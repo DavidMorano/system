@@ -39,9 +39,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<sys/stat.h>		/* |u_stat(3u)| */
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -56,12 +54,12 @@
 #include	<fieldterms.h>
 #include	<vecobj.h>
 #include	<hdb.h>
-#include	<char.h>
 #include	<mkchar.h>
 #include	<strwcpy.h>
 #include	<mkpathx.h>
 #include	<sfx.h>
 #include	<mkpathrooted.h>
+#include	<char.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -93,7 +91,8 @@
 #define	NODEDB_BO(v)		\
 	((NODEDB_KA - ((v) % NODEDB_KA)) % NODEDB_KA)
 
-#define	ARGSMULT		4		/* buffer mulitplier */
+#define	ARGSMULT		4		/* args-buffer mulitplier */
+#define	LINEBUFMULT		4		/* line-buffer multiplier */
 
 #define	KEYALIGNMENT		szof(char *(*)[2])
 
@@ -176,7 +175,8 @@ struct svcentry_key {
 namespace {
     struct vars {
 	int		maxhostlen ;
-	int mkvars() noex ;
+	int		lineslen ;
+	operator int () noex ;
     } ; /* end struct (vars) */
 }
 
@@ -554,10 +554,11 @@ static int nodedb_fileparse(nodedb *op,int fi) noex {
 /* end subroutine (nodedb_fileparse) */
 
 static int nodedb_fileparser(nodedb *op,nodedb_f *fep,int fi) noex {
+    	cint		lsz = var.lineslen ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf{} ; (rs = uc_malloc(lsz,&lbuf)) >= 0) {
 	    bfile	loadfile, *lfp = &loadfile ;
 	    cint	llen = rs ;
 	    if ((rs = bopen(lfp,fep->fname,"r",0664)) >= 0) {
@@ -1078,15 +1079,6 @@ static int freeit(cchar **pp) noex {
 }
 /* end subroutine (freeit) */
 
-static int mkinit() noex {
-    	int		rs ;
-	if ((rs = var.mkvars()) >= 0) {
-	    rs = mkterms() ;
-	}
-	return rs ;
-}
-/* end subroutine (mkinit) */
-
 static int mkterms() noex {
 	int		rs ;
 	if ((rs = fieldterms(fterms,false,'\b','\t','\v','\f',' ')) >= 0) {
@@ -1098,14 +1090,26 @@ static int mkterms() noex {
 }
 /* end subroutine (mkterms) */
 
-int vars::mkvars() noex {
+vars::operator int () noex {
     	int		rs ;
 	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
 	    maxhostlen = rs ;
+	    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
+		lineslen = ((rs + 1) * LINEBUFMULT) ;
+	    }
 	}
 	return rs ;
 }
-/* end method (vars::mkvars) */
+/* end method (vars::operator) */
+
+static int mkinit() noex {
+    	int		rs ;
+	if ((rs = var) >= 0) {
+	    rs = mkterms() ;
+	}
+	return rs ;
+}
+/* end subroutine (mkinit) */
 
 static int cmpfne(nodedb_f *e1p,nodedb_f *e2p) noex {
 	int		rc = 0 ;

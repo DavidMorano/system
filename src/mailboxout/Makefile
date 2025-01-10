@@ -112,7 +112,7 @@ INCS= config.h defs.h
 
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o
 OBJ01= 
-OBJ02= expander.o progmsgs.o progdeliver.o copyparts.o
+OBJ02= expander.o progmsgs.o progdeliver.o
 OBJ03= mailspooldir.o lkmail.o headkeymat.o mkmsgid.o
 OBJ04= emainfo.o msgid.o msgide.o
 OBJ05= getfname.o
@@ -121,8 +121,8 @@ OBJ07= printhelp.o
 OBJ08=
 OBJ09= initnow.o
 OBJ10=
-OBJ11= msgmatenv.o msg.o msgheaders.o dater.o tmz.o
-OBJ12= logzones.o recip.o
+OBJ11=
+OBJ12=
 OBJ13=
 OBJ14=
 OBJ15=
@@ -236,42 +236,14 @@ copyparts.o:		copyparts.c $(INCS)
 mkmsgid.o:		mkmsgid.c $(INCS)
 
 
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-emainfo.o:		emainfo.c emainfo.h
-
 msgmatenv.o:		msgmatenv.c msgmatenv.h
 
 msg.o:			msg.c msg.h msgmatenv.h
 
 msgheaders.o:		msgheaders.c msgheaders.h
 
-getfname.o:		getfname.c getfname.h
-
 lkmail.o:		lkmail.c lkmail.h
 
-mapstrint.o:		mapstrint.c mapstrint.h
-
-logfile.o:		logfile.c logfile.h
-
-logzones.o:		logzones.c logzones.h
-
-dater.o:		dater.c dater.h
-
 tmz.o:			tmz.c tmz.h
-
-msgid.o:		msgid.c msgid.h msgide.h
-
-msgide.o:		msgide.c msgide.h
-
-vecobj.o:		vecobj.c vecobj.h lookaside.h
-
-lookaside.o:		lookaside.c lookaside.h pq.h
-
-pq.o:			pq.c pq.h
-
-recip.o:		recip.c recip.h
 
 

@@ -232,8 +232,6 @@ mkmsgid.o:		mkmsgid.c $(INCS)
 
 boxer.o:		boxer.c $(INCS) lkmail.h
 
-copyparts.o:		copyparts.c $(INCS)
-
 out.o:			out.c $(INCS)
 
 mailnotify.o:		mailnotify.c $(INCS) mcmsg.h
@@ -247,69 +245,11 @@ msgheadkey.o:		msgheadkey.c
 headkeymat.o:		headkeymat.c
 
 
-recip.o:		recip.c recip.h
-
-
-getfname.o:		getfname.c getfname.h
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-vecstr.o:		vecstr.c vecstr.h
-
-emainfo.o:		emainfo.c emainfo.h
-
-ema.o:			ema.c ema.h
-
-matenv.o:		matenv.c matenv.h
-
-msg.o:			msg.c msg.h matenv.h
-
-msgheaders.o:		msgheaders.c msgheaders.h
-
 lkmail.o:		lkmail.c lkmail.h
-
-mapstrint.o:		mapstrint.c mapstrint.h
-
-logfile.o:		logfile.c logfile.h
-
-logzones.o:		logzones.c logzones.h
-
-dater.o:		dater.c dater.h tmz.h comparse.h
-
-comparse.o:		comparse.c comparse.h
-
-tmz.o:			tmz.c tmz.h
-
-msgid.o:		msgid.c msgid.h msgide.h
-
-msgide.o:		msgide.c msgide.h
-
-vecobj.o:		vecobj.c vecobj.h lookaside.h
-
-lookaside.o:		lookaside.c lookaside.h pq.h
-
-pq.o:			pq.c pq.h
-
-ids.o:			ids.c ids.h
-
-sbuf.o:			sbuf.c sbuf.h
-
-splitaddr.o:		splitaddr.c splitaddr.h
-
-whitelist.o:		whitelist.c whitelist.h splitaddr.h
-
-received.o:		received.c received.h mhcom.h
-
-mhcom.o:		mhcom.c mhcom.h
 
 densitydb.o:		densitydb.c densitydb.h densitydbe.h
 
 densitydbe.o:		densitydbe.c densitydbe.h
-
-keyopt.o:		keyopt.c keyopt.h
 
 
 pcsconf.o:		pcsconf.c pcsconf.h

@@ -141,18 +141,18 @@ OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o
 OBJ01= 
 OBJ02= configfile.o checklockfile.o varsub_extras.o expander.o watch.o
 OBJ03= handle.o process.o mailenter.o
-OBJ04= ldebug.o varsub_dumpfd.o
+OBJ04= ldebug.o
 OBJ05= 
 OBJ06= procfileenv.o
 OBJ07= printhelp.o 
 OBJ08=
-OBJ09= cksum.o
-OBJ10= recipient.o address.o
-OBJ11= bopenroot.o getfname.o
+OBJ09=
+OBJ10=
+OBJ11=
 OBJ12=
 OBJ13=
 OBJ14=
-OBJ15= outbuf.o
+OBJ15=
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 
 OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
@@ -274,18 +274,5 @@ process.o:		process.c $(INCS)
 mailenter.o:		mailenter.c $(INCS)
 
 configfile.o:		configfile.c configfile.h
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-vecstr.o:		vecstr.c vecstr.h
-
-recipient.o:		recipient.c recipient.h
-
-address.o:		address.c address.h
-
-outbuf.o:		outbuf.c outbuf.h
 
 

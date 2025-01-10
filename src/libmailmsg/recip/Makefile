@@ -1,6 +1,6 @@
-# MAKEFILES (tmpx)
+# MAKEFILES (recip)
 
-T= tmpx
+T= recip
 
 ALL= $(T).o
 
@@ -17,7 +17,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gxx
+CXX		?= gpp
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -31,16 +31,16 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= tmpx.h
+INCS += recip.h
 
-LIBS=
+LIBS +=
 
 
-INCDIRS=
+INCDIRS +=
 
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS += -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
@@ -55,16 +55,13 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_TMPX= tmpx_main.o tmpx_obj.o
-OBJ1_TMPX= tmpx_getboottime.o
-OBJ2_TMPX= tmpx_getrunlevel.o
-OBJ3_TMPX= tmpx_getuserlines.o tmpx_getuserterms.o
-OBJ4_TMPX= tmpx_getsessions.o
+OBJ0= recip_main.o recip_copyparts.o
+OBJ1=
 
-OBJA_TMPX= obj0_tmpx.o obj1_tmpx.o
-OBJB_TMPX= obj2_tmpx.o obj3_tmpx.o obj4_tmpx.o
+OBJA= obj0.o 
+OBJB=
 
-OBJ_TMPX= $(OBJA_TMPX) $(OBJB_TMPX)
+OBJ= obja.o
 
 
 .SUFFIXES:		.hh .ii
@@ -94,8 +91,8 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 
-$(T).o:			$(OBJ_TMPX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_TMPX)
+$(T).o:			$(OBJ)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -106,7 +103,7 @@ $(T).order:		$(OBJ) $(T).a
 	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
-	rm -f $(ALL)
+	$(RM) $(ALL)
 
 clean:
 	makeclean $(ALL)
@@ -115,27 +112,33 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_tmpx.o:	$(OBJ0_TMPX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_TMPX)
+obj0.o:			$(OBJ0)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
 
-obj1_tmpx.o:	$(OBJ1_TMPX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_TMPX)
+obj1.o:			$(OBJ1)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
 
-obj2_tmpx.o:	$(OBJ2_TMPX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_TMPX)
+obj2.o:			$(OBJ2)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
 
-obj3_tmpx.o:	$(OBJ3_TMPX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_TMPX)
+obj3.o:			$(OBJ3)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
 
-obj4_tmpx.o:	$(OBJ4_TMPX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_TMPX)
+obj4.o:			$(OBJ4)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+
+obj5.o:			$(OBJ5)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-tmpx_main.o:		tmpx_main.cc		$(INCS)
-tmpx_getboottime.o:	tmpx_getboottime.cc	$(INCS)
-tmpx_getrunlevel.o:	tmpx_getrunlevel.cc	$(INCS)
-tmpx_getuserlines.o:	tmpx_getuserlines.cc	$(INCS)
-tmpx_getuserterms.o:	tmpx_getuserterms.cc	$(INCS)
-tmpx_getsessions.o:	tmpx_getsessions.cc	$(INCS)
+obja.o:			$(OBJA)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+
+
+recip_main.o:		recip_main.cc		$(INCS)
+recip_copyparts.o:	recip_copyparts.cc	$(INCS)
 
 

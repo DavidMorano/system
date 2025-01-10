@@ -139,19 +139,19 @@ OBJ02= progmsgs.o progprinthdr.o progmsgid.o progcomsat.o
 OBJ03= progexpand.o prognamecache.o
 OBJ04= progdeliver.o progboxer.o 
 OBJ05=
-OBJ06= parsenodespec.o recipcopyparts.o
+OBJ06= parsenodespec.o
 OBJ07= printhelp.o 
 
 OBJ08=
-OBJ09= vecobj_recip.o
+OBJ09=
 OBJ10= 
-OBJ11= recip.o mcmsg.o outline.o
-OBJ12= lookaddr.o
-OBJ13= mailspool.o
+OBJ11= mcmsg.o outline.o
+OBJ12=
+OBJ13=
 OBJ14= 
 OBJ15= 
 
-OBJ16= received.o mhcom.o
+OBJ16=
 OBJ17= whitelist.o splitaddr.o bfliner.o
 OBJ18= emainfo.o msgid.o msgide.o lkmail.o ema.o
 OBJ19= logzones.o dater.o comparse.o tmz.o
@@ -304,8 +304,6 @@ mkenvfrom.o:		mkenvfrom.c $(INCS)
 
 mailspooldir.o:		mailspooldir.c $(INCS)
 
-recipcopyparts.o:	recipcopyparts.c $(INCS)
-
 parsenodespec.o:	parsenodespec.c $(INCS)
 
 trailaddr.o:		trailaddr.c
@@ -318,51 +316,11 @@ headkeymat.o:		headkeymat.c
 pcstrustuser.o:		pcstrustuser.c
 
 
-recip.o:		recip.c recip.h
-
 outline.o:		outline.c outline.h
 
 mcmsg.o:		mcmsg.c mcmsg.h
 
-bfliner.o:		bfliner.c bfliner.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-vecstr.o:		vecstr.c vecstr.h
-
-vecobj.o:		vecobj.c vecobj.h
-
-vecobj_recip.o:		vecobj_recip.c recip.h
-
-mailmsg_loadfile:	mailmsg_loadfile.c mailmsg.h
-
-emainfo.o:		emainfo.c emainfo.h
-
-ema.o:			ema.c ema.h
-
-mailmsghdrs.o:		mailmsghdrs.c mailmsghdrs.h mailmsg.h
-
-mailmsg.o:		mailmsg.c mailmsg.h mailmsgmatenv.h
-
-mailmsg_loadfile.o:	mailmsg_loadfile.c mailmsg.h
-
-mailmsg_enver.o:	mailmsg_enver.c mailmsg.h mailmsg_enver.h
-
-mailmsgmatenv.o:	mailmsgmatenv.c mailmsgmatenv.h
-
 lkmail.o:		lkmail.c lkmail.h
-
-mapstrint.o:		mapstrint.c mapstrint.h
-
-logfile.o:		logfile.c logfile.h
-
-logzones.o:		logzones.c logzones.h
-
-dater.o:		dater.c dater.h tmz.h comparse.h
-
-comparse.o:		comparse.c comparse.h
 
 tmz.o:			tmz.c tmz.h
 
@@ -370,23 +328,7 @@ msgid.o:		msgid.c msgid.h msgide.h
 
 msgide.o:		msgide.c msgide.h
 
-vecobj.o:		vecobj.c vecobj.h lookaside.h
-
 lookaside.o:		lookaside.c lookaside.h pq.h
-
-pq.o:			pq.c pq.h
-
-ids.o:			ids.c ids.h
-
-sbuf.o:			sbuf.c sbuf.h
-
-splitaddr.o:		splitaddr.c splitaddr.h
-
-whitelist.o:		whitelist.c whitelist.h splitaddr.h
-
-received.o:		received.c received.h mhcom.h
-
-mhcom.o:		mhcom.c mhcom.h
 
 densitydb.o:		densitydb.c densitydb.h densitydbe.h
 

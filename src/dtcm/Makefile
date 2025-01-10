@@ -124,11 +124,11 @@ OBJ01=
 OBJ02= havemsg.o
 OBJ03= headkeymat.o
 OBJ04=
-OBJ05= address.o recipient.o 
+OBJ05=
 OBJ06= systems.o dialer.o cm.o
 OBJ07= printhelp.o 
 OBJ08=
-OBJ09= hostaddr.o nifinfo.o
+OBJ09= nifinfo.o
 OBJ10=
 OBJ11=
 OBJ12=
@@ -234,60 +234,10 @@ dialer.o:		dialer.c dialer.h
 cm.o:			cm.c cm.h dialer.h systems.h
 
 
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-streamsync.o:		streamsync.c streamsync.h
-
-envlist.o:		envlist.c envlist.h
-
-hdb.o:			hdb.c hdb.h
-
-lookaside.o:		lookaside.c lookaside.h
-
-pq.o:			pq.c pq.h
-
-hdbstr.o:		hdbstr.c hdbstr.h
-
-hdbstr_loadfile.o:	hdbstr_loadfile.c
-
-msfile.o:		msfile.c msfile.h msfilee.h msflag.h
-
-msfilee.o:		msfilee.c msfilee.h
-
-mapstrint.o:		mapstrint.c mapstrint.h
-
-mkcexsync.o:		mkcexsync.c mkcexsync.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h kvsfile.h
-
-svctab.o:		svctab.c svctab.h
-
-strstore.o:		strstore.c strstore.h
-
-serialbuf.o:		serialbuf.c serialbuf.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-buffer.o:		buffer.c buffer.h
-
 havemsg.o:		havemsg.c havemsg.h
-
-recipient.o:		recipient.c recipient.h
-
-hostaddr.o:		hostaddr.c hostaddr.h
-
-
-nifinfo.o:		nifobj.o ifaddrlist.o nifinfo.map
-	$(LD) -r -o $@ -B reduce -M $(*).map nifobj.o ifaddrlist.o
 
 nifobj.o:		nifobj.c ifaddrlist.h nifinfo.h
 
 ifaddrlist.o:		ifaddrlist.c ifaddrlist.h
-
-address.o:		address.c address.h
 
 

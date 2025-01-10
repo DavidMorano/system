@@ -44,6 +44,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<utmpx.h>		/* |UTMPX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<storeitem.h>
@@ -55,8 +58,8 @@
 
 /* local defines */
 
-#define	FENT		UTMPFENT
-#define	CFENT		const UTMPFENT
+#define	FENT		UTMPX
+#define	CFENT		const UTMPX
 
 #define	SI		storeitem
 

@@ -55,7 +55,7 @@ EXTERNC_begin
 extern int deffile_open(deffile *,cchar *) noex ;
 extern int deffile_curbegin(deffile *,deffile_cur *) noex ;
 extern int deffile_curend(deffile *,deffile_cur *) noex ;
-extern int deffile_enum(deffile *,deffile_cur *,char *,int,cchar **) noex ;
+extern int deffile_curenum(deffile *,deffile_cur *,char *,int,cchar **) noex ;
 extern int deffile_fetch(deffile *,cchar *,cchar **) noex ;
 extern int deffile_close(deffile *) noex ;
 

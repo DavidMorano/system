@@ -1,14 +1,14 @@
-/* progboxer */
+/* progboxer SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* delivers mail messages (data) to a mailbox */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug prints */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
+#define	CF_UGETPW	1		/* use |ucgetpw(3uc)| */
 #define	CF_TESTSLEEP	0		/* test sleep mode */
-
 
 /* revision history:
 
@@ -21,48 +21,45 @@
 
 /*******************************************************************************
 
-        This subroutine is used to deliver mail to a mailbox file for a given
-        recipient. That file is located in the mail directory area of the given
-        recipient user.
+  	Name:
+	progboxer
+
+	Description:
+	This subroutine is used to deliver mail to a mailbox file
+	for a given recipient. That file is located in the mail
+	directory area of the given recipient user.
 
 	Synopsis:
 
-	int progboxer(pip,tfd,rp)
-	PROGINFO	*pip ;
-	int		tfd ;
-	RECIP		*rp ;
+	int progboxer(proginfo *pip,int tfd,recip *rp) noex
 
 	Arguments:
-
 	pip		program information pointer
 	tfd		file descriptor (FD) to target mailbox file
-	rp		pointer to recipient list container
+	rp		pointer to RECIP list container
 
 	Reuturns:
-
 	>=0		OK
-	<0		error
-
+	<0		error (system-return)[
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<string.h>
+#include	<climits>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
-
 #include	<usystem.h>
+#include	<cucgetpw.h>
 #include	<getbufsize.h>
-#include	<ugetpw.h>
 #include	<getax.h>
 #include	<sbuf.h>
 #include	<bfile.h>
@@ -77,8 +74,8 @@
 /* local defines */
 
 #if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
-#define	GETPW_UID	ugetpw_uid
+#define	GETPW_NAME	ucgetpw_name
+#define	GETPW_UID	ucgetpw_uid
 #else
 #define	GETPW_NAME	getpw_name
 #define	GETPW_UID	getpw_uid
@@ -107,8 +104,7 @@
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	pathadd(char *,int,cchar *) ;
-extern int	recipcopyparts(RECIP *,int,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,USTAT *,int) ;
 extern int	isOneOf(const int *,int) ;
 
 extern int	locinfo_mboxget(LOCINFO *,int,cchar **) ;
@@ -243,7 +239,7 @@ int progboxer(PROGINFO *pip,int tfd,RECIP *rp)
 
 static int progboxer_folder(PROGINFO *pip,cchar *mailfname)
 {
-	struct ustat	sb ;
+	USTAT	sb ;
 	const int	nrs = SR_NOTFOUND ;
 	int		rs ;
 	if ((rs = u_stat(mailfname,&sb)) >= 0) {
@@ -275,7 +271,7 @@ static int boxadd(PROGINFO *pip,int tfd,RECIP *rp,cchar *mailfname)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4)) {
-	        struct ustat	sb ;
+	        USTAT	sb ;
 	        debugprintf("progboxer: tfd u_seek() rs=%d\n",rs) ;
 	        u_fstat(tfd,&sb) ;
 	        debugprintf("progboxer: tfd size=%ld\n",sb.st_size) ;
@@ -303,7 +299,7 @@ static int boxadd(PROGINFO *pip,int tfd,RECIP *rp,cchar *mailfname)
 #endif
 
 	    if (rs >= 0) {
-	        struct ustat	sb ;
+	        USTAT	sb ;
 	        if ((rs = u_fstat(sfd,&sb)) >= 0) {
 	            if (S_ISREG(sb.st_mode)) {
 	                rs = u_seek(sfd,0L,SEEK_END) ;
@@ -340,22 +336,11 @@ static int boxadd(PROGINFO *pip,int tfd,RECIP *rp,cchar *mailfname)
 
 /* do the actual copy according to the specification on this recipient */
 
-#if	CF_DEBUG
-	                if (DEBUGLEVEL(4))
-	                    debugprintf("progboxer: recipcopyparts()\n") ;
-#endif
-
-	                rs = recipcopyparts(rp,tfd,sfd) ;
+	                rs = recip_copyparts(rp,tfd,sfd) ;
 	                tlen += rs ;
-
-#if	CF_DEBUG
-	                if (DEBUGLEVEL(4))
-	                    debugprintf("progboxer: recipcopyparts() rs=%d\n",
-	                        rs) ;
-#endif
-
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    uc_ftruncate(sfd,soff) ;
+			}
 
 	                uc_fsync(sfd) ;
 
@@ -507,7 +492,7 @@ OPENS		*osp ;
 cchar		mailfname[] ;
 int		uid_recip ;
 {
-	struct ustat	sb ;
+	USTAT	sb ;
 	uid_t		euid ;
 	gid_t		egid ;
 	int		rs = SR_ACCESS ;

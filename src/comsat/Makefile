@@ -140,7 +140,7 @@ OBJ10= tmpx.o tmpx_getuserlines.o
 OBJ11= mailmsg.o mailmsg_loadfd.o
 OBJ12= spawner.o
 OBJ13= uiconv.o
-OBJ14= comsatmsg.o
+OBJ14=
 OBJ15= dispatcher.o
 
 OBJ16= pcsgetprogpath.o prgetprogpath.o
@@ -268,9 +268,6 @@ proglog.o:		proglog.c proglog.h $(INCS)
 
 csro.o:			csro.c csro.h
 
-comsatmsg.o:		comsatmsg.c comsatmsg.h
-
-
 getutmpent.o:		getutmpent.c getutmpent.h
 
 spawnproc.o:		spawnproc.c spawnproc.h
@@ -291,8 +288,6 @@ ipasswd.o:		ipasswd.c ipasswd.h
 lastlogfile.o:		lastlogfile.c lastlogfile.h
 
 tmpx.o:			tmpx.c tmpx.h
-
-tmpx_getuserlines.o:	tmpx_getuserlines.c tmpx.h
 
 csr.o:			csr.c csr.h
 

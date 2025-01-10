@@ -67,6 +67,7 @@
 #include	<ucsys.h>
 #include	<ucent.h>
 #include	<ucget.h>
+#include	<ucenum.h>
 #include	<ucuserattr.h>
 #include	<uclibmemalloc.h>
 #include	<ucmemalloc.h>
@@ -148,7 +149,6 @@ extern int	uc_truncate(cchar *,off_t) noex ;
 /* use group */
 extern int	uc_fcntl(int,int,...) noex ;
 extern int	uc_ioctl(int,int,...) noex ;
-extern int	uc_tell(int,off_t *) noex ;
 extern int	uc_fpassfd(int,int) noex ;
 extern int	uc_ftruncate(int,off_t) noex ;
 extern int	uc_fstat(int,USTAT *) noex ;
@@ -163,6 +163,8 @@ extern int	uc_fminmod(int,mode_t) noex ;
 extern int	uc_fsize(int) noex ;
 extern int	uc_fuid(int) noex ;
 extern int	uc_fgid(int) noex ;
+extern int	uc_seek(int,off_t,int) noex ;
+extern int	uc_tell(int,off_t *) noex ;
 extern int	uc_rewind(int) noex ;
 
 extern int	uc_bind(int,void *,int) noex ;

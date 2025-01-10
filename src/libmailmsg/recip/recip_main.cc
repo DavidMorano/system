@@ -1,4 +1,4 @@
-/* recip SUPPORT */
+/* recip_main SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 

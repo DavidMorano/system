@@ -79,7 +79,6 @@
 /* external subroutines */
 
 extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	recipcopyparts(RECIP *,int,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
@@ -204,22 +203,13 @@ static int progdeliverer(proginfo *pip,int tfd,RECIP *rp,cc *md,int f) noex {
 		    if ((rs = progdeliver_lockinfo(pip,&ms)) >= 0) {
 			if ((rs = u_seek(mfd,0L,SEEK_END)) >= 0) {
 			    if ((rs = progdeliver_mbo(pip,rp,rs,f)) >= 0) {
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("progdeliverer: mailspool_lockinfo() rs=%d\n",rs) ;
-#endif
-			        rs = recipcopyparts(rp,tfd,mfd) ;
+			        rs = recip_copyparts(rp,tfd,mfd) ;
 			        tlen = rs ;
-
 				if (rs < 0) {
 	    			    cchar	*fmt ;
 				    fmt = "recipcopypars (%d)" ;
 	    			    proglog_printf(pip,fmt,rs) ;
 				}
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("progdeliverer: recipcopyparts() rs=%d\n",rs) ;
-#endif
 			    } /* end if (progdeliver_mbo) */
 			} /* end if (u_seek) */
 		    } /* end if (progdeliver_lockinfo) */

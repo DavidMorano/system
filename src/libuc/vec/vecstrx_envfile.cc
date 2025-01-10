@@ -124,7 +124,7 @@ namespace {
     constexpr char eword::p[] = WORDEXPORT ;
     struct vars {
 	int		linebuflen ;
-	int mkvars() noex ;
+	operator int () noex ;
     } ;
 }
 
@@ -138,8 +138,8 @@ static int	mkterms() noex ;
 
 /* local variables */
 
-static char		fterms[fieldterms_termsize] ;
 static vars		var ;
+static char		fterms[fieldterms_termsize] ;
 
 
 /* exported variables */
@@ -168,11 +168,10 @@ int vecstrx::envfile(cchar *fname) noex {
 /* local subroutines */
 
 int vecstrx_envfiler(vecstrx *op,cchar *fname) noex {
-	subinfo		si(op,fterms) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-        if ((rs = si.start()) >= 0) {
+	if (subinfo si(op,fterms) ; (rs = si.start()) >= 0) {
             cmode   om = 0666 ;
             cint    of = O_RDONLY ;
             cint    to_open = utimeout[uto_open] ;
@@ -297,19 +296,19 @@ static int mkterms() noex {
 }
 /* end subroutine (mkterms) */
 
-int vars::mkvars() noex {
+vars::operator int () noex {
 	int		rs ;
 	if ((rs = ucmaxline) >= 0) {
 	    var.linebuflen = (rs * LINEBUFMULT) ;
 	}
 	return rs ;
 }
-/* end subroutine (vars::mkvars) */
+/* end subroutine (vars::operator) */
 
 static int mkinit() noex {
     	int		rs ;
 	if ((rs = mkterms()) >= 0) {
-	    rs = var.mkvars() ;
+	    rs = var ;
 	}
 	return rs ;
 }

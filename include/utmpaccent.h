@@ -28,19 +28,10 @@
 #include	<usysrets.h>
 
 
-#ifndef	UTMPFENT
-#define	UTMPFENT		struct utmpx
-#endif
-
-#ifndef	CUTMPFENT
-#define	CUTMPFENT		const struct utmpx
-#endif
-
 #define	UTMPACCENT		struct utmpaccent_s
 #define	CUTMPACCENT		const struct utmpaccent_s
 
-#define	UTMPACCENT_BUFLEN	332
-
+/* entry types */
 #ifndef	UTMPACCENT_TEMPTY
 #define	UTMPACCENT_TEMPTY	0	/* entry is unused */
 #define	UTMPACCENT_TRUNLEVEL	1
@@ -54,7 +45,7 @@
 #define	UTMPACCENT_TACCOUNT	9	/* used in WTMPX only? */
 #define	UTMPACCENT_TSIGNATURE	10	/* used in WTMPX only? */
 #endif /* UTMPACCENT_TEMPTY */
-
+ /* entry field lengths */
 #ifndef	UTMPACCENT_LID
 #define	UTMPACCENT_LID		4
 #define	UTMPACCENT_LUSER	32
@@ -82,7 +73,7 @@ typedef CUTMPACCENT	cutmpaccent ;
 
 EXTERNC_begin
 
-extern int utmpaccent_load(utmpaccent *,char *,int,CUTMPFENT *) noex ;
+extern int utmpaccent_load(utmpaccent *,char *,int,CUTMPX *) noex ;
 extern int utmpaccent_size(cutmpaccent *) noex ;
 
 EXTERNC_end

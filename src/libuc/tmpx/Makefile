@@ -59,7 +59,7 @@ OBJ0_TMPX= tmpx_main.o tmpx_obj.o
 OBJ1_TMPX= tmpx_getboottime.o
 OBJ2_TMPX= tmpx_getrunlevel.o
 OBJ3_TMPX= tmpx_getuserlines.o tmpx_getuserterms.o
-OBJ4_TMPX= tmpx_sessions.o
+OBJ4_TMPX= tmpx_getsessions.o
 
 OBJA_TMPX= obj0_tmpx.o obj1_tmpx.o
 OBJB_TMPX= obj2_tmpx.o obj3_tmpx.o obj4_tmpx.o
@@ -136,6 +136,6 @@ tmpx_getboottime.o:	tmpx_getboottime.cc	$(INCS)
 tmpx_getrunlevel.o:	tmpx_getrunlevel.cc	$(INCS)
 tmpx_getuserlines.o:	tmpx_getuserlines.cc	$(INCS)
 tmpx_getuserterms.o:	tmpx_getuserterms.cc	$(INCS)
-tmpx_sessions.o:	tmpx_sessions.cc	$(INCS)
+tmpx_getsessions.o:	tmpx_getsessions.cc	$(INCS)
 
 

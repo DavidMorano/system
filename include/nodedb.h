@@ -13,10 +13,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
-#include	<netdb.h>
 #include	<usystem.h>		/* for |ino_t| */
 #include	<vecobj.h>
 #include	<hdb.h>
@@ -27,13 +23,8 @@
 #define	NODEDB_CUR		struct nodedb_cursor
 #define	NODEDB_ENT		struct nodedb_entry
 
-#define	NODEDB_LSVC		NODENAMELEN
-#define	NODEDB_LCLU		NODENAMELEN
-#define	NODEDB_LSYS		NODENAMELEN
-
 #define	NODEDB_NFILES		3
 #define	NODEDB_DEFENTS		10
-#define	NODEDB_ENTLEN		(3 * NODENAMELEN)
 
 
 struct nodedb_cursor {

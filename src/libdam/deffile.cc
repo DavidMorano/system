@@ -210,7 +210,7 @@ int deffile_fetch(DF *op,cchar *key,cchar **rpp) noex {
 }
 /* end subroutine (deffile_fetch) */
 
-int deffile_enum(DF *op,DF_CUR *curp,char *kbuf,int klen,cchar **rpp) noex {
+int deffile_curenum(DF *op,DF_CUR *curp,char *kbuf,int klen,cchar **rpp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	if ((rs = deffile_magic(op,curp,kbuf)) >= 0) {
@@ -242,7 +242,7 @@ int deffile_enum(DF *op,DF_CUR *curp,char *kbuf,int klen,cchar **rpp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
 }
-/* end subroutine (deffile_enum) */
+/* end subroutine (deffile_curenum) */
 
 int deffile_checkint(DF *op,int intcheck) noex {
     	int		rs ;

@@ -219,10 +219,6 @@ whatinfo.o:		whatinfo.c config.h
 
 proginfo.o:		proginfo.c $(INCS)
 
-
-comsatmsg.o:		comsatmsg.c comsatmsg.h
-
-
 printhelp.o:		printhelp.c
 
 udomain.o:		udomain.c

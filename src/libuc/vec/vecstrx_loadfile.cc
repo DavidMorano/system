@@ -57,14 +57,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
+#include	<sys/stat.h>		/* |uc_fstat(3uc)| */
 #include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<fcntl.h>		/* |uc_open(3uc)| */
+#include	<climits>		/* <- |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
@@ -79,12 +78,11 @@
 /* local defines */
 
 #define	LINEBUFMULT	5		/* line-buffer size multiplier */
+#define	DEFBUFLEN	1024
 
 #ifndef	FD_STDIN
 #define	FD_STDIN	0
 #endif
-
-#define	DEFBUFLEN	1024
 
 #define	TO_READ		-1		/* read timeout */
 
@@ -111,7 +109,7 @@ using std::nothrow ;			/* constant */
 namespace {
     struct vars {
         int	linebuflen ;
-	int mkvars() noex ;
+	operator int () noex ;
     } ;
 }
 
@@ -144,7 +142,7 @@ int vecstrx::loadfile(int fu,cchar *fname) noex {
 	    if (fname[0]) {
 	        static cint	rst = mkterms() ;
 	        if ((rs = rst) >= 0) {
-	            static cint		rsv = var.mkvars() ;
+	            static cint		rsv = var ;
 	            if ((rs = rsv) >= 0) {
 			rs = vecstrx_loadfiler(this,fu,fname) ;
 			c = rs ;
@@ -188,7 +186,7 @@ static int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
 	    csize	fsz = size_t(sb.st_size) ;
 	    rs = SR_ISDIR ;
 	    if (! S_ISDIR(sb.st_mode)) {
@@ -255,13 +253,13 @@ static int mkterms() noex {
 }
 /* end subroutine (mkterms) */
 
-int vars::mkvars() noex {
+vars::operator int () noex {
         int             rs ;
         if ((rs = ucmaxline) >= 0) {
             var.linebuflen = (rs * LINEBUFMULT) ;
         }
         return rs ;
 }       
-/* end subroutine (vars::mkvars) */
+/* end subroutine (vars::operator) */
 
 

@@ -57,6 +57,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>		/* for |getsid(3c)| */
+#include	<utmpx.h>
 #include	<climits>
 #include	<csignal>		/* |sig_atomic_t| */
 #include	<cstddef>		/* |nullptr_t| */
@@ -297,7 +298,7 @@ int utmpacc_extract(int fd) noex {
 }
 
 struct utmpacc_icur {
-	UTMPFENT	*utmpfentp ;
+	UTMPX		*utmpfentp ;
 	filer		fb ;
 	uint		magic ;
 	int		fd ;
@@ -310,22 +311,26 @@ int utmpacc_curbegin(utmpacc_cur *curp) noex {
 	    cint	csz = szof(utmpacc_icur) ;
 	    curp->icursor = nullptr ;
 	    if (void *vp{} ; (rs = uc_malloc(csz,&vp)) >= 0) {
-		cint		usz = szof(UTMPFENT) ;
+		cint		usz = szof(UTMPX) ;
 	        utmpacc_icur	*icurp = (utmpacc_icur *) vp ;
 		memclear(icurp) ;
 		if ((rs = uc_malloc(usz,&vp)) >= 0) {
-		    UTMPFENT	*ufp = (UTMPFENT *) vp ;
+		    UTMPX	*ufp = (UTMPX *) vp ;
 		    cint	of = (O_CLOEXEC | O_MINFD) ;
 		    cmode	om = 0664 ;
 		    if ((rs = opentmp(np,of,om)) >= 0) {
-		        filer	*fbp = &icurp->fb ;
 		        cint	fd = rs ;
-		        if ((rs = filer_start(fbp,fd,0z,0,0)) >= 0) {
-			    icurp->utmpfentp = ufp ;
-			    icurp->fd = fd ;
-			    icurp->magic = UTMPACC_CURMAGIC ;
-			    curp->icursor = icurp ;
-		        } /* end if (filer_start) */
+			if ((rs = utmpacc_extract(fd)) >= 0) {
+			    if ((rs = u_rewind(fd)) >= 0) {
+		                filer	*fbp = &icurp->fb ;
+		                if ((rs = fbp->start(fd,0z,0,0)) >= 0) {
+			            icurp->utmpfentp = ufp ;
+			            icurp->fd = fd ;
+			            icurp->magic = UTMPACC_CURMAGIC ;
+			            curp->icursor = icurp ;
+		                } /* end if (filer_start) */
+			    } /* end if (u_rewind) */
+			} /* end if (utmpacc_extract) */
 		        if (rs < 0) {
 			    uc_close(fd) ;
 		        }
@@ -354,10 +359,10 @@ int utmpacc_curenum(utmpacc_cur *curp,utmpacc_ent *ep,char *eb,int el) noex {
 	    if (icurp) {
 	        rs = SR_BADFMT ;
 		if (icurp->magic == UTMPACC_CURMAGIC) {
-		    cint	usz = szof(UTMPFENT) ;
+		    cint	usz = szof(UTMPX) ;
 		    filer	*fbp = &icurp->fb ;
-		    UTMPFENT	*ufp = icurp->utmpfentp ;
-		    if ((rs = filer_read(fbp,ufp,usz,-1)) >= 0) {
+		    UTMPX	*ufp = icurp->utmpfentp ;
+		    if ((rs = fbp->read(ufp,usz,-1)) >= 0) {
 			rs = utmpaccent_load(ep,eb,el,ufp) ;
 		        len = rs ;
 		    }
@@ -378,7 +383,7 @@ int utmpacc_curend(utmpacc_cur *curp) noex {
 		if (icurp->magic == UTMPACC_CURMAGIC) {
 		    {
 		        filer	*fbp = &icurp->fb ;
-			rs1 = filer_finish(fbp) ;
+			rs1 = fbp->finish ;
 			if (rs >= 0) rs = rs1 ;
 		    }
 		    if (icurp->fd >= 0) {
@@ -761,14 +766,18 @@ int utmpacc::stats(utmpacc_sb *usp) noex {
 int utmpacc::extract(int fd) noex {
 	int		rs = SR_BADF ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		wlen = 0 ;
 	if (fd >= 0) {
 	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {
-			    rs = getextract(fd) ;
-			    len = rs ;
+			    {
+			        rs = getextract(fd) ;
+			        wlen = rs ;
+			    }
+			    rs1 = u_rewind(fd) ;
+			    if (rs >= 0) rs = rs1 ;
 	                } /* end if */
 	                rs1 = capend ;
 	                if (rs >= 0) rs = rs1 ;
@@ -778,7 +787,7 @@ int utmpacc::extract(int fd) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sigblock) */
 	} /* end if (valid) */
-	return (rs >= 0) ? len : rs ;
+	return (rs >= 0) ? wlen : rs ;
 }
 /* end method (utmpacc::extract) */
 

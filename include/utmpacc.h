@@ -50,8 +50,6 @@
 #define	UTMPACC_ENT		UTMPACCENT
 #define	UTMPACC_SB		struct utmpacc_statistics
 #define	UTMPACC_CUR		struct utmpacc_cursor
-#define	UTMPACC_BUFLEN		332	/* large enough for all fields */
-#define	UTMPACC_MAX		20
 #define	UTMPACC_TTL		(20*60)
 #define	UTMPACC_CURMAGIC	0x97635148
 
@@ -62,7 +60,7 @@
 #else
 #define	UTMPACC_DEFUTMP	"/var/run/utmpx"
 #endif
-
+/* entry types */
 #ifndef	UTMPACC_TEMPTY
 #define	UTMPACC_TEMPTY		UTMPACCENT_TEMPTY
 #define	UTMPACC_TRUNLEVEL	UTMPACCENT_TRUNLEVEL
@@ -76,7 +74,7 @@
 #define	UTMPACC_TACCOUNT	UTMPACCENT_TACCOUNT
 #define	UTMPACC_TSIGNATURE	UTMPACCENT_TSIGNATURE
 #endif /* UTMPACC_TEMPTY */
-
+/* entry field lengths */
 #ifndef	UTMPACC_LID
 #define	UTMPACC_LID		4
 #define	UTMPACC_LUSER		32

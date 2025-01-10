@@ -34,10 +34,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
-#include	<fcntl.h>
+#include	<fcntl.h>		/* |uc_open(3c)| */
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -105,9 +104,8 @@ int vecstrx::loadgrusers(gid_t sgid) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (this) {
-	    subinfo	si ;
 	    if (numsign(sgid)) sgid = getgid() ;
-	    if ((rs = si.start(this,sgid)) >= 0) {
+	    if (subinfo si ; (rs = si.start(this,sgid)) >= 0) {
 		{
 	            rs = si.pwmapload() ;
 	            c = rs ;

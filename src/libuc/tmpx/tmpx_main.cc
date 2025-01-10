@@ -30,7 +30,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
@@ -163,19 +162,19 @@ int tmpx_close(tmpx *op) noex {
 int tmpx_write(tmpx *op,int ei,tmpx_ent *ep) noex {
 	int		rs ;
 	if ((rs = tmpx_magic(op,ep)) >= 0) {
-	        cint	am = (op->oflags & O_ACCMODE) ;
-	        rs = SR_BADF ;
-	        if ((am == SR_WRONLY) || (am == O_RDWR)) {
-	            if (op->fd < 0) {
-	                rs = tmpx_fileopen(op,0L) ;
-	            }
-	            if (rs >= 0) {
-	                off_t	poff ;
-	                cint	esize = TMPX_ENTSIZE ;
-	                poff = (off_t) (ei * esize) ;
-	                rs = u_pwrite(op->fd,ep,esize,poff) ;
-	            }
-	        } /* end if */
+            cint    am = (op->oflags & O_ACCMODE) ;
+            rs = SR_BADF ;
+            if ((am == SR_WRONLY) || (am == O_RDWR)) {
+                if (op->fd < 0) {
+                    rs = tmpx_fileopen(op,0L) ;
+                }
+                if (rs >= 0) {
+                    off_t   poff ;
+                    cint    esz = TMPX_ENTSIZE ;
+                    poff = (off_t) (ei * esz) ;
+                    rs = u_pwrite(op->fd,ep,esz,poff) ;
+                }
+            } /* end if */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -211,14 +210,14 @@ int tmpx_check(tmpx *op,time_t dt) noex {
 int tmpx_curbegin(tmpx *op,tmpx_cur *curp) noex {
 	int		rs ;
 	if ((rs = tmpx_magic(op,curp)) >= 0) {
-	        curp->i = -1 ;
-	        if (op->ncursors == 0) {
-	            if (op->fd < 0) {
-	                custime	dt = getustime ;
-	                rs = tmpx_filesize(op,dt) ;
-	            } /* end if (opened the file) */
-	        }
-	        if (rs >= 0) op->ncursors += 1 ;
+	    curp->i = -1 ;
+	    if (op->ncursors == 0) {
+	        if (op->fd < 0) {
+	            custime	dt = getustime ;
+	            rs = tmpx_filesize(op,dt) ;
+	        } /* end if (opened the file) */
+	    }
+	    if (rs >= 0) op->ncursors += 1 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -227,8 +226,8 @@ int tmpx_curbegin(tmpx *op,tmpx_cur *curp) noex {
 int tmpx_curend(tmpx *op,tmpx_cur *curp) noex {
 	int		rs ;
 	if ((rs = tmpx_magic(op,curp)) >= 0) {
-	        if (op->ncursors > 0) op->ncursors -= 1 ;
-	        curp->i = -1 ;
+	    if (op->ncursors > 0) op->ncursors -= 1 ;
+	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -238,20 +237,20 @@ int tmpx_curenum(tmpx *op,tmpx_cur *curp,tmpx_ent *ep) noex {
 	int		rs ;
 	int		ei = 0 ;
 	if ((rs = tmpx_magic(op,curp,ep)) >= 0) {
-	        int		en = TMPX_NENTS ;
-	        int		n ;
-	        tmpx_ent	*bp{} ;
-	        ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	        rs = tmpx_mapents(op,ei,en,&bp) ;
-	        n = rs ;
-	        if ((rs >= 0) && (n > 0) && bp) {
-	            if (ep) {
-	                memcpy(ep,bp,TMPX_ENTSIZE) ;
-	            }
-	            curp->i = ei ;
-	        } else {
-	            rs = SR_EOF ;
-	        }
+            int		en = TMPX_NENTS ;
+            int		n ;
+            ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
+            if (tmpx_ent *bp{} ; (rs = tmpx_mapents(op,ei,en,&bp)) >= 0) {
+                n = rs ;
+                if ((n > 0) && bp) {
+                    if (ep) {
+                        memcpy(ep,bp,TMPX_ENTSIZE) ;
+                    }
+                    curp->i = ei ;
+                }
+            } else {
+                rs = SR_EOF ;
+            }
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
 }
@@ -261,32 +260,32 @@ int tmpx_fetchpid(tmpx *op,tmpx_ent *ep,pid_t pid) noex {
 	int		rs ;
 	int		ei = 0 ;
 	if ((rs = tmpx_magic(op,ep)) >= 0) {
-	        if (op->ncursors == 0) {
-	            rs = tmpx_filesize(op,0L) ;
-	        }
-	        if (rs >= 0) {
-	            tmpx_ent	*up ;
-	            cint	en = TMPX_NENTS ;
-	            bool	f = false ;
-	            while ((rs = tmpx_mapents(op,ei,en,&up)) > 0) {
-	                cint	n = rs ;
-	                for (int i = 0 ; i < n ; i += 1) {
-	                    f = (up->ut_type == TMPX_TPROCUSER) ;
-	                    f = f && (up->ut_pid == pid) ;
-	                    if (f)
-	                        break ;
-	                    ei += 1 ;
-	                    up += 1 ;
-	                } /* end for */
-	                if (f) break ;
-	            } /* end while */
-	            if ((rs >= 0) && f && ep) {
-	                memcpy(ep,up,TMPX_ENTSIZE) ;
-	            }
-	            if ((rs == SR_OK) && (! f)) {
-	                rs = SR_SEARCH ;
-	            }
-	        } /* end if (ok) */
+            if (op->ncursors == 0) {
+                rs = tmpx_filesize(op,0L) ;
+            }
+            if (rs >= 0) {
+                tmpx_ent    *up ;
+                cint        en = TMPX_NENTS ;
+                bool        f = false ;
+                while ((rs = tmpx_mapents(op,ei,en,&up)) > 0) {
+                    cint    n = rs ;
+                    for (int i = 0 ; i < n ; i += 1) {
+                        f = (up->ut_type == TMPX_TPROCUSER) ;
+                        f = f && (up->ut_pid == pid) ;
+                        if (f)
+                            break ;
+                        ei += 1 ;
+                        up += 1 ;
+                    } /* end for */
+                    if (f) break ;
+                } /* end while */
+                if ((rs >= 0) && f && ep) {
+                    memcpy(ep,up,TMPX_ENTSIZE) ;
+                }
+                if ((rs == SR_OK) && (! f)) {
+                    rs = SR_SEARCH ;
+                }
+            } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
 }
@@ -296,39 +295,39 @@ int tmpx_fetchuser(tmpx *op,tmpx_cur *curp,tmpx_ent *ep,cchar *name) noex {
 	int		rs ;
 	int		ei = 0 ;
 	if ((rs = tmpx_magic(op,curp,ep,name)) >= 0) {
-	        if (curp) {
-	            ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	        }
-	        if (op->ncursors == 0) {
-	            rs = tmpx_filesize(op,0L) ;
-	        }
-	        if (rs >= 0) {
-	            tmpx_ent	*up ;
-	            cint	esize = TMPX_ENTSIZE ;
-	            cint	en = TMPX_NENTS ;
-	            bool	f = false ;
-	            while ((rs = tmpx_mapents(op,ei,en,&up)) > 0) {
-	                cint	n = rs ;
-	                for (int i = 0 ; i < n ; i += 1) {
-			    cint	ul = TMPX_LUSER ;
-	                    f = isproctype(up->ut_type) ;
-	                    f = f && (strncmp(name,up->ut_user,ul) == 0) ;
-	                    if (f) break ;
-	                    ei += 1 ;
-	                    up += 1 ;
-	                } /* end for */
-	                if (f) break ;
-	            } /* end while */
-	            if ((rs >= 0) && f && ep) {
-	                memcpy(ep,up,esize) ;
-	            }
-	            if ((rs == SR_OK) && (! f)) {
-	                rs = SR_NOTFOUND ;
-	            }
-	            if ((rs >= 0) && (curp != nullptr)) {
-	                curp->i = ei ;
-	            }
-	        } /* end if (ok) */
+            if (curp) {
+                ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
+            }
+            if (op->ncursors == 0) {
+                rs = tmpx_filesize(op,0L) ;
+            }
+            if (rs >= 0) {
+                tmpx_ent    *up ;
+                cint        esz = TMPX_ENTSIZE ;
+                cint        en = TMPX_NENTS ;
+                bool        f = false ;
+                while ((rs = tmpx_mapents(op,ei,en,&up)) > 0) {
+                    cint    n = rs ;
+                    for (int i = 0 ; i < n ; i += 1) {
+                        cint        ul = TMPX_LUSER ;
+                        f = isproctype(up->ut_type) ;
+                        f = f && (strncmp(name,up->ut_user,ul) == 0) ;
+                        if (f) break ;
+                        ei += 1 ;
+                        up += 1 ;
+                    } /* end for */
+                    if (f) break ;
+                } /* end while */
+                if ((rs >= 0) && f && ep) {
+                    memcpy(ep,up,esz) ;
+                }
+                if ((rs == SR_OK) && (! f)) {
+                    rs = SR_NOTFOUND ;
+                }
+                if ((rs >= 0) && (curp != nullptr)) {
+                    curp->i = ei ;
+                }
+            } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
 }
@@ -338,25 +337,25 @@ int tmpx_read(tmpx *op,int ei,tmpx_ent *ep) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = tmpx_magic(op,ep)) >= 0) {
-		rs = SR_INVALID ;
-	        if (ei >= 0) {
-		    rs = SR_OK ;
-	            if (op->ncursors == 0) {
-	                rs = tmpx_filesize(op,0L) ;
-	            }
-	            if (rs >= 0) {
-	                tmpx_ent	*up ;
-	                const int	en = TMPX_NENTS ;
-	                const int	esize = TMPX_ENTSIZE ;
-	                if ((rs = tmpx_mapents(op,ei,en,&up)) > 0) {
-		            if (up != nullptr) {
-		                f = true ;
-	                        if (ep != nullptr)
-	                            memcpy(ep,up,esize) ;
-		            }
-	                }
-	            } /* end if */
-	        } /* end if (valid) */
+            rs = SR_INVALID ;
+            if (ei >= 0) {
+                rs = SR_OK ;
+                if (op->ncursors == 0) {
+                    rs = tmpx_filesize(op,0L) ;
+                }
+                if (rs >= 0) {
+                    tmpx_ent        *up ;
+                    cint            en = TMPX_NENTS ;
+                    cint            esz = TMPX_ENTSIZE ;
+                    if ((rs = tmpx_mapents(op,ei,en,&up)) > 0) {
+                        if (up != nullptr) {
+                            f = true ;
+                            if (ep != nullptr)
+                                memcpy(ep,up,esz) ;
+                        }
+                    }
+                } /* end if */
+            } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -366,31 +365,31 @@ int tmpx_nusers(tmpx *op) noex {
 	int		rs ;
 	int		nusers = 0 ;
 	if ((rs = tmpx_magic(op)) >= 0) {
-	        int	en ;
-	        if_constexpr (f_dynents) {
-	            cint	esize = TMPX_ENTSIZE ;
-	            en = ((op->fsize / esize) + 1) ;
-	        } else {
-	            en = TMPX_NENTS ;
-	        }
-	        if (op->ncursors == 0) {
-	            rs = tmpx_filesize(op,0L) ;
-	        }
-	        if (rs >= 0) {
-	            tmpx_ent	*ep ;
-	            int		ei = 0 ;
-	            while ((rs = tmpx_mapents(op,ei,en,&ep)) > 0) {
-	                cint	n = rs ;
-		        int	i ;
-	                for (i = 0 ; i < n ; i += 1) {
-	                    bool	f = (ep->ut_type == TMPX_TPROCUSER) ;
-	                    f = f && (ep->ut_user[0] != '.') ;
-	                    if (f) nusers += 1 ;
-	                    ep += 1 ;
-	                } /* end for */
-	                ei += i ;
-	            } /* end while */
-	        } /* end if (ok) */
+            int     en ;
+            if_constexpr (f_dynents) {
+                cint        esz = TMPX_ENTSIZE ;
+                en = ((op->fsize / esz) + 1) ;
+            } else {
+                en = TMPX_NENTS ;
+            }
+            if (op->ncursors == 0) {
+                rs = tmpx_filesize(op,0L) ;
+            }
+            if (rs >= 0) {
+                tmpx_ent    *ep ;
+                int         ei = 0 ;
+                while ((rs = tmpx_mapents(op,ei,en,&ep)) > 0) {
+                    cint    n = rs ;
+                    int     i ;
+                    for (i = 0 ; i < n ; i += 1) {
+                        bool        f = (ep->ut_type == TMPX_TPROCUSER) ;
+                        f = f && (ep->ut_user[0] != '.') ;
+                        if (f) nusers += 1 ;
+                        ep += 1 ;
+                    } /* end for */
+                    ei += i ;
+                } /* end while */
+            } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? nusers : rs ;
 }
@@ -422,15 +421,13 @@ static int tmpx_writable(tmpx *op,int oflags) noex {
 
 static int tmpx_openbegin(tmpx *op,cchar *dbfn) noex {
 	int		rs ;
-	cchar		*cp{} ;
-	if ((rs = uc_mallocstrw(dbfn,-1,&cp)) >= 0) {
+	if (cchar *cp{} ; (rs = uc_mallocstrw(dbfn,-1,&cp)) >= 0) {
 	    custime	dt = getustime ;
 	    op->fname = cp ;
 	    if ((rs = tmpx_fileopen(op,dt)) >= 0) {
-		USTAT	sb ;
 		op->ti_check = dt ;
-		if ((rs = uc_fstat(op->fd,&sb)) >= 0) {
-	    	    op->fsize = (size_t) (sb.st_size & SIZE_MAX) ;
+		if (USTAT sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
+	    	    op->fsize = size_t(sb.st_size & SIZE_MAX) ;
 	    	    op->ti_mod = sb.st_mtime ;
 		    op->magic = TMPX_MAGIC ;
 		} /* end if (stat) */
@@ -528,7 +525,7 @@ static int tmpx_fileclose(tmpx *op) noex {
 /* end subroutine (tmpx_fileclose) */
 
 static int tmpx_mapents(tmpx *op,int ei,int en,tmpx_ent **rpp) noex {
-	cint		esize = TMPX_ENTSIZE ;
+	cint		esz = TMPX_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		n = 0 ;
 	if (en != 0) {
@@ -539,11 +536,11 @@ static int tmpx_mapents(tmpx *op,int ei,int en,tmpx_ent **rpp) noex {
 	        } /* end if */
 	    } /* end if (old map was sufficient) */
 	    if ((rs >= 0) && (n == 0)) {
-	        uint	eoff = (ei * esize) ;
-	        uint	elen = (en * esize) ;
+	        uint	eoff = (ei * esz) ;
+	        uint	elen = (en * esz) ;
 	        uint	eext = (eoff + elen) ;
 	        if (eext > op->fsize) eext = op->fsize ;
-	        n = (eext - eoff) / esize ;
+	        n = (eext - eoff) / esz ;
 	        if (n > 0) {
 	            cuint	woff = ufloor(eoff,op->pagesize) ;
 	            cuint	wext = uceil(eext,op->pagesize) ;
@@ -552,7 +549,7 @@ static int tmpx_mapents(tmpx *op,int ei,int en,tmpx_ent **rpp) noex {
 	                bool	f = (woff < op->mapoff) ;
 	                f = f || (woff >= (op->mapoff + op->mapsize)) ;
 	                if (! f) {
-	                    f = (((op->mapoff + op->mapsize) - eoff) < esize) ;
+	                    f = (((op->mapoff + op->mapsize) - eoff) < esz) ;
 	                }
 	                if (f) {
 	                    rs = tmpx_mapper(op,ei,woff,wsize) ;
@@ -566,7 +563,7 @@ static int tmpx_mapents(tmpx *op,int ei,int en,tmpx_ent **rpp) noex {
 	    if (rpp) {
 	        caddr_t	ep = nullptr ;
 	        if ((rs >= 0) && (n > 0)) {
-	            ep = (((ei * esize) - op->mapoff) + op->mapdata) ;
+	            ep = (((ei * esz) - op->mapoff) + op->mapdata) ;
 	        }
 	        *rpp = (tmpx_ent *) ep ;
 	    }
@@ -581,7 +578,7 @@ static int tmpx_mapper(tmpx *op,int ei,uint woff,uint wsize) noex {
 	uint		eoff ;
 	uint		eext ;
 	uint		e ;
-	const int	esize = TMPX_ENTSIZE ;
+	cint		esz = TMPX_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		fd = op->fd ;
 	int		mp = PROT_READ ;
@@ -595,15 +592,16 @@ static int tmpx_mapper(tmpx *op,int ei,uint woff,uint wsize) noex {
 	    op->mapen = 0 ;
 	}
 	if ((rs = u_mmapbegin(nullptr,ms,mp,mf,fd,mo,&md)) >= 0) {
-	    const int		madv = MADV_SEQUENTIAL ;
+	    cint		madv = MADV_SEQUENTIAL ;
 	    const caddr_t	ma = caddr_t(md) ;
 	    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
-	        op->mapdata = (caddr_t) md ;
+		csize	esize = size_t(esz) ;
+	        op->mapdata = caddr_t(md) ;
 	        op->mapsize = ms ;
-	        op->mapoff = (uint) mo ;
+	        op->mapoff = uint(mo) ;
 	        eoff = uceil(woff,esize) ;
 	        e = MIN((woff + wsize),op->fsize) ;
-	        eext = ufloor(e,esize) ;
+	        eext = ufloor(e,esz) ;
 	        op->mapei = eoff / esize ;
 	        op->mapen = (eext - eoff) / esize ;
 	        if (ei >= op->mapei) {

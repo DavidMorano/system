@@ -119,19 +119,19 @@ INCS= config.h defs.h
 
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o
 OBJ01= 
-OBJ02= expander.o progmsgs.o mkmsgid.o deliver.o copyparts.o
+OBJ02= expander.o progmsgs.o mkmsgid.o deliver.o
 OBJ03= parsenodespec.o getbestaddr.o
 OBJ04= mailspooldir.o 
-OBJ05= received.o mhcom.o recip.o progout.o
-OBJ06= debug.o getfname.o 
+OBJ05= progout.o
+OBJ06= debug.o
 OBJ07= printhelp.o 
 OBJ08=
 OBJ09= msgheadkey.o headkeymat.o permsched.o
 OBJ10= pcstrustuser.o pcsuserfile.o
-OBJ11= whitelist.o splitaddr.o
-OBJ12= emainfo.o msgid.o msgide.o lkmail.o mailalias.o strtab.o ema.o
-OBJ13= logzones.o sbuf.o 
-OBJ14= matenv.o msg.o msgheaders.o dater.o comparse.o tmz.o
+OBJ11=
+OBJ12= lkmail.o
+OBJ13=
+OBJ14=
 OBJ15=
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
@@ -246,51 +246,9 @@ msgheadkey.o:		msgheadkey.c
 headkeymat.o:		headkeymat.c
 
 
-recip.o:		recip.c recip.h
-
-getfname.o:		getfname.c getfname.h
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-emainfo.o:		emainfo.c emainfo.h
-
-matenv.o:		matenv.c matenv.h
-
-msg.o:			msg.c msg.h matenv.h
-
-msgheaders.o:		msgheaders.c msgheaders.h
-
 lkmail.o:		lkmail.c lkmail.h
 
-mailalias.o:		mailalias.cc mailalias.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) mailalias.cc
-
-mapstrint.o:		mapstrint.c mapstrint.h
-
-logfile.o:		logfile.c logfile.h
-
-logzones.o:		logzones.c logzones.h
-
-dater.o:		dater.c dater.h tmz.h comparse.h
-
-comparse.o:		comparse.c comparse.h
-
 tmz.o:			tmz.c tmz.h
-
-msgid.o:		msgid.c msgid.h msgide.h
-
-msgide.o:		msgide.c msgide.h
-
-vecobj.o:		vecobj.c vecobj.h lookaside.h
-
-lookaside.o:		lookaside.c lookaside.h pq.h
-
-pq.o:			pq.c pq.h
-
-ids.o:			ids.c ids.h
 
 
 pcsconf.o:		pcsconf.c pcsconf.h

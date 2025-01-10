@@ -79,6 +79,7 @@ extern int	recip_getname(recip *,cchar **) noex ;
 extern int	recip_getmailspool(recip *,cchar **) noex ;
 extern int	recip_getuser(recip *,uid_t *) noex ;
 extern int	recip_isuser(recip *) noex ;
+extern int	recip_copyparts(recip *,int,int) noex ;
 extern int	recip_finish(recip *) noex ;
 
 EXTERNC_end

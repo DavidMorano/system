@@ -47,6 +47,8 @@
 #include	<splitaddr.h>
 #include	<stackaddr.h>
 #include	<comsatmsg.h>
+#include	<retpth.h>
+
 #include	<envmat.h>
 
 

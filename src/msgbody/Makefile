@@ -228,8 +228,6 @@ deliver.o:		deliver.c $(INCS) lkmail.h
 
 boxer.o:		boxer.c $(INCS) lkmail.h
 
-copyparts.o:		copyparts.c $(INCS)
-
 trailaddr.o:		trailaddr.c
 
 headkeymat.o:		headkeymat.c
