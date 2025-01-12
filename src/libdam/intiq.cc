@@ -97,7 +97,7 @@ int intiq_ins(intiq *op,int ch) noex {
 	if (op) {
 	    if ((rs = ptm_lock(&op->m)) >= 0) {
 	        {
-	            cint	esize = sizeof(int) ;
+	            cint	esize = szof(int) ;
 	            rs = fifoitem_ins(&op->q,&ch,esize) ;
 		    c = rs ;
 	        }
@@ -116,7 +116,7 @@ int intiq_rem(intiq *op,int *chp) noex {
 	if (op) {
 	    if ((rs = ptm_lock(&op->m)) >= 0) {
 	        {
-		    cint	esize = sizeof(int) ;
+		    cint	esize = szof(int) ;
 	            rs = fifoitem_rem(&op->q,chp,esize) ;
 	            c = rs ;
 	        }

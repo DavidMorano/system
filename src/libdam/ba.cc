@@ -24,7 +24,7 @@
 	This module does some bit-array type stuff.
 
 	Notes:
-	a) we dynamically create a look-up table using | banum_prepare()|
+	a) we dynamically create a look-up table using |banum_prepare()|
 
 *******************************************************************************/
 
@@ -43,7 +43,7 @@
 /* local defines */
 
 #define	BA_MAX16	(1 << 16)
-#define	BA_BITSPERWORD	(8 * sizeof(ulong))
+#define	BA_BITSPERWORD	(8 * szof(ulong))
 
 
 /* imported namespaces */
@@ -85,10 +85,9 @@ int ba_start(ba *op,ba_num *cnp,int n) noex {
 	cint		nw = ((n / BA_BITSPERWORD) + 1) ;
 	int		rs = SR_FAULT ;
 	if (op) {
-	    void	*vp{} ;
 	    op->cnp = nullptr ;
-	    cint	hsz = nw * sizeof(ulong) ;
-	    if ((rs = uc_malloc(hsz,&vp)) >= 0) {
+	    cint	hsz = nw * szof(ulong) ;
+	    if (void *vp{} ; (rs = uc_malloc(hsz,&vp)) >= 0) {
 	        op->a = ulongp(vp) ;
 	        for (int i = 0 ; i < nw ; i += 1) {
 		    op->a[i] = 0 ;
@@ -123,7 +122,7 @@ int ba_finish(ba *op) noex {
 int ba_setones(ba *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    int		asz = op->nwords * sizeof(ulong) ;
+	    int		asz = op->nwords * szof(ulong) ;
 	    rs = SR_OK ;
 	    memset(op->a,(~0),asz) ;
 	}
@@ -134,7 +133,7 @@ int ba_setones(ba *op) noex {
 int ba_zero(ba *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    cint	asz = op->nwords * sizeof(ulong) ;
+	    cint	asz = op->nwords * szof(ulong) ;
 	    rs = memclear(op->a,asz) ;
 	}
 	return rs ;
@@ -145,13 +144,14 @@ int ba_countdown(ba *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    int		r = 0 ;
-	    int		f_borrow ;
-	    int		f_msb1, f_msb2 ;
+	    bool	f_borrow ;
+	    bool	f_msb1 ;
+	    bool	f_msb2 ;
 	    rs = SR_OK ;
 	    do {
-	        f_msb1 = op->a[r] & INT_MAX ;
+	        f_msb1 = !!(op->a[r] & INT_MAX) ;
 	        op->a[r] -= 1 ;
-	        f_msb2 = op->a[r] & INT_MAX ;
+	        f_msb2 = !!(op->a[r] & INT_MAX) ;
 	        f_borrow = (! f_msb1) && f_msb2 ;
 	        r += 1 ;
 	    } while (f_borrow && (r < op->nwords)) ;
@@ -196,11 +196,10 @@ int ba_numones(ba *op) noex {
 /* other interfaces */
 
 int banum_prepare(ba_num *cnp) noex {
-	cint		asz = (BA_MAX16 * sizeof(int)) ;
+	cint		asz = (BA_MAX16 * szof(int)) ;
 	int		rs = SR_FAULT ;
 	if (cnp) {
-	    void	*vp{} ;
-	    if ((rs = uc_malloc(asz,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = uc_malloc(asz,&vp)) >= 0) {
 	        cnp->num = intp(vp) ;
 	        for (int i = 0 ; i < BA_MAX16 ; i += 1) {
 	            cnp->num[i] = numbits(i) ;

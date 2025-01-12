@@ -75,8 +75,8 @@ int detdupai(cint *ap,int al) noex {
 	if (ap) {
 	    rs = SR_OK ;
 	    if (al > 1) {
-		cint	esize = sizeof(int) ;
-		cint	sz = ((al+1)*sizeof(int)) ;
+		cint	esize = szof(int) ;
+		cint	sz = ((al+1)*szof(int)) ;
 	        int	*aa ;
 	        if ((rs = uc_libmalloc(sz,&aa)) >= 0) {
 	            memcpy(aa,ap,sz) ;

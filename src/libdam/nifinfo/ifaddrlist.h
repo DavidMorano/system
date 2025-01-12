@@ -1,4 +1,6 @@
-/* ifaddrlist */
+/* ifaddrlist HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /*
  * Copyright (c) 1997 by Sun Microsystems, Inc.
@@ -33,39 +35,42 @@
 #ifndef _IFADDRLIST_H
 #define	_IFADDRLIST_H
 
-#pragma ident	"@(#)ifaddrlist.h	1.3	99/03/02 SMI"
 
 #include	<envstandards.h>
-
 #include	<net/if.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| + |REALNAMELEN| */
 
 
-#define	IFADDRLIST_ERRBUFSIZE 128
+#define	IFADDRLIST_ERRBUFSIZE	128
+#define	IFADDRLIST_NSZ		TIMEBUFLEN
+#define	IFADDRLIST		struct ifaddrlist
+#define	ANYINFADDR		union any_in_addr
 
 
 /* can store both IPv4 and IPv6 address */
 union any_in_addr {
 	struct in6_addr addr6;
 	struct in_addr addr;
-};
+} ;
 
 struct ifaddrlist {
 	int index;			/* interface index */
 	union any_in_addr addr;		/* interface address */
-	char device[LIFNAMSIZ + 1];	/* interface name */
+	char device[IFADDRLIST_NSZ + 1];	/* interface name */
 	uint64_t flags;			/* interface flags */
-};
+} ;
 
+EXTERNC_begin
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern int	ifaddrlist_get(ISADDRLIST **, int, char *) noex ;
 
-int	ifaddrlist(struct ifaddrlist **, int, char *);
+EXTERNC_end
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _IFADDRLIST_H */
 

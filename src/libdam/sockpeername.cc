@@ -132,7 +132,7 @@ int suber::operator () (int s) noex {
 	sockaddress	sa ;
 	int		rs ;
 	int		rs1 ;
-	int		sal = sizeof(sockaddress) ;
+	int		sal = szof(sockaddress) ;
 	int		rl = 0 ;
 	if ((rs = u_getpeername(s,&sa,&sal)) >= 0) {
 	    if ((rs = sockaddress_getaf(&sa)) >= 0) {

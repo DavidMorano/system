@@ -65,19 +65,22 @@
 
 /* forward references */
 
-static int	vesrch(cvoid *,cvoid *) ;
+extern "C" {
+    static int	vesrch(cvoid *,cvoid *) noex ;
+}
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int ktag_start(KTAG *kop,KTAG_PARAMS *kap,uint soff,cchar *lp,int ll)
-{
-	cint	size = sizeof(KTAG_KEY) ;
+int ktag_start(KTAG *kop,KTAG_PARAMS *kap,uint soff,cchar *lp,int ll) noex {
+	cint	size = szof(KTAG_KEY) ;
 	cint	vopts = VECOBJ_OCOMPACT ;
 	int		rs ;
 
-	memset(kop,0,sizeof(KTAG)) ;
+	memclear(kop) ;
 	kop->kap = kap ;
 	kop->recoff = soff ;
 
@@ -147,7 +150,7 @@ int ktag_mktag(KTAG *kop,uint endoff,TXTINDEXMK_TAG *tagp)
 	int		rs ;
 
 	kop->reclen = (endoff - kop->recoff) ;
-	memset(tagp,0,sizeof(TXTINDEXMK_TAG)) ;
+	memclear(tagp) ;
 
 	tagp->fname = kop->fname ;	/* it is nullptr! (deletion candidate) */
 	tagp->recoff = kop->recoff ;
@@ -158,7 +161,7 @@ int ktag_mktag(KTAG *kop,uint endoff,TXTINDEXMK_TAG *tagp)
 	    int			i ;
 	    tagp->nkeys = rs ;
 
-	    size = tagp->nkeys * sizeof(TXTINDEXMK_KEY) ;
+	    size = tagp->nkeys * szof(TXTINDEXMK_KEY) ;
 	    if ((rs = uc_malloc(size,&kea)) >= 0) {
 
 	        kop->tkeys = kea ;		/* kea: save for us */

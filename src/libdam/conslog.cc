@@ -130,7 +130,7 @@ int conslog_open(CONSLOG *op,int logfac)
 
 	if (! isLogFac(logfac)) return SR_INVALID ;
 
-	memset(op,0,sizeof(CONSLOG)) ;
+	memclear(op) ;
 	op->lfd = -1 ;
 
 	op->magic = CONSLOG_MAGIC ;
@@ -327,26 +327,22 @@ static int conslog_fileclose(CONSLOG *op) noex {
 /* end subroutine (conslog_fileclose) */
 
 static int conslog_logdevice(CONSLOG *op,int logpri,cchar *bp,int bl) noex {
-	struct strbuf	cmsg, dmsg ;
-	struct log_ctl	lc ;
+	struct strbuf	cmsg ;
+	struct strbuf	dmsg ;
+	struct log_ctl	lc{} ;
 	int		rs = SR_OK ;
 
 	if (op->lfd < 0) rs = conslog_fileopen(op) ;
 
 	if (rs >= 0) {
-
 	    logpri &= LOG_PRIMASK ;		/* truncate any garbage */
-
-/* write it to the LOG device */
-
-	    memset(&lc,0,sizeof(struct log_ctl)) ;
+	    /* write it to the LOG device */
 	    lc.flags = SL_CONSOLE ;
 	    lc.level = 0 ;
 	    lc.pri = (op->logfac | logpri) ;
-
-/* set up the strbufs */
-	    cmsg.maxlen = sizeof(struct log_ctl) ;
-	    cmsg.len = sizeof(struct log_ctl) ;
+	    /* set up the strbufs */
+	    cmsg.maxlen = szof(struct log_ctl) ;
+	    cmsg.len = szof(struct log_ctl) ;
 	    cmsg.buf = (caddr_t) &lc ;
 
 	    dmsg.maxlen = (bl+1) ;

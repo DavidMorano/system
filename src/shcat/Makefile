@@ -160,7 +160,7 @@ OBJ05=
 OBJ06= 
 OBJ07= printhelp.o shio.o kshlib.o maininfo.o sesmsg.o msgdata.o
 OBJ08=
-OBJ09= hostaddr.o hostinfo.o sockaddress.o linefold.o termout.o
+OBJ09= hostaddr.o hostinfo.o sockaddress.o termout.o
 OBJ10=
 OBJ11=
 OBJ12=
@@ -328,108 +328,10 @@ sesmsg.o:		sesmsg.c sesmsg.h
 
 msgdata.o:		msgdata.c msgdata.h
 
-sighand.o:		sighand.c sighand.h
-
-
-getutmpent.o:		getutmpent.c getutmpent.h
-
-getnodedomain.o:	getnodedomain.c
-
-dialtcp.o:		dialtcp.c
-
-dialtcpnls.o:		dialtcpnls.c
-
-dialtcpmux.o:		dialtcpmux.c
-
-dialudp.o:		dialudp.c
-
-upt.o:			upt.c upt.h
-
-
-shio.o:			shio.c shio.h
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-sbuf.o:			sbuf.c sbuf.h
-
-sbuf_addquoted.o:	sbuf_addquoted.c sbuf.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-envlist.o:		envlist.c envlist.h
-
-hostinfo.o:		hostinfo.c hostinfo.h
-
-hostaddr.o:		hostaddr.c hostaddr.h
-
-hostent.o:		hostent.c hostent.h
-
-inetaddr.o:		inetaddr.c inetaddr.h
-
-sockaddress.o:		sockaddress.c sockaddress.h
-
-linefold.o:		linefold.c linefold.h
-
-modload.o:		modload.c modload.h
-
-termout.o:		termout.cc termout.h ansigr.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) termout.cc
-
-
-# BFILE
-
-bopen.o:		bopen.c bfile.h
-bread.o:		bread.c bfile.h
-breadline.o:		breadline.cc bfile.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-breadlines.o:		breadlines.c bfile.h
-bwrite.o:		bwrite.c bfile.h
-bprintf.o:		bprintf.c bfile.h
-bflush.o:		bflush.c bfile.h
-bcontrol.o:		bcontrol.c bfile.h
-bclose.o:		bclose.c bfile.h
-bfile_flush.o:		bfile_flush.c bfile.h
-
-
-sfreadline.o:		sfreadline.c
-	$(CC) -c $(ASTCFLAGS) $(ASTCPPFLAGS) $(*).c
-
-sfisterm.o:		sfisterm.c
-	$(CC) -c $(ASTCFLAGS) $(ASTCPPFLAGS) $(*).c
-
 
 localsvchotd.o:		localsvchotd.c
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
 
 udl.o:			udl.c udl.h
-
-
-openint_copyout.o:	openint_copyout.c config_copyout.h
-
-openint_hello.o:	openint_hello.c openint_hello.h
-
-opensvc_logwelcome.o:	opensvc_logwelcome.c opensvc_logwelcome.h
-
-opensvc_fshome.o:	opensvc_fshome.c opensvc_fshome.h
-
-opendialer_hello.o:	opendialer_hello.c opendialer_hello.h
-
-opendialer_prog.o:	opendialer_prog.c opendialer_prog.h
-
-opendialer_tcp.o:	opendialer_tcp.c opendialer_tcp.h
-
-opendialer_tcpmux.o:	opendialer_tcpmux.c opendialer_tcpmux.h
-
-opendialer_finger.o:	opendialer_finger.c opendialer_finger.h
 
 

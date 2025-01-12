@@ -724,6 +724,7 @@ ts.o:			ts.cc ts.h
 envlist.o:		envlist.cc envlist.h
 querystr.o:		querystr.cc querystr.h
 linehist.o:		linehist.cc linehist.h
+linefold.o:		linefold.cc linefold.h
 langstate.o:		langstate.cc langstate.h
 mkdirlist.o:		mkdirlist.cc mkdirlist.h
 sesmsg.o:		sesmsg.cc sesmsg.h

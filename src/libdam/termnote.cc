@@ -614,7 +614,7 @@ namespace {
 
 static int termnote_disuser(termnote *op,int nmax,int o,mbuf *mp,cc *un) noex {
 	vecobj		uts ;
-	cint		utsize = sizeof(userterm) ;
+	cint		utsize = szof(userterm) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;

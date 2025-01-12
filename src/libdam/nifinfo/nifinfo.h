@@ -1,8 +1,23 @@
-/* nifinfo HEADER */
-/* lang=C++20 */
+/* nifinfo HEADER (Network-InterFace) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* manage Network-InterFace information */
+/* version %I% last-modified %G% */
 
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1994 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Object:
+	nifinfo
+
+	Description: 
+	These subroutines form the public calling interface for
+	accessing Network-InterFace information.
+
+*******************************************************************************/
 
 #ifndef	NIFINFO_INCLUDE
 #define	NIFINFO_INCLUDE
@@ -18,14 +33,15 @@
 #include	<netdb.h>
 #include	<string.h>
 #include	<usystem.h>
-#include	<localmisc.h>	/* for 'uint' */
+#include	<localmisc.h>		/* |REALNAMELEN| */
 
 
 #define	NIFINFO_MAGIC		0x73638196
 #define	NIFINFO			struct nifinfo_head
-#define	NIFINFO_ENT		struct nifinfo_entry
-#define	NIFINFO_CUR		struct nifinfo_cursor
-#define	NIFINFO_ADDR		union nifinfo_address
+#define	NIFINFO_ENT		struct nifinfo_e
+#define	NIFINFO_CUR		struct nifinfo_c
+#define	NIFINFO_ADDR		union nifinfo_addr
+#define	NIFINFO_NSZ		REALNAMELEN
 
 
 union nifinfo_address {
@@ -39,12 +55,12 @@ struct nifinfo_entry {
 	int		index ;		/* interface index */
 	int		af ;		/* address family */
 	int		alen ;		/* address length */
-	char		inter[LIFNAMSIZ+1] ;	/* interface name */
+	char		inter[NIFINFO_NSZ + 1] ; /* interface name */
 } ;
 
 struct nifinfo_head {
-	uint		magic ;
 	NIFINFO_ENT	*a ;
+	uint		magic ;
 	int		n ;
 } ;
 

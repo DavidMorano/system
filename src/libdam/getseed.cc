@@ -104,7 +104,7 @@ int getseed(int seed) noex {
 	    if_constexpr (f_gethrtime) {
 	        hrtime_t	h = gethrtime() ;
 	        rv += uint(h) ;
-	        h >>= (sizeof(uint) * CHAR_BIT) ;
+	        h >>= (szof(uint) * CHAR_BIT) ;
 	        rv += uint(h) ;
 	    } /* end if_constexpr (f_gethrtime) */
 	    rs = int(rv & INT_MAX) ;

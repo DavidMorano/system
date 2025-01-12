@@ -60,9 +60,9 @@ int		n ;
 
 	if (n < 1) n = 1 ;
 
-	memset(srp,0,sizeof(SHIFTREGL)) ;
+	memclear(srp) ;
 
-	size = n * sizeof(ULONG) ;
+	size = n * szof(ulong) ;
 	if ((rs = uc_malloc(size,&srp->regs)) >= 0) {
 	    int	i ;
 	    srp->n = n ;
@@ -99,7 +99,7 @@ SHIFTREGL	*srp ;
 
 int shiftregl_shiftin(srp,val)
 SHIFTREGL	*srp ;
-ULONG		val ;
+ulong		val ;
 {
 	int		i ;
 
@@ -116,7 +116,7 @@ ULONG		val ;
 int shiftregl_get(srp,i,vp)
 SHIFTREGL	*srp ;
 int		i ;
-ULONG		*vp ;
+ulong		*vp ;
 {
 
 	if (srp == NULL) return SR_FAULT ;

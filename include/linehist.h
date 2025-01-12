@@ -13,7 +13,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2016 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	LINEHIST_INCLUDE
 #define	LINEHIST_INCLUDE

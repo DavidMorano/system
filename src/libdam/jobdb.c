@@ -65,13 +65,13 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	chmods(const char *,mode_t) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
+extern int	mkdirs(cchar *,mode_t) ;
+extern int	chmods(cchar *,mode_t) ;
 extern int	rmdirfiles(cchar *,cchar *,int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -85,7 +85,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 static int	jobdb_delit(JOBDB *,int,JOBDB_ENT *) ;
 static int	jobdb_checkdir(JOBDB *) ;
 
-static int	entry_start(JOBDB_ENT *,const char *,const char *,int) ;
+static int	entry_start(JOBDB_ENT *,cchar *,cchar *,int) ;
 static int	entry_finish(JOBDB_ENT *) ;
 
 static int	mkfile(cchar *,cchar **) ;
@@ -100,7 +100,7 @@ static int	mkfile(cchar *,cchar **) ;
 int jobdb_start(JOBDB *jlp,int initsize,cchar *tmpdname)
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (jlp == NULL) return SR_FAULT ;
 
@@ -187,7 +187,7 @@ int jobdb_newjob(JOBDB *jlp,cchar *jobid,int f_so)
 	        if ((rs = mkpath2(template,jlp->tmpdname,cbuf)) >= 0) {
 	            JOBDB_ENT	je ;
 	            if ((rs = entry_start(&je,template,jobid,f_so)) >= 0) {
-	                const int	esize = sizeof(JOBDB_ENT) ;
+	                const int	esize = szof(JOBDB_ENT) ;
 	                rs = vecitem_add(&jlp->db,&je,esize) ;
 	                if (rs < 0)
 		            entry_finish(&je) ;
@@ -420,22 +420,17 @@ static int jobdb_checkdir(JOBDB *jlp)
 
 static int entry_start(JOBDB_ENT *jep,cchar *template,cchar *jobid,int f_so)
 {
-	const time_t	dt = time(NULL) ;
+	custime		dt = getustime ;
 	int		rs ;
-	const char	*cp ;
 
-#if	CF_DEBUGS
-	debugprintf("jobdb/entry_start: ent jobid=%s f_so=%u\n",jobid,f_so) ;
-#endif
-
-	memset(jep,0,sizeof(JOBDB_ENT)) ;
+	memclear(jep) ;
 	jep->pid = -1 ;
 	jep->atime = dt ;
 	jep->stime = dt ;
 
 	strwcpy(jep->jobid,jobid,JOBDB_JOBIDLEN) ;
 
-	if ((rs = mkfile(template,&cp)) >= 0) {
+	if (cchar *cp ; (rs = mkfile(template,&cp)) >= 0) {
 	    jep->efname = (char *) cp ;
 	    if (f_so) {
 	        rs = mkfile(template,&cp) ;

@@ -78,7 +78,7 @@
 #define	MKDIRLIST_DIRCACHE	".dircache"
 #define	MKDIRLIST_DCMAGIC	"DIRCACHE"
 
-#define	DS_SIZE		sizeof(MKDIRLIST)
+#define	DS_SIZE		szof(MKDIRLIST)
 
 #ifndef	TMPDNAME
 #define	TMPDNAME	"/tmp"
@@ -460,7 +460,7 @@ static int mkdirlist_pdn(MKDIRLIST *op,cchar *ndn) noex {
 /* end subroutine (mkdirlist_pdn) */
 
 static int mkdirlist_newent(mkdirlist *op,USTAT *sbp,cc *nbuf,int nlen) noex {
-	cint		esize = sizeof(mkdirlist_ent) ;
+	cint		esize = szof(mkdirlist_ent) ;
 	int		rs ;
 	int		c = 0 ;
 	void		*vp{} ;

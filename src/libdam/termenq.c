@@ -94,7 +94,7 @@ int termenq_open(TERMENQ *op,cchar *dbfname,int oflags)
 #if	CF_DEBUGS
 	debugprintf("termenq_open: ent dbfname=%s\n",dbfname) ;
 	debugprintf("termenq_open: entry size=%d\n",
-	    sizeof(TERMENT)) ;
+	    szof(TERMENT)) ;
 #endif
 
 	if (op == NULL) return SR_FAULT ;
@@ -102,7 +102,7 @@ int termenq_open(TERMENQ *op,cchar *dbfname,int oflags)
 
 	if (dbfname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(TERMENQ)) ;
+	memclear(op) ;
 	op->pagesize = getpagesize() ;
 	op->oflags = oflags ;
 	op->fd = -1 ;
@@ -212,7 +212,7 @@ int termenq_write(TERMENQ *op,int ei,TERMENT *ep)
 	    }
 	    if (rs >= 0) {
 	        off_t	poff ;
-	        const int	esize = sizeof(TERMENT) ;
+	        const int	esize = szof(TERMENT) ;
 	        poff = (off_t) (ei * esize) ;
 	        rs = u_pwrite(op->fd,ep,esize,poff) ;
 	    }
@@ -454,7 +454,7 @@ int termenq_fetchline(TERMENQ *op,TERMENQ_CUR *curp,TERMENT *ep,cchar *name)
 
 	if (rs >= 0) {
 	    TERMENT	*up ;
-	    const int	esize = sizeof(TERMENT) ;
+	    const int	esize = szof(TERMENT) ;
 	    int		n, i ;
 	    int		f = FALSE ;
 
@@ -522,7 +522,7 @@ int termenq_read(TERMENQ *op,int ei,TERMENT *ep)
 
 	if (rs >= 0) {
 	    TERMENT	*up ;
-	    const int	esize = sizeof(TERMENT) ;
+	    const int	esize = szof(TERMENT) ;
 	    if ((rs = termenq_mapents(op,ei,&up)) > 0) {
 		if (up != NULL) {
 		    f = TRUE ;
@@ -641,7 +641,7 @@ static int termenq_fileclose(TERMENQ *op)
 
 static int termenq_mapents(TERMENQ *op,int ei,TERMENT **rpp)
 {
-	const int	esize = sizeof(TERMENT) ;
+	const int	esize = szof(TERMENT) ;
 	int		en ;
 	int		rs = SR_OK ;
 	int		n = 0 ;
@@ -746,7 +746,7 @@ static int termenq_mapper(TERMENQ *op,int ei,uint woff,uint wsize)
 	uint		eoff ;
 	uint		eext ;
 	uint		e ;
-	const int	esize = sizeof(TERMENT) ;
+	const int	esize = szof(TERMENT) ;
 	int		rs = SR_OK ;
 	int		fd ;
 	int		mp ;

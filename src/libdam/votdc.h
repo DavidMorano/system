@@ -12,16 +12,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<sys/types.h>		/* |caddr_t| */
+#include	<time.h>		/* |time_t| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<ptm.h>
 #include	<shmalloc.h>
-#include	<localmisc.h>
-
-#include	"votdchdr.h"
+#include	<votdchdr.h>
 
 
 #ifndef	SVCBUFLEN
@@ -50,7 +50,7 @@
 
 
 struct votdc_obj {
-	const char	*name ;
+	cchar		*name ;
 	uint		objsize ;
 } ;
 
@@ -59,8 +59,8 @@ struct votdc_vcur {
 } ;
 
 struct votdc_titlecache {
-	const char	**titles ;
-	const char	*a ;
+	cchar		**titles ;
+	cchar		*a ;
 	int		wmark ;
 	int		amark ;
 	char		lang[VOTDC_LANGLEN+1] ;
@@ -106,19 +106,19 @@ struct votdc_flags {
 struct votdc_head {
 	uint		magic ;
 	VOTDC_FL	f ;
-	const char	*a ;		/* object string allocations */
-	const char	*pr ;
-	const char	*lang ;
-	const char	*shmname ;
+	cchar		*a ;		/* object string allocations */
+	cchar		*pr ;
+	cchar		*lang ;
+	cchar		*shmname ;
 	caddr_t		mapdata ;	/* SHM data */
-	PTM		*mp ;		/* pointer to SHM mutex */
+	ptm		*mp ;		/* pointer to SHM mutex */
 	VOTDC_BOOK	*books ;	/* book-records */
 	VOTDC_VERSE	*verses ;	/* verse-records */
-	SHMALLOC	*ball ;		/* book-string allocator */
-	SHMALLOC	*vall ;		/* verse-string allocator */
+	shmalloc	*ball ;		/* book-string allocator */
+	shmalloc	*vall ;		/* verse-string allocator */
 	char		*bstr ;		/* book string-table */
 	char		*vstr ;		/* verse string-table */
-	VOTDCHDR	hdr ;
+	votdchdr	hdr ;
 	VOTDC_TC	tcs[VOTDC_NBOOKS] ;
 	time_t		ti_map ;	/* map-time */
 	time_t		ti_lastcheck ;
@@ -129,11 +129,18 @@ struct votdc_head {
 	int		fd ;
 } ;
 
+typedef	VOTDC			votdc ;
+typedef	VOTDC_FL		votdc_fl ;
+typedef	VOTDC_OBJ		struct votdc_obj
+typedef	VOTDC_BOOK		struct votdc_book
+typedef	VOTDC_VERSE		struct votdc_verse
+typedef	VOTDC_INFO		struct votdc_info
+typedef	VOTDC_CITE		struct votdc_cite
+typedef	VOTDC_Q			struct votdc_cite
+typedef	VOTDC_TC		struct votdc_titlecache
+typedef	VOTDC_VCUR		struct votdc_vcur
 
-#if	(! defined(VOTDC_MASTER)) || (VOTDC_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
+EXTERNC_begin
 #endif
 
 extern int	votdc_open(VOTDC *,cchar *,cchar *,int) ;
@@ -150,11 +157,8 @@ extern int	votdc_versefetch(VOTDC *,VOTDC_CITE *,char *,int,cchar *,int) ;
 extern int	votdc_info(VOTDC *,VOTDC_INFO *) ;
 extern int	votdc_close(VOTDC *) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* VOTDC_MASTER */
 
 #endif /* VOTDC_INCLUDE */
 

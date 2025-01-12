@@ -1,4 +1,5 @@
 /* svcent HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutines for simple SVCFILE_ENT object management */

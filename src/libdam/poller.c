@@ -80,14 +80,14 @@ static int	ismatch(POLLER_SPEC *,POLLER_SPEC *) ;
 
 int poller_start(POLLER *op)
 {
-	const int	esize = sizeof(POLLER_SPEC) ;
-	const int	n = POLLER_NDEF ;
-	const int	vo = 0 ;
+	cint	esize = szof(POLLER_SPEC) ;
+	cint	n = POLLER_NDEF ;
+	cint	vo = 0 ;
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	memset(op,0,sizeof(POLLER)) ;
+	memclear(op) ;
 
 	if ((rs = vecobj_start(&op->regs,esize,n,vo)) >= 0) {
 	    op->magic = POLLER_MAGIC ;
@@ -356,11 +356,11 @@ int poller_enum(POLLER *op,POLLER_CUR *curp,POLLER_SPEC *rp)
 
 static int poller_extend(POLLER *op,int n)
 {
-	const int	ne = MAX(n,1) ;
+	cint	ne = MAX(n,1) ;
 	int		rs = SR_OK ;
 
 	if ((ne > op->e) || (op->pa == NULL)) {
-	    int		size = ne * sizeof(POLLER_SPEC) ;
+	    int		size = ne * szof(POLLER_SPEC) ;
 	    void	*p ;
 	    if (op->pa != NULL) {
 	        uc_free(op->pa) ;

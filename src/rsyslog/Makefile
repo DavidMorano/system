@@ -239,83 +239,10 @@ pcsconf.o:		pcsconf.c pcsconf.h
 pcstrustuser.o:		pcstrustuser.c pcsconf.h
 
 
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-streamsync.o:		streamsync.c streamsync.h
-
-envlist.o:		envlist.c envlist.h
-
-hdb.o:			hdb.c hdb.h
-
-lookaside.o:		lookaside.c lookaside.h
-
-pq.o:			pq.c pq.h
-
-hdbstr.o:		hdbstr.c hdbstr.h
-
-hdbstr_loadfile.o:	hdbstr_loadfile.c
-
-msfile.o:		msfile.c msfile.h msfilee.h msflag.h
-
-msfilee.o:		msfilee.c msfilee.h
-
-mapstrint.o:		mapstrint.c mapstrint.h
-
-mkcexsync.o:		mkcexsync.c mkcexsync.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h kvsfile.h
-
-svctab.o:		svctab.c svctab.h
-
-strstore.o:		strstore.c strstore.h
-
-serialbuf.o:		serialbuf.c serialbuf.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-buffer.o:		buffer.c buffer.h
-
-dirseen.o:		dirseen.c dirseen.h
-
-expcook.o:		expcook.c expcook.h
-
-inetaddr.o:		inetaddr.c inetaddr.h
-
-linefold.o:		linefold.c linefold.h
-
-sysvar.o:		sysvar.c sysvar.h
-
-prog.o:			prog.c prog.h dialer.h envs.h sysvar.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-uss.o:			uss.c uss.h inetaddrparse.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-ussmux.o:		ussmux.c ussmux.h inetaddrparse.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-ussnls.o:		ussnls.c ussnls.h inetaddrparse.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-ussinfo.o:		ussinfo.c ussinfo.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
 inetaddrparse.o:	inetaddrparse.c inetaddrparse.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-inetaddrparse.o:	inetaddrparse.c inetaddrparse.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-
-getaf.o:		getaf.c
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
 
 hasleadcolon.o:		hasleadcolon.c
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
 
 

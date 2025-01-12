@@ -165,7 +165,7 @@ SYSDIALER_INFO	uux_mod = {
 	UUX_MNAME,
 	UUX_VERSION,
 	UUX_INAME,
-	sizeof(UUX),
+	szof(UUX),
 	UUX_MF
 } ;
 
@@ -219,7 +219,7 @@ cchar	*av[] ;
 	if (ap == nullptr) return SR_FAULT ;
 	if (hostname == nullptr) return SR_FAULT ;
 
-	memset(op,0,sizeof(UUX)) ;
+	memclear(op) ;
 
 	if ((rs = subinfo_start(sip,op,ap,hostname,svcname,av)) >= 0) {
 
@@ -533,17 +533,16 @@ cchar	hostname[] ;
 cchar	svcname[] ;
 cchar	*av[] ;
 {
-	int	rs = SR_OK ;
-
-
-	memset(sip,0,sizeof(struct subinfo)) ;
-	sip->op = op ;
-	sip->ap = ap ;
-	sip->node = hostname ;
-	sip->hostname = hostname ;
-	sip->svcname = svcname ;
-	sip->av = av ;
-
+	int	rs = SR_FAULT ;
+	if (sip) {
+	    rs = memclear(sip) ;
+	    sip->op = op ;
+	    sip->ap = ap ;
+	    sip->node = hostname ;
+	    sip->hostname = hostname ;
+	    sip->svcname = svcname ;
+	    sip->av = av ;
+	}
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
@@ -1189,7 +1188,7 @@ cchar	***davp ;
 	        n += 1 ;
 	}
 
-	size = (n + 1) * sizeof(cchar *) ;
+	size = (n + 1) * szof(cchar *) ;
 	if ((rs = uc_malloc(size,&dav)) >= 0) {
 	    int	j = 0 ;
 	    sip->dav = dav ;

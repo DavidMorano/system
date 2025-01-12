@@ -74,7 +74,7 @@ int numincr_start(NUMINCR *op,cchar *sp,int sl)
 
 	if (op == NULL) return SR_FAULT ;
 
-	memset(op,0,sizeof(NUMINCR)) ;
+	memclear(op) ;
 	op->prec = 1 ;
 	rs = numincr_load(op,sp,sl) ;
 

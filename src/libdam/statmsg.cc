@@ -414,7 +414,7 @@ int statmsg_processid(STATMSG *op,STATMSG_ID *idp,cc **adms,
 	    cint	n = nelem(envstrs) ;
 	    int		sz ;
 	    void	*p ;
-	    sz = (op->nenv + n + 1) * sizeof(cchar *) ;
+	    sz = (op->nenv + n + 1) * szof(cchar *) ;
 	    if ((rs = uc_malloc(sz,&p)) >= 0) {
 	        strpack		packer ;
 	        cchar	**ev = (cchar **) p ;
@@ -624,7 +624,7 @@ static int statmsg_envbegin(STATMSG *op) noex {
 
 	for (i = 0 ; environ[i] != nullptr ; i += 1) ;
 
-	sz = (i + 1) * sizeof(cchar *) ;
+	sz = (i + 1) * szof(cchar *) ;
 	if ((rs = uc_malloc(sz,&p)) >= 0) {
 	    cchar	*ep ;
 	    cchar	**va = (cchar **) p ;
@@ -1100,7 +1100,7 @@ static int mapper_mapload(MA *mmp) noex {
 
 static int mapper_mapadd(MA *mmp,cchar *kp,int kl,cchar *vp,int vl) noex {
 	MD	*ep ;
-	cint	sz = sizeof(MD) ;
+	cint	sz = szof(MD) ;
 	int		rs ;
 
 	if ((kp == nullptr) || (vp == nullptr)) return SR_FAULT ;

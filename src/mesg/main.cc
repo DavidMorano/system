@@ -1,10 +1,9 @@
-/* main */
+/* main SUPPORT (mesg) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* generic front-end subroutine */
-
-
-#define	F_DEBUGS	0		/* non-switchable debug print-outs */
-#define	F_DEBUG		1		/* switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history :
@@ -18,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	main
+
+	Description:
 	This is the front-end (main) subroutine for the MESG program.
 	This program is so small that this subroutine is pretty
 	much it!
@@ -57,8 +60,6 @@
 
 
 /* external subroutines */
-
-extern char	*strbasename(char *) ;
 
 
 /* external variables */
@@ -170,19 +171,11 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 	        if (argl > 1) {
 
-#if	F_DEBUGS
-	            eprintf("main: got an option\n") ;
-#endif
-
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
 	            if ((avp = strchr(aop,'=')) != nullptr) {
-
-#if	F_DEBUGS
-	                eprintf("main: got an option key w/ a value\n") ;
-#endif
 
 	                akl = avp - aop ;
 	                avp += 1 ;
@@ -199,17 +192,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 /* do we have a keyword match or should we assume only key letters ? */
 
-#if	F_DEBUGS
-	            eprintf("main: about to check for a key word match\n") ;
-#endif
-
 	            if ((kwi = matstr(argopts,aop,aol)) >= 0) {
-
-#if	F_DEBUGS
-	                eprintf("main: got an option keyword, kwi=%d\n",
-	                    kwi) ;
-#endif
-
 	                switch (kwi) {
 
 /* version */
@@ -265,27 +248,11 @@ int main(int argc,cchar **argv,cchar **envv) {
 	                } /* end switch (key words) */
 
 	            } else {
-
-#if	F_DEBUGS
-	                eprintf("main: got an option key letter\n") ;
-#endif
-
 	                while (aol--) {
-
-#if	F_DEBUGS
-	                    eprintf("main: option key letters\n") ;
-#endif
-
 	                    switch (*aop) {
-
 	                    case 'V':
-
-#if	F_DEBUGS
-	                        eprintf("main: version key-letter\n") ;
-#endif
 	                        f_version = TRUE ;
 	                        break ;
-
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
@@ -427,10 +394,6 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 /* check arguments */
 
-#if	F_DEBUGS
-	eprintf("main: finished parsing command line arguments\n") ;
-#endif
-
 	if (pip->debuglevel > 1) {
 
 	    bprintf(pip->efp,
@@ -513,11 +476,6 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 	} /* end if */
 
-#if	F_DEBUG
-	if (pip->debuglevel > 1)
-	    eprintf("main: termdevice=%s\n",termdevice) ;
-#endif
-
 	if (termdevice[0] != '/') {
 
 /* is the device base directory there ? */
@@ -575,15 +533,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 /* switch it if called for */
 
 	    if (newstateval >= 0) {
-
 	        int	f_change = FALSE ;
-
-
-#if	F_DEBUG
-	        if (pip->debuglevel > 1)
-	            eprintf("main: newstateval=%d\n",newstateval) ;
-#endif
-
 	        if (newstateval == 1) {
 
 	            if (! f_on) {
@@ -633,23 +583,8 @@ retout:
 	if (pip->verboselevel > 1)
 	    bclose(ofp) ;
 
-
-#if	F_DEBUG
-	if (pip->debuglevel > 1)
-	    eprintf("main: exiting\n") ;
-#endif
-
-
 /* good return from program */
 goodret:
-
-#if	F_DEBUG
-	if (pip->debuglevel > 1)
-	    bprintf(pip->efp,"%s: program exiting\n",
-	        pip->progname) ;
-#endif
-
-
 /* we are out of here */
 done:
 earlyret:
@@ -716,11 +651,6 @@ badoutopen:
 /* come here for a bad return from the program */
 baderr:
 	ex = EX_DATAERR ;
-
-#if	F_DEBUGS
-	eprintf("main: exiting program BAD\n") ;
-#endif
-
 	goto done ;
 
 

@@ -913,7 +913,7 @@ SC_QUERY	*qvp ;
 
 	CYI		*cip ;
 	CYI_CUR		ccur ;
-	CYI_QUERY	cq ;
+	CYI_QUERY	cq{} ;
 	CYI_ENT	ce ;
 
 	uint	loff, llen ;
@@ -936,7 +936,6 @@ SC_QUERY	*qvp ;
 	if (rs < 0)
 	    goto ret0 ;
 
-	memset(&cq,0,sizeof(CYI_QUERY)) ;
 	cq.m = qvp->m ;
 	cq.d = qvp->d ;
 
@@ -1371,7 +1370,7 @@ cchar	calname[] ;
 	int	rs ;
 
 
-	memset(calp,0,sizeof(SC_CAL)) ;
+	memclear(calp) ;
 
 	calp->cidx = cidx ;
 	rs = uc_mallocstrw(dirname,-1,&calp->dirname) ;
@@ -2868,7 +2867,7 @@ int		sl ;
 
 	SPELLCHECKS	*op ;
 
-	TMTIME		tm ;
+	TMTIME		tm{} ;
 
 	int	rs = SR_OK ;
 	int	nl ;
@@ -2952,7 +2951,7 @@ int		sl ;
 
 		    if (f_negative) odays = (- odays) ;
 
-		    memset(&tm,0,sizeof(TMTIME)) ;
+		    tm = {} ;
 		    tm.isdst = sip->isdst ;
 		    tm.gmtoff = sip->gmtoff ;
 		    tm.year = (sip->year - TM_YEAR_BASE) ;
@@ -3068,7 +3067,7 @@ static int db_start(DB *dbp,STRDESC *dp,int nf) noex {
 	int	rs = SR_OK ;
 	int	size = 0 ;
 
-	memset(dbp,0,sizeof(DB)) ;
+	memclear(dbp) ;
 
 	{
 	    int		cl ;
@@ -3129,7 +3128,7 @@ static int entry_start(SC_ENT *ep,SC_CITE *qp,int loff,int llen) noex {
 	if (ep == nullptr)
 	    return SR_FAULT ;
 
-	memset(ep,0,sizeof(SC_ENT)) ;
+	memclear(ep) ;
 	ep->cidx = -1 ;
 	ep->m = qp->m ;
 	ep->d = qp->d ;

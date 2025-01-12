@@ -171,7 +171,7 @@ OBJ15= mailmsg.o mailmsg_loadmb.o mailmsg_enver.o
 OBJ16= mailmsghdrval.o mailmsghdrfold.o mbcache.o
 OBJ17= td.o termstr.o uterm.o uterm_readcmd.o termcmd.o
 OBJ18= keysymer.o kbdinfo.o cmdmap.o subprocs.o
-OBJ19= dirseen.o ema.o useraccdb.o linefold.o
+OBJ19= dirseen.o ema.o useraccdb.o
 OBJ20= sigign.o
 OBJ21= varray.o
 OBJ22= hdrdecode.o qpdecoder.o b64decoder.o utf8decoder.o obuf.o
@@ -374,157 +374,10 @@ help.o:			help.c $(INCS)
 periph.o:		periph.c $(INCS)
 
 
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-vecstr.o:		vecstr.c vecstr.h
-
-keyopt.o:		keyopt.c keyopt.h
-
-dater.o:		dater.c dater.h
-
-dater_getdate.o:	dater_getdate.c dater.h date.h
-
-tmz.o:			tmz.c tmz.h
-
-zos.o:			zos.c zos.h
-
-comparse.o:		comparse.c comparse.h
-
-logfile.o:		logfile.c logfile.h
-
-logfile_userinfo:	logfile_userinfo.c logfile.h userinfo.h
-
-uterm.o:		uterm.c uterm.h
-
-uterm_readcmd.o:	uterm_readcmd.c uterm.h termcmd.h
-
-charq.o:		charq.c charq.h
-
-mailbox.o:		mailbox.c mailbox.h
-
-mailbox_getfrom.o:	mailbox_getfrom.c mailbox.h
-
-mailbox_fromaddr.o:	mailbox_fromaddr.c mailbox.h
-
-mailmsghdrval.o:	mailmsghdrval.c mailmsghdrval.h
-
-mailmsghdrfold.o:	mailmsghdrfold.c mailmsghdrfold.h
-
-mailmsg.o:		mailmsg.c mailmsg.h
-
-mailmsg_loadfile.o:	mailmsg_loadfile.c mailmsg.h
-
-mailmsg_loadmb.o:	mailmsg_loadmb.c mailmsg.h
-
-mailmsg_enver.o:	mailmsg_enver.c mailmsg_enver.h mailmsg.h 
-
-mailmsgmatenv.o:	mailmsgmatenv.c mailmsgmatenv.h
-
-mailmsgmathdr.o:	mailmsgmathdr.c mailmsgmathdr.h
-
-mailmsgfrom.o:		mailmsgfrom.c mailmsgfrom.h
-
-mbcache.o:		mbcache.c mbcache.h mailbox.h mailmsg.h
-
-td.o:			td.c td.h termstr.h
-
-termstr.o:		termstr.c termstr.h
-
-dirlist.o:		dirlist.c dirlist.h
-
-schedvar.o:		schedvar.c schedvar.h
-
-namecache.o:		namecache.c namecache.h
-
-lineindex.o:		lineindex.c lineindex.h
-
-linefold.o:		linefold.c linefold.h
-
-vecobj.o:		vecobj.c vecobj.h
-
-varray.o:		varray.c varray.h
-
-keysymer.o:		keysymer.c keysymer.h
-
-kbdinfo.o:		kbdinfo.c kbdinfo.h
-
-cmdmap.o:		cmdmap.c cmdmap.h
-
-subprocs.o:		subprocs.c subprocs.h
-
-vecint.o:		vecint.c vecint.h
-
-dirseen.o:		dirseen.c dirseen.h
-
-useraccdb.o:		useraccdb.c useraccdb.h
-
-paramopt.o:		paramopt.c paramopt.h
-
-pcsconf.o:		pcsconf.c pcsconf.h
-
-pcspoll.o:		pcspoll.c pcspoll.h
-
-paramfile.o:		paramfile.c paramfile.h
-
-termcmd.o:		termcmd.c termcmd.h
-
-sighand.o:		sighand.c sighand.h
-
-sigign.o:		sigign.c sigign.h
-
-chartrans.o:		chartrans.c chartrans.h uiconv.h
-
-termtrans.o:		termtrans.cc termtrans.h uiconv.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-hdrdecode.o:		hdrdecode.cc hdrdecode.h uiconv.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-b64decoder.o:		b64decoder.cc b64decoder.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-qpdecoder.o:		qpdecoder.cc qpdecoder.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-hexdecoder.o:		hexdecoder.cc hexdecoder.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-utf8decoder.o:		utf8decoder.cc utf8decoder.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-obuf.o:			obuf.cc obuf.hh
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-mapstrint.o:		mapstrint.c mapstrint.h
-
-ema.o:			ema.c ema.h
-
-lookaside.o:		lookaside.c lookaside.h
-
-vechand.o:		vechand.c vechand.h
-
-uiconv.o:		uiconv.c uiconv.h
-
-date.o:			date.c date.h
-
-strmgr.o:		strmgr.c strmgr.h
-
-sesmsg.o:		sesmsg.c sesmsg.h
-
-msgdata.o:		msgdata.c msgdata.h
-
 kshlib.o:		kshlib.c kshlib.h sesmsg.h msgdata.h
 
 progsig.o:		progsig.c progsig.h sesmsg.h msgdata.h
 
-
-upt.o:			upt.c upt.h
-
-spawnproc.o:		spawnproc.c spawnproc.h
 
 progspawncmd.o:		progspawncmd.c spawnproc.h
 

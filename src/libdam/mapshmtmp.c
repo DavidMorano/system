@@ -112,7 +112,7 @@ int mapshmtmp(char *rbuf,int rlen,mode_t operm,int shmlen,char **rpp)
 	}
 
 	if ((rs >= 0) && ((rs = openshmtmp(rbuf,rlen,operm)) >= 0)) {
-	    const int	fd = rs ;
+	    cint	fd = rs ;
 
 	    if (f_bufalloc) {
 	         uc_unlinkshm(rbuf) ;
@@ -143,10 +143,10 @@ int mapshmtmp(char *rbuf,int rlen,mode_t operm,int shmlen,char **rpp)
 static int shmalloc(int fd,int shmlen)
 {
 	off_t	off = 0 ;
-	const int	wlen = sizeof(int) ;
-	const int	ps = getpagesize() ;
+	cint	wlen = szof(int) ;
+	cint	ps = getpagesize() ;
 	int		rs = SR_OK ;
-	char		wbuf[sizeof(int) + 1] ;
+	char		wbuf[szof(int) + 1] ;
 
 	memset(wbuf,0,wlen) ;
 

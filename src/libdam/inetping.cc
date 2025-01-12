@@ -259,7 +259,7 @@ int pingone(cchar *pingprog,in_addr_t *ap,int to) noex {
 	    cint	dotlen = DOTBUFLEN ;
 	    char	dotbuf[DOTBUFLEN + 1] ;
 	    if ((rs = inetaddr_getdotaddr(&ia,dotbuf,dotlen)) >= 0) {
-		SPAWNPROC	ps ;
+		SPAWNPROC	ps{} ;
 		cint		tolen = TOBUFLEN ;
 		int		ai = 0 ;
 		cchar		*args[4] ;
@@ -273,11 +273,6 @@ int pingone(cchar *pingprog,in_addr_t *ap,int to) noex {
 	        }
 		args[ai] = NULL ;
 
-#if	CF_DEBUGS
-	debugprintf("inetping/pingone: mid2 rs=%d\n",rs) ;
-#endif
-
-		memset(&ps,0,sizeof(SPAWNPROC)) ;
 		ps.disp[0] = SPAWNPROC_DNULL ;
 		ps.disp[1] = SPAWNPROC_DCREATE ;
 		ps.disp[2] = SPAWNPROC_DNULL ;
@@ -285,9 +280,6 @@ int pingone(cchar *pingprog,in_addr_t *ap,int to) noex {
 		    const pid_t	pid = rs ;
 		    cint	fd = ps.fd[1] ;
 		    int		cs = 0 ;
-#if	CF_DEBUGS
-	debugprintf("inetping/pingone: mid3 rs=%d\n",rs) ;
-#endif
 		    if (to < 0) to = TO_PING ;
 		    to += TO_MORETIME ;
 		    if ((rs = pingoneresp(fd,to)) >= 0) {
@@ -297,9 +289,6 @@ int pingone(cchar *pingprog,in_addr_t *ap,int to) noex {
 	        	u_kill(pid,SIGTERM) ;
 	        	rs = u_waitpid(pid,&cs,WNOHANG) ;
 		    }
-#if	CF_DEBUGS
-	debugprintf("inetping/pingone: mid5 rs=%d\n",rs) ;
-#endif
 		    u_close(fd) ;
 		} /* end if (spawnproc) */
 #if	CF_DEBUGS

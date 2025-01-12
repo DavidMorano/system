@@ -702,7 +702,7 @@ static int progsig_workgen(PROGSIG *uip,msgdata *mip) noex {
 
 static int progsig_workgener(PROGSIG *uip,SESMSG_GEN *mp) noex {
 	SN	*ep ;
-	cint		esize = sizeof(SN) ;
+	cint		esize = szof(SN) ;
 	int		rs ;
 	if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
 	    time_t	st = mp->stime ;
@@ -743,7 +743,7 @@ static int progsig_workbiff(PROGSIG *uip,msgdata *mip) noex {
 
 static int progsig_workbiffer(PROGSIG *uip,SESMSG_BIFF *mp) noex {
 	SN		*ep ;
-	cint		esize = sizeof(SN) ;
+	cint		esize = szof(SN) ;
 	int		rs ;
 	if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
 	    time_t	st = mp->stime ;
@@ -882,7 +882,7 @@ static int progsig_reqrecv(PROGSIG *uip,msgdata *mip) noex {
 	int		sz ;
 	int		rs ;
 	int		rc = 0 ;
-	sz = (nfds * sizeof(POLLFD)) ;
+	sz = (nfds * szof(POLLFD)) ;
 	memset(fds,0,sz) ;
 	fds[0].fd = fd ;
 	fds[0].events = (POLLIN | POLLPRI | POLLERR) ;

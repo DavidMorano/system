@@ -6,6 +6,9 @@ file		what
 --------------------------------------------------------------------------------
 uctim
 libuc		fix to completely compile!
+ktag
+mapper
+postfile
 quote
 mailmsghdrct
 srv{x}

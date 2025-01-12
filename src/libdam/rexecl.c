@@ -162,7 +162,7 @@ int		*fd2p ;
 /* handle logging if it is enable */
 
 #if	CF_LOG
-	memset(&g,0,sizeof(struct global)) ;
+	memclear(&g) ;
 
 	serial = getserial(SERIALFILE1) ;
 
@@ -293,7 +293,7 @@ int		*fd2p ;
 
 /* server address */
 
-	memset(&server,0,sizeof(struct sockaddr_in)) ;
+	memclear(&server) ;
 
 	addr = inet_addr(*ahost) ;
 	if (addr == INETADDRBAD) {
@@ -310,7 +310,7 @@ int		*fd2p ;
 	} else {
 
 	    server.sin_family = htons(AF_INET) ;
-	    memcpy((char *) &server.sin_addr, &addr, sizeof(long)) ;
+	    memcpy((char *) &server.sin_addr, &addr, szof(long)) ;
 
 	} /* end if */
 
@@ -318,7 +318,7 @@ int		*fd2p ;
 
 /* from address */
 
-	memset(&from,0,sizeof(struct sockaddr_in)) ;
+	memclear(&from) ;
 
 	from.sin_family = htons(AF_INET) ;
 
@@ -438,7 +438,7 @@ int	f_err ;
 #endif
 
 	if ((srs = setsockopt(s1,SOL_SOCKET,SO_KEEPALIVE,
-	    (CONST char *) &f_keepalive,sizeof(int))) < 0)
+	    (cchar *) &f_keepalive,szof(int))) < 0)
 	    goto ret1 ;
 
 #if	CF_DEBUGS
@@ -449,7 +449,7 @@ int	f_err ;
 	ls.l_onoff = TRUE ;
 	ls.l_linger = LINGERTIME ;
 	if ((srs = setsockopt(s1,SOL_SOCKET,SO_LINGER,
-	    (CONST char *) &ls,sizeof(struct linger))) < 0)
+	    (cchar *) &ls,szof(struct linger))) < 0)
 	    goto ret1 ;
 #endif
 
@@ -465,7 +465,7 @@ int	f_err ;
 #endif
 
 	if ((srs = u_connect(s1,(struct sockaddr *) sp, 
-	    sizeof(struct sockaddr))) < 0) {
+	    szof(struct sockaddr))) < 0) {
 
 #if	CF_DEBUGS
 	    debugprintf("makeconn: connect problem (rs %d)\n",
@@ -526,7 +526,7 @@ int	f_err ;
 	        fp->sin_port = htons(i) ;
 
 	        rs = u_bind(slisten, (struct sockaddr *) fp, 
-	            sizeof(struct sockaddr)) ;
+	            szof(struct sockaddr)) ;
 
 		if (rs >= 0)
 			break ;
@@ -636,7 +636,7 @@ int	f_err ;
 	    debugprintf("makeconn: about to accept\n") ;
 #endif
 
-	    len = sizeof(struct sockaddr) ;
+	    len = szof(struct sockaddr) ;
 	    s2 = u_accept(slisten,(struct sockaddr *) fp,&len) ;
 
 	    if (s2 < 0) {
@@ -651,7 +651,7 @@ int	f_err ;
 #endif
 
 	    srs = setsockopt(s2,SOL_SOCKET,SO_KEEPALIVE,
-	        (CONST char *) &f_keepalive,sizeof(int)) ;
+	        (cchar *) &f_keepalive,szof(int)) ;
 
 	    if (srs < 0)
 	        goto ret3 ;
@@ -664,7 +664,7 @@ int	f_err ;
 	    ls.l_onoff = TRUE ;
 	    ls.l_linger = LINGERTIME ;
 	    if ((srs = setsockopt(s1,SOL_SOCKET,SO_LINGER,
-	        (CONST char *) &ls,sizeof(struct linger))) < 0)
+	        (cchar *) &ls,szof(struct linger))) < 0)
 	        goto ret3 ;
 #endif
 

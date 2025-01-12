@@ -1,9 +1,9 @@
-/* svcentsub */
+/* svcentsub SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* build up a server entry piece-meal as it were */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,23 +17,22 @@
 
 /*******************************************************************************
 
+  	Object:
+	svcentsub
+
+	Description:
         This little object takes a regular server entry and substitutes
 	values for keys possibly embedded in the string values inside the
 	server entry.
 
-
 *******************************************************************************/
 
-
-#define	SVCENTSUB_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -55,27 +54,19 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
 
 
-/* local subroutines */
-
-
 /* local variables */
 
-static cchar	*svckeys[] = { /* KEEP IN SYNC W/ HEADER */
+constexpr cpcchar	svckeys[] = { /* KEEP IN SYNC W/ HEADER */
 	"file",
 	"passfile",
 	"so",
@@ -97,11 +88,9 @@ static cchar	*svckeys[] = { /* KEEP IN SYNC W/ HEADER */
 
 /* exported subroutines */
 
-
-int svcentsub_start(SVCENTSUB *op,LOCINFO *lip,SVCFILE_ENT *sep)
-{
-	STRPACK		*spp = &op->strs ;
-	const int	csize = SVCENTSUB_CSIZE ;
+int svcentsub_start(SVCENTSUB *op,LOCINFO *lip,SVCFILE_ENT *sep) noex {
+	strpack		*spp = &op->strs ;
+	cint		csize = SVCENTSUB_CSIZE ;
 	int		rs ;
 	int		rs1 ;
 
@@ -109,13 +98,9 @@ int svcentsub_start(SVCENTSUB *op,LOCINFO *lip,SVCFILE_ENT *sep)
 	if (lip == NULL) return SR_FAULT ;
 	if (sep == NULL) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("svckey_start: ent\n") ;
-#endif
-
-	memset(op,0,sizeof(SVCENTSUB)) ;
+	memclear(op) ;
 	if ((rs = strpack_start(spp,csize)) >= 0) {
-	    const int	elen = EBUFLEN ;
+	    cint	elen = EBUFLEN ;
 	    char	*ebuf ;
 	    if ((rs = uc_malloc((elen+1),&ebuf)) >= 0) {
 	        int	i ;
@@ -123,14 +108,7 @@ int svcentsub_start(SVCENTSUB *op,LOCINFO *lip,SVCFILE_ENT *sep)
 	            int		ki ;
 	            cchar	*kp = sep->keyvals[i][0] ;
 	            cchar	*vp = sep->keyvals[i][1] ;
-#if	CF_DEBUGS
-	            debugprintf("svckey_start: k=%s\n",kp) ;
-#endif
 	            if ((ki = matostr(svckeys,1,kp,-1)) >= 0) {
-#if	CF_DEBUGS
-	                debugprintf("svckey_start: ki=%d\n",ki) ;
-	                debugprintf("svckey_start: kp=%s vp=>%s<\n",kp,vp) ;
-#endif
 	                if ((rs = locinfo_varsub(lip,ebuf,elen,vp,-1)) >= 0) {
 	                    cchar	*ep ;
 	                    if ((rs = strpack_store(spp,ebuf,rs,&ep)) >= 0) {
@@ -143,22 +121,17 @@ int svcentsub_start(SVCENTSUB *op,LOCINFO *lip,SVCFILE_ENT *sep)
 	        rs1 = uc_free(ebuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        strpack_finish(&op->strs) ;
+	    }
 	} /* end if (strpack_start) */
-
-#if	CF_DEBUGS
-	debugprintf("svckey_start: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (svcentsub_start) */
 
-
-int svcentsub_finish(SVCENTSUB *op)
-{
-	const int	vsize = (sizeof(cchar *) * svckey_overlast) ;
+int svcentsub_finish(SVCENTSUB *op) noex {
+	cint		vsz = (szof(cchar *) * svckey_overlast) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -167,7 +140,7 @@ int svcentsub_finish(SVCENTSUB *op)
 	rs1 = strpack_finish(&op->strs) ;
 	if (rs >= 0) rs = rs1 ;
 
-	memset(op->var,0,vsize) ;
+	memset(op->var,0,vsz) ;
 
 	return rs ;
 }

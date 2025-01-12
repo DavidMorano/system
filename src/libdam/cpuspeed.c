@@ -122,7 +122,7 @@ static const char	*exts[] = {
 
 int cpuspeed(cchar *pr,cchar *name,int nruns)
 {
-	struct loadfile	lf ;
+	struct loadfile	lf{} ;
 	int		rs ;
 	int		i ;
 	int		speed ;
@@ -140,8 +140,6 @@ int cpuspeed(cchar *pr,cchar *name,int nruns)
 
 	if (nruns <= 0)
 	    nruns = NRUNS ;
-
-	memset(&lf,0,sizeof(struct loadfile)) ;
 
 #if	CF_PARENT
 	lf.dlmode = RTLD_LAZY | RTLD_LOCAL | RTLD_PARENT ;

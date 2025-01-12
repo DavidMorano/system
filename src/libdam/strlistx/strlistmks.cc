@@ -102,7 +102,7 @@
 #define	KEYBUFLEN	120
 #endif
 
-#define	HDRBUFLEN	(sizeof(strlisthdr) + 128)
+#define	HDRBUFLEN	(szof(strlisthdr) + 128)
 
 #define	TO_OLDFILE	(5 * 60)
 
@@ -240,9 +240,10 @@ constexpr bool		f_usesbuf = CF_USESBUF ;
 
 /* exported variables */
 
-STRLISTMKS_OBJ	strlistmks_mod = {
+strlistmks_obj	strlistmks_modinfo = {
 	"strlistmks",
-	sizeof(strlistmks)
+	szof(strlistmks),
+	0
 } ;
 
 
@@ -687,7 +688,7 @@ int sub_wrsfile::mkfile(rectab_t rt,int rtl) noex {
 	                    /* write the record table */
 	                    hf.rtoff = foff ;
 	                    hf.rtlen = rtl ;
-	                    sz = (rtl + 1) * sizeof(uint) ;
+	                    sz = (rtl + 1) * szof(uint) ;
 	                    if ((rs = filer_write(sfp,rt,sz)) >= 0) {
 			        strtab	*ksp = op->stp ;
 	                        foff += rs ;
@@ -725,7 +726,7 @@ int sub_wrsfile::mkkstab(filer *vfp,int rtl,int sz) noex {
 		    /* make and write out the record-index table */
 	            hf.itoff = foff ;
 	            hf.itlen = itl ;
-	            sz = (itl + 1) * 3 * sizeof(uint) ;
+	            sz = (itl + 1) * 3 * szof(uint) ;
 	            if ((rs = uc_malloc(sz,&indtab)) >= 0) {
 			memset(indtab,0,sz) ;
 	                if ((rs = strlistmks_mkind(op,kstab,indtab,itl)) >= 0) {

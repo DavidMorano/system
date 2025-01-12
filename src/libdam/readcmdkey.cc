@@ -110,7 +110,7 @@ int readcmdkey(readcmdkey *ckp,uterm *utp,int to,int ch) noex {
 	if (utp == NULL)
 	    return SR_INVALID ;
 
-	memset(ckp,0,sizeof(struct readcmdkey)) ;
+	memclear(ckp) ;
 
 	f_csi = (ch == CH_CSI) ;
 

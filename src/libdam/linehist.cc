@@ -25,9 +25,14 @@
 	linehist_finish
 
 	Description:
-	Process characters (a line at a time) for balanced pairs.
-	We record line numbers so that when we are left with some
-	sort of unbalance, we can report the associated line numbers.
+	This object both processes lines and remembers any lines
+	that meet a certain criteria.  I Process characters (a line
+	at a time) for balanced pairs.  I record line numbers so
+	that when we are left with some sort of unbalance, we can
+	report the associated line numbers.
+
+	Dependencies:
+	langstate
 
 *******************************************************************************/
 

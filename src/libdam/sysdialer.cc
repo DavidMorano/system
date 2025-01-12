@@ -323,7 +323,7 @@ int sysdialer_start(sysdialer *op,cchar *pr,cchar **prs,cchar **dirs) noex {
 
 	} /* end if */
 
-	size = sizeof(SYSDIALER_ENT) ;
+	size = szof(SYSDIALER_ENT) ;
 	opts = VECOBJ_OSORTED ;
 	if ((rs = vecobj_start(&op->entries,size,10,opts)) >= 0) {
 	    if ((rs = prcache_start(&op->pc)) >= 0){
@@ -445,7 +445,7 @@ int sysdialer_loadin(sysdialer *op,cchar *name,sysdialer_ent **depp) noex {
 
 /* create a new load module descriptor */
 
-	osize = sizeof(sysdialer_mod) ;
+	osize = szof(sysdialer_mod) ;
 	rs = uc_malloc(osize,&mp) ;
 
 	if (rs < 0)
@@ -793,7 +793,7 @@ SYSDIALER_ENT	*ep ;
 	cchar	*ldnp ;
 	char		subdname[MAXPATHLEN + 1] ;
 
-	dsize = sizeof(caddr_t) ;
+	dsize = szof(caddr_t) ;
 	dirs = (dsize == 8) ? de64 : de32 ;
 
 	for (i = 0 ; dirs[i] != nullptr ; i += 1) {
@@ -849,7 +849,7 @@ static int prcache_start(prcache *pcp) noex {
 	int		rs ;
 	int		osize ;
 	pcp->domainname = nullptr ;
-	osize = (nelem(prnames) + 1) * sizeof(char *) ;
+	osize = (nelem(prnames) + 1) * szof(char *) ;
 	if ((rs = uc_malloc(osize,&pcp->prs)) >= 0) {
 	    memset(pcp->prs,0,osize) ;
 	}

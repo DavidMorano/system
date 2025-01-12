@@ -76,7 +76,7 @@
 #define	DENSITYDB_FOHEAD	(DENSITYDB_FOID + DENSITYDB_FLID)
 #define	DENSITYDB_FOTAB		(DENSITYDB_FOHEAD + DENSITYDB_FLHEAD)
 
-#define	DENSITYDB_ENTSIZE	sizeof(uint)
+#define	DENSITYDB_ENTSIZE	szof(uint)
 #define	DENSITYDB_EBS		((DENSITYDBE_SIZE + 3) & (~ 3))
 
 #define	DENSITYDB_BUFSIZE	(64 * 1024)
@@ -200,7 +200,7 @@ int		maxentry ;
 #endif
 	oflags = (oflags &= (~ O_TRUNC)) ;
 
-	memset(op,0,sizeof(DENSITYDB)) ;
+	memclear(op) ;
 	op->pagesize = getpagesize() ;
 	op->oflags = oflags ;
 	op->om = om ;
@@ -663,7 +663,7 @@ closeit:
 
 static int densitydb_opening(DENSITYDB *op,cchar *fname)
 {
-	const int	of = (op->oflags & (~ O_CREAT)) ;
+	cint	of = (op->oflags & (~ O_CREAT)) ;
 	int		rs ;
 	int		f_create = FALSE ;
 	char		tbuf[MAXPATHLEN+1] ;
@@ -801,7 +801,7 @@ static int densitydb_fileinit(DENSITYDB *op,time_t dt)
 
 /* file header */
 
-	        memset(&op->h,0,sizeof(DENSITYDB_FH)) ;
+	        memclear(&op->h) ;
 
 #if	CF_DEBUGS
 	        debugprintf("densitydb_fileinit: filehead() bl=%d\n",bl) ;
@@ -1145,7 +1145,7 @@ int densitydb_fileclose(DENSITYDB *op)
 /* buffer mangement stuff */
 static int densitydb_bufbegin(DENSITYDB *op)
 {
-	const int	size = DENSITYDB_BUFSIZE ;
+	cint	size = DENSITYDB_BUFSIZE ;
 	int		rs ;
 
 	op->b.off = 0 ;
@@ -1332,7 +1332,7 @@ static int densitydb_writehead(DENSITYDB *op)
 
 	if ((rs = filehead(fbuf,0,&op->h)) >= 0) {
 	    const off_t	uoff = DENSITYDB_FOHEAD ;
-	    const int		bl = rs ;
+	    cint		bl = rs ;
 	    rs = u_pwrite(op->fd,fbuf,bl,uoff) ;
 	}
 
@@ -1385,7 +1385,7 @@ int		f ;
 DENSITYDB_FH	*hp ;
 {
 	SERIALBUF	msgbuf ;
-	const int	bsize = sizeof(DENSITYDB_FH) ;
+	cint		bsize = szof(DENSITYDB_FH) ;
 	int		rs ;
 	int		rs1 ;
 

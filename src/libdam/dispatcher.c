@@ -104,7 +104,7 @@ int dispatcher_start(DISPATCHER *dop,int n,void *callsub,void *callarg)
 	if (dop == NULL) return SR_FAULT ;
 	if (callsub == NULL) return SR_FAULT ;
 
-	memset(dop,0,sizeof(DISPATCHER)) ;
+	memclear(dop) ;
 	dop->nthr = n ;
 	dop->callsub = callsub ;
 	dop->callarg = callarg ;
@@ -127,8 +127,8 @@ int dispatcher_start(DISPATCHER *dop,int n,void *callsub,void *callarg)
 	    dop->nthr = n ;
 	    if ((rs = ciq_start(&dop->wq)) >= 0) {
 	        if ((rs = psem_create(&dop->ws,FALSE,0)) >= 0) {
-	            const int	size = sizeof(pthread_t) ;
-	            const int	vo = (VECOBJ_OREUSE) ;
+	            cint	size = szof(pthread_t) ;
+	            cint	vo = (VECOBJ_OREUSE) ;
 	            if ((rs = vecobj_start(&dop->tids,size,10,vo)) >= 0) {
 	                pthread_t	tid, *tidp ;
 	                workthr		w = (workthr) dispatcher_worker ;

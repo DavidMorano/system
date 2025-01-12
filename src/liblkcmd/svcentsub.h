@@ -1,6 +1,9 @@
-/* svcentsub */
+/* svcentsub HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
 
 /* expanded server entry */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,9 +15,8 @@
 
 /* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	SVCENTSUB_INCLUDE
-#define	SVCENTSUB_INCLUDE	1
+#define	SVCENTSUB_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -49,25 +51,19 @@ enum svckeys { /* KEEP IN SYNC W/ CODE-FILE */
 } ;
 
 struct svcentsub_head {
-	STRPACK		strs ;
+	strpack		strs ;
 	cchar		*var[svckey_overlast] ;
 } ;
 
+typedef	SVCENTSUB	svcentsub ;
 
-#if	(! defined(SVCENTSUB_MASTER)) || (SVCENTSUB_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int svcentsub_start(svcentsub *,locinfo *,svcent *) noex ;
+extern int svcentsub_finish(svcentsub *) noex ;
 
-extern int svcentsub_start(SVCENTSUB *,LOCINFO *,SVCENT *) ;
-extern int svcentsub_finish(SVCENTSUB *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* SVCENTSUB_MASTER */
 
 #endif /* SVCENTSUB_INCLUDE */
 

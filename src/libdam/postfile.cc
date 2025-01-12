@@ -152,7 +152,7 @@ int postfile_open(op,fname)
 POSTFILE	*op ;
 cchar	fname[] ;
 {
-	struct ustat	sb ;
+	USTAT	sb ;
 
 	uint	*table ;
 
@@ -173,7 +173,7 @@ cchar	fname[] ;
 	if (fname == NULL)
 	    return SR_FAULT ;
 
-	(void) memset(op,0,sizeof(POSTFILE)) ;
+	memclear(op) ;
 
 	op->fd = -1 ;
 	op->oflags = O_RDONLY ;
@@ -205,7 +205,7 @@ cchar	fname[] ;
 	    goto bad1 ;
 	}
 
-	size = 16 + 4 + (header_overlast * sizeof(int)) ;
+	size = 16 + 4 + (header_overlast * szof(int)) ;
 
 /* wait for the file to come in if it is not yet available */
 
@@ -1004,7 +1004,7 @@ POSTFILE	*op ;
 time_t		daytime ;
 int		f_read ;
 {
-	struct ustat	sb ;
+	USTAT	sb ;
 
 	int	rs = SR_OK ;
 	int	mpages, fpages ;

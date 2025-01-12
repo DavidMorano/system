@@ -268,17 +268,16 @@ constexpr char		envpre[] = "ISSUE_" ;	/* environment prefix */
 int issue_open(ISSUE *op,cchar *pr) noex {
 	custime		dt = time(nullptr) ;
 	int		rs ;
-	cchar		*cp ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(ISSUE)) ;
+	memclear(op) ;
 	op->fe = ISSUE_DIRSFNAME ;
 
-	if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	    op->pr = cp ;
 	    if ((rs = ptm_create(&op->m,nullptr)) >= 0) {
 	        if ((rs = issue_mapfind(op,dt)) >= 0) {
@@ -286,11 +285,13 @@ int issue_open(ISSUE *op,cchar *pr) noex {
 	                op->ti_lastcheck = dt ;
 	                op->magic = ISSUE_MAGIC ;
 	            }
-	            if (rs < 0)
+	            if (rs < 0) {
 	                issue_maplose(op) ;
+		    }
 	        } /* end if (mapfind) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            ptm_destroy(&op->m) ;
+		}
 	    } /* end if (ptm_create) */
 	    if (rs < 0) {
 	        uc_free(op->pr) ;
@@ -389,7 +390,7 @@ int issue_process(ISSUE *op,cchar *groupname,cchar **adms,int fd) noex {
 /* go */
 
 	n = nelem(envstrs) ;
-	size = (op->nenv + n + 1) * sizeof(cchar *) ;
+	size = (op->nenv + n + 1) * szof(cchar *) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 	    STRPACK	packer ;
 	    cchar	**ev = (cchar **) p ;
@@ -479,7 +480,7 @@ static int issue_mapfname(ISSUE *op,char fbuf[]) noex {
 	fbuf[0] = '\0' ;
 	if ((rs = vecstr_start(&scheds,6,0)) >= 0) {
 	    if ((rs = issue_schedload(op,&scheds)) >= 0) {
-	        const int	flen = MAXPATHLEN ;
+	        cint	flen = MAXPATHLEN ;
 
 	        rs1 = permsched(schedmaps,&scheds,fbuf,flen,op->fe,R_OK) ;
 
@@ -516,7 +517,7 @@ static int issue_schedload(ISSUE *op,vecstr *slp) noex {
 	cchar		*keys = "pen" ;
 	cchar		*name = ISSUE_NAME ;
 	for (i = 0 ; keys[i] != '\0' ; i += 1) {
-	    const int	kch = MKCHAR(keys[i]) ;
+	    cint	kch = MKCHAR(keys[i]) ;
 	    int		vl = -1 ;
 	    cchar	*vp = nullptr ;
 	    switch (kch) {
@@ -561,8 +562,8 @@ static int issue_checker(ISSUE *op,time_t dt) noex {
 /* end subroutine (issue_checker) */
 
 static int issue_envbegin(ISSUE *op) noex {
-	const int	es = envpre[0] ;
-	const int	envprelen = strlen(envpre) ;
+	cint	es = envpre[0] ;
+	cint	envprelen = strlen(envpre) ;
 	int		rs = SR_OK ;
 	int		size ;
 	int		i ;
@@ -572,7 +573,7 @@ static int issue_envbegin(ISSUE *op) noex {
 
 	for (i = 0 ; environ[i] != nullptr ; i += 1) ;
 
-	size = (i + 1) * sizeof(cchar *) ;
+	size = (i + 1) * szof(cchar *) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 	    cchar	*ep ;
 	    cchar	**va = (cchar **) p ;
@@ -613,7 +614,7 @@ static int issue_envend(ISSUE *op) noex {
 
 static int issue_envadds(ISSUE *op,STRPACK *spp,cchar **ev,
 		cchar *keyname) noex {
-	const int	envlen = ENVBUFLEN ;
+	cint	envlen = ENVBUFLEN ;
 	int		rs = SR_OK ;
 	int		n, i ;
 	int		el ;
@@ -722,12 +723,7 @@ static int mapper_start(ISSUE_MAPPER *mmp,time_t dt,cchar fname[]) noex {
 	cchar		**evp = (cchar **) environ ;
 	cchar		*ccp ;
 
-#if	CF_DEBUGS
-	debugprintf("mapper_start: sizeof(PTM)=%u\n",
-	    sizeof(PTM)) ;
-#endif
-
-	memset(mmp,0,sizeof(ISSUE_MAPPER)) ;
+	memclear(mmp) ;
 
 	if ((rs = lockrw_create(&mmp->rwm,0)) >= 0) {
 	    if ((rs = uc_mallocstrw(fname,-1,&ccp)) >= 0) {
@@ -735,7 +731,7 @@ static int mapper_start(ISSUE_MAPPER *mmp,time_t dt,cchar fname[]) noex {
 	        if ((rs = vechand_start(&mmp->mapdirs,4,0)) >= 0) {
 	            cchar	*fn = mmp->fname ;
 	            if ((rs = paramfile_open(&mmp->dirsfile,evp,fn)) >= 0) {
-	                const int	to = TO_MAPCHECK ;
+	                cint	to = TO_MAPCHECK ;
 	                if ((rs = paramfile_checkint(&mmp->dirsfile,to)) >= 0) {
 	                    mmp->magic = ISSUE_MAPPERMAGIC ;
 	                    mmp->ti_check = dt ;
@@ -819,7 +815,7 @@ static int mapper_finish(ISSUE_MAPPER *mmp) noex {
 /* end subroutine (mapper_finish) */
 
 static int mapper_check(ISSUE_MAPPER *mmp,time_t dt) noex {
-	const int	to_lock = TO_LOCK ;
+	cint	to_lock = TO_LOCK ;
 	int		rs ;
 	int		nchanged = 0 ;
 
@@ -828,7 +824,7 @@ static int mapper_check(ISSUE_MAPPER *mmp,time_t dt) noex {
 	if (mmp->magic != ISSUE_MAPPERMAGIC) return SR_NOTOPEN ;
 
 	if ((rs = lockrw_wrlock(&mmp->rwm,to_lock)) >= 0) {
-	    const int	to = TO_MAPCHECK ;
+	    cint	to = TO_MAPCHECK ;
 
 	    if (dt == 0) dt = time(nullptr) ;
 
@@ -862,7 +858,7 @@ static int mapper_check(ISSUE_MAPPER *mmp,time_t dt) noex {
 
 static int mapper_process(ISSUE_MAPPER *mmp,cchar **ev,cchar **adms,
 		cchar *gn,int fd) noex {
-	const int	to_lock = TO_LOCK ;
+	cint	to_lock = TO_LOCK ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -963,7 +959,7 @@ static int mapper_mapload(ISSUE_MAPPER *mmp) noex {
 	    PARAMFILE_CUR	cur ;
 	    mmp->ti_mtime = sb.st_mtime ;
 	    if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
-	        const int	plen = PBUFLEN ;
+	        cint	plen = PBUFLEN ;
 	        int		kl, vl ;
 	        int		fl ;
 	        cchar		*kp, *vp ;
@@ -1007,7 +1003,7 @@ static int mapper_mapload(ISSUE_MAPPER *mmp) noex {
 static int mapper_mapadd(ISSUE_MAPPER *mmp,cchar *kp,int kl,
 		cchar *vp,int vl) noex {
 	ISSUE_MAPDIR	*ep ;
-	const int	size = sizeof(ISSUE_MAPDIR) ;
+	cint	size = szof(ISSUE_MAPDIR) ;
 	int		rs ;
 
 	if ((kp == nullptr) || (vp == nullptr)) return SR_FAULT ;
@@ -1092,7 +1088,7 @@ static int mapdir_start(ISSUE_MAPDIR *ep,cchar *kp,int kl,
 
 	if ((kl == 0) || (vl == 0)) return SR_INVALID ;
 
-	memset(ep,0,sizeof(ISSUE_MAPDIR)) ;
+	memclear(ep) ;
 
 	if (kl < 0)
 	    kl = strlen(kp) ;
@@ -1101,7 +1097,7 @@ static int mapdir_start(ISSUE_MAPDIR *ep,cchar *kp,int kl,
 	    vl = strlen(vp) ;
 
 	{
-	    const int	size = (kl + 1 + vl + 1) ;
+	    cint	size = (kl + 1 + vl + 1) ;
 	    char	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
 	        char	*bp = p ;
@@ -1149,7 +1145,7 @@ static int mapdir_finish(ISSUE_MAPDIR *ep) noex {
 
 static int mapdir_process(ISSUE_MAPDIR *ep,cchar **ev,cchar **adms,
 		cchar *gn,int fd) noex {
-	const int	to_lock = TO_LOCK ;
+	cint	to_lock = TO_LOCK ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -1200,7 +1196,7 @@ static int mapdir_process(ISSUE_MAPDIR *ep,cchar **ev,cchar **adms,
 /* end subroutine (mapdir_process) */
 
 static int mapdir_expand(ISSUE_MAPDIR *ep) noex {
-	const int	to_lock = TO_LOCK ;
+	cint	to_lock = TO_LOCK ;
 	int		rs ;
 
 #if	CF_DEBUGS
@@ -1257,7 +1253,7 @@ static int mapdir_expander(ISSUE_MAPDIR *ep) noex {
 	    }
 	    if ((rs = getbufsize(getbufsize_pw)) >= 0) {
 	        struct passwd	pw ;
-	        const int	pwlen = rs ;
+	        cint	pwlen = rs ;
 	        char		*pwbuf ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 		    if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
@@ -1318,7 +1314,7 @@ static int mapdir_processor(ISSUE_MAPDIR *ep,cchar **ev,
 	    struct ustat	sb ;
 	    if ((rs1 = u_stat(dn,&sb)) >= 0) {
 	        VECSTR		nums ;
-	        const int	envlen = ENVBUFLEN ;
+	        cint	envlen = ENVBUFLEN ;
 	        cchar		*post ;
 	        post = envstrs[envstr_admin] ;
 	        strdcpy4(env_admin,envlen,envpre,post,"=",ep->admin) ;
@@ -1415,7 +1411,7 @@ static int mapdir_processorthem(ISSUE_MAPDIR *ep,cchar **ev,cchar *dn,
 
 static int mapdir_processorone(ISSUE_MAPDIR *ep,cchar **ev,cchar *dn,
 		VECSTR *blp,cchar *kn,int fd) noex {
-	const int	kl = strlen(kn) ;
+	cint	kl = strlen(kn) ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
@@ -1452,7 +1448,7 @@ static int mapdir_processorone(ISSUE_MAPDIR *ep,cchar **ev,cchar *dn,
 
 static int mapdir_procout(ISSUE_MAPDIR *ep,cchar **ev,cchar *dn,
 		cchar *gn,int fd) noex {
-	const int	clen = MAXNAMELEN ;
+	cint	clen = MAXNAMELEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	cchar		*name = ISSUE_NAME ;
@@ -1483,10 +1479,10 @@ static int mapdir_procout(ISSUE_MAPDIR *ep,cchar **ev,cchar *dn,
 static int mapdir_procouter(ISSUE_MAPDIR *ep,cchar **ev,cchar *fname,
 		int ofd) noex {
 	const mode_t	operms = 0664 ;
-	const int	oflags = O_RDONLY ;
-	const int	to_open = TO_OPEN ;
-	const int	to_read = TO_READ ;
-	const int	to_write = TO_WRITE ;
+	cint	oflags = O_RDONLY ;
+	cint	to_open = TO_OPEN ;
+	cint	to_read = TO_READ ;
+	cint	to_write = TO_WRITE ;
 	int		rs ;
 	int		wlen = 0 ;
 
@@ -1497,8 +1493,8 @@ static int mapdir_procouter(ISSUE_MAPDIR *ep,cchar **ev,cchar *fname,
 #endif
 
 	if ((rs = uc_openenv(fname,oflags,operms,ev,to_open)) >= 0) {
-	    const int	mfd = rs ;
-	    const int	olen = MSGBUFLEN ;
+	    cint	mfd = rs ;
+	    cint	olen = MSGBUFLEN ;
 	    char	obuf[MSGBUFLEN + 1] ;
 #if	CF_DEBUGS
 	    debugprintf("issue/mapdir_procouter: uc_openenv() rs=%d\n",rs) ;
@@ -1566,7 +1562,7 @@ static int writeto(int wfd,cchar *wbuf,int wlen,int wto) noex {
 
 	    dt = time(nullptr) ;
 	    if (rs > 0) {
-	        const int	re = fds[0].revents ;
+	        cint	re = fds[0].revents ;
 
 	        if (re & POLLOUT) {
 	            rs = u_write(wfd,(wbuf+tlen),(wlen-tlen)) ;

@@ -226,7 +226,7 @@ int zprinthexblock(cchar *fn,cchar *id,int mc,const void *vp,int vl)
 
 static int subinfo_start(SUBINFO *sip,char *bp,cchar *fn,cchar *id,int mc)
 {
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 	sip->bp = bp ;
 	sip->fn = fn ;
 	sip->mc = mc ;

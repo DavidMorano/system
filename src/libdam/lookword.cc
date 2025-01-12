@@ -263,7 +263,7 @@ static int lookword_record(LW *op,LW_CUR *curp,
 		cc *front,cc *back,cc *wstr) noex {
 	cnullptr	np{} ;
 	vecobj		ans ;
-	cint		esize = sizeof(LOOKWORD_WORD) ;
+	cint		esize = szof(LOOKWORD_WORD) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -315,7 +315,7 @@ static int lookword_recorder(LW *op,LW_CUR *curp,vecobj *alp,int c) noex {
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
 	if (op) {
-	    cint	asize = ((c+1) * sizeof(LOOKWORD_WORD)) ;
+	    cint	asize = ((c+1) * szof(LOOKWORD_WORD)) ;
 	    void	*p ;
 	    if (curp->ans) {
 	        uc_free(curp->ans) ;

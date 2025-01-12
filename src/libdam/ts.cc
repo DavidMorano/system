@@ -167,8 +167,8 @@
 /* local defines */
 
 #define	TS_IDOFF	0
-#define	TS_HEADTABOFF	(TS_IDOFF + (16 + sizeof(uint)))
-#define	TS_TABOFF	(TS_HEADTABOFF + (3 * sizeof(uint)))
+#define	TS_HEADTABOFF	(TS_IDOFF + (16 + szof(uint)))
+#define	TS_TABOFF	(TS_HEADTABOFF + (3 * szof(uint)))
 
 #define	TS_ENTSIZE	TSE_SIZE
 #define	TS_MAXFILESIZE	(4 * 1024 * 1024)
@@ -508,12 +508,10 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	if (dt == 0) dt = time(nullptr) ;
 
 	if (rs >= 0) {
-	    ts_ent	ew ;
+	    ts_ent	ew{} ;
 
-  	    if (ep != nullptr) {
+  	    if (ep)
 		ew = *ep ;
-	    } else {
-		memset(&ew,0,sizeof(ts_ent)) ;
 	    }
 
 	    if (ew.count == 0) ew.count = 1 ;
@@ -531,14 +529,12 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	    rs = ebuf_write(op->ebmp,ei,nullptr) ; /* sync */
 
 	} else if (rs == SR_NOTFOUND) {
-	    ts_ent	ew ;
+	    ts_ent	ew{} ;
 	    char	ebuf[TS_ENTSIZE + 2] ;
 
 	    f_newentry = true ;
   	    if (ep != nullptr) {
 		ew = *ep ;
-	    } else {
-		memset(&ew,0,sizeof(ts_ent)) ;
 	    }
 
 	    if (ew.count == 0) ew.count = 1 ;
@@ -1013,22 +1009,22 @@ static int ts_headtab(ts *op,int f_read) noex {
 	char		*bp = (op->topbuf + TS_HEADTABOFF) ;
 	if (f_read) {
 	    ts_hdr	h{} ;
-	    int		hsize = sizeof(ts_hdr) ;
+	    int		hsize = szof(ts_hdr) ;
 	    stdorder_rui(bp,&h.nentries) ;
-	    bp += sizeof(uint) ;
+	    bp += szof(uint) ;
 	    stdorder_rui(bp,&h.wtime) ;
-	    bp += sizeof(uint) ;
+	    bp += szof(uint) ;
 	    stdorder_rui(bp,&h.wcount) ;
-	    bp += sizeof(uint) ;
+	    bp += szof(uint) ;
 	    f_changed = (memcmp(&h,&op->h,hsize) != 0) ;
 	    op->h = h ;
 	} else {
 	    stdorder_wui(bp,op->h.nentries) ;
-	    bp += sizeof(uint) ;
+	    bp += szof(uint) ;
 	    stdorder_wui(bp,op->h.wtime) ;
-	    bp += sizeof(uint) ;
+	    bp += szof(uint) ;
 	    stdorder_wui(bp,op->h.wcount) ;
-	    bp += sizeof(uint) ;
+	    bp += szof(uint) ;
 	} /* end if */
 	return (rs >= 0) ? f_changed : rs ;
 }

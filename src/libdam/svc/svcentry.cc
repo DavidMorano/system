@@ -1,4 +1,5 @@
 /* svcentry SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* build up a program entry piece-meal as it were */
@@ -88,9 +89,6 @@
 
 #define	TMPLEN		14		/* old SysV file-len */
 #define	BUFMULT		10		/* expansion buffer path multiplier */
-
-#undef	OUTBUFLEN
-#define	OUTBUFLEN	(10 * MAXPATHLEN)
 
 #define	SE		svcentry
 #define	ARGS		svcentry_args
@@ -201,13 +199,12 @@ int svcentry_start(SE *op,varsub *ssp,ENT *sep,ARGS * esap) noex {
 	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
 	        if (char *bp ; (rs = malloc_mn(&bp)) >= 0) {
-	            svckey	sk ;
 		    cint	namelen = rs ;
 		    op->name = bp ;
 	            op->ssp = ssp ;
 	            op->atime = esap->daytime ;	/* job arrival time */
 		    op->jobid[0] = '\0' ;
-		    if ((rs = svckey_load(&sk,sep)) >= 0) {
+	            if (svckey sk ; (rs = svckey_load(&sk,sep)) >= 0) {
 		        strwcpy(op->name,sk.svc,namelen) ;
 		        {
 			    rs = svcentry_starter(op,&sk,esap) ;

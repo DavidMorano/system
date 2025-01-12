@@ -53,9 +53,9 @@ int density_start(DENSITY *op,int len)
 	if (len < 1)
 	    return SR_INVALID ;
 
-	memset(op,0,sizeof(DENSITY)) ;
+	memclear(op) ;
 
-	size = (len + 1) * sizeof(ULONG) ;
+	size = (len + 1) * szof(ULONG) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 	    op->a = p ;
 	    memset(op->a,0,size) ;

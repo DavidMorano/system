@@ -156,7 +156,7 @@ OBJ09= varsub.o varsub_extras.o
 OBJ10=
 OBJ11=
 OBJ12= field_svcargs.o
-OBJ13= sysvar.o dirseen.o linefold.o poller.o
+OBJ13= sysvar.o dirseen.o poller.o
 OBJ14= envs.o envs_procxe.o envs_subs.o
 OBJ15= svcfile.o acctab.o cq.o lfm.o var.o spawner.o
 

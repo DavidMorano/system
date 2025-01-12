@@ -77,22 +77,16 @@ extern char	*strnchr(const char *,int,int) ;
 
 int mapstrs_start(MAPSTRS *op,int n)
 {
-	const int	at = TRUE ;
+	cint		at = true ;
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("mapstrs_start: ent op=%p\n",op) ;
-	debugprintf("mapstrs_start: n=%d\n",n) ;
-#endif
-
-	memset(op,0,sizeof(MAPSTRS)) ;
-
+	memclear(op) ;
 	if ((rs = hdb_start(&op->list,n,at,NULL,NULL)) >= 0) {
 	    STRPACK	*spp = &op->store ;
-	    const int	csize = MAPSTRS_CHUNKSIZE ;
-	    rs = strpack_start(spp,csize) ;
+	    cint	csz = MAPSTRS_CHUNKSIZE ;
+	    rs = strpack_start(spp,csz) ;
 	    if (rs < 0)
 		hdb_finish(&op->list) ;
 	}

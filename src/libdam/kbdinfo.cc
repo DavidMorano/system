@@ -155,15 +155,11 @@ int kbdinfo_open(KBDINFO *op,KEYSYMER *ksp,cchar *fname)
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_open: fname=%s\n",fname) ;
-#endif
-
-	memset(op,0,sizeof(KBDINFO)) ;
+	memclear(op) ;
 	op->ksp = ksp ;
 
 	opts = VECOBJ_OSORTED ;
-	size = sizeof(KBDINFO_KE) ;
+	size = szof(KBDINFO_KE) ;
 	for (i = 0 ; (rs >= 0) && (i < KBDINFO_TOVERLAST) ; i += 1) {
 	    rs = vecobj_start(&op->types[i],size,4,opts) ;
 	} /* end for */
@@ -243,7 +239,8 @@ int kbdinfo_count(KBDINFO *op)
 
 int kbdinfo_lookup(KBDINFO *op,char *ksbuf,int kslen,TERMCMD *cmdp)
 {
-	KBDINFO_KE	te, *ep ;
+	KBDINFO_KE	te{} ;
+	KBDINFO_KE	*ep ;
 	const int	nps = 4 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -258,7 +255,6 @@ int kbdinfo_lookup(KBDINFO *op,char *ksbuf,int kslen,TERMCMD *cmdp)
 
 	ktype = (cmdp->name == '~') ? KBDINFO_TFKEY : cmdp->type ;
 
-	memset(&te,0,sizeof(KBDINFO_KE)) ;
 	te.type = ktype ;
 	te.name = cmdp->name ;
 	te.p = params ;

@@ -93,7 +93,7 @@ int fifoelem_finish(fifoelem *fsp)
 /* add a string (to the tail) */
 int fifoelem_add(fifoelem *fsp,void *s,int slen)
 {
-	const int	esize = sizeof(FIFOELEM_ENT) ;
+	cint		esize = szof(FIFOELEM_ENT) ;
 	int		rs ;
 	void		*np ;
 

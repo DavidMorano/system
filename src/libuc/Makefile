@@ -390,7 +390,6 @@ dstr.o:			dstr.cc dstr.h
 varray.o:		varray.cc varray.h
 
 lookaside.o:		lookaside.cc lookaside.h
-linefold.o:		linefold.cc linefold.h
 
 envlist.o:		envlist.cc envlist.h
 envhelp.o:		envhelp.cc envhelp.h

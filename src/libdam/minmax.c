@@ -71,49 +71,49 @@
 
 int min(int a,int b)
 {
-	const int	sbit = ((sizeof(int)*8)-1) ;
-	const int	d = (a-b) ;
-	const int	sel = (!(((a-b) >> sbit)&1)) ;
+	cint	sbit = ((szof(int)*8)-1) ;
+	cint	d = (a-b) ;
+	cint	sel = (!(((a-b) >> sbit)&1)) ;
 	return (a - (sel*d)) ;
 }
 
 int max(int a,int b)
 {
-	const int	sbit = ((sizeof(int)*8)-1) ;
-	const int	d = (a-b) ;
-	const int	sel = (((a-b) >> sbit)&1) ;
+	cint	sbit = ((szof(int)*8)-1) ;
+	cint	d = (a-b) ;
+	cint	sel = (((a-b) >> sbit)&1) ;
 	return (a - (sel*d)) ;
 }
 
 long lmin(long a,long b)
 {
-	const int	sbit = ((sizeof(long)*8)-1) ;
-	const long	d = (a-b) ;
-	const long	sel = (!(((a-b) >> sbit)&1)) ;
+	cint	sbit = ((szof(long)*8)-1) ;
+	clong	d = (a-b) ;
+	clong	sel = (!(((a-b) >> sbit)&1)) ;
 	return (a - (sel*d)) ;
 }
 
 long lmax(long a,long b)
 {
-	const int	sbit = ((sizeof(long)*8)-1) ;
-	const long	d = (a-b) ;
-	const long	sel = (((a-b) >> sbit)&1) ;
+	cint	sbit = ((szof(long)*8)-1) ;
+	clong	d = (a-b) ;
+	clong	sel = (((a-b) >> sbit)&1) ;
 	return (a - (sel*d)) ;
 }
 
 longlong llmin(longlong a,longlong b)
 {
-	const int	sbit = ((sizeof(longlong)*8)-1) ;
-	const longlong	d = (a-b) ;
-	const longlong	sel = (!(((a-b) >> sbit)&1)) ;
+	cint	sbit = ((szof(longlong)*8)-1) ;
+	clonglong	d = (a-b) ;
+	clonglong	sel = (!(((a-b) >> sbit)&1)) ;
 	return (a - (sel*d)) ;
 }
 
 longlong llmax(longlong a,longlong b)
 {
-	const int	sbit = ((sizeof(longlong)*8)-1) ;
-	const longlong	d = (a-b) ;
-	const longlong	sel = (((a-b) >> sbit)&1) ;
+	cint	sbit = ((szof(longlong)*8)-1) ;
+	clonglong	d = (a-b) ;
+	clonglong	sel = (((a-b) >> sbit)&1) ;
 	return (a - (sel*d)) ;
 }
 

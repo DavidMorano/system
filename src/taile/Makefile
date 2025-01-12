@@ -122,7 +122,7 @@ TSORT= tsort
 RM= rm -f
 
 
-INCS= config.h defs.h filewatch.h strfilter.h linefold.h
+INCS= config.h defs.h filewatch.h strfilter.h
 
 
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o 
@@ -134,7 +134,7 @@ OBJ05=
 OBJ06=
 OBJ07= printhelp.o
 OBJ08=
-OBJ09= filewatch.o strfilter.o linefold.o
+OBJ09= filewatch.o strfilter.o
 OBJ10=
 OBJ11=
 OBJ12=
@@ -234,18 +234,5 @@ proginfo_setpiv.o:	proginfo_setpiv.c defs.h
 
 
 isproc.o:		isproc.c
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-filewatch.o:		filewatch.c filewatch.h
-
-strfilter.o:		strfilter.c strfilter.h
-
-linefold.o:		linefold.c linefold.h
-
-keyopt.o:		keyopt.c keyopt.h
 
 

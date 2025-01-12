@@ -135,10 +135,10 @@ int dw_start(DW *dwp,cchar *dirname) noex {
 
 /* initialize */
 
-	sz = sizeof(DW_ENT) ;
+	sz = szof(DW_ENT) ;
 	opts = (VECOBJ_OSTATIONARY | VECOBJ_OCONSERVE) ;
 	if ((rs = vecobj_start(&dwp->e,sz,10,opts)) >= 0) {
-	    const time_t	dt = time(nullptr) ;
+	    custime	dt = getustime ;
 	    cchar	*cp ;
 	    dwp->mtime = 0 ;
 	    dwp->opentime = 0 ;
@@ -389,7 +389,7 @@ int dw_check(DW *dwp,time_t daytime) noex {
 
 	if (dwp->magic != DW_MAGIC) return SR_NOTOPEN ;
 
-	if (daytime <= 0) daytime = time(nullptr) ;
+	if (daytime <= 0) daytime = getustime ;
 
 /* should we even check? */
 
@@ -580,7 +580,7 @@ static int dw_scanfull(DW *dwp) noex {
 	IENTRY		ie, *iep ;
 	fsdir		d ;
 	fsdir_ent	ds ;
-	time_t		daytime = time(nullptr) ;
+	time_t		daytime = getustime ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;

@@ -415,7 +415,7 @@ static int termtrans_procline(TT *op,char *obuf,int olen,
 	int		ln = 0 ;
 	cvp->clear() ;
 	{
-	    int		istart = (wlen * sizeof(wchar_t)) ;
+	    int		istart = (wlen * szof(wchar_t)) ;
 	    int		ileft = istart ;
 	    int		ostart = olen ;
 	    int		oleft{} ;

@@ -153,7 +153,7 @@ OBJ05=
 OBJ06= shio.o shio_writeblanks.o
 OBJ07= printhelp.o kshlib.o maininfo.o sesmsg.o msgdata.o
 OBJ08=
-OBJ09= linefold.o
+OBJ09=
 OBJ10=
 OBJ11=
 OBJ12=
@@ -320,51 +320,5 @@ kshlib.o:		kshlib.c kshlib.h sesmsg.h msgdata.h
 sesmsg.o:		sesmsg.c sesmsg.h
 
 msgdata.o:		msgdata.c msgdata.h
-
-sighand.o:		sighand.c sighand.h
-
-
-shio.o:			shio.c shio.h
-
-shio_writeblanks.o:	shio_writeblanks.c shio.h
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-sbuf.o:			sbuf.c sbuf.h
-
-sbuf_addquoted.o:	sbuf_addquoted.c sbuf.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-envlist.o:		envlist.c envlist.h
-
-hostinfo.o:		hostinfo.c hostinfo.h
-
-hostaddr.o:		hostaddr.c hostaddr.h
-
-hostent.o:		hostent.c hostent.h
-
-inetaddr.o:		inetaddr.c inetaddr.h
-
-sockaddress.o:		sockaddress.c sockaddress.h
-
-linefold.o:		linefold.c linefold.h
-
-wordfill.o:		wordfill.c wordfill.h
-
-modload.o:		modload.c modload.h
-
-termout.o:		termout.cc termout.h ansigr.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) termout.cc
 
 

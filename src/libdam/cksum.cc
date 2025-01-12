@@ -284,7 +284,7 @@ int cksum_getsum(cksum *csp,uint *rp) noex {
 	if (csp) {
 	    uint	sum = csp->local.sum ;
 	    uint	v = csp->local.len ;
-	    cint	n = sizeof(uint) ;
+	    cint	n = szof(uint) ;
 	    for (int i = 0 ; (v != 0) && (i < n) ; i += 1) {
 	        cint	ch = mkchar(v) ;
 	        ADDSUM(sum,ch) ;
@@ -303,7 +303,7 @@ int cksum_getsumall(cksum *csp,uint *rp) noex {
 	if (csp) {
 	    uint	sum = csp->total.sum ;
 	    uint	v = csp->total.len ;
-	    cint	n = sizeof(uint) ;
+	    cint	n = szof(uint) ;
 	    for (int i = 0 ; (v != 0) && (i < n) ; i += 1) {
 	        cint	ch = mkchar(v) ;
 	        ADDSUM(sum,ch) ;

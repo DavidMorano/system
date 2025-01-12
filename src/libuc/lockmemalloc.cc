@@ -238,12 +238,11 @@ int uc_libmallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		sz = 0 ;
 	if (sp && rpp) {
-	    char	*bp{} ;
 	    rs = SR_OK ;
 	    *rpp = nullptr ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    sz = (sl + 1) ;
-	    if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
+	    if (char *bp{} ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
 	        *rpp = bp ;
 	        strncpy(bp,sp,sl) ;
 	        bp[sl] = '\0' ;
@@ -322,7 +321,9 @@ static int lockmemalloc_basemalloc(int sz,void *vp) noex {
 	void		*rp ;
 	repeat {
 	    rs = SR_OK ;
-	    if ((rp = malloc(msize)) == nullptr) rs = (- errno) ;
+	    if ((rp = malloc(msize)) == nullptr) {
+		rs = (- errno) ;
+	    }
 	    if (rs < 0) {
 	        switch (rs) {
 	        case SR_AGAIN:
@@ -361,7 +362,9 @@ static int lockmemalloc_basevalloc(int sz,void *vp) noex {
 	void		*rp ;
 	repeat {
 	    rs = SR_OK ;
-	    if ((rp = valloc(msize)) == nullptr) rs = (- errno) ;
+	    if ((rp = valloc(msize)) == nullptr) {
+		rs = (- errno) ;
+	    }
 	    if (rs < 0) {
 	        switch (rs) {
 	        case SR_AGAIN:
@@ -401,7 +404,9 @@ static int lockmemalloc_baserealloc(cvoid *cp,int sz,void *vp) noex {
 	void		*rp ;
 	repeat {
 	    rs = SR_OK ;
-	    if ((rp = realloc(argp,msize)) == nullptr) rs = (- errno) ;
+	    if ((rp = realloc(argp,msize)) == nullptr) {
+		rs = (- errno) ;
+	    }
 	    if (rs < 0) {
 	        switch (rs) {
 	        case SR_AGAIN:

@@ -323,51 +323,6 @@ maininfo.o:		maininfo.c maininfo.h kshlib.h
 kshlib.o:		kshlib.c kshlib.h
 
 
-upt.o:			upt.c upt.h
-
-
-shio.o:			shio.c shio.h
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-sbuf.o:			sbuf.c sbuf.h
-
-sbuf_addquoted.o:	sbuf_addquoted.c sbuf.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-envlist.o:		envlist.c envlist.h
-
-hostinfo.o:		hostinfo.c hostinfo.h
-
-hostaddr.o:		hostaddr.c hostaddr.h
-
-hostent.o:		hostent.c hostent.h
-
-inetaddr.o:		inetaddr.c inetaddr.h
-
-sockaddress.o:		sockaddress.c sockaddress.h
-
-linefold.o:		linefold.c linefold.h
-
-modload.o:		modload.c modload.h
-
-xwords.o:		xwords.c xwords.h
-
-termout.o:		termout.cc termout.h ansigr.h
-	$(GPP) -c $(GPPFAGS) $(CFLAGS) $(CPPFLAGS) termout.cc
-
-
 sfreadline.o:		sfreadline.c
 	$(CC) -c $(ASTCFLAGS) $(ASTCPPFLAGS) $(*).c
 

@@ -101,7 +101,7 @@ int srectab_start(srectab *rtp,int n) noex {
 	if (n < 10) n = 10 ;
 	rtp->i = 0 ;
 	rtp->n = n ;
-	sz = (n + 1) * sizeof(int) ;
+	sz = (n + 1) * szof(int) ;
 	if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	    rtp->rt = uintp(vp) ;
 	    rtp->rt[0] = 0 ;
@@ -142,7 +142,7 @@ int srectab_extend(srectab *rtp) noex {
 	int		rs = SR_OK ;
 	if ((rtp->i + 1) > rtp->n) {
 	    uint	*va{} ;
-	    int		sz = (nn + 1) * sizeof(int) ;
+	    int		sz = (nn + 1) * szof(int) ;
 	    if ((rs = uc_realloc(rtp->rt,sz,&va)) >= 0) {
 	        rtp->rt = va ;
 	        rtp->n = nn ;

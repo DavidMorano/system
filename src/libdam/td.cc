@@ -784,7 +784,7 @@ static int td_startwin(td *tdp,int srow,int scol,int rows,int cols) noex {
 	if (f) {
 	    rs = SR_DOM ;
 	} else {
-	    cint	esz = sizeof(td_win) ;
+	    cint	esz = szof(td_win) ;
 	    td_win	win{} ;
 	    win.srow = min(srow,(tdp->rows-1)) ;
 	    win.scol = min(scol,(tdp->cols-1)) ;

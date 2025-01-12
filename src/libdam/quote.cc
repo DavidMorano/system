@@ -115,7 +115,7 @@
 #undef	NLINES
 #define	NLINES		20
 
-#define	CEBUFLEN	(NLINES * 3 * sizeof(int))
+#define	CEBUFLEN	(NLINES * 3 * szof(int))
 
 #define	TO_FILEMOD	(60 * 24 * 3600)
 #define	TO_MKWAIT	(5 * 50)
@@ -640,7 +640,7 @@ QUOTE_QUERY	*qvp ;
 	opts = 0 ;
 	opts |= VECOBJ_OORDERED ;
 	opts |= VECOBJ_OSTATIONARY ;
-	size = sizeof(QUOTE_ENT) ;
+	size = szof(QUOTE_ENT) ;
 	rs = vecobj_start(&res,size,0,opts) ;
 	if (rs < 0)
 	    goto ret0 ;
@@ -806,7 +806,7 @@ static int quote_dirnamescreate(quote *op,cchar **dirnames) noex {
 	    strsize += (strlen(dirnames[i]) + 1) ;
 	} /* end if */
 
-	size = (i + 1) * sizeof(char *) ;
+	size = (i + 1) * szof(char *) ;
 	rs = uc_malloc(size,&p) ;
 	if (rs < 0)
 	    goto bad0 ;
@@ -1038,7 +1038,7 @@ QUOTE_CUR	*curp ;
 	if (n <= 0)
 	    goto ret0 ;
 
-	size = n * sizeof(QUOTE_ENT) ;
+	size = n * szof(QUOTE_ENT) ;
 	rs = uc_malloc(size,&rp) ;
 	if (rs < 0)
 	    goto ret0 ;
@@ -1160,7 +1160,7 @@ cchar	*quotenames[] ;
 	debugprintf("quote_diropen: dirname=%s\n",dirname) ;
 #endif
 
-	size = sizeof(QDIR) ;
+	size = szof(QDIR) ;
 	rs = uc_malloc(size,&p) ;
 	if (rs < 0)
 	    goto bad0 ;
@@ -1225,7 +1225,7 @@ cchar	calname[] ;
 	int	rs = SR_OK ;
 	int	rs1 ;
 	int	cidx ;
-	int	size = sizeof(QUOTE_CAL) ;
+	int	size = szof(QUOTE_CAL) ;
 	int	f = false ;
 
 	cchar	*suf = QUOTE_DBSUF ;
@@ -1430,7 +1430,7 @@ cchar	dirname[] ;
 	if (dbl <= 0)
 	    goto ret0 ;
 
-	memset(qdirp,0,sizeof(QDIR)) ;
+	memclear(qdirp) ;
 
 	rs = mkpath2(dbdname,dirname,dbdir) ;
 	if (rs < 0)
@@ -1666,9 +1666,7 @@ cchar	calname[] ;
 {
 	int	rs ;
 
-
-	memset(calp,0,sizeof(QUOTE_CAL)) ;
-
+	memclear(calp) ;
 	calp->cidx = cidx ;
 	rs = uc_mallocstrw(dirname,-1,&calp->dirname) ;
 	if (rs < 0)
@@ -2493,7 +2491,7 @@ cchar	*dirnames[] ;
 	if (daytime == 0)
 	    daytime = time(NULL) ;
 
-	memset(sip,0,sizeof(struct subinfo)) ;
+	memclear(sip) ;
 
 	sip->op = op ;
 	sip->daytime = daytime ;
@@ -3064,7 +3062,7 @@ int		sl ;
 
 		    if (f_negative) odays = (- odays) ;
 
-		    memset(&tm,0,sizeof(TMTIME)) ;
+		    memclear(&tm) ;
 		    tm.gmtoff = sip->gmtoff ;
 		    tm.isdst = sip->isdst ;
 		    tm.year = (sip->year - TM_YEAR_BASE) ;
@@ -3076,11 +3074,6 @@ int		sl ;
 			qp->m = tm.mon ;
 			qp->d = tm.mday ;
 		    }
-
-#if	CF_DEBUGS
-	debugprintf("quote/subinfo_transhol: adjusted q=(%u:%u)\n",
-		qp->m,qp->d) ;
-#endif
 
 		} /* end if (odays) */
 
@@ -3148,14 +3141,14 @@ int		loff, llen ;
 	if (ep == NULL)
 	    return SR_FAULT ;
 
-	memset(ep,0,sizeof(QUOTE_ENT)) ;
+	memclear(ep) ;
 
 	ep->cidx = -1 ;
 	ep->m = qp->m ;
 	ep->d = qp->d ;
 	ep->voff = loff ;
 	ep->vlen = llen ;
-	size = ne * sizeof(struct quote_eline) ;
+	size = ne * szof(struct quote_eline) ;
 	rs = uc_malloc(size,&elp) ;
 
 	if (rs >= 0) {
@@ -3209,7 +3202,7 @@ uint		loff, llen ;
 
 	if (ep->i == ep->e) {
 	    ne = (ep->e * 2) + QUOTE_NLE ;
-	    size = ne * sizeof(struct quote_eline) ;
+	    size = ne * szof(struct quote_eline) ;
 	    rs = uc_realloc(ep->lines,size,&elp) ;
 	    if (rs >= 0) {
 	        ep->e = ne ;
@@ -3542,7 +3535,7 @@ QUOTE_ENT	*ep ;
 	if (nlines <= UCHAR_MAX) {
 
 	    bvep->nlines = nlines ;
-	    size = (nlines + 1) * sizeof(CYIMK_LINE) ;
+	    size = (nlines + 1) * szof(CYIMK_LINE) ;
 	    rs = uc_malloc(size,&lines) ;
 	    if (rs >= 0) {
 

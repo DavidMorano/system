@@ -63,7 +63,7 @@
 #define	DEVPERMFILE_KEY		struct devpermfile_k
 #define	DEVPERMFILE_IE		struct devpermfile_ie
 
-#define	DEVPERMFILE_KA		sizeof(mode_t)
+#define	DEVPERMFILE_KA		szof(mode_t)
 #define	DEVPERMFILE_BO(v)		\
 	((DEVPERMFILE_KA - ((v) % DEVPERMFILE_KA)) % DEVPERMFILE_KA)
 
@@ -203,7 +203,7 @@ cchar	fname[] ;
 	if (fname[0] == '\0')
 	    return SR_INVALID ;
 
-	memset(op,0,sizeof(DEVPERMFILE)) ;
+	memclear(op) ;
 	op->intcheck = DEVPERMFILE_ICHECKTIME ;
 	op->intchange = DEVPERMFILE_ICHANGETIME ;
 	op->ti_check = time(NULL) ;
@@ -231,7 +231,7 @@ cchar	fname[] ;
 /* initialize */
 
 	opts = VECOBJ_OSTATIONARY ;
-	size = sizeof(DEVPERMFILE_KEY) ;
+	size = szof(DEVPERMFILE_KEY) ;
 	rs = vecobj_start(&op->keys,size,10,opts) ;
 	if (rs < 0)
 	    goto bad1 ;
@@ -239,7 +239,7 @@ cchar	fname[] ;
 /* keep this not-sorted so that the original order is maintained */
 
 	opts = 0 ;
-	size = sizeof(DEVPERMFILE_IE) ;
+	size = szof(DEVPERMFILE_IE) ;
 	rs = vecobj_start(&op->entries,size,10,opts) ;
 	if (rs < 0)
 	    goto bad2 ;
@@ -1117,7 +1117,7 @@ int		conlen ;
 
 	if (conlen < 0) conlen = strlen(console) ;
 
-	memset(kep,0,sizeof(DEVPERMFILE_KEY)) ;
+	memclear(kep) ;
 	rs = uc_mallocstrw(console,conlen,&cp) ;
 	if (rs >= 0) {
 	    kep->console = cp ;
@@ -1247,7 +1247,7 @@ int		dl ;
 	if (dp == NULL)
 	    return SR_FAULT ;
 
-	memset(iep,0,sizeof(DEVPERMFILE_IE)) ;
+	memclear(iep) ;
 	iep->ci = ci ;
 	iep->dmode = m ;
 	if (dl < 0) dl = strlen(dp) ;
@@ -1328,7 +1328,7 @@ DEVPERMFILE_IE		*iep ;
 	if (iep == NULL)
 	    return SR_FAULT ;
 
-	memset(ep,0,sizeof(DEVPERMFILE_ENT)) ;
+	memclear(ep) ;
 	ep->devmode = iep->dmode ;
 	ep->devlen = iep->devlen ;
 

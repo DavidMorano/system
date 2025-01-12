@@ -1,4 +1,5 @@
-/* icalmk */
+/* icalmk HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make a iCalendar (ICS) database file */
@@ -11,32 +12,36 @@
 #define	ICALMK_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 #include	<localmisc.h>
 
 
 #define	ICALMK_MAGIC	0x88773422
 #define	ICALMK		struct icalmk_head
-#define	ICALMK_OBJ	struct icalmk_obj
-#define	ICALMK_ENT	struct icalmk_e
-#define	ICALMK_LINE	struct icalmk_l
+#define	ICALMK_OBJ	struct icalmk_object
+#define	ICALMK_ENT	struct icalmk_entry
+#define	ICALMK_LINE	struct icalmk_liner
 #define	ICALMK_FL	struct icalmk_flags
 
 
-struct icalmk_obj {
-	const char	*name ;
+struct icalmk_object {
+	cchar		*name ;
 	uint		objsize ;
 } ;
 
-struct icalmk_l {
+struct icalmk_liner {
 	uint		loff ;
 	uint		llen ;
 } ;
 
-struct icalmk_e {
-	struct icalmk_l	*lines ;
+struct icalmk_entry {
+	ICALMK_LINE	*lines ;
 	uint		voff ;
 	uint		vlen ;
 	uint		hash ;
@@ -55,33 +60,35 @@ struct icalmk_flags {
 } ;
 
 struct icalmk_head {
-	uint		magic ;
-	const char	*calname ;
-	const char	*dbname ;
-	const char	*idname ;
-	const char 	*cyifname ;
+	cchar		*calname ;
+	cchar		*dbname ;
+	cchar		*idname ;
+	cchar 		*cyifname ;
 	char		*nfname ;
+	vecobj		verses ;
+	vecobj		lines ;
 	ICALMK_FL	f ;
-	VECOBJ		verses ;
-	VECOBJ		lines ;
 	uint		pcitation ;
+	uint		magic ;
 	int		nentries ;
 	int		operms ;
 	int		nfd ;
 	int		year ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef	ICALMK		icalmk ;
+typedef	ICALMK_OBJ	icalmk_obj ;
+typedef	ICALMK_ENT	icalmk_en ;
+typedef	ICALMK_LINE	icalmk_ln ;
+typedef	ICALMK_FL	icalmk_fl ;
 
-extern int	icalmk_open(ICALMK *,cchar *,cchar *,int,int,int,int) ;
-extern int	icalmk_add(ICALMK *,ICALMK_ENT *) ;
-extern int	icalmk_close(ICALMK *) ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int	icalmk_open(icalmk *,cchar *,cchar *,int,int,int,int) noex ;
+extern int	icalmk_add(icalmk *,icalmk_ent *) noex ;
+extern int	icalmk_close(icalmk *) noex ;
+
+EXTERNC_end
 
 
 #endif /* ICALMK_INCLUDE */

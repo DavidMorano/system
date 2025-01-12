@@ -97,7 +97,7 @@ int chowns(cchar *dname,uid_t uid,gid_t gid)
 	debugprintf("chowns: ent dir=%s\n",dir) ;
 #endif
 
-	memset(&ci,0,sizeof(struct checkinfo)) ;
+	memclear(&ci) ;
 	ci.uid = uid ;
 	ci.gid = gid ;
 

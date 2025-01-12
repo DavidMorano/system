@@ -70,7 +70,7 @@ int streamsync_start(streamsync *ssp,cchar *st,int stlen) noex {
 	        char	*p ;
 	        ssp->i = 0 ;
 	        ssp->stlen = stlen ;
-	        sz = (2 * stlen * sizeof(char)) ;
+	        sz = (2 * stlen * szof(char)) ;
 	        if ((rs = uc_malloc(sz,&p)) >= 0) {
 	            ssp->st = p + 0 ;
 	            ssp->data = p + stlen ;

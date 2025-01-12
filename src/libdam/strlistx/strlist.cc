@@ -175,8 +175,8 @@ static bool	ismatkey(cchar *,cchar *,int) noex ;
 
 SL_OBJ	strlist_modinfo = {
 	"strlist",
-	sizeof(strlist),
-	sizeof(strlist_cur)
+	szof(strlist),
+	szof(strlist_cur)
 } ;
 
 
@@ -555,12 +555,12 @@ static int strlist_viverify(SL *op,time_t dt) noex {
 	}
 	{
 	    f = f && (hip->rtoff <= fip->msize) ;
-	    sz = (hip->rtlen + 1) * 2 * sizeof(int) ;
+	    sz = (hip->rtlen + 1) * 2 * szof(int) ;
 	    f = f && ((hip->rtoff + sz) <= fip->msize) ;
 	}
 	{
 	    f = f && (hip->itoff <= fip->msize) ;
-	    sz = (hip->itlen + 1) * 3 * sizeof(int) ;
+	    sz = (hip->itlen + 1) * 3 * szof(int) ;
 	    f = f && ((hip->itoff + sz) <= fip->msize) ;
 	}
 /* an extra (redundant) value */

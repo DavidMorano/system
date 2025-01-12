@@ -127,11 +127,11 @@ int cgi_finish(cgi *op) noex {
 	int		rs1 ;
 	if ((rs = cgi_magic(op)) >= 0) {
 	    op->ofp = nullptr ;
-	    op->magic = 0 ;
 	    {
 		rs1 = cgi_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }

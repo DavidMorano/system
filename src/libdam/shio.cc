@@ -1016,7 +1016,7 @@ int shio_control(SHIO *op,int cmd,...) noex {
 	                rs = bcontrol(op->fp,BC_STAT,sbp) ;
 #endif /* CF_SFIO */
 	            } else {
-	                memset(sbp,0,sizeof(USTAT)) ;
+	                memclear(sbp) ;
 		    }
 	        }
 	        break ;
@@ -1183,7 +1183,7 @@ int shio_writefile(SHIO *op,cchar *fname) noex {
 
 static int shio_bopene(SHIO *op,int fni,cc *fname,cc *ms,
 		mode_t om,int to) noex {
-	cint		osz = sizeof(bfile) ;
+	cint		osz = szof(bfile) ;
 	int		rs ;
 	char		nms[SHIO_MODESTRLEN + 1] ;
 	void		*vp ;
@@ -1286,7 +1286,7 @@ static int shio_sfcookline(SHIO *op,int f) noex {
 static int shio_sfcookbegin(SHIO *op) noex {
 	int		rs = SR_OK ;
 	if (op->outstore == nullptr) {
-	    cint	size = sizeof(OUTSTORE) ;
+	    cint	size = szof(OUTSTORE) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
 	        OUTSTORE	*osp = (OUTSTORE *) p ;

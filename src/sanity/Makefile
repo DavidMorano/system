@@ -159,7 +159,7 @@ OBJ11=
 OBJ12=
 OBJ13=
 OBJ14=
-OBJ15= linefold.o
+OBJ15=
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
 OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
@@ -283,27 +283,6 @@ sesmsg.o:		sesmsg.c sesmsg.h
 msgdata.o:		msgdata.c msgdata.h
 
 
-termwritable.o:		termwritable.c
-
 getutmpent.o:		getutmpent.c getutmpent.h
-
-
-shio.o:			shio.c shio.h
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-linefold.o:		linefold.c linefold.h
 
 

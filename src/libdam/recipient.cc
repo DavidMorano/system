@@ -340,7 +340,7 @@ int recipient_sort(RC *vhp) noex {
 	if ((rs = recipient_magic(op)) >= 0) {
 	    if (vhp->c > 1) {
 	        csize	sidx = size_t(vhp->i) ;
-	        csize	esz = sizeof(char *) ;
+	        csize	esz = szof(char *) ;
 	        qsort(vhp->va,sidx,esz,ourcmp) ;
 	        idx = vhp->i ;
 	    }

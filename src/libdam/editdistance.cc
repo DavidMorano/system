@@ -88,7 +88,7 @@ int editdistance(cchar *a,cchar *b)
 	    int		*previous = (ibuf+(0*(bl+1))) ;
 	    int		*current = (ibuf+(1*(bl+1))) ;
 	    int		i, j ;
-	    memset(ibuf,0,(n*sizeof(int))) ;
+	    memset(ibuf,0,(n*szof(int))) ;
 
 	    for (i = 1; i <= al ; i += 1) {
 	        current[0] = i ;
@@ -97,11 +97,11 @@ int editdistance(cchar *a,cchar *b)
 		    if (a[i-1] == b[j-1]) {
 			current[j] = previous[j-1] ;
 		    } else {
-			const int	a = previous[j-1] ;
-			const int	b = previous[j] ;
-			const int	c = current[j-1] ;
+			cint	a = previous[j-1] ;
+			cint	b = previous[j] ;
+			cint	c = current[j-1] ;
 		 	{
-			    const int	m = miner(a,b,c) ;
+			    cint	m = miner(a,b,c) ;
 		            current[j] = 1 + m ;
 			}
 		    }

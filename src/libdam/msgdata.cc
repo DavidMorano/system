@@ -74,7 +74,7 @@ static int	msgdata_setrecv(msgdata *) noex ;
 
 /* local variables */
 
-constexpr int		conmsghdr_len = int(sizeof(CONMSGHDR)) ;
+constexpr int		conmsghdr_len = int(szof(CONMSGHDR)) ;
 
 
 /* exported variables */
@@ -109,7 +109,7 @@ int msgdata_init(msgdata *mip,int mlen) noex {
 	        memset(mip->cmsgp,0,clen) ; /* clear control-message */
 	        memclear(mp) ;
 	        mp->msg_name = &mip->from ;
-	        mp->msg_namelen = sizeof(SOCKADDRESS) ;
+	        mp->msg_namelen = szof(SOCKADDRESS) ;
 	        mp->msg_control = mip->cmsgp ;
 	        mp->msg_controllen = 0 ;
 	        mp->msg_iov = mip->vecs ;
@@ -242,7 +242,7 @@ int msgdata_getpassfd(msgdata *mip) noex {
 /* end subroutine (msgdata_getpassfd) */
 
 int msgdata_setaddr(msgdata *mip,cvoid *sap,int sal) noex {
-	cint		flen = sizeof(SOCKADDRESS) ;
+	cint		flen = szof(SOCKADDRESS) ;
 	int		rs = SR_OK ;
 	if (sal <= flen) {
 	    memcpy(&mip->from,sap,sal) ;

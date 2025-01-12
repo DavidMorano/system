@@ -81,10 +81,9 @@
 
 
 /* local defines */
-
 #define	USERACCDB_LOGDNAME	"var/log"
 #define	USERACCDB_INTCHECK	5
-
+/* UAFILE */
 #define	UAFILE_SUF		"users"
 #define	UAFILE_LCOUNT		8
 #define	UAFILE_LDATE		(32-9)
@@ -93,13 +92,13 @@
 #define	UAFILE_RECLEN		\
 	(UAFILE_LCOUNT + 1 + UAFILE_LDATE + 1 + \
 	UAFILE_MAXUSERLEN + 2 + UAFILE_MAXNAMELEN + 2) 
-
+/* UAD */
 #define	UAD		useraccdb
 #define	UAD_CUR		useraccdb_cur
 #define	UAD_ENT		useraccdb_ent
 #define	UAD_REC		useraccdb_rec
 #define	UAD_ITEM	useraccdb_item
-
+/* UPI */
 #define	UPI		upinfo
 #define	UPI_REC		upinfo_rec
 
@@ -383,7 +382,7 @@ int useraccdb_update(UAD *op,cchar *user,cchar *name) noex {
 int useraccdb_curbegin(UAD *op,UAD_CUR *curp) noex {
 	int		rs ;
 	if ((rs = useraccdb_magic(op,curp)) >= 0) {
-	    cint	osz = sizeof(filer) ;
+	    cint	osz = szof(filer) ;
 	    curp->fbp = nullptr ;
 	    curp->eo = -1 ;
 	    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {

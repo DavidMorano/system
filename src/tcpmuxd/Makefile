@@ -134,7 +134,7 @@ OBJ13=
 OBJ14= envs.o envs_procxe.o envs_subs.o
 OBJ15= lfm.o svcfile.o acctab.o
 OBJ16= jobdb.o svckey.o connection.o
-OBJ17= sysvar.o dirseen.o linefold.o poller.o
+OBJ17= sysvar.o dirseen.o poller.o
 OBJ18=
 OBJ19= netgroupcheck.o getprogpath.o
 OBJ20= sfthing.o getfname.o securefile.o nlspeername.o 
@@ -338,79 +338,5 @@ muximsg.o:		muximsg.c muximsg.h
 procse.o:		procse.c procse.h
 
 svckey.o:		svckey.c svckey.h
-
-
-userinfo.o:		userinfo.c userinfo.h
-
-getutmpent.o:		getutmpent.c getutmpent.h
-
-pcsuserfile.o:		pcsuserfile.c pcsconf.h
-
-openport.o:		openport.c openport.h
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-vecstr.o:		vecstr.c vecstr.h
-
-pcspoll.o:		pcspoll.c pcsconf.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-expcook.o:		expcook.c expcook.h
-
-envs.o:			envs.c envs.h
-
-envs_procxe.o:		envs_procxe.c envs.h
-
-envs_subs.o:		envs_subs.c envs.h
-
-lfm.o:			lfm.c lfm.h
-
-svcfile.o:		svcfile.c svcfile.h
-
-acctab.o:		acctab.c acctab.h
-
-msg.o:			msg.c msg.h
-
-matenv.o:		matenv.c matenv.h
-
-sysvar.o:		sysvar.c sysvar.h dirseen.h
-
-dirseen.o:		dirseen.c dirseen.h
-
-var.o:			var.c var.h varhdr.h
-
-varhdr.o:		varhdr.c varhdr.h
-
-logfile.o:		logfile.c logfile.h
-
-connection.o:		connection.c connection.h
-
-sockaddress.o:		sockaddress.c sockaddress.h
-
-linefold.o:		linefold.c linefold.h
-
-poller.o:		poller.c poller.h
-
-serialbuf.o:		serialbuf.c serialbuf.h
-
-hostinfo.o:		hostinfo.c hostinfo.h
-
-hostaddr.o:		hostaddr.c hostaddr.h
-
-field_svcargs.o:	field_svcargs.c field.h
-
-field_srvarg.o:		field_srvarg.c field.h
-
-openportmsg.o:		openportmsg.c openportmsg.h
 
 

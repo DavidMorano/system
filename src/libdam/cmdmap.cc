@@ -132,7 +132,7 @@ constexpr bool		f_fastdef = CF_FASTDEF ;
 int cmdmap_start(cmdmap *op,const cmdmap_ent *defmap) noex {
 	int		rs ;
 	if ((rs = cmdmap_ctor(op)) >= 0) {
-	    cint	sz = sizeof(cmdmap_ent) ;
+	    cint	sz = szof(cmdmap_ent) ;
 	    cint	vn = 10 ;
 	    cint	vo = VECOBJ_OREUSE ;
 	    if ((rs = vecobj_start(op->mlp,sz,vn,vo)) >= 0) {
