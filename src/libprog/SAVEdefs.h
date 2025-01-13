@@ -1,6 +1,8 @@
 /* defs */
 /* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
+/* standard definitions */
 /* version %I% last-modified %G% */
 
 

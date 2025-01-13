@@ -1,4 +1,5 @@
 /* proginfo_real SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* proginfo-information real-UID functions */

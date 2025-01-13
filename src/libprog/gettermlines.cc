@@ -34,7 +34,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"proginfo.h"
+#include	"proginfo.hh"
 
 
 /* local defines */

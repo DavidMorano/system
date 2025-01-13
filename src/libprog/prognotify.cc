@@ -54,7 +54,7 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
-#include	"proginfo.h"
+#include	"proginfo.hh"
 #include	"mcmsg.h"
 #include	"recip.h"
 

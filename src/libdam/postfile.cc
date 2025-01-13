@@ -23,7 +23,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2003,2003 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************
 
@@ -67,8 +67,10 @@
 #include	<endian.h>
 #include	<hash.h>
 #include	<hashindex.h>
+#include	<strwcpy.h>
 #include	<intceil.h>
 #include	<randlc.h>
+#include	<isfiledesc.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"postfile.h"
@@ -90,35 +92,35 @@
 
 #define	TI_MINUPDATE	4		/* minimum time between updates */
 
-#define	NSHIFT	6
+#define	NSHIFT		6
 
 
 /* external subroutines */
 
-extern int	randlc(int) ;
-extern int	isfsremote(int) ;
 
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
 
-static uint	ceiling(uint,uint) ;
+static uint	ceiling(uint,uint) noex ;
 
-static int	postfile_fileheader(POSTFILE *) ;
-static int	postfile_holdget(POSTFILE *,time_t) ;
-static int	postfile_holdrelease(POSTFILE *,time_t) ;
+static int	postfile_fileheader(POSTFILE *) noex ;
+static int	postfile_holdget(POSTFILE *,time_t) noex ;
+static int	postfile_holdrelease(POSTFILE *,time_t) noex ;
 
 #if	CF_LOCKING
-static int	postfile_lockget(POSTFILE *,int) ;
-static int	postfile_lockrelease(POSTFILE *) ;
+static int	postfile_lockget(POSTFILE *,int) noex ;
+static int	postfile_lockrelease(POSTFILE *) noex ;
 #endif
 
-static int	postfile_fileopen(POSTFILE *,time_t) ;
-static int	postfile_fileclose(POSTFILE *) ;
-static int	postfile_keymatchlast(POSTFILE *,int,int,char *,int) ;
-static int	postfile_keymatchall(POSTFILE *,int,int,realname *) ;
+static int	postfile_fileopen(POSTFILE *,time_t) noex ;
+static int	postfile_fileclose(POSTFILE *) noex ;
+static int	postfile_keymatchlast(POSTFILE *,int,int,char *,int) noex ;
+static int	postfile_keymatchall(POSTFILE *,int,int,realname *) noex ;
 
 
 /* local variables */
@@ -137,7 +139,7 @@ enum headers {
 	header_overlast
 } ;
 
-static cchar	*localfs[] = {
+constexpr cpcchar	localfs[] = {
 	    "ufs",
 	    "tmpfs",
 	    "lofs",
@@ -145,17 +147,14 @@ static cchar	*localfs[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int postfile_open(op,fname)
-POSTFILE	*op ;
-cchar	fname[] ;
-{
+int postfile_open(PF *,cchar *fname) noex {
 	USTAT	sb ;
-
 	uint	*table ;
-
 	time_t	daytime ;
 
 	int	rs ;

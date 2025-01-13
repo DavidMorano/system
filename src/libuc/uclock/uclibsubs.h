@@ -163,6 +163,7 @@ extern int	uc_fminmod(int,mode_t) noex ;
 extern int	uc_fsize(int) noex ;
 extern int	uc_fuid(int) noex ;
 extern int	uc_fgid(int) noex ;
+extern int	uc_seeko(int,off_t,int,off_t *) noex ;
 extern int	uc_seek(int,off_t,int) noex ;
 extern int	uc_tell(int,off_t *) noex ;
 extern int	uc_rewind(int) noex ;

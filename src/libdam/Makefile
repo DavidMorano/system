@@ -227,8 +227,8 @@ OBJ114=
 OBJ115=
 OBJ116=
 OBJ117= msfile.o msfilee.o ebuf.o nodedb.o clusterdb.o
-OBJ118= cksum.o sha1.o gecos.o pwfile.o ipasswd.o ema.o fsi.o
-OBJ119= q.o plainq.o cq.o fifostr.o fifoitem.o charq.o intiq.o
+OBJ118= cksum.o sha1.o gecos.o pwfile.o ipasswd.o
+OBJ119=
 
 OBJ120= kvsfile.o paramfile.o strtab.o strstore.o querystr.o
 OBJ121=
@@ -627,9 +627,6 @@ outbuf.o:		outbuf.cc outbuf.h
 strmgr.o:		strmgr.c strmgr.h
 
 lookaside.o:		lookaside.c lookaside.h
-
-fsi.o:			fsi.cc fsi.h
-intiq.o:		intiq.cc intiq.h
 
 serialbuf.o:		serialbuf.c serialbuf.h
 

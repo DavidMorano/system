@@ -10,8 +10,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<limits.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -39,11 +37,11 @@ struct hostsfile_cursor {
 } ;
 
 struct hostsfile_head {
-	uint		magic ;
 	char		*cdir ;			/* cache directory */
-	vecelem		files ;			/* files */
-	vecelem		hes ;			/* host entries */
+	vecelem		*flp ;			/* file-list-pointer */
+	vecelem		*hlp ;			/* host-list-pointer */
 	time_t		checktime ;
+	uint		magic ;
 } ;
 
 struct hostsfile_file {
@@ -73,13 +71,14 @@ EXTERNC_begin
 extern int hostsfile_start(hostsfile *,char *,char *,vecelem *) noex ;
 extern int hostsfile_fileadd(hostsfile *,char *,vecele *) noex ;
 extern int hostsfile_finish(hostsfile *) noex ;
-extern int hostsfile_enum(hostsfile *,hostsfile_cur *,hostsfile_ent **) noex ;
 extern int hostsfile_check(hostsfile *,vecelem *) noex ;
 extern int hostsfile_curbegin(hostsfile *,hostsfile_cur *) noex ;
+extern int hostsfile_curenum(hostsfile *,hostsfile_cur *,
+		hostsfile_ent **) noex ;
 extern int hostsfile_curend(hostsfile *,hostsfile_cur *) noex ;
 extern int hostsfile_allowed(hostsfile *,char *,char *,char *,char *) noex ;
-extern int hostsfile_anyallowed(hostsfile *,vecstr *,vecstr *,char *,
-		char *) noex ;
+extern int hostsfile_anyallowed(hostsfile *,vecstr *,vecstr *,
+		char *,char *) noex ;
 
 #ifdef	COMMENT
 extern int hostsfile_find(hostsfile *,char *,HOSTSFILE_ENT **) ;

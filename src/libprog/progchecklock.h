@@ -24,13 +24,14 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<proginfo.h>
+#include	<usysrets.h>
+#include	<bfile.h>
+#include	<proginfo.hh>
 
 
 EXTERNC_begin
 
-extern int progchecklock(proginfo *,bfile *,
-		cc *,cc *,cc *,pid_t) noex ;
+extern int progchecklock(proginfo *,bfile *,cc *,cc *,cc *,pid_t) noex ;
 
 EXTERNC_end
 

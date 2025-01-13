@@ -1220,11 +1220,9 @@ static int proclist(PROGINFO *pip,USERPORTS *dbp,cchar *ofn,VECPSTR *alp)
 }
 /* end subroutine (proclist) */
 
-
-static int proclistall(PROGINFO *pip,USERPORTS *dbp,bfile *ofp)
-{
-	USERPORTS_CUR	cur ;
-	USERPORTS_ENT	ent ;
+static int proclistall(PROGINFO *pip,USERPORTS *dbp,bfile *ofp) noex {
+	userports_cur	cur ;
+	userports_ent	ent ;
 	int		rs ;
 	int		rs1 ;
 
@@ -1232,21 +1230,13 @@ static int proclistall(PROGINFO *pip,USERPORTS *dbp,bfile *ofp)
 
 	if ((rs = userports_curbegin(dbp,&cur)) >= 0) {
 	    cchar	*fmt = "%10u %16s %16s\n" ;
-
-	    while ((rs1 = userports_enum(dbp,&cur,&ent)) >= 0) {
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(3))
-	            debugprintf("main/proclistall: %10u %16s %16s\n",
-	                ent.uid,ent.protocol,ent.portname) ;
-#endif
-
-	        rs = bprintf(ofp,fmt,ent.uid,ent.protocol,ent.portname) ;
-
+	    while ((rs1 = userports_curenum(dbp,&cur,&ent)) >= 0) {
+		{
+	            rs = bprintf(ofp,fmt,ent.uid,ent.protocol,ent.portname) ;
+		}
 	        if (rs < 0) break ;
 	    } /* end while */
 	    if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-
 	    rs1 = userports_curend(dbp,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (userports) */
@@ -1258,8 +1248,8 @@ static int proclistall(PROGINFO *pip,USERPORTS *dbp,bfile *ofp)
 
 static int proclistusers(PROGINFO *pip,USERPORTS *dbp,bfile *ofp,VECPSTR *alp)
 {
-	USERPORTS_CUR	cur ;
-	USERPORTS_ENT	ent ;
+	userports_cur	cur ;
+	userports_ent	ent ;
 	uid_t		uid ;
 	int		rs ;
 	int		rs1 ;

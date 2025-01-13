@@ -16,7 +16,6 @@
 #include	<usystem.h>		/* for |ino_t| */
 #include	<vecobj.h>
 #include	<vecpstr.h>
-#include	<localmisc.h>
 
 
 #define	USERPORTS	struct userports_head
@@ -70,7 +69,7 @@ EXTERNC_begin
 extern int userports_open(userports *,cchar *) noex ;
 extern int userports_query(userports *,uid_t,cchar *,int) noex ;
 extern int userports_curbegin(userports *,userports_cur *) noex ;
-extern int userports_enum(userports *,userports_cur *,userports_ent *) noex ;
+extern int userports_curenum(userports *,userports_cur *,userports_ent *) noex ;
 extern int userports_fetch(userports *,userports_cur *,uid_t,
 		userports_ent *) noex ;
 extern int userports_curend(userports *,userports_cur *) noex ;

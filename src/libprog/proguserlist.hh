@@ -1,4 +1,5 @@
 /* proguserlist HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* program-user-list-ing */
@@ -8,7 +9,7 @@
 /* revision history:
 
 	= 1999-03-01, David A­D­ Morano
-	This code was originally written.
+	This subroutines were originally written.
 
 */
 
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	proguserlist{x}
+
+	Description:
 	Manage a program user-list operation.
 
 *******************************************************************************/
@@ -30,7 +35,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
-
 #include	<proginfo.hh>
 
 

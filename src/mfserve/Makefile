@@ -199,20 +199,20 @@ OBJ06= sreqdb.o sreq.o svcentsub.o
 OBJ07= printhelp.o shio.o kshlib.o maininfo.o sesmsg.o msgdata.o
 OBJ08= 
 OBJ09= 
-OBJ10= osetstr.o osetstr_loadfile.o
-OBJ11= vecstr_svcargs.o vecstr_srvargs.o vecstr_avmkstr.o
-OBJ12= intiq.o
+OBJ10=
+OBJ11=
+OBJ12=
 OBJ13=
-OBJ14= poller.o
-OBJ15= msfile.o msfilee.o ebuf.o msghdr.o cmsghdr.o
+OBJ14=
+OBJ15=
 
-OBJ16= spawnproc.o cpuspeed.o securefile.o strval.o
+OBJ16=
 OBJ17=
 OBJ18=
 OBJ19=
 OBJ20= svckv.o svcent.o
 OBJ21= mkshlibname.o
-OBJ22= isBadSend.o isBadRecv.o isBadMsg.o
+OBJ22=
 OBJ23=
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
@@ -411,78 +411,6 @@ sreqdb.o:		sreqdb.c sreqdb.h sreq.h
 daytime.o:		daytime.c daytime.h mfserve.h
 
 hello.o:		hello.c hello.h mfserve.h
-
-
-# other standard pieces (duplicated here)
-
-getnodedomain.o:	getnodedomain.c
-
-getutmpent.o:		getutmpent.c getutmpent.h
-
-getutmpterm.o:		getutmpterm.c getutmpent.h
-
-svckv.o:		svckv.c svckv.h
-
-svcent.o:		svcent.c svcent.h
-
-# standard objects duplicated here
-
-shio.o:			shio.c shio.h
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr.o:		vecstr.c vecstr.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c vecstr.h
-
-vecstr_env.o:		vecstr_env.c vecstr.h
-
-vecstr_svcargs.o:	vecstr_svcargs.c vecstr.h
-
-vecstr_srvargs.o:	vecstr_srvargs.c vecstr.h
-
-vecstr_avmkstr.o:	vecstr_avmkstr.c vecstr.h
-
-osetstr.o:		osetstr.cc osetstr.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) osetstr.cc
-
-osetstr_loadfile.o:	osetstr_loadfile.c osetstr.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-msfile.o:		msfile.c msfile.h msfilee.h
-
-msfilee.o:		msfilee.c msfilee.h
-
-lfm.o:			lfm.c lfm.h
-
-paramfile.o:		paramfile.c paramfile.h
-
-vecobj.o:		vecobj.c vecobj.h
-
-ebuf.o:			ebuf.c ebuf.h
-
-serialbuf.o:		serialbuf.c serialbuf.h
-
-spawner.o:		spawner.c spawner.h
-
-poller.o:		poller.c poller.h
-
-envmgr.o:		envmgr.c envmgr.h
-
-varsub.o:		varsub.c varsub.h
-
-varsub_extras.o:	varsub_extras.c
-
-intiq.o:		intiq.c intiq.h
-
-spawnproc.o:		spawnproc.c spawnproc.h
 
 
 # testing

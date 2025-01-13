@@ -1,6 +1,6 @@
 /* mailboxappend SUPPORT */
 /* encoding=ISO8859-1 */
-/* version %I% last-modified %G% */
+/* lang=C++20 (conformance reviewed) */
 
 /* append some data (presumably a mail-message) to the end of a mailbox */
 /* version %I% last-modified %G% */
@@ -26,7 +26,7 @@
 	file.
 
 	Synopsis:
-	int mailboxappend(cchar *mbfname,int sfd,int slen,int to) noex ;
+	int mailboxappend(cchar *mbfname,int sfd,int slen,int to) noex
 
 	Arguments:
 	- mbfname	file-name of mailbox
@@ -41,8 +41,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<sys/types.h>		/* system types */
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -133,26 +132,25 @@ static int mailboxappender(cchar *mbfname,int sfd,int slen,int to) noex {
 	int		wlen = 0 ;
 	if ((rs = uc_open(mbfname,of,om)) >= 0) {
 	    cint	tfd = rs ;
-	    if ((rs = mblock(tfd,TRUE,to)) >= 0) {
-		off_t	offend = 0 ;
-		int	cmd ;
-
-	        u_seeko(tfd,0L,SEEK_END,&offend) ;
-
-		if (sigblocker sb ; (rs = sb.start) >= 0) {
-		    {
-	                rs = uc_writedesc(tfd,sfd,slen) ;
-	                wlen = rs ;
-		    }
-	            if (rs < 0) {
-	                uc_ftruncate(tfd,offend) ;
-		    }
-	            rs1 = sb.finish ;
+	    if ((rs = mblock(tfd,true,to)) >= 0) {
+		cint	w = SEEK_END ;
+		if (off_t offend ; (rs = uc_seeko(tfd,0L,w,&offend)) >= 0) {
+		    int	cmd ;
+		    if (sigblocker sb ; (rs = sb.start) >= 0) {
+		        {
+	                    rs = uc_writedesc(tfd,sfd,slen) ;
+	                    wlen = rs ;
+		        }
+	                if (rs < 0) {
+	                    uc_ftruncate(tfd,offend) ;
+		        }
+	                rs1 = sb.finish ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end block (sigblock) */
+	            cmd = F_UNLOCK ;
+	            rs1 = lockfile(tfd,cmd,offend,0z,0) ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end block (sigblock) */
-	        cmd = F_UNLOCK ;
-	        rs1 = lockfile(tfd,cmd,offend,0L,0) ;
-		if (rs >= 0) rs = rs1 ;
+		} /* end if (uc_seeko) */
 	    } /* end if (lock) */
 	    rs1 = u_close(tfd) ;
 	    if (rs >= 0) rs = rs1 ;

@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	intiq
+
+	Description:
 	Manage interlocked FIFO-integer operations.
 
 *******************************************************************************/
@@ -36,11 +40,13 @@
 
 
 #define	INTIQ		struct intiq_head
+#define	INTIQ_MAGIC	0x23043953
 
 
 struct intiq_head {
-	ptm		m ;
-	fifoitem	q ;
+	ptm		*mxp ;
+	fifoitem	*fqp ;
+	uint		magic ;
 } ;
 
 typedef INTIQ		intiq ;

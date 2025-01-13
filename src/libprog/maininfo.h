@@ -1,5 +1,6 @@
-/* maininfo */
+/* maininfo SUPPORT */
 /* encoding=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
 
 /* version %I% last-modified %G% */
 
@@ -15,7 +16,7 @@
 
 
 #ifndef	MAININFO_INCLUDE
-#define	MAININFO_INCLUDE	1
+#define	MAININFO_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -35,7 +36,7 @@
 #define	MAININFO_FL	struct maininfo_flags
 
 
-typedef void		(*maininfohand_t)(int,siginfo_t *,void *) ;
+typedef void		(*maininfohand_t)(int,siginfo_t *,void *) noex ;
 
 
 struct maininfo_flags {

@@ -70,6 +70,7 @@
 
 #define	UP		userports
 #define	UP_ENT		userports_ent
+#define	UP_CUR		userports_cur
 
 #define	ENTRY		struct entry_elem
 
@@ -232,15 +233,15 @@ int userports_close(UP *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = userports_magic(op)) >= 0) {
-	    {
+	    if (op->olp) {
 	        rs1 = vecpstr_finish(op->olp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->plp) {
 	        rs1 = vecpstr_finish(op->plp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->elp) {
 	        rs1 = vecobj_finish(op->elp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -260,7 +261,7 @@ int userports_close(UP *op) noex {
 /* end subroutine (userports_close) */
 
 int userports_query(UP *op,uid_t uid,cc *protoname,int port) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	if ((rs = userports_magic(op)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (port >= 0) {
@@ -293,7 +294,7 @@ int userports_query(UP *op,uid_t uid,cc *protoname,int port) noex {
 }
 /* end subroutine (userports_query) */
 
-int userports_curbegin(UP *op,USERPORTS_CUR *curp) noex {
+int userports_curbegin(UP *op,UP_CUR *curp) noex {
 	int		rs ;
 	if ((rs = userports_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
@@ -302,7 +303,7 @@ int userports_curbegin(UP *op,USERPORTS_CUR *curp) noex {
 }
 /* end subroutine (userports_curbegin) */
 
-int userports_curend(UP *op,USERPORTS_CUR *curp) noex {
+int userports_curend(UP *op,UP_CUR *curp) noex {
 	int		rs ;
 	if ((rs = userports_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
@@ -311,8 +312,7 @@ int userports_curend(UP *op,USERPORTS_CUR *curp) noex {
 }
 /* end subroutine (userports_curend) */
 
-int userports_enum(UP *op,USERPORTS_CUR *curp,
-		UP_ENT *entp) noex {
+int userports_curenum(UP *op,UP_CUR *curp,UP_ENT *entp) noex {
 	int		rs = SR_OK ;
 	int		i ; /* used-afterwards */
 	if ((rs = userports_magic(op,curp,entp)) >= 0) {
@@ -339,10 +339,9 @@ int userports_enum(UP *op,USERPORTS_CUR *curp,
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (userports_enum) */
+/* end subroutine (userports_curenum) */
 
-int userports_fetch(UP *op,USERPORTS_CUR *curp,uid_t uid,
-		UP_ENT *entp) noex {
+int userports_fetch(UP *op,UP_CUR *curp,uid_t uid,UP_ENT *entp) noex {
 	int		rs ;
 	int		i = 0 ; /* used-afterwards */
 	if ((rs = userports_magic(op,curp,entp)) >= 0) {

@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} hdb_delcur "
+NAMES="${NAMES} proginfo.h"
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/hdb_delcur/s//hdb_curdel/g
+g/proginfo.h/s//proginfo.hh/g
 	w
 	q
 EOF

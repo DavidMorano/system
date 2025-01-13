@@ -72,13 +72,13 @@
 
 #include	<envstandards.h>	/* must be before others */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<endian.h>
@@ -96,11 +96,10 @@
 
 /* local defines */
 
-#define	ICALMK_NENTRIES	(19 * 1024)
+#define	ICALMK_NENTS	(19 * 1024)
 #define	ICALMK_NSKIP	5
 
-#undef	RECTAB
-#define	RECTAB		struct icalmk_rectab
+#define	ICM		icalmk
 
 #define	BUFLEN		(szof(ICALHDR) + 128)
 
@@ -170,8 +169,10 @@ static cchar	zerobuf[4] = {
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int icalmk_open(op,dirname,calname,oflags,operms,year,f_tmp)
 ICALMK		*op ;
@@ -184,7 +185,7 @@ int		f_tmp ;
 {
 	int	rs = SR_OK ;
 	int	omode ;
-	int	n = ICALMK_NENTRIES ;
+	int	n = ICALMK_NENTS ;
 
 
 	if (op == NULL)
@@ -203,7 +204,7 @@ int		f_tmp ;
 	    return SR_INVALID ;
 
 	if (year < 0) {
-	    TMTIME	tm ;
+	    tmtime	tm ;
 	    time_t	daytime = time(NULL) ;
 	    rs = tmtime_localtime(&tm,daytime) ;
 	    year = (tm.year + TM_YEAR_BASE) ;

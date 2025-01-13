@@ -41,6 +41,7 @@
 
 EXTERNC_begin
 
+extern int	uc_seeko(int,off_t,int,off_t *) noex ;
 extern int	uc_fcntl(int,int,...) noex ;
 
 EXTERNC_end

@@ -6,6 +6,17 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 2002-05-01, David A­D­ Morano
+	This object module was created for Levo research, to determine
+	if a conditional branch at a given instruction address is
+	a SS-Hamock or not.
+
+*/
+
+/* Copyright © 2002 David A­D­ Morano.  All rights reserved. */
+
 #ifndef	POSTFILE_INCLUDE
 #define	POSTFILE_INCLUDE
 
@@ -45,9 +56,9 @@
 
 
 struct postfile_cursor {
-	uint		magic ;
 	int		wi ;
 	int		i[POSTFILE_NINDICES] ;
+	uint		magic ;
 } ;
 
 struct postfile_information {

@@ -715,19 +715,19 @@ proginfo_vals::proginfo_vals() noex {
 	memclear(this) ;
 }
 
-void proginfo_hwser::operator () (proginfo_head *p) noex {
+void proginfo.hhwser::operator () (proginfo.hhead *p) noex {
 	op = p ;
 	val = 0 ;
 }
 
-proginfo_hwser::operator uint () noex {
+proginfo.hhwser::operator uint () noex {
 	if (val == 0) {
 	    val = (uint) gethostid() ;
 	}
 	return val ;
 }
 
-proginfo_head::proginfo_head() noex {
+proginfo.hhead::proginfo.hhead() noex {
 	argc = 0 ;
 	argv = nullptr ;
 	envv = nullptr ;
@@ -740,7 +740,7 @@ proginfo_head::proginfo_head() noex {
 	ncpu(this,proginfomem_ncpu) ;
 }
 
-void proginfo_head::args(int ac,mainv av,mainv ev) noex {
+void proginfo.hhead::args(int ac,mainv av,mainv ev) noex {
 	argc = ac ;
 	argv = av ;
 	envv = ev ;
@@ -759,13 +759,13 @@ int proginfo_co::operator () (int) noex {
 }
 /* end method (proginfo_co::operator) */
 
-int proginfo_head::incpu() noex {
+int proginfo.hhead::incpu() noex {
 	int		rs = ncpus ;
 	if (rs == 0) {
 	    rs = 1 ;
 	}
 	return rs ;
 }
-/* end method (proginfo_head::incpu) */
+/* end method (proginfo.hhead::incpu) */
 
 

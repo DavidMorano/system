@@ -26,7 +26,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	"proginfo.h"
+#include	"proginfo.hh"
 
 
 EXTERNC_begin

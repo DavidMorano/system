@@ -6,6 +6,7 @@ file		what
 --------------------------------------------------------------------------------
 uctim
 libuc		fix to completely compile!
+fifoelem
 ktag
 mapper
 postfile
@@ -52,4 +53,5 @@ systems
 uunames		block structure
 dialcprog	incredible mess (maybe not worth refactoring)
 logsys		mess -- cannot compile on macOS-Darwin (no STREAMS®)
+icalmk		mess, junk, or not even finished
 

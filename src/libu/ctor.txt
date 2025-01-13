@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int chi_ctor(chi *op,Args ... args) noex {
+static int intiq_ctor(intiq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int chi_ctor(chi *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (chi_ctor) */
+/* end subroutine (intiq_ctor) */
 
-static int chi_dtor(chi *op) noex {
+static int intiq_dtor(intiq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (chi_dtor) */
+/* end subroutine (intiq_dtor) */
 
 template<typename ... Args>
-static inline int chi_magic(chi *op,Args ... args) noex {
+static inline int intiq_magic(intiq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == CGI_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == INTIQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (chi_magic) */
+/* end subroutine (intiq_magic) */

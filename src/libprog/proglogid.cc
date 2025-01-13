@@ -58,7 +58,7 @@
 #include	<mklogid.h>
 #include	<localmisc.h>		/* |LOGIDLEN| */
 
-#include	"proginfo.h"
+#include	"proginfo.hh"
 
 
 /* local defines */

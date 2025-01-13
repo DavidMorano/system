@@ -19,14 +19,13 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 
 #define	ICALMK_MAGIC	0x88773422
 #define	ICALMK		struct icalmk_head
 #define	ICALMK_OBJ	struct icalmk_object
 #define	ICALMK_ENT	struct icalmk_entry
-#define	ICALMK_LINE	struct icalmk_liner
+#define	ICALMK_LN	struct icalmk_liner
 #define	ICALMK_FL	struct icalmk_flags
 
 
@@ -41,7 +40,7 @@ struct icalmk_liner {
 } ;
 
 struct icalmk_entry {
-	ICALMK_LINE	*lines ;
+	ICALMK_LN	*lines ;
 	uint		voff ;
 	uint		vlen ;
 	uint		hash ;
@@ -79,7 +78,7 @@ struct icalmk_head {
 typedef	ICALMK		icalmk ;
 typedef	ICALMK_OBJ	icalmk_obj ;
 typedef	ICALMK_ENT	icalmk_en ;
-typedef	ICALMK_LINE	icalmk_ln ;
+typedef	ICALMK_LN	icalmk_ln ;
 typedef	ICALMK_FL	icalmk_fl ;
 
 EXTERNC_begin

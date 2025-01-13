@@ -1,6 +1,9 @@
-/* numincr */
+/* numincr HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
 
 /* number-incrementer */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,19 +16,18 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	NUMINCR_INCLUDE
-#define	NUMINCR_INCLUDE	1
+#define	NUMINCR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 /* object defines */
-
 #define	NUMINCR		struct numincr_head
 #define	NUMINCR_FL	struct numincr_flags
 #define	NUMINCR_DEFENTS	10
@@ -44,25 +46,20 @@ struct numincr_head {
 	int		prec ;		/* precision */
 } ;
 
+typedef	NUMINCR		numincr ;
+typedef	NUMINCR_FL	numincr_fl ;
 
-#if	(! defined(NUMINCR_MASTER)) || (NUMINCR_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int numincr_start(numincr *,cchar *,int) noex ;
+extern int numincr_load(numincr *,cchar *,int) noex ;
+extern int numincr_setprec(numincr *,int) noex ;
+extern int numincr_incr(numincr *,int) noex ;
+extern int numincr_cvtstr(numincr *,char *,int,int) noex ;
+extern int numincr_finish(numincr *) noex ;
 
-extern int numincr_start(NUMINCR *,const char *,int) ;
-extern int numincr_load(NUMINCR *,const char *,int) ;
-extern int numincr_setprec(NUMINCR *,int) ;
-extern int numincr_incr(NUMINCR *,int) ;
-extern int numincr_cvtstr(NUMINCR *,char *,int,int) ;
-extern int numincr_finish(NUMINCR *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* NUMINCR_MASTER */
 
 #endif /* NUMINCR_INCLUDE */
 

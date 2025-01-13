@@ -1,4 +1,5 @@
 /* proguserlist HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* program-user-list-ing */
@@ -30,8 +31,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
-
-#include	<proginfo.hh>
+#include	<proginfo.h>
 
 
 EXTERNC_begin

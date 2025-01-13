@@ -1,6 +1,6 @@
 /* mailspooldir HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C20 */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -16,7 +16,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	"proginfo.h"
+#include	"proginfo.hh"
 
 
 EXTERNC_begin

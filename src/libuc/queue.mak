@@ -56,7 +56,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0_QUEUE= plainq.o q.o aiq.o
-OBJ1_QUEUE= pq.o ciq.o piq.o
+OBJ1_QUEUE= pq.o ciq.o piq.o intiq.o
 OBJ2_QUEUE= cq.o fifoitem.o
 OBJ3_QUEUE= charq.o chariq.o
 OBJ4_QUEUE= slq.o fifostr.o
@@ -163,5 +163,8 @@ cq.o:			cq.cc cq.h
 
 # composite
 fifostr.o:		fifostr.cc fifostr.h
+
+# specialty interlocked
+intiq.o:		intiq.cc intiq.h
 
 
