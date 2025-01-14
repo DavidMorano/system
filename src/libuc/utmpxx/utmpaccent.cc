@@ -95,9 +95,8 @@ int utmpaccent_load(utmpaccent *uep,char *uebuf,int uelen,CFENT *suep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (uep && uebuf && suep) {
-	    storeitem	ib ;
 	    memclear(uep) ;
-	    if ((rs = storeitem_start(&ib,uebuf,uelen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(uebuf,uelen)) >= 0) {
 		{
 	            uep->ctime = suep->ut_tv.tv_sec ;
 	            uep->sid = suep->ut_pid ;	/* session ID */
@@ -113,11 +112,11 @@ int utmpaccent_load(utmpaccent *uep,char *uebuf,int uelen,CFENT *suep) noex {
 	            uep->e_term = suep->ut_exit.e_termination ;
 #endif
 	            strwcpy(uep->id,suep->ut_id,lid) ;
-	            si_copystr(&ib,&uep->user,suep->ut_user,luser) ;
-	            si_copystr(&ib,&uep->line,suep->ut_line,lline) ;
-	            si_copystr(&ib,&uep->host,suep->ut_host,lhost) ;
+	            si_copystr(&si,&uep->user,suep->ut_user,luser) ;
+	            si_copystr(&si,&uep->line,suep->ut_line,lline) ;
+	            si_copystr(&si,&uep->host,suep->ut_host,lhost) ;
 		} /* end block */
-	        rs1 = storeitem_finish(&ib) ;
+	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
@@ -146,12 +145,12 @@ int utmpaccent_size(cutmpaccent *uep) noex {
 
 /* local subroutines */
 
-static int si_copystr(storeitem *ibp,cchar **pp,cchar *sp,int sl) noex {
+static int si_copystr(storeitem *sip,cchar **pp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	cchar		**cpp = (cchar **) pp ;
+	cchar		**cpp = ccharpp(pp) ;
 	*cpp = nullptr ;
 	if (sp) {
-	    rs = storeitem_strw(ibp,sp,sl,cpp) ;
+	    rs = sip->strw(sp,sl,cpp) ;
 	}
 	return rs ;
 }

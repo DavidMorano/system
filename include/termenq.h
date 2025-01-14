@@ -1,4 +1,9 @@
-/* termenq */
+/* termenq HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
+
+/* manage reading or writing of the TERMENQ database */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,24 +17,27 @@
 
 
 #ifndef	TERMENQ_INCLUDE
-#define	TERMENQ_INCLUDE	1
+#define	TERMENQ_INCLUDE
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<localmisc.h>	/* for special types */
-#include	"terment.h"
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<terment.h>
 
 
 /* object defines */
-
 #define	TERMENQ		struct termenq_head
-#define	TERMENQ_CUR	struct termenq_c
 #define	TERMENQ_FL	struct termenq_flags
-#define	TERMENQ_MAGIC	1092387456
+#define	TERMENQ_ENT	terment
+#define	TERMENQ_CUR	struct termenq_cursor
+#define	TERMENQ_MAGIC	0x10923874
 
 
-struct termenq_c {
+struct termenq_cursor {
 	int		i ;
 } ;
 
@@ -38,7 +46,6 @@ struct termenq_flags {
 } ;
 
 struct termenq_head {
-	uint		magic ;
 	cchar		*fname ;	/* stored file name */
 	caddr_t		mapdata ;	/* file mapping buffer */
 	TERMENQ_FL	f ;
@@ -48,7 +55,8 @@ struct termenq_head {
 	size_t		mapsize ;
 	size_t		fsize ;		/* file total size */
 	uint		mapoff ;	/* file mapping starting offset */
-	int		pagesize ;
+	uint		magic ;
+	int		pagesz ;
 	int		oflags ;	/* open flags */
 	int		operms ;	/* open permissions */
 	int		fd ;		/* file descriptor */
@@ -58,30 +66,28 @@ struct termenq_head {
 	int		en ;		/* convenience store */
 } ;
 
+typedef	TERMENQ		termenq ;
+typedef	TERMENQ_FL	termenq_fl ;
+typedef	TERMENQ_ENT	termenq_ent ;
+typedef	TERMENQ_CUR	termenq_cur ;
 
-#if	(! defined(TERMENQ_MASTER)) || (TERMENQ_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int termenq_open(termenq *,cchar *,int) noex ;
+extern int termenq_read(termenq *,int,termenq_ent *) noex ;
+extern int termenq_write(termenq *,int,termenq_ent *) noex ;
+extern int termenq_check(termenq *,time_t) noex ;
+extern int termenq_curbegin(termenq *,termenq_cur *) noex ;
+extern int termenq_curend(termenq *,termenq_cur *) noex ;
+extern int termenq_curenum(termenq *,termenq_cur *,termenq_ent *) noex ;
+extern int termenq_curfetchln(termenq *,termenq_cur *,termenq_ent *,
+		cchar *) noex ;
+extern int termenq_fetchsid(termenq *,termenq_ent *,pid_t) noex ;
+extern int termenq_nactive(termenq *) noex ;
+extern int termenq_close(termenq *) noex ;
 
-extern int termenq_open(TERMENQ *,cchar *,int) ;
-extern int termenq_read(TERMENQ *,int,TERMENT *) ;
-extern int termenq_write(TERMENQ *,int,TERMENT *) ;
-extern int termenq_check(TERMENQ *,time_t) ;
-extern int termenq_curbegin(TERMENQ *,TERMENQ_CUR *) ;
-extern int termenq_curend(TERMENQ *,TERMENQ_CUR *) ;
-extern int termenq_enum(TERMENQ *,TERMENQ_CUR *,TERMENT *) ;
-extern int termenq_fetchline(TERMENQ *,TERMENQ_CUR *,TERMENT *,cchar *) ;
-extern int termenq_fetchsid(TERMENQ *,TERMENT *,pid_t) ;
-extern int termenq_nactive(TERMENQ *) ;
-extern int termenq_close(TERMENQ *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* TERMENQ_MASTER */
 
 #endif /* TERMENQ_INCLUDE */
 

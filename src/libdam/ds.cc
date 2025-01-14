@@ -1,17 +1,16 @@
-/* ds */
+/* ds SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* low-level terminal-display manager */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_TD		1		/* use TD object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2009-01-20, David A­D­ Morano
-        This is a complete rewrite of the trash that performed this function
-        previously.
+	This is a complete rewrite of the trash that performed this
+	function previously.
 
 */
 
@@ -19,31 +18,30 @@
 
 /*******************************************************************************
 
-        This module implements the display related functions for the program.
-        This code is actually an API-independent front-end for one or more
-        underlying terminal-display APIs. The primary terminal-display API of
-        the past used to be 'curses(3)' but that had way too many bugs for
-        continued use. The primary underlying terminal-display API is now
-        'td(3dam)'.
+  	Object:
+	ds
 
+	Description:
+	This module implements the display related functions for
+	the program.  This code is actually an API-independent
+	front-end for one or more underlying terminal-display APIs.
+	The primary terminal-display API of the past used to be
+	|curses(3)|  but that had way too many bugs for continued
+	use.  The primary underlying terminal-display API is now
+	|td(3dam)|.
 
 *******************************************************************************/
 
-
-#define	DS_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
 #include	<termstr.h>
 #include	<ascii.h>
 #include	<uterm.h>
+#include	<td.h>
 #include	<localmisc.h>
 
 #include	"ds.h"
@@ -55,17 +53,16 @@
 #define	DS_GRMASK	(DS_GRBOLD| DS_GRUNDER| DS_GRBLINK| DS_GRREV)
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strncpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*strnrpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -76,538 +73,313 @@ extern char	*strnrpbrk(const char *,int,const char *) ;
 
 /* forward references */
 
+template<typename ... Args>
+static int ds_ctor(ds *op,Args ... args) noex {
+    	DS		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(hop) ;
+	    if ((op->tdp = new(nothrow) td) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-td) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (ds_ctor) */
+
+static int ds_dtor(ds *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->tdp) {
+		delete op->tdp ;
+		op->tdp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (ds_dtor) */
+
+template<typename ... Args>
+static inline int ds_magic(ds *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == DS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (ds_magic) */
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int ds_start(DS *dsp,int tfd,cchar *termtype,int rows,int cols)
-{
+int ds_start(DS *op,int tfd,cchar *termtype,int rows,int cols) noex {
 	int		rs ;
-	const char	*cp ;
-
-	if (dsp == NULL) return SR_FAULT ;
-	if (termtype == NULL) return SR_FAULT ;
-
-	if (termtype[0] == '\0') return SR_INVALID ;
-	if (tfd < 0) return SR_INVALID ;
-
-#if	CF_DEBUGS
-	    debugprintf("ds_start: termtype=%s\n",termtype) ;
-#endif /* CF_DEBUGS */
-
-	memclear(dsp) ;
-	dsp->tfd = tfd ;
-
-	if ((rs = uc_mallocstrw(termtype,-1,&cp)) >= 0) {
-	    dsp->termtype = cp ;
-#if	CF_TD
-	    rs = td_start(&dsp->dm,tfd,termtype,rows,cols) ;
-#else
-	    rs = SR_NOSYS ;
-#endif
-	    if (rs >= 0) {
-	        dsp->magic = DS_MAGIC ;
-	    }
+	if ((rs = ds_ctor(op,termtype)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (termtype[0]) {
+		rs = SR_BADFD ;
+		if (tfd >= 0) {
+		    auto &tt = termtype ;
+	            op->tfd = tfd ;
+	            if (cchar *cp ; (rs = uc_mallocstrw(tt,-1,&cp)) >= 0) {
+	                op->termtype = cp ;
+	                rs = td_start(op->tdp,tfd,termtype,rows,cols) ;
+	                if (rs >= 0) {
+	                    op->magic = DS_MAGIC ;
+	                }
+	                if (rs < 0) {
+	                    uc_free(op->termtype) ;
+	                    op->termtype = NULL ;
+	                }
+	            } /* end if (m-a) */
+	        } /* end if (good-FD) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-	        uc_free(dsp->termtype) ;
-	        dsp->termtype = NULL ;
+		ds_dtor(op) ;
 	    }
-	} /* end if (m-a) */
-
-#if	CF_DEBUGS
-	    debugprintf("ds_start: ret rs=%d\n",rs) ;
-#endif /* CF_DEBUGS */
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ds_start) */
 
-
-int ds_finish(DS *dsp)
-{
-	int		rs = SR_OK ;
+int ds_finish(DS *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs1 = td_finish(&dsp->dm) ;
-	if (rs >= 0) rs = rs1 ;
-#else
-	rs = SR_NOSYS ;
-#endif
-
-	if (dsp->termtype != NULL) {
-	    rs1 = uc_free(dsp->termtype) ;
-	    if (rs >= 0) rs = rs1 ;
-	    dsp->termtype = NULL ;
-	}
-
-	dsp->magic = 0 ;
+	if ((rs = ds_magic(op)) >= 0) {
+	    {
+	        rs1 = td_finish(op->tdp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->termtype) {
+	        rs1 = uc_free(op->termtype) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->termtype = NULL ;
+	    }
+	    {
+		rs1 = ds_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ds_finish) */
 
-
-int ds_subnew(DS *dsp,int srow,int scol,int rows,int cols)
-{
+int ds_subnew(DS *op,int srow,int scol,int rows,int cols) noex {
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs = td_subnew(&dsp->dm,srow,scol,rows,cols) ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    rs = td_subnew(op->tdp,srow,scol,rows,cols) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ds_subnew) */
 
-
-int ds_subdel(DS *dsp,int w)
-{
+int ds_subdel(DS *op,int w) noex {
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs = td_subdel(&dsp->dm,w) ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    rs = td_subdel(op->tdp,w) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ds_subdel) */
 
-
-int ds_getlines(DS *dsp,int w)
-{
+int ds_getlines(DS *op,int w) noex {
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs = td_getlines(&dsp->dm,w) ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    rs = td_getlines(op->tdp,w) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ds_getlines) */
 
-
-int ds_setlines(DS *dsp,int w,int nl)
-{
+int ds_setlines(DS *op,int w,int nl) noex {
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs = td_setlines(&dsp->dm,w,nl) ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    rs = td_setlines(op->tdp,w,nl) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ds_setlines) */
 
-
-int ds_move(DS *dsp,int w,int r,int c)
-{
+int ds_move(DS *op,int w,int r,int c) noex {
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("ds_move: w=%d r=%d c=%d\n",w,r,c) ;
-#endif
-
-#if	CF_TD
-	rs = td_move(&dsp->dm,w,r,c) ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    rs = td_move(op->tdp,w,r,c) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ds_move) */
 
-
-/* print to a window */
-int ds_printf(DS *dsp,int w,const char *fmt,...)
-{
+int ds_printf(DS *op,int w,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-	if (fmt == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	{
-	    va_list	ap ;
+	if ((rs = ds_magic(op,fmt)) >= 0) {
 	    va_begin(ap,fmt) ;
-	    rs = td_vpprintf(&dsp->dm,w,-1,-1,fmt,ap) ;
+	    rs = td_vpprintf(op->tdp,w,-1,-1,fmt,ap) ;
 	    va_end(ap) ;
-	}
-#else
-	rs = SR_OK ;
-#endif /* CF_TD */
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end wubroutine (ds_printf) */
 
-
-/* print to a window */
-int ds_pprintf(DS *dsp,int w,int r,int c,const char *fmt,...)
-{
+int ds_pprintf(DS *op,int w,int r,int c,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-	if (fmt == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	{
-	    va_list	ap ;
+	if ((rs = ds_magic(op,fmt)) >= 0) {
 	    va_begin(ap,fmt) ;
-	    rs = td_vpprintf(&dsp->dm,w,r,c,fmt,ap) ;
+	    rs = td_vpprintf(op->tdp,w,r,c,fmt,ap) ;
 	    va_end(ap) ;
-	}
-#else
-	    rs = SR_OK ;
-#endif /* CF_TD */
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end wubroutine (ds_pprintf) */
 
-
-/* print to a window */
-int ds_vprintf(DS *dsp,int w,const char *fmt,va_list ap)
-{
+int ds_vprintf(DS *op,int w,cchar *fmt,va_list ap) noex {
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-	if (fmt == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs = td_vpprintf(&dsp->dm,w,-1,-1,fmt,ap) ;
-#else
-	rs = SR_OK ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op,fmt,ap)) >= 0) {
+	    rs = td_vpprintf(op->tdp,w,-1,-1,fmt,ap) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end wubroutine (ds_vprintf) */
 
-
-/* print to a window */
-int ds_vpprintf(DS *dsp,int w,int r,int c,const char *fmt,va_list ap)
-{
+int ds_vpprintf(DS *op,int w,int r,int c,cchar *fmt,va_list ap) noex {
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-	if (fmt == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("ds_vpprintf: r=%d c=%d\n",r,c) ;
-#endif
-
-#if	CF_TD
-	rs = td_vpprintf(&dsp->dm,w,r,c,fmt,ap) ;
-#else
-	rs = SR_OK ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op,fmt,ap)) >= 0) {
+	    rs = td_vpprintf(op->tdp,w,r,c,fmt,ap) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end wubroutine (ds_vpprintf) */
 
-
-/* write to a window */
-int ds_write(DS *dsp,int w,cchar *bp,int bl)
-{
+int ds_write(DS *op,int w,cchar *bp,int bl) noex {
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-	if (bp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs = td_pwrite(&dsp->dm,w,-1,-1,bp,bl) ;
-#else
-	rs = SR_OK ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op,bp)) >= 0) {
+	    rs = td_pwrite(op->tdp,w,-1,-1,bp,bl) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end wubroutine (ds_write) */
 
-
-/* write to a window */
-int ds_pwrite(DS *dsp,int w,int r,int c,cchar *bp,int bl)
-{
+int ds_pwrite(DS *op,int w,int r,int c,cchar *bp,int bl) noex {
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-	if (bp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	{
-	debugprintf("ds_pwrite: w=%d r=%d c=%d\n",w,r,c) ;
-	debugprintf("ds_pwrite: bl=%d \n",bl) ;
-	}
-#endif
-
-#if	CF_TD
-	rs = td_pwrite(&dsp->dm,w,r,c,bp,bl) ;
-#else
-	rs = SR_OK ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op,bp)) >= 0) {
+	    rs = td_pwrite(op->tdp,w,r,c,bp,bl) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end wubroutine (ds_pwrite) */
 
-
-/* write to a window w/ graphic rendition */
-int ds_pwritegr(DS *dsp,int w,int r,int c,int gr,cchar *bp,int bl)
-{
+int ds_pwritegr(DS *op,int w,int r,int c,int gr,cchar *bp,int bl) noex {
 	int		rs ;
-	int		tdgr = 0 ;
-
-	if (dsp == NULL) return SR_FAULT ;
-	if (bp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	{
-	debugprintf("ds_pwritegr: w=%d r=%d c=%d\n",w,r,c) ;
-	debugprintf("ds_pwritegr: bl=%d \n",bl) ;
-	}
-#endif
-
-#if	CF_TD
-	if (gr) {
-	    if (gr & DS_GRBOLD) tdgr |= TD_GRBOLD ;
-	    if (gr & DS_GRUNDER) tdgr |= TD_GRUNDER ;
-	    if (gr & DS_GRBLINK) tdgr |= TD_GRBLINK ;
-	    if (gr & DS_GRREV) tdgr |= TD_GRREV ;
-	}
-	rs = td_pwritegr(&dsp->dm,w,r,c,tdgr,bp,bl) ;
-#else
-	rs = SR_OK ;
-#endif /* CF_TD */
-
-#if	CF_DEBUGS
-	debugprintf("ds_pwritegr: ret rs=%d\n",rs) ;
-#endif
-
+	if ((rs = ds_magic(op,bp)) >= 0) {
+	    int		tdgr = 0 ;
+	    if (gr) {
+	        if (gr & DS_GRBOLD) tdgr |= TD_GRBOLD ;
+	        if (gr & DS_GRUNDER) tdgr |= TD_GRUNDER ;
+	        if (gr & DS_GRBLINK) tdgr |= TD_GRBLINK ;
+	        if (gr & DS_GRREV) tdgr |= TD_GRREV ;
+	    }
+	    rs = td_pwritegr(op->tdp,w,r,c,tdgr,bp,bl) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end wubroutine (ds_pwritegr) */
 
-
 /* erase window; type: 0=forward, 1=back, 2=whole */
-int ds_ew(DS *dsp,int w,int r,int type)
-{
+int ds_ew(DS *op,int w,int r,int type) noex {
 	int		rs ;
 	int		len = 0 ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs = td_ew(&dsp->dm,w,r,type) ;
-	len = rs ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    rs = td_ew(op->tdp,w,r,type) ;
+	    len = rs ;
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end wubroutine (ds_ew) */
 
-
-int ds_el(DS *dsp,int w,int type)
-{
+int ds_el(DS *op,int w,int type) noex {
 	int		rs ;
 	int		len = 0 ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs = td_el(&dsp->dm,w,type) ;
-	len = rs ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    rs = td_el(op->tdp,w,type) ;
+	    len = rs ;
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end wubroutine (ds_el) */
 
-
-int ds_ec(DS *dsp,int w,int n)
-{
-	int		rs = SR_OK ;
+int ds_ec(DS *op,int w,int n) noex {
+	int		rs ;
 	int		len = 0 ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs = td_ec(&dsp->dm,w,n) ;
-	len = rs ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    rs = td_ec(op->tdp,w,n) ;
+	    len = rs ;
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end wubroutine (ds_ec) */
 
-
-int ds_scroll(DS *dsp,int w,int n)
-{
-	int		rs = SR_OK ;
+int ds_scroll(DS *op,int w,int n) noex {
+	int		rs ;
 	int		len = 0 ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs = td_scroll(&dsp->dm,w,n) ;
-	len = rs ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    rs = td_scroll(op->tdp,w,n) ;
+	    len = rs ;
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (ds_scroll) */
 
-
-/* clear (blank out) a window */
-int ds_clear(DS *dsp,int w)
-{
-	int		rs = SR_OK ;
+int ds_clear(DS *op,int w) noex {
+	int		rs ;
 	int		len = 0 ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs = td_clear(&dsp->dm,w) ;
-	len = rs ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    rs = td_clear(op->tdp,w) ;
+	    len = rs ;
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (ds_clear) */
 
-
-int ds_flush(DS *dsp)
-{
+int ds_flush(DS *op) noex {
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_TD
-	rs = td_flush(&dsp->dm) ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    rs = td_flush(op->tdp) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ds_flush) */
 
-
 /* suspend the display (optionally leaving the cursor someplace) */
-int ds_suspend(DS *dsp,int r,int c)
-{
+int ds_suspend(DS *op,int r,int c) noex {
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-	rs = ds_flush(dsp) ;
-
-#if	CF_TD
-	if (rs >= 0)
-	    rs = td_suspend(&dsp->dm,r,c) ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    if ((rs = ds_flush(op)) >= 0) {
+	        rs = td_suspend(op->tdp,r,c) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ds_suspend) */
 
-
-int ds_done(DS *dsp)
-{
+int ds_done(DS *op) noex {
 	int		rs ;
-
-	if (dsp == NULL) return SR_FAULT ;
-
-	if (dsp->magic != DS_MAGIC) return SR_NOTOPEN ;
-
-	rs = ds_pwrite(dsp,0,(dsp->rows-1),0,"\v",1) ;
-
-	if (rs >= 0)
-	    rs = ds_flush(dsp) ;
-
-#if	CF_TD
-	if (rs >= 0)
-	    rs = td_suspend(&dsp->dm,-1,-1) ;
-#else
-	rs = SR_NOSYS ;
-#endif /* CF_TD */
-
+	if ((rs = ds_magic(op)) >= 0) {
+	    if ((rs = ds_pwrite(op,0,(op->rows-1),0,"\v",1)) >= 0) {
+	        if ((rs = ds_flush(op)) >= 0) {
+	            rs = td_suspend(op->tdp,-1,-1) ;
+	        }
+	    }
+	}
 	return rs ;
 }
 /* end subroutine (ds_done) */

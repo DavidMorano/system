@@ -38,6 +38,8 @@ vars
 varmk
 varmks
 ts
+dw
+ds
 spellchecks	incredible mess!
 
 = Future

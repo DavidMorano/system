@@ -20,7 +20,7 @@
 	Name:
 	terment
 
-	Description:[
+	Description:
 	This code provides the methods for the TERMENT object. The
 	TERMENT object, while residing in a file, forms a single
 	record in a file-database of records. This is similar to a
@@ -59,9 +59,10 @@
 /* exported subroutines */
 
 int terment_start(terment *op) noex {
+    	TERMENT		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = memclear(op) ;		/* dangerous */
+	    rs = memclear(hop) ;
 	}
 	return rs ;
 }

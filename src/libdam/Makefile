@@ -158,7 +158,7 @@ OBJ55=
 # these next two are in LINBUC
 #OBJ56= isalphalatin.o isalnumlatin.o isdigitlatin.o ishexlatin.o
 #OBJ57= isdict.o isprintlatin.o isprintbad.o
-OBJ58= islowerlatin.o isupperlatin.o isprintterm.o iswhite.o iseol.o rmeol.o
+OBJ58=
 OBJ59= isindomain.o issamehostname.o isleapyear.o isfnamespecial.o
 # this next one is in LIBUC
 #OBJ60= hasuc.o haslc.o haswhite.o 
@@ -740,6 +740,9 @@ searchkeys.o:		searchkeys.cc searchkeys.h
 xwords.o:		xwords.cc xwords.h
 rtags.o:		rtags.cc rtags.h
 cgi.o:			cgi.cc cgi.h
+termenq.o:		termenq.cc termenq.h
+ds.o:			ds.cc ds.h
+dw.o:			dw.cc dw.h
 
 # DATABASE
 database.o:		database.dir

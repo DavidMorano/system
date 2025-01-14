@@ -66,6 +66,7 @@
 #include	<cstring>
 #include	<atomic>
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<timewatch.hh>
 #include	<syshasutmpx.h>
 #include	<ptm.h>
@@ -96,6 +97,8 @@
 
 #define	ENT			utmpaccent
 #define	ARG			utmpacc_arg
+
+#define	UTMPACC_ENTLENMULT	4	/* entry-legnth multiplier */
 
 #ifndef	TERMBUFLEN
 #define	TERMBUFLEN		256	/* terminal-device buffer length */
@@ -218,6 +221,10 @@ namespace {
 	int ibegin() noex ;
 	int iend() noex ;
     } ; /* end struct (utmpacc) */
+    struct vars {
+	int		entbuflen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
 }
 
 
@@ -249,10 +256,14 @@ static int	utmpaccent_loada(ARG *,CUTMPX *) noex ;
 [[maybe_unused]] constexpr int 		lline = UTMPACCENT_LLINE ;
 [[maybe_unused]] constexpr int 		lhost = UTMPACCENT_LHOST ;
 
+static vars		var ;
+
 static utmpacc		utmpacc_data ;
 
 
 /* exported variables */
+
+utmpacc_enter		utmpacc_entbuflen ;
 
 
 /* exported subroutines */
@@ -1026,5 +1037,23 @@ static int utmpx_eterm(CUTMPX *) noex {
 }
 
 #endif /* defined(SYSHASUTMP_EXIT) && (SYSHASUTMP_EXIT > 0) */
+
+utmpacc_enter::operator int () noex {
+    	static cint	rsv = var ;
+    	int		rs ;
+	if ((rs = rsv) >= 0) {
+	    rs = var.entbuflen ;
+	}
+    	return rs ;
+}
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	    entbuflen = szof(utmpx) ;
+	}
+	return rs ;
+}
+/* end method (vars::operator) */
 
 

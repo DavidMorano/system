@@ -17,7 +17,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1995,1996 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -66,6 +66,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<getnodename.h>
 #include	<vecstr.h>
@@ -80,6 +81,7 @@
 /* local defines */
 
 #define	NODEFNAME	"etc/node"
+#define	ENTLENMULT	4		/* entry-length multiply factor */
 
 
 /* imported namespaces */
@@ -101,6 +103,16 @@ typedef nodedb_ent	ent ;
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int		nodenamelen ;
+	int		maxpathlen ;
+	int		entlen ;
+	int		sz ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+}
+
 
 /* forward references */
 
@@ -110,7 +122,9 @@ static int	vecload(vecstr *,ent *) noex ;
 
 /* local variables */
 
-constexpr cchar		nodefname[] = NODEFNAME ;
+static vars		var ;
+
+constexpr char		nodefname[] = NODEFNAME ;
 
 
 /* exported variables */
@@ -124,8 +138,11 @@ int getnodeinfo(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 	if (pr == nullptr) pr = "/" ;
 	if (nn) {
 	    if (pr[0] && nn[0]) {
-		rs = getx(pr,cbuf,sbuf,klp,nn) ;
-		len = rs ;
+		static cint	rsv = var ;
+		if ((rs = rsv) >= 0) {
+		    rs = getx(pr,cbuf,sbuf,klp,nn) ;
+		    len = rs ;
+		} /* end if (vars) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -139,41 +156,41 @@ static int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = -1 ;
-	if (char *nbuf{} ; (rs = malloc_nn(&nbuf)) >= 0) {
-	    cint	nlen = rs ;		/* "node" length */
-	    cint	clen = rs ;		/* "cluster" length */
+	if (char *a ; (rs = uc_malloc(var.sz,&a)) >= 0) {
+	    cint	nlen = var.nodenamelen ;	/* "node" length */
+	    cint	clen = var.nodenamelen ;	/* "cluster" length */
+	    cint	slen = var.nodenamelen ;	/* "system" length */
+	    char	*nbuf = (a + 0) ;
 	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
-		if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
-	            if ((rs = mkpath(tbuf,pr,nodefname)) >= 0) {
-			cnullptr	np{} ;
-	                if (nodedb st ; (rs = nodedb_open(&st,tbuf)) >= 0) {
-	                    nodedb_ent	ste{} ;
-			    auto	nf = nodedb_fetch ;
-	                    cint	elen = NODEDB_ENTLEN ;
-	                    char	ebuf[NODEDB_ENTLEN + 1] ;
-	                    if ((rs = nf(&st,nn,np,&ste,ebuf,elen)) >= 0) {
-	                        if (cbuf) {
-	                            rs = sncpy1(cbuf,clen,ste.clu) ;
-			            len = rs ;
-	                        } else {
-	                            len = strlen(ste.clu) ;
-			        }
-	                        if ((rs >= 0) && sbuf) {
-	                            rs = sncpy(sbuf,nlen,ste.sys) ;
-			        }
-	                        if ((rs >= 0) && klp) {
-				    rs = vecload(klp,&ste) ;
-	                        } /* end if (keys) */
-	                    } /* end if (fetched result found) */
-	                    rs1 = nodedb_close(&st) ;
-		            if (rs >= 0) rs = rs1 ;
-	                } /* end if (DB opened) */
-	            } /* end if (mkpath) */
-		    rs1 = uc_free(tbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (m-a-f) */
+		cint	tlen = var.maxpathlen ;
+	        char	*tbuf = (a + nlen) ;
+                if ((rs = mkpath(tbuf,pr,nodefname)) >= 0) {
+                    cnullptr        np{} ;
+                    if (nodedb st ; (rs = nodedb_open(&st,tbuf)) >= 0) {
+                        nodedb_ent  ste{} ;
+                        auto        nf = nodedb_fetch ;
+                        cint        elen = var.entlen ;
+                        char        *ebuf = (a + (nlen + 1) + (tlen + 1)) ;
+                        if ((rs = nf(&st,nn,np,&ste,ebuf,elen)) >= 0) {
+                            if (cbuf) {
+                                rs = sncpy1(cbuf,clen,ste.clu) ;
+                                len = rs ;
+                            } else {
+                                len = strlen(ste.clu) ;
+                                }
+                            if ((rs >= 0) && sbuf) {
+                                rs = sncpy(sbuf,slen,ste.sys) ;
+                            }
+                            if ((rs >= 0) && klp) {
+                                rs = vecload(klp,&ste) ;
+                            } /* end if (keys) */
+                        } /* end if (fetched result found) */
+                        rs1 = nodedb_close(&st) ;
+                        if (rs >= 0) rs = rs1 ;
+                    } /* end if (DB opened) */
+                } /* end if (mkpath) */
 	    } /* end if (getnodename) */
-	    rs1 = uc_free(nbuf) ;
+	    rs1 = uc_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
@@ -191,5 +208,21 @@ static int vecload(vecstr *klp,ent *ep) noex {
 	return rs ;
 }
 /* end subroutine (vecload) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	    nodenamelen = rs ;
+	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+		maxpathlen = rs ;
+		entlen = (ENTLENMULT * nodenamelen) ;
+		sz += (nodenamelen + 1) ;
+		sz += (maxpathlen + 1) ;
+		sz += (entlen + 1) ;
+	    }
+	}
+	return rs ;
+}
+/* end method (vars::operator) */
 
 

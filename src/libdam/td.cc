@@ -9,7 +9,7 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1999-08-01, Dave morano
 	This object package is finally finished!
 
 */

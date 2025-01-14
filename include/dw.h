@@ -27,13 +27,12 @@
 #define	DW_FL		struct dw_flags
 #define	DW_ENT		struct dw_entry
 #define	DW_CUR		struct dw_cursor
-
-#define	DW_DEFCHECKTIME	20		/* default check time (seconds) */
-
-/* job states */
+/* values */
+#define	DW_INTCHECK	20		/* default check time (seconds) */
+/* returns */
 #define	DW_SRESERVED	0
-#define	DW_SNEW		1	/* just in */
-#define	DW_SCHECK	2	/* ready for validation check */
+#define	DW_SNEW		1		/* just in */
+#define	DW_SCHECK	2		/* ready for validation check */
 #define	DW_SREADY	3
 #define	DW_SNOTSUP	4
 #define	DW_SRUNNING	5
@@ -61,6 +60,7 @@ struct dw_flags {
 	uint		subdirs:1 ;
 } ;
 
+EXTERNC_begin
 struct dw_head {
 	vecstr		subdirs ;		/* subdirectories */
 	vecobj		e ;			/* directory entries */
@@ -78,6 +78,7 @@ struct dw_head {
 	int		count_new ;
 	int		count_checkable ;
 } ;
+EXTERNC_end
 
 struct dw_cursor {
 	int		i ;

@@ -6,7 +6,15 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 2004-05-25, David A­D­ Morano
+	This subroutine was adopted for use as the node-database
+	reader.
+
+****/
+
+/* Copyright © 2004,2013 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	NODEDB_INCLUDE
 #define	NODEDB_INCLUDE
@@ -22,9 +30,9 @@
 #define	NODEDB			struct nodedb_head
 #define	NODEDB_CUR		struct nodedb_cursor
 #define	NODEDB_ENT		struct nodedb_entry
-
 #define	NODEDB_NFILES		3
 #define	NODEDB_DEFENTS		10
+#define	NODEDB_ENTLENMULT	4	/* entry-length multiplier */
 
 
 struct nodedb_cursor {
@@ -33,11 +41,12 @@ struct nodedb_cursor {
 } ;
 
 struct nodedb_head {
-	vecobj		*filep ;		/* files */
-	hdb		*entsp ;
+	vecobj		*filep ;		/* files-pointer */
+	hdb		*entsp ;		/* entries-pointer */
 	time_t		checktime ;
 	uint		magic ;
 	int		cursors ;
+	int		entbuflen ;		/* <- public member */
 } ;
 
 struct nodedb_entry {

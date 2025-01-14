@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int intiq_ctor(intiq *op,Args ... args) noex {
+static int ds_ctor(ds *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int intiq_ctor(intiq *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (intiq_ctor) */
+/* end subroutine (ds_ctor) */
 
-static int intiq_dtor(intiq *op) noex {
+static int ds_dtor(ds *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (intiq_dtor) */
+/* end subroutine (ds_dtor) */
 
 template<typename ... Args>
-static inline int intiq_magic(intiq *op,Args ... args) noex {
+static inline int ds_magic(ds *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == INTIQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == DS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (intiq_magic) */
+/* end subroutine (ds_magic) */

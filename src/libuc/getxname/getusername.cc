@@ -425,17 +425,21 @@ static int getxusername_varenv(getxuser *xup) noex {
 static int getxusername_utmp(getxuser *xup) noex {
 	int		rs = SR_OK ;
 	if_constexpr (f_utmpacc) {
-	    utmpacc_ent ue{} ; 
-	    cint	uelen = UTMPACC_BUFLEN ;
-	    char	uebuf[UTMPACC_BUFLEN+1] ;
-	    if ((rs = utmpacc_entsid(&ue,uebuf,uelen,0)) >= 0) {
-		if (ue.user != nullptr) {
-		    rs = sncpy(xup->ubuf,xup->ulen,ue.user) ;
-		} else {
-		    rs = SR_NOTFOUND ;
-		    xup->ubuf[0] = '\0' ;
-		}
-	    } /* end if (utmpacc-entsid) */
+	    if ((rs = utmpacc_entbuflen) >= 0) {
+	        utmpacc_ent	ue{} ; 
+	        cint		uelen = rs ;
+		if (char *uebuf ; (rs = uc_malloc((uelen+1),&uebuf)) >= 0) {
+	            if ((rs = utmpacc_entsid(&ue,uebuf,uelen,0)) >= 0) {
+		        if (ue.user != nullptr) {
+		            rs = sncpy(xup->ubuf,xup->ulen,ue.user) ;
+		        } else {
+		            rs = SR_NOTFOUND ;
+		            xup->ubuf[0] = '\0' ;
+		        }
+		    } /* end if (utmpacc_entsid) */
+		    rs = rsfree(rs,uebuf) ;
+	        } /* end if (m-a-f) */
+	    } /* end if (utmpacc_entbuflen) */
 	} else {
 	    if_constexpr (f_getutmpname) {
 	        rs = getutmpname(xup->ubuf,xup->ulen,0) ;

@@ -123,6 +123,19 @@ extern int utmpacc_curend(utmpacc_cur *) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+struct utmpacc_enter {
+    	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+} ;
+
+extern utmpacc_enter	utmpacc_entbuflen ;
+
+#endif /* __cplusplus */
+
 
 #endif /* UTMPACC_INCLUDE */
 

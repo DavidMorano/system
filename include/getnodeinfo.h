@@ -17,12 +17,16 @@
 
 */
 
-/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1995,1996 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	This file contains some support for the UNIX® Address-Familt
-	(AF) related operations.
+	Name:
+	getnodeinfo
+
+	Description:
+	Get a (optional) cluster-name and a (optional) system-name
+	given a nodename.
 
 *******************************************************************************/
 

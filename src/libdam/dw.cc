@@ -19,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	dw
+
+	Description:
 	This object is used to watch a directory path for additions
 	or changes in the file objects under that path.  Subdirectories
 	are allowed.  All files under the directory path (including
@@ -54,16 +58,6 @@
 /* local defines */
 
 #define	IENTRY		struct dw_ientry
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
-#define	BUFLEN		(2 * MAXPATHLEN)
 
 #define	MAXOPENTIME	300		/* maximum FD cache time */
 #define	MINCHECKTIME	2		/* minumun check interval (seconds) */
@@ -130,7 +124,7 @@ int dw_start(DW *dwp,cchar *dirname) noex {
 	dwp->fd = -1 ;
 	dwp->count_new = 0 ;
 	dwp->count_checkable = 0 ;
-	dwp->checkint = DW_DEFCHECKTIME ;
+	dwp->checkint = DW_INTCHECK ;
 	dwp->f.subdirs = false ;
 
 /* initialize */
@@ -153,11 +147,13 @@ int dw_start(DW *dwp,cchar *dirname) noex {
 	        } else {
 	            rs = SR_TOOBIG ;
 	        }
-	        if (rs < 0)
+	        if (rs < 0) {
 	            uc_free(cp) ;
+		}
 	    } /* end if (m-a) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        vecobj_finish(&dwp->e) ;
+	    }
 	} /* end if (vecobj-start) */
 
 	return rs ;
@@ -191,19 +187,16 @@ int dw_finish(DW *dwp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    dwp->dirname = nullptr ;
 	}
-
 	if (dwp->fd >= 0) {
 	    rs1 = u_close(dwp->fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    dwp->fd = -1 ;
 	}
-
 	if (dwp->f.subdirs) {
 	    dwp->f.subdirs = false ;
 	    rs1 = vecstr_finish(&dwp->subdirs) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
-
 	dwp->fd = -1 ;
 	dwp->magic = 0 ;
 	return rs ;

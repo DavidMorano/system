@@ -77,6 +77,8 @@
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<getnodename.h>
 #include	<mallocxx.h>
 #include	<uclustername.h>
 #include	<nodedb.h>
@@ -101,7 +103,9 @@
 #define	CLUSTERFNAME	"etc/cluster"
 #endif
 
-#define	SI		struct subinfo
+#define	SI		subinfo
+
+#define	ENTLENMULT	4		/* entry-length muliply factor */
 
 #define	TO_TTL		(2*3600)	/* two hours */
 
@@ -140,16 +144,21 @@ struct subinfo {
 namespace {
     struct searcher {
     	char		*rbuf ;
-	cchar		*nn ;
+	cchar		*nn{} ;
 	char		*a{} ;
 	int		rlen ;
 	searcher(char *rb,int rl,cchar *n) noex : rbuf(rb), rlen(rl) {
 	    nn = n ;
 	    rbuf[0] = '\0' ;
 	} ;
-	int start(cchar **) noex ;
+	int start() noex ;
+	int getprs() noex ;
 	int finish() noex ;
     } ; /* end struct (searcher) */
+    struct vars {
+	int		entlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
 }
 
 
@@ -166,14 +175,16 @@ static int	subinfo_cdb(SI *) noex ;
 
 /* local variables */
 
+static vars		var ;
+
 constexpr cpcchar	prs[] = {
     "/",
     "/usr/extra",
     "/usr/local"
 } ;
 
-constexpr cchar		nodefname[] = NODEFNAME ;
-constexpr cchar		clusterfname[] = CLUSTERFNAME ;
+constexpr char		nodefname[] = NODEFNAME ;
+constexpr char		clusterfname[] = CLUSTERFNAME ;
 
 
 /* exported variables */
@@ -186,33 +197,18 @@ int getclustername(char *rbuf,int rlen,cchar *nname) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (rbuf) {
-	    searcher	so(rbuf,rlen,nname) ;
-	    rs = SR_OK ;
+	    static cint		rsv = var ;
 	    rbuf[0] = '\0' ;
-	    if (cchar *nn{} ; (rs = so.start(&nn)) >= 0) {
-	        if (ids id ; (rs = id.load) >= 0) {
-	            if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
-		        cint	am = R_OK ;
-		        rs = SR_OK ;
-		        for (const auto pr : prs) {
-		            if ((rs = mkpath(pbuf,nodefname)) >= 0) {
-			        if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
-			            if ((rs = sperm(&id,&sb,am)) >= 0) {
-    				        rs = prgetclustername(pr,rbuf,rlen,nn) ;
-    				        len = rs ;
-				    } /* end if (sperm) */
-			        } /* end if (stat) */
-		            } /* end if (mkpath) */
-		            if (rs != 0) break ;
-		        } /* end for */
-		        rs = rsfree(rs,pbuf) ;
-	            } /* end if (m-a-f) */
-	            rs1 = id.release ;
+	    if ((rs = rsv) >= 0) {
+	        if (searcher so(rbuf,rlen,nname) ; (rs = so.start()) >= 0) {
+		    {
+		        rs = so.getprs() ;
+		        len = rs ;
+		    }
+	            rs1 = so.finish() ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (ids) */
-	        rs1 = so.finish() ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (searcher) */
+	        } /* end if (searcher) */
+	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
@@ -251,6 +247,33 @@ namespace libuc {
 
 
 /* local subroutines */
+
+int searcher::getprs() noex {
+    	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	        if (ids id ; (rs = id.load) >= 0) {
+	            if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
+		        cint	am = R_OK ;
+		        for (cauto &pr : prs) {
+		            if ((rs = mkpath(pbuf,nodefname)) >= 0) {
+			        if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
+			            if ((rs = sperm(&id,&sb,am)) >= 0) {
+    				        rs = prgetclustername(pr,rbuf,rlen,nn) ;
+    				        len = rs ;
+				    } /* end if (sperm) */
+			        } /* end if (stat) */
+		            } /* end if (mkpath) */
+		            if (rs != 0) break ;
+		        } /* end for */
+		        rs = rsfree(rs,pbuf) ;
+	            } /* end if (m-a-f) */
+	            rs1 = id.release ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (ids) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end method (searcher::getprs) */
 
 static int subinfo_start(SI *sip,cc *pr,char *rbuf,int rlen,cc *nn) noex {
 	int		rs = SR_FAULT ;
@@ -291,7 +314,7 @@ static int subinfo_ndb(SI *sip) noex {
 	int		len = 0 ;
 	cchar		*pr = sip->pr ;
 	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
-	    if ((rs = mkpath2(tbuf,pr,nodefname)) >= 0) {
+	    if ((rs = mkpath(tbuf,pr,nodefname)) >= 0) {
 		rs = subinfo_ndber(sip,tbuf) ;
 		len = rs ;
 	    } /* end if (mkpath) */
@@ -303,16 +326,17 @@ static int subinfo_ndb(SI *sip) noex {
 /* end subroutine (subinfo_ndb) */
 
 static int subinfo_ndber(SI *sip,cchar *nfn) noex {
-	cint		elen = NODEDB_ENTLEN ;
     	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 	cint		rlen = sip->rlen ;
 	cchar		*nn = sip->nn ;
 	char		*rbuf = sip->rbuf ;
-	if (char *ebuf{} ; (rs = uc_malloc(elen,&ebuf)) >= 0) {
-            if (nodedb st ; (rs = nodedb_open(&st,nfn)) >= 0) {
-                if (nodedb_cur cur ; (rs = nodedb_curbegin(&st,&cur)) >= 0) {
+        if (nodedb st ; (rs = nodedb_open(&st,nfn)) >= 0) {
+	    cint	elen = st.entbuflen ;
+	    if (char *ebuf{} ; (rs = uc_malloc((elen + 1),&ebuf)) >= 0) {
+		auto curbegin = nodedb_curbegin ;
+                if (nodedb_cur cur ; (rs = curbegin(&st,&cur)) >= 0) {
                     nodedb_ent  ste ;
                     cint    	rsn = SR_NOTFOUND ;
                     while (rs >= 0) {
@@ -331,13 +355,13 @@ static int subinfo_ndber(SI *sip,cchar *nfn) noex {
                     rs1 = nodedb_curend(&st,&cur) ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (nodedb-cursor) */
-                rs1 = nodedb_close(&st) ;
-                if (rs >= 0) rs = rs1 ;
-            } else if (isNotPresent(rs)) {
+	        rs = rsfree(rs,ebuf) ;
+	    } /* end if (m-a-f) */
+            rs1 = nodedb_close(&st) ;
+            if (rs >= 0) rs = rs1 ;
+        } else if (isNotPresent(rs)) {
                 rs = SR_OK ;
-            }
-	    rs = rsfree(rs,ebuf) ;
-	} /* end if (m-a-f) */
+        } /* end if */
 	return (rs >= 0) ? len : rs ;
 }
 /* end if (subinfor_ndber) */
@@ -381,15 +405,21 @@ static int subinfo_cdb(SI *sip) noex {
 }
 /* end subroutine (subinfo_cdb) */
 
-int searcher::start(cchar **npp) noex {
+int searcher::start() noex {
     	int		rs = SR_OK ;
 	if (nn == nullptr) {
 	    if ((rs = malloc_nn(&a)) >= 0) {
-		*npp = a ;
+		cint	nlen = rs ;
+		char	*nbuf = a ;
+		if ((rs = getnodename(nbuf,nlen)) >= 0) {
+		    nn = nbuf ;
+		}
+		if (rs < 0) {
+		    uc_free(a) ;
+		    a = nullptr ;
+		} /* end if (error handling) */
 	    } /* end if (memory-allocation) */
-	} else {
-	    *npp = nn ;
-	}
+	} /* end if ('nodename' was NULL) */
 	return rs ;
 }
 /* end method (search::start) */
@@ -405,5 +435,14 @@ int searcher::finish() noex {
 	return rs ;
 }
 /* end method (search::finish) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	    entlen = (rs * ENTLENMULT) ;
+	}
+	return rs ;
+}
+/* end method (vars::operator) */
 
 

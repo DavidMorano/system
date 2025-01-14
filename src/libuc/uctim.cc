@@ -112,8 +112,24 @@ typedef vecsorthand	prique ;
 
 /* local structures */
 
+enum dispcmds {
+	dispcmd_exit,
+	dispcmd_timeout,
+	dispcmd_handle,
+	dispcmd_overlast
+} ;
+
+enum cmdsubs {
+	cmdsub_create,
+	cmdsub_destroy,
+	cmdsub_set,
+	cmdsub_get,
+	cmdsub_overlast
+} ;
+
 namespace {
     struct uctimarg {
+	enum		cmdsubs ;
 	callback	*cbp ;
 	CITIMERVAL	*ntcp ;
 	ITIMERVAL	*otcp ;
@@ -152,10 +168,11 @@ namespace {
 	aflag		fexitdisp ;	/* thread is exiting */
 	int init() noex ;
 	int fini() noex ;
-	int cmdcreate(uctimarg *) noex ;
-	int cmddestroy(uctimarg *) noex ;
-	int cmdset(uctimarg *) noex ;
-	int cmdget(uctimarg *) noex ;
+	int cmdcreate(int,uctimarg *) noex ;
+	int cmddestroy(int,uctimarg *) noex ;
+	int cmdset(int,uctimarg *) noex ;
+	int cmdget(int,uctimarg *) noex ;
+	int cmdsub(cmdsubs,int,uctimarg *) noex ;
 	int capbegin(int = -1) noex ;
 	int capend() noex ;
 	int enterpri(callback *) noex ;
@@ -194,21 +211,6 @@ namespace {
     } ; /* end struct (uctim) */
 }
 
-enum dispcmds {
-	dispcmd_exit,
-	dispcmd_timeout,
-	dispcmd_handle,
-	dispcmd_overlast
-} ;
-
-enum cmdsubs {
-	cmdsub_create,
-	cmdsub_destroy,
-	cmdsub_set,
-	cmdsub_get,
-	cmdsub_overlast
-} ;
-
 
 /* forward references */
 
@@ -234,7 +236,8 @@ consteval int uctim_voents() noex {
 	vo |= VECHAND_OSORTED ;
 	vo |= VECHAND_OORDERED ;
 	return vo ;
-} ;
+}
+/* end subroutine (uctim_voents) */
 
 
 /* local variables */
@@ -274,10 +277,15 @@ int uc_timget(int id,ITIMERVAL *otvp) noex {
 
 /* local subroutines */
 
-int uctim::cmdsub(cmdsubs cmd,uctimarg *uap) noex {
+int uctimarg::operator () (cmdsubs cmd,int id) noex {
+	return uctim_data.cmdsub(cmd,id,this) ;
+}
+/* end subroutine (uctimarg::operator) */
+
+int uctim::cmdsub(cmdsubs cmd,int id,uctimarg *uap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		id = 0 ;
+	int		rv = 0 ;
 	if (uap) {
 	    rs = SR_INVALID ;
 	    if (cmd >= 0) {
@@ -286,25 +294,22 @@ int uctim::cmdsub(cmdsubs cmd,uctimarg *uap) noex {
 	                if ((rs = workready()) >= 0) {
 	                    switch (cmd) {
 	                    case cmdsub_create:
-	                        rs = cmdcreate(uap) ;
-	                        id = rs ;
+	                        rs = cmdcreate(id,uap) ;
 	                        break ;
 	                    case cmdsub_destroy:
-	                        rs = cmddestroy(uap) ;
-				id = rs ;
+	                        rs = cmddestroy(id,uap) ;
 	                        break ;
 	                    case cmdsub_set:
-	                        rs = cmdset(uap) ;
-				id = rs ;
+	                        rs = cmdset(id,uap) ;
 	                        break ;
 	                    case cmdsub_get:
-	                        rs = cmdget(uap) ;
-				id = rs ;
+	                        rs = cmdget(id,uap) ;
 	                        break ;
 	                    default:
 	                        rs = SR_INVALID ;
 	                        break ;
 	                    } /* end switch */
+			    rv = rs ;
 	                } /* end if (uctim_workready) */
 	                rs1 = capend() ;
 	                if (rs >= 0) rs = rs1 ;
@@ -312,7 +317,7 @@ int uctim::cmdsub(cmdsubs cmd,uctimarg *uap) noex {
 	        } /* end if (uctim_init) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? id : rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (uctim::cmdtimeout) */
 

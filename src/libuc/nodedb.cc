@@ -26,7 +26,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2004,2013 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -176,6 +176,7 @@ namespace {
     struct vars {
 	int		maxhostlen ;
 	int		lineslen ;
+	int		entbuflen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
 }
@@ -290,11 +291,12 @@ int nodedb_open(nodedb *op,cchar *fname) noex {
 	            cint	vsz = szof(nodedb_f) ;
 		    cint	vn = NODEDB_NFILES ;
 	            cint	vo = VECOBJ_OREUSE ;
-	            if ((rs = vecobj_start(flp,vsz,vn,vo)) >= 0) {
+	            if ((rs = flp->start(vsz,vn,vo)) >= 0) {
 	                cnullptr	np{} ;
 		        hdb		*elp = op->entsp ;
 			cint		hn = NODEDB_DEFENTS ;
 	                if ((rs = hdb_start(elp,hn,0,np,np)) >= 0) {
+		    	    op->entbuflen = var.entbuflen ;
 	                    op->checktime = getustime ;
 	                    op->magic = NODEDB_MAGIC ;
 	                    if (fname && fname[0]) {
@@ -434,7 +436,7 @@ int nodedb_fetch(ND *op,cc *svcbuf,ND_C *curp,
 	int		rs ;
 	int		svclen = 0 ;
 	if ((rs = nodedb_magic(op,curp)) >= 0) {
-	    hdb_dat	key{} ;
+	    hdb_dat	key ;
 	    hdb_dat	val{} ;
 	    hdb_cur	*ecp = curp->ecp ;
 	    key.buf = svcbuf ;
@@ -1092,10 +1094,13 @@ static int mkterms() noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
 	    maxhostlen = rs ;
 	    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
 		lineslen = ((rs + 1) * LINEBUFMULT) ;
+	        if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+		    entbuflen = (rs * NODEDB_ENTLENMULT) ;
+		}
 	    }
 	}
 	return rs ;
