@@ -188,10 +188,11 @@ static int uiconv_libopen(uiconv *op ,cchar *tsp,cchar *fsp) noex {
 	    bool	f_exit = false ;
 	    repeat {
 	        rs = SR_OK ;
-	        if (iconv_t cd ; (cd = iconv_open(tsp,fsp)) == iconvbad) {
-		    rs = (- errno) ;
+	        if (iconv_t cd ; (cd = iconv_open(tsp,fsp)) != iconvbad) {
+	            iconv_t *uip = (iconv_t *) op->cdp ;
+	            memcpy(uip,&cd) ;
 		} else {
-	            memcpy(op->cdp,&cd) ;
+		    rs = (- errno) ;
 		}
 	        if (rs < 0) {
 	            switch (rs) {

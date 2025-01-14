@@ -30,7 +30,7 @@
 
 EXTERNC_begin
 
-extern int mkdirs(cchar *,mode_t) noex ;
+extern int	mkdirs(cchar *,mode_t) noex ;
 
 EXTERNC_end
 
