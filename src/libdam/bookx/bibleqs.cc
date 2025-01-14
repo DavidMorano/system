@@ -2016,18 +2016,17 @@ static int subinfo_finish(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
-
 static int ktag_start(KTAG *kop,KTAG_PARAMS *kap,size_t soff,cchar *lp,int ll)
 {
 	int		rs ;
 	int		size ;
 	int		vopts ;
 
-	memset(kop,0,sizeof(KTAG)) ;
+	memclear(kop) ;
 	kop->kap = kap ;
 	kop->recoff = soff ;
 
-	size = sizeof(KTAG_KEY) ;
+	size = szof(KTAG_KEY) ;
 	vopts = VECOBJ_OCOMPACT ;
 	if ((rs = vecobj_start(&kop->keys,size,0,vopts)) >= 0) {
 	    rs = ktag_procline(kop,lp,ll) ;
@@ -2066,7 +2065,7 @@ TXTINDEXMK_TAG	*tagp ;
 	int		i ;
 
 	kop->reclen = (endoff - kop->recoff) ;
-	memset(tagp,0,sizeof(TXTINDEXMK_TAG)) ;
+	memclear(tagp) ;
 	tagp->fname = kop->fname ;	/* it is NULL! (deletion candidate) */
 	tagp->recoff = kop->recoff ;
 	tagp->reclen = kop->reclen ;
@@ -2083,7 +2082,7 @@ TXTINDEXMK_TAG	*tagp ;
 	}
 #endif /* CF_DEBUGS */
 
-	size = tagp->nkeys * sizeof(TXTINDEXMK_KEY) ;
+	size = tagp->nkeys * szof(TXTINDEXMK_KEY) ;
 	if ((rs = uc_malloc(size,&kea)) >= 0) {
 
 	    kop->tkeys = kea ;		/* kea: save for us (free later) */

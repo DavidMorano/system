@@ -136,7 +136,7 @@ int msfile_best(MSFILE *msp,time_t daytime,int flags,MSFILE_ENT *ep) noex {
 
 	        if (avail > bestavail) {
 	            bestavail = avail ;
-	            memcpy(ep,&be,sizeof(MSFILE_ENT)) ;
+	            memcpy(ep,&be) ;
 	        } /* end if (better) */
 
 		} /* end if (found one at all) */

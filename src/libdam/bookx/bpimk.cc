@@ -92,7 +92,7 @@
 
 #define	BPIMK_NENTRIES	(19 * 1024)
 #define	BPIMK_NSKIP	5
-#define	HDRBUFLEN	(sizeof(BPIHDR) + 128)
+#define	HDRBUFLEN	(szof(BPIHDR) + 128)
 
 #define	FSUF_IDX	"bpi"
 
@@ -142,9 +142,10 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 /* exported variables */
 
-BPIMK_OBJ	bpimk = {
+const bpimk_obj		bpimk_modinfo = {
 	"bpimk",
-	sizeof(BPIMK)
+	szof(BPIMK),
+	0
 } ;
 
 
@@ -187,7 +188,7 @@ static int	vvecmp(const void *,const void *) ;
 
 int bpimk_open(BPIMK *op,cchar dbname[],int of,mode_t om)
 {
-	const int	n = BPIMK_NENTRIES ;
+	cint	n = BPIMK_NENTRIES ;
 	int		rs ;
 	const char	*cp ;
 
@@ -196,7 +197,7 @@ int bpimk_open(BPIMK *op,cchar dbname[],int of,mode_t om)
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(BPIMK)) ;
+	memclear(op) ;
 	op->om = (om|0600) ;
 	op->nfd = -1 ;
 
@@ -395,13 +396,13 @@ static int bpimk_filesbegin(BPIMK *op)
 
 static int bpimk_filesbeginc(BPIMK *op)
 {
-	const int	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
 	int		rs ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_IDX	 ;
 	char		tbuf[MAXPATHLEN+1] ;
 	if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
-	    const mode_t	om = op->om ;
+	    cmost	om = op->om ;
 	    cchar		*tfn = tbuf ;
 	    char		rbuf[MAXPATHLEN+1] ;
 	    if (type) {
@@ -432,10 +433,10 @@ static int bpimk_filesbeginwait(BPIMK *op)
 	cchar		*suf = FSUF_IDX	 ;
 	char		tbuf[MAXPATHLEN+1] ;
 	if ((rs = mknewfname(tbuf,FALSE,dbn,suf)) >= 0) {
-	    const mode_t	om = op->om ;
-	    const int		to_stale = BPIMK_INTSTALE ;
-	    const int		nrs = SR_EXISTS ;
-	    const int		of = (O_CREAT|O_WRONLY|O_EXCL) ;
+	    cmost	om = op->om ;
+	    cint		to_stale = BPIMK_INTSTALE ;
+	    cint		nrs = SR_EXISTS ;
+	    cint		of = (O_CREAT|O_WRONLY|O_EXCL) ;
 	    int			to = BPIMK_INTOPEN ;
 	    while ((rs = bpimk_filesbegincreate(op,tbuf,of,om)) == nrs) {
 	        c = 1 ;
@@ -466,7 +467,7 @@ static int bpimk_filesbegincreate(BPIMK *op,cchar *tfn,int of,mode_t om)
 	}
 #endif
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
-	    const int	fd = rs ;
+	    cint	fd = rs ;
 	    cchar	*cp ;
 	    op->f.created = TRUE ;
 	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
@@ -523,7 +524,7 @@ static int bpimk_listbegin(BPIMK *op,int n)
 	opts |= VECOBJ_OCOMPACT ;
 	opts |= VECOBJ_OORDERED ;
 	opts |= VECOBJ_OSTATIONARY ;
-	size = sizeof(struct bventry) ;
+	size = szof(struct bventry) ;
 	rs = vecobj_start(&op->verses,size,n,opts) ;
 
 	return rs ;
@@ -551,9 +552,7 @@ static int bpimk_mkidx(BPIMK *op)
 	int		wlen = 0 ;
 
 	if ((rs = bpimk_nidxopen(op)) >= 0) {
-	    BPIHDR	hdr ;
-
-	    memset(&hdr,0,sizeof(BPIHDR)) ;
+	    BPIHDR	hdr{} ;
 	    hdr.vetu[0] = BPIHDR_VERSION ;
 	    hdr.vetu[1] = ENDIAN ;
 	    hdr.vetu[2] = 0 ;
@@ -565,15 +564,15 @@ static int bpimk_mkidx(BPIMK *op)
 	    hdr.maxchapter = op->maxchapter ;
 
 	    if ((rs = bpimk_mkidxwrmain(op,&hdr)) >= 0) {
-	        const int	hlen = HDRBUFLEN ;
+	        cint	hlen = HDRBUFLEN ;
 	        char		hbuf[HDRBUFLEN+1] ;
 	        hdr.fsize = rs ;
 	        wlen = rs ;
 
 	        if ((rs = bpihdr(&hdr,0,hbuf,hlen)) >= 0) {
-	            const int	bl = rs ;
+	            cint	bl = rs ;
 	            if ((rs = u_pwrite(op->nfd,hbuf,bl,0L)) >= 0) {
-	                const mode_t	om = op->om ;
+	                cmost	om = op->om ;
 	                rs = uc_fminmod(op->nfd,om) ;
 	            }
 	        }
@@ -596,8 +595,8 @@ static int bpimk_mkidx(BPIMK *op)
 static int bpimk_mkidxwrmain(BPIMK *op,BPIHDR *hdrp)
 {
 	FILER		hf, *hfp = &hf ;
-	const int	nfd = op->nfd ;
-	const int	ps = getpagesize() ;
+	cint	nfd = op->nfd ;
+	cint	ps = getpagesize() ;
 	int		bsize ;
 	int		rs ;
 	int		rs1 ;
@@ -622,13 +621,13 @@ static int bpimk_mkidxwrmain(BPIMK *op,BPIHDR *hdrp)
 /* ARGSUSED */
 static int bpimk_mkidxwrhdr(BPIMK *op,BPIHDR *hdrp,FILER *hfp,int off)
 {
-	const int	hlen = HDRBUFLEN ;
+	cint	hlen = HDRBUFLEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	char		hbuf[HDRBUFLEN+1] ;
 	if (op == NULL) return SR_FAULT ; /* LINT */
 	if ((rs = bpihdr(hdrp,0,hbuf,hlen)) >= 0) {
-	    const int	bl = rs ;
+	    cint	bl = rs ;
 	    rs = filer_writefill(hfp,hbuf,bl) ;
 	    wlen += rs ;
 	}
@@ -641,7 +640,7 @@ static int bpimk_mkidxwrtab(BPIMK *op,BPIHDR *hdrp,FILER *hfp,int off)
 {
 	struct bventry	*bvep ;
 	uint		a[4] ;
-	const int	size = (1 * sizeof(uint)) ;
+	cint	size = (1 * szeof(uint)) ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		n = 0 ;
@@ -664,12 +663,12 @@ static int bpimk_mkidxwrtab(BPIMK *op,BPIHDR *hdrp,FILER *hfp,int off)
 
 static int bpimk_nidxopen(BPIMK *op)
 {
-	const mode_t	om = op->om ;
+	cmost	om = op->om ;
 	int		rs ;
 	int		fd = -1 ;
 	int		of = (O_CREAT|O_WRONLY) ;
 	if (op->nidxfname == NULL) {
-	    const int	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	    cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
 	    cchar	*dbn = op->dbname ;
 	    cchar	*suf = FSUF_IDX ;
 	    char	tbuf[MAXPATHLEN+1] ;

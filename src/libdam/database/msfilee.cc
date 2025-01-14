@@ -109,7 +109,7 @@ int msfilee_all(MSFILEE_ALL *ep,int f_read,char *buf,int buflen) noex {
 	    if (ep->atime != 0) {
 	        serialbuf_wui(&msgbuf,ep->atime) ;
 	    } else {
-	        serialbuf_adv(&msgbuf,sizeof(uint)) ;
+	        serialbuf_adv(&msgbuf,szof(uint)) ;
 	    }
 
 	    serialbuf_wui(&msgbuf,ep->utime) ;
@@ -163,12 +163,12 @@ int msfilee_la(MSFILEE_LA *ep,int f_read,char *buf,int) noex {
 	if (f_read) {
 	    for (i = 0 ; i < 3 ; i += 1) {
 		stdorder_rui(bp,&ep->la[i]) ;
-		bp += sizeof(uint) ;
+		bp += szof(uint) ;
 	    }
 	} else {
 	    for (i = 0 ; i < 3 ; i += 1) {
 		stdorder_wui(bp,ep->la[i]) ;
-		bp += sizeof(uint) ;
+		bp += szof(uint) ;
 	    }
 	} /* end if */
 

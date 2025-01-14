@@ -90,7 +90,7 @@ namespace configvars_obj {
 	    rs = SR_NOMEM ;
 	    if ((cfp->filename = mallocstr(filename)) != nullptr) {
 	        vecobj		*vip{} ;
-		cint		vsz = sizeof(CV_VAR) ;
+		cint		vsz = szof(CV_VAR) ;
 		cint		vn = 0 ;
 		cint		vo = 0 ;
 	        vip = &cfp->defines ;

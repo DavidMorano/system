@@ -638,7 +638,7 @@ static int sysvar_procsysdef(SV *op,cchar *fname) noex {
 static int sysvar_defcurbegin(SV *op,SV_CUR *curp) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op && curp) {
-	    cint	sz = sizeof(SV_DC) ;
+	    cint	sz = szof(SV_DC) ;
 	    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
 	        SV_DC	*dcp = (SV_DC *) vp ;
 	        curp->scp = vp ;

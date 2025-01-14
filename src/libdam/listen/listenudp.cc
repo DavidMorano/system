@@ -66,7 +66,7 @@
 /* local defines */
 
 #ifndef	INET4ADDRLEN
-#define	INET4ADDRLEN	sizeof(in_addr_t)
+#define	INET4ADDRLEN	szof(in_addr_t)
 #endif
 
 #ifndef	INET6ADDRLEN
@@ -234,7 +234,7 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 /* opts */
 
 	if ((rs >= 0) && (opts & INETOPT_REUSEADDR)) {
-	    cint	osz = sizeof(int) ;
+	    cint	osz = szof(int) ;
 	    int		one = 1 ;
 	    rs = u_setsockopt(s,SOL_SOCKET,SO_REUSEADDR,&one,osz) ;
 	}

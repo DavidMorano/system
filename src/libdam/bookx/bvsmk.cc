@@ -27,8 +27,8 @@
 	Synopsis:
 	int bvsmk_open(op,pr,dbname,...)
 	BVSMK		*op ;
-	const char	pr[] ;
-	const char	dbname[] ;
+	cchar	pr[] ;
+	cchar	dbname[] ;
 
 	Arguments:
 	- op		object pointer
@@ -95,7 +95,7 @@
 #define	BVSMK_IDNAME	"var/bvses"
 #define	BVSMK_IDMODE	0777
 
-#define	HDRBUFLEN	(sizeof(BVSHDR) + 128)
+#define	HDRBUFLEN	(szof(BVSHDR) + 128)
 
 #define	FSUF_IDX	"bvs"
 
@@ -104,15 +104,15 @@
 
 /* external subroutines */
 
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfhexi(const char *,int,uint *) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfhexi(cchar *,int,uint *) ;
 extern int	getpwd(char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
+extern int	mkdirs(cchar *,mode_t) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	filer_writefill(FILER *,const char *,int) ;
+extern int	filer_writefill(FILER *,cchar *,int) ;
 extern int	filer_writealign(FILER *,int,uint) ;
 extern int	isNotPresent(int) ;
 
@@ -121,10 +121,10 @@ extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -132,9 +132,10 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 /* exported variables */
 
-BVSMK_OBJ	bvsmk = {
+const bvsmk_obj		bvsmk_modinfo = {
 	"bvsmk",
-	sizeof(BVSMK)
+	szof(BVSMK),
+	0
 } ;
 
 
@@ -172,7 +173,7 @@ static int	unlinkstale(cchar *,int) ;
 
 int bvsmk_open(BVSMK *op,cchar *pr,cchar db[],int of,mode_t om)
 {
-	const int	n = BVSMK_NENTRIES ;
+	cint	n = BVSMK_NENTRIES ;
 	int		rs ;
 	int		size = 0 ;
 	int		c = 0 ;
@@ -190,7 +191,7 @@ int bvsmk_open(BVSMK *op,cchar *pr,cchar db[],int of,mode_t om)
 	debugprintf("bvsmk_open: dbname=%s\n",dbname) ;
 #endif /* CF_DEBUGS */
 
-	memset(op,0,sizeof(BVSMK)) ;
+	memclear(op) ;
 	op->om = om ;
 	op->nfd = -1 ;
 
@@ -313,11 +314,9 @@ int bvsmk_add(BVSMK *op,int book,uchar *ap,int al)
 
 	if ((book >= 0) && (al >= 0)) {
 	    if (al > 0) {
-		BVSBOOK		be ;
-		const int	size = (al * sizeof(uchar)) ;
-		uchar		*bp ;
-		memset(&be,0,sizeof(BVSBOOK)) ;
-	        if ((rs = uc_malloc(size,&bp)) >= 0) {
+		BVSBOOK		be{} ;
+		cint	size = (al * szof(uchar)) ;
+		if (uchar *bp ; (rs = uc_malloc(size,&bp)) >= 0) {
 	            uint	nzverses ;
 	            uint	nverses = 0 ;
 	            int		i = 0 ;
@@ -368,15 +367,15 @@ static int bvsmk_filesbegin(BVSMK *op)
 	int		dnl ;
 	int		c = 0 ;
 	cchar		*idname = BVSMK_IDNAME ;
-	const char	*dnp ;
+	cchar	*dnp ;
 	char		tbuf[MAXPATHLEN + 1] ;
 
 	dnp = tbuf ;
 	if ((rs = mkpath2(tbuf,op->pr,idname)) >= 0) {
-	    const mode_t	dm = 0777 ;
+	    cmode	dm = 0777 ;
 	    dnl = rs ;
 	    if ((rs = mkdname(tbuf,dm)) >= 0) {
-	        const char	*cp ;
+	        cchar	*cp ;
 	        if ((rs = uc_mallocstrw(dnp,dnl,&cp)) >= 0) {
 	            op->idname = cp ;
 	            if (op->f.ofcreat) {
@@ -403,14 +402,14 @@ static int bvsmk_filesbegin(BVSMK *op)
 
 static int bvsmk_filesbeginc(BVSMK *op)
 {
-	const int	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
 	int		rs ;
 	cchar		*id = op->idname ;
 	cchar		*db = op->db;
 	cchar		*suf = FSUF_IDX	 ;
 	char		tbuf[MAXPATHLEN+1] ;
 	if ((rs = mknifname(tbuf,type,id,db,suf)) >= 0) {
-	    const mode_t	om = op->om ;
+	    cmode	om = op->om ;
 	    cchar		*tfn = tbuf ;
 	    char		rbuf[MAXPATHLEN+1] ;
 	    if (type) {
@@ -443,10 +442,10 @@ static int bvsmk_filesbeginwait(BVSMK *op)
 	cchar		*suf = FSUF_IDX	 ;
 	char		tbuf[MAXPATHLEN+1] ;
 	if ((rs = mknifname(tbuf,FALSE,id,db,suf)) >= 0) {
-	    const mode_t	om = op->om ;
-	    const int		to_stale = BVSMK_INTSTALE ;
-	    const int		nrs = SR_EXISTS ;
-	    const int		of = (O_CREAT|O_WRONLY|O_EXCL) ;
+	    cmode	om = op->om ;
+	    cint		to_stale = BVSMK_INTSTALE ;
+	    cint		nrs = SR_EXISTS ;
+	    cint		of = (O_CREAT|O_WRONLY|O_EXCL) ;
 	    int			to = BVSMK_INTOPEN ;
 	    while ((rs = bvsmk_filesbegincreate(op,tbuf,of,om)) == nrs) {
 #if	CF_DEBUGS
@@ -483,7 +482,7 @@ static int bvsmk_filesbegincreate(BVSMK *op,cchar *tfn,int of,mode_t om)
 	}
 #endif
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
-	    const int	fd = rs ;
+	    cint	fd = rs ;
 	    cchar	*cp ;
 	    op->f.created = TRUE ;
 	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
@@ -540,7 +539,7 @@ static int bvsmk_listbegin(BVSMK *op,int n)
 	opts |= VECOBJ_OCOMPACT ;
 	opts |= VECOBJ_OORDERED ;
 	opts |= VECOBJ_OSTATIONARY ;
-	size = sizeof(BVSBOOK) ;
+	size = szof(BVSBOOK) ;
 	rs = vecobj_start(&op->books,size,n,opts) ;
 
 	return rs ;
@@ -591,9 +590,7 @@ static int bvsmk_mkidx(BVSMK *op)
 #endif
 
 	if ((rs = bvsmk_nidxopen(op)) >= 0) {
-	    BVSHDR	hdr ;
-
-	    memset(&hdr,0,sizeof(BVSHDR)) ;
+	    BVSHDR	hdr{} ;
 	hdr.vetu[0] = BVSHDR_VERSION ;
 	hdr.vetu[1] = ENDIAN ;
 	hdr.vetu[2] = 0 ;
@@ -603,15 +600,15 @@ static int bvsmk_mkidx(BVSMK *op)
 	hdr.nzverses = op->nverses ;
 
 	    if ((rs = bvsmk_mkidxwrmain(op,&hdr)) >= 0) {
-	        const int	hlen = HDRBUFLEN ;
+	        cint	hlen = HDRBUFLEN ;
 	        char		hbuf[HDRBUFLEN+1] ;
 	        hdr.fsize = rs ;
 	        wlen = rs ;
 
 	        if ((rs = bvshdr(&hdr,0,hbuf,hlen)) >= 0) {
-	            const int	bl = rs ;
+	            cint	bl = rs ;
 	            if ((rs = u_pwrite(op->nfd,hbuf,bl,0L)) >= 0) {
-	                const mode_t	om = op->om ;
+	                cmode	om = op->om ;
 	                rs = uc_fminmod(op->nfd,om) ;
 	            }
 	        }
@@ -634,8 +631,8 @@ static int bvsmk_mkidx(BVSMK *op)
 static int bvsmk_mkidxwrmain(BVSMK *op,BVSHDR *hdrp)
 {
 	FILER		hf, *hfp = &hf ;
-	const int	nfd = op->nfd ;
-	const int	ps = getpagesize() ;
+	cint	nfd = op->nfd ;
+	cint	ps = getpagesize() ;
 	int		bsize ;
 	int		rs ;
 	int		rs1 ;
@@ -665,7 +662,7 @@ static int bvsmk_mkidxwrmain(BVSMK *op,BVSHDR *hdrp)
 /* ARGSUSED */
 static int bvsmk_mkidxwrhdr(BVSMK *op,BVSHDR *hdrp,FILER *hfp)
 {
-	const int	hlen = HDRBUFLEN ;
+	cint	hlen = HDRBUFLEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	char		hbuf[HDRBUFLEN+1] ;
@@ -710,12 +707,12 @@ static int bvsmk_mkidxchaptab(BVSMK *op,BVSHDR *hdrp,FILER *hfp,int foff)
 
 static int bvsmk_mkidxbooktab(BVSMK *op,BVSHDR *hdrp,FILER *hfp,int foff)
 {
-	const int	n = (op->maxbook + 1) ;
+	cint	n = (op->maxbook + 1) ;
 	int		rs ;
 	int		wlen = 0 ;
 
-	if ((rs = filer_writealign(hfp,sizeof(int),foff)) >= 0) {
-	    const int	size = (n * 4) * sizeof(ushort) ;
+	if ((rs = filer_writealign(hfp,szof(int),foff)) >= 0) {
+	    cint	size = (n * 4) * szof(ushort) ;
 	    ushort	(*array)[4] = NULL ;
 	    wlen += rs ;
 	    foff += rs ;
@@ -746,10 +743,8 @@ static int bvsmk_mkidxbooktab(BVSMK *op,BVSHDR *hdrp,FILER *hfp,int foff)
 }
 /* end subroutine (bvsmk_mkidxbooktab) */
 
-
-static int bvsmk_nidxopen(BVSMK *op)
-{
-	const mode_t	om = op->om ;
+static int bvsmk_nidxopen(BVSMK *op) noex {
+	cmode	om = op->om ;
 	int		rs ;
 	int		fd = -1 ;
 	int		of = (O_CREAT|O_WRONLY) ;
@@ -757,7 +752,7 @@ static int bvsmk_nidxopen(BVSMK *op)
 	debugprintf("bvsmk_nidxopen: ent nidxfname=%s\n",op->nidxfname) ;
 #endif
 	if (op->nidxfname == NULL) {
-	    const int	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	    cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
 	    cchar	*id = op->idname ;
 	    cchar	*db = op->db ;
 	    cchar	*suf = FSUF_IDX ;
@@ -818,7 +813,7 @@ static int bvsmk_nidxclose(BVSMK *op)
 
 static int bvsmk_renamefiles(BVSMK *op)
 {
-	const int	clen = MAXNAMELEN ;
+	cint	clen = MAXNAMELEN ;
 	int		rs ;
 	cchar		*suf = FSUF_IDX ;
 	cchar		*end = ENDIANSTR ;
@@ -851,11 +846,9 @@ static int bvsmk_renamefiles(BVSMK *op)
 }
 /* end subroutine (bvsmk_renamefiles) */
 
-
-static int mkdname(cchar *dname,mode_t dm)
-{
-	    struct ustat	sb ;
-	    const int		nrs = SR_NOENT ;
+static int mkdname(cchar *dname,mode_t dm) noex {
+	    USTAT	sb ;
+	    cint	nrs = SR_NOENT ;
 	int		rs ;
 	    if ((rs = u_stat(dname,&sb)) == nrs) {
 		dm |= (BVSMK_IDMODE | 0555) ;

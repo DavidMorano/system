@@ -92,7 +92,7 @@ int getheaddr(ucentho *hep,char *hbuf,int hlen,cchar *ap) noex {
 	    rs = SR_INVALID ;
 	    if (ap[0]) {
 	        cint	af = AF_INET ;
-	        cint	al = sizeof(INADDR) ;
+	        cint	al = szof(INADDR) ;
 	        rs = getho_addr(hep,hbuf,hlen,af,ap,al) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */

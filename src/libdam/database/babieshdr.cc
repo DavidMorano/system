@@ -71,7 +71,7 @@
 
 /* local variables */
 
-constexpr int		headsize = babieshdrh_overlast * sizeof(uint) ;
+constexpr int		headsize = babieshdrh_overlast * szof(uint) ;
 constexpr int		magicsize = BABIESHDR_MAGICSIZE ;
 constexpr char		magicstr[] = BABIESHDR_MAGICSTR ;
 

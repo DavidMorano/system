@@ -59,7 +59,7 @@
 /* local defines */
 
 #define	BVI_FMI		struct bvi_fmi
-#define	BVI_KA		sizeof(BVI_LINE)
+#define	BVI_KA		szof(BVI_LINE)
 #define	BVI_BO(v)	((BVI_KA - ((v) % BVI_KA)) % BVI_KA)
 
 #define	SHIFTINT	(6 * 60)	/* possible time-shift */
@@ -525,15 +525,15 @@ static int bvi_verify(BVI *op,time_t dt) noex {
 
 /* alignment restriction */
 
-	f = f && ((hip->vioff & (sizeof(int)-1)) == 0) ;
+	f = f && ((hip->vioff & (szof(int)-1)) == 0) ;
 	f = f && (hip->vioff <= mip->mapsize) ;
-	size = hip->vilen * 4 * sizeof(uint) ;
+	size = hip->vilen * 4 * szof(uint) ;
 	f = f && ((hip->vioff + size) <= mip->mapsize) ;
 	/* alignment restriction */
-	f = f && ((hip->vloff & (sizeof(int)-1)) == 0) ;
+	f = f && ((hip->vloff & (szof(int)-1)) == 0) ;
 	/* size restrictions */
 	f = f && (hip->vloff <= mip->mapsize) ;
-	size = (hip->vllen * 2 * sizeof(uint)) ;
+	size = (hip->vllen * 2 * szof(uint)) ;
 	f = f && ((hip->vloff + size) <= mip->mapsize) ;
 	/* size restrictions */
 	f = f && (hip->vilen == hip->nverses) ;
@@ -609,7 +609,7 @@ static int bvi_search(BVI *op,BVI_QUERY *qp) noex {
 #if	CF_SEARCH
 	{
 	    uint	*vtep ;
-	    int		vtesize = (4 * sizeof(uint)) ;
+	    int		vtesize = (4 * szof(uint)) ;
 
 	    vtep = (uint *) bsearch(vte,vt,vtlen,vtesize,vtecmp) ;
 
@@ -673,7 +673,7 @@ static int bvi_loadbve(BVI *op,bvi_v *bvep,char *ebuf,int elen,int vi) noex {
 	if (li < hip->vllen) {
 
 	    bo = BVI_BO(uebuf) ;
-	    linesize = ((nlines + 1) * sizeof(BVI_LINE)) ;
+	    linesize = ((nlines + 1) * szof(BVI_LINE)) ;
 	    if (linesize <= (elen - (bo-uebuf))) {
 
 	        lt = (uint (*)[2]) (mip->mapdata + hip->vloff) ;

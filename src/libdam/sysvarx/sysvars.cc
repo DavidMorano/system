@@ -347,10 +347,10 @@ static strlibval		tmpdname(strlibval_tmpdir) ;
 
 /* exported variables */
 
-SYSVARS_OBJ	sysvars_modinfo = {
+const sysvars_obj		sysvars_modinfo = {
 	"sysvars",
-	sizeof(sysvars),
-	sizeof(sysvars_cur)
+	szof(sysvars),
+	szof(sysvars_cur)
 } ;
 
 
@@ -418,7 +418,7 @@ int sysvars_audit(SVS *op) noex {
 int sysvars_curbegin(SVS *op,SVS_C *curp) noex {
 	int		rs ;
 	if ((rs = sysvars_magic(op,curp)) >= 0) {
-	    cint	osz = sizeof(var) ;
+	    cint	osz = szof(var) ;
 	    memclear(curp) ;
 	    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
 		var_cur		*vcp = (var_cur *) vp ;

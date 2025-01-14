@@ -36,13 +36,13 @@
 	Synopsis:
 
 	int opendialer_uss(pr,prn,svc,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
-	const char	*svc ;
+	cchar	*pr ;
+	cchar	*prn ;
+	cchar	*svc ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -90,47 +90,47 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	getaf(const char *,int) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	getaf(cchar *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-extern int	dialtcpnls(const char *,const char *,int,int) ;
-extern int	dialtcpmux(const char *,const char *,const char **,int,int) ;
-extern int	dialuss(const char *,int,int) ;
-extern int	dialussnls(const char *,const char *,int,int) ;
-extern int	dialussmux(const char *,const char *,const char **,int,int) ;
-extern int	uc_openprog(const char *,int,const char **,const char **) ;
+extern int	dialtcp(cchar *,cchar *,int,int,int) ;
+extern int	dialtcpnls(cchar *,cchar *,int,int) ;
+extern int	dialtcpmux(cchar *,cchar *,cchar **,int,int) ;
+extern int	dialuss(cchar *,int,int) ;
+extern int	dialussnls(cchar *,cchar *,int,int) ;
+extern int	dialussmux(cchar *,cchar *,cchar **,int,int) ;
+extern int	uc_openprog(cchar *,int,cchar **,cchar **) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 #if	CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* local structures */
 
 struct argparse {
-	const char	*filepath ;
-	const char	*svc ;
-	const char	*a ;		/* memory allocation */
+	cchar	*filepath ;
+	cchar	*svc ;
+	cchar	*a ;		/* memory allocation */
 	int		to ;
 } ;
 
 
 /* local variables */
 
-static const char	*ops[] = {
+static cchar	*ops[] = {
 	"to",
 	NULL
 } ;
@@ -143,7 +143,7 @@ enum ops {
 
 /* forward references */
 
-static int argparse_start(struct argparse *,const char *) ;
+static int argparse_start(struct argparse *,cchar *) ;
 static int argparse_finish(struct argparse *) ;
 
 
@@ -151,13 +151,13 @@ static int argparse_finish(struct argparse *) ;
 
 
 int opendialer_uss(pr,prn,fname,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
-const char	*fname ;
+cchar	*pr ;
+cchar	*prn ;
+cchar	*fname ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	int		rs = SR_OK ;
@@ -165,7 +165,7 @@ int		to ;
 	int		argc = 0 ;
 	int		opts = 0 ;
 	int		fd = -1 ;
-	const char	*argz = NULL ;
+	cchar	*argz = NULL ;
 
 #if	CF_DEBUGS
 	{
@@ -220,13 +220,13 @@ int		to ;
 
 
 int opendialer_ussnls(pr,prn,fname,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
-const char	*fname ;
+cchar	*pr ;
+cchar	*prn ;
+cchar	*fname ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	int		rs = SR_OK ;
@@ -234,7 +234,7 @@ int		to ;
 	int		argc = 0 ;
 	int		opts = 0 ;
 	int		fd = -1 ;
-	const char	*argz = NULL ;
+	cchar	*argz = NULL ;
 
 #if	CF_DEBUGS
 	{
@@ -289,13 +289,13 @@ int		to ;
 
 
 int opendialer_ussmux(pr,prn,fname,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
-const char	*fname ;
+cchar	*pr ;
+cchar	*prn ;
+cchar	*fname ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	int		rs = SR_OK ;
@@ -303,7 +303,7 @@ int		to ;
 	int		argc = 0 ;
 	int		opts = 0 ;
 	int		fd = -1 ;
-	const char	*argz = NULL ;
+	cchar	*argz = NULL ;
 
 #if	CF_DEBUGS
 	{
@@ -339,7 +339,7 @@ int		to ;
 	    if ((rs = argparse_start(&ai,argz)) >= 0) {
 	        if ((to < 0) && (ai.to >= 0)) to = ai.to ;
 	        if (rs >= 0) {
-		    const char	**av = argv ;
+		    cchar	**av = argv ;
 		    if (argc > 1) av = (argv+1) ;
 		    rs = dialussmux(fname,ai.svc,av,to,opts) ;
 		    fd = rs ;
@@ -366,22 +366,22 @@ int		to ;
 	ticotsord¥<af>:<host>:<port>[,to=<to>][,af=<af>][­<arg(s)>]
 */
 
-static int argparse_start(struct argparse *app,const char *argz)
+static int argparse_start(struct argparse *app,cchar *argz)
 {
 	int		rs = SR_OK ;
-	const char	*tp ;
+	cchar	*tp ;
 
-	memset(app,0,sizeof(struct argparse)) ;
+	memclear(app) ;
 	app->to = -1 ;
 
 	if (argz[0] == '\0') goto ret0 ;
 
 	app->svc = argz ;
 	if ((tp = strpbrk(argz,",")) != NULL) {
-	    const char	*sp = argz ;
-	    const char	*nsp ;
-	    const char	*svcp = argz ;
-	    const char	*optp, *kp, *vp ;
+	    cchar	*sp = argz ;
+	    cchar	*nsp ;
+	    cchar	*svcp = argz ;
+	    cchar	*optp, *kp, *vp ;
 	    int		optl, kl, vl ;
 	    int		svcl = (tp-argz) ;
 	    int		oi ;

@@ -135,8 +135,7 @@ int bibleq_open(BIBLEQ *op,cchar *pr,cchar *dbname)
 	    return SR_INVALID ;
 #endif
 
-	memset(op,0,sizeof(BIBLEQ)) ;
-
+	memclear(op) ;
 	if ((rs = bibleq_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
 		op->magic = BIBLEQ_MAGIC ;
@@ -208,9 +207,7 @@ int bibleq_count(BIBLEQ *op)
 }
 /* end subroutine (bibleq_count) */
 
-
-int bibleq_curbegin(BIBLEQ *op,BIBLEQ_CUR *curp)
-{
+int bibleq_curbegin(BIBLEQ *op,BIBLEQ_CUR *curp) noex {
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -218,8 +215,7 @@ int bibleq_curbegin(BIBLEQ *op,BIBLEQ_CUR *curp)
 
 	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(BIBLEQ_CUR)) ;
-
+	memclear(curp) ;
 	if (op->call.curbegin != NULL) {
 	    void	*p ;
 	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {

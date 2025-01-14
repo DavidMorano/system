@@ -786,8 +786,7 @@ static int msgid_fileinit(msgid *op,time_t dt) noex {
 
 /* file header */
 
-	            memset(&op->h,0,sizeof(MSGID_FH)) ;
-
+	            op->h = {} ;
 	            bl += filehead((fbuf + bl),0,&op->h) ;
 
 /* write them to the file */
@@ -1381,7 +1380,7 @@ static int filemagic(char *buf,int f_read,MSGID_FM *mp) noex {
 /* encode or decode the file header */
 static int filehead(char *mbuf,int f_read,MSGID_FH *hp) noex {
 	serialbuf	msgbuf ;
-	cint		mlen = sizeof(MSGID_FH) ;
+	cint		mlen = szof(MSGID_FH) ;
 	int		rs ;
 	int		rs1 ;
 

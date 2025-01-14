@@ -203,10 +203,10 @@ constexpr bool		f_usefl3 = CF_USEFL3 ;
 /* exported variables */
 
 #ifdef	COMMENT
-IPASSWD_OBJ	ipasswd_modinfo = {
+const ipassswd_obj	ipasswd_modinfo = {
 	"ipasswd",
-	sizeof(ipasswd),
-	sizeof(ipasswd_cur)
+	szof(ipasswd),
+	szof(ipasswd_cur)
 } ;
 #endif /* COMMENT */
 
@@ -926,7 +926,7 @@ static int ipasswd_fileopen(ipasswd *op,time_t dt) noex {
 			csize	fsz = size_t(sb.st_size) ;
 	                int	sz = 0 ;
 	                sz += IPASSWD_IDLEN ;
-	                sz += (pwihdr_overlast * sizeof(int)) ;
+	                sz += (pwihdr_overlast * szof(int)) ;
 	                if (int isz = intsat(fsz) ; isz >= sz) {
 	                    op->mtime = sb.st_mtime ;
 	                    op->filesize = sb.st_size ;

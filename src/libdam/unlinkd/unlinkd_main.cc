@@ -265,7 +265,7 @@ static int subinfo_rmer(SUBINFO *sip) noex {
 	int		rs1 ;
 	int		fd ;
 	int		sv ;
-	int		m0_size = sizeof(struct rmermsg_fname) ;
+	int		m0_size = szof(struct rmermsg_fname) ;
 	int		ipclen ;
 	int		len ;
 	int		cs = 0 ;

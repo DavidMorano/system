@@ -165,8 +165,8 @@
 /* local defines */
 
 #define	MSFILE_IDOFF		0
-#define	MSFILE_HEADTABOFF	(MSFILE_IDOFF + (16 + sizeof(uint)))
-#define	MSFILE_TABOFF		(MSFILE_HEADTABOFF + (3 * sizeof(uint)))
+#define	MSFILE_HEADTABOFF	(MSFILE_IDOFF + (16 + szof(uint)))
+#define	MSFILE_TABOFF		(MSFILE_HEADTABOFF + (3 * szof(uint)))
 
 #define	MSFILE_ENTSIZE		MSFILEE_SIZE
 #define	MSFILE_MAXFILESIZE	(4 * 1024 * 1024)
@@ -1288,16 +1288,16 @@ static int msfile_headtab(MSFILE *op,int f_read) noex {
 	if (f_read) {
 	    struct msfile_h	h ;
 
-	    int	hsize = sizeof(struct msfile_h) ;
+	    int	hsize = szof(struct msfile_h) ;
 
 	    stdorder_rui(bp,&h.nentries) ;
-	    bp += sizeof(uint) ;
+	    bp += szof(uint) ;
 
 	    stdorder_rui(bp,&h.wtime) ;
-	    bp += sizeof(uint) ;
+	    bp += szof(uint) ;
 
 	    stdorder_rui(bp,&h.wcount) ;
-	    bp += sizeof(uint) ;
+	    bp += szof(uint) ;
 
 	    f_changed = (memcmp(&h,&op->h,hsize) != 0) ;
 	    op->h = h ;
@@ -1305,13 +1305,13 @@ static int msfile_headtab(MSFILE *op,int f_read) noex {
 	} else {
 
 	    stdorder_wui(bp,op->h.nentries) ;
-	    bp += sizeof(uint) ;
+	    bp += szof(uint) ;
 
 	    stdorder_wui(bp,op->h.wtime) ;
-	    bp += sizeof(uint) ;
+	    bp += szof(uint) ;
 
 	    stdorder_wui(bp,op->h.wcount) ;
-	    bp += sizeof(uint) ;
+	    bp += szof(uint) ;
 
 	} /* end if */
 

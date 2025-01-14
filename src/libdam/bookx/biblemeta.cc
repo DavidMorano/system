@@ -123,7 +123,8 @@ static int	biblemeta_opener(BM *,cc *,cc *) noex ;
 
 biblemeta_obj	biblemeta_modinfo = {
 	"biblemeta",
-	sizeof(biblemeta)
+	szof(biblemeta),
+	0
 } ;
 
 

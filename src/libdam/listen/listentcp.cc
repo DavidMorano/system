@@ -224,7 +224,7 @@ static int listentcp_try(ADDRINFO *aip,int opts) noex {
 	        s = rs ;
 
 	        if (opts != 0) {
-	            cint	sz = sizeof(int) ;
+	            cint	sz = szof(int) ;
 	            cint	opt = SO_REUSEADDR ;
 	            int		one = 1 ;
 	            rs = u_setsockopt(s,SOL_SOCKET,opt,&one,sz) ;
@@ -234,7 +234,7 @@ static int listentcp_try(ADDRINFO *aip,int opts) noex {
 	        if ((rs >= 0) && (spf == PF_INET6)) {
 	            cint	cmd = IPPROTO_IPV6 ;
 	            cint	opt = IPV6_V6ONLY ;
-	            cint	sz = sizeof(int) ;
+	            cint	sz = szof(int) ;
 	            int		one = 1 ;
 	            rs = u_setsockopt(s,cmd,opt,&one,sz) ;
 	        }

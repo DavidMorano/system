@@ -163,8 +163,8 @@ typedef int (*strtab_t)[3] ;		/* for |strtabfind(3uc)| */
 
 TI_OBJ	txtindexes_modinfo = {
 	"txtindexes",
-	int(sizeof(txtindexes)),
-	int(sizeof(txtindexes_cur))
+	szof(txtindexes),
+	szof(txtindexes_cur)
 } ;
 
 
@@ -746,7 +746,7 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 	    int		n = rs ;
 	    int		sz ;
 
-	    sz = n * sizeof(listdesc) ;
+	    sz = n * szof(listdesc) ;
 	    if ((rs = uc_malloc(sz,&lists)) >= 0) {
 	        uint	hv ;
 	        uint	*table = op->mi.table ;
@@ -826,7 +826,7 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 	        if ((rs >= 0) && (n > 1)) {
 	            int	(*cfn)(cvoid *,cvoid *) ;
 	            cfn = (int (*)(cvoid *,cvoid *)) cmplistdesc ;
-	            qsort(lists,n,sizeof(listdesc),cfn) ;
+	            qsort(lists,n,szof(listdesc),cfn) ;
 	        }
 #endif /* CF_SORTLISTS */
 
@@ -842,7 +842,7 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 
 	                tagcount = ntags ;
 	                taglen = ntags ;
-	                sz = (taglen + 1) * sizeof(uint) ;
+	                sz = (taglen + 1) * szof(uint) ;
 	                if ((rs = uc_malloc(sz,&taglist)) >= 0) {
 	                    memcpy(taglist,uip,sz) ;
 	                }
@@ -971,18 +971,18 @@ static int txtindexes_hdrverify(txtindexes *op,time_t dt) noex {
 	bool		f = true ;
 	hfsize = hip->hfsize ;
 	tfsize = hip->tfsize ;
-	tabsize = (hip->tablen * sizeof(uint)) ;
+	tabsize = (hip->tablen * szof(uint)) ;
 	f = f && (hfsize == fip->mapsize) ;
 	f = f && (tfsize == op->tf.mapsize) ;
 	f = f && (hip->wtime > 0) && (hip->wtime <= (utime + SHIFTINT)) ;
 	f = f && (hip->sdnoff <= fip->mapsize) ;
 	f = f && (hip->sfnoff <= fip->mapsize) ;
 /* alignment restriction */
-	f = f && ((hip->listoff & (sizeof(int)-1)) == 0) ;
+	f = f && ((hip->listoff & (szof(int)-1)) == 0) ;
 /* size restrictions */
 	f = f && (hip->listoff <= fip->mapsize) ;
 /* alignment restriction */
-	f = f && ((hip->taboff & (sizeof(int)-1)) == 0) ;
+	f = f && ((hip->taboff & (szof(int)-1)) == 0) ;
 /* size restrictions */
 	f = f && (hip->taboff <= fip->mapsize) ;
 	f = f && (tabsize <= fip->mapsize) ;
@@ -992,13 +992,13 @@ static int txtindexes_hdrverify(txtindexes *op,time_t dt) noex {
 	    uint	erlen = hip->erlen ;
 	    uint	eilen = hip->eilen ;
 /* alignment restrictions */
-	    f = f && ((hip->esoff & (sizeof(int)-1)) == 0) ;
-	    f = f && ((hip->eroff & (sizeof(int)-1)) == 0) ;
-	    f = f && ((hip->eioff & (sizeof(int)-1)) == 0) ;
+	    f = f && ((hip->esoff & (szof(int)-1)) == 0) ;
+	    f = f && ((hip->eroff & (szof(int)-1)) == 0) ;
+	    f = f && ((hip->eioff & (szof(int)-1)) == 0) ;
 /* size restrictions */
 	    f = f && ((hip->esoff + essize) <= hfsize) ;
-	    f = f && ((hip->eroff + (erlen * sizeof(int))) <= hfsize) ;
-	    f = f && ((hip->eioff + (eilen * 3 * sizeof(int))) <= hfsize) ;
+	    f = f && ((hip->eroff + (erlen * szof(int))) <= hfsize) ;
+	    f = f && ((hip->eioff + (eilen * 3 * szof(int))) <= hfsize) ;
 	} /* end if */
 	if (! f) {
 	    rs = SR_BADFMT ;
@@ -1043,7 +1043,7 @@ static int txtindexes_audithash(txtindexes *op,offindex *oip) noex {
 	            rs = SR_BADFMT ;
 	            break ;
 	        } /* end if (error) */
-	        listsize = (ntags + 1) * sizeof(uint) ;
+	        listsize = (ntags + 1) * szof(uint) ;
 	        if ((listsize + listoff) >= hfsize) {
 	            rs = SR_BADFMT ;
 	            break ;

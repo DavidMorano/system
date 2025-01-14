@@ -83,7 +83,7 @@
 
 int votdchdr(VOTDCHDR *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	cint	headsize = votdchdrh_overlast * sizeof(uint) ;
+	cint	headsize = votdchdrh_overlast * szof(uint) ;
 	cint	magicsize = VOTDCHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;

@@ -191,9 +191,9 @@ int configvars_open(configvars *cvp,cchar *cfn,vecobj *eep) noex {
 	    int		vsz ;
 	    int		vo = 0 ;
 	    vip = cvp->fesp ;
-	    vsz = sizeof(CV_FILE) ;
+	    vsz = szof(CV_FILE) ;
 	    if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
-	  	vsz = sizeof(CV_VAR) ;
+	  	vsz = szof(CV_VAR) ;
 	        vip = cvp->varp ;
 	        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 	      	    vip = cvp->defp ;
@@ -269,7 +269,7 @@ int configvars_addfile(CV *cvp,cchar *cfname,vecobj *eep) noex {
 		rs = SR_INVALID ;
 		if (cfname[0]) {
 	            if ((rs = vecobj_count(cvp->fesp)) >= 0) {
-			cint	isz = sizeof(int) ;
+			cint	isz = szof(int) ;
 			cint	vr = rs ;
 	    	        rs = SR_TOOBIG ;
 			if (vr < isz) {

@@ -211,7 +211,7 @@ int biblebook_open(BIBLEBOOK *op,cchar *pr,cchar *dbname) noex {
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(BIBLEBOOK)) ;
+	memclear(op) ;
 
 	if ((rs = biblebook_openload(op,pr,dbname)) == SR_NOENT) {
 	    rs = biblebook_openlocal(op) ;
@@ -583,7 +583,7 @@ static int biblebook_loadnameslocal(BIBLEBOOK *op) noex {
 	    namesize += (strlen(booknames[n]) + 1) ;
 	}
 
-	sizetab = (n + 1) * sizeof(cchar *) ;
+	sizetab = (n + 1) * szof(cchar *) ;
 	size += sizetab ;
 	size += namesize ;
 	if ((rs = uc_malloc(size,&mp)) >= 0) {
@@ -630,7 +630,7 @@ static int biblebook_loadnamesremote(BIBLEBOOK *op) noex {
 	} /* end if */
 
 	if (rs >= 0) {
-	    cint	sizetab = (n + 1) * sizeof(cchar *) ;
+	    cint	sizetab = (n + 1) * szof(cchar *) ;
 	    int		size = namesize ;
 	    int		bl ;
 	    char	*mp ;

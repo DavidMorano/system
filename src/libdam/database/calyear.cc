@@ -122,8 +122,7 @@ int calyear_open(calyear *op,cc *pr,cc *dirnames,cc *calnames) noex {
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(CALYEAR)) ;
-
+	memclear(op) ;
 	if ((rs = calyear_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr,dirnames,calnames)) >= 0) {
 		op->magic = CALYEAR_MAGIC ;
@@ -213,9 +212,7 @@ int calyear_check(CALYEAR *op,time_t dt)
 }
 /* end subroutine (calyear_check) */
 
-
-int calyear_curbegin(CALYEAR *op,CALYEAR_CUR *curp)
-{
+int calyear_curbegin(CALYEAR *op,CALYEAR_CUR *curp) noex {
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -231,7 +228,7 @@ int calyear_curbegin(CALYEAR *op,CALYEAR_CUR *curp)
 		if (rs < 0) {
 		    uc_free(curp->scp) ;
 		    curp->scp = NULL ;
-		    memset(curp,0,sizeof(CALYEAR_CUR)) ;
+		    memclear(curp) ;
 		}
 	    }
 	} else

@@ -84,7 +84,7 @@ enum his {
 
 /* local variables */
 
-constexpr int		headsize = hi_overlast * sizeof(uint) ;
+constexpr int		headsize = hi_overlast * szof(uint) ;
 constexpr int		magicsize = TTIHDR_MAGICSIZE ;
 constexpr char		magicstr[] = TTIHDR_MAGICSTR ;
 

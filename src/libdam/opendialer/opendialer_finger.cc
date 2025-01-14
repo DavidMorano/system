@@ -35,13 +35,13 @@
 	Synopsis:
 
 	int opendialer_finger(pr,prn,svc,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
-	const char	*svc ;
+	cchar	*pr ;
+	cchar	*prn ;
+	cchar	*svc ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -109,38 +109,38 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optvalue(const char *,int) ;
-extern int	optbool(const char *,int) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	optvalue(cchar *,int) ;
+extern int	optbool(cchar *,int) ;
 extern int	ctdeci(char *,int,int) ;
-extern int	getaf(const char *,int) ;
+extern int	getaf(cchar *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
+extern int	dialtcp(cchar *,cchar *,int,int,int) ;
 extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
 extern int	dialfinger(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strdcpy1(char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
 
 
 /* local structures */
 
 struct argparse {
-	const char	*s1 ;
-	const char	*s2 ;
-	const char	*s3 ;
-	const char	*a ;		/* memory allocation */
+	cchar	*s1 ;
+	cchar	*s2 ;
+	cchar	*s3 ;
+	cchar	*a ;		/* memory allocation */
 	int		af ;
 	int		to ;
 	int		f_long ;
@@ -149,7 +149,7 @@ struct argparse {
 
 /* local variables */
 
-static const char	*ops[] = {
+static cchar	*ops[] = {
 	"to",
 	"af",
 	"long",
@@ -166,7 +166,7 @@ enum ops {
 
 /* forward references */
 
-static int argparse_start(struct argparse *,const char *) ;
+static int argparse_start(struct argparse *,cchar *) ;
 static int argparse_finish(struct argparse *) ;
 
 
@@ -174,13 +174,13 @@ static int argparse_finish(struct argparse *) ;
 
 
 int opendialer_finger(pr,prn,svc,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
-const char	*svc ;
+cchar	*pr ;
+cchar	*prn ;
+cchar	*svc ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	ARGPARSE	ai ;
@@ -189,9 +189,9 @@ int		to ;
 	int		af = AF_UNSPEC ;
 	int		opts = 0 ;
 	int		fd = -1 ;
-	const char	*argz = NULL ;
-	const char	*hostname = NULL ;
-	const char	*portspec = NULL ;
+	cchar	*argz = NULL ;
+	cchar	*hostname = NULL ;
+	cchar	*portspec = NULL ;
 
 #if	CF_DEBUGS
 	{
@@ -268,13 +268,13 @@ int		to ;
 #endif
 
 	    if (rs >= 0) {
-		const int	esize = sizeof(const char *) ;
+		cint	esize = szof(cchar *) ;
 		int		size ;
 		char		*bp ;
 		size = ((argc+1) * esize) ;
 		if ((rs = uc_malloc(size,&bp)) >= 0) {
 		    int		n = 0 ;
-		    const char	**av = (const char **) bp ;
+		    cchar	**av = (cchar **) bp ;
 
 #if	CF_DEBUGS
 		    debugprintf("opendialer_finger: svc=%s\n",
@@ -338,20 +338,20 @@ ret0:
 	finger¥[<af>]:<host>:<svc>[,to=<to>][,af=<af>][­<arg(s)>]
 */
 
-static int argparse_start(struct argparse *app,const char *args)
+static int argparse_start(struct argparse *app,cchar *args)
 {
 	int		rs = SR_OK ;
 	int		s1l = 0 ;
 	int		s2l = 0 ;
 	int		s3l = 0 ;
 	int		opl = 0 ;
-	const char	*tp, *sp ;
-	const char	*s1p = NULL ;
-	const char	*s2p = NULL ;
-	const char	*s3p = NULL ;
-	const char	*opp = NULL ;
+	cchar	*tp, *sp ;
+	cchar	*s1p = NULL ;
+	cchar	*s2p = NULL ;
+	cchar	*s3p = NULL ;
+	cchar	*opp = NULL ;
 
-	memset(app,0,sizeof(struct argparse)) ;
+	memclear(app) ;
 	app->to = -1 ;
 	app->af = -1 ;
 
@@ -366,8 +366,8 @@ static int argparse_start(struct argparse *app,const char *args)
 	    int		v ;
 	    int		kl, vl ;
 	    int		ch ;
-	    const char	*nsp ;
-	    const char	*kp, *vp ;
+	    cchar	*nsp ;
+	    cchar	*kp, *vp ;
 	    s1p = args ;
 	    s1l = (tp-args) ;
 	    sp = (tp+1) ;

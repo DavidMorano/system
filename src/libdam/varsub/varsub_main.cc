@@ -592,7 +592,7 @@ static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 		}
 	    } /* end if (entry search-by-key) */
 	    if (rs1 == SR_NOTFOUND) {
-	        cint	msize = sizeof(ent) ;
+	        cint	msize = szof(ent) ;
 		void	*vp{} ;
 	        if ((rs = uc_malloc(msize,&vp)) >= 0) {
 	            ent		*ep = entp(vp) ;
@@ -621,7 +621,7 @@ static int varsub_iaddq(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	if (vlen < 0) vlen = (v != nullptr) ? strlen(v) : 0 ;
 	if (klen > 0) {
 	    vechand	*elp = op->slp ;
-	    cint	msize = sizeof(ent) ;
+	    cint	msize = szof(ent) ;
 	    void	*vp{} ;
 	    if ((rs = uc_malloc(msize,&vp)) >= 0) {
 	        ent	*ep = entp(vp) ;

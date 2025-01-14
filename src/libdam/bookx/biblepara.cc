@@ -118,21 +118,21 @@ enum subs {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int biblepara_open(BIBLEPARA *op,cchar pr[],cchar dbname[])
-{
+int biblepara_open(BIBLEPARA *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
-	const char	*objname = BIBLEPARA_OBJNAME ;
+	cchar		*objname = BIBLEPARA_OBJNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pr == NULL) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(BIBLEPARA)) ;
-
+	memclear(op) ;
 	if ((rs = biblepara_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
 		op->magic = BIBLEPARA_MAGIC ;
@@ -149,10 +149,7 @@ int biblepara_open(BIBLEPARA *op,cchar pr[],cchar dbname[])
 }
 /* end subroutine (biblepara_open) */
 
-
-/* free up the entire vector string data structure object */
-int biblepara_close(BIBLEPARA *op)
-{
+int biblepara_close(BIBLEPARA *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 

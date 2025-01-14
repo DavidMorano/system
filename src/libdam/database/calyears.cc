@@ -1311,7 +1311,7 @@ static int subinfo_calcreate(SUBINFO *sip,cchar *dn,cchar *cn)
 	    if ((rs = mkpath2(tbuf,dn,nbuf)) >= 0) {
 		if ((rs = subinfo_regacc(sip,tbuf,R_OK)) > 0) {
 		    CALMGR	*calp ;
-		    cint	size = sizeof(CALMGR) ;
+		    cint	size = szof(CALMGR) ;
 		    f = TRUE ;
 	    	    if ((rs = uc_malloc(size,&calp)) >= 0) {
 			vechand	*clp = &op->cals ;

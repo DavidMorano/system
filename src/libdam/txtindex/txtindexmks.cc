@@ -126,8 +126,8 @@
 #endif
 #endif
 
-#define	HDRBUFLEN	(sizeof(HDR) + 128)
-#define	BUFLEN		(sizeof(HDR) + 128)
+#define	HDRBUFLEN	(szof(HDR) + 128)
+#define	BUFLEN		(szof(HDR) + 128)
 #define	SUFBUFLEN	32
 #define	TMPFNAMELEN	14
 
@@ -195,7 +195,8 @@ typedef int *	rectab_t ;
 
 txtindexmks_obj	txtindexmks_modinfo = {
 	"txtindexmks",
-	sizeof(txtindexmks)
+	szof(txtindexmks),
+	0
 } ;
 
 
@@ -658,7 +659,7 @@ static int txtindexmks_idxdirend(TIM *op) noex {
 /* end subroutine (txtindexmks_idxdirend) */
 
 static int txtindexmks_listbegin(TIM *op) noex {
-	int		sz = int(op->pi.tablen * sizeof(LISTOBJ)) ;
+	int		sz = int(op->pi.tablen * szof(LISTOBJ)) ;
 	int		rs ;
 	void		*vp ;
 	if ((rs = uc_malloc(sz,&vp)) >= 0) {
@@ -887,7 +888,7 @@ static int txtindexmks_mkhashwrhdr(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
 
 static int txtindexmks_mkhashwrtab(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
 	int		*table = nullptr ;
-	cint		tsize = op->pi.tablen * sizeof(uint) ;
+	cint		tsize = op->pi.tablen * szof(uint) ;
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = uc_malloc(tsize,&table)) >= 0) {
@@ -901,7 +902,7 @@ static int txtindexmks_mkhashwrtab(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
 	    hdrp->maxtags = op->ti.maxtags ;
 	    hdrp->taboff = off ;
 	    if (rs >= 0) {
-	        cint	tsize = op->pi.tablen * sizeof(uint) ;
+	        cint	tsize = op->pi.tablen * szof(uint) ;
 	        rs = filer_write(hfp,table,tsize) ;
 	        off += rs ;
 	        wlen += rs ;
@@ -921,7 +922,7 @@ static int txtindexmks_mkhashwrtabone(TIM *op,HDR *hdrp,
 	lop += i ;
 	if ((rs = LISTOBJ_COUNT(lop)) > 0) {
 	    cint	c = rs ;
-	    cint	asize = ((c+1)*sizeof(int)) ;
+	    cint	asize = ((c+1)*szof(int)) ;
 	    int		*va ;
 	    if ((rs = uc_malloc(asize,&va)) >= 0) {
 	        if ((rs = LISTOBJ_MKVEC(lop,va)) >= 0) {
@@ -930,14 +931,14 @@ static int txtindexmks_mkhashwrtabone(TIM *op,HDR *hdrp,
 			op->ti.maxtags = c ;
 		    }
 	            if (c > 0) {
-	                cint	csize = sizeof(int) ;
+	                cint	csize = szof(int) ;
 	                op->clists += 1 ;
 	                tab[i] = off ;
 	                if ((rs = filer_write(hfp,&c,csize)) >= 0) {
 	                    off += rs ;
 	                    wlen += rs ;
 	                    if (c > 0) {
-	                        cint	vsize = (c*sizeof(uint)) ;
+	                        cint	vsize = (c*szof(uint)) ;
 	                        rs = filer_write(hfp,va,vsize) ;
 	                        off += rs ;
 	                        wlen += rs ;

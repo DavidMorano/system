@@ -505,7 +505,7 @@ SYSDIALER_INFO	prog_mod = {
 	PROG_MNAME,
 	PROG_VERSION,
 	PROG_INAME,
-	sizeof(PROG),
+	szof(PROG),
 	PROG_FLAGS
 } ;
 
@@ -532,7 +532,7 @@ cchar		*av[] ;
 
 	if (hostname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(PROG)) ;
+	memclear(op) ;
 
 	rs = subinfo_start(sip,op,ap,hostname,svcname) ;
 	if (rs < 0)
@@ -958,7 +958,7 @@ cchar		svcname[] ;
 {
 	int		rs ;
 
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 
 	sip->envv = (cchar	 **) environ ;
 	sip->op = op ;
@@ -975,11 +975,13 @@ cchar		svcname[] ;
 		    if (ap != nullptr) {
 	    		rs = subinfo_procargs(sip) ;
 		    }
-		    if (rs < 0)
+		    if (rs < 0) {
 			vecstr_finish(&sip->aenvs) ;
+		    }
 		} /* end if (aenvs) */
-		if (rs < 0)
+		if (rs < 0) {
 		    vecstr_finish(&sip->stores) ;
+		}
 	    } /* end if (stores) */
 	} /* end if (getnprocessors) */
 

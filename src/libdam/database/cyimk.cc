@@ -104,8 +104,8 @@
 #define	CYIMK_DEFENTS	1024
 #define	CYIMK_NSKIP	5
 
-#define	HDRBUFLEN	(sizeof(CYIHDR) + 128)
-#define	BUFLEN		(sizeof(CYIHDR) + 128)
+#define	HDRBUFLEN	(szof(CYIHDR) + 128)
+#define	BUFLEN		(szof(CYIHDR) + 128)
 
 #define	FSUF_IDX	"cyi"
 
@@ -208,7 +208,7 @@ int cyimk_open(CYIMK *op,int year,cc *dname,cc *cname,int of,mode_t om) noex {
 	    year = (tm.year + TM_YEAR_BASE) ;
 	} /* end if */
 
-	memset(op,0,sizeof(CYIMK)) ;
+	memclear(op) ;
 	op->om = (om|0600) ;
 	op->nfd = -1 ;
 	op->year = year ;
@@ -567,11 +567,12 @@ static int cyimk_listbegin(CYIMK *op,int n)
 	opts |= VECOBJ_OSTATIONARY ;
 	opts |= VECOBJ_OORDERED ;
 	opts |= VECOBJ_OCOMPACT ;
-	size = sizeof(struct bventry) ;
+	size = szof(struct bventry) ;
 	if ((rs = vecobj_start(&op->verses,size,n,opts)) >= 0) {
 	    rs = vecobj_start(&op->lines,size,(n * 2),opts) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        vecobj_finish(&op->verses) ;
+	    }
 	}
 
 	return rs ;
@@ -602,9 +603,7 @@ static int cyimk_mkidx(CYIMK *op)
 	int		wlen = 0 ;
 
 	if ((rs = cyimk_nidxopen(op)) >= 0) {
-	    CYIHDR	hdr ;
-
-	    memset(&hdr,0,sizeof(CYIHDR)) ;
+	    CYIHDR	hdr{} ;
 	    hdr.vetu[0] = CYIHDR_VERSION ;
 	    hdr.vetu[1] = ENDIAN ;
 	    hdr.vetu[2] = 0 ;
@@ -720,7 +719,7 @@ static int cyimk_mkidxents(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
 	struct bventry	*bvep ;
 	vecobj		*elp = &op->verses ;
 	uint		a[5] ;
-	cint	size = (5 * sizeof(uint)) ;
+	cint	size = (5 * szof(uint)) ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		n = 0 ;
@@ -753,7 +752,7 @@ static int cyimk_mkidxlines(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
 	struct blentry	*blep ;
 	vecobj		*llp = &op->lines ;
 	uint		a[2] ;
-	cint	size = (2 * sizeof(uint)) ;
+	cint	size = (2 * szof(uint)) ;
 	int		rs = SR_OK ;
 	int		n = 0 ;
 	int		i ;

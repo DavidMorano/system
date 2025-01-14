@@ -553,16 +553,16 @@ static int listenspec_parse(LS *op,int ac,mv av) noex {
 	/* allocate our information structure */
 	switch (ti) {
 	case ltype_tcp:
-	    sz = sizeof(LISTENSPEC_TCP) ;
+	    sz = szof(LISTENSPEC_TCP) ;
 	    break ;
 	case ltype_uss:
-	    sz = sizeof(LISTENSPEC_USS) ;
+	    sz = szof(LISTENSPEC_USS) ;
 	    break ;
 	case ltype_pass:
-	    sz = sizeof(LISTENSPEC_PASS) ;
+	    sz = seof(LISTENSPEC_PASS) ;
 	    break ;
 	case ltype_conn:
-	    sz = sizeof(LISTENSPEC_CONN) ;
+	    sz = szof(LISTENSPEC_CONN) ;
 	    break ;
 	} /* end switch */
 	if (sz > 0) {
@@ -1066,7 +1066,7 @@ static int listenspec_passaccept(LS *op,void *fp,int *flp,int to) noex {
 	int		rs ;
 	int		fd = -1 ;
 	if (fp) {
-	    *flp = sizeof(long) ;
+	    *flp = szof(long) ;
 	    memset(fp,0,*flp) ;
 	}
 	{
@@ -1215,7 +1215,7 @@ static int listenspec_connaccept(LS *op,void *fp,int *flp,int to) noex {
 	int		rs ;
 	int		fd = -1 ;
 	if (fp) {
-	    *flp = sizeof(long) ;
+	    *flp = szof(long) ;
 	    memset(fp,0,*flp) ;
 	}
 	{

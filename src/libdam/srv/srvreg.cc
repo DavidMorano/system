@@ -113,7 +113,7 @@ static int	srvreg_fileinit(SRVREG *,time_t) ;
 static int	srvreg_filechanged(SRVREG *) ;
 static int	srvreg_filecheck(SRVREG *,time_t,int) ;
 static int	srvreg_buf(SRVREG *,uint,uint,char **) ;
-static int	srvreg_bufupdate(SRVREG *,uint,int,const char *) ;
+static int	srvreg_bufupdate(SRVREG *,uint,int,cchar *) ;
 static int	srvreg_bufinit(SRVREG *) ;
 static int	srvreg_buffree(SRVREG *) ;
 static int	srvreg_writehead(SRVREG *) ;
@@ -126,7 +126,7 @@ static int	filehead(char *,int,struct srvreg_filehead *) ;
 
 #ifdef	COMMENT
 
-static const char	*aitypes[] = {
+static cchar	*aitypes[] = {
 	"empty",
 	"disabled",
 	"fifo",
@@ -151,7 +151,7 @@ static const char	*aitypes[] = {
 
 int srvreg_open(op,fname,oflags,operm)
 SRVREG		*op ;
-const char	fname[] ;
+cchar	fname[] ;
 int		oflags ;
 int		operm ;
 {
@@ -183,7 +183,7 @@ int		operm ;
 	    debugprintf("srvreg_open: creating as needed\n") ;
 #endif
 
-	memset(op,0,sizeof(SRVREG)) ;
+	memclear(op) ;
 
 	op->magic = 0 ;
 	op->fname = NULL ;
@@ -202,7 +202,7 @@ int		operm ;
 	    goto bad0 ;
 
 	op->mtime = 0 ;
-	memset(&op->f,0,sizeof(struct srvreg_flags)) ;
+	op->f = {} ;
 
 /* initialize the buffer structure */
 
@@ -564,7 +564,7 @@ bad0:
 /* fetch by service name */
 int srvreg_fetchsvc(op,svc,cp,ep)
 SRVREG		*op ;
-const char	svc[] ;
+cchar	svc[] ;
 SRVREG_CUR	*cp ;
 SRVREG_ENT	*ep ;
 {
@@ -1056,27 +1056,16 @@ time_t		daytime ;
 	        bl = 0 ;
 	        bl += filemagic((fbuf + bl),0,&fm) ;
 
-	        memset(&op->h,0,sizeof(struct srvreg_filehead)) ;
-
+	        op->h = {} ;
 	        bl += filehead((fbuf + bl),0,&op->h) ;
 
-#if	CF_DEBUGS
-	        debugprintf("srvreg_fileinit: u_pwrite() wlen=%d\n",bl) ;
-#endif
-
 	        rs = u_pwrite(op->fd,fbuf,bl,0L) ;
-
-#if	CF_DEBUGS
-	        debugprintf("srvreg_fileinit: u_pwrite() rs=%d\n",rs) ;
-#endif
-
 	        if (rs > 0) {
-
 	            op->filesize = rs ;
 		    op->mtime = daytime ;
-		    if (op->f.remote)
+		    if (op->f.remote) {
 			u_fsync(op->fd) ;
-
+		    }
 		}
 
 	        op->f.fileinit = (rs >= 0) ;
@@ -1622,7 +1611,7 @@ static int srvreg_bufupdate(op,roff,rbuflen,rbuf)
 SRVREG		*op ;
 uint		roff ;
 int		rbuflen ;
-const char	rbuf[] ;
+cchar	rbuf[] ;
 {
 	uint	boff, bext ;
 	uint	rext = roff + rbuflen ;
@@ -1736,7 +1725,7 @@ int			f_read ;
 struct srvreg_filehead	*hp ;
 {
 	SERIALBUF	msgbuf ;
-	const int	buflen = sizeof(struct srvreg_filehead) ;
+	cint		buflen = szof(struct srvreg_filehead) ;
 	int		rs ;
 	int		rs1 ;
 

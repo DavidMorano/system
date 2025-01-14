@@ -133,8 +133,7 @@ int		n ;
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(STRFILEMK)) ;
-
+	memclear(op) ;
 	if ((rs = strfilemk_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,dbname,of,om,n)) >= 0) {
 		op->magic = STRFILEMK_MAGIC ;

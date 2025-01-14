@@ -503,7 +503,7 @@ static int srvtab_fileparse(srvtab *op,time_t daytime,vecitem *eep) noex {
 
 			if (entry_enough(&se) > 0) {
 
-	                rs = vecitem_add(slp, &se,sizeof(SRVTAB_ENT)) ;
+	                rs = vecitem_add(slp,&se,szof(SRVTAB_ENT)) ;
 	                if (rs < 0) {
 			    f_ent = FALSE ;
 	                    entry_finish(&se) ;
@@ -704,7 +704,7 @@ static int srvtab_fileparse(srvtab *op,time_t daytime,vecitem *eep) noex {
 
 	if ((rs >= 0) && f_ent) {
 	    if (entry_enough(&se) > 0) {
-	        rs = vecitem_add(slp, &se,sizeof(SRVTAB_ENT)) ;
+	        rs = vecitem_add(slp,&se,szof(SRVTAB_ENT)) ;
 	        if (rs >= 0) f_ent = FALSE ;
 	    }
 	    if (f_ent) {

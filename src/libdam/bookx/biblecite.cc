@@ -22,7 +22,7 @@
 	Synopsis:
 
 	int isbiblecite(sp,sl,bcp,sip)
-	const char	*sp ;
+	cchar	*sp ;
 	int		sl ;
 	BIBLECITE	*bcp ;
 	int		*sip ;
@@ -59,22 +59,22 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	siskipwhite(const char *,int) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	siskipwhite(cchar *,int) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matpstr(cchar **,int,cchar *,int) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfdeci(cchar *,int,int *) ;
 extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -89,11 +89,12 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int isbiblecite(BIBLECITE *qp,cchar *lp,int ll,int *sip)
-{
+int isbiblecite(BIBLECITE *qp,cchar *lp,int ll,int *sip) noex {
 	uint		v ;
 	int		rs1 ;
 	int		sl, cl ;
@@ -101,9 +102,9 @@ int isbiblecite(BIBLECITE *qp,cchar *lp,int ll,int *sip)
 	int		ch ;
 	int		si ;
 	int		f = FALSE ;
-	const char	*tp, *sp, *cp ;
+	cchar	*tp, *sp, *cp ;
 
-	memset(qp,0,sizeof(BIBLECITE)) ;
+	memclear(qp) ;
 
 	sp = lp ;
 	sl = ll ;

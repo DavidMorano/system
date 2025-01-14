@@ -78,7 +78,7 @@
 #define	DEFNFILES		10
 #define	DEFNENTRIES		10
 
-#define	SVCFILE_KA		sizeof(char *(*)[2])
+#define	SVCFILE_KA		szof(char *(*)[2])
 #define	SVCFILE_BO(v)		\
 	((SVCFILE_KA - ((v) % SVCFILE_KA)) % SVCFILE_KA)
 
@@ -303,11 +303,11 @@ int svcfile_open(svcfile *op,cchar *fname) noex {
 	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
 	        cnullptr	np{} ;
-	        int		sz = sizeof(SVCFILE_FILE) ;
+	        int		sz = szof(SVCFILE_FILE) ;
 	        int		vn = DEFNFILES ;
 	        int		vo = (VECOBJ_OSTATIONARY | VECOBJ_OREUSE) ;
 	        if ((rs = vecobj_start(op->flp,sz,vn,vo)) >= 0) {
-	            sz = sizeof(SVCFILE_SVCNAME) ;
+	            sz = szof(SVCFILE_SVCNAME) ;
 	            vo = VECOBJ_OCOMPACT ;
 	            if ((rs = vecobj_start(op->slp,sz,10,vo)) >= 0) {
 	                vn = DEFNENTRIES ;
@@ -427,7 +427,7 @@ int svcfile_curbegin(svcfile *op,svcfile_cur *curp) noex {
 	    }
 	    if (rs >= 0) {
 		hdb	*elp = op->elp ;
-		cint	csz = sizeof(hdb_cur) ;
+		cint	csz = szof(hdb_cur) ;
 		void	*vp{} ;
 	        curp->i = -1 ;
 		if ((rs = uc_malloc(csz,&vp)) >= 0) {
@@ -859,7 +859,7 @@ static int svcfile_filealready(svcfile *op,dev_t dev,ino_t ino) noex {
 
 /* add an entry to the access entry list */
 static int svcfile_addentry(svcfile *op,int fi,SVCENTRY *nep) noex {
-	int		sz = sizeof(IENT) ;
+	int		sz = szof(IENT) ;
 	int		rs ;
 	int		f_added = false ;
 
@@ -873,7 +873,7 @@ static int svcfile_addentry(svcfile *op,int fi,SVCENTRY *nep) noex {
 		IENT	*iep = (IENT *) vp ;
 	        cint	n = svcentry_nkeys(nep) ;
 	        iep->fi = fi ;
-	        sz = (n+1) * 2 * sizeof(char *) ;
+	        sz = (n+1) * 2 * szof(char *) ;
 	        if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	            iep->nkeys = n ;
 	            iep->keyvals = keyvals_t(vp) ;
@@ -887,7 +887,7 @@ static int svcfile_addentry(svcfile *op,int fi,SVCENTRY *nep) noex {
 	                    key.buf = iep->svc ;
 	                    key.len = sl ;
 	                    val.buf = iep ;
-	                    val.len = sizeof(IENT) ;
+	                    val.len = szof(IENT) ;
 	                    if ((rs = hdb_store(op->elp,key,val)) >= 0) {
 	                        rs = svcfile_svcadd(op,iep->svc) ;
 	                        if (rs < 0) {
@@ -1150,7 +1150,7 @@ static int svcentry_start(SVCENTRY *sep,cchar *sp,int sl) noex {
 	if (sep) {
 	    rs = memclear(sep) ;
 	    if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
-	        cint	sz = sizeof(SVCENTRY_KEY) ;
+	        cint	sz = szof(SVCENTRY_KEY) ;
 		cint	vn = 5 ;
 		cint	vo = VECOBJ_OORDERED ;
 	        sep->svc = cp ;
@@ -1317,7 +1317,7 @@ static int entry_load(svcfile_ent *ep,char *ebuf,int elen,IENT *iep) noex {
 		cint	bo = SVCFILE_BO((ulong) ebuf) ;
 		char	*bp ;
 		if (iep->sz <= (elen - bo)) {
-		    cint	kal = (iep->nkeys + 1) * 2 * sizeof(char *) ;
+		    cint	kal = (iep->nkeys + 1) * 2 * szof(char *) ;
 		    int		i ; /* used-afterwards */
 		    cchar	*(*keyvals)[2] = keyvals_t(ebuf + bo) ;
 		    bp = charp(ebuf + bo + kal) ;

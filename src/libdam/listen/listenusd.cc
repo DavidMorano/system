@@ -91,7 +91,7 @@ int listenusd(cchar *ps,mode_t om,int lopts) noex {
 	            s = rs ;
 	            if (lopts & 1) {
 	                cint	so = SO_REUSEADDR ;
-	                cint	isize = sizeof(int) ;
+	                cint	isize = szof(int) ;
 	                int	one = 1 ;
 	                rs = u_setsockopt(s,SOL_SOCKET,so,&one,isize) ;
 	            }

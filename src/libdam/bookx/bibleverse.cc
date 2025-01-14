@@ -62,9 +62,9 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
 
 #if	CF_DEBUGS
@@ -72,7 +72,7 @@ extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* local structures */
@@ -83,7 +83,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 static int	bibleverse_objloadbegin(BIBLEVERSE *,cchar *,cchar *) ;
 static int	bibleverse_objloadbeginer(BIBLEVERSE *op,cchar *,cchar *) ;
 static int	bibleverse_objloadend(BIBLEVERSE *) ;
-static int	bibleverse_loadcalls(BIBLEVERSE *,const char *) ;
+static int	bibleverse_loadcalls(BIBLEVERSE *,cchar *) ;
 
 static int	isrequired(int) ;
 
@@ -93,7 +93,7 @@ static int	isrequired(int) ;
 
 /* local variables */
 
-static const char	*subs[] = {
+static cchar	*subs[] = {
 	"open",
 	"count",
 	"read",
@@ -130,14 +130,14 @@ enum subs {
 int bibleverse_open(BIBLEVERSE *op,cchar pr[],cchar dbname[])
 {
 	int		rs ;
-	const char	*objname = BIBLEVERSE_OBJNAME ;
+	cchar	*objname = BIBLEVERSE_OBJNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pr == NULL) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(BIBLEVERSE)) ;
+	memclear(op) ;
 
 	if ((rs = bibleverse_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
@@ -479,7 +479,7 @@ static int bibleverse_objloadbeginer(BIBLEVERSE *op,cchar *pr,cchar *objname)
 	    } /* end for */
 
 	    if (rs >= 0) {
-		const char	**sv ;
+		cchar	**sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
 	            cchar	*modbname = BIBLEVERSE_MODBNAME ;
 	            opts = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
@@ -553,7 +553,7 @@ static int bibleverse_loadcalls(BIBLEVERSE *op,cchar *objname)
 
 		case sub_open:
 		    op->call.open = 
-			(int (*)(void *,const char *,const char *)) snp ;
+			(int (*)(void *,cchar *,cchar *)) snp ;
 		    break ;
 
 		case sub_count:

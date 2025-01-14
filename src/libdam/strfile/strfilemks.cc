@@ -115,7 +115,7 @@
 #define	KEYBUFLEN	120
 #endif
 
-#define	BUFLEN		(sizeof(STRLISTHDR) + 128)
+#define	BUFLEN		(szof(STRLISTHDR) + 128)
 
 #define	FSUF_IND	STRLISTHDR_FSUF
 
@@ -243,9 +243,10 @@ static cchar	zerobuf[4] = {
 
 /* exported variables */
 
-STRFILEMKS_OBJ	strfilemks_mod = {
+const STRFILEMKS_OBJ	strfilemks_mod = {
 	"strfilemks",
-	sizeof(STRFILEMKS)
+	szof(STRFILEMKS),
+	0
 } ;
 
 
@@ -271,7 +272,7 @@ int		n ;
 	if (n < STRFILEMKS_NENTRIES)
 	    n = STRFILEMKS_NENTRIES ;
 
-	memset(op,0,sizeof(STRFILEMKS)) ;
+	memclear(op) ;
 	op->om = om ;
 	op->nfd = -1 ;
 	op->gid = -1 ;
@@ -427,12 +428,12 @@ static int strfilemks_addfiler(STRFILEMKS *op,MAPFILE *mfp)
 }
 /* end subroutine (strfilemks_addfiler) */
 
-
-static int recmgr_start(RECMGR *rmp)
-{
-	cint	esize = sizeof(RECMGR_ENT) ;
-	memset(rmp,0,sizeof(RECMGR)) ;
-	return vecobj_start(&rmp->recs,esize,100,0) ;
+static int recmgr_start(RECMGR *rmp) noex {
+	cint	esz = szof(RECMGR_ENT) ;
+	cint	vn = 100 ;
+	cint	vo = 0 ;
+	memclear(rmp) ;
+	return vecobj_start(&rmp->recs,esz,vn,vo) ;
 }
 /* end subroutine (strfilemks_start) */
 
@@ -512,7 +513,7 @@ gid_t		gid ;
 
 static int strfilemks_recbegin(STRFILEMKS *op)
 {
-	cint	rsize = sizeof(RECMGR) ;
+	cint	rsize = szof(RECMGR) ;
 	int	rs ;
 	void	*p ;
 	if ((rs = uc_malloc(rsize,&p)) >= 0) {
@@ -550,7 +551,7 @@ static int strfilemks_recend(STRFILEMKS *op)
 
 static int strfilemks_idxbegin(STRFILEMKS *op,cchar *dbname)
 {
-	cint	isize = sizeof(IDX) ;
+	cint	isize = szof(IDX) ;
 	int	rs ;
 	void	*p ;
 	if ((rs = uc_malloc(isize,&p)) >= 0) {
@@ -592,7 +593,7 @@ static int idx_start(IDX *ixp,cchar *dbname)
 
 	cchar	*dnp ;
 
-	memset(ixp,0,sizeof(IDX)) ;
+	memclear(ixp) ;
 	ixp->fd = -1 ;
 	if ((dnl = sfdirname(dbname,-1,&dnp)) >= 0) {
 	    int		bnl ;
@@ -619,10 +620,12 @@ static int idx_start(IDX *ixp,cchar *dbname)
 			idx->ibname = NULL ;
 		    }
 		} /* end if (memory-allocation) */
-	    } else
+	    } else {
 		rs = SR_INVALID ;
-	} else
+	    }
+	} else {
 	    rs = SR_BADFMT ;
+	}
 
 	return rs ;
 }
@@ -874,7 +877,7 @@ static int idx_bufwrite(IDX *ixp,cvoid *wbuf,int wlen) noex {
 
 static int idx_bufhdr(IDX *ixp)
 {
-	cint	hlen = sizeof(STRLISTHDR) ;
+	cint	hlen = szof(STRLISTHDR) ;
 	int	rs ;
 
 	rs = filer_write(&ixp->db,&ixp->hdr,hlen) ;
@@ -1266,8 +1269,7 @@ STRFILEMKS	*op ;
 
 /* prepare the file-header */
 
-	memset(&hf,0,sizeof(STRLISTHDR)) ;
-
+	hf = {} ;
 	hf.vetu[0] = STRLISTHDR_VERSION ;
 	hf.vetu[1] = ENDIAN ;
 	hf.vetu[2] = 0 ;
@@ -1298,7 +1300,7 @@ STRFILEMKS	*op ;
 	hf.rtoff = fileoff ;
 	hf.rtlen = rtl ;
 
-	size = (rtl + 1) * 2 * sizeof(uint) ;
+	size = (rtl + 1) * 2 * szof(uint) ;
 	rs = filer_write(&varfile,rt,size) ;
 	fileoff += rs ;
 
@@ -1333,7 +1335,7 @@ STRFILEMKS	*op ;
 	            hf.itoff = fileoff ;
 	            hf.itlen = itl ;
 
-	            size = (itl + 1) * 3 * sizeof(int) ;
+	            size = (itl + 1) * 3 * szof(int) ;
 
 	            if ((rs = uc_malloc(size,&indtab)) >= 0) {
 
@@ -1426,7 +1428,7 @@ int		il ;
 	    VECOBJ	ves ;
 	    int		size, opts ;
 
-	    size = sizeof(struct strentry) ;
+	    size = szof(struct strentry) ;
 	    opts = VECOBJ_OCOMPACT ;
 	    if ((rs = vecobj_start(&ves,size,rtl,opts)) >= 0) {
 
@@ -1537,7 +1539,7 @@ int		n ;
 
 	rtp->i = 0 ;
 	rtp->n = n ;
-	size = (n + 1) * 2 * sizeof(int) ;
+	size = (n + 1) * 2 * szof(int) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 	    rtp->rectab = p ;
 	    rtp->rectab[0][0] = 0 ;
@@ -1601,7 +1603,7 @@ RECTAB		*rtp ;
 	    int		nn ;
 	    int		size ;
 	    nn = (rtp->n + 1) * 2 ;
-	    size = (nn + 1) * 2 * sizeof(int) ;
+	    size = (nn + 1) * 2 * szof(int) ;
 	    if ((rs = uc_realloc(rtp->rectab,size,&va)) >= 0) {
 	        rtp->rectab = va ;
 	        rtp->n = nn ;
@@ -1654,8 +1656,7 @@ static int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl)
 	int	rs ;
 	cchar	*fname ;
 
-	memset(mfp,0,sizeof(MAPFILE)) ;
-
+	memclear(mfp) ;
 	if ((rs = nulstr_start(&fn,sp,sl,&fname)) >= 0) {
 	    cint	of = O_RDONLY ;
 	if ((rs = uc_open(fname,of,0666)) >= 0) {
@@ -1663,7 +1664,7 @@ static int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl)
 	    int	fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 		if (S_ISREG(sb.st_mode)) {
-		    const size_t	ps = op->pagesize ;
+		    csize	ps = op->pagesize ;
 		    if ((max > 0) && (sb.st_size <= max)) {
 	    	        size_t	ms = MAX(ps,sbp->st_size) ;
 	    	        int	mp = PROT_READ ;
@@ -1676,13 +1677,16 @@ static int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl)
 			         mfp->mdata = md ;
 			         mfp->msize = ms ;
 			    }
-			    if (rs < 0)
+			    if (rs < 0) {
 				u_munmap(md,ms) ;
+			    }
 	    	        } /* end if (mmap) */
-		    } else
+		    } else {
 	    	        rs = SR_TOOBIG ;
-	        } else
+		    }
+	        } else {
 	            rs = SR_PROTO ;
+		}
 	    } /* end if (stat) */
 	    u_close(fd) ;
 	} /* end if (file-open) */

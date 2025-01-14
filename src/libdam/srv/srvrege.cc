@@ -108,7 +108,7 @@ SRVREGE_ALL	*ep ;
 
 	    serialbuf_rui(&msgbuf,&ep->pid) ;
 
-	    serialbuf_robj(&msgbuf,&ep->a,sizeof(union srvrege_addr)) ;
+	    serialbuf_robj(&msgbuf,&ep->a,szof(union srvrege_addr)) ;
 
 	    serialbuf_rstrn(&msgbuf,ep->tag,SRVREGE_LTAG) ;
 
@@ -136,7 +136,7 @@ SRVREGE_ALL	*ep ;
 
 	    serialbuf_wui(&msgbuf,ep->pid) ;
 
-	    serialbuf_wobj(&msgbuf,&ep->a,sizeof(union srvrege_addr)) ;
+	    serialbuf_wobj(&msgbuf,&ep->a,szof(union srvrege_addr)) ;
 
 	    serialbuf_wstrn(&msgbuf,ep->tag,SRVREGE_LTAG) ;
 

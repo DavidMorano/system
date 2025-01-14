@@ -34,13 +34,13 @@
 	Synopsis:
 
 	int opendialer_tcpnls(pr,prn,svc,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
-	const char	*svc ;
+	cchar	*pr ;
+	cchar	*prn ;
+	cchar	*svc ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -86,33 +86,33 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	findxfile(IDS *,char *,const char *) ;
-extern int	getaf(const char *,int) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	findxfile(IDS *,char *,cchar *) ;
+extern int	getaf(cchar *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
+extern int	dialtcp(cchar *,cchar *,int,int,int) ;
 extern int	dialtcpnls(cchar *,cchar *,int,cchar *, int,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* local structures */
 
 struct argparse {
-	const char	*hostname ;
-	const char	*portspec ;
-	const char	*svcspec ;
-	const char	*a ;		/* memory allocation */
+	cchar	*hostname ;
+	cchar	*portspec ;
+	cchar	*svcspec ;
+	cchar	*a ;		/* memory allocation */
 	int		af ;
 	int		to ;
 } ;
@@ -120,7 +120,7 @@ struct argparse {
 
 /* local variables */
 
-static const char	*ops[] = {
+static cchar	*ops[] = {
 	"to",
 	"af",
 	NULL
@@ -135,7 +135,7 @@ enum ops {
 
 /* forward references */
 
-static int argparse_start(struct argparse *,const char *) ;
+static int argparse_start(struct argparse *,cchar *) ;
 static int argparse_finish(struct argparse *) ;
 
 
@@ -143,24 +143,24 @@ static int argparse_finish(struct argparse *) ;
 
 
 int opendialer_tcpnls(pr,prn,svc,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
-const char	*svc ;
+cchar	*pr ;
+cchar	*prn ;
+cchar	*svc ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	ARGPARSE	ai ;
-	const int	opts = 0 ;
+	cint	opts = 0 ;
 	int		rs = SR_OK ;
 	int		argc = 0 ;
 	int		af = AF_UNSPEC ;
 	int		fd = -1 ;
-	const char	*argz = NULL ;
-	const char	*hostname = NULL ;
-	const char	*portspec = NULL ;
+	cchar	*argz = NULL ;
+	cchar	*hostname = NULL ;
+	cchar	*portspec = NULL ;
 
 
 #if	CF_DEBUGS
@@ -216,13 +216,13 @@ int		to ;
 	    svc = ai.svcspec ;
 
 	    if (rs >= 0) {
-		const int	esize = sizeof(const char *) ;
+		cint	esize = szof(cchar *) ;
 		int	size ;
 		char	*bp ;
 		size = ((argc+1) * esize) ;
 		if ((rs = uc_malloc(size,&bp)) >= 0) {
 		    int		n = 0 ;
-		    const char	**av = (const char **) bp ;
+		    cchar	**av = (cchar **) bp ;
 
 #if	CF_DEBUGS
 		    debugprintf("opendialer_tcpnls: svc=%s\n",
@@ -263,7 +263,7 @@ ret0:
 	tcpnls¥[<af>]:<host>:<svc>[,to=<to>][,af=<af>][­<arg(s)>]
 */
 
-static int argparse_start(struct argparse *app,const char *args)
+static int argparse_start(struct argparse *app,cchar *args)
 {
 	int	rs = SR_OK ;
 	int	hostl = 0 ;
@@ -271,14 +271,14 @@ static int argparse_start(struct argparse *app,const char *args)
 	int	svcl = 0 ;
 	int	opl = 0 ;
 
-	const char	*tp, *sp ;
-	const char	*hostp = NULL ;
-	const char	*portp = NULL ;
-	const char	*svcp = NULL ;
-	const char	*opp = NULL ;
+	cchar	*tp, *sp ;
+	cchar	*hostp = NULL ;
+	cchar	*portp = NULL ;
+	cchar	*svcp = NULL ;
+	cchar	*opp = NULL ;
 
 
-	memset(app,0,sizeof(struct argparse)) ;
+	memclear(app) ;
 	app->to = -1 ;
 	app->af = -1 ;
 
@@ -289,8 +289,8 @@ static int argparse_start(struct argparse *app,const char *args)
 	    int		v ;
 	    int		kl, vl ;
 	    int		ch ;
-	    const char	*nsp ;
-	    const char	*kp, *vp ;
+	    cchar	*nsp ;
+	    cchar	*kp, *vp ;
 	    sp = (tp+1) ;
 	    if (tp[0] == ':') {
 	        hostp = args ;
