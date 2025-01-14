@@ -58,11 +58,15 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<memx.h>
 
 #include	"ucsyssv.h"
 
@@ -143,7 +147,7 @@ int getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
 	int		ec = EFAULT ;
 	if (svp && svbuf) {
 	    ec = EINVAL ;
-	    memset(svp,0,sizeof(SERVENT)) ;
+	    memclear(svp) ;
 	    if (svlen > 0) {
 	        ec = ENOSYS ;
 	    }
@@ -202,7 +206,7 @@ int getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
 	int		ec = EFAULT ;
 	if (svp && svbuf && n && p) {
 	    ec = EINVAL ;
-	    memset(svp,0,sizeof(SERVENT)) ;
+	    memclear(svp) ;
 	    if ((svlen > 0) && n[0] && p[0]) {
 	        ec = ENOSYS ;
 	    }
@@ -261,7 +265,7 @@ int getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
 	int		ec = EFAULT ;
 	if (svp && svbuf && p) {
 	    ec = EINVAL ;
-	    memset(svp,0,sizeof(SERVENT)) ;
+	    memclear(svp) ;
 	    if ((svlen > 0) && (num >= 0)) {
 	        ec = ENOSYS ;
 	    }

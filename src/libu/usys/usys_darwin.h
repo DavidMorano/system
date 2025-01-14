@@ -223,7 +223,7 @@ EXTERNC_end
 /* UCTIMEOUT begin */
 
 #ifndef	SIGTIMEOUT
-#define	SIGTIMEOUT	0		/* hack for now */
+#define	SIGTIMEOUT	SIGVTALRM		/* hack for now (or always) */
 #endif
 
 /* UCTIMEOUT begin */

@@ -253,14 +253,12 @@ static int opendev_inet(int fi,cchar *fname,int of,int to,int no)
 }
 /* end subroutine (opendev_inet) */
 
-
-static int inetargs_start(INETARGS *iap,const char *sp,int sl)
-{
+static int inetargs_start(INETARGS *iap,const char *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		cl ;
-	const char	*tp, *cp ;
+	cchar		*tp, *cp ;
 	if (sl < 0) sl = strlen(sp) ;
-	memset(iap,0,sizeof(INETARGS)) ;
+	memclear(iap) ;
 	while (sl && (sp[0] == '/')) {
 	    sp += 1 ;
 	    sl -= 1 ;

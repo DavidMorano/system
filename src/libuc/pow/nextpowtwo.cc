@@ -92,7 +92,7 @@ extern "C" {
 /* forward references */
 
 static inline int flbsi(int v) noex {
-	cint		nbit = (sizeof(int) * CHAR_BIT) ;
+	cint		nbit = (szof(int) * CHAR_BIT) ;
 	uint		uv = uint(v) ;
 	int		bn = -1 ;
 	if (v) {

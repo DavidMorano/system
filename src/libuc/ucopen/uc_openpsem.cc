@@ -96,12 +96,13 @@ int uc_openpsem(cchar *name,int oflag,mode_t operm,uint count,PSEM **rpp)
 	debugprintf("psem_open: psem_name=%s\n",name) ;
 #endif
 
-	memset(*rpp,0,sizeof(PSEM)) ;
+	memclear(*rpp) ;
 
 	repeat {
 	    rs = SR_OK ;
-	    *rpp = sem_open(name,oflag,operm,count) ;
-	    if (*rpp == SEM_FAILED) rs = (- errno) ;
+	    if ((*rpp = sem_open(name,oflag,operm,count)) == SEM_FAILED) {
+		rs = (- errno) ;
+	    }
 	    if (rs < 0) {
 	        switch (rs) {
 	        case SR_NFILE:

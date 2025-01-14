@@ -142,7 +142,7 @@ dialmgr::operator int () noex {
 
 int dialmgr::okeepalive() noex {
 	int		one = 1 ;
-	cint		osz = sizeof(int) ;
+	cint		osz = szof(int) ;
 	cint		sol = SOL_SOCKET ;
 	cint		cmd = SO_KEEPALIVE ;
 	int *const	onep = &one ;

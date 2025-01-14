@@ -305,7 +305,7 @@ int		to ;
 	int		rs ;
 	char		svcdname[MAXPATHLEN+1] ;
 
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 	sip->pr = pr ;
 	sip->prn = prn ;
 	sip->svc = svc ;

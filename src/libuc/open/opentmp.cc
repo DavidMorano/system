@@ -79,7 +79,7 @@
 
 #define	MAXLOOP		1000
 
-#define	RANDBUFLEN	int(sizeof(ulong) * 2)
+#define	RANDBUFLEN	(szof(ulong) * 2)
 
 #ifndef	CF_SPLITFNAME
 #define	CF_SPLITFNAME	0		/* used |splitfname(3uc)| */

@@ -113,9 +113,8 @@ int fifoitem_finish(fifoitem *op) noex {
 int fifoitem_ins(fifoitem *op,cvoid *sp,int sl) noex {
 	int		rs ;
 	if ((rs = fifoitem_magic(op,sp)) >= 0) {
-	    cint	esize = sizeof(fifoitem_ent) ;
-	    void	*vp{} ;
-	    if ((rs = uc_malloc(esize,&vp)) >= 0) {
+	    cint	esz = szof(fifoitem_ent) ;
+	    if (void *vp{} ; (rs = uc_malloc(esz,&vp)) >= 0) {
 	        fifoitem_ent	*ep = entp(vp) ;
 	        if ((rs = entry_start(ep,sp,sl)) >= 0) {
 		    if (op->head && op->tail) {
@@ -334,11 +333,10 @@ int fifoitem_finder(fifoitem *op,cchar *s,cmpfun_f cmpfunc,cchar **rpp) noex {
 static int entry_start(fifoitem_ent *ep,cvoid *vp,int sl) noex {
 	int		rs ;
 	cchar		*sp = ccharp(vp) ;
-	cvoid		*dp ;
 	if (sl < 0) sl = strlen(sp) ;
 	ep->next = nullptr ;
 	ep->prev = nullptr ;
-	if ((rs = uc_mallocbuf(sp,sl,&dp)) >= 0) {
+	if (cvoid *dp ; (rs = uc_mallocbuf(sp,sl,&dp)) >= 0) {
 	    ep->dp = cvoidp(dp) ;
 	    ep->dl = sl ;
 	}

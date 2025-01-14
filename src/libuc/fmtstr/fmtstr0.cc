@@ -173,7 +173,7 @@
 
 /* BUFLEN must be large enough for both large floats and binaries */
 #define	MAXPREC		41		/* maximum floating precision */
-#define	BUFLEN		MAX((310+MAXPREC+2),((8*sizeof(LONG))+1))
+#define	BUFLEN		MAX((310+MAXPREC+2),((8*szof(LONG))+1))
 #define	BLANKSIZE	16		/* number of blanks in 'blanks' */
 #define	DEBUGBUFLEN	1024
 
@@ -386,7 +386,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 	            cchar	*fp = fmt ;
 
-	            memset(fsp,0,sizeof(FMTSPEC)) ;
+	            memclear(fsp) ;
 	            fsp->width = -1 ;
 	            fsp->prec = -1 ;
 
@@ -613,11 +613,8 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	        case 's':
 	        case 't':
 	            {
-	                STRDATA	sd ;
-
-	                memset(&sd,0,sizeof(STRDATA)) ;
+	                STRDATA		sd{} ;
 	                sd.sl = -1 ;
-
 	                if (fsp->fcode == 'S') {
 	                    sd.f_wchar = TRUE ;
 	                } else {
@@ -690,17 +687,17 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                switch (lenmod) {
 	                case lenmod_longlong:
 	                    unum = (ulonglong) va_arg(ap,longlong) ;
-	                    nd = (((8*sizeof(longlong))+2)/3) ;
+	                    nd = (((8*szof(longlong))+2)/3) ;
 	                    break ;
 	                case lenmod_long:
 	                    unum = (ulonglong) va_arg(ap,ulong) ;
-	                    nd = (((8*sizeof(ulong))+2)/3) ;
+	                    nd = (((8*szof(ulong))+2)/3) ;
 	                    break ;
 	                default:
 	                    unum = (ulonglong) va_arg(ap,uint) ;
-	                    nd = (((8*sizeof(uint))+2)/3) ;
+	                    nd = (((8*szof(uint))+2)/3) ;
 	                    if (lenmod == lenmod_half) {
-	                        nd = (((8*sizeof(ushort))+2)/3) ;
+	                        nd = (((8*szof(ushort))+2)/3) ;
 	                    }
 	                    break ;
 	                } /* end switch */
@@ -742,22 +739,22 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                if ((fcode == 'p') || (fcode == 'P')) {
 	                    uintptr_t	ul = (uintptr_t) va_arg(ap,void *) ;
 	                    unum = (ulonglong) ul ;
-	                    ndigits = (2 * sizeof(void *)) ;
+	                    ndigits = (2 * szof(void *)) ;
 	                } else {
 	                    switch (lenmod) {
 	                    case lenmod_longlong:
 	                        unum = (ulonglong) va_arg(ap,ulonglong) ;
-	                        ndigits = (2 * sizeof(ulonglong)) ;
+	                        ndigits = (2 * szof(ulonglong)) ;
 	                        break ;
 	                    case lenmod_long:
 	                        unum = (ulonglong) va_arg(ap,ulong) ;
-	                        ndigits = (2 * sizeof(ulong)) ;
+	                        ndigits = (2 * szof(ulong)) ;
 	                        break ;
 	                    default:
 	                        unum = (ULONG) va_arg(ap,uint) ;
-	                        ndigits = (2 * sizeof(uint)) ;
+	                        ndigits = (2 * szof(uint)) ;
 	                        if (lenmod == lenmod_half) {
-	                            ndigits = (2 * sizeof(ushort)) ;
+	                            ndigits = (2 * szof(ushort)) ;
 	                        }
 	                        break ;
 	                    } /* end switch */
@@ -858,18 +855,18 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                switch (fsp->lenmod) {
 	                case lenmod_longlong:
 	                    unum = (ulonglong) va_arg(ap,longlong) ;
-	                    ndigits = (8 * sizeof(longlong)) ;
+	                    ndigits = (8 * szof(longlong)) ;
 	                    break ;
 	                case lenmod_long:
 	                    unum = (ulonglong) va_arg(ap,long) ;
-	                    ndigits = (8 * sizeof(long)) ;
+	                    ndigits = (8 * szof(long)) ;
 	                    break ;
 	                default:
 	                    unum = (ulonglong) va_arg(ap,int) ;
-	                    ndigits = (8 * sizeof(int)) ;
+	                    ndigits = (8 * szof(int)) ;
 	                    if (fsp->lenmod == lenmod_half) {
 	                        unum &= USHORT_MAX ;
-	                        ndigits = (8 * sizeof(short)) ;
+	                        ndigits = (8 * szof(short)) ;
 	                    }
 	                    break ;
 	                } /* end switch */
@@ -882,7 +879,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                {
 	                    bp = tbuf ;
 
-	                    if ((sizeof(LONG) > 4) && (ndigits > 32)) {
+	                    if ((szof(LONG) > 4) && (ndigits > 32)) {
 	                        for (i = 63 ; i >= 32 ; i -= 1) {
 	                            ch = digtable[(unum>>i) & 1] ;
 	                            if (f_got || (ch != '0')) {
@@ -1122,13 +1119,16 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 /* local subroutines */
 
 static int subinfo_start(SUBINFO *sip,char *ubuf,int ulen,int mode) noex {
-	memset(sip,0,sizeof(SUBINFO)) ;
-	sip->ubuf = ubuf ;
-	sip->ulen = ulen ;
-	sip->mode = mode ;
-	sip->f.mclean = (mode & FORMAT_OCLEAN) ;
-	sip->f.mnooverr = (mode & FORMAT_ONOOVERR) ;
-	return SR_OK ;
+    	int		rs = SR_FAULT ;
+	if (sip) {
+	    rs = memclear(sip) ;
+	    sip->ubuf = ubuf ;
+	    sip->ulen = ulen ;
+	    sip->mode = mode ;
+	    sip->f.mclean = (mode & FORMAT_OCLEAN) ;
+	    sip->f.mnooverr = (mode & FORMAT_ONOOVERR) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
@@ -1297,7 +1297,7 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 	        }
 	    }
 	    if (f_notnull) {
-	        int 	size = (i + 1) * sizeof(char) ;
+	        int 	size = (i + 1) * szof(char) ;
 	        char	*p ;
 	        if ((rs = uc_malloc(size,&p)) >= 0) {
 	            int		j ;

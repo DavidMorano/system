@@ -96,8 +96,7 @@ int uc_openuser(cchar *un,cchar *upath,int oflags,mode_t operms,int to) noex {
 	        if (rs >= 0) {
 		    char	fname[MAXPATHLEN+1] ;
 	            if ((rs = mkpath2(fname,pw.pw_dir,upath)) >= 0) {
-	                struct ucopeninfo	oi ;
-	                memset(&oi,0,sizeof(struct ucopeninfo)) ;
+	                struct ucopeninfo	oi{} ;
 	                oi.fname = fname ;
 	                oi.oflags = oflags ;
 	                oi.operms = operms ;

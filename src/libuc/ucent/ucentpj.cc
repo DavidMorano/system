@@ -151,9 +151,9 @@ int ucentpj::load(char *pjbuf,int pjlen,CPJE *spjp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && pjbuf && spjp) {
-	    memcpy(this,spjp,sizeof(PJE)) ;
+	    memcpy(this,spjp) ;
 	    if (storeitem si ; (rs = si.start(pjbuf,pjlen)) >= 0) {
-	        int	n ;
+	        int	n ; /* used-afterwards */
 	        void	**ptab{} ; /* used twice below */
 	        if (spjp->pj_users) {
 	            for (n = 0 ; spjp->pj_users[n] ; n += 1) ;

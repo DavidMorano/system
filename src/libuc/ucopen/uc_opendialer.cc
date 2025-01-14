@@ -233,9 +233,9 @@ cchar	**argv ;
 cchar	**envv ;
 int		to ;
 {
-	int		rs = SR_OK ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
+	int		rs = SR_FAULT ;
+	if (sip) {
+	rs = memclear(sip) ;
 	sip->prn = prn ;
 	sip->svc = svc ;
 	sip->argv = argv ;
@@ -244,7 +244,6 @@ int		to ;
 	sip->om = om ;
 	sip->to = to ;
 	sip->fd = -1 ;
-
 	{
 	    cchar	*prefix = SVCSYMPREFIX ;
 	    char	dialsym[MAXNAMELEN+1] ;
@@ -255,7 +254,7 @@ int		to ;
 		}
 	    }
 	}
-
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subinfo_start) */

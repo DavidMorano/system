@@ -54,11 +54,15 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<memx.h>
 
 #include	"ucsysnw.h"
 #include	"ucsys.h"
@@ -140,7 +144,7 @@ int getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex {
 	int		ec = EFAULT ;
 	if (nwp && nwbuf) {
 	    ec = EINVAL ;
-	    memset(nwp,0,sizeof(NETENT)) ;
+	    memclear(nwp) ;
 	    if (nwlen > 0) {
 	        ec = ENOSYS ;
 	    }
@@ -199,7 +203,7 @@ int getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
 	int		ec = EFAULT ;
 	if (nwp && nwbuf && n) {
 	    ec = EINVAL ;
-	    memset(nwp,0,sizeof(NETENT)) ;
+	    memclear(nwp) ;
 	    if ((nwlen > 0) && n[0]) {
 	        ec = ENOSYS ;
 	    }
@@ -257,7 +261,7 @@ int getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t) noex {
 	int		ec = EFAULT ;
 	if (nwp && nwbuf) {
 	    ec = EINVAL ;
-	    memset(nwp,0,sizeof(NETENT)) ;
+	    memclear(nwp) ;
 	    if ((nwlen > 0) && (t >= 0)) {
 	        ec = ENOSYS ;
 	    }

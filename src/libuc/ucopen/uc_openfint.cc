@@ -264,13 +264,13 @@ cchar	**argv ;
 cchar	**envv ;
 int		to ;
 {
-	struct ustat	sb ;
+	USTAT		sb ;
 	int		rs = SR_OK ;
 	int		pl ;
 	cchar	*ccp ;
 	char		svcdname[MAXPATHLEN+1] ;
 
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 	sip->pr = pr ;
 	sip->dn = dn ;
 	sip->bn = bn ;

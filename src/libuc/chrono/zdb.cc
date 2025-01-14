@@ -18,6 +18,10 @@
 
 /*******************************************************************************
  
+  	Object:
+	ndb
+
+	Description:
 	This object deals with the mangement of the time-zone database.
 
 *******************************************************************************/
@@ -194,7 +198,7 @@ static constexpr ZDB	zones[] = {
 	{ nullptr, 0, 0 }
 } ;
 
-#define	ZDB_NZONES	((sizeof(zones) / sizeof(ZDB)) - 1)
+#define	ZDB_NZONES	((szof(zones) / szof(ZDB)) - 1)
 
 
 /* exported variables */
@@ -351,7 +355,7 @@ static int findname(cchar *sp,int sl) noex {
 	ZDB		ke, *rp ;
 	nulstr		s ;
 	cint		n = ZDB_NZONES ;
-	cint		size = sizeof(struct zdb_e) ;
+	cint		size = szof(struct zdb_e) ;
 	int		rs ;
 	int		rs1 ;
 	int		i = 0 ;

@@ -21,6 +21,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<memx.h>
 #include	<usys.h>		/* <- auxillary OS support */
 #include	<utimeout.h>
 #include	<ulogerror.h>
@@ -33,46 +34,6 @@
 #include	<strtox.h>
 #include	<stdintx.h>
 
-
-#ifndef	SUBROUTINE_MEMCLEAR
-#define	SUBROUTINE_MEMCLEAR
-EXTERNC_begin
-extern int memclear(void *,size_t) noex ;
-EXTERNC_end
-#endif /* SUBROUTINE_MEMCLEAR */
-
-#ifndef	TEMPLATE_MEMCLEAR
-#define	TEMPLATE_MEMCLEAR
-#ifdef	__cplusplus
-template<typename T>
-inline int memclear(T *op) noex {
-	csize	osz = szof(T) ;
-	return memclear(op,osz) ;
-}
-#endif /* __cplusplus */
-#endif /* TEMPLATE_MEMCLEAR */
-
-#ifndef	TEMPLATE_MEMCPY
-#define	TEMPLATE_MEMCPY
-#ifdef	__cplusplus
-template<typename T>
-inline void *memcpy(T *dp,void *sp) noex {
-	csize	dsz = szof(T) ;
-	return memcpy(dp,sp,dsz) ;
-}
-#endif /* __cplusplus */
-#endif /* TEMPLATE_MEMCPY */
-
-#ifndef	SUBROUTINE_CSTRLEN
-#define	SUBROUTINE_CSTRLEN
-#ifdef	__cplusplus
-constexpr int cstrlen(cchar *sp) noex {
-    	cchar		*cp = sp ;
-	while (*cp++) ;
-	return (cp - sp) ;
-}
-#endif /* __cplusplus */
-#endif /* SUBROUTINE_CSTRLEN */
 
 #ifndef	SUBROUTINE_CSTRNLEN
 #define	SUBROUTINE_CSTRNLEN

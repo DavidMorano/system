@@ -45,11 +45,15 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<memx.h>
 
 #include	"ucsyspw.h"
 
@@ -128,7 +132,7 @@ int getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
 	int		ec = EFAULT ;
 	if (pwp && pwbuf) {
 	    ec = EINVAL ;
-	    memset(pwp,0,sizeof(PASSWD)) ;
+	    memclear(pwp) ;
 	    if (pwlen > 0) {
 	        ec = ENOSYS ;
 	    }
@@ -190,7 +194,7 @@ int getpwnam_rp(PASSWD *pwp,char *pwbuf,int,cchar *n) noex {
 	int		ec = EFAULT ;
 	if (pwp && pwbuf && n) {
 	    ec = EINVAL ;
-	    memset(pwp,0,sizeof(PASSWD)) ;
+	    memclear(pwp) ;
 	    if ((pwlen > 0) && n[0]) {
 	        ec = ENOSYS ;
 	    }
@@ -252,7 +256,7 @@ int getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t) noex {
 	int		ec = EFAULT ;
 	if (pwp && pwbuf) {
 	    ec = EINVAL ;
-	    memset(pwp,0,sizeof(PASSWD)) ;
+	    memclear(pwp) ;
 	    if (pwlen > 0) {
 	        ec = ENOSYS ;
 	    }

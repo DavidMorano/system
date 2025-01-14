@@ -816,7 +816,7 @@ static int waitready(int fd,int oflags,int timeout) noex {
 	    POLLFD	polls[NPOLLS] = {} ;
 	    time_t	ti_timeout ;
 	    time_t	daytime = time(nullptr) ;
-	    int		sz = NPOLLS * sizeof(POLLFD) ;
+	    int		sz = NPOLLS * szof(POLLFD) ;
 	    int		pollto = ((timeout > 0) ? POLL_INTMULT : 0) ;
 
 	    polls[0].fd = fd ;

@@ -100,7 +100,7 @@ int getseed(int seed) noex {
 	{
 	    hrtime_t	h = gethrtime() ;
 	    rv += (uint) h ;
-	    h >>= sizeof(uint) ;
+	    h >>= szof(uint) ;
 	    rv += (uint) h ;
 	}
 #endif /* CF_GETHRTIME */

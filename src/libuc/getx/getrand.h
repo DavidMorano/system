@@ -40,15 +40,15 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 static inline int getrand(uint *p, int n = 1) noex {
-	cint	sz = sizeof(uint) ;
+	cint	sz = szof(uint) ;
 	return getrand(p,(sz * n)) ;
 }
 static inline int getrand(ulong *p,int n = 1) noex {
-	cint	sz = sizeof(ulong) ;
+	cint	sz = szof(ulong) ;
 	return getrand(p,(sz * n)) ;
 }
 static inline int getrand(longlong *p,int n = 1) noex {
-	cint	sz = sizeof(ulonglong) ;
+	cint	sz = szof(ulonglong) ;
 	return getrand(p,(sz * n)) ;
 }
 

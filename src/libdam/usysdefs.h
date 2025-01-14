@@ -37,12 +37,14 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/utsname.h>
-#include	<unistd.h>
+#include	<sys/param.h>
+#include	<sys/stat.h>		/* |S_IS{x}| + S_IF{x}| */
+#include	<limits.h>		/* |{xxx}_MIN| + |{xxx}_MAX| */
+#include	<signal.h>		/* |SIG{x}| */
+#include	<unistd.h>		/* |_SC_{x}| + |_PC_{x}| */
+#include	<fcntl.h>		/* |O_{x}| */
 #include	<netdb.h>		/* |NI_MAX{x}| */
-#include	<fcntl.h>
-#include	<limits.h>		/* |{xxx}_MAX| */
 
 
 /* extra "open" flags */
@@ -56,19 +58,24 @@ enum extraopenflags {
 
 /* missing UNIX® signals */
 enum signalmissings {
-	signalmissing_poll = 1000,
-	signalmissing_pwr,
+	signalmissing_start = 1000,
+	signalmissing_pwr = 1000,
 	signalmissing_cancel,
 	signalmissing_lost,
-	signalmissing_xfsz,
 	signalmissing_overlast
 } ;
 
 #ifndef	SIGCLD
 #define	SIGCLD		SIGCHLD
 #endif
+#ifndef	SIGCHILD
+#define	SIGCHILD	SIGCHLD
+#endif
+#ifndef	SIGALARM
+#define	SIGALARM	SIGALRM
+#endif
 #ifndef	SIGPOLL
-#define	SIGPOLL		signalmissing_poll
+#define	SIGPOLL		SIGIO
 #endif
 #ifndef	SIGPWR
 #define	SIGPWR		signalmissing_pwr
@@ -78,9 +85,6 @@ enum signalmissings {
 #endif
 #ifndef	SIGLOST
 #define	SIGLOST		signalmissing_lost
-#endif
-#ifndef	SIGXFSZ
-#define	SIGXFSZ		signalmissing_xfsz
 #endif
 
 /* missing file open-flags */

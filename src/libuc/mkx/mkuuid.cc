@@ -82,7 +82,7 @@ static int mkuunode(uuid_dat *,uint *) noex ;
 /* exported subroutines */
 
 int mkuuid(uuid_dat *up,int) noex {
-	cint		rsize = (NWORDS * sizeof(uint)) ;
+	cint		rsize = (NWORDS * szof(uint)) ;
 	uint		rwords[NWORDS+1] ;
 	int		rs ;
 	memclear(up) ;

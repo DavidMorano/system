@@ -45,11 +45,15 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<memx.h>
 
 #include	"ucsyssp.h"
 
@@ -103,7 +107,7 @@ int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 	int	ec = EFAULT ;
 	if (spp && spbuf) {
 	    ec = EINVAL ;
-	    memset(spp,0,sizeof(SPWD)) ;
+	    memclear(spp) ;
 	    if (splen > 0) {
 	        ec = ENOSYS ;
 	    }
@@ -137,7 +141,7 @@ int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 	int	ec = EFAULT ;
 	if (spp && spbuf && n) {
 	    ec = EINVAL ;
-	    memset(spp,0,sizeof(SPWD)) ;
+	    memclear(spp) ;
 	    if ((splen > 0) && n[0]) {
 	        ec = ENOSYS ;
 	    }
@@ -154,7 +158,7 @@ int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 	int	ec = EFAULT ;
 	if (spp && spbuf) {
 	    ec = EINVAL ;
-	    memset(spp,0,sizeof(SPWD)) ;
+	    memclear(spp) ;
 	    if (splen > 0) {
 	        ec = ENOSYS ;
 	    }
@@ -167,7 +171,7 @@ int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 	int	ec = EFAULT ;
 	if (spp && spbuf && n) {
 	    ec = EINVAL ;
-	    memset(spp,0,sizeof(SPWD)) ;
+	    memclear(spp) ;
 	    if ((splen > 0) && n[0]) {
 	        ec = ENOSYS ;
 	    }

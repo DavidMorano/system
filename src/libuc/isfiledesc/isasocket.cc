@@ -78,7 +78,7 @@ int isasocket(int fd) noex {
 	cint		slev = SOL_SOCKET ;
 	cint		scmd = SO_TYPE ;
 	int		rs ;
-	int		len = sizeof(int) ;
+	int		len = szof(int) ;
 	int		val = 0 ;
 	int		f = false ;
 	if ((rs = u_getsockopt(fd,slev,scmd,&val,&len)) >= 0) {

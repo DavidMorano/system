@@ -810,7 +810,7 @@ int utmpacc::scan(time_t dt) noex {
 	int		rs = SR_OK ;
 	int		nu = 0 ;
 	int		ne = 0 ;
-	memclear(nusers,(sizeof(UTMPACC_ITEM) * utxproctype_overlast)) ;
+	memclear(nusers,(szof(UTMPACC_ITEM) * utxproctype_overlast)) ;
 	setutxent() ;
 	while ((up = getutxent()) != nullptr) {
 	    int		pt = -1 ;

@@ -134,7 +134,7 @@ int ucentsv::load(char *rbuf,int rlen,const ucentsv *cprp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && rbuf && cprp) {
-	    memcpy(this,cprp,sizeof(ucentsv)) ;
+	    memcpy(this,cprp) ;
 	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) {
 	        if (cprp->s_aliases) {
 	            int		n ; /* used-afterwards */

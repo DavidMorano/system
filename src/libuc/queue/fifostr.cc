@@ -111,12 +111,12 @@ int fifostr_add(fifostr *op,cchar *sp,int sl) noex {
 	    fifostr_ent		*ep = nullptr ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    {
-	        cint	sz = sizeof(fifostr_ent) + (sl + 1) ;
+	        cint	sz = szof(fifostr_ent) + (sl + 1) ;
 	        if ((rs = uc_libmalloc(sz,&ep)) >= 0) {
 	            ep->slen = sl ;
 	            {
-	                char	*bp = reinterpret_cast<charp>(ep) ;
-	                bp += sizeof(fifostr_ent) ;
+	                char	*bp = cast_reinterpret<charp>(ep) ;
+	                bp += szof(fifostr_ent) ;
 	                strwcpy(bp,sp,sl) ;	/* <- ok: see 'sz' above */
 	            }
 	            ep->next = nullptr ;
@@ -147,8 +147,8 @@ int fifostr_headread(fifostr *op,char *rbuf,int rlen) noex {
                 fifostr_ent	*ep = op->head ;
                 sl = ep->slen ;
                 if (rbuf) {
-                    cchar	*sp = reinterpret_cast<charp>(ep) ;
-                    sp += sizeof(fifostr_ent) ;
+                    cchar	*sp = cast_reinterpret<charp>(ep) ;
+                    sp += szof(fifostr_ent) ;
                     rs = snwcpy(rbuf,rlen,sp,sl) ;
                 }
             }
@@ -185,8 +185,8 @@ int fifostr_entread(fifostr *op,char *rbuf,int rlen,int n) noex {
                     if (ep) {
                         sl = ep->slen ;
                         if (rbuf) {
-                            cchar   *sp = reinterpret_cast<charp>(ep) ;
-                            sp += sizeof(fifostr_ent) ;
+                            cchar   *sp = cast_reinterpret<charp>(ep) ;
+                            sp += szof(fifostr_ent) ;
                             rs = snwcpy(rbuf,rlen,sp,sl) ;
                         } else {
                             rs = SR_OK ;
@@ -230,8 +230,8 @@ int fifostr_rem(fifostr *op,char *rbuf,int rlen) noex {
                 fifostr_ent *ep = op->head ;
                 sl = ep->slen ;
                 if (rbuf) {
-                    cchar   *sp = reinterpret_cast<charp>(ep) ;
-                    sp += sizeof(fifostr_ent) ;
+                    cchar   *sp = cast_reinterpret<charp>(ep) ;
+                    sp += szof(fifostr_ent) ;
                     rs = snwcpy(rbuf,rlen,sp,sl) ;
                 }
                 if (rs >= 0) {
@@ -290,9 +290,9 @@ int fifostr_curenum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
                 if (ep != nullptr) {
                     sl = ep->slen ;
                     if (rbuf != nullptr) {
-                        cchar       *sp = reinterpret_cast<charp>(ep) ;
+                        cchar       *sp = cast_reinterpret<charp>(ep) ;
                         sp = charp(ep) ;
-                        sp += sizeof(fifostr_ent) ;
+                        sp += szof(fifostr_ent) ;
                         rs = snwcpy(rbuf,rlen,sp,sl) ;
                     }
                 } else {

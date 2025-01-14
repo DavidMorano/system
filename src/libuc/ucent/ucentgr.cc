@@ -30,11 +30,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<utypealiases.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vechand.h>
@@ -143,7 +142,7 @@ int ucentgr::load(char *grbuf,int grlen,CGRE *sgrp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && grbuf && sgrp) {
-	    memcpy(this,sgrp,sizeof(ucentgr)) ;
+	    memcpy(this,sgrp) ;
 	    if (storeitem si ; (rs = si.start(grbuf,grlen)) >= 0) {
 	        if (sgrp->gr_mem) {
 	            int		n ; /* used-afterwards */

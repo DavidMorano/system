@@ -147,14 +147,14 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 	if (this && uabuf && suap) {
-	    memcpy(this,suap,sizeof(userattr)) ;
+	    memcpy(this,suap) ;
 	    if (storeitem si ; (rs = si.start(uabuf,ualen)) >= 0) {
 	        if (suap->attr) {
-	            cint	ksize = szof(kva_t) ;
+	            cint	ksz = szof(kva_t) ;
 	            cint	al = szof(void *) ;
 	            cint	n = suap->attr->length ;
 	            void	*p{} ;
-	            if ((rs = si.block(ksize,al,&p)) >= 0) {
+	            if ((rs = si.block(ksz,al,&p)) >= 0) {
 	                kva_t	*kvap = (kva_t *) p ;
 	                int	dsize = (n * szof(kv_t)) ;
 	                attr = kvap ;
@@ -309,10 +309,10 @@ static int userattrent_parseattr(UA *uap,SI *sip,cc *sp,int sl) noex {
 /* end subroutine (userattrent_parseattr) */
 
 static int userattrent_parseattrload(UA *uap,SI *sip,vecstr *alp,int n) noex {
-	cint		ksize = szof(kva_t) ;
+	cint		ksz = szof(kva_t) ;
 	cint		al = szof(void *) ;
 	int		rs ;
-	if (void *p ; (rs = sip->block(ksize,al,&p)) >= 0) {
+	if (void *p ; (rs = sip->block(ksz,al,&p)) >= 0) {
 	    kva_t	*kvap = (kva_t *) p ;
 	    int		dsize = (n*szof(kv_t)) ;
 	    uap->attr = kvap ;

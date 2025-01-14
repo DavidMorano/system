@@ -167,7 +167,7 @@ int ucentnw::load(char *rbuf,int rlen,const ucentnw *cprp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && rbuf && cprp) {
-	    memcpy(this,cprp,sizeof(ucentnw)) ;
+	    memcpy(this,cprp) ;
 	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) {
 	        if (cprp->n_aliases) {
 	            int		n ; /* used-afterwards */
@@ -275,7 +275,7 @@ static int ucentnw_parseaddr(ucentnw *op,cchar *sp,int sl) noex {
 	char	abuf[inetxaddrlen+1] ;
 	if ((rs = inetnetpton(abuf,alen,af,sp,sl)) >= 0) {
 	    in4_addr_t	a ;
-	    memcpy(&a,abuf,inet4addrlen) ;
+	    memcpy(&a,abuf) ;
 	    op->n_net = ntohl(a) ;	/* |n_net| is machine-byte-order */
 	}
 	return rs ;

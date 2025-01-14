@@ -89,7 +89,7 @@ int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 	int	ec = EFAULT ;
 	if (spp && spbuf) {
 	    ec = EINVAL ;
-	    memset(spp,0,sizeof(SPWD)) ;
+	    memclear(spp) ;
 	    if (splen > 0) {
 	        ec = ENOENT ;
 	    }
@@ -123,7 +123,7 @@ int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 	int	ec = EFAULT ;
 	if (spp && spbuf && n) {
 	    ec = EINVAL ;
-	    memset(spp,0,sizeof(SPWD)) ;
+	    memclear(spp) ;
 	    if ((splen > 0) && n[0]) {
 	        ec = ENOENT ;
 	    }
@@ -154,7 +154,7 @@ int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 	int	ec = EFAULT ;
 	if (spp && spbuf) {
 	    ec = EINVAL ;
-	    memset(spp,0,sizeof(SPWD)) ;
+	    memclear(spp) ;
 	    if (splen > 0) {
 	        ec = ENOENT ;
 	    }
@@ -167,7 +167,7 @@ int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 	int	ec = EFAULT ;
 	if (spp && spbuf && n) {
 	    ec = EINVAL ;
-	    memset(spp,0,sizeof(SPWD)) ;
+	    memclear(spp) ;
 	    if ((splen > 0) && n[0]) {
 	        ec = ENOENT ;
 	    }

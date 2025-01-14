@@ -87,7 +87,7 @@ constexpr int		znamelen = DATE_ZNAMELEN ;
 
 /* exported subroutines */
 
-int date_start(DATE *dp,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
+int date_start(date *dp,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 	int		rs = SR_FAULT ;
 	if (dp && zbuf) {
 	    memclear(dp) ;
@@ -100,7 +100,7 @@ int date_start(DATE *dp,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 }
 /* end subroutine (date_start) */
 
-int date_finish(DATE *dp) noex {
+int date_finish(date *dp) noex {
 	int		rs = SR_FAULT ;
 	if (dp) {
 	    dp->time = 0 ;
@@ -109,16 +109,16 @@ int date_finish(DATE *dp) noex {
 }
 /* end subroutine (date_finish) */
 
-int date_copy(DATE *dp,DATE *d2p) noex {
+int date_copy(date *dp,date *d2p) noex {
 	int		rs = SR_FAULT ;
 	if (dp && d2p) {
-	    memcpy(dp,d2p,sizeof(DATE)) ;
+	    memcpy(dp,d2p) ;
 	}
 	return rs ;
 }
 /* end subroutine (date_copy) */
 
-int date_gettime(DATE *dp,time_t *tp) noex {
+int date_gettime(date *dp,time_t *tp) noex {
 	int		rs = SR_FAULT ;
 	if (dp && tp) {
 	    *tp = dp->time ;
@@ -127,7 +127,7 @@ int date_gettime(DATE *dp,time_t *tp) noex {
 }
 /* end subroutine (date_gettime) */
 
-int date_getzoff(DATE *dp,int *zop) noex {
+int date_getzoff(date *dp,int *zop) noex {
 	int		rs = SR_FAULT ;
 	if (dp && zop) {
 	    *zop = dp->zoff ;
@@ -136,7 +136,7 @@ int date_getzoff(DATE *dp,int *zop) noex {
 }
 /* end subroutine (date_getzoff) */
 
-int date_getisdst(DATE *dp,int *dstp) noex {
+int date_getisdst(date *dp,int *dstp) noex {
 	int		rs = SR_FAULT ;
 	if (dp && dstp) {
 	    *dstp = int(dp->isdst) ;
@@ -145,7 +145,7 @@ int date_getisdst(DATE *dp,int *dstp) noex {
 }
 /* end subroutine (date_getisdst) */
 
-int date_getzname(DATE *dp,char *zbuf,int zlen) noex {
+int date_getzname(date *dp,char *zbuf,int zlen) noex {
 	int		rs = SR_FAULT ;
 	if (dp && zbuf) {
 	    rs = snwcpy(zbuf,zlen,dp->zname,znamelen) ;

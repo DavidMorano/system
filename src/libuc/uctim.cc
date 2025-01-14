@@ -319,7 +319,7 @@ int uctim::cmdsub(cmdsubs cmd,int id,uctimarg *uap) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
 }
-/* end subroutine (uctim::cmdtimeout) */
+/* end subroutine (uctim::cmdisub) */
 
 int uctim::init() noex {
 	int		rs = SR_NXIO ;
@@ -402,7 +402,7 @@ int uctim::fini() noex {
 }
 /* end subroutine (uctim::fini) */
 
-int uctim::cmdset(callback *valp) noex {
+int uctim::cmdset(int id,uctimarg *argp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (valp->metf) {
@@ -434,7 +434,7 @@ int uctim::cmdset(callback *valp) noex {
 }
 /* end subroutine (uctim::cmdset) */
 
-int uctim::cmdcancel(callback *valp) noex {
+int uctim::cmdcancel(int id,uctimarg *argp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mx.lockbegin) >= 0) {
@@ -562,8 +562,9 @@ int uctim::workready() noex {
 int uctim::workbegin() noex {
 	int		rs = SR_OK ;
 	if (! fl.workready) {
+	    cint	vn = 0 ;
 	    cint	vo = voents ;
-	    if ((rs = vechand_start(&ents,0,vo)) >= 0) {
+	    if ((rs = vechand_start(&ents,vn,vo)) >= 0) {
 	        if ((rs = priqbegin()) >= 0) {
 	            if ((rs = sigbegin()) >= 0) {
 	                if ((rs = timerbegin()) >= 0) {
@@ -1131,8 +1132,8 @@ static int vourcmp(cvoid *v1pp,cvoid *v2pp) noex {
 	const TIMEOUT	**e2pp = (const TIMEOUT **) v2pp ;
 	int		rc ;
 	{
-	    TIMEOUT	*e1p = (TIMEOUT *) *e1pp ;
-	    TIMEOUT	*e2p = (TIMEOUT *) *e2pp ;
+	    const TIMEOUT	*e1p = (TIMEOUT *) *e1pp ;
+	    const TIMEOUT	*e2p = (TIMEOUT *) *e2pp ;
 	    rc = ourcmp(e1p,e2p) ;
 	}
 	return rc ;

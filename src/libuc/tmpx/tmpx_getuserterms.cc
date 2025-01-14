@@ -188,7 +188,7 @@ subinfo::operator int () noex {
 
 int subinfo::entget() noex {
 	vecobj		elist, *elp = &elist ;
-	cint		esz = sizeof(terment) ;
+	cint		esz = szof(terment) ;
 	cint		vne = 10 ;
 	cint		vo = VECOBJ_OSORTED ;
 	int		rs ;

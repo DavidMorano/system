@@ -152,8 +152,8 @@ namespace {
 	cchar	*p = sysword.w_blanks ;
     } ; /* end struct (blanker) */
     struct zeroer {
-	cint	l = sizeof(int) ;
-	cchar	p[sizeof(int)] = {} ;
+	cint	l = szof(int) ;
+	cchar	p[szof(int)] = {} ;
     } ; /* end struct (zeroer) */
 }
 
@@ -197,7 +197,7 @@ int filer_writefill(filer *op,cchar *sp,int sl) noex {
 	if ((rs = filer_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = (strlen(sp) + 1) ;
 	    if ((rs = filer_write(op,sp,sl)) >= 0) {
-	        cint	asize = sizeof(int) ;
+	        cint	asize = szof(int) ;
 	        wlen = rs ;
 	        rs = filer_writealign(op,asize) ;
 	        wlen += rs ;

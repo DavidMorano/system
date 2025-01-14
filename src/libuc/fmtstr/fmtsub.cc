@@ -66,7 +66,7 @@
 
 /* BUFLEN must be large enough for both large floats and binaries */
 #define	MAXPREC		41		/* maximum floating precision */
-#define	BUFLEN		MAX((310+MAXPREC+2),((8*sizeof(longlong))+1))
+#define	BUFLEN		MAX((310+MAXPREC+2),((8*szof(longlong))+1))
 
 #ifndef	NULLSTR
 #define	NULLSTR		"(null)"
@@ -275,7 +275,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	        }
 	    }
 	    if (f_notnull) {
-	        cint 	sz = (i + 1) * sizeof(char) ;
+	        cint 	sz = (i + 1) * szof(char) ;
 	        char	*p ;
 	        if ((rs = uc_malloc(sz,&p)) >= 0) {
 	            int		j ;

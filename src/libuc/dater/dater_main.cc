@@ -163,7 +163,7 @@ int dater_start(dater *dp,TIMEB *nowp,cchar *znp,int znl) noex {
 int dater_startcopy(dater *dp,dater *d2p) noex {
 	int		rs ;
 	if ((rs = dater_magic(d2p,dp)) >= 0) {
-	    memcpy(dp,d2p,sizeof(dater)) ;
+	    memcpy(dp,d2p) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -180,10 +180,10 @@ int dater_finish(dater *dp) noex {
 /* end subroutine (dater_finish) */
 
 /* copy one dater to another */
-int dater_setcopy(dater *dp,DATER *d2p) noex {
+int dater_setcopy(dater *dp,dater *d2p) noex {
 	int		rs ;
 	if ((rs = dater_magic(d2p,dp)) >= 0) {
-	    memcpy(dp,d2p,sizeof(DATER)) ;
+	    memcpy(dp,d2p) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -657,7 +657,7 @@ int dater_getzinfo(dater *dp,dater_zinfo *zip) noex {
 /* end subroutine (dater_getzinfo) */
 
 /* get the difference in seconds between two daters */
-int dater_diff(dater *dp,DATER *d2p,time_t *rp) noex {
+int dater_diff(dater *dp,dater *d2p,time_t *rp) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,d2p)) >= 0) {
 	    if (rp) {

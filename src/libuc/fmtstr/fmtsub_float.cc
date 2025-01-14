@@ -53,7 +53,7 @@
 
 /* BUFLEN must be large enough for both large floats and binaries */
 #define	MAXPREC		41		/* maximum floating precision */
-#define	BUFLEN		MAX((310+MAXPREC+2),((8*sizeof(longlong))+1))
+#define	BUFLEN		MAX((310+MAXPREC+2),((8*szof(longlong))+1))
 
 #define	DOFLOAT_STAGELEN	(310+MAXPREC+2)
 #define	DOFLOAT_DEFPREC		MIN(4,MAXPREC)

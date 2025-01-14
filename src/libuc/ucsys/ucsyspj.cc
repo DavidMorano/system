@@ -47,11 +47,15 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<memx.h>
 
 #include	"ucsyspj.h"
 
@@ -106,7 +110,7 @@ int getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
-            memset(pjp,0,sizeof(PROJECT)) ;
+            memclear(pjp) ;
             if (pjlen > 0) {
                 ec = ENOSYS ;
             }
@@ -136,7 +140,7 @@ int getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;
-            memset(pjp,0,sizeof(PROJECT)) ;
+            memclear(pjp) ;
             if ((pjlen > 0) && n[0]) {
                 ec = ENOSYS ;
             }
@@ -166,7 +170,7 @@ int getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
-            memset(pjp,0,sizeof(PROJECT)) ;
+            memclear(pjp) ;
             if (pjlen > 0) {
                 ec = ENOSYS ;
             }
@@ -196,7 +200,7 @@ int getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;
-            memset(pjp,0,sizeof(PROJECT)) ;
+            memclear(pjp) ;
             if ((pjlen > 0) && n[0]) {
                 ec = ENOSYS ;
             }
@@ -241,7 +245,7 @@ int getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
-            memset(pjp,0,sizeof(PROJECT)) ;
+            memclear(pjp) ;
             if (pjlen > 0) {
                 ec = ENOSYS ;
             }
@@ -254,7 +258,7 @@ int getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;
-            memset(pjp,0,sizeof(PROJECT)) ;
+            memclear(pjp) ;
             if ((pjlen > 0) && n[0]) {
                 ec = ENOSYS ;
             }
@@ -267,7 +271,7 @@ int getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
-            memset(pjp,0,sizeof(PROJECT)) ;
+            memclear(pjp) ;
             if (pjlen > 0) {
                 ec = ENOSYS ;
             }
@@ -280,7 +284,7 @@ int getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;
-            memset(pjp,0,sizeof(PROJECT)) ;
+            memclear(pjp) ;
             if ((pjlen > 0) && n[0]) {
                 ec = ENOSYS ;
             }

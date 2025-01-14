@@ -17,11 +17,14 @@
 
 /*******************************************************************************
 
-        This is a container object that implements FIFO access.  It is
-        interlocked for multi-thread use.
+  	Object:
+	ciq
 
-	Usage note:
+	Description:
+	This is a container object that implements FIFO access.  It
+	is interlocked for multi-thread use.
 
+	Notes:
 	Note that we delete all of the entries upon the object
 	itself being freed.  If the entries are not opaque (as they
 	usually are not), this will result in lost memory (memory
@@ -191,8 +194,8 @@ int ciq_ins(ciq *op,void *vp) noex {
 	        pq_ent	*pep{} ;
 	        cint	rse = SR_EMPTY ;
 	        if ((rs = pq_remtail(op->freep,&pep)) == rse) {
-		    cint	esize = sizeof(ciq_ent) ;
-	            rs = uc_libmalloc(esize,&pep) ;
+		    cint	esz = szof(ciq_ent) ;
+	            rs = uc_libmalloc(esz,&pep) ;
 	        }
 	        if (rs >= 0) {
 	            ciq_ent	*cep = (ciq_ent *) pep ;
@@ -213,7 +216,7 @@ int ciq_rem(ciq *op,void *vrp) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = ciq_magic(op,vrp)) >= 0) {
-	    void	**vpp = (void **) vrp ;
+	    void	**vpp = voidpp(vrp) ;
 	    if ((rs = ptm_lock(op->mxp)) >= 0) {
 	        pq_ent	*pep{} ;
 	        if ((rs = pq_rem(op->fifop,&pep)) >= 0) {

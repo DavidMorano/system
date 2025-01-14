@@ -158,7 +158,7 @@
 #define	DATABUFLEN	30
 #define	HOSTBUFLEN	(8 * MAXHOSTNAMELEN)
 #define	ENVBUFLEN	(MAXHOSTNAMELEN + 40)
-#define	ENODELEN	(NODENAMELEN+sizeof(VARNODE))
+#define	ENODELEN	(NODENAMELEN+szof(VARNODE))
 
 #define	TO_SYNC		40
 #define	TO_READ		40
@@ -381,7 +381,7 @@ int dialcprog(cchar *pr,cchar *node,cchar *fname,mainv av,mainv ev,
 	debugprintf("dialcprog: ent pr=%s\n", pr) ;
 #endif
 
-	memset(&di,0,sizeof(struct dialinfo)) ;
+	memclear(&di) ;
 	di.pr = pr ;
 	di.rhost = node ;
 
@@ -867,8 +867,10 @@ int dialcprog(cchar *pr,cchar *node,cchar *fname,mainv av,mainv ev,
 	    int		size ;
 	    cchar	**nev = NULL ;
 	    if (ev == NULL) ev = (cchar **) environ ;
-	    if (ev != NULL) for (n = 0 ; ev[n] != NULL ; n += 1) ;
-	    size = (n+2) * sizeof(cchar *) ;
+	    if (ev != NULL) {
+		for (n = 0 ; ev[n] != NULL ; n += 1) ;
+	    }
+	    size = (n+2) * szof(cchar *) ;
 	    if ((rs = uc_malloc(size,&nev)) >= 0) {
 	        int	i ;
 	        int	j = 0 ;
@@ -1160,7 +1162,7 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 
 /* accept a connection on our primary listen socket */
 
-	    dummylen = sizeof(SOCKADDRESS) ;
+	    dummylen = szof(SOCKADDRESS) ;
 	    rs = uc_accepte(afd,&dummy,&dummylen,TO_ACCEPT) ;
 	    s = rs ;
 
@@ -1180,7 +1182,7 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 
 	    if (dip->f.errchan) {
 
-	        dummylen = sizeof(SOCKADDRESS) ;
+	        dummylen = szof(SOCKADDRESS) ;
 	        rs = uc_accepte(afd2,&dummy,&dummylen,TO_ACCEPT) ;
 	        s = rs ;
 	        if (rs < 0)
@@ -1200,7 +1202,7 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 
 	if (rs >= 0)
 	    rs = u_setsockopt(fd,SOL_SOCKET,SO_KEEPALIVE,
-	        (CONST char *) &one,sizeof(int)) ;
+	        (CONST char *) &one,szof(int)) ;
 
 #if	CF_DEBUGS
 	debugprintf("dialremote: u_setsockopt() rs=%d\n",rs) ;
@@ -1512,7 +1514,7 @@ static int mklisten_bind(DIALINFO *dip,DIALINFO_SI *sip,int s)
 	{
 	    sap = (struct sockaddr *) &sip->sa ;
 	    if ((rs = u_bind(s,sap,sip->salen)) >= 0) {
-	        sip->salen = sizeof(SOCKADDRESS) ;
+	        sip->salen = szof(SOCKADDRESS) ;
 	        rs = u_getsockname(s,sap,&sip->salen) ;
 	    }
 	}
@@ -1692,9 +1694,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 /* what about light-weight sockets? */
 
 	if ((rs >= 0) && (! (dip->opts & DIALOPT_NOLIGHT))) {
-	    struct dialcprogmsg_light	m5 ;
-
-	    memset(&m5,0,sizeof(struct dialcprogmsg_light)) ;
+	    struct dialcprogmsg_light	m5{} ;
 	    m5.salen1 = dip->sout.salen ;
 	    m5.salen2 = dip->serr.salen ;
 
@@ -1703,7 +1703,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	    if (dip->f.errchan) {
 	        memcpy(&m5.saerr,&dip->serr.sa,dip->serr.salen) ;
 	    } else {
-	        memset(&m5.saerr,0,sizeof(SOCKADDRESS)) ;
+	        m5.saerr = {} ;
 	    }
 
 	    cl = dialcprogmsg_light(buf,BUFLEN,0,&m5) ;
@@ -1727,9 +1727,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 /* indicate the end of all data records */
 
 	if (rs >= 0) {
-	    struct dialcprogmsg_end	m0 ;
-
-	    memset(&m0,0,sizeof(struct dialcprogmsg_end)) ;
+	    struct dialcprogmsg_end	m0{} ;
 	    m0.flags = dip->flags ;
 	    m0.opts = dip->opts ;
 
@@ -1923,7 +1921,7 @@ cchar	fname[] ;
 	int		rs ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
-	memset(op,0,sizeof(BESTNODE)) ;
+	memclear(op) ;
 
 	mkpath2(tmpfname,pr,fname) ;
 

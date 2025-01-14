@@ -61,14 +61,14 @@ uint hash_hsieh(cchar *data,int len) noex {
         hash  += get16bits (data);
         tmp    = (get16bits (data+2) << 11) ^ hash;
         hash   = (hash << 16) ^ tmp;
-        data  += 2*sizeof (uint16_t);
+        data  += 2 * szof(uint16_t) ;
         hash  += hash >> 11;
     } /* end for */
     /* handle end cases */
     switch (rem) {
         case 3: hash += get16bits (data);
                 hash ^= hash << 16;
-                hash ^= ((signed char)data[sizeof (uint16_t)]) << 18;
+                hash ^= ((signed char)data[szof(uint16_t)]) << 18;
                 hash += hash >> 11;
                 break;
         case 2: hash += get16bits (data);

@@ -229,7 +229,7 @@ int strpack_size(strpack *op) noex {
 /* private subroutines */
 
 static int strpack_chunknew(strpack *op,int amount) noex {
-	cint		csz = sizeof(strpack_ch) ;
+	cint		csz = szof(strpack_ch) ;
 	int		rs ;
 	void		*vp{} ;
 	if (op->chsize > amount) amount = op->chsize ;
@@ -279,7 +279,7 @@ static int strpack_chunkfins(strpack *op) noex {
 
 static int chunk_start(strpack_ch *cnp,int csz) noex {
 	int		rs = SR_INVALID ;
-	memclear(cnp,sizeof(strpack_ch)) ;
+	memclear(cnp) ;
 	if (csz > 0) {
 	    void	*vp{} ;
 	    cnp->csz = csz ;

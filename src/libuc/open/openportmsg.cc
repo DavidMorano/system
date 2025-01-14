@@ -82,7 +82,7 @@ int openportmsg_request(OPM_REQ *sp,int f,char *mbuf,int mlen) noex {
 
 	        serialbuf_ri(&msgbuf,&sp->proto) ;
 
-	        sz = sizeof(SOCKADDRESS_IN6) ;
+	        sz = szof(SOCKADDRESS_IN6) ;
 	        serialbuf_rubuf(&msgbuf,ubp,sz) ;
 
 	        serialbuf_rstrw(&msgbuf,sp->username,unlen) ;
@@ -99,7 +99,7 @@ int openportmsg_request(OPM_REQ *sp,int f,char *mbuf,int mlen) noex {
 
 	        serialbuf_wi(&msgbuf,sp->proto) ;
 
-	        sz = sizeof(SOCKADDRESS_IN6) ;
+	        sz = szof(SOCKADDRESS_IN6) ;
 	        serialbuf_wubuf(&msgbuf,ubp,sz) ;
 
 	        serialbuf_wstrw(&msgbuf,sp->username,unlen) ;

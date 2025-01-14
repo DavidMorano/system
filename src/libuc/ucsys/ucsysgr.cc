@@ -45,11 +45,15 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<memx.h>
 
 #include	"ucsysgr.h"
 
@@ -124,7 +128,7 @@ int getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
 	int		ec = EFAULT ;
 	if (grp && grbuf) {
 	    ec = EINVAL ;
-	    memset(grp,0,sizeof(GROUP)) ;
+	    memclear(grp) ;
 	    if (grlen > 0) {
 	        ec = ENOSYS ;
 	    }
@@ -161,7 +165,7 @@ int getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
 	int		ec = EFAULT ;
 	if (grp && grbuf && n) {
 	    ec = EINVAL ;
-	    memset(grp,0,sizeof(GROUP)) ;
+	    memclear(grp) ;
 	    if ((grlen > 0) && n[0]) {
 	        ec = ENOSYS ;
 	    }
@@ -199,7 +203,7 @@ int getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t gid) noex {
 	int		ec = EFAULT ;
 	if (grp && grbuf) {
 	    ec = EINVAL ;
-	    memset(grp,0,sizeof(GROUP)) ;
+	    memclear(grp) ;
 	    if (grlen > 0) {
 	        ec = ENOSYS ;
 	    }

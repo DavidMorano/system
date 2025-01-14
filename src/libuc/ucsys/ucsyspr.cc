@@ -58,11 +58,15 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<memx.h>
 
 #include	"ucsyspr.h"
 
@@ -143,7 +147,7 @@ int getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
 	int		ec = EFAULT ;
 	if (prp && prbuf) {
 	    ec = EINVAL ;
-	    memset(prp,0,sizeof(PROTOENT)) ;
+	    memclear(prp) ;
 	    if (prlen > 0) {
 	        ec = ENOSYS ;
 	    }
@@ -202,7 +206,7 @@ int getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
 	int		ec = EFAULT ;
 	if (prp && prbuf && n) {
 	    ec = EINVAL ;
-	    memset(prp,0,sizeof(PROTOENT)) ;
+	    memclear(prp) ;
 	    if ((prlen > 0) && n[0]) {
 	        ec = ENOSYS ;
 	    }
@@ -261,7 +265,7 @@ int getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
 	int		ec = EFAULT ;
 	if (prp && prbuf) {
 	    ec = EINVAL ;
-	    memset(prp,0,sizeof(PROTOENT)) ;
+	    memclear(prp) ;
 	    if ((prlen > 0) && (num >= 0)) {
 	        ec = ENOSYS ;
 	    }

@@ -171,14 +171,14 @@ int ucentho::load(char *rbuf,int rlen,const ucentho *cprp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && rbuf && cprp) {
-	    memcpy(this,cprp,sizeof(ucentho)) ;
+	    memcpy(this,cprp) ;
 	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) {
 	        if (cprp->h_aliases) {
-	            int		n = 0 ;
+	            int		n ; /* used-afterwards */
 	            for (n = 0 ; cprp->h_aliases[n] ; n += 1) ;
 	            if (void **tab{} ; (rs = si.ptab(n,&tab)) >= 0) {
 		        cchar	**aliases = ccharpp(cprp->h_aliases) ;
-		        int	i = 0 ; /* used-afterwards */
+		        int	i ; /* used-afterwards */
 	                h_aliases = charpp(tab) ;
 	                for (i = 0 ; cprp->h_aliases[i] ; i += 1) {
 	                    rs = si_copystr(&si,(h_aliases + i),aliases[i]) ;
