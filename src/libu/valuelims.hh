@@ -49,7 +49,7 @@ struct valuelims {
 	ulonglong	ullmax = 0 ;			/* unsigned */
 	constexpr void mklonglong () noex {
 	    clonglong	one = 1 ;
-	    cint	n = int(CHAR_BIT * sizeof(longlong)) ;
+	    cint	n = (CHAR_BIT * szof(longlong)) ;
 	    ullmax = ~ullmax ;
 	    llmin = (one << (n - 1)) ;
 	    llmax = longlong(ullmax >> 1) ;

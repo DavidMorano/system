@@ -191,7 +191,7 @@ static int uiconv_libopen(uiconv *op ,cchar *tsp,cchar *fsp) noex {
 	        if (iconv_t cd ; (cd = iconv_open(tsp,fsp)) == iconvbad) {
 		    rs = (- errno) ;
 		} else {
-	            memcpy(op->cdp,&cd,sizeof(iconv_t)) ;
+	            memcpy(op->cdp,&cd) ;
 		}
 	        if (rs < 0) {
 	            switch (rs) {

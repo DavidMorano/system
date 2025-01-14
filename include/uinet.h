@@ -52,11 +52,11 @@
 #endif
 
 #ifndef	INET4ADDRLEN
-#define	INET4ADDRLEN	sizeof(in4_addr_t)
+#define	INET4ADDRLEN	szof(in4_addr_t)
 #endif
 
 #ifndef	INET6ADDRLEN
-#define	INET6ADDRLEN	sizeof(in6_addr_t)
+#define	INET6ADDRLEN	szof(in6_addr_t)
 #endif
 
 #ifndef	INETXADDRLEN
