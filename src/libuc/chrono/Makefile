@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gxx
@@ -56,11 +55,16 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
+#OBJ0_DATER= dater_main.o dater_setkey.o
+OBJ0_DATER= dater_main.o 
+OBJ1_DATER= dater_getbbtime.o dater_getdate.o
+
+OBJ_DATER= obj0_dater.o obj1_dater.o
+
 OBJ0_CHRONO= tmstrs.o zdb.o
-OBJ1_CHRONO= date.o
+OBJ1_CHRONO= date.o dater.o
 OBJ2_CHRONO= tmz.o zos.o zoffparts.o
 OBJ3_CHRONO= tmtime.o
-
 
 OBJA_CHRONO= obj0.o obj1.o
 OBJB_CHRONO= obj2.o obj3.o
@@ -100,9 +104,6 @@ $(T).so:		$(OBJ_CHRONO) Makefile
 $(T).o:			$(OBJ_CHRONO)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ_CHRONO) $(LIBINFO)
 
-$(T).a:			$(OBJ_CHRONO)
-	$(AR) $(ARFLAGS) -rc $@ $?
-
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 
@@ -133,6 +134,15 @@ obj2.o:			$(OBJ2_CHRONO)
 obj3.o:			$(OBJ3_CHRONO)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_CHRONO)
 
+obj0_dater.o:		$(OBJ0_DATER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DATER)
+
+obj1_dater.o:		$(OBJ1_DATER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_DATER)
+
+dater.o:		$(OBJ_DATER)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ_DATER) $(LIBINFO)
+
 
 date.o:			date.cc	date.h			$(INCS)
 tmstrs.o:		tmstrs.cc tmstrs.h		$(INCS)
@@ -141,5 +151,10 @@ tmz.o:			tmz.cc tmz.h			$(INCS)
 zdb.o:			zdb.cc zdb.h			$(INCS)
 zos.o:			zos.cc zos.h			$(INCS)
 zoffparts.o:		zoffparts.cc zoffparts.h	$(INCS)
+
+dater_main.o:		dater_main.cc		dater.h	$(INCS)
+dater_getdate.o:	dater_getdate.cc	dater.h	$(INCS)
+dater_getbbtime.o:	dater_getbbtime.cc	dater.h	$(INCS)
+dater_setkey.o:		dater_setkey.cc		dater.h	$(INCS)
 
 

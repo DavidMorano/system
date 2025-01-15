@@ -1,4 +1,5 @@
 /* tmz SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* time and timezone parsing */
@@ -39,6 +40,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	tmz
+
+	Description:
 	This object is used to parse date strings that are in ASCII
 	and are human-readable. There are tons of places where ASCII
 	strings that represent a date are used. I will leave it as
@@ -71,6 +76,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<tzfile.h>		/* for |TM_YEAR_BASE| */
@@ -127,7 +133,7 @@ static cchar	*strnzone(cchar *,int) noex ;
 
 /* local variables */
 
-static constexpr cchar	tpterms[] = {
+constexpr char		tpterms[] = {
 	0x00, 0x1F, 0x00, 0x00,
 	0x01, 0x00, 0x00, 0x04,
 	0x00, 0x00, 0x00, 0x00,
@@ -315,7 +321,7 @@ int tmz_toucht(tmz *op,cchar *sp,int sl) noex {
             stp->tm_year = -1 ;
             stp->tm_wday = -1 ;
             stp->tm_isdst = -1 ;
-    /* skip leading white space */
+    	    /* skip leading white space */
             while (sl && CHAR_ISWHITE(*sp)) {
                 sp += 1 ;
                 sl -= 1 ;
@@ -493,7 +499,7 @@ int tmz_logz(tmz *op,cchar *sp,int sl) noex {
             stp->tm_year = -1 ;
             stp->tm_wday = -1 ;
             stp->tm_isdst = -1 ;
-    /* skip leading and trailing white space */
+    	    /* skip leading and trailing white space */
             while (sl && CHAR_ISWHITE(*sp)) {
                 sp += 1 ;
                 sl -= 1 ;
@@ -726,23 +732,22 @@ int tmz_getzoff(tmz *op) noex {
 
 /* format> hh:mm[:ss] */
 static int tmz_timeparts(tmz *op,cchar *sp,int sl) noex {
-	field		fsb ;
 	int		rs ;
 	int		rs1 ;
 	int		si = 0 ;
-	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
+	if (field fsb ; (rs = field_start(&fsb,sp,sl)) >= 0) {
 	    int		v ;
 	    int		fl ;
 	    cchar	*lp = sp ;
 	    cchar	*fp{} ;
-/* get hours */
+	    /* get hours */
 	    if ((fl = field_get(&fsb,tpterms,&fp)) > 0) {
 	        lp = (fp + fl) ;
 	        rs = cfdeci(fp,fl,&v) ;
 	        op->st.tm_hour = v ;
 	    }
 	    if ((rs >= 0) && (fsb.term == ':')) {
-/* get minutes */
+	        /* get minutes */
 	        if ((fl = field_get(&fsb,tpterms,&fp)) > 0) {
 	            lp = (fp + fl) ;
 	            rs = cfdeci(fp,fl,&v) ;
@@ -750,7 +755,7 @@ static int tmz_timeparts(tmz *op,cchar *sp,int sl) noex {
 	        }
 	    } /* end if */
 	    if ((rs >= 0) && (fsb.term == ':')) {
-/* get seconds */
+		/* get seconds */
 	        if ((fl = field_get(&fsb,tpterms,&fp)) > 0) {
 	            lp = (fp + fl) ;
 	            rs = cfdeci(fp,fl,&v) ;

@@ -27,12 +27,12 @@
 
 	Description:
 	I define some subroutines that are missing from some systems,
-	which will remain nameless for now (Apple Darwin).
+	which systems will remain nameless for now (Apple Darwin).
 
 	Synopsis:
-	int getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex
-	int getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *) noex
-	int getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t gid) noex
+	errno_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex
+	errno_t getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *) noex
+	errno_t getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t gid) noex
 
 	Returns:
 	0	success
@@ -90,41 +90,53 @@
 #if     defined(SYSHAS_GETGRGNUR) && (SYSHAS_GETGRGNUR > 0)
 
 /* GNU version (like in Linux) */
-int getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
-        GROUP          *rp{} ;
-        int             ec ;
-        errno = 0 ;
-        if ((ec = getgrent_r(grp,grbuf,grlen,&rp)) == 0) {
-            if (rp == nullptr) {
-                ec = ENOENT ;
+errno_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
+        int             ec  = EFAULT ;
+	if (grp && grbuf) {
+            GROUP	*rp{} ;
+            errno = 0 ;
+	    ec = 0 ;
+            if ((ec = getgrent_r(grp,grbuf,grlen,&rp)) == 0) {
+                if (rp == nullptr) {
+                    ec = ENOENT ;
+                    errno = ec ;
+                }
+            } else if (ec > 0) {
+                errno = ec ;
+	    } else {
+                ec = EBUGCHECK ;
                 errno = ec ;
             }
-        } else if (ec < 0) {
-            ec = EBUGCHECK ;
-            errno = ec ;
-        }
+	} else {
+	    errno = ec ;
+	} /* end if (non-null) */
         return ec ;
 }
 
 #else
 
 /* POSIX draft-version (like in SunOS) */
-int getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
-	GROUP		*rp ;
-	int		rc = 0 ;
-	errno = 0 ;
-	if ((rp = getgrent_r(grp,grbuf,grlen)) == nullptr) {
-	    rc = errno ;
+errnot_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
+	int		ec = EFAULT ;
+	if (grp && grbuf) {
+	    GROUP	*rp ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getgrent_r(grp,grbuf,grlen)) == nullptr) {
+	        ec = errno ;
+	    }
+	    void(rp) ;
+	} else {
+	    errno = ec ;
 	}
-	void(rp) ;
-	return rc ;
+	return ec ;
 }
 
 #endif /* defined(SYSHAS_GETGRGNUR) && (SYSHAS_GETGRGNUR > 0) */
 
 #else
 
-int getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
+errno_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
 	int		ec = EFAULT ;
 	if (grp && grbuf) {
 	    ec = EINVAL ;
@@ -143,17 +155,24 @@ int getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
 /* GETGRNAMR begin */
 #if	defined(SYSHAS_GETGRNAMR) && (SYSHAS_GETGRNAMR > 0)
 
-int getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
-	GROUP		*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getgrnam_r(n,grp,grbuf,grlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-		ec = ENOENT ;
+errno_t getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
+	int		ec = EFAULT ;
+	if (grp && grbuf && n) {
+	    GROUP	*rp{} ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((ec = getgrnam_r(n,grp,grbuf,grlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+		    ec = ENOENT ;
+		    errno = ec ;
+	        }
+	    } else if (ec > 0) {
 		errno = ec ;
+	    } else {
+	        ec = EBUGCHECK ;
+	        errno = ec ;
 	    }
 	} else {
-	    ec = EBUGCHECK ;
 	    errno = ec ;
 	}
 	return ec ;
@@ -161,7 +180,7 @@ int getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
 
 #else
 
-int getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
+errno_t getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
 	int		ec = EFAULT ;
 	if (grp && grbuf && n) {
 	    ec = EINVAL ;
@@ -180,26 +199,32 @@ int getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
 /* GETGRGIDR begin */
 #if	defined(SYSHAS_GETGRGIDR) && (SYSHAS_GETGRGIDR > 0)
 
-int getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t gid) noex {
-	GROUP		*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getgrgid_r(gid,grp,grbuf,grlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-		ec = ENOENT ;
-		errno = ec ;
+errno_t getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t gid) noex {
+	int		ec = EFAULT ;
+	if (grp && grbuf) {
+	    GROUP	*rp{} ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((ec = getgrgid_r(gid,grp,grbuf,grlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+		    ec = ENOENT ;
+		    errno = ec ;
+	        }
+	    } else if (ec > 0) {
+	        errno = ec ;
+	    } else {
+	        ec = EBUGCHECK ;
+	        errno = ec ;
 	    }
-	} else if (ec < 0) {
-	    ec = EBUGCHECK ;
+	} else {
 	    errno = ec ;
-	
 	}
 	return ec ;
 }
 
 #else
 
-int getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t gid) noex {
+errno_t getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t gid) noex {
 	int		ec = EFAULT ;
 	if (grp && grbuf) {
 	    ec = EINVAL ;

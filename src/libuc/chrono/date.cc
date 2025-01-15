@@ -1,4 +1,5 @@
 /* date SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* general date object */
@@ -43,6 +44,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/timeb.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctime>

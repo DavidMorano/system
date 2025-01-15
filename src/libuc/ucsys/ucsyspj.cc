@@ -31,10 +31,11 @@
 	which will remain nameless for now (Apple Darwin).
 
 	Synopsis:
-	int getpjent_rp(PROJECT *grp,char *pjbuf,int pjlen) noex
-	int getpjnam_rp(PROJECT *grp,char *pjbuf,int pjlen,cchar *) noex
-	int getpjpid_rp(PROJECT *grp,char *pjbuf,int pjlen,projid_t pid) noex
-	int getpjdef_rp(PROJECT *grp,char *pjbuf,int pjlen,cchar *) noex
+	errno_t getpjent_rp(PROJECT *grp,char *pjbuf,int pjlen) noex
+	errno_t getpjnam_rp(PROJECT *grp,char *pjbuf,int pjlen,cchar *) noex
+	errno_t getpjpid_rp(PROJECT *grp,char *pjbuf,int pjlen,
+			projid_t pid) noex
+	errno_t getpjdef_rp(PROJECT *grp,char *pjbuf,int pjlen,cchar *) noex
 
 	Returns:
 	0	success
@@ -68,6 +69,8 @@
 
 /* local typedefs */
 
+typedef const void	cv ;
+
 
 /* external variables */
 
@@ -93,20 +96,25 @@
 
 #if	defined(SYSHAS_GETPJENTR) && (SYSHAS_GETPJENTR > 0)
 
-int getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
-	PROJECT		*rp ;
-	int		ec = 0 ;
-	errno = 0 ;
-	if ((rp = getprojent(pjp,pjbuf,pjlen)) == nullptr) {
-	    ec = errno ;
-	}
-	void(rp) ;
+errno_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
+	int		ec = EFAULT ;
+	if (pjp && pjbuf) {
+	    PROJECT	*rp ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getprojent(pjp,pjbuf,pjlen)) == nullptr) {
+	        ec = errno ;
+	    }
+	    void(rp) ;
+        } else {
+            errno = ec ;
+        }
 	return ec ;
 }
 
 #else
 
-int getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
+errno_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
@@ -123,20 +131,25 @@ int getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
 
 #if	defined(SYSHAS_GETPJNAMR) && (SYSHAS_GETPJNAMR > 0)
 
-int getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
-	PROJECT		*rp ;
-	int		ec = 0 ;
-	errno = 0 ;
-	if ((rp = getprojbyname(n,pjp,pjbuf,pjlen)) == nullptr) {
-	    ec = errno ;
+errno_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+	int		ec = EFAULT ;
+	if (pjp && pjbuf && n) {
+	    PROJECT	*rp ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getprojbyname(n,pjp,pjbuf,pjlen)) == nullptr) {
+	        ec = errno ;
+	    }
+	    void(rp) ;
+	} else {
+	    errno = ec ;
 	}
-	void(rp) ;
 	return ec ;
 }
 
 #else
 
-int getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+errno_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;
@@ -153,20 +166,25 @@ int getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
 
 #if	defined(SYSHAS_GETPJPIDR) && (SYSHAS_GETPJPIDR > 0)
 
-int getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t pid) noex {
-	PROJECT		*rp ;
-	int		ec = 0 ;
-	errno = 0 ;
-	if ((rp = getprojbyid(pid,pjp,pjbuf,pjlen)) == nullptr) {
-	    ec = errno ;
+errno_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t pid) noex {
+	int		ec = EFAULT ;
+	if (pjp && pjbuf) {
+	    PROJECT	*rp ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getprojbyid(pid,pjp,pjbuf,pjlen)) == nullptr) {
+	        ec = errno ;
+	    }
+	    void(rp) ;
+	} else {
+	    errno = ec ;
 	}
-	void(rp) ;
 	return ec ;
 }
 
 #else
 
-int getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
+errno_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
@@ -183,14 +201,19 @@ int getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
 
 #if	defined(SYSHAS_GETPJDEFR) && (SYSHAS_GETPJDEFR > 0)
 
-int getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
-	PROJECT		*rp ;
-	int		ec = 0 ;
-	errno = 0 ;
-	if ((rp = getdefaultproj(n,pjp,pjbuf,pjlen)) == nullptr) {
-	    ec = errno ;
+errno_t getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+	int		ec = EFAULT ;
+	if (pjp && pjbuf && n) {
+	    PROJECT	*rp ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getdefaultproj(n,pjp,pjbuf,pjlen)) == nullptr) {
+	        ec = errno ;
+	    }
+	    void(rp) ;
+	} else {
+	    errno = ec ;
 	}
-	void(rp) ;
 	return ec ;
 }
 
@@ -241,7 +264,7 @@ PROJECT	*getpjdef(cchar *) noex {
 	return nullptr ;
 }
 
-int getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
+errno_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
@@ -254,7 +277,7 @@ int getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
         return ec ;
 }
 
-int getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+errno_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;
@@ -267,7 +290,7 @@ int getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
         return ec ;
 }
 
-int getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
+errno_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
@@ -280,7 +303,7 @@ int getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
         return ec ;
 }
 
-int getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+errno_t getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
         int     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;

@@ -1,4 +1,5 @@
 /* tmtime SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is supposed to provide OS-independent time management operations */
@@ -49,6 +50,8 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<usysflag.h>
@@ -133,7 +136,7 @@ int tmtime_gmtime(tmtime *op,time_t t) noex {
 int tmtime_localtime(tmtime *op,time_t t) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    TM	tms ;
+	    TM		tms ;
 	    if (t == 0) t = time(nullptr) ;
 	    memclear(op) ;
 	    if ((rs = uc_localtime(&t,&tms)) >= 0) {
@@ -183,8 +186,7 @@ int tmtime_insert(tmtime *op,TM *tmp) noex {
 int tmtime_extract(tmtime *op,TM *tmp) noex {
 	int		rs = SR_FAULT ;
 	if (op && tmp) {
-	    rs = SR_OK ;
-	    memclear(tmp) ;
+	    rs = memclear(tmp) ;
 	    tmp->tm_sec = op->sec ;
 	    tmp->tm_min = op->min ;
 	    tmp->tm_hour = op->hour ;

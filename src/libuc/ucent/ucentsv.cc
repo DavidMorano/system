@@ -95,8 +95,9 @@ int ucentsv::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && ebuf && sp) {
+	    SERVENT *sep = this ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(this) ;		/* potentially dangerous */
+	    memclear(sep) ;
 	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
 	        cchar	*cp{} ;
 		if (int idx ; (idx = sichr(sp,sl,'#')) >= 0) {
@@ -130,20 +131,21 @@ int ucentsv::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 }
 /* end subroutine (ucentsv::parse) */
 
-int ucentsv::load(char *rbuf,int rlen,const ucentsv *cprp) noex {
+int ucentsv::load(char *rbuf,int rlen,const ucentsv *csvp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf && cprp) {
-	    memcpy(this,cprp) ;
+	if (this && rbuf && csvp) {
+	    SERVENT	*sep = this ;
+	    *sep = *csvp ; /* shallow copy */
 	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) {
-	        if (cprp->s_aliases) {
-	            int		n ; /* used-afterwards */
-	            for (n = 0 ; cprp->s_aliases[n] ; n += 1) ;
+	        if (csvp->s_aliases) {
+	            int	n ; /* used-afterwards */
+	            for (n = 0 ; csvp->s_aliases[n] ; n += 1) ;
 	            if (void **tab{} ; (rs = si.ptab(n,&tab)) >= 0) {
-		        cchar	**aliases = ccharpp(cprp->s_aliases) ;
+		        cchar	**aliases = ccharpp(csvp->s_aliases) ;
 		        int	i ; /* used-afterwards */
 	                s_aliases = charpp(tab) ;
-	                for (i = 0 ; cprp->s_aliases[i] ; i += 1) {
+	                for (i = 0 ; csvp->s_aliases[i] ; i += 1) {
 			    cchar	*an = aliases[i] ;
 	                    rs = si_copystr(&si,(s_aliases + i),an) ;
 	                    if (rs < 0) break ;
@@ -154,7 +156,7 @@ int ucentsv::load(char *rbuf,int rlen,const ucentsv *cprp) noex {
 		    s_aliases = nullptr ;
 	        } /* end if (aliases) */
 		if (rs >= 0) {
-		    rs = si_copystr(&si,&s_name,cprp->s_name) ;
+		    rs = si_copystr(&si,&s_name,csvp->s_name) ;
 		}
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;

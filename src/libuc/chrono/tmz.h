@@ -1,5 +1,9 @@
 /* tmz HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
+
+/* time and timezone parsing */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -16,9 +20,11 @@
 
 
 #include	<envstandards.h>	/* first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>		/* <- |TZABBRLEN| */
 
 

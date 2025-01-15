@@ -30,9 +30,9 @@
 	which will remain nameless for now (Apple Darwin).
 
 	Synopsis:
-	int getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex
-	int getpwnam_rp(PASSWD *pwp,char *pwbuf,int pwlen,cchar *) noex
-	int getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex
+	errno_t getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex
+	errno_t getpwnam_rp(PASSWD *pwp,char *pwbuf,int pwlen,cchar *) noex
+	errno_t getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex
 
 	Returns:
 	0	success
@@ -66,6 +66,8 @@
 
 /* local typedefs */
 
+typedef const void	cv ;
+
 
 /* external variables */
 
@@ -93,17 +95,23 @@
 #if	defined(SYSHAS_GETPWGNUR) && (SYSHAS_GETPWGNUR > 0)
 
 /* GNU version (like in Linux) */
-int getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
-	PASSWD		*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getpwent_r(pwp,pwbuf,pwlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-	        ec = ENOENT ;
+errno_t getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
+	int		ec = EFAULT ;
+	if (pwp && pwbuf) {
+	    PASSWD	*rp{} ;
+	    errno = 0 ;
+	    if ((ec = getpwent_r(pwp,pwbuf,pwlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+	            ec = ENOENT ;
+		    errno = ec ;
+	        }
+	    } else if (ec > 0) {
 		errno = ec ;
+	    } else {
+	        ec = EBUGCHECK ;
+	        errno = ec ;
 	    }
-	} else if (ec < 0) {
-	    ec = EBUGCHECK ;
+	} else {
 	    errno = ec ;
 	}
 	return ec ;
@@ -112,14 +120,19 @@ int getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
 #else
 
 /* POSIX draft-version (like in SunOS) */
-int getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
-	PASSWD		*rp ;
-	int		ec = 0 ;
-	errno = 0 ;
-	if ((rp = getpwent_r(pwp,pwbuf,pwlen)) == nullptr) {
-	    ec = errno ;
+errno_t getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
+	int		ec = EFAULT ;
+	if (pwp && pwbuf) {
+	    PASSWD	*rp ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getpwent_r(pwp,pwbuf,pwlen)) == nullptr) {
+	        ec = errno ;
+	    }
+	    void(rp) ;
+	} else {
+	    errno = ec ;
 	}
-	void(rp) ;
 	return ec ;
 }
 
@@ -128,7 +141,7 @@ int getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
 #else
 
 /* NULL version (like in Apple-Darwin) */
-int getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
+errno_t getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
 	int		ec = EFAULT ;
 	if (pwp && pwbuf) {
 	    ec = EINVAL ;
@@ -150,17 +163,23 @@ int getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
 #if	defined(SYSHAS_GETPWGNUR) && (SYSHAS_GETPWGNUR > 0)
 
 /* GNU version (like in Linux) */
-int getpwnam_rp(PASSWD *pwp,char *pwbuf,int pwlen,cchar *n) noex {
-	PASSWD		*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getpwnam_r(n,pwp,pwbuf,pwlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-		ec = ENOENT ;
+errno_t getpwnam_rp(PASSWD *pwp,char *pwbuf,int pwlen,cchar *n) noex {
+	int		ec = EFAULT ;
+	if (pwp && pwbuf && n) {
+	    PASSWD	*rp{} ;
+	    errno = 0 ;
+	    if ((ec = getpwnam_r(n,pwp,pwbuf,pwlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+		    ec = ENOENT ;
+		    errno = ec ;
+	        }
+	    } else if (ec > 0) {
 		errno = ec ;
+	    } else {
+	        ec = EBUGCHECK ;
+	        errno = ec ;
 	    }
-	} else if (ec < 0) {
-	    ec = EBUGCHECK ;
+	} else {
 	    errno = ec ;
 	}
 	return ec ;
@@ -169,17 +188,23 @@ int getpwnam_rp(PASSWD *pwp,char *pwbuf,int pwlen,cchar *n) noex {
 #else
 
 /* POSIX version (like in SunOS) */
-int getpwnam_rp(PASSWD *pwp,char *pwbuf,int pwlen,cchar *n) noex {
-	PASSWD		*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getpwnam_r(n,pwp,pwbuf,pwlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-		ec = ENOENT ;
+errno_t getpwnam_rp(PASSWD *pwp,char *pwbuf,int pwlen,cchar *n) noex {
+	int		ec = EFAULT ;
+	if (pwp && pwbuf && n) {
+	    PASSWD	*rp{} ;
+	    errno = 0 ;
+	    if ((ec = getpwnam_r(n,pwp,pwbuf,pwlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+		    ec = ENOENT ;
+		    errno = ec ;
+	        }
+	    } else if (ec > 0) {
 		errno = ec ;
+	    } else {
+	        ec = EBUGCHECK ;
+	        errno = ec ;
 	    }
-	} else if (ec < 0) {
-	    ec = EBUGCHECK ;
+	} else {
 	    errno = ec ;
 	}
 	return ec ;
@@ -190,7 +215,7 @@ int getpwnam_rp(PASSWD *pwp,char *pwbuf,int pwlen,cchar *n) noex {
 #else
 
 /* NULL version (like in Apple-Darwin) */
-int getpwnam_rp(PASSWD *pwp,char *pwbuf,int,cchar *n) noex {
+errno_t getpwnam_rp(PASSWD *pwp,char *pwbuf,int,cchar *n) noex {
 	int		ec = EFAULT ;
 	if (pwp && pwbuf && n) {
 	    ec = EINVAL ;
@@ -212,17 +237,23 @@ int getpwnam_rp(PASSWD *pwp,char *pwbuf,int,cchar *n) noex {
 #if	defined(SYSHAS_GETPWGNUR) && (SYSHAS_GETPWGNUR > 0)
 
 /* GNU version (like in Linux) */
-int getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
-	PASSWD		*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getpwuid_r(uid,pwp,pwbuf,pwlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-		ec = ENOENT ;
+errno_t getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
+	int		ec = EFAULT ;
+	if (pwp && pwbuf) {
+	    PASSWD	*rp{} ;
+	    errno = 0 ;
+	    if ((ec = getpwuid_r(uid,pwp,pwbuf,pwlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+		    ec = ENOENT ;
+		    errno = ec ;
+	        }
+	    } else if (ec > 0) {
 		errno = ec ;
+	    } else {
+	        ex = EBUGCHECK ;
+	        errno = ec ;
 	    }
-	} else if (ec < 0) {
-	    ex = EBUGCHECK ;
+	} else {
 	    errno = ec ;
 	}
 	return ec ;
@@ -231,17 +262,23 @@ int getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 #else
 
 /* POSIX version (like in SunOS) */
-int getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
-	PASSWD		*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getpwuid_r(uid,pwp,pwbuf,pwlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-		ec = ENOENT ;
-		errno = ec ;
+errno_t getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
+	int		ec = EFAULT ;
+	if (pwp && pwbuf) {
+	    PASSWD	*rp{} ;
+	    errno = 0 ;
+	    if ((ec = getpwuid_r(uid,pwp,pwbuf,pwlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+		    ec = ENOENT ;
+		    errno = ec ;
+	        }
+	    } else if (ec > 0) {
+	        errno = ec ;
+	    } else {
+	        ec = EBUGCHECK ;
+	        errno = ec ;
 	    }
-	} else if (ec < 0) {
-	    ec = EBUGCHECK ;
+	} else {
 	    errno = ec ;
 	}
 	return ec ;
@@ -252,7 +289,7 @@ int getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 #else
 
 /* NULL version (like in Apple-Darwin) */
-int getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t) noex {
+errno_t getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t) noex {
 	int		ec = EFAULT ;
 	if (pwp && pwbuf) {
 	    ec = EINVAL ;

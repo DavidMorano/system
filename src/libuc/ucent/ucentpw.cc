@@ -86,30 +86,28 @@ int ucentpw::parse(char *pwbuf,int pwlen,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && pwbuf && sp) {
-	    rs = SR_INVALID ;
-	    memclear(this) ;		/* potentially dangerous */
-	    if (pwlen > 0) {
-	        if (sl < 0) sl = strlen(sp) ;
-	        if (storeitem si ; (rs = si.start(pwbuf,pwlen)) >= 0) {
-	            int		fi = 0 ;
-	            for (int idx ; (idx = sichr(sp,sl,':')) >= 0 ; ) {
-	                rs = ucentpw_parseone(this,&si,fi++,sp,idx) ;
-	                sl -= (idx +1) ;
-	                sp += (idx +1) ;
-	                if (rs < 0) break ;
-	            } /* end for */
-	            if ((rs >= 0) && sl && sp[0]) {
-	                rs = ucentpw_parseone(this,&si,fi++,sp,sl) ;
-	            }
-	            if (rs >= 0) {
-	                rs = ucentpw_parsedefs(this,&si,fi) ;
-		        fi = rs ;
-	            }
-	            if ((rs >= 0) && (fi < 6)) rs = SR_BADFMT ;
-	            rs1 = si.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (storeitem) */
-	    } /* end if (valid) */
+	    PASSWD *pep = this ;
+	    memclear(pep) ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if (storeitem si ; (rs = si.start(pwbuf,pwlen)) >= 0) {
+	        int		fi = 0 ;
+	        for (int idx ; (idx = sichr(sp,sl,':')) >= 0 ; ) {
+	            rs = ucentpw_parseone(this,&si,fi++,sp,idx) ;
+	            sl -= (idx +1) ;
+	            sp += (idx +1) ;
+	            if (rs < 0) break ;
+	        } /* end for */
+	        if ((rs >= 0) && sl && sp[0]) {
+	            rs = ucentpw_parseone(this,&si,fi++,sp,sl) ;
+	        }
+	        if (rs >= 0) {
+	            rs = ucentpw_parsedefs(this,&si,fi) ;
+		    fi = rs ;
+	        }
+	        if ((rs >= 0) && (fi < 6)) rs = SR_BADFMT ;
+	        rs1 = si.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -119,21 +117,19 @@ int ucentpw::load(char *pwbuf,int pwlen,const ucentpw *spwp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && pwbuf && spwp) {
-	    rs = SR_INVALID ;
-	    if (pwlen > 0) {
-	        (*this) = *spwp ;	/* <- copy over opaque values */
-	        if (storeitem si ; (rs = si.start(pwbuf,pwlen)) >= 0) {
-		    {
-	                si_copystr(&si,&pw_name,spwp->pw_name) ;
-	                si_copystr(&si,&pw_passwd,spwp->pw_passwd) ;
-	                si_copystr(&si,&pw_gecos,spwp->pw_gecos) ;
-	                si_copystr(&si,&pw_dir,spwp->pw_dir) ;
-	                si_copystr(&si,&pw_shell,spwp->pw_shell) ;
-		    }
-	            rs1 = si.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (storeitem) */
-	    } /* end if (valid) */
+	    PASSWD *pep = this ;
+	    *pep = *spwp ;	/* <- copy over opaque values */
+	    if (storeitem si ; (rs = si.start(pwbuf,pwlen)) >= 0) {
+		{
+	            si_copystr(&si,&pw_name,spwp->pw_name) ;
+	            si_copystr(&si,&pw_passwd,spwp->pw_passwd) ;
+	            si_copystr(&si,&pw_gecos,spwp->pw_gecos) ;
+	            si_copystr(&si,&pw_dir,spwp->pw_dir) ;
+	            si_copystr(&si,&pw_shell,spwp->pw_shell) ;
+		}
+	        rs1 = si.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -143,46 +139,43 @@ int ucentpw::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && rbuf) {
-	    rs = SR_INVALID ;
-	    if (rlen > 0) {
-	        if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
-	            for (int i = 0 ; i < 7 ; i += 1) {
-	                if (i > 0) rs = b.chr(':') ;
-	                if (rs >= 0) {
-	                    int		v ;
-	                    switch (i) {
-	                    case 0:
-	                        rs = b.str(pw_name) ;
-	                        break ;
-	                    case 1:
-	                        rs = b.str(pw_passwd) ;
-	                        break ;
-	                    case 2:
-	                        v = int(pw_uid) ;
-	                        rs = b.dec(v) ;
-	                        break ;
-	                    case 3:
-	                        v = int(pw_gid) ;
-	                        rs = b.deci(v) ;
-	                        break ;
-	                    case 4:
-	                        rs = b.str(pw_gecos) ;
-	                        break ;
-	                    case 5:
-	                        rs = b.str(pw_dir) ;
-	                        break ;
-	                    case 6:
-	                        rs = b.strw(pw_shell) ;
-	                        break ;
-	                    } /* end switch */
-	                } /* end if */
-	                if (rs < 0) break ;
-	            } /* end for */
-	            rs1 = b.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (sbuf) */
-	    } /* end if (valid) */	
-	} /* endif (non-null) */
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	        for (int i = 0 ; i < 7 ; i += 1) {
+	            if (i > 0) rs = b.chr(':') ;
+	            if (rs >= 0) {
+	                int		v ;
+	                switch (i) {
+	                case 0:
+	                    rs = b.str(pw_name) ;
+	                    break ;
+	                case 1:
+	                    rs = b.str(pw_passwd) ;
+	                    break ;
+	                case 2:
+	                    v = int(pw_uid) ;
+	                    rs = b.dec(v) ;
+	                    break ;
+	                case 3:
+	                    v = int(pw_gid) ;
+	                    rs = b.deci(v) ;
+	                    break ;
+	                case 4:
+	                    rs = b.str(pw_gecos) ;
+	                    break ;
+	                case 5:
+	                    rs = b.str(pw_dir) ;
+	                    break ;
+	                case 6:
+	                    rs = b.strw(pw_shell) ;
+	                    break ;
+	                } /* end switch */
+	            } /* end if */
+	            if (rs < 0) break ;
+	        } /* end for */
+	        rs1 = b.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (sbuf) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ucentpw::format) */

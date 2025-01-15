@@ -95,8 +95,9 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 	if (this && uabuf && sp) {
+	    USERATTR *uep = this ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(this) ;		/* potentially dangerous */
+	    rs = memclear(uep) ;
 	    if ((sl > 0) && (sp[0] != '#')) {
 	        if (storeitem si ; (rs = si.start(uabuf,ualen)) >= 0) {
 	            int		fi = 0 ;
@@ -147,7 +148,8 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 	if (this && uabuf && suap) {
-	    memcpy(this,suap) ;
+	    USERATTR *uep = this ;
+	    *uep = *suap ; /* shallow copy */
 	    if (storeitem si ; (rs = si.start(uabuf,ualen)) >= 0) {
 	        if (suap->attr) {
 	            cint	ksz = szof(kva_t) ;
@@ -196,44 +198,41 @@ int ucentua::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && rbuf) {
-	    rs = SR_INVALID ;
-	    if (rlen > 0) {
-	        if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
-	            for (int i = 0 ; i < 5 ; i += 1) {
-	                if (i > 0) rs = b.chr(':') ;
-	                if (rs >= 0) {
-	                    switch (i) {
-	                    case 0:
-	                        rs = b.str(name) ;
-	                        break ;
-	                    case 1:
-	                        if (qualifier) {
-	                            rs = b.str(qualifier) ;
-	                        }
-	                        break ;
-	                    case 2:
-	                        if (res1) {
-	                            rs = b.str(res1) ;
-	                        }
-	                        break ;
-	                    case 3:
-	                        if (res2) {
-	                            rs = b.strw(res2) ;
-	                        }
-	                        break ;
-	                    case 4:
-	                        if (attr) {
-	                            rs = sbuf_fmtattrs(&b,attr) ;
-	                        }
-	                        break ;
-	                    } /* end switch */
-	                } /* end if */
-	                if (rs < 0) break ;
-	            } /* end for */
-	            rs1 = b.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (sbuf) */
-	    } /* end if (valid) */
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	        for (int i = 0 ; i < 5 ; i += 1) {
+	            if (i > 0) rs = b.chr(':') ;
+	            if (rs >= 0) {
+	                switch (i) {
+	                case 0:
+	                    rs = b.str(name) ;
+	                    break ;
+	                case 1:
+	                    if (qualifier) {
+	                        rs = b.str(qualifier) ;
+	                    }
+	                    break ;
+	                case 2:
+	                    if (res1) {
+	                        rs = b.str(res1) ;
+	                    }
+	                    break ;
+	                case 3:
+	                    if (res2) {
+	                        rs = b.strw(res2) ;
+	                    }
+	                    break ;
+	                case 4:
+	                    if (attr) {
+	                        rs = sbuf_fmtattrs(&b,attr) ;
+	                    }
+	                    break ;
+	                } /* end switch */
+	            } /* end if */
+	            if (rs < 0) break ;
+	        } /* end for */
+	        rs1 = b.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
 }

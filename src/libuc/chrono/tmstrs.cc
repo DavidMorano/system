@@ -1,4 +1,5 @@
 /* tmstrs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* TM structure strings processing */
@@ -17,9 +18,14 @@
 
 /*******************************************************************************
 
+  	Group:
+	tmstrs{x}
+
+	Description:
 	These subroutines provide support for converting various
 	date strings to their TM-structure equivalents.
 
+	Notes:
 	Note on year calculations for MSG-type year strings:
 
 	RFC2822 says that all three digit years should be interpreted

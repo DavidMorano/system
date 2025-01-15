@@ -90,8 +90,9 @@ int ucentgr::parse(char *grbuf,int grlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && grbuf && sp) {
+	    GROUP *gep = this ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(this) ;		/* potentially dangerous */
+	    memclear(gep) ; /* shallow copy */
 	    if (storeitem si ; (rs = si.start(grbuf,grlen)) >= 0) {
 	        int	fi = 0 ;
 	        cchar	*tp ;
@@ -142,7 +143,8 @@ int ucentgr::load(char *grbuf,int grlen,CGRE *sgrp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && grbuf && sgrp) {
-	    memcpy(this,sgrp) ;
+	    GROUP *gep = this ;
+	    *gep = *sgrp ; /* shallow copy */
 	    if (storeitem si ; (rs = si.start(grbuf,grlen)) >= 0) {
 	        if (sgrp->gr_mem) {
 	            int		n ; /* used-afterwards */

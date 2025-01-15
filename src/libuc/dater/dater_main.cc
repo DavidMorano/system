@@ -1,4 +1,5 @@
 /* dater_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* general dater object */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
  
+  	Object:
+	dater
+
+  	Description:
 	This object can be used to create daters from various input
 	data including strings.
 
@@ -57,6 +62,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/timeb.h>
 #include	<climits>		/* |SHORT_MIN| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctime>

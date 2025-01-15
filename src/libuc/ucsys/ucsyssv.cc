@@ -30,9 +30,9 @@
 	which will remain nameless for now (Apple Darwin).
 
 	Synopsis:
-	int getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex
-	int getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc*,cc *) noex
-	int getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int,cc *) noex
+	errno_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex
+	errno_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc*,cc *) noex
+	errno_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int,cc *) noex
 
 	Arguments:
 	svp		NETENT pointer
@@ -106,19 +106,23 @@
 #if	defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0)
 
 /* GNU version (like on Linux) */
-int getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
-	SERVENT		*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getservent_r(svp,svbuf,svlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-		ec = ENOENT ;
+errno_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
+	int		ec =EFAULT ;
+	if (svp && svbuf) {
+	    SERVENT	*rp{} ;
+	    errno = 0 ;
+	    if ((ec = getservent_r(svp,svbuf,svlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+		    ec = ENOENT ;
+	            errno = ec ;
+	        }
+	    } else if (ec > 0) {
+	        ec = errno ;
+	    } else {
+	    ec = EBUGCHECK ;
 	        errno = ec ;
 	    }
-	} else if (ec > 0) {
-	    ec = errno ;
 	} else {
-	    ec = BGCHECK ;
 	    errno = ec ;
 	}
 	return ec ;
@@ -126,15 +130,20 @@ int getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
 
 #else
 
-/* POSIX draft-6 inspired version */
-int getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
-	SERVENT		*rp ;
+/* POSIX draft-6 inspired version (like on Solaris®) */
+errno_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
 	int		ec = 0 ;
-	errno = 0 ;
-	if ((rp = getservent_r(svp,svbuf,svlen)) == nullptr) {
-	    ec = errno ;
+	if (svp && svbuf) {
+	    SERVENT	*rp ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getservent_r(svp,svbuf,svlen)) == nullptr) {
+	        ec = errno ;
+	    }
+	    (void) rp ;
+	} else {
+	    errno = ec ;
 	}
-	(void) rp ;
 	return ec ;
 }
 
@@ -143,7 +152,7 @@ int getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
 #else
 
 /* NULL version (like on Apple Darwin) */
-int getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
+errno_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
 	int		ec = EFAULT ;
 	if (svp && svbuf) {
 	    ec = EINVAL ;
@@ -165,19 +174,23 @@ int getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
 #if	defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0)
 
 /* GNU version (like on Linux) */
-int getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
-	SERVENT		*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getservbyname_r(n,p,svp,svbuf,svlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-		ec = ENOENT ;
+errno_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
+	int		ec = EFAULT ;
+	if (svp && svbuf) {
+	    SERVENT	*rp{} ;
+	    errno = 0 ;
+	    if ((ec = getservbyname_r(n,p,svp,svbuf,svlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+		    ec = ENOENT ;
+	            errno = ec ;
+	        }
+	    } else if (ec > 0) {
+	        ec = errno ;
+	    } else {
+	        ec = EBUGCHECK ;
 	        errno = ec ;
 	    }
-	} else if (ec > 0) {
-	    ec = errno ;
 	} else {
-	    ec = EBUGCHECK ;
 	    errno = ec ;
 	}
 	return ec ;
@@ -186,14 +199,19 @@ int getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
 #else
 
 /* POSIX draft-6 inspired version */
-int getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
-	SERVENT		*rp ;
-	int		ec = 0 ;
-	errno = 0 ;
-	if ((rp = getservbyname_r(n,p,svp,svbuf,svlen)) == nullptr) {
-	    ec = errno ;
+errno_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
+	int		ec = EFAULT ;
+	if (svp && svbuf) {
+	    SERVENT	*rp ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getservbyname_r(n,p,svp,svbuf,svlen)) == nullptr) {
+	        ec = errno ;
+	    }
+	    (void) rp ;
+	} else {
+	    errno = ec ;
 	}
-	(void) rp ;
 	return ec ;
 }
 
@@ -202,7 +220,7 @@ int getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
 #else
 
 /* NULL version (like on Apple Darwin) */
-int getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
+errno_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
 	int		ec = EFAULT ;
 	if (svp && svbuf && n && p) {
 	    ec = EINVAL ;
@@ -224,19 +242,23 @@ int getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
 #if	defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0)
 
 /* GNU version (like on Linux) */
-int getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
-	SERVENT		*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getservbyport_r(num,p,svp,svbuf,svlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-		ec = ENOENT ;
+errno_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
+	int		ec = EFAULT ;
+	if (svp && svbuf) {
+	    SERVENT	*rp{} ;
+	    errno = 0 ;
+	    if ((ec = getservbyport_r(num,p,svp,svbuf,svlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+		    ec = ENOENT ;
+	            errno = ec ;
+	        }
+	    } else if (ec > 0) {
+	        ec = errno ;
+	    } else {
+	        ec = EBUGCHECK ;
 	        errno = ec ;
 	    }
-	} else if (ec > 0) {
-	    ec = errno ;
 	} else {
-	    ec = EBUGCHECK ;
 	    errno = ec ;
 	}
 	return ec ;
@@ -245,14 +267,19 @@ int getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
 #else
 
 /* POSIX draft-6 inspired version */
-int getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
-	SERVENT		*rp ;
-	int		ec = 0 ;
-	errno = 0 ;
-	if ((rp = getservbyport_r(num,p,svp,svbuf,svlen)) == nullptr) {
-	    ec = errno ;
+errno_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
+	int		ec = EFAULT ;
+	if (svp && svbuf) {
+	    SERVENT	*rp ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getservbyport_r(num,p,svp,svbuf,svlen)) == nullptr) {
+	        ec = errno ;
+	    }
+	    (void) rp ;
+	} else {
+	    errno = ec ;
 	}
-	(void) rp ;
 	return ec ;
 }
 
@@ -261,7 +288,7 @@ int getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
 #else
 
 /* NULL version (like on Apple Darwin) */
-int getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
+errno_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
 	int		ec = EFAULT ;
 	if (svp && svbuf && p) {
 	    ec = EINVAL ;

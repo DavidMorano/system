@@ -30,9 +30,9 @@
 	which will remain nameless for now (Apple Darwin).
 
 	Synopsis:
-	int	getspent_rp(SPWD *,char *,int) noex
-	int	getspnam_rp(SPWD *,char *,int,cchar *) noex
-	int	getspuid_rp(SPWD *,char *,int,uid_t) noex
+	errno_t getspent_rp(SPWD *,char *,int) noex
+	errno_t getspnam_rp(SPWD *,char *,int,cchar *) noex
+	errno_t getspuid_rp(SPWD *,char *,int,uid_t) noex
 
 	Returns:
 	0	success
@@ -91,20 +91,25 @@
 
 #if	defined(SYSHAS_GETSPENTR) && (SYSHAS_GETSPENTR > 0)
 
-int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
-	CSPWD	*rp{} ;
-	int	rc = 0 ;
-	errno = 0 ;
-	if ((rp = getspent_r(spp,spbuf,splen)) == nullptr) {
-	    rc = errno ;
+errno_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
+	int		ec = EFAULT ;
+	if (spp && spbuf) {
+	    CSPWD	*rp{} ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getspent_r(spp,spbuf,splen)) == nullptr) {
+	        ec = errno ;
+	    }
+	} else {
+	    errno = ec ;
 	}
-	return rc ;
+	return ec ;
 }
 
 #else /* defined(SYSHAS_GETSPENTR) && (SYSHAS_GETSPENTR > 0) */
 
-int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
-	int	ec = EFAULT ;
+errno_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
+	int		ec = EFAULT ;
 	if (spp && spbuf) {
 	    ec = EINVAL ;
 	    memclear(spp) ;
@@ -113,32 +118,39 @@ int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 	    }
 	}
 	errno = ec ;
-	return -1 ;
+	return ec ;
 }
 
 #endif /* defined(SYSHAS_GETSPENTR) && (SYSHAS_GETSPENTR > 0) */
 
 #if	defined(SYSHAS_GETSPNAMR) && (SYSHAS_GETSPNAMR > 0)
 
-int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
-	CSPWD	*rp{} ;
-	int	rc ;
-	errno = 0 ;
-	if ((rc = getspnam_r(n,spp,spbuf,splen,&rp)) >= 0) {
-	    if (!rp) {
-		errno = ENOENT :
-		rc = errno ;
+errno_t getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
+	int		ec = EFAULT ;
+	if (spp && spbuf && n) {
+	    CSPWD	*rp{} ;
+	    errno = 0 ;
+	    if ((ec = getspnam_r(n,spp,spbuf,splen,&rp)) == 0) {
+	        if (!rp) {
+		    ec = ENOENT ;
+		    errno = ec :
+	        }
+	    } else if (ec > 0) {
+	        errno = ec ;
+	    } else {
+		ec = EBUGCHECK ;
+		errno = ec ;
 	    }
 	} else {
-	    rc = errno ;
+	    errno = ec ;
 	}
-	return rc ;
+	return ec ;
 }
 
 #else /* defined(SYSHAS_GETSPNAMR) && (SYSHAS_GETSPNAMR > 0) */
 
-int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
-	int	ec = EFAULT ;
+errno_t getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
+	int		ec = EFAULT ;
 	if (spp && spbuf && n) {
 	    ec = EINVAL ;
 	    memclear(spp) ;
@@ -147,14 +159,14 @@ int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 	    }
 	}
 	errno = ec ;
-	return -1 ;
+	return ec ;
 }
 
 #endif /* defined(SYSHAS_GETSPNAMR) && (SYSHAS_GETSPNAMR > 0) */
 
 #else /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
 
-int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
+errno_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 	int	ec = EFAULT ;
 	if (spp && spbuf) {
 	    ec = EINVAL ;
@@ -164,10 +176,10 @@ int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 	    }
 	}
 	errno = ec ;
-	return -1 ;
+	return ec ;
 }
 
-int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
+errno_t getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 	int	ec = EFAULT ;
 	if (spp && spbuf && n) {
 	    ec = EINVAL ;
@@ -177,7 +189,7 @@ int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 	    }
 	}
 	errno = ec ;
-	return -1 ;
+	return ec ;
 }
 
 #endif /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */

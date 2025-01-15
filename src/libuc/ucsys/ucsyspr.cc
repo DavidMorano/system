@@ -30,9 +30,9 @@
 	which will remain nameless for now (Apple Darwin).
 
 	Synopsis:
-	int getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex
-	int getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *) noex
-	int getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex
+	errno_t int getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex
+	errno_t getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *) noex
+	errno_t getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex
 
 	Arguments:
 	prp		NETENT pointer
@@ -79,6 +79,8 @@
 
 /* local typedefs */
 
+typedef const void	cv ;
+
 
 /* external variables */
 
@@ -106,19 +108,23 @@
 #if	defined(SYSHAS_GETPRGNUR) && (SYSHAS_GETPRGNUR > 0)
 
 /* GNU version (like on Linux) */
-int getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
-	PROTOENT	*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getprotoent_r(prp,prbuf,prlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-		ec = ENOENT ;
+errno_t getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
+	int		ec = EFAULT ;
+	if (prp && prbuf) {
+	    PROTOENT	*rp{} ;
+	    errno = 0 ;
+	    if ((ec = getprotoent_r(prp,prbuf,prlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+		    ec = ENOENT ;
+	            errno = ec ;
+	        }
+	    } else if (ec > 0) {
+	        errno = ec ;
+	    } else {
+	        ec = EBUGCHECK ;
 	        errno = ec ;
 	    }
-	} else if (ec > 0) {
-	    ec = errno ;
 	} else {
-	    ec = BGCHECK ;
 	    errno = ec ;
 	}
 	return ec ;
@@ -126,15 +132,20 @@ int getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
 
 #else
 
-/* POSIX draft-6 inspired version */
-int getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
-	PROTOENT	*rp ;
-	int		ec = 0 ;
-	errno = 0 ;
-	if ((rp = getprotoent_r(prp,prbuf,prlen)) == nullptr) {
-	    ec = errno ;
+/* POSIX draft-6 inspired version (like on Solaris®) */
+errno_t getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
+	int		ec = EFAULT ;
+	if (prp && prbuf) {
+	    PROTOENT	*rp ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getprotoent_r(prp,prbuf,prlen)) == nullptr) {
+	        ec = errno ;
+	    }
+	    (void) rp ;
+	} else {
+	    errno = ec ;
 	}
-	(void) rp ;
 	return ec ;
 }
 
@@ -143,7 +154,7 @@ int getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
 #else
 
 /* NULL version (like on Apple Darwin) */
-int getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
+errno_t getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
 	int		ec = EFAULT ;
 	if (prp && prbuf) {
 	    ec = EINVAL ;
@@ -165,19 +176,23 @@ int getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
 #if	defined(SYSHAS_GETPRGNUR) && (SYSHAS_GETPRGNUR > 0)
 
 /* GNU version (like on Linux) */
-int getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
-	PROTOENT	*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getprotobyname_r(n,prp,prbuf,prlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-		ec = ENOENT ;
+errno_t getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
+	int		ec = EFAULT ;
+	if (prp && prbuf && n) {
+	    PROTOENT	*rp{} ;
+	    errno = 0 ;
+	    if ((ec = getprotobyname_r(n,prp,prbuf,prlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+		    ec = ENOENT ;
+	            errno = ec ;
+	        }
+	    } else if (ec > 0) {
+	        errno = ec ;
+	    } else {
+	        ec = EBUGCHECK ;
 	        errno = ec ;
 	    }
-	} else if (ec > 0) {
-	    ec = errno ;
 	} else {
-	    ec = EBUGCHECK ;
 	    errno = ec ;
 	}
 	return ec ;
@@ -186,14 +201,19 @@ int getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
 #else
 
 /* POSIX draft-6 inspired version */
-int getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
-	PROTOENT	*rp ;
-	int		ec = 0 ;
-	errno = 0 ;
-	if ((rp = getprotobyname_r(n,prp,prbuf,prlen)) == nullptr) {
-	    ec = errno ;
+errno_t getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
+	int		ec = EFAULT ;
+	if (prp && prbuf && n) {
+	    PROTOENT	*rp ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getprotobyname_r(n,prp,prbuf,prlen)) == nullptr) {
+	        ec = errno ;
+	    }
+	    (void) rp ;
+	} else {
+	    errno = ec ;
 	}
-	(void) rp ;
 	return ec ;
 }
 
@@ -202,7 +222,7 @@ int getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
 #else
 
 /* NULL version (like on Apple Darwin) */
-int getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
+errno_t getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
 	int		ec = EFAULT ;
 	if (prp && prbuf && n) {
 	    ec = EINVAL ;
@@ -224,19 +244,23 @@ int getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
 #if	defined(SYSHAS_GETPRGNUR) && (SYSHAS_GETPRGNUR > 0)
 
 /* GNU version (like on Linux) */
-int getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
-	PROTOENT	*rp{} ;
-	int		ec ;
-	errno = 0 ;
-	if ((ec = getprotobynumber_r(num,prp,prbuf,prlen,&rp)) == 0) {
-	    if (rp == nullptr) {
-		ec = ENOENT ;
+errno_t getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
+	int		ec = EFAULT ;
+	if (prp && prbuf) {
+	    PROTOENT	*rp{} ;
+	    errno = 0 ;
+	    if ((ec = getprotobynumber_r(num,prp,prbuf,prlen,&rp)) == 0) {
+	        if (rp == nullptr) {
+		    ec = ENOENT ;
+	            errno = ec ;
+	        }
+	    } else if (ec > 0) {
+	        errno = ec ;
+	    } else {
+	        ec = EBUGCHECK ;
 	        errno = ec ;
 	    }
-	} else if (ec > 0) {
-	    ec = errno ;
 	} else {
-	    ec = EBUGCHECK ;
 	    errno = ec ;
 	}
 	return ec ;
@@ -245,14 +269,19 @@ int getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
 #else
 
 /* POSIX draft-6 inspired version */
-int getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
-	PROTOENT	*rp ;
-	int		ec = 0 ;
-	errno = 0 ;
-	if ((rp = getprotobynumber_r(num,prp,prbuf,prlen)) == nullptr) {
-	    ec = errno ;
+errno_t getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
+	int		ec = EFAULT ;
+	if (prp && prbuf) {
+	    PROTOENT	*rp ;
+	    errno = 0 ;
+	    ec = 0 ;
+	    if ((rp = getprotobynumber_r(num,prp,prbuf,prlen)) == nullptr) {
+	        ec = errno ;
+	    }
+	    (void) rp ;
+	} else {
+	    errno = ec ;
 	}
-	(void) rp ;
 	return ec ;
 }
 
@@ -261,7 +290,7 @@ int getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
 #else
 
 /* NULL version (like on Apple Darwin) */
-int getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
+errno_t getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
 	int		ec = EFAULT ;
 	if (prp && prbuf) {
 	    ec = EINVAL ;

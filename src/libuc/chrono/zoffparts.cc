@@ -1,4 +1,5 @@
 /* zoffparts SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage time-zone offsets */
@@ -61,6 +62,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* for |abs(3c)| */
 #include	<usystem.h>
 #include	<storebuf.h>

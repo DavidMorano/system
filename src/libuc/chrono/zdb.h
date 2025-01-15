@@ -1,4 +1,5 @@
 /* zdb HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* time-zone database management */
@@ -16,11 +17,11 @@
 
 
 #define	ZDB_MAGIC	0x26213711
-#define	ZDB		struct zdb_e
+#define	ZDB		struct zdb_head
 #define	ZDB_ZNAMESIZE	8
 
 
-struct zdb_e {
+struct zdb_head {
 	cchar		*name ;
 	short		off ;		/* minutes west of GMT */
 	short		isdst ;

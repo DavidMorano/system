@@ -1,4 +1,5 @@
 /* zos SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* time-zone offset string management */
@@ -64,6 +65,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |abs(3c)| */
 #include	<usystem.h>
 #include	<sfx.h>
@@ -101,6 +103,7 @@ int zos_set(char *rbuf,int rlen,int zo) noex {
 	    if (rlen <= 0) {
 	        int	hours, mins ;
 	        char	*bp = rbuf ;
+		rs = SR_OK ;
 	        hours = abs(zo / 60) % 100 ;
 	        mins = abs(zo % 60) ;
 	        *bp++ = ((zo >= 0) ? '-' : '+') ;

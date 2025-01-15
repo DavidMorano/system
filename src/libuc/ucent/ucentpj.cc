@@ -89,8 +89,9 @@ int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && pjbuf && sp) {
+	    PROJECT *pep = this ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(this) ;		/* potentially dangerous */
+	    memclear(pep) ;
 	    if (storeitem si ; (rs = si.start(pjbuf,pjlen)) >= 0) {
 	        int	fi = 0 ;
 	        cchar	**vpp ;
@@ -147,36 +148,37 @@ int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 }
 /* end subroutine (ucentpj::parse) */
 
-int ucentpj::load(char *pjbuf,int pjlen,CPJE *spjp) noex {
+int ucentpj::load(char *pjbuf,int pjlen,CPJE *cpjp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && pjbuf && spjp) {
-	    memcpy(this,spjp) ;
+	if (this && pjbuf && cpjp) {
+	    PROJECT *pep = this ;
+	    *pep = *cpjp ; /* shallow copy */
 	    if (storeitem si ; (rs = si.start(pjbuf,pjlen)) >= 0) {
 	        int	n ; /* used-afterwards */
 	        void	**ptab{} ; /* used twice below */
-	        if (spjp->pj_users) {
-	            for (n = 0 ; spjp->pj_users[n] ; n += 1) ;
+	        if (cpjp->pj_users) {
+	            for (n = 0 ; cpjp->pj_users[n] ; n += 1) ;
 	            if ((rs = si.ptab(n,&ptab)) >= 0) {
 	                int	i = 0 ;
 	                char	**tab = charpp(ptab) ;
 	                pj_users = tab ;
-	                while ((rs >= 0) && spjp->pj_users[i]) {
-			    cchar	*un = spjp->pj_users[i] ;
+	                while ((rs >= 0) && cpjp->pj_users[i]) {
+			    cchar	*un = cpjp->pj_users[i] ;
 	                    rs = si_copystr(&si,(tab + i),un) ;
 			    i += 1 ;
 	                } /* end while */
 	                pj_users[i] = nullptr ;
 	            } /* end if (storeitem-ptab) */
 	        } /* end if (users) */
-	        if (spjp->pj_groups) {
-	            for (n = 0 ; spjp->pj_groups[n] ; n += 1) ;
+	        if (cpjp->pj_groups) {
+	            for (n = 0 ; cpjp->pj_groups[n] ; n += 1) ;
 	            if ((rs = si.ptab(n,&ptab)) >= 0) {
 	                int	i = 0 ;
 	                char	**tab = charpp(ptab) ;
 	                pj_groups = tab ;
-	                while ((rs >= 0) && spjp->pj_groups[i]) {
-			    cchar	*gn = spjp->pj_groups[i] ;
+	                while ((rs >= 0) && cpjp->pj_groups[i]) {
+			    cchar	*gn = cpjp->pj_groups[i] ;
 	                    rs = si_copystr(&si,(tab + i),gn) ;
 			    i += 1 ;
 	                } /* end for */
@@ -184,9 +186,9 @@ int ucentpj::load(char *pjbuf,int pjlen,CPJE *spjp) noex {
 	            } /* end if (storeitem-ptab) */
 	        } /* end if (groups) */
 		{
-	            si_copystr(&si,&pj_name,spjp->pj_name) ;
-	            si_copystr(&si,&pj_comment,spjp->pj_comment) ;
-	            si_copystr(&si,&pj_attr,spjp->pj_attr) ;
+	            si_copystr(&si,&pj_name,cpjp->pj_name) ;
+	            si_copystr(&si,&pj_comment,cpjp->pj_comment) ;
+	            si_copystr(&si,&pj_attr,cpjp->pj_attr) ;
 		}
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;

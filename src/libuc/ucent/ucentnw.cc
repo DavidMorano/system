@@ -127,8 +127,9 @@ int ucentnw::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && ebuf && sp) {
+	    NETENT *nep = this ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(this) ;		/* potentially dangerous */
+	    memclear(nep) ;
 	    n_addrtype = AF_INET4 ;		/* <- mandatory */
 	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
 	        cchar	*cp{} ;
@@ -163,20 +164,21 @@ int ucentnw::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 }
 /* end subroutine (ucentnw::parse) */
 
-int ucentnw::load(char *rbuf,int rlen,const ucentnw *cprp) noex {
+int ucentnw::load(char *rbuf,int rlen,const ucentnw *cnwp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf && cprp) {
-	    memcpy(this,cprp) ;
+	if (this && rbuf && cnwp) {
+	    NETENT *nep = this ;
+	    *nep = *cnwp ; /* shallow copy */
 	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) {
-	        if (cprp->n_aliases) {
+	        if (cnwp->n_aliases) {
 	            int		n ; /* used-afterwards */
-	            for (n = 0 ; cprp->n_aliases[n] ; n += 1) ;
+	            for (n = 0 ; cnwp->n_aliases[n] ; n += 1) ;
 	            if (void **tab{} ; (rs = si.ptab(n,&tab)) >= 0) {
-		        cchar	**aliases = ccharpp(cprp->n_aliases) ;
+		        cchar	**aliases = ccharpp(cnwp->n_aliases) ;
 		        int	i ; /* used-afterwards */
 	                n_aliases = charpp(tab) ;
-	                for (i = 0 ; cprp->n_aliases[i] ; i += 1) {
+	                for (i = 0 ; cnwp->n_aliases[i] ; i += 1) {
 			    cchar	*an = aliases[i] ;
 	                    rs = si_copystr(&si,(n_aliases + i),an) ;
 	                    if (rs < 0) break ;
@@ -187,7 +189,7 @@ int ucentnw::load(char *rbuf,int rlen,const ucentnw *cprp) noex {
 		    n_aliases = nullptr ;
 	        } /* end if (aliases) */
 		if (rs >= 0) {
-		    rs = si_copystr(&si,&n_name,cprp->n_name) ;
+		    rs = si_copystr(&si,&n_name,cnwp->n_name) ;
 		}
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;

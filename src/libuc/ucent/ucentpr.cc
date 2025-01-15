@@ -92,8 +92,9 @@ int ucentpr::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && ebuf && sp) {
+	    PROTOENT *pep = this ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(this) ;		/* potentially dangerous */
+	    memclear(pep) ;
 	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
 	        cchar	*cp{} ;
 		if (int idx ; (idx = sichr(sp,sl,'#')) >= 0) {
@@ -133,7 +134,8 @@ int ucentpr::load(char *rbuf,int rlen,const ucentpr *cprp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && rbuf && cprp) {
-	    memcpy(this,cprp) ;
+	    PROTOENT *pep = this ;
+	    *pep = *cprp ; /* shallow copy */
 	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) {
 	        if (cprp->p_aliases) {
 	            int		n ; /* used-afterwards */

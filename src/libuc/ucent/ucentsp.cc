@@ -85,30 +85,28 @@ int ucentsp::parse(char *spbuf,int splen,cchar *sp,int sl) noex {
 	int		rs  = SR_FAULT ;
 	int		rs1 ;
 	if (spbuf && sp) {
-	    rs = SR_INVALID ;
-	    memclear(this) ;		/* potentially dangerous */
-	    if (splen > 0) {
-	        if (sl < 0) sl = strlen(sp) ;
-	        if (storeitem si ; (rs = si.start(spbuf,splen)) >= 0) {
-	            int		fi = 0 ;
-	            for (int idx ; (idx = sichr(sp,sl,':')) >= 0 ; ) {
-	                rs = ucentsp_parseone(this,&si,fi++,sp,idx) ;
-	                sl -= (idx +1) ;
-	                sp += (idx +1) ;
-	                if (rs < 0) break ;
-	            } /* end for */
-	            if ((rs >= 0) && sl && sp[0]) {
-	                rs = ucentsp_parseone(this,&si,fi++,sp,sl) ;
-	            }
-	            if (rs >= 0) {
-	                rs = ucentsp_parsedefs(this,&si,fi) ;
-	                fi = rs ;
-	            }
-	            if ((rs >= 0) && (fi < 6)) rs = SR_BADFMT ;
-	            rs1 = si.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (storeitem) */
-	    } /* end if (valid) */
+	    SPWD *sep = this ;
+	    memclear(sep) ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if (storeitem si ; (rs = si.start(spbuf,splen)) >= 0) {
+	        int		fi = 0 ;
+	        for (int idx ; (idx = sichr(sp,sl,':')) >= 0 ; ) {
+	            rs = ucentsp_parseone(this,&si,fi++,sp,idx) ;
+	            sl -= (idx +1) ;
+	            sp += (idx +1) ;
+	            if (rs < 0) break ;
+	        } /* end for */
+	        if ((rs >= 0) && sl && sp[0]) {
+	            rs = ucentsp_parseone(this,&si,fi++,sp,sl) ;
+	        }
+	        if (rs >= 0) {
+	            rs = ucentsp_parsedefs(this,&si,fi) ;
+	            fi = rs ;
+	        }
+	        if ((rs >= 0) && (fi < 6)) rs = SR_BADFMT ;
+	        rs1 = si.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -118,18 +116,16 @@ int ucentsp::load(char *spbuf,int splen,const ucentsp *sspp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (spbuf && sspp) {
-	    rs = SR_INVALID ;
-	    if (splen > 0) {
-	        (*this) = *sspp ;
-	        if (storeitem si ; (rs = si.start(spbuf,splen)) >= 0) {
-		    {
-	                si_copystr(&si,&sp_namp,sspp->sp_namp) ;
-	                si_copystr(&si,&sp_pwdp,sspp->sp_pwdp) ;
-		    }
-	            rs1 = si.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (storeitem) */
-	    } /* end if (valid) */
+	    SPWD *sep = this ;
+	    *sep = *sspp ;
+	    if (storeitem si ; (rs = si.start(spbuf,splen)) >= 0) {
+		{
+	            si_copystr(&si,&sp_namp,sspp->sp_namp) ;
+	            si_copystr(&si,&sp_pwdp,sspp->sp_pwdp) ;
+		}
+	        rs1 = si.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -139,63 +135,60 @@ int ucentsp::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (rbuf) {
-	    rs = SR_INVALID ;
-	    if (rlen > 0) {
-	        if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
-	            for (int i = 0 ; i < 9 ; i += 1) {
-	                if (i > 0) rs = b.chr(':') ;
-	                if (rs >= 0) {
-	                    long	v  = -1 ;
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	        for (int i = 0 ; i < 9 ; i += 1) {
+	            if (i > 0) rs = b.chr(':') ;
+	            if (rs >= 0) {
+	                long	v  = -1 ;
+	                switch (i) {
+	                case 0:
+	                    rs = b.str(sp_namp) ;
+	                    break ;
+	                case 1:
+	                    rs = b.str(sp_pwdp) ;
+	                    break ;
+	                case 2:
+	                case 3:
+	                case 4:
+	                case 5:
+	                case 6:
+	                case 7:
 	                    switch (i) {
-	                    case 0:
-	                        rs = b.str(sp_namp) ;
-	                        break ;
-	                    case 1:
-	                        rs = b.str(sp_pwdp) ;
-	                        break ;
 	                    case 2:
-	                    case 3:
-	                    case 4:
-	                    case 5:
-	                    case 6:
-	                    case 7:
-	                        switch (i) {
-	                        case 2:
-	                            v = sp_lstchg ;
-	                            break ;
-	                        case 3:
-	                            v = sp_min ;
-	                            break ;
-	                        case 4:
-	                            v = sp_max ;
-	                            break ;
-	                        case 5:
-	                            v = sp_warn ;
-	                            break ;
-	                        case 6:
-	                            v = sp_inact ;
-	                            break ;
-	                        case 7:
-	                            v = sp_expire ;
-	                            break ;
-	                        } /* end switch */
-	                        if (v != -1) {
-	                            rs = b.dec(v) ;
-	                        }
+	                        v = sp_lstchg ;
 	                        break ;
-	                    case 8:
-	                        if (ulong uv = sp_flag ; uv != 0) {
-	                            rs = b.dec(uv) ;
-	                        }
+	                    case 3:
+	                        v = sp_min ;
+	                        break ;
+	                    case 4:
+	                        v = sp_max ;
+	                        break ;
+	                    case 5:
+	                        v = sp_warn ;
+	                        break ;
+	                    case 6:
+	                        v = sp_inact ;
+	                        break ;
+	                    case 7:
+	                        v = sp_expire ;
 	                        break ;
 	                    } /* end switch */
-	                } /* end if (ok) */
-	                if (rs < 0) break ;
-	            } /* end for */
-	            rs1 = b.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (sbuf) */
-	    } /* end if (valid) */
+	                    if (v != -1) {
+	                        rs = b.dec(v) ;
+	                    }
+	                    break ;
+	                case 8:
+	                    if (ulong uv = sp_flag ; uv != 0) {
+	                        rs = b.dec(uv) ;
+	                    }
+	                    break ;
+	                } /* end switch */
+	            } /* end if (ok) */
+	            if (rs < 0) break ;
+	        } /* end for */
+	        rs1 = b.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
 }
