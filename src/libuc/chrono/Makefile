@@ -55,8 +55,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-#OBJ0_DATER= dater_main.o dater_setkey.o
-OBJ0_DATER= dater_main.o 
+OBJ0_DATER= dater_main.o dater_setkey.o
 OBJ1_DATER= dater_getbbtime.o dater_getdate.o
 
 OBJ_DATER= obj0_dater.o obj1_dater.o

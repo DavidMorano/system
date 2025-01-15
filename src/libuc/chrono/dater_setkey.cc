@@ -98,7 +98,8 @@ namespace {
 	    zn = azn ;
 	} ;
 	operator int () noex ;
-	int exec(int,cc *,int) noex ;
+	int prockey(int,cc *,int) noex ;
+	int procval(cc *,int) noex ;
     } ; /* end struct (datehelp) */
 }
 
@@ -141,13 +142,12 @@ constexpr cpcchar	datetypes[] = {
 /* exported subroutines */
 
 int dater_setkey(dater *dp,cc *dsp,int dsl,TIMEB *nowp,cc *zn) noex {
-    	cnullptr	np{} ;
 	int		rs  ;
 	if ((rs = dater_magic(dp,dsp,nowp,zn)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (dsl < 0) dsl = strlen(dsp) ;
 	    if (dsp[0]) {
-		datehelp	dh(dp,dsp,dsl,nowp,zn) ;
+		datehelp dh(dp,dsp,dsl,nowp,zn) ;
 		rs = dh ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -159,51 +159,52 @@ int dater_setkey(dater *dp,cc *dsp,int dsl,TIMEB *nowp,cc *zn) noex {
 /* local subroutines */
 
 datehelp::operator int () noex {
+    	cnullptr	np{} ;
     	int		rs = SR_OK ;
-
+        if (cc *tp ; (tp = strnchr(dsp,dsl,'=')) != np) {
+	    cint	vall = ((dsp + dsl) - (tp + 1)) ;
+            cc		*valp = (tp + 1) ;
+	    cchar	*kp ;
+            if (int kl ; (kl = sfshrink(dsp,(tp - dsp),&kp)) > 0) {
+                if (int ti ; (ti = matstr(datetypes,kp,kl)) >= 0) {
+		    rs = prockey(ti,valp,vall) ;
+		} else {
+		    rs = SR_NOTSUP ;
+		}
+	    } else {
+		rs = procval(valp,vall) ;
+	    }
+        } else {
+	    rs = procval(dsp,dsl) ;
+	}
 	return rs ;
 }
 /* end method (datehelp::operator) */
 
-int datehelp::keyidx() noex {
+int datehelp::procval(cchar *sp,int sl) noex {
     	int		rs = SR_OK ;
-            int		tlen = 0 ;
-            int		ti = -1 ;
-            cchar	*tnam = nullptr ;
-            cchar	*sp ;
-	    rs = SR_OK ;
-    	    /* get the key name first (if it has one) */
-            if (cc *tp ; (tp = strnchr(dsp,dsl,'=')) != np) {
-                sp = (tp + 1) ;
-                tlen = sfshrink(dbuf,(cp - dbuf),&tnam) ;
+	cchar		*cp ;
+	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
+	    cint	ch = tolc(cp[0]) ;
+            if ((ch == 'c') || (ch == 'n')) {
+		if (int ti ; (ti = matstr(datetypes,cp,cl)) >= 0) {
+		    rs = prockey(ti,cp,cl) ;
+		} else {
+		    rs = SR_BADFMT ;
+		}
             } else {
-                bool        f = false ;
-                sp = dsp ;
-                tlen = sfshrink(dsp,dsl,&tnam) ;
-                if ((tolc(tnam[0]) == 'c') || (tolc(tnam[0]) == 'n')) {
-                    f = ((ti = matstr(datetypes,tnam,tlen)) >= 0) ;
-                }
-                if (! f) {
-                    tlen = -1 ;
-                }
-            } /* end if (getting possible tnam) */
-    	    /* if no type name, assume a TOUCHT type date string */
-            if (ti < 0) {
-                if (tlen > 0) {
-                    ti = matstr(datetypes,tnam,tlen) ;
-                    if (ti < 0) rs = SR_INVALID ;
-                } else {
-                    ti = datetype_toucht ;
-                }
-            } /* end if (had to find the type index) */
-            if (rs >= 0) {
-		rs = dater_setkeyexec(dp,ti,sp,sl,zn) ;
-            } /* end if */
+		    cint	ti = datetype_toucht ;
+		    rs = prockey(ti,cp,cl) ;
+	    }
+	} else {
+	    rs = SR_NOMSG ;
+	}
+	return rs ;
+}
+/* end method (datehelp::procval) */
 
-
-
-int datehelp::exec(int ti,cc *sp,int sl) noex {
-    	int		rs = SR_OK ;
+int datehelp::prockey(int ti,cc *sp,int sl) noex {
+    	int		rs = SR_NOTSUP ;
         switch (ti) {
         case datetype_touch:
             rs = dater_settouch(dp,sp,sl) ;
@@ -229,12 +230,9 @@ int datehelp::exec(int ti,cc *sp,int sl) noex {
                 rs = dater_settimezon(dp,t,zoff,zn,isdst) ;
             }
             break ;
-        default:
-            rs = SR_UNATCH ;
-            break ;
         } /* end switch */
 	return rs ;
 }
-/* end method (datehelp::exec) */
+/* end method (datehelp::prockey) */
 
 
