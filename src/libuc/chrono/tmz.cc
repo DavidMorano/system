@@ -5,7 +5,6 @@
 /* time and timezone parsing */
 /* version %I% last-modified %G% */
 
-#define	CF_MULTIZONE	1		/* allow fragmented time zone names */
 
 /* revision history:
 
@@ -123,10 +122,6 @@ static int	tmz_yearadj(tmz *,int) noex ;
 static int	getzoff(int *,cchar *,int) noex ;
 static int	val(cchar *) noex ;
 static int	silogend(cchar *,int) noex ;
-
-#if	defined(CF_MULTIZONE) && (CF_MULTIZONE == 0)
-static bool	isgoodname(cchar *,int) ;
-#endif
 
 static cchar	*strnzone(cchar *,int) noex ;
 
@@ -735,20 +730,20 @@ static int tmz_timeparts(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		si = 0 ;
-	if (field fsb ; (rs = field_start(&fsb,sp,sl)) >= 0) {
+	if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
 	    int		v ;
 	    int		fl ;
 	    cchar	*lp = sp ;
 	    cchar	*fp{} ;
 	    /* get hours */
-	    if ((fl = field_get(&fsb,tpterms,&fp)) > 0) {
+	    if ((fl = fsb.get(tpterms,&fp)) > 0) {
 	        lp = (fp + fl) ;
 	        rs = cfdeci(fp,fl,&v) ;
 	        op->st.tm_hour = v ;
 	    }
 	    if ((rs >= 0) && (fsb.term == ':')) {
 	        /* get minutes */
-	        if ((fl = field_get(&fsb,tpterms,&fp)) > 0) {
+	        if ((fl = fsb.get(tpterms,&fp)) > 0) {
 	            lp = (fp + fl) ;
 	            rs = cfdeci(fp,fl,&v) ;
 	            op->st.tm_min = v ;
@@ -756,14 +751,14 @@ static int tmz_timeparts(tmz *op,cchar *sp,int sl) noex {
 	    } /* end if */
 	    if ((rs >= 0) && (fsb.term == ':')) {
 		/* get seconds */
-	        if ((fl = field_get(&fsb,tpterms,&fp)) > 0) {
+	        if ((fl = fsb.get(tpterms,&fp)) > 0) {
 	            lp = (fp + fl) ;
 	            rs = cfdeci(fp,fl,&v) ;
 	            op->st.tm_sec = v ;
 	        }
 	    } /* end if */
 	    si = (lp - sp) ;
-	    rs1 = field_finish(&fsb) ;
+	    rs1 = fsb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? si : rs ;
@@ -931,24 +926,6 @@ static int tmz_yearadj(tmz *op,int sc) noex {
 }
 /* end subroutine (tmz_yearadj) */
 
-#if	defined(CF_MULTIZONE) && (CF_MULTIZONE == 0)
-
-/* do we have a valid time-zone name */
-static bool isgoodname(cchar *sp,int sl) noex {
-	bool		f = false ;
-	while ((sl != 0) && (sp[0] != '\0')) {
-	    cint	ch = mkchar(*sp) ;
-	    f = isalnumlatin(ch) ;
-	    if (! f) break ;
-	    sp += 1 ;
-	    sl -= 1 ;
-	} /* end while */
-	return f ;
-}
-/* end subroutine (isgoodname) */
-
-#endif /* defined(CF_MULTIZONE) && (CF_MULTIZONE == 0) */
-
 /* parse minutes west of GMT */
 static int getzoff(int *zop,cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
@@ -998,8 +975,9 @@ static int getzoff(int *zop,cchar *sp,int sl) noex {
 	    zoff = ((hours * 60) + mins) ;
 /* reportedly, there are time zones at up to 14 hours off of GMT! */
 #ifdef	COMMENT
-	    if (zoff > (14 * 60))
+	    if (zoff > (14 * 60)) {
 	        rs = SR_INVALID ;
+	    }
 #endif
 	    zoff *= sign ;
 	    if (zop) {
@@ -1047,5 +1025,22 @@ static cchar *strnzone(cchar *sp,int sl) noex {
 	return sp ;
 }
 /* end subroutine (strnzone) */
+
+#ifdef	COMMENT
+static bool	isgoodname(cchar *,int) noex ;
+/* do we have a valid time-zone name */
+static bool isgoodname(cchar *sp,int sl) noex {
+	bool		f = false ;
+	while ((sl != 0) && (sp[0] != '\0')) {
+	    cint	ch = mkchar(*sp) ;
+	    f = isalnumlatin(ch) ;
+	    if (! f) break ;
+	    sp += 1 ;
+	    sl -= 1 ;
+	} /* end while */
+	return f ;
+}
+/* end subroutine (isgoodname) */
+#endif /* COMMENT */
 
 

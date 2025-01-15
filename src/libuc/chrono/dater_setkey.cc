@@ -9,17 +9,19 @@
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-	Although there was probably something that could have done
-	with parsing job (with a different argument syntax) I wrote
-	this from scratch (sigh).  Yes, we try and avoid writing
-	whatever we can. This subroutine extends the DATE object
-	to parse strings with the date type indicated by a key name.
+	Although there was probably something that could have been
+	done with the parsing of date specification strins (here
+	below) using some existing code (perhaps with a different
+	argument syntax) I wrote this (below) from scratch (sigh).
+	Yes, I try to avoid writing anything new whatever I can.
+	This subroutine extends the DATER object to parse strings
+	with the date type indicated by a key name.
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-/******************************************************************************
+/*******************************************************************************
 
 	Name:
 	dater_setkey
@@ -27,14 +29,10 @@
 	Description:
 	This subroutine will parse out a date that has been specified
 	with a syntax like:
-
 		type=string
-
 	where:
-
 		type		is a name of a date string type
 		string		is the string that is supposed to be the date
-
 
 	Synopsis:
 	int dater_setkey(dater *dp,cc *dbuf,int dlen,TIMEB *nowp,cc *zn) noex
@@ -50,7 +48,7 @@
 	>=0		it all worked out OK
 	<0		the date could not be parsed (system-return)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
@@ -85,13 +83,12 @@
 
 namespace {
     struct datehelp {
-	dater *dp ;
-	cc *dsp ;
-	int dsl ;
-	TIMEB *nowp ;
-	cc *zn ;
-	datehelp(dater *p,cc *asp,int asl,TIMEB *tp,cc *azn) noex {
-	    dp = p ;
+	dater		*dp ;
+	cc		*dsp ;
+	TIMEB		*nowp ;
+	cc		*zn ;
+	int		dsl ;
+	datehelp(dater *p,cc *asp,int asl,TIMEB *tp,cc *azn) noex : dp(p) {
 	    dsp = asp ;
 	    dsl = asl ;
 	    nowp = tp ;
@@ -193,8 +190,8 @@ int datehelp::procval(cchar *sp,int sl) noex {
 		    rs = SR_BADFMT ;
 		}
             } else {
-		    cint	ti = datetype_toucht ;
-		    rs = prockey(ti,cp,cl) ;
+		cint	ti = datetype_toucht ;
+		rs = prockey(ti,cp,cl) ;
 	    }
 	} else {
 	    rs = SR_NOMSG ;

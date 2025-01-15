@@ -18,6 +18,10 @@
 
 /*******************************************************************************
  
+  	Object:
+	date
+
+	Description:
 	This object can be used to create dates from various input
 	data including strings.
 
@@ -105,6 +109,7 @@ int date_start(date *dp,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 int date_finish(date *dp) noex {
 	int		rs = SR_FAULT ;
 	if (dp) {
+	    rs = SR_OK ;
 	    dp->time = 0 ;
 	}
 	return rs ;
@@ -114,6 +119,7 @@ int date_finish(date *dp) noex {
 int date_copy(date *dp,date *d2p) noex {
 	int		rs = SR_FAULT ;
 	if (dp && d2p) {
+	    rs = SR_OK ;
 	    memcpy(dp,d2p) ;
 	}
 	return rs ;
@@ -123,6 +129,7 @@ int date_copy(date *dp,date *d2p) noex {
 int date_gettime(date *dp,time_t *tp) noex {
 	int		rs = SR_FAULT ;
 	if (dp && tp) {
+	    rs = SR_OK ;
 	    *tp = dp->time ;
 	}
 	return rs ;
@@ -132,6 +139,7 @@ int date_gettime(date *dp,time_t *tp) noex {
 int date_getzoff(date *dp,int *zop) noex {
 	int		rs = SR_FAULT ;
 	if (dp && zop) {
+	    rs = SR_OK ;
 	    *zop = dp->zoff ;
 	}
 	return rs ;
@@ -141,6 +149,7 @@ int date_getzoff(date *dp,int *zop) noex {
 int date_getisdst(date *dp,int *dstp) noex {
 	int		rs = SR_FAULT ;
 	if (dp && dstp) {
+	    rs = SR_OK ;
 	    *dstp = int(dp->isdst) ;
 	}
 	return rs ;

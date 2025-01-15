@@ -90,8 +90,7 @@ int dater_getbbtime(dater *dp,cchar *sp,int sl,time_t *tp) noex {
 	        } else if ((rs = dater_setstrdig(dp,cp,cl)) >= 0) {
 	            dater_gettime(dp,tp) ;
 	        } else if (rs == SR_INVALID) {
-	            ulong	ulw ;
-	            if ((rs = cfdecul(cp,cl,&ulw)) >= 0) {
+	            if (ulong ulw ; (rs = cfdecul(cp,cl,&ulw)) >= 0) {
 	                *tp = time_t(ulw) ;
 	            }
 	        } /* end if */
