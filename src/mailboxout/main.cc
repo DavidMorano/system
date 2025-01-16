@@ -1,7 +1,9 @@
-/* main */
+/* main SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* fairly generic (PCS) front-end */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_DEBUG	0		/* run-time */
@@ -10,12 +12,11 @@
 #define	CF_MAILDIRS	1		/* use built-in maildirs */
 #define	CF_ISSAMEHOST	1		/* use 'issamehostname(3dam)' */
 
-
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 */
 
@@ -23,15 +24,16 @@
 
 /******************************************************************************
 
-        This program just locks a mailbox file and copies it out. After a
-        successful copy, the mailbox file is truncated.
+  	Name:
+	main
 
+	Description:
+	This program just locks a mailbox file and copies it out.
+	After a successful copy, the mailbox file is truncated.
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -354,8 +356,7 @@ char	*envv[] ;
 	tmpfname[0] = '\0' ;
 	logfname[0] = '\0' ;
 
-	initnow(&pip->now,pip->zname,DATER_ZNAMELEN) ;
-
+	rs = pip->znameset() ;
 	dater_start(&pip->tmpdate,&pip->now,pip->zname,-1) ;
 
 

@@ -133,6 +133,7 @@ struct proginfo_vals {
 	cchar		*cfname ;
 	cchar		*lfname ;
 	cchar		*pidfname ;
+	cchar		*zname ;
 	void		*efp ;
 	void		*buffer ;	/* general buffer */
 	void		*contextp ;	/* SHELL context */

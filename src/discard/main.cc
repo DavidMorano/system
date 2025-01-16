@@ -1,4 +1,5 @@
 /* main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* generic (pretty much) front-end program subroutine */
@@ -19,6 +20,10 @@
 
 /*****************************************************************************
 
+  	Name:
+	main
+
+	Description:
 	This subroutine forms the front-end part of a generic PCS
 	type of program.  This front-end is used in a variety of
 	PCS programs.  This code was originally part of the
@@ -358,7 +363,7 @@ char	*envv[] ;
 	helpfname[0] = '\0' ;
 
 	{
-	    struct tm	st, *stp ;
+	    TM		st, *stp ;
 	    int		zo ;
 	    char	*tznp ;
 
@@ -372,15 +377,10 @@ char	*envv[] ;
 	    pip->now.dstflag = daylight ;
 
 	    tznp = (stp->tm_isdst <= 0) ? tzname[0] : tzname[1] ;
-	    strncpy(pip->zname,tznp,DATE_ZNAMELEN) ;
-
+	    rs = pip->znameset(tznp) ;
 	} /* end block (getting some current time stuff) */
 
 /* start parsing the arguments */
-
-#if	CF_DEBUGS
-	debugprintf("main: about to loop on arguments\n") ;
-#endif
 
 	for (i = 0 ; i < MAXARGGROUPS ; i += 1) argpresent[i] = 0 ;
 

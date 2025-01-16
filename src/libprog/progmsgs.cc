@@ -1,5 +1,6 @@
 /* progmsgs SUPPORT */
 /* lang=C++20 */
+/* version %I% last-modified %G% */
 
 /* process the input messages and spool them up */
 /* version %I% last-modified %G% */
@@ -2003,11 +2004,6 @@ static int procmsgouthdr_date(PROGINFO *pip,PROCDATA *pdp)
 			    cint	czoff = pip->now.timezone ;
 			    cchar	*fmt = "  date=%s" ;
 			    char	tbuf[TIMEBUFLEN+1] = { 0 } ;
-#if	CF_DEBUG
-			    if (DEBUGLEVEL(4))
-	    			debugprintf("progmsgs/procmsgouthdr_date: "
-					"czoff=%d zoff=%d\n",czoff,zoff) ;
-#endif
 			    if (czoff != zoff) {
 			        fmt = "  date=%s (%s)" ;
 			        timestr_logz(t,tbuf) ;
@@ -2016,13 +2012,11 @@ static int procmsgouthdr_date(PROGINFO *pip,PROCDATA *pdp)
 		        }
 
 	                if (pip->open.logzone) {
-	                    cint	zlen = DATER_ZNAMELEN ;
-	                    char	zbuf[DATER_ZNAMELEN + 1] ;
-    
+	                    char	*zname = tdp->zname ;
 	                    if ((rs1 = dater_getzonename(tdp,zbuf,zlen)) >= 0) {
 			        LOGZONES	*lzp = &pip->lz ;
 	                        if (rs2 < 0) zoff = LOGZONES_NOZONEOFFSET ;
-	                        logzones_update(lzp,zbuf,zlen,zoff,pip->stamp) ;
+	                        logzones_update(lzp,zname,-1,zoff,pip->stamp) ;
 	                    } /* end if */
 
 	                } /* end if (logging time-zone information) */

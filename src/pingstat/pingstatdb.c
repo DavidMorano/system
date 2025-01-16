@@ -209,70 +209,74 @@ int pingstatdb_open(PINGSTATDB *psp,cchar *fname,mode_t omode,int fperm)
 	    psp->fname = cp ;
 	    psp->f.writable = ((omode & O_WRONLY) || (omode & O_RDWR)) ;
 	    mkbstr(omode,bstr) ;
-#if	CF_DEBUGS
-	    debugprintf("pingstatdb_open: bopen mode=%s\n",bstr) ;
-#endif
 	    if ((rs = bopen(&psp->pfile,psp->fname,bstr,fperm)) >= 0) {
-	        const int	cmd = BC_CLOSEONEXEC ;
-#if	CF_DEBUGS
-	        debugprintf("pingstatdb_open: bopen() rs=%d\n",rs) ;
-#endif
+	        cint	cmd = BC_CLOSEONEXEC ;
 	        if ((rs = bcontrol(&psp->pfile,cmd,TRUE)) >= 0) {
 	            if ((rs = vecitem_start(&psp->entries,0,0)) >= 0) {
-	                const int	zsize = DATER_ZNAMELEN ;
-	                if ((rs = initnow(&psp->now,psp->zname,zsize)) >= 0) {
-	                    psp->magic = PINGSTATDB_MAGIC ;
-	                }
-	                if (rs < 0)
+			rs = pingstatdb_opener(psp) ;
+	                if (rs < 0) {
 	                    vecitem_finish(&psp->entries) ;
+			}
 	            }
 	        } /* end if (bcontrol) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            bclose(&psp->pfile) ;
+		}
 	    } /* end if (bopen) */
 	    if (rs < 0) {
 	        uc_free(psp->fname) ;
 	        psp->fname = NULL ;
 	    }
 	} /* end if (m-a) */
-
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_open: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (pingstatdb_open) */
 
+static int pingstatdb_opener(pingstatdb *op) noex {
+    	int		rs ;
+	if (char *znbuf ; (rs = malloc_zn(&znbuf)) >= 0) {
+	    cint	znlen = rs ;
+	    if ((rs = initnow(&psp->now,znbuf,znlen)) >= 0) {
+		if (char *a ; (rs = uc_mallocstrw(znbuf,rs,&a)) >= 0) {
+		    psp->zname = a ;
+		    psp->magic = PINGSTATDB_MAGIC ;
+		} /* end if (memory-allocation) */
+	    }
+	    rs = rsfree(rs,znbuf) ;
+	} /* end if (m-a-f) */
+	return rs ;
+}
+/* end subroutine (pingstatdb_opener) */
 
-int pingstatdb_close(PINGSTATDB *psp)
-{
+int pingstatdb_close(PINGSTATDB *psp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (psp == NULL) return SR_FAULT ;
 
 	if (psp->magic != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
-
+	{
 	rs1 = pingstatdb_fes(psp) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = bclose(&psp->pfile) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = vecitem_finish(&psp->entries) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	if (psp->fname != NULL) {
 	    rs1 = uc_free(psp->fname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    psp->fname = NULL ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_close: ret rs=%d\n",rs) ;
-#endif
-
+	if (psp->zname) {
+	    rs1 = uc_free(psp->zname) ;
+	    if (rs >= 0) rs = rs1 ;
+	    psp->zname = NULL ;
+	}
 	psp->magic = 0 ;
 	return rs ;
 }

@@ -980,17 +980,18 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
 
 	if (rs >= 0) {
-	    rs = initnow(&pip->now,pip->zname,DATER_ZNAMELEN) ;
-	    pip->daytime = pip->now.time ;
+	    rs = pip->nowinit ;
 	}
 
 /* program options */
 
 	if (rs >= 0) {
 	    if ((rs = procopts(pip,&akopts)) >= 0) {
-	        if (pip->lfname == NULL) pip->lfname = getenv(VARLFNAME) ;
+	        if (pip->lfname == NULL) {
+		    pip->lfname = getenv(VARLFNAME) ;
+		}
 	        if ((rs = tmz_isset(&stz)) > 0) {
-	            TMTIME	tmt ;
+	            tmtime tmt ;
 	            if (! stz.f.year) {
 	                rs = tmtime_localtime(&tmt,pip->daytime) ;
 	                stz.st.tm_year = tmt.year ;

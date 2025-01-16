@@ -308,10 +308,9 @@ char	*envv[] ;
 /* get the current time-of-day */
 
 	{
-	    initnow(&pip->now,pip->zname,DATER_ZNAMELEN) ;
-
-	    dater_start(&pip->tmpdate,&pip->now,pip->zname,-1) ;
-
+	    if ((rs = pip->znameset()) >= 0) {
+	        rs = dater_start(&pip->tmpdate,&pip->now,pip->zname,-1) ;
+	    }
 	} /* end block (getting some current time stuff) */
 
 	pip->daytime = pip->now.time ;

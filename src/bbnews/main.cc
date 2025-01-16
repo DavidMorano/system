@@ -1,7 +1,9 @@
-/* main (bbnews) */
+/* main SUPPORT (bbnews) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* BB-News reader */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
@@ -10,12 +12,11 @@
 #define	CF_MKDIRLIST	1		/* enable MKDIRLIST */
 #define	CF_ANSITERMS	0		/* ansiterms[] */
 
-
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
-	This code module was completely rewritten to replace any original
-	garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 	= 1998-11-22, David A­D­ Morano
         I did some clean-up.
@@ -26,16 +27,17 @@
 
 /*******************************************************************************
 
-	This is the front-end subroutine (main) for the BB program.  It is
-	similar to most other PCS programs but may be a little different since
-	it originated differently from the others.
+	Name:
+	main
 
+	Description:
+	This is the front-end subroutine (main) for the BB program.
+	It is similar to most other PCS programs but may be a little
+	different since it originated differently from the others.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -45,9 +47,10 @@
 #include	<time.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
 
 #include	<usystem.h>
+#include	<ucmallreg.h>
+#include	<bufsizevar.hh>
 #include	<sighand.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -61,7 +64,7 @@
 #include	<pcsconf.h>
 #include	<pcspoll.h>
 #include	<mailmsghdrs.h>
-#include	<ucmallreg.h>
+#include	<initnow.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -90,7 +93,6 @@ extern int	cfdecti(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	mkuiname(char *,int,USERINFO *) ;
-extern int	initnow(struct timeb *,char *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;
 extern int	isFailOpen(int) ;
@@ -173,71 +175,23 @@ static void	main_sighand(int,siginfo_t *,void *) ;
 static volatile int	if_exit ;
 static volatile int	if_int ;
 
-static const int	sigblocks[] = {
+constexpr int		sigblocks[] = {
 	0
 } ;
 
-static const int	sigignores[] = {
+constexpr int		sigignores[] = {
 	SIGPIPE,
 	SIGPOLL,
 	SIGHUP,
 	0
 } ;
 
-static const int	sigints[] = {
+constexpr int		sigints[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGINT,
 	SIGTERM,
 	0
-} ;
-
-static cchar	*argopts[] = {
-	"VERSION",
-	"ROOT",
-	"TMPDIR",
-	"HELP",
-	"TERM",
-	"EDITOR",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"if",
-	"nf",
-	"keyboard",
-	"kbd",
-	"titles",
-	"old_titles",
-	"count",
-	"new",
-	"old",
-	"all",
-	"every",
-	"names", /* 18 */
-	"boards",
-	"interactive",
-	"nopage",
-	"article-id",
-	"mailbox",
-	"newsgroups", /* 24 */
-	"reverse",
-	"subjects",
-	"date",
-	"from",
-	"message-id",
-	"msgid",
-	"mailer",
-	"METAMAIL",
-	"catchup",
-	"query",
-	"subscribe",
-	"unsubscribe",
-	"description",
-	"BBPOST",
-	"PAGER",
-	"sort",
-	NULL
 } ;
 
 enum argopts {
@@ -288,7 +242,55 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const struct pivars	initvars = {
+constexpr cpcchar	argopts[] = {
+	"VERSION",
+	"ROOT",
+	"TMPDIR",
+	"HELP",
+	"TERM",
+	"EDITOR",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"if",
+	"nf",
+	"keyboard",
+	"kbd",
+	"titles",
+	"old_titles",
+	"count",
+	"new",
+	"old",
+	"all",
+	"every",
+	"names", /* 18 */
+	"boards",
+	"interactive",
+	"nopage",
+	"article-id",
+	"mailbox",
+	"newsgroups", /* 24 */
+	"reverse",
+	"subjects",
+	"date",
+	"from",
+	"message-id",
+	"msgid",
+	"mailer",
+	"METAMAIL",
+	"catchup",
+	"query",
+	"subscribe",
+	"unsubscribe",
+	"description",
+	"BBPOST",
+	"PAGER",
+	"sort",
+	NULL
+} ;
+
+constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -296,7 +298,7 @@ static const struct pivars	initvars = {
 	VARPRNAME
 } ;
 
-static const struct mapex	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -308,15 +310,6 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static cchar	*akonames[] = {
-	"query",
-	"test",
-	"term",
-	"useclen",
-	"useclines",
-	NULL
-} ;
-
 enum akonames {
 	akoname_query,
 	akoname_test,
@@ -326,9 +319,18 @@ enum akonames {
 	akoname_overlast
 } ;
 
+constexpr cpcchar	akonames[] = {
+	"query",
+	"test",
+	"term",
+	"useclen",
+	"useclines",
+	NULL
+} ;
+
 #if	CF_ANSITERMS
 /* pop screen terminal types (this using prefix matching!) */
-static cchar	*ansiterms[] = {
+constexpr cpcchar	ansiterms[] = {
 	"ansi",
 	"vt100",
 	"vt101",
@@ -344,7 +346,7 @@ static cchar	*ansiterms[] = {
 } ;
 #endif /* CF_ANSITERMS */
 
-static cchar	*sortmodes[] = {
+constexpr cpcchar	sortmodes[] = {
 	"modify",
 	"arrive",
 	"post",
@@ -354,7 +356,7 @@ static cchar	*sortmodes[] = {
 	NULL
 } ;
 
-static cchar	*progmodes[] = {
+constexpr cpcchar	progmodes[] = {
 	"read",
 	"header",
 	"names",
@@ -373,7 +375,7 @@ static cchar	*progmodes[] = {
 #define	PM_OVERLAST	5
 #endif
 
-static const uchar	aterms[] = {
+constexpr char		aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -384,12 +386,15 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
+static bufsizevar	znlen(getbufsize_zn) ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int main(int argc,cchar *argv[],cchar *envv[])
-{
+int main(int argc,mainv argv,mainv envv) noex {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
 	SIGHAND		sm ;
@@ -1291,17 +1296,19 @@ int main(int argc,cchar *argv[],cchar *envv[])
 #endif
 
 	if (rs >= 0) {
-	    if ((rs = initnow(&pip->now,pip->zname,DATER_ZNAMELEN)) >= 0) {
-	        if (( rs = procopts(pip,&akopts)) >= 0) {
+	    if ((rs = znlen) >= 0) {
+	        if ((rs = initnow(&pip->now,pip->zname,rs)) >= 0) {
+	            if (( rs = procopts(pip,&akopts)) >= 0) {
 #if	CF_CHECKONC
-		    rs = checkonc(pip->pr,NULL,NULL,NULL) ;
-		    pip->f.onckey = (rs >= 0) ;
+		        rs = checkonc(pip->pr,NULL,NULL,NULL) ;
+		        pip->f.onckey = (rs >= 0) ;
 #else
-		    rs = 1 ;
+		        rs = 1 ;
 #endif /* CF_CHECKONC */
-		}
-	    }
-	}
+		    }
+	        }
+	    } /* end if (znlen) */
+	} /* end if (ok) */
 
 	if ((pip->progmode < 0) && pip->f.test)
 	    pip->progmode = PM_TEST ;
@@ -1310,7 +1317,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    pip->progmode = PM_READ ;
 
 	if (pip->debuglevel > 0) {
-	    const int	pm = pip->progmode ;
+	    cint	pm = pip->progmode ;
 	    cchar	*pn = pip->progname ;
 	    cchar	*pms = "" ;
 	    if (pm < PM_OVERLAST) pms = progmodes[pm] ;

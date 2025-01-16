@@ -1,7 +1,9 @@
-/* main */
+/* main SUPPORT (comsat) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* COMSAT server */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* debug print-outs */
@@ -10,7 +12,6 @@
 #define	CF_DEBUGOT	0		/* debug 'opentermnote(3dam)' */
 #define	CF_INET6	0		/* use INET6 */
 #define	CF_PRLOCAL	1		/* need PR of LOCAL? */
-
 
 /* revision history:
 
@@ -23,17 +24,19 @@
 
 /*******************************************************************************
 
-	This program is a Comsat server.  It listens for Comsat messages from
-	the Comsat network port (UDP 'biff') and attempts to extract the
-	necessary mail information for display to one or more of the user's
-	(mail user's) logged in terminals.
+  	Name:
+	main
 
+	Description:
+	This program is a Comsat server.  It listens for Comsat
+	messages from the Comsat network port (UDP 'biff') and
+	attempts to extract the necessary mail information for
+	display to one or more of the user's (mail user's) logged
+	in terminals.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -50,9 +53,9 @@
 #include	<cstring>
 #include	<syslog.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<getportnum.h>
+#include	<mallocxx.h>
 #include	<sighand.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -68,6 +71,7 @@
 #include	<spawner.h>
 #include	<buffer.h>
 #include	<ascii.h>
+#include	<initnow.h>
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<isfiledesc.h>
@@ -148,7 +152,6 @@ extern int	getprotofamily(int) ;
 extern int	listenudp(int,cchar *,cchar *,int) ;
 extern int	opentermnote(cchar *,cchar **,int,int) ;
 extern int	pcsgetprogpath(cchar *,char *,cchar *) ;
-extern int	initnow(struct timeb *,char *,int) ;
 extern int	isasocket(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
@@ -1380,11 +1383,9 @@ static int procuserinfo_end(PROGINFO *pip)
 }
 /* end subroutine (procuserinfo_end) */
 
-
-static int procuserinfo_logid(PROGINFO *pip)
-{
-	const int	plen = LOGIDLEN ;
-	const int	pv = pip->pid ;
+static int procuserinfo_logid(proginfo *pip) noex {
+	cint		plen = LOGIDLEN ;
+	cint		pv = pip->pid ;
 	int		rs ;
 	cchar		*nn = pip->nodename ;
 	char		pbuf[LOGIDLEN+1] ;
@@ -1396,50 +1397,41 @@ static int procuserinfo_logid(PROGINFO *pip)
 }
 /* end subroutine (procuserinfo_logid) */
 
-
-static int process(PROGINFO *pip)
-{
-	struct timeb	now ;
-	const int	zlen = DATER_ZNAMELEN ;
+static int process(proginfo *pip) noex {
 	int		rs ;
-	char		*zbuf = pip->zname ;
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("main/process: ent\n") ;
-#endif
-	if ((rs = initnow(&now,zbuf,zlen)) >= 0) {
-	    pip->daytime = now.time ;
-	    if ((rs = dater_start(&pip->d,&now,zbuf,-1)) >= 0) {
-
-	        if (pip->f.background) {
-	            rs = procback(pip) ;
-	        } else if (pip->f.daemon) {
-	            rs = procdaemon(pip) ;
-	        } else {
-	            rs = procreg(pip) ;
-	        }
-	        if (pip->open.logprog) {
-	            char	tbuf[TIMEBUFLEN+1] ;
-	            timestr_logz(pip->daytime,tbuf) ;
-	            proglog_printf(pip,"%s exiting",tbuf) ;
-	        }
-
-	        dater_finish(&pip->d) ;
-	    } /* end if (dater) */
-	} /* end if (initnow) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("main/process: ret rs=%d\n",rs) ;
-#endif
+	int		rs1 ;
+	if (char *znbuf ; (rs = malloc_zn(&znbuf)) >= 0) {
+	    cinst	znlen = rs ;
+	    if (TIMEB now ; (rs = initnow(&now,znbuf,znlen)) >= 0) {
+		if ((rs = pip->znameset(znbuf,rs)) >= 0) {
+	            pip->daytime = now.time ;
+	            if ((rs = dater_start(&pip->d,&now,znbuf,-1)) >= 0) {
+	                if (pip->f.background) {
+	                    rs = procback(pip) ;
+	                } else if (pip->f.daemon) {
+	                    rs = procdaemon(pip) ;
+	                } else {
+	                    rs = procreg(pip) ;
+	                }
+	                if (pip->open.logprog) {
+	                    char	tbuf[TIMEBUFLEN+1] ;
+	                    timestr_logz(pip->daytime,tbuf) ;
+	                    proglog_printf(pip,"%s exiting",tbuf) ;
+	                }
+    
+	                rs1 = dater_finish(&pip->d) ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end if (dater) */
+		} /* end if (proginfo_znameset) */
+	    } /* end if (initnow) */
+	    rs = rsfree(rs,znbuf) ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (process) */
 
-
-static int procback(PROGINFO *pip)
-{
-	const int	elen = MAXPATHLEN ;
+static int procback(PROGINFO *pip) noex {
+	cint		elen = MAXPATHLEN ;
 	int		rs ;
 	char		ebuf[MAXPATHLEN+1] ;
 

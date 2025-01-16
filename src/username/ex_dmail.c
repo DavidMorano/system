@@ -554,20 +554,9 @@ const char	*envv[] ;
 /* get the current time-of-day */
 
 	{
-	    rs = initnow(&pip->now,pip->zname,DATER_ZNAMELEN) ;
-
-#if	CF_DEBUG
-	    {
-	        char	timebuf[TIMEBUFLEN+1] ;
-	        debugprintf("main: now.time=%u now.time=%s\n",
-	            pip->now.time,timestr_logz(pip->now.time,timebuf)) ;
-	    }
-#endif
-
-	    pip->daytime = pip->now.time ;
-	    if (rs >= 0)
+	    if ((rs = pip->nowinit) >= 0) {
 	        rs = dater_start(&pip->tmpdate,&pip->now,pip->zname,-1) ;
-
+	    }
 	} /* end block (getting some current time stuff) */
 	if (rs < 0) {
 	    ex = EX_OSERR ;

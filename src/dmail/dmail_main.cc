@@ -1,4 +1,5 @@
 /* main SUPPORT (DMAIL) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* fairly generic (PCS) front-end */
@@ -572,13 +573,18 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* get the current time-of-day */
 
-	{
-	    struct timeb	*nowp = &pip->now ;
-	    cint		zlen = DATER_ZNAMELEN ;
-	    if ((rs = initnow(nowp,pip->zname,zlen)) >= 0) {
-	        pip->daytime = nowp->time ;
-	        rs = dater_start(&pip->tmpdate,nowp,pip->zname,-1) ;
-	    } /* end if (initnow) */
+	if (rs >= 0) {
+	    if (char *znbuf ; (rs = malloc_zn(&anbuf)) >= 0) {
+	        TIMEB	*nowp = &pip->now ;
+	        cint	zlen = rs ;
+	        if ((rs = initnow(nowp,znbuf,znlen)) >= 0) {
+		    cint	znl = rs ;
+		    if ((rs = pip->znameset(znbuf,znl)) >= 0) {
+	                pip->daytime = nowp->time ;
+	                rs = dater_start(&pip->tmpdate,nowp,znbuf,znl) ;
+		    }
+	        } /* end if (initnow) */
+	    } /* end if (m-a-f) */
 	} /* end block (getting some current time stuff) */
 
 #if	CF_DEBUGS

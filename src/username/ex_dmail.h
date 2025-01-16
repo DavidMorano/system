@@ -205,6 +205,7 @@ struct proginfo {
 	const char	*envfromaddr ;
 	const char	*msgsubject ;
 	const char	*protospec ;
+	cchar		*zname ;
 	USERINFO	*uip ;
 	PCSCONF		*pp ;
 	void		*lip ;
@@ -237,7 +238,6 @@ struct proginfo {
 	int		nbl_system, nbl_local ;
 	int		c_processed, c_delivered ;
 	int		port_comsat ;
-	char		zname[DATER_ZNAMELEN + 1] ;
 	char		stamp[TIMEBUFLEN + 1] ;
 } ;
 

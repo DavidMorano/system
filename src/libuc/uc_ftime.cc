@@ -1,4 +1,5 @@
 /* uc_ftime SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -17,13 +18,13 @@
 /*******************************************************************************
 
 	This was originally supposed to implement the (so-called)
-	|ftime(3c)| subroutine. But that subroutine is *broken* by
-	design. Why is it broken?  It is broken because if always
+	|ftime(3c)| subroutine.  But that subroutine is *broken* by
+	design.  Why is it broken?  It is broken because it always
 	returns the standard time-zone offset from GMT in its
-	'timezone' structure member. This is essentually useless
+	'timezone' structure member.  This is essentually useless
 	in real life.  The only useful thing to return there is the
 	*current* time-zone offset as indicated by the 'dstflag'
-	member. So this is what we do instead of the original
+	member.  So this is what we do instead of the original
 	behavior.  We instead return the current time-zone offset
 	in the 'timezone' variable, as indicated by the 'dstflag'
 	member variable.
@@ -90,13 +91,12 @@ int uc_ftime(TIMEB *tbp) noex {
 		ftime(tbp) ;
 		rs = SR_OK ;
 	    } else {
-	        TIMEVAL		tv ;
 	        memclear(tbp) ;
-	        if ((rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
-	            TMTIME	tmt ;
+	        if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
+		    custime 	t = tbp->time ;
 	            tbp->time = tv.tv_sec ;
 	            tbp->millitm = (tv.tv_usec / 1000) ;
-	            if ((rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
+	            if (tmtime tmt ; (rs = tmtime_localtime(&tmt,t)) >= 0) {
 	                tbp->timezone = (tmt.gmtoff / 60) ;
 	                tbp->dstflag = tmt.isdst ;
 	                rs = (tmt.isdst > 0) ? 1 : 0 ;

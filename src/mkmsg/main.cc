@@ -435,8 +435,8 @@ static int mainsub(int argc,cchar **argv,cchar **envv)
 
 /* get the current time-of-day */
 
-	if ((rs = initnow(&pip->now,pip->zname,DATER_ZNAMELEN)) >= 0) {
-	    struct timeb	*nowp = &pip->now ;
+	if ((rs = pip->nowinit()) >= 0) {
+	    TIMEB	*nowp = &pip->now ;
 	    pip->daytime = pip->now.time ;
 	    if ((rs = dater_start(&pip->tmpdate,nowp,pip->zname,-1)) >= 0) {
 		pip->open.dater = TRUE ;

@@ -185,27 +185,9 @@ int main(int argc,cchar **argv,cchar **envv) {
 /* get the current time-of-day */
 
 	{
-	    struct tm	st, *stp ;
-
-	    char	*tznp ;
-
-	    int	zo ;
-
-
-	    uc_ftime(&pip->now) ;
-
-	    stp = &st ;
-	    uc_localtime(&pip->now.time,&st) ;
-
-	    zo = (stp->tm_isdst <= 0) ? timezone : altzone ;
-	    pip->now.timezone = zo / 60 ;
-	    pip->now.dstflag = daylight ;
-
-	    tznp = (stp->tm_isdst <= 0) ? tzname[0] : tzname[1] ;
-	    strncpy(pip->zname,tznp,DATE_ZNAMELEN) ;
-
-	    dater_start(&pip->tmpdate,&pip->now,pip->zname,-1) ;
-
+	    if ((rs = pip->nowinit) >= 0) {
+	        rs = dater_start(&pip->tmpdate,&pip->now,pip->zname,-1) ;
+	    }
 	} /* end block (getting some current time stuff) */
 
 /* start parsing the arguments */
