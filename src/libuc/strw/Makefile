@@ -56,9 +56,9 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0= strwcmp.o
-OBJ1= strwchr.o sicasechr.o sicite.o sidigit.o 
-OBJ2= sihyphen.o silbrace.o sileader.o
-OBJ3= siskipwhite.o sispan.o sisub.o
+OBJ1=
+OBJ2=
+OBJ3=
 
 OBJA= obj0.o
 

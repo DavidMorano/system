@@ -18,24 +18,21 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<localmisc.h>		/* <- |TZABBRLEN| */
 
 
 #define	DEFZINFO		struct defzinfo_head
-#define	DEFZINFO_ZNAMELEN	TZABBRLEN
 
 
 struct defzinfo_head {
 	int	zoff  ;		/* minutes west of GMT */
 	int	isdst ;		/* is-dst flag */
-	char	zname[DEFZINFO_ZNAMELEN + 1] ;
 } ;
 
 typedef DEFZINFO	defzinfo ;
 
 EXTERNC_begin
 
-extern int	getdefzinfo(defzinfo *,int) noex ;
+extern int	getdefzinfo(defzinfo *,char *,int,int) noex ;
 
 EXTERNC_end
 

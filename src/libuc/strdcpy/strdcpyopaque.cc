@@ -1,4 +1,5 @@
 /* strdcpyopaque SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* special (excellent) string-copy type of subroutine! */
@@ -47,6 +48,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<char.h>
 #include	<mkchar.h>
 
@@ -60,6 +62,12 @@
 
 
 /* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */

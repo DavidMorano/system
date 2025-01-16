@@ -37,6 +37,7 @@
 
 EXTERNC_begin
 
+extern int malloc_ps(char **) noex ;		/* PS pagesize */
 extern int malloc_ma(char **) noex ;		/* MA max-args */
 extern int malloc_mn(char **) noex ;		/* MN max-name */
 extern int malloc_mp(char **) noex ;		/* MP max-path */
@@ -57,8 +58,7 @@ extern int malloc_ho(char **) noex ;		/* HO object */
 extern int malloc_sv(char **) noex ;		/* SV object */
 extern int malloc_fs(char **) noex ;		/* FS type */
 extern int malloc_zn(char **) noex ;		/* TZ name */
-
-extern int malloc_ps(char **) noex ;		/* pagesize */
+extern int malloc_za(char **) noex ;		/* ZA zone-abbreviation */
 extern int malloc_mailaddr(char **) noex ;	/* mail address */
 
 EXTERNC_end

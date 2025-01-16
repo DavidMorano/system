@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	getpassword
+
+	Description:
 	This is a replacement for some UNIX subroutine of the same
 	sort of function ('getpass(3c)').  I forget why this one
 	is better but most of the UNIX system libraries calls are

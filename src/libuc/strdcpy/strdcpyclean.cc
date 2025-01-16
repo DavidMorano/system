@@ -1,4 +1,5 @@
 /* strdcpyclean SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy a source string to a destination while cleaning it up */
@@ -49,6 +50,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<ascii.h>
 #include	<mkchar.h>
 #include	<ischarx.h>

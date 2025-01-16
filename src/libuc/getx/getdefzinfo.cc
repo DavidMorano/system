@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+	Name:
+	getdefzinfo
+
+	Description:
 	We return some default time-zone information.
 
 *******************************************************************************/
@@ -24,9 +28,11 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<ctime>			/* <- for |time(2)| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<usysflag.h>
-#include	<strwcpy.h>
+#include	<bufsizevar.hh>		/* |zn| */
+#include	<snwcpy.h>
 #include	<altzone.h>
 #include	<localmisc.h>
 
@@ -50,6 +56,8 @@
 
 /* local variables */
 
+static bufsizevar	znlen(getbufsize_zn) ;
+
 constexpr bool		f_darwin = F_DARWIN ;
 
 
@@ -58,9 +66,10 @@ constexpr bool		f_darwin = F_DARWIN ;
 
 /* exported subroutines */
 
-int getdefzinfo(DEFZINFO *zip,int isdst) noex {
+int getdefzinfo(defzinfo *zip,char *zbuf,int zlen,int isdst) noex {
 	int		rs = SR_FAULT ;
-	if (zip) {
+	int		znl = 0 ;
+	if (zip && zbuf) {
 	    cchar	*zp{} ;
 	    if_constexpr (f_darwin) {
 		custime		dt = time(nullptr) ;
@@ -70,21 +79,22 @@ int getdefzinfo(DEFZINFO *zip,int isdst) noex {
 	            zp = tmo.tm_zone ;
 		}
 	    } else {
-	        bool	f_daylight ;
 		rs = SR_OK ;
 	        tzset() ;
 		{
-	            f_daylight = (isdst >= 0) ? isdst : daylight ;
+	            bool f_daylight = (isdst >= 0) ? isdst : daylight ;
 	            zip->zoff = (((f_daylight) ? altzone : timezone) / 60) ;
 	            zp = (f_daylight) ? tzname[1] : tzname[0] ;
 		}
 	    } /* end if_constexpr (f_darwin) */
 	    if ((rs >= 0) && zp) {
-		cint	znamelen = DEFZINFO_ZNAMELEN ;
-	        rs = strwcpy(zip->zname,zp,znamelen) - zip->zname ;
+		if ((rs = znlen) >= 0) {
+	            rs = snwcpy(zbuf,zlen,zp,rs) ;
+		    znl = rs ;
+		}
 	    }
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? znl : rs ;
 }
 /* end subroutine (getdefzinfo) */
 

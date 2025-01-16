@@ -37,13 +37,15 @@ EXTERNC_begin
 /* calculate string length */
 extern int strnnlen(cchar *,int,int) noex ;
 /* copy */
-extern char *strnncpy(char *,cchar *,int,int) noex ;
 extern char *strnwcpy(char *,int,cchar *,int) noex ;
 /* set */
 extern char *strnset(char *dp,int ch,int n) noex ;
 
 static inline char *strnblanks(char *dp,int n) noex {
 	return strnset(dp,' ',n) ;
+}
+static inline char *strnncpy(char *dp,cchar *sp,int sl,int sz) noex {
+    	return strnwcpy(dp,sz,sp,sl) ;
 }
 
 EXTERNC_end

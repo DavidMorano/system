@@ -161,6 +161,11 @@ int malloc_zn(char **rpp) noex {
 	return uc_mallocsys(w,rpp) ;
 }
 
+int malloc_za(char **rpp) noex {
+	cint	w = getbufsize_za ;
+	return uc_mallocsys(w,rpp) ;
+}
+
 int malloc_ps(char **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		sz = 0 ;

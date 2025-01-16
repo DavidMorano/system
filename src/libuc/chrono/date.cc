@@ -54,8 +54,11 @@
 #include	<ctime>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
+#include	<bufsizevar.hh>		/* for |za| */
+#include	<mallocxx.h>
 #include	<snwcpy.h>
-#include	<strn.h>		/* |strnncpy(3uc)| */
+#include	<strn.h>		/* |strnwcpy(3uc)| */
+#include	<sncpyx.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"date.h"
@@ -83,9 +86,9 @@
 /* forward references */
 
 
-/* local (static) variables */
+/* local variables */
 
-constexpr int		znamelen = DATE_ZNAMELEN ;
+static bufsizevar		znlen(getbufsize_za) ;
 
 
 /* exported variables */
@@ -93,73 +96,101 @@ constexpr int		znamelen = DATE_ZNAMELEN ;
 
 /* exported subroutines */
 
-int date_start(date *dp,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
+int date_start(date *op,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 	int		rs = SR_FAULT ;
-	if (dp && zbuf) {
-	    memclear(dp) ;
-	    dp->time = t ;
-	    dp->zoff = zoff ;
-	    dp->isdst = isdst ;
-	    rs = (strnncpy(dp->zname,zbuf,zlen,znamelen) - dp->zname) ;
+	if (op) {
+	    memclear(op) ;
+	    if (char *a ; (rs = malloc_za(&a)) >= 0) {
+		cint	znlen = rs ;
+		a[znlen] = '\0' ;
+		op->zname = a ;
+	        op->time = t ;
+	        op->zoff = zoff ;
+	        op->isdst = isdst ;
+		if (zbuf) {
+	            rs = (strnwcpy(op->zname,znlen,zbuf,zlen) - op->zname) ;
+		}
+		if (rs < 0) {
+		    uc_free(op->zname) ;
+		    op->zname = nullptr ;
+		}
+	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (date_start) */
 
-int date_finish(date *dp) noex {
+int date_finish(date *op) noex {
 	int		rs = SR_FAULT ;
-	if (dp) {
+	int		rs1 ;
+	if (op) {
 	    rs = SR_OK ;
-	    dp->time = 0 ;
+	    if (op->zname) {
+		rs1 = uc_free(op->zname) ;
+		if (rs >= 0) rs = rs1 ;
+		op->zname = nullptr ;
+	    }
+	    op->time = 0 ;
 	}
 	return rs ;
 }
 /* end subroutine (date_finish) */
 
-int date_copy(date *dp,date *d2p) noex {
+int date_setzname(date *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (dp && d2p) {
+	if (op && sp) {
+	    rs = (strnwcpy(op->zname,znlen,sp,sl) - op->zname) ;
+	}
+	return rs ;
+}
+/* end subroutine (date_setzname) */
+
+int date_copy(date *op,date *d2p) noex {
+	int		rs = SR_FAULT ;
+	if (op && d2p) {
+	    char	*znp = op->zname ;	/* save */
 	    rs = SR_OK ;
-	    memcpy(dp,d2p) ;
+	    memcpy(op,d2p) ;
+	    op->zname = znp ;			/* restore */
 	}
 	return rs ;
 }
 /* end subroutine (date_copy) */
 
-int date_gettime(date *dp,time_t *tp) noex {
+int date_gettime(date *op,time_t *tp) noex {
 	int		rs = SR_FAULT ;
-	if (dp && tp) {
+	if (op && tp) {
 	    rs = SR_OK ;
-	    *tp = dp->time ;
+	    *tp = op->time ;
 	}
 	return rs ;
 }
 /* end subroutine (date_gettime) */
 
-int date_getzoff(date *dp,int *zop) noex {
+int date_getzoff(date *op,int *zop) noex {
 	int		rs = SR_FAULT ;
-	if (dp && zop) {
+	if (op && zop) {
 	    rs = SR_OK ;
-	    *zop = dp->zoff ;
+	    *zop = op->zoff ;
 	}
 	return rs ;
 }
 /* end subroutine (date_getzoff) */
 
-int date_getisdst(date *dp,int *dstp) noex {
+int date_getisdst(date *op,int *dstp) noex {
 	int		rs = SR_FAULT ;
-	if (dp && dstp) {
+	if (op && dstp) {
 	    rs = SR_OK ;
-	    *dstp = int(dp->isdst) ;
+	    *dstp = int(op->isdst) ;
 	}
 	return rs ;
 }
 /* end subroutine (date_getisdst) */
 
-int date_getzname(date *dp,char *zbuf,int zlen) noex {
+int date_getzname(date *op,char *zbuf,int zlen) noex {
 	int		rs = SR_FAULT ;
-	if (dp && zbuf) {
-	    rs = snwcpy(zbuf,zlen,dp->zname,znamelen) ;
+	if (op && zbuf) {
+	    rs = sncpy(zbuf,zlen,op->zname) ;
 	}
 	return rs ;
 }

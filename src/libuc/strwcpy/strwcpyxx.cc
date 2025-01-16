@@ -1,4 +1,5 @@
 /* strwcpyxx SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy a c-string to a maximum extent */

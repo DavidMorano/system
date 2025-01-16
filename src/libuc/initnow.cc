@@ -1,4 +1,5 @@
 /* initnow SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* initialize both TIMEB and ZNAME */
@@ -130,8 +131,7 @@ static int initnow_ftime(TIMEB *tbp,char *zbuf,int zlen) noex {
 	int		len = 0 ;
 	if ((rs = uc_ftime(tbp)) >= 0) {
 	    if (zbuf) {
-	        TMTIME		tmt ;
-	        if ((rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
+	        if (tmtime tmt ; (rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
 	            rs = sncpy1(zbuf,zlen,tmt.zname) ;
 	            len = rs ;
 	        } /* end if (tmtime_localtime) */
@@ -142,14 +142,12 @@ static int initnow_ftime(TIMEB *tbp,char *zbuf,int zlen) noex {
 /* end subroutine (initnow_ftime) */
 
 static int initnow_gettime(TIMEB *tbp,char *zbuf,int zlen) noex {
-	TIMEVAL		tv{} ;
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
-            TMTIME          tmt ;
+	if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
             tbp->time = tv.tv_sec ;
             tbp->millitm = (tv.tv_usec / 1000) ;
-            if ((rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
+            if (tmtime tmt ; (rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
                 tbp->timezone = (tmt.gmtoff / 60) ;
                 tbp->dstflag = tmt.isdst ;
                 if (zbuf) {

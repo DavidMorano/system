@@ -38,6 +38,7 @@
 
 
 enum getbufsizes {
+	getbufsize_ps,		/* page-size */
 	getbufsize_ma,		/* max-args */
 	getbufsize_mn,		/* max-name */
 	getbufsize_mp,		/* max-path */
@@ -58,7 +59,7 @@ enum getbufsizes {
 	getbufsize_sv,		/* service-ent */
 	getbufsize_fs,		/* filesystem-type */
 	getbufsize_zn,		/* zone-name (from Zone-Info) */
-	getbufsize_ps,		/* page-size */
+	getbufsize_za,		/* zone-name abbreviation */
 	getbufsize_mailaddr,	/* mail-addr */
 	getbufsize_overlast
 } ; /* end enum (getbufsizes) */

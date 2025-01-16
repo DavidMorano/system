@@ -1,4 +1,5 @@
 /* strdcpycompact SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* counted-string copy while compacting white-space from the source */
@@ -59,10 +60,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<algorithm>		/* <- |min(3c++)| */
-#include	<usysrets.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<ascii.h>
 #include	<sfx.h>
 #include	<strmgr.h>

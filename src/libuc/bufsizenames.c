@@ -38,6 +38,7 @@
 
 
 cchar *bufsizenames[] = {
+	[getbufsize_ps] = "PS",		/* page-size */
 	[getbufsize_ma] = "MA",		/* max-args */
 	[getbufsize_mn] = "MN",		/* max-name */
 	[getbufsize_mp] = "MP",		/* max-path */
@@ -58,7 +59,7 @@ cchar *bufsizenames[] = {
 	[getbufsize_sv] = "SV",		/* service-ent */
 	[getbufsize_fs] = "FS",		/* filesystem-type */
 	[getbufsize_zn] = "ZN",		/* zone-name (from Zone-Info) */
-	[getbufsize_ps] = "PS",		/* page-size */
+	[getbufsize_za] = "ZA",		/* zone-name abbreviation */
 	[getbufsize_mailaddr] = "MAILADDR",	/* page-size */
 	nullptr
 } ; /* end array (bufsizenames) */

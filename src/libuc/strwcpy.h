@@ -26,8 +26,6 @@
 #include	<usysdefs.h>
 
 #include	<strwcpyx.h>
-#include	<strwcpyxc.h>
-#include	<strwcpyxx.h>
 
 
 #ifdef	__cplusplus

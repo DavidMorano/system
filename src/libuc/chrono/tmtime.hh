@@ -17,6 +17,7 @@
 
 #ifndef	TMTIME_INCLUDE
 #define	TMTIME_INCLUDE
+#ifdef	__cpluplus
 
 
 #include	<envstandards.h>	/* first to configure */
@@ -28,12 +29,11 @@
 #include	<localmisc.h>		/* <- |TZABBRLEN| */
 
 
-#define	TMTIME			struct tmtime_head
 #define	TMTIME_BASEYEAR		1900
 
 
-struct tmtime_head {
-	char	*zname ;
+struct tmtime {
+	char	*zname{} ;	/* time-zone name abbreviation */
 	int	sec ;		/* 0-61 (for up to two leap-seconds) */
 	int	min ;		/* 0-59 */
 	int	hour ;		/* 0-23 */
@@ -44,9 +44,15 @@ struct tmtime_head {
 	int	yday ;		/* year-day (day-of-year) */
 	int	isdst ;
 	int	gmtoff ;	/* offset from GMT (seconds west of GMT) */
-} ;
-
-typedef TMTIME		tmtime ;
+	cint	baseyear = TMTIME_BASEYEAR ;
+	tmtime() ;
+	tmtime &operator = (const tmtime &) = delete ;
+	tmtime(const tmtime *) = delete ;
+	void dtor() noex ;
+	~tmtime() {
+	    dtor() ;
+	} ;
+} ; /* end struct (tmtime) */
 
 EXTERNC_begin
 
@@ -67,6 +73,7 @@ extern int	mktime_gettime(tmtime *,cchar *,time_t *) noex ;
 EXTERNC_end
 
 
+#endif /* __cpluplus */
 #endif /* TMTIME_INCLUDE */
 
 

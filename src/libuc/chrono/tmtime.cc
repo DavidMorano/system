@@ -55,11 +55,13 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<usysflag.h>
+#include	<bufsizevar.hh>
+#include	<strn.h>		/* |strnwcpy(3uc)| */
 #include	<strwcpy.h>
 #include	<altzone.h>		/* <- special for bad systems */
 #include	<localmisc.h>
 
-#include	"tmtime.h"
+#include	"tmtime.hh"
 
 
 /* local defines */
@@ -72,13 +74,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    int		tmtime_gmtime(tmtime *,time_t) noex ;
-    int		tmtime_gmtime(tmtime *,time_t) noex ;
-    int		tmtime_insert(tmtime *,TM *) noex ;
-    int		tmtime_extract(tmtime *,TM *) noex ;
-}
 
 
 /* external variables */
@@ -94,8 +89,9 @@ static int	tmtime_mktimer(tmtime *,int,time_t *) noex ;
 
 /* local variables */
 
-constexpr int	znamelen = TMTIME_ZNAMELEN ;
-constexpr bool	f_darwin = F_DARWIN ;
+static bufsizevar	znlen(getbufsize_zn) ;
+
+constexpr bool		f_darwin = F_DARWIN ;
 
 
 /* exported variables */
@@ -249,5 +245,12 @@ int tmtime_mktimer(tmtime *op,int f_adj,time_t *tp) noex {
 	return rs ;
 }
 /* end subroutine (tmtime_mktimer) */
+
+void tmtime::dtor() noex {
+    	if (zname) {
+	    uc_free(zname) ;
+	    zname = nullptr ;
+	}
+}
 
 

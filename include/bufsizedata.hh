@@ -102,6 +102,10 @@ constexpr bufsizedata::bufsizedata() noex {
 	    bufsizeitem	*ip = (item+i) ;
 	    ip->name = -1 ;
 	    switch (i) {
+	    case getbufsize_ps:
+	        ip->name = _SC_PAGESIZE ;
+		ip->defval = (8 * 1024) ;	/* page-size Solaris® */
+	        break ;
 	    case getbufsize_ma:
 	        ip->name = _SC_ARG_MAX ;
 		ip->defval = ARBUFLEN ;
@@ -172,9 +176,8 @@ constexpr bufsizedata::bufsizedata() noex {
 	        ip->name = _SC_TZNAME_MAX ;
 		ip->defval = ZNBUFLEN ;
 	        break ;
-	    case getbufsize_ps:
-	        ip->name = _SC_PAGESIZE ;
-		ip->defval = (8 * 1024) ;	/* page-size Solaris® */
+	    case getbufsize_za:
+		ip->defval = 8 ;		/* common value */
 	        break ;
 	    case getbufsize_mailaddr:
 		ip->defval = -1 ;		/* no default size */

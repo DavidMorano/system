@@ -81,9 +81,6 @@ extern "C" {
 
 /* forward references */
 
-
-/* subroutine-templates */
-
 template<int (*toxc)(int)>
 char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
 	if (dst && src) {

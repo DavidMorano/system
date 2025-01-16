@@ -1,4 +1,5 @@
 /* strdcpyx SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* concatenate strings */
@@ -31,8 +32,16 @@
 
 /*******************************************************************************
 
-	This subroutine concatenates strings into a single resulting
-	string.
+  	Group:
+	strdcpyx
+	strdcpy{x}
+
+	Description:
+	This subroutine concatenates c-strings into a single resulting
+	destination c-string.  It will not overflow the destiantion
+	character buffer length.¹  1. The result is always NUL terminated
+	(even beyond the destination character buffer length if
+	necessary).
 
 *******************************************************************************/
 
@@ -43,6 +52,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"strdcpyx.h"
 
@@ -104,8 +114,8 @@ char *strdcpy6(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 /* end subroutine (strdcpy6) */
 
 char *strdcpyx(char *dp,int dl,int n,...) noex {
+	va_list		ap ;
 	if (dp) {
-	    va_list	ap ;
 	    va_begin(ap,n) ;
 	    if (dl < 0) dl = INT_MAX ;
 	    for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {

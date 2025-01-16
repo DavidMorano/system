@@ -1,6 +1,6 @@
 /* tmtime HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* this is supposed to provide OS-independent time management operations */
 /* version %I% last-modified %G% */
@@ -29,11 +29,11 @@
 
 
 #define	TMTIME			struct tmtime_head
-#define	TMTIME_ZNAMELEN		TZABBRLEN
 #define	TMTIME_BASEYEAR		1900
 
 
 struct tmtime_head {
+	char	*zname ;
 	int	sec ;		/* 0-61 (for up to two leap-seconds) */
 	int	min ;		/* 0-59 */
 	int	hour ;		/* 0-23 */
@@ -44,7 +44,6 @@ struct tmtime_head {
 	int	yday ;		/* year-day (day-of-year) */
 	int	isdst ;
 	int	gmtoff ;	/* offset from GMT (seconds west of GMT) */
-	char	zname[TMTIME_ZNAMELEN + 1] ;	/* TZ name abbreviation */
 } ;
 
 typedef TMTIME		tmtime ;

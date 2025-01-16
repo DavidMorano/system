@@ -1,4 +1,5 @@
 /* strdcpyxw SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* concatenate strings */
@@ -29,7 +30,21 @@
 
 /*******************************************************************************
 
-	This subroutine concatenates strings into a single resulting string.
+  	Group:
+	strdcpyx
+	strdcpy{x}
+
+	Description:
+	This subroutine concatenates source c-strings into a single
+	resulting destination character buffer c-string.  It will
+	not overflow the destination character buffer.¹  The result is
+	always NUL-terminated.  The last source c-string has an
+	optional associated length to it.
+
+	Notes:
+	1. If necessary (in order to gurantee NUL-termination) a
+	NUL will be written past the end (deterined by a supplied
+	length) of the destination character buffer.
 
 *******************************************************************************/
 
@@ -40,6 +55,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"strdcpyxw.h"
 
@@ -103,8 +119,8 @@ char *strdcpy6w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,
 /* end subroutine (strdcpy6w) */
 
 char *strdcpyxw(char *dp,int dl,int n,...) noex {
+	va_list		ap ;
 	if (dp) {
-	    va_list	ap ;
 	    va_begin(ap,n) ;
 	    if (dl < 0) dl = INT_MAX ;
 	    for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {

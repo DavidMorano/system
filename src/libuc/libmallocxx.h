@@ -41,6 +41,7 @@
 
 EXTERNC_begin
 
+extern int libmalloc_ps(char **) noex ;	/* PS pagesize */
 extern int libmalloc_ma(char **) noex ;	/* MA max-args */
 extern int libmalloc_mn(char **) noex ;	/* MN max-name */
 extern int libmalloc_mp(char **) noex ;	/* MP max-path */
@@ -61,8 +62,8 @@ extern int libmalloc_ho(char **) noex ;	/* HO object */
 extern int libmalloc_sv(char **) noex ;	/* SV object */
 extern int libmalloc_fs(char **) noex ;	/* FS type */
 extern int libmalloc_zn(char **) noex ;	/* TZ name */
+extern int libmalloc_za(char **) noex ;	/* ZA zone-name abbreviation */
 
-extern int libmalloc_ps(char **) noex ;	/* PS pagesize */
 
 EXTERNC_end
 

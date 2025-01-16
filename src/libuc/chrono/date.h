@@ -15,18 +15,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<time.h>		/* |time_t| */
 #include	<usystem.h>
-#include	<localmisc.h>		/* |TZABBRLEN| */
 
 
 #define	DATE		struct date_head
-#define	DATE_ZNAMELEN	TZABBRLEN		/* maximum TZ name length */
 
 
 struct date_head {
+	char		*zname ;		/* time-zone abbreviation */
 	time_t		time ;			/* UNIX® time */
 	short		zoff ;			/* minutes west of GMT */
 	short		isdst ;			/* is-daylight-savings time */
-	char		zname[DATE_ZNAMELEN+1] ; /* time-zone abbreviation */
 } ;
 
 typedef DATE		date ;
@@ -34,6 +32,7 @@ typedef DATE		date ;
 EXTERNC_begin
 
 extern int date_start(date *,time_t,int,int,cchar *,int) noex ;
+extern int date_setzname(date *,cchar *,int) noex ;
 extern int date_copy(date *,date *) noex ;
 extern int date_gettime(date *,time_t *) noex ;
 extern int date_getzoff(date *,int *) noex ;
