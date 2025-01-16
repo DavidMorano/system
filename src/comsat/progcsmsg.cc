@@ -88,7 +88,7 @@
 #include	<mailmsg.h>
 #include	<mailmsghdrs.h>
 #include	<termnote.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<sntmtime.h>
 #include	<localmisc.h>
 

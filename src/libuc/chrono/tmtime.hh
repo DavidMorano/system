@@ -17,7 +17,7 @@
 
 #ifndef	TMTIME_INCLUDE
 #define	TMTIME_INCLUDE
-#ifdef	__cpluplus
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* first to configure */
@@ -26,7 +26,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<localmisc.h>		/* <- |TZABBRLEN| */
 
 
 #define	TMTIME_BASEYEAR		1900
@@ -45,9 +44,9 @@ struct tmtime {
 	int	isdst ;
 	int	gmtoff ;	/* offset from GMT (seconds west of GMT) */
 	cint	baseyear = TMTIME_BASEYEAR ;
-	tmtime() ;
+	tmtime() = default ;
 	tmtime &operator = (const tmtime &) = delete ;
-	tmtime(const tmtime *) = delete ;
+	tmtime(const tmtime &) = delete ;
 	void dtor() noex ;
 	~tmtime() {
 	    dtor() ;

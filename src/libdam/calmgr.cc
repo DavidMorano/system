@@ -49,7 +49,7 @@
 #include	<sbuf.h>
 #include	<ids.h>
 #include	<vecstr.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<fsdir.h>
 #include	<mkdirs.h>
 #include	<mkpathx.h>

@@ -57,7 +57,7 @@
 #include	<vecstr.h>
 #include	<vecpstr.h>
 #include	<dater.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<pcsconf.h>
 #include	<pcspoll.h>
 #include	<mailmsghdrs.h>

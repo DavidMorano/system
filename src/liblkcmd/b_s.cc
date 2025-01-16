@@ -83,7 +83,7 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<sntmtime.h>
 #include	<sbuf.h>
 #include	<termstr.h>

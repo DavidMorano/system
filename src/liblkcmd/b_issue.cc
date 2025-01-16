@@ -77,7 +77,7 @@
 #include	<termout.h>
 #include	<grmems.h>
 #include	<sysrealname.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<upt.h>
 #include	<ascii.h>
 #include	<buffer.h>

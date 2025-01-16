@@ -74,10 +74,10 @@
 #include	<estrings.h>
 #include	<calstrs.h>
 #include	<sbuf.h>
-#include	<tmtime.h>		/* CHRONO */
+#include	<tmtime.hh>		/* CHRONO */
 #include	<zos.h>			/* CHRONO */
 #include	<comparse.h>		/* CHRONO */
-#include	<tmz.h>			/* CHRONO */
+#include	<tmz.hh>			/* CHRONO */
 #include	<zdb.h>			/* CHRONO */
 #include	<sncpyx.h>
 #include	<snwcpyx.h>
@@ -256,15 +256,13 @@ int dater_setmsg(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
-	    comparse	vc ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = comparse_start(&vc,sp,sl)) >= 0) {
+	    if (comparse vc ; (rs = comparse_start(&vc,sp,sl)) >= 0) {
 	        int	vl ;
 	        cchar	*vp{} ;
 	        if ((rs = comparse_getval(&vc,&vp)) >= 0) {
-	            tmz		stz ;
 	            vl = rs ;
-	            if ((rs = tmz_msg(&stz,vp,vl)) >= 0) {
+	            if (tmz stz ; (rs = tmz_msg(&stz,vp,vl)) >= 0) {
 	                TM	dst = stz.st ;
 	                dater_ldtmz(op,&stz) ;
 	                dater_ldcomzone(op,&vc) ;
@@ -286,9 +284,8 @@ int dater_setmsg(dater *op,cchar *sp,int sl) noex {
 int dater_setstrdig(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
-	    tmz		stz ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = tmz_strdig(&stz,sp,sl)) >= 0) {
+	    if (tmz stz ; (rs = tmz_strdig(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) {
@@ -312,9 +309,8 @@ to the dater object.
 int dater_setlogz(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
-	    tmz		stz ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = tmz_logz(&stz,sp,sl)) >= 0) {
+	    if (tmz stz ; (rs = tmz_logz(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) {
@@ -330,9 +326,8 @@ int dater_setlogz(dater *op,cchar *sp,int sl) noex {
 int dater_settouch(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
-	    tmz		stz ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = tmz_touch(&stz,sp,sl)) >= 0) {
+	    if (tmz stz ; (rs = tmz_touch(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) {
@@ -348,9 +343,8 @@ int dater_settouch(dater *op,cchar *sp,int sl) noex {
 int dater_settoucht(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
-	    tmz		stz ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = tmz_toucht(&stz,sp,sl)) >= 0) {
+	    if (tmz stz ; (rs = tmz_toucht(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) {

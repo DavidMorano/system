@@ -60,7 +60,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* for |memset(3c)| */
 #include	<usystem.h>		/* UNIX® structure aliases */
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<sncpyx.h>
 #include	<localmisc.h>
 

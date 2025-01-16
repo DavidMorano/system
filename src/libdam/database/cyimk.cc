@@ -89,7 +89,7 @@
 #include	<ids.h>
 #include	<storebuf.h>
 #include	<filer.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<opentmp.h>
 #include	<char.h>
 #include	<isnot.h>

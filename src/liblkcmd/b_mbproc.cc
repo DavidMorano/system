@@ -90,7 +90,7 @@
 #include	<mbcache.h>
 #include	<char.h>
 #include	<bfile.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<strw.h>		/* |strwset(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>

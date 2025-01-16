@@ -60,7 +60,7 @@
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<userinfo.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<dayspec.h>
 #include	<openqotd.h>
 #include	<filer.h>

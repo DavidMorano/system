@@ -62,7 +62,7 @@
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"date.h"
-#include	"tmz.h"
+#include	"tmz.hh"
 
 
 /* local defines */

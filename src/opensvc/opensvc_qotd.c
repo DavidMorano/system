@@ -70,7 +70,7 @@
 #include	<getax.h>
 #include	<ugetpw.h>
 #include	<dayspec.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<wordfill.h>
 #include	<ourmjd.h>
 #include	<localmisc.h>

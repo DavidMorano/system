@@ -73,7 +73,7 @@
 #include	<ugetpw.h>
 #include	<commandment.h>
 #include	<dayspec.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<filer.h>
 #include	<wordfill.h>
 #include	<ndigit.h>

@@ -70,7 +70,7 @@
 #include	<paramfile.h>
 #include	<expcook.h>
 #include	<nulstr.h>
-#include	<tmtime.h>		/* is NOT thread-safe */
+#include	<tmtime.hh>		/* is NOT thread-safe */
 #include	<filereadln.h>
 #include	<hasx.h>
 #include	<ischarx.h>

@@ -33,7 +33,7 @@
 #include	<stdarg.h>
 
 #include	<usystem.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<bfile.h>
 #include	<localmisc.h>
 

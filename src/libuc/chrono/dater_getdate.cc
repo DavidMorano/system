@@ -72,15 +72,14 @@
 
 /* exported subroutines */
 
-int dater_getdate(dater *dp,date *dop) noex {
+int dater_getdate(dater *op,date *dop) noex {
 	int		rs ;
-	if ((rs = dater_magic(dp,dop)) >= 0) {
-	    custime	t = dp->b.time ;
-	    cint	zoff = dp->b.timezone ;
-	    cint	isdst = dp->b.dstflag ;
-	    cint	zl = DATER_ZNAMELEN ;
-	    cchar	*zp = dp->zname ;
-	    rs = date_start(dop,t,zoff,isdst,zp,zl) ;
+	if ((rs = dater_magic(op,dop)) >= 0) {
+	    custime	t = op->b.time ;
+	    cint	zoff = op->b.timezone ;
+	    cint	isdst = op->b.dstflag ;
+	    cchar	*zp = op->zname ;
+	    rs = date_start(dop,t,zoff,isdst,zp,-1) ;
 	} /* end if (magic) */
 	return rs ;
 }

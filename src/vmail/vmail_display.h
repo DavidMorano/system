@@ -21,7 +21,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdarg.h>
 #include	<varray.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<hdrdecode.h>
 #include	<localmisc.h>
 

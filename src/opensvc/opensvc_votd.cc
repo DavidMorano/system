@@ -91,7 +91,7 @@
 #include	<field.h>
 #include	<vecstr.h>
 #include	<wordfill.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<dayspec.h>
 #include	<bcspec.h>
 #include	<filer.h>

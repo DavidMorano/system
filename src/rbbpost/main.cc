@@ -48,8 +48,8 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<bfile.h>
-#include	<tmz.h>
-#include	<tmtime.h>
+#include	<tmz.hh>
+#include	<tmtime.hh>
 #include	<timestr.h>
 #include	<vecstr.h>
 #include	<vechand.h>

@@ -120,7 +120,7 @@
 #include	<tmpx.h>
 #include	<utmpacc.h>
 #include	<field.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<uinfo.h>
 #include	<nulstr.h>
 #include	<sysmemutil.h>

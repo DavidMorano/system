@@ -28,10 +28,10 @@
 
 #include	<tmstrs.h>
 #include	<zdb.h>
-#include	<tmz.h>
+#include	<tmz.hh>
 #include	<zos.h>
 #include	<date.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<dater.h>
 
 

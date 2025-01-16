@@ -41,7 +41,7 @@
 
 #include	<usystem.h>
 #include	<bfile.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<localmisc.h>
 
 #include	"config.h"

@@ -61,7 +61,7 @@
 #include	<field.h>
 #include	<vecstr.h>
 #include	<wordfill.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<ndigit.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

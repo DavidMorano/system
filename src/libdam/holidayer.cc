@@ -46,7 +46,7 @@
 #include	<ids.h>
 #include	<vecobj.h>
 #include	<bfile.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<xperm.h>
 #include	<ctdec.h>
 #include	<char.h>

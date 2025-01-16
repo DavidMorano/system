@@ -58,7 +58,7 @@ struct timeb {
 #include	<cstring>
 #include	<usystem.h>
 #include	<usysflag.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 
 
 /* local defines */

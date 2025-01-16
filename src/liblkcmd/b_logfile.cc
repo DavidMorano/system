@@ -61,7 +61,7 @@
 #include	<logfile.h>
 #include	<linefold.h>
 #include	<expcook.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<strn.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

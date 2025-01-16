@@ -41,7 +41,7 @@
 #include	<ascii.h>
 #include	<strn.h>		/* |strnset(3uc)| */
 #include	<sbuf.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<sntmtime.h>
 #include	<ncol.h>		/* |charcols(3uc)| */
 #include	<tabexpand.h>

@@ -218,7 +218,7 @@
 #include	<raqhand.h>
 #include	<char.h>
 #include	<utmpacc.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

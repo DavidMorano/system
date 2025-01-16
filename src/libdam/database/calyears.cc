@@ -57,7 +57,7 @@
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<dayofmonth.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<getusername.h>
 #include	<fsdir.h>
 #include	<localmisc.h>

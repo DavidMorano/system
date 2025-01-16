@@ -31,7 +31,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<calstrs.h>
 #include	<matstr.h>		/* |matcasestr(3uc)| */
 #include	<cfdec.h>

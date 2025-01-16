@@ -33,7 +33,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<tmz.h>
+#include	<tmz.hh>
 #include	<localmisc.h>
 
 #include	"pretime.h"

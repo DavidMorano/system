@@ -1,6 +1,6 @@
 /* tmz SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* time and timezone parsing */
 /* version %I% last-modified %G% */
@@ -80,6 +80,8 @@
 #include	<cstring>
 #include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<estrings.h>
 #include	<field.h>
 #include	<tmstrs.h>
@@ -90,7 +92,7 @@
 #include	<ischarx.h>
 #include	<localmisc.h>		/* |NYEARS_CENTURY| */
 
-#include	"tmz.h"
+#include	"tmz.hh"
 
 
 /* local defines */
@@ -107,8 +109,36 @@
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int		znlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+}
+
 
 /* forward references */
+
+static int	mkvars() noex ;
+
+template<typename ... Args>
+static int tmz_ctor(tmz *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+    	    static cint		rsv = mkvars() ;
+	    if ((rs = rsv) >= 0) {
+	        if (op->zname == nullptr) {
+	            if (char *a ; (rs = malloc_zn(&a)) >= 0) {
+		        op->zname = a ;
+		        memclear(a,rs) ;
+		        a[rs] = '\0' ;
+	            } /* end if (memory-allocation) */
+	        } /* end if (zname was NULL) */
+	    } /* end if (mkvars) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (tmz_ctor) */
 
 static int	tmz_timeparts(tmz *,cchar *,int) noex ;
 static int	tmz_stdtrailing(tmz *,cchar *,int) noex ;
@@ -139,6 +169,8 @@ constexpr char		tpterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
+static vars		var ;
+
 constexpr int		nyears = NYEARS_CENTURY ;
 
 
@@ -148,21 +180,24 @@ constexpr int		nyears = NYEARS_CENTURY ;
 /* exported subroutines */
 
 int tmz_init(tmz *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = memclear(op) ;
+	int		rs ;
+	if ((rs = tmz_ctor(op)) >= 0) {
+	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return rs ;
 }
 /* end subroutine (tmz_init) */
 
 /* format> [Wed] Nov 14 19:24[:04] [EST] [[19]99] [±0400] */
 int tmz_std(tmz *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (op && sp) {
+	int		rs ;
+	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    rs = memclear(op) ;
+	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    op->st.tm_year = -1 ;
 	    op->st.tm_wday = -1 ;
@@ -186,20 +221,24 @@ int tmz_std(tmz *op,cchar *sp,int sl) noex {
 	        sl -= rs ;
 	    } /* end for */
 	    if (rs >= 0) {
-	        rs = strnlen(op->zname,TMZ_ZNAMELEN) ;
+		cint	znl = var.znlen ;
+	        rs = strnlen(op->zname,znl) ;
 	    }
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return rs ;
 }
 /* end subroutine (tmz_std) */
 
 /* format> [Weekday,] DD MMM [CC]YY hh:mm[:ss] [Â±hhmm] [zname] */
 int tmz_msg(tmz *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		zl = 0 ;
-	if (op && sp) {
+	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    rs = memclear(op) ;
+	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    op->st.tm_year = -1 ;
 	    op->st.tm_wday = -1 ;
@@ -238,21 +277,25 @@ int tmz_msg(tmz *op,cchar *sp,int sl) noex {
 	        sl -= rs ;
 	    }
 	    if (rs >= 0) {
-	        rs = strnlen(op->zname,TMZ_ZNAMELEN) ;
+		cint	znl = var.znlen ;
+	        rs = strnlen(op->zname,znl) ;
 	        zl = rs ; /* return value for subroutine */
 	    }
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return (rs >= 0) ? zl : rs ;
 }
 /* end subroutine (tmz_msg) */
 
 /* convert from a TOUCH (original) format> MMDDhhmm[YY] */
 int tmz_touch(tmz *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (op && sp) {
+	int		rs ;
+	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    rs = memclear(op) ;
+	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    stp->tm_year = -1 ;
 	    stp->tm_wday = -1 ;
@@ -300,18 +343,21 @@ int tmz_touch(tmz *op,cchar *sp,int sl) noex {
 	    } else {
 	        rs = SR_INVALID ;
 	    }
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return rs ;
 }
 /* end subroutine (tmz_touch) */
 
 /* convert from a TOUCH-t (new '-t') format> [[CC]YY]MMDDhhmm[.SS] */
 int tmz_toucht(tmz *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (op && sp) {
+	int		rs ;
+	if ((rs = tmz_ctor(op,sp)) >= 0) {
             TM		*stp = &op->st ;
             if (sl < 0) sl = strlen(sp) ;
-            rs = memclear(op) ;
+	    rs = op->clear() ;
             op->zoff = SHORT_MIN ;
             stp->tm_year = -1 ;
             stp->tm_wday = -1 ;
@@ -380,19 +426,22 @@ int tmz_toucht(tmz *op,cchar *sp,int sl) noex {
                     rs = SR_INVALID ;
                 }
 	    } /* end if (ok) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return rs ;
 }
 /* end subroutine (date_toucht) */
 
 /* format> [[CC]]YYMMDDhhmm[ss][Â±hhmm][zname] */
 int tmz_strdig(tmz *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		zl = 0 ;
-	if (op && sp) {
+	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    rs = memclear(op) ;
+	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    stp->tm_year = -1 ;
 	    stp->tm_wday = -1 ;
@@ -425,8 +474,8 @@ int tmz_strdig(tmz *op,cchar *sp,int sl) noex {
 	        if ((rs >= 0) && (cl > 0)) {
 	            cint	ch = mkchar(*cp) ;
 	            if (isalphalatin(ch)) {
-		        cint	zlen = TMZ_ZNAMELEN ;
-	                rs = strnwcpy(op->zname,zlen,cp,cl) - op->zname ;
+		        cint	znl = var.znlen ;
+	                rs = strnwcpy(op->zname,znl,cp,cl) - op->zname ;
 	                zl = rs ;
 	            } else {
 	                rs = SR_INVALID ;
@@ -477,19 +526,22 @@ int tmz_strdig(tmz *op,cchar *sp,int sl) noex {
 	            rs = SR_INVALID ;
 	        }
 	    } /* end if (ok) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return (rs >= 0) ? zl : rs ;
 }
 /* end subroutine (tmz_strdig) */
 
 /* format> [CC]YYMMDD_hhmm[:ss][_][zname] */
 int tmz_logz(tmz *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		zl = 0 ;
-	if (op && sp) {
+	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
             if (sl < 0) sl = strlen(sp) ;
-            rs = memclear(op) ;
+	    rs = op->clear() ;
             op->zoff = SHORT_MIN ;
             stp->tm_year = -1 ;
             stp->tm_wday = -1 ;
@@ -568,18 +620,21 @@ int tmz_logz(tmz *op,cchar *sp,int sl) noex {
                     rs = SR_INVALID ;
                 }
             } /* end if (ok) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return (rs >= 0) ? zl : rs ;
 }
 /* end subroutine (tmz_logz) */
 
 /* format> [CC]YYMMDD */
 int tmz_day(tmz *op,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	if (op && sp) {
+	int		rs ;
+	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    rs = memclear(op) ;
+	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    stp->tm_year = -1 ;
 	    stp->tm_wday = -1 ;
@@ -623,25 +678,34 @@ int tmz_day(tmz *op,cchar *sp,int sl) noex {
 	    } else {
 	        rs = SR_INVALID ;
 	    }
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return rs ;
 }
 /* end subroutine (tmz_day) */
 
 int tmz_isset(tmz *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs ;
+	if ((rs = tmz_ctor(op)) >= 0) {
 	    rs = op->st.tm_mday ;
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return rs ;
 }
 /* end subroutine (tmz_isset) */
 
 int tmz_hasyear(tmz *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs ;
+	if ((rs = tmz_ctor(op)) >= 0) {
 	    rs = op->f.year ;
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return rs ;
 }
 /* end subroutine (tmz_hasyear) */
@@ -650,23 +714,29 @@ int tmz_haszoff(tmz *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = op->f.zoff ;
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (tmz_haszoff) */
 
 int tmz_haszone(tmz *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs ;
+	if ((rs = tmz_ctor(op)) >= 0) {
 	    rs = (op->zname[0] != '\0') ;
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return rs ;
 }
 /* end subroutine (tmz_haszone) */
 
 int tmz_setday(tmz *op,int y,int m,int d) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs ;
+	if ((rs = tmz_ctor(op)) >= 0) {
 	    TM		*stp = &op->st ;
 	    cint	sc = -1 ;
 	    if (y >= TM_YEAR_BASE) {
@@ -676,49 +746,73 @@ int tmz_setday(tmz *op,int y,int m,int d) noex {
 	    stp->tm_mon = m ;
 	    stp->tm_mday = d ;
 	    rs = tmz_yearadj(op,sc) ;
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return rs ;
 }
 /* end subroutine (tmz_setday) */
 
 int tmz_setyear(tmz *op,int year) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_OK ;
+	int		rs ;
+	if ((rs = tmz_ctor(op)) >= 0) {
 	    op->st.tm_year = year ;
 	    op->f.year = true ;
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return rs ;
 }
 /* end subroutine (tmz_setyear) */
 
 int tmz_setzone(tmz *op,cchar *zp,int zl) noex {
-	int		rs = SR_FAULT ;
-	if (op && zp) {
-	    cint	znamelen = TMZ_ZNAMELEN ;
-	    rs = (strnwcpy(op->zname,znamelen,zp,zl) - op->zname) ;
-	} /* end if (non-null) */
+	int		rs ;
+	if ((rs = tmz_ctor(op,zp)) >= 0) {
+	    cint	znl = var.znlen ;
+	    rs = (strnwcpy(op->zname,znl,zp,zl) - op->zname) ;
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return rs ;
 }
 /* end subroutine (tmz_setzone) */
 
 int tmz_gettm(tmz *op,TM *tmp) noex {
-	int		rs = SR_FAULT ;
-	if (op && tmp) {
-	    rs = SR_OK ;
+	int		rs ;
+	if ((rs = tmz_ctor(op,tmp)) >= 0) {
 	    *tmp = op->st ;
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
 	return rs ;
 }
 /* end subroutine (tmz_gettm) */
 
 int tmz_getdst(tmz *op) noex {
-	return op->st.tm_isdst ;
+    	int		rs ;
+	if ((rs = tmz_ctor(op)) >= 0) {
+	    rs = op->st.tm_isdst ;
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
+	return rs ;
 }
 /* end subroutine (tmz_getdst) */
 
 int tmz_getzoff(tmz *op) noex {
-	return op->zoff ;
+    	int		rs ;
+	if ((rs = tmz_ctor(op)) >= 0) {
+	    rs = op->zoff ;
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmz_ctor) */
+	return rs ;
 }
 /* end subroutine (tmz_getzoff) */
 
@@ -898,7 +992,7 @@ static int tmz_proczname(tmz *op,cchar *sp,int sl) noex {
 	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
 	    cint	ch = mkchar(*cp) ;
 	    if (isalphalatin(ch)) {
-	        cint	znl = TMZ_ZNAMELEN ;
+	        cint	znl = var.znlen ;
 	        rs = strnwcpy(op->zname,znl,cp,cl)  - op->zname ;
 	        si = ((cp+cl)-sp) ;
 	    }
@@ -959,12 +1053,12 @@ static int getzoff(int *zop,cchar *sp,int sl) noex {
 	            break ;
 	        }
 	    } /* end for (extra sanity check) */
-/* skip over extra leading digits (usually '0' but whatever) */
+	    /* skip over extra leading digits (usually '0' but whatever) */
 	    if (i > 4) {
 	        cp += (i - 4) ;
 	        cl -= (i - 4) ;
 	    }
-/* extract hours and minutes from remaining 3 or 4 digits */
+	    /* extract hours and minutes from remaining 3 or 4 digits */
 	    hours = (*cp++ - '0') ;
 	    if (cl > 3) {
 	        hours *= 10 ;
@@ -973,7 +1067,7 @@ static int getzoff(int *zop,cchar *sp,int sl) noex {
 	    mins = (*cp++ - '0') * 10 ;
 	    mins += (*cp++ - '0') ;
 	    zoff = ((hours * 60) + mins) ;
-/* reportedly, there are time zones at up to 14 hours off of GMT! */
+	    /* reportedly, there are timezones at up to 14 hours off of GMT! */
 #ifdef	COMMENT
 	    if (zoff > (14 * 60)) {
 	        rs = SR_INVALID ;
@@ -991,6 +1085,34 @@ static int getzoff(int *zop,cchar *sp,int sl) noex {
 }
 /* end subroutine (getzoff) */
 
+int tmz::clear() noex {
+	st = {} ;
+	f = {} ;
+	zoff = 0 ;
+	return SR_OK ;
+}
+/* end method (tmz::clæar) */
+
+void tmz::dtor() noex {
+    if (zname) {
+	uc_free(zname) ;
+	zname = nullptr ;
+    }
+}
+/* end method (tmz::dtor) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_zn)) >= 0) {
+	    znlen = rs ;
+	}
+	return rs ;
+}
+
+static int mkvars() noex {
+    	return var ;
+}
+
 static int val(cchar *sp) noex {
 	int		v = 0 ;
 	v += (10 * (sp[0] - '0')) ;
@@ -1000,7 +1122,7 @@ static int val(cchar *sp) noex {
 /* end subroutine (val) */
 
 static int silogend(cchar *sp,int sl) noex {
-	int		i = 0 ;
+	int		i ; /* used-afterwards */
 	bool		f = false ;
 	for (i = 0 ; sl-- && *sp ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;

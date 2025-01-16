@@ -25,7 +25,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<localmisc.h>		/* |LINEBUFLEN| */
 
 
 #define	COMPARSE_MAGIC		0x77811276
@@ -41,9 +40,9 @@ struct comparse_string {
 struct comparse_head {
 	COMPARSE_STR	val ;
 	COMPARSE_STR	com ;
+	uint		magic ;
 	int		mailaddrlen ;
 	int		mailcommlen ;
-	uint		magic ;
 } ;
 
 typedef COMPARSE	comparse ;

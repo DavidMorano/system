@@ -127,7 +127,7 @@
 #include	<mallocxx.h>
 #include	<ptm.h>
 #include	<ptc.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<storebuf.h>
 #include	<vecpstr.h>
 #include	<fsdir.h>

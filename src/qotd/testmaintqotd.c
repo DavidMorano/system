@@ -12,7 +12,7 @@
 #include	<usystem.h>
 #include	<fsdir.h>
 #include	<filer.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<dayspec.h>
 #include	<localmisc.h>
 

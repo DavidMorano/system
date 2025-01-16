@@ -40,8 +40,8 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<dayspec.h>
-#include	<tmz.h>
-#include	<tmtime.h>
+#include	<tmz.hh>
+#include	<tmtime.hh>
 #include	<hasx.h>		/* |hasalpha(3uc)| */
 #include	<localmisc.h>
 
@@ -95,7 +95,7 @@ int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 	    }
 	    if (rs >= 0) {
 	        TMTIME	tmt ;
-	        if (tmz_hasyear(&stz) == 0) {
+	        if (tmz.hhasyear(&stz) == 0) {
 	            cvtdater_daytime(op,nullptr) ;	/* get current date */
 	            rs = tmtime_localtime(&tmt,op->daytime) ;
 		    tmz_setyear(&stz,tmt.year) ;

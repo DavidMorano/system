@@ -77,7 +77,7 @@
 
 #include	<usystem.h>
 #include	<char.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<sntmtime.h>
 #include	<bits.h>
 #include	<keyopt.h>

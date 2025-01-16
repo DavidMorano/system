@@ -58,7 +58,7 @@
 #include	<field.h>
 #include	<filer.h>
 #include	<char.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<upt.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

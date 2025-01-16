@@ -56,6 +56,7 @@
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<bufsizevar.hh>
+#include	<mallocxx.h>
 #include	<strn.h>		/* |strnwcpy(3uc)| */
 #include	<strwcpy.h>
 #include	<altzone.h>		/* <- special for bad systems */
@@ -83,6 +84,23 @@
 
 
 /* forward references */
+
+template<typename ... Args>
+static int tmtime_ctor(tmtime *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = SR_OK ;
+	    if (op->zname == nullptr) {
+	        if (char *a ; (rs = malloc_zn(&a)) >= 0) {
+		    op->zname = a ;
+		    memclear(a,rs) ;
+		    a[rs] = '\0' ;
+	        }
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (tmtime_ctor) */
 
 static int	tmtime_mktimer(tmtime *,int,time_t *) noex ;
 
@@ -114,41 +132,43 @@ int tmtime_ztime(tmtime *op,bool fz,time_t t) noex {
 
 int tmtime_gmtime(tmtime *op,time_t t) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if ((rs = tmtime_ctor(op)) >= 0) {
 	    TM		tms ;
 	    if (t == 0) t = time(nullptr) ;
-	    memclear(op) ;
 	    if ((rs = uc_gmtime(&t,&tms)) >= 0) {
 	        if ((rs = tmtime_insert(op,&tms)) >= 0) {
 	            op->gmtoff = 0 ;
-	            rs = strwcpy(op->zname,"GMT",znamelen) - op->zname ;
+	            rs = strwcpy(op->zname,"GMT",znlen) - op->zname ;
 	        }
 	    } /* end if */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmtime_ctor) */
 	return rs ;
 }
 /* end subroutine (tmtime_gmtime) */
 
 int tmtime_localtime(tmtime *op,time_t t) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if ((rs = tmtime_ctor(op)) >= 0) {
 	    TM		tms ;
 	    if (t == 0) t = time(nullptr) ;
-	    memclear(op) ;
 	    if ((rs = uc_localtime(&t,&tms)) >= 0) {
 	        rs = tmtime_insert(op,&tms) ;
 	    }
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmtime_ctor) */
 	return rs ;
 }
 /* end subroutine (tmtime_localtime) */
 
 int tmtime_insert(tmtime *op,TM *tmp) noex {
-	int		rs = SR_FAULT ;
-	if (op && tmp) {
+	int		rs ;
+	if ((rs = tmtime_ctor(op,tmp)) >= 0) {
 	    TM		tc = *tmp ;
-	    cchar	*zp ;
-	    rs = memclear(op) ;
 	    op->gmtoff = 0 ;
 	    op->sec = tmp->tm_sec ;
 	    op->min = tmp->tm_min ;
@@ -164,6 +184,7 @@ int tmtime_insert(tmtime *op,TM *tmp) noex {
 	        rs = uc_mktime(&tc,&t) ;
 	    } /* end if (need DST indicator) */
 	    if (rs >= 0) {
+	        cchar	*zp ;
 	        if_constexpr (f_darwin) {
 	            op->gmtoff = tc.tm_gmtoff ;
 	            zp = tc.tm_zone ;
@@ -172,17 +193,19 @@ int tmtime_insert(tmtime *op,TM *tmp) noex {
 	            op->gmtoff = (f_isdst) ? altzone : timezone ;
 	            zp = (f_isdst) ? tzname[1] : tzname[0] ;
 	        } /* end if_constexpr (f_darwin) */
-	        rs = strwcpy(op->zname,zp,znamelen) - op->zname ;
+	        rs = strwcpy(op->zname,zp,znlen) - op->zname ;
 	    } /* end if (getting zone-name) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmtime_ctor) */
 	return rs ;
 }
 /* end subroutine (tmtime_insert) */
 
 int tmtime_extract(tmtime *op,TM *tmp) noex {
-	int		rs = SR_FAULT ;
-	if (op && tmp) {
-	    rs = memclear(tmp) ;
+	int		rs ;
+	if ((rs = tmtime_ctor(op,tmp)) >= 0) {
 	    tmp->tm_sec = op->sec ;
 	    tmp->tm_min = op->min ;
 	    tmp->tm_hour = op->hour ;
@@ -196,7 +219,10 @@ int tmtime_extract(tmtime *op,TM *tmp) noex {
 	        tmp->tm_gmtoff = op->gmtoff ;
 	        tmp->tm_zone = op->zname ;
 	    } /* end if_constexpr (f_darwin) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		op->dtor() ;
+	    }
+	} /* end if (tmtime_ctor) */
 	return rs ;
 }
 /* end subroutine (tmtime_extract) */
@@ -215,8 +241,8 @@ int tmtime_adjtime(tmtime *op,time_t *tp) noex {
 /* local subroutines */
 
 int tmtime_mktimer(tmtime *op,int f_adj,time_t *tp) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs ;
+	if ((rs = tmtime_ctor(op)) >= 0) {
 	    TM		tms ;
 	    time_t	t = 0 ;
 	    tmtime_extract(op,&tms) ;
@@ -241,7 +267,7 @@ int tmtime_mktimer(tmtime *op,int f_adj,time_t *tp) noex {
 	    if (tp) {
 	        *tp = (rs >= 0) ? t : 0 ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (tmtime_ctor) */
 	return rs ;
 }
 /* end subroutine (tmtime_mktimer) */
@@ -252,5 +278,6 @@ void tmtime::dtor() noex {
 	    zname = nullptr ;
 	}
 }
+/* end method (tmtime::dtor) */
 
 

@@ -45,7 +45,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<usupport.h>		/* |ulogerror(3u)| */
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<sntmtime.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 

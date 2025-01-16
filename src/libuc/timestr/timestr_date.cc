@@ -61,7 +61,7 @@
 #include	<usupport.h>		/* |ulogerror(3u)| */
 #include	<snx.h>
 #include	<sncpyx.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<zoffparts.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| + |NYEARS_CENTURY| */
 

@@ -61,7 +61,7 @@
 #include	<msgheaders.h>
 #include	<ema.h>
 #include	<dater.h>
-#include	<tmz.h>
+#include	<tmz.hh>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

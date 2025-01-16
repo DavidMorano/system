@@ -93,7 +93,7 @@
 #include	<termout.h>
 #include	<spawner.h>
 #include	<lfm.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<querystr.h>
 #include	<sfx.h>
 #include	<exitcodes.h>

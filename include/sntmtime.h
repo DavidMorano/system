@@ -25,7 +25,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<tmtime.h>		/* <- the money shot! */
+#include	<tmtime.hh>		/* <- the money shot! */
 
 
 EXTERNC_begin

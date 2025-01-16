@@ -119,7 +119,7 @@
 #include	<ascii.h>
 #include	<spawnproc.h>
 #include	<dater.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<upt.h>
 #include	<grmems.h>
 #include	<sysrealname.h>

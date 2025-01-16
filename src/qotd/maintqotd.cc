@@ -66,7 +66,7 @@
 #include	<estrings.h>
 #include	<mkfnamesuf.h>
 #include	<ids.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<storebuf.h>
 #include	<vecstr.h>
 #include	<vecpstr.h>

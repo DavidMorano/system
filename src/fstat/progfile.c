@@ -43,7 +43,7 @@
 #include	<usystem.h>
 #include	<paramopt.h>
 #include	<bfile.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<sntmtime.h>
 #include	<localmisc.h>
 

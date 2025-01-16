@@ -1,6 +1,6 @@
 /* tmz HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* time and timezone parsing */
 /* version %I% last-modified %G% */
@@ -17,6 +17,7 @@
 
 #ifndef	TMZ_INCLUDE
 #define	TMZ_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* first to configure */
@@ -25,13 +26,11 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<localmisc.h>		/* <- |TZABBRLEN| */
 
 
 #define	TMZ_MAGIC	0x26292511
-#define	TMZ		struct tmz_head
-#define	TMZ_FLAGS	struct tmz_flags
-#define	TMZ_ZNAMELEN	TZABBRLEN
+#define	TMZ		tmz
+#define	TMZ_FLAGS	tmz_flags
 
 
 struct tmz_flags {
@@ -39,14 +38,17 @@ struct tmz_flags {
 	uint		year:1 ;	/* year is present */
 } ;
 
-struct tmz_head {
+struct tmz {
+	char		*zname ;
 	TM		st ;
 	TMZ_FLAGS	f ;
 	short		zoff ;		/* minutes west of GMT */
-	char		zname[TMZ_ZNAMELEN] ;
+	int clear() noex ;
+	void dtor() noex ;
+	~tmz() {
+	    dtor() ;
+	} ;
 } ;
-
-typedef TMZ		tmz ;
 
 EXTERNC_begin
 
@@ -72,6 +74,7 @@ extern int	tmz_getzoff(tmz *) noex ;
 EXTERNC_end
 
 
+#endif /* __cplusplus */
 #endif /* TMZ_INCLUDE */
 
 

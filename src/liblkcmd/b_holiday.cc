@@ -64,7 +64,7 @@
 #include	<field.h>
 #include	<char.h>
 #include	<wordfill.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<dayspec.h>
 #include	<ucmallreg.h>
 #include	<exitcodes.h>

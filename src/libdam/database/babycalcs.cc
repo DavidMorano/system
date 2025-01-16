@@ -57,8 +57,8 @@
 #include	<bfile.h>
 #include	<estrings.h>
 #include	<vecobj.h>
-#include	<tmz.h>
-#include	<tmtime.h>
+#include	<tmz.hh>
+#include	<tmtime.hh>
 #include	<filer.h>
 #include	<storebuf.h>
 #include	<ptma.h>

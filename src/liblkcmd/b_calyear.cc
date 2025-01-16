@@ -71,7 +71,7 @@
 #include	<vecstr.h>
 #include	<wordfill.h>
 #include	<linefold.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<expcook.h>
 #include	<paramfile.h>
 #include	<dayspec.h>

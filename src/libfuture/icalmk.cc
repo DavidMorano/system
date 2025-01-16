@@ -85,7 +85,7 @@
 #include	<estrings.h>
 #include	<vecobj.h>
 #include	<filer.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<opentmp.h>
 #include	<hash.h>
 #include	<char.h>

@@ -37,7 +37,7 @@
 #include	<bfile.h>
 #include	<vecobj.h>
 #include	<strtab.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<sfx.h>
 #include	<hash.h>
 #include	<hashindex.h>

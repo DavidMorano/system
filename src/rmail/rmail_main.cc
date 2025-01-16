@@ -80,7 +80,7 @@
 #include	<dater.h>
 #include	<ids.h>
 #include	<logsys.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

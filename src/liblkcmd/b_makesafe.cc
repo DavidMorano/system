@@ -64,7 +64,7 @@
 #include	<ascii.h>
 #include	<bits.h>
 #include	<keyopt.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<bfile.h>
 #include	<filer.h>
 #include	<vecstr.h>

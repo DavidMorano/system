@@ -58,7 +58,7 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<dayspec.h>
 #include	<ourmjd.h>
 #include	<exitcodes.h>

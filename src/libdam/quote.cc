@@ -60,7 +60,7 @@
 #include	<char.h>
 #include	<ids.h>
 #include	<vecstr.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<fsdir.h>
 #include	<getusername.h>
 #include	<txtindexmk.h>

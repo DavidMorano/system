@@ -54,7 +54,7 @@
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<vechand.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<getusername.h>
 #include	<getuserhome.h>
 #include	<mkdirs.h>

@@ -57,8 +57,8 @@
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
-#include	<tmz.h>
-#include	<tmtime.h>
+#include	<tmz.hh>
+#include	<tmtime.hh>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -813,7 +813,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        }
 #endif /* CF_DEBUG */
 
-	        if ((rs >= 0) && (tmz_hasyear(&stz) == 0)) {
+	        if ((rs >= 0) && (tmz.hhasyear(&stz) == 0)) {
 	            t = time(NULL) ;
 	            rs = tmtime_localtime(&tmt,t) ;
 	            tmz_setyear(&stz,tmt.year) ;

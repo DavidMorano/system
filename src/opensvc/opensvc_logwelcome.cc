@@ -82,7 +82,7 @@
 #include	<ugetpw.h>
 #include	<getusername.h>
 #include	<sbuf.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<localmisc.h>
 
 #include	"opensvc_logwelcome.h"

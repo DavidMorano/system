@@ -64,7 +64,7 @@
 #include	<mailmsghdrs.h>
 #include	<ema.h>
 #include	<vecobj.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<mapstrint.h>
 #include	<snx.h>
 #include	<mkx.h>

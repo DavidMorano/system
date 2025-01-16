@@ -39,7 +39,7 @@
 #include	<cstring>
 
 #include	<usystem.h>
-#include	<tmtime.h>
+#include	<tmtime.hh>
 #include	<sntmtime.h>
 #include	<bfile.h>
 #include	<char.h>
