@@ -507,7 +507,7 @@ static int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
 	ent		*e2p = entp(*v2pp) ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
-	    rc = 1 ;
+	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {

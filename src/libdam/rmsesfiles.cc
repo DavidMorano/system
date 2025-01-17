@@ -297,7 +297,7 @@ static int rmdirfiles(char *pbuf,int plen) noex {
 	                    if (c == rs) rc = (rs+1) ;
 	                }
 	            } else if (rs == 0) {
-	                rc = 1 ;
+	                rc = +1 ;
 	            }
 	            rs1 = files.finish ;
 	            if (rs >= 0) rs = rs1 ;

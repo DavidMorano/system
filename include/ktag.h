@@ -2,6 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
+/* tag accummulator object */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
@@ -10,11 +13,16 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<txtindexmk.h>
 #include	<eigendb.h>
 
 
+#define	KTAG_MAGIC	0x70811238
 #define	KTAG		struct ktag_head
 #define	KTAG_PA		struct ktag_params
 #define	KTAG_KEY	TXTINDEXMK_KEY
@@ -29,13 +37,14 @@ struct ktag_params {
 } ;
 
 struct ktag_head {
-	KTAG_PARAMS	*kap ;
-	TXTINDEXMK_KEY	*tkeys ;	/* storage for TXTMKINDEXMK_ADDTAGS */
+	KTAG_PA		*kap ;
+	KTAG_KEY	*tkeys ;	/* storage for TXTMKINDEXMK_ADDTAGS */
 	cchar		*fname ;
-	vecobj		keys ;
-	vecstr		store ;
+	vecobj		*klp ;		/* key-list-pointer */
+	vecstr		*slp ;		/* string-list-pointer */
 	ulong		recoff ;
 	ulong		reclen ;
+	uint		magic ;
 	int		f_store ;
 } ;
 

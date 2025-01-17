@@ -1,4 +1,5 @@
 /* proginv SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* invert the data (keys to pointers) */
@@ -41,9 +42,10 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<baops.h>
 #include	<bfile.h>
@@ -55,7 +57,8 @@
 #include	<nulstr.h>
 #include	<char.h>
 #include	<ascii.h>
-#include	<localmisc.h>
+#include	<ischarx.h>
+#include	<localmisc.h>		/* |NATURALWORDLEN| */
 
 #include	"config.h"
 #include	"defs.h"
@@ -86,24 +89,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	isNotPresent(int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnrchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -268,7 +253,7 @@ static int procmkeigen(PROGINFO *pip) noex {
 	int		c = 0 ;
 
 	if ((rs = subinfo_txtopen(sip)) >= 0) {
-	    cint	size = (nkeys + 1) * sizeof(TXTINDEXMK_KEY) ;
+	    cint	size = (nkeys + 1) * szof(TXTINDEXMK_KEY) ;
 	    if ((rs = uc_malloc(size,&keys)) >= 0) {
 		VECPSTR		*esp = &sip->eigenwords ;
 		TXTINDEXMK	*tmp = &sip->tm ;
@@ -385,7 +370,7 @@ static int procfiles(PROGINFO *pip,ARGINFO *aip) noex {
 static int procfile(PROGINFO *pip,cchar *fname) noex {
 	SUBINFO		*sip = pip->sip ;
 	KTAG		e ;
-	KTAG_PARAMS	ka ;
+	KTAG_PARAMS	ka{} ;
 	bfile		infile, *ifp = &infile ;
 	int		rs = SR_OK ;
 	int		recoff = 0 ;
@@ -395,7 +380,6 @@ static int procfile(PROGINFO *pip,cchar *fname) noex {
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-	memset(&ka,0,sizeof(KTAG_PARAMS)) ;
 	ka.minwlen = pip->minwordlen ;
 	ka.f_eigen = pip->open.eigendb ;
 	ka.f_nofile = pip->f.optnofile ;
@@ -646,7 +630,7 @@ static int subinfo_start(SUBINFO *sip,PROGINFO *pip,cchar *dbname) noex {
 	int		rs ;
 	cchar		*cp ;
 
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 	sip->pip = pip ;
 	sip->tablen = pip->tablen ;
 	sip->minwlen = pip->minwordlen ;
@@ -748,12 +732,11 @@ static int subinfo_eigendefs(SUBINFO *sip) noex {
 
 static int subinfo_txtopen(SUBINFO *sip) noex {
 	PROGINFO	*pip = sip->pip ;
-	TXTINDEXMK_PA	ta ;
+	TXTINDEXMK_PA	ta{} ;
 	int		rs = SR_OK ;
 
 	if (pip == NULL) return SR_FAULT ;
 
-	memset(&ta,0,sizeof(TXTINDEXMK_PA)) ;
 	ta.tablen = sip->tablen ;
 	ta.minwlen = sip->minwlen ;
 	ta.maxwlen = sip->maxwlen ;
@@ -823,13 +806,13 @@ static int ktag_start(KTAG *kop,KTAG_PARAMS *kap,TAGINFO *tip,
 	int		c = 0 ;
 	cchar		*cp ;
 
-	memset(kop,0,sizeof(KTAG)) ;
+	memclear(kop) ;
 	kop->kap = kap ;
 	kop->recoff = tip->recoff ;
 	kop->reclen = tip->reclen ;
 
 	if ((rs = uc_mallocstrw(fname,tip->fnamelen,&cp)) >= 0) {
-	    cint	size = sizeof(KTAG_KEY) ;
+	    cint	size = szof(KTAG_KEY) ;
 	    cint	vopts = VECOBJ_OCOMPACT ;
 	    kop->fname = cp ;
 	    if ((rs = vecobj_start(&kop->keys,size,0,vopts)) >= 0) {
@@ -885,35 +868,30 @@ static int ktag_add(KTAG *kop,cchar *lp,int ll) noex {
 
 static int ktag_mktag(KTAG *kop,TXTINDEXMK_TAG *tagp) noex {
 	KTAG_PARAMS	*kap = kop->kap ;
-	KTAG_KEY	**va ;
 	int		rs ;
 
-	memset(tagp,0,sizeof(TXTINDEXMK_TAG)) ;
+	memclear(tagp) ;
 	tagp->recoff = kop->recoff ;
 	tagp->reclen = kop->reclen ;
 	if (! kap->f_nofile) {
 	    tagp->fname = kop->fname ;
 	}
 
+	KTAG_KEY	**va ;
 	if ((rs = vecobj_getvec(&kop->keys,&va)) >= 0) {
 	    TXTINDEXMK_KEY	*kea = NULL ;
 	    int			size ;
 
 	    tagp->nkeys = rs ;
 
-	size = (tagp->nkeys * sizeof(TXTINDEXMK_KEY)) ;
+	size = (tagp->nkeys * szof(TXTINDEXMK_KEY)) ;
 	if ((rs = uc_malloc(size,&kea)) >= 0) {
-	    int		i ;
-
 	    kop->tkeys = kea ;		/* kea: save for us */
-	    for (i = 0 ; i < tagp->nkeys ; i += 1) {
+	    for (int i = 0 ; i < tagp->nkeys ; i += 1) {
 	        kea[i] = *(va[i]) ;
 	    } /* end for */
-
 	    tagp->keys = kea ;		/* kea: store in the tag */
-
 	    } /* end if (memory-allocation) */
-
 	} /* end if (m-a) */
 
 	return rs ;

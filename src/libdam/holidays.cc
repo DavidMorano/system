@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	holidays
+
+	Description:
 	This object module provides an interface to the HOLIDAYS (see
 	|holidays(4)|) database.
 
@@ -1241,7 +1245,7 @@ static int vcmprec(cvoid *v1p,cvoid *v2p) noex {
 	        } else
 	            rc = -1 ;
 	    } else
-	        rc = 1 ;
+	        rc = +1 ;
 	}
 	return rc ;
 }
@@ -1258,7 +1262,7 @@ static int cmprec(cvoid *v1p,cvoid *v2p) noex {
 	    	} else
 	            rc = -1 ;
 	    } else
-	        rc = 1 ;
+	        rc = +1 ;
 	}
 	return rc ;
 }

@@ -866,7 +866,7 @@ static int fnamecmp(cvoid **v1pp,cvoid **v2pp) noex {
 	                rc = -1 ;
 		    }
 	        } else {
-	            rc = 1 ;
+	            rc = +1 ;
 	        }
 	    }
 	} /* end block */

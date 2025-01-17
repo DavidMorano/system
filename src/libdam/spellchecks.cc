@@ -4117,8 +4117,8 @@ static int mkmonth(cchar *cp,int cl) noex {
 
 /* for use with |vecobj_sort(3uc)| or similar */
 static int vrcmp(cvoid **v1pp,cvoid **v2pp) noex {
-	SC_ENT	*e1p = (SC_ENT **) *v1pp ;
-	SC_ENT	*e2p = (SC_ENT **) *v2pp ;
+	SC_ENT		*e1p = (SC_ENT **) *v1pp ;
+	SC_ENT		*e2p = (SC_ENT **) *v2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;

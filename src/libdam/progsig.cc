@@ -481,7 +481,7 @@ int progsig_noteread(progsig_note *rp,int ni) noex {
 			    rp->dlen = ep->dlen ;
 			    strwcpy(rp->dbuf,ep->dbuf,SESMSG_NBUFLEN) ;
 			    strwcpy(rp->user,ep->user,SESMSG_USERLEN) ;
-			    rc = 1 ;
+			    rc = +1 ;
 			} /* end if (non-null) */
 		    } /* end if (raqhand_acc) */
 		} /* end if (progsig_mq) */

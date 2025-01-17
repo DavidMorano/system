@@ -1208,7 +1208,7 @@ static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	ent		*e1p = *e1pp ;
 	ent		*e2p = *e2pp ;
 	if (e1p || e2p) {
-	    rc = 1 ;
+	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {

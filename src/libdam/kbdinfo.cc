@@ -742,13 +742,10 @@ static int ke_finish(KBDINFO_KE *kep)
 }
 /* end subroutine (ke_finish) */
 
-
-static int vcmpfind(const void *v1pp,const void *v2pp)
-{
+static int vcmpfind(cvoid *v1pp,cvoid *v2pp) noex {
 	KBDINFO_KE	**e1pp = (KBDINFO_KE **) v1pp ;
 	KBDINFO_KE	**e2pp = (KBDINFO_KE **) v2pp ;
 	int		rc = 0 ;
-
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
 	    if (*e1pp != NULL) {
 	        if (*e2pp != NULL) {
@@ -756,7 +753,7 @@ static int vcmpfind(const void *v1pp,const void *v2pp)
 	                if (((*e1pp)->nparams > 0) && ((*e2pp)->nparams > 0)) {
 		            rc = ((*e1pp)->p[0] - (*e2pp)->p[0]) ;
 	                } else if ((*e1pp)->nparams > 0) {
-		            rc = 1 ;
+		            rc = +1 ;
 	                } else if ((*e2pp)->nparams > 0) {
 		            rc = -1 ;
 	                } else {
@@ -766,13 +763,8 @@ static int vcmpfind(const void *v1pp,const void *v2pp)
 	        } else
 	            rc = -1 ;
 	    } else
-	        rc = 1 ;
+	        rc = +1 ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo/vcmpfind: ret rc=%d\n",rc) ;
-#endif
-
 	return rc ;
 }
 /* end subroutine (vcmpfind) */

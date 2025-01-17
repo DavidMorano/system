@@ -7,7 +7,6 @@ file		what
 uctim
 libuc		fix to completely compile!
 fsdirtree	needs pointer implementation and a lot of cleanup
-ktag
 postfile
 quote
 mailmsghdrct

@@ -3694,7 +3694,7 @@ const void	*v1p, *v2p ;
 
 
 	if (*e1pp == NULL) {
-	    rc = 1 ;
+	    rc = +1 ;
 	    goto ret0 ;
 	}
 
@@ -3707,8 +3707,9 @@ const void	*v1p, *v2p ;
 	e2p = *e2pp ;
 
 	rc = (e1p->m - e2p->m) ;
-	if (rc == 0)
+	if (rc == 0) {
 	    rc = (e1p->d - e2p->d) ;
+	}
 
 ret0:
 	return rc ;
