@@ -57,7 +57,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 OBJ0_QUEUE= plainq.o q.o aiq.o
 OBJ1_QUEUE= pq.o ciq.o piq.o intiq.o
-OBJ2_QUEUE= cq.o fifoitem.o
+OBJ2_QUEUE= cq.o fifoitem.o fifoelem.o
 OBJ3_QUEUE= charq.o chariq.o
 OBJ4_QUEUE= slq.o fifostr.o
 
@@ -115,13 +115,6 @@ control:
 	(uname -n ; date) > Control
 
 
-obja_queue.o:	$(OBJA_QUEUE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_QUEUE)
-
-objb_queue.o:	$(OBJB_QUEUE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_QUEUE)
-
-
 obj0_queue.o:	$(OBJ0_QUEUE)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_QUEUE)
 
@@ -136,6 +129,13 @@ obj3_queue.o:	$(OBJ3_QUEUE)
 
 obj4_queue.o:	$(OBJ4_QUEUE)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_QUEUE)
+
+
+obja_queue.o:	$(OBJA_QUEUE)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_QUEUE)
+
+objb_queue.o:	$(OBJB_QUEUE)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_QUEUE)
 
 
 # single-list-pointer-queue (singly linked pointer queue) */
@@ -155,8 +155,9 @@ piq.o:			piq.cc piq.h pq.h
 charq.o:		charq.cc charq.h
 chariq.o:		chariq.cc chariq.h charq.h
 
-# variable element size
+# FIFOs (variable element size and fixed element size)
 fifoitem.o:		fifoitem.cc fifoitem.h
+fifoelem.o:		fifoelem.cc fifoelem.h
 
 # container
 cq.o:			cq.cc cq.h

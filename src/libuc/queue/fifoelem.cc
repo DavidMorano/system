@@ -30,7 +30,7 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -46,6 +46,8 @@
 
 /* local typedefs */
 
+typedef const void	cv ;
+
 
 /* external subroutines */
 
@@ -55,13 +57,18 @@
 
 /* forward referecens */
 
-static int	entry_start(FE_ENT *,void *,int) noex ;
-static int	entry_finish(FE_ENT *) noex ;
-
-extern "C" {
-    static int	defcmp(cvoid *,cvoid *) noex ;
+template<typename ... Args>
+static inline int fifoelem_magic(fifoelem *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == FIFOELEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
 }
+/* end subroutine (fifoelem_magic) */
 
+static int	entry_start(FE_ENT *,cvoid *,int) noex ;
+static int	entry_finish(FE_ENT *) noex ;
 
 
 /* local variables */
@@ -76,7 +83,7 @@ int fifoelem_start(fifoelem *op) noex {
     	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-	    op->head = op->tail = NULL ;
+	    op->head = op->tail = nullptr ;
 	    op->n = 0 ;
 	    op->magic = FIFOELEM_MAGIC ;
 	}
@@ -87,11 +94,11 @@ int fifoelem_start(fifoelem *op) noex {
 int fifoelem_finish(fifoelem *op) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
 
-	while ((rs = fifoelem_curdel(op,NULL)) >= 0) ;
+	while ((rs = fifoelem_curdel(op,nullptr)) >= 0) ;
 	if (rs == SR_NOTFOUND) rs = SR_OK ;
 
 	op->magic = 0 ;
@@ -103,20 +110,20 @@ int fifoelem_add(fifoelem *op,void *usp,int usl) noex {
 	cint		esize = szof(FE_ENT) ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (usp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (usp == nullptr) return SR_FAULT ;
 
 	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
 
 	if (void *vp ; (rs = uc_malloc(esize,&vp)) >= 0) {
 	    FE_ENT	*ep = (FIFOELEM_ENT *) vp ;
 	    if ((rs = entry_start(ep,usp,usl)) >= 0) {
-	        if (op->head == NULL) {
+	        if (op->head == nullptr) {
 	            op->head = ep ;
 	            op->tail = ep ;
-	            ep->previous = ep->next = NULL ;
+	            ep->prev = ep->next = nullptr ;
 	        } else {
-	            ep->previous = op->tail ;
+	            ep->prev = op->tail ;
 	            (op->tail)->next = ep ;
 	            op->tail = ep ;
 	        }
@@ -137,28 +144,28 @@ int fifoelem_remove(fifoelem *op,void *ebuf,int elen) noex {
 	int		rs1 ;
 	int		slen ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (ebuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (ebuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
 
 /* can we give the call an entry? */
 
-	if (op->head == NULL)
+	if (op->head == nullptr)
 	    return SR_NOTFOUND ;
 
 	ep = op->head ;
-	if ((elen >= 0) && (ep->sl > elen))
+	if ((elen >= 0) && (ep->dl > elen))
 	    return SR_TOOBIG ;
 
-	memcpy(ebuf,ep->sp,ep->sl) ;
+	memcpy(ebuf,ep->dp,ep->dl) ;
 
-	slen = ep->sl ;
+	slen = ep->dl ;
 	op->head = ep->next ;
-	if (op->head == NULL) {
-	    op->tail = NULL ;
+	if (op->head == nullptr) {
+	    op->tail = nullptr ;
 	} else {
-	    (op->head)->previous = NULL ;
+	    (op->head)->prev = nullptr ;
 	}
 	{
 	rs1 = entry_finish(ep) ;
@@ -176,14 +183,14 @@ int fifoelem_remove(fifoelem *op,void *ebuf,int elen) noex {
 int fifoelem_curfetch(fifoelem *op,FE_CUR *cp,FE_ENT **epp) noex {
 	FE_ENT		*ep ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (epp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (epp == nullptr) return SR_FAULT ;
 
 	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
 
 /* OK, do the deed */
 
-	if ((cp == NULL) || (cp->current == NULL)) {
+	if ((cp == nullptr) || (cp->current == nullptr)) {
 	    ep = op->head ;
 	} else {
 	    ep = (cp->current)->next ;
@@ -197,7 +204,7 @@ int fifoelem_curfetch(fifoelem *op,FE_CUR *cp,FE_ENT **epp) noex {
 	    *epp = ep ;
 	}
 
-	return ((ep != NULL) ? ep->sl : SR_NOTFOUND) ;
+	return ((ep != nullptr) ? ep->dl : SR_NOTFOUND) ;
 }
 /* end subroutine (fifoelem_curfetch) */
 
@@ -206,43 +213,43 @@ int fifoelem_curdel(fifoelem *op,FE_CUR *cp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
 
 	/* OK, do the deed */
-	if ((cp == NULL) || (cp->current == NULL)) {
+	if ((cp == nullptr) || (cp->current == nullptr)) {
 	    ep = op->head ;
 	} else {
 	    ep = cp->current ;
 	}
 
-	if (ep == NULL)
+	if (ep == nullptr)
 	    return SR_NOTFOUND ;
 
-	if (cp != NULL) {
+	if (cp != nullptr) {
 
-	    if (ep->previous == NULL) {
+	    if (ep->prev == nullptr) {
 	        op->head = ep->next ;
 	    } else {
-	        (ep->previous)->next = ep->next ;
+	        (ep->prev)->next = ep->next ;
 	    }
 
-	    if (ep->next == NULL) {
-	        op->tail = ep->previous ;
+	    if (ep->next == nullptr) {
+	        op->tail = ep->prev ;
 	    } else {
-	        (ep->next)->previous = ep->previous ;
+	        (ep->next)->prev = ep->prev ;
 	    }
 
-	    cp->current = ep->previous ;
+	    cp->current = ep->prev ;
 
 	} else {
 
 	    op->head = ep->next ;
-	    if (op->head == NULL) {
-	        op->tail = NULL ;
+	    if (op->head == nullptr) {
+	        op->tail = nullptr ;
 	    } else {
-	        (op->head)->previous = NULL ;
+	        (op->head)->prev = nullptr ;
 	    }
 
 	} /* end if */
@@ -261,7 +268,7 @@ int fifoelem_curdel(fifoelem *op,FE_CUR *cp) noex {
 /* end subroutine (fifoelem_curdel) */
 
 int fifoelem_count(fifoelem *op) noex {
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
 
@@ -269,77 +276,70 @@ int fifoelem_count(fifoelem *op) noex {
 }
 /* end subroutine (fifoelem_count) */
 
-/* search for a string in the FIFO string object */
-int fifoelem_finder(fifoelem *op,void *usp,fifoelem_f cmpfunc,void **rpp) noex {
-	fifoelem_cur	cur ;
-	int		rs ;
-	int		rs1 ;
-	int		rl = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
-
-	if (cmpfunc == NULL)
-	    cmpfunc = (fifoelem_f) defcmp ;
-
-	if ((rs = fifoelem_curbegin(op,&cur)) >= 0) {
-	    FE_ENT	*ep ;
-	    while ((rs = fifoelem_curfetch(op,&cur,&ep)) >= 0) {
-	        if ((*cmpfunc)(usp,(*rpp)) == 0) {
-		    rl = ep->sl ;
-		    if (rpp) {
-	    	        *rpp = (rs >= 0) ? ep->sp : NULL ;
-		    }
-		    break ;
-		}
-	    } /* end while */
-	    rs1 = fifoelem_curend(op,&cur) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (cursor) */
-
-	return ((rs >= 0) ? rl : rs) ;
-}
-/* end subroutine (fifoelem_finder) */
-
 int fifoelem_curbegin(FE *op,FE_CUR *cp) noex {
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
 
-	cp->current = NULL ;
+	cp->current = nullptr ;
 	return SR_OK ;
 }
 /* end subroutine (fifoelem_curbegin) */
 
 int fifoelem_curend(FE *op,FE_CUR *cp) noex {
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
 
-	cp->current = NULL ;
+	cp->current = nullptr ;
 	return SR_OK ;
 }
 /* end subroutine (fifoelem_curend) */
 
+int fifoelem_present(fifoelem *op,cv *sp,int sl,fifoelem_cmp scmp) noex {
+	int		rs ;
+	int		rs1 ;
+	int		dl = 0 ;
+	if ((rs = fifoelem_magic(op,sp)) >= 0) {
+	    if (sl < 0) sl = strlen(ccharp(sp)) ;
+	    if (scmp == nullptr) scmp = fifoelem_cmp(strcmp) ;
+	    auto entcmp = [&sp,&sl,scmp] (FE_ENT *ep) {
+		bool f = true ;
+		f = f && (sl == ep->dl) ;
+		f = f && scmp(sp,ep->dp) ;
+		return f ;
+	    } ;
+	    if (FE_CUR cur ; (rs = fifoelem_curbegin(op,&cur)) >= 0) {
+	        FE_ENT	*ep ;
+	        while ((rs = fifoelem_curfetch(op,&cur,&ep)) >= 0) {
+		    if (entcmp(ep)) {
+	                dl = ep->dl ;
+	                break ;
+	            }
+	        } /* end while */
+	        rs1 = fifoelem_curend(op,&cur) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (cursor) */
+	} /* end if (magic) */
+	return (rs >= 0) ? dl : rs ;
+}
+/* end subroutine (fifoelem_present) */
+
 
 /* privatesubroutines */
 
-static int entry_start(FE_ENT *ep,void *vsp,int vsl) noex {
+static int entry_start(FE_ENT *ep,cvoid *vsp,int vsl) noex {
 	int		rs ;
-
 	if (vsl < 0) {
 	    cchar	*cp = charp(vsp) ;
 	    vsl = strlen(cp) ;
 	}
-
-	ep->previous = ep->next = NULL ;
+	ep->prev = ep->next = nullptr ;
 	cchar	*sp = charp(vsp) ;
 	if (cchar *cp ; (rs = uc_mallocstrw(sp,vsl,&cp)) >= 0) {
-	    ep->sl = vsl ;
-	    ep->sp = voidp(cp) ;
+	    ep->dl = vsl ;
+	    ep->dp = voidp(cp) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (entry_start) */
@@ -347,34 +347,15 @@ static int entry_start(FE_ENT *ep,void *vsp,int vsl) noex {
 static int entry_finish(FE_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ep->sp) {
-	    rs1 = uc_free(ep->sp) ;
+	if (ep->dp) {
+	    rs1 = uc_free(ep->dp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->sp = NULL ;
+	    ep->dp = nullptr ;
 	}
 
-	ep->sl = 0 ;
+	ep->dl = 0 ;
 	return rs ;
 }
 /* end subroutine (entry_finish) */
-
-static int defcmp(cvoid *a1p,cvoid *a2p) noex {
-	cvoid		**e1pp = (cvoid **) a1p ;
-	cvoid		**e2pp = (cvoid **) a2p ;
-	int		rc = 0 ;
-	if ((*e1pp != NULL) || (*e2pp != NULL)) {
-	    if (*e1pp != NULL) {
-	        if (*e2pp != NULL) {
-		    cchar	*i1p = (cchar *) *e1pp ;
-		    cchar	*i2p = (cchar *) *e2pp ;
-	            rc = strcmp(i1p,i2p) ;
-	        } else
-		    rc = -1 ;
-	    } else
-		rc = 1 ;
-	}
-	return rc ;
-}
-/* end subroutine (defcmp) */
 
 

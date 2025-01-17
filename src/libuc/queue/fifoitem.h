@@ -29,8 +29,8 @@
 struct fifoitem_entry {
 	FIFOITEM_ENT	*next ;
 	FIFOITEM_ENT	*prev ;
-	int		dl ;
 	cvoid		*dp ;
+	int		dl ;
 } ;
 
 struct fifoitem_head {
@@ -50,6 +50,8 @@ typedef FIFOITEM_CUR	fifoitem_cur ;
 
 EXTERNC_begin
 
+typedef int (*fifoitem_cmp)(cvoid *,cvoid *) noex ;
+
 extern int fifoitem_start(fifoitem *) noex ;
 extern int fifoitem_finish(fifoitem *) noex ;
 extern int fifoitem_ins(fifoitem *,cvoid *,int) noex ;
@@ -61,7 +63,7 @@ extern int fifoitem_curdel(fifoitem *,fifoitem_cur *) noex ;
 extern int fifoitem_curfetch(fifoitem *,fifoitem_cur *,fifoitem_ent **) noex ;
 extern int fifoitem_curenum(fifoitem *,fifoitem_cur *,cvoid **) noex ;
 extern int fifoitem_del(fifoitem *) noex ;
-extern int fifoitem_finder(fifoitem *,cvoid *,int (*)(),cvoid **) noex ;
+extern int fifoitem_present(fifoitem *,cvoid *,int,fifoitem_cmp) noex ;
 
 EXTERNC_end
 

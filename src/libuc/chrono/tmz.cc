@@ -175,6 +175,7 @@ constexpr char		tpterms[] = {
 static vars		var ;
 
 constexpr int		nyears = NYEARS_CENTURY ;
+constexpr bool		f_comment = false ;
 
 
 /* exported variables */
@@ -1075,14 +1076,16 @@ static int getzoff(int *zop,cchar *sp,int sl) noex {
 	    mins += (*cp++ - '0') ;
 	    zoff = ((hours * 60) + mins) ;
 	    /* reportedly, there are timezones at up to 14 hours off of GMT! */
-#ifdef	COMMENT
-	    if (zoff > (14 * 60)) {
-	        rs = SR_INVALID ;
-	    }
-#endif
-	    zoff *= sign ;
-	    if (zop) {
-	        *zop = zoff ;
+	    if_constexpr (f_comment) {
+	        if (zoff > (14 * 60)) {
+	            rs = SR_INVALID ;
+	        }
+	    } /* end if_constexpr (f_comment) */
+	    {
+	        zoff *= sign ;
+	        if (zop) {
+	            *zop = zoff ;
+	        }
 	    }
 	    if (rs >= 0) {
 	        rs = (cp - sp) ;
@@ -1145,9 +1148,15 @@ int tmz::gettm(TM *tmp) noex {
 }
 
 void tmz::dtor() noex {
+    int		rs = SR_OK ;
+    int		rs1 ;
     if (zname) {
-	uc_free(zname) ;
+	rs1 = uc_free(zname) ;
+	if (rs >= 0) rs = rs1 ;
 	zname = nullptr ;
+    }
+    if (rs < 0) {
+	ulogerror("tmx",rs,"dtor-ucfree") ;
     }
 }
 /* end method (tmz::dtor) */

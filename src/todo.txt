@@ -4,12 +4,10 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
-dater		add OBJ
 uctim
 libuc		fix to completely compile!
-fifoelem
+fsdirtree	needs pointer implementation and a lot of cleanup
 ktag
-mapper
 postfile
 quote
 mailmsghdrct
@@ -21,7 +19,6 @@ msfilee
 msfile
 openqotd
 maintqotd
-fsdirtree	needs pointer implementation and a lot of cleanup
 utmpaccenum
 mailmsg		needs a lot of pointer implementation
 mailmsgstage
@@ -42,6 +39,7 @@ ts
 dw
 ds
 spellchecks	incredible mess!
+dater		add OBJ
 
 = Future
 

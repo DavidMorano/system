@@ -28,9 +28,9 @@
 
 struct fifoelem_entry {
 	FIFOELEM_ENT	*next ;		/* must be first! */
-	FIFOELEM_ENT	*previous ;
-	void		*sp ;
-	int		sl ;
+	FIFOELEM_ENT	*prev ;
+	void		*dp ;		/* data-pointer */
+	int		dl ;		/* data-length */
 } ;
 
 
@@ -53,7 +53,7 @@ typedef FIFOELEM_CUR	fifoelem_cur ;
 
 EXTERNC_begin
 
-typedef int	(*fifoelem_f)(cvoid **,cvoid **) noex ;
+typedef int	(*fifoelem_cmp)(cvoid *,cvoid *) noex ;
 
 extern int fifoelem_start(fifoelem *) noex ;
 extern int fifoelem_finish(fifoelem *) noex ;
@@ -64,7 +64,7 @@ extern int fifoelem_curbegin(fifoelem *,fifoelem_cur *) noex ;
 extern int fifoelem_curend(fifoelem *,fifoelem_cur *) noex ;
 extern int fifoelem_curdel(fifoelem *,fifoelem_cur *) noex ;
 extern int fifoelem_curfetch(fifoelem *,fifoelem_cur *,fifoelem_ent **) noex ;
-extern int fifoelem_finder(fifoelem *,void *,fifoelem_f,void **) noex ;
+extern int fifoelem_present(fifoelem *,cvoid *,int,fifoelem_cmp) noex ;
 
 /*
 extern int fifoelem_curenum(fifoelem *,fifoelem_cur *,void *) noex ;

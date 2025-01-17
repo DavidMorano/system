@@ -27,11 +27,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<usystem.h>
+#include	<strwcmp.h>
 #include	<localmisc.h>
 
 #include	"fifoitem.h"
@@ -39,13 +39,17 @@
 
 /* local defines */
 
+#define	FI		fifoitem
+#define	FI_ENT		fifoitem_ent
+#define	FI_CUR		fifoitem_cur
+
 
 /* imported namespaces */
 
 
 /* local typedefs */
 
-typedef int		(*cmpfun_f)(cvoid *,cvoid *) noex ;
+typedef const void	cv ;
 typedef fifoitem_ent *	entp ;
 
 
@@ -72,7 +76,6 @@ static inline int fifoitem_magic(fifoitem *op,Args ... args) noex {
 
 static int	entry_start(fifoitem_ent *,cvoid *,int) noex ;
 static int	entry_finish(fifoitem_ent *) noex ;
-static int	defaultcmp(cchar **,cchar **) noex ;
 
 
 /* local variables */
@@ -300,22 +303,24 @@ int fifoitem_del(fifoitem *op) noex {
 }
 /* end subroutine (fifoitem_del) */
 
-int fifoitem_finder(fifoitem *op,cchar *s,cmpfun_f cmpfunc,cchar **rpp) noex {
+int fifoitem_present(fifoitem *op,cv *sp,int sl,fifoitem_cmp scmp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		dl = 0 ;
-	if ((rs = fifoitem_magic(op,s)) >= 0) {
-	    fifoitem_cur	cur ;
-	    if (cmpfunc == nullptr) cmpfunc = (cmpfun_f) defaultcmp ;
-	    if ((rs = fifoitem_curbegin(op,&cur)) >= 0) {
-	        fifoitem_ent	*ep ;
+	if ((rs = fifoitem_magic(op,sp)) >= 0) {
+	    if (sl < 0) sl = strlen(ccharp(sp)) ;
+	    if (scmp == nullptr) scmp = fifoitem_cmp(strcmp) ;
+	    auto entcmp = [&sp,&sl,scmp] (FI_ENT *ep) {
+		bool f = true ;
+		f = f && (sl == ep->dl) ;
+		f = f && scmp(sp,ep->dp) ;
+		return f ;
+	    } ;
+	    if (FI_CUR cur ; (rs = fifoitem_curbegin(op,&cur)) >= 0) {
+	        FI_ENT	*ep ;
 	        while ((rs = fifoitem_curfetch(op,&cur,&ep)) >= 0) {
-	            if ((*cmpfunc)(s,ep->dp) == 0) {
+		    if (entcmp(ep)) {
 	                dl = ep->dl ;
-	                if (rpp != nullptr) {
-	                    cchar	*rp = ccharp(ep->dp) ;
-	                    *rpp = (rs >= 0) ? rp : nullptr ;
-	                }
 	                break ;
 	            }
 	        } /* end while */
@@ -325,7 +330,7 @@ int fifoitem_finder(fifoitem *op,cchar *s,cmpfun_f cmpfunc,cchar **rpp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? dl : rs ;
 }
-/* end subroutine (fifoitem_finder) */
+/* end subroutine (fifoitem_present) */
 
 
 /* private subroutines */
@@ -358,19 +363,13 @@ static int entry_finish(fifoitem_ent *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int defaultcmp(cchar **e1pp,cchar **e2pp) noex {
-	int		rc = 0 ;
-	if (*e1pp || *e2pp) {
-	    if (*e1pp == nullptr) {
-	        rc = 1 ;
-	    } else if (*e2pp == nullptr) {
-	        rc = -1 ;
-	    } else {
-	        rc = strcmp(*e1pp,*e2pp) ;
-	    }
-	}
-	return rc ;
+#ifdef	COMMENT
+static int cmpent(FI_ENT *e1p,FI_ENT *e2p) noex {
+    	cint		sxl = e1p->dl ;
+    	cchar		*s1p = charp(e1p->dp) ;
+    	cchar		*s2p = charp(e2p->dp) ;
+	return strwcmp(s1p,s2p,sxl) ;
 }
-/* end subroutine (defaultcmp) */
+#endif /* COMMENT */
 
 
