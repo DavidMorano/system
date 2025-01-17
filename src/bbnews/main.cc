@@ -386,7 +386,7 @@ constexpr char		aterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static bufsizevar	znlen(getbufsize_zn) ;
+static bufsizevar	zalen(getbufsize_zn) ;
 
 
 /* exported variables */
@@ -1296,7 +1296,7 @@ int main(int argc,mainv argv,mainv envv) noex {
 #endif
 
 	if (rs >= 0) {
-	    if ((rs = znlen) >= 0) {
+	    if ((rs = zalen) >= 0) {
 	        if ((rs = initnow(&pip->now,pip->zname,rs)) >= 0) {
 	            if (( rs = procopts(pip,&akopts)) >= 0) {
 #if	CF_CHECKONC
@@ -1307,7 +1307,7 @@ int main(int argc,mainv argv,mainv envv) noex {
 #endif /* CF_CHECKONC */
 		    }
 	        }
-	    } /* end if (znlen) */
+	    } /* end if (zalen) */
 	} /* end if (ok) */
 
 	if ((pip->progmode < 0) && pip->f.test)

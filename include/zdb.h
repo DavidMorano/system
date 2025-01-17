@@ -16,13 +16,11 @@
 #include	<usystem.h>
 
 
-#define	ZDB_MAGIC	0x26213711
 #define	ZDB		struct zdb_head
-#define	ZDB_ZNAMESIZE	8
 
 
 struct zdb_head {
-	cchar		*name ;
+	cchar		*name ;		/* static-data (not allocated) */
 	short		off ;		/* minutes west of GMT */
 	short		isdst ;
 } ;

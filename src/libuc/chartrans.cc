@@ -1,4 +1,5 @@
 /* chartrans SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* character translation */
@@ -16,6 +17,7 @@
 
 /*******************************************************************************
 
+  	
 	We deal with translating from some given character sets to the
 	wide-character ('wchar_t') format.
 
@@ -127,12 +129,10 @@ int chartrans_open(CT *op ,cchar *pr,int maxtx) noex {
 	    rs = SR_INVALID ;
 	    memclear(op) ; /* dangerous */
 	    if (pr[0]) {
-	        cchar	*cp{} ;
-	        if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
-	            cint	asize = (maxtx * sizeof(chartrans_set)) ;
-	            void	*p ;
+	        if (cchar *cp ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	            cint	asize = (maxtx * szof(chartrans_set)) ;
 	            op->pr = cp ; /* <- store allocation */
-	            if ((rs = uc_malloc(asize,&p)) >= 0) {
+	            if (void *p ; (rs = uc_malloc(asize,&p)) >= 0) {
 	                op->sets = (chartrans_set *) p ;
 	                op->nmax = maxtx ;
 	                op->magic = CHARTRANS_MAGIC ;
@@ -251,7 +251,7 @@ int chartrans_transread(CT *op,int txid,wchr *rcp,int rcl,
 	        } else {
 	            uiconv	*uip = &setp->id ;
 	            int		ileft = sl ;
-	            int		ostart = (rcl * sizeof(wchar_t)) ;
+	            int		ostart = (rcl * szof(wchar_t)) ;
 	            int		oleft ;
 	            int		ofill ;
 	            cchar	*ibp = sp ;
@@ -292,15 +292,13 @@ static int chartrans_setopen(CT *op,time_t dt,int txid,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*tcsp = CHARTRANS_NCS ;
-	cchar		*name ;
 	memclear(setp) ; /* dangerous */
-        if ((rs = uc_mallocstrw(sp,sl,&name)) >= 0) {
+	if (cchar *name ; (rs = uc_mallocstrw(sp,sl,&name)) >= 0) {
             setp->name = name ;		/* <- store allocation */
             if (int pc ; (pc = matcasestr(charsets,sp,sl)) >= 0) {
                 setp->pc = pc ;
             } else {
-                char        *tbuf{} ;
-		if ((rs = malloc_mp(&tbuf)) >= 0) {
+                if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 		    cint	tlen = rs ;
                     setp->pc = -1 ;
                     if ((rs = mktransname(tbuf,tlen,tcsp,-1)) >= 0) {
@@ -402,9 +400,8 @@ static int chartrans_transutf8(CT *op,wchr *rcp,int rcl,cc *sp,int sl) noex {
 static int chartrans_checkdecoder(CT *op) noex {
 	int		rs = SR_OK ;
         if (op->utf8decoder == nullptr) {
-            cint    osize = sizeof(utf8decoder) ;
-            void    *p ;
-            if ((rs = uc_malloc(osize,&p)) >= 0) {
+            cint    osize = szof(utf8decoder) ;
+            if (void *p ; (rs = uc_malloc(osize,&p)) >= 0) {
                 utf8decoder *uop = (utf8decoder *) p ;
                 op->utf8decoder = p ;
                 rs = utf8decoder_start(uop) ;

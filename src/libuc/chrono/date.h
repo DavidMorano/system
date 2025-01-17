@@ -27,7 +27,46 @@ struct date_head {
 	short		isdst ;			/* is-daylight-savings time */
 } ;
 
+#ifdef	__cplusplus
+enum datemems {
+	datemem_finish,
+	datemem_overlast
+} ;
+struct date ;
+struct date_co {
+	date		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (date *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (date_co) */
+struct date : date_head {
+	date_co	finish ;
+	date() noex {
+	    finish(this,datemem_finish) ;
+	} ;
+	date(const date &) = delete ;
+	date &operator = (const date &) = delete ;
+	int start(time_t,int,int,cchar *,int) noex ;
+	int setzname(cchar *,int) noex ;
+	int copy(date *) noex ;
+	int gettime(time_t *) noex ;
+	int getzoff(int *) noex ;
+	int getisdst(int *) noex ;
+	int getzname(char *,int) noex ;
+	void dtor() noex ;
+	~date() {
+	    dtor() ;
+	} ;
+} ; /* end struct (date) */
+#else	/* __cplusplus */
 typedef DATE		date ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

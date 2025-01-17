@@ -1400,9 +1400,9 @@ static int procuserinfo_logid(proginfo *pip) noex {
 static int process(proginfo *pip) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *znbuf ; (rs = malloc_zn(&znbuf)) >= 0) {
-	    cinst	znlen = rs ;
-	    if (TIMEB now ; (rs = initnow(&now,znbuf,znlen)) >= 0) {
+	if (char *znbuf ; (rs = malloc_za(&znbuf)) >= 0) {
+	    cinst	zalen = rs ;
+	    if (TIMEB now ; (rs = initnow(&now,znbuf,zalen)) >= 0) {
 		if ((rs = pip->znameset(znbuf,rs)) >= 0) {
 	            pip->daytime = now.time ;
 	            if ((rs = dater_start(&pip->d,&now,znbuf,-1)) >= 0) {

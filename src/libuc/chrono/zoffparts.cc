@@ -46,7 +46,7 @@
 	someplace else, cares about that.
 
 	Sysnopsis:
-	int zoffparts_get(ZOFFPARTS *zop,int *vp) noex
+	int zoffparts_get(zoffparts *zop,int *vp) noex
 
 	Arguments:
 	zop		pointer to object
@@ -157,5 +157,17 @@ static int storebuf_twodig(char *rbuf,int rlen,int i,int v) noex {
 	return rs ;
 }
 /* end subroutine (storebuf_twodig) */
+
+int zoffparts::set(int zo) noex {
+	return zoffparts_set(this,zo) ;
+}
+
+int zoffparts::get(int *vp) noex {
+	return zoffparts_get(this,vp) ;
+}
+
+int zoffparts::mkstr(char *rbuf,int rlen) noex {
+	return zoffparts_mkstr(this,rbuf,rlen) ;
+}
 
 

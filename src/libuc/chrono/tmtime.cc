@@ -91,7 +91,7 @@ static int tmtime_ctor(tmtime *op,Args ... args) noex {
 	if (op && (args && ...)) {
 	    rs = SR_OK ;
 	    if (op->zname == nullptr) {
-	        if (char *a ; (rs = malloc_zn(&a)) >= 0) {
+	        if (char *a ; (rs = malloc_za(&a)) >= 0) {
 		    op->zname = a ;
 		    memclear(a,rs) ;
 		    a[rs] = '\0' ;
@@ -107,7 +107,7 @@ static int	tmtime_mktimer(tmtime *,int,time_t *) noex ;
 
 /* local variables */
 
-static bufsizevar	znlen(getbufsize_zn) ;
+static bufsizevar	zalen(getbufsize_za) ;
 
 constexpr bool		f_darwin = F_DARWIN ;
 
@@ -138,7 +138,7 @@ int tmtime_gmtime(tmtime *op,time_t t) noex {
 	    if ((rs = uc_gmtime(&t,&tms)) >= 0) {
 	        if ((rs = tmtime_insert(op,&tms)) >= 0) {
 	            op->gmtoff = 0 ;
-	            rs = strwcpy(op->zname,"GMT",znlen) - op->zname ;
+	            rs = strwcpy(op->zname,"GMT",zalen) - op->zname ;
 	        }
 	    } /* end if */
 	    if (rs < 0) {
@@ -193,7 +193,7 @@ int tmtime_insert(tmtime *op,TM *tmp) noex {
 	            op->gmtoff = (f_isdst) ? altzone : timezone ;
 	            zp = (f_isdst) ? tzname[1] : tzname[0] ;
 	        } /* end if_constexpr (f_darwin) */
-	        rs = strwcpy(op->zname,zp,znlen) - op->zname ;
+	        rs = strwcpy(op->zname,zp,zalen) - op->zname ;
 	    } /* end if (getting zone-name) */
 	    if (rs < 0) {
 		op->dtor() ;

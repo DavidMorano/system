@@ -1693,7 +1693,7 @@ PROCDATA	*pdp ;
 	        dater	*edp ;
 	        cint	n = (rs-1) ;
 	        if ((rs = article_getenvdate(aip,n,&edp)) >= 0) {
-		    if (char *zn ; (rs = malloc_zn(&zn)) >= 0) {
+		    if (char *zn ; (rs = malloc_za(&zn)) >= 0) {
 		        dater_zi zi ; 
 		        if ((rs = dater_zinfoget(edp,&zi,zn,zl)) >= 0) {
 		            rs = dater_zinfoset(tdp,&zi,zn,rs) ;

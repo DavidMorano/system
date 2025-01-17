@@ -73,7 +73,7 @@ struct dater_head {
 	char		*zname ;
 	TIMEB		cb ;		/* current */
 	TIMEB		b ;
-	DATER_FL	f ;
+	DATER_FL	fl ;
 	uint		magic ;
 	int		znamelen ;	/* public variable */
 	short		cyear ;		/* current */

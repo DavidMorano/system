@@ -574,26 +574,18 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* get the current time-of-day */
 
 	if (rs >= 0) {
-	    if (char *znbuf ; (rs = malloc_zn(&anbuf)) >= 0) {
+	    if (char *zabuf ; (rs = malloc_za(&zabuf)) >= 0) {
 	        TIMEB	*nowp = &pip->now ;
 	        cint	zlen = rs ;
-	        if ((rs = initnow(nowp,znbuf,znlen)) >= 0) {
+	        if ((rs = initnow(nowp,zabuf,zalen)) >= 0) {
 		    cint	znl = rs ;
-		    if ((rs = pip->znameset(znbuf,znl)) >= 0) {
+		    if ((rs = pip->znameset(zabuf,znl)) >= 0) {
 	                pip->daytime = nowp->time ;
-	                rs = dater_start(&pip->tmpdate,nowp,znbuf,znl) ;
+	                rs = dater_start(&pip->tmpdate,nowp,zabuf,znl) ;
 		    }
 	        } /* end if (initnow) */
 	    } /* end if (m-a-f) */
 	} /* end block (getting some current time stuff) */
-
-#if	CF_DEBUGS
-	{
-	    struct timeb	*nowp = &pip->now ;
-	    debugprintf("main: initnow() zoff=%d zname=%s\n",
-		nowp->timezone,pip->zname) ;
-	}
-#endif
 
 	if (rs < 0) {
 	    ex = EX_OSERR ;

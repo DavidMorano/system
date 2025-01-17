@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} tmz.h"
+NAMES="${NAMES} alloc_zn"
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/tmz.h/s//tmz.hh/g
+g/alloc_zn/s//alloc_za/g
 	w
 	q
 EOF

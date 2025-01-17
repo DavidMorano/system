@@ -47,7 +47,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/timeb.h>
+#include	<sys/timeb.h>		/* |TIMEB| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -88,7 +88,7 @@
 
 /* local variables */
 
-static bufsizevar		znlen(getbufsize_za) ;
+static bufsizevar		zalen(getbufsize_za) ;
 
 
 /* exported variables */
@@ -100,21 +100,23 @@ int date_start(date *op,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    memclear(op) ;
-	    if (char *a ; (rs = malloc_za(&a)) >= 0) {
-		cint	znlen = rs ;
-		a[znlen] = '\0' ;
-		op->zname = a ;
-	        op->time = t ;
-	        op->zoff = zoff ;
-	        op->isdst = isdst ;
-		if (zbuf) {
-	            rs = (strnwcpy(op->zname,znlen,zbuf,zlen) - op->zname) ;
-		}
-		if (rs < 0) {
-		    uc_free(op->zname) ;
-		    op->zname = nullptr ;
-		}
-	    } /* end if (memory-allocation) */
+	    if ((rs = zalen) >= 0) {
+	        if (char *a ; (rs = malloc_za(&a)) >= 0) {
+		    a[zalen] = '\0' ;
+		    op->zname = a ;
+	            op->time = t ;
+	            op->zoff = zoff ;
+	            op->isdst = isdst ;
+		    if (zbuf) {
+		        char *zp = op->zname ;
+	                rs = (strnwcpy(zp,zalen,zbuf,zlen) - zp) ;
+		    }
+		    if (rs < 0) {
+		        uc_free(op->zname) ;
+		        op->zname = nullptr ;
+		    }
+	        } /* end if (memory-allocation) */
+	    } /* end if (zalen) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -139,7 +141,8 @@ int date_finish(date *op) noex {
 int date_setzname(date *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) {
-	    rs = (strnwcpy(op->zname,znlen,sp,sl) - op->zname) ;
+	    char	*zp = op->zname ;
+	    rs = (strnwcpy(zp,zalen,sp,sl) - zp) ;
 	}
 	return rs ;
 }
@@ -148,9 +151,10 @@ int date_setzname(date *op,cchar *sp,int sl) noex {
 int date_copy(date *op,date *d2p) noex {
 	int		rs = SR_FAULT ;
 	if (op && d2p) {
+	    DATE	*hop = op ;
 	    char	*znp = op->zname ;	/* save */
 	    rs = SR_OK ;
-	    memcpy(op,d2p) ;
+	    memcpy(hop,d2p) ;			/* shallow-copy */
 	    op->zname = znp ;			/* restore */
 	}
 	return rs ;
@@ -195,5 +199,55 @@ int date_getzname(date *op,char *zbuf,int zlen) noex {
 	return rs ;
 }
 /* end subroutine (date_getzname) */
+
+
+/* local subroutines */
+
+int date::start(time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
+	return date_start(this,t,zoff,isdst,zbuf,zlen) ;
+}
+
+int date::setzname(cchar *sp,int sl) noex {
+	return date_setzname(this,sp,sl) ;
+}
+
+int date::copy(date *d2p) noex {
+	return date_copy(this,d2p) ;
+}
+
+int date::gettime(time_t *tp) noex {
+	return date_gettime(this,tp) ;
+}
+
+int date::getzoff(int *zop) noex {
+	return date_getzoff(this,zop) ;
+}
+
+int date::getisdst(int *dstp) noex {
+	return date_getisdst(this,dstp) ;
+}
+
+int date::getzname(char *zbuf,int zlen) noex {
+	return date_getzname(this,zbuf,zlen) ;
+}
+
+void date::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("date",rs,"fini-finish") ;
+	}
+}
+
+date_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case datemem_finish:
+	        rs = date_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (date_co::operator) */
 
 

@@ -19,6 +19,7 @@
 
 	Name:
 	strwcmp
+	strw{x}cmp
 
 	Description: 
 	This subroutine compares two strings, but the second string
@@ -26,8 +27,10 @@
 
 	Synopsis:
 	int strwcmp(cchar *s1,cchar *s2,int s2len) noex
+	int strw{x}cmp(cchar *s1,cchar *s2,int s2len) noex
 
 	Arguments:
+	{×}	'base' 'case' 'fold'
 	s1	one string
 	s2	second string
 	s2len	length of second string

@@ -234,15 +234,15 @@ int pingstatdb_open(PINGSTATDB *psp,cchar *fname,mode_t omode,int fperm)
 
 static int pingstatdb_opener(pingstatdb *op) noex {
     	int		rs ;
-	if (char *znbuf ; (rs = malloc_zn(&znbuf)) >= 0) {
+	if (char *zabuf ; (rs = malloc_za(&zabuf)) >= 0) {
 	    cint	znlen = rs ;
-	    if ((rs = initnow(&psp->now,znbuf,znlen)) >= 0) {
-		if (char *a ; (rs = uc_mallocstrw(znbuf,rs,&a)) >= 0) {
+	    if ((rs = initnow(&psp->now,zabuf,znlen)) >= 0) {
+		if (char *a ; (rs = uc_mallocstrw(zabuf,rs,&a)) >= 0) {
 		    psp->zname = a ;
 		    psp->magic = PINGSTATDB_MAGIC ;
 		} /* end if (memory-allocation) */
 	    }
-	    rs = rsfree(rs,znbuf) ;
+	    rs = rsfree(rs,zabuf) ;
 	} /* end if (m-a-f) */
 	return rs ;
 }

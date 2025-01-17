@@ -56,7 +56,7 @@
 
 /* local variables */
 
-static bufsizevar	znlen(getbufsize_zn) ;
+static bufsizevar	zalen(getbufsize_za) ;
 
 constexpr bool		f_darwin = F_DARWIN ;
 
@@ -88,7 +88,7 @@ int getdefzinfo(defzinfo *zip,char *zbuf,int zlen,int isdst) noex {
 		}
 	    } /* end if_constexpr (f_darwin) */
 	    if ((rs >= 0) && zp) {
-		if ((rs = znlen) >= 0) {
+		if ((rs = zalen) >= 0) {
 	            rs = snwcpy(zbuf,zlen,zp,rs) ;
 		    znl = rs ;
 		}

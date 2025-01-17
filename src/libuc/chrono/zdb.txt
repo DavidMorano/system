@@ -5,6 +5,7 @@
 /* time-zone database management */
 /* version %I% last-modified %G% */
 
+#define	CF_BSEARCH	0		/* use |bsearch(3c)| */
 
 /* revision history:
 
@@ -30,7 +31,7 @@
 #include	<climits>		/* |SHORT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
@@ -52,6 +53,9 @@
 #endif
 #ifndef	TZO_MAXZOFF
 #define	TZO_MAXZOFF	(14*60)
+#endif
+#ifndef	CF_BSEARCH
+#define	CF_BSEARCH	0		/* use |bsearch(3c)| */
 #endif
 
 
@@ -77,6 +81,12 @@ using std::max ;			/* subroutine-template */
 /* forward references */
 
 static int	findname(cchar *,int) noex ;
+
+#if	CF_BSEARCH
+extern "C" {
+    static int cmprec(cvoid *,cvoid *) noex ;
+}
+#endif
 
 
 /* local variables */
@@ -193,10 +203,12 @@ constexpr zdb	zones[] = {
 
 	{ "z", 0, 0 },		/* Zulu */
 
-	{ nullptr, 0, 0 }	/* end-sentinal */
+	{ nullptr, 0, 0 }
 } ;
 
 constexpr int		nzones = ((szof(zones) / szof(zdb)) - 1) ;
+
+constexpr bool		f_bsearch = CF_BSEARCH ;
 
 
 /* exported variables */
@@ -210,14 +222,21 @@ int zdb_nameoff(zdb *op,cchar *sp,int sl,int zoff) noex {
 	int		i = 0 ;
 	if (op && sp) {
 	    int		zi = -1 ;
+	    cint	zlen = ZDB_ZNAMESIZE ;
+	    char	zbuf[ZDB_ZNAMESIZE + 1] ;
 	    bool	f = false ;
 	    rs = SR_NOTFOUND ;
 	    memclear(op) ;
-	    if (sl < 0) sl = int(strlen(sp)) ;
+	    if (sl < 0) sl = strnlen(sp,zlen) ;
+	    if (hasuc(sp,sl)) {
+	        cint	ml = (sl >= 0) ? min(sl,zlen) : zlen ;
+	        sl = strwcpylc(zbuf,sp,ml) - zbuf ;
+	        sp = zbuf ;
+	    }
     	    /* lookup by name and offset (if we have an offset) */
 	    if (zoff != TZO_EMPTY) {
-	        for (i = 0 ; zones[i].name ; i += 1) {
-	            f = (strwcasecmp(zones[i].name,sp,sl) == 0) ;
+	        for (i = 0 ; zones[i].name != nullptr ; i += 1) {
+	            f = (strwcmp(zones[i].name,sp,sl) == 0) ;
 		    if (f && (zi < 0)) zi = i ;
 	            f = f && (zones[i].off == zoff) ;
 		    if (f) break ;
@@ -244,9 +263,16 @@ int zdb_name(zdb *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op && sp) {
+	    cint	zlen = ZDB_ZNAMESIZE ;
+	    char	zbuf[ZDB_ZNAMESIZE + 1] ;
 	    rs = SR_NOTFOUND ;
 	    memclear(op) ;
-	    if (sl < 0) sl = int(strlen(sp)) ;
+	    if (sl < 0) sl = strnlen(sp,zlen) ;
+	    if (hasuc(sp,sl)) {
+	        cint	ml = (sl >= 0) ? min(sl,zlen) : zlen ;
+	        sl = strwcpylc(zbuf,sp,ml) - zbuf ;
+	        sp = zbuf ;
+	    }
 	    if ((i = findname(sp,sl)) >= 0) {
 		rs = SR_OK ;
 	        op->name = zones[i].name ;
@@ -325,6 +351,46 @@ int zdb_count(zdb *op) noex {
 
 /* local subroutines */
 
+#if	CF_BSEARCH
+
+/****
+struct zdb_e {
+	cchar		*name ;
+	short		off ;
+	short		isdst ;
+} ;
+****/
+
+static int findname(cchar *sp,int sl) noex {
+	zdb		ke, *rp ;
+	cint		n = nzones ;
+	cint		sz = szof(struct zdb_e) ;
+	int		rs ;
+	int		rs1 ;
+	int		i = 0 ;
+	cchar		*kp{} ;
+	if (nulstr s ; (rs = s.start(sp,sl,&kp)) >= 0) {
+	    {
+	        ke.name = kp ;
+	        rp = bsearch(&ke,zones,n,sz,cmprec) ;
+	        i = (rp) ? (rp - zones) : -1 ;
+	    }
+	    rs1 = s.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (nulstr) */
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (findname) */
+
+static int cmprec(cvoid *v1p,cvoid *v2p) noex {
+	zdb_e	*e1p = (zdb_e *) v1p ;
+	zdb_e	*e2p = (zdb_e *) v2p ;
+	return strcmp(e1p->name,e2p->name) ;
+}
+/* end subroutine (cmprec) */
+
+#else /* CF_BSEARCH */
+
 /* do a little binary search to find the zone-name (if we have it) */
 static int findname(cchar *sp,int sl) noex {
 	int		i = 0 ;
@@ -336,7 +402,7 @@ static int findname(cchar *sp,int sl) noex {
 	    i = first + ((last - first) >> 1) ;
 	    znp = zones[i].name ;
 	    if ((rc = (sp[0] - znp[0])) == 0) {
-	        rc = - strwcasecmp(znp,sp,sl) ;
+	        rc = -strwcmp(znp,sp,sl) ;
 	        if (rc == 0) break ;
 	    } /* end if (equality comparison) */
 	    if (rc < 0) {
@@ -348,5 +414,7 @@ static int findname(cchar *sp,int sl) noex {
 	return (rc == 0) ? i : -1 ;
 }
 /* end subroutine (findname) */
+
+#endif /* CF_BSEARCH */
 
 

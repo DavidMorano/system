@@ -107,11 +107,14 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 namespace {
     struct vars {
-	int		znlen ;
+	int		zalen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
 }
@@ -128,7 +131,7 @@ static int tmz_ctor(tmz *op,Args ... args) noex {
     	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
 	        if (op->zname == nullptr) {
-	            if (char *a ; (rs = malloc_zn(&a)) >= 0) {
+	            if (char *a ; (rs = malloc_za(&a)) >= 0) {
 		        op->zname = a ;
 		        memclear(a,rs) ;
 		        a[rs] = '\0' ;
@@ -221,7 +224,7 @@ int tmz_std(tmz *op,cchar *sp,int sl) noex {
 	        sl -= rs ;
 	    } /* end for */
 	    if (rs >= 0) {
-		cint	znl = var.znlen ;
+		cint	znl = var.zalen ;
 	        rs = strnlen(op->zname,znl) ;
 	    }
 	    if (rs < 0) {
@@ -277,7 +280,7 @@ int tmz_msg(tmz *op,cchar *sp,int sl) noex {
 	        sl -= rs ;
 	    }
 	    if (rs >= 0) {
-		cint	znl = var.znlen ;
+		cint	znl = var.zalen ;
 	        rs = strnlen(op->zname,znl) ;
 	        zl = rs ; /* return value for subroutine */
 	    }
@@ -333,7 +336,7 @@ int tmz_touch(tmz *op,cchar *sp,int sl) noex {
 	            sl -= 2 ;
 	        } /* end while */
 	        if (i >= n) {
-	            op->f.year = true ;
+	            op->fl.year = true ;
 	            if ((stp->tm_year >= 0) && (stp->tm_year <= 38)) {
 	                stp->tm_year += nyears ;
 	            }
@@ -394,7 +397,7 @@ int tmz_toucht(tmz *op,cchar *sp,int sl) noex {
                         sl -= 2 ;
                     } /* end if (CC) */
                     if (sl >= 10) {
-                        op->f.year = true ;
+                        op->fl.year = true ;
                         stp->tm_year = val(sp) ;
                         sp += 2 ;
                         sl -= 2 ;
@@ -466,7 +469,7 @@ int tmz_strdig(tmz *op,cchar *sp,int sl) noex {
 	            }
 	            if ((rs = getzoff(&zo,zop,zol)) >= 0) {
 	                op->zoff = zo ;
-	                op->f.zoff = true ;
+	                op->fl.zoff = true ;
 	                cp += rs ;
 	                cl -= rs ;
 	            }
@@ -474,7 +477,7 @@ int tmz_strdig(tmz *op,cchar *sp,int sl) noex {
 	        if ((rs >= 0) && (cl > 0)) {
 	            cint	ch = mkchar(*cp) ;
 	            if (isalphalatin(ch)) {
-		        cint	znl = var.znlen ;
+		        cint	znl = var.zalen ;
 	                rs = strnwcpy(op->zname,znl,cp,cl) - op->zname ;
 	                zl = rs ;
 	            } else {
@@ -701,7 +704,7 @@ int tmz_isset(tmz *op) noex {
 int tmz_hasyear(tmz *op) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op)) >= 0) {
-	    rs = op->f.year ;
+	    rs = op->fl.year ;
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
@@ -711,9 +714,9 @@ int tmz_hasyear(tmz *op) noex {
 /* end subroutine (tmz_hasyear) */
 
 int tmz_haszoff(tmz *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = op->f.zoff ;
+	int		rs ;
+	if ((rs = tmz_ctor(op)) >= 0) {
+	    rs = op->fl.zoff ;
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
@@ -758,7 +761,7 @@ int tmz_setyear(tmz *op,int year) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op)) >= 0) {
 	    op->st.tm_year = year ;
-	    op->f.year = true ;
+	    op->fl.year = true ;
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
@@ -770,7 +773,7 @@ int tmz_setyear(tmz *op,int year) noex {
 int tmz_setzone(tmz *op,cchar *zp,int zl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,zp)) >= 0) {
-	    cint	znl = var.znlen ;
+	    cint	znl = var.zalen ;
 	    rs = (strnwcpy(op->zname,znl,zp,zl) - op->zname) ;
 	    if (rs < 0) {
 		op->dtor() ;
@@ -870,7 +873,7 @@ static int tmz_stdtrailing(tmz *op,cchar *sp,int sl) noex {
 	        cint	ch = mkchar(*sp) ;
 	        if (isalphalatin(ch)) {
 	            rs = tmz_proczname(op,sp,sl) ;
-	        } else if (isdigitlatin(ch) && (! op->f.year)) {
+	        } else if (isdigitlatin(ch) && (! op->fl.year)) {
 	            rs = tmz_procyear(op,sp,sl) ;
 	        } else if (isplusminus(ch) || isdigitlatin(ch)) {
 	            rs = tmz_proczoff(op,sp,sl) ;
@@ -956,7 +959,7 @@ static int tmz_procyear(tmz *op,cchar *sp,int sl) noex {
 	    if (isdigitlatin(ch)) {
 	        rs = tmstrsyear(cp,cl) ;
 	        op->st.tm_year = rs ;
-	        op->f.year = true ;
+	        op->fl.year = true ;
 	        si = ((cp+cl)-sp) ;
 	    }
 	} /* end if (sfnext) */
@@ -974,11 +977,11 @@ static int tmz_proczoff(tmz *op,cchar *sp,int sl) noex {
 	    f = f || isplusminus(ch) ;
 	    f = f || isdigitlatin(ch) ;
 	    if (f) {
-	        int	v ;
-	        rs = getzoff(&v,cp,cl) ;
-	        op->zoff = v ;
-	        op->f.zoff = true ;
-	        si = ((cp+cl)-sp) ;
+	        if (int v ; (rs = getzoff(&v,cp,cl)) >= 0) {
+	            op->zoff = v ;
+	            op->fl.zoff = true ;
+	            si = ((cp+cl)-sp) ;
+		}
 	    }
 	} /* end if (sfnext) */
 	return (rs >= 0) ? si : rs ;
@@ -992,7 +995,7 @@ static int tmz_proczname(tmz *op,cchar *sp,int sl) noex {
 	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
 	    cint	ch = mkchar(*cp) ;
 	    if (isalphalatin(ch)) {
-	        cint	znl = var.znlen ;
+	        cint	znl = var.zalen ;
 	        rs = strnwcpy(op->zname,znl,cp,cl)  - op->zname ;
 	        si = ((cp+cl)-sp) ;
 	    }
@@ -1004,7 +1007,7 @@ static int tmz_proczname(tmz *op,cchar *sp,int sl) noex {
 static int tmz_yearadj(tmz *op,int sc) noex {
 	TM		*stp = &op->st ;
 	if (stp->tm_year >= 0) {
-	    op->f.year = true ;
+	    op->fl.year = true ;
 	    if (sc >= 0) {
 	        cint	yy = ((sc*nyears)-TM_YEAR_BASE) ;
 	        stp->tm_year += yy ;
@@ -1023,31 +1026,35 @@ static int tmz_yearadj(tmz *op,int sc) noex {
 /* parse minutes west of GMT */
 static int getzoff(int *zop,cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
-	int		cl ;
-	int		zoff ;
 	int		ch = mkchar(*sp) ;
 	bool		f = false ;
-	cchar		*cp ;
 	f = f || isplusminus(ch) ;
 	f = f || isdigitlatin(ch) ;
 	if ((sl >= 2) && f) {
 	    int		i{} ;
+	    int		zoff ;
 	    int		sign ;
-	    int		hours, mins ;
-	    rs = SR_OK ;
+	    int		hours ;
+	    int		mins ;
+	    int		cl = sl ;
+	    cchar	*cp = sp ;
 	    ch = mkchar(*sp) ;
+	    rs = SR_OK ;
 	    sign = ((*sp == '+') || isdigitlatin(ch)) ? -1 : 1 ;
-	    cp = sp ;
-	    cl = sl ;
 	    if ((*sp == '-') || (*sp == '+')) {
 	        cp += 1 ;
 	        cl -= 1 ;
 	    }
-	    for (i = 0 ; 
-	        (i < cl) && cp[i] && 
-	        (! CHAR_ISWHITE(cp[i])) && (cp[i] != ',') ; 
-	        i += 1) {
-		ch = mkchar(cp[i]) ;
+	    auto lamb = [&cp,&cl] (int &i) {
+		cint	ch = mkchar(cp[i]) ;
+		bool	f = true ;
+		f = f && (i < cl) ;
+		f = f && ch ;
+		f = f && (! CHAR_ISWHITE(ch)) ;
+		f = f && (ch != ',') ; 
+		return (f) ? ch : 0  ;
+	    } ;
+	    for (i = 0 ; (ch = lamb(i)) > 0 ; i += 1) {
 	        if (! isdigitlatin(ch)) {
 	            rs = SR_INVALID ;
 	            break ;
@@ -1085,13 +1092,57 @@ static int getzoff(int *zop,cchar *sp,int sl) noex {
 }
 /* end subroutine (getzoff) */
 
-int tmz::clear() noex {
-	st = {} ;
-	f = {} ;
-	zoff = 0 ;
+static int tmz_clear(tmz *op) noex {
+	op->st = {} ;
+	op->fl = {} ;
+	op->zoff = 0 ;
 	return SR_OK ;
 }
 /* end method (tmz::clæar) */
+
+int tmz::xstd(cchar *sp,int sl) noex {
+	return tmz_std(this,sp,sl) ;
+}
+
+int tmz::msg(cchar *sp,int sl) noex {
+	return tmz_msg(this,sp,sl) ;
+}
+
+int tmz::touch(cchar *sp,int sl) noex {
+	return tmz_touch(this,sp,sl) ;
+}
+
+int tmz::toucht(cchar *sp,int sl) noex {
+	return tmz_toucht(this,sp,sl) ;
+}
+
+int tmz::strdig(cchar *sp,int sl) noex {
+	return tmz_strdig(this,sp,sl) ;
+}
+
+int tmz::logz(cchar *sp,int sl) noex {
+	return tmz_logz(this,sp,sl) ;
+}
+
+int tmz::day(cchar *sp,int sl) noex {
+	return tmz_day(this,sp,sl) ;
+}
+
+int tmz::setday(int y,int m,int d) noex {
+	return tmz_setday(this,y,m,d) ;
+}
+
+int tmz::setyear(int year) noex {
+	return tmz_setyear(this,year) ;
+}
+
+int tmz::setzone(cchar *sp,int sl) noex {
+	return tmz_setzone(this,sp,sl) ;
+}
+
+int tmz::gettm(TM *tmp) noex {
+	return tmz_gettm(this,tmp) ;
+}
 
 void tmz::dtor() noex {
     if (zname) {
@@ -1101,10 +1152,44 @@ void tmz::dtor() noex {
 }
 /* end method (tmz::dtor) */
 
+tmz_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case tmzmem_clear:
+	        rs = tmz_clear(op) ;
+	        break ;
+	    case tmzmem_init:
+	        rs = tmz_init(op) ;
+	        break ;
+	    case tmzmem_isset:
+	        rs = tmz_isset(op) ;
+	        break ;
+	    case tmzmem_hasyear:
+	        rs = tmz_hasyear(op) ;
+	        break ;
+	    case tmzmem_haszoff:
+	        rs = tmz_haszoff(op) ;
+	        break ;
+	    case tmzmem_haszone:
+	        rs = tmz_haszone(op) ;
+	        break ;
+	    case tmzmem_getdst:
+	        rs = tmz_getdst(op) ;
+	        break ;
+	    case tmzmem_getzoff:
+	        rs = tmz_getzoff(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (tmz_co::operator) */
+
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_zn)) >= 0) {
-	    znlen = rs ;
+	if ((rs = getbufsize(getbufsize_za)) >= 0) {
+	    zalen = rs ;
 	}
 	return rs ;
 }

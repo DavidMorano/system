@@ -51,6 +51,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<tzfile.h>		/* for |TM_YEAR_BASE| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<cfdec.h>

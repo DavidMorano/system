@@ -606,13 +606,13 @@ static int useraccdb_recproc(UAD *op,UAD_REC *recp) noex {
 static int useraccdb_doit(UAD *op,time_t *timep,cc *tsp,int tsl) noex {
 	int		rs = SR_OK ;
 	if (! op->f.dater) {
-	    if (char *znbuf ; (rs = malloc_zn(&znbuf)) >= 0) {
+	    if (char *zabuf ; (rs = malloc_za(&zabuf)) >= 0) {
 		cint	znlen = rs ;
-	        if (TIMEB now ; (rs = initnow(&now,znbuf,znlen)) >= 0) {
-	            rs = dater_start(op->dmp,&now,znbuf,rs) ;
+	        if (TIMEB now ; (rs = initnow(&now,zabuf,znlen)) >= 0) {
+	            rs = dater_start(op->dmp,&now,zabuf,rs) ;
 	            op->f.dater = (rs >= 0) ;
 	        } /* end if (initnow) */
-		rs = rsfree(rs,znbuf) ;
+		rs = rsfree(rs,zabuf) ;
 	    } /* end if (m-a-f) */
 	}
 	if (rs >= 0) {

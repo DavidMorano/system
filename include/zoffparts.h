@@ -17,6 +17,10 @@
 
 /*******************************************************************************
  
+  	Object:
+	zoffparts
+
+	Description:
 	These two small subroutines manipulate zone-offsets for use
 	in time strings.
 
@@ -43,7 +47,19 @@ struct zoffparts_head {
 	int	zoff ;		/* value */
 } ;
 
+#ifdef	__cplusplus
+
+struct zoffparts : zoffparts_head {
+	zoffparts() = default ;
+	zoffparts(const zoffparts &) = delete ;
+	zoffparts &operator = (const zoffparts &) = delete ;
+	int	set(int) noex ;
+	int	get(int *) noex ;
+	int	mkstr(char *,int) noex ;
+} ; /* end struct (zoffparts) */
+#else	/* __cplusplus */
 typedef ZOFFPARTS	zoffparts ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
