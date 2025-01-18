@@ -37,7 +37,9 @@ extern int	getsysdomain(char *,int) noex ;
 static inline int getinetdomain(char *rbuf,int rlen) noex {
 	return getsysdomain(rbuf,rlen) ;
 }
-
+static inline int getnetdomain(char *rbuf,int rlen) noex {
+	return getsysdomain(rbuf,rlen) ;
+}
 static inline int getdomainnamex(char *rp,int rl) noex {
 	return getsysdomain(rp,rl) ;
 }

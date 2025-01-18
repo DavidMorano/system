@@ -1,4 +1,4 @@
-/* nisdomainname SUPPORT */
+/* getnisdomain SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,13 +18,13 @@
 /*******************************************************************************
 
 	Name:
-	nisdomainname
+	getnisdomain
 
 	Description:
 	Get the NIS domain name for the local host.
 
 	Synopsis:
-	int nisdomainname(char *dbuf,int dlen) noex
+	int getnisdomain(char *dbuf,int dlen) noex
 
 	Arguments:
 	dbuf		result buffer pointer
@@ -53,14 +53,14 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
-#include	"nisdomainname.h"
+#include	"getnisdomain.h"
 
 
 /* local defines */
 
 #define	VARNISDOMAIN	"NISDOMAIN"
 
-#define	NISDOMAINNAME	"/etc/defaultdomain"
+#define	NISFN		"/etc/defaultdomain"
 
 
 /* imported namespaces */
@@ -117,7 +117,7 @@ constexpr cchar		vn[] = VARNISDOMAIN ;
 
 /* exported subroutines */
 
-int nisdomainname(char *rbuf,int rlen) noex {
+int getnisdomain(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
 	    rs = SR_INVALID ;
@@ -129,7 +129,7 @@ int nisdomainname(char *rbuf,int rlen) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (nisdomainname) */
+/* end subroutine (getnisdomain) */
 
 
 /* local subroutines */
@@ -160,7 +160,7 @@ int nisfind::tryget() noex {
 /* end method (nisfind::tryget) */
 
 int nisfind::tryfile() noex {
-	return nisfile(rbuf,rlen,NISDOMAINNAME) ;
+	return nisfile(rbuf,rlen,NISFN) ;
 }
 /* end method (nisfind::tryfile) */
 

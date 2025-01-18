@@ -892,7 +892,6 @@ callback.o:		callback.cc callback.h
 dictdiff.o:		dictdiff.cc dictdiff.h
 rsfree.o:		rsfree.cc rsfree.h
 xfile.o:		xfile.cc xfile.h
-nisdomainname.o:	nisdomainname.cc nisdomainname.h
 sysmemutil.o:		sysmemutil.cc sysmemutil.h
 mailvalues.o:		mailvalues.cc mailvalues.hh
 

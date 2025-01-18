@@ -70,6 +70,7 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<userinfo.h>
+#include	<getxname.h>
 #include	<getlogx.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -121,60 +122,6 @@
 
 
 /* external subroutines */
-
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	mklogidpre(char *,int,cchar *,int) ;
-extern int	mklogidsub(char *,int,cchar *,int) ;
-extern int	getnodeinfo(cchar *,char *,char *,vecstr *,cchar *) ;
-extern int	mkuibang(char *,int,USERINFO *) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
-extern int	nisdomainname(char *,int) ;
-#if	CF_CHECKONC
-extern int	checkonc(cchar *,cchar *,cchar *,cchar *) ;
-#endif
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	pcsgetorg(cchar *,char *,int,cchar *) ;
-extern int	pcsgetfacility(cchar *,char *,int) ;
-extern int	hasnonwhite(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isStrEmpty(cchar *,int) ;
-
-extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-extern int	proguserlist_begin(PROGINFO *) ;
-extern int	proguserlist_end(PROGINFO *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnrchr(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -2053,12 +2000,13 @@ static int locinfo_nisdomain(LOCINFO *lip)
 	    }
 
 	    if (dp == NULL) {
-	        if ((rs1 = nisdomainname(dbuf,dlen)) >= 0) {
+	        if ((rs = getnisdomain(dbuf,dlen)) >= 0) {
 	            dl = rs1 ;
 	            dp = dbuf ;
 	        } else if (pip->open.logprog) {
-	            logfile_printf(&pip->lh,"no NIS domain name (%d)",rs1) ;
-	        }
+	            logfile_printf(&pip->lh,"no NIS domain name (%d)",rs) ;
+		    rs = SR_OK ;
+	        } /* end if (getnisdomain) */
 	    }
 
 	    if ((rs >= 0) && (dp != NULL)) {

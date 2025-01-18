@@ -5,6 +5,7 @@
 /* main module for the 'passwdv' program */
 /* version %I% last-modified %G% */
 
+#define	CF_PERCACHE	0		/* register |ourfini()| mod-unload */
 
 /* revision history:
 
@@ -57,26 +58,16 @@
 #define	LOCINFO		struct locinfo
 #define	LOCINFO_FL	struct locinfo_flags
 
+#ifndef	CF_PERCACHE
+#define	CF_PERCACHE	0		/* register |ourfini()| mod-unload */
+#endif
+
+#ifndef	PO_OPTION
+#define	PO_OPTION	"opt"
+#endif
+
 
 /* external subroutines */
-
-extern "C" int	sfshrink(cchar *,int,cchar **) ;
-extern "C" int	matstr(cchar **,cchar *,int) ;
-extern "C" int	matostr(cchar **,int,cchar *,int) ;
-extern "C" int	cfdeci(cchar *,int,int *) ;
-extern "C" int	optbool(cchar *,int) ;
-extern "C" int	optvalue(cchar *,int) ;
-extern "C" int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern "C" int	sperm(IDS *,struct ustat *,int) ;
-extern "C" int	isdigitlatin(int) ;
-extern "C" int	isNotPresent(int) ;
-extern "C" int	isFailOpen(int) ;
-
-extern "C" int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern "C" int	proginfo_setpiv(PROGINFO *,cchar *,const PIVARS *) ;
-extern "C" int	process(PROGINFO *,PWFILE *,bfile *,cchar *) ;
-
-extern "C" cchar	*getourenv(cchar **,cchar *) ;
 
 
 /* external variables */
@@ -90,7 +81,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, done ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	PWFILE		pf ;
@@ -117,23 +108,14 @@ static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 static int	locinfo_pwbegin(LOCINFO *,cchar *) ;
 static int	locinfo_pwend(LOCINFO *) ;
 
+extern "C" {
+    static void	ourfini() noex {
+	percache_fini() ;
+    }
+}
+
 
 /* local variables */
-
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"HELP",
-	"sn",
-	"option",
-	"af",
-	"ef",
-	"of",
-	"pf",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -150,7 +132,22 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const PIVARS	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	"sn",
+	"option",
+	"af",
+	"ef",
+	"of",
+	"pf",
+	NULL
+} ;
+
+constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -158,7 +155,7 @@ static const PIVARS	initvars = {
 	VARPRLOCAL
 } ;
 
-static const MAPEX	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -170,27 +167,30 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*aknopts[] = {
-	"seven",
-	NULL
-} ;
-
 enum aknopts {
 	aknopt_seven,
 	aknopt_overlast
 } ;
 
-static const char	*po_option = PO_OPTION ;
+constexpr cpcchar	aknopts[] = {
+	"seven",
+	NULL
+} ;
+
+constexpr char		po_option[] = PO_OPTION ;
+
+constexpr bool		f_percache = CF_PERCACHE ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int main(int argc,cchar *argv[],cchar *envv[])
-{
+int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
-	ARGINFO		ainfo ;
+	ARGINFO		ainfo{} ;
 	BITS		pargs ;
 	PARAMOPT	aparams ;
 	bfile		errfile ;
@@ -210,15 +210,15 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	int		f_passed = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*pwfname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*pwfname = NULL ;
+	cchar	*cp ;
 
 
 	rs = proginfo_start(pip,envv,argv[0],VERSION) ;
@@ -281,7 +281,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
 	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
@@ -310,7 +310,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* version */
 	                case argopt_version:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -346,7 +346,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    break ;
 
 	                case argopt_help:
-	                    f_help = TRUE ;
+	                    f_help = true ;
 	                    break ;
 
 /* the user specified some options */
@@ -476,7 +476,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    switch (kc) {
 
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 	                    case 'D':
@@ -492,7 +492,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->f.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -521,7 +521,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* update */
 	                    case 'u':
-	                        pip->f.update = TRUE ;
+	                        pip->f.update = true ;
 	                        break ;
 
 /* verbose output */
@@ -537,7 +537,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 	                        break ;
 
 	                    default:
@@ -569,8 +569,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if (efname == NULL) efname = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
-	    bcontrol(&errfile,BC_SETBUFLINE,TRUE) ;
+	    pip->open.errfile = true ;
+	    bcontrol(&errfile,BC_SETBUFLINE,true) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -647,7 +647,6 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* get ready */
 
-	memset(&ainfo,0,sizeof(ARGINFO)) ;
 	ainfo.argc = argc ;
 	ainfo.ai = ai ;
 	ainfo.argv = argv ;
@@ -748,8 +747,8 @@ badarg:
 static int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<user(s)> ...] [-u] [-pf <passwdfile>]\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -767,16 +766,15 @@ static int procgather(PROGINFO *pip,PARAMOPT *pop) noex {
 	PARAMOPT_CUR	cur ;
 	int		rs ;
 	int		rs1 ;
-	cchar		*po = PO_OPTION ;
 	if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
-	    int		i ;
+	    cchar	*po = PO_OPTION ;
 	    cchar	*cp ;
 	    while ((rs1 = paramopt_enumvalues(pop,po,&cur,&cp)) >= 0) {
-	            if (cp != NULL) {
-	                if ((i = matostr(aknopts,2,cp,-1)) >= 0) {
+	            if (cp) {
+	                if (int i ; (i = matostr(aknopts,2,cp,-1)) >= 0) {
 	                    switch (i) {
 	                    case aknopt_seven:
-	                        pip->f.sevenbit = TRUE ;
+	                        pip->f.sevenbit = true ;
 	                        break ;
 	                    } /* end switch */
 		        }
@@ -883,10 +881,12 @@ static int procout_begin(PROGINFO *pip,cchar *ofn) noex {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
 	if (! pip->f.nooutput) {
-	    const int	oflen = sizeof(bfile) ;
+	    cint	oflen = szof(bfile) ;
 	    bfile	*ofbuf ;
 	    if ((rs = uc_malloc(oflen+1),&ofbuf)) >= 0) {
-	        if ((ofn == NULL) || (ofn[0] == '\0')) ofn = BFILE_STDOUT ;
+	        if ((ofn == NULL) || (ofn[0] == '\0')) {
+		    ofn = BFILE_STDOUT ;
+		}
 	        if ((rs = bopen(ofbuf,ofn,"dwct",0664)) >= 0) {
 		    lip->ofp = ofbuf ;
 	        }
@@ -920,7 +920,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 
 	if (lip == NULL) return SR_FAULT ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memclear(lip) ;
 	lip->pip = pip ;
 
 	return rs ;
@@ -933,14 +933,14 @@ static int locinfo_finish(LOCINFO *lip) noex {
 
 	if (lip == NULL) return SR_FAULT ;
 
-#if	CF_PERCACHE /* register |ourfini()| for mod-unload */
-	if (lip->f.percache) {
-	    if ((rs1 = percache_finireg(&pc)) > 0) { /* need registration? */
-	        rs1 = uc_atexit(ourfini) ;
+	if_constexpr (f_percache) {	/* need registration? */
+	    if (lip->f.percache) {
+	        if ((rs1 = percache_finireg(&pc)) > 0) { 
+	            rs1 = uc_atexit(ourfini) ;
+	        }
+		if (rs >= 0) rs = rs1 ;
 	    }
-	    if (rs >= 0) rs = rs1 ;
-	}
-#endif /* CF_PERCACHE */
+	} /* end if_constexpr (f_percache) */
 
 	if ((lip->fname != NULL) && lip->f.allocfname) {
 	    rs1 = uc_free(lip->fname) ;

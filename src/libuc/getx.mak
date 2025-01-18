@@ -68,11 +68,12 @@ OBJ09= getseed.o getserial.o getserv.o
 OBJ10= getsocktype.o getsyslogx.o getsystypenum.o
 OBJ11= getuserhome.o getuserorg.o getuserterms.o
 OBJ12= getxid.o getopendial.o getmaxpid.o
+OBJ13= getnisdomain.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o 
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
-OBJD= obj12.o
+OBJD= obj12.o obj13.o
 
 OBJ= obja.o objb.o objc.o objd.o
 
@@ -164,6 +165,9 @@ obj11.o:		$(OBJ11)
 obj12.o:		$(OBJ12)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ12)
 
+obj13.o:		$(OBJ13)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ13)
+
 
 obja.o:			$(OBJA)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
@@ -219,5 +223,6 @@ getuserterms.o:		getuserterms.cc		getuserterms.h		$(INCS)
 getxid.o:		getxid.cc		getxid.h		$(INCS)
 getopendial.o:		getopendial.c		getopendial.h		$(INCS)
 getmaxpid.o:		getmaxpid.cc		getmaxpid.h		$(INCS)
+getnisdomain.o:		getnisdomain.cc		getnisdomain.h		$(INCS)
 
 

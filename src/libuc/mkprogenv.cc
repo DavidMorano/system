@@ -80,6 +80,7 @@
 #include	<getpwd.h>
 #include	<gethz.h>
 #include	<getourenv.h>
+#include	<getxname.h>		/* |getnisdomain(3uc)| */
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<vecstr.h>
@@ -121,7 +122,6 @@ using std::nothrow ;			/* constant */
 /* external subroutines */
 
 extern "C" {
-    extern int	nisdomainname(char *,int) noex ;
     extern int	mkvarpath(char *,cchar *,int) noex ;
     extern bool	hasvarpathprefix(cchar *,int) noex ;
 }
@@ -546,7 +546,7 @@ static int mkprogenv_mkenvsys(mkprogenv *op,EL *etp,mainv envs) noex {
                                 break ;
                             case 'N':
                                 if (kp[1] == 'I') {
-                                    rs = nisdomainname(vbuf,vlen) ;
+                                    rs = getnisdomain(vbuf,vlen) ;
                                     vl = rs ;
                                     vp = vbuf ;
                                 } else {

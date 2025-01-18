@@ -37,6 +37,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 
 
@@ -46,6 +48,9 @@
 /* importæd namespaces */
 
 using libu::ugetnisdom ;			/* subroutine */
+
+
+/* local typedef */
 
 
 /* external subroutines */

@@ -1,4 +1,5 @@
 /* b_userinfo SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in: return various user information */
@@ -65,23 +66,24 @@
 #endif
 
 #include	<usystem.h>
+#include	<uinfo.h>
+#include	<ugetpw.h>
 #include	<ugetpid.h>
+#include	<userattr.h>
 #include	<getbufsize.h>
+#include	<getxname.h>
+#include	<getax.h>
+#include	<getusername.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
 #include	<vecstr.h>
 #include	<sbuf.h>
 #include	<realname.h>
-#include	<uinfo.h>
-#include	<ugetpw.h>
-#include	<getax.h>
-#include	<getusername.h>
 #include	<pwentry.h>
 #include	<pwfile.h>
 #include	<getpwentry.h>
 #include	<getutmpent.h>
-#include	<userattr.h>
 #include	<pcsns.h>
 #include	<lastlogfile.h>
 #include	<sncpy.h>
@@ -89,7 +91,6 @@
 #include	<sysgroup.h>
 #include	<sysproject.h>
 #include	<tmpx.h>
-
 #include	<estrings.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -152,62 +153,6 @@
 
 
 /* external subroutines */
-
-extern int	pathadd(char *,int,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	udomain(cchar *,char *,int,cchar *) ;
-extern int	getinetdomain(char *,int,cchar *) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	gethomeorg(char *,int,cchar *) ;
-extern int	localgetorg(cchar *,char *,int,cchar *) ;
-extern int	localgetorgcode(cchar *,char *,int,cchar *) ;
-extern int	localgetorgloc(cchar *,char *,int,cchar *) ;
-extern int	lastlogin(char *,uid_t,time_t *,char *,char *) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	statvfsdir(cchar *,STATVFS *) ;
-extern int	mkgecosname(char *,int,cchar *) ;
-extern int	mkrealname(char *,int,cchar *,int) ;
-extern int	mkmailname(char *,int,cchar *,int) ;
-extern int	mkfmtphone(char *,int,cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	getnodeinfo(cchar *,char *,char *,vecstr *,cchar *) ;
-extern int	nisdomainname(char *,int) ;
-extern int	inittimezone(char *,int,cchar *) ;
-extern int	tmpx_getuserlines(TMPX *,VECSTR *,cchar *) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-
-extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	pwilookup(cchar *,cchar *,char *,int,cchar *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strdcpy1(char *,int,cchar *) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -3136,14 +3081,14 @@ static int datasys_nisdomain(DATASYS *dsp)
 	    }
 	    ndp = dsp->nisdomainname ;
 	    if ((ndp == nullptr) || (ndp[0] == '\0')) {
-	        cint	nlen = NODENAMELEN ;
-	        char		nbuf[NODENAMELEN+1] ;
-	        if ((rs = nisdomainname(nbuf,nlen)) >= 0) {
+	        cint	nlen = MAXHOSTNAMELEN ;
+	        char	nbuf[MAXHOSTNAMELEN +1] ;
+	        if ((rs = getnisdomain(nbuf,nlen)) >= 0) {
 	            cchar	**vpp = &dsp->nisdomainname ;
 	            rs = datasys_setentry(dsp,vpp,nbuf,rs) ;
 	        } else if (isNotPresent(rs)) {
 	            rs = SR_OK ;
-	        }
+	        } /* end if (getnisdomain) */
 	    }
 	} else if (dsp->nisdomainname != nullptr) {
 	    rs = strlen(dsp->nisdomainname) ;

@@ -1,4 +1,5 @@
 /* b_la SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in to return load averages */
@@ -89,7 +90,7 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<ugetpid.h>
-#include	<getnodedomain.h>
+#include	<getnodedomain.h>	/* |getnetdomain(3uc)| */
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -118,40 +119,12 @@
 
 #define	CVTBUFLEN	100
 
+#ifndef	CF_PERCACHE
+#define	CF_PERCACHE	1		/* use persistent cache */
+#endif
+
 
 /* external subroutines */
-
-extern int	snfsflags(char *,int,ulong) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	statvfsdir(cchar *,struct statvfs *) ;
-extern int	getnprocessors(cchar **,int) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	nusers(cchar *) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
-extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -258,9 +231,7 @@ static int	locinfo_fsdir(LOCINFO *) noex ;
 static int	locinfo_hostid(LOCINFO *) noex ;
 static int	locinfo_pagesize(LOCINFO *) noex ;
 
-#if	CF_PERCACHE
-static void	ourfini() ;
-#endif /* CF_PERCACHE */
+static void	ourfini() noex ;
 
 
 /* local variables */
@@ -280,7 +251,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static cchar	*argopts[] = {
+constexpr cpcchar	argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -295,7 +266,7 @@ static cchar	*argopts[] = {
 	nullptr
 } ;
 
-static const PIVARS	initvars = {
+constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -303,7 +274,7 @@ static const PIVARS	initvars = {
 	VARPRNAME
 } ;
 
-static const MAPEX	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -317,65 +288,15 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static cchar	*akonames[] = {
-	"utf",
-	"db",
-	nullptr
-} ;
-
 enum akonames {
 	akoname_utf,
 	akoname_db,
 	akoname_overlast
 } ;
 
-/* define the configuration keywords */
-static cchar	*qopts[] = {
-	"sysname",
-	"nodename",
-	"release",
-	"version",
-	"machine",
-	"architecture",
-	"platform",
-	"provider",
-	"hwserial",
-	"nisdomain",
-	"domainname",
-	"la1min",
-	"la5min",
-	"la15min",
-	"nusers",
-	"nprocs",
-	"naprocs",
-	"nsprocs",
-	"nuprocs",
-	"ntprocs",
-	"ncpus",
-	"btime",
-	"ctime",
-	"utime",
-	"rnum",
-	"pmtotal",
-	"pmavail",
-	"pmu",
-	"mtotal",
-	"mavail",
-	"mu",
-	"lax",
-	"fsbs",
-	"fspbs",
-	"fstotal",
-	"fsavail",
-	"fsfree",
-	"fsused",
-	"fsutil",
-	"fstype",
-	"fsstr",
-	"fsid",
-	"fsflags",
-	"hostid",
-	"romserial",
+constexpr cpcchar	akonames[] = {
+	"utf",
+	"db",
 	nullptr
 } ;
 
@@ -428,7 +349,56 @@ enum qopts {
 	qopt_overlast
 } ;
 
-static const uchar	aterms[] = {
+constexpt cpcchar	qopts[] = {
+	"sysname",
+	"nodename",
+	"release",
+	"version",
+	"machine",
+	"architecture",
+	"platform",
+	"provider",
+	"hwserial",
+	"nisdomain",
+	"domainname",
+	"la1min",
+	"la5min",
+	"la15min",
+	"nusers",
+	"nprocs",
+	"naprocs",
+	"nsprocs",
+	"nuprocs",
+	"ntprocs",
+	"ncpus",
+	"btime",
+	"ctime",
+	"utime",
+	"rnum",
+	"pmtotal",
+	"pmavail",
+	"pmu",
+	"mtotal",
+	"mavail",
+	"mu",
+	"lax",
+	"fsbs",
+	"fspbs",
+	"fstotal",
+	"fsavail",
+	"fsfree",
+	"fsused",
+	"fsutil",
+	"fstype",
+	"fsstr",
+	"fsid",
+	"fsflags",
+	"hostid",
+	"romserial",
+	nullptr
+} ;
+
+constexpr char		aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -440,11 +410,12 @@ static const uchar	aterms[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int b_la(int argc,cchar *argv[],void *contextp)
-{
+int b_la(int argc,cchar *argv[],void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
@@ -1023,19 +994,13 @@ badarg:
 }
 /* end subroutine (mainsub) */
 
-
-#if	CF_PERCACHE
 /* execute this on module (shared-object) un-load */
-void ourfini()
-{
+void ourfini() noex {
 	percache_fini(&pc) ;
 }
 /* end subroutine (ourfini) */
-#endif /* CF_PERCACHE */
 
-
-static int usage(PROGINFO *pip)
-{
+static int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		i ;
 	int		wlen = 0 ;
@@ -1691,22 +1656,20 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+static int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (lip == nullptr) return SR_FAULT ;
 
-#if	CF_PERCACHE /* register |ourfini()| for mod-unload */
-	if (lip->f.percache) {
-	    if ((rs1 = percache_finireg(&pc)) > 0) { /* need registration? */
-	        rs1 = uc_atexit(ourfini) ;
+	if_constexpr (f_percache) {
+	    if (lip->f.percache) {
+	        if ((rs1 = percache_finireg(&pc)) > 0) {
+	            rs1 = uc_atexit(ourfini) ;
+	        }
+	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (rs >= 0) rs = rs1 ;
-	}
-#endif /* CF_PERCACHE */
+	} /* end if_constexpr (f_percache) */
 
 	if ((lip->fname != nullptr) && lip->f.allocfname) {
 	    rs1 = uc_free(lip->fname) ;
@@ -1731,10 +1694,9 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-
 static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
-	VECSTR		*slp ;
+	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -1874,13 +1836,13 @@ static int locinfo_sysdomain(LOCINFO *lip)
 	if (lip->sysdomain == nullptr) {
 	    cint	dlen = MAXHOSTNAMELEN ;
 	    char	dbuf[MAXHOSTNAMELEN+1] ;
-	    if ((rs = getsysdomain(dbuf,dlen)) >= 0) {
+	    if ((rs = getnetdomain(dbuf,dlen)) >= 0) {
 	        cchar	*cp ;
 	        if ((rs = uc_mallocstrw(dbuf,rs,&cp)) >= 0) {
 	            lip->sysdomain = cp ;
 	            len = (rs-1) ;
 	        }
-	    } /* end if (getsysdomain) */
+	    } /* end if (getnetdomain) */
 	} else {
 	    len = strlen(lip->sysdomain) ;
 	}

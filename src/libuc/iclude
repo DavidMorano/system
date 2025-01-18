@@ -38,7 +38,8 @@ enum pertypes {
 	pertype_runlevel,
 	pertype_nusers,
 	pertype_nodename,
-	pertype_sysdomain,
+	pertype_netdomain,
+	pertype_nisdomain,
 	pertype_netload,
 	pertype_systat,
 	pertype_overlast
@@ -71,7 +72,8 @@ extern int	percache_getbtime(percache *,time_t,time_t *) noex ;
 extern int	percache_getrunlevel(percache *,time_t) noex ;
 extern int	percache_getnusers(percache *,time_t) noex ;
 extern int	percache_getnodename(percache *,time_t,cchar **) noex ;
-extern int	percache_getsysdomain(percache *,time_t,cchar **) noex ;
+extern int	percache_getnetdomain(percache *,time_t,cchar **) noex ;
+extern int	percache_getnisdomain(percache *,time_t,cchar **) noex ;
 extern int	percache_getnetload(percache *,time_t,cchar *,cchar **) noex ;
 extern int	percache_getsystat(percache *,time_t,cchar *,cchar **) noex ;
 extern int	percache_fini(percache *) noex ;

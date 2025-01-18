@@ -65,7 +65,7 @@
 #include	<uinfo.h>
 #include	<userinfo.h>
 #include	<userattr.h>
-#include	<getnodedomain.h>
+#include	<getnodedomain.h>	/* |getnetdomain(3uc)| */
 #include	<keyopt.h>
 #include	<paramopt.h>
 #include	<bfile.h>
@@ -1818,15 +1818,15 @@ static int procenvuser(PROGINFO *pip)
 	if (rs >= 0) {
 	    cchar	*varlocaldomain = VARLOCALDOMAIN ;
 	    if ((rs = vecstr_envget(elp,varlocaldomain,NULL)) == nrs) {
-	        const int	dl = MAXHOSTNAMELEN ;
-	        char		dn[MAXHOSTNAMELEN+1] ;
-	        if ((rs = getsysdomain(dn,dl)) >= 0) {
+	        cint	dl = MAXHOSTNAMELEN ;
+	        char	dn[MAXHOSTNAMELEN+1] ;
+	        if ((rs = getnetdomain(dn,dl)) >= 0) {
 	            vp = pip->domainname ;
 	            if (strcmp(vp,dn) != 0) {
 	                rs = vecstr_envadd(elp,varlocaldomain,vp,-1) ;
 	                if (rs != INT_MAX) c += 1 ;
 	            }
-	        } /* end if (getsysdomain) */
+	        } /* end if (getnetdomain) */
 	    } /* end if (environment variable not found) */
 	} /* end if (environment LOCALDOMAIN) */
 

@@ -50,9 +50,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<mallocxx.h>
 #include	<getxid.h>		/* |getuid_name(3uc)| */
-#include	<nisdomainname.h>	/* |nisdomainname(3uc)| */
+#include	<getxname.h>		/* |getnisdomain(3uc)| */
+#include	<mallocxx.h>
 #include	<sncpyx.h>
 #include	<ctdec.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
@@ -127,7 +127,7 @@ static int getothernetname(char *nbuf,int nlen,cchar *un) noex {
 	if ((rs = uc_procpid(procname,0)) > 0) {
 	    if (char *dbuf{} ; (rs = malloc_hn(&dbuf)) >= 0) {
 		cint	dlen = rs ;
-	        if ((rs = nisdomainname(dbuf,dlen)) >= 0) {
+	        if ((rs = getnisdomain(dbuf,dlen)) >= 0) {
 	            cint	dl = rs ;
 		    if ((rs = getuid_user(un,-1)) >= 0) {
 	                cint	dilen = DIGBUFLEN ;
@@ -139,7 +139,7 @@ static int getothernetname(char *nbuf,int nlen,cchar *un) noex {
 	                    len = rs ;
 	                }
 	            } /* end if (getuid_user) */
-	        } /* end if (nisdomainname) */
+	        } /* end if (getnisdomain) */
 		rs1 = uc_free(dbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */

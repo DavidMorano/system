@@ -320,7 +320,7 @@ static int try_start(TRY *tip,char *nb,char *db,int dl) noex {
 	        tip->nodename = nb ;
 		tip->dlen = (dl < 0) ? hl : dl ;
 	        if (nb == nullptr) {
-	            if (char *cp{} ; (rs = malloc_mn(&cp)) >= 0) {
+	            if (char *cp{} ; (rs = malloc_nn(&cp)) >= 0) {
 		       tip->nbuf = cp ;
 	    	       tip->nodename = cp ;
 		    }
@@ -544,7 +544,7 @@ static int try_gethost(TRY *tip) noex {
 	                        rs = sncpy1(dbuf,dlen,(tp+1)) ;
 				len = rs ;
 	                    } /* end if */
-			    if (rs > 0) break ;
+			    if (rs != 0) break ;
 	                } /* end for */
 	            } /* end if (alias names) */
 		    rs1 = uc_free(hbuf) ;
@@ -598,13 +598,13 @@ static int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	cchar		*dp = nullptr ;
-        if (filer b ; (rs = filer_start(&b,fd,0z,FILERLEN,0)) >= 0) {
+        if (filer b ; (rs = b.start(fd,0z,FILERLEN,0)) >= 0) {
 	    cint	to = TO_READ ;
 	    cchar	*key = "domain" ;
-            while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
+            while ((rs = b.readln(lbuf,llen,to)) > 0) {
                 if ((len = sfkeyval(lbuf,rs,key,&dp)) > 0) break ;
             } /* end while (reading lines) */
-            rs1 = filer_finish(&b) ;
+            rs1 = b.finish ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (filer) */
         if ((rs >= 0) && (len > 0) && dp) {
@@ -640,7 +640,8 @@ static int try_guess(TRY *tip) noex {
 	            } /* end if */
 	        } /* end for */
 	        if (si >= 0) {
-	            rs = sncpy1(tip->domainname,maxhostlen,ga[si].domain) ;
+		    cint	mhl = maxhostlen ;
+	            rs = sncpy1(tip->domainname,mhl,ga[si].domain) ;
 		    len = rs ;
 	        }
 	    } /* end if (have node) */

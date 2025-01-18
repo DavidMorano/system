@@ -148,8 +148,8 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<utmpacc.h>
-#include	<getnodename.h>		/* |getnodename(3uc)| */
-#include	<getnodedomain.h>	/* |getnodedomain(3uc)| */
+#include	<getxname.h>		/* |getnodename(3uc)| */
+#include	<getx.h>		/* |getnodedomain(3uc)| */
 #include	<libmallocxx.h>
 #include	<localget.h>
 #include	<strwcpy.h>
@@ -208,7 +208,8 @@ static constexpr cint	timeouts[] = {
 	20,		/* run-level */
 	5, 		/* nusers */
 	(1*60*60),	/* nodename */
-	(1*60*60),	/* sysdomain */
+	(1*60*60),	/* netdomain */
+	(1*60*60),	/* nisdomain */
 	(5*60),		/* netload */
 	(5*60),		/* systat */
 	0
@@ -408,15 +409,25 @@ int percache_getnodename(percache *pcp,time_t dt,cchar **rpp) noex {
 	return rs ;
 }
 
-int percache_getsysdomain(percache *pcp,time_t dt,cchar **rpp) noex {
+int percache_getnetdomain(percache *pcp,time_t dt,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
 	if (pcp) {
     	    geter go(pcp,dt,nullptr,rpp) ;
-	    rs = go(pertype_sysdomain) ;
+	    rs = go(pertype_netdomain) ;
 	}
 	return rs ;
 }
-/* end subroutine (percache_getsysdomain) */
+/* end subroutine (percache_getnetdomain) */
+
+int percache_getnisdomain(percache *pcp,time_t dt,cchar **rpp) noex {
+    	int		rs = SR_FAULT ;
+	if (pcp) {
+    	    geter go(pcp,dt,nullptr,rpp) ;
+	    rs = go(pertype_nisdomain) ;
+	}
+	return rs ;
+}
+/* end subroutine (percache_getnisdomain) */
 
 int percache_getnetload(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
@@ -466,7 +477,7 @@ int geter::operator () (int pt) noex {
 	                    pcp->items[pt].t = dt ;
 		            pcp->items[pt].v = len ;
 	                } /* end if (memory-allocation) */
-		    } /* end if (getsysdomain) */
+		    } /* end if (getx) */
 		    rs1 = uc_libfree(dbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
@@ -486,8 +497,11 @@ int geter::getx(int pt,char *dbuf,int dlen) noex {
 	case pertype_nodename:
 	    rs = getnodename(dbuf,dlen) ;
 	    break ;
-	case pertype_sysdomain:
-	    rs = getsysname(dbuf,dlen) ;
+	case pertype_netdomain:
+	    rs = getinetdomain(dbuf,dlen) ;
+	    break ;
+	case pertype_nisdomain:
+	    rs = getnisdomain(dbuf,dlen) ;
 	    break ;
 	case pertype_netload:
 	    rs = localgetnetload(pr,dbuf,dlen) ;

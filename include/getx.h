@@ -43,6 +43,7 @@
 #include	<getmjd.h>
 #include	<getnfile.h>
 #include	<getngroups.h>
+#include	<getnisdomain.h>
 #include	<getnodedomain.h>
 #include	<getnodeinfo.h>
 #include	<getnprocessors.h>

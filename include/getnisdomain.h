@@ -1,4 +1,4 @@
-/* nisdomainname HEADER */
+/* getnisdomain HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	NISDOMAINNAME_INCLUDE
-#define	NISDOMAINNAME_INCLUDE
+#ifndef	GETNISDOMAIN_INCLUDE
+#define	GETNISDOMAIN_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -29,11 +29,11 @@
 
 EXTERNC_begin
 
-extern int	nisdomainname(char *,int) noex ;
+extern int	getnisdomain(char *,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* NISDOMAINNAME_INCLUDE */
+#endif /* GETNISDOMAIN_INCLUDE */
 
 
