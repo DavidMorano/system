@@ -147,9 +147,9 @@
 
 /* external variables */
 
-extern char	**environ ;		/* definition required by AT&T AST */
+extern char		**environ ;
 
-extern percache	pc ;			/* unitialized it stays in BSS */
+extern percache		pc ;
 
 
 /* local structures */
@@ -286,7 +286,9 @@ static int	locinfo_netload(LOCINFO *,char *,int,cchar *,int) ;
 static int	locinfo_pagesize(LOCINFO *) ;
 static int	locinfo_timeform(LOCINFO *,cchar *,int) ;
 
-static void	ourfini() noex ;
+extern "C" {
+    static void	ourfini() noex ;
+}
 
 static int	getam(cchar *,int) ;
 
@@ -1256,7 +1258,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 /* execute this on module (shared-object) un-load */
-void ourfini() noex {
+static void ourfini() noex {
 	percache_fini(&pc) ;
 }
 /* end subroutine (ourfini) */
@@ -2673,36 +2675,21 @@ static int locinfo_uaux(LOCINFO *lip)
 }
 /* end subroutine (locinfo_uaux) */
 
-
-static int locinfo_hostid(LOCINFO *lip)
-{
+static int locinfo_hostid(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		to = lip->to ;
 	int		f_hostid = lip->init.hostid ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("locinfo_hostid: init-hostid=%u\n",lip->init.hostid) ;
-	    debugprintf("locinfo_hostid: f_percache=%u\n",lip->f.percache) ;
-	}
-#endif
-
 	if ((! f_hostid) || ((pip->daytime - lip->ti_hostid) >= to)) {
 	    uint	uv = 0 ;
 	    lip->init.hostid = true ;
 	    lip->ti_hostid = pip->daytime ;
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("locinfo_hostid: inside\n") ;
-#endif
-
-#if	CF_PERCACHE
-	    if (lip->f.percache) {
-	        rs = percache_gethostid(&pc,pip->daytime,&uv) ;
-	    }
-#endif /* CF_PERCACHE */
+	    if_constexpr (f_percache) {
+	        if (lip->f.percache) {
+	            rs = percache_gethostid(&pc,pip->daytime,&uv) ;
+	        }
+	    } /* end if_constexpr (f_percache) */
 
 	    if ((rs >= 0) && (uv == 0)) {
 	        uv = gethostid() ;

@@ -33,8 +33,8 @@
 
 enum pertypes {
 	pertype_hostid,
-	pertype_nprocs,
 	pertype_btime,
+	pertype_nprocs,
 	pertype_runlevel,
 	pertype_nusers,
 	pertype_nodename,
@@ -53,6 +53,7 @@ struct percache_dataitem {
 
 struct percache_head {
 	PERCACHE_ITEM	items[pertype_overlast] ;
+	volatile uint	f_void ;
 	volatile uint	f_init ;
 	volatile uint	f_initdone ;
 	volatile uint	f_finireg ;
@@ -67,8 +68,8 @@ extern int	percache_init(percache *) noex ;
 extern int	percache_finireg(percache *) noex ;
 extern int	percache_invalidate(percache *) noex ;
 extern int	percache_gethostid(percache *,time_t,uint *) noex ;
-extern int	percache_getnprocs(percache *,time_t) noex ;
 extern int	percache_getbtime(percache *,time_t,time_t *) noex ;
+extern int	percache_getnprocs(percache *,time_t) noex ;
 extern int	percache_getrunlevel(percache *,time_t) noex ;
 extern int	percache_getnusers(percache *,time_t) noex ;
 extern int	percache_getnodename(percache *,time_t,cchar **) noex ;

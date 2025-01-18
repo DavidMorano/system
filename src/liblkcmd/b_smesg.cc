@@ -131,9 +131,9 @@ extern "C" {
 
 /* external variables */
 
-extern char	**environ ;		/* definition required by AT&T AST */
+extern char		**environ ;
 
-extern percache	pc ;			/* unitialized it stays in BSS */
+extern percache		pc ;
 
 
 /* local structures */
@@ -265,31 +265,24 @@ static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 static int 	locnote_start(LOCNOTE *,KSHLIB_NOTE *) ;
 static int 	locnote_finish(LOCNOTE *) ;
 
-static void	ourfini() noex ;
+extern "C" {
+    static void	ourfini() noex ;
+}
 
-static int	vcmpfor(cvoid *,cvoid *) ;
-static int	vcmprev(cvoid *,cvoid *) ;
+extern "C" {
+    static int	vcmpfor(cvoid *,cvoid *) noex ;
+    static int	vcmprev(cvoid *,cvoid *) noex ;
+}
 
 
 /* local variables */
 
-static cchar	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"pm",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"dd",
-	"dev",
-	"line",
-	"td",
-	"notes",
-	"max",
-	nullptr
+constexpr pivars	initvars = {
+	VARPROGRAMROOT1,
+	VARPROGRAMROOT2,
+	VARPROGRAMROOT3,
+	PROGRAMROOT,
+	VARPRNAME
 } ;
 
 enum argopts {
@@ -311,15 +304,26 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const PIVARS	initvars = {
-	VARPROGRAMROOT1,
-	VARPROGRAMROOT2,
-	VARPROGRAMROOT3,
-	PROGRAMROOT,
-	VARPRNAME
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"pm",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"dd",
+	"dev",
+	"line",
+	"td",
+	"notes",
+	"max",
+	nullptr
 } ;
 
-static const MAPEX	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -333,16 +337,6 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static cchar	*akonames[] = {
-	"owner",
-	"sort",
-	"line",
-	"notes",
-	"max",
-	"date",
-	nullptr
-} ;
-
 enum akonames {
 	akoname_owner,
 	akoname_sort,
@@ -353,7 +347,17 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const uchar	aterms[] = {
+constexpr cpcchar	akonames[] = {
+	"owner",
+	"sort",
+	"line",
+	"notes",
+	"max",
+	"date",
+	nullptr
+} ;
+
+constexpr char		aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -362,15 +366,6 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
-
-static cchar	*ntypes[] = {
-	"exit",
-	"noop",
-	"gen",
-	"biff",
-	"other",
-	nullptr
 } ;
 
 enum ntypes {
@@ -382,9 +377,12 @@ enum ntypes {
 	ntype_overlast
 } ;
 
-static cchar	*typesorts[] = {
-	"forward",
-	"reverse",
+constexpr cpcchar	ntypes[] = {
+	"exit",
+	"noop",
+	"gen",
+	"biff",
+	"other",
 	nullptr
 } ;
 
@@ -392,6 +390,12 @@ enum typesorts {
 	typesort_forward,
 	typesort_reverse,
 	typesort_overlast
+} ;
+
+constexpr cpcchar	typesorts[] = {
+	"forward",
+	"reverse",
+	nullptr
 } ;
 
 enum progmodes {
@@ -1272,10 +1276,9 @@ badarg:
 /* end subroutine (mainsub) */
 
 /* execute this on module (shared-object) un-load */
-void ourfini() noex {
+static void ourfini() noex {
 	percache_fini(&pc) ;
 }
-/* end subroutine (ourfini) */
 
 static int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
@@ -2084,12 +2087,12 @@ static int locinfo_finish(LOCINFO *lip) noex {
 
 	if (lip == nullptr) return SR_FAULT ;
 	{
-	rs1 = locinfo_notesend(lip) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = locinfo_notesend(lip) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	{
-	rs1 = locinfo_typesend(lip) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = locinfo_typesend(lip) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	if_constexpr (f_percache) {
 	    if (lip->f.percache) {

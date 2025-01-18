@@ -129,11 +129,9 @@
 
 /* external variables */
 
-extern char	**environ ;		/* definition required by AT&T AST */
+extern char		**environ ;
 
-#if	CF_PERCACHE
-extern PERCACHE	pc ;			/* unitialized it stays in BSS */
-#endif
+extern percache		pc ;
 
 
 /* local structures */
@@ -231,7 +229,9 @@ static int	locinfo_fsdir(LOCINFO *) noex ;
 static int	locinfo_hostid(LOCINFO *) noex ;
 static int	locinfo_pagesize(LOCINFO *) noex ;
 
-static void	ourfini() noex ;
+extern "C" {
+    static void	ourfini() noex ;
+}
 
 
 /* local variables */
@@ -1745,9 +1745,7 @@ static int locinfo_utfname(LOCINFO *lip,cchar *utfname)
 }
 /* end subroutine (locinfo_utfname) */
 
-
-static int locinfo_flags(LOCINFO *lip,int f_init,int f_nocache)
-{
+static int locinfo_flags(LOCINFO *lip,int f_init,int f_nocache) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1756,20 +1754,17 @@ static int locinfo_flags(LOCINFO *lip,int f_init,int f_nocache)
 	lip->f.init = f_init ;
 	lip->f.nocache = f_nocache ;
 
-#if	CF_PERCACHE
-	if (f_init) {
-	    rs1 = percache_invalidate(&pc) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-#endif /* CF_PERCACHE */
+	if_constexpr (f_percache) {
+	    if (f_init) {
+	        rs = percache_invalidate(&pc) ;
+	    }
+	} /* end if_constexpr (f_percache) */
 
 	return rs ;
 }
 /* end subroutine (locinfo_flags) */
 
-
-static int locinfo_to(LOCINFO *lip,int to)
-{
+static int locinfo_to(LOCINFO *lip,int to) noex {
 	if (to < 0) to = TO_CACHE ;
 	lip->to = to ;
 	return SR_OK ;
@@ -1873,9 +1868,7 @@ static int locinfo_fsdir(LOCINFO *lip)
 }
 /* end subroutine (locinfo_fsdir) */
 
-
-static int locinfo_hostid(LOCINFO *lip)
-{
+static int locinfo_hostid(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		to = lip->to ;
@@ -1886,11 +1879,11 @@ static int locinfo_hostid(LOCINFO *lip)
 	    lip->init.hostid = true ;
 	    lip->ti_hostid = pip->daytime ;
 
-#if	CF_PERCACHE
-	    if (lip->f.percache) {
-	        rs = percache_gethostid(&pc,pip->daytime,&uv) ;
-	    }
-#endif /* CF_PERCACHE */
+	    if_constexpr (f_percache) {
+	        if (lip->f.percache) {
+	            rs = percache_gethostid(&pc,pip->daytime,&uv) ;
+	        }
+	    } /* end if_constexpr (f_percache) */
 
 	    if ((rs >= 0) && (uv == 0)) {
 	        uv = gethostid() ;
@@ -1903,9 +1896,7 @@ static int locinfo_hostid(LOCINFO *lip)
 }
 /* end subroutine (locinfo_hostid) */
 
-
-static int locinfo_pagesize(LOCINFO *lip)
-{
+static int locinfo_pagesize(LOCINFO *lip) noex {
 	if (lip->pagesize == 0) {
 	    lip->pagesize = getpagesize() ;
 	}
