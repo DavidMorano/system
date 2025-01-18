@@ -123,11 +123,12 @@ constexpr cpcchar	charsets[] = {
 /* exported subroutines */
 
 int chartrans_open(CT *op ,cchar *pr,int maxtx) noex {
+    	CHARTRANS	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (maxtx < 1) maxtx = 1 ;
 	if (op && pr) {
 	    rs = SR_INVALID ;
-	    memclear(op) ; /* dangerous */
+	    memclear(hop) ;
 	    if (pr[0]) {
 	        if (cchar *cp ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	            cint	asize = (maxtx * szof(chartrans_set)) ;
@@ -231,8 +232,7 @@ int chartrans_transend(CT *op,int txid) noex {
 }
 /* end subroutine (chartrans_transend) */
 
-int chartrans_transread(CT *op,int txid,wchr *rcp,int rcl,
-		cchar *sp,int sl) noex {
+int chartrans_transread(CT *op,int txid,wchr *rcp,int rcl,cc *sp,int sl) noex {
 	int		rs ;
 	if ((rs = chartrans_magic(op,rcp,sp)) >= 0) {
 	    rs = SR_INVALID ;

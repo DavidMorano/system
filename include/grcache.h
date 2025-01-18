@@ -1,4 +1,5 @@
 /* grcache HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* GROUP cache */

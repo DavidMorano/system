@@ -25,7 +25,14 @@
 	file by mapping it into memory.  No data is copied out of
 	the file map!  This is assumed to provide some performance
 	advantage over reading it line by line and then allocating
-	space for found strings.
+	space for found strings.  Duplicate node entries are ignored.
+
+	File-format:
+	|
+	| <node0>
+	| <node1> <node2> <node2>
+	| <node4>
+	| 
 
 *******************************************************************************/
 
@@ -44,9 +51,9 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<estrings.h>
+#include	<sfx.h>
 #include	<hdb.h>
 #include	<strwcpy.h>
-#include	<intceil.h>
 #include	<localmisc.h>
 
 #include	"nodesfile.h"

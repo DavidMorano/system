@@ -80,9 +80,6 @@ using std::nothrow ;			/* constant */
 /* external variables */
 
 
-/* local typedefs */
-
-
 /* local structures */
 
 

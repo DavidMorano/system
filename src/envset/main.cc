@@ -27,6 +27,9 @@
 
 /*******************************************************************************
 
+  	Name:
+	main
+
 	Synopsis:
 	$ envset [-V] <prog> <arg0> <arg1> ...
 
@@ -48,23 +51,25 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<uinfo.h>
+#include	<userinfo.h>
+#include	<userattr.h>
+#include	<getnodedomain.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
 #include	<bfile.h>
 #include	<ids.h>
-#include	<uinfo.h>
-#include	<userinfo.h>
-#include	<userattr.h>
 #include	<gethz.h>
 #include	<vecstr.h>
 #include	<paramfile.h>
@@ -172,7 +177,6 @@ extern int	xfile(IDS *,cchar *) ;
 extern int	getnodename(char *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getnodeinfo(cchar *,char *,char *,vecstr *,cchar *) ;
-extern int	getsysdomain(char *,int) ;
 extern int	getsystypenum(char *,char *,cchar *,cchar *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getnprocessors(cchar **,int) ;
@@ -1809,15 +1813,6 @@ static int procenvuser(PROGINFO *pip)
 	int		c = 0 ;
 	cchar		*vp ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("main/procenvuser: ent\n",rs) ;
-#endif
-
-#if	CF_DEBUGN
-	nprintf(NDFN,"main/procenvuser: mid tz=%s\n",pip->tz) ;
-#endif
-
 /* environment LOCALDOMAIN */
 
 	if (rs >= 0) {
@@ -1826,13 +1821,6 @@ static int procenvuser(PROGINFO *pip)
 	        const int	dl = MAXHOSTNAMELEN ;
 	        char		dn[MAXHOSTNAMELEN+1] ;
 	        if ((rs = getsysdomain(dn,dl)) >= 0) {
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(3)) {
-	                cchar	*udn = pip->domainname ;
-	                debugprintf("main/procenvuser: sdomain=%s\n",dn) ;
-	                debugprintf("main/procenvuser: udomain=%s\n",udn) ;
-	            }
-#endif
 	            vp = pip->domainname ;
 	            if (strcmp(vp,dn) != 0) {
 	                rs = vecstr_envadd(elp,varlocaldomain,vp,-1) ;
@@ -1841,13 +1829,6 @@ static int procenvuser(PROGINFO *pip)
 	        } /* end if (getsysdomain) */
 	    } /* end if (environment variable not found) */
 	} /* end if (environment LOCALDOMAIN) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3)) {
-	    debugprintf("main/procenvuser: LOCALDOMAIN rs=%d\n",rs) ;
-	    debugprintf("main/procenvuser: mid tz=%s\n",pip->tz) ;
-	}
-#endif
 
 /* environment TZ */
 
@@ -1863,11 +1844,6 @@ static int procenvuser(PROGINFO *pip)
 	    }
 	} /* end if (environment TZ) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("main/procenvuser: TZ rs=%d\n",rs) ;
-#endif
-
 /* environment NAME */
 
 	if (rs >= 0) {
@@ -1875,27 +1851,12 @@ static int procenvuser(PROGINFO *pip)
 	    c += rs ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("main/procenvuser: 1 procenvname() rs=%d\n",rs) ;
-#endif
-
 /* environment FULLNAME */
 
 	if (rs >= 0) {
 	    rs = procenvname(pip,VARFULLNAME,FULLNAMECNAME,pip->fullname) ;
 	    c += rs ;
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("main/procenvuser: 2 procenvname() rs=%d\n",rs) ;
-#endif
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("main/procenvuser: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }

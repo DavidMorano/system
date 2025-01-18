@@ -1,7 +1,8 @@
 /* pwcache SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* ucentpw cache */
+/* system PASSWD database cache */
 /* version %I% last-modified %G% */
 
 
@@ -20,7 +21,7 @@
 	pwcache
 
 	Description:
-        This object provides a crude cache for ucentpw-DB entries.
+        This object provides a crude cache for PASSWD-DB entries.
 
 *******************************************************************************/
 
@@ -43,10 +44,6 @@
 
 /* local defines */
 
-#ifndef PWCACHE_REC
-#define PWCACHE_REC	struct pwcache_record
-#endif
-
 #define PWE             ucentpw
 
 
@@ -58,8 +55,6 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef PWCACHE_REC	rec ;
-typedef PWCACHE_REC *	recp ;
 typedef ucentpw *	pwentp ;
 
 
@@ -77,7 +72,7 @@ enum cts {
         ct_overlast
 } ;
 
-struct pwcache_record : pq_ent {
+struct pwcache_rec : pq_ent {
         char            *un ;		/* allocated: username */
         char            *pwbuf ;	/* allocated: PW-buffer */
         ucentpw		pw ;
@@ -86,6 +81,9 @@ struct pwcache_record : pq_ent {
         uint            wcount ;
         int             pwl ;
 } ;
+
+typedef pwcache_rec	rec ;
+typedef pwcache_rec *	recp ;
 
 namespace {
     struct ureq {
@@ -347,8 +345,7 @@ int pwcache_check(pwcache *op,time_t dt) noex {
         int             rs1 ;
         int             f = false ;
 	if ((rs = pwcache_magic(op)) >= 0) {
-            hdb_cur         cur{} ;
-            if ((rs = hdb_curbegin(op->dbp,&cur)) >= 0) {
+            if (hdb_cur cur ; (rs = hdb_curbegin(op->dbp,&cur)) >= 0) {
                 hdb_dat       key{} ;
                 hdb_dat       val{} ;
                 if (dt == 0) dt = getustime ;
@@ -403,17 +400,20 @@ static int pwcache_mkrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
                 if ((rs = pq_rem(op->lrup,&pep)) >= 0) {
                     rec		*ep = recp(pep) ;
                     if ((rs = pwcache_recdel(op,ep)) >= 0) {
-                        rs = pwcache_recstart(op,dt,ep,rp) ;
-                        pwl = rs ;
+                        if ((rs = pwcache_recstart(op,dt,ep,rp)) >= 0) {
+                            pwl = rs ;
+                	    if (epp) {
+				*epp = (rec *) pep ;
+			    }
+			}
                     }
                     rs1 = pq_ins(op->lrup,pep) ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (removed entry) */
-                if (rs >= 0) *epp = (rec *) pep ;
             } else {
                 if ((rs = pwcache_newrec(op,dt,epp,rp)) >= 0) {
                     pwl = rs ;
-                    if (*epp != nullptr) {
+                    if (*epp) {
                         pep = (pq_ent *) *epp ;
                         rs = pq_ins(op->lrup,pep) ;
                     }
@@ -430,8 +430,8 @@ static int pwcache_mkrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
 static int pwcache_newrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
         int             rs = SR_BUGCHECK ;
         if (epp) {
-            cint	rsz = sizeof(rec) ;
-            rec		*ep{} ;
+            cint	rsz = szof(rec) ;
+            rec		*ep = nullptr ;
             if ((rs = uc_malloc(rsz,&ep)) >= 0) {
                 rs = pwcache_recstart(op,dt,ep,rp) ;
                 if (rs < 0) {
@@ -468,7 +468,7 @@ static int pwcache_recstart(pwcache *op,time_t dt,rec *ep,ureq *rp) noex {
         if ((rs = record_start(ep,dt,wc,rp)) >= 0) {
             hdb_dat	key ;
             hdb_dat	val ;
-            cint	rsz = sizeof(rec) ;
+            cint	rsz = szof(rec) ;
             pwl = rs ;
             key.buf = ep->un ;
             key.len = strlen(ep->un) ;
@@ -609,16 +609,14 @@ static int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
         int             rs1 ;
         int             pwl = 0 ;
         if (ep && rp) {
-            char        *pwbuf{} ;
             memclear(ep) ; /* dangerous */
-            if ((rs = malloc_pw(&pwbuf)) >= 0) {
+            if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
                 ucentpw		pw{} ;
                 cint		pwlen = rs ;
                 if ((rs = getpw(&pw,pwbuf,pwlen,rp)) >= 0) {
 		    if ((rs = record_loadun(ep,&pw)) >= 0) {
-                        void	*vp{} ;
                         pwl = rs ;
-                        if ((rs = uc_malloc((pwl+1),&vp)) >= 0) {
+                        if (void *vp ; (rs = uc_malloc((pwl+1),&vp)) >= 0) {
 			    ucentpw	*pwp = pwentp(&ep->pw) ;
 			    ucentpw	*opwp = pwentp(&pw) ;
                             char	*pwb = charp(vp) ;
@@ -653,10 +651,9 @@ static int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
 
 static int record_loadun(rec *ep,ucentpw *pwp) noex {
 	int		rs ;
-	cchar		*cp{} ;
 	cchar		*un = pwp->pw_name ;
-	if ((rs = uc_mallocstrw(un,-1,&cp)) >= 0) {
-	    ep->un = const_cast<charp>(cp) ;
+	if (cchar *cp ; (rs = uc_mallocstrw(un,-1,&cp)) >= 0) {
+	    ep->un = cast_const<charp>(cp) ;
 	}
 	return rs ;
 }
@@ -700,10 +697,9 @@ static int record_refresh(rec *ep,time_t dt,int wc) noex {
         int             rs1 ;
         int             pwl = 0 ;
         if (ep) {
-            char    *pwbuf{} ;
-            if ((rs = malloc_pw(&pwbuf)) >= 0) {
-                ucentpw		pw{} ;
+            if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
                 cint		pwlen = rs ;
+                ucentpw		pw{} ;
                 if ((rs = getpw_name(&pw,pwbuf,pwlen,ep->un)) >= 0) {
                     void    *vp{} ;
                     pwl = rs ;

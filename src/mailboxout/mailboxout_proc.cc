@@ -969,7 +969,7 @@ int		len ;
 		int	zoff, vlen = rs1 ;
 
 
-		rs = tmz_msg(&info,vp,vlen) ;
+		rs = tmz_xmsg(&info,vp,vlen) ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1)

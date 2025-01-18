@@ -18,7 +18,7 @@
 	I laugh sometimes as how long some of these objects (or
 	subroutines) last without change.  Yes, most of this code
 	looks pretty bad by standards of today.  But to the point,
-	I am enhancing this object (specially the |tmz_std()|
+	I am enhancing this object (specially the |tmz_xstd()|
 	subroutine) so that it recognizes a date-string without
 	either a time-zone abbreviation or a year but which does
 	have a time-zone offset.  In the past, the case of an offset
@@ -44,13 +44,13 @@
 
 	Description:
 	This object is used to parse date strings that are in ASCII
-	and are human-readable. There are tons of places where ASCII
-	strings that represent a date are used. I will leave it as
+	and are human-readable.  There are tons of places where ASCII
+	strings that represent a date are used.  I will leave it as
 	an exercise for the reader to think up some of those!
 
 	Note for STD type dates:
 
-	Note that our |tmz_std()| will parse both the old style
+	Note that our |tmz_xstd()| will parse both the old style
 	standard date strings (a la |ctime(3c)|) as well as the new
 	style date strings (|date(1)|).  An old style standard date
 	string looked like:
@@ -144,7 +144,7 @@ static int tmz_ctor(tmz *op,Args ... args) noex {
 /* end subroutine (tmz_ctor) */
 
 static int	tmz_timeparts(tmz *,cchar *,int) noex ;
-static int	tmz_stdtrailing(tmz *,cchar *,int) noex ;
+static int	tmz_xstdtrailing(tmz *,cchar *,int) noex ;
 static int	tmz_procday(tmz *,cchar *,int) noex ;
 static int	tmz_procmonth(tmz *,cchar *,int) noex ;
 static int	tmz_procyear(tmz *,cchar *,int) noex ;
@@ -197,7 +197,7 @@ int tmz_init(tmz *op) noex {
 /* end subroutine (tmz_init) */
 
 /* format> [Wed] Nov 14 19:24[:04] [EST] [[19]99] [±0400] */
-int tmz_std(tmz *op,cchar *sp,int sl) noex {
+int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
@@ -219,7 +219,7 @@ int tmz_std(tmz *op,cchar *sp,int sl) noex {
 	        sl -= rs ;
 	    }
 	    for (int i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
-	        rs = tmz_stdtrailing(op,sp,sl) ;
+	        rs = tmz_xstdtrailing(op,sp,sl) ;
 	        if (rs == 0) break ;
 	        sp += rs ;
 	        sl -= rs ;
@@ -234,10 +234,10 @@ int tmz_std(tmz *op,cchar *sp,int sl) noex {
 	} /* end if (tmz_ctor) */
 	return rs ;
 }
-/* end subroutine (tmz_std) */
+/* end subroutine (tmz_xstd) */
 
 /* format> [Weekday,] DD MMM [CC]YY hh:mm[:ss] [Â±hhmm] [zname] */
-int tmz_msg(tmz *op,cchar *sp,int sl) noex {
+int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		zl = 0 ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
@@ -291,10 +291,10 @@ int tmz_msg(tmz *op,cchar *sp,int sl) noex {
 	} /* end if (tmz_ctor) */
 	return (rs >= 0) ? zl : rs ;
 }
-/* end subroutine (tmz_msg) */
+/* end subroutine (tmz_xmsg) */
 
 /* convert from a TOUCH (original) format> MMDDhhmm[YY] */
-int tmz_touch(tmz *op,cchar *sp,int sl) noex {
+int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
@@ -353,10 +353,10 @@ int tmz_touch(tmz *op,cchar *sp,int sl) noex {
 	} /* end if (tmz_ctor) */
 	return rs ;
 }
-/* end subroutine (tmz_touch) */
+/* end subroutine (tmz_xtouch) */
 
 /* convert from a TOUCH-t (new '-t') format> [[CC]YY]MMDDhhmm[.SS] */
-int tmz_toucht(tmz *op,cchar *sp,int sl) noex {
+int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
             TM		*stp = &op->st ;
@@ -439,7 +439,7 @@ int tmz_toucht(tmz *op,cchar *sp,int sl) noex {
 /* end subroutine (date_toucht) */
 
 /* format> [[CC]]YYMMDDhhmm[ss][Â±hhmm][zname] */
-int tmz_strdig(tmz *op,cchar *sp,int sl) noex {
+int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		zl = 0 ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
@@ -536,10 +536,10 @@ int tmz_strdig(tmz *op,cchar *sp,int sl) noex {
 	} /* end if (tmz_ctor) */
 	return (rs >= 0) ? zl : rs ;
 }
-/* end subroutine (tmz_strdig) */
+/* end subroutine (tmz_xstrdig) */
 
 /* format> [CC]YYMMDD_hhmm[:ss][_][zname] */
-int tmz_logz(tmz *op,cchar *sp,int sl) noex {
+int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		zl = 0 ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
@@ -630,10 +630,10 @@ int tmz_logz(tmz *op,cchar *sp,int sl) noex {
 	} /* end if (tmz_ctor) */
 	return (rs >= 0) ? zl : rs ;
 }
-/* end subroutine (tmz_logz) */
+/* end subroutine (tmz_xlogz) */
 
-/* format> [CC]YYMMDD */
-int tmz_day(tmz *op,cchar *sp,int sl) noex {
+/* format> [CC]YYMMDD (like abbreviated variation of "touch") */
+int tmz_xday(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
@@ -688,7 +688,7 @@ int tmz_day(tmz *op,cchar *sp,int sl) noex {
 	} /* end if (tmz_ctor) */
 	return rs ;
 }
-/* end subroutine (tmz_day) */
+/* end subroutine (tmz_xday) */
 
 int tmz_isset(tmz *op) noex {
 	int		rs ;
@@ -863,7 +863,7 @@ static int tmz_timeparts(tmz *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (tmz_timeparts) */
 
-static int tmz_stdtrailing(tmz *op,cchar *sp,int sl) noex {
+static int tmz_xstdtrailing(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	if (int wi ; (wi = siskipwhite(sp,sl)) >= 0) {
@@ -886,7 +886,7 @@ static int tmz_stdtrailing(tmz *op,cchar *sp,int sl) noex {
 	} /* end if (siskipwhite) */
 	return (rs >= 0) ? si : rs ;
 }
-/* end subroutine (tmz_stdtrailing) */
+/* end subroutine (tmz_xstdtrailing) */
 
 /* parse out> dd */
 static int tmz_procday(tmz *op,cchar *sp,int sl) noex {
@@ -1032,7 +1032,7 @@ static int getzoff(int *zop,cchar *sp,int sl) noex {
 	f = f || isplusminus(ch) ;
 	f = f || isdigitlatin(ch) ;
 	if ((sl >= 2) && f) {
-	    int		i{} ;
+	    int		i{} ; /* used-afterwards */
 	    int		zoff ;
 	    int		sign ;
 	    int		hours ;
@@ -1104,31 +1104,31 @@ static int tmz_clear(tmz *op) noex {
 /* end method (tmz::clæar) */
 
 int tmz::xstd(cchar *sp,int sl) noex {
-	return tmz_std(this,sp,sl) ;
+	return tmz_xstd(this,sp,sl) ;
 }
 
-int tmz::msg(cchar *sp,int sl) noex {
-	return tmz_msg(this,sp,sl) ;
+int tmz::xmsg(cchar *sp,int sl) noex {
+	return tmz_xmsg(this,sp,sl) ;
 }
 
-int tmz::touch(cchar *sp,int sl) noex {
-	return tmz_touch(this,sp,sl) ;
+int tmz::xtouch(cchar *sp,int sl) noex {
+	return tmz_xtouch(this,sp,sl) ;
 }
 
-int tmz::toucht(cchar *sp,int sl) noex {
-	return tmz_toucht(this,sp,sl) ;
+int tmz::xtoucht(cchar *sp,int sl) noex {
+	return tmz_xtoucht(this,sp,sl) ;
 }
 
-int tmz::strdig(cchar *sp,int sl) noex {
-	return tmz_strdig(this,sp,sl) ;
+int tmz::xstrdig(cchar *sp,int sl) noex {
+	return tmz_xstrdig(this,sp,sl) ;
 }
 
-int tmz::logz(cchar *sp,int sl) noex {
-	return tmz_logz(this,sp,sl) ;
+int tmz::xlogz(cchar *sp,int sl) noex {
+	return tmz_xlogz(this,sp,sl) ;
 }
 
-int tmz::day(cchar *sp,int sl) noex {
-	return tmz_day(this,sp,sl) ;
+int tmz::xday(cchar *sp,int sl) noex {
+	return tmz_xday(this,sp,sl) ;
 }
 
 int tmz::setday(int y,int m,int d) noex {

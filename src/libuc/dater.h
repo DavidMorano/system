@@ -108,10 +108,12 @@ extern int dater_mkmsg(dater *,char *,int) noex ;
 extern int dater_mkhdr(dater *,char *,int) noex ;
 extern int dater_mkstrdig(dater *,char *,int) noex ;
 extern int dater_mklogz(dater *,char *,int) noex ;
+extern int dater_mkgmtlogz(dater *,char *,int) noex ;
 extern int dater_gettime(dater *,time_t *) noex ;
 extern int dater_getzoneoff(dater *,int *) noex ;
 extern int dater_getzonename(dater *,char *,int) noex ;
 extern int dater_zinfoget(dater *,dater_zi *,char *,int) noex ;
+extern int dater_zinfoset(dater *,dater_zi *,cchar *,int) noex ;
 extern int dater_diff(dater *,dater *,time_t *) noex ;
 extern int dater_finish(dater *) noex ;
 

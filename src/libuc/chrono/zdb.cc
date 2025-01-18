@@ -37,7 +37,7 @@
 #include	<estrings.h>
 #include	<nulstr.h>
 #include	<strwcpy.h>
-#include	<strwcmp.h>
+#include	<strwcmp.h>		/* |strwcasecmp(3uc)| */
 #include	<toxc.h>
 #include	<hasx.h>
 #include	<localmisc.h>
@@ -213,7 +213,7 @@ int zdb_nameoff(zdb *op,cchar *sp,int sl,int zoff) noex {
 	    bool	f = false ;
 	    rs = SR_NOTFOUND ;
 	    memclear(op) ;
-	    if (sl < 0) sl = int(strlen(sp)) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
     	    /* lookup by name and offset (if we have an offset) */
 	    if (zoff != TZO_EMPTY) {
 	        for (i = 0 ; zones[i].name ; i += 1) {
@@ -246,7 +246,7 @@ int zdb_name(zdb *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    rs = SR_NOTFOUND ;
 	    memclear(op) ;
-	    if (sl < 0) sl = int(strlen(sp)) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    if ((i = findname(sp,sl)) >= 0) {
 		rs = SR_OK ;
 	        op->name = zones[i].name ;

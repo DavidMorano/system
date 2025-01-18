@@ -791,9 +791,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        TMTIME	tmt ;
 
 	        if (lip->f.toucht) {
-	            rs = tmz_toucht(&stz,datespec,-1) ;
+	            rs = tmz_xtoucht(&stz,datespec,-1) ;
 	        } else {
-	            rs = tmz_touch(&stz,datespec,-1) ;
+	            rs = tmz_xtouch(&stz,datespec,-1) ;
 	        }
 
 #if	CF_DEBUG

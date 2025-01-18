@@ -685,7 +685,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl)
-	                            rs = tmz_toucht(&stz,argp,argl) ;
+	                            rs = tmz_xtoucht(&stz,argp,argl) ;
 	                    } else
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -822,7 +822,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl)
-	                                rs = tmz_touch(&stz,argp,argl) ;
+	                                rs = tmz_xtouch(&stz,argp,argl) ;
 	                        } else
 	                            rs = SR_INVALID ;
 	                        break ;

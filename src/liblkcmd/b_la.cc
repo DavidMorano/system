@@ -75,31 +75,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#if	defined(SFIO) && (SFIO > 0)
-#define	CF_SFIO	1
-#else
-#define	CF_SFIO	0
-#endif
-
-#if	(defined(KSHBUILTIN) && (KSHBUILTIN > 0))
-#include	<shell.h>
-#endif
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/loadavg.h>
 #include	<sys/statvfs.h>
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<ugetpid.h>
+#include	<getnodedomain.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -147,7 +137,6 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	statvfsdir(cchar *,struct statvfs *) ;
 extern int	getnprocessors(cchar **,int) ;
-extern int	getsysdomain(char *,int) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	nusers(cchar *) ;
 extern int	isdigitlatin(int) ;

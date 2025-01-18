@@ -1,4 +1,5 @@
 /* pwcache HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* password cache */
@@ -20,7 +21,6 @@
 
 #define	PWCACHE			struct pwcache_head
 #define	PWCACHE_ST		struct pwcache_stats
-
 #define	PWCACHE_MAGIC		0x98643168
 #define	PWCACHE_DEFENTS		10	/* default entries */
 #define	PWCACHE_DEFMAX		20	/* default maximum entries */

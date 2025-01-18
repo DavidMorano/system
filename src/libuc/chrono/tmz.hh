@@ -66,7 +66,7 @@ struct tmz_co {
 } ; /* end struct (tmz_co) */
 
 struct tmz {
-	char		*zname ;
+	char		*zname{} ;	/* dynamically alocated */
 	tmz_co		clear ;
 	tmz_co		init ;
 	tmz_co		isset ;
@@ -89,12 +89,12 @@ struct tmz {
 	    getzoff(this,tmzmem_getzoff) ;
 	} ;
 	int	xstd(cchar *,int) noex ;
-	int	msg(cchar *,int) noex ;
-	int	touch(cchar *,int) noex ;
-	int	toucht(cchar *,int) noex ;
-	int	strdig(cchar *,int) noex ;
-	int	logz(cchar *,int) noex ;
-	int	day(cchar *,int) noex ;
+	int	xmsg(cchar *,int) noex ;
+	int	xtouch(cchar *,int) noex ;
+	int	xtoucht(cchar *,int) noex ;
+	int	xstrdig(cchar *,int) noex ;
+	int	xlogz(cchar *,int) noex ;
+	int	xday(cchar *,int) noex ;
 	int	setday(int,int,int) noex ;
 	int	setyear(int) noex ;
 	int	setzone(cchar *,int) noex ;
@@ -108,13 +108,13 @@ struct tmz {
 EXTERNC_begin
 
 extern int	tmz_init(tmz *) noex ;
-extern int	tmz_std(tmz *,cchar *,int) noex ;
-extern int	tmz_msg(tmz *,cchar *,int) noex ;
-extern int	tmz_touch(tmz *,cchar *,int) noex ;
-extern int	tmz_toucht(tmz *,cchar *,int) noex ;
-extern int	tmz_strdig(tmz *,cchar *,int) noex ;
-extern int	tmz_logz(tmz *,cchar *,int) noex ;
-extern int	tmz_day(tmz *,cchar *,int) noex ;
+extern int	tmz_xstd(tmz *,cchar *,int) noex ;
+extern int	tmz_xmsg(tmz *,cchar *,int) noex ;
+extern int	tmz_xtouch(tmz *,cchar *,int) noex ;
+extern int	tmz_xtoucht(tmz *,cchar *,int) noex ;
+extern int	tmz_xstrdig(tmz *,cchar *,int) noex ;
+extern int	tmz_xlogz(tmz *,cchar *,int) noex ;
+extern int	tmz_xday(tmz *,cchar *,int) noex ;
 extern int	tmz_isset(tmz *) noex ;
 extern int	tmz_hasyear(tmz *) noex ;
 extern int	tmz_haszoff(tmz *) noex ;

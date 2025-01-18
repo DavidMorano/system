@@ -1,4 +1,5 @@
 /* percache HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* persistent cache */
@@ -36,6 +37,7 @@ enum pertypes {
 	pertype_btime,
 	pertype_runlevel,
 	pertype_nusers,
+	pertype_nodename,
 	pertype_sysdomain,
 	pertype_netload,
 	pertype_systat,
@@ -43,18 +45,16 @@ enum pertypes {
 } ;
 
 struct percache_dataitem {
+    	char		*data ;
 	uint		t ;
 	uint		v ;
 } ;
 
 struct percache_head {
+	PERCACHE_ITEM	items[pertype_overlast] ;
 	volatile uint	f_init ;
 	volatile uint	f_initdone ;
 	volatile uint	f_finireg ;
-	PERCACHE_ITEM	items[pertype_overlast] ;
-	cchar		*sysdomain ;
-	cchar		*netload ;
-	cchar		*systat ;
 } ;
 
 typedef PERCACHE	percache ;
@@ -70,6 +70,7 @@ extern int	percache_getnprocs(percache *,time_t) noex ;
 extern int	percache_getbtime(percache *,time_t,time_t *) noex ;
 extern int	percache_getrunlevel(percache *,time_t) noex ;
 extern int	percache_getnusers(percache *,time_t) noex ;
+extern int	percache_getnodename(percache *,time_t,cchar **) noex ;
 extern int	percache_getsysdomain(percache *,time_t,cchar **) noex ;
 extern int	percache_getnetload(percache *,time_t,cchar *,cchar **) noex ;
 extern int	percache_getsystat(percache *,time_t,cchar *,cchar **) noex ;

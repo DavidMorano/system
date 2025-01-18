@@ -135,7 +135,7 @@ int pretime_init() noex {
 	            cchar	*cp ;
 	            if ((cp = getenv(VARBASETIME)) != nullptr) {
 	                TMZ		z ;
-	                if ((rs = tmz_toucht(&z,cp,-1)) >= 0) {
+	                if ((rs = tmz_xtoucht(&z,cp,-1)) >= 0) {
 		            struct tm	ts ;
 		            memset(&ts,0,sizeof(struct tm)) ;
 		            if ((rs = tmz_gettm(&z,&ts)) >= 0) {

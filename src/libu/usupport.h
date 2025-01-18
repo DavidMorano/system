@@ -48,6 +48,17 @@ constexpr int cstrnlen(cchar *sp,int sl = -1) noex {
 #endif /* __cplusplus */
 #endif /* SUBROUTINE_CSTRNLEN */
 
+#ifndef	SUBROUTINE_CSTRLEN
+#define	SUBROUTINE_CSTRLEN
+#ifdef	__cplusplus
+constexpr int cstrlen(cchar *sp) noex {
+    	cchar		*cp = sp ;
+	while (*cp++) ;
+	return (cp - sp) ;
+}
+#endif /* __cplusplus */
+#endif /* SUBROUTINE_CSTRLEN */
+
 #ifndef	TYPEDEF_MTIME
 #define	TYPEDEF_MTIME
 typedef int64_t		mtime_t ;

@@ -1,4 +1,5 @@
 /* cachetime SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* cache-time manager */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	cachetime
+
+	Description:
 	This object manages system file-directory lists by:
 	+ ensuring unique entries by name
 	+ ensuring unique entries by dev-inode pair

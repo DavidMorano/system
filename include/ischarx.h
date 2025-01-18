@@ -46,35 +46,35 @@ extern bool	ismmclass_7bit(int) noex ;
 extern bool	ismmclass_8bit(int) noex ;
 extern bool	ismmclass_binary(int) noex ;
 
-static inline bool isspacetab(int ch) noex {
-	return ((ch == ' ') || (ch == '\t')) ;
-}
-
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-inline bool	isdigitlatin(int ch) noex {
+constexpr inline bool	isdigitlatin(int ch) noex {
 	return (ch >= '0') && (ch <= '9') ;
 }
-inline bool	isoctlatin(int ch) noex {
+constexpr inline bool	isoctlatin(int ch) noex {
 	return (ch >= '0') && (ch <= '7') ;
 }
-inline bool	isnumlatin(int ch) noex {
+constexpr inline bool	isnumlatin(int ch) noex {
     	return ishexlatin(ch) || (ch == '\\') ;
 }
-inline bool	iseol(int ch) noex {
+constexpr inline bool	iseol(int ch) noex {
 	return (ch == '\n') || (ch == '\r') ;
 }
-inline bool	iszero(int ch) noex {
+constexpr inline bool	iszero(int ch) noex {
 	return (ch == '0') ;
 }
-inline bool	isplusminus(int ch) noex {
+constexpr inline bool	isplusminus(int ch) noex {
 	return (ch == '+') || (ch == '-') ;
 }
-inline bool	isabbr(int ch) noex {
+constexpr inline bool	isabbr(int ch) noex {
 	ch &= UCHAR_MAX ;
 	return (ch == '.') || (ch == ('­' & UCHAR_MAX)) ;
+}
+
+constexpr inline bool	isspacetab(int ch) noex {
+	return ((ch == ' ') || (ch == '\t')) ;
 }
 
 #else /* __cplusplus */
@@ -100,6 +100,10 @@ static inline bool	isplusminus(int ch) noex {
 static inline bool	isabbr(int ch) noex {
 	ch &= UCHAR_MAX ;
 	return (ch == '.') || (ch == ('­' & UCHAR_MAX)) || (ch == '-') ;
+}
+
+static inline bool	isspacetab(int ch) noex {
+	return ((ch == ' ') || (ch == '\t')) ;
 }
 
 #endif /* __cplusplus */

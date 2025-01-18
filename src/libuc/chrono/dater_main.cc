@@ -245,13 +245,13 @@ int dater_setstd(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    if (tmz stz ; (rs = tmz_std(&stz,sp,sl)) >= 0) {
+	    if (tmz stz ; (rs = tmz_xstd(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) {
 	            rs = dater_mktime(op,&dst) ;
 	        }
-	    } /* end if (tmz_std) */
+	    } /* end if (tmz_xstd) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -268,14 +268,14 @@ int dater_setmsg(dater *op,cchar *sp,int sl) noex {
 	        cchar	*vp{} ;
 	        if ((rs = comparse_getval(&vc,&vp)) >= 0) {
 	            vl = rs ;
-	            if (tmz stz ; (rs = tmz_msg(&stz,vp,vl)) >= 0) {
+	            if (tmz stz ; (rs = tmz_xmsg(&stz,vp,vl)) >= 0) {
 	                TM	dst = stz.st ;
 	                dater_ldtmz(op,&stz) ;
 	                dater_ldcomzone(op,&vc) ;
 	                if ((rs = dater_defs(op,&stz)) >= 0) {
 	                    rs = dater_mktime(op,&dst) ;
 	                }
-	            } /* end if (tmz_msg) */
+	            } /* end if (tmz_xmsg) */
 	        } /* end if (comparse_getval) */
 	        rs1 = comparse_finish(&vc) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -291,13 +291,13 @@ int dater_setstrdig(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    if (tmz stz ; (rs = tmz_strdig(&stz,sp,sl)) >= 0) {
+	    if (tmz stz ; (rs = tmz_xstrdig(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) {
 	            rs = dater_mktime(op,&dst) ;
 	        }
-	    } /* end if tmz_strdig) */
+	    } /* end if tmz_xstrdig) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -316,13 +316,13 @@ int dater_setlogz(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    if (tmz stz ; (rs = tmz_logz(&stz,sp,sl)) >= 0) {
+	    if (tmz stz ; (rs = tmz_xlogz(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) {
 	            rs = dater_mktime(op,&dst) ;
 	        }
-	    } /* end if (tmz_logz) */
+	    } /* end if (tmz_xlogz) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -333,13 +333,13 @@ int dater_settouch(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    if (tmz stz ; (rs = tmz_touch(&stz,sp,sl)) >= 0) {
+	    if (tmz stz ; (rs = tmz_xtouch(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) {
 	            rs = dater_mktime(op,&dst) ;
 	        }
-	    } /* end if (tmz_touch) */
+	    } /* end if (tmz_xtouch) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -350,13 +350,13 @@ int dater_settoucht(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    if (tmz stz ; (rs = tmz_toucht(&stz,sp,sl)) >= 0) {
+	    if (tmz stz ; (rs = tmz_xtoucht(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) {
 	            rs = dater_mktime(op,&dst) ;
 	        }
-	    } /* end if (tmz_toucht) */
+	    } /* end if (tmz_xtoucht) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -649,7 +649,7 @@ int dater_mkgmtlogz(dater *op,char *dbuf,int dlen) noex {
 }
 /* end subroutine (dater_mkgmlogz) */
 
-int dater_zinfoset(dater *op,dater_zi *zip,cc *zn,int zl) noex {
+int dater_zinfoset(dater *op,dater_zi *zip,cchar *zn,int zl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,zip,zn)) >= 0) {
 	    if ((rs = zalen) >= 0) {

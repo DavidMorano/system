@@ -1,4 +1,5 @@
 /* gncache HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* group-name cache */

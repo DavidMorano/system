@@ -141,16 +141,6 @@ int msleep(int msec) noex {
 }
 /* end subroutine (msleep) */
 
-int memclear(void *vp,size_t sz) noex {
-	int		rs = SR_FAULT ;
-	if (vp) {
-	    rs = intsat(sz) ;
-	    memset(vp,0,sz) ;
-	}
-	return rs ;
-}
-/* end subroutine (memclear) */
-
 namespace libu {
     char *strwcpy(char *dp,cchar *sp,int sl) noex {
 	if (sl >= 0) {

@@ -27,6 +27,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<limits.h>		/* |UCHAR_MAX| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -41,14 +42,14 @@
 #ifdef	__cplusplus
 
 constexpr inline int mkchar(int ch) noex {
-	return (ch & 255) ;
+	return (ch & UCHAR_MAX) ;
 }
 
 #else /* __cplusplus */
 #define	MKCHAR_STATICINLINE
 
 static inline int mkchar(int ch) noex {
-	return (ch & 255) ;
+	return (ch & UCHAR_MAX) ;
 }
 
 #endif /* _cplusplus */

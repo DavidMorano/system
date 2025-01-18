@@ -864,5 +864,6 @@ findxfile.o:		findxfile.cc findxfile.h
 getostype.o:		getostype.cc getostype.h
 deprecated.o:		deprecated.cc
 getclusters.o:		getclusters.cc getclusters.h
+percache.o:		percache.cc percache.h
 
 

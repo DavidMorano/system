@@ -24,6 +24,9 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_sysval
+
 	Synopsis:
 	$ sysval <spec(s)>
 
@@ -98,10 +101,11 @@
 #include	<sys/loadavg.h>
 #include	<sys/statvfs.h>
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<utmpx.h>
@@ -109,8 +113,11 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<ugetpid.h>
+#include	<utmpacc.h>
+#include	<uinfo.h>
 #include	<getbufsize.h>
 #include	<gethz.h>
+#include	<getnodedomain.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<ctdec.h>
@@ -118,10 +125,8 @@
 #include	<cthex.h>
 #include	<vecstr.h>
 #include	<tmpx.h>
-#include	<utmpacc.h>
 #include	<field.h>
 #include	<tmtime.hh>
-#include	<uinfo.h>
 #include	<nulstr.h>
 #include	<sysmemutil.h>
 #include	<prgetclustername.h>
@@ -178,7 +183,6 @@ extern int	getsystypenum(char *,char *,cchar *,cchar *) ;
 extern int	getstacksize(int) ;
 extern int	getngroups(void) ;
 extern int	getmaxpid(int) ;
-extern int	getsysdomain(char *,int) ;
 extern int	getnfile(int) ;
 extern int	localsetsystat(cchar *,cchar *,int) ;
 extern int	localsetnetload(cchar *,cchar *,int) ;

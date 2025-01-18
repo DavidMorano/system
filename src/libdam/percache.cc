@@ -1,5 +1,6 @@
 /* percache SUPPORT */
-/* lang=C++20 */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* persistent cache */
 /* version %I% last-modified %G% */
@@ -9,6 +10,17 @@
 
 	= 2004-03-01, David A­D­ Morano
 	This code was originally written.  
+
+	= 2025-01-18, David A­D­ Morano
+	I added the subroutine |percache_getnodename()|.  Why?  I
+	am not sure.  The value does not change very much, if at
+	all (during a single boot-up of the system) so it seemed
+	like a resonable thing to cache.  I was already caching the
+	NIS domain name (which also does not change during a single
+	system boot-up) so it seemed reasonable to add support for
+	caching the 'nodename'.  I also reviewed the code for
+	conformance w/ C++20 (although I am actually compiling
+	now-a-days for C++26).
 
 */
 
@@ -37,20 +49,31 @@
 	<0		error (system-return)
 
 	Note:
-	We need to (should) use the memory allocation subroutines:
+	We need to (should) use the special memory allocation
+	subroutines that are set aside for library use.  These
+	memory-allocation-free subroutines are:
 
 	+ uc_libmalloc(3uc)
 	+ uc_libfree(3uc)
+	+ libmalloc{xx}
 
-	since we deal with data that is persistent across full
-	instances of command executions.  That is: our data stays
-	valid throughout the start and complete exit of a command
-	program.  Therefore normal conventions about what data was
-	allocated and left un-freed do not apply to our dynamic
-	memory usage(s).  To someone looking at this code to add or
-	modify it, it means that these memory allocations are not
-	tracked like normal ones are.  Therefore try not to mess up
-	by creating memory leaks, where there are *none* right now!
+	These subroutines are need when we deal with data that is
+	persistent across full instances of command executions.
+	That is: these subroutine are need when our data stays valid
+	throughout the start and complete exit of a command program.
+	Therefore normal conventions about what data was allocated
+	and left un-freed do not apply to our dynamic memory usage(s).
+	Additionally, ant dynamic data that is allocated and freed
+	in the span of time before we exit back to our callers is
+	allowed to use any allocation mechanism they want.  Why?
+	Because the allocated data is returned (free) before anyone
+	else will actually see it.  That is the key.  We only need
+	to guard against having allocated memory stay around when
+	we return to our callers before we deallocate our allocated
+	data.  To someone looking at this code to add or modify it,
+	it means that these memory allocations are not tracked like
+	normal ones are.  Therefore try not to mess up by creating
+	(magining) memory leaks, where there are *none* right now!
 	Get it?
 
 	Notes:
@@ -118,12 +141,15 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<utmpacc.h>
-#include	<mallocxx.h>
-#include	<getnodename.h>
+#include	<getnodename.h>		/* |getnodename(3uc)| */
+#include	<getnodedomain.h>	/* |getnodedomain(3uc)| */
+#include	<libmallocxx.h>
 #include	<localget.h>
 #include	<strwcpy.h>
 #include	<isnot.h>
@@ -135,6 +161,12 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -143,10 +175,27 @@
 
 /* local structures */
 
+namespace {
+    struct geter {
+	percache	*pcp ;
+	time_t		dt ;
+	cchar		*pr ;
+	cchar		**rpp ;
+	geter(percache *o,time_t t,cc *p,cc **r) noex {
+	    pcp = o ;
+	    dt = t ;
+	    pr = p ;
+	    rpp = r ;
+	} ;
+	int operator () (int) noex ;
+	int getx(int,char *,int) noex ;
+    } ; /* end struct (geter) */
+}
+
 
 /* forward references */
 
-static bool	isNoProcs(int rs) noex ;
+static bool	isNoProcs(int) noex ;
 
 
 /* local variables */
@@ -157,6 +206,7 @@ static constexpr cint	timeouts[] = {
 	(5*3600),	/* btime (boot-time) */
 	20,		/* run-level */
 	5, 		/* nusers */
+	(1*60*60),	/* nodename */
 	(1*60*60),	/* sysdomain */
 	(5*60),		/* netload */
 	(5*60),		/* systat */
@@ -186,11 +236,14 @@ int percache_fini(percache *pcp) noex {
 	if (pcp) {
 	    rs = SR_OK ;
 	    if (pcp->f_initdone) {
-	        if (pcp->sysdomain != nullptr) {
-		    rs1 = uc_libfree(pcp->sysdomain) ;
-		    if (rs >= 0) rs = rs1 ;
-		    pcp->sysdomain = nullptr ;
-	        }
+		for (int i = 0 ; i < pertype_overlast ; i += 1) {
+		    char	*dp = pcp->items[i].data ;
+	            if (dp) {
+		        rs1 = uc_libfree(dp) ;
+		        if (rs >= 0) rs = rs1 ;
+		        pcp->items[i].data = nullptr ;
+	            }
+		} /* end for */
 	        memclear(pcp) ;
 	    } /* end if (was inited) */
 	} /* end if (non-null) */
@@ -205,7 +258,9 @@ int percache_finireg(percache *pcp) noex {
 	if (pcp) {
 	    rs = SR_OK ;
 	    if (pcp->f_init) {
+#ifdef	COMMENT
 	        f = ((! pcp->f_finireg) && (pcp->sysdomain != nullptr)) ;
+#endif
 	        if (f) pcp->f_finireg = true ;
 	    }
 	} /* end if (non-null) */
@@ -219,13 +274,16 @@ int percache_invalidate(percache *pcp) noex {
 	if (pcp) {
 	    rs = SR_OK ;
 	    if (pcp->f_init) {
-	        cint	sz = int(sizeof(PERCACHE_ITEM) * pertype_overlast) ;
+	        cint	sz = (szof(PERCACHE_ITEM) * pertype_overlast) ;
+		for (int i = 0 ; i < pertype_overlast ; i += 1) {
+		    char	*dp = pcp->items[i].data ;
+	            if (dp) {
+		        rs1 = uc_libfree(dp) ;
+		        if (rs >= 0) rs = rs1 ;
+		        pcp->items[i].data = nullptr ;
+	            }
+		} /* end for */
 	        memset(pcp->items,0,sz) ;
-	        if (pcp->sysdomain != nullptr) {
-	            rs1 = uc_libfree(pcp->sysdomain) ;
-	            if (rs >= 0) rs = rs1 ;
-	            pcp->sysdomain = nullptr ;
-	        }
 	    } /* end if (initialized) */
 	} /* end if (non-null) */
 	return rs ;
@@ -340,128 +398,106 @@ int percache_getnusers(percache *pcp,time_t dt) noex {
 }
 /* end subroutine (percache_getnusers) */
 
-int percache_getsysdomain(percache *pcp,time_t dt,cchar **rpp) noex {
-	cint		pt = pertype_sysdomain ;
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	int		len = 0 ;
+int percache_getnodename(percache *pcp,time_t dt,cchar **rpp) noex {
+    	int		rs = SR_FAULT ;
 	if (pcp) {
-	    if ((rs = percache_init(pcp)) >= 0) {
-	        custime		vt = pcp->items[pt].t ;
-	        cint		to = timeouts[pt] ;
-	        len = pcp->items[pt].v ;
-	        if (((dt - vt) > to) || (pcp->sysdomain == nullptr)) {
-	            char	*dbuf{} ;
-		    if ((rs = malloc_hn(&dbuf)) >= 0) {
-	                cint	dlen = rs ;
-		        if (pcp->sysdomain != nullptr) {
-		            uc_libfree(pcp->sysdomain) ;
-		            pcp->sysdomain = nullptr ;
-		        }
-	                if ((rs = getsysdomain(dbuf,dlen)) >= 0) {
-		            char	*bp ;
-		            len = rs ;
-		            if ((rs = uc_libmalloc((len+1),&bp)) >= 0) {
-			        strwcpy(bp,dbuf,len) ;
-		                pcp->sysdomain = bp ;
-	                        pcp->items[pt].t = dt ;
-	    	                pcp->items[pt].v = len ;
-	                    } /* end if (memory-allocation) */
-		        } /* end if (getsysdomain) */
-		        rs1 = uc_free(dbuf) ;
-		        if (rs >= 0) rs = rs1 ;
-		    } /* end if (m-a-f) */
-	        } /* end if (update needed) */
-	        if (rpp) {
-		    *rpp = (rs >= 0) ? pcp->sysdomain : nullptr ;
-	        }
-	    } /* end if (init) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
+    	    geter go(pcp,dt,nullptr,rpp) ;
+	    rs = go(pertype_nodename) ;
+	}
+	return rs ;
+}
+
+int percache_getsysdomain(percache *pcp,time_t dt,cchar **rpp) noex {
+    	int		rs = SR_FAULT ;
+	if (pcp) {
+    	    geter go(pcp,dt,nullptr,rpp) ;
+	    rs = go(pertype_sysdomain) ;
+	}
+	return rs ;
 }
 /* end subroutine (percache_getsysdomain) */
 
 int percache_netload(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
-	cint		pt = pertype_netload ;
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	int		len = 0 ;
-	if (pcp) {
-	    if ((rs = percache_init(pcp)) >= 0) {
-	        custime		vt = pcp->items[pt].t ;
-	        cint		to = timeouts[pt] ;
-	        len = pcp->items[pt].v ;
-	        if (((dt - vt) > to) || (pcp->netload == nullptr)) {
-	            char	*dbuf{} ;
-		    if ((rs = malloc_hn(&dbuf)) >= 0) {
-	                cint	dlen = rs ;
-		        if (pcp->netload != nullptr) {
-		            uc_libfree(pcp->netload) ;
-		            pcp->netload = nullptr ;
-		        }
-	                if ((rs = localgetnetload(pr,dbuf,dlen)) >= 0) {
-		            char	*bp ;
-		            len = rs ;
-		            if ((rs = uc_libmalloc((len+1),&bp)) >= 0) {
-			        strwcpy(bp,dbuf,len) ;
-		                pcp->netload = bp ;
-	                        pcp->items[pt].t = dt ;
-	    	                pcp->items[pt].v = len ;
-	                    } /* end if (memory-allocation) */
-		        } /* end if (localgetnetload) */
-		        rs1 = uc_free(dbuf) ;
-		        if (rs >= 0) rs = rs1 ;
-		    } /* end if (m-a-f) */
-	        } /* end if (update needed) */
-	        if (rpp) {
-		    *rpp = (rs >= 0) ? pcp->netload : nullptr ;
-	        }
-	    } /* end if (init) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
+    	int		rs = SR_FAULT ;
+	if (pcp && pr) {
+    	    geter go(pcp,dt,pr,rpp) ;
+	    rs = go(pertype_netload) ;
+	}
+	return rs ;
 }
 /* end subroutine (percache_netload) */
 
 int percache_systat(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
-	cint		pt = pertype_systat ;
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	int		len = 0 ;
-	if (pcp) {
-	    if ((rs = percache_init(pcp)) >= 0) {
-	        custime		vt = pcp->items[pt].t ;
-	        cint		to = timeouts[pt] ;
-	        len = pcp->items[pt].v ;
-	        if (((dt - vt) > to) || (pcp->systat == nullptr)) {
-	            char	*dbuf{} ;
-		    if ((rs = malloc_hn(&dbuf)) >= 0) {
-		        cint	dlen = rs ;
-		        if (pcp->systat != nullptr) {
-		            uc_libfree(pcp->systat) ;
-		            pcp->systat = nullptr ;
-		        }
-	                if ((rs = localgetsystat(pr,dbuf,dlen)) >= 0) {
-		            char	*bp ;
-			    len = rs ;
-		            if ((rs = uc_libmalloc((len+1),&bp)) >= 0) {
-			        strwcpy(bp,dbuf,len) ;
-		                pcp->systat = bp ;
-	                        pcp->items[pt].t = dt ;
-	    	                pcp->items[pt].v = len ;
-	                    } /* end if (memory-allocation) */
-		        } /* end if (localgetsystat) */
-		        rs1 = uc_free(dbuf) ;
-		        if (rs >= 0) rs = rs1 ;
-		    } /* end if (m-a-f) */
-	        } /* end if (update needed) */
-	        if (rpp) {
-		    *rpp = (rs >= 0) ? pcp->systat : nullptr ;
-	        }
-	    } /* end if (init) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
+    	int		rs = SR_FAULT ;
+	if (pcp && pr) {
+    	    geter go(pcp,dt,pr,rpp) ;
+	    rs = go(pertype_systat) ;
+	}
+	return rs ;
 }
 /* end subroutine (percache_systat) */
+
+
+/* local subroutines */
+
+int geter::operator () (int pt) noex {
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	if ((rs = percache_init(pcp)) >= 0) {
+	    custime	vt = pcp->items[pt].t ;
+	    cint	to = timeouts[pt] ;
+	    char	*dp = pcp->items[pt].data ;
+	    len = pcp->items[pt].v ;
+	    if (((dt - vt) > to) || (dp == nullptr)) {
+	        if (char *dbuf ; (rs = libmalloc_nn(&dbuf)) >= 0) {
+	            cint	dlen = rs ;
+		    if (dp) {
+		        uc_libfree(dp) ;
+		        pcp->items[pt].data = nullptr ;
+		    }
+	            if ((rs = getx(pt,dbuf,dlen)) >= 0) {
+		        char	*bp ;
+		        len = rs ;
+		        if ((rs = uc_libmalloc((len+1),&bp)) >= 0) {
+			    strwcpy(bp,dbuf,len) ;
+		            pcp->items[pt].data = bp ;
+	                    pcp->items[pt].t = dt ;
+		            pcp->items[pt].v = len ;
+	                } /* end if (memory-allocation) */
+		    } /* end if (getsysdomain) */
+		    rs1 = uc_libfree(dbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (update needed) */
+	    if (rpp) {
+		*rpp = (rs >= 0) ? pcp->items[pt].data : nullptr ;
+	    }
+	} /* end if (init) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end method (geter::operator) */
+
+/* this (below) kind-of serves as our "virtual" function w/o the b*llsh*t */
+int geter::getx(int pt,char *dbuf,int dlen) noex {
+    	int		rs = SR_BUGCHECK ;
+	switch (pt) {
+	case pertype_nodename:
+	    rs = getnodename(dbuf,dlen) ;
+	    break ;
+	case pertype_sysdomain:
+	    rs = getsysname(dbuf,dlen) ;
+	    break ;
+	case pertype_netload:
+	    rs = localgetnetload(pr,dbuf,dlen) ;
+	    break ;
+	case pertype_systat:
+	    rs = localgetsystat(pr,dbuf,dlen) ;
+	    break ;
+	} /* end switch */
+	return rs ;
+}
+/* end method (geter::getx) */
 
 static bool isNoProcs(int rs) noex {
 	bool		f = false ;

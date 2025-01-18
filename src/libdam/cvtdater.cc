@@ -91,7 +91,7 @@ int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 		    rs = tmz_setday(&stz,ds.y,ds.m,ds.d) ;
 	        }
 	    } else {
-	        rs = tmz_day(&stz,cp,cl) ;
+	        rs = tmz_xday(&stz,cp,cl) ;
 	    }
 	    if (rs >= 0) {
 	        TMTIME	tmt ;
@@ -107,7 +107,7 @@ int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 		        }
 		    }
 	        } /* end if (ok) */
-	    } /* end if (tmz_day) */
+	    } /* end if (tmz_xday) */
 	} /* end if (non-null) */
 	return rs ;
 }

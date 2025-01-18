@@ -13,28 +13,33 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<string.h>		/* |memset(3c)| + |memcpy(3c)| */
-#include	<stdint.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<stdintx.h>
 
 
 #ifndef	SUBROUTINE_MEMCLEAR
 #define	SUBROUTINE_MEMCLEAR
-EXTERNC_begin
-extern int memclear(void *,size_t) noex ;
-EXTERNC_end
+#ifdef	__cplusplus
+constexpr inline int memclear(void *objp,size_t objs) noex {
+    	memset(objp,0,objs) ;
+	return int(objs) ;
+}
+#else /* __cplusplus */
+static inline int memclear(void *objp,size_t objs) noex {
+    	memset(objp,0,objs) ;
+	return int(objs) ;
+}
+#endif /* __cplusplus */
 #endif /* SUBROUTINE_MEMCLEAR */
 
 #ifndef	TEMPLATE_MEMCLEAR
 #define	TEMPLATE_MEMCLEAR
 #ifdef	__cplusplus
 template<typename T>
-inline int memclear(T *op) noex {
+constexpr inline int memclear(T *op) noex {
 	csize	osz = szof(T) ;
 	return memclear(op,osz) ;
 }
@@ -45,7 +50,7 @@ inline int memclear(T *op) noex {
 #define	TEMPLATE_MEMCPY
 #ifdef	__cplusplus
 template<typename T>
-inline void *memcpy(T *dp,cvoid *sp) noex {
+constexpr inline void *memcpy(T *dp,cvoid *sp) noex {
 	csize	dsz = szof(T) ;
 	return memcpy(dp,sp,dsz) ;
 }

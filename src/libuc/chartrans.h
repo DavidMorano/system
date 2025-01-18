@@ -14,6 +14,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<stddef.h>
+#include	<stdlib.h>
 #include	<uiconv.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -46,7 +47,7 @@ struct chartrans_head {
 	CHARTRANS_SET	*sets ;
 	cchar		*pr ;
 	void		*utf8decoder ;
-	CHARTRANS_FL	f ;
+	CHARTRANS_FL	fl ;
 	uint		magic ;
 	int		nmax ;
 	int		nsets ;

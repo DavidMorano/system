@@ -36,18 +36,48 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
+#include	<limits.h>		/* |UCHAR_MAX| */
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
 #include	"mkchar.h"
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
 #ifndef	MKCHAR_STATICINLINE
 inline int mkchar(int ch) noex {
-	return (ch & 255) ;
+	return (ch & UCHAR_MAX) ;
 }
 /* end subroutine (mkchar) */
 #endif /* MKCHAR_STATICINLINE */
