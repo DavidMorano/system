@@ -13,10 +13,11 @@
 
 	= 2025-01-18, David A­D­ Morano
 	I added the subroutine |percache_getnodename()|.  Why?  I
-	am not sure.  The value does not change very much, if at
-	all (during a single boot-up of the system) so it seemed
-	like a resonable thing to cache.  I was already caching the
-	NIS domain name (which also does not change during a single
+	am not sure.  There was no existing requirement for this
+	addition.  The value does not change very much, if at all
+	(during a single boot-up of the system), so it seemed like
+	a resonable thing to cache.  I was already caching the NIS
+	domain name (which also does not change during a single
 	system boot-up) so it seemed reasonable to add support for
 	caching the 'nodename'.  I also reviewed the code for
 	conformance w/ C++20 (although I am actually compiling
@@ -178,9 +179,9 @@
 namespace {
     struct geter {
 	percache	*pcp ;
-	time_t		dt ;
 	cchar		*pr ;
 	cchar		**rpp ;
+	time_t		dt ;
 	geter(percache *o,time_t t,cc *p,cc **r) noex {
 	    pcp = o ;
 	    dt = t ;
@@ -417,7 +418,7 @@ int percache_getsysdomain(percache *pcp,time_t dt,cchar **rpp) noex {
 }
 /* end subroutine (percache_getsysdomain) */
 
-int percache_netload(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
+int percache_getnetload(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
 	if (pcp && pr) {
     	    geter go(pcp,dt,pr,rpp) ;
@@ -425,9 +426,9 @@ int percache_netload(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 	}
 	return rs ;
 }
-/* end subroutine (percache_netload) */
+/* end subroutine (percache_getnetload) */
 
-int percache_systat(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
+int percache_getsystat(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
 	if (pcp && pr) {
     	    geter go(pcp,dt,pr,rpp) ;
@@ -435,7 +436,7 @@ int percache_systat(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 	}
 	return rs ;
 }
-/* end subroutine (percache_systat) */
+/* end subroutine (percache_getsystat) */
 
 
 /* local subroutines */
