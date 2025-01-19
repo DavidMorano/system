@@ -58,9 +58,9 @@ cchar *bufsizenames[] = {
 	[getbufsize_ho] = "HO",		/* host-ent */
 	[getbufsize_sv] = "SV",		/* service-ent */
 	[getbufsize_fs] = "FS",		/* filesystem-type */
-	[getbufsize_zn] = "ZN",		/* zone-name (from Zone-Info) */
-	[getbufsize_za] = "ZA",		/* zone-name abbreviation */
-	[getbufsize_mailaddr] = "MAILADDR",	/* page-size */
+	[getbufsize_zn] = "ZN",		/* time-zone-name abbreviation */
+	[getbufsize_zi] = "ZI",		/* zone-info-name (newer concept) */
+	[getbufsize_mailaddr] = "MAILADDR",	/* mail-address */
 	nullptr
 } ; /* end array (bufsizenames) */
 

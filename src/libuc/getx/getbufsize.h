@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	getbufsize
+
+	Description:
 	This file provides the interface for retrieving system
 	buffer sizes.  These sizes are determined dynamically at
 	run-time but are otherwise expected to remain constant for

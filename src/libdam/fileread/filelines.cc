@@ -119,7 +119,7 @@ int filelines(cchar *fn) noex {
 
 /* local subroutines */
 
-static int liner(int fd,size_t ms) noex {
+static int liner(int fd,csize ms) noex {
 	cint		mp = PROT_READ ;
 	cint		mf = MAP_SHARED ;
 	int		rs ;

@@ -1,4 +1,4 @@
-/* getdefzinfo HEADER */
+/* getdefzdata HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -8,8 +8,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	GETDEFZINFO_INCLUDE
-#define	GETDEFZINFO_INCLUDE
+#ifndef	GETDEFZDATA_INCLUDE
+#define	GETDEFZDATA_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -20,23 +20,23 @@
 #include	<usysrets.h>
 
 
-#define	DEFZINFO		struct defzinfo_head
+#define	DEFZDATA		struct defzdata_head
 
 
-struct defzinfo_head {
+struct defzdata_head {
 	int	zoff  ;		/* minutes west of GMT */
 	int	isdst ;		/* is-dst flag */
 } ;
 
-typedef DEFZINFO	defzinfo ;
+typedef DEFZDATA	defzdata ;
 
 EXTERNC_begin
 
-extern int	getdefzinfo(defzinfo *,char *,int,int) noex ;
+extern int	getdefzdata(defzdata *,char *,int,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* GETDEFZINFO_INCLUDE */
+#endif /* GETDEFZDATA_INCLUDE */
 
 

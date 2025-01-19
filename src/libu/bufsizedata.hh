@@ -43,6 +43,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>		/* |_SC_xx| */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<bufsizenames.h>
 
@@ -76,6 +78,9 @@
 #endif
 #ifndef	_SC_TZNAME_MAX
 #define	_SC_TZNAME_MAX		-1
+#endif
+#ifndef	_SC_ZONEINFO_MAX
+#define	_SC_ZONEINFO_MAX	-1
 #endif
 
 
@@ -170,14 +175,15 @@ constexpr bufsizedata::bufsizedata() noex {
 	        break ;
 	    case getbufsize_fs:
 	        ip->name = _SC_FSTYPE ;
-		ip->defval = FSBUFLEN ;		/* service-buf */
+		ip->defval = FSBUFLEN ;		/* filesystem-name-buf */
 	        break ;
 	    case getbufsize_zn:
 	        ip->name = _SC_TZNAME_MAX ;
 		ip->defval = ZNBUFLEN ;
 	        break ;
-	    case getbufsize_za:
-		ip->defval = 8 ;		/* common value */
+	    case getbufsize_zi:
+	        ip->name = _SC_ZONEINFO_MAX ;
+		ip->defval = ZIBUFLEN ;		/* common value */
 	        break ;
 	    case getbufsize_mailaddr:
 		ip->defval = -1 ;		/* no default size */

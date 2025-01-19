@@ -734,15 +734,18 @@ calmgr.o:		calmgr.cc calmgr.h
 cvtdater.o:		cvtdater.cc cvtdater.h
 sysnamedb.o:		sysnamedb.cc sysnamedb.h
 dirdb.o:		dirdb.cc dirdb.h
-
-textlook.o:		textlook.cc textlook.h
-searchkeys.o:		searchkeys.cc searchkeys.h
-xwords.o:		xwords.cc xwords.h
-rtags.o:		rtags.cc rtags.h
 cgi.o:			cgi.cc cgi.h
 termenq.o:		termenq.cc termenq.h
 ds.o:			ds.cc ds.h
 dw.o:			dw.cc dw.h
+nodesfile.o:		nodesfile.cc nodesfile.h
+nodesearch.o:		nodesearch.cc nodesearch.h
+
+# TEXT related
+textlook.o:		textlook.cc textlook.h
+searchkeys.o:		searchkeys.cc searchkeys.h
+xwords.o:		xwords.cc xwords.h
+rtags.o:		rtags.cc rtags.h
 
 # DATABASE
 database.o:		database.dir

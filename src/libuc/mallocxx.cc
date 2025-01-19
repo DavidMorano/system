@@ -39,6 +39,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<sysval.hh>
@@ -156,13 +158,13 @@ int malloc_fs(char **rpp) noex {
 	cint	w = getbufsize_fs ;
 	return uc_mallocsys(w,rpp) ;
 }
-int malloc_za(char **rpp) noex {
+int malloc_zn(char **rpp) noex {
 	cint	w = getbufsize_zn ;
 	return uc_mallocsys(w,rpp) ;
 }
 
-int malloc_za(char **rpp) noex {
-	cint	w = getbufsize_za ;
+int malloc_zi(char **rpp) noex {
+	cint	w = getbufsize_zi ;
 	return uc_mallocsys(w,rpp) ;
 }
 
@@ -171,8 +173,7 @@ int malloc_ps(char **rpp) noex {
 	int		sz = 0 ;
 	if (rpp) {
 	    if ((rs = pagesize) > 0) {
-		sz = pagesize ;
-	        rs = uc_valloc((sz+1),rpp) ;
+	        rs = uc_valloc((rs + 1),rpp) ;
 	    } else if (rs <= 0) {
 		*rpp = nullptr ;
 		if (rs >= 0) rs = SR_NOSYS ;

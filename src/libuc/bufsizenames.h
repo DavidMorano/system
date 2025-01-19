@@ -58,8 +58,8 @@ enum getbufsizes {
 	getbufsize_ho,		/* host-ent */
 	getbufsize_sv,		/* service-ent */
 	getbufsize_fs,		/* filesystem-type */
-	getbufsize_zn,		/* zone-name (from Zone-Info) */
-	getbufsize_za,		/* zone-name abbreviation */
+	getbufsize_zn,		/* time-zone-name (common abbreviated form) */
+	getbufsize_zi,		/* zone-info-name (newer concept) */
 	getbufsize_mailaddr,	/* mail-addr */
 	getbufsize_overlast
 } ; /* end enum (getbufsizes) */

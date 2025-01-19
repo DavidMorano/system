@@ -122,6 +122,7 @@ namespace {
 	int retrieve(int) noex ;
 	int sysbs(int,int) noex ;
 	int def(int) noex ;
+	int zoneinfo(int) noex ;
 	int mailaddr(int) noex ;
     public:
 	int		bs[getbufsize_overlast] ; /* Buffer-Size */
@@ -289,6 +290,9 @@ int ubufsize::def(int w) noex {
     	    bs[w] = (defval) ? defval : GETBUFSIZE_DEFVAL ;
 	} else {
 	    switch (w) {
+	    case getbufsize_zi:
+		rs = zoneinfo(w) ;
+		break ;
 	    case getbufsize_mailaddr:
 		rs = mailaddr(w) ;
 	        break ;
@@ -300,6 +304,16 @@ int ubufsize::def(int w) noex {
 	return rs ;
 }
 /* end method (ubufsize::def) */
+
+/* yes; I call myself recursively - repeatedly (deal with it) */
+int ubufsize::zoneinfo(int w) noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	    bs[w] = rs ;
+	}
+	return rs ;
+}
+/* end method (ubufsize::zoneinfo) */
 
 /* yes; I call myself recursively - repeatedly (deal with it) */
 int ubufsize::mailaddr(int w) noex {

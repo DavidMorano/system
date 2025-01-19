@@ -178,6 +178,17 @@ enum extrasysconfs {
 #define	TIME_MAX	LONG_MAX
 #endif
 
+/* some stuff that not all systems (like Linux) have */
+
+/* max-namelen */
+#ifndef	MAXNAMELEN
+#ifdef	NAME_MAX
+#define	MAXNAMELEN	NAME_MAX
+#else
+#define	MAXNAMELEN	256		/* common value */
+#endif
+#endif /* MAXNAMELEN */
+
 /* arguments (and environment) */
 #ifndef	ARBUFLEN
 #ifdef	ARG_MAX
@@ -308,32 +319,6 @@ enum extrasysconfs {
 #define	SVBUFLEN	256
 #endif
 
-/* filesystem-type buffer length */
-#ifndef	FSBUFLEN
-#ifdef	MFSNAMELEN
-#define	FSBUFLEN	MFSNAMELEN
-#else
-#ifdef	MFSTYPENAMELEN
-#define	FSBUFLEN	(MFSTYPENAMELEN-1) /* Apple-Darwin value */
-#else
-#ifdef	_ST_FSTYPSZ
-#define	FSBUFLEN	_ST_FSTYPSZ	/* Sun-Solaris value */
-#else
-#define	FSBUFLEN	15		/* Apple-Darwin value */
-#endif
-#endif
-#endif
-#endif
-
-/* zone-name (from Zone-Info) */
-#ifndef	ZNBUFLEN
-#ifdef	TZNAME_MAX
-#define	ZNBUFLEN	TZNAME_MAX
-#else
-#define	ZNBUFLEN	20		/* POSIX®-2 value */
-#endif
-#endif
-
 #ifndef	NODENAMELEN
 #ifdef	SYS_NMLN
 #define	NODENAMELEN	(SYS_NMLN-1)	/* usually 256 for SVR4! */
@@ -373,6 +358,41 @@ enum extrasysconfs {
 #else
 #define	LOGNAMELEN	32
 #endif
+#endif
+
+/* filesystem-type buffer length */
+#ifndef	FSBUFLEN
+#ifdef	MFSNAMELEN
+#define	FSBUFLEN	MFSNAMELEN
+#else
+#ifdef	MFSTYPENAMELEN
+#define	FSBUFLEN	(MFSTYPENAMELEN-1) /* Apple-Darwin value */
+#else
+#ifdef	_ST_FSTYPSZ
+#define	FSBUFLEN	_ST_FSTYPSZ	/* Sun-Solaris value */
+#else
+#define	FSBUFLEN	15		/* Apple-Darwin value */
+#endif
+#endif
+#endif
+#endif
+
+/* time-zone-name (this is the abbreviated time-zone from time immemorial) */
+#ifndef	ZNBUFLEN
+#ifdef	TZNAME_MAX
+#define	ZNBUFLEN	TZNAME_MAX
+#else
+#ifdef	_POSIX_TZNAME_MAX
+#define	ZNBUFLEN	_POSIX_TZNAME_MAX	/* POSIX®-2012 value */
+#else
+#define	ZNBUFLEN	6			/* POSIX®-2 value */
+#endif /* _POSIX_TZNAME_MAX */
+#endif /* TZNAME_MAX */
+#endif /* ZNBUFLEN */
+
+/* zone-info-name (from Zone-Info; a newer concept) */
+#ifndef	ZIBUFLEN
+#define	ZIBUFLEN	MAXNAMELEN	/* what some others have suggested */
 #endif
 
 #ifndef	PASSWORDLEN

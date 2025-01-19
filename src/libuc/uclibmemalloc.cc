@@ -69,7 +69,7 @@ namespace {
     typedef int (uclibmemalloc::*uclibmalloc_m)(int,void *) noex ;
     struct uclibmemalloc {
 	uclibmalloc_m	m ;
-	cvoid		*cp ;
+	cvoid		*cp ;		/* constant-void-pointer */
 	uclibmemalloc(cvoid *op = nullptr) noex : cp(op) { } ;
 	int operator () (int,void *) noex ;
 	int stdmalloc(int,void *) noex ;
@@ -93,9 +93,8 @@ namespace {
 int uc_libmallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rpp) {
-	    char	*bp{} ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = uc_libmalloc((sl+1),&bp)) >= 0) {
+	    if (char *bp ; (rs = uc_libmalloc((sl+1),&bp)) >= 0) {
 	        *rpp = bp ;
 	        strncpy(bp,sp,sl) ;
 	        bp[sl] = '\0' ;
@@ -113,9 +112,8 @@ int uc_libmallocsys(int w,char **rpp) noex {
 	if (rpp) {
 	    *rpp = nullptr ;
 	    if ((rs = getbufsize(w)) >= 0) {
-	        char	*bp{} ;
 		rl = rs ;
-	        if ((rs = uc_libmalloc((rl+1),&bp)) >= 0) {
+	        if (char *bp ; (rs = uc_libmalloc((rl+1),&bp)) >= 0) {
 	            *rpp = bp ;
 	        } /* end if */
 	    } /* end if (getbufsize) */
@@ -231,7 +229,7 @@ int uclibmemalloc::operator () (int sz,void *vp) noex {
 int uclibmemalloc::stdmalloc(int sz,void *vp) noex {
 	csize		msize = size_t(sz) ;
 	int		rs ;
-	void		**rpp = (void **) vp ;
+	void		**rpp = voidpp(vp) ;
 	errno = 0 ;
 	if (void *rp ; (rp = malloc(msize)) != nullptr) {
 	    rs = sz ;
@@ -247,7 +245,7 @@ int uclibmemalloc::stdmalloc(int sz,void *vp) noex {
 int uclibmemalloc::stdvalloc(int sz,void *vp) noex {
 	csize		msize = size_t(sz) ;
 	int		rs ;
-	void		**rpp = (void **) vp ;
+	void		**rpp = voidpp(vp) ;
 	errno = 0 ;
 	if (void *rp ; (rp = valloc(msize)) != nullptr) {
 	    rs = sz ;
@@ -262,8 +260,8 @@ int uclibmemalloc::stdvalloc(int sz,void *vp) noex {
 
 int uclibmemalloc::stdrealloc(int sz,void *vp) noex {
 	csize		msize = size_t(sz) ;
-	void		*fvp = voidp(cp) ;
-	void		**rpp = (void **) vp ;
+	void		*fvp = cast_const<voidp>(cp) ;
+	void		**rpp = voidpp(vp) ;
 	int		rs ;
 	errno = 0 ;
 	if (void *rp ; (rp = realloc(fvp,msize)) != nullptr) {

@@ -1,4 +1,6 @@
-/* main */
+/* main SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UTMP program */
 /* version %I% last-modified %G% */
@@ -23,23 +25,20 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ utmp [-y|-n] [-h <hostname>]
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
 #include	<utmpx.h>
 #include	<netdb.h>
 

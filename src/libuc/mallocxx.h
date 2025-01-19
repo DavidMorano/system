@@ -57,8 +57,8 @@ extern int malloc_nw(char **) noex ;		/* NW object */
 extern int malloc_ho(char **) noex ;		/* HO object */
 extern int malloc_sv(char **) noex ;		/* SV object */
 extern int malloc_fs(char **) noex ;		/* FS type */
-extern int malloc_zn(char **) noex ;		/* TZ name */
-extern int malloc_za(char **) noex ;		/* ZA zone-abbreviation */
+extern int malloc_zn(char **) noex ;		/* TZ name abbreviation */
+extern int malloc_zi(char **) noex ;		/* zone-info name (Zone-Info) */
 extern int malloc_mailaddr(char **) noex ;	/* mail address */
 
 EXTERNC_end

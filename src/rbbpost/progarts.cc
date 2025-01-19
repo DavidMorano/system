@@ -1693,7 +1693,7 @@ PROCDATA	*pdp ;
 	        dater	*edp ;
 	        cint	n = (rs-1) ;
 	        if ((rs = article_getenvdate(aip,n,&edp)) >= 0) {
-		    if (char *zn ; (rs = malloc_za(&zn)) >= 0) {
+		    if (char *zn ; (rs = malloc_zn(&zn)) >= 0) {
 		        dater_zi zi ; 
 		        if ((rs = dater_zinfoget(edp,&zi,zn,zl)) >= 0) {
 		            rs = dater_zinfoset(tdp,&zi,zn,rs) ;
@@ -3498,20 +3498,21 @@ int		vl ;
 	                proglog_printf(pip,"  date=%s",dbuf) ;
 		    }
 	            if (pip->open.logzone) {
-			if (char *zbuf ; (rs = malloc_za(&zbuf)) >= 0) {
-			    cint	zlen = rs ;
-	                    if ((rs1 = dater_getzonename(tdp,zbuf,zlen)) >= 0) {
+			if (char *znbuf ; (rs = malloc_zn(&znbuf)) >= 0) {
+			    auto 	getzname = dater_getzonename ;
+			    cint	znlen = rs ;
+	                    if ((rs1 = getzname(tdp,znbuf,znlen)) >= 0) {
 	                        int	zoff ;
 
 	                	rs2 = dater_getzoneoff(tdp,&zoff) ;
 	                        if (rs2 < 0)
 	                            zoff = LOGZONES_NOZONEOFFSET ;
     
-	                        rs = logzones_update(&pip->lz,zbuf,zlen,
+	                        rs = logzones_update(&pip->lz,znbuf,znlen,
 	                            zoff,pip->stamp) ;
 
 	                } /* end if */
-			    rs = rsfree(rs,zbuf) ;
+			    rs = rsfree(rs,znbuf) ;
 			} /* end if (m-a-f) */
 	            } /* end if (logging time-zone information) */
 

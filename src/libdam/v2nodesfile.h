@@ -34,27 +34,37 @@
 #include	<fcntl.h>		/* |ino_t| + |dev_t| */
 #include	<time.h>		/* |time_t| */
 #include	<usystem.h>
-#include	<vechand.h>
 #include	<hdb.h>
 
 
-#define	NODESFILE		struct nodesfile_head
-#define	NODESFILE_CUR		struct nodesfile_cursor
-#define	NODESFILE_MAGIC 	0x17464148
-#define	NODESFILE_MAXSZ		(500 *1024)
+#define	NODESFILE	struct nodesfile_head
+#define	NODESFILE_CUR	struct nodesfile_cursor
+#define	NODESFILE_FINFO	struct nodesfile_finfo
 
 
 struct nodesfile_cursor {
 	hdb_cur		*hcp ;
 } ;
 
+struct nodesfile_finfo {
+	cchar		*fname ;
+	ino_t		ino ;
+	dev_t		dev ;
+	time_t		timod ;
+	int		oflags ;
+} ;
+
 struct nodesfile_head {
-    	vechand		*flp ;			/* file-list-pointer */
-	hdb		*nlp ;			/* name-list-pointer */
+	char		*mapbuf ;
+	hdb		*nlp ;
 	time_t		ti_check ;
 	time_t		ti_load ;
-	uint		magic ;
-	int		maxsz ;
+	NODESFILE_FINFO	fi ;
+	uint		pagesize ;
+	uint		mapsize ;
+	uint		filesize ;
+	uint		maxsize ;
+	uint		len ;
 } ;
 
 typedef NODESFILE	nodesfile ;

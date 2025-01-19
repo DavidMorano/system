@@ -140,12 +140,12 @@
 
 /* local defines */
 
-#define	HDB_PRBUFLEN		20
-#define	HDB_D			DAT
+#define	HDB_PRBUFLEN	20
+#define	HDB_D		DAT
 
-#define	DAT			hdb_datum
-#define	ENT			hdb_ent
-#define	CUR			hdb_cur
+#define	DAT		hdb_datum
+#define	ENT		hdb_ent
+#define	CUR		hdb_cur
 
 
 /* imported namespaces */

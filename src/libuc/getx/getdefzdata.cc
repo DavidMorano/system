@@ -1,4 +1,4 @@
-/* getdefzinfo SUPPORT */
+/* getdefzdata SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,10 +18,23 @@
 /*******************************************************************************
 
 	Name:
-	getdefzinfo
+	getdefzdata
 
 	Description:
-	We return some default time-zone information.
+	We return some default time-zone data (name and other).
+
+	Sysnopsis:
+	int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex
+
+	Arguments:
+	zip		DEFZDATA object pointer
+	zbuf		time-zone-name abbreviation result buffer pointer
+	zlen		time-zone-name abbreviation result buffer length
+	isdst		is-daylight-savings-time value
+
+	Returns:
+	>=0		length of result buffer
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -36,7 +49,7 @@
 #include	<altzone.h>
 #include	<localmisc.h>
 
-#include	"getdefzinfo.h"
+#include	"getdefzdata.h"
 
 
 /* local defines */
@@ -56,7 +69,7 @@
 
 /* local variables */
 
-static bufsizevar	zalen(getbufsize_za) ;
+static bufsizevar	znlen(getbufsize_zn) ;	/* time-zone-name (abbr) */
 
 constexpr bool		f_darwin = F_DARWIN ;
 
@@ -66,7 +79,7 @@ constexpr bool		f_darwin = F_DARWIN ;
 
 /* exported subroutines */
 
-int getdefzinfo(defzinfo *zip,char *zbuf,int zlen,int isdst) noex {
+int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 	int		rs = SR_FAULT ;
 	int		znl = 0 ;
 	if (zip && zbuf) {
@@ -88,7 +101,7 @@ int getdefzinfo(defzinfo *zip,char *zbuf,int zlen,int isdst) noex {
 		}
 	    } /* end if_constexpr (f_darwin) */
 	    if ((rs >= 0) && zp) {
-		if ((rs = zalen) >= 0) {
+		if ((rs = znlen) >= 0) {
 	            rs = snwcpy(zbuf,zlen,zp,rs) ;
 		    znl = rs ;
 		}
@@ -96,6 +109,6 @@ int getdefzinfo(defzinfo *zip,char *zbuf,int zlen,int isdst) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? znl : rs ;
 }
-/* end subroutine (getdefzinfo) */
+/* end subroutine (getdefzdata) */
 
 

@@ -93,7 +93,7 @@
 	data strctures after all! Enjoy!
 
 	Synopsis:
-	int hdb_start(hdb *op,int n,int at,hsbhas_f h,hsbcmp_f c) noex
+	int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex
 
 	Arguments:
 	op		object pointer
@@ -141,19 +141,17 @@
 
 /* local defines */
 
-#define HDB_MAGICBAD(op)	((op)->magic == HDB_MAGIC)
-#define HDB_MAGICGOOD(op)	((op)->magic == HDB_MAGIC)
-#define	HDB_PRBUFLEN		20
-#define	HDB_D			DAT
-#define HDB_KE			struct hdb_ke
-#define HDB_VE			struct hdb_ve
+#define	HDB_PRBUFLEN	20
+#define	HDB_D		DAT
+#define HDB_KE		hdb_ke
+#define HDB_VE		hdb_ve
 
-#define	DAT			hdb_datum
-#define	ENT			hdb_ent
-#define	CUR			hdb_cur
+#define	DAT		hdb_datum
+#define	ENT		hdb_ent
+#define	CUR		hdb_cur
 
-#define	ENTRYINFO		struct entryinfo
-#define	FETCUR			struct fetchcur
+#define	ENTRYINFO	entryinfo
+#define	FETCUR		fetchcur
 
 
 /* imported namespaces */

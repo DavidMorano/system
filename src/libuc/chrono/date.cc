@@ -88,7 +88,7 @@
 
 /* local variables */
 
-static bufsizevar		zalen(getbufsize_za) ;
+static bufsizevar		znlen(getbufsize_zn) ;
 
 
 /* exported variables */
@@ -100,23 +100,23 @@ int date_start(date *op,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    memclear(op) ;
-	    if ((rs = zalen) >= 0) {
-	        if (char *a ; (rs = malloc_za(&a)) >= 0) {
-		    a[zalen] = '\0' ;
+	    if ((rs = znlen) >= 0) {
+	        if (char *a ; (rs = malloc_zn(&a)) >= 0) {
+		    a[znlen] = '\0' ;
 		    op->zname = a ;
 	            op->time = t ;
 	            op->zoff = zoff ;
 	            op->isdst = isdst ;
 		    if (zbuf) {
 		        char *zp = op->zname ;
-	                rs = (strnwcpy(zp,zalen,zbuf,zlen) - zp) ;
+	                rs = (strnwcpy(zp,znlen,zbuf,zlen) - zp) ;
 		    }
 		    if (rs < 0) {
 		        uc_free(op->zname) ;
 		        op->zname = nullptr ;
 		    }
 	        } /* end if (memory-allocation) */
-	    } /* end if (zalen) */
+	    } /* end if (znlen) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -142,7 +142,7 @@ int date_setzname(date *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) {
 	    char	*zp = op->zname ;
-	    rs = (strnwcpy(zp,zalen,sp,sl) - zp) ;
+	    rs = (strnwcpy(zp,znlen,sp,sl) - zp) ;
 	}
 	return rs ;
 }

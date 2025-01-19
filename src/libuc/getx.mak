@@ -56,7 +56,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ00= getaddr.o getaf.o getarchitecture.o getbufsize.o
-OBJ01= getcols.o getdefzinfo.o getdig.o geteaddrinfo.o
+OBJ01= getcols.o getdefzdata.o getdig.o geteaddrinfo.o
 OBJ02= getenver.o getev.o getfdfile.o
 OBJ03= gethz.o getmailgid.o getmjd.o
 OBJ04= getnfile.o getngroups.o getnodedomain.o
@@ -187,7 +187,7 @@ getaf.o:		getaf.cc		getaf.h			$(INCS)
 getarchitecture.o:	getarchitecture.cc	getarchitecture.h	$(INCS)
 getbufsize.o:		getbufsize.cc		getbufsize.h		$(INCS)
 getcols.o:		getcols.cc		getcols.h		$(INCS)
-getdefzinfo.o:		getdefzinfo.cc		getdefzinfo.h		$(INCS)
+getdefzdata.o:		getdefzdata.cc		getdefzdata.h		$(INCS)
 getdig.o:		getdig.cc		getdig.h		$(INCS)
 geteaddrinfo.o:		geteaddrinfo.cc		geteaddrinfo.h		$(INCS)
 getenver.o:		getenver.cc		getenver.h		$(INCS)

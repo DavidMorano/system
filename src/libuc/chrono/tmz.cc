@@ -114,7 +114,7 @@
 
 namespace {
     struct vars {
-	int		zalen ;
+	int		znlen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
 }
@@ -131,7 +131,7 @@ static int tmz_ctor(tmz *op,Args ... args) noex {
     	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
 	        if (op->zname == nullptr) {
-	            if (char *a ; (rs = malloc_za(&a)) >= 0) {
+	            if (char *a ; (rs = malloc_zn(&a)) >= 0) {
 		        op->zname = a ;
 		        memclear(a,rs) ;
 		        a[rs] = '\0' ;
@@ -225,7 +225,7 @@ int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 	        sl -= rs ;
 	    } /* end for */
 	    if (rs >= 0) {
-		cint	znl = var.zalen ;
+		cint	znl = var.znlen ;
 	        rs = strnlen(op->zname,znl) ;
 	    }
 	    if (rs < 0) {
@@ -281,7 +281,7 @@ int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 	        sl -= rs ;
 	    }
 	    if (rs >= 0) {
-		cint	znl = var.zalen ;
+		cint	znl = var.znlen ;
 	        rs = strnlen(op->zname,znl) ;
 	        zl = rs ; /* return value for subroutine */
 	    }
@@ -478,7 +478,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	        if ((rs >= 0) && (cl > 0)) {
 	            cint	ch = mkchar(*cp) ;
 	            if (isalphalatin(ch)) {
-		        cint	znl = var.zalen ;
+		        cint	znl = var.znlen ;
 	                rs = strnwcpy(op->zname,znl,cp,cl) - op->zname ;
 	                zl = rs ;
 	            } else {
@@ -774,7 +774,7 @@ int tmz_setyear(tmz *op,int year) noex {
 int tmz_setzone(tmz *op,cchar *zp,int zl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,zp)) >= 0) {
-	    cint	znl = var.zalen ;
+	    cint	znl = var.znlen ;
 	    rs = (strnwcpy(op->zname,znl,zp,zl) - op->zname) ;
 	    if (rs < 0) {
 		op->dtor() ;
@@ -996,7 +996,7 @@ static int tmz_proczname(tmz *op,cchar *sp,int sl) noex {
 	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
 	    cint	ch = mkchar(*cp) ;
 	    if (isalphalatin(ch)) {
-	        cint	znl = var.zalen ;
+	        cint	znl = var.znlen ;
 	        rs = strnwcpy(op->zname,znl,cp,cl)  - op->zname ;
 	        si = ((cp+cl)-sp) ;
 	    }
@@ -1197,8 +1197,8 @@ tmz_co::operator int () noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_za)) >= 0) {
-	    zalen = rs ;
+	if ((rs = getbufsize(getbufsize_zn)) >= 0) {
+	    znlen = rs ;
 	}
 	return rs ;
 }

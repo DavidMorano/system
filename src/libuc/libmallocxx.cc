@@ -39,7 +39,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
@@ -150,22 +149,22 @@ int libmalloc_fs(char **rpp) noex {
 	cint	w = getbufsize_fs ;
 	return uc_libmallocsys(w,rpp) ;
 }
-int libmalloc_za(char **rpp) noex {
+int libmalloc_zn(char **rpp) noex {
 	cint	w = getbufsize_zn ;
 	return uc_libmallocsys(w,rpp) ;
 }
-int libmalloc_za(char **rpp) noex {
-	cint	w = getbufsize_za ;
+int libmalloc_zi(char **rpp) noex {
+	cint	w = getbufsize_zi ;
 	return uc_libmallocsys(w,rpp) ;
 }
 
 int libmalloc_ps(char **rpp) noex {
-	int		rs ;
-	if ((rs = pagesize) >= 0) {
-	    cint	sz = (rs + 1) ;
-	    rs = uc_libmalloc(sz,rpp) ;
-	}
-	return rs ;
+	int             rs ;
+        if ((rs = pagesize) >= 0) {
+            cint        sz = (rs + 1) ;
+            rs = uc_libvalloc(sz,rpp) ;
+        }
+        return rs ;
 }
 /* end if (libmalloc_ps) */
 

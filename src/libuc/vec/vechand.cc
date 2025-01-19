@@ -99,22 +99,21 @@ constexpr int		optmask = mkoptmask() ;
 
 /* exported subroutines */
 
-int vechand_start(vechand *op,int n,int opts) noex {
+int vechand_start(vechand *op,int vn,int vo) noex {
 	int		rs ;
 	if ((rs = vechand_ctor(op)) >= 0) {
-	    if (n <= 1) n = VECHAND_DEFENTS ;
-	    if ((rs = vechand_setopts(op,opts)) >= 0) {
-	        cint	size = (n + 1) * szof(cvoid **) ;
-	        void	**va ;
-	        if ((rs = uc_libmalloc(size,&va)) >= 0) {
+	    if (vn <= 1) vn = VECHAND_DEFENTS ;
+	    if ((rs = vechand_setopts(op,vo)) >= 0) {
+	        cint	sz = (vn + 1) * szof(cvoid **) ;
+	        if (void **va ; (rs = uc_libmalloc(sz,&va)) >= 0) {
 		    op->va = va ;
 	            op->va[0] = nullptr ;
-	            op->n = n ;
+	            op->n = vn ;
 	            op->f.issorted = false ;
 	        } /* end if (memory-allocation) */
 	    } /* end if (options) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? n : rs ;
+	return (rs >= 0) ? vn : rs ;
 }
 /* end subroutine (vechand_start) */
 
@@ -141,8 +140,8 @@ int vechand_add(vechand *op,cvoid *nep) noex {
 	int		i = 0 ;
 	if (op && nep) {
 	    if ((rs = vechand_extend(op)) >= 0) {
-	        bool		f_done = false ;
-	        bool		f ;
+	        bool	f_done = false ;
+	        bool	f ;
 	        f = (op->f.oreuse || op->f.oconserve) && (! op->f.oordered) ;
 	        if (f && (op->c < op->i)) {
 	            i = op->fi ;

@@ -61,8 +61,8 @@ extern int libmalloc_nw(char **) noex ;	/* NW object */
 extern int libmalloc_ho(char **) noex ;	/* HO object */
 extern int libmalloc_sv(char **) noex ;	/* SV object */
 extern int libmalloc_fs(char **) noex ;	/* FS type */
-extern int libmalloc_zn(char **) noex ;	/* TZ name */
-extern int libmalloc_za(char **) noex ;	/* ZA zone-name abbreviation */
+extern int libmalloc_zn(char **) noex ;	/* TZ name abbreviation */
+extern int libmalloc_zi(char **) noex ;	/* zone-info-name (Zone-Info) */
 
 
 EXTERNC_end
