@@ -1,4 +1,5 @@
 /* uc_exit */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* regular exit (like |exit(3c)|) */

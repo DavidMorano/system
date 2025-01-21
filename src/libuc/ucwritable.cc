@@ -1,4 +1,5 @@
 /* uc_waitwritable SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */

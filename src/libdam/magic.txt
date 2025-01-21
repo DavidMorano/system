@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int shiftreg_magic(shiftreg *op,Args ... args) noex {
+static inline int nodesfile_magic(nodesfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == SHIFTREG_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == NODESFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (shiftreg_magic) */
+/* end subroutine (nodesfile_magic) */

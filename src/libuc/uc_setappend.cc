@@ -1,4 +1,5 @@
 /* uc_setappend */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* set the APPEND file descriptor open-flag */

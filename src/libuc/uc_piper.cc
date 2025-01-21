@@ -1,4 +1,5 @@
 /* uc_piper */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX®Â® library-3c */
 /* create pipes but moved up to a minimum FD number */

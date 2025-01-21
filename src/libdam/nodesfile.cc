@@ -42,7 +42,7 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
@@ -52,10 +52,12 @@
 #include	<mallocxx.h>
 #include	<estrings.h>
 #include	<sfx.h>
+#include	<sif.hh>
 #include	<hdb.h>
+#include	<linebuffer.h>
 #include	<bfile.h>
 #include	<strwcpy.h>
-#include	<intceil.h>
+#include	<hash.h>		/* |hash_elf(3uc)| */
 #include	<localmisc.h>
 
 #include	"nodesfile.h"
@@ -98,11 +100,65 @@ namespace {
 	ino_t		ino ;
 	dev_t		dev ;
 	time_t		timod ;
+	int start(cc *,dev_t,ino_t,time_t) noex ;
+	int finish() noex ;
     } ;
     struct nodesfile_ent {
     	cchar		*name ;
 	int		fi ;
+	int start(cc *,int,int) noex ;
+	int finish() noex ;
     } ;
+}
+
+int nodesfile_fi::start(cc *sp,dev_t d,ino_t i,time_t t) noex {
+    	int		rs = SR_OK ;
+	dev = d ;
+	ino = i ;
+	timod = t ;
+	fname = nullptr ;
+	if (sp) {
+	    if (cchar *cp ; (rs = uc_mallocstrw(sp,-1,&cp)) >= 0) {
+	        fname = cp ;
+	    }
+	}
+	return rs ;
+}
+
+int nodesfile_fi::finish() noex {
+    	int		rs = SR_FAULT ;
+	int		rs1 ;
+	dev = 0 ;
+	ino = 0 ;
+	timod = 0 ;
+	if (fname) {
+	    rs1 = uc_free(fname) ;
+	    if (rs >= 0) rs = rs1 ;
+	    fname = nullptr ;
+	}
+	return rs ;
+}
+
+int nodesfile_ent::start(cc *sp,int sl,int idx) noex {
+    	int		rs = SR_FAULT ;
+	if (sp) {
+	    fi = idx ;
+	    if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	        name = cp ;
+	    }
+	}
+	return rs ;
+}
+
+int nodesfile_ent::finish() noex {
+    	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (name) {
+	    rs1 = uc_free(name) ;
+	    if (rs >= 0) rs = rs1 ;
+	    name = nullptr ;
+	}
+	return rs ;
 }
 
 
@@ -116,12 +172,12 @@ static inline int nodesfile_ctor(nodesfile *op,Args ... args) noex {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->flp = new(nothrow) vechand) != nullptr) {
-	        if ((op->nlp = new(nothrow) hdb) != nullptr) {
+	        if ((op->elp = new(nothrow) hdb) != nullptr) {
 		    rs = SR_OK ;
 	        } /* end if (new-hdb) */
 		if (rs < 0) {
 		    delete op->flp ;
-		    op->flp = nulltr ;
+		    op->flp = nullptr ;
 		}
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
@@ -133,9 +189,9 @@ static int nodesfile_dtor(nodesfile *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-	    if (op->nlp) {
-		delete op->nlp ;
-		op->nlp = nullptr ;
+	    if (op->elp) {
+		delete op->elp ;
+		op->elp = nullptr ;
 	    }
 	    if (op->flp) {
 		delete op->flp ;
@@ -146,14 +202,36 @@ static int nodesfile_dtor(nodesfile *op) noex {
 }
 /* end subroutine (nodesfile_dtor) */
 
-static int	nodesfile_opens(NF *,cchar *) noex ;
-static int	nodesfile_opener(NF *) noex ;
-static int	nodesfile_parse(NF *) noex ;
-static int	nodesfile_filechanged(NF *,time_t) noex ;
-static int	nodesfile_filemapbegin(NF *) noex ;
-static int	nodesfile_filemapend(NF *) noex ;
+template<typename ... Args>
+static inline int nodesfile_magic(nodesfile *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == NODESFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (nodesfile_magic) */
 
-static int	hdb_release(hdb *) noex ;
+static int	nodesfile_fnparse(NF *,cchar *) noex ;
+static int	nodesfile_fnparseln(NF *,int,cchar *,int) noex ;
+static int	nodesfile_fnparseload(NF *,int,cchar *,int) noex ;
+
+static int	nodesfile_fnloadbegin(NF *,cc *,bfile *) noex ;
+static int	nodesfile_fnloadend(NF *,int) noex ;
+static int	nodesfile_fnalready(NF *,USTAT *) noex ;
+
+#ifdef	COMMENT
+static int	nodesfile_filechanged(NF *,time_t) noex ;
+#endif
+
+static int	nodesfile_fins(NF *) noex ;
+static int	nodesfile_finents(NF *) noex ;
+static int	nodesfile_finfis(NF *) noex ;
+
+extern "C" {
+    static uint	enthash(cvoid *,int) noex ;
+    static int	entmat(cvoid *,cvoid *,int) noex ;
+}
 
 
 /* local variables */
@@ -165,24 +243,26 @@ static int	hdb_release(hdb *) noex ;
 /* exported subroutines */
 
 int nodesfile_open(NF *op,cchar *fname,int maxsz) noex {
-    	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = nodesfile_ctor(op)) >= 0) {
 	    vechand	*flp = op->flp ;
-	    hdb		*nlp = op->nlp ;
+	    hdb		*nlp = op->elp ;
 	    rs = SR_INVALID ;
 	    if (maxsz >= 0) {
 		cint	vn = 1 ;
 		cint	vo = 0 ;
 		op->maxsz = maxsz ;
 		if ((rs = flp->start(vn,vo)) >= 0) {
-		    if ((rs = nlp->start(0,0,np,np)) >= 0) {
+		    cint	hn = 1 ;
+		    cint	at = 0 ;
+		    if ((rs = nlp->start(hn,at,enthash,entmat)) >= 0) {
 			op->magic = NODESFILE_MAGIC ;
 			if (fname) {
-		            rs = nodesfile_opens(op,fname) ;
+		            rs = nodesfile_fnparse(op,fname) ;
 			}
 			if (rs < 0) {
 			    nlp->finish() ;
+			    op->magic = 0 ;
 			}
 	            } /* end if (hdb_start) */
 		    if (rs < 0) {
@@ -203,8 +283,12 @@ int nodesfile_close(NF *op) noex {
 	int		rs1 ;
 	if (op) {
 	    rs = SR_OK ;
-	    if (op->nlp) {
-		rs1 = hdb_finish(op->nlp) ;
+	    {
+		rs1 = nodesfile_fins(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->elp) {
+		rs1 = hdb_finish(op->elp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->flp) {
@@ -221,70 +305,147 @@ int nodesfile_close(NF *op) noex {
 }
 /* end subroutine (nodesfile_close) */
 
+static int nodesfile_fins(NF *op) noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	{
+	    rs1 = nodesfile_finents(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = nodesfile_finfis(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	return rs ;
+}
+/* end subroutine (nodesfile_fins) */
+
+static int nodesfile_finents(NF *op) noex {
+    	hdb		*elp = op->elp ;
+	cint		rsn = SR_NOTFOUND ;
+    	int		rs ;
+	int		rs1 ;
+	int		rs2 ;
+	if (hdb_cur cur ; (rs = hdb_curbegin(elp,&cur)) >= 0) {
+	    hdb_dat	key{} ;
+	    hdb_dat	val{} ;
+	    while ((rs2 = hdb_curenum(elp,&cur,&key,&val)) >= 0) {
+		NF_FI	*ep = (NF_FI *) key.buf ;
+		if (key.buf) {
+		    {
+		        rs1 = ep->finish() ;
+		        if (rs >= 0) rs = rs1 ;
+		    }
+		    {
+			rs1 = uc_free(key.buf) ;
+		        if (rs >= 0) rs = rs1 ;
+		    }
+		}
+	    } /* end while */
+	    if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
+	    rs1 = hdb_curend(elp,&cur) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (hdb-cur) */
+	return rs ;
+}
+/* end subroutine (nodesfile_finents) */
+
+static int nodesfile_finfis(NF *op) noex {
+    	vechand		*flp = op->flp ;
+	cint		rsn = SR_NOTFOUND ;
+    	int		rs ;
+	int		rs1 ;
+	int		rs2 ;
+	void *vp ;
+	for (int i = 0 ; (rs2 = flp->get(i,&vp)) >= 0 ; i += 1) {
+	    NF_FI	*fep = (NF_FI *) vp ;
+	    if (vp) {
+		{
+		    rs1 = fep->finish() ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+		{
+		    rs1 = uc_free(fep) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+	    } /* end if (non-null) */
+	} /* end for */
+	if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
+	return rs ;
+}
+/* end subroutine (nodesfile_finfis) */
+
+int nodesfile_add(NF *op,cchar *fn) noex {
+    	int		rs ;
+	if ((rs = nodesfile_magic(op,fn)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (fn[0]) {
+		rs = nodesfile_fnparse(op,fn) ;
+	    }
+	} /* end if (magic) */
+    	return rs ;
+}
+/* end subroutine (nodesfile_add) */
+
 int nodesfile_check(NF *op,time_t dt) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		f_changed = false ;
-	if (op) {
-	    rs = SR_OK ;
+	if ((rs = nodesfile_magic(op)) >= 0) {
 	    if (dt == 0) dt = getustime ;
 	    if ((dt - op->ti_check) >= TO_CHECK) {
 	        op->ti_check = dt ;
-	        if ((rs = nodesfile_filechanged(op,dt)) >= 0) {
-	            f_changed = true ;
-	            hdb_release(op->nlp) ;
-	            if ((rs = nodesfile_parse(op)) >= 0) {
-	                op->ti_load = dt ;
-		    }
-	        } /* end if */
 	    } /* end if (timeout) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? f_changed : rs ;
 }
 /* end subroutine (nodesfile_check) */
 
-int nodesfile_search(NF *op,cchar *nodep,int nodel) noex {
-	int		rs = SR_FAULT ;
-	if (op && nodep) {
-	    rs = SR_NOTOPEN ;
-	    if (op->mapbuf) {
-	        hdb_datum	key ;
-	        hdb_datum	val{} ;
-	        if (nodel < 0) nodel = strlen(nodep) ;
-	        key.buf = nodep ;
-	        key.len = nodel ;
-	        rs = hdb_fetch(op->nlp,key,nullptr,&val) ;
-	    } /* end if (non-null) */
-	} /* end if (non-null) */
-	return rs ;
+int nodesfile_have(NF *op,cchar *sp,int sl) noex {
+	int		rs ;
+	int		rs1 ;
+	int		fal = false ;
+	if ((rs = nodesfile_magic(op,sp)) >= 0) {
+	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (NF_ENT e ; (rs = e.start(sp,sl,0)) >= 0) {
+	        hdb		*elp = op->elp ;
+	        hdb_dat		key ;
+	        key.buf = &e ;
+	        key.len = sl ;
+	        if ((rs = elp->have(key)) > 0) {
+		    fal = true ;
+	        }
+	        rs1 = e.finish() ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (ent-) */
+	} /* end if (magic) */
+	return (rs >= 0) ? fal : rs ;
 }
-/* end subroutine (nodesfile_search) */
+/* end subroutine (nodesfile_have) */
 
 int nodesfile_curbegin(NF *op,NF_CUR *curp) noex {
-	int		rs = SR_FAULT ;
-	if (op && curp) {
+	int		rs ;
+	if ((rs = nodesfile_magic(op,curp)) >= 0) {
 	    cint	sz = szof(hdb_cur) ;
-	    void	*vp{} ;
-	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
 		curp->hcp = (hdb_cur *) vp ;
-	        rs = hdb_curbegin(op->nlp,curp->hcp) ;
+	        rs = hdb_curbegin(op->elp,curp->hcp) ;
 		if (rs < 0) {
 		    uc_free(curp->hcp) ;
 		    curp->hcp = nullptr ;
 		}
 	    } /* end if (m-a) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (nodesfile_curbegin) */
 
 int nodesfile_curend(NF *op,NF_CUR *curp) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		rs1 ;
-	if (op && curp) {
-	    rs = SR_OK ;
+	if ((rs = nodesfile_magic(op,curp)) >= 0) {
 	    if (curp->hcp) {
 		{
-	            rs1 = hdb_curend(op->nlp,curp->hcp) ;
+	            rs1 = hdb_curend(op->elp,curp->hcp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        }
 	        {
@@ -293,142 +454,177 @@ int nodesfile_curend(NF *op,NF_CUR *curp) noex {
 		    curp->hcp = nullptr ;
 	        }
 	    } /* end if (non-null cursor) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (nodesfile_curend) */
 
 int nodesfile_curenum(NF *op,NF_CUR *curp,char *rbuf,int rlen) noex {
-	int		rs = SR_FAULT ;
-	int		cl = 0 ;
-	if (op && curp) {
+	int		rs ;
+	int		rl = 0 ;
+	if ((rs = nodesfile_magic(op,curp,rbuf)) >= 0) {
+	    hdb		*elp = op->elp ;
 	    hdb_datum	key{} ;
 	    hdb_datum	val{} ;
-	    if ((rs = hdb_curenum(op->nlp,curp->hcp,&key,&val)) >= 0) {
-		cint	cl = key.len ;
-	        cchar	*cp = charp(key.buf) ;
-		rs = sncpyw(rbuf,rlen,cp,cl) ;
+	    if ((rs = elp->curenum(curp->hcp,&key,&val)) >= 0) {
+		NF_ENT	*ep = (NF_ENT *) key.buf ;
+		if (key.buf) {
+		    rs = sncpy(rbuf,rlen,ep->name) ;
+		    rl = rs ;
+		}
 	    }
-	} /* end if (non-null) */
-	return (rs >= 0) ? cl : rs ;
+	} /* end if (magic) */
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (nodesfile_curenum) */
 
 
 /* private subroutines */
 
-static int nodesfile_opens(NF *op,cc *fn) noex {
-    	cint		of = O_RDONLY ;
+static int nodesfile_fnparse(NF *op,cc *fn) noex {
     	int		rs ;
 	int		rs1 ;
-	if ((rs = uc_open(fn,of,0)) >= 0) {
-	    cint	fd = rs ;
-	    if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
-		rs = SR_PROTO ;
-		if (S_ISREG(sb.st_mode)) {
-		    rs = SR_TOOBIG ;
-		    if (sb.st_size < op->maxsize) {
-			op->fi.oflags = of ;
-			if (cc *cp{} ; (rs = uc_mallocstrw(fn,-1,&cp)) >= 0) {
-			    op->fi.fname = cp ;
-			    op->fi.timod = sb.st_mtime ;
-			    op->fi.ino = sb.st_ino ;
-			    op->fi.dev = sb.st_dev ;
-			    op->filesize = sb.st_size ;
-			    rs = nodesfile_opener(op) ;
-			    if (rs < 0) {
-			        uc_free(op->fi.fname) ;
-			        op->fi.fname = nullptr ;
+	if (linebuffer lb ; (rs = lb.start) >= 0) {
+	    if (bfile bf ; (rs = bf.open(fn,"r")) >= 0) {
+	        if ((rs = nodesfile_fnloadbegin(op,fn,&bf)) >= 0) {
+		    if (rs < INT_MAX) {
+		        cint	fi = rs ;
+		        while ((rs = bf.readln(lb.lbuf,lb.llen)) >= 0) {
+			    auto 	sfc = sfcontent ;
+			    cchar	*lp ;
+			    if (int ll ; (ll = sfc(lb.lbuf,rs,&lp)) > 0) {
+			        rs = nodesfile_fnparseln(op,fi,lp,ll) ;
 			    }
-			} /* end if (m-a) */
-		    } /* end if (size OK) */
-		} /* end if (type-of-file) */
-	    } /* end if (stat-file) */
-	    rs1 = uc_close(fd) ;
+			    if (rs < 0) break ;
+		        } /* end while */
+		        if (rs < 0) {
+			    nodesfile_fnloadend(op,fi) ;
+		        }
+		    } /* end if (go ahead) */
+	        } /* end if (fnloadbegin) */
+		rs1 = bf.close ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (bfile) */
+	    rs1 = lb.finish ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (open-file) */
+	} /* end if (linebuffer) */
 	return rs ;
 }
-/* end subroutine (nodesfile_opens) */
+/* end subroutine (nodesfile_fnparse) */
 
-static int nodesfile_opener(nodesfile *op) noex {
-	cnullptr	np{} ;
-	int		rs ;
-	if ((rs = nodesfile_filemapbegin(op)) >= 0) {
-	    cint	ne = NF_DEFNODES ;
-	    if ((rs = hdb_start(op->nlp,ne,0,np,np)) >= 0) {
-		rs = nodesfile_parse(op) ;
-		if (rs < 0) {
-		    hdb_finish(op->nlp) ;
-		}
-	    } /* end if (hdb) */
-	    if (rs < 0) {
-		nodesfile_filemapend(op) ;
-	    }
-	} /* end if (map-file) */
-	return rs ;
-}
-/* end subroutine (nodesfile_opener) */
-
-static int nodesfile_parse(NF *op,bfile *fp) noex {
-    	int		rs ;
-
-}
-
-static int nodesfile_parse(NF *op) noex {
-	hdb_datum	key ;
-	hdb_datum	val ;
-	int		rs = SR_OK ;
-	int		n = 0 ;
-	int		sl = int(op->filesize) ;
-	int		cl ;
-	cchar		*sp = op->mapbuf ;
+static int nodesfile_fnparseln(NF *op,int fi,cc *lp,int ll) noex {
+    	int		rs = SR_OK ;
+	sif		lo(lp,ll) ;
 	cchar		*cp ;
-	cchar		*ep ;
-	value.buf = nullptr ;
-	value.len = 0 ;
-	ep = (sp + sl) ;
-	while (sp < ep) {
-	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
-	        if (cp[0] == '#') {
-	            while ((cp < ep) && (*cp != '\n')) {
-	                cp += 1 ;
-		    }
-	            sl -= (cp - sp) ;
-	            sp = cp ;
-	        } else {
-	            sl -= ((cp + cl) - sp) ;
-	            sp = (cp + cl) ;
-		    /* remove trailing comments */
-		    for (int i = 0 ; i < cl ; i += 1) {
-			if (cp[i] == '#') {
-			    cl = i ;
-			    break ;
-			}
-		    } /* end for */
-		    /* store it */
-	            key.buf = cp ;
-	            key.len = cl ;
-	            rs = hdb_store(op->nlp,key,value) ;
-	            n += 1 ;
-	        } /* end if */
-	        if (rs < 0) break ;
-	    } /* end while (fields) */
-	    cp = sp ;
-	    while ((cp < ep) && (*cp != '\n')) {
-	        cp += 1 ;
-	    }
-	    if ((cp < ep) && (*cp == '\n')) {
-	        cp += 1 ;
-	    }
-	    sl -= (cp - sp) ;
-	    sp = cp ;
+	for (int cl ; (cl = lo.next(&cp)) > 0 ; ) {
+	    rs = nodesfile_fnparseload(op,fi,cp,cl) ;
 	    if (rs < 0) break ;
-	} /* end while (reading lines) */
-	return (rs >= 0) ? n : rs ;
+	} /* end for */
+    	return rs ;
 }
-/* end subroutine (nodesfile_parse) */
+/* end subroutine (nodesfile_fnparseln) */
 
+static int nodesfile_fnloadbegin(NF *op,cchar *fn,bfile *fp) noex {
+    	int		rs ;
+	int		idx = INT_MAX ;
+	if (USTAT sb ; (rs = fp->stat(&sb)) >= 0) {
+	    if ((rs = nodesfile_fnalready(op,&sb)) == 0) {
+		cint	sz = szof(NF_FI) ;
+		if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+		    NF_FI	*fep = (NF_FI *) vp ;
+		    dev_t	d = sb.st_dev ;
+		    ino_t	i = sb.st_ino ;
+		    time_t	t = sb.st_mtime ;
+		    if ((rs = fep->start(fn,d,i,t)) >= 0) {
+			vechand		*flp = op->flp ;
+			if ((rs = flp->add(fep)) >= 0) {
+			    idx = rs ;
+			}
+			if (rs < 0) {
+			    flp->finish() ;
+			}
+		    } /* end if (file_start) */
+		    if (rs < 0) {
+			uc_free(vp) ;
+		    }
+		} /* end if (memory-allocation) */
+	    } /* end if (nodesfile_fnalready) */
+	} /* end if (bfile_stat) */
+	return (rs >= 0) ? idx : rs ;
+}
+/* end subroutine (nodesfile_fnloadbegin) */
+
+static int nodesfile_fnloadend(NF *op,int fi) noex {
+    	vechand		*flp = op->flp ;
+    	int		rs ;
+	if (void *vp ; (rs = flp->get(fi,&vp)) >= 0) {
+	    NF_FI	*fep = (NF_FI *) vp ;
+	    if (vp) {
+		if ((rs = flp->del(fi)) >= 0) {
+	            if ((rs = fep->finish()) >= 0) {
+		        rs = uc_free(fep) ;
+	            }
+		}
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (nodesfile_fnloadend) */
+
+static int nodesfile_fnalready(NF *op,USTAT *sbp) noex {
+    	vechand		*flp = op->flp ;
+    	int		rs ;
+	int		fal = false ;
+	void		*vp ;
+	for (int i = 0 ; (rs = flp->get(i,&vp)) >= 0 ; i += 1) {
+	    NF_FI	*fep = (NF_FI *) vp ;
+	    if (vp) {
+	        fal = true ;
+		fal = fal && (sbp->st_dev == fep->dev) ;
+		fal = fal && (sbp->st_ino == fep->ino) ;
+	    }
+	    if (fal) break ;
+	} /* end for */
+	return (rs >= 0) ? fal : rs ;
+}
+/* end subroutine (nodesfile_fnalready) */
+
+static int nodesfile_fnparseload(NF *op,int fi,cchar *sp,int sl) noex {
+    	cint		esz = szof(NF_ENT) ;
+	int		rs ;
+	if (char *vp ; (rs = uc_malloc(esz,&vp)) >= 0) {
+	    hdb		*elp = op->elp ;
+	    NF_ENT	*ep = (NF_ENT *) vp ;
+	    if ((rs = ep->start(sp,sl,fi)) >= 0) {
+		hdb_dat		key ;
+		key.buf = ep ;
+		key.len = 0 ;
+	        if ((rs = elp->have(key)) == 0) {
+		    hdb_dat	val{} ;
+		    rs = elp->store(key,val) ;
+		}
+		if (rs < 0) {
+		    ep->finish() ;
+		}
+	    } /* end if (entry_start) */
+	    if (rs < 0) {
+		uc_free(vp) ;
+	    }
+	} /* end if (memory-allocation) */
+	return rs ;
+}
+/* end subroutine (nodesfile_fnparseload) */
+
+#ifdef	COMMENT
+static int nodesfile_filechanged(NF *op,time_t dt) noex {
+	(void) op ;
+	(void) dt ;
+	return 0 ;
+}
+/* end subroutine (nodesfile_filechanged) */
+#endif /* COMMENT */
+
+#ifdef	COMMENT
 static int nodesfile_filechanged(NF *op,time_t daytime) noex {
 	int		rs ;
 	int		f = false ;
@@ -455,65 +651,39 @@ static int nodesfile_filechanged(NF *op,time_t daytime) noex {
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (nodesfile_filechanged) */
+#endif /* COMMENT */
 
-static int nodesfile_filemapbegin(NF *op) noex {
-	cnullptr	np{} ;
-	int		rs ;
-	int		rs1 ;
-	cint		of = op->fi.oflags ;
-	cchar		*fn = op->fi.fname ;
-	if ((rs = uc_open(fn,of,0666)) >= 0) {
-	    cint	fd = rs ;
-	    if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
-		cuint	fsz = uint(sb.st_size) ;
-		cuint	msz = uceil(uint(sb.st_size),op->pagesize) ;
-		op->filesize = fsz ;
-	        rs = SR_TOOBIG ;
-	        if (fsz <= op->maxsize) {
-	            csize	ms = size_t(msz) ;
-	            cint	mp = PROT_READ ;
-	            cint	mf = MAP_SHARED ;
-	            void	*ma{} ; 
-		    if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&ma)) >= 0) {
-		        op->mapbuf = charp(ma) ;
-		        op->mapsize = uint(ms) ;
-	            }
-	        } /* end if (file-size) */
-	    } /* end if (stat) */
-	    rs1 = uc_close(fd) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (file-open) */
-	return rs ;
+static uint enthash(cvoid *cvp,int cvl) noex {
+    NF_ENT	*ep = (NF_ENT *) cvp ;
+    uint	hv ;
+    {
+	cchar	*nbuf = ep->name ;
+        cint	nlen = cvl ;
+        hv = hash_elf(nbuf,nlen) ;
+    }
+    return hv ;
 }
-/* end subroutine (nodesfile_filemapbegin) */
+/* end subroutine (enthash) */
 
-static int nodesfile_filemapend(NF *op) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-	if (op->mapbuf) {
-	    caddr_t	ma = caddr_t(op->mapbuf) ;
-	    csize	ms = size_t(op->mapsize) ;
-	    rs1 = u_mmapend(ma,ms) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->mapbuf = nullptr ;
-	    op->mapsize = 0 ;
+static int entmat(cvoid *v1p,cvoid *v2p,int) noex {
+    	NF_ENT	*e1p = (NF_ENT *) v1p ;
+    	NF_ENT	*e2p = (NF_ENT *) v2p ;
+	int	rc = 0 ;
+	if (e1p || e2p) {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+		if (e2p) {
+		    cchar	*s1 = e1p->name ;
+		    cchar	*s2 = e2p->name ;
+		    if ((rc = (*s1 - *s2)) == 0) {
+	    	        rc = (strcmp(s1+1,s2+1) == 0) ;
+		    }
+		}
+	    }
 	}
-	return rs ;
+	return rc ;
 }
-/* end subroutine (nodesfile_filemapend) */
-
-static int hdb_release(hdb *hsp) noex {
-	int		rs = SR_FAULT ;
-	if (hsp) {
-	    if (hdb_cur cur{} ; (rs = hdb_curbegin(hsp,&cur)) >= 0) {
-	        while (hdb_curenum(hsp,&cur,nullptr,nullptr) >= 0) {
-	            hdb_curdel(hsp,&cur,0) ;
-	        }
-	        hdb_curend(hsp,&cur) ;
-	    } /* end if (cursor) */
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (hdb_release) */
+/* end subroutine (entmat) */
 
 

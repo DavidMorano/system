@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* write a block data from a given file to the current file */
+/* write a block of data from a given file to the current file */
 /* version %I% last-modified %G% */
 
 
@@ -21,8 +21,8 @@
 	bwriteblock
 
 	Description:
-	This subroutine copies the remainder of the input file to
-	the output file.
+	This subroutine copies a block (with a given length) of
+	datæ from another file to the output file.
 
 	Synospsis:
 	int bwriteblock(bfile *op,bfile *ifp,int ulen) noex
@@ -67,10 +67,6 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
-extern "C" {
-    extern int	bfile_write(bfile *,cvoid *,int) noex ;
-}
-
 
 /* external variables */
 
@@ -85,7 +81,7 @@ namespace {
 	    wrp = p ;
 	} ;
 	operator int () noex ;
-    } ;
+    } ; /* end struct (writer_rd) */
     struct writer {
 	writer_rd	rd ;
 	bfile		*op ;
@@ -107,7 +103,7 @@ namespace {
 	    }
 	    return rs ;
 	} ;
-    } ;
+    } ; /* end struct (writer) */
 }
 
 
@@ -128,9 +124,9 @@ int bwriteblock(bfile *op,bfile *ifp,int ulen) noex {
 	if ((rs = bfile_magic(op,ifp)) > 0) {
 	    if ((rs = bfile_ckwr(op)) >= 0) {
 	        if (ulen != 0) {
-		    writer	wo(op,ifp,ulen) ;
-		    rs = wo ;
-		    wlen = rs ;
+		    if (writer wo(op,ifp,ulen) ; (rs = wo) >= 0) {
+		        wlen = rs ;
+		    }
 	        } /* end if (not nullfile) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -147,7 +143,7 @@ writer::operator int () noex {
 	int		wlen = 0 ;
 	if ((rs = abegin()) >= 0) {
 	    while ((rs = rd) > 0) {
-		rs = bfile_write(op,tbuf,rs) ;
+		rs = bwrite(op,tbuf,rs) ;
 		ulen -= rs ;
 		wlen += rs ;
 		if (rs < 0) break ;

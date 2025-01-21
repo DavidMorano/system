@@ -5,13 +5,8 @@
 /* UTMP program */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUG	0		/* switchable at invocation */
-#define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_LOCALWTMP	0		/* use local WTMP */
 #define	CF_LOCSETENT	0		/* |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -41,7 +36,6 @@
 #include	<cstring>
 #include	<utmpx.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<bits.h>
@@ -67,10 +61,6 @@
 #define	UTMPFNAME	"/var/adm/utmpx"
 #endif
 
-#ifndef	BUFLEN
-#define	BUFLEN		1024
-#endif
-
 #define	TERMBUFLEN	(TMPX_LLINE + 5)
 
 #define	LOCINFO		struct locinfo
@@ -78,39 +68,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy2(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	mkutmpid(char *,int,const char *,int) ;
-extern int	termdevice(char *,int,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-
-extern int	printhelp(bfile *,const char *,const char *,const char *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -140,7 +97,7 @@ struct locinfo {
 static int	usage(PROGINFO *) ;
 
 static int	process(PROGINFO *,bfile *,pid_t) ;
-static int	zaputx(struct utmpx *) ;
+static int	zaputx(UTMPX	 *) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
 static int	locinfo_finish(LOCINFO *) ;
@@ -151,18 +108,6 @@ static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 
 
 /* local variables */
-
-static cchar	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -176,7 +121,19 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const struct pivars	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	NULL
+} ;
+
+constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -184,7 +141,7 @@ static const struct pivars	initvars = {
 	VARPRLOCAL
 } ;
 
-static const struct mapex	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -196,38 +153,18 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-#if	CF_DEBUG || CF_DEBUGS
-static const char	*utmptypes[] = {
-	"empty",
-	"runlevel",
-	"boottime",
-	"oldtime",
-	"newtime",
-	"initproc",
-	"loginproc",
-	"userproc",
-	"deadproc",
-	"account",
-	"signature",
-	NULL
-} ;
-#endif /* CF_DEBUG */
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	BITS		pargs ;
 	bfile		errfile ;
 	pid_t		pid = 0 ;
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	uint		mo_start = 0 ;
-#endif
 
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
@@ -241,27 +178,15 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		f_help = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cp ;
 
-
-#if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	    rs = debugopen(cp) ;
-	    debugprintf("main: starting DFD=%d\n",rs) ;
-	}
-#endif /* CF_DEBUGS */
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	uc_mallset(1) ;
-	uc_mallout(&mo_start) ;
-#endif
 
 	rs = proginfo_start(pip,envv,argv[0],VERSION) ;
 	if (rs < 0) {
@@ -302,7 +227,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 0) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -440,7 +365,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -560,11 +485,6 @@ int main(int argc,cchar **argv,cchar **envv)
 	if (rs < 0)
 	    goto badarg ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("main: debuglevel=%u\n",pip->debuglevel) ;
-#endif
-
 	if (f_version) {
 	    bprintf(pip->efp,"%s: version %s\n",
 	        pip->progname,VERSION) ;
@@ -582,13 +502,6 @@ int main(int argc,cchar **argv,cchar **envv)
 	    ex = EX_OSERR ;
 	    goto retearly ;
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("main: pr=%s\n",pip->pr) ;
-	    debugprintf("main: sn=%s\n",pip->searchname) ;
-	}
-#endif
 
 	if (pip->debuglevel > 0) {
 	    bprintf(pip->efp,"%s: pr=%s\n", pip->progname,pip->pr) ;
@@ -687,11 +600,6 @@ retearly:
 	        pip->progname,ex,rs) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("main: exiting ex=%u (%d)\n",ex,rs) ;
-#endif
-
 	if (pip->efp != NULL) {
 	    pip->open.errfile = FALSE ;
 	    bclose(pip->efp) ;
@@ -707,20 +615,6 @@ badlocstart:
 	proginfo_finish(pip) ;
 
 badprogstart:
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	{
-	    uint	mo ;
-	    uc_mallout(&mo) ;
-	    debugprintf("main: final mallout=%u\n",(mo-mo_start)) ;
-	    uc_mallset(0) ;
-	}
-#endif
-
-#if	(CF_DEBUGS || CF_DEBUG)
-	debugclose() ;
-#endif
-
 	return ex ;
 
 /* the bad things */
@@ -737,13 +631,11 @@ badarg:
 
 /* local subrouines */
 
-
-static int usage(PROGINFO *pip)
-{
+static int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-y|-n] [-h <hostname>] <searchline> [-z]\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -757,11 +649,9 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-
-static int process(PROGINFO *pip,bfile *ofp,pid_t pid)
-{
-	struct utmpx	uc ;
-	struct utmpx	*up ;
+static int process(PROGINFO *pip,bfile *ofp,pid_t pid) noex {
+	UTMPX		uc ;
+	UTMPX		*up ;
 	LOCINFO		*lip = pip->lip ;
 	const pid_t	sid = u_getsid(pid) ;
 	int		rs = SR_OK ;
@@ -773,12 +663,6 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid)
 
 
 	lognamebuf[0] = '\0' ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("main: ent sid=%d\n",sid) ;
-#endif
-
 	if (pip->debuglevel > 0) {
 	    fmt = "%s: sid=%d\n" ;
 	    bprintf(pip->efp,fmt,pn,sid) ;
@@ -790,32 +674,6 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid)
 
 	si = 0 ;
 	while ((up = getutxent()) != NULL) {
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4)) {
-	        int	i ;
-#ifdef	COMMENT
-	        debugprintf("main: si=%u up=%p\n",si,up) ;
-#endif
-	        for (i = 0 ; utmptypes[i] != NULL ; i += 1) {
-	            if (i == up->ut_type)
-	                break ;
-	        } /* end for */
-	        if (utmptypes[i] != NULL)
-	            debugprintf("main: type=%s(%u)\n",utmptypes[i],i) ;
-	        debugprintf("main: id=%t\n",
-	            up->ut_id,strnlen(up->ut_id,TMPX_LID)) ;
-	        debugprintf("main: line=%t\n",
-	            up->ut_line,strnlen(up->ut_line,TMPX_LLINE)) ;
-	        debugprintf("main: user=%t\n",
-	            up->ut_line,strnlen(up->ut_user,TMPX_LUSER)) ;
-	        debugprintf("main: sid=%d\n",
-	            up->ut_pid) ;
-	        debugprintf("main: host=%t\n",
-	            up->ut_host,strnlen(up->ut_host,TMPX_LHOST)) ;
-	    }
-#endif /* CF_DEBUG */
-
 	    if (lip->f.zap && (lip->searchline != NULL)) {
 		cchar	*searchline = lip->searchline ;
 
@@ -823,15 +681,8 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid)
 	            break ;
 
 	    } else if ((up->ut_type == TMPX_TUSERPROC) &&
-	        (up->ut_pid == sid)) {
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("main: SID match \n") ;
-#endif
-
+	        	(up->ut_pid == sid)) {
 	        break ;
-
 	    } /* end if */
 
 	    si += 1 ;
@@ -841,12 +692,6 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid)
 	if (up != NULL) {
 	    strwcpy(lognamebuf,up->ut_user,TMPX_LUSER) ;
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main: loguser=%s f_zap=%u up=%p\n",
-	        lognamebuf,lip->f.zap,up) ;
-#endif /* CF_DEBUG */
 
 	if (lip->f.zap && (lip->searchline != NULL)) {
 
@@ -868,12 +713,6 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid)
 
 	    if (up != NULL) {
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("main: found at si=%u ut_pid=%u\n",
-	                si,up->ut_pid) ;
-#endif
-
 	        bprintf(ofp,fmt,
 	            up->ut_id,strnlen(up->ut_id,TMPX_LID),
 	            up->ut_line,strnlen(up->ut_line,TMPX_LLINE),
@@ -889,31 +728,15 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid)
 	} else if (lip->f.yes) {
 
 	    if (up == NULL) {
-		const int	termlen = TERMBUFLEN ;
-	        int		tl ;
-	        char		termbuf[TERMBUFLEN + 1] ;
+		cint	termlen = TERMBUFLEN ;
+	        int	tl ;
+	        char	termbuf[TERMBUFLEN + 1] ;
 
 	        if ((rs = termdevice(termbuf,termlen,FD_STDIN)) >= 0) {
 	            char	idbuf[TMPX_LID + 1] ;
 	            tl = rs ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("main: termdevice() rs=%d term=%t\n",
-	                rs,
-	                termbuf,((rs > 0) ? rs : 0)) ;
-#endif
-
-
-	            memset(&uc,0,sizeof(struct utmpx)) ;
-
+	            uc = {} ;
 	            mkutmpid(idbuf,TMPX_LID,termbuf,tl) ;
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("main: idbuf=%t\n",
-	                    idbuf,strnlen(idbuf,TMPX_LID)) ;
-#endif
 
 	            strncpy(uc.ut_id,idbuf,TMPX_LID) ;
 
@@ -951,11 +774,6 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid)
 
 	            up = pututxline(&uc) ;
 
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("main: pututxline() up=%p\n",up) ;
-#endif
-
 	            if (up == NULL) {
 	                rs = SR_ACCESS ;
 	                bprintf(pip->efp,
@@ -981,14 +799,7 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid)
 	        uc.ut_exit.e_exit = 0 ;
 	        uc.ut_type = TMPX_TDEADPROC ;
 
-	        up = pututxline(&uc) ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("main: pututxline() up=%p\n",up) ;
-#endif
-
-	        if (up == NULL) {
+	        if ((up = pututxline(&uc)) == nullptr) {
 	            rs = SR_ACCESS ;
 		    fmt = "%s: operation not allowed\n" ;
 	            bprintf(pip->efp,fmt,pn) ;
@@ -1000,19 +811,12 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid)
 
 	endutxent() ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/process: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (process) */
 
-
 /* zap the specified UTMPX entry */
-static int zaputx(struct utmpx *up)
-{
+static int zaputx(UTMPX	 *up) noex {
 	TMPX		ut ;
 	TMPX_CUR	cur ;
 	TMPX_ENT	ue ;
@@ -1054,21 +858,17 @@ static int zaputx(struct utmpx *up)
 }
 /* end subroutine (zaputx) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memclear(lip) ; /* dangerous */
 	lip->pip = pip ;
 
 	return rs ;
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+static int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1084,11 +884,9 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-
 #if	CF_LOCSETENT
-int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
-{
-	VECSTR		*slp ;
+int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
+	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 

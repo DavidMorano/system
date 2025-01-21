@@ -1,0 +1,7 @@
+MAILBOXOUT (not used)
+
+This program has been deprecated.
+
+Synopsis:
+$ mailboxout [<mailbox>] > outfile
+

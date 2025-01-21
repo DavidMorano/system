@@ -1,4 +1,5 @@
 /* uc_fdatasync */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 
@@ -41,14 +42,13 @@
 
 /* external subroutines */
 
-extern int	msleep(int) ;
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int uc_fdatasync(int fd)
-{
+int uc_fdatasync(int fd) noex {
 	int		rs ;
 	int		to_nospc = TO_NOSPC ;
 	int		f_exit = FALSE ;

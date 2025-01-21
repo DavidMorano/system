@@ -1,4 +1,5 @@
 /* uc_chmodsuid */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* set or clear the SUID bit on the file permissions mode */

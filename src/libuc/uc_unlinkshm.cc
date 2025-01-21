@@ -1,4 +1,6 @@
 /* uc_unlinkshm */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
 /* POSIX shared-meory ("shm(3rt)') file-unlink */

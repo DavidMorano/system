@@ -50,7 +50,7 @@ struct nodesfile_cursor {
 
 struct nodesfile_head {
     	vechand		*flp ;			/* file-list-pointer */
-	hdb		*nlp ;			/* name-list-pointer */
+	hdb		*elp ;			/* entry-list-pointer */
 	time_t		ti_check ;
 	time_t		ti_load ;
 	uint		magic ;
@@ -63,7 +63,8 @@ typedef NODESFILE_CUR	nodesfile_cur ;
 EXTERNC_begin
 
 extern int	nodesfile_open(nodesfile *,cchar *,int) noex ;
-extern int	nodesfile_search(nodesfile *,cchar *,int) noex ;
+extern int	nodesfile_add(nodesfile *,cchar *) noex ;
+extern int	nodesfile_have(nodesfile *,cchar *,int) noex ;
 extern int	nodesfile_curbegin(nodesfile *,nodesfile_cur *) noex ;
 extern int	nodesfile_curend(nodesfile *,nodesfile_cur *) noex ;
 extern int	nodesfile_curenum(nodesfile *,nodesfile_cur *,char *,int) noex ;

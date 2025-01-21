@@ -1,4 +1,5 @@
 /* uc_rmdir */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* like "mkdir(2)' */

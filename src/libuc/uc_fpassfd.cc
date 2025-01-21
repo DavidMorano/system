@@ -1,4 +1,5 @@
 /* uc_fpassfd SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* pass a file-descriptor to a file-descriptor */

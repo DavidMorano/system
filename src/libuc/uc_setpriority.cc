@@ -1,4 +1,5 @@
 /* uc_setpriority */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* set a process priority (old style) */

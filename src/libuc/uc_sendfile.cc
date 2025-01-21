@@ -1,4 +1,5 @@
 /* uc_sendfile */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* UNIX® write system call subroutine */

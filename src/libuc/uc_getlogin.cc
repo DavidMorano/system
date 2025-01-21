@@ -1,4 +1,5 @@
 /* ucgetlogin SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the username of this login session */

@@ -20,20 +20,21 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
+#include	<sys/stat.h>		/* |USTAT| */
 #include	<unistd.h>
-#include	<stdarg.h>
+#include	<stdarg.h>		/* |va_list(3c)| */
 #include	<usystem.h>
 #include	<stdfnames.h>
 
 
+/* objects */
 #define	BFILE		struct bfile_head
 #define	BFILE_BD	struct bfile_bufdesc
 #define	BFILE_BDFL	struct bfile_bdflags
 #define	BFILE_MAP	struct bfile_mapper
 #define	BFILE_FL	struct bfile_flags
 #define	BFILE_MAPFL	struct bfile_mapflags
-
+/* values */
 #define	BFILE_MAGIC	0x20052615
 #define	BFILE_MINFD	10
 #define	BFILE_BUFPAGES	16
@@ -41,13 +42,12 @@
 #define	BFILE_FDNAMELEN	22
 #define	BFILE_MAXNEOF	3		/* maximum EOFs on networks */
 #define	BFILE_NMAPS	32		/* number of pages mapped at a time */
-
-#define	BFILE_STDIN	STDFNIN
-#define	BFILE_STDOUT	STDFNOUT
-#define	BFILE_STDERR	STDFNERR
-#define	BFILE_STDLOG	STDFNLOG
-#define	BFILE_STDNULL	STDFNNULL
-
+/* files */
+#define	BFILE_STDIN	STDFNIN		/* from STDFNAMES */
+#define	BFILE_STDOUT	STDFNOUT	/* from STDFNAMES */
+#define	BFILE_STDERR	STDFNERR	/* from STDFNAMES */
+#define	BFILE_STDLOG	STDFNLOG	/* from STDFNAMES */
+#define	BFILE_STDNULL	STDFNNULL	/* from STDFNAMES */
 /* user commands to 'bcontrol' */
 #define	BC_NOOP		0
 #define	BC_TELL		1
@@ -89,7 +89,6 @@
 #define	BC_GETBUFFLAGS	32		/* output buffering */
 #define	BC_SETBUFFLAGS	33		/* output buffering */
 #define	BC_NONBLOCK	34
-
 /* flags */
 #define	BFILE_FINPARTLINE	(1<<0)
 #define	BFILE_FTERMINAL 	(1<<1)
@@ -98,8 +97,6 @@
 #define	BFILE_FBUFNONE		(1<<4)
 #define	BFILE_FBUFDEF		(1<<5)
 #define	BFILE_FBUFATOMIC	BFILE_FBUFWHOLE
-
-#define	BFILE_DEBUGFNAME	"bfile.deb"
 
 
 /* buffering modes */
@@ -177,12 +174,111 @@ struct bfile_head {
 	mode_t		om ;		/* open-mode (permissions) */
 } ;
 
-typedef BFILE		bfile ;
 typedef BFILE_FL	bfile_fl ;
 typedef BFILE_MAP	bfile_map ;
 typedef	BFILE_BD	bfile_bd ;
 typedef	BFILE_BDFL	bfile_bdfl ;
 typedef	BFILE_MAPFL	bfile_mapfl ;
+
+#ifdef	__cplusplus
+enum bfilemems {
+	bfilemem_size,
+	bfilemem_getc,
+	bfilemem_isterm,
+	bfilemem_flush,
+	bfilemem_rewind,
+	bfilemem_close,
+	bfilemem_overlast
+} ;
+struct bfile ;
+struct bfile_pr {
+	bfile		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (bfile *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (cchar * = nullptr,int = -1) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (bfile_pr) */
+struct bfile_co {
+	bfile		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (bfile *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (bfile_co) */
+struct bfile : bfile_head {
+    	typedef nullptr_t	null ;
+	bfile_pr	println ;
+	bfile_pr	print ;
+	bfile_co	size ;
+	bfile_co	getc ;
+	bfile_co	isterm ;
+	bfile_co	flush ;
+	bfile_co	rewind ;
+	bfile_co	close ;
+	bfile() noex {
+	    println(this,0) ;
+	    print(this,0) ;
+	    size(this,bfilemem_size) ;
+	    getc(this,bfilemem_getc) ;
+	    isterm(this,bfilemem_isterm) ;
+	    flush(this,bfilemem_flush) ;
+	    rewind(this,bfilemem_rewind) ;
+	    close(this,bfilemem_close) ;
+	} ;
+	bfile(const bfile &) = delete ;
+	bfile &operator = (const bfile &) = delete ;
+	int open(cc *,cc * = nullptr,mode_t = 0) noex ;
+	int opene(cc *,cc * = nullptr,mode_t = 0,int = -1) noex ;
+	int openmod(cc *,cc * = nullptr,mode_t = 0) noex ;
+	int wasteln(char *,int) noex ;
+	int reade(void *,int,int,int) noex ;
+	int read(void *,int) noex ;
+	int readlnto(char *,int,int) noex ;
+	int readln(char *lp,int ll) noex {
+	    return readlnto(lp,ll,-1) ;
+	} ;
+	int readlns(char *,int,int,int *) noex ;
+	int seek(off_t,int) noex ;
+	int tell(off_t *) noex ;
+	int write(cvoid *,int) noex ;
+	int writeblock(bfile *,int) noex ;
+	int writefile(cchar *) noex ;
+	int writeblanks(int) noex ;
+	int writechrs(int,int) noex ;
+	int putc(int) noex ;
+	int printf(cchar *,...) noex ;
+	int vprintf(cchar *,va_list) noex ;
+	int printlns(int,cchar *,int) noex ;
+	int printcleanln(cchar *,int) noex ;
+	int printcleanlns(int,cchar *,int) noex ;
+	int copyblock(bfile *,int) noex ;
+	int copyfile(bfile *,char *,int) noex ;
+	int truncate(off_t) noex ;
+	int reserve(int) noex ;
+	int minmod(mode_t) noex ;
+	int flushn(int) noex ;
+	int control(int,...) noex ;
+	int controlv(int,va_list) noex ;
+	int stat(USTAT *) noex ;
+	int dup(bfile *) noex ;
+	void dtor() noex ;
+	~bfile() {
+	    dtor() ;
+	} ;
+} ; /* end struct (bfile) */
+#else	/* __cplusplus */
+typedef BFILE		bfile ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
@@ -193,11 +289,13 @@ extern int	bopentmp(bfile *,cchar *,cchar *,mode_t) noex ;
 extern int	bopenmod(bfile *,cchar *,cchar *,mode_t) noex ;
 extern int	bopenlock(bfile *,cchar *,int,int) noex ;
 extern int	bcontrol(bfile *,int,...) noex ;
+extern int	bcontrolv(bfile *,int,va_list) noex ;
 extern int	bstat(bfile *,USTAT *) noex ;
 extern int	bsize(bfile *) noex ;
 extern int	bseek(bfile *,off_t,int) noex ;
 extern int	btell(bfile *,off_t *) noex ;
 extern int	brewind(bfile *) noex ;
+extern int	bwasteln(bfile *,char *,int) noex ;
 extern int	breade(bfile *,void *,int,int,int) noex ;
 extern int	bread(bfile *,void *,int) noex ;
 extern int	breadlnto(bfile *,char *,int,int) noex ;
@@ -223,6 +321,7 @@ extern int	bisterm(bfile *) noex ;
 extern int	bminmod(bfile *,mode_t) noex ;
 extern int	bflush(bfile *) noex ;
 extern int	bflushn(bfile *,int) noex ;
+extern int	bdup(bfile *,bfile *) noex ;
 extern int	bclose(bfile *) noex ;
 
 extern int	bfile_bufreset(bfile *) noex ;
@@ -236,15 +335,12 @@ extern int	bfile_pagein(bfile *,off_t,int) noex ;
 static inline int breadln(bfile *fp,char *ubuf,int ulen) noex {
 	return breadlnto(fp,ubuf,ulen,-1) ;
 }
-
 static inline int bprint(bfile *fp,cchar *lbuf,int llen) noex {
 	return bprintln(fp,lbuf,llen) ;
 }
-
 static inline int bprintline(bfile *fp,cchar *lbuf,int llen) noex {
 	return bprintln(fp,lbuf,llen) ;
 }
-
 static inline int bprintlines(bfile *fp,int flen,cchar *lbuf,int llen) noex {
 	return bprintlns(fp,flen,lbuf,llen) ;
 }

@@ -1,4 +1,5 @@
 /* uc_gettimeofday */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* interface component for UNIX®Â® library-3c */

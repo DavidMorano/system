@@ -1,4 +1,6 @@
 /* uc_truncate */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
 
@@ -41,8 +43,6 @@
 
 
 /* external subroutines */
-
-extern int	msleep(int) ;
 
 
 /* forward references */

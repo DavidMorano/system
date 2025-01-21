@@ -1,4 +1,5 @@
 /* ucnprocs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -217,17 +218,15 @@ int procer::selection() noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	char		*pbuf{} ;
-	if ((rs = libmalloc_mp(&pbuf)) >= 0) {
+	if (char *pbuf{} ; (rs = libmalloc_mp(&pbuf)) >= 0) {
 	    if ((rs = mkpath1(pbuf,dn)) >= 0) {
 		cint    pl = rs ;
 		while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
-		    cint        ch = mkchar(de.name[0]) ;
+		    cint        ch = mkchar(nbuf[0]) ;
 		    if (isdigitlatin(ch)) {
-		        cchar   *dp = de.name ;
+		        cchar   *dp = nbuf ;
                         if ((rs = pathadd(pbuf,pl,dp)) >= 0) {
-                            USTAT       sb ;
-                            if ((rs = u_stat(pbuf,&sb)) >= 0) {
+                            if (USTAT sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
 				switch (w) {
 				case ucproctype_all:
 				    n += 1 ;

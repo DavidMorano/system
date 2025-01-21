@@ -1,4 +1,5 @@
 /* uccloseonexec SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */

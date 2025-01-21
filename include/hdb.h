@@ -109,6 +109,7 @@ struct hdb : hdb_head {
 	hdb &operator = (const hdb &) = delete ;
 	int start(int,int,hdbhash_f,hdbcmp_f) noex ;
 	int store(hdb_dat,hdb_dat) noex ;
+	int have(hdb_dat) noex ;
 	int fetch(hdb_dat,hdb_cur *,hdb_dat *) noex ;
 	int fetchrec(hdb_dat,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
 	int getkeyrec(hdb_dat,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
@@ -133,6 +134,7 @@ typedef HDB		hdb ;
 EXTERNC_begin
 
 extern int hdb_start(hdb *,int,int,hdbhash_f,hdbcmp_f) noex ;
+extern int hdb_have(hdb *,hdb_dat) noex ;
 extern int hdb_store(hdb *,hdb_dat,hdb_dat) noex ;
 extern int hdb_curbegin(hdb *,hdb_cur *) noex ;
 extern int hdb_curenum(hdb *,hdb_cur *,hdb_dat *,hdb_dat *) noex ;

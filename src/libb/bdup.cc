@@ -11,22 +11,24 @@
 	= 1998-07-01, David A­D­ Morano
 	This code was originally written.
 
-	= 1999-01-10, David A­D­ Morano
-	I added the little extra code to allow for memory mapped
-	I-O. It is all a waste because it is way slower than without
-	it! This should teach me to leave old programs alone!!!
-
 */
 
-/* Copyright © 1998,1999 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	Duplicate a BFILE stream.
+  	Name:
+	bdup
+
+	Description:
+	Duplicate a BFILE stream.  Take the existing BFILE stream and
+	duplicate it to the passwd BFILE object (by pointer).
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -57,30 +59,31 @@
 
 /* exported subroutines */
 
-int bdup(bfile *fp,bfile *fnewp) noex {
+int bdup(bfile *op,bfile *fnewp) noex {
 	int		rs ;
-	if ((rs = bfile_magic(fp,fnewp)) > 0) {
-	    memcpy(fnewp,fp,sizeof(bfile)) ;	/* <- copy */
-	        if ((rs = bfile_flush(fp)) >= 0) {
-	            if ((rs = u_dup(fp->fd)) >= 0) {
-	                fnewp->fd = rs ;
-	                if (fp->bsize > 0) {
-		            void	*vp = nullptr ;
-	                    if ((rs = uc_malloc(fp->bsize,&vp)) >= 0) {
-	                        fnewp->bdata = (char *) vp ;
-	                        fnewp->bbp = (char *) vp ;
-	                        fnewp->bp = (char *) vp ;
-	                    }
+	if ((rs = bfile_magic(op,fnewp)) > 0) {
+	    BFILE	*bnewp = fnewp ;
+	    memcpy(bnewp,op) ; /* shallow-copy */
+	    if ((rs = bfile_flush(op)) >= 0) {
+	        if ((rs = u_dup(op->fd)) >= 0) {
+	            fnewp->fd = rs ;
+	            if (op->bsize > 0) {
+			cint	bsz = op->bsize ;
+		        if (void *vp ; (rs = uc_malloc(bsz,&vp)) >= 0) {
+	                    fnewp->bdata = (char *) vp ;
+	                    fnewp->bbp = (char *) vp ;
+	                    fnewp->bp = (char *) vp ;
 	                }
-		        if (rs < 0) {
-		            uc_close(fnewp->fd) ;
-		            fnewp->fd = -1 ;
-		        }
-	            } /* end if (u_dup) */
-	            if (rs < 0) {
-		        fnewp->magic = 0 ;
 	            }
-	        } /* end if (bfile_flush) */
+		    if (rs < 0) {
+		        uc_close(fnewp->fd) ;
+		        fnewp->fd = -1 ;
+		    }
+	        } /* end if (u_dup) */
+	        if (rs < 0) {
+		    fnewp->magic = 0 ;
+	        }
+	    } /* end if (bfile_flush) */
 	} /* end if (magic) */
 	return rs ;
 }

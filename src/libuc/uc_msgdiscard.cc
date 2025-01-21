@@ -1,4 +1,5 @@
 /* uc_msgdiscard */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* set the message-discard mode on the file descriptor */

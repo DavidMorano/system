@@ -1,4 +1,5 @@
 /* uc_rename */
+/* encoding=ISO8859-1 */
 
 /* rename (link to and delete original) a file */
 /* translation layer interface for UNIX® equivalents */

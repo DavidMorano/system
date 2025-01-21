@@ -1,4 +1,5 @@
 /* uc_sighold */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* interface component for UNIX® library-3c */

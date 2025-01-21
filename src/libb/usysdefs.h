@@ -88,11 +88,23 @@ enum signalmissings {
 #endif
 
 /* missing file open-flags */
-#ifndef	O_SPECIALMASK
-#define	O_SPECIALMASK	((~ 0) << extraopenflag_start)
+#ifndef	OM_SPECIAL
+#define	OM_SPECIALMASK	((~ 0) << extraopenflag_start)
 #endif
 #ifndef	O_LARGEFILE
 #define	O_LARGEFILE	0
+#endif
+#ifndef	O_DIRECTORY
+#define	O_DIRECTORY	0
+#endif
+#ifndef	O_DIRECT
+#define	O_DIRECT	0
+#endif
+#ifndef	O_TMPFILE
+#define	O_TMPFILE	0
+#endif
+#ifndef	O_PRIV
+#define	O_PRIV		0
 #endif
 #ifndef	O_MINMODE
 #define	O_MINMODE	(1 << extraopenflag_minmode)
@@ -102,6 +114,29 @@ enum signalmissings {
 #endif
 #ifndef	O_NETWORK
 #define	O_NETWORK	(1 << extraopenflag_network)
+#endif
+
+/* extra system flags for |uc_lockfile(3uc)| */
+#ifndef	F_UNLOCK
+#define	F_UNLOCK	F_ULOCK
+#endif
+#ifndef	F_WLOCK	
+#define	F_WLOCK		F_LOCK
+#endif
+#ifndef	F_TWLOCK
+#define	F_TWLOCK	F_TLOCK
+#endif
+#ifndef	F_WTEST
+#define	F_WTEST		F_TEST
+#endif
+#ifndef	F_RLOCK
+#define	F_RLOCK		10		/* new! (watch UNIX® for changes) */
+#endif
+#ifndef	F_TRLOCK
+#define	F_TRLOCK	11		/* new! (watch UNIX® for changes) */
+#endif
+#ifndef	F_RTEST
+#define	F_RTEST		12		/* new! (watch UNIX® for changes) */
 #endif
 
 /* missing from some operating systems */
@@ -178,7 +213,7 @@ enum extrasysconfs {
 #define	TIME_MAX	LONG_MAX
 #endif
 
-/* some stuff that not all systems (like Linux) have */
+/* some stuff that not all systems (like GNU-Linux) have */
 
 /* max-namelen */
 #ifndef	MAXNAMELEN
@@ -188,6 +223,26 @@ enum extrasysconfs {
 #define	MAXNAMELEN	256		/* common value */
 #endif
 #endif /* MAXNAMELEN */
+
+/* max-pathlen */
+#ifndef	MAXPATHLEN
+#ifdef	PATH_MAX
+#define	MAXPATHLEN	PATH_MAX
+#else
+#define	MAXPATHLEN	2048		/* common value */
+#endif
+#endif /* MAXPATHLEN */
+
+/* max-linelen */
+#ifndef	MAXLINELEN
+#ifdef	LINE_MAX
+#define	MAXLINELEN	LINE_MAX
+#else
+#define	MAXLINELEN	2048		/* common value */
+#endif
+#endif /* MAXLINELEN */
+
+/* follows are the GETBUFSIZE defaults */
 
 /* arguments (and environment) */
 #ifndef	ARBUFLEN

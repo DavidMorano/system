@@ -30,11 +30,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>
+#include	<sys/stat.h>		/* USTAT */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* |INT_MAX| */
-#include	<cstdarg>
+#include	<cstdarg>		/* |va_list(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -67,14 +67,23 @@ static int	bcontrol_lock(bfile *,FLOCK *,int,int,int) noex ;
 /* exported subroutines */
 
 int bcontrol(bfile *op,int cmd,...) noex {
+    	va_list		ap ;
+	int		rs ;
+	{
+	    va_begin(ap,cmd) ;
+	    rs = bcontrolv(op,cmd,ap) ;
+	    va_end(ap) ;
+	}
+	return rs ;
+}
+
+int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 	int		rs ;
 	if ((rs = bfile_magic(op)) > 0) {
 	    if ((rs = bfile_flush(op)) >= 0) {
-	        va_list	ap ;
 	        FLOCK	fl, *fsp ;
 	        int	fcmd ;
 	        int	f_tc = FALSE ;
-	        va_begin(ap,cmd) ;
 	        switch (cmd) {
 	        case BC_TELL:
 	            {
@@ -361,7 +370,6 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	            rs = SR_INVALID ;
 	            break ;
 	        } /* end switch (handling different "cmd"s) */
-	        va_end(ap) ;
 	    } /* end if (bflush) */
 	} /* end if (magic) */
 	return rs ;

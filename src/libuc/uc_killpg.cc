@@ -1,4 +1,5 @@
 /* uc_killpg */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* send a kill-signal to a process group */

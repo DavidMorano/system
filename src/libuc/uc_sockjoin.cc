@@ -1,5 +1,6 @@
 /* uc_sockjoin */
-/* lang=C20 */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* join a UNIX®-Socket-Datagram */
 /* version %I% last-modified %G% */

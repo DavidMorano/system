@@ -1,4 +1,5 @@
 /* uc_reuseaddr */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* reuse an existing (perhaps) socket address */

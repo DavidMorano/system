@@ -1,4 +1,5 @@
 /* uc_settimeofday */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* set the current time of day */

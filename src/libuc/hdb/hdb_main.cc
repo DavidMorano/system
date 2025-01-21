@@ -142,7 +142,7 @@
 /* local defines */
 
 #define	HDB_PRBUFLEN	20
-#define	HDB_D		DAT
+#define	HDB_D		hdb_datum
 #define HDB_KE		hdb_ke
 #define HDB_VE		hdb_ve
 
@@ -449,6 +449,18 @@ int hdb_store(hdb *op,HDB_D key,DAT val) noex {
 }
 /* end subroutine (hdb_store) */
 
+/* determine if we have a key in the database already; 0=not-have, 1=have */
+int hdb_have(hdb *op,hdb_dat key) noex {
+    	int		rs ;
+	if ((rs = hdb_magic(op,key.buf)) >= 0) {
+	    uint	hv = (*op->hashfunc)(key.buf,key.len) ;
+	    ENT		**nextp = getpoint(op,hv,&key) ;
+	    rs = (nextp != nullptr) ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (hdb_have) */
+
 /* delete all entries with a specified key */
 
 /****
@@ -494,6 +506,53 @@ int hdb_delkey(hdb *op,HDB_D key) noex {
 }
 /* end subroutine (hdb_delkey) */
 
+/* count of items in container */
+int hdb_count(hdb *op) noex {
+	int		rs ;
+	if ((rs = hdb_magic(op)) >= 0) {
+	    rs = op->count ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (hdb_count) */
+
+int hdb_curbegin(hdb *op,CUR *curp) noex {
+	int		rs ;
+	if ((rs = hdb_magic(op,curp)) >= 0) {
+	    *curp = icur ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (hdb_curbegin) */
+
+int hdb_curdone(hdb *op,CUR *curp) noex {
+	int		rs ;
+	int		fret = false ;
+	if ((rs = hdb_magic(op,curp)) >= 0) {
+	    fret = (curp->i >= op->htlen) ;
+	} /* end if (magic) */
+	return (rs >= 0) ? fret : rs ;
+}
+/* end subroutine (hdb_curdone) */
+
+int hdb_curend(hdb *op,CUR *curp) noex {
+	int		rs ;
+	if ((rs = hdb_magic(op,curp)) >= 0) {
+	    *curp = icur ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (hdb_curend) */
+
+int hdb_curcopy(hdb *op,CUR *curp,CUR *othp) noex {
+	int		rs ;
+	if ((rs = hdb_magic(op,curp,othp)) >= 0) {
+	    *othp = *curp ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (hdb_curcopy) */
+
 /* delete an entry by its cursor */
 
 /****
@@ -518,7 +577,7 @@ int hdb_curdel(hdb *op,CUR *curp,int f_adv) noex {
                 ENT         *pjep = ei.pjep ;
                 ENT         *pkep = ei.pkep ;
                 int         i, j ;
-    /* determine any necessary cursor adjustment */
+    		/* determine any necessary cursor adjustment */
                 if (f_adv) {
                     if (ep->same == nullptr) { /* code-reviewed */
                         ncur.k = 0 ;
@@ -567,7 +626,7 @@ int hdb_curdel(hdb *op,CUR *curp,int f_adv) noex {
                         ncur.k = (curp->k - 1) ;
                     }
                 } /* end if (cursor disposition) */
-    /* do all necessary list pointer adjustments */
+    		/* do all necessary list pointer adjustments */
                 if (curp->k == 0) { /* code-reviewed */
                     i = curp->i ;
                     if (curp->j == 0) {
@@ -734,53 +793,6 @@ int hdb_curenum(hdb *op,CUR *curp,HDB_D *keyp,DAT *valp) noex {
 }
 /* end subroutine (hdb_curenum) */
 
-/* count of items in container */
-int hdb_count(hdb *op) noex {
-	int		rs ;
-	if ((rs = hdb_magic(op)) >= 0) {
-	    rs = op->count ;
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (hdb_count) */
-
-int hdb_curbegin(hdb *op,CUR *curp) noex {
-	int		rs ;
-	if ((rs = hdb_magic(op,curp)) >= 0) {
-	    *curp = icur ;
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (hdb_curbegin) */
-
-int hdb_curdone(hdb *op,CUR *curp) noex {
-	int		rs ;
-	int		fret = false ;
-	if ((rs = hdb_magic(op,curp)) >= 0) {
-	    fret = (curp->i >= op->htlen) ;
-	} /* end if (magic) */
-	return (rs >= 0) ? fret : rs ;
-}
-/* end subroutine (hdb_curdone) */
-
-int hdb_curend(hdb *op,CUR *curp) noex {
-	int		rs ;
-	if ((rs = hdb_magic(op,curp)) >= 0) {
-	    *curp = icur ;
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (hdb_curend) */
-
-int hdb_curcopy(hdb *op,CUR *curp,CUR *othp) noex {
-	int		rs ;
-	if ((rs = hdb_magic(op,curp,othp)) >= 0) {
-	    *othp = *curp ;
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (hdb_curcopy) */
-
 int hdb_hashtablen(hdb *op,uint *rp) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,rp)) >= 0) {
@@ -798,9 +810,8 @@ int hdb_hashtabcounts(hdb *op,int *rp,int n) noex {
             if (n >= op->htlen) {
                 ENT         **hepp ;
                 ENT         *hp ;
-                int         hi ;
                 rs = SR_OK ;
-                for (hi = 0 ; hi < op->htlen ; hi += 1) {
+                for (int hi = 0 ; hi < op->htlen ; hi += 1) {
                     int     c = 0 ;
                     hepp = (op->htaddr + hi) ;
                     for (hp = *hepp ; hp ; hp = hp->next) {
@@ -947,6 +958,7 @@ static int hdb_get(hdb *op,int f,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 }
 /* end subroutine (hdb_get) */
 
+/* extend the hash-table itself */
 static int hdb_ext(hdb *op) noex {
 	ENT		**htaddr = op->htaddr ;
 	int		rs = SR_OK ;
@@ -1216,7 +1228,7 @@ static int fetchcur_adv(FETCUR *fcp) noex {
 
 /****
 	The returned value is the address of the pointer that refers
-	to the found object.  The pointer may be nullptr if the object
+	to the found object.  The pointer may be NULL if the object
 	was not found.  If so, this pointer should be updated with
 	the address of the object to be inserted, if insertion is
 	desired.
@@ -1227,8 +1239,8 @@ static ENT **getpoint(hdb *op,uint hv,HDB_D *keyp) noex {
 	ENT		*ep ;
 	ENT		**hepp ;
 	ENT		*pep = nullptr ;
-	int		hi = (hv % op->htlen) ;
-	int		keylen = keyp->len ;
+	cint		hi = (hv % op->htlen) ;
+	cint		keylen = keyp->len ;
 	cchar		*keydat = charp(keyp->buf) ;
 	hepp = (op->htaddr + hi) ;
 	for (ep = *hepp ; ep ; ep = ep->next) {

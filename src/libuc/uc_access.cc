@@ -1,4 +1,5 @@
 /* uc_access */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* POSIX file-unlink */

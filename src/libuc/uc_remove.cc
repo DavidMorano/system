@@ -1,4 +1,5 @@
 /* uc_remove */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* remove a file */

@@ -89,14 +89,26 @@ constexpr flagstrs	fs_open[] = {
 #ifdef	O_LARGEFILE
 	{ O_LARGEFILE, "LARGE" },
 #endif
+#ifdef	O_DIRECTORY
+	{ O_DIRECTORY, "DIRECTORY" },
+#endif
+#ifdef	O_DIRECT
+	{ O_DIRECT, "DIRECT" },
+#endif
+#ifdef	O_TMPFILE
+	{ O_TMPFILE, "TMPFILE" },
+#endif
 #ifdef	O_PRIV
 	{ O_PRIV, "PRIV" },
 #endif
-#ifdef	O_SETSID
-	{ O_SETSID, "SETSID" },
-#endif
 #ifdef	O_CLOEXEC
 	{ O_CLOEXEC, "CLOEXEC" },
+#endif
+#ifdef	O_MINMOD
+	{ O_MINMOD, "MINMOD" },
+#endif
+#ifdef	O_MINFD
+	{ O_MINFD, "MINFD" },
 #endif
 #ifdef	O_NETWORK
 	{ O_NETWORK, "NETWORK" },

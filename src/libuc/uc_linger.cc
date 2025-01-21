@@ -1,4 +1,5 @@
 /* uc_linger */
+/* encoding=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* set (or unset) a LINGER time-out on a socket */

@@ -57,12 +57,12 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 OBJ00= bsupport.o bopen.o bcontrol.o
 OBJ01= bminmod.o bflush.o breserve.o
-OBJ02= bseek.o brewind.o btell.o btruncate.o
-OBJ03= bisterm.o
+OBJ02= bseek.o brewind.o btell.o 
+OBJ03= bisterm.o bobj.o
 
 OBJ04= bwrite.o 
 OBJ05= bwriteblock.o bwriteblanks.o bwritefile.o
-OBJ06=
+OBJ06= btruncate.o
 OBJ07=
 
 OBJ08= bprintf.o bputc.o
@@ -75,10 +75,10 @@ OBJ13= bwasteln.o
 OBJ14= 
 OBJ15=
 
-OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
-OBJB= $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
-OBJC= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) 
-OBJD= $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
+OBJA= obj00.o obj01.o obj02.o obj03.o
+OBJB= obj04.o obj05.o obj06.o
+OBJC= obj08.o obj09.o obj10.o
+OBJD= obj12.o obj13.o
 
 OBJ= obja.o objb.o objc.o objd.o
 
@@ -116,9 +116,6 @@ $(T).so:		$(OBJ) Makefile
 $(T).o:			$(OBJ)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
 
-$(T).a:			$(OBJ)
-	$(AR) $(ARFLAGS) -rc $@ $?
-
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 
@@ -135,6 +132,55 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
+
+obj00.o:		$(OBJ00)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ00)
+
+obj01.o:		$(OBJ01)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ01)
+
+obj02.o:		$(OBJ02)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ02)
+
+obj03.o:		$(OBJ03)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ03)
+
+obj04.o:		$(OBJ04)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ04)
+
+obj05.o:		$(OBJ05)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ05)
+
+obj06.o:		$(OBJ06)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ06)
+
+obj07.o:		$(OBJ07)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ07)
+
+obj08.o:		$(OBJ08)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ08)
+
+obj09.o:		$(OBJ09)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ09)
+
+obj10.o:		$(OBJ10)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ10)
+
+obj11.o:		$(OBJ11)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ11)
+
+obj12.o:		$(OBJ12)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ12)
+
+obj13.o:		$(OBJ13)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ13)
+
+obj14.o:		$(OBJ14)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ14)
+
+obj15.o:		$(OBJ15)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ15)
 
 
 obja.o:			$(OBJA)
@@ -183,5 +229,6 @@ bdup.o:			bdup.cc			$(INCS)
 bminmod.o:		bminmod.cc		$(INCS)
 
 bsupport.o:		bsupport.cc		$(INCS)
+bobj.o:			bobj.cc			$(INCS)
 
 

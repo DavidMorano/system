@@ -187,6 +187,10 @@ int hdb::store(HDB_D key,DAT val) noex {
 	return hdb_store(this,key,val) ;
 }
 
+int hdb::have(HDB_D key) noex {
+	return hdb_have(this,key) ;
+}
+
 int hdb::curbegin(CUR *curp) noex {
 	return hdb_curbegin(this,curp) ;
 }
