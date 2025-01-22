@@ -28,14 +28,14 @@
 	Note:
 	The timezone offset value in 'TIMEB' is the minutes
 	west of GMT.  This is a positive value for timezones that
-	are west of Greenwich. It is negative for timezones east
-	of Greenwich. This is opposite from what you will see in
-	email headers (for example). Our number here must be
+	are west of Greenwich.  It is negative for timezones east
+	of Greenwich.  This is opposite from what you will see in
+	email headers (for example).  Our number here must be
 	subtracted from GMT in order to get the local time.
 
 	Frustration note:
 	What an incredible pain this time-dater handling stuff all
-	is?  This file doesn't even do justice to a small fraction
+	is?  This file does not even do justice to a small fraction
 	of the real problems associated with date management!  The
 	problem is that the dater changes as time progresses.
 	Changes are due to timezone differences and year leaps and
@@ -53,7 +53,7 @@
 	of the string and which contains a time-zone-name.
 
 	Full comment parsing is done on MSG dates using a comparse
-	object. With comparse processing, we still try to divine a
+	object.  With comparse processing, we still try to divine a
 	time-zone-name from the leading part of the resulting
 	comment.
 
@@ -81,6 +81,8 @@
 #include	<zdb.h>			/* CHRONO */
 #include	<sncpyx.h>
 #include	<snwcpyx.h>
+#include	<strn.h>		/* |strnwcpyxc(3uc)| */
+#include	<strwcpy.h>
 #include	<mkchar.h>
 #include	<hasx.h>		/* |hasalldig(3uc)| */
 #include	<ischarx.h>		/* |isdigitlatin(3uc)| */
@@ -140,7 +142,7 @@ static int	dater_ldzname(dater *,cchar *,int) noex ;
 static int	dater_defs(dater *,tmz *) noex ;
 
 static inline int znwcpy(char *zb,int zl,cc *zsp,int zsl = -1) noex {
-	cint rs = strnwcpy(zb,zl,zsp,zsl) - zb ;
+	cint rs = strnwcpylc(zb,zl,zsp,zsl) - zb ; /* <- lower-case */
 	zb[zl] = '0' ;
 	return rs ;
 }
@@ -470,7 +472,7 @@ int dater_settimezn(dater *op,time_t t,cchar *zname,int isdst) noex {
 	                op->fl.zname = true ;
 		        if ((rs = znlen) >= 0) {
 			    cint	znl = rs ;
-	                    strncpylc(op->zname,zname,(znl + 1)) ;
+	                    znwcpy(op->zname,znl,zname) ;
 		        } /* end if (znlen) */
 	                if (isdst < 0) {
 			    isdst = tmt.isdst ;
@@ -504,13 +506,13 @@ int dater_settimezon(dater *op,time_t t,int zoff,cchar *zname,int isdst) noex {
 	        op->fl.zoff = true ;
 	        /* continue */
 	        if ((zname != nullptr) && (zname[0] != '\0')) {
-	            strncpylc(op->zname,zname,(znl + 1)) ;
+	            znwcpy(op->zname,znl,zname) ;
 	        } else {
 	            op->fl.tzset = true ;
 	            if (tmtime tmt ; (rs = tmt.localtime(t)) >= 0) {
 	                zname = tmt.zname ;
 	                op->fl.zname = true ;
-	                strncpylc(op->zname,zname,(znl + 1)) ;
+	                znwcpy(op->zname,znl,zname) ;
 	                if (isdst < 0) {
 			    isdst = tmt.isdst ;
 			}
@@ -789,7 +791,7 @@ static int dater_initcur(dater *op) noex {
 	            op->cyear = tmt.year ;
 	            op->cb.timezone = (zo / 60) ; /* minutes west of GMT */
 	            op->cb.dstflag = tmt.isdst ;
-	            strncpylc(op->cname,tmt.zname,(znl + 1)) ;
+	            znwcpy(op->cname,znl,tmt.zname) ;
 	            op->fl.cb = true ;
 	            op->fl.czn = true ;
 	            op->fl.cyear = true ;
@@ -808,8 +810,6 @@ static int dater_mkpzoff(dater *op,TM *stp,int zoff) noex {
 	    if ((rs = znlen) >= 0) {
 		cint	znl = rs ;
 	        rs = znwcpy(op->zname,znl,zr.name) ;
-	        rs = (strncpylc(op->zname,zr.name,znl)) - op->zname) ;
-		op->zname[znl] = '\0' ;
 	    } /* end if (znlen) */
 	} else {
 	    rs = SR_OK ;
@@ -826,8 +826,7 @@ static int dater_ldtmz(dater *op,tmz *tp) noex {
 	if (tp->zname[0] != '\0') {
 	    if ((rs = znlen) >= 0) {
 		cint	znl = rs ;
-	        strncpylc(op->zname,tp->zname,znl) ;
-		op->zname[znl] = '\0' ;
+	        znwcpy(op->zname,znl,tp->zname) ;
 	        op->fl.zname = (op->zname[0] != '\0') ;
 	    } /* end if (znlen) */
 	}
