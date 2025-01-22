@@ -28,7 +28,16 @@ struct defzdata_head {
 	int	isdst ;		/* is-dst flag */
 } ;
 
-typedef DEFZDATA	defzdata ;
+#ifdef	__cplusplus
+struct defzdata : defzdata_head {
+    	defzdata() = default ;
+	defzdata(const defzdata &) = delete ;
+	defzdata &operator = (const defzdata &) = delete ;
+	int get(char *,int,int) noex ;
+} ; /* end struct (defzdata) */
+#else	/* __cplusplus */
+typedef ZDEFINFO	defzdata ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

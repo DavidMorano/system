@@ -111,4 +111,8 @@ int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 }
 /* end subroutine (getdefzdata) */
 
+int defzdata::get(char *zbuf,int zlen,int isdst) noex {
+	return getdefzdata(this,zbuf,zlen,isdst) ;
+}
+
 
