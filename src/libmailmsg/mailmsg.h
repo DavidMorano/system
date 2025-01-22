@@ -20,6 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<unistd.h>		/* |off_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

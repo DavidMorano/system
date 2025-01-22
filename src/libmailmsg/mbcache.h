@@ -13,6 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<time.h>		/* |time_t| */
+#include	<unistd.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -32,15 +34,14 @@
 #define	MBCACHE_INFO		struct mbcache_information
 #define	MBCACHE_SCAN		struct mbcache_scanner
 #define	MBCACHE_SFLAGS		struct mbcache_sflags
-
 /* open options */
 #define	MBCACHE_ORDWR		MAILBOX_ORDWR
-
+/* state */
 #define	MBCACHE_MFVREAD		0		/* MSG has been read */
 #define	MBCACHE_MFVDEL		1		/* MSG marked for deletion */
 #define	MBCACHE_MFVSPAM		2		/* MSG marked as spam */
 #define	MBCACHE_MFVTRASH	3		/* MSG marked as trash */
-
+/* state-mask */
 #define	MBCACHE_MFMREAD		(1<<MBCACHE_MFVREAD)
 #define	MBCACHE_MFMDEL		(1<<MBCACHE_MFVDEL)
 #define	MBCACHE_MFMSPAM		(1<<MBCACHE_MFVSPAM)
@@ -94,8 +95,8 @@ struct mbcache_scanner {
 	cchar		*vs[mbcachemf_overlast] ;
 	cchar		*fname ;	/* processed content file */
 	vecint		lineoffs ;
-	DATE		edate ;		/* date-envelope */
-	DATE		hdate ;		/* date-header */
+	date		edate ;		/* date-envelope */
+	date		hdate ;		/* date-header */
 	off_t		moff ;		/* offset message start (envelope) */
 	off_t		hoff ;		/* offset message headers */
 	off_t		boff ;		/* offset message body */
@@ -106,7 +107,7 @@ struct mbcache_scanner {
 	int		mlen ;		/* length message whole */
 	int		hlen ;		/* length message headers */
 	int		blen ;		/* length message body */
-	int		filesize ;	/* processed content file */
+	int		filesz ;	/* processed content file */
 	int		nlines ;	/* message lines-native */
 	int		vlines ; 	/* message lines-view */
 	int		msgi ;		/* message index */
@@ -117,12 +118,12 @@ struct mbcache_flags {
 } ;
 
 struct mbcache_head {
-	mailbox		*mbp ;
-	cchar		*mbfname ;
+	cchar		*mbfname ;	/* mail-box-file-name */
+	mailbox		*mbp ;		/* mail-box-pointer */
+	mailbox_info	*mip ;		/* mailbox-info-pointer */
+	strpack		*spp ;		/* string-pack-pointer */
+	dater		*dmp ;		/* dater-manager-pointer */
 	MBCACHE_SCAN	**msgs ;
-	mailbox_info	mbi ;
-	strpack		strs ;
-	dater		dm ;		/* dater-manager */
 	MBCACHE_FL	f ;
 	uint		magic ;
 	int		mflags ;	/* mailbox open-flags */

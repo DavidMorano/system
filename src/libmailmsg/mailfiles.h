@@ -21,6 +21,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
+#include	<time.h>		/* |time_t| */
+#include	<fcntl.h>		/* |off_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -29,7 +31,7 @@
 #include	<vecitem.h>
 
 
-#define	MAILFILES		VECITEM
+#define	MAILFILES		vecitem
 #define	MAILFILES_ENT		struct mailfiles_entry
 
 

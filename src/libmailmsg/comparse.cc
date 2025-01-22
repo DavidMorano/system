@@ -306,6 +306,37 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (comparse_bake) */
 
+int comparse::start(cchar *sp,int sl) noex {
+	return comparse_start(this,sp,sl) ;
+}
+
+int comparse::getval(cchar **rpp) noex {
+	return comparse_getval(this,rpp) ;
+}
+
+int comparse::getcom(cchar **rpp) noex {
+	return comparse_getcom(this,rpp) ;
+}
+
+void comparse::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("comparse",rs,"fini-finish") ;
+	}
+}
+
+comparse_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case comparsemem_finish:
+	        rs = comparse_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (comparse_co::operator) */
+
 vars::operator int () noex {
     	int		rs ;
 	if ((rs = getbufsize(getbufsize_mailaddr)) >= 0) {

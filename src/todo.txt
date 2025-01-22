@@ -39,12 +39,12 @@ ts
 dw
 ds
 spellchecks	incredible mess!
-dater		add OBJ
 
 = Future
 
 file		description
 --------------------------------------------------------------------------------
+mbcache		add dynamic alloc for |mbcache_scan|
 searchkeys
 lookaddr	pointer-implementation
 progsig		total mess

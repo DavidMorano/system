@@ -40,7 +40,7 @@
 #define	MAILALIAS_NSHIFT	8
 #define	MAILALIAS_FILEVERSION	0
 #define	MAILALIAS_DEFAPTAB	"default"
-
+/* options */
 #define	MAILALIAS_OSEC		(1<<0)		/* use secondard hash */
 #define	MAILALIAS_ORANDLC	(1<<1)		/* use |randlc()| */
 

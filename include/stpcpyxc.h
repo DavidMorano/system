@@ -1,4 +1,4 @@
-/* strcpyxc HEADER */
+/* stpcpyxc HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRCPYXC_INCLUDE
-#define	STRCPYXC_INCLUDE
+#ifndef	STPCPYXC_INCLUDE
+#define	STPCPYXC_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -28,14 +28,14 @@
 
 EXTERNC_begin
 
-extern char	* strcpybc (char *,cchar *) noex ;
-extern char	* strcpylc (char *,cchar *) noex ;
-extern char	* strcpyuc (char *,cchar *) noex ;
-extern char	* strcpyfc (char *,cchar *) noex ;
+extern char	* stpcpybc (char *,cchar *) noex ;
+extern char	* stpcpylc (char *,cchar *) noex ;
+extern char	* stpcpyuc (char *,cchar *) noex ;
+extern char	* stpcpyfc (char *,cchar *) noex ;
 
 EXTERNC_end
 
 
-#endif /* STRCPYXC_INCLUDE */
+#endif /* STPCPYXC_INCLUDE */
 
 

@@ -18,14 +18,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<sys/param.h>
 #include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<localmisc.h>		/* |MAXPATHLEN| */
 
 
 #define	LKMAIL_MAGIC	0x95437651

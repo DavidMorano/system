@@ -21,7 +21,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<limits.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

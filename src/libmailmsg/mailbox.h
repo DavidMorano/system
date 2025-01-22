@@ -21,8 +21,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>		/* |open(2)| definitions */
+#include	<fcntl.h>		/* |open(2)| definitions */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

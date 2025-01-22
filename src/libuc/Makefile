@@ -872,6 +872,8 @@ typenonpath.o:		typenonpath.cc typenonpath.h
 digval.o:		digval.cc digval.h
 willaddover.o:		willaddover.cc willaddover.h
 mkdirs.o:		mkdirs.cc mkdirs.h
+strcpyxc.o:		strcpyxc.cc strcpyxc.h
+stpcpyxc.o:		stpcpyxc.cc stpcpyxc.h
 
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 readln.o:		readln.cc readln.hh

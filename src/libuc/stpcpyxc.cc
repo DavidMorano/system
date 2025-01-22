@@ -1,8 +1,8 @@
-/* strcpyxc SUPPORT */
+/* stpcpyxc SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* copy a c-string to destination buffer w/ a case conversion */
+/* copy a c-string to destination buffer a/ a case conversion */
 /* version %I% last-modified %G% */
 
 #define	CF_STPCPY	1		/* use |stpcpy(3c)| */
@@ -19,10 +19,10 @@
 /*******************************************************************************
 
 	Names:
-	strcpybc
-	strcpylc
-	strcpyuc
-	strcpyfc
+	stpcpybc
+	stpcpylc
+	stpcpyuc
+	stpcpyfc
 
 	Description:
 	These subroutines copy a source c-string to a (uncounted)
@@ -30,7 +30,7 @@
 	(according to which subroutine is called).
 
 	Synopsis:
-	rp = *strcpy{x}c(char *dst,cchar *src) noex
+	rp = *stpcpy{x}c(char *dst,cchar *src) noex
 
 	Arguments:
 	dst	destination result buffer (pointer)
@@ -50,7 +50,7 @@
 #include	<toxc.h>
 #include	<localmisc.h>
 
-#include	"strcpyxc.h"
+#include	"stpcpyxc.h"
 
 
 /* local defines */
@@ -81,14 +81,14 @@ extern "C" {
 
 /* forward references */
 
-static char *strcpyxc(toxc_f toxc,char *dp,cchar *sp) noex {
+static char *stpcpyxc(toxc_f toxc,char *dp,cchar *sp) noex {
 	while (*sp) {
 	    *dp++ = toxc(*sp++) ;
 	} /* end while */
 	*dp = '\0' ;
 	return dp ;
 }
-/* end subroutine (strcpyxc) */
+/* end subroutine (stpcpyxc) */
 
 
 /* local variables */
@@ -101,26 +101,26 @@ constexpr bool		f_stpcpy = CF_STPCPY ;
 
 /* exported subroutines */
 
-char *strcpybc(char *dp,cchar *sp) noex {
+char *stpcpybc(char *dp,cchar *sp) noex {
 	char		*rp ;
 	if_constexpr (f_stpcpy) {
 	    rp = stpcpy(dp,sp) ;
 	} else {
-	    rp = strcpyxc(tobc,dp,sp) ;
+	    rp = stpcpyxc(tobc,dp,sp) ;
 	}
 	return rp ;
 }
 
-char *strcpylc(char *dp,cchar *sp) noex {
-	return strcpyxc(tolc,dp,sp) ;
+char *stpcpylc(char *dp,cchar *sp) noex {
+	return stpcpyxc(tolc,dp,sp) ;
 }
 
-char *strcpyuc(char *dp,cchar *sp) noex {
-	return strcpyxc(touc,dp,sp) ;
+char *stpcpyuc(char *dp,cchar *sp) noex {
+	return stpcpyxc(touc,dp,sp) ;
 }
 
-char *strcpyfc(char *dp,cchar *sp) noex {
-	return strcpyxc(tofc,dp,sp) ;
+char *stpcpyfc(char *dp,cchar *sp) noex {
+	return stpcpyxc(tofc,dp,sp) ;
 }
 
 

@@ -42,12 +42,13 @@
 #include	<contentencodings.h>
 #include	<contypevals.h>
 #include	<headkeymat.h>
-#include	<comparse.h>
 #include	<whitelist.h>
 #include	<splitaddr.h>
 #include	<stackaddr.h>
+#include	<comparse.h>
 #include	<comsatmsg.h>
-#include	<retpth.h>
+#include	<retpath.h>
+#include	<csro.h>
 
 #include	<envmat.h>
 

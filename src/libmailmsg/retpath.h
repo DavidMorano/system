@@ -19,7 +19,7 @@
 #define	RETPATH_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

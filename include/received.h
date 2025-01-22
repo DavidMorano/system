@@ -55,7 +55,7 @@ enum receivedmems {
 } ;
 struct received ;
 struct received_co {
-	received		*op = nullptr ;
+	received	*op = nullptr ;
 	int		w = -1 ;
 	void operator () (received *p,int m) noex {
 	    op = p ;
