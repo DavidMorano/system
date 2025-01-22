@@ -39,7 +39,6 @@
 	Returns:
 	last		pointer to one character past the end of destination
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -66,6 +65,7 @@
 /* local typedefs */
 
 extern "C" {
+    typedef int (*toxc_f)(int) noex ;
     typedef char *(*scxc_f)(char *,cchar *) noex ;
 }
 
@@ -81,7 +81,7 @@ extern "C" {
 
 /* forward references */
 
-template<int (*toxc)(int)>
+template<toxc_f toxc>
 char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
 	if (dst && src) {
 	    dst[0] = '\0' ;

@@ -30,6 +30,7 @@
 #include	<strnxpbrk.h>		/* find */
 #include	<strnxsub.h>		/* find */
 #include	<strncpyxc.h>		/* copy */
+#include	<strnwcpyxc.h>		/* copy (special) */
 
 
 EXTERNC_begin

@@ -24,14 +24,23 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<strcpyxc.h>
 
 
 EXTERNC_begin
 
-extern char	* stpcpybc (char *,cchar *) noex ;
-extern char	* stpcpylc (char *,cchar *) noex ;
-extern char	* stpcpyuc (char *,cchar *) noex ;
-extern char	* stpcpyfc (char *,cchar *) noex ;
+static inline char * stpcpybc (char *dp,cchar *sp) noex {
+	return strcpybc(dp,sp) ;
+}
+static inline char * stpcpylc (char *dp,cchar *sp) noex {
+	return strcpylc(dp,sp) ;
+}
+static inline char * stpcpyuc (char *dp,cchar *sp) noex {
+	return strcpyuc(dp,sp) ;
+}
+static inline char * stpcpyfc (char *dp,cchar *sp) noex {
+	return strcpyfc(dp,sp) ;
+}
 
 EXTERNC_end
 
