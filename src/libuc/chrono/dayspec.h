@@ -35,11 +35,43 @@ struct dayspec_head {
 	schar		m, d ;
 } ;
 
+#ifdef	__cplusplus
+enum dayspecmems {
+	dayspecmem_def,
+	dayspecmem_yday,
+	dayspecmem_overlast
+} ;
+struct dayspec ;
+struct dayspec_co {
+	dayspec		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (dayspec *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (dayspec_co) */
+struct dayspec : dayspec_head {
+	dayspec_co	def ;
+	dayspec_co	yday ;
+	dayspec() noex {
+	    def(this,dayspecmem_def) ;
+	    yday(this,dayspecmem_yday) ;
+	} ;
+	dayspec(const dayspec &) = delete ;
+	dayspec &operator = (const dayspec &) = delete ;
+	int load(cchar *,int = -1) noex ;
+} ; /* end struct (dayspec) */
+#else	/* __cplusplus */
 typedef DAYSPEC		dayspec ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
-extern int dayspec_default(dayspec *) noex ;
+extern int dayspec_def(dayspec *) noex ;
 extern int dayspec_load(dayspec *,cchar *,int) noex ;
 extern int dayspec_yday(dayspec *) noex ;
 

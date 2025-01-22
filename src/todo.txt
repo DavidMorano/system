@@ -4,12 +4,12 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
-nodesfile
 uctim
 libuc		fix to completely compile!
 fsdirtree	needs pointer implementation and a lot of cleanup
 postfile
 quote
+sysdialer
 mailmsghdrct
 srv{x}
 memfile		can we just trash this?

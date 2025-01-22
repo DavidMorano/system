@@ -17,6 +17,12 @@
 
 /*******************************************************************************
 
+	Group:
+	dayspec_def
+	dayspec_load
+	dayspec_yday
+
+	Decription:
 	This object parses and loads a given day-specification
 	string into itself.  The given day-specification string
 	looks like:
@@ -45,6 +51,20 @@
 	y		0-2037
 	m		0-11
 	d		1-31
+
+	Synopsis:
+	int dayspec_def(dayspec *op) noex
+	int dayspec_load(dayspec *op,cchar *sp,int sl) noex
+	int dayspec_yday(dayspec *op) noex
+
+	Arguments:
+	dayspec		OBJECT pointer
+	sp		c-string pointer
+	sl		c-string length
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -108,7 +128,7 @@ static int	parsemonth(cchar *,int) noex ;
 
 /* exported subroutines */
 
-int dayspec_default(dayspec *op) noex {
+int dayspec_def(dayspec *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -118,7 +138,7 @@ int dayspec_default(dayspec *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dayspec_default) */
+/* end subroutine (dayspec_def) */
 
 int dayspec_load(dayspec *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -302,5 +322,25 @@ static int siourbrk(cchar *sp,int sl,int f_dig) noex {
 	return (f) ? i : -1 ;
 }
 /* end subroutine (siourbrk) */
+
+int dayspec::load(cchar *sp,int sl) noex {
+	return dayspec_load(this,sp,sl) ;
+}
+
+dayspec_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case dayspecmem_def:
+	        rs = dayspec_def(op) ;
+	        break ;
+	    case dayspecmem_yday:
+	        rs = dayspec_yday(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (dayspec_co::operator) */
 
 

@@ -47,6 +47,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<ctime>			/* |time(2)| */
+#include	<new>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -330,13 +331,14 @@ static int nodesfile_finents(NF *op) noex {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    while ((rs2 = hdb_curenum(elp,&cur,&key,&val)) >= 0) {
-		NF_FI	*ep = (NF_FI *) key.buf ;
+		NF_ENT	*ep = (NF_ENT *) key.buf ;
 		if (key.buf) {
 		    {
 		        rs1 = ep->finish() ;
 		        if (rs >= 0) rs = rs1 ;
 		    }
 		    {
+			ep->~nodesfile_ent() ;
 			rs1 = uc_free(key.buf) ;
 		        if (rs >= 0) rs = rs1 ;
 		    }
@@ -365,6 +367,7 @@ static int nodesfile_finfis(NF *op) noex {
 		    if (rs >= 0) rs = rs1 ;
 		}
 		{
+		    fep->~nodesfile_fi() ;
 		    rs1 = uc_free(fep) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
@@ -423,12 +426,20 @@ int nodesfile_have(NF *op,cchar *sp,int sl) noex {
 /* end subroutine (nodesfile_have) */
 
 int nodesfile_curbegin(NF *op,NF_CUR *curp) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = nodesfile_magic(op,curp)) >= 0) {
 	    cint	sz = szof(hdb_cur) ;
 	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
-		curp->hcp = (hdb_cur *) vp ;
-	        rs = hdb_curbegin(op->elp,curp->hcp) ;
+		rs = SR_BUGCHECK ;
+		if ((curp->hcp = new(vp) hdb_cur) != np) {
+		    {
+	                rs = hdb_curbegin(op->elp,curp->hcp) ;
+		    }
+		    if (rs < 0) {
+		        curp->hcp->~hdb_cur() ;
+		    }
+		} /* end if (new-hdb_cur) */
 		if (rs < 0) {
 		    uc_free(curp->hcp) ;
 		    curp->hcp = nullptr ;
@@ -448,7 +459,8 @@ int nodesfile_curend(NF *op,NF_CUR *curp) noex {
 	            rs1 = hdb_curend(op->elp,curp->hcp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        }
-	        {
+		{
+		    curp->hcp->~hdb_cur() ;
 		    rs1 = uc_free(curp->hcp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    curp->hcp = nullptr ;
@@ -532,12 +544,13 @@ static int nodesfile_fnloadbegin(NF *op,cchar *fn,bfile *fp) noex {
 	    if ((rs = nodesfile_fnalready(op,&sb)) == 0) {
 		cint	sz = szof(NF_FI) ;
 		if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+		    rs = SR_BUGCHECK ;
 		    if (NF_FI *fep ; (fep = new(vp) NF_FI) != np) {
 		        dev_t	d = sb.st_dev ;
 		        ino_t	i = sb.st_ino ;
 		        time_t	t = sb.st_mtime ;
 		        if ((rs = fep->start(fn,d,i,t)) >= 0) {
-			    vechand		*flp = op->flp ;
+			    vechand	*flp = op->flp ;
 			    if ((rs = flp->add(fep)) >= 0) {
 			        idx = rs ;
 			    }
@@ -567,6 +580,7 @@ static int nodesfile_fnloadend(NF *op,int fi) noex {
 	    if (vp) {
 		if ((rs = flp->del(fi)) >= 0) {
 	            if ((rs = fep->finish()) >= 0) {
+			fep->~nodesfile_fi() ;
 		        rs = uc_free(fep) ;
 	            }
 		}
@@ -600,6 +614,7 @@ static int nodesfile_fnparseload(NF *op,int fi,cchar *sp,int sl) noex {
 	int		rs ;
 	if (char *vp ; (rs = uc_malloc(esz,&vp)) >= 0) {
 	    hdb		*elp = op->elp ;
+	    rs = SR_BUGCHECK ;
 	    if (NF_ENT *ep ; (ep = new(vp) NF_ENT) != np) {
 	        if ((rs = ep->start(sp,sl,fi)) >= 0) {
 		    hdb_dat		key ;

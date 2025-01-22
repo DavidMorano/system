@@ -17,9 +17,18 @@
 
 
 #include	<envstandards.h>	/* first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+
+#include	"cvttemperature.h"
+
+
+/* local defines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

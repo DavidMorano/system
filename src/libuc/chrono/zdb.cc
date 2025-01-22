@@ -73,6 +73,12 @@ using std::max ;			/* subroutine-template */
 
 /* local structures */
 
+struct zdata {
+    	cchar		*name ;
+	short		off ;		/* minutes west of GMT */
+	short		isdst ;		/* values: -1, 0, +1 */
+} ;
+
 
 /* forward references */
 
@@ -81,7 +87,7 @@ static int	findname(cchar *,int) noex ;
 
 /* local variables */
 
-constexpr zdb	zones[] = {
+constexpr zdata		zones[] = {
 	{ "acsst", -630, 1 },	/* Central Australia */
 	{ "acst", -570, 0 },	/* Central Australia */
 	{ "adt", 3*60, 1 },	/* Atlantic */
@@ -240,7 +246,7 @@ int zdb_nameoff(zdb *op,cchar *sp,int sl,int zoff) noex {
 /* end subroutine (zdb_nameoff) */
 
 /* set from 'name' only */
-int zdb_name(zdb *op,cchar *sp,int sl) noex {
+int zdb_setname(zdb *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op && sp) {
@@ -256,10 +262,10 @@ int zdb_name(zdb *op,cchar *sp,int sl) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (zdb_name) */
+/* end subroutine (zdb_setname) */
 
 /* set from 'offset' only */
-int zdb_off(zdb *op,int zoff) noex {
+int zdb_setoff(zdb *op,int zoff) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op) {
@@ -279,7 +285,7 @@ int zdb_off(zdb *op,int zoff) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (zdb_off) */
+/* end subroutine (zdb_setoff) */
 
 /* set from 'offset' and 'isdst' */
 int zdb_offisdst(zdb *op,int zoff,int isdst) noex {
@@ -310,7 +316,7 @@ int zdb_offisdst(zdb *op,int zoff,int isdst) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (zdb_off) */
+/* end subroutine (zdb_offisdst) */
 
 int zdb_count(zdb *op) noex {
 	int		rs = SR_FAULT ;
@@ -349,4 +355,15 @@ static int findname(cchar *sp,int sl) noex {
 }
 /* end subroutine (findname) */
 
+int zdb_nameoff(zdb *op,cchar *sp,int sl,int zoff) noex {
+int zdb_nameoff(zdb *op,cchar *sp,int sl,int zoff) noex {
+
+int zdb_setname(zdb *op,cchar *sp,int sl) noex {
+int zdb_setname(zdb *op,cchar *sp,int sl) noex {
+
+int zdb_setoff(zdb *op,int zoff) noex {
+int zdb_setoff(zdb *op,int zoff) noex {
+
+int zdb_offisdst(zdb *op,int zoff,int isdst) noex {
+int zdb_offisdst(zdb *op,int zoff,int isdst) noex {
 

@@ -29,7 +29,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
+#include	<sys/stat.h>		/* |USTAT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
@@ -167,7 +167,7 @@ int dirseen_add(dirseen *op,cchar *sp,int sl,USTAT *sbp) noex {
 	        ino_t	ino = sbp->st_ino ;
 	        int	pl = sl ;
 	        cchar	*pp = sp ;
-/* any NUL (blank) paths need to be converted to "." */
+		/* any NUL (blank) paths need to be converted to "." */
 	        if (pl == 0) {
 	            pp = "." ;
 	            pl = 1 ;

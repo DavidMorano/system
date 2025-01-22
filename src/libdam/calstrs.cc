@@ -20,7 +20,7 @@
 
 /*******************************************************************************
 
-  	Name:
+  	Data:
 	calstrs
 
 	Description:
@@ -96,5 +96,8 @@ cpcchar	calstrs_daytypes[] = {
 
 
 /* exported subroutines */
+
+
+/* local subroutines */
 
 

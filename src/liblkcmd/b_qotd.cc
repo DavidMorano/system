@@ -97,46 +97,6 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	mklogidpre(char *,int,cchar *,int) ;
-extern int	mklogidsub(char *,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	getmjd(int,int,int) ;
-extern int	dialudp(cchar *,cchar *,int,int,int) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
-
-extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const PIVARS *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthex(cchar *,int,cchar *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-
 
 /* external variables */
 
@@ -801,8 +761,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                                rs = cfdecti(argp,argl,&v) ;
 	                                pip->to = v ;
 	                            }
-	                        } else
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                        break ;
 
 /* line-buffered */
@@ -1526,15 +1487,15 @@ static int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 	if (ql < 0) ql = strlen(qp) ;
 
 	if (lip->f.mjd && hasalldig(qp,ql)) {
-	    uint	uv ;
-	    rs = cfdecui(qp,ql,&uv) ;
-	    mjd = (int) uv ;
+	    if (uint uv ; (rs = cfdecui(qp,ql,&uv)) >= 0) {
+	        mjd = (int) uv ;
+	    }
 	} else if ((rs = ourmjd(qp,ql)) > 0) {
 	    mjd = rs ;
 	} else {
 	    DAYSPEC	ds ;
 	    if ((qp[0] == '+') || (qp[0] == '-')) {
-	        rs = dayspec_default(&ds) ;
+	        rs = dayspec_def(&ds) ;
 	    } else {
 	        rs = dayspec_load(&ds,qp,ql) ;
 	    }
@@ -2037,9 +1998,9 @@ static int locinfo_termoutbegin(LOCINFO *lip,void *ofp)
 	    int		ncols = COLUMNS ;
 	    cchar	*vp ;
 	    if ((vp = getourenv(pip->envv,VARCOLUMNS)) != NULL) {
-	        int	v ;
-	        rs1 = cfdeci(vp,-1,&v) ;
-	        if (rs1 >= 0) ncols = v ;
+	        if (int v ; (rs1 = cfdeci(vp,-1,&v)) >= 0) {
+	            ncols = v ;
+		}
 	    }
 	    if (rs >= 0) {
 	        rs = termout_start(&lip->outer,tstr,-1,ncols) ;
@@ -2158,16 +2119,14 @@ static int locinfo_curdate(LOCINFO *lip)
 }
 /* end subroutine (locinfo_curdate) */
 
-
-static int locinfo_netparse(LOCINFO *lip,cchar *qp,int ql)
-{
+static int locinfo_netparse(LOCINFO *lip,cchar *qp,int ql) noex {
 	int		rs = SR_OK ;
 	int		mjd = 0 ;
 	if (ql < 0) ql = strlen(qp) ;
 	if (hasalldig(qp,ql)) {
-	    uint	uv ;
-	    rs = cfdecui(qp,ql,&uv) ;
-	    mjd = (int) uv ;
+	    if (uint uv ; (rs = cfdecui(qp,ql,&uv)) >= 0) {
+	        mjd = (int) uv ;
+	    }
 	} else if ((rs = ourmjd(qp,ql)) > 0) {
 	    mjd = rs ;
 	} else {

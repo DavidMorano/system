@@ -29,16 +29,16 @@
 #define	VARDEBUGFNAME	"TESTMAINTQOTD_DEBUGFILE"
 
 extern int	getmjd(int,int,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern const char 	*getourenv(const char **,const char *) ;
+extern cchar 	*getourenv(cchar **,cchar *) ;
 
 extern char	*timestr_logz(time_t,char *) ;
 
@@ -46,7 +46,7 @@ extern char	*timestr_logz(time_t,char *) ;
 
 static int curdate(DAYSPEC *,int) ;
 static int defspec(DAYSPEC *,DAYSPEC *) ;
-static int cvtdate(DAYSPEC *,const char *) ;
+static int cvtdate(DAYSPEC *,cchar *) ;
 
 static int dumpfile(int,int) ;
 static int dumpdir(int,int) ;
@@ -58,7 +58,7 @@ static int filer_refill(FILER *,int) ;
 
 /* exported subroutines */
 
-int main(int argc,const char **argv,const char **envv)
+int main(int argc,cchar **argv,cchar **envv)
 {
 	DAYSPEC		defs ;
 
@@ -72,11 +72,11 @@ int main(int argc,const char **argv,const char **envv)
 	int	rs1 ;
 	int	mjd ;
 
-	const char	*pr = "/usr/add-on/local" ;
+	cchar	*pr = "/usr/add-on/local" ;
 
 #if	CF_DEBUGS
 	{
-	    const char	*cp ;
+	    cchar	*cp ;
 	    if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL)
 	        debugopen(cp) ;
 	    debugprintf("main: starting\n") ;
@@ -98,7 +98,7 @@ int main(int argc,const char **argv,const char **envv)
 	    int		ai ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    for (ai = 1 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
-	        const char	*qp = argv[ai] ;
+	        cchar	*qp = argv[ai] ;
 	        const int	of = O_RDONLY ;
 #if	CF_DEBUGS
 	        debugprintf("main: qp=%s\n",qp) ;
@@ -373,27 +373,21 @@ static int defspec(DAYSPEC *ddsp,DAYSPEC *dsp)
 }
 /* end subroutine (defspec) */
 
-
-static int cvtdate(DAYSPEC *ddsp,const char *qp)
-{
+static int cvtdate(DAYSPEC *ddsp,cchar *qp) noex {
 	DAYSPEC	ds ;
 	int	rs = SR_OK ;
 	int	mjd = 0 ;
 	if ((qp[0] == '+') || (qp[0] == '-')) {
-	    rs = dayspec_default(&ds) ;
-	} else
+	    rs = dayspec_def(&ds) ;
+	} else {
 	    rs = dayspec_load(&ds,qp,-1) ;
+	}
 	if (rs >= 0) {
 	    if ((rs = defspec(ddsp,&ds)) >= 0) {
 	        rs = getmjd(ds.y,ds.m,ds.d) ;
 	        mjd = rs ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("main/cvtdate: ret rs=%d mjd=%d\n",rs,mjd) ;
-#endif
-
 	return (rs >= 0) ? mjd : rs ;
 }
 /* end subroutine (cvtdate) */

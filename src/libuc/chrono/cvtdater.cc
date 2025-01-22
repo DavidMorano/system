@@ -22,7 +22,7 @@
 
 	Description:
 	This small object assists in converting text strings
-	representing dates into UNIX® time values. The hard work
+	representing dates into UNIX® time values.  The hard work
 	is actually done by the included TMZ object.
 
 	Source formats include:
@@ -33,10 +33,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<ctime>			/* |time_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdarg>
 #include	<cstring>
 #include	<usystem.h>
 #include	<dayspec.h>
@@ -84,21 +83,22 @@ int cvtdater_start(cvtdater *op,time_t daytime) noex {
 int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 	int		rs = SR_FAULT ;
 	if (op && cp) {
-	    TMZ		stz ;
+	    tmz		stz ;
+	    if (cl < 0) cl = strlen(cp) ;
 	    if (hasalpha(cp,cl)) {
 	        tmz_init(&stz) ;
 	        if (dayspec ds ; (rs = dayspec_load(&ds,cp,cl)) >= 0) {
-		    rs = tmz_setday(&stz,ds.y,ds.m,ds.d) ;
+		    rs = stz.setday(ds.y,ds.m,ds.d) ;
 	        }
 	    } else {
-	        rs = tmz_xday(&stz,cp,cl) ;
+	        rs = stz.xday(cp,cl) ;
 	    }
 	    if (rs >= 0) {
-	        TMTIME	tmt ;
-	        if (tmz.hhasyear(&stz) == 0) {
+	        tmtime	tmt ;
+	        if (stz.hasyear == 0) {
 	            cvtdater_daytime(op,nullptr) ;	/* get current date */
 	            rs = tmtime_localtime(&tmt,op->daytime) ;
-		    tmz_setyear(&stz,tmt.year) ;
+		    stz.setyear(tmt.year) ;
 	        } /* end if (getting the current year) */
 	        if (rs >= 0) {
 	            if ((rs = tmtime_insert(&tmt,&stz.st)) >= 0) {
@@ -137,5 +137,32 @@ static int cvtdater_daytime(cvtdater *op,time_t *rp) noex {
 	return rs ;
 }
 /* end subroutine (cvtdater_daytime) */
+
+int cvtdater::start(time_t t) noex {
+	return cvtdater_start(this,t) ;
+}
+
+int cvtdater::load(time_t *tp,cchar *sp,int sl) noex {
+	return cvtdater_load(this,tp,sp,sl) ;
+}
+
+void cvtdater::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("cvtdater",rs,"fini-finish") ;
+	}
+}
+
+cvtdater_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case cvtdatermem_finish:
+	        rs = cvtdater_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (cvtdater_co::operator) */
 
 

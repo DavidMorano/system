@@ -1168,12 +1168,10 @@ static int vecstr_loadexts(vecstr *lp,cc *dname,cc *name,int namelen) noex {
 	int		rs1 ;
 	int		nl ;
 	int		c = 0 ;
-	cchar		*nbuf{} ;
-	if ((rs = malloc_mp(&nbuf)) >= 0) {
-	    fsdir	dir ;
-	    fsdir_ent	slot ;
+	if ((cchar *nbuf ; (rs = malloc_mp(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
-	    if ((rs = fsdir_open(&dir,dname)) >= 0) {
+	    if (fsdir dir ; (rs = fsdir_open(&dir,dname)) >= 0) {
+	        fsdir_ent	slot ;
 	        while ((dnl = fsdir_read(&dir,&slot,nbuf,nlen)) > 0) {
 		    fext	e ;
 		    cint	dnl = rs ;

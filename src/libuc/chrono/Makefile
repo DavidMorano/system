@@ -63,7 +63,7 @@ OBJ_DATER= obj0_dater.o obj1_dater.o
 OBJ0_CHRONO= tmstrs.o zdb.o
 OBJ1_CHRONO= date.o dater.o
 OBJ2_CHRONO= tmz.o zos.o zoffparts.o
-OBJ3_CHRONO= tmtime.o
+OBJ3_CHRONO= tmtime.o dayspec.o cvtdater.o
 
 OBJA_CHRONO= obj0.o obj1.o
 OBJB_CHRONO= obj2.o obj3.o
@@ -150,6 +150,8 @@ tmz.o:			tmz.cc tmz.hh			$(INCS)
 zdb.o:			zdb.cc zdb.h			$(INCS)
 zos.o:			zos.cc zos.h			$(INCS)
 zoffparts.o:		zoffparts.cc zoffparts.h	$(INCS)
+dayspec.o:		dayspec.cc dayspec.h		$(INCS)
+cvtdater.o:		cvtdater.cc cvtdater.h		$(INCS)
 
 dater_main.o:		dater_main.cc		dater.h	$(INCS)
 dater_getdate.o:	dater_getdate.cc	dater.h	$(INCS)

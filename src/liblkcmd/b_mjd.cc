@@ -1,4 +1,5 @@
 /* b_mjd SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is a SHELL built-in version of |mjd(1)| */
@@ -1336,15 +1337,15 @@ static int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 	if (ql < 0) ql = strlen(qp) ;
 
 	if (lip->f.mjd && hasalldig(qp,ql)) {
-	    uint	uv ;
-	    rs = cfdecui(qp,ql,&uv) ;
-	    mjd = (int) uv ;
+	    if (uint uv ; (rs = cfdecui(qp,ql,&uv)) >= 0) {
+	        mjd = (int) uv ;
+	    }
 	} else if ((rs = ourmjd(qp,ql)) > 0) {
 	    mjd = rs ;
 	} else {
 	    DAYSPEC	ds ;
 	    if ((qp[0] == '+') || (qp[0] == '-')) {
-	        rs = dayspec_default(&ds) ;
+	        rs = dayspec_def(&ds) ;
 	    } else {
 	        rs = dayspec_load(&ds,qp,-1) ;
 	    }

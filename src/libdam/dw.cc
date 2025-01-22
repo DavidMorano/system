@@ -111,6 +111,7 @@ constexpr int			rsn = SR_NOTFOUND ;
 /* exported subroutines */
 
 int dw_start(DW *dwp,cchar *dirname) noex {
+    	DW		*hop = dwp ;
 	int		rs ;
 	int		sz ;
 	int		opts ;
@@ -120,7 +121,7 @@ int dw_start(DW *dwp,cchar *dirname) noex {
 
 	if (dirname[0] == '\0') return SR_INVALID ;
 
-	memclear(dwp) ;
+	memclear(hop) ;
 	dwp->fd = -1 ;
 	dwp->count_new = 0 ;
 	dwp->count_checkable = 0 ;

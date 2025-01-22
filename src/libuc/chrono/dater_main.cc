@@ -77,7 +77,7 @@
 #include	<tmtime.hh>		/* CHRONO */
 #include	<zos.h>			/* CHRONO */
 #include	<comparse.h>		/* CHRONO */
-#include	<tmz.hh>			/* CHRONO */
+#include	<tmz.hh>		/* CHRONO */
 #include	<zdb.h>			/* CHRONO */
 #include	<sncpyx.h>
 #include	<snwcpyx.h>
@@ -377,9 +377,9 @@ int dater_settmzon(dater *op,TM *stp,int zoff,cchar *zstr,int zlen) noex {
 		/* lookup the zone-name */
 	        if ((rs >= 0) && (zstr != nullptr) && (zstr[0] != '\0')) {
 		    if ((rs = znlen) >= 0) {
-	                zdb	zr ;
 	                op->fl.zname = true ;
 	                znwcpy(op->zname,znlen,zstr,zlen) ;
+	                zdb	zr ;
 	                if ((rs = zdb_nameoff(&zr,zstr,zlen,zoff)) >= 0) {
 	                    if (stp->tm_isdst < 0) stp->tm_isdst = zr.isdst ;
 	                    if (zoff == TZO_EMPTY) zoff = zr.off ;
@@ -432,15 +432,15 @@ int dater_settmzn(dater *op,TM *stp,cchar *zstr,int zlen) noex {
 	    /* lookup the zone-name */
 	    if ((rs >= 0) && (zstr != nullptr) && (zstr[0] != '\0')) {
 		if ((rs = znlen) >= 0) {
-	            zdb		zr ;
 	            op->fl.zname = true ;
 	            znwcpy(op->zname,znlen,zstr,zlen) ;
-	            if ((rs = zdb_name(&zr,zstr,zlen)) >= 0) {
+	            zdb		zr ;
+	            if ((rs = zdb_setname(&zr,zstr,zlen)) >= 0) {
 	                if (stp->tm_isdst < 0) stp->tm_isdst = zr.isdst ;
 	                if (zoff == TZO_EMPTY) zoff = zr.off ;
 	            } else if (rs == SR_NOTFOUND) {
 	                rs = SR_OK ;
-	            } /* end if (zdb_name) */
+	            } /* end if (zdb_setname) */
 		} /* end if (znlen) */
 	    } /* end if (name lookup) */
 	    /* calculate the time */
@@ -739,6 +739,7 @@ int dater_diff(dater *op,dater *d2p,time_t *rp) noex {
 int dater_nzones(dater *op) noex {
 	int		rs ;
 	if ((rs = dater_magic(op)) >= 0) {
+	    zdb	zr ;
 	    rs  = zdb_count(&zr) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -797,9 +798,9 @@ static int dater_initcur(dater *op) noex {
 
 /* get any possible zone-name information from the zone offset */
 static int dater_mkpzoff(dater *op,TM *stp,int zoff) noex {
-	zdb		zr ;
 	int		rs ;
 	op->zname[0] = '\0' ;
+	zdb		zr ;
 	if ((rs = zdb_offisdst(&zr,zoff,stp->tm_isdst)) >= 0) {
 	    if ((rs = znlen) >= 0) {
 	        rs = znwcpy(op->zname,znlen,zr.name) ;
@@ -912,14 +913,14 @@ TIMEB {
 #endif /* COMMENT */
 
 static int dater_pname(dater *op) noex {
-	zdb		zr ;
 	int		rs ;
 	int		zl = -1 ;
 	cchar		*zp = op->zname ;
 	if (! op->fl.zoff) {
 	    op->b.timezone = 0 ;
 	}
-	if ((rs = zdb_name(&zr,zp,zl)) >= 0) {
+	zdb	zr ;
+	if ((rs = zdb_setname(&zr,zp,zl)) >= 0) {
 	    if (! op->fl.zoff) {
 	        op->b.timezone = zr.off ;
 	    }
@@ -928,7 +929,7 @@ static int dater_pname(dater *op) noex {
 	    }
 	    op->fl.zname = true ;
 	    op->fl.zoff = true ;
-	} /* end if (zdb_name) */
+	} /* end if (zdb_setname) */
 	return rs ;
 }
 /* end subroutine (dater_pname) */
@@ -979,7 +980,8 @@ static int dater_findzoff(dater *op,TM *stp) noex {
 		}
 	        if (op->zname[0] != '\0') {
 		    if ((rs = znlen) >= 0) {
-	                if (zdb d ; (rs = zdb_name(&d,op->zname,znlen)) >= 0) {
+			cchar	*zn = op->zname ;
+	                if (zdb d ; (rs = zdb_setname(&d,zn,znlen)) >= 0) {
 	                    op->b.timezone = d.off ;
 	                    op->b.dstflag = d.isdst ;
 	                    op->fl.zoff = true ;

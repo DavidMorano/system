@@ -37,9 +37,9 @@ struct quote_object {
 } ;
 
 struct quote_cursor {
-	ulong		magic ;
 	void		*results ;
 	uint		nresults ;
+	uint		magic ;
 	int		i ;
 } ;
 

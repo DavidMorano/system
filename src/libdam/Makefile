@@ -731,7 +731,6 @@ sysrealname.o:		sysrealname.cc sysrealname.h
 dayofmonth.o:		dayofmonth.cc dayofmonth.h
 netfile.o:		netfile.cc netfile.h
 calmgr.o:		calmgr.cc calmgr.h
-cvtdater.o:		cvtdater.cc cvtdater.h
 sysnamedb.o:		sysnamedb.cc sysnamedb.h
 dirdb.o:		dirdb.cc dirdb.h
 cgi.o:			cgi.cc cgi.h
@@ -868,5 +867,6 @@ getostype.o:		getostype.cc getostype.h
 deprecated.o:		deprecated.cc
 getclusters.o:		getclusters.cc getclusters.h
 percache.o:		percache.cc percache.h
+cvttemperature.o:	cvttemperature.cc cvttemperature.h
 
 

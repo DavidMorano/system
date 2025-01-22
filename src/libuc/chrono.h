@@ -33,6 +33,9 @@
 #include	<date.h>
 #include	<tmtime.hh>
 #include	<dater.h>
+#include	<dayspec.h>
+#include	<zoffparts.h>
+#include	<cvtdater.h>
 
 
 #endif /* CHRONO_INCLUDE */

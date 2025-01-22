@@ -40,9 +40,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
+#include	<sys/stat.h>		/* |USTAT| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
@@ -96,10 +95,10 @@ extern "C" {
 /* local structures */
 
 struct dirlist_ent {
-	cchar		*np ;
+	cchar		*sp ;
 	ino_t		ino ;
 	dev_t		dev ;
-	int		nl ;
+	int		sl ;
 } ;
 
 
@@ -163,16 +162,16 @@ constexpr bool		f_nulpath = CF_NULPATH ;
 int dirlist_start(dirlist *op) noex {
 	int		rs ;
 	if ((rs = dirlist_ctor(op)) >= 0) {
-	    cint	esize = szof(ent) ;
+	    cint	esz = szof(ent) ;
 	    cint	ne = DIRLIST_NDEF ;
 	    cint	vo = VECOBJ_OORDERED ;
-	    if ((rs = vecobj_start(op->dbp,esize,ne,vo)) >= 0) {
+	    if ((rs = vecobj_start(op->dbp,esz,ne,vo)) >= 0) {
 	        op->magic = DIRLIST_MAGIC ;
 	    }
 	    if (rs < 0) {
 		dirlist_dtor(op) ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (dirlist_ctor) */
 	return rs ;
 }
 /* end subroutine (dirlist_start) */
@@ -181,20 +180,23 @@ int dirlist_finish(dirlist *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = dirlist_magic(op)) >= 0) {
-	    {
-	        void	*vp{} ;
-	        for (int i = 0 ; vecobj_get(op->dbp,i,&vp) >= 0 ; i += 1) {
-	            if (vp) {
-		        ent	*ep = cast_static<entp>(vp) ;
-	                rs1 = entry_finish(ep) ;
-	                if (rs >= 0) rs = rs1 ;
-	            }
-	        } /* end for */
-	    }
-	    {
-	        rs1 = vecobj_finish(op->dbp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
+	    if (op->dbp) {
+		vecobj	*dbp = op->dbp ;
+	        {
+	            void	*vp{} ;
+	            for (int i = 0 ; dbp->get(i,&vp) >= 0 ; i += 1) {
+	                if (vp) {
+		            ent	*ep = cast_static<entp>(vp) ;
+	                    rs1 = entry_finish(ep) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                }
+	            } /* end for */
+	        }
+	        {
+	            rs1 = vecobj_finish(op->dbp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	    } /* end if (op->dbp) */
 	    {
 	        rs1 = dirlist_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -208,8 +210,7 @@ int dirlist_finish(dirlist *op) noex {
 int dirlist_semi(dirlist *op) noex { /* add a semicolon as an entry */
 	int		rs ;
 	if ((rs = dirlist_magic(op)) >= 0) {
-	    ent		e ;
-	    if ((rs = entry_start(&e,";",1,0L,0L)) >= 0) {
+	    if (ent e ; (rs = entry_start(&e,";",1,0L,0L)) >= 0) {
 	        op->tlen += (rs+1) ;
 	        rs = vecobj_add(op->dbp,&e) ;
 	        if (rs < 0) {
@@ -255,9 +256,8 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		f_added = false ;
 	if ((rs = dirlist_magic(op,sp)) >= 0) {
-	    char	*pbuf{} ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = malloc_mp(&pbuf)) >= 0) {
+	    if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) {
 	        int	pl{} ;
 	        if ((sl == 0) || ((sl == 1) && (sp[0] == '.'))) {
 	            pbuf[0] = '.' ;
@@ -270,21 +270,20 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 	        if (rs >= 0) {
 	            ent		e ;
 	            cint	rsn = SR_NOTFOUND ;
-/* any NUL (blank) paths need to be converted to "." */
+		    /* any NUL (blank) paths need to be converted to "." */
 	            if (pl == 0) {
 	                pbuf[0] = '.' ;
 	                pbuf[1] = '\0' ;
 	                pl = 1 ;
 	            }
-/* now see if it is already in the list by NAME */
-	            e.np = pbuf ;
-	            e.nl = pl ;
+		    /* now see if it is already in the list by NAME */
+	            e.sp = pbuf ;
+	            e.sl = pl ;
 	            vecobj_vcf	vcf = vecobj_vcf(vcmpname) ;
 	            void	*vp{} ;
 	            if ((rs = vecobj_search(op->dbp,&e,vcf,&vp)) == rsn) {
-	                USTAT	sb ;
-/* now see if it is already in the list by DEV-INO */
-	                if ((rs = u_stat(pbuf,&sb)) >= 0) {
+			/* now see if it is already in the list by DEV-INO */
+	                if (USTAT sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
 	                    if (S_ISDIR(sb.st_mode)) {
 	                        vecobj_vcf	vcf = vecobj_vcf(vcmpdevino) ;
 				auto		vs = vecobj_search ;
@@ -357,7 +356,7 @@ int dirlist_curenum(dirlist *op,dirlist_cur *curp,char *rbuf,int rlen) noex {
 	    } /* end while */
 	    if ((rs >= 0) && vp) {
 		ent	*ep = cast_static<entp>(vp) ;
-	        if ((rs = sncpy1w(rbuf,rlen,ep->np,ep->nl)) >= 0) {
+	        if ((rs = sncpy1w(rbuf,rlen,ep->sp,ep->sl)) >= 0) {
 	            curp->i = i ;
 	        }
 	    }
@@ -377,12 +376,12 @@ int dirlist_curget(dirlist *op,dirlist_cur *curp,cchar **rpp) noex {
 	    } /* end while */
 	    if (rpp) {
 		ent	*ep = cast_static<entp>(vp) ;
-	        *rpp = (rs >= 0) ? ep->np : nullptr ;
+	        *rpp = (rs >= 0) ? ep->sp : nullptr ;
 	    }
 	    if ((rs >= 0) && vp) {
 	        ent	*ep = entp(vp) ;
 	        curp->i = i ;
-	        rs = ep->nl ;
+	        rs = ep->sl ;
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -412,8 +411,8 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 	        for (int i = 0 ; vecobj_get(op->dbp,i,&vp) >= 0 ; i += 1) {
 		    ent	*ep = cast_static<entp>(vp) ;
 	            if (vp == nullptr) break ;
-	            dp = ep->np ;
-	            dl = ep->nl ;
+	            dp = ep->sp ;
+	            dl = ep->sl ;
 	            if (dp[0] != ';') {
 	                if (c++ > 0) {
 	                    if (f_semi) {
@@ -432,7 +431,6 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 	                        bp = strwcpy(bp,dp,dl) ;
 	                    }
 		        } /* end if_constexpr */
-	                c += 1 ;
 	            } else {
 	                f_semi = true ;
 		    }
@@ -449,15 +447,14 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 
 /* private subroutines */
 
-static int entry_start(ent *ep,cc *np,int nl,dev_t dev,ino_t ino) noex {
+static int entry_start(ent *ep,cc *sp,int sl,dev_t dev,ino_t ino) noex {
 	int		rs ;
-	cchar		*cp{} ;
 	memclear(ep) ;
 	ep->dev = dev ;
 	ep->ino = ino ;
-	if ((rs = uc_mallocstrw(np,nl,&cp)) >= 0) {
-	    ep->nl = rs ;
-	    ep->np = cp ;
+	if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	    ep->sl = rs ;
+	    ep->sp = cp ;
 	} /* end if */
 	return rs ;
 }
@@ -466,11 +463,11 @@ static int entry_start(ent *ep,cc *np,int nl,dev_t dev,ino_t ino) noex {
 static int entry_finish(ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ep->np) {
-	    rs1 = uc_free(ep->np) ;
+	if (ep->sp) {
+	    rs1 = uc_free(ep->sp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->np = nullptr ;
-	    ep->nl = 0 ;
+	    ep->sp = nullptr ;
+	    ep->sl = 0 ;
 	}
 	return rs ;
 }
@@ -485,9 +482,9 @@ static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
-		    cint	ml = min(e1p->nl,e2p->nl) ;
-		    cchar	*s1 = e1p->np ;
-		    cchar	*s2 = e2p->np ;
+		    cint	ml = min(e1p->sl,e2p->sl) ;
+		    cchar	*s1 = e1p->sp ;
+		    cchar	*s2 = e2p->sp ;
 		    {
                         cint        ch1 = mkchar(*s1) ;
                         cint        ch2 = mkchar(*s2) ;
