@@ -100,7 +100,7 @@ extern "C" {
 
 /* forward references */
 
-char *dstcpy(toxc_f toxc,char *dp,cc *sp,int n) noex {
+static char *dstcpy(toxc_f toxc,char *dp,cc *sp,int n) noex {
     	while (n-- && *sp) {
 	    *dp++ = toxc(*sp++) ;
 	}
@@ -115,7 +115,7 @@ static char *dstncpy(toxc_f toxc,char *dp,int dl,cc *sp,int sl) noex {
 	return rp ;
 }
 
-char *strnwcpyxc(toxc_f toxc,char *dp,int dl,cchar *sp,int sl) noex {
+static char *strnwcpyxc(toxc_f toxc,char *dp,int dl,cchar *sp,int sl) noex {
 	char		*rp = dp ;
 	if (dp && sp) {
 	    if (dl >= 0) {
