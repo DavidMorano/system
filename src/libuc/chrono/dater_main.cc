@@ -167,8 +167,8 @@ int dater_start(dater *op,TIMEB *nowp,cchar *zsp,int zsl) noex {
 		    int		ai = 0 ;
 		    op->znamelen = rs ;
 		    if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
-			op->cname = (a + ((znlen + 1) * ai++)) ;
-			op->zname = (a + ((znlen + 1) * ai++)) ;
+			op->cname = (a + ((znl + 1) * ai++)) ;
+			op->zname = (a + ((znl + 1) * ai++)) ;
 			op->cname[znl] = '\0' ;
 			op->zname[znl] = '\0' ;
 	                op->b.timezone = TZO_EMPTY ;
@@ -179,7 +179,7 @@ int dater_start(dater *op,TIMEB *nowp,cchar *zsp,int zsl) noex {
 	                } /* end if (time-offset) */
 	                if ((zsp != nullptr) && (zsl != 0)) {
 	                    op->fl.czn = true ;
-	                    znwcpy(op->cname,znlen,zsp,zsl) ;
+	                    znwcpy(op->cname,znl,zsp,zsl) ;
 	                }
 	                op->magic = DATER_MAGIC ;
 		    } /* end if (memory-allocation) */
@@ -196,8 +196,8 @@ int dater_startcopy(dater *op,dater *d2p) noex {
 	if (op && d2p) {
 	    if ((rs = dater_start(op,np,np,0)) >= 0) {
 	        cint	znl = op->znamelen ;
-	        strncpy(op->cname,d2p->cname,znl) ; op->cname[znl] = '\0' ;
-	        strncpy(op->zname,d2p->zname,znl) ; op->zname[znl] = '\0' ;
+	        strncpy(op->cname,d2p->cname,(znl + 1)) ;
+	        strncpy(op->zname,d2p->zname,(znl + 1)) ;
 	        op->cb = d2p->cb ;
 	        op->b = d2p->b ;
 	        op->fl = d2p->fl ;
@@ -230,8 +230,8 @@ int dater_setcopy(dater *op,dater *d2p) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,d2p)) >= 0) {
 	    cint	znl = op->znamelen ;
-	    strncpy(op->cname,d2p->cname,znl) ; op->cname[znl] = '\0' ;
-	    strncpy(op->zname,d2p->zname,znl) ; op->zname[znl] = '\0' ;
+	    strncpy(op->cname,d2p->cname,(znl + 1)) ;
+	    strncpy(op->zname,d2p->zname,(znl + 1)) ;
 	    op->cb = d2p->cb ;
 	    op->b = d2p->b ;
 	    op->fl = d2p->fl ;
@@ -377,8 +377,9 @@ int dater_settmzon(dater *op,TM *stp,int zoff,cchar *zstr,int zlen) noex {
 		/* lookup the zone-name */
 	        if ((rs >= 0) && (zstr != nullptr) && (zstr[0] != '\0')) {
 		    if ((rs = znlen) >= 0) {
+			cint	znl = rs ;
 	                op->fl.zname = true ;
-	                znwcpy(op->zname,znlen,zstr,zlen) ;
+	                znwcpy(op->zname,znl,zstr,zlen) ;
 	                if (zdb zr ; (rs = zr.nameoff(zstr,zlen,zoff)) >= 0) {
 	                    if (stp->tm_isdst < 0) stp->tm_isdst = zr.isdst ;
 	                    if (zoff == TZO_EMPTY) zoff = zr.off ;
@@ -408,13 +409,12 @@ int dater_settmzo(dater *op,TM *stp,int zoff) noex {
 	if ((rs = dater_magic(op,stp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if ((zoff == TZO_EMPTY) || (abs(zoff) <= TZO_MAXZOFF)) {
-	        rs = dater_initbase(op) ;
-/* calculate the time */
-	        if (rs >= 0) {
-	            rs = dater_mkptime(op,stp,zoff) ;
-	        }
-/* try to find a time zone-name for the information we have */
-	        if (rs >= 0) op->magic = DATER_MAGIC ;
+	        if ((rs = dater_initbase(op)) >= 0) {
+		    /* calculate the time */
+	            if ((rs = dater_mkptime(op,stp,zoff)) >= 0) {
+	                op->magic = DATER_MAGIC ;
+		    }
+		}
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
@@ -427,25 +427,28 @@ int dater_settmzn(dater *op,TM *stp,cchar *zstr,int zlen) noex {
 	if ((rs = dater_magic(op,stp)) >= 0) {
 	    int		zoff = TZO_EMPTY ;
 	    /* initialize */
-	    rs = dater_initbase(op) ;
-	    /* lookup the zone-name */
-	    if ((rs >= 0) && (zstr != nullptr) && (zstr[0] != '\0')) {
-		if ((rs = znlen) >= 0) {
-	            op->fl.zname = true ;
-	            znwcpy(op->zname,znlen,zstr,zlen) ;
-	            if (zdb zr ; (rs = zr.setname(zstr,zlen)) >= 0) {
-	                if (stp->tm_isdst < 0) stp->tm_isdst = zr.isdst ;
-	                if (zoff == TZO_EMPTY) zoff = zr.off ;
-	            } else if (rs == SR_NOTFOUND) {
-	                rs = SR_OK ;
-	            } /* end if (zdb_setname) */
-		} /* end if (znlen) */
-	    } /* end if (name lookup) */
-	    /* calculate the time */
-	    if (rs >= 0) {
-	        rs = dater_mkptime(op,stp,zoff) ;
+	    if ((rs = dater_initbase(op)) >= 0) {
+	        /* lookup the zone-name */
+	        if (zstr && (zstr[0] != '\0')) {
+		    if ((rs = znlen) >= 0) {
+			cint	znl = rs ;
+	                op->fl.zname = true ;
+	                znwcpy(op->zname,znl,zstr,zlen) ;
+	                if (zdb zr ; (rs = zr.setname(zstr,zlen)) >= 0) {
+	                    if (stp->tm_isdst < 0) stp->tm_isdst = zr.isdst ;
+	                    if (zoff == TZO_EMPTY) zoff = zr.off ;
+	                } else if (rs == SR_NOTFOUND) {
+	                    rs = SR_OK ;
+	                } /* end if (zdb_setname) */
+		    } /* end if (znlen) */
+	        } /* end if (name lookup) */
+	        /* calculate the time */
+	        if (rs >= 0) {
+	            if ((rs = dater_mkptime(op,stp,zoff)) >= 0) {
+	               op->magic = DATER_MAGIC ;
+		    }
+	        }
 	    }
-	    if (rs >= 0) op->magic = DATER_MAGIC ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -455,32 +458,33 @@ int dater_settmzn(dater *op,TM *stp,cchar *zstr,int zlen) noex {
 int dater_settimezn(dater *op,time_t t,cchar *zname,int isdst) noex {
 	int		rs ;
 	if ((rs = dater_magic(op)) >= 0) {
-	    rs = dater_initbase(op) ;
-	    op->b.time = t ;
-	    op->b.dstflag = isdst ;
-	    if ((zname != nullptr) && (zname[0] != '\0')) {
-	        rs = dater_ldname(op,zname,-1) ;
-	    } else {
-	        op->fl.tzset = true ;
-	        if (tmtime tmt ; (rs = tmt.localtime(t)) >= 0) {
-	            zname = tmt.zname ;
-	            op->fl.zname = true ;
-		    if ((rs = znlen) >= 0) {
-	                strncpylc(op->zname,zname,znlen) ;
-		        op->zname[znlen] = '\0' ;
-		    }
-	            if (isdst < 0) {
-			isdst = tmt.isdst ;
-		    }
-	            if (isdst >= 0) {
-	                op->b.timezone = short(tmt.gmtoff / 60) ;
-	            }
-	        } /* end if */
+	    if ((rs = dater_initbase(op)) >= 0) {
+	        op->b.time = t ;
 	        op->b.dstflag = isdst ;
-	        op->fl.zoff = true ;
-	        op->b.timezone = 0 ;
-	    } /* end if */
-	    if (rs >= 0) op->magic = DATER_MAGIC ;
+	        if ((zname != nullptr) && (zname[0] != '\0')) {
+	            rs = dater_ldname(op,zname,-1) ;
+	        } else {
+	            op->fl.tzset = true ;
+	            if (tmtime tmt ; (rs = tmt.localtime(t)) >= 0) {
+	                zname = tmt.zname ;
+	                op->fl.zname = true ;
+		        if ((rs = znlen) >= 0) {
+			    cint	znl = rs ;
+	                    strncpylc(op->zname,zname,(znl + 1)) ;
+		        } /* end if (znlen) */
+	                if (isdst < 0) {
+			    isdst = tmt.isdst ;
+		        }
+	                if (isdst >= 0) {
+	                    op->b.timezone = short(tmt.gmtoff / 60) ;
+	                }
+	            } /* end if */
+	            op->b.dstflag = isdst ;
+	            op->fl.zoff = true ;
+	            op->b.timezone = 0 ;
+	        } /* end if */
+	        if (rs >= 0) op->magic = DATER_MAGIC ;
+	    } /* end if (dater_initbase) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -491,6 +495,7 @@ int dater_settimezon(dater *op,time_t t,int zoff,cchar *zname,int isdst) noex {
 	int		rs ;
 	if ((rs = dater_magic(op)) >= 0) {
 	    if ((rs = znlen) >= 0) {
+		cint	znl = rs ;
 	        op->b.time = t ;
 	        op->b.timezone = zoff ;
 	        op->b.dstflag = isdst ;
@@ -499,15 +504,13 @@ int dater_settimezon(dater *op,time_t t,int zoff,cchar *zname,int isdst) noex {
 	        op->fl.zoff = true ;
 	        /* continue */
 	        if ((zname != nullptr) && (zname[0] != '\0')) {
-	            strncpylc(op->zname,zname,znlen) ;
-		    op->zname[znlen] = '\0' ;
+	            strncpylc(op->zname,zname,(znl + 1)) ;
 	        } else {
 	            op->fl.tzset = true ;
 	            if (tmtime tmt ; (rs = tmt.localtime(t)) >= 0) {
 	                zname = tmt.zname ;
 	                op->fl.zname = true ;
-	                strncpylc(op->zname,zname,znlen) ;
-		        op->zname[znlen] = '\0' ;
+	                strncpylc(op->zname,zname,(znl + 1)) ;
 	                if (isdst < 0) {
 			    isdst = tmt.isdst ;
 			}
@@ -519,7 +522,7 @@ int dater_settimezon(dater *op,time_t t,int zoff,cchar *zname,int isdst) noex {
 	            op->fl.zoff = true ;
 	            op->b.timezone = 0 ;
 	        } /* end if */
-	    if (rs >= 0) op->magic = DATER_MAGIC ;
+	        if (rs >= 0) op->magic = DATER_MAGIC ;
 	    } /* end if (znlen) */
 	} /* end if (magic) */
 	return rs ;
@@ -527,7 +530,7 @@ int dater_settimezon(dater *op,time_t t,int zoff,cchar *zname,int isdst) noex {
 /* end subroutine (dater_settimezon) */
 
 int dater_mkdatestr(dater *op,int type,char *dbuf,int dlen) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		sl = 0 ;
 	if ((rs = dater_magic(op,dbuf)) >= 0) {
 	    rs = SR_INVALID ;
@@ -564,7 +567,8 @@ int dater_mkdatestr(dater *op,int type,char *dbuf,int dlen) noex {
 	        if (tmtime tmt ; (rs = tmt.gmtime(t)) >= 0) {
 	            tmt.gmtoff = (zoff * 60) ;
 		    if ((rs = znlen) >= 0) {
-	                strwcpyuc(tmt.zname,znp,znlen) ;
+			cint	znl = rs ;
+	                strwcpyuc(tmt.zname,znp,znl) ;
 	                switch (type) {
 		        /* UNIX® envelope */
 	                case DATER_DTSENV:
@@ -651,10 +655,11 @@ int dater_zinfoset(dater *op,dater_zi *zip,cchar *zn,int zl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,zip,zn)) >= 0) {
 	    if ((rs = znlen) >= 0) {
+		cint	znl = rs ;
 	        op->b.timezone = zip->zoff ;
 	        op->b.dstflag = zip->isdst ;
-	        rs = snwcpy(op->zname,znlen,zn,zl) ;
-	    }
+	        rs = snwcpy(op->zname,znl,zn,zl) ;
+	    } /* end if (znlen) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -754,10 +759,11 @@ int dater_zi(dater *op,dater_zi *zip,int ei) noex {
 	    if ((ei > 0) && (ei < n)) {
 		char	*zbuf = zip->zname ;
 		if ((rs = znlen) >= 0) {
+		    cint	znl = rs ;
 	            zip->isdst = zones[ei].isdst ;
 	            zip->zoff = zones[ei].off ;
-	            znl = strwcpy(zbuf,zones[ei].zname,znlen) - zbuf ;
-		}
+	            zl = strwcpy(zbuf,zones[ei].zname,znl) - zbuf ;
+		} /* end if (znlen) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? zl : rs ;
@@ -778,12 +784,12 @@ static int dater_initcur(dater *op) noex {
 	    op->fl.tzset = true ;
 	    if (tmtime tmt ; (rs = tmt.localtime(op->cb.time)) >= 0) {
 		if ((rs = znlen) >= 0) {
+		    cint	znl = rs ;
 	            cint	zo = tmt.gmtoff ; /* seconds west of GMT */
 	            op->cyear = tmt.year ;
 	            op->cb.timezone = (zo / 60) ; /* minutes west of GMT */
 	            op->cb.dstflag = tmt.isdst ;
-	            strncpylc(op->cname,tmt.zname,znlen) ;
-		    op->cname[znlen] = '\0' ;
+	            strncpylc(op->cname,tmt.zname,(znl + 1)) ;
 	            op->fl.cb = true ;
 	            op->fl.czn = true ;
 	            op->fl.cyear = true ;
@@ -800,8 +806,9 @@ static int dater_mkpzoff(dater *op,TM *stp,int zoff) noex {
 	op->zname[0] = '\0' ;
 	if (zdb zr ; (rs = zr.offisdst(zoff,stp->tm_isdst)) >= 0) {
 	    if ((rs = znlen) >= 0) {
-	        rs = znwcpy(op->zname,znlen,zr.name) ;
-	    }
+		cint	znl = rs ;
+	        rs = znwcpy(op->zname,(znl + 1),zr.name) ;
+	    } /* end if (znlen) */
 	} else {
 	    rs = SR_OK ;
 	}
@@ -816,10 +823,10 @@ static int dater_ldtmz(dater *op,tmz *tp) noex {
 	op->fl.zoff = tp->fl.zoff ;
 	if (tp->zname[0] != '\0') {
 	    if ((rs = znlen) >= 0) {
-	        strncpylc(op->zname,tp->zname,znlen) ;
-		op->zname[znlen] = '\0' ;
+		cint	znl = rs ;
+	        strncpylc(op->zname,tp->zname,(znl + 1)) ;
 	        op->fl.zname = (op->zname[0] != '\0') ;
-	    }
+	    } /* end if (znlen) */
 	}
 	return rs ;
 }
@@ -832,8 +839,9 @@ static int dater_ldzname(dater *op,cchar *sp,int sl) noex {
 	    sl = (tp - sp) ;
 	}
 	if ((rs = znlen) >= 0) {
-	    len = znwcpy(op->zname,znlen,sp,sl) ;
-	}
+	    cint	znl = rs ;
+	    len = znwcpy(op->zname,znl,sp,sl) ;
+	} /* end if (znlen) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (dater_ldzname) */
@@ -879,12 +887,13 @@ static int dater_defs(dater *op,tmz *tp) noex {
 /* end subroutine (dater_defs) */
 
 /* store a time zone-name into the object */
-static int dater_ldname(dater *op,cchar *znp,int znl) noex {
+static int dater_ldname(dater *op,cchar *zstrp,int zstrl) noex {
 	int		rs ;
 	if ((rs = znlen) >= 0) {
+	    cint	znl = rs ;
 	    char	*dnp = op->zname ;
 	    op->fl.zname = true ;
-	    znwcpy(dnp,znlen,znp,znl) ;
+	    znwcpy(dnp,znl,zstrp,zstrl) ;
 	    if ((! op->fl.zoff) || (op->b.dstflag < 0)) {
 	        cint	ch = mkchar(dnp[0]) ;
 	        if (isplusminus(ch) || isdigitlatin(ch)) {
@@ -936,8 +945,8 @@ static int dater_pnum(dater *op) noex {
 	if (!op->fl.zoff) {
 	    if (int zo{} ; (rs = zos_get(op->zname,-1,&zo)) >= 0) {
 		op->fl.zname = false ;	/* XXX why is this? */
-	        op->b.timezone = zo ;
 	        op->fl.zoff = true ;
+	        op->b.timezone = zo ;
 	    }
 	} /* end if (already extracted) */
 	return rs ;
@@ -953,9 +962,10 @@ static int dater_findzname(dater *op) noex {
 	    if (rs >= 0) {
 		if (op->fl.zoff && (op->b.timezone == op->cb.timezone)) {
 		    if ((rs = znlen) >= 0) {
+			cint	znl = rs ;
 	                op->b.dstflag = op->cb.dstflag ;
 	                op->fl.zname = true ;
-	                rs = znwcpy(op->zname,znlen,op->cname) ;
+	                rs = znwcpy(op->zname,znl,op->cname) ;
 		    } /* end if (znlen) */
 		} /* end if */
 	    } /* end if (ok) */
@@ -975,8 +985,9 @@ static int dater_findzoff(dater *op,TM *stp) noex {
 		}
 	        if (op->zname[0] != '\0') {
 		    if ((rs = znlen) >= 0) {
+			cint	znl = rs ;
 			cchar	*zn = op->zname ;
-	                if (zdb zr ; (rs = zr.setname(zn,znlen)) >= 0) {
+	                if (zdb zr ; (rs = zr.setname(zn,znl)) >= 0) {
 	                    op->b.timezone = zr.off ;
 	                    op->b.dstflag = zr.isdst ;
 	                    op->fl.zoff = true ;
@@ -994,23 +1005,21 @@ static int dater_findzoff(dater *op,TM *stp) noex {
 
 /* try to make a time for the given date */
 static int dater_mkptime(dater *op,TM *stp,int zoff) noex {
-	tmtime tmt{} ;
 	int		rs = SR_OK ;
 	if ((zoff == TZO_EMPTY) || (! op->fl.zoff)) {
 	    if (! op->fl.cb) rs = dater_initcur(op) ;
 	    zoff = op->cb.timezone ;
 	}
 	if (rs >= 0) {
-	    rs = tmt.insert(stp) ;
-	    tmt.gmtoff = (zoff*60) ;
-	}
-	if (rs >= 0) {
-	    time_t	t ;
-	    op->fl.tzset = true ;		/* mktime() calls it! */
-	    rs = tmt.mktime(&t) ;
-	    op->b.time = t ;
-	    op->b.timezone = short(zoff) ;
-	    op->fl.zoff = true ;
+	    if (tmtime tmt ; (rs = tmt.insert(stp)) >= 0) {
+	        tmt.gmtoff = (zoff*60) ;
+	        op->fl.tzset = true ;		/* mktime() calls it! */
+	        if (time_t t ; (rs = tmt.mktime(&t)) >= 0) {
+	            op->b.time = t ;
+	            op->b.timezone = short(zoff) ;
+	            op->fl.zoff = true ;
+		}
+	    } /* end if (tmtime) */
 	} /* end if (ok) */
 	return rs ;
 }
@@ -1031,17 +1040,17 @@ static int dater_mktime(dater *op,TM *stp) noex {
 	    op->fl.tzset = true ;		/* mktime() calls it! */
 	    if ((rs = uc_mktime(stp,&t)) >= 0) {
 	        op->b.time = t ;
-		if (char *zb ; (rs = malloc_zn(&zb)) >= 0) {
-		    cint	zl = rs ;
+		if (char *znb ; (rs = malloc_zn(&znb)) >= 0) {
+		    cint	znl = rs ;
 		    cint	isd = stp->tm_isdst ;
-	            if (defzdata zi ; (rs = zi.get(zb,zl,isd)) >= 0) {
-	                znwcpy(op->zname,znlen,zb,rs) ;
+	            if (defzdata zi ; (rs = zi.get(znb,znl,isd)) >= 0) {
+	                znwcpy(op->zname,znl,znb,rs) ;
 	                op->b.timezone = zi.zoff ;
 	                op->b.dstflag = stp->tm_isdst ;
 	                op->fl.zoff = true ;
 	                op->fl.zname = true ;
 	            } /* end if (getdefzdata) */
-		    rs = rsfree(rs,zb) ;
+		    rs = rsfree(rs,znb) ;
 		} /* end if (m-a-f) */
 	    } /* end if (uc_mktime) */
 	} /* end if (something or local) */

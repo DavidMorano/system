@@ -440,10 +440,9 @@ int uctim::cmdcancel(int id,uctimarg *argp) noex {
 	if ((rs = mx.lockbegin) >= 0) {
 	    vechand	*elp = &ents ;
 	    cint	id = valp->id ;
-	    void	*vp ;
-	    if ((rs = vechand_get(elp,id,&vp)) >= 0) {
+	    if (void *vp ; (rs = vechand_get(elp,id,&vp)) >= 0) {
 	        callback	*ep = (callback *) vp ;
-	        cint	ei = rs ;
+	        cint		ei = rs ;
 	        if ((rs = vechand_del(elp,ei)) >= 0) {
 	            cint	nrs = SR_NOTFOUND ;
 		    bool	f_free = false ;
@@ -473,8 +472,7 @@ int uctim::enterpri(callback *ep) noex {
 	int		rs ;
 	int		pi = 0 ;
 	if ((rs = vecsorthand_count(pqp)) > 0) {
-	    callback	*tep ;
-	    if ((rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
+	    if (callback *tep ; (rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
 	        if (ep->val < tep->val) {
 	            if ((rs = vecsorthand_add(pqp,ep)) >= 0) {
 	                pi = rs ;
@@ -884,8 +882,7 @@ int uctim::sigerwait() noex {
 	    siginfo_t	si{} ;
 	    bool	f_exit = false ;
 	    repeat {
-	        rs = uc_sigwaitinfoto(&ss,&si,&ts) ;
-	        if (rs < 0) {
+	        if ((rs = uc_sigwaitinfoto(&ss,&si,&ts)) < 0) {
 	            switch (rs) {
 	            case SR_INTR:
 	                break ;
@@ -918,10 +915,9 @@ int uctim::sigerserve() noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = capbegin(to)) >= 0) {
-	    const time_t	dt = time(nullptr) ;
+	    custime	dt = time(nullptr) ;
 	    while ((rs = vecsorthand_count(pqp)) > 0) {
-	        callback	*tep ;
-	        if ((rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
+	        if (callback *tep ; (rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
 	            cint	ei = rs ;
 	            if (tep->val > dt) break ;
 	            if ((rs = vecsorthand_del(pqp,ei)) >= 0) {

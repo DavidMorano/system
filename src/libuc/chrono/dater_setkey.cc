@@ -35,10 +35,10 @@
 		string		is the string that is supposed to be the date
 
 	Synopsis:
-	int dater_setkey(dater *dp,cc *dbuf,int dlen,TIMEB *nowp,cc *zn) noex
+	int dater_setkey(dater *op,cc *dbuf,int dlen,TIMEB *nowp,cc *zn) noex
 
 	Arguments:
-	dp		pointer to DATE object (already initialized)
+	op		pointer to DATE object (already initialized)
 	dbuf		date buffer pointer w/ specified key=value pair
 	dlen		date buffer length
 	nowp		pointer to a timeb structure representing NOW
@@ -83,12 +83,12 @@
 
 namespace {
     struct datehelp {
-	dater		*dp ;
+	dater		*op ;
 	cc		*dsp ;
 	TIMEB		*nowp ;
 	cc		*zn ;
 	int		dsl ;
-	datehelp(dater *p,cc *asp,int asl,TIMEB *tp,cc *azn) noex : dp(p) {
+	datehelp(dater *p,cc *asp,int asl,TIMEB *tp,cc *azn) noex : op(p) {
 	    dsp = asp ;
 	    dsl = asl ;
 	    nowp = tp ;
@@ -138,13 +138,13 @@ constexpr cpcchar	datetypes[] = {
 
 /* exported subroutines */
 
-int dater_setkey(dater *dp,cc *dsp,int dsl,TIMEB *nowp,cc *zn) noex {
+int dater_setkey(dater *op,cc *dsp,int dsl,TIMEB *nowp,cc *zn) noex {
 	int		rs  ;
-	if ((rs = dater_magic(dp,dsp,nowp,zn)) >= 0) {
+	if ((rs = dater_magic(op,dsp,nowp,zn)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (dsl < 0) dsl = strlen(dsp) ;
 	    if (dsp[0]) {
-		datehelp dh(dp,dsp,dsl,nowp,zn) ;
+		datehelp dh(op,dsp,dsl,nowp,zn) ;
 		rs = dh ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -204,19 +204,19 @@ int datehelp::prockey(int ti,cc *sp,int sl) noex {
     	int		rs = SR_NOTSUP ;
         switch (ti) {
         case datetype_touch:
-            rs = dater_settouch(dp,sp,sl) ;
+            rs = dater_settouch(op,sp,sl) ;
             break ;
         case datetype_tt:
         case datetype_ttouch:
         case datetype_toucht:
-            rs = dater_settoucht(dp,sp,sl) ;
+            rs = dater_settoucht(op,sp,sl) ;
             break ;
         case datetype_log:
         case datetype_logz:
-            rs = dater_setlogz(dp,sp,sl) ;
+            rs = dater_setlogz(op,sp,sl) ;
             break ;
         case datetype_strdig:
-            rs = dater_setstrdig(dp,sp,sl) ;
+            rs = dater_setstrdig(op,sp,sl) ;
             break ;
         case datetype_current:
         case datetype_now:
@@ -224,7 +224,7 @@ int datehelp::prockey(int ti,cc *sp,int sl) noex {
                 custime		t = nowp->time ;
                 cint		zoff = nowp->timezone ;
                 cint		isdst = nowp->dstflag ;
-                rs = dater_settimezon(dp,t,zoff,zn,isdst) ;
+                rs = dater_settimezon(op,t,zoff,zn,isdst) ;
             }
             break ;
         } /* end switch */

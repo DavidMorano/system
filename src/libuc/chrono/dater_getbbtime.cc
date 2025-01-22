@@ -30,10 +30,10 @@
 	This subroutine parses BBNEWS time-stamps into DATER objects.
 
 	Synopsis:
-	int dater_getbbtime(dater *dp,cchar *sp,int sl,time_t *tp) noex
+	int dater_getbbtime(dater *op,cchar *sp,int sl,time_t *tp) noex
 
 	Arguments:
-	dp	DATER object pointer
+	op	DATER object pointer
 	sp	source c-string pointer
 	sl	source c-string length
 	tp	result time
@@ -45,7 +45,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
+#include	<ctime>			/* |time_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -80,15 +80,15 @@
 
 /* exported subroutines */
 
-int dater_getbbtime(dater *dp,cchar *sp,int sl,time_t *tp) noex {
+int dater_getbbtime(dater *op,cchar *sp,int sl,time_t *tp) noex {
 	int		rs ;
-	if ((rs = dater_magic(dp,sp,tp)) >= 0) {
+	if ((rs = dater_magic(op,sp,tp)) >= 0) {
 	    cchar	*cp{} ;
 	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
 	        if ((cl == 1) && (cp[0] == '0')) {
 	            *tp = 0 ;
-	        } else if ((rs = dater_setstrdig(dp,cp,cl)) >= 0) {
-	            dater_gettime(dp,tp) ;
+	        } else if ((rs = dater_setstrdig(op,cp,cl)) >= 0) {
+	            rs = dater_gettime(op,tp) ;
 	        } else if (rs == SR_INVALID) {
 	            if (ulong ulw ; (rs = cfdecul(cp,cl,&ulw)) >= 0) {
 	                *tp = time_t(ulw) ;

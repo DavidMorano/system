@@ -44,7 +44,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<date.h>
-#include	<localmisc.h>		/* |NYEARS_CENTURY| + |TIMEBUFLEN| */
+#include	<localmisc.h>
 
 #include	"dater.h"
 

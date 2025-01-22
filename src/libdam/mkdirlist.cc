@@ -386,9 +386,8 @@ static int mkdirlist_pdc(mkdirlist *op,cchar *ndn,int fd) noex {
 	int		sz = ((var.maxpathlen + 1) * 2) ;
 	int		ai = 0 ;
 	cchar		*dcm = MKDIRLIST_DCMAGIC ;
-	char		*ap{} ;
-	if ((uc_malloc(sz,&ap)) >= 0) {
-	    char	*dbuf = (ap + (plen + ai++)) ;
+	if (char *ap{} ; (uc_malloc(sz,&ap)) >= 0) {
+	    char	*dbuf = (ap + (plen * ai++)) ;
 	    if ((rs = mkpath1(dbuf,ndn)) >= 0) {
 	        cint	dlen = rs ;
 	        if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
@@ -397,7 +396,7 @@ static int mkdirlist_pdc(mkdirlist *op,cchar *ndn,int fd) noex {
 	            int		line = 0 ;
 	            bool	f_bol = true ;
 	            bool	f_eol ;
-	            char	*nbuf = (ap + (plen & ai++)) ;
+	            char	*nbuf = (ap + (plen * ai++)) ;
 	            while ((rs = filer_readln(&b,nbuf,nlen,-1)) > 0) {
 	                int	len = rs ;
 	                f_eol = (len && (nbuf[len-1] == '\n')) ;
