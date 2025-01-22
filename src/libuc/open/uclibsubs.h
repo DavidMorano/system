@@ -81,6 +81,7 @@
 #include	<ucrand.h>
 #include	<ucsysauxinfo.h>
 #include	<uctimer.h>
+#include	<uctimeconv.h>
 #include	<ucinetconv.h>
 #include	<ucsysconf.h>
 #include	<ucprochave.h>
@@ -244,8 +245,6 @@ extern int	uc_sigwaitinfoto(const sigset_t *,siginfo_t *,
 /* special */
 extern int	uc_safesleep(int) noex ;
 extern int	uc_mktime(TM *,time_t *) noex ;
-extern int	uc_gmtime(const time_t *,TM *) noex ;
-extern int	uc_localtime(const time_t *,TM *) noex ;
 extern int	uc_ttyname(int,char *,int) noex ;
 extern int	uc_mkfifo(cchar *,mode_t) noex ;
 
@@ -264,7 +263,6 @@ extern int uc_addrinfoget(cchar *,cchar *,const ADDRINFO *,ADDRINFO **) noex ;
 extern int uc_addrinfofree(ADDRINFO *) noex ;
 
 /* miscellaneous */
-extern int	uc_ztime(TM *,const time_t *,int) noex ;
 extern int	uc_kvamatch(kva_t *,cchar *,cchar **) noex ;
 extern int	uc_strtod(cchar *,char **,double *) noex ;
 

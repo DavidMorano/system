@@ -42,10 +42,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cerrno>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |memcpy(3c)| */
 #include	<usystem.h>
 #include	<aflag.hh>
 #include	<localmisc.h>
+
+#include	"uctimeconv.h"
 
 
 /* local defines */
@@ -104,7 +108,7 @@ int uc_localtime(const time_t *tp,TM *tsp) noex {
 	                if ((rp = localtime(tp)) == nullptr) {
 	                    rs = (- errno) ;
 		        } else {
-	                    memcpy(tsp,rp,sizeof(TM)) ;
+	                    memcpy(tsp,rp) ;
 		        }
 		        rs1 = uctimeconvmx.lockend ;
 		        if (rs >= 0) rs = rs1 ;
@@ -135,7 +139,7 @@ int uc_gmtime(const time_t *tp,TM *tsp) noex {
 	                if ((rp = gmtime(tp)) == nullptr) {
 	                    rs = (- errno) ;
 		        } else {
-	                    memcpy(tsp,rp,sizeof(TM)) ;
+	                    memcpy(tsp,rp) ;
 		        }
 		        rs1 = uctimeconvmx.lockend ;
 		        if (rs >= 0) rs = rs1 ;
@@ -148,5 +152,16 @@ int uc_gmtime(const time_t *tp,TM *tsp) noex {
 	return rs ;
 }
 /* end subroutine (uc_gmtime) */
+
+int uc_ztime(const time_t *tp,TM *tsp,int z) noex {
+	int		rs ;
+	if (z) {
+	    rs = uc_localtime(tp,tsp) ;
+	} else {
+	    rs = uc_gmtime(tp,tsp) ;
+	}
+	return rs ;
+}
+/* end subroutine (uc_ztime) */
 
 
