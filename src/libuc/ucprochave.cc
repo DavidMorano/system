@@ -44,6 +44,8 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"ucprochave.h"
+
 
 /* local defines */
 
@@ -69,16 +71,18 @@
 /* exported subroutines */
 
 int ucprochave(pid_t pid) noex {
-	int		rs ;
+	int		rs = SR_INVALID ;
 	int		f = false ;
-	if ((rs = u_kill(pid,0)) >= 0) {
-	    f = true ;
-	} else if (rs == SR_PERM) {
-	    f = true ;
-	    rs = SR_OK ;
-	} else if (rs == SR_SRCH) {
-	    rs = SR_OK ;
-	}
+	if (pid >= 0) {
+	    if ((rs = u_kill(pid,0)) >= 0) {
+	        f = true ;
+	    } else if (rs == SR_PERM) {
+	        f = true ;
+	        rs = SR_OK ;
+	    } else if (rs == SR_SRCH) {
+	        rs = SR_OK ;
+	    }
+	} /* end if (valid) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (ucprochave) */

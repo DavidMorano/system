@@ -47,6 +47,13 @@ struct tmtime {
 	tmtime() = default ;
 	tmtime &operator = (const tmtime &) = delete ;
 	tmtime(const tmtime &) = delete ;
+	int insert(TM *) noex ;
+	int ztime(bool,time_t) noex ;
+	int gmtime(time_t) noex ;
+	int localtime(time_t) noex ;
+	int extract(TM *) noex ;
+	int mktime(time_t *) noex ;
+	int adjtime(time_t *) noex ;
 	void dtor() noex ;
 	~tmtime() {
 	    dtor() ;

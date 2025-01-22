@@ -240,7 +240,7 @@ int tmtime_adjtime(tmtime *op,time_t *tp) noex {
 
 /* local subroutines */
 
-int tmtime_mktimer(tmtime *op,int f_adj,time_t *tp) noex {
+static int tmtime_mktimer(tmtime *op,int f_adj,time_t *tp) noex {
 	int		rs ;
 	if ((rs = tmtime_ctor(op)) >= 0) {
 	    TM		tms ;
@@ -272,10 +272,44 @@ int tmtime_mktimer(tmtime *op,int f_adj,time_t *tp) noex {
 }
 /* end subroutine (tmtime_mktimer) */
 
+int tmtime::ztime(bool fz,time_t t) noex {
+	return tmtime_ztime(this,fz,t) ;
+}
+
+int tmtime::gmtime(time_t t) noex {
+	return tmtime_gmtime(this,t) ;
+}
+
+int tmtime::localtime(time_t t) noex {
+	return tmtime_localtime(this,t) ;
+}
+
+int tmtime::insert(TM *tmp) noex {
+	return tmtime_insert(this,tmp) ;
+}
+
+int tmtime::extract(TM *tmp) noex {
+	return tmtime_extract(this,tmp) ;
+}
+
+int tmtime::mktime(time_t *tp) noex {
+	return tmtime_mktime(this,tp) ;
+}
+
+int tmtime::adjtime(time_t *tp) noex {
+	return tmtime_adjtime(this,tp) ;
+}
+
 void tmtime::dtor() noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
     	if (zname) {
-	    uc_free(zname) ;
+	    rs1 = uc_free(zname) ;
+	    if (rs >= 0) rs = rs1 ;
 	    zname = nullptr ;
+	}
+	if (rs < 0) {
+	    ulogerror("tmtime",rs,"dtor-free") ;
 	}
 }
 /* end method (tmtime::dtor) */

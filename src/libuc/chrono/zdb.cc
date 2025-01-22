@@ -355,15 +355,33 @@ static int findname(cchar *sp,int sl) noex {
 }
 /* end subroutine (findname) */
 
-int zdb_nameoff(zdb *op,cchar *sp,int sl,int zoff) noex {
-int zdb_nameoff(zdb *op,cchar *sp,int sl,int zoff) noex {
+int zdb::nameoff(cchar *sp,int sl,int zoff) noex {
+	return zdb_nameoff(this,sp,sl,zoff) ;
+}
 
-int zdb_setname(zdb *op,cchar *sp,int sl) noex {
-int zdb_setname(zdb *op,cchar *sp,int sl) noex {
+int zdb::setname(cchar *sp,int sl) noex {
+	return zdb_setname(this,sp,sl) ;
+}
 
-int zdb_setoff(zdb *op,int zoff) noex {
-int zdb_setoff(zdb *op,int zoff) noex {
+int zdb::setoff(int zoff) noex {
+	return zdb_setoff(this,zoff) ;
+}
 
-int zdb_offisdst(zdb *op,int zoff,int isdst) noex {
-int zdb_offisdst(zdb *op,int zoff,int isdst) noex {
+int zdb::offisdst(int zoff,int isdst) noex {
+	return zdb_offisdst(this,zoff,isdst) ;
+}
+
+zdb_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case zdbmem_count:
+	        rs = zdb_count(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (zdb_co::operator) */
+
 
