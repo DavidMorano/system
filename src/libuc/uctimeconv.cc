@@ -164,4 +164,23 @@ int uc_ztime(const time_t *tp,TM *tsp,int z) noex {
 }
 /* end subroutine (uc_ztime) */
 
+int uc_mktime(TM *tmp,time_t *rp) noex {
+	int		rs = SR_FAULT ;
+	if (tmp && rp) {
+	    time_t	res = 0 ;
+	    errno = 0 ;
+	    if ((res = mktime(tmp)) < 0) {
+	        if (errno != 0) {
+	    	    rs = (- errno) ;
+	        }
+	    }
+	    if (rp) {
+	        *rp = (rs >= 0) ? res : 0 ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (uc_mktime) */
+
+
 

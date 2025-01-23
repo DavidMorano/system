@@ -244,7 +244,6 @@ extern int	uc_sigwaitinfoto(const sigset_t *,siginfo_t *,
 			CTIMESPEC *) noex ;
 /* special */
 extern int	uc_safesleep(int) noex ;
-extern int	uc_mktime(TM *,time_t *) noex ;
 extern int	uc_ttyname(int,char *,int) noex ;
 extern int	uc_mkfifo(cchar *,mode_t) noex ;
 
