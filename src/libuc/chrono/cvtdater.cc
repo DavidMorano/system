@@ -26,7 +26,6 @@
 	is actually done by the included TMZ object.
 
 	Source formats include:
-
 	  YYMMDD
 	CCYYMMDD
 
@@ -58,7 +57,7 @@
 
 /* forward references */
 
-static int	cvtdater_daytime(cvtdater *,time_t *) noex ;
+static int	cvtdater_daytime(cvtdater *,time_t * = nullptr) noex ;
 
 
 /* local variables */
@@ -69,12 +68,13 @@ static int	cvtdater_daytime(cvtdater *,time_t *) noex ;
 
 /* exported subroutines */
 
-int cvtdater_start(cvtdater *op,time_t daytime) noex {
+int cvtdater_start(cvtdater *op,time_t dt) noex {
 	CVTDATER	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op) {
+	    if (dt == 0) dt = getustime ;
 	    rs = memclear(hop) ;
-	    op->daytime = daytime ;
+	    op->daytime = dt ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -87,7 +87,7 @@ int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 	    if (cl < 0) cl = strlen(cp) ;
 	    if (hasalpha(cp,cl)) {
 	        tmz_init(&stz) ;
-	        if (dayspec ds ; (rs = dayspec_load(&ds,cp,cl)) >= 0) {
+	        if (dayspec ds ; (rs = ds.load(cp,cl)) >= 0) {
 		    rs = stz.setday(ds.y,ds.m,ds.d) ;
 	        }
 	    } else {
@@ -96,18 +96,19 @@ int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 	    if (rs >= 0) {
 	        tmtime	tmt ;
 	        if (stz.hasyear == 0) {
-	            cvtdater_daytime(op,nullptr) ;	/* get current date */
-	            rs = tmtime_localtime(&tmt,op->daytime) ;
-		    stz.setyear(tmt.year) ;
+	            cvtdater_daytime(op) ;	/* get current date */
+	            if ((rs = tmt.localtime(op->daytime)) >= 0) {
+		        rs = stz.setyear(tmt.year) ;
+		    }
 	        } /* end if (getting the current year) */
 	        if (rs >= 0) {
-	            if ((rs = tmtime_insert(&tmt,&stz.st)) >= 0) {
-	                if (time_t t{} ; (rs = tmtime_mktime(&tmt,&t)) >= 0) {
+	            if ((rs = tmt.insert(&stz.st)) >= 0) {
+	                if (time_t t{} ; (rs = tmt.mktime(&t)) >= 0) {
 	                    if (dp) *dp = t ;
 		        }
 		    }
 	        } /* end if (ok) */
-	    } /* end if (tmz_xday) */
+	    } /* end if (ok - TMZ scope) */
 	} /* end if (non-null) */
 	return rs ;
 }

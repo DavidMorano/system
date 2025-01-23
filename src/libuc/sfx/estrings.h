@@ -28,10 +28,15 @@
 
 #include	<sncpyx.h>
 #include	<snwcpy.h>
+
 #include	<strcpyx.h>
 #include	<strwcpyx.h>
 #include	<strdcpyx.h>
 #include	<strn.h>
+
+#include	<stpcpyxc.h>
+#include	<stpncpyxc.h>
+
 #include	<sfx.h>
 #include	<six.h>
 #include	<mkpathx.h>

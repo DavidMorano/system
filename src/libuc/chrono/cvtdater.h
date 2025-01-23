@@ -53,7 +53,7 @@ struct cvtdater : cvtdater_head {
 	} ;
 	cvtdater(const cvtdater &) = delete ;
 	cvtdater &operator = (const cvtdater &) = delete ;
-	int start(time_t) noex ;
+	int start(time_t = 0L) noex ;
 	int load(time_t *,cchar *,int = -1) noex ;
 	void dtor() noex ;
 	~cvtdater() {
@@ -66,11 +66,24 @@ typedef CVTDATER	cvtdater ;
 
 EXTERNC_begin
 
-extern int	cvtdater_start(cvtdater *,time_t) noex ;
-extern int	cvtdater_load(cvtdater *,time_t *,cchar *,int) noex ;
 extern int	cvtdater_finish(cvtdater *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+extern "C" {
+    extern int	cvtdater_start(cvtdater *,time_t = 0L) noex ;
+    extern int	cvtdater_load(cvtdater *,time_t *,cchar *,int = -1) noex ;
+}
+
+#else	/* __cplusplus */
+
+extern int	cvtdater_start(cvtdater *,time_t) noex ;
+extern int	cvtdater_load(cvtdater *,time_t *,cchar *,int) noex ;
+
+#endif /* __cplusplus */
+
 
 #endif /* CVTDATER_INCLUDE */
 

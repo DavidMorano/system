@@ -116,12 +116,6 @@
 
 /* local structures */
 
-struct knownzone {
-	cchar		*zname ;
-	int		zoff ;
-	int		isdst ;
-} ;
-
 
 /* forward references */
 
