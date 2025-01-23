@@ -133,9 +133,8 @@ int tmtime_ztime(tmtime *op,bool fz,time_t t) noex {
 int tmtime_gmtime(tmtime *op,time_t t) noex {
 	int		rs = SR_FAULT ;
 	if ((rs = tmtime_ctor(op)) >= 0) {
-	    TM		tms ;
 	    if (t == 0) t = time(nullptr) ;
-	    if ((rs = uc_gmtime(&t,&tms)) >= 0) {
+	    if (TM tms ; (rs = uc_gmtime(&t,&tms)) >= 0) {
 	        if ((rs = tmtime_insert(op,&tms)) >= 0) {
 	            op->gmtoff = 0 ;
 	            rs = strwcpy(op->zname,"GMT",znlen) - op->zname ;
@@ -152,9 +151,8 @@ int tmtime_gmtime(tmtime *op,time_t t) noex {
 int tmtime_localtime(tmtime *op,time_t t) noex {
 	int		rs = SR_FAULT ;
 	if ((rs = tmtime_ctor(op)) >= 0) {
-	    TM		tms ;
 	    if (t == 0) t = time(nullptr) ;
-	    if ((rs = uc_localtime(&t,&tms)) >= 0) {
+	    if (TM tms ; (rs = uc_localtime(&t,&tms)) >= 0) {
 	        rs = tmtime_insert(op,&tms) ;
 	    }
 	    if (rs < 0) {
@@ -165,7 +163,7 @@ int tmtime_localtime(tmtime *op,time_t t) noex {
 }
 /* end subroutine (tmtime_localtime) */
 
-int tmtime_insert(tmtime *op,TM *tmp) noex {
+int tmtime_insert(tmtime *op,CTM *tmp) noex {
 	int		rs ;
 	if ((rs = tmtime_ctor(op,tmp)) >= 0) {
 	    TM		tc = *tmp ;
@@ -189,7 +187,7 @@ int tmtime_insert(tmtime *op,TM *tmp) noex {
 	            op->gmtoff = tc.tm_gmtoff ;
 	            zp = tc.tm_zone ;
 	        } else {
-	            bool	f_isdst = (tc.tm_isdst > 0) ;
+	            cbool	f_isdst = (tc.tm_isdst > 0) ;
 	            op->gmtoff = (f_isdst) ? altzone : timezone ;
 	            zp = (f_isdst) ? tzname[1] : tzname[0] ;
 	        } /* end if_constexpr (f_darwin) */
@@ -243,27 +241,27 @@ int tmtime_adjtime(tmtime *op,time_t *tp) noex {
 static int tmtime_mktimer(tmtime *op,int f_adj,time_t *tp) noex {
 	int		rs ;
 	if ((rs = tmtime_ctor(op)) >= 0) {
-	    TM		tms ;
 	    time_t	t = 0 ;
-	    tmtime_extract(op,&tms) ;
-	    if ((rs = uc_mktime(&tms,&t)) >= 0) {
-	        int	taroff = op->gmtoff ;
-	        int 	locoff ;
-	        cbool	f_isdst = (tms.tm_isdst > 0) ;
-	        locoff = (f_isdst) ? altzone : timezone ;
-	        t += (taroff - locoff) ;
-	        if (f_adj) {
-	            op->sec = tms.tm_sec ;
-	            op->min = tms.tm_min ;
-	            op->hour = tms.tm_hour ;
-	            op->mday = tms.tm_mday ;
-	            op->mon = tms.tm_mon ;
-	            op->year = tms.tm_year ;
-	            op->wday = tms.tm_wday ;
-	            op->yday = tms.tm_yday ;
-	            op->isdst = tms.tm_isdst ;
-	        }
-	    } /* end if (uc_mktime) */
+	    if (TM tms ; (tmtime_extract(op,&tms)) >= 0) {
+	        if ((rs = uc_mktime(&tms,&t)) >= 0) {
+	            cint	taroff = op->gmtoff ;
+	            int 	locoff ;
+	            cbool	f_isdst = (tms.tm_isdst > 0) ;
+	            locoff = (f_isdst) ? altzone : timezone ;
+	            t += (taroff - locoff) ;
+	            if (f_adj) {
+	                op->sec = tms.tm_sec ;
+	                op->min = tms.tm_min ;
+	                op->hour = tms.tm_hour ;
+	                op->mday = tms.tm_mday ;
+	                op->mon = tms.tm_mon ;
+	                op->year = tms.tm_year ;
+	                op->wday = tms.tm_wday ;
+	                op->yday = tms.tm_yday ;
+	                op->isdst = tms.tm_isdst ;
+	            }
+	        } /* end if (uc_mktime) */
+	    } /* end if (ttime_extract) */
 	    if (tp) {
 	        *tp = (rs >= 0) ? t : 0 ;
 	    }
@@ -284,7 +282,7 @@ int tmtime::localtime(time_t t) noex {
 	return tmtime_localtime(this,t) ;
 }
 
-int tmtime::insert(TM *tmp) noex {
+int tmtime::insert(CTM *tmp) noex {
 	return tmtime_insert(this,tmp) ;
 }
 

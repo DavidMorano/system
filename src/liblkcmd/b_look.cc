@@ -1,13 +1,14 @@
-/* b_look */
+/* b_look SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is the LOOK program (for looking up words in a dictionary) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-#define	CF_CHAR		1		/* use 'char(3dam)' */
-
+#define	CF_CHAR		1		/* use |char(3uc)| */
 
 /* revision history:
 
@@ -20,9 +21,13 @@
 
 /*******************************************************************************
 
-	This is a knock-off of the famous LOOK program.  It looks up strings
-	(which should be prefixes to words) in a sorted word list (contains
-	in a file).
+  	Name:
+	b_look
+
+	Description:
+	This is a knock-off of the famous LOOK program.  It looks
+	up strings (which should be prefixes to words) in a sorted
+	word list (contains in a file).
 
 	A note from the BSD (I think) version of this program:
  	|
@@ -30,9 +35,7 @@
 	| In fact, they were ignored.  This implements historic practice, not
 	| the manual page.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

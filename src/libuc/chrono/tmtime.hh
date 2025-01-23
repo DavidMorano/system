@@ -47,7 +47,7 @@ struct tmtime {
 	tmtime() = default ;
 	tmtime &operator = (const tmtime &) = delete ;
 	tmtime(const tmtime &) = delete ;
-	int insert(TM *) noex ;
+	int insert(CTM *) noex ;
 	int ztime(bool,time_t) noex ;
 	int gmtime(time_t) noex ;
 	int localtime(time_t) noex ;
@@ -62,7 +62,7 @@ struct tmtime {
 
 EXTERNC_begin
 
-extern int	tmtime_insert(tmtime *,TM *) noex ;
+extern int	tmtime_insert(tmtime *,CTM *) noex ;
 extern int	tmtime_ztime(tmtime *,bool,time_t) noex ;
 extern int	tmtime_gmtime(tmtime *,time_t) noex ;
 extern int	tmtime_localtime(tmtime *,time_t) noex ;

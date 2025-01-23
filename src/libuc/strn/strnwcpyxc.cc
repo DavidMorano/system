@@ -11,18 +11,6 @@
 	= 1998-11-01, David A­D­ Morano
 	This code was originally written.
 
-	= 2025-01-15, David A­D­ Morano
-	In the course of reviewing this code (after some years now)
-	for conformance with the C++20 standard (I am actually
-	compiling now-a-days for C++26), I decided (again after
-	all of these years), to change the code to use (optionally
-	when a compile-define 'define' is set to '1') the new (as
-	of POSIX® 2008) subroutine |stpncpy(3c)|.  Using this new
-	subroutine is now the default.  Does it really make this
-	faster?  Who knows?  I simply put a compile-time flag (using
-	C++11 'constexpr') around the old and new code, in the
-	subroutine |dstcpy()| below, to decide which code to use.
-
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -65,7 +53,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strncpy(3c)| + |memset(3c)| */
+#include	<cstring>		/* |memset(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

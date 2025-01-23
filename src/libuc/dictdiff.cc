@@ -1,10 +1,11 @@
 /* dictdiff SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* compare two dictionary characters (like for a dictionary) */
 /* version %I% last-modified %G% */
 
-#define	CF_CHAR		1		/* use |CHAR_XX(3dam)| */
+#define	CF_CHAR		1		/* use |CHAR_XX(3uc)| */
 
 /* revision history:
 

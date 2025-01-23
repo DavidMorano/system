@@ -26,8 +26,9 @@
 	Time conversion subroutines.
 
 	Synopsis:
-	int uc_localtime(const time_t *dt,TM *tmp) noex
-	int uc_gmtime(const time_t *dt,TM *tmp) noex
+	int uc_localtime(custime *dt,TM *tmp) noex
+	int uc_gmtime(custime *dt,TM *tmp) noex
+	int uc_ztime(custime *tp,TM *tsp,int z) noex
 
 	Arguments:
 	dt	time to convert

@@ -1,11 +1,11 @@
-/* cup */
+/* cup SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* subroutine to convert a counted string to upper case */
 /* version %I% last-modified %G% */
 
-
-#define	CF_CHAR		1		/* use 'char(3dam)' */
-
+#define	CF_CHAR		1		/* use 'char(3uc)' */
 
 /* revision history:
 
@@ -24,12 +24,9 @@
 ;	used in other modules.
 */
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
 #include	<string.h>
-
 #include	<char.h>
 #include	<localmisc.h>
 

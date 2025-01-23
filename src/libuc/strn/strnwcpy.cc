@@ -26,7 +26,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2025 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -65,7 +65,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strncpy(3c)| + |memset(3c)| */
+#include	<cstring>		/* |stpncpy(3c)| + |memset(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

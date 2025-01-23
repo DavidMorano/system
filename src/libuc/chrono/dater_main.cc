@@ -52,20 +52,20 @@
 	that NetNews does ; namely, only for a comment at the end
 	of the string and which contains a time-zone-name.
 
-	Full comment parsing is done on MSG dates using a comparse
-	object.  With comparse processing, we still try to divine a
+	Full comment parsing is done on MSG dates using a COMPARSE
+	object.  With COMPARSE processing, we still try to divine a
 	time-zone-name from the leading part of the resulting
 	comment.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/timeb.h>
+#include	<sys/timeb.h>		/* |TIMEB| */
 #include	<climits>		/* |SHORT_MIN| */
+#include	<ctime>			/* |time_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<ctime>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<getdefzdata.h>
@@ -81,6 +81,7 @@
 #include	<zdb.h>			/* CHRONO */
 #include	<sncpyx.h>
 #include	<snwcpyx.h>
+#include	<sntmtime.h>
 #include	<strn.h>		/* |strnwcpyxc(3uc)| */
 #include	<strwcpy.h>
 #include	<mkchar.h>
@@ -137,7 +138,7 @@ static int	dater_defs(dater *,tmz *) noex ;
 
 static inline int znwcpy(char *zb,int zl,cc *zsp,int zsl = -1) noex {
 	cint rs = strnwcpylc(zb,zl,zsp,zsl) - zb ; /* <- lower-case */
-	zb[zl] = '0' ;
+	zb[zl] = '\0' ;
 	return rs ;
 }
 
@@ -260,9 +261,8 @@ int dater_setmsg(dater *op,cchar *sp,int sl) noex {
 	if ((rs = dater_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (comparse vc ; (rs = comparse_start(&vc,sp,sl)) >= 0) {
-	        int	vl ;
 	        cchar	*vp{} ;
-	        if ((rs = comparse_getval(&vc,&vp)) >= 0) {
+	        if (int vl ; (rs = comparse_getval(&vc,&vp)) >= 0) {
 	            vl = rs ;
 	            if (tmz stz ; (rs = tmz_xmsg(&stz,vp,vl)) >= 0) {
 	                TM	dst = stz.st ;
@@ -1027,7 +1027,7 @@ static int dater_mktime(dater *op,TM *stp) noex {
 	int		rs = SR_OK ;
 	if (op->fl.zoff) {
 	    if (tmtime tmt ; (rs = tmt.insert(stp)) >= 0) {
-	        tmt.gmtoff = (op->b.timezone*60) ; /* insert time-zone-offet */
+	        tmt.gmtoff = (op->b.timezone * 60) ; /* time-zone-offet */
 	        op->fl.tzset = true ;		/* mktime() calls it! */
 	        rs = tmt.mktime(&t) ;
 	        op->b.time = t ;

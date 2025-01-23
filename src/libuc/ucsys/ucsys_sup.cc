@@ -16,19 +16,24 @@
 /* Copyright (c) 2001 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************* 
-	These subroutines perform character case conversions (cheaply).  Yes,
-	case-conversion is used a lot in embedded systems!
+  	Purpose:
+	library-support
+
+	Description:
+	These subroutines perform character case conversions
+	(cheaply).  Yes, case-conversion is used a lot in embedded
+	systems!
 
 	Implementation note:
-
-        The "CHAR(3dam)' translations (conversions) return an unsigned character
-        ('uchar') type. This means that when cajoled into becoming an 'int' type
-        on return, it will not be sign-extended.
+	The |CHAR(3uc)| translations (conversions) return an unsigned
+	character ('uchar') type.  This means that when cajoled into
+	becoming an 'int' type on return, it will not be sign-extended.
 
 	= 2014-01-13
-        We now use the 'CHAR(3dam)' translation tables only (no computed
-        conversion compile-time option). Deal with it. See my note above under
-        the revision history. Look how trivial the code is now!
+	We now use the |CHAR(3uc)| translation tables only (no
+	computed conversion compile-time option).  Deal with it.  See
+	my note above under the revision history.  Look how trivial
+	the code is now!
 
 *******************************************************************************/
 
