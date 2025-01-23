@@ -1,4 +1,5 @@
 /* strkeydictcmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string key comparison */
@@ -47,6 +48,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<ischarx.h>
+#include	<dictdiff.h>
 #include	<localmisc.h>
 
 #include	"strkeycmp.h"
@@ -56,10 +58,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	dictdiff(int,int) noex ;
-}
 
 
 /* external variables */

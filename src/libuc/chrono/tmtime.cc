@@ -33,13 +33,13 @@
 	Note also that the Darwin OS (used on Macs as the core of
 	MacOS) does not maintain the normal external variables that
 	are set by |tzset(3c)| as previous, more traditional, OSes
-	did. This is a positive development and one that should
+	did.  This is a positive development and one that should
 	have been in there from the beginning, but provision has
 	to made for it none-the-less.
 
 	Finally, note that SlowLaris has a 'define' bug in that it
 	does not declare the 'altzone' variable unless some other
-	defines are made (see the code). It is not clear if and
+	defines are made (see the code).  It is not clear if and
 	when this will be or has been fixed.  This subroutine does
 	not currently use the 'altzone' variable anyway.
 
@@ -131,11 +131,11 @@ int tmtime_ztime(tmtime *op,bool fz,time_t t) noex {
 /* end subroutine (tmtime_ztime) */
 
 int tmtime_gmtime(tmtime *op,time_t t) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	if ((rs = tmtime_ctor(op)) >= 0) {
 	    if (t == 0) t = time(nullptr) ;
-	    if (TM tms ; (rs = uc_gmtime(&t,&tms)) >= 0) {
-	        if ((rs = tmtime_insert(op,&tms)) >= 0) {
+	    if (TM tmd ; (rs = uc_gmtime(&t,&tmd)) >= 0) {
+	        if ((rs = tmtime_insert(op,&tmd)) >= 0) {
 	            op->gmtoff = 0 ;
 	            rs = strwcpy(op->zname,"GMT",znlen) - op->zname ;
 	        }
@@ -149,11 +149,11 @@ int tmtime_gmtime(tmtime *op,time_t t) noex {
 /* end subroutine (tmtime_gmtime) */
 
 int tmtime_localtime(tmtime *op,time_t t) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	if ((rs = tmtime_ctor(op)) >= 0) {
 	    if (t == 0) t = time(nullptr) ;
-	    if (TM tms ; (rs = uc_localtime(&t,&tms)) >= 0) {
-	        rs = tmtime_insert(op,&tms) ;
+	    if (TM tmd ; (rs = uc_localtime(&t,&tmd)) >= 0) {
+	        rs = tmtime_insert(op,&tmd) ;
 	    }
 	    if (rs < 0) {
 		op->dtor() ;
@@ -238,27 +238,27 @@ int tmtime_adjtime(tmtime *op,time_t *tp) noex {
 
 /* local subroutines */
 
-static int tmtime_mktimer(tmtime *op,int f_adj,time_t *tp) noex {
+static int tmtime_mktimer(tmtime *op,int fadj,time_t *tp) noex {
 	int		rs ;
 	if ((rs = tmtime_ctor(op)) >= 0) {
 	    time_t	t = 0 ;
-	    if (TM tms ; (tmtime_extract(op,&tms)) >= 0) {
-	        if ((rs = uc_mktime(&tms,&t)) >= 0) {
+	    if (TM tmd ; (tmtime_extract(op,&tmd)) >= 0) {
+	        if ((rs = uc_mktime(&tmd,&t)) >= 0) {
 	            cint	taroff = op->gmtoff ;
 	            int 	locoff ;
-	            cbool	f_isdst = (tms.tm_isdst > 0) ;
+	            cbool	f_isdst = (tmd.tm_isdst > 0) ;
 	            locoff = (f_isdst) ? altzone : timezone ;
 	            t += (taroff - locoff) ;
-	            if (f_adj) {
-	                op->sec = tms.tm_sec ;
-	                op->min = tms.tm_min ;
-	                op->hour = tms.tm_hour ;
-	                op->mday = tms.tm_mday ;
-	                op->mon = tms.tm_mon ;
-	                op->year = tms.tm_year ;
-	                op->wday = tms.tm_wday ;
-	                op->yday = tms.tm_yday ;
-	                op->isdst = tms.tm_isdst ;
+	            if (fadj) {
+	                op->sec = tmd.tm_sec ;
+	                op->min = tmd.tm_min ;
+	                op->hour = tmd.tm_hour ;
+	                op->mday = tmd.tm_mday ;
+	                op->mon = tmd.tm_mon ;
+	                op->year = tmd.tm_year ;
+	                op->wday = tmd.tm_wday ;
+	                op->yday = tmd.tm_yday ;
+	                op->isdst = tmd.tm_isdst ;
 	            }
 	        } /* end if (uc_mktime) */
 	    } /* end if (ttime_extract) */

@@ -5,7 +5,6 @@
 /* compare two dictionary characters (like for a dictionary) */
 /* version %I% last-modified %G% */
 
-#define	CF_CHAR		1		/* use |CHAR_XX(3uc)| */
 
 /* revision history:
 
@@ -39,16 +38,17 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<toxc.h>
-#include	<char.h>
 #include	<localmisc.h>
+
+#include	"dictdiff.h"
 
 
 /* local defines */
@@ -80,8 +80,8 @@ extern "C" {
 
 int dictdiff(int ch1,int ch2) noex {
 	int		rc ;
-	ch1 &= 0xff ;
-	ch2 &= 0xff ;
+	ch1 &= UCHAR_MAX ;
+	ch2 &= UCHAR_MAX ;
 	if ((rc = (tofc(ch1) - tofc(ch2))) == 0) {
 	    rc = (ch1 - ch2) ;
 	}

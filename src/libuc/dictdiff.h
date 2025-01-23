@@ -1,4 +1,5 @@
 /* dictdiff HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* compare two dictionary characters (like for a dictionary) */
@@ -20,7 +21,7 @@
 
 EXTERNC_begin
 
-int dictdiff(int ch1,int ch2) noex {
+extern int	dictdiff(int,int) noex ;
 
 EXTERNC_end
 
