@@ -28,11 +28,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<new>
 #include	<usystem.h>
 #include	<ulogerror.h>
-#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"strnul.hh"
@@ -44,6 +45,7 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using libu::strwcpy ;			/* subroutine */
 using std::nothrow ;			/* constant */
 
 

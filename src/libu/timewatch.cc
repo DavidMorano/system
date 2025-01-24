@@ -1,4 +1,5 @@
 /* timewatch SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* watch time and variables simultaneously */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	timwatch
+
+	Description:
 	This structure provides a facility to watch variables for changes.
 
 *******************************************************************************/

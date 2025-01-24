@@ -19,6 +19,10 @@
 /*******************************************************************************
 
 	Names:
+	int u_uname(UTSNAME *) noex
+	int u_getnodename(char *,int) noex
+	int u_getauxinfo(char *,int,int) noex
+	int u_gethostid(ulong *) noex
 
 	Description:
 	These subroutines mange the operating system itself.

@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	ITIMERSPEC
+
+  	Description:
 	Methods for the ITIMERSPEC object.
 
 *******************************************************************************/
@@ -36,7 +40,7 @@
 
 EXTERNC_begin
 
-extern int itimerspec_load(ITIMERSPEC *,CTIMESPEC *,CTIMESPEC *) noex ;
+extern int	itimerspec_load(ITIMERSPEC *,CTIMESPEC *,CTIMESPEC *) noex ;
 
 EXTERNC_end
 

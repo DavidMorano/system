@@ -1,4 +1,5 @@
-/* testsigpending */
+/* testsigpending SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C89 */
 
 #define	CF_DEBUGS	1		/* compile-time debugging */

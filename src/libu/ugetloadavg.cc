@@ -1,4 +1,5 @@
 /* ugetloadavg SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the standard load averages maintained by the kernel */

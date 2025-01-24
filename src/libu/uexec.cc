@@ -1,4 +1,5 @@
 /* uexec SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -16,6 +17,9 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Group:
+	uexec
 
 	Coding note:
 	The Solaris® (from Sun Microsystems) OS is messed up if

@@ -17,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	uiconv
 
 	Description:
@@ -120,14 +120,14 @@ int uiconv_open(uiconv *op,cchar *tsp,cchar *fsp) noex {
 	    rs = SR_INVALID ;
 	    if (tsp[0] && fsp[0]) {
 		rs = SR_NOMEM ;
-	        if (ic_t *icp ; (icp = new(nothrow) iconv_t) != np) {
-		    op->cdp = icp ;
+	        if (ic_t *cdp ; (cdp = new(nothrow) iconv_t) != np) {
+		    op->cdp = cdp ;
 	            if ((rs = uiconv_libopen(op,tsp,fsp)) >= 0) {
 	                op->magic = UICONV_MAGIC ;
 	            }
 	            if (rs < 0) {
-			iconv_t	*icp = iconvp(op->cdp) ;
-		        delete icp ;
+			iconv_t	*cdp = iconvp(op->cdp) ;
+		        delete cdp ;
 		        op->cdp = nullptr ;
 	            }
 	        } /* end if (memory-allocation) */
@@ -149,8 +149,8 @@ int uiconv_close(uiconv *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->cdp) {
-		iconv_t *icp = iconvp(op->cdp) ;
-		delete icp ;
+		iconv_t *cdp = iconvp(op->cdp) ;
+		delete cdp ;
 	        op->cdp = nullptr ;
 	    }
 	    {
@@ -170,7 +170,7 @@ int uiconv_trans(uiconv *op,cchar **ib,int *ilp,char **ob,int *olp) noex {
 	    size_t	ileft = size_t(*ilp) ;
 	    size_t	oleft = size_t(*olp) ;
 	    {
-	        iconv_t	*cdp = (iconv_t *) op->cdp ;
+	        iconv_t	*cdp = iconvp(op->cdp) ;
 	        size_t	*ileftp = &ileft ;
 	        size_t	*oleftp = &oleft ;
 	        {
@@ -198,14 +198,12 @@ int uiconv_trans(uiconv *op,cchar **ib,int *ilp,char **ob,int *olp) noex {
 static int uiconv_libopen(uiconv *op ,cchar *tsp,cchar *fsp) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op->cdp) {
+	    iconv_t	*cdp = iconvp(op->cdp) ;
 	    int		to_mem = UICONV_TOMEM ;
 	    bool	f_exit = false ;
 	    repeat {
 	        rs = SR_OK ;
-	        if (iconv_t cd ; (cd = iconv_open(tsp,fsp)) != iconvbad) {
-	            iconv_t *uip = (iconv_t *) op->cdp ;
-	            memcpy(uip,&cd) ;
-		} else {
+		if ((*cdp = iconv_open(tsp,fsp)) == iconvbad) {
 		    rs = (- errno) ;
 		}
 	        if (rs < 0) {
@@ -231,7 +229,7 @@ static int uiconv_libopen(uiconv *op ,cchar *tsp,cchar *fsp) noex {
 /* end subroutine (uiconv_libopen) */
 
 static int uiconv_libclose(uiconv *op) noex {
-	iconv_t		*cdp = (iconv_t *) op->cdp ;
+	iconv_t		*cdp = iconvp(op->cdp) ;
 	int		rs ;
 	repeat {
 	    if ((rs = iconv_close(*cdp)) == -1) {

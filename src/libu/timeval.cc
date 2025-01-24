@@ -1,4 +1,5 @@
 /* timeval SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutines to manipulate TIMEVAL values */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	TIMEVAL
+
+	Description:
 	We manage (a little bit) the TIMEVAL object.
 
 *******************************************************************************/

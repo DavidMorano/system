@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += libu.h
 
-LIBS +=
+LIBS += -liconv
 
 
 INCDIRS=
@@ -59,7 +59,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 SOFL= -shared
 
 
-OBJ00= endian.o intx.o
+OBJ00= endian.o intx.o strnul.o
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
 OBJ03= strtox.o xxtostr.o

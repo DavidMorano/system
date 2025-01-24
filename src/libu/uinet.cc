@@ -1,4 +1,5 @@
 /* uinet SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Internet-Address functions */
@@ -14,9 +15,14 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-/******************************************************************************* 
-	These are support subroutines for some Internet-Address (IP)
-	operations.
+/*******************************************************************************
+
+  	Group:
+	uinet
+
+	Description:
+	These are support subroutines for some Internet-Address
+	(IP) operations.
 
 *******************************************************************************/
 
@@ -25,6 +31,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
 #include	"uinet.h"
