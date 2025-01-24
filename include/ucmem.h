@@ -20,11 +20,14 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucmem
+
+	Description:
 	This file contains the UNIX system types that the brain-damaged
 	MacOS operating system does NOT have.  We are trying in a very
 	small way to make up for some of the immense brain-damage within
 	the MacOS operating system.
-
 
 *******************************************************************************/
 
@@ -37,6 +40,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

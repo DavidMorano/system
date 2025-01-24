@@ -134,11 +134,11 @@ OBJ06=
 OBJ07= printhelp.o shio.o
 OBJ08=
 OBJ09=
-OBJ10= tmz.o ptm.o ptma.o
-OBJ11= babycalc.o babiesfu.o cvtdater.o
+OBJ10=
+OBJ11=
 OBJ12=
 OBJ13= 
-OBJ14= heapsort.o
+OBJ14=
 OBJ15=
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
@@ -254,47 +254,5 @@ proginfo.o:		proginfo.c defs.h
 proginfo_setpiv.o:	proginfo_setpiv.c defs.h
 
 b_$(T).o:		b_$(T).c $(INCS)
-
-
-getutmpent.o:		getutmpent.c getutmpent.h
-
-getnodedomain.o:	getnodedomain.c
-
-
-userinfo.o:		userinfo.c userinfo.h
-
-shio.o:			shio.c shio.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-vecstr.o:		vecstr.c vecstr.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-babycalc.o:		babycalc.c babycalc.h babiesfu.h
-
-babiesfu.o:		babiesfu.c babiesfu.h cvtdater.h
-
-cvtdater.o:		cvtdater.c cvtdater.h tmz.h
-
-tmz.o:			tmz.c tmz.h
-
-ptm.o:			ptm.c ptm.h
-
-ptma.o:			ptma.c ptma.h
 
 

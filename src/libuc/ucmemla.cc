@@ -134,7 +134,7 @@ int ucmemla_release(ucmemla *op) noex {
 /* local subroutines */
 
 static int ucmemla_map(ucmemla *op,size_t us,void **rpp) noex {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	size_t		ms ;
 	int		rs ;
 	if ((rs = pagesize) >= 0) {

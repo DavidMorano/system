@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* copy a c-string to destination buffer w/ a case conversion */
+/* copy a c-string to destination buffer w/ case conversions */
 /* version %I% last-modified %G% */
 
 #define	CF_STPCPY	1		/* use |stpcpy(3c)| */

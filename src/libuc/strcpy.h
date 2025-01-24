@@ -2,6 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
+/* copy a c-string to destination buffer (ad other functions) */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

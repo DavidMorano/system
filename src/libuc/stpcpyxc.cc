@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* copy a c-string to destination buffer w/ a case conversion */
+/* copy a c-string to destination buffer w/ case conversions */
 /* version %I% last-modified %G% */
 
 #define	CF_STPCPY	1		/* use |stpcpy(3c)| */
@@ -30,12 +30,11 @@
 	(according to which subroutine is called).
 
 	Synopsis:
-	rp = *stpcpy{x}c(char *dst,cchar *src) noex
+	char *stpcpy{x}c(char *dst,cchar *src) noex
 
 	Arguments:
 	dst	destination result buffer (pointer)
 	src	source c-string pointer
-	rp	result pointer (pointing to resulting NUL character in 'dst'
 
 	Returns:
 	-	a pointer to the NUL character in the destination buffer
@@ -43,6 +42,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>

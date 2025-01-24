@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	uc_memla
+
+	Description:
 	This object provides a large-allocation memory capability.
 
 *******************************************************************************/
@@ -33,6 +37,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	UCMEMLA		struct ucmemla_head

@@ -174,9 +174,9 @@ OBJ06=
 OBJ07= printhelp.o shio.o kshlib.o maininfo.o sesmsg.o msgdata.o
 OBJ08=
 OBJ09=
-OBJ10= tmz.o tmtime.o
-OBJ11= modload.o dirseen.o
-OBJ12= babycalc.o cvtdater.o
+OBJ10=
+OBJ11=
+OBJ12=
 OBJ13= 
 OBJ14= 
 OBJ15=
@@ -197,7 +197,7 @@ OBJC= $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19) $(OBJ20) $(OBJ21) $(OBJ22) $(OBJ23)
 OBJ= $(OBJA) $(OBJB) $(OBJC)
 
 
-SOBJ00= babycalcs.o babiesfu.o cvtdater.o
+SOBJ00=
 SOBJ01=
 SOBJ02=
 SOBJ03=
@@ -326,57 +326,5 @@ maininfo.o:		maininfo.c maininfo.h kshlib.h
 kshlib.o:		kshlib.c kshlib.h sesmsg.h msgdata.h
 
 sesmsg.o:		sesmsg.c sesmsg.h
-
-msgdata.o:		msgdata.c msgdata.h
-
-
-shio.o:			shio.c shio.h
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-vecstr.o:		vecstr.c vecstr.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-babycalc.o:		babycalc.c babycalc.h babycalcs.h
-
-babycalcs.o:		babycalcs.c babycalcs.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-babiesfu.o:		babiesfu.c babiesfu.h cvtdater.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-cvtdater.o:		cvtdater.c cvtdater.h tmz.h dayspec.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-tmtime.o:		tmtime.c tmtime.h
-
-tmz.o:			tmz.c tmz.h
-
-dayspec.o:		dayspec.c dayspec.h
-
-ptm.o:			ptm.c ptm.h
-
-ptma.o:			ptma.c ptma.h
-
-modload.o:		modload.c modload.h
-
-dirseen.o:		dirseen.c dirseen.h
 
 

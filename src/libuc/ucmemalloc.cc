@@ -49,6 +49,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	uc_mem{xx}
+
+	Description:
 	This is the friendly version of the standrd |malloc(3c)|
 	subroutine and its various friends.  These subroutines are
 	not interpositioned on the standard versions but rather have
@@ -97,7 +101,7 @@
 /* local defines */
 
 
-/* namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
@@ -378,7 +382,7 @@ int ucmemalloc::iinit() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (!fvoid) {
-	    cint		to = utimeout[uto_busy] ;
+	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {			/* <- the money shot */
 	        if ((rs = mx.create) >= 0) {
@@ -572,13 +576,13 @@ int ucmemalloc::trackpresent(cvoid *cp) noex {
 int ucmemalloc::trackcurenum(ucmallreg_cur *curp,ucmallreg_ent *rp) noex {
 	int		rs ;
 	int		rs1 ;
-	int		rsize = 0 ;
+	int		rsz = 0 ;
 	if ((rs = init) >= 0) {
 	    if ((rs = uc_forklockbegin(-1)) >= 0) {
 	        if ((rs = mx.lockbegin) >= 0) {
 		    {
 			rs = callcurenum(curp,rp) ;
-			rsize = rs ;
+			rsz = rs ;
 		    }
 	            rs1 = mx.lockend ;
 	            if (rs >= 0) rs = rs1 ;
@@ -587,7 +591,7 @@ int ucmemalloc::trackcurenum(ucmallreg_cur *curp,ucmallreg_ent *rp) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (forklock) */
 	} /* end if (init) */
-	return (rs >= 0) ? rsize : rs ;
+	return (rs >= 0) ? rsz : rs ;
 }
 /* end method (ucmemalloc::trackcurenum) */
 
@@ -653,17 +657,17 @@ int ucmemalloc::callpresent(cvoid *cp,int,void *) noex {
 
 int ucmemalloc::callcurenum(ucmallreg_cur *curp,ucmallreg_ent *rp) noex {
 	int		rs = SR_NOTOPEN ;
-	int		rsize = 0 ;
+	int		rsz = 0 ;
 	if (ftrack) {
 	    addrset	*aop = &mt ;
 	    addrset_cur	*acp = (addrset_cur *) curp->mcp ;
 	    if (addrset_ent e{} ; (rs = aop->curenum(acp,&e)) >= 0) {
 	        rp->addr = caddr_t(e.addr) ;
 	        rp->asize = e.asize ;
-	        rsize = intsat(e.asize) ;
+	        rsz = intsat(e.asize) ;
 	    } /* end if */
 	} /* end if (tracking) */
-	return (rs >= 0) ? rsize : rs ;
+	return (rs >= 0) ? rsz : rs ;
 }
 /* end subroutine (ucmemalloc::callcurenum) */
 
