@@ -44,6 +44,18 @@
 #define	UICONV_TOMEM	(1*60)
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+typedef iconv_t		ic_t ;
+typedef iconv_t	*	iconvp ;
+
+
 /* external subroutines */
 
 
@@ -101,19 +113,21 @@ constexpr size_t	szbad = size_t(-1) ;
 
 /* exported subroutines */
 
-int uiconv_open(uiconv *op ,cchar *tsp,cchar *fsp) noex {
+int uiconv_open(uiconv *op,cchar *tsp,cchar *fsp) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = uiconv_ctor(op,tsp,fsp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (tsp[0] && fsp[0]) {
-	        cint	isz = szof(iconv_t) ;
-	        if (char *vp{} ; (rs = uc_malloc(isz,&vp)) >= 0) {
-	            op->cdp = (iconv_t *) vp ;
+		rs = SR_NOMEM ;
+	        if (ic_t *icp ; (icp = new(nothrow) iconv_t) != np) {
+		    op->cdp = icp ;
 	            if ((rs = uiconv_libopen(op,tsp,fsp)) >= 0) {
 	                op->magic = UICONV_MAGIC ;
 	            }
 	            if (rs < 0) {
-		        uc_free(op->cdp) ;
+			iconv_t	*icp = iconvp(op->cdp) ;
+		        delete icp ;
 		        op->cdp = nullptr ;
 	            }
 	        } /* end if (memory-allocation) */
@@ -135,8 +149,8 @@ int uiconv_close(uiconv *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->cdp) {
-	        rs1 = uc_free(op->cdp) ;
-	        if (rs >= 0) rs = rs1 ;
+		iconv_t *icp = iconvp(op->cdp) ;
+		delete icp ;
 	        op->cdp = nullptr ;
 	    }
 	    {

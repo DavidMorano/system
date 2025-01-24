@@ -59,7 +59,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 SOFL= -shared
 
 
-OBJ00= endian.o
+OBJ00= endian.o intx.o
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
 OBJ03= strtox.o xxtostr.o
@@ -292,17 +292,17 @@ ulock.o:		ulock.dir
 ulock.dir:
 	makesubdir $@
 
-# INTX
-intx.o:		intx.dir
-intx.dir:
-	makesubdir $@
-
 # POSIX Message Queue
 pmq.o:			pmq.cc pmq.h			$(INCS)
 
 # POSIX® synchronization mechanisms
 ptx.o:			ptx.dir
 ptx.dir:
+	makesubdir $@
+
+# INTX
+intx.o:			intx.dir
+intx.dir:
 	makesubdir $@
 
 # OTHER
@@ -328,6 +328,6 @@ timecount.o:		timecount.cc timecount.hh
 strtox.o:		strtox.cc strtox.h		$(INCS)
 xxtostr.o:		xxtostr.cc xxtostr.h		$(INCS)
 
-strnul.o:		strnul.cc strnul.hh
+strnul.o:		strnul.cc strnul.hh		$(INCS)
 
 

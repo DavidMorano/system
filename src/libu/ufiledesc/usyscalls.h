@@ -66,6 +66,8 @@
 #include	<uexec.h>
 
 #include	<ptx.h>
+#include	<strnul.hh>
+#include	<intx.h>
 
 
 #endif /* USYSCALLS_INCLUDE */

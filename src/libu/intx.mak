@@ -134,10 +134,10 @@ obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-satarith.o:		satarith.cc satarith.h
-intrem.o:		intrem.cc intrem.h
-intsat.o:		intsat.cc intsat.h
-intfloor.o:		intfloor.cc intfloor.h
-intceil.o:		intceil.cc intceil.h
+satarith.o:		satarith.cc satarith.h		$(INCS)
+intrem.o:		intrem.cc intrem.h		$(INCS)
+intsat.o:		intsat.cc intsat.h		$(INCS)
+intfloor.o:		intfloor.cc intfloor.h		$(INCS)
+intceil.o:		intceil.cc intceil.h		$(INCS)
 
 

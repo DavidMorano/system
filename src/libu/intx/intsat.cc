@@ -1,4 +1,5 @@
 /* intsat SUPPORT (Integer-Saturation) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Integer Saturation (clamping) */
@@ -23,6 +24,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |INT_MIN| + |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<localmisc.h>
 
 #include	"intsat.h"
