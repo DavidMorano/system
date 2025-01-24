@@ -302,7 +302,7 @@ int opener::openreg(cchar *fname,int of,mode_t om) noex {
 
 int opener::callstd(cchar *fname,int of,mode_t om) noex {
 	int		rs ;
-	of &= (~ OF_SPECIALMASK) ;
+	of &= (~ OM_SPECIALMASK) ;
 	if ((rs = (this->*m)(fname,of,om)) < 0) {
 	    rs = (- errno) ;
 	}

@@ -157,4 +157,9 @@ libpr.o:		libpr.dir
 libpr.dir:
 	makesubdir $@
 
+# LIBPROG
+libprog.o:		libprog.dir
+libprog.dir:
+	makesubdir $@
+
 
