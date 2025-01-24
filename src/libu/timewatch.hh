@@ -40,7 +40,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usupport.h>
+#include	<usupport.h>		/* |msleep(3u)| */
 
 
 #ifndef	POLL_INTMULT
@@ -49,7 +49,7 @@
 
 
 class timewatch {
-	int		mto ;		/* millisecond-timeout */
+	int		mto ;		/* millisecond-time-out */
 public:
 	timewatch(int a) : mto(a * POLL_INTMULT) { } ;
 	timewatch(const timewatch &) = delete ;
