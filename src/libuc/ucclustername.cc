@@ -75,11 +75,13 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<ctime>
 #include	<usystem.h>
 #include	<sigblocker.h>
+#include	<aflag.hh>
 #include	<ptm.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>
@@ -121,11 +123,11 @@ extern "C" {
 /* local structures */
 
 struct clustername {
-	ptm		m ;		/* data mutex */
-	time_t		et ;
+	ptm		mx ;		/* data mutex */
 	cchar		*nn ;		/* node-name */
 	cchar		*cn ;		/* cluster-name */
 	char		*a ;		/* memory-allocation */
+	time_t		et ;
 	int		ttl ;		/* time-to-live */
 	vaflag		f_void ;
 	vaflag		f_init ;
@@ -185,7 +187,7 @@ int ucclustername_init() noex {
 	if (! uip->f_void) {
 	    if (! uip->f_init) {
 	        uip->f_init = true ;
-	        if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
+	        if ((rs = ptm_create(&uip->mx,nullptr)) >= 0) {
 	            void_f	b = ucclustername_atforkbefore ;
 	            void_f	a = ucclustername_atforkafter ;
 	            if ((rs = uc_atfork(b,a,a)) >= 0) {
@@ -198,7 +200,7 @@ int ucclustername_init() noex {
 			}
 	            } /* end if (uc_atfork) */
 	            if (rs < 0) {
-	                ptm_destroy(&uip->m) ;
+	                ptm_destroy(&uip->mx) ;
 		    }
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
@@ -233,7 +235,7 @@ int ucclustername_fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptm_destroy(&uip->m) ;
+	        rs1 = ptm_destroy(&uip->mx) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    uip->f_init = false ;
@@ -250,9 +252,8 @@ int ucclustername_get(char *rbuf,int rlen,cchar *nn) noex {
 	if (rbuf && nn) {
 	    rs = SR_INVALID ;
 	    if (nn[0]) {
-	        sigblocker	b ;
 	        rbuf[0] = '\0' ;
-	        if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
+	        if (sigblocker b ; (rs = b.start) >= 0) {
 	            if ((rs = ucclustername_init()) >= 0) {
 	                SUBINFO		si ;
 	                if ((rs = subinfo_start(&si,rbuf,rlen,nn)) >= 0) {
@@ -265,7 +266,7 @@ int ucclustername_get(char *rbuf,int rlen,cchar *nn) noex {
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (subinfo) */
 	            } /* end if (ucclustername_init) */
-	            rs1 = sigblocker_finish(&b) ;
+	            rs1 = b.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
 	    } /* end if (valid) */
@@ -281,12 +282,11 @@ int ucclustername_set(cchar *cbuf,int clen,cchar *nn,int to) noex {
 	if (cbuf && nn) {
 	    rs = SR_INVALID ;
 	    if (cbuf[0] && nn[0]) {
-	        sigblocker	b ;
 	        if (clen < 0) clen = strlen(cbuf) ;
-	        if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
+	        if (sigblocker b ; (rs = b.start) >= 0) {
 	            if ((rs = ucclustername_init()) >= 0) {
 	                SUBINFO		si ;
-		        char		*sbuf = (char *) cbuf ;
+		        char		*sbuf = charp(cbuf) ;
 	                if ((rs = subinfo_start(&si,sbuf,clen,nn)) >= 0) {
 	                    UCLUSTERNAME	*uip = &ucclustername_data ;
 		            {
@@ -297,7 +297,7 @@ int ucclustername_set(cchar *cbuf,int clen,cchar *nn,int to) noex {
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (subinfo) */
 	            } /* end if (ucclustername_init) */
-	            rs1 = sigblocker_finish(&b) ;
+	            rs1 = b.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
 	    } /* end if (valid) */
@@ -328,14 +328,14 @@ static int ucclustername_allocbegin(UCLUSTERNAME *uip,time_t dt,int ttl) noex {
 	int		rs1 ;
 	int		f = false ;
 	if ((rs = uc_forklockbegin(-1)) >= 0) {
-	    if ((rs = ptm_lock(&uip->m)) >= 0) {
+	    if ((rs = ptm_lock(&uip->mx)) >= 0) {
 	        if ((uip->a == nullptr) || ((dt-uip->et) >= ttl)) {
 	            if (! uip->f_allocget) {
 	                uip->f_allocget = true ;
 	                f = true ; /* indicate "got" */
 	            }
 	        } /* end if (need) */
-	        rs1 = ptm_unlock(&uip->m) ;
+	        rs1 = ptm_unlock(&uip->mx) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
 	    rs1 = uc_forklockend() ;
@@ -350,7 +350,7 @@ static int ucclustername_allocend(UCLUSTERNAME *uip,UCLUSTERNAME_A *ap) noex {
 	int		rs1 ;
 	if (ap && ap->a) {
 	    if ((rs = uc_forklockbegin(-1)) >= 0) {
-	        if ((rs = ptm_lock(&uip->m)) >= 0) {
+	        if ((rs = ptm_lock(&uip->mx)) >= 0) {
 	            {
 	                uip->f_allocget = false ;
 	                uip->a = ap->a ;
@@ -359,7 +359,7 @@ static int ucclustername_allocend(UCLUSTERNAME *uip,UCLUSTERNAME_A *ap) noex {
 	                uip->et = ap->et ;
 	                uip->ttl = ap->ttl ;
 	            }
-	            rs1 = ptm_unlock(&uip->m) ;
+	            rs1 = ptm_unlock(&uip->mx) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex) */
 	        rs1 = uc_forklockend() ;
@@ -372,13 +372,13 @@ static int ucclustername_allocend(UCLUSTERNAME *uip,UCLUSTERNAME_A *ap) noex {
 
 static void ucclustername_atforkbefore() noex {
 	UCLUSTERNAME	*uip = &ucclustername_data ;
-	ptm_lock(&uip->m) ;
+	ptm_lock(&uip->mx) ;
 }
 /* end subroutine (ucclustername_atforkbefore) */
 
 static void ucclustername_atforkafter() noex {
 	UCLUSTERNAME	*uip = &ucclustername_data ;
-	ptm_unlock(&uip->m) ;
+	ptm_unlock(&uip->mx) ;
 }
 /* end subroutine (ucclustername_atforkafter) */
 
@@ -389,12 +389,16 @@ static void ucclustername_exit() noex {
 }
 
 static int subinfo_start(SUBINFO *sip,char *rbuf,int rlen,cchar *nn) noex {
-	sip->to = TO_TTL ;
-	sip->dt = time(nullptr) ;
-	sip->rbuf = rbuf ;
-	sip->rlen = rlen ;
-	sip->nn = nn ;
-	return SR_OK ;
+    	int		rs = SR_FAULT ;
+	if (sip && rbuf && nn) {
+	    rs = SR_OK ;
+	    sip->to = TO_TTL ;
+	    sip->dt = time(nullptr) ;
+	    sip->rbuf = rbuf ;
+	    sip->rlen = rlen ;
+	    sip->nn = nn ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
@@ -412,7 +416,7 @@ static int subinfo_cacheget(SUBINFO *sip,UCLUSTERNAME *uip) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if ((rs = uc_forklockbegin(-1)) >= 0) {
-	    if ((rs = ptm_lock(&uip->m)) >= 0) {
+	    if ((rs = ptm_lock(&uip->mx)) >= 0) {
 	        if (uip->a != nullptr) {
 	            if ((uip->et > 0) && ((sip->dt-uip->et) < uip->ttl)) {
 	                if (strcmp(sip->nn,uip->nn) == 0) {
@@ -421,7 +425,7 @@ static int subinfo_cacheget(SUBINFO *sip,UCLUSTERNAME *uip) noex {
 	                }
 	            } /* end if (not timed-out) */
 	        } /* end if (was loaded) */
-	        rs1 = ptm_unlock(&uip->m) ;
+	        rs1 = ptm_unlock(&uip->mx) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
 	    rs1 = uc_forklockend() ;

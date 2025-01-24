@@ -55,7 +55,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_STRN= strncpyxc.o strnwcpy.o strnwcpyxc.o 
+OBJ0_STRN= strncpyxc.o strnwcpyxc.o 
 OBJ1_STRN= strnnlen.o
 OBJ2_STRN= strnxchr.o strnxpbrk.o strnxsub.o
 OBJ3_STRN= strnset.o 
@@ -134,7 +134,6 @@ strnxpbrk.o:		strnxpbrk.cc	strnxpbrk.h	$(INCS)
 strnnlen.o:		strnnlen.cc			$(INCS)
 strnset.o:		strnset.cc			$(INCS)
 strncpyxc.o:		strncpyxc.cc	strncpyxc.h	$(INCS)
-strnwcpy.o:		strnwcpy.cc			$(INCS)
 strnwcpyxc.o:		strnwcpyxc.cc	strnwcpyxc.h	$(INCS)
 
 

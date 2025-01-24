@@ -127,7 +127,7 @@ char *strnwcpy(char *dp,int dl,cchar *sp,int sl) noex {
 	    if (dl >= 0) {
 	        if (sl >= 0) {
 		    if (sl >= dl) {
-		        rp = dstcpy(dp,sp,dl) ;
+		        rp = dstncpy(dp,dl,sp,dl) ;
 		    } else {
 		        rp = dstncpy(dp,dl,sp,sl) ;
 		    }
