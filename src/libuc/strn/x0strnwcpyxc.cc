@@ -48,6 +48,10 @@
 	-		pointer to the end of the filled in part
 			of the created destination string
 
+	Notes:
+	Please be careful.  This (as simple a function as it looks)
+	is a slightly tricky one to understand.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -97,7 +101,7 @@ static char *dstcpy(toxc_f toxc,char *dp,cc *sp,int n) noex {
 
 static char *dstncpy(toxc_f toxc,char *dp,int dl,cc *sp,int sl) noex {
     	char	*rp = dstcpy(toxc,dp,sp,sl) ;
-	if (int fl ; (dl > 0) && ((fl = ((dp + dl) - rp)) > 0)) {
+	if (int fl ; (fl = ((dp + dl) - rp)) > 0) {
 	    memset(rp,0,fl) ;
 	}
 	return rp ;

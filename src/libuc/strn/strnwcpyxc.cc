@@ -11,6 +11,18 @@
 	= 1998-11-01, David A­D­ Morano
 	This code was originally written.
 
+	= 2025-01-24, David A­D­ Morano
+	There are many ways (amazingly) to code up this kind of
+	function (as simple as this function may appear to be).
+	One can code for (small) code size; one can code for (faster)
+	performance; or one can try and strike a balance betwwen
+	the two (size and performance), sort of like what compilers
+	generally try to do on their default optimization levels.
+	I changed the code for: small size, and possibly less
+	performance.  The older version is archived.  The older
+	version targeted a medium performance with a moderately
+	acceptable (relative good) code size.
+
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
