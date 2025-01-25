@@ -106,10 +106,23 @@ control:
 	(uname -n ; date) > Control
 
 
+obj0.o:			$(OBJ0)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+
+obj1.o:			$(OBJ1)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+
+obj2.o:			$(OBJ2)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+
+obj3.o:			$(OBJ3)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+
+
 strwcpyx.o:		strwcpyx.cc	strwcpyx.h	$(INCS)
 strwcpyxc.o:		strwcpyxc.cc	strwcpyxc.h	$(INCS)
 strwcpyxx.o:		strwcpyxx.cc	strwcpyxx.h	$(INCS)
 
-strwset.o:		strwset.cc strwset.h $(INCS)
+strwset.o:		strwset.cc	strwset.h	$(INCS)
 
 

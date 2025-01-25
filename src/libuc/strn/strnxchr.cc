@@ -132,7 +132,7 @@ char *strnochr(cchar *sp,int sl,int sch) noex {
 	                sp += 1 ;
 	            } /* end while */
 		    if (f) rsp = charp(sp) ;
-		} /* end if */
+		} /* end if_constexpr (f_memchr) */
 	    } /* end if */
 	} /* end if (non-null) */
 	return rsp ;

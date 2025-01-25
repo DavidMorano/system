@@ -37,15 +37,31 @@
 #include	"strwcpyx.h"
 
 
+/* local defines */
+
+
+/* local namespaces */
+
+
 /* local typedefs */
 
 
-/* local subroutine-templates */
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
-
-int strwcpyx_nosymbols ;
 
 
 /* exported subroutines */

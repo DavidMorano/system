@@ -76,9 +76,6 @@ extern "C" {
 
 /* forward references */
 
-
-/* local subroutine-templates */
-
 template<toxc_f toxc>
 char *strwcpyxc(char *dp,cchar *sp,int sl) noex {
 	if (sl >= 0) {

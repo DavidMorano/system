@@ -36,7 +36,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<usystem.h>
@@ -67,7 +66,7 @@ struct locktype {
 
 /* local variables */
 
-static constexpr struct locktype	types[] = {
+constexpr locktype	types[] = {
 	{ F_UNLOCK, "UNLOCK" },
 	{ F_WLOCK, "WLOCK" },
 	{ F_RLOCK, "RLOCK" },
@@ -75,7 +74,7 @@ static constexpr struct locktype	types[] = {
 	{ F_TRLOCK, "TRLOCK" },
 	{ F_WTEST, "WTEST" },
 	{ F_RTEST, "RTEST" },
-	{ -1, NULL }
+	{ -1, nullptr }
 } ;
 
 

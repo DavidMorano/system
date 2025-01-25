@@ -135,7 +135,7 @@ char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 		    strner	so(tobc,nleadbasestr) ;
 		    cint	sslen = strlen(ss) ;
 	            rp = so.strnxsub(sp,sl,ss,sslen) ;
-		}
+		} /* end if_constexpr (f_strnstr) */
 	    } else {
 	        rp = strstr(sp,ss) ;
 	    }
@@ -159,7 +159,7 @@ char *strncasesub(cchar *sp,int sl,cchar *ss) noex {
 		    } else {
 		        strner	so(tolc,nleadcasestr) ;
 		        rp = so.strnxsub(sp,sl,ss,sslen) ;
-		    } /* end if_constexpr) */
+		    } /* end if_constexpr (f_strcasestr) */
 		} /* end if */
 	    } /* end if (positive) */
 	} /* end if (non-null) */
@@ -182,7 +182,7 @@ char *strner::strnxsub(cchar *sp,int sl,cchar *ss,int sslen) noex {
         if (sl < 0) sl = strlen(sp) ;
         if (sslen <= sl) {
             cint        sslead = toxc(ss[0]) ;
-            int         i{} ; /* used-afterwards */
+            int         i ; /* used-afterwards */
             bool        f = false ;
             for (i = 0 ; i <= (sl - sslen) ; i += 1) {
                 if (toxc(sp[i]) == sslead) {
