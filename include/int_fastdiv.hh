@@ -1,4 +1,5 @@
 /* int_fastdiv HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform specialized fast-integer-division */

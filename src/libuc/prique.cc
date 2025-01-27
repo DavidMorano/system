@@ -1,4 +1,5 @@
 /* prique SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* implement a map container of blocks (of a given structure) */
@@ -15,6 +16,9 @@
 /* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Object:
+	prique
 
 	Description:
 	prique

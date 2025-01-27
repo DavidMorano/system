@@ -1,4 +1,5 @@
 /* bstree HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* binary search tree */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	bstree
+
+	Description:
 	Binary-Search-Tree (without rebalancing)
 
 	Notes:

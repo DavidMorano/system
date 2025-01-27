@@ -1,8 +1,8 @@
-/* readln HEADER */
+/* cup HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C20 */
 
-/* read characters from Standard-Input (STDIN) */
+/* convert a single character to a given case */
 /* version %I% last-modified %G% */
 
 
@@ -15,24 +15,21 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	READLN_INCLUDE
-#define	READLN_INCLUDE
-#ifdef	__cplusplus
+#ifndef	CUP_INCLUDE
+#define	CUP_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<istream>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
+
+EXTERNC_begin
+
+EXTERNC_end
 
 
-extern int readln(std::istream *,char *,int,int = eol) noex ;
-
-
-#endif /* __cplusplus */
-#endif /* READLN_INCLUDE */
+#endif /* CUP_INCLUDE */
 
 

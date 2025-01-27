@@ -546,9 +546,9 @@ static int nodesfile_fnloadbegin(NF *op,cchar *fn,bfile *fp) noex {
 		if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
 		    rs = SR_BUGCHECK ;
 		    if (NF_FI *fep ; (fep = new(vp) NF_FI) != np) {
-		        dev_t	d = sb.st_dev ;
-		        ino_t	i = sb.st_ino ;
-		        time_t	t = sb.st_mtime ;
+		        const dev_t	d = sb.st_dev ;
+		        const ino_t	i = sb.st_ino ;
+		        const time_t	t = sb.st_mtime ;
 		        if ((rs = fep->start(fn,d,i,t)) >= 0) {
 			    vechand	*flp = op->flp ;
 			    if ((rs = flp->add(fep)) >= 0) {
@@ -617,7 +617,7 @@ static int nodesfile_fnparseload(NF *op,int fi,cchar *sp,int sl) noex {
 	    rs = SR_BUGCHECK ;
 	    if (NF_ENT *ep ; (ep = new(vp) NF_ENT) != np) {
 	        if ((rs = ep->start(sp,sl,fi)) >= 0) {
-		    hdb_dat		key ;
+		    hdb_dat	key ;
 		    key.buf = ep ;
 		    key.len = 0 ;
 	            if ((rs = elp->have(key)) == 0) {
@@ -702,7 +702,7 @@ static int entmat(cvoid *v1p,cvoid *v2p,int) noex {
 		    cchar	*s1 = e1p->name ;
 		    cchar	*s2 = e2p->name ;
 		    if ((rc = (*s1 - *s2)) == 0) {
-	    	        rc = (strcmp(s1+1,s2+1) == 0) ;
+	    	        rc = (strcmp(s1,s2) == 0) ;
 		    }
 		}
 	    }

@@ -1,4 +1,5 @@
 /* constdiv HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform division of a 32-bit value by a constant w/o using division */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	constdiv
+
+	Description:
 	This is a common algorithn for performing division by a
 	constant (what I am callig "constant division").  I forget
 	the name of the person who invented this.  If you know
