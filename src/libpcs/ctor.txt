@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int ktag_ctor(ktag *op,Args ... args) noex {
+static int dw_ctor(dw *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int ktag_ctor(ktag *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ktag_ctor) */
+/* end subroutine (dw_ctor) */
 
-static int ktag_dtor(ktag *op) noex {
+static int dw_dtor(dw *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ktag_dtor) */
+/* end subroutine (dw_dtor) */
 
 template<typename ... Args>
-static inline int ktag_magic(ktag *op,Args ... args) noex {
+static inline int dw_magic(dw *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == KTAG_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == DW_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (ktag_magic) */
+/* end subroutine (dw_magic) */

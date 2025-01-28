@@ -25,10 +25,11 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 consteval in_addr_t mkinaddrbad() noex {
-	in_addr_t	a = 0 ;
+	const in_addr_t	a = 0 ;
 	return (~a) ;
 }
 

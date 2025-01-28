@@ -82,7 +82,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<new>
 #include	<initializer_list>
 #include	<algorithm>
@@ -123,7 +123,7 @@ class bstree_iter {
 	typedef bstree_node<T,Comp>	node ;
 	bstree_node<T,Comp>	*n = nullptr ;
 	mutable T		defval ;
-	bstree_iter<T,Comp>	&findnext(int) ;
+	bstree_iter<T,Comp>	&findnext(int) noex ;
 	typedef bstree_iter	bit ;
 public:
 	bstree_iter() noex { } ;
@@ -179,7 +179,7 @@ public:
 	    return findnext(1) ;
 	} ;
 	bstree_iter<T,Comp> operator ++ (int) noex { /* post-increment */
-	    btree_iter<T.Comp>	tmp(*this) ;
+	    bstree_iter<T,Comp>	tmp(*this) ;
 	    findnext(1) ;
 	    return tmp ; /* returns previous value */
 	} ;
@@ -238,13 +238,13 @@ struct bstree_depth {
 	    dmin = INT_MAX ;
 	    dmax = 0 ;
 	} ;
-} /* end method (bstree_depth) */
+} ; /* end method (bstree_depth) */
 
 template <typename T,typename Comp>
 class bstree {
 	typedef bstree_depth		depth ;
 	typedef bstree_node<T,Comp>	node ;
-	using std:nothrow ;
+	using std::nothrow ;
 	bstree_node<T,Comp>	*root = nullptr ;
 	Comp			keycmp ;
 	int			c = 0 ;

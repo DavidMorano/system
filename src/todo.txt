@@ -4,6 +4,7 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
+prique		broken, ill-conceived
 uctim
 libuc		fix to completely compile!
 fsdirtree	needs pointer implementation and a lot of cleanup

@@ -18,7 +18,6 @@
 #include	<time.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
-#include	<localmisc.h>		/* |MAXPATHLEN| */
 
 
 /* object defines */
@@ -41,17 +40,17 @@
 
 
 struct dw_entry {
+	char		*name ;
 	time_t		itime ;
-	time_t		mtime ;
+	time_t		timod ;
 	size_t		fsize ;
 	int		state ;
-	char		name[MAXPATHLEN + 1] ;
 } ;
 
 struct dw_ientry {
 	cchar		*name ;
 	time_t		itime ;
-	time_t		mtime ;
+	time_t		timod ;
 	size_t		fsize ;
 	int		state ;
 } ;
@@ -62,13 +61,13 @@ struct dw_flags {
 
 EXTERNC_begin
 struct dw_head {
-	vecstr		subdirs ;		/* subdirectories */
-	vecobj		e ;			/* directory entries */
+	vecstr		*sdp ;			/* subdirectories */
+	vecobj		*elp ;			/* directory entries */
 	cchar		*dirname ;		/* directory path */
 	void		(*callback)(DW_ENT *,int,void *) noex ;
 	cvoid		*argp ;
 	time_t		opentime ;		/* time FD was cached */
-	time_t		mtime ;			/* directory mod-time */
+	time_t		timod ;			/* directory mod-time */
 	time_t		checktime ;		/* time last checked */
 	time_t		removetime ;		/* last checked for removed */
 	DW_FL		f ;
@@ -93,13 +92,13 @@ EXTERNC_begin
 
 extern int dw_start(dw *,cchar *) noex ;
 extern int dw_finish(dw *) noex ;
-extern int dw_find(dw *,cchar *,dw_ent *) noex ;
+extern int dw_find(dw *,cchar *,dw_ent *,char *,int) noex ;
 extern int dw_del(dw *,dw_cur *) noex ;
 extern int dw_check(dw *,time_t) noex ;
 extern int dw_curbegin(dw *,dw_cur *) noex ;
 extern int dw_curend(dw *,dw_cur *) noex ;
-extern int dw_enum(dw *,dw_cur *,dw_ent *) noex ;
-extern int dw_enumcheckable(dw *,dw_cur *,dw_ent *) noex ;
+extern int dw_curenum(dw *,dw_cur *,dw_ent *,char *,int) noex ;
+extern int dw_curenumcheck(dw *,dw_cur *,dw_ent *,char *,int) noex ;
 extern int dw_state(dw *,int,int) noex ;
 
 EXTERNC_end

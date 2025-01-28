@@ -19,13 +19,13 @@
 /*******************************************************************************
 
 	Name:
-	ctdecf
+	libu::ctdecf
 
 	Description:
 	Convert a |double| to a string.
 
 	Synopsis:
-	int ctdecf(char *rbuf,int rlen,int prec,double v) noex
+	int libu::ctdecf(char *rbuf,int rlen,int prec,double v) noex
 
 	Arguments:
 	rbuf		result buffer pointer
@@ -145,6 +145,26 @@ namespace libu {
 }
 
 namespace libu {
+    int ctdecf(char *rbuf,int rlen,int prec,double v) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (rbuf) {
+	    rs = SR_INVALID ;
+	    if (prec >= 0) {
+		try {
+		    string	s = "%." + to_string(prec) + "f" ;
+		    {
+			cchar	*fmt = s.c_str() ;
+	        	rs = snuprintf(rbuf,rlen,fmt,prec,v) ;
+			len = rs ;
+		    }
+		} catch (...) {
+		    rs = SR_NOMEM ;
+		}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+    } /* end subroutine (ctdecf) */
     int snuvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf && fmt && ap) {
@@ -173,11 +193,11 @@ namespace libu {
 	return rs ;
     } /* end subroutine (snuvprintf) */
     int snuprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (rbuf && fmt) {
 	    rs = SR_INVALID ;
 	    if ((rlen >= 0) && fmt[0]) {
-		va_list	ap ;
 		va_begin(ap,fmt) ;
 		rs = snuvprintf(rbuf,rlen,fmt,ap) ;
 		va_end(ap) ;
@@ -216,26 +236,6 @@ namespace libu {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (snuloadavgd) */
-    int ctdecf(char *rbuf,int rlen,int prec,double v) noex {
-	int		rs = SR_FAULT ;
-	int		len = 0 ;
-	if (rbuf) {
-	    rs = SR_INVALID ;
-	    if (prec >= 0) {
-		try {
-		    string	s = "%." + to_string(prec) + "f" ;
-		    {
-			cchar	*fmt = s.c_str() ;
-	        	rs = snuprintf(rbuf,rlen,fmt,prec,v) ;
-			len = rs ;
-		    }
-		} catch (...) {
-		    rs = SR_NOMEM ;
-		}
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
-    } /* end subroutine (ctdecf) */
 }
 
 

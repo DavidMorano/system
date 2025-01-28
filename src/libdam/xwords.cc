@@ -83,7 +83,7 @@ static int	xwords_more(xwords *,cchar *,int,int) noex ;
 int xwords_start(xwords *op,cchar *wbuf,int wlen) noex {
     	XWORDS		*hop = op ; /* <- head */
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	if (op && wbuf) {
 	    rs = memclear(hop) ;
             /* always enter the whole word */
@@ -105,6 +105,12 @@ int xwords_start(xwords *op,cchar *wbuf,int wlen) noex {
 	            op->words[i].wl = el ;
 	            i += 1 ;
 	        }
+	    } else if ((wlen == 7) && (wbuf[0] == 'c')) {
+		if (strcmp(wbuf,"cieling") == 0) {
+	            op->words[i].wp = "ceiling" ;
+	            op->words[i].wl = 7 ;
+	            i += 1 ;
+		}
 	    } /* end if (long enough for extra words) */
 	    op->nwords = i ;
 	    if (int si ; (si = sichr(wbuf,wlen,'-')) >= 0) {
@@ -157,22 +163,24 @@ int xwords_finish(xwords *op) noex {
 /* private subroutines */
 
 static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
-	cint		esize = szof(xwords_wi) ;
+	cint		esz = szof(xwords_wi) ;
+	cint		vn = 2 ;
+	cint		vo = 0 ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (vecobj wil ; (rs = vecobj_start(&wil,esize,2,0)) >= 0) {
+	if (vecobj wil ; (rs = wil.start(esz,vn,vo)) >= 0) {
 	    xwords_wi	wi ;
 	    wi.wp = wbuf ;
 	    wi.wl = si ;
-	    if ((rs = vecobj_add(&wil,&wi)) >= 0) {
+	    if ((rs = wil.add(&wi)) >= 0) {
 		int	wl = (wlen-(si+1)) ;
 		cchar	*wp = (wbuf+(si+1)) ;
 		while ((si = sichr(wp,wl,'-')) >= 0) {
 		    if (si > 0) {
 	    	        wi.wp = wp ;
 	    	        wi.wl = si ;
-	    	        rs = vecobj_add(&wil,&wi) ;
+	    	        rs = wil.add(&wi) ;
 		    }
 		    wl -= (si+1) ;
 		    wp += (si+1) ;
@@ -183,20 +191,19 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 	    	    wi.wl = wl ;
 	    	    rs = vecobj_add(&wil,&wi) ;
 		}
-		if (rs >= 0) {
+		if ((rs >= 0) && ((rs = wil.count) >= 0)) {
 		    int		i ;
 		    int		j ; /* used-afterwards */
-		    void	*vp ;
-		    n = op->nwords + vecobj_count(&wil) ;
+		    n = (op->nwords + rs) ;
 		    if (n > XWORDS_MAX) {
-		        cint	sz = (n * esize) ;
-		        if ((rs = uc_malloc(sz,&vp)) >= 0) {
+		        cint	sz = (n * esz) ;
+		        if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
 			    op->xa = wordp(vp) ;
 			    for (j = 0 ; j < op->nwords ; j += 1) {
 			        op->xa[j].wp = op->words[j].wp ;
 			        op->xa[j].wl = op->words[j].wl ;
 			    }
-			    for (i = 0 ; vecobj_get(&wil,i,&vp) >= 0 ; i += 1) {
+			    for (i = 0 ; wil.get(i,&vp) >= 0 ; i += 1) {
 		    		xwords_wi	*ep = wip(vp) ;
 			        op->xa[j].wp = ep->wp ;
 			        op->xa[j].wl = ep->wl ;
@@ -205,7 +212,8 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 		        } /* end if (memory-allocation) */
 		    } else {
 			j = op->nwords ;
-			for (i = 0 ; vecobj_get(&wil,i,&vp) >= 0 ; i += 1) {
+			void	*vp ;
+			for (i = 0 ; wil.get(i,&vp) >= 0 ; i += 1) {
 		   	    xwords_wi	*ep = wip(vp) ;
 			    op->words[j].wp = ep->wp ;
 			    op->words[j].wl = ep->wl ;
@@ -214,7 +222,7 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 		    } /* end if */
 		} /* end if (ok) */
 	    } /* end if (add first word) */
-	    rs1 = vecobj_finish(&wil) ;
+	    rs1 = wil.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecobj) */
 	return (rs >= 0) ? n : rs ;

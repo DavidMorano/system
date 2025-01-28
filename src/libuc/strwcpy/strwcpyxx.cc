@@ -134,8 +134,8 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usupport.h>		/* |libu::strwcpy(3u)| */
 #include	<sfx.h>
-#include	<strwcpy.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
@@ -147,6 +147,8 @@
 
 
 /* imported namespaces */
+
+using libu::strwcpy ;			/* subroutine */
 
 
 /* local typedefs */
@@ -166,14 +168,14 @@
 
 /* exported subroutines */
 
-char *strwcpyblanks(char *dp,int w) noex {
-	while (w-- > 0) {
-	    *dp++ = ' ' ;
+char *strwcpychrs(char *dp,int ch,int n) noex {
+	while (n-- > 0) {
+	    *dp++ = ch ;
 	}
 	*dp = '\0' ;
 	return dp ;
 }
-/* end subroutine (strwcpyblanks) */
+/* end subroutine (strwcpychrs) */
 
 char *strwcpycompact(char *dp,cchar *sp,int sl) noex {
 	int		c = 0 ;

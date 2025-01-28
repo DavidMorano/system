@@ -133,6 +133,88 @@
 
 /* types */
 
+#ifndef	TYPEDEF_IN4ADDRT
+#define	TYPEDEF_IN4ADDRT
+typedef in_addr_t		in4_addr_t ;
+#endif
+
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+#if	defined(OSNUM) && (OSNUM <= 9)
+typedef struct in6_addr		in6_addr_t ;
+#endif
+#endif
+
+/* handle some really brain-damaged systems -- like MacOS-X Darwin®! */
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+#if	defined(OSNUM) && (OSNUM <= 7)
+#ifndef	TYPEDEF_ID
+#define	TYPEDEF_ID
+typedef int			id_t ;
+#endif /* TYPEDEF_ID */
+#endif
+#endif
+
+#ifndef	TYPEDEF_NOTHROW
+#define	TYPEDEF_NOTHROW
+#ifdef	__cplusplus
+typedef decltype(std::nothrow)	nothrow_t ;
+#endif /* __cplusplus */
+#endif /* TYPEDEF_NOTHROW */
+
+#ifndef	TYPEDEF_ERRNO
+#define	TYPEDEF_ERRNO
+typedef int			errno_t ;
+#endif /* TYPEDEF_ERRNO */
+
+#ifndef	TYPEDEF_UNIXRET
+#define	TYPEDEF_UNIXRET
+typedef int			unixret_t ;
+#endif /* TYPEDEF_UNIXRET */
+
+#ifndef	TYPEDEF_SYSRET
+#define	TYPEDEF_SYSRET
+typedef int			sysret_t ;
+#endif /* TYPEDEF_SYSRET */
+
+#ifndef	TYPEDEF_CERRNO
+#define	TYPEDEF_CERRNO
+typedef const errno_t		cerrno_t ;
+#endif /* TYPEDEF_CERRNO */
+
+#ifndef	TYPEDEF_CUNIXRET
+#define	TYPEDEF_CUNIXRET
+typedef const unixret_t		cunixret_t ;
+#endif /* TYPEDEF_CUNIXRET */
+
+#ifndef	TYPEDEF_CSYSRET
+#define	TYPEDEF_CSYSRET
+typedef const sysret_t		csysret_t ;
+#endif /* TYPEDEF_CSYSRET */
+
+#ifndef	TYPEDEF_SIGT
+#define	TYPEDEF_SIGT
+#if	(! defined(SYSHAS_TYPESIGT)) || (SYSHAS_TYPESIGT == 0)
+EXTERNC_begin
+typedef void (*sig_t)(int) noex ;
+EXTERNC_end
+#endif /* syshas */
+#endif /* TYPEDEF_SIGT */
+
+#ifndef	TYPEDEF_VOIDF
+#define	TYPEDEF_VOIDF
+EXTERNC_begin
+typedef void (*void_f)() noex ;
+EXTERNC_end
+#endif /* TYPEDEF_VOIDF */
+
+#ifndef	TYPEDEF_SORTVCMP
+#define	TYPEDEF_SORTVCMP
+EXTERNC_begin
+typedef int (*sort_vcmp)(const void *,const void *) noex ;
+typedef int (*sortvcmp_f)(const void *,const void *) noex ;
+EXTERNC_end
+#endif /* TYPEDEF_SORTVCMP */
+
 #ifndef	TYPEDEF_SCHAR
 #define	TYPEDEF_SCHAR
 typedef signed char		schar ;
@@ -283,6 +365,11 @@ typedef const void **		cvoidpp ;
 #ifndef	TYPEDEF_CNULLPTR
 #define	TYPEDEF_CNULLPTR
 typedef const nullptr_t		cnullptr ;
+#endif
+
+#ifndef	TYPEDEF_CNOTHROW
+#define	TYPEDEF_CNOTHROW
+typedef const nothrow_t		cnothrow ;
 #endif
 
 #ifndef	TYPEDEF_WCHARP
@@ -456,6 +543,13 @@ typedef time_t			ustime ;
 #define	TYPEDEF_CUSTIME
 typedef const time_t		custime ;
 #endif
+
+#ifndef	TYPEDEF_NOTHROW
+#define	TYPEDEF_NOTHROW
+#ifdef	__cplusplus
+typedef decltype(std::nothrow)	nothrow_t ;
+#endif /* __cplusplus */
+#endif /* TYPEDEF_NOTHROW */
 
 #ifndef	TYPEDEF_ERRNO
 #define	TYPEDEF_ERRNO

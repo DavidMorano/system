@@ -1,4 +1,4 @@
-/* prique HEADER */
+/* prique MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -39,10 +39,7 @@
 
 *******************************************************************************/
 
-#ifndef	PRIQUE_INCLUDE
-#define	PRIQUE_INCLUDE
-#ifdef	__cplusplus /* everything is C++ only */
-
+module ;
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<new>
@@ -56,6 +53,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
+export module prique ;
 
 template<typename K> class prique ;
 
@@ -65,6 +63,7 @@ using prique_is = std::priority_queue<K,std::vector<K>,std::greater<K>> ;
 template <typename K>
 class prique_iter {
 	using 		isiter_t = typename prique_is<K>::iterator ;
+	using		pq_t = prique<K> ;
 	isiter_t	isit ;		
 public:
 	prique_iter() noex { } ;
@@ -72,12 +71,12 @@ public:
 	    if (this != &oit) {
 	        isit = oit.isit ;
 	    }
-	} ;
+	} ; /* end ctor */
 	prique_iter(prique_iter<K> &&oit) noex {
 	    if (this != &oit) {
 	        isit = oit.isit ;
 	    }
-	} ;
+	} ; /* end ctor */
 	prique_iter(pq_t *pqp,bool fend) noex {
 	    if (pqp->mp) {
 	        if (fend) {
@@ -86,7 +85,7 @@ public:
 	            isit = pqp->mp->begin() ;
 	        }
 	    }
-	} ;
+	} ; /* end ctor */
 	prique_iter<K> &operator = (const prique_iter<K> &oit) noex {
 	    if (this != &oit) {
 	        isit = oit.isit ;
@@ -105,7 +104,7 @@ public:
 	    }
 	    return *this ;
 	} ;
-	std::pair<const K,B> &operator * () const noex {
+	K &operator * () const noex {
 	    return *isit ;
 	} ;
 	prique_iter<K> &operator ++ () noex { /* pre-increment */
@@ -117,7 +116,7 @@ public:
 	    isit++ ;
 	    return tmp ; /* returns previous PRVALUE */
 	} ;
-	prique_iter<K,B> &operator += (int inc) noex {
+	prique_iter<K> &operator += (int inc) noex {
 	    isit += inc ;
 	    return *this ;
 	} ;
@@ -246,7 +245,7 @@ int prique<K>::ifinish() noex {
 /* end method (prique::ifinish) */
 
 template<typename K>
-int prique<K,B>::ins(const K &k) noex {
+int prique<K>::ins(const K &k) noex {
 	typedef	typename maptype::iterator	isiter_t ;
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
@@ -381,9 +380,5 @@ int prique_rem<K>::operator () (const K &k) noex {
 	return rs ;
 }
 /* end method (prique_rem::operator) */
-
-
-#endif	/* __cplusplus */
-#endif /* PRIQUE_INCLUDE */
 
 

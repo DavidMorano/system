@@ -1,4 +1,4 @@
-/* bstree HEADER */
+/* bstree MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++11 */
 
@@ -76,22 +76,25 @@
 
 *******************************************************************************/
 
-#ifndef	BSTREE_INCLUDE
-#define	BSTREE_INCLUDE
-#ifdef	__cplusplus /* everything is C++ only */
-
+module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<new>
 #include	<initializer_list>
 #include	<algorithm>
 #include	<functional>
 #include	<stack>
 #include	<vector>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
+export module bstree ;
 
 template <typename T,typename Comp = std::less<T>>
 class bstree ;
@@ -109,11 +112,9 @@ class bstree_node {
 	    val = v ;
 	} ;
 public:
-	bstree_node(T av) : val(av) noex { } ;
+	bstree_node(T av) noex : val(av) { } ;
 	bstree_node(const bstree_node<T> &other) = delete ;
 	bstree_node &operator = (const bstree_node<T> &other) = delete ;
-	~bstree_node() {
-	} ;
  	friend bstree<T,Comp> ;
  	friend bstree_iter<T,Comp> ;
 } ; /* end class (bstree_node) */
@@ -123,11 +124,11 @@ class bstree_iter {
 	typedef bstree_node<T,Comp>	node ;
 	bstree_node<T,Comp>	*n = nullptr ;
 	mutable T		defval ;
-	bstree_iter<T,Comp>	&findnext(int) ;
+	bstree_iter<T,Comp>	&findnext(int) noex ;
 	typedef bstree_iter	bit ;
 public:
 	bstree_iter() noex { } ;
-	bstree_iter(node *an) : n(an) noex { } ;
+	bstree_iter(node *an) noex : n(an) { } ;
 	bstree_iter(const bstree_iter<T,Comp> &it) noex {
 	    if (this != &it) {
 	        n = it.n ;
@@ -179,7 +180,7 @@ public:
 	    return findnext(1) ;
 	} ;
 	bstree_iter<T,Comp> operator ++ (int) noex { /* post-increment */
-	    btree_iter<T.Comp>	tmp(*this) ;
+	    bstree_iter<T,Comp>	tmp(*this) ;
 	    findnext(1) ;
 	    return tmp ; /* returns previous value */
 	} ;
@@ -238,13 +239,12 @@ struct bstree_depth {
 	    dmin = INT_MAX ;
 	    dmax = 0 ;
 	} ;
-} /* end method (bstree_depth) */
+} ; /* end method (bstree_depth) */
 
 template <typename T,typename Comp>
 class bstree {
-	typedef bstree_depth		depth ;
+	typedef bstree_depth		depth_t ;
 	typedef bstree_node<T,Comp>	node ;
-	using std:nothrow ;
 	bstree_node<T,Comp>	*root = nullptr ;
 	Comp			keycmp ;
 	int			c = 0 ;
@@ -376,21 +376,21 @@ public:
 	    }
 	    return (*this) ;
 	} ;
-	bstree(const std::initializer_list<T> &list) noex {
+	bstree(const std::initializer_list<T> &il) noex {
 	    if (root != nullptr) clear() ;
-	    for (const T &v : list) {
+	    for (const T &v : il) {
 		add(v) ;
 	    }
 	} ;
-	bstree &operator = (const std::initializer_list<T> &list) noex {
+	bstree &operator = (const std::initializer_list<T> &il) noex {
 	    if (root != nullptr) clear() ;
-	    for (const T &v : list) {
+	    for (const T &v : il) {
 		add(v) ;
 	    }
 	    return (*this) ;
 	} ;
-	bstree &operator += (const std::initializer_list<T> &list) noex {
-	    for (const T &v : list) {
+	bstree &operator += (const std::initializer_list<T> &il) noex {
+	    for (const T &v : il) {
 		add(v) ;
 	    }
 	    return (*this) ;
@@ -416,7 +416,7 @@ public:
 	    return rc ;
 	} ;
 	int add(const T &v) noex {
-	    bstree_node<T,Comp>	*nn = new(nothrow) bstree_node<T,Comp>(v) ;
+	    bstree_node<T,Comp>	*nn = new(std::nothrow) bstree_node<T,Comp>(v) ;
 	    int			rc = -1 ;
 	    if (nn != nullptr) {
 		if (root != nullptr) {
@@ -433,12 +433,6 @@ public:
 		add(v) ;
 	    }
 	    return c ;
-	} ;
-	bstree &operator = (const std::initializer_list<T> &il) noex {
-	    for (const T &v : il) {
-		add(v) ;
-	    }
-	    return (*this) ;
 	} ;
 	int add(const bstree<T,Comp> &other) noex {
 	    for(const T &v : other) {
@@ -590,9 +584,5 @@ public:
 	    return d ;
     } ; /* end method (depthrecurse) */
 } ; /* end class (bstree) */
-
-
-#endif	/* __cplusplus */
-#endif /* BSTREE_INCLUDE */
 
 

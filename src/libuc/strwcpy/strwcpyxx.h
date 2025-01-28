@@ -29,11 +29,15 @@
 
 EXTERNC_begin
 
-extern char *strwcpyblanks(char *,int) noex ;
+extern char *strwcpychrs(char *,int,int) noex ;
 extern char *strwcpycompact(char *,cchar *,int) noex ;
 extern char *strwcpyopaque(char *,cchar *,int) noex ;
 extern char *strwcpyrev(char *,cchar *,int) noex ;
 extern char *strwcpywide(char *,const wchar_t *,int) noex ;
+
+static inline char *strwcpyblanks(char *dp,int n) noex {
+    	return strwcpychrs(dp,' ',n) ;
+}
 
 EXTERNC_end
 
