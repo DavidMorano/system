@@ -182,10 +182,13 @@ objd.o:			$(OBJD)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJD)
 
 
+getbufsize.o:		getbufsize.cc		getbufsize.h		$(INCS)
+	makemodule bufsizedata
+	$(COMPILE.cc) getbufsize.cc
+
 getaddr.o:		getaddr.cc		getaddr.h		$(INCS)
 getaf.o:		getaf.cc		getaf.h			$(INCS)
 getarchitecture.o:	getarchitecture.cc	getarchitecture.h	$(INCS)
-getbufsize.o:		getbufsize.cc		getbufsize.h		$(INCS)
 getcols.o:		getcols.cc		getcols.h		$(INCS)
 getdefzdata.o:		getdefzdata.cc		getdefzdata.h		$(INCS)
 getdig.o:		getdig.cc		getdig.h		$(INCS)

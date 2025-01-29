@@ -1,4 +1,5 @@
-/* sethand HEADER */
+/* sethand MODULE */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* SETHAND object */
@@ -17,19 +18,25 @@
 
 /*******************************************************************************
 
+  	Name:
+	sethand
+
+	Description:
 	This object is a container that implements a "set" semantic
-	on its entries. The thing that is different is that the
-	entries are stored as pointers to the actual entries. This
+	on its entries.  The thing that is different is that the
+	entries are stored as pointers to the actual entries.  This
 	allows for entries to be created outside of the container
 	and passed around as usch, and then entered into the container
 	as may be needed.
 
 *******************************************************************************/
 
+module ;
+
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<new>
 #include	<utility>
@@ -41,23 +48,24 @@
 #include	<hdb.h>
 #include	<localmisc.h>
 
-#include	"returnstatus.h"
-
+#include	"returnstatus.hh"
 
 #define	SETHAND_DEFENTS	10
 
+export module sethand ;
 
 extern "C" uint	elfhash(cvoid *,int) noex ;
 extern "C" int	strnncmp(cchar *,int,cchar *,int) noex ;
 
-class sethandent {
+export {
+    class sethandent {
 	int		osize = 0 ;
-protected:
+    protected:
 	int		kl = 0 ;
 	int		vl = 0 ;
 	cvoid	*kp = nullptr ;
 	cvoid	*vp = nullptr ;
-public:
+    public:
 	virtual int	getkey(cvoid **rpp) const {
 	    if (rpp != nullptr) *rpp = (cvoid *) kp ;
 	    return kl ;
@@ -101,21 +109,18 @@ public:
 	    kl = 0 ;
 	    vl = 0 ;
 	} ;
-} ; /* end class (sethandent) */
-
-class sethand ;
-
-class sethand_it {
+    } ; /* end class (sethandent) */
+    class sethand ;
+    class sethand_it {
 	hdb_cur		cur ;
 	friend		sethand ;
-} ;
-
-class sethand {
+    } ;
+    class sethand {
 	hdb		list ;
 	int		f_started = FALSE ;
 	int		n = 0 ;
 	int		at = 0 ;
-public:
+    public:
 	typedef sethand_it iterator ;
 	sethand(int an = SETHAND_DEFENTS) : n(an) { } ;
 	sethand(int an,int aat) : n(an), at(aat) { } ;
@@ -125,7 +130,7 @@ public:
 		hdb_finish(&list) ;
 	    }
 	} ;
-	int		begin(int an) {
+	int begin(int an) {
 	    int		rs ;
 	    n = an ;
 	    if ((rs = hdb_start(&list,n,at,nullptr,nullptr)) >= 0) {
@@ -133,14 +138,14 @@ public:
 	    }
 	    return rs ;
 	} ;
-	int		begin() {
+	int begin() {
 	    int		rs ;
 	    if ((rs = hdb_start(&list,n,at,nullptr,nullptr)) >= 0) {
 		f_started = TRUE ;
 	    }
 	    return rs ;
 	} ;
-	int		end() {
+	int end() {
 	    int		rs = SR_OK ;
 	    if (f_started) {
 		f_started = FALSE ;
@@ -148,10 +153,10 @@ public:
 	    }
 	    return rs ;
 	} ;
-	int		itbegin(sethand_it *itp) {
+	int itbegin(sethand_it *itp) {
 	    return hdb_curbegin(&list,&itp->cur) ;
 	} ;
-	int		itend(sethand_it *itp) {
+	int itend(sethand_it *itp) {
 	    return hdb_curend(&list,&itp->cur) ;
 	} ;
 	int itfetch(sethand_it *itp,sethandent **rpp,cchar *kp,int kl) {
@@ -170,7 +175,7 @@ public:
 	    hdb_dat	key, val ;
 	    hdb_cur	*curp = &itp->cur ;
 	    int		rs ;
-	    if ((rs = hdb_enum(&list,curp,&key,&val)) >= 0) {
+	    if ((rs = hdb_curenum(&list,curp,&key,&val)) >= 0) {
 		if (rpp != nullptr) *rpp = (sethandent *) val.buf ;
 		rs = val.len ;
 	    }
@@ -204,6 +209,6 @@ public:
 	    }
 	    return (*this) ;
 	} ;
-} ; /* end class (sethand) */
-
+    } ; /* end class (sethand) */
+} /* end export */
 

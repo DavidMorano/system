@@ -84,7 +84,6 @@
 #include	<matostr.h>
 #include	<cfdecmf.h>
 #include	<isnot.h>
-#include	<bufsizedata.hh>
 #include	<mailvalues.hh>		/* |hostnamemult| + |nodenamemult| */
 #include	<localmisc.h>
 
@@ -94,14 +93,18 @@
 /* local defines */
 
 
+/* imported modules */
+
+import bufsizedata ;
+
+
+/* imported namespaces */
+
+
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	vecstr_envfile(vecstr *,cchar *) noex ;
-}
 
 
 /* external variables */

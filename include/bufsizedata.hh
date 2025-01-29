@@ -1,4 +1,4 @@
-/* bufsizedata HEADER */
+/* bufsizedata MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -35,10 +35,7 @@
 
 *******************************************************************************/
 
-#ifndef	BUFSIZEDATA_INCLUDE
-#define	BUFSIZEDATA_INCLUDE
-#ifdef	__cplusplus /* everything is C++ only */
-
+module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>		/* |_SC_xx| */
@@ -83,28 +80,27 @@
 #define	_SC_ZONEINFO_MAX	-1
 #endif
 
+export module bufsizedata ;
 
-namespace {
-    struct bufsizeitem {
+export {
+    struct bufsizedata_item {
 	int	name ;
 	int	defval ;
     } ;
     struct bufsizedata {
-	bufsizeitem	item[getbufsize_overlast] = {} ;
+	bufsizedata_item	item[getbufsize_overlast] = {} ;
 	constexpr bufsizedata() noex ;
-	constexpr bufsizeitem operator [] (int w) const noex {
-	    bufsizeitem		it = {-1,0} ;
-	    if ((w >= 0) && (w < getbufsize_overlast)) {
-	        it = item[w] ;
-	    }
-	    return it ;
+	constexpr bufsizedata_item operator [] (int w) const noex {
+	        bufsizedata_item	it = {-1,0} ;
+	        if ((w >= 0) && (w < getbufsize_overlast)) {
+	            it = item[w] ;
+	        }
+	        return it ;
 	} ; /* end method (operator) */
-   } ; /* end class (bufsizedata) */
-}
-
-constexpr bufsizedata::bufsizedata() noex {
+    } ; /* end class (bufsizedata) */
+    constexpr bufsizedata::bufsizedata() noex {
 	for (int i = 0 ; i < getbufsize_overlast ; i += 1) {
-	    bufsizeitem	*ip = (item+i) ;
+	    bufsizedata_item	*ip = (item+i) ;
 	    ip->name = -1 ;
 	    switch (i) {
 	    case getbufsize_ps:
@@ -190,11 +186,7 @@ constexpr bufsizedata::bufsizedata() noex {
 	        break ;
 	    } /* end switch */
 	} /* end for */
-}
-/* end method (bufsizedata:bufsizedata) */
-
-
-#endif	/* __cplusplus */
-#endif /* BUFSIZEDATA_INCLUDE */
+    } /* end method (bufsizedata:bufsizedata) */
+} /* end export */
 
 

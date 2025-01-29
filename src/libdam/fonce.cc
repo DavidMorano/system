@@ -66,8 +66,6 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef decltype(std::nothrow)	nothrow_t ;
-
 typedef fonce::stype::iterator	setiter ;
 
 

@@ -157,6 +157,7 @@ typedef int			id_t ;
 #ifndef	TYPEDEF_NOTHROW
 #define	TYPEDEF_NOTHROW
 #ifdef	__cplusplus
+#include			<new>		/* |nothrow(3c++)| */
 typedef decltype(std::nothrow)	nothrow_t ;
 #endif /* __cplusplus */
 #endif /* TYPEDEF_NOTHROW */
@@ -369,7 +370,9 @@ typedef const nullptr_t		cnullptr ;
 
 #ifndef	TYPEDEF_CNOTHROW
 #define	TYPEDEF_CNOTHROW
+#ifdef	__cplusplus
 typedef const nothrow_t		cnothrow ;
+#endif /* __cplusplus */
 #endif
 
 #ifndef	TYPEDEF_WCHARP

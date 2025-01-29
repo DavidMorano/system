@@ -17,8 +17,12 @@
 
 /*******************************************************************************
 
-	This file provides the definition of the TIMEOUT object, and its
-	method declarations.
+  	Object:
+	timeout
+
+	Description:
+	This file provides the definition of the TIMEOUT object,
+	and its method declarations.
 
 *******************************************************************************/
 

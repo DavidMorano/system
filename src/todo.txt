@@ -5,6 +5,8 @@ TODO
 file		what
 --------------------------------------------------------------------------------
 prique		broken, ill-conceived
+dw
+timer		decide what to do about |timer_hand()|
 uctim
 libuc		fix to completely compile!
 fsdirtree	needs pointer implementation and a lot of cleanup
@@ -37,7 +39,6 @@ vars
 varmk
 varmks
 ts
-dw
 ds
 spellchecks	incredible mess!
 

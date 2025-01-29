@@ -1,4 +1,4 @@
-/* minmaxelem HEADER */
+/* minmaxelem MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++98 */
 
@@ -30,10 +30,7 @@
 
 *******************************************************************************/
 
-#ifndef	MINMAXELEM_INCLUDE
-#define	MINMAXELEM_INCLUDE
-#ifdef	__cplusplus
-
+module ;
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>		/* |INT_MAX| */
@@ -42,10 +39,12 @@
 #include	<utility>		/* |pair(3c++)| */
 #include	<usystem.h>
 
+export module minmaxelem ;
 
-template<typename I,typename T>
-inline pair<T,T> minmaxelem(const I &bit,const I &eit) noex {
-	pair<T,T>	res ;
+export {
+    template<typename I,typename T>
+    inline std::pair<T,T> minmaxelem(const I &bit,const I &eit) noex {
+	std::pair<T,T>	res ;
 	int		minval = INT_MAX ;
 	int		maxval = 0 ;
 	for (I it = bit ; it != eit ; it += 1) {
@@ -56,11 +55,7 @@ inline pair<T,T> minmaxelem(const I &bit,const I &eit) noex {
 	res.first = minval ;
 	res.second = maxval ;
 	return res ;
+    } /* end subroutine-template (minmaxelem) */
 }
-/* end subroutine-template (minmaxelem) */
-
-
-#endif /* __cplusplus */
-#endif /* MINMAXELEM_INCLUDE */
 
 

@@ -104,7 +104,7 @@ OBJ += $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
 OBJ += $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .mod .ccm
 
 
 default:		$(T).o
@@ -416,7 +416,9 @@ serialbuf.o:		serialbuf.cc serialbuf.h stdorder.h
 stdorder.o:		stdorder.cc stdorder.h
 
 bufsizenames.o:		bufsizenames.c bufsizenames.h
-bufsizedata.o:		bufsizedata.cc bufsizedata.hh
+bufsizedata.o:		bufsizedata.mod
+	makemodule bufsizedata
+
 bufsizevar.o:		bufsizevar.cc bufsizevar.hh
 
 mapex.o:		mapex.cc mapex.h
@@ -475,10 +477,31 @@ ucproject.o:		ucproject.cc ucproject.h
 libmallocxx.o:		libmallocxx.cc libmallocxx.h
 
 # UNIX C-language system library memory management
-mapblock.o:		mapblock.cc mapblock.hh
-memtrack.o:		memtrack.cc memtrack.hh mapblock.hh
-addrset.o:		addrset.cc addrset.hh
+mapblock.o:		mapblock.mod
+	makemodule mapblock
+
+# MEMTRACK
+memtrack.o:		memtrack0.o memtrack1.o
+	$(LD) -r -o $@ $(LDFLAGS) memtrack0.o memtrack1.o
+memtrack0.o:		memtrack.mod
+	makemodule mapblock
+	makemodule memtrack
+memtrack1.o:		memtrack.mod memtrack1.cc
+	makemodule mapblock memtrack
+	$(COMPILE.cc) memtrack1.cc
+
+# ADDRSET
+addrset.o:		addrset0.o addrset1.o
+	$(LD) -r -o $@ $(LDFLAGS) addrset0.o addrset1.o
+addrset0.o:		addrset.mod
+	makemodule mapblock
+	makemodule addrset
+addrset1.o:		addrset.mod addrset1.cc
+	makemodule mapblock addrset
+	$(COMPILE.cc) addrset1.cc
+
 ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h ucmallreg.h addrset.hh
+ucmemalloc.o:		addrset.mod
 ucmallocx.o:		ucmallocx.cc ucmallocx.h
 
 # UNIX C-language system library timer management

@@ -1,4 +1,4 @@
-/* sview HEADER */
+/* sview MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -8,10 +8,7 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	SVIEW_INCLUDE
-#define	SVIEW_INCLUDE
-#ifdef	__cplusplus
-
+module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* |strlen(3c)| */
@@ -21,7 +18,10 @@
 #include	<usysdefs.h>
 
 
-struct sview {
+export module sview ;
+
+export {
+    struct sview {
 	cchar		*sp ;
 	int		sl ;
 	constexpr sview() noex : sp(nullptr), sl(0) { } ;
@@ -46,10 +46,7 @@ struct sview {
 	    sl = strlen(op) ;
 	    return *this ;
 	} ;
-} ; /* end struct (sview) */
-
-
-#endif /* __cplusplus */
-#endif /* SVIEW_UNCLUDE */
+    } ; /* end struct (sview) */
+} /* end export */
 
 

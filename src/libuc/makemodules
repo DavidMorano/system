@@ -1,0 +1,33 @@
+#!/usr/extra/bin/ksh
+# MAKEMODULES
+PN=${0##*/}
+GCM=gcm.cache
+
+function makeone {
+  if [[ -r "${M}.mod" ]] ; then
+    MF=${M}.mod
+  elif [[ -r "${M}.ccm" ]] ; then
+    MF=${M}.mod
+  fi
+  if [[ "${MF}" -nt ${GCM}/${M}.gcm ]] ; then
+    if [[ -r ${M}.mod ]] ; then
+      gxx -x c++ -c -O ${M}.mod
+    elif [[ -r ${M}.ccm ]] ; then
+      gxx -x c++ -c -O ${M}.ccm
+    fi
+    if [[ -r ${M}.o ]] ; then
+      if havefile ${M}_*.c* || havefile ${M}[0-9]*.c* ; then
+	mv -f ${M}.o ${M}0.o
+      fi
+    fi
+  fi
+}
+
+for M in "${@}" ; do
+  if [[ -r "${M}.mod" ]] || [[ -r "${M}.ccm" ]] ; then
+    makeone $M
+  else
+    print -u 2 -- "${PN}: module -${M}- not found"
+  fi
+done
+

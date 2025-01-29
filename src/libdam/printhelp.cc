@@ -93,11 +93,6 @@ using std::ostream ;			/* type */
 
 /* external subroutines */
 
-extern "C" {
-    extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) noex ;
-    extern int	vecstr_loadfile(vecstr *,int,cchar *) noex ;
-}
-
 
 /* external variables */
 
