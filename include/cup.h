@@ -27,6 +27,8 @@
 
 EXTERNC_begin
 
+extern char	*cup(int,cchar *,char *) noex ;
+
 EXTERNC_end
 
 

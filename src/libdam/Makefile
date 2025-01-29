@@ -868,5 +868,26 @@ deprecated.o:		deprecated.cc
 getclusters.o:		getclusters.cc getclusters.h
 percache.o:		percache.cc percache.h
 cvttemperature.o:	cvttemperature.cc cvttemperature.h
+cup.o:			cup.cc cup.h
+
+# DFSA
+dfsa.o:			dfsa0.o dfsa1.o
+	makemodule dfsa
+	$(LD) -r -o $@ $(LDFLAGS) dfsa0.o dfsa1.o
+dfsa0.o:		dfsa.mod
+	makemodule dfsa
+dfsa1.o:		dfsa1.cc dfsa.mod
+	makemodule dfsa
+	$(COMPILE.cc) dfsa1.cc
+
+# DFSB
+dfsb.o:			dfsb0.o dfsb1.o
+	makemodule dfsb
+	$(LD) -r -o $@ $(LDFLAGS) dfsb0.o dfsb1.o
+dfsb0.o:		dfsb.mod
+	makemodule dfsb
+dfsb1.o:		dfsb1.cc dfsb.mod
+	makemodule dfsb
+	$(COMPILE.cc) dfsb1.cc
 
 

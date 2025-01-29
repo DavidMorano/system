@@ -17,16 +17,18 @@
 
 /*******************************************************************************
 
-; string library subroutines
-;
-;	This file contains many of the string manipulation subroutines
-;	used in other modules.
-
 	Name:
 	cup
 
+	Description:
+	This file contains many of the string manipulation subroutines
+	used in other modules.
+
 	Synopsis:
 	char *cup(int len,cchar *src,char *dst) noex
+
+	Returns:
+	-		pointer to the end of filled-in destination buffer
 
 *******************************************************************************/
 

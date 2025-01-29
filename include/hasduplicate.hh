@@ -1,4 +1,5 @@
-/* hasdupplicate HEADER */
+/* hasdupplicate MODULE (primary module interface) */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* does the given array of elements have duplicate entries */
@@ -37,14 +38,17 @@
 
 *******************************************************************************/
 
+module ;
+
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<unordered_set>
 #include	<usystem.h>
 #include	<localmisc.h>
 
+export module hasduplicate ;
 
 /* local defines */
 
@@ -60,9 +64,9 @@
 
 /* exported subroutines */
 
-template<typename T>
-bool hasduplicate(const T *sp,int sl) noex {
-	typename std::unordered_set<T>		visited ;
+export {
+    template<typename T> bool hasduplicate(const T *sp,int sl) noex {
+	typename std::unordered_set<T>	visited ;
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (sl > 1) {
@@ -77,7 +81,7 @@ bool hasduplicate(const T *sp,int sl) noex {
 	    } /* end for */
 	} /* end if (needed more work) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (hasduplicate) */
+    } /* end subroutine (hasduplicate) */
+} /* end export */
 
 

@@ -3,13 +3,23 @@
 PN=${0##*/}
 GCM=gcm.cache
 
+function makeobj {
+  typeset M=${1}
+  MFO=${M}.o
+  if havefile ${M}_*.c* || havefile ${M}[0-9]*.c* ; then
+    MFO=${M}0.o
+  fi
+}
+
 function makeone {
+  MFO=
   if [[ -r "${M}.mod" ]] ; then
     MF=${M}.mod
   elif [[ -r "${M}.ccm" ]] ; then
     MF=${M}.mod
   fi
-  if [[ "${MF}" -nt ${GCM}/${M}.gcm ]] ; then
+  makeobj ${M}
+  if [[ ${MF} -nt ${GCM}/${M}.gcm ]] || [[ ${MF} -nt "${MFO}" ]] ; then
     if [[ -r ${M}.mod ]] ; then
       gxx -x c++ -c -O ${M}.mod
     elif [[ -r ${M}.ccm ]] ; then
