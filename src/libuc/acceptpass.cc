@@ -1,4 +1,5 @@
 /* acceptpass SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to accept an FD that was passed through a FIFO */

@@ -1,16 +1,16 @@
 /* findfile */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* find a file within a given list of directories */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-        The subroutine was written from scratch. It is modeled after many other
-        variations that I have written.
+	The subroutine was written from scratch. It is modeled after
+	many other variations that I have written.
 
 */
 
@@ -18,47 +18,40 @@
 
 /*******************************************************************************
 
-        This subroutines just searches a list of directories for a specified
-        file.
+  	Name:
+	findfile
+
+	Description:
+	This subroutines just searches a list of directories for a
+	specified file.
 
 	Synopsis:
-
-	int findfile(idp,plp,mode,pbuf,fbuf,flen)
-	IDS		*idp ;
-	vecstr		*plp ;
-	int		mode ;
-	char		pbuf[] ;
-	const char	fbuf[] ;
-	int		flen ;
+	typedef vecstr	vs ;
+	int findfile(ids *idp,vs *plp,int mode,char *pb,cc *fb,int fl) noex
 
 	Arguments:
-
 	idp		pointer to IDS object
 	plp		pointer to VECSTR object of directories
 	mode		mode of file to search for
-	pbuf		buffer to receive result
-	fbuf		buffer containing filename string to search for
-	flen		length of filename string to search for
+	pb		buffer to receive result
+	fb		buffer containing filename string to search for
+	fl		length of filename string to search for
 
 	Returns:
-
 	>=0		file was found and this is the resulting plen
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<signal.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<ids.h>
@@ -71,17 +64,8 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	sperm(IDS *,USTAT *,int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
 
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
+/* external variables */
 
 
 /* local structures */
@@ -89,24 +73,19 @@ extern char	*strnchr(cchar *,int,int) ;
 
 /* forward references */
 
-static int	mkfpathw(char *,cchar *,cchar *,int) ;
-static int	fileperm(IDS *,cchar *,mode_t) ;
+static int	mkfpathw(char *,cchar *,cchar *,int) noex ;
+static int	fileperm(IDS *,cchar *,mode_t) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int findfile(idp,plp,am,pbuf,fbuf,flen)
-IDS		*idp ;
-vecstr		*plp ;
-mode_t		am ;
-char		pbuf[] ;
-const char	fbuf[] ;
-int		flen ;
-{
+int findfile(ids *idp,vecstr *plp,int am,char *pbuf,cc *fbuf,int flen) noex {
 	int		rs = SR_OK ;
 	int		pl = 0 ;
 

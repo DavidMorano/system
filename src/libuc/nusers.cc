@@ -1,4 +1,5 @@
 /* nusers SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find number of users (logged-in) on system */

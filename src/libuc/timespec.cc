@@ -1,5 +1,6 @@
 /* timespec SUPPORT */
 /* lang=C++20 */
+/* version %I% last-modified %G% */
 
 /* UNIX® TIMESPEC object initialization */
 /* version %I% last-modified %G% */

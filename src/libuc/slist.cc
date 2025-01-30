@@ -1,4 +1,5 @@
 /* slist SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* a regular (no-frills) single-linked pointer queue */

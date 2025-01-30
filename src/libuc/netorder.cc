@@ -1,4 +1,5 @@
 /* netorder SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* network byte order manipulations */

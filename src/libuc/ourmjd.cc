@@ -1,4 +1,5 @@
 /* ourmjd SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* test whether a string is composed of our MJD specifiction */

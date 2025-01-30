@@ -1,24 +1,25 @@
-/* termdevice */
+/* termdevice SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* find the name of the device for the given file descriptor */
-
-
-#define	CF_DEBUGS	0		/* debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-06-15, David A­D­ Morano
-        This code was originally written. This was also inspired by the
-        fact that the Sun Solaris 2.5.1 POSIX version of 'ttyname_r' does not
-        appear to work. I got the idea for this subroutine from the GNU standard
-        C library implementation. It seems like Slowlaris 5.x certainly had a
-        lot of buggy problems (sockets, I-O, virtual memory, more)!
+	This code was originally written. This was also inspired
+	by the fact that the Sun Solaris 2.5.1 POSIX version of
+	'ttyname_r' does not appear to work. I got the idea for
+	this subroutine from the GNU standard C library implementation.
+	It seems like Slowlaris 5.x certainly had a lot of buggy
+	problems (sockets, I-O, virtual memory, more)!
 
 	= 2011-10-12, David A­D­ Morano
         I am changing the order of attempts to put 'ttyname_r(3c)' before
         forking a process. Even though we are still on Slowlaris we hope that
-        'ttyname_r(3c)' is now working properly!
+        |ttyname_r(3c)\ is now working properly!
 
 */
 
@@ -26,34 +27,29 @@
 
 /*******************************************************************************
 
-        Store at most BUFLEN character of the pathname, if the terminal FD is
-        open, in the caller specified buffer.
+  	Name:
+	termdevice
+
+	Description:
+	Store at most BUFLEN character of the pathname, if the
+	terminal FD is open, in the caller specified buffer.
 
 	Synopsis:
-
-	int termdevice(dbuf,dben,fd)
-	int		fd ;
-	char		dbuf[] ;
-	int		dlen ;
+	int termdevice(int fd,char *dbuf,int dben) noex[
 
 	Arguments:
-
+	fd		file descriptor
 	dbuf		buffer to store name
 	dlen		length of buffer to store name
-	fd		file descriptor
 
 	Return:
-
-	>=0	length of device name
+	>0	length of device name
 	0	on success
-	<0	otherwise
-
+	<0	otherwise error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>

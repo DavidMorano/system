@@ -1,4 +1,5 @@
 /* typenonpath SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine the type of nonpath in give counted c-string (filename) */

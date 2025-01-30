@@ -1,6 +1,9 @@
-/* termescseq */
+/* termescseq SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* Terminal Control Sequence (make them) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

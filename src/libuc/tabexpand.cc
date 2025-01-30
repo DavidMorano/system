@@ -1,4 +1,5 @@
 /* tabexpand SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* expand TAB characters to the appropriate number of spaces */

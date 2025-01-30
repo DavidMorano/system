@@ -1,4 +1,5 @@
 /* removes SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* removes (recursively as necessary) a directory tree */

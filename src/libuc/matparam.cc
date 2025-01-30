@@ -1,4 +1,5 @@
 /* matparam SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* does the parameter array have a given value? */

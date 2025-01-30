@@ -1,4 +1,5 @@
 /* maxvecaddr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* maximum core-address determination for a vector-array of strings */

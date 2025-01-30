@@ -1,4 +1,5 @@
 /* hasx SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* has a counted c-string some characteristic? */

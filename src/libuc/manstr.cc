@@ -1,4 +1,5 @@
 /* manstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* special string manipulations */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	manstr
+
+	Description:
         This object allows for some specialized manipulations on a
         counted-string object.
 

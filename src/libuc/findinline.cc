@@ -1,4 +1,5 @@
 /* findinline SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find a TeX-type in-line text escape */

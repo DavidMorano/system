@@ -1,4 +1,5 @@
 /* thrbase SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this object implements a sort of base thread manager (THRBASE) */

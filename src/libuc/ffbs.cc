@@ -1,4 +1,5 @@
 /* ffbs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the first bit set in various integer types */

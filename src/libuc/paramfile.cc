@@ -1,4 +1,5 @@
 /* paramfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* read in a file of parameters */

@@ -1,4 +1,5 @@
 /* nlinecols SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* calculate number of columns used by a line of characters */

@@ -1,4 +1,5 @@
 /* openshm SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a share-memory file in shared memory (really private) */

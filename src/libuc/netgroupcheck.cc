@@ -1,4 +1,5 @@
 /* netgroupcheck SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* check names against the system netgroups */

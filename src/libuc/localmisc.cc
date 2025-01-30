@@ -1,4 +1,5 @@
 /* localmisc SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* local miscellaneous subroutines */
@@ -15,6 +16,10 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************* 
+  	Name:
+	localmisc
+
+	Description:
 	These subroutines provide some miscellaneous subroutines.
 
 *******************************************************************************/

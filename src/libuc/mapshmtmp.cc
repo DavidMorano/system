@@ -1,4 +1,5 @@
 /* mapshmtmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* map some POSIX® SHM-type shared memory */
