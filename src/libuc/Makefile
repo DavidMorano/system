@@ -134,6 +134,9 @@ a:			$(T).a
 .cc.o:
 	$(COMPILE.cc) $<
 
+.mod.o:
+	makemodule $(*)
+
 
 $(T).so:		$(OBJ) Makefile
 	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
@@ -416,9 +419,6 @@ serialbuf.o:		serialbuf.cc serialbuf.h stdorder.h
 stdorder.o:		stdorder.cc stdorder.h
 
 bufsizenames.o:		bufsizenames.c bufsizenames.h
-bufsizedata.o:		bufsizedata.mod
-	makemodule bufsizedata
-
 bufsizevar.o:		bufsizevar.cc bufsizevar.hh
 
 mapex.o:		mapex.cc mapex.h
@@ -500,7 +500,7 @@ addrset1.o:		addrset.mod addrset1.cc
 	makemodule mapblock addrset
 	$(COMPILE.cc) addrset1.cc
 
-ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h ucmallreg.h addrset.hh
+ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h ucmallreg.h
 ucmemalloc.o:		addrset.mod
 ucmallocx.o:		ucmallocx.cc ucmallocx.h
 
@@ -926,5 +926,17 @@ umask.o:		umask.cc umask.h
 unameo.o:		unameo.cc unameo.h
 ucrand.o:		ucrand.cc ucrand.h
 ucprochave.o:		ucprochave.cc ucprochave.h
+
+# BSTREE
+bstree.o:		bstree.mod
+	makemodule bstree
+
+# SVIEW
+sview.o:		sview.mod
+	makemodule sview
+
+# BUFSIZEDATA
+bufsizedata.o:		bufsizedata.mod
+	makemodule bufsizedata
 
 
