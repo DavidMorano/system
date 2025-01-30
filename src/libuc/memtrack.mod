@@ -46,13 +46,15 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<mapblock.hh>
+#include	<uvariables.hh>
 
 /* local defines */
 
 #define	MEMTRACK_MAGIC	0x65821293
 
 export module memtrack ;
+
+import mapblock ;
 
 /* local stuff */
 
@@ -62,6 +64,8 @@ enum memtrackmems {
 	memtrackmem_finish,
 	memtrackmem_overlast
 } ;
+
+constexpr int	memtrack_magic = MEMTRACK_MAGIC ;
 
 /* exported stuff */
 

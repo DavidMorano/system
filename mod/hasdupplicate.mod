@@ -1,4 +1,4 @@
-/* hasdupplicate MODULE (primary module interface) */
+/* hasduplicate MODULE (primary module interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++11 */
 
@@ -25,7 +25,7 @@
 	'T') has duplicate entries.
 
 	Synopsis:
-	int hasdupplicate(const int *sp,int sl) noex
+	int hasduplicate(const int *sp,int sl) noex
 
 	Arguments:
 	sp		source array of integers

@@ -46,16 +46,19 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<utility>		/* |hash(3c++)| */
+#include	<utility>
+#include	<functional>		/* |hash(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<mapblock.hh>
-
 
 export module addrset ;
+
+import mapblock ;
+
+using std::hash ;			/* type */
 
 enum addrsetmems {
 	addrsetmem_start,
@@ -70,7 +73,7 @@ export {
 	size_t		asize ;
     } ;
     namespace std {
-        typedef const addrset_ent		cent ;
+        typedef const addrset_ent	cent ;
         template<> struct hash<addrset_ent> {
 	    size_t operator() (cent &di) const noex {
 	        csize	hv = size_t(di.addr) ;

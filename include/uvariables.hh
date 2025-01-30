@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	uvaraibles
+
+	Description:
 	This object contains various commonly used environment
 	variable names.
 

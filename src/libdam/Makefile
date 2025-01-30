@@ -906,4 +906,24 @@ sort_merge.o:		sort_merge.mod
 sort_insertion.o:	sort_insertion.mod
 	makemodule sort_insertion
 
+# SETHAND
+sethand.o:		sethand.mod
+	makemodule sethand
+
+# CCMUTEX
+ccmutex.o:		ccmutex.mod
+	makemodule ccmutex
+
+# RETSTAT
+retstat.o:		retstat.mod
+	makemodule retstat
+
+# MINMAXELEM
+minmaxelem.o:		minmaxelem.mod
+	makemodule minmaxelem
+
+# HASDUPLICATE
+hasduplicate.o:		hasduplicate.mod
+	makemodule hasduplicate
+
 

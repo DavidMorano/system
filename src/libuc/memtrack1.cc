@@ -58,8 +58,9 @@ module ;
 #include	<cstdint>
 #include	<cstring>
 #include	<utility>		/* |std::unreachable()| */
-#include	<new>
+#include	<new>			/* |nothrow| */
 #include	<usystem.h>
+#include	<uvariables.hh>
 
 module memtrack ;
 
@@ -91,8 +92,6 @@ using std::nothrow ;			/* constant */
 
 
 /* lcaal variables */
-
-constexpr uint		memtrack_magic = MEMTRACK_MAGIC ;
 
 
 /* exported variables */
