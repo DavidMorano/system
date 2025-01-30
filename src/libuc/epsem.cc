@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	psem
+
+	Description:
 	This module provides a sanitized version of the standard
 	POSIX® semaphore facility provided with some new UNIX®i.
 	Some operating system problems are managed within these
@@ -28,9 +32,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 

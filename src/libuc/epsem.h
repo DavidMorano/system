@@ -26,7 +26,7 @@
 	implementation of POSIX semaphores myself because the Apple
 	Darwin implemention does not allow for the un-named semaphore
 	use case!  Yes, once and (and again, and again) the Apple
-	Darwin UNIX-like implementation sucks cock meat. F*ck Apple
+	Darwin UNIX-like implementation sucks cock meat.  F*ck Apple
 	Darwin.
 
 *******************************************************************************/

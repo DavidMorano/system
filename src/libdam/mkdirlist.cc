@@ -18,7 +18,7 @@
 
 */
 
-/* Copyright © 2014 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1994,2014 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 

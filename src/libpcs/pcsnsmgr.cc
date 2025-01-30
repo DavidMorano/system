@@ -1,4 +1,5 @@
 /* pcsnsmgr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* PCS Name-Server Manager */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	pcsnsmgr
+
+	Description:
 	This module manages the in-memory cache for the PCS Name-Server
 	shared-object module.
 
