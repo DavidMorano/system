@@ -36,6 +36,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -63,6 +64,10 @@
 #define	MAXOPENTIME	300		/* maximum FD cache time */
 #define	MINCHECKTIME	2		/* minumun check interval (seconds) */
 #define	MAXIDLETIME	240		/* maximum allowable idle time */
+
+#ifndef	CF_FNAMECMP
+#define	CF_FNAMECMP	0
+#endif
 
 
 /* imported namespaces */
@@ -99,11 +104,6 @@ namespace {
 
 
 /* forward references */
-
-#ifdef	COMMENT
-	vecstr		*sdp ;			/* subdirectories */
-	vecobj		*elp ;			/* directory entries */
-#endif /* COMMENT */
 
 template<typename ... Args>
 static int dw_ctor(dw *op,Args ... args) noex {
@@ -154,8 +154,6 @@ static inline int dw_magic(dw *op,Args ... args) noex {
 }
 /* end subroutine (dw_magic) */
 
-
-
 static int	dw_scanfull(DW *) noex ;
 static int	dw_scansub(DW *,cchar *,time_t) noex ;
 static int	dw_findi(DW *,cchar *,IENTRY **) noex ;
@@ -163,7 +161,7 @@ static int	dw_findi(DW *,cchar *,IENTRY **) noex ;
 static int	ientry_start(IENTRY *,DW *,cchar *,USTAT *) noex ;
 static int	ientry_finish(IENTRY *,DW *) noex ;
 
-static int	entry_load(DW_ENT *,IENTRY *) noex ;
+static int	entry_load(DW_ENT *,IENTRY *,cchar *) noex ;
 
 extern "C" {
     static int	vcmpfn(cvoid **,cvoid **) noex ;
@@ -175,6 +173,8 @@ extern "C" {
 static vars		var ;
 
 constexpr int		rsn = SR_NOTFOUND ;
+
+constexpr bool		f_fnamecmp = CF_FNAMECMP ;
 
 
 /* exported variables */
@@ -206,7 +206,7 @@ int dw_start(DW *op,cchar *dirname) noex {
 	                op->checktime = dt ;
 	                op->removetime = dt ;
 	                if (cchar *cp ; (rs = mall(dirname,-1,&cp)) >= 0) {
-	                    if ((rs-1) <= MAXPATHLEN) {
+	                    if ((rs-1) <= var.maxpathlen) {
 	                        op->dirname = cp ;
 	                        rs = dw_scanfull(op) ;
 	                        if (rs == SR_NOENT) rs = SR_OK ;
@@ -268,183 +268,170 @@ int dw_finish(DW *op) noex {
 	        rs1 = vecstr_finish(op->sdp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if */
-	    op->fd = -1 ;
+	    {
+		rs1 = dw_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (dw_finish) */
 
-int dw_curbegin(DW *op,DW_CUR *cp) noex {
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != DW_MAGIC) return SR_NOTOPEN ;
-
-	cp->i = -1 ;
-	return SR_OK ;
+int dw_curbegin(DW *op,DW_CUR *curp) noex {
+    	int		rs ;
+	if ((rs = dw_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (dw_curbegin) */
 
-int dw_curend(DW *op,DW_CUR *cp) noex {
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != DW_MAGIC) return SR_NOTOPEN ;
-
-	cp->i = -1 ;
-	return SR_OK ;
+int dw_curend(DW *op,DW_CUR *curp) noex {
+    	int		rs ;
+	if ((rs = dw_magic(op)) >= 0) {
+	    curp->i = -1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (dw_curend) */
 
-int dw_enum(DW *op,DW_CUR *cp,DW_ENT *dep) noex {
-	IENTRY		*iep = nullptr ;
+int dw_curenum(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 	int		rs ;
-	int		i ;
-	int		nlen ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != DW_MAGIC) return SR_NOTOPEN ;
-
-/* get the next entry (any one) */
-
-	if ((cp == nullptr) || (cp->i < 0)) {
-	    i = 0 ;
-	} else {
-	    i = cp->i + 1 ;
-	}
-
-	void		*vp{} ;
-	while ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
-	    iep = (IENTRY *) vp ;
-	    if (vp) break ;
-	    i += 1 ;
-	} /* end while */
-
-	if ((rs >= 0) && iep) {
-	    if (dep) {
-	        rs = entry_load(dep,iep) ;
+	int		nlen = 0 ;
+	if ((rs = dw_magic(op,curp)) >= 0) {
+	    /* get the next entry (any one) */
+	    IENTRY	*iep = nullptr ;
+	    int		i ;
+	    if ((curp == nullptr) || (curp->i < 0)) {
+	        i = 0 ;
+	    } else {
+	        i = curp->i + 1 ;
 	    }
-	    nlen = rs ;
-	    if ((rs >= 0) && cp) {
-	        cp->i = i ;
+	    void	*vp{} ;
+	    while ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
+	        iep = (IENTRY *) vp ;
+	        if (vp) break ;
+	        i += 1 ;
+	    } /* end while */
+	    if ((rs >= 0) && iep) {
+	        if ((rs >= 0) && dep) {
+	            rs = entry_load(dep,iep,rbuf) ;
+		    nlen = rs ;
+	        }
+		if ((rs >= 0) && rbuf) {
+		    rs = sncpy(rbuf,rlen,iep->name) ;
+		    nlen = rs ;
+		}
+	        if (rs >= 0) {
+	            curp->i = i ;
+	        }
+	    } /* end if (ok) */
+	    if (rs >= 0) {
+	        curp->i = i ;
 	    }
-	} /* end if (ok) */
-
-	if ((rs >= 0) && cp) {
-	    cp->i = i ;
-	}
-
+	} /* end if (magic) */
 	return (rs >= 0) ? nlen : rs ;
 }
-/* end subroutine (dw_enum) */
-
-int dw_del(DW *op,DW_CUR *cp) noex {
-	int		rs ;
-	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (cp == nullptr) return SR_FAULT ;
-
-	if (op->magic != DW_MAGIC) return SR_NOTOPEN ;
-
-	void		*vp{} ;
-	if ((rs = vecobj_get(op->elp,cp->i,&vp)) >= 0) {
-	    if (vp) {
-		IENTRY	*iep = (IENTRY *) vp ;
-		{
-	            rs1 = ientry_finish(iep,op) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
-		{
-	            rs1 = vecobj_del(op->elp,cp->i) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
-	    }
-	} /* end if */
-
-	return rs ;
-}
-/* end subroutine (dw_del) */
-
-int dw_find(DW *op,cchar *name,DW_ENT *dep) noex {
-	IENTRY		ie{} ;
-	IENTRY		*iep = nullptr ;
-	int		rs ;
-	int		i = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (name == nullptr) return SR_FAULT ;
-
-	if (op->magic != DW_MAGIC) return SR_NOTOPEN ;
-
-	if (name[0] == '\0') return SR_NOTFOUND ;
-
-	void		*vp{} ;
-#if	CF_FNAMECMP
-	ie.name = (char *) name ;
-	if ((rs = vecobj_search(op->elp,&ie,vcmpfn,&vp)) >= 0) {
-	    iep = (IENTRY *) vp ;
-	}
-#else /* CF_FNAMECMP */
-	for (i = 0 ; (rs = vecobj_get(op->elp,i,&vp)) >= 0 ; i += 1) {
-	    if (vp) {
-		iep = (IENTRY *) vp ;
-	        if (strcmp(name,iep->name) == 0) break ;
-
-	    }
-	} /* end for (looping through entries) */
-#endif /* CF_FNAMECMP */
-
-	if ((rs >= 0) && dep && iep) {
-	    rs = entry_load(dep,iep) ;
-	}
-
-	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (dw_find) */
+/* end subroutine (dw_curenum) */
 
 /* enumerate those entries that are "checkable" */
-int dw_enumcheckable(DW *op,DW_CUR *cp,DW_ENT *dep) noex {
-	IENTRY		*iep = nullptr ;
+int dw_curenumcheck(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 	int		rs ;
-	int		i ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != DW_MAGIC) return SR_NOTOPEN ;
-
-/* get the next entry with a checkable file */
-
-	if ((cp == nullptr) || (cp->i < 0)) {
-	    i = 0 ;
-	} else {
-	    i = cp->i + 1 ;
-	}
-
-	void	*vp{} ;
-	while ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
-	    if (vp) {
-		iep = (IENTRY *) vp ;
-		if (iep->state == DW_SCHECK) break ;
+	int		i = 0 ;
+	if ((rs = dw_magic(op)) >= 0) {
+	    IENTRY	*iep = nullptr ;
+	    /* get the next entry with a checkable file */
+	    if ((curp == nullptr) || (curp->i < 0)) {
+	        i = 0 ;
+	    } else {
+	        i = curp->i + 1 ;
 	    }
-	    i += 1 ;
-	} /* end while */
-
-	if (rs >= 0) {
-	    if (dep && iep) {
-	        rs = entry_load(dep,iep) ;
-	    }
-	    if ((rs >= 0) && cp) {
-	        cp->i = i ;
-	    }
-	} /* end if */
-
+	    void	*vp{} ;
+	    while ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
+	        if (vp) {
+		    iep = (IENTRY *) vp ;
+		    if (iep->state == DW_SCHECK) break ;
+	        }
+	        i += 1 ;
+	    } /* end while */
+	    if (rs >= 0) {
+	        if (dep && iep) {
+	            rs = entry_load(dep,iep,rbuf) ;
+	        }
+		if ((rs >= 0) && rbuf) {
+		    rs = sncpy(rbuf,rlen,iep->name) ;
+		}
+	        if ((rs >= 0) && curp) {
+	            curp->i = i ;
+	        }
+	    } /* end if */
+	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (dw_enumcheckable) */
 
+int dw_del(DW *op,DW_CUR *curp) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = dw_magic(op,curp)) >= 0) {
+	    void	*vp{} ;
+	    if ((rs = vecobj_get(op->elp,curp->i,&vp)) >= 0) {
+	        if (vp) {
+		    IENTRY	*iep = (IENTRY *) vp ;
+		    {
+	                rs1 = ientry_finish(iep,op) ;
+		        if (rs >= 0) rs = rs1 ;
+		    }
+		    {
+	                rs1 = vecobj_del(op->elp,curp->i) ;
+		        if (rs >= 0) rs = rs1 ;
+		    }
+	        }
+	    } /* end if */
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (dw_del) */
+
+int dw_find(DW *op,cchar *name,DW_ENT *dep,char *rbuf,int rlen) noex {
+	int		rs ;
+	int		i = 0 ;
+	if ((rs = dw_magic(op,name)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+		vecobj		*elp = op->elp ;
+	        IENTRY		ie{} ;
+	        IENTRY		*iep = nullptr ;
+	        void		*vp{} ;
+		if_constexpr (f_fnamecmp) {
+	            ie.name = charp(name) ;
+	            if ((rs = elp->search(&ie,vcmpfn,&vp)) >= 0) {
+	                iep = (IENTRY *) vp ;
+	            }
+		} else {
+	            for (i = 0 ; (rs = elp->get(i,&vp)) >= 0 ; i += 1) {
+	                if (vp) {
+		            iep = (IENTRY *) vp ;
+	                    if (strcmp(name,iep->name) == 0) break ;
+	                }
+	            } /* end for (looping through entries) */
+		} /* end if_constexpr (f_fnamecmp) */
+	        if ((rs >= 0) && dep && iep) {
+	            rs = entry_load(dep,iep,rbuf) ;
+	        }
+		if ((rs >= 0) && rbuf) {
+		    rs = sncpy(rbuf,rlen,iep->name) ;
+		}
+	    } /* end if (valid) */
+	} /* end if (magic) */
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (dw_find) */
+
 /* check if the directory (and any subdirectories) has changed */
 int dw_check(DW *op,time_t dt) noex {
+	USTAT sb{} ; 
 	int		rs = SR_OK ;
 	int		i ;
 	int		n = 0 ;
@@ -474,7 +461,7 @@ int dw_check(DW *op,time_t dt) noex {
 	} /* end if (opened FD for caching) */
 	if (rs < 0) goto ret0 ;
 
-	if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) < 0) {
+	if ((rs = u_fstat(op->fd,&sb)) < 0) {
 	    u_close(op->fd) ;
 	    op->fd = -1 ;
 	    goto done ;
@@ -599,39 +586,34 @@ done:
 	op->checktime = dt ;
 
 ret0:
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (dw_check) */
 
 int dw_callback(DW *op,dwcallback_f func,void *argp) noex {
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != DW_MAGIC) return SR_NOTOPEN ;
-
-	op->callback = func ;
-	op->argp = argp ;
-	return SR_OK ;
+    	int		rs ;
+	if ((rs = dw_magic(op)) >= 0) {
+	    op->callback = func ;
+	    op->argp = argp ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (dw_callback) */
 
 extern int dw_state(DW *op,int i,int state) noex {
 	int		rs ;
 	int		state_prev = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != DW_MAGIC) return SR_NOTOPEN ;
-
-	if (state < 0) return SR_INVALID ;
-
-	void		*vp{} ;
-	if ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
-	    IENTRY	*iep = (IENTRY *) vp ;
-	    state_prev = iep->state ;
-	    iep->state = state ;
-	}
-
+	if ((rs = dw_magic(op)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (state >= 0) {
+	        void	*vp{} ;
+	        if ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
+	            IENTRY	*iep = (IENTRY *) vp ;
+	            state_prev = iep->state ;
+	            iep->state = state ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? state_prev : rs ;
 }
 /* end subroutine (dw_state) */
@@ -641,7 +623,8 @@ extern int dw_state(DW *op,int i,int state) noex {
 
 static int dw_scanfull(DW *op) noex {
 	USTAT		sb ;
-	IENTRY		ie, *iep ;
+	IENTRY		ie ;
+	IENTRY		*iep ;
 	fsdir		d ;
 	fsdir_ent	ds ;
 	time_t		dt = getustime ;
@@ -733,23 +716,16 @@ static int dw_scanfull(DW *op) noex {
 /* end subroutine (dw_scanfull) */
 
 static int dw_scansub(DW *op,cchar *subdname,time_t dt) noex {
-	USTAT		sb ;
-	IENTRY		ie, *iep ;
-	fsdir		d ;
-	fsdir_ent	ds ;
 	int		rs ;
 	int		rs1 ;
-	int		dlen ;
 	int		n = 0 ;
+	if ((rs = dw_magic(op)) >= 0) {
+	USTAT		sb ;
+	IENTRY		ie, *iep ;
+	int		dlen ;
 	char		dnamebuf[MAXPATHLEN + 1], *dbp ;
 	char		*sdbp ;
-
-	if (op->dirname == nullptr) return SR_FAULT ;
-
-	if (op->dirname[0] == '\0') return SR_INVALID ;
-
-/* put it together */
-
+	/* put it together */
 	dbp = dnamebuf ;
 	dbp = strwcpy(dbp,op->dirname,-1) ;
 
@@ -767,9 +743,9 @@ static int dw_scansub(DW *op,cchar *subdname,time_t dt) noex {
 
 	if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
 	    cint	nlen = 0 ;
-	if ((rs = fsdir_open(&d,dnamebuf)) >= 0) {
+	if (fsdir d ; (rs = fsdir_open(&d,dnamebuf)) >= 0) {
+	fsdir_ent	ds ;
 	    cint	rsn = SR_NOENT ;
-
 	    while ((rs = fsdir_read(&d,&ds,nbuf,nlen)) > 0) {
 		cint	nl = rs ;
 	        if (ds.name[0] == '.') continue ;
@@ -821,6 +797,7 @@ static int dw_scansub(DW *op,cchar *subdname,time_t dt) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 
+	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (dw_scansub) */
@@ -828,16 +805,15 @@ static int dw_scansub(DW *op,cchar *subdname,time_t dt) noex {
 #ifdef	COMMENT
 
 static int dw_finddelete(DW *op,cchar *name) noex {
-	IENTRY		ie, *iep ;
 	int		rs ;
-	int		i ;
-
+	int		i = 0 ;
+	IENTRY		ie ;
+	IENTRY		*iep ;
 	ie.name = name ;
-	rs = vecobj_search(op->elp,&ie,vcmpfn,&iep) ;
-	i = rs ;
-	if (rs >= 0)
+	if ((rs = vecobj_search(op->elp,&ie,vcmpfn,&iep)) >= 0) {
+	    i = rs ;
 	    rs = vecobj_del(op->elp,i) ;
-
+	}
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (dw_finddelete) */
@@ -845,46 +821,37 @@ static int dw_finddelete(DW *op,cchar *name) noex {
 #endif /* COMMENT */
 
 static int dw_findi(DW *op,cchar *name,IENTRY **iepp) noex {
-	IENTRY		ie ;
 	int		rs ;
-
-	ie.name = (char *) name ;
+	IENTRY		ie ;
+	ie.name = charp(name) ;
 	void		*vp{} ;
 	if ((rs = vecobj_search(op->elp,&ie,vcmpfn,&vp)) >= 0) {
 	    IENTRY	*iep = (IENTRY *) vp ;
 	    *iepp = iep ;
 	}
-
 	return rs ;
 }
 /* end subroutine (dw_findi) */
 
 /* initialize an entry */
 static int ientry_start(IENTRY *iep,DW *op,cchar *name,USTAT *sbp) noex {
-	USTAT		sb ;
 	int		rs ;
-	cchar		*cp ;
-
 	iep->state = DW_SNEW ;
-	if ((rs = uc_mallocstrw(name,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = uc_mallocstrw(name,-1,&cp)) >= 0) {
 	    iep->name = cp ;
-
-/* do we need to get some status on the file? */
-
+	    /* do we need to get some status on the file? */
 	    if (sbp == nullptr) {
-	        char	dnamebuf[MAXPATHLEN + 1] ;
-
-	        if ((rs = mkpath2(dnamebuf,op->dirname,name)) >= 0) {
-	            rs = u_stat(dnamebuf,&sb) ;
-	            if (rs >= 0) sbp = &sb ;
-	        }
-
-	    } /* end if */
-
-	    iep->itime = ((sbp != nullptr) ? sbp->st_mtime : 0) ;
-
-	} /* end if */
-
+		if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
+	            if ((rs = mkpath(dbuf,op->dirname,name)) >= 0) {
+		        if (USTAT sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
+	                    sbp = &sb ;
+		        }
+	            }
+		    rs = rsfree(rs,dbuf) ;
+		} /* end if (m-a-f) */
+	    } /* end if (non-null) */
+	    iep->itime = ((sbp) ? sbp->st_mtime : 0) ;
+	} /* end if (memory-allocation) */
 	return rs ;
 }
 /* end subroutine (ientry_start) */
@@ -892,31 +859,32 @@ static int ientry_start(IENTRY *iep,DW *op,cchar *name,USTAT *sbp) noex {
 static int ientry_finish(IENTRY *iep,DW *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (iep->state == DW_SNEW) {
 	    op->count_new -= 1 ;
 	} else if (iep->state == DW_SCHECK) {
 	    op->count_checkable -= 1 ;
 	}
-
-	if (iep->name != nullptr) {
+	if (iep->name) {
 	    rs1 = uc_free(iep->name) ;
 	    if (rs >= 0) rs = rs1 ;
 	    iep->name = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (ientry_finish) */
 
-static int entry_load(DW_ENT *dep,IENTRY *iep) noex {
+static int entry_load(DW_ENT *dep,IENTRY *iep,cchar *rbuf) noex {
 	int		rs = SR_FAULT ;
-	if (dep) {
+	if (dep && iep) {
+	    rs = SR_OK ;
 	    dep->itime = iep->itime ;
 	    dep->timod = iep->timod ;
 	    dep->fsize = iep->fsize ;
 	    dep->state = iep->state ;
-	    rs = sncpy1(dep->name,MAXPATHLEN,iep->name) ;
+	    dep->name = rbuf ;
+	    if (rbuf) {
+		rs = cstrlen(rbuf) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }

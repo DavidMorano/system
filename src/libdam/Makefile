@@ -890,4 +890,20 @@ dfsb1.o:		dfsb1.cc dfsb.mod
 	makemodule dfsb
 	$(COMPILE.cc) dfsb1.cc
 
+# FONCE
+fonce.o:		fonce0.o fonce1.o
+	makemodule fonce
+	$(LD) -r -o $@ $(LDFLAGS) fonce0.o fonce1.o
+fonce0.o:		fonce.mod
+	makemodule fonce
+fonce1.o:		fonce1.cc fonce.mod
+	makemodule fonce
+	$(COMPILE.cc) fonce1.cc
+
+sort_merge.o:		sort_merge.mod
+	makemodule sort_merge
+
+sort_insertion.o:	sort_insertion.mod
+	makemodule sort_insertion
+
 

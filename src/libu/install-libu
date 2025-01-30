@@ -1,6 +1,8 @@
 #!/usr/extra/bin/ksh
 # INSTALL-LIBU
 
+ma so
+
 LIBS="libu.so libu.a"
 
 TDIRS+=" ${HOME}/github/system/lib ${HOME}/lib "

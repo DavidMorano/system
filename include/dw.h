@@ -13,9 +13,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<time.h>
+#include	<sys/types.h>		/* system types */
+#include	<sys/stat.h>		/* |dev_t| + |ino_t| */
+#include	<time.h>		/* |time_t| */
+#include	<stdlib.h>		/* |size_t| */
 #include	<vecstr.h>
 #include	<vecobj.h>
 
@@ -40,7 +41,7 @@
 
 
 struct dw_entry {
-	char		*name ;
+	cchar		*name ;
 	time_t		itime ;
 	time_t		timod ;
 	size_t		fsize ;

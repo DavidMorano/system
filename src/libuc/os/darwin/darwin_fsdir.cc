@@ -219,7 +219,7 @@ static int fsdir_begin(fsdir *op,cchar *dname) noex {
 	            op->posixp = vp ;
 		}
 		if (rs < 0) {
-		    objp->dtor() ;
+		    objp->~posixdirent() ;
 		}
 	    } /* end if (operator-new) */
 	    if (rs < 0) {
@@ -239,7 +239,7 @@ static int fsdir_end(fsdir *op) noex {
 		posixdirent	*objp = posixdirentp(op->posixp) ;
 	        rs1 = objp->close ;
 	        if (rs >= 0) rs = rs1 ;
-	        objp->dtor() ;
+		objp->~posixdirent() ;
 	    }
 	    {
 		rs1 = uc_libfree(op->posixp) ;

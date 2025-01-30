@@ -39,8 +39,8 @@
 
 
 struct fsdir_entry {
-	ino_t		ino ;		/* UNIX® "inode number" of entry */
 	char		*name ;		/* name of file */
+	ino_t		ino ;		/* UNIX® "inode number" of entry */
 	ushort		nlen ;		/* length of this record */
 	ushort		type ;		/* some systems support this */
 } ;
@@ -119,7 +119,7 @@ struct fsdir : fsdir_head {
 	fsdir(const fsdir &) = delete ;
 	fsdir &operator = (const fsdir &) = delete ;
 	int read(fsdir_ent *,char *,int) noex ;
-	int seek(off_t = 0) noex ;
+	int seek(off_t = 0z) noex ;
 	void dtor() noex ;
 	~fsdir() {
 	    dtor() ;

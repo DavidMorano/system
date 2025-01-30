@@ -61,7 +61,7 @@
 #include	<mkpathx.h>
 #include	<mkchar.h>
 #include	<xperm.h>
-#include	<getnodename.h>
+#include	<getx.h>		/* |getnodedomain(3uc)| */
 #include	<rmx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -84,7 +84,7 @@
 
 /* imported namespaces */
 
-using std::nulptr_t ;			/* type */
+using std::nullptr_t ;			/* type */
 using std::ostream ;			/* type */
 
 
@@ -404,12 +404,10 @@ static int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
 	cint		sz = var.maxcombolen ;
 	int		rs ;
 	int		rs1 ;
-	char		*nn{} ;
-	if ((rs = uc_malloc(sz,&nn)) >= 0) {
+	if (char *nn ; (rs = uc_malloc(sz,&nn)) >= 0) {
 	    char	*dn = (nn + (var.maxnodelen + 1)) ;
 	    if ((rs = getnodedomain(nn,dn)) >= 0) {
-	        char	*hbuf{} ;
-	        if ((rs = malloc_hn(&hbuf)) >= 0) {
+	        if (char *hbuf ; (rs = malloc_hn(&hbuf)) >= 0) {
 		    cint	hlen = rs ;
 	            cchar	*ks = "SNDHPR" ;
 	            char	kbuf[KBUFLEN+1] ;
@@ -488,7 +486,7 @@ static int mkvars() noex {
 	    var.maxhostlen = rs ;
 	    if ((rs = getbufsize(getbufsize_nn)) >= 0) {
 	        var.maxnodelen = rs ;
-		var.maxcombolen = ((var.maxhostlen+1) + rs) ;
+		var.maxcombolen = ((var.maxhostlen + 1) + rs) ;
 	    }
 	}
 	return rs ;

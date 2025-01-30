@@ -32,7 +32,7 @@
 #include	<getbufsize.h>
 #include	<getchostname.h>
 #include	<getcols.h>
-#include	<getdefzinfo.h>
+#include	<getdefzdata.h>
 #include	<getdig.h>
 #include	<geteaddrinfo.h>
 #include	<getenver.h>
