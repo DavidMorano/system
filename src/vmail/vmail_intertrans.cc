@@ -1,4 +1,5 @@
 /* inter_trans SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* translate (TRANS) compoeent of INTER */
@@ -18,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	inter_trans
+
+	Description:
 	These subroutines for the TRANS component of INTER.
 
 *******************************************************************************/
@@ -36,6 +41,7 @@
 #include	<ischarx.h>
 #include	<hdrdecode.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -48,43 +54,6 @@
 
 
 /* external subroutines */
-
-extern int	snsdd(char *,int,const char *,uint) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	wsnwcpynarrow(wchar_t *,int,cchar *,int) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfnext(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	nleadcasestr(const char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	msleep(int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const void *,int) ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	mkhexstr(char *,int,const void *,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnrchr(cchar *,int,int) ;
-extern char	*strnsub(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -135,7 +104,7 @@ int inter_transhd(INTER *iap)
 {
 	int		rs = SR_OK ;
 	if (iap->trans == NULL) {
-	    const int	osize = sizeof(INTER_TRANS) ;
+	    cint	osize = szof(INTER_TRANS) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(osize,&p)) >= 0) {
 		INTER_TRANS	*itp = p ;
@@ -164,8 +133,8 @@ int inter_transproc(INTER *iap,char *dbuf,int dlen,cchar *sp,int sl,int n)
 	if (strnsub(sp,sl,"=?") != NULL) {
 	    if ((rs = inter_transhd(iap)) >= 0) {
 	        INTER_TRANS	*itp = iap->trans ;
-		const int	wsize = ((sl+1)*sizeof(wchar_t)) ;
-		const int	wlen = sl ;
+		cint	wsize = ((sl+1)*szof(wchar_t)) ;
+		cint	wlen = sl ;
 		wchar_t		*wbuf ;
 		if ((rs = uc_malloc(wsize,&wbuf)) >= 0) {
 		    HDRDECODE	*hdp = &itp->hd ;

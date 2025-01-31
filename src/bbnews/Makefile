@@ -397,8 +397,6 @@ dater.o:		dater.c dater.h
 
 mailmsgviewer.o:	mailmsgviewer.c mailmsgviewer.h
 
-uterm.o:		uterm.c uterm.h
-
 pcsconf.o:		pcsconf.c pcsconf.h
 
 pcspoll.o:		pcspoll.c pcspoll.h pcsconf.h

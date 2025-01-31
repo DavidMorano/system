@@ -1,4 +1,5 @@
 /* fmtstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to format string output */
@@ -33,6 +34,9 @@
 
 /*******************************************************************************
 
+  	Name:
+	format
+
 	Description:
 	This subroutine is used by 'printf()' type routines to
 	format an output string from a format specification.  Floating
@@ -48,7 +52,6 @@
 	mode		formatting mode (options)
 	fmt		the format string
 	ap		argument-pointer (see STDARG)
-
 
 	Returns:
 	<0		error (if mode allows errors to be returned)
@@ -90,7 +93,6 @@
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -111,6 +113,7 @@
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 #include	"format.h"
 
@@ -189,25 +192,16 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	snwcpy(char *,int,const char *,int) ;
-    extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-    extern int	strlinelen(const char *,int,int) ;
+    extern int	snwcpy(char *,int,cchar *,int) ;
+    extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+    extern int	strlinelen(cchar *,int,int) ;
 }
 
-#if	CF_DEBUGZ
 extern "C" {
-    extern int	zprint(cchar *,cchar *,int) ;
-    extern int	zprintf(cchar *,cchar *,...) ;
-    extern int	mkhexstr(char *,int,void *,int) ;
-    extern int	hexblock(const char *,void *,int) ;
-}
-#endif
-
-extern "C" {
-    extern char	*strwcpy(char *,const char *,int) ;
-    extern char	*strnchr(const char *,int,int) ;
-    extern char	*strdcpy1(char *,int,const char *) ;
-    extern char	*strdcpy1w(char *,int,const char *,int) ;
+    extern char	*strwcpy(char *,cchar *,int) ;
+    extern char	*strnchr(cchar *,int,int) ;
+    extern char	*strdcpy1(char *,int,cchar *) ;
+    extern char	*strdcpy1w(char *,int,cchar *,int) ;
 }
 
 
@@ -249,7 +243,7 @@ struct fmtspec {
 struct strdata {
 	const wint_t	*lsp ;
 	const wchar_t	*wsp ;
-	const char	*sp ;
+	cchar	*sp ;
 	int		sl ;
 	int		f_wint ;
 	int		f_wchar ;
@@ -270,11 +264,11 @@ enum lenmods {
 
 static int subinfo_start(SUBINFO *,char *,int,int) noex ;
 static int subinfo_finish(SUBINFO *) noex ;
-static int subinfo_strw(SUBINFO *,const char *,int) noex ;
+static int subinfo_strw(SUBINFO *,cchar *,int) noex ;
 static int subinfo_char(SUBINFO *,int) noex ;
 static int subinfo_blanks(SUBINFO *,int) noex ;
-static int subinfo_cleanstrw(SUBINFO *,const char *,int) noex ;
-static int subinfo_emit(SUBINFO *,FMTSPEC *,const char *,int) noex ;
+static int subinfo_cleanstrw(SUBINFO *,cchar *,int) noex ;
+static int subinfo_emit(SUBINFO *,FMTSPEC *,cchar *,int) noex ;
 static int subinfo_fmtstr(SUBINFO *,FMTSPEC *,STRDATA *) noex ;
 
 #if	CF_RESERVE
@@ -296,7 +290,7 @@ static int	hasourbad(cchar *sp,int sl) noex ;
 #if	CF_LPRINT
 #if	((CF_LSPRINTF || CF_LVSPRINTF || CF_LSNPRINTF || CF_LVSNPRINTF))
 #if	(! CF_SUNCC)
-static int	lsprintf(char *,const char *,...) noex ;
+static int	lsprintf(char *,cchar *,...) noex ;
 #endif
 #endif
 #endif /* CF_LPRINT */
@@ -304,10 +298,10 @@ static int	lsprintf(char *,const char *,...) noex ;
 
 /* local variables */
 
-static const char	digtable_hi[] = "0123456789ABCDEF" ;
-static const char	digtable_lo[] = "0123456789abcdef" ;
-static const char	blanks[] = "                " ;
-static const char	*nullpointer = NULLPOINTER ;
+static cchar	digtable_hi[] = "0123456789ABCDEF" ;
+static cchar	digtable_lo[] = "0123456789abcdef" ;
+static cchar	blanks[] = "                " ;
+static cchar	*nullpointer = NULLPOINTER ;
 
 /* subroutine-templaes */
 
@@ -331,12 +325,12 @@ static int	isourbad(int ch) noex ;
 int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	SUBINFO		si, *sip = &si ;
 	FMTSPEC		fs, *fsp = &fs ;
-	const int	tlen = BUFLEN ;
+	cint	tlen = BUFLEN ;
 	int		rs = SR_OK ;
 	int		fmtlen = 0 ;
-	const char	*tp ;
+	cchar	*tp ;
 #if	CF_DEBUGZ
-	const int	dlen = DEBUGBUFLEN ;
+	cint	dlen = DEBUGBUFLEN ;
 	char		dbuf[DEBUGBUFLEN+1] ;
 #endif
 	char		tbuf[BUFLEN+1] ;	/* must be > MAXDECDIG */
@@ -392,7 +386,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 	            f_continue = TRUE ;
 	            while (f_continue) {
-	                const int	ch = MKCHAR(fp[0]) ;
+	                cint	ch = MKCHAR(fp[0]) ;
 	                switch (ch) {
 	                case '-':
 	                    fsp->f.left = TRUE ;
@@ -481,7 +475,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 /* check for a format length-modifier */
 
 	            {
-	                const int	ch = MKCHAR(*fp) ;
+	                cint	ch = MKCHAR(*fp) ;
 
 	                switch (ch) {
 	                case 'h':
@@ -633,7 +627,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                } else if (sd.f_wchar) {
 	                    sd.wsp = (const wchar_t *) va_arg(ap,wchar_t *) ;
 	                } else {
-	                    sd.sp = (const char *) va_arg(ap,char *) ;
+	                    sd.sp = (cchar *) va_arg(ap,char *) ;
 	                }
 
 	                if (fsp->fcode == 't') {
@@ -850,7 +844,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                int		f_special = CF_SPECIALHEX ;
 #endif /* CF_BINARYMIN */
 	                int		f_got = FALSE ;
-	                const char	*digtable = digtable_lo ;
+	                cchar	*digtable = digtable_lo ;
 
 	                switch (fsp->lenmod) {
 	                case lenmod_longlong:
@@ -961,15 +955,15 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 #if	CF_FLOAT && F_SUNOS
 	                {
-			    const int	w = fsp->width ;
-			    const int	p = fsp->prec ;
+			    cint	w = fsp->width ;
+			    cint	p = fsp->prec ;
 	                    int		fill = -1 ;
 	                    if (fsp->f.zerofill) fill = 0 ;
 	                    rs = subinfo_float(sip,fcode,dv,w,p,fill,tbuf) ;
 	                }
 #else
 	                {
-	                    const char	*cp ;
+	                    cchar	*cp ;
 	                    cp = "* no floating support *" ;
 	                    rs = subinfo_strw(sip,cp,-1) ;
 	                }

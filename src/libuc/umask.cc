@@ -17,18 +17,22 @@
 
 /*******************************************************************************
 
+  	Name:
+	umask
+
+	Description:
 	This module serves to provide two functions that manipulate
 	the UNIX® UMASK.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>
+#include	<sys/stat.h>		/* |mode_t| */
 #include	<csignal>		/* |sig_atomic_t| */
 #include	<climits>		/* |INT_MAX| */
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<aflag.hh>
 #include	<timewatch.hh>
 #include	<sigblocker.h>

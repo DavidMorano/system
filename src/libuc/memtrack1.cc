@@ -32,7 +32,7 @@
 	memtrack::ifinish
 
 	Description:
-	Reack memory blocks.
+	Track memory blocks.
 
 	Symopsis:
 	int memtrack::start(int n) noex
@@ -55,8 +55,7 @@ module ;
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>
-#include	<cstring>
+#include	<cstdint>		/* |uintptr_t| */
 #include	<utility>		/* |std::unreachable()| */
 #include	<new>			/* |nothrow| */
 #include	<usystem.h>
@@ -90,6 +89,15 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
+template<typename ... Args>
+static inline int memtrack_magic(memtrack *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == memtrack_magicval) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (memtrack_magic) */
 
 /* lcaal variables */
 
@@ -100,8 +108,8 @@ using std::nothrow ;			/* constant */
 /* exported subroutines */
 
 int memtrack::ins(cvoid *addr,int asize) noex {
-	int		rs = SR_NOTOPEN ;
-	if (magic == memtrack_magic) {
+	int		rs ;
+	if ((rs = memtrack_magic(this)) >= 0) {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr && (asize > 0)) {
@@ -114,8 +122,8 @@ int memtrack::ins(cvoid *addr,int asize) noex {
 /* end method (memtrack::ins) */
 
 int memtrack::rem(cvoid *addr) noex {
-	int		rs = SR_NOTOPEN ;
-	if (magic == memtrack_magic) {
+	int		rs ;
+	if ((rs = memtrack_magic(this)) >= 0) {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr) {
@@ -127,8 +135,8 @@ int memtrack::rem(cvoid *addr) noex {
 /* end method (memtrack::rem) */
 
 int memtrack::present(cvoid *addr) noex {
-	int		rs = SR_NOTOPEN ;
-	if (magic == memtrack_magic) {
+	int		rs ;
+	if ((rs = memtrack_magic(this)) >= 0) {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr) {
@@ -142,8 +150,8 @@ int memtrack::present(cvoid *addr) noex {
 /* end method (memtrack::present) */
 
 int memtrack::get(cvoid *addr,memtrack_ent *ep) noex {
-	int		rs = SR_NOTOPEN ;
-	if (magic == memtrack_magic) {
+	int		rs ;
+	if ((rs = memtrack_magic(this)) >= 0) {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr) {
@@ -165,7 +173,7 @@ int memtrack::istart(int n) noex {
 	if (n >= 0) {
 	    if ((tp = new(nothrow) track_t) != nullptr) {
 	        if ((rs = tp->start(n)) >= 0) {
-		    magic = memtrack_magic ;
+		    magic = memtrack_magicval ;
 	        }
 		if (rs < 0) {
 		    delete tp ;
@@ -178,9 +186,9 @@ int memtrack::istart(int n) noex {
 /* end method (memtrack::istart) */
 
 int memtrack::ifinish() noex {
-	int		rs = SR_NOTOPEN ;
+	int		rs ;
 	int		rs1 ;
-	if (magic == memtrack_magic) {
+	if ((rs = memtrack_magic(this)) >= 0) {
 	    rs = SR_OK ;
 	    {
 	        rs1 = tp->finish() ;
@@ -197,8 +205,8 @@ int memtrack::ifinish() noex {
 /* end method (memtrack::ifinish) */
 
 int memtrack::icount() noex {
-	int		rs = SR_NOTOPEN ;
-	if (magic == memtrack_magic) {
+	int		rs ;
+	if ((rs = memtrack_magic(this)) >= 0) {
 	    rs = tp->count() ;
 	} /* end if (was open) */
 	return rs ;
@@ -207,8 +215,8 @@ int memtrack::icount() noex {
 
 void memtrack::dtor() noex {
 	ulogerror("memtrack",SR_BUGCHECK,"dtor called") ;
-	if (magic == memtrack_magic) {
-	    if (cint rs = ifinish() ; rs < 0) {
+	if (int rs = memtrack_magic(this) ; rs >= 0) {
+	    if ((rs = ifinish()) < 0) {
 		ulogerror("memtrack",rs,"dtor-finish") ;
 	    }
 	}
@@ -234,6 +242,6 @@ int memtrack_co::operator () (int a) noex {
 	} /* end if (valid) */
 	return rs ;
 }
-/* end method (memtrack_co::operator int) */
+/* end method (memtrack_co::operator) */
 
 

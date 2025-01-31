@@ -1,9 +1,9 @@
 /* format SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to format string output */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGZ	0	/* turn on debugging */
 #define	CF_DEBUGZZ	0	/* extra */
@@ -21,13 +21,13 @@
 #define	CF_BINARYMIN	1	/* perform binary conversion minimally */
 #define	CF_BINCHAR	0	/* compile in 'binchar()' */
 
-
 /* revision history:
 
 	= 1998-03-01, David A�D� Morano
-        Of course, this subroutine was inspired by the UNIX® equivalent, but
-        this is my own version for a. when I don't have the UNIX® libraries
-        around, and b. to customize it to what I want!
+	Of course, this subroutine was inspired by the UNIX®
+	equivalent, but this is my own version for a. when I don't
+	have the UNIX® libraries around, and b. to customize it
+	to what I want!
 
 */
 
@@ -35,10 +35,14 @@
 
 /*******************************************************************************
 
+  	Name:
+	format
+
 	Description:
-	This subroutine is used by 'printf()' type routines to format an output
-	string from a format specification.  Floating point support is optional
-	at compile time by using the compile time switch "CF_FLOAT".
+	This subroutine is used by 'printf()' type routines to
+	format an output string from a format specification.  Floating
+	point support is optional at compile time by using the
+	compile time switch "CF_FLOAT".
 
 	Synopsis:
 	int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex
@@ -49,7 +53,6 @@
 	mode		formatting mode (options)
 	fmt		the format string
 	ap		argument-pointer (see STDARG)
-
 
 	Returns:
 	<0		error (if mode allows errors to be returned)
@@ -114,6 +117,7 @@
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 #include	"format.h"
 
@@ -208,15 +212,6 @@ extern "C" {
     extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
     extern int	strlinelen(const char *,int,int) ;
 }
-
-#if	CF_DEBUGZ
-extern "C" {
-    extern int	zprint(cchar *,cchar *,int) ;
-    extern int	zprintf(cchar *,cchar *,...) ;
-    extern int	mkhexstr(char *,int,void *,int) ;
-    extern int	hexblock(const char *,void *,int) ;
-}
-#endif
 
 extern "C" {
     extern char	*strwcpy(char *,const char *,int) ;

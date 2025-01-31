@@ -1,7 +1,9 @@
-/* bbinter */
+/* bbinter SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* the user bbinterface (command bbinterpreter) for VMAIL */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
@@ -11,12 +13,11 @@
 #define	CF_WELCOME	1		/* issue welcome info */
 #define	CF_KBDINFO	1		/* activate KBDINFO */
 
-
 /* revision history:
 
 	= 2009-01-20, David A­D­ Morano
-        This is a complete rewrite of the trash that performed this function
-        previously.
+	This is a complete rewrite of the trash that performed this
+	function previously.
 
 */
 
@@ -24,15 +25,18 @@
 
 /*******************************************************************************
 
+  	Name:
+	bbinter
+
+	Description:
 	This subroutine is the main bbinteractive loop.
 
 	Implimentation notes:
-
 	Caching: We cache scanlines (scan-line data) in two places.
-	This is probably needless but we are doing it anyway.  It is first
-	cached in the mailbox-cache (MBCACHE) object.  It is secondarily
-	cached in our own DISPLAY object.  Mail-message viewing data is
-	cached in the MAILMSGFILE object.
+	This is probably needless but we are doing it anyway.  It
+	is first cached in the mailbox-cache (MBCACHE) object.  It
+	is secondarily cached in our own DISPLAY object.  Mail-message
+	viewing data is cached in the MAILMSGFILE object.
 
 *******************************************************************************/
 
@@ -60,6 +64,7 @@
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 #include	"mailmsg.h"
 #include	"keysymer.h"
@@ -149,13 +154,6 @@ extern int	iscmdstart(int) ;
 extern int	mailboxappend(const char *,int,int) ;
 extern int	mkdisplayable(char *,int,const char *,int) ;
 extern int	compactstr(char *,int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const void *,int) ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	mkhexstr(char *,int,const void *,int) ;
-#endif
 
 extern char	*strwcpy(char *,const char *,int) ;
 extern char	*strnchr(const char *,int,int) ;

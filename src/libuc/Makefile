@@ -806,6 +806,11 @@ sigobj.o:		sigobj.dir
 sigobj.dir:
 	makesubdir $@
 
+# UTERM
+uterm.o:		uterm.dir
+uterm.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 

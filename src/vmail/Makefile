@@ -169,13 +169,13 @@ OBJ14= mailbox.o mailbox_getfrom.o tmpmailboxes.o
 OBJ15= mailmsg.o mailmsg_loadmb.o mailmsg_enver.o
 
 OBJ16= mailmsghdrval.o mailmsghdrfold.o mbcache.o
-OBJ17= td.o termstr.o uterm.o uterm_readcmd.o termcmd.o
-OBJ18= keysymer.o kbdinfo.o cmdmap.o subprocs.o
-OBJ19= dirseen.o ema.o useraccdb.o
+OBJ17=
+OBJ18= kbdinfo.o cmdmap.o subprocs.o
+OBJ19=
 OBJ20= sigign.o
 OBJ21= varray.o
-OBJ22= hdrdecode.o qpdecoder.o b64decoder.o utf8decoder.o obuf.o
-OBJ23= chartrans.o uiconv.o strmgr.o
+OBJ22=
+OBJ23=
 
 OBJ24=
 OBJ25=
@@ -347,7 +347,7 @@ progconfig.o:		progconfig.c $(INCS)
 
 proglog.o:		proglog.c $(INCS)
 
-progterm.o:		progterm.c $(INCS) uterm.h inter.h
+progterm.o:		progterm.c $(INCS) inter.h
 
 progmailget.o:		progmailget.c $(INCS)
 
@@ -355,7 +355,7 @@ proguserlist.o:		proguserlist.c $(INCS)
 
 initnow.o:		initnow.c $(INCS)
 
-inter.o:		inter.c inter.h $(INCS) uterm.h ds.h display.h
+inter.o:		inter.c inter.h $(INCS) ds.h display.h
 inter.o:		mailbox.h mailmsgviewer.h mbcache.h
 inter.o:		kbdinfo.h cmdmap.h subprocs.h
 

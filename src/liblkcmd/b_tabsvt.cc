@@ -1,4 +1,5 @@
 /* b_tabsvt SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* KSH built-in version of 's(1d)' */
@@ -43,7 +44,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* must be ordered first to configure */
 
 #if	defined(SFIO) || defined(SFIO > 0)
 #define	CF_SFIO	1
@@ -66,7 +67,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<vecstr.h>
@@ -75,6 +75,7 @@
 #include	<termstr.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 #include	"shio.h"
 #include	"kshlib.h"

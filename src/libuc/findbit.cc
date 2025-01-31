@@ -29,7 +29,26 @@
 
 /******************************************************************************
 
-	Find bits that meet a certain criteria in an integer (or long).
+  	Group:
+	findbit
+
+	Names:
+	ffbsi
+	ffbsl
+	ffbsll
+	ffbci
+	ffbcl
+	ffbcll
+	flbsi
+	flbsl
+	flbsll
+	flbci
+	flbcl
+	flbcll
+
+	Description:
+	Find bits that meet a certain criteria in an integer (of
+	some type).
 
 	ffbs[il]	find first bit set [integer, long, longlong]
 	flbs[il]	find last bit set [integer, long, longlong]
@@ -37,13 +56,32 @@
 	ffbc[il]	find first bit clear [integer, long, longlong]
 	flbc[il]	find last bit clear [integer, long, longlong]
 
-	Notes:
+	Synopsis:
+	int ffbsi(uint v) noex
+	int ffbsl(ulong v) noex 
+	int ffbsll(ulonglong v) noex 
+	int ffbci(uint v) noex 
+	int ffbcl(ulong v) noex 
+	int ffbcll(ulonglong v) noex 
+	int flbsi(uint v) noex 
+	int flbsl(ulong v) noex 
+	int flbsll(ulonglong v) noex 
+	int flbci(uint v) noex 
+	int flbcl(ulong v) noex 
+	int flbcll(ulonglong v) noex 
 
+	Arguments:
+	v		value to compute result for
+
+	Returns:
+	-		result: -1 or bit-number (0 - (n-1))
+
+	Notes:
 	There are (obviously) a lot of ways to implement these sorts
 	of functions.  Doing these functions in hardware used to be
 	the norm in the olden days.  But the reach for the modern
 	RISC (we no longer count machines like the CDC [67]600
-	variations) screwed that pooch! For the |ffbsx()| functions
+	variations) screwed that pooch!  For the |ffbsx()| functions
 	we have traditionally done a bit more work since they are
 	more commonly used than the others.  We used to use a
 	relatively larger look-up table for it, but we have now
@@ -57,11 +95,14 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<stdintx.h>
+#include	<usysdefs.h>
+#include	<stdintx.h>		/* for type |longlong| */
 
 
 /* local defines */
@@ -133,7 +174,7 @@ const unsigned char	flbstab[] = {
 
 int ffbsi(uint v) noex {
 	uint		ti, tr ;
-	cint		nb = sizeof(uint) ;
+	cint		nb = szof(uint) ;
 	int		i = -1 ;
 	int		s ;
 	int		n ;
@@ -153,7 +194,7 @@ int ffbsi(uint v) noex {
 
 int ffbsl(ulong v) noex {
 	ulong		ti, tr ;
-	cint		nb = sizeof(ulong) ;
+	cint		nb = szof(ulong) ;
 	int		i = -1 ;
 	int		s ;
 	int		n ;
@@ -173,7 +214,7 @@ int ffbsl(ulong v) noex {
 
 int ffbsll(ulonglong v) noex {
 	ulonglong	ti, tr ;
-	cint		nb = sizeof(ulonglong) ;
+	cint		nb = szof(ulonglong) ;
 	int		i = -1 ;
 	int		s ;
 	int		n ;
@@ -192,8 +233,8 @@ int ffbsll(ulonglong v) noex {
 /* end subroutine (ffbsll) */
 
 int ffbci(uint v) noex {
-	cint		n = (8*sizeof(uint)) ;
-	int		i ;
+	cint		n = (CHAR_BIT * szof(uint)) ;
+	int		i ; /* U-A */
 	for (i = 0 ; i < n ; i += 1) {
 	    if (! (v & 1)) break ;
 	    v = v >> 1 ;
@@ -203,8 +244,8 @@ int ffbci(uint v) noex {
 /* end subroutine (ffbci) */
 
 int ffbcl(ulong v) noex {
-	cint		n = (8*sizeof(ulong)) ;
-	int		i ;
+	cint		n = (CHAR_BIT * szof(ulong)) ;
+	int		i ; /* U-A */
 	for (i = 0 ; i < n ; i += 1) {
 	    if (! (v & 1)) break ;
 	    v = v >> 1 ;
@@ -214,8 +255,8 @@ int ffbcl(ulong v) noex {
 /* end subroutine (ffbcl) */
 
 int ffbcll(ulonglong v) noex {
-	cint		n = (8*sizeof(ulonglong)) ;
-	int		i ;
+	cint		n = (CHAR_BIT * szof(ulonglong)) ;
+	int		i ; /* U-A */
 	for (i = 0 ; i < n ; i += 1) {
 	    if (! (v & 1)) break ;
 	    v = v >> 1 ;
@@ -226,7 +267,7 @@ int ffbcll(ulonglong v) noex {
 
 int flbsi(uint v) noex {
 	uint		ti, tr ;
-	cint		nb = sizeof(uint) ;
+	cint		nb = szof(uint) ;
 	int		i = -1 ;
 	int		s ;
 	int		n ;
@@ -246,7 +287,7 @@ int flbsi(uint v) noex {
 
 int flbsl(ulong v) noex {
 	ulong		ti, tr ;
-	cint		nb = sizeof(ulong) ;
+	cint		nb = szof(ulong) ;
 	int		i = -1 ;
 	int		s ;
 	int		n ;
@@ -266,7 +307,7 @@ int flbsl(ulong v) noex {
 
 int flbsll(ulonglong v) noex {
 	ulonglong	ti, tr ;
-	cint		nb = sizeof(ulonglong) ;
+	cint		nb = szof(ulonglong) ;
 	int		i = -1 ;
 	int		s ;
 	int		n ;
@@ -285,37 +326,37 @@ int flbsll(ulonglong v) noex {
 /* end subroutine (flbsll) */
 
 int flbci(uint v) noex {
-	cint		n = (8*sizeof(uint)) ;
-	int		i ;
+	cint		n = (CHAR_BIT * szof(uint)) ;
+	int		i ; /* U-A */
 	for (i = (n - 1) ; i >= 0 ; i -= 1) {
 	    if (! ((v >> i) & 1)) break ;
 	} /* end for */
-	return (i >= 0) ? i : -1 ;
+	return i ;
 }
 /* end subroutine (flbci) */
 
 int flbcl(ulong v) noex {
-	cint		n = (8*sizeof(ulong)) ;
-	int		i ;
+	cint		n = (CHAR_BIT * szof(ulong)) ;
+	int		i ; /* U-A */
 	for (i = (n - 1) ; i >= 0 ; i -= 1) {
 	    if (! ((v >> i) & 1)) break ;
 	} /* end for */
-	return (i >= 0) ? i : -1 ;
+	return i ;
 }
 /* end subroutine (flbcl) */
 
 int flbcll(ulonglong v) noex {
-	cint		n = (8*sizeof(ulonglong)) ;
-	int		i ;
+	cint		n = (CHAR_BIT * szof(ulonglong)) ;
+	int		i ; /* U-A */
 	for (i = (n - 1) ; i >= 0 ; i -= 1) {
 	    if (! ((v >> i) & 1)) break ;
 	} /* end for */
-	return (i >= 0) ? i : -1 ;
+	return i ;
 }
 /* end subroutine (flbcll) */
 
 int fbscounti(uint v) noex {
-	cint		n = (8*sizeof(uint)) ;
+	cint		n = (CHAR_BIT * szof(uint)) ;
 	int		c = 0 ;
 	for (int i = 0 ; i < n ; i += 1) {
 	    if (v & 1) c += 1 ;
@@ -326,7 +367,7 @@ int fbscounti(uint v) noex {
 /* end subroutine (fbscounti) */
 
 int fbscountl(ulong v) noex {
-	cint		n = (8*sizeof(ulong)) ;
+	cint		n = (CHAR_BIT * szof(ulong)) ;
 	int		c = 0 ;
 	for (int i = 0 ; i < n ; i += 1) {
 	    if (v & 1) c += 1 ;
@@ -337,7 +378,7 @@ int fbscountl(ulong v) noex {
 /* end subroutine (fbscountl) */
 
 int fbscountll(ulonglong v) noex {
-	cint		n = (8*sizeof(ulonglong)) ;
+	cint		n = (CHAR_BIT * szof(ulonglong)) ;
 	int		c = 0 ;
 	for (int i = 0 ; i < n ; i += 1) {
 	    if (v & 1) c += 1 ;

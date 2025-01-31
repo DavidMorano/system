@@ -1,4 +1,6 @@
-/* zprintf */
+/* zprintf SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* 'Named File' printf subroutine */
 /* version %I% last-modified %G% */
@@ -15,29 +17,26 @@
 
 /*******************************************************************************
 
-	This subroutine performs a 'printf' like function but to the named file
-	which is passed as the first argument.
+  	Name:
+	printf
+
+	Description:
+	This subroutine performs a 'printf' like function but to
+	the named file which is passed as the first argument.
 
 	Synopsis:
-
-	int zprintf(fname,fmt,...)
-	const char	fname[] ;
-	const char	fmt[] ;
-	...		
+	int zprintf(cchar *fname,cchar *fmt,...) noex
 
 	Arguments:
-
 	fname		file to print to
 	fmt		standard format string
 	...		enverything else
 
 	Returns:
-
 	>=0		length of data (in bytes) written to file
-	<0		failure
+	<0		failure (system-return)
 
-
-	+ Notes:
+	Notes:
 
 	Q. Does this subroutine have to be multi-thread-safe?
 	A. In short, of course!
@@ -57,47 +56,40 @@
         rather a section beyong what was written. So we use |uc_lockfile(3uc)|
         instead to just lock and unlock the entire file.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
-#include	<stdarg.h>
-#include	<stdio.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstdio>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<localmisc.h>
+#include	<mkx.h>
+#include	<rmx.h>
+#include	<strwcpy.h>
+#include	<format.h>
+#include	<localmisc.h>		/* |COLUMNS| */
 
-#include	"format.h"
+#include	"zprintf.h"
 
 
 /* local defines */
 
-#ifndef	COLUMNS
-#define	COLUMNS		80
-#endif
-
 #define	PBUFLEN		512
 
-#define	SUBINFO		struct subinfo
+#define	SI		struct subinfo
 
 
 /* external subroutines */
 
-extern int	mkhexstr(char *,int,const void *,int) ;
-extern int	rmeol(cchar *,int) ;
 
-extern char	*strwcpy(char *,cchar *,int) ;
+/* external variables */
 
 
 /* local structures */
-
-typedef const void	cvoid ;
 
 struct subinfo {
 	cchar		*fn ;
@@ -113,21 +105,22 @@ struct subinfo {
 
 /* forward references */
 
-static int subinfo_start(SUBINFO *,char *,cchar *,cchar *,int) ;
-static int subinfo_finish(SUBINFO *) ;
-static int subinfo_wrline(SUBINFO *,cchar *,int) ;
-static int subinfo_flushover(SUBINFO *,int) ;
-static int subinfo_write(SUBINFO *,cchar *,int) ;
+static int subinfo_start(SI *,char *,cchar *,cchar *,int) noex ;
+static int subinfo_finish(SI *) noex ;
+static int subinfo_wrline(SI *,cchar *,int) noex ;
+static int subinfo_flushover(SI *,int) noex ;
+static int subinfo_write(SI *,cchar *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int zprint(cchar *fn,cchar *sp,int sl)
-{
+int zprint(cchar *fn,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -139,10 +132,10 @@ int zprint(cchar *fn,cchar *sp,int sl)
 	if (sl < 0) sl = strlen(sp) ;
 
 	if (sl > 0) {
-	    const int	of = (O_WRONLY | O_APPEND) ;
+	    cint	of = (O_WRONLY | O_APPEND) ;
 	    if ((rs = u_open(fn,of,0666)) >= 0) {
-	        const int	fd = rs ;
-		const int	cmd = F_LOCK ;
+	        cint	fd = rs ;
+		cint	cmd = F_LOCK ;
 		if ((rs = uc_lockfile(fd,cmd,0L,0L,-1)) >= 0) {
 	            if ((rs = uc_writen(fd,sp,sl)) >= 0) {
 		        len = rs ;
@@ -161,9 +154,7 @@ int zprint(cchar *fn,cchar *sp,int sl)
 }
 /* end subroutine (zprint) */
 
-
-int zprintf(cchar *fn,cchar *fmt,...)
-{
+int zprintf(cchar *fn,cchar *fmt,...) noex {
 	int		rs = SR_OK ;
 	int		fl = 0 ;
 
@@ -175,7 +166,7 @@ int zprintf(cchar *fn,cchar *fmt,...)
 	if (fmt[0] != '\0') {
 	    va_list	ap ;
 	    va_begin(ap,fmt) ;
-	    const int	flen = PBUFLEN ;
+	    cint	flen = PBUFLEN ;
 	    char	fbuf[PBUFLEN + 1] ;
 	    if ((fl = vsnprintf(fbuf,flen,fmt,ap)) > 0) {
 		rs = zprint(fn,fbuf,fl) ;
@@ -187,10 +178,8 @@ int zprintf(cchar *fn,cchar *fmt,...)
 }
 /* end subroutine (zprintf) */
 
-
-int zprinthexblock(cchar *fn,cchar *id,int mc,const void *vp,int vl)
-{
-	SUBINFO		si ;
+int zprinthexblock(cchar *fn,cchar *id,int mc,cvoid *vp,int vl) noex {
+	SI		si ;
 	int		rs ;
 	int		sl = vl ;
 	int		wlen = 0 ;
@@ -223,25 +212,24 @@ int zprinthexblock(cchar *fn,cchar *id,int mc,const void *vp,int vl)
 
 /* local subroutines */
 
-
-static int subinfo_start(SUBINFO *sip,char *bp,cchar *fn,cchar *id,int mc)
-{
-	memset(sip,0,sizeof(SUBINFO)) ;
-	sip->bp = bp ;
-	sip->fn = fn ;
-	sip->mc = mc ;
-	sip->blen = PBUFLEN ;
-	if (id != NULL) {
-	    sip->id = id ;
-	    sip->ilen = strlen(id) ;
-	}
-	return SR_OK ;
+static int subinfo_start(SI *sip,char *bp,cchar *fn,cchar *id,int mc) noex {
+    	int		rs = SR_FAULT ;
+	if (sip) {
+	    rs = memclear(sip) ;
+	    sip->bp = bp ;
+	    sip->fn = fn ;
+	    sip->mc = mc ;
+	    sip->blen = PBUFLEN ;
+	    if (id) {
+	        sip->id = id ;
+	        sip->ilen = strlen(id) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subfino_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
+static int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
 	if (sip->bl > 0) {
 	    if ((rs = zprint(sip->fn,sip->bp,sip->bl)) >= 0) {
@@ -253,10 +241,8 @@ static int subinfo_finish(SUBINFO *sip)
 }
 /* end subroutine (subfino_finish) */
 
-
-static int subinfo_wrline(SUBINFO *sip,cchar *sp,int sl)
-{
-	const int	mlen = MIN((3*sl),(sip->mc-sip->ilen+1)) ;
+static int subinfo_wrline(SI *sip,cchar *sp,int sl) noex {
+	cint		mlen = MIN((3*sl),(sip->mc-sip->ilen+1)) ;
 	int		rs ;
 	int		ul = 0 ;
 
@@ -265,9 +251,9 @@ static int subinfo_wrline(SUBINFO *sip,cchar *sp,int sl)
 		rs = subinfo_write(sip,sip->id,sip->ilen) ;
 	    }
 	    if (rs >= 0) {
-		const int	alen = (sip->blen - sip->bl) ;
-		const int	n = (mlen / 3) ;
-	        char		*bp = (sip->bp + sip->bl) ;
+		cint	alen = (sip->blen - sip->bl) ;
+		cint	n = (mlen / 3) ;
+	        char	*bp = (sip->bp + sip->bl) ;
 	        if ((rs = mkhexstr(bp,alen,sp,n)) >= 0) {
 		    sip->bl += rs ;
 		    sip->bp[sip->bl++] = '\n' ;
@@ -280,9 +266,7 @@ static int subinfo_wrline(SUBINFO *sip,cchar *sp,int sl)
 }
 /* end subroutine (subinfo_wrline) */
 
-
-static int subinfo_flushover(SUBINFO *sip,int mlen)
-{
+static int subinfo_flushover(SI *sip,int mlen) noex {
 	int		rs = SR_OK ;
 	if (mlen > (sip->blen-sip->bl)) {
 	    char	*bp = (sip->bp + sip->bl) ;
@@ -295,11 +279,9 @@ static int subinfo_flushover(SUBINFO *sip,int mlen)
 }
 /* end subroutine (subfino_flushover) */
 
-
-static int subinfo_write(SUBINFO *sip,cchar *sp,int sl)
-{
+static int subinfo_write(SI *sip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	if (sl < (sip->blen-sip->bl)) {
+	if (sl < (sip->blen - sip->bl)) {
 	    char	*bp = (sip->bp + sip->bl) ;
 	    rs = (strwcpy(bp,sp,sl) - sip->bp) ;
 	    sip->bl += rs ;

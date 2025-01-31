@@ -32,7 +32,7 @@
 	(Basic I-O).  These file pointers must be eventually closed
 	by the calling routine or somebody!  One returned file
 	pointer is to a file of the path names.  The other file
-	pointer is a file of an array of 'stat(2)' structures
+	pointer is a file of an array of |stat(2)| structures
 	corresponding to the directory specified by the path in the
 	other file.
 
@@ -51,10 +51,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -67,7 +67,7 @@
 #include	<pathadd.h>
 #include	<strwcmp.h>
 #include	<mktmp.h>		/* |mktmpfile(3uc)| */
-#include	<isnot.h>
+#include	<isnot.h>		/* |isNotPresent(3uc)| */
 #include	<localmisc.h>
 
 #include	"mkdirlist.h"
@@ -408,12 +408,14 @@ static int mkdirlist_pdc(mkdirlist *op,cchar *ndn,int fd) noex {
 	                        }
 	                    } else {
 	                        if ((rs = pathadd(dbuf,dlen,nbuf)) >= 0) {
-	                            if (u_stat(dbuf,&sb) >= 0) {
+	                            if ((rs = u_stat(dbuf,&sb) >= 0)) {
 	                                rs = mkdirlist_newent(op,&sb,nbuf,len) ;
 	                                c += rs ;
-	                            }
+	                            } else if (isNotPresent(rs)) {
+					rs = SR_OK ;
+				    }
 	                        }
-	                    }
+	                    } /* end if */
 	                } /* end if (BOL) */
 	                f_bol = f_eol ;
 	                if (rs < 0) break ;
@@ -434,8 +436,7 @@ static int mkdirlist_pdn(MKDIRLIST *op,cchar *ndn) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		*nbuf{} ;
-	if ((rs = malloc_mp(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = malloc_mp(&nbuf)) >= 0) {
 	    fsdirtree	dir ;
 	    cint	nlen = rs ;
 	    if ((rs = fsdirtree_open(&dir,ndn,dot)) >= 0) {
@@ -459,11 +460,10 @@ static int mkdirlist_pdn(MKDIRLIST *op,cchar *ndn) noex {
 /* end subroutine (mkdirlist_pdn) */
 
 static int mkdirlist_newent(mkdirlist *op,USTAT *sbp,cc *nbuf,int nlen) noex {
-	cint		esize = szof(mkdirlist_ent) ;
+	cint		esz = szof(mkdirlist_ent) ;
 	int		rs ;
 	int		c = 0 ;
-	void		*vp{} ;
-	if ((rs = uc_malloc(esize,&vp)) >= 0) {
+	if (void *vp ; (rs = uc_malloc(esz,&vp)) >= 0) {
 	    mkdirlist_ent	*ep = entp(vp) ;
 	    if ((rs = entry_start(ep,sbp,nbuf,nlen)) > 0) { /* rs>0 */
 	        c = rs ;

@@ -1,4 +1,5 @@
 /* recorder SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string recorder object */
@@ -22,8 +23,12 @@
 
 /*******************************************************************************
 
+  	Name:
+	recorder
+
+	Description:
 	This object module creates records that represent system
-	password (PASSWD DB) username and realname information. The
+	password (PASSWD DB) username and realname information.  The
 	recrods can be indexed by various numbers of characters
 	from the last name and the first name of each record.
 
@@ -39,6 +44,7 @@
 #include	<nextpowtwo.h>
 #include	<randlc.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 #include	"recorder.h"
 
@@ -57,12 +63,6 @@
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	mkhexstr(char *,int,const void *,int) ;
-#endif
 
 
 /* external variables */
@@ -83,7 +83,7 @@ static int	recorder_matun(RECORDER *,cchar *,uint [][2],int,cchar *) ;
 static int	recorder_cden(RECORDER *,int,int) ;
 
 #if	CF_DEBUGS && CF_DEBUGBOUNDS
-static int inbounds(const char *,int,const char *) ;
+static int inbounds(cchar *,int,cchar *) ;
 #endif
 
 
@@ -111,7 +111,7 @@ int recorder_start(RECORDER *asp,int n,int opts) noex {
 
 	if (asp == NULL) return SR_FAULT ;
 
-	memset(asp,0,sizeof(RECORDER)) ;
+	memclear(asp) ;
 
 	if (n < RECORDER_STARTNUM)
 	    n = RECORDER_STARTNUM ;
@@ -120,7 +120,7 @@ int recorder_start(RECORDER *asp,int n,int opts) noex {
 	debugprintf("recorder_start: allocating RECTAB n=%d\n",n) ;
 #endif
 
-	size = (n * sizeof(RECORDER_ENT)) ;
+	size = (n * szof(RECORDER_ENT)) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 	    asp->rectab = p ;
 	    asp->e = n ;
@@ -203,7 +203,7 @@ int recorder_add(RECORDER *asp,RECORDER_ENT *ep) noex {
 /* end subroutine (recorder_add) */
 
 int recorder_already(RECORDER *asp,RECORDER_ENT *ep) noex {
-	cint		esize = sizeof(RECORDER_ENT) ;
+	cint		esize = szof(RECORDER_ENT) ;
 	int		i ;
 
 #if	CF_SAFE
@@ -272,7 +272,7 @@ int recorder_indsize(RECORDER *asp) noex {
 
 	n = nextpowtwo(asp->i) ;
 
-	return (n * 2 * sizeof(int)) ;
+	return (n * 2 * szof(int)) ;
 }
 /* end subroutine (recorder_indsize) */
 
@@ -290,7 +290,7 @@ int recorder_gettab(RECORDER *asp,RECORDER_ENT **rpp) noex {
 	    *rpp = asp->rectab ;
 	}
 
-	size = (asp->i * sizeof(RECORDER_ENT)) ;
+	size = (asp->i * szof(RECORDER_ENT)) ;
 	return size ;
 }
 /* end subroutine (recorder_gettab) */
@@ -301,7 +301,7 @@ int recorder_mkindl1(RECORDER *asp,cchar *s,uint (*it)[2],int itsize) noex {
 #if	CF_DEBUGSHIFT
 	int		ns = (nshift > 0) ? nshift : NSHIFT ;
 #else
-	const int	ns = NSHIFT ;
+	cint	ns = NSHIFT ;
 #endif
 	int		rs = SR_OK ;
 	int		hi, ri, c, nc = 1 ;
@@ -323,7 +323,7 @@ int recorder_mkindl1(RECORDER *asp,cchar *s,uint (*it)[2],int itsize) noex {
 
 	n = nextpowtwo(asp->i) ;
 
-	size = n * 2 * sizeof(uint) ;
+	size = n * 2 * szof(uint) ;
 
 #if	CF_DEBUGS
 	debugprintf("recorder_mkindl1: size calc=%u given=%u\n",
@@ -459,14 +459,14 @@ int recorder_mkindl3(RECORDER *asp,cchar s[],uint it[][2],int itsize) noex {
 #if	CF_DEBUGSHIFT
 	int		ns = (nshift > 0) ? nshift : NSHIFT ;
 #else
-	const int	ns = NSHIFT ;
+	cint	ns = NSHIFT ;
 #endif
 	int		rs = SR_OK ;
 	int		hi, ri, c ;
 	int		nc = 3 ;
 	int		sl, hl, n, size ;
 	int		wi = index_l3 ;
-	const char	*sp ;
+	cchar	*sp ;
 
 #if	CF_SAFE
 	if (asp == NULL) return SR_FAULT ;
@@ -479,7 +479,7 @@ int recorder_mkindl3(RECORDER *asp,cchar s[],uint it[][2],int itsize) noex {
 
 	n = nextpowtwo(asp->i) ;
 
-	size = n * 2 * sizeof(uint) ;
+	size = n * 2 * szof(uint) ;
 
 	if (size > itsize)
 	    return SR_OVERFLOW ;
@@ -576,13 +576,13 @@ int recorder_mkindf(RECORDER *asp,cchar s[],uint it[][2],int itsize) noex {
 #if	CF_DEBUGSHIFT
 	int		ns = (nshift > 0) ? nshift : NSHIFT ;
 #else
-	const int	ns = NSHIFT ;
+	cint	ns = NSHIFT ;
 #endif
 	int		rs = SR_OK ;
 	int		hi, ri, c, nc = 1 ;
 	int		sl, hl, n, size ;
 	int		wi = index_f ;
-	const char	*sp ;
+	cchar	*sp ;
 
 #if	CF_SAFE
 	if (asp == NULL) return SR_FAULT ;
@@ -594,7 +594,7 @@ int recorder_mkindf(RECORDER *asp,cchar s[],uint it[][2],int itsize) noex {
 
 	n = nextpowtwo(asp->i) ;
 
-	size = n * 2 * sizeof(uint) ;
+	size = n * 2 * szof(uint) ;
 
 	if (size > itsize)
 	    return SR_OVERFLOW ;
@@ -698,13 +698,13 @@ int recorder_mkindfl3(RECORDER *asp,cchar s[],uint it[][2],int itsize) noex {
 #if	CF_DEBUGSHIFT
 	int		ns = (nshift > 0) ? nshift : NSHIFT ;
 #else
-	const int	ns = NSHIFT ;
+	cint	ns = NSHIFT ;
 #endif
 	int		rs = SR_OK ;
 	int		hi, ri, c, maxlast ;
 	int		sl, hl, n, size ;
 	int		wi = index_fl3 ;
-	const char	*sp ;
+	cchar	*sp ;
 	char		hbuf[4 + 1] ;
 
 #if	CF_SAFE
@@ -717,7 +717,7 @@ int recorder_mkindfl3(RECORDER *asp,cchar s[],uint it[][2],int itsize) noex {
 
 	n = nextpowtwo(asp->i) ;
 
-	size = n * 2 * sizeof(uint) ;
+	size = n * 2 * szof(uint) ;
 
 	if (size > itsize)
 	    return SR_OVERFLOW ;
@@ -836,13 +836,13 @@ int recorder_mkindun(RECORDER *asp,cchar s[],uint it[][2],int itsize) noex {
 #if	CF_DEBUGSHIFT
 	int		ns = (nshift > 0) ? nshift : NSHIFT ;
 #else
-	const int	ns = NSHIFT ;
+	cint	ns = NSHIFT ;
 #endif
 	int		rs = SR_OK ;
 	int		hi, ri, c ;
 	int		hl, n, size ;
 	int		wi = index_un ;
-	const char	*hp ;
+	cchar	*hp ;
 
 #if	CF_SAFE
 	if (asp == NULL) return SR_FAULT ;
@@ -854,7 +854,7 @@ int recorder_mkindun(RECORDER *asp,cchar s[],uint it[][2],int itsize) noex {
 
 	n = nextpowtwo(asp->i) ;
 
-	size = n * 2 * sizeof(uint) ;
+	size = n * 2 * szof(uint) ;
 
 	if (size > itsize)
 	    return SR_OVERFLOW ;
@@ -994,7 +994,7 @@ static int recorder_extend(RECORDER *asp) noex {
 	ne = (asp->e + RECORDER_STARTNUM) ;
 #endif /* CF_FASTGROW */
 
-	size = ne * sizeof(RECORDER_ENT) ;
+	size = ne * szof(RECORDER_ENT) ;
 	if ((rs = uc_realloc(asp->rectab,size,&nrt)) >= 0) {
 	    asp->e = ne ;
 	    asp->rectab = (RECORDER_ENT *) nrt ;

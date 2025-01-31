@@ -1,5 +1,6 @@
 /* debug SUPPORT */
-/* lang=C++20 */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* debugging stubs */
 /* version %I% last-modified %G% */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	debug
+
+	Description:
 	This modeule provides debugging support.
 
 *******************************************************************************/
@@ -26,7 +31,9 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstdarg>
 #include	<cstring>
 #include	<usystem.h>
 #include	<storebuf.h>

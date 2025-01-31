@@ -21,7 +21,7 @@
 /*******************************************************************************
 
   	Object:
-	TIMEVAL
+	timeval
 
 	Description:
 	We manage (a little bit) the TIMEVAL object.
@@ -30,6 +30,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<ctime>			/* |TIMEVAL| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 

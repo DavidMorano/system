@@ -123,7 +123,7 @@ OBJ05=
 OBJ06=
 OBJ07= printhelp.o
 OBJ08=
-OBJ09= uterm.o
+OBJ09=
 OBJ10=
 OBJ11=
 OBJ12=
@@ -207,7 +207,7 @@ control:
 	date >> Control
 
 
-main.o:			main.c $(INCS) uterm.h
+main.o:			main.c $(INCS)
 
 whatinfo.o:		whatinfo.c config.h
 
@@ -216,12 +216,5 @@ proginfo.o:		proginfo.c defs.h
 proginfo_setpiv.o:	proginfo_setpiv.c defs.h
 
 process.o:		process.c $(INCS)
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-uterm.o:		uterm.c uterm.h
 
 

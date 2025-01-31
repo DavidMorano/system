@@ -1,9 +1,9 @@
-/* b_s (s) */
+/* b_s SUPPORT (s) */
+/* encoding=ISO8859-1 */
 /* language=C89 */
 
 /* KSH built-in version of 's(1d)' */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -28,12 +28,11 @@
 #define	CF_ANSICSM	1		/* use ANSI-standard Char-Set-Maps */
 #define	CF_TERMMAILNAME	1		/* perform 'termmailname()' */
 
-
 /* revision history:
 
 	= 2004-06-24, David A­D­ Morano
-        I rewrote this from scratch. The previous version of this program was a
-        hack.
+	I rewrote this from scratch.  The previous version of this
+	program was a hack.
 
 */
 
@@ -42,22 +41,17 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ s [arguments]
 
-
 	Notes:
-
 	DCS	ESC P
 	ST	ESC \
 	CSI	ESC <ch_lbracket>
 	LS2R	ESC <ch_rbrace>
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* must be ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -77,7 +71,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<ucmallreg.h>
 #include	<bits.h>
@@ -91,6 +84,7 @@
 #include	<strw.h>		/* |strwset(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 #include	"shio.h"
 #include	"kshlib.h"

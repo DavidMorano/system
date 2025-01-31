@@ -43,9 +43,12 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<unordered_set>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 export module hasduplicate ;
@@ -56,7 +59,13 @@ export module hasduplicate ;
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* forwards references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -66,19 +75,24 @@ export module hasduplicate ;
 
 export {
     template<typename T> bool hasduplicate(const T *sp,int sl) noex {
-	typename std::unordered_set<T>	visited ;
+	typedef typename std::unordered_set<T>::iterator iter_t ;
+	std::unordered_set<T>	visited ;
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (sl > 1) {
-	    typename std::unordered_set<T>::iterator	end = visited.end() ;
-	    for (int i = 0 ; i < sl ; i += 1) {
-	        if (visited.find(*sp) != end) {
-		    f = true ;
-		    break ;
-		} else {
-		    visited.insert(*sp) ;
-		}
-	    } /* end for */
+	    try {
+	        iter_t end = visited.end() ;
+	        for (int i = 0 ; i < sl ; i += 1) {
+	            if (visited.find(*sp) != end) {
+		        f = true ;
+		        break ;
+		    } else {
+		        visited.insert(*sp) ;
+		    }
+	        } /* end for */
+	    } catch (...) {
+		rs = SR_NOMEM ;
+	    }
 	} /* end if (needed more work) */
 	return (rs >= 0) ? f : rs ;
     } /* end subroutine (hasduplicate) */

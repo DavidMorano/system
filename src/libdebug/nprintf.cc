@@ -1,4 +1,5 @@
 /* nprintf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* 'Named File' printf subroutine */
@@ -47,7 +48,6 @@
 	getting a unique file-pointer, we *think* that the |write(2)|
 	shoule be atomic, thus making this subroutine multi-thread-safe.
 
-
 	+ Note on locking:
 	There is no problem using (for example) |uc_lockf(3uc)| for
 	establishing the lock on the file.  The problem comes in
@@ -63,12 +63,15 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<rmx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |COLUMNS| */
+#include	<debug.h>
 
 #include	"format.h"
 #include	"nprintf.h"
@@ -76,14 +79,10 @@
 
 /* local defines */
 
-#ifndef	COLUMNS
-#define	COLUMNS		80
-#endif
-
 #define	PRINTBUFLEN	512
 #define	FBUFLEN		512
 
-#define	SUBINFO		struct subinfo
+#define	SI		struct subinfo
 
 
 /* imported namespaces */
@@ -93,10 +92,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	mkhexstr(char *,int,cvoid *,int) noex ;
-}
 
 
 /* local structures */
@@ -161,13 +156,13 @@ int nprint(cchar *fn,cchar *sp,int sl) noex {
 /* end subroutine (nprint) */
 
 int nprintf(cchar *fn,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		fl = 0 ;
 	if (fn && fmt) {
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
 	        if (fmt[0] != '\0') {
-	            va_list	ap ;
 	            cint	flen = FBUFLEN ;
 	            char	fbuf[FBUFLEN + 1] ;
 	            va_begin(ap,fmt) ;
@@ -187,7 +182,6 @@ int nprinthexblock(cchar *fn,cchar *id,int mc,cvoid *vp,int vl) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if (fn && vp) {
-	    SUBINFO	si ;
 	    int		sl = vl ;
 	    cchar	*sp = (cchar *) vp ;
 	    char	b[PRINTBUFLEN + 1] ;
@@ -195,7 +189,7 @@ int nprinthexblock(cchar *fn,cchar *id,int mc,cvoid *vp,int vl) noex {
 	    if (fn[0]) {
 	        if (mc < 0) mc = COLUMNS ;
 	        if (sl < 0) sl = strlen(sp) ;
-	        if ((rs = subinfo_start(&si,b,fn,id,mc)) >= 0) {
+	        if (SI si ; (rs = subinfo_start(&si,b,fn,id,mc)) >= 0) {
 	            while (sl > 0) {
 		        rs = subinfo_wrline(&si,sp,sl) ;
 		        sp += rs ;
@@ -229,7 +223,7 @@ static int subinfo_start(SI *sip,char *bp,cchar *fn,cchar *id,int mc) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (subfino_start) */
+/* end subroutine (subinfo_start) */
 
 static int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
@@ -241,14 +235,14 @@ static int subinfo_finish(SI *sip) noex {
 	}
 	return (rs >= 0) ? sip->wl : rs ;
 }
-/* end subroutine (subfino_finish) */
+/* end subroutine (subinfo_finish) */
 
 static int subinfo_wrline(SI *sip,cchar *sp,int sl) noex {
 	cint		mlen = MIN((3*sl),(sip->mc-sip->ilen+1)) ;
 	int		rs ;
 	int		ul = 0 ;
 	if ((rs = subinfo_flushover(sip,mlen)) >= 0) {
-	    if (sip->id != NULL) {
+	    if (sip->id != nullptr) {
 		rs = subinfo_write(sip,sip->id,sip->ilen) ;
 	    }
 	    if (rs >= 0) {
@@ -277,7 +271,7 @@ static int subinfo_flushover(SI *sip,int mlen) noex {
 	}
 	return rs ;
 }
-/* end subroutine (subfino_flushover) */
+/* end subroutine (subinfo_flushover) */
 
 static int subinfo_write(SI *sip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -290,6 +284,6 @@ static int subinfo_write(SI *sip,cchar *sp,int sl) noex {
 	}
 	return rs ;
 }
-/* end subroutine (subfino_write) */
+/* end subroutine (subinfo_write) */
 
 

@@ -92,7 +92,7 @@ LDFLAGS_P= $(LF_LDFLAGS) -L/usr/lib/libp # -R$(LIBDIR):${EXTRA}/lib
 
 LIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
 
-LIB0= -luterm
+LIB0=
 LIB1= -ldam -lb
 LIB2=
 LIB3= -luc -lu
@@ -108,7 +108,7 @@ LIBINFO= $(LIBDIRS) $(LIBS)
 
 SLIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
 
-SLIB0= -luterm
+SLIB0=
 SLIB1= -ldam -lb
 SLIB2= -ldebug
 SLIB3= -luc -lu
@@ -172,8 +172,8 @@ OBJ04=
 OBJ05= 
 OBJ06= 
 OBJ07= printhelp.o shio.o kshlib.o maininfo.o sesmsg.o msgdata.o
-OBJ08= uterm.o uterm_readcmd.o
-OBJ09= termcmd.o
+OBJ08=
+OBJ09=
 OBJ10=
 OBJ11=
 OBJ12=
@@ -328,34 +328,5 @@ termtype.o:		termtype.c termtype.h
 
 
 termtype_vt.o:		termtype_vt.c termtype.h
-
-getutmpent.o:		getutmpent.c getutmpent.h
-
-
-shio.o:			shio.c shio.h
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-uterm.o:		uterm.c uterm.h
-
-uterm_readcmd.o:	uterm_readcmd.c uterm.h termcmd.h
-
-termenq.o:		termenq.c termenq.h terment.h
-
-terment.o:		terment.c terment.h
-
-termcmd.o:		termcmd.c termcmd.h
 
 

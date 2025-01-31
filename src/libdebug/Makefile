@@ -5,53 +5,54 @@ T= libdebug
 ALL= $(T).o $(T).a
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
+
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
+DEFS +=
 
-CPP= cpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
+INCS += debug.h
 
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
+LIBS +=
 
 
-DEFS=
-
-LDRPATH= $(EXTRA)/lib
+INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
-LIBS=
 
+RUNINFO= -rpath $(RUNDIR)
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CXXFLAGS= $(MAKECXXFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
-
-
-INCS= debug.h
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ00= debugprintf.o debug.o 
@@ -110,33 +111,34 @@ OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE)
 OBJS= obja.o objb.o objc.o objd.o obje.o
 
 
-.SUFFIXES:		.ls .i .cx .cs
+.SUFFIXES:		.hh .ii .mod .ccm
 
 
 default:		all
 
 all:			$(ALL)
 
-.cc.o:
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-.c.o:
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $<
-
-.c.ln:
-	$(LINT) -c -u $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
-.c.cx:
-	$(CXREF) -C $(CXREFFLAGS) $(CPPFLAGS) $<
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
-.c.cs:
-	$(CXREF) $(CXREFFLAGS) $(CPPFLAGS) -o $(*).cs $<
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
+.c.o:
+	$(COMPILE.c) $<
+
+.cc.o:
+	$(COMPILE.cc) $<
+
+.mod.o:
+	makemodule $(*)
 
 
 a:			$(T).a

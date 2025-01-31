@@ -1,8 +1,9 @@
-/* watch */
+/* watch SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process the service names given us */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
@@ -17,7 +18,6 @@
 #define	CF_LOGFILECHECK	1		/* logfile check */
 #define	CF_SPERM	1		/* use 'sperm(3dam)' */
 
-
 /* revision history:
 
 	= 1991-09-01, David A­D­ Morano
@@ -25,8 +25,15 @@
 
 */
 
+/* Copyright © 1991 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
 /*****************************************************************************
 
+  	Name:
+	watch
+
+	Description:
 	This subroutine is responsible for processing the jobs that
 	have been handed to us from the initialization code.
 
@@ -62,14 +69,11 @@
 #include	<sfx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 #include	"progentry.h"
 #include	"config.h"
 #include	"defs.h"
-
-#ifdef	DMALLOC
-#include	<dmalloc.h>
-#endif
 
 
 /* local defines */
@@ -160,31 +164,21 @@ static int	xfile(struct proginfo *,const char *) ;
 
 static void	int_all(int) ;
 
-#if	CF_DEBUGS
-extern int	mkhexstr(char *,int,void *,int) ;
-#endif
-
 
 /* local variables */
 
 static int	f_exit ;
 
 
+/* exported variables */
 
 
+/* exported subroutines */
 
-
-
-int watch(pip,snp)
-struct proginfo		*pip ;
-vecstr			*snp ;		/* initial service names */
-{
+int watch(proginfo *pip,vecstr *snp) noex {
 	struct procinfo	pi ;
-
-	struct sigaction	sigs ;
-
-	struct pollfd	fds[2] ;
-
+	SIGACTION	sigs ;
+	POLLFD		fds[2] ;
 	PROGENTRY	*pep ;
 
 	SRVTAB		*sfp = &pip->stab ;

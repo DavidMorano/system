@@ -1,15 +1,15 @@
-/* main (CEXECER) */
+/* main SUPORT (CEXECER) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to return a user's home login directory */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_DEBUGN	0		/* special debugging */
 #define	CF_LOCSETENT	0		/* compile |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -23,15 +23,11 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ /usr/add-on/local/lib/cexece/cexecer
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/systeminfo.h>
@@ -44,7 +40,6 @@
 #include	<grp.h>
 #include	<netdb.h>
 #include	<time.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<bits.h>
@@ -55,6 +50,7 @@
 #include	<filer.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 #include	"dialopts.h"
 #include	"dialcprogmsg.h"
@@ -200,10 +196,6 @@ static int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_LOCSETENT
 static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-#endif
-
-#if	CF_DEBUGS
-extern int	mkhexstr(char *,int,void *,int) ;
 #endif
 
 

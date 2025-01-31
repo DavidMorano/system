@@ -39,6 +39,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<ctime>			/* |TIMESPEC| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 

@@ -99,6 +99,7 @@
 #include	<filer.h>
 #include	<findfilepath.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 #include	"streamsync.h"
 #include	"dialopts.h"
@@ -200,15 +201,6 @@ extern int	getnodename(char *,int) ;
 extern int	dialprog(cchar *,int,cchar **,cchar **,int *) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_foilcmp(vecstr *,vecstr *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	mkhexstr(char *,int,void *,int) ;
-#if	CF_REVENT
-extern char	*d_reventstr(int,char *,int) ;
-#endif
-#endif /* CF_DEBUGS */
 
 extern int	rcmdr(cchar *,cchar *,cchar *,int *) ;
 extern int	mkcexsync(char *,int) ;

@@ -16,17 +16,39 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************* 
+	Group:
+	ffbs{x}
+
+	Names:
+	ffbsi
+	ffbsl
+	ffbsll
+	ffbsui
+	ffbsul
+	ffbsull
+
+	Description:
 	These subroutines find the first bit set in various integer
 	types.
+
+	Synopsis:
+	int ffbsi(int) noex 
+	int ffbsl(long) noex 
+	int ffbsll(longlong) noex 
+	int ffbsui(uint) noex 
+	int ffbsul(ulong) noex 
+	int ffbsull(ulonglong) noex 
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<bit>			/* <- for |countr_zero(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<stdintx.h>
 
 #include	"ffbs.h"

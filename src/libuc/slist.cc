@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	slist
+
+	Description:
 	This is a regular, pointer based, no-frills single-linked
 	list queue.  Note that this object CAN be moved (copied)
 	since there are no pointers pointing back at the list head
@@ -27,6 +31,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 
 #include	"slist.h"

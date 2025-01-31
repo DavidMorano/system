@@ -32,7 +32,7 @@
 	memtrack::ifinish
 
 	Description:
-	Reack memory blocks.
+	Track memory blocks.
 
 *******************************************************************************/
 
@@ -65,16 +65,19 @@ enum memtrackmems {
 	memtrackmem_overlast
 } ;
 
-constexpr int	memtrack_magic = MEMTRACK_MAGIC ;
+constexpr int	memtrack_magicval = MEMTRACK_MAGIC ;
 
 /* exported stuff */
 
-export {
     struct memtrack_ent {
 	cvoid		*addr ;
 	int		asize ;
     } ;
+
+export {
     struct memtrack ;
+}
+
     struct memtrack_co {
 	memtrack	*op = nullptr ;
 	int		w = -1 ;
@@ -87,7 +90,10 @@ export {
 	    return operator () () ;
 	} ;
     } ; /* end struct (memtrack_co) */
+
+export {
     struct memtrack {
+	friend		memtrack_co ;
 	typedef memtrack_ent	ent ;
 	typedef mapblock<uintptr_t,memtrack_ent> track_t ;
 	mapblock<uintptr_t,memtrack_ent>	*tp = nullptr ;
@@ -106,13 +112,14 @@ export {
 	int	rem(cvoid *) noex ;
 	int	present(cvoid *) noex ;
 	int	get(cvoid *,ent *) noex ;
-	int	istart(int = 0) noex ;
-	int	ifinish() noex ;
-	int	icount() noex ;
 	void	dtor() noex ;
 	~memtrack() {
 	    dtor() ;
 	} ; /* end if (dtor) */
+    private:
+	int	istart(int = 0) noex ;
+	int	ifinish() noex ;
+	int	icount() noex ;
     } ; /* end struct (memtrack) */
 } /* end export */
 

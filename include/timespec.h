@@ -17,8 +17,11 @@
 
 /*******************************************************************************
 
-	Methods for the TIMESPEC object.
+  	Object:
+	timespec
 
+	Description:
+	Methods for the TIMESPEC object.
 
 *******************************************************************************/
 
@@ -32,11 +35,12 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
 
-extern int timespec_load(TIMESPEC *,time_t,long) noex ;
+extern int	timespec_load(TIMESPEC *,time_t,long) noex ;
 
 EXTERNC_end
 

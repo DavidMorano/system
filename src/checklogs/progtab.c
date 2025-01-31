@@ -1,19 +1,18 @@
-/* progtab */
+/* progtab SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a log table file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGDETAIL	0		/* extra debugging */
 
-
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-
-	The subroutine was adapted from other programs that do similar
-	things.
-
+	The subroutine was adapted from other programs that do
+	similar things.
 
 */
 
@@ -21,16 +20,17 @@
 
 /*******************************************************************************
 
+  	Name:
+	progtab
+
+	Description:
 	In this subroutine we process 'logtab' files.  The input is taken
 	as a 'logtab file.  We process each 'logtab' file by calling
-	'proglogent()' for each entry.
-
+	|proglogent()| for each entry.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -38,12 +38,11 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<varsub.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -74,16 +73,14 @@ extern int	proglogent(struct proginfo *,const char *,int) ;
 
 /* forward references */
 
-#if	CF_DEBUGS
-extern int	mkhexstr(char *,int,void *,int) ;
-#endif
-
 
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int progtab(pip,lnp,lnl)
 struct proginfo	*pip ;

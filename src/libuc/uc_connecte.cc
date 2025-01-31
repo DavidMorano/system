@@ -63,6 +63,7 @@
 #include	<usystem.h>
 #include	<bufprintf.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 
 /* local defines */
@@ -77,11 +78,8 @@
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	mkhexstr(char *,int,void *,int) ;
-#endif
+
+/* external variables */
 
 
 /* local structures */
