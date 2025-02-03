@@ -1,25 +1,28 @@
-/* debugging */
-
+/* debugging SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/utsname.h>
 #include	<sys/stat.h>
-#include	<errno.h>
 #include	<unistd.h>
-#include	<string.h>
-#include	<signal.h>
-#include	<time.h>
+#include	<cerrno>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdio>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<stdio.h>
 
 #include	<baops.h>
 #include	<logfile.h>
 #include	<bfile.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"prompt.h"
@@ -42,14 +45,9 @@ extern int	errno ;
 
 
 
-void fileinfo(file,w)
-char	file[] ;
-char	w[] ;
-{
+void fileinfo(cchar *file,cchar *w) noex {
 	bfile		msgfile, *mfp = &msgfile ;
-
-	struct ustat	sb ;
-
+	USTAT		sb ;
 	int	i, j, rs, len, l ;
 
 	char	linebuf[LINELEN + 1] ;

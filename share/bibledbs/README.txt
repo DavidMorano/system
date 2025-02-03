@@ -4,5 +4,6 @@ name		description
 ----------------------------------------
 
 av		King James (Authorized) Version 1611
-rena		Versión Reina-valera de 1909
+rvv		Versión Reina-valera de 1909
+kjv		alias for 'av' (above)
 

@@ -1,4 +1,4 @@
-/* prique MODULE */
+/* prique MODULE (primary module interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -21,11 +21,12 @@
 	prique
 
 	Description:
-	This object implements a "priority queue" object.  It is
-	built from the standard C++ library class-template
-	|priority_queue(3c++)|.  Note that a C-language and C++-language
-	type of priority queue already exists in the form of the
-	|vecsorthand(3uc)| object.
+	This object implements a "priority queue" object -- with
+	the smallest item on the 'top'.  It is built from the
+	standard C++ library class-template |priority_queue(3c++)|.
+	Note that a C-language and C++-language type of priority
+	queue already exists in the form of the |vecsorthand(3uc)|
+	object.
 
 	Symopsis:
 	int prique_start<typename K,typename B>(int n = 0) noex

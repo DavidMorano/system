@@ -1,4 +1,4 @@
-/* addrset MODULE */
+/* addrset MODULE (primary module interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 

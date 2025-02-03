@@ -1,4 +1,4 @@
-/* sview MODULE */
+/* sview MODULE (primary module interface) */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
