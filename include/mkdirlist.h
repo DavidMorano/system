@@ -55,7 +55,7 @@ struct mkdirlist_ent {
 	dev_t		dev ;
 	time_t		mtime ;
 	time_t		utime ;
-	MKDIRLIST_OFL	f ;
+	MKDIRLIST_OFL	fl ;
 	int		nlen ;
 	int		narticles ;
 	int		order ;

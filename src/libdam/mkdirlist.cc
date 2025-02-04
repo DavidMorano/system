@@ -37,12 +37,12 @@
 	other file.
 
 	Synopsis:
-	int mkdirlist(char *basedir,bfile *sfp,bfile *nfp,int (*uf)()) noex
+	int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndn) noex
 
 	Arguments:
-	basedir		directory at top of tree
-	nfp		Name File Pointer
-	sfp		Stat File Pointer
+	op		object pointer
+	pr		program-root
+	ndn		name-directory name
 
 	Returns:
 	>=0		count
@@ -114,6 +114,7 @@ extern "C" {
 
 struct vars {
 	int		maxpathlen ;
+	operator int () noex ;
 } ;
 
 
@@ -160,7 +161,7 @@ static int mkdirlist_magic(mkdirlist *op,Args ... args) noex {
 static int mkdirlist_pdc(mkdirlist *,cchar *,int) noex ; /* proc-dir-cache */
 static int mkdirlist_pdn(mkdirlist *,cchar *) noex ;	/* proc-dir-news */
 static int mkdirlist_newent(mkdirlist *,USTAT *,cchar *,int) noex ;
-static int mkdirlist_entfins(mkdirlist *) noex ;
+static int mkdirlist_finents(mkdirlist *) noex ;
 
 static int entry_start(ENT *,USTAT *,cchar *,int) noex ;
 static int entry_finish(ENT *) noex ;
@@ -171,8 +172,6 @@ static int entry_matung(ENT *,cchar *,time_t,int,int) noex ;
 extern "C" {
     static int vcmporder(cvoid **,cvoid **) noex ;
 }
-
-static int mkvars() noex ;
 
 
 /* local variables */
@@ -192,7 +191,7 @@ int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndn) noex {
 	if ((rs = mkdirlist_ctor(op,pr,ndn)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pr[0] && ndn[0]) {
-		static cint	rsv = mkvars() ;
+		static cint	rsv = var ;
 		if ((rs = rsv) >= 0) {
 	            if ((rs = vechand_start(op->dlp,20,0)) >= 0) {
 	                cint	of = O_RDONLY ;
@@ -212,11 +211,11 @@ int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndn) noex {
 			    op->magic = MKDIRLIST_MAGIC ;
 		        }
 	                if (rs < 0) {
-	                    mkdirlist_entfins(op) ;
+	                    mkdirlist_finents(op) ;
 	                    vechand_finish(op->dlp) ;
 	                }
 	            } /* end if (vechand) */
-		} /* end if (mkvars) */
+		} /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		mkdirlist_dtor(op) ;
@@ -231,7 +230,7 @@ int mkdirlist_finish(mkdirlist *op) noex {
 	int		rs1 ;
 	if ((rs = mkdirlist_magic(op)) >= 0) {
 	    {
-	        rs1 = mkdirlist_entfins(op) ;
+	        rs1 = mkdirlist_finents(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -268,7 +267,7 @@ int mkdirlist_link(mkdirlist *op) noex {
 	    for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
 	        if (vp) {
 	    	    mkdirlist_ent	*ep = entp(vp) ;
-	            if (! ep->f.link) {
+	            if (! ep->fl.link) {
 	    	        mkdirlist_ent	*pep = ep ;
 		        auto		vg = vechand_get ;
 	                for (int j = (i+1) ; vg(dlp,j,&vp) >= 0 ; j += 1) {
@@ -276,9 +275,9 @@ int mkdirlist_link(mkdirlist *op) noex {
 	    	    	        mkdirlist_ent	*ep = entp(vp) ;
 				cchar		*n1 = pep->name ;
 				cchar		*n2 = ep->name ;
-	                        if ((! ep->f.link) && (bbcmp(n1,n2) == 0)) {
+	                        if ((! ep->fl.link) && (bbcmp(n1,n2) == 0)) {
 	                            pep->link = ep ;
-	                            ep->f.link = true ;
+	                            ep->fl.link = true ;
 	                            pep = ep ;
 	                        } /* end if (board match) */
         		    } /* end if (non-null entry) */
@@ -390,14 +389,13 @@ static int mkdirlist_pdc(mkdirlist *op,cchar *ndn,int fd) noex {
 	    char	*dbuf = (ap + (plen * ai++)) ;
 	    if ((rs = mkpath1(dbuf,ndn)) >= 0) {
 	        cint	dlen = rs ;
-	        if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
-	            USTAT	sb ;
+	        if (filer b ; (rs = b.start(fd,0z,0,0)) >= 0) {
 	            cint	nlen = plen ;
 	            int		line = 0 ;
 	            bool	f_bol = true ;
 	            bool	f_eol ;
 	            char	*nbuf = (ap + (plen * ai++)) ;
-	            while ((rs = filer_readln(&b,nbuf,nlen,-1)) > 0) {
+	            while ((rs = b.readln(nbuf,nlen,-1)) > 0) {
 	                int	len = rs ;
 	                f_eol = (len && (nbuf[len-1] == '\n')) ;
 	                if (f_eol) nbuf[--len] = '\0' ;
@@ -408,6 +406,7 @@ static int mkdirlist_pdc(mkdirlist *op,cchar *ndn,int fd) noex {
 	                        }
 	                    } else {
 	                        if ((rs = pathadd(dbuf,dlen,nbuf)) >= 0) {
+	            		    USTAT	sb ;
 	                            if ((rs = u_stat(dbuf,&sb) >= 0)) {
 	                                rs = mkdirlist_newent(op,&sb,nbuf,len) ;
 	                                c += rs ;
@@ -420,7 +419,7 @@ static int mkdirlist_pdc(mkdirlist *op,cchar *ndn,int fd) noex {
 	                f_bol = f_eol ;
 	                if (rs < 0) break ;
 	            } /* end while */
-	            rs1 = filer_finish(&b) ;
+	            rs1 = b.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if */
 	    } /* end if (mkpath) */
@@ -437,9 +436,8 @@ static int mkdirlist_pdn(MKDIRLIST *op,cchar *ndn) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (char *nbuf ; (rs = malloc_mp(&nbuf)) >= 0) {
-	    fsdirtree	dir ;
 	    cint	nlen = rs ;
-	    if ((rs = fsdirtree_open(&dir,ndn,dot)) >= 0) {
+	    if (fsdirtree dir ; (rs = fsdirtree_open(&dir,ndn,dot)) >= 0) {
 	        USTAT	sb ;
 	        while ((rs = fsdirtree_read(&dir,&sb,nbuf,nlen)) > 0) {
 	            cint	ngl = rs ;
@@ -480,14 +478,16 @@ static int mkdirlist_newent(mkdirlist *op,USTAT *sbp,cc *nbuf,int nlen) noex {
 }
 /* end subroutine (mkdirlist_newent) */
 
-static int mkdirlist_entfins(mkdirlist *op) noex {
+static int mkdirlist_finents(mkdirlist *op) noex {
 	vechand		*dlp = op->dlp ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
+	int		rs2 ;
 	void		*vp{} ;
-	for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
+	for (int i = 0 ; (rs2 = dlp->get(i,&vp)) >= 0 ; i += 1) {
+	    mkdirlist_ent	*ep = entp(vp) ;
 	    if (vp) {
-		mkdirlist_ent	*ep = entp(vp) ;
 		{
 	    	    rs1 = entry_finish(ep) ;
 	    	    if (rs >= 0) rs = rs1 ;
@@ -498,9 +498,10 @@ static int mkdirlist_entfins(mkdirlist *op) noex {
 		}
 	    } /* end if (non-null entry) */
 	} /* end for */
+	if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
 	return rs ;
 }
-/* end subroutine (mkdirlist_entfins) */
+/* end subroutine (mkdirlist_finents) */
 
 static int entry_start(ENT *ep,USTAT *sbp,cchar *dbuf,int dlen) noex {
 	int		rs ;
@@ -534,11 +535,11 @@ static int entry_finish(ENT *ep) noex {
 
 static int entry_matung(ENT *ep,cc *ung,time_t ut,int f_sub,int order) noex {
 	int		rs = SR_OK ;
-	if (! ep->f.link) {
+	if (! ep->fl.link) {
 	    if (bbcmp(ung,ep->name) == 0) {
 	        rs = 1 ;
-	        ep->f.seen = true ;
-	        ep->f.subscribe = f_sub ;
+	        ep->fl.seen = true ;
+	        ep->fl.subscribe = f_sub ;
 	        ep->utime = ut ;
 		ep->order = order ;
 	    } /* end if (name match) */
@@ -549,9 +550,9 @@ static int entry_matung(ENT *ep,cc *ung,time_t ut,int f_sub,int order) noex {
 
 static int entry_showdef(ENT *ep) noex {
 	int		rs = SR_OK ;
-	if (!ep->f.link) {
-	    ep->f.show = ep->f.subscribe ;
-	    if (ep->f.show) rs = 1 ;
+	if (!ep->fl.link) {
+	    ep->fl.show = ep->fl.subscribe ;
+	    if (ep->fl.show) rs = 1 ;
 	}
 	return rs ;
 }
@@ -559,10 +560,10 @@ static int entry_showdef(ENT *ep) noex {
 
 static int entry_show(ENT *ep,cchar *ng,int order) noex {
 	int		rs = SR_OK ;
-	if (! ep->f.link) {
+	if (! ep->fl.link) {
 	    if (bbcmp(ng,ep->name) == 0) {
 		ep->order = order ;
-	        ep->f.show = true ;
+	        ep->fl.show = true ;
 	        rs = 1 ;
 	    } /* end if (name match) */
 	} /* end if (not a linked entry) */
@@ -587,13 +588,13 @@ static int vcmporder(cvoid **v1pp,cvoid **v2pp) noex {
 }
 /* end subroutine (vcmporder) */
 
-static int mkvars() noex {
+vars::operator int () noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
 	    var.maxpathlen = rs ;
 	}
 	return rs ;
 }
-/* end subroutine (mkvars) */
+/* end method (vars::operator) */
 
 
