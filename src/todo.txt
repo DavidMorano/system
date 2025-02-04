@@ -29,7 +29,6 @@ calmgr		pointer implementation
 spawnproc	block structure; actually this is a huge mess
 termnote	could use some break-down of large subs into smaller ones
 ipasswd
-postfile
 nettime		add 'constexpr if'
 msgidx		(mesgid, msgide)
 statmsg

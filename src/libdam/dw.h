@@ -29,16 +29,18 @@
 #define	DW_CUR		struct dw_cursor
 /* values */
 #define	DW_INTCHECK	20		/* default check time (seconds) */
-/* returns */
-#define	DW_SRESERVED	0
-#define	DW_SNEW		1		/* just in */
-#define	DW_SCHECK	2		/* ready for validation check */
-#define	DW_SREADY	3
-#define	DW_SNOTSUP	4
-#define	DW_SRUNNING	5
-#define	DW_SRETRY	6
-#define	DW_SUSER	10
 
+enum dwstates {
+    	dwstate_reserved,
+    	dwstate_new,
+    	dwstate_check,
+    	dwstate_ready,
+    	dwstate_notsup,
+    	dwstate_running,
+    	dwstate_retry,
+    	dwstate_user,
+	dwstate_overlast
+} ;
 
 struct dw_entry {
 	cchar		*name ;
@@ -62,22 +64,21 @@ struct dw_flags {
 
 EXTERNC_begin
 struct dw_head {
-	vecstr		*sdp ;			/* subdirectories */
 	vecobj		*elp ;			/* directory entries */
 	cchar		*dirname ;		/* directory path */
 	void		(*callback)(DW_ENT *,int,void *) noex ;
 	cvoid		*argp ;
-	time_t		opentime ;		/* time FD was cached */
+	time_t		tiopen ;		/* time FD was cached */
 	time_t		timod ;			/* directory mod-time */
-	time_t		checktime ;		/* time last checked */
-	time_t		removetime ;		/* last checked for removed */
+	time_t		ticheck ;		/* time last checked */
+	time_t		tiremove ;		/* last checked for removed */
 	DW_FL		f ;
 	uint		magic ;
-	int		checkint ;		/* file check interval */
+	int		intcheck ;		/* file check interval */
 	int		fd ;			/* cached directory FD */
 	int		count_new ;
 	int		count_checkable ;
-} ;
+} ; /* end struct (dw_head) */
 EXTERNC_end
 
 struct dw_cursor {
@@ -103,6 +104,16 @@ extern int dw_curenumcheck(dw *,dw_cur *,dw_ent *,char *,int) noex ;
 extern int dw_state(dw *,int,int) noex ;
 
 EXTERNC_end
+
+/* returns */
+#define	DW_SRESERVED	dwstate_reserved
+#define	DW_SNEW		dwstate_new
+#define	DW_SCHECK	dwstate_check		/* ready for validation check */
+#define	DW_SREADY	dwstate_ready
+#define	DW_SNOTSUP	dwstate_notdup
+#define	DW_SRUNNING	dwstate_running
+#define	DW_SRETRY	dwstate_retry
+#define	DW_SUSER	dwstate_user
 
 
 #endif /* DW_INCLUDE */
