@@ -81,9 +81,9 @@ export {
 	int		f = false ;
 	if (sl > 1) {
 	    try {
-	        iter_t end = visited.end() ;
+	        iter_t itend = visited.end() ;
 	        for (int i = 0 ; i < sl ; i += 1) {
-	            if (visited.find(*sp) != end) {
+	            if (visited.find(*sp) != itend) {
 		        f = true ;
 		        break ;
 		    } else {

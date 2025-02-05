@@ -125,6 +125,7 @@ export {
 	    dtor() ;
 	} ; /* end dtor */
 	int		checkin(CUSTAT *) noex ;
+    private:
 	int		istart(int) noex ;
 	int		ifinish() noex ;
 	int		icount() noex ;

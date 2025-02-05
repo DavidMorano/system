@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	strwcpyxc
+	strwcpy{x}c
 
 	Description
 	Copy a source string to a destination until either the end
@@ -26,9 +26,10 @@
 	length of the source string is exhausted.
 
 	Synopsis:
-	char *strwcpyxc(char *dp,cchar *sp,int sl) noex
+	char *strwcpy{x}c(char *dp,cchar *sp,int sl) noex
 
 	Arguments:
+	{x}	one of: b, l, u, f
 	dp	string buffer that receives the copy
 	sp	the source string that is to be copied
 	sl	the maximum length to be copied

@@ -122,7 +122,6 @@
 	Returns:
 	-	the character pointer to the end of the destination
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -214,9 +213,8 @@ char *strwcpyopaque(char *dp,cchar *sp,int sl) noex {
 /* end subroutine (strwcpyopaque) */
 
 char *strwcpyrev(char *dp,cchar *sp,int sl) noex {
-	int		i ;
 	if (sl < 0) sl = strlen(sp) ;
-	for (i = (sl-1) ; i >= 0 ; i += 1) {
+	for (int i = (sl-1) ; i >= 0 ; i += 1) {
 	    *dp++ = sp[i] ;
 	} /* end for */
 	*dp = '\0' ;

@@ -2,7 +2,7 @@
 
 T= wsix
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -70,12 +70,13 @@ OBJCWSIX= obj4_sfx.o obj5_sfx.o
 OBJWSIX= obja.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .mod .ccm
 
 
 default:		$(T).o
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -95,12 +96,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.mod.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJWSIX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJWSIX)
-
-$(T).a:			$(OBJWSIX)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm

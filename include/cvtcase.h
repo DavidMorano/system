@@ -1,4 +1,4 @@
-/* cup HEADER */
+/* cvtcase HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	CUP_INCLUDE
-#define	CUP_INCLUDE
+#ifndef	CVTCASE_INCLUDE
+#define	CVTCASE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -28,10 +28,11 @@
 EXTERNC_begin
 
 extern char	*cup(int,cchar *,char *) noex ;
+extern char	*clow(int,cchar *,char *) noex ;
 
 EXTERNC_end
 
 
-#endif /* CUP_INCLUDE */
+#endif /* CVTCASE_INCLUDE */
 
 

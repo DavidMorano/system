@@ -14,7 +14,7 @@
 
 	= 2014-11-25, David A­D­ Morano
 	This object was enhanced to include much of the functionality
-	from the old 'get_bds' function.
+	from the old PCS |get_bds(3pcs)| function.
 
 */
 
@@ -63,10 +63,10 @@
 #include	<bfile.h>
 #include	<filer.h>
 #include	<fsdirtree.h>
+#include	<mktmp.h>		/* |mktmpfile(3uc)| */
 #include	<mkpathx.h>
 #include	<pathadd.h>
 #include	<strwcmp.h>
-#include	<mktmp.h>		/* |mktmpfile(3uc)| */
 #include	<isnot.h>		/* |isNotPresent(3uc)| */
 #include	<localmisc.h>
 
@@ -193,7 +193,9 @@ int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndn) noex {
 	    if (pr[0] && ndn[0]) {
 		static cint	rsv = var ;
 		if ((rs = rsv) >= 0) {
-	            if ((rs = vechand_start(op->dlp,20,0)) >= 0) {
+		    cint	vn = 20 ;
+		    cint	vo = 0 ;
+	            if ((rs = vechand_start(op->dlp,vn,vo)) >= 0) {
 	                cint	of = O_RDONLY ;
 	                cmode	om = 0666 ;
 	                if ((rs = pcsopendircache(pr,ndn,of,om,-1)) >= 0) {
@@ -213,7 +215,7 @@ int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndn) noex {
 	                if (rs < 0) {
 	                    mkdirlist_finents(op) ;
 	                    vechand_finish(op->dlp) ;
-	                }
+	                } /* end if (error handling) */
 	            } /* end if (vechand) */
 		} /* end if (vars) */
 	    } /* end if (valid) */
@@ -265,14 +267,14 @@ int mkdirlist_link(mkdirlist *op) noex {
 	    vechand	*dlp = op->dlp ;
 	    void	*vp{} ;
 	    for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
+	    	mkdirlist_ent	*ep = entp(vp) ;
 	        if (vp) {
-	    	    mkdirlist_ent	*ep = entp(vp) ;
 	            if (! ep->fl.link) {
 	    	        mkdirlist_ent	*pep = ep ;
 		        auto		vg = vechand_get ;
 	                for (int j = (i+1) ; vg(dlp,j,&vp) >= 0 ; j += 1) {
+	    	    	    mkdirlist_ent	*ep = entp(vp) ;
 	                    if (vp) {
-	    	    	        mkdirlist_ent	*ep = entp(vp) ;
 				cchar		*n1 = pep->name ;
 				cchar		*n2 = ep->name ;
 	                        if ((! ep->fl.link) && (bbcmp(n1,n2) == 0)) {
@@ -296,8 +298,8 @@ int mkdirlist_showdef(mkdirlist *op) noex {
 	if ((rs = mkdirlist_magic(op)) >= 0) {
 	    void	*vp{} ;
 	    for (int i = 0 ; vechand_get(op->dlp,i,&vp) >= 0 ; i += 1) {
+	        mkdirlist_ent	*ep = entp(vp) ;
 	        if (vp) {
-	            mkdirlist_ent	*ep = entp(vp) ;
 	            rs = entry_showdef(ep) ;
 	            c += rs ;
 	        } /* end if (non-null entry) */
@@ -318,8 +320,8 @@ int mkdirlist_show(mkdirlist *op,cchar *ng,int order) noex {
 		void		*vp{} ;
 		rs = SR_OK ;
 	        for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
+	            mkdirlist_ent	*ep = entp(vp) ;
 	            if (vp) {
-	                mkdirlist_ent	*ep = entp(vp) ;
 	                rs = entry_show(ep,ng,order) ;
 	                c += rs ;
 		    } /* end if (non-null entry) */
@@ -341,8 +343,8 @@ int mkdirlist_ung(mkdirlist *op,cc *ung,time_t utime,int f_sub,int order) noex {
 		void		*vp{} ;
 		rs = SR_OK ;
 	        for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
+	            mkdirlist_ent	*ep = entp(vp) ;
 	            if (vp) {
-	                mkdirlist_ent	*ep = entp(vp) ;
 	                rs = entry_matung(ep,ung,utime,f_sub,order) ;
 	                c += rs ;
 		    } /* end if (non-null entry) */
@@ -385,9 +387,9 @@ static int mkdirlist_pdc(mkdirlist *op,cchar *ndn,int fd) noex {
 	int		sz = ((var.maxpathlen + 1) * 2) ;
 	int		ai = 0 ;
 	cchar		*dcm = MKDIRLIST_DCMAGIC ;
-	if (char *ap{} ; (uc_malloc(sz,&ap)) >= 0) {
+	if (char *ap{} ; (rs = uc_malloc(sz,&ap)) >= 0) {
 	    char	*dbuf = (ap + (plen * ai++)) ;
-	    if ((rs = mkpath1(dbuf,ndn)) >= 0) {
+	    if ((rs = mkpath(dbuf,ndn)) >= 0) {
 	        cint	dlen = rs ;
 	        if (filer b ; (rs = b.start(fd,0z,0,0)) >= 0) {
 	            cint	nlen = plen ;
@@ -591,7 +593,7 @@ static int vcmporder(cvoid **v1pp,cvoid **v2pp) noex {
 vars::operator int () noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-	    var.maxpathlen = rs ;
+	    maxpathlen = rs ;
 	}
 	return rs ;
 }

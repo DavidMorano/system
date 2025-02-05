@@ -98,7 +98,11 @@ define	isleap(y) ((((y) % 4) == 0) && (((y) % 100) != 0 || ((y) % 400) == 0))
 #include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"getmjd.h"
@@ -178,7 +182,7 @@ int getmjd(int yr,int mo,int day) noex {
 	+ 1 day for each leap year
 	+ number of days since start of this year
 */
-	    mjd += ((365*myr) + nlyears + doy[mo] + (day - 1)) ;
+	    mjd += ((365 * myr) + nlyears + doy[mo] + (day - 1)) ;
 /*
 	If the current month is March or later, then we must add 1 day if
 	the current year is a leap year.

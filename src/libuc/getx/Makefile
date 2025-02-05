@@ -78,7 +78,7 @@ OBJD= obj12.o obj13.o
 OBJ= obja.o objb.o objc.o objd.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .mod .ccm
 
 
 default:		$(T).o
@@ -103,6 +103,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.mod.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ)

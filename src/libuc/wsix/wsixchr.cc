@@ -1,4 +1,5 @@
 /* wsixchr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* search for a character in a wide-string */
@@ -41,11 +42,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stddef.h>		/* for 'wchar_t' */
+#include	<cstddef>		/* |nullptr_t| + |wchar_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"wsix.h"
 

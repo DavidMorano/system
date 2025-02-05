@@ -39,8 +39,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<cfdec.h>
 #include	<hasx.h>
 #include	<char.h>
@@ -73,6 +79,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ourmjd(cchar *sp,int sl) noex {
@@ -82,14 +91,13 @@ int ourmjd(cchar *sp,int sl) noex {
 	    sp += 1 ;
 	    sl -= 1 ;
 	    if (hasalldig(sp,sl)) {
-		int	v ;
-		if ((rs = cfdeci(sp,sl,&v)) >= 0) {
+		if (int v ; (rs = cfdeci(sp,sl,&v)) >= 0) {
 		    rs = v ;
 		}
 	    }
 	} /* end if (has our 'm' marker) */
 	return rs ;
 }
-/* end subroutine (sourmjd) */
+/* end subroutine (ourmjd) */
 
 

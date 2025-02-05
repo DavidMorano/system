@@ -1,4 +1,4 @@
-/* cup SUPPORT */
+/* cvtcase SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -17,18 +17,28 @@
 
 /*******************************************************************************
 
-	Name:
+	Names:
 	cup
+	clow
 
 	Description:
-	This file contains many of the string manipulation subroutines
-	used in other modules.
+	This subroutine copies a source c-string to a destination character
+	buffer while converting the case to upper or lower case.
 
 	Synopsis:
 	char *cup(int len,cchar *src,char *dst) noex
+	char *clow(int len,cchar *src,char *dst) noex
 
 	Returns:
 	-		pointer to the end of filled-in destination buffer
+
+	Notes:
+	These subroutines date from the original assembly language
+	versions.  I still have the original assembly language
+	versions.  These (below) were created to execute the various
+	calling code pieces (written in C-language) on machine
+	architectures other thæn the M680x0 variants (what the
+	original assembly language versions were written in).
 
 *******************************************************************************/
 
@@ -44,7 +54,7 @@
 #include	<mkchar.h>
 #include	<localmisc.h>
 
-#include	"cup.h"
+#include	"cvtcase.h"
 
 
 /* local defines */
@@ -78,5 +88,14 @@ char *cup(int len,cchar *src,char *dst) noex {
 	return dst ;
 }
 /* end subroutine (cup) */
+
+char *clow(int len,cchar *src,char *dst) noex {
+	for (int i = 0 ; i < len ; i += 1) {
+	    *dst++ = tolc(*src++) ;
+	} /* end for */
+	*dst = '\0' ;
+	return dst ;
+}
+/* end subroutine (clow) */
 
 

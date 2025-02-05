@@ -1,4 +1,5 @@
 /* wswcpynarrow SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy a narrow source string to a wide-string recipient */
@@ -39,9 +40,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stddef.h>		/* presumable for 'wchar_t' type */
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| + |wchar_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 

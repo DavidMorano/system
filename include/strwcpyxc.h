@@ -38,16 +38,16 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 inline char	* strwcpybc (char *dp,cchar *sp) noex {
-	return strwcpybc(dp,sp) ;
+	return strwcpybc(dp,sp,-1) ;
 }
 inline char	* strwcpylc (char *dp,cchar *sp) noex {
-	return strwcpylc(dp,sp) ;
+	return strwcpylc(dp,sp,-1) ;
 }
 inline char	* strwcpyuc (char *dp,cchar *sp) noex {
-	return strwcpyuc(dp,sp) ;
+	return strwcpyuc(dp,sp,-1) ;
 }
 inline char	* strwcpyfc (char *dp,cchar *sp) noex {
-	return strwcpyfc(dp,sp) ;
+	return strwcpyfc(dp,sp,-1) ;
 }
 
 #endif /* __cplusplus */

@@ -1,4 +1,5 @@
 /* wsncols SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* calculate the number of columns used by a wide-string */
@@ -42,11 +43,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* for |wchar_t| */
-#include	<ascii.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* |nullptr_t| + |wchar_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<ascii.h>		/* |CH_TAB| */
 #include	<tabcols.h>
+#include	<localmisc.h>
 
 #include	"wsnx.h"
 

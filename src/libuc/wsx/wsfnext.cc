@@ -1,4 +1,5 @@
 /* wsfnext SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the next field in a white-space dilineated record */
@@ -52,9 +53,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
-#include	<cstddef>		/* for 'wchar_t' */
+#include	<cstddef>		/* |nullptr_t| + |wchar_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<char.h>
 #include	<localmisc.h>
@@ -90,7 +91,7 @@
 int wsfnext(const wchar_t *wsp,int wsl,const wchar_t **spp) noex {
 	int		ch ;
 	while (wsl && *wsp) {
-	    ch = (int) *wsp ;
+	    ch = int(*wsp) ;
 	    if (! WCHAR_ISWHITE(ch)) break ;
 	    wsp += 1 ;
 	    wsl -= 1 ;
@@ -98,7 +99,7 @@ int wsfnext(const wchar_t *wsp,int wsl,const wchar_t **spp) noex {
 	*spp = wsp ;
 	/* skip the non-white space */
 	while (wsl && *wsp && (*wsp != '\n')) {
-	    ch = (int) *wsp ;
+	    ch = int(*wsp) ;
 	    if  (WCHAR_ISWHITE(ch)) break ;
 	    wsp += 1 ;
 	    wsl -= 1 ;

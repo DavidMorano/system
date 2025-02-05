@@ -1,4 +1,5 @@
 /* wsnwcpynarrow SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy a narrow source string to a wide-string recipient */
@@ -33,14 +34,18 @@
 
 	Returns:
 	>=0	number of characters copied
-	<0	error (buffer overflow?)
+	<0	error; buffer overflow (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* for |wchar_t| */
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| + |wchar_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>		/* return-system codes */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
