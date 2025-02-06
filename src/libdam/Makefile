@@ -868,7 +868,6 @@ deprecated.o:		deprecated.cc
 getclusters.o:		getclusters.cc getclusters.h
 percache.o:		percache.cc percache.h
 cvttemperature.o:	cvttemperature.cc cvttemperature.h
-cup.o:			cup.cc cup.h
 
 # DFSA
 dfsa.o:			dfsa0.o dfsa1.o
@@ -923,7 +922,7 @@ minmaxelem.o:		minmaxelem.mod
 	makemodule minmaxelem
 
 # HASDUPLICATE
-hasduplicate.o:		hasduplicate.mod
-	makemodule hasduplicate
+hascount.o:		hascount.mod
+	makemodule hascount
 
 

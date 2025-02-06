@@ -29,8 +29,9 @@ constexpr inline int memclear(void *objp,size_t objs) noex {
 }
 #else /* __cplusplus */
 static inline int memclear(void *objp,size_t objs) noex {
+    	cint	sz = (int) objs ;
     	memset(objp,0,objs) ;
-	return int(objs) ;
+	return sz ;
 }
 #endif /* __cplusplus */
 #endif /* SUBROUTINE_MEMCLEAR */

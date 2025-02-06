@@ -1,4 +1,4 @@
-/* hasduplicate MODULE (primary module interface) */
+/* hascount MODULE (primary module interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++11 */
 
@@ -18,23 +18,24 @@
 /*******************************************************************************
 
 	Name:
-	hasduplicate
+	hascount
 
 	Description:
 	This subroutine checks if the given array of elements (type
 	'T') has duplicate entries.
 
 	Synopsis:
-	int hasduplicate(const int *sp,int sl) noex
+	template(typename T> int hascount(const int *sp,int sl,int n) noex
 
 	Arguments:
+	T		type of object that contains the string to search for
 	sp		source array of integers
 	sl		length of source array
+	n		target count to reach before returning
 
 	Returns:
-	<0		error
-	==0		no duplicates
-	==1		found a duplicate entry
+	>=0		number of matches before target count reached
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -51,7 +52,7 @@ module ;
 #include	<usysrets.h>
 #include	<localmisc.h>
 
-export module hasduplicate ;
+export module hascount ;
 
 /* local defines */
 
@@ -74,28 +75,26 @@ export module hasduplicate ;
 /* exported subroutines */
 
 export {
-    template<typename T> bool hasduplicate(const T *sp,int sl) noex {
+    template<typename T> bool hascount(const T *sp,int sl,int n) noex {
 	typedef typename std::unordered_set<T>::iterator iter_t ;
 	std::unordered_set<T>	visited ;
 	int		rs = SR_OK ;
-	int		f = false ;
-	if (sl > 1) {
+	int		c = 0 ;
+	if ((sl > 1) && (n > 0)) {
 	    try {
 	        iter_t itend = visited.end() ;
-	        for (int i = 0 ; i < sl ; i += 1) {
+	        for (int i = 0 ; (c < n) && (i < sl) ; i += 1) {
 	            if (visited.find(*sp) != itend) {
-		        f = true ;
-		        break ;
-		    } else {
-		        visited.insert(*sp) ;
+		        c += 1 ;
 		    }
+		    if (c < n) visited.insert(*sp) ;
 	        } /* end for */
 	    } catch (...) {
 		rs = SR_NOMEM ;
 	    }
 	} /* end if (needed more work) */
-	return (rs >= 0) ? f : rs ;
-    } /* end subroutine (hasduplicate) */
+	return (rs >= 0) ? c : rs ;
+    } /* end subroutine (hascount) */
 } /* end export */
 
 

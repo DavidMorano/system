@@ -48,6 +48,7 @@
 #include	<mallocxx.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
+#include	<absfn.h>
 #include	<fsdir.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
@@ -64,9 +65,9 @@
 
 #define	IENTRY		struct dw_ientry
 
-#define	MAXOPENTIME	300		/* maximum FD cache time */
-#define	MINCHECKTIME	2		/* minumun check interval (seconds) */
-#define	MAXIDLETIME	240		/* maximum allowable idle time */
+#define	MININTCHECK	2		/* minumun check interval (seconds) */
+#define	MAXINTOPEN	300		/* maximum FD cache interval */
+#define	MAXINTIDLE	240		/* maximum allowable idle interval */
 
 #ifndef	CF_FNAMECMP
 #define	CF_FNAMECMP	0
@@ -149,9 +150,15 @@ static inline int dw_magic(dw *op,Args ... args) noex {
 
 static int	dw_starter(DW *,cchar *) noex ;
 static int	dw_finents(DW *) noex ;
-static int	dw_scan(DW *,cchar *,time_t) noex ;
-static int	dw_scaner(DW *,cchar *,int,time_t) noex ;
-static int	dw_scanent(SW *,cchar *,int,cchar *,time_t) noex ;
+static int	dw_checker(DW *,time_t) noex ;
+static int	dw_checknew(DW *,time_t,char *) noex ;
+static int	dw_checknewent(DW *,time_t,IENTRY *,char *) noex ;
+static int	dw_checkrm(DW *,time_t,char *) noex ;
+static int	dw_checkrmer(DW *,char *,time_t) noex ;
+static int	dw_checkrment(DW *,time_t,IENTRY *,cchar *) noex ;
+static int	dw_scan(DW *,time_t) noex ;
+static int	dw_scaner(DW *,char *,int,time_t) noex ;
+static int	dw_scanent(DW *,cchar *,cchar *,time_t) noex ;
 static int	dw_findi(DW *,cchar *,IENTRY **) noex ;
 static int	dw_diropen(DW *,time_t) noex ;
 static int	dw_dirclose(DW *) noex ;
@@ -170,9 +177,9 @@ extern "C" {
 
 static vars		var ;
 
-constexpr int		rsn = SR_NOTFOUND ;
+const int		rsn = SR_NOTFOUND ;
 
-constexpr bool		f_fnamecmp = CF_FNAMECMP ;
+const bool		f_fnamecmp = CF_FNAMECMP ;
 
 
 /* exported variables */
@@ -223,14 +230,15 @@ static int dw_starter(DW *op,cchar *dn) noex {
 	        op->ticheck = dt ;
 	        op->tiremove = dt ;
 	        if (cchar *cp ; (rs = mall(dn,-1,&cp)) >= 0) {
-		    rs = SR_TOOBIG ;
 	            if (rs <= var.maxpathlen) {
 	                op->dirname = cp ;
-	                rs = dw_scan(op) ;
+	                rs = dw_scan(op,dt) ;
 	                if (rs == SR_NOENT) rs = SR_OK ;
 			if (rs >= 0) {
 	                    op->magic = DW_MAGIC ;
 			}
+		    } else {
+		        rs = SR_TOOBIG ;
 	            } /* end if (size OK) */
 	            if (rs < 0) {
 	                uc_free(cp) ;
@@ -450,6 +458,7 @@ int dw_find(DW *op,cchar *name,DW_ENT *dep,char *rbuf,int rlen) noex {
 }
 /* end subroutine (dw_find) */
 
+#ifdef	COMMENT
 /* check if the directory has changed */
 int dw_check(DW *op,time_t dt) noex {
 	USTAT sb{} ; 
@@ -465,7 +474,7 @@ int dw_check(DW *op,time_t dt) noex {
 
 /* should we even check? */
 
-	if ((dt - op->ticheck) <= MINCHECKTIME)
+	if ((dt - op->ticheck) <= MININTCHECK)
 	    goto ret0 ;
 
 /* perform the directory time check */
@@ -489,13 +498,13 @@ int dw_check(DW *op,time_t dt) noex {
 	}
 
 	if ((sb.st_mtime > op->timod) ||
-	    ((dt - op->ticheck) > MAXIDLETIME)) {
+	    ((dt - op->ticheck) > MAXINTIDLE)) {
 
 	    op->timod = sb.st_mtime ;
 	    rs = dw_scan(op,"",dt) ;
 	    if (rs >= 0) n = rs ;
 
-	} else if ((dt - op->tiopen) > MAXOPENTIME) {
+	} else if ((dt - op->tiopen) > MAXINTOPEN) {
 
 	    u_close(op->fd) ;
 	    op->fd = -1 ;
@@ -504,70 +513,6 @@ int dw_check(DW *op,time_t dt) noex {
 
 /* OK, now check all files that are 'NEW' and see if they are older! */
 
-	if ((rs >= 0) && (op->count_new > 0)) {
-	    char	dnamebuf[MAXPATHLEN + 1], *dbp ;
-
-	    dbp = dnamebuf ;
-	    dbp = strwcpy(dbp,op->dirname,-1) ;
-
-	    *dbp++ = '/' ;
-	    void	*vp{} ;
-	    for (i = 0 ; vecobj_get(op->elp,i,&vp) >= 0 ; i += 1) {
-	        if (vp) {
-		    IENTRY	*iep = (IENTRY *) vp ;
-	            if (iep->state == DW_SNEW) {
-	                if ((dt - iep->itime) > (op->intcheck / 4)) {
-	                    {
-	                        cint	rl = (MAXPATHLEN - (dbp-dnamebuf)) ;
-	                        strdcpy1(dbp,rl,iep->name) ;
-	                    }
-	                    if ((u_stat(dnamebuf,&sb) >= 0) &&
-	                        ((dt - sb.st_mtime) > op->intcheck)) {
-
-	                        iep->state = DW_SCHECK ;
-	                        op->count_new -= 1 ;
-	                        op->count_checkable += 1 ;
-	                        n += 1 ;
-
-	                    } /* end if */
-	                } /* end if (intcheck) */
-		    } /* end if (equal) */
-		} /* end if (non-null) */
-	    } /* end for */
-
-	} /* end if */
-
-/* OK, we are on a roll now!, check for files that have been removed! */
-
-	if ((rs >= 0) && ((dt - op->tiremove) > MAXIDLETIME) &&
-	    (vecobj_count(op->elp) > 0)) {
-
-	    char	dnamebuf[MAXPATHLEN + 1], *dbp ;
-
-	    op->tiremove = dt ;
-	    dbp = dnamebuf ;
-	    dbp = strwcpy(dbp,op->dirname,-1) ;
-
-	    *dbp++ = '/' ;
-	    void	*vp{} ;
-	    for (i = 0 ; vecobj_get(op->elp,i,&vp) >= 0 ; i += 1) {
-		if (vp) {
-		    IENTRY	*iep = (IENTRY *) vp ;
-	            if ((dt - iep->itime) >= MAXIDLETIME) {
-	                iep->itime = dt ;
-	                {
-	                    cint	rl = (MAXPATHLEN - (dbp-dnamebuf)) ;
-	                    strdcpy1(dbp,rl,iep->name) ;
-	                }
-	                if (u_stat(dnamebuf,&sb) < 0) {
-	                    ientry_finish(iep,op) ;
-	                    vecobj_del(op->elp,i--) ;
-	                } /* end if (could not 'stat') */
-		    } /* end if (got time-out) */
-		} /* end if (non-null) */
-	    } /* end for */
-
-	} /* end if (checking for removed files) */
 
 done:
 	op->ticheck = dt ;
@@ -576,6 +521,144 @@ ret0:
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (dw_check) */
+#else /* COMMENT */
+int dw_check(DW *op,time_t dt) noex {
+    	int		rs ;
+	int		n = 0 ;
+	if ((rs = dw_magic(op)) >= 0) {
+	    if (dt == 0) dt = getustime ;
+	    if ((dt - op->ticheck) >= MININTCHECK) {
+		op->ticheck = dt ;
+	        if ((rs = dw_diropen(op,dt)) >= 0) {
+		    rs = dw_checker(op,dt) ;
+		    n = rs ;
+	        } /* end if (dw_diropen) */
+	    } /* end if (check-time) */
+	} /* end if (magic) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end subroutine (dw_check) */
+
+static int dw_checker(DW *op,time_t dt) noex {
+    	int		rs ;
+	int		n = 0 ;
+	if (USTAT sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
+	    if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
+	        if ((rs = dw_checknew(op,dt,dbuf)) >= 0) {
+	            rs = dw_checkrm(op,dt,dbuf) ;
+		    n = rs ;
+	        }
+		rs = rsfree(rs,dbuf) ;
+	    } /* end if (m-a-f) */
+	} /* end if (stat) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end subroutine (dw_checker) */
+
+static int dw_checknew(DW *op,time_t dt,char *dbuf) noex {
+    	int		rs = SR_OK ;
+	int		rs2 ;
+	if (op->count_new > 0) {
+		vecobj	*elp = op->elp ;
+	        void	*vp{} ;
+	        for (int i = 0 ; (rs2 = elp->get(i,&vp)) >= 0 ; i += 1) {
+		    IENTRY	*iep = (IENTRY *) vp ;
+	            if (vp) {
+	                if (iep->state == DW_SNEW) {
+	                    if ((dt - iep->itime) > (op->intcheck / 4)) {
+			    	rs = dw_checknewent(op,dt,iep,dbuf) ;
+	                    } /* end if (intcheck) */
+		        } /* end if (equal) */
+		    } /* end if (non-null) */
+	        } /* end for */
+	} /* end if (non-zero positive new entries) */
+	return rs ;
+}
+/* end subroutine (dw_checknew) */
+
+static int dw_checknewent(DW *op,time_t dt,IENTRY *iep,char *dbuf) noex {
+	int		rs ;
+	int		n = 0 ;
+	if (USTAT sb ; (rs = uc_stat(dbuf,&sb)) >= 0) {
+	    if ((dt - sb.st_mtime) >= op->intcheck) {
+		iep->state = DW_SCHECK ;
+		op->count_new -= 1 ;
+		op->count_checkable += 1 ;
+		n = 1 ;
+	    } /* end if */
+	} else if (isNotPresent(rs)) {
+	    rs = SR_OK ;
+	} /* end if (stat) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end subroutine (dw_checknewent) */
+
+static int dw_checkrm(DW *op,time_t dt,char *dbuf) noex {
+    	int		rs = SR_OK ;
+	if ((dt - op->tiremove) >= MAXINTIDLE) {
+	    vecobj	*elp = op->elp ;
+	    op->tiremove = dt ;
+	    if ((rs = elp->count) > 0) {
+		    {
+		        rs = dw_checkrmer(op,dbuf,dt) ;
+		    }
+	    } /* end if (vecobj_count) */
+	} /* end if (idle interval) */
+	return rs ;
+}
+/* end subroutine (dw_checkrm) */
+
+static int dw_checkrmer(DW *op,char *dbuf,time_t dt) noex {
+    	vecobj		*elp = op->elp ;
+    	int		rs = SR_OK ;
+	int		rs2 ;
+	void		*vp{} ;
+	for (int i = 0 ; (rs2 = elp->get(i,&vp)) >= 0 ; i += 1) {
+	    if (vp) {
+		IENTRY	*iep = (IENTRY *) vp ;
+		if ((dt - iep->itime) >= MAXINTIDLE) {
+		    cchar	*den = iep->name ;
+		    if ((rs = mkpath(dbuf,op->dirname,den)) >= 0) {
+			if ((rs = dw_checkrment(op,dt,iep,dbuf)) > 0) {
+			    rs = elp->del(i--) ;
+			}
+		    } /* end if (idle period) */
+		} /* end if (idle) */
+		if (rs < 0) break ;
+	    } /* end for */
+	    if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
+	} /* end for */
+	return rs ;
+}
+/* end subroutine (dw_checkrmer) */
+
+static int dw_checkrment(DW *op,time_t dt,IENTRY *iep,cchar *dbuf) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		f = false ;
+	if (USTAT sb ; (rs = uc_stat(dbuf,&sb)) >= 0) {
+	    iep->itime = dt ;
+	} else if (isNotPresent(rs)) {
+	    f = true ;
+	    {
+	        rs1 = ientry_finish(iep,op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (could not 'stat') */
+	return (rs >= 0) ? f : rs ;
+}
+/* end subroutine (dw_checkrment) */
+
+#ifdef	COMMENT2
+	                iep->itime = dt ;
+	                if (u_stat(dnamebuf,&sb) < 0) {
+	                    ientry_finish(iep,op) ;
+	                    vecobj_del(op->elp,i--) ;
+	                } /* end if (could not 'stat') */
+#endif /* COMMENT2 */
+
+
+#endif /* COMMENT */
 
 int dw_callback(DW *op,dwcallback_f func,void *argp) noex {
     	int		rs ;
@@ -608,7 +691,7 @@ extern int dw_state(DW *op,int i,int state) noex {
 
 /* private subroutines */
 
-static int dw_scan(DW *op,cchar *subdname,time_t dt) noex {
+static int dw_scan(DW *op,time_t dt) noex {
 	int		rs ;
 	int		n = 0 ;
 	if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
@@ -624,7 +707,7 @@ static int dw_scan(DW *op,cchar *subdname,time_t dt) noex {
 /* end subroutine (dw_scan) */
 
 /* "do" the subdirectory */
-static int dw_scaner(DW *op,cchar *dbuf,int dl,time_t dt) noex {
+static int dw_scaner(DW *op,char *dbuf,int dl,time_t dt) noex {
     	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
@@ -633,10 +716,9 @@ static int dw_scaner(DW *op,cchar *dbuf,int dl,time_t dt) noex {
 	    if (fsdir d ; (rs = d.open(dbuf)) >= 0) {
 	        fsdir_ent	ds ;
 		while ((rs = d.read(&ds,nbuf,nlen)) > 0) {
-		    cchar	*n = nbuf ;
-		    if (n[0] != '.') {
-			if ((rs = pathadd(dbuf,dl,n)) >= 0) {
-			    rs = dw_scanent(op,dbuf,rs,n,dt) ;
+		    if (nbuf[0] != '.') {
+			if ((rs = pathadd(dbuf,dl,nbuf)) >= 0) {
+			    rs = dw_scanent(op,dbuf,nbuf,dt) ;
 			    n += rs ;
 			}
 		    } /* end if (non-dot) */
@@ -651,12 +733,12 @@ static int dw_scaner(DW *op,cchar *dbuf,int dl,time_t dt) noex {
 }
 /* end subroutine (dw_scaner) */
 
-static int dw_scanent(DW *op,cchar *dbuf,int dl,cchar *n,time_t dt) noex {
+static int dw_scanent(DW *op,cchar *dbuf,cchar *dn,time_t dt) noex {
 	int		rs ;
 	int		n = 0 ;
 	if (USTAT sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
-	        if (IENTRY *iep ; (rs = dw_findi(op,n,&iep)) >= 0) {
+	        if (IENTRY *iep ; (rs = dw_findi(op,dn,&iep)) >= 0) {
                     if (iep->state == DW_SNEW) {
                         iep->itime = dt ;
                         if ((dt - sb.st_mtime) > op->intcheck) {
@@ -669,7 +751,7 @@ static int dw_scanent(DW *op,cchar *dbuf,int dl,cchar *n,time_t dt) noex {
                         iep->itime = dt ;
                     }
 		} else if (rs == rsn) {
-	            if (IENTRY ie ; (rs = ientry_start(&ie,op,n,&sb)) >= 0) {
+	            if (IENTRY ie ; (rs = ientry_start(&ie,op,dn,&sb)) >= 0) {
 			if ((rs = vecobj_add(op->elp,&ie)) >= 0) {
                             op->count_new += 1 ;
 			}
