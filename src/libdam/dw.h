@@ -21,14 +21,13 @@
 #include	<vecobj.h>
 
 
-/* object defines */
 #define	DW_MAGIC	0x31415926
+#define	DW_INTCHECK	20		/* default check time (seconds) */
 #define	DW		struct dw_head
 #define	DW_FL		struct dw_flags
 #define	DW_ENT		struct dw_entry
 #define	DW_CUR		struct dw_cursor
-/* values */
-#define	DW_INTCHECK	20		/* default check time (seconds) */
+
 
 enum dwstates {
     	dwstate_reserved,
@@ -50,14 +49,6 @@ struct dw_entry {
 	int		state ;
 } ;
 
-struct dw_ientry {
-	cchar		*name ;
-	time_t		itime ;
-	time_t		timod ;
-	size_t		fsize ;
-	int		state ;
-} ;
-
 struct dw_flags {
 	uint		subdirs:1 ;
 } ;
@@ -66,13 +57,12 @@ EXTERNC_begin
 struct dw_head {
 	vecobj		*elp ;			/* directory entries */
 	cchar		*dirname ;		/* directory path */
-	void		(*callback)(DW_ENT *,int,void *) noex ;
 	cvoid		*argp ;
 	time_t		tiopen ;		/* time FD was cached */
 	time_t		timod ;			/* directory mod-time */
 	time_t		ticheck ;		/* time last checked */
 	time_t		tiremove ;		/* last checked for removed */
-	DW_FL		f ;
+	DW_FL		fl ;
 	uint		magic ;
 	int		intcheck ;		/* file check interval */
 	int		fd ;			/* cached directory FD */
@@ -92,7 +82,7 @@ typedef	DW_CUR		dw_cur ;
 
 EXTERNC_begin
 
-extern int dw_start(dw *,cchar *) noex ;
+extern int dw_start(dw *,cchar *,int) noex ;
 extern int dw_finish(dw *) noex ;
 extern int dw_find(dw *,cchar *,dw_ent *,char *,int) noex ;
 extern int dw_del(dw *,dw_cur *) noex ;

@@ -2,10 +2,8 @@
 # SUBER
 
 DN=/dev/null
-builtin fgrep 2> ${DN}
 
 for F in *.c ; do
-
   ON=${F%.*}
   if [[ -r ${ON}.c ]] ; then
     if fgrep ${ON}_init ${ON}.c > ${DN} ; then
@@ -15,7 +13,6 @@ for F in *.c ; do
 	print -- "g/${ON}_cursorfree/s//${ON}_curend/g"
     fi
   fi
-
 done > changes
 
 

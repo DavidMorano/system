@@ -320,7 +320,6 @@ uiconv.o:		uiconv.cc uiconv.h		$(INCS)
 syswords.o:		syswords.cc syswords.hh
 varnames.o:		varnames.cc varnames.hh
 valuelims.o:		valuelims.cc valuelims.hh
-digbufsizes.o:		digbufsizes.cc digbufsizes.hh
 endian.o::		endian.cc endian.h
 
 timecount.o:		timecount.cc timecount.hh
@@ -329,5 +328,9 @@ strtox.o:		strtox.cc strtox.h		$(INCS)
 xxtostr.o:		xxtostr.cc xxtostr.h		$(INCS)
 
 strnul.o:		strnul.cc strnul.hh		$(INCS)
+
+# DIGBUFSIZES
+digbufsizes.o:		digbufsizes.ccm			$(INCS)
+	makemodule digbufsizes
 
 

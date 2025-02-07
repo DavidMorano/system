@@ -62,14 +62,18 @@
 /* external variables */
 
 
-/* local subroutine-templates */
+/* local structures */
 
-template<typename T> constexpr static inline int nbits(T) noex {
+
+/* forward references */
+
+template<typename T> 
+constexpr static inline int nbits(T) noex {
     	return (szof(T) * CHAR_BIT) ;
 }
 
 template<typename T>
-static inline bool bit(T v,int n) noex {
+constexpr static inline bool bit(T v,int n) noex {
 	return !!((v >> n) & 1) ;
 }
 
@@ -150,6 +154,9 @@ int ucstrtox(cchar *sp,cchar **epp,int b,T *rp) noex {
 	return rs ;
 }
 /* end subroutine-template (ucstrtox) */
+
+
+/* local variables */
 
 
 /* exported variables */

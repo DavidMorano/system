@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-I00= vsystem.h exitcodes.h localmisc.h
+I00= usystem.h exitcodes.h localmisc.h
 I01= vechand.h vecstr.h vecitem.h vecobj.h vecint.h veclong.h vecelem.h
 I02=
 I03= field.h 
@@ -57,7 +57,8 @@ INCD= $(I12) $(I13) $(I14) $(I15)
 INCE= $(I16) $(I17) $(I18) $(I19) 
 INCF= $(I20) $(I21) $(I22) $(I32)
 
-INCS= $(INCA) $(INCB) $(INCC) $(INCD) $(INCE) $(INCF) 
+#INCS= $(INCA) $(INCB) $(INCC) $(INCD) $(INCE) $(INCF) 
+INCS= libdam.h
 
 LIBS += -lb -luc
 
@@ -870,59 +871,60 @@ percache.o:		percache.cc percache.h
 cvttemperature.o:	cvttemperature.cc cvttemperature.h
 
 # DFSA
-dfsa.o:			dfsa0.o dfsa1.o
+dfsa.o:			dfsa0.o dfsa1.o			$(INCS)
 	makemodule dfsa
 	$(LD) -r -o $@ $(LDFLAGS) dfsa0.o dfsa1.o
-dfsa0.o:		dfsa.mod
+dfsa0.o:		dfsa.ccm			$(INCS)
 	makemodule dfsa
-dfsa1.o:		dfsa1.cc dfsa.mod
+dfsa1.o:		dfsa1.cc dfsa.ccm		$(INCS)
 	makemodule dfsa
 	$(COMPILE.cc) dfsa1.cc
 
 # DFSB
-dfsb.o:			dfsb0.o dfsb1.o
+dfsb.o:			dfsb0.o dfsb1.o			$(INCS)
 	makemodule dfsb
 	$(LD) -r -o $@ $(LDFLAGS) dfsb0.o dfsb1.o
-dfsb0.o:		dfsb.mod
+dfsb0.o:		dfsb.ccm			$(INCS)
 	makemodule dfsb
-dfsb1.o:		dfsb1.cc dfsb.mod
+dfsb1.o:		dfsb1.cc dfsb.ccm		$(INCS)
 	makemodule dfsb
 	$(COMPILE.cc) dfsb1.cc
 
 # FONCE
-fonce.o:		fonce0.o fonce1.o
+fonce.o:		fonce0.o fonce1.o		$(INCS)
 	makemodule fonce
 	$(LD) -r -o $@ $(LDFLAGS) fonce0.o fonce1.o
-fonce0.o:		fonce.mod
+fonce0.o:		fonce.ccm			$(INCS)
 	makemodule fonce
-fonce1.o:		fonce1.cc fonce.mod
+fonce1.o:		fonce1.cc fonce.ccm		$(INCS)
 	makemodule fonce
 	$(COMPILE.cc) fonce1.cc
 
-sort_merge.o:		sort_merge.mod
+sort_merge.o:		sort_merge.ccm			$(INCS)
 	makemodule sort_merge
 
-sort_insertion.o:	sort_insertion.mod
+sort_insertion.o:	sort_insertion.ccm		$(INCS)
 	makemodule sort_insertion
 
 # SETHAND
-sethand.o:		sethand.mod
+sethand.o:		sethand.ccm retstat.ccm		$(INCS)
+	makemodule retstat
 	makemodule sethand
 
 # CCMUTEX
-ccmutex.o:		ccmutex.mod
+ccmutex.o:		ccmutex.ccm			$(INCS)
 	makemodule ccmutex
 
 # RETSTAT
-retstat.o:		retstat.mod
+retstat.o:		retstat.ccm			$(INCS)
 	makemodule retstat
 
 # MINMAXELEM
-minmaxelem.o:		minmaxelem.mod
+minmaxelem.o:		minmaxelem.ccm			$(INCS)
 	makemodule minmaxelem
 
 # HASDUPLICATE
-hascount.o:		hascount.mod
+hascount.o:		hascount.ccm			$(INCS)
 	makemodule hascount
 
 

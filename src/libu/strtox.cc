@@ -214,7 +214,7 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 	longlong acc, cutoff;
 	const char *s;
 	int c;
-	int neg, any, cutlim;
+	int neg, vany, cutlim;
 	/*
 	 * Skip white space and pick up leading +/- sign if any.
 	 * If base is 0, allow 0x for hex and 0 for octal, else
@@ -229,8 +229,9 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 		c = *s++;
 	} else {
 		neg = 0;
-		if (c == '+')
+		if (c == '+') {
 			c = *s++;
+		}
 	}
 	if ((base == 0 || base == 16) &&
 	    c == '0' && (*s == 'x' || *s == 'X')) {
@@ -255,7 +256,7 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 	 * a value > 214748364, or equal but the next digit is > 7 (or 8),
 	 * the number is too big, and we will return a range error.
 	 *
-	 * Set 'any' if any `digits' consumed; make it negative to indicate
+	 * Set 'vany' if vany `digits' consumed; make it negative to indicate
 	 * overflow.
 	 */
 	cutoff = neg ? llhelp.llmin : llhelp.llmax ;
@@ -268,41 +269,42 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 		}
 		cutlim = -cutlim;
 	}
-	for (acc = 0, any = 0 ; ; c = (unsigned char) *s++) {
+	for (acc = 0, vany = 0 ; ; c = (unsigned char) *s++) {
 		if (isdigit(c)) {
 			c -= '0';
 		} else if (isalpha(c)) {
 			c -= isupper(c) ? ('A' - 10) : ('a' - 10) ;
-		} else
+		} else {
 			break;
+		}
 		if (c >= base)
 			break;
-		if (any < 0)
+		if (vany < 0)
 			continue;
 		if (neg) {
 			if (acc < cutoff || (acc == cutoff && c > cutlim)) {
-				any = -1;
+				vany = -1;
 				acc = llhelp.llmin ;
 				errno = ERANGE;
 			} else {
-				any = 1;
+				vany = 1;
 				acc *= base;
 				acc -= c;
 			}
 		} else {
 			if (acc > cutoff || (acc == cutoff && c > cutlim)) {
-				any = -1;
+				vany = -1;
 				acc = llhelp.llmax ;
 				errno = ERANGE;
 			} else {
-				any = 1;
+				vany = 1;
 				acc *= base;
 				acc += c;
 			}
 		}
 	} /* end for */
 	if (endptr != nullptr) {
-	    *endptr = (char *) (any ? (s - 1) : nptr) ;
+	    *endptr = (char *) (vany ? (s - 1) : nptr) ;
 	}
 	return acc ;
 }
@@ -319,7 +321,7 @@ ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
 	ulonglong	acc, cutoff;
 	const char *s;
 	int c;
-	int neg, any, cutlim;
+	int neg, vany, cutlim;
 	/*
 	 * See strtoq for comments as to the logic used.
 	 */
@@ -338,9 +340,9 @@ ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
 	}
 	if ((base == 0 || base == 16) &&
 	    c == '0' && (*s == 'x' || *s == 'X')) {
-		c = s[1];
-		s += 2;
-		base = 16;
+		c = s[1] ;
+		s += 2 ;
+		base = 16 ;
 	}
 	if (base == 0) {
 		base = ((c == '0') ? 8 : 10) ;
@@ -348,7 +350,7 @@ ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
 
 	    cutoff = llhelp.cutoff[base] ;
 	    cutlim = llhelp.cutlim[base] ;
-	for (acc = 0, any = 0 ; ; c = (unsigned char) *s++) {
+	for (acc = 0, vany = 0 ; ; c = (unsigned char) *s++) {
 		if (isdigit(c)) {
 			c -= '0';
 		} else if (isalpha(c)) {
@@ -357,23 +359,23 @@ ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
 			break;
 		if (c >= base)
 			break;
-		if (any < 0)
+		if (vany < 0)
 			continue;
 		if (acc > cutoff || (acc == cutoff && c > cutlim)) {
-			any = -1;
+			vany = -1;
 			acc = llhelp.ullmax ;
 			errno = ERANGE;
 		} else {
-			any = 1;
+			vany = 1;
 			acc *= base ;
 			acc += c ;
 		}
 	} /* end for */
-	if (neg && any > 0) {
+	if (neg && vany > 0) {
 	    acc = (-acc) ;
 	}
 	if (endptr != nullptr) {
-	    *endptr = (char *) (any ? (s - 1) : nptr) ;
+	    *endptr = (char *) (vany ? (s - 1) : nptr) ;
 	}
 	return acc ;
 }

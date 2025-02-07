@@ -29,18 +29,18 @@
 
 EXTERNC_begin
 
-extern int		strtoxi(cchar *,char **,int) noex ;
-extern uint		strtoxui(cchar *,char **,int) noex ;
+extern int		strtoxi(cchar *,char **,int) noex ;	/* 32-bits */
+extern uint		strtoxui(cchar *,char **,int) noex ;	/* 32-bits */
 
-extern long		strtoxl(cchar *,char **,int) noex ;
-extern ulong		strtoxul(cchar *,char **,int) noex ;
+extern long		strtoxl(cchar *,char **,int) noex ;	/* 64-bits */
+extern ulong		strtoxul(cchar *,char **,int) noex ;	/* 64-bits */
 
-extern longlong		strtoxll(cchar *,char **,int) noex ;
-extern ulonglong	strtoxull(cchar *,char **,int) noex ;
+extern longlong		strtoxll(cchar *,char **,int) noex ;	/* 128-bits */
+extern ulonglong	strtoxull(cchar *,char **,int) noex ;	/* 128-bits */
 
-#ifdef	COMMENT /* this is a 128-bit integer; but it does not yet exist */
-extern intmax		strtoxim(cchar *,char **,int) noex ;
-extern uintmax		strtoxuim(cchar *,char **,int) noex ;
+#ifdef	COMMENT /* this is a 256-bit integer; but it does not yet exist */
+extern intmax		strtoxim(cchar *,char **,int) noex ;	/* 256-bits */
+extern uintmax		strtoxuim(cchar *,char **,int) noex ;	/* 256-bits */
 #endif /* COMMENT */
 
 EXTERNC_end

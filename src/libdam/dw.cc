@@ -10,7 +10,7 @@
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-	This subroutine was written for use in the 'rbbpost' daemon
+	This subroutine was written for use in the RBBPOST daemon
 	program.
 
 */
@@ -31,16 +31,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
@@ -63,7 +59,7 @@
 
 /* local defines */
 
-#define	IENTRY		struct dw_ientry
+#define	IENT		dw_ient
 
 #define	MININTCHECK	2		/* minumun check interval (seconds) */
 #define	MAXINTOPEN	300		/* maximum FD cache interval */
@@ -82,16 +78,8 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-extern "C" {
-    typedef void (*dwcallback_f)(DW_ENT *,int,void *) noex ;
-}
-
 
 /* external subroutines */
-
-extern "C" {
-    int dw_callback(DW *,dwcallback_f,void *) noex ;
-}
 
 
 /* external variables */
@@ -104,7 +92,20 @@ namespace {
 	int		maxpathlen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
+    struct intvals {
+	int		mincheck = MININTCHECK ;
+	int		maxopen = MAXINTOPEN ;
+	int		maxidle = MAXINTIDLE ;
+    } ; /* end struct (intvals) */
 }
+
+struct dw_ient {
+	cchar		*name ;
+	time_t		itime ;
+	time_t		timod ;
+	size_t		fsize ;
+	int		state ;
+} ; /* end struct (dw_ient) */
 
 
 /* forward references */
@@ -151,22 +152,23 @@ static inline int dw_magic(dw *op,Args ... args) noex {
 static int	dw_starter(DW *,cchar *) noex ;
 static int	dw_finents(DW *) noex ;
 static int	dw_checker(DW *,time_t) noex ;
+static int	dw_checkx(DW *,time_t) noex ;
 static int	dw_checknew(DW *,time_t,char *) noex ;
-static int	dw_checknewent(DW *,time_t,IENTRY *,char *) noex ;
+static int	dw_checknewent(DW *,time_t,IENT *,char *) noex ;
 static int	dw_checkrm(DW *,time_t,char *) noex ;
 static int	dw_checkrmer(DW *,char *,time_t) noex ;
-static int	dw_checkrment(DW *,time_t,IENTRY *,cchar *) noex ;
+static int	dw_checkrment(DW *,time_t,IENT *,cchar *) noex ;
 static int	dw_scan(DW *,time_t) noex ;
 static int	dw_scaner(DW *,char *,int,time_t) noex ;
 static int	dw_scanent(DW *,cchar *,cchar *,time_t) noex ;
-static int	dw_findi(DW *,cchar *,IENTRY **) noex ;
+static int	dw_findi(DW *,cchar *,IENT **) noex ;
 static int	dw_diropen(DW *,time_t) noex ;
 static int	dw_dirclose(DW *) noex ;
 
-static int	ientry_start(IENTRY *,DW *,cchar *,USTAT *) noex ;
-static int	ientry_finish(IENTRY *,DW *) noex ;
+static int	ient_start(IENT *,DW *,cchar *,USTAT *) noex ;
+static int	ient_finish(IENT *,DW *) noex ;
 
-static int	entry_load(DW_ENT *,IENTRY *,cchar *) noex ;
+static int	entry_load(DW_ENT *,IENT *,cchar *) noex ;
 
 extern "C" {
     static int	vcmpfn(cvoid **,cvoid **) noex ;
@@ -174,6 +176,8 @@ extern "C" {
 
 
 /* local variables */
+
+constexpr intvals	intval ;
 
 static vars		var ;
 
@@ -187,16 +191,17 @@ const bool		f_fnamecmp = CF_FNAMECMP ;
 
 /* exported subroutines */
 
-int dw_start(DW *op,cchar *dirname) noex {
+int dw_start(DW *op,cchar *dirname,int intck) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = dw_ctor(op,dirname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (dirname[0]) {
-		cchar	*fn ;
-		if (absfn d ; (rs = d.start(dirname,-1,&fn)) >= 0) {
+		cchar	*dn ;
+		if (absfn d ; (rs = d.start(dirname,-1,&dn)) >= 0) {
 		    {
-		        rs = dw_starter(op,fn) ;
+	    		op->intcheck = (intck > 2) ? intck : DW_INTCHECK ;
+		        rs = dw_starter(op,dn) ;
 		    }
 		    rs1 = d.finish ;
 		    if (rs >= 0) rs = rs1 ;
@@ -220,7 +225,6 @@ static int dw_starter(DW *op,cchar *dn) noex {
 	    op->fd = -1 ;
 	    op->count_new = 0 ;
 	    op->count_checkable = 0 ;
-	    op->intcheck = DW_INTCHECK ;
             /* initialize */
 	    if ((rs = vecobj_start(op->elp,sz,vn,vo)) >= 0) {
 		auto		mall = uc_mallocstrw ;
@@ -293,9 +297,9 @@ static int dw_finents(DW *op) noex {
 	    void	*vp{} ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; (rs2 = elp->get(i,&vp)) >= 0 ; i += 1) {
-		IENTRY	*iep = (IENTRY *) vp ;
+		IENT	*iep = (IENT *) vp ;
 	        if (vp) {
-	            rs1 = ientry_finish(iep,op) ;
+	            rs1 = ient_finish(iep,op) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	    } /* end for */
@@ -327,8 +331,7 @@ int dw_curenum(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		nlen = 0 ;
 	if ((rs = dw_magic(op,curp)) >= 0) {
-	    /* get the next entry (any one) */
-	    IENTRY	*iep = nullptr ;
+	    IENT	*iep = nullptr ;
 	    int		i ;
 	    if ((curp == nullptr) || (curp->i < 0)) {
 	        i = 0 ;
@@ -337,7 +340,7 @@ int dw_curenum(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 	    }
 	    void	*vp{} ;
 	    while ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
-	        iep = (IENTRY *) vp ;
+	        iep = (IENT *) vp ;
 	        if (vp) break ;
 	        i += 1 ;
 	    } /* end while */
@@ -350,11 +353,8 @@ int dw_curenum(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 		    rs = sncpy(rbuf,rlen,iep->name) ;
 		    nlen = rs ;
 		}
-	        if (rs >= 0) {
-	            curp->i = i ;
-	        }
 	    } /* end if (ok) */
-	    if (rs >= 0) {
+	    if ((rs >= 0) && curp) {
 	        curp->i = i ;
 	    }
 	} /* end if (magic) */
@@ -367,7 +367,7 @@ int dw_curenumcheck(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = dw_magic(op)) >= 0) {
-	    IENTRY	*iep = nullptr ; /* used across blocks */
+	    IENT	*iep = nullptr ; /* used across blocks */
 	    /* get the next entry with a checkable file */
 	    if ((curp == nullptr) || (curp->i < 0)) {
 	        i = 0 ;
@@ -377,7 +377,7 @@ int dw_curenumcheck(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 	    void	*vp{} ;
 	    while ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
 	        if (vp) {
-		    iep = (IENTRY *) vp ;
+		    iep = (IENT *) vp ;
 		    if (iep->state == DW_SCHECK) break ;
 	        }
 	        i += 1 ;
@@ -404,10 +404,10 @@ int dw_del(DW *op,DW_CUR *curp) noex {
 	if ((rs = dw_magic(op,curp)) >= 0) {
 	    void	*vp{} ;
 	    if ((rs = vecobj_get(op->elp,curp->i,&vp)) >= 0) {
-		IENTRY	*iep = (IENTRY *) vp ;
+		IENT	*iep = (IENT *) vp ;
 	        if (vp) {
 		    {
-	                rs1 = ientry_finish(iep,op) ;
+	                rs1 = ient_finish(iep,op) ;
 		        if (rs >= 0) rs = rs1 ;
 		    }
 		    {
@@ -428,18 +428,18 @@ int dw_find(DW *op,cchar *name,DW_ENT *dep,char *rbuf,int rlen) noex {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
 		vecobj	*elp = op->elp ;
-	        IENTRY	*iep = nullptr ;
+	        IENT	*iep = nullptr ;
 	        void	*vp{} ;
 		if_constexpr (f_fnamecmp) {
-	            IENTRY	ie{} ;
+	            IENT	ie{} ;
 	            ie.name = charp(name) ;
 	            if ((rs = elp->search(&ie,vcmpfn,&vp)) >= 0) {
-	                iep = (IENTRY *) vp ;
+	                iep = (IENT *) vp ;
 	            }
 		} else {
 	            for (i = 0 ; (rs = elp->get(i,&vp)) >= 0 ; i += 1) {
 	                if (vp) {
-		            iep = (IENTRY *) vp ;
+		            iep = (IENT *) vp ;
 	                    if (strcmp(name,iep->name) == 0) break ;
 	                }
 	            } /* end for (looping through entries) */
@@ -458,76 +458,12 @@ int dw_find(DW *op,cchar *name,DW_ENT *dep,char *rbuf,int rlen) noex {
 }
 /* end subroutine (dw_find) */
 
-#ifdef	COMMENT
-/* check if the directory has changed */
-int dw_check(DW *op,time_t dt) noex {
-	USTAT sb{} ; 
-	int		rs = SR_OK ;
-	int		i ;
-	int		n = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != DW_MAGIC) return SR_NOTOPEN ;
-
-	if (dt <= 0) dt = getustime ;
-
-/* should we even check? */
-
-	if ((dt - op->ticheck) <= MININTCHECK)
-	    goto ret0 ;
-
-/* perform the directory time check */
-
-	if (op->fd < 0) {
-
-	    rs = u_open(op->dirname,O_RDONLY,0666) ;
-	    op->fd = rs ;
-	    if (rs >= 0) {
-	        op->tiopen = dt ;
-	        rs = uc_closeonexec(op->fd,true) ;
-	    }
-
-	} /* end if (opened FD for caching) */
-	if (rs < 0) goto ret0 ;
-
-	if ((rs = u_fstat(op->fd,&sb)) < 0) {
-	    u_close(op->fd) ;
-	    op->fd = -1 ;
-	    goto done ;
-	}
-
-	if ((sb.st_mtime > op->timod) ||
-	    ((dt - op->ticheck) > MAXINTIDLE)) {
-
-	    op->timod = sb.st_mtime ;
-	    rs = dw_scan(op,"",dt) ;
-	    if (rs >= 0) n = rs ;
-
-	} else if ((dt - op->tiopen) > MAXINTOPEN) {
-
-	    u_close(op->fd) ;
-	    op->fd = -1 ;
-
-	} /* end if */
-
-/* OK, now check all files that are 'NEW' and see if they are older! */
-
-
-done:
-	op->ticheck = dt ;
-
-ret0:
-	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (dw_check) */
-#else /* COMMENT */
 int dw_check(DW *op,time_t dt) noex {
     	int		rs ;
 	int		n = 0 ;
 	if ((rs = dw_magic(op)) >= 0) {
 	    if (dt == 0) dt = getustime ;
-	    if ((dt - op->ticheck) >= MININTCHECK) {
+	    if ((dt - op->ticheck) >= intval.mincheck) {
 		op->ticheck = dt ;
 	        if ((rs = dw_diropen(op,dt)) >= 0) {
 		    rs = dw_checker(op,dt) ;
@@ -543,17 +479,38 @@ static int dw_checker(DW *op,time_t dt) noex {
     	int		rs ;
 	int		n = 0 ;
 	if (USTAT sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
-	    if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
-	        if ((rs = dw_checknew(op,dt,dbuf)) >= 0) {
-	            rs = dw_checkrm(op,dt,dbuf) ;
-		    n = rs ;
-	        }
-		rs = rsfree(rs,dbuf) ;
-	    } /* end if (m-a-f) */
+	    bool	f = false ;
+	    f = f || (sb.st_mtime >= op->timod) ;
+	    f = f || ((dt = op->ticheck) >= intval.maxidle) ;
+	    if (f) {
+		op->timod = sb.st_mtime ;
+		rs = dw_scan(op,dt) ;
+		n = rs ;
+	    } else if ((dt = op->tiopen) >= intval.maxopen) {
+		uc_close(op->fd) ;
+		op->fd = -1 ;
+	    }
+	    if (rs >= 0) {
+	        rs = dw_checkx(op,dt) ;
+	    }
 	} /* end if (stat) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (dw_checker) */
+
+static int dw_checkx(DW *op,time_t dt) noex {
+    	int		rs ;
+	int		n = 0 ;
+	if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
+	    if ((rs = dw_checknew(op,dt,dbuf)) >= 0) {
+	        rs = dw_checkrm(op,dt,dbuf) ;
+		n = rs ;
+	    }
+	    rs = rsfree(rs,dbuf) ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end subroutine (dw_checkx) */
 
 static int dw_checknew(DW *op,time_t dt,char *dbuf) noex {
     	int		rs = SR_OK ;
@@ -562,7 +519,7 @@ static int dw_checknew(DW *op,time_t dt,char *dbuf) noex {
 		vecobj	*elp = op->elp ;
 	        void	*vp{} ;
 	        for (int i = 0 ; (rs2 = elp->get(i,&vp)) >= 0 ; i += 1) {
-		    IENTRY	*iep = (IENTRY *) vp ;
+		    IENT	*iep = (IENT *) vp ;
 	            if (vp) {
 	                if (iep->state == DW_SNEW) {
 	                    if ((dt - iep->itime) > (op->intcheck / 4)) {
@@ -576,7 +533,7 @@ static int dw_checknew(DW *op,time_t dt,char *dbuf) noex {
 }
 /* end subroutine (dw_checknew) */
 
-static int dw_checknewent(DW *op,time_t dt,IENTRY *iep,char *dbuf) noex {
+static int dw_checknewent(DW *op,time_t dt,IENT *iep,char *dbuf) noex {
 	int		rs ;
 	int		n = 0 ;
 	if (USTAT sb ; (rs = uc_stat(dbuf,&sb)) >= 0) {
@@ -595,13 +552,11 @@ static int dw_checknewent(DW *op,time_t dt,IENTRY *iep,char *dbuf) noex {
 
 static int dw_checkrm(DW *op,time_t dt,char *dbuf) noex {
     	int		rs = SR_OK ;
-	if ((dt - op->tiremove) >= MAXINTIDLE) {
+	if ((dt - op->tiremove) >= intval.maxidle) {
 	    vecobj	*elp = op->elp ;
 	    op->tiremove = dt ;
 	    if ((rs = elp->count) > 0) {
-		    {
-		        rs = dw_checkrmer(op,dbuf,dt) ;
-		    }
+		rs = dw_checkrmer(op,dbuf,dt) ;
 	    } /* end if (vecobj_count) */
 	} /* end if (idle interval) */
 	return rs ;
@@ -615,8 +570,8 @@ static int dw_checkrmer(DW *op,char *dbuf,time_t dt) noex {
 	void		*vp{} ;
 	for (int i = 0 ; (rs2 = elp->get(i,&vp)) >= 0 ; i += 1) {
 	    if (vp) {
-		IENTRY	*iep = (IENTRY *) vp ;
-		if ((dt - iep->itime) >= MAXINTIDLE) {
+		IENT	*iep = (IENT *) vp ;
+		if ((dt - iep->itime) >= intval.maxidle) {
 		    cchar	*den = iep->name ;
 		    if ((rs = mkpath(dbuf,op->dirname,den)) >= 0) {
 			if ((rs = dw_checkrment(op,dt,iep,dbuf)) > 0) {
@@ -632,7 +587,7 @@ static int dw_checkrmer(DW *op,char *dbuf,time_t dt) noex {
 }
 /* end subroutine (dw_checkrmer) */
 
-static int dw_checkrment(DW *op,time_t dt,IENTRY *iep,cchar *dbuf) noex {
+static int dw_checkrment(DW *op,time_t dt,IENT *iep,cchar *dbuf) noex {
     	int		rs ;
 	int		rs1 ;
 	int		f = false ;
@@ -641,7 +596,7 @@ static int dw_checkrment(DW *op,time_t dt,IENTRY *iep,cchar *dbuf) noex {
 	} else if (isNotPresent(rs)) {
 	    f = true ;
 	    {
-	        rs1 = ientry_finish(iep,op) ;
+	        rs1 = ient_finish(iep,op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (could not 'stat') */
@@ -649,28 +604,7 @@ static int dw_checkrment(DW *op,time_t dt,IENTRY *iep,cchar *dbuf) noex {
 }
 /* end subroutine (dw_checkrment) */
 
-#ifdef	COMMENT2
-	                iep->itime = dt ;
-	                if (u_stat(dnamebuf,&sb) < 0) {
-	                    ientry_finish(iep,op) ;
-	                    vecobj_del(op->elp,i--) ;
-	                } /* end if (could not 'stat') */
-#endif /* COMMENT2 */
-
-
-#endif /* COMMENT */
-
-int dw_callback(DW *op,dwcallback_f func,void *argp) noex {
-    	int		rs ;
-	if ((rs = dw_magic(op)) >= 0) {
-	    op->callback = func ;
-	    op->argp = argp ;
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (dw_callback) */
-
-extern int dw_state(DW *op,int i,int state) noex {
+int dw_state(DW *op,int i,int state) noex {
 	int		rs ;
 	int		state_prev = 0 ;
 	if ((rs = dw_magic(op)) >= 0) {
@@ -678,7 +612,7 @@ extern int dw_state(DW *op,int i,int state) noex {
 	    if (state >= 0) {
 	        void	*vp{} ;
 	        if ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
-	            IENTRY	*iep = (IENTRY *) vp ;
+	            IENT	*iep = (IENT *) vp ;
 	            state_prev = iep->state ;
 	            iep->state = state ;
 	        }
@@ -738,7 +672,7 @@ static int dw_scanent(DW *op,cchar *dbuf,cchar *dn,time_t dt) noex {
 	int		n = 0 ;
 	if (USTAT sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
-	        if (IENTRY *iep ; (rs = dw_findi(op,dn,&iep)) >= 0) {
+	        if (IENT *iep ; (rs = dw_findi(op,dn,&iep)) >= 0) {
                     if (iep->state == DW_SNEW) {
                         iep->itime = dt ;
                         if ((dt - sb.st_mtime) > op->intcheck) {
@@ -751,7 +685,7 @@ static int dw_scanent(DW *op,cchar *dbuf,cchar *dn,time_t dt) noex {
                         iep->itime = dt ;
                     }
 		} else if (rs == rsn) {
-	            if (IENTRY ie ; (rs = ientry_start(&ie,op,dn,&sb)) >= 0) {
+	            if (IENT ie ; (rs = ient_start(&ie,op,dn,&sb)) >= 0) {
 			if ((rs = vecobj_add(op->elp,&ie)) >= 0) {
                             op->count_new += 1 ;
 			}
@@ -779,7 +713,7 @@ static int dw_diropen(DW *op,time_t dt) noex {
 		if (rs < 0) {
 		    uc_close(op->fd) ;
 		    op->fd = -1 ;
-		}
+		} /* end if (error handling) */
 	    } /* end if (u_open) */
 	} /* end if (opened FD for caching) */
 	return rs ;
@@ -800,11 +734,11 @@ static int dw_dirclose(DW *op) noex {
 
 #ifdef	COMMENT
 
-static int dw_finddelete(DW *op,cchar *name) noex {
+static int dw_delname(DW *op,cchar *name) noex {
 	int		rs ;
 	int		i = 0 ;
-	IENTRY		ie{} ;
-	IENTRY		*iep ;
+	IENT		ie{} ;
+	IENT		*iep ;
 	ie.name = name ;
 	if ((rs = vecobj_search(op->elp,&ie,vcmpfn,&iep)) >= 0) {
 	    i = rs ;
@@ -812,17 +746,17 @@ static int dw_finddelete(DW *op,cchar *name) noex {
 	}
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (dw_finddelete) */
+/* end subroutine (dw_delname) */
 
 #endif /* COMMENT */
 
-static int dw_findi(DW *op,cchar *name,IENTRY **iepp) noex {
+static int dw_findi(DW *op,cchar *name,IENT **iepp) noex {
 	int		rs ;
-	IENTRY		ie ;
+	IENT		ie ;
 	ie.name = charp(name) ;
 	void		*vp{} ;
 	if ((rs = vecobj_search(op->elp,&ie,vcmpfn,&vp)) >= 0) {
-	    IENTRY	*iep = (IENTRY *) vp ;
+	    IENT	*iep = (IENT *) vp ;
 	    *iepp = iep ;
 	}
 	return rs ;
@@ -830,7 +764,7 @@ static int dw_findi(DW *op,cchar *name,IENTRY **iepp) noex {
 /* end subroutine (dw_findi) */
 
 /* initialize an entry */
-static int ientry_start(IENTRY *iep,DW *op,cchar *name,USTAT *sbp) noex {
+static int ient_start(IENT *iep,DW *op,cchar *name,USTAT *sbp) noex {
 	int		rs ;
 	iep->state = DW_SNEW ;
 	if (cchar *cp ; (rs = uc_mallocstrw(name,-1,&cp)) >= 0) {
@@ -850,9 +784,9 @@ static int ientry_start(IENTRY *iep,DW *op,cchar *name,USTAT *sbp) noex {
 	} /* end if (memory-allocation) */
 	return rs ;
 }
-/* end subroutine (ientry_start) */
+/* end subroutine (ient_start) */
 
-static int ientry_finish(IENTRY *iep,DW *op) noex {
+static int ient_finish(IENT *iep,DW *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (iep->state == DW_SNEW) {
@@ -867,9 +801,9 @@ static int ientry_finish(IENTRY *iep,DW *op) noex {
 	}
 	return rs ;
 }
-/* end subroutine (ientry_finish) */
+/* end subroutine (ient_finish) */
 
-static int entry_load(DW_ENT *dep,IENTRY *iep,cchar *rbuf) noex {
+static int entry_load(DW_ENT *dep,IENT *iep,cchar *rbuf) noex {
 	int		rs = SR_FAULT ;
 	if (dep && iep) {
 	    rs = SR_OK ;
@@ -896,12 +830,12 @@ vars::operator int () noex {
 /* end method (vars::operator) */
 
 static int vcmpfn(cvoid **v1pp,cvoid **v2pp) noex {
-	IENTRY		**e1pp = (IENTRY **) v1pp ;
-	IENTRY		**e2pp = (IENTRY **) v2pp ;
+	IENT		**e1pp = (IENT **) v1pp ;
+	IENT		**e2pp = (IENT **) v2pp ;
 	int		rc = 0 ;
 	{
-	    IENTRY	*e1p = *e1pp ;
-	    IENTRY	*e2p = *e2pp ;
+	    IENT	*e1p = *e1pp ;
+	    IENT	*e2p = *e2pp ;
 	    if (e1p || e2p) {
 	        if (e1p) {
 	            if (e2p) {

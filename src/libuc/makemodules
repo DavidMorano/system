@@ -1,7 +1,8 @@
 #!/usr/extra/bin/ksh
-# MAKEMODULES
+# MAKEMODULE
 PN=${0##*/}
 GCM=gcm.cache
+MFO=
 
 function makeobj {
   typeset M=${1}
@@ -16,7 +17,7 @@ function makeone {
   if [[ -r "${M}.mod" ]] ; then
     MF=${M}.mod
   elif [[ -r "${M}.ccm" ]] ; then
-    MF=${M}.mod
+    MF=${M}.ccm
   fi
   makeobj ${M}
   if [[ ${MF} -nt ${GCM}/${M}.gcm ]] || [[ ${MF} -nt "${MFO}" ]] ; then

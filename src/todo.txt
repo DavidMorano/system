@@ -5,7 +5,6 @@ TODO
 file		what
 --------------------------------------------------------------------------------
 prique		broken, ill-conceived
-dw
 timer		decide what to do about |timer_hand()| -- broken
 uctim
 libuc		fix to completely compile!

@@ -27,9 +27,6 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<libmallocxx.h>
-#include	<getxname.h>
-
 
 #endif /* LIBDAM_INCLUDE */
 
