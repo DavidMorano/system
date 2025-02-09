@@ -39,6 +39,13 @@
 	int ffbsul(ulong) noex 
 	int ffbsull(ulonglong) noex 
 
+	Arguments:
+	-		value to analyze
+
+	Returns:
+	>=0		first (lowest) bit number found to be set
+	<0		did not find any set bits
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */

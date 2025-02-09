@@ -483,7 +483,7 @@ mapblock.o:		mapblock.ccm
 # MEMTRACK
 memtrack.o:		memtrack0.o memtrack1.o
 	$(LD) -r -o $@ $(LDFLAGS) memtrack0.o memtrack1.o
-memtrack0.o:		memtrack.ccm
+memtrack0.o:		memtrack.ccm mapblock.ccm
 	makemodule mapblock
 	makemodule memtrack
 memtrack1.o:		memtrack.ccm memtrack1.cc
@@ -494,10 +494,9 @@ memtrack1.o:		memtrack.ccm memtrack1.cc
 addrset.o:		addrset0.o addrset1.o
 	$(LD) -r -o $@ $(LDFLAGS) addrset0.o addrset1.o
 addrset0.o:		addrset.ccm
-	makemodule mapblock
 	makemodule addrset
 addrset1.o:		addrset.ccm addrset1.cc
-	makemodule mapblock addrset
+	makemodule addrset
 	$(COMPILE.cc) addrset1.cc
 
 ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h ucmallreg.h

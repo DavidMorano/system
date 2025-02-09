@@ -157,9 +157,13 @@ export {
 	} ;
     } ; /* end struct (mapblock_co) */
     template<typename K,typename B> class mapblock {
+	friend mapblock_co<K,B> ;
 	std::unordered_map<K,B>			*mp = nullptr ;
 	typedef std::unordered_map<K,B>		maptype ;
 	typedef mapblock_co<K,B>		mbco_type ;
+	int		istart(int) noex ;
+	int		ifinish() noex ;
+	int		icount() noex ;
     public:
 	typedef K				key_type ;
 	typedef B				mapped_type ;
@@ -175,9 +179,6 @@ export {
 	int		rem(K) noex ;
 	int		present(K &) noex ;
 	int		get(K,B *) noex ;
-	int		istart(int) noex ;
-	int		ifinish() noex ;
-	int		icount() noex ;
 	iterator begin() noex {
 	    iterator	it(this,false) ;
 	    return it ;

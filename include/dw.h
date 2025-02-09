@@ -76,7 +76,7 @@ struct dw_cursor {
 } ;
 
 typedef	DW		dw ;
-typedef	DW_FL		dw_flags ;
+typedef	DW_FL		dw_fl ;
 typedef	DW_ENT		dw_ent ;
 typedef	DW_CUR		dw_cur ;
 

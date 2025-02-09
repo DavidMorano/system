@@ -56,8 +56,6 @@ module ;
 
 export module addrset ;
 
-import mapblock ;
-
 using std::hash ;			/* type */
 
 enum addrsetmems {

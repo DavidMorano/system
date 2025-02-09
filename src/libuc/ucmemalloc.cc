@@ -90,7 +90,6 @@
 #include	<timewatch.hh>
 #include	<ptm.h>
 #include	<sysval.hh>
-#include	<addrset.hh>
 #include	<localmisc.h>
 
 #include	"uclibmemalloc.h"
@@ -99,6 +98,11 @@
 
 
 /* local defines */
+
+
+/* imports */
+
+import addrset ;
 
 
 /* imported namespaces */
