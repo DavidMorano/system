@@ -65,10 +65,12 @@ export {
         using		pq_t = prique<K> ;
 	isiter_t	isit ;		
     public:
-	prique_iter() noex { } ;
+	prique_iter() = default ;
 	prique_iter(const prique_iter<K> &oit) noex {
 	    if (this != &oit) {
-	        isit = oit.isit ;
+		try {
+	            isit = oit.isit ;
+		} catch (...) ;
 	    }
 	} ; /* end ctor */
 	prique_iter(prique_iter<K> &&oit) noex {
@@ -78,16 +80,20 @@ export {
 	} ; /* end ctor */
 	prique_iter(pq_t *pqp,bool fend) noex {
 	    if (pqp->mp) {
-	        if (fend) {
-	            isit = pqp->mp->end() ;
-	        } else {
-	            isit = pqp->mp->begin() ;
-	        }
+		try {
+	            if (fend) {
+	                isit = pqp->mp->end() ;
+	            } else {
+	                isit = pqp->mp->begin() ;
+	            }
+		} catch (...) ;
 	    }
 	} ; /* end ctor */
 	prique_iter<K> &operator = (const prique_iter<K> &oit) noex {
 	    if (this != &oit) {
-	        isit = oit.isit ;
+		try {
+	            isit = oit.isit ;
+		} catch (...) ;
 	    }
 	    return *this ;
 	} ;
@@ -99,7 +105,9 @@ export {
 	} ;
 	prique_iter<K> &operator = (const prique_iter<K> *oip) noex {
 	    if (this != oip) {
-	        isit = oip->isit ;
+		try {
+	            isit = oip->isit ;
+		} catch (...) ;
 	    }
 	    return *this ;
 	} ;
@@ -210,7 +218,7 @@ export {
 	    try {
 		const nothrow_t		nt = std::nothrow ;
 		const nullptr_t		np{} ;
-	        if ((mp = new(nt) maptype(n)) != np) {
+	        if ((mp = new(nt) prique_is<K>(n)) != np) {
 	            rs = SR_OK ;
 	        }
 	    } catch (...) {

@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gpp
@@ -44,7 +43,7 @@ INCDIRS +=
 LIBDIRS += -L$(LIBDIR)
 
 
-RUNINFO= -tpath $(RUNDIR)
+RUNINFO= -rpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -66,7 +65,7 @@ OBJA= obj0.o
 OBJ= $(OBJA)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .mod .ccm
 
 
 default:		$(T).o
@@ -92,12 +91,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.mod.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
-
-$(T).a:			$(OBJ)
-	$(AR) $(ARFLAGS) -rc $@ $?
+	$(LD) -r -o $(LDFLAGS) $@ $(OBJ)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm

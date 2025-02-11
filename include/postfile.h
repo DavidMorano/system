@@ -9,9 +9,8 @@
 /* revision history:
 
 	= 2002-05-01, David A­D­ Morano
-	This object module was created for Levo research, to determine
-	if a conditional branch at a given instruction address is
-	a SS-Hamock or not.
+	This object module was created from some previous code, of
+	which I longer know what it was.
 
 */
 
@@ -38,20 +37,19 @@
 #define	POSTFILE_INFO		struct postfile_information
 #define	POSTFILE_CUR		struct postfile_cursor
 #define	POSTFILE_ENT		struct postfile_entry
-
+/* file values */
 #define	POSTFILE_FILEMAGIC	"POSTINDEX"
 #define	POSTFILE_FILEMAGICSIZE	16
-#define	POSTFILE_FILEMAGICLEN	sizeof(POSTFILEMAGIC)
-
+#define	POSTFILE_FILEMAGICLEN	szof(POSTFILEMAGIC)
 #define	POSTFILE_FILEVERSION	0
 #define	POSTFILE_FILETYPE	0
-
+/* constants */
 #define	POSTFILE_USERNAMELEN	32
 #define	POSTFILE_NINDICES	3
-
+/* options */
 #define	POSTFILE_OSEC		(1 << 0)	/* use secondard hash */
 #define	POSTFILE_ORANDLC	(1 << 1)	/* use |randlc(3c)| */
-
+/* special options */
 #define	POSTFILE_FLASTFULL	(1 << 0)	/* full last name */
 
 
@@ -125,9 +123,9 @@ extern int	postfile_open(postfile *,cchar *) noex ;
 extern int	postfile_info(postfile *,postfile_info *) noex ;
 extern int	postfile_curbegin(postfile *,postfile_cur *) noex ;
 extern int	postfile_curend(postfile *,postfile_cur *) noex ;
-extern int	postfile_enum(postfile *,postfile_cur noex *,
+extern int	postfile_curenum(postfile *,postfile_cur noex *,
 			realname *,char *) noex ;
-extern int	postfile_fetch(postfile *,REALNAME *,postfile_cur *,
+extern int	postfile_fetch(postfile *,realname *,postfile_cur *,
 			int,char *) noex ;
 extern int	postfile_close(postfile *) noex ;
 

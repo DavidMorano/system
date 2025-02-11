@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int filemap_ctor(filemap *op,Args ... args) noex {
+static int recorder_ctor(dw *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,14 +8,23 @@ static int filemap_ctor(filemap *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filemap_ctor) */
+/* end subroutine (recorder_ctor) */
 
-static int filemap_dtor(filemap *op) noex {
+static int recorder_dtor(dw *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filemap_dtor) */
+/* end subroutine (recorder_dtor) */
 
+template<typename ... Args>
+static inline int recorder_magic(dw *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == RECORDER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (recorder_magic) */

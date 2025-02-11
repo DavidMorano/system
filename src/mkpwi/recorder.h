@@ -1,5 +1,9 @@
 /* recorder HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
+
+/* database of (strings) recorder object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,26 +21,26 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	RECORDER		struct recorder_head
-#define	RECORDER_ENT		struct recorder_e
-#define	RECORDER_INFO		struct recorder_i
+#define	RECORDER_ENT		struct recorder_entry
+#define	RECORDER_INFO		struct recorder_information
 #define	RECORDER_MAGIC		0x12856734
 #define	RECORDER_STARTNUM	100	/* starting number records */
 #define	RECORDER_NINDICES	5
 #define	RECORDER_NCOLLISIONS	10
-
 /* options */
 #define	RECORDER_OSEC		(1<<0)
 #define	RECORDER_ORANDLC	(1<<1)
 
 
-struct recorder_i {
+struct recorder_information {
 	uint		cden[RECORDER_NINDICES][RECORDER_NCOLLISIONS] ;
 	uint		c_l1 ;
 	uint		c_l3 ;
@@ -46,7 +50,7 @@ struct recorder_i {
 	uint		ilen ;		/* index length */
 } ;
 
-struct recorder_e {
+struct recorder_entry {
 	uint		username ;
 	uint		last ;
 	uint		first ;
@@ -64,23 +68,27 @@ struct recorder_head {
 	int		opts ;
 } ;
 
+typedef	RECORDER	recorder ;
+typedef	RECORDER_ENT	recorder_ent ;
+typedef	RECORDER_INFO	recorder_info ;
+
 EXTERNC_begin
 
-extern int	recorder_start(RECORDER *,int,int) noex ;
-extern int	recorder_finish(RECORDER *) noex ;
-extern int	recorder_add(RECORDER *,RECORDER_ENT *) noex ;
-extern int	recorder_already(RECORDER *,RECORDER_ENT *) noex ;
-extern int	recorder_gettab(RECORDER *,RECORDER_ENT **) noex ;
-extern int	recorder_rtlen(RECORDER *) noex ;
-extern int	recorder_count(RECORDER *) noex ;
-extern int	recorder_indlen(RECORDER *) noex ;
-extern int	recorder_indsize(RECORDER *) noex ;
-extern int	recorder_mkindun(RECORDER *,cchar *,uint (*)[2],int) noex ;
-extern int	recorder_mkindl1(RECORDER *,cchar *,uint (*)[2],int) noex ;
-extern int	recorder_mkindl3(RECORDER *,cchar *,uint (*)[2],int) noex ;
-extern int	recorder_mkindf(RECORDER *,cchar *,uint (*)[2],int) noex ;
-extern int	recorder_mkindfl3(RECORDER *,cchar *,uint (*)[2],int) noex ;
-extern int	recorder_info(RECORDER *,RECORDER_INFO *) noex ;
+extern int	recorder_start(recorder *,int,int) noex ;
+extern int	recorder_finish(recorder *) noex ;
+extern int	recorder_add(recorder *,recorder_ent *) noex ;
+extern int	recorder_already(recorder *,recorder_ent *) noex ;
+extern int	recorder_gettab(recorder *,recorder_ent **) noex ;
+extern int	recorder_rtlen(recorder *) noex ;
+extern int	recorder_count(recorder *) noex ;
+extern int	recorder_indlen(recorder *) noex ;
+extern int	recorder_indsize(recorder *) noex ;
+extern int	recorder_mkindun(recorder *,cchar *,uint (*)[2],int) noex ;
+extern int	recorder_mkindl1(recorder *,cchar *,uint (*)[2],int) noex ;
+extern int	recorder_mkindl3(recorder *,cchar *,uint (*)[2],int) noex ;
+extern int	recorder_mkindf(recorder *,cchar *,uint (*)[2],int) noex ;
+extern int	recorder_mkindfl3(recorder *,cchar *,uint (*)[2],int) noex ;
+extern int	recorder_info(recorder *,recorder_info *) noex ;
 
 EXTERNC_end
 

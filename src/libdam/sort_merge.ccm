@@ -12,8 +12,8 @@
 	Originally written for Rightcore Network Services.
 
 	= 2013-07-23, David A­D­ Morano
-	Updated to C++11, to get rid of stupid restriction on not having two
-	adjacent '>' characters!
+	Updated to C++11, to get rid of stupid restriction on not
+	having two adjacent '>' characters!
 
 */
 

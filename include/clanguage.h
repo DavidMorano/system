@@ -52,6 +52,10 @@
 #define	forever			for (;;)
 #endif
 
+#ifndef	local
+#define	local			static
+#endif
+
 #ifndef	fallthrough
 #define	fallthrough		/* FALLTHROUGH */
 #endif

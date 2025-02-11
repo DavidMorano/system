@@ -111,7 +111,7 @@ struct dw_ient {
 /* forward references */
 
 template<typename ... Args>
-static int dw_ctor(dw *op,Args ... args) noex {
+local int dw_ctor(dw *op,Args ... args) noex {
     	DW		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
@@ -126,7 +126,7 @@ static int dw_ctor(dw *op,Args ... args) noex {
 }
 /* end subroutine (dw_ctor) */
 
-static int dw_dtor(dw *op) noex {
+local int dw_dtor(dw *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -215,7 +215,7 @@ int dw_start(DW *op,cchar *dirname,int intck) noex {
 }
 /* end subroutine (dw_start) */
 
-static int dw_starter(DW *op,cchar *dn) noex {
+local int dw_starter(DW *op,cchar *dn) noex {
 	static cint	rsv = var ;
 	int		rs ;
 	if ((rs = rsv) >= 0) {
@@ -288,7 +288,7 @@ int dw_finish(DW *op) noex {
 }
 /* end subroutine (dw_finish) */
 
-static int dw_finents(DW *op) noex {
+local int dw_finents(DW *op) noex {
     	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
 	int		rs2 ;
@@ -475,7 +475,7 @@ int dw_check(DW *op,time_t dt) noex {
 }
 /* end subroutine (dw_check) */
 
-static int dw_checker(DW *op,time_t dt) noex {
+local int dw_checker(DW *op,time_t dt) noex {
     	int		rs ;
 	int		n = 0 ;
 	if (USTAT sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
@@ -498,7 +498,7 @@ static int dw_checker(DW *op,time_t dt) noex {
 }
 /* end subroutine (dw_checker) */
 
-static int dw_checkx(DW *op,time_t dt) noex {
+local int dw_checkx(DW *op,time_t dt) noex {
     	int		rs ;
 	int		n = 0 ;
 	if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
@@ -512,7 +512,7 @@ static int dw_checkx(DW *op,time_t dt) noex {
 }
 /* end subroutine (dw_checkx) */
 
-static int dw_checknew(DW *op,time_t dt,char *dbuf) noex {
+local int dw_checknew(DW *op,time_t dt,char *dbuf) noex {
     	int		rs = SR_OK ;
 	int		rs2 ;
 	if (op->count_new > 0) {
@@ -533,7 +533,7 @@ static int dw_checknew(DW *op,time_t dt,char *dbuf) noex {
 }
 /* end subroutine (dw_checknew) */
 
-static int dw_checknewent(DW *op,time_t dt,IENT *iep,char *dbuf) noex {
+local int dw_checknewent(DW *op,time_t dt,IENT *iep,char *dbuf) noex {
 	int		rs ;
 	int		n = 0 ;
 	if (USTAT sb ; (rs = uc_stat(dbuf,&sb)) >= 0) {
@@ -550,7 +550,7 @@ static int dw_checknewent(DW *op,time_t dt,IENT *iep,char *dbuf) noex {
 }
 /* end subroutine (dw_checknewent) */
 
-static int dw_checkrm(DW *op,time_t dt,char *dbuf) noex {
+local int dw_checkrm(DW *op,time_t dt,char *dbuf) noex {
     	int		rs = SR_OK ;
 	if ((dt - op->tiremove) >= intval.maxidle) {
 	    vecobj	*elp = op->elp ;
@@ -563,7 +563,7 @@ static int dw_checkrm(DW *op,time_t dt,char *dbuf) noex {
 }
 /* end subroutine (dw_checkrm) */
 
-static int dw_checkrmer(DW *op,char *dbuf,time_t dt) noex {
+local int dw_checkrmer(DW *op,char *dbuf,time_t dt) noex {
     	vecobj		*elp = op->elp ;
     	int		rs = SR_OK ;
 	int		rs2 ;
@@ -587,7 +587,7 @@ static int dw_checkrmer(DW *op,char *dbuf,time_t dt) noex {
 }
 /* end subroutine (dw_checkrmer) */
 
-static int dw_checkrment(DW *op,time_t dt,IENT *iep,cchar *dbuf) noex {
+local int dw_checkrment(DW *op,time_t dt,IENT *iep,cchar *dbuf) noex {
     	int		rs ;
 	int		rs1 ;
 	int		f = false ;
@@ -625,7 +625,7 @@ int dw_state(DW *op,int i,int state) noex {
 
 /* private subroutines */
 
-static int dw_scan(DW *op,time_t dt) noex {
+local int dw_scan(DW *op,time_t dt) noex {
 	int		rs ;
 	int		n = 0 ;
 	if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
@@ -641,7 +641,7 @@ static int dw_scan(DW *op,time_t dt) noex {
 /* end subroutine (dw_scan) */
 
 /* "do" the subdirectory */
-static int dw_scaner(DW *op,char *dbuf,int dl,time_t dt) noex {
+local int dw_scaner(DW *op,char *dbuf,int dl,time_t dt) noex {
     	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
@@ -667,7 +667,7 @@ static int dw_scaner(DW *op,char *dbuf,int dl,time_t dt) noex {
 }
 /* end subroutine (dw_scaner) */
 
-static int dw_scanent(DW *op,cchar *dbuf,cchar *dn,time_t dt) noex {
+local int dw_scanent(DW *op,cchar *dbuf,cchar *dn,time_t dt) noex {
 	int		rs ;
 	int		n = 0 ;
 	if (USTAT sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
@@ -699,7 +699,7 @@ static int dw_scanent(DW *op,cchar *dbuf,cchar *dn,time_t dt) noex {
 }
 /* end subroutine (dw_scanent) */
 
-static int dw_diropen(DW *op,time_t dt) noex {
+local int dw_diropen(DW *op,time_t dt) noex {
     	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    cint	of = O_RDONLY ;
@@ -720,7 +720,7 @@ static int dw_diropen(DW *op,time_t dt) noex {
 }
 /* end subroutine (dw_diropen) */
 
-static int dw_dirclose(DW *op) noex {
+local int dw_dirclose(DW *op) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fd >= 0) {
@@ -734,7 +734,7 @@ static int dw_dirclose(DW *op) noex {
 
 #ifdef	COMMENT
 
-static int dw_delname(DW *op,cchar *name) noex {
+local int dw_delname(DW *op,cchar *name) noex {
 	int		rs ;
 	int		i = 0 ;
 	IENT		ie{} ;
@@ -750,7 +750,7 @@ static int dw_delname(DW *op,cchar *name) noex {
 
 #endif /* COMMENT */
 
-static int dw_findi(DW *op,cchar *name,IENT **iepp) noex {
+local int dw_findi(DW *op,cchar *name,IENT **iepp) noex {
 	int		rs ;
 	IENT		ie ;
 	ie.name = charp(name) ;
@@ -764,7 +764,7 @@ static int dw_findi(DW *op,cchar *name,IENT **iepp) noex {
 /* end subroutine (dw_findi) */
 
 /* initialize an entry */
-static int ient_start(IENT *iep,DW *op,cchar *name,USTAT *sbp) noex {
+local int ient_start(IENT *iep,DW *op,cchar *name,USTAT *sbp) noex {
 	int		rs ;
 	iep->state = DW_SNEW ;
 	if (cchar *cp ; (rs = uc_mallocstrw(name,-1,&cp)) >= 0) {
@@ -786,7 +786,7 @@ static int ient_start(IENT *iep,DW *op,cchar *name,USTAT *sbp) noex {
 }
 /* end subroutine (ient_start) */
 
-static int ient_finish(IENT *iep,DW *op) noex {
+local int ient_finish(IENT *iep,DW *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (iep->state == DW_SNEW) {
@@ -803,7 +803,7 @@ static int ient_finish(IENT *iep,DW *op) noex {
 }
 /* end subroutine (ient_finish) */
 
-static int entry_load(DW_ENT *dep,IENT *iep,cchar *rbuf) noex {
+local int entry_load(DW_ENT *dep,IENT *iep,cchar *rbuf) noex {
 	int		rs = SR_FAULT ;
 	if (dep && iep) {
 	    rs = SR_OK ;
@@ -829,7 +829,7 @@ vars::operator int () noex {
 }
 /* end method (vars::operator) */
 
-static int vcmpfn(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpfn(cvoid **v1pp,cvoid **v2pp) noex {
 	IENT		**e1pp = (IENT **) v1pp ;
 	IENT		**e2pp = (IENT **) v2pp ;
 	int		rc = 0 ;
