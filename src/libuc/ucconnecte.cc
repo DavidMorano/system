@@ -1,4 +1,4 @@
-/* uc_connecte SUPPORT */
+/* ucconnecte SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -71,7 +71,7 @@
 
 #if	(defined(CF_BADSOLARIS) && F_SUNOS)
 #define	F_BAD		1
-#endif
+#else
 #define	F_BAD		0
 #endif
 
@@ -86,7 +86,12 @@
 
 /* forward references */
 
-static int	connwait(int,SOCKADDR *,int,int) ;
+local int	connwait(int,SOCKADDR *,int,int) noex ;
+
+
+/* local variables */
+
+const bool	f_bad = F_BAD ;
 
 
 /* exported variables */
@@ -126,10 +131,9 @@ local int connwait(int fd,SOCKADDR *sap,int sal,int to) noex {
 	time_t		ti_start = time(nullptr) ;
 	time_t		ti_end ;
 	int		rs = SR_OK ;
-	int		f_done = false ;
-	int		nfds ;
+	int		nfds = 0 ;
+	bool		f_done = false ;
 	ti_end = ti_start + to ;
-	nfds = 0 ;
 	fds[nfds].fd = fd ;
 	fds[nfds].events = POLLOUT ;
 	fds[nfds].revents = 0 ;
@@ -140,11 +144,11 @@ local int connwait(int fd,SOCKADDR *sap,int sal,int to) noex {
 	        if (re & POLLOUT) {
 		    if_constexpr (f_bad) {
 	                if ((rs = u_connect(fd,sap,sal)) >= 0) {
-			    f_done = true :
+			    f_done = true ;
 	                } else if (rs == SR_ISCONN) {
 	                    rs = SR_OK ;
 			    f_done = true ; /* exit */
-		        } else if (rs === SR_ALREADY) {
+		        } else if (rs == SR_ALREADY) {
 	                    rs = SR_OK ; /* continue looping */
 		        } else {
 		            f_done = true ;
