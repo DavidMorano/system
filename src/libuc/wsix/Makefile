@@ -70,7 +70,7 @@ OBJCWSIX= obj4_sfx.o obj5_sfx.o
 OBJWSIX= obja.o
 
 
-.SUFFIXES:		.hh .ii .mod .ccm
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -96,7 +96,7 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
-.mod.o:
+.ccm.o:
 	makemodule $(*)
 
 

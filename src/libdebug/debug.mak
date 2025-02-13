@@ -111,7 +111,7 @@ OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE)
 OBJS= obja.o objb.o objc.o objd.o obje.o
 
 
-.SUFFIXES:		.hh .ii .mod .ccm
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		all
@@ -137,7 +137,7 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
-.mod.o:
+.ccm.o:
 	makemodule $(*)
 
 

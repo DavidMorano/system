@@ -810,6 +810,11 @@ uterm.o:		uterm.dir
 uterm.dir:
 	makesubdir $@
 
+# SETX
+setx.o:			setx.dir
+setx.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
@@ -863,16 +868,9 @@ pwentry.o:		pwentry.cc	pwentry.h
 pwfile.o:		pwfile.cc	pwfile.h
 sif.o:			sif.cc		sif.hh
 bufstr.o:		bufstr.cc bufstr.h
-setint.o:		setint.cc setint.h
-osetint.o:		osetint.cc osetint.h
 syspasswd.o:		syspasswd.cc syspasswd.h
 absfn.o:		absfn.cc absfn.h
 envmgr.o:		envmgr.cc envmgr.h
-
-# set-(of)-strings
-osetstr.o:		osetstr.cc osetstr.h
-osetstr_loadfile.o:	osetstr_loadfile.cc osetstr.h
-setstr.o:		setstr.cc setstr.h
 
 # sring-comparisons
 vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h

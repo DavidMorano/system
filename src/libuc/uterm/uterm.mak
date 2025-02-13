@@ -63,7 +63,7 @@ OBJA= obj0.o
 OBJ= obja.o
 
 
-.SUFFIXES:		.hh .ii .mod .ccm
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o

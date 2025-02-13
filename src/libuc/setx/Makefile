@@ -1,6 +1,6 @@
-# MAKEFILES (wsix)
+# MAKEFILES (setx)
 
-T= wsix
+T= setx
 
 ALL= $(T).o
 
@@ -15,10 +15,9 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gxx
+CXX		?= gpp
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -32,16 +31,16 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= wsix.h
+INCS += setx.h
 
-LIBS=
+LIBS +=
 
 
-INCDIRS=
+INCDIRS +=
 
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS += -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
@@ -56,18 +55,16 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0WSIX= wsinul.o wsixchr.o
-OBJ1WSIX= 
-OBJ2WSIX= 
-OBJ3WSIX= 
-OBJ4WSIX= 
-OBJ5WSIX= 
+OBJ0= retstat.o sethand.o
+OBJ1= setstr.o
+OBJ2= setostr.o setostr_loadfile.o
+OBJ3= setint.o 
+OBJ4= setoint.o
 
-OBJAWSIX= obj0_sfx.o
-OBJBWSIX= obj2_sfx.o obj3_sfx.o
-OBJCWSIX= obj4_sfx.o obj5_sfx.o
+OBJA= obj0.o obj1.o obj2.o 
+OBJB= obj3.o obj4.o
 
-OBJWSIX= obja.o
+OBJ= obja.o objb.o
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -100,8 +97,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJWSIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJWSIX)
+$(T).o:			$(OBJ)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -112,7 +109,7 @@ $(T).order:		$(OBJ) $(T).a
 	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
-	rm -f $(ALL)
+	$(RM) $(ALL)
 
 clean:
 	makeclean $(ALL)
@@ -121,36 +118,50 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_sfx.o:		$(OBJ0WSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0WSIX)
+obj0.o:			$(OBJ0)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
 
-obj1_sfx.o:		$(OBJ1WSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1WSIX)
+obj1.o:			$(OBJ1)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
 
-obj2_sfx.o:		$(OBJ2WSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2WSIX)
+obj2.o:			$(OBJ2)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
 
-obj3_sfx.o:		$(OBJ3WSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3WSIX)
+obj3.o:			$(OBJ3)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
 
-obj4_sfx.o:		$(OBJ4WSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4WSIX)
+obj4.o:			$(OBJ4)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
 
-obj5_sfx.o:		$(OBJ5WSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5WSIX)
-
-
-obja.o:			$(OBJAWSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJAWSIX)
-
-objb.o:			$(OBJBWSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJBWSIX)
-
-objc.o:			$(OBJCWSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJCWSIX)
+obj5.o:			$(OBJ5)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-wsinul.o:		wsinul.cc	$(INCS)
-wsixchr.o:		wsixchr.cc	$(INCS)
+obja.o:			$(OBJA)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+
+
+# RETSTAT
+retstat.o:		retstat.ccm			$(INCS)
+	makemodule retstat
+
+# set-ordered-strings
+setostr.o:		setostr.cc setostr.h		$(INCS)
+setostr_loadfile.o:	setostr_loadfile.cc setostr.h	$(INCS)
+
+# set-strings
+setstr.o:		setstr.cc setstr.h		$(INCS)
+setstr_loadfile.o:	setstr_loadfile.cc setstr.h	$(INCS)
+
+setint.o:		setint.cc setint.h		$(INCS)
+
+sethand.o:		sethand.ccm retstat.ccm		$(INCS)
+	makemodule retstat
+	makemodule sethand
+
+setoint.o:		setoint.cc setoint.h		$(INCS)
 
 

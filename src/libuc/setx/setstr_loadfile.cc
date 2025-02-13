@@ -1,4 +1,4 @@
-/* osetstr_loadfile SUPPORT */
+/* setstr_loadfile SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,18 +18,18 @@
 /*******************************************************************************
 
 	Name:
-	osetstr_loadfile
+	setstr_loadfile
 
 	Description:
 	This subroutine will read (process) a file and put all of
 	the strings found into the string (supplied) list, consisting
-	of a osetstr object.
+	of a setstr object.
 
 	Synopsis:
-	int osetstr_loadfile(osetstr *vsp,int fo,cchar *fname) noex
+	int setstr_loadfile(setstr *vsp,int fo,cchar *fname) noex
 
 	Arguments:
-	vsp		pointer to osetstr object
+	vsp		pointer to setstr object
 	fo		0=ignore, 1=replace
 	fname		file to load
 
@@ -47,7 +47,7 @@
 
 	Why are we using FIELD as opposed to |sfnext(3uc)| or
 	something similar?  Because our sematics are to process
-	quoted strings as a single osetstr entry!
+	quoted strings as a single setstr entry!
 
 	Note_on_uniqueness:
 
@@ -77,7 +77,7 @@
 #include	<sfx.h>
 #include	<localmisc.h>		/* |BCEIL(3dam)| */
 
-#include	"osetstr.h"
+#include	"setstr.h"
 
 
 /* local defines */
@@ -108,8 +108,8 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static int	osetstr_loadfd(osetstr *,int,int) noex ;
-static int	osetstr_loadln(osetstr *,int,cchar *,int) noex ;
+static int	setstr_loadfd(setstr *,int,int) noex ;
+static int	setstr_loadln(setstr *,int,cchar *,int) noex ;
 
 
 /* local structures */
@@ -125,10 +125,10 @@ constexpr fieldterminit		ft("\n#") ;
 
 /* exported subroutines */
 
-int osetstr_loadfile(osetstr *vsp,int fu,cchar *fname) noex {
+int setstr_loadfile(setstr *vsp,int fu,cchar *fname) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = osetstr_magic(vsp,fname)) >= 0) {
+	if ((rs = setstr_magic(vsp,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 	        int	fd = FD_STDIN ;
@@ -143,7 +143,7 @@ int osetstr_loadfile(osetstr *vsp,int fu,cchar *fname) noex {
 	            }
 	        }
 	        if (rs >= 0) {
-	            rs = osetstr_loadfd(vsp,fu,fd) ;
+	            rs = setstr_loadfd(vsp,fu,fd) ;
 	            c = rs ;
 	        }
 	        if (f_opened && (fd >= 0)) {
@@ -153,12 +153,12 @@ int osetstr_loadfile(osetstr *vsp,int fu,cchar *fname) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (osetstr_loadfile) */
+/* end subroutine (setstr_loadfile) */
 
 
 /* local subroutines */
 
-static int osetstr_loadfd(osetstr *vsp,int fu,int fd) noex {
+static int setstr_loadfd(setstr *vsp,int fu,int fd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		to = -1 ;
@@ -185,7 +185,7 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd) noex {
 	                while ((rs = fb.readln(lbuf,llen,to)) > 0) {
 			    cchar	*cp{} ;
 			    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
-			        rs = osetstr_loadln(vsp,fu,cp,cl) ;
+			        rs = setstr_loadln(vsp,fu,cp,cl) ;
 			        c += rs ;
 			    }
 	                    if (rs < 0) break ;
@@ -202,9 +202,9 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd) noex {
 	} /* end if (stat) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (osetstr_loadfd) */
+/* end subroutine (setstr_loadfd) */
 
-static int osetstr_loadln(osetstr *vsp,int fu,cchar *lp,int ll) noex {
+static int setstr_loadln(setstr *vsp,int fu,cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -214,10 +214,10 @@ static int osetstr_loadln(osetstr *vsp,int fu,cchar *lp,int ll) noex {
 	    while ((fl = fsb.get(ft.terms,&fp)) >= 0) {
 		if (fl > 0) {
 		    if (fu) {
-			rs = osetstr_del(vsp,fp,fl) ;
+			rs = setstr_del(vsp,fp,fl) ;
 		    }
 		    if (rs >= 0) {
-			rs = osetstr_add(vsp,fp,fl) ;
+			rs = setstr_add(vsp,fp,fl) ;
 		    }
 		    if (rs != INT_MAX) c += 1 ;
 		} /* end if (got one) */
@@ -229,6 +229,6 @@ static int osetstr_loadln(osetstr *vsp,int fu,cchar *lp,int ll) noex {
 	} /* end if (fields) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (osetstr_loadln) */
+/* end subroutine (setstr_loadln) */
 
 

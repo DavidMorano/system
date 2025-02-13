@@ -204,7 +204,7 @@ export {
 	sethand& operator += (const sethandent *ep) {
 	    int	rs = add(ep) ;
 	    if (rs < 0) {
-		returnstatus a(rs) ;
+		retstat		a(rs) ;
 		throw a ;
 	    }
 	    return (*this) ;

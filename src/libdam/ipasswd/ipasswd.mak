@@ -65,7 +65,7 @@ OBJA= obj0.o
 OBJ= $(OBJA)
 
 
-.SUFFIXES:		.hh .ii .mod .ccm
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -91,7 +91,7 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
-.mod.o:
+.ccm.o:
 	makemodule $(*)
 
 

@@ -906,18 +906,9 @@ sort_merge.o:		sort_merge.ccm			$(INCS)
 sort_insertion.o:	sort_insertion.ccm		$(INCS)
 	makemodule sort_insertion
 
-# SETHAND
-sethand.o:		sethand.ccm retstat.ccm		$(INCS)
-	makemodule retstat
-	makemodule sethand
-
 # CCMUTEX
 ccmutex.o:		ccmutex.ccm			$(INCS)
 	makemodule ccmutex
-
-# RETSTAT
-retstat.o:		retstat.ccm			$(INCS)
-	makemodule retstat
 
 # MINMAXELEM
 minmaxelem.o:		minmaxelem.ccm			$(INCS)

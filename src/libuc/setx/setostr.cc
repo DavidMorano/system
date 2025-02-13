@@ -1,4 +1,4 @@
-/* osetstr SUPPORT */
+/* setostr SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++98 */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	osetstr
+	setostr
 
 	Description:
 	This object provides am ordered set of strings.  No two
@@ -37,7 +37,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"osetstr.h"
+#include	"setostr.h"
 
 
 /* local defines */
@@ -78,7 +78,7 @@ typedef	set<string>::iterator *	iterp ;
 
 /* exported subroutines */
 
-int osetstr_start(osetstr *op,int n) noex {
+int setostr_start(setostr *op,int n) noex {
 	int		rs = SR_FAULT ;
 	if (n < 0) n = 0 ;
 	if (op) {
@@ -87,17 +87,17 @@ int osetstr_start(osetstr *op,int n) noex {
 	    op->magic = 0 ;
 	    if (setstr *setp ; (setp = new(nothrow) setstr) != np) {
 	        op->setp = setp ;
-		op->magic = OSETSTR_MAGIC ;
+		op->magic = SETOSTR_MAGIC ;
 		rs = SR_OK ;
 	    } /* end if (new-setsrt) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (osetstr_start) */
+/* end subroutine (setostr_start) */
 
-int osetstr_finish(osetstr *op) noex {
+int setostr_finish(setostr *op) noex {
 	int		rs ;
-	if ((rs = osetstr_magic(op)) >= 0) {
+	if ((rs = setostr_magic(op)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
 	    rs = SR_BADFMT ;
 	    if (setp) {
@@ -109,12 +109,12 @@ int osetstr_finish(osetstr *op) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (osetstr_finish) */
+/* end subroutine (setostr_finish) */
 
-int osetstr_already(osetstr *op,cchar *sp,int sl) noex {
+int setostr_already(setostr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		f = true ;
-	if ((rs = osetstr_magic(op,sp)) >= 0) {
+	if ((rs = setostr_magic(op,sp)) >= 0) {
 	    cnullptr	np{} ;
 	    setstr	*setp  = setstrp(op->setp) ;
 	    if (sl < 0) sl = strlen(sp) ;
@@ -130,12 +130,12 @@ int osetstr_already(osetstr *op,cchar *sp,int sl) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (osetstr_already) */
+/* end subroutine (setostr_already) */
 
-int osetstr_add(osetstr *op,cchar *sp,int sl) noex {
+int setostr_add(setostr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = osetstr_magic(op,sp)) >= 0) {
+	if ((rs = setostr_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
 	    setstr	*setp  = setstrp(op->setp) ;
 	    pair<iter,bool>	ret ;
@@ -145,12 +145,12 @@ int osetstr_add(osetstr *op,cchar *sp,int sl) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (osetstr_add) */
+/* end subroutine (setostr_add) */
 
-int osetstr_del(osetstr *op,cchar *sp,int sl) noex {
+int setostr_del(setostr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = osetstr_magic(op)) >= 0) {
+	if ((rs = setostr_magic(op)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    {
@@ -164,11 +164,11 @@ int osetstr_del(osetstr *op,cchar *sp,int sl) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (osetstr_del) */
+/* end subroutine (setostr_del) */
 
-int osetstr_delall(osetstr *op) noex {
+int setostr_delall(setostr *op) noex {
 	int		rs ;
-	if ((rs = osetstr_magic(op)) >= 0) {
+	if ((rs = setostr_magic(op)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
  	    {
 	        iter	ite = setp->end() ;
@@ -179,12 +179,12 @@ int osetstr_delall(osetstr *op) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (osetstr_delall) */
+/* end subroutine (setostr_delall) */
 
-int osetstr_count(osetstr *op) noex {
+int setostr_count(setostr *op) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = osetstr_magic(op)) >= 0) {
+	if ((rs = setostr_magic(op)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
 	    {
 	        c = setp->size() ;
@@ -192,11 +192,11 @@ int osetstr_count(osetstr *op) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (osetstr_count) */
+/* end subroutine (setostr_count) */
 
-int osetstr_curbegin(osetstr *op,osetstr_cur *curp) noex {
+int setostr_curbegin(setostr *op,setostr_cur *curp) noex {
 	int		rs ;
-	if ((rs = osetstr_magic(op,curp)) >= 0) {
+	if ((rs = setostr_magic(op,curp)) >= 0) {
 	    cnullptr	np{} ;
 	    setstr	*setp  = setstrp(op->setp) ;
 	    if (iter *itp ; (itp = new(nothrow) iter) != np) {
@@ -208,11 +208,11 @@ int osetstr_curbegin(osetstr *op,osetstr_cur *curp) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (osetstr_curbegin) */
+/* end subroutine (setostr_curbegin) */
 
-int osetstr_curend(osetstr *op,osetstr_cur *curp) noex {
+int setostr_curend(setostr *op,setostr_cur *curp) noex {
 	int		rs ;
-	if ((rs = osetstr_magic(op,curp)) >= 0) {
+	if ((rs = setostr_magic(op,curp)) >= 0) {
 	    if (curp->itp) {
 	        iter	*itp = iterp(curp->itp) ;
 	        delete itp ;
@@ -223,11 +223,11 @@ int osetstr_curend(osetstr *op,osetstr_cur *curp) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (osetstr_curend) */
+/* end subroutine (setostr_curend) */
 
-int osetstr_curenum(osetstr *op,osetstr_cur *curp,cchar **rpp) noex {
+int setostr_curenum(setostr *op,setostr_cur *curp,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = osetstr_magic(op,curp,rpp)) >= 0) {
+	if ((rs = setostr_magic(op,curp,rpp)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
 	    if (curp->itp) {
 	        iter	ite = setp->end() ;
@@ -245,47 +245,46 @@ int osetstr_curenum(osetstr *op,osetstr_cur *curp,cchar **rpp) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (osetstr_curenum) */
+/* end subroutine (setostr_curenum) */
 
-int osetstr::already(cchar *sp,int sl) noex {
-	return osetstr_already(this,sp,sl) ;
+int setostr::already(cchar *sp,int sl) noex {
+	return setostr_already(this,sp,sl) ;
 }
 
-int osetstr::add(cchar *sp,int sl) noex {
-	return osetstr_add(this,sp,sl) ;
+int setostr::add(cchar *sp,int sl) noex {
+	return setostr_add(this,sp,sl) ;
 }
 
-int osetstr::del(cchar *sp,int sl) noex {
-	return osetstr_del(this,sp,sl) ;
+int setostr::del(cchar *sp,int sl) noex {
+	return setostr_del(this,sp,sl) ;
 }
 
-void osetstr::dtor() noex {
+void setostr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
-	    ulogerror("osetstr",rs,"fini-finish") ;
+	    ulogerror("setostr",rs,"fini-finish") ;
 	}
 }
 
-int osetstr_co::operator () (int a) noex {
+int setostr_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
-	    case osetstrmem_start:
-	        rs = osetstr_start(op,a) ;
+	    case setostrmem_start:
+	        rs = setostr_start(op,a) ;
 	        break ;
-	    case osetstrmem_delall:
-	        rs = osetstr_delall(op) ;
+	    case setostrmem_delall:
+	        rs = setostr_delall(op) ;
 	        break ;
-	    case osetstrmem_count:
-	        rs = osetstr_count(op) ;
+	    case setostrmem_count:
+	        rs = setostr_count(op) ;
 	        break ;
-	    case osetstrmem_finish:
-	        rs = osetstr_finish(op) ;
+	    case setostrmem_finish:
+	        rs = setostr_finish(op) ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (osetstr_co::operator) */
-
+/* end method (setostr_co::operator) */
 
 

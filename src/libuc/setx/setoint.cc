@@ -1,4 +1,4 @@
-/* osetint SUPPORT */
+/* setoint SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++98 */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	osetint
+	setoint
 
 	Description:
 	This object provides am ordered set of integers.  No two
@@ -41,7 +41,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"osetint.h"
+#include	"setoint.h"
 
 
 /* local defines */
@@ -75,7 +75,7 @@ typedef set<int>::iterator *	setitp ;
 
 /* exported subroutines */
 
-int osetint_start(osetint *op) noex {
+int setoint_start(setoint *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    cnullptr	np{} ;
@@ -91,9 +91,9 @@ int osetint_start(osetint *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (osetint_start) */
+/* end subroutine (setoint_start) */
 
-int osetint_finish(osetint *op) noex {
+int setoint_finish(setoint *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_NOTOPEN ;
@@ -106,9 +106,9 @@ int osetint_finish(osetint *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (osetint_finish) */
+/* end subroutine (setoint_finish) */
 
-int osetint_addval(osetint *op,int v) noex {
+int setoint_addval(setoint *op,int v) noex {
 	int		rs = SR_FAULT ;
 	int		f = INT_MAX ;
 	if (op) {
@@ -127,9 +127,9 @@ int osetint_addval(osetint *op,int v) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (osetint_addval) */
+/* end subroutine (setoint_addval) */
 
-int osetint_delval(osetint *op,int v) noex {
+int setoint_delval(setoint *op,int v) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_NOTOPEN ;
@@ -141,9 +141,9 @@ int osetint_delval(osetint *op,int v) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (osetint_delval) */
+/* end subroutine (setoint_delval) */
 
-int osetint_count(osetint *op) noex {
+int setoint_count(setoint *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op) {
@@ -156,9 +156,9 @@ int osetint_count(osetint *op) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (osetint_count) */
+/* end subroutine (setoint_count) */
 
-int osetint_extent(osetint *op) noex {
+int setoint_extent(setoint *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op) {
@@ -171,9 +171,9 @@ int osetint_extent(osetint *op) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (osetint_extent) */
+/* end subroutine (setoint_extent) */
 
-int osetint_mkvec(osetint *op,int *va) noex {
+int setoint_mkvec(setoint *op,int *va) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op && va) {
@@ -194,9 +194,9 @@ int osetint_mkvec(osetint *op,int *va) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (osetint_mkvec) */
+/* end subroutine (setoint_mkvec) */
 
-int osetint_curbegin(osetint *op,osetint_cur *curp) noex {
+int setoint_curbegin(setoint *op,setoint_cur *curp) noex {
 	int		rs = SR_FAULT ;
 	if (op && curp) {
 	    rs = SR_NOTOPEN ;
@@ -209,14 +209,14 @@ int osetint_curbegin(osetint *op,osetint_cur *curp) noex {
 	            *interp = setp->begin() ;
 	            curp->interp = voidp(interp) ;
 		    rs = SR_OK ;
-		} /* end if (new-osetint) */
+		} /* end if (new-setoint) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (osetint_curbegin) */
+/* end subroutine (setoint_curbegin) */
 
-int osetint_curend(osetint *op,osetint_cur *curp) noex {
+int setoint_curend(setoint *op,setoint_cur *curp) noex {
 	int		rs = SR_FAULT ;
 	if (op && curp) {
 	    rs = SR_NOTOPEN ;
@@ -232,9 +232,9 @@ int osetint_curend(osetint *op,osetint_cur *curp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (osetint_curend) */
+/* end subroutine (setoint_curend) */
 
-int osetint_curenum(osetint *op,osetint_cur *curp,int *rp) noex {
+int setoint_curenum(setoint *op,setoint_cur *curp,int *rp) noex {
 	int		rs = SR_FAULT ;
 	if (op && curp && rp) {
 	    rs = SR_NOTOPEN ;
@@ -255,6 +255,6 @@ int osetint_curenum(osetint *op,osetint_cur *curp,int *rp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (osetint_curenum) */
+/* end subroutine (setoint_curenum) */
 
 
