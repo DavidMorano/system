@@ -26,10 +26,10 @@
 	of a setstr object.
 
 	Synopsis:
-	int setstr_loadfile(setstr *vsp,int fo,cchar *fname) noex
+	int setstr_loadfile(setstr *op,int fo,cchar *fname) noex
 
 	Arguments:
-	vsp		pointer to setstr object
+	op		pointer to setstr object
 	fo		0=ignore, 1=replace
 	fname		file to load
 
@@ -58,7 +58,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -125,10 +124,10 @@ constexpr fieldterminit		ft("\n#") ;
 
 /* exported subroutines */
 
-int setstr_loadfile(setstr *vsp,int fu,cchar *fname) noex {
-	int		rs ;
+int setstr_loadfile(setstr *op,int fu,cchar *fname) noex {
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if ((rs = setstr_magic(vsp,fname)) >= 0) {
+	if (op && fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 	        int	fd = FD_STDIN ;
@@ -143,7 +142,7 @@ int setstr_loadfile(setstr *vsp,int fu,cchar *fname) noex {
 	            }
 	        }
 	        if (rs >= 0) {
-	            rs = setstr_loadfd(vsp,fu,fd) ;
+	            rs = setstr_loadfd(op,fu,fd) ;
 	            c = rs ;
 	        }
 	        if (f_opened && (fd >= 0)) {
@@ -158,7 +157,7 @@ int setstr_loadfile(setstr *vsp,int fu,cchar *fname) noex {
 
 /* local subroutines */
 
-static int setstr_loadfd(setstr *vsp,int fu,int fd) noex {
+static int setstr_loadfd(setstr *op,int fu,int fd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		to = -1 ;
@@ -185,7 +184,7 @@ static int setstr_loadfd(setstr *vsp,int fu,int fd) noex {
 	                while ((rs = fb.readln(lbuf,llen,to)) > 0) {
 			    cchar	*cp{} ;
 			    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
-			        rs = setstr_loadln(vsp,fu,cp,cl) ;
+			        rs = setstr_loadln(op,fu,cp,cl) ;
 			        c += rs ;
 			    }
 	                    if (rs < 0) break ;
@@ -204,7 +203,7 @@ static int setstr_loadfd(setstr *vsp,int fu,int fd) noex {
 }
 /* end subroutine (setstr_loadfd) */
 
-static int setstr_loadln(setstr *vsp,int fu,cchar *lp,int ll) noex {
+static int setstr_loadln(setstr *op,int fu,cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -214,10 +213,10 @@ static int setstr_loadln(setstr *vsp,int fu,cchar *lp,int ll) noex {
 	    while ((fl = fsb.get(ft.terms,&fp)) >= 0) {
 		if (fl > 0) {
 		    if (fu) {
-			rs = setstr_del(vsp,fp,fl) ;
+			rs = setstr_del(op,fp,fl) ;
 		    }
 		    if (rs >= 0) {
-			rs = setstr_add(vsp,fp,fl) ;
+			rs = setstr_add(op,fp,fl) ;
 		    }
 		    if (rs != INT_MAX) c += 1 ;
 		} /* end if (got one) */

@@ -56,7 +56,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0= retstat.o sethand.o
-OBJ1= setstr.o
+OBJ1= setstr.o setstr_loadfile.o
 OBJ2= setostr.o setostr_loadfile.o
 OBJ3= setint.o 
 OBJ4= setoint.o
@@ -148,13 +148,13 @@ objb.o:			$(OBJB)
 retstat.o:		retstat.ccm			$(INCS)
 	makemodule retstat
 
-# set-ordered-strings
-setostr.o:		setostr.cc setostr.h		$(INCS)
-setostr_loadfile.o:	setostr_loadfile.cc setostr.h	$(INCS)
-
 # set-strings
 setstr.o:		setstr.cc setstr.h		$(INCS)
 setstr_loadfile.o:	setstr_loadfile.cc setstr.h	$(INCS)
+
+# set-ordered-strings
+setostr.o:		setostr.cc setostr.h		$(INCS)
+setostr_loadfile.o:	setostr_loadfile.cc setostr.h	$(INCS)
 
 setint.o:		setint.cc setint.h		$(INCS)
 
