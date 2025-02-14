@@ -40,7 +40,10 @@
 /* local defines */
 
 
-/* default name spaces */
+/* imported spaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -50,6 +53,11 @@
 
 
 /* local variables */
+
+const int	rsn = SR_NOTFOUND ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -67,7 +75,6 @@ int setstr_finish(setstr *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    {
-	        cint	rsn = SR_NOTFOUND ;
 	        if (hdb_cur cur ; (rs1 = hdb_curbegin(op,&cur)) >= 0) {
 	            hdb_dat	key{} ;
 	            hdb_dat	val{} ;
@@ -100,7 +107,6 @@ int setstr_already(setstr *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    cint	rsn = SR_NOTFOUND ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    key.buf = sp ;
 	    key.len = sl ;
@@ -121,7 +127,6 @@ int setstr_add(setstr *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    cint	rsn = SR_NOTFOUND ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    key.buf = sp ;
 	    key.len = sl ;
@@ -150,7 +155,6 @@ int setstr_del(setstr *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
-	    cint	rsn = SR_NOTFOUND ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    key.buf = sp ;
 	    key.len = sl ;

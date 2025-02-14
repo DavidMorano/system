@@ -26,10 +26,10 @@
 	of a setostr object.
 
 	Synopsis:
-	int setostr_loadfile(setostr *vsp,int fo,cchar *fname) noex
+	int setostr_loadfile(setostr *op,int fo,cchar *fname) noex
 
 	Arguments:
-	vsp		pointer to setostr object
+	op		pointer to setostr object
 	fo		0=ignore, 1=replace
 	fname		file to load
 
@@ -124,10 +124,10 @@ constexpr fieldterminit		ft("\n#") ;
 
 /* exported subroutines */
 
-int setostr_loadfile(setostr *vsp,int fu,cchar *fname) noex {
+int setostr_loadfile(setostr *op,int fu,cchar *fname) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = setostr_magic(vsp,fname)) >= 0) {
+	if ((rs = setostr_magic(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 	        int	fd = FD_STDIN ;
@@ -142,7 +142,7 @@ int setostr_loadfile(setostr *vsp,int fu,cchar *fname) noex {
 	            }
 	        }
 	        if (rs >= 0) {
-	            rs = setostr_loadfd(vsp,fu,fd) ;
+	            rs = setostr_loadfd(op,fu,fd) ;
 	            c = rs ;
 	        }
 	        if (f_opened && (fd >= 0)) {
@@ -157,7 +157,7 @@ int setostr_loadfile(setostr *vsp,int fu,cchar *fname) noex {
 
 /* local subroutines */
 
-static int setostr_loadfd(setostr *vsp,int fu,int fd) noex {
+static int setostr_loadfd(setostr *op,int fu,int fd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		to = -1 ;
@@ -184,7 +184,7 @@ static int setostr_loadfd(setostr *vsp,int fu,int fd) noex {
 	                while ((rs = fb.readln(lbuf,llen,to)) > 0) {
 			    cchar	*cp{} ;
 			    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
-			        rs = setostr_loadln(vsp,fu,cp,cl) ;
+			        rs = setostr_loadln(op,fu,cp,cl) ;
 			        c += rs ;
 			    }
 	                    if (rs < 0) break ;
@@ -203,7 +203,7 @@ static int setostr_loadfd(setostr *vsp,int fu,int fd) noex {
 }
 /* end subroutine (setostr_loadfd) */
 
-static int setostr_loadln(setostr *vsp,int fu,cchar *lp,int ll) noex {
+static int setostr_loadln(setostr *op,int fu,cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -213,10 +213,10 @@ static int setostr_loadln(setostr *vsp,int fu,cchar *lp,int ll) noex {
 	    while ((fl = fsb.get(ft.terms,&fp)) >= 0) {
 		if (fl > 0) {
 		    if (fu) {
-			rs = setostr_del(vsp,fp,fl) ;
+			rs = setostr_del(op,fp,fl) ;
 		    }
 		    if (rs >= 0) {
-			rs = setostr_add(vsp,fp,fl) ;
+			rs = setostr_add(op,fp,fl) ;
 		    }
 		    if (rs != INT_MAX) c += 1 ;
 		} /* end if (got one) */
