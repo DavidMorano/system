@@ -111,8 +111,8 @@ export {
 	uint		magic = 0 ;
 	constexpr addrset() noex {
 	    start(this,addrsetmem_start) ;
-	    finish(this,addrsetmem_finish) ;
 	    count(this,addrsetmem_count) ;
+	    finish(this,addrsetmem_finish) ;
 	} ; /* end ctor */
 	addrset(const addrset &) = delete ;
 	addrset &operator = (const addrset &) = delete ;
@@ -123,14 +123,15 @@ export {
 	int	curbegin(addrset_cur *) noex ;
 	int	curenum(addrset_cur *,ent *) noex ;
 	int	curend(addrset_cur *) noex ;
-	~addrset() {
-	    dtor() ;
-	} ; /* end if (dtor) */
     private:
 	int	istart(int = 0) noex ;
 	int	ifinish() noex ;
 	int	icount() noex ;
 	void	dtor() noex ;
+    public:
+	~addrset() {
+	    dtor() ;
+	} ; /* end if (dtor) */
    } ; /* end struct (addrset) */
 } /* end export (addrset) */
 
