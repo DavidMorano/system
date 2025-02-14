@@ -34,6 +34,7 @@ typedef SETSTR_CUR	setstr_cur ;
 #ifdef	__cplusplus
 enum setstrmems {
     	setstrmem_start,
+	setstrmem_delall,
 	setstrmem_count,
 	setstrmem_finish,
 	setstrmem_overlast
@@ -53,10 +54,12 @@ struct setstr_co {
 } ; /* end struct (setstr_co) */
 struct setstr : setstr_head {
 	setstr_co	start ;
+	setstr_co	delall ;
 	setstr_co	count ;
 	setstr_co	finish ;
 	setstr() noex {
 	    start(this,setstrmem_start) ;
+	    delall(this,setstrmem_delall) ;
 	    count(this,setstrmem_count) ;
 	    finish(this,setstrmem_finish) ;
 	} ;
@@ -83,6 +86,7 @@ extern int setstr_start(setstr *,int) noex ;
 extern int setstr_already(setstr *,cchar *,int) noex ;
 extern int setstr_add(setstr *,cchar *,int) noex ;
 extern int setstr_del(setstr *,cchar *,int) noex ;
+extern int setstr_delall(setstr *) noex ;
 extern int setstr_count(setstr *) noex ;
 extern int setstr_curbegin(setstr *,setstr_cur *) noex ;
 extern int setstr_curenum(setstr *,setstr_cur *,cchar **) noex ;

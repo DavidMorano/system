@@ -51,6 +51,8 @@
 
 /* forward references */
 
+static int	setstr_finents(setstr *) noex ;
+
 
 /* local variables */
 
@@ -75,22 +77,9 @@ int setstr_finish(setstr *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    {
-	        if (hdb_cur cur ; (rs1 = hdb_curbegin(op,&cur)) >= 0) {
-	            hdb_dat	key{} ;
-	            hdb_dat	val{} ;
-	            int		rs2 ;
-	            while ((rs2 = hdb_curenum(op,&cur,&key,&val)) >= 0) {
-	                if (key.buf) {
-		            c += 1 ;
-	                    rs1 = uc_free(key.buf) ;
-	                    if (rs >= 0) rs = rs1 ;
-	                }
-	            } /* end while (enum) */
-	            if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
-	            rs2 = hdb_curend(op,&cur) ;
-	            if (rs >= 0) rs = rs2 ;
-	        } /* end if (cursor) */
-	        if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+		rs1 = setstr_finents(op) ;
+	        if (rs >= 0) rs = rs1 ;
+		c = rs ;
 	    }
 	    {
 	        rs1 = hdb_finish(op) ;
@@ -177,6 +166,10 @@ int setstr_del(setstr *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (setstr_del) */
 
+int setstr_delall(setstr *op) noex {
+    	return hdb_delall(op) ;
+}
+
 int setstr_count(setstr *op) noex {
 	return hdb_count(op) ;
 }
@@ -247,6 +240,9 @@ int setstr_co::operator () (int a) noex {
 	    case setstrmem_start:
 	        rs = setstr_start(op,a) ;
 	        break ;
+	    case setstrmem_delall:
+	        rs = setstr_delall(op) ;
+	        break ;
 	    case setstrmem_count:
 	        rs = setstr_count(op) ;
 	        break ;
@@ -258,5 +254,32 @@ int setstr_co::operator () (int a) noex {
 	return rs ;
 }
 /* end method (setstr_co::operator) */
+
+
+/* local subroutines */
+
+static int setstr_finents(setstr *op) noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	int		c = 0 ;
+	if (hdb_cur cur ; (rs1 = hdb_curbegin(op,&cur)) >= 0) {
+	    hdb_dat	key{} ;
+	    hdb_dat	val{} ;
+	    int		rs2 ;
+	    while ((rs2 = hdb_curenum(op,&cur,&key,&val)) >= 0) {
+	        if (key.buf) {
+		    c += 1 ;
+	            rs1 = uc_free(key.buf) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	    } /* end while (enum) */
+	    if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
+	    rs2 = hdb_curend(op,&cur) ;
+	    if (rs >= 0) rs = rs2 ;
+	} /* end if (cursor) */
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (setstr_finents) */
 
 

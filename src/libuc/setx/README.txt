@@ -9,4 +9,7 @@ setint		set of integers
 setstr		set of strings
 setoint		ordered set of integers
 setostr		ordered set of strings
+sethand		set of handles
+
+retstat		an object to provide a "return-status"
 

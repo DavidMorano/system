@@ -46,8 +46,8 @@ typedef SETOSTR_CUR	setostr_cur ;
 #ifdef	__cplusplus
 enum setostrmems {
     	setostrmem_start,
-	setostrmem_count,
 	setostrmem_delall,
+	setostrmem_count,
 	setostrmem_finish,
 	setostrmem_overlast
 } ;
@@ -71,8 +71,8 @@ struct setostr : setostr_head {
 	setostr_co	finish ;
 	setostr() noex {
 	    start(this,setostrmem_start) ;
-	    count(this,setostrmem_count) ;
 	    delall(this,setostrmem_delall) ;
+	    count(this,setostrmem_count) ;
 	    finish(this,setostrmem_finish) ;
 	} ;
 	setostr(const setostr &) = delete ;

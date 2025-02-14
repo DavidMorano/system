@@ -1,7 +1,0 @@
-
-
-# set-(of)-strings
-osetstr.o:		osetstr.cc osetstr.h
-osetstr_loadfile.o:	osetstr_loadfile.cc osetstr.h
-setstr.o:		setstr.cc setstr.h
-

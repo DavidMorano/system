@@ -23,13 +23,13 @@
 	Description:
 	This subroutine will read (process) a file and put all of
 	the strings found into the string (supplied) list, consisting
-	of a setostr object.
+	of a SETOSTR object.
 
 	Synopsis:
 	int setostr_loadfile(setostr *op,int fo,cchar *fname) noex
 
 	Arguments:
-	op		pointer to setostr object
+	op		pointer to SETOSTR object
 	fo		0=ignore, 1=replace
 	fname		file to load
 
@@ -41,8 +41,8 @@
 
 	Why use FILER over BFILE?  Yes, FILER is a tiny bit more
 	lightweight than BFILE -- on a good day.  But the real reason
-	may be so that we don't need to load BFILE in code that
-	resides very deep in a software stack if we don't need it
+	may be so that we do not need to load BFILE in code that
+	resides very deep in a software stack if we do not need it
 	-- like deep inside loadable modules.  Anyway, just a thought!
 
 	Why are we using FIELD as opposed to |sfnext(3uc)| or
@@ -105,13 +105,13 @@ using std::nothrow ;			/* constant */
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 static int	setostr_loadfd(setostr *,int,int) noex ;
 static int	setostr_loadln(setostr *,int,cchar *,int) noex ;
-
-
-/* local structures */
 
 
 /* local variables */

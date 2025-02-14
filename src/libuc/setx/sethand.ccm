@@ -5,7 +5,6 @@
 /* SETHAND object */
 /* version %I% last-modified %G% */
 
-#define	CF_DEL		1		/* delete */
 
 /* revision history:
 
@@ -67,11 +66,11 @@ export {
 	cvoid		*vp = nullptr ;
     public:
 	virtual int	getkey(cvoid **rpp) const {
-	    if (rpp != nullptr) *rpp = (cvoid *) kp ;
+	    if (rpp != nullptr) *rpp = cvoidp(kp) ;
 	    return kl ;
 	} ;
 	virtual int	getval(cvoid **rpp) const {
-	    if (rpp != nullptr) *rpp = (cvoid *) vp ;
+	    if (rpp != nullptr) *rpp = cvoidp(vp) ;
 	    return vl ;
 	} ;
 	virtual uint	hash() {
@@ -81,12 +80,11 @@ export {
 	} ;
 	virtual int	cmp(sethandent *e1p,sethandent *e2p) {
 	    int		rc = 0 ;
-	    int		k1l, k2l ;
 	    cvoid	*v1p, *v2p ;
-	    if ((k1l = e1p->getkey(&v1p)) >= 0) {
-	        if ((k2l = e2p->getkey(&v2p)) >= 0) {
-	    	    cchar	*c1p = (cchar *) v1p ;
-	    	    cchar	*c2p = (cchar *) v2p ;
+	    if (int k1l ; (k1l = e1p->getkey(&v1p)) >= 0) {
+	        if (int k2l ; (k2l = e2p->getkey(&v2p)) >= 0) {
+	    	    cchar	*c1p = charp(v1p) ;
+	    	    cchar	*c2p = charp(v2p) ;
 		    rc = strnncmp(c1p,k1l,c2p,k2l) ;
 		}
 	    }
@@ -211,4 +209,5 @@ export {
 	} ;
     } ; /* end class (sethand) */
 } /* end export */
+
 
