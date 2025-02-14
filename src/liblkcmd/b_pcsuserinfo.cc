@@ -74,7 +74,7 @@
 #include	<getax.h>
 #include	<getusername.h>
 #include	<vecstr.h>
-#include	<osetstr.h>
+#include	<setostr.h>
 #include	<grmems.h>
 #include	<sysrealname.h>
 #include	<sysusernames.h>
@@ -1291,7 +1291,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
 	int		rs1 ;
 	int		wlen = 0 ;
 
-	if ((rs = osetstr_start(&ss,n)) >= 0) {
+	if ((rs = setostr_start(&ss,n)) >= 0) {
 	    int		pan = 0 ;
 	    int		cl ;
 	    cchar	*cp ;
@@ -1368,16 +1368,16 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
 
 	    if (rs >= 0) {
 	        OSETSTR_CUR	cur ;
-	        if ((rs = osetstr_curbegin(&ss,&cur)) >= 0) {
-	            while ((rs1 = osetstr_enum(&ss,&cur,&cp)) >= 0) {
+	        if ((rs = setostr_curbegin(&ss,&cur)) >= 0) {
+	            while ((rs1 = setostr_enum(&ss,&cur,&cp)) >= 0) {
 	                rs = procname(pip,ofp,cp) ;
 	                wlen += rs ;
 	                if (rs < 0) break ;
 	            } /* end while */
 	            if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-	            rs1 = osetstr_curend(&ss,&cur) ;
+	            rs1 = setostr_curend(&ss,&cur) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (osetstr-cursor) */
+	        } /* end if (setostr-cursor) */
 	    } /* end if (ok) */
 
 #if	CF_DEBUG
@@ -1385,9 +1385,9 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
 	        debugprintf("b_pcsuserinfo/process: almost rs=%d\n",rs) ;
 #endif
 
-	    rs1 = osetstr_finish(&ss) ;
+	    rs1 = setostr_finish(&ss) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (osetstr) */
+	} /* end if (setostr) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1445,7 +1445,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 	    if ((rs = locinfo_username(lip)) >= 0) {
 	        np = lip->unbuf ;
 	        nl = rs ;
-	        rs = osetstr_add(nlp,np,nl) ;
+	        rs = setostr_add(nlp,np,nl) ;
 	        c += rs ;
 	    } /* end if (locinfo_username) */
 	} else {
@@ -1461,7 +1461,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 	                const int	ul = USERNAMELEN ;
 	                char		ub[USERNAMELEN+1] ;
 	                while ((rs = locinfo_rnread(lip,&rnc,ub,ul)) > 0) {
-	                    rs = osetstr_add(nlp,ub,rs) ;
+	                    rs = setostr_add(nlp,ub,rs) ;
 	        	    c += rs ;
 	                    if (rs < 0) break ;
 	                } /* end while (reading entries) */
@@ -1484,7 +1484,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 	                    const int	ul = USERNAMELEN ;
 	                    char	ub[USERNAMELEN+1] ;
 	                    while ((rs = locinfo_gmread(lip,&gc,ub,ul)) > 0) {
-	                        rs = osetstr_add(nlp,ub,rs) ;
+	                        rs = setostr_add(nlp,ub,rs) ;
 	        		c += rs ;
 	                        if (rs < 0) break ;
 	                    } /* end while */
@@ -1505,7 +1505,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 		    }
 		}
 	        if ((rs >= 0) && (nl > 0)) {
-	            rs = osetstr_add(nlp,np,nl) ;
+	            rs = setostr_add(nlp,np,nl) ;
 	            c += rs ;
 		}
 	    } /* end if */

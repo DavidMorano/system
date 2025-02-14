@@ -5,7 +5,7 @@
 /* make a TXTINDEX database */
 /* version %I% last-modified %G% */
 
-#define	CF_SETINT	1		/* use |osetint(3dam)| */
+#define	CF_SETINT	1		/* use |setoint(3dam)| */
 
 /* revision history:
 
@@ -88,7 +88,7 @@
 #include	<endian.h>
 #include	<estrings.h>
 #include	<vecint.h>
-#include	<osetint.h>
+#include	<setoint.h>
 #include	<strtab.h>
 #include	<bfile.h>
 #include	<filer.h>
@@ -139,17 +139,17 @@
 #define	MODP2(v,n)	((v) & ((n) - 1))
 
 #if	CF_SETINT
-#define	LISTOBJ				osetint
+#define	LISTOBJ				setoint
 #define	LISTOBJ_OORDERED 		0
-#define	LISTOBJ_CUR			osetint_cur
-#define	LISTOBJ_START(op,n,opts)	osetint_start((op))
-#define	LISTOBJ_FINISH(op)		osetint_finish((op))
-#define	LISTOBJ_ADD(op,v)		osetint_addval((op),(v))
-#define	LISTOBJ_COUNT(op)		osetint_count((op))
-#define	LISTOBJ_MKVEC(op,va)		osetint_mkvec((op),(va))
-#define	LISTOBJ_CURBEGIN(op,cp)		osetint_curbegin((op),(cp))
-#define	LISTOBJ_ENUM(op,cp,rp)		osetint_curenum((op),(cp),(rp))
-#define	LISTOBJ_CUREND(op,cp)		osetint_curend((op),(cp))
+#define	LISTOBJ_CUR			setoint_cur
+#define	LISTOBJ_START(op,n,opts)	setoint_start((op))
+#define	LISTOBJ_FINISH(op)		setoint_finish((op))
+#define	LISTOBJ_ADD(op,v)		setoint_addval((op),(v))
+#define	LISTOBJ_COUNT(op)		setoint_count((op))
+#define	LISTOBJ_MKVEC(op,va)		setoint_mkvec((op),(va))
+#define	LISTOBJ_CURBEGIN(op,cp)		setoint_curbegin((op),(cp))
+#define	LISTOBJ_ENUM(op,cp,rp)		setoint_curenum((op),(cp),(rp))
+#define	LISTOBJ_CUREND(op,cp)		setoint_curend((op),(cp))
 #else /* CF_SETINT */
 #define	LISTOBJ				vecint
 #define	LISTOBJ_OORDERED		VECINT_OORDERED

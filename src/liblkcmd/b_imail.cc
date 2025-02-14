@@ -104,7 +104,7 @@
 #include	<logfile.h>
 #include	<vecstr.h>
 #include	<vechand.h>
-#include	<osetstr.h>
+#include	<setostr.h>
 #include	<field.h>
 #include	<paramfile.h>
 #include	<expcook.h>
@@ -500,7 +500,7 @@ struct locinfo {
 	MSGDATA		*md ;
 	vecstr		stores ;	/* allocation maintenance */
 	vecstr		epath ;		/* execution path (broken out) */
-	osetstr		recips ;	/* recipient addresses */
+	setostr		recips ;	/* recipient addresses */
 	EMA		hdrfroms ;	/* FROM addresses */
 	MAILMSGSTAGE	ms ;
 	DATER		dc ;		/* date converter */
@@ -3513,11 +3513,11 @@ vechand		*tlp ;
 /* add any specified recipients (watching out for duplicates) */
 
 	    if (rs >= 0) {
-	        osetstr_cur	rcur ;
-	        osetstr		*rlp = &lip->recips ;
+	        setostr_cur	rcur ;
+	        setostr		*rlp = &lip->recips ;
 
-	        if ((rs = osetstr_curbegin(rlp,&rcur)) >= 0) {
-	            while ((rs1 = osetstr_enum(rlp,&rcur,&ap)) >= 0) {
+	        if ((rs = setostr_curbegin(rlp,&rcur)) >= 0) {
+	            while ((rs1 = setostr_enum(rlp,&rcur,&ap)) >= 0) {
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(5))
@@ -3540,9 +3540,9 @@ vechand		*tlp ;
 	                if (rs < 0) break ;
 	            } /* end while */
 	            if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-	            rs1 = osetstr_curend(rlp,&rcur) ;
+	            rs1 = setostr_curend(rlp,&rcur) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (osetstr-cur) */
+	        } /* end if (setostr-cur) */
 
 /* now: submit a separate message f/e of remaining BCC recipients */
 
@@ -6117,15 +6117,15 @@ static int procprinthdr_bcc(PROGINFO *pip,filer *fbp,vechand *tlp)
 	int		wlen = 0 ;
 
 	if ((rs = outema_start(&out,fbp,lip->msgcols)) >= 0) {
-	    osetstr	*rlp = &lip->recips ;
-	    osetstr_cur	rcur ;
+	    setostr	*rlp = &lip->recips ;
+	    setostr_cur	rcur ;
 	    int		f_hdr = FALSE ;
 	    cchar	*kn = HN_BCC ;
 
-	    if ((rs = osetstr_curbegin(rlp,&rcur)) >= 0) {
+	    if ((rs = setostr_curbegin(rlp,&rcur)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
 	        cchar		*ap ;
-	        while ((rs1 = osetstr_enum(rlp,&rcur,&ap)) >= 0) {
+	        while ((rs1 = setostr_enum(rlp,&rcur,&ap)) >= 0) {
 	            if ((rs = vechand_search(tlp,ap,vrecipsch,NULL)) == rsn) {
 	                rs = SR_OK ;
 	                if (! f_hdr) {
@@ -6139,9 +6139,9 @@ static int procprinthdr_bcc(PROGINFO *pip,filer *fbp,vechand *tlp)
 	            if (rs < 0) break ;
 	        } /* end while */
 	        if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-	        rs1 = osetstr_curend(rlp,&rcur) ;
+	        rs1 = setostr_curend(rlp,&rcur) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (osetstr-cur) */
+	    } /* end if (setostr-cur) */
 
 	    rs1 = outema_finish(&out) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -6673,12 +6673,12 @@ static int proclogmsg_bcc(PROGINFO *pip,int mi)
 	    cchar	*kn = HN_BCC ;
 	    if ((rs = vechand_start(&aa,0,0)) >= 0) {
 	        if ((rs = procreciploads(pip,&aa,mi,atypes)) >= 0) {
-	            osetstr	*rlp = &lip->recips ;
-	            osetstr_cur	rcur ;
-	            if ((rs = osetstr_curbegin(rlp,&rcur)) >= 0) {
+	            setostr	*rlp = &lip->recips ;
+	            setostr_cur	rcur ;
+	            if ((rs = setostr_curbegin(rlp,&rcur)) >= 0) {
 	                cint	rsn = SR_NOTFOUND ;
 	                cchar		*ap ;
-	                while ((rs1 = osetstr_enum(rlp,&rcur,&ap)) >= 0) {
+	                while ((rs1 = setostr_enum(rlp,&rcur,&ap)) >= 0) {
 	                    vrecipsch_t	vs = vrecipsch ;
 	                    if ((rs = vechand_search(&aa,ap,vs,NULL)) == rsn) {
 	                        cchar	*fmt = "  %s=%s" ;
@@ -6689,9 +6689,9 @@ static int proclogmsg_bcc(PROGINFO *pip,int mi)
 	                    if (rs < 0) break ;
 	                } /* end while */
 	                if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-	                rs1 = osetstr_curend(rlp,&rcur) ;
+	                rs1 = setostr_curend(rlp,&rcur) ;
 	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (osetstr-cur) */
+	            } /* end if (setostr-cur) */
 	        } /* end if (procreciploads) */
 	        rs1 = vechand_finish(&aa) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -6912,7 +6912,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	if ((rs = vecstr_start(&lip->stores,4,0)) >= 0) {
 	    lip->open.stores = TRUE ;
 	    if ((rs = vecstr_start(&lip->epath,4,0)) >= 0) {
-	        rs = osetstr_start(&lip->recips,4) ;
+	        rs = setostr_start(&lip->recips,4) ;
 	        if (rs < 0)
 	            vecstr_finish(&lip->epath) ;
 	    }
@@ -6965,7 +6965,7 @@ static int locinfo_finish(LOCINFO *lip)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	rs1 = osetstr_finish(&lip->recips) ;
+	rs1 = setostr_finish(&lip->recips) ;
 	if (rs >= 0) rs = rs1 ;
 
 	rs1 = vecstr_finish(&lip->epath) ;
@@ -7799,7 +7799,7 @@ static int locinfo_loadrecip(LOCINFO *lip,cchar *np,int nl)
 	    debugprintf("b_imail/locinfo_loadrecip: recip=%t\n",np,nl) ;
 #endif
 
-	rs = osetstr_add(&lip->recips,np,nl) ;
+	rs = setostr_add(&lip->recips,np,nl) ;
 	c += rs ;
 
 	return (rs >= 0) ? c : rs ;

@@ -50,7 +50,7 @@
 #include	<vecstr.h>
 #include	<vecint.h>
 #include	<vechand.h>
-#include	<osetstr.h>
+#include	<setostr.h>
 #include	<field.h>
 #include	<sntmtime.h>
 #include	<ids.h>
@@ -1701,7 +1701,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	int		rs1 ;
 	int		wlen = 0 ;
 
-	if ((rs = osetstr_start(&ss,n)) >= 0) {
+	if ((rs = setostr_start(&ss,n)) >= 0) {
 	    int		pan = 0 ;
 	    int		cl ;
 	    cchar	*cp ;
@@ -1781,9 +1781,9 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 		}
 	    } /* end if (ok) */
 
-	    rs1 = osetstr_finish(&ss) ;
+	    rs1 = setostr_finish(&ss) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (osetstr) */
+	} /* end if (setostr) */
 
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -1887,7 +1887,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 	    if ((rs = locinfo_username(lip)) >= 0) {
 	        np = lip->unbuf ;
 	        nl = rs ;
-	        rs = osetstr_add(nlp,np,nl) ;
+	        rs = setostr_add(nlp,np,nl) ;
 	        c += rs ;
 	    } /* end if (locinfo_username) */
 	} else {
@@ -1903,7 +1903,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 	                cint	ul = USERNAMELEN ;
 	                char		ub[USERNAMELEN+1] ;
 	                while ((rs = locinfo_rnread(lip,&rnc,ub,ul)) > 0) {
-	                    rs = osetstr_add(nlp,ub,rs) ;
+	                    rs = setostr_add(nlp,ub,rs) ;
 	        	    c += rs ;
 	                    if (rs < 0) break ;
 	                } /* end while (reading entries) */
@@ -1926,7 +1926,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 	                    cint	ul = USERNAMELEN ;
 	                    char	ub[USERNAMELEN+1] ;
 	                    while ((rs = locinfo_gmread(lip,&gc,ub,ul)) > 0) {
-	                        rs = osetstr_add(nlp,ub,rs) ;
+	                        rs = setostr_add(nlp,ub,rs) ;
 	        		c += rs ;
 	                        if (rs < 0) break ;
 	                    } /* end while */
@@ -1947,7 +1947,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 		    }
 		}
 	        if ((rs >= 0) && (nl > 0)) {
-	            rs = osetstr_add(nlp,np,nl) ;
+	            rs = setostr_add(nlp,np,nl) ;
 	            c += rs ;
 		}
 	    } /* end if */
@@ -2683,7 +2683,7 @@ static int locinfo_userbegin(LOCINFO *lip,OSETSTR *osp)
 	if (DEBUGLEVEL(4))
 	debugprintf("b_smesg/locinfo_userbegin: ent\n") ;
 #endif
-	if ((rs = osetstr_count(osp)) > 0) {
+	if ((rs = setostr_count(osp)) > 0) {
 	    lip->nusers = rs ;
 	}
 #if	CF_DEBUG
@@ -2718,7 +2718,7 @@ static int locinfo_usermatch(LOCINFO *lip,OSETSTR *osp,cchar *un)
 #endif
 	if (lip->nusers > 0) {
 	    f = false ;
-	    if ((rs = osetstr_already(osp,un,-1)) > 0) {
+	    if ((rs = setostr_already(osp,un,-1)) > 0) {
 		f = true ;
 	    }
 	}

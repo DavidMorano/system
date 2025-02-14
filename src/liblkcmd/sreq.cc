@@ -449,9 +449,9 @@ int sreq_thrdone(sreq *op) noex {
 int sreq_sncreate(sreq *op) noex {
 	int		rs = SR_OK ;
 	if (! op->open.namesvcs) {
-	    osetstr	*ssp = &op->namesvcs ;
+	    setostr	*ssp = &op->namesvcs ;
 	    cint	ne = 50 ;
-	    if ((rs = osetstr_start(ssp,ne)) >= 0) {
+	    if ((rs = setostr_start(ssp,ne)) >= 0) {
 	        op->open.namesvcs = true ;
 	    }
 	}
@@ -464,9 +464,9 @@ int sreq_sndestroy(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->open.namesvcs) {
-	    osetstr	*ssp = &op->namesvcs ;
+	    setostr	*ssp = &op->namesvcs ;
 	    op->open.namesvcs = false ;
-	    rs1 = osetstr_finish(ssp) ;
+	    rs1 = setostr_finish(ssp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
@@ -477,8 +477,8 @@ int sreq_sndestroy(sreq *op) noex {
 int sreq_snadd(sreq *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if (op->open.namesvcs) {
-	    osetstr	*ssp = &op->namesvcs ;
-	    rs = osetstr_add(ssp,sp,sl) ;
+	    setostr	*ssp = &op->namesvcs ;
+	    rs = setostr_add(ssp,sp,sl) ;
 	}
 	return rs ;
 }
@@ -488,9 +488,9 @@ int sreq_snadd(sreq *op,cchar *sp,int sl) noex {
 int sreq_snbegin(sreq *op,SREQ_SNCUR *scp) noex {
 	int		rs = SR_OK ;
 	if (op->open.namesvcs) {
-	    osetstr	*ssp = &op->namesvcs ;
-	    osetstr_cur	*curp = &scp->cur ;
-	    rs = osetstr_curbegin(ssp,curp) ;
+	    setostr	*ssp = &op->namesvcs ;
+	    setostr_cur	*curp = &scp->cur ;
+	    rs = setostr_curbegin(ssp,curp) ;
 	}
 	return rs ;
 }
@@ -501,9 +501,9 @@ int sreq_snend(sreq *op,SREQ_SNCUR *scp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->open.namesvcs) {
-	    osetstr	*ssp = &op->namesvcs ;
-	    osetstr_cur	*curp = &scp->cur ;
-	    rs1 = osetstr_curend(ssp,curp) ;
+	    setostr	*ssp = &op->namesvcs ;
+	    setostr_cur	*curp = &scp->cur ;
+	    rs1 = setostr_curend(ssp,curp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
@@ -514,9 +514,9 @@ int sreq_snend(sreq *op,SREQ_SNCUR *scp) noex {
 int sreq_snenum(sreq *op,SREQ_SNCUR *scp,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	if (op->open.namesvcs) {
-	    osetstr	*ssp = &op->namesvcs ;
-	    osetstr_cur	*curp = &scp->cur ;
-	    rs = osetstr_enum(ssp,curp,rpp) ;
+	    setostr	*ssp = &op->namesvcs ;
+	    setostr_cur	*curp = &scp->cur ;
+	    rs = setostr_enum(ssp,curp,rpp) ;
 	}
 	return rs ;
 }

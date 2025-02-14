@@ -82,7 +82,7 @@
 #include	<varsub.h>
 #include	<vecstr.h>
 #include	<vecpstr.h>
-#include	<osetstr.h>
+#include	<setostr.h>
 #include	<sockaddress.h>
 #include	<connection.h>
 #include	<poller.h>
@@ -240,7 +240,7 @@ static int	mfswatch_tabsmaint(PROGINFO *) ;
 
 static int	mfswatch_usersbegin(PROGINFO *) ;
 static int	mfswatch_usersend(PROGINFO *) ;
-static int	mfswatch_usersload(PROGINFO *,osetstr *) ;
+static int	mfswatch_usersload(PROGINFO *,setostr *) ;
 static int	mfswatch_usersmaint(PROGINFO *) ;
 static int	mfswatch_usershave(PROGINFO *,cchar *) ;
 static int	mfswatch_usershandle(PROGINFO *,SREQ *) ;
@@ -1244,14 +1244,14 @@ static int mfswatch_usersbegin(PROGINFO *pip)
 	    if (! wip->open.users) {
 		OSETSTR		*ulp = &wip->users ;
 		cint	n = DEFNUSERS ;
-		if ((rs = osetstr_start(ulp,n)) >= 0) {
+		if ((rs = setostr_start(ulp,n)) >= 0) {
 		    wip->open.users = TRUE ;
 		    rs = mfswatch_usersload(pip,ulp) ;
 		    if (rs < 0) {
 		        wip->open.users = FALSE ;
-			osetstr_finish(ulp) ;
+			setostr_finish(ulp) ;
 		    }
-		} /* end if (osetstr_start) */
+		} /* end if (setostr_start) */
 	    }
 	}
 #if	CF_DEBUG
@@ -1271,7 +1271,7 @@ static int mfswatch_usersend(PROGINFO *pip)
 	if (wip->open.users) {
 	    OSETSTR	*ulp = &wip->users ;
 	    wip->open.users = FALSE ;
-	    rs1 = osetstr_finish(ulp) ;
+	    rs1 = setostr_finish(ulp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
@@ -1279,14 +1279,14 @@ static int mfswatch_usersend(PROGINFO *pip)
 /* end subroutine (mfswatch_usersend) */
 
 
-static int mfswatch_usersload(PROGINFO *pip,osetstr *ulp)
+static int mfswatch_usersload(PROGINFO *pip,setostr *ulp)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
 	if (wip->open.users) {
 	    OSETSTR	*ulp = &wip->users ;
 	    cchar	*ufn = "/sys/users" ;
-	    if ((rs = osetstr_loadfile(ulp,0,ufn)) >= 0) {
+	    if ((rs = setostr_loadfile(ulp,0,ufn)) >= 0) {
 		wip->ti_users = time(NULL) ;
 	    }
 	}
@@ -1304,7 +1304,7 @@ static int mfswatch_usersmaint(PROGINFO *pip)
 	    cint		to = TO_USERSMAINT ;
 	    if ((dt - wip->ti_users) >= to) {
 	        OSETSTR	*ulp = &wip->users ;
-		if ((rs = osetstr_delall(ulp)) >= 0) {
+		if ((rs = setostr_delall(ulp)) >= 0) {
 		    rs = mfswatch_usersload(pip,ulp) ;
 		}
 	    }
@@ -1320,7 +1320,7 @@ static int mfswatch_usershave(PROGINFO *pip,cchar *sp)
 	int		rs = SR_OK ;
 	if (wip->open.users) {
 	    OSETSTR	*ulp = &wip->users ;
-	    rs = osetstr_already(ulp,sp,-1) ;
+	    rs = setostr_already(ulp,sp,-1) ;
 	}
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1993,7 +1993,7 @@ static int mfswatch_svchelper(PROGINFO *pip,SREQ *jep)
 	            if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	            rs1 = sreq_snend(jep,&cur) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (osetstr-cur) */
+	        } /* end if (setostr-cur) */
 	        rs1 = filer_finish(&b) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (filer) */

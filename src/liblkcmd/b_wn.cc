@@ -76,7 +76,7 @@
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
-#include	<osetstr.h>
+#include	<setostr.h>
 #include	<hdbstr.h>
 #include	<tmpx.h>
 #include	<realname.h>
@@ -1358,7 +1358,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
-	if ((rs = osetstr_start(&ss,n)) >= 0) {
+	if ((rs = setostr_start(&ss,n)) >= 0) {
 	    int		pan = 0 ;
 	    int		cl ;
 	    cchar	*cp ;
@@ -1438,9 +1438,9 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
 	        wlen += rs ;
 	    } /* end if (ok) */
 
-	    rs1 = osetstr_finish(&ss) ;
+	    rs1 = setostr_finish(&ss) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (osetstr) */
+	} /* end if (setostr) */
 
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -1498,7 +1498,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 	    if ((rs = locinfo_username(lip)) >= 0) {
 	        np = lip->unbuf ;
 	        nl = rs ;
-	        rs = osetstr_add(nlp,np,nl) ;
+	        rs = setostr_add(nlp,np,nl) ;
 	        c += rs ;
 	    } /* end if (locinfo_username) */
 	} else {
@@ -1514,7 +1514,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 	                const int	ul = USERNAMELEN ;
 	                char		ub[USERNAMELEN+1] ;
 	                while ((rs = locinfo_rnread(lip,&rnc,ub,ul)) > 0) {
-	                    rs = osetstr_add(nlp,ub,rs) ;
+	                    rs = setostr_add(nlp,ub,rs) ;
 	        	    c += rs ;
 	                    if (rs < 0) break ;
 	                } /* end while (reading entries) */
@@ -1537,7 +1537,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 	                    const int	ul = USERNAMELEN ;
 	                    char	ub[USERNAMELEN+1] ;
 	                    while ((rs = locinfo_gmread(lip,&gc,ub,ul)) > 0) {
-	                        rs = osetstr_add(nlp,ub,rs) ;
+	                        rs = setostr_add(nlp,ub,rs) ;
 	        		c += rs ;
 	                        if (rs < 0) break ;
 	                    } /* end while */
@@ -1558,7 +1558,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 		    }
 		}
 	        if ((rs >= 0) && (nl > 0)) {
-	            rs = osetstr_add(nlp,np,nl) ;
+	            rs = setostr_add(nlp,np,nl) ;
 	            c += rs ;
 		}
 	    } /* end if */
@@ -1584,7 +1584,7 @@ static int procents(PROGINFO *pip,SHIO *ofp,OSETSTR *nlp)
 
 	if ((rs = vecobj_start(elp,esize,20,0)) >= 0) {
 
-	    if ((rs = osetstr_count(nlp)) > 0) {
+	    if ((rs = setostr_count(nlp)) > 0) {
 	        lip->f.restricted = TRUE ;
 	    }
 
@@ -1670,7 +1670,7 @@ static int procgetdb(PROGINFO *pip,OSETSTR *nlp,VECOBJ *elp)
 	                const int	ml = MIN(UTMPX_LUSER,LOGNAMELEN) ;
 	                cp = up->ut_user ;
 	                cl = strnlen(up->ut_user,ml) ;
-	                rs = osetstr_already(nlp,cp,cl) ;
+	                rs = setostr_already(nlp,cp,cl) ;
 	                f = (rs > 0) ;
 	            }
 
