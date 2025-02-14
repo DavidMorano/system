@@ -28,11 +28,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usystem.h>
 #include	<localmisc.h>
 
 #include	"slq.h"
@@ -198,5 +194,53 @@ int slq_audit(slq *op) noex {
 	return rs ;
 }
 /* end subroutine (slq_audit) */
+
+
+/* local subroutines */
+
+void slq::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("slq",rs,"fini-finish") ;
+	}
+}
+
+slq_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case slqmem_start:
+	        rs = slq_start(op) ;
+	        break ;
+	    case slqmem_audit:
+	        rs = slq_audit(op) ;
+	        break ;
+	    case slqmem_finish:
+	        rs = slq_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (slq_co::operator) */
+
+int slq::ins(slq_ent *ep) noex {
+	return slq_ins(this,ep) ;
+}
+
+int slq::insgroup(slq_ent *gp,int esz,int n) noex {
+	return slq_insgroup(this,gp,esz,n) ;
+}
+
+int slq::rem(slq_ent **epp) noex {
+	return slq_rem(this,epp) ;
+}
+
+int slq::gethead(slq_ent **epp) noex {
+	return slq_gethead(this,epp) ;
+}
+
+int slq::gettail(slq_ent **epp) noex {
+	return slq_gettail(this,epp) ;
+}
 
 

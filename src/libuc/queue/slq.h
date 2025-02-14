@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* SIngle-List-Queue - regular (no-frills) single list pointer queue */
+/* Single-List-Queue - regular (no-frills) single list pointer queue */
 /* version %I% last-modified %G% */
 
 
@@ -40,8 +40,53 @@ struct slq_head {
 	SLQ_ENT		*tail ;
 } ;
 
-typedef SLQ		slq ;
 typedef SLQ_ENT		slq_ent ;
+
+#ifdef	__cplusplus
+enum slqmems {
+    	slqmem_start,
+	slqmem_audit,
+	slqmem_finish,
+	slqmem_overlast
+} ;
+struct slq ;
+struct slq_co {
+	slq		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (slq *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (slq_co) */
+struct slq : slq_head {
+	slq_co		start ;
+	slq_co		audit ;
+	slq_co		finish ;
+	slq() noex {
+	    start(this,slqmem_start) ;
+	    audit(this,slqmem_audit) ;
+	    finish(this,slqmem_finish) ;
+	} ;
+	slq(const slq &) = delete ;
+	slq &operator = (const slq &) = delete ;
+	int ins(slq_ent *) noex ;
+	int insgroup(slq_ent *,int,int) noex ;
+	int gethead(slq_ent **) noex ;
+	int gettail(slq_ent **) noex ;
+	int rem(slq_ent **) noex ;
+	void dtor() noex ;
+	~slq() {
+	    dtor() ;
+	} ;
+} ; /* end struct (slq) */
+#else	/* __cplusplus */
+typedef SLIST		slq ;
+#endif /* __cplusplus */
+
 
 EXTERNC_begin
 

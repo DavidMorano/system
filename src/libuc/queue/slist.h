@@ -46,9 +46,58 @@ struct slist_head {
 	int		count ;
 } ;
 
-typedef	SLIST		slist ;
 typedef	SLIST_ENT	slist_ent ;
 typedef	SLIST_CUR	slist_cur ;
+
+#ifdef	__cplusplus
+enum slistmems {
+    	slistmem_start,
+	slistmem_audit,
+	slistmem_finish,
+	slistmem_overlast
+} ;
+struct slist ;
+struct slist_co {
+	slist		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (slist *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (slist_co) */
+struct slist : slist_head {
+	slist_co	start ;
+	slist_co	audit ;
+	slist_co	finish ;
+	slist() noex {
+	    start(this,slistmem_start) ;
+	    audit(this,slistmem_audit) ;
+	    finish(this,slistmem_finish) ;
+	} ;
+	slist(const slist &) = delete ;
+	slist &operator = (const slist &) = delete ;
+	int ins(slist_ent *) noex ;
+	int insgroup(slist_ent *,int,int) noex ;
+	int present(slist_ent *) noex ;
+	int gethead(slist_ent **) noex ;
+	int gettail(slist_ent **) noex ;
+	int rem(slist_ent **) noex ;
+	int unlink(slist_ent *) noex ;
+	int curbegin(slist_cur *) noex ;
+	int curenum(slist_cur *,slist_ent **) noex ;
+	int curend(slist_cur *) noex ;
+	void dtor() noex ;
+	~slist() {
+	    dtor() ;
+	} ;
+} ; /* end struct (slist) */
+#else	/* __cplusplus */
+typedef SLIST		slist ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

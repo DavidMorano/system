@@ -24,7 +24,7 @@
 	This is a regular, pointer based, no-frills single-linked
 	list queue.  Note that this object CAN be moved (copied)
 	since there are no pointers pointing back at the list head
-	(located in the object). This object (header) is NOT
+	(located in the object).  This object (header) is NOT
 	circularly linked.
 
 *******************************************************************************/
@@ -117,12 +117,12 @@ int slist_ins(slist *qhp,slist_ent *ep) noex {
 }
 /* end subroutine (slist_ins) */
 
-int slist_insgroup(slist *qhp,slist_ent *gp,int esize,int n) noex {
+int slist_insgroup(slist *qhp,slist_ent *gp,int esz,int n) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (qhp && gp) {
 	    rs = SR_INVALID ;
-	    if ((esize > 0) && (n >= 0)) {
+	    if ((esz > 0) && (n >= 0)) {
 		caddr_t		p = (caddr_t) gp ;
 	        rs = SR_OK ;
 	        if (n > 0) {
@@ -135,11 +135,11 @@ int slist_insgroup(slist *qhp,slist_ent *gp,int esize,int n) noex {
 	                qhp->head = ep ;
 	            } /* end if */
 	            pep = ep ;
-	            p += esize ;
+	            p += esz ;
 	            for (int i = 1 ; i < n ; i += 1) {
 	                ep = (slist_ent *) p ;
 	                pep->next = ep ;
-	                p += esize ;
+	                p += esz ;
 	                pep = ep ;
 	            } /* end for */
 	            pep->next = nullptr ;
@@ -297,5 +297,61 @@ int slist_audit(slist *qhp) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (slist_audit) */
+
+
+/* local subroutines */
+
+void slist::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("slist",rs,"fini-finish") ;
+	}
+}
+
+slist_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case slistmem_start:
+	        rs = slist_start(op) ;
+	        break ;
+	    case slistmem_audit:
+	        rs = slist_audit(op) ;
+	        break ;
+	    case slistmem_finish:
+	        rs = slist_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (slist_co::operator) */
+
+int slist::ins(slist_ent *ep) noex {
+	return slist_ins(this,ep) ;
+}
+
+int slist::insgroup(slist_ent *gp,int esz,int n) noex {
+	return slist_insgroup(this,gp,esz,n) ;
+}
+
+int slist::present(slist_ent *ep) noex {
+	return slist_present(this,ep) ;
+}
+
+int slist::unlink(slist_ent *ep) noex {
+	return slist_unlink(this,ep) ;
+}
+
+int slist::rem(slist_ent **epp) noex {
+	return slist_rem(this,epp) ;
+}
+
+int slist::gethead(slist_ent **epp) noex {
+	return slist_gethead(this,epp) ;
+}
+
+int slist::gettail(slist_ent **epp) noex {
+	return slist_gettail(this,epp) ;
+}
 
 

@@ -9,6 +9,7 @@ fifoitem	FIFO for variable sized items, relo, count, magic
 fsi		FIFO for strings, stores-data, thread
 plainq		Q: self-rel, relo, double, count, magic
 slq		Q: pointer, relo, single
+slist		Q: pointer, relo, single, count, enumeration
 piq		Q: pointer, relo, double, count, magic, thread
 q		Q: self-rel, relo, double, count, thread
 aiq		Q: self-rel, relo, double, count, magic, thread, async
