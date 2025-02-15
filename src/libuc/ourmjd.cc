@@ -33,7 +33,7 @@
 
 	Returns:
 	>0		MJD
-	0		no MJD found (not ours anyway)
+	0		no MJD found
 	<0		error (system-return)
 
 *******************************************************************************/
