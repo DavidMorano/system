@@ -928,9 +928,10 @@ static int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		vl = hip->vl ;
 	if (hip->vp == nullptr) {
+	    vecobj	*vlp = &hip->vals ;
 	    int		sz = 1 ;
 	    void	*vp{} ;
-	    for (int i = 0 ; vecobj_get(&hip->vals,i,&vp) >= 0 ; i += 1) {
+	    for (int i = 0 ; vlp->get(i,&vp) >= 0 ; i += 1) {
 	        if (vp) {
 	    	    MMHVAL	*valp = (MMHVAL *) vp ;
 	            sz += (valp->vl + 1) ;
@@ -940,7 +941,7 @@ static int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
 		int	n = 0 ;
 		hip->vp = bp ;
 		hip->f_alloc = true ;
-		for (int i = 0 ; vecobj_get(&hip->vals,i,&vp) >= 0 ; i += 1) {
+		for (int i = 0 ; vlp->get(i,&vp) >= 0 ; i += 1) {
 		    if (vp) {
 	    	        MMHVAL	*valp = (MMHVAL *) vp ;
 		        if (valp->vl > 0) {

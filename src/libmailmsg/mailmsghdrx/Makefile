@@ -64,7 +64,7 @@ OBJA_MAILMSGHDRX= obj0_mailmsghdrx.o obj1_mailmsghdrx.o
 OBJ_MAILMSGHDRX= $(OBJA_MAILMSGHDRX)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -89,6 +89,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_MAILMSGHDRX)

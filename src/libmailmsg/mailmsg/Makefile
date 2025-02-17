@@ -69,7 +69,7 @@ OBJC_MAILMSG= obj4_mailmsg.o
 OBJ_MAILMSG= obja_mailmsg.o objb_mailmsg.o objc_mailmsg.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -94,6 +94,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_MAILMSG)

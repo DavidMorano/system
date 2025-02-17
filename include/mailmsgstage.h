@@ -32,10 +32,10 @@
 #define	MAILMSGSTAGE_FL		struct mailmsgstage_flags
 #define	MAILMSGSTAGE_MAGIC	0x53232856
 #define	MAILMSGSTAGE_TMPDNAME	"/tmp"
-
+/* options */
 #define	MAILMSGSTAGE_OUSECLEN	(1 << 0) /* option: use content-length */
 #define	MAILMSGSTAGE_OUSECLINES	(1 << 1) /* option: use content-lines */
-
+/* mask */
 #define	MAILMSGSTAGE_MCLEN	(1 << 0)
 #define	MAILMSGSTAGE_MCLINES	(1 << 1)
 #define	MAILMSGSTAGE_MCTYPE	(1 << 2)

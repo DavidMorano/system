@@ -65,7 +65,7 @@ OBJB_MAILBOX= obj2_mailbox.o
 OBJ_MAILBOX= $(OBJA_MAILBOX) $(OBJB_MAILBOX)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -90,6 +90,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_MAILBOX)

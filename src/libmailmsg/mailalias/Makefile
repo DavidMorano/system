@@ -67,7 +67,7 @@ OBJB_MAILALIAS= obj2.o obj3.o obj4.o
 OBJ_MAILALIAS= obja.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -92,6 +92,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_MAILALIAS)

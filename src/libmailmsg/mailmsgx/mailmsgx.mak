@@ -66,7 +66,7 @@ OBJB= obj2_mailmsgx.o obj3_mailmsgx.o
 OBJ_MAILMSGX= obja.o objb.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -91,6 +91,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_MAILMSGX)

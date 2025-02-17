@@ -9,6 +9,7 @@ timer		decide what to do about |timer_hand()| -- broken
 uctim
 libuc		fix to completely compile!
 fsdirtree	needs pointer implementation and a lot of cleanup
+ts
 quote
 sysdialer
 mailmsghdrct
@@ -21,8 +22,6 @@ msfile
 openqotd
 maintqotd
 utmpaccenum
-mailmsg		needs a lot of pointer implementation
-mailmsgstage
 calmgr		pointer implementation
 spawnproc	block structure; actually this is a huge mess
 termnote	could use some break-down of large subs into smaller ones
@@ -35,8 +34,6 @@ var
 vars
 varmk
 varmks
-ts
-ds
 spellchecks	incredible mess!
 
 = Future

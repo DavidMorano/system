@@ -46,7 +46,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<sys/time.h>		/* for |gethrtime(3c)| */
@@ -58,6 +57,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* |memcpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<filer.h>
@@ -205,8 +205,7 @@ static int mailmsgstage_starts(MMS *op,int ifd,cc *tmpdn) noex {
 	    if ((rs = mkpath2(tpat,tmpdn,xpat)) >= 0) {
 	        cint	of = O_RDWR ;
 	        cmode	om = 0660 ;
-	        char	*tbuf{} ;
-		if ((rs = malloc_mp(&tbuf)) >= 0) {
+	        if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	            if ((rs = opentmpfile(tpat,of,om,tbuf)) >= 0) {
 	                op->tfd = rs ;
 	                if ((rs = uc_closeonexec(op->tfd,true)) >= 0) {

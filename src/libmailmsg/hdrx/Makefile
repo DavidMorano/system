@@ -63,7 +63,7 @@ OBJA_HDRX= obj0_hdrx.o obj1_hdrx.o
 OBJ_HDRX= $(OBJA_HDRX)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -88,6 +88,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_HDRX)

@@ -123,7 +123,6 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<netinet/in.h>
@@ -137,7 +136,7 @@
 #include	<cstdlib>
 #include	<cinttypes>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<usysflag.h>
@@ -340,7 +339,7 @@ int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 	    if (rs < 0) {
 		ts_dtor(op) ;
 	    }
-	} /* end if (magic) */
+	} /* end if (ts_ctor) */
 	return (rs >= 0) ? f_created : rs ;
 }
 /* end subroutine (ts_open) */

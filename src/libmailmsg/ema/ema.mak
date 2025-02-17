@@ -62,7 +62,7 @@ OBJ2= asstr.o parts.o entry.o
 OBJ_EMA= obj0.o obj1.o obj2.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -87,6 +87,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_EMA)

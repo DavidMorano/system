@@ -76,7 +76,7 @@ OBJE= obj8.o
 OBJ= obja.o objb.o objc.o objd.o obje.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -104,6 +104,9 @@ so:			$(T).so
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
@@ -127,6 +130,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0.o:			$(OBJ0)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
