@@ -100,6 +100,7 @@
 #define	cast_reinterpret	reinterpret_cast
 #define	cast_bit		bit_cast
 #define	cast_saturate		saturate_cast
+#define	cast_any		any_cast
 #endif
 #endif /* __cplusplus */
 

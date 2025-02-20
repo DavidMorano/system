@@ -10,6 +10,7 @@
 
 #ifndef	TSE_INCLUDE
 #define	TSE_INCLUDE
+#ifdef	__cplusplus /* C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -46,6 +47,8 @@ struct tse_aller {
 	uint		ctime ;		/* creation time-stamp */
 	uint		hash ;
 	char		keyname[TSE_LKEYNAME+ 1] ;
+	int rd(char *,int) noex ;
+	int wr(cchar *,int) noex ;
 } ;
 
 struct tse_updater {
@@ -56,14 +59,8 @@ struct tse_updater {
 typedef	TSE_ALL		tse_all ;
 typedef	TSE_UPDATE	tse_update ;
 
-EXTERNC_begin
 
-extern int tse_all(tse_all *,int,char *,int) noex ;
-extern int tse_update(tse_update *,int,char *,int) noex ;
-
-EXTERNC_end
-
-
+#endif /* __cplusplus */
 #endif /* TSE_INCLUDE */
 
 

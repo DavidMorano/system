@@ -20,7 +20,7 @@
 #include	<usysrets.h>
 #include	<mapstrint.h>
 
-#include	<tse.h>
+#include	<tse.hh>
 #include	<ebuf.h>
 
 
@@ -70,7 +70,7 @@ struct ts_head {
 	time_t		ti_access ;		/* file access time */
 	time_t		ti_mod ;		/* file modification time */
 	TS_HDR		h ;
-	TS_FL		f ;
+	TS_FL		fl ;
 	uint		magic ;
 	int		oflags ;
 	int		pagesize ;
@@ -78,10 +78,8 @@ struct ts_head {
 	int		topsize ;
 	int		fd ;
 	int		ncursors ;
-	int		fileversion (V) ;
-	int		fileencoding (E) ;
-	int		filetype (T) ;
 	mode_t		operm ;
+	uchar		vetu[4] ;
 	char		topbuf[TS_TOPLEN + 1] ;	/* top-buffer */
 } ;
 
