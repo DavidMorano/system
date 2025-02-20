@@ -69,13 +69,13 @@
 #include	<userinfo.h>
 #include	<msgbuf.h>
 #include	<sockaddress.h>
+#include	<userports.h>
+#include	<openport.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
-#include	"userports.h"
-#include	"openport.h"
 #include	"proglog.h"
 
 
