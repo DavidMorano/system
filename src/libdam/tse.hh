@@ -25,8 +25,8 @@
 #define	TSE_UPDATE	struct tse_updater
 /* entry field lengths */
 #define	TSE_LCOUNT		4
-#define	TSE_LUTIME		4	/* entry update */
-#define	TSE_LCTIME		4	/* entry creation */
+#define	TSE_LUTIME		4	/* time - entry update */
+#define	TSE_LCTIME		4	/* time - entry creation */
 #define	TSE_LHASH		4
 #define	TSE_LKEYNAME		32
 /* entry field offsets */
@@ -41,7 +41,7 @@
 #define	TSE_SIZE		(TSE_OKEYNAME + TSE_LKEYNAME)
 
 
-struct tse_aller {
+struct tse {
 	uint		count ;		/* count */
 	uint		utime ;		/* update time-stamp */
 	uint		ctime ;		/* creation time-stamp */
@@ -49,15 +49,11 @@ struct tse_aller {
 	char		keyname[TSE_LKEYNAME+ 1] ;
 	int rd(char *,int) noex ;
 	int wr(cchar *,int) noex ;
+	int rdu(char *,int) noex ;
+	int wru(cchar *,int) noex ;
 } ;
 
-struct tse_updater {
-	uint		count ;
-	uint		utime ;
-} ;
-
-typedef	TSE_ALL		tse_all ;
-typedef	TSE_UPDATE	tse_update ;
+typedef	TSE		tse ;
 
 
 #endif /* __cplusplus */
