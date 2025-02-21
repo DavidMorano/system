@@ -22,13 +22,13 @@
 	ds
 
 	Description:
-	This module implements the display related functions for
-	the program.  This code is actually an API-independent
-	front-end for one or more underlying terminal-display APIs.
-	The primary terminal-display API of the past used to be
-	|curses(3)|  but that had way too many bugs for continued
-	use.  The primary underlying terminal-display API is now
-	|td(3dam)|.
+	This module implements the display related functions for a
+	screen-oriented user-interface program.  This code is
+	actually an API-independent front-end for one or more
+	underlying terminal-display APIs.  The primary terminal-display
+	API of the past used to be |curses(3)|  but that had way
+	too many bugs for continued use.  The primary underlying
+	terminal-display API is now |td(3dam)|.
 
 *******************************************************************************/
 

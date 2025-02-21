@@ -21,8 +21,7 @@
 #include	<usysrets.h>
 
 
-#define	TSE_ALL		struct tse_aller
-#define	TSE_UPDATE	struct tse_updater
+#define	TSE		struct tse
 /* entry field lengths */
 #define	TSE_LCOUNT		4
 #define	TSE_LUTIME		4	/* time - entry update */
