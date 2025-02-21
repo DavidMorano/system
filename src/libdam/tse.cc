@@ -61,8 +61,6 @@
 
 /* forward references */
 
-static int	tse_update(tse *,int,char *,int) noex ;
-
 
 /* local variables */
 
@@ -73,13 +71,44 @@ static int	tse_update(tse *,int,char *,int) noex ;
 /* exported subroutines */
 
 int tse::wr(cchar *abuf,int alen) noex {
-	int		rs = SR_FAULT ;
+    	cbool		frd = false ;
+	char		*wbuf = cast_const<charp>(abuf) ;
+    	return all(frd,wbuf,alen) ;
+}
+/* end subroutine (tse::wr) */
+
+int tse::rd(char *abuf,int alen) noex {
+    	cbool		frd = true ;
+    	return all(frd,abuf,alen) ;
+}
+
+int tse::wru(cchar *abuf,int alen) noex {
+    	cbool		frd = false ;
+    	char		*wbuf = cast_const<charp>(abuf) ;
+    	return update(frd,wbuf,alen) ;
+}
+
+int tse::rdu(char *abuf,int alen) noex {
+    	cbool		frd = true ;
+    	return update(frd,abuf,alen) ;
+}
+
+
+/* local subroutines */
+
+int tse::all(bool frd,char *abuf,int alen) noex {
+    	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (alen < 0) alen = INT_MAX ;
 	if (abuf) {
-	    char	*wbuf = cast_const<charp>(abuf) ;
-	    if (serialbuf sb ; (rs = sb.start(wbuf,alen)) >= 0) {
-		{
+	    if (serialbuf sb ; (rs = sb.start(abuf,alen)) >= 0) {
+		if (frd) {
+	            sb.wui(count) ;
+	            sb.wui(utime) ;
+	            sb.wui(ctime) ;
+	            sb.wui(hash) ;
+	            sb.wstrn(keyname,TSE_LKEYNAME) ;
+		} else {
 	            sb.rui(&count) ;
 	            sb.rui(&utime) ;
 	            sb.rui(&ctime) ;
@@ -89,61 +118,26 @@ int tse::wr(cchar *abuf,int alen) noex {
 	        rs1 = sb.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (serialbuf) */
-	} /* end if (magic) */
+	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (tse::wr) */
+/* end subroutine (tse::all) */
 
-int tse::rd(char *abuf,int alen) noex {
-    	int		rs = SR_FAULT ;
-	int		rs1 ;
-	if (alen < 0) alen = INT_MAX ;
-	if (abuf) {
-	    if (serialbuf sb ; (rs = sb.start(abuf,alen)) >= 0) {
-		{
-	            sb.wui(count) ;
-	            sb.wui(utime) ;
-	            sb.wui(ctime) ;
-	            sb.wui(hash) ;
-	            sb.wstrn(keyname,TSE_LKEYNAME) ;
-	        }
-	        rs1 = sb.finish ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (serialbuf) */
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (tse::rd) */
-
-int tse::wru(cchar *abuf,int alen) noex {
-    	cint		frd = false ;
-    	char		*wbuf = cast_const<charp>(abuf) ;
-    	return tse_update(this,frd,wbuf,alen) ;
-}
-
-int tse::rdu(char *abuf,int alen) noex {
-    	cint		frd = true ;
-    	return tse_update(this,frd,abuf,alen) ;
-}
-
-
-/* local subroutines */
-
-static int tse_update(tse *ep,int f_read,char *abuf,int alen) noex {
+int tse::update(bool frd,char *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (ep && abuf) {
+	if (abuf) {
 	    /* go to where this data is in the message buffer */
 	    abuf += TSE_OCOUNT ;
 	    alen -= TSE_OCOUNT ;
 	    /* proceed as normal (?) :-) */
 	    if (serialbuf sb ; (rs = sb.start(abuf,alen)) >= 0) {
-	        if (f_read) {
-	            sb.wui(ep->count) ;
-	            sb.wui(ep->utime) ;
+	        if (frd) {
+	            sb.wui(count) ;
+	            sb.wui(utime) ;
 	        } else {
-	            sb.rui(&ep->count) ;
-	            sb.rui(&ep->utime) ;
+	            sb.rui(&count) ;
+	            sb.rui(&utime) ;
 	        } /* end if */
 	        rs1 = sb.finish ;
 	        if (rs >= 0) rs = rs1 ;
@@ -151,9 +145,9 @@ static int tse_update(tse *ep,int f_read,char *abuf,int alen) noex {
 	    if (rs >= 0) {
 	        rs += TSE_OCOUNT ;
 	    }
-	} /* end if (magic) */
+	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (tse_update) */
+/* end subroutine (tse::update) */
 
 

@@ -50,6 +50,9 @@ struct tse {
 	int wr(cchar *,int) noex ;
 	int rdu(char *,int) noex ;
 	int wru(cchar *,int) noex ;
+    private:
+	int all(bool,char *,int) noex ;
+	int update(bool,char *,int) noex ;
 } ;
 
 typedef	TSE		tse ;
