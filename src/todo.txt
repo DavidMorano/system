@@ -4,6 +4,8 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
+mbcache		add dynamic alloc for |mbcache_scan|
+searchkeys
 ts
 prique		broken, ill-conceived
 timer		decide what to do about |timer_hand()| -- broken
@@ -40,8 +42,6 @@ spellchecks	incredible mess!
 
 file		description
 --------------------------------------------------------------------------------
-mbcache		add dynamic alloc for |mbcache_scan|
-searchkeys
 lookaddr	pointer-implementation
 progsig		total mess
 termtrans	not coded up properly

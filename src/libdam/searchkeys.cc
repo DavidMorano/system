@@ -6,7 +6,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_REGPROC	0		/* compile regular processing */
-#define	CF_BUILDREDUCE	1		/* try '_buildreduce()' */
+#define	CF_BUILDREDUCE	1		/* try |{xx}_buildreduce()| */
 #define	CF_SHORTCUT	1		/* use short-cut */
 
 /* revision history:
