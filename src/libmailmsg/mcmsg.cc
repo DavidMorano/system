@@ -27,6 +27,7 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<climit>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
@@ -44,7 +45,13 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
@@ -92,45 +99,44 @@ int mcmsg_request(mcmsg_req *sp,int f,char *buf,int buflen) noex {
 /* end subroutine (mcmsg_request) */
 
 int mcmsg_report(mcmsg_rep *sp,int f,char *buf,int buflen) noex {
-	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&msgbuf,buf,buflen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(buf,buflen)) >= 0) {
 	    uint	hdr ;
 	    if (f) { /* read */
-	        serialbuf_rui(&msgbuf,&hdr) ;
+	        mb.rui(&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
-	        serialbuf_ruc(&msgbuf,&sp->seq) ;
-	        serialbuf_rui(&msgbuf,&sp->tag) ;
-	        serialbuf_rui(&msgbuf,&sp->timestamp) ;
-	        serialbuf_rui(&msgbuf,&sp->mlen) ;
-	        serialbuf_rstrw(&msgbuf,sp->cluster,MCMSG_LCLUSTER) ;
-	        serialbuf_rstrw(&msgbuf,sp->mailuser,MCMSG_LMAILUSER) ;
-	        serialbuf_rstrw(&msgbuf,sp->msgid,MCMSG_LMSGID) ;
-	        serialbuf_rstrw(&msgbuf,sp->from,MCMSG_LFROM) ;
-	        serialbuf_ruc(&msgbuf,&sp->flags) ;
-	        serialbuf_ruc(&msgbuf,&sp->rc) ;
+	        mb.ruc(&sp->seq) ;
+	        mb.rui(&sp->tag) ;
+	        mb.rui(&sp->timestamp) ;
+	        mb.rui(&sp->mlen) ;
+	        mb.rstrw(sp->cluster,MCMSG_LCLUSTER) ;
+	        mb.rstrw(sp->mailuser,MCMSG_LMAILUSER) ;
+	        mb.rstrw(sp->msgid,MCMSG_LMSGID) ;
+	        mb.rstrw(sp->from,MCMSG_LFROM) ;
+	        mb.ruc(&sp->flags) ;
+	        mb.ruc(&sp->rc) ;
 	    } else { /* write */
 	        sp->msgtype = mcmsgtype_report ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wui(&msgbuf,hdr) ;
-	        serialbuf_wuc(&msgbuf,sp->seq) ;
-	        serialbuf_wui(&msgbuf,sp->tag) ;
-	        serialbuf_wui(&msgbuf,sp->timestamp) ;
-	        serialbuf_wui(&msgbuf,sp->mlen) ;
-	        serialbuf_wstrw(&msgbuf,sp->cluster,MCMSG_LCLUSTER) ;
-	        serialbuf_wstrw(&msgbuf,sp->mailuser,MCMSG_LMAILUSER) ;
-	        serialbuf_wstrw(&msgbuf,sp->msgid,MCMSG_LMSGID) ;
-	        serialbuf_wstrw(&msgbuf,sp->from,MCMSG_LFROM) ;
-	        serialbuf_wuc(&msgbuf,sp->flags) ;
-	        serialbuf_wuc(&msgbuf,sp->rc) ;
-	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
+	        mb.wui(hdr) ;
+	        mb.wuc(sp->seq) ;
+	        mb.wui(sp->tag) ;
+	        mb.wui(sp->timestamp) ;
+	        mb.wui(sp->mlen) ;
+	        mb.wstrw(sp->cluster,MCMSG_LCLUSTER) ;
+	        mb.wstrw(sp->mailuser,MCMSG_LMAILUSER) ;
+	        mb.wstrw(sp->msgid,MCMSG_LMSGID) ;
+	        mb.wstrw(sp->from,MCMSG_LFROM) ;
+	        mb.wuc(sp->flags) ;
+	        mb.wuc(sp->rc) ;
+	        if ((sp->msglen = mb.getlen) > 0) {
 	            hdr |= (sp->msglen << 8) ;
 	            stdorder_wui(buf,hdr) ;
 	        }
 	    } /* end if */
-	    rs1 = serialbuf_finish(&msgbuf) ;
+	    rs1 = mb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
@@ -138,31 +144,30 @@ int mcmsg_report(mcmsg_rep *sp,int f,char *buf,int buflen) noex {
 /* end subroutine (mcmsg_report) */
 
 int mcmsg_acknowledge(mcmsg_ack *sp,int f,char *buf,int buflen) noex {
-	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&msgbuf,buf,buflen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(buf,buflen)) >= 0) {
 	    uint	hdr ;
 	    if (f) { /* read */
-	        serialbuf_rui(&msgbuf,&hdr) ;
+	        mb.rui(&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
-	        serialbuf_ruc(&msgbuf,&sp->seq) ;
-	        serialbuf_rui(&msgbuf,&sp->tag) ;
-	        serialbuf_ruc(&msgbuf,&sp->rc) ;
+	        mb.ruc(&sp->seq) ;
+	        mb.rui(&sp->tag) ;
+	        mb.ruc(&sp->rc) ;
 	    } else { /* write */
 	        sp->msgtype = mcmsgtype_ack ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wui(&msgbuf,hdr) ;
-	        serialbuf_wuc(&msgbuf,sp->seq) ;
-	        serialbuf_wui(&msgbuf,sp->tag) ;
-	        serialbuf_wuc(&msgbuf,sp->rc) ;
-	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
+	        mb.wui(hdr) ;
+	        mb.wuc(sp->seq) ;
+	        mb.wui(sp->tag) ;
+	        mb.wuc(sp->rc) ;
+	        if ((sp->msglen = mb.getlen) > 0) {
 	            hdr |= (sp->msglen << 8) ;
 	            stdorder_wui(buf,hdr) ;
 	        }
 	    } /* end if */
-	    rs1 = serialbuf_finish(&msgbuf) ;
+	    rs1 = mb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;

@@ -1,6 +1,6 @@
 /* splitaddr HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* mail address management */
 /* version %I% last-modified %G% */
@@ -46,7 +46,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<strings.h>		/* for |strcasecmp(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
+#include	<strings.h>		/* |strcasecmp(3c)| + |strlen(3c)| */
 #include	<usystem.h>
 #include	<vechand.h>
 #include	<strn.h>
@@ -77,6 +78,9 @@ using std::nothrow ;			/* constant */
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -130,6 +134,7 @@ static inline int splitaddr_magic(splitaddr *op,Args ... args) noex {
 /* exported subroutines */
 
 int splitaddr_start(splitaddr *op,cchar *ap) noex {
+    	cnullptr	np{} ;
 	cint		nents = SPLITADDR_DEFENTS ;
 	int		rs ;
 	int		n = 0 ;
@@ -142,10 +147,9 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	        if (char *bp ; (rs = uc_malloc((al+1),&bp)) >= 0) {
 	            int		bl = al ;
 	            bool	f = false ;
-	            cchar	*tp ;
 	            op->mailaddr = charp(bp) ;
 		    strwcpy(bp,ap,al) ;
-	            while ((tp = strnrpbrk(bp,bl,".@")) != nullptr) {
+	            for (cc *tp ; (tp = strnrpbrk(bp,bl,".@")) != np ; ) {
 	                f = (*tp == '@') ;
 	                n += 1 ;
 	                rs = vechand_add(op->comp,(tp+1)) ;
@@ -153,13 +157,13 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	                bp[bl] = '\0' ;
 	                if (f) break ;
 	                if (rs < 0) break ;
-	            } /* end while */
+	            } /* end for */
 	            if ((rs >= 0) && (bp[0] != '\0')) {
 	                if (! f) {
 	                    n += 1 ;
 	                    rs = vechand_add(op->comp,bp) ;
 	                } else {
-	                    op->local = bp ;
+	                    op->lpart = bp ;
 		        }
 	            } /* end if */
 	            if (rs >= 0) {
@@ -169,16 +173,16 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 		    if (rs < 0) {
 			uc_free(bp) ;
 			op->mailaddr = nullptr ;
-		    }
+		    } /* end if (error handling) */
 	        } /* end if (memory-allocation) */
 	        if (rs < 0) {
 	            vechand_finish(op->comp) ;
-	        }
+	        } /* end if (error handling) */
 	    } /* end if (vechand_start) */
 	    if (rs < 0) {
 		splitaddr_dtor(op) ;
-	    }
-	} /* end if (non-null) */
+	    } /* end if (error handling) */
+	} /* end if (splitaddr_ctor) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (splitaddr_start) */
@@ -215,33 +219,36 @@ int splitaddr_count(splitaddr *op) noex {
 }
 /* end subroutine (splitaddr_count) */
 
-int splitaddr_prematch(splitaddr *op,splitaddr *tp) noex {
+int splitaddr_prematch(splitaddr *op,splitaddr *sap) noex {
+    	int		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		f = false ;
-	if ((rs = splitaddr_magic(op,tp)) >= 0) {
+	if ((rs = splitaddr_magic(op,sap)) >= 0) {
 	    int		rs1 ;
 	    int		rs2 ;
 	    int		f_so = false ;
-	    for (int i = 0 ; true ; i += 1) {
+	    for (int i = 0 ; rs >= 0 ; i += 1) {
 	        void	*v1p{} ;
 	        void	*v2p{} ;
-		{
+		if (rs >= 0) {
 	            rs1 = vechand_get(op->comp,i,&v1p) ;
-	            if (rs1 < 0) break ;
+	            if (rs1 == rsn) break ;
     		}
-		{
+		if (rs >= 0) {
 	            f_so = false ;
-	            rs2 = vechand_get(tp->comp,i,&v2p) ;
-	            if (rs2 < 0) break ;
+	            rs2 = vechand_get(sap->comp,i,&v2p) ;
+	            if (rs2 == rsn) break ;
 		}
 	        f_so = true ;
-	        cchar	*c1p = charp(v1p) ;
-	        cchar	*c2p = charp(v2p) ;
-	        f = (strcasecmp(c1p,c2p) == 0) ;
-	        if (! f) break ;
+		if ((rs >= 0) && v1p && v2p) {
+	            cchar	*c1p = charp(v1p) ;
+	            cchar	*c2p = charp(v2p) ;
+	            f = (strcasecmp(c1p,c2p) == 0) ;
+	            if (! f) break ;
+		}
 	    } /* end for */
 	    /* handle non-matching related errors first */
-	    if ((rs1 < 0) && (rs1 != SR_NOTFOUND)) {
+	    if ((rs >= 0) && (rs1 < 0) && (rs1 != SR_NOTFOUND)) {
 	        rs = rs1 ;
 	    }
 	    if ((rs >= 0) && (rs2 < 0) && (rs2 != SR_NOTFOUND)) {
@@ -252,10 +259,10 @@ int splitaddr_prematch(splitaddr *op,splitaddr *tp) noex {
 	        f = f_so ;
 	    }
     	    /* candidate entry must have local-name match if it is local */
-	    if ((rs >= 0) && f && (op->local != nullptr)) {
+	    if ((rs >= 0) && f && (op->lpart != nullptr)) {
 	        f = false ;
-	        if (tp->local != nullptr) {
-	            f = (strcmp(op->local,tp->local) == 0) ;
+	        if (sap->lpart != nullptr) {
+	            f = (strcmp(op->lpart,sap->lpart) == 0) ;
 	        }
 	    } /* end if */
 	} /* end if (magic) */

@@ -47,12 +47,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<unistd.h>
-#include	<limits>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -140,7 +140,7 @@ namespace {
 /* forward references */
 
 template<typename ... Args>
-static int mbcache_ctor(mbcache *op,Args ... args) noex {
+local int mbcache_ctor(mbcache *op,Args ... args) noex {
     	MBCACHE		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -167,7 +167,7 @@ static int mbcache_ctor(mbcache *op,Args ... args) noex {
 }
 /* end subroutine (mbcache_ctor) */
 
-static int mbcache_dtor(mbcache *op) noex {
+local int mbcache_dtor(mbcache *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -189,7 +189,7 @@ static int mbcache_dtor(mbcache *op) noex {
 /* end subroutine (mbcache_dtor) */
 
 template<typename ... Args>
-static int mbcache_magic(mbcache *op,Args ... args) noex {
+local int mbcache_magic(mbcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == MBCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -198,44 +198,44 @@ static int mbcache_magic(mbcache *op,Args ... args) noex {
 }
 /* end subroutine (mbcache_magic) */
 
-static int mbcache_starter(mbcache *,cc *) noex ;
-static int mbcache_msgfins(mbcache *) noex ;
-static int mbcache_msgframing(mbcache *,int,ME **) noex ;
-static int mbcache_msgtimers(mbcache *,int,time_t *) noex ;
+local int mbcache_starter(mbcache *,cc *) noex ;
+local int mbcache_msgfins(mbcache *) noex ;
+local int mbcache_msgframing(mbcache *,int,ME **) noex ;
+local int mbcache_msgtimers(mbcache *,int,time_t *) noex ;
 
 #ifdef	COMMENT
-static int mbcache_msgscanmk(mbcache *,int) noex ;
+local int mbcache_msgscanmk(mbcache *,int) noex ;
 #endif
 
-static int msgent_start(ME *,int) noex ;
-static int msgent_frame(ME *,mailbox_mi *) noex ;
-static int msgent_load(ME *,mbcache *) noex ;
-static int msgent_loadenv(ME *,mbcache *,mailmsg *) noex ;
-static int msgent_loadhdrmid(ME *,mbcache *,mailmsg *) noex ;
-static int msgent_loadhdrfrom(ME *,mbcache *,mailmsg *) noex ;
-static int msgent_loadhdrsubj(ME *,mbcache *,mailmsg *) noex ;
-static int msgent_loadhdrdate(ME *,mbcache *,mailmsg *) noex ;
-static int msgent_loadhdrstatus(ME *,mbcache *,mailmsg *) noex ;
-static int msgent_procenvdate(ME *,mbcache *) noex ;
-static int msgent_prochdrdate(ME *,mbcache *) noex ;
-static int msgent_msgtimes(ME *,mbcache *) noex ;
-static int msgent_procscanfrom(ME *,mbcache *) noex ;
-static int msgent_procscandate(ME *,mbcache *) noex ;
-static int msgent_finish(ME *) noex ;
+local int msgent_start(ME *,int) noex ;
+local int msgent_frame(ME *,mailbox_mi *) noex ;
+local int msgent_load(ME *,mbcache *) noex ;
+local int msgent_loadenv(ME *,mbcache *,mailmsg *) noex ;
+local int msgent_loadhdrmid(ME *,mbcache *,mailmsg *) noex ;
+local int msgent_loadhdrfrom(ME *,mbcache *,mailmsg *) noex ;
+local int msgent_loadhdrsubj(ME *,mbcache *,mailmsg *) noex ;
+local int msgent_loadhdrdate(ME *,mbcache *,mailmsg *) noex ;
+local int msgent_loadhdrstatus(ME *,mbcache *,mailmsg *) noex ;
+local int msgent_procenvdate(ME *,mbcache *) noex ;
+local int msgent_prochdrdate(ME *,mbcache *) noex ;
+local int msgent_msgtimes(ME *,mbcache *) noex ;
+local int msgent_procscanfrom(ME *,mbcache *) noex ;
+local int msgent_procscandate(ME *,mbcache *) noex ;
+local int msgent_finish(ME *) noex ;
 
 #if	CF_LOADENVADDR
-static int msgent_loadenvaddr(ME *,mbcache *,mailmsg *,cchar **) noex ;
+local int msgent_loadenvaddr(ME *,mbcache *,mailmsg *,cchar **) noex ;
 #endif /* CF_LOADENVADDR */
 
 #ifdef	COMMENT
-static int	headappend(char **,char *,int) noex ;
+local int	headappend(char **,char *,int) noex ;
 #endif
 
 static bool	isNoMsg(int) noex ;
 static bool	isBadDate(int) noex ;
 
 extern "C" {
-    static int	vcmpmsgentry(cvoid *,cvoid *) noex ;
+    local int	vcmpmsgentry(cvoid *,cvoid *) noex ;
 }
 
 
@@ -296,7 +296,7 @@ int mbcache_start(mbcache *op,cchar *mbfname,int mflags,mailbox *mbp) noex {
 }
 /* end subroutine (mbcache_start) */
 
-static int mbcache_starter(mbcache *op,cc *mbfname) noex {
+local int mbcache_starter(mbcache *op,cc *mbfname) noex {
 	cnullptr	np{} ;
 	mailbox		*mbp = op->mbp ;
 	strpack		*psp = op->spp ;
@@ -404,7 +404,7 @@ int mbcache_mbinfo(mbcache *op,MBCACHE_INFO *mep) noex {
 
 int mbcache_count(mbcache *op) noex {
 	int		rs ;
-	int		nmsgs ;
+	int		nmsgs = 0 ;
 	if ((rs = mbcache_magic(op)) >= 0) {
 	    mailbox_info	*mip = op->mip ;
 	    nmsgs = mip->nmsgs ;
@@ -490,9 +490,8 @@ int mbcache_msgdeldup(mbcache *op) noex {
 	int		c = 0 ;
 	if ((rs = mbcache_magic(op)) >= 0) {
 	    mailbox_info	*mip = op->mip ;
-	    mapstrint		mm ;
 	    nmsgs = mip->nmsgs ;
-	    if ((rs = mapstrint_start(&mm,nmsgs)) >= 0) {
+	    if (mapstrint mm ; (rs = mapstrint_start(&mm,nmsgs)) >= 0) {
 	        cint	vi = mbcachemf_hdrmid ;
 	        for (int mi = 0 ; mi < nmsgs ; mi += 1) {
 	            if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
@@ -531,8 +530,7 @@ int mbcache_msgflags(mbcache *op,int mi) noex {
 	    nmsgs = mip->nmsgs ;
 	    rs = SR_NOMSG ;
 	    if ((mi >= 0) && (mi < nmsgs)) {
-	        ME	*mep ;
-	        if ((rs = mbcache_msgframing(op,mi,&mep)) >= 0) {
+	        if (ME *mep ; (rs = mbcache_msgframing(op,mi,&mep)) >= 0) {
 	            if (mep->f.read) mf |= MBCACHE_MFMREAD ;
 	            if (mep->f.del) mf |= MBCACHE_MFMDEL ;
 	            if (mep->f.spam) mf |= MBCACHE_MFMSPAM ;
@@ -554,8 +552,7 @@ int mbcache_msgsetflag(mbcache *op,int mi,int w,int v) noex {
 	    nmsgs = mip->nmsgs ;
 	    rs = SR_NOMSG ;
 	    if ((mi >= 0) && (mi < nmsgs)) {
-	        ME	*mep ;
-		if ((rs = mbcache_msgframing(op,mi,&mep)) >= 0) {
+	        if (ME *mep ; (rs = mbcache_msgframing(op,mi,&mep)) >= 0) {
 	            switch (w) {
 	            case MBCACHE_MFVREAD:
 	                mf = mep->f.read ;
@@ -599,8 +596,7 @@ int mbcache_msgsetlines(mbcache *op,int mi,int vlines) noex {
 	    nmsgs = mip->nmsgs ;
 	    rs = SR_NOMSG ;
 	    if ((mi >= 0) && (mi < nmsgs)) {
-	        ME	*mep ;
-	        if ((rs = mbcache_msgframing(op,mi,&mep)) >= 0) {
+	        if (ME *mep ; (rs = mbcache_msgframing(op,mi,&mep)) >= 0) {
 	            if (vlines >= 0) {
 	                if (mep->vlines < 0) {
 	                    mep->vlines = vlines ;
@@ -717,14 +713,13 @@ int mbcache_msgenvtime(mbcache *op,int mi,time_t *timep) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = mbcache_magic(op,timep)) >= 0) {
-	    ME		*mep ;
-	    if ((rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
+	    if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
 	        if ((rs = msgent_procenvdate(mep,op)) >= 0) {
 	            t = mep->etime ;
 	            f = true ;
 	        }
 	    }
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	if (timep) *timep = t ;
 	return (rs >= 0) ? f : rs ;
 }
@@ -735,8 +730,7 @@ int mbcache_msghdrtime(mbcache *op,int mi,time_t *timep) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = mbcache_magic(op,timep)) >= 0) {
-	    ME		*mep ;
-	    if ((rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
+	    if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
 	        if ((rs = msgent_prochdrdate(mep,op)) >= 0) {
 	            f = true ;
 	            t = mep->htime ;
@@ -751,14 +745,13 @@ int mbcache_msghdrtime(mbcache *op,int mi,time_t *timep) noex {
 int mbcache_msgtimes(mbcache *op,int mi,time_t *timep) noex {
 	int		rs ;
 	if ((rs = mbcache_magic(op,timep)) >= 0) {
-	    ME		*mep ;
-	    if ((rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
+	    if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
 	        if ((rs = msgent_msgtimes(mep,op)) >= 0) {
 	            timep[0] = mep->etime ;
 	            timep[1] = mep->htime ;
 	        }
 	    }
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mbcache_msgtimes) */
@@ -766,7 +759,7 @@ int mbcache_msgtimes(mbcache *op,int mi,time_t *timep) noex {
 
 /* private subroutines */
 
-static int mbcache_msgfins(mbcache *op) noex {
+local int mbcache_msgfins(mbcache *op) noex {
 	mailbox_info	*mip = op->mip ;
 	int		nmsgs ;
 	int		rs = SR_OK ;
@@ -790,7 +783,7 @@ static int mbcache_msgfins(mbcache *op) noex {
 }
 /* end subroutine (mbcache_msgfins) */
 
-static int mbcache_msgframing(mbcache *op,int mi,ME **mpp) noex {
+local int mbcache_msgframing(mbcache *op,int mi,ME **mpp) noex {
 	int		rs = SR_OK ;
 	if (op->msgs[mi] == nullptr) {
 	    mailbox_mi	*mip{} ;
@@ -818,10 +811,9 @@ static int mbcache_msgframing(mbcache *op,int mi,ME **mpp) noex {
 }
 /* end subroutine (mbcache_msgframing) */
 
-static int mbcache_msgtimers(mbcache *op,int mi,time_t *timep) noex {
-	ME		*mep ;
+local int mbcache_msgtimers(mbcache *op,int mi,time_t *timep) noex {
 	int		rs ;
-	if ((rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
+	if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
 	    if ((rs = msgent_msgtimes(mep,op)) >= 0) {
 	        if (timep != nullptr) {
 	            timep[0] = mep->etime ;
@@ -834,22 +826,19 @@ static int mbcache_msgtimers(mbcache *op,int mi,time_t *timep) noex {
 /* end subroutine (mbcache_msgtimers) */
 
 #ifdef	COMMENT
-static int mbcache_msgscanmk(mbcache *op,int mi) noex {
+local int mbcache_msgscanmk(mbcache *op,int mi) noex {
 	ME		*mep = op->msgs[mi] ;
 	cint		sl = SCANBUFLEN ;
 	int		rs = SR_OK ;
 	if (mep != nullptr) {
 	    if (mep->vs[mbcachemf_scanline] == nullptr) {
 	        cint	sz = (sl + 1) ;
-	        char	*bp ;
-	        if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	        if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	            int		tcol ;
-	            int		cl ;
-	            cchar	*cp ;
 	            strwcpyblanks(bp,sl) ;
 	            for (int i = 0 ; scantitles[i].name ; i += 1) {
-	                cp = scantitles[i].name ;
-	                cl = strlen(cp) ;
+	                cchar	*cp = scantitles[i].name ;
+	                cint	cl = strlen(cp) ;
 	                tcol = scantitles[i].col ;
 	                strncpy((bp + tcol),cp,cl) ;
 	            } /* end for */
@@ -867,13 +856,12 @@ static int mbcache_msgscanmk(mbcache *op,int mi) noex {
 #endif /* COMMENT */
 
 #ifdef	COMMENT
-static int mbcache_setnow(mbcache *op) noex {
+local int mbcache_setnow(mbcache *op) noex {
 	int		rs = SR_OK ;
 	if (! op->f.now) {
 	    TIMEB	*tbp = &op->now ;
 	    if ((rs = uc_ftime(tbp)) >= 0) {
 	        TMTIME	tmt ;
-	        int	zo ;
 	        if ((rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
 	            tbp->timezone = (tmt.gmtoff / 60) ;
 	            tbp->dstflag = tmt.isdst ;
@@ -888,7 +876,7 @@ static int mbcache_setnow(mbcache *op) noex {
 
 #endif /* COMMENT */
 
-static int msgent_start(ME *mep,int mi) noex {
+local int msgent_start(ME *mep,int mi) noex {
 	int		rs = SR_FAULT ;
 	if (mep) {
 	    rs = memclear(mep) ;
@@ -904,7 +892,7 @@ static int msgent_start(ME *mep,int mi) noex {
 }
 /* end subroutine (msgent_start) */
 
-static int msgent_finish(ME *mep) noex {
+local int msgent_finish(ME *mep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (mep) {
@@ -924,7 +912,7 @@ static int msgent_finish(ME *mep) noex {
 }
 /* end subroutine (msgent_finish) */
 
-static int msgent_frame(ME *mep,mailbox_mi *mip) noex {
+local int msgent_frame(ME *mep,mailbox_mi *mip) noex {
 	int		rs = SR_FAULT ;
 	if (mep && mip) {
 	    rs = SR_OK ;
@@ -973,7 +961,7 @@ static msgent_f		msgents[] = {
 	msgent_loadhdrstatus
 } ;
 
-static int msgent_load(ME *mep,mbcache *op) noex {
+local int msgent_load(ME *mep,mbcache *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (! mep->f.info) {
@@ -999,7 +987,7 @@ static int msgent_load(ME *mep,mbcache *op) noex {
 }
 /* end subroutine (msgent_load) */
 
-static int msgent_loadenv(ME *mep,mbcache *op,mailmsg *mmp) noex {
+local int msgent_loadenv(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
 	if ((rs = mailmsg_envcount(mmp)) >= 0) {
 	    strpack		*psp = op->spp ;
@@ -1045,7 +1033,7 @@ static int msgent_loadenv(ME *mep,mbcache *op,mailmsg *mmp) noex {
 /* end subroutine (msgent_loadenv) */
 
 #if	CF_LOADENVADDR
-static int msgent_loadenvaddr(ME *mep,MC *op,mailmsg *mmp,cchar **rpp) noex {
+local int msgent_loadenvaddr(ME *mep,MC *op,mailmsg *mmp,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (mep->vs[mbcachemf_envaddr] == nullptr) {
@@ -1063,12 +1051,11 @@ static int msgent_loadenvaddr(ME *mep,MC *op,mailmsg *mmp,cchar **rpp) noex {
 /* end subroutine (msgent_loadenvaddr) */
 #endif /* CF_LOADENVADDR */
 
-static int msgent_loadhdrmid(ME *mep,mbcache *op,mailmsg *mmp) noex {
+local int msgent_loadhdrmid(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
 	int		sl = 0 ;
 	cchar		*hdr = HN_MESSAGEID ;
-	cchar		*sp ;
-	if ((rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
+	if (cchar *sp ; (rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
 	    cint	hlen = var.hdrbuflen ;
 	    strpack	*psp = op->spp ;
 	    if (char *hbuf ; (rs = uc_malloc((hlen+1),&hbuf)) >= 0) {
@@ -1089,7 +1076,7 @@ static int msgent_loadhdrmid(ME *mep,mbcache *op,mailmsg *mmp) noex {
 }
 /* end subroutine (msgent_loadhdrmid) */
 
-static int msgent_loadhdrfrom(ME *mep,mbcache *op,mailmsg *mmp) noex {
+local int msgent_loadhdrfrom(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	cchar		*hdr = HN_FROM ;
@@ -1116,7 +1103,7 @@ static int msgent_loadhdrfrom(ME *mep,mbcache *op,mailmsg *mmp) noex {
 }
 /* end subroutine (msgent_loadhdrfrom) */
 
-static int msgent_loadhdrsubj(ME *mep,mbcache *op,mailmsg *mmp) noex {
+local int msgent_loadhdrsubj(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
 	int		sl = 0 ;
 	cchar		*hdr = HN_SUBJECT ;
@@ -1135,7 +1122,7 @@ static int msgent_loadhdrsubj(ME *mep,mbcache *op,mailmsg *mmp) noex {
 }
 /* end subroutine (msgent_loadhdrsubj) */
 
-static int msgent_loadhdrdate(ME *mep,mbcache *op,mailmsg *mmp) noex {
+local int msgent_loadhdrdate(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
 	int		sl = 0 ;
 	cchar		*hdr = HN_DATE ;
@@ -1154,7 +1141,7 @@ static int msgent_loadhdrdate(ME *mep,mbcache *op,mailmsg *mmp) noex {
 }
 /* end subroutine (msgent_loadhdrdate) */
 
-static int msgent_loadhdrstatus(ME *mep,mbcache *op,mailmsg *mmp) noex {
+local int msgent_loadhdrstatus(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
 	int		sl = 0 ;
 	cchar		*hdr = HN_STATUS ;
@@ -1173,7 +1160,7 @@ static int msgent_loadhdrstatus(ME *mep,mbcache *op,mailmsg *mmp) noex {
 }
 /* end subroutine (msgent_loadhdrstatus) */
 
-static int msgent_procenvdate(ME *mep,mbcache *op) noex {
+local int msgent_procenvdate(ME *mep,mbcache *op) noex {
 	cint		vi = mbcachemf_envdate ;
 	int		rs = SR_OK ;
 	int		f = false ;
@@ -1201,7 +1188,7 @@ static int msgent_procenvdate(ME *mep,mbcache *op) noex {
 }
 /* end subroutine (msgent_procenvdate) */
 
-static int msgent_prochdrdate(ME *mep,mbcache *op) noex {
+local int msgent_prochdrdate(ME *mep,mbcache *op) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (! mep->proc.hdate) {
@@ -1229,7 +1216,7 @@ static int msgent_prochdrdate(ME *mep,mbcache *op) noex {
 }
 /* end subroutine (msgent_prochdrdate) */
 
-static int msgent_procscanfrom(ME *mep,mbcache *op) noex {
+local int msgent_procscanfrom(ME *mep,mbcache *op) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (! mep->proc.scanfrom) {
@@ -1264,7 +1251,7 @@ static int msgent_procscanfrom(ME *mep,mbcache *op) noex {
 }
 /* end subroutine (msgent_procscanfrom) */
 
-static int msgent_procscandate(ME *mep,mbcache *op) noex {
+local int msgent_procscandate(ME *mep,mbcache *op) noex {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		cl = 0 ;
@@ -1297,7 +1284,7 @@ static int msgent_procscandate(ME *mep,mbcache *op) noex {
 }
 /* end subroutine (msgent_procscandate) */
 
-static int msgent_msgtimes(ME *mep,mbcache *op) noex {
+local int msgent_msgtimes(ME *mep,mbcache *op) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = msgent_procenvdate(mep,op)) >= 0) {
@@ -1328,15 +1315,16 @@ static bool isNoMsg(int rs) noex {
 }
 /* end subroutine (isNoMsg) */
 
-static int vcmpmsgentry(cvoid *e1pp,cvoid *e2pp) noex {
+local int vcmpmsgentry(cvoid *e1pp,cvoid *e2pp) noex {
 	ME		**m1pp = (ME **) e1pp ;
 	ME		**m2pp = (ME **) e2pp ;
-	ME		*m1p, *m2p ;
+	ME		*m1p ;
+	ME		*m2p ;
 	int		rc = 0 ;
 	m1p = (*m1pp) ;
 	m2p = (*m2pp) ;
 	if (m1p || m2p) {
-	    if ((rc == 0) && (m1p == nullptr)) rc = 1 ;
+	    if ((rc == 0) && (m1p == nullptr)) rc = +1 ;
 	    if ((rc == 0) && (m2p == nullptr)) rc = -1 ;
 	    if (rc == 0) {
 	        time_t	t1e = m1p->etime ;
@@ -1355,16 +1343,14 @@ static int vcmpmsgentry(cvoid *e1pp,cvoid *e2pp) noex {
 
 #ifdef	COMMENT
 /* append some additional value to an existing header value */
-static int headappend(cchar **pp,cchar *sp,int sl) noex {
+local int headappend(cchar **pp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		cl = 0 ;
 	if (*pp) {
-	    int		cl2 = strlen(*pp) ;
-	    char	*cp ;
-	    char	*cp2 ;
+	    cint	cl2 = strlen(*pp) ;
 	    cl = sl + cl2 + 2 ;
-	    if ((rs = uc_malloc(cl,&cp)) >= 0) {
-	        cp2 = strwcpy(cp,*pp,cl2) ;
+	    if (char *cp ; (rs = uc_malloc(cl,&cp)) >= 0) {
+	        char	*cp2 = strwcpy(cp,*pp,cl2) ;
 	        *cp2++ = ',' ;
 	        *cp2++ = ' ' ;
 	        strwcpy(cp2,sp,sl) ;
@@ -1379,7 +1365,7 @@ static int headappend(cchar **pp,cchar *sp,int sl) noex {
 
 #ifdef	COMMENT
 /* is the next non-white-space character a colon */
-static int nextnonwhite(cchar *sp,int sl) noex {
+local int nextnonwhite(cchar *sp,int sl) noex {
 	int		i = 0 ;
 	while (CHAR_ISWHITE(*sp) && (i++ < sl)) {
 	    sp += 1 ;

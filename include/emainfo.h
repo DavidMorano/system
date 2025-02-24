@@ -28,7 +28,7 @@
 
 
 /* object defines */
-#define	EMAINFO		struct emainfo_head
+#define	EMAINFO			struct emainfo_head
 /* other defines */
 #define	EMAINFO_TLOCAL		0
 #define	EMAINFO_TUUCP		1
@@ -39,8 +39,8 @@
 
 
 struct emainfo_head {
-	cchar		*local ;
-	cchar		*host ;
+	cchar		*lpart ;
+	cchar		*hpart ;
 	int		type ;
 	int		llen ;
 	int		hlen ;

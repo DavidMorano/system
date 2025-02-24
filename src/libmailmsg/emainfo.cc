@@ -99,37 +99,37 @@ int emainfo_load(emainfo *eip,cchar *sp,int sl) noex {
 		    /* ARPAnet route address */
 	            eip->type = EMAINFO_TARPAROUTE ;
 	            if ((cp = strnchr(sp,sl,',')) != nullptr) {
-	                eip->host = (cp1 + 1) ;
+	                eip->hpart = (cp1 + 1) ;
 	                eip->hlen = (cp - (cp1 + 1)) ;
-	                eip->local = (cp + 1) ;
+	                eip->lpart = (cp + 1) ;
 	                eip->llen = (sp + sl) - (cp + 1) ;
 	            } else {
-	                eip->host = (cp1 + 1) ;
+	                eip->hpart = (cp1 + 1) ;
 	                eip->hlen = (cp2 - (cp1 + 1)) ;
-	                eip->local = (cp2 + 1) ;
+	                eip->lpart = (cp2 + 1) ;
 	                eip->llen = (sp + sl) - (cp2 + 1) ;
 	            } /* end if */
 	        } else {
 		    /* normal ARPAnet address */
 	            eip->type = EMAINFO_TARPA ;
-	            eip->host = (cp1 + 1) ;
+	            eip->hpart = (cp1 + 1) ;
 	            eip->hlen = (sp + sl) - (cp1 + 1) ;
-	            eip->local = sp ;
+	            eip->lpart = sp ;
 	            eip->llen = (cp1 - sp) ;
 	        } /* end if */
 	    } else if ((cp = strnrchr(sp,sl,'!')) != nullptr) {
 	        eip->type = EMAINFO_TUUCP ;
-	        eip->host = sp ;
+	        eip->hpart = sp ;
 	        eip->hlen = (cp - sp) ;
-	        eip->local = (cp + 1) ;
+	        eip->lpart = (cp + 1) ;
 	        eip->llen = (sp + sl) - (cp + 1) ;
 	        eip->hlen = (cp - sp) ;
 	    } else {
 		/* local */
 	        eip->type = EMAINFO_TLOCAL ;
-	        eip->host = nullptr ;
+	        eip->hpart = nullptr ;
 	        eip->hlen = 0 ;
-	        eip->local = sp ;
+	        eip->lpart = sp ;
 	        eip->llen = sl ;
 	    } /* end if */
 	   type = eip->type ;
@@ -150,39 +150,39 @@ int emainfo_mktype(emainfo *eip,int type,char *rbuf,int rlen) noex {
 	        case EMAINFO_TLOCAL:
 		    {
 		        cint	ml = min(eip->llen,rlen) ;
-			rs = b.strw(eip->local,ml) ;
+			rs = b.strw(eip->lpart,ml) ;
 		    }
 	            break ;
 	        case EMAINFO_TUUCP:
-	            if (eip->host && (eip->hlen >= 0)) {
+	            if (eip->hpart && (eip->hlen >= 0)) {
 		        cint	hl = eip->hlen ;
-		        cchar	*hp = eip->host ;
+		        cchar	*hp = eip->hpart ;
 	                if ((rs = b.strw(hp,hl)) >= 0) {
 	                    rs = b.chr('!') ;
 		        }
 	            } /* end if (had a host part) */
 		    if (rs >= 0) {
-	                rs = b.strw(eip->local,eip->llen) ;
+	                rs = b.strw(eip->lpart,eip->llen) ;
 		    }
 	            break ;
 	        case EMAINFO_TARPA:
-	            if ((rs = b.strw(eip->local,eip->llen)) >= 0) {
-	                if (eip->host && (eip->hlen >= 0)) {
+	            if ((rs = b.strw(eip->lpart,eip->llen)) >= 0) {
+	                if (eip->hpart && (eip->hlen >= 0)) {
 	                    if ((rs = b.chr('@')) >= 0) {
 		                cint	hl = eip->hlen ;
-			        cchar	*hp = eip->host ;
+			        cchar	*hp = eip->hpart ;
 	                        rs = b.strw(hp,hl) ;
 		            }
 	                } /* end if */
 		    } /* end if */
 	            break ;
 	        case EMAINFO_TARPAROUTE:
-	            if (eip->host && (eip->hlen >= 0)) {
+	            if (eip->hpart && (eip->hlen >= 0)) {
 	                if ((rs = b.chr('@')) >= 0) {
 		            cint	hl = eip->hlen ;
-			    cchar	*hp = eip->host ;
+			    cchar	*hp = eip->hpart ;
 	                    if ((rs = b.strw(hp,hl)) >= 0) {
-	                        if (strnchr(eip->local,eip->llen,':') != np) {
+	                        if (strnchr(eip->lpart,eip->llen,':') != np) {
 	                            rs = b.chr(',') ;
 	                        } else {
 	                            rs = b.chr(':') ;
@@ -192,7 +192,7 @@ int emainfo_mktype(emainfo *eip,int type,char *rbuf,int rlen) noex {
 	            } /* end if (had a host part) */
 		    if (rs >= 0) {
 		        cint	ll = eip->llen ;
-		        cchar	*lp = eip->local ;
+		        cchar	*lp = eip->lpart ;
 	                rs = b.strw(lp,ll) ;
 		    }
 	            break ;
@@ -200,7 +200,7 @@ int emainfo_mktype(emainfo *eip,int type,char *rbuf,int rlen) noex {
 		rl = b.idx ;
 	    } else {
 		cint	ml = min(eip->llen,rlen) ;
-	        rl = strwcpy(rbuf,eip->local,ml) - rbuf ;
+	        rl = strwcpy(rbuf,eip->lpart,ml) - rbuf ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;

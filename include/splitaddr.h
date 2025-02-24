@@ -30,7 +30,7 @@
 
 struct splitaddr_head {
 	vechand		*comp ;		/* pointer to VECHAND object */
-	cchar		*local ;
+	cchar		*lpart ;
 	cchar		*mailaddr ;
 	uint		magic ;
 	int		nd ;
