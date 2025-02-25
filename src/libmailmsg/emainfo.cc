@@ -77,6 +77,15 @@ using std::nothrow ;			/* constant */
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
 
 

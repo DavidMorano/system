@@ -28,7 +28,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -43,20 +42,34 @@
 #include	"mailfiles.h"
 
 
+/* local defines */
+
+#define	MF		mailfiles
+#define	MF_ENT		mailfiles_ent
+
+
 /* external subroutines */
 
 
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
-static int	entry_init(MAILFILES_ENT *,const char *,int) ;
-static int	entry_free(MAILFILES_ENT *) ;
+static int	entry_init(MF_ENT *,cchar *,int) noex ;
+static int	entry_free(MF_ENT *) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int mailfiles_init(lp)
 MAILFILES	*lp ;
@@ -72,12 +85,12 @@ MAILFILES	*lp ;
 
 int mailfiles_add(lp,path,pathlen)
 MAILFILES	*lp ;
-const char	path[] ;
+cchar	path[] ;
 int		pathlen ;
 {
-	MAILFILES_ENT		e ;
+	MF_ENT	e ;
 
-	struct ustat		sb ;
+	USTAT		sb ;
 
 	int	rs, cl ;
 
@@ -115,7 +128,7 @@ int		pathlen ;
 
 #endif /* CF_MAILBOXZERO */
 
-	rs = vecitem_add(lp,&e,szof(MAILFILES_ENT)) ;
+	rs = vecitem_add(lp,&e,szof(MF_ENT)) ;
 
 	if (rs < 0)
 	    goto bad1 ;
@@ -134,7 +147,7 @@ bad0:
 
 int mailfiles_addpath(lp,path,pathlen)
 MAILFILES	*lp ;
-const char	path[] ;
+cchar	path[] ;
 int		pathlen ;
 {
 	int	rs = SR_OK, n ;
@@ -184,7 +197,7 @@ int		pathlen ;
 int mailfiles_get(lp,i,epp)
 MAILFILES	*lp ;
 int		i ;
-MAILFILES_ENT	**epp ;
+MF_ENT	**epp ;
 {
 	int	rs ;
 
@@ -198,7 +211,7 @@ MAILFILES_ENT	**epp ;
 int mailfiles_free(lp)
 MAILFILES	*lp ;
 {
-	MAILFILES_ENT	*ep ;
+	MF_ENT	*ep ;
 	int		rs = SR_OK :
 	int		rs1 ;
 	int		i ;
@@ -232,18 +245,18 @@ MAILFILES	*lp ;
 int mailfiles_check(lp)
 MAILFILES	*lp ;
 {
-	MAILFILES_ENT	*ep ;
+	int		rs ;
+	MF_ENT	*ep ;
 
-	struct ustat	sb ;
+	USTAT		sb ;
 
-	int	rs, i ;
 	int	changed = 0 ;
 
 
 	if (lp == NULL)
 	    return SR_FAULT ;
 
-	for (i = 0 ; (rs = vecitem_get(lp,i,&ep)) >= 0 ; i += 1) {
+	for (int i = 0 ; (rs = vecitem_get(lp,i,&ep)) >= 0 ; i += 1) {
 
 	    if (ep == NULL) continue ;
 
@@ -285,14 +298,11 @@ MAILFILES	*lp ;
 /* end subroutine (mailfiles_check) */
 
 
-
-/* INTERNAL SUBROUTINES */
-
-
+/* local subroutines */
 
 static int entry_init(ep,path,pathlen)
-MAILFILES_ENT	*ep ;
-const char	path[] ;
+MF_ENT	*ep ;
+cchar	path[] ;
 int		pathlen ;
 {
 	int	rs ;
@@ -311,7 +321,7 @@ int		pathlen ;
 
 
 static int entry_free(ep)
-MAILFILES_ENT	*ep ;
+MF_ENT	*ep ;
 {
 
 

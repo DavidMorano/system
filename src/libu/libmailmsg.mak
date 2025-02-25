@@ -209,6 +209,11 @@ mailalias.o:		mailalias.dir
 mailalias.dir:
 	makesubdir $@
 
+# MAILFILES
+mailfiles.o:		mailfiles.dir
+mailfiles.dir:
+	makesubdir $@
+
 # EMA
 ema.o:		ema.dir
 ema.dir:

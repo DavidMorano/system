@@ -54,6 +54,7 @@ extern int mailfiles_addpath(mailfiles *,cchar *,int) noex ;
 extern int mailfiles_get(mailfiles *,int,mailfiles_ent **) noex ;
 extern int mailfiles_check(mailfiles *) noex ;
 extern int mailfiles_count(mailfiles *) noex ;
+extern int mailfiles_parse(mailfiles *,cchar *) noex ;
 
 EXTERNC_end
 
