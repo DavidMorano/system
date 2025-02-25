@@ -35,7 +35,6 @@
 
 #include	<envstandards.h>	/* must be before others */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -697,16 +696,16 @@ static int searchkeys_buildload(SK *op,BUILD *bip) noex {
 
 static int searchkeys_curinc(SK *op,SK_CUR *curp,int *ip,int *jp) noex {
 	int		rs = SR_OK ;
+	int		wel ; /* used below */
 	if (curp->i < 0) {
 	    *ip = 0 ;
 	    *jp = 0 ;
 	} else if (curp->i >= op->nphrases) {
 	    rs = SR_NOTFOUND ;
-	} else {
-	    int		wel ;
+	} else { /* note order of statements */
 	    *ip = curp->i ;
 	    *jp = (curp->j < 0) ? 1 : (curp->j + 1) ;
-	    wel = op->kphrases[*ip].nwords ;
+	    wel = op->kphrases[*ip].nwords ; /* <- after 'ip' is set */
 	    if (*jp >= wel) {
 	        *ip = (curp->i + 1) ;
 	        *jp = 0 ;

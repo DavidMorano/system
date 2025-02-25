@@ -4,7 +4,6 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
-mbcache		add dynamic alloc for |mbcache_scan|
 searchkeys
 ts
 prique		broken, ill-conceived
@@ -37,6 +36,7 @@ vars
 varmk
 varmks
 spellchecks	incredible mess!
+mcmsg		mail-related messages (needs total modern rework)
 
 = Future
 

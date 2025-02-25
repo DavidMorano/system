@@ -1,6 +1,6 @@
 /* mcmsg SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 (conformance reviewed) */
+/* lang=C++20 */
 
 /* create and parse mail-cluster IPC messages */
 /* version %I% last-modified %G% */
@@ -36,7 +36,7 @@
 #include	<serialbuf.h>
 #include	<localmisc.h>
 
-#include	"mcmsg.hh"
+#include	"mcmsg.h"
 
 
 /* local defines */
@@ -62,23 +62,21 @@
 
 /* exported subroutines */
 
-int mcmsg_req::rd(char *abuf,int alen) noex {
-    	cint	frd = true ;
-    	return mcmsg_request(this,frd,abuf,alen) ;
-}
-
-int mcmsg_req::wr(cchar *abuf,int alen) noex {
-    	char	*wbuf = cast_const<charp>(abuf) ;
-    	cint	frd = false ;
-    	return mcmsg_request(this,frd,wbuf,alen) ;
-}
-
 int mcmsg_request(mcmsg_req *sp,int f,char *buf,int buflen) noex {
 	int		rs ;
 	int		rs1 ;
 	if (serialbuf mb ; (rs = mb.start(buf,buflen)) >= 0) {
 	    uint	hdr ;
 	    if (f) { /* read */
+	        mb.rui(&hdr) ;
+	        sp->msgtype = (hdr & UCHAR_MAX) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
+	        mb.ruc(&sp->seq) ;
+	        mb.rui(&sp->tag) ;
+	        mb.rui(&sp->timestamp) ;
+	        mb.rstrw(sp->cluster,MCMSG_LCLUSTER) ;
+	        mb.rstrw(sp->mailuser,MCMSG_LMAILUSER) ;
+	    } else { /* write */
 	        sp->msgtype = mcmsgtype_request ;
 	        hdr = sp->msgtype ;
 	        mb.wui(hdr) ;
@@ -91,15 +89,6 @@ int mcmsg_request(mcmsg_req *sp,int f,char *buf,int buflen) noex {
 	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(buf,hdr) ;
 	        }
-	    } else { /* write */
-	        mb.rui(&hdr) ;
-	        sp->msgtype = (hdr & UCHAR_MAX) ;
-	        sp->msglen = (hdr >> CHAR_BIT) ;
-	        mb.ruc(&sp->seq) ;
-	        mb.rui(&sp->tag) ;
-	        mb.rui(&sp->timestamp) ;
-	        mb.rstrw(sp->cluster,MCMSG_LCLUSTER) ;
-	        mb.rstrw(sp->mailuser,MCMSG_LMAILUSER) ;
 	    } /* end if */
 	    rs1 = mb.finish ;
 	    if (rs >= 0) rs = rs1 ;
@@ -108,23 +97,26 @@ int mcmsg_request(mcmsg_req *sp,int f,char *buf,int buflen) noex {
 }
 /* end subroutine (mcmsg_request) */
 
-int mcmsg_rep::rd(char *abuf,int alen) noex {
-    	cint	frd = true ;
-    	return mcmsg_report(this,frd,abuf,alen) ;
-}
-
-int mcmsg_rep::wr(cchar *abuf,int alen) noex {
-    	char	*wbuf = cast_const<charp>(abuf) ;
-    	cint	frd = false ;
-    	return mcmsg_report(this,frd,wbuf,alen) ;
-}
-
 int mcmsg_report(mcmsg_rep *sp,int f,char *buf,int buflen) noex {
 	int		rs ;
 	int		rs1 ;
 	if (serialbuf mb ; (rs = mb.start(buf,buflen)) >= 0) {
 	    uint	hdr ;
 	    if (f) { /* read */
+	        mb.rui(&hdr) ;
+	        sp->msgtype = (hdr & UCHAR_MAX) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
+	        mb.ruc(&sp->seq) ;
+	        mb.rui(&sp->tag) ;
+	        mb.rui(&sp->timestamp) ;
+	        mb.rui(&sp->mlen) ;
+	        mb.rstrw(sp->cluster,MCMSG_LCLUSTER) ;
+	        mb.rstrw(sp->mailuser,MCMSG_LMAILUSER) ;
+	        mb.rstrw(sp->msgid,MCMSG_LMSGID) ;
+	        mb.rstrw(sp->from,MCMSG_LFROM) ;
+	        mb.ruc(&sp->flags) ;
+	        mb.ruc(&sp->rc) ;
+	    } else { /* write */
 	        sp->msgtype = mcmsgtype_report ;
 	        hdr = sp->msgtype ;
 	        mb.wui(hdr) ;
@@ -142,20 +134,6 @@ int mcmsg_report(mcmsg_rep *sp,int f,char *buf,int buflen) noex {
 	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(buf,hdr) ;
 	        }
-	    } else { /* write */
-	        mb.rui(&hdr) ;
-	        sp->msgtype = (hdr & UCHAR_MAX) ;
-	        sp->msglen = (hdr >> CHAR_BIT) ;
-	        mb.ruc(&sp->seq) ;
-	        mb.rui(&sp->tag) ;
-	        mb.rui(&sp->timestamp) ;
-	        mb.rui(&sp->mlen) ;
-	        mb.rstrw(sp->cluster,MCMSG_LCLUSTER) ;
-	        mb.rstrw(sp->mailuser,MCMSG_LMAILUSER) ;
-	        mb.rstrw(sp->msgid,MCMSG_LMSGID) ;
-	        mb.rstrw(sp->from,MCMSG_LFROM) ;
-	        mb.ruc(&sp->flags) ;
-	        mb.ruc(&sp->rc) ;
 	    } /* end if */
 	    rs1 = mb.finish ;
 	    if (rs >= 0) rs = rs1 ;
@@ -164,23 +142,19 @@ int mcmsg_report(mcmsg_rep *sp,int f,char *buf,int buflen) noex {
 }
 /* end subroutine (mcmsg_report) */
 
-int mcmsg_ack::rd(char *abuf,int alen) noex {
-    	cint	frd = true ;
-    	return mcmsg_acknowledge(this,frd,abuf,alen) ;
-}
-
-int mcmsg_ack::wr(cchar *abuf,int alen) noex {
-    	char	*wbuf = cast_const<charp>(abuf) ;
-    	cint	frd = false ;
-    	return mcmsg_acknowledge(this,frd,wbuf,alen) ;
-}
-
 int mcmsg_acknowledge(mcmsg_ack *sp,int f,char *buf,int buflen) noex {
 	int		rs ;
 	int		rs1 ;
 	if (serialbuf mb ; (rs = mb.start(buf,buflen)) >= 0) {
 	    uint	hdr ;
 	    if (f) { /* read */
+	        mb.rui(&hdr) ;
+	        sp->msgtype = (hdr & UCHAR_MAX) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
+	        mb.ruc(&sp->seq) ;
+	        mb.rui(&sp->tag) ;
+	        mb.ruc(&sp->rc) ;
+	    } else { /* write */
 	        sp->msgtype = mcmsgtype_ack ;
 	        hdr = sp->msgtype ;
 	        mb.wui(hdr) ;
@@ -191,13 +165,6 @@ int mcmsg_acknowledge(mcmsg_ack *sp,int f,char *buf,int buflen) noex {
 	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(buf,hdr) ;
 	        }
-	    } else { /* write */
-	        mb.rui(&hdr) ;
-	        sp->msgtype = (hdr & UCHAR_MAX) ;
-	        sp->msglen = (hdr >> CHAR_BIT) ;
-	        mb.ruc(&sp->seq) ;
-	        mb.rui(&sp->tag) ;
-	        mb.ruc(&sp->rc) ;
 	    } /* end if */
 	    rs1 = mb.finish ;
 	    if (rs >= 0) rs = rs1 ;
