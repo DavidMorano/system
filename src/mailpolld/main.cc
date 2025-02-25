@@ -16,18 +16,14 @@
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
-/************************************************************************
+/*******************************************************************************
 
 	Synopsis:
-
 	$ mailpolld program
 
+*******************************************************************************/
 
-*************************************************************************/
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be ordered first for config */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
@@ -36,12 +32,11 @@
 #include	<netinet/in.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
 #include	<netdb.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<baops.h>
@@ -50,14 +45,14 @@
 #include	<lfm.h>
 #include	<sockaddress.h>
 #include	<connection.h>
-#include	<exitcodes.h>
 #include	<mallocstuff.h>
+#include	<mcmsg.h>
+#include	<msgid.h>
+#include	<exitcodes.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
-#include	"mcmsg.h"
-#include	"msgid.h"
 
 
 
@@ -91,12 +86,12 @@
 
 /* external subroutines */
 
-extern int	nextfield(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	listenusd(const char *,int,int) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	listenusd(cchar *,int,int) ;
 extern int	isdigitlatin(int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strbasename(char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 extern char	*timestr_log(time_t,char *) ;
@@ -113,12 +108,12 @@ extern char	makedate[] ;
 /* forward references */
 
 static int	usage(struct proginfo *) ;
-static int	helpfile(const char *,bfile *) ;
+static int	helpfile(cchar *,bfile *) ;
 
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"DEBUG",
 	"VERSION",
@@ -192,8 +187,8 @@ char	*envv[] ;
 	int	f_help = FALSE ;
 	int	f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
 	char	argpresent[NARGPRESENT] ;
 	char	buf[BUFLEN + 1] ;
 	char	tmpbuf[MAXPATHLEN + 1] ;
@@ -202,14 +197,14 @@ char	*envv[] ;
 	char	peername[SOCKADDRESS_NAMELEN + 1] ;
 	char	jobidbuf[JOBIDLEN + 1] ;
 	char	timebuf[TIMEBUFLEN] ;
-	const char	*pr = NULL ;
-	const char	*searchname = NULL ;
-	const char	*jobid = NULL ;
-	const char	*logfname = NULL ;
-	const char	*hostname = NULL ;
-	const char	*portspec = NULL ;
-	const char	*progpath = NULL ;
-	const char	*cp ;
+	cchar	*pr = NULL ;
+	cchar	*searchname = NULL ;
+	cchar	*jobid = NULL ;
+	cchar	*logfname = NULL ;
+	cchar	*hostname = NULL ;
+	cchar	*portspec = NULL ;
+	cchar	*progpath = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -722,8 +717,7 @@ char	*envv[] ;
 /* do the deed */
 
 	while (rs >= 0) {
-
-	        struct mcmsg_report	m1 ;
+	        mcmsg_rep	m1{} ;
 
 	        MSGID		db ;
 
@@ -738,13 +732,13 @@ char	*envv[] ;
 	    int	pid ;
 	        int	f_repeat = FALSE ;
 
-	    const char	*sp ;
+	    cchar	*sp ;
 
 
 	opts = 0 ;
-	    fromlen = sizeof(SOCKADDRESS) ;
+	    fromlen = szof(SOCKADDRESS) ;
 	    rs = uc_recvfrome(ifd,buf,BUFLEN,0,
-	        (struct sockaddr *) &from,&fromlen,to,opts) ;
+	        (SOCKADDR *) &from,&fromlen,to,opts) ;
 
 	    len = rs ;
 	    if (rs < 0)
@@ -756,7 +750,7 @@ char	*envv[] ;
 
 	        msgid_open(&db,tmpfname,(O_RDWR | O_CREAT),0666,100) ;
 
-	        mcmsg_report(buf,MSGBUFLEN,1,&m1) ;
+	        mcmsg_report(&m1,fwr,buf,MSGBUFLEN) ;
 
 	        memset(&midkey,0,sizeof(MSGID_KEY)) ;
 
@@ -790,7 +784,7 @@ char	*envv[] ;
 	        f_repeat = ((rs1 >= 0) && (mid.count > 0)) ;
 
 	        if (fromlen > 0) {
-	            struct mcmsg_ack	m2{} ;
+	            mcmsg_ack	m2{} ;
 	            in_addr_t	addr1, addr2 ;
 	            int		af ;
 	            char	replybuf[MSGBUFLEN + 1] ;
@@ -803,7 +797,7 @@ char	*envv[] ;
 	            m2.seq = m1.seq + 1 ;
 	            m2.rc = mcmsgrc_ok ;
 
-	            blen = mcmsg_ack(replybuf,MSGBUFLEN,0,&m2) ;
+	            blen = mcmsg_ack(&m2,frd,replybuf,MSGBUFLEN) ;
 
 	            rs = u_sendto(ifd,replybuf,blen,0,&from,fromlen) ;
 
@@ -823,7 +817,7 @@ char	*envv[] ;
 	            if ((rs >= 0) && (af == AF_INET)) {
 
 	                rs = sockaddress_getaddr(&from,
-	                    (char *) &addr1,sizeof(in_addr_t)) ;
+	                    (char *) &addr1,szof(in_addr_t)) ;
 
 	                addr2 = htonl(0x40c05865) ;
 
@@ -1012,7 +1006,7 @@ struct proginfo	*pip ;
 
 
 static int helpfile(f,ofp)
-const char	f[] ;
+cchar	f[] ;
 bfile		*ofp ;
 {
 	bfile	file, *ifp = &file ;

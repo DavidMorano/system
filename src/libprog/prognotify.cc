@@ -51,12 +51,12 @@
 #include	<hash.h>
 #include	<snx.h>
 #include	<strwcpy.h>
+#include	<mcmsg.h>
+#include	<recip.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"proginfo.hh"
-#include	"mcmsg.h"
-#include	"recip.h"
 
 
 /* local defines */
@@ -105,7 +105,7 @@ extern "C" {
 /* local structures */
 
 struct reportinfo {
-	struct mcmsg_report	m1 ;
+	mcmsg_rep	m1 ;
 	sockaddress	sa ;
 	uint		tag ;
 	int		defport ;
@@ -128,6 +128,9 @@ static int	searchfunc() noex ;
 
 
 /* local variables */
+
+static cint	frd = true ;
+static cint	fwr = false ;
 
 
 /* exported variables */
@@ -346,7 +349,6 @@ static int prognotifyrecipnode(proginfo *pip,vecobj *mip,REPORTINFO *rip,
 /* end subroutine (prognotifyrecipnode) */
 
 static int report(proginfo *pip,REPORTINFO *rip) noex {
-	struct mcmsg_ack	m2 ;
 	SOCKADDR	*sap = (SOCKADDR *) &rip->sa ;
 	cint		mlen = MSGBUFLEN ;
 	cint		to = pip->to_msgread ;
@@ -360,13 +362,14 @@ static int report(proginfo *pip,REPORTINFO *rip) noex {
 	for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	    rip->m1.seq = (uchar) i ;
 	    rip->m1.timestamp = (uint) time(nullptr) ;
-	    rs = mcmsg_report(&rip->m1,0,rip->buf,mlen) ;
+	    rs = mcmsg_report(&rip->m1,frd,rip->buf,mlen) ;
 	    blen = rs ;
 	    if (rs < 0) break ;
 	    if ((rs = u_sendto(rip->fd,rip->buf,blen,sflags,sap,sal)) >= 0) {
-		cint	fm = FM_TIMED ;
+		mcmsg_ack	m2{} ;
+		cint		fm = FM_TIMED ;
 	        if ((rs1 = uc_recve(rip->fd,rip->buf,mlen,0,to,fm)) >= 0) {
-	            blen = mcmsg_ack(&m2,1,rip->buf,mlen) ;
+	            blen = mcmsg_acknowledge(&m2,fwr,rip->buf,mlen) ;
 	            if ((blen > 0) && (m2.tag == rip->m1.tag)) f = true ;
 	        }
 	    }

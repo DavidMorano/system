@@ -51,12 +51,12 @@
 #include	<vecobj.h>
 #include	<paramfile.h>
 #include	<sockaddress.h>
+#include	<mcmsg.h>
+#include	<recip.h>
 #include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
-#include	"mcmsg.h"
-#include	"recip.h"
 
 
 /* local defines */
@@ -118,7 +118,7 @@ extern char	*timestr_logz(time_t,char *) ;
 
 struct reportinfo {
 	SOCKADDRESS	sa ;
-	struct mcmsg_report	m1 ;
+	mcmsg_rep	m1 ;
 	uint		tag ;
 	int		defport ;
 	int		salen ;
@@ -205,13 +205,13 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp)
 	}
 
 	if (rs >= 0) {
-	   const int	pf = PF_INET ;
-	   const int	st = SOCK_DGRAM ;
-	   const int	pnum = IPPROTO_UDP ;
+	   cint	pf = PF_INET ;
+	   cint	st = SOCK_DGRAM ;
+	   cint	pnum = IPPROTO_UDP ;
 
 /* initialze the message to send */
 
-	memset(&ri.m1,0,sizeof(struct mcmsg_report)) ;
+	ri.m1 = {} ;
 	ri.m1.tag = ri.tag ;
 	ri.m1.rc = mcmsgrc_ok ;
 	strwcpy(ri.m1.cluster,cluster,MCMSG_LCLUSTER) ;
@@ -287,8 +287,8 @@ RECIP		*rp ;
 /* loop through target machines for this mailuser (recipient) */
 
 	if ((rs = paramfile_curbegin(mbp,&cur)) >= 0) {
-	    const int	nslen = NSBUFLEN ;
-	    const int	rsn = SR_NOTFOUND ;
+	    cint	nslen = NSBUFLEN ;
+	    cint	rsn = SR_NOTFOUND ;
 	    int		port ;
 	    int		nsl ;
 	    char	nsbuf[NSBUFLEN + 1] ;
@@ -336,8 +336,8 @@ int		port ;
 	struct hostent	he, *hep = &he ;
 	struct msginfo	mi, *iep = &mi ;
 	int		moff ;
-	const int	helen = getbufsize(getbufsize_he) ;
-	const int	af = AF_INET4 ;
+	cint	helen = getbufsize(getbufsize_he) ;
+	cint	af = AF_INET4 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		k ;
@@ -444,13 +444,13 @@ int		port ;
 
 static int report(PROGINFO *pip,struct reportinfo *rip)
 {
-	struct mcmsg_ack	m2 ;
-	struct sockaddr		*sap = (struct sockaddr *) &rip->sa ;
-	const int	mlen = MSGBUFLEN ;
-	const int	to = pip->to_msgread ;
-	const int	sflags = rip->sendflags ;
-	const int	sal = rip->salen ;
-	const int	n = MSGSENDTRIES ;
+	SOCKADDR	*sap = (SOCKADDR *) &rip->sa ;
+	mcmsg_ack	m2{} ;
+	cint	mlen = MSGBUFLEN ;
+	cint	to = pip->to_msgread ;
+	cint	sflags = rip->sendflags ;
+	cint	sal = rip->salen ;
+	cint	n = MSGSENDTRIES ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i, blen ;
@@ -461,7 +461,7 @@ static int report(PROGINFO *pip,struct reportinfo *rip)
 	    rip->m1.seq = (uchar) i ;
 	    rip->m1.timestamp = (uint) time(NULL) ;
 
-	    rs = mcmsg_report(&rip->m1,0,rip->buf,mlen) ;
+	    rs = mcmsg_report(&rip->m1,1,rip->buf,mlen) ;
 	    blen = rs ;
 	    if (rs < 0) break ;
 
@@ -475,9 +475,9 @@ static int report(PROGINFO *pip,struct reportinfo *rip)
 #endif
 
 	    if ((rs = u_sendto(rip->fd,rip->buf,blen,sflags,sap,sal)) >= 0) {
-		const int	fm = FM_TIMED ;
+		cint	fm = FM_TIMED ;
 	        if ((rs1 = uc_recve(rip->fd,rip->buf,mlen,0,to,fm)) >= 0) {
-	            blen = mcmsg_ack(&m2,1,rip->buf,mlen) ;
+	            blen = mcmsg_ack(&m2,0,rip->buf,mlen) ;
 	            if ((blen > 0) && (m2.tag == rip->m1.tag)) f = TRUE ;
 	        }
 	    }

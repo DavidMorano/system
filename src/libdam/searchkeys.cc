@@ -541,10 +541,11 @@ static int searchkeys_buildphrasemat(SK *op,BUILD *bip,BUILD_PH *bpp) noex {
 /* end subroutine (searchkeys_buildphrasemat) */
 
 static int searchkeys_buildreduce(SK *op,BUILD *bip) noex {
+	vecobj		*plp = &bip->phrases ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	void		*vp{} ;
-	for (int i = 0 ; vecobj_get(&bip->phrases,i,&vp) >= 0 ; i += 1) {
+	for (int i = 0 ; plp->get(i,&vp) >= 0 ; i += 1) {
 	    BUILD_PH	*bpp = (BUILD_PH *) vp ;
 	    if (vp) {
 	        if ((rs = buildphrase_count(bpp)) >= 0) {
@@ -553,7 +554,7 @@ static int searchkeys_buildreduce(SK *op,BUILD *bip) noex {
 			cint	n = (i+1) ;
 	                if ((rs = searchkeys_buildmatone(op,bip,n,bpp)) > 0) {
 	                    buildphrase_finish(bpp) ;
-	                    vecobj_del(&bip->phrases,i--) ;
+	                    plp->del(i--) ;
 	                    if (op->nphrases > 0) op->nphrases -=1 ;
 		        }
 	            }
@@ -567,11 +568,12 @@ static int searchkeys_buildreduce(SK *op,BUILD *bip) noex {
 /* end subroutine (searchkeys_buildreduce) */
 
 static int searchkeys_buildfins(SK *op,BUILD *bip) noex {
+	vecobj		*plp = &bip->phrases ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) {
 	    void	*vp{} ;
-	    for (int i = 0 ; vecobj_get(&bip->phrases,i,&vp) >= 0 ; i += 1) {
+	    for (int i = 0 ; plp->get(i,&vp) >= 0 ; i += 1) {
 	        BUILD_PH	*bpp = (BUILD_PH *) vp ;
 	        if (vp) {
 		    {
@@ -579,7 +581,7 @@ static int searchkeys_buildfins(SK *op,BUILD *bip) noex {
 	                if (rs >= 0) rs = rs1 ;
 		    }
 		    {
-	                rs1 = vecobj_del(&bip->phrases,i--) ;
+	                rs1 = plp->del(i--) ;
 	                if (rs >= 0) rs = rs1 ;
 		    }
 	        }
@@ -589,8 +591,7 @@ static int searchkeys_buildfins(SK *op,BUILD *bip) noex {
 }
 /* end subroutine (searchkeys_buildfins) */
 
-static int searchkeys_buildmatone(SK *op,BUILD *bip,int si,
-		BUILD_PH *bpp) noex {
+static int searchkeys_buildmatone(SK *op,BUILD *bip,int si,BUILD_PH *bpp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		f_match = false ;
@@ -622,7 +623,7 @@ static int searchkeys_buildload(SK *op,BUILD *bip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		nphrases = 0 ;
-	if ((rs = vecobj_count(plp)) >= 0) {
+	if ((rs = plp->count) >= 0) {
 	    int		sz = (rs + 1) * szof(SK_PH) ;
 	    nphrases = rs ;
 	    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
@@ -634,7 +635,7 @@ static int searchkeys_buildload(SK *op,BUILD *bip) noex {
 	        op->kphrases = (SK_PH *) vp ;
 	        op->nphrases = nphrases ;
 	        pj = 0 ;
-	        for (pi = 0 ; vecobj_get(plp,pi,&vp) >= 0 ; pi += 1) {
+	        for (pi = 0 ; plp->get(pi,&vp) >= 0 ; pi += 1) {
 	    	    BUILD_PH	*bpp = (BUILD_PH *) vp ;
 	            if (vp) {
 	    		SK_KW	*wep{} ;

@@ -33,7 +33,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
@@ -41,7 +40,7 @@
 #include	<getbufsize.h>
 #include	<ascii.h>
 #include	<buffer.h>
-#include	<char.h>
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -83,7 +82,10 @@ static inline int comparse_magic(comparse *op,Args ... args) noex {
 	}
 	return rs ;
 }
-/* end subroutine (comparse_magic) */
+
+static inline int chiswh(int ch) noex {
+    	return CHAR_ISWHITE(ch) ;
+}
 
 static int	comparse_bake(comparse *,cchar *,int) noex ;
 
@@ -109,7 +111,7 @@ int comparse_start(comparse *op,cchar *sp,int sl) noex {
 	    if ((rs = rsv) >= 0) {
 		op->mailaddrlen = var.mailaddrlen ;
 		op->mailcommlen = var.mailcommlen ;
-	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	        while ((sl > 0) && chiswh(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        }
@@ -167,12 +169,13 @@ int comparse_getcom(comparse *op,cchar **rpp) noex {
 /* private subroutines */
 
 int comparse_bake(comparse *op,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	buffer		as[COMPARSE_SOVERLAST] ;
 	cint		defsize = COMPARSE_DEFSIZE ;
 	int		rs ;
 	int		rs1 ;
 	int		vl = 0 ;
-	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	while ((sl > 0) && chiswh(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
 	}
@@ -208,13 +211,13 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	                if (! f_quote) {
 	                    if (c_comment == 0) {
 	                        pc = buffer_getprev(as + state) ;
-	                        if ((pc >= 0) && (! CHAR_ISWHITE(pc))) {
+	                        if ((pc >= 0) && (! chiswh(pc))) {
 	                            buffer_chr((as + state),' ') ;
 				}
 	                        pstate = state ;
 	                        state = COMPARSE_SCOMMENT ;
 	                        pc = buffer_getprev(as + state) ;
-	                        if ((pc >= 0) && (! CHAR_ISWHITE(pc))) {
+	                        if ((pc >= 0) && (! chiswh(pc))) {
 	                            buffer_chr((as + state),' ') ;
 				}
 	                        sp += 1 ;
@@ -248,13 +251,15 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	            case ' ':
 	            case '\t':
 	                if (! f_quote) {
-	                    cint	cl = buffer_get((as+state),nullptr) ;
-	                    pc = buffer_getprev(as+state) ;
-	                    if ((cl == 0) || ((pc >= 0) && CHAR_ISWHITE(pc))) {
-	                        sp += 1 ;
-	                        sl -= 1 ;
-	                        break ;
-	                    }
+			    if ((rs = buffer_get((as+state),np)) >= 0) {
+	                        cint	cl = rs ;
+	                        pc = buffer_getprev(as+state) ;
+	                        if ((cl == 0) || ((pc >= 0) && chiswh(pc))) {
+	                            sp += 1 ;
+	                            sl -= 1 ;
+	                            break ;
+	                        }
+			    } /* end if (buffer_get) */
 	                } /* end if (not in a quote) */
 			fallthrough ;
 			/* FALLTHROUGH */
@@ -269,12 +274,10 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	            } /* end switch */
 	        } /* end while (scanning characters) */
 	        if (rs >= 0) {
-	            cchar	*bp ;
-	            int		bl ;
 	            int		w = COMPARSE_SCOMMENT ;
-	            if ((rs = buffer_get((as+w),&bp)) >= 0) {
-	                bl = rs ;
-	                while (bl && CHAR_ISWHITE(bp[bl-1])) {
+	            if (cchar *bp ; (rs = buffer_get((as+w),&bp)) >= 0) {
+	                int	bl = rs ;
+	                while (bl && chiswh(bp[bl-1])) {
 			    bl -= 1 ;
 			}
 	                if (cchar *cp ; (rs = uc_mallocstrw(bp,bl,&cp)) >= 0) {
@@ -283,12 +286,14 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	                    w = COMPARSE_SVALUE ;
 	                    if ((rs = buffer_get((as+w),&bp)) >= 0) {
 	                        bl = rs ;
-	                        while (bl && CHAR_ISWHITE(bp[bl-1])) bl -= 1 ;
+	                        while (bl && chiswh(bp[bl-1])) {
+				    bl -= 1 ;
+				}
 	                        if ((rs = uc_mallocstrw(bp,bl,&cp)) >= 0) {
 	                            op->val.sp = cp ;
 	                            op->val.sl = bl ;
 	                        } /* end if (memory-allocation) */
-	                    }
+	                    } /* end if (buffer_get) */
 	                    if (rs < 0) {
 	                        uc_free(op->com.sp) ;
 	                        op->com.sp = nullptr ;

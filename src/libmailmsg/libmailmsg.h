@@ -51,6 +51,7 @@
 #include	<csro.h>
 
 #include	<envmat.h>
+#include	<mcmsg.hh>
 
 
 EXTERNC_begin

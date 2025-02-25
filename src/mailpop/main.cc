@@ -21,12 +21,9 @@
 	This subroutine forms a program that sends data to a remote
 	INET host to its 'echo' service.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be first to configure */
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<sys/time.h>
@@ -36,18 +33,16 @@
 #include	<netdb.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<sockaddress.h>
+#include	<mcmsg.h>
 #include	<exitcodes.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
-#include	"mcmsg.h"
 
 
 
@@ -803,15 +798,13 @@ char	*envv[] ;
 /* do it */
 
 	{
-		struct mcmsg_report	m1 ;
+	    mcmsg_report	m1{} ;
 
-
-	memset(&m1,0,sizeof(struct mcmsg_report)) ;
-
-	if (mailuser != NULL)
+	if (mailuser != NULL) {
 		strwcpy(m1.mailuser,mailuser,MCMSG_LMAILUSER) ;
+	}
 
-	blen = mcmsg_report(buf,MSGBUFLEN,0,&m1) ;
+	blen = mcmsg_report(&m1,frd,buf,MSGBUFLEN) ;
 
 	rs = u_send(s,buf,blen,0) ;
 

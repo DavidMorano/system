@@ -123,6 +123,10 @@ struct serialbuf : serialbuf_head {
 	    r(p) ;
 	    return *this ;
 	} ;
+	serialbuf &operator >> (auto &v) noex {
+	    r(&v) ;
+	    return *this ;
+	} ;
 	template<typename T> int w(T) noex {
 	    i = SR_NOTSUP ;
 	    return i ;

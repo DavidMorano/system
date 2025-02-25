@@ -20,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stdarg.h>
+#include	<stdarg.h>		/* |va_list(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

@@ -231,7 +231,7 @@ mbcache.o:		mbcache.cc mbcache.h			$(INCS)
 msgentry.o:		msgentry.cc msgentry.h			$(INCS)
 
 mhcom.o:		mhcom.cc mhcom.h			$(INCS)
-mcmsg.o:		mcmsg.cc mcmsg.h			$(INCS)
+mcmsg.o:		mcmsg.cc mcmsg.hh			$(INCS)
 comsatmsg.o:		comsatmsg.cc comsatmsg.h		$(INCS)
 csro.o:			csro.cc csro.h				$(INCS)
 emainfo.o:		emainfo.cc emainfo.h			$(INCS)
@@ -247,5 +247,4 @@ retpath.o:		retpath.cc retpath.h			$(INCS)
 filer_mailsup.o:	filer_mailsup.cc			$(INCS)
 
 envmat.o:		envmat.cc envmat.h			$(INCS)
-
 
