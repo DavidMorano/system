@@ -74,7 +74,7 @@
 #endif
 
 #ifdef	CF_BUILDREDUCE
-#define	CF_BUILDREDUCE	1		/* try '_buildreduce()' */
+#define	CF_BUILDREDUCE	1		/* try |{xx}_buildreduce()| */
 #endif
 
 #ifndef	CF_SHORTCUT
@@ -151,7 +151,7 @@ static inline int searchkeys_magic(SK *op,Args ... args) noex {
 }
 /* end subroutine (searchkeys_magic) */
 
-static int searchkeys_build(SK *,cchar **) noex ;
+static int searchkeys_build(SK *,mainv) noex ;
 static int searchkeys_buildadd(SK *,BUILD *,cchar *) noex ;
 static int searchkeys_buildaddword(SK *,BUILD_PH *,cchar *,int) noex ;
 static int searchkeys_buildphrasemat(SK *,BUILD *,BUILD_PH *) noex ;
@@ -186,7 +186,7 @@ constexpr bool		f_shortcut = CF_SHORTCUT ;
 
 /* exported subroutines */
 
-int searchkeys_start(SK *op,cchar**qsp) noex {
+int searchkeys_start(SK *op,mainv qsp) noex {
 	int		rs ;
 	int		nphrases = 0 ;
 	if ((rs = searchkeys_ctor(op,qsp)) >= 0) {
@@ -411,7 +411,7 @@ int searchkeys_curenum(SK *op,SK_CUR *curp,cchar **rpp) noex {
 
 /* private subroutines */
 
-static int searchkeys_build(SK *op,cchar **qsp) noex {
+static int searchkeys_build(SK *op,mainv qsp) noex {
 	BUILD		bi, *bip = &bi ;
 	int		rs ;
 	int		rs1 ;

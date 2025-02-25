@@ -36,8 +36,44 @@ struct xwords_head {
 	int		nwords ;
 } ;
 
-typedef	XWORDS		xwords ;
 typedef	XWORDS_WORD	xwords_word ;
+
+#ifdef	__cplusplus
+enum xwordsmems {
+	xwordsmem_finish,
+	xwordsmem_overlast
+} ;
+struct xwords ;
+struct xwords_co {
+	xwords		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (xwords *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (xwords_co) */
+struct xwords : xwords_head {
+	xwords_co	finish ;
+	xwords() noex {
+	    finish(this,xwordsmem_finish) ;
+	} ;
+	xwords(const xwords &) = delete ;
+	xwords &operator = (const xwords &) = delete ;
+	int start(cchar *,int) noex ;
+	int get(int,cchar **) noex ;
+	int del(int = -1) noex ;
+	void dtor() noex ;
+	~xwords() {
+	    dtor() ;
+	} ;
+} ; /* end struct (xwords) */
+#else	/* __cplusplus */
+typedef XWORDS		xwords ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

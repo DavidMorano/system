@@ -229,4 +229,28 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 }
 /* end subroutine (xwords_more) */
 
+int xwords::start(cchar *wbuf,int wlen) noex {
+	return xwords_start(this,wbuf,wlen) ;
+}
+
+void xwords::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("xwords",rs,"fini-finish") ;
+	}
+}
+
+xwords_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case xwordsmem_finish:
+	        rs = xwords_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (xwords_co::operator) */
+
+
 

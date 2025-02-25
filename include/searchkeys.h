@@ -67,7 +67,7 @@ typedef	SEARCHKEYS_PH	searchkeys_ph ;
 
 EXTERNC_begin
 
-extern int searchkeys_start(searchkeys *,cchar **) noex ;
+extern int searchkeys_start(searchkeys *,mainv) noex ;
 extern int searchkeys_popbegin(searchkeys *,searchkeys_pop *,int) noex ;
 extern int searchkeys_process(searchkeys *,searchkeys_pop *,cchar *,int) noex ;
 extern int searchkeys_processxw(searchkeys *,searchkeys_pop *,xwords *) noex ;
