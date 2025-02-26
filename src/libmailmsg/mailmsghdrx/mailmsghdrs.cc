@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	mailmsghdrs
+
+	Description:
 	This subroutine depends on a MAILMSG object to have already
 	been instantiated (and initialized).  This present object
 	should then be initialized with a pointer to the MAILMSG
@@ -76,55 +80,55 @@ static inline int mailmsghdrs_magic(mailmsghdrs *op,Args ... args) noex {
 /* exported variables */
 
 cpcchar		mailmsghdrs_names[] = {
-	"From",			/* 0 */
-	"To",
-	"Date",
-	"Subject",
-	"title",
-	"message-id",		/* 5 */
-	"article-id",
-	"content-length",
-	"newsgroups",
-	"in-reply-to",
-	"board",		/* 10 */
-	"lines",
-	"reply-to",
-	"references",
-	"content-type",
-	"expires",		/* 15 */
-	"keywords",
-	"control",
-	"x-lines",
-	"path",
-	"errors-to",		/* 20 */
-	"return-path",
-	"received",
-	"x-queuespec",		/* 23 */
-	"x-service",
-	"x-jobid",
-	"x-orighost",
-	"x-origuser",
-	"x-username",
-	"sender",
-	"cc",
-	"bcc",
-	"status",
-	"content-lines",	/* 33 */
-	"content-transfer-encoding",	/* 34 */
-	"organization",		/* 35 */
-	"delivered-to",		/* 36 */
-	"x-original-to",	/* 37 */
-	"x-priority",		/* 38 */
-	"priority",		/* 39 */
-	"x-face",		/* 40 */
-	"x-bbnews",		/* 41 */
-	"x-universally-unique-identifier",
-	"x-uniform-type-identifier",
-	"x-mail-created-date",
-	"x-mailer",		/* 45 */
-	"x-forwarded-to",	/* 46 */
-	"subj",			/* 47 */
-	nullptr			/* 48 */
+	[hi_from] = "From",			/* 0 */
+	[hi_to] = "To",
+	[hi_date] = "Date",
+	[hi_subject] = "Subject",
+	[hi_title] = "title",
+	[hi_messageid] = "message-id",		/* 5 */
+	[hi_articleid] = "article-id",
+	[hi_clength] = "content-length",
+	[hi_newsgroups] = "newsgroups",
+	[hi_inreplyto] = "in-reply-to",
+	[hi_board] = "board",		/* 10 */
+	[hi_lines] = "lines",
+	[hi_replyto] = "reply-to",
+	[hi_references] = "references",
+	[hi_ctype] = "content-type",
+	[hi_expires] = "expires",		/* 15 */
+	[hi_keywords] = "keywords",
+	[hi_control] = "control",
+	[hi_xlines] = "x-lines",
+	[hi_path] = "path",
+	[hi_errorsto] = "errors-to",		/* 20 */
+	[hi_returnpath] = "return-path",
+	[hi_received] = "received",
+	[hi_xqueuespec] = "x-queuespec",		/* 23 */
+	[hi_xservice] =  "x-service",
+	[hi_xjobid] = "x-jobid",
+	[hi_xorighost] = "x-orighost",
+	[hi_xoriguser] = "x-origuser",
+	[hi_xusername] = "x-username",
+	[hi_sender] = "sender",
+	[hi_cc] = "cc",
+	[hi_bcc] = "bcc",
+	[hi_status] = "status",
+	[hi_clines] = "content-lines",	/* 33 */
+	[hi_cencoding] = "content-transfer-encoding",	/* 34 */
+	[hi_organization] = "organization",		/* 35 */
+	[hi_deliveredto] = "delivered-to",		/* 36 */
+	[hi_xoriginalto] = "x-original-to",	/* 37 */
+	[hi_xpriority] = "x-priority",		/* 38 */
+	[hi_priority] = "priority",		/* 39 */
+	[hi_xface] = "x-face",		/* 40 */
+	[hi_xbbnews] = "x-bbnews",		/* 41 */
+	[hi_xuuid] = "x-universally-unique-identifier",
+	[hi_xuti] = "x-uniform-type-identifier",
+	[hi_xmcd] = "x-mail-created-date",
+	[hi_xmailer] = "x-mailer",		/* 45 */
+	[hi_xforwardedto] = "x-forwarded-to",	/* 46 */
+	[hi_subj] = "subj",			/* 47 */
+	[hi_overlast] = nullptr			/* 48 */
 } ;
 
 
@@ -151,7 +155,9 @@ int mailmsghdrs_start(mailmsghdrs *op,mailmsg *msgp) noex {
 	            } /* end if (message header search) */
 	        } /* end for (looping over header names) */
 	        op->v[i] = nullptr ;
-	        if (rs >= 0) op->magic = MAILMSGHDRS_MAGIC ;
+	        if (rs >= 0) {
+		    op->magic = MAILMSGHDRS_MAGIC ;
+		}
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
