@@ -514,9 +514,6 @@ int mailmsg_hdrval(mailmsg *op,cchar *name,cchar **rpp) noex {
 
 static int mailmsg_procline(mailmsg *op,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
-	int		vl ;
-	int		vi = 0 ;
-	cchar		*vp ;
 	if (op->msgstate == msgstate_env) {
 	    if (mmenvdat es ; (rs = mailmsgmatenv(&es,lp,ll)) > 0) {
 	        rs = mailmsg_envadd(op,&es) ;
@@ -525,9 +522,9 @@ static int mailmsg_procline(mailmsg *op,cchar *lp,int ll) noex {
 	    }
 	} /* end if */
 	if ((rs >= 0) && (op->msgstate == msgstate_hdr)) {
-	    if ((rs = mailmsgmathdr(lp,ll,&vi)) > 0) {
-	        vp = (lp + vi) ;
-	        vl = (ll - vi) ;
+	    if (int vi ; (rs = mailmsgmathdr(lp,ll,&vi)) > 0) {
+	        cchar	*vp = (lp + vi) ;
+	        cint	vl = (ll - vi) ;
 	        rs = mailmsg_hdraddnew(op,lp,rs,vp,vl) ;
 	    } else if ((rs == 0) && (ll > 0) && ISHDRCONT(lp[0])) {
 	        rs = mailmsg_hdraddcont(op,(lp+1),(ll-1)) ;
@@ -575,8 +572,8 @@ static int mailmsg_hdrend(mailmsg *op) noex {
 	int		rs1 ;
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(op->hlp,i,&vp) >= 0 ; i += 1) {
+	    MMHNAME	*hnp = (MMHNAME *) vp ;
 	    if (vp) {
-		MMHNAME		*hnp = (MMHNAME *) vp ;
 	        rs1 = msghdrname_finish(hnp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }

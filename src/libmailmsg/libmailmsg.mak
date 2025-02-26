@@ -55,25 +55,26 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= mailmsgx.o mailmsg.o msgentry.o mailbox.o
-OBJ1= mailmsgmatx.o mailmsghdrx.o
-OBJ2= recip.o retpath.o envmat.o lkmail.o
-OBJ3= mhcom.o mcmsg.o comsatmsg.o mimetypes.o 
-OBJ4= ema.o emainfo.o comparse.o
-OBJ5= mbcache.o contypevals.o contentencodings.o
-OBJ6= whitelist.o splitaddr.o csro.o
-OBJ7= filer_mailsup.o mailalias.o mailfiles.o
+OBJ00= mailmsgx.o mailmsg.o msgentry.o mailbox.o
+OBJ01= mailmsgmatx.o mailmsghdrx.o
+OBJ02= recip.o retpath.o envmat.o lkmail.o
+OBJ03= mhcom.o mcmsg.o comsatmsg.o mimetypes.o 
 
-OBJ8= hdrx.o
-OBJ9=
+OBJ04= ema.o emainfo.o comparse.o
+OBJ05= mbcache.o contypevals.o contentencodings.o
+OBJ06= whitelist.o splitaddr.o csro.o
+OBJ07= filer_mailsup.o mailalias.o mailfiles.o
 
-OBJA= obj0.o obj1.o
-OBJB= obj2.o obj3.o
-OBJC= obj4.o obj5.o
-OBJD= obj6.o obj7.o
-OBJE= obj8.o
+OBJ08= hdrx.o stackaddr.o
+OBJ09= mailaddr.o mailspool.o
+OBJ10= ourmsginfo.o outema.o
+OBJ11= headkeymat.o received.o
 
-OBJ= obja.o objb.o objc.o objd.o obje.o
+OBJA= obj00.o obj01.o obj02.o obj03.o
+OBJB= obj04.o obj05.o obj06.o obj07.o
+OBJC= obj08.o obj09.o obj10.o obj11.o
+
+OBJ= obja.o objb.o objc.o
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -132,35 +133,41 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0.o:			$(OBJ0)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+obj00.o:		$(OBJ00)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ00)
 
-obj1.o:			$(OBJ1)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+obj01.o:		$(OBJ01)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ01)
 
-obj2.o:			$(OBJ2)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+obj02.o:		$(OBJ02)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ02)
 
-obj3.o:			$(OBJ3)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+obj03.o:		$(OBJ03)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ03)
 
-obj4.o:			$(OBJ4)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+obj04.o:		$(OBJ04)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ04)
 
-obj5.o:			$(OBJ5)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+obj05.o:		$(OBJ05)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ05)
 
-obj6.o:			$(OBJ6)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6)
+obj06.o:		$(OBJ06)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ06)
 
-obj7.o:			$(OBJ7)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7)
+obj07.o:		$(OBJ07)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ07)
 
-obj8.o:			$(OBJ8)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ8)
+obj08.o:		$(OBJ08)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ08)
 
-obj9.o:			$(OBJ9)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ9)
+obj09.o:		$(OBJ09)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ09)
+
+obj10.o:		$(OBJ10)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ10)
+
+obj11.o:		$(OBJ11)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ11)
 
 
 obja.o:			$(OBJA)

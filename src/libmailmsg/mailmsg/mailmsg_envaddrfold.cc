@@ -135,7 +135,7 @@ static int mailmsg_ema(mm *op,dat *mep,char *abuf,int alen,sbuf *sbp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op && mep && abuf && sbp) {
-	    int		cl = mep->a.el ;
+	    cint	cl = mep->a.el ;
 	    cchar	*cp = mep->a.ep ;
 	    if (emainfo ai ; (rs = emainfo_load(&ai,cp,cl)) >= 0) {
 	        cint	at = rs ;
