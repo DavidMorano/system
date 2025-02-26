@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* put all of the header values of a message into an array */
+/* put all of the mail-message header values of a message into an array */
 /* version %I% last-modified %G% */
 
 

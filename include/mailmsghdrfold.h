@@ -13,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<limits.h>
 #include	<usystem.h>
 #include	<vecobj.h>
-#include	<localmisc.h>		/* |MIN(3dam)| */
 
 
 /* object defines */

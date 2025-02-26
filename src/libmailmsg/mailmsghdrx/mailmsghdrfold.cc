@@ -55,7 +55,7 @@
 	Returns:
 	>0		length of line
 	==0		done
-	<0		bad (system-return)
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -82,13 +82,12 @@
 
 /* local defines */
 
-#define	MF		MAILMSGHDRFOLD
+#define	MF		mailmsghdrfold
+#define	MF_FL		mailmsghdrfold_fl
 
-#undef	LINER
-#define	LINER		struct liner
-
-#undef	PARAMS
-#define	PARAMS		struct params
+#ifndef	CF_STRNBREAK
+#define	CF_STRNBREAK	1		/* use |strnbreak()| */
+#endif
 
 
 /* imported namespaces */
@@ -127,17 +126,17 @@ static int	findall(MF *,cchar **) noex ;
 static int	nextpiece(int,cchar *,int,int *) noex ;
 static int	nextbreak(int,int,cchar *,int,int *) noex ;
 
-static bool	isskip(int) noex ;
-
-#if	CF_STRNBREAK
 static cchar	*strnbreak(cchar *,int,int) noex ;
-#endif
+
+static bool	isskip(int) noex ;
 
 
 /* local variables */
 
 constexpr cchar		blank[] = " " ;
 constexpr cchar		breaks[] = ";:@.%!=" ;
+
+cbool			f_strnbreak = CF_STRNBREAK ;
 
 
 /* exported variables */
@@ -376,7 +375,7 @@ static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	int		n ;
 	int		pl = 0 ;
 	cchar		*cp = sp ;
-/* skip over whitespace */
+	/* skip over whitespace */
 	while (cl && CHAR_ISWHITE(cp[0])) {
 	    n = ncolchar(ntab,ncol,cp[0]) ;
 	    cp += 1 ;
@@ -384,7 +383,7 @@ static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	    ncs += n ;
 	    ncol += n ;
 	} /* end while */
-/* skip over the non-whitespace */
+	/* skip over the non-whitespace */
 	while (cl && cp[0] && (! CHAR_ISWHITE(cp[0]))) {
 	    if (cp[0] == CH_DQUOTE) {
 	        cp += 1 ;
@@ -404,7 +403,7 @@ static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	    ncs += n ;
 	    ncol += n ;
 	} /* end while */
-/* done */
+	/* done */
 	*ncp = ncs ;
 	pl = (cp - sp) ;
 	return pl ;
@@ -420,7 +419,7 @@ static int nextbreak(int ncol,int bch,cchar *sp,int sl,int *ncp) noex {
 	cchar		*tp ;
 	cchar		*cp = sp ;
 	*ncp = 0 ;
-/* skip over whitespace */
+	/* skip over whitespace */
 	while (cl && CHAR_ISWHITE(cp[0])) {
 	    n = ncolchar(ntab,ncol,cp[0]) ;
 	    cp += 1 ;
@@ -428,35 +427,29 @@ static int nextbreak(int ncol,int bch,cchar *sp,int sl,int *ncp) noex {
 	    ncs += n ;
 	    ncol += n ;
 	} /* end while */
-/* find a possible break */
-#if	CF_STRNBREAK
-	if ((tp = strnbreak(cp,cl,bch)) != nullptr) {
-	    n = ncolstr(ntab,ncol,cp,((tp+1)-cp)) ;
-	    ncs += n ;
-	    pl = ((tp+1) - sp) ;
-	    *ncp = ncs ;
-	} /* end if */
-#else
-	if ((tp = strnchr(cp,cl,bch)) != nullptr) {
-	    n = ncolstr(ntab,ncol,cp,((tp+1)-cp)) ;
-	    ncs += n ;
-	    pl = ((tp+1) - sp) ;
-	    *ncp = ncs ;
-	} /* end if */
-#endif /* CF_STRNBREAK */
+	/* find a possible break */
+	if_constexpr (f_strnbreak) {
+	    if ((tp = strnbreak(cp,cl,bch)) != nullptr) {
+	        n = ncolstr(ntab,ncol,cp,((tp+1)-cp)) ;
+	        ncs += n ;
+	        pl = ((tp+1) - sp) ;
+	        *ncp = ncs ;
+	    } /* end if */
+	} else {
+	    if ((tp = strnchr(cp,cl,bch)) != nullptr) {
+	        n = ncolstr(ntab,ncol,cp,((tp+1)-cp)) ;
+	        ncs += n ;
+	        pl = ((tp+1) - sp) ;
+	        *ncp = ncs ;
+	    } /* end if */
+	} /* end if_constexpr (f_strnbreak) */
 	*ncp = ncs ;
-/* done */
+	/* done */
 	return pl ;
 }
 /* end subroutine (nextbreak) */
 
-static bool isskip(int ch) noex {
-	return (CHAR_ISWHITE(ch) || iseol(ch)) ;
-}
-/* end subrouine (isskip) */
-
-#if	CF_STRNBREAK
-cchar *strnbreak(cchar *sp,int sl,int bch) noex {
+static cchar *strnbreak(cchar *sp,int sl,int bch) noex {
 	int		si ;
 	bool		f = false ;
 	bch &= UCHAR_MAX ;
@@ -477,6 +470,10 @@ cchar *strnbreak(cchar *sp,int sl,int bch) noex {
 	return (f) ? sp : nullptr ;
 }
 /* end subroutine (strnbreak) */
-#endif /* CF_STRNBREAK */
+
+static bool isskip(int ch) noex {
+	return (CHAR_ISWHITE(ch) || iseol(ch)) ;
+}
+/* end subrouine (isskip) */
 
 

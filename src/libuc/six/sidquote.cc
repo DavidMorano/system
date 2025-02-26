@@ -65,7 +65,7 @@
 /* exported subroutines */
 
 int sidquote(cchar *sp,int sl) noex {
-	int		i ;
+	int		i ; /* used-afterwards (return value) */
 	bool		f_skip = false ;
 	bool		f_done = false ;
 	for (i = 0 ; sl && sp[i] && (! f_done) ; i += 1) {
@@ -76,6 +76,7 @@ int sidquote(cchar *sp,int sl) noex {
 		break ;
 	    case CH_DQUOTE:
 		if (! f_skip) f_done = TRUE ;
+		fallthrough ;
 	        /* FALLTHROUGH */
 	    default:
 		f_skip = false ;
