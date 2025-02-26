@@ -107,6 +107,7 @@ constexpr char		localhostpart[] = MAILADDR_LOCALHOST ;
 /* exported subroutines */
 
 int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		t = 0 ;
 	if (sp && mahost && malocal) {
@@ -116,24 +117,22 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	    if ((rs = rsv) >= 0) {
 	        cint	hnl = var.hostnamelen ; /* host-name length */
 	        cint	mal = var.mailaddrlen ; /* mail-address length */
-	        cchar	*cp ;
-	        cchar	*cp1 ;
-	        cchar	*cp2 ;
+		cchar	*tp ;
 	        rs = SR_OK ;
 	        if (sl < 0) sl = strlen(sp) ;
 	        /* what kind of address do we have? */
-	        if ((cp1 = strnchr(sp,sl,'@')) != nullptr) {
-	            if ((cp2 = strnchr(sp,sl,':')) != nullptr) {
+	        if (cc *cp1 ; (cp1 = strnchr(sp,sl,'@')) != np) {
+	            if (cc *cp2 ; (cp2 = strnchr(sp,sl,':')) != np) {
 		        /* ARPAnet route address */
 	                t = MAILADDRTYPE_ARPAROUTE ;
-	                if ((cp = strnchr(sp,sl,',')) != nullptr) {
+	                if ((tp = strnchr(sp,sl,',')) != np) {
 	                    if (rs >= 0) {
-			        cint	vlen = (cp - (cp1 + 1)) ;
+			        cint	vlen = (tp - (cp1 + 1)) ;
 			        cchar	*vstr = (cp1 + 1) ;
 	                        rs = snwcpy(mahost,hnl,vstr,vlen) ;
 		            }
 	                    if (rs >= 0) {
-	                        rs = sncpy1(malocal,mal,(cp + 1)) ;
+	                        rs = sncpy1(malocal,mal,(tp + 1)) ;
 		            }
 	                } else {
 	                    if (rs >= 0) {
@@ -155,13 +154,13 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	                    rs = snwcpy(malocal,mal,sp,(cp1 - sp)) ;
 		        }
 	            } /* end if */
-	        } else if ((cp = strnrchr(sp,sl,'!')) != nullptr) {
+	        } else if ((tp = strnrchr(sp,sl,'!')) != nullptr) {
 	            t = MAILADDRTYPE_UUCP ;
 	            if (rs >= 0) {
-	                rs = snwcpy(mahost,hnl,sp,(cp - sp)) ;
+	                rs = snwcpy(mahost,hnl,sp,(tp - sp)) ;
 	            }
 	            if (rs >= 0) {
-	                rs = sncpy1(malocal,mal,(cp + 1)) ;
+	                rs = sncpy1(malocal,mal,(tp + 1)) ;
 	            }
 	        } else {
 	           /* local */

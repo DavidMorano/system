@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Names:
-	{x}irem
+	{x}rem
 
 	Description:
 	These subroutine calculates the unsigned remainder of a
@@ -28,6 +28,7 @@
 	int {x}rem(int v,int m) noex
 
 	Arguments:
+	{x}	i, l, ll, u, ul, ull
 	v	number to find the remainder for
 	m	the modulus to use in the calculation
 
@@ -91,7 +92,7 @@ longlong llrem(longlong v,int m) noex {
 }
 /* end subroutine (llrem) */
 
-uint uirem(uint v,int m) noex {
+uint urem(uint v,int m) noex {
 	return remx(v,m) ;
 }
 /* end subroutine (uirem) */

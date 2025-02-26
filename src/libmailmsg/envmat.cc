@@ -2,6 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* mail-message envelope matching */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -39,7 +42,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
+#include	<cstring>		/* |strcmp(3c)| + |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

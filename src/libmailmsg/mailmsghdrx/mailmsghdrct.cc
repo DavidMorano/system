@@ -57,6 +57,35 @@
 
 /* forward references */
 
+template<typename ... Args>
+static int mailmsghdrct_ctor(mailmsghdrct *op,Args ... args) noex {
+    	MAILMSGHDRCT	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (mailmsghdrct_ctor) */
+
+static int mailmsghdrct_dtor(mailmsghdrct *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (mailmsghdrct_dtor) */
+
+template<typename ... Args>
+static inline int mailmsghdrct_magic(mailmsghdrct *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == MAILMSGHDRCT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (mailmsghdrct_magic) */
 
 /* local variables */
 
@@ -67,175 +96,55 @@
 /* exported subroutines */
 
 int mailmsghdrct_start(MMHCT *op,cchar *hp,int hl) noex {
-    	MAILMSGHDRCT	*hop = op ;
-	mode_t	operms = 0660 ;
-
-	int	rs ;
-	int	vopts ;
-	int	oflags = O_RDWR ;
-	int	nmsgs = 0 ;
-
-	const char	*tmpdname ;
-
-	char	tpat[MAXPATHLEN + 1] ;
-	char	tmpfname[MAXPATHLEN + 1] ;
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (mfd < 0)
-	    return SR_BADF ;
-
-	memclear(hop) ;
-
-	op->tfd = -1 ;
-	op->f.useclen = (opts & MAILMSGHDRCT_OUSECLEN) ? 1 : 0 ;
-	op->f.useclines = (opts & MAILMSGHDRCT_OUSECLINES) ? 1 : 0 ;
-
-	tmpdname = getenv(VARTMPDNAME) ;
-
-	if (tmpdname == NULL)
-	    tmpdname = MAILMSGHDRCT_TMPDNAME ;
-
-	rs = mkpath2(tpat,tmpdname,"msXXXXXXXXXXXX") ;
-
-	if (rs >= 0) {
-	    rs = opentmpfile(tpat,oflags,operms,tmpfname) ;
-	    op->tfd = rs ;
-	}
-
-	if (rs < 0)
-	    goto bad0 ;
-
-	rs = uc_mallocstrw(tmpfname,-1,&op->tmpfname) ;
-	if (rs < 0)
-	    goto bad1 ;
-
-	vopts = (VECHAND_OCOMPACT | VECHAND_OSTATIONARY) ;
-	rs = vechand_start(&op->msgs,4,vopts) ;
-	if (rs < 0)
-	    goto bad2 ;
-
-	rs = mailmsghdrct_gather(op,mfd,to) ;
-	nmsgs = rs ;
-	if (rs < 0)
-	    goto bad3 ;
-
-	if (op->tflen > 0) {
-	    cnullptr	np{} ;
-	    size_t	ms = op->tflen ;
-	    char	*p ;
-	    int		mp = PROT_READ ;
-	    int		mf = MAP_SHARED ;
-	    if ((rs = u_mmapbegin(np,ms,mp,mf,op->tfd,0L,&p)) >= 0) {
-	        op->mapdata = p ;
-	        op->mapsize = msize ;
+	int		rs ;
+	int		nparams = 0 ;
+	if ((rs = mailmsghdrct_ctor(op,hp)) >= 0) {
+	    (void) hl ;
+	    rs = SR_NOSYS ;
+	    if (rs < 0) {
+		mailmsghdrct_dtor(op) ;
 	    }
-	} /* end if */
-
-	op->magic = MAILMSGHDRCT_MAGIC ;
-
-ret0:
-	return (rs >= 0) ? nmsgs : rs ;
-
-/* bad stuff */
-bad3:
-	mailmsghdrct_msgsfree(op) ;
-
-	vechand_finish(&op->msgs) ;
-
-bad2:
-	if (op->tmpfname != NULL) {
-	    uc_free(op->tmpfname) ;
-	    op->tmpfname = NULL ;
-	}
-
-bad1:
-	if (op->tfd >= 0) {
-	    u_close(op->tfd) ;
-	    op->tfd = -1 ;
-	}
-
-	if (tmpfname != NULL) {
-	    if (tmpfname[0] != '\0') {
-	        u_unlink(tmpfname) ;
-		tmpfname[0] = '\0' ;
-	    }
-	}
-
-bad0:
-	goto ret0 ;
+	} /* end if (mailmsghdrct_ctor) */
+	return (rs >= 0) ? nparams : rs ;
 }
 /* end subroutine (mailmsghdrct_start) */
 
 int mailmsghdrct_finish(MMHCT *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != MAILMSGHDRCT_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if ((op->mapsize > 0) && (op->mapdata != NULL)) {
-	    u_munmap(op->mapdata,op->mapsize) ;
-	    op->mapdata = NULL ;
-	    op->mapsize = 0 ;
-	}
-	{
-	rs1 = mailmsghdrct_msgsfree(op) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	{
-	rs1 = vechand_finish(&op->msgs) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	if (op->tfd >= 0) {
-	    u_close(op->tfd) ;
-	    op->tfd = -1 ;
-	}
-
-	if (op->tmpfname) {
-	    if (op->tmpfname[0] != '\0') {
-	        u_unlink(op->tmpfname) ;
-		op->tmpfname[0] = '\0' ;
+	if ((rs = mailmsghdrct_magic(op)) >= 0) {
+	    op->mtp = nullptr ;
+	    op->stp = nullptr ;
+	    op->mtl = 0 ;
+	    op->stl = 0 ;
+	    {
+		rs1 = mailmsghdrct_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
 	    }
-	    rs1 = uc_free(op->tmpfname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->tmpfname = NULL ;
-	}
-
-	op->magic = 0 ;
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mailmsghdrct_finish) */
 
-int mailmsghdrct_paramget(MMHCT *op,int i,cchar **rpp) noex {
+int mailmsghdrct_paramget(MMHCT *op,int i,MMHCT_PAR *rp) noex {
 	int		rs ;
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != MAILMSGHDRCT_MAGIC)
-	    return SR_NOTOPEN ;
-
-	rs = vechand_count(&op->msgs) ;
-
+	if ((rs = mailmsghdrct_magic(op,rp)) >= 0) {
+	    rs = SR_INVALID ;
+	    if ((i >= 0) && (i < MAILMSGHDRCT_NPARAMS)) {
+		rs = op->p[i].kl ;
+		*rp = op->p[i] ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mailmsghdrct_paramget) */
 
-int mailmsghdrct_paramfind(MMHCT *op,cchar *key,cchar **rpp) noex {
+int mailmsghdrct_paramfind(MMHCT *op,cchar *key,MMHCT *rp) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != MAILMSGHDRCT_MAGIC) return SR_NOTOPEN ;
-
-	rs = vechand_count(&op->msgs) ;
-
+	if ((rs = mailmsghdrct_magic(op,key,rp)) >= 0) {
+	    rs = SR_NOSYS ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mailmsghdrct_paramfind) */

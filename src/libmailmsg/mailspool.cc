@@ -343,7 +343,7 @@ static int si_trying(si *sip) noex {
 	    if (rs == SR_AGAIN) rs = SR_OK ;
 	    if (rs >= 0) sleep(1) ;
 	    ti_now = time(nullptr) ;
-	    if ((ti_now-ti_start) >= sip->to) {
+	    if ((ti_now - ti_start) >= sip->to) {
 		rs = SR_AGAIN ;
 	    }
 	} /* end while */
@@ -455,8 +455,8 @@ static int si_chown(si *sip) noex {
 			const uid_t	euid = geteuid() ;
 		        const uid_t	uid = pw.pw_uid ;
 			if ((uid != euid) || (gid != egid)) {
-			    cint	cv = _PC_CHOWN_RESTRICTED ;
-	                    if ((rs = u_pathconf(md,cv,nullptr)) == 0) {
+			    cint	cmd = _PC_CHOWN_RESTRICTED ;
+	                    if ((rs = u_pathconf(md,cmd,nullptr)) == 0) {
 			        cchar	*mfname = sip->mfname ;
 			        f = true ;
     		                rs = u_chown(mfname,uid,gid) ;

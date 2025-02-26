@@ -27,7 +27,7 @@
 
 #include	<intceil.h>
 #include	<intfloor.h>
-#include	<intx.h>
+#include	<intrem.h>
 #include	<intsat.h>
 #include	<satarith.h>
 

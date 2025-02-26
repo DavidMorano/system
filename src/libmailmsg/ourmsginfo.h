@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* load up the process IDs */
+/* load and store certain mail-message information from the headers */
 /* version %I% last-modified %G% */
 
 

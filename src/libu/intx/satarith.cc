@@ -17,16 +17,22 @@
 
 /*******************************************************************************
 
-  	Name:
+  	Group
 	satarith
 
 	Description:
 	We provide some saturated add operations.
 
+	Synopsis:
+	T {x}addsat(T,T) noex
+
+	Returns:
+	-		result
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<climits>		/* |{x}_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -53,6 +59,24 @@
 #ifndef	ULONGLONG_MAX
 #define	ULONGLONG_MAX	valuelimit.ullmax
 #endif
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
@@ -108,13 +132,13 @@ longlong lladdsat(longlong v1,longlong v2) noex {
 }
 /* end subroutine (lladdsat) */
 
-uint uiaddsat(uint v1,uint v2) noex {
+uint uaddsat(uint v1,uint v2) noex {
 	const uint	m = (~ INT_MAX) ;
 	uint		vr = (v1+v2) ;
 	if ((v1&m) && (v2&m)) vr = UINT_MAX ;
 	return vr ;
 }
-/* end subroutine (uiaddsat) */
+/* end subroutine (uaddsat) */
 
 ulong uladdsat(ulong v1,ulong v2) noex {
 	const ulong	m = (~ LONG_MAX) ;

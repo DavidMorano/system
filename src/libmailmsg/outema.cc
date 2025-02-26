@@ -37,7 +37,7 @@
 #include	<buffer.h>
 #include	<strn.h>
 #include	<sfx.h>
-#include	<localmisc.h>		/* |NTABCOLS| */
+#include	<localmisc.h>		/* |NTABCOLS| + |COLUMNS| */
 
 #include	"outema.h"
 
@@ -118,7 +118,7 @@ int outema_ent(outema *op,EMA_ENT *ep) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = outema_magic(op)) >= 0) {
-	    if (buffer b ; (rs = b.start(80)) >= 0) {
+	    if (buffer b ; (rs = b.start(COLUMNS)) >= 0) {
 	        cchar	*bp ;
 	        int	bl ;
 	        int	c = 0 ;
@@ -227,7 +227,7 @@ int outema_value(outema *op,cchar *vp,int vl) noex {
 	                    op->llen += rs ;
 	                    op->rlen -= rs ;
 	                    f_comma = false ;
-	                }
+	                } /* end if */
 	                op->c_values += 1 ;
 	                cl2 = (cp + cl - vp) ;
 	                vp += cl2 ;
@@ -266,13 +266,12 @@ int outema_write(outema *op,cchar *v,int vlen) noex {
 #ifdef	COMMENT
 
 int outema_printf(outema *op,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = outema_magic(op,fmt)) >= 0) {
-	    va_list	ap ;
-	    char	*fbuf{} ;
-	    if ((rs = malloc_mailaddr(&fbuf)) >= 0) {
+	    if (char *fbuf ; (rs = malloc_mailaddr(&fbuf)) >= 0) {
 	        va_begin(ap,fmt) ;
 	        cint	flen = rs ;
 	        if ((rs = bufvprintf(fbuf,flen,fmt,ap)) >= 0) {

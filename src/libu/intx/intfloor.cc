@@ -18,16 +18,17 @@
 /*******************************************************************************
 
 	Name:
-	{xx}floor
+	{x}floor
 
 	Description:
 	This subroutine calculates the unsigned flooring of a number
 	given a specified modulus.
 
 	Synopsis:
-	int {xx}floor({xx} v,int m) noex
+	int {x}floor({xx} v,int m) noex
 
 	Arguments:
+	{x}	i, l, ll, u, ul, ull
 	v	number to find the flooring for
 	m	the modulus to use in the calculation
 

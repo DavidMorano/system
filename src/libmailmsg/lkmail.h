@@ -1,4 +1,4 @@
-/* lkmail HEADER */
+/* lkmail HEADER (Lock-Mail) */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 

@@ -33,7 +33,22 @@
 /* local defines */
 
 
-/* local subroutine-templates */
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 template<typename T>
 int intsatx(T v) noex {

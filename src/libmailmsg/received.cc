@@ -46,12 +46,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<stdlib.h>
-#include	<strings.h>
+#include	<cstdlib>
+#include	<strings.h>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<field.h>
 #include	<sbuf.h>
@@ -100,17 +97,6 @@ static int received_bake(received *,int,cchar *,int) noex ;
 
 /* local variables */
 
-constexpr cpcchar	received_keys[] = {
-	"from",
-	"by",
-	"with",
-	"id",
-	"for",
-	"date",
-	"via",
-	nullptr
-} ;
-
 /****
 
 	  9	(tab)
@@ -138,7 +124,18 @@ constexpr bool		f_emptyvalue = CF_EMPTYVALUE ;
 constexpr bool		f_fieldword = CF_FIELDWORD ;
 
 
-/* external variables */
+/* exported variables */
+
+cpcchar	received_keys[] = {
+	"from",
+	"by",
+	"with",
+	"id",
+	"for",
+	"date",
+	"via",
+	nullptr
+} ;
 
 
 /* exported subroutines */
@@ -199,7 +196,8 @@ int received_getkey(received *op,int ki,cchar **rpp) noex {
 	    if (ki >= 0) {
 	        rs = SR_NOENT ;
 	        if ((ki >= 0) && (ki < received_keyoverlast)) {
-		    cl = (op->key[ki] != nullptr) ? strlen(op->key[ki]) : 0 ;
+		    rs = SR_OK  ;
+		    cl = (op->key[ki]) ? strlen(op->key[ki]) : 0 ;
 		    if (rpp) {
 	    		*rpp = op->key[ki] ;
 		    }
@@ -221,12 +219,12 @@ int received_getitem(received *op,int ki,cchar **rpp) noex {
 static int received_bake(received *op,int sz,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
-	int		ki = -1 ;
-	int		wi = 0 ;
 	int		c = 0 ;
-	int		f_prevmatch = false ;
 	if (sbuf sb ; (rs = sb.start(op->a,sz)) >= 0) {
 	    if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
+	        int	ki = -1 ;
+	        int	wi = 0 ;
+	        bool	f_prevmatch = false ;
 	        cchar	*fp ;
 	        int	fl ;
 	        while (rs >= 0) {

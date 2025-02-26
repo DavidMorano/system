@@ -31,7 +31,7 @@ EXTERNC_begin
 extern int		irem(int,int) noex ;
 extern long		lrem(long,int) noex ;
 extern longlong		llrem(longlong,int) noex ;
-extern uint		uirem(uint,int) noex ;
+extern uint		urem(uint,int) noex ;
 extern ulong		ulrem(ulong,int) noex ;
 extern ulonglong	ullrem(ulonglong,int) noex ;
 
@@ -50,7 +50,7 @@ static inline longlong rem(longlong v,int d) noex {
 }
 
 static inline uint rem(uint v,int d) noex {
-	return uirem(v,d) ;
+	return urem(v,d) ;
 }
 static inline ulong rem(ulong v,int d) noex {
 	return ulrem(v,d) ;

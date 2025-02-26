@@ -179,7 +179,7 @@ int csro_finish(csro *op) noex {
 		    rs1 = value_finish(valp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
-	    } /* end while */
+	    } /* end for */
 	    {
 	        rs1 = vecobj_finish(elp) ;
 	        if (rs >= 0) rs = rs1 ;

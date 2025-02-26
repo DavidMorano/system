@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 (conformance reviewed) */
 
-/* object to handle parameter files */
+/* mail-message envelope matching */
 /* version %I% last-modified %G% */
 
 

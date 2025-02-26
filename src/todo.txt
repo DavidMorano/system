@@ -4,7 +4,6 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
-mailfiles	mess
 ts
 prique		broken, ill-conceived
 timer		decide what to do about |timer_hand()| -- broken
@@ -13,7 +12,7 @@ libuc		fix to completely compile!
 fsdirtree	needs pointer implementation and a lot of cleanup
 quote
 sysdialer
-mailmsghdrct
+mailmsghdrct	mess
 srv{x}
 memfile		can we just trash this?
 libpcs		a lot of junk in there

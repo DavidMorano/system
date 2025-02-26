@@ -17,8 +17,11 @@
 
 /****************************************************************************
 
-	This object deals with printing lines.
+  	Object:
+	outema
 
+	Description:
+	This object deals with printing lines.
 
 ****************************************************************************/
 

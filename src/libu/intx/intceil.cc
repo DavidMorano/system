@@ -18,16 +18,17 @@
 /*******************************************************************************
 
 	Name:
-	{xx}ceil
+	{x}ceil
 
 	Description:
 	This subroutine calculates the unsigned ceiling of a number
 	given a specified modulus.
 
 	Synopsis:
-	int {xx}ceil({xx} v,int m) noex
+	int {x}ceil({xx} v,int m) noex
 
 	Arguments:
+	{x}	i, l, ll, u, ul, ull
 	v	number to find the ceiling for
 	m	the modulus to use in the calculation
 

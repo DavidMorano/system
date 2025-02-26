@@ -1,8 +1,8 @@
-/* ourmsginfo SUPPORT */
+/* ourmsginfo SUPPORT (Our_Message-Information) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* load up the process IDs */
+/* load and store certain mail-message information from the headers */
 /* version %I% last-modified %G% */
 
 
@@ -21,7 +21,8 @@
 	ourmsginfo
 
 	Description:
-	This subroutine will load up the process user-group IDs.
+	This subroutine will load and store certain mail-message
+	information as gleaned from the various mail-message headers.
 
 	Synopsis:
 	int ourmsginfo_start(ourmsginfo *op,dater *dp) noex
@@ -31,18 +32,15 @@
 	dp		pointer to DATER object
 
 	Returns:
-	>=0	length of found filepath
-	<0	error (system-return)
+	>=0		length of found filepath
+	<0		error (system-return)
 
 *****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<dater.h>
@@ -107,25 +105,24 @@ int ourmsginfo_finish(ourmsginfo *op) noex {
 }
 /* end subroutine (ourmsginfo_finish) */
 
-int ourmsginfo_addhead(ourmsginfo *op,int w,cc *s,int slen) noex {
+int ourmsginfo_addhead(ourmsginfo *op,int w,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (op && s) {
+	if (op && sp) {
 	    rs = SR_INVALID ;
 	    if ((w >= 0) && (w < ourmsginfohead_overlast)) {
-		if (slen < 0) slen = strlen(s) ;
-		    if (slen > 0) {
-			vecstr	*vsp = (op->head + w) ;
-		        /* is the vector for this header initialized? */
-	                if (! ((op->hif >> w) & 1)) {
-	                    cint	vo = 0 ;
-	                    rs = vsp->start(OURMSGINFO_N,vo) ;
-	                    op->hif |= (1 << w) ;
-	                } /* end if (needed initialization) */
-	                if (rs >= 0) {
-	                    rs = vsp->add(s,slen) ;
-	                }
-		    } /* end if (positive) */
-		/* end if (non-zero positive) */
+		if (sl < 0) sl = strlen(sp) ;
+		if (sl > 0) {
+		    vecstr	*vsp = (op->head + w) ;
+		    /* is the vector for this header initialized? */
+	            if (! ((op->hif >> w) & 1)) {
+	                cint	vo = 0 ;
+	                rs = vsp->start(OURMSGINFO_N,vo) ;
+	                op->hif |= (1 << w) ;
+	            } /* end if (needed initialization) */
+	            if ((rs >= 0) && (sl > 0)) {
+	                rs = vsp->add(sp,sl) ;
+	            }
+		} /* end if (non-zero positive) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
