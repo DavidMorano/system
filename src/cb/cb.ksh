@@ -4,7 +4,7 @@
 
 : ${LOCAL:=/usr/add-on/local}
 : ${NCMP:=/usr/add-on/ncmp}
-: {SUNWSPRO:=/opt/SUNWspro}
+: ${SUNWSPRO:=/opt/SUNWspro}
 export LOCAL NCMP SUNWSPRO
 
 

@@ -27,16 +27,20 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* memset(3c)| */
+#include	<cstring>		/* |memset(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<new>			/* |nothrow(3C++)| */
 #include	<usystem.h>
-#include	<vecitem.h>
+#include	<vecobj.h>
 #include	<mallocstuff.h>
 #include	<strwcpy.h>
 #include	<strn.h>
+#include	<sfx.h>
+#include	<sif.hh>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"mailfiles.h"
@@ -46,6 +50,15 @@
 
 #define	MF		mailfiles
 #define	MF_ENT		mailfiles_ent
+
+
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -59,8 +72,36 @@
 
 /* forward references */
 
-static int	entry_init(MF_ENT *,cchar *,int) noex ;
-static int	entry_free(MF_ENT *) noex ;
+template<typename ... Args>
+static int mailfiles_ctor(MF *op,Args ... args) noex {
+    	MAILFILES	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->elp = new(nothrow) vecobj) != np) {
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (mailfiles_ctor) */
+
+static int mailfiles_dtor(MF *op) noex {
+	int		rs ;
+	if ((rs = mailfiles_magic(op)) >= 0) {
+	    if (op->elp) {
+		delete op->elp ;
+		op->elp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (mailfiles_dtor) */
+
+static int	entry_start(MF_ENT *,cchar *,int) noex ;
+static int	entry_finish(MF_ENT *) noex ;
 
 
 /* local variables */
@@ -71,265 +112,187 @@ static int	entry_free(MF_ENT *) noex ;
 
 /* exported subroutines */
 
-int mailfiles_init(lp)
-MAILFILES	*lp ;
-{
-	int	rs ;
-
-
-	rs = vecitem_start(lp,5,VECITEM_PNOHOLES) ;
-
+int mailfiles_start(MF *op) noex {
+	int		rs ;
+	if ((rs = mailfiles_ctor(op)) >= 0) {
+	    vecobj	*elp = op->elp ;
+	    cint	vsz = szof(MF_ENT) ;
+	    cint	vn = 4 ;
+	    cint	vo = VECOBJ_OCOMPACT ;
+	    if ((rs = elp->start(vsz,vn,vo)) >= 0) {
+		op->magic = MAILFILES_MAGIC ;
+	    }
+	    if (rs < 0) {
+		mailfiles_dtor(op) ;
+	    }
+	} /* end if (mailfiles_ctor) */
 	return rs ;
 }
+/* end subroutine (mailfiles_start) */
 
-
-int mailfiles_add(lp,path,pathlen)
-MAILFILES	*lp ;
-cchar	path[] ;
-int		pathlen ;
-{
-	MF_ENT	e ;
-
-	USTAT		sb ;
-
-	int	rs, cl ;
-
-
-	if ((lp == NULL) || (path == NULL))
-	    return SR_FAULT ;
-
-	cl = strnlen(path,pathlen) ;
-
-	rs = entry_init(&e,path,cl) ;
-
-	if (rs < 0)
-	    goto bad0 ;
-
-	e.lasttime = -1 ;
-	e.lastsize = -1 ;
-	rs = u_stat(e.mailfname,&sb) ;
-
-#if	CF_MAILBOXZERO
-
-	if (rs >= 0) {
-
-	e.lasttime = sb.st_mtime ;
-	e.lastsize = sb.st_size ;
-
-	}
-
-#else /* CF_MAILBOXZERO */
-
-	if (rs < 0)
-	    goto bad1 ;
-
-	e.lasttime = sb.st_mtime ;
-	e.lastsize = sb.st_size ;
-
-#endif /* CF_MAILBOXZERO */
-
-	rs = vecitem_add(lp,&e,szof(MF_ENT)) ;
-
-	if (rs < 0)
-	    goto bad1 ;
-
-ret0:
-	return rs ;
-
-/* bad stuff */
-bad1:
-	entry_free(&e) ;
-
-bad0:
+int mailfiles_finish(MF *op) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = mailfiles_magic(op)) >= 0) {
+	    vecobj	*elp = op->elp ;
+	    if (elp) {
+	        void	*vp{} ;
+	        for (int i = 0 ; elp->get(i,&vp) >= 0 ; i += 1) {
+	            MF_ENT	*ep = (MF_ENT *) vp ;
+	            if (vp) {
+	                rs1 = entry_finish(ep) ;
+	                if (rs >= 0) rs = rs1 ;
+	            }
+	        } /* end for */
+	        {
+	            rs1 = vecobj_finish(elp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	    }
+	    {
+		rs1 = mailfiles_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
+/* end subroutine (mailfiles_finish) */
 
+int mailfiles_add(MF *op,cchar *sp,int sl) noex {
+    	int		rs ;
+	if ((rs = mailfiles_magic(op,sp)) >= 0) {
+	    cchar	*cp ;
+	    if (cint cl = sfshrink(sp,sl,&cp) ; cl > 0) {
+		if (MF_ENT e ; (rs = entry_start(&e,cp,cl)) >= 0) {
+		    vecobj	*elp = op->elp ;
+		    rs = elp->add(&e) ;
+		    if (rs < 0) {
+			entry_finish(&e) ;
+		    }
+		} /* end if (entry_start) */
+	    } /* end if (sfshrink) */
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (mailfiles_add) */
 
-int mailfiles_addpath(lp,path,pathlen)
-MAILFILES	*lp ;
-cchar	path[] ;
-int		pathlen ;
-{
-	int	rs = SR_OK, n ;
-	int	sl, cl ;
-
-	char	*sp, *cp ;
-
-
-	sp = (char *) path ;
-	sl = strnlen(path,pathlen) ;
-
-	if ((cp = strnrchr(sp,sl,'?')) != NULL)
-	    sl -= ((sp + sl) - cp) ;
-
-	n = 0 ;
-	while ((cp = strnchr(sp,sl,':')) != NULL) {
-
-	    cl = cp - sp ;
-	    cp = sp ;
-
-	    rs = mailfiles_add(lp,cp,cl) ;
-
-	    if (rs < 0)
-	        break ;
-
-	    sl -= (cl + 1) ;
-	    sp += (cl + 1) ;
-
-	    n += 1 ;
-
-	} /* end while */
-
-	if ((rs >= 0) && (sl > 0)) {
-
-	    rs = mailfiles_add(lp,sp,sl) ;
-
-	    if (rs >= 0)
-	        n += 1 ;
-
-	}
-
+int mailfiles_addpath(MF *op,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
+	int		rs ;
+	int		n = 0 ;
+	if ((rs = mailfiles_magic(op,sp)) >= 0) {
+	    if (cchar *tp ; (tp = strnrchr(sp,sl,'?')) != np) {
+	        sl -= ((sp + sl) - tp) ;
+	    }
+	    for (cc *tp ; (tp = strnchr(sp,sl,':')) != np ; ) {
+		if ((tp - sp) > 0) {
+	            rs = mailfiles_add(op,sp,(tp - sp)) ;
+	    	    n += (rs < INT_MAX) ;
+		}
+	        sl -= ((tp + 1) - sp) ;
+	        sp = (tp + 1) ;
+		if (rs < 0) break ;
+	    } /* end for */
+	    if ((rs >= 0) && (sl > 0)) {
+	        rs = mailfiles_add(op,sp,sl) ;
+	    	n += (rs < INT_MAX) ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (mailfiles_addpath) */
 
-
-int mailfiles_get(lp,i,epp)
-MAILFILES	*lp ;
-int		i ;
-MF_ENT	**epp ;
-{
-	int	rs ;
-
-
-	rs = vecitem_get(lp,i,epp) ;
-
-	return rs ;
-}
-
-
-int mailfiles_free(lp)
-MAILFILES	*lp ;
-{
-	MF_ENT	*ep ;
-	int		rs = SR_OK :
-	int		rs1 ;
-	int		i ;
-
-	for (i = 0 ; vecitem_get(lp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
-	        rs1 = entry_free(ep) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	} /* end for */
-
-	rs1 = vecitem_finish(lp) ;
-	if (rs >= 0) rs = rs1 ;
-
-	return rs ;
-}
-
-
-int mailfiles_count(lp)
-MAILFILES	*lp ;
-{
-	int	rs ;
-
-
-	rs = vecitem_count(lp) ;
-
-	return rs ;
-}
-
-
-int mailfiles_check(lp)
-MAILFILES	*lp ;
-{
+int mailfiles_get(MF *op,int i,MF_ENT **epp) noex {
 	int		rs ;
-	MF_ENT	*ep ;
-
-	USTAT		sb ;
-
-	int	changed = 0 ;
-
-
-	if (lp == NULL)
-	    return SR_FAULT ;
-
-	for (int i = 0 ; (rs = vecitem_get(lp,i,&ep)) >= 0 ; i += 1) {
-
-	    if (ep == NULL) continue ;
-
-	    if (u_stat(ep->mailfname,&sb) >= 0) {
-
-	        if (! ep->f_changed) {
-
-	            if (sb.st_size > ep->lastsize) {
-
-	                ep->f_changed = TRUE ;
-	                changed += 1 ;
-
-	            }
-
-	        } else {
-
-	            if (sb.st_size < ep->lastsize)
-	                ep->f_changed = FALSE ;
-
-	        }
-
-#ifdef	COMMENT
-	        if ((changed == 0) && (sb.st_mtime > ep->lasttime))
-	            f_changed = TRUE ;
-#endif /* COMMENT */
-
-	        ep->lasttime = sb.st_mtime ;
-	        ep->lastsize = sb.st_size ;
-
-	    } /* end if */
-
-	} /* end for */
-
-	if ((rs >= 0) && (changed > 0))
-	    rs = changed ;
-
+	if ((rs = mailfiles_magic(op,epp)) >= 0) {
+	    vecobj	*elp = op->elp ;
+	    void	*vp ;
+	    if ((rs = elp->get(i,&vp)) >= 0) {
+		*epp = (MF_ENT *) vp ;
+	    }
+	} /* end if (magic) */
 	return rs ;
+}
+/* end subroutine (mailfiles_get) */
+
+int mailfiles_count(MF *op) noex {
+	int		rs ;
+	if ((rs = mailfiles_magic(op)) >= 0) {
+	    vecobj	*elp = op->elp ;
+	    rs = elp->count ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (mailfiles_count) */
+
+int mailfiles_check(MF *op) noex {
+	int		rs ;
+	int		nchg = 0 ;
+	if ((rs = mailfiles_magic(op)) >= 0) {
+	    vecobj	*elp = op->elp ;
+	    void	*vp{} ;
+	    for (int i = 0 ; (rs = elp->get(i,&vp)) >= 0 ; i += 1) {
+	        MF_ENT	*ep = (MF_ENT *) vp ;
+		if (vp) {
+	            if (! ep->f_changed) {
+		        cchar	*fn = ep->mailfname ;
+	                if (USTAT sb ; (rs = u_stat(fn,&sb)) >= 0) {
+	                    if (sb.st_size > ep->lastsize) {
+	        		ep->lasttime = sb.st_mtime ;
+	        		ep->lastsize = sb.st_size ;
+	                        ep->f_changed = true ;
+	                        nchg += 1 ;
+			    }
+			} else if (isNotPresent(rs)) {
+	                    ep->f_changed = true ;
+			    nchg += 1 ;
+			    rs = SR_OK ;
+			}
+	            } else {
+			nchg += 1 ;
+		    }
+		} /* end if (non-null) */
+		if (rs < 0) break ;
+	    } /* end for */
+	} /* end if (magic) */
+	return (rs >= 0) ? nchg : rs ;
 }
 /* end subroutine (mailfiles_check) */
 
 
 /* local subroutines */
 
-static int entry_init(ep,path,pathlen)
-MF_ENT	*ep ;
-cchar	path[] ;
-int		pathlen ;
-{
-	int	rs ;
-	char	*cp ;
-
-	memclear(ep) ;
-	ep->f_changed = FALSE ;
-	rs = uc_malloc((pathlen + 1),&ep->mailfname) ;
-
-	if (rs >= 0) {
-	    rs = strwcpy(ep->mailfname,path,pathlen) - path ;
-	}
-
+static int entry_start(MF_ENT *ep,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (ep && sp) {
+	    memclear(ep) ;
+	    ep->f_changed = false ;
+	    if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	        ep->mailfname = cp ;
+		if (USTAT sb ; (rs = u_stat(cp,&sb)) >= 0) {
+		    ep->lasttime = sb.st_mtime ;
+		    ep->lastsize = sb.st_size ;
+		}
+		if (rs < 0) {
+		    uc_free(ep->mailfname) ;
+		    ep->mailfname = nullptr ;
+		}
+	    } /* end if (memory-allocation) */
+	} /* end if (non-null) */
 	return rs ;
 }
+/* end subroutine (entry_start) */
 
-
-static int entry_free(ep)
-MF_ENT	*ep ;
-{
-
-
-	if (ep->mailfname != NULL)
-	    free(ep->mailfname) ;
-
-	return 0 ;
+static int entry_finish(MF_ENT *ep) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (ep->mailfname) {
+	    rs1 = uc_free(ep->mailfname) ;
+	    if (rs >= 0) rs = rs1 ;
+	    ep->mailfname = nullptr ;
+	}
+	return rs ;
 }
-
+/* end subroutine (entry_finish) */
 
 

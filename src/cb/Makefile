@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (cb)
 
 T= cb
 

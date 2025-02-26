@@ -30,7 +30,6 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cinttypes>
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -103,16 +102,16 @@ int tse::all(bool frd,char *abuf,int alen) noex {
 	if (abuf) {
 	    if (serialbuf sb ; (rs = sb.start(abuf,alen)) >= 0) {
 		if (frd) {
-	            sb.wui(count) ;
-	            sb.wui(utime) ;
-	            sb.wui(ctime) ;
-	            sb.wui(hash) ;
+	            sb << count ;
+	            sb << utime ;
+	            sb << ctime ;
+	            sb << hash ;
 	            sb.wstrn(keyname,TSE_LKEYNAME) ;
 		} else {
-	            sb.rui(&count) ;
-	            sb.rui(&utime) ;
-	            sb.rui(&ctime) ;
-	            sb.rui(&hash) ;
+	            sb >> count ;
+	            sb >> utime ;
+	            sb >> ctime ;
+	            sb >> hash ;
 	            sb.rstrn(keyname,TSE_LKEYNAME) ;
 	        }
 	        rs1 = sb.finish ;
@@ -133,11 +132,11 @@ int tse::update(bool frd,char *abuf,int alen) noex {
 	    /* proceed as normal (?) :-) */
 	    if (serialbuf sb ; (rs = sb.start(abuf,alen)) >= 0) {
 	        if (frd) {
-	            sb.wui(count) ;
-	            sb.wui(utime) ;
+	            sb << count ;
+	            sb << utime ;
 	        } else {
-	            sb.rui(&count) ;
-	            sb.rui(&utime) ;
+	            sb >> count ;
+	            sb >> utime ;
 	        } /* end if */
 	        rs1 = sb.finish ;
 	        if (rs >= 0) rs = rs1 ;

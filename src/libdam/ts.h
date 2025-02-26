@@ -6,7 +6,7 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1991 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TS_INCLUDE
 #define	TS_INCLUDE
@@ -19,9 +19,8 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<mapstrint.h>
-
-#include	<tse.hh>
 #include	<ebuf.h>
+#include	<tse.hh>
 
 
 #define	TS_MAGIC		918245636
@@ -29,7 +28,7 @@
 #define	TS_FL			struct ts_flags
 #define	TS_CUR			struct ts_cursor
 #define	TS_HDR			struct ts_header
-#define	TS_ENT			TSE_ALL
+#define	TS_ENT			TSE
 #define	TS_FILEMAGIC		"TIMESTAMP"
 #define	TS_FILEMAGICSIZE	16
 #define	TS_FILEVERSION		0

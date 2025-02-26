@@ -16,7 +16,7 @@
 	= 1991-06-01, David A­D­ Morano
 	This code was originally written.
 
-	= 2003-06-26, David A­D­ Morano
+	= 1999-06-26, David A­D­ Morano
 	Although this object works, it was only a micracle that it
 	did.  There is a feature-bug in Solaris that does not allow
 	a file to be both mapped and locked at the same time (in
@@ -39,7 +39,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1991,1999 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************
 
@@ -183,6 +183,10 @@
 #define	CF_CREAT	0		/* always create the file? */
 #endif
 
+#define	FV		vetu[0]
+#define	FE		vetu[1]
+#define	FT		vetu[2]
+
 
 /* imported namespaces */
 
@@ -193,8 +197,6 @@ using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
-
-typedef tse		ts_ent ;
 
 
 /* external subroutines */
@@ -993,14 +995,14 @@ static int ts_fileverify(ts *op) noex {
 	    goto ret0 ;
 	}
 
-	op->fileversion = cp[0] ;
+	op->FV = cp[0] ;
 
 	if (cp[1] != TS_ENDIAN) {
 	    rs = SR_NOTSUP ;
 	    goto ret0 ;
 	}
 
-	op->filetype = cp[2] ;
+	op->FT = cp[2] ;
 
 ret0:
 
@@ -1015,14 +1017,14 @@ static int ts_headtab(ts *op,int f_read) noex {
 	char		*bp = (op->topbuf + TS_HEADTABOFF) ;
 	if (f_read) {
 	    ts_hdr	h{} ;
-	    int		hsize = szof(ts_hdr) ;
+	    int		hsz = szof(ts_hdr) ;
 	    stdorder_rui(bp,&h.nentries) ;
 	    bp += szof(uint) ;
 	    stdorder_rui(bp,&h.wtime) ;
 	    bp += szof(uint) ;
 	    stdorder_rui(bp,&h.wcount) ;
 	    bp += szof(uint) ;
-	    f_changed = (memcmp(&h,&op->h,hsize) != 0) ;
+	    f_changed = (memcmp(&h,&op->h,hsz) != 0) ;
 	    op->h = h ;
 	} else {
 	    stdorder_wui(bp,op->h.nentries) ;

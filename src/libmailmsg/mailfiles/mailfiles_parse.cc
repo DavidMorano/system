@@ -18,7 +18,7 @@
 
 */
 
-/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 /* Use is subject to license terms. */
 
 /************************************************************************
@@ -45,15 +45,10 @@
 *************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<netdb.h>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strpbrk(3c)| */
 #include	<usystem.h>
 #include	<cfdec.h>
 #include	<localmisc.h>
@@ -84,35 +79,29 @@
 
 /* exported subroutines */
 
-int mailfiles_parse(mailfiles *lp,cchar *mailpath) noex {
+int mailfiles_parse(mailfiles *op,cchar *mailpath) noex {
+    	cnullptr	np{} ;
 	int		rs ;
-	int		f_done = FALSE ;
-	char		*cp, *cp1 ;
-
-	if ((lp == NULL) || (mailpath == NULL))
-	    return SR_FAULT ;
-
-	cp = (char *) mailpath ;
-	while ((cp1 = strpbrk(cp,":?")) != NULL) {
-
-	    rs = mailfiles_add(lp,cp,(cp1 - cp)) ;
-
-	    if (rs < 0)
-	        return rs ;
-
-	    if (*cp1 == '?')
-	        f_done = TRUE ;
-
-	    cp = cp1 + 1 ;
-
-	} /* end while */
-
-	if (! f_done)
-	    rs = mailfiles_add(lp,cp,-1) ;
-
-	return rs ;
+	int		c = 0 ;
+	if ((rs = mailfiles_magic(op,mailpath)) >= 0) {
+	    bool	fdone = false ;
+	    cchar	*cp = mailpath ;
+	    for (cc *tp ; (tp = strpbrk(cp,":?")) != np ; ) {
+		if ((tp - cp) >= 0) {
+	            rs = mailfiles_add(op,cp,(tp - cp)) ;
+		    c += (rs < INT_MAX) ;
+	            if (*tp == '?') fdone = true ;
+		}
+	        cp = (tp + 1) ;
+	        if (rs < 0) break ;
+	    } /* end for */
+	    if ((rs >= 0) && (! fdone) && cp[0]) {
+	        rs = mailfiles_add(op,cp,-1) ;
+		c += (rs < INT_MAX) ;
+	    }
+	} /* end if (magic) */
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mailfiles_parse) */
-
 
 

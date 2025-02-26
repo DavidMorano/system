@@ -28,15 +28,21 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<vecitem.h>
+#include	<vecobj.h>
 
 
-#define	MAILFILES		vecitem
+#define	MAILFILES_MAGIC		0x21658252
+#define	MAILFILES		struct mailfiles_head
 #define	MAILFILES_ENT		struct mailfiles_entry
 
 
+struct mailfiles_head {
+    	vecobj		*elp ;
+	uint		magic ;
+} ;
+
 struct mailfiles_entry {
-	char		*mailfname ;
+	cchar		*mailfname ;
 	time_t		lasttime ;
 	off_t		lastsize ;
 	int		f_changed ;
@@ -47,8 +53,8 @@ typedef	MAILFILES_ENT		mailfiles_ent ;
 
 EXTERNC_begin
 
-extern int mailfiles_init(mailfiles *) noex ;
-extern int mailfiles_free(mailfiles *) noex ;
+extern int mailfiles_start(mailfiles *) noex ;
+extern int mailfiles_finish(mailfiles *) noex ;
 extern int mailfiles_add(mailfiles *,cchar *,int) noex ;
 extern int mailfiles_addpath(mailfiles *,cchar *,int) noex ;
 extern int mailfiles_get(mailfiles *,int,mailfiles_ent **) noex ;
@@ -57,6 +63,20 @@ extern int mailfiles_count(mailfiles *) noex ;
 extern int mailfiles_parse(mailfiles *,cchar *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+static inline int mailfiles_magic(mailfiles *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == MAILFILES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (mailfiles_magic) */
+
+#endif /* __cplusplus */
 
 
 #endif /* MAILFILES_INCLUDE */

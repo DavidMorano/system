@@ -62,7 +62,7 @@ OBJ3= mhcom.o mcmsg.o comsatmsg.o mimetypes.o
 OBJ4= ema.o emainfo.o comparse.o
 OBJ5= mbcache.o contypevals.o contentencodings.o
 OBJ6= whitelist.o splitaddr.o csro.o
-OBJ7= filer_mailsup.o mailalias.o 
+OBJ7= filer_mailsup.o mailalias.o mailfiles.o
 
 OBJ8= hdrx.o
 OBJ9=
