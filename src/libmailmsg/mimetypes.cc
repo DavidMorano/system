@@ -237,22 +237,22 @@ static int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
 			key.buf = fp ;
 			key.len = fl ;
                         if (hdb_fetch(op->dbp,key,np,&data) < 0) {
-                                        char    *bkp, *bvp ;
-                                        size = key.len + 1 + ctl + 1 ;
-                                        rs = uc_malloc(size,&bkp) ;
-                                        if (rs < 0) break ;
-                                        kp = charp(key.buf) ;
-                                        bvp = strwcpy(bkp,kp,key.len) + 1 ;
-                                        key.buf = bkp ;
-                                        strwcpy(bvp,ctp,ctl) ;
-                                        data.len = ctl ;
-                                        data.buf = bvp ;
-                                        rs = hdb_store(op->dbp,key,data) ;
-                                        if (rs < 0) {
-                                            uc_free(bkp) ;
-                                            break ;
-                                        }
-                                        c += 1 ;
+                            char    *bkp, *bvp ;
+                            size = key.len + 1 + ctl + 1 ;
+                            rs = uc_malloc(size,&bkp) ;
+                            if (rs < 0) break ;
+                            kp = charp(key.buf) ;
+                            bvp = strwcpy(bkp,kp,key.len) + 1 ;
+                            key.buf = bkp ;
+                            strwcpy(bvp,ctp,ctl) ;
+                            data.len = ctl ;
+                            data.buf = bvp ;
+                            rs = hdb_store(op->dbp,key,data) ;
+                            if (rs < 0) {
+                                uc_free(bkp) ;
+                                break ;
+                            }
+                            c += 1 ;
 			} /* end if */
                     } /* end if (non-zero field) */
  		    if (fb.term == '#') break ;

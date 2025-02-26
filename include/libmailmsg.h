@@ -30,8 +30,10 @@
 #include	<mailmsgmatx.h>		/* composite group */
 #include	<mailmsgx.h>		/* composite group */
 #include	<mailbox.h>
-#include	<msgentry.h>
+#include	<mailalias.h>
+#include	<mailfiles.h>
 
+#include	<msgentry.h>
 #include	<mimetypes.h>
 #include	<mbcache.h>
 #include	<emainfo.h>
@@ -49,9 +51,10 @@
 #include	<comsatmsg.h>
 #include	<retpath.h>
 #include	<csro.h>
+#include	<mcmsg.hh>
+#include	<lkcmail.hh>
 
 #include	<envmat.h>
-#include	<mcmsg.hh>
 
 
 EXTERNC_begin

@@ -160,7 +160,6 @@ int msgentry_getclen(msgentry *mep) noex {
 	        mep->clen = clen ;
 	    }
 	} /* end if (only once) */
-
 	return (rs >= 0) ? clen : rs ;
 }
 /* end subroutine (msgentry_getclen) */
@@ -197,9 +196,8 @@ int msgentry_setct(msgentry *mep) noex {
 	if ((hl = mailmsg_hdrval(&mep->m,HN_CTYPE,&hp)) > 0) {
 	    mep->hdr.ctype = true ;
 	    if ((rs = mhcom_start(&hc,hp,hl)) >= 0) {
-		int	vl ;
 		cchar	*vp ;
-	        if ((vl = mhcom_getval(&hc,&vp)) > 0) {
+	        if (int vl ; (vl = mhcom_getval(&hc,&vp)) > 0) {
 	            if (cchar *tp ; (tp = strnchr(vp,vl,';')) != nullptr) {
 	                vl = (tp - vp) ;
 		    }
@@ -224,13 +222,11 @@ int msgentry_setce(msgentry *mep) noex {
 	cchar		*hp ;
 	mep->f.ceplain = true ;
 	if ((hl = mailmsg_hdrval(&mep->m,HN_CENCODING,&hp)) > 0) {
-	    int		vl ;
-	    cchar	*tp ;
-	    cchar	*vp ;
 	    mep->hdr.cencoding = true ;
 	    if (comparse com ; (rs = comparse_start(&com,hp,hl)) >= 0) {
-	        if ((vl = comparse_getval(&com,&vp)) > 0) {
-	            if ((tp = strnchr(vp,vl,';')) != nullptr) {
+	        cchar	*vp ;
+	        if (int vl ; (vl = comparse_getval(&com,&vp)) > 0) {
+	            if (cc *tp ; (tp = strnchr(vp,vl,';')) != nullptr) {
 	                vl = (tp - vp) ;
 	            }
 	            rs1 = sisub(vp,vl,"7bit") ;

@@ -27,9 +27,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<sys/stat.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>
@@ -52,6 +51,10 @@
 
 #ifndef	LKMAIL_AGE
 #define	LKMAIL_AGE	(5 * 60)
+#endif
+
+#ifndef	CF_SGIDGROUPS
+#define	CF_SGIDGROUPS	0
 #endif
 
 
@@ -111,6 +114,10 @@ static int	lkmail_starter(lkmail *) noex ;
 
 /* local variables */
 
+cbool		f_comment = false ;
+
+cbool		f_sgidgroups = CF_SGIDGROUPS ;
+
 
 /* exported variables */
 
@@ -168,11 +175,11 @@ int lkmail_create(lkmail *op) noex {
 	    /* blow out if the lock file is already there! */
 	    if (USTAT sb ; (rs = u_stat(op->lockfname,&sb)) == nrs) {
 	        /* go ahead and try to create the lock file */
-#ifdef	COMMENT
-	        rs = u_creat(op->lockfname,0444) ;
-#else
-	        rs = SR_ACCES ;
-#endif
+		if_constexpr (f_comment) {
+	            rs = u_creat(op->lockfname,0444) ;
+		} else {
+	            rs = SR_ACCES ;
+		} /* end if_constexpr (f_comment) */
 	        lfd = rs ;
 	        if ((rs == SR_ACCES) && (op->id.egid != op->id.gid)) {
 	            if ((rs = u_setegid(op->id.gid_maildir)) >= 0) {
@@ -181,15 +188,15 @@ int lkmail_create(lkmail *op) noex {
 	                u_setegid(op->id.gid) ;
 	            }
 	        } /* end if (tryint to SGID to maildir) */
-#if	CF_SGIDGROUPS
-	        if ((rs == SR_ACCES) || (rs == SR_PERM)) {
-	            if ((rs = u_setegid(op->id.gid_maildir)) >= 0) {
-	                rs = u_creat(op->lockfname,0444) ;
-	                lfd = rs ;
-	                u_setegid(op->id.gid) ;
-	            }
-	        } /* end if (tryint to SGID to maildir) */
-#endif /* CF_SGIDGROUPS */
+		if_constexpr (f_sgidgroups) {
+	            if ((rs == SR_ACCES) || (rs == SR_PERM)) {
+	                if ((rs = u_setegid(op->id.gid_maildir)) >= 0) {
+	                    rs = u_creat(op->lockfname,0444) ;
+	                    lfd = rs ;
+	                    u_setegid(op->id.gid) ;
+	                }
+	            } /* end if (tryint to SGID to maildir) */
+		} /* end if_constexpr (f_sgidgroups) */
 	        if ((rs == SR_ACCES) || (rs == SR_PERM)) {
 	            rs = u_creat(op->lockfname,0444) ;
 	            lfd = rs ;

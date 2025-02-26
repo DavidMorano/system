@@ -267,7 +267,7 @@ int whitelist_prematch(whitelist *op,cchar *ta) noex {
 	            splitaddr	ac ; /* address-candidate */
 	            if ((rs = splitaddr_start(&ac,ta)) >= 0) {
 	                cchar	*cp ;
-	                for (int i = 0 ; vecstr_get(lp,i,&cp) >= 0 ; i += 1) {
+	                for (int i = 0 ; lp->get(i,&cp) >= 0 ; i += 1) {
 	                    if (cp) {
 	            		splitaddr	aw ; /* address-white */
 	                        if ((rs = splitaddr_start(&aw,cp)) >= 0) {

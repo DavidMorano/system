@@ -61,6 +61,9 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 static int	retpath_iadd(retpath *,cchar *,int) noex ;
