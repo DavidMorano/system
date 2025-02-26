@@ -47,6 +47,8 @@
 
 /* local defines */
 
+#define	MMHV	mailmsghdrval
+
 
 /* imported namespaces */
 
@@ -65,7 +67,7 @@
 
 /* forward references */
 
-static int mailmsghdrval_loadadd(MAILMSGHDRVAL *,cchar *,int) noex ;
+static int mailmsghdrval_loadadd(mailmsghdrval *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -81,10 +83,9 @@ constexpr int		extlen = REALNAMELEN ;
 int mailmsghdrval_start(mailmsghdrval *op,int i,cchar *hp,int hl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    char	*cp{} ;
 	    op->idx = i ;
 	    op->vl = 0 ;
-	    if ((rs = malloc_ml(&cp)) >= 0) {
+	    if (char *cp ; (rs = malloc_ml(&cp)) >= 0) {
 		op->vlen = rs ;
 	        op->vbuf = cp ;
 		op->vbuf[0] = '\0' ;
@@ -133,6 +134,7 @@ int mailmsghdrval_get(mailmsghdrval *op,cchar **vpp,int *vlp) noex {
 	int		rs = SR_FAULT ;
 	int		idx = 0 ;
 	if (op) {
+	    rs = SR_OK ;
 	    if (vpp) *vpp = op->vbuf ;
 	    if (vlp) *vlp = op->vl ;
 	    idx = op->idx ;
