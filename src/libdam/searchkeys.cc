@@ -416,31 +416,34 @@ static int searchkeys_build(SK *op,mainv qsp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	cint		vsz = szof(BUILD_PH) ;
-	cint		vn = 4 ;
-	cint		vo = VECOBJ_OSWAP ;
-	if ((rs = vecobj_start(&bip->phrases,vsz,vn,vo)) >= 0) {
-	    for (int i = 0 ; qsp[i] ; i += 1) {
-	        rs = searchkeys_buildadd(op,bip,qsp[i]) ;
-	        if (rs < 0) break ;
-	    } /* end for */
-	    /* finish up */
-	    if (rs >= 0) {
-		if_constexpr (f_buildreduce) {
-	            rs = searchkeys_buildreduce(op,bip) ;
-		}
+	{
+	    cint	vsz = szof(BUILD_PH) ;
+	    cint	vn = 4 ;
+	    cint	vo = VECOBJ_OSWAP ;
+    	    vecobj	*plp = &bip->phrases ;
+	    if ((rs = plp->start(vsz,vn,vo)) >= 0) {
+	        for (int i = 0 ; qsp[i] ; i += 1) {
+	            rs = searchkeys_buildadd(op,bip,qsp[i]) ;
+	            if (rs < 0) break ;
+	        } /* end for */
+	        /* finish up */
 	        if (rs >= 0) {
-	            rs = searchkeys_buildload(op,bip) ;
-	            c = 0 ;
+		    if_constexpr (f_buildreduce) {
+	                rs = searchkeys_buildreduce(op,bip) ;
+		    }
+	            if (rs >= 0) {
+	                rs = searchkeys_buildload(op,bip) ;
+	                c = 0 ;
+	            }
+	        } /* end if */
+	        {
+	            rs1 = searchkeys_buildfins(op,bip) ;
+	            if (rs >= 0) rs = rs1 ;
 	        }
-	    } /* end if */
-	    {
-	        rs1 = searchkeys_buildfins(op,bip) ;
+	        rs1 = plp->finish ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
-	    rs1 = vecobj_finish(&bip->phrases) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (phrases) */
+	    } /* end if (phrases) */
+	} /* end block */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (searchkeys_build) */
@@ -790,9 +793,10 @@ static int buildphrase_havekey(BUILD_PH *bpp,cchar *kp,int kl) noex {
     	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (bpp && kp) {
+	    vecobj	*wlp = &bpp->words ;
 	    void	*vp{} ;
 	    if (kl < 0) kl = strlen(kp) ;
-	    for (int i = 0 ; vecobj_get(&bpp->words,i,&vp) >= 0 ; i += 1) {
+	    for (int i = 0 ; wlp->get(i,&vp) >= 0 ; i += 1) {
 	        SK_KW	*kep = (SK_KW *) vp ;
 	        if (vp) {
 	            f = (kl == kep->kl) ;

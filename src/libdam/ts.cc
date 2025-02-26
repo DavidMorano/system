@@ -159,7 +159,7 @@
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"ts.h"
-#include	"tse.h"
+#include	"tse.hh"
 #include	"ebuf.h"
 
 
@@ -193,6 +193,8 @@ using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
+
+typedef tse		ts_ent ;
 
 
 /* external subroutines */
@@ -316,16 +318,14 @@ int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 	if ((rs = ts_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        cchar		*cp ;
 	        op->fd = -1 ;
 	        op->oflags = oflags ;
 	        op->operm = operm ;
-
 		if_constexpr (f_creat) {
 	            oflags |= O_CREAT ;
 		}
 	        oflags = (oflags & (~ O_TRUNC)) ;
-	        if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
 		    custime	dt = getustime ;
 	            op->fname = cp ;
 	            if ((rs = ts_fileopen(op,dt)) >= 0) {
@@ -454,7 +454,7 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	        idx = min(nnl,TS_KEYNAMELEN) ;
 	    }
 	    nnl = strnlen(nnp,idx) ;
-	    if (dt == 0) dt = time(nullptr) ;
+	    if (dt == 0) dt = getustime ;
 	    if ((rs = ts_acquire(op,dt,1)) >= 0) {
 	        if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
 	            ei = rs ;
@@ -467,7 +467,7 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	            }
 		    /* update access time as appropriate */
 	            if (op->ncursors == 0) {
-	                if (dt == 0) dt = time(nullptr) ;
+	                if (dt == 0) dt = getustime ;
 	                op->ti_access = dt ;
 	            } else {
 	                op->fl.cursoracc = true ;
@@ -511,7 +511,7 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 
 /* write the entry */
 
-	if (dt == 0) dt = time(nullptr) ;
+	if (dt == 0) dt = getustime ;
 
 	if (rs >= 0) {
 	    ts_ent	ew{} ;
@@ -563,7 +563,7 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	if ((rs >= 0) && op->fl.writable) {
 
 #ifdef	COMMENT
-	    if (dt == 0) dt = time(nullptr) ;
+	    if (dt == 0) dt = getustime ;
 #endif
 
 	    op->h.wcount += 1 ;
@@ -586,7 +586,7 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 /* update access time as appropriate */
 
 	if (op->ncursors == 0) {
-	    if (dt == 0) dt = time(nullptr) ;
+	    if (dt == 0) dt = getustime ;
 	    op->ti_access = dt ;
 	} else {
 	    op->fl.cursoracc = true ;
@@ -667,7 +667,7 @@ int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 	if (rs >= 0) {
 
 	    if (dt == 0)
-	        dt = time(nullptr) ;
+	        dt = getustime ;
 
 	    op->h.wcount += 1 ;
 	    op->h.wtime = dt ;
@@ -693,7 +693,7 @@ ret2:
 
 /* update access time as appropriate */
 	if (op->ncursors == 0) {
-	    if (dt == 0) dt = time(nullptr) ;
+	    if (dt == 0) dt = getustime ;
 	    op->ti_access = dt ;
 	} else {
 	    op->fl.cursoracc = true ;
@@ -711,7 +711,7 @@ int ts_check(ts *op,time_t dt) noex {
 	if ((rs = ts_magic(op)) >= 0) {
 	    if (op->fd >= 0) {
 	        if ((! op->fl.lockedread) && (! op->fl.lockedwrite)) {
-	            if (dt == 0) dt = time(nullptr) ;
+	            if (dt == 0) dt = getustime ;
 	            f = ((dt - op->ti_access) >= TO_ACCESS) ;
 	            f = f || ((dt - op->ti_open) >= TO_OPEN) ;
 	            if (f) {
@@ -773,7 +773,7 @@ static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	    for (i = 0 ; (rs >= 0) && (i < ne) ; i += 1) {
 
 	        cchar	*sp = bp + TSE_OKEYNAME ;
-/* is this a match for what we want? */
+		/* is this a match for what we want? */
 	        if (namematch(sp,nnp,nnl)) {
 		    f_found = true ;
 	            break ;
@@ -1204,10 +1204,9 @@ static int ts_fileopen(ts *op,time_t dt) noex {
 }
 /* end subroutine (ts_fileopen) */
 
-int ts_fileclose(ts *op) noex {
-	int	rs ;
+static int ts_fileclose(ts *op) noex {
+	int	rs = SR_OK ;
 	int	rs1 ;
-	if ((rs = ts_magic(op)) >= 0) {
 	    if (op->fl.ebuf) {
 	        rs1 = ts_ebuffinish(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -1219,7 +1218,6 @@ int ts_fileclose(ts *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->fd = -1 ;
 	    }
-	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ts_fileclose) */

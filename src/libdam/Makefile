@@ -667,7 +667,9 @@ kinfo.o:		kinfo.c kinfo.h
 msfile.o:		msfile.c msfile.h msfilee.h
 msfilee.o:		msfilee.c msfilee.h
 
-ebuf.o:			ebuf.c ebuf.h
+ebuf.o:			ebuf.cc ebuf.h
+ts.o:			ts.cc ts.h tse.hh ebuf.h
+tse.o:			tse.cc tse.hh
 
 mapstrint.o:		mapstrint.c mapstrint.h
 
