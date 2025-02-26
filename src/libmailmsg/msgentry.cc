@@ -126,12 +126,11 @@ int msgentry_loadline(msgentry *mep,cchar *lp,int ll) noex {
 
 int msgentry_loadhdrs(msgentry *mep,fdliner *lsp) noex {
 	int		rs ;
-	int		ll ;
 	int		tlen = 0 ;
 	int		f_eoh = false ;
 	cchar		*lp ;
 	while ((rs = fdliner_getln(lsp,&lp)) > 0) {
-	    ll = rs ;
+	    cint	ll = rs ;
 	    tlen += ll ;
 	    f_eoh = (lp[0] == '\n') ;
 	    if (! f_eoh) {
@@ -187,7 +186,6 @@ int msgentry_setflags(msgentry *mep) noex {
 /* end subroutine (msgentry_setflags) */
 
 int msgentry_setct(msgentry *mep) noex {
-	mhcom		hc ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		hl ;
@@ -195,7 +193,7 @@ int msgentry_setct(msgentry *mep) noex {
 	mep->f.ctplain = true ;
 	if ((hl = mailmsg_hdrval(&mep->m,HN_CTYPE,&hp)) > 0) {
 	    mep->hdr.ctype = true ;
-	    if ((rs = mhcom_start(&hc,hp,hl)) >= 0) {
+	    if (mhcom hc ; (rs = mhcom_start(&hc,hp,hl)) >= 0) {
 		cchar	*vp ;
 	        if (int vl ; (vl = mhcom_getval(&hc,&vp)) > 0) {
 	            if (cchar *tp ; (tp = strnchr(vp,vl,';')) != nullptr) {
@@ -247,7 +245,7 @@ int msgentry_getclines(msgentry *mep) noex {
 	int		rs = SR_OK ;
 	int		clines = 0 ;
 	if (! mep->f.clines) {
-	    cchar		*kn = HN_CLINES ;
+	    cchar	*kn = HN_CLINES ;
 	    mep->f.clines = true ; /* once-flag */
 	    mep->clines = -1 ;
 	    if ((clines = msgentry_gethdrnum(mep,kn)) >= 0) {
@@ -262,21 +260,33 @@ int msgentry_getclines(msgentry *mep) noex {
 /* end subroutine (msgentry_getclines) */
 
 int msgentry_setclines(msgentry *mep,int clines) noex {
-	mep->f.clines = true ;
-	mep->clines = clines ;
-	return SR_OK ;
+    	int		rs = SR_FAULT ;
+	if (mep) {
+	    rs = SR_OK ;
+	    mep->f.clines = true ;
+	    mep->clines = clines ;
+	}
+	return rs ;
 }
 /* end subroutine (msgentry_setclines) */
 
 int msgentry_setoff(msgentry *mep,off_t boff) noex {
-	mep->boff = boff ;
-	return SR_OK ;
+    	int		rs = SR_FAULT ;
+	if (mep) {
+	    rs = SR_OK ;
+	    mep->boff = boff ;
+	}
+	return rs ;
 }
 /* end subroutine (msgentry_setoff) */
 
 int msgentry_setlen(msgentry *mep,int blen) noex {
-	mep->blen = blen ;
-	return SR_OK ;
+    	int		rs = SR_FAULT ;
+	if (mep) {
+	    rs = SR_OK ;
+	    mep->blen = blen ;
+	}
+	return rs ;
 }
 /* end subroutine (msgentry_setoff) */
 

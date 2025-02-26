@@ -32,11 +32,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* |off_t| */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<stdlib.h>
+#include	<string.h>		/* |memcpy(3c)| */
 #include	<usystem.h>
 #include	<mailmsg.h>
 #include	<fdliner.h>

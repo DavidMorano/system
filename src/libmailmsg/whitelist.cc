@@ -27,15 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<strings.h>		/* for |strcasecmp(3c)| */
-#include	<netdb.h>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<vecstr.h>
-#include	<field.h>
 #include	<bfile.h>
 #include	<bfliner.h>
 #include	<sfx.h>			/* |sfconrtent(3uc)| */

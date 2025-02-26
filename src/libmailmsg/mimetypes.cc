@@ -37,7 +37,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -216,6 +215,7 @@ int mimetypes_file(mt *op,cchar *fname) noex {
 
 static int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
 	cnullptr	np{} ;
+	cint		rsn = SR_NOTFOUND ;
     	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -236,7 +236,7 @@ static int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
 			cchar	*kp{} ;
 			key.buf = fp ;
 			key.len = fl ;
-                        if (hdb_fetch(op->dbp,key,np,&data) < 0) {
+                        if ((rs = hdb_fetch(op->dbp,key,np,&data)) == rsn) {
                             char    *bkp, *bvp ;
                             size = key.len + 1 + ctl + 1 ;
                             rs = uc_malloc(size,&bkp) ;
@@ -281,7 +281,7 @@ int mimetypes_find(mt *op,char *typespec,cchar *ext) noex {
 	    }
 	    if (tp[0] != '\0') {
 	        mt_dat	key ;
-	        mt_dat	data{} ;
+	        mt_dat	data ;
 	        key.len = -1 ;
 	        key.buf = tp ;
 	        if ((rs = hdb_fetch(op->dbp,key,nullptr,&data)) >= 0) {

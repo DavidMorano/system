@@ -1,4 +1,4 @@
-/* mhcom HEADER */
+/* mhcom HEADER (Message header Comment) */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 

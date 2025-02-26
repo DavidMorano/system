@@ -34,13 +34,10 @@
 **************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<sbuf.h>
@@ -78,9 +75,13 @@ static int	retpath_iadd(retpath *,cchar *,int) noex ;
 /* exported subroutines */
 
 int retpath_start(retpath *plp) noex {
-    	cint		vn = 10 ;
-	cint		vo = VECSTR_OORDERED ;
-	return vecstr_start(plp,vn,vo) ;
+    	int		rs = SR_FAULT ;
+	if (plp) {
+    	    cint	vn = 10 ;
+	    cint	vo = VECSTR_OORDERED ;
+	    rs = vecstr_start(plp,vn,vo) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (retpath_start) */
 
@@ -113,15 +114,15 @@ int retpath_add(retpath *plp,cchar *sp,int sl) noex {
 
 /* add ret-path entries by parsing a string of them */
 int retpath_parse(retpath *plp,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
 	if (plp && sp) {
 	    int		cl ;
-	    cchar	*tp ;
 	    cchar	*cp ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    rs = SR_OK ;
-	    while ((tp = strnpbrk(sp,sl,"!@,%:")) != nullptr) {
+	    for (cchar *tp ; (tp = strnpbrk(sp,sl,"!@,%:")) != np ; ) {
 	        if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
 	            n += 1 ;
 	            rs = retpath_iadd(plp,cp,cl) ;

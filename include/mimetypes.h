@@ -19,7 +19,6 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<hdb.h>
-#include	<localmisc.h>		/* |MAXNAMELEN| */
 
 
 #define	MIMETYPES		mimetypes_head

@@ -1,4 +1,4 @@
-/* mhcom SUPPORT */
+/* mhcom SUPPORT (Message Header Comment) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
