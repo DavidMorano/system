@@ -100,23 +100,26 @@ int tse::all(bool frd,char *abuf,int alen) noex {
 	int		rs1 ;
 	if (alen < 0) alen = INT_MAX ;
 	if (abuf) {
-	    if (serialbuf sb ; (rs = sb.start(abuf,alen)) >= 0) {
-		if (frd) {
-	            sb << count ;
-	            sb << utime ;
-	            sb << ctime ;
-	            sb << hash ;
-	            sb.wstrn(keyname,TSE_LKEYNAME) ;
-		} else {
-	            sb >> count ;
-	            sb >> utime ;
-	            sb >> ctime ;
-	            sb >> hash ;
-	            sb.rstrn(keyname,TSE_LKEYNAME) ;
-	        }
-	        rs1 = sb.finish ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (serialbuf) */
+	    rs = SR_INVALID ;
+	    if (alen > 0) {
+	        if (serialbuf sb ; (rs = sb.start(abuf,alen)) >= 0) {
+		    if (frd) {
+	                sb << count ;
+	                sb << utime ;
+	                sb << ctime ;
+	                sb << hash ;
+	                sb.wstrn(keyname,TSE_LKEYNAME) ;
+		    } else {
+	                sb >> count ;
+	                sb >> utime ;
+	                sb >> ctime ;
+	                sb >> hash ;
+	                sb.rstrn(keyname,TSE_LKEYNAME) ;
+	            }
+	            rs1 = sb.finish ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (serialbuf) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -126,24 +129,27 @@ int tse::update(bool frd,char *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (abuf) {
-	    /* go to where this data is in the message buffer */
-	    abuf += TSE_OCOUNT ;
-	    alen -= TSE_OCOUNT ;
-	    /* proceed as normal (?) :-) */
-	    if (serialbuf sb ; (rs = sb.start(abuf,alen)) >= 0) {
-	        if (frd) {
-	            sb << count ;
-	            sb << utime ;
-	        } else {
-	            sb >> count ;
-	            sb >> utime ;
-	        } /* end if */
-	        rs1 = sb.finish ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (serialbuf) */
-	    if (rs >= 0) {
-	        rs += TSE_OCOUNT ;
-	    }
+	    rs = SR_INVALID ;
+	    if (alen > 0) {
+	        /* go to where this data is in the message buffer */
+	        abuf += TSE_OCOUNT ;
+	        alen -= TSE_OCOUNT ;
+	        /* proceed as normal (?) :-) */
+	        if (serialbuf sb ; (rs = sb.start(abuf,alen)) >= 0) {
+	            if (frd) {
+	                sb << count ;
+	                sb << utime ;
+	            } else {
+	                sb >> count ;
+	                sb >> utime ;
+	            } /* end if */
+	            rs1 = sb.finish ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (serialbuf) */
+	        if (rs >= 0) {
+	            rs += TSE_OCOUNT ;
+	        }
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }

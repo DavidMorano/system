@@ -436,7 +436,7 @@ int ts_curenum(ts *op,ts_cur *curp,ts_ent *ep) noex {
 	        ei = (curp->i < 0) ? 0 : curp->i + 1 ;
 	        if (char *bp ; (rs = ts_readentry(op,ei,&bp)) >= 0) {
 	            if (ep && bp) {
-	                rs = tse_all(ep,1,bp,szent) ;
+	                rs = ep->wr(bp,szent) ;
 		    }
 	        } /* end if */
 	        if (rs >= 0) {
@@ -463,8 +463,8 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	    if ((rs = ts_acquire(op,dt,1)) >= 0) {
 	        if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
 	            ei = rs ;
-	            if (ep) {
-	                rs = tse_all(ep,1,bp,szent) ;
+	            if (ep && bp) {
+	                rs = ep->wr(bp,szent) ;
 	            } /* end if */
 		    /* optionally release our lock */
 	            if (op->ncursors == 0) {
@@ -511,7 +511,7 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	            if (ew.hash == 0) {
 		        ew.hash = hash_elf(ew.keyname,-1) ;
 	            }
-	            if ((rs = tse_all(&ew,0,bp,szent)) >= 0) {
+	            if ((rs = ew.rd(bp,szent)) >= 0) {
 	                rs = ebuf_write(op->ebmp,ei,nullptr) ; /* sync */
 		    }
 	        } else if (rs == SR_NOTFOUND) {
@@ -525,7 +525,7 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 		        strdcpy1w(ew.keyname,TSE_LKEYNAME,nnp,nnl) ;
 	            }
 	            if (ew.hash == 0) ew.hash = hash_elf(ew.keyname,-1) ;
-	            if ((rs = tse_all(&ew,0,ebuf,szent)) >= 0) {
+	            if ((rs = ew.rd(ebuf,szent)) >= 0) {
 	                ei = op->h.nentries ;
 	                rs = ebuf_write(op->ebmp,ei,ebuf) ;
 		    }
@@ -598,14 +598,11 @@ int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 /* update the entry that we found and write it back */
 
 	if (rs >= 0) {
-	    ts_ent	ew ;
-
-	    tse_all(&ew,1,bp,szent) ;
-
+	    ts_ent	ew{} ;
+	    ew.wr(bp,szent) ;
 	    ew.utime = dt ;
 	    ew.count += 1 ;
-	    tse_all(&ew,0,bp,szent) ;
-
+	    ew.rd(bp,szent) ;
 	    rs = ebuf_write(op->ebmp,ei,nullptr) ; /* sync */
 
 	} else if (rs == SR_NOTFOUND) {
@@ -617,7 +614,7 @@ int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 	    if (ew.ctime == 0) ew.ctime = dt ;
 	    ew.hash = hash_elf(ew.keyname,-1) ;
 
-	    tse_all(&ew,0,ebuf,szent) ;
+	    ew.rd(ebuf,szent) ;
 
 	    ei = op->h.nentries ;
 	    rs = ebuf_write(op->ebmp,ei,ebuf) ;
