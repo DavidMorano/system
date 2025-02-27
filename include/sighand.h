@@ -30,6 +30,14 @@
 #define	SIGHAND_HA	struct sighand_handle
 
 
+#ifndef	SIGHANDF_TYPEDEF
+#define	SIGHANDF_TYPEDEF
+EXTERNC_begin
+typedef void (*sighand_f)(int,siginfo_t *,void *) noex ;
+EXTERNC_end
+#endif /* SIGHANDF_TYPEDEF */
+
+
 struct sighand_handle {
 	SIGACTION	action ;
 	int		sig ;
@@ -49,7 +57,6 @@ typedef	SIGHAND_HA	sighand_ha ;
 EXTERNC_begin
 
 typedef void (*sighand_handler)(int,siginfo_t *,void *) noex ;
-typedef void (*sighand_f)(int,siginfo_t *,void *) noex ;
 
 extern int sighand_start(sighand *,cint *,cint *,cint *,sighand_f) noex ;
 extern int sighand_finish(sighand *) noex ;

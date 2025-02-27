@@ -1,4 +1,5 @@
 /* progsig HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* program signal handling */
@@ -29,10 +30,10 @@
 
 #define	PROGSIG_NENTS	30
 #define	PROGSIG_NOTE	struct progsig_noter
-
+/* options */
 #define	PROGSIG_RMKSH	(1<<0)
 #define	PROGSIG_RMMAIN	(1<<1)
-
+/* lengths */
 #define	PROGSIG_NBUFLEN	100
 #define	PROGSIG_USERLEN	100
 
