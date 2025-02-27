@@ -7,7 +7,7 @@
 
 #define	CF_CREAT	0		/* always create the file? */
 #define	CF_LOCKF	0		/* use |lockf(3c)| */
-#define	CF_SOLARISBUG	1		/* work around Solaris MMAP bug */
+#define	CF_SOLARISBUG	1		/* work around Solaris® MMAP bug */
 #define	CF_NIENUM	0		/* perform NI updates on ENUM */
 #define	CF_NISEARCH	0		/* perform NI updates on SEARCH */
 
@@ -18,20 +18,20 @@
 
 	= 1999-06-26, David A­D­ Morano
 	Although this object works, it was only a micracle that it
-	did.  There is a feature-bug in Solaris that does not allow
+	did.  There is a feature-bug in Solaris® that does not allow
 	a file to be both mapped and locked at the same time (in
 	either order).  But there seems to be a crack in the stupid
-	Solaris implementation because it does not enforce its stupid
+	Solaris® implementation because it does not enforce its stupid
 	bug carefully enough and this object here fell through the
 	cracks and continued working by accident.  We were locking
 	the whole file beyond its end and that appears to get by
-	the Solaris police-state bug-patrol and was accidentally
+	the Solaris® police-state bug-patrol and was accidentally
 	being allowed.  I reworked a good bit of this code to
 	eliminate any file mapping (so that we can continue to use
-	file-record locks).  This whole Solaris crap (this is being
-	done on Solaris 8 right now) is really a pain and Sun should
+	file-record locks).  This whole Solaris® crap (this is being
+	done on Solaris® 8 right now) is really a pain and Sun should
 	face punitive charges for inhumanity to the programmer
-	community.  Solaris has some nice things since it was derived
+	community.  Solaris® has some nice things since it was derived
 	from the older (and better?) System V UNIX®, but has really
 	messed it up by not allowing what used to be allowed in the
 	old days with things like the old RFS facility.  Oh, while
@@ -53,11 +53,11 @@
 	- (see the 'entry' structure in the header)
 
 	Design note: 
-	In summary, Solaris sucks cock meat!  Solaris does not allow
+	In summary, Solaris® sucks cock meat!  Solaris® does not allow
 	a file to be memory-mapped from an NFS remote server *and*
-	also be file-locked at the same time.  A lot of stupid Solaris
+	also be file-locked at the same time.  A lot of stupid Solaris®
 	documentation notes say something to the effect that the
-	Solaris VM system cannot handle a remote file that is both
+	Solaris® VM system cannot handle a remote file that is both
 	mapped and subject to file-locking at the same time.  They
 	use some sort of stupid circular reasoning that if any file
 	is being file-locked, then obviously it cannot be memory-mapped
@@ -73,29 +73,29 @@
 	Remote files were cross mounted in the late 80s and very
 	early 90s using RFS (not stupid NFS).  The use of RFS provided
 	many advantages not the least of them being full UFS
-	file-system semantics, but it is not clear why Solaris took
+	file-system semantics, but it is not clear why Solaris® took
 	a step backward from simply allowing remote files to be
 	both memory-mapped and file-locked at the same time.  Some
 	bright light-bulb of a software developer must have gotten
 	his underwear in a bunch at some point and decided to
 	disallow both of these from ever occurring at the same time
-	in Solaris.  We all have suffered from these dumb-butt Solaris
+	in Solaris®.  We all have suffered from these dumb-butt Solaris®
 	developers since we have to take time out to re-debug-write
 	old code (like this code here) to handle the case of stupid
-	Solaris not allowing memory mapping for a file that is also
+	Solaris® not allowing memory mapping for a file that is also
 	file-locked.
 
 	Implementation note:
 	The code was actually running when files were being locked
 	in their entirety and beyond their ends.  There was some
-	sort of loop-hole in the stupid Solaris code that allowed
+	sort of loop-hole in the stupid Solaris® code that allowed
 	a file to be both file-locked and memory mapped at the same
 	time under certain circumstances.  However, there seemed to
 	be problems with this code when other parties on other
 	(remote) systems tried to do the same thing.  They sometimes
 	failed with dead-lock types of errors (I forget the details).
 	As a result, I decided to change the code to fully comply
-	with the stupid Solaris requirements that no remote file
+	with the stupid Solaris® requirements that no remote file
 	be both memory mapped and file locked at the same time.  Any
 	code that is here now that has to be with mapping of files
 	is really just code that now allocates local private memory.
@@ -103,22 +103,22 @@
 	really done because it seemed to offer the minimal changes
 	to the code to get a private memory access to the file while
 	still retaining the ability to file-lock the file.  Finally,
-	let me finish with the comment that Solaris sucks cock meat.
+	let me finish with the comment that Solaris® sucks cock meat.
 
 	Final note:
-	Solaris sucks cock meat! Give me back simultaneous memory
+	Solaris® sucks cock meat! Give me back simultaneous memory
 	mapping and file locking.  And while you're at it, give me
-	back RFS also! And to you stupid Solaris VM developers, get
-	out of Solaris development.  Either get a new job somewhere
+	back RFS also! And to you stupid Solaris® VM developers, get
+	out of Solaris® development.  Either get a new job somewhere
 	else or think about committing suicide.  Either way, we can
 	all be happier with one (or more) of those alternatives.
 
 	Anecdotal note:
-	Hey, you stupid Solaris developers: give me back the ability
-	to push SOCKMOD on a TPI endpoint also! Since you're so
-	stupid, I know that you forgot that this was possible at
+	Hey, you stupid Solaris® developers: give me back the ability
+	to push SOCKMOD on a TPI endpoint also!  Since you're so
+	stupid,  I know that you forgot that this was possible at
 	one time.  You hosed that ability away when you botched up
-	making Solaris 2.6.
+	making Solaris® 2.6.
 
 ******************************************************************************/
 
@@ -297,10 +297,11 @@ static bool	namematch(cchar *,cchar *,int) noex ;
 
 constexpr int		toplen = TS_TOPLEN ;
 constexpr int		taboff = TS_TABOFF ;
-constexpr int		entsize = TS_ENTSIZE ;
+constexpr int		szent = TS_ENTSIZE ;
 constexpr int		nidxent = TS_NIDXENT ;
 constexpr int		maglen = TS_FILEMAGICSIZE ;
 
+constexpr bool		f_comment = false ;
 constexpr bool		f_sunos = F_SUNOS ;
 
 constexpr bool		f_creat = CF_CREAT ;
@@ -325,7 +326,7 @@ int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 	        op->operm = operm ;
 		if_constexpr (f_creat) {
 	            oflags |= O_CREAT ;
-		}
+		} /* end if_constexpr (f_creat) */
 	        oflags = (oflags & (~ O_TRUNC)) ;
 	        if (cchar *cp ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
 		    custime	dt = getustime ;
@@ -383,9 +384,9 @@ int ts_close(ts *op) noex {
 
 int ts_count(ts *op) noex {
 	int		rs ;
-	int		c ;
+	int		c = 0 ;
 	if ((rs = ts_magic(op)) >= 0) {
-	    c = (op->filesize - taboff) / entsize ;
+	    c = (op->filesize - taboff) / szent ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -432,13 +433,15 @@ int ts_curenum(ts *op,ts_cur *curp,ts_ent *ep) noex {
 	if ((rs = ts_magic(op,curp)) >= 0) {
 	    custime	dt = getustime ;
 	    if ((rs = ts_acquire(op,dt,1)) >= 0) {
-	        char	*bp ;
 	        ei = (curp->i < 0) ? 0 : curp->i + 1 ;
-	        rs = ts_readentry(op,ei,&bp) ;
-	        if ((rs >= 0) && (ep != nullptr) && (bp != nullptr)) {
-	            rs = tse_all(ep,1,bp,entsize) ;
+	        if (char *bp ; (rs = ts_readentry(op,ei,&bp)) >= 0) {
+	            if (ep && bp) {
+	                rs = tse_all(ep,1,bp,szent) ;
+		    }
 	        } /* end if */
-	        if (rs >= 0) curp->i = ei ;
+	        if (rs >= 0) {
+		    curp->i = ei ;
+		}
 	        op->fl.cursoracc = true ;
 	    } /* end if (acquire) */
 	} /* end if (magic) */
@@ -461,7 +464,7 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	        if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
 	            ei = rs ;
 	            if (ep) {
-	                rs = tse_all(ep,1,bp,entsize) ;
+	                rs = tse_all(ep,1,bp,szent) ;
 	            } /* end if */
 		    /* optionally release our lock */
 	            if (op->ncursors == 0) {
@@ -483,118 +486,75 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 
 /* write an entry (match on a key-name) */
 int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
-	int		rs = SR_OK ;
-	int		i ;
-	int		ei ;
-	int		f_newentry = false ;
-	char		*bp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
-
-	if (nnp == nullptr) return SR_FAULT ;
-
-#ifdef	COMMENT
-	if (ep == nullptr) return SR_FAULT ;
-#endif
-
-	i = TS_KEYNAMELEN ;
-	if (nnl >= 0) {
-	    i = MIN(nnl,TS_KEYNAMELEN) ;
-	}
-	nnl = strnlen(nnp,i) ;
-
-	rs = ts_acquire(op,dt,1) ;
-	if (rs < 0)
-	     goto ret0 ;
-
-	rs = ts_findname(op,nnp,nnl,&bp) ;
-	ei = rs ;
-
-/* write the entry */
-
-	if (dt == 0) dt = getustime ;
-
-	if (rs >= 0) {
-	    ts_ent	ew{} ;
-
-  	    if (ep)
-		ew = *ep ;
+	int		rs ;
+	int		ei = 0 ;
+	if ((rs = ts_magic(op,nnp,ep)) >= 0) {
+	    int		i = TS_KEYNAMELEN ;
+	    bool	f_newentry = false ;
+	    if (nnl >= 0) {
+	        i = min(nnl,TS_KEYNAMELEN) ;
 	    }
-
-	    if (ew.count == 0) ew.count = 1 ;
-	    if (ew.utime == 0) ew.utime = dt ;
-	    if (ew.ctime == 0) ew.ctime = dt ;
-	    if (ew.keyname[0] == '\0') {
-		strdcpy1w(ew.keyname,TSE_LKEYNAME,nnp,nnl) ;
-	    }
-	    if (ew.hash == 0) {
-		ew.hash = hash_elf(ew.keyname,-1) ;
-	    }
-
-	    tse_all(&ew,0,bp,entsize) ;
-
-	    rs = ebuf_write(op->ebmp,ei,nullptr) ; /* sync */
-
-	} else if (rs == SR_NOTFOUND) {
-	    ts_ent	ew{} ;
-	    char	ebuf[TS_ENTSIZE + 2] ;
-
-	    f_newentry = true ;
-  	    if (ep != nullptr) {
-		ew = *ep ;
-	    }
-
-	    if (ew.count == 0) ew.count = 1 ;
-	    if (ew.utime == 0) ew.utime = dt ;
-	    if (ew.ctime == 0) ew.ctime = dt ;
-	    if (ew.keyname[0] == '\0') {
-		strdcpy1w(ew.keyname,TSE_LKEYNAME,nnp,nnl) ;
-	    }
-	    if (ew.hash == 0) ew.hash = hash_elf(ew.keyname,-1) ;
-
-	    tse_all(&ew,0,ebuf,entsize) ;
-
-	    ei = op->h.nentries ;
-	    rs = ebuf_write(op->ebmp,ei,ebuf) ;
-
-	} /* end if (existing or new entry) */
-
-/* update the file header-table (for a write) */
-
-	if ((rs >= 0) && op->fl.writable) {
-
-#ifdef	COMMENT
-	    if (dt == 0) dt = getustime ;
-#endif
-
-	    op->h.wcount += 1 ;
-	    op->h.wtime = dt ;
-	    if (f_newentry) {
-	        op->h.nentries += 1 ;
-	        op->filesize += entsize ;
-	    }
-	    if ((rs = ts_headwrite(op)) >= 0) {
-		rs = ebuf_sync(op->ebmp) ;
-	    }
-
-	} /* end if (updating header-table) */
-
-/* optionally release our lock if we didn't have a cursor outstanding */
-
-	if (op->ncursors == 0)
-	    ts_lockrelease(op) ;
-
-/* update access time as appropriate */
-
-	if (op->ncursors == 0) {
-	    if (dt == 0) dt = getustime ;
-	    op->ti_access = dt ;
-	} else {
-	    op->fl.cursoracc = true ;
-	}
-
-ret0:
+	    nnl = strnlen(nnp,i) ;
+	    if ((rs = ts_acquire(op,dt,1)) >= 0) {
+	    	ts_ent	ew{} ;
+	        if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
+		    ei = rs ;
+		    /* write the entry */
+		    if (dt == 0) dt = getustime ;
+  	            if (ep) ew = *ep ;
+	            if (ew.count == 0) ew.count = 1 ;
+	            if (ew.utime == 0) ew.utime = dt ;
+	            if (ew.ctime == 0) ew.ctime = dt ;
+	            if (ew.keyname[0] == '\0') {
+		        strdcpy1w(ew.keyname,TSE_LKEYNAME,nnp,nnl) ;
+	            }
+	            if (ew.hash == 0) {
+		        ew.hash = hash_elf(ew.keyname,-1) ;
+	            }
+	            if ((rs = tse_all(&ew,0,bp,szent)) >= 0) {
+	                rs = ebuf_write(op->ebmp,ei,nullptr) ; /* sync */
+		    }
+	        } else if (rs == SR_NOTFOUND) {
+	            char	ebuf[TS_ENTSIZE + 2] ;
+	            f_newentry = true ;
+  	            if (ep) ew = *ep ;
+	            if (ew.count == 0) ew.count = 1 ;
+	            if (ew.utime == 0) ew.utime = dt ;
+	            if (ew.ctime == 0) ew.ctime = dt ;
+	            if (ew.keyname[0] == '\0') {
+		        strdcpy1w(ew.keyname,TSE_LKEYNAME,nnp,nnl) ;
+	            }
+	            if (ew.hash == 0) ew.hash = hash_elf(ew.keyname,-1) ;
+	            if ((rs = tse_all(&ew,0,ebuf,szent)) >= 0) {
+	                ei = op->h.nentries ;
+	                rs = ebuf_write(op->ebmp,ei,ebuf) ;
+		    }
+	        } /* end if (existing or new entry) */
+		/* update the file header-table (for a write) */
+	        if ((rs >= 0) && op->fl.writable) {
+	            op->h.wcount += 1 ;
+	            op->h.wtime = dt ;
+	            if (f_newentry) {
+	                op->h.nentries += 1 ;
+	                op->filesize += szent ;
+	            }
+	            if ((rs = ts_headwrite(op)) >= 0) {
+		        rs = ebuf_sync(op->ebmp) ;
+	            }
+	        } /* end if (updating header-table) */
+	        /* optionally release our lock if no cursor outstanding */
+	        if (op->ncursors == 0) {
+	    	    ts_lockrelease(op) ;
+		}
+		/* update access time as appropriate */
+	        if (op->ncursors == 0) {
+	            if (dt == 0) dt = getustime ;
+	            op->ti_access = dt ;
+	        } else {
+	            op->fl.cursoracc = true ;
+	        }
+	    } /* end if (ts_acquire) */
+	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
 }
 /* end subroutine (ts_write) */
@@ -605,8 +565,8 @@ int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 	int		rs1 ;
 	int		nnl ;
 	int		ei ;
-	int		f_newentry = false ;
-	cchar	*nnp ;
+	bool		f_newentry = false ;
+	cchar		*nnp ;
 	char		ebuf[TS_ENTSIZE + 2] ;
 	char		*bp ;
 
@@ -640,11 +600,11 @@ int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 	if (rs >= 0) {
 	    ts_ent	ew ;
 
-	    tse_all(&ew,1,bp,entsize) ;
+	    tse_all(&ew,1,bp,szent) ;
 
 	    ew.utime = dt ;
 	    ew.count += 1 ;
-	    tse_all(&ew,0,bp,entsize) ;
+	    tse_all(&ew,0,bp,szent) ;
 
 	    rs = ebuf_write(op->ebmp,ei,nullptr) ; /* sync */
 
@@ -657,7 +617,7 @@ int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 	    if (ew.ctime == 0) ew.ctime = dt ;
 	    ew.hash = hash_elf(ew.keyname,-1) ;
 
-	    tse_all(&ew,0,ebuf,entsize) ;
+	    tse_all(&ew,0,ebuf,szent) ;
 
 	    ei = op->h.nentries ;
 	    rs = ebuf_write(op->ebmp,ei,ebuf) ;
@@ -675,7 +635,7 @@ int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 	    op->h.wtime = dt ;
 	    if (f_newentry) {
 	        op->h.nentries += 1 ;
-	        op->filesize += entsize ;
+	        op->filesize += szent ;
 	    }
 
 	    rs = ts_headwrite(op) ;
@@ -758,38 +718,27 @@ static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 /* search for an entry */
 static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	int		rs = SR_OK ;
-	int		i ;
 	int		ne = 0 ;
 	int		ei = 0 ;
-	int		f_found = false ;
+	bool		f_found = false ;
 	char		*bp = nullptr ;
-
 	if (nnl < 0) nnl = strlen(nnp) ;
-
 	while ((rs >= 0) && (! f_found)) {
-
 	    rs = ebuf_read(op->ebmp,ei,&bp) ;
 	    ne = rs ;
 	    if (rs <= 0) break ;
-
-	    for (i = 0 ; (rs >= 0) && (i < ne) ; i += 1) {
-
+	    for (int i = 0 ; (rs >= 0) && (i < ne) ; i += 1) {
 	        cchar	*sp = bp + TSE_OKEYNAME ;
 		/* is this a match for what we want? */
 	        if (namematch(sp,nnp,nnl)) {
 		    f_found = true ;
 	            break ;
 		}
-
-		bp += entsize ;
-
+		bp += szent ;
 	    } /* end for (looping through entries) */
-
 	    ei += i ;
-
 	    if (f_found) break ;
 	} /* end while */
-
 	if (rs >= 0) {
 	    if ((ne != 0) && f_found) {
 		if (rpp) {
@@ -799,7 +748,6 @@ static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	        rs = SR_NOTFOUND ;
 	    }
 	} /* end if */
-
 	return (rs >= 0) ? ei : rs ;
 }
 /* end subroutine (ts_search) */
@@ -807,35 +755,27 @@ static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 static int ts_acquire(ts *op,time_t dt,int f_read) noex {
 	int		rs = SR_OK ;
 	int		f_changed = false ;
-	int		f ;
-
 	if (dt == 0) dt = getustime ;
-
-/* is the file open? */
-
-	if (op->fd < 0) {
-	    rs = ts_fileopen(op,dt) ;
-	}
-
-	if ((rs >= 0) && (! f_read) && op->fl.lockedread) {
-	    rs = ts_lockrelease(op) ;
-	}
-
-/* capture the lock if we do not already have it */
-
-	f = (op->fl.lockedread || op->fl.lockedwrite) ;
-	if ((rs >= 0) && (! f)) {
-	    if ((rs = ts_lockget(op,dt,f_read)) >= 0) {
-	        f_changed = (rs > 0) ;
-	        rs = ts_filecheck(op,dt) ;
-	        f_changed = f_changed || (rs > 0) ;
-	        if ((rs >= 0) && f_changed) {
-		    int n = (op->filesize - toplen) / entsize ;
-	            rs = ebuf_invalidate(op->ebmp,n) ;
-		}
+	if ((rs = ts_fileopen(op,dt)) >= 0) {
+	    bool	f ;
+	    if ((! f_read) && op->fl.lockedread) {
+	        rs = ts_lockrelease(op) ;
 	    }
-	} /* end if (need lock) */
-
+	    /* capture the lock if we do not already have it */
+	    f = (op->fl.lockedread || op->fl.lockedwrite) ;
+	    if ((rs >= 0) && (! f)) {
+	        if ((rs = ts_lockget(op,dt,f_read)) >= 0) {
+	            f_changed = (rs > 0) ;
+	            if ((rs = ts_filecheck(op,dt)) >= 0) {
+	                f_changed = f_changed || (rs > 0) ;
+	                if (f_changed) {
+		            cint	n = (op->filesize - toplen) / szent ;
+	                    rs = ebuf_invalidate(op->ebmp,n) ;
+		        }
+		    }
+	        }
+	    } /* end if (need lock) */
+	} /* end if (ts_fileopen) */
 	return (rs >= 0) ? f_changed : rs ;
 }
 /* end subroutine (ts_acquire) */
@@ -843,66 +783,51 @@ static int ts_acquire(ts *op,time_t dt,int f_read) noex {
 /* initialize the file header (either read it only or write it) */
 static int ts_filebegin(ts *op,time_t dt) noex {
 	int		rs = SR_OK ;
-	int		f_locked = false ;
-	int		f ;
-
+	bool		f_locked = false ;
 	if (op->filesize == 0) {
-
 	    op->fl.fileinit = false ;
 	    if (op->fl.writable) {
-
 		if (op->fl.lockedread) {
 		    rs = ts_lockrelease(op) ;
 		}
-
 	        if ((rs >= 0) && (! op->fl.lockedwrite)) {
 	            f_locked = true ;
 	            rs = ts_lockget(op,dt,0) ;
 	        }
-
 		if (rs >= 0) {
 	            rs = ts_filetopwrite(op,dt) ;
 	            f_locked = (rs > 0) ;
 		}
-
 	    } /* end if (writable) */
-
 	} else if (op->filesize >= taboff) {
-
-/* read the file header */
-
-	    f = (op->fl.lockedread || op->fl.lockedwrite) ;
+	    /* read the file header */
+	    bool	f = (op->fl.lockedread || op->fl.lockedwrite) ;
 	    if (! f) {
 	        rs = ts_lockget(op,dt,1) ;
 	        f_locked = (rs >= 0) ;
 	    }
-
-	    if (rs >= 0)
+	    if (rs >= 0) {
 	        rs = ts_filetopread(op) ;
-
-	    if (rs >= 0)
+	    }
+	    if (rs >= 0) {
 	        rs = ts_fileverify(op) ;
-
+	    }
 	    if (rs >= 0) {
 	        rs = ts_headtab(op,1) ;
 	        op->fl.fileinit = (rs >= 0) ;
 	    }
-
 	} /* end if */
-
-/* if we locked, we unlock it, otherwise leave it! */
-
+	/* if we locked, we unlock it, otherwise leave it! */
 	if (f_locked) {
 	    ts_lockrelease(op) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (ts_filebegin) */
 
 static int ts_filecheck(ts *op,time_t dt) noex {
-	int	rs = SR_OK ;
-	int	f_changed = false ;
+	int		rs = SR_OK ;
+	int		f_changed = false ;
 	if (op->filesize < taboff) {
 	    f_changed = true ;
 	    if (op->fl.writable) {
@@ -1209,33 +1134,31 @@ static int ts_fileopen(ts *op,time_t dt) noex {
 static int ts_fileclose(ts *op) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-	    if (op->fl.ebuf) {
-	        rs1 = ts_ebuffinish(op) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    if (op->fd >= 0) {
-	        op->fl.lockedread = false ;
-	        op->fl.lockedwrite = false ;
-	        rs1 = u_close(op->fd) ;
-	        if (rs >= 0) rs = rs1 ;
-	        op->fd = -1 ;
-	    }
+	if (op->fl.ebuf) {
+	    rs1 = ts_ebuffinish(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	if (op->fd >= 0) {
+	    op->fl.lockedread = false ;
+	    op->fl.lockedwrite = false ;
+	    rs1 = u_close(op->fd) ;
+	    if (rs >= 0) rs = rs1 ;
+	    op->fd = -1 ;
+	}
 	return rs ;
 }
 /* end subroutine (ts_fileclose) */
 
 static int ts_filesetinfo(ts *op,time_t dt) noex {
-	USTAT		sb ;
 	int		rs ;
 	int		rs1 ;
 	int		am = (op->oflags & O_ACCMODE) ;
 	(void) dt ;
 	op->fl.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
-	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-	    char	*fsbuf{} ;
+	if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 	    op->ti_mod = sb.st_mtime ;
 	    op->filesize = sb.st_size ;
-	    if ((rs = malloc_fs(&fsbuf)) >= 0) {
+	    if (char *fsbuf ; (rs = malloc_fs(&fsbuf)) >= 0) {
 		cint	fslen = rs ;
 	        if ((rs = getfstype(fsbuf,fslen,op->fd)) >= 0) {
 		    cbool	f = (matlocalfs(fsbuf,rs) >= 0) ;

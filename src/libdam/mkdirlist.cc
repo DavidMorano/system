@@ -112,10 +112,12 @@ extern "C" {
 
 /* local structures */
 
-struct vars {
+namespace {
+    struct vars {
 	int		maxpathlen ;
 	operator int () noex ;
-} ;
+    } ; /* end struct (vars) */
+}
 
 
 /* forward references */
@@ -381,10 +383,10 @@ int mkdirlist_audit(mkdirlist *op) noex {
 
 static int mkdirlist_pdc(mkdirlist *op,cchar *ndn,int fd) noex {
 	cint		plen = var.maxpathlen ;
+	cint		sz = ((var.maxpathlen + 1) * 2) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	int		sz = ((var.maxpathlen + 1) * 2) ;
 	int		ai = 0 ;
 	cchar		*dcm = MKDIRLIST_DCMAGIC ;
 	if (char *ap{} ; (rs = uc_malloc(sz,&ap)) >= 0) {
@@ -506,19 +508,21 @@ static int mkdirlist_finents(mkdirlist *op) noex {
 /* end subroutine (mkdirlist_finents) */
 
 static int entry_start(ENT *ep,USTAT *sbp,cchar *dbuf,int dlen) noex {
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	memclear(ep) ; /* dangerous */
-	if (cchar *cp{} ; (rs = uc_mallocstrw(dbuf,dlen,&cp)) >= 0) {
-	    cint	nlen = rs ;
-	    ep->name = cp ;
-	    c += 1 ;
-	    ep->nlen = nlen ;
-	    ep->mode = sbp->st_mode ;
-	    ep->mtime = sbp->st_mtime ;
-	    ep->ino = sbp->st_ino ;
-	    ep->dev = sbp->st_dev ;
-	} /* end if (memory-allocation) */
+	if (ep) {
+	    memclear(ep) ; /* dangerous */
+	    if (cchar *cp{} ; (rs = uc_mallocstrw(dbuf,dlen,&cp)) >= 0) {
+	        cint	nlen = rs ;
+	        ep->name = cp ;
+	        c += 1 ;
+	        ep->nlen = nlen ;
+	        ep->mode = sbp->st_mode ;
+	        ep->mtime = sbp->st_mtime ;
+	        ep->ino = sbp->st_ino ;
+	        ep->dev = sbp->st_dev ;
+	    } /* end if (memory-allocation) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (entry_start) */
