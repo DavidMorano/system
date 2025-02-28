@@ -472,7 +472,6 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	            }
 		    /* update access time as appropriate */
 	            if (op->ncursors == 0) {
-	                if (dt == 0) dt = getustime ;
 	                op->ti_access = dt ;
 	            } else {
 	                op->fl.cursoracc = true ;
