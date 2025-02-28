@@ -567,13 +567,15 @@ int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 	if ((rs = ts_magic(op,ep)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (ep->keyname[0]) {
+		cint	namelen = TS_KEYNAMELEN ;
 		if (dt == 0) dt = getustime ;
 		if ((rs = ts_acquire(op,dt,1)) >= 0) {
-		    int		nnl = strnlen(ep->keyname,TS_KEYNAMELEN) ;
+		    int		nnl = strnlen(ep->keyname,namelen) ;
 		    cchar	*nnp = ep->keyname ;
 		    rs = SR_INVALID ;
 		    if (nnl > 0) {
 			rs = ts_updater(op,dt,ep,nnp,nnl) ;
+			ei = rs ;
 		    }
 		} /* end if (rs_acquire) */
 	    } /* end if (valid) */
@@ -659,9 +661,6 @@ static int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
 }
 /* end subroutine (rs_updater) */
 
-
-
-
 static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	cnullptr	np{} ;
 	int		rs ;
@@ -726,7 +725,7 @@ static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 /* end subroutine (ts_search) */
 
 static int ts_acquire(ts *op,time_t dt,int f_read) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		f_changed = false ;
 	if (dt == 0) dt = getustime ;
 	if ((rs = ts_fileopen(op,dt)) >= 0) {
@@ -867,43 +866,26 @@ static int ts_filetopread(ts *op) noex {
 
 static int ts_fileverify(ts *op) noex {
 	static cint	magl = strlen(TS_FILEMAGIC) ;
-	int		rs = SR_OK ;
-	bool		f ;
 	cchar		*magp = TS_FILEMAGIC ;
-	cchar		*cp ;
-
-	if (op->topsize < toplen) {
-	    rs = SR_INVALID ;
-	    goto ret0 ;
-	}
-
-	cp = op->topbuf ;
-	f = (strncmp(cp,magp,magl) == 0) ;
-	f = f && (*(cp + magl) == '\n') ;
-
-	if (! f) {
-
+	int		rs = SR_INVALID ;
+	bool		f ;
+	if (op->topsize >= toplen) {
+	    cchar	*cp = op->topbuf ;
+	    f = (strncmp(cp,magp,magl) == 0) ;
+	    f = f && (*(cp + magl) == '\n') ;
 	    rs = SR_BADFMT ;
-	    goto ret0 ;
-	}
-
-	cp += 16 ;
-	if (cp[0] > TS_FILEVERSION) {
-	    rs = SR_NOTSUP ;
-	    goto ret0 ;
-	}
-
-	op->FV = cp[0] ;
-
-	if (cp[1] != TS_ENDIAN) {
-	    rs = SR_NOTSUP ;
-	    goto ret0 ;
-	}
-
-	op->FT = cp[2] ;
-
-ret0:
-
+	    if (f) {
+	        rs = SR_NOTSUP ;
+		cp += 16 ;
+		if (cp[0] <= TS_FILEVERSION) {
+		    op->FV = cp[0] ;
+		    if (cp[1] == TS_ENDIAN) {
+	    		rs = SR_OK ;
+		    }
+		    op->FT = cp[2] ;
+	        } /* end if (supported) */
+	    } /* end if (valid) */
+	} /* end if (valid) */
 	return rs ;
 }
 /* end subroutine (ts_fileverify) */
