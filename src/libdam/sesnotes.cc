@@ -27,9 +27,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
+#include	<sys/types.h>		/* system types */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -94,7 +92,7 @@ static int sesnotes_ctor(SN *op,Args ... args) noex {
 		    op->unbuf = bp ;
 		}
 		if (rs < 0) {
-		    uc_free(op->unbuf) ;
+		    uc_free(bp) ;
 		    op->unbuf = nullptr ;
 		}
 	    } /* end if (memory-allocation) */
@@ -214,7 +212,7 @@ int sesnotes_send(SN *op,int mt,cchar *mp,int ml,pid_t sid) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = sesnotes_magic(op,mp)) >= 0) {
-	    custime	st = getustime ;
+	    custime	dt = getustime ;
 	    uint	uv = sid ;
 	    int		sz = 0 ;
 	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
@@ -224,9 +222,9 @@ int sesnotes_send(SN *op,int mt,cchar *mp,int ml,pid_t sid) noex {
 		if (char *ap ; (rs = uc_malloc(sz,&ap)) >= 0) {
 		     char	*cbuf = (ap + ((maxpath + 1) * ai++)) ;
 		     if ((rs = snsd(cbuf,maxpath,"s",uv)) >= 0) {
-	    	         char	*dbuf{} ;
+	    	         char	*dbuf = (ap + ((maxpath + 1) * ai++)) ;
 	    	         if ((rs = mkpath(dbuf,sesdname,cbuf)) >= 0) {
-	        	     rs = sesnotes_sends(op,dbuf,rs,mt,st,mp,ml) ;
+	        	     rs = sesnotes_sends(op,dbuf,rs,mt,dt,mp,ml) ;
 	        	     c += rs ;
 	    	        } /* end if (mkpath) */
 		    } /* end if (snsd) */
@@ -251,7 +249,7 @@ static int sesnotes_ready(SN *op) noex {
 	    cint	sz = ((var.maxpathlen + 1) * 3) ;
 	    int		ai = 0 ;
 	    cmode	dm = 0775 ;
-	    if (char *ap{} ; (rs = uc_malloc(sz,&ap)) >= 0) {
+	    if (char *ap ; (rs = uc_malloc(sz,&ap)) >= 0) {
 	        char	*dbuf = ap + ((var.maxpathlen + 1) * ai++) ;
 	        if ((rs = mktmpuserdir(dbuf,op->unbuf,dname,dm)) >= 0) {
 	            char	*rbuf = ap + ((var.maxpathlen + 1) * ai++) ;
@@ -385,7 +383,7 @@ static int sesnotes_sender(SN *op,cc *ap,int al,int mt,time_t st,
 				if (rs >= 0) rs = rs1 ;
 			    } /* end if (nulstr) */
 			} else {
-	                    rs = SR_OK ;
+	                    rs = SR_OK ; /* just ignore any other failures */
 			}
 	            } /* end if */
 	        } /* end if (ok) */

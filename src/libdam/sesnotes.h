@@ -31,7 +31,7 @@
 
 #define	SESNOTES		struct sesnotes_head
 #define	SESNOTES_MAGIC		0x04431590
-#define	SESNOTES_SESDNAME	"/var/tmp/sessions"
+#define	SESNOTES_SESDNAME	"/tmp/sessions"
 
 
 struct sesnotes_head {
