@@ -27,6 +27,7 @@
 
 module ;
 
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -58,16 +59,21 @@ export module timer ;
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
 /* forward references */
 
 
+/* local variables */
+
+
 /* exported stuff */
 
 export {
-    static int timer_hand(void *,uint,int) noex ;
     template<typename T> class timer {
 	timeout		to ;
 	T		objp = nullptr ;
@@ -115,12 +121,6 @@ export {
 	    return rs ;
 	} ;
     } ; /* end struct (timer) */
-    int timer_hand(void *objp,uint tag,int arg) noex {
-	T		*cop = (T *) objp ;
-	int		rs ;
-	rs = cop->timeout(tag,arg) ;
-	return rs ;
-    } /* end subroutine (timer_hand) */
 } /* end export */
 
 
