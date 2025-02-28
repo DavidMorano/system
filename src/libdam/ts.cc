@@ -920,116 +920,70 @@ static int ts_headtab(ts *op,int f_read) noex {
 
 /* acquire access to the file */
 static int ts_lockget(ts *op,time_t dt,int f_read) noex {
-	USTAT		sb ;
-	int		rs = SR_OK ;
-	int		lockcmd ;
-	int		f_already = false ;
+	int		rs ;
 	int		f_changed = false ;
-
-	if (op->fd < 0) {
-
-	    rs = ts_fileopen(op,dt) ;
-
-	    if (rs < 0)
-	        goto bad0 ;
-
-	} /* end if (needed to open the file) */
-
-/* acquire a file record lock */
-
-	if (f_read || (! op->fl.writable)) {
-
-	    f_already = op->fl.lockedread ;
-	    op->fl.lockedread = true ;
-	    op->fl.lockedwrite = false ;
-	    lockcmd = F_RLOCK ;
-
-	} else {
-
-	    f_already = op->fl.lockedwrite ;
-	    op->fl.lockedread = false ;
-	    op->fl.lockedwrite = true ;
-	    lockcmd = F_WLOCK ;
-
-	} /* end if */
-
-/* get out if we have the lock that we want already */
-
-	if (f_already)
-	    goto ret0 ;
-
-/* we need to actually do the lock */
-
-	if_constexpr (f_lockf) {
-	    rs = uc_lockf(op->fd,F_LOCK,0L) ;
-	} else {
-	    if_constexpr (f_solarisbug) {
-	        rs = lockfile(op->fd,lockcmd,0L,0L,TO_LOCK) ;
+	if ((rs = ts_fileopen(op,dt)) >= 0) {
+	    int		lockcmd ;
+	    bool	f_already = false ;
+	    /* acquire a file record lock */
+	    if (f_read || (! op->fl.writable)) {
+	        f_already = op->fl.lockedread ;
+	        op->fl.lockedread = true ;
+	        op->fl.lockedwrite = false ;
+	        lockcmd = F_RLOCK ;
 	    } else {
-	        coff	fs = op->filesize ;
-	        rs = lockfile(op->fd,lockcmd,0L,fs,TO_LOCK) ;
-	    } /* end if_constexpr (f_solarisbug) */
-	} /* end if_constexpr (f_lockf) */
-
-	if (rs < 0)
-	    goto bad2 ;
-
-/* has the file changed at all? */
-
-	rs = u_fstat(op->fd,&sb) ;
-
-#ifdef	COMMENT
-	if (rs == SR_NOENT)
-	    rs = SR_OK ;
-#endif /* COMMENT */
-
-	if (rs < 0)
-	    goto bad2 ;
-
-	f_changed = 
-	    (sb.st_size != op->filesize) ||
-	    (sb.st_mtime != op->ti_mod) ;
-
-	if (f_changed) {
-
-	    if (op->fl.bufvalid)
-	        op->fl.bufvalid = false ;
-
-	    op->filesize = sb.st_size ;
-	    op->ti_mod = sb.st_mtime ;
-
-	} /* end if */
-
-	if (op->filesize < taboff) {
-	    op->fl.fileinit = false ;
-	}
-
-ret0:
-
+	        f_already = op->fl.lockedwrite ;
+	        op->fl.lockedread = false ;
+	        op->fl.lockedwrite = true ;
+	        lockcmd = F_WLOCK ;
+	    } /* end if */
+	    /* get out if we have the lock that we want already */
+	    if (! f_already) {
+		/* we need to actually do the lock */
+		if_constexpr (f_lockf) {
+	    	    rs = uc_lockf(op->fd,F_LOCK,0L) ;
+		} else {
+	    	    if_constexpr (f_solarisbug) {
+	        	rs = lockfile(op->fd,lockcmd,0L,0L,TO_LOCK) ;
+	    	    } else {
+	        	coff	fs = op->filesize ;
+	        	rs = lockfile(op->fd,lockcmd,0L,fs,TO_LOCK) ;
+	    	    } /* end if_constexpr (f_solarisbug) */
+		} /* end if_constexpr (f_lockf) */
+		if (rs >= 0) {
+		    /* has the file changed at all? */
+	            if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+			f_changed = f_changed || (sb.st_size != op->filesize) ;
+			f_changed = f_changed || (sb.st_mtime != op->ti_mod) ;
+		        if (f_changed) {
+	    		    if (op->fl.bufvalid) {
+				op->fl.bufvalid = false ;
+			    }
+	    		    op->filesize = sb.st_size ;
+	    		    op->ti_mod = sb.st_mtime ;
+			} /* end if */
+	                if (op->filesize < taboff) {
+	                    op->fl.fileinit = false ;
+	                }
+		    } /* end if (u_fstat) */
+		} else {
+	            op->fl.fileinit = false ;
+	            if_constexpr (f_lockf) {
+	                uc_lockf(op->fd,F_ULOCK,0L) ;
+	            } else {
+	                if_constexpr (f_solarisbug) {
+	                    lockfile(op->fd,F_ULOCK,0L,0L,TO_LOCK) ;
+	                } else {
+	                    off_t	fs = op->filesize ;
+	                    lockfile(op->fd,F_ULOCK,0L,fs,TO_LOCK) ;
+	                }
+	            }
+	            op->fl.lockedread = false ;
+	            op->fl.lockedwrite = false ;
+		} /* end if (ok) */
+	    } /* end if (was not already) */
+	} /* end if (ts_fileopen) */
 	return (rs >= 0) ? f_changed : rs ;
-
-/* bad stuff */
-bad2:
-	op->fl.fileinit = false ;
-
-#if	CF_LOCKF
-	rs = uc_lockf(op->fd,F_ULOCK,0L) ;
-#else /* CF_LOCKF */
-#if	CF_SOLARISBUG
-	lockfile(op->fd,F_ULOCK,0L,0L,TO_LOCK) ;
-#else
-	{
-	    off_t	fs = op->filesize ;
-	    lockfile(op->fd,F_ULOCK,0L,fs,TO_LOCK) ;
-	}
-#endif /* CF_SOLARISBUF */
-#endif /* CF_LOCKF */
-
-	op->fl.lockedread = false ;
-	op->fl.lockedwrite = false ;
-
-bad0:
-	goto ret0 ;
 }
 /* end subroutine (ts_lockget) */
 
