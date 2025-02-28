@@ -302,6 +302,8 @@ constexpr int		szent = TS_ENTSIZE ;
 constexpr int		nidxent = TS_NIDXENT ;
 constexpr int		maglen = TS_FILEMAGICSIZE ;
 
+constexpr char		magstr[] = TS_FILEMAGIC ;
+
 constexpr bool		f_comment = false ;
 constexpr bool		f_sunos = F_SUNOS ;
 
@@ -562,7 +564,6 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 /* update an entry */
 int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 	int		rs ;
-	int		rs1 ;
 	int		ei = 0 ;
 	if ((rs = ts_magic(op,ep)) >= 0) {
 	    rs = SR_INVALID ;
@@ -609,10 +610,10 @@ int ts_check(ts *op,time_t dt) noex {
 
 static int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
     	int		rs ;
+	int		rs1 ;
 	int		ei = 0 ;
 	bool		f_newentry = false ;
 	if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
-	    char	ebuf[TS_ENTSIZE + 2] ;
 	    ts_ent	ew{} ;
 	    ei = rs ;
 	    /* update the entry that we found and write it back */
@@ -622,6 +623,7 @@ static int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
 	    ew.rd(bp,szent) ;
 	    rs = ebuf_write(op->ebmp,ei,nullptr) ; /* sync */
 	} else if (rs == SR_NOTFOUND) {
+	    char	ebuf[TS_ENTSIZE + 2] ;
 	    ts_ent	ew = *ep ;
 	    f_newentry = true ;
 	    if (ew.count == 0) ew.count = 1 ;
@@ -645,7 +647,7 @@ static int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
 		rs = ebuf_sync(op->ebmp) ;
 	    }
 	} /* end if (updating header-table) */
-	/* optionally release our lock if we didn't have a cursor outstanding */
+	/* optionally release lock if we did not have a cursor outstanding */
 	if (op->ncursors == 0) {
 	    rs1 = ts_lockrelease(op) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -696,10 +698,11 @@ static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	char		*bp = nullptr ;
 	if (nnl < 0) nnl = strlen(nnp) ;
 	while ((rs >= 0) && (! f_found)) {
+	    int		i ; /* used-afterwards */
 	    rs = ebuf_read(op->ebmp,ei,&bp) ;
 	    ne = rs ;
 	    if (rs <= 0) break ;
-	    for (int i = 0 ; (rs >= 0) && (i < ne) ; i += 1) {
+	    for (i = 0 ; (rs >= 0) && (i < ne) ; i += 1) {
 	        cchar	*sp = bp + TSE_OKEYNAME ;
 		/* is this a match for what we want? */
 	        if (namematch(sp,nnp,nnl)) {
@@ -708,7 +711,7 @@ static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 		}
 		bp += szent ;
 	    } /* end for (looping through entries) */
-	    ei += i ;
+	    ei += i ; /* from above (the 'for' loop) */
 	    if (f_found) break ;
 	} /* end while */
 	if (rs >= 0) {
@@ -823,7 +826,7 @@ static int ts_filetopwrite(ts *op,time_t dt) noex {
 	char		*bp = op->topbuf ;
 	int		rs ;
 	(void) dt ;
-	if ((rs = mkmagic(bp,maglen,TS_FILEMAGIC)) >= 0) {
+	if ((rs = mkmagic(bp,maglen,magstr)) >= 0) {
 	    coff	poff = 0 ;
 	    int		bl ;
 	    bp += rs ;
@@ -865,8 +868,8 @@ static int ts_filetopread(ts *op) noex {
 /* end subroutine (ts_filetopread) */
 
 static int ts_fileverify(ts *op) noex {
-	static cint	magl = strlen(TS_FILEMAGIC) ;
-	cchar		*magp = TS_FILEMAGIC ;
+	static cint	magl = strlen(magstr) ;
+	cchar		*magp = magstr ;
 	int		rs = SR_INVALID ;
 	bool		f ;
 	if (op->topsize >= toplen) {

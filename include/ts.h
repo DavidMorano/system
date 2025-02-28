@@ -30,12 +30,12 @@
 #define	TS_HDR			struct ts_header
 #define	TS_ENT			TSE
 #define	TS_FILEMAGIC		"TIMESTAMP"
-#define	TS_FILEMAGICSIZE	16
+#define	TS_FILEMAGICSIZE	16		/* magic size */
 #define	TS_FILEVERSION		0
 #define	TS_ENDIAN		0
 #define	TS_KEYNAMELEN		TSE_LKEYNAME
-#define	TS_IDLEN		(TS_FILEMAGICSIZE + sizeof(uint))
-#define	TS_HEADTABLEN		(3 * sizeof(uint))
+#define	TS_IDLEN		(TS_FILEMAGICSIZE + szof(uint))
+#define	TS_HEADTABLEN		(3 * szof(uint))
 #define	TS_TOPLEN		(TS_IDLEN + TS_HEADTABLEN)
 /* entry flags */
 #define	TS_FLA			(1 << 0)	/* loadaverage */
