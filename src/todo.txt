@@ -6,7 +6,6 @@ file		what
 --------------------------------------------------------------------------------
 ts
 prique		broken, ill-conceived
-timer		decide what to do about |timer_hand()| -- broken
 uctim
 libuc		fix to completely compile!
 fsdirtree	needs pointer implementation and a lot of cleanup
