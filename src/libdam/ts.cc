@@ -1,6 +1,6 @@
 /* ts SUPPORT (Time-Stamp) */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* time-stamp file manager */
 /* version %I% last-modified %G% */
@@ -135,7 +135,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cinttypes>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| + |strnlen(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -284,6 +284,7 @@ static int	ts_filetopread(ts *) noex ;
 static int	ts_fileverify(ts *) noex ;
 static int	ts_headtab(ts *,int) noex ;
 
+static int	ts_updater(ts *,time_t,ts_ent *,cc *,int) noex ;
 static int	ts_findname(ts *,cchar *,int,char **) noex ;
 static int	ts_search(ts *,cchar *,int,char **) noex ;
 static int	ts_readentry(ts *,int,char **) noex ;
@@ -560,104 +561,23 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 
 /* update an entry */
 int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-	int		nnl ;
-	int		ei ;
-	bool		f_newentry = false ;
-	cchar		*nnp ;
-	char		ebuf[TS_ENTSIZE + 2] ;
-	char		*bp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	if (ep->keyname[0] == '\0') return SR_INVALID ;
-
-	rs = ts_acquire(op,dt,1) ;
-
-	if (rs < 0)
-	     goto ret0 ;
-
-/* do the search */
-
-	nnp = ep->keyname ;
-	nnl = strnlen(nnp,TS_KEYNAMELEN) ;
-
-	if (nnl == 0) {
+	int		ei = 0 ;
+	if ((rs = ts_magic(op,ep)) >= 0) {
 	    rs = SR_INVALID ;
-	    goto ret2 ;
-	}
-
-	rs = ts_findname(op,nnp,nnl,&bp) ;
-	ei = rs ;
-
-/* update the entry that we found and write it back */
-
-	if (rs >= 0) {
-	    ts_ent	ew{} ;
-	    ew.wr(bp,szent) ;
-	    ew.utime = dt ;
-	    ew.count += 1 ;
-	    ew.rd(bp,szent) ;
-	    rs = ebuf_write(op->ebmp,ei,nullptr) ; /* sync */
-
-	} else if (rs == SR_NOTFOUND) {
-	    ts_ent	ew = *ep ;
-
-	    f_newentry = true ;
-	    if (ew.count == 0) ew.count = 1 ;
-	    if (ew.utime == 0) ew.utime = dt ;
-	    if (ew.ctime == 0) ew.ctime = dt ;
-	    ew.hash = hash_elf(ew.keyname,-1) ;
-
-	    ew.rd(ebuf,szent) ;
-
-	    ei = op->h.nentries ;
-	    rs = ebuf_write(op->ebmp,ei,ebuf) ;
-
-	} /* end if (entry update) */
-
-/* update the file header */
-
-	if (rs >= 0) {
-
-	    if (dt == 0)
-	        dt = getustime ;
-
-	    op->h.wcount += 1 ;
-	    op->h.wtime = dt ;
-	    if (f_newentry) {
-	        op->h.nentries += 1 ;
-	        op->filesize += szent ;
-	    }
-
-	    rs = ts_headwrite(op) ;
-
-	    if (rs >= 0)
-		rs = ebuf_sync(op->ebmp) ;
-
-	} /* end if (updating header-table) */
-
-/* optionally release our lock if we didn't have a cursor outstanding */
-ret2:
-
-	if (op->ncursors == 0) {
-	    rs1 = ts_lockrelease(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if */
-
-/* update access time as appropriate */
-	if (op->ncursors == 0) {
-	    if (dt == 0) dt = getustime ;
-	    op->ti_access = dt ;
-	} else {
-	    op->fl.cursoracc = true ;
-	}
-
-ret0:
+	    if (ep->keyname[0]) {
+		if (dt == 0) dt = getustime ;
+		if ((rs = ts_acquire(op,dt,1)) >= 0) {
+		    int		nnl = strnlen(ep->keyname,TS_KEYNAMELEN) ;
+		    cchar	*nnp = ep->keyname ;
+		    rs = SR_INVALID ;
+		    if (nnl > 0) {
+			rs = ts_updater(op,dt,ep,nnp,nnl) ;
+		    }
+		} /* end if (rs_acquire) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
 }
 /* end subroutine (ts_update) */
@@ -684,6 +604,63 @@ int ts_check(ts *op,time_t dt) noex {
 
 
 /* private subroutines */
+
+static int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
+    	int		rs ;
+	int		ei = 0 ;
+	bool		f_newentry = false ;
+	if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
+	    char	ebuf[TS_ENTSIZE + 2] ;
+	    ts_ent	ew{} ;
+	    ei = rs ;
+	    /* update the entry that we found and write it back */
+	    ew.wr(bp,szent) ;
+	    ew.utime = dt ;
+	    ew.count += 1 ;
+	    ew.rd(bp,szent) ;
+	    rs = ebuf_write(op->ebmp,ei,nullptr) ; /* sync */
+	} else if (rs == SR_NOTFOUND) {
+	    ts_ent	ew = *ep ;
+	    f_newentry = true ;
+	    if (ew.count == 0) ew.count = 1 ;
+	    if (ew.utime == 0) ew.utime = dt ;
+	    if (ew.ctime == 0) ew.ctime = dt ;
+	    ew.hash = hash_elf(ew.keyname,-1) ;
+	    ew.rd(ebuf,szent) ;
+	    ei = op->h.nentries ;
+	    rs = ebuf_write(op->ebmp,ei,ebuf) ;
+	} /* end if (entry update) */
+	/* update the file header */
+	if (rs >= 0) {
+	    if (dt == 0) dt = getustime ;
+	    op->h.wcount += 1 ;
+	    op->h.wtime = dt ;
+	    if (f_newentry) {
+	        op->h.nentries += 1 ;
+	        op->filesize += szent ;
+	    }
+	    if ((rs = ts_headwrite(op)) >= 0) {
+		rs = ebuf_sync(op->ebmp) ;
+	    }
+	} /* end if (updating header-table) */
+	/* optionally release our lock if we didn't have a cursor outstanding */
+	if (op->ncursors == 0) {
+	    rs1 = ts_lockrelease(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if */
+	/* update access time as appropriate */
+	if (op->ncursors == 0) {
+	    if (dt == 0) dt = getustime ;
+	    op->ti_access = dt ;
+	} else {
+	    op->fl.cursoracc = true ;
+	}
+	return (rs >= 0) ? ei : rs ;
+}
+/* end subroutine (rs_updater) */
+
+
+
 
 static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	cnullptr	np{} ;
@@ -1203,10 +1180,11 @@ static int ts_readentry(ts *op,int ei,char **rpp) noex {
 	char		*bp = nullptr ;
 	if ((rs = ebuf_read(op->ebmp,ei,&bp)) > 0) {
 	    if_constexpr (f_nienum) {
-	        int	nl ;
 	        char	*sp = bp + TSE_OKEYNAME ;
-	        nl = strnlen(sp,TSE_LKEYNAME) ;
-	        rs = ts_index(op,sp,nl,ei) ;
+		{
+	            cint	nl = strnlen(sp,TSE_LKEYNAME) ;
+	            rs = ts_index(op,sp,nl,ei) ;
+		}
 	    } /* end if_constexpr (f_nienum) */
 	} else if (rs == 0) {
 	    rs = SR_NOTFOUND ;

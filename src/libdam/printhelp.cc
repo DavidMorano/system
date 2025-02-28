@@ -47,6 +47,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<ostream>
 #include	<usystem.h>
 #include	<syswords.hh>
