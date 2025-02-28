@@ -33,6 +33,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<nulstr.h>
@@ -133,8 +134,9 @@ int dirseen_finish(dirseen *op) noex {
 	if ((rs = dirseen_magic(op)) >= 0) {
 	    rs = SR_BUGCHECK ;
 	    if (op->dlistp) {
+		vecobj	*dlp = op->dlistp ;
 	        void	*vp{} ;
-	        for (int i = 0 ; vecobj_get(op->dlistp,i,&vp) >= 0 ; i += 1) {
+	        for (int i = 0 ; dlp->get(i,&vp) >= 0 ; i += 1) {
 	            if (vp) {
 	                dirseen_ent	*ep = entp(vp) ;
 	                rs1 = entry_finish(ep) ;
@@ -142,7 +144,7 @@ int dirseen_finish(dirseen *op) noex {
 	            }
 	        } /* end for */
 	        {
-	            rs1 = vecobj_finish(op->dlistp) ;
+	            rs1 = dlp->finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        {

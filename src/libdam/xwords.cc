@@ -174,16 +174,16 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 	    wi.wp = wbuf ;
 	    wi.wl = si ;
 	    if ((rs = wil.add(&wi)) >= 0) {
-		int	wl = (wlen-(si+1)) ;
-		cchar	*wp = (wbuf+(si+1)) ;
+		int	wl = (wlen - (si + 1)) ;
+		cchar	*wp = (wbuf + (si + 1)) ;
 		while ((si = sichr(wp,wl,'-')) >= 0) {
 		    if (si > 0) {
 	    	        wi.wp = wp ;
 	    	        wi.wl = si ;
 	    	        rs = wil.add(&wi) ;
 		    }
-		    wl -= (si+1) ;
-		    wp += (si+1) ;
+		    wl -= (si + 1) ;
+		    wp += (si + 1) ;
 		    if (rs < 0) break ;
 		} /* end while */
 		if ((rs >= 0) && (wl > 0)) {
@@ -192,7 +192,6 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 	    	    rs = vecobj_add(&wil,&wi) ;
 		}
 		if ((rs >= 0) && ((rs = wil.count) >= 0)) {
-		    int		i ;
 		    int		j ; /* used-afterwards */
 		    n = (op->nwords + rs) ;
 		    if (n > XWORDS_MAX) {
@@ -203,7 +202,7 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 			        op->xa[j].wp = op->words[j].wp ;
 			        op->xa[j].wl = op->words[j].wl ;
 			    }
-			    for (i = 0 ; wil.get(i,&vp) >= 0 ; i += 1) {
+			    for (int i = 0 ; wil.get(i,&vp) >= 0 ; i += 1) {
 		    		xwords_wi	*ep = wip(vp) ;
 			        op->xa[j].wp = ep->wp ;
 			        op->xa[j].wl = ep->wl ;
@@ -213,7 +212,7 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 		    } else {
 			j = op->nwords ;
 			void	*vp ;
-			for (i = 0 ; wil.get(i,&vp) >= 0 ; i += 1) {
+			for (int i = 0 ; wil.get(i,&vp) >= 0 ; i += 1) {
 		   	    xwords_wi	*ep = wip(vp) ;
 			    op->words[j].wp = ep->wp ;
 			    op->words[j].wl = ep->wl ;

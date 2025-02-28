@@ -34,7 +34,7 @@
 #ifndef	SVCNAMELEN
 #define	SVCNAMELEN		32
 #endif
-
+/* message objects */
 #define	SESMSG_EXIT		struct sesmsg_exit
 #define	SESMSG_NOOP		struct sesmsg_noop
 #define	SESMSG_MBUF		struct sesmsg_mbuf
@@ -43,7 +43,19 @@
 #define	SESMSG_ECHO		struct sesmsg_echo
 #define	SESMSG_RESPONSE		struct sesmsg_response
 #define	SESMSG_PASSFD		struct sesmsg_passfd
-
+#define	SESMSG_GETSYSMISC	struct sesmsg_getsysmisc
+#define	SESMSG_SYSMISC		struct sesmsg_sysmisc
+#define	SESMSG_GETLOADAVE	struct sesmsg_getloadave
+#define	SESMSG_LOADAVE		struct sesmsg_loadave
+#define	SESMSG_REPLOADAVE	struct sesmsg_reploadave
+#define	SESMSG_GETLISTENER	struct sesmsg_getlistener
+#define	SESMSG_LISTENER		struct sesmsg_listener
+#define	SESMSG_GETHELP		struct sesmsg_gethelp
+#define	SESMSG_HELP		struct sesmsg_help
+#define	SESMSG_CMD		struct sesmsg_cmd
+#define	SESMSG_MARK		struct sesmsg_mark
+#define	SESMSG_UNKNOWN		struct sesmsg_unknown
+/* lengths or sizes */
 #define	SESMSG_USERLEN		USERNAMELEN
 #define	SESMSG_NBUFLEN		MAXNAMELEN
 #define	SESMSG_REASONLEN	100

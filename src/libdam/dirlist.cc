@@ -45,7 +45,7 @@
 #include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -193,7 +193,7 @@ int dirlist_finish(dirlist *op) noex {
 	            } /* end for */
 	        }
 	        {
-	            rs1 = vecobj_finish(op->dbp) ;
+	            rs1 = dbp->finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	    } /* end if (op->dbp) */
@@ -403,12 +403,13 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 	if ((rs = dirlist_magic(op,jbuf)) >= 0) {
 	    int		djlen = op->tlen ;
 	    if (jlen >= djlen) {
+		vecobj	*dbp = op->dbp ;
 	        char	*bp = jbuf ;
 	        cchar	*dp ;
 	        int	dl ;
 	        bool	f_semi = false ;
 	        void	*vp{} ;
-	        for (int i = 0 ; vecobj_get(op->dbp,i,&vp) >= 0 ; i += 1) {
+	        for (int i = 0 ; dbp->get(i,&vp) >= 0 ; i += 1) {
 		    ent	*ep = cast_static<entp>(vp) ;
 	            if (vp == nullptr) break ;
 	            dp = ep->sp ;
@@ -423,7 +424,9 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 			    }
 	                } /* end if */
 		        if_constexpr (f_nulpath) {
-	                    if ((dl > 0) && (! ((dp[0] == '.') && (dl == 1)))) {
+			    bool	f = (dl > 0) ;
+			    f = f && (! ((dp[0] == '.') && (dl == 1))) ;
+	                    if (f) {
 	                        bp = strwcpy(bp,dp,dl) ;
 	                    }
 		        } else {

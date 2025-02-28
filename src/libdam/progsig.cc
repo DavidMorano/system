@@ -50,6 +50,7 @@
 #include	<ctdec.h>
 #include	<sesmsg.h>
 #include	<msgdata.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"progsig.h"
@@ -875,7 +876,7 @@ static int progsig_reqsend(progsig *uip,msgdata *mip,int dlen) noex {
 static int progsig_reqrecv(progsig *uip,msgdata *mip) noex {
 	POLLFD		fds[1] = {} ;
 	cint		fd = uip->sfd ;
-	cint		mto = (5*POLL_INTMULT) ;
+	cint		mto = (5 * POLL_INTMULT) ;
 	cint		nfds = 1 ;
 	int		sz ;
 	int		rs ;
@@ -894,8 +895,9 @@ static int progsig_reqrecv(progsig *uip,msgdata *mip) noex {
 			f = true ;
 	    	        if (rs > 0) {
 	        	    rc = MKCHAR(mip->mbuf[0]) ;
-	    	        } else
+	    	        } else {
 	        	    rc = sesmsgtype_invalid ;
+			}
 	            } /* end if (msgdata_recv) */
 		} else if (re & POLLERR) {
 		    rs = SR_IO ;
@@ -914,8 +916,10 @@ static int progsig_reqrecv(progsig *uip,msgdata *mip) noex {
 /* end subroutine (progsig_reqrecv) */
 
 static int progsig_poll(progsig *uip) noex {
-	int		rs = SR_OK ;
-	if (uip == nullptr) return SR_FAULT ;
+	int		rs = SR_FAULT ;
+	if (uip) {
+	    rs = SR_OK ;
+	}
 	return rs ;
 }
 /* end subroutine (progsig_poll) */

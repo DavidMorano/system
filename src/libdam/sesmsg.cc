@@ -1,5 +1,5 @@
 /* sesmsg SUPPORT */
-/* encoding=ISO8859-1 */
+/* encoding=ISOCHAR_BITCHAR_BIT59-1 */
 /* lang=C++20 */
 
 /* create and parse the internal messages */
@@ -17,13 +17,19 @@
 
 /*******************************************************************************
 
+  	Group:
+	sesmsg
+
+	Description:
 	This module contains the code to make and parse the internal
 	messages that are used in this whole server facility.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<climits>		/* |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<stdorder.h>
 #include	<serialbuf.h>
@@ -63,7 +69,7 @@ int sesmsg_exit(SESMSG_EXIT *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	        serialbuf_rstrw(&mb,sp->reason,SESMSG_REASONLEN) ;
 	    } else { /* write */
@@ -73,7 +79,7 @@ int sesmsg_exit(SESMSG_EXIT *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wui(&mb,sp->tag) ;
 	        serialbuf_wstrw(&mb,sp->reason,SESMSG_REASONLEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -93,7 +99,7 @@ int sesmsg_noop(SESMSG_NOOP *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	    } else { /* write */
 	        sp->msgtype = sesmsgtype_noop ;
@@ -101,7 +107,7 @@ int sesmsg_noop(SESMSG_NOOP *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wui(&mb,hdr) ;
 	        serialbuf_wui(&mb,sp->tag) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -142,7 +148,7 @@ int sesmsg_response(SESMSG_RESPONSE *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	        serialbuf_rui(&mb,&sp->pid) ;
 	        serialbuf_ruc(&mb,&sp->rc) ;
@@ -154,7 +160,7 @@ int sesmsg_response(SESMSG_RESPONSE *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wui(&mb,sp->pid) ;
 	        serialbuf_wuc(&mb,sp->rc) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -165,7 +171,7 @@ int sesmsg_response(SESMSG_RESPONSE *sp,int f,char *mbuf,int mlen) noex {
 }
 /* end subroutine (sesmsg_response) */
 
-int sesmsg_passfd(SESMSG_PASSWD *sp,int f,char *mbuf,int mlen) noex {
+int sesmsg_passfd(SESMSG_PASSFD *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
 	int		rs1 ;
@@ -174,7 +180,7 @@ int sesmsg_passfd(SESMSG_PASSWD *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	        serialbuf_rstrw(&mb,sp->svc,SESMSG_SVCLEN) ;
 	    } else { /* write */
@@ -185,7 +191,7 @@ int sesmsg_passfd(SESMSG_PASSWD *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wui(&mb,sp->tag) ;
 	        serialbuf_wstrw(&mb,sp->svc,SESMSG_SVCLEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -196,7 +202,6 @@ int sesmsg_passfd(SESMSG_PASSWD *sp,int f,char *mbuf,int mlen) noex {
 }
 /* end subroutine (sesmsg_passfd) */
 
-
 int sesmsg_getsysmisc(SESMSG_GETSYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
@@ -206,7 +211,7 @@ int sesmsg_getsysmisc(SESMSG_GETSYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	    } else { /* write */
 	        sp->msgtype = sesmsgtype_getsysmisc ;
@@ -214,7 +219,7 @@ int sesmsg_getsysmisc(SESMSG_GETSYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wui(&mb,hdr) ;
 	        serialbuf_wui(&mb,sp->tag) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -225,7 +230,7 @@ int sesmsg_getsysmisc(SESMSG_GETSYSMISC *sp,int f,char *mbuf,int mlen) noex {
 }
 /* end subroutine (sesmsg_getsysmisc) */
 
-int sesmsg_sysmisc(SESMG_SYSMISC *sp,int f,char *mbuf,int mlen) noex {
+int sesmsg_sysmisc(SESMSG_SYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
 	int		rs1 ;
@@ -234,7 +239,7 @@ int sesmsg_sysmisc(SESMG_SYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	        serialbuf_rui(&mb,&sp->la_1min) ;
 	        serialbuf_rui(&mb,&sp->la_5min) ;
@@ -254,7 +259,7 @@ int sesmsg_sysmisc(SESMG_SYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wui(&mb,sp->nproc) ;
 	        serialbuf_wuc(&mb,sp->rc) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -265,7 +270,7 @@ int sesmsg_sysmisc(SESMG_SYSMISC *sp,int f,char *mbuf,int mlen) noex {
 }
 /* end subroutine (sesmsg_sysmisc) */
 
-int sesmsg_getloadave(SESMG_GETLOADAVE *sp,int f,char *mbuf,int mlen) noex {
+int sesmsg_getloadave(SESMSG_GETLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
 	int		rs1 ;
@@ -274,7 +279,7 @@ int sesmsg_getloadave(SESMG_GETLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	    } else { /* write */
 	        sp->msgtype = sesmsgtype_getloadave ;
@@ -282,7 +287,7 @@ int sesmsg_getloadave(SESMG_GETLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wui(&mb,hdr) ;
 	        serialbuf_wui(&mb,sp->tag) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -293,7 +298,7 @@ int sesmsg_getloadave(SESMG_GETLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 }
 /* end subroutine (sesmsg_getloadve) */
 
-int sesmsg_loadave(SESMSG_LOADVE *sp,int f,char *mbuf,int mlen) noex {
+int sesmsg_loadave(SESMSG_LOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
 	int		rs1 ;
@@ -302,7 +307,7 @@ int sesmsg_loadave(SESMSG_LOADVE *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	        serialbuf_rui(&mb,&sp->la_1min) ;
 	        serialbuf_rui(&mb,&sp->la_5min) ;
@@ -318,7 +323,7 @@ int sesmsg_loadave(SESMSG_LOADVE *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wui(&mb,sp->la_15min) ;
 	        serialbuf_wuc(&mb,sp->rc) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -329,7 +334,7 @@ int sesmsg_loadave(SESMSG_LOADVE *sp,int f,char *mbuf,int mlen) noex {
 }
 /* end subroutine (sesmsg_loadave) */
 
-int sesmsg_reploadave(sesmsg_reploadave *sp,f,mbuf,mlen) noex {
+int sesmsg_reploadave(SESMSG_REPLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
 	int		rs1 ;
@@ -338,7 +343,7 @@ int sesmsg_reploadave(sesmsg_reploadave *sp,f,mbuf,mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	        serialbuf_rui(&mb,&sp->utag) ;
 	        serialbuf_rui(&mb,&sp->duration) ;
@@ -364,7 +369,7 @@ int sesmsg_reploadave(sesmsg_reploadave *sp,f,mbuf,mlen) noex {
 	        serialbuf_wui(&mb,sp->addrhost[2]) ;
 	        serialbuf_wui(&mb,sp->addrhost[4]) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -375,7 +380,7 @@ int sesmsg_reploadave(sesmsg_reploadave *sp,f,mbuf,mlen) noex {
 }
 /* end subroutine (sesmsg_reploadave) */
 
-int sesmsg_getlistener(sesmsg_getlistener *sp,int f,char *mbuf,int mlen) noex {
+int sesmsg_getlistener(SESMSG_GETLISTENER *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
 	int		rs1 ;
@@ -384,7 +389,7 @@ int sesmsg_getlistener(sesmsg_getlistener *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	        serialbuf_rui(&mb,&sp->idx) ;
 	    } else { /* write */
@@ -394,7 +399,7 @@ int sesmsg_getlistener(sesmsg_getlistener *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wui(&mb,sp->tag) ;
 	        serialbuf_wui(&mb,sp->idx) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -405,7 +410,7 @@ int sesmsg_getlistener(sesmsg_getlistener *sp,int f,char *mbuf,int mlen) noex {
 }
 /* end subroutine (sesmsg_getlistener) */
 
-int sesmsg_listener(sesmsg_listener *sp,int f,char *mbuf,int mlen) noex {
+int sesmsg_listener(SESMSG_LISTENER *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
 	int		rs1 ;
@@ -414,7 +419,7 @@ int sesmsg_listener(sesmsg_listener *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	        serialbuf_rui(&mb,&sp->idx) ;
 	        serialbuf_rui(&mb,&sp->pid) ;
@@ -434,7 +439,7 @@ int sesmsg_listener(sesmsg_listener *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wstrw(&mb,sp->name,SESMSG_LNAMELEN) ;
 	        serialbuf_wstrw(&mb,sp->addr,SESMSG_LADDRLEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -445,7 +450,7 @@ int sesmsg_listener(sesmsg_listener *sp,int f,char *mbuf,int mlen) noex {
 }
 /* end subroutine (sesmsg_listener) */
 
-int sesmsg_mark(sesmsg_mark *sp,int f,char *mbuf,int mlen) noex {
+int sesmsg_mark(SESMSG_MARK *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
 	int		rs1 ;
@@ -454,7 +459,7 @@ int sesmsg_mark(sesmsg_mark *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	    } else { /* write */
 	        sp->msgtype = sesmsgtype_mark ;
@@ -462,7 +467,7 @@ int sesmsg_mark(sesmsg_mark *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wui(&mb,hdr) ;
 	        serialbuf_wui(&mb,sp->tag) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -473,7 +478,7 @@ int sesmsg_mark(sesmsg_mark *sp,int f,char *mbuf,int mlen) noex {
 }
 /* end subroutine (sesmsg_mark) */
 
-int sesmsg_unknown(sesmsg_unknown *sp,int f,char *mbuf,int mlen) noex {
+int sesmsg_unknown(SESMSG_UNKNOWN *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
 	int		rs1 ;
@@ -482,13 +487,13 @@ int sesmsg_unknown(sesmsg_unknown *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	    } else { /* write */
 	        sp->msgtype = sesmsgtype_unknown ;
 	        hdr = sp->msgtype ;
 	        serialbuf_wui(&mb,hdr) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -499,7 +504,7 @@ int sesmsg_unknown(sesmsg_unknown *sp,int f,char *mbuf,int mlen) noex {
 }
 /* end subroutine (sesmsg_unknown) */
 
-int sesmsg_gethelp(sesmsg_gethelp *sp,int f,char *mbuf,int mlen) noex {
+int sesmsg_gethelp(SESMSG_GETHELP *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
 	int		rs1 ;
@@ -508,7 +513,7 @@ int sesmsg_gethelp(sesmsg_gethelp *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	        serialbuf_rui(&mb,&sp->idx) ;
 	    } else { /* write */
@@ -518,7 +523,7 @@ int sesmsg_gethelp(sesmsg_gethelp *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wui(&mb,sp->tag) ;
 	        serialbuf_wui(&mb,sp->idx) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -529,7 +534,7 @@ int sesmsg_gethelp(sesmsg_gethelp *sp,int f,char *mbuf,int mlen) noex {
 }
 /* end subroutine (sesmsg_gethelp) */
 
-int sesmsg_help(sessmsg_help *sp,int f,char *mbuf,int mlen) noex {
+int sesmsg_help(SESMSG_HELP *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
 	int		rs1 ;
@@ -538,7 +543,7 @@ int sesmsg_help(sessmsg_help *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	        serialbuf_rui(&mb,&sp->idx) ;
 	        serialbuf_rui(&mb,&sp->pid) ;
@@ -554,7 +559,7 @@ int sesmsg_help(sessmsg_help *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wuc(&mb,sp->rc) ;
 	        serialbuf_wstrw(&mb,sp->name,SESMSG_LNAMELEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -566,7 +571,7 @@ int sesmsg_help(sessmsg_help *sp,int f,char *mbuf,int mlen) noex {
 }
 /* end subroutine (sesmsg_help) */
 
-int sesmsg_cmd(sesmsg_cmd *sp,int f,char *mbuf,int mlen) noex {
+int sesmsg_cmd(SESMSG_CMD *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	int		rs ;
 	int		rs1 ;
@@ -575,7 +580,7 @@ int sesmsg_cmd(sesmsg_cmd *sp,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rui(&mb,&sp->tag) ;
 	        serialbuf_rstrw(&mb,sp->cmd,SESMSG_CMDLEN) ;
 	    } else { /* write */
@@ -585,7 +590,7 @@ int sesmsg_cmd(sesmsg_cmd *sp,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wui(&mb,sp->tag) ;
 	        serialbuf_wstrw(&mb,sp->cmd,SESMSG_CMDLEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
@@ -599,7 +604,7 @@ int sesmsg_cmd(sesmsg_cmd *sp,int f,char *mbuf,int mlen) noex {
 
 /* local subroutines */
 
-static int sesmsg_mbuf(sesmsg_mbuf *sp,int mt,int f,char *mbuf,int mlen) noex {
+static int sesmsg_mbuf(SESMSG_MBUF *sp,int mt,int f,char *mbuf,int mlen) noex {
 	serialbuf	mb ;
 	cint		nlen = SESMSG_NBUFLEN ;
 	cint		ulen = SESMSG_USERLEN ;
@@ -611,7 +616,7 @@ static int sesmsg_mbuf(sesmsg_mbuf *sp,int mt,int f,char *mbuf,int mlen) noex {
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
-	        sp->msglen = (hdr >> 8) ;
+	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        serialbuf_rul(&mb,&lw) ;
 		sp->stime = (time_t) lw ;
 	        serialbuf_rui(&mb,&sp->tag) ;
@@ -629,7 +634,7 @@ static int sesmsg_mbuf(sesmsg_mbuf *sp,int mt,int f,char *mbuf,int mlen) noex {
 	        serialbuf_wstrw(&mb,sp->user,ulen) ;
 	        serialbuf_wstrw(&mb,sp->nbuf,nlen) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
-	            hdr |= (sp->msglen << 8) ;
+	            hdr |= (sp->msglen << CHAR_BIT) ;
 	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
