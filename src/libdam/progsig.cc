@@ -1,4 +1,4 @@
-/* progsig SUPPORT */
+/* progsig SUPPORT (XXX INCOMPLETE TODO) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
