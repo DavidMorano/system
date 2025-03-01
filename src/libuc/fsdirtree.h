@@ -30,7 +30,6 @@
 #define	FSDIRTREE_FL		struct fsdirtree_flags
 #define	FSDIRTREE_STAT		USTAT
 #define	FSDIRTREE_MAGIC		0x98653217
-
 /* options */
 #define	FSDIRTREE_MFOLLOW	(1<<0)	/* follow symbolic links */
 #define	FSDIRTREE_MLINK		(1<<1)
@@ -55,16 +54,18 @@ struct fsdirtree_head {
 	cchar		**prune ;
 	char		*bnbuf ;
 	char		*nbuf ;
+	char		*lbuf ;
 	void		*bsp ;		/* Bit-Set-Pointer */
-	fifostr		dirq ;
-	fsdir		dir ;
-	hdb		dirids ;
+	fifostr		*dqp ;		/* directory-queue-pointer */
+	fsdir		*dirp ;		/* directory-pointer */
+	hdb		*dip ;		/* directory-id-pointer */
 	uint		magic ;
 	int		opts ;
 	int		bndlen ;
 	int		cdnlen ;
 	int		bnlen ;
 	int		nlen ;
+	int		llen ;
 	FSDIRTREE_FL	f ;
 } ;
 
@@ -80,16 +81,6 @@ extern int fsdirtree_read(fsdirtree *,USTAT *,char *,int) noex ;
 extern int fsdirtree_close(fsdirtree *) noex ;
 
 EXTERNC_end
-
-
-#ifndef	FSDIRTREESTAT
-#define	FSDIRTREESTAT
-EXTERNC_begin
-
-extern int fsdirtreestat(cchar *,int,FSDIRTREE_STAT *) noex ;
-
-EXTERNC_end
-#endif /* FSDIRTREESTAT */
 
 
 #endif /* FSDIRTREE_INCLUDE */

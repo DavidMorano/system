@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int mailmsghdrct_ctor(mailmsghdrct *op,Args ... args) noex {
+static int fsdirtree_ctor(fsdirtree *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int mailmsghdrct_ctor(mailmsghdrct *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mailmsghdrct_ctor) */
+/* end subroutine (fsdirtree_ctor) */
 
-static int mailmsghdrct_dtor(mailmsghdrct *op) noex {
+static int fsdirtree_dtor(fsdirtree *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mailmsghdrct_dtor) */
+/* end subroutine (fsdirtree_dtor) */
 
 template<typename ... Args>
-static inline int mailmsghdrct_magic(mailmsghdrct *op,Args ... args) noex {
+static inline int fsdirtree_magic(fsdirtree *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MAILMSGHDRCT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == FSDIRTREE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (mailmsghdrct_magic) */
+/* end subroutine (fsdirtree_magic) */
