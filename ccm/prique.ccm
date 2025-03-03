@@ -70,7 +70,7 @@ export {
 	    if (this != &oit) {
 		try {
 	            isit = oit.isit ;
-		} catch (...) ;
+		} catch (...) { } ;
 	    }
 	} ; /* end ctor */
 	prique_iter(prique_iter<K> &&oit) noex {
@@ -86,14 +86,14 @@ export {
 	            } else {
 	                isit = pqp->mp->begin() ;
 	            }
-		} catch (...) ;
+		} catch (...) { } ;
 	    }
 	} ; /* end ctor */
 	prique_iter<K> &operator = (const prique_iter<K> &oit) noex {
 	    if (this != &oit) {
 		try {
 	            isit = oit.isit ;
-		} catch (...) ;
+		} catch (...) { } ;
 	    }
 	    return *this ;
 	} ;
@@ -107,7 +107,7 @@ export {
 	    if (this != oip) {
 		try {
 	            isit = oip->isit ;
-		} catch (...) ;
+		} catch (...) { } ;
 	    }
 	    return *this ;
 	} ;
@@ -183,11 +183,6 @@ export {
 	int		ins(const K &) noex ;
 	int		present(const K &) noex ;
 	int		get(K *) noex ;
-	int		istart(int) noex ;
-	int		ifinish() noex ;
-	int		icount() noex ;
-	int		irem() noex ;
-	int		irem(const K &) noex ;
 	iterator begin() noex {
 	    iterator	it(this,false) ;
 	    return it ;
@@ -210,6 +205,12 @@ export {
 	    }
 	} ; /* end dtor */
 	friend iterator ;
+    private:
+	int		istart(int) noex ;
+	int		ifinish() noex ;
+	int		icount() noex ;
+	int		irem() noex ;
+	int		irem(const K &) noex ;
     } ; /* end class (prique) */
     template<typename K> int prique<K>::istart(int n) noex {
 	int		rs = SR_INVALID ;
@@ -242,7 +243,6 @@ export {
 	    rs = SR_OK ;
 	    try {
 	        mp->push(k) ;
-	        if (!r.second) rs = SR_EXISTS ;
 	    } catch (...) {
 	        rs = SR_NOMEM ;
 	    }
@@ -262,7 +262,7 @@ export {
 	return rs ;
     } /* end method (prique::irem) */
     template<typename K> int prique<K>::irem(const K &k) noex {
-	typedef typename maptype::size_type	isitsize_t ;
+	typedef typename prique_is<K>::size_type	isitsize_t ;
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
 	    rs = SR_OK ;
@@ -276,7 +276,7 @@ export {
 	return rs ;
     } /* end method (prique::irem) */
     template<typename K> int prique<K>::present(const K &k) noex {
-	typedef typename maptype::iterator	isiter_t ;
+	typedef typename prique_is<K>::iterator	isiter_t ;
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
 	    const isiter_t	itend = mp->end() ;
@@ -285,15 +285,15 @@ export {
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique::present) */
-    template<typename K> int prique<K>::get(const K &k,K *vp) noex {
-	typedef typename maptype::iterator	isiter_t ;
+    template<typename K> int prique<K>::get(K *vp) noex {
+	typedef typename prique_is<K>::iterator	isiter_t ;
 	int		rs = SR_FAULT ;
 	if (vp) {
 	    rs = SR_BUGCHECK ;
 	    if (mp) {
-	        typedef typename maptype::value_type	v_t ;
+	        typedef typename prique_is<K>::value_type	v_t ;
 	        const isiter_t	it_end = mp->end() ;
-	        const isiter_t	it = mp->find(k) ;
+	        const isiter_t	it = mp->find(*vp) ;
 	        rs = SR_NOENT ;
 	        if (it != it_end) {
 		    const v_t	r = *it ;
@@ -331,7 +331,7 @@ export {
 	}
 	return rs ;
     } /* end method (prique_co::operator) */
-    template<typename K> int prique_rem<K>::operator int () noex {
+    template<typename K> prique_rem<K>::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    rs = op->irem() ;

@@ -40,11 +40,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cinttypes>
 #include	<new>
 #include	<initializer_list>
 #include	<utility>
@@ -137,7 +135,7 @@ typedef priority_queue<nodeval,vector<nodeval>,nodevalcmp>	ourmin ;
 int dijkstra2(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	int		rs = SR_OK ;
 	bool		*visited ;
-	if ((visited = new(nothrow) bool [vertices+1]) != NULL) {
+	if ((visited = new(nothrow) bool [vertices+1]) != nullptr) {
 	    const int	ne = edges.size() ;
 	    ourmin	pq ; /* min-heap */
 	    nodeval	nv ;
