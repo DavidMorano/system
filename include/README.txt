@@ -1,4 +1,4 @@
 INC (and INCLUDE)
 
-This directory contains "include" source code files.
+This directory contains "include" (header) source code files.
 
