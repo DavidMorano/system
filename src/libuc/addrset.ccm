@@ -69,7 +69,7 @@ export {
     struct addrset_ent {
 	cvoid		*addr ;
 	size_t		asize ;
-    } ;
+    } ; /* end struct (addset_ent) */
     namespace std {
         typedef const addrset_ent	cent ;
         template<> struct hash<addrset_ent> {
@@ -100,7 +100,7 @@ export {
     struct addrset_cur {
 	void		*vitcp ;		/* iterator-current */
 	void		*vitep ;		/* iterator-end */
-    } ;
+    } ; /* end struct (addrset_cur) */
     struct addrset {
 	friend		addrset_co ;
 	typedef addrset_ent	ent ;
