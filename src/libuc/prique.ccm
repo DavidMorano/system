@@ -153,8 +153,8 @@ export {
 	    op = p ;
 	    w = m ;
 	} ;
-	int operator () (int = 0) noex ;
-	operator int () noex {
+	constexpr int operator () (int = 0) noex ;
+	constexpr operator int () noex {
 	    return operator () () ;
 	} ;
     } ; /* end struct (prique_co) */
@@ -164,8 +164,8 @@ export {
 	constexpr void operator () (pq_t *p) noex {
 	    op = p ;
 	} ;
-	int operator () (const K &) noex ;
-	operator int () noex ;
+	constexpr int operator () (const K &) noex ;
+	constexpr operator int () noex ;
     } ; /* end struct (prique_rem) */
     template<typename K> class prique {
 	prique_is<K>	*mp = nullptr ;
@@ -180,14 +180,14 @@ export {
 	prique_co<K>	count ;
 	prique_co<K>	pop ;
 	prique_rem<K>	rem ;
-	int		ins(const K &) noex ;
-	int		present(const K &) noex ;
-	int		get(K *) noex ;
-	iterator begin() noex {
+	constexpr int		ins(const K &) noex ;
+	constexpr int		present(const K &) noex ;
+	constexpr int		get(K *) noex ;
+	constexpr iterator begin() noex {
 	    iterator	it(this,false) ;
 	    return it ;
 	} ;
-	iterator end() noex {
+	constexpr iterator end() noex {
 	    iterator	it(this,true) ;
 	    return it ;
 	} ;
@@ -198,7 +198,7 @@ export {
 	    pop(this,priquemem_pop) ;
 	    rem(this) ;
 	} ; /* end ctor) */
-	~prique() {
+	constexpr ~prique() {
 	    if (mp) {
 	        delete mp ;
 		mp = nullptr ;
@@ -206,13 +206,13 @@ export {
 	} ; /* end dtor */
 	friend iterator ;
     private:
-	int		istart(int) noex ;
-	int		ifinish() noex ;
-	int		icount() noex ;
-	int		irem() noex ;
-	int		irem(const K &) noex ;
+	constexpr int		istart(int) noex ;
+	constexpr int		ifinish() noex ;
+	constexpr int		icount() noex ;
+	constexpr int		irem() noex ;
+	constexpr int		irem(const K &) noex ;
     } ; /* end class (prique) */
-    template<typename K> int prique<K>::istart(int n) noex {
+    template<typename K> constexpr int prique<K>::istart(int n) noex {
 	int		rs = SR_INVALID ;
 	if (n >= 0) {
 	    rs = SR_NOMEM ;
@@ -228,7 +228,7 @@ export {
 	}
 	return rs ;
     } /* end method (prique::istart) */
-    template<typename K> int prique<K>::ifinish() noex {
+    template<typename K> constexpr int prique<K>::ifinish() noex {
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
 	    delete mp ;
@@ -237,7 +237,7 @@ export {
 	}
 	return rs ;
     } /* end method (prique::ifinish) */
-    template<typename K> int prique<K>::ins(const K &k) noex {
+    template<typename K> constexpr int prique<K>::ins(const K &k) noex {
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
 	    rs = SR_OK ;
@@ -249,7 +249,7 @@ export {
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique::ins) */
-    template<typename K> int prique<K>::irem() noex {
+    template<typename K> constexpr int prique<K>::irem() noex {
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
 	    rs = SR_OK ;
@@ -261,7 +261,7 @@ export {
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique::irem) */
-    template<typename K> int prique<K>::irem(const K &k) noex {
+    template<typename K> int constexpr prique<K>::irem(const K &k) noex {
 	typedef typename prique_is<K>::size_type	isitsize_t ;
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
@@ -275,7 +275,7 @@ export {
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique::irem) */
-    template<typename K> int prique<K>::present(const K &k) noex {
+    template<typename K> constexpr int prique<K>::present(const K &k) noex {
 	typedef typename prique_is<K>::iterator	isiter_t ;
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
@@ -285,7 +285,7 @@ export {
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique::present) */
-    template<typename K> int prique<K>::get(K *vp) noex {
+    template<typename K> constexpr int prique<K>::get(K *vp) noex {
 	typedef typename prique_is<K>::iterator	isiter_t ;
 	int		rs = SR_FAULT ;
 	if (vp) {
@@ -304,14 +304,14 @@ export {
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique::get) */
-    template<typename K> int prique<K>::icount() noex {
+    template<typename K> constexpr int prique<K>::icount() noex {
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
 	    rs = mp->size() ;
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique::icount) */
-    template<typename K> int prique_co<K>::operator () (int a) noex {
+    template<typename K> constexpr int prique_co<K>::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
@@ -331,14 +331,15 @@ export {
 	}
 	return rs ;
     } /* end method (prique_co::operator) */
-    template<typename K> prique_rem<K>::operator int () noex {
+    template<typename K> constexpr prique_rem<K>::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    rs = op->irem() ;
 	}
 	return rs ;
     } /* end method (prique_rem::operator) */
-    template<typename K> int prique_rem<K>::operator () (const K &k) noex {
+    template<typename K> 
+    constexpr int prique_rem<K>::operator () (const K &k) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    rs = op->irem(k) ;
