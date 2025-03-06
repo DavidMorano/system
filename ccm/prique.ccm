@@ -75,7 +75,9 @@ export {
 	} ; /* end ctor */
 	prique_iter(prique_iter<K> &&oit) noex {
 	    if (this != &oit) {
+		try {
 	        isit = oit.isit ;
+		} catch (...) { } ;
 	    }
 	} ; /* end ctor */
 	prique_iter(pq_t *pqp,bool fend) noex {
@@ -99,7 +101,9 @@ export {
 	} ;
 	prique_iter<K> &operator = (prique_iter<K> &&oit) noex {
 	    if (this != &oit) {
+		try {
 	        isit = oit.isit ;
+		} catch (...) { } ;
 	    }
 	    return *this ;
 	} ;
