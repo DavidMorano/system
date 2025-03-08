@@ -551,6 +551,14 @@ void vechand::dtor() noex {
 	}
 }
 
+vechand::operator int () noex {
+    	int		rs = SR_NOTOPEN ;
+	if (n > 0) {
+	    rs = c ;
+	}
+	return rs ;
+}
+
 vechand_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {

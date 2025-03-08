@@ -112,12 +112,11 @@ int vecobj_start(vecobj *op,int osize,int n,int opts) noex {
 	        op->esz = osize ;
 	        if ((rs = vecobj_setopts(op,opts)) >= 0) {
 	            cint	size = (n + 1) * szof(char **) ;
-	            void	*vp{} ;
 	            op->i = 0 ;
 	            op->c = 0 ;
 	            op->fi = 0 ;
-	            if ((rs = uc_libmalloc(size,&vp)) >= 0) {
-	                op->va = (void **) vp ;
+	            if (void *vp ; (rs = uc_libmalloc(size,&vp)) >= 0) {
+	                op->va = voidpp(vp) ;
 	                op->va[0] = nullptr ;
 	                op->n = n ;
 	                rs = lookaside_start(op->lap,osize,n) ;
@@ -843,6 +842,14 @@ void vecobj::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecobj",rs,"fini-finish") ;
 	}
+}
+
+vecobj::operator int () noex {
+    	int		rs = SR_NOTOPEN ;
+	if (n > 0) {
+	    rs = c ;
+	}
+	return rs ;
 }
 
 vecobj_co::operator int () noex {

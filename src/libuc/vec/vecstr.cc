@@ -182,7 +182,7 @@ int vecstr_start(vecstr *op,int n,int opts) noex {
 	    if ((rs = vecstr_setopts(op,opts)) >= 0) {
 	        cint	sz = (n + 1) * szof(cchar **) ;
 	        if (void *va{} ; (rs = uc_libmalloc(sz,&va)) >= 0) {
-	            op->va = (cchar **) va ;
+	            op->va = ccharpp(va) ;
 	            op->va[0] = nullptr ;
 	            op->stsize = 1 ;
 		    op->f.stsize = true ;	/* starts off true */
@@ -1034,6 +1034,14 @@ void vecstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecstr",rs,"fini-finish") ;
 	}
+}
+
+vecstr::operator int () noex {
+    	int		rs = SR_NOTOPEN ;
+	if (n > 0) {
+	    rs = c ;
+	}
+	return rs ;
 }
 
 vecstr_co::operator int () noex {

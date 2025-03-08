@@ -290,7 +290,7 @@ int vecpstr_addkeyval(vecpstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	        }
 	        if ((rs = vecpstr_extstr(op,amount)) >= 0) {
 	            cchar	*cp{} ;
-	            if ((rs = chunk_addkeyval(op->ccp,kp,kl,vp,vl,&cp)) >= 0) {
+	            if ((rs = chunk_addkeyval(op->chp,kp,kl,vp,vl,&cp)) >= 0) {
 	                if ((rs = vecpstr_record(op,cp)) >= 0) {
 	                    i = rs ;
 	        	    op->stsize += amount ;
@@ -332,7 +332,7 @@ int vecpstr_store(vecpstr *op,cchar *sp,int sl,cchar **rpp) noex {
 	        cint	amount = (sl + 1) ;
 	        cchar	*cp = nullptr ;
 	        if ((rs = vecpstr_extstr(op,amount)) >= 0) {
-	            if ((rs = chunk_add(op->ccp,sp,sl,&cp)) >= 0) {
+	            if ((rs = chunk_add(op->chp,sp,sl,&cp)) >= 0) {
 	                if ((rs = vecpstr_record(op,cp)) >= 0) {
 	                     i = rs ;
 	                     op->stsize += amount ;
@@ -448,7 +448,7 @@ int vecpstr_delall(vecpstr *op) noex {
 	    {
 	        rs1 = vecpstr_finchunks(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->ccp = nullptr ;
+	        op->chp = nullptr ;
 	    }
 	    {
 	        rs1 = vechand_delall(op->clp) ;
@@ -827,7 +827,7 @@ static int vecpstr_ctor(vecpstr *op) noex {
 	    op->n = 0 ;
 	    op->fi = 0 ;
 	    op->stsize = 0 ;
-	    op->ccp = nullptr ;
+	    op->chp = nullptr ;
 	    op->magic = 0 ;
 	    op->chsize = 0 ;
 	    op->an = 0 ;
@@ -910,17 +910,17 @@ static int vecpstr_finchunks(vecpstr *op) noex {
 		}
 	    }
 	} /* end for */
-	op->ccp = nullptr ;
+	op->chp = nullptr ;
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecpstr_finchunks) */
 
 static int vecpstr_extstr(vecpstr *op,int amount) noex {
 	int		rs = SR_OK ;
-	if (op->ccp) {
-	    if (chunk_check(op->ccp,amount) > 0) op->ccp = nullptr ;
+	if (op->chp) {
+	    if (chunk_check(op->chp,amount) > 0) op->chp = nullptr ;
 	} /* end if (check if could add to existing chunk) */
-	if ((rs >= 0) && (amount > 0) && (op->ccp == nullptr)) {
+	if ((rs >= 0) && (amount > 0) && (op->chp == nullptr)) {
 	    rs = vecpstr_newchunk(op,amount) ;
 	}
 	return rs ;
@@ -931,18 +931,18 @@ static int vecpstr_newchunk(vecpstr *op,int amount) noex {
 	cint		sz = szof(vecpstr_ch) ;
 	int		rs ;
 	void		*vp{} ;
-	op->ccp = nullptr ;
+	op->chp = nullptr ;
 	if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
-	    op->ccp = (vecpstr_ch *) vp ;
+	    op->chp = (vecpstr_ch *) vp ;
 	    if (amount < op->chsize) amount = op->chsize ;
-	    if ((rs = chunk_start(op->ccp,amount)) >= 0) {
-	        rs = vechand_add(op->clp,op->ccp) ;
+	    if ((rs = chunk_start(op->chp,amount)) >= 0) {
+	        rs = vechand_add(op->clp,op->chp) ;
 		if (rs < 0)
-		    chunk_finish(op->ccp) ;
+		    chunk_finish(op->chp) ;
 	    } /* end if (chunk) */
 	    if (rs < 0) {
-	        uc_libfree(op->ccp) ;
-	        op->ccp = nullptr ;
+	        uc_libfree(op->chp) ;
+	        op->chp = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
@@ -968,7 +968,7 @@ static int vecpstr_extvec(vecpstr *op,int n) noex {
 	        op->va = nullptr ;
 	    } /* end if */
 	    if (rs >= 0) {
-	        op->va = (cchar **) na ;
+	        op->va = ccharpp(na) ;
 	        op->va[op->i] = nullptr ;
 	        op->n = nn ;
 	    }
@@ -1177,6 +1177,14 @@ void vecpstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecpstr",rs,"fini-finish") ;
 	}
+}
+
+vecpstr::operator int () noex {
+    	int		rs = SR_NOTOPEN ;
+	if (magic == VECPSTR_MAGIC) {
+	    rs = c ;
+	}
+	return rs ;
 }
 
 vecpstr_co::operator int () noex {

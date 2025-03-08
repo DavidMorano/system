@@ -124,6 +124,7 @@ struct vecobj : vecobj_head {
 	int search(cvoid *,vecobj_vcf,void **) noex ;
 	int sort(vecobj_vcf) noex ;
 	void dtor() noex ;
+	operator int () noex ;
 	~vecobj() {
 	    dtor() ;
 	} ;

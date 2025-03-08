@@ -183,6 +183,7 @@ struct vecstr : vecstr_head {
 	int search(cchar *,vecstr_f,cchar ** = nullptr) noex ;
 	int finder(cchar *,vecstr_f,cchar ** = nullptr) noex ;
 	int del(int = -1) noex ;
+	operator int () noex ;
 	vecstr_iter begin() noex {
 	    vecstr_iter		it(va,0,i) ;
 	    return it ;

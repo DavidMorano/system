@@ -32,7 +32,7 @@
 	int prique_start<typename K,typename B>(int n = 0) noex
 
 	Arguments:
-	n		suggested starting possible nupqer of elements
+	n		suggested starting possible number of elements
 
 	Returns:
 	>=0		ok
@@ -76,7 +76,7 @@ export {
 	prique_iter(prique_iter<K> &&oit) noex {
 	    if (this != &oit) {
 		try {
-	        isit = oit.isit ;
+	            isit = oit.isit ;
 		} catch (...) { } ;
 	    }
 	} ; /* end ctor */
@@ -102,7 +102,7 @@ export {
 	prique_iter<K> &operator = (prique_iter<K> &&oit) noex {
 	    if (this != &oit) {
 		try {
-	        isit = oit.isit ;
+	            isit = std::move(oit.isit) ;
 		} catch (...) { } ;
 	    }
 	    return *this ;
@@ -136,9 +136,8 @@ export {
 	    tmp.isit + inc ;
 	    return tmp ;
 	} ;
-	friend bool operator == (const prique_iter<K> &i1,
-		const prique_iter<K> &i2) noex {
-	    return (i1.isit == i2.isit) ;
+	bool operator == (const prique_iter<K> &i2) noex {
+	    return (isit == i2.isit) ;
 	} ;
 	friend prique<K> ;
     } ; /* end class (prique_iter) */

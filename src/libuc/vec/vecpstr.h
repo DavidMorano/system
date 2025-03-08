@@ -70,7 +70,7 @@ struct vecpstr_flags {
 } ;
 
 struct vecpstr_chunk {
-	char		*tab ;
+	char		*tab ;		/* table pointer */
 	int		tabsize ;	/* tab-bytes allocated extent */
 	int		tablen ;	/* tab-bytes amount used */
 	int		count ;		/* number of items */
@@ -79,7 +79,7 @@ struct vecpstr_chunk {
 struct vecpstr_head {
 	cchar		**va ;
 	vechand		*clp ;		/* chunk-list-pointer */
-	VECPSTR_CH	*ccp ;
+	VECPSTR_CH	*chp ;		/* chunk (current) pointer */
 	VECPSTR_FL	f ;
 	uint		magic ;
 	int		chsize ;
@@ -199,6 +199,7 @@ struct vecpstr : vecpstr_head {
 	int finder(cchar *,vecpstr_f,cchar ** = nullptr) noex ;
 	int del(int = -1) noex ;
 	int sort(vecpstr_f = nullptr) noex ;
+	operator int () noex ;
 	vecpstr_iter begin() noex {
 	    vecpstr_iter		it(va,0,i) ;
 	    return it ;

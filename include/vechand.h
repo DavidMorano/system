@@ -124,6 +124,7 @@ struct vechand : vechand_head {
 	int delhand(cvoid *) noex ;
 	int sort(vechand_f) noex ;
 	void dtor() noex ;
+	operator int () noex ;
 	~vechand() {
 	    dtor() ;
 	} ;
