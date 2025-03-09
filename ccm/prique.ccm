@@ -208,6 +208,7 @@ export {
 	    }
 	} ; /* end dtor */
 	friend iterator ;
+	friend prique_co<K> ;
     private:
 	constexpr int		istart(int) noex ;
 	constexpr int		ifinish() noex ;
