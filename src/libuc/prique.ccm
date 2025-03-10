@@ -184,6 +184,7 @@ export {
 	prique_co<K>	pop ;
 	prique_rem<K>	rem ;
 	constexpr int		ins(const K &) noex ;
+	constexpr int		ins(const K *) noex ;
 	constexpr int		present(const K &) noex ;
 	constexpr int		get(K *) noex ;
 	constexpr iterator begin() noex {
@@ -241,18 +242,21 @@ export {
 	}
 	return rs ;
     } /* end method (prique::ifinish) */
-    template<typename K> constexpr int prique<K>::ins(const K &k) noex {
+    template<typename K> constexpr int prique<K>::ins(const K *kp) noex {
 	int		rs = SR_BUGCHECK ;
-	if (mp) {
+	if (mp && kp) {
 	    rs = SR_OK ;
 	    try {
-	        mp->push(k) ;
+	        mp->push(*kp) ;
 	    } catch (...) {
 	        rs = SR_NOMEM ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique::ins) */
+    template<typename K> constexpr int prique<K>::ins(const K &k) noex {
+	return ins(&k) ;
+    } ;
     template<typename K> constexpr int prique<K>::irem() noex {
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
