@@ -147,8 +147,7 @@
 #include	<vecstr.h>
 #include	<mapstrint.h>
 #include	<stdorder.h>
-#include	<localmisc.h>
-#include	<hash.h>
+#include	<hash.h>		/* |hash_elf(3dam)| */
 #include	<strwcpy.h>
 #include	<strdcpyx.h>
 #include	<matxstr.h>

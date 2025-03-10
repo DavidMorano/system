@@ -37,7 +37,7 @@
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<hdb.h>
-#include	<hash.h>
+#include	<hash.h>		/* |hash_elf(3dam)| */
 #include	<localmisc.h>
 
 #include	"keyvals.h"

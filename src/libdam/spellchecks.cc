@@ -62,7 +62,7 @@
 #include	<fsdir.h>
 #include	<paramfile.h>
 #include	<ascii.h>
-#include	<hash.h>
+#include	<hash.h>		/* |hash_elf(3dam)| */
 #include	<strn.h>
 #include	<sfx.h>
 #include	<six.h>

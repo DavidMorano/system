@@ -64,10 +64,11 @@
 #include	<fsdir.h>
 #include	<getusername.h>
 #include	<txtindexmk.h>
+#include	<textlook.h>
+#include	<hash.h>		/* |hash_elf(3dam)| */
 #include	<localmisc.h>
 
 #include	"quote.h"
-#include	"textlook.h"
 
 
 /* local defines */
@@ -124,8 +125,6 @@
 
 
 /* external subroutines */
-
-extern uint	hash_elf(cchar *,int) ;
 
 extern int	snsds(char *,int,cchar *,cchar *) ;
 extern int	snwcpy(char *,int,cchar *,int) ;

@@ -48,7 +48,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<randomvar.h>
-#include	<hash.h>
+#include	<hash.h>		/* |hash_elf(3dam)| */
 #include	<localmisc.h>
 
 #include	"burn.h"

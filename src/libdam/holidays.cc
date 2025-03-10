@@ -43,7 +43,7 @@
 #include	<strtab.h>
 #include	<tmtime.hh>
 #include	<sfx.h>
-#include	<hash.h>
+#include	<hash.h>		/* |hash_elf(3dam)| */
 #include	<hashindex.h>
 #include	<nextpowtwo.h>
 #include	<char.h>
