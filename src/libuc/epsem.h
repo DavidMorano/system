@@ -1,8 +1,8 @@
-/* psem HEADER */
+/* psem HEADER (POSIX® Semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* POSIX© unnamed Semaphore (PSEM) */
+/* unnamed POSIX© Semaphore (PSEM) */
 /* version %I% last-modified %G% */
 
 
@@ -41,7 +41,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<csem.h>		/* <- couting semaphore (DAM) */
+#include	<csem.h>		/* <- counting semaphore (DAM) */
 
 
 #define	PSEM		csem		/* <- the "money" shot */

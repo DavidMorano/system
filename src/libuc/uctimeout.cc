@@ -393,15 +393,15 @@ int uctimeout::cmdcancel(TIMEOUT *valp) noex {
 	        TIMEOUT	*ep = (TIMEOUT *) vp ;
 	        cint	ei = rs ;
 	        if ((rs = vechand_del(elp,ei)) >= 0) {
-	            cint	nrs = SR_NOTFOUND ;
+	            cint	rsn = SR_NOTFOUND ;
 		    bool	f_free = false ;
 	            if ((rs = vecsorthand_delhand(pqp,ep)) >= 0) {
 			f_free = true ;
-		    } else if (rs == nrs) {
+		    } else if (rs == rsn) {
 	                ciq	*cqp = &pass ;
 	                if ((rs = ciq_rement(cqp,ep)) >= 0) {
 			    f_free = true ;
-			} else if (rs == nrs) {
+			} else if (rs == rsn) {
 	                    rs = SR_OK ;
 	                }
 		    }

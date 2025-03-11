@@ -40,8 +40,60 @@ struct keyvals_head {
 	uint		magic ;
 } ;
 
-typedef KEYVALS		keyvals ;
 typedef KEYVALS_CUR	keyvals_cur ;
+
+#ifdef	__cplusplus
+enum keyvalsmems {
+    	keyvalsmem_start,
+	keyvalsmem_count,
+	keyvalsmem_delset,
+	keyvalsmem_finish,
+	keyvalsmem_overlast
+} ;
+struct keyvals ;
+struct keyvals_co {
+	keyvals		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (keyvals *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 0) noex ;
+	operator int () noex {
+	    return operator () (0) ;
+	} ;
+} ; /* end struct (keyvals_co) */
+struct keyvals : keyvals_head {
+	keyvals_co	start ;
+	keyvals_co	count ;
+	keyvals_co	delset ;
+	keyvals_co	finish ;
+	keyvals() noex {
+	    start(this,keyvalsmem_start) ;
+	    count(this,keyvalsmem_count) ;
+	    delset(this,keyvalsmem_delset) ;
+	    finish(this,keyvalsmem_finish) ;
+	} ;
+	keyvals(const keyvals &) = delete ;
+	keyvals &operator = (const keyvals &) = delete ;
+	int add(keyvals *,int,cchar *,cchar *,int) noex ;
+	int already(keyvals *,cchar *,int) noex ;
+	int curbegin(keyvals *,keyvals_cur *) noex ;
+	int curend(keyvals *,keyvals_cur *) noex ;
+	int curenumkey(keyvals *,keyvals_cur *,cchar **) noex ;
+	int curenum(keyvals *,keyvals_cur *,cchar **,cchar **) noex ;
+	int fetch(keyvals *,cchar *,keyvals_cur *,cchar **) noex ;
+	int delkey(keyvals *,cchar *,int) noex ;
+	int check(keyvals *,time_t) noex ;
+	void dtor() noex ;
+	operator int () noex ;
+	~keyvals() {
+	    dtor() ;
+	} ;
+} ; /* end struct (keyvals) */
+#else	/* __cplusplus */
+typedef VECSTR		keyvals ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

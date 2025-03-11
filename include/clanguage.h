@@ -56,6 +56,10 @@
 #define	local			static
 #endif
 
+#ifndef	typealias
+#define	typealias		typedef
+#endif
+
 #ifndef	fallthrough
 #define	fallthrough		/* FALLTHROUGH */
 #endif

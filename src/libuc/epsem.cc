@@ -1,8 +1,8 @@
-/* psem SUPPORT */
+/* psem SUPPORT (POSIX® Semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* POSIX© unnamed Semaphore (PSEM) */
+/* unnamed POSIX© Semaphore (PSEM) */
 /* version %I% last-modified %G% */
 
 

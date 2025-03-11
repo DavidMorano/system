@@ -91,7 +91,6 @@ namespace {
 	randomvar	x ;
 	off_t		fsz ;
 	int		bcount ;
-	int		ps ;
 	burner_fl	fl{} ;
 	burner(randomvar *abp,int bc) noex : bcount(bc) {
 	    rvp = abp ;
@@ -163,7 +162,7 @@ int burner::operator () (cchar *fn) noex {
     	int		rs ;
 	int		rs1 ;
 	if ((rs = ucpagesize) >= 0) {
-	    ps = rs ;
+	    cint	ps = rs ;
 	    if ((rs = rvbegin(fn)) >= 0) {
 		cint	flen = (NPAGES * ps) ;
 		if (char *fbuf{} ; (rs = uc_valloc(flen,&fbuf)) >= 0) {

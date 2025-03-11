@@ -33,6 +33,7 @@
 #include	<cstddef>		/* |nullptr_t(3c++)| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<vecobj.h>
@@ -170,11 +171,6 @@ static int	key_mat(KEY *,cchar *,int) noex ;
 static int	entry_start(ENT *,int,int,KEY *,cchar *,int) noex ;
 static int	entry_matkey(ENT *,cchar *,int) noex ;
 static int	entry_finish(ENT *) noex ;
-
-#ifdef	COMMENT
-typedef uint		(*hdbhash_f)(cvoid *,int) noex ;
-typedef int		(*hdbcmp_f)(cvoid *,cvoid *,int) noex ;
-#endif /* COMMENT */
 
 extern "C" {
     static uint	hashent(cvoid *,int) noex ;
@@ -694,6 +690,42 @@ static int keyvals_finents(keyvals *op) noex {
 	return rs ;
 }
 /* end subroutine (keyvals_finents) */
+
+void keyvals::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("keyvals",rs,"fini-finish") ;
+	}
+}
+
+keyvals::operator int () noex {
+    	int		rs = SR_NOTOPEN ;
+	if (keyp) {
+	    rs = keyp->count ;
+	}
+	return rs ;
+}
+
+int keyvals_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case keyvalsmem_start:
+	        rs = keyvals_start(op,a) ;
+	        break ;
+	    case keyvalsmem_count:
+	        rs = keyvals_count(op) ;
+	        break ;
+	    case keyvalsmem_delset:
+	        rs = keyvals_delset(op,a) ;
+	        break ;
+	    case keyvalsmem_finish:
+	        rs = keyvals_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (keyvals_co::operator) */
 
 static int key_start(KEY *kep,cchar *ksp,int ksl) noex {
 	int		rs = SR_FAULT ;
