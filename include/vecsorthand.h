@@ -128,6 +128,7 @@ struct vecsorthand : vecsorthand_head {
 	    return it ;
 	} ;
 	void dtor() noex ;
+	operator int () noex ;
 	~vecsorthand() {
 	    dtor() ;
 	} ;
@@ -138,7 +139,7 @@ typedef VECSORTHAND		vecsorthand ;
 
 EXTERNC_begin
 
-typedef int (*vecsorthand_f)(cvoid **,cvoid **) noex ;
+typedef int (*vecsorthand_f)(cvoid *,cvoid *) noex ;
 
 extern int vecsorthand_start(vecsorthand *,int,vecsorthand_vcf) noex ;
 extern int vecsorthand_finish(vecsorthand *) noex ;

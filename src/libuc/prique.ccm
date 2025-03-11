@@ -102,6 +102,7 @@ export {
 	prique_rem<K>	rem ;
 	constexpr int		ins(const K &) noex ;
 	constexpr int		ins(const K *) noex ;
+	constexpr int		get(const K *) noex ;
 	constexpr prique() noex {
 	    start(this,priquemem_start) ;
 	    finish(this,priquemem_finish) ;
@@ -169,6 +170,25 @@ export {
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique::icount) */
+    template<typename K> constexpr int prique<K>::get(const K *ep) noex {
+	int		rs = SR_BUGCHECK ;
+	if (mp) {
+	    rs = SR_FAULT ;
+	    if (ep) {
+	        if (! mp->empty()) {
+		    try {
+		        *ep = mp->top() ;
+		        rs = mp->size() ;
+	            } catch (...) {
+	                rs = SR_NOMEM ;
+	            } /* end if */
+	       } else {
+		   rs = SR_NOENT ;
+	       } /* end if */
+	    }
+	} /* end if (non-null) */
+	return rs ;
+    } /* end method (prique::get) */
     template<typename K> constexpr int prique<K>::irem(K *ep) noex {
 	int		rs = SR_BUGCHECK ;
 	if (mp) {

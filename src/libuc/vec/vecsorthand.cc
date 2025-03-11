@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-02-28,  David A-D- Morano
+	= 1998-02-28, David A-D- Morano
 	Module was originally written.
 
 */
@@ -97,10 +97,9 @@ int vecsorthand_start(vecsorthand *op,int vn,vc_f cmpfunc) noex {
 	int		rs ;
 	if (vn <= 1) vn = VECSORTHAND_DEFENTS ;
 	if ((rs = vecsorthand_ctor(op,cmpfunc)) >= 0) {
-	    int		sz = 0 ;
-	    sz += (szof(void **) * (vn + 1)) ;
+	    cint	sz = (szof(void **) * (vn + 1)) ;
 	    if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
-	        op->va = (void **) vp ;
+	        op->va = voidpp(vp) ;
 	        op->e = vn ;
 	        {
 	            op->va[0] = nullptr ;
@@ -137,12 +136,13 @@ int vecsorthand_add(vecsorthand *op,cvoid *nep) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
 	        if ((rs = vecsorthand_extend(op)) >= 0) {
+		    auto	vcf = op->vcf ;
 	            int		bot = 0 ;
 	            int		top = max((op->i - 1),0) ;
 	            op->c += 1 ;		/* increment list count */
 	            i = (bot + top) / 2 ;
 	            while ((top - bot) > 0) {
-	                if ((rs = (*op->vcf)(&nep,(op->va+i))) < 0) {
+	                if (vcf(nep,op->va[i]) < 0) {
 	                    top = i - 1 ;
 	                } else if (rs > 0) {
 	                    bot = i + 1 ;
@@ -152,7 +152,7 @@ int vecsorthand_add(vecsorthand *op,cvoid *nep) noex {
 	                i = (bot + top) / 2 ;
 	            } /* end while */
 	            if (i < op->i) {
-	                if ((*op->vcf)(&nep,&op->va[i]) > 0) {
+	                if (vcf(nep,op->va[i]) > 0) {
 	                    i += 1 ;
 	                }
 	                for (int j = (op->i - 1) ; j >= i ; j -= 1) {
@@ -245,6 +245,7 @@ int vecsorthand_count(vecsorthand *op) noex {
 }
 /* end subroutine (vecsorthand_count) */
 
+#ifdef	COMMENT
 int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 	cint		esize = szof(void *) ;
 	int		rs = SR_FAULT ;
@@ -269,6 +270,7 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (vecsorthand_search) */
+#endif /* COMMENT */
 
 
 /* private subroutines */
@@ -315,6 +317,14 @@ void vecsorthand::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecsorthand",rs,"fini-finish") ;
 	}
+}
+
+vecsorthand::operator int () noex {
+	int		rs = SR_NOTOPEN ;
+	if (vcf) {
+	    rs = c ;
+	}
+	return rs ;
 }
 
 int vecsorthand_co::operator () (int ai) noex {
