@@ -194,8 +194,6 @@ enum dispcmds {
 
 /* forward references */
 
-static int	ourcmp(const TIMEOUT *,const TIMEOUT *) noex ;
-
 extern "C" {
     static int	uctimeout_sigerworker(uctimeout *) noex ;
     static int	uctimeout_dispworker(uctimeout *) noex ;
@@ -203,10 +201,10 @@ extern "C" {
     static void	uctimeout_atforkparent() noex ;
     static void	uctimeout_atforkchild() noex ;
     static void	uctimeout_exit() noex ;
-    static int	vourcmp(cvoid *,cvoid *) noex ;
+    static int	ourcmp(const TIMEOUT *,const TIMEOUT *) noex ;
 }
 
-consteval int uctimeout_voents() noex {
+consteval int mkopts() noex {
 	int	vo = 0 ;
 	vo |= VECHAND_OSTATIONARY ;
 	vo |= VECHAND_OREUSE ;
@@ -221,7 +219,7 @@ consteval int uctimeout_voents() noex {
 
 static uctimeout	uctimeout_data ;
 
-constexpr int		voents = uctimeout_voents() ;
+constexpr int		vopts = mkopts() ;
 
 constexpr bool		f_childthrs = CF_CHILDTHRS ;
 
@@ -512,7 +510,7 @@ int uctimeout::workready() noex {
 int uctimeout::workbegin() noex {
 	int		rs = SR_OK ;
 	if (! fl.workready) {
-	    static cint		vo = voents ;
+	    static cint		vo = vopts ;
 	    if ((rs = vechand_start(&ents,0,vo)) >= 0) {
 	        if ((rs = priqbegin()) >= 0) {
 	            if ((rs = sigbegin()) >= 0) {
@@ -625,7 +623,7 @@ int uctimeout::priqbegin() noex {
 	int		rs ;
 	if (void *p ; (rs = uc_libmalloc(osize,&p)) >= 0) {
 	    prique	*pqp = (prique *) p ;
-	    rs = vecsorthand_start(pqp,1,vourcmp) ;
+	    rs = vecsorthand_start(pqp,1,ourcmp) ;
 	    if (rs < 0) {
 	        uc_libfree(pqp) ;
 	        pqp = nullptr ;
@@ -1075,18 +1073,5 @@ static int ourcmp(const TIMEOUT *e1p,const TIMEOUT *e2p) noex {
 	return rc ;
 }
 /* end subroutine (ourcmp) */
-
-static int vourcmp(cvoid *v1pp,cvoid *v2pp) noex {
-	const TIMEOUT	**e1pp = (const TIMEOUT **) v1pp ;
-	const TIMEOUT	**e2pp = (const TIMEOUT **) v2pp ;
-	int		rc ;
-	{
-	    TIMEOUT	*e1p = (TIMEOUT *) *e1pp ;
-	    TIMEOUT	*e2p = (TIMEOUT *) *e2pp ;
-	    rc = ourcmp(e1p,e2p) ;
-	}
-	return rc ;
-}
-/* end subroutine (vourcmp) */
 
 

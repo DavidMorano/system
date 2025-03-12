@@ -16,7 +16,6 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<termios.h>
 #include	<unistd.h>
 #include	<cerrno>

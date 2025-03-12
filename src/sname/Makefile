@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (sname)
 
 T= sname
 

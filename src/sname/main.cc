@@ -1,4 +1,6 @@
 /* main (sname) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to EXEC a program with the named INPUT file and ARG0 */
 /* version %I% last-modified %G% */
@@ -6,30 +8,29 @@
 
 /* revision history:
 
-	= David A.D. Morano, November 1990
-
+	= 1990-11-00, David A.D. Morano
 	This program was originally written.
 
-
-	= David A.D. Morano, January 1996
-
+	= 1997-01-00, David A.D. Morano
 	I fixed a potentially fatal bug when incorrect arguments
 	are given !
 
-
 */
 
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /**************************************************************************
 
-	Execute as :
+  	Name:
+	main
 
-		sname program arg0 [arg2 [arg3 [...]]]
-
+	Synopsis:
+	$ sname program arg0 [arg2 [arg3 [...]]]
 
 **************************************************************************/
 
-
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -62,14 +63,12 @@ extern char	*strbasename(char *) ;
 /* external variables */
 
 
+/* exported variables */
 
 
+/* exported subroutines */
 
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
+int main(int argc,mainv argv,mainv envv) {
 	bfile	errfile ;
 
 	struct passwd	*pp ;

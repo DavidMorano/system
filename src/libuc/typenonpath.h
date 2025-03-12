@@ -2,6 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
+/* determine the type of nonpath in give counted c-string (filename) */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

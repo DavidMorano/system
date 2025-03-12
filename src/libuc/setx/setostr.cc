@@ -1,6 +1,6 @@
 /* setostr SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++98 */
+/* lang=C++20 (conformance reviewed) */
 
 /* ordered set of strings */
 /* version %I% last-modified %G% */
@@ -30,7 +30,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<new>
+#include	<new>			/* |nothrow(3c++) */
 #include	<utility>		/* |pair(3c++)| */
 #include	<string>		/* |string(3c++)| */
 #include	<set>

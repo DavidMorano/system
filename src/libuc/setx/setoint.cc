@@ -1,6 +1,6 @@
 /* setoint SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++98 */
+/* lang=C++20 (conformance reviewed) */
 
 /* ordered set of integers */
 /* version %I% last-modified %G% */
@@ -35,7 +35,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<utility>
 #include	<set>
 #include	<usystem.h>

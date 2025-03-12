@@ -34,13 +34,13 @@
 #define	TYPEDEF_VECENTCMP
 EXTERNC_begin
 
-typedef int (*vecsorthand_vcf)(cvoid *,cvoid *) noex ;
+typedef int (*vecsorthand_cmpf)(cvoid *,cvoid *) noex ;
 
 EXTERNC_end
 #endif /* TYPEDEF_VECENTCMP */
 
 struct vecsorthand_head {
-	vecsorthand_vcf	vcf ;
+	vecsorthand_cmpf	cmpf ;
 	void		**va ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
@@ -114,7 +114,7 @@ struct vecsorthand : vecsorthand_head {
 	} ;
 	vecsorthand(const vecsorthand &) = delete ;
 	vecsorthand &operator = (const vecsorthand &) = delete ;
-	int start(int,vecsorthand_vcf) noex ;
+	int start(vecsorthand_cmpf,int = 0) noex ;
 	int add(cvoid *) noex ;
 	int get(int,void *) noex ;
 	int delhand(cvoid *) noex ;
@@ -139,9 +139,7 @@ typedef VECSORTHAND		vecsorthand ;
 
 EXTERNC_begin
 
-typedef int (*vecsorthand_f)(cvoid *,cvoid *) noex ;
-
-extern int vecsorthand_start(vecsorthand *,int,vecsorthand_vcf) noex ;
+extern int vecsorthand_start(vecsorthand *,vecsorthand_cmpf,int) noex ;
 extern int vecsorthand_finish(vecsorthand *) noex ;
 extern int vecsorthand_add(vecsorthand *,cvoid *) noex ;
 extern int vecsorthand_get(vecsorthand *,int,void *) noex ;

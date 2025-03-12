@@ -35,15 +35,19 @@
 	Returns:
 	0	no non-path filename found
 	>0	type of non-path filename determined
+	<0	error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<six.h>
 #include	<strn.h>
 #include	<localmisc.h>
@@ -82,17 +86,21 @@ static constexpr cchar		nonpaths[] = "/ез~" ;
 /* exported subroutines */
 
 bool typenonpath(cchar *fp,int fl) noex {
+    	int		rs = SR_FAULT ;
 	int		t = 0 ; /* assume not non-path */
-	if (fl < 0) fl = strlen(fp) ;
-	if ((fl > 0) && (fp[0] != '/')) {
-	    cnullptr	np{} ;
-	    if (cchar *tp ; (tp = strnpbrk(fp,fl,nonpaths)) != np) {
-	        if (((tp - fp) > 0) && (tp[1] != '\0')) {
-	            t = sichr(nonpaths,-1,*tp) ;
+	if (fp) {
+	    rs = SR_OK ;
+	    if (fl < 0) fl = strlen(fp) ;
+	    if ((fl > 0) && (fp[0] != '/')) {
+	        cnullptr	np{} ;
+	        if (cchar *tp ; (tp = strnpbrk(fp,fl,nonpaths)) != np) {
+	            if (((tp - fp) > 0) && (tp[1] != '\0')) {
+	                t = sichr(nonpaths,-1,*tp) ;
+	            }
 	        }
 	    }
-	}
-	return t ; /* type-of-nonpath */
+	} /* end if (non-null) */
+	return (rs >= 0) ? t : rs ; /* type-of-nonpath */
 }
 /* end subroutine (typenonpath) */
 

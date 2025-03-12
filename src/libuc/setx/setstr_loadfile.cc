@@ -1,6 +1,6 @@
 /* setstr_loadfile SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* load strings from a file */
 /* version %I% last-modified %G% */
@@ -65,6 +65,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -116,7 +117,7 @@ static int	setstr_loadln(setstr *,int,cchar *,int) noex ;
 
 /* local variables */
 
-constexpr fieldterminit		ft("\n#") ;
+static constexpr fieldterminit		ft("\n#") ;
 
 
 /* exported variables */

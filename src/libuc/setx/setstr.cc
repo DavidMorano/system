@@ -1,6 +1,6 @@
 /* setstr SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C99 */
+/* lang=C++20 (conformance reviewed) */
 
 /* set of strings */
 /* version %I% last-modified %G% */
@@ -30,6 +30,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<string>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -47,6 +48,12 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */

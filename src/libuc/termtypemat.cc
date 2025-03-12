@@ -21,12 +21,29 @@
 
 /*******************************************************************************
 
+  	Name:
+	termtypemat
+
+	Description:
 	We try to match a set of paramters to a terminal-type.
+
+	Synopsis:
+	int termtypemat(const termtype *types, cshort *pvp,cshort *svp) noex
+
+	Arguments:
+	types		pointer
+	pvp		pointer
+	svp		pointer
+
+	Returns:
+	==0		match
+	<0		error *system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
+#include	<climits>		/* |SHORT_MIN| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -51,6 +68,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -70,7 +90,7 @@ static int	isMatch(cshort *,cshort *) noex ;
 int termtypemat(const termtype *types, cshort *pvp,cshort *svp) noex {
 	int		i ; /* used-afterwards */
 	int		f = false ;
-	for (i = 0 ; types[i].name != NULL ; i += 1) {
+	for (i = 0 ; types[i].name != nullptr ; i += 1) {
 	    if ((f = isMatch(types[i].pv,pvp)) >= 0) {
 	        f = isMatch(types[i].sv,svp) ;
 	    }

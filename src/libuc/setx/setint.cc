@@ -1,6 +1,6 @@
 /* setint SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++11 */
+/* lang=C++20 (conformance reviewed) */
 
 /* unordered set of integers */
 /* version %I% last-modified %G% */
@@ -30,7 +30,7 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<initializer_list>
 #include	<utility>
 #include	<functional>

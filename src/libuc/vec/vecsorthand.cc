@@ -1,6 +1,6 @@
 /* vecsorthand SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* vector of sorted handles */
 /* version %I% last-modified %G% */
@@ -32,7 +32,6 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -47,14 +46,12 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
-typedef vecsorthand_vcf		vc_f ;
+typedef vecsorthand_cmpf		cmp_f ; /* Cmp-Function */
 
 
 /* external subroutines */
@@ -84,6 +81,8 @@ static int vecsorthand_ctor(vecsorthand *op,Args ... args) noex {
 
 static int	vecsorthand_extend(vecsorthand *) noex ;
 
+static int	mktop(int) noex ;
+
 
 /* local variables */
 
@@ -93,7 +92,7 @@ static int	vecsorthand_extend(vecsorthand *) noex ;
 
 /* exported subroutines */
 
-int vecsorthand_start(vecsorthand *op,int vn,vc_f cmpfunc) noex {
+int vecsorthand_start(vecsorthand *op,cmp_f cmpfunc,int vn) noex {
 	int		rs ;
 	if (vn <= 1) vn = VECSORTHAND_DEFENTS ;
 	if ((rs = vecsorthand_ctor(op,cmpfunc)) >= 0) {
@@ -103,10 +102,10 @@ int vecsorthand_start(vecsorthand *op,int vn,vc_f cmpfunc) noex {
 	        op->e = vn ;
 	        {
 	            op->va[0] = nullptr ;
-	            op->vcf = cmpfunc ;
+	            op->cmpf = cmpfunc ;
 	        }
 	    } /* end if (m-a) */
-	} /* end if (non-null) */
+	} /* end if (vecsorthand_ctor) */
 	return rs ;
 }
 /* end subroutine (vecsorthand_start) */
@@ -136,32 +135,35 @@ int vecsorthand_add(vecsorthand *op,cvoid *nep) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
 	        if ((rs = vecsorthand_extend(op)) >= 0) {
-		    auto	vcf = op->vcf ;
-	            int		bot = 0 ;
-	            int		top = max((op->i - 1),0) ;
-	            op->c += 1 ;		/* increment list count */
-	            i = (bot + top) / 2 ;
-	            while ((top - bot) > 0) {
-	                if (vcf(nep,op->va[i]) < 0) {
-	                    top = i - 1 ;
-	                } else if (rs > 0) {
-	                    bot = i + 1 ;
-	                } else {
-	                    break ;
-		        }
+		    if (op->i > 0) {
+		        auto	cf = op->cmpf ;
+			int	rc = -1 ;
+	                int	bot = 0 ;
+	                int	top = mktop(op->i) ;
 	                i = (bot + top) / 2 ;
-	            } /* end while */
-	            if (i < op->i) {
-	                if (vcf(nep,op->va[i]) > 0) {
-	                    i += 1 ;
-	                }
-	                for (int j = (op->i - 1) ; j >= i ; j -= 1) {
-	                    op->va[j + 1] = op->va[j] ;
-	                }
-	            } /* end if */
+	                while ((top - bot) > 0) {
+	                    if ((rc = cf(nep,op->va[i])) < 0) {
+	                        top = i - 1 ;
+	                    } else if (rc > 0) {
+	                        bot = i + 1 ;
+	                    } else {
+	                        break ;
+		            }
+	                    i = (bot + top) / 2 ;
+	                } /* end while */
+	                if (i < op->i) {
+	                    if ((rc != 0) && (cf(nep,op->va[i]) > 0)) {
+	                        i += 1 ;
+	                    }
+	                    for (int j = (op->i - 1) ; j >= i ; j -= 1) {
+	                        op->va[j + 1] = op->va[j] ;
+	                    }
+	                } /* end if */
+		    } /* end if (non-zero positive) */
 	            op->va[i] = voidpp(nep) ;
 	            op->i += 1 ;
 	            op->va[op->i] = nullptr ;
+	            op->c += 1 ;		/* increment list count */
 	        } /* end if (vecsorthand_extend) */
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -245,22 +247,36 @@ int vecsorthand_count(vecsorthand *op) noex {
 }
 /* end subroutine (vecsorthand_count) */
 
-#ifdef	COMMENT
 int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
-	cint		esize = szof(void *) ;
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op && ep) {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
-		vc_f		cf = op->vcf ;
-		void		**spp ;
 		rs = SR_NOTFOUND ;
-		spp = (void **) bsearch(&ep,op->va,op->i,esize,cf) ;
-		if (spp) {
-	    	    i = (spp - op->va) ;
-	    	    rs = SR_OK ;
-		}
+		if (op->i > 0) {
+		    auto	cf = op->cmpf ;
+		    int		rc = -1 ;
+	            int		bot = 0 ;
+	            int		top = mktop(op->i) ;
+	            i = (bot + top) / 2 ;
+		    auto lamb = [&op,&cf,&ep] (int i) noex {
+			return cf(ep,op->va[i]) ;
+		    } ;
+		    while (((top - bot) > 0) && ((rc = lamb(i)) != 0)) {
+		        if (rc < 0) {
+	                    top = i - 1 ;
+	                } else {
+	                    bot = i + 1 ;
+		        }
+	                i = (bot + top) / 2 ;
+	            } /* end while */
+	            if (rc == 0) {
+			rs = SR_OK ;
+		    } else if (i < op->i) {
+	                if (cf(ep,op->va[i]) == 0) rs = SR_OK ;
+		    }
+		} /* end if (have entries) */
 		if (vrp) {
 	    	    void	**rpp = voidpp(vrp) ;
 	    	    *rpp = ((rs >= 0) ? op->va[i] : nullptr) ;
@@ -270,7 +286,6 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (vecsorthand_search) */
-#endif /* COMMENT */
 
 
 /* private subroutines */
@@ -301,8 +316,8 @@ static int vecsorthand_extend(vecsorthand *op) noex {
 }
 /* end subroutine (vecsorthand_extend) */
 
-int vecsorthand::start(int ne,vc_f vcf) noex {
-	return vecsorthand_start(this,ne,vcf) ;
+int vecsorthand::start(cmp_f cf,int vn) noex {
+	return vecsorthand_start(this,cf,vn) ;
 }
 
 int vecsorthand::add(cvoid *nep) noex {
@@ -321,7 +336,7 @@ void vecsorthand::dtor() noex {
 
 vecsorthand::operator int () noex {
 	int		rs = SR_NOTOPEN ;
-	if (vcf) {
+	if (cmpf) {
 	    rs = c ;
 	}
 	return rs ;
@@ -345,5 +360,13 @@ int vecsorthand_co::operator () (int ai) noex {
 	return rs ;
 }
 /* end method (vecsorthand_co::operator) */
+
+static int mktop(int i) noex {
+    	if (i > 0) {
+	    i -= 1 ;
+	}
+	return i ;
+}
+/* end subroutine (mktop) */
 
 
