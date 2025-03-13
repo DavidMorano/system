@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	psem
+
+	Description:
 	This module provides a sanitized version of the standard
 	POSIX® semaphore facility provided with some new UNIX®i.
 	Some operating system problems are managed within these
@@ -79,6 +83,12 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */

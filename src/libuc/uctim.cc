@@ -681,7 +681,7 @@ int uctim::priqbegin() noex {
 	int		rs ;
 	if (void *p ; (rs = uc_libmalloc(osz,&p)) >= 0) {
 	    prique	*pqp = (prique *) p ;
-	    rs = vecsorthand_start(pqp,1,ourcmp) ;
+	    rs = vecsorthand_start(pqp,ourcmp,1) ;
 	    if (rs < 0) {
 	        uc_libfree(pqp) ;
 	        pqp = nullptr ;

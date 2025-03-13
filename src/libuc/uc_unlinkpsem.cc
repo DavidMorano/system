@@ -1,4 +1,4 @@
-/* uc_unlinkpsem */
+/* ucunlinkpsem SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -18,9 +18,7 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<semaphore.h>
 #include	<unistd.h>
@@ -36,11 +34,9 @@
 
 /* exported subroutines */
 
-
 #if	defined(SYSHAS_PSEM) && (SYSHAS_PSEM > 0)
 
-int uc_unlinkpsem(cchar *fname)
-{
+int uc_unlinkpsem(cchar *fname) noex {
 	int		rs ;
 
 	if (fname == NULL) return SR_FAULT ;
@@ -57,8 +53,7 @@ int uc_unlinkpsem(cchar *fname)
 
 #else /* defined(SYSHAS_PSEM) && (SYSHAS_PSEM > 0) */
 
-int uc_unlinkpsem(cchar *fname)
-{
+int uc_unlinkpsem(cchar *fname) noex {
 	if (fname == NULL) return SR_FAULT ;
 	if (fname[0] == '\0') return SR_INVALID ;
 	return SR_NOSYS ;

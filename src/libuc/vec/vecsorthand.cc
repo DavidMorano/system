@@ -81,7 +81,7 @@ static int vecsorthand_ctor(vecsorthand *op,Args ... args) noex {
 
 static int	vecsorthand_extend(vecsorthand *) noex ;
 
-static int	mktop(int) noex ;
+static int	topidx(int) noex ;
 
 
 /* local variables */
@@ -139,7 +139,7 @@ int vecsorthand_add(vecsorthand *op,cvoid *nep) noex {
 		        auto	cf = op->cmpf ;
 			int	rc = -1 ;
 	                int	bot = 0 ;
-	                int	top = mktop(op->i) ;
+	                int	top = topidx(op->i) ;
 	                i = (bot + top) / 2 ;
 	                while ((top - bot) > 0) {
 	                    if ((rc = cf(nep,op->va[i])) < 0) {
@@ -258,7 +258,7 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 		    auto	cf = op->cmpf ;
 		    int		rc = -1 ;
 	            int		bot = 0 ;
-	            int		top = mktop(op->i) ;
+	            int		top = topidx(op->i) ;
 	            i = (bot + top) / 2 ;
 		    auto lamb = [&op,&cf,&ep] (int i) noex {
 			return cf(ep,op->va[i]) ;
@@ -361,12 +361,12 @@ int vecsorthand_co::operator () (int ai) noex {
 }
 /* end method (vecsorthand_co::operator) */
 
-static int mktop(int i) noex {
+static int topidx(int i) noex {
     	if (i > 0) {
 	    i -= 1 ;
 	}
 	return i ;
 }
-/* end subroutine (mktop) */
+/* end subroutine (topidx) */
 
 
