@@ -172,6 +172,7 @@ namespace {
 	int cmddestroy(int,uctimarg *) noex ;
 	int cmdset(int,uctimarg *) noex ;
 	int cmdget(int,uctimarg *) noex ;
+	int cmdover(int,uctimarg *) noex ;
 	int cmdsub(cmdsubs,int,uctimarg *) noex ;
 	int capbegin(int = -1) noex ;
 	int capend() noex ;
