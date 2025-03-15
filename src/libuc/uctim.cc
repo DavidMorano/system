@@ -172,6 +172,7 @@ namespace {
 	int cmddestroy(int,uctimarg *) noex ;
 	int cmdset(int,uctimarg *) noex ;
 	int cmdget(int,uctimarg *) noex ;
+	int cmdcancel(int,uctimarg *) noex ;
 	int cmdover(int,uctimarg *) noex ;
 	int cmdsub(cmdsubs,int,uctimarg *) noex ;
 	int capbegin(int = -1) noex ;
@@ -475,6 +476,13 @@ int uctim::cmdcancel(int id,uctimarg *argp) noex {
 	return rs ;
 }
 /* end subroutine (uctim_cmdcancel) */
+
+int uctim::cmdover(int id,uctimarg *argp) noex {
+    	int		rs = SR_OK ;
+	(void) id ;
+	(void) argp ;
+	return rs ;;
+}
 
 int uctim::enterpri(callback *ep) noex {
 	int		rs ;
