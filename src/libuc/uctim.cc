@@ -83,8 +83,6 @@
 #define	CF_CHILDTHRS	0
 #endif
 
-#define	UCTIM		struct uctim
-#define	UCTIM_FL	struct uctim_flags
 #define	UCTIM_SCOPE	PTHREAD_SCOPE_SYSTEM
 
 #define	TO_CAPTURE	60		/* timeout: capture wait for threads */
@@ -101,7 +99,9 @@ extern "C" {
     typedef int (*tworker_f)(void *) noex ;
 }
 
+typedef	UCTIM_FL	uctim_fl ;
 typedef vecsorthand	prique ;
+typedef callback *	callbackp ;
 
 
 /* external subroutines */
@@ -154,7 +154,7 @@ namespace {
 	sigset_t	savemask ;
 	pthread_t	tid_siger ;
 	pthread_t	tid_disper ;
-	UCTIM_FL	fl ;
+	uctim_fl	fl ;
 	volatile int	waiters ;	/* n-waiters for general capture */
 	aflag		fvoid ;
 	aflag		finit ;
@@ -168,12 +168,12 @@ namespace {
 	aflag		fexitdisp ;	/* thread is exiting */
 	int init() noex ;
 	int fini() noex ;
-	int cmdcreate(int,uctimarg *) noex ;
-	int cmddestroy(int,uctimarg *) noex ;
-	int cmdset(int,uctimarg *) noex ;
-	int cmdget(int,uctimarg *) noex ;
+	int cmd_create(int,uctimarg *) noex ;
+	int cmd_destroy(int,uctimarg *) noex ;
+	int cmd_set(int,uctimarg *) noex ;
+	int cmd_get(int,uctimarg *) noex ;
 	int cmdcancel(int,uctimarg *) noex ;
-	int cmdover(int,uctimarg *) noex ;
+	int cmd_over(int,uctimarg *) noex ;
 	int cmdsub(cmdsubs,int,uctimarg *) noex ;
 	int capbegin(int = -1) noex ;
 	int capend() noex ;
@@ -225,7 +225,6 @@ extern "C" {
     static void	uctim_atforkparent() noex ;
     static void	uctim_atforkchild() noex ;
     static void	uctim_exit() noex ;
-    static int	vourcmp(cvoid *,cvoid *) noex ;
 }
 
 consteval int mkopts() noex {
@@ -301,19 +300,19 @@ int uctim::cmdsub(cmdsubs cmd,int id,uctimarg *uap) noex {
 	                if ((rs = workready()) >= 0) {
 	                    switch (cmd) {
 	                    case cmdsub_create:
-	                        rs = cmdcreate(id,uap) ;
+	                        rs = cmd_create(id,uap) ;
 	                        break ;
 	                    case cmdsub_destroy:
-	                        rs = cmddestroy(id,uap) ;
+	                        rs = cmd_destroy(id,uap) ;
 	                        break ;
 	                    case cmdsub_set:
-	                        rs = cmdset(id,uap) ;
+	                        rs = cmd_set(id,uap) ;
 	                        break ;
 	                    case cmdsub_get:
-	                        rs = cmdget(id,uap) ;
+	                        rs = cmd_get(id,uap) ;
 	                        break ;
 	                    case cmdsub_over:
-	                        rs = cmdover(id,uap) ;
+	                        rs = cmd_over(id,uap) ;
 	                        break ;
 	                    default:
 	                        rs = SR_INVALID ;
@@ -412,7 +411,7 @@ int uctim::fini() noex {
 }
 /* end subroutine (uctim::fini) */
 
-int uctim::cmdset(int id,uctimarg *argp) noex {
+int uctim::cmd_set(int id,uctimarg *argp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (valp->metf) {
@@ -441,9 +440,9 @@ int uctim::cmdset(int id,uctimarg *argp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (uctim::cmdset) */
+/* end subroutine (uctim::cmd_set) */
 
-int uctim::cmdcancel(int id,uctimarg *argp) noex {
+int uctim::cmd_destroy(int id,uctimarg *argp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mx.lockbegin) >= 0) {
@@ -455,7 +454,7 @@ int uctim::cmdcancel(int id,uctimarg *argp) noex {
 	        if ((rs = vechand_del(elp,ei)) >= 0) {
 	            cint	rsn = SR_NOTFOUND ;
 		    bool	f_free = false ;
-	            if ((rs = vecsorthand_delhand(pqp,ep)) >= 0) {
+	            if ((rs = pqp->delhand(ep)) >= 0) {
 			f_free = true ;
 		    } else if (rs == rsn) {
 	                ciq	*cqp = &pass ;
@@ -477,7 +476,7 @@ int uctim::cmdcancel(int id,uctimarg *argp) noex {
 }
 /* end subroutine (uctim_cmdcancel) */
 
-int uctim::cmdover(int id,uctimarg *argp) noex {
+int uctim::cmd_over(int id,uctimarg *argp) noex {
     	int		rs = SR_OK ;
 	(void) id ;
 	(void) argp ;
@@ -487,26 +486,26 @@ int uctim::cmdover(int id,uctimarg *argp) noex {
 int uctim::enterpri(callback *ep) noex {
 	int		rs ;
 	int		pi = 0 ;
-	if ((rs = vecsorthand_count(pqp)) > 0) {
-	    if (callback *tep ; (rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
+	if ((rs = pqp->count) > 0) {
+	    if (callback *tep ; (rs = pqp->get(0,&tep)) >= 0) {
 	        if (ep->val < tep->val) {
-	            if ((rs = vecsorthand_add(pqp,ep)) >= 0) {
+	            if ((rs = pqp->add(ep)) >= 0) {
 	                pi = rs ;
 	                rs = timerset(ep->val) ;
 	                if (rs < 0)
-	                    vecsorthand_del(pqp,pi) ;
+	                    pqp->del(pi) ;
 	            }
 	        } else {
-	            rs = vecsorthand_add(pqp,ep) ;
+	            rs = pqp->add(ep) ;
 	            pi = rs ;
 	        }
 	    } /* end if (vecsorthand_get) */
 	} else {
-	    if ((rs = vecsorthand_add(pqp,ep)) >= 0) {
+	    if ((rs = pqp->add(ep)) >= 0) {
 	        pi = rs ;
 	        rs = timerset(ep->val) ;
 	        if (rs < 0) {
-	            vecsorthand_del(pqp,pi) ;
+	            pqp->del(pi) ;
 		}
 	    } /* end if (vecsorthand_add) */
 	}
@@ -690,7 +689,7 @@ int uctim::priqbegin() noex {
 	int		rs ;
 	if (void *p ; (rs = uc_libmalloc(osz,&p)) >= 0) {
 	    prique	*pqp = (prique *) p ;
-	    rs = vecsorthand_start(pqp,ourcmp,1) ;
+	    rs = pqp->start(ourcmp,1) ;
 	    if (rs < 0) {
 	        uc_libfree(pqp) ;
 	        pqp = nullptr ;
@@ -704,12 +703,14 @@ int uctim::priqend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (pqp) {
-	    rs1 = vecsorthand_finish(pqp) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-	if (pqp) {
-	    rs1 = uc_libfree(pqp) ;
-	    if (rs >= 0) rs = rs1 ;
+	    {
+	        rs1 = pqp->finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = uc_libfree(pqp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	    pqp = nullptr ;
 	}
 	return rs ;
@@ -720,9 +721,9 @@ int uctim::pridump() noex {
         int             rs = SR_OK ;
         int             rs1 ;
         void            *tep ;
-        for (int i = 0 ; (rs1 = vecsorthand_get(pqp,i,&tep)) >= 0 ; i += 1) {
+        for (int i = 0 ; (rs1 = pqp->get(i,&tep)) >= 0 ; i += 1) {
             if (tep) {
-                rs1 = vecsorthand_del(pqp,i--) ;
+                rs1 = pqp->del(i--) ;
                 if (rs >= 0) rs = rs1 ;
             }
         } /* end for */
@@ -932,11 +933,11 @@ int uctim::sigerserve() noex {
 	int		rs1 ;
 	if ((rs = capbegin(to)) >= 0) {
 	    custime	dt = time(nullptr) ;
-	    while ((rs = vecsorthand_count(pqp)) > 0) {
-	        if (callback *tep ; (rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
+	    while ((rs = pqp->count) > 0) {
+	        if (callback *tep ; (rs = pqp->get(0,&tep)) >= 0) {
 	            cint	ei = rs ;
 	            if (tep->val > dt) break ;
-	            if ((rs = vecsorthand_del(pqp,ei)) >= 0) {
+	            if ((rs = pqp->del(ei)) >= 0) {
 	                if ((rs = ciq_ins(&pass,tep)) >= 0) {
 	                    fcmd = true ;
 	                    rs = cv.signal ;
@@ -1138,18 +1139,5 @@ static int ourcmp(const TIMEOUT *e1p,const TIMEOUT *e2p) noex {
 	return rc ;
 }
 /* end subroutine (ourcmp) */
-
-static int vourcmp(cvoid *v1pp,cvoid *v2pp) noex {
-	const TIMEOUT	**e1pp = (const TIMEOUT **) v1pp ;
-	const TIMEOUT	**e2pp = (const TIMEOUT **) v2pp ;
-	int		rc ;
-	{
-	    const TIMEOUT	*e1p = (TIMEOUT *) *e1pp ;
-	    const TIMEOUT	*e2p = (TIMEOUT *) *e2pp ;
-	    rc = ourcmp(e1p,e2p) ;
-	}
-	return rc ;
-}
-/* end subroutine (vourcmp) */
 
 

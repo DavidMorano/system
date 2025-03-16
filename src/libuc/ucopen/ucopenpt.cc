@@ -1,4 +1,5 @@
 /* ucopenpt SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a PTS-style pseudo-terminal */
@@ -60,6 +61,9 @@
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward references */

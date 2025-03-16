@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* UNIX® signal event initialization */
+/* surboutine call-back interface */
 /* version %I% last-modified %G% */
 
 
@@ -13,7 +13,7 @@
 
 */
 
-/* Copyright Â© 2014 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2014 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 

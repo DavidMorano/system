@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C99 */
 
-/* time-out interface */
+/* surboutine call-back interface */
 /* version %I% last-modified %G% */
 
 
@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	callback
+
+	Description:
 	This file provides the definition of the CALLBACK object, and its
 	method declarations.
 
@@ -45,7 +49,7 @@ EXTERNC_end
 
 struct callback_entry {
 	void		*objp ;		/* object pointer */
-	callback_f	metf ;		/* function method (C-linkage) */
+	callback_f	metf ;		/* function subroutine (C-linkage) */
 	int		arg ;		/* function argument */
 } ;
 
