@@ -24,12 +24,13 @@
 	This subroutine loads (initializes) a TIMEOUT object.
 
 	Synopsis:
-	int callback_load(TIMEOUT *top,time_t sec,long nsec)
+	int callback_load(callback *op,void *objp,callback_f *memf,int arg) noex
 
 	Arguments:
-	top		pointer to TIMEOUT
-	sec		seconds
-	nsec		nanoseconds
+	op		object pointer
+	objp		target object-pointer
+	memf		member-function pointer
+	arg		argument
 
 	Returns:
 	>=0		OK
@@ -75,13 +76,13 @@ typedef callback_f	t_f ;
 
 /* exported subroutines */
 
-int callback_load(callback *top,void *o,t_f m,int arg) noex {
+int callback_load(callback *op,void *objp,t_f m,int arg) noex {
 	int		rs = SR_FAULT ;
-	if (top) {
+	if (op) {
 	    rs = SR_OK ;
-	    top->objp = o ;
-	    top->metf = m ;
-	    top->arg = arg ;
+	    op->objp = objp ;
+	    op->memf = m ;
+	    op->arg = arg ;
 	} /* end if (non-null) */
 	return rs ;
 }

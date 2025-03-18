@@ -38,18 +38,19 @@
 #include	<usysrets.h>
 
 
-#define	CALLBACK	struct callback_entry
+#define	CALLBACK	struct callback_head
 
 
 EXTERNC_begin
 
-typedef int (*callback_f)(void *,int) noex ;
+typedef int (*callback_f)(void *objp,int timid,int arg) noex ;
 
 EXTERNC_end
 
-struct callback_entry {
+struct callback_head {
 	void		*objp ;		/* object pointer */
-	callback_f	metf ;		/* function subroutine (C-linkage) */
+	callback_f	memf ;		/* function subroutine (C-linkage) */
+	int		timid ;		/* timer-ID */
 	int		arg ;		/* function argument */
 } ;
 
