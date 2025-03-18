@@ -1,17 +1,15 @@
-/* syshelper */
+/* syshelper SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* syshelper gathering and manipulation */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-12-01, David A­D­ Morano
-
 	This module was originally written.
-
 
 */
 
@@ -19,38 +17,39 @@
 
 /**************************************************************************
 
-	This modules provide a convenient way to perform some
+  	Name:
+	syshelper
+
+	Description:
+	This module provides a convenient way to perform some
 	operations with the Entropy Gathering Daemon (EGD) that
 	may be running on the current system.
 
-	Commands to the Entropy Gathering Daemon (EGD) :
+	Commands to the Entropy Gathering Daemon (EGD):
 
- 0x00 (get syshelper level)
-  0xMM (msb) 0xmm 0xll 0xLL (lsb)
- 0x01 (read syshelper nonblocking) 0xNN (bytes requested)
-  0xMM (bytes granted) MM bytes
- 0x02 (read syshelper blocking) 0xNN (bytes desired)
-  [block] NN bytes
- 0x03 (write syshelper) 0xMM 0xLL (bits of syshelper) 0xNN (bytes of data) NN bytes
- 0x04 (report PID)
-  0xMM (length of PID string, not null-terminated) MM chars
-
+	0x00 (get syshelper level)
+	0xMM (msb) 0xmm 0xll 0xLL (lsb)
+	0x01 (read syshelper nonblocking) 0xNN (bytes requested)
+	0xMM (bytes granted) MM bytes
+	0x02 (read syshelper blocking) 0xNN (bytes desired) [block] NN bytes
+	0x03 (write syshelper) 0xMM 0xLL (bits of syshelper) 0xNN 
+		(bytes of data) NN bytes
+	0x04 (report PID)
+	0xMM (length of PID string, not null-terminated) MM chars
 
 **************************************************************************/
 
-
-#define	SYSHELPER_MASTER	1
-
-
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<netorder.h>
+#include	<cfdec.h>
 #include	<localmisc.h>
 
 #include	"syshelper.h"
@@ -76,15 +75,25 @@
 
 /* external subroutines */
 
-extern int	cfdeci(char *,int,int *) ;
-extern int	dialuss(char *,int,int) ;
+extern int	dialuss(char *,int,int) noex ;
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
 
 
-/* exported subroutines */
+/* local variables */
 
+
+/* exported variables */
+
+
+/* exported subroutines */
 
 int syshelper_start(eop,filename)
 SYSHELPER	*eop ;

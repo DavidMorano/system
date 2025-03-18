@@ -55,10 +55,10 @@
 #include	<paramfile.h>
 #include	<nulstr.h>
 #include	<logfile.h>
+#include	<sysdialer.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
-#include	"sysdialer.h"
 #include	"prog.h"
 #include	"envs.h"
 #include	"sysvar.h"
@@ -229,10 +229,10 @@ struct subinfo {
 	PROG		*op ;
 	SYSDIALER_ARGS	*ap ;
 	IDS		id ;
-	VECSTR		aenvs ;
-	VECSTR		stores ;
-	VECSTR		defs ;
-	VECSTR		pvars, exports ;
+	vecstr		aenvs ;
+	vecstr		stores ;
+	vecstr		defs ;
+	vecstr		pvars, exports ;
 	EXPCOOK		cooks ;
 	vecstr		svars ;
 	ENVS		xenvs ;
@@ -256,60 +256,60 @@ struct intprog {
 /* forward references */
 
 static int	subinfo_start(SUBINFO *,PROG *,SYSDIALER_ARGS *,
-			cchar *,cchar *) ;
-static int	subinfo_procargs(SUBINFO *) ;
-static int	subinfo_procopts(SUBINFO *,KEYOPT *) ;
-static int	subinfo_defaults(SUBINFO *) ;
-static int	subinfo_userinfo(SUBINFO *) ;
-static int	subinfo_findprog(SUBINFO *,char *) ;
-static int	subinfo_search(SUBINFO *,VECSTR *,char *,cchar	 *) ;
-static int	subinfo_envdialer(SUBINFO *) ;
-static int	subinfo_sasize(SUBINFO *) ;
-static int	subinfo_sabuild(SUBINFO *,char *) ;
-static int	subinfo_exec(SUBINFO *,cchar *,cchar **) ;
-static int	subinfo_logfile(SUBINFO *) ;
-static int	subinfo_dirok(SUBINFO *,cchar	 *,int) ;
-static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
-static int	subinfo_finish(SUBINFO *) ;
+			cchar *,cchar *) noex ;
+static int	subinfo_procargs(SUBINFO *) noex ;
+static int	subinfo_procopts(SUBINFO *,KEYOPT *) noex ;
+static int	subinfo_defaults(SUBINFO *) noex ;
+static int	subinfo_userinfo(SUBINFO *) noex ;
+static int	subinfo_findprog(SUBINFO *,char *) noex ;
+static int	subinfo_search(SUBINFO *,vecstr *,char *,cchar *) noex ;
+static int	subinfo_envdialer(SUBINFO *) noex ;
+static int	subinfo_sasize(SUBINFO *) noex ;
+static int	subinfo_sabuild(SUBINFO *,char *) noex ;
+static int	subinfo_exec(SUBINFO *,cchar *,cchar **) noex ;
+static int	subinfo_logfile(SUBINFO *) noex ;
+static int	subinfo_dirok(SUBINFO *,cchar *,int) noex ;
+static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) noex ;
+static int	subinfo_finish(SUBINFO *) noex ;
 
-static int	loadgroupname(SUBINFO *) ;
-static int	loadarchitecture(SUBINFO *) ;
-static int	loadhz(SUBINFO *) ;
-static int	loadcooks(SUBINFO *) ;
+static int	loadgroupname(SUBINFO *) noex ;
+static int	loadarchitecture(SUBINFO *) noex ;
+static int	loadhz(SUBINFO *) noex ;
+static int	loadcooks(SUBINFO *) noex ;
 
-static int	loadpathlist(SUBINFO *,VECSTR *,VECSTR *) ;
-static int	loadpathcomp(SUBINFO *,VECSTR *,cchar	 *) ;
+static int	loadpathlist(SUBINFO *,vecstr *,vecstr *) noex ;
+static int	loadpathcomp(SUBINFO *,vecstr *,cchar *) noex ;
 
-static int	loaddefsfile(SUBINFO *,cchar	 *) ;
-static int	loaddefs(SUBINFO *,cchar	 **) ;
-static int	loadxfile(SUBINFO *,cchar	 *) ;
-static int	loadxsched(SUBINFO *,cchar	 **) ;
-static int	loadpvars(SUBINFO *,cchar **,cchar *) ;
-static int	loadpvarsdef(SUBINFO *,cchar	 **) ;
+static int	loaddefsfile(SUBINFO *,cchar *) noex ;
+static int	loaddefs(SUBINFO *,cchar **) noex ;
+static int	loadxfile(SUBINFO *,cchar *) noex ;
+static int	loadxsched(SUBINFO *,cchar **) noex ;
+static int	loadpvars(SUBINFO *,cchar **,cchar *) noex ;
+static int	loadpvarsdef(SUBINFO *,cchar **) noex ;
 
-static int	pvars_begin(SUBINFO *,cchar	 **,cchar	 *) ;
-static int	pvars_end(SUBINFO *) ;
+static int	pvars_begin(SUBINFO *,cchar **,cchar *) noex ;
+static int	pvars_end(SUBINFO *) noex ;
 
-static int	sched_begin(SUBINFO *) ;
-static int	sched_end(SUBINFO *) ;
+static int	sched_begin(SUBINFO *) noex ;
+static int	sched_end(SUBINFO *) noex ;
 
-static int	procenvextra(SUBINFO *) ;
-static int	procenvdef(SUBINFO *) ;
-static int	procenvsys(SUBINFO *,cchar *) ;
-static int	procdefprog(SUBINFO *,cchar **) ;
+static int	procenvextra(SUBINFO *) noex ;
+static int	procenvdef(SUBINFO *) noex ;
+static int	procenvsys(SUBINFO *,cchar *) noex ;
+static int	procdefprog(SUBINFO *,cchar **) noex  ;
 
-static int	xfile(IDS *,cchar *) ;
+static int	xfile(IDS *,cchar *) noex ;
 
 #ifdef	COMMENT
-static int	loadpath(vecstr *,cchar *) ;
-static int	intprog(struct intprog *,cchar *) ;
-static int	xfile(IDS *,cchar *) ;
-static int	setdefpath(vecstr *,cchar *) ;
-static int	createsearchpath(VECSTR *,cchar *) ;
+static int	loadpath(vecstr *,cchar *) noex ;
+static int	intprog(struct intprog *,cchar *) noex ;
+static int	xfile(IDS *,cchar *) noex ;
+static int	setdefpath(vecstr *,cchar *) noex ;
+static int	createsearchpath(vecstr *,cchar *) noex ;
 #endif /* COMMENT */
 
 #ifdef	COMMENT
-static int	mkpathvar(SUBINFO *,vecstr *,cchar *,char **) ;
+static int	mkpathvar(SUBINFO *,vecstr *,cchar *,char **) noex ;
 #endif
 
 static bool	haspmz(cchar *) noex ;
@@ -331,7 +331,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static constexpr cchar	 *argopts[] = {
+static constexpr cpcchar	 argopts[] = {
 	"ROOT",
 	"RN",
 	"sn",
@@ -349,7 +349,7 @@ enum procopts {
 	procopt_overlast
 } ;
 
-static constexpr cchar	 *procopts[] = {
+static constexpr cpcchar	 procopts[] = {
 	"log",
 	nullptr
 } ;
@@ -359,7 +359,7 @@ enum cparams {
 	cparam_overlast
 } ;
 
-static constexpr cchar	*cparams[] = {
+static constexpr cpcchar	cparams[] = {
 	"defprog",
 	nullptr
 } ;
@@ -389,7 +389,7 @@ enum cooks {
 	cook_overlast
 } ;
 
-static constexpr cchar	*cooks[] = {
+static constexpr cpcchar	cooks[] = {
 	"MACHINE",	/* machine-name */
 	"ARCHITECTURE",	/* machine-architecture */
 	"NCPU",		/* number of machine CPUs */
@@ -414,21 +414,21 @@ static constexpr cchar	*cooks[] = {
 	nullptr
 } ;
 
-static constexpr cchar	*schedhconf[] = {
+static constexpr cpcchar	schedhconf[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
 	nullptr
 } ;
 
-static constexpr cchar	*schedpconf[] = {
+static constexpr cpcchar	schedpconf[] = {
 	"%h/%e/%n/%n.%f",
 	"%h/%e/%n/%f",
 	"%h/%e/%n.%f",
 	nullptr
 } ;
 
-static constexpr cchar	*schedpfile[] = {
+static constexpr cpcchar	schedpfile[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -436,7 +436,7 @@ static constexpr cchar	*schedpfile[] = {
 	nullptr
 } ;
 
-static constexpr cchar	*schedhfile[] = {
+static constexpr cpcchar	schedhfile[] = {
 	"%h/%e/%n/%n.%f",
 	"%h/%e/%n/%f",
 	"%h/%e/%n.%f",
@@ -444,7 +444,7 @@ static constexpr cchar	*schedhfile[] = {
 	nullptr
 } ;
 
-static constexpr cchar	*pathvars[] = {
+static constexpr cpcchar	pathvars[] = {
 	"PATH",
 	"LD_LIBRARY_PATH",
 	"MANPATH",
@@ -457,7 +457,7 @@ static constexpr cchar	*pathvars[] = {
 	nullptr
 } ;
 
-static constexpr cchar	*envbad[] = {
+static constexpr cpcchar	envbad[] = {
 	"_",
 	"_A0",
 	"_EF",
@@ -467,7 +467,7 @@ static constexpr cchar	*envbad[] = {
 	nullptr
 } ;
 
-static constexpr cchar	*envsys[] = {
+static constexpr cpcchar	envsys[] = {
 	"SYSNAME",
 	"RELEASE",
 	"VERSION",
@@ -490,7 +490,7 @@ enum envdialers {
 	envdialer_overlast
 } ;
 
-static constexpr cchar	*envdialers[] = {
+static constexpr cpcchar	envdialers[] = {
 	"SYSDIALER_ROOT",
 	"SYSDIALER_HOST",
 	"SYSDIALER_SVC",
@@ -501,13 +501,16 @@ static constexpr cchar	*envdialers[] = {
 
 /* exported variables */
 
-SYSDIALER_INFO	prog_mod = {
+SYSDIALER_INFO	prog_modinfo = {
 	PROG_MNAME,
 	PROG_VERSION,
 	PROG_INAME,
 	szof(PROG),
 	PROG_FLAGS
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -608,7 +611,7 @@ cchar		*av[] ;
 	if (rs < 0)
 	    goto badenvsload ;
 
-	opts = VECSTR_OCOMPACT ;
+	opts = vecstr_OCOMPACT ;
 	rs = vecstr_start(&sip->exports,DEFNXENVS,opts) ;
 	if (rs < 0)
 	    goto badxinit ;
@@ -864,12 +867,7 @@ int		salen ;
 }
 /* end subroutine (prog_sendto) */
 
-
-int prog_sendmsg(op,msgp,flags)
-PROG		*op ;
-struct msghdr	*msgp ;
-int		flags ;
-{
+int prog_sendmsg(PROG *op,MSGHDR *msgp,int flags) noex {
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -1018,12 +1016,14 @@ static int subinfo_finish(SUBINFO *sip)
 	    if (rs >= 0) rs = rs1 ;
 	    sip->a.pr = nullptr ;
 	}
-
+	{
 	rs1 = vecstr_finish(&sip->aenvs) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = vecstr_finish(&sip->stores) ;
 	if (rs >= 0) rs = rs1 ;
+	}
 
 	return rs ;
 }
@@ -1563,9 +1563,9 @@ ret0:
 /* end subroutine (subinfo_findprog) */
 
 
-static int subinfo_search(SUBINFO *sip,VECSTR *elp,char progfname[],cchar pn[])
+static int subinfo_search(SUBINFO *sip,vecstr *elp,char progfname[],cchar pn[])
 {
-	VECSTR		pathlist ;
+	vecstr		pathlist ;
 	int		rs ;
 
 	if ((rs = vecstr_start(&pathlist,10,0)) >= 0) {
@@ -2506,7 +2506,7 @@ SUBINFO		*sip ;
 cchar		*sched[] ;
 cchar		fname[] ;
 {
-	VECSTR		*pvp ;
+	vecstr		*pvp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	char		tmpfname[MAXPATHLEN + 1] ;
@@ -2551,8 +2551,8 @@ cchar		*pnames[] ;
 
 static int loadpathlist(sip,plp,elp)
 SUBINFO		*sip ;
-VECSTR		*plp ;
-VECSTR		*elp ;
+vecstr		*plp ;
+vecstr		*elp ;
 {
 	int		rs = SR_OK ;
 	cchar		*varpath = VARPATH ;
@@ -2622,7 +2622,7 @@ cchar		*pp ;
 #ifdef	COMMENT
 
 static int createsearchpath(lp,pr)
-VECSTR		*lp ;
+vecstr		*lp ;
 cchar		pr[] ;
 {
 	int		rs ;

@@ -140,7 +140,7 @@ OBJE=
 OBJ= obja.o 
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		all
@@ -168,9 +168,9 @@ so:			$(T).so
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
 
-$(T).a:			$(OBJ)
-	$(AR) -rc $(T).a $?
 
 $(T).o:			$(OBJ) Makefile localmisc.h
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
