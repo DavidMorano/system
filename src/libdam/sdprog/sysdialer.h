@@ -1,4 +1,5 @@
 /* sysdialer HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* system-dialer storage object */
@@ -18,8 +19,8 @@
 #define	SYSDIALER_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* system types */
 #include	<usystem.h>		/* for |ino_t| */
 #include	<vecobj.h>
 #include	<vecstr.h>
