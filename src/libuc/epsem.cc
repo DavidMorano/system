@@ -1,4 +1,4 @@
-/* psem SUPPORT (POSIX® Semaphore) */
+/* psem HEADER (emulated POSIX® Semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -32,7 +32,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>

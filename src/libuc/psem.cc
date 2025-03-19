@@ -24,15 +24,15 @@
 	This module provides the POSIX® standard (unnamed) semaphore
 	facility one way or another.  On normal operating systems,
 	the whole POSIX semaphore facility (both named and unnamed)
-	is readily available. But on the Apple Darwin operating
+	is readily available.  But on the Apple Darwin operating
 	system, it is not.  Apple Darwin only supports the named
-	POSIX semaphore capability. Why? Because Apple really does
+	POSIX semaphore capability.  Why?  Because Apple really does
 	not give a hoot number one to POSIX standards.  They (Apple)
 	do not have to.  They can just ignore everyone and get away
 	with it because ... after all ...  they are Apple!  So below
 	we have a compile time switch.  If we are compiling on a
 	system that supports the the POSIX unnamed semaphores, we
-	just used a cleaned up wrapper version of them. But if we
+	just used a cleaned up wrapper version of them.  But if we
 	are on a system (like Apple Darwin) that does not support
 	unnamed POSIX semaphores, then we substitute our own
 	implemetation of POSIX unnamed semaphores.  Happily, we

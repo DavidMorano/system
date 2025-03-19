@@ -37,7 +37,12 @@ export {
 	void set(int a) { 
 	    rs = a ; 
 	} ;
+	operator int () noex ;
     } ; /* end struct (retstat) */
+}
+
+retstat::operator int () noex {
+    	return rs ;
 }
 
 

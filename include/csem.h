@@ -1,4 +1,4 @@
-/* csem HEADER */
+/* csem HEADER (Counting Semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -20,7 +20,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<pthread.h>
 #include	<ptm.h>
 #include	<ptc.h>

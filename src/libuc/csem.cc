@@ -1,4 +1,4 @@
-/* csem SUPPORT */
+/* csem HEADER (Counting Semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -50,7 +50,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
@@ -89,7 +88,7 @@ template<typename ... Args>
 static inline int csem_ctor(csem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->count = 0 ;
@@ -193,7 +192,7 @@ int csem_decr(csem *op,int c,int to) noex {
 	int		ocount = 0 ;
 	if ((rs = csem_magic(op)) >= 0) {
             if (c > 0) {
-                timespec    ts ;
+                timespec    ts{} ;
                 if (to >= 0) {
                     clock_gettime(CLOCK_REALTIME,&ts) ;
                     ts.tv_sec += to ;

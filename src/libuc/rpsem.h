@@ -1,4 +1,4 @@
-/* psem HEADER */
+/* psem HEADER ("real" POSIX® Semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
