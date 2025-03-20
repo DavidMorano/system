@@ -1,4 +1,4 @@
-/* psem HEADER ("real" POSIX® Semaphore) */
+/* rpsem HEADER ("real" POSIX® Semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -35,13 +35,13 @@
 	error messages to appear from the compiler when attempting
 	to use the |init| and |destroy| subroutines (methods) of
 	the POSIX® semaphore object.  There is no easy fix for this
-	that I know of.  So to get around this, I redefine (using
+	that I know of.  So to get around this,  I redefine (using
 	the C/C++ language preprocessor (CPP) to redefine the
 	names for those subroutines to something else (which are
-	defined) elsewhere ) so that at least we get a clear ocmpile
+	defined elsewhere) so that at least we get a clear ocmpile
 	for code test purposes.  Not that for real run-time, the
 	native Apple-Darwin implementation of POSIX® is completely
-	bypassed with my own implementation. See the pre-processor
+	bypassed with my own implementation.  See the pre-processor
 	definitions under the section below named "local defines"
 	to see how I deal with this (crap)!  
 
@@ -53,14 +53,12 @@
 #include	<semaphore.h>
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#if	defined(PSEM_REDIRECT) && (PSEM_REDIRECT > 0)
 #include	"rpsem.h"
-#else /* redirect */
-#include	"psem.h"
-#endif /* redirect */
 
 
 /* local defines */

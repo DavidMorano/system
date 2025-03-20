@@ -1,4 +1,4 @@
-/* psem HEADER (emulated POSIX® Semaphore) */
+/* epsem HEADER (emulated POSIX® Semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -37,11 +37,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#if	defined(PSEM_REDIRECT) && (PSEM_REDIRECT > 0)
 #include	"epsem.h"
-#else /* redirect */
-#include	"psem.h"
-#endif /* redirect */
 
 
 /* local defines */

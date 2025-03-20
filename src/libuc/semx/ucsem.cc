@@ -202,18 +202,18 @@ int ucsem_close(ucsem *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ucsem_magic(op)) >= 0) {
-		rs = SR_BADFMT ;
-	        if (op->sp) {
-	            repeat {
-	                if ((rs = sem_close(op->sp)) < 0) rs = (- errno) ;
-	            } until (rs != SR_INTR) ;
-		} /* end if (non-null) */
-		if (op->name) {
-		    rs1 = uc_free(op->name) ;
-		    if (rs >= 0) rs = rs1 ;
-		    op->name = nullptr ;
-		}
-		op->magic = 0 ;
+	    rs = SR_BADFMT ;
+	    if (op->sp) {
+	        repeat {
+	            if ((rs = sem_close(op->sp)) < 0) rs = (- errno) ;
+	        } until (rs != SR_INTR) ;
+	    } /* end if (non-null) */
+	    if (op->name) {
+		rs1 = uc_free(op->name) ;
+		if (rs >= 0) rs = rs1 ;
+		op->name = nullptr ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -222,9 +222,9 @@ int ucsem_close(ucsem *op) noex {
 int ucsem_trywait(ucsem *op) noex {
 	int		rs ;
 	if ((rs = ucsem_magic(op)) >= 0) {
-	        repeat {
-	            if ((rs = sem_trywait(op->sp)) < 0) rs = (- errno) ;
-	        } until (rs != SR_INTR) ;
+	    repeat {
+	        if ((rs = sem_trywait(op->sp)) < 0) rs = (- errno) ;
+	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -234,9 +234,9 @@ int ucsem_trywait(ucsem *op) noex {
 int ucsem_getvalue(ucsem *op,int *rp) noex {
 	int		rs ;
 	if ((rs = ucsem_magic(op)) >= 0) {
-	        repeat {
-	            if ((rs = sem_getvalue(op->sp,rp)) < 0) rs = (- errno) ;
-	        } until (rs != SR_INTR) ;
+	    repeat {
+	        if ((rs = sem_getvalue(op->sp,rp)) < 0) rs = (- errno) ;
+	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -257,9 +257,9 @@ int ucsem_wait(ucsem *op) noex {
 int ucsem_waiti(ucsem *op) noex {
 	int		rs ;
 	if ((rs = ucsem_magic(op)) >= 0) {
-	        if ((rs = sem_wait(op->sp)) < 0) {
-	            rs = (- errno) ;
-	        }
+	   if ((rs = sem_wait(op->sp)) < 0) {
+	        rs = (- errno) ;
+	   }
 	} /* end if (magic) */
 	return rs ;
 }
@@ -268,9 +268,9 @@ int ucsem_waiti(ucsem *op) noex {
 int ucsem_post(ucsem *op) noex {
 	int		rs = SR_FAULT ;
 	if ((rs = ucsem_magic(op)) >= 0) {
-	        repeat {
-	            if ((rs = sem_post(op->sp)) < 0) rs = (- errno) ;
-	        } until (rs != SR_INTR) ;
+	    repeat {
+	        if ((rs = sem_post(op->sp)) < 0) rs = (- errno) ;
+	   } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }

@@ -13,7 +13,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<semaphore.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>

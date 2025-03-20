@@ -91,8 +91,8 @@ static inline int csem_ctor(csem *op,Args ... args) noex {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
-	    op->count = 0 ;
-	    op->waiters = 0 ;
+	    op->cnt = 0 ;
+	    op->nwaiting = 0 ;
 	    if ((op->mxp = new(nothrow) ptm) != np) {
 	        if ((op->cvp = new(nothrow) ptc) != np) {
 		    rs = SR_OK ;
@@ -147,7 +147,7 @@ int csem_create(csem *op,int f_shared,int count) noex {
 	int		rs ;
 	if ((rs = csem_ctor(op)) >= 0) {
 	    if (count < 1) count = 1 ;
-	    op->count = count ;
+	    op->cnt = count ;
 	    if ((rs = csem_ptminit(op,f_shared)) >= 0) {
 	        if ((rs = csem_ptcinit(op,f_shared)) >= 0) {
 		    op->magic = CSEM_MAGIC ;
@@ -198,8 +198,8 @@ int csem_decr(csem *op,int c,int to) noex {
                     ts.tv_sec += to ;
                 }
                 if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
-                    op->waiters += 1 ;
-                    while ((rs >= 0) && (op->count < c)) {
+                    op->nwaiting += 1 ;
+                    while ((rs >= 0) && (op->cnt < c)) {
                         if (to >= 0) {
                             rs = ptc_timedwait(op->cvp,op->mxp,&ts) ;
                         } else {
@@ -207,10 +207,10 @@ int csem_decr(csem *op,int c,int to) noex {
                         }
                     } /* end while */
                     if (rs >= 0) {
-                        ocount = op->count ;
-                        op->count -= c ;
+                        ocount = op->cnt ;
+                        op->cnt -= c ;
                     }
-                    op->waiters -= 1 ;
+                    op->nwaiting -= 1 ;
                     rs1 = ptm_unlock(op->mxp) ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (ptm) */
@@ -230,9 +230,9 @@ int csem_incr(csem *op,int c) noex {
 	    rs = SR_INVALID ;
 	    if (c > 0) {
 	        if ((rs = ptm_lock(op->mxp)) >= 0) {
-	            ocount = op->count ;
-	            op->count += c ;
-		    if ((ocount == 0) && (op->waiters > 0)) {
+	            ocount = op->cnt ;
+	            op->cnt += c ;
+		    if ((ocount == 0) && (op->nwaiting > 0)) {
 	                rs = ptc_signal(op->cvp) ;
 	            }
 	            rs1 = ptm_unlock(op->mxp) ;
@@ -253,7 +253,7 @@ int csem_count(csem *op) noex {
 	if ((rs = csem_magic(op)) >= 0) {
 	    if ((rs = ptm_lock(op->mxp)) >= 0) {
 	        {
-	            ocount = op->count ;
+	            ocount = op->cnt ;
 	        }
 	        rs1 = ptm_unlock(op->mxp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -266,17 +266,17 @@ int csem_count(csem *op) noex {
 int csem_waiters(csem *op) noex {
 	int		rs ;
 	int		rs1 ;
-	int		waiters = 0 ;
+	int		c = 0 ;
 	if ((rs = csem_magic(op)) >= 0) {
 	    if ((rs = ptm_lock(op->mxp)) >= 0) {
 	        {
-	            waiters = op->waiters ;
+	            c = op->nwaiting ;
 	        }
 	        rs1 = ptm_unlock(op->mxp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex-lock) */
 	} /* end if (magic) */
-	return (rs >= 0) ? waiters : rs ;
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (csem_waiters) */
 
@@ -328,5 +328,50 @@ static int csem_ptcinit(csem *op,int f_shared) noex {
 	return rs ;
 }
 /* end subroutine (csem_ptcinit) */
+
+int csem::create(int fshared,int sc) noex {
+    	return csem_create(this,fshared,sc) ;
+}
+
+int csem::decr(int c,int to) noex {
+    	return csem_decr(this,c,to) ;
+}
+
+int csem::incr(int c) noex {
+    	return csem_incr(this,c) ;
+}
+
+void csem::dtor() noex {
+	if (cint rs = destroy ; rs < 0) {
+	    ulogerror("csem",rs,"fini-destroy") ;
+	}
+}
+
+csem::operator int () noex {
+	int		rs ;
+	if ((rs = csem_magic(this)) >= 0) {
+	    rs = cnt ;
+	}
+	return rs ;
+}
+
+csem_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case csemmem_count:
+	        rs = csem_count(op) ;
+	        break ;
+	    case csemmem_waiters:
+	        rs = csem_waiters(op) ;
+	        break ;
+	    case csemmem_destroy:
+	        rs = csem_destroy(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (csem_co::operator) */
 
 

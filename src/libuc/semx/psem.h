@@ -19,7 +19,7 @@
 	psem
 
 	Description:
-	These are unnamed POSIX® semaphores.  Sss the corresponding
+	These are unnamed POSIX® semaphores.  See the corresponding
 	main C-language source file for more information on what
 	is going on here.
 
