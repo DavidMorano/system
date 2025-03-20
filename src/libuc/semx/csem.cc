@@ -146,8 +146,7 @@ static int	csem_ptcinit(csem *,int) noex ;
 int csem_create(csem *op,int f_shared,int count) noex {
 	int		rs ;
 	if ((rs = csem_ctor(op)) >= 0) {
-	    if (count < 1) count = 1 ;
-	    op->cnt = count ;
+	    op->cnt = (count > 0) ? count : 0 ;
 	    if ((rs = csem_ptminit(op,f_shared)) >= 0) {
 	        if ((rs = csem_ptcinit(op,f_shared)) >= 0) {
 		    op->magic = CSEM_MAGIC ;
@@ -348,8 +347,8 @@ void csem::dtor() noex {
 }
 
 csem::operator int () noex {
-	int		rs ;
-	if ((rs = csem_magic(this)) >= 0) {
+	int		rs = SR_NOTOPEN ;
+	if (mxp && cvp) {
 	    rs = cnt ;
 	}
 	return rs ;

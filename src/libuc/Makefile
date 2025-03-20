@@ -352,6 +352,7 @@ uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
 ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
 ucsysconf.o:		ucsysconf.cc ucsysconf.h
 ucobjmode.o:		ucobjmode.cc
+ucunlink.o:		ucunlink.cc
 
 # UNIX C-language system library string-to-integer interface
 # string-to-x

@@ -250,11 +250,15 @@ extern int	uc_mkfifo(cchar *,mode_t) noex ;
 /* project related */
 extern int	uc_inproj(cchar *,cchar *,char *,int) noex ;
 
-/* POSIX shared memory operations */
+/* POSIX® shared memory operations */
 extern int	uc_openshm(cchar *,int,mode_t) noex ;
 extern int	uc_openshmto(cchar *,int,mode_t,int) noex ;
 extern int	uc_unlinkshm(cchar *) noex ;
 
+/* POSIX® semaphore */
+extern int	uc_unlinksem(cchar *) noex ;
+
+/* host entry */
 extern int	uc_hostentfree(HOSTENT *) noex ;
 
 /* NETWORK ADDRINFO database */
