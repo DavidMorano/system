@@ -815,6 +815,11 @@ setx.o:			setx.dir
 setx.dir:
 	makesubdir $@
 
+# SEMX
+semx.o:			semx.dir
+semx.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 

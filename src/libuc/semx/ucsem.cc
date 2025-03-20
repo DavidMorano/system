@@ -36,7 +36,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |mode_t| */
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -92,9 +92,6 @@
 
 
 /* forward references */
-
-int		ucsemunlink(cchar *) noex ;
-int		unlinkucsem(cchar *) noex ;
 
 template<typename ... Args>
 static inline int ucsem_magic(ucsem *op,Args ... args) noex {
@@ -258,7 +255,7 @@ int ucsem_waiti(ucsem *op) noex {
 	int		rs ;
 	if ((rs = ucsem_magic(op)) >= 0) {
 	   if ((rs = sem_wait(op->sp)) < 0) {
-	        rs = (- errno) ;
+	       rs = (- errno) ;
 	   }
 	} /* end if (magic) */
 	return rs ;
@@ -270,7 +267,7 @@ int ucsem_post(ucsem *op) noex {
 	if ((rs = ucsem_magic(op)) >= 0) {
 	    repeat {
 	        if ((rs = sem_post(op->sp)) < 0) rs = (- errno) ;
-	   } until (rs != SR_INTR) ;
+	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -279,20 +276,16 @@ int ucsem_post(ucsem *op) noex {
 int ucsem_unlink(ucsem *op) noex {
 	int		rs ;
 	if ((rs = ucsem_magic(op)) >= 0) {
-		rs = SR_BADFMT ;
-		if (op) {
-		    rs = SR_OK ;
-	            if (op->name[0] != '\0') {
-	    		rs = unlinkucsem(op->name) ;
-		        if_constexpr (f_condunlink) {
-	    		    if (rs >= 0) {
-	        		ucsemdirrm(op->name) ;
-			    }
-			} else {
-	    		    ucsemdirrm(op->name) ;
-		        }
-		    } /* end if (not zero name) */
-		} /* end if (not BADFMT) */
+	    if (op->name[0] != '\0') {
+		rs = unlinkucsem(op->name) ;
+		if_constexpr (f_condunlink) {
+		    if (rs >= 0) {
+			ucsemdirrm(op->name) ;
+		    }
+		} else {
+		    ucsemdirrm(op->name) ;
+		}
+	    } /* end if (not zero name) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -349,8 +342,7 @@ static int ucsemdiradd(cchar *name,mode_t om) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (name) {
-	    char	*tmpfname{} ;
-	    if ((rs = malloc_mp(&tmpfname)) >= 0) {
+	    if (char *tmpfname ; (rs = malloc_mp(&tmpfname)) >= 0) {
 		cchar	*pp = UCSEM_PATHPREFIX ;
 		if ((rs = mkpath2(tmpfname,pp,name)) >= 0) {
 		    cint	rsn = SR_NOENT ;
@@ -373,8 +365,7 @@ static int ucsemdirrm(cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (name) {
-	    char	*tmpfname{} ;
-	    if ((rs = malloc_mp(&tmpfname)) >= 0) {
+	    if (char *tmpfname ; (rs = malloc_mp(&tmpfname)) >= 0) {
 	        cchar	*pp = UCSEM_PATHPREFIX ;
 	        if ((rs = mkpath2(tmpfname,pp,name)) >= 0) {
 		    rs = u_unlink(tmpfname) ;
@@ -393,8 +384,7 @@ static int ucsemdircheck(cchar *pp) noex {
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
 	    ucentpw	pw ;
 	    cint	pwlen = rs ;
-	    char	*pwbuf{} ;
-	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
+	    if (char *pwbuf ; (rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        USTAT	sb ;
 	        rs = u_stat(pp,&sb) ;
 	        if ((rs < 0) || (! S_ISDIR(sb.st_mode))) {
@@ -433,12 +423,12 @@ static int ucsemdircheck(cchar *pp) noex {
 /* end subroutine (ucsemdircheck) */
 
 static int getucsemgid(void) noex {
-	cint		nrs = SR_NOTFOUND ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	cchar		*gn = UCSEM_GROUPNAME1 ;
-	if ((rs = getgid_group(gn,-1)) == nrs) {
+	if ((rs = getgid_group(gn,-1)) == rsn) {
 	    gn = UCSEM_GROUPNAME2 ;
-	    if ((rs = getgid_group(gn,-1)) == nrs) {
+	    if ((rs = getgid_group(gn,-1)) == rsn) {
 		rs = UCSEM_GID ;
 	    }
 	}
