@@ -27,9 +27,7 @@
 #include	<usysrets.h>
 
 #include	<csem.h>
-#include	<epsem.h>
 #include	<psem.h>
-#include	<rpsem.h>
 #include	<ucsem.h>
 
 

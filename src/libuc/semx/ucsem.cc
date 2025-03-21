@@ -1,9 +1,9 @@
-/* ucsem SUPPORT */
+/* ucsem SUPPORT (named semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
-/* UNIX® Counting Semaphore (UCSEM) */
+/* UNIX® -- named -- Counting Semaphore (UCSEM) */
 /* version %I% last-modified %G% */
 
 #define	CF_CONDUNLINK	1		/* conditional unlink */
@@ -132,12 +132,10 @@ int ucsem_open(ucsem *op,cchar *name,int oflag,mode_t om,uint count) noex {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
 		if (char *altname{} ; (rs = malloc_mn(&altname)) >= 0) {
+		    cint	mnlen = rs ;
 	            if (name[0] != '/') {
-			if ((rs = getbufsize(getbufsize_mn)) >= 0) {
-			    cint	mnlen = rs ;
-	                    rs = sncpy2(altname,mnlen,"/",name) ;
-	                    name = altname ;
-			}
+	                rs = sncpy2(altname,mnlen,"/",name) ;
+	                name = altname ;
 	            } /* end if (name does not start w/ '/') */
 	            if (rs >= 0) {
 	                bool	f_exit = true ;
@@ -181,7 +179,9 @@ int ucsem_open(ucsem *op,cchar *name,int oflag,mode_t om,uint count) noex {
 				cint	mnlen = rs ;
 				op->name = bp ;
 	                        strwcpy(bp,name,mnlen) ;
-	                        if (oflag & O_CREAT) ucsemdiradd(name,om) ;
+	                        if (oflag & O_CREAT) {
+				    ucsemdiradd(name,om) ;
+				}
 	                        op->magic = UCSEM_MAGIC ;
 			    } /* end if (memory-allocation) */
 	                } /* end if (opened) */
@@ -202,7 +202,9 @@ int ucsem_close(ucsem *op) noex {
 	    rs = SR_BADFMT ;
 	    if (op->sp) {
 	        repeat {
-	            if ((rs = sem_close(op->sp)) < 0) rs = (- errno) ;
+	            if ((rs = sem_close(op->sp)) < 0) {
+			rs = (- errno) ;
+		    }
 	        } until (rs != SR_INTR) ;
 	    } /* end if (non-null) */
 	    if (op->name) {
@@ -220,7 +222,9 @@ int ucsem_trywait(ucsem *op) noex {
 	int		rs ;
 	if ((rs = ucsem_magic(op)) >= 0) {
 	    repeat {
-	        if ((rs = sem_trywait(op->sp)) < 0) rs = (- errno) ;
+	        if ((rs = sem_trywait(op->sp)) < 0) {
+		    rs = (- errno) ;
+		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
 	return rs ;
@@ -232,7 +236,9 @@ int ucsem_getvalue(ucsem *op,int *rp) noex {
 	int		rs ;
 	if ((rs = ucsem_magic(op)) >= 0) {
 	    repeat {
-	        if ((rs = sem_getvalue(op->sp,rp)) < 0) rs = (- errno) ;
+	        if ((rs = sem_getvalue(op->sp,rp)) < 0) {
+		    rs = (- errno) ;
+		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
 	return rs ;
@@ -244,7 +250,9 @@ int ucsem_wait(ucsem *op) noex {
 	int		rs ;
 	if ((rs = ucsem_magic(op)) >= 0) {
 	    repeat {
-	        if ((rs = sem_wait(op->sp)) < 0) rs = (- errno) ;
+	        if ((rs = sem_wait(op->sp)) < 0) {
+		    rs = (- errno) ;
+		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
 	return rs ;
@@ -266,7 +274,9 @@ int ucsem_post(ucsem *op) noex {
 	int		rs = SR_FAULT ;
 	if ((rs = ucsem_magic(op)) >= 0) {
 	    repeat {
-	        if ((rs = sem_post(op->sp)) < 0) rs = (- errno) ;
+	        if ((rs = sem_post(op->sp)) < 0) {
+		    rs = (- errno) ;
+		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -300,9 +310,7 @@ int ucsemunlink(cchar *name) noex {
 	if (name) {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
-	        char	*altname = nullptr ;
-		rs = SR_OK ;
-		if ((rs = malloc_mn(&altname)) >= 0) {
+	        if (char *altname ; (rs = malloc_mn(&altname)) >= 0) {
 		    cint	mnlen = rs ;
 	            if (name[0] != '/') {
 	                sncpy2(altname,mnlen,"/",name) ;
@@ -310,7 +318,7 @@ int ucsemunlink(cchar *name) noex {
 	            }
 	            repeat {
 	                rs = SR_OK ;
-	                if ((rs = sem_unlink(name)) < -1) {
+	                if ((rs = sem_unlink(name)) < 0) {
 			    rs = (- errno) ;
 			}
 	            } until (rs != SR_INTR) ;
@@ -388,9 +396,9 @@ static int ucsemdircheck(cchar *pp) noex {
 	        USTAT	sb ;
 	        rs = u_stat(pp,&sb) ;
 	        if ((rs < 0) || (! S_ISDIR(sb.st_mode))) {
-	    	    rs = u_mkdir(pp,0777) ;
-	            if (rs >= 0) {
-	                rs = u_chmod(pp,(0777 | S_ISVTX)) ;
+		    cmode	dm = 0777 ;
+	    	    if ((rs = u_mkdir(pp,dm)) >= 0) {
+	                rs = u_chmod(pp,(dm | S_ISVTX)) ;
 		    }
 	            if (rs >= 0) {
 	        	long	cv ;

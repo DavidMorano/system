@@ -54,6 +54,7 @@ extern int	psem_wait(psem *) noex ;
 extern int	psem_waiter(psem *,int) noex ;
 extern int	psem_trywait(psem *) noex ;
 extern int	psem_post(psem *) noex ;
+extern int	psem_count(psem *) noex ;
 
 EXTERNC_end
 

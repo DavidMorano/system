@@ -1,8 +1,8 @@
-/* ucsem HEADER */
+/* ucsem HEADER (named semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* UNIX® Counting Semaphore (UCSEM) */
+/* UNIX® -- named -- Counting Semaphore (UCSEM) */
 /* version %I% last-modified %G% */
 
 

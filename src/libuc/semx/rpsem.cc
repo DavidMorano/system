@@ -127,24 +127,6 @@ int psem_destroy(psem *psp) noex {
 }
 /* end subroutine (psem_destroy) */
 
-#ifdef	COMMENT
-int psem_getvalue(psem *psp) noex {
-	int		rs = SR_FAULT ;
-	int		c = 0 ;
-	if (psp) {
-	    repeat {
-	        if ((rs = sem_getvalue(psp,&c)) < 0) {
-		    rs = (- errno) ;
-	        } else {
-		    c &= INT_MAX ;
-	        }
-	    } until (rs != SR_INTR) ;
-	} /* end if (non-null) */
-	return (rs >= 0) c : rs ;
-}
-/* end subroutine (psem_getvalue) */
-#endif /* COMMENT */
-
 int psem_waiti(psem *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
@@ -229,5 +211,14 @@ int psem_post(psem *psp) noex {
 	return rs ;
 }
 /* end subroutine (psem_post) */
+
+int psem_count(psem *psp) noex {
+	int		rs = SR_FAULT ;
+	if (psp) {
+	    rs = SR_NOSYS ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (psem_count) */
 
 
