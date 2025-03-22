@@ -24,6 +24,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<libmallocxx.h>
+#include	<posname.h>		/* create POSIX® entity names */
 #include	<localmisc.h>
 
 
@@ -96,16 +97,22 @@ int uc_unlink(cchar *fname) noex {
 
 int uc_unlinkshm(cchar *fname) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 		if_constexpr (f_pshm) {
-	            repeat {
-	                errno = 0 ;
-	                if ((rs = shm_unlink(fname)) < 0) {
-		            rs = (- errno) ;
-	                }
-	            } until (rs != SR_INTR) ;
+		    cchar	*nn ;
+		    if (posname pn ; (rs = pn.start(fname,-1,&nn)) >= 0) {
+	                repeat {
+	                    errno = 0 ;
+	                    if ((rs = shm_unlink(nn)) < 0) {
+		                rs = (- errno) ;
+	                    }
+	                } until (rs != SR_INTR) ;
+		        rs1 = pn.finish ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (posname) */
 		} else {
 		    rs = SR_NOSYS ;
 		}
@@ -117,16 +124,22 @@ int uc_unlinkshm(cchar *fname) noex {
 
 int uc_unlinksem(cchar *fname) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 		if_constexpr (f_psem) {
-	            repeat {
-	                errno = 0 ;
-	                if ((rs = sem_unlink(fname)) < 0) {
-			    rs = (- errno) ;
-		        }
-	            } until (rs != SR_INTR) ;
+		    cchar	*nn ;
+		    if (posname pn ; (rs = pn.start(fname,-1,&nn)) >= 0) {
+	                repeat {
+	                    errno = 0 ;
+	                    if ((rs = sem_unlink(nn)) < 0) {
+			        rs = (- errno) ;
+		            }
+	                } until (rs != SR_INTR) ;
+		        rs1 = pn.finish ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (posname) */
 		} else {
 		    rs = SR_NOSYS ;
 		} /* end if_constexpr (f_psem) */

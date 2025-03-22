@@ -21,7 +21,7 @@
 	posname
 	
 	Description:
-	This object module (posname) creates a POSIX® entity name
+	This object module (POSNAME) creates a POSIX® entity name
 	when needed.  It does this by possibly prepending a slash
 	('/') character before the given name.
 

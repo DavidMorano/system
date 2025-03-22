@@ -50,6 +50,7 @@
 #include	<mallocxx.h>
 #include	<getxid.h>
 #include	<errtimer.hh>
+#include	<posname.h>
 #include	<mkpathx.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>
@@ -62,10 +63,10 @@
 
 #define	NAMESEM_PATHPREFIX	"/tmp/namesem"
 
-#define	NAMESEM_CHOWNVAR		_PC_CHOWN_RESTRICTED
+#define	NAMESEM_CHOWNVAR	_PC_CHOWN_RESTRICTED
 
-#define	NAMESEM_USERNAME1		"sys"
-#define	NAMESEM_USERNAME2		"adm"
+#define	NAMESEM_USERNAME1	"sys"
+#define	NAMESEM_USERNAME2	"adm"
 
 #define	NAMESEM_GROUPNAME1	"sys"
 #define	NAMESEM_GROUPNAME2	"sys"
@@ -124,7 +125,7 @@ constexpr bool		f_condunlink = CF_CONDUNLINK ;
 
 /* exported subroutines */
 
-int namesem_open(namesem *op,cchar *name,int of,mode_t om,uint count) noex {
+int namesem_open(namesem *op,cchar *name,int of,mode_t om,uint c) noex {
     	NAMESEM		*hop = op ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
@@ -132,28 +133,22 @@ int namesem_open(namesem *op,cchar *name,int of,mode_t om,uint count) noex {
 	    memclear(hop) ;
 	    rs = SR_INVALID ;
 	    if (name[0]) {
-		if (char *altname{} ; (rs = malloc_mn(&altname)) >= 0) {
-		    cint	mnlen = rs ;
-	            if (name[0] != '/') {
-	                rs = sncpy2(altname,mnlen,"/",name) ;
-	                name = altname ;
-	            } /* end if (name does not start w/ '/') */
-	            if (rs >= 0) {
-			if ((rs = namesemopen(op,name,of,om,count)) >= 0) {
-			    if (char *bp ; (rs = malloc_mn(&bp)) >= 0) {
-				cint	mnlen = rs ;
-				op->name = bp ;
-	                        strwcpy(bp,name,mnlen) ;
-	                        if (of & O_CREAT) {
-				    namesemdiradd(name,om) ;
-				}
-	                        op->magic = NAMESEM_MAGIC ;
-			    } /* end if (memory-allocation) */
-	                } /* end if (opened) */
-	            } /* end if (ok) */
-		    rs1 = uc_free(altname) ;
+		cchar	*nn ;
+		if (posname pn ; (rs = pn.start(name,-1,&nn)) >= 0) {
+		    if ((rs = namesemopen(op,nn,of,om,c)) >= 0) {
+			if (char *bp ; (rs = malloc_mn(&bp)) >= 0) {
+			    cint	mnlen = rs ;
+			    op->name = bp ;
+	                    strwcpy(bp,nn,mnlen) ;
+	                    if (of & O_CREAT) {
+				namesemdiradd(nn,om) ;
+			    }
+	                    op->magic = NAMESEM_MAGIC ;
+			} /* end if (memory-allocation) */
+	            } /* end if (opened) */
+		    rs1 = pn.finish ;
 		    if (rs >= 0) rs = rs1 ;
-		} /* end if (mallocxx-altname) */
+		} /* end if (posname) */
 	    } /* end if (non-zero name) */
 	} /* end if (non-null) */
 	return rs ;
@@ -265,27 +260,23 @@ int namesemunlink(cchar *name) noex {
 	if (name) {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
-	        if (char *altname ; (rs = malloc_mn(&altname)) >= 0) {
-		    cint	mnlen = rs ;
-	            if (name[0] != '/') {
-	                sncpy2(altname,mnlen,"/",name) ;
-	                name = altname ;
-	            }
+		cchar	*nn ;
+		if (posname pn ; (rs = pn.start(name,-1,&nn)) >= 0) {
 	            repeat {
-	                if ((rs = sem_unlink(name)) < 0) {
+	                if ((rs = sem_unlink(nn)) < 0) {
 			    rs = (- errno) ;
 			}
 	            } until (rs != SR_INTR) ;
 		    if_constexpr (f_condunlink) {
 		        if (rs >= 0) {
-	    		    namesemdirrm(name) ;
+	    		    namesemdirrm(nn) ;
 		        }
 		    } else {
-		        namesemdirrm(name) ;
+		        namesemdirrm(nn) ;
 		    }
-		    rs1 = uc_free(altname) ;
+		    rs1 = pn.finish ;
 		    if (rs >= 0) rs = rs1 ;
-		} /* end if (mallocxx-altname) */
+		} /* end if (posname) */
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */
 	return rs ;
