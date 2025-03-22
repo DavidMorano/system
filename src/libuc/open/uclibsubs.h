@@ -251,8 +251,6 @@ extern int	uc_mkfifo(cchar *,mode_t) noex ;
 extern int	uc_inproj(cchar *,cchar *,char *,int) noex ;
 
 /* POSIX® shared memory operations */
-extern int	uc_openshm(cchar *,int,mode_t) noex ;
-extern int	uc_openshmto(cchar *,int,mode_t,int) noex ;
 extern int	uc_unlinkshm(cchar *) noex ;
 
 /* POSIX® semaphore */

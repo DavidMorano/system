@@ -73,6 +73,8 @@ extern int uc_opensys(cchar *,int,mode_t,mainv,int,int) noex ;
 extern int uc_opendev(cchar *,int,mode_t,mainv,int,int) noex ;
 extern int uc_opensysdb(int,int,mode_t) noex ;
 extern int uc_openpt(int) noex ;
+extern int	uc_openshm(cchar *,int,mode_t) noex ;
+extern int	uc_openshmto(cchar *,int,mode_t,int) noex ;
 
 static inline int uc_dup(int fd) noex {
 	return uc_dupmin(fd,0) ;
