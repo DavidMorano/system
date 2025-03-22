@@ -56,7 +56,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0= csem.o
-OBJ1= psem.o ucsem.o
+OBJ1= psem.o namesem.o
 
 OBJA= obj0.o obj1.o
 
@@ -144,6 +144,6 @@ csem.o:			csem.cc		csem.h		$(INCS)
 epsem.o:		epsem.cc	epsem.h		$(INCS)
 psem.o:			psem.cc		psem.h		$(INCS)
 rpsem.o:		rpsem.cc	rpsem.h		$(INCS)
-ucsem.o:		ucsem.cc	ucsem.h		$(INCS)
+namesem.o:		namesem.cc	namesem.h	$(INCS)
 
 

@@ -63,9 +63,9 @@ struct csem_co {
 	} ;
 } ; /* end struct (csem_co) */
 struct csem : csem_head {
-	csem_co	count ;
-	csem_co	waiters ;
-	csem_co	destroy ;
+	csem_co		count ;
+	csem_co		waiters ;
+	csem_co		destroy ;
 	csem() noex {
 	    count(this,csemmem_count) ;
 	    waiters(this,csemmem_waiters) ;

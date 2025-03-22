@@ -28,7 +28,7 @@
 
 #include	<csem.h>
 #include	<psem.h>
-#include	<ucsem.h>
+#include	<namesem.h>
 
 
 #endif /* SEMX_INCLUDE */

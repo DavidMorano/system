@@ -1,9 +1,9 @@
-/* ucsem SUPPORT (named semaphore) */
+/* namesem SUPPORT (named semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
-/* UNIX® -- named -- Counting Semaphore (UCSEM) */
+/* UNIX® -- named -- Counting Semaphore (NAMESEM) */
 /* version %I% last-modified %G% */
 
 #define	CF_CONDUNLINK	1		/* conditional unlink */
@@ -20,7 +20,7 @@
 /*******************************************************************************
 
   	Object:
-	ucsem
+	namesem
 
 	Description:
 	These are (secretly) POSIX® "named" semaphores!  These do
@@ -49,28 +49,29 @@
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<getxid.h>
+#include	<errtimer.hh>
 #include	<mkpathx.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
-#include	"ucsem.h"
+#include	"namesem.h"
 
 
 /* local defines */
 
-#define	UCSEM_PATHPREFIX	"/tmp/ucsem"
+#define	NAMESEM_PATHPREFIX	"/tmp/namesem"
 
-#define	UCSEM_CHOWNVAR		_PC_CHOWN_RESTRICTED
+#define	NAMESEM_CHOWNVAR		_PC_CHOWN_RESTRICTED
 
-#define	UCSEM_USERNAME1		"sys"
-#define	UCSEM_USERNAME2		"adm"
+#define	NAMESEM_USERNAME1		"sys"
+#define	NAMESEM_USERNAME2		"adm"
 
-#define	UCSEM_GROUPNAME1	"sys"
-#define	UCSEM_GROUPNAME2	"sys"
+#define	NAMESEM_GROUPNAME1	"sys"
+#define	NAMESEM_GROUPNAME2	"sys"
 
-#define	UCSEM_UID	3
-#define	UCSEM_GID	3
+#define	NAMESEM_UID	3
+#define	NAMESEM_GID	3
 
 #define	TO_NOSPC	10
 #define	TO_MFILE	10
@@ -94,20 +95,23 @@
 /* forward references */
 
 template<typename ... Args>
-static inline int ucsem_magic(ucsem *op,Args ... args) noex {
+static inline int namesem_magic(namesem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == UCSEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == NAMESEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (ucsem_magic) */
+/* end subroutine (namesem_magic) */
 
-static int	ucsemdircheck(cchar *) noex ;
-static int	ucsemdiradd(cchar *,mode_t) noex ;
-static int	ucsemdirrm(cchar *) noex ;
+static int	namesemopen(namesem *,cc *,int,mode_t,int) noex ;
+static int	namesemclose(namesem *) noex ;
 
-static int	getucsemgid(void) noex ;
+static int	namesemdircheck(cchar *) noex ;
+static int	namesemdiradd(cchar *,mode_t) noex ;
+static int	namesemdirrm(cchar *) noex ;
+
+static int	getnamesemgid(void) noex ;
 
 
 /* local variables */
@@ -120,11 +124,8 @@ constexpr bool		f_condunlink = CF_CONDUNLINK ;
 
 /* exported subroutines */
 
-int ucsem_open(ucsem *op,cchar *name,int oflag,mode_t om,uint count) noex {
-    	UCSEM		*hop = op ;
-	int		to_mfile = utimeout[uto_mfile] ;
-	int		to_nfile = utimeout[uto_nfile] ;
-	int		to_nospc = utimeout[uto_nospc] ;
+int namesem_open(namesem *op,cchar *name,int of,mode_t om,uint count) noex {
+    	NAMESEM		*hop = op ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op && name) {
@@ -138,51 +139,15 @@ int ucsem_open(ucsem *op,cchar *name,int oflag,mode_t om,uint count) noex {
 	                name = altname ;
 	            } /* end if (name does not start w/ '/') */
 	            if (rs >= 0) {
-	                bool	f_exit = true ;
-	                repeat {
-	                    rs = SR_OK ;
-	                    op->sp = sem_open(name,oflag,om,count) ;
-	                    if (op->sp == SEM_FAILED) rs = (- errno) ;
-	                    if (rs < 0) {
-	                        switch (rs) {
-	                        case SR_MFILE:
-	                            if (to_mfile-- > 0) {
-	                                msleep(1000) ;
-		                    } else {
-			                f_exit = true ;
-		                    }
-	                            break ;
-	                        case SR_NFILE:
-	                            if (to_nfile-- > 0) {
-	                                msleep(1000) ;
-		                    } else {
-			                f_exit = true ;
-		                    }
-	                            break ;
-	                        case SR_NOSPC:
-	                            if (to_nospc-- > 0) {
-	                                msleep(1000) ;
-		                    } else {
-			                f_exit = true ;
-		                    }
-	                            break ;
-		                case SR_INTR:
-		                    break ;
-		                default:
-		                    f_exit = true ;
-		                    break ;
-	                        } /* end switch */
-	                    } /* end if (error) */
-	                } until ((rs >= 0) || f_exit) ;
-	                if (rs >= 0) {
-			    if (char *bp{} ; (rs = malloc_mn(&bp)) >= 0) {
+			if ((rs = namesemopen(op,name,of,om,count)) >= 0) {
+			    if (char *bp ; (rs = malloc_mn(&bp)) >= 0) {
 				cint	mnlen = rs ;
 				op->name = bp ;
 	                        strwcpy(bp,name,mnlen) ;
-	                        if (oflag & O_CREAT) {
-				    ucsemdiradd(name,om) ;
+	                        if (of & O_CREAT) {
+				    namesemdiradd(name,om) ;
 				}
-	                        op->magic = UCSEM_MAGIC ;
+	                        op->magic = NAMESEM_MAGIC ;
 			    } /* end if (memory-allocation) */
 	                } /* end if (opened) */
 	            } /* end if (ok) */
@@ -193,20 +158,16 @@ int ucsem_open(ucsem *op,cchar *name,int oflag,mode_t om,uint count) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ucsem_open) */
+/* end subroutine (namesem_open) */
 
-int ucsem_close(ucsem *op) noex {
+int namesem_close(namesem *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ucsem_magic(op)) >= 0) {
-	    rs = SR_BADFMT ;
-	    if (op->sp) {
-	        repeat {
-	            if ((rs = sem_close(op->sp)) < 0) {
-			rs = (- errno) ;
-		    }
-	        } until (rs != SR_INTR) ;
-	    } /* end if (non-null) */
+	if ((rs = namesem_magic(op)) >= 0) {
+	    {
+	        rs1 = namesemclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	    if (op->name) {
 		rs1 = uc_free(op->name) ;
 		if (rs >= 0) rs = rs1 ;
@@ -216,11 +177,11 @@ int ucsem_close(ucsem *op) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (ucsem_close) */
+/* end subroutine (namesem_close) */
 
-int ucsem_trywait(ucsem *op) noex {
+int namesem_trywait(namesem *op) noex {
 	int		rs ;
-	if ((rs = ucsem_magic(op)) >= 0) {
+	if ((rs = namesem_magic(op)) >= 0) {
 	    repeat {
 	        if ((rs = sem_trywait(op->sp)) < 0) {
 		    rs = (- errno) ;
@@ -229,26 +190,11 @@ int ucsem_trywait(ucsem *op) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (ucsem_trywait) */
+/* end subroutine (namesem_trywait) */
 
-#ifdef	COMMENT
-int ucsem_getvalue(ucsem *op,int *rp) noex {
+int namesem_wait(namesem *op) noex {
 	int		rs ;
-	if ((rs = ucsem_magic(op)) >= 0) {
-	    repeat {
-	        if ((rs = sem_getvalue(op->sp,rp)) < 0) {
-		    rs = (- errno) ;
-		}
-	    } until (rs != SR_INTR) ;
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (ucsem_getvalue) */
-#endif /* COMMENT */
-
-int ucsem_wait(ucsem *op) noex {
-	int		rs ;
-	if ((rs = ucsem_magic(op)) >= 0) {
+	if ((rs = namesem_magic(op)) >= 0) {
 	    repeat {
 	        if ((rs = sem_wait(op->sp)) < 0) {
 		    rs = (- errno) ;
@@ -257,22 +203,22 @@ int ucsem_wait(ucsem *op) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (ucsem_wait) */
+/* end subroutine (namesem_wait) */
 
-int ucsem_waiti(ucsem *op) noex {
+int namesem_waiti(namesem *op) noex {
 	int		rs ;
-	if ((rs = ucsem_magic(op)) >= 0) {
+	if ((rs = namesem_magic(op)) >= 0) {
 	   if ((rs = sem_wait(op->sp)) < 0) {
 	       rs = (- errno) ;
 	   }
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (ucsem_waiti) */
+/* end subroutine (namesem_waiti) */
 
-int ucsem_post(ucsem *op) noex {
-	int		rs = SR_FAULT ;
-	if ((rs = ucsem_magic(op)) >= 0) {
+int namesem_post(namesem *op) noex {
+	int		rs ;
+	if ((rs = namesem_magic(op)) >= 0) {
 	    repeat {
 	        if ((rs = sem_post(op->sp)) < 0) {
 		    rs = (- errno) ;
@@ -281,30 +227,39 @@ int ucsem_post(ucsem *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ucsem_post) */
+/* end subroutine (namesem_post) */
 
-int ucsem_unlink(ucsem *op) noex {
+int namesem_unlink(namesem *op) noex {
 	int		rs ;
-	if ((rs = ucsem_magic(op)) >= 0) {
+	if ((rs = namesem_magic(op)) >= 0) {
 	    if (op->name[0] != '\0') {
-		rs = unlinkucsem(op->name) ;
+		rs = unlinknamesem(op->name) ;
 		if_constexpr (f_condunlink) {
 		    if (rs >= 0) {
-			ucsemdirrm(op->name) ;
+			namesemdirrm(op->name) ;
 		    }
 		} else {
-		    ucsemdirrm(op->name) ;
+		    namesemdirrm(op->name) ;
 		}
 	    } /* end if (not zero name) */
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (ucsem_unlink) */
+/* end subroutine (namesem_unlink) */
+
+int namesem_count(namesem *op) noex {
+	int		rs ;
+	if ((rs = namesem_magic(op)) >= 0) {
+	    rs = SR_NOSYS ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (namesem_count) */
 
 
 /* OTHER API (but related) */
 
-int ucsemunlink(cchar *name) noex {
+int namesemunlink(cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (name) {
@@ -317,17 +272,16 @@ int ucsemunlink(cchar *name) noex {
 	                name = altname ;
 	            }
 	            repeat {
-	                rs = SR_OK ;
 	                if ((rs = sem_unlink(name)) < 0) {
 			    rs = (- errno) ;
 			}
 	            } until (rs != SR_INTR) ;
 		    if_constexpr (f_condunlink) {
 		        if (rs >= 0) {
-	    		    ucsemdirrm(name) ;
+	    		    namesemdirrm(name) ;
 		        }
 		    } else {
-		        ucsemdirrm(name) ;
+		        namesemdirrm(name) ;
 		    }
 		    rs1 = uc_free(altname) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -336,26 +290,76 @@ int ucsemunlink(cchar *name) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ucsemunlink) */
+/* end subroutine (namesemunlink) */
 
-int unlinkucsem(cchar *name) noex {
-	return ucsemunlink(name) ;
+int unlinknamesem(cchar *name) noex {
+	return namesemunlink(name) ;
 }
-/* end subroutine (unlinkucsem) */
+/* end subroutine (unlinknamesem) */
 
 
 /* local subroutines */
 
-static int ucsemdiradd(cchar *name,mode_t om) noex {
+static int namesemopen(namesem *op,cc *name,int of,mode_t om,int c) noex {
+	errtimer	to_mfile = utimeout[uto_mfile] ;
+	errtimer	to_nfile = utimeout[uto_nfile] ;
+	errtimer	to_nomem = utimeout[uto_nomem] ;
+	errtimer	to_nospc = utimeout[uto_nospc] ;
+        reterr          r ;
+    	int		rs ;
+        repeat {
+            rs = SR_OK ;
+	    if ((op->sp = sem_open(name,of,om,c)) == SEM_FAILED) {
+                rs = (- errno) ;
+                r(rs) ;                 /* <- default causes exit */
+	        switch (rs) {
+	        case SR_MFILE:
+                    r = to_mfile(rs) ;
+		    break ;
+	        case SR_NFILE:
+                    r = to_nfile(rs) ;
+		    break ;
+		case SR_NOMEM:
+                    r = to_nomem(rs) ;
+		    break ;
+	        case SR_NOSPC:
+                    r = to_nospc(rs) ;
+		    break ;
+	        case SR_INTR:
+		    r(false) ;
+	            break ;
+	        } /* end switch */
+		rs = r ;
+	    } /* end if (error) */
+	} until ((rs >= 0) || r.fexit) ;
+	return rs ;
+}
+/* end subroutine (namesemopen) */
+
+static int namesemclose(namesem *op) noex {
+    	int		rs = SR_BUGCHECK ;
+	if (op->sp) {
+	    repeat {
+	        if ((rs = sem_close(op->sp)) < 0) {
+		    rs = (- errno) ;
+		}
+	    } until (rs != SR_INTR) ;
+	    op->sp = nullptr ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (namesemclose) */
+
+static int namesemdiradd(cchar *name,mode_t om) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (name) {
 	    if (char *tmpfname ; (rs = malloc_mp(&tmpfname)) >= 0) {
-		cchar	*pp = UCSEM_PATHPREFIX ;
+		cchar	*pp = NAMESEM_PATHPREFIX ;
 		if ((rs = mkpath2(tmpfname,pp,name)) >= 0) {
 		    cint	rsn = SR_NOENT ;
 	            if ((rs = u_creat(tmpfname,om)) == rsn) {
-	                if ((rs = ucsemdircheck(pp)) >= 0) {
+	                if ((rs = namesemdircheck(pp)) >= 0) {
 	                    rs = u_creat(tmpfname,om) ;
 	                }
 	            }
@@ -367,14 +371,14 @@ static int ucsemdiradd(cchar *name,mode_t om) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ucsemdiradd) */
+/* end subroutine (namesemdiradd) */
 
-static int ucsemdirrm(cchar *name) noex {
+static int namesemdirrm(cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (name) {
 	    if (char *tmpfname ; (rs = malloc_mp(&tmpfname)) >= 0) {
-	        cchar	*pp = UCSEM_PATHPREFIX ;
+	        cchar	*pp = NAMESEM_PATHPREFIX ;
 	        if ((rs = mkpath2(tmpfname,pp,name)) >= 0) {
 		    rs = u_unlink(tmpfname) ;
 	        } /* end if (mkpath2) */
@@ -384,9 +388,9 @@ static int ucsemdirrm(cchar *name) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ucsemdirrm) */
+/* end subroutine (namesemdirrm) */
 
-static int ucsemdircheck(cchar *pp) noex {
+static int namesemdircheck(cchar *pp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
@@ -402,19 +406,19 @@ static int ucsemdircheck(cchar *pp) noex {
 		    }
 	            if (rs >= 0) {
 	        	long	cv ;
-	                rs = u_pathconf(pp,UCSEM_CHOWNVAR,&cv) ;
+	                rs = u_pathconf(pp,NAMESEM_CHOWNVAR,&cv) ;
 	                if ((rs < 0) || cv) {
 	        	    const uid_t	euid = geteuid() ;
 	        	    uid_t	uid ;
-			    cchar	*un = UCSEM_USERNAME1 ;
+			    cchar	*un = NAMESEM_USERNAME1 ;
 	                    rs = uc_getpwnam(&pw,pwbuf,pwlen,un) ;
 	                    if (rs < 0) {
-			        un = UCSEM_USERNAME2 ;
+			        un = NAMESEM_USERNAME2 ;
 	                        rs = uc_getpwnam(&pw,pwbuf,pwlen,un) ;
 			    }
-	                    uid = (rs >= 0) ? pw.pw_uid : UCSEM_UID ;
+	                    uid = (rs >= 0) ? pw.pw_uid : NAMESEM_UID ;
 	                    if (euid != uid) {
-			        if ((rs = getucsemgid()) >= 0) {
+			        if ((rs = getnamesemgid()) >= 0) {
 			            const gid_t	gid = rs ;
 	              	            rs = u_chown(pp,uid,gid) ;
 			        }
@@ -428,20 +432,20 @@ static int ucsemdircheck(cchar *pp) noex {
 	} /* end if (getbufsize) */
 	return rs ;
 }
-/* end subroutine (ucsemdircheck) */
+/* end subroutine (namesemdircheck) */
 
-static int getucsemgid(void) noex {
+static int getnamesemgid(void) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	cchar		*gn = UCSEM_GROUPNAME1 ;
+	cchar		*gn = NAMESEM_GROUPNAME1 ;
 	if ((rs = getgid_group(gn,-1)) == rsn) {
-	    gn = UCSEM_GROUPNAME2 ;
+	    gn = NAMESEM_GROUPNAME2 ;
 	    if ((rs = getgid_group(gn,-1)) == rsn) {
-		rs = UCSEM_GID ;
+		rs = NAMESEM_GID ;
 	    }
 	}
 	return rs ;
 }
-/* end subroutine (getucsemgid) */
+/* end subroutine (getnamesemgid) */
 
 
