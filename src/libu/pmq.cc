@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* Posix Message Queue (PMQ) */
+/* POSIX® Message Queue (PMQ) */
 /* version %I% last-modified %G% */
 
 #define	CF_PMQDIR	0		/* manage message-queue directory */
@@ -341,8 +341,7 @@ int uc_unlinkpmq(cchar *name) noex {
 	if (name) {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
-	        char	*altname{} ;
-		if ((rs = libmalloc_mn(&altname)) >= 0) {
+	        if (char *altname ; (rs = libmalloc_mn(&altname)) >= 0) {
 		    cint	maxnamelen = rs ;
 	            if (name[0] != '/') {
 	                rs = sncpy(altname,maxnamelen,"/",name) ;
@@ -390,8 +389,7 @@ static int pmq_nameload(pmq *op,cchar *name) noex {
 	    rs = SR_INVALID ;
 	} /* end if (needed rooted name) */
 	if (rs >= 0) {
-	    char	*cp{} ;
-	    if ((rs = uc_libmalloc((cl + 1),&cp)) >= 0) {
+	    if (char *cp ; (rs = uc_libmalloc((cl + 1),&cp)) >= 0) {
 	        if ((rs = sncpy(cp,cl,prefix,name)) >= 0) {
 		    op->name = cp ;
 	        }
