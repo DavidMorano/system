@@ -1,6 +1,6 @@
 /* pmq SUPPORT (LIBUC) */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* POSIX® Message Queue (PMQ) */
 /* version %I% last-modified %G% */
@@ -33,8 +33,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -42,7 +40,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
-#include	<usystem.h>
+#include	<usystem.h>		/* contains 'mqueue.h' */
 #include	<usysflag.h>
 #include	<getbufsize.h>
 #include        <errtimer.hh>
@@ -526,16 +524,20 @@ int posixhelp::unlink(pmq *op) noex {
 
 static int pmqdiradd(cchar *name,mode_t om) noex {
 	int		rs ;
+	int		rs1 ;
 	cchar		*pp = PMQ_PATHPREFIX ;
-	char		tmpfname[MAXPATHLEN + 1] ;
-	if ((rs = mkpath2(tmpfname,pp,name)) >= 0) {
-	    if ((rs = u_creat(tmpfname,om)) == SR_NOENT) {
-	        if ((rs = pmqdircheck(pp)) >= 0) {
-	            rs = u_creat(tmpfname,om) ;
-		}
-	    } /* end if (u_creat) */
-	    if (rs >= 0) u_close(rs) ;
-	} /* end if (mkpath) */
+	if (char *tbuf ; (rs = libmalloc_mp(&tbuf)) >= 0) {
+	    if ((rs = mkpath(tbuf,pp,name)) >= 0) {
+	        if ((rs = u_creat(tbuf,om)) == SR_NOENT) {
+	            if ((rs = pmqdircheck(pp)) >= 0) {
+	                rs = u_creat(tbuf,om) ;
+		    }
+	        } /* end if (u_creat) */
+	        if (rs >= 0) u_close(rs) ;
+	    } /* end if (mkpath) */
+	    rs1 = uc_libfree(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (pmqdiradd) */
