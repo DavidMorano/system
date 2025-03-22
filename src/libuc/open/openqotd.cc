@@ -114,7 +114,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>

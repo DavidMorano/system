@@ -1,4 +1,6 @@
-/* uc_openpsem */
+/* uc_openpsem SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* open a Posix Semaphore (PSEM) */
@@ -18,27 +20,26 @@
 
 /*******************************************************************************
 
-        This module provides a sanitized version of the standard POSIX semaphore
-        facility provided with some new UNIX®i. Some operating system problems
-        are managed within these routines for the common stuff that happens when
-        a poorly configured OS gets overloaded!
+	This module provides a sanitized version of the standard
+	POSIX semaphore facility provided with some new UNIX®i.
+	Some operating system problems are managed within these
+	routines for the common stuff that happens when a poorly
+	configured OS gets overloaded!
 
 	Enjoy!
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<semaphore.h>
-#include	<string.h>
-#include	<errno.h>
-
+#include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 

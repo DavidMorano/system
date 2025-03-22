@@ -77,7 +77,7 @@ OBJC= obj08.o obj09.o
 OBJ_UCOPEN= obja.o objb.o objc.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -102,6 +102,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_UCOPEN)

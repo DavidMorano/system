@@ -100,7 +100,7 @@ int openshmtmpx(mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (char *sbuf{} ; (rs = malloc_mn(&sbuf)) >= 0) {
+	if (char *sbuf ; (rs = malloc_mn(&sbuf)) >= 0) {
 	    cint	slen = rs ;
 	    {
 		rs = openshmtmp(sbuf,slen,om) ;
@@ -174,7 +174,7 @@ static int mkshmname(char *rbuf,int rlen,ulong rv) noex {
 	char		ebuf[EBUFLEN+1] ;
 	if ((rs = cthex(ebuf,elen,rv)) >= 0) {
 	    cint	el = (SHMNAME_MAX - tmplen) ;
-	    cint	i = (rs >= 16) ? ((rs-16)+6) : 0 ;
+	    cint	i = (rs >= 16) ? ((rs - 16)+6) : 0 ;
 	    rs = sncpy2w(rbuf,rlen,tpre,(ebuf + i),el) ;
 	}
 	return rs ;

@@ -68,7 +68,7 @@ OBJB= obj3_open.o obj4_open.o obj5_open.o
 OBJ_OPEN= obja.o objb.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -93,6 +93,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_OPEN)

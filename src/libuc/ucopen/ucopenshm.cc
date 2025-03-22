@@ -1,8 +1,9 @@
 /* ucopenshm SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
-/* open POSIX share-memory (w/ time-out) */
+/* open POSIX® share-memory (w/ time-out) */
 
 
 /* revision history:
@@ -28,6 +29,7 @@
 
 	Synopsis:
 	int uc_openshmto(cchar *shmname,int of,mode_t om,int to) noex
+	int uc_openshm(cchar *shmname,int of,mode_t om) noex
 
 	Arguments:
 	shmname		string representing the name of the shared memory
@@ -43,11 +45,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstring>		/* |strlen(3c)| */
 #include	<cerrno>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -64,6 +67,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -71,6 +77,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -103,13 +112,12 @@ int uc_openshm(cchar *shmname,int of,mode_t om) noex {
 	    rs = SR_OK ;
 	    if (shmname[0] != '/') {
 	        cint	ns = (strlen(shmname)+2) ;
-	        char	*bp ;
-	        if ((rs = uc_libmalloc(ns,&bp)) >= 0) {
+	        if (char *bp ; (rs = uc_libmalloc(ns,&bp)) >= 0) {
 		    cchar	*a = bp ;
 		    *bp++ = '/' ;
 		    strwcpy(bp,shmname,-1) ;
 		    shmname = a ;
-	        }
+	        } /* end if (memory-allocation) */
 	    }
 	    if (rs >= 0) {
 	        repeat {

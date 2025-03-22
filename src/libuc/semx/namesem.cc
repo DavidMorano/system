@@ -219,7 +219,7 @@ int namesem_post(namesem *op) noex {
 		    rs = (- errno) ;
 		}
 	    } until (rs != SR_INTR) ;
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (namesem_post) */

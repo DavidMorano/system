@@ -1,4 +1,4 @@
-/* uc_openusvc (open-facility-service) */
+/* uc_openusvc SUPPORT (open-facility-service) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 

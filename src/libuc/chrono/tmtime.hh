@@ -28,6 +28,7 @@
 #include	<usysrets.h>
 
 
+#define	TMTIME			tmtime
 #define	TMTIME_BASEYEAR		1900
 
 

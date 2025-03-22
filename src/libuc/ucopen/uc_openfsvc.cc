@@ -1,4 +1,6 @@
 /* uc_openfsvc (open-facility-service) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* open a facility-service */

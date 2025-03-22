@@ -76,13 +76,14 @@ typedef callback_f	t_f ;
 
 /* exported subroutines */
 
-int callback_load(callback *op,void *objp,t_f m,int arg) noex {
+int callback_load(callback *op,void *objp,psem *sp,t_f f,int arg) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-	    op->objp = objp ;
-	    op->memf = m ;
-	    op->arg = arg ;
+	    op->objp = objp ;		/* object pointer */
+	    op->psemp = sp ;		/* semæphore (POSIX®) pointer */
+	    op->memf = f ;		/* callback subroutine pointer */
+	    op->arg = arg ;		/* optional argument */
 	} /* end if (non-null) */
 	return rs ;
 }
