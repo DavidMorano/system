@@ -40,12 +40,12 @@ typedef PMQ_ATTR	pmq_attr ;
 
 EXTERNC_begin
 
-extern int	pmq_open(pmq *,cchar *,int,mode_t,const PMQ_ATTR *) noex ;
+extern int	pmq_open(pmq *,cchar *,int,mode_t,const pmq_attr *) noex ;
 extern int	pmq_close(pmq *) noex ;
 extern int	pmq_send(pmq *,cchar *,int,uint) noex ;
 extern int	pmq_recv(pmq *,char *,int,uint *) noex ;
-extern int	pmq_attrset(pmq *,const PMQ_ATTR *,PMQ_ATTR *) noex ;
-extern int	pmq_attrget(pmq *,PMQ_ATTR *) noex ;
+extern int	pmq_attrset(pmq *,const pmq_attr *,pmq_attr *) noex ;
+extern int	pmq_attrget(pmq *,pmq_attr *) noex ;
 extern int	pmq_notify(pmq *,SIGEVENT *) noex ;
 extern int	pmq_unlink(pmq *) noex ;
 
