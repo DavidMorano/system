@@ -22,16 +22,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 
+#include	<openaddrinfo.h>
+#include	<opendial.h>
 #include	<openport.h>
 #include	<openportmsg.h>
-
-#include	<opentmp.h>
-#include	<openaddrinfo.h>
-#include	<opensockaddr.h>
-#include	<opendial.h>
 #include	<openqotd.h>
 #include	<openshm.h>
-#include	<opensysfs.h>
+#include	<opensockaddr.h>
+#include	<opensys.h>
+#include	<opentmp.h>
+#include	<splitfname.h>
 
 
 EXTERNC_begin

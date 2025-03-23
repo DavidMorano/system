@@ -1,6 +1,6 @@
 /* opentmp HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* open a tempoary file (one that is removed immediately) */
 /* version %I% last-modified %G% */

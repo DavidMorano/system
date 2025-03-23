@@ -38,7 +38,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<ucopen.h>
 
 
 EXTERNC_begin

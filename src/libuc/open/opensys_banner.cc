@@ -18,12 +18,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	opsys_banner
+
+	Description:
 	Write ("date") the current date on the system banner.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -40,6 +43,8 @@
 #include	<char.h>
 #include	<mkchar.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| + |COLUMNS| */
+
+#include	"opensys.h"
 
 
 /* local defines */
@@ -102,11 +107,10 @@ int opensys_banner(cchar *fname,int of,mode_t om) noex {
 	if (fname) {
 	    rs = SR_INVALID ;
 	    if ((of >= 0) && isreadable(of)) {
-	        TMTIME		tm ;
 	        const time_t	dt = time(nullptr) ;
 	        int		f_top = true ;
 	        cchar		*tspec = "%e %b %T" ;
-	        if ((rs = tmtime_gmtime(&tm,dt)) >= 0) {
+	        if (TMTIME tm ; (rs = tmtime_gmtime(&tm,dt)) >= 0) {
 	            cint	tlen = TIMEBUFLEN ;
 	            char	tbuf[TIMEBUFLEN+1] ;
 	            if ((rs = sntmtime(tbuf,tlen,&tm,tspec)) >= 0) {
@@ -194,12 +198,12 @@ static int procfile_reg(filer *wfp,cchar *ds,int f_top) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	char		*lbuf{} ;
-	if ((rs = malloc_mp(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = malloc_mp(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    cint	of = O_RDONLY ;
 	    cint	to = -1 ;
-	    if ((rs = uc_open(sysbanner,of,0666)) >= 0) {
+	    cmode	om = 0666 ;
+	    if ((rs = uc_open(sysbanner,of,om)) >= 0) {
 	        filer	sysban, *sfp = &sysban ;
 	        cint	fd = rs ;
 	        if ((rs = filer_start(sfp,fd,0z,0,0)) >= 0) {

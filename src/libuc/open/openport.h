@@ -1,6 +1,6 @@
 /* openport HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* subroutine to open a priviledged network port */
 /* version %I% last-modified %G% */
