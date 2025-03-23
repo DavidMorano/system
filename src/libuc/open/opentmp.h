@@ -21,6 +21,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* |mode_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -35,8 +36,8 @@ enum opentmps {
 } ;
 
 /* options */
-#define	OTM_DGRAM	(1<<0)		/* open-type-mask DGRAM */
-#define	OTM_STREAM	(1<<1)		/* open-type-mask STREAM */
+#define	OTM_DGRAM	(1<< opentmp_dgram)	/* open-type-mask DGRAM */
+#define	OTM_STREAM	(1<< opentmp_stream)	/* open-type-mask STREAM */
 
 
 EXTERNC_begin

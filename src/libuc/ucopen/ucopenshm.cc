@@ -33,7 +33,7 @@
 	int uc_openshm(cchar *shmname,int of,mode_t om) noex
 
 	Arguments:
-	shmname		string representing the name of the shared memory
+	shmname		c-string naming shared-memory-segment
 	of		open flags
 	om		open mode
 	to		time-out
@@ -46,7 +46,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |mode_t| */
-#include	<sys/mman.h>
+#include	<sys/mman.h>		/* SHM asks for this */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cerrno>
@@ -84,6 +84,8 @@ static int	ucopenshm(cc *,int,mode_t) noex ;
 
 /* local variables */
 
+const int	onethousand = 1000 ;	/* One-Thousand */
+
 
 /* exported variables */
 
@@ -101,11 +103,15 @@ int uc_openshmto(cchar *shmname,int of,mode_t om,int to) noex {
 	        cchar	*nn ;
 	        if (posname pn ; (rs = pn.start(shmname,-1,&nn)) >= 0) {
 	            for (int i = 0 ; to-- >= 0 ; i += 1) {
-	                if (i > 0) msleep(1000) ;
-		        rs = ucopenshm(nn,of,om) ;
-	                fd = rs ;
+	                if (i > 0) {
+			    rs = msleep(onethousand) ;
+			}
+			if (rs >= 0) {
+		            rs = ucopenshm(nn,of,om) ;
+	                    fd = rs ;
+			}
 	                if (rs != SR_ACCESS) break ;
-	            } /* end while */
+	            } /* end for */
 	            if (rs == SR_ACCESS) rs = SR_TIMEDOUT ;
 		    rs1 = pn.finish ;
 		    if (rs >= 0) rs = rs1 ;

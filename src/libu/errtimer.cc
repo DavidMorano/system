@@ -28,6 +28,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -79,7 +80,7 @@ const reterr errtimer::operator () (int ars) noex {
 /* end method (errtimer::operator) */
 
 errtimer::operator reterr () noex {
-	reterr	r(rs,(mto == 0)) ;
+	reterr		r(rs,(mto == 0)) ;
 	return r ;
 }
 /* end method (errtimer::operator) */

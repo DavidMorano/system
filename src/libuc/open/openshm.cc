@@ -18,6 +18,7 @@
 /*******************************************************************************
 
 	Name:
+	openshmtmpx
 	openshmtmp
 
 	Description:
@@ -26,6 +27,7 @@
 	created is returned to the caller.
 
 	Synopsis:
+	int openshmtmpx(mode_t om) noex
 	int openshmtmp(char *rbuf,int rlen,mode_r om) noex
 
 	Arguments:

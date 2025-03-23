@@ -3,7 +3,7 @@
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
-/* UNIX® -- named -- Counting Semaphore (NAMESEM) */
+/* POSIX® real-time -- named -- Counting Semaphore (NAMESEM) */
 /* version %I% last-modified %G% */
 
 #define	CF_CONDUNLINK	1		/* conditional unlink */
@@ -23,13 +23,13 @@
 	namesem
 
 	Description:
-	These are (secretly) POSIX® "named" semaphores!  These do
-	NOT have the same API as the w/ regular POSIX® interface.
-	This module provides a sanitized version of the standard
-	POSIX® semaphore facility provided with some new UNIX®i.
-	Some operating system problems are managed within these
-	routines for the common stuff (memory exhaustion) that
-	happens when a poorly configured OS gets overloaded!
+	This object essentially (secretly) implements a POSIX®
+	"named" semaphore!  This object does *not* have the same
+	API as the regular POSIX® named-semaphore interface.  This
+	module provides a sanitized version of the standard POSIX®
+	semaphore facility provided with some new UNIX®i.  Some
+	operating system problems are managed within these routines
+	for the common stuff, like memory exhaustion.
 
 	Enjoy!
 
@@ -141,9 +141,15 @@ int namesem_open(namesem *op,cchar *name,int of,mode_t om,uint c) noex {
 			    op->name = bp ;
 	                    strwcpy(bp,nn,mnlen) ;
 	                    if (of & O_CREAT) {
-				namesemdiradd(nn,om) ;
+				rs = namesemdiradd(nn,om) ;
 			    }
-	                    op->magic = NAMESEM_MAGIC ;
+			    if (rs >= 0) {
+	                        op->magic = NAMESEM_MAGIC ;
+			    }
+			    if (rs < 0) {
+				uc_free(op->name) ;
+				op->name = nullptr ;
+			    }
 			} /* end if (memory-allocation) */
 	            } /* end if (opened) */
 		    rs1 = pn.finish ;

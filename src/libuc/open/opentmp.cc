@@ -46,8 +46,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* |mode_t| */
 #include	<sys/stat.h>
-#include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<sys/time.h>		/* for |TIMEVAL| */
 #include	<unistd.h>
@@ -140,9 +140,12 @@ namespace {
     } ; /* end struct (openmgr) */
 }
 
-struct vars {
+namespace {
+    struct vars {
 	int		maxpathlen ;
-} ;
+	operator int () noex ;
+    } ;
+}
 
 
 /* forward reference */
@@ -152,7 +155,6 @@ static int	opentmpxer(cchar *,int,mode_t,int,char *) noex ;
 static int	randload(ulong *) noex ;
 static int	substr(char *,int,ulong) noex ;
 static int	mkvarsx() noex ;
-static int	mkvars() noex ;
 
 
 /* local variables */
@@ -207,8 +209,7 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 	            char	*ibuf = (a) ;
 	            char	*obuf = (a + (maxpath + 1)) ;
 	            if ((rs = mkpath(ibuf,dname,platename)) >= 0) {
-	                sigblocker	b ;
-	                if ((rs = b.start) >= 0) {
+	                if (sigblocker b ; (rs = b.start) >= 0) {
 		            cint	otm = OTM_STREAM ;
 	                    if ((rs = opentmpx(ibuf,of,om,otm,obuf)) >= 0) {
 		                fd = rs ;
@@ -241,7 +242,7 @@ static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	if (inname && obuf) {
 	    rs = SR_INVALID ;
 	    if (inname[0] && (of >= 0) && (opt >= 0)) {
-	        if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
+	        if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) {
 	            if ((rs = mkexpandpath(pbuf,inname,-1)) > 0) {
 		        rs = opentmpxer(pbuf,of,om,opt,obuf) ;
 		        fd = rs ;
@@ -472,6 +473,7 @@ int openmgr::oreg() noex {
 int openmgr::osock() noex {
 	cint		pf = PF_UNIX ;
 	int		rs ;
+	int		rs1 ;
         if ((rs = uc_socket(pf,stype,0)) >= 0) {
             sockaddress sa ;
             cint        af = AF_UNIX ;
@@ -487,7 +489,8 @@ int openmgr::osock() noex {
                         obuf[0] = '\0' ;
                     }
                 } /* end if (bind) */
-                sockaddress_finish(&sa) ;
+                rs1 = sockaddress_finish(&sa) ;
+		if (rs >= 0) rs = rs1 ;
             } /* end if (sockaddress) */
             if (rs < 0) {
                 uc_close(fd) ;
@@ -546,18 +549,18 @@ static int substr(char *dp,int dl,ulong rv) noex {
 /* end subroutine (substr) */
 
 static int mkvarsx() noex {
-	static cint	rsv = mkvars() ;
+	static cint	rsv = var ;
 	return rsv ;
 }
 /* end subroutine (mkvarsx) */
 
-static int mkvars() noex {
+vars::operator int () noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-	    var.maxpathlen = rs ;
+	    maxpathlen = rs ;
 	}
 	return rs ;
 }
-/* end subroutine (mkvars) */
+/* end subroutine (vars::operator) */
 
 
