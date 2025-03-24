@@ -47,7 +47,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */

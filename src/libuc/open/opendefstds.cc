@@ -18,30 +18,30 @@
 
 /*******************************************************************************
 
-	This subroutine opens the default standard files up to a certain
-	file-descriptor number (generally should be '3').
+  	Name:
+	opendefstds
 
+	Description:
+	This subroutine opens the default standard files up to a
+	certain file-descriptor number (generally should be '3').
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<syswords.hh>
 #include	<localmisc.h>
 
 #include	"open.h"
 
 
 /* local defines */
-
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
 
 
 /* imported namespaces */
@@ -73,7 +73,7 @@
 int opendefstds(int n) noex {
 	int		rs = SR_OK ;
 	cmode		om = 0666 ;
-	cchar		*nfn = NULLFNAME ;
+	cchar		*nfn = sysword.w_devnull ;
 	for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	    if ((rs = u_fcntl(i,F_GETFD,0)) == SR_BADF) {
 	        cint	of = (i == 0) ? O_RDONLY : O_WRONLY ;

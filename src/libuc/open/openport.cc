@@ -45,7 +45,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -244,11 +243,10 @@ int openporter::opener() noex {
 /* end if (openporter::opener) */
 
 int openporter::progproc(cchar *bn,int bl) noex {
-	vecstr		envs ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = vecstr_start(&envs,5,0)) >= 0) {
+	if (vecstr envs ; (rs = vecstr_start(&envs,5,0)) >= 0) {
 	    if ((rs = loadenvs(&envs,ubuf,pbuf,bn,bl)) >= 0) {
 		nulstr	n ;
 		cchar	*name ;
@@ -296,11 +294,10 @@ int openporter::progproc(cchar *bn,int bl) noex {
 
 static int procspawn(cc *un,cc *prog,mainv sargv,mainv senvv,
 		int pf,int pt,int proto,SA *sap) noex {
-	SP_CON		psa ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = procspawn_begin(&psa,prog,sargv,senvv)) >= 0) {
+	if (SP_CON psa ; (rs = procspawn_begin(&psa,prog,sargv,senvv)) >= 0) {
 	    const pid_t	pid = rs ;
 	    cint	cfd = psa.fd[0] ;
 	    int		cs{} ;
@@ -343,8 +340,7 @@ static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	char		mbuf[MBUFLEN+1] ;
-	if ((rs = uc_malloc((mlen+1),&mbuf)) >= 0) {
+	if (char *mbuf ; (rs = uc_malloc((mlen+1),&mbuf)) >= 0) {
 	    openportmsg_req	m0{} ;
 	    openportmsg_res	m1{} ;
 	    int		ml ;
