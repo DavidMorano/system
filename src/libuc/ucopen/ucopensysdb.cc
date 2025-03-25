@@ -59,13 +59,16 @@
 /* local typedefs */
 
 
-/* local subroutine-templates */
-
-
 /* external subroutines */
 
 
 /* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
@@ -83,8 +86,7 @@ int uc_opensysdb(int id,int oflags,mode_t operms) noex {
 	int		rs1 ;
 	int		fd = -1 ;
 	if ((id >= 0) && (id < sysdbfile_overlast)) {
-	    char	*nbuf{} ;
-	    if ((rs = libmalloc_mn(&nbuf)) >= 0) {
+	    if (char *nbuf ; (rs = libmalloc_mn(&nbuf)) >= 0) {
 		cint	nlen = rs ;
 		cchar	*sysdbname = sysdbfnames[id] ;
 		if ((rs = mknpath(nbuf,nlen,prefix,sysdbname)) >= 0) {

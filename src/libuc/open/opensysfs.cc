@@ -89,6 +89,7 @@
 #define	PROJECTFNAME	"/etc/project"
 #define	SHADOWFNAME	"/etc/shadow"
 #define	USERATTRFNAME	"/etc/user_attr"
+#define	SHELLSFNAME	"/etc/shells"
 
 #ifndef	MAXNAMELEN
 #ifdef	MAXNAMLEN
@@ -165,7 +166,7 @@ static int	runsysfs(int) noex ;
 
 /* local variables */
 
-static cchar	*dbfnames[] = { /* source database files */
+constexpr cpcchar	dbfnames[] = { /* source database files */
 	PASSWDFNAME,
 	PASSWDFNAME,
 	GROUPFNAME,
@@ -174,13 +175,13 @@ static cchar	*dbfnames[] = { /* source database files */
 	GROUPFNAME,
 	PROJECTFNAME,
 	PASSWDFNAME,
-	"/etc/shells",
+	SHELLSFNAME,
 	SHADOWFNAME,
 	USERATTRFNAME,
 	nullptr
 } ;
 
-static cchar	*cfnames[] = {
+constexpr cpcchar	cfnames[] = {
 	OPENSYSFS_FUSERHOMES,
 	OPENSYSFS_FUSERNAMES,
 	OPENSYSFS_FGROUPNAMES,
@@ -195,25 +196,25 @@ static cchar	*cfnames[] = {
 	nullptr
 } ;
 
-static cchar	*prvars[] = {
+constexpr cpcchar	prvars[] = {
 	"EXTRA",
 	"PREROOT",
 	nullptr
 } ;
 
-static cchar	*prdirs[] = {
+constexpr cpcchar	prdirs[] = {
 	"/usr/extra",
 	"/usr/preroot",
 	nullptr
 } ;
 
-static cchar	*prbins[] = {
+constexpr cpcchar	prbins[] = {
 	"sbin",
 	"bin",
 	nullptr
 } ;
 
-static cchar	*envbads[] = {
+constexpr cpcchar	envbads[] = {
 	"_",
 	"_A0",
 	"_EF",

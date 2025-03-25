@@ -38,12 +38,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/socket.h>
+#include	<sys/types.h>		/* |ADDRINFO| */
+#include	<sys/socket.h>		/* |ADDRINFO| */
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<netdb.h>
+#include	<netdb.h>		/* |ADDRINFO| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>

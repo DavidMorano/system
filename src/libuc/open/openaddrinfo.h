@@ -33,6 +33,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* |ADDRINFO| */
+#include	<sys/socket.h>		/* |ADDRINFO| */
+#include	<netdb.h>		/* |ADDRINFO| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

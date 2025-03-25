@@ -1,4 +1,5 @@
 /* b_sysfs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in to create the sys-users database */
@@ -948,12 +949,11 @@ static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 /* end subroutine (procopts) */
 
 static int procsysdir(PROGINFO *pip) noex {
-	USTAT		sb ;
-	cmode	dm = (0777 | S_ISGID|S_IXGRP) ;
+	cmode		dm = (0777 | S_ISGID|S_IXGRP) ;
 	int		rs ;
 	cchar		*sdname = OPENSYSFS_SYSDNAME ;
 
-	if ((rs = u_stat(sdname,&sb)) >= 0) {
+	if (USTAT sb ; (rs = u_stat(sdname,&sb)) >= 0) {
 	    if ((sb.st_mode & S_IAMB) != dm) {
 	        uid_t	euid = geteuid() ;
 	        if (sb.st_uid == euid) {

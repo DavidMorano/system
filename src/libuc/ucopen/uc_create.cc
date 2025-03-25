@@ -1,4 +1,4 @@
-/* uc_create */
+/* uc_create SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -21,9 +21,9 @@
 #include	<fcntl.h>
 #include	<usystem.h>
 #include	<libmallocxx.h>
+#include	<mkx.h>
 #include	<localmisc.h>
 
-#include	"mkx.h"
 #include	"ucopen.h"
 
 
@@ -42,6 +42,9 @@
 /* forward references */
 
 
+/* local variables */
+
+
 /* exported variables */
 
 
@@ -54,8 +57,7 @@ int uc_create(cchar *fname,mode_t om) noex {
 	if (fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-		char	*ebuf{} ;
-		if ((rs = libmalloc_mp(&ebuf)) >= 0) {
+		if (char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) {
 	            if ((rs = mkexpandpath(ebuf,fname,-1)) > 0) {
 		        rs = u_creat(ebuf,om) ;
 			fd = rs ;
