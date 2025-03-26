@@ -1,0 +1,11 @@
+# PROJECT
+# This file forms part of the PROJECT information database.
+# Additional information on other projects can be found in the various
+# directory services.  The projects listed here (below) are accessible
+# even if no directory services are available.
+#
+system:0::::
+user.root:1::::
+noproject:2::::
+default:3::::
+group.staff:10::::

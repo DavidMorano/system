@@ -65,10 +65,15 @@
 #include	<ctdec.h>
 #include	<stdfnames.h>
 #include	<spawnproc.h>
+#include	<sfx.h>
+#include	<snx.h>
+#include	<mkpathx.h>
+#include	<xperm.h>
 #include	<ischarx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
+#include	"opensysdbs.h"
 #include	"opensysfs.h"
 
 
@@ -102,45 +107,13 @@
 
 /* imported namespaces */
 
-using std::endian ;
+using std::endian ;			/* type (enumeration-class) */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	snsd(char *,int,cchar *,uint) noex ;
-    extern int	snsds(char *,int,cchar *,cchar *) noex ;
-    extern int	snwcpy(char *,int,cchar *,int) noex ;
-    extern int	sncpyuc(char *,int,cchar *) noex ;
-    extern int	sncpy1(char *,int,cchar *) noex ;
-    extern int	sncpy2(char *,int,cchar *,cchar *) noex ;
-    extern int	mkpath2(char *,cchar *,cchar *) noex ;
-    extern int	mkpath3(char *,cchar *,cchar *,cchar *) noex ;
-    extern int	mkpath2w(char *,cchar *,cchar *,int) noex ;
-    extern int	sfshrink(cchar *,int,cchar **) noex ;
-    extern int	sfbasename(cchar *,int,cchar **) noex ;
-    extern int	sfprogroot(cchar *,int,cchar **) noex ;
-    extern int	matostr(cchar **,int,cchar *,int) noex ;
-    extern int	cfdeci(cchar *,int,int *) noex ;
-    extern int	ctdeci(char *,int,int) noex ;
-    extern int	strwcmp(cchar *,cchar *,int) noex ;
-    extern int	mktmpfile(char *,mode_t,cchar *) noex ;
-    extern int	sperm(ids *,USTAT *,int) noex ;
-    extern int	dirseen_notseen(dirseen *,USTAT *,cchar *,int) noex ;
-    extern int	dirseen_notadd(dirseen *,USTAT *,cchar *,int) noex ;
-}
-
-extern "C" {
-    extern char	*strwcpy(char *,cchar *,int) noex ;
-    extern char	*strwcpylc(char *,cchar *,int) noex ;
-    extern char	*strwcpyuc(char *,cchar *,int) noex ;
-    extern char	*strcpylc(char *,cchar *) noex ;
-    extern char	*strcpyuc(char *,cchar *) noex ;
-    extern char	*timestr_log(time_t,char *) noex ;
-}
 
 
 /* external variables */
@@ -178,21 +151,6 @@ constexpr cpcchar	dbfnames[] = { /* source database files */
 	SHELLSFNAME,
 	SHADOWFNAME,
 	USERATTRFNAME,
-	nullptr
-} ;
-
-constexpr cpcchar	cfnames[] = {
-	OPENSYSFS_FUSERHOMES,
-	OPENSYSFS_FUSERNAMES,
-	OPENSYSFS_FGROUPNAMES,
-	OPENSYSFS_FPROJECTNAMES,
-	OPENSYSFS_FPASSWD,
-	OPENSYSFS_FGROUP,
-	OPENSYSFS_FPROJECT,
-	OPENSYSFS_FREALNAME,
-	OPENSYSFS_FSHELLS,
-	OPENSYSFS_FSHADOW,
-	OPENSYSFS_FUSERATTR,
 	nullptr
 } ;
 
@@ -283,18 +241,18 @@ static int opencfile(int w,int of,int ttl) noex {
 	int		rs ;
 	int		fd = -1 ;
 	cchar		*sdname = OPENSYSFS_SYSDNAME ;
-	cchar		*gcname = cfnames[w] ;
+	cchar		*gcname = opensysdbs[w] ;
 	char		gfname[MAXPATHLEN+1] ;
 	if ((rs = mkrealpath(gfname,w,sdname,gcname)) > 0) {
-	    USTAT	sb ;
 	    time_t	dt = 0 ;
-	    if ((rs = u_stat(gfname,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = u_stat(gfname,&sb)) >= 0) {
 		mode_t	mm = MINPERMS ;
 	        time_t	mt = sb.st_mtime ;
 		switch (w) {
 	        case OPENSYSFS_WSHADOW:
 		    mm &= (~7) ;
-		/* FALLTHROUGH */
+		    fallthrough ;
+		    /* FALLTHROUGH */
 		default:
 	            rs = checkperms(gfname,&sb,mm) ;
 		    break ;
@@ -323,7 +281,7 @@ static int opencfile(int w,int of,int ttl) noex {
 	                    cint	aw = OPENSYSFS_WUSERNAMES ;
 	                    cchar	*an ;
 	                    char	tfname[MAXPATHLEN+1] ;
-	                    an = cfnames[aw] ;
+	                    an = opensysdbs[aw] ;
 	                    if ((rs = mkpath2(tfname,sdname,an)) >= 0) {
 	                        if ((rs = u_stat(tfname,&sb)) >= 0) {
 	                            if (dt == 0) dt = time(nullptr) ;
@@ -414,11 +372,10 @@ static int checkperms(cchar *gfname,USTAT *sbp,mode_t mm) noex {
 /* end subroutine (checkperms) */
 
 static int runmkpwi(int w,cchar *dbp,int dbl) noex {
-	ids		id ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*pn = OPENSYSFS_PROGMKPWI ;
-	if ((rs = ids_load(&id)) >= 0) {
+	if (ids id ; (rs = ids_load(&id)) >= 0) {
 	    char	pfname[MAXPATHLEN+1] ;
 	    if ((rs = findprog(&id,pfname,pn)) > 0) {
 		cint	zlen = MAXNAMELEN ;
@@ -476,21 +433,20 @@ static int runmkpwi(int w,cchar *dbp,int dbl) noex {
 /* end subroutine (runmkpwi) */
 
 static int runsysfs(int w) noex {
-	ids		id ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*pn = OPENSYSFS_PROGSYSFS ;
-	if ((rs = ids_load(&id)) >= 0) {
+	if (ids id ; (rs = ids_load(&id)) >= 0) {
 	    char	pfname[MAXPATHLEN+1] ;
 	    if ((rs = findprog(&id,pfname,pn)) > 0) {
-	        spawnproc_con	ps{} ;
 	        cint		alen = ABUFLEN ;
 	        int		cs = 0 ;
 	        cchar		*av[3] ;
 	        char		zbuf[MAXNAMELEN+1] ;
 	        char		abuf[ABUFLEN+1] ;
 	        if ((rs = sncpyuc(zbuf,MAXNAMELEN,pn)) >= 0) {
-	            cchar	**ev = nullptr ;
+	            spawnproc_con	ps{} ;
+	            mainv		ev = nullptr ;
 	            if ((rs = ctdeci(abuf,alen,w)) >= 0) {
 	                av[0] = zbuf ;
 	                av[1] = abuf ;
@@ -501,7 +457,7 @@ static int runsysfs(int w) noex {
 	                ps.opts |= SPAWNPROC_OIGNINTR ;
 	                ps.opts |= SPAWNPROC_OSETSID ;
 	                if ((rs = spawnproc(&ps,pfname,av,ev)) >= 0) {
-	                    const pid_t	pid = rs ;
+	                    const pid_t		pid = rs ;
 	                    rs = u_waitpid(pid,&cs,0) ;
 	                } /* end if (spawned and waited for) */
 	            } /* end if (argument-preparation) */
@@ -521,10 +477,9 @@ static int findprog(ids *idp,char *pfname,cchar *pn) noex {
 	int		pl = 0 ;
 	pfname[0] = '\0' ;
 	if ((rs = dirseen_start(blp)) >= 0) {
-	    vecpstr	dhist ;
-	    if ((rs = vecpstr_start(&dhist,4,0,0)) >= 0) {
+	    if (vecpstr dhist ; (rs = vecpstr_start(&dhist,4,0,0)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
-	        int	f = false ;
+	        bool	f = false ;
 	        cchar	*pr ;
 	        for (int i = 0 ; (rs >= 0) && prvars[i] ; i += 1) {
 	            if ((pr = getenv(prvars[i])) != nullptr) {
@@ -549,8 +504,9 @@ static int findprog(ids *idp,char *pfname,cchar *pn) noex {
 	                        pl = rs ;
 	                        f = true ;
 	                    }
-	                    if ((rs >= 0) && (! f))
+	                    if ((rs >= 0) && (! f)) {
 	                        vecpstr_add(&dhist,pr,-1) ;
+			    }
 	                } /* end if (not already) */
 	                if (rs > 0) break ;
 	            } /* end for */
@@ -566,11 +522,10 @@ static int findprog(ids *idp,char *pfname,cchar *pn) noex {
 /* end subroutine (findprog) */
 
 static int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
-	USTAT		sb ;
 	int		rs ;
 	int		pl = 0 ;
 	int		f = false ;
-	if ((rs = u_stat(pr,&sb)) >= 0) {
+	if (USTAT sb ; (rs = u_stat(pr,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        int	dl ;
 	        char	bindname[MAXPATHLEN+1] ;
@@ -584,9 +539,12 @@ static int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 	                        if ((rs = u_stat(pfname,&psb)) >= 0) {
 	                            if ((rs = sperm(idp,&psb,X_OK)) >= 0) {
 	                                f = S_ISREG(psb.st_mode) ;
-	                            }
-	                        }
-	                        if ((rs < 0) && isNotPresent(rs)) rs = SR_OK ;
+	                            } else if (isNotPresent(rs)) {
+					rs = SR_OK ;
+				    }
+	                        } else if (isNotPresent(rs)) {
+				    rs = SR_OK ;
+				}
 	                        if ((rs >= 0) && (! f)) {
 	                            rs = dirseen_notadd(dsp,&sb,bindname,dl) ;
 	                        }

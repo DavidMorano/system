@@ -165,4 +165,7 @@ opendial.o:		opendial.cc opendial.h		$(INCS)
 # associated
 splitfname.o:		splitfname.cc splitfname.h	$(INCS)
 
+opensysdbs.o:		opensysdbs.c opensysdbs.h	$(INCS)
+
+
 
