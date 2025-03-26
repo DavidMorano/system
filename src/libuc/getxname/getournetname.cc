@@ -44,14 +44,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<getxid.h>		/* |getuid_name(3uc)| */
-#include	<getxname.h>		/* |getnisdomain(3uc)| */
+#include	<getxname.h>
+#include	<getnisdomain.h>	/* |getnisdomain(3uc)| */
 #include	<mallocxx.h>
 #include	<sncpyx.h>
 #include	<ctdec.h>

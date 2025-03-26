@@ -285,7 +285,9 @@ static int opencfile(int w,int of,int ttl) noex {
 	                    if ((rs = mkpath2(tfname,sdname,an)) >= 0) {
 	                        if ((rs = u_stat(tfname,&sb)) >= 0) {
 	                            if (dt == 0) dt = time(nullptr) ;
-	                            if ((dt-sb.st_mtime) >= ttl) rs = SR_STALE ;
+	                            if ((dt-sb.st_mtime) >= ttl) {
+					rs = SR_STALE ;
+				    }
 	                        } /* end if (stat) */
 	                    } /* end if (mkpath) */
 	                } /* end block */
@@ -358,9 +360,9 @@ static int mkrealpath(char *gfname,int w,cchar *sdname,cchar *gcname) noex {
 static int checkperms(cchar *gfname,USTAT *sbp,mode_t mm) noex {
 	int		rs = SR_OK ;
 	if ((sbp->st_mode & mm) != mm) {
-	    uid_t	uid = getuid() ;
+	    const uid_t		uid = getuid() ;
 	    if (sbp->st_uid == uid) {
-	        mode_t	newm = (sbp->st_mode | mm) ;
+	        cmode		newm = (sbp->st_mode | mm) ;
 	        rs = u_chmod(gfname,newm) ;
 	    } else {
 	        uc_unlink(gfname) ;
@@ -471,25 +473,25 @@ static int runsysfs(int w) noex {
 /* end subroutine (runsysfs) */
 
 static int findprog(ids *idp,char *pfname,cchar *pn) noex {
-	dirseen		bhist, *blp = &bhist ;
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
 	pfname[0] = '\0' ;
-	if ((rs = dirseen_start(blp)) >= 0) {
-	    if (vecpstr dhist ; (rs = vecpstr_start(&dhist,4,0,0)) >= 0) {
+	if (dirseen dirs ; (rs = dirs.start) >= 0) {
+	    if (vecpstr dhist ; (rs = dhist.start(4,0,0)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
 	        bool	f = false ;
 	        cchar	*pr ;
 	        for (int i = 0 ; (rs >= 0) && prvars[i] ; i += 1) {
 	            if ((pr = getenv(prvars[i])) != nullptr) {
-	                if ((rs = vecpstr_already(&dhist,pr,-1)) == rsn) {
-	                    if ((rs = findprogbin(idp,blp,pfname,pr,pn)) > 0) {
+	                if ((rs = dhist.already(pr,-1)) == rsn) {
+			    dirseen	*dsp = &dirs ;
+	                    if ((rs = findprogbin(idp,dsp,pfname,pr,pn)) > 0) {
 	                        pl = rs ;
 	                        f = true ;
 	                    }
 	                    if ((rs >= 0) && (! f)) {
-	                        rs = vecpstr_add(&dhist,pr,-1) ;
+	                        rs = dhist.add(pr,-1) ;
 	                    }
 	                }
 	            } /* end if */
@@ -499,22 +501,23 @@ static int findprog(ids *idp,char *pfname,cchar *pn) noex {
 	        if ((rs >= 0) && (! f)) {
 	            for (int i = 0 ; (rs >= 0) && prdirs[i] ; i += 1) {
 	                pr = prdirs[i] ;
-	                if ((rs = vecpstr_already(&dhist,pr,-1)) == rsn) {
-	                    if ((rs = findprogbin(idp,blp,pfname,pr,pn)) > 0) {
+	                if ((rs = dhist.already(pr,-1)) == rsn) {
+			    dirseen	*dsp = &dirs ;
+	                    if ((rs = findprogbin(idp,dsp,pfname,pr,pn)) > 0) {
 	                        pl = rs ;
 	                        f = true ;
 	                    }
 	                    if ((rs >= 0) && (! f)) {
-	                        vecpstr_add(&dhist,pr,-1) ;
+	                        rs = dhist.add(pr,-1) ;
 			    }
 	                } /* end if (not already) */
 	                if (rs > 0) break ;
 	            } /* end for */
 	        } /* end if */
-	        rs1 = vecpstr_finish(&dhist) ;
+	        rs1 = dhist.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (vecpstr) */
-	    rs1 = dirseen_finish(blp) ;
+	    rs1 = dirs.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (dirseen) */
 	return (rs >= 0) ? pl : rs ;
@@ -532,7 +535,7 @@ static int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 	        for (int i = 0 ; (rs >= 0) && prbins[i] ; i += 1) {
 	            if ((rs = mkpath2(bindname,pr,prbins[i])) >= 0) {
 	                dl = rs ;
-	                if ((rs = dirseen_notseen(dsp,&sb,bindname,rs)) > 0) {
+	                if ((rs = dsp->notseen(&sb,bindname,rs)) > 0) {
 	                    if ((rs = mkpath2(pfname,bindname,pn)) >= 0) {
 	                        USTAT	psb ;
 	                        pl = rs ;
@@ -546,7 +549,7 @@ static int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 				    rs = SR_OK ;
 				}
 	                        if ((rs >= 0) && (! f)) {
-	                            rs = dirseen_notadd(dsp,&sb,bindname,dl) ;
+	                            rs = dsp->notadd(&sb,bindname,dl) ;
 	                        }
 	                    } /* end if (mkpath) */
 	                } /* end if (dirseen-notseen) */

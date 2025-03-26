@@ -126,6 +126,7 @@
 #include	<sysusernames.h>
 #include	<linefold.h>
 #include	<mkuuid.h>
+#include	<snuuid.h>
 #include	<pcsns.h>
 #include	<opentmp.h>
 #include	<strw.h>		/* |strwset(3uc)| */
@@ -7755,7 +7756,7 @@ static int locinfo_mkhdrxuuid(LOCINFO *lip) noex {
 	        uuid_dat	*up = &lip->uuid ;
 	        cint		ulen = 100 ;
 	        char		ubuf[100+1] ;
-	        if ((rs = snmkuuid(ubuf,ulen,up)) >= 0) {
+	        if ((rs = snuuid(ubuf,ulen,up)) >= 0) {
 	            cchar	**vpp = &lip->hdruuid ;
 	            lip->have.hdruuid = TRUE ;
 	            rs = locinfo_setentry(lip,vpp,ubuf,rs) ;

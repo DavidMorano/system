@@ -95,8 +95,7 @@ namespace {
 
 static constexpr nodeinfo_m	nodes[] = {
 	&nodeinfo::env,
-	&nodeinfo::uinfo,
-	nullptr
+	&nodeinfo::uinfo
 } ;
 
 
@@ -120,9 +119,9 @@ int getnodename(char *nbuf,int nlen) noex {
 
 nodeinfo::operator int () noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; (rs == SR_OK) && nodes[i] ; i += 1) {
-	    nodeinfo_m	m = nodes[i] ;
+	for (cauto &m : nodes) {
 	    rs = (this->*m)() ;
+	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
 }

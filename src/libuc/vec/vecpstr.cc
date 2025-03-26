@@ -1128,6 +1128,14 @@ int vecpstr::addpath(cchar *sp,int sl) noex {
 	return vecpstr_addpath(this,sp,sl) ;
 }
 
+int vecpstr::store(cchar *sp,int sl,cchar **rpp) noex {
+	return vecpstr_store(this,sp,sl,rpp) ;
+}
+
+int vecpstr::already(cchar *sp,int sl) noex {
+	return vecpstr_already(this,sp,sl) ;
+}
+
 int vecpstr::get(int ai,cchar **rpp) noex {
 	return vecpstr_get(this,ai,rpp) ;
 }

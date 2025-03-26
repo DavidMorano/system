@@ -985,6 +985,14 @@ int vecstr::insert(int ai,cchar *sp,int sl) noex {
 	return vecstr_insert(this,ai,sp,sl) ;
 }
 
+int vecstr::store(cchar *sp,int sl,cchar **rpp) noex {
+	return vecstr_store(this,sp,sl,rpp) ;
+}
+
+int vecstr::already(cchar *sp,int sl) noex {
+	return vecstr_already(this,sp,sl) ;
+}
+
 int vecstr::get(int ai,cchar **rpp) noex {
 	return vecstr_get(this,ai,rpp) ;
 }

@@ -13,7 +13,7 @@
 
 	= 1996-05-22, David A­D­ Morano
 	This subroutine was enhanced to get the local node-name if
-	one if not supplied, using 'getnodename(3dam)'.
+	one if not supplied, using |getnodename(3dam)|.
 
 */
 

@@ -84,12 +84,12 @@ int mkmid(char *rbuf,int rlen,cchar *dn,cchar *nn,pid_t pid,int serial) noex {
 	        if (sbuf mb ; (rs = mb.start(rbuf,rlen)) >= 0) {
 		    {
 	                custime		dt = getustime ;
-	                uint		uv = (uint) pid ;
+	                uint		uv = uint(pid) ;
 	                mb.strw(nn) ;
 	                mb.dec(uv) ;
 	                mb.chr('.') ;
 	                {
-		            uv = (uint) dt ;
+		            uv = uint(dt) ;
 	                    mb.hex(uv) ;
 	                }
 	                mb.chr('.') ;

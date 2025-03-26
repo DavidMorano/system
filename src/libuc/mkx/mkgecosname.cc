@@ -128,10 +128,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* |strnlen(3c)| + |strnchr(3c)| */
 #include	<usystem.h>
 #include	<strn.h>
 #include	<sncpyx.h>

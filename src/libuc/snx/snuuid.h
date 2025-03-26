@@ -18,7 +18,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<mkuuid.h>
+#include	<mkuuid.h>		/* |uuid_dat| below */
 
 
 EXTERNC_begin

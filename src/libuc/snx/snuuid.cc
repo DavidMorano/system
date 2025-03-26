@@ -28,8 +28,8 @@
 	int snuuid(char *rbuf,int rlen,uuid_dat *up) noex
 
 	Arguments:
-	rbuf		result buffer
-	rlen		size of supplied result buffer
+	rbuf		result buffer pointer
+	rlen		result buffer length
 	up		pointer to UUID_DAT object holding a UUID
 
 	Returns:
@@ -39,13 +39,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<stdint.h>
 #include	<climits>		/* |UINT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<sbuf.h>
-#include	<cthex.h>
-#include	<mkuuid.h>
+#include	<mkuuid.h>		/* |uuid_dat| below */
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"snx.h"
@@ -96,7 +96,7 @@ int snuuid(char *dbuf,int dlen,uuid_dat *up) noex {
 		    v = 0 ;
 		    tv = ((up->time >> 48) & UINT_MAX) ;
 		    v |= (tv & UCHAR_MAX) ;
-		    tv = (up->version & (16-1)) ;
+		    tv = (up->version & USHORT_MAX) ;
 		    v |= (tv << 8) ;
 		    tv = ((up->time >> 48) & UINT_MAX) ;
 		    v |= (tv << (8+4)) ;

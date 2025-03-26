@@ -122,3 +122,14 @@ int dirseen_notadd(dirseen *op,USTAT *sbp,cchar *dbuf,int dlen) noex {
 /* end subroutine (dirseen_notadd) */
 
 
+/* local subroutines */
+
+int dirseen::notseen(USTAT *sbp,cchar *dbuf,int dlen) noex {
+	return dirseen_notseen(this,sbp,dbuf,dlen) ;
+}
+
+int dirseen::notadd(USTAT *sbp,cchar *dbuf,int dlen) noex {
+	return dirseen_notadd(this,sbp,dbuf,dlen) ;
+}
+
+

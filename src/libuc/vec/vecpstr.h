@@ -187,6 +187,7 @@ struct vecpstr : vecpstr_head {
 	int addpath(cchar *,int = -1) noex ;
 	int insert(int,cchar *,int = -1) noex ;
 	int store(cchar *,int,cchar **) noex ;
+	int already(cchar *,int) noex ;
 	int get(int,cchar **) noex ;
 	int getlast(cchar **) noex ;
 	int getvec(mainv *) noex ;

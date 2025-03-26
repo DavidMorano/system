@@ -115,6 +115,8 @@ struct dirseen : dirseen_head {
 	int add(cchar *,int,USTAT *) noex ;
 	int havename(cchar *,int) noex ;
 	int havedevino(USTAT *) noex ;
+	int notseen(USTAT *,cchar *,int) noex ;
+	int notadd(USTAT *,cchar *,int) noex ;
 	void dtor() noex ;
 	~dirseen() {
 	    dtor() ;

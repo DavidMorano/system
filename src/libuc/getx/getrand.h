@@ -35,21 +35,25 @@ extern int	getrandi(int *) noex ;
 extern int	getrandl(long *) noex ;
 extern int	getrandll(longlong *) noex ;
 
+static inline int getrandv(void *vp,int vsz) noex {
+    	return getrand(vp,vsz) ;
+}
+
 EXTERNC_end
 
 #ifdef	__cplusplus
 
 static inline int getrand(uint *p, int n = 1) noex {
 	cint	sz = szof(uint) ;
-	return getrand(p,(sz * n)) ;
+	return getrandv(p,(sz * n)) ;
 }
 static inline int getrand(ulong *p,int n = 1) noex {
 	cint	sz = szof(ulong) ;
-	return getrand(p,(sz * n)) ;
+	return getrandv(p,(sz * n)) ;
 }
 static inline int getrand(longlong *p,int n = 1) noex {
 	cint	sz = szof(ulonglong) ;
-	return getrand(p,(sz * n)) ;
+	return getrandv(p,(sz * n)) ;
 }
 
 #endif /* __cplusplus */

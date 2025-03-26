@@ -95,6 +95,7 @@ struct sbuf_co {
 extern "C" {
    extern int sbuf_strw(sbuf *,cchar *,int) noex ;
    extern int sbuf_addquoted(sbuf *,cchar *,int) noex ;
+   extern int sbuf_getlen(sbuf *) noex ;
 }
 struct sbuf : sbuf_head {
 	sbuf_co		deci ;
@@ -157,6 +158,9 @@ struct sbuf : sbuf_head {
 	sbuf_iter end() noex {
 	    sbuf_iter		it(rbuf+index) ;
 	    return it ;
+	} ;
+	operator int () noex {
+	    return sbuf_getlen(this) ;
 	} ;
 	void dtor() noex ;
 	~sbuf() {

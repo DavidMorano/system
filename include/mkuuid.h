@@ -13,15 +13,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
+#include	<stdint.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<stdint.h>
 
 
+#define	UUID_VERSION	4		/* default UUID version */
 #define	UUID_DAT	struct uuid_data
 
 
@@ -41,6 +41,14 @@ EXTERNC_begin
 extern int mkuuid(uuid_dat *,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+static inline int mkuuid(uuid_dat *udp) noex {
+    	return mkuuid(udp,0) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* MKUUID_INCLUDE */

@@ -1,13 +1,13 @@
-/* b_uuidgen */
+/* b_uuidgen SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in to for specialized DB access */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -21,12 +21,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ babies <date(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be first to configure */
 
@@ -42,19 +39,20 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
 #include	<mkuuid.h>
-#include	<snmkuuid.h>
+#include	<snuuid.h>
+#include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -77,19 +75,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
@@ -143,18 +128,6 @@ static int	locinfo_dbname(LOCINFO *,const char *) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	NULL
-} ;
-
 enum argopts {
 	argopt_root,
 	argopt_version,
@@ -167,7 +140,19 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const PIVARS	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	NULL
+} ;
+
+constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -175,7 +160,7 @@ static const PIVARS	initvars = {
 	VARPRNAME
 } ;
 
-static const MAPEX	mapexs[] = {
+constexpr MAPEX		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -189,28 +174,13 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-#ifdef	COMMENT
-static const uchar	aterms[] = {
-	0x00, 0x2E, 0x00, 0x00,
-	0x09, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ;
-#endif /* COMMENT */
 
-
-/* persistent local variables (special class of local variables) */
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int b_uuidgen(int argc,cchar *argv[],void *contextp)
-{
+int b_uuidgen(int argc,mainv argv,void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
@@ -228,9 +198,7 @@ int b_uuidgen(int argc,cchar *argv[],void *contextp)
 }
 /* end subroutine (b_uuidgen) */
 
-
-int p_uuidgen(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_uuidgen(int argc,mainv argv,mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
 }
 /* end subroutine (p_uuidgen) */
@@ -238,10 +206,7 @@ int p_uuidgen(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
@@ -272,6 +237,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	const char	*dbname = NULL ;
 	const char	*cp ;
 
+		(void) contextp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -801,14 +767,12 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    ofn = STDFNOUT ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
-	    uuid_dat	uuid ;
-
-	    if ((rs = mkuuid(&uuid,0)) >= 0) {
+	    if (uuid_dat uuid ; (rs = mkuuid(&uuid,0)) >= 0) {
 		cint	rlen = MAXNAMELEN ;
 		char	rbuf[MAXNAMELEN+1] ;
-		if ((rs = snmkuuid(rbuf,rlen,&uuid)) >= 0) {
+		if ((rs = snuuid(rbuf,rlen,&uuid)) >= 0) {
 		    rs = shio_print(ofp,rbuf,rs) ;
-		} /* end if (snmkuuid) */
+		} /* end if (snuuid) */
 	    } /* end if (mkuuid) */
 
 	    rs1 = shio_close(ofp) ;
