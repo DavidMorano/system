@@ -1,4 +1,4 @@
-/* dialcprog HEADER */
+/* dialprog HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	DIALCPROG_INCLUDE
-#define	DIALCPROG_INCLUDE
+#ifndef	DIALPROG_INCLUDE
+#define	DIALPROG_INCLUDE
 
 
 #include	<envstandards.h>	/* first to configure */
@@ -31,11 +31,11 @@
 
 EXTERNC_begin
 
-extern int dialcprog(cchar *,cchar *,cchar *,mainv,mainv,int,int,int *) noex ;
+extern int dialprog(cchar *,int,mainv,mainv,int *) noex ;
 
 EXTERNC_end
 
 
-#endif /* DIALCPROG_INCLUDE */
+#endif /* DIALPROG_INCLUDE */
 
 

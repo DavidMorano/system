@@ -74,7 +74,7 @@ OBJE_DIAL= obj8_dial.o
 OBJ_DIAL= obja_dial.o objb_dial.o objc_dial.o objd_dial.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -99,6 +99,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_DIAL)
@@ -169,14 +172,14 @@ obje_dial.o:	$(OBJE_DIAL)
 dialopts.o:		dialopts.cc $(INCS)
 dialpass.o:		dialpass.cc $(INCS)
 
-dialusd.o:		dialusd.cc $(INCS)
+dialusd.o:		dialusd.cc	dialusd.h	$(INCS)
 
-dialuss.o:		dialuss.cc $(INCS)
-dialussmux.o:		dialussmux.cc $(INCS)
-dialussnls.o:		dialussnls.cc $(INCS)
+dialuss.o:		dialuss.cc 	dialuss.h	$(INCS)
+dialussmux.o:		dialussmux.cc	dialuss.h	$(INCS)
+dialussnls.o:		dialussnls.cc	dialuss.h	$(INCS)
 
-dialprog.o:		dialprog.cc $(INCS)
-dialcprog.o:		dialcprog.cc $(INCS)
+dialprog.o:		dialprog.cc dialprog.h		$(INCS)
+dialcprog.o:		dialcprog.cc dialcprog.h	$(INCS)
 
 dialudp.o:		dialudp.cc dialudp.h $(INCS)
 
@@ -186,10 +189,10 @@ dialtcpnls.o:		dialtcpnls.cc dialtcp.h $(INCS)
 dialfinger.o:		dialfinger.cc dialtcp.h $(INCS)
 dialhttp.o:		dialhttp.cc dialtcp.h $(INCS)
 
-dialticotsord.o:	dialticotsord.cc $(INCS)
-dialticotsordmux.o:	dialticotsordmux.cc $(INCS)
-dialticotsordnls.o:	dialticotsordnls.cc $(INCS)
+dialticotsord.o:	dialticotsord.cc	dialticotsord.h		$(INCS)
+dialticotsordmux.o:	dialticotsordmux.cc	dialticotsord.h		$(INCS)
+dialticotsordnls.o:	dialticotsordnls.cc	dialticotsord.h		$(INCS)
 
-nlsdialassist.o:	nlsdialassist.cc nlsdialassist.h
+nlsdialassist.o:	nlsdialassist.cc nlsdialassist.h nlsmsg.h	$(INCS)
 
 

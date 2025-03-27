@@ -26,24 +26,22 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<dialopts.h>
-#include	<dialuss.h>
-#include	<dialudp.h>
-#include	<dialtcp.h>
 #include	<dialcprog.h>
+#include	<dialcprogmsg.h>
+#include	<dialopts.h>
+#include	<dialprog.h>
+#include	<dialtcp.h>
+#include	<dialticotsord.h>
+#include	<dialudp.h>
+#include	<dialusd.h>
+#include	<dialuss.h>
+#include	<dialuux.h>
 
 
 EXTERNC_begin
 
-extern int dialprog(cchar *,int,mainv,mainv,int *) noex ;
-extern int dialuss(cchar *,int,int) noex ;
-extern int dialusd(cchar *,int,int) noex ;
-extern int dialussmux(cchar *,cchar *,mainv,int,int) noex ;
-extern int dialussnls(cchar *,cchar *,int,int) noex ;
 extern int dialpass(cchar *,int,int) noex ;
-extern int dialticotsord(cchar *,int,int,int) noex ;
-extern int dialticotsordmux(cc *,int,cc *,mainv,int,int) noex ;
-extern int dialticotsordnls(cc *,int,cc *,int,int) noex ;
+extern int dialhttp(cc *,cc *,int,cc *,mainv,int,int) noex ;
 
 EXTERNC_end
 

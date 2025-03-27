@@ -1,4 +1,5 @@
 /* dialfinger SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* dial out to a machine server listening on FINGER */
@@ -121,6 +122,9 @@ static int	mkmuxreq(char *,int,cchar *,int,mainv,int) noex ;
 /* local variables */
 
 constexpr bool	f_cr = CF_CR ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

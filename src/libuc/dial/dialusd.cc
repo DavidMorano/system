@@ -1,4 +1,5 @@
 /* dialusd SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to dial out to a UNIX® domain socket in data-gram mode */
@@ -57,7 +58,7 @@
 #include	<sockaddress.h>
 #include	<localmisc.h>
 
-#include	"dial.h"
+#include	"dialusd.h"
 
 
 /* local defines */
@@ -82,6 +83,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

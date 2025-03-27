@@ -1,4 +1,5 @@
 /* dialcprogmsg HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* dial a program within the current machine cluster */
@@ -16,13 +17,14 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<sockaddress.h>
-#include	<localmisc.h>
 
 
 /* flags */
 #define	DIALCPROGMSG_FERRCHAN	0x01
-
+/* objects */
 #define	DIALCPROGMSG_END	struct dialcprogmsg_end
 #define	DIALCPROGMSG_LIGHT	struct dialcprogmsg_light
 

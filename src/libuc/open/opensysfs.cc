@@ -56,7 +56,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<bit>
+#include	<bit>			/* |endian(3c++)| */
 #include	<usystem.h>
 #include	<ids.h>
 #include	<vecpstr.h>

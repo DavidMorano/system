@@ -1,4 +1,5 @@
 /* dialpass SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to dial over to a UNIX® domain socket in stream mode */
@@ -45,10 +46,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>
+#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctime>
+#include	<algorithm>		/* |min(3c++)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -104,10 +106,10 @@ int dialpass(cchar *fname,int timeout,int) noex {
 		rs = SR_NOSYS ;
 		if_constexpr (f_streams) {
 	            cint	of = (O_WRONLY | O_NDELAY) ;
-	            if ((rs = uc_open(fname,of,0666)) >= 0) {
-	                USTAT	sb ;
+		    cmode	om = 0666 ;
+	            if ((rs = uc_open(fname,of,om)) >= 0) {
 	                cint	fd_pass = rs ;
-	                if ((rs = uc_fstat(fd_pass,&sb)) >= 0) {
+	                if (USTAT sb ; (rs = uc_fstat(fd_pass,&sb)) >= 0) {
 			    rs = SR_INVALID ;
 	                    if (S_ISFIFO(sb.st_mode) || S_ISCHR(sb.st_mode)) {
 			        rs = SR_OK ;
@@ -145,7 +147,7 @@ int dialpass(cchar *fname,int timeout,int) noex {
 
 static int waitready(int fd,int timeout) noex {
 	time_t		ti_timeout ;
-	time_t		daytime = time(nullptr) ;
+	time_t		dt = time(nullptr) ;
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 	if (timeout >= 0) {
@@ -154,7 +156,7 @@ static int waitready(int fd,int timeout) noex {
 	    polls[0].events = (POLLOUT | POLLWRBAND) ;
 	    polls[1].fd = -1 ;
 	    polls[1].events = 0 ;
-	    ti_timeout = daytime + timeout ;
+	    ti_timeout = dt + timeout ;
 	    while (rs >= 0) {
 	        cint	pollto = MIN(timeout,5) * POLL_INTMULT ;
 	        if ((rs = u_poll(polls,1,pollto)) > 0) {
@@ -172,8 +174,8 @@ static int waitready(int fd,int timeout) noex {
 		    rs = SR_OK ;
 	        }
 	        if ((rs >= 0) && (! f)) {
-	            daytime = time(nullptr) ;
-		    if (daytime >= ti_timeout) rs = SR_TIMEDOUT ;
+	            dt = time(nullptr) ;
+		    if (dt >= ti_timeout) rs = SR_TIMEDOUT ;
 	        }
 	        if ((rs >= 0) && f) break ;
 	    } /* end while */

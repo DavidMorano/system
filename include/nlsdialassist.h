@@ -1,4 +1,5 @@
 /* nlsdialassist HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* assistance for NLS dialing */
@@ -16,6 +17,10 @@
 
 /******************************************************************************
 
+  	Name:
+	nlsdialassist
+
+	Description:
 	We provide NLS dialing assistance.
 
 ******************************************************************************/

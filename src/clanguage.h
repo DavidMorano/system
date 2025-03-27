@@ -79,12 +79,6 @@
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
-#ifndef	typeof
-#define	typeof(expr)		decltype(expr)
-#endif
-#endif /* __cplusplus */
-
-#ifdef	__cplusplus
 #ifndef	if_constexpr
 #define	if_constexpr		if constexpr
 #endif

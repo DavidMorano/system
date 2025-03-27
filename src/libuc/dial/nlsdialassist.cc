@@ -1,4 +1,5 @@
 /* nlsdialassist SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* we provide NLS dialing assistance */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	nlsdialassist
+
+	Description:
 	We provide NLS dialing assistance.
 
 *******************************************************************************/
@@ -65,14 +70,15 @@ static int	nlsresponse(char *,int,cchar *,int) noex ;
 /* exported subroutines */
 
 int mknlsreq(char *nlsbuf,int nlslen,cchar *svcbuf,int svclen) noex {
-	sbuf		svc ;
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = sbuf_start(&svc,nlsbuf,nlslen)) >= 0) {
-	    sbuf_strw(&svc,NLPS_REQ2,-1) ;
-	    sbuf_strw(&svc,svcbuf,svclen) ;
-	    sbuf_chr(&svc,0) ;
-	    len = sbuf_finish(&svc) ;
+	if (sbuf svc ; (rs = svc.start(nlsbuf,nlslen)) >= 0) {
+	    {
+	        svc.strw(NLPS_REQ2,-1) ;
+	        svc.strw(svcbuf,svclen) ;
+	        svc.chr(0) ;
+	    }
+	    len = svc.finish ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (nlsbuf) */
 	return (rs >= 0) ? len : rs ;
@@ -82,8 +88,7 @@ int mknlsreq(char *nlsbuf,int nlslen,cchar *svcbuf,int svclen) noex {
 int readnlsresp(int fd,char *tbuf,int tlen,int to) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*rbuf{} ;
-	if ((rs = malloc_mn(&rbuf)) >= 0) {
+	if (char *rbuf ; (rs = malloc_mn(&rbuf)) >= 0) {
 	    cint	rlen = rs ;
 	    if ((rs = uc_readlinetimed(fd,rbuf,rlen,to)) >= 0) {
 	        if ((rs = nlsresponse(tbuf,tlen,rbuf,rs)) >= 0) {
@@ -117,11 +122,10 @@ int readnlsresp(int fd,char *tbuf,int tlen,int to) noex {
 static int nlsresponse(char *tbuf,int tlen,cchar *rbuf,int rlen) noex {
 	int		rs = SR_PROTO ;
 	int		sl = rlen ;
-	int		pv = 0 ;
-	int		code = 0 ;
-	cchar		*tp ;
+	int		pv = 0 ;	/* used-afterwards */
+	int		code = 0 ;	/* return-value */
 	cchar		*sp = rbuf ;
-	if ((tp = strnchr(sp,sl,':')) != nullptr) {
+	if (cchar *tp ; (tp = strnchr(sp,sl,':')) != nullptr) {
 	    if ((rs = cfdeci(sp,(tp-sp),&pv)) >= 0) {
 	        sl -= ((tp+1)-sp) ;
 	        sp = (tp+1) ;
@@ -136,7 +140,9 @@ static int nlsresponse(char *tbuf,int tlen,cchar *rbuf,int rlen) noex {
 		}
 	    }
 	}
-	if ((rs >= 0) && (pv != NLPS_REQVERSION)) rs = SR_NOPROTOOPT ;
+	if ((rs >= 0) && (pv != NLPS_REQVERSION)) {
+	    rs = SR_NOPROTOOPT ;
+	}
 	return (rs >= 0) ? code : rs ;
 }
 /* end subroutine (nlsresponse) */

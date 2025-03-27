@@ -1,4 +1,5 @@
 /* dialprog SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* connect to a local program */
@@ -55,7 +56,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"dial.h"
+#include	"dialprog.h"
 
 
 /* local defines */

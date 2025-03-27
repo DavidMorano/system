@@ -1,4 +1,5 @@
 /* dialticotsordmux SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* dial to the server listening on USSMUX */

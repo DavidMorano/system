@@ -1,4 +1,4 @@
-/* uc_opendev */
+/* ucopendev SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -35,9 +35,12 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strnchr(3c)| */
 #include	<usystem.h>
+#include	<getx.h>
 #include	<opensysfs.h>
+#include	<mkpathx.h>
+#include	<strwcpy.h>
 #include	<matstr.h>
 #include	<localmisc.h>
 
@@ -51,15 +54,10 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	getaf(const char *) ;
 extern int	dialtcp(cchar *,cchar *,int,int,int) ;
 extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;
 extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
 extern int	dialudp(cchar *,cchar *,int,int,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* local structures */

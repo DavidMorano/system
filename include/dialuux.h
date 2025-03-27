@@ -1,4 +1,6 @@
-/* dialuux */
+/* dialuux SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* revision history:
@@ -11,26 +13,24 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DIALUUX_INCLUDE
-#define	DIALUUX_INCLUDE		1
+#define	DIALUUX_INCLUDE	
 
 
-#include	<usystem.h>	/* function-modifier definitions */
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<usystem.h>		/* function-modifier definitions */
 
 
+/* options */
 #define	DIALUUX_OQUEUE		FM_QUEUE
 #define	DIALUUX_ONOREPORT	FM_NOREPORT
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int dialuux(const char *,const char *,const char *,
-		const char **,const char *,const char *,int) ;
+extern int dialuux(cchar *,cchar *,cchar *,cchar **,cchar *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* DIALUUX_INCLUDE */
 

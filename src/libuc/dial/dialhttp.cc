@@ -1,4 +1,5 @@
 /* dialhttp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* dial out to the web */
@@ -75,10 +76,12 @@
 #include	<ctdec.h>
 #include	<isnot.h>
 #include	<getnodename.h>
+#include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
 #include	<getprogpath.h>
 #include	<localmisc.h>
 
-#include	"dial.h"
+#include	"dialtcp.h"
+#include	"dialprog.h"
 
 
 /* local defines */
@@ -169,12 +172,10 @@ static int dialhttper(cc *hn,cc *ps,int,cc *svc,mv sargv,int to,int) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	char		*ubuf{} ;
-	if ((rs = uc_malloc((ulen+1),&ubuf)) >= 0) {
+	if (char *ubuf ; (rs = uc_malloc((ulen+1),&ubuf)) >= 0) {
 	    if ((rs = mkurl(ubuf,ulen,hn,ps,svc,sargv)) >= 0) {
 		cchar	*pn = PROG_WGET ;
-		char	*ebuf{} ;
-		if ((rs = malloc_mp(&ebuf)) >= 0) {
+		if (char *ebuf ; (rs = malloc_mp(&ebuf)) >= 0) {
 		    if ((rs = findprog(ebuf,pn)) >= 0) {
 			char	tobuf[TOBUFLEN + 1] = {} ;
 	                if (to >= 0) {
@@ -199,14 +200,12 @@ static int dialhttper(cc *hn,cc *ps,int,cc *svc,mv sargv,int to,int) noex {
 /* end subroutine (dialhttper) */
 
 static int findprog(char *execfname,cchar *pn) noex {
-	ids		id ;
 	int		rs  ;
 	int		rs1 ;
 	int		pl = 0 ;
 	execfname[0] = '\0' ;
-	if ((rs = ids_load(&id)) >= 0) {
-	    vecstr	path ;
-	    if ((rs = vecstr_start(&path,20,0)) >= 0) {
+	if (ids id ; (rs = ids_load(&id)) >= 0) {
+	    if (vecstr path ; (rs = vecstr_start(&path,20,0)) >= 0) {
 	        if ((rs = loadpath(&path)) >= 0) {
 	            rs = getprogpath(&id,&path,execfname,pn,-1) ;
 	            pl = rs ;
@@ -230,15 +229,13 @@ static int findprprog(ids *idp,vecstr *plp,char *rbuf,cchar *pn) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	char		*dn{} ;
 	rbuf[0] = '\0' ;
-	if ((rs = malloc_hn(&dn)) >= 0) {
+	if (char *dn ; (rs = malloc_hn(&dn)) >= 0) {
 	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
 	        cint	sz = ((maxpathlen + 1) * 2) ;
 	        cchar	*bdname = BINDNAME ;
-	        char	*prbuf{} ;
-	        if ((rs = uc_malloc((sz+1),&prbuf)) >= 0) {
+	        if (char *prbuf ; (rs = uc_malloc((sz+1),&prbuf)) >= 0) {
 		    cint	prlen = maxpathlen ;
 	            char	*dbuf = (prbuf + (maxpathlen+1)) ;
 	            for (int i = 0 ; prnames[i] ; i += 1) {
@@ -320,8 +317,7 @@ static int loadpath(vecstr *plp) noex {
 	cchar		*vn = varname.path ;
 	cchar		*pp ;
 	if ((pp = getenv(vn)) != nullptr) {
-	    char	*tbuf{} ;
-	    if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	        cchar	*tp ;
 	        while ((tp = strpbrk(pp,":;")) != nullptr) {
 	            if ((rs = pathclean(tbuf,pp,(tp - pp))) >= 0) {
@@ -346,10 +342,9 @@ static int loadpath(vecstr *plp) noex {
 /* end subroutine (loadpath) */
 
 static int mkurl(char *ubuf,int ulen,cc *hn,cc *ps,cc *svc,mainv sargv) noex {
-	sbuf		url ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sbuf_start(&url,ubuf,ulen)) >= 0) {
+	if (sbuf url ; (rs = sbuf_start(&url,ubuf,ulen)) >= 0) {
 	    sbuf_strw(&url,"http://",-1) ;
 	    sbuf_strw(&url,hn,-1) ;
 	    if ((ps != nullptr) && (ps[0] != '\0')) {
@@ -384,7 +379,7 @@ static int mkvars() noex {
 /* end subroutine (mkvars) */
 
 static int afvalid(int af) noex {
-	bool	f = false ;
+	bool		f = false ;
 	f = f || (af == AF_UNSPEC) ;
 	f = f || (af == AF_INET4) ;
 	f = f || (af == AF_INET6) ;

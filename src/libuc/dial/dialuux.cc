@@ -1,4 +1,5 @@
 /* dialuux SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform remote UUX service execution */
@@ -78,10 +79,6 @@
 
 #ifndef	NULLFNAME
 #define	NULLFNAME	"/dev/null"
-#endif
-
-#ifndef	NOFILE
-#define	NOFILE		20
 #endif
 
 #ifndef	VARUSERNAME

@@ -18,14 +18,20 @@
 
 /*******************************************************************************
 
-	Name:
+	Names:
 	opentmpfile
+	opentmpusd
+	opentmpuss
+	opentmp
 
 	Description:
 	Make and open a temporary file.
 
 	Synopsis:
 	int opentmpfile(cchar *inname,int of,mode_t om,char *obuf) noex
+	int opentmpusd(cchar *inname,int of,mode_t om,char *rbuf) noex
+	int opentmpuss(cchar *inname,int of,mode_t om,char *rbuf) noex
+	int opentmp(cchar *dname,int of,mode_t om) noex
 
 	Arguments:
 	inname		input directory template
@@ -561,6 +567,6 @@ vars::operator int () noex {
 	}
 	return rs ;
 }
-/* end subroutine (vars::operator) */
+/* end method (vars::operator) */
 
 

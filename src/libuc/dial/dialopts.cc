@@ -1,4 +1,5 @@
 /* dialopts SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* set options on dialer file-descriptor */

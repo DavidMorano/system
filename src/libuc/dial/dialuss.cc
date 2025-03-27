@@ -1,4 +1,5 @@
 /* dialuss SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to dial over to a UNIX® domain socket in stream mode */
@@ -92,8 +93,7 @@ int dialuss(cchar *pathname,int to,int opts) noex {
 	if (pathname) {
 	    rs = SR_INVALID ;
 	    if (pathname[0]) {
-	        USTAT	sb ;
-	        if ((rs = uc_stat(pathname,&sb)) >= 0) {
+	        if (USTAT sb ; (rs = uc_stat(pathname,&sb)) >= 0) {
 	            if (S_ISSOCK(sb.st_mode)) {
 		        sockaddress	sa ;
 		        cint		af = AF_UNIX ;

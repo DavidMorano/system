@@ -1,4 +1,5 @@
 /* dialticotsord HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* dial out to a TI-CO-TS-ORD service */
@@ -40,9 +41,10 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 #include	<dialopts.h>
-#include	<dialtcpnls.h>
 
 
 EXTERNC_begin

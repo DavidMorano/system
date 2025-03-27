@@ -1,4 +1,5 @@
 /* nlsmsg HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* information to create and read an NLS-connect message */
@@ -32,13 +33,11 @@
 
 /* this is the NLS dial-out connection-request string-prefix */
 #define	NLSDIALSTR	"NLPS:002:002:"
-
 /* these are some kind of NLS codes */
 #define	NLSSTART	0
 #define	NLSFORMAT	2
 #define	NLSUNKNOWN	3
 #define	NLSDISABLED	4
-
 /* these are environment variables passed down to a NLPS sub-servier */
 #define	NLSADDR		"NLSADDR"
 #define	NLSOPT		"NLSOPT"

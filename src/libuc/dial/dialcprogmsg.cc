@@ -1,4 +1,5 @@
 /* dialcprogmsg SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* create and parse the internal messages */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	dialcprogmsg
+
+	Description:
 	This module contains the code to make and parse the internal
 	messages that are used in this whole server facility.
 
@@ -46,10 +51,19 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
+/* forward references */
+
+
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

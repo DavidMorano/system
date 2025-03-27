@@ -1,4 +1,5 @@
 /* dialussmux SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* dial to the server listening on USSMUX */
@@ -70,7 +71,7 @@ static int	loadargs(buffer *,mainv) noex ;
 static int	badreq(int,cchar *) noex ;
 
 
-/* local subroutines */
+/* local variables */
 
 
 /* exported variables */

@@ -1,7 +1,8 @@
-/* dialtcpnls HEADER */
+/* dialusd HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* dial out to a TCP port and using the NLS connect protocol */
+/* dial out to a TCP port */
 /* version %I% last-modified %G% */
 
 
@@ -14,24 +15,27 @@
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	DIALTCPNLS_INCLUDE
-#define	DIALTCPNLS_INCLUDE
+#ifndef	DIALUSD_INCLUDE
+#define	DIALUSD_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 #include	<dialopts.h>
 
 
 EXTERNC_begin
 
+extern int dialusd(cchar *,int,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* DIALTCPNLS_INCLUDE */
+#endif /* DIALUSD_INCLUDE */
 
 
