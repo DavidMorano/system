@@ -1,6 +1,6 @@
-# MAKEFILES (dial)
+# MAKEFILES (cluster)
 
-T= dial
+T= cluster
 
 ALL= $(T).o
 
@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += dial.h dialopts.h
+INCS += cluster.h dialcprog.h
 
 LIBS +=
 
@@ -55,23 +55,19 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_DIAL= dialopts.o nlsdialassist.o
-OBJ1_DIAL= dialpass.o 
-OBJ2_DIAL= dialtcp.o dialtcpmux.o dialtcpnls.o 
-OBJ3_DIAL= dialfinger.o dialhttp.o
-OBJ4_DIAL= dialudp.o 
-OBJ5_DIAL= dialusd.o 
-OBJ6_DIAL= dialuss.o dialussmux.o dialussnls.o
-OBJ7_DIAL= dialprog.o
-
-OBJ8_DIAL= dialticotsord.o dialticotsordmux.o dialticotsordnls.o
-OBJ9_DIAL= dialuux.o
+OBJ0_DIAL= dialcprog.o dialcprogmsg.o
+OBJ1_DIAL=
+OBJ2_DIAL=
+OBJ3_DIAL=
+OBJ4_DIAL=
+OBJ5_DIAL=
+OBJ6_DIAL=
+OBJ7_DIAL=
 
 OBJA_DIAL= obj0_dial.o obj1_dial.o
 OBJB_DIAL= obj2_dial.o obj3_dial.o
 OBJC_DIAL= obj4_dial.o obj5_dial.o
 OBJD_DIAL= obj6_dial.o obj7_dial.o
-OBJE_DIAL= obj8_dial.o obj9_dial.o
 
 OBJ_DIAL= obja_dial.o objb_dial.o objc_dial.o objd_dial.o
 
@@ -171,31 +167,9 @@ obje_dial.o:	$(OBJE_DIAL)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJE_DIAL)
 
 
-dialopts.o:		dialopts.cc $(INCS)
-dialpass.o:		dialpass.cc $(INCS)
+dialcprog.o:		dialcprog.cc dialcprog.h	$(INCS)
+dialcprog.o:		msflag.h			$(INCS)
 
-dialusd.o:		dialusd.cc	dialusd.h	$(INCS)
-
-dialuss.o:		dialuss.cc 	dialuss.h	$(INCS)
-dialussmux.o:		dialussmux.cc	dialuss.h	$(INCS)
-dialussnls.o:		dialussnls.cc	dialuss.h	$(INCS)
-
-dialprog.o:		dialprog.cc dialprog.h		$(INCS)
-
-dialudp.o:		dialudp.cc dialudp.h $(INCS)
-
-dialtcp.o:		dialtcp.cc dialtcp.h $(INCS)
-dialtcpmux.o:		dialtcpmux.cc dialtcp.h $(INCS)
-dialtcpnls.o:		dialtcpnls.cc dialtcp.h $(INCS)
-dialfinger.o:		dialfinger.cc dialtcp.h $(INCS)
-dialhttp.o:		dialhttp.cc dialtcp.h $(INCS)
-
-dialticotsord.o:	dialticotsord.cc	dialticotsord.h		$(INCS)
-dialticotsordmux.o:	dialticotsordmux.cc	dialticotsord.h		$(INCS)
-dialticotsordnls.o:	dialticotsordnls.cc	dialticotsord.h		$(INCS)
-
-dialuux.o:		dialuux.cc dialuux.h				$(INCS)
-
-nlsdialassist.o:	nlsdialassist.cc nlsdialassist.h nlsmsg.h	$(INCS)
+dialcprogmsg.o:		dialcprogmsg.cc dialcprogmsg.h	$(INCS)
 
 

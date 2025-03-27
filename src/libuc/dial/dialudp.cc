@@ -110,6 +110,9 @@ static constexpr int	pfs[] = {
 constexpr bool		f_proto = CF_PROTO ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int dialudp(cchar *hostname,cchar *portspec,int af,int to,int) noex {
@@ -162,11 +165,10 @@ static int opendialudp(int af,cchar *hostname,cchar *portspec,int to) noex {
 /* end subroutine (opendialudp) */
 
 static int opendialudp_hint(ADDRINFO *hip,cchar *hs,cchar *ps,int to) noex {
-	hostaddr	ha ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = hostaddr_start(&ha,hs,ps,hip)) >= 0) {
+	if (hostaddr ha ; (rs = hostaddr_start(&ha,hs,ps,hip)) >= 0) {
 	    hostaddr_cur	cur ;
 	    if ((rs = hostaddr_curbegin(&ha,&cur)) >= 0) {
 	        ADDRINFO	*aip ;

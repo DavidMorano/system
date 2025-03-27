@@ -455,6 +455,10 @@ int buffer::chr(int ch) noex {
 	return buffer_chr(this,ch) ;
 }
 
+int buffer::buf(cchar *sbuf,int slen) noex {
+	return buffer_buf(this,sbuf,slen) ;
+}
+
 int buffer::get(cchar **rpp) noex {
 	return buffer_get(this,rpp) ;
 }

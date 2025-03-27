@@ -37,17 +37,16 @@
 #define	MSFILE_ENT		MSFILEE_ALL
 #define	MSFILE_FL		struct msfile_flags
 #define	MSFILE_H		struct msfile_her
-
+/* other */
 #define	MSFILE_MAGIC		918245634
 #define	MSFILE_FILEMAGIC	"MS"
 #define	MSFILE_FILEMAGICSIZE	16
-#define	MSFILE_FILEMAGICLEN	sizeof(MSFILE_FILEMAGIC)
+#define	MSFILE_FILEMAGICLEN	szof(MSFILE_FILEMAGIC)
 #define	MSFILE_FILEVERSION	0
 #define	MSFILE_NODENAMELEN	MSFILEE_LNODENAME
-#define	MSFILE_IDLEN		(16 + sizeof(uint))
-#define	MSFILE_HEADTABLEN	(3 * sizeof(uint))
+#define	MSFILE_IDLEN		(16 + szof(uint))
+#define	MSFILE_HEADTABLEN	(3 * szof(uint))
 #define	MSFILE_TOPLEN		(MSFILE_IDLEN + MSFILE_HEADTABLEN)
-
 /* entry flags */
 #define	MSFILE_FLA		0x01	/* flag-loadaverage */
 #define	MSFILE_FUSERS		0x02	/* flag-users */

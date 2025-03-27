@@ -638,6 +638,10 @@ int sbuf::printf(cchar *fmt,...) noex {
 	return rs ;
 }
 
+int sbuf::buf(cchar *sp,int sl) noex {
+	return sbuf_buf(this,sp,sl) ;
+}
+
 int sbuf::getpoint(cchar **rpp) noex {
 	return sbuf_getpoint(this,rpp) ;
 }

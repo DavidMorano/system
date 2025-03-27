@@ -53,6 +53,7 @@
 #include	<sigblocker.h>
 #include	<buffer.h>
 #include	<sfx.h>
+#include	<mkx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -78,10 +79,6 @@ typedef mainv		mv ;
 
 /* external subroutines */
 
-extern "C" {
-     extern int	mkquoted(char *,int,cchar *,int) noex ;
-}
-
 
 /* external variables */
 
@@ -103,6 +100,9 @@ static constexpr int	sigblocks[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int dialticotsordmux(cc *abuf,int alen,cc *svc,mv sargv,int to,int opts) noex {
@@ -112,14 +112,12 @@ int dialticotsordmux(cc *abuf,int alen,cc *svc,mv sargv,int to,int opts) noex {
 	if (abuf && svc) {
 	    rs = SR_INVALID ;
 	    if (svc[0]) {
-	        int	sl ;
 	        cchar	*sp{} ;
-		if ((cl = sfshrink(svc,-1,&sp)) > 0) {
-	            buffer	srv ;
-	            if ((rs = buffer_start(&srv,100)) >= 0) {
+		if (int sl ; (sl = sfshrink(svc,-1,&sp)) > 0) {
+	            if (buffer srv ; (rs = buffer_start(&srv,100)) >= 0) {
 	                cint	dlen = DBUFLEN ;
-	                char	*dbuf ;
-	                if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
+	                char *dbuf ; 
+		        if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
 	                    buffer_strw(&srv,svc,svclen) ;
 	                    if (sargv != NULL) {
 		                auto	mq = mkquoted ;
@@ -158,14 +156,12 @@ int dialticotsordmux(cc *abuf,int alen,cc *svc,mv sargv,int to,int opts) noex {
 
 static int dialer(buffer *sbp,cchar *abuf,int alen,char *dbuf,int dlen,
 		int to,int opts) noex {
-	sigblocker	ss ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	cchar		*bp ;
-	if ((rs = buffer_get(sbp,&bp)) >= 0) {
+	if (cchar *bp ; (rs = sbp->get(&bp)) >= 0) {
 	    cint	blen = rs ;
-	    if ((rs = sigblocker_start(&ss,sigblocks)) >= 0) {
+	    if (sigblocker ss ; (rs = sigblocker_start(&ss,sigblocks)) >= 0) {
 	        if ((rs = dialticotsord(abuf,alen,to,opts)) >= 0) {
 	            fd = rs ;
 	            if ((rs = uc_writen(fd,bp,blen)) >= 0) {

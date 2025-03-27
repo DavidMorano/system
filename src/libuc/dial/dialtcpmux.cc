@@ -143,7 +143,7 @@ static int	mkmuxreq(char *,int,cchar *,int,mainv) noex ;
 
 /* local variables */
 
-constexpr bool	f_cr = CF_CR ;
+const bool	f_cr = CF_CR ;
 
 
 /* exported variables */
@@ -180,9 +180,8 @@ int dialtcpmux(cc *hn,cc *ps,int af,cc *svc,mainv sargs,int to,int dot) noex {
 
 int muxhelp::start() noex {
 	int		rs ;
-	void		*vp{} ;
 	mlen = getmuxlen(sl,sargs) ;
-	if ((rs = uc_malloc((mlen+1),&vp)) >= 0) {
+	if (void *vp ; (rs = uc_malloc((mlen+1),&vp)) >= 0) {
 	    mbuf = charp(vp) ;
 	}
 	return rs ;
@@ -234,8 +233,7 @@ int muxhelp::reqsvc(int fd) noex {
 	int		rs ;
 	int		rs1 ;
         if ((rs = uc_writen(fd,mbuf,mlen)) >= 0) {
-            char        *rbuf{}  ;
-	    if ((rs = malloc_mn(&rbuf)) >= 0) {
+            if (char *rbuf  ; (rs = malloc_mn(&rbuf)) >= 0) {
 		cint	rlen = rs ;
                 if ((rs = uc_readlinetimed(fd,rbuf,rlen,to)) >= 0) {
                     if ((rs == 0) || (rbuf[0] != '+'))
@@ -261,22 +259,20 @@ static int getmuxlen(int svclen,mainv sargs) noex {
 /* end subroutine (getmuxlen) */
 
 static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,mainv sargs) noex {
-	sbuf		b ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = sbuf_start(&b,mbuf,mlen)) >= 0) {
-	    if ((rs = sbuf_strw(&b,sp,sl)) >= 0) {
+	if (sbuf b ; (rs = b.start(mbuf,mlen)) >= 0) {
+	    if ((rs = b.strw(sp,sl)) >= 0) {
 	        if (sargs) {
-	            char	*qbuf{} ;
-		    if ((rs = malloc_mn(&qbuf)) >= 0) {
+	            if (char *qbuf ; (rs = malloc_mn(&qbuf)) >= 0) {
 			cint	qlen = rs ;
 	                for (int i = 0 ; (rs >= 0) && sargs[i] ; i += 1) {
 			    cchar	*sa = sargs[i] ;
 	                    sbuf_chr(&b,' ') ;
 	                    if ((rs = mkquoted(qbuf,qlen,sa,-1)) >= 0) {
 	                        len = rs ;
-	                        sbuf_buf(&b,qbuf,len) ;
+	                        rs = b.buf(qbuf,len) ;
 	                    }
 	                } /* end for */
 		        rs1 = uc_free(qbuf) ;
@@ -285,12 +281,12 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,mainv sargs) noex {
 	        } /* end if (svc-args) */
 	        if (rs >= 0) {
 		    if_constexpr (f_cr) {
-	                sbuf_chr(&b,'\r') ;
+	                b.chr('\r') ;
 		    }
-	            sbuf_chr(&b,'\n') ;
+	            b.chr('\n') ;
 	        } /* end if */
 	    } /* end if */
-	    len = sbuf_getlen(&b) ;
+	    len = b.finish ;
 	    if (rs >= 0) rs = len ;
 	} /* end if */
 	return (rs >= 0) ? len : rs ;

@@ -45,6 +45,7 @@ sysvars
 systems
 uunames		block structure
 dialcprog	incredible mess (maybe not worth refactoring)
+dialuux		a mess
 logsys		mess -- cannot compile on macOS-Darwin (no STREAMS®)
 icalmk		mess, junk, or not even finished
 

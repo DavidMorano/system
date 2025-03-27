@@ -60,7 +60,6 @@
 #include	"pcslocinfo.h"
 #include	"pcslog.h"
 #include	"defs.h"
-#include	"msflag.h"
 
 
 /* local defines */

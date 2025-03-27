@@ -74,6 +74,7 @@
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<sbuf.h>
+#include	<mkx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -87,22 +88,12 @@
 #endif
 #define	PORTSPEC_FINGERALT	"5112"
 
-#ifndef	SVCLEN
-#define	SVCLEN		MAXNAMELEN
-#endif
-
-#define	MUXBUFLEN	(SVCLEN + MAXPATHLEN)
-
 #ifndef	CF_CR
 #define	CF_CR		1		/* stupid CR character */
 #endif
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	mkquoted(char *,int,cchar *,int) noex ;
-}
 
 
 /* external variables */

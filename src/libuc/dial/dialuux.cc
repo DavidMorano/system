@@ -26,20 +26,15 @@
 	This is a dialer to connect to the UUX facility.
 
 	Synopsis:
-	int dialuux(pr,node,svc,argv,u,g,opts)
-	const char	pr[] ;
-	const char	node[] ;
-	const char	svc[] ;
-	char		*argv[] ;
-	const char	u[] ;
-	const char	g[] ;
-	int		opts ;
+	int dialuux(cc *pr,cc *node,cc *svc,mv argv,cc *u,cc *g,int opts) noex
 
 	Arguments:
 	pr		program-root
 	node		target node
 	svc		target service
 	argv		arguments to program
+	u		c-string user-name
+	g		c-string group-name
 	opts		options
 
 	Returns:
@@ -49,7 +44,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -58,13 +52,19 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<getpwd.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
+#include	<sncpyx.h>
+#include	<strn.h>
+#include	<strw.h>
+#include	<mkpathx.h>
+#include	<pathclean.h>
 #include	<matxstr.h>
+#include	<uuname.h>
 #include	<localmisc.h>
 
 #include	"dialuux.h"
-#include	"uuname.h"
 
 
 /* local defines */
@@ -77,8 +77,8 @@
 #define	DEFLOGFNAME	"/etc/default/login"
 #endif
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
+#ifndef	nullptrFNAME
+#define	nullptrFNAME	"/dev/null"
 #endif
 
 #ifndef	VARUSERNAME
@@ -134,31 +134,14 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	strkeycmp(const char *,const char *) ;
-extern int	vstrkeycmp(const void **,const void **) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	ctdecl(char *,int,long) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	prgetprogpath(const char *,char *,const char *,int) ;
-extern int	getprogroot(const char *,const char **,
-			int *,char *,const char *) ;
+extern int	strkeycmp(cchar *,cchar *) noex ;
+extern int	vstrkeycmp(cvoid **,cvoid **) noex ;
+extern int	prgetprogpath(cchar *,char *,cchar *,int) noex ;
+extern int	getprogroot(cchar *,cchar **,int *,char *,cchar *) noex ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) noex ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -167,61 +150,55 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 /* local structures */
 
 struct envpop {
-	const char	*name ;
-	const char	*sub1dname ;
-	const char	*sub2dname ;
+	cchar	*name ;
+	cchar	*sub1dname ;
+	cchar	*sub2dname ;
 } ;
 
 
 /* forward reference */
 
-static int	vecstr_defenvs(vecstr *,const char **) ;
-static int	vecstr_loadpath(vecstr *,const char *) ;
-static int	mkpathval(vecstr *,char *,int) ;
+static int	vecstr_defenvs(vecstr *,cchar **) noex ;
+static int	vecstr_loadpath(vecstr *,cchar *) noex ;
+static int	mkpathval(vecstr *,char *,int) noex ;
 
-static int	procenvpaths(const char *,vecstr *) ;
-static int	mknodesvc(char *,int,const char *,const char *) ;
-static int	havenode(const char *,const char *) ;
+static int	procenvpaths(cchar *,vecstr *) noex ;
+static int	mknodesvc(char *,int,cchar *,cchar *) noex ;
+static int	havenode(cchar *,cchar *) noex ;
 
 
 /* local variables */
 
-static const char	*prnames[] = {
+constexpr cpcchar	prnames[] = {
 	"LOCAL",
 	"NCMP",
 	"EXTRA",
 	"PCS",
-	NULL
+	nullptr
 } ;
 
-static const char	*envdefs[] = {
+constexpr cpcchar	envdefs[] = {
 	"PATH",
 	"LD_LIBRARY_PATH",
 	"MAIL",
 	"MAILDIR",
-	NULL
+	nullptr
 } ;
 
-static const struct envpop	envpops[] = {
+constexpr envpop	envpops[] = {
 	{ VARPATH, "bin", "sbin" },
-	{ VARLIBPATH, "lib", NULL },
-	{ VARMANPATH, "man", NULL },
-	{ NULL, NULL, NULL }
+	{ VARLIBPATH, "lib", nullptr },
+	{ VARMANPATH, "man", nullptr },
+	{ nullptr, nullptr, nullptr }
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int dialuux(pr,node,svc,argv,u,g,opts)
-const char	pr[] ;
-const char	node[] ;
-const char	svc[] ;
-const char	*argv[] ;
-const char	u[] ;
-const char	g[] ;
-int		opts ;
-{
+int dialuux(cc *pr,cc *node,cc *svc,mainv argv,cc *u,cc *g,int opts) noex {
 	vecstr		args ;
 	vecstr		envs ;
 	int		rs = SR_OK ;
@@ -229,15 +206,15 @@ int		opts ;
 	int		oflags ;
 	int		prlen = 0 ;
 	int		fd = -1 ;
-	const char	*varpruux = VARPRUUX ;
+	cchar	*varpruux = VARPRUUX ;
 	char		progfname[MAXPATHLEN + 1] ;
-	const char	*pn = PROG_UUX ;
-	const char	**av ;
-	const char	**ev ;
+	cchar	*pn = PROG_UUX ;
+	cchar	**av ;
+	cchar	**ev ;
 
-	if (pr == NULL) return SR_FAULT ;
-	if (node == NULL) return SR_FAULT ;
-	if (svc == NULL) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
+	if (node == nullptr) return SR_FAULT ;
+	if (svc == nullptr) return SR_FAULT ;
 	if (pr[0] == '\0') return SR_INVALID ;
 	if (svc[0] == '\0') return SR_INVALID ;
 
@@ -341,13 +318,13 @@ int		opts ;
 	if ((rs >= 0) && (opts & DIALUUX_ONOREPORT))
 	    rs = vecstr_add(&args,"-n",2) ;
 
-	if ((rs >= 0) && (u != NULL) && (u[0] != '\0')) {
+	if ((rs >= 0) && (u != nullptr) && (u[0] != '\0')) {
 	    rs = vecstr_add(&args,"-a",2) ;
 	    if (rs >= 0)
 	        rs = vecstr_add(&args,u,-1) ;
 	}
 
-	if ((rs >= 0) && (g != NULL) && (g[0] != '\0')) {
+	if ((rs >= 0) && (g != nullptr) && (g[0] != '\0')) {
 	    rs = vecstr_add(&args,"-g",2) ;
 	    if (rs >= 0)
 	        rs = vecstr_add(&args,g,-1) ;
@@ -367,8 +344,8 @@ int		opts ;
 
 /* load up any supplied arguments */
 
-	if ((rs >= 0) && (argv != NULL)) {
-	    for (i = 0 ; argv[i] != NULL ; i += 1) {
+	if ((rs >= 0) && (argv != nullptr)) {
+	    for (i = 0 ; argv[i] != nullptr ; i += 1) {
 	        rs = vecstr_add(&args,argv[i],-1) ;
 	        if (rs < 0) break ;
 	    }
@@ -410,18 +387,13 @@ ret0:
 
 /* local subroutines */
 
-
-static int vecstr_defenvs(elp,ea)
-vecstr		*elp ;
-const char	**ea ;
-{
+static int vecstr_defenvs(vecstr *elp,mainv ea) noex {
 	int		rs = SR_OK ;
-	int		i ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar		*cp ;
 
-	for (i = 0 ; ea[i] != NULL ; i += 1) {
-	    if ((cp = getenv(ea[i])) != NULL)
+	for (int i = 0 ; ea[i] != nullptr ; i += 1) {
+	    if ((cp = getenv(ea[i])) != nullptr)
 		rs = vecstr_envadd(elp,ea[i],cp,-1) ;
 	    if (rs < 0) break ;
 	} /* end for */
@@ -430,19 +402,15 @@ const char	**ea ;
 }
 /* end subroutine (vecstr_defenvs) */
 
-
-static int vecstr_loadpath(clp,pp)
-vecstr		*clp ;
-const char	*pp ;
-{
+static int vecstr_loadpath(vecstr *clp,cchar *pp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cl ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
-	while ((cp = strpbrk(pp,":;")) != NULL) {
+	while ((cp = strpbrk(pp,":;")) != nullptr) {
 
 	    cl = pathclean(tmpfname,pp,(cp - pp)) ;
 
@@ -475,19 +443,14 @@ const char	*pp ;
 }
 /* end subroutine (vecstr_loadpath) */
 
-
-static int mkpathval(clp,vbuf,vbuflen)
-vecstr		*clp ;
-char		vbuf[] ;
-int		vbuflen ;
-{
+static int mkpathval(vecstr *clp,char *vbuf,int vbuflen) noex {
 	int		rs = SR_OK ;
 	int		i ;
 	int		sch ;
 	int		c = 0 ;
 	int		rlen = 0 ;
 	int		f_semi = FALSE ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (vbuflen < 0) {
 	    rs = SR_NOANODE ;
@@ -496,7 +459,7 @@ int		vbuflen ;
 
 	vbuf[0] = '\0' ;
 	for (i = 0 ; vecstr_get(clp,i,&cp) >= 0 ; i += 1) {
-	    if (cp == NULL) continue ;
+	    if (cp == nullptr) continue ;
 
 	    if (cp[0] != ';') {
 
@@ -528,35 +491,30 @@ ret0:
 }
 /* end subroutine (mkpathval) */
 
-
-static int procenvpaths(pr,elp)
-const char	pr[] ;
-vecstr		*elp ;
-{
+static int procenvpaths(cchar *pr,vecstr *elp) noex {
 	vecstr	pathcomps ;
-
 	int	rs = SR_OK ;
 	int	i ;
 	int	opts ;
 	int	size ;
 	int	bl, pl ;
 
-	const char	*subdname ;
-	const char	*np ;
-	const char	*vp ;
+	cchar	*subdname ;
+	cchar	*np ;
+	cchar	*vp ;
 
 	char	pathbuf[MAXPATHLEN + 1] ;
-	char	*bp = NULL ;
+	char	*bp = nullptr ;
 
 
 	opts = VECSTR_OORDERED ;
 	if ((rs = vecstr_start(&pathcomps,40,opts)) >= 0) {
 
-	for (i = 0 ; envpops[i].name != NULL ; i += 1) {
+	for (i = 0 ; envpops[i].name != nullptr ; i += 1) {
 	    np = envpops[i].name ;
 
 	    subdname = envpops[i].sub1dname ;
-	    if ((rs >= 0) && (subdname != NULL)) {
+	    if ((rs >= 0) && (subdname != nullptr)) {
 
 	        rs = mkpath2(pathbuf,pr,subdname) ;
 	        pl = rs ;
@@ -566,7 +524,7 @@ vecstr		*elp ;
 	    } /* end if */
 
 	    subdname = envpops[i].sub2dname ;
-	    if ((rs >= 0) && (subdname != NULL)) {
+	    if ((rs >= 0) && (subdname != nullptr)) {
 
 	        rs = mkpath2(pathbuf,pr,subdname) ;
 	        pl = rs ;
@@ -575,7 +533,7 @@ vecstr		*elp ;
 
 	    } /* end if */
 
-	    if ((rs >= 0) && ((vp = getenv(np)) != NULL)) {
+	    if ((rs >= 0) && ((vp = getenv(np)) != nullptr)) {
 	        rs = vecstr_loadpath(&pathcomps,vp) ;
 	    }
 
@@ -605,44 +563,28 @@ vecstr		*elp ;
 }
 /* end subroutine (procenvpaths) */
 
-
-static int mknodesvc(buf,buflen,node,svc)
-char		buf[] ;
-int		buflen ;
-const char	node[] ;
-const char	svc[] ;
-{
-	int	rs = SR_OK ;
-	int	i = 0 ;
-
-
+static int mknodesvc(char *buf,int buflen,cchar *node,cchar *svc) noex {
+	int		rs = SR_OK ;
+	int		i = 0 ;
 	if (node[0] != '\0') {
 	    rs = storebuf_strw(buf,buflen,i,node,-1) ;
 	    i += rs ;
 	}
-
 	if (rs >= 0) {
 	    rs = storebuf_chr(buf,buflen,i,'!') ;
 	    i += rs ;
 	}
-
 	if (rs >= 0) {
 	    rs = storebuf_strw(buf,buflen,i,svc,-1) ;
 	    i += rs ;
 	}
-
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (mknodesvc) */
 
-
-static int havenode(pr,node)
-const char	pr[] ;
-const char	node[] ;
-{
-	UUNAME	un ;
-
-	int	rs = SR_OK ;
+static int havenode(cchar *pr,cchar *node) noex {
+	UUNAME		un ;
+	int		rs = SR_OK ;
 
 #if	CF_DEBUGS
 	debugprintf("dialuux/havenode: pr=%s\n",pr) ;

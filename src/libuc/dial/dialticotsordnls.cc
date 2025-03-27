@@ -58,9 +58,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<sbuf.h>
 #include	<char.h>
 #include	<sigblocker.h>
@@ -82,11 +84,6 @@
 #endif
 
 #define	NLSBUFLEN	(SVCLEN + 30)
-#define	NLSBUFLEN	(SVCLEN + 30)
-
-#define	TBUFLEN		MAXNAMELEN
-
-#define	HEXBUFLEN	((2 * MAXPATHLEN) + 2)
 
 
 /* external subroutines */
@@ -104,21 +101,25 @@
 /* local vaiables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int dialticotsordnls(cc *abuf,int alen,cc *svcbuf,int to,int opts) noex {
 	cint		nlslen = NLSBUFLEN ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		svclen ;
 	int		fd = -1 ;
 	char		nlsbuf[NLSBUFLEN + 1] ;
 
-	if ((abuf != NULL) && (abuf[0] == '\0'))
-	    abuf = NULL ;
+	if ((abuf != nullptr) && (abuf[0] == '\0'))
+	    abuf = nullptr ;
 
 /* perform some cleanup on the service code specification */
 
-	if (svcbuf == NULL)
+	if (svcbuf == nullptr)
 	    return SR_INVAL ;
 
 	while (CHAR_ISWHITE(*svcbuf)) svcbuf += 1 ;
@@ -131,7 +132,7 @@ int dialticotsordnls(cc *abuf,int alen,cc *svcbuf,int to,int opts) noex {
 	if (svclen <= 0)
 	    return SR_INVAL ;
 
-	if (abuf == NULL) {
+	if (abuf == nullptr) {
 	    abuf = "local" ;
 	    alen = strlen(abuf) ;
 	} /* end if (default UNIX® address!) */
@@ -148,14 +149,18 @@ int dialticotsordnls(cc *abuf,int alen,cc *svcbuf,int to,int opts) noex {
 	    if ((rs = u_sigaction(SIGPIPE,&nsigs,&osigs)) >= 0) {
 	        if ((rs = dialticotsord(abuf,alen,to,opts)) >= 0) {
 	            fd = rs ;
-	            rs = uc_writen(fd,nlsbuf,blen) ;
-	            if (rs >= 0) {
-	                cint	tlen = TBUFLEN ;
-	                char	tbuf[TBUFLEN+1] ;
-	                rs = readnlsresp(fd,tbuf,tlen,to) ;
+	            if ((rs = uc_writen(fd,nlsbuf,blen)) >= 0) {
+			if (char *tbuf ; (rs = malloc_mn(&tbuf)) >= 0) {
+			    cint	tlen = rs ;
+			    {
+	                        rs = readnlsresp(fd,tbuf,tlen,to) ;
+			    }
+			    rs = rsfree(rs,tbuf) ;
+			} /* end if (m-a-f) *?
 	            } /* end if (reading response) */
 	        } /* end if (opened) */
-	        u_sigaction(SIGPIPE,&osigs,NULL) ;
+	        rs1 = u_sigaction(SIGPIPE,&osigs,nullptr) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (sig-action) */
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} else {

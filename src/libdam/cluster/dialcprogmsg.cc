@@ -27,13 +27,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/socket.h>
-#include	<sys/uio.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<sockaddress.h>
 #include	<serialbuf.h>
@@ -69,23 +64,22 @@
 /* exported subroutines */
 
 int dialcprogmsg_end(char *mbuf,int mlen,bool f,DMSG_END *sp) noex {
-	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&msgbuf,mbuf,mlen)) >= 0) {
-	    if (f) { /* read */
-	        serialbuf_ruc(&msgbuf,&sp->type) ;
-	        serialbuf_rus(&msgbuf,&sp->len) ;
-	        serialbuf_rus(&msgbuf,&sp->flags) ;
-	        serialbuf_ri(&msgbuf,&sp->opts) ;
-	    } else { /* write */
+	if (serialbuf sb ; (rs = sb.start(mbuf,mlen)) >= 0) {
+	    if (f) { /* read (from object) */
 	        sp->type = dialcprogmsgtype_end ;
-	        serialbuf_wuc(&msgbuf,sp->type) ;
-	        serialbuf_wus(&msgbuf,4) ;
-	        serialbuf_wus(&msgbuf,sp->flags) ;
-	        serialbuf_wi(&msgbuf,sp->opts) ;
+	        sb << sp->type ;
+	        sb << ushort(4) ;
+	        sb << sp->flags ;
+	        sb << sp->opts ;
+	    } else { /* write (to object) */
+	        sb >> sp->type ;
+	        sb >> sp->len ;
+	        sb >> sp->flags ;
+	        sb >> sp->opts ;
 	    } /* end if */
-	    rs1 = serialbuf_finish(&msgbuf) ;
+	    rs1 = sb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
@@ -93,29 +87,28 @@ int dialcprogmsg_end(char *mbuf,int mlen,bool f,DMSG_END *sp) noex {
 /* end subroutine (dialcprogmsg_end) */
 
 int dialcprogmsg_light(char *mbuf,int mlen,bool f,DMSG_LIGHT *sp) noex {
-	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&msgbuf,mbuf,mlen)) >= 0) {
+	if (serialbuf sb ; (rs = sb.start(mbuf,mlen)) >= 0) {
 	    ushort	usw ;
-	    if (f) { /* read */
-	        serialbuf_ruc(&msgbuf,&sp->type) ;
-	        serialbuf_rus(&msgbuf,&sp->len) ;
-	        serialbuf_rus(&msgbuf,&sp->salen1) ;
-	        serialbuf_rus(&msgbuf,&sp->salen2) ;
-	        serialbuf_robj(&msgbuf,&sp->saout,int(sp->salen1)) ;
-	        serialbuf_robj(&msgbuf,&sp->saerr,int(sp->salen2)) ;
-	    } else { /* write */
+	    if (f) { /* read (from object) */
 	        sp->type = dialcprogmsgtype_light ;
-	        serialbuf_wuc(&msgbuf,sp->type) ;
+	        sb << sp->type ;
 	        usw = sp->salen1 + sp->salen2 + (2 * szof(ushort)) ;
-	        serialbuf_wus(&msgbuf,usw) ;
-	        serialbuf_wus(&msgbuf,sp->salen1) ;
-	        serialbuf_wus(&msgbuf,sp->salen2) ;
-	        serialbuf_wobj(&msgbuf,&sp->saout,int(sp->salen1)) ;
-	        serialbuf_wobj(&msgbuf,&sp->saerr,int(sp->salen2)) ;
+	        sb << usw ;
+	        sb << sp->salen1 ;
+	        sb << sp->salen2 ;
+	        sb.wobj(&sp->saout,int(sp->salen1)) ;
+	        sb.wobj(&sp->saerr,int(sp->salen2)) ;
+	    } else { /* write (to object) */
+	        sb >> sp->type ;
+	        sb >> sp->len ;
+	        sb >> sp->salen1 ;
+	        sb >> sp->salen2 ;
+	        sb.robj(&sp->saout,int(sp->salen1)) ;
+	        sb.robj(&sp->saerr,int(sp->salen2)) ;
 	    } /* end if */
-	    rs1 = serialbuf_finish(&msgbuf) ;
+	    rs1 = sb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;

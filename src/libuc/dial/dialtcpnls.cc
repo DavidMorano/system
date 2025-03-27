@@ -57,7 +57,6 @@
 #include	<sbuf.h>
 #include	<char.h>
 #include	<sfx.h>
-#include	<dialtcp.h>
 #include	<nlsdialassist.h>
 #include	<localmisc.h>
 
@@ -100,22 +99,21 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 	if (hn && svc) {
 	    rs = SR_INVALID ;
 	    if (hn[0] && svc[0]) {
-	        int		sl ;
 	        cchar		*sp{} ;
-	        if ((sl = sfshrink(svc,-1,&sp)) > 0) {
-	            char	*nlsbuf{} ;
-	            if ((rs = malloc_mn(&nlsbuf)) >= 0) {
+	        if (int sl ; (sl = sfshrink(svc,-1,&sp)) > 0) {
+	            if (char *nlsbuf ; (rs = malloc_mn(&nlsbuf)) >= 0) {
 	                cint	nlslen = rs ;
 	                if ((rs = mknlsreq(nlsbuf,nlslen,sp,sl)) >= 0) {
 		            SIGACTION	osig ;
 		            SIGACTION	nsig{} ;
 		            sigset_t	sigmask ;
+			    cint	sig = SIGPIPE ;
 	                    cint	blen = rs ;
 	                    uc_sigsetempty(&sigmask) ;
 	                    nsig.sa_handler = SIG_IGN ;
 	                    nsig.sa_mask = sigmask ;
 	                    nsig.sa_flags = 0 ;
-	                    if ((rs = u_sigaction(SIGPIPE,&nsig,&osig)) >= 0) {
+	                    if ((rs = u_sigaction(sig,&nsig,&osig)) >= 0) {
 	                        if (ps == nullptr) {
 	                            ps = SVC_LISTEN ;
 	                            rs = dialtcp(hn,ps,af,to,opts) ;
@@ -132,7 +130,7 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 	                        if (rs >= 0) {
 				    rs = dialconn(fd,nlsbuf,blen,to) ;
 	                        } /* end if (opened) */
-	                        rs1 = u_sigaction(SIGPIPE,&osig,nullptr) ;
+	                        rs1 = u_sigaction(sig,&osig,nullptr) ;
 		                if (rs >= 0) rs = rs1 ;
 	                    } /* end if (sigaction) */
 	                } else {
@@ -155,8 +153,7 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 static int dialconn(int fd,cc *nbuf,int nlen,int to) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*rbuf{} ;
-	if ((rs = malloc_mn(&rbuf)) >= 0) {
+	if (char *rbuf ; (rs = malloc_mn(&rbuf)) >= 0) {
 	    cint	rlen = rs ;
 	    if ((rs = uc_writen(fd,nbuf,nlen)) >= 0) {
 		rs = readnlsresp(fd,rbuf,rlen,to) ;

@@ -1,14 +1,14 @@
-/* b_msinfo */
+/* b_msinfo SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* query the machine status database */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_FLOAT	0		/* use floating point */
-
 
 /* revision history:
 
@@ -21,35 +21,34 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  It should also be able to
-	be made into a stand-alone program without much (if almost any)
-	difficulty, but I have not done that yet (we already have a MSINFO
-	program out there).
+	This is a built-in command to the KSH shell.  It should
+	also be able to be made into a stand-alone program without
+	much (if almost any) difficulty, but I have not done that
+	yet (we already have a MSINFO program out there).
 
-	Note that special care needed to be taken with the child processes
-	because we cannot let them ever return normally!  They cannot return
-	since they would be returning to a KSH program that thinks it is alive
-	(!) and that geneally causes some sort of problem or another.  That is
-	just some weird thing asking for trouble.  So we have to take care to
-	force child procnodees to exit explicitly.  Child procnodees are only
-	created when run in "daemon" mode.
+	Note that special care needed to be taken with the child
+	processes because we cannot let them ever return normally!
+	They cannot return since they would be returning to a KSH
+	program that thinks it is alive (!) and that geneally causes
+	some sort of problem or another.  That is just some weird
+	thing asking for trouble.  So we have to take care to force
+	child procnodees to exit explicitly.  Child procnodees are
+	only created when run in "daemon" mode.
 
-	Implemtation note: We do not print out the data on a node whence we
-	first get it.  First we collect all of the data on all nodes, and then
-	we print out all nodes that we have data for.  We do this because,
-	there is optimized locking within the MSFILE object and the look can be
-	held from one enumeration of a node to another (that is the
-	optimization) and if we printed stuff out between getting a node's
-	information, we cannot guarantee that we will not be blocked on output
-	while we might be holding the MSFILE lock.
+	Implemtation note: We do not print out the data on a node
+	whence we first get it.  First we collect all of the data
+	on all nodes, and then we print out all nodes that we have
+	data for.  We do this because, there is optimized locking
+	within the MSFILE object and the look can be held from one
+	enumeration of a node to another (that is the optimization)
+	and if we printed stuff out between getting a node's
+	information, we cannot guarantee that we will not be blocked
+	on output while we might be holding the MSFILE lock.
 
 	Synopsis:
-
 	$ msinfo [-msfile <file>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -81,6 +80,7 @@
 #include	<vecstr.h>
 #include	<vecobj.h>
 #include	<msfile.h>
+#include	<msflag.h>		/* |MSFLAG_{x}| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -91,10 +91,6 @@
 
 
 /* local defines */
-
-#ifndef	MSFLAG_MDISABLED
-#define	MSFLAG_MDISABLED	0x0001
-#endif
 
 #ifndef	BUFLEN
 #define	BUFLEN		(MAXPATHLEN + 20)

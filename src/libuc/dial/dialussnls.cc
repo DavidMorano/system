@@ -17,12 +17,17 @@
 
 /*******************************************************************************
 
+  	Name:
+	dialussnls
+
+	Description:
 	This is the NLS version of the TCP dialer.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -76,11 +81,9 @@ int dialussnls(cchar *portspec,cchar *svc,int to,int aopts) noex {
 	if (svc) {
 	    rs = SR_INVALID ;
 	    if (portspec[0] && svc[0]) {
-		int	sl ;
 		cchar	*sp{} ;
-	        if ((sl = sfshrink(svc,-1,&sp)) > 0) {
-	            char	*nlsbuf{} ;
-	            if ((rs = malloc_mn(&nlsbuf)) >= 0) {
+	        if (int sl ; (sl = sfshrink(svc,-1,&sp)) > 0) {
+	            if (char *nlsbuf ; (rs = malloc_mn(&nlsbuf)) >= 0) {
 	                cint	nlslen = rs ;
 	                if ((rs = mknlsreq(nlsbuf,nlslen,sp,sl)) >= 0) {
 	                    SIGACTION	osig ;

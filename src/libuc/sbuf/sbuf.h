@@ -137,6 +137,7 @@ struct sbuf : sbuf_head {
 	int vprintf(cchar *,va_list) noex ;
 	int printf(cchar *,...) noex ;
 	int hexp(uint64_t,int) noex ;
+	int buf(cchar *,int) noex ;
 	int getpoint(cchar **) noex ;
 	int decl(long) noex ;
 	template<typename Binary> int bin(Binary) noex ;

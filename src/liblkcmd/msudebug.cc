@@ -25,7 +25,6 @@
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
@@ -44,7 +43,6 @@
 #include	"msulocinfo.h"
 #include	"msulog.h"
 #include	"defs.h"
-#include	"msflag.h"
 
 
 /* local typedefs */

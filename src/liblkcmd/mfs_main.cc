@@ -118,7 +118,6 @@
 #include	"mfscmd.h"
 #include	"mfslog.h"
 #include	"defs.h"
-#include	"msflag.h"
 
 
 /* local typedefs */

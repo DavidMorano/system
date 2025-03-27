@@ -159,17 +159,15 @@ static int	subinfo_tryone(SUBINFO *) noex ;
 static int	try_inet4(SUBINFO *) noex ;
 static int	try_inet6(SUBINFO *) noex ;
 static int	try_addr(SUBINFO *) noex ;
-
-#if	CF_TRYINET
 static int	try_inet(SUBINFO *) noex ;
-#endif
 
 static int	subinfo_makeconn(SUBINFO *,int,SOCKADDR *) noex ;
 
 
 /* local variables */
 
-constexpr bool		f_proto = CF_PROTO ;
+const bool		f_proto = CF_PROTO ;
+const bool		f_tryinet = CF_TRYINET ;
 
 
 /* exported variables */
@@ -314,13 +312,13 @@ static int subinfo_tryone(SUBINFO *sip) noex {
 	        fd = rs1 ;
 	        if (rs1 != SR_NOTFOUND) rs = rs1 ;
 	    } /* end if (IPv6) */
-#if	CF_TRYINET
-	    if (isFailConn(rs) || (sip->count == 0)) {
-	        rs1 = try_inet(sip) ;
-	        fd = rs1 ;
-	        if (rs1 != SR_NOTFOUND) rs = rs1 ;
-	    } /* end if (any address family) */
-#endif /* CF_TRYINET */
+	    if_constexpr (f_tryinet) {
+	        if (isFailConn(rs) || (sip->count == 0)) {
+	            rs1 = try_inet(sip) ;
+	            fd = rs1 ;
+	            if (rs1 != SR_NOTFOUND) rs = rs1 ;
+	        } /* end if (any address family) */
+	    } /* end if_constexpr (f_tryinet) */
 	} /* end if */
 	return (rs >= 0) ? fd : rs ;
 }
@@ -437,7 +435,6 @@ static int try_addr(SUBINFO *sip) noex {
 }
 /* end subroutine (try_addr) */
 
-#if	CF_TRYINET
 static int try_inet(SUBINFO *sip) noex {
 	ADDRINFO	hint{} ;
 	ADDRINFO	*aip{} ;
@@ -450,12 +447,11 @@ static int try_inet(SUBINFO *sip) noex {
 	        hint.ai_family = rs ;	/* documentation says use PF! */
 	    }
 	}
-/* do the spin */
+	/* do the spin */
 	if (rs >= 0) {
-	    hostaddr	ha ;
 	    cchar	*hn = sip->hn ;
 	    cchar	*ps = sip->ps ;
-	    if ((rs = hostaddr_start(&ha,hn,ps,&hint)) >= 0) {
+	    if (hostaddr ha ; (rs = hostaddr_start(&ha,hn,ps,&hint)) >= 0) {
 	        hostaddr_cur	cur ;
 	        if ((rs = hostaddr_curbegin(&ha,&cur)) >= 0) {
 	            int		c = 0 ;
@@ -488,7 +484,6 @@ static int try_inet(SUBINFO *sip) noex {
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (try_inet) */
-#endif /* CF_TRYINET */
 
 /* make a connection (with protocol family and socket-address) */
 static int subinfo_makeconn(SUBINFO *sip,int pf,SOCKADDR *sap) noex {
@@ -498,17 +493,5 @@ static int subinfo_makeconn(SUBINFO *sip,int pf,SOCKADDR *sap) noex {
 	return opensockaddr(pf,st,proto,sap,to) ;
 }
 /* end subroutine (subinfo_makeconn) */
-
-#if	COMMENT
-static int makeint(const void *addr) noex {
-	int		hi = 0 ;
-	uchar		*us = (uchar *) addr ;
-	hi |= (MKCHAR(us[0]) << 24) ;
-	hi |= (MKCHAR(us[1]) << 16) ;
-	hi |= (MKCHAR(us[2]) << 8) ;
-	hi |= (MKCHAR(us[3]) << 0) ;
-	return hi ;
-}
-#endif /* COMMENT */
 
 

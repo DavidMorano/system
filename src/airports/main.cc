@@ -121,11 +121,8 @@
 #include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
-#include	"msflag.h"
 #include	"stat32.h"
-
 #include	"shio.h"
-
 
 
 /* local defines */

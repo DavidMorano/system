@@ -45,11 +45,11 @@
 
 	What is up with the 'timeout' argument?
 
-	<0              use the system default timeout (xx minutes --
-			whatever)
+	>0		use the timeout as it is
 	==0             asynchronously spawn the connect and do not wait
 			for it
-	>0		use the timeout as it is
+	<0              use the system default timeout (xx minutes --
+			whatever)
 
 	Synopsis:
 	int dialcprog(pr,node,pfn,mainv av,mainv ev,int to,opts,int *fd2p) noex
@@ -78,11 +78,12 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<csignal>
 #include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<estrings.h>
@@ -98,18 +99,19 @@
 #include	<getusername.h>
 #include	<filer.h>
 #include	<findfilepath.h>
+#include	<streamsync.h>
+#include	<nodesearch.h>
+#include	<envlist.h>
+#include	<nodedb.h>
+#include	<clusterdb.h>
+#include	<mkcexsync.h>
 #include	<localmisc.h>
 #include	<debug.h>
 
-#include	"streamsync.h"
 #include	"dialopts.h"
+#include	"dialprog.h"
 #include	"dialcprogmsg.h"
-#include	"nodesearch.h"
-#include	"envlist.h"
 #include	"msflag.h"
-#include	"nodedb.h"
-#include	"clusterdb.h"
-#include	"mkcexsync.h"
 
 
 /* local defines */
@@ -199,8 +201,6 @@ extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	getnodename(char *,int) ;
 extern int	dialprog(cchar *,int,cchar **,cchar **,int *) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	vecstr_foilcmp(vecstr *,vecstr *) ;
 
 extern int	rcmdr(cchar *,cchar *,cchar *,int *) ;
 extern int	mkcexsync(char *,int) ;

@@ -46,6 +46,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	msfile
+
+	Description:
 	This subroutine maintains a MSFILE file. This file is used
 	to maintain machine status for nodes in the local machine
 	cluster.
@@ -136,11 +140,11 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<inttypes.h>
-#include	<climits>
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>

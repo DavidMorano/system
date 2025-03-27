@@ -854,6 +854,11 @@ lineindex.o:		lineindex.dir
 lineindex.dir:	
 	makesubdir $@
 
+# CLUSTER
+cluster.o:		cluster.dir
+cluster.dir:	
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 

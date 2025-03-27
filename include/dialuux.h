@@ -2,6 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* perform remote UUX service execution */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

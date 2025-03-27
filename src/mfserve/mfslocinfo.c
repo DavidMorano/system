@@ -65,7 +65,6 @@
 #include	"mfslisten.h"
 #include	"mfslog.h"
 #include	"defs.h"
-#include	"msflag.h"
 
 
 /* local defines */

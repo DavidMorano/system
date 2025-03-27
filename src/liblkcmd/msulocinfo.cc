@@ -61,7 +61,6 @@
 #include	"msulocinfo.h"
 #include	"msulog.h"
 #include	"defs.h"
-#include	"msflag.h"
 #include	"shio.h"
 
 

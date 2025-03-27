@@ -1,15 +1,15 @@
-static int msupdate(pip,lp)
-struct proginfo	*pip ;
-LFM		*lp ;
-{
-	struct pollfd	fds[2] ;
 
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<usystem.h>
+#include	<msflag.h>
+#include	<localmisc.h>
+
+
+static int msupdate(progifo *pip,LFM *lp) noex {
+	POLLFD		fds[2] = {} ;
 	MSFILE		ms ;
-
 	MSFILE_ENT	e, etmp ;
-
 	KINFO		ki ;
-
 	KINFO_DATA	d ;
 
 	time_t	ti_start ;

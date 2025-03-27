@@ -30,6 +30,7 @@
 #include	<mallocxx.h>
 #include	<buffer.h>
 #include	<sfx.h>
+#include	<mkx.h>			/* |mkquoted(3uc)| */
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -53,10 +54,6 @@ typedef mainv		mv ;
 
 /* external subroutines */
 
-extern "C" {
-    extern int	mkquoted(char *,int,cchar *,int) noex ;
-}
-
 
 /* external variables */
 
@@ -67,7 +64,7 @@ extern "C" {
 /* forward references */
 
 static int	dialer(cc *,cc *,int,mv,int,int) noex ;
-static int	loadargs(buffer *,mainv) noex ;
+static int	buffer_loadargs(buffer *,mainv) noex ;
 static int	badreq(int,cchar *) noex ;
 
 
@@ -85,9 +82,8 @@ int dialussmux(cc *ps,cc *svc,mv sargv,int to,int dot) noex {
 	if (ps && svc) {
 	    rs = SR_INVALID ;
 	    if (ps[0] && svc[0]) {
-		int	sl ;
 		cchar	*sp{} ;
-		if ((sl = sfshrink(svc,-1,&sp)) > 0) {
+		if (int sl ; (sl = sfshrink(svc,-1,&sp)) > 0) {
 		    rs = dialer(ps,sp,sl,sargv,to,dot) ;
 		    fd = rs ;
 		} /* end if (sfshrink) */
@@ -101,13 +97,12 @@ int dialussmux(cc *ps,cc *svc,mv sargv,int to,int dot) noex {
 /* local subroutines */
 
 static int dialer(cc *ps,cc *sp,int sl,mv sargv,int to,int dot) noex {
-	buffer		srvbuf ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = buffer_start(&srvbuf,100)) >= 0) {
+	if (buffer srvbuf ; (rs = buffer_start(&srvbuf,100)) >= 0) {
 	    buffer_strw(&srvbuf,sp,sl) ;
-	    if ((rs = loadargs(&srvbuf,sargv)) >= 0) {
+	    if ((rs = buffer_loadargs(&srvbuf,sargv)) >= 0) {
 		cchar	*bp{} ;
 	        buffer_chr(&srvbuf,'\n') ;
 	        if ((rs = buffer_get(&srvbuf,&bp)) >= 0) {
@@ -124,8 +119,7 @@ static int dialer(cc *ps,cc *sp,int sl,mv sargv,int to,int dot) noex {
 	                    fd = rs ;
 	                    if ((rs = uc_writen(fd,bp,blen)) >= 0) {
 	                        auto	rln = uc_readlinetimed ;
-	                        char	*rbuf{} ;
-				if ((rs = malloc_mn(&rbuf)) >= 0) {
+	                        if (char *rbuf ; (rs = malloc_mn(&rbuf)) >= 0) {
 	                            cint	rlen = rs ;
 	                            if ((rs = rln(fd,rbuf,rlen,to)) >= 0) {
 					rs = badreq(rs,rbuf) ;
@@ -152,18 +146,17 @@ static int dialer(cc *ps,cc *sp,int sl,mv sargv,int to,int dot) noex {
 }
 /* end subroutine (dialer) */
 
-static int loadargs(buffer *bp,mainv sargv) noex {
+static int buffer_loadargs(buffer *bp,mainv sargv) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (sargv != nullptr) {
-	    char	*qbuf{} ;
-	    if ((rs = malloc_ml(&qbuf)) >= 0) {
+	    if (char *qbuf ; (rs = malloc_ml(&qbuf)) >= 0) {
 	        cint	qlen = rs ;
 	        for (int i = 0 ; sargv[i] ; i += 1) {
 	            rs = mkquoted(qbuf,qlen,sargv[i],-1) ;
 	            if (rs < 0) break ;
-	            buffer_chr(bp,' ') ;
-	            buffer_buf(bp,qbuf,rs) ;
+	            bp->chr(' ') ;
+	            bp->buf(qbuf,rs) ;
 	        } /* end for */
 		rs1 = uc_free(qbuf) ;
 		if (rs >= 0) rs = rs1 ;
@@ -171,7 +164,7 @@ static int loadargs(buffer *bp,mainv sargv) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (loadargs) */
+/* end subroutine (buffer_loadargs) */
 
 static int badreq(int rs,cchar *rbuf) noex {
 	if ((rs == 0) || (rbuf[0] != '+')) {

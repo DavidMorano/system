@@ -85,6 +85,7 @@ struct buffer : buffer_head {
 	int blanks(int) noex ;
 	int vprintf(cchar *,va_list) noex ;
 	int printf(cchar *,...) noex ;
+	int buf(cchar *,int) noex ;
 	template<typename Binary> int bin(Binary) noex ;
 	template<typename Octal> int oct(Octal) noex ;
 	template<typename Decimal> int dec(Decimal) noex ;
