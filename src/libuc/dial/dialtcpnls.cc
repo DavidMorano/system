@@ -51,6 +51,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -99,7 +100,7 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 	if (hn && svc) {
 	    rs = SR_INVALID ;
 	    if (hn[0] && svc[0]) {
-	        cchar		*sp{} ;
+	        cchar	*sp{} ;
 	        if (int sl ; (sl = sfshrink(svc,-1,&sp)) > 0) {
 	            if (char *nlsbuf ; (rs = malloc_mn(&nlsbuf)) >= 0) {
 	                cint	nlslen = rs ;

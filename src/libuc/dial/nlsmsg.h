@@ -13,11 +13,15 @@
 
 */
 
-/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 /* Use is subject to license terms. */
 
 /*******************************************************************************
 
+  	Name:
+	nlsmsg
+
+  	Description:
 	This header file contains some pre-processor defines used to
 	create an NLS connection message and to parse the result.
 

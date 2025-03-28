@@ -62,11 +62,13 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<sbuf.h>
 #include	<sfx.h>
+#include	<mkx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -91,10 +93,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	mkquoted(char *,int,cchar *,int) noex ;
-}
 
 
 /* external variables */
@@ -191,7 +189,7 @@ int muxhelp::start() noex {
 int muxhelp::finish() noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && mbuf) {
+	if (mbuf) {
 	    rs1 = uc_free(mbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    mbuf = nullptr ;
@@ -236,8 +234,9 @@ int muxhelp::reqsvc(int fd) noex {
             if (char *rbuf  ; (rs = malloc_mn(&rbuf)) >= 0) {
 		cint	rlen = rs ;
                 if ((rs = uc_readlinetimed(fd,rbuf,rlen,to)) >= 0) {
-                    if ((rs == 0) || (rbuf[0] != '+'))
+                    if ((rs == 0) || (rbuf[0] != '+')) {
                         rs = SR_BADREQUEST ;
+		    }
                 }
 		rs1 = uc_free(rbuf) ;
 		if (rs >= 0) rs = rs1 ;
@@ -269,7 +268,7 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,mainv sargs) noex {
 			cint	qlen = rs ;
 	                for (int i = 0 ; (rs >= 0) && sargs[i] ; i += 1) {
 			    cchar	*sa = sargs[i] ;
-	                    sbuf_chr(&b,' ') ;
+	                    b.chr(' ') ;
 	                    if ((rs = mkquoted(qbuf,qlen,sa,-1)) >= 0) {
 	                        len = rs ;
 	                        rs = b.buf(qbuf,len) ;
