@@ -65,7 +65,7 @@ OBJ6_DIAL= dialuss.o dialussmux.o dialussnls.o
 OBJ7_DIAL= dialprog.o
 
 OBJ8_DIAL= dialticotsord.o dialticotsordmux.o dialticotsordnls.o
-OBJ9_DIAL= dialuux.o
+OBJ9_DIAL=
 
 OBJA_DIAL= obj0_dial.o obj1_dial.o
 OBJB_DIAL= obj2_dial.o obj3_dial.o
@@ -193,8 +193,6 @@ dialhttp.o:		dialhttp.cc dialtcp.h $(INCS)
 dialticotsord.o:	dialticotsord.cc	dialticotsord.h		$(INCS)
 dialticotsordmux.o:	dialticotsordmux.cc	dialticotsord.h		$(INCS)
 dialticotsordnls.o:	dialticotsordnls.cc	dialticotsord.h		$(INCS)
-
-dialuux.o:		dialuux.cc dialuux.h				$(INCS)
 
 nlsdialassist.o:	nlsdialassist.cc nlsdialassist.h nlsmsg.h	$(INCS)
 

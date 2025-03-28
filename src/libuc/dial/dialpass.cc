@@ -54,7 +54,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"dial.h"
+#include	"dialpass.h"
 
 
 /* local defines */

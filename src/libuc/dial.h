@@ -35,15 +35,7 @@
 #include	<dialudp.h>
 #include	<dialusd.h>
 #include	<dialuss.h>
-#include	<dialuux.h>
-
-
-EXTERNC_begin
-
-extern int dialpass(cchar *,int,int) noex ;
-extern int dialhttp(cc *,cc *,int,cc *,mainv,int,int) noex ;
-
-EXTERNC_end
+#include	<dialpass.h>
 
 
 #endif /* DIAL_INCLUDE */

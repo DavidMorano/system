@@ -1,8 +1,8 @@
-/* dial HEADER */
+/* dialpass HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* dial out to a TCP port */
+/* dial out to a PASS port */
 /* version %I% last-modified %G% */
 
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	DIAL_INCLUDE
-#define	DIAL_INCLUDE
+#ifndef	DIALPASS_INCLUDE
+#define	DIALPASS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -26,18 +26,16 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<dialcprog.h>
-#include	<dialcprogmsg.h>
 #include	<dialopts.h>
-#include	<dialprog.h>
-#include	<dialtcp.h>
-#include	<dialticotsord.h>
-#include	<dialudp.h>
-#include	<dialusd.h>
-#include	<dialuss.h>
-#include	<dialpass.h>
 
 
-#endif /* DIAL_INCLUDE */
+EXTERNC_begin
+
+extern int dialpass(cchar *,int,int) noex ;
+
+EXTERNC_end
+
+
+#endif /* DIALPASS_INCLUDE */
 
 
