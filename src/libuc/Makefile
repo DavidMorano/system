@@ -401,15 +401,8 @@ envhelp.o:		envhelp.cc envhelp.h
 spawner.o:		spawner.cc spawner.h
 
 nulstr.o:		nulstr.cc nulstr.h
-
 csem.o:			csem.cc csem.h
-ucsem.o:		ucsem.cc ucsem.h
-
 dirlist.o:		dirlist.cc dirlist.h
-
-dirseen.o:		dirseen.cc dirseen.h
-dirseen_not.o:		dirseen_not.cc dirseen.h
-
 randomvar.o:		randomvar.cc randomvar.h
 
 strtab.o:		strtab.cc strtab.h
@@ -819,6 +812,11 @@ setx.dir:
 # SEMX
 semx.o:			semx.dir
 semx.dir:
+	makesubdir $@
+
+# DIRSEEN
+dirseen.o:		dirseen.dir
+dirseen.dir:
 	makesubdir $@
 
 # UCINET

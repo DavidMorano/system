@@ -153,3 +153,4 @@ int buffer::printf(cchar *fmt,...) noex {
 	return rs ;
 }
 
+

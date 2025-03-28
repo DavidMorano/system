@@ -1,4 +1,4 @@
-/* dirseen SUPPORT */
+/* dirseen_main SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -137,8 +137,8 @@ int dirseen_finish(dirseen *op) noex {
 		vecobj	*dlp = op->dlistp ;
 	        void	*vp{} ;
 	        for (int i = 0 ; dlp->get(i,&vp) >= 0 ; i += 1) {
+	            dirseen_ent		*ep = entp(vp) ;
 	            if (vp) {
-	                dirseen_ent	*ep = entp(vp) ;
 	                rs1 = entry_finish(ep) ;
 	                if (rs >= 0) rs = rs1 ;
 	            }
@@ -297,7 +297,7 @@ int entry_start(dirseen_ent *ep,cchar *sp,int sl,dev_t dev,ino_t ino) noex {
 	int		rs ;
 	ep->dev = dev ;
 	ep->ino = ino ;
-	if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	    ep->name = cp ;
 	    ep->namelen = rs ;
 	}

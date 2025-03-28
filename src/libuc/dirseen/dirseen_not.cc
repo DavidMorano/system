@@ -106,10 +106,10 @@ int dirseen_notseen(dirseen *op,USTAT *sbp,cchar *dbuf,int dlen) noex {
 /* end subroutine (dirseen_notseen) */
 
 int dirseen_notadd(dirseen *op,USTAT *sbp,cchar *dbuf,int dlen) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		rs1 ;
 	if ((rs = dirseen_magic(op,sbp,dbuf)) >= 0) {
-	    if (char *cbuf{} ; (rs = malloc_mp(&cbuf)) >= 0) {
+	    if (char *cbuf ; (rs = malloc_mp(&cbuf)) >= 0) {
 	        if ((rs = pathclean(cbuf,dbuf,dlen)) > 0) {
 	            rs = dirseen_add(op,cbuf,rs,sbp) ;
 	        }

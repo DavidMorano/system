@@ -89,7 +89,6 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -274,7 +273,7 @@ int buffer_vprintf(buffer *op,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op && fmt) {
-	    if (char *lbuf{} ; (rs = libmalloc_ml(&lbuf)) >= 0) {
+	    if (char *lbuf ; (rs = libmalloc_ml(&lbuf)) >= 0) {
 		cint	llen = rs ;
 	        if ((rs = format(lbuf,llen,0x01,fmt,ap)) >= 0) {
 	            rs = buffer_strw(op,lbuf,rs) ;
@@ -289,9 +288,9 @@ int buffer_vprintf(buffer *op,cchar *fmt,va_list ap) noex {
 
 /* PRINTFLIKE2 */
 int buffer_printf(buffer *op,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (op && fmt) {
-	    va_list	ap ;
 	    va_begin(ap,fmt) ;
 	    rs = buffer_vprintf(op,fmt,ap) ;
 	    va_end(ap) ;
