@@ -1,5 +1,5 @@
 #!/bin/ksh
-# PROGRAM (local or project)
+# RUNADVICE (local or project)
 
 
 : ${NCMP:=/usr/add-on/ncmp}
@@ -10,14 +10,10 @@ export LOCAL TOOLS NMCP PROJTOOLS
 
 
 if [ -d /usr/sbin ] ; then
-
   MACH=`uname -n`
-
 else
-
   MACH=`hostname`
   PATH=/usr/5bin:${PATH}
-
 fi
 
 
@@ -31,32 +27,21 @@ if [ $? -ne 0 ] ; then PATH=/usr/bin:${PATH} ; fi
 
 addpath() {
   if [ $# -ge 1 -a -d "${1}" ] ; then
-
     echo ${PATH} | grep "${1}" > /dev/null
     if [ $? -ne 0 ] ; then
-
       if [ -z "${PATH}" ] ; then
-
           PATH=${1}
-
       else
-
         if [ $# -eq 1 ] ; then
-
           PATH=${PATH}:${1}
-
         else
-
           case "${2}" in
-
           f* | h* )
             PATH=${1}:${PATH}
             ;;
-
           * )
             PATH=${PATH}:${1}
             ;;
-
           esac
         fi
       fi
@@ -143,6 +128,5 @@ fi
 
 echo "${P}: could not find the underlying \"${P}\" program" >&2
 exit 1
-
 
 

@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* determine the type of nonpath in give counted c-string (filename) */
+/* determine the type of nonpath in given counted c-string (filename) */
 /* version %I% last-modified %G% */
 
 
