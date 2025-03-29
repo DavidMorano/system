@@ -35,7 +35,7 @@ extern int uc_clockres(clockid_t,TIMESPEC *) noex ;
 extern int uc_clockget(clockid_t,TIMESPEC *) noex ;
 
 static inline int uc_clockreal(TIMESPEC *tsp) noex {
-    clockid_t	cid = CLOCK_REALTIME ;
+    const clockid_t	cid = CLOCK_REALTIME ;
     return uc_clockget(cid,tsp) ;
 }
 

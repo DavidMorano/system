@@ -193,7 +193,8 @@ int csem_decr(csem *op,int c,int to) noex {
             if (c > 0) {
                 timespec    ts{} ;
                 if (to >= 0) {
-                    clock_gettime(CLOCK_REALTIME,&ts) ;
+		    const clockid_t	cid = CLOCK_REALTIME ;
+                    clock_gettime(cid,&ts) ;
                     ts.tv_sec += to ;
                 }
                 if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
