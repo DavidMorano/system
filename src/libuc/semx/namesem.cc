@@ -206,6 +206,7 @@ int namesem_wait(namesem *op) noex {
 }
 /* end subroutine (namesem_wait) */
 
+/* wait and wakeup on interrupt */
 int namesem_waiti(namesem *op) noex {
 	int		rs ;
 	if ((rs = namesem_magic(op)) >= 0) {
@@ -444,5 +445,50 @@ static int getnamesemgid(void) noex {
 	return rs ;
 }
 /* end subroutine (getnamesemgid) */
+
+int namesem::open(cchar *name,int of,mode_t om,uint c) noex {
+	return namesem_open(this,name,of,om,c) ;
+}
+
+void namesem::dtor() noex {
+	if (cint rs = close ; rs < 0) {
+	    ulogerror("namesem",rs,"fini-finish") ;
+	}
+}
+
+namesem::operator int () noex {
+    	return namesem_count(this) ;
+}
+
+namesem_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case namesemmem_close:
+	        rs = namesem_close(op) ;
+	        break ;
+	    case namesemmem_wait:
+	        rs = namesem_wait(op) ;
+	        break ;
+	    case namesemmem_waiti:
+	        rs = namesem_waiti(op) ;
+	        break ;
+	    case namesemmem_trywait:
+	        rs = namesem_trywait(op) ;
+	        break ;
+	    case namesemmem_post:
+	        rs = namesem_post(op) ;
+	        break ;
+	    case namesemmem_unlink:
+	        rs = namesem_unlink(op) ;
+	        break ;
+	    case namesemmem_count:
+	        rs = namesem_count(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (namesem_co::operator) */
 
 

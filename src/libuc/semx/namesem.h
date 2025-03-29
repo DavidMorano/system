@@ -31,7 +31,58 @@ struct namesem_head {
 	uint		magic ;
 } ;
 
+#ifdef	__cplusplus
+enum namesemmems {
+	namesemmem_close,
+	namesemmem_wait,
+	namesemmem_waiti,
+	namesemmem_trywait,
+	namesemmem_post,
+	namesemmem_unlink,
+	namesemmem_count
+} ;
+struct namesem ;
+struct namesem_co {
+	namesem		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (namesem *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (namesem_co) */
+struct namesem : namesem_head {
+	namesem_co	close ;
+	namesem_co	wait ;
+	namesem_co	waiti ;
+	namesem_co	trywait ;
+	namesem_co	post ;
+	namesem_co	unlink ;
+	namesem_co	count ;
+	namesem() noex {
+	    close(this,namesemmem_close) ;
+	    wait(this,namesemmem_wait) ;
+	    waiti(this,namesemmem_waiti) ;
+	    trywait(this,namesemmem_trywait) ;
+	    post(this,namesemmem_post) ;
+	    unlink(this,namesemmem_unlink) ;
+	    count(this,namesemmem_count) ;
+	} ;
+	namesem(const namesem &) = delete ;
+	namesem &operator = (const namesem &) = delete ;
+	int open(cchar *,int,mode_t,uint) noex ;
+	operator int () noex ;
+	void dtor() noex ;
+	~namesem() {
+	    dtor() ;
+	} ;
+} ; /* end struct (namesem) */
+#else	/* __cplusplus */
 typedef NAMESEM		namesem ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
