@@ -31,14 +31,14 @@
 	for callers.
 
 	Synopsis:
-	int uc_timcreate(callback *cbp) noex
+	int uc_timcreate(itcontrol *itcp) noex
 	int uc_timdestroy(int id) noex
 	int uc_timset(int id,int,CITIMERVAL *ntvp,ITIMERVAL *otvp) noex
 	int uc_timget(int id,ITIMERVAL *otvp) noex
 	int uc_timover(int id) noex
 
 	Arguments:
-	cbp		callback object pointer
+	itcp		itcontrol object pointer
 	id		timer identification
 	ntvp		new timer-value-pointer
 	otvp		old timer-value-pointer
@@ -74,7 +74,7 @@
 #include	<sigevent.h>
 #include	<localmisc.h>
 
-#include	"callback.h"
+#include	"itcontrol.h"
 
 
 /* local defines */
@@ -101,7 +101,7 @@ extern "C" {
 
 typedef	UCTIM_FL	uctim_fl ;
 typedef vecsorthand	prique ;
-typedef callback *	callbackp ;
+typedef itcontrol *	itcontrolp ;
 
 
 /* external subroutines */
@@ -130,10 +130,10 @@ enum cmdsubs {
 
 namespace {
     struct uctimarg {
-	callback	*cbp ;
+	itcontrol	*itcp ;
 	CITIMERVAL	*ntcp ;
 	ITIMERVAL	*otcp ;
-	uctimarg(callback *c) noex : cbp(c) { } ;
+	uctimarg(itcontrol *c) noex : itcp(c) { } ;
 	uctimarg(ITIMERVAL *o,CITIMERVAL *n) noex : ntvp(n), otvp(o) { } ;
 	int operator (cmdsubs,int) noex ;
     } ;
@@ -145,9 +145,6 @@ namespace {
 	uint		running_siger:1 ;
 	uint		running_disper:1 ;
     } ;
-    struct uctim_ent {
-	callback	cb ;
-    } ; /* end struct (uctim_ent) */
     struct uctim {
 	ptm		mx ;		/* data mutex */
 	ptc		cv ;		/* condition variable */
@@ -180,7 +177,7 @@ namespace {
 	int cmdsub(cmdsubs,int,uctimarg *) noex ;
 	int capbegin(int = -1) noex ;
 	int capend() noex ;
-	int enterpri(callback *) noex ;
+	int enterpri(itcontrol *) noex ;
 	int timerset(time_t) noex ;
 	int workready() noex ;
 	int workbegin() noex ;
@@ -207,7 +204,7 @@ namespace {
 	int dispworker() noex ;
 	int disprecv() noex ;
 	int disphandle() noex ;
-	int dispjobdel(callback *) noex ;
+	int dispjobdel(itcontrol *) noex ;
 	~uctim() noex {
 	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("uctim",rs,"dtor-fini") ;
@@ -258,8 +255,8 @@ constexpr bool		f_childthrs = CF_CHILDTHRS ;
 
 /* exported subroutines */
 
-int uc_timcreate(callback *cbp) noex {
-	uctimarg	ao(cbp) ;
+int uc_timcreate(itcontrol *itcp) noex {
+	uctimarg	ao(itcp) ;
 	return ao(cmdsub_create,0) ;
 }
 
@@ -418,19 +415,20 @@ int uctim::cmd_create(int id,uctimarg *argp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (valp->metf) {
-	    cint	esz = szof(callback) ;
-	    if (callback *ep ; (rs = uc_libmalloc(esz,&ep)) >= 0) {
-	            if ((rs = ents.add(ep)) >= 0) {
-	                cint	ei = rs ;
-	                *ep = *valp ;
-	                {
-	                    ep->id = ei ;
-	                    rs = enterpri(ep) ;
-	                }
-	                if (rs < 0) {
-	                    ents.del(ei) ;
-			}
-	            } /* end if (vechand_add) */
+	    cint	esz = szof(itcontrol) ;
+	    if (itcontrol *ep ; (rs = uc_libmalloc(esz,&ep)) >= 0) {
+		*ep = *argp->itcp ;
+	        if ((rs = ents.add(ep)) >= 0) {
+	            cint	ei = rs ;
+	            *ep = *valp ;
+	            {
+	                ep->id = ei ;
+	                rs = enterpri(ep) ;
+	            }
+	            if (rs < 0) {
+	                ents.del(ei) ;
+		    }
+	        } /* end if (vechand_add) */
 	        if (rs < 0) {
 	            uc_libfree(ep) ;
 		}
@@ -444,8 +442,8 @@ int uctim::cmd_set(int id,uctimarg *argp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (valp->metf) {
-	    cint	esz = szof(callback) ;
-	    if (callback *ep ; (rs = uc_libmalloc(esz,&ep)) >= 0) {
+	    cint	esz = szof(itcontrol) ;
+	    if (itcontrol *ep ; (rs = uc_libmalloc(esz,&ep)) >= 0) {
 	        if ((rs = mx.lockbegin) >= 0) {
 	            vechand	*elp = &ents ;
 	            if ((rs = vechand_add(elp,ep)) >= 0) {
@@ -478,7 +476,7 @@ int uctim::cmd_destroy(int id,uctimarg *argp) noex {
 	    vechand	*elp = &ents ;
 	    cint	id = valp->id ;
 	    if (void *vp ; (rs = vechand_get(elp,id,&vp)) >= 0) {
-	        callback	*ep = (callback *) vp ;
+	        itcontrol	*ep = (itcontrol *) vp ;
 	        cint		ei = rs ;
 	        if ((rs = vechand_del(elp,ei)) >= 0) {
 	            cint	rsn = SR_NOTFOUND ;
@@ -512,11 +510,11 @@ int uctim::cmd_over(int id,uctimarg *argp) noex {
 	return rs ;;
 }
 
-int uctim::enterpri(callback *ep) noex {
+int uctim::enterpri(itcontrol *ep) noex {
 	int		rs ;
 	int		pi = 0 ;
 	if ((rs = pqp->count) > 0) {
-	    if (callback *tep ; (rs = pqp->get(0,&tep)) >= 0) {
+	    if (itcontrol *tep ; (rs = pqp->get(0,&tep)) >= 0) {
 	        if (ep->val < tep->val) {
 	            if ((rs = pqp->add(ep)) >= 0) {
 	                pi = rs ;
@@ -963,7 +961,7 @@ int uctim::sigerserve() noex {
 	if ((rs = capbegin(to)) >= 0) {
 	    custime	dt = time(nullptr) ;
 	    while ((rs = pqp->count) > 0) {
-	        if (callback *tep ; (rs = pqp->get(0,&tep)) >= 0) {
+	        if (itcontrol *tep ; (rs = pqp->get(0,&tep)) >= 0) {
 	            cint	ei = rs ;
 	            if (tep->val > dt) break ;
 	            if ((rs = pqp->del(ei)) >= 0) {
@@ -1078,7 +1076,7 @@ int uctim::disprecv() noex {
 /* end subroutine (uctim::disprecv) */
 
 int uctim::disphandle() noex {
-	callback	*tep ;
+	itcontrol	*tep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	while ((rs1 = ciq_rem(&pass,&tep)) >= 0) {
@@ -1094,7 +1092,7 @@ int uctim::disphandle() noex {
 }
 /* end subroutine (uctim::disphandle) */
 
-int uctim::dispjobdel(callback *tep) noex {
+int uctim::dispjobdel(itcontrol *tep) noex {
         cint       	to = TO_CAPTURE ;
 	int		rs ;
 	int		rs1 ;

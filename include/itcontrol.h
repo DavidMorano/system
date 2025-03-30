@@ -54,7 +54,7 @@ struct itcontrol_head {
 	psem		*psemp ;	/* POSIX® Semaphore pointer */
 	itcontrol_f	memf ;		/* function subroutine (C-linkage) */
 	ITIMERVAL	it ;		/* i-timer-value */
-	int		timid ;		/* timer-ID */
+	int		id ;		/* timer-ID */
 	int		arg ;		/* function argument */
 } ;
 
