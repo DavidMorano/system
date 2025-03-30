@@ -18,15 +18,26 @@
 
 /*******************************************************************************
 
+  	Group:
+	uc_timercreate
+	uc_timerdestroy
+	uc_timerset
+	uc_timerget
+	uc_timerover
+
+	Description:
 	POSIX® timer (|timer(3rt)|) operations.
 
-	System subroutines provided:
-	
-	uc_timercreate(3rt)
-	uc_timerdestroy(3rt)
-	uc_timerset(3rt)
-	uc_timerget(3rt)
-	uc_timerover(3rt)
+	Synopsis:
+	int uc_timercreate() noex
+	int uc_timerdestroy() noex
+	int uc_timerset() noex
+	int uc_timerget() noex
+	int uc_timerover() noex
+
+	Arguments:
+
+	Returns:
 
 *******************************************************************************/
 

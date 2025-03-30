@@ -498,6 +498,7 @@ ucmemalloc.o:		addrset.ccm
 ucmallocx.o:		ucmallocx.cc ucmallocx.h
 
 # UNIX C-language system library timer management
+uctim.o:		uctim.cc uctim.h itcontrol.h
 uctimer.o:		uctimer.cc uctimer.h
 
 # misc-character
@@ -920,7 +921,7 @@ ipow.o:			ipow.cc ipow.h
 base64.o:		base64.cc base64.h
 ffbs.o:			ffbs.cc ffbs.h
 shellunder.o:		shellunder.cc shellunder.h
-callback.o:		callback.cc callback.h
+itcontrol.o:		itcontrol.cc itcontrol.h
 dictdiff.o:		dictdiff.cc dictdiff.h
 rsfree.o:		rsfree.cc rsfree.h
 xfile.o:		xfile.cc xfile.h

@@ -1,8 +1,8 @@
-/* callback HEADER */
+/* itcontrol HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C99 */
 
-/* surboutine call-back interface */
+/* interval-timer control (block) */
 /* version %I% last-modified %G% */
 
 
@@ -18,16 +18,17 @@
 /*******************************************************************************
 
   	Name:
-	callback
+	itcontrol
 
 	Description:
-	This file provides the definition of the CALLBACK object, and its
-	method declarations.
+	This file provides the definition of the ITCONTROL object.
+	This is the control-block for specifying how an interval-timer
+	expiration is handled.
 
 *******************************************************************************/
 
-#ifndef	CALLBACK_INCLUDE
-#define	CALLBACK_INCLUDE
+#ifndef	ITCONTROL_INCLUDE
+#define	ITCONTROL_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -39,32 +40,33 @@
 #include	<psem.h>
 
 
-#define	CALLBACK	struct callback_head
+#define	ITCONTROL	struct itcontrol_head
 
 
 EXTERNC_begin
 
-typedef int (*callback_f)(void *objp,int timid,int arg) noex ;
+typedef int (*itcontrol_f)(void *objp,int timid,int arg) noex ;
 
 EXTERNC_end
 
-struct callback_head {
+struct itcontrol_head {
 	void		*objp ;		/* object pointer */
 	psem		*psemp ;	/* POSIX® Semaphore pointer */
-	callback_f	memf ;		/* function subroutine (C-linkage) */
+	itcontrol_f	memf ;		/* function subroutine (C-linkage) */
+	ITIMERVAL	it ;		/* i-timer-value */
 	int		timid ;		/* timer-ID */
 	int		arg ;		/* function argument */
 } ;
 
-typedef CALLBACK	callback ;
+typedef ITCONTROL	itcontrol ;
 
 EXTERNC_begin
 
-extern int callback_load(callback *,void *,psem *,callback_f,int) noex ;
+extern int itcontrol_load(itcontrol *,void *,psem *,itcontrol_f,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* CALLBACK_INCLUDE */
+#endif /* ITCONTROL_INCLUDE */
 
 

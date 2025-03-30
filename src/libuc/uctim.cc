@@ -145,6 +145,9 @@ namespace {
 	uint		running_siger:1 ;
 	uint		running_disper:1 ;
     } ;
+    struct uctim_ent {
+	callback	cb ;
+    } ; /* end struct (uctim_ent) */
     struct uctim {
 	ptm		mx ;		/* data mutex */
 	ptc		cv ;		/* condition variable */
@@ -328,7 +331,7 @@ int uctim::cmdsub(cmdsubs cmd,int id,uctimarg *uap) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
 }
-/* end subroutine (uctim::cmdisub) */
+/* end subroutine (uctim::cmdsub) */
 
 int uctim::init() noex {
 	int		rs = SR_NXIO ;
@@ -410,6 +413,32 @@ int uctim::fini() noex {
 	return rs ;
 }
 /* end subroutine (uctim::fini) */
+
+int uctim::cmd_create(int id,uctimarg *argp) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (valp->metf) {
+	    cint	esz = szof(callback) ;
+	    if (callback *ep ; (rs = uc_libmalloc(esz,&ep)) >= 0) {
+	            if ((rs = ents.add(ep)) >= 0) {
+	                cint	ei = rs ;
+	                *ep = *valp ;
+	                {
+	                    ep->id = ei ;
+	                    rs = enterpri(ep) ;
+	                }
+	                if (rs < 0) {
+	                    ents.del(ei) ;
+			}
+	            } /* end if (vechand_add) */
+	        if (rs < 0) {
+	            uc_libfree(ep) ;
+		}
+	    } /* end if (m-a) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (uctim::cmd_create) */
 
 int uctim::cmd_set(int id,uctimarg *argp) noex {
 	int		rs = SR_FAULT ;

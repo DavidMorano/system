@@ -39,12 +39,12 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<callback.h>
+#include	<itcontrol.h>
 
 
 EXTERNC_begin
 
-extern int uc_timcreate(callback *) noex ;
+extern int uc_timcreate(itcontrol *) noex ;
 extern int uc_timdestroy(int) noex ;
 extern int uc_timset(int,CITIMERVAL *,ITIMERVAL *) noex ;
 extern int uc_timget(int,ITIMERVAL *) noex ;

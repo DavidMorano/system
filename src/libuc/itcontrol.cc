@@ -1,8 +1,8 @@
-/* callback SUPPORT */
+/* itcontrol SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* surboutine call-back interface */
+/* interval-timer control (block) */
 /* version %I% last-modified %G% */
 
 
@@ -18,18 +18,22 @@
 /*******************************************************************************
 
 	Name:
-	callback_load
+	itcontrol_load
 
 	Description:
-	This subroutine loads (initializes) a TIMEOUT object.
+	This file provides the definition of the ITCONTROL object.
+	This is the control-block for specifying how an interval-timer
+	expiration is handled.
 
 	Synopsis:
-	int callback_load(callback *op,void *objp,callback_f *memf,int arg) noex
+	typedef itcontrol	itc ;
+	typedef itcontrol_f 	itc_f ;
+	int itcontrol_load(itc *op,void *objp,itc_f *memf,int arg) noex
 
 	Arguments:
-	op		object pointer
+	op		ITCONTROL object pointer
 	objp		target object-pointer
-	memf		member-function pointer
+	memf		call-back subroutine-function pointer
 	arg		argument
 
 	Returns:
@@ -42,7 +46,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"callback.h"
+#include	"itcontrol.h"
 
 
 /* local defines */
@@ -53,7 +57,8 @@
 
 /* local typedefs */
 
-typedef callback_f	t_f ;
+typedef itcontrol	itc ;
+typedef itcontrol_f	itc_f ;
 
 
 /* external subroutines */
@@ -76,17 +81,17 @@ typedef callback_f	t_f ;
 
 /* exported subroutines */
 
-int callback_load(callback *op,void *objp,psem *sp,t_f f,int arg) noex {
+int itcontrol_load(itc *op,void *objp,psem *sp,itc_f f,int arg) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	    op->objp = objp ;		/* object pointer */
 	    op->psemp = sp ;		/* semæphore (POSIX®) pointer */
-	    op->memf = f ;		/* callback subroutine pointer */
+	    op->memf = f ;		/* itcontrol subroutine pointer */
 	    op->arg = arg ;		/* optional argument */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (callback_load) */
+/* end subroutine (itcontrol_load) */
 
 
