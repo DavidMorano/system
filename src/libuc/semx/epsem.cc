@@ -69,39 +69,42 @@
 
 /* exported subroutines */
 
-int psem_create(psem *psp,int pshared,int count) noex {
-	return csem_create(psp,pshared,count) ;
+int psem_create(psem *op,int pshared,int count) noex {
+	return csem_create(op,pshared,count) ;
 }
 /* end subroutine (psem_create) */
 
-int psem_destroy(psem *psp) noex {
-	return csem_destroy(psp) ;
+int psem_destroy(psem *op) noex {
+	return csem_destroy(op) ;
 }
 /* end subroutine (psem_destroy) */
 
-int psem_wait(psem *psp) noex {
-	return csem_decr(psp,1,-1) ;
+int psem_wait(psem *op) noex {
+	return csem_decr(op,1,-1) ;
 }
 /* end subroutine (psem_wait) */
 
-int psem_trywait(psem *psp) noex {
+int psem_trywait(psem *op) noex {
 	cint		rsto = SR_TIMEDOUT ;
 	int		rs ;
-	if ((rs = csem_decr(psp,1,0)) == rsto) {
+	if ((rs = csem_decr(op,1,0)) == rsto) {
 	    rs = SR_AGAIN ;		/* <- required by |psem(3uc)| */
 	}
 	return rs ;
 }
 /* end subroutine (psem_trywait) */
 
-int psem_waiter(psem *psp,int to) noex {
-	return csem_decr(psp,1,to) ;
+int psem_waiter(psem *op,int to) noex {
+	return csem_decr(op,1,to) ;
 }
 /* end subroutine (psem_waiter) */
 
-int psem_post(psem *psp) noex {
-	return csem_incr(psp,1) ;
+int psem_post(psem *op) noex {
+	return csem_incr(op,1) ;
 }
 /* end subroutine (psem_post) */
 
+int psem_count(psem *op) noex {
+	return csem_count(op) ;
+}
 

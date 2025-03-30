@@ -128,7 +128,7 @@ const uchar	base64_dt[] = {
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-} ;
+} ; /* end array (base64_dt) */
 
 
 /* exported variables */
@@ -198,7 +198,8 @@ static void base64_eg(cchar *inbuf,char *outbuf) noex {
 	    hold |= mkchar(inbuf[i]) ;
 	} /* end for */
 	for (i = 0 ; i < 4 ; i += 1) {
-	    outbuf[i] = base64_et[(hold >> ((3 - i) * 6)) & 0x3F] ;
+	    cint	idx = (hold >> ((3 - i) * 6)) & 0x3F ;
+	    outbuf[i] = base64_et[idx] ;
 	}
 }
 /* end subroutine (base64_eg) */
@@ -224,7 +225,8 @@ static int base64_dg(cchar *inbuf,char *outbuf) noex {
 	if_constexpr (f_comment) {
 	    if (rs >= 0) {
 	        for (int i = 0 ; i < 3 ; i += 1) {
-	            outbuf[i] = mkchar(hold >> ((2 - i) * 6)) ;
+	            cint	val = hold >> ((2 - i) * 6) ;
+	            outbuf[i] = mkchar(val) ;
 	        }
 	        dlen -= 1 ;
 	    }

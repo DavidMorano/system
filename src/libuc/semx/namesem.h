@@ -19,6 +19,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	NAMESEM_MAGIC	0x31419877

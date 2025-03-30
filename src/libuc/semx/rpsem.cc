@@ -100,12 +100,12 @@
 
 /* exported subroutines */
 
-int psem_create(psem *psp,int pshared,int count) noex {
+int psem_create(psem *op,int pshared,int cnt) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
-	    cint	ic = (count & INT_MAX) ;
+	if (op) {
+	    cint	ic = (cnt & INT_MAX) ;
 	    repeat {
-	        if ((rs = sem_init(psp,pshared,ic)) < 0) {
+	        if ((rs = sem_init(op,pshared,ic)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -114,11 +114,11 @@ int psem_create(psem *psp,int pshared,int count) noex {
 }
 /* end subroutine (psem_create) */
 
-int psem_destroy(psem *psp) noex {
+int psem_destroy(psem *op) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
+	if (op) {
 	    repeat {
-	        if ((rs = sem_destroy(psp)) < 0) {
+	        if ((rs = sem_destroy(op)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -127,11 +127,11 @@ int psem_destroy(psem *psp) noex {
 }
 /* end subroutine (psem_destroy) */
 
-int psem_waiti(psem *psp) noex {
+int psem_waiti(psem *op) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
+	if (op) {
 	    repeat {
-	        if ((rs = sem_wait(psp)) < 0) {
+	        if ((rs = sem_wait(op)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -140,11 +140,11 @@ int psem_waiti(psem *psp) noex {
 }
 /* end subroutine (psem_waiti) */
 
-int psem_wait(psem *psp) noex {
+int psem_wait(psem *op) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
+	if (op) {
 	    repeat {
-	        if ((rs = sem_wait(psp)) < 0) {
+	        if ((rs = sem_wait(op)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -153,11 +153,11 @@ int psem_wait(psem *psp) noex {
 }
 /* end subroutine (psem_wait) */
 
-int psem_trywait(psem *psp) noex {
+int psem_trywait(psem *op) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
+	if (op) {
 	    repeat {
-	        if ((rs = sem_trywait(psp)) < 0) {
+	        if ((rs = sem_trywait(op)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -166,17 +166,17 @@ int psem_trywait(psem *psp) noex {
 }
 /* end subroutine (psem_trywait) */
 
-int psem_waiter(psem *psp,int to) noex {
+int psem_waiter(psem *op,int to) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (to < 0) to = (INT_MAX/(2*NLPS)) ;
-	if (psp) {
+	if (op) {
 	    cint	mint = (1000/NLPS) ;
 	    cint	cto = (to*NLPS) ;
 	    bool	f_exit = false ;
 	    repeat {
-	        if ((rs = sem_trywait(psp)) < 0) rs = (- errno) ;
-	        if (rs < 0) {
+	        if ((rs = sem_trywait(op)) < 0) {
+		    rs = (- errno) ;
 		    switch (rs) {
 	    	    case SR_AGAIN:
 		        if (c++ < cto) {
@@ -199,11 +199,11 @@ int psem_waiter(psem *psp,int to) noex {
 }
 /* end subroutine (psem_waiter) */
 
-int psem_post(psem *psp) noex {
+int psem_post(psem *op) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
+	if (op) {
 	    repeat {
-	        if ((rs = sem_post(psp)) < 0) {
+	        if ((rs = sem_post(op)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -212,12 +212,21 @@ int psem_post(psem *psp) noex {
 }
 /* end subroutine (psem_post) */
 
-int psem_count(psem *psp) noex {
+int psem_count(psem *op) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
-	    rs = SR_NOSYS ;
+	int		c = 0 ;
+	if (op) {
+	    while ((rs = psem_trywait(op)) >= 0) {
+		c += 1 ;
+	    } /* end while */
+	    if (rs == SR_AGAIN) {
+		rs = SR_OK ;
+		for (int i = 0 ; (rs >= 0) && (i < c) ; i += 1) {
+		    rs = psem_post(op) ;
+		} /* end for */
+	    } /* end if */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (psem_count) */
 

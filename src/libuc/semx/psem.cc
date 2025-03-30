@@ -20,7 +20,7 @@
   	Object:
 	psem
 
-	[Description:
+	Description:
 	This module provides the POSIX® standard (unnamed) semaphore
 	facility one way or another.  On normal operating systems,
 	the whole POSIX semaphore facility (both named and unnamed)
