@@ -52,7 +52,14 @@
 
 /* local defines */
 
-#define	PRCACHE		struct sysdialer_prcache
+#define	SD		sysdialer_head
+#define	SD_FL		sysdialer_flags
+#define	SD_ENT		sysdialer_entry
+#define	SD_CALLS	sysdialer_calls
+#define	SD_INFO		sysdialer_information
+#define	SD_ARGS		sysdialer_arguments
+#define	SD_PRC		sysdialer_prcache
+#define	SD_MOD		sysdialer_module
 
 #define	TO_FILECHECK	3
 
@@ -60,12 +67,22 @@
 
 #define	LIBCNAME	"lib"
 
-#ifndef	SYSDIALERDNAME
-#define	SYSDIALERDNAME	"sysdialers"
+#ifndef	SDDNAME
+#define	SDDNAME		"sysdialers"
 #endif
 
 #ifndef	VARLIBPATH
 #define	VARLIBPATH	"LD_LIBRARY_PATH"
+#endif
+
+#ifndef	CF_SAMEMODULE
+#define	CF_SAMEMODULE	1		/* try to use same module */
+#endif
+#ifndef	CF_PRCACHE
+#define	CF_PRCACHE	1		/* PR-cache */
+#endif
+#ifndef	CF_LOOKSELF
+#define	CF_LOOKSELF	0		/* allow for compiled-in sysdialers */
 #endif
 
 
@@ -253,6 +270,10 @@ constexpr int		rsnotconnected[] = {
 	0
 } ;
 
+const bool	f_samemodule = CF_SAMEMODULE ;
+const bool	f_prcache = CF_PRCACHE ;
+const bool	f_lookself = CF_LOOKSELF ;
+
 
 /* exported variables */
 
@@ -261,7 +282,6 @@ constexpr int		rsnotconnected[] = {
 
 int sysdialer_start(sysdialer *op,cchar *pr,cchar **prs,cchar **dirs) noex {
 	int		rs = SR_OK ;
-	int		i ;
 	int		size ;
 	int		opts ;
 	cchar		*cp ;
@@ -283,7 +303,7 @@ int sysdialer_start(sysdialer *op,cchar *pr,cchar **prs,cchar **dirs) noex {
 	        goto bad1 ;
 
 	    op->f.vsprs = TRUE ;
-	    for (i = 0 ; prs[i] != nullptr ; i += 1) {
+	    for (int i = 0 ; prs[i] != nullptr ; i += 1) {
 	        if (strcmp(prs[i],op->pr) != 0) {
 	            rs = vecstr_add(&op->prlist,prs[i],-1) ;
 	        }
@@ -302,7 +322,7 @@ int sysdialer_start(sysdialer *op,cchar *pr,cchar **prs,cchar **dirs) noex {
 	        goto bad2 ;
 
 	    op->f.vsdirs = (rs >= 0) ;
-	    for (i = 0 ; (rs >= 0) && (dirs[i] != nullptr) ; i += 1) {
+	    for (int i = 0 ; (rs >= 0) && (dirs[i] != nullptr) ; i += 1) {
 	        rs = vecstr_add(&op->dirlist,dirs[i],-1) ;
 	        if (rs < 0) break ;
 	    } /* end for */
@@ -323,14 +343,15 @@ int sysdialer_start(sysdialer *op,cchar *pr,cchar **prs,cchar **dirs) noex {
 
 	} /* end if */
 
-	size = szof(SYSDIALER_ENT) ;
+	size = szof(SD_ENT) ;
 	opts = VECOBJ_OSORTED ;
 	if ((rs = vecobj_start(&op->entries,size,10,opts)) >= 0) {
 	    if ((rs = prcache_start(&op->pc)) >= 0){
-	        op->magic = SYSDIALER_MAGIC ;
+	        op->magic = SD_MAGIC ;
 	    }
-	    if (rs < 0)
+	    if (rs < 0) {
 	        vecobj_finish(&op->entries) ;
+	    }
 	} /* end if (vecobj_start) */
 
 ret0:
@@ -355,14 +376,14 @@ bad0:
 /* end subroutine (sysdialer_start) */
 
 int sysdialer_finish(sysdialer *op) noex {
-	SYSDIALER_ENT	*ep ;
+	SD_ENT	*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != SYSDIALER_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != SD_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = prcache_finish(&op->pc) ;
 	if (rs >= 0) rs = rs1 ;
@@ -400,7 +421,7 @@ int sysdialer_finish(sysdialer *op) noex {
 /* load a sysdialer */
 int sysdialer_loadin(sysdialer *op,cchar *name,sysdialer_ent **depp) noex {
 	sysdialer_mod	*mp ;
-	SYSDIALER_ENT	se, e, *dep ;
+	SD_ENT	se, e, *dep ;
 	int		rs ;
 	int		osize ;
 	int		f_alloc = FALSE ;
@@ -507,14 +528,14 @@ bad0:
 
 int sysdialer_loadout(sysdialer *op,cchar *name)
 {
-	SYSDIALER_ENT	te, *dep ;
+	SD_ENT	te, *dep ;
 	int		rs ;
 	int		ei ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (name == nullptr) return SR_FAULT ;
 
-	if (op->magic != SYSDIALER_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != SD_MAGIC) return SR_NOTOPEN ;
 
 	if (name[0] == '\0') return SR_INVALID ;
 
@@ -537,7 +558,7 @@ int sysdialer_check(sysdialer *op,time_t daytime) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 
-	if (op->magic != SYSDIALER_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != SD_MAGIC) return SR_NOTOPEN ;
 
 	if (daytime == 0) daytime = time(nullptr) ;
 
@@ -608,18 +629,17 @@ static int sysdialer_sofindloc(sysdialer *op,ids *idp,cc *soname,ent *ep) noex {
 #endif /* CF_LOOKSELF */
 
 static int sysdialer_sofindprs(op,idp,dsp,soname,ep)
-SYSDIALER	*op ;
+SD	*op ;
 IDS		*idp ;
 dirseen		*dsp ;
 cchar	soname[] ;
-SYSDIALER_ENT	*ep ;
+SD_ENT	*ep ;
 {
 	int		rs = SR_NOENT ;
 	int		rs1 ;
-	int		i ;
 	cchar	*prp ;
 
-	for (i = 0 ; prnames[i] != nullptr ; i += 1) {
+	for (int i = 0 ; prnames[i] != nullptr ; i += 1) {
 
 	    rs1 = prcache_lookup(&op->pc,i,&prp) ;
 
@@ -635,12 +655,12 @@ SYSDIALER_ENT	*ep ;
 
 
 static int sysdialer_sofindpr(op,idp,dsp,pr,soname,ep)
-SYSDIALER	*op ;
+SD	*op ;
 IDS		*idp ;
 dirseen		*dsp ;
 cchar	pr[] ;
 cchar	soname[] ;
-SYSDIALER_ENT	*ep ;
+SD_ENT	*ep ;
 {
 	USTAT		sb ;
 	int		rs ;
@@ -687,11 +707,11 @@ ret0:
 
 
 static int sysdialer_sofindvar(op,idp,dsp,soname,ep)
-SYSDIALER	*op ;
+SD	*op ;
 IDS		*idp ;
 dirseen		*dsp ;
 cchar	soname[] ;
-SYSDIALER_ENT	*ep ;
+SD_ENT	*ep ;
 {
 	int		rs = SR_NOENT ;
 	cchar	*sp = getenv(VARLIBPATH) ;
@@ -726,13 +746,13 @@ SYSDIALER_ENT	*ep ;
 
 
 static int sysdialer_socheckvarc(op,idp,dsp,ldnp,ldnl,soname,ep)
-SYSDIALER	*op ;
+SD	*op ;
 IDS		*idp ;
 dirseen		*dsp ;
 cchar	ldnp[] ;
 int		ldnl ;
 cchar	soname[] ;
-SYSDIALER_ENT	*ep ;
+SD_ENT	*ep ;
 {
 	USTAT		sb ;
 	int		rs ;
@@ -777,12 +797,12 @@ ret0:
 
 
 static int sysdialer_sochecklib(op,idp,dsp,libdname,soname,ep)
-SYSDIALER	*op ;
+SD	*op ;
 IDS		*idp ;
 dirseen		*dsp ;
 cchar	libdname[] ;
 cchar	soname[] ;
-SYSDIALER_ENT	*ep ;
+SD_ENT	*ep ;
 {
 	USTAT		sb ;
 	int		rs = SR_NOENT ;
@@ -1002,7 +1022,7 @@ static int entry_checkdir(ent *ep,cc *libdname,cc *name) noex {
 	int		fl = 0 ;
 	void		*dhp = nullptr ;
 	cchar	*fn ;
-	cchar	*sublibdname = SYSDIALERDNAME ;
+	cchar	*sublibdname = SDDNAME ;
 	char		dname[MAXPATHLEN + 1] ;
 	char		dlfname[MAXPATHLEN + 1] ;
 	char		fname[MAXNAMELEN + 1] ;
