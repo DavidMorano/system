@@ -46,11 +46,56 @@
 
 #define	PSEM		csem		/* <- the "money" shot */
 
-
-#ifndef	TYPEDEF_PSEM
-#define	TYPEDEF_PSEM
+#ifdef	__cplusplus
+enum psemmems {
+	psemmem_wait,
+	psemmem_waiter,
+	psemmem_trywait,
+	psemmem_post,
+	psemmem_count,
+    	psemmem_destroy,
+	psemmem_overlast
+} ;
+struct psem ;
+struct psem_co {
+	psem		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (psem *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = -1) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (psem_co) */
+struct psem : csem {
+	psem_co		wait ;
+	psem_co		waiter ;
+	psem_co		trywait ;
+	psem_co		post ;
+	psem_co		count ;
+	psem_co		destroy ;
+	psem() noex {
+	    wait(this,psemmem_wait) ;
+	    waiter(this,psemmem_waiter) ;
+	    trywait(this,psemmem_trywait) ;
+	    post(this,psemmem_post) ;
+	    count(this,psemmem_count) ;
+	    destroy(this,psemmem_destroy) ;
+	} ;
+	psem(const psem &) = delete ;
+	psem &operator = (const psem &) = delete ;
+	int create(int = 0,int = -1) noex ;
+	operator int () noex ;
+	void dtor() noex ;
+	~psem() {
+	    dtor() ;
+	} ;
+} ; /* end struct (psem) */
+#else	/* __cplusplus */
 typedef PSEM		psem ;
-#endif
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

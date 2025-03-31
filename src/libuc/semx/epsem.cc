@@ -69,8 +69,8 @@
 
 /* exported subroutines */
 
-int psem_create(psem *op,int pshared,int count) noex {
-	return csem_create(op,pshared,count) ;
+int psem_create(psem *op,int pshared,int cnt) noex {
+	return csem_create(op,pshared,cnt) ;
 }
 /* end subroutine (psem_create) */
 
@@ -107,4 +107,47 @@ int psem_post(psem *op) noex {
 int psem_count(psem *op) noex {
 	return csem_count(op) ;
 }
+
+int psem::create(int pshared,int cnt) noex {
+	return psem_create(this,pshared,cnt) ;
+}
+
+psem::operator int () noex {
+	return csem_count(this) ;
+}
+
+void psem::dtor() noex {
+	if (cint rs = destroy ; rs < 0) {
+	    ulogerror("psem",rs,"fini-destroy") ;
+	}
+}
+
+int psem_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case psemmem_wait:
+	        rs = psem_wait(op) ;
+	        break ;
+	    case psemmem_waiter:
+	        rs = psem_waiter(op,a) ;
+	        break ;
+	    case psemmem_trywait:
+	        rs = psem_trywait(op) ;
+	        break ;
+	    case psemmem_post:
+	        rs = psem_post(op) ;
+	        break ;
+	    case psemmem_count:
+	        rs = psem_count(op) ;
+	        break ;
+	    case psemmem_destroy:
+	        rs = psem_destroy(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (psem_co::operator) */
+
 

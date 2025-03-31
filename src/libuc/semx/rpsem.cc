@@ -105,7 +105,7 @@ int psem_create(psem *op,int pshared,int cnt) noex {
 	if (op) {
 	    cint	ic = (cnt & INT_MAX) ;
 	    repeat {
-	        if ((rs = sem_init(op,pshared,ic)) < 0) {
+	        if ((rs = sem_init(&op->ps,pshared,ic)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -118,7 +118,7 @@ int psem_destroy(psem *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    repeat {
-	        if ((rs = sem_destroy(op)) < 0) {
+	        if ((rs = sem_destroy(&op->ps)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -131,7 +131,7 @@ int psem_waiti(psem *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    repeat {
-	        if ((rs = sem_wait(op)) < 0) {
+	        if ((rs = sem_wait(&op->ps)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -144,7 +144,7 @@ int psem_wait(psem *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    repeat {
-	        if ((rs = sem_wait(op)) < 0) {
+	        if ((rs = sem_wait(&op->ps)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -157,7 +157,7 @@ int psem_trywait(psem *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    repeat {
-	        if ((rs = sem_trywait(op)) < 0) {
+	        if ((rs = sem_trywait(&op->ps)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -169,13 +169,13 @@ int psem_trywait(psem *op) noex {
 int psem_waiter(psem *op,int to) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (to < 0) to = (INT_MAX/(2*NLPS)) ;
+	if (to < 0) to = (INT_MAX / (2 * NLPS)) ;
 	if (op) {
-	    cint	mint = (1000/NLPS) ;
-	    cint	cto = (to*NLPS) ;
+	    cint	mint = (1000 / NLPS) ;
+	    cint	cto = (to * NLPS) ;
 	    bool	f_exit = false ;
 	    repeat {
-	        if ((rs = sem_trywait(op)) < 0) {
+	        if ((rs = sem_trywait(&op->ps)) < 0) {
 		    rs = (- errno) ;
 		    switch (rs) {
 	    	    case SR_AGAIN:
@@ -203,7 +203,7 @@ int psem_post(psem *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    repeat {
-	        if ((rs = sem_post(op)) < 0) {
+	        if ((rs = sem_post(&op->ps)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -229,5 +229,43 @@ int psem_count(psem *op) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (psem_count) */
+
+psem::operator int () noex {
+	return psem_count(this) ;
+}
+
+void psem::dtor() noex {
+	if (cint rs = destroy ; rs < 0) {
+	    ulogerror("psem",rs,"fini-destroy") ;
+	}
+}
+
+int psem_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case psemmem_wait:
+	        rs = psem_wait(op) ;
+	        break ;
+	    case psemmem_waiter:
+	        rs = psem_waiter(op,a) ;
+	        break ;
+	    case psemmem_trywait:
+	        rs = psem_trywait(op) ;
+	        break ;
+	    case psemmem_post:
+	        rs = psem_post(op) ;
+	        break ;
+	    case psemmem_count:
+	        rs = psem_count(op) ;
+	        break ;
+	    case psemmem_destroy:
+	        rs = psem_destroy(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (psem_co::operator) */
 
 
