@@ -6,7 +6,6 @@ file		what
 --------------------------------------------------------------------------------
 uctim
 libuc		fix to completely compile!
-syshelper
 fsdirtree	needs pointer implementation and a lot of cleanup
 quote
 sysdialer
