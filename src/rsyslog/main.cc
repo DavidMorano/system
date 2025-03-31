@@ -1,7 +1,9 @@
-/* main */
+/* main SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* small (rather generic) front-end subroutine */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
@@ -9,7 +11,6 @@
 #define	CF_PCSPOLL	1
 #define	CF_PCS		0
 #define	CF_SHUTDOWN	0
-
 
 /* revision history:
 
@@ -22,16 +23,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	main
+
 	Synopsis:
-
 	$ rsyslog [recipient(s) ...] [-p priority] [-t tag]
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -1126,10 +1126,10 @@ char	*envv[] ;
 #if	CF_DEBUG 
 	if (DEBUGLEVEL(6)) {
 	    SYSTEMS_CUR	cur ;
-	        SYSTEMS_ENT	*sep ;
-	        debugprintf("main: sysnames: \n") ;
-	        systems_curbegin(&sysdb,&cur) ;
-	        while (systems_enum(&sysdb,&cur,&sep) >= 0) {
+	    SYSTEMS_ENT	*sep ;
+	    debugprintf("main: sysnames: \n") ;
+	    systems_curbegin(&sysdb,&cur) ;
+	    while (systems_enum(&sysdb,&cur,&sep) >= 0) {
 	        debugprintf("main: sysname=%s\n",sep->sysname) ;
 	    }
 	    systems_curend(&sysdb,&cur) ;
@@ -1139,7 +1139,7 @@ char	*envv[] ;
 /* can we initialize the DIALER subsystem? */
 
 	if (rs >= 0) {
-	    rs = dialer_init(&d,pip->pr,NULL,NULL) ;
+	    rs = sysdialer_start(&d,pip->pr,NULL,NULL) ;
 	        f_dialer = (rs >= 0) ;
 	}
 
@@ -1308,7 +1308,7 @@ char	*envv[] ;
 	    vecstr_finish(&addrs) ;
 
 	    if (f_dialer)
-	    dialer_free(&d) ;
+	    sysdialer_finish(&d) ;
 
 	    if (f_systems)
 	    systems_close(&sysdb) ;

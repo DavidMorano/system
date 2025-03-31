@@ -1,4 +1,5 @@
 /* b_rfinger SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in FINGER client */
@@ -26,6 +27,9 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_rfinger
 
 	Synopsis:
 	$ rfinger <user>@<host> [-d <dialerspec>]
@@ -1584,21 +1588,16 @@ static int procdialread(PROGINFO *pip,void *ofp,int s,LINEBUF *lbp) noex {
 }
 /* end subroutine (procdialread) */
 
-
-static int procsystems(PROGINFO *pip,void *ofp,cchar *sfname)
-{
+static int procsystems(PROGINFO *pip,void *ofp,cchar *sfname) noex {
 	LOCINFO		*lip = pip->lip ;
 	SYSDIALER	d ;
 	int		rs ;
 	int		rs1 ;
-
 	if ((rs = sysdialer_start(&d,pip->pr,NULL,NULL)) >= 0) {
-	    CM_ARGS	ca ;
+	    CM_ARGS	ca{} ;
 	    SYSTEMS	sysdb ;
 	    int		al ;
 	    cchar	*ap ;
-
-	    memset(&ca,0,sizeof(CM_ARGS)) ;
 	    ca.pr = pip->pr ;
 	    ca.prn = pip->rootname ;
 	    ca.searchname = pip->searchname ;
@@ -1642,34 +1641,23 @@ static int procsystems(PROGINFO *pip,void *ofp,cchar *sfname)
 	                al = locinfo_argenum(lip,i++,&ap) ;
 	                if (al == SR_NOTFOUND) break ;
 	                rs = al ;
-
 	                if ((rs >= 0) && (ap != NULL)) {
 	                    rs = procsystem(pip,ofp,&ca,ap) ;
 	                }
-
 	            } /* end while */
 	        } /* end if (ok) */
 
 	        rs1 = systems_close(&sysdb) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (systems) */
-
 	    rs1 = sysdialer_finish(&d) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sysdialer) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("b_rfinger/procsystems: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procsystems) */
 
-
-static int procsystem(PROGINFO *pip,void *ofp,CM_ARGS *cap,cchar *ap)
-{
+static int procsystem(PROGINFO *pip,void *ofp,CM_ARGS *cap,cchar *ap) noex {
 	LOCINFO		*lip = pip->lip ;
 	struct query	q ;
 	int		rs ;

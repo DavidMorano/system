@@ -12,8 +12,7 @@
 	This subroutine was adopted for use from the DWD program.
 
 	- 2003-11-04, David A­D­ Morano
-	I don't know where all this has been (apparently "around")
-	but I grabbed it from the SYSTEMS object!
+	I do not know where all this has been (apparently "around").
 
 */
 
@@ -452,7 +451,7 @@ int parser::operator () (SYS_FILE *fep) noex {
 }
 
 static int systems_fileparse(systems *op,int fi,SYS_FILE *fep) noex {
-	parser po(op,fi) ;
+	parser	po(op,fi) ;
        	return po(fep) ;
 }
 

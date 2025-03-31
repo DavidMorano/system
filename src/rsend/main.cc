@@ -976,7 +976,7 @@ char	*envv[] ;
 #endif /* CF_DEBUG */
 
 
-	dialer_init(&d,pip->pr,NULL) ;
+	sysdialer_start(&d,pip->pr,NULL) ;
 
 	memset(&ca,0,sizeof(CM_ARGS)) ;
 
@@ -1262,7 +1262,7 @@ char	*envv[] ;
 #endif /* CF_DEBUGS */
 
 
-	dialer_free(&d) ;
+	sysdialer_finish(&d) ;
 
 
 	systems_free(&sysdb) ;

@@ -1,17 +1,17 @@
-/* maintqotd_sys */
+/* maintqotd_sys SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SYSTEM dialer for MAINTQOTD */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_BACKGROUND	1		/* put program in background */
-
 
 /* revision history:
 
 	= 1998-06-01, David A­D­ Morano
 	This code was originally written.
-
 
 */
 
@@ -19,37 +19,35 @@
 
 /*******************************************************************************
 
+  	Name:
+	maintqotd_sys
+
+	Description:
 	This subroutine is called for the "system" dialer for MAINTQOTD.
 
 	Synopsis:
-
-	int maintqotd_sys(MAINTQOTD *sip,const char *qfname,const char *sep)
+	int maintqotd_sys(MAINTQOTD *sip,cchar *qfname,cchar *sep)
 
 	Arguments:
-
 	sip		pointer to local state
 	qfname		QOTD-file name
 	sep		source entry pointer
 
 	Returns:
-
-	<0		some error
 	>=0		resulting FD
-
+	<0		some error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<ascii.h>
@@ -83,44 +81,44 @@
 
 /* external subroutines */
 
-extern int	snwcpyclean(char *,int,int,const char *,int) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	mkpath3w(char *,const char *,const char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	matkeystr(const char **,char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
+extern int	snwcpyclean(char *,int,int,cchar *,int) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath2w(char *,cchar *,cchar *,int) ;
+extern int	mkpath3w(char *,cchar *,cchar *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matpstr(cchar **,int,cchar *,int) ;
+extern int	matkeystr(cchar **,char *,int) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optvalue(const char *,int) ;
-extern int	prgetprogpath(const char *,char *,const char *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	optvalue(cchar *,int) ;
+extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-static int	debugoutput(const char *,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+static int	debugoutput(cchar *,int) ;
 #endif
 
-extern const char	*getourenv(const char **,const char *) ;
-extern const char	*strsigabbr(int) ;
+extern cchar	*getourenv(cchar **,cchar *) ;
+extern cchar	*strsigabbr(int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnwcpy(char *,int,const char *,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnwcpy(char *,int,cchar *,int) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
 
-extern const char	**environ ;
+extern cchar	**environ ;
 
 
 /* local structures */
@@ -128,12 +126,12 @@ extern const char	**environ ;
 struct checker {
 	VECSTR		stores ;
 	MAINTQOTD	*sip ;
-	const char	**envv ;	/* remains NULL */
-	const char	*pr ;
-	const char	*sep ;
-	const char	*progfname ;
-	const char	**argv ;
-	const char	*a ;		/* allocation */
+	cchar	**envv ;	/* remains NULL */
+	cchar	*pr ;
+	cchar	*sep ;
+	cchar	*progfname ;
+	cchar	**argv ;
+	cchar	*a ;		/* allocation */
 	int		intcheck ;	/* interval-check */
 	int		an ;
 } ;
@@ -141,31 +139,29 @@ struct checker {
 
 /* forward references */
 
-static int checker_start(CHECKER *,MAINTQOTD *,const char *) ;
+static int checker_start(CHECKER *,MAINTQOTD *,cchar *) ;
 static int checker_finish(CHECKER *) ;
-static int checker_setentry(CHECKER *,const char **,const char *,int) ;
-static int checker_argbegin(CHECKER *,const char *) ;
+static int checker_setentry(CHECKER *,cchar **,cchar *,int) ;
+static int checker_argbegin(CHECKER *,cchar *) ;
 static int checker_argend(CHECKER *) ;
-static int checker_findprog(CHECKER *,char *,const char *,int) ;
-static int checker_progrun(CHECKER *,const char *) ;
+static int checker_findprog(CHECKER *,char *,cchar *,int) ;
+static int checker_progrun(CHECKER *,cchar *) ;
 static int checker_proglog(CHECKER *,int) ;
 
 #ifdef	COMMENT
-static int mksfname(char *,const char *,const char *,const char *) ;
+static int mksfname(char *,cchar *,cchar *,cchar *) ;
 #endif /* COMMENT */
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int maintqotd_sys(sip,qfname,sep)
-MAINTQOTD	*sip ;
-const char	qfname[] ;
-const char	*sep ;
-{
+int maintqotd_sys(MAINTQOTD *sip,cchar *qfname,cchar *sep) noex {
 	CHECKER		c ;
 	int		rs ;
 	int		rs1 ;
@@ -209,20 +205,16 @@ const char	*sep ;
 
 /* local subroutines */
 
-
-static int procsystems(PROGINFO *pip,void *ofp,const char *sfname)
-{
-	struct locinfo	*lip = pip->lip ;
+static int procsystems(PROGINFO *pip,void *ofp,cchar *sfname) noex {
+	LOCKINFO	*lip = pip->lip ;
 	SYSDIALER	d ;
 	int		rs ;
-
+	int		rs1 ;
 	if ((rs = sysdialer_start(&d,pip->pr,NULL,NULL)) >= 0) {
-	    CM_ARGS		ca ;
-	    SYSTEMS		sysdb ;
+	    CM_ARGS	ca{} ;
+	    SYSTEMS	sysdb ;
 	    int		al ;
-	    const char	*ap ;
-
-	    memset(&ca,0,sizeof(CM_ARGS)) ;
+	    cchar	*ap ;
 	    ca.pr = pip->pr ;
 	    ca.prn = pip->rootname ;
 	    ca.searchname = pip->searchname ;
@@ -244,12 +236,6 @@ static int procsystems(PROGINFO *pip,void *ofp,const char *sfname)
 
 	        if (sfname == NULL) {
 	            rs = loadsysfiles(pip,&sysdb) ;
-
-#if	CF_DEBUGS
-	                debugprintf("b_rfinger: loadsysfiles() rs=%d\n",
-	                    rs) ;
-#endif
-
 	        } /* end if (loadfiles) */
 
 #if	CF_DEBUGS && 0
@@ -279,27 +265,21 @@ static int procsystems(PROGINFO *pip,void *ofp,const char *sfname)
 
 	            } /* end while */
 	        } /* end if */
-
-	        systems_close(&sysdb) ;
+	        rs1 = systems_close(&sysdb) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (systems) */
-
-	    sysdialer_finish(&d) ;
+	    rs1 = sysdialer_finish(&d) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sysdialer) */
-
-#if	CF_DEBUGS
-	    debugprintf("b_rfinger/procsystems: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procsystems) */
-
 
 static int procsystem(pip,ofp,cap,ap)
 PROGINFO	*pip ;
 void		*ofp ;
 CM_ARGS		*cap ;
-const char	*ap ;
+cchar	*ap ;
 {
 	struct locinfo	*lip = pip->lip ;
 	struct query	q ;
@@ -314,8 +294,8 @@ const char	*ap ;
 	int		ropts = 0 ;
 	int		wlen = 0 ;
 	int		f_long ;
-	const char	**av ;
-	const char	*qp ;
+	cchar	**av ;
+	cchar	*qp ;
 	char		lbuf[LINEBUFLEN + 1], *lp = lbuf ;
 	char		cbuf[LINEBUFLEN+1] ;
 
@@ -364,7 +344,7 @@ const char	*ap ;
 #endif /* CF_DEBUGS */
 
 	if ((rs = cm_open(&con,cap,q.hpart,lip->svcspec,NULL)) >= 0) {
-	    const char	*tmpdname = pip->tmpdname ;
+	    cchar	*tmpdname = pip->tmpdname ;
 
 #if	CF_DEBUGS
 	        debugprintf("main/procsystem: cm_open() rs=%d\n",rs) ;
@@ -461,20 +441,11 @@ const char	*ap ;
 	} /* end if (cm) */
 
 ret0:
-
-#if	CF_DEBUGS
-	    debugprintf("main/procsystem: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procsystem) */
 
-
-static int loadsysfiles(pip,sdbp)
-PROGINFO	*pip ;
-SYSTEMS		*sdbp ;
-{
+static int loadsysfiles(proginfo *pip,systems *sdbp) noex {
 	SCHEDVAR	sf ;
 	int		rs ;
 	int		rs1 ;
@@ -537,7 +508,7 @@ SYSTEMS		*sdbp ;
 static int checker_start(chp,sip,sep)
 CHECKER		*chp ;
 MAINTQOTD	*sip ;
-const char	*sep ;
+cchar	*sep ;
 {
 	int		rs ;
 
@@ -582,8 +553,8 @@ CHECKER		*chp ;
 
 int checker_setentry(chp,epp,vp,vl)
 CHECKER		*chp ;
-const char	**epp ;
-const char	*vp ;
+cchar	**epp ;
+cchar	*vp ;
 int		vl ;
 {
 	VECSTR		*slp = &chp->stores ;
@@ -611,14 +582,14 @@ int		vl ;
 /* end subroutine (checker_setentry) */
 
 
-static int checker_argbegin(CHECKER *chp,const char *ap)
+static int checker_argbegin(CHECKER *chp,cchar *ap)
 {
 	int		rs ;
 	int		avsize ;
 	int		size = 0 ;
 	int		na = 0 ;
-	const char	*sp = ap ;
-	const char	*tp ;
+	cchar	*sp = ap ;
+	cchar	*tp ;
 	void		*a ;
 
 	while ((tp = strchr(sp,CH_FS)) != NULL) {
@@ -631,13 +602,13 @@ static int checker_argbegin(CHECKER *chp,const char *ap)
 	    size += (strlen(sp) + 1) ;
 	}
 
-	avsize = ((na+1) * sizeof(const char **)) ;
+	avsize = ((na+1) * sizeof(cchar **)) ;
 	size += avsize ;
 
 	chp->an = na ;
 	if ((rs = uc_malloc(size,&a)) >= 0) {
 	    int		c = 1 ;
-	    const char	**argv = (const char **) a ;
+	    cchar	**argv = (cchar **) a ;
 	    char	*bp = a ;
 	    chp->a = a ;
 	    chp->argv = argv ;
@@ -680,7 +651,7 @@ static int checker_argend(CHECKER *chp)
 /* end subroutine (checker_argend) */
 
 
-static int checker_findprog(CHECKER *chp,char *rbuf,const char *pp,int pl)
+static int checker_findprog(CHECKER *chp,char *rbuf,cchar *pp,int pl)
 {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
@@ -709,7 +680,7 @@ static int checker_findprog(CHECKER *chp,char *rbuf,const char *pp,int pl)
 #endif
 
 	if (rs >= 0) {
-	    const char	**vpp = &chp->progfname ;
+	    cchar	**vpp = &chp->progfname ;
 	    rl = (rs > 0) ? rs : strlen(rbuf) ;
 	    rs = checker_setentry(chp,vpp,rbuf,rl) ;
 	} /* end if */
@@ -733,7 +704,7 @@ static int checker_findprog(CHECKER *chp,char *rbuf,const char *pp,int pl)
 /* end subroutine (checker_findprog) */
 
 
-static int checker_progrun(CHECKER *chp,const char *qfname)
+static int checker_progrun(CHECKER *chp,cchar *qfname)
 {
 	SPAWNER		s ;
 	int		rs = SR_OK ;
@@ -748,14 +719,14 @@ static int checker_progrun(CHECKER *chp,const char *qfname)
 
 	if (chp->progfname != NULL) {
 	    int		zl ;
-	    const char	*pf = chp->progfname ;
-	    const char	**ev = chp->envv ;
-	    const char	**av = chp->argv ;
-	    const char	*zp ;
+	    cchar	*pf = chp->progfname ;
+	    cchar	**ev = chp->envv ;
+	    cchar	**av = chp->argv ;
+	    cchar	*zp ;
 	    if ((zl = sfbasename(pf,-1,&zp)) > 0) {
 		const mode_t	om = 0664 ;
 		const int	of = (O_RDWR|O_CREAT|O_TRUNC) ;
-	        const char	*ap = av[0] ;
+	        cchar	*ap = av[0] ;
 	        char		argz[MAXNAMELEN+1] ;
 	        if (ap != NULL) {
 	            if ((ap[0] == '+') || (ap[0] == '-') || (ap[0] == '\0')) {
@@ -768,7 +739,7 @@ static int checker_progrun(CHECKER *chp,const char *qfname)
 	        if ((rs = u_open(qfname,of,om)) >= 0) {
 	            fd = rs ;
 	            if ((rs = spawner_start(&s,pf,av,ev)) >= 0) {
-	                const char	*varpr = MAINTQOTD_PRNAME ;
+	                cchar	*varpr = MAINTQOTD_PRNAME ;
 	                if (getourenv(ev,varpr) == NULL) {
 	                    rs = spawner_envset(&s,varpr,chp->pr,-1) ;
 	                }
@@ -841,7 +812,7 @@ static int checker_proglog(CHECKER *chp,int cs)
 		logfile_printf(lhp,"program exited normally ex=%u",ex) ;
 	    } else if (WIFSIGNALED(cs)) {
 		int	sig = WTERMSIG(cs) ;
-		const char	*ss ;
+		cchar	*ss ;
 		char		sigbuf[20+1] ;
 		if ((ss = strsigabbr(sig)) == NULL) {
 		     ctdeci(sigbuf,20,sig) ;
@@ -861,9 +832,9 @@ static int checker_proglog(CHECKER *chp,int cs)
 #ifdef	COMMENT
 static int mksfname(rbuf,pr,sdname,sname)
 char		rbuf[] ;
-const char	*pr ;
-const char	*sdname ;
-const char	*sname ;
+cchar	*pr ;
+cchar	*sdname ;
+cchar	*sname ;
 {
 	int		rs ;
 

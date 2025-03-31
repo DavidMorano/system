@@ -54,16 +54,15 @@ typedef	SYSTEMS_ENT	systems_ent ;
 
 EXTERNC_begin
 
-extern int	systems_open(systems *,cchar *) noex ;
-extern int	systems_fileadd(systems *,cchar *) noex ;
-extern int	systems_filedel(systems *,cchar *) noex ;
-extern int	systems_check(systems *,time_t) noex ;
-extern int	systems_curbegin(systems *,systems_cur *) noex ;
-extern int	systems_curend(systems *,systems_cur *) noex ;
-extern int	systems_curenum(systems *,systems_cur *,systems_ent **) noex ;
-extern int	systems_fetch(systems *,cchar *,systems_cur *,
-			systems_ent **) noex ;
-extern int	systems_close(systems *) noex ;
+extern int systems_open(systems *,cchar *) noex ;
+extern int systems_fileadd(systems *,cchar *) noex ;
+extern int systems_filedel(systems *,cchar *) noex ;
+extern int systems_check(systems *,time_t) noex ;
+extern int systems_curbegin(systems *,systems_cur *) noex ;
+extern int systems_curend(systems *,systems_cur *) noex ;
+extern int systems_curenum(systems *,systems_cur *,systems_ent **) noex ;
+extern int systems_fetch(systems *,cchar *,systems_cur *,systems_ent **) noex ;
+extern int systems_close(systems *) noex ;
 
 EXTERNC_end
 

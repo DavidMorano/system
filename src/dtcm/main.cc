@@ -1129,7 +1129,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* can we initialize the DIALER subsystem? */
 
 	if (f_systems && (rs >= 0)) {
-	    rs = dialer_init(&d,pip->pr,NULL,NULL) ;
+	    rs = sysdialer_start(&d,pip->pr,NULL,NULL) ;
 	    f_dialer = (rs >= 0) ;
 	}
 
@@ -1282,7 +1282,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 #endif
 
 	if (f_dialer)
-	    dialer_free(&d) ;
+	    sysdialer_finish(&d) ;
 
 	if (f_systems)
 	    systems_close(&sysdb) ;

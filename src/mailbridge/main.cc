@@ -1174,7 +1174,7 @@ char	*envv[] ;
 
 	if (rs >= 0) {
 
-	    rs = dialer_init(&d,pip->pr,NULL,NULL) ;
+	    rs = sysdialer_start(&d,pip->pr,NULL,NULL) ;
 	    f_dialer = (rs >= 0) ;
 
 	}
@@ -1182,21 +1182,14 @@ char	*envv[] ;
 /* try to open a connection (with connection-manager) */
 
 	if (rs >= 0) {
-
-	    CM_ARGS	ca ;
-
-	    const char	**av ;
-
-
-	    memset(&ca,0,sizeof(CM_ARGS)) ;
-
+	    CM_ARGS	ca{} ;
+	    cchar	**av ;
 	ca.pr = pip->pr ;
 	ca.prn = pip->rootname ;
 	ca.searchname = pip->searchname ;
 	ca.nodename = pip->nodename ;
 	ca.domainname = pip->domainname ;
 	ca.username = pip->username ;
-
 	    ca.sp = &sysdb ;
 	    ca.dp = &d ;
 	    ca.timeout = TO_CONNECT ;
@@ -1258,7 +1251,7 @@ char	*envv[] ;
 	vecstr_finish(&addrs) ;
 
 	if (f_dialer)
-	    dialer_free(&d) ;
+	    sysdialer_finish(&d) ;
 
 	if (f_systems)
 	    systems_close(&sysdb) ;
