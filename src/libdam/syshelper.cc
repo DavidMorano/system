@@ -75,7 +75,9 @@
 
 /* external subroutines */
 
-extern int	dialuss(char *,int,int) noex ;
+extern "C" {
+    extern int	dialuss(char *,int,int) noex ;
+}
 
 
 /* external variables */

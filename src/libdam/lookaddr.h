@@ -2,6 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
+/* Addres-Look-List */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

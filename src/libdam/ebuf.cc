@@ -244,11 +244,11 @@ int ebuf_sync(ebuf *op) noex {
 
 static int ebuf_waybegin(ebuf *op,int wi) noex {
 	int		rs ;
-	    WAY		*wp = (op->ways + wi) ;
-	    int		wsize = (op->npw * op->esize) ;
-	    if (void *vp{} ; (rs = uc_malloc(wsize,&vp)) >= 0) {
-		wp->wbuf = charp(vp) ;
-	    }
+	WAY		*wp = (op->ways + wi) ;
+	int		wsize = (op->npw * op->esize) ;
+	if (void *vp{} ; (rs = uc_malloc(wsize,&vp)) >= 0) {
+	    wp->wbuf = charp(vp) ;
+	}
 	return rs ;
 }
 /* end subroutine (ebuf_waybegin) */
@@ -256,13 +256,13 @@ static int ebuf_waybegin(ebuf *op,int wi) noex {
 static int ebuf_wayend(ebuf *op,int wi) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
-	    WAY		*wp = (op->ways + wi) ;
-	    if (wp->wbuf != nullptr) {
-	        rs1 = uc_free(wp->wbuf) ;
-	        if (rs >= 0) rs = rs1 ;
-	        wp->wbuf = nullptr ;
-	    }
-	    memclear(wp) ;
+	WAY		*wp = (op->ways + wi) ;
+	if (wp->wbuf != nullptr) {
+	    rs1 = uc_free(wp->wbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	    wp->wbuf = nullptr ;
+	}
+	memclear(wp) ;
 	return rs ;
 }
 /* end subroutine (ebuf_wayend) */
@@ -270,33 +270,33 @@ static int ebuf_wayend(ebuf *op,int wi) noex {
 static int ebuf_search(ebuf *op,int ei,char **rpp) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_NOTFOUND ;
-	    for (int wi = 0 ; wi < op->iways ; wi += 1) {
-	        rs = ebuf_get(op,wi,ei,rpp) ;
-	        if ((rs >= 0) || (rs != rsn)) break ;
-	    } /* end if */
-	    if ((rs < 0) && rpp) {
-	        *rpp = nullptr ;
-	    }
+	for (int wi = 0 ; wi < op->iways ; wi += 1) {
+	    rs = ebuf_get(op,wi,ei,rpp) ;
+	    if ((rs >= 0) || (rs != rsn)) break ;
+	} /* end if */
+	if ((rs < 0) && rpp) {
+	    *rpp = nullptr ;
+	}
 	return rs ;
 }
 /* end subroutine (ebuf_search) */
 
 static int ebuf_get(ebuf *op,int wi,int ei,char **rpp) noex {
 	int		rs = SR_OK ;
-	    WAY		*wp = (op->ways + wi) ;
-	    uint	roff = 0 ;
-	    rs = SR_NOTFOUND ;
-	    if ((wp->wbuf != nullptr) && (wp->wlen > 0)) {
-	        uint	eoff = (op->soff + (ei * op->esize)) ;
-	        if ((eoff >= wp->woff) && (eoff < (wp->woff + wp->wlen))) {
-		    rs = SR_OK ;
-		    wp->utime = ++op->utimer ;
-		    roff = eoff - wp->woff ;
-	        }
-	    } /* end if */
-	    if (rpp) {
-	        *rpp = (rs >= 0) ? (wp->wbuf + roff) : nullptr ;
+	WAY		*wp = (op->ways + wi) ;
+	uint	roff = 0 ;
+	rs = SR_NOTFOUND ;
+	if ((wp->wbuf != nullptr) && (wp->wlen > 0)) {
+	    uint	eoff = (op->soff + (ei * op->esize)) ;
+	    if ((eoff >= wp->woff) && (eoff < (wp->woff + wp->wlen))) {
+		rs = SR_OK ;
+		wp->utime = ++op->utimer ;
+		roff = eoff - wp->woff ;
 	    }
+	} /* end if */
+	if (rpp) {
+	    *rpp = (rs >= 0) ? (wp->wbuf + roff) : nullptr ;
+	}
 	return rs ;
 }
 /* end subroutine (ebuf_get) */
@@ -305,17 +305,17 @@ static int ebuf_load(ebuf *op,int ei,char **rpp) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		n = 0 ;
-	    int		wi ;
-	    if ((rs = ebuf_wayfindfin(op)) >= 0) {
-	        wi = rs ;
-	    } else if (rs == rsn) {
-	        rs = ebuf_wayfindevict(op) ;
-	        wi = rs ;
-	    } /* end if */
-	    if (rs >= 0) {
-	        rs = ebuf_wayloadread(op,wi,ei,rpp) ;
-	        n = rs ;
-	    }
+	int		wi ;
+	if ((rs = ebuf_wayfindfin(op)) >= 0) {
+	    wi = rs ;
+	} else if (rs == rsn) {
+	    rs = ebuf_wayfindevict(op) ;
+	    wi = rs ;
+	} /* end if */
+	if (rs >= 0) {
+	    rs = ebuf_wayloadread(op,wi,ei,rpp) ;
+	    n = rs ;
+	}
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (ebuf_load) */
@@ -323,26 +323,26 @@ static int ebuf_load(ebuf *op,int ei,char **rpp) noex {
 static int ebuf_wayfindfin(ebuf *op) noex {
 	int		rs = SR_OK ;
 	int		wi = 0 ;
-	    WAY		*wp{} ;
-	    for (wi = 0 ; wi < op->iways ; wi += 1) {
-	        wp = (op->ways + wi) ;
-	        if (wp->wlen == 0) break ;
-	    } /* end if */
-	    if (wi >= op->iways) {
-		/* look for un-initialized and not used once yet */
-	        if (op->iways >= op->nways) {
-		    /* look for un-initialized anywhere */
-	            for (wi = 0 ; wi < op->iways ; wi += 1) {
-	                wp = (op->ways + wi) ;
-	                if (wp->wbuf == nullptr) break ;
-	            } /* end if */
-	            if (wi >= op->iways) {
-	                rs = SR_NOTFOUND ;
-	            }
-	        } else {
-	            wi = op->iways ;
+	WAY		*wp{} ;
+	for (wi = 0 ; wi < op->iways ; wi += 1) {
+	    wp = (op->ways + wi) ;
+	    if (wp->wlen == 0) break ;
+	} /* end if */
+	if (wi >= op->iways) {
+	    /* look for un-initialized and not used once yet */
+	    if (op->iways >= op->nways) {
+		/* look for un-initialized anywhere */
+	        for (wi = 0 ; wi < op->iways ; wi += 1) {
+	            wp = (op->ways + wi) ;
+	            if (wp->wbuf == nullptr) break ;
+	        } /* end if */
+	        if (wi >= op->iways) {
+	            rs = SR_NOTFOUND ;
 	        }
-	    } /* end if */
+	    } else {
+	        wi = op->iways ;
+	    }
+	} /* end if */
 	return (rs >= 0) ? wi : rs ;
 }
 /* end subroutine (ebuf_wayfindfin) */

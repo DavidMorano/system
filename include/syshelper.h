@@ -22,9 +22,9 @@
 
 
 struct syshelper_head {
-	uint	magic ;
-	int	fd ;		/* socket file descriptor */
-	int	pid ;		/* daemon PID */
+	uint		magic ;
+	int		fd ;		/* socket file descriptor */
+	int		pid ;		/* daemon PID */
 } ;
 
 typedef SYSHELPER	syshelper ;

@@ -476,9 +476,8 @@ int parser::parse(SYS_FILE *fep) noex {
                         cint	len = rs ;
                         if ((len <= 1) || (lbuf[0] == '#')) continue ;
                         if ((rs = fsb.start(lbuf,len)) >= 0) {
-                            int     fl ;
                             cchar   *fp ;
-                            if ((fl = fsb.get(fterms,&fp)) >= 0) {
+                            if (int fl ; (fl = fsb.get(fterms,&fp)) >= 0) {
                                 if (fsb.term != '#') {
                                     rs = parseln(&fsb) ;
                                     if (rs > 0) c += 1 ;
@@ -625,15 +624,15 @@ static int entry_dialer(ENT *ep,cchar *dp,int dl) noex {
 }
 /* end subroutine (entry_dialer) */
 
-static int entry_args(ENT *ep,cchar *args,int argslen) noex {
+static int entry_args(ENT *ep,cchar *argp,int argl) noex {
 	int		rs = SR_OK ;
-	if (argslen > 0) {
-	    ep->dialerargslen = argslen ;
-	    if (cchar *cp ; (rs = uc_mallocstrw(args,argslen,&cp)) >= 0) {
+	if (argl > 0) {
+	    ep->dialerargslen = argl ;
+	    if (cchar *cp ; (rs = uc_mallocstrw(argp,argl,&cp)) >= 0) {
 		ep->dialerargs = cp ;
 	    }
 	} /* end if */
-	return (rs >= 0) ? argslen : rs ;
+	return (rs >= 0) ? argl : rs ;
 }
 /* end subroutine (entry_args) */
 

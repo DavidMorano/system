@@ -6,6 +6,7 @@ file		what
 --------------------------------------------------------------------------------
 uctim
 libuc		fix to completely compile!
+syshelper
 fsdirtree	needs pointer implementation and a lot of cleanup
 quote
 sysdialer
@@ -38,11 +39,9 @@ mcmsg		mail-related messages (needs total modern rework)
 
 file		description
 --------------------------------------------------------------------------------
-lookaddr	pointer-implementation
 progsig		total mess
 termtrans	not coded up properly
 sysvars
-systems
 uunames		block structure
 dialcprog	incredible mess (maybe not worth refactoring)
 dialuux		a mess
