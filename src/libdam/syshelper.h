@@ -18,6 +18,7 @@
 #include	<usystem.h>
 
 
+#define	SYSHELPER_MAGIC		0x93847561
 #define	SYSHELPER		struct syshelper_head
 
 
