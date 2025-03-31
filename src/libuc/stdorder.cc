@@ -85,7 +85,7 @@ template<typename T>
 static int stdorder_rxx(cchar *buf,T *wp) noex {
 	cint		n = szof(T) ;
 	T		stage = 0 ;
-	const uchar	*ubuf = (uchar *) buf ;
+	const uchar	*ubuf = ucharp(buf) ;
 	for (int i = 0 ; i < n ; i += 1) {
 	     T	v = ubuf[i] ;
 	     stage |= (v << (i * nb)) ;
@@ -98,7 +98,7 @@ static int stdorder_rxx(cchar *buf,T *wp) noex {
 template<typename T>
 static int stdorder_wxx(char *buf,T w) noex {
 	cint		n = szof(T) ;
-	uchar		*ubuf = (uchar *) buf ;
+	uchar		*ubuf = ucharp(buf) ;
 	for (int i = 0 ; i < n ; i += 1) {
 	    ubuf[i] = uchar(w >> (i * nb)) ;
 	}
