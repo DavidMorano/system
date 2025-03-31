@@ -21,7 +21,7 @@
 	psem
 
 	Description:
-	These are "unnamed" POSIX® semaphores.
+	These are (real) "unnamed" POSIX® semaphores.
 
 *******************************************************************************/
 

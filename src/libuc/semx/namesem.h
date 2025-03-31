@@ -37,6 +37,7 @@ enum namesemmems {
 	namesemmem_close,
 	namesemmem_wait,
 	namesemmem_waiti,
+	namesemmem_waiter,
 	namesemmem_trywait,
 	namesemmem_post,
 	namesemmem_unlink,
@@ -50,15 +51,16 @@ struct namesem_co {
 	    op = p ;
 	    w = m ;
 	} ;
-	operator int () noex ;
-	int operator () () noex { 
-	    return operator int () ;
+	int operator () (int = -1) noex ;
+	operator int () noex {
+	    return operator () () ;
 	} ;
 } ; /* end struct (namesem_co) */
 struct namesem : namesem_head {
 	namesem_co	close ;
 	namesem_co	wait ;
 	namesem_co	waiti ;
+	namesem_co	waiter ;
 	namesem_co	trywait ;
 	namesem_co	post ;
 	namesem_co	unlink ;
@@ -91,6 +93,7 @@ extern int	namesem_open(namesem *,cchar *,int,mode_t,uint) noex ;
 extern int	namesem_close(namesem *) noex ;
 extern int	namesem_wait(namesem *) noex ;
 extern int	namesem_waiti(namesem *) noex ;
+extern int	namesem_waiter(namesem *,int) noex ;
 extern int	namesem_trywait(namesem *) noex ;
 extern int	namesem_post(namesem *) noex ;
 extern int	namesem_unlink(namesem *) noex ;

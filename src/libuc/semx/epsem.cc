@@ -1,4 +1,4 @@
-/* epsem HEADER (emulated POSIX® Semaphore) */
+/* epsem SUPPORT (emulated POSIX® Semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -84,6 +84,11 @@ int psem_wait(psem *op) noex {
 }
 /* end subroutine (psem_wait) */
 
+int psem_waiter(psem *op,int to) noex {
+	return csem_decr(op,1,to) ;
+}
+/* end subroutine (psem_waiter) */
+
 int psem_trywait(psem *op) noex {
 	cint		rsto = SR_TIMEDOUT ;
 	int		rs ;
@@ -93,11 +98,6 @@ int psem_trywait(psem *op) noex {
 	return rs ;
 }
 /* end subroutine (psem_trywait) */
-
-int psem_waiter(psem *op,int to) noex {
-	return csem_decr(op,1,to) ;
-}
-/* end subroutine (psem_waiter) */
 
 int psem_post(psem *op) noex {
 	return csem_incr(op,1) ;

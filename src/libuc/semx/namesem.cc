@@ -42,6 +42,7 @@
 #include	<fcntl.h>
 #include	<semaphore.h>
 #include	<cerrno>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -83,6 +84,8 @@
 #ifndef	CF_CONDUNLINK
 #define	CF_CONDUNLINK	0		/* conditional unlink */
 #endif
+
+#define	NLPS		5	/* number of polls per second */
 
 
 /* external subroutines */
@@ -181,19 +184,6 @@ int namesem_close(namesem *op) noex {
 }
 /* end subroutine (namesem_close) */
 
-int namesem_trywait(namesem *op) noex {
-	int		rs ;
-	if ((rs = namesem_magic(op)) >= 0) {
-	    repeat {
-	        if ((rs = sem_trywait(op->sp)) < 0) {
-		    rs = (- errno) ;
-		}
-	    } until (rs != SR_INTR) ;
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (namesem_trywait) */
-
 int namesem_wait(namesem *op) noex {
 	int		rs ;
 	if ((rs = namesem_magic(op)) >= 0) {
@@ -218,6 +208,52 @@ int namesem_waiti(namesem *op) noex {
 	return rs ;
 }
 /* end subroutine (namesem_waiti) */
+
+int namesem_waiter(namesem *op,int to) noex {
+	int		rs = SR_FAULT ;
+	int		c = 0 ;
+	if (to < 0) to = (INT_MAX / (2 * NLPS)) ;
+	if (op) {
+	    cint	mint = (1000 / NLPS) ;
+	    cint	cto = (to * NLPS) ;
+	    bool	f_exit = false ;
+	    repeat {
+	        if ((rs = sem_trywait(op->sp)) < 0) {
+		    rs = (- errno) ;
+		    switch (rs) {
+	    	    case SR_AGAIN:
+		        if (c++ < cto) {
+			    msleep(mint) ;
+		        } else {
+			    rs = SR_TIMEDOUT ;
+			    f_exit = true ;
+		        }
+		        break ;
+		    case SR_INTR:
+		        break ;
+		    default:
+		        f_exit = true ;
+		        break ;
+		    } /* end switch */
+	        } /* end if (error) */
+	    } until ((rs >= 0) || f_exit) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (namesem_waiter) */
+
+int namesem_trywait(namesem *op) noex {
+	int		rs ;
+	if ((rs = namesem_magic(op)) >= 0) {
+	    repeat {
+	        if ((rs = sem_trywait(op->sp)) < 0) {
+		    rs = (- errno) ;
+		}
+	    } until (rs != SR_INTR) ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (namesem_trywait) */
 
 int namesem_post(namesem *op) noex {
 	int		rs ;
@@ -496,7 +532,7 @@ namesem::operator int () noex {
     	return namesem_count(this) ;
 }
 
-namesem_co::operator int () noex {
+int namesem_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
@@ -508,6 +544,9 @@ namesem_co::operator int () noex {
 	        break ;
 	    case namesemmem_waiti:
 	        rs = namesem_waiti(op) ;
+	        break ;
+	    case namesemmem_waiter:
+	        rs = namesem_waiter(op,a) ;
 	        break ;
 	    case namesemmem_trywait:
 	        rs = namesem_trywait(op) ;

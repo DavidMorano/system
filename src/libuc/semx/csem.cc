@@ -1,4 +1,4 @@
-/* csem HEADER (Counting Semaphore) */
+/* csem SUPPORT (Counting Semaphore) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
