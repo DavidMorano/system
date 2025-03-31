@@ -31,11 +31,11 @@ typedef SYSHELPER	syshelper ;
 
 EXTERNC_begin
 
-extern int syshelper_start(SYSHELPER *,char *) noex ;
-extern int syshelper_getpid(SYSHELPER *,pid_t *) noex ;
-extern int syshelper_finish(SYSHELPER *) noex ;
-extern int syshelper_localtime(SYSHELPER *,time_t,TM *) noex ;
-extern int syshelper_random(SYSHELPER *,char *,int) noex ;
+extern int syshelper_start(syshelper *,char *) noex ;
+extern int syshelper_getpid(syshelper *,pid_t *) noex ;
+extern int syshelper_finish(syshelper *) noex ;
+extern int syshelper_localtime(syshelper *,time_t,TM *) noex ;
+extern int syshelper_random(syshelper *,char *,int) noex ;
 
 EXTERNC_end
 

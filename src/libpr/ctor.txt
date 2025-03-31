@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int fsdirtree_ctor(fsdirtree *op,Args ... args) noex {
+static int syshelper_ctor(syshelper *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int fsdirtree_ctor(fsdirtree *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (fsdirtree_ctor) */
+/* end subroutine (syshelper_ctor) */
 
-static int fsdirtree_dtor(fsdirtree *op) noex {
+static int syshelper_dtor(syshelper *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (fsdirtree_dtor) */
+/* end subroutine (syshelper_dtor) */
 
 template<typename ... Args>
-static inline int fsdirtree_magic(fsdirtree *op,Args ... args) noex {
+static inline int syshelper_magic(syshelper *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == FSDIRTREE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == SYSHELPER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (fsdirtree_magic) */
+/* end subroutine (syshelper_magic) */

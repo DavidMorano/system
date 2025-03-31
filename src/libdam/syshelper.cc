@@ -43,10 +43,11 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| */
 #include	<usystem.h>
 #include	<netorder.h>
 #include	<cfdec.h>
@@ -73,6 +74,15 @@
 #define	TO_READ			10	/* seconds */
 
 
+/* imported namespaces */
+
+using	std:min ;			/* subroutine-template */
+using	std:max ;			/* subroutine-template */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -88,6 +98,37 @@ extern "C" {
 
 /* forward references */
 
+template<typename ... Args>
+static int syshelper_ctor(syshelper *op,Args ... args) noex {
+    	SYSHELPER	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(hop) ;
+	   op->pid = -1 ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (syshelper_ctor) */
+
+static int syshelper_dtor(syshelper *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (syshelper_dtor) */
+
+template<typename ... Args>
+static inline int syshelper_magic(syshelper *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == SYSHELPER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (syshelper_magic) */
+
 
 /* local variables */
 
@@ -97,58 +138,31 @@ extern "C" {
 
 /* exported subroutines */
 
-int syshelper_start(eop,filename)
-SYSHELPER	*eop ;
-const char	filename[] ;
-{
-	int	rs ;
-	int	len ;
-
-	char	cmdbuf[CMDBUFLEN + 1] ;
-
-
-#if	CF_DEBUGS
-	debugprintf("syshelper_start: ent\n") ;
-#endif
-
-	if (eop == NULL)
-	    return SR_FAULT ;
-
-	eop->magic = 0 ;
-	if (filename == NULL)
-	    filename = SYSHELPER_DEFFILE ;
-
-/* do this to be in accord with the latest BSD rules */
-
-	if ((rs = perm(filename,-1,-1,NULL,R_OK | W_OK)) < 0)
-	    return rs ;
-
-	rs = dialuss(filename,5,0) ;
-	eop->fd = rs ;
-	if (rs < 0)
-	    return rs ;
-
-	rs = u_fcntl(eop->fd,F_GETFD,0) :
-
-	if ((rs & FD_CLOEXEC) == 0) {
-
-	    rs |= FD_CLOEXEC ;
-	    (void) u_fcntl(eop->fd,F_SETFD,rs) ;
-
+int syshelper_start(syshelper *op,cchar *filename) noex {
+	int		rs ;
+	if ((rs = syshelper_ctor(op)) >= 0) {
+	    cint	am = (R_OK | W_OK) ;
+	    int		len ;
+	    char	cmdbuf[CMDBUFLEN + 1] ;
+	    if (filename == nullptr) filename = SYSHELPER_DEFFILE ;
+	    if ((rs = perm(filename,-1,-1,nullptr,am)) >= 0)
+	        if ((rs = dialuss(filename,5,0)) >= 0) {
+		    op->fd = rs ;
+		    if ((rs = u_fcntl(op->fd,F_GETFD,0)) >= 0) {
+			if ((rs & FD_CLOEXEC) == 0) {
+	    		    rs |= FD_CLOEXEC ;
+	    		    (void) u_fcntl(op->fd,F_SETFD,rs) ;
+			}
+		    }
+		} /* end if (dialuss) */
 	} /* end if (setting CLOSE-on-EXEC) */
 
-/* establish that the correct server is on the other end ! */
-
-	eop->pid = -1 ;
-
-/* get the EGD program PID and check it */
-
 	cmdbuf[0] = SYSHELPER_CMDGETPID ;
-	rs = uc_writen(eop->fd,cmdbuf,1) ;
+	rs = uc_writen(op->fd,cmdbuf,1) ;
 	if (rs < 0)
 	    goto badret ;
 
-	rs = uc_reade(eop->fd,cmdbuf,1, TO_READ, FM_EXACT) ;
+	rs = uc_reade(op->fd,cmdbuf,1, TO_READ, FM_EXACT) ;
 	if (rs < 0)
 	    goto badret ;
 
@@ -159,89 +173,58 @@ const char	filename[] ;
 	    goto badret ;
 	}
 
-	rs = uc_reade(eop->fd,cmdbuf,len, TO_READ, FM_EXACT) ;
+	rs = uc_reade(op->fd,cmdbuf,len, TO_READ, FM_EXACT) ;
 	if (rs < 0)
 	    goto badret ;
 
-	if ((rs = cfdeci(cmdbuf,len,&eop->pid)) < 0)
+	if ((rs = cfdeci(cmdbuf,len,&op->pid)) < 0)
 	    goto badret ;
 
-	if ((eop->pid < 0) || (eop->pid >= SYSHELPER_MAXPID))
+	if ((op->pid < 0) || (op->pid >= SYSHELPER_MAXPID))
 		goto badret ;
 	
-#if	CF_DEBUGS
-	debugprintf("syshelper_start: we have an EGD at %W\n",cmdbuf,len) ;
-#endif
-
-	eop->magic = SYSHELPER_MAGIC ;
+	op->magic = SYSHELPER_MAGIC ;
 	return rs ;
 
 /* bad things */
 badret:
-	u_close(eop->fd) ;
+	u_close(op->fd) ;
 
 	return rs ;
 }
 /* end subroutine (syshelper_start) */
 
-
-/* free up the entire vector string data structure object */
-int syshelper_finish(eop)
-SYSHELPER	*eop ;
-{
-	int	i ;
-
-
-#if	CF_DEBUGS
-	debugprintf("syshelper_finish: ent\n") ;
-#endif
-
-	if (eop == NULL)
-	    return SR_FAULT ;
-
-	if (eop->magic != SYSHELPER_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (eop->fd >= 0) {
-	    u_close(eop->fd) ;
-	    eop->fd = -1 ;
-	}
-
-	return SR_OK ;
+int syshelper_finish(syshelper *op) noex {
+    	int		rs ;
+	int		rs1 ;
+	if ((rs = syshelper_magic(op)) >= 0) {
+	   if (op->fd >= 0) {
+	       rs1 = u_close(op->fd) ;
+	       if (rs >= 0) rs = rs1 ;
+	       op->fd = -1 ;
+	   }
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (syshelper_finish) */
 
-
-/* add some of our own syshelper to the mix (is this a security problem?) */
-int syshelper_write(eop,buf,buflen)
-SYSHELPER	*eop ;
-char		buf[] ;
-int		buflen ;
-{
-	int	rs ;
-	int	rlen, tlen, mlen ;
-	int	bits ;
-	int	i ;
+int syshelper_write(syshelper *op,cchar *wbuf,wlen) noex {
+	int		rs ;
+	int		rlen, tlen, mlen ;
+	int		bits ;
+	int		i ;
 
 	uchar	cmdbuf[CMDBUFLEN + 1] ;
 
 
-#if	CF_DEBUGS
-	debugprintf("syshelper_write: ent\n") ;
-#endif
-
-	if (eop == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (buf == NULL)
+	if (buf == nullptr)
 	    return SR_FAULT ;
 
-	if (eop->magic != SYSHELPER_MAGIC)
+	if (op->magic != SYSHELPER_MAGIC)
 	    return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("syshelper_write: ent\n") ;
-#endif
 
 	if (buflen < 0)
 	    buflen = strlen(buf) ;
@@ -259,12 +242,12 @@ int		buflen ;
 		cmdbuf[1] = (uchar) (bits >> 8) ;
 		cmdbuf[0] = (uchar) (bits & 255) ;
 	    cmdbuf[3] = (uchar) mlen ;
-	    rs = uc_writen(eop->fd,cmdbuf,4) ;
+	    rs = uc_writen(op->fd,cmdbuf,4) ;
 
 	    if (rs < 0)
 	        return rs ;
 
-	    rs = uc_writen(eop->fd,buf + i,mlen) ;
+	    rs = uc_writen(op->fd,buf + i,mlen) ;
 
 	    if (rs < 0)
 	        return rs ;
@@ -277,122 +260,60 @@ int		buflen ;
 	if (rs >= 0)
 		rs = buflen ;
 
-#if	CF_DEBUGS
-	debugprintf("syshelper_write: exiting, rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (syshelper_write) */
 
-
-/* read some syshelper */
-int syshelper_read(eop,buf,buflen)
-SYSHELPER	*eop ;
-char		buf[] ;
-int		buflen ;
-{
-	int	rs ;
-	int	i ;
-	int	rlen, tlen, mlen ;
-
-	uchar	cmdbuf[CMDBUFLEN + 1] ;
-
-
-	if (eop == NULL)
-	    return SR_FAULT ;
-
-	if (buf == NULL)
-	    return SR_FAULT ;
-
-	if (eop->magic != SYSHELPER_MAGIC)
-	    return SR_NOTOPEN ;
-
-	tlen = MIN(255,CMDBUFLEN) ;
-
-	i = 0 ;
-	rlen = buflen ;
-	while (rlen > 0) {
-
-	    mlen = MIN(tlen,rlen) ;
-
-	    cmdbuf[0] = SYSHELPER_CMDREAD ;
-	    cmdbuf[1] = (uchar) mlen ;
-	    rs = uc_writen(eop->fd,cmdbuf,2) ;
-
-	    if (rs < 0)
-	        return rs ;
-
-	    rs = uc_reade(eop->fd,buf + i,mlen, TO_READ, FM_EXACT) ;
-
-	    if (rs < 0)
-	        return rs ;
-
-	    rlen -= mlen ;
-	    i += mlen ;
-
-	} /* end while */
-
-	return mlen ;
+int syshelper_read(syshelper *op,char *rbuf,int rlen) noex {
+	int		rs ;
+	int		tlen = 0 ;
+	if ((rs = syshelper_magic(op,rbuf)) >= 0) {
+	    cint	to = TO_READ ;
+	    cint	fm = FM_EXACT ;
+	    cint	clen = min(UCHAR_MAX,CMDBUFLEN) ;
+	    uchar	cmdbuf[CMDBUFLEN + 1] = { SYSHELPER_CMDREAD } ;
+	    for (int i = 0 ; (rs >= 0) && (rlen > 0) ; ) {
+	        cint	mlen = min(clen,rlen) ;
+	        cmdbuf[1] = uchar(mlen) ;
+	        if ((rs = uc_writen(op->fd,cmdbuf,2)) >= 0) {
+	            rs = uc_reade(op->fd,(rbuf + i),mlen,to,fm) ;
+	            rlen -= rs ;
+	            i += rs ;
+		    tlen += rs ;
+	        }
+	    } /* end for */
+	} /* end if (magic) */
+	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (syshelper_read) */
 
-
 /* return the level of syshelper available */
-int syshelper_level(eop)
-SYSHELPER	*eop ;
-{
-	int	rs ;
-	int	len ;
-	int	niw ;
-
-	char	cmdbuf[CMDBUFLEN + 1] ;
-
-
-	if (eop == NULL)
-	    return SR_FAULT ;
-
-	if (eop->magic != SYSHELPER_MAGIC)
-	    return SR_NOTOPEN ;
-
-	cmdbuf[0] = SYSHELPER_CMDGETLEVEL ;
-	rs = uc_writen(eop->fd,cmdbuf,1) ;
-
-	if (rs < 0)
-	    return rs ;
-
-	rs = uc_reade(eop->fd,cmdbuf,4, TO_READ, FM_EXACT) ;
-
-	if (rs < 0)
-	    return rs ;
-
-	netorder_rint(cmdbuf,&niw) ;
-
-	rs = niw & INT_MAX ;
-
+int syshelper_level(syshelper *op) noex {
+	int		rs ;
+	if ((rs = syshelper_magic(op)) >= 0) {
+	    char	cmdbuf[CMDBUFLEN + 1] = { SYSHELPER_CMDGETLEVEL } ;
+	    if ((rs = uc_writen(op->fd,cmdbuf,1)) >= 0) {
+		cint	to = TO_READ ;
+		cint	fm = FM_EXACT ;
+	        if ((rs = uc_reade(op->fd,cmdbuf,4,to,fm)) >= 0) {
+	    	    int		niw ;
+		    netorder_rint(cmdbuf,&niw) ;
+		    rs = niw & INT_MAX ;
+	        }
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (syshelper_level) */
 
-
-/* return the daemon PID */
-int syshelper_getpid(eop,pidp)
-SYSHELPER	*eop ;
-pid_t		*pidp ;
-{
-	int	rs = SR_OK ;
-
-
-	if (eop == NULL)
-	    return SR_FAULT ;
-
-	if (eop->magic != SYSHELPER_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (pidp != NULL)
-	    *pidp = (pid_t) eop->pid ;
-
-	rs = (int) eop->pid ;
+int syshelper_getpid(syshelper *op,pid_t *pidp) noex {
+	int		rs = SR_OK ;
+	if ((rs = syshelper_magic(op)) >= 0) {
+	   if (pidp) {
+	       *pidp = pid_t(op->pid) ;
+	   }
+	   rs = op->pid ;
+	} /* end if (syshelper_magic) */
 	return rs ;
 }
 /* end subroutine (syshelper_getpid) */
