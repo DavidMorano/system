@@ -76,11 +76,6 @@
 #define	NAMESEM_UID	3
 #define	NAMESEM_GID	3
 
-#define	TO_NOSPC	10
-#define	TO_MFILE	10
-#define	TO_NFILE	10
-#define	TO_INTR		10
-
 #ifndef	CF_CONDUNLINK
 #define	CF_CONDUNLINK	0		/* conditional unlink */
 #endif
