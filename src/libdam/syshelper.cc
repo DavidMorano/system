@@ -174,11 +174,11 @@ static int syshelper_starter(syshelper *op) noex {
 	    cint	to = TO_READ ;
 	    cint	fm = FM_EXACT ;
 	    if ((rs = uc_reade(op->fd,cmdbuf,1,to,fm)) >= 0) {
-		cint	len = uchar(cmdbuf[0]) ;
+		cint	clen = min(CMDBUFLEN,uchar(cmdbuf[0])) ;
 	        rs = SR_TOOBIG ;
 		if (len <= CMDBUFLEN) {
-		    if ((rs = uc_reade(op->fd,cmdbuf,len,to,fm)) >= 0) {
-			if (int v ; (rs = cfdeci(cmdbuf,len,&v)) >= 0) {
+		    if ((rs = uc_reade(op->fd,cmdbuf,clen,to,fm)) >= 0) {
+			if (int v ; (rs = cfdeci(cmdbuf,rs,&v)) >= 0) {
 			    cint	mpid = SYSHELPER_MAXPID ;
 			    op->pid = v ;
 			    if ((v >= 0) && (v < mpid)) {
@@ -212,7 +212,7 @@ int syshelper_write(syshelper *op,cchar *wbuf,int wlen) noex {
 	int		tlen = 0 ;
 	if ((rs = syshelper_magic(op,wbuf)) >= 0) {
 	    char	cmdbuf[CMDBUFLEN + 1] = { SYSHELPER_CMDWRITE } ;
-	    cint	clen = min(255,CMDBUFLEN) ;
+	    cint	clen = min(UCHAR_MAX,CMDBUFLEN) ;
 	    int		bits ;
 	    int		mlen = 0 ;
 	    if (wlen < 0) wlen = strlen(wbuf) ;
