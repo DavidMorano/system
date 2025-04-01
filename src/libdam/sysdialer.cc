@@ -162,7 +162,9 @@ static int	entry_finish(sysdialer_ent *) noex ;
 
 static int	vecstr_loadexts(vecstr *,cchar *,cchar *,int) noex ;
 
-static int	vcmpname(cvoid **,cvoid **) noex ;
+extern "C" {
+    static int	vcmpname(cvoid **,cvoid **) noex ;
+}
 
 static int	getext(fext *,cchar *,int) noex ;
 
