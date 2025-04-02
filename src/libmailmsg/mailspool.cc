@@ -109,7 +109,7 @@ struct si {
 	mode_t		om ;
 	int		of ;
 	int		to ;
-	int		f_create:1 ;
+	bool		f_create ;
 } ;
 
 
