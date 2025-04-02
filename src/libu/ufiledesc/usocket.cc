@@ -408,7 +408,7 @@ int usocket::isetsockopt(int fd) noex {
 int usocket::igetsockopt(int fd) noex {
 	int		rs = SR_FAULT ;
 	if (valp && lenp) {
-	    void	*vp = const_cast<void *>(valp) ;
+	    void	*vp = cast_const<void *>(valp) ;
 	    socklen_t	slen = socklen_t(*lenp) ;
 	    if ((rs = getsockopt(fd,level,name,vp,&slen)) < 0) {
 	        rs = (- errno) ;
@@ -422,7 +422,7 @@ int usocket::igetsockopt(int fd) noex {
 /* end method (usocket::igetsockopt) */
 
 int usocket::igetpeername(int fd) noex {
-	SOCKADDR	*fromp = const_cast<SOCKADDR *>(sap) ;
+	SOCKADDR	*fromp = cast_const<SOCKADDR *>(sap) ;
 	socklen_t	slen = socklen_t(*lenp) ;
 	int		rs ;
 	if ((rs = getpeername(fd,fromp,&slen)) < 0) {
@@ -436,7 +436,7 @@ int usocket::igetpeername(int fd) noex {
 /* end method (usocket::igetpeername) */
 
 int usocket::igetsockname(int fd) noex {
-	SOCKADDR	*fromp = const_cast<SOCKADDR *>(sap) ;
+	SOCKADDR	*fromp = cast_const<SOCKADDR *>(sap) ;
 	socklen_t	slen = socklen_t(*lenp) ;
 	int		rs ;
 	if ((rs = getsockname(fd,fromp,&slen)) < 0) {
@@ -451,9 +451,11 @@ int usocket::igetsockname(int fd) noex {
 
 int usocket::isend(int fd) noex {
 	int		rs ;
-	csize		wsz = size_t(wlen) ;
-	if ((rs = send(fd,wbuf,wsz,flags)) < 0) {
+	csize		wsize = size_t(wlen) ;
+	if (ssize_t rsize ; (rsize = send(fd,wbuf,wsize,flags)) < 0) {
 	    rs = (- errno) ;
+	} else {
+	    rs = intsat(rsize) ;
 	}
 	return rs ;
 }
@@ -461,8 +463,10 @@ int usocket::isend(int fd) noex {
 
 int usocket::isendmsg(int fd) noex {
 	int		rs ;
-	if ((rs = sendmsg(fd,msgp,flags)) < 0) {
+	if (ssize_t rsize ; (rsize = sendmsg(fd,msgp,flags)) < 0) {
 	    rs = (- errno) ;
+	} else {
+	    rs = intsat(rsize) ;
 	}
 	return rs ;
 }
@@ -470,10 +474,13 @@ int usocket::isendmsg(int fd) noex {
 
 int usocket::isendto(int fd) noex {
 	int		rs ;
-	csize		wsz = size_t(wlen) ;
+	csize		wsize = size_t(wlen) ;
 	csocklen	slen = socklen_t(sal) ;
-	if ((rs = sendto(fd,wbuf,wsz,flags,sap,slen)) < 0) {
+	ssize_t		rsize ;
+	if ((rsize = sendto(fd,wbuf,wsize,flags,sap,slen)) < 0) {
 	    rs = (- errno) ;
+	} else {
+	    rs = intsat(rsize) ;
 	}
 	return rs ;
 }
@@ -481,8 +488,10 @@ int usocket::isendto(int fd) noex {
 
 int usocket::irecv(int fd) noex {
 	int		rs ;
-	if ((rs = recv(fd,rbuf,rlen,flags)) < 0) {
+	if (ssize_t rsize ; (rsize = recv(fd,rbuf,rlen,flags)) < 0) {
 	    rs = (- errno) ;
+	} else {
+	    rs = intsat(rsize) ;
 	}
 	return rs ;
 }
@@ -490,9 +499,11 @@ int usocket::irecv(int fd) noex {
 
 int usocket::irecvmsg(int fd) noex {
 	int		rs ;
-	MSGHDR		*mp = const_cast<MSGHDR *>(msgp) ;
-	if ((rs = recvmsg(fd,mp,flags)) < 0) {
+	MSGHDR		*mp = cast_const<MSGHDR *>(msgp) ;
+	if (ssize_t rsize ; (rsize = recvmsg(fd,mp,flags)) < 0) {
 	    rs = (- errno) ;
+	} else {
+	    rs = intsat(rsize) ;
 	}
 	return rs ;
 }
@@ -502,10 +513,12 @@ int usocket::irecvfrom(int fd) noex {
 	int		rs ;
 	csize		rsz = size_t(rlen) ;
 	socklen_t	slen = socklen_t(*lenp) ;
-	SOCKADDR	*sp = const_cast<SOCKADDR *>(sap) ;
-	if ((rs = recvfrom(fd,rbuf,rsz,flags,sp,&slen)) < 0) {
+	SOCKADDR	*sp = cast_const<SOCKADDR *>(sap) ;
+	ssize_t		rsize ;
+	if ((rsize = recvfrom(fd,rbuf,rsz,flags,sp,&slen)) < 0) {
 	    rs = (- errno) ;
 	} else {
+	    rs = intsat(rsize) ;
 	    *lenp = intsat(slen) ;
 	}
 	return rs ;

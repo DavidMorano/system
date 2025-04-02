@@ -640,8 +640,10 @@ int uregular::ilockf(int fd) noex {
 int uregular::ipread(int fd) noex {
 	csize		rsz = size_t(rlen) ;
 	int		rs ;
-	if ((rs = pread(fd,rbuf,rsz,sz)) < 0) {
+	if (ssize_t rsize ; (rsize = pread(fd,rbuf,rsz,sz)) < 0) {
 	    rs = (- errno) ;
+	} else {
+	    rs = intsat(rsize) ;
 	}
 	return rs ;
 }
@@ -650,8 +652,10 @@ int uregular::ipread(int fd) noex {
 int uregular::ipwrite(int fd) noex {
 	csize		wsz = size_t(wlen) ;
 	int		rs ;
-	if ((rs = pwrite(fd,wbuf,wsz,sz)) < 0) {
+	if (ssize_t rsize ; (rsize = pwrite(fd,wbuf,wsz,sz)) < 0) {
 	    rs = (- errno) ;
+	} else {
+	    rs = intsat(rsize) ;
 	}
 	return rs ;
 }
@@ -660,7 +664,7 @@ int uregular::ipwrite(int fd) noex {
 int uregular::iread(int fd) noex {
 	csize		rsz = size_t(rlen) ;
 	int		rs ;
-	if ((rs = read(fd,rbuf,rsz)) < 0) {
+	if (ssize_t rsize ; (rsize = read(fd,rbuf,rsz)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
@@ -670,8 +674,10 @@ int uregular::iread(int fd) noex {
 int uregular::ireadv(int fd) noex {
 	IOVEC		*riop = const_cast<IOVEC *>(iop) ;
 	int		rs ;
-	if ((rs = readv(fd,riop,n)) < 0) {
+	if (ssize_t rsize ; (rsize = readv(fd,riop,n)) < 0) {
 	    rs = (- errno) ;
+	} else {
+	    rs = intsat(rsize) ;
 	}
 	return rs ;
 }
@@ -680,8 +686,10 @@ int uregular::ireadv(int fd) noex {
 int uregular::iwrite(int fd) noex {
 	csize		wsz = size_t(wlen) ;
 	int		rs ;
-	if ((rs = write(fd,wbuf,wsz)) < 0) {
+	if (ssize_t rsize ; (rsize = write(fd,wbuf,wsz)) < 0) {
 	    rs = (- errno) ;
+	} else {
+	    rs = intsat(rsize) ;
 	}
 	return rs ;
 }
@@ -689,8 +697,10 @@ int uregular::iwrite(int fd) noex {
 
 int uregular::iwritev(int fd) noex {
 	int		rs ;
-	if ((rs = writev(fd,iop,n)) < 0) {
+	if (ssize_t rsize ; (rsize = writev(fd,iop,n)) < 0) {
 	    rs = (- errno) ;
+	} else {
+	    rs = intsat(rsize) ;
 	}
 	return rs ;
 }
