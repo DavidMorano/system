@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	bprintcleanlns
+
+	Description:
 	This subroutine prints out a cleaned up line of text.
 
 *******************************************************************************/
@@ -69,7 +73,7 @@ static int	bprintcleanliner(bfile *,int,cchar *,int) noex ;
 
 /* local variables */
 
-constexpr bool	f_linefold = CF_LINEFOLD ;
+const bool	f_linefold = CF_LINEFOLD ;
 
 
 /* exported variables */
@@ -101,11 +105,10 @@ int bprintcleanlns(bfile *op,int linelen,cchar *lp,int ll) noex {
 /* local subroutines */
 
 static int bprintfold(bfile *op,int linelen,cchar *lp,int ll) noex {
-	linefold	lf ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = lf.start(linelen,0,lp,ll)) >= 0) {
+	if (linefold lf ; (rs = lf.start(linelen,0,lp,ll)) >= 0) {
 	    int		sl ;
 	    cchar	*sp ;
 	    for (int i = 0 ; (sl = lf.getln(i,&sp)) >= 0 ; i += 1) {

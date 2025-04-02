@@ -82,7 +82,7 @@ static int	bwritebuf(bfile *,cchar *,int) noex ;
 
 constexpr char		blanks[] = "        " ;
 
-constexpr int		nblanks = strlen(blanks) ;
+constexpr int		nblanks = cstrlen(blanks) ;
 
 
 /* exported variables */

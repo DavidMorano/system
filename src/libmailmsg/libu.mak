@@ -35,6 +35,8 @@ DEFS +=
 
 INCS += libu.h
 
+MODS += valuelims.o digbufsizes.o uvariables.o
+
 LIBS += -liconv
 
 
@@ -327,26 +329,26 @@ xxtostr.o:		xxtostr.cc xxtostr.h		$(INCS)
 
 strnul.o:		strnul.cc strnul.hh		$(INCS)
 
-# DIGBUFSIZES
-digbufsizes.o:		digbufsizes.ccm			$(INCS)
-	makemodule digbufsizes
-
 # VALUELIMS
 valuelims.o:		valuelims.ccm			$(INCS)
 	makemodule valuelims
+
+# DIGBUFSIZES
+digbufsizes.o:		digbufsizes.ccm valuelims.o
+	makemodule digbufsizes
 
 # UVARIABLES
 uvariables.o:		uvariables0.o uvariables1.o
 	$(LD) -r -o $@ $(LDFLAGS) uvariables0.o uvariables1.o
 
-uvariables0.o:		modules uvariables.ccm uvariables1.cc
+uvariables0.o:		uvariables.ccm uvariables1.cc valuelims.o digbufsizes.o
 	makemodule valuelims
 
 uvariables1.o:		uvariables.ccm uvariables1.cc 
 	makemodule uvariables
 	$(COMPILE.cc) uvariables1.cc
 
-modules:		valuelims.o digbufsizes.o	$(INCS)
+modules:		valuelims.o digbufsizes.o uvariables.o
 	touch $@
 
 

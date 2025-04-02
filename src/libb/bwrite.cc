@@ -116,7 +116,7 @@ int bwrite(bfile *op,cvoid *abuf,int alen) noex {
 /* end subroutine (bwrite) */
 
 int bfile_write(bfile *op,cvoid *abuf,int alen) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	cchar		*abp = charp(abuf) ;
 	if (alen < 0) alen = cstrlen(abp) ;
 	if (op->bm == bfilebm_none) {

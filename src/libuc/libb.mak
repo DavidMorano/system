@@ -66,8 +66,8 @@ OBJ06= btruncate.o
 OBJ07=
 
 OBJ08= bprintf.o bputc.o
-OBJ09= bprintcleanln.o bprintcleanlns.o 
-OBJ10= bprintln.o bprintlns.o 
+OBJ09= bprintln.o bprintlns.o 
+OBJ10= bprintcleanln.o bprintcleanlns.o 
 OBJ11=
 
 OBJ12= bread.o breadln.o breadlns.o bgetc.o 
@@ -83,7 +83,7 @@ OBJD= obj12.o obj13.o
 OBJ= obja.o objb.o objc.o objd.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -108,6 +108,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).so:		$(OBJ) Makefile
@@ -135,52 +138,52 @@ control:
 
 
 obj00.o:		$(OBJ00)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ00)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ00)
 
 obj01.o:		$(OBJ01)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ01)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ01)
 
 obj02.o:		$(OBJ02)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ02)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ02)
 
 obj03.o:		$(OBJ03)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ03)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ03)
 
 obj04.o:		$(OBJ04)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ04)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ04)
 
 obj05.o:		$(OBJ05)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ05)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ05)
 
 obj06.o:		$(OBJ06)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ06)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ06)
 
 obj07.o:		$(OBJ07)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ07)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ07)
 
 obj08.o:		$(OBJ08)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ08)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ08)
 
 obj09.o:		$(OBJ09)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ09)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ09)
 
 obj10.o:		$(OBJ10)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ10)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ10)
 
 obj11.o:		$(OBJ11)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ11)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ11)
 
 obj12.o:		$(OBJ12)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ12)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ12)
 
 obj13.o:		$(OBJ13)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ13)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ13)
 
 obj14.o:		$(OBJ14)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ14)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ14)
 
 obj15.o:		$(OBJ15)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ15)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ15)
 
 
 obja.o:			$(OBJA)
@@ -208,8 +211,6 @@ bopenrcmd.o:		bopenrcmd.cc		$(INCS)
 bopenremote.o:		bopenremote.cc		$(INCS)
 bopensched.o:		bopensched.cc		$(INCS)
 bopentmp.o:		bopentmp.cc		$(INCS)
-bprintf.o:		bprintf.cc		$(INCS)
-bprintline.o:		bprintline.cc		$(INCS)
 bputc.o:		bputc.cc		$(INCS)
 bread.o:		bread.cc		$(INCS)
 breadln.o:		breadln.cc		$(INCS)
@@ -222,6 +223,9 @@ bwrite.o:		bwrite.cc		$(INCS)
 bwriteblock.o:		bwriteblock.cc		$(INCS)
 bwritefile.o:		bwritefile.cc		$(INCS)
 bwriteblanks.o:		bwriteblanks.cc		$(INCS)
+bprintf.o:		bprintf.cc		$(INCS)
+bprintln.o:		bprintln.cc		$(INCS)
+bprintlns.o:		bprintlns.cc		$(INCS)
 bprintcleanline.o:	bprintcleanline.cc	$(INCS)
 bprintcleanlines.o:	bprintcleanlines.cc	$(INCS)
 brewind.o:		brewind.cc		$(INCS)

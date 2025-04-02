@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	bprintcleanln
+
+	Description:
 	This subroutine prints out a cleaned up line of text.
 
 *******************************************************************************/
@@ -65,9 +69,8 @@ int bprintcleanln(bfile *op,cchar *lp,int ll) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = bfile_magic(op,lp)) > 0) {
-	    linebuffer	lo ;
 	    cint	rl = rmeol(lp,ll) ;
-	    if ((rs = lo.start) >= 0) {
+	    if (linebuffer lo ; (rs = lo.start) >= 0) {
 		if ((rs = snclean(lo.lbuf,lo.llen,lp,rl)) >= 0) {
 	            rs = bprintln(op,lo.lbuf,rs) ;
 		    wlen = rs ;

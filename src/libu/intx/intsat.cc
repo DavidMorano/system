@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	intsat
+
+	Description:
 	We provide some saturated add operations.
 
 *******************************************************************************/
@@ -25,6 +29,7 @@
 #include	<climits>		/* |INT_MIN| + |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<stdintx.h>
 #include	<localmisc.h>
 
 #include	"intsat.h"
@@ -62,6 +67,14 @@ int intsatx(T v) noex {
 }
 /* end subroutine-template (intsatx) */
 
+template<typename UT>
+int intsatux(UT v) noex {
+	UT	im = UT(INT_MAX) ;
+	if (v > im) v = im ;
+	return int(v) ;
+}
+/* end subroutine-template (intsatux) */
+
 
 /* exported variables */
 
@@ -81,27 +94,19 @@ int intsatll(longlong v) noex {
 }
 
 int intsatui(uint v) noex {
-	uint		im = uint(INT_MAX) ;
-	if (v > im) v = im ;
-	return int(v) ;
+    	return intsatux(v) ;
 }
 
 int intsatul(ulong v) noex {
-	ulong		im = ulong(INT_MAX) ;
-	if (v > im) v = im ;
-	return int(v) ;
+    	return intsatux(v) ;
 }
 
 int intsats(size_t v) noex {
-	size_t		im = size_t(INT_MAX) ;
-	if (v > im) v = im ;
-	return int(v) ;
+    	return intsatux(v) ;
 }
 
 int intsatull(ulonglong v) noex {
-	ulonglong	im = ulonglong(INT_MAX) ;
-	if (v > im) v = im ;
-	return int(v) ;
+    	return intsatux(v) ;
 }
 
 
