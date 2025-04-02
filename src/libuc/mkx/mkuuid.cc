@@ -37,6 +37,19 @@
 	>=0		OK
 	<0		error (system-return)
 
+	Notes:
+	There are bugs in all compilers.  I try to stay calm (as
+	mush as possible) when I come across one (bug).  The GCC
+	compiler when invoked to flag narrowing conversions
+	(conversions that may lose precision or otherwise change a
+	value) falsely does not allow (flags as a porlbme) any
+	attempt to assign a value to an unsigned bit field to the
+	structure 'uuid_dat' member field 'version'.  I had to
+	actually change the bit-field member variable to type 'uchar'
+	in order to get a clean compile.  F*ck GCC!  Why this happend
+	here in the previously present circumstances is anybody's
+	guess.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -45,7 +58,6 @@
 #include	<climits>		/* |UINT_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>		/* <- for |memclear| */
 #include	<mallocxx.h>
 #include	<getnodename.h>
@@ -120,9 +132,10 @@ int mkuuid(uuid_dat *up,int ver) noex {
 int mkuu::operator () (int ver) noex {
 	cint		rsz = (NWORDS * szof(uint)) ;
 	int		rs ;
+	if (ver <= 0) ver = UUID_VERSION ;
 	memclear(up) ;
 	if ((rs = getrand(rwords,rsz)) >= 0) {
-	    up->version = (ver > 0) ? ver : UUID_VERSION ;
+	    up->version = uchar(ver) ;
 	    for (cauto &m : mems) {
 		rs = (this->*m)() ;
 		if (rs < 0) break ;
@@ -159,7 +172,7 @@ int mkuu::mkuuclk() noex {
 	    v = rwords[rwi++] ;
 	    v >>= 16 ;
 	}
-	up->clk = v ;
+	up->clk = ushort(v) ;
 	return 0 ;
 }
 /* end method (mkuu::mkuuclk) */

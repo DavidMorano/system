@@ -29,7 +29,7 @@ struct uuid_data {
 	uint64_t	time ;		/* 60-bits */
 	uint64_t	node ;		/* 48-bits */
 	uint16_t	clk ;		/* 14 (or 13¹) bits */
-	uint		version:4 ;	/* 4-bits */
+	uint8_t		version ;	/* 4-bits */
 } ;
 
 /* Note ¹: Micro$oft used 13 bits in the past (we always use 14 bits) */

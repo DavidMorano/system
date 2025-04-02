@@ -423,7 +423,7 @@ static int subinfo_domain(SI *sip,char *rbuf,int rlen) noex {
 	    sip->domain = getenv(vn) ;
 	}
 	if (sip->domain && sip->domain[0]) {
-	    int		dnl = strlen(sip->domain) ;
+	    int		dnl = cstrlen(sip->domain) ;
 	    cchar	*dnp = sip->domain ;
 	    while ((dnl > 0) && (dnp[dnl-1] == '.')) dnl -= 1 ;
 	    if (dnl > 0) {

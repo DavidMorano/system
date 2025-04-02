@@ -114,7 +114,7 @@ int mkvarpath(char *rbuf,cchar *fp,int fl) noex {
 	int		pl = 0 ;
 	if (rbuf && fp) {
             rbuf[0] = '\0' ;
-            if (fl < 0) fl = strlen(fp) ;
+            if (fl < 0) fl = cstrlen(fp) ;
             if ((fp[0] == ec) || ((fp[0] == '/') && fl && (fp[1] == ec))) {
                 int         vl = (fl - 1) ;
                 cchar       *vp = (fp + 1) ;
@@ -126,15 +126,14 @@ int mkvarpath(char *rbuf,cchar *fp,int fl) noex {
                     vl -= 1 ;
                 }
                 if ((tp = strnchr(vp,vl,'/')) != nullptr) {
-                    vl = (tp-vp) ;
+                    vl = intconv(tp - vp) ;
                     rp = tp ;
                 }
                 if (vl > 0) {
                     char    *vbuf = nullptr ; /* writable (will be) */
                     if ((cp = getenver(vp,vl)) == nullptr) {
                         if (haslc(vp,vl)) {
-                            char    *p ;
-                            if ((rs = uc_malloc((vl+1),&p)) >= 0) {
+                            if (char *p ; (rs = uc_malloc((vl+1),&p)) >= 0) {
                                 vbuf = p ;
                                 strwcpyuc(vbuf,vp,vl) ;
                                 cp = getenver(vbuf,vl) ;
@@ -179,9 +178,8 @@ static int mkvarpath_list(char *rbuf,cchar *pathlist,cchar *rp) noex {
 	    int		sl ;
 	    int		f_zero = false ;
 	    cchar	*sp = pathlist ;
-	    cchar	*tp ;
-	    while ((tp = strchr(sp,':')) != nullptr) {
-	        sl = (tp-sp) ;
+	    for (cchar *tp ; (tp = strchr(sp,':')) != nullptr ; ) {
+	        sl = intconv(tp - sp) ;
 	        if (sl || (! f_zero)) {
 	            if ((! f_zero) && (sl == 0)) f_zero = true ;
 	            rs = mkvarpath_one(rbuf,&paths,sp,sl,rp) ;
@@ -189,7 +187,7 @@ static int mkvarpath_list(char *rbuf,cchar *pathlist,cchar *rp) noex {
 	        }
 	        sp = (tp+1) ;
 	        if (((rs >= 0) && (pl > 0)) || (! isNotPresent(rs))) break ;
-	    } /* end while */
+	    } /* end for */
 	    if ((rs >= 0) && (pl == 0) && ((sp[0] != '\0') || (! f_zero))) {
 	        rs = mkvarpath_one(rbuf,&paths,sp,-1,rp) ;
 	        pl = rs ;
@@ -206,7 +204,7 @@ static int mkvarpath_one(char *rbuf,vecstr *plp,cc *sp,int sl,cc *rp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = cstrlen(sp) ;
 	if ((rs = vecstr_findn(plp,sp,sl)) == rsn) {
 	    if ((rs = vecstr_add(plp,sp,sl)) >= 0) {
 	        USTAT	sb ;
