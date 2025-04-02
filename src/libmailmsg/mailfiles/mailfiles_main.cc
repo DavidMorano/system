@@ -182,14 +182,15 @@ int mailfiles_addpath(MF *op,cchar *sp,int sl) noex {
 	int		n = 0 ;
 	if ((rs = mailfiles_magic(op,sp)) >= 0) {
 	    if (cchar *tp ; (tp = strnrchr(sp,sl,'?')) != np) {
-	        sl -= ((sp + sl) - tp) ;
+	        sl -= intconv((sp + sl) - tp) ;
 	    }
 	    for (cc *tp ; (tp = strnchr(sp,sl,':')) != np ; ) {
 		if ((tp - sp) > 0) {
-	            rs = mailfiles_add(op,sp,(tp - sp)) ;
+		    cint	ll = intconv(tp - sp) ;
+	            rs = mailfiles_add(op,sp,ll) ;
 	    	    n += (rs < INT_MAX) ;
 		}
-	        sl -= ((tp + 1) - sp) ;
+	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 		if (rs < 0) break ;
 	    } /* end for */
@@ -206,8 +207,7 @@ int mailfiles_get(MF *op,int i,MF_ENT **epp) noex {
 	int		rs ;
 	if ((rs = mailfiles_magic(op,epp)) >= 0) {
 	    vecobj	*elp = op->elp ;
-	    void	*vp ;
-	    if ((rs = elp->get(i,&vp)) >= 0) {
+	    if (void *vp ; (rs = elp->get(i,&vp)) >= 0) {
 		*epp = (MF_ENT *) vp ;
 	    }
 	} /* end if (magic) */

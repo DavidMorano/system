@@ -88,7 +88,8 @@ int mailfiles_parse(mailfiles *op,cchar *mailpath) noex {
 	    cchar	*cp = mailpath ;
 	    for (cc *tp ; (tp = strpbrk(cp,":?")) != np ; ) {
 		if ((tp - cp) >= 0) {
-	            rs = mailfiles_add(op,cp,(tp - cp)) ;
+		    cint	cl = intconv(tp - cp) ;
+	            rs = mailfiles_add(op,cp,cl) ;
 		    c += (rs < INT_MAX) ;
 	            if (*tp == '?') fdone = true ;
 		}
