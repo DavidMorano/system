@@ -838,7 +838,7 @@ local int mbcache_msgscanmk(mbcache *op,int mi) noex {
 	            strwcpyblanks(bp,sl) ;
 	            for (int i = 0 ; scantitles[i].name ; i += 1) {
 	                cchar	*cp = scantitles[i].name ;
-	                cint	cl = strlen(cp) ;
+	                cint	cl = cstrlen(cp) ;
 	                tcol = scantitles[i].col ;
 	                strncpy((bp + tcol),cp,cl) ;
 	            } /* end for */
@@ -1347,7 +1347,7 @@ local int headappend(cchar **pp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		cl = 0 ;
 	if (*pp) {
-	    cint	cl2 = strlen(*pp) ;
+	    cint	cl2 = cstrlen(*pp) ;
 	    cl = sl + cl2 + 2 ;
 	    if (char *cp ; (rs = uc_malloc(cl,&cp)) >= 0) {
 	        char	*cp2 = strwcpy(cp,*pp,cl2) ;

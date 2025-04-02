@@ -65,7 +65,7 @@ int ema_haveaddr(ema *op,cchar *ap,int al) noex {
 	int		f = false ;
 	if (op && ap) {
 	    ema_ent	*ep{} ;
-	    if (al < 0) al = strlen(ap) ;
+	    if (al < 0) al = cstrlen(ap) ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; (rs1 = ema_get(op,i,&ep)) >= 0 ; i += 1) {
 	        int	cl = 0 ;

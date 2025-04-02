@@ -140,7 +140,7 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	int		n = 0 ;
 	if ((rs = splitaddr_ctor(op,ap)) >= 0) {
 	    if ((rs = vechand_start(op->comp,nents,0)) >= 0) {
-	        int	al = strlen(ap) ;
+	        int	al = cstrlen(ap) ;
 	        while (al && (ap[al-1] == '.')) {
 		    al -= 1 ;
 	        }

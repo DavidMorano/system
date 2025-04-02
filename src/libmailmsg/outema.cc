@@ -173,7 +173,7 @@ int outema_item(outema *op,cchar *vp,int vl) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = outema_magic(op)) >= 0) {
-	    if (vl < 0) vl = strlen(vp) ;
+	    if (vl < 0) vl = cstrlen(vp) ;
 	    if (vl > 0) {
 	        bool	f_prevcomma = op->f.comma ;
 	        op->f.comma = true ;
@@ -197,7 +197,7 @@ int outema_value(outema *op,cchar *vp,int vl) noex {
 	        bool	f_comma = false ;
 	        cchar	*fmt ;
 	        cchar	*tp, *cp ;
-	        if (vl < 0) vl = strlen(vp) ;
+	        if (vl < 0) vl = cstrlen(vp) ;
 	        op->c_values = 0 ;
 	        while ((rs >= 0) && (vl > 0)) {
 	            if ((cl = sfnextqtok(vp,vl,&cp)) > 0) {
@@ -250,7 +250,7 @@ int outema_write(outema *op,cchar *v,int vlen) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = outema_magic(op)) >= 0) {
-	    if (vlen < 0) vlen = strlen(v) ;
+	    if (vlen < 0) vlen = cstrlen(v) ;
 	    if (vlen > 0) {
 	        rs = filer_write(op->ofp,v,vlen) ;
 	        wlen += rs ;

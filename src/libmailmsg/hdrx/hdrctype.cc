@@ -71,7 +71,7 @@ int hdrctype_decode(hdrctype *op,cchar *hp,int hl) noex {
 	    cchar	*cp ;
 	    cchar	*tp ;
 	    rs = memclear(hop) ;
-	    if (hl < 0) hl = strlen(hp) ;
+	    if (hl < 0) hl = cstrlen(hp) ;
 /* ignore any parameters */
 	    if ((tp = strnchr(hp,hl,';')) != nullptr) {
 	        hl = ((hp+hl) - tp) ;

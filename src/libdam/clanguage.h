@@ -33,6 +33,10 @@
 #endif
 #endif /* noex */
 
+#ifndef	intconv
+#define	intconv			int
+#endif
+
 #ifdef	__cplusplus
 #ifndef	restruct
 #define	restrict		__restrict__

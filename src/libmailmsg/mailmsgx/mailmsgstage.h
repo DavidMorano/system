@@ -83,7 +83,7 @@ extern int mailmsgstage_hdrikey(mailmsgstage *,int,int,cchar **) noex ;
 extern int mailmsgstage_hdriline(mailmsgstage *,int,cc *,int,int,cc **) noex ;
 extern int mailmsgstage_hdrival(mailmsgstage *,int,cchar *,int,cchar **) noex ;
 extern int mailmsgstage_hdrval(mailmsgstage *,int,cchar *,cchar **) noex ;
-extern int mailmsgstage_flags(mailmsgstage *,int) noex ;
+extern int mailmsgstage_getfl(mailmsgstage *,int) noex ;
 extern int mailmsgstage_finish(mailmsgstage *) noex ;
 
 EXTERNC_end

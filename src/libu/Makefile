@@ -314,7 +314,6 @@ usysop.o:		usysop.cc usysop.h		$(INCS)
 ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
 uexec.o:		uexec.cc uexec.h		$(INCS)
 uinet.o:		uinet.cc uinet.h		$(INCS)
-uvariables.o:		uvariables.cc uvariables.hh modules	$(INCS)
 uiconv.o:		uiconv.cc uiconv.h		$(INCS)
 
 syswords.o:		syswords.cc syswords.hh		$(INCS)
@@ -335,6 +334,17 @@ digbufsizes.o:		digbufsizes.ccm			$(INCS)
 # VALUELIMS
 valuelims.o:		valuelims.ccm			$(INCS)
 	makemodule valuelims
+
+# UVARIABLES
+uvariables.o:		uvariables0.o uvariables1.o
+	$(LD) -r -o $@ $(LDFLAGS) uvariables0.o uvariables1.o
+
+uvariables0.o:		modules uvariables.ccm uvariables1.cc
+	makemodule valuelims
+
+uvariables1.o:		uvariables.ccm uvariables1.cc 
+	makemodule uvariables
+	$(COMPILE.cc) uvariables1.cc
 
 modules:		valuelims.o digbufsizes.o	$(INCS)
 	touch $@

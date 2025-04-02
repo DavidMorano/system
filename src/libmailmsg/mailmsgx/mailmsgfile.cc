@@ -49,7 +49,6 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<getbufsize.h>
 #include	<sysval.hh>
 #include	<mallocxx.h>
@@ -70,8 +69,8 @@
 #include	<rmx.h>
 #include	<cfdec.h>
 #include	<char.h>
+#include	<varnames.hh>
 #include	<localmisc.h>		/* |COLUMNS| + |NTABCOLS| */
-#include	<exitcodes.h>
 
 #include	"mailmsgfile.h"
 
@@ -86,10 +85,6 @@
 #define	MMF			mailmsgfile
 #define	MMF_MI			mailmsgfile_mi
 #define	MMF_CD			mailmsgfile_checkdat
-
-#ifndef	VARCOLUMNS
-#define	VARCOLUMNS	"COLUMNS"
-#endif
 
 
 /* imported namespaces */
@@ -291,7 +286,7 @@ int mailmsgfile_msginfo(MMF *op,MMF_MI **mipp,cc *msgid) noex {
 	            hdb_dat	key ;
 	            hdb_dat	val ;
 	            key.buf = msgid ;
-	            key.len = strlen(msgid) ;
+	            key.len = cstrlen(msgid) ;
 	            if ((rs = hdb_fetch(op->flp,key,np,&val)) >= 0) {
 	                *mipp = (MMF_MI *) val.buf ;
 	                vlines = (*mipp)->vlines ;
@@ -354,7 +349,7 @@ static int mailmsgfile_newx(MMF *op,cc *mid,int mfd,off_t bo,int bl) noex {
 	hdb_dat		key ;
 	hdb_dat		val ;
 	key.buf = mid ;
-	key.len = strlen(mid) ;
+	key.len = cstrlen(mid) ;
 	if ((rs = hdb_fetch(op->flp,key,nullptr,&val)) >= 0) {
 	    MMF_MI	*mip = (MMF_MI *) val.buf ;
 	    vlines = mip->vlines ;
@@ -449,8 +444,7 @@ static int mailmsgfile_mkdis(MMF *op,MMF_MI *mip,
 	int		rs ;
 	int		rs1 ;
 	int		vlines = 0 ;
-	char		*lbuf{} ;
-	if ((rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    cint	ibsize = min(blen,(op->pagesize*8)) ;
 	    int		inlen ;
@@ -596,7 +590,7 @@ static int mailmsgfile_store(MMF *op,MMF_MI *mip) noex {
 	        hdb_dat	val ;
 	        *ep = *mip ; /* copy */
 	        key.buf = ep->mid ;
-	        key.len = strlen(ep->mid) ;
+	        key.len = cstrlen(ep->mid) ;
 	        val.buf = ep ;
 	        val.len = sz ;
 	        rs = hdb_store(op->flp,key,val) ;
@@ -747,8 +741,8 @@ static int mailmsgfile_checkerxxx(MMF *op,vecpstr *flp,
 static int mi_start(MMF_MI *mip,cc *msgid,cc *mfname,int blen) noex {
 	int		rs = SR_FAULT ;
 	if (mip) {
-	    cint	milen = strlen(msgid) ;
-	    cint	mflen = strlen(mfname) ;
+	    cint	milen = cstrlen(msgid) ;
+	    cint	mflen = cstrlen(mfname) ;
 	    int		sz = 0 ;
 	    char	*bp = nullptr ;
 	    memclear(mip) ;

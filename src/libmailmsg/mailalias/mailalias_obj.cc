@@ -465,7 +465,7 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 				    bp = strwcpy(kbuf,(op->skey + ai),cl) ;
 	                	    vl = (bp - kbuf) ;
 	                         } else {
-	                             vl = strlen(op->skey + ai) ;
+	                             vl = cstrlen(op->skey + ai) ;
 	                         }
 	                         if (vbuf != nullptr) {
 	                             cl = var.mailaddrlen ;
@@ -524,7 +524,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
                                 hl = cp - keybuf ;
                             } else {
                                 hp = aname ;
-                                hl = strlen(aname) ;
+                                hl = cstrlen(aname) ;
                             } /* end if */
                             khash = hash_elf(hp,hl) ;
                             hi = hashindex(khash,op->rilen) ;
@@ -588,7 +588,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
                                 cp = strwcpy(vbuf,(op->sval + vi),cl) ;
                                 vl = (cp - vbuf) ;
                             } else {
-                                vl = strlen(op->sval + vi) ;
+                                vl = cstrlen(op->sval + vi) ;
                             }
                             /* update cursor */
                             curp->i = hi ;

@@ -89,7 +89,7 @@ int envmat(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (sp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    rs = SR_OK ;
 	    if ((sl > 5) && (sp[0] == 'F') && (sp[1] == 'r')) {
 		f = (strncmp((sp+2),"om ",3) == 0) ;

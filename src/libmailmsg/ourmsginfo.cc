@@ -110,7 +110,7 @@ int ourmsginfo_addhead(ourmsginfo *op,int w,cc *sp,int sl) noex {
 	if (op && sp) {
 	    rs = SR_INVALID ;
 	    if ((w >= 0) && (w < ourmsginfohead_overlast)) {
-		if (sl < 0) sl = strlen(sp) ;
+		if (sl < 0) sl = cstrlen(sp) ;
 		if (sl > 0) {
 		    vecstr	*vsp = (op->head + w) ;
 		    /* is the vector for this header initialized? */

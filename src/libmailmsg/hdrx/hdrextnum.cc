@@ -114,7 +114,7 @@ int hdrextnum(cchar *sp,int sl) noex {
 int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	int		rs ;
 	int		vl = 0 ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = cstrlen(sp) ;
 	/* skip over any leading white space */
 	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;

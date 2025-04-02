@@ -140,9 +140,16 @@ objb.o:			$(OBJB)
 mailmsgatt.o:		mailmsgatt.cc		mailmsgatt.h		$(INCS)
 mailmsgattent.o:	mailmsgattent.cc	mailmsgattent.h		$(INCS)
 mailmsgfile.o:		mailmsgfile.cc		mailmsgfile.h		$(INCS)
+mailmsgfile.o:		modules
 mailmsgfrom.o:		mailmsgfrom.cc		mailmsgfrom.h		$(INCS)
 mailmsgheadkey.o:	mailmsgheadkey.cc	mailmsgheadkey.h	$(INCS)
 mailmsgstage.o:		mailmsgstage.cc		mailmsgstage.h		$(INCS)
 mailmsgviewer.o:	mailmsgviewer.cc	mailmsgviewer.h		$(INCS)
+
+modules:		valuelims.o digbufsizes.o
+
+valuelims.o:		
+
+digbufsizes.o:
 
 

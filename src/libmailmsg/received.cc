@@ -147,7 +147,7 @@ int received_start(received *op,cchar *hbuf,int hlen) noex {
 	int		c = 0 ;
 	if (op && hbuf) {
 	    memclear(hop) ;
-	    if (hlen < 0) hlen = strlen(hbuf) ;
+	    if (hlen < 0) hlen = cstrlen(hbuf) ;
 	    /* prepare a MHCOM object for comment parsing */
 	    if (mhcom com ; (rs = com.start(hbuf,hlen)) >= 0) {
 	        if (cchar *sp ; (rs = com.getval(&sp)) > 0) {
@@ -197,7 +197,7 @@ int received_getkey(received *op,int ki,cchar **rpp) noex {
 	        rs = SR_NOENT ;
 	        if ((ki >= 0) && (ki < received_keyoverlast)) {
 		    rs = SR_OK  ;
-		    cl = (op->key[ki]) ? strlen(op->key[ki]) : 0 ;
+		    cl = (op->key[ki]) ? cstrlen(op->key[ki]) : 0 ;
 		    if (rpp) {
 	    		*rpp = op->key[ki] ;
 		    }

@@ -550,7 +550,7 @@ int mailbox_readln(mailbox *op,MAILBOX_READ *curp,char *lbuf,int llen) noex {
 	            while (bp < lastp) {
 	                if ((*lbp++ = *bp++) == '\n') break ;
 	            } /* end while */
-	            i = (bp - curp->rbp) ;
+	            i = intconv(bp - curp->rbp) ;
 	        } /* end block */
 	        curp->rbp += i ;
 	        tlen += i ;
@@ -571,12 +571,13 @@ int mailbox_readln(mailbox *op,MAILBOX_READ *curp,char *lbuf,int llen) noex {
 static int mailbox_opener(mailbox *op,cc *mbfname,int of) noex {
 	int		rs ;
 	int		nmsgs = 0 ;
-	if ((rs = uc_open(mbfname,of,0666)) >= 0) {
+	cmode		om = 0666 ;
+	if ((rs = uc_open(mbfname,of,om)) >= 0) {
 	    op->mfd = rs ;
 	    if (USTAT sb ; (rs = u_fstat(op->mfd,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
 		    cchar	*fn = mbfname ;
-	            op->mblen = uint(sb.st_size) ;
+	            op->mblen = intsat(sb.st_size) ;
 	            op->ti_mod = sb.st_mtime ;
 	            op->ti_check = getustime ;
 		    if (cchar *cp ; (rs = uc_mallocstrw(fn,-1,&cp)) >= 0) {
@@ -588,7 +589,6 @@ static int mailbox_opener(mailbox *op,cc *mbfname,int of) noex {
 	                if ((rs = vecobj_start(op->mlp,es,vn,vo)) >= 0) {
 	                    cint	to = op->to_lock ;
 	                    if ((rs = uc_locktail(op->mfd,true,1,to)) >= 0) {
-	                        off_t	loff ;
 	                        if ((rs = mailbox_parse(op)) >= 0) {
 	                            nmsgs = op->msgs_total ;
 	                            op->magic = MAILBOX_MAGIC ;
@@ -596,8 +596,10 @@ static int mailbox_opener(mailbox *op,cc *mbfname,int of) noex {
 	                        if (rs < 0) {
 	                            mailbox_msgfins(op) ;
 	                        }
-	                        loff = op->mblen ;
-	                        lockfile(op->mfd,F_UNLOCK,loff,0L,0) ;
+				{
+	                            coff	loff = op->mblen ;
+	                            lockfile(op->mfd,F_UNLOCK,loff,0L,0) ;
+				}
 	                    } /* end if (lock) */
 	                    if (rs < 0) {
 	                        vecobj_finish(op->mlp) ;
@@ -637,7 +639,7 @@ static int mailbox_parse(mailbox *op) noex {
 	        while ((rs = mailbox_parsemsg(op,lsp,mi)) > 0) {
 	            mi += 1 ;
 	        } /* end while */
-	        op->mblen = (lsp->foff - soff) ;
+	        op->mblen = intconv(lsp->foff - soff) ;
 	        op->msgs_total = mi ;
 	        rs1 = lsp->finish ;
 	        if (rs >= 0) rs = rs1 ;
@@ -752,7 +754,7 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	            if (msgp->hoff < 0) {
 	                msgp->hoff = lsp->poff ;
 		    }
-	            msgp->hlen = (lsp->poff - msgp->hoff) ;
+	            msgp->hlen = intconv(lsp->poff - msgp->hoff) ;
 	        } /* end if */
 	        ll = 0 ;
 	        pip->f.fenv = false ;
@@ -775,7 +777,7 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	            msgp->hoff = lsp->poff ;
 		}
 	        if (msgp->hlen < 0) {
-	            msgp->hlen = (lsp->poff - msgp->hoff) ;
+	            msgp->hlen = intconv(lsp->poff - msgp->hoff) ;
 		}
 	        if (pip->f.feoh) {
 	            msgp->boff = lsp->foff ;
@@ -788,19 +790,21 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	            rs = lsp->adv(msgp->clen) ;
 	        } else {
 	            int		linemax = INT_MAX ;
-	            if (op->f.useclines && 
-	                msgp->hdrval.clines && (msgp->clines >= 0)) {
+		    bool	f = op->f.useclines ;
+		    f = f || msgp->hdrval.clines ;
+		    f = f || (msgp->clines >= 0) ;
+		    if (f) {
 	                linemax = msgp->clines ;
 		    }
 	            pip->f.fbol = true ;
 	            clines = 0 ;
 		    auto getln = [&clines,&linemax,&lsp] (cchar **lpp) noex { 
-			int	rs = SR_OK ;
+			int	rsl = SR_OK ; /* XXX GCC "shadow" complaint */
 			if (clines < linemax) {
-	                    rs = lsp->getln(lpp) ;
+	                    rsl = lsp->getln(lpp) ;
 			}
-			return rs ;
-		    } ;
+			return rsl ;
+		    } ; /* end lambda (getln) */
 		    while ((rs >= 0) && ((rs = getln(&lp)) > 0)) {
 	                ll = rs ;
 	                pip->f.feol = (lp[ll-1] == '\n') ;
@@ -823,7 +827,7 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	                    msgp->clines = clines ;
 	                }
 	            }
-	            clen = (lsp->poff - msgp->boff) ;
+	            clen = intconv(lsp->poff - msgp->boff) ;
 	        } /* end if (advancing to end-of-message) */
 	        if (rs >= 0) {
 		    if (msgp->clen < 0) {
@@ -831,11 +835,11 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 		    }
 	            if (! msgp->f.blen) {
 	                msgp->f.blen = true ;
-	                msgp->blen = (lsp->poff - msgp->boff) ;
+	                msgp->blen = intconv(lsp->poff - msgp->boff) ;
 	            } /* end if (blen) */
 	            if (! msgp->f.mlen) {
 	                msgp->f.mlen = true ;
-	                msgp->mlen = (lsp->poff - msgp->moff) ;
+	                msgp->mlen = intconv(lsp->poff - msgp->moff) ;
 	            } /* end if (mlen) */
 	        } /* end if (ok) */
 	    } /* end if (ok) */
@@ -1031,7 +1035,7 @@ static int mailbox_rewriter(mailbox *op,int tfd) noex {
 	    if (rs >= 0) {
 		/* extend the mailbox file if necessary (rarely happens?) */
 	        if ((op->mblen + elen) < (mbchange + wlen)) {
-	            rs1 = (mbchange + wlen) - (op->mblen + elen) ;
+	            rs1 = intconv(mbchange + wlen) - (op->mblen + elen) ;
 	            rs = writeblanks(mfd,rs1) ;
 	        } /* end if */
 		/* copy adjusted data back to the mailbox file */
@@ -1077,7 +1081,7 @@ static int mailbox_msgcopy(mailbox *op,MSGCOPY *mcp,MB_MI *mip) noex {
 
 static int mailbox_msgcopyadd(mailbox *op,MSGCOPY *mcp,MB_MI *mip) noex {
 	cint		mfd = op->mfd ;
-	cint		ehlen = ((mip->hoff + mip->hlen) - mip->moff) ;
+	cint		ehlen = intconv((mip->hoff + mip->hlen) - mip->moff) ;
 	int		rs ;
 	int		wlen = 0 ;
 	int		wl = mcp->bl ;

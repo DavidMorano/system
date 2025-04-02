@@ -466,7 +466,7 @@ int mailmsgstage_hdrval(MMS *op,int mi,cchar *name,cchar **rpp) noex {
 }
 /* end subroutine (mailmsgstage_hdrval) */
 
-int mailmsgstage_flags(MMS *op,int mi) noex {
+int mailmsgstage_getfl(MMS *op,int mi) noex {
 	int		rs ;
 	int		flags = 0 ;
 	if ((rs = mailmsgstage_magic(op)) >= 0) {
@@ -483,7 +483,7 @@ int mailmsgstage_flags(MMS *op,int mi) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? flags : rs ;
 }
-/* end subroutine (mailmsgstage_flags) */
+/* end subroutine (mailmsgstage_getfl) */
 
 int mailmsgstage_bodyget(MMS *op,int mi,off_t boff,cchar **bpp) noex {
 	int		rs = SR_OK ;
@@ -501,7 +501,7 @@ int mailmsgstage_bodyget(MMS *op,int mi,off_t boff,cchar **bpp) noex {
 	                    msgentry	*mep = msgentryp(vp) ;
 	                    if (boff < mep->blen) {
 	                        off_t	moff = (mep->boff + boff) ;
-	                        ml = (mep->blen - boff) ;
+	                        ml = intconv(mep->blen - boff) ;
 	                        if (bpp) {
 	                            *bpp = (op->mapdata + moff) ;
 				}

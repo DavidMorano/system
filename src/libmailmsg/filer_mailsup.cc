@@ -92,7 +92,7 @@ int filer_writehdr(filer *fbp,cchar *sp,int sl) noex {
 	    int		kl ;
 	    int		vl = -1 ;
 	    cchar	*vp = nullptr ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    kl = sl ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
 	        kl = (tp - sp) ;
@@ -141,7 +141,7 @@ int filer_printlncont(filer *fbp,int leader,cchar *sp,int sl) noex {
 	int		wlen = 0 ;
 	if (fbp && sp) {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    if (sl > 0) {
 	        char	buf[2] ;
 	        if ((rs >= 0) && (leader > 0)) {
@@ -176,7 +176,7 @@ static int filer_writehdrval(filer *fbp,cchar *vp,int vl) noex {
 	int		wlen = 0 ;
 	if (vp) {
 	    MAILMSGHDRFOLD	folder, *fp = &folder ;
-	    if (vl < 0) vl = strlen(vp) ;
+	    if (vl < 0) vl = cstrlen(vp) ;
 	    while (vl && CHAR_ISWHITE(*vp)) {
 	        vp += 1 ;
 	        vl -= 1 ;

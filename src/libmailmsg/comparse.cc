@@ -107,7 +107,7 @@ int comparse_start(comparse *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    static cint		rsv = var ;
 	    memclear(hop) ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    if ((rs = rsv) >= 0) {
 		op->mailaddrlen = var.mailaddrlen ;
 		op->mailcommlen = var.mailcommlen ;

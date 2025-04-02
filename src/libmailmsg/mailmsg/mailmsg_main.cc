@@ -294,7 +294,7 @@ int mailmsg_finish(mailmsg *op) noex {
 int mailmsg_loadline(mailmsg *op,cchar *lp,int ll) noex {
 	int		rs ;
 	if ((rs = mailmsg_magic(op,lp)) >= 0) {
-	    if (ll < 0) ll = strlen(lp) ;
+	    if (ll < 0) ll = cstrlen(lp) ;
 	    while ((ll > 0) && ISEND(lp[ll-1])) {
 	        ll -= 1 ;
 	    }
@@ -393,7 +393,7 @@ int mailmsg_hdrcount(mailmsg *op,cchar *name) noex {
 	    cchar	*hp = name ;
 	    char	hbuf[HDRNAMELEN + 1] ;
 	    if (hasuc(name,-1)) {
-	        hl = strwcpylc(hbuf,name,hlen) - hbuf ;
+	        hl = intconv(strwcpylc(hbuf,name,hlen) - hbuf) ;
 	        hp = hbuf ;
 	    }
 	    if ((rs = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
@@ -438,7 +438,7 @@ int mailmsg_hdriline(mailmsg *op,cchar *name,int hi,int li,cchar **rpp) noex {
 	    cchar	*hp = name ;
 	    char	hbuf[HDRNAMELEN + 1] ;
 	    if (hasuc(name,-1)) {
-	        hl = strwcpylc(hbuf,name,hlen) - hbuf ;
+	        hl = intconv(strwcpylc(hbuf,name,hlen) - hbuf) ;
 	        hp = hbuf ;
 	    }
 	    if ((rs = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
@@ -465,7 +465,7 @@ int mailmsg_hdrival(mailmsg *op,cchar *name,int hi,cchar **rpp) noex {
 	    cchar	*hp = name ;
 	    char	hbuf[HDRNAMELEN + 1] ;
 	    if (hasuc(name,-1)) {
-	        hl = strwcpylc(hbuf,name,hlen) - hbuf ;
+	        hl = intconv(strwcpylc(hbuf,name,hlen) - hbuf) ;
 	        hp = hbuf ;
 	    }
 	    if ((rs = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
@@ -492,7 +492,7 @@ int mailmsg_hdrval(mailmsg *op,cchar *name,cchar **rpp) noex {
 	    cchar	*hp = name ;
 	    char	hbuf[HDRNAMELEN + 1] ;
 	    if (hasuc(name,-1)) {
-	        hl = strwcpylc(hbuf,name,hlen) - hbuf ;
+	        hl = intconv(strwcpylc(hbuf,name,hlen) - hbuf) ;
 	        hp = hbuf ;
 	    }
 	    if ((rs = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
@@ -586,7 +586,7 @@ static int mailmsg_hdrend(mailmsg *op) noex {
 }
 /* end subroutine (mailmsg_hdrend) */
 
-static int mailmsg_hdraddnew(mailmsg *op,cc *hp,int hl,cc *vp,int vl) noex {
+static int mailmsg_hdraddnew(mailmsg *op,cc *hp,int hl,cc *valp,int vall) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (hl != 0) {
@@ -599,17 +599,16 @@ static int mailmsg_hdraddnew(mailmsg *op,cc *hp,int hl,cc *vp,int vl) noex {
 	        strwcpylc(hbuf,hp,hl) ;
 	        hp = hbuf ;
 	    }
-	    if ((cl = sfshrink(vp,vl,&cp)) >= 0) {
+	    if ((cl = sfshrink(valp,vall,&cp)) >= 0) {
 	        MMHNAME	*hnp ;
 	        if ((rs1 = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
 	            op->lastname = rs1 ;
 	            rs = msghdrname_addnew(hnp,cp,cl) ;
 	        } else {
 		    vecobj	*nlp = op->hlp ;
-	            void	*p ;
-	            if ((rs = vecobj_addnew(nlp,&p)) >= 0) {
-	                MMHNAME	*hnp = (MMHNAME *) p ;
+	            if (void *p ; (rs = vecobj_addnew(nlp,&p)) >= 0) {
 		        cint	i = rs ;
+	                hnp = (MMHNAME *) p ;
 	                if ((rs = msghdrname_start(hnp,hp,hl,cp,cl)) >= 0) {
 	                    op->lastname = i ;
 		        } else {
@@ -625,17 +624,16 @@ static int mailmsg_hdraddnew(mailmsg *op,cc *hp,int hl,cc *vp,int vl) noex {
 }
 /* end subroutine (mailmsg_hdraddnew) */
 
-static int mailmsg_hdraddcont(mailmsg *op,cchar *vp,int vl) noex {
+static int mailmsg_hdraddcont(mailmsg *op,cchar *valp,int vall) noex {
 	int		rs = SR_OK ;
-	if (vl > 0) {
+	if (vall > 0) {
 	    cchar	*cp{} ;
-	    if (int cl ; (cl = sfshrink(vp,vl,&cp)) > 0) {
+	    if (int cl ; (cl = sfshrink(valp,vall,&cp)) > 0) {
 		cint	ln = op->lastname ;
 		if (ln >= 0) {
-		    void	*vp{} ;
-		    if ((rs = vecobj_get(op->hlp,ln,&vp)) >= 0) {
+		    if (void *vp ; (rs = vecobj_get(op->hlp,ln,&vp)) >= 0) {
+		    	MMHNAME		*hnp = (MMHNAME *) vp ;
 	    	        if (vp) {
-		    	    MMHNAME	*hnp = (MMHNAME *) vp ;
 	        	    rs = msghdrname_addcont(hnp,cp,cl) ;
 	    	        }
 		    }
@@ -651,7 +649,7 @@ static int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,cc *hp,int hl) noex {
 	int		rs ;
 	int		i ; /* used-afterwards */
 	int		f = false ;
-	if (hl < 0) hl = strlen(hp) ;
+	if (hl < 0) hl = cstrlen(hp) ;
 	*hnpp = nullptr ;
 	void	*vp{} ;
 	for (i = 0 ; (rs = vecobj_get(op->hlp,i,&vp)) >= 0 ; i += 1) {
@@ -761,24 +759,24 @@ static int msghdrname_addnew(MMHNAME *hnp,cchar *vp,int vl) noex {
 	        hnp->lastinst = i ;
 		f = true ;
 	    } else {
-		vecobj_del(ilp,i) ;
+		ilp->del(i) ;
 	    }
 	}
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (msghdrname_addnew) */
 
-static int msghdrname_addcont(MMHNAME *hnp,cchar *vp,int vl) noex {
+static int msghdrname_addcont(MMHNAME *hnp,cchar *valp,int vall) noex {
 	int		rs = SR_OK ;
-	if (vl > 0) {
+	if (vall > 0) {
 	    cchar	*cp{} ;
-	    if (int cl ; (cl = sfshrink(vp,vl,&cp)) > 0) {
+	    if (int cl ; (cl = sfshrink(valp,vall,&cp)) > 0) {
 	        cint	li = hnp->lastinst ;
 		if (li >= 0) {
-		    void	*vp{} ;
-		    if ((rs = vecobj_get(&hnp->insts,li,&vp)) >= 0) {
+		    vecobj	*ilp = &hnp->insts ;
+		    if (void *vp ; (rs = ilp->get(li,&vp)) >= 0) {
+		    	MMHINST	*hip = (MMHINST *) vp ;
 		        if (vp) {
-		    	    MMHINST	*hip = (MMHINST *) vp ;
 	    		    rs = msghdrinst_add(hip,cp,cl) ;
 			}
 		    }
@@ -790,17 +788,17 @@ static int msghdrname_addcont(MMHNAME *hnp,cchar *vp,int vl) noex {
 /* end subroutine (msghdrname_addcont) */
 
 static int msghdrname_iline(MMHNAME *hnp,int hi,int li,cchar **rpp) noex {
+    	vecobj		*ilp = &hnp->insts ;
 	int		rs ;
-	int		vl = 0 ;
-	void		*vp{} ;
-	if ((rs = vecobj_get(&hnp->insts,hi,&vp)) >= 0) {
+	int		len = 0 ;
+	if (void *vp ; (rs = ilp->get(hi,&vp)) >= 0) {
+	    MMHINST	*hip = (MMHINST *) vp ;
 	    if (vp) {
-		MMHINST	*hip = (MMHINST *) vp ;
 	        rs = msghdrinst_ival(hip,li,rpp) ;
-	        vl = rs ;
+	        len = rs ;
 	    }
 	}
-	return (rs >= 0) ? vl : rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (msghdrname_iline) */
 
@@ -855,7 +853,7 @@ static int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 			if (rs < 0) break ;
 	            } /* end for */
 	            *bp = '\0' ;
-	            hnp->vl = (bp - hnp->vp) ;
+	            hnp->vl = intconv(bp - hnp->vp) ;
 	    } /* end if (m-a) */
 	    vl = hnp->vl ;
 	} /* end if (needed) */
@@ -948,7 +946,7 @@ static int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
 		    }
 		} /* end for */
 		*bp = '\0' ;
-		hip->vl = (bp - hip->vp) ;
+		hip->vl = intconv(bp - hip->vp) ;
 	    } /* end if (m-a) */
 	    vl = hip->vl ;
 	} /* end if (needed) */

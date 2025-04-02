@@ -117,7 +117,7 @@ int mailmsgattent_start(MME *op,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
     	MAILMSGATTENT	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && ct && nbuf) {
-	    if (nlen < 0) nlen = strlen(nbuf) ;
+	    if (nlen < 0) nlen = cstrlen(nbuf) ;
 	    rs = memclear(hop) ;
 	    op->cte = -1 ;
 	    op->clen = -1 ;
@@ -133,7 +133,7 @@ int mailmsgattent_start(MME *op,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
 	    }
 	    if (rs >= 0) {
 	       if (ct && (op->ext == nullptr) && (op->type == nullptr)) {
-	            cint	cl = strlen(ct) ;
+	            cint	cl = cstrlen(ct) ;
 		    rs = mailmsgattent_startct(op,ct,cl) ;
 	        } /* end if */
 	    } /* end if (ok) */
@@ -237,7 +237,7 @@ int mailmsgattent_type(MME *op,MT *mtp) noex {
 	                    if ((tp = strchr(typespec,'/')) != nullptr) {
 			        cchar	*cp ;
 			        vp = typespec ;
-			        vl = (tp-typespec) ;
+			        vl = intsat(tp - typespec) ;
 			        if ((rs = uc_mallocstrw((tp+1),-1,&cp)) >= 0) {
 	                            op->subtype = cp ;
 			        }
@@ -337,8 +337,8 @@ int mailmsgattent_code(MME *op,cchar *tmpdname) noex {
 	            if ((rs = mailmsgattent_analyze(op,tmpdname)) >= 0) {
 	                code = rs ;
 	                if ((code >= CE_7BIT) && (code < CE_OVERLAST)) {
-			    cchar	*enc = contentencodings[code] ;
 			    cchar	*cp ;
+			    enc = contentencodings[code] ;
 			    if ((rs = uc_mallocstrw(enc,-1,&cp)) >= 0) {
 	                        op->encoding = cp ;
 			    }
@@ -404,7 +404,7 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
                         bool     f_needaux = true ;
                         abuf[0] = '\0' ;
                         if (S_ISREG(sb.st_mode)) {
-                            op->clen = int(sb.st_size & INT_MAX) ;
+                            op->clen = intsat(sb.st_size) ;
                             f_needaux = false ;
                         }
                         if (f_needaux) {

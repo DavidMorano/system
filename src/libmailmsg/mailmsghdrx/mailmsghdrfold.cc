@@ -150,7 +150,7 @@ int mailmsghdrfold_start(MF *op,int mcols,int ln,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    rs = SR_INVALID ;
 	    if ((mcols >= 1) && (ln >= 0)) {
-		if (sl < 0) sl = strlen(sp) ;
+		if (sl < 0) sl = cstrlen(sp) ;
 	        rs = memclear(hop) ;
 	        op->mcols = mcols ;
 	        op->ln = ln ;

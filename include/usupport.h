@@ -31,6 +31,7 @@
 #include	<aflag.hh>
 #include	<strxlen.hh>
 #include	<stdintx.h>
+#include	<intx.h>
 
 
 #ifndef	TYPEDEF_MTIME

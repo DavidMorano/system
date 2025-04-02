@@ -207,7 +207,7 @@ int csro_add(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
 	    if ((rs = value_start(&ve,mailname,fname,moff)) >= 0) {
 	        vecstr	*nlp = op->nlp ;
 	        vecobj	*vlp = op->elp ;
-	        cint	nlen = strlen(mailname) ;
+	        cint	nlen = cstrlen(mailname) ;
 	        bool	f_release = false ;
 	        if ((rs = vecstr_findn(nlp,mailname,nlen)) >= 0) {
 	            if ((rs = vecobj_search(vlp,&ve,vcmpentry,np)) >= 0) {
@@ -368,9 +368,9 @@ static int value_start(VALUE *ep,cchar *mailname,cchar *fname,off_t moff) noex {
 	int		sz = 1 ;
 	memclear(ep) ;
 	ep->moff = moff ;
-	sz += (strlen(mailname)+1) ;
+	sz += (cstrlen(mailname)+1) ;
 	if (fname != nullptr) {
-	   sz += (strlen(fname)+1) ;
+	   sz += (cstrlen(fname)+1) ;
 	}
 	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    ep->mailname = bp ;

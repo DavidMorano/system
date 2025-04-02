@@ -109,7 +109,7 @@ int stackaddr_add(stackaddr *op,cchar *hp,int hl,cchar *up,int ul) noex {
                 }
                 if ((rs >= 0) && (hp != np) && (hp[0] != '\0')) {
                     cchar       *nhp ;
-                    if (hl < 0) hl = strlen(hp) ;
+                    if (hl < 0) hl = cstrlen(hp) ;
                     if (nulstr h ; (rs = h.start(hp,hl,&nhp)) >= 0) {
                         cchar   *lhp = op->lhp ;
                         int     lhl = op->lhl ;

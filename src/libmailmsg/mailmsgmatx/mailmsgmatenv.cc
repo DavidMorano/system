@@ -127,12 +127,13 @@ constexpr cpcchar	exts[] = {
 /* exported subroutines */
 
 int mailmsgmatenv(mmenvdat *mep,cchar *sp,int sl) noex {
+    	MMENVDAT	*hop = mep ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (mep && sp) {
 	    bool	f_start = true ;
-	    rs = memclear(mep) ;		/* dangerous */
-	    if (sl < 0) sl = strlen(sp) ;
+	    rs = memclear(hop) ;		/* dangerous */
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    while (sl && iseol(sp[sl-1])) sl -= 1 ;
 	    if ((sl > 0) && (*sp == '>')) {
 	        sp += 1 ;
@@ -169,9 +170,8 @@ int mailmsgmatenv(mmenvdat *mep,cchar *sp,int sl) noex {
 
 static int mmenvdat_ema(mmenvdat *mep,cchar *sp,int sl) noex {
 	int		skip = 0 ;
-	int		cl ;
 	cchar		*cp ;
-	if ((cl = sfnext(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
 	    mep->a.ep = cp ;
 	    mep->a.el = cl ;
 	    skip = ((cp+cl)-sp) ;
@@ -240,7 +240,7 @@ static int mmenvdat_datefin(mmenvdat *mep,cchar *rp,int rl) noex {
 static int mmenvdat_remote(mmenvdat *mep,cchar *sp,int sl) noex {
 	int		skip = 0 ;
 	if ((sl > 0) && (mep->rt >= 0)) {
-	    cint	el = strlen(exts[mep->rt]) ;
+	    cint	el = cstrlen(exts[mep->rt]) ;
 	    int		cl ;
 	    cchar	*cp ;
 	    sp += el ;

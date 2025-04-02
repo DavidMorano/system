@@ -101,7 +101,7 @@ int emainfo_load(emainfo *eip,cchar *sp,int sl) noex {
 	    cchar	*cp ;
 	    cchar	*cp1, *cp2 ;
 	    rs = memclear(eip) ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    /* what kind of address do we have? */
 	    if ((cp1 = strnchr(sp,sl,'@')) != nullptr) {
 	        if ((cp2 = strnchr(sp,sl,':')) != nullptr) {

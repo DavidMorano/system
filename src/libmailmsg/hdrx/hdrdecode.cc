@@ -247,7 +247,7 @@ int hdrdecode_proc(hdrdecode *op,wchar_t *rarr,int rlen,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	if ((rs = hdrdecode_magic(op,rarr,sp)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    if (rlen >= 0) {
 	        if (strnsub(sp,sl,"=?") != nullptr) {
 	            if (subinfo s(op,rarr,rlen) ; (rs = s.begin(sp,sl)) >= 0) {

@@ -481,7 +481,7 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	                record	*rep = recordp(vp) ;
 	                int	c = 0 ;
 	                kp = charp(skey + rep->key) ;
-	                kl = strlen(kp) ;
+	                kl = cstrlen(kp) ;
 	                khash = hash_elf(kp,kl) ;
 	                hi = hashindex(khash,n) ;
 	                if ((ropts & DBMAKE_OSEC) && (it[hi][0] != 0)) {

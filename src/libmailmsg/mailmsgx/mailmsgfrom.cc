@@ -106,7 +106,7 @@ int mailmsgfrom_loadfrom(mailmsgfrom *op,cchar *sp,int sl) noex {
 	int		fl = 0 ;
 	if (op && sp) {
 	    rs = SR_OK ;
-	    op->fl = strdcpy1w(op->fbuf,op->flen,sp,sl) - op->fbuf ;
+	    op->fl = intconv(strdcpy1w(op->fbuf,op->flen,sp,sl) - op->fbuf) ;
 	    fl = op->fl ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;

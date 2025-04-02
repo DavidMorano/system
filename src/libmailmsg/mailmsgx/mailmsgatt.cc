@@ -107,7 +107,7 @@ int mailmsgatt_add(mailmsgatt *op,cc *ct,cc *ce,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && ct && sp) {
 	    mailmsgattent	ve ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    if ((rs = mailmsgattent_start(&ve,ct,ce,sp,sl)) >= 0) {
 	        cint	esz = szof(mailmsgattent) ;
 	        rs = vecitem_add(op,&ve,esz) ;

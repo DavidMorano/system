@@ -127,7 +127,7 @@ int msgentry_loadline(msgentry *mep,cchar *lp,int ll) noex {
 int msgentry_loadhdrs(msgentry *mep,fdliner *lsp) noex {
 	int		rs ;
 	int		tlen = 0 ;
-	int		f_eoh = false ;
+	bool		f_eoh = false ;
 	cchar		*lp ;
 	while ((rs = fdliner_getln(lsp,&lp)) > 0) {
 	    cint	ll = rs ;
@@ -197,7 +197,7 @@ int msgentry_setct(msgentry *mep) noex {
 		cchar	*vp ;
 	        if (int vl ; (vl = mhcom_getval(&hc,&vp)) > 0) {
 	            if (cchar *tp ; (tp = strnchr(vp,vl,';')) != nullptr) {
-	                vl = (tp - vp) ;
+	                vl = intconv(tp - vp) ;
 		    }
 	            rs1 = sisub(vp,vl,"text") ;
 	            if ((rs1 >= 0) && (strnchr(vp,vl,'/') != nullptr)) {
@@ -225,7 +225,7 @@ int msgentry_setce(msgentry *mep) noex {
 	        cchar	*vp ;
 	        if (int vl ; (vl = comparse_getval(&com,&vp)) > 0) {
 	            if (cc *tp ; (tp = strnchr(vp,vl,';')) != nullptr) {
-	                vl = (tp - vp) ;
+	                vl = intconv(tp - vp) ;
 	            }
 	            rs1 = sisub(vp,vl,"7bit") ;
 	            if (rs1 < 0) {

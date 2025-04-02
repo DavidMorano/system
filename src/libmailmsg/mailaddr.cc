@@ -119,7 +119,7 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	        cint	mal = var.mailaddrlen ; /* mail-address length */
 		cchar	*tp ;
 	        rs = SR_OK ;
-	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl < 0) sl = cstrlen(sp) ;
 	        /* what kind of address do we have? */
 	        if (cc *cp1 ; (cp1 = strnchr(sp,sl,'@')) != np) {
 	            if (cc *cp2 ; (cp2 = strnchr(sp,sl,':')) != np) {
@@ -174,7 +174,7 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	        } /* end if */
 	        /* perform some cleanup (remove stupid trailing dots) */
 	        if (rs >= 0) {
-	            int		cl = strlen(mahost) ;
+	            int		cl = cstrlen(mahost) ;
 	            while ((cl > 0) && (mahost[cl - 1] == '.')) {
 	                cl -= 1 ;
 	            }

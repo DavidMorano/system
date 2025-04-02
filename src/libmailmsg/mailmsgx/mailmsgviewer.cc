@@ -318,22 +318,22 @@ static int mailmsgviewer_findline(MMV *op,int ln,cchar **lpp) noex {
 	            if ((rs = vecobj_get(op->llp,(c - 1),&vp)) >= 0) {
 	                MMV_LN	*ep = mlinep(vp) ;
 	                bp = (ep->lp + ep->ll) ;
-	                bl = (op->mapsize - (bp - op->mapdata)) ;
+	                bl = intconv(op->mapsize - (bp - op->mapdata)) ;
 	            }
 	        } else {
 	            bp = op->mapdata ;
-	            bl = op->mapsize ;
+	            bl = intsat(op->mapsize) ;
 	        } /* end if */
 	        if (rs >= 0) {
 	            while ((tp = strnchr(bp,bl,'\n')) != nullptr) {
 	                *lpp = bp ;
-	                ll = ((tp + 1) - bp) ;
+	                ll = intconv((tp + 1) - bp) ;
 	                e.lp = bp ;
-	                e.ll = ((tp + 1) - bp) ;
+	                e.ll = intconv((tp + 1) - bp) ;
 	                rs = vecobj_add(op->llp,&e) ;
 	                if (rs < 0) break ;
 	                if (c++ == ln) break ;
-	                bl -= ((tp + 1) - bp) ;
+	                bl -= intconv((tp + 1) - bp) ;
 	                bp = (tp + 1) ;
 	            } /* end while */
 	            if ((rs >= 0) && (tp == nullptr)) {

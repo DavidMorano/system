@@ -128,8 +128,9 @@ int mailmsgheadkey(cchar *sp,int sl,cchar **kpp) noex {
 	        }
 	    } else {
 	        if (char *tp ; (tp = strnochr(sp,sl,':')) != nullptr) {
+		    cint	ll = intconv(tp - sp) ;
 	            cchar	*cp{} ;
-		    if (int cl ; (cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
+		    if (int cl ; (cl = sfshrink(sp,ll,&cp)) > 0) {
 		        if (hasallhdrkey(cp,cl)) {
 		            *kpp = cp ;
 			    kl = cl ;

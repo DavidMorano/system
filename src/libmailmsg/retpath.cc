@@ -120,7 +120,7 @@ int retpath_parse(retpath *plp,cchar *sp,int sl) noex {
 	if (plp && sp) {
 	    int		cl ;
 	    cchar	*cp ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    rs = SR_OK ;
 	    for (cchar *tp ; (tp = strnpbrk(sp,sl,"!@,%:")) != np ; ) {
 	        if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {

@@ -81,7 +81,8 @@ enum his {
 	hi_xmailer,
 	hi_xforwardedto,
 	hi_subj,
-	hi_overlast
+	hi_overlast,
+	hi_clen = hi_clength,
 } ; /* end enum (his) */
 
 #define	HI_FROM		hi_from
