@@ -315,12 +315,12 @@ static int loadpath(vecstr *plp) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	cchar		*vn = varname.path ;
-	cchar		*pp ;
-	if ((pp = getenv(vn)) != nullptr) {
+	if (cchar *pp ; (pp = getenv(vn)) != nullptr) {
 	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	        cchar	*tp ;
 	        while ((tp = strpbrk(pp,":;")) != nullptr) {
-	            if ((rs = pathclean(tbuf,pp,(tp - pp))) >= 0) {
+		    cint	pl = intconv(tp - pp) ;
+	            if ((rs = pathclean(tbuf,pp,pl)) >= 0) {
 			rs = vecstr_adduniq(plp,tbuf,rs) ;
 			c += (rs < INT_MAX) ;
 		    }

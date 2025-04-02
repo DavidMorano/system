@@ -128,13 +128,15 @@ static int nlsresponse(char *tbuf,int tlen,cchar *rbuf,int rlen) noex {
 	int		code = 0 ;	/* return-value */
 	cchar		*sp = rbuf ;
 	if (cchar *tp ; (tp = strnchr(sp,sl,':')) != nullptr) {
-	    if ((rs = cfdeci(sp,(tp-sp),&pv)) >= 0) {
-	        sl -= ((tp+1)-sp) ;
-	        sp = (tp+1) ;
+	    int		ll = intconv(tp - sp) ;
+	    if ((rs = cfdeci(sp,ll,&pv)) >= 0) {
+	        sl -= intconv((tp + 1) - sp) ;
+	        sp = (tp + 1) ;
 	        if ((tp = strnchr(sp,sl,':')) != nullptr) {
-	            if ((rs = cfdeci(sp,(tp-sp),&code)) >= 0) {
-	                sl -= ((tp+1)-sp) ;
-	                sp = (tp+1) ;
+		    ll = intconv(tp - sp) ;
+	            if ((rs = cfdeci(sp,ll,&code)) >= 0) {
+	                sl -= intconv((tp + 1) - sp) ;
+	                sp = (tp + 1) ;
 	                rs = snwcpy(tbuf,tlen,sp,sl) ;
 	            }
 	        } else {

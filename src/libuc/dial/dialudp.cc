@@ -134,7 +134,6 @@ static int opendialudp(int af,cchar *hostname,cchar *portspec,int to) noex {
 	ADDRINFO	hint{} ;
 	int		rs = SR_OK ;
 	if_constexpr (f_proto) {
-	    int		rs ;
 	    cchar	*pn = PROTONAME ;
 	    if ((rs = getproto_name(pn,-1)) >= 0) {
 	        hint.ai_protocol = rs ;

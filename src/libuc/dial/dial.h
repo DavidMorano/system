@@ -26,8 +26,6 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<dialcprog.h>
-#include	<dialcprogmsg.h>
 #include	<dialopts.h>
 #include	<dialprog.h>
 #include	<dialtcp.h>

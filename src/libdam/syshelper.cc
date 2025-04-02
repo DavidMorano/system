@@ -53,6 +53,7 @@
 #include	<cfdec.h>
 #include	<xperm.h>
 #include	<dial.h>		/* |dialuss(3uc)| */
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"syshelper.h"
@@ -174,9 +175,9 @@ static int syshelper_starter(syshelper *op) noex {
 	    cint	to = TO_READ ;
 	    cint	fm = FM_EXACT ;
 	    if ((rs = uc_reade(op->fd,cmdbuf,1,to,fm)) >= 0) {
-		cint	clen = min(CMDBUFLEN,uchar(cmdbuf[0])) ;
+		cint	clen = min(CMDBUFLEN,mkchar(cmdbuf[0])) ;
 	        rs = SR_TOOBIG ;
-		if (len <= CMDBUFLEN) {
+		if (clen <= CMDBUFLEN) {
 		    if ((rs = uc_reade(op->fd,cmdbuf,clen,to,fm)) >= 0) {
 			if (int v ; (rs = cfdeci(cmdbuf,rs,&v)) >= 0) {
 			    cint	mpid = SYSHELPER_MAXPID ;
@@ -215,7 +216,7 @@ int syshelper_write(syshelper *op,cchar *wbuf,int wlen) noex {
 	    cint	clen = min(UCHAR_MAX,CMDBUFLEN) ;
 	    int		bits ;
 	    int		mlen = 0 ;
-	    if (wlen < 0) wlen = strlen(wbuf) ;
+	    if (wlen < 0) wlen = cstrlen(wbuf) ;
 	    for (int i = 0 ; (rs >= 0) && (wlen > 0) ; i += mlen) {
 		mlen = min(clen,wlen) ;
 		bits = mlen * 8 ;

@@ -107,7 +107,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_DIAL)
+	$(LD) -r $(LDFLAGS) -r -o $@ $(OBJ_DIAL)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -128,47 +128,47 @@ control:
 
 
 obj0_dial.o:	$(OBJ0_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_DIAL)
 
 obj1_dial.o:	$(OBJ1_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_DIAL)
 
 obj2_dial.o:	$(OBJ2_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_DIAL)
 
 obj3_dial.o:	$(OBJ3_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_DIAL)
 
 obj4_dial.o:	$(OBJ4_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_DIAL)
 
 obj5_dial.o:	$(OBJ5_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_DIAL)
 
 obj6_dial.o:	$(OBJ6_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6_DIAL)
 
 obj7_dial.o:	$(OBJ7_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7_DIAL)
 
 obj8_dial.o:	$(OBJ8_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ8_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ8_DIAL)
 
 
 obja_dial.o:	$(OBJA_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_DIAL)
 
 objb_dial.o:	$(OBJB_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_DIAL)
 
 objc_dial.o:	$(OBJC_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_DIAL)
 
 objd_dial.o:	$(OBJD_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJD_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJD_DIAL)
 
 obje_dial.o:	$(OBJE_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJE_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJE_DIAL)
 
 
 dialopts.o:		dialopts.cc $(INCS)

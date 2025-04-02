@@ -7,11 +7,11 @@ file		what
 uctim
 libuc		fix to completely compile!
 fsdirtree	needs pointer implementation and a lot of cleanup
-quote
 sysdialer
 mailmsghdrct	mess
-srv{x}
 memfile		can we just trash this?
+quote
+srv{x}
 libpcs		a lot of junk in there
 convertx	part of the |ctx| group
 msfilee

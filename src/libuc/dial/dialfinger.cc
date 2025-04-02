@@ -173,7 +173,7 @@ int dialfinger(cc *hn,cc *ps,int af,cc *svc,
 /* local subroutines */
 
 static int getsvclen(cchar *svc) noex {
-	int		sl = strlen(svc) ;
+	int		sl = cstrlen(svc) ;
 	while (sl && CHAR_ISWHITE(svc[sl- 1])) {
 	    sl -= 1 ;
 	}
@@ -182,10 +182,11 @@ static int getsvclen(cchar *svc) noex {
 /* end subroutine (getsvclen) */
 
 static int getmlen(int svclen,mainv sargs) noex {
-	int		ml = (svclen+4) ;
+	int		ml = (svclen + 4) ;
 	if (sargs) {
 	    for (int i = 0 ; sargs[i] ; i += 1) {
-	        ml += (strlen(sargs[i])+3) ;
+		cchar	*sap = sargs[i] ;
+	        ml += cstrlen(sap + 3) ;
 	    } /* end for */
 	} /* end if */
 	return ml ;

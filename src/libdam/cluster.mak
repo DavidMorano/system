@@ -103,7 +103,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_DIAL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_DIAL)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
