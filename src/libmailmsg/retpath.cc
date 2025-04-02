@@ -123,11 +123,12 @@ int retpath_parse(retpath *plp,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = cstrlen(sp) ;
 	    rs = SR_OK ;
 	    for (cchar *tp ; (tp = strnpbrk(sp,sl,"!@,%:")) != np ; ) {
-	        if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
+		cint	ll = intconv(tp - sp) ;
+	        if ((cl = sfshrink(sp,ll,&cp)) > 0) {
 	            n += 1 ;
 	            rs = retpath_iadd(plp,cp,cl) ;
 	        }
-	        sl -= ((tp+1)-sp) ;
+	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
 	    } /* end for */

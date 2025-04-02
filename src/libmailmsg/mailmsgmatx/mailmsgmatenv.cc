@@ -174,7 +174,7 @@ static int mmenvdat_ema(mmenvdat *mep,cchar *sp,int sl) noex {
 	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
 	    mep->a.ep = cp ;
 	    mep->a.el = cl ;
-	    skip = ((cp+cl)-sp) ;
+	    skip = intconv((cp + cl) - sp) ;
 	}
 	return skip ;
 }
@@ -186,23 +186,23 @@ static int mmenvdat_date(mmenvdat *mep,cchar *sp,int sl) noex {
 	cchar		*cp ;
 	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
 	    int		rl ;
-	    cchar	*begin = cp ;
+	    cchar	*beginp = cp ;
 	    cchar	*rp ;
 	    if (tmstrsday(cp,cl) >= 0) {
-		int	si = ((cp+cl)-sp) ;
+		int	si = intconv((cp + cl) - sp) ;
 		rl = (sl-si) ;
 		rp = (sp+si) ;
-	        mep->d.ep = begin ;
-		mep->d.el = ((sp+sl)-begin) ;
+	        mep->d.ep = beginp ;
+		mep->d.el = intconv((sp + sl) - beginp) ;
 	        if ((cl = sfnext(rp,rl,&cp)) > 0) {
 		    if (tmstrsmonth(cp,cl) >= 0) {
-		        si = ((cp+cl)-sp) ;
+		        si = intconv((cp + cl) - sp) ;
 		        rp = (sp+si) ;
 		        rl = (sl-si) ;
 	        	if ((cl = sfnext(rp,rl,&cp)) > 0) {
 			    if (hasalldig(cp,cl)) {
-		                si = ((cp+cl)-sp) ;
-		                rp = (sp+si) ;
+		                si = intconv((cp + cl) - sp) ;
+		                rp = (sp + si) ;
 		                rl = (sl-si) ;
 				if ((si = sichr(rp,rl,':')) >= 0) {
 			    	    skip = sl ;
@@ -210,8 +210,8 @@ static int mmenvdat_date(mmenvdat *mep,cchar *sp,int sl) noex {
 		            	    rl -= (si+1) ;
 				    si = mmenvdat_datefin(mep,rp,rl) ;
 				    if (si >= 0) {
-					skip = (rp+si-begin) ;
-					mep->d.el = (rp+si-begin) ;
+					skip = intconv(rp + si - beginp) ;
+					mep->d.el = intconv(rp + si - beginp) ;
 				    }
 				}
 			    }
@@ -248,7 +248,7 @@ static int mmenvdat_remote(mmenvdat *mep,cchar *sp,int sl) noex {
 	    if ((cl = sfnext(sp,sl,&cp)) > 0) {
 		mep->r.ep = cp ;
 		mep->r.el = cl ;
-		skip = ((cp+cl)-sp) ;
+		skip = intconv((cp + cl) - sp) ;
 	    }
 	}
 	return skip ;

@@ -123,13 +123,13 @@ int mailmsgmathdr(cchar *sp,int sl,int *ip) noex {
 	            tl -= 1 ;
 	        } /* end while */
 	    } /* end if_constexpr (f_alt) */
-	    kl = (tp - sp) ;
+	    kl = intconv(tp - sp) ;
 	    while (tl && ishdrwht(*tp)) {
 	        tp += 1 ;
 	        tl -= 1 ;
 	    } /* end while */
 	    if (ip) {
-	        *ip = ((tp + 1) - sp) ;
+	        *ip = intconv((tp + 1) - sp) ;
 	    }
 	    rs = (tl && (*tp == ':')) ? kl : 0 ;
 	} /* end if (non-null) */

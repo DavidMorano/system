@@ -56,17 +56,16 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0_MAILMSG= mailmsg_main.o 
-OBJ1_MAILMSG= mailmsg_envaddrfold.o
-OBJ2_MAILMSG= mailmsg_envget.o
-OBJ3_MAILMSG= mailmsg_envdates.o mailmsg_envtimes.o
-OBJ4_MAILMSG= mailmsg_loadfd.o mailmsg_loadmb.o mailmsg_loadfile.o
-
+OBJ1_MAILMSG= mailmsg_envaddrfold.o mailmsg_envget.o
+OBJ2_MAILMSG= mailmsg_envdates.o mailmsg_envtimes.o
+OBJ3_MAILMSG= mailmsg_loadfile.o
+OBJ4_MAILMSG= mailmsg_loadfd.o mailmsg_loadmb.o 
 
 OBJA_MAILMSG= obj0_mailmsg.o obj1_mailmsg.o
 OBJB_MAILMSG= obj2_mailmsg.o obj3_mailmsg.o
 OBJC_MAILMSG= obj4_mailmsg.o
 
-OBJ_MAILMSG= obja_mailmsg.o objb_mailmsg.o objc_mailmsg.o
+OBJ_MAILMSG= obja.o objb.o objc.o
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -120,29 +119,29 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_mailmsg.o:	$(OBJ0_MAILMSG)
+obj0_mailmsg.o:		$(OBJ0_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILMSG)
 
-obj1_mailmsg.o:	$(OBJ1_MAILMSG)
+obj1_mailmsg.o:		$(OBJ1_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MAILMSG)
 
-obj2_mailmsg.o:	$(OBJ2_MAILMSG)
+obj2_mailmsg.o:		$(OBJ2_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MAILMSG)
 
-obj3_mailmsg.o:	$(OBJ3_MAILMSG)
+obj3_mailmsg.o:		$(OBJ3_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MAILMSG)
 
-obj4_mailmsg.o:	$(OBJ4_MAILMSG)
+obj4_mailmsg.o:		$(OBJ4_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_MAILMSG)
 
 
-obja_mailmsg.o:	$(OBJA_MAILMSG)
+obja.o:			$(OBJA_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MAILMSG)
 
-objb_mailmsg.o:	$(OBJB_MAILMSG)
+objb.o:			$(OBJB_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_MAILMSG)
 
-objc_mailmsg.o:	$(OBJC_MAILMSG)
+objc.o:			$(OBJC_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_MAILMSG)
 
 
