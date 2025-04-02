@@ -201,9 +201,13 @@ int umsg::rcv(int msqid,void *msgp,int msgl,int msgflag) noex {
 	if (msgp) {
 	    rs = SR_INVALID ;
 	    if (msgl > 0) {
-	        if ((rs = msgrcv(msqid,msgp,msgl,msgtype,msgflag)) < 0) {
+		csize	msize = size_t(msgl) ;
+		ssize_t	rsize ;
+	        if ((rsize = msgrcv(msqid,msgp,msize,msgtype,msgflag)) < 0) {
 	            rs = (- errno) ;
-	        }
+	        } else {
+		    rs = intsat(rsize) ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -215,7 +219,8 @@ int umsg::snd(int msqid,void *msgp,int msgl,int msgflag) noex {
 	if (msgp) {
 	    rs = SR_INVALID ;
 	    if (msgl > 0) {
-	        if ((rs = msgsnd(msqid,msgp,msgl,msgflag)) < 0) {
+		csize	msize = size_t(msgl) ;
+	        if ((rs = msgsnd(msqid,msgp,msize,msgflag)) < 0) {
 	            rs = (- errno) ;
 	        }
 	    } /* end if (valid) */

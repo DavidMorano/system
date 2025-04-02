@@ -35,10 +35,11 @@ module ;
 #include	<stdintx.h>
 #include	<valuelims.hh>
 
-export module digbufsize ;
+export module digbufsizes ;
+
+extern const valuelims 	valuelimit ;
 
 export {
-    extern const valuelims	valuelimit ;
     constexpr int	digbufsizes_maxbase = 64 ; /* current max-base */
     constexpr int	digbufsizes_ntypes = 10 ; /* up to types w/ 1024 bits */
     constexpr int	digbufsizes_nbases = (digbufsizes_maxbase+1) ;

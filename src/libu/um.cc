@@ -124,11 +124,11 @@ namespace {
 	} ;
 	um(int f) noex : fl(f) { } ;
 	um(char *v) noex : vec(v) { } ;
-	um(int c,void *a,int t,int m) noex {
+	um(int c,void *a,int t,int om) noex {
 	    fl = c ;
 	    arg = a ;
 	    attr = t ;
-	    mask = m ;
+	    mask = om ;
 	} ;
 	int operator () (void *,size_t) noex ;
 	int mapbegin(void *,size_t) noex ;

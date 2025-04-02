@@ -29,35 +29,9 @@
 #include	<timecount.hh>
 #include	<filetype.h>
 #include	<aflag.hh>
-#include	<intsat.h>
-#include	<xxtostr.h>
-#include	<strtox.h>
+#include	<strxlen.hh>
 #include	<stdintx.h>
 
-
-#ifndef	SUBROUTINE_CSTRNLEN
-#define	SUBROUTINE_CSTRNLEN
-#ifdef	__cplusplus
-constexpr int cstrnlen(cchar *sp,int sl = -1) noex {
-    	cchar		*cp = sp ;
-	while (*cp++ && sl) {
-	    sl -= 1 ;
-	}
-	return (cp - sp) ;
-}
-#endif /* __cplusplus */
-#endif /* SUBROUTINE_CSTRNLEN */
-
-#ifndef	SUBROUTINE_CSTRLEN
-#define	SUBROUTINE_CSTRLEN
-#ifdef	__cplusplus
-constexpr int cstrlen(cchar *sp) noex {
-    	cchar		*cp = sp ;
-	while (*cp++) ;
-	return (cp - sp) ;
-}
-#endif /* __cplusplus */
-#endif /* SUBROUTINE_CSTRLEN */
 
 #ifndef	TYPEDEF_MTIME
 #define	TYPEDEF_MTIME
@@ -77,13 +51,6 @@ EXTERNC_begin
 extern int	msleep(int) noex ;
 EXTERNC_end
 #endif
-
-#ifndef	SUBROUTINE_FILETYPE
-#define	SUBROUTINE_FILETYPE
-EXTERNC_begin
-extern int	filetype(mode_t) noex ;
-EXTERNC_end
-#endif /* SUBROUTINE_FILETYPE */
 
 #ifndef	OBJECT_GETMTIME
 #define	OBJECT_GETMTIME

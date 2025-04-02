@@ -1,4 +1,5 @@
 /* ufiler SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -136,7 +137,7 @@ namespace {
 	int		oo ;
 	mode_t		fm ;
 	ufiler() noex { } ;
-	ufiler(mode_t m,dev_t d = 0) noex : fm(m), dev(d) { } ;
+	ufiler(mode_t om,dev_t d = 0) noex : fm(om), dev(d) { } ;
 	ufiler(cchar *d) noex : dfn(d) { } ;
 	ufiler(cc *n,cvoid *v,size_t s,uint32_t fo,int o) noex {
 	    xaname = n ;
@@ -323,8 +324,10 @@ int u_pathconf(cchar *fn,int name,long *rp) noex {
 int u_readlink(cchar *fname,char *rbuf,int rlen) noex {
 	int		rs ;
 	repeat {
-	    if ((rs = readlink(fname,rbuf,rlen)) < 0) {
+	    if (ssize_t rsize ; (rsize = readlink(fname,rbuf,rlen)) < 0) {
 		rs = (- errno) ;
+	    } else {
+		rs = intsat(rsize) ;
 	    }
 	} until ((rs != SR_AGAIN) && (rs != SR_INTR)) ;
 	if (rs >= 0) {
@@ -500,8 +503,10 @@ int ufiler::isymlink(cchar *fn) noex {
 int ufiler::ixattrget(cchar *fn) noex {
 	void		*val = const_cast<voidp>(xaval) ;
 	int		rs ;
-	if ((rs = getxattr(fn,xaname,val,sz,foff,oo)) < 0) {
+	if (ssize_t rsize ; (rsize = getxattr(fn,xaname,val,sz,foff,oo)) < 0) {
 	    rs = (- errno) ;
+	} else {
+	    rs = intsat(rsize) ;
 	}
 	return rs ;
 }

@@ -48,7 +48,7 @@ struct strnul {
 	strnul(strview &sv) noex {
 	    buf[0] = '\0' ;
 	    sp = sv.data() ;
-	    sl = sv.length() ;
+	    sl = (int) sv.length() ;
 	} ; /* end ctor */
 	strnul() noex : strnul(nullptr,0) { } ;
 	strnul(const strnul &) = delete ;
@@ -65,7 +65,7 @@ struct strnul {
 	} ; /* end method */
 	ccharp operator () (strview &sv) noex {
 	    cchar	*ap = sv.data() ;
-	    cint	al = sv.length() ;
+	    cint	al = (int) sv.length() ;
 	    return operator () (ap,al) ;
 	} ; /* end method */
 	operator ccharp () noex ;

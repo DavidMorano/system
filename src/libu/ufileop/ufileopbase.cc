@@ -1,4 +1,5 @@
 /* ufileopbase SUPPORT (UNIX® file operations) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -78,11 +79,11 @@ using std::nullptr_t ;			/* type */
 /* exported subroutines */
 
 namespace ufileop {
-    int ufileopbase::operator () (cchar *fn) noex {
+    int ufileopbase::operator () (cchar *fname) noex {
 	int		rs = SR_BADF ;
-	if (fn) {
+	if (fname) {
 	    rs = SR_INVALID ;
-	    if (fn[0]) {
+	    if (fname[0]) {
 	        errtimer	to_again	= utimeout[uto_again] ;
 	        errtimer	to_busy		= utimeout[uto_busy] ;
 	        errtimer	to_nomem	= utimeout[uto_nomem] ;
@@ -96,7 +97,7 @@ namespace ufileop {
 	        errtimer	to_io		= utimeout[uto_io] ;
 	        reterr		r ;
 	        repeat {
-	            if ((rs = callstd(fn)) < 0) {
+	            if ((rs = callstd(fname)) < 0) {
 		        r(rs) ;			/* <- default causes exit */
                         switch (rs) {
                         case SR_AGAIN:

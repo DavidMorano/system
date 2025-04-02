@@ -29,13 +29,16 @@
 
 #include	<climits>		/* |PATH_MAX| + |INT_MAX| */
 #include	<cerrno>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |realpath(3c)| */
-#include	<cstring>
+#include	<cstring>		/* |strcpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<strxlen.hh>		/* |cstrlen(3u)| */
 
 #include	"usys_resolvepath.h"
 
@@ -47,7 +50,7 @@ unixret_t resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
 	    cnullptr	np{} ;
 	    if (fname[0] && (rlen >= 0)) {
 		 if (char *rp ; (rp = realpath(fname,np)) != np) {
-		    if ((rl = strlen(rp)) <= rlen) {
+		    if ((rl = cstrlen(rp)) <= rlen) {
 			strcpy(rbuf,rp) ;
 		    } else {
 			rc = -1 ;

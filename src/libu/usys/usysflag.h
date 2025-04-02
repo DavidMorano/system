@@ -20,7 +20,6 @@
 	This file defines preprocessor symbols that express which
 	operating syustem is being compiled.
 
-
 *******************************************************************************/
 
 #ifndef	USYSFLAG_INCLUDE

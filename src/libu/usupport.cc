@@ -176,13 +176,13 @@ namespace libu {
 	        if (sl > dl) {
 	            rs = sncpy1(dp,dl,sp) ;
 	        } else {
-	            rs = strwcpy(dp,sp,sl) - dp ;
+	            rs = int(strwcpy(dp,sp,sl) - dp) ;
 		}
 	    } else {
 	        rs = sncpy1(dp,dl,sp) ;
 	    }
 	} else {
-	    rs = strwcpy(dp,sp,sl) - dp ;
+	    rs = int(strwcpy(dp,sp,sl) - dp) ;
 	}
 	return rs ;
     }

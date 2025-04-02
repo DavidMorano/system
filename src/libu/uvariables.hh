@@ -40,8 +40,8 @@
 #include	<syswords.hh>
 #include	<varnames.hh>
 #include	<valuelims.hh>
-#include	<digbufsizes.hh>
 
+import digbufsizes ;
 
 extern const syswords		sysword ;
 extern const varnames		varname ;

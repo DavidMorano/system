@@ -96,7 +96,6 @@ namespace {
 	opener_m	m ;
 	SOCKADDR	*sap ;
 	int		*pipes ;
-	cchar		*fname ;
 	int		*lenp ;
 	int		dfd ;
 	int		tfd ;
@@ -284,13 +283,13 @@ int u_piper(int *pipes,int of,int mfd) noex {
 
 /* local subroutines */
 
-int opener::openreg(cchar *fname,int of,mode_t om) noex {
+int opener::openreg(cchar *fn,int of,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
 	if ((rs = uopenmx.lockbegin) >= 0) {
 	    {
-		rs = openjack(fname,of,om) ;
+		rs = openjack(fn,of,om) ;
 		fd = rs ;
 	    }
 	    rs1 = uopenmx.lockend ;
@@ -301,17 +300,17 @@ int opener::openreg(cchar *fname,int of,mode_t om) noex {
 }
 /* end method (opener::openreg) */
 
-int opener::callstd(cchar *fname,int of,mode_t om) noex {
+int opener::callstd(cchar *fn,int of,mode_t om) noex {
 	int		rs ;
 	of &= (~ OM_SPECIALMASK) ;
-	if ((rs = (this->*m)(fname,of,om)) < 0) {
+	if ((rs = (this->*m)(fn,of,om)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
 }
 /* end method (opener::callstd) */
 
-int opener::openjack(cchar *fname,int of,mode_t om) noex {
+int opener::openjack(cchar *fn,int of,mode_t om) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
 	errtimer	to_busy		= utimeout[uto_busy] ;
 	errtimer	to_nomem	= utimeout[uto_nomem] ;
@@ -327,7 +326,7 @@ int opener::openjack(cchar *fname,int of,mode_t om) noex {
 	int		rs ;
 	int		fd = -1 ;
 	repeat {
-	    if ((rs = callstd(fname,of,om)) < 0) {
+	    if ((rs = callstd(fn,of,om)) < 0) {
                 r(rs) ;                 /* <- default causes exit */
                 switch (rs) {
                 case SR_AGAIN:
@@ -381,12 +380,12 @@ int opener::openjack(cchar *fname,int of,mode_t om) noex {
 }
 /* end method (opener::openjack) */
 
-int opener::iopen(cchar *fname,int of,mode_t om) noex {
+int opener::iopen(cchar *fn,int of,mode_t om) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fn) {
 	    rs = SR_INVALID ;
-	    if (fname[0] && (of >= 0)) {
-	        if ((rs = open(fname,of,om)) < 0) {
+	    if (fn[0] && (of >= 0)) {
+	        if ((rs = open(fn,of,om)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } /* end if (valid) */
@@ -395,12 +394,12 @@ int opener::iopen(cchar *fname,int of,mode_t om) noex {
 }
 /* end method (opener::iopen) */
 
-int opener::iopenat(cchar *fname,int of,mode_t om) noex {
+int opener::iopenat(cchar *fn,int of,mode_t om) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fn) {
 	    rs = SR_INVALID ;
-	    if (fname[0] && (of >= 0)) {
-	        if ((rs = openat(dfd,fname,of,om)) < 0) {
+	    if (fn[0] && (of >= 0)) {
+	        if ((rs = openat(dfd,fn,of,om)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } /* end if (valid) */

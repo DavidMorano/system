@@ -126,7 +126,7 @@ int uiconv_open(uiconv *op,cchar *tsp,cchar *fsp) noex {
 	                op->magic = UICONV_MAGIC ;
 	            }
 	            if (rs < 0) {
-			iconv_t	*cdp = iconvp(op->cdp) ;
+			cdp = iconvp(op->cdp) ;
 		        delete cdp ;
 		        op->cdp = nullptr ;
 	            }

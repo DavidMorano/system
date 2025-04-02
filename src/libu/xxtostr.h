@@ -70,13 +70,14 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<uvariables.hh>
+#include	<usupport.h>
 #include	<varnames.hh>
 #include	<stdintx.h>
 
 
 #ifdef	__cplusplus
 
-static cint		xxtostr_maxbase = strlen(sysword.w_digtab) ;
+static cint		xxtostr_maxbase = cstrlen(sysword.w_digtab) ;
 
 template<typename UT>
 inline int uxxtostr(char *endp,int b,UT v) noex {
@@ -91,12 +92,12 @@ inline int uxxtostr(char *endp,int b,UT v) noex {
                     int		di ;
 	            if_constexpr (szof(UT) > szof(ulong)) {
 	                const UT	vmask(~ LONG_MAX) ;
-		        UT		nv ;
+		        UT		utnv ;
 	                while ((v & vmask) != 0L) {
-	                    nv = v / ub ;
-                            di = int(v - (nv * ub)) ;
+	                    utnv = v / ub ;
+                            di = int(v - (utnv * ub)) ;
                             *--rp = sysword.w_digtab[di] ;
-	                    v = nv ;
+	                    v = utnv ;
 	                } /* end while (slower) */
 	                {
 		            ulong	lv = ulong(v) ;
@@ -125,7 +126,7 @@ inline int uxxtostr(char *endp,int b,UT v) noex {
 	        } /* end if */
 	    } /* end if (base supported) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? (endp - rp) : rs ;
+	return (rs >= 0) ? int(endp - rp) : rs ;
 }
 /* end subroutine-template (uxxtostr) */
 
@@ -142,9 +143,9 @@ inline constexpr int sxxtostr(char *endp,int b,ST v) noex {
 	        if (v < 0) *--rp = '-' ;
 	    }
 	}
-	return (rs >= 0) ? (endp - rp) : rs ;
+	return (rs >= 0) ? int(endp - rp) : rs ;
 }
-/* end subroutine (ctdecx) */
+/* end subroutine (sxxtostr) */
 
 #endif /* __cplusplus */
 

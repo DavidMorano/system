@@ -52,7 +52,6 @@ namespace ufileop {
 	uint		fintr:1 ;	/* request interrupts to return */
     } ; /* end struct (ufileopflags) */
     struct ufileopbase {
-	cchar		*fn ;
 	ufileopflags	f{} ;
 	ufileopbase() noex { } ;
 	int operator () (cchar *) noex ;

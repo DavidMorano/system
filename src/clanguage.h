@@ -33,6 +33,12 @@
 #endif
 #endif /* noex */
 
+#ifdef	__cplusplus
+#ifndef	restruct
+#define	restrict		__restrict__
+#endif
+#endif /* __cplusplus */
+
 #ifndef	va_begin
 #define	va_begin(ap,arg)	va_start((ap),(arg))
 #endif

@@ -114,7 +114,7 @@ struct llhelper {
 	    llmax = longlong(ullmax >> 1) ;
 	    for (uint b = 2 ; b <= maxbase ; b += 1) {
 		cutoff[b] = (ullmax / b) ;
-		cutlim[b] = (ullmax & b) ;
+		cutlim[b] = int(ullmax & b) ;
 	    } /* end for */
 	} ; /* end constructor */
 } ; /* end subroutine (llhelper) */
@@ -260,7 +260,7 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 	 * overflow.
 	 */
 	cutoff = neg ? llhelp.llmin : llhelp.llmax ;
-	cutlim = cutoff % base;
+	cutlim = int(cutoff % base) ;
 	cutoff /= base;
 	if (neg) {
 		if (cutlim > 0) {
