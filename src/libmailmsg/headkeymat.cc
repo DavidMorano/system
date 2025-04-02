@@ -91,9 +91,10 @@ int headkeymat(cchar *key,cchar *hbuf,int hlen) noex {
 	if (key && hbuf) {
 	    rs = SR_OK ;
 	    if (char *tp ; (tp = strnochr(hbuf,hlen,':')) != nullptr) {
-		cint	vi = ((tp + 1) - hbuf) ;
+		cint	vi = intconv((tp + 1) - hbuf) ;
+		cint	hl = intconv(tp - hbuf) ;
 	        cchar	*cp{} ;
-		if (int cl ; (cl = sfshrink(hbuf,(tp - hbuf),&cp)) > 0) {
+		if (int cl ; (cl = sfshrink(hbuf,hl,&cp)) > 0) {
 		    if (strwcmp(key,cp,cl) == 0) {
 			len = vi ;
 		    }
