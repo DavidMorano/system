@@ -26,7 +26,7 @@
 #include	<vecstr.h>
 
 
-#define	SYSDIALER_MAGIC	31815927
+#define	SYSDIALER_MAGIC	0x31815927
 #define	SYSDIALER	struct sysdialer_head
 #define	SYSDIALER_FL	struct sysdialer_flags
 #define	SYSDIALER_ENT	struct sysdialer_entry
@@ -41,7 +41,7 @@
 #define	INTERFACE	struct interface
 #endif
 
-/* sysdialer flags */
+/* option masks */
 #define	SYSDIALER_MFULL		0x0001
 #define	SYSDIALER_MHALFOUT	0x0002
 #define	SYSDIALER_MHALFIN	0x0004
@@ -49,7 +49,7 @@
 #define	SYSDIALER_MCO		0x0010
 #define	SYSDIALER_MCL		0x0020
 #define	SYSDIALER_MARGS		0x0040
-
+/* option mash aliases */
 #define	SYSDIALER_MRDONLY	SYSDIALER_MHALFIN
 #define	SYSDIALER_MWRONLY	SYSDIALER_MHALFOUT
 
@@ -65,21 +65,23 @@ struct sysdialer_information {
 struct sysdialer_flags {
 	uint		vsprs:1 ;
 	uint		vsdirs:1 ;
+	uint		voents:1 ;
+	uint		prcache:1 ;
 } ;
 
 struct sysdialer_prcache {
 	cchar		*domainname ;
-	cchar		**prs ;
+	mainv		prs ;
 } ;
 
 struct sysdialer_head {
 	cchar		*pr ;
-	cchar		**dirs ;
+	mainv		dirs ;
 	SYSDIALER_PRC	pc ;
-	SYSDIALER_FL	f ;
-	vecobj		entries ;	/* sysdialer-module names */
-	vecstr		prlist ;
-	vecstr		dirlist ;
+	SYSDIALER_FL	fl ;
+	vecobj		*elp ;		/* entry-list-pointer */
+	vecstr		*plp ;		/* pr-list-pointer */
+	vecstr		*dlp ;		/* directory-list-pointer */
 	time_t		ti_lastcheck ;
 	uint		magic ;
 } ;

@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int syshelper_ctor(syshelper *op,Args ... args) noex {
+static int sysdialer_ctor(sysdialer *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int syshelper_ctor(syshelper *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (syshelper_ctor) */
+/* end subroutine (sysdialer_ctor) */
 
-static int syshelper_dtor(syshelper *op) noex {
+static int sysdialer_dtor(sysdialer *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (syshelper_dtor) */
+/* end subroutine (sysdialer_dtor) */
 
 template<typename ... Args>
-static inline int syshelper_magic(syshelper *op,Args ... args) noex {
+static inline int sysdialer_magic(sysdialer *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == SYSHELPER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == SYSDIALER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (syshelper_magic) */
+/* end subroutine (sysdialer_magic) */
