@@ -34,8 +34,8 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
-#include	<syswords.hh>
 #include	<varnames.hh>
+#include	<syswords.hh>
 
 export module uvariables ;
 
@@ -43,6 +43,8 @@ export import valuelims ;
 export import digbufsizes ;
 
 export {
+    extern "C++" const varnames		varname ;
+    extern "C++" const syswords		sysword ;
     extern "C++" const valuelims	valuelimit ;
     extern "C++" const digbufsizes	digbufsize ;
 }

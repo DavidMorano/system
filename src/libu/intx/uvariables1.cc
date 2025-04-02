@@ -1,4 +1,4 @@
-/* uvariables MODULE */
+/* uvariables1 SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -37,16 +37,12 @@ module ;
 #include	<varnames.hh>
 #include	<syswords.hh>
 
-export module uvariables ;
+import uvariables ;
 
-export import valuelims ;
-export import digbufsizes ;
+constinit const varnames	varname ;
+constinit const syswords	sysword ;
+constinit const valuelims	valuelimit ;
 
-export {
-    extern "C++" const varnames		varname ;
-    extern "C++" const syswords		sysword ;
-    extern "C++" const valuelims	valuelimit ;
-    extern "C++" const digbufsizes	digbufsize ;
-}
+const digbufsizes		digbufsize ;
 
 

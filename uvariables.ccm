@@ -1,4 +1,4 @@
-/* uvariables HEADER */
+/* uvariables MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -26,10 +26,7 @@
 
 *******************************************************************************/
 
-#ifndef	UVARIABLES_INCLUDE
-#define	UVARIABLES_INCLUDE
-#ifdef	__cplusplus /* everything is C++ only */
-
+module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
@@ -37,19 +34,19 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
-#include	<syswords.hh>
 #include	<varnames.hh>
+#include	<syswords.hh>
 
-import valuelims ;
-import digbufsizes ;
+export module uvariables ;
 
-extern const syswords		sysword ;
-extern const varnames		varname ;
-extern const valuelims		valuelimit ;
-extern const digbufsizes	digbufsize ;
+export import valuelims ;
+export import digbufsizes ;
 
-
-#endif	/* __cplusplus */
-#endif /* UVARIABLES_INCLUDE */
+export {
+    extern "C++" const varnames		varname ;
+    extern "C++" const syswords		sysword ;
+    extern "C++" const valuelims	valuelimit ;
+    extern "C++" const digbufsizes	digbufsize ;
+}
 
 

@@ -98,7 +98,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -119,28 +119,43 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
 
 obj1.o:			$(OBJ1)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
 
 obj2.o:			$(OBJ2)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
 
 obj3.o:			$(OBJ3)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
 
 obj4.o:			$(OBJ4)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
 
 obj5.o:			$(OBJ5)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
 
 
-satarith.o:		satarith.cc satarith.h		$(INCS)
+satarith.o:		satarith.cc satarith.h mods.mod $(INCS)
 intrem.o:		intrem.cc intrem.h		$(INCS)
 intsat.o:		intsat.cc intsat.h		$(INCS)
 intfloor.o:		intfloor.cc intfloor.h		$(INCS)
 intceil.o:		intceil.cc intceil.h		$(INCS)
+
+mods.mod:		valuelims.o
+
+valuelims.o:		valuelims.ccm
+	makemodule valuelims
+
+uvariables.o:		uvariables0.o uvariables1.o
+	$(LD) -r $(LDFLAGS) -o $@ uvariables0.o uvariables1.o
+
+uvariables0.o:		uvariables.ccm
+	makemodule uvariables
+
+uvariables1.o:		uvariables1.cc uvariables.ccm
+	makemodule uvariables
+	$(COMPILE.cc) uvariables1.cc
 
 

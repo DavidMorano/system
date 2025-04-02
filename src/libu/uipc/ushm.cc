@@ -1,4 +1,5 @@
 /* ushm SUPPORT (UNIX® System V IPC - Shared Memory) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -167,8 +168,8 @@ int u_shmctl(int shmid,int cmd,SHMIDDS *buf) noex {
 	int		to_nomem = utimeout[uto_nomem] ;
 	bool		f_exit = false ;
 	repeat {
-	    if ((rs = shmctl(shmid,cmd,buf)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
+	    if ((rs = shmctl(shmid,cmd,buf)) < 0) {
+		rs = (- errno) ;
 	        switch (rs) {
 	        case SR_NOMEM:
 	            if (to_nomem-- > 0) {

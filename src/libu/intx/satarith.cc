@@ -39,12 +39,13 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<uvariables.hh>		/* <- for variable |valuelimit| */
 #include	<stdintx.h>		/* extended integer types */
 #include	<localmisc.h>
 
 #include	"satarith.h"
 
+
+import uvariables ;
 
 /* local defines */
 

@@ -69,13 +69,14 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<uvariables.hh>
 #include	<usupport.h>
 #include	<varnames.hh>
 #include	<stdintx.h>
 
 
 #ifdef	__cplusplus
+
+import uvariables ;
 
 static cint		xxtostr_maxbase = cstrlen(sysword.w_digtab) ;
 

@@ -1,4 +1,5 @@
 /* usem SUPPORT (UNIX® System V IPC - Semaphores) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -80,8 +81,8 @@ int u_semget(key_t key,int nsems,int semflag) noex {
 	int		to_nospc = utimeout[uto_nospc] ;
 	bool		f_exit = false ;
 	repeat {
-	    if ((rs = semget(key,nsems,semflag)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
+	    if ((rs = semget(key,nsems,semflag)) < 0) {
+		rs = (- errno) ;
 	        switch (rs) {
 	        case SR_NOMEM:
 	            if (to_nomem-- > 0) {
@@ -120,8 +121,6 @@ int u_semop(int semid,SEMBUF *sops,size_t nsops) noex {
 	    repeat {
 	        if ((rs = semop(semid,sops,nsops)) < 0) {
 		    rs = (- errno) ;
-		}
-	        if (rs < 0) {
 	            switch (rs) {
 	            case SR_NOMEM:
 	                if (to_nomem-- > 0) {
@@ -168,8 +167,6 @@ int u_semctl(int semid,int semnum,int cmd,...) noex {
 	repeat {
 	    if ((rs = semctl(semid,semnum,cmd,unp)) < 0) {
 		rs = (- errno) ;
-	    }
-	    if (rs < 0) {
 	        switch (rs) {
 	        case SR_NOMEM:
 	            if (to_nomem-- > 0) {
