@@ -95,9 +95,9 @@ int filer_writehdr(filer *fbp,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = cstrlen(sp) ;
 	    kl = sl ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
-	        kl = (tp - sp) ;
+	        kl = intconv(tp - sp) ;
 	        vp = (tp+1) ;
-	        vl = ((sp+sl)-vp) ;
+	        vl = intconv((sp + sl) - vp) ;
 	    }
 	    if (kl > 0) {
 	        if ((rs = fbp->write(sp,kl)) >= 0) {
@@ -145,7 +145,7 @@ int filer_printlncont(filer *fbp,int leader,cchar *sp,int sl) noex {
 	    if (sl > 0) {
 	        char	buf[2] ;
 	        if ((rs >= 0) && (leader > 0)) {
-	            buf[0] = leader ;
+	            buf[0] = char(leader) ;
 	            buf[1] = '\0' ;
 	            rs = fbp->write(buf,1) ;
 	            wlen += rs ;
