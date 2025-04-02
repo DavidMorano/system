@@ -119,7 +119,6 @@ int outema_ent(outema *op,EMA_ENT *ep) noex {
 	int		wlen = 0 ;
 	if ((rs = outema_magic(op)) >= 0) {
 	    if (buffer b ; (rs = b.start(COLUMNS)) >= 0) {
-	        cchar	*bp ;
 	        int	bl ;
 	        int	c = 0 ;
 	        if ((rs >= 0) && (ep->ap != nullptr) && (ep->al > 0)) {
@@ -141,12 +140,15 @@ int outema_ent(outema *op,EMA_ENT *ep) noex {
 	                if (rs >= 0) {
 	                    cint	sz = (cl+2+1) ;
 	                    if (char *ap ; (rs = uc_malloc(sz,&ap)) >= 0) {
-	                        char	*bp = ap ;
-	                        *bp++ = CH_LPAREN ;
-	                        if ((rs = snwcpycompact(bp,cl,cp,cl)) >= 0) {
-	                            bp += rs ;
-	                            *bp++ = CH_RPAREN ;
-	                            rs = b.strw(ap,(bp-ap)) ;
+				char	*tbp = ap ;
+	                        *tbp++ = CH_LPAREN ;
+	                        if ((rs = snwcpycompact(tbp,cl,cp,cl)) >= 0) {
+	                            tbp += rs ;
+	                            *tbp++ = CH_RPAREN ;
+				    {
+				       cint	tbl = intconv(tbp - ap) ;
+	                               rs = b.strw(tbp,tbl) ;
+				    }
 	                        } /* end if (snwcpycompact) */
 	                        rs1 = uc_free(ap) ;
 				if (rs >= 0) rs = rs1 ;
@@ -155,7 +157,7 @@ int outema_ent(outema *op,EMA_ENT *ep) noex {
 	            } /* end if (shrink) */
 	        } /* end if (comment) */
 	        if (rs >= 0) {
-	            if ((rs = b.get(&bp)) > 0) {
+	            if (cchar *bp ; (rs = b.get(&bp)) > 0) {
 	                bl = rs ;
 	                rs = outema_item(op,bp,bl) ;
 	                wlen += rs ;
@@ -229,11 +231,11 @@ int outema_value(outema *op,cchar *vp,int vl) noex {
 	                    f_comma = false ;
 	                } /* end if */
 	                op->c_values += 1 ;
-	                cl2 = (cp + cl - vp) ;
+	                cl2 = intconv(cp + cl - vp) ;
 	                vp += cl2 ;
 	                vl -= cl2 ;
 	            } else if ((tp = strnchr(vp,vl,'\n')) != nullptr) {
-	                vl -= ((tp + 1) - vp) ;
+	                vl -= intconv((tp + 1) - vp) ;
 	                vp = (tp + 1) ;
 	            } else {
 	                vl = 0 ;
