@@ -314,15 +314,14 @@ usysop.o:		usysop.cc usysop.h		$(INCS)
 ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
 uexec.o:		uexec.cc uexec.h		$(INCS)
 uinet.o:		uinet.cc uinet.h		$(INCS)
-uvariables.o:		uvariables.cc uvariables.hh	$(INCS)
+uvariables.o:		uvariables.cc uvariables.hh modules	$(INCS)
 uiconv.o:		uiconv.cc uiconv.h		$(INCS)
 
-syswords.o:		syswords.cc syswords.hh
-varnames.o:		varnames.cc varnames.hh
-valuelims.o:		valuelims.cc valuelims.hh
-endian.o::		endian.cc endian.h
+syswords.o:		syswords.cc syswords.hh		$(INCS)
+varnames.o:		varnames.cc varnames.hh		$(INCS)
+endian.o::		endian.cc endian.h		$(INCS)
 
-timecount.o:		timecount.cc timecount.hh
+timecount.o:		timecount.cc timecount.hh	$(INCS)
 
 strtox.o:		strtox.cc strtox.h		$(INCS)
 xxtostr.o:		xxtostr.cc xxtostr.h		$(INCS)
@@ -332,5 +331,12 @@ strnul.o:		strnul.cc strnul.hh		$(INCS)
 # DIGBUFSIZES
 digbufsizes.o:		digbufsizes.ccm			$(INCS)
 	makemodule digbufsizes
+
+# VALUELIMS
+valuelims.o:		valuelims.ccm			$(INCS)
+	makemodule valuelims
+
+modules:		valuelims.o digbufsizes.o	$(INCS)
+	touch $@
 
 

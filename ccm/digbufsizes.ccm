@@ -33,9 +33,10 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<stdintx.h>
-#include	<valuelims.hh>
 
 export module digbufsizes ;
+
+import valuelims ;
 
 extern const valuelims 	valuelimit ;
 

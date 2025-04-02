@@ -1,4 +1,4 @@
-/* valuelims HEADER */
+/* valuelims MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -15,15 +15,17 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-/******************************************************************************* 
+/*******************************************************************************
+
+  	Object:
+	valuelims
+
+	Description:
 	This object provides value limits on various integer types.
 
 *******************************************************************************/
 
-#ifndef	VALUELIMS_INCLUDE
-#define	VALUELIMS_INCLUDE
-#ifdef	__cplusplus
-
+module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |CHAR_BIT| + others */
@@ -33,8 +35,10 @@
 #include	<usysdefs.h>
 #include	<stdintx.h>
 
+export module valuelims ;
 
-struct valuelims {
+export {
+    struct valuelims {
 	cshort		smin = short(SHORT_MIN) ;
 	cshort		smax = short(SHORT_MAX) ;
 	cint		imin = INT_MIN ;
@@ -57,10 +61,7 @@ struct valuelims {
 	constexpr valuelims() noex {
 	    mklonglong() ;
 	} ;
-} ; /* end subroutine (valuelims) */
-
-
-#endif /* __cplusplus */
-#endif /* VALUELIMS_INCLUDE */
+    } ; /* end subroutine (valuelims) */
+}
 
 

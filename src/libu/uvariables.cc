@@ -64,7 +64,8 @@
 constinit const varnames	varname ;
 constinit const syswords	sysword ;
 constinit const valuelims	valuelimit ;
-constinit const digbufsizes	digbufsize ;
+
+const digbufsizes		digbufsize ;
 
 
 /* exported subroutines */

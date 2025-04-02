@@ -58,7 +58,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 OBJ_UIPC= uipcbase.o ushm.o umsg.o usem.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -83,6 +83,9 @@ all:			$(TARS)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_UIPC)

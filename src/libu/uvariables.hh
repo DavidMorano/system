@@ -39,8 +39,8 @@
 
 #include	<syswords.hh>
 #include	<varnames.hh>
-#include	<valuelims.hh>
 
+import valuelims ;
 import digbufsizes ;
 
 extern const syswords		sysword ;
