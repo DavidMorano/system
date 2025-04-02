@@ -110,7 +110,7 @@ so:			$(T).so
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+	$(LD) -o $@ $(LDFLAGS) $(OBJ)
 
 $(T).so:		$(OBJ) Makefile
 	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
@@ -134,56 +134,56 @@ control:
 
 
 obj00.o:		$(OBJ00)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ00)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ00)
 
 obj01.o:		$(OBJ01)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ01)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ01)
 
 obj02.o:		$(OBJ02)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ02)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ02)
 
 obj03.o:		$(OBJ03)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ03)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ03)
 
 obj04.o:		$(OBJ04)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ04)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ04)
 
 obj05.o:		$(OBJ05)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ05)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ05)
 
 obj06.o:		$(OBJ06)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ06)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ06)
 
 obj07.o:		$(OBJ07)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ07)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ07)
 
 obj08.o:		$(OBJ08)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ08)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ08)
 
 obj09.o:		$(OBJ09)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ09)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ09)
 
 obj10.o:		$(OBJ10)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ10)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ10)
 
 obj11.o:		$(OBJ11)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ11)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ11)
 
 
 obja.o:			$(OBJA)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
 
 objb.o:			$(OBJB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 objc.o:			$(OBJC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJC)
 
 objd.o:			$(OBJD)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJD)
 
 obje.o:			$(OBJE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJE)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJE)
 
 
 # MAILBOX

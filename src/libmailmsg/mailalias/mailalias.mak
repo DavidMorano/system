@@ -98,7 +98,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MAILALIAS)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -119,26 +119,26 @@ control:
 
 
 obj0.o:			$(OBJ0_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MAILALIAS)
 
 obj1.o:			$(OBJ1_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MAILALIAS)
 
 obj2.o:			$(OBJ2_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MAILALIAS)
 
 obj3.o:			$(OBJ3_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_MAILALIAS)
 
 obj4.o:			$(OBJ4_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_MAILALIAS)
 
 
 obja.o:			$(OBJA_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_MAILALIAS)
 
 objb.o:			$(OBJB_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_MAILALIAS)
 
 
 mailalias_obj.o:	mailalias_obj.cc	$(INCS) dbmake.hh

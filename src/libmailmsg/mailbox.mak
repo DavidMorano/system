@@ -96,7 +96,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_MAILBOX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILBOX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MAILBOX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -117,13 +117,13 @@ control:
 
 
 obj0_mailbox.o:	$(OBJ0_MAILBOX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILBOX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MAILBOX)
 
 obj1_mailbox.o:	$(OBJ1_MAILBOX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MAILBOX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MAILBOX)
 
 obj2_mailbox.o:	$(OBJ2_MAILBOX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MAILBOX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MAILBOX)
 
 
 mailbox_main.o:		mailbox_main.cc		$(INCS)

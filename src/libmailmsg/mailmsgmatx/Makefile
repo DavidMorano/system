@@ -94,7 +94,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_MAILMSGMATX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILMSGMATX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MAILMSGMATX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -115,13 +115,13 @@ control:
 
 
 obj0_mailmsgmatx.o:	$(OBJ0_MAILMSGMATX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILMSGMATX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MAILMSGMATX)
 
 obj1_mailmsgmatx.o:	$(OBJ1_MAILMSGMATX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MAILMSGMATX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MAILMSGMATX)
 
 obj2_mailmsgmatx.o:	$(OBJ2_MAILMSGMATX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MAILMSGMATX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MAILMSGMATX)
 
 
 mailmsgmatenv.o:	mailmsgmatenv.cc	mailmsgmatenv.h		$(INCS)

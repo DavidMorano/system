@@ -97,7 +97,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_MAILMSGX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILMSGX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MAILMSGX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -118,23 +118,23 @@ control:
 
 
 obj0_mailmsgx.o:	$(OBJ0_MAILMSGX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILMSGX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MAILMSGX)
 
 obj1_mailmsgx.o:	$(OBJ1_MAILMSGX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MAILMSGX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MAILMSGX)
 
 obj2_mailmsgx.o:	$(OBJ2_MAILMSGX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MAILMSGX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MAILMSGX)
 
 obj3_mailmsgx.o:	$(OBJ3_MAILMSGX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MAILMSGX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_MAILMSGX)
 
 
 obja.o:			$(OBJA)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
 
 objb.o:			$(OBJB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
 mailmsgatt.o:		mailmsgatt.cc		mailmsgatt.h		$(INCS)

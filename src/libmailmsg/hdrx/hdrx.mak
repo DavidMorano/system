@@ -94,7 +94,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_HDRX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_HDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_HDRX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -115,13 +115,13 @@ control:
 
 
 obj0_hdrx.o:	$(OBJ0_HDRX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_HDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_HDRX)
 
 obj1_hdrx.o:	$(OBJ1_HDRX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_HDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_HDRX)
 
 obj2_hdrx.o:	$(OBJ2_HDRX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_HDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_HDRX)
 
 
 hdrctype.o:		hdrctype.cc	hdrctype.h	$(INCS)

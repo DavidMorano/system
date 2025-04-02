@@ -99,7 +99,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_MAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MAILMSG)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -120,29 +120,29 @@ control:
 
 
 obj0_mailmsg.o:		$(OBJ0_MAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MAILMSG)
 
 obj1_mailmsg.o:		$(OBJ1_MAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MAILMSG)
 
 obj2_mailmsg.o:		$(OBJ2_MAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MAILMSG)
 
 obj3_mailmsg.o:		$(OBJ3_MAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_MAILMSG)
 
 obj4_mailmsg.o:		$(OBJ4_MAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_MAILMSG)
 
 
 obja.o:			$(OBJA_MAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_MAILMSG)
 
 objb.o:			$(OBJB_MAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_MAILMSG)
 
 objc.o:			$(OBJC_MAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_MAILMSG)
 
 
 mailmsg_main.o:			mailmsg_main.cc			$(INCS)

@@ -95,7 +95,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_MAILMSGHDRX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILMSGHDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MAILMSGHDRX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -116,13 +116,13 @@ control:
 
 
 obj0_mailmsghdrx.o:	$(OBJ0_MAILMSGHDRX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILMSGHDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MAILMSGHDRX)
 
 obj1_mailmsghdrx.o:	$(OBJ1_MAILMSGHDRX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MAILMSGHDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MAILMSGHDRX)
 
 obj2_mailmsghdrx.o:	$(OBJ2_MAILMSGHDRX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MAILMSGHDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MAILMSGHDRX)
 
 
 mailmsghdrct.o:		mailmsghdrct.cc		mailmsghdrct.h		$(INCS)
