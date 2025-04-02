@@ -130,7 +130,7 @@ namespace emaobj {
 	        }
 	    }
 	    if (rs >= 0) {
-	        asp->sp[(asp->sl)++] = ch ;
+	        asp->sp[(asp->sl)++] = char(ch) ;
 	        asp->sp[asp->sl] = '\0' ;
 	        len = asp->sl ;
 	    }

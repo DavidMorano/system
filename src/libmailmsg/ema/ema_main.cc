@@ -409,7 +409,7 @@ static int ema_parseit(ema *op,asstr *bp) noex {
 	        if ((state == si_address) && 
 	            (! f_quote) && (c_comment == 0)) {
 	            f_exit = TRUE ;
-	            olen = (bp->sp - orig) ;
+	            olen = intconv(bp->sp - orig) ;
 	            asstr_adv(bp) ;
 	        } else {
 	            asstr_addchr((as + state),ch) ;
@@ -419,7 +419,7 @@ static int ema_parseit(ema *op,asstr *bp) noex {
 	    case ',':
 	        if ((! f_quote) && (c_comment == 0) && 
 	            (state == si_address)) {
-	            olen = bp->sp - orig ;
+	            olen = intconv(bp->sp - orig) ;
 	            if ((olen > 0) && (partslen(as) > 0)) {
 	                n += 1 ;
 	                rs = ema_load(op,orig,olen,as,nlp) ;
@@ -495,7 +495,7 @@ static int ema_parseit(ema *op,asstr *bp) noex {
 #endif /* COMMENT */
 
 	if (! f_exit) {
-	    olen = (bp->sp - orig) ;
+	    olen = intconv(bp->sp - orig) ;
 	}
 
 	if (rs >= 0) {
