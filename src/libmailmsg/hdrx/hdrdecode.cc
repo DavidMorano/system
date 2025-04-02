@@ -96,8 +96,8 @@ namespace {
 	int proctrans_q(escinfo *,char *,int) noex ;
 	int proctrans_unknown(escinfo *,char *,int,cchar *) noex ;
 	int store(int ch) noex {
-	    int	c = 0 ;
-	    if ((rlen-rl) > 0) {
+	    int		c = 0 ;
+	    if ((rlen - rl) > 0) {
 	        rarr[rl++] = ch ;
 	        c = 1 ;
 	    }
@@ -241,16 +241,16 @@ int hdrdecode_finish(hdrdecode *op) noex {
 }
 /* end subroutine (hdrdecode_finish) */
 
-int hdrdecode_proc(hdrdecode *op,wchar_t *rarr,int rlen,cchar *sp,int sl) noex {
+int hdrdecode_proc(hdrdecode *op,wchar_t *rarr,int alen,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = hdrdecode_magic(op,rarr,sp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (sl < 0) sl = cstrlen(sp) ;
-	    if (rlen >= 0) {
+	    if (alen >= 0) {
 	        if (strnsub(sp,sl,"=?") != nullptr) {
-	            if (subinfo s(op,rarr,rlen) ; (rs = s.begin(sp,sl)) >= 0) {
+	            if (subinfo s(op,rarr,alen) ; (rs = s.begin(sp,sl)) >= 0) {
 	                {
 	                    rs = s.proc() ;
 	                    c = rs ;
@@ -259,7 +259,7 @@ int hdrdecode_proc(hdrdecode *op,wchar_t *rarr,int rlen,cchar *sp,int sl) noex {
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (s) */
 	        } else {
-	            rs = wsnwcpynarrow(rarr,rlen,sp,sl) ;
+	            rs = wsnwcpynarrow(rarr,alen,sp,sl) ;
 	            c += rs ;
 	        }
 	    } /* end if (valid) */
@@ -437,17 +437,17 @@ int subinfo::proctranser(escinfo *eip,cchar *tp,int tl) noex {
 /* end subroutine (subinfo::proctranser) */
 
 int subinfo::storetrans(int txid,cchar *tp,int tl) noex {
-	cint		rlen = (tl * szof(wchar_t)) ;
+	cint		tlen = (tl * szof(wchar_t)) ;
 	int		rs ;
 	int		rs1 ;
 	int		wl = 0 ;
-	if (wchar_t *rbuf{} ; (rs = uc_malloc((rlen+1),&rbuf)) >= 0) {
+	if (wchar_t *tbuf ; (rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 	    chartrans	*ctp = op->ctp ;
-	    if ((rs = chartrans_transread(ctp,txid,rbuf,rlen,tp,tl)) >= 0) {
-	        rs = store(rbuf,rs) ;
+	    if ((rs = chartrans_transread(ctp,txid,tbuf,tlen,tp,tl)) >= 0) {
+	        rs = store(tbuf,rs) ;
 	        wl = rs ;
 	    }
-	    rs1 = uc_free(rbuf) ;
+	    rs1 = uc_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? wl : rs ;
@@ -496,17 +496,17 @@ int subinfo::proctrans_q(escinfo *eip,char *tbuf,int tlen) noex {
 }
 /* end subroutine (subinfo::proctrans_q) */
 
-int subinfo::proctrans_unknown(escinfo *eip,char *tp,int tl,cchar *sp) noex {
+int subinfo::proctrans_unknown(escinfo *eip,char *tp,int tl,cchar *up) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (eip) {
+	if (eip && up) {
 	    rs = SR_OK ;
-	    while ((tl > 0) && *sp) {
-	        *tp++ = *sp ;
+	    while ((tl > 0) && *up) {
+	        *tp++ = *up ;
 	        tl -= 1 ;
 	        c += 1 ;
 	    } /* end while */
-	    if (*sp != '\0') rs = SR_OVERFLOW ;
+	    if (*up != '\0') rs = SR_OVERFLOW ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -533,8 +533,8 @@ static int escinfo_have(escinfo *eip,cchar *sp,int sl) noex {
 	                sp += (i+1) ;
 	                sl -= (i+1) ;
 	                if (int ei ; (ei = sisub(sp,sl,"?=")) >= 0) {
-	                    eip->skip = ((sp+ei+2)-sp_start) ;
-	                    eip->edl = (sp+ei-eip->edp) ;
+	                    eip->skip = intconv((sp + ei + 2) - sp_start) ;
+	                    eip->edl = intconv(sp + ei - eip->edp) ;
 	                } else {
 	                    si = -1 ;
 	                }
