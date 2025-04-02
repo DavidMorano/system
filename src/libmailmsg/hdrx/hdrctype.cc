@@ -78,13 +78,13 @@ int hdrctype_decode(hdrctype *op,cchar *hp,int hl) noex {
 	    }
 /* parse the type and subtype */
 	    if ((tp = strnchr(hp,hl,'/')) != nullptr) {
-	        cchar	*sp = (tp+1) ;
-	        int	sl = ((hp+hl) - (tp+1)) ;
+	        cchar	*sp = (tp +1) ;
+	        cint	sl = intconv((hp + hl) - (tp + 1)) ;
 	        if ((cl = sfshrink(sp,sl,&cp)) > 0) {
 		    op->sub.tp = cp ;
 		    op->sub.tl = cl ;
 	        }
-	        hl = (tp-hp) ;
+	        hl = intconv(tp - hp) ;
 	    }
 	    if ((cl = sfshrink(hp,hl,&cp)) > 0) {
 	        op->main.tp = cp ;
