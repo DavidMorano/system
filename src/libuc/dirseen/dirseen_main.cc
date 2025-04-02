@@ -32,7 +32,7 @@
 #include	<sys/stat.h>		/* |USTAT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -74,7 +74,7 @@ namespace {
 	int		namelen ;
 	dirseen_ent() noex : name(nullptr), namelen(0), dev(0L), ino(0L) { } ;
 	dirseen_ent(cchar *sp,int sl = -1) noex : name(sp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    namelen = sl ;
 	} ;
 	dirseen_ent(dev_t d,ino_t i) noex : dev(d), ino(i) { } ;
@@ -174,7 +174,7 @@ int dirseen_add(dirseen *op,cchar *sp,int sl,USTAT *sbp) noex {
 	            pp = "." ;
 	            pl = 1 ;
 	        } else {
-	            if (pl < 0) pl = strlen(pp) ;
+	            if (pl < 0) pl = cstrlen(pp) ;
 	 	}
 	        if ((rs = entry_start(&e,pp,pl,dev,ino)) >= 0) {
 	            op->strsize += rs ;

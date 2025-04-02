@@ -71,35 +71,32 @@ static bufsizevar	maxnamelen(getbufsize_mn) ;
 
 int mkshlibname(char *shlibname,cchar *pnp,int pnl) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		rl = 0 ;
 	if (shlibname && pnp) {
 	    rs = SR_INVALID ;
 	    if (pnp[0]) {
 	        cchar	*lc = "lib" ;
-		if (pnl < 0) pnl = strlen(pnp) ;
+		if (pnl < 0) pnl = cstrlen(pnp) ;
 		if ((rs = maxnamelen) >= 0) {
-		    cint	shliblen = rs ;
+		    storebuf	sb(shlibname,rs) ;
 	            bool	f = ((pnl >= 3) && (strncmp(pnp,lc,3) == 0)) ;
 	            if (! f) {
-	                rs = storebuf_strw(shlibname,shliblen,i,lc,3) ;
-	                i += rs ;
+			rs = sb.strw(lc,3) ;
 	            }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(shlibname,shliblen,i,pnp,pnl) ;
-	                i += rs ;
+	                rs = sb.strw(pnp,pnl) ;
 	            }
 	            if (rs >= 0) {
-	                rs = storebuf_chr(shlibname,shliblen,i,'.') ;
-	                i += rs ;
+	                rs = sb.chr('.') ;
 	            }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(shlibname,shliblen,i,"so",2) ;
-	                i += rs ;
+	                rs = sb.strw("so",2) ;
 	            }
+		    rl = sb ;
 		} /* end if (maxnamelen) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mkshlibname) */
 

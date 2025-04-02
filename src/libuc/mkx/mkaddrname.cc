@@ -123,20 +123,19 @@ constexpr bool		f_massage = CF_MASSAGE ;
 /* exported subroutines */
 
 int mkaddrname(char *fbuf,int flen,cchar *sp,int sl) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
 	if (fbuf && sp) {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    fbuf[0] = '\0' ;
 	    if (sl > 0)  {
-	        ema		a ;
-	        ema_ent		*ep{} ;
-	        if ((rs = ema_start(&a)) >= 0) {
-	            if ((rs = ema_parse(&a,sp,sl)) >= 0) {
-			auto	eg = ema_get ;
-		        cint	rsn = SR_NOTFOUND ;
+	        if (ema a ; (rs = a.start) >= 0) {
+	            if ((rs = a.parse(sp,sl)) >= 0) {
+	        	ema_ent		*ep{} ;
+			auto		eg = ema_get ;
 		        for (int i = 0 ; (rs1 = eg(&a,i,&ep)) >= 0 ; i += 1) {
 		            rs = emaentry_addrname(ep,fbuf,flen) ;
 	                    len = rs ;
@@ -146,7 +145,7 @@ int mkaddrname(char *fbuf,int flen,cchar *sp,int sl) noex {
 		    } else if (isBadAddr(rs)) {
 		        rs = SR_OK ;
 	            } /* end if (ema_parse) */
-	            rs1 = ema_finish(&a) ;
+	            rs1 = a.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (ema) */
 	    } /* end if (non-zero source) */

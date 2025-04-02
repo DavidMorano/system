@@ -205,18 +205,23 @@ int getgecosname(cchar *gbuf,int glen,cchar **rpp) noex {
 	    cchar	*tp ;
 	    bool	f = true ;
 	    rs = SR_OK ;
-	    if (glen < 0) glen = strnlen(gbuf,maxgecoslen) ;
+	    if (glen < 0) {
+		glen = cstrnlen(gbuf,maxgecoslen) ;
+	    }
 	    f = f && ((cp = strnchr(gbuf,glen,'-')) != np) ;
-	    f = f && ((tp = strnchr(cp,(glen - (cp - gbuf)),sch)) != np) ;
+	    {
+		cint	tl = intconv(glen - (cp - gbuf)) ;
+	        f = f && ((tp = strnchr(cp,tl,sch)) != np) ;
+	    }
 	    if (f) {
 	        cp += 1 ;
-	        cl = (tp - cp) ;
+	        cl = intconv(tp - cp) ;
 	    } else if ((tp = strnchr(gbuf,glen,sch)) != nullptr) {
 	        cp = gbuf ;
-	        cl = (tp - gbuf) ;
+	        cl = intconv(tp - gbuf) ;
 	    } else if ((tp = strnchr(gbuf,glen,'-')) != nullptr) {
 	        cp = (tp + 1) ;
-	        cl = glen - ((tp + 1) - gbuf) ;
+	        cl = glen - intconv((tp + 1) - gbuf) ;
 	    } else {
 	        cp = gbuf ;
 	        cl = glen ;

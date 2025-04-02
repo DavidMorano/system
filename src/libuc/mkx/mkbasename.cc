@@ -59,7 +59,7 @@ int mkbasename(char *rbuf,cchar *pnp,int pnl) noex {
 	    cchar	*cp{} ;
 	    rs = SR_INVALID ;
 	    if (int cl ; (cl = sfbasename(pnp,pnl,&cp)) > 0) {
-	        rs = mkpath1w(rbuf,cp,(cp - pnp)) ;
+	        rs = mkpath1w(rbuf,cp,cl) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;

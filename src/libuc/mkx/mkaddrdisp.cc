@@ -94,14 +94,11 @@ int mkaddrdisp(char *abuf,int alen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (abuf && sp) {
-	    sbuf	b ;
-	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = b.start(abuf,alen)) >= 0) {
-	        field	fsb ;
+	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sbuf b ; (rs = b.start(abuf,alen)) >= 0) {
 	        cint	flen = sl ;
-	        char	*fbuf ;
-	        if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
-	            if ((rs = field_start(&fsb,sp,sl)) >= 0) {
+	        if (char *fbuf ; (rs = uc_malloc((flen+1),&fbuf)) >= 0) {
+	            if (field fsb ; (rs = field_start(&fsb,sp,sl)) >= 0) {
 			cnullptr	np{} ;
 	                cchar		*fp = fbuf ;
 	                int		fl ;

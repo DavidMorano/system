@@ -101,7 +101,7 @@ namespace {
 	int		alen ;
 	bool		f_white ;
 	quoter(char *qp,int ql,cchar *ap,int al) noex {
-	    if (al < 0) al = strlen(ap) ;
+	    if (al < 0) al = cstrlen(ap) ;
 	    qbuf = qp ;
 	    abuf = ap ;
 	    qlen = ql ;

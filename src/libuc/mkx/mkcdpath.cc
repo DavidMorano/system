@@ -61,7 +61,6 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<new>
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<bufsizevar.hh>
 #include	<strwcpy.h>
 #include	<storebuf.h>
@@ -71,6 +70,7 @@
 #include	<mkchar.h>
 #include	<localmisc.h>
 
+import  uvariables ;
 
 /* local defines */
 
@@ -115,8 +115,8 @@ namespace {
 	int getvarname() noex {
 	    cchar	*tp ;
 	    if ((tp = strnchr(sp,sl,'/')) != nullptr) {
-		vl = (tp-sp) ;
-		sl -= ((tp+1)-sp) ;
+		vl = intconv(tp - sp) ;
+		sl -= intconv((tp + 1) - sp) ;
 		sp = (tp+1) ;
 	    }
 	    return vl ;
@@ -139,7 +139,7 @@ namespace {
 	} ;
 	int getbasename() noex {
 	    if ((bl = sfbasename(sp,sl,&bp)) > 0) {
-		sl = (bp-sp-1) ;
+		sl = intconv(bp -sp - 1) ;
 	    }
 	    return sl ;
 	} ;
@@ -172,7 +172,7 @@ int mkcdpath(char *ebuf,cchar *fp,int fl) noex {
 	if (ebuf && fp) {
 	    cint	ec = CH_EXPAND ;
 	    ebuf[0] = '\0' ;
-	    if (fl < 0) fl = strlen(fp) ;
+	    if (fl < 0) fl = cstrlen(fp) ;
 	    if ((fl > 0) && (mkchar(fp[0]) == ec)) {
 	        mkcdpathsub 	*sip = new mkcdpathsub(ebuf,(fp+1),(fl+1)) ;
 	        if ((rs = sip->getvarname()) >= 0) {
@@ -196,21 +196,22 @@ int mkcdpath(char *ebuf,cchar *fp,int fl) noex {
 /* local srubroutines */
 
 int mkcdpathsub::testpaths() noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		el = 0 ;
 	if (plist != nullptr) {
-	    int		pl = strlen(plist) ;
+	    int		pl = cstrlen(plist) ;
 	    cchar	*pp = plist ;
-	    cchar	*tp ;
-	    while ((tp = strnchr(pp,pl,':')) != nullptr) {
-		if ((tp-pp) > 0) {
-		    rs = testpath(pp,(tp-pp)) ;
+	    for (cchar *tp ; (tp = strnchr(pp,pl,':')) != np ; ) {
+		cint	ll = intconv(tp - pp) ;
+		if (ll > 0) {
+		    rs = testpath(pp,ll) ;
 		    el = rs ;
 	        }
-		pl -= ((tp+1)-pp) ;
+		pl -= intconv((tp + 1) - pp) ;
 	        pp = (tp+1) ;
 		if (rs != 0) break ;
-	    } /* end while */
+	    } /* end for */
 	    if ((rs == 0) && (pl > 0)) {
 	        rs = testpath(pp,pl) ;
 		el = rs ;

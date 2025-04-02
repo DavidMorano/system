@@ -113,10 +113,11 @@ int mknpath6w(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,
 /* end subroutine (mknpath6w) */
 
 int mknpathxw(char *pbuf,int plen,int n,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
+	int		pl = 0 ;
 	char		*bp = pbuf ;
 	if (pbuf) {
-	    va_list	ap ;
 	    if ((rs = getrlen(plen)) >= 0) {
 	        int	bl = rs ;
 	        int	sl = -1 ;
@@ -145,10 +146,11 @@ int mknpathxw(char *pbuf,int plen,int n,...) noex {
 	            } /* end if */
 	        } /* end for */
 	        *bp = '\0' ; /* in case of overflow */
+		pl = intconv(bp - pbuf) ;
 	        va_end(ap) ;
 	    } /* end if (getplen) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? (bp - pbuf) : rs ;
+	return (rs >= 0) ? pl : rs ;
 }
 /* end subroutine (mknpathxw) */
 

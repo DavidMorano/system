@@ -119,18 +119,17 @@ int mkonefrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 	    fbuf[0] = '\0' ;
 	    if (sp[0]) {
 		rs = SR_OK ;
-	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl < 0) sl = cstrlen(sp) ;
 	        if (sl > 0)  {
-	            ema		a ;
-	            ema_ent	*ep ;
-	            if ((rs = ema_start(&a)) >= 0) {
-	                if (ema_parse(&a,sp,sl) >= 0) {
-		            if (ema_get(&a,0,&ep) >= 0) {
+	            if (ema a ; (rs = a.start) >= 0) {
+	                if ((rs = a.parse(sp,sl)) >= 0) {
+	            	    ema_ent	*ep ;
+		            if ((rs = a.get(0,&ep)) >= 0) {
 		                rs = emaentry_bestfrom(ep,fbuf,flen) ;
 	                        len = rs ;
 		            } /* end if (ema_get) */
 	                } /* end if (ema_parse) */
-	                rs1 = ema_finish(&a) ;
+	                rs1 = a.finish ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (ema) */
 	        } /* end if (non-zero source) */

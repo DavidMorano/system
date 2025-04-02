@@ -69,6 +69,10 @@ namespace {
 
 /* forward references */
 
+static int cstrlcpy(char *dp,cchar *sp,int sl) noex {
+    	csize	ssz = size_t(sl) ;
+	return int(strlcpy(dp,sp,ssz)) ;
+}
 
 /* local variables */
 
@@ -112,10 +116,11 @@ int mknpath6(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 /* end subroutine (mknpath5) */
 
 int mknpathx(char *pbuf,int plen,int n,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
+	int		pl = 0 ;
 	char		*bp = pbuf ;
 	if (pbuf) {
-	    va_list	ap ;
 	    if ((rs = getrlen(plen)) >= 0) {
 	        int	rlen = (rs + 1) ;
 	        va_begin(ap,n) ;
@@ -133,7 +138,7 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 		        }
 	            } /* end if (needed a pathname separator) */
 		    if (rs >= 0) {
-	                if (int ml ; (ml = strlcpy(bp,sp,rlen)) < rlen) {
+	                if (int ml ; (ml = cstrlcpy(bp,sp,rlen)) < rlen) {
 	        	    bp += ml ;
 	        	    rlen -= ml ;
 		        } else {
@@ -144,8 +149,9 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 	        va_end(ap) ;
 	    } /* end if (getrlen) */
 	    *bp = '\0' ; /* in case of overflow */
+	    pl = intconv(bp - pbuf) ;
 	} /* end if (non-null) */
-	return (rs >= 0) ? (bp - pbuf) : rs ;
+	return (rs >= 0) ? pl : rs ;
 }
 /* end subroutine (mknpathx) */
 

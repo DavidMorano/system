@@ -92,7 +92,7 @@ int mkstrunique(char *bp,int bl) noex {
 	    while (bl-- && *bp) {
 	        cint	ch = mkchar(*bp) ;
 		if (!seen[ch]) {
-		    bp[rl++] = ch ;
+		    bp[rl++] = char(ch) ;
 	            seen[ch] = true ;
 		}
 	        bp += 1 ;

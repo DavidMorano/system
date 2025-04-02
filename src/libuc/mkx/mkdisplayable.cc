@@ -85,11 +85,10 @@ int mkdisplayable(char *rbuf,int rlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (rbuf && sp) {
-	    sbuf	s ;
-	    if ((rs = s.start(rbuf,rlen)) >= 0) {
+	    if (sbuf s ; (rs = s.start(rbuf,rlen)) >= 0) {
 	        int	pch = 0 ;
 	        bool	f_shift = false ;
-		if (sl < 0) sl = strlen(sp) ;
+		if (sl < 0) sl = cstrlen(sp) ;
 	        for (int i = 0 ; (i < sl) && sp[i] ; i += 1) {
 	            cint	ch = mkchar(sp[i]) ;
 	            switch (ch) {

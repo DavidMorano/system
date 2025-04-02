@@ -84,12 +84,11 @@ int mkaddrbest(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (rbuf && abuf) {
-	    ema		a ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = ema_start(&a)) >= 0) {
-	        if ((rs = ema_parse(&a,abuf,alen)) >= 0) {
+	    if (ema a ; (rs = a.start) >= 0) {
+	        if ((rs = a.parse(abuf,alen)) >= 0) {
 	            ema_ent	*ep ;
-	            for (int i = 0 ; ema_get(&a,i,&ep) >= 0 ; i += 1) {
+	            for (int i = 0 ; a.get(i,&ep) >= 0 ; i += 1) {
 	                if (ep) {
 	                    int		sl = 0 ;
 	                    cchar	*sp = nullptr ;
@@ -118,7 +117,7 @@ int mkaddrbest(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 		        if (rs < 0) break ;
 	            } /* end for */
 	        } /* end if (parse) */
-	        rs1 = ema_finish(&a) ;
+	        rs1 = a.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ema) */
 	} /* end if (non-null) */

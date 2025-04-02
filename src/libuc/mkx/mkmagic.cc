@@ -82,13 +82,13 @@ int mkmagic(char *rbuf,int rlen,cchar *ms) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if ((rlen >= 2) && ms[0]) {
-	        if (cint mslen = strlen(ms) ; (mslen+1) <= rlen) {
+	        if (cint mslen = cstrlen(ms) ; (mslen+1) <= rlen) {
 	            char	*bp = strwcpy(rbuf,ms,-1) ;
 	            rs = SR_OK ;
 	            *bp++ = '\n' ;
-	            if (cint zl = ((rbuf + rlen) - bp) ; zl > 0) {
+	            if (cint zl = intconv((rbuf + rlen) - bp) ; zl > 0) {
 	                memclear(bp,zl) ;
-	            }
+		    }
 	        } else {
 	            rs = SR_OVERFLOW ;
 	        }

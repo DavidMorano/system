@@ -60,11 +60,11 @@
 int mkrevstr(char *bp,int bl) noex {
 	int		rs = SR_FAULT ;
 	if (bp) {
-	    if (bl < 0) bl = strlen(bp) ;
+	    if (bl < 0) bl = cstrlen(bp) ;
 	    for (int i = 0 ; i < (bl/2) ; i += 1) {
 	        int	ch = bp[i] ;
 	        bp[i] = bp[bl-i-1] ;
-	        bp[bl-i-1] = ch ;
+	        bp[bl-i-1] = char(ch) ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? bl : rs ;

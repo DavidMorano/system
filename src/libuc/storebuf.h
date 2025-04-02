@@ -205,6 +205,9 @@ struct storebuf {
 	    idx += rs ;
 	    return rs ;
 	} ;
+	operator int () noex {
+	    return idx ;
+	} ;
 } ; /* end struct (storebuf) */
 
 #endif /* __cplusplus */

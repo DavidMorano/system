@@ -433,9 +433,6 @@ projectent.o:		projectent.cc projectent.h
 userattrent.o:		userattrent.cc userattrent.h
 
 mkprogenv.o:		mkprogenv.cc mkprogenv.h
-mkvarpath.o:		mkvarpath.cc
-mkuserpath.o:		mkuserpath.cc
-mkcdpath.o:		mkcdpath.cc
 
 strcpyxc.o:		strcpyxc.cc strcpyxc.h
 

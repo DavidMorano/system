@@ -126,7 +126,7 @@ int mkaddrfrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	    fbuf[0] = '\0' ;
 	    if (sp[0]) {
-	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl < 0) sl = cstrlen(sp) ;
 	        if (sl > 0)  {
 	            rs = mkaddrx(fbuf,flen,sp,sl) ;
 		    len = rs ;
@@ -141,16 +141,14 @@ int mkaddrfrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 /* local subroutines */
 
 static int mkaddrx(char *rbuf,int rlen,cchar *sp,int sl) noex {
-	ema		a ;
-	ema_ent		*ep ;
+        cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-        if ((rs = ema_start(&a)) >= 0) {
-            if ((rs = ema_parse(&a,sp,sl)) >= 0) {
-                auto        eg = ema_get ;
-                cint        rsn = SR_NOTFOUND ;
-                for (int i = 0 ; (rs1 = eg(&a,i,&ep)) >= 0 ; i += 1) {
+	if (ema a ; (rs = a.start) >= 0) {
+            if ((rs = a.parse(sp,sl)) >= 0) {
+		ema_ent		*ep ;
+                for (int i = 0 ; (rs1 = a.get(i,&ep)) >= 0 ; i += 1) {
                     rs = emaentry_bestfrom(ep,rbuf,rlen) ;
                     len = rs ;
                     if (rs != 0) break ;
@@ -159,7 +157,7 @@ static int mkaddrx(char *rbuf,int rlen,cchar *sp,int sl) noex {
             } else if (isBadAddr(rs)) {
                 rs = SR_OK ;
             } /* end if (ema_parse) */
-            rs1 = ema_finish(&a) ;
+            rs1 = a.finish ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (ema) */
 	return (rs >= 0) ? len : rs ;

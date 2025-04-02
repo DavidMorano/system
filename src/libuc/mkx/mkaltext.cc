@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	mkalttext
+	mkaltext
 
 	Description:
 	We take a file-name and create a new file-name replacing
@@ -84,15 +84,14 @@ int mkaltext(char *dbuf,cchar *name,cchar *ext) noex {
 	if (dbuf && name && ext) {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
-	        cchar	*tp ;
-	        if ((tp = strrchr(name,'.')) != nullptr) {
+	        if (cchar *tp ; (tp = strrchr(name,'.')) != nullptr) {
 	            if (tp[1] != '\0') {
 			if ((rs = maxpathlen) >= 0) {
-	                    sbuf	alt ;
 	                    cint	dlen = rs ;
-	                    if ((rs = alt.start(dbuf,dlen)) >= 0) {
+	                    if (sbuf alt ; (rs = alt.start(dbuf,dlen)) >= 0) {
 		                {
-	                            alt.strw(name,(tp - name)) ;
+				    cint	nl = intconv(tp - name) ;
+	                            alt.strw(name,nl) ;
 	                            alt.chr('.') ;
 	                            alt.strw(ext,-1) ;
 		                }
