@@ -242,7 +242,7 @@ int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
                 int		ct = 0 ;
                 op->s.total += 1 ;
                 key.buf = un ;
-                key.len = strlen(un) ;
+                key.len = cstrlen(un) ;
                 if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
                     ep = (rec *) val.buf ;
                     ct = ct_hit ;
@@ -310,7 +310,7 @@ int pwcache_invalidate(pwcache *op,cchar *un) noex {
                 hdb_dat   key ;
                 hdb_dat   val{} ;
                 key.buf = un ;
-                key.len = strlen(un) ;
+                key.len = cstrlen(un) ;
                 if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
                     rec     *ep = (rec *) val.buf ;
                     f_found = true ;
@@ -373,7 +373,7 @@ int pwcache_check(pwcache *op,time_t dt) noex {
 }
 /* end subroutine (pwcache_check) */
 
-int pwcache_stats(pwcache *op,pwcache_st *sp) noex {
+int pwcache_getstat(pwcache *op,pwcache_st *sp) noex {
         int             rs ;
 	if ((rs = pwcache_magic(op,sp)) >= 0) {
             if ((rs = hdb_count(op->dbp)) >= 0) {
@@ -383,7 +383,7 @@ int pwcache_stats(pwcache *op,pwcache_st *sp) noex {
 	} /* end if (magic) */
         return rs ;
 }
-/* end subroutine (pwcache_stats) */
+/* end subroutine (pwcache_getstat) */
 
 
 /* private subroutines */
@@ -471,7 +471,7 @@ static int pwcache_recstart(pwcache *op,time_t dt,rec *ep,ureq *rp) noex {
             cint	rsz = szof(rec) ;
             pwl = rs ;
             key.buf = ep->un ;
-            key.len = strlen(ep->un) ;
+            key.len = cstrlen(ep->un) ;
             val.buf = ep ;
             val.len = rsz ;
             rs = hdb_store(op->dbp,key,val) ;
@@ -500,16 +500,15 @@ static int pwcache_recaccess(pwcache *op,time_t dt,rec *ep) noex {
 
 static int pwcache_recrear(pwcache *op,rec *ep) noex {
         pq_ent          *pcp = (pq_ent *) ep ;
-        pq_ent          *pep{} ;
         int             rs ;
-        if ((rs = pq_gettail(op->lrup,&pep)) >= 0) {
+        if (pq_ent *pep{} ; (rs = pq_gettail(op->lrup,&pep)) >= 0) {
             if (pcp != pep) {
                 pep = (pq_ent *) ep ;
                 if ((rs = pq_unlink(op->lrup,pep)) >= 0) {
                     rs = pq_ins(op->lrup,pep) ;
                     if (rs < 0) {
-                        rec     *ep = (rec *) pep ;
-                        record_finish(ep) ;
+			rec	*rep = (rec *) pep ;
+                        record_finish(rep) ;
                         uc_free(pep) ;
                     }
                 }
@@ -525,7 +524,7 @@ static int pwcache_recdel(pwcache *op,rec *ep) noex {
 	{
             hdb_dat	key ;
             key.buf = ep->un ;
-            key.len = strlen(ep->un) ;
+            key.len = cstrlen(ep->un) ;
             rs1 = hdb_delkey(op->dbp,key) ;
             if (rs >= 0) rs = rs1 ;
 	}
@@ -712,9 +711,9 @@ static int record_refresh(rec *ep,time_t dt,int wc) noex {
                     if (rs >= 0) {
                         ucentpw     *pwp = pwentp(&ep->pw) ;
                         ucentpw     *opwp = pwentp(&pw) ;
-                        char        *pwbuf = charp(vp) ;
+                        char        *mbuf = charp(vp) ;
                         ep->pwbuf = charp(vp) ;
-                        rs = pwp->load(pwbuf,pwl,opwp) ;
+                        rs = pwp->load(mbuf,pwl,opwp) ;
                         if (rs < 0) {
 			    uc_free(vp) ;
 			}

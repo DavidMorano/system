@@ -157,7 +157,7 @@ namespace {
 	int	iopend() noex ;
 	int	name(ucentpw *,char *,int,cchar *) noex ;
 	int	uid(ucentpw *,char *,int,uid_t) noex ;
-	int	stats(ucpwcache_st *) noex ;
+	int	getstat(ucpwcache_st *) noex ;
 	~ucpwcache() noex {
 	    if (cint rs = fini ; rs < 0) {
 		ulogerror("ucpwcache",rs,"dtor-fini") ;
@@ -202,8 +202,8 @@ int ucpwcache_uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	return ucpwcache_data.uid(pwp,pwbuf,pwlen,uid) ;
 }
 
-int ucpwcache_stats(ucpwcache_st *usp) noex {
-	return ucpwcache_data.stats(usp) ;
+int ucpwcache_getstat(ucpwcache_st *usp) noex {
+	return ucpwcache_data.getstat(usp) ;
 }
 
 
@@ -243,13 +243,13 @@ int ucpwcache::iinit() noex {
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
-	            int		rs = SR_OK ;
+	            int		rsl = SR_OK ; /* XX GCC complaint */
 	            if (!finit) {
-		        rs = SR_LOCKLOST ;
+		        rsl = SR_LOCKLOST ;
 	            } else if (finitdone) {
-		        rs = 1 ;
+		        rsl = 1 ;
 	            }
-	            return rs ;
+	            return rsl ;
 	        } ; /* end lambda */
 	        rs = tw(lamb) ;
 	    } /* end if (initialization) */
@@ -331,7 +331,7 @@ int ucpwcache::uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 }
 /* end subroutine (ucpwcache_uid) */
 
-int ucpwcache::stats(ucpwcache_st *usp) noex {
+int ucpwcache::getstat(ucpwcache_st *usp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		n = 0 ;
@@ -340,8 +340,8 @@ int ucpwcache::stats(ucpwcache_st *usp) noex {
 	    if ((rs = init()) >= 0) {
 	        if ((rs = capbegin) >= 0) {
 	            if ((rs = opcheck) >= 0) {
-	                pwcache_st	s{} ;
-	                if ((rs = pwcache_stats(pwc,&s)) >= 0) {
+	                pwcache_st s ; 
+			if ((rs = pwcache_getstat(pwc,&s)) >= 0) {
 	                    usp->nmax = nmax ;
 	                    usp->ttl = ttl ;
 	                    usp->nent = s.nentries ;
@@ -351,7 +351,7 @@ int ucpwcache::stats(ucpwcache_st *usp) noex {
 	                    usp->pmis = s.pmisses ;
 	                    usp->nmis = s.nmisses ;
 	                    n = s.nentries ;
-	                } /* end if (ucpwcache_stats) */
+	                } /* end if (ucpwcache_getstat) */
 	            } /* end if */
 	            rs1 = capend() ;
 	            if (rs >= 0) rs = rs1 ;
@@ -360,7 +360,7 @@ int ucpwcache::stats(ucpwcache_st *usp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (ucpwcache_stats) */
+/* end method (ucpwcache::getstat) */
 
 int ucpwcache::icapbegin(int to) noex {
 	int		rs ;
@@ -408,9 +408,8 @@ int ucpwcache::iopcheck() noex {
 int ucpwcache::iopbegin() noex {
 	int		rs = SR_OK ;
 	if (pwc == nullptr) {
-	    cint	esz = sizeof(ucpwcache) ;
-	    void	*vp{} ;
-	    if ((rs = uc_libmalloc(esz,&vp)) >= 0) {
+	    cint	esz = szof(ucpwcache) ;
+	    if (void *vp ; (rs = uc_libmalloc(esz,&vp)) >= 0) {
 	        cint		amax = UCPWCACHE_MAX ;
 	        cint		attl = UCPWCACHE_TTL ;
 	        pwcache		*pwcp = (pwcache *) vp ;

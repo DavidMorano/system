@@ -114,7 +114,7 @@ int mkuserpath(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 	if (rbuf && pp) {
 	    rbuf[0] = '\0' ;
 	    rs = SR_OK ;
-	    if (pl < 0) pl = strlen(pp) ;
+	    if (pl < 0) pl = cstrlen(pp) ;
 	    while ((pl > 0) && (pp[0] == '/')) {
 	        pp += 1 ;
 	        pl -= 1 ;
@@ -140,11 +140,11 @@ static int mkpathsquiggle(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 	int		rs ;
 	int		ul = pl ;
 	cchar		*up = pp ;
-	if (pl < 0) pl = strlen(pp) ;
+	if (pl < 0) pl = cstrlen(pp) ;
 	if (cchar *tp{} ; (tp = strnchr(pp,pl,'/')) != nullptr) {
-	    ul = (tp-pp) ;
-	    pl -= ((tp+1)-pp) ;
-	    pp = (tp+1) ;
+	    ul = intconv(tp - pp) ;
+	    pl -= intconv((tp + 1) - pp) ;
+	    pp = (tp + 1) ;
 	} else {
 	    pp += pl ;
 	    pl = 0 ;
@@ -159,7 +159,7 @@ static int mkpathsquiggle(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 /* end subroutine (mkpathsqiggle) */
 
 static int mkpathuserfs(char *rbuf,cchar *pp,int pl) noex {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	if ((pl >= 2) && (strncmp("u/",pp,2) == 0)) {
 	    pp += 2 ;
@@ -173,8 +173,8 @@ static int mkpathuserfs(char *rbuf,cchar *pp,int pl) noex {
 	            cchar	*up = pp ;
 	            int		ul = pl ;
 	            if (cchar *tp{} ; (tp = strnchr(pp,pl,'/')) != np) {
-	                ul = (tp - pp) ;
-	                pl -= ((tp+1)-pp) ;
+	                ul = intconv(tp - pp) ;
+	                pl -= intconv((tp + 1) - pp) ;
 	                pp = (tp+1) ;
 	            } else {
 	                pp += pl ;
@@ -197,7 +197,7 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
 	    cchar	*un = up ;
 	    char	ubuf[ulen+1] ;		/* <- VLA */
 	    if (ul >= 0) {
-	        rs = strwcpy(ubuf,up,min(ul,ulen)) - ubuf ;
+	        rs = intconv(strwcpy(ubuf,up,min(ul,ulen)) - ubuf) ;
 	        un = ubuf ;
 	    }
 	    if (rs >= 0) {

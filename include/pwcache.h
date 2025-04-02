@@ -56,7 +56,7 @@ extern int pwcache_lookup(pwcache *,ucentpw *,char *,int,cchar *) noex ;
 extern int pwcache_uid(pwcache *,ucentpw *,char *,int,uid_t) noex ;
 extern int pwcache_invalidate(pwcache *,cchar *) noex ;
 extern int pwcache_check(pwcache *,time_t) noex ;
-extern int pwcache_stats(pwcache *,pwcache_st *) noex ;
+extern int pwcache_getstat(pwcache *,pwcache_st *) noex ;
 extern int pwcache_finish(pwcache *) noex ;
 
 EXTERNC_end
