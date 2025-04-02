@@ -226,7 +226,7 @@ static int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
             int		cl, fl ;
             cchar	*cp = ctp + ctl ;
             /* get the file suffixes for this MIME content type */
-            cl = ll - (cp - lbuf) ;
+            cl = ll - intconv(cp - lbuf) ;
 	    if (field fb ; (rs = fb.start(cp,cl)) >= 0) {
 		cchar	*fp ;
 		while ((fl = fb.get(terms,&fp)) >= 0) {
@@ -351,7 +351,7 @@ int mimetypes_fetch(mt *op,mt_cur *curp,char *ext,char *ts) noex {
 	    if ((rs = hdb_fetch(op->dbp,key,curp,&val)) >= 0) {
 	        cint	ml = min(val.len,var.typelen) ;
 	        cchar	*mp = charp(val.buf) ;
-	        rs = (strwcpy(ts,mp,ml) - ts) ;
+	        rs = intconv(strwcpy(ts,mp,ml) - ts) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -383,7 +383,7 @@ static int exttypespec(cchar *tbuf,int tlen,cchar **rpp) noex {
 	        cl -= 1 ;
 	    }
 	    *rpp = sp ;
-	    spec = (cp - sp) ;
+	    spec = intconv(cp - sp) ;
 	} /* end if */
 	return spec ;
 }

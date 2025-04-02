@@ -405,7 +405,7 @@ static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	} /* end while */
 	/* done */
 	*ncp = ncs ;
-	pl = (cp - sp) ;
+	pl = intconv(cp - sp) ;
 	return pl ;
 }
 /* end subroutine (nextpiece) */
@@ -430,16 +430,18 @@ static int nextbreak(int ncol,int bch,cchar *sp,int sl,int *ncp) noex {
 	/* find a possible break */
 	if_constexpr (f_strnbreak) {
 	    if ((tp = strnbreak(cp,cl,bch)) != nullptr) {
-	        n = ncolstr(ntab,ncol,cp,((tp+1)-cp)) ;
+		cint	ll = intconv((tp + 1) - cp) ;
+	        n = ncolstr(ntab,ncol,cp,ll) ;
 	        ncs += n ;
-	        pl = ((tp+1) - sp) ;
+	        pl = intconv((tp + 1) - sp) ;
 	        *ncp = ncs ;
 	    } /* end if */
 	} else {
 	    if ((tp = strnchr(cp,cl,bch)) != nullptr) {
-	        n = ncolstr(ntab,ncol,cp,((tp+1)-cp)) ;
+		cint	ll = intconv((tp+1)-cp) ;
+	        n = ncolstr(ntab,ncol,cp,ll) ;
 	        ncs += n ;
-	        pl = ((tp+1) - sp) ;
+	        pl = intconv((tp + 1) - sp) ;
 	        *ncp = ncs ;
 	    } /* end if */
 	} /* end if_constexpr (f_strnbreak) */

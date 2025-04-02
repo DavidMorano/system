@@ -25,7 +25,7 @@
 
 struct mailmsghdrval_head {
 	char		*vbuf ;	/* initially LINEBUFLEN in size */
-	char		vlen ;
+	int		vlen ;
 	int		vl ;
 	int		idx ;
 } ;

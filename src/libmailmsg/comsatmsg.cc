@@ -150,17 +150,19 @@ int comsatmsg_wr(comsatmsg *op,cchar *mbuf,int mlen) noex {
 	        sl -= 1 ;
 	    }
 	    if (cc *tp ; (tp = strnchr(sp,sl,'@')) != nullptr) {
+		int	ll = intconv(tp - sp) ;
 		int	cl ;
 		cchar	*cp{} ;
-	        if ((rs = sncpy1w(ubuf,ulen,sp,(tp-sp))) >= 0) {
-	            sl -= ((tp + 1) - mbuf) ;
+	        if ((rs = sncpy1w(ubuf,ulen,sp,ll)) >= 0) {
+	            sl -= intconv((tp + 1) - mbuf) ;
 	            sp = (tp + 1) ;
 	            cp = sp ;
 	            cl = sl ;
 	            if ((tp = strnchr(sp,sl,':')) != nullptr) {
+			ll = intconv((sp+sl)-(tp+1)) ;
 	                char	*fbuf = op->fname ;
-	                cl = (tp - sp) ;
-	                rs = mkpath1w(fbuf,(tp+1),((sp+sl)-(tp+1))) ;
+	                cl = intconv(tp - sp) ;
+	                rs = mkpath1w(fbuf,(tp+1),ll) ;
 	            }
 	            if (rs >= 0) {
 	                if (ulong ulv ; (rs = cfdec(cp,cl,&ulv)) >= 0) {

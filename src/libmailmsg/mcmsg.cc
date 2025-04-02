@@ -94,7 +94,7 @@ int mcmsg_request(mcmsg_req *sp,int f,char *abuf,int alen) noex {
 	        }
 	    } else { /* write */
 	        mb.rui(&hdr) ;
-	        sp->msgtype = mkchar(hdr) ;
+	        sp->msgtype = uchar(hdr) ;
 	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        mb >> sp->seq ;
 	        mb >> sp->tag ;
@@ -145,7 +145,7 @@ int mcmsg_report(mcmsg_rep *sp,int f,char *abuf,int alen) noex {
 	        }
 	    } else { /* write */
 	        mb >> hdr ;
-	        sp->msgtype = mkchar(hdr) ;
+	        sp->msgtype = uchar(hdr) ;
 	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        mb >> sp->seq ;
 	        mb >> sp->tag ;
@@ -194,7 +194,7 @@ int mcmsg_acknowledge(mcmsg_ack *sp,int f,char *abuf,int alen) noex {
 	        }
 	    } else { /* write */
 	        mb >> hdr ;
-	        sp->msgtype = mkchar(hdr) ;
+	        sp->msgtype = uchar(hdr) ;
 	        sp->msglen = (hdr >> CHAR_BIT) ;
 	        mb >> sp->seq ;
 	        mb >> sp->tag ;
