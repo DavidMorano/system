@@ -100,17 +100,17 @@ using std::max ;			/* subroutine-template */
 
 /* exported subroutines */
 
-int bfile::opene(cchar *fn,cchar *os,mode_t om,int to) noex {
-	return bopene(this,fn,os,om,to) ;
+int bfile::opene(cchar *fn,cchar *aos,mode_t aom,int to) noex {
+	return bopene(this,fn,aos,aom,to) ;
 }
 
-int bfile::open(cchar *fn,cchar *os,mode_t om) noex {
-	return bopene(this,fn,os,om,-1) ;
+int bfile::open(cchar *fn,cchar *aos,mode_t aom) noex {
+	return bopene(this,fn,aos,aom,-1) ;
 }
 /* end subroutine (bopen) */
 
-int bfile::openmod(cchar *fname,cchar *of,mode_t om) noex {
-	return bopenmod(this,fname,of,om) ;
+int bfile::openmod(cchar *fname,cchar *aof,mode_t aom) noex {
+	return bopenmod(this,fname,aof,aom) ;
 }
 
 int bfile::controlv(int cmd,va_list ap) noex {
@@ -144,8 +144,8 @@ int bfile::flushn(int n) noex {
 	return bflushn(this,n) ;
 }
 
-int bfile::minmod(mode_t om) noex {
-	return bminmod(this,om) ;
+int bfile::minmod(mode_t aom) noex {
+	return bminmod(this,aom) ;
 }
 
 int bfile::printcleanln(cchar *lp,int ll) noex {

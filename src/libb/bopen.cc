@@ -132,7 +132,7 @@ namespace {
 	    to = ato ;
 	} ; /* end ctor */
 	int operator () (mainv av,mainv ev) noex ;
-	int mkoflags(cchar *) noex ;
+	int mkoflags() noex ;
 	int getfile() noex ;
 	int openfd(int) noex ;
 	int openadj() noex ;
@@ -222,9 +222,10 @@ int bclose(bfile *op) noex {
                 rs1 = bfile_bufend(op) ;
                 if (rs >= 0) rs = rs1 ;
             }
-            {
+            if (op->fd >= 0) {
                 rs1 = uc_close(op->fd) ;
                 if (rs >= 0) rs = rs1 ;
+		op->fd = -1 ;
             }
             op->magic = 0 ;
 	} /* end if (magic) */
@@ -240,7 +241,7 @@ int sub_bopen::operator () (mainv av,mainv ev) noex {
 	argv = av ;
 	envv = ev ;
 	op->fd = -1 ;
-	if ((rs = mkoflags(os)) >= 0) {
+	if ((rs = mkoflags()) >= 0) {
 	    if ((rs = getfile()) > 0) {
 		if ((rs = bufsize()) >= 0) {
 	            if ((rs = bfile_bufbegin(op,bsize)) >= 0) {
@@ -468,11 +469,12 @@ static int bfile_mapend(bfile *op) noex {
 }
 /* end subroutine (bfile_mapend) */
 
-int sub_bopen::mkoflags(cchar *os) noex {
+int sub_bopen::mkoflags() noex {
 	int		rs = SR_OK ;
 	int		of = O_CLOEXEC ;
+	cchar		*osp = os ;
 	while (*os) {
-	    cint	sc = mkchar(*os++) ;
+	    cint	sc = mkchar(*osp++) ;
 	    switch (sc) {
 	    case 'r':
 	        op->f.rd = true ;

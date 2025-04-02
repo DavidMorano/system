@@ -118,7 +118,7 @@ int bwrite(bfile *op,cvoid *abuf,int alen) noex {
 int bfile_write(bfile *op,cvoid *abuf,int alen) noex {
 	int		rs = SR_OK ;
 	cchar		*abp = charp(abuf) ;
-	if (alen < 0) alen = strlen(abp) ;
+	if (alen < 0) alen = cstrlen(abp) ;
 	if (op->bm == bfilebm_none) {
 	    rs = bfile_wbig(op,abuf,alen) ;
 	} else {
@@ -168,12 +168,12 @@ static int bfile_wreg(bfile *op,cvoid *abuf,int alen) noex {
 	    } /* end if_constexpr (f_chunkcpy) */
 	    if ((rs >= 0) && (alenr > 0)) {
 	        int	n = 0 ;
-	        int	blenr = (op->bdata + op->bsize - op->bp) ;
+	        int	blenr = intconv(op->bdata + op->bsize - op->bp) ;
 	        mlen = min(alenr,blenr) ;
 	        if (f_bufline && (mlen > 0)) {
 	            cchar	*tp ;
 	            if ((tp = strnrchr(abp,mlen,'\n')) != nullptr) {
-	                n = (op->len + ((tp+1) - abp)) ;
+	                n = intconv(op->len + ((tp+1) - abp)) ;
 	            }
 	        }
 	        len = bfile_bufcpy(op,abp,mlen) ;

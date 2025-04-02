@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	bsupport
+
+	Description:
 	Internal (BFILE) flush support subroutines.
 
 *******************************************************************************/
@@ -25,6 +29,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<intfloor.h>
 #include	<localmisc.h>
@@ -108,7 +113,7 @@ int bfile_flushn(bfile *op,int n) noex {
 	        op->offset = o ;
 	    } /* end if (sa) */
 	    if ((rs >= 0) && (op->len > 0)) {
-	        int	mlen = (op->bp - op->bbp) ;
+	        int	mlen = intconv(op->bp - op->bbp) ;
 	        if ((n > 0) && (n < mlen)) mlen = n ;
 	        if ((rs = uc_writen(op->fd,op->bbp,mlen)) >= 0) {
 	            len = rs ;

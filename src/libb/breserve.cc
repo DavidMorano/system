@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	breserve
+
+	Description:
 	Some kind of reserve function.
 
 *******************************************************************************/
@@ -24,6 +28,8 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -48,7 +54,7 @@ int breserve(bfile *op,int n) noex {
 	    if (n >= 0) {
 		rs = SR_OK ;
 	        if (op->f.writing) {
-	            cint	blenr = (op->bdata + op->bsize - op->bp) ;
+	            cint blenr = intconv(op->bdata + op->bsize - op->bp) ;
 	            if (n > blenr) {
 			rs = bfile_flushn(op,-1) ;
 		    }

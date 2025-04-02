@@ -27,6 +27,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	bread
+
+	Description:
 	We do the reading.
 
 *******************************************************************************/
@@ -35,7 +39,8 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -110,10 +115,7 @@ static int bfile_rdmap(bfile *op,void *ubuf,int ulen,int,int) noex {
 
 	f_already = false ;
 	while (tlen < ulen) {
-
-/* is there more data in the file and are we at a map page boundary? */
-
-	    mlen = (op->fsize - op->offset) ;
+	    mlen = intconv(op->fsize - op->offset) ;
 	    if ((mlen > 0) &&
 	        ((op->bp == nullptr) || (op->len == op->pagesize))) {
 
@@ -122,7 +124,7 @@ static int bfile_rdmap(bfile *op,void *ubuf,int ulen,int,int) noex {
 	            || (op->maps[i].offset != (op->offset & (~ pagemask))))
 	            bfile_pagein(op,op->offset,i) ;
 
-	        op->len = op->offset & pagemask ;
+	        op->len = intconv(op->offset & pagemask) ;
 	        op->bp = op->maps[i].bdata + op->len ;
 
 	    } /* end if (initializing memory mapping) */

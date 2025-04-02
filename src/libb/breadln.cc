@@ -129,7 +129,7 @@ static int breadlnmap(bfile *op,char *ubuf,int ulen) noex {
 
 /* is there more data in the file and are we at a map page boundary? */
 
-	    mlen = (op->fsize - runoff) ;
+	    mlen = intconv(op->fsize - runoff) ;
 
 	    if ((mlen > 0) &&
 	        ((op->bp == nullptr) || (op->len == op->pagesize))) {
@@ -142,7 +142,7 @@ static int breadlnmap(bfile *op,char *ubuf,int ulen) noex {
 	            bfile_pagein(op,runoff,i) ;
 	        }
 
-	        op->len = runoff & pagemask ;
+	        op->len = intconv(runoff & pagemask) ;
 	        op->bp = op->maps[i].bdata + op->len ;
 
 	    } /* end if (initializing memory mapping) */
@@ -173,7 +173,7 @@ static int breadlnmap(bfile *op,char *ubuf,int ulen) noex {
 	            while (bp < lastp) {
 	                if (isoureol(*dbp++ = *bp++)) break ;
 	            }
-	            i = bp - op->bp ;
+	            i = intconv(bp - op->bp) ;
 	            op->bp += i ;
 		} /* end if_constexpr (f_memcpy) */
 	        op->len += i ;
@@ -240,7 +240,7 @@ static int breadlnreg(bfile *op,char *ubuf,int ulen,int to) noex {
 	            while (bp < lastp) {
 	                if (isoureol(*dbp++ = *bp++)) break ;
 	            } /* end while */
-	            i = bp - op->bp ;
+	            i = intconv(bp - op->bp) ;
 	            op->bp += i ;
 		} /* end if_constexpr (f_memcpy) */
 	        op->len -= i ;
