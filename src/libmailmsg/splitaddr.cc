@@ -153,7 +153,7 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	                f = (*tp == '@') ;
 	                n += 1 ;
 	                rs = vechand_add(op->comp,(tp+1)) ;
-	                bl = (tp - bp) ;
+	                bl = intconv(tp - bp) ;
 	                bp[bl] = '\0' ;
 	                if (f) break ;
 	                if (rs < 0) break ;

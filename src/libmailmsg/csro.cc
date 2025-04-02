@@ -414,7 +414,7 @@ static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 		        cchar	*s1 = e1p->mailname ;
 		        cchar	*s2 = e2p->mailname ;
 	                if ((rc = strcmp(s1,s2)) == 0) {
-	                    rc = (e1p->moff - e2p->moff) ;
+	                    rc = intconv(e1p->moff - e2p->moff) ;
 	                }
 	            } else {
 	                rc = -1 ;
@@ -441,7 +441,7 @@ static int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 		        cchar	*s1 = e1p->mailname ;
 		        cchar	*s2 = e2p->mailname ;
 	                if ((rc = strcmp(s1,s2)) == 0) {
-	                    if ((rc = (e1p->moff - e2p->moff)) == 0) {
+	                    if ((rc = intconv(e1p->moff - e2p->moff)) == 0) {
 	                        if (e1p->fname == nullptr) {
 	                            rc = 1 ;
 	                        } else if (e1p->fname == nullptr) {
