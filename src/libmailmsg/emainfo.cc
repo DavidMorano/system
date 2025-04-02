@@ -109,30 +109,30 @@ int emainfo_load(emainfo *eip,cchar *sp,int sl) noex {
 	            eip->type = EMAINFO_TARPAROUTE ;
 	            if ((cp = strnchr(sp,sl,',')) != nullptr) {
 	                eip->hpart = (cp1 + 1) ;
-	                eip->hlen = (cp - (cp1 + 1)) ;
+	                eip->hlen = intconv(cp - (cp1 + 1)) ;
 	                eip->lpart = (cp + 1) ;
-	                eip->llen = (sp + sl) - (cp + 1) ;
+	                eip->llen = intconv((sp + sl) - (cp + 1)) ;
 	            } else {
 	                eip->hpart = (cp1 + 1) ;
-	                eip->hlen = (cp2 - (cp1 + 1)) ;
+	                eip->hlen = intconv(cp2 - (cp1 + 1)) ;
 	                eip->lpart = (cp2 + 1) ;
-	                eip->llen = (sp + sl) - (cp2 + 1) ;
+	                eip->llen = intconv((sp + sl) - (cp2 + 1)) ;
 	            } /* end if */
 	        } else {
 		    /* normal ARPAnet address */
 	            eip->type = EMAINFO_TARPA ;
 	            eip->hpart = (cp1 + 1) ;
-	            eip->hlen = (sp + sl) - (cp1 + 1) ;
+	            eip->hlen = intconv((sp + sl) - (cp1 + 1)) ;
 	            eip->lpart = sp ;
-	            eip->llen = (cp1 - sp) ;
+	            eip->llen = intconv(cp1 - sp) ;
 	        } /* end if */
 	    } else if ((cp = strnrchr(sp,sl,'!')) != nullptr) {
 	        eip->type = EMAINFO_TUUCP ;
 	        eip->hpart = sp ;
-	        eip->hlen = (cp - sp) ;
+	        eip->hlen = intconv(cp - sp) ;
 	        eip->lpart = (cp + 1) ;
-	        eip->llen = (sp + sl) - (cp + 1) ;
-	        eip->hlen = (cp - sp) ;
+	        eip->llen = intconv((sp + sl) - (cp + 1)) ;
+	        eip->hlen = intconv(cp - sp) ;
 	    } else {
 		/* local */
 	        eip->type = EMAINFO_TLOCAL ;
@@ -209,7 +209,7 @@ int emainfo_mktype(emainfo *eip,int type,char *rbuf,int rlen) noex {
 		rl = b.idx ;
 	    } else {
 		cint	ml = min(eip->llen,rlen) ;
-	        rl = strwcpy(rbuf,eip->lpart,ml) - rbuf ;
+	        rl = intconv(strwcpy(rbuf,eip->lpart,ml) - rbuf) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
