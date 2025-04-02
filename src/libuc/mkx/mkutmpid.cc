@@ -224,12 +224,10 @@ tmper::operator int () noex {
 	    if (rlen >= 1) {
 		rs = SR_DOM ;
 	        memclear(rbuf,rlen) ;
-	        if (slen < 0) slen = strlen(sbuf) ;
+	        if (slen < 0) slen = cstrlen(sbuf) ;
 		if (slen > 0) {
-		    cchar	*lp{} ;
-		    if ((rs = extdev(&lp)) >= 0) {
+		    if (cchar *lp ; (rs = extdev(&lp)) >= 0) {
 		        cint	ll = rs ;
-		        cchar	*lp{} ;
 		        rs = 0 ;
 		        for (int i = 0 ; (rs == 0) && tmpcalls[i] ; i += 1) {
 		            tmp_m	m = tmpcalls[i] ;
@@ -244,7 +242,7 @@ tmper::operator int () noex {
 /* end method (tmper::operator) */
 
 int tmper::extdev(cchar **rpp) noex {
-	static constexpr int	dl = strlen(dpre) ;
+	static constexpr int	dl = cstrlen(dpre) ;
 	int		rs = SR_OK ;
 	int		ll = slen ;
 	cchar		*lp = sbuf ;
@@ -264,16 +262,16 @@ int tmper::subdirs(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	if ((ll > 0) && (rbuf[0] == '\0')) {
 	    if (cchar *tp ; (tp = strnchr(lp,ll,'/')) != nullptr) {
-	        cint	sl = (tp - lp) ;
-	        cint	cl = (ll - ((tp+1) - lp)) ;
+	        cint	sl = intconv(tp - lp) ;
+	        cint	cl = (ll - intconv((tp + 1) - lp)) ;
 	        int	pl = 0 ;
 	        int	i ; /* used-afterwards */
 	        cchar	*sp = lp ;
-	        cchar	*cp = (tp+1) ;
+	        cchar	*cp = (tp + 1) ;
 	        cchar	*pp{} ;
 	        for (i = 0 ; prefixes[i].name ; i += 1) {
 	            pp = prefixes[i].name ;
-	            pl = strlen(pp) ;
+	            pl = cstrlen(pp) ;
 	            if ((pl == sl) && (strncmp(pp,sp,pl) == 0)) break ;
 	        } /* end for */
 	        if (prefixes[i].name && pp && pl) {
@@ -295,7 +293,7 @@ int tmper::basename(cchar *lp,int ll) noex {
 	    cchar	*pp{} ;
 	    for (i = 0 ; prefixes[i].name ; i += 1) {
 	        pp = prefixes[i].name ;
-	        pl = strlen(pp) ;
+	        pl = cstrlen(pp) ;
 	        if ((pl <= cl) && (strncmp(pp,lp,pl) == 0)) break ;
 	    } /* end for */
 	    if (prefixes[i].name && pp && pl) {
@@ -314,7 +312,7 @@ int tmper::special(cchar *lp,int ll) noex {
 	    cchar	*pp{} ;
 	    for (i = 0 ; specials[i].name ; i += 1) {
 	        pp = specials[i].name ;
-		pl = strlen(pp) ;
+		pl = cstrlen(pp) ;
 	        if (strcmp(pp,lp) == 0) break ;
 	    } /* end for */
 	    if (prefixes[i].name && pp && pl) {
@@ -332,7 +330,7 @@ int tmper::something(cchar *lp,int ll) noex {
 	    cchar	*cp ;
 	    if ((cp = strnchr(lp,ll,'/')) != nullptr) {
 	        cp += 1 ;
-	        cl = (ll - (cp - lp)) ;
+	        cl = intconv(ll - (cp - lp)) ;
 	    } else {
 	        cp = lp ;
 	        cl = ll ;
