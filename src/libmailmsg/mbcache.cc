@@ -1333,8 +1333,9 @@ local int vcmpmsgentry(cvoid *e1pp,cvoid *e2pp) noex {
 	        time_t	t2h = m2p->htime ;
 	        if (t1h == 0) t1h = t1e ;
 	        if (t2h == 0) t2h = t2e ;
-	        rc = (t1h - t2h) ;
-	        if (rc == 0) rc = (t1e - t2e) ;
+	        if ((rc = intconv(t1h - t2h)) == 0) {
+	            rc = intconv(t1e - t2e) ;
+		}
 	    }
 	}
 	return rc ;
