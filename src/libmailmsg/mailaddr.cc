@@ -127,7 +127,7 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	                t = MAILADDRTYPE_ARPAROUTE ;
 	                if ((tp = strnchr(sp,sl,',')) != np) {
 	                    if (rs >= 0) {
-			        cint	vlen = (tp - (cp1 + 1)) ;
+			        cint	vlen = intconv(tp - (cp1 + 1)) ;
 			        cchar	*vstr = (cp1 + 1) ;
 	                        rs = snwcpy(mahost,hnl,vstr,vlen) ;
 		            }
@@ -136,7 +136,7 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 		            }
 	                } else {
 	                    if (rs >= 0) {
-			        cint	vlen = (cp2 - (cp1 + 1)) ;
+			        cint	vlen = intconv(cp2 - (cp1 + 1)) ;
 			        cchar	*vstr = (cp1 + 1) ;
 	                        rs = snwcpy(mahost,hnl,vstr,vlen) ;
 		            }
@@ -151,22 +151,24 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	                    rs = sncpy1(mahost,hnl,(cp1 + 1)) ;
 		        }
 	                if (rs >= 0) {
-	                    rs = snwcpy(malocal,mal,sp,(cp1 - sp)) ;
+			    cint	tl = intconv(cp1 - sp) ;
+	                    rs = snwcpy(malocal,mal,sp,tl) ;
 		        }
 	            } /* end if */
 	        } else if ((tp = strnrchr(sp,sl,'!')) != nullptr) {
 	            t = MAILADDRTYPE_UUCP ;
 	            if (rs >= 0) {
-	                rs = snwcpy(mahost,hnl,sp,(tp - sp)) ;
+			cint	tl = intconv(tp - sp) ;
+	                rs = snwcpy(mahost,hnl,sp,tl) ;
 	            }
 	            if (rs >= 0) {
-	                rs = sncpy1(malocal,mal,(tp + 1)) ;
+	                rs = sncpy(malocal,mal,(tp + 1)) ;
 	            }
 	        } else {
 	           /* local */
 	            t = MAILADDRTYPE_LOCAL ;
 	            if (rs >= 0) {
-	                rs = sncpy1(mahost,hnl,localhostpart) ;
+	                rs = sncpy(mahost,hnl,localhostpart) ;
 	            }
 	            if (rs >= 0) {
 	                rs = snwcpy(malocal,mal,sp,sl) ;
