@@ -301,8 +301,10 @@ int mailalias_open(MA *op,cc *pr,cc *pname,int of,m_t om,int ot) noex {
 	        op->operm = om ;
 	        op->otype = ot ;
 	        op->f.ocreate = ((of & O_CREAT) == O_CREAT) ;
-	        op->f.owrite |= ((of & O_WRONLY) == O_WRONLY) ;
-	        op->f.owrite |= ((of & O_RDWR) == O_RDWR) ;
+		/* XXX GCC conversion complaint */
+	        op->f.owrite = op->f.owrite || ((of & O_WRONLY) == O_WRONLY) ;
+		/* XXX GCC conversion complaint */
+	        op->f.owrite = op->f.owrite || ((of & O_RDWR) == O_RDWR) ;
 	        op->aprofile = defprofile ;
 	        if ((rs = ids_load(op->idp)) >= 0) {
 	            if (cchar *cp ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
@@ -463,7 +465,7 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	                    	        cl = min(klen,var.mailaliaslen) ;
 				    }
 				    bp = strwcpy(kbuf,(op->skey + ai),cl) ;
-	                	    vl = (bp - kbuf) ;
+	                	    vl = intconv(bp - kbuf) ;
 	                         } else {
 	                             vl = cstrlen(op->skey + ai) ;
 	                         }
@@ -521,7 +523,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 			    if (strcasecmp(aname,pm) == 0) {
                                 hp = keybuf ;
                                 cp = strwcpylc(keybuf,aname,keylen) ;
-                                hl = cp - keybuf ;
+                                hl = intconv(cp - keybuf) ;
                             } else {
                                 hp = aname ;
                                 hl = cstrlen(aname) ;
@@ -586,7 +588,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
                             if (vbuf != nullptr) {
                                 cl = min(vlen,var.mailaliaslen) ;
                                 cp = strwcpy(vbuf,(op->sval + vi),cl) ;
-                                vl = (cp - vbuf) ;
+                                vl = intconv(cp - vbuf) ;
                             } else {
                                 vl = cstrlen(op->sval + vi) ;
                             }

@@ -92,12 +92,13 @@ namespace mailutils {
 	int		nshift ;
 	int		mags ;
 	int		fver ;
-	int		f_havekey ;
+	bool		f_havekey ;
 	dbmake(vecobj *arlp,strtab *aklp,strtab *avlp,int afd) noex {
 	    rlp = arlp ;
 	    klp = aklp ;
 	    vlp = avlp ;
 	    fd = afd ;
+	    ropts = 0 ;
 	    f_havekey = false ;
 	} ;
 	void setmagic(cchar *m,int s) noex {

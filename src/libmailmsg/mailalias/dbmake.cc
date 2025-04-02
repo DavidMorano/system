@@ -228,14 +228,15 @@ int dbmake::wrfiler(time_t dt) noex {
 	/* prepare the version and encoding (VETU) */
 	{
 	fidbuf[16] = uchar(fver) ;	/* file-version */
-	fidbuf[17] = ENDIAN ;
-	fidbuf[18] = ropts ;
+	fidbuf[17] = uchar(ENDIAN) ;
+	fidbuf[18] = uchar(ropts) ;
 	fidbuf[19] = 0 ;
 	}
 	/* write magic along with version encoding */
-	if ((rs = u_write(fd,fidbuf,(bp - fidbuf))) >= 0) {
+	cint	fidlen = intconv(bp - fidbuf) ;
+	if ((rs = u_write(fd,fidbuf,fidlen)) >= 0) {
 	    cint	hsize = (mailaliashdr_overlast * szof(int)) ;
-	    fto += (bp - fidbuf) ;
+	    fto += intconv(bp - fidbuf) ;
 	    /* make the header itself (skip over it for FTO) */
 	    {
 	    fto += hsize ;
@@ -386,7 +387,7 @@ int dbmake::wrfilerec() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (int (*rectab)[2] ; (rs = uc_malloc(recsize,&rectab)) >= 0) {
+	if ((rs = uc_malloc(recsize,&rectab)) >= 0) {
 	    {
 	        void	*vp{} ;
 	        int	ri = 0 ;

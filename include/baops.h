@@ -57,9 +57,12 @@
 
 /* on char(acter) (byte) organized bit arrays */
 
-#define	BASET(array,bn)		((array)[(bn) >> 3] |= (1 << ((bn) & 7)))
-#define	BACLR(array,bn)		((array)[(bn) >> 3] &= (~ (1 << ((bn) & 7))))
-#define	BATST(array,bn)		(((array)[(bn) >> 3] >> ((bn) & 7)) & 1)
+#define	BASET(array,bn)	\
+    	((array)[(bn) >> 3] |= ((uchar) (1 << ((bn) & 7))))
+#define	BACLR(array,bn)	\
+	((array)[(bn) >> 3] &= ((uchar) (~ (1 << ((bn) & 7)))))
+#define	BATST(array,bn)	\
+    	(((array)[(bn) >> 3] >> ((bn) & 7)) & 1)
 
 #define	BASETB(array,bn)	BASET((array),(bn))
 #define	BACLRB(array,bn)	BACLR((array),(bn))
@@ -67,40 +70,46 @@
 
 /* on short-word (16-bit) organized bit arrays */
 
-#define	BASETS(array,bn)	((array)[(bn) >> 4] |= (1 << ((bn) & 15)))
-#define	BACLRS(array,bn)	((array)[(bn) >> 4] &= (~ (1 << ((bn) & 15))))
-#define	BATSTS(array,bn)	(((array)[(bn) >> 4] >> ((bn) & 15)) & 1)
+#define	BASETS(array,bn)	\
+    	((array)[(bn) >> 4] |= ((ushort) (1 << ((bn) & 15))))
+#define	BACLRS(array,bn)	\
+    	((array)[(bn) >> 4] &= ((ushort) (~ (1 << ((bn) & 15)))))
+#define	BATSTS(array,bn)	\
+    	(((array)[(bn) >> 4] >> ((bn) & 15)) & 1)
 
 /* on integers (currently 32-bit) */
 
-#define	BASETI(array,bn)	((array)[(bn) >> 5] |= (1 << ((bn) & 31)))
-#define	BACLRI(array,bn)	((array)[(bn) >> 5] &= (~ (1 << ((bn) & 31))))
-#define	BATSTI(array,bn)	(((array)[(bn) >> 5] >> ((bn) & 31)) & 1)
+#define	BASETI(array,bn)	\
+    	((array)[(bn) >> 5] |= ((uint) (1 << ((bn) & 31))))
+#define	BACLRI(array,bn)	\
+    	((array)[(bn) >> 5] &= ((uint) (~ (1 << ((bn) & 31)))))
+#define	BATSTI(array,bn)	\
+    	(((array)[(bn) >> 5] >> ((bn) & 31)) & 1)
 
 /* on 64-bit longs */
 
 #define	BASETL(array,bn) \
-	((array)[(bn) >> 6] |= (1L << ((bn) & 63)))
+	((array)[(bn) >> 6] |= ((ulong) (1L << ((bn) & 63))))
 #define	BACLRL(array,bn) \
-	((array)[(bn) >> 6] &= (~ (1L << ((bn) & 63))))
+	((array)[(bn) >> 6] &= ((ulong) (~ (1L << ((bn) & 63)))))
 #define	BATSTL(array,bn) \
 	(((array)[(bn) >> 6] >> ((bn) & 63)) & 1L)
 
 /* on 128-bit longlongs */
 
 #define	BASETLL(array,bn) \
-	((array)[(bn) >> 7] |= (1LL << ((bn) & 127)))
+	((array)[(bn) >> 7] |= ((uint128_t) (1LL << ((bn) & 127))))
 #define	BACLRLL(array,bn) \
-	((array)[(bn) >> 7] &= (~ (1LL << ((bn) & 127))))
+	((array)[(bn) >> 7] &= ((uint128_t) (~ (1LL << ((bn) & 127)))))
 #define	BATSTLL(array,bn) \
 	(((array)[(bn) >> 7] >> ((bn) & 127)) & 1LL)
 
 /* on 256-bit intmax (IM) */
 
 #define	BASETIM(array,bn) \
-	((array)[(bn) >> 7] |= (1LL << ((bn) & 255)))
+	((array)[(bn) >> 7] |= ((uint256_t) (1LL << ((bn) & 255))))
 #define	BACLRIM(array,bn) \
-	((array)[(bn) >> 7] &= (~ (1LL << ((bn) & 255))))
+	((array)[(bn) >> 7] &= ((uint256_t) (~ (1LL << ((bn) & 255)))))
 #define	BATSTIM(array,bn) \
 	(((array)[(bn) >> 7] >> ((bn) & 255)) & 1LL)
 
