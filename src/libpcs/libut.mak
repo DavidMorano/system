@@ -139,6 +139,7 @@ default:		all
 
 all:			$(ALL)
 
+
 .cc.o:
 	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
 
