@@ -304,7 +304,7 @@ int whitelist_audit(whitelist *op) noex {
 
 static int mkaddr(char *mbuf,int mlen,cchar *lp,int ll) noex {
 	if (cchar *tp ; (tp = strnchr(lp,ll,'#')) != nullptr) {
-	    ll = (tp-lp) ;
+	    ll = intconv(tp - lp) ;
 	}
 	return snwcpyopaque(mbuf,mlen,lp,ll) ;
 }

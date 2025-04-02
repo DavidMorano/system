@@ -1327,10 +1327,10 @@ local int vcmpmsgentry(cvoid *e1pp,cvoid *e2pp) noex {
 	    if ((rc == 0) && (m1p == nullptr)) rc = +1 ;
 	    if ((rc == 0) && (m2p == nullptr)) rc = -1 ;
 	    if (rc == 0) {
-	        time_t	t1e = m1p->etime ;
-	        time_t	t2e = m2p->etime ;
-	        time_t	t1h = m1p->htime ;
-	        time_t	t2h = m2p->htime ;
+	        const time_t	t1e = m1p->etime ;
+	        const time_t	t2e = m2p->etime ;
+	        time_t		t1h = m1p->htime ;
+	        time_t		t2h = m2p->htime ;
 	        if (t1h == 0) t1h = t1e ;
 	        if (t2h == 0) t2h = t2e ;
 	        if ((rc = intconv(t1h - t2h)) == 0) {
