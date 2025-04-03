@@ -42,6 +42,19 @@ inline int tofc(int ch) noex {
 	return CHAR_TOFC(ch) ;
 }
 
+inline int chtobc(int ch) noex {
+	return char(ch) ;
+}
+inline int chtolc(int ch) noex {
+	return char(CHAR_TOLC(ch)) ;
+}
+inline int chtouc(int ch) noex {
+	return char(CHAR_TOUC(ch)) ;
+}
+inline int chtofc(int ch) noex {
+	return char(CHAR_TOFC(ch)) ;
+}
+
 #else /* __cplusplus */
 #define	TOXC_STATICINLINE
 

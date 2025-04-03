@@ -81,8 +81,6 @@
 
 /* exported variables */
 
-int toxc_nosymbols ;
-
 
 /* exported subroutines */
 
