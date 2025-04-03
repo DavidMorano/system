@@ -76,7 +76,7 @@
 
 /* local variables */
 
-constexpr int	nb = CHAR_BIT ;
+cint	nb = CHAR_BIT ;
 
 
 /* subroutine templates */

@@ -40,7 +40,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -74,21 +74,52 @@
 
 /* local variables */
 
+cint	nb = CHAR_BIT ;
+
+
+/* subroutine-templates */
+
+template<typename T>
+static int netorder_rxx(cchar *buf,T *wp) noex {
+	cint		n = szof(T) ;
+	T		stage = 0 ;
+	const uchar	*ubuf = ucharp(buf) ;
+	for (int i = (n-1) ; i >= 0 ; i -= 1) {
+	     T	v = ubuf[i] ;
+	     stage |= (v << (i * nb)) ;
+	}
+	*wp = stage ;
+	return n ;
+}
+/* end subroutine-template (netorder_rxx) */
+
+template<typename T>
+static int netorder_wxx(char *buf,T w) noex {
+	cint		n = szof(T) ;
+	uchar		*ubuf = ucharp(buf) ;
+	for (int i = (n-1) ; i >= 0 ; i -= 1) {
+	    ubuf[i] = uchar(w) ;
+	    w >>= nb ;
+	}
+	return n ;
+}
+/* end subroutine-template (netorder_wxx) */
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int netorder_rchar(char *buf,char *cwp) noex {
+int netorder_rc(char *buf,char *cwp) noex {
 	cint		rs = szof(char) ;
 	uchar		*ubuf = (uchar *) buf ;
 	*cwp = ubuf[0] ;
 	return rs ;
 }
-/* end subroutine (netorder_rchar) */
+/* end subroutine (netorder_rc) */
 
-int netorder_rshort(char *buf,short *swp) noex {
+int netorder_rs(char *buf,short *swp) noex {
 	cint		rs = szof(short) ;
 	uchar		*ubuf = (uchar *) buf ;
 	*swp = 0 ;
@@ -96,9 +127,9 @@ int netorder_rshort(char *buf,short *swp) noex {
 	*swp |= (ubuf[1] << 0) ;
 	return rs ;
 }
-/* end subroutine (netorder_rshort) */
+/* end subroutine (netorder_rs) */
 
-int netorder_rint(char *buf,int *iwp) noex {
+int netorder_ri(char *buf,int *iwp) noex {
 	cint		rs = szof(int) ;
 	uchar		*ubuf = (uchar *) buf ;
 	*iwp = 0 ;
@@ -108,49 +139,27 @@ int netorder_rint(char *buf,int *iwp) noex {
 	*iwp |= (ubuf[3] << 0) ;
 	return rs ;
 }
-/* end subroutine (netorder_rint) */
+/* end subroutine (netorder_ri) */
 
-int netorder_rlong(char *buf,long *lwp) noex {
-	cint		rs = szof(long) ;
-	uchar		*ubuf = (uchar *) buf ;
-	*lwp = 0 ;
-	*lwp |= (((long) ubuf[0]) << 56) ;
-	*lwp |= (((long) ubuf[1]) << 48) ;
-	*lwp |= (((long) ubuf[2]) << 40) ;
-	*lwp |= (((long) ubuf[3]) << 32) ;
-	*lwp |= (((long) ubuf[4]) << 24) ;
-	*lwp |= (((long) ubuf[5]) << 16) ;
-	*lwp |= (((long) ubuf[6]) << 8) ;
-	*lwp |= (((long) ubuf[7]) << 0) ;
-	return rs ;
+int netorder_rl(char *buf,long *lwp) noex {
+	return netorder_rxx(buf,lwp) ;
 }
-/* end subroutine (netorder_rlong) */
+/* end subroutine (netorder_rl) */
 
-int netorder_rll(char *buf,longlong *lwp) noex {
-	cint		rs = szof(longlong) ;
-	uchar		*ubuf = (uchar *) buf ;
-	*lwp = 0 ;
-	*lwp |= (((longlong) ubuf[0]) << 56) ;
-	*lwp |= (((longlong) ubuf[1]) << 48) ;
-	*lwp |= (((longlong) ubuf[2]) << 40) ;
-	*lwp |= (((longlong) ubuf[3]) << 32) ;
-	*lwp |= (((longlong) ubuf[4]) << 24) ;
-	*lwp |= (((longlong) ubuf[5]) << 16) ;
-	*lwp |= (((longlong) ubuf[6]) << 8) ;
-	*lwp |= (((longlong) ubuf[7]) << 0) ;
-	return rs ;
+int netorder_rll(char *buf,longlong *llwp) noex {
+	return netorder_rxx(buf,llwp) ;
 }
 /* end subroutine (netorder_rll) */
 
-int netorder_ruchar(char *buf,uchar *cwp) noex {
+int netorder_ruc(char *buf,uchar *cwp) noex {
 	cint		rs = szof(uchar) ;
 	uchar		*ubuf = (uchar *) buf ;
 	*cwp = ubuf[0] ;
 	return rs ;
 }
-/* end subroutine (netorder_ruchar) */
+/* end subroutine (netorder_ruc) */
 
-int netorder_rushort(char *buf,ushort *swp) noex {
+int netorder_rus(char *buf,ushort *swp) noex {
 	cint		rs = szof(ushort) ;
 	uchar		*ubuf = (uchar *) buf ;
 	*swp = 0 ;
@@ -158,9 +167,9 @@ int netorder_rushort(char *buf,ushort *swp) noex {
 	*swp |= (ubuf[1] << 0) ;
 	return rs ;
 }
-/* end subroutine (netorder_rushort) */
+/* end subroutine (netorder_rus) */
 
-int netorder_ruint(char *buf,uint *iwp) noex {
+int netorder_rui(char *buf,uint *iwp) noex {
 	cint		rs = szof(uint) ;
 	uchar		*ubuf = (uchar *) buf ;
 	*iwp = 0 ;
@@ -170,97 +179,67 @@ int netorder_ruint(char *buf,uint *iwp) noex {
 	*iwp |= (ubuf[3] << 0) ;
 	return rs ;
 }
-/* end subroutine (netorder_ruint) */
+/* end subroutine (netorder_rui) */
 
-int netorder_rulong(char *buf,ulong *lwp) noex {
-	cint		rs = szof(ulong) ;
-	uchar		*ubuf = (uchar *) buf ;
-	*lwp = 0 ;
-	*lwp |= (((ulong) ubuf[0]) << 56) ;
-	*lwp |= (((ulong) ubuf[1]) << 48) ;
-	*lwp |= (((ulong) ubuf[2]) << 40) ;
-	*lwp |= (((ulong) ubuf[3]) << 32) ;
-	*lwp |= (((ulong) ubuf[4]) << 24) ;
-	*lwp |= (((ulong) ubuf[5]) << 16) ;
-	*lwp |= (((ulong) ubuf[6]) << 8) ;
-	*lwp |= (((ulong) ubuf[7]) << 0) ;
-	return rs ;
+int netorder_rul(char *buf,ulong *lwp) noex {
+	return netorder_rxx(buf,lwp) ;
 }
-/* end subroutine (netorder_rulong) */
+/* end subroutine (netorder_rul) */
 
-int netorder_rull(char *buf,ulonglong *lwp) noex {
-	cint		rs = szof(ulonglong) ;
-	uchar		*ubuf = (uchar *) buf ;
-	*lwp = 0 ;
-	*lwp |= (((ulonglong) ubuf[0]) << 56) ;
-	*lwp |= (((ulonglong) ubuf[1]) << 48) ;
-	*lwp |= (((ulonglong) ubuf[2]) << 40) ;
-	*lwp |= (((ulonglong) ubuf[3]) << 32) ;
-	*lwp |= (((ulonglong) ubuf[4]) << 24) ;
-	*lwp |= (((ulonglong) ubuf[5]) << 16) ;
-	*lwp |= (((ulonglong) ubuf[6]) << 8) ;
-	*lwp |= (((ulonglong) ubuf[7]) << 0) ;
-	return rs ;
+int netorder_rull(char *buf,ulonglong *llwp) noex {
+	return netorder_rxx(buf,llwp) ;
 }
 /* end subroutine (netorder_rull) */
 
-int netorder_wchar(char *buf,int cw) noex {
-	cint		rs = szof(char) ;
-	uchar		*ubuf = (uchar *) buf ;
-	ubuf[0] = (uchar) cw ;
-	return rs ;
+int netorder_wc(char *buf,int cw) noex {
+	return netorder_wxx(buf,cw) ;
 }
-/* end subroutine (netorder_wchar) */
+/* end subroutine (netorder_wc) */
 
-int netorder_wshort(char *buf,int sw) noex {
-	cint		rs = szof(short) ;
-	uchar		*ubuf = (uchar *) buf ;
-	ubuf[0] = uchar((sw >> 8) & 0xff) ;
-	ubuf[1] = uchar((sw >> 0) & 0xff) ;
-	return rs ;
+int netorder_ws(char *buf,int sw) noex {
+	return netorder_wxx(buf,sw) ;
 }
-/* end subroutine (netorder_wshort) */
+/* end subroutine (netorder_ws) */
 
-int netorder_wint(char *buf,int iw) noex {
-	cint		rs = szof(int) ;
-	uchar		*ubuf = (uchar *) buf ;
-	ubuf[0] = uchar((iw >> 24) & 0xff) ;
-	ubuf[1] = uchar((iw >> 16) & 0xff) ;
-	ubuf[2] = uchar((iw >> 8) & 0xff) ;
-	ubuf[3] = uchar((iw >> 0) & 0xff) ;
-	return rs ;
+int netorder_wi(char *buf,int iw) noex {
+	return netorder_wxx(buf,iw) ;
 }
-/* end subroutine (netorder_wint) */
+/* end subroutine (netorder_wi) */
 
-int netorder_wlong(char *buf,long lw) noex {
-	cint		rs = szof(long) ;
-	uchar		*ubuf = (uchar *) buf ;
-	ubuf[0] = uchar((lw >> 56) & 0xff) ;
-	ubuf[1] = uchar((lw >> 48) & 0xff) ;
-	ubuf[2] = uchar((lw >> 40) & 0xff) ;
-	ubuf[3] = uchar((lw >> 32) & 0xff) ;
-	ubuf[4] = uchar((lw >> 24) & 0xff) ;
-	ubuf[5] = uchar((lw >> 16) & 0xff) ;
-	ubuf[6] = uchar((lw >> 8) & 0xff) ;
-	ubuf[7] = uchar((lw >> 0) & 0xff) ;
-	return rs ;
+int netorder_wl(char *buf,long lw) noex {
+	return netorder_wxx(buf,lw) ;
 }
-/* end subroutine (netorder_wlong) */
+/* end subroutine (netorder_wl) */
 
-int netorder_wll(char *buf,longlong lw) noex {
-	cint		rs = szof(longlong) ;
-	uchar		*ubuf = (uchar *) buf ;
-	ubuf[0] = uchar((lw >> 56) & 0xff) ;
-	ubuf[1] = uchar((lw >> 48) & 0xff) ;
-	ubuf[2] = uchar((lw >> 40) & 0xff) ;
-	ubuf[3] = uchar((lw >> 32) & 0xff) ;
-	ubuf[4] = uchar((lw >> 24) & 0xff) ;
-	ubuf[5] = uchar((lw >> 16) & 0xff) ;
-	ubuf[6] = uchar((lw >> 8) & 0xff) ;
-	ubuf[7] = uchar((lw >> 0) & 0xff) ;
-	return rs ;
+int netorder_wll(char *buf,longlong llw) noex {
+	return netorder_wxx(buf,llw) ;
 }
 /* end subroutine (netorder_wll) */
+
+int netorder_wuc(char *buf,uint ucw) noex {
+	return netorder_wxx(buf,ucw) ;
+}
+/* end subroutine (netorder_wuc) */
+
+int netorder_wus(char *buf,uint usw) noex {
+	return netorder_wxx(buf,usw) ;
+}
+/* end subroutine (netorder_wus) */
+
+int netorder_wui(char *buf,uint uiw) noex {
+	return netorder_wxx(buf,uiw) ;
+}
+/* end subroutine (netorder_wui) */
+
+int netorder_wul(char *buf,ulong ulw) noex {
+	return netorder_wxx(buf,ulw) ;
+}
+/* end subroutine (netorder_wul) */
+
+int netorder_wull(char *buf,ulonglong ullw) noex {
+	return netorder_wxx(buf,ullw) ;
+}
+/* end subroutine (netorder_wull) */
 
 
 /* older API */
