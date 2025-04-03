@@ -32,8 +32,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<new>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
@@ -65,16 +65,17 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-struct babycalc_calls {
-	typedef int (*soopen_f)(void *,cchar *,cchar *) noex ;
-	typedef int (*socheck_f)(void *,time_t) noex ;
-	typedef int (*solookup_f)(void *,time_t,uint *) noex ;
-	typedef int (*soinfo_f)(void *,babycalcs_info *) noex ;
-	typedef int (*soclose_f)(void *) noex ;
-} ;
+typedef int (*soopen_f)(void *,cchar *,cchar *) noex ;
+typedef int (*socheck_f)(void *,time_t) noex ;
+typedef int (*solookup_f)(void *,time_t,uint *) noex ;
+typedef int (*soinfo_f)(void *,babycalcs_info *) noex ;
+typedef int (*soclose_f)(void *) noex ;
 
 
 /* external subroutines */
+
+
+/* external varaibles */
 
 
 /* local structures */
@@ -87,8 +88,61 @@ struct babycalc_calls {
 	soclose_f	close ;
 } ;
 
+typedef babycalc_calls *	callsp ;
+
 
 /* forward references */
+
+template<typename ... Args>
+static int babycalc_ctor(babycalc *op,Args ... args) noex {
+    	BABYCALC	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(hop) ;
+	    if ((op->mlp = new(nothrow) modload) != np) {
+	        if (callsp p ; (p = new(nothrow) modload) != np) {
+		    op->callp = callsp(p) ;
+		    rs = SR_OK ;
+		}
+		if (rs < 0) {
+		    delete op->mlp ;
+		    op->mlp = np ;
+		}
+	    } /* end new (modload) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (babycalc_ctor) */
+
+static int babycalc_dtor(babycalc *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->callp) {
+		callsp p = callsp(op->callp) ;
+		delete p ;
+		op->callp = nullptr ;
+	    }
+	    if (op->mlp) {
+		delete op->mlp ;
+		op->mlp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (babycalc_dtor) */
+
+template<typename ... Args>
+static inline int babycalc_magic(babycalc *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == BABYCALC_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (babycalc_magic) */
 
 static int	babycalc_objloadbegin(BC *,cchar *,cchar *) noex ;
 static int	babycalc_objloadend(BC *) noex ;
@@ -128,23 +182,23 @@ constexpr cpcchar	subs[] = {
 
 int babycalc_open(BC *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
-	cchar		*objname = BC_OBJNAME ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-
-	if ((rs = babycalc_objloadbegin(op,pr,objname)) >= 0) {
-	    if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
-	        op->magic = BABYCALC_MAGIC ;
+	if ((rs = babycalc_ctor(op,pr,dbname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+		cchar	*objname = BC_OBJNAME ;
+	        if ((rs = babycalc_objloadbegin(op,pr,objname)) >= 0) {
+	            if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
+	                op->magic = BABYCALC_MAGIC ;
+	            }
+	            if (rs < 0) {
+		        babycalc_objloadend(op) ;
+		    }
+	        } /* end if (obj-load-begin) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		babycalc_dtor(op) ;
 	    }
-	    if (rs < 0)
-		babycalc_objloadend(op) ;
-	} /* end if (obj-load-begin) */
-
+	} /* end if (babycalc_ctor) */
 	return rs ;
 }
 /* end subroutine (babycalc_open) */
@@ -153,12 +207,17 @@ int babycalc_close(BC *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = babycalc_magic(op)) >= 0) {
-	    {
-	        rs1 = (*op->call.close)(op->obj) ;
+	    if (op->callp && op->obj) {
+		callsp	p = callsp(op->callp) ;
+	        rs1 = (*p->close)(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
 	        rs1 = babycalc_objloadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = babycalc_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;

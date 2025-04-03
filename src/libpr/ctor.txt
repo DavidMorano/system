@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int egs_ctor(egs *op,Args ... args) noex {
+static int babycalc_ctor(babycalc *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int egs_ctor(egs *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (egs_ctor) */
+/* end subroutine (babycalc_ctor) */
 
-static int egs_dtor(egs *op) noex {
+static int babycalc_dtor(babycalc *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (egs_dtor) */
+/* end subroutine (babycalc_dtor) */
 
 template<typename ... Args>
-static inline int egs_magic(egs *op,Args ... args) noex {
+static inline int babycalc_magic(babycalc *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == EGS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == BABYCALC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (egs_magic) */
+/* end subroutine (babycalc_magic) */

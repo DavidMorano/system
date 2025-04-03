@@ -66,6 +66,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 bool isoneof(cint *a,int rs) noex {

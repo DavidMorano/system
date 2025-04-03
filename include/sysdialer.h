@@ -129,7 +129,7 @@ typedef	SYSDIALER_ARGS	sysdialer_args ;
 
 EXTERNC_begin
 
-extern int sysdialer_start(sysdialer *,cchar *,cchar **,cchar **) noex ;
+extern int sysdialer_start(sysdialer *,cchar *,mainv,mainv) noex ;
 extern int sysdialer_loadin(sysdialer *,cchar *,sysdialer_ent **) noex ;
 extern int sysdialer_loadout(sysdialer *,cchar *) noex ;
 extern int sysdialer_check(sysdialer *,time_t) noex ;

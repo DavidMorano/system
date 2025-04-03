@@ -217,7 +217,7 @@ namespace {
 }
 
 
-/* local methods */
+/* forward references */
 
 constexpr void ischarinfo::mkisalpha() noex {
 	for (int ch = 'A' ; ch <= 'Z' ; ch += 1) {
