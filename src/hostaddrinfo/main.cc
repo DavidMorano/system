@@ -108,7 +108,7 @@ extern int	proginfo_setpiv(PROGINFO *,cchar *,const PIVARS *) ;
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
@@ -170,7 +170,7 @@ static int	locinfo_finish(LOCINFO *) ;
 static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 
-static int	morder_ruint(const void *,uint *) ;
+static int	morder_ruint(cvoid *,uint *) ;
 
 
 /* local variables */
@@ -1392,16 +1392,10 @@ int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar vp[],int vl)
 /* end subroutine (locinfo_setentry) */
 #endif /* CF_LOCSETENT */
 
-
 /* machine-order */
-static int morder_ruint(const void *buf,uint *vp)
-{
-	int		rs ;
+static int morder_ruint(cvoid *buf,uint *vp) noex {
 	void		*vbuf = (void *) buf ;
-
-	rs = netorder_ruint(vbuf,vp) ;
-
-	return rs ;
+	return netorder_rui(vbuf,vp) ;
 }
 /* end if (morder_ruint) */
 

@@ -41,8 +41,9 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<usystem.h>
 #include	<vecstr.h>
@@ -453,12 +454,11 @@ const char	*sargv[] ;
 	uint		nettime ;
 	char		buf[8] ;
 
-
 	pip->daytime = time(NULL) ;
 
 	nettime = mknettime(pip->daytime) ;
 
-	netorder_wuint(buf,nettime) ;
+	netorder_wui(buf,nettime) ;
 
 	rs = uc_writen(cip->fd_output,buf,4) ;
 
