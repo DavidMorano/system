@@ -50,6 +50,7 @@
 #include	<strn.h>		/* |strnrchr(3uc)| */
 #include	<mkpathx.h>
 #include	<mkfname.h>
+#include	<pathclean.h>
 #include	<localmisc.h>
 
 #include	"sysdialer.h"
@@ -230,7 +231,7 @@ static int	entry_start(SD_ENT **,cchar *,cchar *,
 static int	entry_checkdir(SD_ENT **,cchar *,cchar *) noex ;
 static int	entry_loadcalls(SD_ENT **,void *) noex ;
 static int	entry_hasname(SD_ENT **,void *,cchar *) noex ;
-static int	entry_finish(SD_ENT **) noex ;
+static int	entry_finish(SD_ENT *) noex ;
 
 static int	vecstr_loadexts(vecstr *,cchar *,cchar *,int) noex ;
 
@@ -471,7 +472,7 @@ int sysdialer_finish(SD *op) noex {
 /* end subroutine (sysdialer_finish) */
 
 /* load a SD */
-int sysdialer_loadin(SD *op,cchar *name,SD_ENT ***depp) noex {
+int sysdialer_loadin(SD *op,cchar *name,SD_ENT **depp) noex {
 	sysdialer_mod	*mp ;
 	SD_ENT		se, e, *dep ;
 	int		rs ;
@@ -581,43 +582,38 @@ bad0:
 /* end subroutine (sysdialer_loadin) */
 
 int sysdialer_loadout(SD *op,cchar *name) noex {
-	SD_ENT	te, *dep ;
 	int		rs ;
-	int		ei ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (name == nullptr) return SR_FAULT ;
-
-	if (op->magic != SD_MAGIC) return SR_NOTOPEN ;
-
-	if (name[0] == '\0') return SR_INVALID ;
-
-	te.name = name ;
-	if ((rs = vecobj_search(op->elp,&te,vcmpname,&dep)) >= 0) {
-	    ei = rs ;
-	    if (dep->count <= 1) {
-	        entry_finish(dep) ;
-	        vecobj_del(op->elp,ei) ;
-	    } else {
-	        dep->count -= 1 ;
-	    }
-	} /* end if */
-
+	if ((rs = sysdialer_magic(op,name)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+		vecobj	*ep = op->elp ;
+	        SD_ENT	te{} ;
+	        te.name = name ;
+	        void	*vp{} ;
+	        if ((rs = elp->search(&te,vcmpname,&vp)) >= 0) {
+	            cint	ei = rs ;
+	            SD_ENT	*dep = (SD_ENT *) vp ;
+	            if (vp) {
+	               if (dep->count <= 1) {
+	                   entry_finish(dep) ;
+	                   elp->del(ei) ;
+	               } else {
+	                   dep->count -= 1 ;
+	               }
+	            }
+	        } /* end if (vecobj_search) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (sysdialer_loadout) */
 
-int sysdialer_check(SD *op,time_t daytime) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-
-	if (op->magic != SD_MAGIC) return SR_NOTOPEN ;
-
-	if (daytime == 0) daytime = time(nullptr) ;
-
-	op->ti_lastcheck = daytime ;
-
-	} /* end if (non-null) */
+int sysdialer_check(SD *op,time_t dt) noex {
+	int		rs ;
+	if ((rs = sysdialer_magic(op)) >= 0) {
+	    if (dt == 0) dt = getustime ;
+	    op->ti_lastcheck = dt ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (sysdialer_check) */
@@ -643,12 +639,12 @@ static int sysdialer_sofind(SD *op,cc *pr,cc *soname,ent *ep) noex {
 
 	        rs = sysdialer_sofindpr(op,&id,&ds,pr,soname,ep) ;
 
-	        if ((rs < 0) && isOneOf(rsnotconnected,rs))
+	        if ((rs < 0) && isOneOf(rsnotconnected,rs)) {
 	            rs = sysdialer_sofindprs(op,&id,&ds,soname,ep) ;
-
-	        if ((rs < 0) && isOneOf(rsnotconnected,rs))
+		}
+	        if ((rs < 0) && isOneOf(rsnotconnected,rs)) {
 	            rs = sysdialer_sofindvar(op,&id,&ds,soname,ep) ;
-
+		}
 	        rs1 = dirseen_finish(&ds) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (dirseen) */
@@ -685,25 +681,20 @@ static int sysdialer_sofindprs(SD *op,ids *idp,DS **dsp,
 		cc *soname,SD_ENT *ep) noex {
 	int		rs = SR_NOENT ;
 	int		rs1 ;
-	cchar	*prp ;
-
 	for (int i = 0 ; prnames[i] != nullptr ; i += 1) {
-
-	    rs1 = prcache_lookup(&op->pc,i,&prp) ;
-
-	    if (rs1 >= 0)
+	    if (cchar *prp ; (rs = prcache_lookup(&op->pc,i,&prp)) >= 0) {
 	        rs = sysdialer_sofindpr(op,idp,dsp,prp,soname,ep) ;
-
+	    } else if (isNotPresent(rs)) {
+		rs = SR_OK ;
+	    }
 	    if (rs >= 0) break ;
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (sysdialer_sofindprs) */
 
 static int sysdialer_sofindpr(SD *op,ids *idp,DS *dsp,cc *pr,
 		cc *soname,SD_ENT *ep) noex {
-	USTAT		sb ;
 	int		rs ;
 	int		rs1 ;
 	int		pathlen ;
@@ -720,12 +711,16 @@ static int sysdialer_sofindpr(SD *op,ids *idp,DS *dsp,cc *pr,
 	    goto ret0 ;
 	}
 
-	rs = u_stat(libdname,&sb) ;
-	if ((rs >= 0) && (! S_ISDIR(sb.st_mode)))
-	    rs = SR_NOTDIR ;
+	if (USTAT sb ; (rs = u_stat(libdname,&sb)) >= 0) {
+	    if (S_ISDIR(sb.st_mode)) {
+	        rs1 = dirseen_havedevino(dsp,&sb) ;
+
+	    if (! S_ISDIR(sb.st_mode)) {
+	       rs = SR_NOTDIR ;
+	    }
+	}
 
 	if (rs >= 0) {
-	    rs1 = dirseen_havedevino(dsp,&sb) ;
 	    if (rs1 >= 0) {
 		rs = SR_NOENT ;
 		goto ret0 ;
