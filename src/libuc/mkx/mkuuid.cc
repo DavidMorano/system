@@ -135,7 +135,7 @@ int mkuu::operator () (int ver) noex {
 	if (ver <= 0) ver = UUID_VERSION ;
 	memclear(up) ;
 	if ((rs = getrand(rwords,rsz)) >= 0) {
-	    up->version = uchar(ver) ;
+	    up->version = uchar(ver & 0x0F) ; /* <- four (4) bits */
 	    for (cauto &m : mems) {
 		rs = (this->*m)() ;
 		if (rs < 0) break ;
