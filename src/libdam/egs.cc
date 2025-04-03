@@ -27,14 +27,14 @@
 
 	Commands to the Entropy Gathering Daemon (EGD):
 
- 0x00 (get entropy level)
++ 0x00 (get entropy level)
   0xMM (msb) 0xmm 0xll 0xLL (lsb)
- 0x01 (read entropy nonblocking) 0xNN (bytes requested)
++ 0x01 (read entropy nonblocking) 0xNN (bytes requested)
   0xMM (bytes granted) MM bytes
- 0x02 (read entropy blocking) 0xNN (bytes desired)
++ 0x02 (read entropy blocking) 0xNN (bytes desired)
   [block] NN bytes
- 0x03 (write entropy) 0xMM 0xLL (bits of entropy) 0xNN (bytes of data) NN bytes
- 0x04 (report PID)
++ 0x03 (write entropy) 0xMM 0xLL (bits of entropy) 0xNN (bytes of data) NN bytes
++ 0x04 (report PID)
   0xMM (length of PID string, not null-terminated) MM chars
 
 *******************************************************************************/
@@ -55,6 +55,7 @@
 #include	<xperm.h>
 #include	<cfdec.h>
 #include	<netorder.h>
+#include	<egscmd.hh>
 #include	<localmisc.h>
 
 #include	"egs.h"
@@ -63,14 +64,8 @@
 /* local defines */
 
 #ifndef	PID_MAX
-#define	PID_MAX			(6*10)
+#define	PID_MAX			999999
 #endif
-
-#define	EGS_CMDGETLEVEL		0
-#define	EGS_CMDREADSHORT	1
-#define	EGS_CMDREAD		2
-#define	EGS_CMDWRITE		3
-#define	EGS_CMDGETPID		4
 
 #undef	CMDBUFLEN
 #define	CMDBUFLEN		100
@@ -90,6 +85,12 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -182,37 +183,30 @@ int egs_close(egs *op) noex {
 /* add some of our own entropy to the mix (is this a security problem?) */
 int egs_write(egs *op,cchar *wbuf,int wlen) noex {
 	int		rs ;
+	int		wl = 0 ;
 	if (wlen < 0) wlen = cstrlen(wbuf) ;
 	if ((rs = egs_magic(op,wbuf)) >= 0) {
-	int		rlen, mlen ;
-	int		bits ;
-	int		i = 0 ;
-	cint		tlen = MIN(255,CMDBUFLEN) ;
-	uchar		cmdbuf[CMDBUFLEN + 1] ;
-	rlen = wlen ;
-	while ((rs >= 0) && (rlen > 0)) {
-
-	    mlen = MIN(tlen,rlen) ;
-
-		bits = mlen * 8 ;
-	    cmdbuf[0] = EGS_CMDWRITE ;
-		cmdbuf[1] = uchar(bits >> 8) ;
-		cmdbuf[0] = uchar(bits & 255) ;
-	    cmdbuf[3] = uchar(mlen) ;
-	    rs = uc_writen(op->fd,cmdbuf,4) ;
-
-	    if (rs >= 0)
-	    rs = uc_writen(op->fd,(wbuf + i),mlen) ;
-
-	    rlen -= mlen ;
-	    i += mlen ;
-
-	} /* end while */
-
-	if (rs >= 0)
-	    rs = buflen ;
-
-	return rs ;
+	    cint	clen = min(UCHAR_MAX,CMDBUFLEN) ;
+	    int		bits ;
+	    int		len ;
+	    uchar	cmdbuf[CMDBUFLEN + 1] ;
+	    for (int i = 0 ; wlen > 0 ; i += 1) {
+	        cint	mlen = min(clen,wlen) ;
+		bits = (mlen * CHAR_BIT) ;
+	        cmdbuf[0] = char(egscmd::write) ;
+		cmdbuf[1] = uchar(bits >> CHAR_BIT) ;
+		cmdbuf[2] = uchar(bits >> 0) ;
+	        cmdbuf[3] = uchar(mlen) ;
+	        if ((rs = uc_writen(op->fd,cmdbuf,4)) >= 0) {
+	            rs = uc_writen(op->fd,(wbuf + i),mlen) ;
+		    len = rs ;
+	            wlen -= len ;
+		    wl += len ;
+	        }
+		if (rs < 0) break ;
+	    } /* end for */
+	} /* end if (magic) */
+	return (rs >= 0) ? wl : rs ;
 }
 /* end subroutine (egs_write) */
 
@@ -222,20 +216,21 @@ int egs_read(egs *op,char *rbuf,int rlen) noex {
 	if ((rs = egs_magic(op,rbuf)) >= 0) {
 	    cint	to = TO_READ ;
 	    cint	fm = FM_EXACT ;
-	    cint	tlen = min(255,CMDBUFLEN) ;
+	    cint	clen = min(UCHAR_MAX,CMDBUFLEN) ;
 	    int		len ;
 	    uchar	cmdbuf[CMDBUFLEN + 1] ;
 	    for (int i = 0 ; rlen > 0 ; i += len) {
-	        cint	mlen = min(tlen,rlen) ;
-	        cmdbuf[0] = EGS_CMDREAD ;
+	        cint	mlen = min(clen,rlen) ;
+	        cmdbuf[0] = char(egscmd::read) ;
 	        cmdbuf[1] = uchar(mlen) ;
 	        if ((rs = uc_writen(op->fd,cmdbuf,2)) >= 0) {
 	            rs = uc_reade(op->fd,(rbuf + i),mlen,to,fm) ;
 	            len = rs ;
+		    rlen -= len ;
+		    rl += len ;
 	        }
 	        if ((rs < 0) || (len == 0)) break ;
-	        rlen -= len ;
-	    } /* end while */
+	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
 }
@@ -246,7 +241,7 @@ int egs_level(egs *op) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = egs_magic(op)) >= 0) {
-	    char	cmdbuf[CMDBUFLEN + 1] = { EGS_CMDGETLEVEL } ;
+	    char	cmdbuf[CMDBUFLEN + 1] = { char(egscmd::getlevel) } ;
 	    if ((rs = uc_writen(op->fd,cmdbuf,1)) >= 0) {
 	        cint	to = TO_READ ;
 	        cint	fm = FM_EXACT ;
@@ -278,7 +273,7 @@ int egs_getpid(egs *op,pid_t *pidp) noex {
 static int egs_opencheck(egs *op) noex {
 	int		rs ;
 	int		len ;
-	char		cmdbuf[CMDBUFLEN + 1] = { EGS_CMDGETPID } ;
+	char		cmdbuf[CMDBUFLEN + 1] = { char(egscmd::getpid) } ;
 	if ((rs = uc_writen(op->fd,cmdbuf,1)) >= 0) {
 	    cint	to = TO_READ ;
 	    cint	fm = FM_EXACT ;
