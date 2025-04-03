@@ -112,28 +112,6 @@ static int stdorder_wxx(char *buf,T w) noex {
 
 /* exported subroutines */
 
-int stdorder_ruc(cchar *buf,uchar *wp) noex {
-	const uchar	*ubuf = (const uchar *) buf ;
-	*wp = ubuf[0] ;
-	return 1 ;
-}
-
-int stdorder_rus(cchar *buf,ushort *wp) noex {
-	return stdorder_rxx(buf,wp) ;
-}
-
-int stdorder_rui(cchar *buf,uint *wp) noex {
-	return stdorder_rxx(buf,wp) ;
-}
-
-int stdorder_rul(cchar *buf,ulong *wp) noex {
-	return stdorder_rxx(buf,wp) ;
-}
-
-int stdorder_rull(cchar *buf,ulonglong *wp) noex {
-	return stdorder_rxx(buf,wp) ;
-}
-
 int stdorder_rc(cchar *buf,char *wp) noex {
 	uchar		*ubuf = (uchar *) buf ;
 	*wp = ubuf[0] ;
@@ -160,29 +138,26 @@ int stdorder_rll(cchar *buf,longlong *sp) noex {
 	return stdorder_rull(buf,up) ;
 }
 
-int stdorder_wuc(char *buf,uchar uw) noex {
-	uchar		*ubuf = (uchar *) buf ;
-	ubuf[0] = uchar(uw) ;
+int stdorder_ruc(cchar *buf,uchar *wp) noex {
+	const uchar	*ubuf = (const uchar *) buf ;
+	*wp = ubuf[0] ;
 	return 1 ;
 }
 
-int stdorder_wus(char *buf,ushort uw) noex {
-	uchar		*ubuf = (uchar *) buf ;
-	ubuf[0] = uchar(uw >> (0 * nb)) ;
-	ubuf[1] = uchar(uw >> (1 * nb)) ;
-	return 2 ;
+int stdorder_rus(cchar *buf,ushort *wp) noex {
+	return stdorder_rxx(buf,wp) ;
 }
 
-int stdorder_wui(char *buf,uint uw) noex {
-	return stdorder_wxx(buf,uw) ;
+int stdorder_rui(cchar *buf,uint *wp) noex {
+	return stdorder_rxx(buf,wp) ;
 }
 
-int stdorder_wul(char *buf,ulong uw) noex {
-	return stdorder_wxx(buf,uw) ;
+int stdorder_rul(cchar *buf,ulong *wp) noex {
+	return stdorder_rxx(buf,wp) ;
 }
 
-int stdorder_wull(char *buf,ulonglong uw) noex {
-	return stdorder_wxx(buf,uw) ;
+int stdorder_rull(cchar *buf,ulonglong *wp) noex {
+	return stdorder_rxx(buf,wp) ;
 }
 
 int stdorder_wc(char *buf,char cw) noex {
@@ -211,6 +186,31 @@ int stdorder_wl(char *buf,long sw) noex {
 int stdorder_wll(char *buf,longlong sw) noex {
 	ulonglong	uw = ulonglong(sw) ;
 	return stdorder_wull(buf,uw) ;
+}
+
+int stdorder_wuc(char *buf,uchar uw) noex {
+	uchar		*ubuf = (uchar *) buf ;
+	ubuf[0] = uchar(uw) ;
+	return 1 ;
+}
+
+int stdorder_wus(char *buf,ushort uw) noex {
+	uchar		*ubuf = (uchar *) buf ;
+	ubuf[0] = uchar(uw >> (0 * nb)) ;
+	ubuf[1] = uchar(uw >> (1 * nb)) ;
+	return 2 ;
+}
+
+int stdorder_wui(char *buf,uint uw) noex {
+	return stdorder_wxx(buf,uw) ;
+}
+
+int stdorder_wul(char *buf,ulong uw) noex {
+	return stdorder_wxx(buf,uw) ;
+}
+
+int stdorder_wull(char *buf,ulonglong uw) noex {
+	return stdorder_wxx(buf,uw) ;
 }
 
 
