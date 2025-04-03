@@ -185,8 +185,8 @@ int dirlist_finish(dirlist *op) noex {
 	        {
 	            void	*vp{} ;
 	            for (int i = 0 ; dbp->get(i,&vp) >= 0 ; i += 1) {
+		        ent	*ep = cast_static<entp>(vp) ;
 	                if (vp) {
-		            ent	*ep = cast_static<entp>(vp) ;
 	                    rs1 = entry_finish(ep) ;
 	                    if (rs >= 0) rs = rs1 ;
 	                }
@@ -227,10 +227,10 @@ int dirlist_adds(dirlist *op,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	if ((rs = dirlist_magic(op,sp)) >= 0) {
 	    cchar	*tp ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    while ((tp = strnpbrk(sp,sl,":; \t,")) != nullptr) {
 	        cchar	*cp = sp ;
-	        cint	cl = (tp - sp) ;
+	        cint	cl = intconv(tp - sp) ;
 	        if (rs >= 0) {
 	            rs = dirlist_add(op,cp,cl) ;
 	            c += rs ;
@@ -238,7 +238,7 @@ int dirlist_adds(dirlist *op,cchar *sp,int sl) noex {
 	        if ((rs >= 0) && (tp[0] == ';')) {
 	            rs = dirlist_semi(op) ;
 	        }
-	        sl -= ((tp + 1) - sp) ;
+	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
 	    } /* end while */
@@ -256,7 +256,7 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		f_added = false ;
 	if ((rs = dirlist_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) {
 	        int	pl{} ;
 	        if ((sl == 0) || ((sl == 1) && (sp[0] == '.'))) {
@@ -285,11 +285,11 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 			/* now see if it is already in the list by DEV-INO */
 	                if (USTAT sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
 	                    if (S_ISDIR(sb.st_mode)) {
-	                        vecobj_vcf	vcf = vecobj_vcf(vcmpdevino) ;
+	                        vecobj_vcf	vdf = vecobj_vcf(vcmpdevino) ;
 				auto		vs = vecobj_search ;
 	                        e.dev = sb.st_dev ;
 	                        e.ino = sb.st_ino ;
-	                        if ((rs = vs(op->dbp,&e,vcf,&vp)) == rsn) {
+	                        if ((rs = vs(op->dbp,&e,vdf,&vp)) == rsn) {
 				    auto	es = entry_start ;
 	                            dev_t	d = sb.st_dev ;
 	                            ino_t	i = sb.st_ino ;
@@ -438,7 +438,7 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 	                f_semi = true ;
 		    }
 	        } /* end for */
-	        rs = (bp - jbuf) ;
+	        rs = intconv(bp - jbuf) ;
 	    } else {
 	        rs = SR_OVERFLOW ;
 	    }
@@ -511,8 +511,8 @@ static int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
-	            if ((rc = (e1p->dev - e2p->dev)) == 0) {
-		        rc = (e1p->ino - e2p->ino) ;
+	            if ((rc = intconv(e1p->dev - e2p->dev)) == 0) {
+		        rc = intconv(e1p->ino - e2p->ino) ;
 		    }
 	        }
 	    }

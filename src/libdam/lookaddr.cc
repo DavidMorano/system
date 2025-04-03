@@ -157,26 +157,26 @@ static int lookaddr_ubl(LA *,LA_US *,cchar *) noex ;
 
 /* addrlist file search (for system lists) */
 constexpr cpcchar	sched2[] = {
-	    "%p/etc/%n/%n.%f",
-	    "%p/etc/%n/%f",
-	    "%p/etc/%n.%f",
-	    "%p/etc/mail/%n.%f",
-	    "%p/etc/mail/%f",
-	    "%p/etc/mail.%f",
-	    "%p/etc/%f",
-	    nullptr
+	"%p/etc/%n/%n.%f",
+	"%p/etc/%n/%f",
+	"%p/etc/%n.%f",
+	"%p/etc/mail/%n.%f",
+	"%p/etc/mail/%f",
+	"%p/etc/mail.%f",
+	"%p/etc/%f",
+	nullptr
 } ;
 
 /* addrlist file search (for local-user lists) */
 constexpr cpcchar	sched3[] = {
-	    "%h/etc/%n/%n.%f",
-	    "%h/etc/%n/%f",
-	    "%h/etc/%n.%f",
-	    "%h/etc/mail/%n.%f",
-	    "%h/etc/mail/%f",
-	    "%h/etc/mail.%f",
-	    "%h/etc/%f",
-	    nullptr
+	"%h/etc/%n/%n.%f",
+	"%h/etc/%n/%f",
+	"%h/etc/%n.%f",
+	"%h/etc/mail/%n.%f",
+	"%h/etc/mail/%f",
+	"%h/etc/mail.%f",
+	"%h/etc/%f",
+	nullptr
 } ;
 
 
