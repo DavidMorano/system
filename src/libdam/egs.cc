@@ -44,7 +44,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
+#include	<climits>		/* |INT_MAX| + |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -94,6 +94,36 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
+template<typename ... Args>
+static int egs_ctor(egs *op,Args ... args) noex {
+    	EGS		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (egs_ctor) */
+
+static int egs_dtor(egs *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (egs_dtor) */
+
+template<typename ... Args>
+static inline int egs_magic(egs *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == EGS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (egs_magic) */
+
 static int egs_opencheck(egs *) noex ;
 
 
@@ -102,87 +132,77 @@ static int egs_opencheck(egs *) noex ;
 
 /* exported subroutines */
 
-int egs_open(egs *eop,cchar *filename) noex {
+int egs_open(egs *op,cchar *filename) noex {
 	int		rs ;
-
-	if (eop == NULL) return SR_FAULT ;
-
-	eop->magic = 0 ;
-	eop->pid = -1 ;
-	if (filename == NULL) filename = EGS_DEFFILE ;
-
-/* do this to be in accord with the latest BSD rules */
-
-	if ((rs = perm(filename,-1,-1,NULL,(R_OK | W_OK))) >= 0) {
-	    if ((rs = dialuss(filename,5,0)) >= 0) {
-	        eop->fd = rs ;
-	        if ((uc_closeonexec(eop->fd,TRUE)) >= 0) {
-		    if ((rs = egs_opencheck(eop)) >= 0) {
-		        eop->magic = EGS_MAGIC ;
+	if (filename == nullptr) filename = EGS_DEFFILE ;
+	if ((rs = egs_ctor(op)) >= 0) {
+	    cint	am = (R_OK | W_OK) ;
+	    op->pid = -1 ;
+	    if ((rs = perm(filename,-1,-1,nullptr,am)) >= 0) {
+	        if ((rs = dialuss(filename,5,0)) >= 0) {
+	            op->fd = rs ;
+	            if ((uc_closeonexec(op->fd,true)) >= 0) {
+		        if ((rs = egs_opencheck(op)) >= 0) {
+		            op->magic = EGS_MAGIC ;
+		        }
+	            } /* end if (closeonexec) */
+	            if (rs < 0) {
+		        u_close(op->fd) ;
+		        op->fd = -1 ;
 		    }
-	        } /* end if (closeonexec) */
-	        if (rs < 0) {
-		    u_close(eop->fd) ;
-		    eop->fd = -1 ;
-		}
-	    } /* end if (dialuss) */
-	} /* end if (perm) */
-
+	        } /* end if (dialuss) */
+	    } /* end if (perm) */
+	    if (rs < 0) {
+		egs_dtor(op) ;
+	    }
+	} /* end if (egs_ctor) */
 	return rs ;
 }
 /* end subroutine (egs_open) */
 
-int egs_close(egs *eop) noex {
-	int		rs = SR_OK ;
+int egs_close(egs *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (eop == NULL) return SR_FAULT ;
-
-	if (eop->magic != EGS_MAGIC) return SR_NOTOPEN ;
-
-	if (eop->fd >= 0) {
-	    rs1 = u_close(eop->fd) ;
-	    if (rs >= 0) rs = rs1 ;
-	    eop->fd = -1 ;
-	}
-
-	eop->magic = 0 ;
+	if ((rs = egs_magic(op)) >= 0) {
+	    if (op->fd >= 0) {
+	        rs1 = u_close(op->fd) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->fd = -1 ;
+	    }
+	    {
+		rs1 = egs_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (egs_close) */
 
 /* add some of our own entropy to the mix (is this a security problem?) */
-int egs_write(egs *eop,cchar *buf,int buflen) noex {
-	cint		tlen = MIN(255,CMDBUFLEN) ;
-	int		rs = SR_OK ;
+int egs_write(egs *op,cchar *wbuf,int wlen) noex {
+	int		rs ;
+	if (wlen < 0) wlen = cstrlen(wbuf) ;
+	if ((rs = egs_magic(op,wbuf)) >= 0) {
 	int		rlen, mlen ;
 	int		bits ;
-	int		i ;
+	int		i = 0 ;
+	cint		tlen = MIN(255,CMDBUFLEN) ;
 	uchar		cmdbuf[CMDBUFLEN + 1] ;
-
-	if (eop == NULL) return SR_FAULT ;
-	if (buf == NULL) return SR_FAULT ;
-
-	if (eop->magic != EGS_MAGIC) return SR_NOTOPEN ;
-
-	if (buflen < 0)
-	    buflen = cstrlen(buf) ;
-
-	i = 0 ;
-	rlen = buflen ;
+	rlen = wlen ;
 	while ((rs >= 0) && (rlen > 0)) {
 
 	    mlen = MIN(tlen,rlen) ;
 
 		bits = mlen * 8 ;
 	    cmdbuf[0] = EGS_CMDWRITE ;
-		cmdbuf[1] = (uchar) (bits >> 8) ;
-		cmdbuf[0] = (uchar) (bits & 255) ;
-	    cmdbuf[3] = (uchar) mlen ;
-	    rs = uc_writen(eop->fd,(void *) cmdbuf,4) ;
+		cmdbuf[1] = uchar(bits >> 8) ;
+		cmdbuf[0] = uchar(bits & 255) ;
+	    cmdbuf[3] = uchar(mlen) ;
+	    rs = uc_writen(op->fd,cmdbuf,4) ;
 
 	    if (rs >= 0)
-	    rs = uc_writen(eop->fd,(void *) (buf + i),mlen) ;
+	    rs = uc_writen(op->fd,(wbuf + i),mlen) ;
 
 	    rlen -= mlen ;
 	    i += mlen ;
@@ -196,79 +216,57 @@ int egs_write(egs *eop,cchar *buf,int buflen) noex {
 }
 /* end subroutine (egs_write) */
 
-int egs_read(egs *eop,char *buf,int buflen) noex {
-	cint		tlen = MIN(255,CMDBUFLEN) ;
-	int		rs = SR_OK ;
-	int		i ;
-	int		len, rlen, mlen ;
-	uchar		cmdbuf[CMDBUFLEN + 1] ;
-
-	if (eop == NULL) return SR_FAULT ;
-	if (buf == NULL) return SR_FAULT ;
-
-	if (eop->magic != EGS_MAGIC) return SR_NOTOPEN ;
-
-	i = 0 ;
-	rlen = buflen ;
-	while (rlen > 0) {
-
-	    mlen = MIN(tlen,rlen) ;
-
-	    cmdbuf[0] = EGS_CMDREAD ;
-	    cmdbuf[1] = (uchar) mlen ;
-	    rs = uc_writen(eop->fd,(void *) cmdbuf,2) ;
-	    if (rs < 0) break ;
-
-	    rs = uc_reade(eop->fd,buf + i,mlen, TO_READ, FM_EXACT) ;
-	    len = rs ;
-	    if (rs < 0) break ;
-
-	    if (len == 0)
-		break ;
-
-	    rlen -= len ;
-	    i += len ;
-
-	} /* end while */
-
-	return (rs >= 0) ? i : rs ;
+int egs_read(egs *op,char *rbuf,int rlen) noex {
+	int		rs ;
+	int		rl = 0 ;
+	if ((rs = egs_magic(op,rbuf)) >= 0) {
+	    cint	to = TO_READ ;
+	    cint	fm = FM_EXACT ;
+	    cint	tlen = min(255,CMDBUFLEN) ;
+	    int		len ;
+	    uchar	cmdbuf[CMDBUFLEN + 1] ;
+	    for (int i = 0 ; rlen > 0 ; i += len) {
+	        cint	mlen = min(tlen,rlen) ;
+	        cmdbuf[0] = EGS_CMDREAD ;
+	        cmdbuf[1] = uchar(mlen) ;
+	        if ((rs = uc_writen(op->fd,cmdbuf,2)) >= 0) {
+	            rs = uc_reade(op->fd,(rbuf + i),mlen,to,fm) ;
+	            len = rs ;
+	        }
+	        if ((rs < 0) || (len == 0)) break ;
+	        rlen -= len ;
+	    } /* end while */
+	} /* end if (magic) */
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (egs_read) */
 
 /* return the level of entropy available */
-int egs_level(egs *eop) noex {
+int egs_level(egs *op) noex {
 	int		rs ;
 	int		len = 0 ;
-	char		cmdbuf[CMDBUFLEN + 1] ;
-
-	if (eop == NULL) return SR_FAULT ;
-
-	if (eop->magic != EGS_MAGIC) return SR_NOTOPEN ;
-
-	cmdbuf[0] = EGS_CMDGETLEVEL ;
-	if ((rs = uc_writen(eop->fd,cmdbuf,1)) >= 0) {
-	    if ((rs = uc_reade(eop->fd,cmdbuf,4, TO_READ, FM_EXACT)) >= 0) {
-	        uint	uiw ;
-	        netorder_rui(cmdbuf,&uiw) ;
-	        len = (uiw & INT_MAX) ;
-	    } /* end if (uc_reade) */
-	} /* end if (uc_writen) */
-
+	if ((rs = egs_magic(op)) >= 0) {
+	    char	cmdbuf[CMDBUFLEN + 1] = { EGS_CMDGETLEVEL } ;
+	    if ((rs = uc_writen(op->fd,cmdbuf,1)) >= 0) {
+	        cint	to = TO_READ ;
+	        cint	fm = FM_EXACT ;
+	        if ((rs = uc_reade(op->fd,cmdbuf,4,to,fm)) >= 0) {
+	            uint	uiw ;
+	            netorder_rui(cmdbuf,&uiw) ;
+	            len = (uiw & INT_MAX) ;
+	        } /* end if (uc_reade) */
+	    } /* end if (uc_writen) */
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (egs_level) */
 
-int egs_getpid(egs *eop,pid_t *pidp) noex {
-	int		rs = SR_OK ;
-
-	if (eop == NULL) return SR_FAULT ;
-
-	if (eop->magic != EGS_MAGIC) return SR_NOTOPEN ;
-
-	if (pidp != NULL)
-	    *pidp = (pid_t) eop->pid ;
-
-	rs = (int) eop->pid ;
+int egs_getpid(egs *op,pid_t *pidp) noex {
+	int		rs ;
+	if ((rs = egs_magic(op)) >= 0) {
+	    if (pidp) *pidp = pid_t(op->pid) ;
+	    rs = int(op->pid) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (egs_getpid) */
@@ -277,31 +275,29 @@ int egs_getpid(egs *eop,pid_t *pidp) noex {
 /* private subroutines */
 
 /* get the EGD program PID and check it */
-static int egs_opencheck(egs *eop) noex {
+static int egs_opencheck(egs *op) noex {
 	int		rs ;
 	int		len ;
-	char		cmdbuf[CMDBUFLEN + 1] ;
-
-	cmdbuf[0] = EGS_CMDGETPID ;
-	if ((rs = uc_writen(eop->fd,cmdbuf,1)) >= 0) {
+	char		cmdbuf[CMDBUFLEN + 1] = { EGS_CMDGETPID } ;
+	if ((rs = uc_writen(op->fd,cmdbuf,1)) >= 0) {
 	    cint	to = TO_READ ;
 	    cint	fm = FM_EXACT ;
-	    if ((rs = uc_reade(eop->fd,cmdbuf,1,to,fm)) >= 0) {
-		len = int(cmdbuf[0]) ;
+	    if ((rs = uc_reade(op->fd,cmdbuf,1,to,fm)) >= 0) {
+		len = int(cmdbuf[0] & UCHAR_MAX) ;
 		if (len <= CMDBUFLEN) {
-		    if ((rs = uc_reade(eop->fd,cmdbuf,len,to,fm)) >= 0) {
+		    if ((rs = uc_reade(op->fd,cmdbuf,len,to,fm)) >= 0) {
 	    		if (int v ; (rs = cfdeci(cmdbuf,len,&v)) >= 0) {
-	    		    eop->pid = (v & INT_MAX) ;
-			    if ((eop->pid < 0) || (eop->pid > PID_MAX)) {
+	    		    op->pid = (v & INT_MAX) ;
+			    if ((op->pid < 0) || (op->pid > PID_MAX)) {
 				rs = SR_PROTO ;
 			    }
 			} /* end if (cfdeci) */
 		    } /* end if (uc_reade) */
-		} else
+		} else {
 		    rs = SR_PROTO ;
+		}
 	    } /* end if (uc_reade) */
 	} /* end if (uc_writen) */
-	
 	return rs ;
 }
 /* end subroutine (egs_opencheck) */
