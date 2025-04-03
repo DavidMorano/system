@@ -1190,9 +1190,8 @@ static int entry_loadcalls(ent *ep,void *dhp) noex {
 /* end subroutine (entry_loadcalls) */
 
 static int entry_hasname(ent *ep,void *dhp,cc *name) noex {
-	sysdialer_info	*dip ;
+	sysdialer_info	*dip = (sysdialer_info *) dlsym(dhp,name) ;
 	int		rs = SR_NOTFOUND ;
-	dip = (sysdialer_info *) dlsym(dhp,name) ;
 	if ((dip != nullptr) && (strcmp(dip->name,name) == 0)) {
 	    ep->osize = dip->osize ;
 	    rs = SR_OK ;
