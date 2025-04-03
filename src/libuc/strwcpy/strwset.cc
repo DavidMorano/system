@@ -78,7 +78,7 @@
 
 char *strwset(char *dp,int ch,int n) noex {
 	while (n-- > 0) {
-	    *dp++ = ch ;
+	    *dp++ = char(ch) ;
 	}
 	*dp = '\0' ;
 	return dp ;

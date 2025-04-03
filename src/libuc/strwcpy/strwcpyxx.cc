@@ -169,7 +169,7 @@ using libu::strwcpy ;			/* subroutine */
 
 char *strwcpychrs(char *dp,int ch,int n) noex {
 	while (n-- > 0) {
-	    *dp++ = ch ;
+	    *dp++ = char(ch) ;
 	}
 	*dp = '\0' ;
 	return dp ;
@@ -180,14 +180,14 @@ char *strwcpycompact(char *dp,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	int		cl ;
 	cchar		*cp ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = cstrlen(sp) ;
 	while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	    if (c++ > 0) {
 	        *dp++ =  ' ' ;
 	    }
 	    dp = strwcpy(dp,cp,cl) ;
-	    sl -= ((cp+cl) - sp) ;
-	    sp = (cp+cl) ;
+	    sl -= intconv((cp + cl) - sp) ;
+	    sp = (cp + cl) ;
 	} /* end while (looping through string pieces) */
 	*dp = '\0' ;
 	return dp ;
@@ -213,7 +213,7 @@ char *strwcpyopaque(char *dp,cchar *sp,int sl) noex {
 /* end subroutine (strwcpyopaque) */
 
 char *strwcpyrev(char *dp,cchar *sp,int sl) noex {
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = cstrlen(sp) ;
 	for (int i = (sl-1) ; i >= 0 ; i += 1) {
 	    *dp++ = sp[i] ;
 	} /* end for */
