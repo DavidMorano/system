@@ -66,6 +66,7 @@
 #include	<toxc.h>
 #include	<nleadstr.h>
 #include	<char.h>
+#include	<libutil.hh>		/* |cstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"strnxsub.h"
@@ -147,7 +148,7 @@ char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 char *strncasesub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
 	if (sp && ss) {
-	    cint	sslen = strlen(ss) ;
+	    cint	sslen = cstrlen(ss) ;
 	    rp = charp(sp) ;
 	    if (sslen > 0) {
 		if (sl >= 0) {
@@ -168,8 +169,8 @@ char *strncasesub(cchar *sp,int sl,cchar *ss) noex {
 /* end subroutine (strncasesub) */
 
 char *strbfoldsub(cchar *sp,int sl,cchar *ss) {
-	strner	so(tofc,nleadfoldstr) ;
-	cint	sslen = strlen(ss) ;
+	strner		so(tofc,nleadfoldstr) ;
+	cint		sslen = cstrlen(ss) ;
     	return so.strnxsub(sp,sl,ss,sslen) ;
 }
 /* end subroutine (strnfoldsub) */
@@ -179,7 +180,7 @@ char *strbfoldsub(cchar *sp,int sl,cchar *ss) {
 
 char *strner::strnxsub(cchar *sp,int sl,cchar *ss,int sslen) noex {
 	char		*rp = nullptr ;
-        if (sl < 0) sl = strlen(sp) ;
+        if (sl < 0) sl = cstrlen(sp) ;
         if (sslen <= sl) {
             cint        sslead = toxc(ss[0]) ;
             int         i ; /* used-afterwards */

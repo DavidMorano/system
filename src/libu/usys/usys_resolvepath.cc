@@ -38,7 +38,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<strxlen.hh>		/* |cstrlen(3u)| */
+#include	<libutil.hh>		/* |cstrlen(3u)| */
 
 #include	"usys_resolvepath.h"
 

@@ -107,7 +107,7 @@
 
 char *strnset(char *bp,int ch,int n) noex {
 	while (n-- > 0) {
-	    *bp++ = ch ;
+	    *bp++ = char(ch) ;
 	}
 	return bp ;
 }

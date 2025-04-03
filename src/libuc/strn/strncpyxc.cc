@@ -87,7 +87,7 @@ char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
 	    dst[0] = '\0' ;
 	    if (n >= 0) {
 	        while (n && *src) {
-	            *dst++ = toxc(*src++) ;
+	            *dst++ = char(toxc(*src++)) ;
 		    n -= 1 ;
 	        } /* end while */
 	        if (n > 0) {

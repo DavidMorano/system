@@ -47,6 +47,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<libutil.hh>		/* |cstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"strn.h"
@@ -89,7 +90,7 @@ int strnnlen(cchar *sp,int sl,int mlen) noex {
 	    } else {
 	        sl = mlen ;
 	    }
-	    len = strnlen(sp,sl) ;
+	    len = cstrnlen(sp,sl) ;
 	} /* end if */
 	return len ;
 }

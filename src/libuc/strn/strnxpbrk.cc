@@ -48,6 +48,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<libutil.hh>		/* |cstrlen(3u)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -108,7 +109,7 @@ char *strnrpbrk(cchar *sp,int sl,cchar *ss) noex {
 	bool		f = false ;
 	char		*rsp = nullptr ;
 	if (sp && ss) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = cstrlen(sp) ;
 	    rsp = charp(sp + sl) ;
 	    while (--rsp >= sp) {
 	        cint	ch = mkchar(*rsp) ;

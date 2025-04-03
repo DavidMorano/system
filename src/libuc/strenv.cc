@@ -35,7 +35,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstdlib>		/* for |getenv(3c)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<timewatch.hh>
 #include	<bufsizevar.hh>
 #include	<getbufsize.h>
@@ -48,6 +47,8 @@
 
 #include	"strenv.hh"
 
+
+import uvariables ;
 
 /* local defines */
 
@@ -100,7 +101,7 @@ namespace {
     } ; /* end struct (valstore_co) */
     struct valstore {
 	cchar		*strp[strenv_overlast] ;
-	char		*a[strenv_overlast] ;
+	char		*ma[strenv_overlast] ;	/* memory-allocation */
 	bool		facc[strenv_overlast] ;
 	ptm		mx ;		/* data mutex */
 	aflag		fvoid ;
@@ -248,13 +249,13 @@ int valstore::iinit() noex {
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
-	            int		rs = SR_OK ;
+	            int		rsl = SR_OK ;
 	            if (!finit) {
-		        rs = SR_LOCKLOST ;
+		        rsl = SR_LOCKLOST ;
 	            } else if (finitdone) {
-		        rs = 1 ;
+		        rsl = 1 ;
 	            }
-	            return rs ;
+	            return rsl ;
 	        } ; /* end lambda */
 	        rs = tw(lamb) ;
 	    } /* end if (initialization) */
@@ -269,10 +270,10 @@ int valstore::ifini() noex {
 	if (finitdone && (! fvoid.testandset)) {
 	    {
 		for (int i = 0 ; i < strenv_overlast ; i += 1) {
-		    if (a[i]) {
-			rs1 = uc_free(a[i]) ;
+		    if (ma[i]) {
+			rs1 = uc_free(ma[i]) ;
 			if (rs >= 0) rs = rs1 ;
-			a[i] = nullptr ;
+			ma[i] = nullptr ;
 		    }
 		} /* end for */
 	    }
@@ -370,7 +371,7 @@ int valstore::valpath(int aw) noex {
 			        tl += rs ;
 		                if ((rs = uc_sysconfstr(cbuf,clen,cmd)) >= 0) {
 			            tl += rs ;
-			            a[aw] = mallocstrw(tbuf,tl) ;
+			            ma[aw] = mallocstrw(tbuf,tl) ;
 		                } /* end if (uc_sysconfstr) */
 			    } /* end if (sncpy) */
 		        } /* end if (mkpath) */

@@ -1,4 +1,4 @@
-/* strxlen HEADER */
+/* libutil HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -8,8 +8,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRXLEN_INCLUDE
-#define	STRXLEN_INCLUDE
+#ifndef	LIBUTIL_INCLUDE
+#define	LIBUTIL_INCLUDE
 #ifdef	__cplusplus
 
 
@@ -42,6 +42,6 @@ constexpr int cstrlen(cchar *sp) noex {
 #endif /* SUBROUTINE_CSTRLEN */
 
 
-#endif /* STRXLEN_INCLUDE */
+#endif /* LIBUTIL_INCLUDE */
 
 

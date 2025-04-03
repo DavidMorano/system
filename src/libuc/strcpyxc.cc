@@ -83,7 +83,7 @@ extern "C" {
 
 static char *strcpyxc(toxc_f toxc,char *dp,cchar *sp) noex {
 	while (*sp) {
-	    *dp++ = toxc(*sp++) ;
+	    *dp++ = char(toxc(*sp++)) ;
 	} /* end while */
 	*dp = '\0' ;
 	return dp ;

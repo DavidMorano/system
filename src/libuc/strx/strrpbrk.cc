@@ -43,6 +43,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<libutil.hh>		/* |cstrlen(3u)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -79,7 +80,7 @@
 /* exported subroutines */
 
 char *strrpbrk(cchar *s,cchar *ss) noex {
-	cint		n = strlen(s) ;
+	cint		n = cstrlen(s) ;
 	bool		f = false ;
 	char		*rsp ;
 	rsp = (char *) (s + n) ;

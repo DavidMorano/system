@@ -29,9 +29,9 @@
 #include	<timecount.hh>
 #include	<filetype.h>
 #include	<aflag.hh>
-#include	<strxlen.hh>
 #include	<stdintx.h>
 #include	<intx.h>
+#include	<libutil.hh>
 
 
 #ifndef	TYPEDEF_MTIME

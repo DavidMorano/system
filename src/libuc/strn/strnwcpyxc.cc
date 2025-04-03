@@ -103,7 +103,7 @@ extern "C" {
 static char *strnwcpyxc(toxc_f toxc,char *dp,int dl,cchar *sp,int sl) noex {
 	if (dp && sp) {
     	    while (dl && sl-- && *sp) {
-	        *dp++ = toxc(*sp++) ;
+	        *dp++ = char(toxc(*sp++)) ;
 		dl -= 1 ;
 	    }
 	    if (dl > 0) {

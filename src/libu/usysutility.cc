@@ -46,6 +46,7 @@
 #include	<cstdlib>
 #include	<cstdio>		/* |snprintf(3c)| */
 #include	<cstring>		/* |strlcpy(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)|  */
 #include	<string>
 #include	<clanguage.h>
