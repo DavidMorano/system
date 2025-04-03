@@ -618,7 +618,7 @@ paramopt_loadone.o:	paramopt_loadone.cc paramopt.h
 
 loadave.o:		loadave.c loadave.h
 
-egs.o:			egs.c egs.h
+egs.o:			egs.cc egs.h
 
 sha1.o:			sha1.c sha1.h
 
