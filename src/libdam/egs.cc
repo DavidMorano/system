@@ -67,8 +67,7 @@
 #define	PID_MAX			999999
 #endif
 
-#undef	CMDBUFLEN
-#define	CMDBUFLEN		100
+#define	CMDBUFLEN		16
 
 #define	TO_READ			10	/* seconds */
 
@@ -180,36 +179,6 @@ int egs_close(egs *op) noex {
 }
 /* end subroutine (egs_close) */
 
-/* add some of our own entropy to the mix (is this a security problem?) */
-int egs_write(egs *op,cchar *wbuf,int wlen) noex {
-	int		rs ;
-	int		wl = 0 ;
-	if (wlen < 0) wlen = cstrlen(wbuf) ;
-	if ((rs = egs_magic(op,wbuf)) >= 0) {
-	    cint	clen = min(UCHAR_MAX,CMDBUFLEN) ;
-	    int		bits ;
-	    int		len ;
-	    uchar	cmdbuf[CMDBUFLEN + 1] ;
-	    for (int i = 0 ; wlen > 0 ; i += 1) {
-	        cint	mlen = min(clen,wlen) ;
-		bits = (mlen * CHAR_BIT) ;
-	        cmdbuf[0] = char(egscmd::write) ;
-		cmdbuf[1] = uchar(bits >> CHAR_BIT) ;
-		cmdbuf[2] = uchar(bits >> 0) ;
-	        cmdbuf[3] = uchar(mlen) ;
-	        if ((rs = uc_writen(op->fd,cmdbuf,4)) >= 0) {
-	            rs = uc_writen(op->fd,(wbuf + i),mlen) ;
-		    len = rs ;
-	            wlen -= len ;
-		    wl += len ;
-	        }
-		if (rs < 0) break ;
-	    } /* end for */
-	} /* end if (magic) */
-	return (rs >= 0) ? wl : rs ;
-}
-/* end subroutine (egs_write) */
-
 int egs_read(egs *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rl = 0 ;
@@ -217,13 +186,14 @@ int egs_read(egs *op,char *rbuf,int rlen) noex {
 	    cint	to = TO_READ ;
 	    cint	fm = FM_EXACT ;
 	    cint	clen = min(UCHAR_MAX,CMDBUFLEN) ;
-	    int		len ;
+	    int		len{} ;
 	    uchar	cmdbuf[CMDBUFLEN + 1] ;
 	    for (int i = 0 ; rlen > 0 ; i += len) {
 	        cint	mlen = min(clen,rlen) ;
-	        cmdbuf[0] = char(egscmd::read) ;
-	        cmdbuf[1] = uchar(mlen) ;
-	        if ((rs = uc_writen(op->fd,cmdbuf,2)) >= 0) {
+		int	ci = 0 ;
+	        cmdbuf[ci++] = char(egscmd::read) ;
+	        cmdbuf[ci++] = uchar(mlen) ;
+	        if ((rs = uc_writen(op->fd,cmdbuf,ci)) >= 0) {
 	            rs = uc_reade(op->fd,(rbuf + i),mlen,to,fm) ;
 	            len = rs ;
 		    rlen -= len ;
@@ -236,23 +206,57 @@ int egs_read(egs *op,char *rbuf,int rlen) noex {
 }
 /* end subroutine (egs_read) */
 
+/* add some of our own entropy to the mix (is this a security problem?) */
+int egs_write(egs *op,cchar *wbuf,int wlen) noex {
+	int		rs ;
+	int		wl = 0 ;
+	if (wlen < 0) wlen = cstrlen(wbuf) ;
+	if ((rs = egs_magic(op,wbuf)) >= 0) {
+	    cint	clen = min(UCHAR_MAX,CMDBUFLEN) ;
+	    int		bits ;
+	    int		len{} ;
+	    uchar	cmdbuf[CMDBUFLEN + 1] ;
+	    for (int i = 0 ; wlen > 0 ; i += 1) {
+	        cint	mlen = min(clen,wlen) ;
+	        int	ci = 0 ;
+		bits = (mlen * CHAR_BIT) ;
+	        cmdbuf[ci++] = char(egscmd::write) ;
+		cmdbuf[ci++] = uchar(bits >> CHAR_BIT) ;	/* high bits */
+		cmdbuf[ci++] = uchar(bits >> 0) ;		/* low  bits */
+	        cmdbuf[ci++] = uchar(mlen) ;
+	        if ((rs = uc_writen(op->fd,cmdbuf,ci)) >= 0) {
+	            rs = uc_writen(op->fd,(wbuf + i),mlen) ;
+		    len = rs ;
+	            wlen -= len ;
+		    wl += len ;
+	        }
+		if (rs < 0) break ;
+	    } /* end for */
+	} /* end if (magic) */
+	return (rs >= 0) ? wl : rs ;
+}
+/* end subroutine (egs_write) */
+
 /* return the level of entropy available */
 int egs_level(egs *op) noex {
 	int		rs ;
-	int		len = 0 ;
+	int		level = 0 ;
 	if ((rs = egs_magic(op)) >= 0) {
-	    char	cmdbuf[CMDBUFLEN + 1] = { char(egscmd::getlevel) } ;
-	    if ((rs = uc_writen(op->fd,cmdbuf,1)) >= 0) {
+	    char	cmdbuf[CMDBUFLEN + 1] ;
+	    int		ci = 0 ;
+	    cmdbuf[ci++] = char(egscmd::getlevel) ;
+	    if ((rs = uc_writen(op->fd,cmdbuf,ci)) >= 0) {
 	        cint	to = TO_READ ;
 	        cint	fm = FM_EXACT ;
-	        if ((rs = uc_reade(op->fd,cmdbuf,4,to,fm)) >= 0) {
+	        cmdbuf[3] = 0 ; /* <- fourth byte (make up 4-byte integer) */
+	        if ((rs = uc_reade(op->fd,cmdbuf,3,to,fm)) >= 0) {
 	            uint	uiw ;
 	            netorder_rui(cmdbuf,&uiw) ;
-	            len = (uiw & INT_MAX) ;
+	            level = (uiw & INT_MAX) ;
 	        } /* end if (uc_reade) */
 	    } /* end if (uc_writen) */
 	} /* end if (magic) */
-	return (rs >= 0) ? len : rs ;
+	return (rs >= 0) ? level : rs ;
 }
 /* end subroutine (egs_level) */
 
@@ -273,15 +277,19 @@ int egs_getpid(egs *op,pid_t *pidp) noex {
 static int egs_opencheck(egs *op) noex {
 	int		rs ;
 	int		len ;
-	char		cmdbuf[CMDBUFLEN + 1] = { char(egscmd::getpid) } ;
-	if ((rs = uc_writen(op->fd,cmdbuf,1)) >= 0) {
+	char		cmdbuf[CMDBUFLEN + 1] ;
+	int		ci = 0 ;
+	cmdbuf[ci++] = char(egscmd::getpid) ;
+	if ((rs = uc_writen(op->fd,cmdbuf,ci)) >= 0) {
 	    cint	to = TO_READ ;
 	    cint	fm = FM_EXACT ;
 	    if ((rs = uc_reade(op->fd,cmdbuf,1,to,fm)) >= 0) {
 		len = int(cmdbuf[0] & UCHAR_MAX) ;
 		if (len <= CMDBUFLEN) {
+		    memclear(cmdbuf) ;
 		    if ((rs = uc_reade(op->fd,cmdbuf,len,to,fm)) >= 0) {
-	    		if (int v ; (rs = cfdeci(cmdbuf,len,&v)) >= 0) {
+			cmdbuf[rs] = '\0' ;
+	    		if (int v ; (rs = cfdeci(cmdbuf,rs,&v)) >= 0) {
 	    		    op->pid = (v & INT_MAX) ;
 			    if ((op->pid < 0) || (op->pid > PID_MAX)) {
 				rs = SR_PROTO ;
