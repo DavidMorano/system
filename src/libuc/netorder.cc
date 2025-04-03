@@ -51,6 +51,33 @@
 #include	"netorder.h"
 
 
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int netorder_rchar(char *buf,char *cwp) noex {
@@ -188,8 +215,8 @@ int netorder_wchar(char *buf,int cw) noex {
 int netorder_wshort(char *buf,int sw) noex {
 	cint		rs = szof(short) ;
 	uchar		*ubuf = (uchar *) buf ;
-	ubuf[0] = (uchar) ((sw >> 8) & 0xff) ;
-	ubuf[1] = (uchar) ((sw >> 0) & 0xff) ;
+	ubuf[0] = uchar((sw >> 8) & 0xff) ;
+	ubuf[1] = uchar((sw >> 0) & 0xff) ;
 	return rs ;
 }
 /* end subroutine (netorder_wshort) */
@@ -197,10 +224,10 @@ int netorder_wshort(char *buf,int sw) noex {
 int netorder_wint(char *buf,int iw) noex {
 	cint		rs = szof(int) ;
 	uchar		*ubuf = (uchar *) buf ;
-	ubuf[0] = (uchar) ((iw >> 24) & 0xff) ;
-	ubuf[1] = (uchar) ((iw >> 16) & 0xff) ;
-	ubuf[2] = (uchar) ((iw >> 8) & 0xff) ;
-	ubuf[3] = (uchar) ((iw >> 0) & 0xff) ;
+	ubuf[0] = uchar((iw >> 24) & 0xff) ;
+	ubuf[1] = uchar((iw >> 16) & 0xff) ;
+	ubuf[2] = uchar((iw >> 8) & 0xff) ;
+	ubuf[3] = uchar((iw >> 0) & 0xff) ;
 	return rs ;
 }
 /* end subroutine (netorder_wint) */
@@ -208,14 +235,14 @@ int netorder_wint(char *buf,int iw) noex {
 int netorder_wlong(char *buf,long lw) noex {
 	cint		rs = szof(long) ;
 	uchar		*ubuf = (uchar *) buf ;
-	ubuf[0] = ((lw >> 56) & 0xff) ;
-	ubuf[1] = ((lw >> 48) & 0xff) ;
-	ubuf[2] = ((lw >> 40) & 0xff) ;
-	ubuf[3] = ((lw >> 32) & 0xff) ;
-	ubuf[4] = ((lw >> 24) & 0xff) ;
-	ubuf[5] = ((lw >> 16) & 0xff) ;
-	ubuf[6] = ((lw >> 8) & 0xff) ;
-	ubuf[7] = ((lw >> 0) & 0xff) ;
+	ubuf[0] = uchar((lw >> 56) & 0xff) ;
+	ubuf[1] = uchar((lw >> 48) & 0xff) ;
+	ubuf[2] = uchar((lw >> 40) & 0xff) ;
+	ubuf[3] = uchar((lw >> 32) & 0xff) ;
+	ubuf[4] = uchar((lw >> 24) & 0xff) ;
+	ubuf[5] = uchar((lw >> 16) & 0xff) ;
+	ubuf[6] = uchar((lw >> 8) & 0xff) ;
+	ubuf[7] = uchar((lw >> 0) & 0xff) ;
 	return rs ;
 }
 /* end subroutine (netorder_wlong) */
@@ -223,14 +250,14 @@ int netorder_wlong(char *buf,long lw) noex {
 int netorder_wll(char *buf,longlong lw) noex {
 	cint		rs = szof(longlong) ;
 	uchar		*ubuf = (uchar *) buf ;
-	ubuf[0] = ((lw >> 56) & 0xff) ;
-	ubuf[1] = ((lw >> 48) & 0xff) ;
-	ubuf[2] = ((lw >> 40) & 0xff) ;
-	ubuf[3] = ((lw >> 32) & 0xff) ;
-	ubuf[4] = ((lw >> 24) & 0xff) ;
-	ubuf[5] = ((lw >> 16) & 0xff) ;
-	ubuf[6] = ((lw >> 8) & 0xff) ;
-	ubuf[7] = ((lw >> 0) & 0xff) ;
+	ubuf[0] = uchar((lw >> 56) & 0xff) ;
+	ubuf[1] = uchar((lw >> 48) & 0xff) ;
+	ubuf[2] = uchar((lw >> 40) & 0xff) ;
+	ubuf[3] = uchar((lw >> 32) & 0xff) ;
+	ubuf[4] = uchar((lw >> 24) & 0xff) ;
+	ubuf[5] = uchar((lw >> 16) & 0xff) ;
+	ubuf[6] = uchar((lw >> 8) & 0xff) ;
+	ubuf[7] = uchar((lw >> 0) & 0xff) ;
 	return rs ;
 }
 /* end subroutine (netorder_wll) */
