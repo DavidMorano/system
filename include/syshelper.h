@@ -20,6 +20,7 @@
 
 #define	SYSHELPER_MAGIC		0x93847561
 #define	SYSHELPER		struct syshelper_head
+#define	SYSHELPER_DEFFILE	"/tmp/syshelper"
 
 
 struct syshelper_head {
