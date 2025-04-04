@@ -36,7 +36,7 @@
 #include	<climits>		/* for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<field.h>
 #include	<fieldterms.h>
@@ -94,7 +94,7 @@ int vecstrx::srvargs(cchar *abuf) noex {
 /* local subroutines */
 
 static int vecstrx_arger(vecstrx *vsp,cchar *abuf) noex {
-	cint		alen = strlen(abuf) ;
+	cint		alen = xstrlen(abuf) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;

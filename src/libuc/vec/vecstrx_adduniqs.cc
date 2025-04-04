@@ -82,14 +82,15 @@ int vecstrx::adduniqs(cchar *sp,int sl) noex {
 	    cchar	*cp ;
 	    cchar	*tp ;
 	    rs = SR_OK ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    while ((tp = strnpbrk(sp,sl," ,")) != nullptr) {
-	        if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
+		cint	tl = intconv(tp - sp) ;
+	        if ((cl = sfshrink(sp,tl,&cp)) > 0) {
 	            rs = adduniq(cp,cl) ;
 	            c += ((rs < INT_MAX) ? 1 : 0) ;
 	        }
-	        sl -= ((tp+1)-sp) ;
-	        sp = (tp+1) ;
+	        sl -= intconv((tp + 1) - sp) ;
+	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
 	    } /* end while */
 	    if ((rs >= 0) && (sl > 0)) {

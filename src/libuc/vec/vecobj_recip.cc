@@ -76,7 +76,7 @@ static int	vecobj_reciphave(vecobj *,cchar *,int) noex ;
 int vecobj_recipadd(vecobj *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if (sl > 0) {
 	    if ((rs = vecobj_reciphave(op,sp,sl)) == 0) {
 	        if (RECIP re ; (rs = recip_start(&re,sp,sl)) >= 0) {
@@ -116,7 +116,7 @@ static int vecobj_reciphave(vecobj *op,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		f = false ;
 	void		*vp{} ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	for (int i = 0 ; (rs1 = vecobj_get(op,i,&vp)) >= 0 ; i += 1) {
 	    recip	*rp = (recip *) vp ;
 	    if (vp) {

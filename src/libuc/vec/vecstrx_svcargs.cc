@@ -31,7 +31,7 @@
 #include	<climits>		/* for |CHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<field.h>
 #include	<fieldterms.h>
@@ -95,7 +95,7 @@ int vecstrx::svcargs(int *fp,cchar *abuf) noex {
 
 static int vecstrx_arger(vecstrx *vsp,int *fp,cchar *abuf) noex {
     	cnullptr	np{} ;
-	cint		alen = strlen(abuf) ;
+	cint		alen = xstrlen(abuf) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -107,8 +107,8 @@ static int vecstrx_arger(vecstrx *vsp,int *fp,cchar *abuf) noex {
 	        while ((fl = fsb.sharg(terms,fbuf,flen)) >= 0) {
 		    if (c == 0) {
 			if (cc *tp ; (tp = strnchr(fbuf,fl,'/')) != np) {
-			     fl = (tp-fbuf) ;
-			     if (((fbuf+fl)-tp) >= 2) {
+			     fl = intconv(tp - fbuf) ;
+			     if (((fbuf + fl) - tp) >= 2) {
 				cint	sch = mkchar(tp[1]) ;
 				f = (tolc(sch) == 'w') ;
 			    }
@@ -144,7 +144,7 @@ static int mkterms() noex {
 static int hasLong(cchar *sp,int sl) noex {
 	int		f = false ;
 	if (sp[0] == '/') {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (sl >= 2) {
 		cint	sch = mkchar(sp[1]) ;
 		f = (tolc(sch) == 'w') ;

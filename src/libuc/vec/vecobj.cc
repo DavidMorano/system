@@ -570,7 +570,7 @@ int vecobj_search(vecobj *op,cvoid *ep,vecobj_vcf vcf,void **rpp) noex {
 	            rs = SR_NOTFOUND ;
 	            if (sepp) {
 	                rs = SR_OK ;
-	                i = charpp(sepp) - charpp(op->va) ;
+	                i = intconv(charpp(sepp) - charpp(op->va)) ;
 	            }
 	        } else {
 	            for (i = 0 ; i < op->i ; i += 1) {

@@ -260,14 +260,15 @@ int veclong_getval(veclong *op,int i,VECLONG_TYPE *rp) noex {
 /* end subroutine (veclong_getval) */
 
 int veclong_mkvec(veclong *op,VECLONG_TYPE *va) noex {
+    	typedef VECLONG_TYPE	val_t ;
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = veclong_magic(op,va)) >= 0) {
 	    if (va) {
 	        cint	n = op->i ;
 	        for (int i = 0 ; i < n ; i += 1) {
-		    cint	v = op->va[i] ;
-		    if (v != INT_MIN) {
+		    val_t	tv = op->va[i] ;
+		    if (tv != val_t(INT_MIN)) {
 		        va[c++] = op->va[i] ;
 		    }
 	        } /* end for */
@@ -296,19 +297,21 @@ int veclong_curend(veclong *op,veclong_cur *curp) noex {
 /* end subroutine (veclong_end) */
 
 int veclong_curenum(veclong *op,veclong_cur *curp,VECLONG_TYPE *rp) noex {
+    	typedef VECLONG_TYPE	val_t ;
 	int		rs ;
-	int		v = 0 ;
+	int		i = 0 ;
 	if ((rs = veclong_magic(op,curp,rp)) >= 0) {
-	    cint	i = curp->i ;
+	    val_t	tv{} ;
+	    i = curp->i ;
 	    if ((i >= 0) && (i < op->i)) {
-	        v = (op->va)[i] ;
+	        tv = (op->va)[i] ;
 	        curp->i = (i+1) ;
 	    } else {
 	        rs = SR_NOTFOUND ;
 	    }
+	    if (rp) *rp = (rs >= 0) ? tv : val_t(INT_MIN) ;
 	} /* end if (magic) */
-	if (rp) *rp = (rs >= 0) ? v : INT_MIN ;
-	return rs ;
+	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (veclong_curenum) */
 
@@ -415,7 +418,7 @@ int veclong_find(veclong *op,VECLONG_TYPE v) noex {
 	        rpp2 = (long *) bsearch(&v,op->va,op->i,esz,scmp) ;
 	        rs = SR_NOTFOUND ;
 	        if (rpp2 != nullptr) {
-	            i = rpp2 - op->va ;
+	            i = intconv(rpp2 - op->va) ;
 	            rs = SR_OK ;
 	        }
 	    } else {
@@ -591,7 +594,7 @@ static int veclong_extrange(veclong *op,int n) noex {
 /* end subroutine (veclong_extrange) */
 
 static int deflongcmp(const VECLONG_TYPE *l1p,const VECLONG_TYPE  *l2p) noex {
-	return (*l1p - *l2p) ;
+	return intsat(*l1p - *l2p) ;
 }
 /* end subroutine (deflongcmp) */
 

@@ -157,6 +157,7 @@ struct vecitem : vecitem_head {
 	int fetch(cvoid *,vecitem_cur *,vecitem_cmpf,void *) noex ;
 	int search(cvoid *,vecitem_cmpf,void *) noex ;
 	int sort(vecitem_cmpf) noex ;
+	operator int () noex ;
 	vecitem_iter begin() noex {
 	    vecitem_iter		it(va,0,i) ;
 	    return it ;

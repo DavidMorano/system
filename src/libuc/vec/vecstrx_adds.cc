@@ -79,11 +79,11 @@ int vecstrx::adds(cchar *sp,int sl) noex {
 	    int		wl ;
 	    cchar	*wp ;
 	    rs = SR_OK ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    while ((sl > 0) && ((wl = sfnext(sp,sl,&wp)) > 0)) {
 	        c += 1 ;
 	        rs = add(wp,wl) ;
-	        sl -= ((wp + wl) - sp) ;
+	        sl -= intconv((wp + wl) - sp) ;
 	        sp = (wp + wl) ;
 	        if (rs < 0) break ;
 	    } /* end while */

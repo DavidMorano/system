@@ -271,7 +271,7 @@ int subinfo::parse(field *fsp,cchar *kp,int kl) noex {
 	 	rs = SR_OK ;
 	        *vp++ = '=' ;
 	        *vp = '\0' ;
-	        vl = (vp-vbuf) ;
+	        vl = intconv(vp - vbuf) ;
 	        while ((fl = fsp->sharg(ft,vp,(vlen-vl))) >= 0) {
 	            if (fl > 0) {
 	                vp += fl ;

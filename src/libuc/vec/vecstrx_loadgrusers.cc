@@ -121,11 +121,11 @@ int vecstrx::loadgrusers(gid_t sgid) noex {
 
 /* local subroutines */
 
-int subinfo::start(vecstrx *vsp,gid_t g) noex {
+int subinfo::start(vecstrx *p,gid_t g) noex {
     	int		rs = SR_BUGCHECK ;
 	if (vsp) {
 	    rs = SR_OK ;
-	    vsp = vsp ;
+	    vsp = p ;
 	    sgid = g ;
 	} /* end if (non-null) */
 	return rs ;
@@ -146,11 +146,11 @@ int subinfo::pwmapload() noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = pwmapbegin()) >= 0) {
-	    int		ml = fsize ;
+	    int		ml = intconv(fsize) ;
 	    cchar	*mp = charp(mapdata) ;
 	    cchar	*tp ;
 	    while ((tp = strnchr(mp,ml,CH_NL)) != nullptr) {
-	        cint	len = (tp - mp) ;
+	        cint	len = intconv(tp - mp) ;
 	        if (gid_t gid{} ; (rs = pwentparse(mp,len,&gid)) > 0) {
 		    cint	ul = rs ;
 		    if (sgid == gid) {
@@ -158,8 +158,8 @@ int subinfo::pwmapload() noex {
 	                rs = vsp->adduniq(mp,ul) ;
 	            }
 	        } /* end if (pwentparse) */
-	        ml -= ((tp+1)-mp) ;
-	        mp = (tp+1) ;
+	        ml -= intconv((tp + 1) - mp) ;
+	        mp = (tp + 1) ;
 	        if (rs < 0) break ;
 	    } /* end while (reading lines) */
 	    rs1 = pwmapend() ;
@@ -230,11 +230,12 @@ static int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {
 	    if (cchar *tp ; (tp = strnchr(lp,ll,':')) != nullptr) {
 	        switch (fi) {
 	        case 0:
-	            ul = (tp-lp) ;
+	            ul = intconv(tp - lp) ;
 	            break ;
 	        case 3:
 	            {
-	                if (int v{} ; (rs = cfdeci(lp,(tp-lp),&v)) >= 0) {
+			cint	tl = intconv(tp - lp) ;
+	                if (int v{} ; (rs = cfdeci(lp,tl,&v)) >= 0) {
 	                    *gp = gid_t(v) ;
 	                } else if (isNotValid(rs)) {
 			    rs = SR_OK ;
@@ -243,7 +244,7 @@ static int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {
 	            } /* end block */
 	            break ;
 	        } /* end switch */
-	        ll -= ((tp+1)-lp) ;
+	        ll -= intconv((tp+1)-lp) ;
 	        lp = (tp+1) ;
 	    } /* end if (had separator) */
 	} /* end for (looping through fields) */

@@ -381,7 +381,7 @@ int vecint_find(vecint *op,VECINT_TYPE v) noex {
 	        rpp = (int *) bsearch(&v,op->va,op->i,esz,qcf) ;
 	        rs = SR_NOTFOUND ;
 	        if (rpp) {
-	            i = (rpp - op->va) ;
+	            i = intconv(rpp - op->va) ;
 	            rs = SR_OK ;
 	        }
 	    } else {
@@ -646,18 +646,18 @@ int vecint::adduniq(VECINT_TYPE v) noex {
 	return vecint_adduniq(this,v) ;
 }
 
-int vecint::insert(int i,VECINT_TYPE v) noex {
-	return vecint_insert(this,i,v) ;
+int vecint::insert(int idx,VECINT_TYPE v) noex {
+	return vecint_insert(this,idx,v) ;
 }
 
-int vecint::assign(int i,VECINT_TYPE v) noex {
-	return vecint_insert(this,i,v) ;
+int vecint::assign(int idx,VECINT_TYPE v) noex {
+	return vecint_insert(this,idx,v) ;
 }
 
-int vecint::del(int i) noex {
+int vecint::del(int idx) noex {
     	int		rs ;
-	if (i >= 0) {
-	    rs = vecint_del(this,i) ;
+	if (idx >= 0) {
+	    rs = vecint_del(this,idx) ;
 	} else {
 	    rs = vecint_delall(this) ;
 	}
@@ -672,16 +672,16 @@ int vecint::match(VECINT_TYPE v) noex {
 	return vecint_match(this,v) ;
 }
 
-int vecint::getval(int i,VECINT_TYPE *rp) noex {
-	return vecint_getval(this,i,rp) ;
+int vecint::getval(int idx,VECINT_TYPE *rp) noex {
+	return vecint_getval(this,idx,rp) ;
 }
 
 int vecint::getvec(VECINT_TYPE **rpp) noex {
 	return vecint_getvec(this,rpp) ;
 }
 
-int vecint::mkvec(VECINT_TYPE *va) noex {
-	return vecint_mkvec(this,va) ;
+int vecint::mkvec(VECINT_TYPE *rva) noex {
+	return vecint_mkvec(this,rva) ;
 }
 
 int vecint::curbegin(vecint_cur *curp) noex {

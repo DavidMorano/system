@@ -232,7 +232,7 @@ int vechand_search(vechand *op,cv *ep,vechand_vcmp vcf,void **rpp) noex {
 	            spp = (void **) bsearch(&ep,op->va,op->i,esize,scf) ;
 	            rs = SR_NOTFOUND ;
 	            if (spp) {
-	                i = (spp - op->va) ;
+	                i = intconv(spp - op->va) ;
 	                rs = SR_OK ;
 	            }
 	        } else {

@@ -266,7 +266,7 @@ int vecpstr_add(vecpstr *op,cchar *sp,int sl) noex {
 int vecpstr_adduniq(vecpstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if ((rs = vecpstr_findn(op,sp,sl)) >= 0) {
 	        rs = INT_MAX ;
 	    } else if (rs == SR_NOTFOUND) {
@@ -282,10 +282,10 @@ int vecpstr_addkeyval(vecpstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		i = 0 ;
 	if ((rs = vecpstr_magic(op,kp)) >= 0) {
 		int	amount = 0 ;
-	        if (kl < 0) kl = strlen(kp) ;
+	        if (kl < 0) kl = xstrlen(kp) ;
 	        amount += (kl+1) ;
 	        if (vp) {
-	            if (vl < 0) vl = strlen(vp) ;
+	            if (vl < 0) vl = xstrlen(vp) ;
 	            amount += (vl+1) ;
 	        }
 	        if ((rs = vecpstr_extstr(op,amount)) >= 0) {
@@ -306,7 +306,7 @@ int vecpstr_insert(vecpstr *op,int ii,cchar *sp,int sl) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = vecpstr_validx(op,ii)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if ((op->i + 1) > op->n) {
 	        rs = vecpstr_extvec(op) ;
 	    }
@@ -327,7 +327,7 @@ int vecpstr_store(vecpstr *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = vecpstr_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    {
 	        cint	amount = (sl + 1) ;
 	        cchar	*cp = nullptr ;
@@ -392,7 +392,7 @@ int vecpstr_del(vecpstr *op,int i) noex {
             if (op->va[i] != nullptr) {
                 op->c -= 1 ;            /* decrement list count */
                 if (op->f.stsize) {
-                    op->stsize -= (strlen(op->va[i]) + 1) ;
+                    op->stsize -= (xstrlen(op->va[i]) + 1) ;
                 }
             } /* end if (freeing the actual string data) */
             if (op->f.ostationary) {
@@ -507,7 +507,7 @@ int vecpstr_search(vecpstr *op,cchar *sp,vecpstr_vcmp vcf,cchar **rpp) noex {
 	                rpp2 = (cchar **) bsearch(&sp,op->va,op->i,esize,scf) ;
 	                rs = SR_NOTFOUND ;
 	                if (rpp2) {
-	                    i = (rpp2 - op->va) ;
+	                    i = intconv(rpp2 - op->va) ;
 	                    rs = SR_OK ;
 	                }
 	            } else {
@@ -576,7 +576,7 @@ int vecpstr_findn(vecpstr *op,cchar *sp,int sl) noex {
 	    int		sch = sp[0] ; /* ok: since all get promoted similarly */
 	    int		i{} ;		/* <- used afterwards */
 	    rs = SR_NOTFOUND ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    for (i = 0 ; i < op->i ; i += 1) {
 	        cchar	*ep = op->va[i] ;
 	        if (ep && (sch == ep[0])) {
@@ -626,7 +626,7 @@ int vecpstr_strsize(vecpstr *op) noex {
 	            for (int i = 0 ; i < op->i ; i += 1) {
 			cchar	*ep = op->va[i] ;
 	                if (ep) {
-	                    stsize += (strlen(ep) + 1) ;
+	                    stsize += (xstrlen(ep) + 1) ;
 		        }
 	            } /* end for */
 	            op->stsize = stsize ;
@@ -654,11 +654,11 @@ int vecpstr_strmk(vecpstr *op,char *tab,int tabsize) noex {
 			*bp++ = '\0' ;	/* <- zeroth entry */
 			c += 1 ;
 	                for (int i = 0 ; get(clp,i,&vp) >= 0 ; i += 1) {
-	                    vecpstr_ch	*ccp = (vecpstr_ch *) vp ;
-	                    if (ccp && ccp->tab) {
-	                        c += ccp->count ;
-	                        memcpy(bp,ccp->tab,ccp->tablen) ;
-	                        bp += ccp->tablen ;
+	                    vecpstr_ch	*chkp = (vecpstr_ch *) vp ;
+	                    if (chkp && chkp->tab) {
+	                        c += chkp->count ;
+	                        memcpy(bp,chkp->tab,chkp->tablen) ;
+	                        bp += chkp->tablen ;
 		            }
 	                } /* end for */
 	                while (bp < (tab + tabsize)) {
@@ -708,7 +708,7 @@ int vecpstr_recmk(vecpstr *op,int *rec,int recsize) noex {
 			cchar	*ep = op->va[i] ;
 	                if (ep) {
 	                    rec[c++] = si ;
-	                    si += (strlen(ep) + 1) ;
+	                    si += (xstrlen(ep) + 1) ;
 		        }
 	            } /* end for */
 	            rec[c] = -1 ;
@@ -737,7 +737,7 @@ int vecpstr_recmkstr(vecpstr *op,int *rec,int recs,char *tab,int tabs) noex {
 	                for (int i = 0 ; i < op->i ; i += 1) {
 			    cchar	*ep = op->va[i] ;
 	                    if (ep) {
-	                        rec[c++] = (bp - tab) ;
+	                        rec[c++] = intconv(bp - tab) ;
 	                        bp = (strwcpy(bp,ep,-1) + 1) ;
 		            }
 	                } /* end for */
@@ -897,15 +897,15 @@ static int vecpstr_finchunks(vecpstr *op) noex {
 	int		c = 0 ;
 	void		*vp ;
 	for (int i = 0 ; vechand_get(clp,i,&vp) >= 0 ; i += 1) {
-	    vecpstr_ch	*ccp = (vecpstr_ch *) vp ;
-	    if (ccp) {
+	    vecpstr_ch	*chkp = (vecpstr_ch *) vp ;
+	    if (chkp) {
 	        c += 1 ;
 		{
-	            rs1 = chunk_finish(ccp) ;
+	            rs1 = chunk_finish(chkp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_libfree(ccp) ;
+	            rs1 = uc_libfree(chkp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	    }
@@ -930,15 +930,15 @@ static int vecpstr_extstr(vecpstr *op,int amount) noex {
 static int vecpstr_newchunk(vecpstr *op,int amount) noex {
 	cint		sz = szof(vecpstr_ch) ;
 	int		rs ;
-	void		*vp{} ;
 	op->chp = nullptr ;
-	if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
+	if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
 	    op->chp = (vecpstr_ch *) vp ;
 	    if (amount < op->chsize) amount = op->chsize ;
 	    if ((rs = chunk_start(op->chp,amount)) >= 0) {
 	        rs = vechand_add(op->clp,op->chp) ;
-		if (rs < 0)
+		if (rs < 0) {
 		    chunk_finish(op->chp) ;
+		}
 	    } /* end if (chunk) */
 	    if (rs < 0) {
 	        uc_libfree(op->chp) ;
@@ -1025,47 +1025,46 @@ static int vecpstr_validx(vecpstr *op,int i) noex {
 }
 /* end subroutine (vecpstr_validx) */
 
-static int chunk_start(vecpstr_ch *ccp,int chsize) noex {
+static int chunk_start(vecpstr_ch *chkp,int chsize) noex {
 	int		rs ;
-	void		*vp{} ;
 	chsize = iceil(chsize,8) ;
-	memclear(ccp) ; /* <- potentially dangerous if type changes */
-	if ((rs = uc_libmalloc(chsize,&vp)) >= 0) {
-	    ccp->tab = (char *) vp ;
-	    ccp->tabsize = chsize ;
-	    ccp->tab[0] = '\0' ;
-	    ccp->tablen = 0 ;
+	memclear(chkp) ; /* <- potentially dangerous if type changes */
+	if (void *vp ; (rs = uc_libmalloc(chsize,&vp)) >= 0) {
+	    chkp->tab = charp(vp) ;
+	    chkp->tabsize = chsize ;
+	    chkp->tab[0] = '\0' ;
+	    chkp->tablen = 0 ;
 	} /* end if (memory-allocation) */
 	return rs ;
 }
 /* end subroutine (chunk_start) */
 
-static int chunk_finish(vecpstr_ch *ccp) noex {
+static int chunk_finish(vecpstr_ch *chkp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ccp->tab) {
-	    rs1 = uc_libfree(ccp->tab) ;
+	if (chkp->tab) {
+	    rs1 = uc_libfree(chkp->tab) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ccp->tab = nullptr ;
+	    chkp->tab = nullptr ;
 	}
-	ccp->tabsize = 0 ;
+	chkp->tabsize = 0 ;
 	return rs ;
 }
 /* end subroutine (chunk_finish) */
 
-static int chunk_check(vecpstr_ch *ccp,int amount) noex {
-	return (amount > (ccp->tabsize - ccp->tablen)) ;
+static int chunk_check(vecpstr_ch *chkp,int amount) noex {
+	return (amount > (chkp->tabsize - chkp->tablen)) ;
 }
 /* end subroutine (chunk_check) */
 
-static int chunk_add(vecpstr_ch *ccp,cchar *sp,int sl,cchar **rpp) noex {
+static int chunk_add(vecpstr_ch *chkp,cchar *sp,int sl,cchar **rpp) noex {
 	cint		amount = (sl + 1) ;
 	int		rs = SR_OK ;
-	if (amount <= (ccp->tabsize - ccp->tablen)) {
-	    char	*bp = (ccp->tab + ccp->tablen) ;
+	if (amount <= (chkp->tabsize - chkp->tablen)) {
+	    char	*bp = (chkp->tab + chkp->tablen) ;
 	    strwcpy(bp,sp,sl) ;
-	    ccp->tablen += amount ;
-	    ccp->count += 1 ;
+	    chkp->tablen += amount ;
+	    chkp->count += 1 ;
 	    *rpp = bp ;
 	} else {
 	    rs = SR_BUGCHECK ;
@@ -1074,12 +1073,12 @@ static int chunk_add(vecpstr_ch *ccp,cchar *sp,int sl,cchar **rpp) noex {
 }
 /* end subroutine (chunk_add) */
 
-static int chunk_addkeyval(vecpstr_ch *ccp,cchar *kp,int kl,
+static int chunk_addkeyval(vecpstr_ch *chkp,cchar *kp,int kl,
 		cchar *vp,int vl,cchar **rpp) noex {
 	cint		amount = (kl+1+vl+1) ;
 	int		rs = SR_OK ;
-	if (amount <= (ccp->tabsize - ccp->tablen)) {
-	    char	*bp = (ccp->tab + ccp->tablen) ;
+	if (amount <= (chkp->tabsize - chkp->tablen)) {
+	    char	*bp = (chkp->tab + chkp->tablen) ;
 	    bp = strwcpy(bp,kp,kl) ;
 	    *bp++ = '=' ;
 	    if (vp != nullptr) {
@@ -1087,8 +1086,8 @@ static int chunk_addkeyval(vecpstr_ch *ccp,cchar *kp,int kl,
 	    } else {
 		*bp++ = '\0' ;
 	    }
-	    ccp->tablen += amount ;
-	    ccp->count += 1 ;
+	    chkp->tablen += amount ;
+	    chkp->count += 1 ;
 	    *rpp = bp ;
 	} else {
 	    rs = SR_BUGCHECK ;

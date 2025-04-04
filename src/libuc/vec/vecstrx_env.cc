@@ -109,15 +109,15 @@ int vecstrx::envadds(cchar *sp,int sl) noex {
 	if (sp) {
 	    cchar	*tp ;
 	    rs = SR_OK ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    while ((tp = strnpbrk(sp,sl," \t\r\n,")) != nullptr) {
-	        cint	cl = (tp - sp) ;
+	        cint	cl = intconv(tp - sp) ;
 	        cchar	*cp = sp ;
 	        if (cl > 0) {
 	            rs = vecstrx_addwithin(this,cp,cl) ;
 	            if (rs > 0) c += 1 ;
 	        } /* end if */
-	        sl -= ((tp + 1) - sp) ;
+	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
 	    } /* end while */
@@ -157,7 +157,7 @@ int vecstrx::envget(cchar *kp,cchar **rpp) noex {
 	    if (cchar *ep ; (rs = finder(kp,vstrkeycmp,&ep)) >= 0) {
 	        if (cchar *tp ; (tp = strchr(ep,'=')) != nullptr) {
 	            rp = (tp + 1) ;
-	            rl = strlen(tp + 1) ;
+	            rl = xstrlen(tp + 1) ;
 	        } else {
 	            rp = (ep + strlen(ep)) ; /* <- NUL character */
 		}
@@ -175,7 +175,7 @@ static int vecstrx_addwithin(vecstrx *op,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		f_added = false ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
@@ -191,8 +191,8 @@ static int vecstrx_addwithin(vecstrx *op,cchar *sp,int sl) noex {
 	    cchar	*vp = nullptr ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
 	        vp = tp + 1 ;
-	        vl = (kp + kl) - vp ;
-	        kl = tp - kp ;
+	        vl = intconv((kp + kl) - vp) ;
+	        kl = intconv(tp - kp) ;
 	        while ((kl > 0) && CHAR_ISWHITE(kp[kl - 1])) {
 	            f_separated = true ;
 	            kl -= 1 ;

@@ -425,7 +425,7 @@ int recarr_search(recarr *op,cvoid *ep,recarr_cf vcmp,void *vrp) noex {
 	        spp = (void **) bsearch(&ep,op->va,op->i,esize,qcmp) ;
 	        rs = SR_NOTFOUND ;
 	        if (spp) {
-	            i = (spp - op->va) ;
+	            i = intconv(spp - op->va) ;
 	            rs = SR_OK ;
 	        }
 	    } else {

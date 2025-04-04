@@ -91,7 +91,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |sort(3c++)| */
 #include	<usystem.h>
 #include	<nulstr.h>
@@ -256,7 +256,7 @@ int vecstr_add(vecstr *op,cchar *sp,int sl) noex {
 int vecstr_adduniq(vecstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if ((rs = vecstr_findn(op,sp,sl)) >= 0) {
 	        rs = INT_MAX ;
 	    } else if (rs == SR_NOTFOUND) {
@@ -272,9 +272,9 @@ int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		i = 0 ;
 	if (op && kp) {
 	    rs = SR_OK ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = xstrlen(kp) ;
 	    if ((vl < 0) || ((vp == nullptr) && (vl != 0))) {
-	        vl = (vp) ? strlen(vp) : 0 ;
+	        vl = (vp) ? xstrlen(vp) : 0 ;
 	    }
 	    if ((op->i + 1) > op->n) {
 	        rs = vecstr_extvec(op) ;
@@ -301,7 +301,7 @@ int vecstr_insert(vecstr *op,int ii,cchar *sp,int sl) noex {
 	int		i = 0 ;
 	if (op && sp) {
 	     if ((rs = vecstr_validx(op,ii)) >= 0) {
-	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl < 0) sl = xstrlen(sp) ;
 	        if ((op->i + 1) > op->n) {
 	            rs = vecstr_extvec(op) ;
 	        }
@@ -324,7 +324,7 @@ int vecstr_store(vecstr *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		i = 0 ;
 	if (op) {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if ((op->i + 1) > op->n) {
 	        rs = vecstr_extvec(op) ;
 	    }
@@ -394,7 +394,7 @@ int vecstr_del(vecstr *op,int i) noex {
 	            if (op->va[i] != nullptr) {
 	                op->c -= 1 ;		/* decrement list count */
 	                if (op->f.stsize) {
-	                    op->stsize -= (strlen(op->va[i]) + 1) ;
+	                    op->stsize -= (xstrlen(op->va[i]) + 1) ;
 	                }
 	    		uc_libfree(op->va[i]) ;
 		    } /* end if (freeing the actual string data) */
@@ -515,7 +515,7 @@ int vecstr_search(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	            spp = (cchar **) bsearch(&sp,op->va,op->i,esize,scf) ;
 	            rs = SR_NOTFOUND ;
 	            if (spp) {
-	                i = (spp - op->va) ;
+	                i = intconv(spp - op->va) ;
 	                rs = i ;
 	            }
 	        } else {
@@ -605,7 +605,7 @@ int vecstr_findn(vecstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) {
 	    rs = SR_NOTFOUND ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (op->va) {
 	        cint	sch = sp[0] ; /* ok: since all get promoted similarly */
 	    	int	i{} ;		/* <- used afterwards */
@@ -665,7 +665,7 @@ int vecstr_strsize(vecstr *op) noex {
 	            for (int i = 0 ; i < op->i ; i += 1) {
 			cchar	*ep = op->va[i] ;
 	                if (ep) {
-	                    stsize += (strlen(ep) + 1) ;
+	                    stsize += (xstrlen(ep) + 1) ;
 		        }
 	            } /* end for */
 	            op->stsize = stsize ;
@@ -747,7 +747,7 @@ int vecstr_recmk(vecstr *op,int *rec,int recs) noex {
 			cchar	*ep = op->va[i] ;
 	                if (ep) {
 	                    rec[c++] = si ;
-	                    si += (strlen(ep) + 1) ;
+	                    si += (xstrlen(ep) + 1) ;
 		        }
 	            } /* end for */
 		} /* end if (populated) */
@@ -778,7 +778,7 @@ int vecstr_recmkstr(vecstr *op,int *rec,int recs,char *tab,int tabs) noex {
 	                    for (int i = 0 ; i < op->i ; i += 1) {
 				cchar	*ep = op->va[i] ;
 	                        if (ep) {
-	                            rec[c++] = (bp - tab) ;
+	                            rec[c++] = intconv(bp - tab) ;
 	                            bp = (strwcpy(bp,ep,-1) + 1) ;
 		                }
 	                    } /* end for */

@@ -33,7 +33,6 @@
 #define	VECELEM			struct vecelem_head
 #define	VECELEM_FL		struct vecelem_flags
 #define	VECELEM_DEFENTS		2
-
 /* options */
 #define	VECELEM_ODEFAULT	0
 #define	VECELEM_OREUSE		(1 << 0)	/* reuse empty slots */

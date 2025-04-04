@@ -66,7 +66,7 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<libmallocxx.h>		/* <- currently unused */
@@ -123,7 +123,7 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 	int		c = 0 ;
 	if (lp) {
 	    rs = SR_OK ;
-	    if (ll < 0) ll = strlen(lp) ;
+	    if (ll < 0) ll = xstrlen(lp) ;
 	    if (ll > 0) {
 		if ((rs = maxpathlen) >= 0) {
 		    cint	plen = rs ;
@@ -131,11 +131,11 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 	                cchar	*tp ;
 	                while ((tp = strnpbrk(lp,ll,":;")) != nullptr) {
 		            if ((tp-lp) >= 0) {
-				cint	pl = (tp - lp) ;
+				cint	pl = intconv(tp - lp) ;
 				rs = vecstrx_addone(this,pbuf,lp,pl) ;
 				c += rs ;
 		            }
-		            ll -= ((tp+1)-lp) ;
+		            ll -= intconv((tp+1)-lp) ;
 		            lp = (tp+1) ;
 		            if (rs < 0) break ;
 	                } /* end while */
@@ -158,16 +158,17 @@ int vecstrx::addpath(cchar *lp,int ll) noex {
 	int		c = 0 ;
 	if (lp) {
 	    rs = SR_OK ;
-	    if (ll < 0) ll = strlen(lp) ;
+	    if (ll < 0) ll = xstrlen(lp) ;
 	    if (ll > 0) {
 	        cchar	*tp ;
 	        while ((tp = strnpbrk(lp,ll,":;")) != nullptr) {
 		    if ((tp-lp) >= 0) {
-		        rs = adduniq(lp,(tp-lp)) ;
+			cint	tl = intconv(tp - lp) ;
+		        rs = adduniq(lp,tl) ;
 		        if (rs < INT_MAX) c += 1 ;
 		    }
-		    ll -= ((tp+1)-lp) ;
-		    lp = (tp+1) ;
+		    ll -= intconv((tp + 1) - lp) ;
+		    lp = (tp + 1) ;
 		    if (rs < 0) break ;
 	        } /* end while */
 	        if ((rs >= 0) && (ll > 0)) {
@@ -188,7 +189,7 @@ int vecstrx::addcspath() noex {
 	int		c = 0 ;
         if ((rs = maxpathlen) >= 0) {
             cint    clen = (NPATH * rs) ;
-            if (char *cbuf{} ; (rs = mall((clen+1),&cbuf)) >= 0) {
+            if (char *cbuf ; (rs = mall((clen+1),&cbuf)) >= 0) {
                 cint        req = _CS_PATH ;
                 if ((rs = uc_sysconfstr(cbuf,clen,req)) >= 0) {
                     rs = addpath(cbuf,rs) ;

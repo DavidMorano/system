@@ -175,7 +175,7 @@ int vecitem_add(vecitem *op,cvoid *ep,int el) noex {
 	    char	*bp = nullptr ;
 	    bool	f_done = false ;
 	    bool	f ;
-	    if (el < 0) el = strlen(charp(ep)) ;
+	    if (el < 0) el = xstrlen(charp(ep)) ;
 	    if ((rs = uc_malloc((el+1),&bp)) >= 0) {
 	        memcpy(bp,ep,el) ;
 	        bp[el] = '\0' ;
@@ -391,7 +391,7 @@ int vecitem_search(vecitem *op,cvoid *cep,cmpf cf,void *vrp) noex {
 	        void		**spp ;
 	        rs = SR_NOTFOUND ;
 	        if ((spp = voidpp(bsearch(&cep,op->va,op->i,ssz,scf))) != np) {
-	            i = (spp - op->va) ;
+	            i = intconv(spp - op->va) ;
 	            rs = SR_OK ;
 	        }
 	    } else {
@@ -670,6 +670,10 @@ void vecitem::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecitem",rs,"fini-finish") ;
 	}
+}
+
+vecitem::operator int () noex {
+    	return vecitem_count(this) ;
 }
 
 int vecitem_co::operator () (int a) noex {
