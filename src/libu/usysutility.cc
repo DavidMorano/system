@@ -178,7 +178,7 @@ namespace libu {
 			switch (rs) {
 			case SR_NOMEM:
 			    if (to_nomem-- > 0) {
-				sleep(1) ;
+				msleep(1000) ;
 			    } else {
 				fexit = true ;
 			    }

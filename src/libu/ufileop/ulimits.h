@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	ulimits
+
+	Description:
 	Additional (or supplemental) support for UNIX® limits.
 
 *******************************************************************************/
@@ -31,9 +35,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<limits.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
 
 
 #ifndef	LONG64_MIN
