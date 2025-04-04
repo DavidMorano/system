@@ -227,10 +227,10 @@ int buffer_strw(buffer *op,cchar *sbuf,int slen) noex {
 	int		len = 0 ;
 	if (op && sbuf) {
 	    if ((rs = op->len) >= 0) {
-	        if (slen < 0) slen = strlen(sbuf) ;
+	        if (slen < 0) slen = xstrlen(sbuf) ;
 	        if ((rs = buffer_ext(op,slen)) >= 0) {
 	            char	*bp = (op->dbuf + op->len) ;
-	            len = strwcpy(bp,sbuf,slen) - bp ;
+	            len = intconv(strwcpy(bp,sbuf,slen) - bp) ;
 	            op->len += len ;
 	        }
 	    }
@@ -244,7 +244,7 @@ int buffer_chr(buffer *op,int ch) noex {
 	if (op) {
 	    if ((rs = op->len) >= 0) {
 	        if ((rs = buffer_ext(op,1)) >= 0) {
-	            op->dbuf[(op->len)++] = ch ;
+	            op->dbuf[(op->len)++] = char(ch) ;
 	            op->dbuf[op->len] = '\0' ;
 	        }
 	    }
@@ -257,7 +257,7 @@ int buffer_buf(buffer *op,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	if (op && sbuf) {
 	    if ((rs = op->len) >= 0) {
-	        if (slen < 0) slen = strlen(sbuf) ;
+	        if (slen < 0) slen = xstrlen(sbuf) ;
 	        if ((rs = buffer_ext(op,slen)) >= 0) {
 	            char	*bp = (op->dbuf + op->len) ;
 	            memcpy(bp,sbuf,slen) ;

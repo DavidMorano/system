@@ -83,11 +83,11 @@ int buffer_stropaque(buffer *op,cchar *sp,int sl) noex {
 	int		cl ;
 	int		len = 0 ;
 	cchar		*cp{} ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	    rs = buffer_strw(op,cp,cl) ;
 	    len += rs ;
-	    sl -= ((cp+cl)-sp) ;
+	    sl -= intconv((cp + cl) - sp) ;
 	    sp = (cp+cl) ;
 	    if (rs < 0) break ;
 	} /* end while */

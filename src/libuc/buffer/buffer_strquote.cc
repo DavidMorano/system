@@ -84,26 +84,30 @@ int buffer_strquote(buffer *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if (strnpbrk(sp,sl," \t\r\n\v\f\b\"\\") != nullptr) {
-	    cint	sz = ((2*sl)+3) ;
+	    cint	sz = ((2 * sl) + 3) ;
 	    if (char *ap ; (rs = uc_malloc(sz,&ap)) >= 0) {
 	        cchar	*tp ;
 		char	*bp = ap ;
 		{
 		    *bp++ = qch ;
 		    while ((tp = strnpbrk(sp,sl,"\"\\")) != nullptr) {
-		        bp = strwcpy(bp,sp,(tp-sp)) ;
+			cint	tl = intconv(tp - sp) ;
+		        bp = strwcpy(bp,sp,tl) ;
 		        *bp++ = CH_BSLASH ;
 		        *bp++ = *tp ;
-		        sl -= ((tp+1)-sp) ;
+		        sl -= intconv((tp + 1) - sp) ;
 		        sp = (tp+1) ;
 		    } /* end while */
 		    if (sl > 0) {
 		        bp = strwcpy(bp,sp,sl) ;
 		    }
 		    *bp++ = qch ;
-		    rs = buffer_strw(op,ap,(bp-ap)) ;
+		    {
+		        cint	tl = intconv(bp - ap) ;
+		        rs = buffer_strw(op,ap,tl) ;
+		    }
 		    len = rs ;
 		} /* end block */
 		rs1 = uc_free(ap) ;

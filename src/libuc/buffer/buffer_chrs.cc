@@ -51,6 +51,8 @@
 #include	"buffer.h"
 
 
+import uvariables ;
+
 /* local defines */
 
 
@@ -74,7 +76,7 @@ using std::max ;			/* subroutine-template */
 
 namespace {
     struct blanker {
-	cint	l = strlen(sysword.w_blanks) ;
+	cint	l = xstrlen(sysword.w_blanks) ;
 	cchar	*p = sysword.w_blanks ;
     } ; /* end struct (blanker) */
 }

@@ -84,7 +84,7 @@ int buffer_strcompact(buffer *op,cchar *sp,int sl) noex {
 	int		len = 0 ;
 	int		c = 0 ;
 	cchar		*cp{} ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	    if (c++ > 0) {
 	        rs = buffer_chr(op,CH_SP) ;
@@ -94,7 +94,7 @@ int buffer_strcompact(buffer *op,cchar *sp,int sl) noex {
 	        rs = buffer_strw(op,cp,cl) ;
 	        len += rs ;
 	    }
-	    sl -= ((cp+cl)-sp) ;
+	    sl -= intconv((cp + cl) - sp) ;
 	    sp = (cp+cl) ;
 	    if (rs < 0) break ;
 	} /* end while */
