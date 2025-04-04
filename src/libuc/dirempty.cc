@@ -85,19 +85,17 @@ int dirempty(cchar *dname) noex {
 	if (dname) {
 	    rs = SR_INVALID ;
 	    if (dname[0]) {
-		char	*nbuf{} ;
-		if ((rs = malloc_mn(&nbuf)) >= 0) {
-	            fsdir	d ;
-	            fsdir_ent	de ;
+		if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
 		    cint	nlen = rs ;
-	            if ((rs = fsdir_open(&d,dname)) >= 0) {
-	                while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
+	            if (fsdir d ; (rs = d.open(dname)) >= 0) {
+	                fsdir_ent	de ;
+	                while ((rs = d.read(&de,nbuf,nlen)) > 0) {
 			    if (hasNotDots(de.name,rs) > 0) {
 				f = false ;
 		            } /* end (not dots) */
 		            if (!f) break ;
 	                } /* end while */
-	                rs1 = fsdir_close(&d) ;
+	                rs1 = d.close ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (fsdir) */
 		    rs1 = uc_free(nbuf) ;
