@@ -84,7 +84,7 @@ int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 	int		rs = SR_FAULT ;
 	if (op && cp) {
 	    tmz		stz ;
-	    if (cl < 0) cl = strlen(cp) ;
+	    if (cl < 0) cl = xstrlen(cp) ;
 	    if (hasalpha(cp,cl)) {
 	        tmz_init(&stz) ;
 	        if (dayspec ds ; (rs = ds.load(cp,cl)) >= 0) {
