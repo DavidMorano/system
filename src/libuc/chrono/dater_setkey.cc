@@ -142,7 +142,7 @@ int dater_setkey(dater *op,cc *dsp,int dsl,TIMEB *nowp,cc *zn) noex {
 	int		rs  ;
 	if ((rs = dater_magic(op,dsp,nowp,zn)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (dsl < 0) dsl = strlen(dsp) ;
+	    if (dsl < 0) dsl = xstrlen(dsp) ;
 	    if (dsp[0]) {
 		datehelp dh(op,dsp,dsl,nowp,zn) ;
 		rs = dh ;
@@ -159,10 +159,11 @@ datehelp::operator int () noex {
     	cnullptr	np{} ;
     	int		rs = SR_OK ;
         if (cc *tp ; (tp = strnchr(dsp,dsl,'=')) != np) {
-	    cint	vall = ((dsp + dsl) - (tp + 1)) ;
+	    cint	vall = intconv((dsp + dsl) - (tp + 1)) ;
+	    cint	tl = intconv(tp - dsp) ;
             cc		*valp = (tp + 1) ;
 	    cchar	*kp ;
-            if (int kl ; (kl = sfshrink(dsp,(tp - dsp),&kp)) > 0) {
+            if (int kl ; (kl = sfshrink(dsp,tl,&kp)) > 0) {
                 if (int ti ; (ti = matstr(datetypes,kp,kl)) >= 0) {
 		    rs = prockey(ti,valp,vall) ;
 		} else {
