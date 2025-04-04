@@ -33,6 +33,10 @@
 #endif
 #endif /* noex */
 
+#ifndef	charconv
+#define	charconv		char
+#endif
+
 #ifndef	shortconv
 #define	shortconv		short
 #endif
