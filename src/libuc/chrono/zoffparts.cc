@@ -150,8 +150,8 @@ static int storebuf_twodig(char *rbuf,int rlen,int i,int v) noex {
 	cint		n = 2 ;
 	int		rs = SR_OVERFLOW ;
 	if ((i+n) <= rlen) {
-	    rbuf[i++] = (v / 10) + '0' ;
-	    rbuf[i++] = (v % 10) + '0' ;
+	    rbuf[i++] = charconv((v / 10) + '0') ;
+	    rbuf[i++] = charconv((v % 10) + '0') ;
 	    rs = n ;
 	}
 	return rs ;
