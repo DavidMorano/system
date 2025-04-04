@@ -167,14 +167,14 @@ static int ictroman(char *dbuf,int dlen,ulonglong v) noex {
 	    cint	ntabs = nelem(tabs) ;
 	    ulonglong	n = 1000 ;
 	    if (v >= n) {
-	        cint		i = (v/n) ;
+	        cint		i = intconv(v / n) ;
 	        rs = sbuf_chrs(&b,'M',i) ;
 	        v = (v%n) ;
 	    }
 	    n /= 10 ;
 	    for (int r = 0 ; (rs >= 0) && (r < ntabs) ; r += 1) {
 	        if (v >= n) {
-	            cint	i = (v/n) ;
+	            cint	i = intconv(v / n) ;
 	            rs = sbuf_strw(&b,tabs[r][i],-1) ;
 	            v = (v%n) ;
 	        }
