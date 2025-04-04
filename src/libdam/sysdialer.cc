@@ -659,7 +659,7 @@ int sofind::operator () (SD *op,cchar *pr) noex {
 		int	ai = 0 ;
 	        if (char *a ; (rs = uc_malloc(asz,&a)) >= 0) {
 	            lbuf = (a + (maxpath * ai++)) ;
-	            pbuf = (a + (maxpath + ai++)) ;
+	            pbuf = (a + (maxpath * ai++)) ;
 	            if ((rs = sofindpr(op,pr)) == 0) {
 	                if ((rs = sofindprs(op)) == 0) {
 	                    rs = sofindvar(op) ;
