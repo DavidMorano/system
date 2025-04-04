@@ -50,6 +50,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<usupport.h>
 
 #include	"ctwords.hh"
 
@@ -164,7 +165,10 @@ int ctwords(string *sp,int v) noex {
 	                sp->append(" ") ;
 	                sp->append(ones[0]) ;
 	            }
-	            rs = sp->length() ;
+		    {
+			csize	rsize = sp->length() ;
+	                rs = intsat(rsize) ;
+		    }
 	        } catch (...) {
 	            rs = SR_NOMEM ;
 	        }
