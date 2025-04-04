@@ -200,7 +200,7 @@ int tmz_init(tmz *op) noex {
 int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    op->st.tm_year = -1 ;
@@ -226,7 +226,7 @@ int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 	    } /* end for */
 	    if (rs >= 0) {
 		cint	znl = var.znlen ;
-	        rs = strnlen(op->zname,znl) ;
+	        rs = xstrnlen(op->zname,znl) ;
 	    }
 	    if (rs < 0) {
 		op->dtor() ;
@@ -241,20 +241,21 @@ int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		zl = 0 ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    op->st.tm_year = -1 ;
 	    op->st.tm_wday = -1 ;
 	    op->st.tm_isdst = -1 ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,',')) != nullptr) {
+		cint	tl = intconv(tp - sp) ;
 	        cchar	*cp{} ;
-	        if (int cl ; (cl = sfnext(sp,(tp-sp),&cp)) > 0) {
+	        if (int cl ; (cl = sfnext(sp,tl,&cp)) > 0) {
 	            rs = tmstrsday(cp,cl) ;
 	            op->st.tm_wday = rs ;
 	        }
-	        sl -= ((tp+1)-sp) ;
-	        sp = (tp+1) ;
+	        sl -= intconv((tp + 1) - sp) ;
+	        sp = (tp + 1) ;
 	    }
 	    if ((rs >= 0) && ((rs = tmz_procday(op,sp,sl)) > 0)) {
 	        sp += rs ;
@@ -282,7 +283,7 @@ int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 	    }
 	    if (rs >= 0) {
 		cint	znl = var.znlen ;
-	        rs = strnlen(op->zname,znl) ;
+	        rs = xstrnlen(op->zname,znl) ;
 	        zl = rs ; /* return value for subroutine */
 	    }
 	    if (rs < 0) {
@@ -298,7 +299,7 @@ int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    stp->tm_year = -1 ;
@@ -360,7 +361,7 @@ int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
             TM		*stp = &op->st ;
-            if (sl < 0) sl = strlen(sp) ;
+            if (sl < 0) sl = xstrlen(sp) ;
 	    rs = op->clear() ;
             op->zoff = SHORT_MIN ;
             stp->tm_year = -1 ;
@@ -375,7 +376,7 @@ int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
                 sl -= 1 ;
             }
             if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != nullptr) {
-                cint        cl = (sl-((tp+1)-sp)) ;
+                cint        cl = intconv(sl-((tp+1)-sp)) ;
                 cchar       *cp = (tp+1) ;
                 if (cl >= 2) {
                     cint    tch = mkchar(*cp) ;
@@ -385,7 +386,7 @@ int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
                         rs = SR_INVALID ;
                     }
                 }
-                sl = (tp-sp) ;
+                sl = intconv(tp - sp) ;
             } /* end if (tried for seconds) */
             if (rs >= 0) {
                 if (hasalldig(sp,sl)) {
@@ -444,7 +445,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	int		zl = 0 ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    stp->tm_year = -1 ;
@@ -460,7 +461,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	    }
 	    if (cchar *tp ; (tp = strnzone(sp,sl)) != nullptr) {
 	        cchar	*cp = tp ;
-	        int	cl = (sl-(tp-sp)) ;
+	        int	cl = intconv(sl - (tp - sp)) ;
 	        if ((cl >= 1) && isplusminus(*cp)) { /* ok */
 	            int		zol = cl ;
 	            int		zo ;
@@ -469,7 +470,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	                zol = si ;
 	            }
 	            if ((rs = getzoff(&zo,zop,zol)) >= 0) {
-	                op->zoff = zo ;
+	                op->zoff = shortconv(zo) ;
 	                op->fl.zoff = true ;
 	                cp += rs ;
 	                cl -= rs ;
@@ -479,13 +480,14 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	            cint	ch = mkchar(*cp) ;
 	            if (isalphalatin(ch)) {
 		        cint	znl = var.znlen ;
-	                rs = strnwcpy(op->zname,znl,cp,cl) - op->zname ;
+			cchar	*znp = op->zname ;
+	                rs = intconv(strnwcpy(op->zname,znl,cp,cl) - znp) ;
 	                zl = rs ;
 	            } else {
 	                rs = SR_INVALID ;
 	            }
 	        }
-	        sl = (tp-sp) ;
+	        sl = intconv(tp - sp) ;
 	    } /* end if (tried for ZOFF and ZNAME) */
 	    if (rs >= 0) {
 	        if (hasalldig(sp,sl)) {
@@ -544,7 +546,7 @@ int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
 	int		zl = 0 ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
-            if (sl < 0) sl = strlen(sp) ;
+            if (sl < 0) sl = xstrlen(sp) ;
 	    rs = op->clear() ;
             op->zoff = SHORT_MIN ;
             stp->tm_year = -1 ;
@@ -559,7 +561,7 @@ int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
                 sl -= 1 ;
             }
             if (cchar *tp ; (tp = strnchr(sp,sl,'_')) != nullptr) {
-                int         si = (tp-sp) ;
+                int         si = intconv(tp - sp) ;
                 if (hasalldig(sp,si)) {
                     int     sc = -1 ;
                     int     i = 0 ;
@@ -614,7 +616,7 @@ int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
                             }
                             if (sl && ((ch = mkchar(*sp)),isalphalatin(ch))) {
                                 rs = tmz_proczname(op,sp,sl) ;
-                                zl = strlen(op->zname) ;
+                                zl = xstrlen(op->zname) ;
                             }
                         } else {
                             rs = SR_INVALID ;
@@ -637,7 +639,7 @@ int tmz_xday(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    stp->tm_year = -1 ;
@@ -775,7 +777,8 @@ int tmz_setzone(tmz *op,cchar *zp,int zl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,zp)) >= 0) {
 	    cint	znl = var.znlen ;
-	    rs = (strnwcpy(op->zname,znl,zp,zl) - op->zname) ;
+	    cchar	*znp = op->zname ;
+	    rs = intconv(strnwcpy(op->zname,znl,zp,zl) - znp) ;
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
@@ -855,7 +858,7 @@ static int tmz_timeparts(tmz *op,cchar *sp,int sl) noex {
 	            op->st.tm_sec = v ;
 	        }
 	    } /* end if */
-	    si = (lp - sp) ;
+	    si = intconv(lp - sp) ;
 	    rs1 = fsb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
@@ -899,7 +902,7 @@ static int tmz_procday(tmz *op,cchar *sp,int sl) noex {
 	        if (int v{} ; (rs = cfdeci(cp,cl,&v)) >= 0) {
 		    if (v <= 31) {
 	        	op->st.tm_mday = v ;
-	        	si = ((cp+cl)-sp) ;
+	        	si = intconv((cp + cl) - sp) ;
 		    } else {
 			rs = SR_INVALID ;
 		    }
@@ -924,7 +927,7 @@ static int tmz_procmonth(tmz *op,cchar *sp,int sl) noex {
 	    if (isalphalatin(ch)) {
 	        int	ml = cl ;
 	        cchar	*mp = cp ;
-	        si += ((cp+cl)-sp) ;
+	        si += intconv((cp + cl) - sp) ;
 	        sp += si ;
 	        sl -= si ;
 	        if ((cl = sfnext(sp,sl,&cp)) > 0) {
@@ -934,7 +937,7 @@ static int tmz_procmonth(tmz *op,cchar *sp,int sl) noex {
 	                op->st.tm_wday = rs ;
 	                mp = cp ;
 	                ml = cl ;
-	                si += ((cp+cl)-sp) ;
+	                si += intconv((cp + cl) - sp) ;
 	            }
 	        }
 	        if (rs >= 0) {
@@ -961,7 +964,7 @@ static int tmz_procyear(tmz *op,cchar *sp,int sl) noex {
 	        rs = tmstrsyear(cp,cl) ;
 	        op->st.tm_year = rs ;
 	        op->fl.year = true ;
-	        si = ((cp+cl)-sp) ;
+	        si = intconv((cp + cl) - sp) ;
 	    }
 	} /* end if (sfnext) */
 	return (rs >= 0) ? si : rs ;
@@ -979,9 +982,9 @@ static int tmz_proczoff(tmz *op,cchar *sp,int sl) noex {
 	    f = f || isdigitlatin(ch) ;
 	    if (f) {
 	        if (int v ; (rs = getzoff(&v,cp,cl)) >= 0) {
-	            op->zoff = v ;
+	            op->zoff = shortconv(v) ;
 	            op->fl.zoff = true ;
-	            si = ((cp+cl)-sp) ;
+	            si = intconv((cp + cl) - sp) ;
 		}
 	    }
 	} /* end if (sfnext) */
@@ -997,8 +1000,9 @@ static int tmz_proczname(tmz *op,cchar *sp,int sl) noex {
 	    cint	ch = mkchar(*cp) ;
 	    if (isalphalatin(ch)) {
 	        cint	znl = var.znlen ;
-	        rs = strnwcpy(op->zname,znl,cp,cl)  - op->zname ;
-	        si = ((cp+cl)-sp) ;
+		cchar	*znp = op->zname ;
+	        rs = intconv(strnwcpy(op->zname,znl,cp,cl)  - znp) ;
+	        si = intconv((cp + cl) - sp) ;
 	    }
 	} /* end if (sfnext) */
 	return (rs >= 0) ? si : rs ;
@@ -1046,15 +1050,15 @@ static int getzoff(int *zop,cchar *sp,int sl) noex {
 	        cp += 1 ;
 	        cl -= 1 ;
 	    }
-	    auto lamb = [&cp,&cl] (int &i) {
-		cint	ch = mkchar(cp[i]) ;
-		bool	f = true ;
-		f = f && (i < cl) ;
-		f = f && ch ;
-		f = f && (! CHAR_ISWHITE(ch)) ;
-		f = f && (ch != ',') ; 
-		return (f) ? ch : 0  ;
-	    } ;
+	    auto lamb = [&cp,&cl] (int &idx) {
+		cint	ich = mkchar(cp[idx]) ;
+		bool	lf = true ;
+		lf = lf && (idx < cl) ;
+		lf = lf && ich ;
+		lf = lf && (! CHAR_ISWHITE(ich)) ;
+		lf = lf && (ich != ',') ; 
+		return (lf) ? ich : 0  ;
+	    } ; /* end lambda (lamb) */
 	    for (i = 0 ; (ch = lamb(i)) > 0 ; i += 1) {
 	        if (! isdigitlatin(ch)) {
 	            rs = SR_INVALID ;
@@ -1088,7 +1092,7 @@ static int getzoff(int *zop,cchar *sp,int sl) noex {
 	        }
 	    }
 	    if (rs >= 0) {
-	        rs = (cp - sp) ;
+	        rs = intconv(cp - sp) ;
 	    }
 	} /* end if (getting timezone offset) */
 	return rs ;
