@@ -29,7 +29,6 @@ constexpr int cstrnlen(cchar *sp,int sl = -1) noex {
 	}
 	return int(cp - sp) ;
 }
-#endif /* __cplusplus */
 #endif /* SUBROUTINE_CSTRNLEN */
 
 #ifndef	SUBROUTINE_CSTRLEN
@@ -41,7 +40,23 @@ constexpr int cstrlen(cchar *sp) noex {
 }
 #endif /* SUBROUTINE_CSTRLEN */
 
+#ifndef	SUBROUTINE_XSTRNLEN
+#define	SUBROUTINE_XSTRNLEN
+constexpr int xstrlen(cchar *sp,int sl) noex {
+    	csize	ssz = size_t(sl) ;
+    	return intconv(strnlen(sp,ssz)) ;
+}
+#endif /* SUBROUTINE_XSTRNLEN */
 
+#ifndef	SUBROUTINE_XSTRLEN
+#define	SUBROUTINE_XSTRLEN
+constexpr int xstrlen(cchar *sp) noex {
+    	return intconv(strlen(sp)) ;
+}
+#endif /* SUBROUTINE_XSTRLEN */
+
+
+#endif /* __cplusplus */
 #endif /* LIBUTIL_INCLUDE */
 
 
