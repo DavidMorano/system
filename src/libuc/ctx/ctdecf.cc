@@ -54,6 +54,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<convertx.h>		/* <- the money shot! */
 #include	<localmisc.h>
 
@@ -146,14 +147,14 @@ int ctdecf(char *dbuf,int dlen,double dv,int fcode,int w,int p,int fill) noex {
 
 /* local subroutines */
 
-int subinfo::start(char *ubuf,int ulen,int mode) noex {
+int subinfo::start(char *bufp,int bufl,int am) noex {
 	int		rs = SR_FAULT ;
 	if (this) {
-	    ubuf = ubuf ;
-	    ulen = ulen ;
-	    mode = mode ;
-	    f.mclean = (mode & FORMAT_OCLEAN) ;
-	    f.mnooverr = (mode & FORMAT_ONOOVERR) ;
+	    ubuf = bufp ;
+	    ulen = bufl ;
+	    mode = am ;
+	    f.mclean = !!(am & FORMAT_OCLEAN) ;
+	    f.mnooverr = !!(am & FORMAT_ONOOVERR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -291,7 +292,7 @@ int subinfo::addchr(int ch) noex {
 	int		rs = SR_OK ;
 	char		buf[1] ;
 	if (ch != 0) {
-	    buf[0] = ch ;
+	    buf[0] = charconv(ch) ;
 	    rs = addstrw(buf,1) ;
 	}
 	return rs ;
@@ -304,7 +305,7 @@ int subinfo::addstrw(cchar *sp,int sl) noex {
 	if (! f.ov) {
 	    cint	rlen = (ulen - len) ;
 	    rs = SR_OK ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (sl > rlen) f.ov = true ;
 	    ml = min(sl,rlen) ;
 	    if (ml > 0) {
