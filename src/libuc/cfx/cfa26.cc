@@ -57,9 +57,10 @@
 #include	<usysrets.h>
 #include	<stdintx.h>
 
-#include	"cfalphax.hh"		/* <- the money shot! */
 #include	"cfa26.h"
 
+
+import cfalphax ;
 
 /* local defines */
 

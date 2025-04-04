@@ -1,4 +1,4 @@
-/* cfalphax HEADER */
+/* cfalphax MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -35,29 +35,29 @@
 
 *******************************************************************************/
 
-#ifndef	CFALPHAX_INCLUDE
-#define	CFALPHAX_INCLUDE
-#ifdef	__cplusplus
-
+module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* for |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<stdintx.h>
 #include	<sfx.h>
 #include	<cfutil.h>
 #include	<char.h>
 #include	<ischarx.h>
 
+export module cfalphax ;
 
-template<stdintx T> struct cfashelp {
+export {
+    template<stdintx T> struct cfashelp {
 	cint		nb = (CHAR_BIT * szof(T)) ;
 	T		*rp = nullptr ;
 	T		val = 0 ;	/* value to create */
@@ -79,7 +79,7 @@ template<stdintx T> struct cfashelp {
 	int getsign() noex {
 	    int		rs = SR_FAULT ;
 	    if (rp) {
-	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl < 0) sl = xstrlen(sp) ;
 	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
@@ -159,10 +159,9 @@ template<stdintx T> struct cfashelp {
 	    *rp = (rs >= 0) ? val : 0 ;
 	    return rs ;
 	} ; /* end method (proc) */
-} ; /* end struct (cfashelp) */
-
-template<typename T> 
-inline int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
+    } ; /* end struct (cfashelp) */
+    template<typename T> 
+    inline int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
 	    if (cfashelp cfo(sp,sl,b,rp) ; (rs = cfo.getsign()) >= 0) {
@@ -171,11 +170,7 @@ inline int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
+    } /* end subroutine-template (cfalphax) */
 }
-/* end subroutine-template (cfalphax) */
-
-
-#endif /* __cplusplus */
-#endif /* CFALPHAX_INCLUDE */
 
 
