@@ -1,4 +1,4 @@
-# MAKEFILE (libuc)
+#r MAKEFILE (libuc)
 
 T= libuc
 
@@ -817,6 +817,11 @@ dirseen.o:		dirseen.dir
 dirseen.dir:
 	makesubdir $@
 
+# PATH
+path.o:			path.dir
+path.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
@@ -884,10 +889,6 @@ vstrkeydictcmp.o:	vstrkeydictcmp.cc vstrkeycmpx.h
 stdfnames.o:		stdfnames.c stdfnames.h
 syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 sysdbfname.o:		sysdbfname.cc sysdbfname.h
-
-# PATH
-pathadd.o:		pathadd.cc pathadd.h
-pathclean.o:		pathclean.cc pathclean.h
 
 # UTILITY
 splitfname.o:		splitfname.cc splitfname.h
