@@ -67,9 +67,9 @@
 #include	<climits>		/* |ULONG_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
-#include	<bit>			/* <- for |countr_zero(3c++)| */
-#include	<usystem.h>		/* <- memory-allocation */
+#include	<cstring>		/* |strlen(3c)| */
+#include	<bit>			/* |countr_zero(3c++)| */
+#include	<usystem.h>		/* memory-allocation */
 #include	<syswords.hh>
 #include	<stdintx.h>
 #include	<sncpyx.h>
@@ -105,7 +105,7 @@ static inline constexpr int ffbsi(int b) noex {
 
 /* local variables */
 
-static cint		maxbase = strlen(sysword.w_digtab) ;
+static cint		maxbase = xstrlen(sysword.w_digtab) ;
 
 constexpr int		maxstack = (1024+1) ;
 
@@ -115,6 +115,7 @@ constexpr int		maxstack = (1024+1) ;
 template<typename UT>
 static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	cuint		ub(b) ;
+	int		rl = 0 ;
 	char		*rp = (dbuf + dlen) ;
 	*rp = '\0' ;
 	if (v != 0) {
@@ -130,12 +131,12 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	        } /* end while (slower) */
 	        {
 		    ulong	lv = (ulong) v ;
-		    ulong	nv ;
+		    ulong	nlv ;
 		    while (lv != 0) {
-	                nv = lv / ub ;
-			di = int(lv - (nv * ub)) ;
+	                nlv = lv / ub ;
+			di = int(lv - (nlv * ub)) ;
 	                *--rp = sysword.w_digtab[di] ;
-	                lv = nv ;
+	                lv = nlv ;
 		    } /* end while */
 		    v = lv ;
 	        } /* end block (faster) */
@@ -148,10 +149,11 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	            v = nv ;
 	        } /* end while (regular) */
 	    } /* end if_constexpr (size-of-operand) */
+	    rl = intconv(dbuf + dlen - rp) ;
 	} else {
 	    *--rp = '0' ;
 	}
-	return (dbuf + dlen - rp) ;
+	return rl ;
 }
 /* end subroutine (ctxxxx) */
 
