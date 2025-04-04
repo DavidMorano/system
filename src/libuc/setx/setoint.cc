@@ -150,8 +150,11 @@ int setoint_count(setoint *op) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
 	        setint	*setp  = setintp(op->setp) ;
-	        c = setp->size() ;
-		rs = SR_OK ;
+		{
+		    csize	sz = setp->size() ;
+	            c = intconv(sz) ;
+		    rs = SR_OK ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -165,8 +168,11 @@ int setoint_extent(setoint *op) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
 	        setint	*setp  = setintp(op->setp) ;
-	        c = setp->max_size() ;
-		rs = SR_OK ;
+		{
+		    csize	sz = setp->max_size() ;
+	            c = intconv(sz) ;
+		    rs = SR_OK ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -188,7 +194,8 @@ int setoint_mkvec(setoint *op,int *va) noex {
 	                va[c++] = *it++ ;
 	            } /* end while */
 	        } else {
-		    c = setp->size() ;
+		    csize	sz = setp->size() ;
+		    c = intconv(sz) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */

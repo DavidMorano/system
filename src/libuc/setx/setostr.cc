@@ -117,7 +117,7 @@ int setostr_already(setostr *op,cchar *sp,int sl) noex {
 	if ((rs = setostr_magic(op,sp)) >= 0) {
 	    cnullptr	np{} ;
 	    setstr	*setp  = setstrp(op->setp) ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (string *strp ; (strp = new(nothrow) string(sp,sl)) != np) {
 	        iter	ite = setp->end() ;
 	        if (iter it ; (it = setp->find(*strp)) == ite) {
@@ -136,7 +136,7 @@ int setostr_add(setostr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = setostr_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    setstr	*setp  = setstrp(op->setp) ;
 	    pair<iter,bool>	ret ;
 	    string	v(sp,sl) ;
@@ -152,7 +152,7 @@ int setostr_del(setostr *op,cchar *sp,int sl) noex {
 	int		f = false ;
 	if ((rs = setostr_magic(op)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    {
 	        iter	ite = setp->end() ;
 	        string	v(sp,sl) ;
@@ -187,7 +187,8 @@ int setostr_count(setostr *op) noex {
 	if ((rs = setostr_magic(op)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
 	    {
-	        c = setp->size() ;
+	        csize	sz = setp->size() ;
+	        c = intconv(sz) ;
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
@@ -233,8 +234,9 @@ int setostr_curenum(setostr *op,setostr_cur *curp,cchar **rpp) noex {
 	        iter	ite = setp->end() ;
 	        iter	*itp = iterp(curp->itp) ;
 	        if (*itp != ite) {
+		    csize	sz = (*(*itp)).length() ;
 		    *rpp = (*(*itp)).c_str() ;
-		    rs = (*(*itp)).length() ;
+		    rs = intconv(sz) ;
 	            (*itp)++ ;
 	        } else {
 		    rs = SR_NOTFOUND ;

@@ -103,7 +103,7 @@ int setstr_already(setstr *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    key.buf = sp ;
 	    key.len = sl ;
 	    val.buf = sp ;
@@ -123,7 +123,7 @@ int setstr_add(setstr *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    key.buf = sp ;
 	    key.len = sl ;
 	    val.buf = sp ;
@@ -151,7 +151,7 @@ int setstr_del(setstr *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    key.buf = sp ;
 	    key.len = sl ;
 	    if ((rs = hdb_fetch(op,key,nullptr,&val)) >= 0) {
