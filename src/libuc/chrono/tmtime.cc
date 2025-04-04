@@ -137,7 +137,7 @@ int tmtime_gmtime(tmtime *op,time_t t) noex {
 	    if (TM tmd ; (rs = uc_gmtime(&t,&tmd)) >= 0) {
 	        if ((rs = tmtime_insert(op,&tmd)) >= 0) {
 	            op->gmtoff = 0 ;
-	            rs = strwcpy(op->zname,"GMT",znlen) - op->zname ;
+	            rs = intconv(strwcpy(op->zname,"GMT",znlen) - op->zname) ;
 	        }
 	    } /* end if */
 	    if (rs < 0) {
@@ -184,14 +184,14 @@ int tmtime_insert(tmtime *op,CTM *tmp) noex {
 	    if (rs >= 0) {
 	        cchar	*zp ;
 	        if_constexpr (f_darwin) {
-	            op->gmtoff = tc.tm_gmtoff ;
+	            op->gmtoff = intconv(tc.tm_gmtoff) ;
 	            zp = tc.tm_zone ;
 	        } else {
 	            cbool	f_isdst = (tc.tm_isdst > 0) ;
 	            op->gmtoff = (f_isdst) ? altzone : timezone ;
 	            zp = (f_isdst) ? tzname[1] : tzname[0] ;
 	        } /* end if_constexpr (f_darwin) */
-	        rs = strwcpy(op->zname,zp,znlen) - op->zname ;
+	        rs = intconv(strwcpy(op->zname,zp,znlen) - op->zname) ;
 	    } /* end if (getting zone-name) */
 	    if (rs < 0) {
 		op->dtor() ;
@@ -247,7 +247,7 @@ static int tmtime_mktimer(tmtime *op,int fadj,time_t *tp) noex {
 	            cint	taroff = op->gmtoff ;
 	            int 	locoff ;
 	            cbool	f_isdst = (tmd.tm_isdst > 0) ;
-	            locoff = (f_isdst) ? altzone : timezone ;
+	            locoff = intconv((f_isdst) ? altzone : timezone) ;
 	            t += (taroff - locoff) ;
 	            if (fadj) {
 	                op->sec = tmd.tm_sec ;
