@@ -77,9 +77,9 @@ int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 	    rs = SR_DOM ;
 	    if (int sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) {
 		bool	f_negative = false ;
-		int	res = 0 ;
 	        cchar	*tp ;
 		rs = SR_OK ;
+		res = 0 ;
 	        if (sl && (*sp == '-')) {
 	            f_negative = true ;
 	            sp += 1 ;
@@ -87,9 +87,10 @@ int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 	        }
 	        while ((tp = strnpbrk(sp,sl,"YMWDwdhms")) != nullptr) {
 		    cint	mch = mkchar(*tp) ;
-	            rs = convert(sp,(tp - sp),mch,&res) ;
+		    cint	tl = intconv(tp - sp) ;
+	            rs = convert(sp,tl,mch,&res) ;
 	            if (rs < 0) break ;
-	            sl -= ((tp + 1) - sp) ;
+	            sl -= intconv((tp + 1) - sp) ;
 	            sp = (tp + 1) ;
 	        } /* end while */
 	        if ((rs >= 0) && (sl > 0)) {

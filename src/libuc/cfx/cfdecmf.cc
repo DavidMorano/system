@@ -48,12 +48,8 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strnlen(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<cstring>		/* |strnlen(3c)| */
+#include	<usystem.h>
 #include	<ascii.h>
 #include	<cfdec.h>
 #include	<char.h>
@@ -84,7 +80,7 @@
 
 /* forward references */
 
-static int	getmf(cchar *,int,ulong *) noex ;
+static int	getmf(cchar *,int,long *) noex ;
 
 
 /* local variables */
@@ -96,11 +92,12 @@ template<typename T>
 int cfdecmfx(int (*cfdecx)(cchar *,int,T *),cchar *sp,int sl,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
-	    ulong	mf{} ;
+	    long	mf{} ;
 	    cint	ml = getmf(sp,sl,&mf) ;
-	    if (T v{} ; (rs = cfdecx(sp,ml,&v)) >= 0) {
-	        rs = intsat(v * mf) ;
-	        if (rp) *rp = (v * mf) ;
+	    if (T v ; (rs = cfdecx(sp,ml,&v)) >= 0) {
+		const T	mfv = (T) mf ;
+	        rs = intsat(v * mfv) ;
+	        if (rp) *rp = (v * mfv) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -149,9 +146,9 @@ int cfdecmfull(cchar *sbuf,int slen,ulonglong *rp) noex {
 
 /* local subroutines */
 
-static int getmf(cchar *sbuf,int slen,ulong *rp) noex {
-	ulong		mf = 1 ;
-	int		sl = strnlen(sbuf,slen) ;
+static int getmf(cchar *sbuf,int slen,long *rp) noex {
+	long		mf = 1 ;
+	int		sl = xstrnlen(sbuf,slen) ;
 	uchar		*ubuf = (uchar *) sbuf ;
 	while ((sl > 0) && OUR_ISWHITE(ubuf[sl - 1])) {
 	    sl -= 1 ;

@@ -79,6 +79,7 @@
 
 int cfhexstr(cchar *sp,int sl,uchar *rp) noex {
 	int		rs = SR_FAULT ;
+	int		rl = 0 ;
 	const uchar	*rbuf = (const uchar *) rp ;
 	if (sp && rp) {
 	    cchar	*cp ;
@@ -102,8 +103,9 @@ int cfhexstr(cchar *sp,int sl,uchar *rp) noex {
 		    rs = SR_INVALID ;
 	        }
 	    } /* end if (got some) */
+	    rl = intconv(rp - rbuf) ;
 	} /* end if (non-null) */
-	return (rs >= 0) ? (rp - rbuf) : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (cfhexstr) */
 

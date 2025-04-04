@@ -172,12 +172,18 @@ cfdecmf.o:		cfdecmf.cc cfdecmf.h			$(INCS)
 cfdect.o:		cfdect.cc cfdect.h			$(INCS)
 cfhex.o:		cfhex.cc cfhex.h			$(INCS)
 cfxxx.o:		cfxxx.cc cfxxx.h			$(INCS)
-cfa26.o:		cfa26.cc cfa26.h cfalphax.hh		$(INCS)
 cfnum.o:		cfnum.cc cfnum.h			$(INCS)
+
+cfa26.o:		cfa26.cc cfa26.h cfalphax.o		$(INCS)
+	makemodule cfalphax
+	$(COMPILE.cc) cfa26.cc
 
 # algorithms
 cfsysx.o:		cfsysx.cc cfsysx.hh			$(INCS)
 
 cfhexstr.o:		cfhexstr.cc cfhexstr.h			$(INCS)
+
+cfalphax.o:		cfalphax.ccm
+	makemodule cfalphax
 
 
