@@ -107,12 +107,12 @@ int zos_set(char *rbuf,int rlen,int zo) noex {
 	        hours = abs(zo / 60) % 100 ;
 	        mins = abs(zo % 60) ;
 	        *bp++ = ((zo >= 0) ? '-' : '+') ;
-	        *bp++ = (hours / 10) + '0' ;
-	        *bp++ = (hours % 10) + '0' ;
-	        *bp++ = (mins / 10) + '0' ;
-	        *bp++ = (mins % 10) + '0' ;
+	        *bp++ = charconv((hours / 10) + '0') ;
+	        *bp++ = charconv((hours % 10) + '0') ;
+	        *bp++ = charconv((mins / 10) + '0') ;
+	        *bp++ = charconv((mins % 10) + '0') ;
 	        *bp = '\0' ;
-	        rl = (bp - rbuf) ;
+	        rl = intconv(bp - rbuf) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
@@ -146,7 +146,7 @@ int zos_get(cchar *sp,int sl,int *zop) noex {
 	                    if (zop) {
 		                *zop = zoff ;
 	                    }
-		            rs = (zp - sp) ;
+		            rs = intconv(zp - sp) ;
 			} /* end if (hasalldig) */
 		    } /* end if (sfbnextchr) */
 	        } /* end if (sfsign) */
