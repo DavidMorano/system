@@ -87,7 +87,7 @@ int dirempty(cchar *dname) noex {
 	            if (fsdir d ; (rs = d.open(dname)) >= 0) {
 	                fsdir_ent	de ;
 	                while ((rs = d.read(&de,nbuf,nlen)) > 0) {
-			    if (hasNotDots(de.name,rs) > 0) {
+			    if (hasNotDots(de.name,rs)) {
 				f = false ;
 		            } /* end (not dots) */
 		            if (!f) break ;
