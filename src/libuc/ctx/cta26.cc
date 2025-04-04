@@ -52,7 +52,7 @@
 #include	<usysrets.h>
 #include	<stdintx.h>
 #include	<sncpyx.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
+#include	<localmisc.h>		/* for |DIGBUFLEN| */
 
 #include	"cta26.h"
 
@@ -85,27 +85,32 @@ constexpr bool	f_remainder = CF_REMAINDER ;
 template<stdintx UT>
 static int icta26x(char *rbuf,int rlen,int type,int prec,UT v) noex {
 	constexpr uint	base = DIGBASE ;
+	int		rl = 0 ;
 	char		*rp = (rbuf + rlen) ;
 	*rp = '\0' ;
 	if (v != 0) {
 	    while (v != 0) {
 	        if_constexpr (f_remainder) {
-	            *--rp = (char) ((v % base) + type) ;
+	            *--rp = char((v % base) + type) ;
 	            v = (v / base) ;
 		} else {
 		    const UT	nv = (v / base) ;
-	            *--rp = (char) ((v - (nv * base)) + type) ;
+	            *--rp = char((v - (nv * base)) + type) ;
 	            v = nv ;
 		} /* end if (f_remainder) */
 	    } /* end while */
+	    rl = intconv(rbuf + rlen - rp) ;
 	} else {
-	    *--rp = type ;
+	    *--rp = charconv(type) ;
 	}
 	{
-	    int		n = ((rbuf + rlen) - rp) ;
-	    while (n++ < prec) *--rp = type ;
+	    int		n = intconv((rbuf + rlen) - rp) ;
+	    while (n++ < prec) {
+		*--rp = charconv(type) ;
+		rl += 1 ;
+	    }
 	}
-	return (rbuf + rlen - rp) ;
+	return rl ;
 }
 /* end subroutine-template (icta26x) */
 
