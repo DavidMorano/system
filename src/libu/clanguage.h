@@ -33,8 +33,16 @@
 #endif
 #endif /* noex */
 
+#ifndef	shortconv
+#define	shortconv		short
+#endif
+
 #ifndef	intconv
 #define	intconv			int
+#endif
+
+#ifndef	longconv
+#define	longconv		long
 #endif
 
 #ifdef	__cplusplus
