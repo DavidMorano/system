@@ -21,7 +21,7 @@
 
 struct zdb_head {
 	cchar		*name ;		/* static-data (not allocated) */
-	short		off ;		/* minutes west of GMT */
+	short		woff ;		/* minutes west of GMT */
 	short		isdst ;		/* values: -1, 0, +1 */
 } ;
 

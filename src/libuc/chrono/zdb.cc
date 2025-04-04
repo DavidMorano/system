@@ -75,7 +75,7 @@ using std::max ;			/* subroutine-template */
 
 struct zdata {
     	cchar		*name ;
-	short		off ;		/* minutes west of GMT */
+	short		woff ;		/* minutes west of GMT */
 	short		isdst ;		/* values: -1, 0, +1 */
 } ;
 
@@ -225,7 +225,7 @@ int zdb_nameoff(zdb *op,cchar *sp,int sl,int zoff) noex {
 	        for (i = 0 ; zones[i].name ; i += 1) {
 	            f = (strwcasecmp(zones[i].name,sp,sl) == 0) ;
 		    if (f && (zi < 0)) zi = i ;
-	            f = f && (zones[i].off == zoff) ;
+	            f = f && (zones[i].woff == zoff) ;
 		    if (f) break ;
 	        } /* end for */
 	    } /* end if */
@@ -237,7 +237,7 @@ int zdb_nameoff(zdb *op,cchar *sp,int sl,int zoff) noex {
 	    if (f) {
 		rs = SR_OK ;
 	        op->name = zones[i].name ;
-	        op->off = zones[i].off ;
+	        op->woff = zones[i].woff ;
 	        op->isdst = zones[i].isdst ;
 	    }
 	} /* end if (non-null) */
@@ -256,7 +256,7 @@ int zdb_setname(zdb *op,cchar *sp,int sl) noex {
 	    if ((i = findname(sp,sl)) >= 0) {
 		rs = SR_OK ;
 	        op->name = zones[i].name ;
-	        op->off = zones[i].off ;
+	        op->woff = zones[i].woff ;
 	        op->isdst = zones[i].isdst ;
 	    }
 	} /* end if (non-null) */
@@ -273,13 +273,13 @@ int zdb_setoff(zdb *op,int zoff) noex {
 	    rs = SR_NOTFOUND ;
 	    memclear(op) ;
 	    for (i = 0 ; zones[i].name != nullptr ; i += 1) {
-	        f = (zones[i].off == zoff) ;
+	        f = (zones[i].woff == zoff) ;
 	        if (f) break ;
 	    } /* end for */
 	    if (f) {
 	 	rs = SR_OK ;
 	        op->name = zones[i].name ;
-	        op->off = zones[i].off ;
+	        op->woff = zones[i].woff ;
 	        op->isdst = zones[i].isdst ;
 	    }
 	} /* end if (non-null) */
@@ -297,20 +297,20 @@ int zdb_offisdst(zdb *op,int zoff,int isdst) noex {
 	    memclear(op) ;
 	    if (isdst >= 0) {
 	        for (i = 0 ; zones[i].name != nullptr ; i += 1) {
-	            f = (zones[i].off == zoff) ;
+	            f = (zones[i].woff == zoff) ;
 		    f = f && (zones[i].isdst == isdst) ;
 	            if (f) break ;
 	        } /* end for */
 	    } else {
 	        for (i = 0 ; zones[i].name != nullptr ; i += 1) {
-	            f = (zones[i].off == zoff) ;
+	            f = (zones[i].woff == zoff) ;
 	            if (f) break ;
 	        } /* end for */
 	    } /* end if */
 	    if (f) {
 	 	rs = SR_OK ;
 	        op->name = zones[i].name ;
-	        op->off = zones[i].off ;
+	        op->woff = zones[i].woff ;
 	        op->isdst = zones[i].isdst ;
 	    }
 	} /* end if (non-null) */
@@ -367,8 +367,8 @@ int zdb::setoff(int zoff) noex {
 	return zdb_setoff(this,zoff) ;
 }
 
-int zdb::offisdst(int zoff,int isdst) noex {
-	return zdb_offisdst(this,zoff,isdst) ;
+int zdb::offisdst(int zoff,int dst) noex {
+	return zdb_offisdst(this,zoff,dst) ;
 }
 
 zdb_co::operator int () noex {
