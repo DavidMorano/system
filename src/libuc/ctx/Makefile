@@ -34,7 +34,7 @@ LINT		?= lint
 
 DEFS=
 
-INCS= cvtdig.hh
+INCS= ctx.h
 
 LIBS=
 
@@ -124,50 +124,52 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0ctx.o:	$(OBJ0_CTX)
+obj0ctx.o:		$(OBJ0_CTX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_CTX)
 
-obj1ctx.o:	$(OBJ1_CTX)
+obj1ctx.o:		$(OBJ1_CTX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_CTX)
 
-obj2ctx.o:	$(OBJ2_CTX)
+obj2ctx.o:		$(OBJ2_CTX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_CTX)
 
-obj3ctx.o:	$(OBJ3_CTX)
+obj3ctx.o:		$(OBJ3_CTX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_CTX)
 
-obj4ctx.o:	$(OBJ4_CTX)
+obj4ctx.o:		$(OBJ4_CTX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_CTX)
 
-obj5ctx.o:	$(OBJ5_CTX)
+obj5ctx.o:		$(OBJ5_CTX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_CTX)
 
-obj6ctx.o:	$(OBJ6_CTX)
+obj6ctx.o:		$(OBJ6_CTX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6_CTX)
 
-obj7ctx.o:	$(OBJ7_CTX)
+obj7ctx.o:		$(OBJ7_CTX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7_CTX)
 
 
-obja_ctx.o:	$(OBJA_CTX)
+obja_ctx.o:		$(OBJA_CTX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_CTX)
 
-objb_ctx.o:	$(OBJB_CTX)
+objb_ctx.o:		$(OBJB_CTX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_CTX)
 
 
-ctchars.o:			ctchars.cc ctchars.h $(INCS)
-ctbin.o:			ctbin.cc ctbin.h $(INCS)
-ctoct.o:			ctoct.cc ctoct.h $(INCS)
-ctdec.o:			ctdec.cc ctdec.h $(INCS)
-ctdecp.o:			ctdecp.cc ctdecp.h $(INCS)
-ctdecf.o:			ctdecf.cc ctdecf.h $(INCS)
-cthex.o:			cthex.cc cthex.h $(INCS)
-cthexstr.o:			cthexstr.cc cthexstr.h $(INCS)
-cta26.o:			cta26.cc cta26.h $(INCS)
-ctxxx.o:			ctxxx.cc ctxxx.h $(INCS)
-ctroman.o:			ctroman.cc ctroman.h $(INCS)
-ctwords.o:			ctwords.cc ctwords.hh
-cvtdig.o:			cvtdig.cc $(INCS)
+ctchars.o:		ctchars.cc ctchars.h		$(INCS)
+ctbin.o:		ctbin.cc ctbin.h		$(INCS)
+ctoct.o:		ctoct.cc ctoct.h		$(INCS)
+ctdec.o:		ctdec.cc ctdec.h		$(INCS)
+ctdecp.o:		ctdecp.cc ctdecp.h		$(INCS)
+ctdecf.o:		ctdecf.cc ctdecf.h		$(INCS)
+cthex.o:		cthex.cc cthex.h		$(INCS)
+cthexstr.o:		cthexstr.cc cthexstr.h		$(INCS)
+cta26.o:		cta26.cc cta26.h		$(INCS)
+ctxxx.o:		ctxxx.cc ctxxx.h		$(INCS)
+ctroman.o:		ctroman.cc ctroman.h		$(INCS)
+ctwords.o:		ctwords.cc ctwords.hh		$(INCS)
+
+cvtdig.o:		cvtdig.ccm 			$(INCS)
+	makemodule cvtdig
 
 

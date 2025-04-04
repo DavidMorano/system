@@ -66,7 +66,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<uvariables.hh>
 #include	<sncpyx.h>
 
 #include	"ctchars.h"
@@ -86,6 +85,12 @@ using std::errc ;
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -120,6 +125,9 @@ static int ctcharsx(char *dbuf,int dlen,int base,T &v) noex {
 	return rs ;
 }
 /* end subroutine (ctcharsx) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

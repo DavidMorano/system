@@ -70,7 +70,6 @@
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<bit>			/* <- for |countr_zero(3c++)| */
 #include	<usystem.h>		/* <- memory-allocation */
-#include	<uvariables.hh>
 #include	<syswords.hh>
 #include	<stdintx.h>
 #include	<sncpyx.h>
@@ -78,6 +77,8 @@
 
 #include	"ctxxx.h"
 
+
+import uvariables ;
 
 /* local defines */
 

@@ -1,4 +1,4 @@
-/* cvtdig HEADER */
+/* cvtdig MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -57,10 +57,7 @@
 
 *******************************************************************************/
 
-#ifndef	CVTDIG_INCLUDE
-#define	CVTDIG_INCLUDE
-#ifdef	__cplusplus /* everything is C++ only */
-
+module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |CHAR_BIT| */
@@ -71,9 +68,11 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<uvariables.hh>
 #include	<stdintx.h>
 
+export module cvtdig ;
+
+import uvariables ;
 
 constexpr int	cvtdig_maxbase = 128 ;	/* largest pow-of-two */
 
@@ -83,8 +82,9 @@ inline constexpr int cvtdig_ffbsi(int b) noex {
 }
 /* end subroutine (cvtdig_ffbsi) */
 
-template<typename UT>
-constexpr int cvtdig(char *rbuf,int rlen,UT val,int n,int b) noex {
+export {
+    template<typename UT>
+    constexpr int cvtdig(char *rbuf,int rlen,UT val,int n,int b) noex {
 	cint		nshift = cvtdig_ffbsi(b) ;
 	int		rs = SR_INVALID ;
 	int		ndig = 0 ;
@@ -102,11 +102,6 @@ constexpr int cvtdig(char *rbuf,int rlen,UT val,int n,int b) noex {
 	    } /* end if (no-overflow) */
 	} /* end if (valid base) */
 	return (rs >= 0) ? ndig : rs ;
+    } /* end subroutine-template (cvtdig) */
 }
-/* end subroutine-template (cvtdig) */
-
-
-#endif	/* __cplusplus */
-#endif /* CVTDIG_INCLUDE */
-
 

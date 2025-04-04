@@ -70,11 +70,12 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<uvariables.hh>
 #include	<sncpyx.h>
 
 #include	"ctdec.h"
 
+
+import uvariables ;
 
 /* local defines */
 
@@ -114,6 +115,7 @@ static constexpr int	base = 10 ;
 template<typename UT>
 static int ctdecx(char *dbuf,int dlen,UT v) noex {
 	char		*rp = (dbuf + dlen) ;
+	int		rl = 0 ;
 	*rp = '\0' ;
 	if (v != 0) {
 	    constexpr uint	ub = uint(base) ;
@@ -127,11 +129,11 @@ static int ctdecx(char *dbuf,int dlen,UT v) noex {
 	        } /* end while (slower) */
 	        {
 		    ulong	lv = (ulong) v ;
-		    ulong	nv ;
+		    ulong	nlv ;
 		    while (lv != 0) {
-	                nv = lv / ub ;
-	                *--rp = (char) ((lv - (nv * ub)) + '0') ;
-	                lv = nv ;
+	                nlv = lv / ub ;
+	                *--rp = char((lv - (nlv * ub)) + '0') ;
+	                lv = nlv ;
 		    } /* end while */
 		    v = lv ;
 	        } /* end block (faster) */
@@ -143,10 +145,11 @@ static int ctdecx(char *dbuf,int dlen,UT v) noex {
 	            v = nv ;
 	        } /* end while (regular) */
 	    } /* end if (constexpr) */
+	    rl = intconv(dbuf + dlen - rp) ;
 	} else {
 	    *--rp = '0' ;
 	}
-	return (dbuf + dlen - rp) ;
+	return rl ;
 }
 /* end subroutine (ctdecx) */
 

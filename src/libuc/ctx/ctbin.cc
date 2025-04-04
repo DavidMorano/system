@@ -37,10 +37,11 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>
-#include	<cvtdig.hh>
 
 #include	"ctbin.h"
 
+
+import cvtdig ;
 
 /* local defines */
 
