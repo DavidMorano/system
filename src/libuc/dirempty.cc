@@ -31,7 +31,7 @@
 
 	Returns:
 	>0		is empty
-	==		not empty
+	==0		not empty
 	<0		error (system-return)
 
 *******************************************************************************/
@@ -56,9 +56,6 @@
 
 
 /* external subroutines */
-
-
-/* external variables */
 
 
 /* external variables */
