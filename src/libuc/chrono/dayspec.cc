@@ -179,7 +179,7 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	cchar		*yp = nullptr ;
 	cchar		*mp = nullptr ;
 	cchar		*dp = nullptr ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if (hasalldig(sp,sl)) {
 	    switch (sl) {
 	    case 8:
@@ -273,15 +273,15 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	} /* end if (all-digital) */
 	if ((rs >= 0) && (yp != nullptr) && (yl > 0)) {
 	    rs = cfdeci(yp,yl,&v) ;
-	    op->y = v ;
+	    op->y = shortconv(v) ;
 	}
 	if ((rs >= 0) && (mp != nullptr) && (ml > 0)) {
 	    rs = parsemonth(mp,ml) ;
-	    op->m = rs ;
+	    op->m = schar(rs) ;
 	}
 	if ((rs >= 0) && (dp != nullptr) && (dl > 0)) {
 	    rs = cfdeci(dp,dl,&v) ;
-	    op->d = v ;
+	    op->d = schar(v) ;
 	}
 	return rs ;
 }
