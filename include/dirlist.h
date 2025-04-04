@@ -40,8 +40,65 @@ struct dirlist_head {
 	int		tlen ;
 } ;
 
-typedef DIRLIST		dirlist ;
 typedef DIRLIST_CUR	dirlist_cur ;
+
+#ifdef	__cplusplus
+enum dirlistmems {
+	dirlistmem_start,
+	dirlistmem_semi,
+	dirlistmem_count,
+	dirlistmem_strsize,
+	dirlistmem_join,
+	dirlistmem_finish,
+	dirlistmem_overlast
+} ;
+struct dirlist ;
+struct dirlist_co {
+	dirlist		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (dirlist *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (dirlist_co) */
+struct dirlist : dirlist_head {
+	dirlist_co	start ;
+	dirlist_co	semi ;
+	dirlist_co	count ;
+	dirlist_co	strsize ;
+	dirlist_co	join ;
+	dirlist_co	finish ;
+	dirlist() noex {
+	    start(this,dirlistmem_start) ;
+	    semi(this,dirlistmem_semi) ;
+	    count(this,dirlistmem_count) ;
+	    strsize(this,dirlistmem_strsize) ;
+	    join(this,dirlistmem_join) ;
+	    finish(this,dirlistmem_finish) ;
+	} ;
+	dirlist(const dirlist &) = delete ;
+	dirlist &operator = (const dirlist &) = delete ;
+	int adds(cchar *,int) noex ;
+	int add(cchar *,int) noex ;
+	int curbegin(dirlist_cur *) noex ;
+	int curend(dirlist_cur *) noex ;
+	int curenum(dirlist_cur *,char *,int) noex ;
+	int curget(dirlist_cur *,cchar **) noex ;
+	int joinmk(char *,int) noex ;
+	operator int () noex ;
+	void dtor() noex ;
+	~dirlist() {
+	    dtor() ;
+	} ;
+} ; /* end struct (dirlist) */
+#else	/* __cplusplus */
+typedef DIRLIST		dirlist ;
+#endif /* __cplusplus */
+
 
 EXTERNC_begin
 
@@ -49,6 +106,7 @@ extern int dirlist_start(dirlist *) noex ;
 extern int dirlist_semi(dirlist *) noex ;
 extern int dirlist_adds(dirlist *,cchar *,int) noex ;
 extern int dirlist_add(dirlist *,cchar *,int) noex ;
+extern int dirlist_count(dirlist *) noex ;
 extern int dirlist_strsize(dirlist *) noex ;
 extern int dirlist_curbegin(dirlist *,dirlist_cur *) noex ;
 extern int dirlist_curend(dirlist *,dirlist_cur *) noex ;

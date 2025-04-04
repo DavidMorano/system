@@ -318,6 +318,14 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (dirlist_add) */
 
+int dirlist_count(dirlist *op) noex {
+	int		rs ;
+	if ((rs = dirlist_magic(op)) >= 0) {
+	    rs = vecobj_count(op->dbp) ;
+	} /* end if (magic) */
+	return rs ;
+}
+
 int dirlist_strsize(dirlist *op) noex {
 	int		rs ;
 	if ((rs = dirlist_magic(op)) >= 0) {
@@ -449,6 +457,72 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 
 
 /* private subroutines */
+
+int dirlist::adds(cchar *sp,int sl) noex {
+	return dirlist_adds(this,sp,sl) ;
+}
+
+int dirlist::add(cchar *sp,int sl) noex {
+	return dirlist_add(this,sp,sl) ;
+}
+
+int dirlist::curbegin(dirlist_cur *curp) noex {
+	return dirlist_curbegin(this,curp) ;
+}
+
+int dirlist::curend(dirlist_cur *curp) noex {
+	return dirlist_curend(this,curp) ;
+}
+
+int dirlist::curenum(dirlist_cur *curp,char *rbuf,int rlen) noex {
+	return dirlist_curenum(this,curp,rbuf,rlen) ;
+}
+
+int dirlist::curget(dirlist_cur *curp,cchar **rpp) noex {
+	return dirlist_curget(this,curp,rpp) ;
+}
+
+int dirlist::joinmk(char *jbuf,int jlen) noex {
+	return dirlist_joinmk(this,jbuf,jlen) ;
+}
+
+void dirlist::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("dirlist",rs,"fini-finish") ;
+	}
+}
+
+dirlist::operator int () noex {
+    	return dirlist_count(this) ;
+}
+
+dirlist_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case dirlistmem_start:
+	        rs = dirlist_start(op) ;
+	        break ;
+	    case dirlistmem_semi:
+	        rs = dirlist_semi(op) ;
+	        break ;
+	    case dirlistmem_count:
+	        rs = dirlist_count(op) ;
+	        break ;
+	    case dirlistmem_strsize:
+	        rs = dirlist_strsize(op) ;
+	        break ;
+	    case dirlistmem_join:
+	        rs = dirlist_join(op) ;
+	        break ;
+	    case dirlistmem_finish:
+	        rs = dirlist_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (dirlist_co::operator) */
 
 static int entry_start(ent *ep,cc *sp,int sl,dev_t dev,ino_t ino) noex {
 	int		rs ;
