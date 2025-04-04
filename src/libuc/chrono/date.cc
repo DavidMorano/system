@@ -105,11 +105,11 @@ int date_start(date *op,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 		    a[znlen] = '\0' ;
 		    op->zname = a ;
 	            op->time = t ;
-	            op->zoff = zoff ;
-	            op->isdst = isdst ;
+	            op->zoff = shortconv(zoff) ;
+	            op->isdst = shortconv(isdst) ;
 		    if (zbuf) {
-		        char *zp = op->zname ;
-	                rs = (strnwcpy(zp,znlen,zbuf,zlen) - zp) ;
+		        char *zp = op->zname ; /* white "buffer" */
+	                rs = intconv(strnwcpy(zp,znlen,zbuf,zlen) - zp) ;
 		    }
 		    if (rs < 0) {
 		        uc_free(op->zname) ;
@@ -141,8 +141,8 @@ int date_finish(date *op) noex {
 int date_setzname(date *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) {
-	    char	*zp = op->zname ;
-	    rs = (strnwcpy(zp,znlen,sp,sl) - zp) ;
+	    char	*zp = op->zname ; /* "write" buffer */
+	    rs = intconv(strnwcpy(zp,znlen,sp,sl) - zp) ;
 	}
 	return rs ;
 }
@@ -203,8 +203,8 @@ int date_getzname(date *op,char *zbuf,int zlen) noex {
 
 /* local subroutines */
 
-int date::start(time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
-	return date_start(this,t,zoff,isdst,zbuf,zlen) ;
+int date::start(time_t t,int off,int dst,cchar *zbuf,int zlen) noex {
+	return date_start(this,t,off,dst,zbuf,zlen) ;
 }
 
 int date::setzname(cchar *sp,int sl) noex {
