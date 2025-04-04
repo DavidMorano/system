@@ -45,7 +45,7 @@ constexpr int cstrlen(cchar *sp) noex {
 
 #ifndef	SUBROUTINE_XSTRNLEN
 #define	SUBROUTINE_XSTRNLEN
-constexpr int xstrlen(cchar *sp,int sl) noex {
+constexpr int xstrnlen(cchar *sp,int sl) noex {
     	csize	ssz = size_t(sl) ;
     	return intconv(strnlen(sp,ssz)) ;
 }
