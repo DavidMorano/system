@@ -37,6 +37,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -103,9 +105,11 @@ static int stremacmp_main(cchar *e1p,cchar *e2p) noex {
 	int		rc = 0 ;
 	cchar		*t1p = strchr(e1p,CH_AT) ;
 	cchar		*t2p = strchr(e2p,CH_AT) ;
-	if ((t1p != NULL) && (t2p != NULL)) {
+	if (t1p && t2p) {
 	    if ((rc = strcasecmp((t1p+1),(t2p+1))) == 0) {
-	        rc = strnncmp(e1p,(t1p-e1p),e2p,(t2p-e2p)) ;
+	        cint	t1l = intconv(t1p - e1p) ;
+	        cint	t2l = intconv(t2p - e2p) ;
+	        rc = strnncmp(e1p,t1l,e2p,t2l) ;
 	    }
 	} else {
 	    rc = strcmp(e1p,e2p) ;

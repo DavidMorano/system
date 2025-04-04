@@ -1,4 +1,5 @@
 /* strnndictcmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string compare using dictionary order */
@@ -46,14 +47,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<strwcmp.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
+#include	<libutil.hh>
+#include	<localmisc.h>
 
 #include	"strnxcmp.h"
 
@@ -100,8 +106,8 @@ int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex {
 	int		ch1, ch2 ;
 	int		fch1, fch2 ;
 	int		rc = 0 ;
-	if (s1len < 0) s1len = strlen(s1) ;
-	if (s2len < 0) s2len = strlen(s2) ;
+	if (s1len < 0) s1len = xstrlen(s1) ;
+	if (s2len < 0) s2len = xstrlen(s2) ;
 	if ((rs = dch_start(&dc1,s1,s1len)) >= 0) {
 	    if ((rs = dch_start(&dc2,s2,s2len)) >= 0) {
 		int	i{} ;

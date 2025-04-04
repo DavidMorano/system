@@ -42,11 +42,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- |strlen(3c)| + |strncmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<libutil.hh>
 
 #include	"strnxcmp.h"
 
@@ -57,6 +61,7 @@
 /* imported namespaces */
 
 using std::min ;			/* type */
+using std::max ;			/* type */
 
 
 /* local typedefs */
@@ -73,8 +78,8 @@ using std::min ;			/* type */
 int strnncmp(cchar *s1,int n1,cchar *s2,int n2) noex {
 	int		rc ;
 	int		n ;
-	if (n1 < 0) n1 = strlen(s1) ;
-	if (n2 < 0) n2 = strlen(s2) ;
+	if (n1 < 0) n1 = xstrlen(s1) ;
+	if (n2 < 0) n2 = xstrlen(s2) ;
 	n = min(n1,n2) ;
 	if ((rc = strncmp(s1,s2,n)) == 0) {
 	    rc = (n1 - n2) ;

@@ -40,6 +40,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<libutil.hh>
 #include	<localmisc.h>
 
 #include	"strnxcmp.h"
@@ -76,7 +77,7 @@
 
 int strnvalcmp(cchar *sp,cchar *vp,int vl) noex {
 	int		rc = -1 ;
-	if (vl < 0) vl = strlen(vp) ;
+	if (vl < 0) vl = xstrlen(vp) ;
 	if (cchar *tp ; (tp = strchr(sp,'=')) != nullptr) {
 	    sp = (tp+1) ;
 	    while (*sp) {

@@ -51,6 +51,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<nleadstr.h>
+#include	<libutil.hh>
 #include	<strnxcmp.h>		/* |strnfoldcmp(3uc)| */
 #include	<toxc.h>
 
@@ -152,7 +153,7 @@ int strwfoldcmp(cchar *s1,cchar *s2,int s2len) noex {
 int cmpx::x(cchar *s1,cchar *s2,int s2len) noex {
 	int		rc = tox(s1[0]) ;
 	if (s2len < 0) {
-	    s2len = strlen(s2) ;
+	    s2len = xstrlen(s2) ;
 	}
 	if (s2len > 0) {
 	    cint	ch1 = tox(*s1) ;

@@ -23,10 +23,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<libutil.hh>
+#include	<localmisc.h>
 
 #include	"strnxcmp.h"
 
@@ -47,7 +52,7 @@
 
 int strnleadcmp(cchar *s1,cchar *s2,int lr) noex {
 	int		f = true ;
-	if (lr < 0) lr = strlen(s2) ;
+	if (lr < 0) lr = xstrlen(s2) ;
 	while (lr-- > 0) {
 	    f = (*s2++ == *s1++) ;
 	    if (! f) break ;
