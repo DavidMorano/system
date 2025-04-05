@@ -90,7 +90,7 @@ typedef list<edge_t>::iterator	edgeit_t ;
 int bellmanford1(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	edgeit_t	elit ; /* edge-list-iterator */
 	edgeit_t	end ; /* edge-list-iterator */
-	cint		ne = edges.size() ;
+	cint		ne = intconv(edges.size()) ;
 	int		rs = SR_OK ;
 
 	for (int i = 0 ; i < vertices ; i += 1) {

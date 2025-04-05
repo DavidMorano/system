@@ -90,12 +90,12 @@ static int minvertex(bool *,res_t *,int) ;
 /* exported subroutines */
 
 int dijkstra1(res_t *resp,edges_t &edges,int vertices,int vstart) {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
-	bool		*visited ;
-	if ((visited = new(nothrow) bool [vertices+1]) != nullptr) {
+	if (bool *visited ; (visited = new(nothrow) bool [vertices+1]) != np) {
 	    edgeit_t	elit ; /* edge-list-iterator */
 	    edgeit_t	end ; /* edge-list-iterator */
-	    cint	ne = edges.size() ;
+	    cint	ne = intconv(edges.size()) ;
 
 	    for (int i = 0 ; i < vertices ; i += 1) {
 		visited[i] = false ;

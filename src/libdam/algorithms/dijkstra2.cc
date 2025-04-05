@@ -133,10 +133,10 @@ typedef priority_queue<nodeval,vector<nodeval>,nodevalcmp>	ourmin ;
 /* exported subroutines */
 
 int dijkstra2(res_t *resp,edges_t &edges,int vertices,int vstart) {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
-	bool		*visited ;
-	if ((visited = new(nothrow) bool [vertices+1]) != nullptr) {
-	    const int	ne = edges.size() ;
+	if (bool *visited ; (visited = new(nothrow) bool [vertices+1]) != np) {
+	    cint	ne = intconv(edges.size()) ;
 	    ourmin	pq ; /* min-heap */
 	    nodeval	nv ;
 	    edgeit_t	elit ; /* edge-list-iterator */
@@ -156,29 +156,26 @@ int dijkstra2(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	    pq.push(nv) ;
 
 	    for (i = 0 ; i < (vertices-1) ; i += 1) {
-	        nodeval	nv = pq.top() ;
-		int	u, w ;
+		int	u ;
+		int	w ;
+	        nv = pq.top() ;
 		u = nv.v ;
 		w = nv.dist ;
 	        if ((u < ne) && (w < INT_MAX)) {
 	            elit = edges[u].begin() ; /* this is 'list.begin()' */
 	            end = edges[u].end() ; /* this is 'list.end()' */
-
 		    visited[u] = true ;
-
 	            while (elit != end) {
-	                const int	v = (*elit).dst ; /* dst vertex */
+	                cint	v = (*elit).dst ; /* dst vertex */
 	                if ((! visited[v]) && (resp[u].dist != INT_MAX)) {
-	                    const int	d = resp[u].dist ;
-	                    const int	w = (*elit).weight ;
-
+	                    cint	d = resp[u].dist ;
+	                    w = (*elit).weight ;
 	                    if ((d+w) < resp[v].dist) {
 	                        resp[v].dist = (d+w) ;
 	                        resp[v].prev = u ;
 	    			nv = {v,(d+w)} ;
 			        pq.push(nv) ;
 	                    }
-
 	                } /* end if (distance to current vertex not INF) */
 	                elit++ ;
 	            } /* end while */
