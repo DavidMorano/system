@@ -185,13 +185,13 @@ int ucgetpid::init() noex {
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
-	            int		rs = SR_OK ;
+	            int		rsl = SR_OK ; /* GCC 'shadow' complaint */
 	            if (!finit) {
-		        rs = SR_LOCKLOST ;
+		        rsl = SR_LOCKLOST ;
 	            } else if (finitdone) {
-		        rs = 1 ;
+		        rsl = 1 ;
 	            }
-	            return rs ;
+	            return rsl ;
 	        } ; /* end lambda */
 	        rs = tw(lamb) ;
 	    } /* end if (initialization) */

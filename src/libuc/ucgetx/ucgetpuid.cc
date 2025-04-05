@@ -45,13 +45,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<climits>		/* |INT_MAX| */
 #include	<usystem.h>
-#include	<uvariables.hh>		/* |sysword(3u)| */
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<libmallocxx.h>
 
+
+import uvariables ;
 
 /* local defines */
 

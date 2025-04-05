@@ -76,12 +76,12 @@ static int	sysgetrandom(void *,int,uint) noex ;
 
 int uc_getrandom(void *rbuf,int rlen,uint fl) noex {
 	const caddr_t	ca = caddr_t(rbuf) ;
-	size_t		rem = size_t(rlen) ;
-	csize		inc = (fl & GRND_RANDOM) ? 512 : 33554431 ;
+	int		rem = rlen ;
+	int		inc = (fl & GRND_RANDOM) ? 512 : 33554431 ;
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 	while ((rs >= 0) && (rem > 0)) {
-	    csize	ml = min(rem,inc) ;
+	    cint	ml = min(rem,inc) ;
 	    if ((rs = sysgetrandom((ca+rl),ml,fl)) >= 0) {
 		rl += rs ;
 		rem -= rs ;
@@ -94,7 +94,7 @@ int uc_getrandom(void *rbuf,int rlen,uint fl) noex {
 int uc_getentropy(void *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    char	*cbuf = static_cast<charp>(rbuf) ;
+	    char	*cbuf = cast_static<charp>(rbuf) ;
 	    rs = SR_OK ;
 	    cbuf[0] = '\0' ;
 	    if (rlen > 0) {

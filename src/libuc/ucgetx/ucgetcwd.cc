@@ -31,6 +31,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- |strnlen(3c)| */
 #include	<usystem.h>
 #include	<usupport.h>
@@ -127,7 +129,7 @@ int ucgetcwd::operator () () noex {
 int ucgetcwd::stdgetcwd() noex {
 	int		rs ;
 	if (getcwd(cwbuf,cwlen) != nullptr) {
-	    rs = strnlen(cwbuf,cwlen) ;
+	    rs = xstrnlen(cwbuf,cwlen) ;
 	} else {
 	    rs = (- errno) ;
 	}

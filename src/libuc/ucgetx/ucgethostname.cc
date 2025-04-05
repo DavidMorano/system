@@ -32,7 +32,7 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3cu)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -80,7 +80,7 @@ int uc_gethostname(char *hbuf,int hlen) noex {
 		csize	hsz = size_t(hlen + 1) ;
 	        if ((rs = gethostname(hbuf,hsz)) >= 0) {
 	            hbuf[hlen] = '\0' ;
-	            rs = strlen(hbuf) ;
+	            rs = xstrlen(hbuf) ;
 	        } else {
 	            rs = (- errno) ;
 	        }
