@@ -64,6 +64,7 @@
 #include	<usysdefs.h>
 #include	<toxc.h>
 #include	<nleadstr.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"matstr.h"		/* <- needed for one case */
@@ -139,7 +140,7 @@ int matpfoldstr(mainv a,int n,cchar *sp,int sl) noex {
 
 int mater::matpxstr(mainv a,int n,cchar *sp,int sl) noex {
 	int		si = -1 ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if (n >= 0) {
 	    cint	lch = toxc(sp[0]) ;
 	    int		m_max = 0 ;

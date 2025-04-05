@@ -45,13 +45,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |xstrlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<toxc.h>
 #include	<nleadstr.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"matstr.h"		/* <- needed for default case */
@@ -130,7 +131,7 @@ int matofoldstr(mainv a,int n,cchar *sp,int sl) noex {
 
 int mater::matoxstr(mainv a,int n,cchar *sp,int sl) noex {
 	int		si = -1 ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if (n >= 0) {
 	    cint	lch = toxc(sp[0]) ;
 	    for (int i = 0 ; a[i] ; i += 1) {

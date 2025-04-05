@@ -2,7 +2,7 @@
 
 T= matxstr
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -35,6 +35,8 @@ DEFS=
 
 INCS= matxstr.h
 
+MODS=
+
 LIBS=
 
 
@@ -66,12 +68,13 @@ OBJB_MATXSTR= obj2.o obj3.o
 OBJ_MATXSTR= obja.o objb.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -91,12 +94,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_MATXSTR)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MATXSTR)
-
-$(T).a:			$(OBJ_MATXSTR)
-	$(AR) $(ARFLAGS) -rc $@ $?
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MATXSTR)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -117,23 +120,23 @@ control:
 
 
 obj0.o:			$(OBJ0_MATXSTR)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MATXSTR)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MATXSTR)
 
 obj1.o:			$(OBJ1_MATXSTR)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MATXSTR)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MATXSTR)
 
 obj2.o:			$(OBJ2_MATXSTR)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MATXSTR)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MATXSTR)
 
 obj3.o:			$(OBJ3_MATXSTR)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MATXSTR)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_MATXSTR)
 
 
 obja.o:			$(OBJA_MATXSTR)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MATXSTR)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_MATXSTR)
 
 objb.o:			$(OBJB_MATXSTR)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_MATXSTR)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_MATXSTR)
 
 
 matstr.o:		matstr.cc matstr.h		$(INCS)
