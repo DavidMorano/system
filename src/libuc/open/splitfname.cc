@@ -75,15 +75,15 @@
 int splitfname_split(splitfname *op,cchar *fp,int fl) noex {
 	int		rs = SR_FAULT ;
 	if (op && fp) {
-	    if (fl < 0) fl = strlen(fp) ;
+	    if (fl < 0) fl = xstrlen(fp) ;
 	    op->dp = fp ;
 	    op->dl = fl ;
 	    op->bp = fp ;
 	    op->bl = fl ;
 	    if (cchar *tp ; (tp = strnrchr(fp,fl,'/')) != nullptr) {
 		op->bp = (tp + 1) ;
-		op->bl = ((fp + fl) - (tp + 1)) ;
-		op->dl = (tp - fp) ;
+		op->bl = intconv((fp + fl) - (tp + 1)) ;
+		op->dl = intconv(tp - fp) ;
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;

@@ -238,7 +238,7 @@ static int procfile_reg(filer *wfp,cchar *ds,int f_top) noex {
 
 static int printend(filer *wfp,cchar *ds,cchar *lbuf,int len) noex {
 	cint		cols = COLUMNS ;
-	cint		dl = strlen(ds) ;
+	cint		dl = xstrlen(ds) ;
 	int		rs = SR_OK ;
 	int		breaklen ;
 	int		ml ;
@@ -292,7 +292,7 @@ static int printsub(filer *wfp,cchar *ds,cchar *lbuf,int llen) noex {
 
 static int filer_char(filer *wfp,int ch) noex {
 	char		wbuf[2] ;
-	wbuf[0] = ch ;
+	wbuf[0] = charconv(ch) ;
 	wbuf[1] = '\0' ;
 	return filer_write(wfp,wbuf,1) ;
 }
