@@ -46,6 +46,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>		/* |LEQUIV(3dam)| */
 
 #include	"ismisc.h"
@@ -124,8 +125,8 @@ samehelp::operator bool () noex {
 }
 
 bool samehelp::tryh1() noex {
-	cint		len1 = cp1 - h1 ;
-	cint		len2 = strlen(h2) ;
+	cint		len1 = intconv(cp1 - h1) ;
+	cint		len2 = xstrlen(h2) ;
 	bool		f = false ;
 	if (len1 == len2) {
 	    cp1 += 1 ;
@@ -138,8 +139,8 @@ bool samehelp::tryh1() noex {
 /* end method (tryh1) */
 
 bool samehelp::tryh2() noex {
-	cint		len1 = strlen(h1) ;
-	cint		len2 = cp2 - h2 ;
+	cint		len1 = xstrlen(h1) ;
+	cint		len2 = intconv(cp2 - h2) ;
 	bool		f = false ;
 	if (len1 == len2) {
 	    cp2 += 1 ;
