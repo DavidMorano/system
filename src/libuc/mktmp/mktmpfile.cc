@@ -83,7 +83,7 @@ int mktmpfile(char *rbuf,cchar *inname,mode_t om) noex {
 	int		rs ;
 	if ((rs = opentmpfile(inname,of,om,rbuf)) >= 0) {
 	    if ((rs = uc_close(rs)) >= 0) {
-	        rs = strlen(rbuf) ;
+	        rs = xstrlen(rbuf) ;
 	    }
 	} /* end if (opentmpfile) */
 	return rs ;

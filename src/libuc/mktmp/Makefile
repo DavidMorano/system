@@ -62,7 +62,7 @@ OBJC_MKTMP= mktmpfile.o mktmplock.o
 OBJ_MKTMP= obja_mktmp.o objb_mktmp.o objc_mktmp.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -88,6 +88,9 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_MKTMP)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MKTMP)
@@ -111,13 +114,13 @@ control:
 
 
 obja_mktmp.o:		$(OBJA_MKTMP) 
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MKTMP)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_MKTMP)
 
 objb_mktmp.o:		$(OBJB_MKTMP) 
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_MKTMP)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_MKTMP)
 
 objc_mktmp.o:		$(OBJC_MKTMP)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_MKTMP)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_MKTMP)
 
 
 # directories
