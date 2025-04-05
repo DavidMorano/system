@@ -48,7 +48,6 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<grp.h>
 #include	<usystem.h>
-#include	<uvariables.hh>		/* |varname| */
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<getax.h>
@@ -59,6 +58,8 @@
 
 #include	"getgroupname.h"
 
+
+import uvariables ;
 
 /* local defines */
 

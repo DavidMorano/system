@@ -42,12 +42,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* <- |getenv(3c)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<getourenv.h>
 #include	<localmisc.h>
 
 #include	"gettmpdname.h"
 
+
+import uvariables ;
 
 /* local defines */
 

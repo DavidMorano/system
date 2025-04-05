@@ -40,7 +40,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<uinfo.h>
 #include	<sfx.h>
 #include	<snwcpy.h>
@@ -50,6 +49,8 @@
 
 #include	"getsysname.h"
 
+
+import uvariables ;
 
 /* local defines */
 
