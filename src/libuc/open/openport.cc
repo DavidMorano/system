@@ -53,7 +53,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<nulstr.h>
@@ -72,6 +71,8 @@
 #include	"openport.h"
 #include	"openportmsg.h"
 
+
+import uvariables ;
 
 /* local defines */
 

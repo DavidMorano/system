@@ -99,7 +99,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_OPEN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_OPEN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_OPEN)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -120,29 +120,29 @@ control:
 
 
 obj0_open.o:		$(OBJ0_OPEN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_OPEN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_OPEN)
 
 obj1_open.o:		$(OBJ1_OPEN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_OPEN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_OPEN)
 
 obj2_open.o:		$(OBJ2_OPEN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_OPEN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_OPEN)
 
 obj3_open.o:		$(OBJ3_OPEN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_OPEN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_OPEN)
 
 obj4_open.o:		$(OBJ4_OPEN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_OPEN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_OPEN)
 
 obj5_open.o:		$(OBJ5_OPEN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_OPEN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_OPEN)
 
 
 obja.o:			$(OBJA)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
 
 objb.o:			$(OBJB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
 # objects
