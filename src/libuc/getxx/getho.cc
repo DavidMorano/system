@@ -61,13 +61,16 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
 /* external variables */
-
-
-/* local typedefs */
 
 
 /* local structures */
