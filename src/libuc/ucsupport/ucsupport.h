@@ -25,10 +25,9 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<usupport.h>
 
 #include	<spwd.h>
-#include	<ucpasswd.h>
-#include	<ucproject.h>
 
 
 #endif /* UCSUPPORT_INCLUDE */
