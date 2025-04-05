@@ -279,7 +279,7 @@ int filer_readln(filer *op,char *rbuf,int rlen,int to) noex {
 	            while (bp < lastp) {
 	                if ((*rbp++ = *bp++) == '\n') break ;
 	            } /* end while */
-	            i = (bp - op->bp) ;
+	            i = intconv(bp - op->bp) ;
 	            op->bp += i ;
 	            tlen += i ;
 	            op->len -= i ;
@@ -319,15 +319,15 @@ int filer_update(filer *op,off_t roff,cchar *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = filer_magic(op,rbuf)) >= 0) {
 	    uint	boff, bext ;
-	    uint	rext = roff + rlen ;
+	    uint	rext = uint(intconv(roff) + rlen) ;
 	    int		bdiff ;
 	    bool	f_exit = false ;
-	    boff = op->off - (op->bp - op->dbuf) ;
-	    bext = op->off + op->len ;
+	    boff = intconv(op->off - (op->bp - op->dbuf)) ;
+	    bext = intconv(op->off + op->len) ;
 	    if (roff < boff) {
 	        if (rext > boff) {
 	            rbuf += (boff - roff) ;
-	            rlen -= (boff - roff) ;
+	            rlen -= intconv(boff - roff) ;
 	            roff = boff ;
 	        } else {
 		    f_exit = true ;
@@ -344,7 +344,7 @@ int filer_update(filer *op,off_t roff,cchar *rbuf,int rlen) noex {
 	        }
 	    }
 	    if ((! f_exit) && (rlen > 0)) {
-	        bdiff = roff - boff ;
+	        bdiff = intconv(roff - boff) ;
 	        memcpy((op->dbuf + bdiff),rbuf,rlen) ;
 	    }
 	} /* end if (magic) */
@@ -361,7 +361,7 @@ int filer_write(filer *op,cvoid *abuf,int alen) noex {
 	    int		len ;
 	    cchar	*abp = charp(abuf) ;
 	    op->f.write = true ;
-	    if (alen < 0) alen = strlen(abp) ;
+	    if (alen < 0) alen = xstrlen(abp) ;
 	    alenr = alen ;
 	    while ((rs >= 0) && (alenr > 0)) {
 	        if ((rs >= 0) && (op->len == 0) && (alenr >= op->dlen)) {
@@ -413,7 +413,7 @@ int filer_println(filer *op,cchar *sp,int sl) noex {
 	if ((rs = filer_magic(op,sp)) >= 0) {
 	    int		reslen ;
 	    bool	feol = false ;
-	    sl = strnlen(sp,sl) ;
+	    sl = xstrnlen(sp,sl) ;
 	    feol = feol || (sl == 0) ;
 	    feol = feol || (sp[sl-1] != '\n') ;
 	    reslen = (feol) ? (sl+1) : sl ;
@@ -597,29 +597,29 @@ int filer_poll(filer *op,int mto) noex {
 
 /* private subroutines */
 
-static int filer_adjbuf(filer *op,int bufsize) noex {
+static int filer_adjbuf(filer *op,int bufsz) noex {
 	int		rs ;
 	if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 	    op->dt = filetype(sb.st_mode) ;
-	    if (bufsize <= 0) {
+	    if (bufsz <= 0) {
 	        if (S_ISFIFO(sb.st_mode)) {
-	            bufsize = PIPEBUFLEN ;
+	            bufsz = PIPEBUFLEN ;
 	        } else {
 		    if ((rs = pagesize) >= 0) {
 			coff	ps = off_t(rs) ;
 		        off_t	cs ;
 	        	cint	of = op->of ;
 		        if ((of & O_ACCMODE) == O_RDONLY) {
-		            off_t fs = ((sb.st_size == 0) ? 1 : sb.st_size) ;
+		            csize fs = ((sb.st_size == 0) ? 1 : sb.st_size) ;
 		            cs = BCEIL(fs,BLOCKBUFLEN) ;
-	                    bufsize = (int) min(ps,cs) ;
+	                    bufsz = (int) min(ps,cs) ;
 	                } else {
-		            bufsize = ps ;
+		            bufsz = intconv(ps) ;
 		        }
 		    } /* end if (pagesize) */
 	        } /* end if */
-	    } /* end if (bufsize) */
-	    op->dlen = bufsize ;
+	    } /* end if (bufsz) */
+	    op->dlen = bufsz ;
 	} /* end if (stat) */
 	return rs ;
 }

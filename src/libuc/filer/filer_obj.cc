@@ -100,8 +100,8 @@ int filer_co::operator () (int a) noex {
 }
 /* end method (filer_co::operator) */
 
-int filer::start(int fd,off_t soff,int bsz,int to) noex {
-	return filer_start(this,fd,soff,bsz,to) ;
+int filer::start(int afd,off_t soff,int bsz,int to) noex {
+	return filer_start(this,afd,soff,bsz,to) ;
 }
 
 int filer::read(void *rbuf,int rlen,int to) noex {
@@ -159,8 +159,8 @@ int filer::writefill(cchar *wbuf,int wlen) noex {
 	return filer_writefill(this,wbuf,wlen) ;
 }
 
-int filer::writefd(char *bp,int bl,int mfd,int len) noex {
-	return filer_writefd(this,bp,bl,mfd,len) ;
+int filer::writefd(char *bufp,int bufl,int mfd,int alen) noex {
+	return filer_writefd(this,bufp,bufl,mfd,alen) ;
 }
 
 void filer::dtor() noex {

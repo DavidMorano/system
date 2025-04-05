@@ -119,11 +119,12 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<uvariables.hh>		/* |sysword(3u)| */
 #include	<localmisc.h>
 
 #include	"filer.h"
 
+
+import uvariables ;
 
 /* local defines */
 
@@ -148,7 +149,7 @@ using std::max ;			/* subroutine-template */
 
 namespace {
     struct blanker {
-	cint	l = strlen(sysword.w_blanks) ;
+	cint	l = xstrlen(sysword.w_blanks) ;
 	cchar	*p = sysword.w_blanks ;
     } ; /* end struct (blanker) */
     struct zeroer {
@@ -195,7 +196,7 @@ int filer_writefill(filer *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = filer_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = (strlen(sp) + 1) ;
+	    if (sl < 0) sl = (xstrlen(sp) + 1) ;
 	    if ((rs = filer_write(op,sp,sl)) >= 0) {
 	        cint	asize = szof(int) ;
 	        wlen = rs ;
@@ -246,14 +247,14 @@ int filer_writefd(filer *op,char *bp,int bl,int mfd,int len) noex {
 	int		wlen = 0 ;
 	if ((rs = filer_magic(op,bp)) >= 0) {
 	    int		rlen = len ;
-	    auto read = [mfd,bp,bl] (int rlen) {
-		int	rs = SR_OK ;
-		if (rlen > 0) {
-	            cint	ml = min(rlen,bl) ;
-	            rs = u_read(mfd,bp,ml) ;
+	    auto read = [mfd,bp,bl] (int arlen) noex {
+		int	rsl = SR_OK ;
+		if (arlen > 0) {
+	            cint	ml = min(arlen,bl) ;
+	            rsl = u_read(mfd,bp,ml) ;
 		}
-		return rs ;
-	    } ;
+		return rsl ;
+	    } ; /* end lambda (read) */
 	    while ((rs = read(rlen)) > 0) {
 	        rs = filer_write(op,bp,rs) ;
 	        wlen += rs ;
