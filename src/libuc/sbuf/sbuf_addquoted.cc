@@ -74,7 +74,7 @@ int sbuf_addquoted(sbuf *sbp,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (sbp && sp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    {
 	        cint	qlen = ((sl * 2) + 3) ;
 	        if (char *qbuf{} ; (rs = uc_libmalloc((qlen+1),&qbuf)) >= 0) {

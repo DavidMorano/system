@@ -60,7 +60,6 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<uvariables.hh>		/* |sysword(3u)| */
 #include	<format.h>
 #include	<ctbin.h>
 #include	<ctoct.h>
@@ -71,6 +70,8 @@
 
 #include	"sbuf.h"
 
+
+import uvariables ;
 
 /* local defines */
 
@@ -100,7 +101,7 @@ using std::nothrow ;			/* constant */
 
 namespace {
     struct blanker {
-	cint	l = strlen(sysword.w_blanks) ;
+	cint	l = xstrlen(sysword.w_blanks) ;
 	cchar	*p = sysword.w_blanks ;
     } ; /* end struct (blanker) */
 }
@@ -244,8 +245,8 @@ int sbuf_buf(sbuf *sbp,cchar *sp,int sl) noex {
 	            if (*sp && (sl > 0)) rs = SR_OVERFLOW ;
 	        } /* end if */
 	        *bp = '\0' ;
-	        len = (bp - (SBUF_RBUF + SBUF_INDEX)) ;
-	        SBUF_INDEX = (rs >= 0) ? (bp - SBUF_RBUF) : rs ;
+	        len = intconv(bp - (SBUF_RBUF + SBUF_INDEX)) ;
+	        SBUF_INDEX = (rs >= 0) ? intconv(bp - SBUF_RBUF) : rs ;
 	    } /* end if (not in error-mode) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -371,7 +372,7 @@ int sbuf_decull(sbuf *sbp,ulonglong v) noex {
 /* end subroutine (sbuf_decull) */
 
 int sbuf_hexc(sbuf *sbp,char v) noex {
-	uint		uv = uint(v) ;
+	uchar		uv = uchar(v) ;
 	return sbuf_hexuc(sbp,uv) ;
 }
 /* end subroutine (sbuf_hexc) */
@@ -439,7 +440,7 @@ int sbuf_chr(sbuf *sbp,int ch) noex {
 	        char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
 		rs = SR_OVERFLOW ;
 	        if (bl >= len) {
-	            *bp++ = ch ;
+	            *bp++ = charconv(ch) ;
 	            *bp = '\0' ;
 	            SBUF_INDEX += len ;
 	            rs = SR_OK ;
@@ -464,7 +465,7 @@ int sbuf_chrs(sbuf *sbp,int ch,int len) noex {
 		    rs = SR_OVERFLOW ;
 	            if (bl >= len) {
 	                for (int i = 0 ; i < len ; i += 1) {
-		            *bp++ = ch ;
+		            *bp++ = charconv(ch) ;
 	                }
 	                SBUF_INDEX += len ;
 	                rs = SR_OK ;
@@ -694,8 +695,8 @@ static int sbuf_addstrw(sbuf *sbp,cchar *sp,int sl) noex {
 	    } /* end if */
 	} /* end if */
 	*bp = '\0' ;
-	len = (bp - (SBUF_RBUF + SBUF_INDEX)) ;
-	SBUF_INDEX = (rs >= 0) ? (bp - SBUF_RBUF) : rs ;
+	len = intconv(bp - (SBUF_RBUF + SBUF_INDEX)) ;
+	SBUF_INDEX = (rs >= 0) ? intconv(bp - SBUF_RBUF) : rs ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (sbuf_addstrw) */
@@ -708,13 +709,19 @@ int sbuf_co::operator () (int a) noex {
 		rs = sbuf_deci(op,a) ;
 		break ;
 	    case sbufmem_hexc:
-		rs = sbuf_hexc(op,a) ;
+		{
+		    char	c = charconv(a) ;
+		    rs = sbuf_hexc(op,c) ;
+		}
 		break ;
 	    case sbufmem_hexi:
 		rs = sbuf_hexi(op,a) ;
 		break ;
 	    case sbufmem_chr:
-		rs = sbuf_chr(op,a) ;
+		{
+		    char	c = charconv(a) ;
+		    rs = sbuf_chr(op,c) ;
+		}
 		break ;
 	    case sbufmem_blanks:
 		rs = sbuf_blanks(op,a) ;
