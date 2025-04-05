@@ -249,9 +249,8 @@ int openporter::progproc(cchar *bn,int bl) noex {
 	int		fd = -1 ;
 	if (vecstr envs ; (rs = vecstr_start(&envs,5,0)) >= 0) {
 	    if ((rs = loadenvs(&envs,ubuf,pbuf,bn,bl)) >= 0) {
-		nulstr	n ;
 		cchar	*name ;
-		if ((rs = nulstr_start(&n,bn,bl,&name)) >= 0) {
+		if (nulstr n ; (rs = n.start(bn,bl,&name)) >= 0) {
 		    cchar	*vnhome = varname.home ;
 	            int 	i = 0 ;
 	            int		j ;
@@ -281,7 +280,7 @@ int openporter::progproc(cchar *bn,int bl) noex {
 		        rs = procspawn(un,pn,sargv,senvv,pf,pt,proto,sap) ;
 		        fd = rs ;
 	            } /* end if (ok) */
-		    rs1 = nulstr_finish(&n) ;
+		    rs1 = n.finish ;
 	            if (rs >= 0) rs = rs1 ;
 		} /* end if (nulstr) */
 	    } /* end if (loadenvs) */
@@ -352,35 +351,32 @@ static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
 	    m0.sa = *sap ;
 	    strwcpy(m0.username,un,unlen) ;
     
-	    rs = openportmsg_msgrequest(&m0,0,mbuf,mlen) ;
-	    ml = rs ;
+	    if ((rs = openportmsg_msgrequest(&m0,1,mbuf,mlen)) >= 0) {
+	        ml = rs ;
+	        if ((rs = uc_writen(cfd,mbuf,ml)) >= 0) {
+	            cint	mt = openportmsgtype_response ;
     
-	    if (rs >= 0)
-	        rs = uc_writen(cfd,mbuf,ml) ;
-    
-	    if (rs >= 0) {
-	        cint	mt = openportmsgtype_response ;
-    
-	        rs1 = u_read(cfd,mbuf,mlen) ;
-	        ml = rs1 ;
-	        if (rs1 >= 0) {
-	            rs1 = openportmsg_msgresponse(&m1,1,mbuf,ml) ;
+	            rs1 = u_read(cfd,mbuf,mlen) ;
+	            ml = rs1 ;
+	            if (rs1 >= 0) {
+	                rs1 = openportmsg_msgresponse(&m1,0,mbuf,ml) ;
 	        }
     
-	        if ((rs1 > 0) && (m1.msgtype == mt)) {
-	            if (m1.rs >= 0) {
-		        STRRECVFD	fds{} ;
-		        cint	cmd = I_RECVFD ;
-	                rs = u_ioctl(cfd,cmd,&fds) ;
-	                fd = fds.fd ;
+	            if ((rs1 > 0) && (m1.msgtype == mt)) {
+	                if (m1.rs >= 0) {
+		            STRRECVFD	fds{} ;
+		            cint	cmd = I_RECVFD ;
+	                    rs = u_ioctl(cfd,cmd,&fds) ;
+	                    fd = fds.fd ;
+	                } else {
+	                    rs = m1.rs ;
+		        }
 	            } else {
-	                rs = m1.rs ;
-		    }
-	        } else {
-	            rs = SR_PROTO ;
-	        }
-    
-	    } /* end if (write was successful) */
+	                rs = SR_PROTO ;
+	            }
+        
+	        } /* end if (write was successful) */
+	    } /* end if (openportmsg) */
 	    rs1 = uc_free(mbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
