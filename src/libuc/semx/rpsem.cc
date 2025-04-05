@@ -100,10 +100,10 @@
 
 /* exported subroutines */
 
-int psem_create(psem *op,int pshared,int cnt) noex {
+int psem_create(psem *op,int pshared,int acnt) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    cint	ic = (cnt & INT_MAX) ;
+	    cint	ic = (acnt & INT_MAX) ;
 	    repeat {
 	        if ((rs = sem_init(&op->ps,pshared,ic)) < 0) {
 		    rs = (- errno) ;
@@ -229,6 +229,10 @@ int psem_count(psem *op) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (psem_count) */
+
+int psem::create(int pshared,int acnt) noex {
+	return psem_create(this,pshared,acnt) ;
+}
 
 psem::operator int () noex {
 	return psem_count(this) ;

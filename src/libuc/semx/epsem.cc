@@ -108,8 +108,8 @@ int psem_count(psem *op) noex {
 	return csem_count(op) ;
 }
 
-int psem::create(int pshared,int cnt) noex {
-	return psem_create(this,pshared,cnt) ;
+int psem::create(int pshared,int acnt) noex {
+	return psem_create(this,pshared,acnt) ;
 }
 
 psem::operator int () noex {

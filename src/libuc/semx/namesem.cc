@@ -513,8 +513,8 @@ static int getnamesemgid(void) noex {
 }
 /* end subroutine (getnamesemgid) */
 
-int namesem::open(cchar *name,int of,mode_t om,uint c) noex {
-	return namesem_open(this,name,of,om,c) ;
+int namesem::open(cchar *aname,int of,mode_t om,uint c) noex {
+	return namesem_open(this,aname,of,om,c) ;
 }
 
 void namesem::dtor() noex {
