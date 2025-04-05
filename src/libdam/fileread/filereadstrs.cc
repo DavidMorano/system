@@ -124,7 +124,7 @@ static int reader(cchar *fname,char *rbuf,int rlen) noex {
                                     strwcpy((rbuf+rl),cp,cl) ;
                                     rl += cl ;
                                 } /* end if (have space) */
-				sl -= ((cp + cl) - sp) ;
+				sl -= intconv((cp + cl) - sp) ;
 				sp = (cp + cl) ;
 				if (! fs) break ;
                             } /* end while */
