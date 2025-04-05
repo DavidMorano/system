@@ -167,13 +167,13 @@ int ucgetus::init() noex {
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
-	            int		rs = SR_OK ;
+	            int		rsl = SR_OK ; /* GCC 'shadow' complaint */
 	            if (!finit) {
-		        rs = SR_LOCKLOST ;		/* <- failure */
+		        rsl = SR_LOCKLOST ;		/* <- failure */
 	            } else if (finitdone) {
-		        rs = 1 ;			/* <- OK ready */
+		        rsl = 1 ;			/* <- OK ready */
 	            }
-	            return rs ;
+	            return rsl ;
 	        } ; /* end lambda (lamb) */
 	        rs = tw(lamb) ;		/* <- time-watching occurs in there */
 	    } /* end if (initialization) */
