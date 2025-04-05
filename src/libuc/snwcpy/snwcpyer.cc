@@ -69,6 +69,9 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| (not currently used) */
+#include	<localmisc.h>
 
 #include	"strwcpy.h"
 #include	"sncpyx.h"
@@ -111,13 +114,13 @@ int snwcpy(char *dp,int dl,cchar *sp,int sl) noex {
 	        if (sl > dl) {
 	            rs = sncpy1(dp,dl,sp) ;
 	        } else {
-	            rs = strwcpy(dp,sp,sl) - dp ;
+	            rs = intconv(strwcpy(dp,sp,sl) - dp) ;
 		}
 	    } else {
 	        rs = sncpy1(dp,dl,sp) ;
 	    }
 	} else {
-	    rs = strwcpy(dp,sp,sl) - dp ;
+	    rs = intconv(strwcpy(dp,sp,sl) - dp) ;
 	}
 	return rs ;
 }

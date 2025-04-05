@@ -61,6 +61,8 @@
 #include	<usystem.h>
 #include	<strmgr.h>
 #include	<sfx.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
+#include	<localmisc.h>
 
 #include	"snwcpyx.h"
 
@@ -89,13 +91,12 @@
 /* exported subroutines */
 
 int snwcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
-	strmgr		m ;
 	int		rs ;
 	int		rs1 ;
 	int		dl = 0 ;
 	if (dlen < 0) dlen = INT_MAX ;
-	if (sl < 0) sl = strlen(sp) ;
-	if ((rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
+	if (sl < 0) sl = xstrlen(sp) ;
+	if (strmgr m ; (rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
 	    int		cl ;
 	    cchar	*cp ;
 	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
@@ -107,8 +108,8 @@ int snwcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	            rs = strmgr_str(&m,cp,cl) ;
 	            if (rs >= 0) dl += cl ;
 	        }
-	        sl -= ((cp+cl) - sp) ;
-	        sp = (cp+cl) ;
+	        sl -= intconv((cp + cl) - sp) ;
+	        sp = (cp + cl) ;
 	        if (rs < 0) break ;
 	    } /* end while (looping through string pieces) */
 	    rs1 = strmgr_finish(&m) ;

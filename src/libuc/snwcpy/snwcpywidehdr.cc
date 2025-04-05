@@ -130,8 +130,8 @@ int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int wsl) noex {
 	            } /* end for */
 	            if (rs >= 0) dl += i ;
 	        } /* end if (ok) */
-	        wsl -= ((wp+wl) - wsp) ;
-	        wsp = (wp+wl) ;
+	        wsl -= intconv((wp + wl) - wsp) ;
+	        wsp = (wp + wl) ;
 	        if (rs < 0) break ;
 	    } /* end while (looping through string pieces) */
 	    rs1 = strmgr_finish(&m) ;

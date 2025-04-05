@@ -27,6 +27,8 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
+#include	<localmisc.h>
 
 #include	"snwcpyx.h"
 
@@ -61,7 +63,7 @@ int snwcpyrev(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf && sp) {
 	    rs = SR_OVERFLOW ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if ((dlen < 0) || (dlen >= sl)) {
 	        int	i ; /* used afterwards */
 	        for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
