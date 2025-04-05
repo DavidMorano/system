@@ -344,7 +344,7 @@ static int revsortfunc(cvoid **v1pp,cvoid **v2pp) noex {
 	    if (f1p || f2p) {
 	        if (f1p) {
 	            if (f2p) {
-	                rc = (f2p->atime - f1p->atime) ; /* reversed */
+	                rc = intconv(f2p->atime - f1p->atime) ; /* reversed */
 	            } else {
 	                rc = -1 ;
 		    }

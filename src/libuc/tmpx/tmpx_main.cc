@@ -398,7 +398,7 @@ int tmpx_nusers(tmpx *op) noex {
             int     en ;
             if_constexpr (f_dynents) {
                 cint        esz = TMPX_ENTSIZE ;
-                en = ((op->fsize / esz) + 1) ;
+                en = intconv((op->fsize / esz) + 1) ;
             } else {
                 en = TMPX_NENTS ;
             } /* end if_constexpr (f_dynents) */
@@ -585,7 +585,7 @@ static int tmpx_mapents(tmpx *op,int ei,int en,tmpx_ent **rpp) noex {
 	        uint	eoff = (ei * esz) ;
 	        uint	elen = (en * esz) ;
 	        uint	eext = (eoff + elen) ;
-	        if (eext > op->fsize) eext = op->fsize ;
+	        if (eext > op->fsize) eext = intsat(op->fsize) ;
 	        n = (eext - eoff) / esz ;
 	        if (n > 0) {
 	            cuint	woff = ufloor(eoff,op->pagesize) ;
