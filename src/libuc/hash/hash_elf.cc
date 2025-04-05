@@ -45,8 +45,9 @@
 	2. As as aside, for those who do not already know, Peter
 	Weinberger was the 'W' in the AWK programming language,
 	along with Alfred Vaino Aho (author of EGREP and of "Aho
-	and Ullman" fame), and Brian Kernighan (coauthor of the
-	original C-language book along with Dennis Ritchie).
+	and Ullman" fame; think "Dragon Book" among others), and
+	Brian Kernighan (coauthor of the original C-language book
+	along with Dennis Ritchie).
 
 *******************************************************************************/
 
@@ -54,11 +55,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"hash.h"
@@ -76,6 +78,12 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
 
 
@@ -91,7 +99,7 @@ uint hash_elf(cchar *sp,int sl) noex {
 	unsigned	h = 0 ;
 	unsigned	g ;
 	unsigned	v ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	while (sl-- > 0) {
 	    v = uchar(*sp++) ;
 	    h <<= 4 ;

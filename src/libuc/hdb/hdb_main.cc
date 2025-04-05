@@ -128,7 +128,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |strlen(3c)| + |memcmp(3c)| */
+#include	<cstring>		/* |strlen(3c)| + |memcmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<lookaside.h>
@@ -206,8 +206,8 @@ struct fetchcur {
 	CUR		*curp ;
 	uint		hv ;
 	int		htl ;
-	int		f_ikeyed:1 ;
-	int		f_jkeyed:1 ;
+	uint		f_ikeyed:1 ;
+	uint		f_jkeyed:1 ;
 } ;
 
 struct entryinfo {
@@ -287,7 +287,7 @@ static inline int defcmpfun(cvoid *s1,cvoid *s2,int sl) noex {
 
 static inline int voidlen(cvoid *buf) noex {
 	cchar	*s = charp(buf) ;
-	return strlen(s) ;
+	return xstrlen(s) ;
 }
 
 consteval CUR mkcurnull() noex {

@@ -97,9 +97,9 @@ struct hdb_co {
 	} ;
 } ; /* end struct (hdb_co) */
 struct hdb : hdb_head {
-	hdb_co	delall ;
-	hdb_co	audit ;
-	hdb_co	finish ;
+	hdb_co		delall ;
+	hdb_co		audit ;
+	hdb_co		finish ;
 	hdb() noex {
 	    delall(this,hdbmem_delall) ;
 	    audit(this,hdbmem_audit) ;

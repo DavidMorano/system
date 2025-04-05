@@ -179,8 +179,8 @@ using std::nothrow ;			/* constant */
 
 /* exported subroutines */
 
-int hdb::start(int n,int at,hdbhash_f h,hdbcmp_f c) noex {
-    	return hdb_start(this,n,at,h,c) ;
+int hdb::start(int n,int alt,hdbhash_f h,hdbcmp_f c) noex {
+    	return hdb_start(this,n,alt,h,c) ;
 }
 
 int hdb::store(HDB_D key,DAT val) noex {
