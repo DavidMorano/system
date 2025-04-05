@@ -183,7 +183,7 @@ int tryer::looper() noex {
 	    char	*bp = (rbuf+rl) ;
 	    int		bl = (rlen-rl) ;
 	    if ((loop >= 0) && (loop < nalpha)) {
-	        *bp++ = ('a' + loop) ;
+	        *bp++ = charconv('a' + loop) ;
 		*bp = '\0' ;
 		rs = 1 ;
 		bl -= rs ;

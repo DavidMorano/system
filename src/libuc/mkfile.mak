@@ -35,6 +35,8 @@ DEFS=
 
 INCS= mkfile.h
 
+MODS=
+
 LIBS=
 
 
@@ -58,7 +60,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 OBJ_MKFILE= mkartfile.o mkdatefile.o mkjobfile.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -83,6 +85,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_MKFILE)

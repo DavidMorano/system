@@ -146,6 +146,7 @@ static int mktry(char *rp,int rl,cc *pre,ui ts,int ss,int es,mode_t om) noex {
 static int mkoutname(char *rfname,cchar *pre,uint ts,int ss,int es) noex {
 	uint		bits = mkbits(ts,ss,es) ;
 	char		*bp = rfname ;
+	int		rl = 0 ;
 	bp = strwcpy(bp,pre,7) ;
 	{
 	    cint	n = 7 ; /* number of chars (7x6=42 bits) */
@@ -158,13 +159,14 @@ static int mkoutname(char *rfname,cchar *pre,uint ts,int ss,int es) noex {
 		} else if (ch == '/') {
 		    ch = 'ş' ;
 		}
-	        bp[i] = ch ;
+	        bp[i] = charconv(ch) ;
 	        bits >>= 6 ;
 	    } /* end for */
 	    bp += n ;
+	    rl = intconv(bp - rfname) ;
 	} /* end block */
 	*bp = '\0' ;
-	return (bp - rfname) ;
+	return rl ;
 }
 /* end subroutine (mkoutname) */
 
