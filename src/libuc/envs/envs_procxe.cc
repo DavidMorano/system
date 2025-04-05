@@ -61,7 +61,7 @@
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |xstrlen(3c)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
@@ -244,7 +244,7 @@ int subinfo::expln(cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if (strnchr(sp,sl,'%') != nullptr) {
 	    cint	bsz = (sl + 20) ;
 	    if (buffer b ; (rs = b.start(bsz)) >= 0) {
@@ -290,8 +290,9 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	}
 /* extract any dependencies (if we have any) */
 	if (((tp = strnpbrk(sp,sl,scl)) != np) && (*tp == '?')) {
-	    if ((rs = deps(sp,(tp - sp))) > 0) {
-	        sl -= ((tp+1) - sp) ;
+	    cint	tl = intconv(tp - sp) ;
+	    if ((rs = deps(sp,tl)) > 0) {
+	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp+1) ;
 	        while (sl && char_iswhite(*sp)) {
 	            sp += 1 ;
@@ -304,7 +305,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	        int	sch = 0 ;
 	        bool	f_exit = false ;
 	        bool	f_go = true ;
-	        sl -= ((ep+el)-sp) ;
+	        sl -= intconv((ep + el) - sp) ;
 	        sp = (ep+el) ;
 	        while (sl && char_iswhite(*sp)) {
 	            sp += 1 ;
@@ -422,7 +423,7 @@ int subinfo::lner(cc *enp,int enl,AT *atp,int sch,cc *sp,int sl) noex {
 	                if (atp->sep) {
 	                    if ((rs = envs_present(nlp,enp,enl)) > 0) {
 	                        char	sbuf[2] ;
-	                        sbuf[0] = sch ;
+	                        sbuf[0] = charconv(sch) ;
 	                        sbuf[1] = '\0' ;
 	                        rs = envs_store(nlp,enp,true,sbuf,1) ;
 	                    } else if (rs == SR_NOTFOUND) {
@@ -510,7 +511,7 @@ int subinfo::val(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	cchar		*kp{} ;
 	while ((kl = sfthing(sp,sl,ss,&kp)) >= 0) {
 	    cchar	*cp = sp ;
-	    int		cl = ((kp - 2) - sp) ;
+	    int		cl = intconv((kp - 2) - sp) ;
 	    if (cl > 0) {
 	        rs = bp->strw(cp,cl) ;
 	        len += rs ;
@@ -519,7 +520,7 @@ int subinfo::val(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	        rs = def(bp,kp,kl) ;
 	        len += rs ;
 	    }
-	    sl -= ((kp + kl + 1) - sp) ;
+	    sl -= intconv((kp + kl + 1) - sp) ;
 	    sp = (kp + kl + 1) ;
 	    if (rs < 0) break ;
 	} /* end while */
@@ -539,8 +540,8 @@ int subinfo::def(buffer *bp,cchar *kp,int kl) noex {
 	    cchar	*ap = nullptr ;
 	    if (cc *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
 	        ap = (tp + 1) ;
-	        al = (kp + kl) - (tp + 1) ;
-	        kl = (tp - kp) ;
+	        al = intconv((kp + kl) - (tp + 1)) ;
+	        kl = intconv(tp - kp) ;
 	    }
 	    {
 		int	cl{} ;
@@ -549,9 +550,9 @@ int subinfo::def(buffer *bp,cchar *kp,int kl) noex {
 		bool	f_found = false ;
 	        if ((rs = vecstr_searchl(dlp,kp,kl,vs,&cp)) >= 0) {
 		    f_found = true ;
-	            cl = strlen(cp) ;
+	            cl = xstrlen(cp) ;
 	            if (cc *tp ; (tp = strchr(cp,'=')) != nullptr) {
-	                cl -= ((tp + 1) - cp) ;
+	                cl -= intconv((tp + 1) - cp) ;
 	                cp = (tp + 1) ;
 	            }
 	        } else if (rs == rsn) {

@@ -29,7 +29,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |xstrlen(3c)| */
 #include	<usystem.h>
 #include	<hdb.h>
 #include	<vecstr.h>
@@ -202,7 +202,7 @@ int envs_store(envs *op,cchar *kp,int fa,cchar *vp,int vl) noex {
 	    ENVS_DBDAT	val{} ;
 	    ENVS_ENT	*ep{} ;
 	    key.buf = kp ;
-	    key.len = strlen(kp) ;
+	    key.len = xstrlen(kp) ;
 	    val.buf = nullptr ;
 	    val.len = -1 ;
 	    if ((rs = ENVS_DBFETCH(op->varp,key,nullptr,&val)) >= 0) {
@@ -252,7 +252,7 @@ int envs_present(envs *op,cchar *kp,int kl) noex {
 	if ((rs = envs_magic(op,kp)) >= 0) {
 	    ENVS_DBDAT	key ;
 	    ENVS_DBDAT	val{} ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = xstrlen(kp) ;
 	    key.buf = kp ;
 	    key.len = kl ;
 	    if ((rs = ENVS_DBFETCH(op->varp,key,nullptr,&val)) >= 0) {
@@ -270,8 +270,8 @@ int envs_substr(envs *op,cchar *kp,int kl,cchar *sp,int sl) noex {
 	    hdb		*vlp = op->varp ;
 	    ENVS_DBDAT	key ;
 	    ENVS_DBDAT	val{} ;
-	    if (kl < 0) kl = strlen(kp) ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (kl < 0) kl = xstrlen(kp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    key.buf = kp ;
 	    key.len = kl ;
 	    if ((rs = ENVS_DBFETCH(vlp,key,nullptr,&val)) >= 0) {
@@ -330,7 +330,7 @@ int envs_curenumkey(envs *op,ENVS_CUR *curp,cchar **kpp) noex {
 	    if (kpp) *kpp = nullptr ;
 	    if ((rs = ENVS_DBENUM(dlp,curp->curp,&key,&val)) >= 0) {
 	        cchar	*kp = charp(key.buf) ;
-	        kl = strlen(kp) ;
+	        kl = xstrlen(kp) ;
 	        if (kpp) *kpp = kp ;
 	    } /* end if */
 	} /* end if (magic) */
@@ -359,7 +359,7 @@ int envs_curenum(envs *op,ENVS_CUR *curp,cchar **kpp,cchar **vpp) noex {
 	        }
 	        if (rs < 0) break ;
 	        kp = charp(key.buf) ;
-	        kl = strlen(kp) ;
+	        kl = xstrlen(kp) ;
 	        if (kpp) *kpp = kp ;
 	        ep = (ENVS_ENT *) val.buf ;
 	        i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
@@ -384,7 +384,7 @@ int envs_fetch(envs *op,cc *kp,int kl,ENVS_CUR *curp,cc **rpp) noex {
 	    ENVS_DBDAT	val{} ;
 	    ENVS_ENT	*ep ;
 	    int		i = 0 ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = xstrlen(kp) ;
 	    if (rpp) *rpp = nullptr ;
 	    if (curp) {
 	        i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
@@ -409,7 +409,7 @@ int envs_delname(envs *op,cchar *kp,int kl) noex {
 	if ((rs = envs_magic(op,kp)) >= 0) {
 	    ENVS_DBDAT	key ;
 	    ENVS_DBDAT	val{} ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = xstrlen(kp) ;
 	    key.buf = kp ;
 	    key.len = kl ;
 	    rs = ENVS_DBFETCH(op->varp,key,nullptr,&val) ;
@@ -502,7 +502,7 @@ static int entry_get(ENVS_ENT *ep,int i,cchar **rpp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	if (cchar *rp{} ; (rs = elp->get(i,&rp)) >= 0) {
-	    vl = strlen(rp) ;
+	    vl = xstrlen(rp) ;
 	    if (*rpp) *rpp = rp ;
 	}
 	return (rs >= 0) ? vl : rs ;

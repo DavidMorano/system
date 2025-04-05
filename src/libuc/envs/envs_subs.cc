@@ -289,7 +289,7 @@ int subinfo::procpathsplit(vecstr *plp,cchar *vp,int vl) noex {
 	        cchar	*tp, *cp ;
 	        while ((tp = strnpbrk(vp,vl,":;")) != nullptr) {
 	            cp = vp ;
-	            cl = (tp - vp) ;
+	            cl = intconv(tp - vp) ;
 	            c += 1 ;
 	            if ((pl = pathclean(pbuf,cp,cl)) >= 0) {
 	                rs = plp->adduniq(pbuf,pl) ;
@@ -297,13 +297,14 @@ int subinfo::procpathsplit(vecstr *plp,cchar *vp,int vl) noex {
 	            if ((rs >= 0) && (tp[0] == ';')) {
 	                rs = plp->adduniq(";",1) ;
 	            }
-	            vl -= ((tp + 1) - vp) ;
+	            vl -= intconv((tp + 1) - vp) ;
 	            vp = (tp + 1) ;
 	            if (rs < 0) break ;
 	        } /* end while */
 	        if ((rs >= 0) && ((c == 0) || (vl > 0))) {
+		    cint	tl = intconv(tp - vp) ;
 	            c += 1 ;
-	            if ((pl = pathclean(pbuf,vp,(tp - vp))) >= 0) {
+	            if ((pl = pathclean(pbuf,vp,tl)) >= 0) {
 	                rs = plp->adduniq(pbuf,pl) ;
 	            }
 	        } /* end if */
