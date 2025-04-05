@@ -35,8 +35,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>
-#include	<cstring>		/* <- |memcpy(3c)| */
-#include	<algorithm>
+#include	<cstring>		/* |memcpy(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
@@ -128,7 +129,7 @@ int ucentnw::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (this && ebuf && sp) {
 	    NETENT *nep = this ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    memclear(nep) ;
 	    n_addrtype = AF_INET4 ;		/* <- mandatory */
 	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
@@ -152,8 +153,8 @@ int ucentnw::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 		    if ((rs >= 0) && vpp) {
 	        	rs = si.strw(cp,cl,vpp) ;
 		    }
-	            sl -= ((cp+cl)-sp) ;
-	            sp = (cp+cl) ;
+	            sl -= intconv((cp + cl) - sp) ;
+	            sp = (cp + cl) ;
 	            if (rs < 0) break ;
 	        } /* end while */
 	        rs1 = si.finish ;
@@ -240,12 +241,12 @@ int ucentnw::size() noex {
 	if (this) {
 	    int		sz = 1 ;
 	    if (n_name) {
-	        sz += (strlen(n_name)+1) ;
+	        sz += (xstrlen(n_name) + 1) ;
 	    }
 	    if (n_aliases) {
 	        int	i ; /* used-afterwards */
 	        for (i = 0 ; n_aliases[i] ; i += 1) {
-	            sz += (strlen(n_aliases[i])+1) ;
+	            sz += (xstrlen(n_aliases[i]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if (name-list aliases) */

@@ -30,6 +30,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
@@ -102,12 +104,12 @@ namespace ucent {
 	int		c = 0 ;
 	cchar		*tp ;
 	while ((tp = strnpbrk(sp,sl," ,")) != nullptr) {
-	    if ((tp-sp) > 0) {
+	    if (cint tl = intconv(tp - sp) ; tl > 0) {
 		c += 1 ;
-		rs = si_loadname(sip,ulp,sp,(tp-sp)) ;
+		rs = si_loadname(sip,ulp,sp,tl) ;
 	    } /* end if (non-zero) */
-	    sl -= ((tp+1)-sp) ;
-	    sp = (tp+1) ;
+	    sl -= intconv((tp + 1) - sp) ;
+	    sp = (tp + 1) ;
 	    if (rs < 0) break ;
 	} /* end while */
 	if ((rs >= 0) && sl && sp[0]) {

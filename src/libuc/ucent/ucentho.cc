@@ -34,6 +34,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<storeitem.h>
@@ -130,7 +131,7 @@ int ucentho::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (this && ebuf && sp) {
 	    HOSTENT *hep = this ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    memclear(hep) ;
 	    h_addrtype = AF_INET4 ;	/* <- mandatory */
 	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
@@ -156,8 +157,8 @@ int ucentho::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 		    if ((rs >= 0) && vpp) {
 	        	rs = si.strw(cp,cl,vpp) ;
 		    }
-	            sl -= ((cp+cl)-sp) ;
-	            sp = (cp+cl) ;
+	            sl -= intconv((cp + cl) - sp) ;
+	            sp = (cp + cl) ;
 	            if (rs < 0) break ;
 	        } /* end while */
 	        rs1 = si.finish ;
@@ -240,12 +241,12 @@ int ucentho::size() noex {
 	if (this) {
 	    int		sz = 1 ;
 	    if (h_name) {
-	        sz += (strlen(h_name)+1) ;
+	        sz += (xstrlen(h_name) + 1) ;
 	    }
 	    if (h_aliases) {
 	        int	i = 0 ; /* used-afterwards */
 	        for (i = 0 ; h_aliases[i] ; i += 1) {
-	            sz += (strlen(h_aliases[i])+1) ;
+	            sz += (xstrlen(h_aliases[i]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if (name-alias list) */

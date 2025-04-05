@@ -31,7 +31,9 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
@@ -96,12 +98,13 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	int		wlen = 0 ;
 	if (this && uabuf && sp) {
 	    USERATTR *uep = this ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    rs = memclear(uep) ;
 	    if ((sl > 0) && (sp[0] != '#')) {
 	        if (storeitem si ; (rs = si.start(uabuf,ualen)) >= 0) {
 	            int		fi = 0 ;
 	            for (cc *tp ; (tp = strnchr(sp,sl,':')) != np ; ) {
+			cint	tl = intconv(tp - sp) ;
 	                cchar	**vpp = nullptr ;
 	                switch (fi++) {
 	                case 0:
@@ -117,17 +120,17 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	                    vpp = ccharpp(&res1) ;
 	                    break ;
 	                case 4:
-	                    rs = userattrent_parseattr(this,&si,sp,(tp-sp)) ;
+	                    rs = userattrent_parseattr(this,&si,sp,tl) ;
 	                    break ;
 	                } /* end switch */
 	                if ((rs >= 0) && vpp) {
 	                    cchar	*cp{} ;
-	                    if (int cl ; (cl = sfshrink(sp,(tp-sp),&cp)) >= 0) {
+	                    if (int cl ; (cl = sfshrink(sp,tl,&cp)) >= 0) {
 	                        rs = si.strw(cp,cl,vpp) ;
 	                    }
 	                }
-	                sl -= ((tp+1)-sp) ;
-	                sp = (tp+1) ;
+	                sl -= intconv((tp + 1) - sp) ;
+	                sp = (tp + 1) ;
 	                if (rs < 0) break ;
 	            } /* end for */
 	            if ((rs >= 0) && (fi == 4) && sl && sp[0]) {
@@ -244,15 +247,15 @@ int ucentua::size() noex {
 	    int		sz = 1 ;
 	    kva_t	*kvap = attr ;
 	    if (name) {
-	        sz += (strlen(name)+1) ;
+	        sz += (xstrlen(name)+1) ;
 	    }
 	    if (attr) {
 	        kv_t	*kvp = kvap->data ;
 	        cint	n = kvap->length ;
 	        sz += szof(kva_t) ;
 	        for (int i = 0 ; i < n ; i += 1) {
-	            sz += (strlen(kvp[i].key)+1) ;
-	            sz += (strlen(kvp[i].value)+1) ;
+	            sz += (xstrlen(kvp[i].key)+1) ;
+	            sz += (xstrlen(kvp[i].value)+1) ;
 	        } /* end for */
 	        sz += ((n+1)*szof(kv_t)) ;
 	    } /* end if */
@@ -266,8 +269,8 @@ int ucentua::getent(char *uabuf,int ualen) noex {
 	return uc_getuaent(this,uabuf,ualen) ;
 }
 
-int ucentua::getnam(char *uabuf,int ualen,cchar *name) noex {
-	return uc_getuanam(this,uabuf,ualen,name) ;
+int ucentua::getnam(char *uabuf,int ualen,cchar *uaname) noex {
+	return uc_getuanam(this,uabuf,ualen,uaname) ;
 }
 
 int ucentua::getuid(char *uabuf,int ualen,uid_t uid) noex {
@@ -285,12 +288,12 @@ static int userattrent_parseattr(UA *uap,SI *sip,cc *sp,int sl) noex {
 	    cint	sch = ';' ;
 	    cchar	*tp ;
 	    while ((tp = strnchr(sp,sl,sch)) != nullptr) {
-	        if ((tp-sp) > 0) {
+	        if (cint tl = intconv(tp - sp) ; tl > 0) {
 		    c += 1 ;
-	            rs = a.add(sp,(tp-sp)) ;
+	            rs = a.add(sp,tl) ;
 	        }
-	        sl -= ((tp+1)-sp) ;
-	        sp = (tp+1) ;
+	        sl -= intconv((tp + 1) - sp) ;
+	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
 	    } /* end while */
 	    if ((rs >= 0) && (sl > 0)) {
@@ -337,10 +340,10 @@ static int si_attrload(SI *sip,kv_t *kvp,int i,cchar *ep) noex {
 	int		el = -1 ;
 	cchar		*vp ;
 	if (cchar *tp ; (tp = strchr(ep,'=')) != nullptr) {
-	    vp = (tp+1) ;
-	    el = (tp-ep) ;
+	    vp = (tp + 1) ;
+	    el = intconv(tp - ep) ;
 	} else {
-	    vp = (ep+strlen(ep)) ;
+	    vp = (ep+xstrlen(ep)) ;
 	}
 	{
 	    if (cchar *crp{} ; (rs = sip->strw(ep,el,&crp)) >= 0) {

@@ -29,7 +29,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
@@ -39,6 +41,7 @@
 #include	<six.h>
 #include	<intceil.h>
 #include	<cfdec.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"ucentsp.h"
@@ -87,7 +90,7 @@ int ucentsp::parse(char *spbuf,int splen,cchar *sp,int sl) noex {
 	if (spbuf && sp) {
 	    SPWD *sep = this ;
 	    memclear(sep) ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (storeitem si ; (rs = si.start(spbuf,splen)) >= 0) {
 	        int		fi = 0 ;
 	        for (int idx ; (idx = sichr(sp,sl,':')) >= 0 ; ) {
@@ -199,10 +202,10 @@ int ucentsp::size() noex {
 	if (this) {
 	    int		sz = 1 ;
 	    if (sp_namp) {
-	        sz += (strlen(sp_namp)+1) ;
+	        sz += (xstrlen(sp_namp) + 1) ;
 	    }
 	    if (sp_pwdp) {
-	        sz += (strlen(sp_pwdp)+1) ;
+	        sz += (xstrlen(sp_pwdp) + 1) ;
 	    }
 	    rs = sz ;
 	} /* end if (non-null) */
@@ -285,7 +288,7 @@ static int ucentsp_parsedefs(ucentsp *spp,SI *sip,int sfi) noex {
 	    cchar	**vpp = ccharpp(&spp->sp_pwdp) ;
 	    cchar	*sp = spp->sp_namp ;
 	    cchar	*vp ;
-	    vp = (sp + strlen(sp)) ;
+	    vp = (sp + xstrlen(sp)) ;
 	    sfi += 1 ;
 	    rs = sip->strw(vp,0,vpp) ;
 	}

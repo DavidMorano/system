@@ -32,7 +32,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<utypealiases.h>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
@@ -41,6 +43,7 @@
 #include	<sfx.h>
 #include	<intceil.h>
 #include	<cfdec.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"ucentgr.h"
@@ -91,12 +94,13 @@ int ucentgr::parse(char *grbuf,int grlen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (this && grbuf && sp) {
 	    GROUP *gep = this ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    memclear(gep) ; /* shallow copy */
 	    if (storeitem si ; (rs = si.start(grbuf,grlen)) >= 0) {
 	        int	fi = 0 ;
 	        cchar	*tp ;
 	        while ((tp = strnchr(sp,sl,':')) != nullptr) {
+		    cint	tl = intconv(tp - sp) ;
 	            int		v = -1 ;
 	            cchar	**vpp = nullptr ;
 	            switch (fi++) {
@@ -107,21 +111,21 @@ int ucentgr::parse(char *grbuf,int grlen,cchar *sp,int sl) noex {
 	                vpp = ccharpp(&gr_passwd) ;
 	                break ;
 	            case 2:
-	                rs = cfdeci(sp,(tp-sp),&v) ;
+	                rs = cfdeci(sp,tl,&v) ;
 	                gr_gid = v ;
 	                break ;
 	            case 3:
-	                rs = ucentgr_parseusers(this,&si,sp,(tp-sp)) ;
+	                rs = ucentgr_parseusers(this,&si,sp,tl) ;
 	                break ;
 	            } /* end switch */
 		    if ((rs >= 0) && vpp) {
 	    	        cchar	*cp{} ;
-	    	        if (int cl ; (cl = sfshrink(sp,(tp-sp),&cp)) >= 0) {
+	    	        if (int cl ; (cl = sfshrink(sp,tl,&cp)) >= 0) {
 	        	    rs = si.strw(cp,cl,vpp) ;
 	    	        }
 		    }
-	            sl -= ((tp+1)-sp) ;
-	            sp = (tp+1) ;
+	            sl -= intconv((tp + 1) - sp) ;
+	            sp = (tp + 1) ;
 	            if (rs < 0) break ;
 	        } /* end while */
 	        if (rs >= 0) {
@@ -215,15 +219,15 @@ int ucentgr::size() noex {
 	if (this) {
 	    int		sz = 1 ;
 	    if (gr_name) {
-	        sz += (strlen(gr_name)+1) ;
+	        sz += (xstrlen(gr_name) + 1) ;
 	    }
 	    if (gr_passwd) {
-	        sz += (strlen(gr_passwd)+1) ;
+	        sz += (xstrlen(gr_passwd) + 1) ;
 	    }
 	    if (gr_mem) {
 	        int	i = 0 ;
 	        while (gr_mem[i]) {
-	            sz += (strlen(gr_mem[i++])+1) ;
+	            sz += (xstrlen(gr_mem[i++]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if (group members) */

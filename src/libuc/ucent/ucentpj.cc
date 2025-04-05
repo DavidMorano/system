@@ -31,7 +31,9 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3cu)| */
+#include	<new>			/* |nothrow(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
@@ -41,6 +43,7 @@
 #include	<six.h>
 #include	<intceil.h>
 #include	<cfdec.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"ucentpj.h"
@@ -90,12 +93,13 @@ int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (this && pjbuf && sp) {
 	    PROJECT *pep = this ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    memclear(pep) ;
 	    if (storeitem si ; (rs = si.start(pjbuf,pjlen)) >= 0) {
 	        int	fi = 0 ;
 	        cchar	**vpp ;
 	        for (cc *tp ; (tp = strnchr(sp,sl,':')) != nullptr ; ) {
+		    cint	tl = intconv(tp - sp) ;
 	            int		v = -1 ;
 	            char	**sv{} ;
 	            vpp = nullptr ;
@@ -104,18 +108,18 @@ int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	                vpp = ccharpp(&pj_name) ;
 	                break ;
 	            case 1:
-	                rs = cfdeci(sp,(tp-sp),&v) ;
+	                rs = cfdeci(sp,tl,&v) ;
 	                pj_projid = v ;
 	                break ;
 	            case 2:
 	                vpp = ccharpp(&pj_comment) ;
 	                break ;
 		    case 3:
-	                rs = si_storestrs(&si,',',sp,(tp-sp),&sv) ;
+	                rs = si_storestrs(&si,',',sp,tl,&sv) ;
 		        pj_users = sv ;
 	                break ;
 	            case 4:
-	                rs = si_storestrs(&si,',',sp,(tp-sp),&sv) ;
+	                rs = si_storestrs(&si,',',sp,tl,&sv) ;
 		        pj_groups = sv ;
 	                break ;
 	            case 5:
@@ -124,12 +128,12 @@ int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	            } /* end switch */
 	            if ((rs >= 0) && vpp) {
 	                cchar	*cp{} ;
-	                if (int cl ; (cl = sfshrink(sp,(tp-sp),&cp)) >= 0) {
+	                if (int cl ; (cl = sfshrink(sp,tl,&cp)) >= 0) {
 	                    rs = si.strw(cp,cl,vpp) ;
 	                }
 	            } /* end if */
-	            sl -= ((tp+1)-sp) ;
-	            sp = (tp+1) ;
+	            sl -= intconv((tp + 1) - sp) ;
+	            sp = (tp + 1) ;
 	            if (rs < 0) break ;
 	        } /* end while */
 	        if ((rs >= 0) && (fi == 5) && sl && sp[0]) {
@@ -251,23 +255,23 @@ int ucentpj::size() noex {
 	    int		sz = 1 ;
 	    int		i = 0 ;
 	    if (pj_name) {
-	        sz += (strlen(pj_name)+1) ;
+	        sz += (xstrlen(pj_name) + 1) ;
 	    }
 	    if (pj_comment) {
-	        sz += (strlen(pj_comment)+1) ;
+	        sz += (xstrlen(pj_comment) + 1) ;
 	    }
 	    if (pj_attr) {
-	        sz += (strlen(pj_attr)+1) ;
+	        sz += (xstrlen(pj_attr) + 1) ;
 	    }
 	    if (pj_users) {
 	        for (i = 0 ; pj_users[i] ; i += 1) {
-	            sz += (strlen(pj_users[i])+1) ;
+	            sz += (xstrlen(pj_users[i]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if */
 	    if (pj_groups) {
 	        for (i = 0 ; pj_groups[i] ; i += 1) {
-	            sz += (strlen(pj_groups[i])+1) ;
+	            sz += (xstrlen(pj_groups[i]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if */
@@ -324,21 +328,20 @@ static int si_storestrs(SI *sip,int sch,cc *sp,int sl,char ***svp) noex {
 static int si_loadstrs(SI *sip,vechand *ulp,int sch,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	cchar		*tp ;
-	while ((tp = strnchr(sp,sl,sch)) != nullptr) {
-	    if ((tp-sp) > 0) {
+	for (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr ; ) {
+	    if (cint tl = intconv(tp - sp) ; tl > 0) {
 		cchar	*zp{} ;
-		if (int zl ; (zl = sfshrink(sp,(tp-sp),&zp)) > 0) {
-	            if (cc *cp{} ; (rs = sip->strw(zp,zl,&cp)) >= 0) {
+		if (int zl ; (zl = sfshrink(sp,tl,&zp)) > 0) {
+	            if (cc *cp ; (rs = sip->strw(zp,zl,&cp)) >= 0) {
 		        c += 1 ;
 		        rs = ulp->add(cp) ;
 	            }
 		} /* end if (sfshrink) */
 	    } /* end if (non-zero) */
-	    sl -= ((tp+1)-sp) ;
-	    sp = (tp+1) ;
+	    sl -= intconv((tp + 1) - sp) ;
+	    sp = (tp + 1) ;
 	    if (rs < 0) break ;
-	} /* end while */
+	} /* end for */
 	if ((rs >= 0) && sl && sp[0]) {
 	    if (cc *cp{} ; (rs = sip->strw(sp,sl,&cp)) >= 0) {
 		c += 1 ;

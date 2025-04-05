@@ -20,6 +20,9 @@
 
 /*******************************************************************************
 
+  	Name:
+	usys_xxx
+
   	Description:
 	This file contains the UNIX® system types that the brain-damaged
 	MacOS operating system does NOT have.  We are trying in a very

@@ -33,7 +33,9 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
@@ -96,7 +98,7 @@ int ucentsv::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (this && ebuf && sp) {
 	    SERVENT *sep = this ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    memclear(sep) ;
 	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
 	        cchar	*cp{} ;
@@ -119,8 +121,8 @@ int ucentsv::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 		    if ((rs >= 0) && vpp) {
 	        	rs = si.strw(cp,cl,vpp) ;
 		    }
-	            sl -= ((cp+cl)-sp) ;
-	            sp = (cp+cl) ;
+	            sl -= intconv((cp + cl) - sp) ;
+	            sp = (cp + cl) ;
 	            if (rs < 0) break ;
 	        } /* end while */
 	        rs1 = si.finish ;
@@ -204,12 +206,12 @@ int ucentsv::size() noex {
 	if (this) {
 	    int		sz = 1 ;
 	    if (s_name) {
-	        sz += (strlen(s_name)+1) ;
+	        sz += (xstrlen(s_name) + 1) ;
 	    }
 	    if (s_aliases) {
 	        int	i ; /* used-afterwards */
 	        for (i = 0 ; s_aliases[i] ; i += 1) {
-	            sz += (strlen(s_aliases[i])+1) ;
+	            sz += (xstrlen(s_aliases[i]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if (group members) */
@@ -237,9 +239,10 @@ int ucentsv::getnum(char *rb,int rl,int n,cchar *p) noex {
 static int ucentsv_parsenum(SVE *op,SI *sbp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if (cchar *tp ; (tp = strnchr(sp,sl,'/')) != nullptr) {
-	    if (int v{} ; (rs = cfdeci(sp,(tp-sp),&v)) >= 0) {
-		cint	cl = ((sp+sl)-(tp+1))  ;
-		cchar	*cp = (tp+1) ;
+	    cint	tl = intconv(tp - sp) ;
+	    if (int v{} ; (rs = cfdeci(sp,tl,&v)) >= 0) {
+		cint	cl = intconv((sp + sl) - (tp + 1))  ;
+		cchar	*cp = (tp + 1) ;
 		op->s_port = v ;
 		if (cchar *rp{} ; (rs = sbp->strw(cp,cl,&rp)) >= 0) {
 		    op->s_proto = charp(rp) ;
