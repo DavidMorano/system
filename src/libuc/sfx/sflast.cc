@@ -42,11 +42,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>		/* possible future use */
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -67,7 +69,7 @@
 /* exported subroutines */
 
 int sflast(cchar *sp,int sl,int n,cchar **rpp) noex {
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if ((n >= 0) && (sl > n)) {
 	    sl = n ;
 	    sp += (sl-n) ;

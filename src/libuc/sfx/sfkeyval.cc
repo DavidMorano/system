@@ -46,16 +46,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<strn.h>
 #include	<six.h>
-#include	<char.h>
 #include	<ischarx.h>
 #include	<strwcmp.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -87,7 +88,7 @@
 int sfcontent(cchar *sp,int sl,cchar **rpp) noex {
 	int		rl = 0 ;
 	cchar		*rp = nullptr ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if (sl > 0) {
 	    if (int si ; (si = sichr(sp,sl,'#')) > 0) {
 		rl = sfshrink(sp,si,&rp) ;
@@ -112,7 +113,7 @@ int sfkeyval(cchar *sp,int sl,cchar *key,cchar **rpp) noex {
 		cchar	*kp{} ;
 		if (int kl ; (kl = sfnext(cp,cl,&kp)) > 0) {
 		    if (strwcmp(key,kp,kl) == 0) {
-			cint	xl = ((cp+cl) - (kp+kl)) ;
+			cint	xl = intconv((cp+cl) - (kp+kl)) ;
 			cchar	*xp = (kp+kl) ;
 			vl = sfnext(xp,xl,&vp) ;
 		    } /* end if (strwcmp) */

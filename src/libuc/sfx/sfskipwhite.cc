@@ -47,6 +47,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<char.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -78,7 +79,7 @@
 int sfskipwhite(cchar *sp,int sl,cchar **rpp) noex {
 	if (sl < 0) {
 	    while (CHAR_ISWHITE(*sp)) sp += 1 ;
-	    sl = strlen(sp) ;
+	    sl = xstrlen(sp) ;
 	} else {
 	    while (sl && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;

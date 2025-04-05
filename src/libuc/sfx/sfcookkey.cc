@@ -53,6 +53,7 @@
 #include	<usysdefs.h>
 #include	<ascii.h>
 #include	<strn.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -90,13 +91,13 @@ int sfcookkey(cchar *sp,int sl,cchar **rpp) noex {
 	cint		sch = CH_COOK ;
 	int		cl = -1 ;
 	cchar		*cp = nullptr ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if (sl >= 1) {
 	    cchar	*ss = "{}" ;
 	    cchar	*tp ;
 	    while ((tp = strnchr(sp,sl,sch)) != nullptr) {
-	        sl -= ((tp+1)-sp) ;
-	        sp = (tp+1) ;
+	        sl -= intconv((tp + 1) - sp) ;
+	        sp = (tp + 1) ;
 	        if (sl > 0) {
 	            if (sp[0] != sch) {
 	                cl = getkey(sp,sl,ss,&cp) ;
@@ -127,7 +128,7 @@ static int getkey(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	        sl -= 1 ;
 	        if ((tp = strnchr(sp,sl,ss[1])) != nullptr) {
 	            cp = sp ;
-	            cl = (tp-sp) ;
+	            cl = intconv(tp - sp) ;
 	        }
 	    } else {
 	        cp = sp ;

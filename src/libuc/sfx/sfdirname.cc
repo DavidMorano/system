@@ -65,6 +65,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -101,8 +102,8 @@
 
 int sfdirname(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
-	int		i ;
-	if (sl < 0) sl = strlen(sp) ;
+	int		i ; /* used-afterwards */
+	if (sl < 0) sl = xstrlen(sp) ;
 	while ((sl > 0) && (sp[sl - 1] == '/'))  {
 	    sl -= 1 ;
 	}

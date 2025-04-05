@@ -47,6 +47,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<estrings.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -84,7 +85,7 @@ int sfbaselib(cchar *pnp,int pnl,cchar **rpp) noex {
 	    pnl = cl ;
 	}
 	if ((tp = strnrchr(pnp,pnl,'.')) != nullptr) {
-	    pnl = (tp-pnp) ;
+	    pnl = intconv(tp - pnp) ;
 	}
 	if ((pnl > 3) && (strncmp(pnp,"lib",3) == 0)) {
 	    pnp += 3 ;

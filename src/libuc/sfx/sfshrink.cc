@@ -42,11 +42,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>		/* possible future use */
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -87,7 +89,7 @@ int sfshrink(cchar *sp,int sl,cchar **rpp) noex {
 	    while (CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	    }
-	    sl = strlen(sp) ;
+	    sl = xstrlen(sp) ;
 	} else {
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;

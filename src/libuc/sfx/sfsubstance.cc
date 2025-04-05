@@ -45,14 +45,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>		/* possible future use */
+#include	<ascii.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<char.h>
 #include	<mkchar.h>
-#include	<ascii.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -85,7 +87,7 @@ static bool	isnotours(int) noex ;
 
 int sfsubstance(cchar *sp,int sl,cchar **cpp) noex {
 	int		ch ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	while (sl > 0) {
 	    ch = mkchar(sp[0]) ;
 	    if (isnotours(ch)) break ;

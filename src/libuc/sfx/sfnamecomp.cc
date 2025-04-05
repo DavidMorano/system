@@ -48,6 +48,8 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>		/* possible fuure use */
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -93,7 +95,7 @@ static inline bool isleader(cchar *sp) noex {
 /* exported subroutines */
 
 int sfnamecomp(cchar *sp,int sl,cchar **rpp) noex {
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if (sl > 1) {
 	    while ((sl > 2) && isleader(sp)) {
 	        sp += 1 ;

@@ -63,8 +63,9 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<char.h>
 #include	<strn.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -131,14 +132,14 @@ int sub_sfxchr::operator () (cchar *sp,int sl,int sch,cchar **rpp) noex {
 	int		rl = -1 ;
 	cchar		*rp = nullptr ;
 	if (sp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (sl > 0) {
 	        while (sl && CHAR_ISWHITE(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        }
 	        if (cchar *tp ; (tp = fun(sp,sl,sch)) != nullptr) {
-	            sl = (tp - sp) ;
+	            sl = intconv(tp - sp) ;
 		    rp = sp ;
 	        }
 	        while (sl && CHAR_ISWHITE(sp[sl - 1])) {

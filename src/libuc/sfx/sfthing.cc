@@ -51,6 +51,7 @@
 #include	<usysdefs.h>
 #include	<ascii.h>
 #include	<strn.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -93,11 +94,11 @@ static bool	isour(int) noex ;
 int sfthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		cl = -1 ;
 	cchar		*cp = nullptr ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if (sl >= 4) {
 	    cchar	*tp ;
 	    while ((tp = strnchr(sp,sl,CH_THING)) != nullptr) {
-	        sl -= (tp - sp) ;
+	        sl -= intconv(tp - sp) ;
 	        sp = tp ;
 	        cl = getthing(sp,sl,ss,&cp) ;
 	        if (cl >= 0) break ;
@@ -119,17 +120,17 @@ static int getthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		cl = 0 ;
 	bool		f = false ;
 	cchar		*cp = nullptr ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if (sl > 0) {
 	    char	buf[3] ;
 	    buf[0] = '$' ;
 	    buf[1] = ss[0] ;
 	    buf[2] = '\0' ;
 	    if (cchar *tp ; (tp = strnsub(sp,sl,buf)) != nullptr) {
-	        cl = sl - ((tp + 2) - sp) ;
+	        cl = sl - intconv((tp + 2) - sp) ;
 	        cp = (tp + 2) ;
 	        if ((tp = strnchr(cp,cl,ss[1])) != nullptr) {
-	            cl = (tp - cp) ;
+	            cl = intconv(tp - cp) ;
 	            f = hasgood(cp,cl) ;
 	        }
 	    }

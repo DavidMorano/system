@@ -50,6 +50,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<strnxcmp.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -90,10 +91,10 @@ int sfsub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	if (sp && ss) {
 	    int		i = 0 ;
 	    f = true ;
-	    sslen = strlen(ss) ;
+	    sslen = xstrlen(ss) ;
 	    if (sslen > 0) {
 		f = false ;
-	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl < 0) sl = xstrlen(sp) ;
 	        if (sslen <= sl) {
 	            for (i = 0 ; i <= (sl-sslen) ; i += 1) {
 		        f = ((sslen == 0) || (sp[i] == ss[0])) ;

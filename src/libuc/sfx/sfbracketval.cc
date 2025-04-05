@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+	Name:
+	sfbracketval
+
+	Description:
 	We find a sub-string within brackets.
 
 *******************************************************************************/
@@ -64,9 +68,9 @@ int sfbracketval(cchar *sp,int sl,cchar **rpp) noex {
 	cchar		*cp3 ;
 	if ((cp2 = strnchr(sp,sl,'<')) != nullptr) {
 	    cp2 += 1 ;
-	    sl = (sp + sl) - cp2 ;
+	    sl = intconv((sp + sl) - cp2) ;
 	    if ((cp3 = strnchr(cp2,sl,'>')) != nullptr) {
-	        sl = cp3 - cp2 ;
+	        sl = intconv(cp3 - cp2) ;
 	    }
 	    sp = cp2 ;
 	} /* end if */

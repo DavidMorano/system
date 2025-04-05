@@ -47,11 +47,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>		/* possible future use */
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<char.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -84,7 +86,7 @@
 
 int sfsign(cchar *sp,int sl,cchar **rpp,bool *bp) noex {
 	bool		fneg = false ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;

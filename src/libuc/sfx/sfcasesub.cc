@@ -52,6 +52,7 @@
 #include	<nleadstr.h>		/* |nleadcasestr(3uc)| */
 #include	<toxc.h>
 #include	<char.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -86,10 +87,10 @@ int sfcasesub(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
 	if (sp && s2) {
 	    int		i = 0 ;
 	    f = true ;
-	    s2len = strlen(s2) ;
+	    s2len = xstrlen(s2) ;
 	    if (s2len > 0) {
 	        f = false ;
-	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl < 0) sl = xstrlen(sp) ;
 	        if (s2len <= sl) {
 	            cint	s2lead = CHAR_TOLC(s2[0]) ;
 	            for (i = 0 ; i <= (sl-s2len) ; i += 1) {

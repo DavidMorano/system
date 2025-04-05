@@ -53,6 +53,7 @@
 #include	<usysdefs.h>
 #include	<strn.h>
 #include	<char.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -84,9 +85,9 @@
 int sfkey(cchar *sp,int sl,cchar **rpp) noex {
 	int		kl = -1 ;
 	if (sp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
-	        kl = (tp - sp) ;
+	        kl = intconv(tp - sp) ;
 	        while ((kl > 0) && CHAR_ISWHITE(sp[kl - 1])) {
 	            kl -= 1 ;
 		}

@@ -42,6 +42,7 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -83,7 +84,7 @@ extern "C" {
 
 int sfnextqtok(cchar *sp,int sl,cchar **rpp) noex {
 	int		len = 0 ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	/* skip over whitespace */
 	while (sl && CHAR_ISWHITE(sp[0])) {
 	    sp += 1 ;

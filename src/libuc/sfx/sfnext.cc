@@ -204,7 +204,7 @@ sfnextx::operator int () noex {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
-	    rl = (sp - rp) ;
+	    rl = intconv(sp - rp) ;
 	    *rpp = rp ;
 	} /* end if (non-null) */
 	return rl ;
