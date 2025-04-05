@@ -308,7 +308,10 @@ int fifoitem_present(fifoitem *op,cv *sp,int sl,fifoitem_cmp scmp) noex {
 	int		rs1 ;
 	int		dl = 0 ;
 	if ((rs = fifoitem_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(ccharp(sp)) ;
+	    if (sl < 0) {
+		cchar	*cp = charp(sp) ;
+		sl = xstrlen(cp) ;
+	    }
 	    if (scmp == nullptr) scmp = fifoitem_cmp(strcmp) ;
 	    auto entcmp = [&sp,&sl,scmp] (FI_ENT *ep) {
 		bool f = true ;
@@ -338,7 +341,7 @@ int fifoitem_present(fifoitem *op,cv *sp,int sl,fifoitem_cmp scmp) noex {
 static int entry_start(fifoitem_ent *ep,cvoid *vp,int sl) noex {
 	int		rs ;
 	cchar		*sp = ccharp(vp) ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	ep->next = nullptr ;
 	ep->prev = nullptr ;
 	if (cvoid *dp ; (rs = uc_mallocbuf(sp,sl,&dp)) >= 0) {

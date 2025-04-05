@@ -296,12 +296,16 @@ int fifoelem_curend(FE *op,FE_CUR *cp) noex {
 }
 /* end subroutine (fifoelem_curend) */
 
-int fifoelem_present(fifoelem *op,cv *sp,int sl,fifoelem_cmp scmp) noex {
+int fifoelem_present(fifoelem *op,cv *vsp,int vsl,fifoelem_cmp scmp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		dl = 0 ;
-	if ((rs = fifoelem_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(ccharp(sp)) ;
+	if ((rs = fifoelem_magic(op,vsp)) >= 0) {
+	    int		sl = vsl ;
+	    cchar	*sp = charp(vsp) ;
+	    if (vsl < 0) {
+		sl = xstrlen(sp) ;
+	    }
 	    if (scmp == nullptr) scmp = fifoelem_cmp(strcmp) ;
 	    auto entcmp = [&sp,&sl,scmp] (FE_ENT *ep) {
 		bool f = true ;
@@ -332,7 +336,7 @@ static int entry_start(FE_ENT *ep,cvoid *vsp,int vsl) noex {
 	int		rs ;
 	if (vsl < 0) {
 	    cchar	*cp = charp(vsp) ;
-	    vsl = strlen(cp) ;
+	    vsl = xstrlen(cp) ;
 	}
 	ep->prev = ep->next = nullptr ;
 	cchar	*sp = charp(vsp) ;

@@ -82,7 +82,7 @@ int charq_ins(charq *op,int ch) noex {
 	if (op) {
 	    rs = SR_OVERFLOW ;
 	    if (op->count < op->sz) {
-	        op->buf[op->wi] = ch ;
+	        op->buf[op->wi] = charconv(ch) ;
 	        op->wi = ((op->wi + 1) % op->sz) ;
 	        op->count += 1 ;
 	        rs = op->count ;

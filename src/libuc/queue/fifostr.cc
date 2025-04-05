@@ -109,7 +109,7 @@ int fifostr_add(fifostr *op,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	if ((rs = fifostr_magic(op,sp)) >= 0) {
 	    fifostr_ent		*ep = nullptr ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    {
 	        cint	sz = szof(fifostr_ent) + (sl + 1) ;
 	        if ((rs = uc_libmalloc(sz,&ep)) >= 0) {
