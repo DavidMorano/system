@@ -229,8 +229,8 @@ static int fdliner_bufsize(fdliner *op,int mfd) noex {
 }
 /* end subroutine (fdliner_bufsize) */
 
-int fdliner::start(int mfd,off_t foff,int to) noex {
-	return fdliner_start(this,mfd,foff,to) ;
+int fdliner::start(int mfd,off_t off,int ato) noex {
+	return fdliner_start(this,mfd,off,ato) ;
 }
 
 int fdliner::getln(cchar **lpp) noex {

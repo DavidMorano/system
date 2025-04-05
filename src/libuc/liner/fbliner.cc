@@ -161,8 +161,8 @@ int fbliner_adv(fbliner *lsp,int inc) noex {
 }
 /* end subroutine (fbliner_adv) */
 
-int fbliner::start(filer *fbp,off_t off,int to) noex {
-	return fbliner_start(this,fbp,off,to) ;
+int fbliner::start(filer *p,off_t off,int ato) noex {
+	return fbliner_start(this,p,off,ato) ;
 }
 
 int fbliner::getln(cchar **lpp) noex {
