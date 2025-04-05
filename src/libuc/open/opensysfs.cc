@@ -309,7 +309,8 @@ static int opencfile(int w,int of,int ttl) noex {
 	        switch (w) {
 	        case OPENSYSFS_WREALNAME:
 	            if ((tp = strrchr(gfname,'.')) != nullptr) {
-	                rs = runmkpwi(w,gfname,(tp-gfname)) ;
+			cint	tl = intconv(tp - gfname) ;
+	                rs = runmkpwi(w,gfname,tl) ;
 	            }
 	            break ;
 	        default:

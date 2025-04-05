@@ -63,7 +63,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<ucgetpid.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -80,6 +79,8 @@
 
 #include	"opentmp.h"
 
+
+import uvariables ;
 
 /* local defines */
 
@@ -126,7 +127,7 @@ namespace {
 	mode_t		am ;
 	mode_t		om ;
 	bool		falloc = false ;
-	openmgr(int f,mode_t m,char *o) noex : of(f), om(m) { 
+	openmgr(int f,mode_t aom,char *o) noex : of(f), om(aom) { 
 	    obuf = o ;
 	    am = (om & S_IAMB) ;	/* isolate access-mode */
 	} ;
@@ -138,7 +139,7 @@ namespace {
 	int split(cchar *) noex ;
 	int dirload() noex ;
 	int loop() noex ;
-	int mkofname(ulong) noex ;
+	int mkofname() noex ;
 	int ofifo() noex ;
 	int odir() noex ;
 	int oreg() noex ;
@@ -382,7 +383,6 @@ int openmgr::obufend() noex {
 int openmgr::operator () (cchar *inname,int opt) noex {
 	int		rs ;
 	int		rs1 ;
-	int		fd = -1 ;
 	if ((rs = typeinit(opt)) >= 0) {
 	    if ((rs = setft()) >= 0) {
 	        if ((rs = split(inname)) >= 0) {
@@ -408,7 +408,7 @@ int openmgr::operator () (cchar *inname,int opt) noex {
 }
 /* end method (openmgr::operator) */
 
-int openmgr::mkofname(ulong rv) noex {
+int openmgr::mkofname() noex {
 	int		rs ;
 	if ((rs = pathadd(obuf,pl,basep,basel)) >= 0) {
 	    cint	bl = (rs - pl) ;
@@ -422,7 +422,8 @@ int openmgr::mkofname(ulong rv) noex {
 int openmgr::loop() noex {
 	int		rs = SR_OK ;
 	for (int c = 0 ; (rs >= 0) && (c < MAXLOOP) ; c += 1) {
-	    if ((rs = mkofname(rv++)) >= 0) {
+	    if ((rs = mkofname()) >= 0) {
+		rv += 1 ;
 		rs = (this->*m)() ;
 	    } /* end if (mkofname) */
 	    if (fd >= 0) break ;

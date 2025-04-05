@@ -323,8 +323,7 @@ int openqotd(cchar *pr,int mjd,int of,int to) noex {
 	                rs = qotdexpire(vtd,rnp,rnl,cn,dt,to) ;
 	            }
 	            if (rs >= 0) {
-			char	*qfname{} ;
-			if ((rs = malloc_mp(&qfname)) >= 0) {
+			if (char *qfname ; (rs = malloc_mp(&qfname)) >= 0) {
 			    auto	mk = mkqfname ;
 	                    if ((rs = mk(qfname,vtd,rnp,rnl,cn,mjd)) >= 0) {
 	                        {
@@ -411,8 +410,7 @@ static int openqotd_open(OPENQOTD_SUB *sip) noex {
 	    cchar	*qfname = sip->qfname ;
 	    cchar	*vtmpdname = sip->vtmpdname ;
 	    cchar	*qcname = sip->qcname ;
-	    char	*qdname{} ;
-	    if ((rs = malloc_mp(&qdname)) >= 0) {
+	    if (char *qdname ; (rs = malloc_mp(&qdname)) >= 0) {
 	        if ((rs = prmktmpdir(pr,qdname,vtmpdname,qcname,dm)) >= 0) {
 	            cint	mjd = sip->mjd ;
 	            cint	of = sip->of ;
@@ -452,15 +450,13 @@ static int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		*qdname{} ;
 	if (to <= 0) to = TTL_EXPIRE ;
-	if ((rs = malloc_mp(&qdname)) >= 0) {
+	if (char *qdname ; (rs = malloc_mp(&qdname)) >= 0) {
 	    if ((rs = mkqdname(qdname,vtd,rnp,rnl,cn)) >= 0) {
-	        USTAT	sb ;
-	        if ((rs = uc_stat(qdname,&sb)) >= 0) {
+	        if (USTAT sb ; (rs = uc_stat(qdname,&sb)) >= 0) {
 	            if (S_ISDIR(sb.st_mode)) {
-	                cint	n = (sb.st_size / 10) ;
-	                cint	cs = (sb.st_size / 4) ;
+	                cint	n = intconv(sb.st_size / 10) ;
+	                cint	cs = intconv(sb.st_size / 4) ;
 	                vecpstr	ds ;
 	                if ((rs = vecpstr_start(&ds,n,cs,0)) >= 0) {
 	                    if ((rs = qotdexpireload(&ds,qdname,dt,to)) > 0) {
@@ -494,14 +490,12 @@ static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		*ebuf{} ;
-	if ((rs = malloc_mn(&ebuf)) >= 0) {
-	    fsdir	d ;
-	    fsdir_ent	de ;
+	if (char *ebuf ; (rs = malloc_mn(&ebuf)) >= 0) {
 	    cint	elen = rs ;
-	    if ((rs = fsdir_open(&d,qfname)) >= 0) {
-	        USTAT	sb ;
-	        cint	dlen = strlen(qfname) ;
+	    if (fsdir d ; (rs = fsdir_open(&d,qfname)) >= 0) {
+	        fsdir_ent	de ;
+	        USTAT		sb ;
+	        cint		dlen = xstrlen(qfname) ;
 	        while ((rs = fsdir_read(&d,&de,ebuf,elen)) > 0) {
 	            cint	el = rs ;
 	            cchar	*ep = de.name ;
