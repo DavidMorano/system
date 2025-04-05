@@ -1,4 +1,5 @@
 /* strpack_envstore SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* packed-string object (add environment variable) */
@@ -47,6 +48,7 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"strpack.h"
@@ -92,10 +94,10 @@ int strpack_envstorer(SP *op,cc *kp,int kl,cc *vp,int vl,cc **rpp) noex {
 	int		len = 0 ;
 	if ((rs = strpack_magic(op,kp)) >= 0) {
 	    int		sz = 1 ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = xstrlen(kp) ;
 	    sz += (kl+1) ;
 	    if (vp) {
-	        if (vl < 0) vl = strlen(vp) ;
+	        if (vl < 0) vl = xstrlen(vp) ;
 	        sz += vl ;
 	    }
 	    if (char *ep{} ; (rs = uc_malloc(sz,&ep)) >= 0) {
@@ -104,8 +106,11 @@ int strpack_envstorer(SP *op,cc *kp,int kl,cc *vp,int vl,cc **rpp) noex {
 	            bp = strwcpy(bp,kp,kl) ;
 	            *bp++ = '=' ;
 	            bp = strwcpy(bp,vp,vl) ;
-	            rs = strpack_store(op,ep,(bp - ep),rpp) ;
-		    len = rs ;
+		    {
+			cint	tl = intconv(bp - ep) ;
+	                rs = strpack_store(op,ep,tl,rpp) ;
+		        len = rs ;
+		    }
 		}
 	        rs1 = uc_free(ep) ;
 		if (rs >= 0) rs = rs1 ;

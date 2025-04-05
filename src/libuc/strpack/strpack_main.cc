@@ -1,4 +1,5 @@
 /* strpack SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string pack object */
@@ -53,6 +54,7 @@
 #include	<usystem.h>
 #include	<vechand.h>
 #include	<strwcpy.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"strpack.h"
@@ -184,7 +186,7 @@ int strpack_finish(strpack *op) noex {
 int strpack_store(strpack *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	if ((rs = strpack_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    {
 	        strpack_ch	*chp = op->chp ;
 	        int		amount = (sl + 1) ;
