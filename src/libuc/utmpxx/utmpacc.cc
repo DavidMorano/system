@@ -495,14 +495,14 @@ int utmpacc::iinit() noex {
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
-	            int		rs = SR_OK ;
+	            int		rsl = SR_OK ;
 	            if (!finit) {
-		        rs = SR_LOCKLOST ;
+		        rsl = SR_LOCKLOST ;
 	            } else if (finitdone) {
-		        rs = 1 ;
+		        rsl = 1 ;
 	            }
-	            return rs ;
-	        } ; /* end lambda */
+	            return rsl ;
+	        } ; /* end lambda (lamb) */
 	        rs = tw(lamb) ;			/* <- time-watching */
 	    } /* end if (initialization) */
 	} /* end if (not-voided) */
@@ -824,7 +824,7 @@ int utmpacc::scan(time_t dt) noex {
 		break ;
 	    case UTMPACC_TBOOTTIME:
 		{
-	            btime.v = up->ut_tv.tv_sec ;
+	            btime.v = uint(up->ut_tv.tv_sec) ;
 	            btime.t = dt ;
 	        }
 		break ;
@@ -874,7 +874,7 @@ int utmpacc::getentsid(ARG *ap,pid_t sid) noex {
 		break ;
 	    case UTMPACC_TBOOTTIME:
 		{
-	            btime.v = up->ut_tv.tv_sec ;
+	            btime.v = uint(up->ut_tv.tv_sec) ;
 	            btime.t = ap->dt ;
 	        }
 		break ;
@@ -953,7 +953,7 @@ int utmpacc::getentline(ARG *ap,cchar *lp,int ll) noex {
 		break ;
 	    case UTMPACC_TBOOTTIME:
 		{
-	            btime.v = up->ut_tv.tv_sec ;
+	            btime.v = uint(up->ut_tv.tv_sec) ;
 	            btime.t = ap->dt ;
 	        }
 		break ;

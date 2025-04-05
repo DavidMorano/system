@@ -47,7 +47,7 @@
 #include	<utmpx.h>		/* |UTMPX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<storeitem.h>
 #include	<strwcpy.h>
@@ -129,13 +129,13 @@ int utmpaccent_size(cutmpaccent *uep) noex {
 	int		sz = 0 ;
 	if (uep) {
 	    if (uep->user) {
-	        sz += (strlen(uep->user)+1) ;
+	        sz += (xstrlen(uep->user) + 1) ;
 	    }
 	    if (uep->line) {
-	        sz += (strlen(uep->line)+1) ;
+	        sz += (xstrlen(uep->line) + 1) ;
 	    }
 	    if (uep->host) {
-	        sz += (strlen(uep->host)+1) ;
+	        sz += (xstrlen(uep->host) + 1) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;

@@ -57,6 +57,11 @@
 
 /* local variables */
 
+cint		lid = UTMPENT_LID ;
+cint		luser = UTMPENT_LUSER ;
+cint		lline = UTMPENT_LLINE ;
+cint		lhost = UTMPENT_LHOST ;
+
 
 /* exported variables */
 
@@ -85,7 +90,7 @@ int utmpent_finish(utmpent *op) noex {
 int utmpent_settype(utmpent *op,int type) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    op->ut_type = type ;
+	    op->ut_type = shortconv(type) ;
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -119,7 +124,8 @@ int utmpent_setsession(utmpent *op,int lines) noex {
 int utmpent_setid(utmpent *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = (strnwcpy(op->ut_id,UTMPENT_LID,sp,sl) - op->ut_id) ;
+	    char	*up = op->ut_id ;
+	    rs = intconv(strnwcpy(up,lid,sp,sl) - up) ;
 	}
 	return rs ;
 }
@@ -128,7 +134,8 @@ int utmpent_setid(utmpent *op,cchar *sp,int sl) noex {
 int utmpent_setline(utmpent *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = (strnwcpy(op->ut_line,UTMPENT_LLINE,sp,sl) - op->ut_line) ;
+	    char	*up = op->ut_line ;
+	    rs = intconv(strnwcpy(up,lline,sp,sl) - up) ;
 	}
 	return rs ;
 }
@@ -137,7 +144,8 @@ int utmpent_setline(utmpent *op,cchar *sp,int sl) noex {
 int utmpent_setuser(utmpent *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = (strnwcpy(op->ut_user,UTMPENT_LUSER,sp,sl) - op->ut_user) ;
+	    char	*up = op->ut_user ;
+	    rs = intconv(strnwcpy(up,luser,sp,sl) - up) ;
 	}
 	return rs ;
 }
@@ -146,7 +154,8 @@ int utmpent_setuser(utmpent *op,cchar *sp,int sl) noex {
 int utmpent_sethost(utmpent *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = (strnwcpy(op->ut_host,UTMPENT_LHOST,sp,sl) - op->ut_host) ;
+	    char	*up = op->ut_host ;
+	    rs = intconv(strnwcpy(up,lhost,sp,sl) - up) ;
 #if	CF_SYSLEN
 	    op->ut_syslen = rs ;
 #endif /* CF_SYSLEN */
@@ -189,7 +198,7 @@ int utmpent_getsession(utmpent *op) noex {
 int utmpent_getid(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = strnlen(op->ut_id,UTMPENT_LID) ;
+	    rs = xstrnlen(op->ut_id,UTMPENT_LID) ;
 	    if (rpp) *rpp = op->ut_id ;
 	}
 	return rs ;
@@ -199,7 +208,7 @@ int utmpent_getid(utmpent *op,cchar **rpp) noex {
 int utmpent_getline(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = strnlen(op->ut_line,UTMPENT_LLINE) ;
+	    rs = xstrnlen(op->ut_line,UTMPENT_LLINE) ;
 	    if (rpp) *rpp = op->ut_line ;
 	}
 	return rs ;
@@ -209,7 +218,7 @@ int utmpent_getline(utmpent *op,cchar **rpp) noex {
 int utmpent_getuser(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = strnlen(op->ut_user,UTMPENT_LUSER) ;
+	    rs = xstrnlen(op->ut_user,UTMPENT_LUSER) ;
 	    if (rpp) *rpp = op->ut_user ;
 	}
 	return rs ;
@@ -219,7 +228,7 @@ int utmpent_getuser(utmpent *op,cchar **rpp) noex {
 int utmpent_gethost(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = strnlen(op->ut_host,UTMPENT_LHOST) ;
+	    rs = xstrnlen(op->ut_host,UTMPENT_LHOST) ;
 #if	CF_SYSLEN
 	    if (op->ut_syslen > 0) {
 	        if (rs > op->ut_syslen) rs = op->ut_syslen ;
