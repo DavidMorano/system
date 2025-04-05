@@ -129,7 +129,7 @@ int mklogidsub(char *dbuf,int dlen,cchar *bname,int v) noex {
         	}
         	if (rs >= 0) {
         	    bp = bname ;
-        	    bl = strlen(bname) ;
+        	    bl = xstrlen(bname) ;
         	    if ((bl + 1 + vl) > dlen) {
         	        dmax = MAXDIG ;
         	        if (vl > dmax) {

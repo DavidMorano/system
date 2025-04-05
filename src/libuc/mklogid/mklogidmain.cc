@@ -44,7 +44,7 @@
 #include	<climits>		/* |INT_MAX| + |PID_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* for |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<sbuf.h>
@@ -148,7 +148,7 @@ int loghelp::valcvt(int maxdigs,int maxstrlen) noex {
 	int		rl = 0 ;
 	int		modval ;
 	char		dbuf[DIGBUFLEN + 1] ;
-	sl = strnlen(sp,sl) ;
+	sl = xstrnlen(sp,sl) ;
 	modval = (maxdigs < 10) ? ipow(10,maxdigs) : INT_MAX ;
 	val = (val % modval) ; /* limits the decimal part to 'maxdigs' */
 	if ((rs = ctdec(dbuf,dlen,val)) >= 0) {
