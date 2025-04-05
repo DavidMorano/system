@@ -57,6 +57,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| + |xstrcspn(3u)| */
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -115,7 +116,7 @@ int sibreak(cchar *sp,int sl,cchar *ss) noex {
 	        } /* end for */
 	    } /* end if_constexpr (f_strchr) */
 	} else {
-	    f = ((i = strcspn(sp,ss)) , (sp[i] != '\0')) ;
+	    f = ((i = xstrcspn(sp,ss)) , (sp[i] != '\0')) ;
 	}
 	return (f) ? i : -1 ;
 }

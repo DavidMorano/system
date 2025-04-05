@@ -56,14 +56,15 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<ascii.h>
-#include	<toxc.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<nleadstr.h>
+#include	<toxc.h>
 #include	<localmisc.h>
 
 #include	"six.h"
@@ -96,10 +97,10 @@ extern "C" {
 
 template<toxc_f toxc,nleadxstr_f nleadxstr>
 int sixsub(cchar *sp,int sl,cchar *ss) noex {
-	cint		sslen = strlen(ss) ;
+	cint		sslen = xstrlen(ss) ;
 	int		i{} ; /* used-afterwards */
 	bool		f = false ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if (sslen <= sl) {
 	    cint	sslead = toxc(ss[0]) ;
 	    int		m ;

@@ -95,10 +95,10 @@ int sicite(cchar *sp,int sl,cchar *ep,int el) noex {
 	cchar		*cp = sp ;
 	while ((tp = strnchr(cp,cl,'\\')) != nullptr) {
 	    if (strncmp((tp + 1),ep,el) == 0) {
-	        si = (tp - sp) ;
+	        si = intconv(tp - sp) ;
 	        break ;
 	    }
-	    cl -= ((tp + 1) - cp) ;
+	    cl -= intconv((tp + 1) - cp) ;
 	    cp = (tp + 1) ;
 	} /* end while */
 	return si ;

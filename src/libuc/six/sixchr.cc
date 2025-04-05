@@ -45,11 +45,12 @@
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -88,7 +89,7 @@ int sirchr(cchar *sp,int sl,int sch) noex {
 	bool		f = false ;
 	sch &= UCHAR_MAX ;
 	if (sp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    for (i = (sl-1) ; i >= 0 ; i -= 1) {
 	        cint	ch = mkchar(sp[i]) ;
 		if ((f = (ch == sch))) break ;

@@ -43,14 +43,15 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<mkchar.h>
-#include	<toxc.h>
 #include	<baops.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
+#include	<toxc.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"six.h"
@@ -79,7 +80,7 @@
 int siterm(cchar *sp,int sl,cchar *terms) noex {
 	int		i = 0 ;
 	bool		f = false ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
 	    f = batst(terms,ch) ;

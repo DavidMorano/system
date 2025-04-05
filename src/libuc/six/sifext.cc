@@ -50,6 +50,7 @@
 #include	<usysdefs.h>
 #include	<matstr.h>
 #include	<strn.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sifext.h"
@@ -59,6 +60,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -77,12 +81,12 @@
 
 int sifext(cchar *fp,int fl,mainv exts) noex {
 	int		si = -1 ;
-	if (fl < 0) fl = strlen(fp) ;
+	if (fl < 0) fl = xstrlen(fp) ;
 	if (cchar *tp ; (tp = strnrchr(fp,fl,'.')) != nullptr) {
-	    cint	el = ((fp+fl)-(tp+1)) ;
-	    cchar	*ep = (tp+1) ;
+	    cint	el = intconv((fp + fl) - (tp + 1)) ;
+	    cchar	*ep = (tp + 1) ;
 	    if ((el > 0) && (matstr(exts,ep,el) >= 0)) {
-	    	si = (tp-fp) ;
+	    	si = intconv(tp - fp) ;
 	    }
 	} /* end if(had extension) */
 	return si ;

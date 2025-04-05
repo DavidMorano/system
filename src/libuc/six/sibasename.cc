@@ -45,6 +45,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<ascii.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<toxc.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
@@ -56,6 +57,27 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
 /* exported variables */
 
 
@@ -63,7 +85,7 @@
 
 int sibasename(cchar *sp,int sl) noex {
 	int		si{} ; /* used-afterwards */
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	while ((sl > 0) && (sp[sl - 1] == '/'))  {
 	    sl -= 1 ;
 	}

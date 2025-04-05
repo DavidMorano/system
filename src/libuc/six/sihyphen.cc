@@ -48,6 +48,7 @@
 #include	<usysdefs.h>
 #include	<ascii.h>
 #include	<strn.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<toxc.h>
 #include	<localmisc.h>
 
@@ -56,11 +57,35 @@
 
 /* local defines */
 
+#ifndef	CF_STRNCHR
+#define	CF_STRNCHR	0		/* use |strnchr(3dam)| */
+#endif
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
 
 /* forward references */
 
 
 /* local variables */
+
+cbool		f_strnchr = CF_STRNCHR ;
 
 
 /* external subroutines */
@@ -68,35 +93,28 @@
 
 /* exported subroutines */
 
-#if	CF_STRNCHR
 int sihyphen(cchar *sp,int sl) noex {
 	int		si = 0 ;
 	bool		f = false ;
-	cchar		*tp ;
-	if (sl < 0) sl = strlen(sp) ;
-	while ((sl >= 2) && ((tp = strnchr(sp,sl,'-')) != nullptr) {
-	    si += (tp-sp) ;
-	    f = (((tp-sp)+1) < sl) && (tp[1] == '-') ;
-	    if (f) break ;
-	    si += 1 ;
-	    sl -= ((tp+1)-sp) ;
-	    sp = (tp+1) ;
-	} /* end while */
+	if (sl < 0) sl = xstrlen(sp) ;
+	if_constexpr (f_strnchr) {
+	    cchar	*tp ;
+	    while ((sl >= 2) && ((tp = strnchr(sp,sl,'-')) != nullptr)) {
+	        si += (tp-sp) ;
+	        f = (((tp-sp)+1) < sl) && (tp[1] == '-') ;
+	        if (f) break ;
+	        si += 1 ;
+	        sl -= ((tp+1)-sp) ;
+	        sp = (tp+1) ;
+	    } /* end while */
+	} else {
+	    for (si = 0 ; (si < (sl-1)) && sp[si] ; si += 1) {
+	        f = (sp[si] == '-') && (sp[si + 1] == '-') ;
+	        if (f) break ;
+	    } /* end for */
+	} /* end if_constexpr (f_strnchr) */
 	return (f) ? si : -1 ;
 }
 /* end subroutine (sihyphen) */
-#else /* CF_STRNCHR */
-int sihyphen(cchar *sp,int sl) noex {
-	int		i ; /* used-afterwards */
-	bool		f = false ;
-	if (sl < 0) sl = strlen(sp) ;
-	for (i = 0 ; (i < (sl-1)) && sp[i] ; i += 1) {
-	    f = (sp[i] == '-') && (sp[i + 1] == '-') ;
-	    if (f) break ;
-	} /* end for */
-	return (f) ? i : -1 ;
-}
-/* end subroutine (sihyphen) */
-#endif /* CF_STRNCHR */
 
 
