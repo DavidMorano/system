@@ -74,14 +74,18 @@
 
 template<int (*toxc)(int)>
 int sncpyxc(char *dbuf,int dlen,cchar *sp) noex {
+    	int		rl = SR_OVERFLOW ;
 	int		i = 0 ;
 	char		*dp = dbuf ;
 	if (dlen < 0) dlen = INT_MAX ;
 	while ((i < dlen) && sp[i]) {
-	    *dp++ = toxc(sp[i++]) ;
+	    *dp++ = charconv(toxc(sp[i++])) ;
 	}
 	*dp = '\0' ;
-	return (sp[i] == '\0') ? (dp - dbuf) : SR_OVERFLOW ;
+	if (sp[i] == '\0') {
+	    rl = intconv(dp - dbuf) ;
+	}
+	return rl ;
 }
 /* end subroutine-template (sncpyxc) */
 

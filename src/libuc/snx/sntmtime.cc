@@ -168,8 +168,8 @@ int sntmtime(char *dbuf,int dlen,tmtime *tmp,cchar *fmt) noex {
 static int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	int		rs = SR_FAULT ;
 	if (ssp && tmp) {
-	    cchar	*const *m = calstrs_months ;
-	    cchar	*const *d = calstrs_days ;
+	    mainv	monp = calstrs_months ;
+	    mainv	dayp = calstrs_days ;
 	    rs = SR_OK ;
 	    while ((rs >= 0) && *fmt) {
 	        int	ch = mkchar(*fmt++) ;
@@ -180,11 +180,11 @@ static int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	                rs = sbuf_chr(ssp,ch) ;
 	                break ;
 	            case 'a':
-	                rs = sbuf_strw(ssp,d[tmp->wday],3) ;
+	                rs = sbuf_strw(ssp,dayp[tmp->wday],3) ;
 	                break ;
 	            case 'b':
 	            case 'h':
-	                rs = sbuf_strw(ssp,m[tmp->mon],3) ;
+	                rs = sbuf_strw(ssp,monp[tmp->mon],3) ;
 	                break ;
 	            case 'C':
 	                {
@@ -203,26 +203,26 @@ static int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'I':
 	                {
-	                    int		h = (tmp->hour%12) ;
+	                    int		h = (tmp->hour % 12) ;
 	                    if (h == 0) h = 12 ;
 	                    rs = sbuf_twodig(ssp,h) ;
 	                }
 	                break ;
 	            case 'j':
-	                rs = sbuf_digs(ssp,(tmp->yday+1),3,0) ;
+	                rs = sbuf_digs(ssp,(tmp->yday + 1),3,0) ;
 	                break ;
 	            case 'k':
 	                rs = sbuf_digs(ssp,tmp->hour,2,1) ;
 	                break ;
 	            case 'l':
 	                {
-	                    int		h = (tmp->hour%12) ;
+	                    int		h = (tmp->hour % 12) ;
 	                    if (h == 0) h = 12 ;
 	                    rs = sbuf_digs(ssp,h,2,1) ;
 	                }
 	                break ;
 	            case 'm':
-	                rs = sbuf_twodig(ssp,(tmp->mon+1)) ;
+	                rs = sbuf_twodig(ssp,(tmp->mon + 1)) ;
 	                break ;
 	            case 'M':
 	                rs = sbuf_twodig(ssp,tmp->min) ;
@@ -326,8 +326,8 @@ static int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 
 static int sbuf_twodig(sbuf *ssp,int v) noex {
 	char		dbuf[2+1] ;
-	dbuf[0] = (v/10) + '0' ;
-	dbuf[1] = (v%10) + '0' ;
+	dbuf[0] = charconv((v/10) + '0') ;
+	dbuf[1] = charconv((v%10) + '0') ;
 	return sbuf_strw(ssp,dbuf,2) ;
 }
 /* end subroutine (sbuf_twodig) */
@@ -338,23 +338,19 @@ static int sbuf_digs(sbuf *ssp,int v,int n,int f_space) noex {
 	char		dbuf[3+1] ;
 	switch (n) {
 	case 1:
-	    dbuf[0] = (v%10) + '0' ;
+	    dbuf[0] = charconv((v % 10) + '0') ;
 	    break ;
 	case 2:
-	    ch = (v/10) + '0' ;
-	    dbuf[0] = ch ;
+	    ch = ((v / 10) + '0') ;
+	    dbuf[0] = charconv(ch) ;
 	    if ((ch == '0') && f_space) dbuf[0] = ' ' ;
-	    dbuf[1] = (v%10) + '0' ;
+	    dbuf[1] = charconv((v % 10) + '0') ;
 	    break ;
 	case 3:
 	    rs = ctdecpi(dbuf,n,n,v) ;
 	    if (f_space) {
-	        int	i ;
-	        for (i = 0 ; i < (n-1) ; i += 1) {
-	            if (dbuf[i] == '0') {
-			dbuf[i] = ' ' ;
-		    } else
-			break ;
+	        for (int i = 0 ; (i < (n - 1)) && (dbuf[i] == '0')  ; i += 1) {
+		    dbuf[i] = ' ' ;
 	        } /* end for */
 	    } /* end if (space) */
 	    break ;

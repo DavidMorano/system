@@ -128,8 +128,8 @@ int snflags_finish(snflags *op) noex {
 }
 /* end subroutine (snflags_finish) */
 
-int snflags::start(char *bp,int bl) noex {
-	return snflags_start(this,bp,bl) ;
+int snflags::start(char *bufp,int bufl) noex {
+	return snflags_start(this,bufp,bufl) ;
 }
 
 int snflags::addstr(cchar *sp) noex {

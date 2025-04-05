@@ -56,6 +56,7 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<sfx.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<toxc.h>
 #include	<localmisc.h>
 
@@ -84,15 +85,15 @@ int snabbr(char *dp,int dl,cchar *sp,int sl) noex {
 	    cchar	*cp{} ;
 	    rs = SR_OK ;
 	    if (dl < 0) dl = INT_MAX ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	        if (i < dl) {
-	            dp[i++] = touc(cp[0]) ;
+	            dp[i++] = chtouc(cp[0]) ; /* <- GCC conversion complaint */
 	        } else {
 		    rs = SR_OVERFLOW ;
 	        }
-	        sl -= ((cp+cl)-sp) ;
-	        sp = (cp+cl) ;
+	        sl -= intconv((cp + cl) - sp) ;
+	        sp = (cp + cl) ;
 	        if (rs < 0) break ;
 	    } /* end while */
 	    dp[i] = '\0' ;

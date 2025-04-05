@@ -110,11 +110,12 @@ int sncpy6w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,
 /* end subroutine (sncpy6w) */
 
 int sncpyxw(char *dp,int dl,int n,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
+	int		rl = 0 ;
 	char		*bp = dp ;
 	if (dl < 0) dl = (INT_MAX - 1) ;
 	if (dp) {
-	    va_list	ap ;
 	    size_t	rlen = (dl+1) ;
 	    va_begin(ap,n) ;
 	    rs = SR_OK ;
@@ -141,9 +142,10 @@ int sncpyxw(char *dp,int dl,int n,...) noex {
 		    rs = SR_OVERFLOW ;
 		}
 	    } /* end for */
+	    rl = intconv(bp - dp) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
-	return (rs >= 0) ? (bp - dp) : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (sncpyxw) */
 

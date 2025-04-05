@@ -149,7 +149,7 @@ int sninetaddr(char *dbuf,int dlen,int af,cchar *addr) noex {
 static int snunix(char *dbuf,int dlen,cchar *addr) noex {
 	int		rs ;
 	if_constexpr (f_cthexuc) {
-	    rs = strdcpy1(dbuf,dlen,addr) - dbuf ;
+	    rs = intconv(strdcpy1(dbuf,dlen,addr) - dbuf) ;
 	} else {
 	    rs = sncpy1(dbuf,dlen,addr) ;
 	}
