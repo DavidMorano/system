@@ -35,6 +35,8 @@ DEFS=
 
 INCS= ismisc.h
 
+MODS=
+
 LIBS=
 
 
@@ -66,7 +68,7 @@ OBJB_ISMISC= obj2_ismisc.o obj3_ismisc.o
 OBJ_ISMISC= $(OBJA_ISMISC) $(OBJB_ISMISC)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -92,9 +94,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_ISMISC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_ISMISC)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -115,16 +120,16 @@ control:
 
 
 obj0_ismisc.o:	$(OBJ0_ISMISC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_ISMISC)
 
 obj1_ismisc.o:	$(OBJ1_ISMISC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_ISMISC)
 
 obj2_ismisc.o:	$(OBJ2_ISMISC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_ISMISC)
 
 obj3_ismisc.o:	$(OBJ3_ISMISC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_ISMISC)
 
 
 isdotdir.o:		isdotdir.cc		$(INCS)
