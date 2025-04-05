@@ -48,6 +48,7 @@
 #include	<snx.h>
 #include	<getmjd.h>
 #include	<nistinfo.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"timestr.h"
@@ -113,7 +114,7 @@ char *timestr_nist(time_t t,nistinfo *nip,char *tbuf) noex {
 	                        if (tslp->tm_isdst) tt = 50 ;
 	                    }
 	                    if (nip->org[0] != '\0') {
-			        cint	ol = strlen(nip->org) ;
+			        cint	ol = xstrlen(nip->org) ;
 			        if (ol > olen) {
 			            nip->org[olen] = '\0' ;
 			        }

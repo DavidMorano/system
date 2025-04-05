@@ -68,8 +68,8 @@ char *timestr_elapsed(time_t t,char *rbuf) noex {
 	if (rbuf) {
 	    rs = SR_DOM ;
 	    if (t >= 0) {
-	        cuint	tmins = (t / 60) ;
-	        cuint	secs = (t % 60) ;
+	        cuint	tmins = uint(t / 60) ; /* conversion */
+	        cuint	secs = uint(t % 60) ; /* conversion */
 		{
 	            cuint	thours = (tmins / 60) ;
 	            cuint	mins = (tmins % 60) ;
