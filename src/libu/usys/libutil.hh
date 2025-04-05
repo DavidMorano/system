@@ -58,6 +58,13 @@ constexpr int xstrlen(cchar *sp) noex {
 }
 #endif /* SUBROUTINE_XSTRLEN */
 
+#ifndef	SUBROUTINE_XSTRCSPN
+#define	SUBROUTINE_XSTRCSPN
+constexpr int xstrcspn(cchar *sp,cchar *ss) noex {
+    	return intconv(strcspn(sp,ss)) ;
+}
+#endif	/* SUBROUTINE_XSTRCSPN */
+
 
 #endif /* __cplusplus */
 #endif /* LIBUTIL_INCLUDE */
