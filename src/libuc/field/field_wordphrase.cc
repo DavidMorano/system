@@ -161,7 +161,7 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	                            ll -= 1 ;
 		                    ch = mkchar(*lp) ;
 	                            if (flen > 0) {
-	                                *bp++ = ch ;
+	                                *bp++ = charconv(ch) ;
 	                                flen -= 1 ;
 	                            }
 	                            lp += 1 ;
@@ -172,7 +172,7 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	                            break ;
 	                        } else {
 	                            if (flen > 0) {
-	                                *bp++ = ch ;
+	                                *bp++ = charconv(ch) ;
 	                                flen -= 1 ;
 	                            }
 	                            lp += 1 ;
@@ -191,7 +191,7 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	                            break ;
 	                        } else {
 	                            if (flen > 0) {
-	                                *bp++ = ch ;
+	                                *bp++ = charconv(ch) ;
 	                                flen -= 1 ;
 	                            }
 	                            lp += 1 ;
@@ -203,14 +203,14 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	                    ll -= 1 ;
 		            ch = mkchar(*lp) ;
 	                    if (flen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        flen -= 1 ;
 	                    }
 	                    lp += 1 ;
 	                    ll -= 1 ;
 	                } else {
 	                    if (flen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        flen -= 1 ;
 	                    }
 	                    lp += 1 ;
@@ -230,7 +230,7 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	                lp += 1 ;
 	                ll -= 1 ;		/* skip over the terminator */
 	            } /* end if */
-	            fl = (bp - fbuf) ;
+	            fl = intconv(bp - fbuf) ;
 	        } /* end if (positive) */
 	        op->ll = ll ;
 	        op->lp = lp ;

@@ -164,7 +164,7 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	        if (batst(terms,ch)) break ;
 	        if (ch == '\"') {
 	            if (alen > 0) {
-	                *bp++ = ch ;
+	                *bp++ = charconv(ch) ;
 	                alen -= 1 ;
 	            }
 	            qe = ch ;
@@ -175,21 +175,21 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 		        if (ll > 1) nch = mkchar(lp[1]) ;
 	                if ((ch == '\\') && (ll > 1) && batst(doubles,nch)) {
 	                    if (alen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        alen -= 1 ;
 	                    }
 	                    lp += 1 ;
 	                    ll -= 1 ;
 	                    ch = mkchar(*lp) ;
 	                    if (alen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        alen -= 1 ;
 	                    }
 	                    lp += 1 ;
 	                    ll -= 1 ;
 	                } else if (ch == qe) {
 	                    if (alen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        alen -= 1 ;
 	                    }
 	                    lp += 1 ;
@@ -197,7 +197,7 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	                    break ;
 	                } else {
 	                    if (alen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        alen -= 1 ;
 	                    }
 	                    lp += 1 ;
@@ -206,7 +206,7 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	            } /* end while (processing the quoted portion) */
 	        } else if (ch == '\'') {
 	            if (alen > 0) {
-	                *bp++ = ch ;
+	                *bp++ = charconv(ch) ;
 	                alen -= 1 ;
 	            }
 	            qe = ch ;
@@ -216,7 +216,7 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	                ch = mkchar(*lp) ;
 	                if (ch == qe) {
 	                    if (alen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        alen -= 1 ;
 	                    }
 	                    lp += 1 ;
@@ -224,7 +224,7 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	                    break ;
 	                } else {
 	                    if (alen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        alen -= 1 ;
 	                    }
 	                    lp += 1 ;
@@ -240,14 +240,14 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 		        if (ll > 1) nch = mkchar(lp[1]) ;
 	                if ((ch == '\\') && (ll > 1) && batst(doubles,nch)) {
 	                    if (alen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        alen -= 1 ;
 	                    }
 	                    lp += 1 ;
 	                    ll -= 1 ;
 	                    ch = mkchar(*lp) ;
 	                    if (alen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        alen -= 1 ;
 	                    }
 	                    lp += 1 ;
@@ -258,7 +258,7 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	                    break ;
 	                } else {
 	                    if (alen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        alen -= 1 ;
 	                    }
 	                    lp += 1 ;
@@ -267,21 +267,21 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	            } /* end while (processing the quoted portion) */
 	        } else if ((ch == '\\') && (ll > 1)) {
 	            if (alen > 0) {
-	                *bp++ = ch ;
+	                *bp++ = charconv(ch) ;
 	                alen -= 1 ;
 	            }
 	            lp += 1 ;
 	            ll -= 1 ;
 	            ch = mkchar(*lp) ;
 	            if (alen > 0) {
-	                *bp++ = ch ;
+	                *bp++ = charconv(ch) ;
 	                alen -= 1 ;
 	            }
 	            lp += 1 ;
 	            ll -= 1 ;
 	        } else {
 	            if (alen > 0) {
-	                *bp++ = ch ;
+	                *bp++ = charconv(ch) ;
 	                alen -= 1 ;
 	            }
 	            lp += 1 ;
@@ -301,7 +301,7 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	        lp += 1 ;
 	        ll -= 1 ;
 	    } /* end while */
-	    fl = (bp - abuf) ;
+	    fl = intconv(bp - abuf) ;
 	    if_constexpr (f_trailwhite) {
 	        while ((fl > 0) && char_iswhite(abuf[fl - 1])) {
 		    fl -= 1 ;

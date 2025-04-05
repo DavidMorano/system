@@ -96,7 +96,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |xstrlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<baops.h>
@@ -165,7 +165,7 @@ int field_start(field *fsbp,cchar *lp,int ll) noex {
 	    fsbp->fp = nullptr ;
 	    fsbp->fl = 0 ;
 	    fsbp->term = '\0' ;
-	    if (ll < 0) ll = strlen(lp) ;
+	    if (ll < 0) ll = xstrlen(lp) ;
 	    while ((ll > 0) && char_iswhite(*lp)) {
 	        lp += 1 ;
 	        ll -= 1 ;
@@ -210,7 +210,7 @@ int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 			so.inc() ;
 	        	fp = so.sp ; 		/* save field address */
 			so.findchr(qe) ;
-	        	fl = (so.sp - fp) ;
+	        	fl = intconv(so.sp - fp) ;
 			so.inc() ;
 	    	    } else if (! batst(terms,ch)) {
 	        	fp = so.sp ;		/* save field address */
@@ -221,7 +221,7 @@ int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 			    if (char_iswhite(ch)) break ;
 			    so.inc() ;
 	        	} /* end while */
-	        	fl = (so.sp - fp) ;
+	        	fl = intconv(so.sp - fp) ;
 		    } /* end if (processing a field) */
 	    	    if ((so.sl > 0) && char_iswhite(*so.sp)) {
 	                chterm = ' ' ;
@@ -267,7 +267,7 @@ int field_getterm(field *fsbp,cchar *terms,cchar **fpp) noex {
 	        	fp = so.sp ; 		/* save field address */
 			so.inc() ;
 			so.findterm(terms) ;
-	        	fl = (so.sp - fp) ;
+	        	fl = intconv(so.sp - fp) ;
 	            } /* end if (processing a field) */
 	            ch = mkchar(*so.sp) ;
 	            if ((so.sl > 0) && batst(terms,ch)) {
@@ -319,7 +319,7 @@ int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 			            so.inc() ;
 	                            ch = mkchar(*so.sp) ;
 	                            if (flen > 0) {
-	                                *bp++ = ch ;
+	                                *bp++ = charconv(ch) ;
 	                                flen -= 1 ;
 	                            }
 			            so.inc() ;
@@ -328,7 +328,7 @@ int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 	                            break ;
 	                        } else {
 	                            if (flen > 0) {
-	                                *bp++ = ch ;
+	                                *bp++ = charconv(ch) ;
 	                                flen -= 1 ;
 	                            }
 			            so.inc() ;
@@ -344,7 +344,7 @@ int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 	                            break ;
 	                        } else {
 	                            if (flen > 0) {
-	                                *bp++ = ch ;
+	                                *bp++ = charconv(ch) ;
 	                                flen -= 1 ;
 	                            }
 			            so.inc() ;
@@ -354,13 +354,13 @@ int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 		            so.inc() ;
 	                    ch = mkchar(*so.sp) ;
 	                    if (flen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        flen -= 1 ;
 	                    }
 			    so.inc() ;
 	                } else {
 	                    if (flen > 0) {
-	                        *bp++ = ch ;
+	                        *bp++ = charconv(ch) ;
 	                        flen -= 1 ;
 	                    }
 			    so.inc() ;
@@ -375,7 +375,7 @@ int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 		            so.inc() ;
 	                } /* end if */
 	            } /* end if (positive) */
-	            fl = (bp - fbuf) ;
+	            fl = intconv(bp - fbuf) ;
 	            *bp = '\0' ;
 	        } else {
 		    fl = SR_NOTFOUND ;

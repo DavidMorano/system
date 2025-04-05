@@ -125,7 +125,7 @@ int field_word(field *op,cchar *terms,cchar **fpp) noex {
 	                lp += 1 ;
 	                ll -= 1 ;
 	            } /* end while */
-	            fl = (lp - fp) ;
+	            fl = intconv(lp - fp) ;
 	            if ((ll > 0) && CHAR_ISWHITE(*lp)) {
 	                chterm = ' ' ;
 	                while ((ll > 0) && CHAR_ISWHITE(*lp)) {
