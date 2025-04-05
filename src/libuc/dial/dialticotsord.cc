@@ -106,7 +106,7 @@ struct subinfo {
 
 /* forward references */
 
-static int	makeconn(SUBINFO *,cchar *,int,int) noex ;
+static int	makeconn(subinfo *,cchar *,int,int) noex ;
 
 #if	CF_PUSHMOD
 static int	pushmod(int,cchar *) noex ;
@@ -148,7 +148,7 @@ int dialticotsord(cchar *abuf,int alen,int to,int opts) noex {
 	        } /* end if */
 	        /* try to connect to the remote machine */
 	        if (rs >= 0) {
-	            if (SUBINFO g ; (rs = makeconn(&g,abuf,alen,to)) >= 0) {
+	            if (subinfo g ; (rs = makeconn(&g,abuf,alen,to)) >= 0) {
 	                fd = rs ;
 	            }
 	        }
@@ -162,7 +162,7 @@ int dialticotsord(cchar *abuf,int alen,int to,int opts) noex {
 
 /* local subroutines */
 
-static int makeconn(SUBINFO *gp,cchar addr[],int alen,int to) noex {
+static int makeconn(subinfo *gp,cchar addr[],int alen,int to) noex {
 	int		rs = SR_FAULT ;
 	int		fd = -1 ;
 	if (gp) {
