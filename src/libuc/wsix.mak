@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gxx
@@ -101,7 +100,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJWSIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJWSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJWSIX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -122,32 +121,32 @@ control:
 
 
 obj0_sfx.o:		$(OBJ0WSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0WSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0WSIX)
 
 obj1_sfx.o:		$(OBJ1WSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1WSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1WSIX)
 
 obj2_sfx.o:		$(OBJ2WSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2WSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2WSIX)
 
 obj3_sfx.o:		$(OBJ3WSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3WSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3WSIX)
 
 obj4_sfx.o:		$(OBJ4WSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4WSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4WSIX)
 
 obj5_sfx.o:		$(OBJ5WSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5WSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5WSIX)
 
 
 obja.o:			$(OBJAWSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJAWSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJAWSIX)
 
 objb.o:			$(OBJBWSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJBWSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJBWSIX)
 
 objc.o:			$(OBJCWSIX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJCWSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJCWSIX)
 
 
 wsinul.o:		wsinul.cc	$(INCS)
