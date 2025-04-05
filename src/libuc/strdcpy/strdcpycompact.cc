@@ -58,8 +58,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>		/* <- |strlen(3c)| */
-#include	<algorithm>		/* <- |min(3c++)| */
+#include	<cstring>		/* |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -67,7 +67,9 @@
 #include	<ascii.h>
 #include	<sfx.h>
 #include	<strmgr.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<nleadstr.h>
+#include	<localmisc.h>
 
 #include	"strdcpy.h"
 
@@ -78,6 +80,7 @@
 /* imported namespaces */
 
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* external subroutines */
@@ -103,13 +106,12 @@ using std::min ;			/* subroutine-template */
 char *strdcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	char		*rp = nullptr ;
 	if (dbuf && sp) {
-	    strmgr	m ;
 	    int		rs ;
 	    int		rs1 ;
 	    int		dl = 0 ;
 	    if (dlen < 0) dlen = INT_MAX ;
-	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
+	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (strmgr m ; (rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
 		int	cl ;
 	        cchar	*cp{} ;
 	        while ((cl = sfnext(sp,sl,&cp)) > 0) {
@@ -130,7 +132,7 @@ char *strdcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 			    }
 		        }
 	            }
-	            sl -= ((cp+cl) - sp) ;
+	            sl -= intconv((cp+cl) - sp) ;
 	            sp = (cp+cl) ;
 	            if (rs < 0) break ;
 	        } /* end while (looping through string pieces) */
