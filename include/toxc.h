@@ -42,16 +42,16 @@ inline int tofc(int ch) noex {
 	return CHAR_TOFC(ch) ;
 }
 
-inline int chtobc(int ch) noex {
+inline char chtobc(int ch) noex {
 	return char(ch) ;
 }
-inline int chtolc(int ch) noex {
+inline char chtolc(int ch) noex {
 	return char(CHAR_TOLC(ch)) ;
 }
-inline int chtouc(int ch) noex {
+inline char chtouc(int ch) noex {
 	return char(CHAR_TOUC(ch)) ;
 }
-inline int chtofc(int ch) noex {
+inline char chtofc(int ch) noex {
 	return char(CHAR_TOFC(ch)) ;
 }
 
