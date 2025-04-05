@@ -100,7 +100,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_WSNX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_WSNX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -121,32 +121,32 @@ control:
 
 
 obj0_sfx.o:		$(OBJ0_WSNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_WSNX)
 
 obj1_sfx.o:		$(OBJ1_WSNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_WSNX)
 
 obj2_sfx.o:		$(OBJ2_WSNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_WSNX)
 
 obj3_sfx.o:		$(OBJ3_WSNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_WSNX)
 
 obj4_sfx.o:		$(OBJ4_WSNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_WSNX)
 
 obj5_sfx.o:		$(OBJ5_WSNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_WSNX)
 
 
 obja.o:			$(OBJA_WSNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_WSNX)
 
 objb.o:			$(OBJB_WSNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_WSNX)
 
 objc.o:			$(OBJC_WSNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_WSNX)
 
 
 wsncols.o:		wsncols.cc		$(INCS)
