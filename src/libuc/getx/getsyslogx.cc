@@ -40,7 +40,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/syslog.h>		/* for LOG_XXX numbers */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -84,36 +83,36 @@ struct logitem {
 /* local variables */
 
 constexpr logitem	logfacs[] = {
-	{ "kernel", LOG_KERN },
-	{ "user", LOG_USER },
-	{ "mail", LOG_MAIL },
-	{ "daemon", LOG_DAEMON },
-	{ "auth", LOG_AUTH },
-	{ "syslog", LOG_SYSLOG },
-	{ "lpr", LOG_LPR },
-	{ "news", LOG_NEWS },
-	{ "uucp", LOG_UUCP },
-	{ "cron", LOG_CRON },
-	{ "local0", LOG_LOCAL0 },
-	{ "local1", LOG_LOCAL1 },
-	{ "local2", LOG_LOCAL2 },
-	{ "local3", LOG_LOCAL3 },
-	{ "local4", LOG_LOCAL4 },
-	{ "local5", LOG_LOCAL5 },
-	{ "local6", LOG_LOCAL6 },
-	{ "local7", LOG_LOCAL7 },
+	{ "kernel",	LOG_KERN },
+	{ "user",	LOG_USER },
+	{ "mail",	LOG_MAIL },
+	{ "daemon",	LOG_DAEMON },
+	{ "auth",	LOG_AUTH },
+	{ "syslog",	LOG_SYSLOG },
+	{ "lpr",	LOG_LPR },
+	{ "news",	LOG_NEWS },
+	{ "uucp",	LOG_UUCP },
+	{ "cron",	LOG_CRON },
+	{ "local0",	LOG_LOCAL0 },
+	{ "local1",	LOG_LOCAL1 },
+	{ "local2",	LOG_LOCAL2 },
+	{ "local3",	LOG_LOCAL3 },
+	{ "local4",	LOG_LOCAL4 },
+	{ "local5",	LOG_LOCAL5 },
+	{ "local6",	LOG_LOCAL6 },
+	{ "local7",	LOG_LOCAL7 },
 	{ nullptr, 0 }
 } ;
 
 constexpr logitem	logpris[] = {
-	{ "emergency", LOG_EMERG },
-	{ "alert", LOG_ALERT },
-	{ "critical", LOG_CRIT },
-	{ "error", LOG_ERR },
-	{ "warning", LOG_WARNING },
-	{ "notice", LOG_NOTICE },
+	{ "emergency",	LOG_EMERG },
+	{ "alert",	LOG_ALERT },
+	{ "critical",	LOG_CRIT },
+	{ "error",	LOG_ERR },
+	{ "warning",	LOG_WARNING },
+	{ "notice",	LOG_NOTICE },
 	{ "information", LOG_INFO },
-	{ "debug", LOG_DEBUG },
+	{ "debug",	LOG_DEBUG },
 	{ nullptr, 0 }
 } ;
 
@@ -132,7 +131,7 @@ int getsyslogfac(cchar *sp,int sl) noex {
 	if ((sl < 0) || (sl > FACNAMELEN)) {
 	    sl = FACNAMELEN ;
 	}
-	if (int nlen ; (nlen = (strwcpylc(nbuf,sp,sl) - nbuf)) > 0) {
+	if (int nlen ; (nlen = intconv(strwcpylc(nbuf,sp,sl) - nbuf)) > 0) {
 	    int		i ; /* used-afterwards */
 	    int		m ;
 	    bool	f = false ;
@@ -163,7 +162,7 @@ int getsyslogpri(cchar *sp,int sl) noex {
 	if ((sl < 0) || (sl > PRINAMELEN)) {
 	    sl = PRINAMELEN ;
 	}
-	if (int nlen ; (nlen = (strwcpylc(nbuf,sp,sl) - nbuf)) > 0) {
+	if (int nlen ; (nlen = intconv(strwcpylc(nbuf,sp,sl) - nbuf)) > 0) {
 	    cint	ch = mkchar(nbuf[0]) ;
 	    if (isdigitlatin(ch)) {
 	        if ((rs = cfdeci(nbuf,nlen,&val)) >= 0) {

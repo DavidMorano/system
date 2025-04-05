@@ -88,7 +88,7 @@ int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 		custime		dt = time(nullptr) ;
 		TM		tmo ;
 	 	if ((rs = uc_localtime(&dt,&tmo)) >= 0) {
-	            zip->zoff = (tmo.tm_gmtoff / 60) ;
+	            zip->zoff = intconv(tmo.tm_gmtoff / 60) ;
 	            zp = tmo.tm_zone ;
 		}
 	    } else {
@@ -111,8 +111,8 @@ int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 }
 /* end subroutine (getdefzdata) */
 
-int defzdata::get(char *zbuf,int zlen,int isdst) noex {
-	return getdefzdata(this,zbuf,zlen,isdst) ;
+int defzdata::get(char *zbuf,int zlen,int dst) noex {
+	return getdefzdata(this,zbuf,zlen,dst) ;
 }
 
 

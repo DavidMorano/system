@@ -75,17 +75,16 @@
 
 int getpassword(cchar *prompt,char *passbuf,int passlen) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		rlen = 0 ;
 	if (prompt && passbuf) {
 	    if ((rs = u_open(TTYFNAME,O_RDWR,0666)) >= 0) {
-	        TERMIOS	oterm ;
-	        TERMIOS	nterm ;
 	        cint	fd = rs ;
-	        if ((rs = uc_tcattrget(fd,&oterm)) >= 0) {
-		    nterm = oterm ;
+	        if (TERMIOS oterm ; (rs = uc_tcattrget(fd,&oterm)) >= 0) {
+	            TERMIOS	nterm = oterm ;
 		    nterm.c_lflag &= (~ ECHO) ;
 	            if ((rs = uc_tcattrset(fd,TCSADRAIN,&nterm)) >= 0) {
-	                cint	pl = strlen(prompt) ;
+	                cint	pl = xstrlen(prompt) ;
 	                if ((rs = uc_write(fd,prompt,pl)) >= 0) {
 	                    passbuf[0] = '\0' ;
 	                    rs = u_read(fd,passbuf,passlen) ;
@@ -94,7 +93,8 @@ int getpassword(cchar *prompt,char *passbuf,int passlen) noex {
 	    	        uc_tcattrset(fd,TCSADRAIN,&oterm) ; /* try! */
 	            } /* end if (terminal attributes) */
 	        } /* end if (get-term-attributes) */
-	        u_close(fd) ;
+	        rs1 = u_close(fd) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (open) */
 	    if ((rs >= 0) && (rlen > 0)) {
 	        if (iseol(passbuf[rlen - 1])) {

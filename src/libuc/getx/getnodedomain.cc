@@ -373,7 +373,7 @@ static int try_inituname(TRY *tip) noex {
 	    tip->f.inituname = true ;
 	    if (uinfo_names uin ; (rs = uinfo_name(&uin)) >= 0) {
 	        cchar	*sp = uin.nodename ;
-	        int	sl = strlen(uin.nodename) ;
+	        int	sl = xstrlen(uin.nodename) ;
 	        if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	            tip->f.uname = true ;
 	            tip->sysnodename = cp ;
@@ -460,7 +460,7 @@ static int try_varlocaldomain(TRY *tip) noex {
 	    while (*sp && (! CHAR_ISWHITE(*sp)) && (*sp != ':')) {
 	        sp += 1 ;
 	    }
-	    if ((cl = (sp - cp)) > 0) {
+	    if ((cl = intconv(sp - cp)) > 0) {
 		cint	dlen = tip->dlen ;
 	        rs = snwcpy(tip->domainname,dlen,cp,cl) ;
 		len = rs ;
@@ -631,7 +631,7 @@ static int try_guess(TRY *tip) noex {
 	        rs = 0 ;
 	        for (int i = 0 ; ga[i].name ; i += 1) {
 	            cchar	*gnp = ga[i].name ;
-		    cint	gnl = strlen(ga[i].name) ;
+		    cint	gnl = xstrlen(ga[i].name) ;
 	            if (int m ; (m = nleadstr(gnp,nn,-1)) >= gnl) {
 	                if (m > m_max) {
 	                    m_max = m ;

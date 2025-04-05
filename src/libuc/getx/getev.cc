@@ -50,6 +50,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<matkeystr.h>
 
 #include	"getev.h"
@@ -86,7 +87,7 @@ int getev(mainv envv,cchar *kp,int kl,cchar **rpp) noex {
 	        if (int ei ; (ei = matkeystr(envv,kp,kl)) >= 0) {
 	            if ((vp = strchr(envv[ei],'=')) != nullptr) {
 	                vp += 1 ;
-	                vl = strlen(vp) ;
+	                vl = xstrlen(vp) ;
 	            }
 	        } else {
 	            rs = SR_NOTFOUND ;

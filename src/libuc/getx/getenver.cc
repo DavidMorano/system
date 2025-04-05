@@ -50,6 +50,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<libutil.hh>
 #include	<strn.h>
 #include	<matkeystr.h>
 
@@ -78,9 +79,9 @@ extern mainv	environ ;
 cchar *getenver(cchar *kp,int kl) noex {
 	cchar		*vp = nullptr ;
 	if (kp) {
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = xstrlen(kp) ;
 	    if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
-		kl = (tp-kp) ;
+		kl = intconv(tp - kp) ;
 	    }
 	    if (int ei ; (ei = matkeystr(environ,kp,kl)) >= 0) {
 	        if ((vp = strchr(environ[ei],'=')) != nullptr) {

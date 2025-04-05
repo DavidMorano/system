@@ -72,7 +72,6 @@
 #include	<cstring>
 #include	<pwd.h>
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>
@@ -182,8 +181,7 @@ int getuserhome(char *rbuf,int rlen,cchar *un) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (un[0]) {
-	        SUBINFO		si ;
-	        if ((rs = subinfo_start(&si,un)) >= 0) {
+	        if (subinfo si ; (rs = subinfo_start(&si,un)) >= 0) {
 	            for (int i = 0 ; gethomes[i] ; i += 1) {
 	                rs = (*gethomes[i])(&si,rbuf,rlen) ;
 	                rl = rs ;

@@ -44,11 +44,13 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<uvariables.hh>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"getdig.h"
 
+
+import uvariables ;
 
 /* local defines */
 
@@ -73,7 +75,7 @@
 
 /* local variables */
 
-static cint	maxbase = strlen(sysword.w_digtab) ;
+static cint	maxbase = xstrlen(sysword.w_digtab) ;
 
 
 /* exported variables */

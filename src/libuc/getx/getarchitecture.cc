@@ -40,7 +40,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<ucsysauxinfo.h>	/* |usysauxinforeq_architecture| */
 #include	<sfx.h>
 #include	<snwcpy.h>
@@ -49,6 +48,8 @@
 
 #include	"getarchitecture.h"
 
+
+import uvariables ;
 
 /* local defines */
 

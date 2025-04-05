@@ -45,7 +45,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |xstrlen(3c)| */
 #include	<usystem.h>
 #include	<stdfnames.h>
 #include	<cfdec.h>
@@ -89,7 +89,7 @@ int getfdfilex(cchar *fp,int fl) noex {
 	int 		fd = -1 ;
 	if (fp) {
 	    rs = SR_INVALID ;
-	    if (fl < 0) fl = strlen(fp) ;
+	    if (fl < 0) fl = xstrlen(fp) ;
 	    if ((fl > 0) && fp[0]) {
 		rs = SR_DOM ;
 		if ((fl >= 2) && isstar(fp[0])) {
@@ -123,7 +123,7 @@ int getfdfilex(cchar *fp,int fl) noex {
 static int extfd(cchar *sp,int sl) noex {
 	int		rs = SR_DOM ;
 	int		fd = -1 ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if ((sl > 0) && isstar(*sp)) {
 	   rs = SR_BADFD ;
 	   sp += 1 ;

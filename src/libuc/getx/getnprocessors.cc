@@ -45,7 +45,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* <- for |getenv(3c)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<getourenv.h>
 #include	<cfdec.h>
 #include	<isnot.h>
@@ -53,6 +52,8 @@
 
 #include	"getnprocessors.h"
 
+
+import uvariables ;
 
 /* local defines */
 

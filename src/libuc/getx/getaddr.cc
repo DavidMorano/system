@@ -103,6 +103,7 @@ constexpr addrfamily	addrfamilies[] = {
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
+cint			afnamelen = AFNAMELEN ;
 
 /* exported variables */
 
@@ -114,8 +115,8 @@ int getaddrfamily(cchar *name) noex {
 	int		m_max = 0 ;
 	int		si = -1 ;
 	int		cnamelen ;
-	char		cname[AFNAMELEN + 1] ;
-	cnamelen = strwcpylc(cname,name,AFNAMELEN) - cname ;
+	char		cname[afnamelen + 1] ;
+	cnamelen = intconv(strwcpylc(cname,name,afnamelen) - cname) ;
 	for (int i = 0 ; afs[i].name ; i += 1) {
 	    cchar	*anp = afs[i].name ;
 	    if (int m ; (m = nleadstr(anp,cname,cnamelen)) >= 2) {

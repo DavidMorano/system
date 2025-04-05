@@ -63,7 +63,7 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |strlen(3c)| + |strcmp(3c)| */
+#include	<cstring>		/* <- |xstrlen(3c)| + |strcmp(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
@@ -233,7 +233,7 @@ static int subinfo_domain(SUBINFO *mip) noex {
 	    if ((rs = malloc_hn(&dbuf)) >= 0) {
 	        if ((rs = getnodedomain(nullptr,dbuf)) >= 0) {
 	            cchar	*dp{} ;
-	            len = strlen(dbuf) ;
+	            len = xstrlen(dbuf) ;
 	            if ((rs = uc_mallocstrw(dbuf,len,&dp)) >= 0) {
 	                mip->domainname = dp ;
 		    }
@@ -242,7 +242,7 @@ static int subinfo_domain(SUBINFO *mip) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
-	    len = strlen(mip->domainname) ;
+	    len = xstrlen(mip->domainname) ;
 	}
 	return (rs >= 0) ? len : rs ;
 }
@@ -334,7 +334,7 @@ static int try_rem(SUBINFO *mip) noex {
 	            if ((rs = subinfo_domain(mip)) >= 0) {
 	                rs = SR_NOTFOUND ;
 	                if (isindomain(aip->hostname,mip->domainname)) {
-	                    int		hl = (tp - aip->hostname) ;
+	                    int		hl = intconv(tp - aip->hostname) ;
 			    cchar	*hn = aip->hostname ;
 			    if (char *hbuf{} ; (rs = malloc_hn(&hbuf)) >= 0) {
 				cint	hlen = rs ;
@@ -376,10 +376,9 @@ static int try_remlocal(SUBINFO *mip) noex {
 		const nullptr_t		np{} ;
 	        if (cchar *tp ; (tp = strchr(aip->hostname,'.')) != np) {
 	            if (isindomain(aip->hostname,LOCALDOMAINNAME)) {
-	                int	hl = (tp - aip->hostname) ;
+	                int	hl = intconv(tp - aip->hostname) ;
 			cchar	*hn = aip->hostname ;
-	                char	*hbuf{} ;
-			if ((rs = malloc_hn(&hbuf)) >= 0) {
+	                if (char *hbuf ; (rs = malloc_hn(&hbuf)) >= 0) {
 			    cint	hlen = rs ;
 			    char	*bp = hbuf ;
 	    		    if (mip->ehostname != nullptr) {

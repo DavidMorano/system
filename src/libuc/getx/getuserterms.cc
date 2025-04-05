@@ -167,7 +167,7 @@ int userterms::start() noex {
 	if ((rs = vecobj_start(&el,osz,vn,vo)) >= 0) {
 	    if ((rs = malloc_mp(&tbuf)) >= 0) {
 		tlen = rs ;
-		tl = strwcpy(tbuf,DEVDNAME) - tbuf ;
+		tl = intconv(strwcpy(tbuf,DEVDNAME) - tbuf) ;
 	    }
 	    if (rs < 0) {
 		vecobj_finish(&el) ;
@@ -238,7 +238,7 @@ int userterms::proc() noex {
 	            f = f || (ue.ut_type != TMPX_TPROCUSER) ;
 	            f = f || (ue.ut_line[0] == '\0') ;
 		    if (f) continue ;
-	            rl = strwcpy(bp,ue.ut_line,lline) - tbuf ;
+	            rl = intconv(strwcpy(bp,ue.ut_line,lline) - tbuf) ;
 		    if (time_t tia{} ; (rs = getatime(tbuf,&tia)) >= 0) {
 	                TE	te ;
 	                if ((rs = terment_start(&te,tbuf,rl,tia)) >= 0) {

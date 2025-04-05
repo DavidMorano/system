@@ -100,7 +100,7 @@ int getprogpath(ids *idp,vecstr *plp,char *rbuf,cchar *pnp,int pnl) noex {
 	     rs = SR_INVALID ;
 	     rbuf[0] = '\0' ;
 	     if (pnp[0]) {
-	         if (pnl < 0) pnl = strlen(pnp) ;
+	         if (pnl < 0) pnl = xstrlen(pnp) ;
 	         while ((pnl > 0) && (pnp[pnl-1] == '/')) {
 	             pnl -= 1 ;
 	         }

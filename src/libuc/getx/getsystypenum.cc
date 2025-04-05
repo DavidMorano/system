@@ -147,7 +147,7 @@ static int getfield(cchar *sp,int n,cchar **rpp) noex {
 	while ((tp = strchr(sp,'.')) != nullptr) {
 	    if (i == n) {
 		cp = sp ;
-		cl = (tp - sp) ;
+		cl = intconv(tp - sp) ;
 		break ;
 	    }
 	    sp = (tp+1) ;
@@ -155,7 +155,7 @@ static int getfield(cchar *sp,int n,cchar **rpp) noex {
 	} /* end if */
 	if ((cp == nullptr) && sp[0] && (i == n)) {
 	    cp = sp ;
-	    cl = strlen(sp) ;
+	    cl = xstrlen(sp) ;
 	}
 	if (rpp) {
 	    *rpp = cp ;

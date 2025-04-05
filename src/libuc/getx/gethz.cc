@@ -56,13 +56,14 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
-#include	<uvariables.hh>		/* |varname(3u)| */
 #include	<cfdec.h>
 #include	<isnot.h>		/* |isNotValid(3uc)| */
 #include	<localmisc.h>
 
 #include	"gethz.h"
 
+
+import uvariables ;
 
 /* local defines */
 

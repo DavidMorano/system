@@ -97,7 +97,7 @@ int getportnum(cchar *pn,cchar *ps) noex {
 	if (ps) {
 	    rs = SR_INVALID ;
 	    if (ps[0]) {
-		cint	pl = strlen(ps) ;
+		cint	pl = xstrlen(ps) ;
 	        if (hasalldig(ps,pl)) {
 	            rs = cfdeci(ps,pl,&port) ;
 	        } /* end if */

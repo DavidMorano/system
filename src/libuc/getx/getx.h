@@ -66,6 +66,7 @@
 #include	<getuserterms.h>
 #include	<getxid.h>
 #include	<getopendial.h>
+#include	<getseed.h>
 
 
 #endif /* GETX_INCLUDE */

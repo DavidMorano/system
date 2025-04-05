@@ -176,7 +176,7 @@ static int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
                                 rs = sncpy1(cbuf,clen,ste.clu) ;
                                 len = rs ;
                             } else {
-                                len = strlen(ste.clu) ;
+                                len = xstrlen(ste.clu) ;
                                 }
                             if ((rs >= 0) && sbuf) {
                                 rs = sncpy(sbuf,slen,ste.sys) ;

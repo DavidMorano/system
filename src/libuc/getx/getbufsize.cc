@@ -180,13 +180,13 @@ int ubufsize::init() noex {
 	} else if (! finitdone) {
 	    timewatch	tw(to) ;
 	    auto lamb = [this] () -> int {
-	        int	rs = SR_OK ;
+	        int	rsl = SR_OK ;
 	        if (!finit) {
-		    rs = SR_LOCKLOST ;		/* <- failure */
+		    rsl = SR_LOCKLOST ;		/* <- failure */
 	        } else if (finitdone) {
-		    rs = 1 ;			/* <- OK ready */
+		    rsl = 1 ;			/* <- OK ready */
 	        }
-	        return rs ;
+	        return rsl ;
 	    } ; /* end lambda (lamb) */
 	    rs = tw(lamb) ;		/* <- time-watching occurs in there */
 	} /* end if (time-watching) */
@@ -237,7 +237,7 @@ int ubufsize::loadent(cchar *kp) noex {
 	cchar		*vp = nullptr ;
 	cchar		**vars = bufsizenames ;
 	if (cchar *tp ; (tp = strchr(kp,'=')) != nullptr) {
-	    kl = (tp-kp) ;
+	    kl = intconv(tp - kp) ;
 	    vp = (tp+1) ;
 	    vl = -1 ;
 	} /* end if */

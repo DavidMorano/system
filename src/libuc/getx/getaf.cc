@@ -220,18 +220,18 @@ int getaf(cchar *sp,int sl) noex {
 	if (sp) {
 	    rs = SR_INVALID ;
 	    if ((sl > 0) && sp[0]) {
+	        cint	alen = AFNAMELEN ;
+	        char	abuf[AFNAMELEN + 1] ;
 	        if (hasalldig(sp,sl)) {
 	            if (int v ; (rs = cfdeci(sp,sl,&v)) >= 0) {
 		        rs = v ;
 	            }
 	        } else {
-	            cint	alen = AFNAMELEN ;
-	            int		al ;
-	            char	abuf[AFNAMELEN + 1] ;
-	            if ((al = (strdcpy1w(abuf,alen,sp,sl)-abuf)) > 0) {
+		    cint al = intconv(strdcpy1w(abuf,alen,sp,sl) - abuf) ;
+	            if (al > 0) {
 	                CADDRFAM	*afs = addrfamilies ;
 	                cint		n = 2 ;
-	                int		i{} ;
+	                int		i{} ; /* used afterwards */
 	                int		m ;
 	                for (i = 0 ; afs[i].name ; i += 1) {
 	                    cchar	*anp = afs[i].name ;

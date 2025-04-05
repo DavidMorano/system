@@ -39,21 +39,28 @@
 #include	<unistd.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
 #include	<cfdec.h>
 #include	<randlc.h>
 #include	<localmisc.h>
 
+#include	"getseed.h"
+
+
+import uvariables ;
 
 /* local defines */
 
-#ifndef	VARRANDOM
-#define	VARRANDOM	"RANDOM"
+#ifndef	CF_GETHRTIME
+#define	CF_GETHRTIME	1		/* use |gethrtime(3c)| */
 #endif
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -64,48 +71,49 @@
 
 /* local variables */
 
+constexpr cchar		*varrand = varname.random ;
+
+cbool			f_gethrtime = CF_GETHRTIME ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
 int getseed(int seed) noex {
+    	static cchar	*randp = getenv(varrand) ;
 	TIMEVAL		tv ;
-	const pid_t	pid = getpid() ;
-	const uid_t	uid = getuid() ;
-	uint		rv = 0 ;
+	cnullptr	np{} ;
+	cint		pid = getpid() ;
+	cint		uid = getuid() ;
+	cint		v1 = getppid() ;
+	cint		v2 = getpgrp() ;
 	int		rs ;
-	int		v1, v2 ;
-	int		v3 = 0 ;
-	cchar		*cp ;
-
-	    gettimeofday(&tv,NULL) ;
-
-	    v1 = getppid() ;
-
-	    v2 = getpgrp() ;
-
-	    if ((cp = getenv(VARRANDOM)) != NULL) {
-		cfdeci(cp,-1,&v3) ;
+	if ((rs = uc_gettimeofday(&tv,np)) >= 0) {
+	    cint	usec = intconv(tv.tv_usec) ;
+	    cint	rsec = intconv(tv.tv_sec) ;
+	    uint	rv = 0 ;
+	    rv += randlc(usec) ;
+	    rv += randlc(rsec) ;
+	    if (randp) {
+		if (int v3 ; cfdec(randp,-1,&v3) >= 0) {
+		    rv += randlc(v3) ;
+		}
 	    }
-
-	rv += randlc(tv.tv_usec) ;
-	rv += randlc((int) pid) ;
-	rv += randlc(v1) ;
-	rv += randlc(v2) ;
-	rv += randlc(v3) ;
-	rv += randlc(tv.tv_sec) ;
-	rv += randlc(uid) ;
-	rv += randlc(seed) ;
-
-#if	CF_GETHRTIME
-	{
-	    hrtime_t	h = gethrtime() ;
-	    rv += (uint) h ;
-	    h >>= szof(uint) ;
-	    rv += (uint) h ;
-	}
-#endif /* CF_GETHRTIME */
-
-	rs = (rv & INT_MAX) ;
+	    rv += randlc(pid) ;
+	    rv += randlc(v1) ;
+	    rv += randlc(v2) ;
+	    rv += randlc(uid) ;
+	    rv += randlc(seed) ;
+	    if_constexpr (f_gethrtime) {
+	        hrtime_t	h = gethrtime() ;
+	        rv += uint(h) ;
+	        h >>= szof(uint) ;
+	        rv += uint(h) ;
+	    }
+	    rs = (rv & INT_MAX) ;
+	} /* end if (uc_gettimeofday) */
 	return rs ;
 }
 /* end subroutine (getseed) */

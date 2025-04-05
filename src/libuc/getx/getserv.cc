@@ -88,7 +88,8 @@ int getserv_name(cchar *svc,cchar *pn) noex {
 	    if (pn[0] && svc[0]) {
 	        if (char *svbuf{} ; (rs = malloc_sv(&svbuf)) >= 0) {
 	            if (ucentsv sv ; (rs = sv.getnam(svbuf,rs,svc,pn)) >= 0) {
-	                port = int(ntohs(sv.s_port)) ;
+			uint16_t	sport = uint16_t(sv.s_port) ;
+	                port = int(ntohs(sport)) ;
 	            }
 		    rs = rsfree(rs,svbuf) ;
 	        } /* end if (m-a-f) */
