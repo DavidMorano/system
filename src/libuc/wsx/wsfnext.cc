@@ -89,6 +89,7 @@
 /* exported subroutines */
 
 int wsfnext(const wchar_t *wsp,int wsl,const wchar_t **spp) noex {
+    	int		rl = 0 ;
 	int		ch ;
 	while (wsl && *wsp) {
 	    ch = int(*wsp) ;
@@ -104,7 +105,8 @@ int wsfnext(const wchar_t *wsp,int wsl,const wchar_t **spp) noex {
 	    wsp += 1 ;
 	    wsl -= 1 ;
 	} /* end while */
-	return (wsp - (*spp)) ;
+	rl = intconv(wsp - (*spp)) ;
+	return rl ;
 }
 /* end subroutine (wsfnext) */
 
