@@ -60,7 +60,6 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<utmpent.h>
 #include	<mknpathx.h>
 #include	<localmisc.h>
@@ -68,6 +67,8 @@
 #include	"getutmpent.h"
 #include	"getutmpterm.h"
 
+
+import uvariables ;
 
 /* local defines */
 

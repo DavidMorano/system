@@ -50,7 +50,6 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<utmpacc.h>
 #include	<strwcpy.h>
 #include	<sncpyx.h>
@@ -58,6 +57,8 @@
 
 #include	"getutmpent.h"
 
+
+import uvariables ;
 
 /* local defines */
 
