@@ -56,7 +56,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0= lineindexhdr.o
-OBJ1= lineindex_main.o
+OBJ1= lineindex_main.o lineindex_mkidx.o
 OBJ2= 
 OBJ3=
 
@@ -66,7 +66,7 @@ OBJB=
 OBJ= obja.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -94,7 +94,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -115,32 +115,33 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
 
 obj1.o:			$(OBJ1)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
 
 obj2.o:			$(OBJ2)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
 
 obj3.o:			$(OBJ3)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
 
 obj4.o:			$(OBJ4)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
 
 obj5.o:			$(OBJ5)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
 
 
 obja.o:			$(OBJA)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
 
 objb.o:			$(OBJB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
 lineindex_main.o:	lineindex_main.cc			$(INCS)
+lineindex_mkidx.o:	lineindex_mkidx.cc			$(INCS)
 lineindexhdr.o:		lineindexhdr.cc lineindexhdr.h		$(INCS)
 
 

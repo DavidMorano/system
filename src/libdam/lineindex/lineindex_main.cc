@@ -457,7 +457,7 @@ static int lineindex_idxclose(LI *op) noex {
 static int lineindex_idxverify(LI *op) noex {
     	int		rs = SR_BUGCHECK ;
 	if (op->mapdata) {
-	    cint	ml = op->mapsize ;
+	    cint	ml = intsat(op->mapsize) ;
 	    char	*mp = charp(op->mapdata) ;
 	    if (lineindexhdr hdr{} ; (rs = hdr.wr(mp,ml)) >= 0) {
 		cint	ver = hdr.vetu[0] ;

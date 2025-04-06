@@ -321,7 +321,7 @@ int idxer::wridx(int lines) noex {
 	hdr.rectab = headsize ;
 	hdr.wrtime = uint(dt & UINT_MAX) ;
 	hdr.vetu[0] = LI_VERSION ;
-	hdr.vetu[1] = ENDIAN ;
+	hdr.vetu[1] = charconv(ENDIAN) ;
 	hdr.vetu[2] = LI_TYPE ;
 	if (char *hbuf{} ; (rs = uc_malloc(sz,&hbuf)) >= 0) {
 	    if ((rs = hdr.rd(hbuf,rs)) >= 0) {

@@ -96,7 +96,7 @@ int lineindexhdr_rd(lineindexhdr *op,char *hbuf,int hlen) noex {
 	            bl -= magicsize ;
 	    	    memcpy(bp,op->vetu,4) ;
 	    	    bp[0] = LINEINDEXHDR_VERSION ;
-	    	    bp[1] = ENDIAN ;
+	    	    bp[1] = charconv(ENDIAN) ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= tabsize) {
@@ -106,7 +106,7 @@ int lineindexhdr_rd(lineindexhdr *op,char *hbuf,int hlen) noex {
 			header[lineindexhdr_lines] = op->lines ;
 	        	bp += tabsize ;
 	        	bl -= tabsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
 	            }
@@ -147,7 +147,7 @@ int lineindexhdr_wr(lineindexhdr *op,cchar *hbuf,int hlen) noex {
 	                op->lines = header[lineindexhdr_lines] ;
 	                bp += tabsize ;
 	                bl -= tabsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
 		    }
