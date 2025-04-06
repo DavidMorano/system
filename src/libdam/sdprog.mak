@@ -2,7 +2,6 @@
 
 T= sdprog
 
-#ALL= $(T).so $(T).a
 ALL= $(T).o
 
 
@@ -57,86 +56,14 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ00= sfprog.o
+OBJ00= sdprog_main.o
 OBJ01=
 OBJ02= 
 OBJ03= 
 
-OBJ04= 
-OBJ05= 
-OBJ06= 
-OBJ07= 
-
-OBJ08= 
-OBJ09= 
-OBJ10=
-OBJ11=
-
-OBJ12=
-OBJ13= 
-OBJ14=
-OBJ15= 
-
-OBJ16= 
-OBJ17= 
-OBJ18= 
-OBJ19= 
-OBJ20=
-OBJ21=
-OBJ22= 
-OBJ23= 
-OBJ24= 
-OBJ25= 
-OBJ26= 
-OBJ27= 
-OBJ28= 
-OBJ29= 
-OBJ30= 
-OBJ31= 
-OBJ32= 
-OBJ33=
-OBJ34= 
-OBJ35= 
-OBJ36= 
-OBJ37= 
-OBJ38= 
-OBJ39= 
-OBJ40=
-OBJ41=
-OBJ42=
-OBJ43= 
-OBJ44=
-OBJ45=
-OBJ46= 
-OBJ47=
-
-OBJ48= 
-OBJ50= 
-OBJ50=
-OBJ51=
-OBJ52=
-OBJ53=
-OBJ54=
-OBJ55=
-
-#OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 
-#OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
-#OBJC= $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19) $(OBJ20) $(OBJ21) $(OBJ22) $(OBJ23)
-#OBJD= $(OBJ24) $(OBJ25) $(OBJ26) $(OBJ27) $(OBJ28) $(OBJ29) $(OBJ30) $(OBJ31)
-#OBJE= $(OBJ32) $(OBJ33) $(OBJ34) $(OBJ35) $(OBJ36) $(OBJ37) $(OBJ38) $(OBJ39)
-#OBJF= $(OBJ40) $(OBJ41) $(OBJ42) $(OBJ43) $(OBJ44) $(OBJ45) $(OBJ46) $(OBJ47)
-#OBJG= $(OBJ48) $(OBJ49) $(OBJ50) $(OBJ51) $(OBJ52) $(OBJ53) $(OBJ54) $(OBJ55)
-
-#OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG)
-
-OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03)
+OBJA= obj00.o
 OBJB= 
-OBJC= 
-OBJD= 
-OBJE= 
 
-#OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
-#OBJ= obja.o objb.o objc.o objd.o obje.o
 OBJ= obja.o 
 
 
@@ -172,11 +99,11 @@ so:			$(T).so
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ) Makefile localmisc.h
+$(T).o:			$(OBJ) Makefile
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
 
-$(T).so:		$(OBJ) Makefile localmisc.h
-	$(LD) -o $@ $(SOFL) $(LDFLAGS) $(OBJ) $(LIBINFO)
+$(T).so:		$(OBJ) Makefile
+	$(LD) $(SOFL) -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -209,28 +136,26 @@ control:
 	(uname -n ; date) > Control
 
 
+obj00.o:		$(OBJ00)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ00)
+
+obj01.o:		$(OBJ01)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ01)
+
+obj02.o:		$(OBJ02)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ02)
+
+obj03.o:		$(OBJ03)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ03)
+
+
 obja.o:			$(OBJA)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
 
 objb.o:			$(OBJB)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
 
-objc.o:			$(OBJC)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJC)
 
-objd.o:			$(OBJD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJD)
-
-obje.o:			$(OBJE)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJE)
-
-objf.o:			$(OBJF)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJF)
-
-objg.o:			$(OBJG)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJG)
-
-
-sdprog.o:	sdprog.cc			$(INCS)
+sdprog_main.o:		sdprog_main.cc		$(INCS)
 
 

@@ -59,12 +59,14 @@
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
-#include	"prog.h"
+#include	"sdprog.h"
 #include	"envs.h"
 #include	"sysvar.h"
 
 
 /* local defines */
+
+#define	SD_ARGS		sysdialer_args
 
 #define	PROG_MNAME	"prog"
 #define	PROG_VERSION	"0"
@@ -84,10 +86,6 @@
 
 #define	PROG_DEFPROG	"/usr/bin/ksh"
 #define	PROG_DEFPATH	"/bin:/usr/bin"
-
-#ifndef	NOFILE
-#define	NOFILE		20
-#endif
 
 #ifndef	KBUFLEN
 #define	KBUFLEN		120
@@ -109,12 +107,13 @@
 #define	ARCHBUFLEN	80
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
+#ifndef	ARGBUFLEN
+#define	ARGBUFLEN	(MAXPATHLEN + 35)
 #endif
 
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
+#ifndef	PATHBUFLEN
 #define	PATHBUFLEN	((4 * MAXPATHLEN) + 3)
+#endif
 
 #define	MAXARGINDEX	100
 #define	NARGPRESENT	(MAXARGINDEX/8 + 1)
@@ -227,7 +226,7 @@ struct subinfo {
 	cchar		*logid ;
 	cchar		*defprog ;
 	PROG		*op ;
-	SYSDIALER_ARGS	*ap ;
+	SD_ARGS	*ap ;
 	IDS		id ;
 	vecstr		aenvs ;
 	vecstr		stores ;
@@ -255,7 +254,7 @@ struct intprog {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,PROG *,SYSDIALER_ARGS *,
+static int	subinfo_start(SUBINFO *,PROG *,SD_ARGS *,
 			cchar *,cchar *) noex ;
 static int	subinfo_procargs(SUBINFO *) noex ;
 static int	subinfo_procopts(SUBINFO *,KEYOPT *) noex ;
@@ -517,7 +516,7 @@ SYSDIALER_INFO	prog_modinfo = {
 
 int prog_open(op,ap,hostname,svcname,av)
 PROG		*op ;
-SYSDIALER_ARGS	*ap ;
+SD_ARGS	*ap ;
 cchar		hostname[] ;
 cchar		svcname[] ;
 cchar		*av[] ;
@@ -950,7 +949,7 @@ int prog_close(PROG *op)
 static int subinfo_start(sip,op,ap,hostname,svcname)
 SUBINFO		*sip ;
 PROG		*op ;
-SYSDIALER_ARGS	*ap ;
+SD_ARGS	*ap ;
 cchar		hostname[] ;
 cchar		svcname[] ;
 {
@@ -1033,7 +1032,7 @@ static int subinfo_finish(SUBINFO *sip)
 static int subinfo_procargs(SUBINFO *sip)
 {
 	KEYOPT		akopts ;
-	SYSDIALER_ARGS	*ap = sip->ap ;
+	SD_ARGS	*ap = sip->ap ;
 	int		rs ;
 	int		argc ;
 	int		argr, argl, aol, akl, avl, kwi ;
@@ -1420,7 +1419,7 @@ static int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar v[],int vlen)
 
 static int subinfo_defaults(SUBINFO *sip)
 {
-	SYSDIALER_ARGS	*ap = sip->ap ;
+	SD_ARGS	*ap = sip->ap ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		*vp ;
