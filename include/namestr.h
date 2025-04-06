@@ -31,8 +31,8 @@
 
 
 struct namestr_head {
-	cchar		*sp ;
-	int		sl ;
+	cchar		*strp ;
+	int		strl ;
 } ;
 
 #ifdef	__cplusplus

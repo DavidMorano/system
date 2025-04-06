@@ -80,8 +80,8 @@ int namestr_start(namestr *op,cchar *sbuf,int slen) noex {
     	int		rs = SR_FAULT ;
 	if (op && sbuf) {
 	    rs = SR_OK ;
-	    op->sp = sbuf ;
-	    op->sl = (slen >= 0) ? slen : strlen(sbuf) ;
+	    op->strp = sbuf ;
+	    op->strl = (slen >= 0) ? slen : xstrlen(sbuf) ;
 	}
 	return rs ;
 }
@@ -91,25 +91,25 @@ int namestr_finish(namestr *op) noex {
     	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-	    op->sp = nullptr ;
-	    op->sl = 0 ;
+	    op->strp = nullptr ;
+	    op->strl = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (namestr_finish) */
 
 int namestr_skipwhite(namestr *op) noex {
-	while ((op->sl > 0) && op->sp[0] && CHAR_ISWHITE(op->sp[0])) {
-	    op->sp += 1 ;
-	    op->sl -= 1 ;
+	while ((op->strl > 0) && op->strp[0] && CHAR_ISWHITE(op->strp[0])) {
+	    op->strp += 1 ;
+	    op->strl -= 1 ;
 	}
-	return op->sl ;
+	return op->strl ;
 }
 /* end subroutine (namestr_skipwhite) */
 
 int namestr_brk(namestr *op,cchar *bs,cchar **rpp) noex {
-	cint		si = sibreak(op->sp,op->sl,bs) ;
-	*rpp = (si >= 0) ? (op->sp + si) : nullptr ;
+	cint		si = sibreak(op->strp,op->strl,bs) ;
+	*rpp = (si >= 0) ? (op->strp + si) : nullptr ;
 	return si ;
 }
 /* end subroutine (namestr_brk) */
@@ -120,46 +120,46 @@ int namestr_next(namestr *op,cchar **npp,int *fap,int *flp) noex {
 	*fap = false ;
 	*flp = false ;
 	namestr_skipwhite(op) ;
-	if (op->sl > 0) {
+	if (op->strl > 0) {
 	    cchar	*sxp ;
 	    cchar	*cp ;
 	    rs = SR_OK ;
 	    if (int i ; (i = namestr_brk(op," \t.,­",&cp)) >= 0) {
-	        sxp = op->sp ;
+	        sxp = op->strp ;
 	        nlen = i ;
-	        op->sp += nlen ;
-	        op->sl -= nlen ;
+	        op->strp += nlen ;
+	        op->strl -= nlen ;
 	        namestr_skipwhite(op) ;
 	        bool	f = true ;
-	        f = f && (op->sl > 0) ;
-	        f = f && ((op->sp[0] == ',') || isAbbr(op->sp[0])) ;
+	        f = f && (op->strl > 0) ;
+	        f = f && ((op->strp[0] == ',') || isAbbr(op->strp[0])) ;
 	        if (f) {
-	            if (isAbbr(op->sp[0])) {
+	            if (isAbbr(op->strp[0])) {
 	                *fap = true ;
 	            } else {
 	                *flp = true ;
 		    }
-	            op->sp += 1 ;
-	            op->sl -= 1 ;
+	            op->strp += 1 ;
+	            op->strl -= 1 ;
 	        } /* end if */
 	        namestr_skipwhite(op) ;
-	        if ((! *flp) && (op->sl > 0) && (op->sp[0] == ',')) {
+	        if ((! *flp) && (op->strl > 0) && (op->strp[0] == ',')) {
 	            *flp = true ;
-	            op->sp += 1 ;
-	            op->sl -= 1 ;
+	            op->strp += 1 ;
+	            op->strl -= 1 ;
 	        } /* end if */
 	        namestr_skipwhite(op) ;
     		/* eat any weirdo characters that are here */
-	        while ((op->sl > 0) && 
-	            ((op->sp[0] == ',') || (op->sp[0] == '.'))) {
-	            op->sp += 1 ;
-	            op->sl -= 1 ;
+	        while ((op->strl > 0) && 
+	            ((op->strp[0] == ',') || (op->strp[0] == '.'))) {
+	            op->strp += 1 ;
+	            op->strl -= 1 ;
 	        } /* end while */
 	    } else {
-	        sxp = op->sp ;
-	        nlen = (op->sl > 0) ? op->sl : SR_EOF ;
-	        op->sp += nlen ;
-	        op->sl = 0 ;
+	        sxp = op->strp ;
+	        nlen = (op->strl > 0) ? op->strl : SR_EOF ;
+	        op->strp += nlen ;
+	        op->strl = 0 ;
 	    } /* end if */
 	    if (npp) {
 	        *npp = (nlen >= 0) ? sxp : nullptr ;

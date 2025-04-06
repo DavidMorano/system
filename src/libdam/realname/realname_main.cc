@@ -608,7 +608,7 @@ static int realname_parse(realname *op,cchar *sbuf,int slen) noex {
 		    }
 	            op->last = n.a[i] ;
 	            op->len.last = n.l[i] ;
-	            op->abv.last = n.f_abv[i] ;
+	            op->abv.last = !!n.f_abv[i] ;
 	            n.a[i] = nullptr ;
 	            i = (i + 1) % nnames ;
 /* get the rest of the parts of this realname */
@@ -619,22 +619,22 @@ static int realname_parse(realname *op,cchar *sbuf,int slen) noex {
 	                    case 0:
 	                        op->first = n.a[i] ;
 	                        op->len.first = n.l[i] ;
-	                        op->abv.first = n.f_abv[i] ;
+	                        op->abv.first = !!n.f_abv[i] ;
 	                        break ;
 	                    case 1:
 	                        op->m1 = n.a[i] ;
 	                        op->len.m1 = n.l[i] ;
-	                        op->abv.m1 = n.f_abv[i] ;
+	                        op->abv.m1 = !!n.f_abv[i] ;
 	                        break ;
 	                    case 2:
 	                        op->m2 = n.a[i] ;
 	                        op->len.m2 = n.l[i] ;
-	                        op->abv.m2 = n.f_abv[i] ;
+	                        op->abv.m2 = !!n.f_abv[i] ;
 	                        break ;
 	                    case 3:
 	                        op->m3 = n.a[i] ;
 	                        op->len.m3 = n.l[i] ;
-	                        op->abv.m3 = n.f_abv[i] ;
+	                        op->abv.m3 = !!n.f_abv[i] ;
 	                        break ;
 	                    } /* end switch */
 	                    j += 1 ;
