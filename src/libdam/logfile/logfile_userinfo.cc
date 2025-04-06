@@ -1,4 +1,5 @@
 /* logfile_userinfo SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* log user information */
@@ -52,7 +53,6 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<getbufsize.h>
 #include	<userinfo.h>
 #include	<getostype.h>
@@ -62,6 +62,8 @@
 
 #include	"logfile.h"
 
+
+import uvariables ;
 
 /* local defines */
 
@@ -171,9 +173,9 @@ loguser::operator int () noex {
 int loguser::first() noex {
 	int		rs ;
 	int		wlen = 0 ;
-	char		timebuf[TIMEBUFLEN + 1] ;
+	char		tbuf[TIMEBUFLEN + 1] ;
 	{
-	    cchar	*ts = timestr_logz(dt,timebuf) ;
+	    cchar	*ts = timestr_logz(dt,tbuf) ;
 	    cchar	*st = "-" ;
 	    cchar	*fmt ;
 	    if (uip->ostype < ostype_overlast) {

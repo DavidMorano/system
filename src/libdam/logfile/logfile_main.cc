@@ -1,4 +1,5 @@
 /* logfile_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform logging operations on a file */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	logfile
+
+	Description:
 	This is a module to operate on a logfile.  The subroutines
 	in this module are:
 
@@ -42,7 +47,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -65,6 +69,7 @@
 #include	<strwcpy.h>
 #include	<ncol.h>		/* |charcols(3uc)| */
 #include	<mkx.h>
+#include	<mklogid.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>		/* |NTABCOLS| + |TIMEBUFLEN| */
@@ -267,6 +272,7 @@ int logfile_printf(logfile *op,cchar *fmt,...) noex {
 /* end subroutine (logfile_printf) */
 
 int logfile_vprintf(logfile *op,cchar *fmt,va_list ap) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = logfile_magic(op,fmt,ap)) >= 0) {
@@ -275,16 +281,16 @@ int logfile_vprintf(logfile *op,cchar *fmt,va_list ap) noex {
 	    if ((rs = bufvprintf(obuf,olen,fmt,ap)) >= 0) {
 	        int	sl = rs ;
 	        cchar	*sp = obuf ;
-	        cchar	*tp ;
-	        while ((tp = strnchr(sp,sl,'\n')) != nullptr) {
+	        for (cchar *tp ; (tp = strnchr(sp,sl,'\n')) != np ; ) {
+		    cint	tl = intconv(tp - sp) ;
 	            {
-	                rs = logfile_write(op,sp,(tp - sp)) ;
+	                rs = logfile_write(op,sp,tl) ;
 	                len += rs ;
 	            }
-	            sl -= ((tp + 1) - sp) ;
+	            sl -= intconv((tp + 1) - sp) ;
 	            sp = (tp + 1) ;
 	            if (rs < 0) break ;
-	        } /* end while */
+	        } /* end for */
 	        if ((rs >= 0) && (sl > 0)) {
 	            rs = logfile_write(op,sp,sl) ;
 	            len += rs ;
@@ -329,13 +335,11 @@ int logfile_control(logfile *op,int cmd,void *ap) noex {
 	        rs = SR_OK ;
 	        break ;
 	    case LOGFILE_CSIZE:
-	        {
 	            if ((rs = logfile_fileopen(op)) >= 0) {
-	                USTAT	sb ;
-	                rs = u_fstat(op->lfd,&sb) ;
-	                if (rs >= 0) rs = (sb.st_size & INT_MAX) ;
+	                if (USTAT sb ; (rs = u_fstat(op->lfd,&sb)) >= 0) {
+	                    rs = intsat(sb.st_size) ;
+			}
 	            }
-	        }
 	        break ;
 	    default:
 	        rs = SR_INVALID ;
@@ -353,9 +357,8 @@ int logfile_checksize(logfile *op,int logsize) noex {
 	if ((rs = logfile_magic(op)) >= 0) {
 	    if (logsize <= 0) logsize = LOGFILE_LOGSIZE ;
 	    if ((rs = logfile_fileopen(op)) >= 0) {
-	        USTAT	sb ;
 	        cint	loglimit = (logsize * (op->percent + 100)) / 100 ;
-	        if ((rs = u_fstat(op->lfd,&sb)) >= 0) {
+	        if (USTAT sb ; (rs = u_fstat(op->lfd,&sb)) >= 0) {
 	            if (sb.st_size > loglimit) {
 	                f_oversize = true ;
 	                rs = logfile_copylock(op,logsize) ;
@@ -411,7 +414,7 @@ int logfile_write(logfile *op,cchar *sp,int sl) noex {
 	    int		bl ;
 	    cchar	*bp ;
 	    char	tmpbuf[TMPBUFLEN+ 1] ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (sp[sl-1] == '\n') sl -= 1 ;
 	    colstate_load(&cs,linelen,(logidlen + 1)) ;
 	    clen = colstate_linecols(&cs,sp,sl) ;
@@ -626,7 +629,7 @@ static int logfile_mkentry(logfile *op,time_t dt,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		rlen = (op->bufsize - op->len) ;
 	int		ll ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	ll = (LOGFILE_LOGIDLEN+1+sl) ;
 	{
 	    if ((ll+1) > rlen) rs = logfile_iflush(op) ;
@@ -651,8 +654,8 @@ static int logfile_mkline(logfile *op,cchar *sp,int sl) noex {
 	    bp = strwcpy(bp,op->logid,op->logidlen) ;
 	    bp = strwcpy(bp,sp,min(LOGFILE_USERLEN,sl)) ;
 	    bp = strwcpy(bp,"\n",1) ;
-	    op->len += (bp-buf) ;
-	    len = (bp-buf) ;
+	    op->len += intconv(bp - buf) ;
+	    len = intconv(bp - buf) ;
 	}
 	return len ;
 }
@@ -672,7 +675,7 @@ static int colstate_linecols(COLSTATE *csp,cchar *sbuf,int slen) noex {
 	int		i ; /* used afterwards */
 	int		cols ;
 	int		rcols ;
-	if (slen < 0) slen = strlen(sbuf) ;
+	if (slen < 0) slen = xstrlen(sbuf) ;
 	rcols = (csp->ncols - csp->ncol) ;
 	for (i = 0 ; (rcols > 0) && (i < slen) ; i += 1) {
 	    cols = charcols(NTABCOLS,csp->ncol,sbuf[i]) ;

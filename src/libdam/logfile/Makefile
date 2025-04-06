@@ -2,7 +2,7 @@
 
 T= logfile
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -63,12 +62,13 @@ OBJA_LOGFILE= obj0_logfile.o
 OBJ_LOGFILE= $(OBJA_LOGFILE)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -88,12 +88,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_LOGFILE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LOGFILE)
-
-$(T).a:			$(OBJ_LOGFILE)
-	$(AR) $(ARFLAGS) -rc $@ $?
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LOGFILE)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -112,8 +112,9 @@ clean:
 control:
 	(uname -n ; date) > Control
 
+
 obj0_logfile.o:	$(OBJ0_LOGFILE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LOGFILE)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_LOGFILE)
 
 
 logfile_main.o:		logfile_main.cc		$(INCS)

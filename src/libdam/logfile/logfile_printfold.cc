@@ -1,4 +1,5 @@
 /* logfile_printfold HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform logging operations on a file */
@@ -17,11 +18,20 @@
 
 /*******************************************************************************
 
+  	Name:
+	logfile_printfold
+
+	Description:
 	This is an extra method for LOGFILE.
+
+	Synopsis:
+	int logfile_printfold(logfile *lhp,cchar *pre,cchar *sp,int sl) noex
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<linefold.h>
@@ -62,29 +72,28 @@ static int logfile_pfi(logfile *,int,cchar *,int,cchar *,int) noex ;
 /* exported subroutines */
 
 int logfile_printfold(logfile *lhp,cchar *pre,cchar *sp,int sl) noex {
-	linefold	fo ;
-	cint		pl = strlen(pre) ;
+	cint		pl = xstrlen(pre) ;
 	int		rs ;
 	int		rs1 ;
 	int		n ;
 	n = (LOGFILE_FMTLEN - pl - 2) ;
-	if ((rs = linefold_start(&fo,n,0,sp,sl)) >= 0) {
+	if (linefold fo ; (rs = fo.start(n,0,sp,sl)) >= 0) {
 	    int		c = 0 ;
-	    cchar	*sp{} ;
-	    for (int i = 0 ; (rs = linefold_getln(&fo,i,&sp)) > 0 ; i += 1) {
-		int	sl = rs ;
-		while (sl > n) {
-	            rs = logfile_pfi(lhp,c++,pre,pl,sp,n) ;
-		    sl -= n ;
-		    sp = (sp+n) ;
+	    cchar	*lp{} ;
+	    for (int i = 0 ; (rs = fo.getln(i,&lp)) > 0 ; i += 1) {
+		int	ll = rs ;
+		while (ll > n) {
+	            rs = logfile_pfi(lhp,c++,pre,pl,lp,n) ;
+		    ll -= n ;
+		    lp = (lp + n) ;
 		    if (rs < 0) break ;
 		} /* end while */
-		if ((rs >= 0) && (sl > 0)) {
-	            rs = logfile_pfi(lhp,c++,pre,pl,sp,sl) ;
+		if ((rs >= 0) && (ll > 0)) {
+	            rs = logfile_pfi(lhp,c++,pre,pl,lp,ll) ;
 		} /* end if */
 		if (rs < 0) break ;
 	    } /* end for */
-	    rs1 = linefold_finish(&fo) ;
+	    rs1 = fo.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (linefold) */
 	return rs ;
