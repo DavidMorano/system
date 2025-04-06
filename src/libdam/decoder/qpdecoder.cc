@@ -122,7 +122,7 @@ static inline int qpdecoder_magic(qpdecoder *op,Args ... args) noex {
 
 static int	qpdecoder_loadspace(qpdecoder *,cchar *,int) noex ;
 static int	qpdecoder_add(qpdecoder *,cchar *,int) noex ;
-static int	qpdecoder_add(qpdecoder *,char) noex ;
+static int	qpdecoder_add(qpdecoder *,int) noex ;
 static int	qpdecoder_cvt(qpdecoder *) noex ;
 
 
@@ -137,7 +137,7 @@ static int	qpdecoder_cvt(qpdecoder *) noex ;
 int qpdecoder_start(qpdecoder *op,int f_space) noex {
 	int		rs ;
 	if ((rs = qpdecoder_ctor(op)) >= 0) {
-	    op->f.space = f_space ;
+	    op->f.space = bool(f_space) ;
 	    if (obuf *obp ; (obp = new(nothrow) obuf) != nullptr) {
 		if ((rs = obp->start) >= 0) {
 	            op->outbuf = obp ;
@@ -186,7 +186,7 @@ int qpdecoder_load(qpdecoder *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = qpdecoder_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
 	        if (op->f.space) {
 	            rs = qpdecoder_loadspace(op,sp,sl) ;
@@ -265,7 +265,8 @@ int qpdecoder_read(qpdecoder *op,char *rbuf,int rlen) noex {
 	            cint	len = obp->len ;
 	            ml = min(len,rlen) ;
 	            for (i = 0 ; i < ml ; i += 1) {
-	                rbuf[i] = obp->at(i) ;
+			cint	ch = obp->at(i) ;
+	                rbuf[i] = charconv(ch) ;
 	            }
 	            rbuf[i] = '\0' ;
 	            rs = obp->adv(i) ;
@@ -288,7 +289,7 @@ static int qpdecoder_loadspace(qpdecoder *op,cchar *sp,int sl) noex {
 	    cint	ch = mkchar(*sp) ;
 	    if (! CHAR_ISWHITE(ch)) {
 	        if (op->f.esc) {
-	            op->rb[op->rl++] = ch ;
+	            op->rb[op->rl++] = charconv(ch) ;
 	            if (op->rl == 2) {
 	                rs = qpdecoder_cvt(op) ;
 	                c += rs ;
@@ -319,7 +320,7 @@ static int qpdecoder_add(qpdecoder *op,cchar *vp,int vl = -1) noex {
 }
 /* end subrolutine (qpdecoder_add) */
 
-static int qpdecoder_add(qpdecoder *op,char v) noex {
+static int qpdecoder_add(qpdecoder *op,int v) noex {
     	int		rs ;
 	obuf 		*obp = obufp(op->outbuf) ;
 	if (op->f.space && (v == '_')) {

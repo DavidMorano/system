@@ -35,7 +35,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<new>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -167,16 +167,16 @@ int hexdecoder_load(hexdecoder *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = hexdecoder_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
 	        while ((rs >= 0) && (sl > 0) && *sp) {
 		    cint	ch = mkchar(*sp) ;
 		    if (ishexlatin(ch)) {
 		        if (op->rl == 0) {
-			    op->rb[0] = ch ;
+			    op->rb[0] = charconv(ch) ;
 			    op->rl = 1 ;
 		        } else {
-			    op->rb[1] = ch ;
+			    op->rb[1] = charconv(ch) ;
 			    rs = hexdecoder_cvt(op) ;
 			    c += rs ;
 			    op->rl = 0 ;
@@ -203,7 +203,8 @@ int hexdecoder_read(hexdecoder *op,char *rbuf,int rlen) noex {
 	        cint	len = obp->len ;
 	        ml = min(len,rlen) ;
 	        for (i = 0 ; i < ml ; i += 1) {
-		    rbuf[i] = obp->at(i) ;
+		    cint	ch = obp->at(i) ;
+		    rbuf[i] = charconv(ch) ;
 	        }
 	        rbuf[i] = '\0' ;
 	        rs = obp->adv(i) ;

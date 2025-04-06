@@ -171,13 +171,13 @@ int b64decoder_load(b64decoder *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = b64decoder_magic(op,sp)) >= 0) {
-            if (sl < 0) sl = strlen(sp) ;
+            if (sl < 0) sl = xstrlen(sp) ;
             if (obuf *obp ; (obp = obufp(op->outbuf)) != np) {
                 int         cl ;
                 cchar       *cp ;
                 while ((cl = nextfield(sp,sl,&cp)) > 0) {
-                    sl -= ((cp+cl)-sp) ;
-                    sp = (cp+cl) ;
+                    sl -= intconv((cp + cl) - sp) ;
+                    sp = (cp + cl) ;
                     if (op->rl > 0) {
                         cint        rl = op->rl ;
                         int         ml = min(cl,(4-op->rl)) ;
@@ -229,7 +229,8 @@ int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
                         cint        len = obp->len ;
                         ml = min(len,rlen) ;
                         for (i = 0 ; i < ml ; i += 1) {
-                            rbuf[i] = obp->at(i) ;
+			    cint	ch = obp->at(i) ;
+                            rbuf[i] = charconv(ch) ;
                         }
                         rbuf[i] = '\0' ;
                         rs = obp->adv(i) ;

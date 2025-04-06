@@ -76,15 +76,26 @@ public:
 	widebuf() noex : oi(0) { } ;
 	wchar_t operator [] (int i) const noex {
 	    wchar_t	rch = 0 ;
-	    cint	n = b.size() ;
-	    if ((oi+i) < n) rch = b[oi+i] ;
+	    csize	bsize = b.size() ;
+	    int		n ;
+	    n = intconv(bsize) ;
+	    if ((oi+i) < n) {
+		rch = b[oi+i] ;
+	    }
 	    return rch ;
 	} ;
 	int add(int ch) noex {
 	    int		rs ;
 	    try {
 	        b.push_back(ch) ;
-		rs = (b.size() - oi) ;
+		{
+		    csize	bsize = b.size() ;
+		    int		sz ;
+		    {
+		        sz = intconv(bsize) ;
+		        rs = (sz - oi) ;
+		    }
+		}
 	    } catch (...) {
 		rs = SR_NOMEM ;
 	    }
@@ -92,28 +103,43 @@ public:
 	} ;
 	int add(cchar *sp,int sl = -1) noex {
 	    int		rs ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    try {
 	        for (int i = 0 ; i < sl ; i += 1) {
 		    b.push_back(sp[i]) ;
 	        }
-	        rs = (b.size() - oi) ;
+		{
+		    csize	bsize = b.size() ;
+		    {
+			cint	sz = intconv(bsize) ;
+	        	rs = (sz - oi) ;
+		    }
+		}
 	    } catch (...) {
 		rs = SR_NOMEM ;
 	    }
 	    return rs ;
 	} ;
 	int count() const noex {
-	    return (b.size() - oi) ;
+	    csize	bsize = b.size() ;
+	    int		rs ;
+	    {
+		cint	sz = intconv(bsize) ;
+	    	rs = (sz - oi) ;
+	    }
+	    return rs ;
 	} ;
 	int len() const noex {
 	    return count() ;
 	} ;
 	wchar_t at(int i) const noex {
-	    cint	n = b.size() ;
+	    csize	bsize = b.size() ;
 	    int		rch = 0 ;
-	    if ((oi+i) < n) {
-		rch = b[oi+i] ;
+	    {
+	       cint	n = intconv(bsize) ;
+	       if ((oi+i) < n) {
+		   rch = b[oi+i] ;
+	       }
 	    }
 	    return rch ;
 	} ;
@@ -183,7 +209,7 @@ int utf8decoder_load(utf8decoder *op,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	if ((rs = utf8decoder_magic(op,sp)) >= 0) {
 	    cnullptr	np{} ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (widebuf *wbp ; (wbp = widebufp(op->outbuf)) != np) {
 	        while ((rs >= 0) && (sl-- > 0)) {
 		    const wchar_t	uch = mkchar(*sp++) ;
@@ -249,9 +275,10 @@ int utf8decoder_read(utf8decoder *op,wchar_t *rbuf,int rlen) noex {
 /* private subroutines */
 
 int widebuf::adv(int al) noex {
-	cint		sl = b.size() ;
+    	csize		bsize = b.size() ;
 	int		rl = 0 ;
 	if (al > 0) {
+	    cint	sl = intconv(bsize) ;
 	    if (sl > (oi+al)) {
 		rl = (sl - oi) ;
 		oi += rl ;
@@ -264,6 +291,7 @@ int widebuf::adv(int al) noex {
 		}
 	    }
 	} else if (al < 0) {
+	    cint	sl = intconv(bsize) ;
 	    if (sl > oi) {
 		rl = (sl - oi) ;
 		oi += rl ;
