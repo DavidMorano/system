@@ -57,6 +57,10 @@
 /* local defines */
 
 #define	SRVTAB_RGXLEN	256		/* regexp buffer length */
+#define	SRVTAB_REGEX	CF_REGEX
+
+#define	ST		srvtab
+#define	ST_ENT		srvtab_ent
 
 #ifndef	LINEBUFLEN
 #define	LINEBUFLEN	2048
@@ -69,8 +73,6 @@
 #define	MAXOPENTIME	300		/* maximum FD cache time */
 #define	TI_FILECHECK	9		/* file check interval (seconds) */
 #define	TI_FILECHANGE	3		/* wait change interval (seconds) */
-
-#define	SRVTAB_REGEX	CF_REGEX
 
 
 /* external subroutines */
@@ -162,7 +164,7 @@ constexpr cpcchar	srvkeys[] = {
 /* exported subroutines */
 
 int srvtab_open(srvtab *op,cchar *fname,vecitem *eep) noex {
-	time_t		daytime = time(NULL) ;
+	time_t		dt = time(NULL) ;
 	int		rs = SR_OK ;
 	int		fnl = -1 ;
 	cchar		*fnp ;
@@ -177,8 +179,8 @@ int srvtab_open(srvtab *op,cchar *fname,vecitem *eep) noex {
 
 /* initialize */
 
-	op->opentime = daytime ;
-	op->checktime = daytime ;
+	op->opentime = dt ;
+	op->checktime = dt ;
 
 	fnp = fname ;
 	if (fname[0] != '/') {
@@ -204,7 +206,7 @@ int srvtab_open(srvtab *op,cchar *fname,vecitem *eep) noex {
 	if (rs < 0)
 	    goto bad2 ;
 
-	rs = srvtab_fileparse(op,daytime,eep) ;
+	rs = srvtab_fileparse(op,dt,eep) ;
 	if (rs < 0)
 	    goto bad3 ;
 
@@ -281,9 +283,9 @@ int srvtab_match(srvtab *op,cchar *service,srvtab_ent **sepp) noex {
 	        if (strncmp(service,sp,cp - sp) == 0) {
 
 	            cp += 1 ;
-	            l1 = strlen(service) ;
+	            l1 = xstrlen(service) ;
 
-	            l2 = strlen(sp) ;
+	            l2 = xstrlen(sp) ;
 
 	            sl = sp + l2 - cp ;
 
@@ -355,7 +357,7 @@ int srvtab_get(srvtab *op,int i,srvtab_ent **sepp) noex {
 }
 /* end subroutine (srvtab_get) */
 
-int srvtab_check(srvtab *op,time_t daytime,vecitem *eep) noex {
+int srvtab_check(srvtab *op,time_t dt,vecitem *eep) noex {
 	USTAT		sb ;
 	int		rs = SR_OK ;
 
@@ -365,15 +367,15 @@ int srvtab_check(srvtab *op,time_t daytime,vecitem *eep) noex {
 	if (op->magic != SRVTAB_MAGIC)
 	    return SR_NOTOPEN ;
 
-	if (daytime <= 0)
-	    daytime = time(NULL) ;
+	if (dt <= 0)
+	    dt = time(NULL) ;
 
 /* should we even check? */
 
-	if ((daytime - op->checktime) <= TI_FILECHECK)
+	if ((dt - op->checktime) <= TI_FILECHECK)
 	    goto ret0 ;
 
-	op->checktime = daytime ;
+	op->checktime = dt ;
 
 /* is the file open already? */
 
@@ -382,7 +384,7 @@ int srvtab_check(srvtab *op,time_t daytime,vecitem *eep) noex {
 	    rs = uc_open(op->fname,O_RDONLY,0666) ;
 	    op->fd = rs ;
 	    if (rs >= 0) {
-	        op->opentime = daytime ;
+	        op->opentime = dt ;
 	        uc_closeonexec(op->fd,TRUE) ;
 	    }
 
@@ -395,16 +397,16 @@ int srvtab_check(srvtab *op,time_t daytime,vecitem *eep) noex {
 	if (rs < 0) goto ret0 ;
 
 	if ((sb.st_mtime > op->mtime) &&
-	    ((daytime - sb.st_mtime) >= TI_FILECHANGE)) {
+	    ((dt - sb.st_mtime) >= TI_FILECHANGE)) {
 
 	    rs = srvtab_filedump(op) ;
 
 	    if (rs >= 0) {
 	        op->mtime = sb.st_mtime ;
-	        rs = srvtab_fileparse(op,daytime,eep) ;
+	        rs = srvtab_fileparse(op,dt,eep) ;
 	    }
 
-	} else if ((daytime - op->opentime) > MAXOPENTIME) {
+	} else if ((dt - op->opentime) > MAXOPENTIME) {
 	    u_close(op->fd) ;
 	    op->fd = -1 ;
 	}
@@ -417,7 +419,7 @@ ret0:
 
 /* private subroutines */
 
-static int srvtab_fileparse(srvtab *op,time_t daytime,vecitem *eep) noex {
+static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 	USTAT		sb ;
 	vecitem		*slp ;
 	SRVTAB_ENT	se ;
@@ -453,8 +455,8 @@ static int srvtab_fileparse(srvtab *op,time_t daytime,vecitem *eep) noex {
 /* what about caching the file descriptor? */
 
 	if (op->fd >= 0) {
-	    if (daytime <= 0) daytime = time(NULL) ;
-	    if ((daytime - op->opentime) > MAXOPENTIME) {
+	    if (dt <= 0) dt = time(NULL) ;
+	    if ((dt - op->opentime) > MAXOPENTIME) {
 	        u_close(op->fd) ;
 	        op->fd = -1 ;
 	        f_closed = TRUE ;
@@ -725,10 +727,10 @@ static int srvtab_fileparse(srvtab *op,time_t daytime,vecitem *eep) noex {
 
 	    if (bcontrol(sfp,BC_FD,&fd) >= 0) {
 
-	        if (daytime <= 0)
-	            daytime = time(NULL) ;
+	        if (dt <= 0)
+	            dt = time(NULL) ;
 
-	        op->opentime = daytime ;
+	        op->opentime = dt ;
 	        op->fd = u_dup(fd) ;
 
 	        uc_closeonexec(op->fd,TRUE) ;
@@ -844,16 +846,12 @@ static int entry_enough(srvtab_ent *sep) noex {
 
 
 /* load up some groups into the current entry */
-static int entry_groupsload(sep,buf,buflen)
-SRVTAB_ENT	*sep ;
-cchar	buf[] ;
-int		buflen ;
-{
-	field		fsb ;
+static int entry_groupsload(ST_ENT *sep,cchar *buf,int buflen) noex {
 	int	rs ;
 	int	fl ;
 	cchar	*fp ;
 
+	field		fsb ;
 	if ((rs = field_start(&fsb,buf,buflen)) >= 0) {
 
 	while ((fl = field_get(&fsb,key_terms,&fp)) >= 0) {
@@ -911,7 +909,7 @@ static int stradd(cchar **spp,cchar *s,int slen) noex {
 	    char	*cp ;
 	    char	*osp = (char *) sp ;
 
-	    sl = strlen(sp) ;
+	    sl = xstrlen(sp) ;
 
 	    len += (sl + 1) ;
 	    if ((rs = uc_realloc(osp,len,&cp)) >= 0) {

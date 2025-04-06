@@ -1,4 +1,5 @@
 /* strfilemks HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make a STRFILE database */

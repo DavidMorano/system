@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* machine status entry */
+/* server registry database */
 /* version %I% last-modified %G% */
 
 
@@ -29,7 +29,6 @@
 #define	SRVREGE_ALL		struct srvrege_allstuff
 #define	SRVREGE_UT		struct srvrege_utime
 #define	SRVREGE_ADDR		struct srvrege_address
-
 /* the interface types for users */
 #define	SRVREGE_TEMPTY		0	/* entry is unused */
 #define	SRVREGE_TDISABLED	1	/* currently disabled (not serving) */
@@ -43,10 +42,8 @@
 #define	SRVREGE_TSOCKSTREAM	9	/* socket STREAM */
 #define	SRVREGE_TSOCKDGRAM	10	/* socket DGRAM */
 #define	SRVREGE_TPMQ		11	/* POSIX message queue */
-
 /* other (for user) */
 #define	SRVREGE_TAGLEN	14
-
 /* entry field lengths */
 #define	SRVREGE_LSTIME		4
 #define	SRVREGE_LUTIME		4
@@ -60,12 +57,10 @@
 #define	SRVREGE_LSVC		MAXNAMELEN
 #define	SRVREGE_LSS		MAXNAMELEN
 #define	SRVREGE_LHOST		MAXHOSTNAMELEN
-
 /* entry field offsets */
 /* do this carefully! */
 /* there is no good automatic way to do this in C language (sigh) */
 /* the C language does not have all of the advantages of assembly language */
-
 #define	SRVREGE_OUTIME		(0 * 4)
 #define	SRVREGE_OSTIME		(1 * 4)
 #define	SRVREGE_OHOSTID		(2 * 4)

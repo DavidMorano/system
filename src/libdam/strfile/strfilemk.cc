@@ -1,4 +1,5 @@
 /* strfilemk HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* STRFILEMK management */
@@ -37,6 +38,8 @@
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<modload.h>
+#include	<snvpt.h>
+#include	<mkpathx.h>
 #include	<localmisc.h>
 
 #include	"strfilemk.h"
@@ -56,8 +59,6 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
 extern int	mkpath1(char *,cchar *) ;
 extern int	mkpath1w(char *,cchar *,int) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
@@ -68,7 +69,6 @@ extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
 extern int	mksofname(char *,cchar *,cchar *,cchar *) ;
 extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	pathclean(char *,cchar *,int) ;
 
 extern char	*strwcpy(char *,cchar *,int) ;
 

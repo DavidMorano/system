@@ -2,13 +2,16 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
+/* server registry database */
+/* version %I% last-modified %G% */
+
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
 	= 2003-06-25, David A­D­ Morano
-	This is a whole rewrite of the marshalling for deadling
-	with MS entries.  The previous stuff (now eradicated !)
+	This is a whole rewrite of the marshalling for dealing
+	with SRVREG entries.  The previous stuff (now eradicated !)
 	was too error-prone and inflexible to deal with partial
 	updates.
 

@@ -24,8 +24,9 @@
 	Name:
 	srvreg
 
+	Description:
 	This module manages the reading and writing of entries to
-	or from a server registry file. A server registry file is
+	or from a server registry file.  A server registry file is
 	where (system?) servers register themselves so that clients
 	know how to communicate with them.
 

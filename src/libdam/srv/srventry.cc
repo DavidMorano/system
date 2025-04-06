@@ -52,6 +52,9 @@
 
 #define	EBUFLEN		(10 * MAXPATHLEN)
 
+#define	SE		srventry
+#define	SE_ARGS		srventry_args
+
 
 /* external subroutines */
 
@@ -64,11 +67,11 @@
 
 /* forward references */
 
-static int	process(varsub *,cchar *,SRVENTRY_ARGS *,cchar **) noex ;
-static int	expand(cchar *,int,srventry_args *,char *,int) noex ;
+static int	process(varsub *,cchar *,SE_ARGS *,cchar **) noex ;
+static int	expand(cchar *,int,SE_ARGS *,char *,int) noex ;
 
 
-/* external variables */
+/* local variables */
 
 
 /* exported variables */
@@ -76,7 +79,7 @@ static int	expand(cchar *,int,srventry_args *,char *,int) noex ;
 
 /* exported subroutines */
 
-int srventry_start(srventry *sep) noex {
+int srventry_start(SE *sep) noex {
 	int		rs = SR_FAULT ;
 	if (sep) {
 	    rs = memclear(sep) ;
@@ -91,7 +94,7 @@ int srventry_start(srventry *sep) noex {
 }
 /* end subroutine (srventry_init) */
 
-int srventry_finish(srventry *sep) noex {
+int srventry_finish(SE *sep) noex {
 	int		rs = SR_FAULT ;
 	if (sep) {
 	    rs = SR_OK ;
@@ -118,8 +121,8 @@ int srventry_finish(srventry *sep) noex {
 }
 /* end subroutine (srventry_uc_free) */
 
-int srventry_process(srventry *sep,varsub *ssp,mainv envv,
-		srvtab_ent *step,srventry_args *esap) noex {
+int srventry_process(SE *sep,varsub *ssp,mainv envv,
+		srvtab_ent *step,SE_ARGS *esap) noex {
 	int		rs = SR_FAULT ;
 	if (sep && sep && envv && step && esap) {
 	    rs = SR_OK ;
@@ -146,7 +149,7 @@ int srventry_process(srventry *sep,varsub *ssp,mainv envv,
 }
 /* end subroutine (srventry_process) */
 
-int srventry_addprogram(srventry *sep,cchar *program) noex {
+int srventry_addprogram(SE *sep,cchar *program) noex {
 	int		rs = SR_FAULT ;
 	if (sep && program) {
 	    sep->program = mallocstr(program) ;
@@ -156,7 +159,7 @@ int srventry_addprogram(srventry *sep,cchar *program) noex {
 }
 /* end subroutine (srventry_addprogram) */
 
-int srventry_addsrvargs(srventry *sep,cchar *srvargs) noex {
+int srventry_addsrvargs(SE *sep,cchar *srvargs) noex {
 	int		rs = SR_FAULT ;
 	if (sep && srvargs) {
 	    sep->srvargs = mallocstr(srvargs) ;
@@ -166,7 +169,7 @@ int srventry_addsrvargs(srventry *sep,cchar *srvargs) noex {
 }
 /* end subroutine (srventry_addsrvargs) */
 
-int srventry_addusername(srventry *sep,cchar *username) noex {
+int srventry_addusername(SE *sep,cchar *username) noex {
 	int		rs = SR_FAULT ;
 	if (sep && username) {
 	    sep->username = mallocstr(username) ;
@@ -176,7 +179,7 @@ int srventry_addusername(srventry *sep,cchar *username) noex {
 }
 /* end subroutine (srventry_addusername) */
 
-int srventry_addgroupname(srventry *sep,cchar *groupname) noex {
+int srventry_addgroupname(SE *sep,cchar *groupname) noex {
 	int		rs = SR_FAULT ;
 	if (sep && groupname) {
 	    sep->groupname = mallocstr(groupname) ;
@@ -186,7 +189,7 @@ int srventry_addgroupname(srventry *sep,cchar *groupname) noex {
 }
 /* end subroutine (srventry_addgroupname) */
 
-int srventry_addoptions(srventry *sep,cchar *options) noex {
+int srventry_addoptions(SE *sep,cchar *options) noex {
 	int		rs = SR_FAULT ;
 	if (sep && options) {
 	    sep->options = mallocstr(options) ;
@@ -199,8 +202,7 @@ int srventry_addoptions(srventry *sep,cchar *options) noex {
 
 /* local subroutines */
 
-static int process(varsub *vsp,cchar *inbuf,srventry_args *esap,
-		cchar **opp) noex {
+static int process(varsub *vsp,cchar *inbuf,SE_ARGS *esap,cc **opp) noex {
 	int		rs ;
 	int		fl = 0 ;
 	char		vbuf[EBUFLEN + 1] ;
@@ -245,7 +247,7 @@ static int process(varsub *vsp,cchar *inbuf,srventry_args *esap,
 #
 */
 
-static int expand(cchar *buf,int len,srventry_args *esap,
+static int expand(cchar *buf,int len,SE_ARGS *esap,
 		char *rbuf,int rlen) noex {
 	int		elen = 0 ;
 	int		sl ;
@@ -260,7 +262,7 @@ static int expand(cchar *buf,int len,srventry_args *esap,
 	    return 0 ;
 
 	if (len < 0)
-	    len = strlen(buf) ;
+	    len = xstrlen(buf) ;
 
 	rlen -= 1 ;			/* reserve for zero terminator */
 	while ((len > 0) && (elen < rlen)) {
@@ -276,23 +278,23 @@ static int expand(cchar *buf,int len,srventry_args *esap,
 	        switch ((int) *bp) {
 	        case 'V':
 	            cp = esap->version ;
-	            sl = strlen(cp) ;
+	            sl = xstrlen(cp) ;
 	            break ;
 	        case 'S':
 	            cp = esap->searchname ;
-	            sl = strlen(cp) ;
+	            sl = xstrlen(cp) ;
 	            break ;
 	        case 'R':
 	            cp = esap->programroot ;
-	            sl = strlen(cp) ;
+	            sl = xstrlen(cp) ;
 	            break ;
 	        case 'N':
 	            cp = esap->nodename ;
-	            sl = strlen(cp) ;
+	            sl = xstrlen(cp) ;
 	            break ;
 	        case 'D':
 	            cp = esap->domainname ;
-	            sl = strlen(cp) ;
+	            sl = xstrlen(cp) ;
 	            break ;
 	        case 'H':
 	            sl = -1 ;
@@ -306,28 +308,28 @@ static int expand(cchar *buf,int len,srventry_args *esap,
 	                cp = esap->hostname ;
 		    }
 	            if (sl < 0) {
-	                sl = strlen(cp) ;
+	                sl = xstrlen(cp) ;
 		    }
 	            break ;
 
 		case 'U':
 	            cp = esap->username ;
 	            if (cp != nullptr)
-	                sl = strlen(cp) ;
+	                sl = xstrlen(cp) ;
 
 		    break ;
 
 	        case 'P':
 	            cp = esap->peername ;
 	            if (cp != nullptr)
-	                sl = strlen(cp) ;
+	                sl = xstrlen(cp) ;
 
 	            break ;
 
 	        case 's':
 	            cp = esap->service ;
 	            if (cp != nullptr)
-	                sl = strlen(cp) ;
+	                sl = xstrlen(cp) ;
 
 	            break ;
 
@@ -335,28 +337,28 @@ static int expand(cchar *buf,int len,srventry_args *esap,
 
 	            cp = esap->svcargs ;
 	            if (cp != nullptr)
-	                sl = strlen(cp) ;
+	                sl = xstrlen(cp) ;
 
 	            break ;
 
 	        case 'h':
 	            cp = esap->nethost ;
 	            if (cp != nullptr)
-	                sl = strlen(cp) ;
+	                sl = xstrlen(cp) ;
 
 	            break ;
 
 	        case 'u':
 	            cp = esap->netuser ;
 	            if (cp != nullptr)
-	                sl = strlen(cp) ;
+	                sl = xstrlen(cp) ;
 
 	            break ;
 
 	        case 'p':
 	            cp = esap->netpass ;
 	            if (cp != nullptr)
-	                sl = strlen(cp) ;
+	                sl = xstrlen(cp) ;
 
 	            break ;
 
