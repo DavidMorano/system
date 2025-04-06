@@ -113,7 +113,7 @@ struct ipasswd_head {
 	int		collisions ;
 	int		fd ;
 	int		oflags ;
-	int		operm ;
+	mode_t		operm ;
 } ;
 
 typedef IPASSWD			ipasswd ;

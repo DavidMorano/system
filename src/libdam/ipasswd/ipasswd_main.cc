@@ -226,8 +226,7 @@ int ipasswd_open(ipasswd *op,cchar *dbname) noex {
 	            op->fd = -1 ;
 	            op->oflags = O_RDONLY ;
 	            op->operm = 0666 ;
-	            char	*dbfname{} ;
-	            if ((rs = malloc_mp(&dbfname)) >= 0) {
+	            if (char *dbfname ; (rs = malloc_mp(&dbfname)) >= 0) {
 	                if ((rs = mkourfname(dbfname,dbname)) >= 0) {
 	                    cchar	*cp ;
 	                    if ((rs = uc_mallocstrw(dbfname,-1,&cp)) >= 0) {
@@ -452,9 +451,9 @@ int ipasswd_fetch(ipasswd *op,realname *rp,ipasswd_cur *curp,
                     ui = op->rectab[ri].username ;
                     if (up != nullptr) {
                         cp = strwcpy(up,(op->stab + ui),IPASSWD_USERNAMELEN) ;
-                        ul = (cp - up) ;
+                        ul = intconv(cp - up) ;
                     } else {
-                        ul = strlen(op->stab + ui) ;
+                        ul = xstrlen(op->stab + ui) ;
                     }
                     /* update cursor */
                     if (f_cur) {
@@ -562,9 +561,9 @@ int ipasswd_curenum(ipasswd *op,ipasswd_cur *curp,char *ubuf,cc **sa,
 	                        if (ubuf != nullptr) {
 			            cint	ulen = IPASSWD_USERNAMELEN ;
 	                            cp = strwcpy(ubuf,(op->stab + ui),ulen) ;
-	                            ul = (cp - ubuf) ;
+	                            ul = intconv(cp - ubuf) ;
 	                        } else {
-	                            ul = strlen(op->stab + ui) ;
+	                            ul = xstrlen(op->stab + ui) ;
 	                        }
 				/* update the cursor */
 	            		curp->i[0] = ri ;
@@ -782,9 +781,9 @@ int ipasswd_curfetch(ipasswd *op,ipasswd_cur *curp,int opts,char *ubuf,
 	                if (ubuf != nullptr) {
 			    cint	ulen = IPASSWD_USERNAMELEN ;
 	                    cp = strwcpy(ubuf,(op->stab + ui),ulen) ;
-	                    ul = (cp - ubuf) ;
+	                    ul = intconv(cp - ubuf) ;
 	                } else {
-	                    ul = strlen(op->stab + ui) ;
+	                    ul = xstrlen(op->stab + ui) ;
 	                }
 
 /* update cursor */
@@ -929,7 +928,7 @@ static int ipasswd_fileopen(ipasswd *op,time_t dt) noex {
 	                sz += (pwihdr_overlast * szof(int)) ;
 	                if (int isz = intsat(fsz) ; isz >= sz) {
 	                    op->mtime = sb.st_mtime ;
-	                    op->filesize = sb.st_size ;
+	                    op->filesize = intsat(sb.st_size) ;
 	                    rs = ipasswd_remotefs(op) ;
 	                } else {
 	                    rs = SR_NOMSG ;
@@ -996,7 +995,7 @@ static int ipasswd_remotefs(ipasswd *op) noex {
 	int		f = false ;
 	if ((rs = isfsremote(op->fd)) > 0) {
 	    f = true ;
-	    op->f.remote = f ;
+	    op->f.remote = !!f ;
 	}
 	return (rs >= 0) ? f : rs ;
 }
@@ -1142,9 +1141,9 @@ static int detOurSuf(cchar *suf,cchar *fname,int fl) noex {
 	if ((cl = sfbasename(fname,fl,&cp)) > 0) {
 	    cchar	*tp ;
 	    if ((tp = strnrchr(cp,cl,'.')) != nullptr) {
-	        cint	suflen = strlen(suf) ;
+	        cint	suflen = xstrlen(suf) ;
 	        if (strncmp((tp+1),suf,suflen) == 0) {
-	            len = (tp-fname) ;
+	            len = intconv(tp - fname) ;
 	        }
 	    }
 	}
