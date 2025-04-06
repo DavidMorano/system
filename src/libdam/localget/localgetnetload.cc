@@ -64,6 +64,8 @@
 #include	"localget.h"
 
 
+import uvariables ;
+
 /* local defines */
 
 #define	NETLOADFNAME	"netload"

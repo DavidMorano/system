@@ -67,7 +67,7 @@ OBJB_LCOALGET= obj2_localget.o
 OBJ_LCOALGET= $(OBJA_LCOALGET) $(OBJB_LCOALGET)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -93,9 +93,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LCOALGET)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LCOALGET)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -116,16 +119,16 @@ control:
 
 
 obj0_localget.o:	$(OBJ0_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LCOALGET)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_LCOALGET)
 
 obj1_localget.o:	$(OBJ1_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LCOALGET)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_LCOALGET)
 
 obj2_localget.o:	$(OBJ2_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LCOALGET)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_LCOALGET)
 
 obj3_localget.o:	$(OBJ3_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LCOALGET)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_LCOALGET)
 
 
 localgetnetload.o:		localgetnetload.cc	$(INCS)
