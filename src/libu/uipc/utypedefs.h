@@ -236,6 +236,11 @@ typedef unsigned int		uint ;
 typedef unsigned long		ulong ;
 #endif /* TYPEDEF_ULONG */
 
+#ifndef	TYPEDEF_LONGDOUBLE
+#define	TYPEDEF_LONGDOUBLE
+typedef long double		longdouble ;
+#endif /* TYPEDEF_LONGDOUBLE */
+
 #ifndef	TYPEDEF_CBOOL
 #define	TYPEDEF_CBOOL
 typedef const bool		cbool ;
@@ -265,6 +270,11 @@ typedef const int		cint ;
 #define	TYPEDEF_CLONG
 typedef const long		clong ;
 #endif /* TYPEDEF_CULONG */
+
+#ifndef	TYPEDEF_CLONGDOUBLE
+#define	TYPEDEF_CLONGDOUBLE
+typedef const long double	clongdouble ;
+#endif /* TYPEDEF_CLONGDOUBLE */
 
 #ifndef	TYPEDEF_CVOID
 #define	TYPEDEF_CVOID
