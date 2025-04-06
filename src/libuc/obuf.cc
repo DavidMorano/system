@@ -84,8 +84,12 @@
 int obuf::push(int ch) noex {
     	int		rs ;
 	try {
-	    b.push_back(ch) ;
-	    rs = (b.size() - oi) ;
+	    cchar	cha = charconv(ch) ;
+	    b.push_back(cha) ;
+	    {
+		csize	bsize = b.size() ;
+	        rs = (intconv(bsize) - oi) ;
+	    }
 	} catch (...) {
 	    rs = SR_NOMEM ;
 	}
@@ -93,9 +97,10 @@ int obuf::push(int ch) noex {
 }
 
 int obuf::adv(int al) noex {
-	cint		sl = b.size() ;
+    	csize		bsize = b.size() ;
 	int		rl = 0 ;
 	if (al > 0) {
+	    cint	sl = intconv(bsize) ;
 	    if (sl > (oi+al)) {
 	        rl = (sl - oi) ;
 	        oi += rl ;
@@ -108,6 +113,7 @@ int obuf::adv(int al) noex {
 	        }
 	    } /* end if */
 	} else if (al < 0) {
+	    cint	sl = intconv(bsize) ;
 	    if (sl > oi) {
 	        rl = (sl - oi) ;
 	        oi += rl ;

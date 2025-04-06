@@ -42,6 +42,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -72,7 +73,10 @@ class obuf {
 	int		oi ;		/* output index */
 	int push(int) noex ;
 	int ilen() const noex {
-	    return (b.size() - oi) ;
+	    csize	bsize = b.size() ;
+	    int		rs ;
+	    rs = intconv(bsize) - oi ;
+	    return rs ;
 	} ;
 public:
 	obuf_co		start ;
@@ -82,23 +86,24 @@ public:
 	obuf(const obuf &) = delete ;
 	obuf &operator = (const obuf &) = delete ;
 	obuf(cchar *sp = nullptr,int sl = -1) noex : oi(0) {
-	    obuf_co	start(this,obufmem_start) ;
-	    obuf_co	finish(this,obufmem_finish) ;
-	    obuf_co	count(this,obufmem_count) ;
-	    obuf_co	len(this,obufmem_len) ;
+	    start(this,obufmem_start) ;
+	    finish(this,obufmem_finish) ;
+	    count(this,obufmem_count) ;
+	    len(this,obufmem_len) ;
 	    if (sp) {
 	        if (sl < 0) {
-		    sl = strlen(sp) ;
+		    sl = xstrlen(sp) ;
 		}
 		try {
 		    std::string_view	sv(sp,sl) ;
 		    b += sv ;
 		} catch (...) {
+		    (void) sp ;
 		}
 	    } /* end if (non-null) */
 	} ; /* end ctor */
 	int operator [] (int i) const noex {
-	    cint	n = b.size() ;
+	    cint	n = intconv(b.size()) ;
 	    int		rch = 0 ;
 	    if ((oi+i) < n) {
 		rch = mkchar(b[oi+i]) ;
@@ -114,19 +119,24 @@ public:
 	} ;
 	int add(cchar *sp,int sl = -1) noex {
 	    int		rs = SR_OK ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    try {
 		std::string_view	sv(sp,sl) ;
 		b += sv ;
-	        rs = (b.size() - oi) ;
+		{
+		    csize	bsize = b.size() ;
+	            rs = (intconv(bsize) - oi) ;
+		}
 	    } catch (...) {
 		rs = SR_NOMEM ;
 	    }
 	    return rs ;
 	} ;
 	int at(int i) const noex {
-	    cint	n = b.size() ;
+	    csize	bsize = b.size() ;
+	    int		n ;
 	    int		rch = 0 ;
+	    n = intconv(bsize) ;
 	    if ((oi+i) < n) {
 		rch = mkchar(b[oi+i]) ;
 	    }
@@ -137,8 +147,8 @@ public:
 	~obuf() {
 	    dtor() ;
 	} ; /* end dtor */
-	operator int () const noex {
-	    return ilen() ;
+	operator int () noex {
+	    return len() ;
 	} ;
 } ; /* end class (obuf) */
 
