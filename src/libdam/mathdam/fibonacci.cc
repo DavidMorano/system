@@ -11,9 +11,17 @@
 	= 1998-09-10, David A­D­ Morano
 	This was originally written.
 
+	= 2024-12-15, David A­D­ Morano
+	I (finally) revised this little (old) function to use C++20
+	math constants (new w/ C++20).  This was not a big deal and
+	was likely not very important.  It did save a tiny bit of
+	module-load-time static-constant initialization.  Before
+	C++20 I computed (at module-load-time) the constants (|double|
+	and |long double|) for the Golden-Ratio (phi).
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2024 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -56,21 +64,80 @@
 	the last entry (#47) storing the last representable result
 	for a 32-bit unsigned integer.
 
+
+	Name:
+	dfifonacci
+	lfifonacci
+
+	Description:
+	We calculate the (floating) Fibonacci of the given number.
+
+	Synopsis:
+	double		dfibonacci(int n) noex
+	long double	lfibonacci(int n) noex
+
+	Arguments:
+	n	number to return Fibonacci value for
+
+	Returns:
+	-	the Fibonacci of the input
+
+	Notes:
+	The original Fibonacci function:
+	double dfibonacci(int n) noex {
+	    return dfibonacci(n-1) + dfibonacci(n-2) ;
+	}
+
+	Floating-point (double) version:
+	constexpr double	phi = ((1.0 + sqrt(5.0)) / 2.0) ;
+	constexpr double	num = binexp(phi,n) - binexp((1.0 - phi),n) ;
+	constexpr double	den = sqrt(5.0) ;
+	dfibonacci(n) = floor(num / den) ;
+
+	Note that the variable 'phi' above is the Golden-Number.
+
+	There is no |float|-type version of this subroutine.
+
+	Note that for C++ the math functions (see my use of
+	|floor(3m++)| below) need to be imported from the C++ |std|
+	namespace, otherwise the stupid-(ass) compiler will not
+	properly disambiguate which version of the function (either
+	|double| or |long double|) to call.  We (poor) programmers
+	have to deal with these sort of shoddy compiler issues.
+	Some will argue that this problem is justified because only
+	the C20 language (and not C++20) understands how to
+	disambiguate the CMATH functions based on the argument type.
+	My response: to you C++ compilers out there -- grow up and
+	just deal with it!
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cmath>			/* |floor(3m++)| | |sqrt(3c++)| */
+#include	<numbers>		/* C++20 math consants */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
+#include	"binexp.h"
 #include	"fibonacci.h"
 
 
-/* local variables */
+/* local defines */
+
+
+/* imported namespaces */
+
+using std::sqrt ;			/* subroutine-template (req by C++) */
+using std::floor ;			/* subroutine-template (req by C++) */
+using std::numbers::phi ;		/* constant (C++20) */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -83,9 +150,6 @@
 
 
 /* forward references */
-
-
-/* local variables */
 
 constexpr uint		fibotab[] = {
 	0x00000000, 0x00000001, 0x00000001, 0x00000002,
@@ -101,6 +165,26 @@ constexpr uint		fibotab[] = {
 	0x06197ecb, 0x09de8d6d, 0x0ff80c38, 0x19d699a5,
 	0x29cea5dd, 0x43a53f82, 0x6d73e55f, 0xb11924e1
 } ;
+
+template<typename T> constexpr T five = T{5.0} ;
+
+template<typename T> static T fibonaccix(int n) noex {
+    	static constexpr T	den = sqrt(five<T>) ;
+	static constexpr T	aphi = std::numbers::phi_v<T> ;
+	T		v = -1.0 ;
+	if (n >= 0) {
+	    if (n < nelem(fibotab)) {
+	        v = (T) fibotab[n] ;
+	    } else {
+	        const T num = binexp(aphi,n) - binexp((1.0 - aphi),n) ;
+	        v = floor(num / den) ;
+	    } /* end if */
+	}
+	return v ;
+}
+/* end subroutine-template (fibonaccix) */
+
+/* local variables */
 
 
 /* exported variables */
@@ -119,5 +203,13 @@ long fibonacci(int n) noex {
 	return v ;
 }
 /* end subroutine (fibonacci) */
+
+double dfibonacci(int n) noex {
+    	return fibonaccix<double>(n) ;
+}
+
+longdouble lfibonacci(int n) noex { 
+    	return fibonaccix<longdouble>(n) ;
+}
 
 

@@ -86,7 +86,7 @@
 #include	<binexp.h>
 #include	<localmisc.h>
 
-#include	"dfibonacci.h"
+#include	"fibonacci.h"
 
 
 /* local defines */
@@ -112,7 +112,7 @@ using std::numbers::phi ;		/* constant (C++20) */
 
 /* forward references */
 
-template<typename T> static T fibonaccix(T phi,T den,int n) noex {
+template<typename T> static T fibonaccix(T aphi,T den,int n) noex {
 	T	v = -1.0 ;
 	if (n >= 0) {
 	    switch (n) {
@@ -131,7 +131,7 @@ template<typename T> static T fibonaccix(T phi,T den,int n) noex {
 		break ;
 	    default:
 		{
-	            const T num = binexp(phi,n) - binexp((1.0 - phi),n) ;
+	            const T num = binexp(aphi,n) - binexp((1.0 - aphi),n) ;
 	            v = floor(num / den) ;
 		}
 		break ;
@@ -144,7 +144,7 @@ template<typename T> static T fibonaccix(T phi,T den,int n) noex {
 
 /* local variables */
 
-#ifdef	COMMENT
+#ifdef	COMMENT /* these are now provided by C++20 */
 constexpr double	phi = ((1.0 + sqrt(5.0)) / 2.0) ;   /* prior C++20 */
 constexpr long double	phil = ((1.0 + sqrtl(5.0)) / 2.0) ; /* prior C++20 */
 #endif

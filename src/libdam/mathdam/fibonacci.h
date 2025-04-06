@@ -30,6 +30,9 @@ EXTERNC_begin
 
 extern long	fibonacci(int) noex ;
 
+extern double		dfibonacci(int) noex ;
+extern long double	ldfibonacci(int) noex ;
+
 EXTERNC_end
 
 

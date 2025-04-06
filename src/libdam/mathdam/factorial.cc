@@ -33,29 +33,60 @@
 	-	the factorial result of the input
 
 	Notes:
-	The original Fibonacci function:
+	The original Factorial function:
 
 	long factorial(int n) {
 	    return (n * factorial(n-1)) ;
 	}
 
-	Note that when putting the result into a 32-bit unsigned
-	integer (which is what we are doing here) the largest valued
-	input (domain) of the Factorial function that can be
-	represented in the result is 12. An input value of 13
-	overflows the 32-bit unsigned integer result.
 
+  	Name:
+	dfactorial
+	ldfactorial
 
-	Floating-point:
+	Description:
+	We calculate the (floating) factorial of the given (integer)
+	number.
 
-	f(n) = floor(1.0 / sqrt(5.0)) * pow(((1.0 + sqrt(5.0)) / 2.0),(n+1))
-	
+	Synopsis:
+	double		dfactorial(int n) noex
+	long double	ldfactorial(int n) noex
+
+	Arguments:
+	n	number to return factorial value for
+
+	Returns:
+	-	the factorial result (as a |double|)
+
+	Notes:
+	The original factorial function:
+
+	double factorial(int n) noex {
+	    return (n * dfactorial(n-1)) ;
+	}
+
+	Stirling's approximation:
+	f(n) = sqrt(2.0 * pi * n) * pow((n / e),n)
+
+	Gamma function:
+	f(n) = gamma(n + 1)
+
+	Note that the C++ function |tgamma(3c++)| needs to be
+	imported from the C++ |std| namespace because the C++
+	compiler (whatever it may be) is too stupid to deal with
+	disambiguating which version of the function (|double| or
+	|long double|) to use otherwise (without the namespace
+	importation).  This should be corrected with the compiler
+	implementation, but who has the time to deal with that?
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cmath>			/* |tgamma(3m++)| */
+#include	<numbers>		/* |pi(3c++)| + |e(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -66,6 +97,16 @@
 
 
 /* local defines */
+
+
+/* impored namespaces */
+
+using std::tgamma ;			/* subroutine */
+using std::numbers::pi ;		/* constant (C++20) */
+using std::numbers::e ;			/* constant (C++20) */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -79,10 +120,7 @@
 
 /* forward references */
 
-
-/* local variables */
-
-constexpr long		facttab[] = {
+constexpr long		facts[] = {
 	0x0000000000000001, 0x0000000000000001, 
 	0x0000000000000002, 0x0000000000000006,
 	0x0000000000000018, 0x0000000000000078, 
@@ -96,6 +134,20 @@ constexpr long		facttab[] = {
 	0x21c3677c82b40000
 } ;
 
+template<typename T> static T factorialx(int n) noex {
+	T	v = -1.0 ;
+	if (n >= 0) {
+	    if (n < nelem(facts)) {
+		v = (T) facts[n] ;
+	    } else {
+		const T x = (T) (n + 1) ;
+		v = tgamma(x) ;
+	    } /* end if */
+	}
+	return v ;
+}
+/* end subroutine-template (factorialx) */
+
 
 /* exported variables */
 
@@ -105,13 +157,21 @@ constexpr long		facttab[] = {
 long factorial(int n) noex {
 	long		v = -1 ;
 	if (n >= 0) {
-	    cint	ne = nelem(facttab) ;
+	    cint	ne = nelem(facts) ;
 	    if (n < ne) {
-	        v = facttab[n] ;
+	        v = facts[n] ;
 	    }
 	}
 	return v ;
 }
 /* end subroutine (factorial) */
+
+double		dfactorial(int n) noex {
+    	return factorialx<double>(n) ;
+}
+
+long double	ldfactorial(int n) noex {
+    	return factorialx<long double>(n) ;
+}
 
 
