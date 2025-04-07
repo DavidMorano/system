@@ -56,16 +56,12 @@
 #include	<mkpath.h>
 #include	<mkpr.h>
 #include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NOFILE| */
 
 #include	"rmermsg.h"
 
 
 /* local defines */
-
-#ifndef	NOFILE
-#define	NOFILE		20
-#endif
 
 #ifndef	VARPRLOCAL
 #define	VARPRLOCAL	"LOCAL"
@@ -95,7 +91,9 @@
 
 /* external subroutines */
 
-extern int	pcsgetprogpath(cchar *,char *,cchar *,int) ;
+extern "C" {
+    extern int	pcsgetprogpath(cchar *,char *,cchar *,int) noex ;
+}
 
 
 /* external variables */
@@ -120,23 +118,24 @@ struct subinfo {
 	time_t		daytime ;
 } ;
 
+typedef int (*subinfo_f)(subinfo *) noex ;
+
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,cchar *,int) noex ;
-static int	subinfo_finish(SUBINFO *) noex ;
-static int	subinfo_fork(SUBINFO *) noex ;
-static int	subinfo_daemon(SUBINFO *) noex ;
-static int	subinfo_rmer(SUBINFO *) noex ;
+static int	subinfo_start(ßubinfo *,cchar *,int) noex ;
+static int	subinfo_finish(ßubinfo *) noex ;
+static int	subinfo_fork(ßubinfo *) noex ;
+static int	subinfo_daemon(ßubinfo *) noex ;
+static int	subinfo_rmer(ßubinfo *) noex ;
 
 
 /* local variables */
 
-constexpr int	(*scheds[])(SUBINFO *) = {
+constexpr subinfo_f	scheds[] = {
 	subinfo_rmer,
 	subinfo_fork,
-	subinfo_daemon,
-	NULL
+	subinfo_daemon
 } ;
 
 
@@ -149,14 +148,14 @@ int unlinkd(cchar *fname,int delay) noex {
 	int		rs ;
 	int		rs1 ;
 
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
 	if (USTAT sb ; (rs = u_stat(fname,&sb)) >= 0) {
 	    SUBINFO	si, *sip = &si ;
 	    if ((rs = subinfo_start(sip,fname,delay)) >= 0) {
-		for (int i = 0 ; scheds[i] != NULL ; i += 1) {
+		for (int i = 0 ; scheds[i] != nullptr ; i += 1) {
 	    	    rs = (*scheds[i])(sip) ;
 	    	    if (rs >= 0) break ;
 	        } /* end for */
@@ -174,7 +173,7 @@ int unlinkd(cchar *fname,int delay) noex {
 
 /* local subroutines */
 
-static int subinfo_start(SUBINFO *sip,cchar *fname,int delay) noex {
+static int subinfo_start(ßubinfo *sip,cchar *fname,int delay) noex {
 	int		rs = SR_FAULT ;
 	if (delay <= 0) delay = DEFDELAY ;
 	if (sip && fname) {
@@ -187,7 +186,7 @@ static int subinfo_start(SUBINFO *sip,cchar *fname,int delay) noex {
 }
 /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+static int subinfo_finish(ßubinfo *sip) noex {
     	int		rs = SR_FAULT ;
 	if (sip) {
 	    sip->daytime = 0 ;
@@ -197,7 +196,7 @@ static int subinfo_finish(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
-static int subinfo_fork(SUBINFO *sip) noex {
+static int subinfo_fork(ßubinfo *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = u_fork()) == 0) {
@@ -230,7 +229,7 @@ static int subinfo_fork(SUBINFO *sip) noex {
 
 	        uc_safesleep(1) ;
 
-	        sip->daytime = time(NULL) ;
+	        sip->daytime = time(nullptr) ;
 
 	        rs1 = u_stat(sip->arg.fname,&sb) ;
 	        if (rs1 < 0)
@@ -238,7 +237,7 @@ static int subinfo_fork(SUBINFO *sip) noex {
 
 	    } /* end for */
 
-	    if ((rs1 >= 0) && (sip->arg.fname != NULL)) {
+	    if ((rs1 >= 0) && (sip->arg.fname != nullptr)) {
 	        u_unlink(sip->arg.fname) ;
 	    }
 
@@ -249,14 +248,14 @@ static int subinfo_fork(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_fork) */
 
-static int subinfo_daemon(SUBINFO *sip) noex {
+static int subinfo_daemon(ßubinfo *sip) noex {
 	int		rs = SR_NOSYS ;
-	if (sip == NULL) return SR_FAULT ;
+	if (sip == nullptr) return SR_FAULT ;
 	return rs ;
 }
 /* end subroutine (subinfo_daemon) */
 
-static int subinfo_rmer(SUBINFO *sip) noex {
+static int subinfo_rmer(ßubinfo *sip) noex {
 	spawnproc	pg{} ;
 	rmermsg_fname	m0{} ;
 	pid_t		pid ;
@@ -278,10 +277,10 @@ static int subinfo_rmer(SUBINFO *sip) noex {
 	char		dname[MAXHOSTNAMELEN + 1] ;
 	char		pr[MAXPATHLEN + 1] ;
 	char		progfname[MAXPATHLEN + 1] ;
-	char		*ipcbuf = NULL ;
+	char		*ipcbuf = nullptr ;
 
 
-	rs1 = getnodedomain(NULL,dname) ;
+	rs1 = getnodedomain(nullptr,dname) ;
 	if (rs1 < 0)
 	    dname[0] = '\0' ;
 
@@ -322,7 +321,7 @@ static int subinfo_rmer(SUBINFO *sip) noex {
 
 	i = 0 ;
 	av[i++] = "RMER" ;
-	av[i++] = NULL ;
+	av[i++] = nullptr ;
 
 	pg.disp[0] = SPAWNPROC_DOPEN ;
 	pg.disp[1] = SPAWNPROC_DCLOSE ;
@@ -368,7 +367,7 @@ static int subinfo_rmer(SUBINFO *sip) noex {
 	} /* end for */
 
 ret1:
-	if (ipcbuf != NULL) {
+	if (ipcbuf != nullptr) {
 	    uc_free(ipcbuf) ;
 	}
 

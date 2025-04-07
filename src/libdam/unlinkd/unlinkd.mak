@@ -47,6 +47,13 @@ RUNINFO= -rpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
 
 OBJ00= unlinkd_main.o 
 OBJ01= rmermsg.o
@@ -71,7 +78,7 @@ OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
 OBJ= $(OBJA) $(OBJB)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -97,9 +104,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
 
-$(T).o:			$(OBJ) Makefile $(T).map
-	$(LD) -r -o $@ $(LDFLAGS) -M $(T).map -B reduce $(OBJ)
+
+$(T).o:			$(OBJ) Makefile
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
 
 $(T).nm nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
