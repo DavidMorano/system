@@ -1,4 +1,5 @@
 /* configvars_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Configuration-Variables */
@@ -30,7 +31,8 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<usupport.h>

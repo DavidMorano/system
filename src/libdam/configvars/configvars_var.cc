@@ -1,4 +1,5 @@
 /* configvars_var SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Configuration-Variables */
@@ -17,21 +18,24 @@
 
 /*******************************************************************************
 
+  	Name:
+	congivars_var
+
+	Description:
 	This is an object that reads configuration files and organizes
 	the content into the object for structured access.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<usupport.h>
@@ -86,16 +90,15 @@ namespace configvars_obj {
 	int		rs = SR_FAULT ;
 	if (cep && kp) {
 	    int		len{} ;
-	    char	*vb{} ;
 	    memclear(cep) ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = xstrlen(kp) ;
 	    if (vp) {
-	        if (vl < 0) vl = strlen(vp) ;
+	        if (vl < 0) vl = xstrlen(vp) ;
 	    } else {
 		vl = 0 ;
 	    }
 	    len = (kl + vl + 2) ;
-	    if ((rs = uc_malloc(len,&vb)) >= 0) {
+	    if (char *vb ; (rs = uc_malloc(len,&vb)) >= 0) {
 	        char	*cp = (strwcpy(vb,kp,kl) + 1) ;
 	        cep->fi = fi ;
 	        cep->key = vb ;

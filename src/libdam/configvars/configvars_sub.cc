@@ -1,4 +1,5 @@
 /* configvars_sub SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Configuration-Variables - Subsidiary-Functions */
@@ -16,21 +17,24 @@
 
 /*******************************************************************************
 
+  	Name:
+	configvars_sub
+
+	Description:
 	This is an object that reads configuration files and organizes
 	the content into the object for structured access.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<usupport.h>

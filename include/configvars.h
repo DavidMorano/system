@@ -1,4 +1,5 @@
 /* configvars HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Configuration-Variables */
@@ -12,9 +13,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<time.h>
+#include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

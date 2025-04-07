@@ -1,4 +1,5 @@
-/* configvars SUPPORT */
+/* configvars_file SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Configuration-Variables */
@@ -16,14 +17,16 @@
 
 /*******************************************************************************
 
+  	Name:
+	configvars_file
+
+	Description:
 	This is an object that reads configuration files and organizes
 	the content into the object for structured access.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -31,6 +34,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<usupport.h>
@@ -89,17 +93,16 @@ namespace configvars_obj {
 	    memclear(cfp) ;
 	    rs = SR_NOMEM ;
 	    if ((cfp->filename = mallocstr(filename)) != nullptr) {
-	        vecobj		*vip{} ;
+	        vecobj		*vip = &cfp->defines ;
 		cint		vsz = szof(CV_VAR) ;
 		cint		vn = 0 ;
 		cint		vo = 0 ;
-	        vip = &cfp->defines ;
 	        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 	            vip = &cfp->exports ;
 	            if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 	                vip = &cfp->unsets ;
 		        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
-			    rs = strlen(filename) ;
+			    rs = xstrlen(filename) ;
 		        }
 		        if (rs < 0) {
 			    vecobj_finish(&cfp->exports) ;
