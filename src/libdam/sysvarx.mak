@@ -66,7 +66,7 @@ OBJB_STRLIST= obj2.o obj3.o
 OBJ_STRLIST= obja.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -92,9 +92,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_STRLIST)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -115,23 +118,23 @@ control:
 
 
 obj0.o:			$(OBJ0_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_STRLIST)
 
 obj1.o:			$(OBJ1_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_STRLIST)
 
 obj2.o:			$(OBJ2_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_STRLIST)
 
 obj3.o:			$(OBJ3_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_STRLIST)
 
 
 obja.o:			$(OBJA_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_STRLIST)
 
 objb.o:			$(OBJB_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_STRLIST)
 
 
 sysvar.o:		sysvar.cc	sysvar.h	$(INCS)

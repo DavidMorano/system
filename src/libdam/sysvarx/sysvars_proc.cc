@@ -270,7 +270,7 @@ static int procvarfile(hdbstr *vlp,cchar *fname) noex {
 
 	                if ((kl > 0) && (! hasweird(kp,kl))) {
 	                    cint	nrs = SR_NOTFOUND ;
-	                    const void	*n = nullptr ;
+	                    cvoid	*n = nullptr ;
 
 	                    if ((rs = hdbstr_fetch(vlp,kp,kl,n,n)) == nrs) {
 
