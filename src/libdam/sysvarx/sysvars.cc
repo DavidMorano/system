@@ -342,7 +342,9 @@ constexpr cpcchar	dbdirs[] = {
 	nullptr
 } ;
 
-static strlibval		tmpdname(strlibval_tmpdir) ;
+static strlibval	tmpdname(strlibval_tmpdir) ;
+
+cbool			f_mksysvars = CF_MKSYSVARS ;
 
 
 /* exported variables */
@@ -494,8 +496,8 @@ int sysvars_count(SVS *op) noex {
 static int sysvars_infoloadbegin(SVS *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		sz = 0 ;
-	sz += (strlen(pr)+1) ;
-	sz += (strlen(dbname)+1) ;
+	sz += (xstrlen(pr) + 1) ;
+	sz += (xstrlen(dbname) + 1) ;
 	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->pr = bp ;
@@ -643,7 +645,7 @@ static int sysvars_loadcooks(SVS *op,expcook *ecp) noex {
 		break ;
 	    } /* end switch */
 	    if ((rs >= 0) && vp) {
-		kbuf[0] = kch ;
+		kbuf[0] = charconv(kch) ;
 		rs = expcook_add(ecp,kbuf,vp,vl) ;
 	    }
 	} /* end for */
@@ -734,11 +736,10 @@ static int sysvars_indmkdata(SVS *op,cchar *indname,mode_t om) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (op) {
-	    hdbstr	vars, *vlp = &vars ;
-	    if ((rs = hdbstr_start(vlp,DEFNVARS)) >= 0) {
-	        int	f ;
+	    if (hdbstr vt ; (rs = hdbstr_start(&vt,DEFNVARS)) >= 0) {
+	        bool	f  = false ;
 	        for (int i = 0 ; sysfnames[i] != nullptr ; i += 1) {
-	            rs = sysvars_procget(vlp,sysfnames[i]) ;
+	            rs = sysvars_procget(&vt,sysfnames[i]) ;
 	            f = false ;
 	            f = f || (rs == SR_NOENT) ;
 	            f = f || (rs == SR_ACCESS) ;
@@ -747,9 +748,9 @@ static int sysvars_indmkdata(SVS *op,cchar *indname,mode_t om) noex {
 	            if (rs < 0) break ;
 	        } /* end for */
 	        if (rs >= 0) {
-	            rs = sysvars_procset(vlp,indname,om) ;
+	            rs = sysvars_procset(&vtindname,om) ;
 	        }
-	        rs1 = hdbstr_finish(vlp) ;
+	        rs1 = hdbstr_finish(&vt) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (hdbstr) */
 	} /* end if (non-null) */
