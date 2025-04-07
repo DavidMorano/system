@@ -145,27 +145,25 @@ constexpr subinfo_f	scheds[] = {
 /* exported subroutines */
 
 int unlinkd(cchar *fname,int delay) noex {
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (fname == nullptr) return SR_FAULT ;
-
-	if (fname[0] == '\0') return SR_INVALID ;
-
-	if (USTAT sb ; (rs = u_stat(fname,&sb)) >= 0) {
-	    SUBINFO	si, *sip = &si ;
-	    if ((rs = subinfo_start(sip,fname,delay)) >= 0) {
-		for (int i = 0 ; scheds[i] != nullptr ; i += 1) {
-	    	    rs = (*scheds[i])(sip) ;
-	    	    if (rs >= 0) break ;
-	        } /* end for */
-	        rs1 = subinfo_finish(sip) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (subinfo) */
-	} else if (isNotPresent(rs)) {
-	    rs = SR_OK ;
-	} /* end if (uc_stat) */
-
+	if (fname) {
+	    rs = SR_INVALID ;
+	   if (fname[0]) {
+	       if (USTAT sb ; (rs = u_stat(fname,&sb)) >= 0) {
+	           if (subinfo si ; (rs = subinfo_start(si,fname,delay)) >= 0) {
+		       for (cauto &fun : scheds) {
+	    	           rs = (*fun)(&si) ;
+	    	           if (rs >= 0) break ;
+	               } /* end for */
+	               rs1 = subinfo_finish(&si) ;
+		       if (rs >= 0) rs = rs1 ;
+	           } /* end if (subinfo) */
+	       } else if (isNotPresent(rs)) {
+	           rs = SR_OK ;
+	       } /* end if (uc_stat) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (unlinkd) */
