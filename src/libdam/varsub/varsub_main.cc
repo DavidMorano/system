@@ -1,4 +1,5 @@
 /* varsub_main SUPPORT */
+/* varsub_addvec SUPPORT */
 /* lang=C++20 */
 
 /* module to handle variable substitution in strings */
@@ -21,7 +22,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	varsub
 
 	Description:
@@ -36,7 +37,7 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<new>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
@@ -146,7 +147,10 @@ static int	entry_tmp(ent *,cchar *,int,cchar *,int) noex ;
 static int	entry_valcmp(ent *,ent *) noex ;
 
 static int	getkey(cchar *,int,int [][2]) noex ;
-static int	vcmpent(cvoid **,cvoid **) noex ;
+
+extern "C" {
+    static int	vcmpent(cvoid **,cvoid **) noex ;
+}
 
 
 /* local subroutines */
@@ -240,7 +244,8 @@ int varsub_addva(varsub *op,mainv envv) noex {
 	            if (isprintlatin(kch)) {
 	                cint	vch = mkchar(vp[0]) ;
 	                if ((vch == '\0') || isprintlatin(vch)) {
-	                    rs = varsub_iadd(op,esp,(tp-esp),vp,-1) ;
+			    cint	tl = intconv(tp - esp) ;
+	                    rs = varsub_iadd(op,esp,tl,vp,-1) ;
 	                    if (rs < INT_MAX)  c += 1 ;
 	                }
 	            } /* end if (adding) */
@@ -276,7 +281,8 @@ int varsub_addvaquick(varsub *op,cchar **envv) noex {
 	            if (isprintlatin(kch)) {
 	                cint	vch = mkchar(vp[0]) ;
 	                if ((vch == '\0') || isprintlatin(vch)) {
-	                    rs = varsub_iaddq(op,esp,(tp-esp),vp,-1) ;
+			    cint	tl = intconv(tp - esp) ;
+	                    rs = varsub_iaddq(op,esp,tl,vp,-1) ;
 	                    if (rs < INT_MAX)  c += 1 ;
 	                }
 	            } /* end if (adding) */
@@ -293,7 +299,7 @@ int varsub_del(varsub *op,cchar *k,int klen) noex {
 	int		rs1 ;
 	if ((rs = varsub_magic(op,k)) >= 0) {
 	    vechand	*elp = op->slp ;
-	    if (klen < 0) klen = strlen(k) ;
+	    if (klen < 0) klen = xstrlen(k) ;
 	    if (klen > 0) {
 	        ent	te ;
 	        void	*vp{} ;
@@ -324,7 +330,7 @@ int varsub_find(varsub *op,cchar *k,int klen,cchar **vpp,int *vlenp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	if ((rs = varsub_magic(op,k)) >= 0) {
-	    if (klen < 0) klen = strlen(k) ;
+	    if (klen < 0) klen = xstrlen(k) ;
 	    if ((rs = varsub_sort(op)) >= 0) {
 	        rs = varsub_getval(op,k,klen,vpp) ;
 	        vl = rs ;
@@ -338,7 +344,7 @@ int varsub_find(varsub *op,cchar *k,int klen,cchar **vpp,int *vlenp) noex {
 int varsub_fetch(varsub *op,cchar *k,int klen,cchar **vpp) noex {
 	int		rs ;
 	if ((rs = varsub_magic(op,k)) >= 0) {
-	    if (klen < 0) klen = strlen(k) ;
+	    if (klen < 0) klen = xstrlen(k) ;
 	    if ((rs = varsub_sort(op)) >= 0) {
 	        rs = varsub_getval(op,k,klen,vpp) ;
 	    }
@@ -414,14 +420,13 @@ int varsub_exp(varsub *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 	    if ((rs = maxlinelen) >= 0) {
 		cint	mll = rs ;
 	        rs = SR_TOOBIG ;
-	        if (slen < 0) slen = strlen(sbuf) ;
+	        if (slen < 0) slen = xstrlen(sbuf) ;
 	        if (dlen < 0) dlen = mll ;
 	        op->badline = -1 ;
 	        if (dlen >= slen) {
 	            if ((rs = varsub_sort(op)) >= 0) {
 		        auto	vsp = varsub_procvalue ;
-	                buffer	b ;
-	                if ((rs = b.start(mll)) >= 0) {
+	                if (buffer b ; (rs = b.start(mll)) >= 0) {
 	                    if ((rs = vsp(op,&b,sbuf,slen)) >= 0) {
 	                        if (cchar *bp{} ; (rs = b.get(&bp)) >= 0) {
 	                            bl = rs ;
@@ -442,7 +447,7 @@ int varsub_exp(varsub *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 int varsub_expbuf(varsub *op,buffer *bufp,cchar *sbuf,int slen) noex {
 	int		rs ;
 	if ((rs = varsub_magic(op,bufp,sbuf)) >= 0) {
-	    if (slen < 0) slen = strlen(sbuf) ;
+	    if (slen < 0) slen = xstrlen(sbuf) ;
 	    if ((rs = varsub_sort(op)) >= 0) {
 	        rs = varsub_procvalue(op,bufp,sbuf,slen) ;
 	    }
@@ -499,23 +504,24 @@ static int varsub_procvalue(varsub *op,buffer *bufp,cchar *sp,int sl) noex {
 	cchar		*tp ;
 	while ((tp = strnchr(sp,sl,'$')) != nullptr) {
 	    cchar	*cp = sp ;
-	    int		cl = (tp - sp) ;
+	    int		cl = intconv(tp - sp) ;
 	    if (cl > 0) {
 	        rs = bufp->strw(cp,cl) ;
 	        len += rs ;
 	    }
 	    if (rs >= 0) {
+		cint	tl = intconv((sp + sl) - tp) ;
 	        kp = (tp + 2) ;
-	        if ((kl = getkey(tp,((sp + sl) - tp),sses)) > 0) {
+	        if ((kl = getkey(tp,tl,sses)) > 0) {
 	            rs = varsub_procsub(op,bufp,kp,kl) ;
 	            len += rs ;
 	        }
 	        if (rs >= 0) {
 	            if (kl >= 0) {
-	                sl -= ((kp + kl + 1) - sp) ;
+	                sl -= intconv((kp + kl + 1) - sp) ;
 	                sp = (kp + kl + 1) ;
 	            } else {
-	                sl -= ((tp + 1) - sp) ;
+	                sl -= intconv((tp + 1) - sp) ;
 	                sp = (tp + 1) ;
 	                rs = bufp->chr('$') ;
 	                len += rs ;
@@ -540,8 +546,8 @@ static int varsub_procsub(varsub *op,buffer *bufp,cchar *kp,int kl) noex {
 	    cchar	*ap = nullptr ;
 	    if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
 	        ap = (tp + 1) ;
-	        al = (kp + kl) - (tp + 1) ;
-	        kl = (tp - kp) ;
+	        al = intconv((kp + kl) - (tp + 1)) ;
+	        kl = intconv(tp - kp) ;
 	    }
 	    /* lookup the environment key-name that we have */
 	    if (cchar *cp{} ; (rs = varsub_getval(op,kp,kl,&cp)) >= 0) {
@@ -572,11 +578,10 @@ static int varsub_procsub(varsub *op,buffer *bufp,cchar *kp,int kl) noex {
 /* end subroutine (varsub_procsub) */
 
 static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
-	ent		tmp ;
 	int		rs ;
-	if (klen < 0) klen = strlen(k) ;
-	if (vlen < 0) vlen = (v) ? strlen(v) : 0 ;
-	if ((rs = entry_tmp(&tmp,k,klen,v,vlen)) >= 0) {
+	if (klen < 0) klen = xstrlen(k) ;
+	if (vlen < 0) vlen = (v) ? xstrlen(v) : 0 ;
+	if (ent tmp ; (rs = entry_tmp(&tmp,k,klen,v,vlen)) >= 0) {
 	    vechand	*elp = op->slp ;
 	    int		rs1 ;
 	    void	*vp{} ;
@@ -593,7 +598,6 @@ static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	    } /* end if (entry search-by-key) */
 	    if (rs1 == SR_NOTFOUND) {
 	        cint	msize = szof(ent) ;
-		void	*vp{} ;
 	        if ((rs = uc_malloc(msize,&vp)) >= 0) {
 	            ent		*ep = entp(vp) ;
 	            if ((rs = entry_start(ep,k,klen,v,vlen)) >= 0) {
@@ -617,8 +621,8 @@ static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 
 static int varsub_iaddq(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	int		rs = SR_INVALID ;
-	if (klen < 0) klen = strlen(k) ;
-	if (vlen < 0) vlen = (v != nullptr) ? strlen(v) : 0 ;
+	if (klen < 0) klen = xstrlen(k) ;
+	if (vlen < 0) vlen = (v != nullptr) ? xstrlen(v) : 0 ;
 	if (klen > 0) {
 	    vechand	*elp = op->slp ;
 	    cint	msize = szof(ent) ;
@@ -657,7 +661,7 @@ static int varsub_getval(varsub *op,cchar *kp,int kl,cchar **vpp) noex {
 	ent		*ep{} ;
 	int		rs = SR_DOM ;
 	int		vl = 0 ;
-	if (kl < 0) kl = strlen(kp) ;
+	if (kl < 0) kl = xstrlen(kp) ;
 	if (kl > 0) {
 	    vechand	*slp = op->slp ;
 	    ent		te{} ;
@@ -755,9 +759,9 @@ static int varsub_entfins(varsub *op) noex {
 
 static int entry_start(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_DOM ;
-	if (kl < 0) kl = strlen(kp) ;
+	if (kl < 0) kl = xstrlen(kp) ;
 	if (vl < 0) {
-	    vl = (vp) ? strlen(vp) : 0 ;
+	    vl = (vp) ? xstrlen(vp) : 0 ;
 	}
 	/* allocate buffers for the key and its value respectively */
 	if (kl > 0) {
@@ -795,7 +799,7 @@ static int entry_keycmp(ent *ep,ent *eap) noex {
 
 static int entry_tmp(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_DOM ;
-	if (kl < 0) kl = strlen(kp) ;
+	if (kl < 0) kl = xstrlen(kp) ;
 	if (kl > 0) {
 	    rs = SR_OK ;
 	    ep->kp = kp ;
@@ -846,7 +850,7 @@ static int getkey(cchar *sp,int sl,int sses[][2]) noex {
 	    } /* end for */
 	    if (f) {
 	        if (cchar *tp ; (tp = strnchr(sp,sl,sses[i][1])) != nullptr) {
-	            kl = (tp - (sp+1)) ;
+	            kl = intconv(tp - (sp + 1)) ;
 	        }
 	    }
 	} /* end if (greater than length one) */

@@ -1,4 +1,5 @@
 /* varsub_loadfile SUPPORT */
+/* varsub_addvec SUPPORT */
 /* lang=C++20 */
 
 /* process a file with variable substitutions */
@@ -144,10 +145,9 @@ int sub_loadfile::operator () (cchar *fn) noex {
 	    int		bl ;
 	    while ((rs = breadlns(vfp,lbuf,llen,to,nullptr)) > 0) {
 		if (int len ; (len = rmcomment(lbuf,llen)) > 0) {
-		    field	fsb ;
 	            cchar	*cp = lbuf ;
 	            int		cl = len ;
-	            if ((rs = fsb.start(cp,cl)) >= 0) {
+		    if (field fsb ; (rs = fsb.start(cp,cl)) >= 0) {
 	    		cchar	*kp{} ;
 	                if (int kl ; (kl = fsb.get(fterms,&kp)) > 0) {
 		            int		al = alen ;
@@ -159,11 +159,11 @@ int sub_loadfile::operator () (cchar *fn) noex {
 			        bl = fsb.sharg(fterms,bp,al) ;
 			        if (bl < 0) break ;
 	                        if (bl > 0) bp += bl ;
-	                        al = (abuf + alen - bp) ;
+	                        al = intconv(abuf + alen - bp) ;
 	                        if (fsb.term == '#') break ;
 	                    } /* end while */
 	                    *bp = '\0' ;
-			    al = (bp - abuf) ;
+			    al = intconv(bp - abuf) ;
 	                    rs = varsub_add(op,kp,kl,abuf,al) ;
 			    if (rs < INT_MAX) c += 1 ;
 	                } /* end if (have a variable keyname) */

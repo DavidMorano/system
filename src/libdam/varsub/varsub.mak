@@ -2,7 +2,7 @@
 
 T= varsub
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -66,7 +66,7 @@ OBJB_VARSUB= obj2_varsub.o
 OBJ_VARSUB= obja_varsub.o objb_varsub.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -94,7 +94,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_VARSUB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_VARSUB)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -115,23 +115,23 @@ control:
 
 
 obj0_varsub.o:		$(OBJ0_VARSUB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_VARSUB)
 
 obj1_varsub.o:		$(OBJ1_VARSUB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_VARSUB)
 
 obj2_varsub.o:		$(OBJ2_VARSUB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_VARSUB)
 
 obj3_varsub.o:		$(OBJ3_VARSUB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_VARSUB)
 
 
 obja_varsub.o:		$(OBJA_VARSUB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_VARSUB)
 
 objb_varsub.o:		$(OBJB_VARSUB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_VARSUB)
 
 
 varsub_main.o:		varsub_main.cc		$(INCS)

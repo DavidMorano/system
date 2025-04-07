@@ -1,4 +1,5 @@
 /* varsub_addvec SUPPORT */
+/* configvars_sub SUPPORT */
 /* lang=C++20 */
 
 /* variable manipulation (like for configuration files!) */
@@ -35,6 +36,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	varsub_addvec
+
+	Description:
 	These routines operate on 'defined' and 'export'ed variables
 	from a configuration file.  What we want to do is to perform
 	a substitution on these variables from existing variables
@@ -100,7 +105,8 @@ int varsub_addvec(varsub *op,vecstr *vsp) noex {
 		        f = ((ch == '\0') || isprintlatin(ch)) ;
 	            }
 	            if (f) {
-	                rs = varsub_add(op,kp,(tp - kp),vp,-1) ;
+			cint	tl = intconv(tp - kp) ;
+	                rs = varsub_add(op,kp,tl,vp,-1) ;
 		        if (rs < INT_MAX) c += 1 ;
 	            } /* end if */
 	        } /* end if */

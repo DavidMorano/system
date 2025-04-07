@@ -1,4 +1,5 @@
 /* varsub HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* module to handle variable substitution in strings */
@@ -19,7 +20,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -28,7 +28,7 @@
 #include	<vechand.h>
 #include	<buffer.h>
 #include	<bfile.h>
-#include	<localmisc.h>
+#include	<vecstr.h>
 
 
 /* object defines */
@@ -36,7 +36,6 @@
 #define	VARSUB_FL		struct varsub_flags
 #define	VARSUB_CUR		struct varsub_cursor
 #define	VARSUB_MAGIC		91827364
-
 /* initialization options */
 #define	VARSUB_OBLANK		0	/* default, substitute blank */
 #define	VARSUB_ONOBLANK		(1<<0)	/* substitute the key on failure */
@@ -86,6 +85,8 @@ extern int	varsub_fetch(varsub *,cchar *,int,cchar **) noex ;
 extern int	varsub_exp(varsub *,char *,int,cchar *,int) noex ;
 extern int	varsub_expbuf(varsub *,buffer *,cchar *,int) noex ;
 extern int	varsub_expfile(varsub *,bfile *,bfile *) noex ;
+extern int	varsub_loadfile(varsub *,cchar *) noex ;
+extern int	varsub_addvec(varsub *,vecstr *) noex ;
 extern int	varsub_finish(varsub *) noex ;
 
 EXTERNC_end
