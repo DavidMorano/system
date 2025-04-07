@@ -120,6 +120,8 @@ struct subinfo {
 
 typedef int (*subinfo_f)(subinfo *) noex ;
 
+cbool		f_setruid = CF_SETRUID;
+
 
 /* forward references */
 
@@ -149,7 +151,7 @@ int unlinkd(cchar *fname,int delay) noex {
 	int		rs1 ;
 	if (fname) {
 	    rs = SR_INVALID ;
-	   if (fname[0]) {
+	    if (fname[0]) {
 	       if (USTAT sb ; (rs = u_stat(fname,&sb)) >= 0) {
 	           if (subinfo si ; (rs = subinfo_start(si,fname,delay)) >= 0) {
 		       for (cauto &fun : scheds) {
@@ -203,17 +205,15 @@ static int subinfo_fork(ßubinfo *sip) noex {
 	    pid_t	pid = rs ;
 	    int		i ;
 
-#if	CF_SETRUID
-	{
+	if_constexpr (f_setruid) {
 	    uid_t	uid = getuid() ;
 	    uid_t	euid = geteuid() ;
 	    if (euid != uid) {
 	        u_setreuid(euid,-1) ;
 	    }
 	}
-#endif /* CF_SETRUID */
 
-/* the child continues on from here */
+	/* the child continues on from here */
 
 	    for (i = 0 ; i < NOFILE ; i += 1) {
 	        u_close(i) ;
