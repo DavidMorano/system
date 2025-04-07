@@ -58,7 +58,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 OBJ_LIBNSS= nss_parse.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).a
@@ -84,9 +84,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_LIBNSS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LIBNSS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LIBNSS)
 
 $(T).a:			$(OBJ_LIBNSS)
 	$(AR) $(ARFLAGS) -rc $@ $?
