@@ -28,6 +28,11 @@ export module msgide ;
 
 export {
     struct msgide_all {
+	struct msgide_len {
+	    int		recipient ;
+	    int		messageid ;
+	    int		from ;
+	} ;
 	char		*a{} ;
 	char		*recipient{} ;
 	char		*messageid{} ;
@@ -37,6 +42,7 @@ export {
 	uint		ctime{} ;	/* time-stamp creation */
 	uint		mtime{} ;	/* time-stamp message */
 	uint		hash{} ;
+	msgide_len	len ;
 	msgide_all() = default ;
 	msgide_all(const msgide_all &) = delete ;
 	msgide_all &operator = (const msgide_all &) = delete ;

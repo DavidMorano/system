@@ -38,7 +38,7 @@
 #define	MSGID_CUR		struct msgid_cursor
 #define	MSGID_BUF		struct msgid_buffer
 #define	MSGID_ENT		MSGIDE_ALL
-
+#define	MSGID_MAGICSIZE		16
 /* other defines */
 #define	MSGID_FILEPATH		"/tmp/msgid"
 #define	MSGID_FILEVERSION	0
@@ -54,7 +54,7 @@ struct msgid_buffer {
 
 /* decoded file magic */
 struct msgid_filemagic {
-	char		magic[16] ;
+	char		magic[MSGID_MAGICSIZE] ;
 	uchar		vetu[4] ;
 } ;
 

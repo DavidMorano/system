@@ -63,7 +63,7 @@ import msgide ;
 namespace {
     struct vars {
 	int		reciplen ;
-	int		maxpathlen ;
+	int		maxhostlen ;
 	operator int () noex ;
     } ;
 }
@@ -85,15 +85,18 @@ int msgide_all::start() noex {
     	int		rs ;
 	static cint		rsv = var ;
 	if ((rs = rsv) >= 0) {
-	    cint	maxpath = var.maxpathlen ;
-	    cint	sz = (var.reciplen + (2 * var.maxpathlen)) ;
+	    cint	maxhost = var.maxhostlen ;
+	    cint	sz = ((var.reciplen + 1) + (2 * (var.maxhostlen + 1))) ;
 	    int		ai = 0 ;
 	    if ((rs = uc_malloc(sz,&a)) >= 0) {
-		recipient = (a + (maxpath * ai++)) ;
-		messageid = (a + (maxpath * ai++)) ;
-		from = (a + (maxpath * ai++)) ;
+		recipient = (a + (maxhost * ai++)) ;
+		messageid = (a + (maxhost * ai++)) ;
+		from = (a + (maxhost * ai++)) ;
+		len.from = maxhost ;
+		len.messageid = maxhost ;
+		len.recipient = var.reciplen ;
 	    }
-	}
+	} /* end if (vars) */
 	return rs ;
 }
 
@@ -119,8 +122,7 @@ int msgide_all::wr(cchar *mbuf,int mlen) noex {
 	if (mbuf) {
 	    rs = SR_INVALID ;
 	    if (mlen > 0) {
-		cint	reciplen = var.reciplen ;
-		cint	maxpath = var.maxpathlen ;
+		cint	maxhost = var.maxhostlen ;
 		char	*buf = cast_const<charp>(mbuf) ;
 	        if (serialbuf sb ; (rs = sb.start(buf,mlen)) >= 0) {
 		    {
@@ -129,9 +131,9 @@ int msgide_all::wr(cchar *mbuf,int mlen) noex {
 			sb >> ctime ;
 			sb >> mtime ;
 			sb >> hash ;
-			sb.rstrn(recipient,reciplen) ;
-			sb.rstrn(messageid,maxpath) ;
-			sb.rstrn(from,maxpath) ;
+			sb.rstrn(recipient,len.recipient) ;
+			sb.rstrn(messageid,maxhost) ;
+			sb.rstrn(from,maxhost) ;
 	    	    }
 	            rs1 = sb.finish ;
 	            if (rs >= 0) rs = rs1 ;
@@ -148,17 +150,16 @@ int msgide_all::rd(char *mbuf,int mlen) noex {
 	if (mbuf) {
 	    rs = SR_INVALID ;
 	    if (mlen > 0) {
-		cint	reciplen = var.reciplen ;
-		cint	maxpath = var.maxpathlen ;
+		cint	maxhost = var.maxhostlen ;
 	        if (serialbuf sb ; (rs = sb.start(mbuf,mlen)) >= 0) {
 		    {
 			sb << count ;
 			sb << utime ;
 			sb << mtime ;
 			sb << hash ;
-	    		sb.wstrn(recipient,reciplen) ;
-	    		sb.wstrn(messageid,maxpath) ;
-	    		sb.wstrn(from,maxpath) ;
+	    		sb.wstrn(recipient,len.recipient) ;
+	    		sb.wstrn(messageid,maxhost) ;
+	    		sb.wstrn(from,maxhost) ;
 		    }
 	            rs1 = sb.finish ;
 	            if (rs >= 0) rs = rs1 ;
@@ -227,7 +228,7 @@ vars::operator int () noex {
 	if ((rs = getbufsize(getbufsize_un)) >= 0) {
 	    reciplen = rs ;
 	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-		maxpathlen = rs ;
+		maxhostlen = rs ;
 	    }
 	}
 	return rs ;
