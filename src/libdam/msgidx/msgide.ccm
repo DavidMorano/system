@@ -26,17 +26,14 @@ module ;
 
 export module msgide ;
 
-export {
     enum msgidemems {
     	msgidemem_start,
 	msgidemem_finish,
 	msgidemem_overlast
     } ;
-}
 
 struct msgide ;
 
-export {
     template<typename T> struct msgide_co {
 	T		*op = nullptr ;
 	int		w = -1 ;
@@ -49,7 +46,6 @@ export {
 	    return operator int () ;
 	} ;
     } ; /* end struct (msgide_co) */
-}
 
 export {
     struct msgide_all {
