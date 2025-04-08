@@ -81,7 +81,7 @@ static vars		var ;
 
 /* exported subroutines */
 
-int msgide_all::start() noex {
+int msgide_all::istart() noex {
     	int		rs ;
 	static cint		rsv = var ;
 	if ((rs = rsv) >= 0) {
@@ -100,7 +100,7 @@ int msgide_all::start() noex {
 	return rs ;
 }
 
-int msgide_all::finish() noex {
+int msgide_all::ifinish() noex {
     	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
 	if (a) {
@@ -170,11 +170,11 @@ int msgide_all::rd(char *mbuf,int mlen) noex {
 }
 /* end subroutine (entry_all::rd) */
 
-int msgide_update::start() noex {
+int msgide_update::istart() noex {
     	return SR_OK ;
 }
 
-int msgide_update::finish() noex {
+int msgide_update::ifinish() noex {
     	return SR_OK ;
 }
 
@@ -217,11 +217,45 @@ int msgide_update::rd(char *mbuf,int mlen) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (entry_update::rd) */
-
+/* end subroutine (msgide_update::rd) */
 
 
 /* local subroutines */
+
+template<>
+msgide_co<msgide_all>::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case msgidemem_start:
+	        rs = op->istart() ;
+	        break ;
+	    case msgidemem_finish:
+	        rs = op->ifinish() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (msgide_co<msgide_all>::operator) */
+
+template<>
+msgide_co<msgide_update>::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case msgidemem_start:
+	        rs = op->istart() ;
+	        break ;
+	    case msgidemem_finish:
+	        rs = op->ifinish() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (msgide_co<msgide_update>::operator) */
+
 
 vars::operator int () noex {
     	int		rs ;
