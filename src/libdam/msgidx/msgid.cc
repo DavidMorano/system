@@ -398,44 +398,34 @@ int msgid_curenum(msgid *op,msgid_cur *curp,msgid_ent *ep) noex {
 	    if (op->f.fileinit) {
 	    	rs = SR_LOCKLOST ;
 	        if (! op->f.cursorlockbroken) {
-	int		eoff ;
-	char		*bp ;
-	if ((rs = msgid_filecheck(op,dt,var.lread)) >= 0) {
-	        ei = (curp->i < 0) ? 0 : curp->i + 1 ;
-	        eoff = MSGID_FOTAB + (ei * op->ebs) ;
-
-/* form result to caller */
-
-	        if ((eoff + op->ebs) <= op->filesize) {
-
-/* verify sufficient file buffering */
-
-	            if ((rs = msgid_bufload(op,eoff,op->ebs,&bp)) >= 0) {
-	                if (rs >= op->ebs) {
-
-/* copy entry to caller buffer */
-
-	                    if (ep) {
-	                        msgide_all(ep,1,bp,MSGIDE_SIZE) ;
-	                    } /* end if */
-
-/* commit the cursor movement? */
-
-	                    if (rs >= 0) {
-	                        curp->i = ei ;
-			    }
-	                    op->f.cursoracc = true ;
-
+		    cint	ebs = op->ebs ;
+		    int		eoff ;
+		    if ((rs = msgid_filecheck(op,dt,var.lread)) >= 0) {
+	        	ei = (curp->i < 0) ? 0 : curp->i + 1 ;
+	        	eoff = MSGID_FOTAB + (ei * ebs) ;
+			/* form result to caller */
+	        	if ((eoff + ebs) <= op->filesize) {
+		    	    char	*bp ;
+			    /* verify sufficient file buffering */
+	                    if ((rs = msgid_bufload(op,eoff,ebs,&bp)) >= 0) {
+	                        if (rs >= op->ebs) {
+			            /* copy entry to caller buffer */
+	                            if (ep) {
+	                                msgide_all(ep,1,bp,MSGIDE_SIZE) ;
+	                            } /* end if */
+			            /* commit the cursor movement? */
+	                            if (rs >= 0) {
+	                                curp->i = ei ;
+			            }
+	                            op->f.cursoracc = true ;
+	                        } else {
+	                            rs = SR_EOF ;
+			        }
+	                    } /* end if (msgid_buf) */
 	                } else {
-	                    rs = SR_EOF ;
-			}
-	            } /* end if (msgid_buf) */
-
-	        } else {
-	            rs = SR_NOTFOUND ;
-		}
-	} /* end if (msgid_filecheck) */
-
+	                    rs = SR_NOTFOUND ;
+		        }
+		    } /* end if (msgid_filecheck) */
 	        } /* end if (valid) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
