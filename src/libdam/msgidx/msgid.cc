@@ -392,6 +392,7 @@ int msgid_curend(msgid *op,msgid_cur *curp) noex {
 int msgid_curenum(msgid *op,msgid_cur *curp,msgid_ent *ep) noex {
 	custime		dt = getustime ;
 	int		rs ;
+	int		rs1 ;
 	int		ei = 0 ;
 	if ((rs = msgid_magic(op,curp)) >= 0) {
 	    rs = SR_NOTFOUND ;
@@ -411,7 +412,14 @@ int msgid_curenum(msgid *op,msgid_cur *curp,msgid_ent *ep) noex {
 	                        if (rs >= op->ebs) {
 			            /* copy entry to caller buffer */
 	                            if (ep) {
-	                                msgide_all(ep,1,bp,MSGIDE_SIZE) ;
+					if ((rs = ep->start) >= 0) {
+					    {
+					        bl = ep->len.mlen ;
+	                                        rs = ep->rd(bp,bl) ;
+					    }
+					    rs1 = ep->finish ;
+					    if (rs >= 0) rs = rs1 ;
+					} /* end if (msgid_all) */
 	                            } /* end if */
 			            /* commit the cursor movement? */
 	                            if (rs >= 0) {
