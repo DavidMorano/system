@@ -83,21 +83,29 @@ static vars		var ;
 
 int msgide_all::istart() noex {
     	int		rs ;
+	int		esz = 0 ;
 	static cint		rsv = var ;
 	if ((rs = rsv) >= 0) {
 	    cint	maxhost = var.maxhostlen ;
 	    cint	sz = ((var.reciplen + 1) + (2 * (var.maxhostlen + 1))) ;
 	    int		ai = 0 ;
 	    if ((rs = uc_malloc(sz,&a)) >= 0) {
-		recipient = (a + (maxhost * ai++)) ;
-		messageid = (a + (maxhost * ai++)) ;
+		recipient = (a + ((maxhost + 1) * ai++)) ;
+		messageid = (a + ((maxhost + 1) * ai++)) ;
 		from = (a + (maxhost * ai++)) ;
 		len.from = maxhost ;
 		len.messageid = maxhost ;
 		len.recipient = var.reciplen ;
+		esz += sz ;
+		esz += szof(count) ;
+		esz += szof(utime) ;
+		esz += szof(ctime) ;
+		esz += szof(mtime) ;
+		esz += szof(hash) ;
+		len.entsz = esz ;
 	    }
 	} /* end if (vars) */
-	return rs ;
+	return (rs >= 0) ? esz : rs ;
 }
 
 int msgide_all::ifinish() noex {
@@ -171,11 +179,16 @@ int msgide_all::rd(char *mbuf,int mlen) noex {
 /* end subroutine (entry_all::rd) */
 
 int msgide_update::istart() noex {
-    	return SR_OK ;
+    	int		rs = SR_OK ;
+	rs += szof(count) ;
+	rs += szof(utime) ;
+	len.entsz = rs ;
+    	return rs ;
 }
 
 int msgide_update::ifinish() noex {
-    	return SR_OK ;
+    	int		rs = SR_OK ;
+    	return rs ;
 }
 
 int msgide_update::wr(cchar *mbuf,int mlen) noex {
@@ -222,13 +235,16 @@ int msgide_update::rd(char *mbuf,int mlen) noex {
 
 /* local subroutines */
 
-template<>
+template<> 
 msgide_co<msgide_all>::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
 	    case msgidemem_start:
 	        rs = op->istart() ;
+	        break ;
+	    case msgidemem_entsz:
+	        rs = op->len.entsz ;
 	        break ;
 	    case msgidemem_finish:
 	        rs = op->ifinish() ;
@@ -239,13 +255,16 @@ msgide_co<msgide_all>::operator int () noex {
 }
 /* end method (msgide_co<msgide_all>::operator) */
 
-template<>
+template<> 
 msgide_co<msgide_update>::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
 	    case msgidemem_start:
 	        rs = op->istart() ;
+	        break ;
+	    case msgidemem_entsz:
+	        rs = op->len.entsz ;
 	        break ;
 	    case msgidemem_finish:
 	        rs = op->ifinish() ;
@@ -255,7 +274,6 @@ msgide_co<msgide_update>::operator int () noex {
 	return rs ;
 }
 /* end method (msgide_co<msgide_update>::operator) */
-
 
 vars::operator int () noex {
     	int		rs ;
