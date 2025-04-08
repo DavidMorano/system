@@ -120,7 +120,6 @@ EXTERNC_begin
 
 extern int msgid_open(msgid *,cchar *,int,mode_t,int) noex ;
 extern int msgid_check(msgid *,time_t) noex ;
-extern int msgid_close(msgid *) noex ;
 extern int msgid_curbegin(msgid *,msgid_cur *) noex ;
 extern int msgid_curend(msgid *,msgid_cur *) noex ;
 extern int msgid_curenum(msgid *,msgid_cur *,msgid_ent *) noex ;
@@ -128,6 +127,7 @@ extern int msgid_match(msgid *,time_t,msgid_key *,msgid_ent *) noex ;
 extern int msgid_update(msgid *,time_t,msgid_key *,msgid_ent *) noex ;
 extern int msgid_matchid(msgid *,time_t,cchar *,int,msgid_ent *) noex ;
 extern int msgid_write(msgid *,int,msgid_ent *) noex ;
+extern int msgid_close(msgid *) noex ;
 
 #ifdef	COMMENT
 extern int msgid_txbegin(msgid *) noex ;

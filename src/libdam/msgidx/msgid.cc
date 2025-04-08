@@ -63,8 +63,8 @@
 #include	<localmisc.h>
 
 #include	"msgid.h"
-#include	"msgide.h"
 
+import msgide ;
 
 /* local defines */
 
@@ -120,10 +120,6 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
-extern "C" {
-    int		msgid_close(msgid *) noex ;
-}
-
 
 /* external variables */
 
@@ -138,6 +134,7 @@ struct oldentry {
 namespace {
     struct vars {
 	int		hostnamelen ;
+	int		entsz ;
 	operator int () noex ;
     } ; /* end struct (vars) */
 }
@@ -209,10 +206,10 @@ static int	extutime(char *) noex ;
 
 /* local variables */
 
-static vars		var ;
+static vars	var ;
 
-cbool			f_creat = CF_CREAT ;
-cbool			f_hash = CF_HASH ;
+cbool		f_creat = CF_CREAT ;
+cbool		f_hash = CF_HASH ;
 
 
 /* exported variables */
@@ -234,6 +231,7 @@ int msgid_open(msgid *op,cchar *fname,int of,mode_t om,int maxentry) noex {
 		    op->fd = -1 ;
 		    op->oflags = of ;
 		    op->operm = om ;
+	            op->pagesize = var.pagesize ;
 		    op->maxentry = maxentry ;
 		    op->ebs = uceil(MSGID_ENTSZ,4) ;
 		    rs = msgid_opens(op,fn,of,om) ;
@@ -251,7 +249,7 @@ static int msgid_opens(msgid *op,cc *fname,int of,mode_t om) noex {
     	int		rs ;
 	if ((rs = msgid_bufbegin(op)) >= 0) {
 	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
-	        custime	dt = getustime ;
+	        custime		dt = getustime ;
 	        if ((rs = msgid_opener(op,tbuf,fname,of,om)) >= 0) {
 	            f_create = rs ;
 	            op->opentime = dt ;
@@ -264,7 +262,6 @@ static int msgid_opens(msgid *op,cc *fname,int of,mode_t om) noex {
 	                    if (S_ISREG(sb.st_mode)) {
 	                        op->mtime = sb.st_mtime ;
 	                        op->filesize = sb.st_size ;
-	                        op->pagesize = getpagesize() ;
 	                        if ((rs = isfsremote(op->fd)) >= 0) {
 	                            op->f.remote = (rs > 0) ;
 	                            if ((rs = msgid_fileinit(op,dt)) >= 0) {
@@ -1380,10 +1377,19 @@ static int matfield(cchar *mp,int ml,cchar *ep,int el) noex {
 /* end subroutine (matfield) */
 
 static int extutime(char *ep) noex {
-	MSGIDE_UPDATE	m1 ;
 	int		rs ;
-	rs = msgide_update(&m1,1,ep,MSGIDE_SIZE) ;
-	return (rs >= 0) ? m1.utime : rs ;
+	int		rs1 ;
+	int		rv = 0 ;
+	if (msgide_update mu ; (rs = mu.start) >= 0) {
+	    cint	esz = mu.len.entsz ;
+	    cchar	*cp = cast_const<ccharp>(ep) ;
+	    if ((rs = mu.wr(cp,esz)) >= 0) {
+	        rv = mu.utime ;
+	    }
+	    rs1 = mu.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (extutime) */
 
@@ -1399,6 +1405,9 @@ vars::operator int () noex {
         int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
 	    cint	hostnamelen = rs ;
+	    if ((rs = ucpagesize) >= 0) {
+		pagesize = rs ;
+	    }
 	} /* end if (getbufsize) */
 	return rs ;
 }
