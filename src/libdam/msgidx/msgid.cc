@@ -177,7 +177,7 @@ static int	msgid_openone(msgid *,char *,cchar *,cchar *,int,mode_t) noex ;
 
 static int	msgid_fileopen(msgid *,time_t) noex ;
 static int	msgid_fileclose(msgid *) noex ;
-static int	msgid_lockget(msgid *,time_t,int) noex ;
+static int	msgid_lockacquire(msgid *,time_t,int) noex ;
 static int	msgid_lockrelease(msgid *) noex ;
 static int	msgid_fileinit(msgid *,time_t) noex ;
 static int	msgid_filechanged(msgid *) noex ;
@@ -719,7 +719,7 @@ static int msgid_filecheck(msgid *op,time_t dt,int f_read) noex {
 	if (rs >= 0) {
 	    if ((! op->f.readlocked) && (! op->f.writelocked)) {
 	        if (dt == 0) dt = getustime ;
-	        if ((rs = msgid_lockget(op,dt,f_read)) >= 0) {
+	        if ((rs = msgid_lockacquire(op,dt,f_read)) >= 0) {
 	            if ((rs = msgid_filechanged(op)) >= 0) {
 	                f_changed = (rs > 0) ;
 	            }
@@ -745,7 +745,7 @@ static int msgid_fileinit(msgid *op,time_t dt) noex {
 	    op->f.fileinit = false ;
 	    if (op->f.writable) {
 	        if (! op->f.writelocked) {
-	            if ((rs = msgid_lockget(op,dt,0)) >= 0) {
+	            if ((rs = msgid_lockacquire(op,dt,0)) >= 0) {
 	                f_locked = true ;
 	            }
 	        }
@@ -775,7 +775,7 @@ static int msgid_fileinit(msgid *op,time_t dt) noex {
 	} else if (op->filesize >= MSGID_FOTAB) {
 	    /* read the file header */
 	    if (! op->f.readlocked) {
-	        if ((rs = msgid_lockget(op,dt,1)) >= 0) {
+	        if ((rs = msgid_lockacquire(op,dt,1)) >= 0) {
 	            f_locked = true ;
 	        }
 	    }
@@ -850,19 +850,15 @@ static int msgid_filechanged(msgid *op) noex {
 /* end subroutine (msgid_filechanged) */
 
 /* acquire access to the file */
-static int msgid_lockget(msgid *op,time_t dt,int f_read) noex {
+static int msgid_lockacquire(msgid *op,time_t dt,int f_read) noex {
 	int		rs = SR_OK ;
-
 	if (op->fd < 0) {
 	    rs = msgid_fileopen(op,dt) ;
 	} /* end if (needed to open the file) */
-
-/* acquire a file record lock */
-
+	/* acquire a file record lock */
 	if (rs >= 0) {
 	    int		lockcmd ;
-	    int		f_already = false ;
-
+	    bool	f_already = false ;
 	    if (f_read || (! op->f.writable)) {
 	        f_already = op->f.readlocked ;
 	        op->f.readlocked = true ;
@@ -874,18 +870,14 @@ static int msgid_lockget(msgid *op,time_t dt,int f_read) noex {
 	        op->f.writelocked = true ;
 	        lockcmd = F_WLOCK ;
 	    }
-
-/* get out if we have the lock that we want already */
-
+	    /* get out if we have the lock that we want already */
 	    if (! f_already) {
-	        rs = lockfile(op->fd,lockcmd,0L,0L,TO_LOCK) ;
+	        rs = lockfile(op->fd,lockcmd,0z,0z,TO_LOCK) ;
 	    }
-
 	} /* end if (ok) */
-
 	return rs ;
 }
-/* end subroutine (msgid_lockget) */
+/* end subroutine (msgid_lockacquire) */
 
 static int msgid_lockrelease(msgid *op) noex {
 	int		rs = SR_OK ;
