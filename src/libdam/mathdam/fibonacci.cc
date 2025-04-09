@@ -110,6 +110,14 @@
 	My response: to you C++ compilers out there -- grow up and
 	just deal with it!
 
+	Some-sort-of-screwup-in-C++-math:
+	For some reason, the |sqrt(3c++)| subroutine-template in
+	C++20 cannot be called with a specified template type.  It
+	seems like the "math" functions in C++20 are somehow special,
+	in that the specific function called is deduced from its
+	argument(s) only and cannot be specifically specified by
+	giving a template type paramter on the call.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -183,6 +191,7 @@ template<typename T> static T fibonaccix(int n) noex {
 	return v ;
 }
 /* end subroutine-template (fibonaccix) */
+
 
 /* local variables */
 
