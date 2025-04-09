@@ -815,48 +815,36 @@ static int msgid_filechanged(msgid *op) noex {
 	    if (sb.st_size < MSGID_FOTAB) {
 	        op->f.fileinit = false ;
 	    } 
-	    f_changed = (! op->f.fileinit) ||
-	        (sb.st_size != op->filesize) ||
-	        (sb.st_mtime != op->mtime) ;
-
-/* if it has NOT changed, read the file header for write indications */
-
+	    f_changed = f_changed || (! op->f.fileinit) ;
+	    f_changed = f_changed || (sb.st_size != op->filesize) ;
+	    f_changed = f_changed || (sb.st_mtime != op->mtime) ;
+	    /* if it has NOT changed, read file header for writes */
 	    if ((! f_changed) && op->f.fileinit) {
 	        MSGID_FH	h ;
 	        char		hbuf[MSGID_FLTOP + 1] ;
-
 	        if ((rs = u_pread(op->fd,hbuf,MSGID_FLTOP,0z)) >= 0) {
-
-	            if (rs < MSGID_FLTOP)
+	            if (rs < MSGID_FLTOP) {
 	                op->f.fileinit = false ;
-
+		    }
 	            if (rs > 0) {
-
 	                filehead((hbuf + MSGID_FOHEAD),1,&h) ;
-
 	                f_changed = (op->h.wtime != h.wtime) ||
 	                    (op->h.wcount != h.wcount) ||
 	                    (op->h.nentries != h.nentries) ;
 
-	                if (f_changed)
+	                if (f_changed) {
 	                    op->h = h ;
-
+			}
 	            } /* end if (positive) */
-
 	        } /* end if (u_pread) */
-
 	    } /* end if (reading file header) */
-
-/* OK, we're done */
-
+	    /* OK, we are done */
 	    if ((rs >= 0) && f_changed) {
 	        op->b.len = 0 ;
 	        op->filesize = sb.st_size ;
 	        op->mtime = sb.st_mtime ;
 	    }
-
 	} /* end if (stat) */
-
 	return (rs >= 0) ? f_changed : rs ;
 }
 /* end subroutine (msgid_filechanged) */
