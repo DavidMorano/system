@@ -979,59 +979,42 @@ static int msgid_searchid(msgid *op,cchar *midp,int midl,char **bepp) noex {
 /* search by recipient AND message-id */
 static int msgid_search(msgid *op,msgid_key *kp,uint khash,char **bepp) noex {
 	int		rs = SR_OK ;
-	int		eoff ;
 	int		len ;
-	int		n ;
-	int		i ;
 	int		ne = 100 ;
 	int		ei = 0 ;
-	int		f = false ;
+	bool		f = false ;
 	char		*bp, *bep ;
-
 	while (! f) {
-
-	    eoff = MSGID_FOTAB + (ei * op->entsz) ;
-	    len = ne * op->entsz ;
+	    cint	eoff = MSGID_FOTAB + (ei * op->entsz) ;
+	    cint	len = ne * op->entsz ;
+	    int		n ;
 	    rs = msgid_bufload(op,eoff,len,&bp) ;
-
 	    if (rs < op->entsz) break ;
-
 	    bep = bp ;
-	    n = rs / op->entsz ;
-
-	    for (i = 0 ; i < n ; i += 1) {
-
-#if	CF_HASH
-
-	        {
-	            uint	uiw ;
-	            stdorder_rui((bep + MSGIDE_OHASH),&uiw) ;
-	            f = (khash == uiw) ;
-	        }
-
-	        if (f) {
+	    n = (rs / op->entsz) ;
+	    for (int i = 0 ; i < n ; i += 1) {
+		if_constexpr (f_hash) {
+	            {
+	                uint	uiw ;
+	                stdorder_rui((bep + MSGIDE_OHASH),&uiw) ;
+	                f = (khash == uiw) ;
+	            }
+	            if (f) {
+	                f = emat_recipid(bep,kp) ;
+	                if (f) break ;
+	            }
+		} else {
 	            f = emat_recipid(bep,kp) ;
 	            if (f) break ;
-	        }
-
-#else /* CF_HASH */
-
-	        f = emat_recipid(bep,kp) ;
-	        if (f) break ;
-#endif /* CF_HASH */
-
+		} /* end if_constexpr (f_hash) */
 	        bep += op->entsz ;
 	        ei += 1 ;
-
 	    } /* end for */
-
 	} /* end while */
-
 	*bepp = bep ;
 	if ((rs >= 0) && (! f)) {
 	    rs = SR_NOTFOUND ;
 	}
-
 	return (rs >= 0) ? ei : rs ;
 }
 /* end subroutine (msgid_search) */
