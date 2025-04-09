@@ -30,10 +30,6 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<inttypes.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
@@ -103,7 +99,7 @@ int msgide_all::istart() noex {
 		esz += szof(mtime) ;
 		esz += szof(hash) ;
 		len.entsz = esz ;
-	    }
+	    } /* end if (memory-allocation) */
 	} /* end if (vars) */
 	return (rs >= 0) ? esz : rs ;
 }
