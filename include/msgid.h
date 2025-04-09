@@ -91,7 +91,7 @@ struct msgid_head {
 	int		filesize ;
 	int		fd ;
 	int		cursors ;
-	int		ebs ;		/* entry buffer size */
+	int		entsz ;		/* entry buffer size */
 } ;
 
 struct msgid_cursor {

@@ -35,9 +35,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<inttypes.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* |INT_MAX| */
@@ -134,6 +132,7 @@ struct oldentry {
 namespace {
     struct vars {
 	int		hostnamelen ;
+	int		pagesize ;
 	int		entsz ;
 	operator int () noex ;
     } ; /* end struct (vars) */
@@ -233,7 +232,7 @@ int msgid_open(msgid *op,cchar *fname,int of,mode_t om,int maxentry) noex {
 		    op->operm = om ;
 	            op->pagesize = var.pagesize ;
 		    op->maxentry = maxentry ;
-		    op->ebs = uceil(MSGID_ENTSZ,4) ;
+		    op->entsz = uceil(var.entsz,szof(uint)) ;
 		    rs = msgid_opens(op,fn,of,om) ;
 		} /* end if (vars) */
 	    } /* end if (valid) */
@@ -396,7 +395,7 @@ int msgid_curenum(msgid *op,msgid_cur *curp,msgid_ent *ep) noex {
 	    if (op->f.fileinit) {
 	    	rs = SR_LOCKLOST ;
 	        if (! op->f.cursorlockbroken) {
-		    cint	ebs = op->ebs ;
+		    cint	ebs = op->entsz ;
 		    int		eoff ;
 		    if ((rs = msgid_filecheck(op,dt,var.lread)) >= 0) {
 	        	ei = (curp->i < 0) ? 0 : curp->i + 1 ;
@@ -406,7 +405,7 @@ int msgid_curenum(msgid *op,msgid_cur *curp,msgid_ent *ep) noex {
 		    	    char	*bp ;
 			    /* verify sufficient file buffering */
 	                    if ((rs = msgid_bufload(op,eoff,ebs,&bp)) >= 0) {
-	                        if (rs >= op->ebs) {
+	                        if (rs >= ebs) {
 			            /* copy entry to caller buffer */
 	                            if (ep) {
 					if ((rs = ep->start) >= 0) {
@@ -453,7 +452,7 @@ int msgid_matchid(msgid *op,time_t dt,cchar *midp,int midl,msgid_ent *ep) noex {
 	                    msgide_all(ep,1,bep,MSGIDE_SIZE) ;
 	                }
 	            } /* end if */
-	            if (dt == 0) dt = time(nullptr) ;
+	            if (dt == 0) dt = getustime ;
 	            op->accesstime = dt ;
 	        } /* end if (msgid_filecheck) */
 	    } /* end if (valid) */
@@ -482,7 +481,7 @@ int msgid_match(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
 	                        msgide_all(ep,1,bep,MSGIDE_SIZE) ;
 	                    }
 	                } /* end if */
-	                if (dt == 0) dt = time(nullptr) ;
+	                if (dt == 0) dt = getustime (nullptr) ;
 	                op->accesstime = dt ;
 		    } /* end if (msgid_filecheck) */
 	        } /* end if (valid) */
@@ -594,7 +593,7 @@ int msgid_update(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
 /* update the in-core file buffer as needed or as appropriate */
 
 	            if ((rs >= 0) && f_bufupdate && op->f.writable) {
-	                eoff = MSGID_FOTAB + (ei * op->ebs) ;
+	                eoff = MSGID_FOTAB + (ei * op->entsz) ;
 	                msgid_bufupdate(op,eoff,wlen,ebuf) ;
 	            }
 
@@ -604,11 +603,11 @@ int msgid_update(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
 
 /* write back this entry */
 
-	            eoff = MSGID_FOTAB + (ei * op->ebs) ;
+	            eoff = MSGID_FOTAB + (ei * op->entsz) ;
 	            uoff = eoff ;
 	            if ((rs = u_pwrite(op->fd,bep,wlen,uoff)) >= wlen) {
 
-	                if (dt == 0) dt = time(nullptr) ;
+	                if (dt == 0) dt = getustime ;
 
 	                op->h.wcount += 1 ;
 	                op->h.wtime = dt ;
@@ -628,7 +627,7 @@ int msgid_update(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
 
 /* update access time as appropriate */
 
-	        if (dt == 0) dt = time(nullptr) ;
+	        if (dt == 0) dt = getustime ;
 	        op->accesstime = dt ;
 
 	    } else {
@@ -693,7 +692,7 @@ static int msgid_opener(msgid *op,char *tbuf,cchar *fn,int of,mode_t om) noex {
 }
 /* end subroutine (msgid_opener) */
 
-static int msgid_openone(msgid *op,char *tbuf,cchar *fn,cchar *ext,
+static int msgid_openone(msgid *op,char *tbuf,cc *fn,cc *ext,
 		int of,mode_t om) noex {
 	int		rs ;
 	int		pl = 0 ;
@@ -713,13 +712,13 @@ static int msgid_filecheck(msgid *op,time_t dt,int f_read) noex {
 	int		f_changed = false ;
 	/* is the file open */
 	if (op->fd < 0) {
-	    if (dt == 0) dt = time(nullptr) ;
+	    if (dt == 0) dt = getustime ;
 	    rs = msgid_fileopen(op,dt) ;
 	}
 	/* capture the lock if we do not already have it */
 	if (rs >= 0) {
 	    if ((! op->f.readlocked) && (! op->f.writelocked)) {
-	        if (dt == 0) dt = time(nullptr) ;
+	        if (dt == 0) dt = getustime ;
 	        if ((rs = msgid_lockget(op,dt,f_read)) >= 0) {
 	            if ((rs = msgid_filechanged(op)) >= 0) {
 	                f_changed = (rs > 0) ;
@@ -742,7 +741,7 @@ static int msgid_fileinit(msgid *op,time_t dt) noex {
 	int		f_locked = false ;
 	char		fbuf[MSGID_FBUFLEN + 1] ;
 	if (op->filesize == 0) {
-	    u_seek(op->fd,0L,SEEK_SET) ;
+	    u_seek(op->fd,0z,SEEK_SET) ;
 	    op->f.fileinit = false ;
 	    if (op->f.writable) {
 	        if (! op->f.writelocked) {
@@ -954,13 +953,13 @@ static int msgid_searchid(msgid *op,cchar *midp,int midl,char **bepp) noex {
 	bool		f = false ;
 	char		*bp, *bep, *eidp ;
 	while (! f) {
-	    cint	eoff = MSGID_FOTAB + (ei * op->ebs) ;
-	    len = ne * op->ebs ;
+	    cint	eoff = MSGID_FOTAB + (ei * op->entsz) ;
+	    len = ne * op->entsz ;
 	    rs = msgid_bufload(op,eoff,len,&bp) ;
-	    if (rs < op->ebs) break ;
-	    n = (rs / op->ebs) ;
+	    if (rs < op->entsz) break ;
+	    n = (rs / op->entsz) ;
 	    for (int i = 0 ; i < n ; i += 1) {
-	        bep = bp + (i * op->ebs) ;
+	        bep = bp + (i * op->entsz) ;
 	        eidp = bep + MSGIDE_OMSGID ;
 	        f = matfield(midp,midl,eidp,var.lmsgid) ;
 	        if (f) break ;
@@ -991,14 +990,14 @@ static int msgid_search(msgid *op,msgid_key *kp,uint khash,char **bepp) noex {
 
 	while (! f) {
 
-	    eoff = MSGID_FOTAB + (ei * op->ebs) ;
-	    len = ne * op->ebs ;
+	    eoff = MSGID_FOTAB + (ei * op->entsz) ;
+	    len = ne * op->entsz ;
 	    rs = msgid_bufload(op,eoff,len,&bp) ;
 
-	    if (rs < op->ebs) break ;
+	    if (rs < op->entsz) break ;
 
 	    bep = bp ;
-	    n = rs / op->ebs ;
+	    n = rs / op->entsz ;
 
 	    for (i = 0 ; i < n ; i += 1) {
 
@@ -1021,7 +1020,7 @@ static int msgid_search(msgid *op,msgid_key *kp,uint khash,char **bepp) noex {
 	        if (f) break ;
 #endif /* CF_HASH */
 
-	        bep += op->ebs ;
+	        bep += op->entsz ;
 	        ei += 1 ;
 
 	    } /* end for */
@@ -1051,12 +1050,12 @@ static int msgid_searchempty(msgid *op,oldentry *oep,char **bepp) noex {
 
 	if (op->b.off >= MSGID_FLTOP) {
 
-	    ra = uceil((op->b.off - MSGID_FLTOP),op->ebs) ;
+	    ra = uceil((op->b.off - MSGID_FLTOP),op->entsz) ;
 
-	    rb = ufloor((op->b.off + op->b.len - MSGID_FLTOP),op->ebs) ;
+	    rb = ufloor((op->b.off + op->b.len - MSGID_FLTOP),op->entsz) ;
 
-	    ei_start = ra / op->ebs ;
-	    n = (rb > ra) ? ((rb - ra) / op->ebs) : 0 ;
+	    ei_start = ra / op->entsz ;
+	    n = (rb > ra) ? ((rb - ra) / op->entsz) : 0 ;
 
 	} /* end if */
 
@@ -1107,14 +1106,14 @@ static int msgid_searchemptyrange(msgid *op,int ei,int nmax,
 
 	    ne = MIN(nmax,100) ;
 
-	    eoff = MSGID_FOTAB + (ei * op->ebs) ;
-	    len = ne * op->ebs ;
+	    eoff = MSGID_FOTAB + (ei * op->entsz) ;
+	    len = ne * op->entsz ;
 	    rs = msgid_bufload(op,eoff,len,&bp) ;
-	    if (rs < op->ebs) break ;
+	    if (rs < op->entsz) break ;
 
-	    n = (rs / op->ebs) ;
+	    n = (rs / op->entsz) ;
 	    for (i = 0 ; i < n ; i += 1) {
-	        bep = bp + (i * op->ebs) ;
+	        bep = bp + (i * op->entsz) ;
 	        eidp = bep + MSGIDE_OMSGID ;
 	        f = (*eidp == '\0') ;
 	        if (f) break ;
@@ -1403,10 +1402,18 @@ static uint recipidhash(msgid_key *kp,int reciplen,int midlen) noex {
 
 vars::operator int () noex {
         int		rs ;
+	int		rs1 ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
 	    cint	hostnamelen = rs ;
 	    if ((rs = ucpagesize) >= 0) {
 		pagesize = rs ;
+		if (msgide_all ma ; (rs = ma.start) >= 0) {
+		    {
+			var.entsz = ma.entsz ;
+		    }
+		    rs1 = ma.finish ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (msgide_update) */
 	    }
 	} /* end if (getbufsize) */
 	return rs ;
