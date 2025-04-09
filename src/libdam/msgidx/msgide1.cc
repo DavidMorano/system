@@ -80,15 +80,15 @@ static vars		var ;
 int msgide_all::istart() noex {
     	int		rs ;
 	int		esz = 0 ;
-	static cint		rsv = var ;
+	static cint	rsv = var ;
 	if ((rs = rsv) >= 0) {
 	    cint	maxhost = var.maxhostlen ;
 	    cint	sz = ((var.reciplen + 1) + (2 * (var.maxhostlen + 1))) ;
 	    int		ai = 0 ;
 	    if ((rs = uc_malloc(sz,&a)) >= 0) {
-		recipient = (a + ((maxhost + 1) * ai++)) ;
-		messageid = (a + ((maxhost + 1) * ai++)) ;
-		from = (a + (maxhost * ai++)) ;
+		from 		= (a + ((maxhost + 1) * ai++)) ;
+		messageid 	= (a + ((maxhost + 1) * ai++)) ;
+		recipient 	= (a + ((maxhost + 1) * ai++)) ;
 		len.from = maxhost ;
 		len.messageid = maxhost ;
 		len.recipient = var.reciplen ;
@@ -98,7 +98,8 @@ int msgide_all::istart() noex {
 		esz += szof(ctime) ;
 		esz += szof(mtime) ;
 		esz += szof(hash) ;
-		len.entsz = esz ;
+		len.entsz = iceil(esz,szof(int)) ;
+		esz = len.entsz ;
 	    } /* end if (memory-allocation) */
 	} /* end if (vars) */
 	return (rs >= 0) ? esz : rs ;
@@ -176,10 +177,12 @@ int msgide_all::rd(char *mbuf,int mlen) noex {
 
 int msgide_update::istart() noex {
     	int		rs = SR_OK ;
-	rs += szof(count) ;
-	rs += szof(utime) ;
-	len.entsz = rs ;
-    	return rs ;
+	int		esz = 0 ;
+	esz += szof(count) ;
+	esz += szof(utime) ;
+	len.entsz = iceil(esz,szof(int)) ;
+	esz = len.entsz ;
+    	return (rs >= 0) ? esz : rs ;
 }
 
 int msgide_update::ifinish() noex {
