@@ -110,13 +110,11 @@
 	My response: to you C++ compilers out there -- grow up and
 	just deal with it!
 
-	Some-sort-of-screwup-in-C++-math:
-	For some reason, the |sqrt(3c++)| subroutine-template in
-	C++20 cannot be called with a specified template type.  It
-	seems like the "math" functions in C++20 are somehow special,
-	in that the specific function called is deduced from its
-	argument(s) only and cannot be specifically specified by
-	giving a template type paramter on the call.
+	Reminder-C++-math:
+	Just a reminder that the standard C++ math functions (and
+	the standard C-lang functions) are not function-templates
+	but are rather function-overloads.  So (what?) ... they have
+	to called as functions and not as function templates.
 
 *******************************************************************************/
 
