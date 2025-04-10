@@ -35,7 +35,7 @@
 struct varray_head {
 	void		**va ;
 	lookaside	*lap ;
-	int		esize ;		/* element size */
+	int		esz ;		/* element size */
 	int		c ;		/* count of items in array */
 	int		n ;		/* extent of array */
 	int		imax ;		/* maximum used */
