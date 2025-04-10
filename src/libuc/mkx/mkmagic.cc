@@ -12,7 +12,7 @@
         This code was originally written.
 
 	= 2017-07-17, David A­D­ Morano
-	I added the code to return overflow if the given string
+	I added code to return overflow if the given string
 	cannot fit into the result buffer.
 
 */
@@ -82,7 +82,7 @@ int mkmagic(char *rbuf,int rlen,cchar *ms) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if ((rlen >= 2) && ms[0]) {
-	        if (cint mslen = cstrlen(ms) ; (mslen+1) <= rlen) {
+	        if (cint mslen = xstrlen(ms) ; (mslen+1) <= rlen) {
 	            char	*bp = strwcpy(rbuf,ms,-1) ;
 	            rs = SR_OK ;
 	            *bp++ = '\n' ;
