@@ -35,6 +35,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<serialbuf.h>
+#include	<intceil.h>
 #include	<localmisc.h>
 
 #include	"tse.hh"
@@ -95,6 +96,22 @@ int tse::rdu(char *abuf,int alen) noex {
 
 /* local subroutines */
 
+int tse::istart() noex {
+    	int		rs = SR_OK ;
+	int		esz = 0 ;
+	esz += szof(count) ;
+	esz += szof(utime) ;
+	esz += szof(ctime) ;
+	esz += szof(hash) ;
+	esz += szof(keyname) ;
+	entsz = iceil(esz,szof(int)) ;
+    	return (rs >= 0) ? entsz : rs ;
+}
+
+int tse::ifinish() noex {
+    	return SR_OK ;
+}
+
 int tse::all(bool frd,char *abuf,int alen) noex {
     	int		rs = SR_FAULT ;
 	int		rs1 ;
@@ -154,5 +171,35 @@ int tse::update(bool frd,char *abuf,int alen) noex {
 	return rs ;
 }
 /* end subroutine (tse::update) */
+
+void tse::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("tse",rs,"fini-finish") ;
+	}
+}
+
+tse::operator int () noex {
+    	int		rs = SR_NOTOPEN ;
+	if (entsz > 0) {
+	    rs = entsz ;
+	}
+	return rs ;
+}
+
+tse_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case tsemem_start:
+	        rs = op->istart() ;
+	        break ;
+	    case tsemem_finish:
+	        rs = op->finish() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (tse_co::operator) */
 
 
