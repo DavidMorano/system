@@ -28,7 +28,7 @@
 #include	<mapstrint.h>
 
 #include	<msfilee.h>
-#include	<ebuf.h>
+#include	<entbuf.h>
 
 
 /* object defines */
@@ -68,14 +68,14 @@ struct msfile_flags {
 	uint		cursoracc:1 ;		/* accessed while cursored? */
 	uint		remote:1 ;		/* remote mounted file */
 	uint		bufvalid:1 ;		/* buffer valid */
-	uint		ebuf:1 ;		/* EBUF active */
+	uint		entbuf:1 ;		/* EBUF active */
 } ;
 
 struct msfile_head {
-	ebuf		ebm ;		/* entry-buffer-manager */
+	entbuf		ebm ;		/* entry-buffer-manager */
 	mapstrint	ni ;		/* nodename index */
 	cchar		*fname ;
-	MSFILE_FL	f ;
+	MSFILE_FL	fl ;
 	MSFILE_H	h ;
 	time_t		ti_open ;		/* file open time */
 	time_t		ti_access ;		/* file access time */

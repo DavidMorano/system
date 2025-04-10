@@ -1,4 +1,4 @@
-/* ebuf HEADER (Entry-Buffer) */
+/* entbuf HEADER (Entry-Buffer) */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -15,14 +15,13 @@
 
 /* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	EBUF_INCLUDE
-#define	EBUF_INCLUDE
+#ifndef	ENTBUF_INCLUDE
+#define	ENTBUF_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<unistd.h>		/* |off_t| */
-#include	<sys/types.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -30,14 +29,14 @@
 #include	<usysrets.h>
 
 
-#define	EBUF_MAGIC	1092847456
-#define	EBUF_NENTS	4
-#define	EBUF		struct ebuf_head
-#define	EBUF_FL		struct ebuf_flags
-#define	EBUF_WAY	struct ebuf_wayer
+#define	ENTBUF_MAGIC	1092847456
+#define	ENTBUF_NENTS	4
+#define	ENTBUF		struct entbuf_head
+#define	ENTBUF_FL	struct entbuf_flags
+#define	ENTBUF_WAY	struct entbuf_wayer
 
 
-struct ebuf_wayer {
+struct entbuf_wayer {
 	char		*wbuf ;		/* buffer */
 	off_t		woff ;		/* "way" offset to file entries */
 	uint		utime ;		/* usage time */
@@ -45,13 +44,13 @@ struct ebuf_wayer {
 	int		nvalid ;	/* number of valid entries */
 } ;
 
-struct ebuf_flags {
+struct entbuf_flags {
 	uint		init:1 ;	/* init'ed */
 } ;
 
-struct ebuf_head {
-	EBUF_WAY	*ways ;
-	EBUF_FL		f ;
+struct entbuf_head {
+	ENTBUF_WAY	*ways ;
+	ENTBUF_FL	f ;
 	uint		magic ;
 	uint		utimer ;	/* usage timer (fake time) */
 	uint		soff ;		/* starting offset */
@@ -63,23 +62,23 @@ struct ebuf_head {
 	int		fd ;
 } ;
 
-typedef EBUF		ebuf ;
-typedef	EBUF_FL		ebuf_fl ;
-typedef	EBUF_WAY	ebuf_way ;
+typedef ENTBUF		entbuf ;
+typedef	ENTBUF_FL	entbuf_fl ;
+typedef	ENTBUF_WAY	entbuf_way ;
 
 EXTERNC_begin
 
-extern int ebuf_start(ebuf *,int,uint,int,int,int) noex ;
-extern int ebuf_finish(ebuf *) noex ;
-extern int ebuf_read(ebuf *,int,char **) noex ;
-extern int ebuf_write(ebuf *,int,cvoid *) noex ;
-extern int ebuf_count(ebuf *) noex ;
-extern int ebuf_sync(ebuf *) noex ;
-extern int ebuf_invalidate(ebuf *,int) noex ;
+extern int entbuf_start(entbuf *,int,uint,int,int,int) noex ;
+extern int entbuf_finish(entbuf *) noex ;
+extern int entbuf_read(entbuf *,int,char **) noex ;
+extern int entbuf_write(entbuf *,int,cvoid *) noex ;
+extern int entbuf_count(entbuf *) noex ;
+extern int entbuf_sync(entbuf *) noex ;
+extern int entbuf_invalidate(entbuf *,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* EBUF_INCLUDE */
+#endif /* ENTBUF_INCLUDE */
 
 

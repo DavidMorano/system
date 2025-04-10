@@ -1,4 +1,4 @@
-/* ebuf SUPPORT (Entry-Buffer) */
+/* entbuf SUPPORT (Entry-Buffer) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -20,7 +20,7 @@
 /*******************************************************************************
 
   	Object:
-	ebuf
+	entbuf
 
 	Description:
 	This module manages the entry-buffering of a read-write
@@ -49,12 +49,12 @@
 #include	<intsat.h>
 #include	<localmisc.h>
 
-#include	"ebuf.h"
+#include	"entbuf.h"
 
 
 /* local defines */
 
-#define	WAY	ebuf_way
+#define	WAY	entbuf_way
 
 
 /* imported namespaces */
@@ -80,24 +80,24 @@ struct oldentry {
 /* forward references */
 
 template<typename ... Args>
-static inline int ebuf_magic(ebuf *op,Args ... args) noex {
+static inline int entbuf_magic(entbuf *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == EBUF_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == ENTBUF_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (ebuf_magic) */
+/* end subroutine (entbuf_magic) */
 
-static int	ebuf_waybegin(ebuf *,int) noex ;
-static int	ebuf_wayend(ebuf *,int) noex ;
-static int	ebuf_search(ebuf *,int,char **) noex ;
-static int	ebuf_get(ebuf *,int,int,char **) noex ;
-static int	ebuf_load(ebuf *,int,char **) noex ;
-static int	ebuf_wayfindfin(ebuf *) noex ;
-static int	ebuf_wayfindevict(ebuf *) noex ;
-static int	ebuf_wayevict(ebuf *,int) noex ;
-static int	ebuf_wayloadread(ebuf *,int,int,char **) noex ;
+static int	entbuf_waybegin(entbuf *,int) noex ;
+static int	entbuf_wayend(entbuf *,int) noex ;
+static int	entbuf_search(entbuf *,int,char **) noex ;
+static int	entbuf_get(entbuf *,int,int,char **) noex ;
+static int	entbuf_load(entbuf *,int,char **) noex ;
+static int	entbuf_wayfindfin(entbuf *) noex ;
+static int	entbuf_wayfindevict(entbuf *) noex ;
+static int	entbuf_wayevict(entbuf *,int) noex ;
+static int	entbuf_wayloadread(entbuf *,int,int,char **) noex ;
 
 
 /* local variables */
@@ -108,13 +108,13 @@ static int	ebuf_wayloadread(ebuf *,int,int,char **) noex ;
 
 /* exported subroutines */
 
-int ebuf_start(ebuf *op,int fd,uint soff,int esize,int nways,int npw) noex {
-    	EBUF		*hop = op ;
+int entbuf_start(entbuf *op,int fd,uint soff,int esize,int nways,int npw) noex {
+    	ENTBUF		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op) {
 	    memclear(hop) ;
 	    if (nways < 0) nways = 1 ;
-	    if (npw < EBUF_NENTS) npw = EBUF_NENTS ;
+	    if (npw < ENTBUF_NENTS) npw = ENTBUF_NENTS ;
 	    op->fd = fd ;
 	    op->soff = soff ;
 	    op->esize = esize ;
@@ -128,23 +128,23 @@ int ebuf_start(ebuf *op,int fd,uint soff,int esize,int nways,int npw) noex {
 	            op->nentries = ((foff - soff) / esize) ;
 	        }
 	        sz = nways * szof(WAY) ;
-	        if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
-		    op->ways = (EBUF_WAY *) vp ;
+	        if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+		    op->ways = (WAY *) vp ;
 		    memset(op->ways,0,sz) ;
-		    op->magic = EBUF_MAGIC ;
+		    op->magic = ENTBUF_MAGIC ;
 	        } /* end if (m-a) */
 	    } /* end if (fstat) */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ebuf_start) */
+/* end subroutine (entbuf_start) */
 
-int ebuf_finish(ebuf *op) noex {
+int entbuf_finish(entbuf *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ebuf_magic(op)) >= 0) {
+	if ((rs = entbuf_magic(op)) >= 0) {
 	    for (int i = 0 ; i < op->nways ; i += 1) {
-	        rs1 = ebuf_wayend(op,i) ;
+	        rs1 = entbuf_wayend(op,i) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if */
 	    if (op->ways != nullptr) {
@@ -156,36 +156,36 @@ int ebuf_finish(ebuf *op) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (ebuf_finish) */
+/* end subroutine (entbuf_finish) */
 
-int ebuf_read(ebuf *op,int ei,char **rpp) noex {
+int entbuf_read(entbuf *op,int ei,char **rpp) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		n = 1 ;
-	if ((rs = ebuf_magic(op)) >= 0) {
-	    if ((rs = ebuf_search(op,ei,rpp)) == rsn) {
-	        rs = ebuf_load(op,ei,rpp) ;
+	if ((rs = entbuf_magic(op)) >= 0) {
+	    if ((rs = entbuf_search(op,ei,rpp)) == rsn) {
+	        rs = entbuf_load(op,ei,rpp) ;
 	        n = rs ;
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (ebuf_read) */
+/* end subroutine (entbuf_read) */
 
-int ebuf_write(ebuf *op,int ei,cvoid *ebuf) noex {
+int entbuf_write(entbuf *op,int ei,cvoid *ubuf) noex {
 	int		rs ;
-	if ((rs = ebuf_magic(op)) >= 0) {
+	if ((rs = entbuf_magic(op)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (ei >= 0) {
 		char	*rp = nullptr ;
-	        if ((rs = ebuf_search(op,ei,&rp)) >= 0) {
-	            if (ebuf) {
-	                memcpy(rp,ebuf,op->esize) ;
+	        if ((rs = entbuf_search(op,ei,&rp)) >= 0) {
+	            if (ubuf) {
+	                memcpy(rp,ubuf,op->esize) ;
 	            }
 	        } else if (rs == SR_NOTFOUND) {
 	            rs = SR_OK ;
-	            if (ebuf != nullptr) {
-	                rp = charp(ebuf) ;
+	            if (ubuf) {
+	                rp = charp(ubuf) ;
 	            }
 	        }
 	        if (rs >= 0) {
@@ -203,14 +203,14 @@ int ebuf_write(ebuf *op,int ei,cvoid *ebuf) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (ebuf_write) */
+/* end subroutine (entbuf_write) */
 
-int ebuf_invalidate(ebuf *op,int n) noex {
+int entbuf_invalidate(entbuf *op,int n) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ebuf_magic(op)) >= 0) {
+	if ((rs = entbuf_magic(op)) >= 0) {
 	    for (int i = 0 ; (rs >= 0) && (i < op->iways) ; i += 1) {
-	        rs1 = ebuf_wayevict(op,i) ;
+	        rs1 = entbuf_wayevict(op,i) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end for */
 	    if ((rs >= 0) && (n >= 0)) {
@@ -219,41 +219,41 @@ int ebuf_invalidate(ebuf *op,int n) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (ebuf_invalidate) */
+/* end subroutine (entbuf_invalidate) */
 
-int ebuf_count(ebuf *op) noex {
+int entbuf_count(entbuf *op) noex {
 	int		rs ;
-	if ((rs = ebuf_magic(op)) >= 0) {
+	if ((rs = entbuf_magic(op)) >= 0) {
 	    rs = op->nentries ;
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (ebuf_count) */
+/* end subroutine (entbuf_count) */
 
-int ebuf_sync(ebuf *op) noex {
+int entbuf_sync(entbuf *op) noex {
 	int		rs ;
-	if ((rs = ebuf_magic(op)) >= 0) {
+	if ((rs = entbuf_magic(op)) >= 0) {
 	    rs = uc_fsync(op->fd) ;
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (ebuf_count) */
+/* end subroutine (entbuf_count) */
 
 
 /* private subroutines */
 
-static int ebuf_waybegin(ebuf *op,int wi) noex {
+static int entbuf_waybegin(entbuf *op,int wi) noex {
 	int		rs ;
 	WAY		*wp = (op->ways + wi) ;
 	int		wsize = (op->npw * op->esize) ;
-	if (void *vp{} ; (rs = uc_malloc(wsize,&vp)) >= 0) {
+	if (void *vp ; (rs = uc_malloc(wsize,&vp)) >= 0) {
 	    wp->wbuf = charp(vp) ;
 	}
 	return rs ;
 }
-/* end subroutine (ebuf_waybegin) */
+/* end subroutine (entbuf_waybegin) */
 
-static int ebuf_wayend(ebuf *op,int wi) noex {
+static int entbuf_wayend(entbuf *op,int wi) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	WAY		*wp = (op->ways + wi) ;
@@ -265,13 +265,13 @@ static int ebuf_wayend(ebuf *op,int wi) noex {
 	memclear(wp) ;
 	return rs ;
 }
-/* end subroutine (ebuf_wayend) */
+/* end subroutine (entbuf_wayend) */
 
-static int ebuf_search(ebuf *op,int ei,char **rpp) noex {
+static int entbuf_search(entbuf *op,int ei,char **rpp) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_NOTFOUND ;
 	for (int wi = 0 ; wi < op->iways ; wi += 1) {
-	    rs = ebuf_get(op,wi,ei,rpp) ;
+	    rs = entbuf_get(op,wi,ei,rpp) ;
 	    if ((rs >= 0) || (rs != rsn)) break ;
 	} /* end if */
 	if ((rs < 0) && rpp) {
@@ -279,9 +279,9 @@ static int ebuf_search(ebuf *op,int ei,char **rpp) noex {
 	}
 	return rs ;
 }
-/* end subroutine (ebuf_search) */
+/* end subroutine (entbuf_search) */
 
-static int ebuf_get(ebuf *op,int wi,int ei,char **rpp) noex {
+static int entbuf_get(entbuf *op,int wi,int ei,char **rpp) noex {
 	int		rs = SR_OK ;
 	WAY		*wp = (op->ways + wi) ;
 	uint	roff = 0 ;
@@ -291,7 +291,7 @@ static int ebuf_get(ebuf *op,int wi,int ei,char **rpp) noex {
 	    if ((eoff >= wp->woff) && (eoff < (wp->woff + wp->wlen))) {
 		rs = SR_OK ;
 		wp->utime = ++op->utimer ;
-		roff = eoff - wp->woff ;
+		roff = intconv(eoff - wp->woff) ;
 	    }
 	} /* end if */
 	if (rpp) {
@@ -299,28 +299,28 @@ static int ebuf_get(ebuf *op,int wi,int ei,char **rpp) noex {
 	}
 	return rs ;
 }
-/* end subroutine (ebuf_get) */
+/* end subroutine (entbuf_get) */
 
-static int ebuf_load(ebuf *op,int ei,char **rpp) noex {
+static int entbuf_load(entbuf *op,int ei,char **rpp) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		n = 0 ;
 	int		wi ;
-	if ((rs = ebuf_wayfindfin(op)) >= 0) {
+	if ((rs = entbuf_wayfindfin(op)) >= 0) {
 	    wi = rs ;
 	} else if (rs == rsn) {
-	    rs = ebuf_wayfindevict(op) ;
+	    rs = entbuf_wayfindevict(op) ;
 	    wi = rs ;
 	} /* end if */
 	if (rs >= 0) {
-	    rs = ebuf_wayloadread(op,wi,ei,rpp) ;
+	    rs = entbuf_wayloadread(op,wi,ei,rpp) ;
 	    n = rs ;
 	}
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (ebuf_load) */
+/* end subroutine (entbuf_load) */
 
-static int ebuf_wayfindfin(ebuf *op) noex {
+static int entbuf_wayfindfin(entbuf *op) noex {
 	int		rs = SR_OK ;
 	int		wi = 0 ;
 	WAY		*wp{} ;
@@ -345,9 +345,9 @@ static int ebuf_wayfindfin(ebuf *op) noex {
 	} /* end if */
 	return (rs >= 0) ? wi : rs ;
 }
-/* end subroutine (ebuf_wayfindfin) */
+/* end subroutine (entbuf_wayfindfin) */
 
-static int ebuf_wayfindevict(ebuf *op) noex {
+static int entbuf_wayfindevict(entbuf *op) noex {
 	WAY		*wp = nullptr ;
 	uint		otime = INT_MAX ;
 	int		rs = SR_OK ;
@@ -361,13 +361,13 @@ static int ebuf_wayfindevict(ebuf *op) noex {
 	} /* end for */
 	wp = (op->ways + wi) ;
 	if (wp->wlen != 0) {
-	    rs = ebuf_wayevict(op,wi) ;
+	    rs = entbuf_wayevict(op,wi) ;
 	}
 	return (rs >= 0) ? wi : rs ;
 }
-/* end subroutine (ebuf_wayfindevict) */
+/* end subroutine (entbuf_wayfindevict) */
 
-static int ebuf_wayevict(ebuf *op,int wi) noex {
+static int entbuf_wayevict(entbuf *op,int wi) noex {
 	WAY		*wp = (op->ways + wi) ;
 	int		rs = SR_OK ;
 	wp->woff = 0 ;
@@ -376,15 +376,15 @@ static int ebuf_wayevict(ebuf *op,int wi) noex {
 	wp->utime = 0 ;
 	return rs ;
 }
-/* end subroutine (ebuf_wayevict) */
+/* end subroutine (entbuf_wayevict) */
 
-static int ebuf_wayloadread(ebuf *op,int wi,int ei,char **rpp) noex {
+static int entbuf_wayloadread(entbuf *op,int wi,int ei,char **rpp) noex {
 	WAY		*wp = (op->ways + wi) ;
 	off_t		poff ;
 	int		rs = SR_OK ;
 	int		n = 0 ;
 	if (wp->wbuf == nullptr) {
-	    rs = ebuf_waybegin(op,wi) ;
+	    rs = entbuf_waybegin(op,wi) ;
 	}
 	if (rs >= 0) {
 	    uint	woff = op->soff + (ei * op->esize) ;
@@ -407,6 +407,6 @@ static int ebuf_wayloadread(ebuf *op,int wi,int ei,char **rpp) noex {
 	}
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (ebuf_wayloadread) */
+/* end subroutine (entbuf_wayloadread) */
 
 
