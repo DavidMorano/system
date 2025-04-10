@@ -13,13 +13,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* |time_t| + |mode_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<mapstrint.h>
-#include	<ebuf.h>
+#include	<entbuf.h>
 #include	<tse.hh>
 
 
@@ -58,12 +59,12 @@ struct ts_flags {
 	uint		cursoracc:1 ;		/* accessed while cursored? */
 	uint		remote:1 ;		/* remote mounted file */
 	uint		bufvalid:1 ;		/* buffer valid */
-	uint		ebuf:1 ;		/* EBUF active */
+	uint		entbuf:1 ;		/* ENTBUF active */
 } ;
 
 struct ts_head {
 	cchar		*fname ;
-	ebuf		*ebmp ;			/* entry-buffer-manager */
+	entbuf		*ebmp ;			/* entry-buffer-manager */
 	mapstrint	*nip ;			/* nodename index */
 	time_t		ti_open ;		/* file open time */
 	time_t		ti_access ;		/* file access time */
