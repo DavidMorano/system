@@ -149,6 +149,27 @@ int msgide_all::wr(cchar *mbuf,int mlen) noex {
 } 
 /* end method (msgide_all::wr) */
 
+int msgide_all::wru(cchar *mbuf,int mlen) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (mbuf) {
+	    rs = SR_INVALID ;
+	    if (mlen > 0) {
+		char	*buf = cast_const<charp>(mbuf) ;
+	        if (serialbuf sb ; (rs = sb.start(buf,mlen)) >= 0) {
+		    {
+			sb >> count ;
+			sb >> utime ;
+	    	    }
+	            rs1 = sb.finish ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (serialbuf) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+} 
+/* end method (msgide_all::wru) */
+
 int msgide_all::rd(char *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
@@ -174,6 +195,26 @@ int msgide_all::rd(char *mbuf,int mlen) noex {
 	return rs ;
 }
 /* end subroutine (entry_all::rd) */
+
+int msgide_all::rdu(char *mbuf,int mlen) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (mbuf) {
+	    rs = SR_INVALID ;
+	    if (mlen > 0) {
+	        if (serialbuf sb ; (rs = sb.start(mbuf,mlen)) >= 0) {
+		    {
+			sb << count ;
+			sb << utime ;
+		    }
+	            rs1 = sb.finish ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (serialbuf) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (entry_all::rdu) */
 
 int msgide_update::istart() noex {
     	int		rs = SR_OK ;

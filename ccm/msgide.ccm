@@ -82,7 +82,9 @@ export {
 	msgide_all(const msgide_all &) = delete ;
 	msgide_all &operator = (const msgide_all &) = delete ;
 	int rd(char *,int) noex ;
+	int rdu(char *,int) noex ;
 	int wr(cchar *,int) noex ;
+	int wru(cchar *,int) noex ;
 	~msgide_all() {
 	    finish() ;
 	} ;
