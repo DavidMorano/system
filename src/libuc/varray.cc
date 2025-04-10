@@ -31,6 +31,8 @@
 #include	<cstdlib>
 #include	<cstdlib>
 #include	<cstring>
+#include	<new>			/* |nothrow(3c++) */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<lookaside.h>
 #include	<localmisc.h>
@@ -47,7 +49,10 @@
 
 /* imported namespaces */
 
-using std::nothrow ;
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -70,7 +75,7 @@ static inline int varray_ctor(varray *op,Args ... args) noex {
 	if (op && (args && ...)) {
 	    rs = SR_NOMEM ;
 	    op->va = nullptr ;
-	    op->esize = 0 ;
+	    op->esz = 0 ;
 	    op->c = 0 ;
 	    op->n = 0 ;
 	    op->imax = 0 ;
@@ -106,19 +111,19 @@ static int	varray_extend(varray *,int) noex ;
 
 /* exported subroutines */
 
-int varray_start(varray *op,int esize,int n) noex {
+int varray_start(varray *op,int esz,int n) noex {
 	int		rs ;
 	if ((rs = varray_ctor(op)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (n <= 0) n = VARRAY_DEFENTS ;
-	    if (esize > 0) {
-	        cint	sz = (n + 1) * sizeof(void **) ;
-	        op->esize = esize ;
+	    if (esz > 0) {
+	        cint	sz = (n + 1) * szof(void **) ;
+	        op->esz = esz ;
 	        if (void *vp{} ; (rs = OURMALLOC(sz,&vp)) >= 0) {
 	            memclear(vp,sz) ;
 	            op->va = (void **) vp ;
 	            op->n = n ;
-	            rs = lookaside_start(op->lap,esize,n) ;
+	            rs = lookaside_start(op->lap,esz,n) ;
 	            if (rs < 0) {
 	                OURFREE(vp) ;
 		    }
@@ -324,11 +329,12 @@ int varray_find(varray *op,void *oep) noex {
 	if (op && oep) {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
-		cint	esz = op->esize ;
+		cint	esz = op->esz ;
 		for (i = 0 ; i < op->n ; i += 1) {
 		    void	*ep = op->va[i] ;
 	            if (ep) {
-	                if (memcmp(oep,ep,esz) == 0) break ;
+			csize	esize = size_t(esz) ;
+	                if (memcmp(oep,ep,esize) == 0) break ;
 		    }
 	        } /* end for */
 	        rs = (i < op->n) ? SR_OK : SR_NOTFOUND ;
@@ -373,7 +379,7 @@ static int varray_extend(VARRAY *op,int ni) noex {
 	    int		sz ;
 	    void	*vp{} ;
 	    nn = (op->n + MAX(ndif,ninc)) ;
-	    sz = nn * sizeof(void **) ;
+	    sz = nn * szof(void **) ;
 	    if (op->va == nullptr) {
 	        if ((rs = OURMALLOC(sz,&vp)) >= 0) {
 	            memclear(vp,sz) ;
@@ -383,7 +389,7 @@ static int varray_extend(VARRAY *op,int ni) noex {
 	            void	**nva = (void **) vp ;
 	            cint	nndif = (nn-op->n) ;
 	            int		dsize ;
-	            dsize = (nndif * sizeof(void **)) ;
+	            dsize = (nndif * szof(void **)) ;
 	            memclear((nva+op->n),dsize) ;
 	            op->va = nullptr ;
 	        }
