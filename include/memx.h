@@ -23,13 +23,14 @@
 #ifndef	SUBROUTINE_MEMCLEAR
 #define	SUBROUTINE_MEMCLEAR
 #ifdef	__cplusplus
-constexpr inline int memclear(void *objp,size_t objs) noex {
+constexpr inline int memclear(void *objp,int sz) noex {
+    	csize	objs = size_t(sz) ;
     	memset(objp,0,objs) ;
-	return int(objs) ;
+	return sz ;
 }
 #else /* __cplusplus */
-static inline int memclear(void *objp,size_t objs) noex {
-    	cint	sz = (int) objs ;
+static inline int memclear(void *objp,int sz) noex {
+    	csize	objs = size_t(sz) ;
     	memset(objp,0,objs) ;
 	return sz ;
 }
@@ -41,8 +42,8 @@ static inline int memclear(void *objp,size_t objs) noex {
 #ifdef	__cplusplus
 template<typename T>
 constexpr inline int memclear(T *op) noex {
-	csize	osz = szof(T) ;
-	return memclear(op,osz) ;
+	int	sz = szof(T) ;
+	return memclear(op,sz) ;
 }
 #endif /* __cplusplus */
 #endif /* TEMPLATE_MEMCLEAR */
@@ -52,7 +53,7 @@ constexpr inline int memclear(T *op) noex {
 #ifdef	__cplusplus
 template<typename T>
 constexpr inline void *memcpy(T *dp,cvoid *sp) noex {
-	csize	dsz = szof(T) ;
+	csize	dsz = sizeof(T) ;
 	return memcpy(dp,sp,dsz) ;
 }
 #endif /* __cplusplus */
