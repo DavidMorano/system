@@ -1,4 +1,5 @@
 /* main SUPPORT (filoex) */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* front-end subroutine for the FILEOP program */
