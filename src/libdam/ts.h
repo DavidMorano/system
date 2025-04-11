@@ -71,7 +71,6 @@ struct ts_head {
 	TS_FL		fl ;
 	uint		magic ;
 	int		oflags ;
-	int		pagesize ;
 	int		filesize ;
 	int		topsize ;
 	int		fd ;
