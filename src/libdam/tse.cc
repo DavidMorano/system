@@ -35,6 +35,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<serialbuf.h>
+#include	<sncpyx.h>
 #include	<intceil.h>
 #include	<localmisc.h>
 
@@ -93,6 +94,9 @@ int tse::rdu(char *abuf,int alen) noex {
     	return update(frd,abuf,alen) ;
 }
 
+int tse::keyload(cchar *sp,int sl) noex {
+	return sncpy(keyname,keylen,sp,sl) ;
+}
 
 /* local subroutines */
 
@@ -145,13 +149,12 @@ int tse::all(bool frd,char *abuf,int alen) noex {
 int tse::update(bool frd,char *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		usz = 0 ;
 	if (abuf) {
 	    rs = SR_INVALID ;
 	    if (alen > 0) {
-	        /* go to where this data is in the message buffer */
-	        abuf += TSE_OCOUNT ;
-	        alen -= TSE_OCOUNT ;
-	        /* proceed as normal (?) :-) */
+		usz += szof(count) ;
+		usz += szof(utime) ;
 	        if (serialbuf sb ; (rs = sb.start(abuf,alen)) >= 0) {
 	            if (frd) {
 	                sb << count ;
@@ -163,12 +166,9 @@ int tse::update(bool frd,char *abuf,int alen) noex {
 	            rs1 = sb.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (serialbuf) */
-	        if (rs >= 0) {
-	            rs += TSE_OCOUNT ;
-	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? usz : rs ;
 }
 /* end subroutine (tse::update) */
 
