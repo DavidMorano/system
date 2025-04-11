@@ -61,11 +61,11 @@ struct tse {
 	    start(this,tsemem_start) ;
 	    finish(this,tsemem_finish) ;
 	} ;
-	int rd(char *,int) noex ;
-	int wr(cchar *,int) noex ;
-	int rdu(char *,int) noex ;
-	int wru(cchar *,int) noex ;
-	int keyload(cchar *,int) noex ;
+	int rd(char *,int = -1) noex ;
+	int wr(cchar *,int = -1) noex ;
+	int rdu(char *,int = -1) noex ;
+	int wru(cchar *,int = -1) noex ;
+	int keyload(cchar *,int = -1) noex ;
 	operator int () noex ;
 	void dtor() noex ;
 	~tse() {

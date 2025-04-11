@@ -119,7 +119,7 @@ int tse::ifinish() noex {
 int tse::all(bool frd,char *abuf,int alen) noex {
     	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (alen < 0) alen = INT_MAX ;
+	if (alen < 0) alen = entsz ;
 	if (abuf) {
 	    rs = SR_INVALID ;
 	    if (alen > 0) {
@@ -150,6 +150,7 @@ int tse::update(bool frd,char *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		usz = 0 ;
+	if (alen < 0) alen = entsz ;
 	if (abuf) {
 	    rs = SR_INVALID ;
 	    if (alen > 0) {
