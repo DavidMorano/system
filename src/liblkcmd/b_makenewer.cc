@@ -1,20 +1,20 @@
-/* b_makenewer */
+/* b_makenewer SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in to return load averages */
 /* generic short program front-end */
-
 
 #define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_ALWAYS	1		/* always update the target? */
 
-
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	The program was written from scratch to do what the previous program by
-	the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 */
 
@@ -22,6 +22,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	main
+
+	Description:
 	This is the main subroutine for MAKENEWER.
 	This was a fairly generic subroutine adpapted for this program.
 
@@ -34,9 +38,7 @@
 	+ suffix-substitution (uses the '-s' option)
 	This maps specified source files to destination files
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
