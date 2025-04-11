@@ -703,15 +703,21 @@ static int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
 static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	cnullptr	np{} ;
 	int		rs ;
+	int		rs1 ;
 	int		ei = 0 ;
 	char		*bp = nullptr ;
 	if ((rs = mapstrint_fetch(op->nip,nnp,nnl,np,&ei)) >= 0) {
 	    if ((rs = entbuf_read(op->ebmp,ei,&bp)) > 0) {
-	        cchar	*sp = bp + TSE_OKEYNAME ;
-	        if (! namematch(sp,nnp,nnl)) {
-	            rs = SR_NOTFOUND ;
-	            mapstrint_delkey(op->nip,nnp,nnl) ;
-	        } /* end if */
+		if (tse ew ; (rs = ew.start) >= 0) {
+		    if ((rs = ew.wr(bp)) >= 0) {
+	                if (! namematch(ew.keyname,nnp,nnl)) {
+	                    rs = SR_NOTFOUND ;
+	                    mapstrint_delkey(op->nip,nnp,nnl) ;
+	                } /* end if */
+		    }
+		    rs1 = ew.finish ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (tse) */
 	    } else {
 	        if ((rs = ts_search(op,nnp,nnl,&bp)) >= 0) {
 	            ei = rs ;
@@ -729,28 +735,30 @@ static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 /* search for an entry */
 static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		ne = 0 ;
 	int		ei = 0 ;
 	bool		f_found = false ;
 	char		*bp = nullptr ;
 	if (nnl < 0) nnl = xstrlen(nnp) ;
-	while ((rs >= 0) && (! f_found)) {
-	    int		i ; /* used-afterwards */
-	    rs = entbuf_read(op->ebmp,ei,&bp) ;
-	    ne = rs ;
-	    if (rs <= 0) break ;
-	    for (i = 0 ; (rs >= 0) && (i < ne) ; i += 1) {
-	        cchar	*sp = bp + TSE_OKEYNAME ;
-		/* is this a match for what we want? */
-	        if (namematch(sp,nnp,nnl)) {
-		    f_found = true ;
-	            break ;
-		}
-		bp += var.entsz ;
-	    } /* end for (looping through entries) */
-	    ei += i ; /* from above (the 'for' loop) */
-	    if (f_found) break ;
-	} /* end while */
+	if (tse ew ; (rs = ew.start) >= 0) {
+	    while ((rs >= 0) && (! f_found)) {
+	        int		i ; /* used-afterwards */
+	        rs = entbuf_read(op->ebmp,ei,&bp) ;
+	        ne = rs ;
+	        if (rs <= 0) break ;
+	        for (i = 0 ; (rs >= 0) && (i < ne) ; i += 1) {
+		    if ((rs = ew.wr(bp)) >= 0) {
+	                f_found = namematch(ew.keyname,nnp,nnl) ;
+		    }
+		    if (f_found) break ;
+	        } /* end for (looping through entries) */
+	        ei += i ; /* from above (the 'for' loop) */
+	        if (f_found) break ;
+	    } /* end while */
+	    rs1 = ew.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (tse) */
 	if (rs >= 0) {
 	    if ((ne != 0) && f_found) {
 		if (rpp) {
@@ -1153,14 +1161,21 @@ static int ts_ebuffinish(ts *op) noex {
 
 static int ts_readentry(ts *op,int ei,char **rpp) noex {
 	int		rs ;
+	int		rs1 ;
 	char		*bp = nullptr ;
 	if ((rs = entbuf_read(op->ebmp,ei,&bp)) > 0) {
 	    if_constexpr (f_nienum) {
-	        char	*sp = bp + TSE_OKEYNAME ;
-		{
-	            cint	nl = xstrnlen(sp,TSE_LKEYNAME) ;
-	            rs = ts_index(op,sp,nl,ei) ;
-		}
+		if (tse ew ; (rs = ew.start) >= 0) {
+		    if ((rs = ew.wr(bp)) >= 0) {
+		        {
+	                    cchar	*kp = ew.keyname ;
+			    cint	kl = xstrlen(ew.keyname) ;
+	                    rs = ts_index(op,kp,kl,ei) ;
+		        }
+		    } /* end if (tse_wr) */
+		    rs1 = ew.finish ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (tse) */
 	    } /* end if_constexpr (f_nienum) */
 	} else if (rs == 0) {
 	    rs = SR_NOTFOUND ;
