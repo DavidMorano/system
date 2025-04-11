@@ -47,6 +47,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<endian.h>
 #include	<lockfile.h>
 #include	<serialbuf.h>
@@ -98,7 +99,6 @@ import msgide ;
 #ifndef	CF_CREAT
 #define	CF_CREAT	0		/* always create the file? */
 #endif
-
 #ifndef	CF_HASH
 #define	CF_HASH		1		/* use hash for faster lookup */
 #endif
@@ -258,13 +258,13 @@ static int msgid_opens(msgid *op,cc *fname,int of,mode_t om) noex {
 	            if (cchar *fn ; (rs = uc_mallocstrw(tbuf,-1,&fn)) >= 0) {
 			cint	am = (of & O_ACCMODE) ;
 			op->fname = fn ;
-			op->f.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
+			op->fl.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
 	                if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 	                    if (S_ISREG(sb.st_mode)) {
 	                        op->mtime = sb.st_mtime ;
 	                        op->filesize = sb.st_size ;
 	                        if ((rs = isfsremote(op->fd)) >= 0) {
-	                            op->f.remote = (rs > 0) ;
+	                            op->fl.remote = (rs > 0) ;
 	                            if ((rs = msgid_fileinit(op,dt)) >= 0) {
 	                                op->magic = MSGID_MAGIC ;
 	                            }
@@ -359,8 +359,8 @@ int msgid_curbegin(msgid *op,msgid_cur *curp) noex {
     	int		rs ;
 	if ((rs = msgid_magic(op,curp)) >= 0) {
 	    op->cursors += 1 ;
-	    op->f.cursorlockbroken = false ;
-	    op->f.cursoracc = false ;
+	    op->fl.cursorlockbroken = false ;
+	    op->fl.cursoracc = false ;
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -371,13 +371,16 @@ int msgid_curend(msgid *op,msgid_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = msgid_magic(op,curp)) >= 0) {
-	    if (op->f.cursoracc) {
+	    bool	f = true ;
+	    if (op->fl.cursoracc) {
 	        op->accesstime = getustime ;
 	    }
 	    if (op->cursors > 0) {
 	        op->cursors -= 1 ;
 	    }
-	    if ((op->cursors == 0) && (op->f.readlocked || op->f.writelocked)) {
+	    f = f && (op->cursors == 0) ;
+	    f = f && (op->fl.readlocked || op->fl.writelocked) ;
+	    if (f) {
 	        rs1 = msgid_lockrelease(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -394,9 +397,9 @@ int msgid_curenum(msgid *op,msgid_cur *curp,msgid_ent *ep) noex {
 	int		ei = 0 ;
 	if ((rs = msgid_magic(op,curp)) >= 0) {
 	    rs = SR_NOTFOUND ;
-	    if (op->f.fileinit) {
+	    if (op->fl.fileinit) {
 	    	rs = SR_LOCKLOST ;
-	        if (! op->f.cursorlockbroken) {
+	        if (! op->fl.cursorlockbroken) {
 		    cint	ebs = op->entsz ;
 		    int		eoff ;
 		    if ((rs = msgid_filecheck(op,dt,var.lread)) >= 0) {
@@ -408,7 +411,7 @@ int msgid_curenum(msgid *op,msgid_cur *curp,msgid_ent *ep) noex {
 			    /* verify sufficient file buffering */
 	                    if ((rs = msgid_bufload(op,eoff,ebs,&bp)) >= 0) {
 	                        if (rs >= ebs) {
-			            /* copy entry to caller buffer */
+			            /* copy entry to buffer */
 	                            if (ep) {
 					if ((rs = ep->start) >= 0) {
 					    {
@@ -423,7 +426,7 @@ int msgid_curenum(msgid *op,msgid_cur *curp,msgid_ent *ep) noex {
 	                            if (rs >= 0) {
 	                                curp->i = ei ;
 			            }
-	                            op->f.cursoracc = true ;
+	                            op->fl.cursoracc = true ;
 	                        } else {
 	                            rs = SR_EOF ;
 			        }
@@ -444,7 +447,7 @@ int msgid_matchid(msgid *op,time_t dt,cchar *midp,int midl,msgid_ent *ep) noex {
 	int		ei = 0 ;
 	if ((rs = msgid_magic(op,midp)) >= 0) {
 	    rs = SR_NOTFOUND ;
-	    if (op->f.fileinit) {
+	    if (op->fl.fileinit) {
 	        if (dt == 0) dt = getustime ;
 	        if ((rs = msgid_filecheck(op,dt,var.lread)) >= 0) {
 		    char	*bep ;
@@ -470,7 +473,7 @@ int msgid_match(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
 	    rs = SR_FAULT ;
 	    if (kp->recip && kp->mid) {
 	    	rs = SR_NOTFOUND ;
-	        if (op->f.fileinit) {
+	        if (op->fl.fileinit) {
 		    if (dt == 0) dt = getustime ;
 	            if ((rs = msgid_filecheck(op,dt,var.lread)) >= 0) {
 			uint	khash ;
@@ -502,7 +505,7 @@ int msgid_update(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
 	    rs = SR_FAULT ;
 	    if (kp->recip && kp->mid) {
 	        rs = SR_NOTFOUND ;
-		if (op->f.fileinit) {
+		if (op->fl.fileinit) {
 		    const funmode	fc = funmode::wr ;
         	    if (dt == 0) dt = getustime ;
         	    if ((rs = msgid_filecheck(op,dt,fc)) >= 0) {
@@ -578,12 +581,12 @@ static int msgid_updates(msgid *op,time_t dt,key *kp,ent *ep) noex {
             m1.utime = m0.utime ;
             msgide_update(&m1,0,bep,op->entsz) ;
         /* update the in-core file buffer as needed or as appropriate */
-            if ((rs >= 0) && f_bufupdate && op->f.writable) {
+            if ((rs >= 0) && f_bufupdate && op->fl.writable) {
                 eoff = MSGID_FOTAB + (ei * op->entsz) ;
                 msgid_bufupdate(op,eoff,wlen,ebuf) ;
             }
         } /* end if (match or not) */
-        if ((rs >= 0) && op->f.writable) {
+        if ((rs >= 0) && op->fl.writable) {
             /* write back this entry */
             eoff = MSGID_FOTAB + (ei * op->entsz) ;
             uoff = eoff ;
@@ -596,7 +599,7 @@ static int msgid_updates(msgid *op,time_t dt,key *kp,ent *ep) noex {
                     op->filesize += wlen ;
                 }
                 rs = msgid_writehead(op) ;
-                if ((rs >= 0) && op->f.remote) {
+                if ((rs >= 0) && op->fl.remote) {
                     u_fsync(op->fd) ;
                 }
             } /* end if (data write was successful) */
@@ -613,7 +616,7 @@ int msgid_check(msgid *op,time_t dt) noex {
 	int		f = false ;
 	if ((rs = msgid_magic(op)) >= 0) {
 	    if (op->fd >= 0) {
-	        if ((! op->f.readlocked) && (! op->f.writelocked)) {
+	        if ((! op->fl.readlocked) && (! op->fl.writelocked)) {
 	            f = f || ((dt - op->accesstime) > TO_ACCESS) ;
 	            f = f || ((dt - op->opentime) > TO_OPEN) ;
 	            if (f) {
@@ -683,7 +686,7 @@ static int msgid_filecheck(msgid *op,time_t dt,int f_read) noex {
 	}
 	/* capture the lock if we do not already have it */
 	if (rs >= 0) {
-	    if ((! op->f.readlocked) && (! op->f.writelocked)) {
+	    if ((! op->fl.readlocked) && (! op->fl.writelocked)) {
 	        if (dt == 0) dt = getustime ;
 	        if ((rs = msgid_lockacquire(op,dt,f_read)) >= 0) {
 	            if ((rs = msgid_filechanged(op)) >= 0) {
@@ -708,9 +711,9 @@ static int msgid_fileinit(msgid *op,time_t dt) noex {
 	char		fbuf[MSGID_FBUFLEN + 1] ;
 	if (op->filesize == 0) {
 	    u_seek(op->fd,0z,SEEK_SET) ;
-	    op->f.fileinit = false ;
-	    if (op->f.writable) {
-	        if (! op->f.writelocked) {
+	    op->fl.fileinit = false ;
+	    if (op->fl.writable) {
+	        if (! op->fl.writelocked) {
 		    const funmode	fc = funmode:wr ;
 	            if ((rs = msgid_lockacquire(op,dt,fc)) >= 0) {
 	                f_locked = true ;
@@ -735,17 +738,17 @@ static int msgid_fileinit(msgid *op,time_t dt) noex {
 	            	    if ((rs = u_pwrite(op->fd,fbuf,bl,0z)) > 0) {
 				op->filesize = rs ;
 	                        op->mtime = dt ;
-	                        if (op->f.remote) u_fsync(op->fd) ;
+	                        if (op->fl.remote) u_fsync(op->fd) ;
 	                        rs = msgid_bufupdate(op,0,bl,fbuf) ;
 	                    }
-	                    op->f.fileinit = (rs >= 0) ;
+	                    op->fl.fileinit = (rs >= 0) ;
 	                } /* end if (filehead) */
 		    } /* end if (filemagic) */
 		} /* end if (ok) */
 	    } /* end if (writing) */
 	} else if (op->filesize >= MSGID_FOTAB) {
 	    /* read the file header */
-	    if (! op->f.readlocked) {
+	    if (! op->fl.readlocked) {
 		const funmode	fc = funmode:rd ;
 	        if ((rs = msgid_lockacquire(op,dt,fc)) >= 0) {
 	            f_locked = true ;
@@ -770,7 +773,7 @@ static int msgid_fileinit(msgid *op,time_t dt) noex {
 	                    if (! f) {
 	                        rs = SR_BADFMT ;
 		            }
-	                    op->f.fileinit = f ;
+	                    op->fl.fileinit = f ;
 			} /* end if (filehead) */
 		    } /* end if (filemagic) */
 	        } /* end if (u_pread) */
@@ -790,18 +793,18 @@ static int msgid_filechanged(msgid *op) noex {
 	int		f_changed = false ;
 	if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 	    if (sb.st_size < MSGID_FOTAB) {
-	        op->f.fileinit = false ;
+	        op->fl.fileinit = false ;
 	    } 
-	    f_changed = f_changed || (! op->f.fileinit) ;
+	    f_changed = f_changed || (! op->fl.fileinit) ;
 	    f_changed = f_changed || (sb.st_size != op->filesize) ;
 	    f_changed = f_changed || (sb.st_mtime != op->mtime) ;
 	    /* if it has NOT changed, read file header for writes */
-	    if ((! f_changed) && op->f.fileinit) {
+	    if ((! f_changed) && op->fl.fileinit) {
 	        MSGID_FH	h ;
 	        char		hbuf[MSGID_FLTOP + 1] ;
 	        if ((rs = u_pread(op->fd,hbuf,MSGID_FLTOP,0z)) >= 0) {
 	            if (rs < MSGID_FLTOP) {
-	                op->f.fileinit = false ;
+	                op->fl.fileinit = false ;
 		    }
 	            if (rs > 0) {
 	                filehead(&h,funmode::wr,(hbuf + MSGID_FOHEAD)) ;
@@ -836,15 +839,15 @@ static int msgid_lockacquire(msgid *op,time_t dt,int f_read) noex {
 	if (rs >= 0) {
 	    int		lockcmd ;
 	    bool	f_already = false ;
-	    if (f_read || (! op->f.writable)) {
-	        f_already = op->f.readlocked ;
-	        op->f.readlocked = true ;
-	        op->f.writelocked = false ;
+	    if (f_read || (! op->fl.writable)) {
+	        f_already = op->fl.readlocked ;
+	        op->fl.readlocked = true ;
+	        op->fl.writelocked = false ;
 	        lockcmd = F_RLOCK ;
 	    } else {
-	        f_already = op->f.writelocked ;
-	        op->f.readlocked = false ;
-	        op->f.writelocked = true ;
+	        f_already = op->fl.writelocked ;
+	        op->fl.readlocked = false ;
+	        op->fl.writelocked = true ;
 	        lockcmd = F_WLOCK ;
 	    }
 	    /* get out if we have the lock that we want already */
@@ -858,12 +861,12 @@ static int msgid_lockacquire(msgid *op,time_t dt,int f_read) noex {
 
 static int msgid_lockrelease(msgid *op) noex {
 	int		rs = SR_OK ;
-	if ((op->f.readlocked || op->f.writelocked)) {
+	if ((op->fl.readlocked || op->fl.writelocked)) {
 	    if (op->fd >= 0) {
 	        rs = lockfile(op->fd,F_ULOCK,0L,0L,TO_LOCK) ;
 	    }
-	    op->f.readlocked = false ;
-	    op->f.writelocked = false ;
+	    op->fl.readlocked = false ;
+	    op->fl.writelocked = false ;
 	} /* end if */
 	return rs ;
 }
