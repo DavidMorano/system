@@ -17,7 +17,7 @@
 
 #ifndef	FUNMODE_INCLUDE
 #define	FUNMODE_INCLUDE
-#ifdef	__cpluplsus
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -34,7 +34,7 @@ enum struct funmode : int {
 } ;
 
 
-#endif /* __cpluplsus */
+#endif /* __cplusplus */
 #endif /* FUNMODE_INCLUDE */
 
 
