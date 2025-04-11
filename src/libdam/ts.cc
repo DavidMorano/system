@@ -195,6 +195,8 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+typedef ts_ent		tsent ;
+
 
 /* external subroutines */
 
@@ -295,6 +297,9 @@ static int	ts_readentry(ts *,int,char **) noex ;
 static int	ts_index(ts *,cchar *,int,int) noex ;
 static int	ts_headwrite(ts *) noex ;
 
+static int	tsent_load(tsent *,cchar *) noex ;
+static int	tsent_trans(tsent *,tse *) noex ;
+
 static bool	namematch(cchar *,cchar *,int) noex ;
 
 
@@ -382,7 +387,7 @@ int ts_close(ts *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ts_magic(op)) >= 0) {
-	    {
+	    if (op->nip) {
 	        rs1 = mapstrint_finish(op->nip) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -459,7 +464,7 @@ int ts_curenum(ts *op,ts_cur *curp,ts_ent *ep) noex {
 	        ei = (curp->i < 0) ? 0 : curp->i + 1 ;
 	        if (char *bp ; (rs = ts_readentry(op,ei,&bp)) >= 0) {
 	            if (ep && bp) {
-	                rs = ep->wr(bp,var.entsz) ;
+			rs = tsent_load(ep,bp) ;
 		    }
 	        } /* end if */
 	        if (rs >= 0) {
@@ -477,9 +482,9 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	int		rs ;
 	int		ei = 0 ;
 	if ((rs = ts_magic(op,nnp)) >= 0) {
-	    int		idx = TS_KEYNAMELEN ;
+	    int		idx = var.entsz ;
 	    if (nnl >= 0) {
-	        idx = min(nnl,TS_KEYNAMELEN) ;
+	        idx = min(nnl,var.entsz) ;
 	    }
 	    nnl = xstrnlen(nnp,idx) ;
 	    if (dt == 0) dt = getustime ;
@@ -487,11 +492,11 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	        if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
 	            ei = rs ;
 	            if (ep && bp) {
-	                rs = ep->wr(bp,var.entsz) ;
+	                rs = tsent_load(ep,bp) ;
 	            } /* end if */
 		    /* optionally release our lock */
 	            if (op->ncursors == 0) {
-	                ts_lockrelease(op) ;
+	                rs = ts_lockrelease(op) ;
 	            }
 		    /* update access time as appropriate */
 	            if (op->ncursors == 0) {
@@ -509,49 +514,63 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 /* write an entry (match on a key-name) */
 int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	int		rs ;
+	int		rs1 ;
 	int		ei = 0 ;
 	if ((rs = ts_magic(op,nnp,ep)) >= 0) {
-	    int		i = TS_KEYNAMELEN ;
+	    int		i = var.entsz ;
 	    bool	f_newentry = false ;
 	    if (nnl >= 0) {
-	        i = min(nnl,TS_KEYNAMELEN) ;
+	        i = min(nnl,var.entsz) ;
 	    }
 	    nnl = xstrnlen(nnp,i) ;
 	    if ((rs = ts_acquire(op,dt,1)) >= 0) {
-	    	ts_ent	ew{} ;
-	        if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
-		    ei = rs ;
-		    /* write the entry */
-		    if (dt == 0) dt = getustime ;
-  	            if (ep) ew = *ep ;
-	            if (ew.count == 0) ew.count = 1 ;
-	            if (ew.utime == 0) ew.utime = uint(dt) ;
-	            if (ew.ctime == 0) ew.ctime = uint(dt) ;
-	            if (ew.keyname[0] == '\0') {
-		        strdcpy1w(ew.keyname,TSE_LKEYNAME,nnp,nnl) ;
-	            }
-	            if (ew.hash == 0) {
-		        ew.hash = hash_elf(ew.keyname,-1) ;
-	            }
-	            if ((rs = ew.rd(bp,var.entsz)) >= 0) {
-	                rs = entbuf_write(op->ebmp,ei,nullptr) ; /* sync */
-		    }
-	        } else if (rs == SR_NOTFOUND) {
-	            char	ebuf[var.entsz + 2] ;
-	            f_newentry = true ;
-  	            if (ep) ew = *ep ;
-	            if (ew.count == 0) ew.count = 1 ;
-	            if (ew.utime == 0) ew.utime = uint(dt) ;
-	            if (ew.ctime == 0) ew.ctime = uint(dt) ;
-	            if (ew.keyname[0] == '\0') {
-		        strdcpy1w(ew.keyname,TSE_LKEYNAME,nnp,nnl) ;
-	            }
-	            if (ew.hash == 0) ew.hash = hash_elf(ew.keyname,-1) ;
-	            if ((rs = ew.rd(ebuf,var.entsz)) >= 0) {
-	                ei = op->h.nentries ;
-	                rs = entbuf_write(op->ebmp,ei,ebuf) ;
-		    }
-	        } /* end if (existing or new entry) */
+		if (tse ew ; (rs = ew.start) >= 0) {
+	            if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
+		        ei = rs ;
+		        /* write the entry */
+		        if (dt == 0) dt = getustime ;
+  	                if (ep) {
+			    rs = tsent_trans(ep,&ew) ;
+			}
+	                if (ew.count == 0) ew.count = 1 ;
+	                if (ew.utime == 0) ew.utime = uint(dt) ;
+	                if (ew.ctime == 0) ew.ctime = uint(dt) ;
+	                if (ew.keyname[0] == '\0') {
+		            strdcpy1w(ew.keyname,TSE_LKEYNAME,nnp,nnl) ;
+	                }
+	                if (ew.hash == 0) {
+		            ew.hash = hash_elf(ew.keyname,-1) ;
+	                }
+	                if ((rs = ew.rd(bp,var.entsz)) >= 0) {
+	                    rs = entbuf_write(op->ebmp,ei,nullptr) ; /* sync */
+		        }
+	            } else if (rs == SR_NOTFOUND) {
+	                f_newentry = true ;
+  	                if (ep) {
+			    rs = tsent_trans(ep,&ew) ;
+			}
+			if (rs >= 0) {
+	                    char	ebuf[var.entsz + 2] ;
+	                    if (ew.count == 0) ew.count = 1 ;
+	                    if (ew.utime == 0) ew.utime = uint(dt) ;
+	                    if (ew.ctime == 0) ew.ctime = uint(dt) ;
+	                    if (ew.keyname[0] == '\0') {
+		                rs = ew.keyload(nnp,nnl) ;
+	                    }
+	                    if (ew.hash == 0) {
+			        ew.hash = hash_elf(ew.keyname,-1) ;
+			    }
+			    if (rs >= 0) {
+	                        if ((rs = ew.rd(ebuf,var.entsz)) >= 0) {
+	                            ei = op->h.nentries ;
+	                            rs = entbuf_write(op->ebmp,ei,ebuf) ;
+		                }
+			    } /* end if (ok) */
+			} /* end if (ok) */
+	            } /* end if (existing or new entry) */
+		    rs1 = ew.finish ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (tse) */
 		/* update the file header-table (for a write) */
 	        if ((rs >= 0) && op->fl.writable) {
 	            op->h.wcount += 1 ;
@@ -565,8 +584,8 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	            }
 	        } /* end if (updating header-table) */
 	        /* optionally release our lock if no cursor outstanding */
-	        if (op->ncursors == 0) {
-	    	    ts_lockrelease(op) ;
+	        if ((rs >= 0) && (op->ncursors == 0)) {
+	    	    rs = ts_lockrelease(op) ;
 		}
 		/* update access time as appropriate */
 	        if (op->ncursors == 0) {
@@ -582,22 +601,16 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 /* end subroutine (ts_write) */
 
 /* update an entry */
-int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
+int ts_update(ts *op,time_t dt,cc *kp,int kl,ts_ent *ep) noex {
 	int		rs ;
 	int		ei = 0 ;
-	if ((rs = ts_magic(op,ep)) >= 0) {
+	if ((rs = ts_magic(op,ep,kp)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (ep->keyname[0]) {
-		cint	namelen = TS_KEYNAMELEN ;
+	    if (kp[0]) {
 		if (dt == 0) dt = getustime ;
 		if ((rs = ts_acquire(op,dt,1)) >= 0) {
-		    int		nnl = xstrnlen(ep->keyname,namelen) ;
-		    cchar	*nnp = ep->keyname ;
-		    rs = SR_INVALID ;
-		    if (nnl > 0) {
-			rs = ts_updater(op,dt,ep,nnp,nnl) ;
-			ei = rs ;
-		    }
+		    rs = ts_updater(op,dt,ep,kp,kl) ;
+		    ei = rs ;
 		} /* end if (rs_acquire) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -633,27 +646,31 @@ static int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
 	int		rs1 ;
 	int		ei = 0 ;
 	bool		f_newentry = false ;
-	if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
-	    ts_ent	ew{} ;
-	    ei = rs ;
-	    /* update the entry that we found and write it back */
-	    ew.wr(bp,var.entsz) ;
-	    ew.utime = uint(dt) ;
-	    ew.count += 1 ;
-	    ew.rd(bp,var.entsz) ;
-	    rs = entbuf_write(op->ebmp,ei,nullptr) ; /* sync */
-	} else if (rs == SR_NOTFOUND) {
-	    char	ebuf[var.entsz + 2] ;
-	    ts_ent	ew = *ep ;
-	    f_newentry = true ;
-	    if (ew.count == 0) ew.count = 1 ;
-	    if (ew.utime == 0) ew.utime = uint(dt) ;
-	    if (ew.ctime == 0) ew.ctime = uint(dt) ;
-	    ew.hash = hash_elf(ew.keyname,-1) ;
-	    ew.rd(ebuf,var.entsz) ;
-	    ei = op->h.nentries ;
-	    rs = entbuf_write(op->ebmp,ei,ebuf) ;
-	} /* end if (entry update) */
+	if (tse ew ; (rs = ew.start) >= 0) {
+	    if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
+	        ei = rs ;
+	        /* update the entry that we found and write it back */
+	        ew.wr(bp,var.entsz) ;
+	        ew.utime = uint(dt) ;
+	        ew.count += 1 ;
+	        ew.rd(bp,var.entsz) ;
+	        rs = entbuf_write(op->ebmp,ei,nullptr) ; /* sync */
+	    } else if (rs == SR_NOTFOUND) {
+		if ((rs = tsent_trans(ep,&ew)) >= 0) {
+	            char	ebuf[var.entsz + 2] ;
+	            f_newentry = true ;
+	            if (ew.count == 0) ew.count = 1 ;
+	            if (ew.utime == 0) ew.utime = uint(dt) ;
+	            if (ew.ctime == 0) ew.ctime = uint(dt) ;
+	            ew.hash = hash_elf(ew.keyname,-1) ;
+	            ew.rd(ebuf,var.entsz) ;
+	            ei = op->h.nentries ;
+	            rs = entbuf_write(op->ebmp,ei,ebuf) ;
+		} /* end if (tsent_trans) */
+	    } /* end if (entry update) */
+	    rs1 = ew.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (tse) */
 	/* update the file header */
 	if (rs >= 0) {
 	    if (dt == 0) dt = getustime ;
@@ -1201,6 +1218,34 @@ vars::operator int () noex {
 	}
     	return rs ;
 }
+/* end method (vars::operator) */
+
+static int tsent_load(tsent *ep,cchar *bp) noex {
+    	int		rs ;
+	int		rs1 ;
+	if (tse e ; (rs = e.start) >= 0) {
+	    if ((rs = e.wr(bp,var.entsz)) >= 0) {
+		ep->count = e.count ;
+		ep->utime = e.utime ;
+		ep->ctime = e.ctime ;
+	    }
+	    rs1 = e.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (tsent) */
+	return rs ;
+}
+/* end subroutine (tsent_load) */
+
+static int tsent_trans(tsent *ep,tse *tep) noex {
+    	int		rs = SR_FAULT ;
+	if (tep) {
+	    tep->count = ep->count ;
+	    tep->utime = ep->utime ;
+	    tep->ctime = ep->ctime ;
+	}
+	return rs ;
+}
+/* end subroutine (tsent_trans) */
 
 static bool namematch(cc *sp,cc *nnp,int nnl) noex {
 	bool		f = false ;

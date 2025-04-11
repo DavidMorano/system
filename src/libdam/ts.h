@@ -21,7 +21,6 @@
 #include	<usysrets.h>
 #include	<mapstrint.h>
 #include	<entbuf.h>
-#include	<tse.hh>
 
 
 #define	TS_MAGIC		918245636
@@ -29,12 +28,11 @@
 #define	TS_FL			struct ts_flags
 #define	TS_CUR			struct ts_cursor
 #define	TS_HDR			struct ts_header
-#define	TS_ENT			TSE
+#define	TS_ENT			struct ts_entry
 #define	TS_FILEMAGIC		"TIMESTAMP"
 #define	TS_FILEMAGICSIZE	16		/* magic size */
 #define	TS_FILEVERSION		0
 #define	TS_ENDIAN		0
-#define	TS_KEYNAMELEN		TSE_LKEYNAME
 #define	TS_IDLEN		(TS_FILEMAGICSIZE + szof(uint))
 #define	TS_HEADTABLEN		(3 * szof(uint))
 #define	TS_TOPLEN		(TS_IDLEN + TS_HEADTABLEN)
@@ -87,6 +85,12 @@ struct ts_cursor {
 	int		i ;
 } ;
 
+struct ts_entry {
+	uint		count ;		/* count */
+	uint		utime ;		/* update time-stamp */
+	uint		ctime ;		/* creation time-stamp */
+} ;
+
 typedef	TS		ts ;
 typedef	TS_FL		ts_fl ;
 typedef	TS_HDR		ts_hdr ;
@@ -98,10 +102,10 @@ EXTERNC_begin
 extern int ts_open(ts *,cchar *,int,mode_t) noex ;
 extern int ts_curbegin(ts *,ts_cur *) noex ;
 extern int ts_curend(ts *,ts_cur *) noex ;
-extern int ts_curenum(ts *,ts_cur *,ts_ent *) noex ;
+extern int ts_curenum(ts *,ts_cur *,char *,int,ts_ent *) noex ;
 extern int ts_match(ts *,time_t,cchar *,int,ts_ent *) noex ;
 extern int ts_write(ts *,time_t,cchar *,int,ts_ent *) noex ;
-extern int ts_update(ts *,time_t,ts_ent *) noex ;
+extern int ts_update(ts *,time_t,cchar *,int,ts_ent *) noex ;
 extern int ts_check(ts *,time_t) noex ;
 extern int ts_count(ts *) noex ;
 extern int ts_close(ts *) noex ;
