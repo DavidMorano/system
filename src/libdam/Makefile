@@ -227,7 +227,7 @@ OBJ113= qpdecoder.o b64decoder.o hexdecoder.o utf8decoder.o
 OBJ114= 
 OBJ115=
 OBJ116=
-OBJ117= msfile.o msfilee.o ebuf.o nodedb.o clusterdb.o
+OBJ117= msfile.o msfilee.o entbuf.o nodedb.o clusterdb.o
 OBJ118= cksum.o sha1.o gecos.o pwfile.o ipasswd.o
 OBJ119=
 
@@ -667,8 +667,8 @@ kinfo.o:		kinfo.c kinfo.h
 msfile.o:		msfile.c msfile.h msfilee.h
 msfilee.o:		msfilee.c msfilee.h
 
-ebuf.o:			ebuf.cc ebuf.h
-ts.o:			ts.cc ts.h tse.hh ebuf.h
+entbuf.o:		entbuf.cc entbuf.h
+ts.o:			ts.cc ts.h tse.hh entbuf.h
 tse.o:			tse.cc tse.hh
 
 mapstrint.o:		mapstrint.c mapstrint.h
