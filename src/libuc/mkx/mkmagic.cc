@@ -29,11 +29,11 @@
 	(usualy) of a file in order to identify it (its purpose).
 
 	Synopsis:
-	int mkmagic(char *rbuf,int rlen,cchar *ms) noex
+	int mkmagic(char *robj,int rsz,cchar *ms) noex
 
 	Arguments:
-	rbuf		result buffer
-	rlen		result buffer length
+	robj		result buffer pointer
+	rsz		result buffer size (not NUL-terminator)
 	ms		source c-string
 
 	Returns:
@@ -45,7 +45,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |strlen(3c)| + |memset(3c)| */
+#include	<cstring>		/* <- |strsz(3c)| + |memset(3c)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
@@ -76,17 +76,17 @@
 
 /* exported subroutines */
 
-int mkmagic(char *rbuf,int rlen,cchar *ms) noex {
+int mkmagic(char *robj,int rsz,cchar *ms) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf && ms) {
+	if (robj && ms) {
 	    rs = SR_INVALID ;
-	    rbuf[0] = '\0' ;
-	    if ((rlen >= 2) && ms[0]) {
-	        if (cint mslen = xstrlen(ms) ; (mslen+1) <= rlen) {
-	            char	*bp = strwcpy(rbuf,ms,-1) ;
+	    robj[0] = '\0' ;
+	    if ((rsz >= 2) && ms[0]) {
+	        if (cint mslen = xstrlen(ms) ; (mslen+1) <= rsz) {
+	            char	*bp = strwcpy(robj,ms,-1) ;
 	            rs = SR_OK ;
 	            *bp++ = '\n' ;
-	            if (cint zl = intconv((rbuf + rlen) - bp) ; zl > 0) {
+	            if (cint zl = intconv((robj + rsz) - bp) ; zl > 0) {
 	                memclear(bp,zl) ;
 		    }
 	        } else {
@@ -94,7 +94,7 @@ int mkmagic(char *rbuf,int rlen,cchar *ms) noex {
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? rlen : rs ;
+	return (rs >= 0) ? rsz : rs ;
 }
 /* end subroutine (mkmagic) */
 
