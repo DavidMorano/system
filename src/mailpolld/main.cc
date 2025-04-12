@@ -753,39 +753,23 @@ char	*envv[] ;
 	        mcmsg_report(&m1,fwr,buf,MSGBUFLEN) ;
 
 	        memset(&midkey,0,sizeof(MSGID_KEY)) ;
-
 	        midkey.recip = m1.mailuser ;
 	        midkey.reciplen = -1 ;
-
 	        midkey.mtime = pip->daytime ;
 	        midkey.from = m1.from ;
 	        midkey.mid = m1.msgid ;
 
-	        rs1 = msgid_update(&db,pip->daytime,
-	            &midkey,&mid) ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("main: msgid_update() rs=%d\n",rs1) ;
-#endif
-
+	        rs1 = msgid_update(&db,pip->daytime,&midkey,&mid) ;
 	        if (rs1 == SR_ACCESS) {
-
-	            rs1 = msgid_match(&db,pip->daytime,
-	                &midkey,&mid) ;
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("main: msgid_match() rs=%d\n",rs1) ;
-#endif
-
+	            rs1 = msgid_match(&db,pip->daytime,&midkey,&mid) ;
 	        }
 
 	        f_repeat = ((rs1 >= 0) && (mid.count > 0)) ;
 
 	        if (fromlen > 0) {
 	            mcmsg_ack	m2{} ;
-	            in_addr_t	addr1, addr2 ;
+	            in_addr_t	addr1 ;
+	            in_addr_t	addr2 ;
 	            int		af ;
 	            char	replybuf[MSGBUFLEN + 1] ;
 

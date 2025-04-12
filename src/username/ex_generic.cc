@@ -3269,17 +3269,16 @@ int		tfd ;
 		}
 
 	        if (rs < 0) {
-
-	            if (pip->f.logmsg)
+	            if (pip->f.logmsg) {
 	                logfile_printf(&pip->lh, 
 	                    "delivery failure u=%s (%d)\n",
 	                    rp->recipient,rs) ;
-
-	            if (pip->debuglevel > 0)
+		    }
+	            if (pip->debuglevel > 0) {
 	                bprintf(pip->efp, 
 	                    "%s: delivery failure (%d)\n",
 	                    pip->progname,rs) ;
-
+		    }
 	        } /* end if */
 
 	    } /* end if (delivery) */
@@ -3462,23 +3461,8 @@ int		tfd ;
 	            midkey.mid = mop->h_messageid ;
 
 	            rs1 = msgid_update(&lip->mids,dt,&midkey,&mid) ;
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("main/procrecips: msgid_update() rs=%d\n",
-			rs1) ;
-#endif
-
 	            if (rs1 == SR_ACCESS) {
-
 	                rs1 = msgid_match(&lip->mids,dt,&midkey,&mid) ;
-
-#if	CF_DEBUG
-	                if (DEBUGLEVEL(4))
-	                    debugprintf("main/procrecips: "
-				"msgid_match() rs=%d\n",rs1) ;
-#endif
-
 	            }
 
 	            f_repeat = ((rs1 >= 0) && (mid.count > 0)) ;
