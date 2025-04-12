@@ -1,0 +1,122 @@
+/* msgide HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
+
+/* message identification (MSG-ID) entry */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2003-03-04, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	MAGIDE_INCLUDE
+#define	MAGIDE_INCLUDE
+
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+
+
+    enum msgidemems {
+    	msgidemem_start,
+	msgidemem_entsz,
+	msgidemem_finish,
+	msgidemem_overlast
+    } ;
+
+struct msgide ;
+
+    template<typename T> struct msgide_co {
+	T		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (T *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+    } ; /* end struct (msgide_co) */
+
+    struct msgide_all {
+	friend		msgide_co<msgide_all> ;
+	struct msgide_len {
+	    int		entsz ;
+	    int		recipient ;
+	    int		messageid ;
+	    int		from ;
+	} ;
+	char		*a{} ;
+	char		*recipient{} ;
+	char		*messageid{} ;
+	char		*from{} ;
+	uint		count{} ;	/* count */
+	uint		utime{} ;	/* time-stamp update */
+	uint		ctime{} ;	/* time-stamp creation */
+	uint		mtime{} ;	/* time-stamp message */
+	uint		hash ;
+	msgide_co<msgide_all>		start ;
+	msgide_co<msgide_all>		entsz ;
+	msgide_co<msgide_all>		finish ;
+	msgide_len	len ;
+	msgide_all() noex {
+	    start(this,msgidemem_start) ;
+	    entsz(this,msgidemem_entsz) ;
+	    finish(this,msgidemem_finish) ;
+	} ;
+	msgide_all(const msgide_all &) = delete ;
+	msgide_all &operator = (const msgide_all &) = delete ;
+	int rd(char *,int) noex ;
+	int rdu(char *,int) noex ;
+	int wr(cchar *,int = -1) noex ;
+	int wru(cchar *,int = -1) noex ;
+	~msgide_all() {
+	    finish() ;
+	} ;
+    private:
+	int istart() noex ;
+	int ifinish() noex ;
+    } ; /* end struct (msgide_all) */
+    struct msgide_update {
+	friend		msgide_co<msgide_update> ;
+	struct msgide_len {
+	    int		entsz ;
+	} ;
+	uint		count{} ;
+	uint		utime{} ;
+	msgide_len	len ;
+	msgide_co<msgide_update>	start ;
+	msgide_co<msgide_update>	entsz ;
+	msgide_co<msgide_update>	finish ;
+	msgide_update() noex {
+	    start(this,msgidemem_start) ;
+	    entsz(this,msgidemem_entsz) ;
+	    finish(this,msgidemem_finish) ;
+	} ;
+	msgide_update(const msgide_update &) = delete ;
+	msgide_update &operator = (const msgide_update &) = delete ;
+	int rd(char *,int) noex ;
+	int wr(cchar *,int) noex ;
+	~msgide_update() {
+	    finish() ;
+	} ;
+    private:
+	int istart() noex ;
+	int ifinish() noex ;
+    } ; /* end struct (msgide_update) */
+
+
+#endif /* MAGIDE_INCLUDE */
+
+
