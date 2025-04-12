@@ -26,8 +26,8 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<msgide.h>
 #include	<msgid.h>
+#include	<msgide.hh>
 
 
 #endif /* MSHIDX_INCLUDE */

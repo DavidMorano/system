@@ -132,16 +132,8 @@ obj5.o:			$(OBJ5)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
 
 
-msgid.o:		msgid.cc msgid.h		$(INCS)
+msgid.o:		msgid.cc msgid.h msgide.hh	$(INCS)
 
-msgide.o:		msgide0.o msgide1.o		$(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ msgide0.o msgide1.o
-
-msgide0.o:		msgide.ccm			$(INCS)
-	makemodule msgide
-
-msgide1.o:		msgide1.cc			$(INCS)
-	makemodule msgide
-	$(COMPILE.cc) msgide1.cc
+msgide.o:		msgide.cc msgide.hh		$(INCS)
 
 

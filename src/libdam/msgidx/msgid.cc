@@ -136,6 +136,8 @@ namespace {
 	int		hostnamelen ;
 	int		pagesize ;
 	int		entsz ;
+	int		reciplen ;
+	int		midlen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
 }
@@ -200,7 +202,7 @@ static int	filehead(MSGID_FH *,funmode,char *) noex ;
 
 static int	emat_recipid(cchar *,msgid_key *) noex ;
 
-static uint	recipidhash(msgid_key *,int,int) noex ;
+static uint	keyhash(msgid_key *) noex ;
 static int	matfield(cchar *,int,cchar *,int) noex ;
 static int	extutime(char *) noex ;
 
@@ -390,10 +392,9 @@ int msgid_curend(msgid *op,msgid_cur *curp) noex {
 }
 /* end subroutine (msgid_curend) */
 
-int msgid_curenum(msgid *op,msgid_cur *curp,msgid_ent *ep) noex {
+int msgid_curenum(msgid *op,msgid_cur *curp,msgide *ep) noex {
 	custime		dt = getustime ;
 	int		rs ;
-	int		rs1 ;
 	int		ei = 0 ;
 	if ((rs = msgid_magic(op,curp)) >= 0) {
 	    rs = SR_NOTFOUND ;
@@ -407,20 +408,11 @@ int msgid_curenum(msgid *op,msgid_cur *curp,msgid_ent *ep) noex {
 	        	eoff = MSGID_FOTAB + (ei * ebs) ;
 			/* form result to caller */
 	        	if ((eoff + ebs) <= op->filesize) {
-		    	    char	*bp ;
-			    /* verify sufficient file buffering */
-	                    if ((rs = msgid_bufload(op,eoff,ebs,&bp)) >= 0) {
+		    	    char	*bep ;
+	                    if ((rs = msgid_bufload(op,eoff,ebs,&bep)) >= 0) {
 	                        if (rs >= ebs) {
-			            /* copy (write) buffer to supplied entry */
-	                            if (ep) {
-					if ((rs = ep->start) >= 0) {
-					    {
-					        bl = ep->len.mlen ;
-	                                        rs = ep->wr(bp,bl) ;
-					    }
-					    rs1 = ep->finish ;
-					    if (rs >= 0) rs = rs1 ;
-					} /* end if (msgid_all) */
+	                            if (ep && bep) {
+					rs = ep->wr(bep) ;
 	                            } /* end if */
 			            /* commit the cursor movement? */
 	                            if (rs >= 0) {
@@ -453,8 +445,8 @@ int msgid_matchid(msgid *op,time_t dt,cchar *midp,int midl,msgid_ent *ep) noex {
 		    char	*bep ;
 	            if ((rs = msgid_searchid(op,midp,midl,&bep)) >= 0) {
 	                ei = rs ;
-	                if (ep) {
-	                    msgide_all(ep,1,bep,op->entsz) ;
+	                if (ep && bep) {
+	                    rs = ep->wr(bep) ;
 	                }
 	            } /* end if */
 	            if (dt == 0) dt = getustime ;
@@ -478,7 +470,7 @@ int msgid_match(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
 	            if ((rs = msgid_filecheck(op,dt,var.lread)) >= 0) {
 			uint	khash ;
 			int	midlen = xstrnlen(kp->mid,var.lmsgid) ;
-	        	khash = recipidhash(kp,-1,midlen) ;
+	        	khash = keyhash(kp,-1,midlen) ;
 			char	*bep ;
 	        	if ((rs = msgid_search(op,kp,khash,&bep)) >= 0) {
 	                    ei = rs ;
@@ -521,7 +513,7 @@ int msgid_update(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
 
 static int msgid_updates(msgid *op,time_t dt,key *kp,ent *ep) noex {
 	off_t		uoff ;
-	const uint	khash = recipidhash(kp,-1,midlen) ;
+	const uint	khash = keyhash(kp,-1,midlen) ;
 	int		eoff ;
 	int		midlen = xstrnlen(kp->mid,var.lmsgid) ;
 	int		wlen{} ;
@@ -1321,13 +1313,15 @@ static int extutime(char *ep) noex {
 }
 /* end subroutine (extutime) */
 
-static uint recipidhash(msgid_key *kp,int reciplen,int midlen) noex {
+static uint keyhash(msgid_key *kp) noex {
 	uint		khash = 0 ;
-	khash += hash_elf(kp->recip,reciplen) ;
+	cint		reclen = xstrnlen(kp->recip,var.reciplen) ;
+	cint		midlen = xstrnlen(kp->mid,var.midlen) ;
+	khash += hash_elf(kp->recip,reclen) ;
 	khash += hash_elf(kp->mid,midlen) ;
 	return khash ;
 }
-/* end subroutine (recipidhash) */
+/* end subroutine (keyhash) */
 
 vars::operator int () noex {
         int		rs ;
@@ -1339,6 +1333,8 @@ vars::operator int () noex {
 		if (msgide_all ma ; (rs = ma.start) >= 0) {
 		    {
 			var.entsz = ma.entsz ;
+			var.reciplen = ma.len.recipient ;
+			var.midlen = ma.len.messageid ;
 		    }
 		    rs1 = ma.finish ;
 		    if (rs >= 0) rs = rs1 ;

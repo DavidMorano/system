@@ -26,7 +26,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	"msgide.h"
+#include	"msgide.hh"
 
 
 #define	MSGID_MAGIC		1092847456
@@ -37,7 +37,6 @@
 #define	MSGID_KEY		struct msgid_keyer
 #define	MSGID_CUR		struct msgid_cursor
 #define	MSGID_BUF		struct msgid_buffer
-#define	MSGID_ENT		struct msgid_entry
 #define	MSGID_MAGICSIZE		16
 /* other defines */
 #define	MSGID_FILEPATH		"/tmp/msgid"
@@ -54,7 +53,7 @@ struct msgid_buffer {
 
 /* decoded file magic */
 struct msgid_filemagic {
-	char		magic[MSGID_MAGICSIZE] ;
+	char		magic[MSGID_MAGICSIZE + 1] ;
 	uchar		vetu[4] ;
 } ;
 
@@ -100,14 +99,7 @@ struct msgid_cursor {
 
 struct msgid_keyer {
 	cchar		*recip ;
-	cchar		*from ;
 	cchar		*mid ;
-	time_t		mtime ;
-	int		reciplen ;
-	int		midlen ;
-} ;
-
-struct msgid_entry {
 } ;
 
 typedef MSGID		msgid ;
@@ -125,20 +117,20 @@ extern int msgid_open(msgid *,cchar *,int,mode_t,int) noex ;
 extern int msgid_check(msgid *,time_t) noex ;
 extern int msgid_curbegin(msgid *,msgid_cur *) noex ;
 extern int msgid_curend(msgid *,msgid_cur *) noex ;
-extern int msgid_curenum(msgid *,msgid_cur *,char *,int,msgid_ent *) noex ;
-extern int msgid_match(msgid *,time_t,msgid_key *,cc *,int,msgid_ent *) noex ;
-extern int msgid_update(msgid *,time_t,msgid_key *,cc *,int,msgid_ent *) noex ;
-extern int msgid_matchid(msgid *,time_t,cchar *,int,msgid_ent *) noex ;
-extern int msgid_write(msgid *,int,msgid_ent *) noex ;
+extern int msgid_curenum(msgid *,msgid_cur *,msgide *) noex ;
+extern int msgid_matchid(msgid *,time_t,cchar *,int,msgide *) noex ;
+extern int msgid_match(msgid *,time_t,msgid_key *,msgide *) noex ;
+extern int msgid_update(msgid *,time_t,msgid_key *,msgide *) noex ;
+extern int msgid_write(msgid *,int,msgide *) noex ;
 extern int msgid_close(msgid *) noex ;
 
 #ifdef	COMMENT
 extern int msgid_txbegin(msgid *) noex ;
 extern int msgid_txabort(msgid *,int) noex ;
 extern int msgid_txcommit(msgid *,int) noex ;
-extern int msgid_fetchsvc(msgid *,cchar *,msgid_cur *,msgid_ent *) noex ;
-extern int msgid_fetchhostsvc(msgid *,uint,cc *,msgid_cur *,msgid_ent *) noex ;
-extern int msgid_fetchhostpid(msgid *,uint,int,msgid_cur *,msgid_ent *) noex ;
+extern int msgid_fetchsvc(msgid *,cchar *,msgid_cur *,msgide *) noex ;
+extern int msgid_fetchhostsvc(msgid *,uint,cc *,msgid_cur *,msgide *) noex ;
+extern int msgid_fetchhostpid(msgid *,uint,int,msgid_cur *,msgide *) noex ;
 #endif /* COMMENT */
 
 EXTERNC_end
