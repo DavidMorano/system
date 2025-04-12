@@ -37,7 +37,7 @@
 #define	MSGID_KEY		struct msgid_keyer
 #define	MSGID_CUR		struct msgid_cursor
 #define	MSGID_BUF		struct msgid_buffer
-#define	MSGID_ENT		MSGIDE_ALL
+#define	MSGID_ENT		struct msgid_entry
 #define	MSGID_MAGICSIZE		16
 /* other defines */
 #define	MSGID_FILEPATH		"/tmp/msgid"
@@ -105,6 +105,9 @@ struct msgid_keyer {
 	time_t		mtime ;
 	int		reciplen ;
 	int		midlen ;
+} ;
+
+struct msgid_entry {
 } ;
 
 typedef MSGID		msgid ;
