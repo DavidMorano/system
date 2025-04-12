@@ -1,4 +1,5 @@
 /* main SUPPORT (liblkcmd) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* generic front-end for SHELL built-ins */
@@ -30,11 +31,12 @@
 #include	<unistd.h>
 #include	<ucontext.h>
 #include	<dlfcn.h>
-#include	<climits>
 #include	<csignal>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<usystem.h>
 #include	<intceil.h>
 #include	<sighand.h>
@@ -60,6 +62,9 @@
 
 
 /* imported namespaces */
+
+using std:nullptr_t ;			/* type */
+using std:nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -160,12 +165,12 @@ static const SIGCODE	sigcode_bus[] = {
 /* exported subroutines */
 
 int main(int argc,mainv argv,mainv envv) {
-	cint	f_lockmemalloc = CF_LOCKMEMALLOC ;
-	cint	f_util = CF_UTIL ;
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ex = EX_INFO ;
-
+	cbool		f_lockmemalloc = CF_LOCKMEMALLOC ;
+	cbool		f_util = CF_UTIL ;
 	if (argv != nullptr) {
 	    MAININFO	mi, *mip = &mi ;
 	    if ((rs = maininfo_start(mip,argc,argv)) >= 0) {
@@ -175,11 +180,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                if ((rs = lib_mainbegin(envv,nullptr)) >= 0) {
 	                    if ((rs = maininfo_utilbegin(mip,f_util)) >= 0) {
 	                        cchar	*srch ;
-
 	                        if ((rs = maininfo_srchname(mip,&srch)) >= 0) {
-	                            ex = lib_callcmd(srch,argc,argv,envv,nullptr) ;
+	                            ex = lib_callcmd(srch,argc,argv,envv,np) ;
 	                        } /* end if */
-
 	                        rs1 = maininfo_utilend(mip) ;
 	                        if (rs >= 0) rs = rs1 ;
 	                    } /* end if (maininfo-util) */
@@ -198,11 +201,9 @@ int main(int argc,mainv argv,mainv envv) {
 	} else {
 	    ex = EX_OSERR ;
 	}
-
 	if ((rs < 0) && (ex == EX_OK)) {
 	    ex = mapex(mapexs,rs) ;
 	}
-
 	return ex ;
 }
 /* end subroutine (main) */

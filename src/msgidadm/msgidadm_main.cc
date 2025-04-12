@@ -1,14 +1,14 @@
-/* main */
+/* msgidadm_main SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* test template */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocations */
 #define	CF_MID		1		/* do new MID print-out */
-
 
 /* revision history:
 
@@ -23,25 +23,21 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ msgidadm <name(s)>
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1028,13 +1024,8 @@ static int procout(PROGINFO *pip,vecstr *rlp,cchar *dfn,cchar *ofn)
 }
 /* end subroutine (procout) */
 
-
-static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp)
-{
+static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 	LOCINFO		*lip = pip->lip ;
-	MSGID		db ;
-	MSGID_CUR	cur ;
-	MSGID_ENT	e, *ep ;
 	vecobj		entries ;
 	time_t		t ;
 	int		rs, rs1 ;
@@ -1082,16 +1073,13 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp)
 
 /* open the database */
 
+	MSGID		db ;
+	MSGID_CUR	cur ;
+	MSGID_ENT	e, *ep ;
 	oflags = O_FLAGS ;
 	f = FALSE ;
 	f = f || ((oflags & O_RDWR) == O_RDWR) ;
 	rs = msgid_open(&db,dbfname,oflags,0666,0) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main: 1 msgid_open() rs=%d\n",rs) ;
-#endif
-
 	if ((rs == SR_ACCESS) && (! f))
 	    rs = msgid_open(&db,dbfname,O_RDONLY,0666,4) ;
 
@@ -1113,14 +1101,9 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp)
 	f_done = FALSE ;
 	for (tc = 0 ; (! f_done) && (tc < 20) ; tc += 1) {
 
-#ifdef	COMMENT
-	    rs = msgid_txbegin(&db) ;
-	    txid = rs ;
-#endif /* COMMENT */
-
 	    msgid_curbegin(&db,&cur) ;
 
-	    while (msgid_enum(&db,&cur,&e) >= 0) {
+	    while ((rs = msgid_curenum(&db,&cur,&e)) >= 0) {
 
 	        if (e.recipient[0] != '\0') {
 	            f = TRUE ;
@@ -1136,11 +1119,13 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp)
 	                    rs1 = vecobj_inorder(&entries,&e,
 	                        lip->cmpfunc,ninsert) ;
 
-	                    if ((rs1 >= 0) && (! lip->f.all))
+	                    if ((rs1 >= 0) && (! lip->f.all)) {
 	                        vecobj_del(&entries,nentries) ;
+			    }
 
-	                } else
+	                } else {
 	                    rs1 = vecobj_add(&entries,&e) ;
+			}
 
 	            } /* end if */
 
@@ -1150,13 +1135,7 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp)
 	    } /* end while */
 
 	    msgid_curend(&db,&cur) ;
-
-#ifdef	COMMENT
-	    rs = msgid_txcommit(&db,txid) ;
-	    f_done = (rs >= 0) ;
-#else
 	    f_done = TRUE ;
-#endif /* COMMENT */
 
 	    if (! f_done) {
 	        for (i = 0 ; vecobj_get(&entries,i,&ep) >= 0 ; i += 1) {

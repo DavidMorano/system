@@ -411,12 +411,12 @@ int msgid_curenum(msgid *op,msgid_cur *curp,msgid_ent *ep) noex {
 			    /* verify sufficient file buffering */
 	                    if ((rs = msgid_bufload(op,eoff,ebs,&bp)) >= 0) {
 	                        if (rs >= ebs) {
-			            /* copy entry to buffer */
+			            /* copy (write) buffer to supplied entry */
 	                            if (ep) {
 					if ((rs = ep->start) >= 0) {
 					    {
 					        bl = ep->len.mlen ;
-	                                        rs = ep->rd(bp,bl) ;
+	                                        rs = ep->wr(bp,bl) ;
 					    }
 					    rs1 = ep->finish ;
 					    if (rs >= 0) rs = rs1 ;

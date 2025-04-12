@@ -5,11 +5,6 @@
 /* fairly generic (PCS) front-end */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUG	0		/* switchable print-outs */
-#define	CF_DEBUGMALL	1		/* debug memory allocations */
-#define	CF_DEBUGN	0		/* special debugging */
-#define	CF_DEBUGRECIPS	0		/* debug recipients */
 #define	CF_PCSTRUSTUSER	1		/* call 'pcstrustuser(3pcs)' */
 #define	CF_DEFLOGSIZE	0		/* use a default log length */
 #define	CF_PROGMSGS	1		/* call 'progmsgs()' */
@@ -133,7 +128,7 @@ extern int	cfdecti(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,USTAT *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	mkdirs(cchar *,mode_t) ;
@@ -187,17 +182,6 @@ extern int	mkrealname(char *,int,cchar *,int) ;
 
 extern int	vecobj_recipadd(vecobj *,cchar *,int) ;
 extern int	vecobj_recipfins(vecobj *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-#if	CF_DEBUGN
-extern int	nprintf(cchar *,cchar *,...) ;
-#endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
@@ -331,10 +315,6 @@ static int	mkreportfile(PROGINFO *,char *,cchar *) ;
 static int	mkreportout(PROGINFO *,cchar *,cchar *,int,cchar **,int) ;
 static int	mktmpreportdir(char *,cchar *,cchar *,mode_t) ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGRECIPS
-static int	debugrecips(PROGINFO *,VECOBJ *) ;
-#endif
-
 
 /* local variables */
 
@@ -358,7 +338,7 @@ static cchar *argopts[] = {
 	"mr",
 	"nm",
 	"cp",
-	NULL
+	nullptr
 } ;
 
 enum argopts {
@@ -408,7 +388,7 @@ static const struct mapex	mapexs[] = {
 static cchar	*progmodes[] = {
 	"dmail",
 	"dmailbox",
-	NULL
+	nullptr
 } ;
 
 enum progmodes {
@@ -425,7 +405,7 @@ static cchar *pcsopts[] = {
 	"pcspoll",
 	"syslog",
 	"mailhist",
-	NULL
+	nullptr
 } ;
 
 enum pcsopts {
@@ -462,7 +442,7 @@ static cchar *locopts[] = {
 	"mailhist",
 	"deliver",
 	"finish",
-	NULL
+	nullptr
 } ;
 
 enum locopts {
@@ -495,7 +475,7 @@ static cchar	*varmaildirs[] = {
 	VARMAILDNAMEP,
 	VARMAILDNAME,
 	VARMAILDNAMES,
-	NULL
+	nullptr
 } ;
 
 static const uchar	aterms[] = {
@@ -522,9 +502,6 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	KEYOPT		akopts ;
 	PARAMOPT	akparams ;
 	bfile		errfile ;
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	uint		mo_start = 0 ;
-#endif
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs ;
@@ -533,34 +510,19 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	int		cl ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_usage = FALSE ;
-	int		f_help = FALSE ;
-	int		f_version = FALSE ;
+	int		f_usage = false ;
+	int		f_help = false ;
+	int		f_version = false ;
 	cchar		*argp, *aop, *akp, *avp ;
-	cchar		*argval = NULL ;
-	cchar		*pr = NULL ;
-	cchar		*sn = NULL ;
-	cchar		*pmspec = NULL ;
-	cchar		*afname = NULL ;
-	cchar		*efname = NULL ;
-	cchar		*ofname = NULL ;
-	cchar		*ifname = NULL ;
+	cchar		*argval = nullptr ;
+	cchar		*pr = nullptr ;
+	cchar		*sn = nullptr ;
+	cchar		*pmspec = nullptr ;
+	cchar		*afname = nullptr ;
+	cchar		*efname = nullptr ;
+	cchar		*ofname = nullptr ;
+	cchar		*ifname = nullptr ;
 	cchar		*cp ;
-
-#if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	    rs = debugopen(cp) ;
-	    debugprintf("main: starting DFD=%d\n",rs) ;
-	}
-#endif /* CF_DEBUGS */
-#if	CF_DEBUGN
-	nprintf(NDF,"main: starting\n") ;
-#endif
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	uc_mallset(1) ;
-	uc_mallout(&mo_start) ;
-#endif
 
 	rs = proginfo_start(pip,envv,argv[0],VERSION) ;
 	if (rs < 0) {
@@ -568,7 +530,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    goto badprogstart ;
 	}
 
-	if ((cp = getenv(VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getenv(VARBANNER)) == nullptr) cp = BANNER ;
 	proginfo_setbanner(pip,cp) ;
 
 /* get the current time-of-day */
@@ -638,7 +600,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -665,15 +627,15 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	            f_optequal = false ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -685,7 +647,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* program root */
 	                case argopt_root:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pr = avp ;
 	                    } else {
@@ -702,7 +664,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	                case argopt_tmpdir:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pip->tmpdname = avp ;
 	                    } else {
@@ -719,12 +681,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* help */
 	                case argopt_help:
-	                    f_help = TRUE ;
+	                    f_help = true ;
 	                    break ;
 
 	                case argopt_pm:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl > 0)
 	                            pmspec = avp ;
 	                    } else {
@@ -741,7 +703,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl > 0)
 	                            sn = avp ;
 	                    } else {
@@ -759,7 +721,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                case argopt_af:
 	                case argopt_rf:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -777,7 +739,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -795,7 +757,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* output file */
 	                case argopt_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -812,7 +774,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	                case argopt_if:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ifname = avp ;
 	                    } else {
@@ -830,7 +792,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* configuration file-name */
 	                case argopt_cf:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pip->cfname = avp ;
 	                    } else {
@@ -848,7 +810,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* log file name */
 	                case argopt_lf:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pip->lfname = avp ;
 	                    } else {
@@ -866,9 +828,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* mail spool directory */
 	                case argopt_ms:
 	                case argopt_md:
-	                    cp = NULL ;
+	                    cp = nullptr ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            cp = avp ;
 	                            cl = avl ;
@@ -885,7 +847,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        } else
 	                            rs = SR_INVALID ;
 	                    }
-	                    if ((rs >= 0) && (cp != NULL)) {
+	                    if ((rs >= 0) && (cp != nullptr)) {
 	                        cchar	*po = PO_MAILDIRS ;
 	                        rs = paramopt_loads(&akparams,po,cp,cl) ;
 	                    }
@@ -893,13 +855,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* version */
 	                case argopt_version:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    break ;
 
 	                case argopt_verbose:
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optvalue(avp,avl) ;
 	                            pip->verboselevel = rs ;
@@ -908,17 +870,17 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    break ;
 
 	                case argopt_mr:
-	                    pip->f.multirecip = TRUE ;
+	                    pip->f.multirecip = true ;
 	                    break ;
 
 	                case argopt_nm:
-	                    pip->f.nopollmsg = TRUE ;
+	                    pip->f.nopollmsg = true ;
 	                    break ;
 
 /* COMAST port */
 	                case argopt_cp:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl > 0)
 	                            pip->portspec = avp ;
 	                    } else {
@@ -948,13 +910,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    switch (kc) {
 
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -963,7 +925,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->f.quiet = true ;
 	                        break ;
 
 	                    case 'R':
@@ -1036,7 +998,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->f.quiet = true ;
 	                        break ;
 
 /* subject */
@@ -1069,7 +1031,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -1078,7 +1040,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 	                        break ;
 
 	                    default:
@@ -1106,22 +1068,17 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getenv(VAREFNAME) ;
-	if (efname == NULL) efname = getenv(VARERRORFNAME) ;
-	if (efname == NULL) efname = BFILE_STDERR ;
+	if (efname == nullptr) efname = getenv(VAREFNAME) ;
+	if (efname == nullptr) efname = getenv(VARERRORFNAME) ;
+	if (efname == nullptr) efname = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
-	    bcontrol(&errfile,BC_SETBUFLINE,TRUE) ;
+	    pip->open.errfile = true ;
+	    bcontrol(&errfile,BC_SETBUFLINE,true) ;
 	}
 
 	if (rs < 0)
 	    goto badarg ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("main: debuglevel=%u\n", pip->debuglevel) ;
-#endif
 
 	if (f_version) {
 	    bprintf(pip->efp,"%s: version %s\n",
@@ -1140,12 +1097,6 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    goto retearly ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2)) {
-	    debugprintf("main: pr=%s\n",pip->pr) ;
-	    debugprintf("main: sn=%s\n",pip->searchname) ;
-	}
-#endif
 
 	if (pip->debuglevel > 0) {
 	    bprintf(pip->efp,"%s: pr=%s\n", pip->progname,pip->pr) ;
@@ -1154,20 +1105,10 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* continue */
 
-	if (pmspec == NULL) pmspec = pip->progname ;
+	if (pmspec == nullptr) pmspec = pip->progname ;
 
 	pip->progmode = matstr(progmodes,pmspec,-1) ;
 	if (pip->progmode < 0) pip->progmode = 0 ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    if (pip->progmode >= 0) {
-	        debugprintf("main: pm=%s(%u)\n",
-	            progmodes[pip->progmode],pip->progmode) ;
-	    } else
-	        debugprintf("main: pm=NONE\n") ;
-	}
-#endif /* CF_DEBUG */
 
 	if (pip->debuglevel > 0) {
 	    bprintf(pip->efp,"%s: progmode=%s(%u)\n",
@@ -1180,7 +1121,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    usage(pip) ;
 
 	if (f_help)
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 	if (f_version || f_usage || f_help)
 	    goto retearly ;
@@ -1190,34 +1131,34 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* other initialization */
 
-	if (afname == NULL) afname = getenv(VARAFNAME) ;
+	if (afname == nullptr) afname = getenv(VARAFNAME) ;
 
-	if (pip->portspec == NULL) pip->portspec = getenv(VARCOMSATPORT) ;
+	if (pip->portspec == nullptr) pip->portspec = getenv(VARCOMSATPORT) ;
 
-	if (pip->csfname == NULL) {
+	if (pip->csfname == nullptr) {
 	    pip->csfname = getenv(VARCOMSATFNAME) ;
 	}
 
-	if (pip->tmpdname == NULL) pip->tmpdname = getenv(VARTMPDNAME) ;
-	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = getenv(VARTMPDNAME) ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = TMPDNAME ;
 
-	if ((rs >= 0) && (pip->deadmaildname == NULL)) {
-	    if ((cp = getenv(VARDMAILDNAMEP)) != NULL) {
+	if ((rs >= 0) && (pip->deadmaildname == nullptr)) {
+	    if ((cp = getenv(VARDMAILDNAMEP)) != nullptr) {
 		rs = procmaildirdead(pip,cp,-1) ;
 	    }
 	}
-	if ((rs >= 0) && (pip->deadmaildname == NULL)) {
-	    if ((cp = getenv(VARDMAILDNAME)) != NULL) {
+	if ((rs >= 0) && (pip->deadmaildname == nullptr)) {
+	    if ((cp = getenv(VARDMAILDNAME)) != nullptr) {
 		rs = procmaildirdead(pip,cp,-1) ;
 	    }
 	}
-	if ((rs >= 0) && (pip->copymaildname == NULL)) {
-	    if ((cp = getenv(VARCMAILDNAME)) != NULL) {
+	if ((rs >= 0) && (pip->copymaildname == nullptr)) {
+	    if ((cp = getenv(VARCMAILDNAME)) != nullptr) {
 		rs = procmaildircopy(pip,cp,-1) ;
 	    }
 	}
 
-	if (pip->defbox == NULL) pip->defbox = getenv(VARMAILBOX) ;
+	if (pip->defbox == nullptr) pip->defbox = getenv(VARMAILBOX) ;
 
 	if (pip->to_spool <= 1) pip->to_spool = TO_SPOOL ;
 
@@ -1240,11 +1181,11 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	if (rs >= 0) {
 	    if ((rs = procopts(pip,&akopts,&akparams)) >= 0) {
-		if (pip->lfname == NULL) pip->lfname = getenv(VARLFNAME) ;
-		if (pip->lfname == NULL) pip->lfname = getenv(VARLOGFNAME) ;
+		if (pip->lfname == nullptr) pip->lfname = getenv(VARLFNAME) ;
+		if (pip->lfname == nullptr) pip->lfname = getenv(VARLOGFNAME) ;
 		if ((rs = procstuff_begin(pip,argval)) >= 0) {
 	            USERINFO	u ;
-	            if ((rs = userinfo_start(&u,NULL)) >= 0) {
+	            if ((rs = userinfo_start(&u,nullptr)) >= 0) {
 	                pip->uip = &u ;
 	                if ((rs = procuserinfo_begin(pip,&u)) >= 0) {
 	                    if ((rs = proglog_begin(pip,&u)) >= 0) {
@@ -1263,7 +1204,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    rs1 = procuserinfo_end(pip) ;
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (procuserinfo) */
-	                pip->uip = NULL ;
+	                pip->uip = nullptr ;
 	                rs1 = userinfo_finish(&u) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (userinfo) */
@@ -1340,35 +1281,25 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* good return from program */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("main: vecobj_recipfins()\n") ;
-#endif
-
 retearly:
 	if (pip->debuglevel > 0) {
 	    bprintf(pip->efp,"%s: exiting ex=%u (%d)\n",
 	        pip->progname,ex,rs) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("main: exiting ex=%u (%d)\n",ex,rs) ;
-#endif
-
-	if (pip->efp != NULL) {
-	    pip->open.errfile = FALSE ;
+	if (pip->efp != nullptr) {
+	    pip->open.errfile = false ;
 	    bclose(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.akparams) {
-	    pip->open.akparams = FALSE ;
+	    pip->open.akparams = false ;
 	    paramopt_finish(&akparams) ;
 	}
 
 	if (pip->open.akopts) {
-	    pip->open.akopts = FALSE ;
+	    pip->open.akopts = false ;
 	    keyopt_finish(&akopts) ;
 	}
 
@@ -1387,48 +1318,6 @@ baddatestart:
 	proginfo_finish(pip) ;
 
 badprogstart:
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	{
-	    uint	mi[12] ;
-	    uint	mo ;
-	    uint	mdiff ;
-	    uc_mallout(&mo) ;
-	    mdiff = (mo-mo_start) ;
-	    debugprintf("main: final mallout=%u\n",mdiff) ;
-	    if (mdiff > 0) {
-	        UCMALLREG_CUR	cur ;
-	        UCMALLREG_REG	reg ;
-	        cint	size = (10*sizeof(uint)) ;
-	        cchar		*ids = "main" ;
-	        uc_mallinfo(mi,size) ;
-	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
-	        debugprintf("main: MIoutnummax=%u\n",mi[ucmallreg_outnummax]) ;
-	        debugprintf("main: MIoutsize=%u\n",mi[ucmallreg_outsize]) ;
-	        debugprintf("main: MIoutsizemax=%u\n",
-	            mi[ucmallreg_outsizemax]) ;
-	        debugprintf("main: MIused=%u\n",mi[ucmallreg_used]) ;
-	        debugprintf("main: MIusedmax=%u\n",mi[ucmallreg_usedmax]) ;
-	        debugprintf("main: MIunder=%u\n",mi[ucmallreg_under]) ;
-	        debugprintf("main: MIover=%u\n",mi[ucmallreg_over]) ;
-	        debugprintf("main: MInotalloc=%u\n",mi[ucmallreg_notalloc]) ;
-	        debugprintf("main: MInotfree=%u\n",mi[ucmallreg_notfree]) ;
-	        ucmallreg_curbegin(&cur) ;
-	        while (ucmallreg_curenum(&cur,&reg) >= 0) {
-	            debugprintf("main: MIreg.addr=%p\n",reg.addr) ;
-	            debugprintf("main: MIreg.size=%u\n",reg.size) ;
-	            debugprinthexblock(ids,80,reg.addr,reg.size) ;
-	        }
-	        ucmallreg_curend(&cur) ;
-	    }
-	    uc_mallset(0) ;
-	}
-#endif /* CF_DEBUGMALL */
-
-#if	(CF_DEBUGS || CF_DEBUG)
-	debugclose() ;
-#endif
-
 	return ex ;
 
 /* bad stuff */
@@ -1485,7 +1374,7 @@ static int procopts_setpcs(PROGINFO *pip,KEYOPT *kop,vecstr *setsp)
 
 	if (rs >= 0) {
 	    for (i = 0 ; vecstr_get(setsp,i,&cp) >= 0 ; i += 1) {
-	        if (cp == NULL) continue ;
+	        if (cp == nullptr) continue ;
 
 	        fi = headkeymat(pip->searchname,cp,-1) ;
 	        if (fi <= 0) continue ;
@@ -1494,9 +1383,9 @@ static int procopts_setpcs(PROGINFO *pip,KEYOPT *kop,vecstr *setsp)
 
 	        kp = cp ;
 	        kl = -1 ;
-	        vp = NULL ;
+	        vp = nullptr ;
 	        vl = 0 ;
-	        if ((tp = strchr(cp,'=')) != NULL) {
+	        if ((tp = strchr(cp,'=')) != nullptr) {
 	            kl = (tp - cp) ;
 	            vp = tp + 1 ;
 	            vl = -1 ;
@@ -1505,7 +1394,7 @@ static int procopts_setpcs(PROGINFO *pip,KEYOPT *kop,vecstr *setsp)
 	        oi = matostr(locopts,3,kp,kl) ;
 	        if (oi >= 0) kp = locopts[oi] ;
 
-	        if ((oi >= 0) && (keyopt_fetch(kop,kp,NULL,NULL) == rsn)) {
+	        if ((oi >= 0) && (keyopt_fetch(kop,kp,nullptr,nullptr) == rsn)) {
 	            rs = keyopt_loadvalue(kop,kp,vp,vl) ;
 	        }
 
@@ -1517,16 +1406,16 @@ static int procopts_setpcs(PROGINFO *pip,KEYOPT *kop,vecstr *setsp)
 
 	if (rs >= 0) {
 	    for (i = 0 ; vecstr_get(setsp,i,&cp) >= 0 ; i += 1) {
-	        if (cp == NULL) continue ;
+	        if (cp == nullptr) continue ;
 
-	        if (strchr(cp,':') != NULL)
+	        if (strchr(cp,':') != nullptr)
 	            continue ;
 
 	        kp = cp ;
 	        kl = -1 ;
-	        vp = NULL ;
+	        vp = nullptr ;
 	        vl = 0 ;
-	        if ((tp = strchr(cp,'=')) != NULL) {
+	        if ((tp = strchr(cp,'=')) != nullptr) {
 	            kl = (tp - cp) ;
 	            vp = tp + 1 ;
 	            vl = -1 ;
@@ -1535,7 +1424,7 @@ static int procopts_setpcs(PROGINFO *pip,KEYOPT *kop,vecstr *setsp)
 	        oi = matostr(pcsopts,3,kp,kl) ;
 	        if (oi >= 0) kp = pcsopts[oi] ;
 
-	        if ((oi >= 0) && (keyopt_fetch(kop,kp,NULL,NULL) == rsn)) {
+	        if ((oi >= 0) && (keyopt_fetch(kop,kp,nullptr,nullptr) == rsn)) {
 	            rs = keyopt_loadvalue(kop,kp,vp,vl) ;
 	        }
 
@@ -1556,7 +1445,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *aop)
 	int		cl ;
 	cchar		*cp ;
 
-	if ((cp = getenv(VAROPTS)) != NULL) {
+	if ((cp = getenv(VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
@@ -1571,7 +1460,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *aop)
 
 	            if ((oi = matostr(locopts,3,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	                switch (oi) {
 	                case locopt_deadmaildir:
@@ -1580,7 +1469,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *aop)
 	                    }
 	                    break ;
 	                case locopt_mbtab:
-	                    if ((vl > 0) && (pip->mbfname == NULL)) {
+	                    if ((vl > 0) && (pip->mbfname == nullptr)) {
 	                        cchar	**vpp = &pip->mbfname ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
@@ -1599,31 +1488,31 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *aop)
 	                            cl = vl ;
 	                        }
 	                    }
-	                    if ((rs >= 0) && (pip->csfname == NULL)) {
+	                    if ((rs >= 0) && (pip->csfname == nullptr)) {
 	                        cchar	**vpp = &pip->csfname ;
 	                        rs = proginfo_setentry(pip,vpp,cp,cl) ;
 	                    }
 	                    break ;
 	                case locopt_spam:
-	                    if ((vl > 0) && (pip->spfname == NULL)) {
+	                    if ((vl > 0) && (pip->spfname == nullptr)) {
 	                        cchar	**vpp = &pip->spfname ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 	                case locopt_spambox:
-	                    if ((vl > 0) && (pip->spambox == NULL)) {
+	                    if ((vl > 0) && (pip->spambox == nullptr)) {
 	                        cchar	**vpp = &pip->spambox ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 	                case locopt_boxdir:
-	                    if ((vl > 0) && (pip->boxdname == NULL)) {
+	                    if ((vl > 0) && (pip->boxdname == nullptr)) {
 	                        cchar	**vpp = &pip->boxdname ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 	                case locopt_boxname:
-	                    if ((vl > 0) && (pip->defbox == NULL)) {
+	                    if ((vl > 0) && (pip->defbox == nullptr)) {
 	                        cchar	**vpp = &pip->defbox ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
@@ -1731,13 +1620,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *aop)
 	                    }
 	                    break ;
 	                case pcsopt_cluster:
-	                    if ((vl > 0) && (pip->cluster == NULL)) {
+	                    if ((vl > 0) && (pip->cluster == nullptr)) {
 	                        cchar	**vpp = &pip->cluster ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 	                case pcsopt_pcsadmin:
-	                    if ((vl > 0) && (pip->username_pcs == NULL)) {
+	                    if ((vl > 0) && (pip->username_pcs == nullptr)) {
 	                        cchar	**vpp = &pip->username_pcs ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
@@ -1825,7 +1714,7 @@ cchar		*ifn ;
 static int procstuff_begin(PROGINFO *pip,cchar *argval)
 {
 	int		rs = SR_OK ;
-	if ((pip->logsize == 0) && (argval != NULL)) {
+	if ((pip->logsize == 0) && (argval != nullptr)) {
 	    int		v ;
 	    if ((rs = cfdecmfi(argval,-1,&v)) >= 0) {
 		pip->logsize = v ;
@@ -1838,7 +1727,7 @@ static int procstuff_begin(PROGINFO *pip,cchar *argval)
 
 static int procstuff_end(PROGINFO *pip)
 {
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	return SR_OK ;
 }
 /* end subroutine (procstuff_end) */
@@ -1883,7 +1772,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	            if ((rs = procuserboxes(pip)) >= 0) {
 	                cchar	*un = pip->username ;
 	                if ((rs = pcstrustuser(pip->pr,un)) >= 0) {
-	                    pip->f.trusted = TRUE ;
+	                    pip->f.trusted = true ;
 	                }
 	            } /* end if (procuserboxes) */
 	        } /* end if (procnodecluster) */
@@ -1895,7 +1784,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->uid_divert = pip->uid ;
 
 	if ((pip->f.optlogmsg || pip->f.optlogconf)) {
-	    pip->f.logprog = TRUE ;
+	    pip->f.logprog = true ;
 	}
 
 	return rs ;
@@ -1944,7 +1833,7 @@ static int procourconf_begin(PROGINFO *pip,PARAMOPT *aop)
 static int procourconf_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	return rs ;
 }
 /* end subroutine (procourconf_begin) */
@@ -1985,12 +1874,12 @@ static int proclogs_log(PROGINFO *pip)
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 	cchar		*fn ;
-	if (pip->zfname != NULL) {
+	if (pip->zfname != nullptr) {
 	    fn = pip->zfname ;
 	    fmt = "zl=%s"  ;
 	    proglog_printf(pip,fmt,fn) ;
 	}
-	if (pip->csfname != NULL) {
+	if (pip->csfname != nullptr) {
 	    fn = pip->csfname ;
 	    if (dl > 0) {
 	        fmt = "%s: cs=%s\n"  ;
@@ -1999,7 +1888,7 @@ static int proclogs_log(PROGINFO *pip)
 	    fmt = "cs=%s"  ;
 	    proglog_printf(pip,fmt,fn) ;
 	}
-	if (pip->mbfname != NULL) {
+	if (pip->mbfname != nullptr) {
 	    fn = pip->mbfname ;
 	    if (dl > 0) {
 	        fmt = "%s: mb=%s\n"  ;
@@ -2008,7 +1897,7 @@ static int proclogs_log(PROGINFO *pip)
 	    fmt = "mb=%s"  ;
 	    proglog_printf(pip,fmt,fn) ;
 	}
-	if (pip->spfname != NULL) {
+	if (pip->spfname != nullptr) {
 	    fn = pip->spfname ;
 	    if (dl > 0) {
 	        fmt = "%s: sp=%s\n"  ;
@@ -2043,7 +1932,7 @@ static int proctmp_end(PROGINFO *pip,bfile *tfp,char *tbuf)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	rs1 = bclose(tfp) ;
 	if (rs >= 0) rs = rs1 ;
 	if (tbuf[0] != '\0') {
@@ -2055,15 +1944,9 @@ static int proctmp_end(PROGINFO *pip,bfile *tfp,char *tbuf)
 }
 /* end subroutine (proctmp_end) */
 
-
-static int procmsgid_begin(PROGINFO *pip)
-{
+static int procmsgid_begin(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("main/procmsgid_begin: ent f=%u\n",pip->f.optlogmsgid) ;
-#endif
+	int		f = false ;
 	if (pip->f.optlogmsgid) {
 	    LOCINFO	*lip = pip->lip ;
 	    cchar	*vd = VARDNAME ;
@@ -2073,35 +1956,17 @@ static int procmsgid_begin(PROGINFO *pip)
 	        MSGID		*mip = &lip->mids ;
 	        cint	rsn = SR_ACCESS ;
 	        cint	n = MAXMSGID ;
-#if	CF_DEBUG
-		if (DEBUGLEVEL(5))
-	    	    debugprintf("main/procmsgid_begin: tbuf=%s\n",tbuf) ;
-#endif
 	        if ((rs = msgid_open(mip,tbuf,O_RDWR,0660,n)) == rsn) {
-#if	CF_DEBUG
-		    if (DEBUGLEVEL(5))
-	    	        debugprintf("main/procmsgid_begin: no-access\n") ;
-#endif
 	            rs = msgid_open(mip,tbuf,O_RDONLY,0660,n) ;
 	        }
 	        if (rs >= 0) {
-	            lip->open.mids = TRUE ;
-		    f = TRUE ;
+	            lip->open.mids = true ;
+		    f = true ;
 	        } else if (isNotPresent(rs)) {
-#if	CF_DEBUG
-		    if (DEBUGLEVEL(5)) {
-	    	        debugprintf("main/procmsgid_begin: "
-				"no-present (%d)\n", rs) ;
-		    }
-#endif
 	            rs = SR_OK ;
 	        }
 	    } /* end if (mkpath) */
 	} /* end if (optlogmsgid) */
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("main/procmsgid_begin: ret rs=%d f=%u\n",rs,f) ;
-#endif
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (procmsgid_begin) */
@@ -2113,7 +1978,7 @@ static int procmsgid_end(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (lip->open.mids) {
-	    lip->open.mids = FALSE ;
+	    lip->open.mids = false ;
 	    rs1 = msgid_close(&lip->mids) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -2121,90 +1986,43 @@ static int procmsgid_end(PROGINFO *pip)
 }
 /* end subroutine (procmsgid_end) */
 
-
-static int procmsgid_update(PROGINFO *pip,MSGINFO *mop,cchar *r)
-{
+static int procmsgid_update(PROGINFO *pip,MSGINFO *mop,cchar *r) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	debugprintf("main/procmsgid_update: ent open=%u\n",lip->open.mids) ;
-	debugprintf("main/procmsgid_update: r=%s\n",r) ;
-	}
-#endif
 	if (lip->open.mids) {
-	    MSGID_KEY		midkey ;
-	    MSGID_ENT		mident ;
+	    MSGID_KEY		midkey{} ;
+	    MSGID_ENT		mident{} ;
 	    custime	dt = pip->daytime ;
 	    cchar		*mid = mop->h_messageid ;
 
-	    memset(&midkey,0,sizeof(MSGID_KEY)) ;
 	    midkey.recip = r ;
 	    midkey.reciplen = -1 ;
 	    mident.count = 0 ;
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4)) {
-	        debugprintf("main/procmsgid_update: f_mid=%u\n",
-			mop->f.messageid) ;
-	        debugprintf("main/procmsgid_update: mid=%s\n",
-			mop->h_messageid) ;
-	    }
-#endif
-	        if ((mid != NULL) && (mid[0] != '\0')) {
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("main/procmsgid_update: messageid=%s\n",mid) ;
-#endif
-
+	        if ((mid != nullptr) && (mid[0] != '\0')) {
 	        midkey.mtime = mop->mtime ;
 	        midkey.from = mop->h_from ;
 	        midkey.mid = mid ;
 
 	        rs = msgid_update(&lip->mids,dt,&midkey,&mident) ;
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4)) {
-	            debugprintf("main/procmsgid_update: "
-			"msgid_update() rs=%d\n", rs) ;
-		}
-#endif
-
 	        if (rs == SR_ACCESS) {
 	            rs = msgid_match(&lip->mids,dt,&midkey,&mident) ;
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4)) {
-	                debugprintf("main/procmsgid_update: "
-				"msgid_match() rs=%d\n",rs) ;
-		    }
-#endif
 	        }
 
 		if (rs >= 0) c = mident.count ;
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("main/procmsgid_update: rs=%d c=%u\n",rs,c) ;
-#endif
-
-		} /* end if (non-NULL) */
+		} /* end if (non-nullptr) */
 	} /* end if (MSGID-open) */
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	debugprintf("main/procmsgid_update: ret rs=%d c=%u\n",rs,c) ;
-#endif
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procmsgid_update) */
 
-
-static int procnodecluster(PROGINFO *pip)
-{
+static int procnodecluster(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
-	if (pip->cluster == NULL) {
+	if (pip->cluster == nullptr) {
 	    cchar	*tp ;
-	    if ((tp = strchr(pip->domainname,'.')) != NULL) {
+	    if ((tp = strchr(pip->domainname,'.')) != nullptr) {
 	        int	cl = (tp - pip->domainname) ;
 		cchar	**vpp = &pip->cluster ;
 	        cchar	*cp = pip->domainname ;
@@ -2215,20 +2033,16 @@ static int procnodecluster(PROGINFO *pip)
 }
 /* end subroutine (procnodecluster) */
 
-
-static int procuucpinfo(PROGINFO *pip)
-{
+static int procuucpinfo(PROGINFO *pip) noex {
 	pip->uu_machine = getenv(VARUUMACHINE) ;
 	pip->uu_user = getenv(VARUUUSER) ;
 	return SR_OK ;
 }
 /* end subroutine (procuucpinfo) */
 
-
-static int procenvfromaddr(PROGINFO *pip)
-{
+static int procenvfromaddr(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
-	if (pip->addenvfrom != NULL) {
+	if (pip->addenvfrom != nullptr) {
 	    cint	elen = strlen(pip->addenvfrom) ;
 	    char	*ebuf ;
 	    if ((rs = uc_malloc((elen+1),&ebuf)) >= 0) {
@@ -2239,8 +2053,8 @@ static int procenvfromaddr(PROGINFO *pip)
 		}
 		uc_free(ebuf) ;
 	    } /* end if (m-a-f) */
-	} else if (pip->envfrom == NULL) {
-	    if (pip->f.trusted && (pip->uu_user != NULL)) {
+	} else if (pip->envfrom == nullptr) {
+	    if (pip->f.trusted && (pip->uu_user != nullptr)) {
 	        pip->envfrom = pip->uu_user ;
 	    } else {
 	        pip->envfrom = pip->username ;
@@ -2250,10 +2064,8 @@ static int procenvfromaddr(PROGINFO *pip)
 }
 /* end subroutine (procenvfromaddr) */
 
-
 /* find the mail spool directory, as dynamically as possible */
-static int procmaildname_begin(PROGINFO *pip,PARAMOPT *aop)
-{
+static int procmaildname_begin(PROGINFO *pip,PARAMOPT *aop) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -2286,15 +2098,13 @@ static int procmaildname_begin(PROGINFO *pip,PARAMOPT *aop)
 }
 /* end subroutine (procmaildname_begin) */
 
-
-static int procmaildname_add(PROGINFO *pip,cchar *vp,int vl)
-{
-	NULSTR		md ;
+static int procmaildname_add(PROGINFO *pip,cchar *vp,int vl) noex {
+	nulstr		md ;
 	int		rs ;
 	int		c = 0 ;
 	cchar		*dname ;
 	if ((rs = nulstr_start(&md,vp,vl,&dname)) >= 0) {
-	    struct ustat	sb ;
+	    USTAT	sb ;
 	    if ((rs = uc_stat(dname,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 		    IDS		*idp = &pip->id ;
@@ -2337,7 +2147,7 @@ static int procprotospec(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
-	if ((pip->protospec == NULL) && (pip->uu_machine != NULL)) {
+	if ((pip->protospec == nullptr) && (pip->uu_machine != nullptr)) {
 	    char	pbuf[PSBUFLEN+1] ;
 	    if ((rs = snscs(pbuf,BUFLEN,"uucp",pip->uu_machine)) >= 0) {
 	        cchar	**vpp = &pip->protospec ;
@@ -2345,10 +2155,10 @@ static int procprotospec(PROGINFO *pip)
 	    }
 	}
 
-	if (pip->protospec != NULL) {
+	if (pip->protospec != nullptr) {
 	    cchar	*ps = pip->protospec ;
 	    if (strcasecmp(ps,PROTOSPEC_POSTFIX) == 0) {
-	        pip->f.trusted = TRUE ;
+	        pip->f.trusted = true ;
 	    }
 	}
 
@@ -2362,9 +2172,9 @@ static int procuserboxes(PROGINFO *pip)
 	int		rs = SR_OK ;
 	if (pip->progmode == progmode_dmailbox) {
 
-	    if (pip->boxdname == NULL) pip->boxdname = DEFMAILFOLDER ;
+	    if (pip->boxdname == nullptr) pip->boxdname = DEFMAILFOLDER ;
 
-	    if (pip->defbox == NULL) pip->defbox = DEFBOXNAME ;
+	    if (pip->defbox == nullptr) pip->defbox = DEFBOXNAME ;
 
 	} /* end if (progmode-dmail) */
 	return rs ;
@@ -2384,7 +2194,7 @@ static int procloginfo(PROGINFO *pip)
 	    if (pip->f.optlogconf) {
 	        proglog_printf(pip,"pr=%s\n",pip->pr) ;
 	    }
-	    if (pip->protospec != NULL) {
+	    if (pip->protospec != nullptr) {
 		if (dl > 0) {
 		    fmt = "%s: proto=%s\n" ;
 		    bprintf(pip->efp,fmt,pn,pip->protospec) ;
@@ -2392,7 +2202,7 @@ static int procloginfo(PROGINFO *pip)
 	        fmt = "proto=%s" ;
 	        proglog_printf(pip,fmt,pip->protospec) ;
 	    }
-	    if (pip->uu_machine != NULL) {
+	    if (pip->uu_machine != nullptr) {
 		if (dl > 0) {
 		    fmt = "%s: umachine=%s\n" ;
 		    bprintf(pip->efp,fmt,pn,pip->uu_machine) ;
@@ -2400,7 +2210,7 @@ static int procloginfo(PROGINFO *pip)
 	        fmt = "uu_machine=%s" ;
 	        proglog_printf(pip,fmt,pip->uu_machine) ;
 	    }
-	    if (pip->uu_user != NULL) {
+	    if (pip->uu_user != nullptr) {
 		if (dl > 0) {
 		    fmt = "%s: uuser=%s\n" ;
 		    bprintf(pip->efp,fmt,pn,pip->uu_user) ;
@@ -2408,7 +2218,7 @@ static int procloginfo(PROGINFO *pip)
 	        fmt = "uu_user=%s" ;
 	        proglog_printf(pip,fmt,pip->uu_user) ;
 	    }
-	    if (pip->copymaildname != NULL) {
+	    if (pip->copymaildname != nullptr) {
 		cchar	*sp = pip->copymaildname ;
 		if (dl > 0) {
 		    fmt = "%s: maildir-copy=%s\n" ;
@@ -2417,7 +2227,7 @@ static int procloginfo(PROGINFO *pip)
 	        fmt = "maildir-copy=%s" ;
 	        proglog_printf(pip,fmt,sp) ;
 	    }
-	    if (pip->deadmaildname != NULL) {
+	    if (pip->deadmaildname != nullptr) {
 		cchar	*sp = pip->deadmaildname ;
 		if (dl > 0) {
 		    fmt = "%s: maildir-dead=%s\n" ;
@@ -2445,7 +2255,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *app,VECOBJ *rlp,cchar *afn)
 	    for (ai = 1 ; ai < aip->argc ; ai += 1) {
 
 	        f = (ai <= aip->ai_max) && (bits_test(app,ai) > 0) ;
-	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
+	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
 	        if (f) {
 	            cp = aip->argv[ai] ;
 	            if (cp[0] != '\0') {
@@ -2458,7 +2268,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *app,VECOBJ *rlp,cchar *afn)
 	    } /* end for */
 	} /* end if (ok) */
 
-	if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
+	if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
 	    bfile	afile, *afp = &afile ;
 
 	    if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
@@ -2502,16 +2312,6 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *app,VECOBJ *rlp,cchar *afn)
 	    c += rs ;
 	} /* end if */
 
-#if	CF_DEBUG && CF_DEBUGRECIPS
-	if (DEBUGLEVEL(3))
-	    debugrecips(pip,rlp) ;
-#endif
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("main/procargs: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procargs) */
@@ -2525,7 +2325,7 @@ static int logrecip(PROGINFO *pip,cchar recip[],struct passwd *pwp)
 	    cint	nlen = REALNAMELEN ;
 	    cchar	*fmt = "load recip=%s" ;
 	    char	nbuf[REALNAMELEN + 1] = { 0 } ;
-	    if (pwp != NULL) {
+	    if (pwp != nullptr) {
 	        rs = mkrecipname(nbuf,nlen,pwp->pw_gecos) ;
 	        if ((rs >= 0) && (rs <= 50)) {
 	            fmt = "load recip=%s (%s)" ;
@@ -2584,14 +2384,9 @@ static int loadrecip(PROGINFO *pip,VECOBJ *nlp,cchar np[],int nl)
 	int		rs1 ;
 	int		c = 0 ;
 
-	if (np == NULL) return SR_FAULT ;
+	if (np == nullptr) return SR_FAULT ;
 
 	if (np[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("main/loadrecip: rn=%t\n",np,nl) ;
-#endif
 
 	if (nl < 0) nl = strlen(np) ;
 
@@ -2604,10 +2399,10 @@ static int loadrecip(PROGINFO *pip,VECOBJ *nlp,cchar np[],int nl)
 	} else {
 	    cint	nch = MKCHAR(np[0]) ;
 	    cchar	*tp ;
-	    if ((tp = strnchr(np,nl,'+')) != NULL) {
+	    if ((tp = strnchr(np,nl,'+')) != nullptr) {
 	        nl = (tp-np) ;
 	    }
-	    if (strnchr(np,nl,'.') != NULL) {
+	    if (strnchr(np,nl,'.') != nullptr) {
 	        LOCINFO_RNCUR	rnc ;
 	        if ((rs = locinfo_rncurbegin(lip,&rnc)) >= 0) {
 	            if ((rs = locinfo_rnlook(lip,&rnc,np,nl)) >= 0) {
@@ -2617,31 +2412,13 @@ static int loadrecip(PROGINFO *pip,VECOBJ *nlp,cchar np[],int nl)
 	                    rs = vecobj_recipadd(nlp,ub,rs) ;
 	                    c += rs ;
 	                    pip->nrecips += rs ;
-#if	CF_DEBUG
-	                    if (DEBUGLEVEL(5))
-	                        debugprintf("main/loadrecip: "
-	                            "vecobj_recipadd() rs=%d\n",rs) ;
-#endif
 	                    if (rs < 0) break ;
 	                } /* end while (reading entries) */
-#if	CF_DEBUG
-	                if (DEBUGLEVEL(5))
-	                    debugprintf("main/loadrecip: "
-	                        "while-out rs=%d\n",rs) ;
-#endif
 	            } /* end if */
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(5))
-	                debugprintf("main/loadrecip: rnlook-out rs=%d\n",rs) ;
-#endif
 	            if (rs == SR_NOTFOUND) rs = SR_OK ;
 	            rs1 = locinfo_rncurend(lip,&rnc) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (srncursor) */
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(5))
-	            debugprintf("main/loadrecip: rncur-out rs=%d\n",rs) ;
-#endif
 	    } else if (nch == MKCHAR('¡')) {
 	        LOCINFO_GMCUR	gc ;
 	        cchar		*gnp = (np+1) ;
@@ -2679,11 +2456,6 @@ static int loadrecip(PROGINFO *pip,VECOBJ *nlp,cchar np[],int nl)
 
 	} /* end if */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("main/loadrecip: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (loadrecip) */
@@ -2703,11 +2475,6 @@ cchar		*ifn ;
 	int		rs ;
 	int		rs1 ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("main/processing: ent\n") ;
-#endif
-
 	if ((rs = vecobj_start(&recips,size,1,0)) >= 0) {
 	    if ((rs = procargs(pip,aip,bop,&recips,afn)) >= 0) {
 	        bfile	tfile, *tfp = &tfile ;
@@ -2717,11 +2484,6 @@ cchar		*ifn ;
 	            cint	size = sizeof(MSGINFO) ;
 	            if ((rs = vecobj_start(&info,size,1,0)) >= 0) {
 	                if ((rs = procin(pip,&info,tfp,&recips,ifn)) >= 0) {
-#if	CF_DEBUG
-	                    if (DEBUGLEVEL(5))
-	                        debugprintf("main/processing: "
-					"procin() rs=%d\n",rs) ;
-#endif
 	                    if ((rs = procmsgid_begin(pip)) >= 0) {
 	                        {
 	                            VECOBJ	*mip = &info ;
@@ -2731,19 +2493,10 @@ cchar		*ifn ;
 	                        rs1 = procmsgid_end(pip) ;
 	                        if (rs >= 0) rs = rs1 ;
 	                    } /* end if (procmsgid) */
-#if	CF_DEBUG
-	                    if (DEBUGLEVEL(5))
-	                        debugprintf("main/processing: "
-					"procmsgid-out rs=%d\n", rs) ;
-#endif
 	                } /* end if (procin) */
 	                rs1 = vecobj_finish(&info) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (vecobj) */
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(5))
-	                debugprintf("main/processing: vecobj-out rs=%d\n",rs) ;
-#endif
 	            rs1 = proctmp_end(pip,tfp,tbuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
@@ -2751,25 +2504,12 @@ cchar		*ifn ;
 	            fmt = "%s: could not create-open tempory file (%d)\n" ;
 	            bprintf(pip->efp,fmt,pip->progname,rs) ;
 	        }
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(5))
-	            debugprintf("main/processing: proctmp-out rs=%d\n",rs) ;
-#endif
 	        rs1 = vecobj_recipfins(&recips) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (procargs) */
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(5))
-	        debugprintf("main/processing: procargs-out rs=%d\n",rs) ;
-#endif
 	    rs1 = vecobj_finish(&recips) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecobj) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("main/processing: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -2779,10 +2519,6 @@ cchar		*ifn ;
 static int processings(PROGINFO *pip,VECOBJ *mip,VECOBJ *rip,cchar *tfn)
 {
 	int		rs ;
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("main/processings: ent tfn=%s\n",tfn) ;
-#endif
 	if ((rs = procspamsetup(pip,mip)) >= 0) {
 	    cmode	om = 0666 ;
 	    cint		of = O_RDONLY ;
@@ -2791,15 +2527,12 @@ static int processings(PROGINFO *pip,VECOBJ *mip,VECOBJ *rip,cchar *tfn)
 	        if ((rs = procrecips(pip,mip,rip,tfd)) >= 0) {
 	            if (pip->progmode == progmode_dmail) {
 #if	CF_SPAMBOX
-	                if (pip->spambox != NULL) {
+	                if (pip->spambox != nullptr) {
 	                    rs = procspambox(pip,mip,rip,tfd) ;
 	                }
 #endif
 			if (rs >= 0) {
 			    rs = progcomsat(pip,rip) ;
-#if	CF_DEBUGN
-	nprintf(NDF,"main/processings: progcomsat() rs=%d\n",rs) ;
-#endif
 			}
 	            } /* end if (progmode-dmail) */
 	        } /* end if (procrecips) */
@@ -2817,10 +2550,6 @@ static int processings(PROGINFO *pip,VECOBJ *mip,VECOBJ *rip,cchar *tfn)
 	        u_close(tfd) ;
 	    } /* end if (file) */
 	} /* end if (procspamsetup) */
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("main/processings: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (processings) */
@@ -2832,12 +2561,7 @@ static int procin(PROGINFO *pip,vecobj *mip,bfile *tfp,vecobj *rip,cchar *ifn)
 	int		rs ;
 	int		rs1 ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procin: ent ifn=%s\n",ifn) ;
-#endif
-
-	if ((ifn == NULL) || (ifn[0] == '\0') || (ifn[0] == '-'))
+	if ((ifn == nullptr) || (ifn[0] == '\0') || (ifn[0] == '-'))
 	    ifn = BFILE_STDIN ;
 
 	if ((rs = bopen(ifp,ifn,"r",0666)) >= 0) {
@@ -2845,19 +2569,7 @@ static int procin(PROGINFO *pip,vecobj *mip,bfile *tfp,vecobj *rip,cchar *ifn)
 	    if ((rs = prognamecache_begin(pip,uip)) >= 0) {
 
 #if	CF_PROGMSGS
-#if	CF_DEBUG && CF_DEBUGRECIPS
-	        if (DEBUGLEVEL(4)) {
-	            debugprintf("main/procin: progmsgs()\n") ;
-	            debugrecips(pip,&recips) ;
-	        }
-#endif
-
 	        rs = progmsgs(pip,ifp,tfp,mip,rip) ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("main/procin: progmsgs() rs=%d\n",rs) ;
-#endif
 #endif /* CF_PROGMSGS */
 
 	        rs1 = prognamecache_end(pip) ;
@@ -2870,11 +2582,6 @@ static int procin(PROGINFO *pip,vecobj *mip,bfile *tfp,vecobj *rip,cchar *ifn)
 	        pip->progname,rs) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procin: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procin) */
@@ -2885,10 +2592,6 @@ static int procfindfiles(PROGINFO *pip)
 	VECSTR		svars ;
 	int		rs ;
 	int		rs1 ;
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procfindfiles: ent\n") ;
-#endif
 	if ((rs = vecstr_start(&svars,6,0)) >= 0) {
 	    if ((rs = procfindsched(pip,&svars)) >= 0) {
 	        if ((rs = procfindcomsat(pip,&svars)) >= 0) {
@@ -2900,13 +2603,6 @@ static int procfindfiles(PROGINFO *pip)
 	    rs1 = vecstr_finish(&svars) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (svars) */
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("main/procfindfiles: ret rs=%d\n",rs) ;
-	    if (pip->csfname != NULL)
-	    debugprintf("main/procfindfiles: ret csfn=%s\n",pip->csfname) ;
-	}
-#endif
 	return rs ;
 }
 /* end subroutine (procfindfiles) */
@@ -2918,26 +2614,18 @@ static int procfindcomsat(PROGINFO *pip,vecstr *slp)
 {
 	int		rs = SR_OK ;
 	if (pip->progmode == progmode_dmail) {
-	    cchar	*fn = NULL ;
-	    if ((pip->csfname == NULL) || (pip->csfname[0] == '+')) {
+	    cchar	*fn = nullptr ;
+	    if ((pip->csfname == nullptr) || (pip->csfname[0] == '+')) {
 	        fn = COMSATFNAME ;
 	    } else if (pip->csfname[0] != '-') {
 	        fn = pip->csfname ;
 	    }
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	debugprintf("main/procfindcomsat: beginning fn=%s\n",fn) ;
-#endif
-	    if ((rs >= 0) && (fn != NULL)) {
+	    if ((rs >= 0) && (fn != nullptr)) {
 	        int	flen = MAXPATHLEN ;
 	        int	fl = -1 ;
 	        char	fbuf[MAXPATHLEN+1] ;
 	        if ((rs = progexpand(pip,fbuf,flen,fn,-1)) >= 0) {
 	            fl = rs ;
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	debugprintf("main/procfindcomsat: exp fl=%d fbuf=%s\n",fl,fbuf) ;
-#endif
 	            if (fbuf[0] != '/') {
 	        	char	tbuf[MAXPATHLEN+1] ;
 	                if ((rs = mkpath2(tbuf,pip->pr,fbuf)) >= 0) {
@@ -2946,38 +2634,17 @@ static int procfindcomsat(PROGINFO *pip,vecstr *slp)
 	                }
 	            }
 	        } /* end if (progexpand) */
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	debugprintf("main/procfindcomsat: mid fl=%d fbuf=%s\n",fl,fbuf) ;
-#endif
 	        if (rs >= 0) {
-	            if ((rs = perm(fbuf,-1,-1,NULL,R_OK)) >= 0) {
+	            if ((rs = perm(fbuf,-1,-1,nullptr,R_OK)) >= 0) {
 	                cchar	**vpp = &pip->csfname ;
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	debugprintf("main/procfindcomsat: perm() rs=%d\n",rs) ;
-#endif
 	                if ((rs = proginfo_setentry(pip,vpp,fbuf,fl)) >= 0) {
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	debugprintf("main/procfindcomsat: proginfo_setent() rs=%d\n",rs) ;
-	debugprintf("main/procfindcomsat: csfn=%s\n",pip->csfname) ;
-	}
-#endif
-	                    pip->f.comsat = TRUE ;
+	                    pip->f.comsat = true ;
 	                }
 	            } else if (isNotAccess(rs)) {
 	                rs = SR_OK ;
 	            }
 	        } /* end if (ok) */
 	    } /* end if (non-null) */
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	debugprintf("main/procfindcomsat: ending rs=%d\n",rs) ;
-	    if (pip->csfname != NULL)
-	    debugprintf("main/procfindcomsat: ret csfn=%s\n",pip->csfname) ;
-	}
-#endif
 	} /* end if (progmode-dmail) */
 	return rs ;
 }
@@ -2989,13 +2656,13 @@ static int procfindcomsat(PROGINFO *pip,vecstr *slp)
 static int procfindspam(PROGINFO *pip,vecstr *slp)
 {
 	int		rs = SR_OK ;
-	cchar		*fn = NULL ;
-	if ((pip->spfname == NULL) || (pip->spfname[0] == '+')) {
+	cchar		*fn = nullptr ;
+	if ((pip->spfname == nullptr) || (pip->spfname[0] == '+')) {
 	    fn = SPAMFNAME ;
 	} else if (pip->spfname[0] != '-') {
 	    fn = pip->spfname ;
 	}
-	if ((rs >= 0) && (fn != NULL)) {
+	if ((rs >= 0) && (fn != nullptr)) {
 	    int		flen = MAXPATHLEN ;
 	    int		fl = -1 ;
 	    char	fbuf[MAXPATHLEN+1] ;
@@ -3010,23 +2677,16 @@ static int procfindspam(PROGINFO *pip,vecstr *slp)
 	        }
 	    } /* end if (progexpand) */
 	    if (rs >= 0) {
-	        if ((rs = perm(fbuf,-1,-1,NULL,R_OK)) >= 0) {
+	        if ((rs = perm(fbuf,-1,-1,nullptr,R_OK)) >= 0) {
 	            cchar	**vpp = &pip->spfname ;
 	            if ((rs = proginfo_setentry(pip,vpp,fbuf,fl)) >= 0) {
-	                pip->f.spam = TRUE ;
+	                pip->f.spam = true ;
 	            }
 	        } else if (isNotAccess(rs)) {
 	            rs = SR_OK ;
 	        }
 	    } /* end if (ok) */
 	} /* end if (non-null) */
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	debugprintf("main/procfindspam: ret rs=%d\n",rs) ;
-	    if (pip->spfname != NULL)
-	    debugprintf("main/procfindspam: ret spamfn=%s\n",pip->spfname) ;
-	}
-#endif
 	return rs ;
 }
 /* end subroutine (procfindspam) */
@@ -3037,13 +2697,13 @@ static int procfindspam(PROGINFO *pip,vecstr *slp)
 static int procfindmbtab(PROGINFO *pip,vecstr *slp)
 {
 	int		rs = SR_OK ;
-	cchar		*fn = NULL ;
-	if ((pip->mbfname == NULL) || (pip->mbfname[0] == '+')) {
+	cchar		*fn = nullptr ;
+	if ((pip->mbfname == nullptr) || (pip->mbfname[0] == '+')) {
 	    fn = MBFNAME ;
 	} else if (pip->mbfname[0] != '-') {
 	    fn = pip->mbfname ;
 	}
-	if ((rs >= 0) && (fn != NULL)) {
+	if ((rs >= 0) && (fn != nullptr)) {
 	    int		flen = MAXPATHLEN ;
 	    int		fl = -1 ;
 	    char	fbuf[MAXPATHLEN+1] ;
@@ -3058,23 +2718,16 @@ static int procfindmbtab(PROGINFO *pip,vecstr *slp)
 	        }
 	    } /* end if (progexpand) */
 	    if (rs >= 0) {
-	        if ((rs = perm(fbuf,-1,-1,NULL,R_OK)) >= 0) {
+	        if ((rs = perm(fbuf,-1,-1,nullptr,R_OK)) >= 0) {
 	            cchar	**vpp = &pip->mbfname ;
 	            if ((rs = proginfo_setentry(pip,vpp,fbuf,fl)) >= 0) {
-	                pip->f.mbtab = TRUE ;
+	                pip->f.mbtab = true ;
 	            }
 	        } else if (isNotAccess(rs)) {
 	            rs = SR_OK ;
 	        }
 	    } /* end if (ok) */
 	} /* end if (non-null) */
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	debugprintf("main/procfindmbtab: ret rs=%d\n",rs) ;
-	    if (pip->spfname != NULL)
-	    debugprintf("main/procfindmbtab: ret mbfn=%s\n",pip->mbfname) ;
-	}
-#endif
 	return rs ;
 }
 /* end subroutine (procfindmbtab) */
@@ -3083,8 +2736,8 @@ static int procfindmbtab(PROGINFO *pip,vecstr *slp)
 static int procdefs(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
-	if (pip->spambox == NULL) pip->spambox = SPAMUSER ;
-	if (pip->defbox != NULL) {
+	if (pip->spambox == nullptr) pip->spambox = SPAMUSER ;
+	if (pip->defbox != nullptr) {
 	    if (pip->defbox[0] != '\0') {
 		LOCINFO	*lip = pip->lip ;
 		if ((rs = locinfo_mboxcount(lip)) == 0) {
@@ -3102,9 +2755,9 @@ static int procspamsetup(PROGINFO *pip,vecobj *ilp)
 	MSGINFO		*mop ;
 	int		rs = SR_OK ;
 	int		i ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	for (i = 0 ; vecobj_get(ilp,i,&mop) >= 0 ; i += 1) {
-	    if (mop != NULL) {
+	    if (mop != nullptr) {
 	        mop->f.spamdeliver = mop->f.spam ;
 	    }
 	} /* end for */
@@ -3122,23 +2775,18 @@ static int procspambox(PROGINFO *pip,vecobj *ilp,vecobj *rlp,int tfd)
 	int		rs1 ;
 	int		c = 0 ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	debugprintf("main/procspambox: ent\n") ;
-#endif
-
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	if ((pip->progmode == progmode_dmail) && pip->f.optnospam) {
-	    if ((pip->spambox != NULL) && (pip->spambox[0] != '\0')) {
+	    if ((pip->spambox != nullptr) && (pip->spambox[0] != '\0')) {
 	        int	i ;
-	        int	f = FALSE ;
-	        cchar	*r = NULL ;
+	        int	f = false ;
+	        cchar	*r = nullptr ;
 
 	        {
 	            RECIP		*orp ;
 	            for (i = 0 ; (rs1 = vecobj_get(rlp,i,&orp)) >= 0 ; i += 1) {
-	                if (orp != NULL) {
+	                if (orp != nullptr) {
 	                    r = orp->recipient ;
 	                    f = recip_match(orp,pip->spambox,-1) ;
 	                    if (f) break ;
@@ -3146,12 +2794,7 @@ static int procspambox(PROGINFO *pip,vecobj *ilp,vecobj *rlp,int tfd)
 	            } /* end for */
 	        } /* end block */
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(5))
-	            debugprintf("main/procspambox: mid rs=%d f=%u\n",rs,f) ;
-#endif
-
-	        if ((rs >= 0) && (! f) && (r != NULL)) {
+	        if ((rs >= 0) && (! f) && (r != nullptr)) {
 	            RECIP	recip, *rp = &recip ;
 	            if ((rs = recip_start(rp,pip->spambox,-1)) >= 0) {
 	                if ((rs = procrecipvalid(pip,rp)) >= 0) {
@@ -3172,11 +2815,6 @@ static int procspambox(PROGINFO *pip,vecobj *ilp,vecobj *rlp,int tfd)
 	    } /* end if (enabled) */
 	} /* end if (progmode-dmail) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	debugprintf("main/procspambox: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procspambox) */
@@ -3189,7 +2827,7 @@ static int procspamboxing(PROGINFO *pip,vecobj *ilp,RECIP *rp)
 	int		i ;
 	int		c = 0 ;
 	for (i = 0 ; vecobj_get(ilp,i,&mop) >= 0 ; i += 1) {
-	    if ((mop != NULL) && mop->f.spamdeliver) {
+	    if ((mop != nullptr) && mop->f.spamdeliver) {
 		rs = procspamprogboxer(pip,rp,mop) ;
 		c += rs ;
 	    }
@@ -3205,12 +2843,6 @@ static int procspamprogboxer(PROGINFO *pip,RECIP *rp,MSGINFO *mop)
 	int		rs ;
 	int		c = 0 ;
 	cchar		*r = rp->recipient ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procspamprogboxer: moff=%u mlen=%u\n",
-	                        mop->moff,mop->mlen) ;
-#endif
 
 	if ((rs = procmsgid_update(pip,mop,r)) == 0) {
 	    c += 1 ;
@@ -3229,29 +2861,14 @@ static int procrecips(PROGINFO *pip,vecobj *mip,vecobj *rlp,int tfd)
 	int		rs ;
 	int		rs1 ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecips: ent\n") ;
-#endif
-
 	if ((rs = procrecip_addropen(pip)) >= 0) {
 	    RECIP	*rp ;
-	    int		i ;
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("main/procrecips: for-before rs=%d\n",rs) ;
-#endif
-	    for (i = 0 ; vecobj_get(rlp,i,&rp) >= 0 ; i += 1) {
-	        int	f_failed = FALSE ;
-	        if (rp != NULL) {
+	    for (int i = 0 ; vecobj_get(rlp,i,&rp) >= 0 ; i += 1) {
+	        int	f_failed = false ;
+	        if (rp != nullptr) {
 	            cchar	*r = rp->recipient ;
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("main/procrecips: recip=%s\n",r) ;
-#endif
 
 	            if (pip->debuglevel > 0) {
 	                bprintf(pip->efp, "%s: recip=%s\n",pn,r) ;
@@ -3266,16 +2883,11 @@ static int procrecips(PROGINFO *pip,vecobj *mip,vecobj *rlp,int tfd)
 	                    if ((rs = procrecip(pip,mip,rp,tfd)) >= 0) {
 	                        if (rp->n > 0) pip->c_delivered += 1 ;
 			    } else if (rs == 0) {
-	                        f_failed = TRUE ;
+	                        f_failed = true ;
 			    }
 	                } /* end if (procrecip_defmaildir) */
-#if	CF_DEBUG
-	                if (DEBUGLEVEL(4))
-	                    debugprintf("main/procrecips: "
-	                        "procrecip_defmaildir out rs=%d\n",rs) ;
-#endif
 	            } else if (rs == 0) {
-	                f_failed = TRUE ;
+	                f_failed = true ;
 	                recip_ds(rp,SR_NOTFOUND) ;
 	                if ((pip->debuglevel > 0) && (! pip->f.quiet)) {
 	                    fmt = "%s: NOTFOUND recip=%s\n" ;
@@ -3288,21 +2900,9 @@ static int procrecips(PROGINFO *pip,vecobj *mip,vecobj *rlp,int tfd)
 	        if (f_failed && (! pip->f.multirecip)) break ;
 	        if (rs < 0) break ;
 	    } /* end for (looping through recipients) */
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("main/procrecips: for-after rs=%d\n",rs) ;
-#endif
 	    rs1 = procrecip_addrclose(pip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (procrecip) */
-
-#if	CF_DEBUGN
-	nprintf(NDF,"main/procecips: ret rs=%d\n",rs) ;
-#endif
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecips: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -3319,14 +2919,6 @@ static int procrecip(PROGINFO *pip,vecobj *mip,RECIP *rp,int tfd)
 	cchar		*pn = pip->progname ;
 	cchar		*r = rp->recipient ;
 	cchar		*fmt ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecip: ent r=%s\n",r) ;
-#endif
-#if	CF_DEBUGN
-	nprintf(NDF,"main/procecip: ent\n") ;
-#endif
 
 	if (pip->progmode == progmode_dmail) {
 	    cchar	*md = rp->maildname ;
@@ -3346,38 +2938,15 @@ static int procrecip(PROGINFO *pip,vecobj *mip,RECIP *rp,int tfd)
 	    midkey.reciplen = -1 ;
 
 	    for (mn = 0 ; vecobj_get(mip,mn,&mop) >= 0 ; mn += 1) {
-	        if (mop == NULL) continue ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("main/procrecip: msg=%u off=%u mlen=%u\n",
-	                mn,mop->moff,mop->mlen) ;
-#endif
+	        if (mop == nullptr) continue ;
 
 	        if ((rs = procmsgid_update(pip,mop,r)) >= 0) {
 	            int	f_repeat = rs ;
-	            int	f_blacklist = FALSE ;
+	            int	f_blacklist = false ;
 	            int	f_deliver = (rs == 0) ;
-
-#if	CF_DEBUGN
-	nprintf(NDF,"main/procecip: update() rs=%d\n",rs) ;
-#endif
-
 /* repeat message-id? */
-
 	            if (f_deliver && pip->f.optnorepeat && f_repeat)
-	                f_deliver = FALSE ;
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4)) {
-	                debugprintf("main/procrecip: repeat deliver=%u\n",
-	                    f_deliver) ;
-	                debugprintf("main/procrecip: optnospam=%u\n",
-			    pip->f.optnospam) ;
-	                debugprintf("main/procrecip: f_spam=%u\n",
-			    mop->f.spam) ;
-		    }
-#endif /* CF_DEBUG */
+	                f_deliver = false ;
 
 /* is this address in any whitelist? */
 
@@ -3386,20 +2955,12 @@ static int procrecip(PROGINFO *pip,vecobj *mip,RECIP *rp,int tfd)
 	                rs = procrecip_addrcheck(pip,&lcur,mop,f_spam) ;
 			f_blacklist = ((rs > 0) && (! f_spam)) ;
 	                f_deliver = (rs == 0) ;
-#if	CF_DEBUG
-	                if (DEBUGLEVEL(4)) {
-	                    debugprintf("main/procrecip: addrcheck() rs=%d\n",
-				rs) ;
-	                    debugprintf("main/procrecip: spam deliver=%u\n",
-	                        f_deliver) ;
-			}
-#endif /* CF_DEBUG */
 	            } /* end if (list-check) */
 
 /* deliver or not based on what we know */
 
 	            if ((rs >= 0) && f_deliver) {
-	                mop->f.spamdeliver = FALSE ;
+	                mop->f.spamdeliver = false ;
 	                c += 1 ;
 	                rs = recip_mo(rp,mop->moff,mop->mlen) ;
 	            }
@@ -3429,49 +2990,24 @@ static int procrecip(PROGINFO *pip,vecobj *mip,RECIP *rp,int tfd)
 	        if (rs < 0) break ;
 	    } /* end for (looping through messages) */
 
-#if	CF_DEBUGN
-	nprintf(NDF,"main/procecip: mid rs=%d\n",rs) ;
-#endif
-
 	    pip->c_processed += 1 ;
 	    if ((rs >= 0) && (rp->n > 0)) {
 
 	        if (pip->progmode == progmode_dmail) {
 	            if (pip->f.optdeliver) {
 	                rs = progdeliver(pip,tfd,rp) ;
-
-#if	CF_DEBUGN
-		    nprintf(NDF,"main/procecip: progdeliver() rs=%d\n",rs) ;
-#endif
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("main/procrecip: "
-				"deliver=%u progdeliver() rs=%d\n",
-	                    pip->f.optdeliver,rs) ;
-#endif
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("main/procrecip: after progdeliver\n") ;
-#endif
-
 		    } /* end if (opt-deliver) */
 	        } else if (pip->progmode == progmode_dmailbox) {
 
 	            if (locinfo_mboxcount(lip) == 0) {
 			cchar	*bn = pip->defbox ;
-	                if ((bn != NULL) && (bn[0] != '\0')) {
+	                if ((bn != nullptr) && (bn[0] != '\0')) {
 	                    rs = locinfo_mboxadd(lip,bn,-1) ;
 	                }
 	            }
 
 	            if (rs >= 0) {
 	                rs = progboxer(pip,tfd,rp) ;
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("main/procrecip: progboxer() rs=%d\n",rs) ;
-#endif
 		    } /* end if (progboxer) */
 
 	        } /* end if (progmode-dmailbox) */
@@ -3520,15 +3056,6 @@ static int procrecip(PROGINFO *pip,vecobj *mip,RECIP *rp,int tfd)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (procrecip-addruser) */
 
-#if	CF_DEBUGN
-	nprintf(NDF,"main/procecip: ret rs=%d\n",rs) ;
-#endif
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecip: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procrecip) */
@@ -3537,12 +3064,6 @@ static int procrecipvalid(PROGINFO *pip,RECIP *rp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecipvalid: ent r=%s\n",
-		rp->recipient) ;
-#endif
 
 	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
 	    cint	pwlen = rs ;
@@ -3570,11 +3091,6 @@ static int procrecipvalid(PROGINFO *pip,RECIP *rp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecipvalid: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procrecipvalid) */
@@ -3589,12 +3105,8 @@ static int procrecip_addropen(PROGINFO *pip)
 	cchar		*pr = pip->pr ;
 	cchar		*sn = pip->searchname ;
 	if ((rs = lookaddr_start(&lip->la,pr,sn)) >= 0) {
-	    lip->open.la = TRUE ;
+	    lip->open.la = true ;
 	}
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecip_addropen: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (procrecip_addropen) */
@@ -3606,14 +3118,10 @@ static int procrecip_addrclose(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (lip->open.la) {
-	    lip->open.la = FALSE ;
+	    lip->open.la = false ;
 	    rs1 = lookaddr_finish(&lip->la) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecip_addrclose: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (procrecip_addrclose) */
@@ -3623,19 +3131,11 @@ static int procrecip_addrbegin(PROGINFO *pip,LOOKADDR_USER *curp,cchar *un)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecip_addrbegin: ent un=%s\n",un) ;
-#endif
-	if (curp == NULL) return SR_FAULT ;
-	if (un == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (un == nullptr) return SR_FAULT ;
 	if (lip->open.la) {
 	    rs = lookaddr_userbegin(&lip->la,curp,un) ;
 	}
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecip_addrbegin: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (procrecip_addrbegin) */
@@ -3671,11 +3171,6 @@ static int procrecip_addrcheck(PROGINFO *pip,LOOKADDR_USER *curp,
 		f_spam = rs ;
 	    }
 	} /* end if (lookup-address) */
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecip_addrcheck: ret rs=%d f=%u\n",
-		rs,f_spam) ;
-#endif
 	return (rs >= 0) ? f_spam : rs ;
 }
 /* end subroutine (procrecip_addrcheck) */
@@ -3686,22 +3181,11 @@ static int procrecip_addrchecker(PROGINFO *pip,LOOKADDR_USER *curp,
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
-	if ((a[0] != '\0') && (strpbrk(a,"@!") != NULL)) {
+	if ((a[0] != '\0') && (strpbrk(a,"@!") != nullptr)) {
 	            LOOKADDR	*lap = &lip->la ;
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("main/procrecip_addrchecker: a=%s\n",a) ;
-	    debugprintf("main/procrecip_addrchecker: f_spam=%u\n",f_spam) ;
-	}
-#endif
 	            rs = lookaddr_usercheck(lap,curp,a,f_spam) ;
 	            f_spam = rs ;
 	    } /* end if (qualified address) */
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecip_addrchecker: ret rs=%d f=%u\n",
-		rs,f_spam) ;
-#endif
 	return (rs >= 0) ? f_spam : rs ;
 }
 /* end subroutine (procrecip_addrchecker) */
@@ -3713,14 +3197,10 @@ static int procrecip_addrend(PROGINFO *pip,LOOKADDR_USER *curp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
-	if (curp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 	if (lip->open.la) {
 	    rs = lookaddr_userend(&lip->la,curp) ;
 	}
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecip_addrend: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (procrecip_addrend) */
@@ -3759,14 +3239,14 @@ static int procrecip_hasmailfile(PROGINFO *pip,RECIP *rp)
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (pip->progmode == progmode_dmail) {
-	    struct ustat	sb ;
+	    USTAT	sb ;
 	    vecstr		*mlp = &pip->maildirs ;
 	    int			i ;
 	    cchar		*r = rp->recipient ;
 	    cchar		*mdp ;
 	    char		tbuf[MAXPATHLEN+1] ;
 	    for (i = 0 ; vecstr_get(mlp,i,&mdp) >= 0 ; i += 1) {
-	        if (mdp != NULL) {
+	        if (mdp != nullptr) {
 	            if ((rs = mkpath2(tbuf,mdp,r)) >= 0) {
 	                if ((rs = uc_stat(tbuf,&sb)) >= 0) {
 	                    if (S_ISREG(sb.st_mode)) {
@@ -3792,7 +3272,7 @@ static int procrecip_defmaildir(PROGINFO *pip,RECIP *rp)
 	vecstr		*mlp = &pip->maildirs ;
 	int		rs = SR_OK ;
 	if (pip->progmode == progmode_dmail) {
-	    if ((rs = recip_getmailspool(rp,NULL)) == 0) {
+	    if ((rs = recip_getmailspool(rp,nullptr)) == 0) {
 	        cint	rsn = SR_NOTFOUND ;
 	        cchar		*mdp ;
 	        if ((rs = vecstr_get(mlp,0,&mdp)) >= 0) {
@@ -3803,10 +3283,6 @@ static int procrecip_defmaildir(PROGINFO *pip,RECIP *rp)
 	        }
 	    } /* end if (recip_getmailspool) */
 	} /* end if (progmode-dmail) */
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/procrecip_defmaildir: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (procrecip_defmaildir) */
@@ -3849,15 +3325,15 @@ static int procunavail(PROGINFO *pip,int rstat)
 
 	} /* end if (logging to the system) */
 
-	f = pip->f.optdivert && (pip->deadmaildname != NULL) ;
+	f = pip->f.optdivert && (pip->deadmaildname != nullptr) ;
 	if (f) {
-	    rs = perm(pip->deadmaildname,-1,-1,NULL,W_OK) ;
+	    rs = perm(pip->deadmaildname,-1,-1,nullptr,W_OK) ;
 	}
 
 	if (f && (rs >= 0)) {
 	    cchar	*un = DIVERTUSER ;
 
-	    pip->f.diverting = TRUE ;
+	    pip->f.diverting = true ;
 	    pip->maildname = pip->deadmaildname ;
 
 	    if (pip->open.logprog) {
@@ -3886,11 +3362,11 @@ static int procmboxes(PROGINFO *pip,cchar *sp,int sl)
 	cchar		*tp ;
 	cchar		*cp ;
 
-	if (sp == NULL) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
 	if (sl < 0) sl = strlen(sp) ;
 
-	while ((tp = strnpbrk(sp,sl,", :")) != NULL) {
+	while ((tp = strnpbrk(sp,sl,", :")) != nullptr) {
 	    if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
 	        c += 1 ;
 	        rs = locinfo_mboxadd(lip,cp,cl) ;
@@ -3919,7 +3395,7 @@ static int procmultierror(PROGINFO *pip,cchar *mfn)
 	if (pip->f.multirecip) {
 	    bfile	mfile, *mfp = &mfile ;
 
-	    if ((mfn == NULL) || (mfn[0] == '-')) mfn = BFILE_STDOUT ;
+	    if ((mfn == nullptr) || (mfn[0] == '-')) mfn = BFILE_STDOUT ;
 
 	    if ((rs = bopen(mfp,mfn,"wct",0644)) >= 0) {
 	        bprintf(mfp,"hello world!\n") ;
@@ -3940,7 +3416,7 @@ static int procfindsched(PROGINFO *pip,vecstr *slp)
 	for (i = 0 ; keys[i] != '\0' ; i += 1) {
 	    cint	kch = MKCHAR(keys[i]) ;
 	    int		vl = -1 ;
-	    cchar	*vp = NULL ;
+	    cchar	*vp = nullptr ;
 	    switch (kch) {
 	    case 'p':
 	        vp = pip->pr ;
@@ -3958,7 +3434,7 @@ static int procfindsched(PROGINFO *pip,vecstr *slp)
 	        vp = pip->homedname ;
 	        break ;
 	    } /* end switch */
-	    if ((rs >= 0) && (vp != NULL)) {
+	    if ((rs >= 0) && (vp != nullptr)) {
 	        char	kbuf[2] = { 0, 0 } ;
 	        kbuf[0] = kch ;
 	        rs = vecstr_envset(slp,kbuf,vp,vl) ;
@@ -3972,7 +3448,7 @@ static int procfindsched(PROGINFO *pip,vecstr *slp)
 static int procportcomsat(PROGINFO *pip) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	if (pip->portspec == NULL) pip->portspec = PORTSPEC_COMSAT ;
+	if (pip->portspec == nullptr) pip->portspec = PORTSPEC_COMSAT ;
 	if ((rs = getportnum(PROTONAME_COMSAT,pip->portspec)) == rsn) {
 	    rs = SR_OK ;
 	    pip->port_comsat = IPPORT_BIFFUDP ;
@@ -3987,15 +3463,15 @@ static int procportcomsat(PROGINFO *pip) noex {
 static int procmaildirdead(PROGINFO *pip,cchar *dp,int dl)
 {
 	int		rs = SR_OK ;
-	if (pip->deadmaildname == NULL) {
-	    NULSTR	ds ;
+	if (pip->deadmaildname == nullptr) {
+	    nulstr	ds ;
 	    cchar	*dname ;
 	    if ((rs = nulstr_start(&ds,dp,dl,&dname)) >= 0) {
-	        struct ustat	sb ;
+	        USTAT	sb ;
 	        if ((rs = u_stat(dname,&sb)) >= 0) {
 		    if (S_ISDIR(sb.st_mode)) {
 			cint	pm = (W_OK|W_OK) ;
-	                if ((rs = perm(dname,-1,-1,NULL,pm)) >= 0) {
+	                if ((rs = perm(dname,-1,-1,nullptr,pm)) >= 0) {
 			    cchar	**vpp = &pip->deadmaildname ;
 			    rs = proginfo_setentry(pip,vpp,dname,-1) ;
 		        } else if (isNotAccess(rs)) {
@@ -4016,15 +3492,15 @@ static int procmaildirdead(PROGINFO *pip,cchar *dp,int dl)
 static int procmaildircopy(PROGINFO *pip,cchar *dp,int dl)
 {
 	int		rs = SR_OK ;
-	if (pip->copymaildname == NULL) {
-	    NULSTR	ds ;
+	if (pip->copymaildname == nullptr) {
+	    nulstr	ds ;
 	    cchar	*dname ;
 	    if ((rs = nulstr_start(&ds,dp,dl,&dname)) >= 0) {
-	        struct ustat	sb ;
+	        USTAT	sb ;
 	        if ((rs = u_stat(dname,&sb)) >= 0) {
 		    if (S_ISDIR(sb.st_mode)) {
 			cint	pm = (W_OK|W_OK) ;
-	                if ((rs = perm(dname,-1,-1,NULL,pm)) >= 0) {
+	                if ((rs = perm(dname,-1,-1,nullptr,pm)) >= 0) {
 			    cchar	**vpp = &pip->copymaildname ;
 			    rs = proginfo_setentry(pip,vpp,dname,-1) ;
 		        } else if (isNotAccess(rs)) {
@@ -4050,10 +3526,10 @@ static int procmaildirs(PROGINFO *pip,PARAMOPT *pop)
 	    int		i ;
 	    cchar	*dns ;
 	    cchar	*tp ;
-	    for (i = 0 ; varmaildirs[i] != NULL ; i += 1) {
+	    for (i = 0 ; varmaildirs[i] != nullptr ; i += 1) {
 	        dns = getourenv(pip->envv,varmaildirs[i]) ;
-	        if (dns != NULL) {
-	            while ((tp = strpbrk(dns," :,\t\n")) != NULL) {
+	        if (dns != nullptr) {
+	            while ((tp = strpbrk(dns," :,\t\n")) != nullptr) {
 	                rs = procmaildir(pip,pop,dns,(tp-dns)) ;
 	                if (rs < 0) break ;
 	                c += rs ;
@@ -4083,14 +3559,14 @@ static int procmaildir(PROGINFO *pip,PARAMOPT *pop,cchar *dp,int dl)
 	int		c = 0 ;
 	cchar		*po = PO_MAILDIRS ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	if (dl < 0) dl = strlen(dp) ;
 
 	if ((rs = paramopt_haveval(pop,po,dp,dl)) == 0) {
 	    char	dname[MAXPATHLEN+1] ;
 	    if (mkpath1w(dname,dp,dl) > 0) {
-	        struct ustat	sb ;
+	        USTAT	sb ;
 	        if ((rs = u_stat(dname,&sb)) >= 0) {
 	            rs = paramopt_loads(pop,po,dp,dl) ;
 	            c += rs ;
@@ -4108,7 +3584,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
@@ -4129,34 +3605,34 @@ static int locinfo_finish(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	if (lip->open.la) {
-	    lip->open.la = FALSE ;
+	    lip->open.la = false ;
 	    rs1 = lookaddr_finish(&lip->la) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (lip->open.rn) {
-	    lip->open.rn = FALSE ;
+	    lip->open.rn = false ;
 	    rs1 = sysrealname_close(&lip->rn) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (lip->open.gm) {
-	    lip->open.gm = FALSE ;
+	    lip->open.gm = false ;
 	    rs1 = grmems_finish(&lip->gm) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (lip->open.mboxes) {
-	    lip->open.mboxes = FALSE ;
+	    lip->open.mboxes = false ;
 	    rs1 = vecstr_finish(&lip->mboxes) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (lip->open.stores) {
-	    lip->open.stores = FALSE ;
+	    lip->open.stores = false ;
 	    rs1 = vecstr_finish(&lip->stores) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -4172,8 +3648,8 @@ int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar vp[],int vl)
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
-	if (lip == NULL) return SR_FAULT ;
-	if (epp == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
+	if (epp == nullptr) return SR_FAULT ;
 
 	if (! lip->open.stores) {
 	    rs = vecstr_start(&lip->stores,4,0) ;
@@ -4183,14 +3659,14 @@ int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar vp[],int vl)
 	if (rs >= 0) {
 	    vecstr	*svp = &lip->stores ;
 	    int		oi = -1 ;
-	    if (*epp != NULL) {
+	    if (*epp != nullptr) {
 	        oi = vecstr_findaddr(svp,*epp) ;
 	    }
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 	        len = strnlen(vp,vl) ;
 	        rs = vecstr_store(svp,len,epp) ;
 	    } else {
-	        *epp = NULL ;
+	        *epp = nullptr ;
 	    }
 	    if ((rs >= 0) && (oi >= 0)) {
 	        vecstr_del(svp,oi) ;
@@ -4207,7 +3683,7 @@ int locinfo_gmcurbegin(LOCINFO *lip,LOCINFO_GMCUR *curp)
 {
 	int		rs = SR_OK ;
 
-	if (curp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (! lip->open.gm) {
 	    cint	max = 20 ;
@@ -4230,7 +3706,7 @@ int locinfo_gmcurend(LOCINFO *lip,LOCINFO_GMCUR *curp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (curp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	rs1 = grmems_curend(&lip->gm,&curp->gmcur) ;
 	if (rs >= 0) rs = rs1 ;
@@ -4244,8 +3720,8 @@ int locinfo_gmlook(LOCINFO *lip,LOCINFO_GMCUR *curp,cchar *gnp,int gnl)
 {
 	int		rs ;
 
-	if (curp == NULL) return SR_FAULT ;
-	if (gnp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (gnp == nullptr) return SR_FAULT ;
 
 	rs = grmems_lookup(&lip->gm,&curp->gmcur,gnp,gnl) ;
 
@@ -4258,8 +3734,8 @@ int locinfo_gmread(LOCINFO *lip,LOCINFO_GMCUR *curp,char ubuf[],int ulen)
 {
 	int		rs ;
 
-	if (curp == NULL) return SR_FAULT ;
-	if (ubuf == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (ubuf == nullptr) return SR_FAULT ;
 
 	rs = grmems_lookread(&lip->gm,&curp->gmcur,ubuf,ulen) ;
 
@@ -4272,10 +3748,10 @@ int locinfo_rncurbegin(LOCINFO *lip,LOCINFO_RNCUR *curp)
 {
 	int		rs = SR_OK ;
 
-	if (curp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (! lip->open.rn) {
-	    rs = sysrealname_open(&lip->rn,NULL) ;
+	    rs = sysrealname_open(&lip->rn,nullptr) ;
 	    lip->open.rn = (rs >= 0) ;
 	}
 
@@ -4293,7 +3769,7 @@ int locinfo_rncurend(LOCINFO *lip,LOCINFO_RNCUR *curp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (curp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	rs1 = sysrealname_curend(&lip->rn,&curp->rncur) ;
 	if (rs >= 0) rs = rs1 ;
@@ -4309,17 +3785,11 @@ int locinfo_rnlook(LOCINFO *lip,LOCINFO_RNCUR *curp,cchar *gnp,int gnl)
 	cint	fo = 0 ;
 	int		rs ;
 
-	if (pip == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (gnp == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (gnp == nullptr) return SR_FAULT ;
 
 	rs = sysrealname_look(&lip->rn,&curp->rncur,fo,gnp,gnl) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("main/locinfo_rnlook: sysrealname_look() rs=%d\n",
-	        rs) ;
-#endif
 
 	return rs ;
 }
@@ -4331,19 +3801,13 @@ int locinfo_rnread(LOCINFO *lip,LOCINFO_RNCUR *curp,char ubuf[],int ulen)
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
 
-	if (pip == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (ubuf == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (ubuf == nullptr) return SR_FAULT ;
 
 	if ((ulen >= 0) && (ulen < USERNAMELEN)) return SR_OVERFLOW ;
 
 	rs = sysrealname_lookread(&lip->rn,&curp->rncur,ubuf) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("main/locinfo_rnread: sysrealname_lookread() rs=%d\n",
-	        rs) ;
-#endif
 
 	return rs ;
 }
@@ -4354,8 +3818,8 @@ static int locinfo_mboxadd(LOCINFO *lip,cchar *mp,int ml)
 {
 	int		rs = SR_OK ;
 
-	if (lip == NULL) return SR_FAULT ;
-	if (mp == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
+	if (mp == nullptr) return SR_FAULT ;
 
 	if (! lip->open.mboxes) {
 	    rs = vecstr_start(&lip->mboxes,0,0) ;
@@ -4375,7 +3839,7 @@ static int locinfo_mboxcount(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	if (lip->open.mboxes) {
 	    rs = vecstr_count(&lip->mboxes) ;
@@ -4390,9 +3854,9 @@ int locinfo_mboxget(LOCINFO *lip,int i,cchar **rpp)
 {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
-	cchar		*rp = NULL ;
+	cchar		*rp = nullptr ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	if (lip->open.mboxes) {
 	    if ((rs = vecstr_get(&lip->mboxes,i,&rp)) >= 0)
@@ -4400,7 +3864,7 @@ int locinfo_mboxget(LOCINFO *lip,int i,cchar **rpp)
 	} else
 	    rs = SR_NOTFOUND ;
 
-	if (rpp != NULL)
+	if (rpp != nullptr)
 	    *rpp = rp ;
 
 	return (rs >= 0) ? rl : rs ;
@@ -4414,7 +3878,7 @@ static int mkreport(PROGINFO *pip,int argc,cchar **argv,int rrs)
 	int		rs ;
 	char		ubuf[USERNAMELEN+1] ;
 
-	if (pip->daytime == 0) pip->daytime = time(NULL) ;
+	if (pip->daytime == 0) pip->daytime = time(nullptr) ;
 
 	if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
 	    cmode	m = 0777 ;
@@ -4512,7 +3976,7 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,int ac,
 	    bprintf(rfp,fmt,id,ac) ;
 
 	    fmt = "%-15s a%02u=>%t<\n" ;
-	    for (i = 0 ; (i < ac) && (av[i] != NULL) ; i += 1) {
+	    for (i = 0 ; (i < ac) && (av[i] != nullptr) ; i += 1) {
 		cchar	*ap = av[i] ;
 	        rs = bprintf(rfp,fmt,id,i,ap,al) ;
 		if (rs < 0) break ;
@@ -4528,15 +3992,13 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,int ac,
 }
 /* end subroutine (mkreportout) */
 
-
 /* ARGSUSED */
-static int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m)
-{
+static int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m) noex {
 	cchar		*rdname = REPORTDNAME ;
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = mkdirs(rdname,m)) >= 0) {
-	    struct ustat	sb ;
+	    USTAT	sb ;
 	    if ((rs = uc_stat(rdname,&sb)) >= 0) {
 		const uid_t	uid = getuid() ;
 		const uid_t	u = sb.st_uid ;
@@ -4569,30 +4031,5 @@ static int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m)
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mktmpreportdir) */
-
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGRECIPS
-static int debugrecips(PROGINFO *pip,VECOBJ *rlp)
-{
-	int		rs = SR_OK ;
-	if (DEBUGLEVEL(5)) {
-	    RECIP	*rp ;
-	    int		i ;
-	    int		cl ;
-	    cchar	*cp ;
-	    debugprintf("main/debugrecips: rlp={%p} ¬\n",rlp) ;
-	    for (i = 0 ; vecobj_get(rlp,i,&rp) >= 0 ; i += 1) {
-	        if ((rs = recip_get(rp,&cp)) > 0) {
-	            cl = rs ;
-	            debugprintf("main/debugrecips: r=%t\n",cp,cl) ;
-	        }
-	        if (rs < 0) break ;
-	    } /* end for */
-	    debugprintf("main/debugrecips: ret rs=%d\n",rs) ;
-	}
-	return rs ;
-}
-/* end subroutine (debugrecips) */
-#endif /* CF_DEBUGS */
 
 
