@@ -1,6 +1,9 @@
-/* main */
+/* main SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* fairly generic (PCS) front-end */
+/* version %I% last-modified %G% */
 
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
@@ -73,6 +76,9 @@
 #include	<usystem.h>
 #include	<ucmallreg.h>
 #include	<getportnum.h>
+#include	<getax.h>
+#include	<getx.h>
+#include	<getxname.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<bfile.h>
@@ -86,14 +92,22 @@
 #include	<dater.h>
 #include	<estrings.h>
 #include	<ids.h>
+#include	<sfx.h>
+#include	<snx.h>
+#include	<sncpyx.h>
+#include	<mkx.h>
+#include	<mktmp.h>
 #include	<logsys.h>
 #include	<pcsconf.h>
+#include	<cfdec.h>
+#include	<matxstr.h>
+#include	<msgid.h>
+#include	<whitelist.h>
+#include	<recip.h>
+#include	<xperm.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
-#include	"msgid.h"
-#include	"whitelist.h"
-#include	"recip.h"
 #include	"config.h"
 #include	"defs.h"
 
@@ -112,48 +126,20 @@
 
 /* external subroutines */
 
-extern int	snscs(char *,int,const char *,const char *) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	headkeymat(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	getfname(const char *,const char *,int,char *) ;
-extern int	getserial(const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	mklogid(char *,int,const char *,int,int) ;
-extern int	mkgecosname(char *,int,const char *) ;
-extern int	mkrealame(char *,int,const char *,int) ;
-extern int	mkuibang(char *,int,USERINFO *) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
-extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,
-			const char *,const char *) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	pcstrustuser(const char *,const char *) ;
-extern int	pcsuserfile(const char *,const char *,const char *,
-			const char *,const char *) ;
-extern int	getmailgid(const char *,gid_t) ;
-extern int	initnow(struct timeb *,const char *,int) ;
+extern int	headkeymat(cchar *,cchar *,int) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
+extern int	getfname(cchar *,cchar *,int,char *) ;
+extern int	pcstrustuser(cchar *,cchar *) ;
+extern int	pcsuserfile(cchar *,cchar *,cchar *,
+			cchar *,cchar *) ;
+extern int	initnow(struct timeb *,cchar *,int) ;
 
-extern int	printhelp(bfile *,const char *,const char *,const char *) ;
-extern int	proginfo_setpiv(struct proginfo *,const char *,
+extern int	printhelp(bfile *,cchar *,cchar *,cchar *) ;
+extern int	proginfo_setpiv(struct proginfo *,cchar *,
 			const struct pivars *) ;
 extern int	proglogfname(struct proginfo *,char *,
-			const char *,const char *) ;
+			cchar *,cchar *) ;
 extern int	prognamecache_begin(struct proginfo *,USERINFO *) ;
 extern int	prognamecache_end(struct proginfo *) ;
 
@@ -161,31 +147,31 @@ extern int	progmsgs(struct proginfo *,bfile *,bfile *,vecobj *,vecobj *) ;
 extern int	deliver(struct proginfo *,int,RECIP *) ;
 extern int	boxer(struct proginfo *,int,RECIP *) ;
 extern int	parsenodespec(struct proginfo *,int,char *,int,
-			char *,const char *) ;
-extern int	expander(struct proginfo *,const char *,int,char *,int) ;
-extern int	mkrealname(char *,int,const char *,int) ;
+			char *,cchar *) ;
+extern int	expander(struct proginfo *,cchar *,int,char *,int) ;
+extern int	mkrealname(char *,int,cchar *,int) ;
 
-extern int	vecobj_recipadd(vecobj *,const char *,int) ;
+extern int	vecobj_recipadd(vecobj *,cchar *,int) ;
 extern int	vecobj_recipfins(vecobj *) ;
 
 extern int	prognotify(struct proginfo *,vecobj *,vecobj *) ;
 extern int	progcomsat(struct proginfo *,vecobj *,vecobj *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthexblock(const char *,int,const void *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern const char	*getourenv(const char **,const char *) ;
+extern cchar	*getourenv(cchar **,cchar *) ;
 
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*strdcpy3(char *,int,const char *,const char *,const char *) ;
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
+extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
@@ -203,17 +189,17 @@ extern char	*timestr_logz(time_t,char *) ;
 
 static int	usage(struct proginfo *) ;
 
-static int	logrecip(struct proginfo *,const char *,int,struct passwd *) ;
-static int	mkrecipname(char *,int,const char *) ;
+static int	logrecip(struct proginfo *,cchar *,int,struct passwd *) ;
+static int	mkrecipname(char *,int,cchar *) ;
 
-static int	loadrecips(struct proginfo *,VECOBJ *,const char *,int) ;
-static int	loadrecip(struct proginfo *,VECOBJ *,const char *,int) ;
+static int	loadrecips(struct proginfo *,VECOBJ *,cchar *,int) ;
+static int	loadrecip(struct proginfo *,VECOBJ *,cchar *,int) ;
 
 static int	procopts_setenv(struct proginfo *,KEYOPT *) ;
 static int	procopts_setpcs(struct proginfo *,KEYOPT *,vecstr *) ;
 static int	procopts(struct proginfo *,KEYOPT *) ;
 static int	procargs(struct proginfo *,struct arginfo *,BITS *,
-			VECOBJ *,const char *,const char *) ;
+			VECOBJ *,cchar *,cchar *) ;
 
 static int	procspamsetup(struct proginfo *,vecobj *) ;
 static int	procspambox(struct proginfo *,struct locinfo *,
@@ -221,20 +207,20 @@ static int	procspambox(struct proginfo *,struct locinfo *,
 static int	procrecips(struct proginfo *,struct locinfo *,
 			vecstr *,vecobj *,vecobj *,int) ;
 static int	procunavail(struct proginfo *,int) ;
-static int	procmboxes(struct proginfo *,const char *,int) ;
+static int	procmboxes(struct proginfo *,cchar *,int) ;
 
 static int	locinfo_start(struct locinfo *,struct proginfo *) ;
 static int	locinfo_finish(struct locinfo *) ;
-static int	locinfo_mboxadd(struct locinfo *,const char *,int) ;
+static int	locinfo_mboxadd(struct locinfo *,cchar *,int) ;
 static int	locinfo_mboxcount(struct locinfo *) ;
-static int	locinfo_mboxget(struct locinfo *,int,const char **) ;
+static int	locinfo_mboxget(struct locinfo *,int,cchar **) ;
 int		locinfo_rncurbegin(LOCINFO *,LOCINFO_RNCUR *) ;
 int		locinfo_rncurend(LOCINFO *,LOCINFO_RNCUR *) ;
-int		locinfo_rnlook(LOCINFO *,LOCINFO_RNCUR *,const char *,int) ;
+int		locinfo_rnlook(LOCINFO *,LOCINFO_RNCUR *,cchar *,int) ;
 int		locinfo_rnread(LOCINFO *,LOCINFO_RNCUR *,char *,int) ;
 int		locinfo_gmcurbegin(LOCINFO *,LOCINFO_GMCUR *) ;
 int		locinfo_gmcurend(LOCINFO *,LOCINFO_GMCUR *) ;
-int		locinfo_gmlook(LOCINFO *,LOCINFO_GMCUR *,const char *,int) ;
+int		locinfo_gmlook(LOCINFO *,LOCINFO_GMCUR *,cchar *,int) ;
 int		locinfo_gmread(LOCINFO *,LOCINFO_GMCUR *,char *,int) ;
 
 #if	CF_LOCSETENT
@@ -249,29 +235,6 @@ static int debugrecips(struct proginfo *,VECOBJ *) ;
 
 
 /* local variables */
-
-static const char *argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"HELP",
-	"pm",
-	"sn",
-	"rf",
-	"af",
-	"ef",
-	"of",
-	"if",
-	"lf",
-	"ms",
-	"md",
-	"mr",
-	"nm",
-	"oi",
-	"cp",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -296,7 +259,30 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const struct pivars	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	"pm",
+	"sn",
+	"rf",
+	"af",
+	"ef",
+	"of",
+	"if",
+	"lf",
+	"ms",
+	"md",
+	"mr",
+	"nm",
+	"oi",
+	"cp",
+	NULL
+} ;
+
+constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -304,7 +290,7 @@ static const struct pivars	initvars = {
 	VARPRPCS
 } ;
 
-static const struct mapex	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -317,27 +303,15 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progmodes[] = {
-	"dmail",
-	"dmailbox",
-	NULL
-} ;
-
 enum progmodes {
 	progmode_dmail,
 	progmode_dmailbox,
 	progmode_overlast
 } ;
 
-static const char *pcsopts[] = {
-	"cluster",
-	"pcsadmin",
-	"maildir",
-	"logsize",
-	"loglen",
-	"pcspoll",
-	"syslog",
-	"mailhist",
+constexpr cpcchar	progmodes[] = {
+	"dmail",
+	"dmailbox",
 	NULL
 } ;
 
@@ -353,29 +327,15 @@ enum pcsopts {
 	pcsopt_overlast
 } ;
 
-static const char *locopts[] = {
-	"deadmaildir",
-	"comsat",
-	"spam",
-	"logconf",
-	"logmsg",
-	"logzone",
-	"logenv",
-	"logmsgid",
-	"divert",
-	"forward",
-	"nospam",
-	"norepeat",
-	"nopollmsg",
-	"mbtab",
-	"boxdir",
-	"boxname",
-	"timeout",
-	"tomsgread",
-	"spambox",
+constexpr cpcchar	pcsopts[] = {
+	"cluster",
+	"pcsadmin",
+	"maildir",
+	"logsize",
+	"loglen",
+	"pcspoll",
+	"syslog",
 	"mailhist",
-	"deliver",
-	"finish",
 	NULL
 } ;
 
@@ -405,7 +365,33 @@ enum locopts {
 	locopt_overlast
 } ;
 
-static const char	*mailentries[] = {
+constexpr cpcchar	locopts[] = {
+	"deadmaildir",
+	"comsat",
+	"spam",
+	"logconf",
+	"logmsg",
+	"logzone",
+	"logenv",
+	"logmsgid",
+	"divert",
+	"forward",
+	"nospam",
+	"norepeat",
+	"nopollmsg",
+	"mbtab",
+	"boxdir",
+	"boxname",
+	"timeout",
+	"tomsgread",
+	"spambox",
+	"mailhist",
+	"deliver",
+	"finish",
+	NULL
+} ;
+
+constexpr cpcchar	mailentries[] = {
 	":saved",
 	"root",
 	"adm",
@@ -416,7 +402,7 @@ static const char	*mailentries[] = {
 } ;
 
 /* 'conf' for most regular programs */
-static const char	*sched1[] = {
+constexpr cpcchar	sched1[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -426,7 +412,7 @@ static const char	*sched1[] = {
 } ;
 
 /* whitelist file search (for system file) */
-static const char	*sched2[] = {
+constexpr cpcchar	sched2[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -438,7 +424,7 @@ static const char	*sched2[] = {
 } ;
 
 /* whitelist file search (for local-user file) */
-static const char	*sched3[] = {
+constexpr cpcchar	sched3[] = {
 	"%h/%e/%n/%n.%f",
 	"%h/%e/%n/%f",
 	"%h/%e/%n.%f",
@@ -449,7 +435,7 @@ static const char	*sched3[] = {
 	NULL
 } ;
 
-static const uchar	aterms[] = {
+constexpr char		aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -461,14 +447,12 @@ static const uchar	aterms[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
-{
+int main(int argc,mainv argv,mainv envv) {
 	struct proginfo	pi, *pip = &pi ;
 	struct locinfo	li, *lip = &li ;
 	struct arginfo	ainfo ;
@@ -505,23 +489,23 @@ const char	*envv[] ;
 	int		f_schedvar = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*logcname = LOGCNAME ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*pmspec = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*lfname = NULL ;
-	const char	*envfromaddr = NULL ;
-	const char	*uu_machine = NULL ;
-	const char	*uu_user = NULL ;
-	const char	*protospec = NULL ;
-	const char	*portspec = NULL ;
-	const char	*sp, *cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*logcname = LOGCNAME ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*pmspec = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*lfname = NULL ;
+	cchar	*envfromaddr = NULL ;
+	cchar	*uu_machine = NULL ;
+	cchar	*uu_user = NULL ;
+	cchar	*protospec = NULL ;
+	cchar	*portspec = NULL ;
+	cchar	*sp, *cp ;
 	char	userbuf[USERINFO_LEN + 1] ;
 	char	tmpfname[MAXPATHLEN + 1] ;
 	char	mbfname[MAXPATHLEN + 1] ;
@@ -1239,7 +1223,7 @@ const char	*envv[] ;
 /* establish what cluster we are on */
 
 	if (pip->cluster == NULL) {
-	    const char	*tp ;
+	    cchar	*tp ;
 
 	    if ((tp = strchr(pip->domainname,'.')) != NULL) {
 	        cl = (tp - pip->domainname) ;
@@ -1391,8 +1375,8 @@ const char	*envv[] ;
 
 	if (rs >= 0) {
 	    if ((rs1 = mkuiname(buf,BUFLEN,&u)) >= 0) {
-	        const char	*nn = pip->nodename ;
-	        const char	*un = pip->username ;
+	        cchar	*nn = pip->nodename ;
+	        cchar	*un = pip->username ;
 	        char	ucname[MAXNAMELEN+1] ;
 
 	        rs1 = snsds(ucname,MAXNAMELEN,pip->searchname,USERFSUF) ;
@@ -1421,7 +1405,7 @@ const char	*envv[] ;
 #endif
 
 	if ((rs >= 0) && pip->f.optlogenv) {
-	    const char	*env = LOGENVFNAME ;
+	    cchar	*env = LOGENVFNAME ;
 	    char	cname[MAXNAMELEN+1] ;
 	    char	envfname[MAXPATHLEN+1] ;
 
@@ -1454,7 +1438,7 @@ const char	*envv[] ;
 #endif
 
 	if ((rs >= 0) && pip->f.optlogzone) {
-	    const char	*zone = LOGZONEFNAME ;
+	    cchar	*zone = LOGZONEFNAME ;
 	    char	cname[MAXNAMELEN+1] ;
 	    char	zfname[MAXPATHLEN+1] ;
 
@@ -2051,7 +2035,7 @@ const char	*envv[] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    const char	*pn = pip->progname ;
+	    cchar	*pn = pip->progname ;
 	    debugprintf("main: comsatfname=%s\n",pip->comsatfname) ;
 	    debugprintf("main: c_delivered=%u\n",pip->c_delivered) ;
 	    if (pip->debuglevel > 0)
@@ -2438,7 +2422,7 @@ badprogstart:
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
 	        const int	size = (10*szof(uint)) ;
-	        const char	*ids = "main" ;
+	        cchar	*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
 	        debugprintf("main: MIoutnummax=%u\n",mi[ucmallreg_outnummax]) ;
@@ -2489,8 +2473,8 @@ struct proginfo	*pip ;
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-d] [-f <fromaddr>] <recip(s)> ...]\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -2516,7 +2500,7 @@ struct proginfo	*pip ;
 KEYOPT		*kop ;
 {
 	int		rs = SR_OK ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getenv(VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -2537,8 +2521,8 @@ vecstr		*setsp ;
 	int		i ;
 	int		fi, oi ;
 	int		kl, vl ;
-	const char	*tp, *cp ;
-	const char	*kp, *vp ;
+	cchar	*tp, *cp ;
+	cchar	*kp, *vp ;
 
 /* all PCS options *with* our component name prefix */
 
@@ -2614,7 +2598,7 @@ KEYOPT		*kop ;
 {
 	int		rs = SR_OK ;
 	int		cl ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getenv(VAROPTS)) != NULL)
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -2624,7 +2608,7 @@ KEYOPT		*kop ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int		oi, v ;
 	        int		kl, vl ;
-	        const char	*kp, *vp ;
+	        cchar	*kp, *vp ;
 
 	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
 
@@ -2635,13 +2619,13 @@ KEYOPT		*kop ;
 	                switch (oi) {
 	                case locopt_deadmaildir:
 	                    if ((vl > 0) && (pip->deadmaildname == NULL)) {
-	                        const char	**vpp = &pip->deadmaildname ;
+	                        cchar	**vpp = &pip->deadmaildname ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 	                case locopt_mbtab:
 	                    if ((vl > 0) && (pip->mbfname == NULL)) {
-	                        const char	**vpp = &pip->mbfname ;
+	                        cchar	**vpp = &pip->mbfname ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
@@ -2660,31 +2644,31 @@ KEYOPT		*kop ;
 	                        }
 	                    }
 	                    if (pip->comsatfname == NULL) {
-	                        const char	**vpp = &pip->comsatfname ;
+	                        cchar	**vpp = &pip->comsatfname ;
 	                        rs = proginfo_setentry(pip,vpp,cp,cl) ;
 	                    }
 	                    break ;
 	                case locopt_spam:
 	                    if ((vl > 0) && (pip->spamfname == NULL)) {
-	                        const char	**vpp = &pip->spamfname ;
+	                        cchar	**vpp = &pip->spamfname ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 	                case locopt_spambox:
 	                    if ((vl > 0) && (pip->spambox == NULL)) {
-	                        const char	**vpp = &pip->spambox ;
+	                        cchar	**vpp = &pip->spambox ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 	                case locopt_boxdir:
 	                    if ((vl > 0) && (pip->boxdname == NULL)) {
-	                        const char	**vpp = &pip->boxdname ;
+	                        cchar	**vpp = &pip->boxdname ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 	                case locopt_boxname:
 	                    if ((vl > 0) && (pip->boxname == NULL)) {
-	                        const char	**vpp = &pip->boxname ;
+	                        cchar	**vpp = &pip->boxname ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
@@ -2786,19 +2770,19 @@ KEYOPT		*kop ;
 	                switch (oi) {
 	                case pcsopt_maildir:
 	                    if ((vl > 0) && (pip->maildname == NULL)) {
-	                        const char	**vpp = &pip->maildname ;
+	                        cchar	**vpp = &pip->maildname ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 	                case pcsopt_cluster:
 	                    if ((vl > 0) && (pip->cluster == NULL)) {
-	                        const char	**vpp = &pip->cluster ;
+	                        cchar	**vpp = &pip->cluster ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 	                case pcsopt_pcsadmin:
 	                    if ((vl > 0) && (pip->username_pcs == NULL)) {
-	                        const char	**vpp = &pip->username_pcs ;
+	                        cchar	**vpp = &pip->username_pcs ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
@@ -2842,8 +2826,8 @@ struct proginfo	*pip ;
 struct arginfo	*aip ;
 BITS		*app ;
 VECOBJ		*rlp ;
-const char	*afname ;
-const char	*ofname ;
+cchar	*afname ;
+cchar	*ofname ;
 {
 	bfile		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -2854,7 +2838,7 @@ const char	*ofname ;
 	    ofname = BFILE_STDOUT ;
 
 	if ((rs = bopen(ofp,ofname,"wct",0666)) >= 0){
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    if (rs >= 0) {
 	        int	ai ;
@@ -2939,7 +2923,7 @@ const char	*ofname ;
 
 static int logrecip(pip,recip,rs1,pwp)
 struct proginfo	*pip ;
-const char	recip[] ;
+cchar	recip[] ;
 int		rs1 ;
 struct passwd	*pwp ;
 {
@@ -2947,7 +2931,7 @@ struct passwd	*pwp ;
 
 	if (pip->f.logmsg) {
 	    char	namebuf[REALNAMELEN + 1] = { 0 } ;
-	    const char	*fmt = "recip=%s" ;
+	    cchar	*fmt = "recip=%s" ;
 
 	    if ((rs1 >= 0) && (pwp != NULL)) {
 
@@ -2971,7 +2955,7 @@ struct passwd	*pwp ;
 static int mkrecipname(rname,rnamelen,gecos)
 char		rname[] ;
 int		rnamelen ;
-const char	gecos[] ;
+cchar	gecos[] ;
 {
 	int		rs1 ;
 	int		rl = 0 ;
@@ -2991,7 +2975,7 @@ const char	gecos[] ;
 static int loadrecips(pip,rlp,sp,sl)
 struct proginfo	*pip ;
 VECOBJ		*rlp ;
-const char	sp[] ;
+cchar	sp[] ;
 int		sl ;
 {
 	FIELD		fsb ;
@@ -3000,7 +2984,7 @@ int		sl ;
 
 	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
 	    int		fl ;
-	    const char	*fp ;
+	    cchar	*fp ;
 
 	    while ((fl = field_get(&fsb,aterms,&fp)) >= 0) {
 	        if (fl > 0) {
@@ -3022,7 +3006,7 @@ int		sl ;
 static int loadrecip(pip,rlp,np,nl)
 struct proginfo	*pip ;
 VECOBJ		*rlp ;
-const char	np[] ;
+cchar	np[] ;
 int		nl ;
 {
 	struct locinfo	*lip = pip->lip ;
@@ -3050,7 +3034,7 @@ int		nl ;
 
 	if ((np != NULL) && (np[0] != '\0')) {
 	    const int	nch = MKCHAR(np[0]) ;
-	    const char	*tp ;
+	    cchar	*tp ;
 
 	    if ((tp = strnchr(np,nl,'+')) != NULL) {
 	        nl = (tp-np) ;
@@ -3093,7 +3077,7 @@ int		nl ;
 #endif
 	    } else if (nch == MKCHAR('¡')) {
 	        LOCINFO_GMCUR	gc ;
-	        const char	*gnp = (np+1) ;
+	        cchar	*gnp = (np+1) ;
 	        const int	gnl = (nl-1) ;
 	        if ((rs = locinfo_gmcurbegin(lip,&gc)) >= 0) {
 	            if ((rs = locinfo_gmlook(lip,&gc,gnp,gnl)) >= 0) {
@@ -3312,7 +3296,7 @@ int		tfd ;
 	int		mn ;
 	int		sl ;
 	int		c = 0 ;
-	const char	*fmt ;
+	cchar	*fmt ;
 	char		pwbuf[PWBUFLEN + 1] ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
@@ -3829,7 +3813,7 @@ int		tfd ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
-	    const char	*pn = pip->progname ;
+	    cchar	*pn = pip->progname ;
 	    debugprintf("main/procrecips: ret rs=%d\n",rs) ;
 	    if (pip->debuglevel > 0)
 	        bprintf(pip->efp,"%s: procrecips-ret (%d)\n",pn,rs) ;
@@ -3857,11 +3841,11 @@ int		rstat ;
 	    LOGSYS	ls, *lsp = &ls ;
 	    const int	fac = LOG_MAIL ;
 	    int		opts = 0 ;
-	    const char	*logtab = pip->searchname ;
-	    const char	*logid = pip->logid ;
+	    cchar	*logtab = pip->searchname ;
+	    cchar	*logid = pip->logid ;
 
 	    if ((rs1 = logsys_open(lsp,fac,logtab,logid,opts)) >= 0) {
-	        const char	*fmt = "maildir=%s unavailable (%d)" ;
+	        cchar	*fmt = "maildir=%s unavailable (%d)" ;
 
 	        rs1 = logsys_printf(lsp,LOG_ERR,fmt,pip->maildname,rstat) ;
 
@@ -3905,14 +3889,14 @@ int		rstat ;
 /* end subroutine (procunavail) */
 
 
-static int procmboxes(struct proginfo *pip,const char *sp,int sl)
+static int procmboxes(struct proginfo *pip,cchar *sp,int sl)
 {
 	struct locinfo	*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		cl ;
 	int		c = 0 ;
-	const char	*tp ;
-	const char	*cp ;
+	cchar	*tp ;
+	cchar	*cp ;
 
 	if (sp == NULL) return SR_FAULT ;
 
@@ -4002,8 +3986,8 @@ struct locinfo	*lip ;
 #if	CF_LOCSETENT
 int locinfo_setentry(lip,epp,vp,vl)
 struct locinfo	*lip ;
-const char	**epp ;
-const char	vp[] ;
+cchar	**epp ;
+cchar	vp[] ;
 int		vl ;
 {
 	int		rs = SR_OK ;
@@ -4084,7 +4068,7 @@ LOCINFO_GMCUR	*curp ;
 int locinfo_gmlook(lip,curp,gnp,gnl)
 LOCINFO		*lip ;
 LOCINFO_GMCUR	*curp ;
-const char	*gnp ;
+cchar	*gnp ;
 int		gnl ;
 {
 	int		rs ;
@@ -4159,7 +4143,7 @@ LOCINFO_RNCUR	*curp ;
 int locinfo_rnlook(lip,curp,gnp,gnl)
 LOCINFO		*lip ;
 LOCINFO_RNCUR	*curp ;
-const char	*gnp ;
+cchar	*gnp ;
 int		gnl ;
 {
 	struct proginfo	*pip = lip->pip ;
@@ -4211,7 +4195,7 @@ int		ulen ;
 
 static int locinfo_mboxadd(lip,mp,ml)
 struct locinfo	*lip ;
-const char	*mp ;
+cchar	*mp ;
 int		ml ;
 {
 	int		rs = SR_OK ;
@@ -4252,11 +4236,11 @@ struct locinfo	*lip ;
 static int locinfo_mboxget(lip,i,rpp)
 struct locinfo	*lip ;
 int		i ;
-const char	**rpp ;
+cchar	**rpp ;
 {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
-	const char	*rp = NULL ;
+	cchar	*rp = NULL ;
 
 	if (lip == NULL) return SR_FAULT ;
 
@@ -4282,7 +4266,7 @@ static int debugrecips(struct proginfo *pip,VECOBJ *rlp)
 	    RECIP	*rp ;
 	    int	i ;
 	    int	cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    debugprintf("main/debugrecips: rlp={%p} ¬\n",rlp) ;
 	    for (i = 0 ; vecobj_get(rlp,i,&rp) >= 0 ; i += 1) {
 	        if ((rs = recip_get(rp,&cp)) > 0) {
