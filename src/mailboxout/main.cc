@@ -41,17 +41,19 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<termios.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
-#include	<sysexits.h>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<grp.h>
 #include	<syslog.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<getax.h>
+#include	<getx.h>
+#include	<getxname.h>
 #include	<baops.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -61,13 +63,16 @@
 #include	<dater.h>
 #include	<sbuf.h>
 #include	<sockaddress.h>
-#include	<exitcodes.h>
-#include	<mallocstuff.h>
-#include	<getax.h>
 #include	<userinfo.h>
 #include	<pcsconf.h>
 #include	<mailmsgid.h>
-#include	<ctdec.h>
+#include	<sfx.h>
+#include	<snx.h>
+#include	<sncpyx.h>
+#include	<mkx.h>
+#include	<mktmp.h>
+#include	<cfdec.h>
+#include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -92,24 +97,12 @@
 
 /* external subroutines */
 
-extern int	snscs(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
 extern int	matstr(const char **,const char *,int) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	headkeymat(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
 extern int	getfname(const char *,const char *,int,char *) ;
 extern int	getserial(const char *) ;
-extern int	getuid_name(cchar *,int) ;
-extern int	getheour(cchar *,char *,struct hostent *,char *,int) ;
 extern int	pcsuserfile() ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	vecstr_loadfile(vecstr *,int,const char *) ;
-extern int	isdigitlatin(int) ;
 
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	process(struct proginfo *,bfile *,bfile *,vecobj *) ;
@@ -168,18 +161,6 @@ static int	recip_free(struct recip *) ;
 
 /* local variables */
 
-static const char *argopts[] = {
-	"VERSION",
-	"VERBOSE",
-	"ROOT",
-	"TMPDIR",
-	"HELP",
-	"if",
-	"af",
-	"of",
-	NULL
-} ;
-
 enum argopts {
 	argopt_version,
 	argopt_verbose,
@@ -192,7 +173,19 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	*maildirs[] = {
+constexpr cpcchar	argopts[] = {
+	"VERSION",
+	"VERBOSE",
+	"ROOT",
+	"TMPDIR",
+	"HELP",
+	"if",
+	"af",
+	"of",
+	NULL
+} ;
+
+constexpr cpcchar	maildirs[] = {
 	"/var/mail",
 	"/var/spool/mail",
 	"/usr/mail",
@@ -200,7 +193,7 @@ static const char	*maildirs[] = {
 	NULL
 } ;
 
-static const char	*trustedusers[] = {
+constexpr cpcchar	trustedusers[] = {
 	"root",
 	"uucp",
 	"nuucp",
@@ -213,21 +206,6 @@ static const char	*trustedusers[] = {
 	"smtp",
 	"dam",
 	"morano",
-	NULL
-} ;
-
-static const char *progopts[] = {
-	"maildir",
-	"deadmaildir",
-	"comsat",
-	"spam",
-	"loglen",
-	"logzones",
-	"logenv",
-	"divert",
-	"logmsgid",
-	"nospam",
-	"norepeat",
 	NULL
 } ;
 
@@ -246,7 +224,22 @@ enum progopts {
 	progopt_overlast
 } ;
 
-static const struct errormap	errormaps[] = {
+constexpr cpcchar	progopts[] = {
+	"maildir",
+	"deadmaildir",
+	"comsat",
+	"spam",
+	"loglen",
+	"logzones",
+	"logenv",
+	"divert",
+	"logmsgid",
+	"nospam",
+	"norepeat",
+	NULL
+} ;
+
+constexpr errormap	errormaps[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_TXTBSY, EX_TEMPFAIL },
 	{ SR_ACCESS, EX_ACCESS },
@@ -255,7 +248,7 @@ static const struct errormap	errormaps[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*entries[] = {
+constexpr cpcchar	entries[] = {
 	":saved",
 	"root",
 	"adm",
@@ -266,15 +259,13 @@ static const char	*entries[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
-	struct ustat	sb ;
+int main(int argc,mainv argv,mainv envv) {
+	USTAT		sb ;
 	struct pcsconf	p ;
 	struct proginfo	pi, *pip = &pi ;
 	struct group	ge ;
