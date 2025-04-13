@@ -53,9 +53,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
+#include	<ugetpw.h>
 #include	<ucmallreg.h>
 #include	<getbufsize.h>
 #include	<getportnum.h>
+#include	<getx.h>
+#include	<getxname.h>
+#include	<getax.h>
 #include	<mallocxx.h>
 #include	<estrings.h>
 #include	<bits.h>
@@ -64,8 +68,6 @@
 #include	<nulstr.h>
 #include	<bfile.h>
 #include	<userinfo.h>
-#include	<getax.h>
-#include	<ugetpw.h>
 #include	<userattr.h>
 #include	<logfile.h>
 #include	<vecstr.h>
@@ -77,11 +79,20 @@
 #include	<ids.h>
 #include	<logsys.h>
 #include	<tmtime.hh>
+#include	<msgid.h>
+#include	<recip.h>
+#include	<sfx.h>
+#include	<snx.h>
+#include	<mkx.h>
+#include	<mktmp.h>
+#include	<mkdirs.h>
+#include	<cfdec.h>
+#include	<xperm.h>
+#include	<matxstr.h>
+#include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
-#include	"msgid.h"
-#include	"recip.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"proglog.h"
@@ -117,41 +128,12 @@
 
 /* external subroutines */
 
-extern int	sntmtime(char *,int,TMTIME *,cchar *) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	headkeymat(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,USTAT *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	mklogid(char *,int,cchar *,int,int) ;
-extern int	mkgecosname(char *,int,cchar *) ;
-extern int	mkrealame(char *,int,cchar *,int) ;
-extern int	mkuibang(char *,int,USERINFO *) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
-extern int	mkbestaddr(char *,int,cchar *,int) ;
 extern int	pcstrustuser(cchar *,cchar *) ;
-extern int	getnodename(char *,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	getserial(cchar *) ;
-extern int	getgid_def(cchar *,gid_t) ;
-extern int	getuid_name(cchar *,int) ;
-extern int	getuid_user(cchar *,int) ;
 extern int	initnow(struct timeb *,cchar *,int) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
 
 extern int	printhelp(bfile *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
