@@ -115,7 +115,6 @@ using std::nothrow ;			/* constant */
 /* local typedefs */
 
 typedef msgid_key	key ;
-typedef msgid_ent	ent ;
 
 
 /* external subroutines */
@@ -126,7 +125,7 @@ typedef msgid_ent	ent ;
 
 /* local structures */
 
-struct oldentry {
+struct oldent {
 	time_t		utime ;
 	int		ei ;
 } ;
@@ -188,9 +187,8 @@ static int	msgid_filechanged(msgid *) noex ;
 static int	msgid_filecheck(msgid *,time_t,int) noex ;
 static int	msgid_searchid(msgid *,cchar *,int,char **) noex ;
 static int	msgid_search(msgid *,msgid_key *,uint,char **) noex ;
-static int	msgid_searchempty(msgid *,oldentry *,char **) noex ;
-static int	msgid_searchemptyrange(msgid *,int,int,
-			oldentry *,char **) noex ;
+static int	msgid_searchempty(msgid *,oldent *,char **) noex ;
+static int	msgid_searchemptyrange(msgid *,int,int,oldent *,char **) noex ;
 static int	msgid_bufload(msgid *,int,int,char **) noex ;
 static int	msgid_bufupdate(msgid *,int,int,cchar *) noex ;
 static int	msgid_bufbegin(msgid *) noex ;
@@ -434,7 +432,7 @@ int msgid_curenum(msgid *op,msgid_cur *curp,msgide *ep) noex {
 }
 /* end subroutine (msgid_curenum) */
 
-int msgid_matchid(msgid *op,time_t dt,cchar *midp,int midl,msgid_ent *ep) noex {
+int msgid_matchid(msgid *op,time_t dt,cchar *midp,int midl,msgide *ep) noex {
 	int		rs ;
 	int		ei = 0 ;
 	if ((rs = msgid_magic(op,midp)) >= 0) {
@@ -458,7 +456,7 @@ int msgid_matchid(msgid *op,time_t dt,cchar *midp,int midl,msgid_ent *ep) noex {
 }
 /* end subroutine (msgid_matchid) */
 
-int msgid_match(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
+int msgid_match(msgid *op,time_t dt,msgid_key *kp,msgide *ep) noex {
 	int		rs ;
 	int		ei = 0 ;
 	if ((rs = msgid_magic(op,kp)) >= 0) {
@@ -468,14 +466,11 @@ int msgid_match(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
 	        if (op->fl.fileinit) {
 		    if (dt == 0) dt = getustime ;
 	            if ((rs = msgid_filecheck(op,dt,var.lread)) >= 0) {
-			uint	khash ;
-			int	midlen = xstrnlen(kp->mid,var.lmsgid) ;
-	        	khash = keyhash(kp,-1,midlen) ;
-			char	*bep ;
+			const uint	khash = keyhash(kp) ;
 	        	if ((rs = msgid_search(op,kp,khash,&bep)) >= 0) {
 	                    ei = rs ;
-	                    if (ep) {
-	                        msgide_all(ep,1,bep,op->entsz) ;
+	                    if (ep && bep) {
+	                        rs = ep->wr(bep) ;
 	                    }
 	                } /* end if */
 	                if (dt == 0) dt = getustime (nullptr) ;
@@ -489,9 +484,9 @@ int msgid_match(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
 /* end subroutine (msgid_match) */
 
 /* update a (recipient,message-id) tuple entry match */
-static int msgid_updates(msgid *,time_t,key *,ent *) noex ;
+static int msgid_updates(msgid *,time_t,msgid_key *,msgide *) noex ;
 
-int msgid_update(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
+int msgid_update(msgid *op,time_t dt,msgid_key *kp,msgide *ep) noex {
 	int		rs ;
 	if ((rs = msgid_magic(op,kp,ep)) >= 0) {
 	    rs = SR_FAULT ;
@@ -511,94 +506,98 @@ int msgid_update(msgid *op,time_t dt,msgid_key *kp,msgid_ent *ep) noex {
 }
 /* end subroutine (msgid_update) */
 
-static int msgid_updates(msgid *op,time_t dt,key *kp,ent *ep) noex {
-	off_t		uoff ;
-	const uint	khash = keyhash(kp,-1,midlen) ;
-	int		eoff ;
-	int		midlen = xstrnlen(kp->mid,var.lmsgid) ;
-	int		wlen{} ;
+static int msgid_updates(msgid *op,time_t dt,msgid_key *kp,ent *ep) noex {
+	int		rsn = SR_NOTFOUND ;
     	int		rs ;
+	int		rs1 ;
 	int		ei = 0 ;
-	bool		f_addition = false ;
-	bool		f_bufupdate = false ;
-	char		*bep ;
-        if ((rs = msgid_search(op,kp,khash,&bep)) >= 0) {
-            MSGIDE_UPDATE   m1 ;
-            ei = rs ;
-            if (ep != nullptr) {
-                msgide_all(ep,1,bep,op->entsz) ;
-            }
-        /* update the file buffer */
-            msgide_update(&m1,1,bep,op->entsz) ;
-            m1.count += 1 ;
-            m1.utime = dt ;
-            wlen = msgide_update(&m1,0,bep,op->entsz) ;
-        } else if (rs == SR_NOTFOUND) {
-            oldentry		old ;
-            MSGIDE_ALL		m0{} ;
-            MSGIDE_UPDATE	m1{} ;
-	    char		ebuf[op->entsz + 4] ;
-            m0.count = 0 ;
-            m0.utime = dt ;
-            m0.mtime = kp->mtime ;
-            m0.ctime = dt ;
-            m0.hash = khash ;
-            if (kp->from != nullptr) {
-                strwcpy(m0.from,kp->from,var.lfrom) ;
-            }
-            strwcpy(m0.messageid,kp->mid,var.lmsgid) ;
-            strwcpy(m0.recipient,kp->recip,var.lrecip) ;
-        /* find an empty slot if there is one */
-            rs = msgid_searchempty(op,&old,&bep) ;
-            ei = rs ;
-            if (rs == SR_NOTFOUND) {
-                rs = SR_OK ;
-                bep = ebuf ;
-                f_bufupdate = true ;
-                if (op->h.nentries < op->maxentry) {
-                    f_addition = true ;
-                    ei = op->h.nentries ;
-                } else {
-                    ei = old.ei ;
+	if (msgide ew ; (rs = ew.start) >= 0) {
+	    const uint	khash = keyhash(kp) ;
+	    off_t	uoff ;
+	    int		eoff ;
+	    int		midlen = xstrnlen(kp->mid,var.lmsgid) ;
+	    int		wlen{} ;
+	    bool	f_addition = false ;
+	    bool	f_bufupdate = false ;
+	    char	*bep ;
+            if ((rs = msgid_search(op,kp,khash,&bep)) >= 0) {
+                ei = rs ;
+                if (ep) {
+                    rs = ep->wr(bep) ;
                 }
-            } /* end if (entry not found) */
-        /* write to the buffer we have (either the file buffer or our own) */
-            wlen = msgide_all(&m0,0,bep,op->entsz) ;
-            if (ep != nullptr) {
-                msgide_all(ep,1,bep,op->entsz) ;
-            }
-            m0.count += 1 ;
-        /* also update the entry */
-            m1.count = 1 ;
-            m1.utime = m0.utime ;
-            msgide_update(&m1,0,bep,op->entsz) ;
-        /* update the in-core file buffer as needed or as appropriate */
-            if ((rs >= 0) && f_bufupdate && op->fl.writable) {
+                /* update the file buffer */
+	        if ((rs >= 0) && ((rs = ew.wr(bep)) >= 0)) {
+                    ew.count += 1 ;
+                    ew.utime = dt ;
+	            rs = ew.rd(bep) ;	/* <- updated */
+                    wlen = rs ;
+	        }
+            } else if (rs == SR_NOTFOUND) {
+                oldent		old ;
+                MSGIDE_ALL		m0{} ;
+                MSGIDE_UPDATE	m1{} ;
+	        char		ebuf[op->entsz + 4] ;
+                m0.count = 0 ;
+                m0.utime = dt ;
+                m0.mtime = kp->mtime ;
+                m0.ctime = dt ;
+                m0.hash = khash ;
+                strwcpy(m0.messageid,kp->mid,var.lmsgid) ;
+                strwcpy(m0.recipient,kp->recip,var.lrecip) ;
+                /* find an empty slot if there is one */
+                if ((rs = msgid_searchempty(op,&old,&bep)) >= 0) {
+                    ei = rs ;
+	        } else if (rs == SR_NOTFOUND) {
+                    rs = SR_OK ;
+                    bep = ebuf ;
+                    f_bufupdate = true ;
+                    if (op->h.nentries < op->maxentry) {
+                        f_addition = true ;
+                        ei = op->h.nentries ;
+                    } else {
+                        ei = old.ei ;
+                    }
+                } /* end if (entry not found) */
+                /* write the buffer we have (either file buffer or our own) */
+                wlen = msgide_all(&m0,0,bep,op->entsz) ;
+                if (ep != nullptr) {
+                    msgide_all(ep,1,bep,op->entsz) ;
+                }
+                m0.count += 1 ;
+                /* also update the entry */
+                m1.count = 1 ;
+                m1.utime = m0.utime ;
+                msgide_update(&m1,0,bep,op->entsz) ;
+                /* update the in-core file buffer as needed or as appropriate */
+                if ((rs >= 0) && f_bufupdate && op->fl.writable) {
+                    eoff = MSGID_FOTAB + (ei * op->entsz) ;
+                    msgid_bufupdate(op,eoff,wlen,ebuf) ;
+                }
+            } /* end if (match or not) */
+            if ((rs >= 0) && op->fl.writable) {
+                /* write back this entry */
                 eoff = MSGID_FOTAB + (ei * op->entsz) ;
-                msgid_bufupdate(op,eoff,wlen,ebuf) ;
-            }
-        } /* end if (match or not) */
-        if ((rs >= 0) && op->fl.writable) {
-            /* write back this entry */
-            eoff = MSGID_FOTAB + (ei * op->entsz) ;
-            uoff = eoff ;
-            if ((rs = u_pwrite(op->fd,bep,wlen,uoff)) >= wlen) {
-                if (dt == 0) dt = getustime ;
-                op->h.wcount += 1 ;
-                op->h.wtime = dt ;
-                if (f_addition) {
-                    op->h.nentries += 1 ;
-                    op->filesize += wlen ;
-                }
-                rs = msgid_writehead(op) ;
-                if ((rs >= 0) && op->fl.remote) {
-                    u_fsync(op->fd) ;
-                }
-            } /* end if (data write was successful) */
-        } /* end if (writing updated entry to file) */
-        /* update access time as appropriate */
-        if (dt == 0) dt = getustime ;
-        op->accesstime = dt ;
+                uoff = eoff ;
+                if ((rs = u_pwrite(op->fd,bep,wlen,uoff)) >= wlen) {
+                    if (dt == 0) dt = getustime ;
+                    op->h.wcount += 1 ;
+                    op->h.wtime = dt ;
+                    if (f_addition) {
+                        op->h.nentries += 1 ;
+                        op->filesize += wlen ;
+                    }
+                    rs = msgid_writehead(op) ;
+                    if ((rs >= 0) && op->fl.remote) {
+                        u_fsync(op->fd) ;
+                    }
+                } /* end if (data write was successful) */
+            } /* end if (writing updated entry to file) */
+            /* update access time as appropriate */
+            if (dt == 0) dt = getustime ;
+            op->accesstime = dt ;
+	    rs1 = ew.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (msgide) */
 	return (rs >= 0) ? ei : rs ;
 }
 /* end subroutine (msgid_updates) */
@@ -972,7 +971,7 @@ static int msgid_search(msgid *op,msgid_key *kp,uint khash,char **bepp) noex {
 /* end subroutine (msgid_search) */
 
 /* find an empty slot */
-static int msgid_searchempty(msgid *op,oldentry *oep,char **bepp) noex {
+static int msgid_searchempty(msgid *op,oldent *oep,char **bepp) noex {
 	uint		ra, rb ;
 	int		rs = SR_NOTFOUND ;
 	int		ei_start = 0 ;
@@ -1027,7 +1026,7 @@ static int msgid_searchempty(msgid *op,oldentry *oep,char **bepp) noex {
 
 /* search for an empty slot in a specified range of entries */
 static int msgid_searchemptyrange(msgid *op,int ei,int nmax,
-		oldentry *oep,char **bepp) noex {
+		oldent *oep,char **bepp) noex {
 	time_t		t ;
 	int		rs = SR_OK ;
 	int		eoff ;
