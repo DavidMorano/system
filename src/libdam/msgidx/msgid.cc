@@ -529,21 +529,19 @@ static int msgid_updates(msgid *op,time_t dt,msgid_key *kp,ent *ep) noex {
 	        if ((rs >= 0) && ((rs = ew.wr(bep)) >= 0)) {
                     ew.count += 1 ;
                     ew.utime = dt ;
-	            rs = ew.rd(bep) ;	/* <- updated */
+	            rs = ew.rd(bep) ;	/* <- update */
                     wlen = rs ;
 	        }
             } else if (rs == SR_NOTFOUND) {
                 oldent		old ;
-                MSGIDE_ALL		m0{} ;
-                MSGIDE_UPDATE	m1{} ;
 	        char		ebuf[op->entsz + 4] ;
-                m0.count = 0 ;
-                m0.utime = dt ;
-                m0.mtime = kp->mtime ;
-                m0.ctime = dt ;
-                m0.hash = khash ;
-                strwcpy(m0.messageid,kp->mid,var.lmsgid) ;
-                strwcpy(m0.recipient,kp->recip,var.lrecip) ;
+                ew.count = 0 ;
+                ew.utime = dt ;
+                ew.mtime = kp->mtime ;
+                ew.ctime = dt ;
+                ew.hash = khash ;
+		ew.loadmid(kp->mid) ;
+		ew.loadmid(kp->recip) ;
                 /* find an empty slot if there is one */
                 if ((rs = msgid_searchempty(op,&old,&bep)) >= 0) {
                     ei = rs ;
@@ -559,15 +557,15 @@ static int msgid_updates(msgid *op,time_t dt,msgid_key *kp,ent *ep) noex {
                     }
                 } /* end if (entry not found) */
                 /* write the buffer we have (either file buffer or our own) */
-                wlen = msgide_all(&m0,0,bep,op->entsz) ;
+                wlen = msgide(&m0,0,bep,op->entsz) ;
                 if (ep != nullptr) {
-                    msgide_all(ep,1,bep,op->entsz) ;
+                    msgide(ep,1,bep,op->entsz) ;
                 }
                 m0.count += 1 ;
                 /* also update the entry */
                 m1.count = 1 ;
                 m1.utime = m0.utime ;
-                msgide_update(&m1,0,bep,op->entsz) ;
+                msgide(&m1,0,bep,op->entsz) ;
                 /* update the in-core file buffer as needed or as appropriate */
                 if ((rs >= 0) && f_bufupdate && op->fl.writable) {
                     eoff = MSGID_FOTAB + (ei * op->entsz) ;
@@ -972,54 +970,41 @@ static int msgid_search(msgid *op,msgid_key *kp,uint khash,char **bepp) noex {
 
 /* find an empty slot */
 static int msgid_searchempty(msgid *op,oldent *oep,char **bepp) noex {
-	uint		ra, rb ;
+	uint		ra ;
+	uint		rb ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_NOTFOUND ;
 	int		ei_start = 0 ;
 	int		ei_mark ;
 	int		n = 0 ;
 	int		ei = 0 ;
-
 	oep->utime = INT_MAX ;
 	oep->ei = 0 ;
-
 	if (op->b.off >= MSGID_FLTOP) {
-
 	    ra = uceil((op->b.off - MSGID_FLTOP),op->entsz) ;
-
 	    rb = ufloor((op->b.off + op->b.len - MSGID_FLTOP),op->entsz) ;
-
 	    ei_start = ra / op->entsz ;
 	    n = (rb > ra) ? ((rb - ra) / op->entsz) : 0 ;
-
 	} /* end if */
-
 	ei_mark = ei_start ;
 	if (n > 0) {
-
-	    rs = msgid_searchemptyrange(op,ei_start,n,oep,bepp) ;
-	    ei = rs ;
-	    if (rs < 0)
+	    if ((rs = msgid_searchemptyrange(op,ei_start,n,oep,bepp)) >= 0) {
+	        ei = rs ;
+	    } else if (rs == rsn) {
 	        ei_start += n ;
-
+	    }
 	} /* end if */
-
 	n = (op->h.nentries - ei_start) ;
 	if ((rs == SR_NOTFOUND) && (n > 0)) {
 	    rs = msgid_searchemptyrange(op,ei_start,n,oep,bepp) ;
 	    ei = rs ;
-
 	} /* end if */
-
 	if ((rs == SR_NOTFOUND) && (ei_mark > 0)) {
-
 	    ei_start = 0 ;
 	    n = ei_mark ;
-
 	    rs = msgid_searchemptyrange(op,ei_start,n,oep,bepp) ;
 	    ei = rs ;
-
 	} /* end if */
-
 	return (rs >= 0) ? ei : rs ;
 }
 /* end subroutine (msgid_searchempty) */
@@ -1027,26 +1012,22 @@ static int msgid_searchempty(msgid *op,oldent *oep,char **bepp) noex {
 /* search for an empty slot in a specified range of entries */
 static int msgid_searchemptyrange(msgid *op,int ei,int nmax,
 		oldent *oep,char **bepp) noex {
-	time_t		t ;
 	int		rs = SR_OK ;
-	int		eoff ;
 	int		len ;
-	int		i ;
-	int		ne, n ;
 	int		f = false ;
-	char		*bp, *bep, *eidp ;
-
+	char		*bp ;
+	char		*bep{} ;
+	char		*eidp ;
 	while (! f) {
-
-	    ne = min(nmax,100) ;
-
-	    eoff = MSGID_FOTAB + (ei * op->entsz) ;
+	    cint	ne = min(nmax,100) ;
+	    cint	eoff = MSGID_FOTAB + (ei * op->entsz) ;
+	    int		t ;
+	    int		n ;
 	    len = ne * op->entsz ;
 	    rs = msgid_bufload(op,eoff,len,&bp) ;
 	    if (rs < op->entsz) break ;
-
 	    n = (rs / op->entsz) ;
-	    for (i = 0 ; i < n ; i += 1) {
+	    for (int i = 0 ; i < n ; i += 1) {
 	        bep = bp + (i * op->entsz) ;
 	        eidp = bep + MSGIDE_OMSGID ;
 	        f = (*eidp == '\0') ;
@@ -1057,14 +1038,11 @@ static int msgid_searchemptyrange(msgid *op,int ei,int nmax,
 	        }
 	        ei += 1 ;
 	    } /* end for */
-
 	} /* end while */
-
 	*bepp = bep ;
 	if ((rs >= 0) && (! f)) {
 	    rs = SR_NOTFOUND ;
 	}
-
 	return (rs >= 0) ? ei : rs ;
 }
 /* end subroutine (msgid_searchemptyrange) */
@@ -1078,7 +1056,7 @@ static int msgid_bufbegin(msgid *op) noex {
 	op->b.mlen = 0 ;
 	op->b.mbuf = nullptr ;
 	if (char *bp ; (rs = uc_malloc(bsz,&bp)) >= 0) {
-	    op->b.mlen = size ;
+	    op->b.mlen = bsz ;
 	    op->b.mbuf = bp ;
 	}
 	return rs ;
@@ -1102,15 +1080,15 @@ static int msgid_bufend(msgid *op) noex {
 /* try to buffer up some of the file */
 static int msgid_bufload(msgid *op,int roff,int rlen,char **rpp) noex {
 	off_t		poff ;
-	uint		bend, fext ;
+	uint		bend ;
+	uint		fext = (op->b.off + op->b.len) ;
 	uint		foff ;
-	uint		rext = (roff + rlen), ext ;
+	uint		rext = (roff + rlen) ;
+	uint		ext ;
 	int		rs = SR_OK ;
-	int		len = 0 ;
+	int		len = rlen ;
 	char		*rbuf ;
 	/* do we need to read in more data? */
-	len = rlen ;
-	fext = op->b.off + op->b.len ;
 	if ((roff < op->b.off) || (rext > fext)) {
 	    /* can we do an "add-on" type read operation? */
 	    bend = op->b.off + op->b.mlen ;
@@ -1299,15 +1277,14 @@ static int extutime(char *ep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if (msgide_update mu ; (rs = mu.start) >= 0) {
-	    cint	esz = mu.len.entsz ;
+	if (msgide mu ; (rs = mu.start) >= 0) {
 	    cchar	*cp = cast_const<ccharp>(ep) ;
-	    if ((rs = mu.wr(cp,esz)) >= 0) {
+	    if ((rs = mu.wru(cp)) >= 0) {
 	        rv = mu.utime ;
 	    }
 	    rs1 = mu.finish ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end if (msgide) */
 	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (extutime) */
@@ -1325,19 +1302,19 @@ static uint keyhash(msgid_key *kp) noex {
 vars::operator int () noex {
         int		rs ;
 	int		rs1 ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
 	    cint	hostnamelen = rs ;
 	    if ((rs = ucpagesize) >= 0) {
 		pagesize = rs ;
-		if (msgide_all ma ; (rs = ma.start) >= 0) {
+		if (msgide ma ; (rs = ma.start) >= 0) {
 		    {
-			var.entsz = ma.entsz ;
-			var.reciplen = ma.len.recipient ;
-			var.midlen = ma.len.messageid ;
+			entsz = ma.entsz ;
+			reciplen = ma.len.recipient ;
+			midlen = ma.len.messageid ;
 		    }
 		    rs1 = ma.finish ;
 		    if (rs >= 0) rs = rs1 ;
-		} /* end if (msgide_update) */
+		} /* end if (msgide) */
 	    }
 	} /* end if (getbufsize) */
 	return rs ;
