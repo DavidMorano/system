@@ -49,8 +49,8 @@ struct msgide ;
 	} ;
     } ; /* end struct (msgide_co) */
 
-    struct msgide_all {
-	friend		msgide_co<msgide_all> ;
+    struct msgide {
+	friend		msgide_co<msgide> ;
 	struct msgide_len {
 	    int		entsz ;
 	    int		recipient ;
@@ -66,55 +66,28 @@ struct msgide ;
 	uint		ctime{} ;	/* time-stamp creation */
 	uint		mtime{} ;	/* time-stamp message */
 	uint		hash ;
-	msgide_co<msgide_all>		start ;
-	msgide_co<msgide_all>		entsz ;
-	msgide_co<msgide_all>		finish ;
 	msgide_len	len ;
-	msgide_all() noex {
+	msgide_co<msgide>		start ;
+	msgide_co<msgide>		entsz ;
+	msgide_co<msgide>		finish ;
+	msgide() noex {
 	    start(this,msgidemem_start) ;
 	    entsz(this,msgidemem_entsz) ;
 	    finish(this,msgidemem_finish) ;
 	} ;
-	msgide_all(const msgide_all &) = delete ;
-	msgide_all &operator = (const msgide_all &) = delete ;
-	int rd(char *,int) noex ;
-	int rdu(char *,int) noex ;
+	msgide(const msgide &) = delete ;
+	msgide &operator = (const msgide &) = delete ;
+	int rd(char *,int = -1) noex ;
+	int rdu(char *,int = -1) noex ;
 	int wr(cchar *,int = -1) noex ;
 	int wru(cchar *,int = -1) noex ;
-	~msgide_all() {
+	~msgide() {
 	    finish() ;
 	} ;
     private:
 	int istart() noex ;
 	int ifinish() noex ;
-    } ; /* end struct (msgide_all) */
-    struct msgide_update {
-	friend		msgide_co<msgide_update> ;
-	struct msgide_len {
-	    int		entsz ;
-	} ;
-	uint		count{} ;
-	uint		utime{} ;
-	msgide_len	len ;
-	msgide_co<msgide_update>	start ;
-	msgide_co<msgide_update>	entsz ;
-	msgide_co<msgide_update>	finish ;
-	msgide_update() noex {
-	    start(this,msgidemem_start) ;
-	    entsz(this,msgidemem_entsz) ;
-	    finish(this,msgidemem_finish) ;
-	} ;
-	msgide_update(const msgide_update &) = delete ;
-	msgide_update &operator = (const msgide_update &) = delete ;
-	int rd(char *,int) noex ;
-	int wr(cchar *,int) noex ;
-	~msgide_update() {
-	    finish() ;
-	} ;
-    private:
-	int istart() noex ;
-	int ifinish() noex ;
-    } ; /* end struct (msgide_update) */
+    } ; /* end struct (msgide) */
 
 
 #endif /* MAGIDE_INCLUDE */

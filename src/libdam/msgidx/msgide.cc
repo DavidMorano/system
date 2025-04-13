@@ -76,7 +76,7 @@ static vars		var ;
 
 /* exported subroutines */
 
-int msgide_all::istart() noex {
+int msgide::istart() noex {
     	int		rs ;
 	int		esz = 0 ;
 	static cint	rsv = var ;
@@ -104,7 +104,7 @@ int msgide_all::istart() noex {
 	return (rs >= 0) ? esz : rs ;
 }
 
-int msgide_all::ifinish() noex {
+int msgide::ifinish() noex {
     	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
 	if (a) {
@@ -120,7 +120,7 @@ int msgide_all::ifinish() noex {
 	return rs ;
 }
 
-int msgide_all::wr(cchar *mbuf,int mlen) noex {
+int msgide::wr(cchar *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (mbuf) {
@@ -147,9 +147,9 @@ int msgide_all::wr(cchar *mbuf,int mlen) noex {
 	} /* end if (non-null) */
 	return rs ;
 } 
-/* end method (msgide_all::wr) */
+/* end method (msgide::wr) */
 
-int msgide_all::wru(cchar *mbuf,int mlen) noex {
+int msgide::wru(cchar *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (mbuf) {
@@ -169,12 +169,13 @@ int msgide_all::wru(cchar *mbuf,int mlen) noex {
 	} /* end if (non-null) */
 	return rs ;
 } 
-/* end method (msgide_all::wru) */
+/* end method (msgide::wru) */
 
-int msgide_all::rd(char *mbuf,int mlen) noex {
+int msgide::rd(char *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (mbuf) {
+	    if (mlen < 0) mlen = len.entsz ;
 	    rs = SR_INVALID ;
 	    if (mlen > 0) {
 		cint	maxhost = var.maxhostlen ;
@@ -197,10 +198,11 @@ int msgide_all::rd(char *mbuf,int mlen) noex {
 }
 /* end subroutine (entry_all::rd) */
 
-int msgide_all::rdu(char *mbuf,int mlen) noex {
+int msgide::rdu(char *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (mbuf) {
+	    if (mlen < 0) mlen = len.entsz ;
 	    rs = SR_INVALID ;
 	    if (mlen > 0) {
 	        if (serialbuf sb ; (rs = sb.start(mbuf,mlen)) >= 0) {
@@ -217,67 +219,11 @@ int msgide_all::rdu(char *mbuf,int mlen) noex {
 }
 /* end subroutine (entry_all::rdu) */
 
-int msgide_update::istart() noex {
-    	int		rs = SR_OK ;
-	int		esz = 0 ;
-	esz += szof(count) ;
-	esz += szof(utime) ;
-	len.entsz = iceil(esz,szof(int)) ;
-	esz = len.entsz ;
-    	return (rs >= 0) ? esz : rs ;
-}
-
-int msgide_update::ifinish() noex {
-    	int		rs = SR_OK ;
-    	return rs ;
-}
-
-int msgide_update::wr(cchar *mbuf,int mlen) noex {
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	if (mbuf) {
-	    rs = SR_INVALID ;
-	    if (mlen > 0) {
-		char	*buf = cast_const<charp>(mbuf) ;
-	        if (serialbuf sb ; (rs = sb.start(buf,mlen)) >= 0) {
-		    {
-			sb >> count ;
-			sb >> utime ;
-	    	    }
-	            rs1 = sb.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (serialbuf) */
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
-} 
-/* end method (msgide_update::wr) */
-
-int msgide_update::rd(char *mbuf,int mlen) noex {
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	if (mbuf) {
-	    rs = SR_INVALID ;
-	    if (mlen > 0) {
-	        if (serialbuf sb ; (rs = sb.start(mbuf,mlen)) >= 0) {
-		    {
-			sb << count ;
-			sb << utime ;
-		    }
-	            rs1 = sb.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (serialbuf) */
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (msgide_update::rd) */
-
 
 /* local subroutines */
 
 template<> 
-msgide_co<msgide_all>::operator int () noex {
+msgide_co<msgide>::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
@@ -294,27 +240,7 @@ msgide_co<msgide_all>::operator int () noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (msgide_co<msgide_all>::operator) */
-
-template<> 
-msgide_co<msgide_update>::operator int () noex {
-	int		rs = SR_BUGCHECK ;
-	if (op) {
-	    switch (w) {
-	    case msgidemem_start:
-	        rs = op->istart() ;
-	        break ;
-	    case msgidemem_entsz:
-	        rs = op->len.entsz ;
-	        break ;
-	    case msgidemem_finish:
-	        rs = op->ifinish() ;
-	        break ;
-	    } /* end switch */
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end method (msgide_co<msgide_update>::operator) */
+/* end method (msgide_co<msgide>::operator) */
 
 vars::operator int () noex {
     	int		rs ;
