@@ -1,11 +1,12 @@
-/* main */
+/* main SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* front-end (everything) for MAILPOLLD */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
-
 
 /* revision history:
 
@@ -48,12 +49,13 @@
 #include	<mallocstuff.h>
 #include	<mcmsg.h>
 #include	<msgid.h>
+#include	<cfdec.h>
+#include	<isx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
-
 
 
 /* local defines */
@@ -86,10 +88,7 @@
 
 /* external subroutines */
 
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
 extern int	listenusd(cchar *,int,int) ;
-extern int	isdigitlatin(int) ;
 
 extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strbasename(char *) ;
@@ -113,17 +112,6 @@ static int	helpfile(cchar *,bfile *) ;
 
 /* local variables */
 
-static cchar *argopts[] = {
-	"ROOT",
-	"DEBUG",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"LOG",
-	"MAKEDATE",
-	NULL
-} ;
-
 enum argopts {
 	argopt_root,
 	argopt_debug,
@@ -136,14 +124,24 @@ enum argopts {
 } ;
 
 
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"DEBUG",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"LOG",
+	"MAKEDATE",
+	NULL
+} ;
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
+int main(int argc,mainv argv,mainv envv) {
 	struct proginfo	pi, *pip = &pi ;
 
 	struct msghdr	mh ;
@@ -152,7 +150,7 @@ char	*envv[] ;
 
 	struct iovec	vecs[NIOVECS] ;
 
-	struct ustat	sb ;
+	USTAT		sb ;
 
 	USERINFO	u ;
 
@@ -257,7 +255,7 @@ char	*envv[] ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -384,7 +382,7 @@ char	*envv[] ;
 	            } else {
 
 	                while (akl--) {
-			    const int	kc = MKCHAR(*akp) ;
+			    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
