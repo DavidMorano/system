@@ -81,6 +81,8 @@ struct msgide ;
 	int rdu(char *,int = -1) noex ;
 	int wr(cchar *,int = -1) noex ;
 	int wru(cchar *,int = -1) noex ;
+	int loadrec(cchar *,int = -1) noex ;
+	int loadmid(cchar *,int = -1) noex ;
 	~msgide() {
 	    finish() ;
 	} ;

@@ -33,6 +33,8 @@
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<serialbuf.h>
+#include	<sncpyx.h>
+#include	<snwcpy.h>
 #include	<localmisc.h>
 
 #include	"msgide.hh"
@@ -196,7 +198,7 @@ int msgide::rd(char *mbuf,int mlen) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (entry_all::rd) */
+/* end subroutine (msgide::rd) */
 
 int msgide::rdu(char *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
@@ -217,7 +219,33 @@ int msgide::rdu(char *mbuf,int mlen) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (entry_all::rdu) */
+/* end method (msgide::rdu) */
+
+int msgide::loadrec(cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (sp) {
+	    if (sl < 0) sl = xstrnlen(sp,len.recipient) ;
+	    rs = SR_INVALID ;
+	    if (sl > 0) {
+		rs = snwcpy(recipient,len.recipient,sp,sl) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (msgide::loadrec) */
+
+int msgide::loadmid(cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (sp) {
+	    if (sl < 0) sl = xstrnlen(sp,len.messageid) ;
+	    rs = SR_INVALID ;
+	    if (sl > 0) {
+		rs = snwcpy(messageid,len.messageid,sp,sl) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (msgide::loadmid) */
 
 
 /* local subroutines */
