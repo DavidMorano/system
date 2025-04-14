@@ -59,7 +59,7 @@
 #include	<hash.h>
 #include	<strwcpy.h>
 #include	<funmode.hh>
-#include	<strnisfiledesc.h>
+#include	<strnxcmp.h>		/* |strnncmp(3uc)| */
 #include	<isfiledesc.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -476,8 +476,8 @@ int msgid_match(msgid *op,time_t dt,msgid_key *kp,msgide *ep) noex {
 		    cfm		fc = funmode::rd ;
 		    if (dt == 0) dt = getustime ;
 	            if ((rs = msgid_filecheck(op,dt,fc)) >= 0) {
-			const uint	khash = keyhash(kp) ;
-			char		*bep ;
+			cuint	khash = keyhash(kp) ;
+			char	*bep ;
 	        	if ((rs = msgid_search(op,kp,khash,&bep)) >= 0) {
 	                    ei = rs ;
 	                    if (ep && bep) {
