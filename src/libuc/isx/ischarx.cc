@@ -14,7 +14,7 @@
 	= 2011-08-19, David A­D­ Morano
 	I changed this to use the C++11 |bitset| object instead of
 	an array of bytes (holding bits for lookup) for some of the
-	single-bit truth-value observers. I also changed the
+	single-bit truth-value observers.  I also changed the
 	|ishexlatin()| subroutine to use a lookup table (implemented
 	w/ C++11 |bitset|) rather than computing the answer on the
 	fly.  Oringally, a look-up table was used to implement that
@@ -27,13 +27,13 @@
 	revision note above), I changed that subroutine to use the
 	computed version (both versions were in the code with only
 	a compile-time preprocessor define used to determine which
-	version got compiled in). I also took out (erased out) the
+	version got compiled in).  I also took out (erased out) the
 	computed version of that subroutine with this update and
-	also removed the associated preprocessor define. So the
+	also removed the associated preprocessor define.  So the
 	current code only has a look-up table version -- in the
 	form of looking up the value inside of a C++11 |bitset|
 	object -- and it is probably slower than the previous
-	computed version. But whatever, I am not so obscessed with
+	computed version.  But whatever, I am not so obscessed with
 	performance as I once was.  Rather, now-a-days we all
 	(including myself I think) are more obscessed with having
 	readable code.  The old look-up table version was (indeed)
@@ -43,7 +43,7 @@
 	= 2023-10-23, David A-D- Morano
 	I changed the instantiated helper object ('ischarx_data') to
 	be initialized w/ C++20 |constinit| keyword.  I did it because
-	... it could be done. There is not really a better reason.
+	... it could be done.  There is not really a better reason.
 
 */
 
@@ -107,10 +107,8 @@
 
 	Description:
 	This subroutine is similar to the |isalnum(3c)| subroutine
-	except that it checks if characters are "dictionary"
-	significant.  Dictionary significant characters are:
-		letters
-		digits
+	except that a space character is considered a character (but
+	is otherwise not used in a comparison).
 
 	Synopsis:
 	int isdict(int ch) noex
@@ -142,16 +140,16 @@
 
 
 	Notes:
-	1. It is 2011. This implemetation has remnants of using the
+	1. It is 2011.  This implemetation has remnants of using the
 	|char(3uc)| facility for some of our functions (determining
 	lower or upper case for example).  I do not apologize for
 	that.  That old |char(3uc)| facility has earned its place
 	in solid gold for all the work is has done over these last
 	few (about three) decades (and more).  This all (almost
 	everything here and elsewhere) came from my old embedded days
-	in the 1980s, when I had to litterally write every single
+	in the 1980s, when I had to literally write every single
 	thing from absolute scratch.  So I do not apologize for still
-	using (grandfathered in) some of my old code pieces. Enjoy.
+	using (grandfathered in) some of my old code pieces.  Enjoy.
 		-- 2011-08-19, David A-D- Morano
 
 *******************************************************************************/
@@ -190,15 +188,9 @@ using std::bitset ;			/* type */
 /* external variables */
 
 
-/* forward references */
-
-
-/* local variables */
+/* local structures */
 
 constexpr int   chtablen = (UCHAR_MAX+1) ;
-
-
-/* local structures */
 
 namespace {
     struct ischarinfo {
@@ -361,12 +353,26 @@ bool iswhite(int ch) noex {
 bool isdict(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < 0x100)) {
-	    f = (ch < 0x80) && ischarx_data.isalnum[ch] ;
-	    f = f || ((ch >= 0xC0) && (ch != 0xD7) && (ch != 0xF7)) ;
+	    f = ischarx_data.isalnum[ch] || (ch == 0x20) ;
 	}
 	return f ;
 }
 /* end subroutine (isdict) */
+
+bool iscmdstart(int ch) noex {
+	bool		f = false ;
+	f = f || (ch == CH_ESC) ;
+	f = f || (ch == CH_CSI) ;
+	f = f || (ch == CH_DCS) ;
+	f = f || (ch == CH_SS3) ;
+	return f ;
+}
+/* end subroutine (iscmdstart) */
+
+bool ishdrkey(int ch) noex {
+	return (isalnumlatin(ch) || (ch == '-') || (ch == '_')) ;
+}
+/* end subroutine (ishdrkey) */
 
 /* is it 7-bit text (no controls or other weirdo) */
 bool ismmclass_7bit(int ch) noex {
@@ -407,21 +413,6 @@ bool ismmclass_binary(int ch) noex {
 	return f ;
 }
 /* end subroutine (ismmclass_binary) */
-
-bool iscmdstart(int ch) noex {
-	bool		f = false ;
-	f = f || (ch == CH_ESC) ;
-	f = f || (ch == CH_CSI) ;
-	f = f || (ch == CH_DCS) ;
-	f = f || (ch == CH_SS3) ;
-	return f ;
-}
-/* end subroutine (iscmdstart) */
-
-bool ishdrkey(int ch) noex {
-	return (isalnumlatin(ch) || (ch == '-') || (ch == '_')) ;
-}
-/* end subroutine (ishdrkey) */
 
 
 /* COMMENTS */
