@@ -59,6 +59,7 @@
 #include	<hash.h>
 #include	<strwcpy.h>
 #include	<funmode.hh>
+#include	<strnisfiledesc.h>
 #include	<isfiledesc.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -906,29 +907,35 @@ int msgid_fileclose(msgid *op) noex {
 /* search for an entry by MESSAGE-ID */
 static int msgid_searchid(msgid *op,cchar *midp,int midl,char **bepp) noex {
 	cint		ne = 100 ;
-	int		rs = SR_OK ;
-	int		len ;
-	int		n ;
+	int		rs ;
+	int		rs1 ;
 	int		ei = 0 ;
 	bool		f = false ;
-	char		*bp, *bep, *eidp ;
-	while (! f) {
-	    cint	eoff = MSGID_FOTAB + (ei * op->entsz) ;
-	    len = ne * op->entsz ;
-	    rs = msgid_bufload(op,eoff,len,&bp) ;
-	    if (rs < op->entsz) break ;
-	    n = (rs / op->entsz) ;
-	    for (int i = 0 ; i < n ; i += 1) {
-	        bep = bp + (i * op->entsz) ;
-	        eidp = bep + MSGIDE_OMSGID ;
-	        f = matfield(midp,midl,eidp,var.lmsgid) ;
-	        if (f) break ;
-	        ei += 1 ;
-	    } /* end for */
-	} /* end while */
-	if ((rs >= 0) && f) {
-	    *bepp = bep ;
-	}
+	if (msgide ma ; (rs = ma.start) >= 0) {
+	    int		n ;
+	    char	*bp ;
+	    while ((rs >= 0) && (! f)) {
+	        cint	eoff = MSGID_FOTAB + (ei * op->entsz) ;
+	        cint	len = ne * op->entsz ;
+	        rs = msgid_bufload(op,eoff,len,&bp) ;
+	        if (rs < op->entsz) break ;
+	        n = (rs / op->entsz) ;
+	        for (int i = 0 ; i < n ; i += 1) {
+	            cchar	*bep = bp + (i * op->entsz) ;
+		    if ((rs = ma.wr(bep)) >= 0) {
+	                cchar	*cp = ma.messageid ;
+	                f = strnncmp(midp,midl,cp,var.lmsgid) ;
+		    } /* end if (msgide_wr) */
+	            if (f) break ;
+	            ei += 1 ;
+	        } /* end for */
+	    } /* end while */
+	    if ((rs >= 0) && f) {
+	        *bepp = bep ;
+	    }
+	    rs1 = ma.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (msgide) */
 	if ((rs >= 0) && (! f)) {
 	    rs = SR_NOTFOUND ;
 	}
@@ -1190,7 +1197,7 @@ static int msgid_writehead(msgid *op) noex {
 }
 /* end subroutine (msgid_writehead) */
 
-static int filemagic(MSGID_FM *mp, cfm fm, char *mbuf) noex {
+static int filemagic(MSGID_FM *mp,cfm fm, char *mbuf) noex {
     	cint		msz = MSGID_MAGICSIZE ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
