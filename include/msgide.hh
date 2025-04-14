@@ -27,16 +27,16 @@
 #include	<usysrets.h>
 
 
-    enum msgidemems {
+enum msgidemems {
     	msgidemem_start,
 	msgidemem_entsz,
 	msgidemem_finish,
 	msgidemem_overlast
-    } ;
+} ;
 
 struct msgide ;
 
-    template<typename T> struct msgide_co {
+template<typename T> struct msgide_co {
 	T		*op = nullptr ;
 	int		w = -1 ;
 	void operator () (T *p,int m) noex {
@@ -47,9 +47,9 @@ struct msgide ;
 	int operator () () noex { 
 	    return operator int () ;
 	} ;
-    } ; /* end struct (msgide_co) */
+} ; /* end struct (msgide_co) */
 
-    struct msgide {
+struct msgide {
 	friend		msgide_co<msgide> ;
 	struct msgide_len {
 	    int		entsz ;
@@ -89,7 +89,7 @@ struct msgide ;
     private:
 	int istart() noex ;
 	int ifinish() noex ;
-    } ; /* end struct (msgide) */
+} ; /* end struct (msgide) */
 
 
 #endif /* MAGIDE_INCLUDE */

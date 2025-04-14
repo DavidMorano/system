@@ -74,8 +74,8 @@
 
 /* imported namespaces */
 
-using std::min ;			/* type */
-using std::max ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
