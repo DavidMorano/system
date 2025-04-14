@@ -31,13 +31,13 @@
 	upper case still comes before lower case.
 
 	Synopsis:
-	int strnndictcmp(cchar *s1,iny s1len,cchar *s2,int s2len) noex
+	int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex
 
 	Arguments:
-	s1	one string
-	s2	second string
-	s1len	c-string s1 length
-	s2len	c-string s2 length
+	s1	c-string -1- pointer
+	s1len	c-string -1- length
+	s2	c-string -2- pointer
+	s2len	c-string -2- length
 
 	Returns:
 	>0	the first string is bigger than the second
@@ -49,12 +49,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| | |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<strwcmp.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
@@ -67,6 +66,12 @@
 /* local defines */
 
 #define	DCH	struct dictchar
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -101,19 +106,18 @@ static int	strdocmp(cchar *,cchar *,int) noex ;
 /* exported subroutines */
 
 int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex {
-	DCH		dc1, dc2 ;
 	int		rs ;
-	int		ch1, ch2 ;
-	int		fch1, fch2 ;
 	int		rc = 0 ;
 	if (s1len < 0) s1len = xstrlen(s1) ;
 	if (s2len < 0) s2len = xstrlen(s2) ;
-	if ((rs = dch_start(&dc1,s1,s1len)) >= 0) {
-	    if ((rs = dch_start(&dc2,s2,s2len)) >= 0) {
-		int	i{} ;
+	if (DCH dc1 ; (rs = dch_start(&dc1,s1,s1len)) >= 0) {
+	    if (DCH dc2 ; (rs = dch_start(&dc2,s2,s2len)) >= 0) {
+		int	fch1 ;
+		int	fch2 ;
+		int	i{} ; /* used-afterwards */
 	        for (i = 0 ; rc == 0 ; i += 1) {
-	            ch1 = dch_get(&dc1) ;
-	            ch2 = dch_get(&dc2) ;
+	            cint	ch1 = dch_get(&dc1) ;
+	            cint	ch2 = dch_get(&dc2) ;
 	            fch1 = CHAR_TOFC(ch1) ;
 	            fch2 = CHAR_TOFC(ch2) ;
 	            rc = (fch1 - fch2) ;
@@ -127,8 +131,12 @@ int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex {
 	            rc = strdocmp(s1,s2,i) ; /* break ties so far */
 		}
 	        if (rc == 0) {
-	            while (s1len && (! isdict(s1[s1len-1]))) s1len -= 1 ;
-	            while (s2len && (! isdict(s2[s2len-1]))) s2len -= 1 ;
+	            while (s1len && (! isdict(s1[s1len-1]))) {
+			s1len -= 1 ;
+		    }
+	            while (s2len && (! isdict(s2[s2len-1]))) {
+			s2len -= 1 ;
+		    }
 	            rc = (s1len - s2len) ; /* more determinism */
 	        }
 	        if (rc == 0) {
@@ -167,8 +175,7 @@ static int dch_get(DCH *dcp) noex {
 	    if (doch == 0) break ;
 	    dcp->sp += 1 ;
 	    dcp->sl -= 1 ;
-	    if (isdict(doch))
-	        break ;
+	    if (isdict(doch)) break ;
 	} /* end forever */
 	return doch ;
 }

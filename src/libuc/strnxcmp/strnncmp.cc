@@ -1,4 +1,5 @@
 /* strnncmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* compare the minimum common characters of two strings */
@@ -29,10 +30,10 @@
 	int strnncmp(cchar *s1,int n1,cchar *s2,int n2) noex
 
 	Arguments:
-	s1	one string
-	n1	length of first string
-	s2	second string
-	n2	length of second string
+	s1	c-string -1- pointer
+	n1	c-string -1- length
+	s2	c-string -2- pointer
+	n2	c-string -2- length
 
 	Returns:
 	>0	the first string is bigger than the second
@@ -44,13 +45,15 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |strlen(3c)| + |strncmp(3c)| */
+#include	<cstring>		/* |strlen(3c)| + |strncmp(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<libutil.hh>
+#include	<localmisc.h>
 
 #include	"strnxcmp.h"
 
@@ -60,11 +63,23 @@
 
 /* imported namespaces */
 
-using std::min ;			/* type */
-using std::max ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
@@ -77,12 +92,13 @@ using std::max ;			/* type */
 
 int strnncmp(cchar *s1,int n1,cchar *s2,int n2) noex {
 	int		rc ;
-	int		n ;
 	if (n1 < 0) n1 = xstrlen(s1) ;
 	if (n2 < 0) n2 = xstrlen(s2) ;
-	n = min(n1,n2) ;
-	if ((rc = strncmp(s1,s2,n)) == 0) {
-	    rc = (n1 - n2) ;
+	{
+	    cint	n = min(n1,n2) ;
+	    if ((rc = strncmp(s1,s2,n)) == 0) {
+	        rc = (n1 - n2) ;
+	    }
 	}
 	return rc ;
 }
