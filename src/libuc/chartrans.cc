@@ -17,7 +17,10 @@
 
 /*******************************************************************************
 
-  	
+  	Object:
+	chartrans
+  
+	Description:
 	We deal with translating from some given character sets to the
 	wide-character ('wchar_t') format.
 
@@ -29,7 +32,7 @@
 #include	<cstddef>		/* |wchar_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<usystem.h>		/* |libutil| */
 #include	<mallocxx.h>
 #include	<storebuf.h>
 #include	<utf8decoder.h>
@@ -192,7 +195,7 @@ int chartrans_transbegin(CT *op,time_t dt,cchar *sp,int sl) noex {
 	if ((rs = chartrans_magic(op,sp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
-	       if (sl < 0) sl = strlen(sp) ;
+	       if (sl < 0) sl = xstrlen(sp) ;
 	       if ((rs = chartrans_sethave(op,sp,sl)) >= 0) {
 	           txid = rs ;
 	           op->sets[txid].uc += 1 ;
@@ -237,7 +240,7 @@ int chartrans_transread(CT *op,int txid,wchr *rcp,int rcl,cc *sp,int sl) noex {
 	if ((rs = chartrans_magic(op,rcp,sp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if ((txid >= 0) && (txid < op->nmax) && (rcl >= 0)) {
-	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl < 0) sl = xstrlen(sp) ;
 	        chartrans_set	*setp = (op->sets + txid) ;
 	        if (setp->pc >= 0) {
 		    switch (setp->pc) {
@@ -416,18 +419,14 @@ static int chartrans_checkdecoder(CT *op) noex {
 /* end subroutine (chartrans_checkdecoder) */
 
 static int mktransname(char *nbuf,int nlen,cchar *sp,int sl) noex {
+    	storebuf	sb(nbuf,nlen) ;
 	int		rs = SR_OK ;
-	int		i = 0 ;
-	if (rs >= 0) {
-	    rs = storebuf_strw(nbuf,nlen,i,sp,sl) ;
-	    i += rs ;
-	}
-	if (rs >= 0) {
-	    cchar	*suf = (ENDIAN) ? "BE" : "LE" ;
-	    rs = storebuf_strw(nbuf,nlen,i,suf,-1) ;
-	    i += rs ;
-	}
-	return (rs >= 0) ? i : rs ;
+	int		len = 0 ;
+	cchar		*suf = (ENDIAN) ? "BE" : "LE" ;
+	if (rs >= 0) rs = sb.strw(sp,sl) ;
+	if (rs >= 0) rs = sb.str(suf) ;
+	len = sb.idx ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mktransname) */
 
