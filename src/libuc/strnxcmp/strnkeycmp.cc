@@ -1,4 +1,5 @@
 /* strnkeycmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string key comparison */
@@ -62,10 +63,10 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
-
-
-/* local subroutines */
 
 static inline bool keyend(int ch) noex {
 	return ((ch == '\0') || (ch == '=')) ;

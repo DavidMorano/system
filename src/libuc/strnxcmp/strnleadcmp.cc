@@ -1,4 +1,5 @@
 /* strnleadcmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* check if string 's2' is a leading substring of string 's1' */
@@ -16,9 +17,26 @@
 
 /*******************************************************************************
 
+  	Name:
+	strnleadcmp
+
+	Description:
 	This subroutine returns true if 's2' is an initial substring
 	of 's1'.  But only up to the maximum number of characters
 	are checked.
+
+	Synopsis:
+	int strnleadcmp(cchar *s1,cchar *s2,int lr) noex
+
+	Arguments:
+	s1		string-1 pointer
+	s2		string-2 pointer
+	lr		length?
+
+	Returns:
+	>0		greater-than
+	==0		equal-to
+	<0		less-than
 
 *******************************************************************************/
 
@@ -39,10 +57,28 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
-/* local varabiables */
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported variables */
