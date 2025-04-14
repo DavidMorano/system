@@ -1,4 +1,5 @@
 /* stremacmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string key comparison */
@@ -43,6 +44,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<strnxcmp.h>		/* |strnncmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"strxcmp.h"
@@ -56,10 +58,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	strnncmp(cchar *,int,cchar *,int) noex ;
-}
 
 
 /* external variables */
