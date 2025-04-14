@@ -21,14 +21,22 @@
 	strnndictcmp
 
 	Description:
-	This subroutine is similar to the 'strcmp(3c)' subroutine
+	This subroutine is similar to the |strcmp(3c)| subroutine
 	except that with this subroutine all comparisions are done
 	using "dictionary" order.  Dictionary order only compares
 	characters that are:
 		letters
 		digits
-	Also, upper and lower case are mostly ignored except that
-	upper case still comes before lower case.
+		spaces
+	The dictionary order used below is (currently) the same as 
+	defined by the outcome of using the SORT program with the
+	'-d' option (specifying "dictionnary" order).  This is
+	*different* than many -- or even most -- of the current
+	(English) dictionaries that are out there.
+
+	Also (in accordance w/ "dictionnary" order), upper and lower
+	case are mostly ignored except that upper case still comes
+	before lower case.
 
 	Synopsis:
 	int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex
@@ -43,6 +51,20 @@
 	>0	the first string is bigger than the second
 	0	both strings are equal (as compared)
 	<0	first string is less than the second
+
+	Example:
+	Below is an example of tthe dictionary order as used by
+	this subroutine (and as determined by the UNIX® SORT program):
+		Oak
+		Oak Hill
+		Oak Ridge
+		Oakley Park
+		Oakley River
+		oak antelers
+
+	Future:
+	The future definition or implementation of "dictionary"
+	order may (or may likely) change.
 
 *******************************************************************************/
 
