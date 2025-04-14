@@ -33,14 +33,15 @@
 	u_pwrite
 	u_read
 	u_readv
-	u_seeko
 	u_tell
-	u_write
-	u_writev
+	u_seeko
 	u_seek
 	u_seekoff
+	u_seeko
 	u_rewind
 	u_seekable
+	u_write
+	u_writev
 
 	General-Description:
 	This module contains the UNIX® file-system system calls.
