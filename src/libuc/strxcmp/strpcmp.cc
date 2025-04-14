@@ -1,4 +1,5 @@
 /* strpcmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* compares the second string against the prefix of the first */

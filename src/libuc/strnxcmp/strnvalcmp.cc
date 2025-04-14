@@ -1,4 +1,5 @@
 /* strnvalcmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string field comparisons */
@@ -23,7 +24,6 @@
 	These subroutines are used to compare fields of a string
 	(like an environment variables type of string 'HOME=/here').
 	Fields that can be compared are:
-
 		key
 		value
 
@@ -31,11 +31,24 @@
 	int strnkeycmp(cchar *sp,cchar *kp,int kl) noex
 	int strnvalcmp(cchar *sp,cchar *vp,int vl) noex
 
+	Arguments:
+	sp		c-string pointer
+	kp		key c-string pointer
+	kl		key c-string length
+	vp		value c-string pointer
+	vl		value c-string length
+
+	Returns:
+	>=0		greater-than
+	==0		equal-to
+	<0		less-than
+
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstring>		/* |strchr(3c)| + |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
