@@ -252,7 +252,7 @@ inline int sbuf_bin(sbuf *op,ulonglong v) noex {
 	return sbuf_binull(op,v) ;
 }
 
-template<typename Binary> int sbuf::bin(Binary v) noex {
+template<typename Binary> inline int sbuf::bin(Binary v) noex {
 	return sbuf_bin(this,v) ;
 }
 
@@ -276,7 +276,7 @@ inline int sbuf_oct(sbuf *op,ulonglong v) noex {
 	return sbuf_octull(op,v) ;
 }
 
-template<typename Octal> int sbuf::oct(Octal v) noex {
+template<typename Octal> int inline sbuf::oct(Octal v) noex {
 	return sbuf_oct(this,v) ;
 }
 
@@ -300,7 +300,7 @@ inline int sbuf_dec(sbuf *op,ulonglong v) noex {
 	return sbuf_decull(op,v) ;
 }
 
-template<typename Decimal> int sbuf::dec(Decimal v) noex {
+template<typename Decimal> inline int sbuf::dec(Decimal v) noex {
 	return sbuf_dec(this,v) ;
 }
 
@@ -324,7 +324,7 @@ inline int sbuf_hex(sbuf *op,ulonglong v) noex {
 	return sbuf_hexull(op,v) ;
 }
 
-template<typename Hexadecimal> int sbuf::hex(Hexadecimal v) noex {
+template<typename Hexadecimal> inline int sbuf::hex(Hexadecimal v) noex {
 	return sbuf_hex(this,v) ;
 }
 
