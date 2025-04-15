@@ -91,17 +91,16 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
 	$(RM) $(ALL)
@@ -124,12 +123,6 @@ obj2.o:			$(OBJ2)
 
 obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
-
-obj4.o:			$(OBJ4)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
-
-obj5.o:			$(OBJ5)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
 
 
 msgid.o:		msgid.cc msgid.h msgide.hh	$(INCS)
