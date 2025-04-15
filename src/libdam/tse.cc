@@ -94,7 +94,7 @@ int tse::rdu(char *abuf,int alen) noex {
     	return update(frd,abuf,alen) ;
 }
 
-int tse::keyload(cchar *sp,int sl) noex {
+int tse::loadkey(cchar *sp,int sl) noex {
 	return sncpy(keyname,keylen,sp,sl) ;
 }
 

@@ -65,7 +65,7 @@ struct tse {
 	int wr(cchar *,int = -1) noex ;
 	int rdu(char *,int = -1) noex ;
 	int wru(cchar *,int = -1) noex ;
-	int keyload(cchar *,int = -1) noex ;
+	int loadkey(cchar *,int = -1) noex ;
 	operator int () noex ;
 	void dtor() noex ;
 	~tse() {
