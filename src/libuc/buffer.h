@@ -184,16 +184,16 @@ inline int buffer_hex(buffer *op,ulonglong v) noex {
 	return buffer_hexull(op,v) ;
 }
 
-template<typename Binary> int buffer::bin(Binary v) noex {
+template<typename Binary> inline int buffer::bin(Binary v) noex {
 	return buffer_bin(this,v) ;
 }
-template<typename Octal> int buffer::oct(Octal v) noex {
+template<typename Octal> int inline buffer::oct(Octal v) noex {
 	return buffer_oct(this,v) ;
 }
-template<typename Decimal> int buffer::dec(Decimal v) noex {
+template<typename Decimal> int inline buffer::dec(Decimal v) noex {
 	return buffer_dec(this,v) ;
 }
-template<typename Hexadecimal> int buffer::hex(Hexadecimal v) noex {
+template<typename Hexadecimal> inline int buffer::hex(Hexadecimal v) noex {
 	return buffer_hex(this,v) ;
 }
 
