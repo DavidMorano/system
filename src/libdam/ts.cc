@@ -558,7 +558,7 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	                    if (ew.utime == 0) ew.utime = uint(dt) ;
 	                    if (ew.ctime == 0) ew.ctime = uint(dt) ;
 	                    if (ew.keyname[0] == '\0') {
-		                rs = ew.keyload(nnp,nnl) ;
+		                rs = ew.loadkey(nnp,nnl) ;
 	                    }
 	                    if (ew.hash == 0) {
 			        ew.hash = hash_elf(ew.keyname,-1) ;
