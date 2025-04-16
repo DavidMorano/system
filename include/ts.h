@@ -78,7 +78,7 @@ struct ts_head {
 	mode_t		operm ;
 	uchar		vetu[4] ;
 	char		topbuf[TS_TOPLEN + 1] ;	/* top-buffer */
-} ;
+} ; /* end struct (ts) */
 
 struct ts_cursor {
 	int		i ;
