@@ -9,9 +9,10 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This object module was originally written to create a logging
-	mechanism for PCS application programs.  This is a second
-	go at this object.  The first was written in C89.
+	This object module was originally written.  This was written
+	to decihper (I am using that word for now) the extended
+	text scheme (to call it that) located in some of the quotes
+	within our quote database.
 
 */
 
@@ -23,9 +24,12 @@
 	termout
 
 	Description:
-	This is a module that operates on termials (to be determined)
+	This object module operates on termials (to be determined)
 	for the purposes of putting out small messages to them.
-	Subroutines in this module are:
+	The secret sauce (as it were) to this object is that it
+	deciphers the sort-of extended text representation scheme
+	encoded (to use that word) inside some of the quotes inside
+	of our quote database.  Subroutines in this module are:
 
 		termout_start
 		termout_load
@@ -35,7 +39,7 @@
 	Implementation note:
 	Note (on the C++ language): Note how we had to create a
 	mess out of our character database below because of how
-	f**ked up the C++ language is. There is no way to provide
+	f**ked up the C++ language is.  There is no way to provide
 	an unsigned char literal in the language without an incredible
 	mess!  This does not occur with the regular C language.
 
@@ -59,7 +63,7 @@
 #include	<findbit.h>		/* for |flbsi(3dam)| */
 #include	<mkchar.h>
 #include	<strwcmp.h>
-#include	<localmisc.h>		/* |NTABCOLS| */
+#include	<localmisc.h>
 
 #include	"termout.h"
 
@@ -67,26 +71,19 @@
 /* local defines */
 
 #undef	GCH
-#define	GCH		struct termout_gch
+#define	GCH		termout_gch
 
 #undef	SCH
-#define	SCH		struct termout_sch
+#define	SCH		termout_sch
 
 #undef	LINE
-#define	LINE		struct termout_line
+#define	LINE		termout_line
 
 #undef	GHBUFLEN
 #define	GHBUFLEN	20	/* should be large enough to hold ~10 */
 
 #undef	DBUFLEN
 #define	DBUFLEN		((4*GHBUFLEN) + 5) /* each is 3 decimal digits + ';' */
-
-#ifndef	COLUMNS
-#define	COLUMNS		80
-#endif
-
-#undef	OUTBUFLEN
-#define	OUTBUFLEN	(10 * LINEBUFLEN)
 
 /* terminal-type attributes */
 
@@ -125,6 +122,7 @@
 #define	GR_VWIDE	5		/* double wide */
 #define	GR_VOVERLAST	6		/* over-last */
 
+/* masks */
 #define	GR_MBOLD	(1<<GR_VBOLD)	/* indicate BOLD */
 #define	GR_MUNDER	(1<<GR_VUNDER)	/* indicate UNDER */
 #define	GR_MBLINK	(1<<GR_VBLINK)	/* indicate BLINK */
@@ -137,14 +135,17 @@
 
 using std::nullptr_t ;			/* type */
 using std::initializer_list ;		/* type */
-using std::vector ;			/* type */
+using std::basic_string ;		/* type */
 using std::string ;			/* type */
+using std::vector ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
+
+typedef std::basic_string<uchar>	ustring ;
 
 
 /* external subroutines */
@@ -155,55 +156,56 @@ using std::nothrow ;			/* constant */
 
 /* local structures */
 
-struct termout_terminfo {
+namespace {
+    struct termout_terminfo {
 	cchar		*name ;
 	int		attr ;
-} ;
-
-struct termout_sch {
+    } ;
+    struct termout_sch {
 	uchar		ch1, ch2, ft, ch ;
-} ;
-
-struct termout_gch {
+    } ;
+    struct termout_gch {
 	uchar		gr ;
 	uchar		ft ;
 	uchar		ch ;
-	termout_gch(int i=0) : gr(i), ft(i), ch(i) { } ;
-	termout_gch(int ngr,int nft,int nch) : gr(ngr), ft(nft), ch(nch) { } ;
-	termout_gch &operator = (int a) {
+	termout_gch(int i = 0) noex {
+	    gr = uchar(i) ;
+	    ft = uchar(i) ;
+	    ch = uchar(i) ;
+	} ;
+	termout_gch(uchar ngr,uchar nft,uchar nch) noex {
+	    gr = ngr ;
+	    ft = nft ;
+	    ch = nch  ;
+	} ;
+	termout_gch &operator = (int a) noex {
 	    gr = 0 ;
 	    ft = 0 ;
-	    ch = a ;
+	    ch = uchar(a) ;
 	    return (*this) ;
 	} ;
-	termout_gch(initializer_list<int> &list) {
+	termout_gch(initializer_list<uchar> &list) noex {
 	    load(list) ;
 	} ;
-	termout_gch &operator = (initializer_list<int> &list) {
+	termout_gch &operator = (initializer_list<uchar> &list) noex {
 	    load(list) ;
 	    return (*this) ;
 	} ;
-	termout_gch &set(int i=0) {
-	    gr = i ;
-	    ft = i ;
-	    ch = i ;
+	termout_gch &set(int i = 0) noex {
+	    gr = uchar(i) ;
+	    ft = uchar(i) ;
+	    ch = uchar(i) ;
 	    return (*this) ;
 	} ;
-	termout_gch &set(int ngr,int nft,int nch) {
+	termout_gch &set(uchar ngr,uchar nft,uchar nch) noex {
 	    gr = ngr ;
 	    ft = nft ;
 	    ch = nch ;
 	    return (*this) ;
 	} ;
-	termout_gch &set(uchar ngr,uchar nft,uchar nch) {
-	    gr = ngr ;
-	    ft = nft ;
-	    ch = nch ;
-	    return (*this) ;
-	} ;
-	void load(initializer_list<int> &list) {
-	    int	i = 0 ;
-	    for (auto a : list) {
+	void load(initializer_list<uchar> &list) {
+	    int		i = 0 ;
+	    for (cauto a : list) {
 		if (i++ >= 3) break ;
 	        switch (i) {
 		case 0:
@@ -218,7 +220,8 @@ struct termout_gch {
 		} /* end switch */
 	    } /* end for */
 	} ; /* end method (load) */
-} ; /* end struct (termout_gch) */
+    } ; /* end struct (termout_gch) */
+}
 
 class termout_line {
 	cchar		*lbuf ;
@@ -227,6 +230,26 @@ class termout_line {
 
 
 /* forward references */
+
+template<typename ... Args>
+static int termout_ctor(termout *op,Args ... args) noex {
+    	TERMOUT		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (termout_ctor) */
+
+static int termout_dtor(termout *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (termout_dtor) */
 
 template<typename ... Args>
 static int termout_magic(termout *op,Args ... args) noex {
@@ -241,9 +264,9 @@ static int termout_magic(termout *op,Args ... args) noex {
 static int	termout_process(termout *,cchar *,int) noex ;
 static int	termout_loadline(termout *,int,int) noex ;
 
-static int	termout_loadgr(termout *,string &,int,int) noex ;
-static int	termout_loadch(termout *,string &,int,int) noex ;
-static int	termout_loadcs(termout *,string &,int,cchar *,int) noex ;
+static int	termout_loadgr(termout *,ustring &,int,int) noex ;
+static int	termout_loadch(termout *,ustring &,int,int) noex ;
+static int	termout_loadcs(termout *,ustring &,int,cchar *,int) noex ;
 
 static int	gettermattr(cchar *,int) noex ;
 static bool	isspecial(SCH *,uchar,uchar) noex ;
@@ -251,7 +274,7 @@ static bool	isspecial(SCH *,uchar,uchar) noex ;
 
 /* local variables */
 
-constexpr termout_terminfo	terms[] = {
+constexpr static termout_terminfo	terms[] = {
 	{ "sun", 0 },
 	{ "ansi", 0 },
 	{ "xterm", TA_MBASE },
@@ -275,7 +298,7 @@ constexpr termout_terminfo	terms[] = {
 	{ nullptr, 0 }
 } ; /* end struct (termout_terminfo) */
 
-constexpr termout_sch		specials[] = {
+constexpr static termout_sch		specials[] = {
 	{ '1', '4', 0, UC('¼') },
 	{ '1', '2', 0, UC('½') },
 	{ '3', '4', 0, UC('¾') },
@@ -292,7 +315,7 @@ constexpr termout_sch		specials[] = {
 	{ CH_SQUOTE, 'A', 0, UC('Á') },
 	{ CH_SQUOTE, 'E', 0, UC('É') },
 	{ CH_SQUOTE, 'I', 0, UC('Í') },
-	{ CH_SQUOTE, 'O', 0, UC('Ó') },
+	{ CH_SQUOTE, 'o', 0, UC('Ó') },
 	{ CH_SQUOTE, 'U', 0, UC('Ú') },
 	{ CH_SQUOTE, 'Y', 0, UC('Ý') },
 	{ CH_SQUOTE, 'a', 0, UC('á') },
@@ -385,48 +408,67 @@ constexpr termout_sch		specials[] = {
 
 /* exported subroutines */
 
+static int termout_starts(termout *) noex ;
+
 int termout_start(termout *op,cchar *tstr,int tlen,int ncols) noex {
-    	TERMOUT		*hop = op ;
-	int		rs = SR_FAULT ;
-	if (op && tstr) {
+	int		rs ;
+	if ((rs = termout_ctor(op,tstr)) >= 0) {
 	    rs = SR_INVALID ;
-	    memclear(hop) ;		/* <- dangerous */
 	    if (ncols > 0) {
-	        vector<GCH>	*cvp ;
 		rs = SR_NOMEM ;
 	        op->ncols = ncols ;
 	        op->termattr = gettermattr(tstr,tlen) ;
-	        if ((cvp = new(nothrow) vector<GCH>) != nullptr) {
-	    	    vector<string>	*lvp ;
-	            op->cvp = voidp(cvp) ;
-	            if ((lvp = new(nothrow) vector<string>) != nullptr) {
-			rs = SR_OK ;
-	                op->lvp = voidp(lvp) ;
-	                op->magic = TERMOUT_MAGIC ;
-	            } /* end if (new-vector<string>) */
-		    if (rs < 0) {
-			delete lvp ;
-			op->lvp = nullptr ;
-		    }
-		} /* end if (new-vector<GCH>) */
+		rs = termout_starts(op) ;
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		termout_dtor(op) ;
+	    }
+	} /* end if (termout_ctor) */
 	return rs ;
 }
 /* end subroutine (termout_start) */
 
+static int termout_starts(termout *op) noex {
+	cnullptr	np{} ;
+    	int		rs = SR_NOMEM ;
+	try {
+	    if (vector<GCH> *cvp ; (cvp = new(nothrow) vector<GCH>) != np) {
+	    	vector<ustring>	*lvp ;
+	        op->cvp = voidp(cvp) ;
+	        if ((lvp = new(nothrow) vector<ustring>) != np) {
+		    rs = SR_OK ;
+		    op->lvp = voidp(lvp) ;
+	            op->magic = TERMOUT_MAGIC ;
+	        } /* end if (new-vector<ustring>) */
+		if (rs < 0) {
+		    delete lvp ;
+		    op->lvp = nullptr ;
+		} /* end if (error handling) */
+	    } /* end if (new-vector<GCH>) */
+	} catch (...) {
+	    rs = SR_NOMEM ;
+	}
+	return rs ;
+}
+/* end subroutine (termout_starts) */
+
 int termout_finish(termout *op) noex {
 	int		rs ;
+	int		rs1 ;
 	if ((rs = termout_magic(op)) >= 0) {
 	    if (op->lvp) {
-	        vector<string> *lvp = (vector<string> *) op->lvp ;
-	        delete lvp ; /* calls all 'string' destructors */
+	        vector<ustring> *lvp = (vector<ustring> *) op->lvp ;
+	        delete lvp ; /* calls all 'ustring' destructors */
 	        op->lvp = nullptr ;
 	    }
 	    if (op->cvp) {
 	        vector<GCH> *cvp = (vector<GCH> *) op->cvp ;
 	        delete cvp ;
 	        op->cvp = nullptr ;
+	    }
+	    {
+		rs1 = termout_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;
 	} /* end if (magic) */
@@ -438,7 +480,7 @@ int termout_load(termout *op,cchar *sbuf,int slen) noex {
 	int		rs ;
 	int		ln = 0 ;
 	if ((rs = termout_magic(op,sbuf)) >= 0) {
-	    if (slen < 0) slen = strlen(sbuf) ;
+	    if (slen < 0) slen = xstrlen(sbuf) ;
 	    rs = termout_process(op,sbuf,slen) ;
 	    ln = rs ;
 	} /* end if (magic) */
@@ -450,14 +492,17 @@ int termout_getline(termout *op,int i,cchar **lpp) noex {
 	int		rs ;
 	int		ll = 0 ;
 	if ((rs = termout_magic(op,lpp)) >= 0) {
-	    vector<string>	*lvp ;
+	    cnullptr	np{} ;
 	    rs = SR_BUGCHECK ;
-	    if ((lvp = ((vector<string> *) op->lvp)) != nullptr) {
+	    vector<ustring> *lvp ; 
+	    if ((lvp = ((vector<ustring> *) op->lvp)) != np) {
 	        csize	ui = size_t(i) ;
 		rs = SR_NOTFOUND ;
 	        if (ui < lvp->size()) {
-	            *lpp = lvp->at(i).c_str() ;
-	            ll = lvp->at(i).size() ;
+		    csize	lsize = lvp->at(i).size() ;
+		    cuchar	*ucp = lvp->at(i).c_str() ;
+	            *lpp = ccharp(ucp) ;
+	            ll = intsat(lsize) ;
 	        } /* end if (found) */
 	    } /* end if */
 	} /* end if (magic) */
@@ -508,10 +553,11 @@ static int termout_process(termout *op,cchar *sbuf,int slen) noex {
 		    GCH	gch(0) ;
 		    if (j < nmax) {
 			SCH	sch ;
-		        int	ft = 0 ;
-			int	pch = (j < nmax) ? cvp->at(j).ch : 0 ;
-		        int	gr = cvp->at(j).gr ;
-		        switch (pch) {
+		        uchar	ft = 0 ;
+			uchar	pch = (j < nmax) ? cvp->at(j).ch : 0 ;
+		        uchar	gr = cvp->at(j).gr ;
+		        uchar	uch = uchar(ch) ;
+		        switch (int(pch)) {
 		        case GRCH_BOLD :
 			    if (op->termattr & TA_MBOLD) gr |= GR_MBOLD ;
 			    break ;
@@ -531,9 +577,9 @@ static int termout_process(termout *op,cchar *sbuf,int slen) noex {
 		            } else if ((pch == GRCH_WIDE) && (ch == '#')) {
 			        if (op->termattr & TA_MWIDE) gr |= GR_MWIDE ;
 			        ch = 0 ;
-		            } else if (pch == ch) {
+		            } else if (pch == uch) {
 			        if (op->termattr & TA_MBOLD) gr |= GR_MBOLD ;
-			    } else if (isspecial(&sch,pch,ch)) {
+			    } else if (isspecial(&sch,pch,uch)) {
 				ft = sch.ft ;
 				ch = sch.ch ;
 				switch (ft) {
@@ -555,11 +601,14 @@ static int termout_process(termout *op,cchar *sbuf,int slen) noex {
 		        case 0:
 			    break ;
 		        } /* end switch */
-			gch.set(gr,ft,ch) ;
+			{
+			    uchar	tch = uchar(ch) ;
+			    gch.set(gr,ft,tch) ;
+			}
 	                cvp->at(j) = gch ;
 	                j += 1 ;
 		    } else {
-			gch.ch = ch ;
+			gch.ch = uchar(ch) ;
 	                cvp->push_back(gch) ;
 	                j += 1 ;
 		    } /* end if */
@@ -579,39 +628,43 @@ static int termout_process(termout *op,cchar *sbuf,int slen) noex {
 
 static int termout_loadline(termout *op,int ln,int nmax) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
-	vector<string>	*lvp = (vector<string> *) op->lvp ;
+	vector<ustring>	*lvp = (vector<ustring> *) op->lvp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	lvp->resize(ln+1) ;		/* instantiates new 'string' */
-	{
-	    int		ft, ch, gr ;
-	    int		pgr = 0 ; /* holds Previous-Graphic-Rendition */
-	    string	&line = lvp->at(ln) ;
-	    line.reserve(120) ;
-	    line.clear() ;
-	    for (int i = 0 ; (rs >= 0) && (i < nmax) ; i += 1) {
-		ft = cvp->at(i).ft ; /* font */
-		ch = cvp->at(i).ch ; /* character */
-		gr = cvp->at(i).gr ; /* graphic-rendition */
-		if ((rs = termout_loadgr(op,line,pgr,gr)) >= 0) {
-		    len += rs ;
-		    if (ch > 0) {
-		        rs = termout_loadch(op,line,ft,ch) ;
+	try {
+	    lvp->resize(ln + 1) ;	/* instantiates new 'ustring' */
+	    {
+	        int	ft, ch, gr ;
+	        int	pgr = 0 ; /* holds Previous-Graphic-Rendition */
+	        ustring	&line = lvp->at(ln) ;
+	        line.reserve(120) ;
+	        line.clear() ;
+	        for (int i = 0 ; (rs >= 0) && (i < nmax) ; i += 1) {
+		    ft = cvp->at(i).ft ; /* font */
+		    ch = cvp->at(i).ch ; /* character */
+		    gr = cvp->at(i).gr ; /* graphic-rendition */
+		    if ((rs = termout_loadgr(op,line,pgr,gr)) >= 0) {
 		        len += rs ;
+		        if (ch > 0) {
+		            rs = termout_loadch(op,line,ft,ch) ;
+		            len += rs ;
+		        }
 		    }
-		}
-		pgr = gr ;
-	    } /* end for */
-	    if ((rs >= 0) && (pgr != 0)) {
-		rs = termout_loadgr(op,line,pgr,0) ;
-		len += rs ;
-	    }
-	} /* end block */
+		    pgr = gr ;
+	        } /* end for */
+	        if ((rs >= 0) && (pgr != 0)) {
+		    rs = termout_loadgr(op,line,pgr,0) ;
+		    len += rs ;
+	        }
+	    } /* end block */
+	} catch (...) {
+	    rs = SR_NOMEM ;
+	}
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termout_loadline) */
 
-static int termout_loadgr(termout *op,string &line,int pgr,int gr) noex {
+static int termout_loadgr(termout *op,ustring &line,int pgr,int gr) noex {
 	cint		grmask = ( GR_MBOLD| GR_MUNDER| GR_MBLINK| GR_MREV) ;
 	int		rs = SR_OK ;
 	int		n ;
@@ -645,7 +698,7 @@ static int termout_loadgr(termout *op,string &line,int pgr,int gr) noex {
 			        gch = ANSIGR_OFFREV ;
 			        break ;
 			    } /* end switch */
-			    grbuf[gl++] = gch ;
+			    grbuf[gl++] = char(gch) ;
 			    bgr &= (~(1<<i)) ;
 		        } /* end if */
 		    } /* end for */
@@ -677,7 +730,7 @@ static int termout_loadgr(termout *op,string &line,int pgr,int gr) noex {
 			    gch = ANSIGR_REV ;
 			    break ;
 			} /* end switch */
-			grbuf[gl++] = gch ;
+			grbuf[gl++] = char(gch) ;
 			bgr &= (~(1<<i)) ;
 		    } /* end if */
 		} /* end for */
@@ -694,59 +747,60 @@ static int termout_loadgr(termout *op,string &line,int pgr,int gr) noex {
 }
 /* end subroutine (termout_loadgr) */
 
-static int termout_loadcs(termout *op,string &line,int n,cc *pp,int pl) noex {
+static int termout_loadcs(termout *op,ustring &line,int n,cc *pp,int pl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (op) {
-	int		i = 0 ;
-	while ((rs >= 0) && (i < pl)) {
-	    cint	ml = min(4,(pl-i)) ;
-	    int		a1 = -1 ;
-	    int		a2 = -1 ;
-	    int		a3 = -1 ;
-	    int		a4 = -1 ;
-	    switch (ml) {
-	    case 4:
-		a4 = pp[i+3] ;
-		fallthrough ;
-		/* FALLTHROUGH */
-	    case 3:
-		a3 = pp[i+2] ;
-		fallthrough ;
-		/* FALLTHROUGH */
-	    case 2:
-		a2 = pp[i+1] ;
-		fallthrough ;
-		/* FALLTHROUGH */
-	    case 1:
-		a1 = pp[i+0] ;
-		fallthrough ;
-		/* FALLTHROUGH */
-	    case 0:
-		break ;
-	    } /* end switch */
-	    if (ml > 0) {
-		cint	dlen = DBUFLEN ;
-		char	dbuf[DBUFLEN+1] ;
-		if ((rs = termconseq(dbuf,dlen,n,a1,a2,a3,a4)) >= 0) {
-		    cint	dl = rs ;
-		    i += ml ;
-		    len += dl ;
-		    line.append(dbuf,dl) ;
-		}
-	    }
-	} /* end while */
-	} /* end if */
+	    int		i = 0 ;
+	    while ((rs >= 0) && (i < pl)) {
+	        cint	ml = min(4,(pl-i)) ;
+	        int	a1 = -1 ;
+	        int	a2 = -1 ;
+	        int	a3 = -1 ;
+	        int	a4 = -1 ;
+	        switch (ml) {
+	        case 4:
+		    a4 = pp[i+3] ;
+		    fallthrough ;
+		    /* FALLTHROUGH */
+	        case 3:
+		    a3 = pp[i+2] ;
+		    fallthrough ;
+		    /* FALLTHROUGH */
+	        case 2:
+		    a2 = pp[i+1] ;
+		    fallthrough ;
+		    /* FALLTHROUGH */
+	        case 1:
+		    a1 = pp[i+0] ;
+		    fallthrough ;
+		    /* FALLTHROUGH */
+	        case 0:
+		    break ;
+	        } /* end switch */
+	        if (ml > 0) {
+		    cint	dlen = DBUFLEN ;
+		    char	dbuf[DBUFLEN+1] ;
+		    if ((rs = termconseq(dbuf,dlen,n,a1,a2,a3,a4)) >= 0) {
+			cuchar		*ucp = cucharp(dbuf) ;
+		        cint		dl = rs ;
+		        i += ml ;
+		        len += dl ;
+		        line.append(ucp,dl) ;
+		    }
+	        }
+	    } /* end while */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termout_loadcs) */
 
-static int termout_loadch(termout *op,string &line,int ft,int ch) noex {
+static int termout_loadch(termout *op,ustring &line,int ft,int ch) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (op) {
 	    if (ch > 0) {
-	        int		sch = 0 ;
+	        uchar	sch = 0 ;
 	        if (ft > 0) {
 	            switch (ft) {
 	            case 1:
@@ -762,7 +816,10 @@ static int termout_loadch(termout *op,string &line,int ft,int ch) noex {
 	            line.push_back(sch) ;
 	            len += 1 ;
 	        } /* end if (font handling) */
-	        line.push_back(ch) ;
+		{
+		    uchar	tch = uchar(ch) ;
+	            line.push_back(tch) ;
+		}
 	        len += 1 ;
 	        if (ft == 1) {
 		    sch = CH_SI ;
@@ -778,7 +835,7 @@ static int termout_loadch(termout *op,string &line,int ft,int ch) noex {
 static int gettermattr(cchar *tstr,int tlen) noex {
 	int		ta = 0 ;
 	if (tstr != nullptr) {
-	    if (tlen < 0) tlen = strlen(tstr) ;
+	    if (tlen < 0) tlen = xstrlen(tstr) ;
 	    for (int i = 0 ; terms[i].name ; i += 1) {
 	        cchar	*sp = terms[i].name ;
 	        if (strwcmp(sp,tstr,tlen) == 0) {
@@ -786,7 +843,7 @@ static int gettermattr(cchar *tstr,int tlen) noex {
 		    break ;
 	        }
 	    } /* end for */
-	} /* end if (non-null terminal-string) */
+	} /* end if (non-null terminal-ustring) */
 	return ta ;
 }
 /* end subroutine (gettermattr) */
