@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int msgid_ctor(msgid *op,Args ... args) noex {
+static int termout_ctor(termout *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int msgid_ctor(msgid *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (msgid_ctor) */
+/* end subroutine (termout_ctor) */
 
-static int msgid_dtor(msgid *op) noex {
+static int termout_dtor(termout *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (msgid_dtor) */
+/* end subroutine (termout_dtor) */
 
 template<typename ... Args>
-static inline int msgid_magic(msgid *op,Args ... args) noex {
+static inline int termout_magic(termout *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MSGID_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == TERMOUT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (msgid_magic) */
+/* end subroutine (termout_magic) */
