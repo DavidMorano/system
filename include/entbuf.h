@@ -32,7 +32,6 @@
 #define	ENTBUF_MAGIC	1092847456
 #define	ENTBUF_NENTS	4
 #define	ENTBUF		struct entbuf_head
-#define	ENTBUF_FL	struct entbuf_flags
 #define	ENTBUF_WAY	struct entbuf_wayer
 
 
@@ -44,13 +43,8 @@ struct entbuf_wayer {
 	int		nvalid ;	/* number of valid entries */
 } ;
 
-struct entbuf_flags {
-	uint		init:1 ;	/* init'ed */
-} ;
-
 struct entbuf_head {
 	ENTBUF_WAY	*ways ;
-	ENTBUF_FL	f ;
 	uint		magic ;
 	uint		utimer ;	/* usage timer (fake time) */
 	uint		soff ;		/* starting offset */
@@ -63,7 +57,6 @@ struct entbuf_head {
 } ;
 
 typedef ENTBUF		entbuf ;
-typedef	ENTBUF_FL	entbuf_fl ;
 typedef	ENTBUF_WAY	entbuf_way ;
 
 EXTERNC_begin
