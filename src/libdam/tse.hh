@@ -76,7 +76,7 @@ struct tse {
 	int update(bool,char *,int) noex ;
 	int istart() noex ;
 	int ifinish() noex ;
-} ;
+} ; /* end struct (tse) */
 
 typedef	TSE		tse ;
 
