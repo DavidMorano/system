@@ -9,7 +9,8 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This code was originally written.
+	This code was modeled after the TERMOUT object, which was
+	written previous to this object.
 
 */
 
@@ -20,7 +21,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stddef.h>
+#include	<stddef.h>		/* |wchar_t| */
 #include	<uiconv.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -40,14 +41,14 @@ struct termtrans_flags {
 } ;
 
 struct termtrans_head {
+    	cchar		*pr ;
 	void		*cvp ;		/* character-vector-pointer */
 	void		*lvp ;		/* line-vector-pointer */
-	UICONV		id ;
-	TERMTRANS_FL	f ;
+	UICONV		*idp ;		/* UICONV-pointer */
+	TERMTRANS_FL	fl ;
 	uint		magic ;
 	uint		termattr ;	/* mask of terminal attributes */
 	int		ncols ;		/* terminal columns */
-	int		ncol ;
 } ;
 
 typedef TERMTRANS	termtrans ;

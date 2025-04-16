@@ -9,7 +9,8 @@
 /* revision history:
 
 	= 1998-02-01, David Morano
-	This object module was originally written.
+	This code was modeled after the TERMOUT object, which was
+	written previous to this object.
 
 */
 
@@ -21,19 +22,19 @@
 	termtrans
 
 	Description:
-	We translate UCS characters (in 'wchar_t' form) to byte
+	We translate UCS characters (in |wchar_t| form) to byte
 	sequences for output to a terminal (specified).
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<unistd.h>
+#include	<uiconv.h>		/* |UICONV| */
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<vector>
 #include	<string>
 #include	<usystem.h>
@@ -47,7 +48,7 @@
 #include	<strwcmp.h>
 #include	<termconseq.h>
 #include	<mkchar.h>
-#include	<localmisc.h>		/* |NTABCOLS| | |COLUMNS| */
+#include	<localmisc.h>
 
 #include	"termtrans.h"
 
@@ -69,10 +70,10 @@
 #define	TT			termtrans
 
 #undef	GCH
-#define	GCH			struct termtrans_gch
+#define	GCH			termtrans_gch
 
 #undef	SCH
-#define	SCH			struct termtrans_sch
+#define	SCH			termtrans_sch
 
 #undef	GHBUFLEN
 #define	GHBUFLEN	20	/* should be large enough to hold ~10 */
@@ -119,6 +120,7 @@
 #define	GR_VWIDE	5		/* double wide */
 #define	GR_VOVERLAST	6		/* over-last */
 
+/* masks */
 #define	GR_MBOLD	(1<<GR_VBOLD)	/* indicate BOLD */
 #define	GR_MUNDER	(1<<GR_VUNDER)	/* indicate UNDER */
 #define	GR_MBLINK	(1<<GR_VBLINK)	/* indicate BLINK */
@@ -129,10 +131,19 @@
 
 /* imported namespaces */
 
-using namespace		std ;		/* yes, we want punishment! */
+using std::nullptr_t ;			/* type */
+using std::basic_string ;		/* type */
+using std::string ;			/* type */
+using std::vector ;			/* type */
+using std::string_view ;		/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
+
+typedef basic_string<uchar>		ustring ;	/* currently unused */
 
 
 /* external subroutines */
@@ -155,21 +166,23 @@ namespace {
 	uchar		gr ;
 	uchar		ft ;
 	uchar		ch ;
-	termtrans_gch(int i=0) : gr(i), ft(i), ch(i) { } ;
-	termtrans_gch(int ngr,int nft,int nch) : gr(ngr), ft(nft), ch(nch) { } ;
-	termtrans_gch &set(int i=0) {
-		gr = i ;
-		ft = i ;
-		ch = i ;
+	termtrans_gch(int i = 0) noex {
+	    gr = charconv(i) ;
+	    ft = charconv(i) ;
+	    ch = charconv(i) ;
+	} ;
+	termtrans_gch(uchar ngr,uchar nft,uchar nch) noex {
+	    gr = ngr ;
+	    ft = nft ;
+	    ch = nch ;
+	} ;
+	termtrans_gch &set(int i = 0) noex {
+		gr = charconv(i) ;
+		ft = charconv(i) ;
+		ch = charconv(i) ;
 		return (*this) ;
 	} ;
-	termtrans_gch &set(int ngr,int nft,int nch) {
-		gr = ngr ;
-		ft = nft ;
-		ch = nch ;
-		return (*this) ;
-	} ;
-	termtrans_gch &set(uchar ngr,uchar nft,uchar nch) {
+	termtrans_gch &set(uchar ngr,uchar nft,uchar nch) noex {
 		gr = ngr ;
 		ft = nft ;
 		ch = nch ;
@@ -181,10 +194,40 @@ namespace {
 struct vars {
 	int		csnlen ;
 	int		outlinelen ;
+	operator int () noex ;
 } ;
 
 
 /* forward references */
+
+template<typename ... Args>
+static int termtrans_ctor(termtrans *op,Args ... args) noex {
+    	TERMTRANS	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(hop) ;
+	    if ((op->idp = new(nothrow) UICONV) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-UICONV) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (termtrans_ctor) */
+
+static int termtrans_dtor(termtrans *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->idp) {
+		delete op->idp ;
+		op->idp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (termtrans_dtor) */
 
 template<typename ... Args>
 static inline int termtrans_magic(termtrans *op,Args ... args) noex {
@@ -208,8 +251,6 @@ static int	termtrans_loadcs(TT *,string &,int,cchar *,int) noex ;
 static int	gettermattr(cchar *,int) noex ;
 static int	wsgetline(const wchar_t *,int) noex ;
 static bool	isspecial(SCH *,uchar,uchar) noex ;
-
-static int	mkvars() noex ;
 
 
 /* local variables */
@@ -278,49 +319,64 @@ static vars		var ;
 
 /* exported subroutines */
 
+static int termtrans_starts(TT *) noex ;
+
 int termtrans_start(TT *op,cc *pr,cc *tstr,int tlen,int ncols) noex {
-	int		rs = SR_FAULT ;
-	if (op && pr) {
+	int		rs ;
+	if ((rs = termtrans_ctor(op,pr,tstr)) >= 0) {
 	    rs = SR_INVALID ;
-	    memclear(op) ;
 	    if (ncols > 0) {
-		static cint	rsv = mkvars() ;
+		static cint	rsv = var ;
 		if ((rs = rsv) >= 0) {
-	            vector<GCH>	*cvp ;
 	            op->ncols = ncols ;
 	            op->termattr = gettermattr(tstr,tlen) ;
-	            if ((cvp = new(nothrow) vector<GCH>) != nullptr) {
-	                cint	fcslen = var.csnlen ;
-	                cchar	*fcs = TERMTRANS_FCS ;
-	                cchar	*suf = TERMTRANS_SUF ;
-	                char	fcsbuf[var.csnlen + 1] ;
-	                op->cvp = (void *) cvp ;
-	                if ((rs = sncpy2(fcsbuf,fcslen,fcs,suf)) >= 0) {
-	                    cchar	*tcsp = TERMTRANS_TCS ;
-	                    if ((rs = uiconv_open(&op->id,tcsp,fcsbuf)) >= 0) {
-		                op->magic = TERMTRANS_MAGIC ;
-	                    }
-	                }
-	                if (rs < 0) {
-		            delete cvp ;
-		            op->cvp = nullptr ;
-	                }
-	            } else {
-	                rs = SR_NOMEM ;
-	            }
+		    op->pr = pr ;
+		    rs = termtrans_starts(op) ;
 		} /* end if (mkvars) */
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		termtrans_dtor(op) ;
+	    }
+	} /* end if (termtrans_ctor) */
 	return rs ;
 }
 /* end subroutine (termtrans_start) */
+
+static int termtrans_starts(TT *op) noex {
+    	cnullptr	np{} ;
+    	int		rs ;
+	try {
+	    rs = SR_NOMEM ;
+	    if (vector<GCH>*cvp ; (cvp = new(nothrow) vector<GCH>) != np) {
+	        cint	fcslen = var.csnlen ;
+	        cchar	*fcs = TERMTRANS_FCS ;
+	        cchar	*suf = TERMTRANS_SUF ;
+	        char	fcsbuf[var.csnlen + 1] ;
+	        op->cvp = voidp(cvp) ;
+	        if ((rs = sncpy(fcsbuf,fcslen,fcs,suf)) >= 0) {
+		    cchar	*tcsp = TERMTRANS_TCS ;
+		    if ((rs = uiconv_open(op->idp,tcsp,fcsbuf)) >= 0) {
+			op->magic = TERMTRANS_MAGIC ;
+		    }
+		}
+		if (rs < 0) {
+		    delete cvp ;
+		    op->cvp = nullptr ;
+		} /* end if (error handing) */
+	    } /* end if (new-vector) */
+	} catch (...) {
+	    rs = SR_NOMEM ;
+	}
+	return rs ;
+}
+/* end subroutine (termtrans_starts) */
 
 int termtrans_finish(TT *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = termtrans_magic(op)) >= 0) {
 	    {
-	        rs1 = uiconv_close(&op->id) ;
+	        rs1 = uiconv_close(op->idp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->lvp) {
@@ -333,6 +389,10 @@ int termtrans_finish(TT *op) noex {
 	        delete cvp ;
 	        op->cvp = nullptr ;
 	    }
+	    {
+		rs1 = termtrans_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
 	    op->magic = 0 ;
 	} /* end if (non-null) */
 	return rs ;
@@ -340,14 +400,19 @@ int termtrans_finish(TT *op) noex {
 /* end subroutine (termtrans_finish) */
 
 int termtrans_load(TT *op,const wchar_t *wbuf,int wlen) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		ln = 0 ;
 	if ((rs = termtrans_magic(op,wbuf)) >= 0) {
 	    vector<string>	*lvp = (vector<string> *) op->lvp ;
 	    if (lvp == nullptr) {
-	        if ((lvp = new(nothrow) vector<string>) != nullptr) {
-	            op->lvp = lvp ;
-	        } else {
+		try {
+	            if ((lvp = new(nothrow) vector<string>) != np) {
+	                op->lvp = lvp ;
+	            } else {
+		        rs = SR_NOMEM ;
+		    }
+		} catch (...) {
 		    rs = SR_NOMEM ;
 		}
 	    }
@@ -369,8 +434,9 @@ int termtrans_getline(TT *op,int li,cchar **lpp) noex {
 	    {
 		cint	vlen = int(lvp->size()) ;
 	        if (li < vlen) {
+		    csize	lsize = lvp->at(li).size() ;
 	            *lpp = lvp->at(li).c_str() ;
-	            ll = lvp->at(li).size() ;
+	            ll = intconv(lsize) ;
 	        }
 	    } /* end block */
 	} /* end if (magic) */
@@ -386,8 +452,7 @@ static int termtrans_process(TT *op,const wchar_t *wbuf,int wlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ln = 0 ;
-	char		*obuf ;
-	if ((rs = uc_malloc((olen + 1),&obuf)) >= 0) {
+	if (char *obuf ; (rs = uc_malloc((olen + 1),&obuf)) >= 0) {
 	    int		wl ;
 	    while ((rs = wsgetline(wbuf,wlen)) > 0) {
 		wl = rs ;
@@ -419,11 +484,11 @@ static int termtrans_procline(TT *op,char *obuf,int olen,
 	    int		ileft = istart ;
 	    int		ostart = olen ;
 	    int		oleft{} ;
-	    cchar	*ibp = (cchar *) wbuf ;
+	    cchar	*ibp = ccharp(wbuf) ;
 	    char	*obp = obuf ;
 	    oleft = ostart ;
-	    if ((rs = uiconv_trans(&op->id,&ibp,&ileft,&obp,&oleft)) >= 0) {
-	        cint	ofill = (ostart-oleft) ;
+	    if ((rs = uiconv_trans(op->idp,&ibp,&ileft,&obp,&oleft)) >= 0) {
+	        cint	ofill = (ostart - oleft) ;
 		rs = termtrans_proclinepost(op,obuf,ofill) ;
 		ln += rs ;
 	    }
@@ -442,7 +507,7 @@ static int termtrans_proclinepost(TT *op,cchar *obuf,int olen) noex {
 	int		len = 0 ;
 	cvp->clear() ;
 	for (int i = 0 ; i < olen ; i += 1) {
-	    int		ch = mkchar(obuf[i]) ;
+	    uchar	ch = charconv(obuf[i]) ;
 	    switch (ch) {
 	    case '\r':
 		j = 0 ;
@@ -464,9 +529,9 @@ static int termtrans_proclinepost(TT *op,cchar *obuf,int olen) noex {
 		    GCH		gch(0) ;
 		    if (j < nmax) {
 			SCH	sch ;
-		        int	ft = 0 ;
-			int	pch = (j < nmax) ? cvp->at(j).ch : 0 ;
-		        int	gr = cvp->at(j).gr ;
+		        uchar	ft = 0 ;
+			uchar	pch = (j < nmax) ? cvp->at(j).ch : 0 ;
+		        uchar	gr = cvp->at(j).gr ;
 		        switch (pch) {
 		        case GRCH_BOLD :
 			    if (op->termattr & TA_MBOLD) gr |= GR_MBOLD ;
@@ -492,7 +557,7 @@ static int termtrans_proclinepost(TT *op,cchar *obuf,int olen) noex {
 			    } else if (isspecial(&sch,pch,ch)) {
 				ft = sch.ft ;
 				ch = sch.ch ;
-				switch (ft) {
+				switch (int(ft)) {
 				case 2:
 			            if (! (op->termattr & TA_MFT2)) {
 					ft = 0 ;
@@ -515,7 +580,7 @@ static int termtrans_proclinepost(TT *op,cchar *obuf,int olen) noex {
 	                cvp->at(j) = gch ;
 	                j += 1 ;
 		    } else {
-			gch.ch = ch ;
+			gch.ch = charconv(ch) ;
 	                cvp->push_back(gch) ;
 	                j += 1 ;
 		    } /* end if */
@@ -538,33 +603,35 @@ static int termtrans_loadline(TT *op,int ln,int nmax) noex {
 	vector<string>	*lvp = (vector<string> *) op->lvp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	lvp->resize(ln+1) ;		/* instantiates new 'string' */
-	{
-	    string	&line = lvp->at(ln) ;
-	    int		ft, ch, gr ;
-	    int		pgr = 0 ;
-	    line.reserve(120) ;
-	    line.clear() ;
-	    for (int i = 0 ; (rs >= 0) && (i < nmax) ; i += 1) {
-		ft = cvp->at(i).ft ;
-		ch = cvp->at(i).ch ;
-		gr = cvp->at(i).gr ;
-
-		rs = termtrans_loadgr(op,line,pgr,gr) ;
-		len += rs ;
-
-		if ((rs >= 0) && (ch > 0)) {
-		    rs = termtrans_loadch(op,line,ft,ch) ;
+	try {
+	    lvp->resize(ln + 1) ;	/* instantiates new 'string' */
+	    {
+	        string	&line = lvp->at(ln) ;
+	        int	ft, ch, gr ;
+	        int	pgr = 0 ;
+	        line.reserve(120) ;
+	        line.clear() ;
+	        for (int i = 0 ; (rs >= 0) && (i < nmax) ; i += 1) {
+		    ft = cvp->at(i).ft ;
+		    ch = cvp->at(i).ch ;
+		    gr = cvp->at(i).gr ;
+		    if ((rs = termtrans_loadgr(op,line,pgr,gr)) >= 0) {
+		        len += rs ;
+		        if (ch > 0) {
+		            rs = termtrans_loadch(op,line,ft,ch) ;
+		            len += rs ;
+			}
+		    }
+		    pgr = gr ;
+	        } /* end for */
+	        if ((rs >= 0) && (pgr != 0)) {
+		    rs = termtrans_loadgr(op,line,pgr,0) ;
 		    len += rs ;
-		}
-
-		pgr = gr ;
-	    } /* end for */
-	    if ((rs >= 0) && (pgr != 0)) {
-		rs = termtrans_loadgr(op,line,pgr,0) ;
-		len += rs ;
-	    }
-	} /* end block */
+	        }
+	    } /* end block */
+	} catch (...) {
+	    rs = SR_NOMEM ;
+	}
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termtrans_loadline) */
@@ -574,7 +641,7 @@ static int termtrans_loadgr(TT *op,string &line,int pgr,int gr) noex {
 	int		rs = SR_OK ;
 	int		ogr = pgr ;
 	int		bgr = pgr ;
-	int		cc ;
+	int		cch ;
 	int		n ;
 	int		sz ;
 	int		gl = 0 ;
@@ -591,19 +658,19 @@ static int termtrans_loadgr(TT *op,string &line,int pgr,int gr) noex {
 		        if ((ogr>>i)&1) {
 			    switch (i) {
 			    case GR_VBOLD:
-			        cc = ANSIGR_OFFBOLD ;
+			        cch = ANSIGR_OFFBOLD ;
 			        break ;
 			    case GR_VUNDER:
-			        cc = ANSIGR_OFFUNDER ;
+			        cch = ANSIGR_OFFUNDER ;
 			        break ;
 			    case GR_VBLINK:
-			        cc = ANSIGR_OFFBLINK ;
+			        cch = ANSIGR_OFFBLINK ;
 			        break ;
 			    case GR_VREV:
-			        cc = ANSIGR_OFFREV ;
+			        cch = ANSIGR_OFFREV ;
 			        break ;
 			    } /* end switch */
-			    grbuf[gl++] = cc ;
+			    grbuf[gl++] = charconv(cch) ;
 			    bgr &= (~(1<<i)) ;
 		        } /* end if */
 		    } /* end for */
@@ -623,19 +690,19 @@ static int termtrans_loadgr(TT *op,string &line,int pgr,int gr) noex {
 		    if ((ogr>>i)&1) {
 			switch (i) {
 			case GR_VBOLD:
-			    cc = ANSIGR_BOLD ;
+			    cch = ANSIGR_BOLD ;
 			    break ;
 			case GR_VUNDER:
-			    cc = ANSIGR_UNDER ;
+			    cch = ANSIGR_UNDER ;
 			    break ;
 			case GR_VBLINK:
-			    cc = ANSIGR_BLINK ;
+			    cch = ANSIGR_BLINK ;
 			    break ;
 			case GR_VREV:
-			    cc = ANSIGR_REV ;
+			    cch = ANSIGR_REV ;
 			    break ;
 			} /* end switch */
-			grbuf[gl++] = cc ;
+			grbuf[gl++] = charconv(cch) ;
 			bgr &= (~(1<<i)) ;
 		    } /* end if */
 		} /* end for */
@@ -666,21 +733,24 @@ static int termtrans_loadcs(TT *op,string &line,int n,cc *pp,int pl) noex {
 	    int	a2 = -1 ;
 	    int	a3 = -1 ;
 	    int	a4 = -1 ;
-	    ml = MIN(4,(pl-i)) ;
+	    ml = min(4,(pl-i)) ;
 	    switch (ml) {
-/* FALLTHROUGH */
 	    case 4:
 		a4 = pp[i+3] ;
-/* FALLTHROUGH */
+		fallthrough ;
+	        /* FALLTHROUGH */
 	    case 3:
 		a3 = pp[i+2] ;
-/* FALLTHROUGH */
+		fallthrough ;
+                /* FALLTHROUGH */
 	    case 2:
 		a2 = pp[i+1] ;
-/* FALLTHROUGH */
+		fallthrough ;
+                /* FALLTHROUGH */
 	    case 1:
 		a1 = pp[i+0] ;
-/* FALLTHROUGH */
+		fallthrough ;
+                /* FALLTHROUGH */
 	    case 0:
 		break ;
 	    } /* end switch */
@@ -698,22 +768,23 @@ static int termtrans_loadcs(TT *op,string &line,int n,cc *pp,int pl) noex {
 }
 /* end subroutine (termtrans_loadcs) */
 
-static int termtrans_loadch(TT *op,string &line,int ft,int ch) noex {
+static int termtrans_loadch(TT *op,string &line,int ft,int ach) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
+	uchar		ch = uchar(ach) ;
 	if (op && (ch > 0)) {
-	    int		sch = 0 ;
+	    uchar	sch = 0 ;
 	    if (ft > 0) {
 	        switch (ft) {
 	        case 1:
-			sch = CH_SO ;
-			break ;
+		    sch = CH_SO ;
+		    break ;
 	        case 2:
-			sch = CH_SS2 ;
-			break ;
+		    sch = CH_SS2 ;
+		    break ;
 	        case 3:
-			sch = CH_SS3 ;
-			break ;
+		    sch = CH_SS3 ;
+		    break ;
 	        } /* end witch */
 	        line.push_back(sch) ;
 	        len += 1 ;
@@ -733,7 +804,7 @@ static int termtrans_loadch(TT *op,string &line,int ft,int ch) noex {
 static int gettermattr(cchar *tstr,int tlen) noex {
 	int		ta = 0 ;
 	if (tstr != nullptr) {
-	    if (tlen < 0) tlen = strlen(tstr) ;
+	    if (tlen < 0) tlen = xstrlen(tstr) ;
 	    for (int i = 0 ; terms[i].name != nullptr ; i += 1) {
 	        cchar	*sp = terms[i].name ;
 	        if (strwcmp(sp,tstr,tlen) == 0) {
@@ -773,7 +844,7 @@ static bool isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
 }
 /* end subroutine (isspecial) */
 
-static int mkvars() noex {
+vars::operator int () noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
 	    var.csnlen = rs ;
@@ -783,6 +854,6 @@ static int mkvars() noex {
 	} /* end if (getbufsize) */
 	return rs ;
 }
-/* end subroutine (mkvars) */
+/* end method (vars::operator) */
 
 
