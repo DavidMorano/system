@@ -1,0 +1,176 @@
+/* cfalphax MODULE */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
+
+/* conversion of power-base-two c-string to their binary integer types */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2023-05-14, David A­D­ Morano
+	Convert numeric digit c-strings into integers.  This code
+	replaces a previous algorithm that used to be used for this
+	function.  I think that I was on drugs when I wrote that
+	previous version (but people might say the same about this
+	version also).
+
+*/
+
+/* Copyright © 2023 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Name:
+	cfalphax
+
+	Description:
+	This code converts a c-string of digits (of a power-of-two
+	base) into the normal integer types: these being |int|,
+	|long|, and |longlong| and their associated unsigned
+	variations.
+
+	Notes:
+	1. This code is limited to a maximum base of 64.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* for |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
+#include	<stdintx.h>
+#include	<sfx.h>
+#include	<cfutil.h>
+#include	<char.h>
+#include	<ischarx.h>
+
+export module cfalphax ;
+
+export {
+    template<stdintx T> struct cfashelp {
+	cint		nb = (CHAR_BIT * szof(T)) ;
+	T		*rp = nullptr ;
+	T		val = 0 ;	/* value to create */
+	T		cutoff{} ;
+	T		tmax = 0 ;	/* type-maximum value */
+	T		tmin{} ;	/* type-minimum value */
+	int		cutlim ;
+	int		sl ;
+	int		base ;
+	bool		fneg = false ;
+	cchar		*sp ;
+	cfashelp(cchar *asp,int asl,int b,T *arp) noex : sp(asp), sl(asl) {
+	    const T	one = 1 ;
+	    tmin = (one << (nb - 1)) ;
+	    tmax = (~ tmax) & (~ tmin) ;
+	    base = b ;
+	    rp = arp ;
+	} ; /* end ctor */
+	int getsign() noex {
+	    int		rs = SR_FAULT ;
+	    if (rp) {
+	        if (sl < 0) sl = xstrlen(sp) ;
+	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        }
+	        if ((sl > 0) && isplusminus(*sp)) {
+	            fneg = (*sp == '-') ;
+	            sp += 1 ;
+	            sl -= 1 ;
+	        }
+	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        }
+	        if (sl > 1) {
+		    cint r = cfx::rmleadzero(sp,sl) ;
+		    sp += (sl - r) ;
+		    sl = r ;
+		} else if (sl == 0) {
+		    rs = SR_INVALID ;
+		} /* end if */
+	    } /* end if (non-null) */
+	    return rs ;
+	} ; /* end if (getsign) */
+	void prepare() noex {
+	    cutoff = fneg ? tmin : tmax ;
+	    cutlim = int(cutoff % base) ;
+	    cutoff /= base ;
+	    if (fneg) {
+		if (cutlim > 0) {
+		    cutlim -= base ;
+		    cutoff += 1 ;
+		}
+		cutlim = (- cutlim) ;
+	    }
+	} ; /* end method (prepare) */
+	int getval(int ch) noex {
+	    int		rs = SR_INVALID ;
+	    if ((ch >= 'A') && (ch <= 'Z')) {
+		rs = (ch - 'A') ;
+	    } else if ((ch >= 'a') && (ch <= 'z')) {
+		rs = (ch - 'a') ;
+	    }
+	    if (rs >= base) {
+		rs = SR_DOM ;
+	    }
+	    return rs ;
+	} ; /* end method (getval) */
+	int proc() noex {
+	    int		rs = SR_INVALID ;
+	    if (fneg) {
+	        while (sl && ((rs = getval(*sp)) >= 0)) {
+		    cint	nv = rs ;
+		    if ((val < cutoff) || (val == cutoff && nv > cutlim)) {
+			rs = SR_RANGE ;
+		    } else {
+		        val *= base ;
+		        val -= nv ;
+		    }
+		    sp += 1 ;
+		    sl -= 1 ;
+		    if (rs < 0) break ;
+	        } /* end while */
+	    } else {
+	    	while (sl && ((rs = getval(*sp)) >= 0)) {
+		    cint	nv = rs ;
+		    if ((val > cutoff) || (val == cutoff && nv > cutlim)) {
+			rs = SR_RANGE ;
+		    } else {
+			val *= base ;
+			val += nv ;
+		    }
+		    sp += 1 ;
+		    sl -= 1 ;
+		    if (rs < 0) break ;
+	        } /* end while */
+	    } /* end if (sign) */
+	    *rp = (rs >= 0) ? val : 0 ;
+	    return rs ;
+	} ; /* end method (proc) */
+    } ; /* end struct (cfashelp) */
+    template<typename T> 
+    inline int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
+	int		rs = SR_FAULT ;
+	if (sp && rp) {
+	    if (cfashelp cfo(sp,sl,b,rp) ; (rs = cfo.getsign()) >= 0) {
+		cfo.prepare() ;
+		rs = cfo.proc() ;
+	    } /* end if */
+	} /* end if (non-null) */
+	return rs ;
+    } /* end subroutine-template (cfalphax) */
+}
+
+

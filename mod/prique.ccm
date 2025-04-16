@@ -1,0 +1,237 @@
+/* prique MODULE (primary module interface) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
+
+/* implement a queue container of objects */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2011-04-12, David A­D­ Morano
+	This code was originally written. 
+
+*/
+
+/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	prique
+
+	Description:
+	This object implements a "priority queue" object -- with
+	the smallest item on the 'top'.  It is built from the
+	standard C++ library class-template |priority_queue(3c++)|.
+	Note that a C-language and C++-language type of priority
+	queue already exists in the form of the |vecsorthand(3uc)|
+	object.
+
+	Symopsis:
+	int prique_start<typename K,typename B>(int n = 0) noex
+
+	Arguments:
+	n		suggested starting possible number of elements
+
+	Returns:
+	>=0		ok
+	<0		error (system-return)
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<new>
+#include	<utility>
+#include	<queue>
+#include	<vector>
+#include	<functional>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+
+export module prique ;
+
+export {
+    template<typename K> class prique ;
+    template<typename K>
+    using prique_is = std::priority_queue<K,std::vector<K>,std::greater<K>> ;
+    enum priquemems {
+	priquemem_start,
+	priquemem_finish,
+	priquemem_count,
+	priquemem_overlast
+    } ; /* end enum (priquemems) */
+    template<typename K> struct prique_co {
+        using		pq_t = prique<K> ;
+	pq_t		*op = nullptr ;
+	int		w = -1 ;
+	constexpr void operator () (pq_t *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	constexpr int operator () (int = 0) noex ;
+	constexpr operator int () noex {
+	    return operator () () ;
+	} ;
+    } ; /* end struct (prique_co) */
+    template<typename K> struct prique_rem {
+        using		pq_t = prique<K> ;
+	pq_t		*op = nullptr ;
+	constexpr void operator () (pq_t *p) noex {
+	    op = p ;
+	} ;
+	constexpr int operator () (K * = nullptr) noex ;
+	constexpr operator int () noex {
+	    return operator () (nullptr) ;
+	} ;
+    } ; /* end struct (prique_rem) */
+    template<typename K> class prique {
+	prique_is<K>	*mp = nullptr ;
+    public:
+	typedef K			key_type ;
+	prique(const prique &) = delete ;
+	prique &operator = (const prique &) = delete ;
+	prique_co<K>	start ;
+	prique_co<K>	finish ;
+	prique_co<K>	count ;
+	prique_rem<K>	rem ;
+	constexpr int		ins(const K &) noex ;
+	constexpr int		ins(const K *) noex ;
+	constexpr int		get(const K *) noex ;
+	constexpr prique() noex {
+	    start(this,priquemem_start) ;
+	    finish(this,priquemem_finish) ;
+	    count(this,priquemem_count) ;
+	    rem(this) ;
+	} ; /* end ctor) */
+	constexpr ~prique() {
+	    if (mp) {
+	        delete mp ;
+		mp = nullptr ;
+	    }
+	} ; /* end dtor */
+	friend prique_rem<K> ;
+	friend prique_co<K> ;
+    private:
+	constexpr int		istart(int = 0) noex ;
+	constexpr int		ifinish() noex ;
+	constexpr int		icount() noex ;
+	constexpr int		irem(K * = nullptr) noex ;
+    } ; /* end class (prique) */
+    template<typename K> constexpr int prique<K>::istart(int n) noex {
+	int		rs = SR_INVALID ;
+	if (n >= 0) {
+	    rs = SR_NOMEM ;
+	    try {
+		const nothrow_t		nt = std::nothrow ;
+		const nullptr_t		np{} ;
+	        if ((mp = new(nt) prique_is<K>) != np) {
+	            rs = SR_OK ;
+	        }
+	    } catch (...) {
+		rs = SR_NOMEM ;
+	    }
+	}
+	return rs ;
+    } /* end method (prique::istart) */
+    template<typename K> constexpr int prique<K>::ifinish() noex {
+	int		rs = SR_BUGCHECK ;
+	if (mp) {
+	    delete mp ;
+	    mp = nullptr ;
+	    rs = SR_OK ;
+	}
+	return rs ;
+    } /* end method (prique::ifinish) */
+    template<typename K> constexpr int prique<K>::ins(const K *kp) noex {
+	int		rs = SR_BUGCHECK ;
+	if (mp && kp) {
+	    rs = SR_OK ;
+	    try {
+	        mp->push(*kp) ;
+	    } catch (...) {
+	        rs = SR_NOMEM ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+    } /* end method (prique::ins) */
+    template<typename K> constexpr int prique<K>::ins(const K &k) noex {
+	return ins(&k) ;
+    } ;
+    template<typename K> constexpr int prique<K>::icount() noex {
+	int		rs = SR_BUGCHECK ;
+	if (mp) {
+	    rs = mp->size() ;
+	} /* end if (non-null) */
+	return rs ;
+    } /* end method (prique::icount) */
+    template<typename K> constexpr int prique<K>::get(const K *ep) noex {
+	int		rs = SR_BUGCHECK ;
+	if (mp) {
+	    rs = SR_FAULT ;
+	    if (ep) {
+	        if (! mp->empty()) {
+		    try {
+		        *ep = mp->top() ;
+		        rs = mp->size() ;
+	            } catch (...) {
+	                rs = SR_NOMEM ;
+	            } /* end if */
+	       } else {
+		   rs = SR_NOENT ;
+	       } /* end if */
+	    }
+	} /* end if (non-null) */
+	return rs ;
+    } /* end method (prique::get) */
+    template<typename K> constexpr int prique<K>::irem(K *ep) noex {
+	int		rs = SR_BUGCHECK ;
+	if (mp) {
+	    if (! mp->empty()) {
+	        try {
+	            if (ep) {
+		        *ep = mp->top() ;
+		    }
+	            mp->pop() ;
+		    rs = mp->size() ;
+	        } catch (...) {
+	            rs = SR_NOMEM ;
+	        } /* end if */
+	    } else {
+		rs = SR_NOENT ;
+	    } /* end if */
+	} /* end if (non-null) */
+	return rs ;
+    } ;
+    template<typename K> constexpr int prique_rem<K>::operator () (K *ep) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    rs = op->irem(ep) ;
+	}
+	return rs ;
+    } ;
+    template<typename K> constexpr int prique_co<K>::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case priquemem_start:
+	        rs = op->istart(a) ;
+	        break ;
+	    case priquemem_finish:
+	        rs = op->ifinish() ;
+	        break ;
+	    case priquemem_count:
+	        rs = op->icount() ;
+	        break ;
+	    } /* end switch */
+	}
+	return rs ;
+    } /* end method (prique_co::operator) */
+} /* end export (prique) */
+
+
