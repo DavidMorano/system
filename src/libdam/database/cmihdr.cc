@@ -96,6 +96,7 @@ constexpr char		magicstr[] = CMIHDR_MAGICSTR ;
 
 /* exported subroutines */
 
+/* read from to (header) object (to buffer) */
 int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
@@ -108,7 +109,7 @@ int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex {
 	            bl -= magicsize ;
 	    	    memcpy(bp,op->vetu,4) ;
 	    	    bp[0] = CMIHDR_VERSION ;
-	    	    bp[1] = ENDIAN ;
+	    	    bp[1] = uchar(ENDIAN) ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= headsize) {
@@ -125,7 +126,7 @@ int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex {
 	        	header[hi_maxent] = op->maxent ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
 	            } /* end if */
@@ -138,6 +139,7 @@ int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex {
 }
 /* end subroutine (cmihdr_rd) */
 
+/* write to (header) object (from buffer) */
 int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
@@ -150,11 +152,12 @@ int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 	        bl -= magicsize ;
 		/* read out the VETU information */
 	        if (bl >= 4) {
+		    uchar	ech = uchar(ENDIAN) ;
 	            memcpy(op->vetu,bp,4) ;
 	            if (op->vetu[0] != CMIHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
 		    }
-	            if ((rs >= 0) && (op->vetu[1] != ENDIAN)) {
+	            if ((rs >= 0) && (op->vetu[1] != ech)) {
 	                rs = SR_PROTOTYPE ;
 		    }
 	            bp += 4 ;
@@ -164,7 +167,7 @@ int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 		}
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
-	                uint	*header = (uint *) bp ;
+	                uint	*header = uintp(bp) ;
 	                op->dbsize = header[hi_dbsize] ;
 	                op->dbtime = header[hi_dbtime] ;
 	                op->idxsize = header[hi_idxsize] ;
@@ -177,7 +180,7 @@ int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 	                op->maxent = header[hi_maxent] ;
 	                bp += headsize ;
 	                bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
 	            }
