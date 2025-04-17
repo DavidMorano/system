@@ -38,7 +38,7 @@
 #include	<ptm.h>
 #include	<fifoitem.h>
 
-#include	<babiesfu.h>
+#include	<babieshdr.h>
 #include	<babycalc.h>
 #include	<babycalcs.h>
 #include	<bpihdr.h>
@@ -46,6 +46,7 @@
 #include	<bvshdr.h>
 #include	<cmi.h>
 #include	<cmihdr.h>
+#include	<cmimk.h>
 #include	<commandment.h>
 #include	<commandments.h>
 #include	<cyihdr.h>
