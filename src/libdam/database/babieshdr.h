@@ -2,6 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
+/* header management for BABIES shared-memory segment */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
