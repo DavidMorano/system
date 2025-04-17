@@ -26,6 +26,7 @@
 #include	<vecstr.h>
 
 
+/* striaght up */
 #define	SYSDIALER_MAGIC	0x31815927
 #define	SYSDIALER	struct sysdialer_head
 #define	SYSDIALER_FL	struct sysdialer_flags
@@ -36,19 +37,45 @@
 #define	SYSDIALER_PRC	struct sysdialer_prcache
 #define	SYSDIALER_MOD	struct sysdialer_module
 #define	SYSDIALER_LF	"sysdialer"
-
+/* optional */
 #ifdef	COMMENT
 #define	INTERFACE	struct interface
 #endif
-
 /* option masks */
-#define	SYSDIALER_MFULL		0x0001
-#define	SYSDIALER_MHALFOUT	0x0002
-#define	SYSDIALER_MHALFIN	0x0004
-#define	SYSDIALER_MCOR		0x0008
-#define	SYSDIALER_MCO		0x0010
-#define	SYSDIALER_MCL		0x0020
-#define	SYSDIALER_MARGS		0x0040
+enum sysdialeros {
+    	sysdialero_full,
+    	sysdialero_halfout,
+    	sysdialero_halfin,
+    	sysdialero_cor,
+    	sysdialero_co,
+    	sysdialero_cl,
+    	sysdialero_nargs,
+    	sysdialero_overlast,
+    	sysdialero_rdonly = sysdialero_halfin,
+    	sysdialero_wronly = sysdialero_halfout
+} ;
+
+#ifdef	__cplusplus
+
+struct sysdialerms {
+	static cint	full ;
+	static cint	halfout ;
+	static cint	halfin ;
+	static cint	cor ;
+	static cint	co ;
+	static cint	cl ;
+	static cint	nargs ;
+} ;
+
+#endif /* __cplusplus */
+
+#define	SYSDIALER_MFULL		(1 << sysdialero_full)
+#define	SYSDIALER_MHALFOUT	(1 << sysdialero_halfout)
+#define	SYSDIALER_MHALFIN	(1 << sysdialero_halfin)
+#define	SYSDIALER_MCOR		(1 << sysdialero_cor)
+#define	SYSDIALER_MCO		(1 << sysdialero_co)
+#define	SYSDIALER_MCL		(1 << sysdialero_cl)
+#define	SYSDIALER_MARGS		(1 << sysdialero_nargs)
 /* option mash aliases */
 #define	SYSDIALER_MRDONLY	SYSDIALER_MHALFIN
 #define	SYSDIALER_MWRONLY	SYSDIALER_MHALFOUT
@@ -77,11 +104,12 @@ struct sysdialer_prcache {
 struct sysdialer_head {
 	cchar		*pr ;
 	mainv		dirs ;
-	SYSDIALER_PRC	pc ;
-	SYSDIALER_FL	fl ;
 	vecobj		*elp ;		/* entry-list-pointer */
 	vecstr		*plp ;		/* pr-list-pointer */
 	vecstr		*dlp ;		/* directory-list-pointer */
+	void		*callp ;	/* calls-structure pointer */
+	SYSDIALER_PRC	pc ;
+	SYSDIALER_FL	fl ;
 	time_t		ti_lastcheck ;
 	uint		magic ;
 } ;
@@ -126,6 +154,8 @@ typedef	SYSDIALER_ENT	sysdialer_ent ;
 typedef	SYSDIALER_MOD	sysdialer_mod ;
 typedef	SYSDIALER_INFO	sysdialer_info ;
 typedef	SYSDIALER_ARGS	sysdialer_args ;
+typedef	SYSDIALER_PRC	sysdialer_prc ;
+typedef	SYSDIALER_MOD	sysdialer_mod ;
 
 EXTERNC_begin
 
