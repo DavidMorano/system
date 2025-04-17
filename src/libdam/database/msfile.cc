@@ -10,7 +10,7 @@
 #define	CF_SAFE		1		/* safer? */
 #define	CF_CREAT	0		/* always create the file? */
 #define	CF_LOCKF	0		/* use 'lockf(3c)' */
-#define	CF_SOLARISBUG	1		/* work around Solaris MMAP bug */
+#define	CF_SOLARISBUG	1		/* work around Solaris® MMAP bug */
 #define	CF_NIENUM	0		/* perform NI updates on ENUM */
 #define	CF_NISEARCH	0		/* perform NI updates on SEARCH */
 
@@ -20,21 +20,21 @@
 	This code was originally written.
 
 	= 2003-06-26, David A­D­ Morano
-	Although this object works, it was only a micracle that it
-	did.  There is a feature-bug in Solaris that does not allow
+	Although this object works, it was only a miracle that it
+	did.  There is a feature-bug in Solaris® that does not allow
 	a file to be both mapped and locked at the same time (in
 	either order).  But there seems to be a crack in the stupid
-	Solaris implementation because it does not enforce its stupid
+	Solaris® implementation because it does not enforce its stupid
 	bug carefully enough and this object here fell through the
 	cracks and continued working by accident.  We were locking
 	the whole file beyond its end and that appears to get by
-	the Solaris police-state bug-patrol and was accidentally
+	the Solaris® police-state bug-patrol and was accidentally
 	being allowed.  I reworked a good bit of this code to eliminate
 	any file mapping (so that we can continue to use file-record
-	locks).  This whole Solaris crap (this is being done on
-	Solaris 8 right now) is really a pain and Sun should face
+	locks).  This whole Solaris® crap (this is being done on
+	Solaris® 8 right now) is really a pain and Sun should face
 	punitive charges for inhumanity to the programmer community.
-	Solaris has some nice things since it was derived from the
+	Solaris® has some nice things since it was derived from the
 	older (and better) System V UNIX®, but has really messed
 	it up by not allowing what used to be allowed in the old
 	days with things like the old RFS facility.  Oh, while we are
@@ -60,11 +60,11 @@
 
 	Design note: 
 
-	In summary, Solaris sucks cock meat! Solaris does not allow
+	In summary, Solaris® sucks cock meat!  Solaris® does not allow
 	a file to be memory-mapped from an NFS remote server AND
-	also be file-locked at the same time.  A lot of stupid Solaris
+	also be file-locked at the same time.  A lot of stupid Solaris®
 	documentation notes say something to the effect that the
-	Solaris VM system cannot handle a remote file that is both
+	Solaris® VM system cannot handle a remote file that is both
 	mapped and subject to file-locking at the same time.  They
 	use some sort of stupid circular reasoning that if any file
 	is being file-locked, then obviously it cannot be memory-mapped
@@ -80,30 +80,30 @@
 	Remote files were cross mounted in the late 80s and very
 	early 90s using RFS (not stupid NFS).  The use of RFS provided
 	many advantages not the least of them being full UFS
-	file-system semantics, but it is not clear why Solaris took
+	file-system semantics, but it is not clear why Solaris® took
 	a step backward from simply allowing remote files to be
 	both memory-mapped and file-locked at the same time.  Some
 	bright light-bulb of a software developer must have gotten
 	his underwear in a bunch at some point and decided to
 	disallow both of these from ever occurring at the same time
-	in Solaris.  We all have suffered from these dumb-butt Solaris
+	in Solaris®.  We all have suffered from these dumb-butt Solaris®
 	developers since we have to take time out to re-debug-write
 	old code (like this code here) to handle the case of stupid
-	Solaris not allowing memory mapping for a file that is also
+	Solaris® not allowing memory mapping for a file that is also
 	file-locked.
 
 	Implementation note:
 
 	The code was actually running when files were being locked
 	in their entirety and beyond their ends.  There was some
-	sort of loop-hole in the stupid Solaris code that allowed
+	sort of loop-hole in the stupid Solaris® code that allowed
 	a file to be both file-locked and memory mapped at the same
 	time under certain circumstances.  However, there seemed to
 	be problems with this code when other parties on other
 	(remote) systems tried to do the same thing.  They sometimes
 	failed with dead-lock types of errors (I forget the details).
 	As a result, I decided to change the code to fully comply
-	with the stupid Solaris requirements that no remote file
+	with the stupid Solaris® requirements that no remote file
 	be both memory mapped and file locked at the same time.  Any
 	code that is here now that has to be with mapping of files
 	is really just code that now allocates local private memory.
@@ -111,30 +111,29 @@
 	really done because it seemed to offer the minimal changes
 	to the code to get a private memory access to the file while
 	still retaining the ability to file-lock the file.  Finally,
-	let me finish with the comment that Solaris sucks cock meat.
+	let me finish with the comment that Solaris® sucks cock meat.
 
 	Final note:
 
-	Solaris sucks cock meat! Give me back simultaneous memory
-	mapping and file locking.  And while you're at it, give me
-	back RFS also! And to you stupid Solaris VM developers, get
-	out of Solaris development.  Either get a new job somewhere
+	Solaris® sucks cock meat!  Give me back simultaneous memory
+	mapping and file locking.  And while you are at it, give me
+	back RFS also!  And to you stupid Solaris® VM developers, get
+	out of Solaris® development.  Either get a new job somewhere
 	else or think about committing suicide.  Either way, we can
 	all be happier with one (or more) of those alternatives.
 
 	Anecdotal note:
 
-	Hey, you stupid Solaris developers: give me back the ability
-	to push SOCKMOD on a TPI endpoint also! Since you're so
-	stupid, I know that you forgot that this was possible at
-	one time.  You hosed that ability away when you botched up
-	making Solaris 2.6.
+	Hey, you cognatively challenged Solaris® developers: give
+	me back the ability to push SOCKMOD on a TPI endpoint also!
+	Since you are so challenged, I know that you forgot that this
+	was possible at one time.  You hosed that ability away when
+	you botched up making Solaris® 2.6.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<netinet/in.h>
@@ -143,7 +142,7 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
+#include	<ctime>			/* |time_t| */
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -159,7 +158,7 @@
 #include	<hasx.h>
 #include	<isnot.h>
 #include	<isfiledesc.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"msfile.h"
 #include	"msfilee.h"
@@ -188,50 +187,82 @@
 #define	TO_LOCK		30		/* seconds */
 #endif /* CF_DEBUGTEST */
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
+#define	MS		msfile
+#define	MS_ENT		msfile_ent
 
 
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	stroflags(char *,int) ;
+extern int	debugprintf(cchar *,...) noex ;
+extern int	strlinelen(cchar *,int,int) noex ;
+extern int	stroflags(char *,int) noex ;
 #endif
 
 
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
-static int	msfile_fileopen(MSFILE *,time_t) noex ;
-static int	msfile_fileclose(MSFILE *) noex ;
-static int	msfile_filesetinfo(MSFILE *) noex ;
-static int	msfile_lockget(MSFILE *,time_t,int) noex ;
-static int	msfile_lockrelease(MSFILE *) noex ;
-static int	msfile_filebegin(MSFILE *,time_t) noex ;
-static int	msfile_acquire(MSFILE *,time_t,int) noex ;
-static int	msfile_filecheck(MSFILE *) noex ;
-static int	msfile_entbufstart(MSFILE *) noex ;
-static int	msfile_entbuffinish(MSFILE *) noex ;
+template<typename ... Args>
+static int msfile_ctor(msfile *op,Args ... args) noex {
+    	MSFILE		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (msfile_ctor) */
 
-static int	msfile_filetopwrite(MSFILE *) noex ;
-static int	msfile_filetopread(MSFILE *) noex ;
-static int	msfile_fileverify(MSFILE *) noex ;
-static int	msfile_headtab(MSFILE *,int) noex ;
+static int msfile_dtor(msfile *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (msfile_dtor) */
 
-static int	msfile_findname(MSFILE *,cchar *,int,char **) noex ;
-static int	msfile_search(MSFILE *,cchar *,int,char **) noex ;
-static int	msfile_readentry(MSFILE *,int,char **) noex ;
+template<typename ... Args>
+static inline int msfile_magic(msfile *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == MSFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (msfile_magic) */
+
+static int	msfile_fileopen(MS *,time_t) noex ;
+static int	msfile_fileclose(MS *) noex ;
+static int	msfile_filesetinfo(MS *) noex ;
+static int	msfile_lockget(MS *,time_t,int) noex ;
+static int	msfile_lockrelease(MS *) noex ;
+static int	msfile_filebegin(MS *,time_t) noex ;
+static int	msfile_acquire(MS *,time_t,int) noex ;
+static int	msfile_filecheck(MS *) noex ;
+static int	msfile_entbufstart(MS *) noex ;
+static int	msfile_entbuffinish(MS *) noex ;
+
+static int	msfile_filetopwrite(MS *) noex ;
+static int	msfile_filetopread(MS *) noex ;
+static int	msfile_fileverify(MS *) noex ;
+static int	msfile_headtab(MS *,int) noex ;
+
+static int	msfile_findname(MS *,cchar *,int,char **) noex ;
+static int	msfile_search(MS *,cchar *,int,char **) noex ;
+static int	msfile_readentry(MS *,int,char **) noex ;
 
 #if	CF_NISEARCH
-static int	msfile_index(MSFILE *,cchar *,int,int) noex ;
+static int	msfile_index(MS *,cchar *,int,int) noex ;
 #endif
 
-static int	msfile_headwrite(MSFILE *) noex ;
+static int	msfile_headwrite(MS *) noex ;
 
 static int	namematch(cchar *,cchar *,int) noex ;
 
@@ -239,9 +270,12 @@ static int	namematch(cchar *,cchar *,int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int msfile_open(MSFILE *op,cchar *fname,int oflags,mode_t operm) noex {
+int msfile_open(MS *op,cchar *fname,int oflags,mode_t operm) noex {
 	const time_t	dt = time(nullptr) ;
 	int		rs ;
 	int		f_created = false ;
@@ -309,7 +343,7 @@ int msfile_open(MSFILE *op,cchar *fname,int oflags,mode_t operm) noex {
 }
 /* end subroutine (msfile_open) */
 
-int msfile_close(MSFILE *op) noex {
+int msfile_close(MS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -352,7 +386,7 @@ int msfile_close(MSFILE *op) noex {
 }
 /* end subroutine (msfile_close) */
 
-int msfile_count(MSFILE *op) noex {
+int msfile_count(MS *op) noex {
 	int		rs = SR_OK ;
 	int		c ;
 
@@ -368,7 +402,7 @@ int msfile_count(MSFILE *op) noex {
 }
 /* end subroutine (msfile_count) */
 
-int msfile_curbegin(MSFILE *op,MSFILE_CUR *curp) noex {
+int msfile_curbegin(MS *op,MSFILE_CUR *curp) noex {
 
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
@@ -387,7 +421,7 @@ int msfile_curbegin(MSFILE *op,MSFILE_CUR *curp) noex {
 }
 /* end subroutine (msfile_curbegin) */
 
-int msfile_curend(MSFILE *op,MSFILE_CUR *curp) noex {
+int msfile_curend(MS *op,MSFILE_CUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -403,10 +437,13 @@ int msfile_curend(MSFILE *op,MSFILE_CUR *curp) noex {
 	    op->ti_access = time(nullptr) ;
 	} /* end if */
 
-	if (op->ncursors > 0)
+	if (op->ncursors > 0) {
 	    op->ncursors -= 1 ;
+	}
 
-	if ((op->ncursors == 0) && (opop->fl.lockedread || opop->fl.lockedwrite)) {
+	bool	f = (op->ncursors == 0) ;
+	f = f && (opop->fl.lockedread || opop->fl.lockedwrite) ;
+	if (f) {
 	    rs1 = msfile_lockrelease(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -416,7 +453,7 @@ int msfile_curend(MSFILE *op,MSFILE_CUR *curp) noex {
 }
 /* end subroutine (msfile_curend) */
 
-int msfile_enum(MSFILE *op,MSFILE_CUR *curp,MSFILE_ENT *ep) noex {
+int msfile_enum(MS *op,MSFILE_CUR *curp,MS_ENT *ep) noex {
 	time_t		dt = 0 ;
 	int		ebs = MSFILE_ENTSIZE ;
 	int		rs = SR_OK ;
@@ -458,7 +495,7 @@ int msfile_enum(MSFILE *op,MSFILE_CUR *curp,MSFILE_ENT *ep) noex {
 }
 /* end subroutine (msfile_enum) */
 
-int msfile_match(MSFILE *op,time_t dt,cchar *nnp,int nnl,MSFILE_ENT *ep) noex {
+int msfile_match(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 	cint		ebs = MSFILE_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		i = MSFILE_NODENAMELEN ;
@@ -478,8 +515,9 @@ int msfile_match(MSFILE *op,time_t dt,cchar *nnp,int nnl,MSFILE_ENT *ep) noex {
 	    nnl,nnp,xstrnlen(nnp,nnl)) ;
 #endif
 
-	if (nnl >= 0)
+	if (nnl >= 0) {
 	    i = MIN(nnl,MSFILE_NODENAMELEN) ;
+	}
 
 	nnl = xstrnlen(nnp,i) ;
 
@@ -541,7 +579,7 @@ int msfile_match(MSFILE *op,time_t dt,cchar *nnp,int nnl,MSFILE_ENT *ep) noex {
 }
 /* end subroutine (msfile_match) */
 
-int msfile_write(MSFILE *op,time_t dt,cchar *nnp,int nnl,MSFILE_ENT *ep) noex {
+int msfile_write(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 	cint		ebs = MSFILE_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		i = MSFILE_NODENAMELEN ;
@@ -674,7 +712,7 @@ int msfile_write(MSFILE *op,time_t dt,cchar *nnp,int nnl,MSFILE_ENT *ep) noex {
 }
 /* end subroutine (msfile_write) */
 
-int msfile_update(MSFILE *op,time_t dt,MSFILE_ENT *ep) noex {
+int msfile_update(MS *op,time_t dt,MS_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		ei = 0 ;
 
@@ -880,7 +918,7 @@ int msfile_update(MSFILE *op,time_t dt,MSFILE_ENT *ep) noex {
 }
 /* end subroutine (msfile_update) */
 
-int msfile_check(MSFILE *op,time_t dt) noex {
+int msfile_check(MS *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 
@@ -908,7 +946,7 @@ int msfile_check(MSFILE *op,time_t dt) noex {
 
 /* private subroutines */
 
-static int msfile_findname(MSFILE *op,cchar *nnp,int nnl,char **rpp) noex {
+static int msfile_findname(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 	int		rs ;
 	int		ei = 0 ;
 	char		*bp = nullptr ;
@@ -959,7 +997,7 @@ static int msfile_findname(MSFILE *op,cchar *nnp,int nnl,char **rpp) noex {
 }
 /* end subroutine (msfile_findname) */
 
-static int msfile_search(MSFILE *op,cchar *nnp,int nnl,char **rpp) noex {
+static int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 	cint		ebs = MSFILE_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -1052,7 +1090,7 @@ static int msfile_search(MSFILE *op,cchar *nnp,int nnl,char **rpp) noex {
 }
 /* end subroutine (msfile_search) */
 
-static int msfile_acquire(MSFILE *op,time_t dt,int f_read) noex {
+static int msfile_acquire(MS *op,time_t dt,int f_read) noex {
 	cint		ebs = MSFILE_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		f_changed = false ;
@@ -1099,7 +1137,7 @@ static int msfile_acquire(MSFILE *op,time_t dt,int f_read) noex {
 }
 /* end subroutine (msfile_acquire) */
 
-static int msfile_filebegin(MSFILE *op,time_t dt) noex {
+static int msfile_filebegin(MS *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f_locked = false ;
 
@@ -1169,7 +1207,7 @@ static int msfile_filebegin(MSFILE *op,time_t dt) noex {
 }
 /* end subroutine (msfile_filebegin) */
 
-static int msfile_filecheck(MSFILE *op) noex {
+static int msfile_filecheck(MS *op) noex {
 	int		rs = SR_OK ;
 	int		f_changed = false ;
 
@@ -1192,7 +1230,7 @@ static int msfile_filecheck(MSFILE *op) noex {
 }
 /* end subroutine (msfile_filecheck) */
 
-static int msfile_filetopwrite(MSFILE *op) noex {
+static int msfile_filetopwrite(MS *op) noex {
 	off_t	poff = 0L ;
 	int		ml ;
 	int		rs = SR_OK ;
@@ -1228,7 +1266,7 @@ static int msfile_filetopwrite(MSFILE *op) noex {
 }
 /* end subroutine (msfile_filetopwrite) */
 
-static int msfile_filetopread(MSFILE *op) noex {
+static int msfile_filetopread(MS *op) noex {
 	off_t	poff = 0L ;
 	int		rs ;
 
@@ -1239,7 +1277,7 @@ static int msfile_filetopread(MSFILE *op) noex {
 }
 /* end subroutine (msfile_filetopread) */
 
-static int msfile_fileverify(MSFILE *op) noex {
+static int msfile_fileverify(MS *op) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUGS
@@ -1283,7 +1321,7 @@ static int msfile_fileverify(MSFILE *op) noex {
 }
 /* end subroutine (msfile_fileverify) */
 
-static int msfile_headtab(MSFILE *op,int f_read) noex {
+static int msfile_headtab(MS *op,int f_read) noex {
 	int		rs = SR_OK ;
 	int		f_changed = false ;
 	char		*bp = (op->topbuf + MSFILE_HEADTABOFF) ;
@@ -1324,7 +1362,7 @@ static int msfile_headtab(MSFILE *op,int f_read) noex {
 }
 /* end subroutine (msfile_headtab) */
 
-static int msfile_lockget(MSFILE *op,time_t dt,int f_read) noex {
+static int msfile_lockget(MS *op,time_t dt,int f_read) noex {
 	USTAT		sb ;
 	int		rs = SR_OK ;
 	int		lockcmd ;
@@ -1362,14 +1400,14 @@ static int msfile_lockget(MSFILE *op,time_t dt,int f_read) noex {
 /* we need to actually do the lock */
 
 #if	CF_LOCKF
-	        rs = uc_lockf(op->fd,F_LOCK,0L) ;
+	        rs = uc_lockf(op->fd,F_LOCK,0z) ;
 #else /* CF_LOCKF */
 #if	CF_SOLARISBUG
-	        rs = lockfile(op->fd,lockcmd,0L,0L,TO_LOCK) ;
+	        rs = lockfile(op->fd,lockcmd,0z,0z,TO_LOCK) ;
 #else
 	        {
 	            off_t	fs = op->filesize ;
-	            rs = lockfile(op->fd,lockcmd,0L,fs,TO_LOCK) ;
+	            rs = lockfile(op->fd,lockcmd,0z,fs,TO_LOCK) ;
 	        }
 #endif /* CF_SOLARISBUF */
 #endif /* CF_LOCKF */
@@ -1415,7 +1453,7 @@ static int msfile_lockget(MSFILE *op,time_t dt,int f_read) noex {
 }
 /* end subroutine (msfile_lockget) */
 
-static int msfile_lockrelease(MSFILE *op) noex {
+static int msfile_lockrelease(MS *op) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUGS && 0
@@ -1427,14 +1465,14 @@ static int msfile_lockrelease(MSFILE *op) noex {
 	    if (op->fd >= 0) {
 
 #if	CF_LOCKF
-	        rs = uc_lockf(op->fd,F_ULOCK,0L) ;
+	        rs = uc_lockf(op->fd,F_ULOCK,0z) ;
 #else /* CF_LOCKF */
 #if	CF_SOLARISBUG
-	        rs = lockfile(op->fd,F_ULOCK,0L,0L,TO_LOCK) ;
+	        rs = lockfile(op->fd,F_ULOCK,0z,0z,TO_LOCK) ;
 #else
 	        {
 	            off_t	fs = op->filesize ;
-	            rs = lockfile(op->fd,F_ULOCK,0L,fs,TO_LOCK) ;
+	            rs = lockfile(op->fd,F_ULOCK,0z,fs,TO_LOCK) ;
 	        }
 #endif /* CF_SOLARISBUF */
 #endif /* CF_LOCKF */
@@ -1463,7 +1501,7 @@ static int msfile_lockrelease(MSFILE *op) noex {
 }
 /* end subroutine (msfile_lockrelease) */
 
-static int msfile_fileopen(MSFILE *op,time_t dt) noex {
+static int msfile_fileopen(MS *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f_created = false ;
 
@@ -1508,7 +1546,7 @@ static int msfile_fileopen(MSFILE *op,time_t dt) noex {
 }
 /* end subroutine (msfile_fileopen) */
 
-int msfile_fileclose(MSFILE *op) noex {
+int msfile_fileclose(MS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1529,7 +1567,7 @@ int msfile_fileclose(MSFILE *op) noex {
 }
 /* end subroutine (msfile_fileclose) */
 
-static int msfile_filesetinfo(MSFILE *op) noex {
+static int msfile_filesetinfo(MS *op) noex {
 	USTAT		sb ;
 	int		rs ;
 	int		amode ;
@@ -1546,7 +1584,7 @@ static int msfile_filesetinfo(MSFILE *op) noex {
 }
 /* end subroutine (msfile_filesetinfo) */
 
-static int msfile_entbufstart(MSFILE *op) noex {
+static int msfile_entbufstart(MS *op) noex {
 	int		rs = SR_OK ;
 
 	if (! opop->fl.entbuf) {
@@ -1566,7 +1604,7 @@ static int msfile_entbufstart(MSFILE *op) noex {
 }
 /* end subroutine (msfile_entbufstart) */
 
-static int msfile_entbuffinish(MSFILE *op) noex {
+static int msfile_entbuffinish(MS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1580,7 +1618,7 @@ static int msfile_entbuffinish(MSFILE *op) noex {
 }
 /* end subroutine (msfile_entbuffinish) */
 
-static int msfile_readentry(MSFILE *op,int ei,char **rpp) noex {
+static int msfile_readentry(MS *op,int ei,char **rpp) noex {
 	int		rs ;
 	char		*bp ;
 
@@ -1615,7 +1653,7 @@ static int msfile_readentry(MSFILE *op,int ei,char **rpp) noex {
 
 #if	CF_NISEARCH
 
-static int msfile_index(MSFILE *op,cchar *np,int nl,int ei) noex {
+static int msfile_index(MS *op,cchar *np,int nl,int ei) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ei2 ;
@@ -1641,7 +1679,7 @@ static int msfile_index(MSFILE *op,cchar *np,int nl,int ei) noex {
 
 #endif /* CF_NISEARCH */
 
-static int msfile_headwrite(MSFILE *op) noex {
+static int msfile_headwrite(MS *op) noex {
 	int		rs ;
 
 	if ((rs = msfile_headtab(op,0)) >= 0) {
