@@ -742,6 +742,9 @@ ds.o:			ds.cc ds.h
 dw.o:			dw.cc dw.h
 nodesfile.o:		nodesfile.cc nodesfile.h
 nodesearch.o:		nodesearch.cc nodesearch.h
+termtrans.o:		termtrans.cc termtrans.h
+termout.o:		termout.cc termout.h
+modload.o:		modload.cc modload.h
 
 # TEXT related
 textlook.o:		textlook.cc textlook.h
