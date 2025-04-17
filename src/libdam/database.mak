@@ -74,7 +74,7 @@ OBJC= obj8.o
 OBJ= $(OBJA) $(OBJB) $(OBJC)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -100,9 +100,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -123,41 +126,41 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
 
 obj1.o:			$(OBJ1)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
 
 obj2.o:			$(OBJ2)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
 
 obj3.o:			$(OBJ3)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
 
 obj4.o:			$(OBJ4)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
 
 obj5.o:			$(OBJ5)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
 
 obj6.o:			$(OBJ6)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6)
 
 obj7.o:			$(OBJ7)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7)
 
 obj8.o:			$(OBJ8)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ8)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ8)
 
 
 obja.o:		$(OBJA)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
 
 objb.o:		$(OBJB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 objc.o:		$(OBJC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
 babieshdr.o:		babieshdr.cc babieshdr.h		$(INCS)
@@ -168,7 +171,6 @@ bpihdr.o:		bpihdr.cc bpihdr.h		$(INCS)
 bvihdr.o:		bvihdr.cc bvihdr.h		$(INCS)
 bvshdr.o:		bvshdr.cc bvshdr.h		$(INCS)
 cmi.o:			cmi.cc cmi.h			$(INCS)
-cmihdr.o:		cmihdr.cc cmihdr.h		$(INCS)
 commandment.o:		commandment.cc commandment.h	$(INCS)
 commandments.o:		commandments.cc commandments.h	$(INCS)
 cyihdr.o:		cyihdr.cc cyihdr.h		$(INCS)
@@ -187,5 +189,8 @@ vars.o:			vars.cc vars.h			$(INCS)
 votdchdr.o:		votdchdr.cc votdchdr.h		$(INCS)
 votdshdr.o:		votdshdr.cc votdshdr.h		$(INCS)
 ttihdr.o:		ttihdr.cc ttihdr.h		$(INCS)
+
+cmihdr.o:		cmihdr.cc cmihdr.h		$(INCS)
+cmimk.o:		cmimk.cc cmimk.h		$(INCS)
 
 
