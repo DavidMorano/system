@@ -1,5 +1,5 @@
 DATABASE
 
 This directory contains the various access, creation, and support 
-subroutines for various file-databases.
+objects and subroutines for various file-databases.
 
