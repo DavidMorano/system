@@ -2,6 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
+/* baby calculator */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -10,8 +13,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<sys/types.h>		/* |time_t| */
 #include	<ptm.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -19,7 +21,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<babiesfu.h>
+#include	<babieshdr.h>
 
 
 #define	BABYCALCS_DBNAME	"babies"
@@ -61,7 +63,7 @@ struct babycalcs_head {
 	cchar		*shmname ;
 	caddr_t		mapdata ;	/* SHM data */
 	ptm		*mp ;		/* pointer to SHM mutex */
-	BABIESFU	hf ;
+	BABIESHDR	hf ;
 	time_t		ti_mdb ;	/* db-mtime */
 	time_t		ti_map ;	/* map-time */
 	time_t		ti_lastcheck ;
@@ -85,7 +87,7 @@ EXTERNC_begin
 extern int	babycalcs_open(babycalcs *,cchar *,cchar *) noex ;
 extern int	babycalcs_check(babycalcs *,time_t) noex ;
 extern int	babycalcs_lookup(babycalcs *,time_t,uint *) noex ;
-extern int	babycalcs_info(babycalcs *,babycals_info *) noex ;
+extern int	babycalcs_getinfo(babycalcs *,babycalcs_info *) noex ;
 extern int	babycalcs_close(babycalcs *) noex ;
 
 EXTERNC_end

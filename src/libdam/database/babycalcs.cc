@@ -42,7 +42,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
@@ -63,11 +63,11 @@
 #include	<storebuf.h>
 #include	<ptma.h>
 #include	<ptm.h>
+#include	<cvtdater.h>
 #include	<localmisc.h>
 
 #include	"babycalcs.h"
-#include	"cvtdater.h"
-#include	"babiesfu.h"
+#include	"babieshdr.h"
 
 
 /* local defines */
@@ -79,6 +79,9 @@
 #define	BABYCALCS_PREFIXLEN	5
 #define	BABYCALCS_POSTFIXLEN	7
 #define	BABYCALCS_PERMS		0666
+
+#define	BC		babycalcs
+#define	HDR		BABIESGDR
 
 #ifndef	LINEBUFLEN
 #ifdef	LINE_MAX
@@ -100,7 +103,7 @@
 #define	SHMPOSTFIXLEN	4
 #endif
 
-#define	HDRBUFLEN	(szof(BABIESFU) + MAXNAMELEN)
+#define	HDRBUFLEN	(szof(HDR) + MAXNAMELEN)
 
 #ifndef	TO_WAITSHM
 #define	TO_WAITSHM	20		/* seconds */
@@ -124,52 +127,54 @@
 
 /* forward references */
 
-static int	babycalcs_shmload(BABYCALCS *,mode_t) ;
-static int	babycalcs_shmopen(BABYCALCS *,time_t,cchar *,mode_t) ;
-static int	babycalcs_loadtxt(BABYCALCS *) ;
+static int	babycalcs_shmload(BC *,mode_t) noex ;
+static int	babycalcs_shmopen(BC *,time_t,cchar *,mode_t) noex ;
+static int	babycalcs_loadtxt(BC *) noex ;
 
-static int	babycalcs_mapbegin(BABYCALCS *,time_t,int) ;
-static int	babycalcs_mapend(BABYCALCS *) ;
+static int	babycalcs_mapbegin(BC *,time_t,int) noex ;
+static int	babycalcs_mapend(BC *) noex ;
 
-static int	babycalcs_proctxt(BABYCALCS *,vecobj *) ;
-static int	babycalcs_proctxtline(BABYCALCS *,vecobj *,CVTDATER *,
-			cchar *,int) ;
+static int	babycalcs_proctxt(BC *,vecobj *) noex ;
+static int	babycalcs_proctxtline(BC *,vecobj *,CVTDATER *,
+			cchar *,int) noex ;
 
-static int	babycalcs_shmwr(BABYCALCS *,time_t,int,mode_t) ;
-static int	babycalcs_shmwrer(BABYCALCS *,time_t,int,mode_t,BABIESFU *) ;
-static int	babycalcs_openshmwait(BABYCALCS *,cchar *) ;
-static int	babycalcs_mutexinit(BABYCALCS *) ;
-static int	babycalcs_procmap(BABYCALCS *,time_t) ;
-static int	babycalcs_verify(BABYCALCS *,time_t) ;
+static int	babycalcs_shmwr(BC *,time_t,int,mode_t) noex ;
+static int	babycalcs_shmwrer(BC *,time_t,int,mode_t,HDR *) noex ;
+static int	babycalcs_openshmwait(BC *,cchar *) ;
+static int	babycalcs_mutexinit(BC *) ;
+static int	babycalcs_procmap(BC *,time_t) ;
+static int	babycalcs_verify(BC *,time_t) ;
 
-static int	babycalcs_lookshm(BABYCALCS *,time_t,time_t,uint *) ;
-static int	babycalcs_lookproc(BABYCALCS *,time_t,uint *) ;
-static int	babycalcs_lookinfo(BABYCALCS *,BABYCALCS_INFO *) ;
-static int	babycalcs_calc(BABYCALCS *,int,time_t,uint *) ;
-static int	babycalcs_dbcheck(BABYCALCS *,time_t) ;
-static int	babycalcs_dbwait(BABYCALCS *,time_t,USTAT *) ;
-static int	babycalcs_reloadshm(BABYCALCS *,time_t,USTAT *) ;
-static int	babycalcs_reloadtxt(BABYCALCS *,time_t) ;
-static int	babycalcs_shmcheck(BABYCALCS *,USTAT *) ;
-static int	babycalcs_shmaccess(BABYCALCS *,time_t) ;
-static int	babycalcs_shmupdate(BABYCALCS *,time_t,USTAT *,int) ;
-static int	babycalcs_shmaddwrite(BABYCALCS *,int) ;
-static int	babycalcs_shminfo(BABYCALCS *,BABYCALCS_INFO *) ;
+static int	babycalcs_lookshm(BC *,time_t,time_t,uint *) ;
+static int	babycalcs_lookproc(BC *,time_t,uint *) ;
+static int	babycalcs_lookinfo(BC *,BABYCALCS_INFO *) ;
+static int	babycalcs_calc(BC *,int,time_t,uint *) ;
+static int	babycalcs_dbcheck(BC *,time_t) ;
+static int	babycalcs_dbwait(BC *,time_t,USTAT *) ;
+static int	babycalcs_reloadshm(BC *,time_t,USTAT *) ;
+static int	babycalcs_reloadtxt(BC *,time_t) ;
+static int	babycalcs_shmcheck(BC *,USTAT *) ;
+static int	babycalcs_shmaccess(BC *,time_t) ;
+static int	babycalcs_shmupdate(BC *,time_t,USTAT *,int) ;
+static int	babycalcs_shmaddwrite(BC *,int) ;
+static int	babycalcs_shminfo(BC *,BABYCALCS_INFO *) ;
 
 static int	mkshmname(char *,cchar *,int,cchar *,int) ;
 
-static int	vcmpentry(BABYCALCS_ENT **,BABYCALCS_ENT **) ;
+extern "C" {
+    static int	vcmpentry(BABYCALCS_ENT **,BABYCALCS_ENT **) noex ;
+}
 
 
 /* local variables */
 
-static BABYCALCS_ENT	defs[] = {
+constexpr static BABYCALCS_ENT	defs[] = {
 	{ 96526800, 0 },
 	{ 1167627600, 47198810 },	/* from Guntmacker Institute */
 	{ 0, 0 }
 } ;
 
-static cint	loadrs[] = {
+constexpr static cint		loadrs[] = {
 	SR_NOENT,
 	SR_NOTSUP,
 	SR_NOSYS,
@@ -187,7 +192,7 @@ extern const babycalcs_obj	babycalcs_modinfo = {
 
 /* exported subroutines */
 
-int babycalcs_open(BABYCALCS *op,cchar *pr,cchar *dbname) noex {
+int babycalcs_open(BC *op,cchar *pr,cchar *dbname) noex {
 	cmode	om = BABYCALCS_PERMS ;
 	int		rs ;
 	cchar	*cp ;
@@ -256,9 +261,7 @@ int babycalcs_open(BABYCALCS *op,cchar *pr,cchar *dbname) noex {
 }
 /* end subroutine (babycalcs_open) */
 
-
-int babycalcs_close(BABYCALCS *op)
-{
+int babycalcs_close(BC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -299,9 +302,7 @@ int babycalcs_close(BABYCALCS *op)
 }
 /* end subroutine (babycalcs_close) */
 
-
-int babycalcs_check(BABYCALCS *op,time_t dt)
-{
+int babycalcs_check(BC *op,time_t dt) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -314,9 +315,7 @@ int babycalcs_check(BABYCALCS *op,time_t dt)
 }
 /* end subroutine (babycalcs_check) */
 
-
-int babycalcs_lookup(BABYCALCS *op,time_t datereq,uint *rp)
-{
+int babycalcs_lookup(BC *op,time_t datereq,uint *rp) noex {
 	time_t		dt = 0 ;
 	int		rs ;
 
@@ -342,9 +341,7 @@ int babycalcs_lookup(BABYCALCS *op,time_t datereq,uint *rp)
 }
 /* end subroutine (babycalcs_lookup) */
 
-
-int babycalcs_info(BABYCALCS *op,BABYCALCS_INFO *bip)
-{
+int babycalcs_getinfo(BC *op,BABYCALCS_INFO *bip) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -362,12 +359,12 @@ int babycalcs_info(BABYCALCS *op,BABYCALCS_INFO *bip)
 
 	return rs ;
 }
-/* end subroutine (babycalcs_info) */
+/* end subroutine (babycalcs_getinfo) */
 
 
 /* private subroutines */
 
-static int babycalcs_shmload(BABYCALCS *op,mode_t om) noex {
+static int babycalcs_shmload(BC *op,mode_t om) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	int		c = 0 ;
@@ -440,9 +437,8 @@ static int babycalcs_shmload(BABYCALCS *op,mode_t om) noex {
 }
 /* end subroutine (babycalcs_shmload) */
 
-
-static int babycalcs_shmopen(BABYCALCS *op,time_t dt,cchar *shmname,mode_t om)
-{
+static int babycalcs_shmopen(BC *op,time_t dt,cchar *shmname,
+		mode_t om) noex {
 	cint	rsn = SR_NOENT ;
 	int		of = O_RDWR ;
 	int		rs ;
@@ -481,10 +477,8 @@ static int babycalcs_shmopen(BABYCALCS *op,time_t dt,cchar *shmname,mode_t om)
 }
 /* end subroutine (babycalcs_shmopen) */
 
-
-static int babycalcs_mapbegin(BABYCALCS *op,time_t dt,int fd)
-{
-	const size_t	msize = op->shmsize ;
+static int babycalcs_mapbegin(BC *op,time_t dt,int fd) noex {
+	csize		msize = op->shmsize ;
 	cint	mprot = PROT_READ | PROT_WRITE ;
 	cint	mflags = MAP_SHARED ;
 	int		rs ;
@@ -525,8 +519,7 @@ static int babycalcs_mapbegin(BABYCALCS *op,time_t dt,int fd)
 /* end subroutine (babycalcs_mapbegin) */
 
 
-static int babycalcs_mapend(BABYCALCS *op)
-{
+static int babycalcs_mapend(BC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -549,10 +542,8 @@ static int babycalcs_mapend(BABYCALCS *op)
 }
 /* end subroutine (babycalcs_mapend) */
 
-
-static int babycalcs_procmap(BABYCALCS *op,time_t dt)
-{
-	BABIESFU	*hfp = &op->hf ;
+static int babycalcs_procmap(BC *op,time_t dt) noex {
+	HDR	*hfp = &op->hf ;
 	int		rs ;
 	int		c = 0 ;
 
@@ -580,9 +571,7 @@ static int babycalcs_procmap(BABYCALCS *op,time_t dt)
 }
 /* end subroutine (babycalcs_procmap) */
 
-
-static int babycalcs_loadtxt(BABYCALCS *op)
-{
+static int babycalcs_loadtxt(BC *op) noex {
 	vecobj		ents ;
 	int		rs ;
 	int		rs1 ;
@@ -635,9 +624,7 @@ static int babycalcs_loadtxt(BABYCALCS *op)
 }
 /* end subroutine (babycalcs_loadtxt) */
 
-
-static int babycalcs_proctxt(BABYCALCS *op,vecobj *tlp)
-{
+static int babycalcs_proctxt(BC *op,vecobj *tlp) noex {
 	CVTDATER	cdater ;
 	int		rs ;
 	int		rs1 ;
@@ -715,10 +702,8 @@ static int babycalcs_proctxt(BABYCALCS *op,vecobj *tlp)
 }
 /* end subroutine (babycalcs_proctxt) */
 
-
-static int babycalcs_proctxtline(BABYCALCS *op,vecobj *tlp,CVTDATER *cdp,
-		cchar *lbuf,int llen)
-{
+static int babycalcs_proctxtline(BC *op,vecobj *tlp,CVTDATER *cdp,
+		cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	int		c = 0 ;
@@ -760,8 +745,8 @@ static int babycalcs_proctxtline(BABYCALCS *op,vecobj *tlp,CVTDATER *cdp,
 }
 /* end subroutine (babycalcs_proctxtline) */
 
-static int babycalcs_shmwr(BABYCALCS *op,time_t dt,int fd,mode_t om) noex {
-	BABIESFU	hf{} ;
+static int babycalcs_shmwr(BC *op,time_t dt,int fd,mode_t om) noex {
+	HDR	hf{} ;
 	int		rs ;
 	int		foff = 0 ;
 
@@ -772,7 +757,7 @@ static int babycalcs_shmwr(BABYCALCS *op,time_t dt,int fd,mode_t om) noex {
 
 /* prepare the file-header */
 
-	hf.vetu[0] = BABIESFU_VERSION ;
+	hf.vetu[0] = HDR_VERSION ;
 	hf.vetu[1] = ENDIAN ;
 	hf.vetu[2] = 0 ;
 	hf.vetu[3] = 0 ;
@@ -802,11 +787,9 @@ static int babycalcs_shmwr(BABYCALCS *op,time_t dt,int fd,mode_t om) noex {
 }
 /* end subroutine (babycalcs_shmwr) */
 
-
-static int babycalcs_shmwrer(BABYCALCS *op,time_t dt,int fd,mode_t om,
-		BABIESFU *hfp)
-{
-	FILER		babyfile ;
+static int babycalcs_shmwrer(BC *op,time_t dt,int fd,mode_t om,
+		HDR *hfp) noex {
+	filer		babyfile ;
 	cint	bsize = op->pagesize ;
 	int		rs ;
 	int		rs1 ;
@@ -864,10 +847,8 @@ static int babycalcs_shmwrer(BABYCALCS *op,time_t dt,int fd,mode_t om,
 }
 /* end subroutine (babycalcs_shmwrer) */
 
-
-static int babycalcs_mutexinit(BABYCALCS *op)
-{
-	BABIESFU	*hfp = &op->hf ;
+static int babycalcs_mutexinit(BC *op) noex {
+	HDR	*hfp = &op->hf ;
 	PTM		*mp ;
 	PTMA		ma ;
 	int		rs ;
@@ -894,9 +875,7 @@ static int babycalcs_mutexinit(BABYCALCS *op)
 }
 /* end subroutine (babycalcs_mutexinit) */
 
-
-static int babycalcs_openshmwait(BABYCALCS *op,cchar *shmname)
-{
+static int babycalcs_openshmwait(BC *op,cchar *shmname) noex {
 	cint	om = BABYCALCS_PERMS ;
 	int		rs = SR_OK ;
 	int		oflags = O_RDWR ;
@@ -921,10 +900,8 @@ static int babycalcs_openshmwait(BABYCALCS *op,cchar *shmname)
 }
 /* end subroutine (babycalcs_openshmwait) */
 
-
-static int babycalcs_verify(BABYCALCS *op,time_t dt)
-{
-	BABIESFU	*hfp = &op->hf ;
+static int babycalcs_verify(BC *op,time_t dt) noex {
+	HDR	*hfp = &op->hf ;
 	uint		utime = (uint) dt ;
 	int		rs = SR_OK ;
 	int		size ;
@@ -994,9 +971,8 @@ static int babycalcs_verify(BABYCALCS *op,time_t dt)
 }
 /* end subroutine (babycalcs_verify) */
 
-
-static int babycalcs_lookshm(BABYCALCS *op,time_t dt,time_t datereq,uint *rp)
-{
+static int babycalcs_lookshm(BC *op,time_t dt,time_t datereq,
+		uint *rp) noex {
 	sigset_t	oldsigmask, newsigmask ;
 	int		rs ;
 
@@ -1027,9 +1003,7 @@ static int babycalcs_lookshm(BABYCALCS *op,time_t dt,time_t datereq,uint *rp)
 }
 /* end subroutine (babycalcs_lookshm) */
 
-
-static int babycalcs_lookproc(BABYCALCS *op,time_t datereq,uint *rp)
-{
+static int babycalcs_lookproc(BC *op,time_t datereq,uint *rp) noex {
 	int		rs = SR_OK ;
 	int		i ;
 
@@ -1062,9 +1036,7 @@ static int babycalcs_lookproc(BABYCALCS *op,time_t datereq,uint *rp)
 }
 /* end subroutine (babycalcs_lookproc) */
 
-
-static int babycalcs_calc(BABYCALCS *op,int i,time_t rd,uint *rp)
-{
+static int babycalcs_calc(BC *op,int i,time_t rd,uint *rp) noex {
 	time_t		bd ;
 	double		x0, x1, dx ;
 	double		y0, y1, dy ;
@@ -1092,9 +1064,7 @@ static int babycalcs_calc(BABYCALCS *op,int i,time_t rd,uint *rp)
 }
 /* end subroutine (babycalcs_calc) */
 
-
-static int babycalcs_dbcheck(BABYCALCS *op,time_t dt)
-{
+static int babycalcs_dbcheck(BC *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		tint ;
 	int		f = FALSE ;
@@ -1141,9 +1111,7 @@ static int babycalcs_dbcheck(BABYCALCS *op,time_t dt)
 }
 /* end subroutine (babycalcs_dbcheck) */
 
-
-static int babycalcs_shminfo(BABYCALCS *op,BABYCALCS_INFO *bip)
-{
+static int babycalcs_shminfo(BC *op,BABYCALCS_INFO *bip) noex {
 	sigset_t	oldsigmask, newsigmask ;
 	int		rs ;
 	int		rs1 ;
@@ -1175,11 +1143,11 @@ static int babycalcs_shminfo(BABYCALCS *op,BABYCALCS_INFO *bip)
 }
 /* end subroutine (babycalcs_shminfo) */
 
-static int babycalcs_lookinfo(BABYCALCS *op,BABYCALCS_INFO *bip) noex {
+static int babycalcs_lookinfo(BC *op,BABYCALCS_INFO *bip) noex {
 	uint		*hwp ;
 	int		rs = SR_OK ;
 	memclear(bip) ;
-	hwp = (uint *) (op->mapdata + BABIESFU_IDLEN) ;
+	hwp = (uint *) (op->mapdata + HDR_IDLEN) ;
 	bip->wtime = hwp[babiesfuh_wtime] ;
 	bip->atime = hwp[babiesfuh_atime] ;
 	bip->acount = hwp[babiesfuh_acount] ;
@@ -1187,9 +1155,7 @@ static int babycalcs_lookinfo(BABYCALCS *op,BABYCALCS_INFO *bip) noex {
 }
 /* end subroutine (babycalcs_lookinfo) */
 
-
-static int babycalcs_dbwait(BABYCALCS *op,time_t dt,USTAT *sbp)
-{
+static int babycalcs_dbwait(BC *op,time_t dt,USTAT *sbp) noex {
 	USTAT		nsb ;
 	int		rs = SR_OK ;
 	int		f ;
@@ -1220,9 +1186,7 @@ static int babycalcs_dbwait(BABYCALCS *op,time_t dt,USTAT *sbp)
 }
 /* end subroutine (babycalcs_dbwait) */
 
-
-static int babycalcs_reloadshm(BABYCALCS *op,time_t dt,USTAT *sbp)
-{
+static int babycalcs_reloadshm(BC *op,time_t dt,USTAT *sbp) noex {
 	cmode	om = BABYCALCS_PERMS ;
 	cint	oflags = O_RDWR ;
 	int		rs ;
@@ -1311,9 +1275,7 @@ static int babycalcs_reloadshm(BABYCALCS *op,time_t dt,USTAT *sbp)
 }
 /* end subroutine (babycalcs_reloadshm) */
 
-
-static int babycalcs_shmupdate(BABYCALCS *op,time_t dt,USTAT *sbp,int fd)
-{
+static int babycalcs_shmupdate(BC *op,time_t dt,USTAT *sbp,int fd) noex {
 	BABYCALCS_ENT	*tblp = op->table ;
 	int		rs ;
 
@@ -1342,11 +1304,12 @@ static int babycalcs_shmupdate(BABYCALCS *op,time_t dt,USTAT *sbp,int fd)
 	        if (rs >= 0) {
 
 #if	CF_DEBUGS
-	            debugprintf("babycalcs_shmupdate: new shmsize=%u\n",shmsize) ;
+	            debugprintf("babycalcs_shmupdate: new shmsize=%u\n",
+			    shmsize) ;
 #endif
 
 	            op->shmsize = shmsize ;
-	            hwp = (uint *) (op->mapdata + BABIESFU_IDLEN) ;
+	            hwp = (uint *) (op->mapdata + HDR_IDLEN) ;
 	            hwp[babiesfuh_shmsize] = shmsize ;
 	            hwp[babiesfuh_dbsize] = (uint) sbp->st_size ;
 	            hwp[babiesfuh_dbtime] = (uint) sbp->st_mtime ;
@@ -1381,9 +1344,7 @@ static int babycalcs_shmupdate(BABYCALCS *op,time_t dt,USTAT *sbp,int fd)
 }
 /* end subroutine (babycalcs_shmupdate) */
 
-
-static int babycalcs_shmaddwrite(BABYCALCS *op,int fd)
-{
+static int babycalcs_shmaddwrite(BC *op,int fd) noex {
 	off_t	tbloff ;
 	uint		*hwp ;
 	cint	es = szof(BABYCALCS_ENT) ;
@@ -1395,7 +1356,7 @@ static int babycalcs_shmaddwrite(BABYCALCS *op,int fd)
 	debugprintf("babycalcs_shmaddwrite: nentries=%u\n",op->nentries) ;
 #endif
 
-	hwp = (uint *) (op->mapdata + BABIESFU_IDLEN) ;
+	hwp = (uint *) (op->mapdata + HDR_IDLEN) ;
 	tbloff = hwp[babiesfuh_btoff] ;
 	tblsize = ((op->nentries + 1) * es) ;
 
@@ -1415,13 +1376,11 @@ static int babycalcs_shmaddwrite(BABYCALCS *op,int fd)
 }
 /* end subroutine (babycalcs_shmaddwrite) */
 
-
-/* ARGSUSED */
-static int babycalcs_reloadtxt(BABYCALCS *op,time_t dt)
-{
+static int babycalcs_reloadtxt(BC *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
+	(void) dt ;
 	if (op->f.txt && (op->table != NULL)) {
 	    op->f.txt = FALSE ;
 	    rs1 = uc_free(op->table) ;
@@ -1437,14 +1396,12 @@ static int babycalcs_reloadtxt(BABYCALCS *op,time_t dt)
 }
 /* end subroutine (babycalcs_reloadtxt) */
 
-
-static int babycalcs_shmcheck(BABYCALCS *op,USTAT *sbp)
-{
+static int babycalcs_shmcheck(BC *op,USTAT *sbp) noex {
 	uint		*hwp ;
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 
-	hwp = (uint *) (op->mapdata + BABIESFU_IDLEN) ;
+	hwp = (uint *) (op->mapdata + HDR_IDLEN) ;
 	f = (sbp->st_mtime > hwp[babiesfuh_dbtime]) ;
 	f = f || (sbp->st_size != hwp[babiesfuh_dbsize]) ;
 	f = f || (op->shmsize != hwp[babiesfuh_shmsize]) ;
@@ -1452,9 +1409,7 @@ static int babycalcs_shmcheck(BABYCALCS *op,USTAT *sbp)
 }
 /* end subroutine (babycalcs_shmcheck) */
 
-
-static int babycalcs_shmaccess(BABYCALCS *op,time_t dt)
-{
+static int babycalcs_shmaccess(BC *op,time_t dt) noex {
 	uint		*hwp ;
 	int		rs = SR_OK ;
 
@@ -1463,16 +1418,14 @@ static int babycalcs_shmaccess(BABYCALCS *op,time_t dt)
 
 	if (dt == 0) dt = time(NULL) ;
 
-	hwp = (uint *) (op->mapdata + BABIESFU_IDLEN) ;
+	hwp = (uint *) (op->mapdata + HDR_IDLEN) ;
 	hwp[babiesfuh_atime] = dt ;
 	hwp[babiesfuh_acount] += 1 ;
 	return rs ;
 }
 /* end subroutine (babycalcs_shmaccess) */
 
-
-static int mkshmname(char *shmbuf,cchar *fp,int fl,cchar *dp,int dl)
-{
+static int mkshmname(char *shmbuf,cchar *fp,int fl,cchar *dp,int dl) noex {
 	cint	shmlen = SHMNAMELEN ;
 	int		rs = SR_OK ;
 	int		ml ;
@@ -1509,9 +1462,7 @@ static int mkshmname(char *shmbuf,cchar *fp,int fl,cchar *dp,int dl)
 }
 /* end subroutine (mkshmname) */
 
-
-static int vcmpentry(BABYCALCS_ENT **e1pp,BABYCALCS_ENT **e2pp)
-{
+static int vcmpentry(BABYCALCS_ENT **e1pp,BABYCALCS_ENT **e2pp) noex {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
 	    if (*e1pp != NULL) {
