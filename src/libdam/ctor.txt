@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int termout_ctor(termout *op,Args ... args) noex {
+static int cmimk_ctor(cmimk *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int termout_ctor(termout *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (termout_ctor) */
+/* end subroutine (cmimk_ctor) */
 
-static int termout_dtor(termout *op) noex {
+static int cmimk_dtor(cmimk *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (termout_dtor) */
+/* end subroutine (cmimk_dtor) */
 
 template<typename ... Args>
-static inline int termout_magic(termout *op,Args ... args) noex {
+static inline int cmimk_magic(cmimk *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == TERMOUT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == CMIMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (termout_magic) */
+/* end subroutine (cmimk_magic) */
