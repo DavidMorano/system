@@ -70,9 +70,10 @@ namespace {
 /* forward references */
 
 static int cstrlcpy(char *dp,cchar *sp,int sl) noex {
-    	csize	ssz = size_t(sl) ;
-	return int(strlcpy(dp,sp,ssz)) ;
+    	csize	ssize = size_t(sl) ;
+	return int(strlcpy(dp,sp,ssize)) ;
 }
+
 
 /* local variables */
 
