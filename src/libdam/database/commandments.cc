@@ -61,13 +61,7 @@
 #define	COMMANDMENTS_TMPDNAME	"/var/tmp"
 #define	COMMANDMENTS_NLINES	40
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
+#define	CM			commandments
 
 #define	MKENT		struct mkent
 #define	MKENT_LINE	struct mkent_line
@@ -76,6 +70,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -101,42 +98,42 @@ constexpr int		rsold[] = {
 
 /* forward references */
 
-static int	commandments_argsbegin(COMMANDMENTS *,cchar *,cchar *) ;
-static int	commandments_argsend(COMMANDMENTS *) ;
+static int	commandments_argsbegin(CM *,cchar *,cchar *) noex ;
+static int	commandments_argsend(CM *) noex ;
 
-static int	commandments_findbegin(COMMANDMENTS *,cchar *,cchar *) ;
-static int	commandments_findend(COMMANDMENTS *) ;
-static int	commandments_tmpcheck(COMMANDMENTS *,char *,USTAT *,cchar *) ;
-static int	commandments_tmpcopy(COMMANDMENTS *,char *,cchar *,char *) ;
+static int	commandments_findbegin(CM *,cchar *,cchar *) noex ;
+static int	commandments_findend(CM *) noex ;
+static int	commandments_tmpcheck(CM *,char *,USTAT *,cchar *) noex ;
+static int	commandments_tmpcopy(CM *,char *,cchar *,char *) noex ;
 
-static int	commandments_fileloadbegin(COMMANDMENTS *,cchar *) ;
-static int	commandments_fileloadend(COMMANDMENTS *) ;
-static int	commandments_dbmapbegin(COMMANDMENTS *,time_t) ;
-static int	commandments_dbmapend(COMMANDMENTS *) ;
-static int	commandments_dbproc(COMMANDMENTS *,CMIMK *) ;
-static int	commandments_checkupdate(COMMANDMENTS *,time_t) ;
-static int	commandments_loadbuf(COMMANDMENTS *,CMI_ENT *,char *,int rlen) ;
+static int	commandments_fileloadbegin(CM *,cchar *) noex ;
+static int	commandments_fileloadend(CM *) noex ;
+static int	commandments_dbmapbegin(CM *,time_t) noex ;
+static int	commandments_dbmapend(CM *) noex ;
+static int	commandments_dbproc(CM *,CMIMK *) noex ;
+static int	commandments_checkupdate(CM *,time_t) noex ;
+static int	commandments_loadbuf(CM *,CMI_ENT *,char *,int rlen) noex ;
 
-static int	commandments_userhome(COMMANDMENTS *) ;
-static int	commandments_usridname(COMMANDMENTS *,char *) ;
-static int	commandments_sysidname(COMMANDMENTS *,char *) ;
+static int	commandments_userhome(CM *) noex ;
+static int	commandments_usridname(CM *,char *) noex ;
+static int	commandments_sysidname(CM *,char *) noex ;
 
-static int	commandments_idxbegin(COMMANDMENTS *,cchar *) ;
-static int	commandments_idxend(COMMANDMENTS *) ;
-static int	commandments_idxmkname(COMMANDMENTS *,char *,cchar *) ;
-static int	commandments_idxopencheck(COMMANDMENTS *,cchar *) ;
-static int	commandments_idxmk(COMMANDMENTS *,cchar *) ;
-static int	commandments_idxmapbegin(COMMANDMENTS *,cchar *) ;
-static int	commandments_idxmapend(COMMANDMENTS *) ;
-static int	commandments_chownpr(COMMANDMENTS *,cchar *) ;
-static int	commandments_ids(COMMANDMENTS *) ;
+static int	commandments_idxbegin(CM *,cchar *) noex ;
+static int	commandments_idxend(CM *) noex ;
+static int	commandments_idxmkname(CM *,char *,cchar *) noex ;
+static int	commandments_idxopencheck(CM *,cchar *) noex ;
+static int	commandments_idxmk(CM *,cchar *) noex ;
+static int	commandments_idxmapbegin(CM *,cchar *) noex ;
+static int	commandments_idxmapend(CM *) noex ;
+static int	commandments_chownpr(CM *,cchar *) noex ;
+static int	commandments_ids(CM *) noex ;
 
-static int	mkent_start(MKENT *,int,uint,uint) ;
-static int	mkent_add(MKENT *,uint,uint) ;
-static int	mkent_finish(MKENT *) ;
+static int	mkent_start(MKENT *,int,uint,uint) noex ;
+static int	mkent_add(MKENT *,uint,uint) noex ;
+static int	mkent_finish(MKENT *) noex ;
 
-static int	cmimkent_start(CMIMK_ENT *,MKENT *) ;
-static int	cmimkent_finish(CMIMK_ENT *) ;
+static int	cmimkent_start(CMIMK_ENT *,MKENT *) noex ;
+static int	cmimkent_finish(CMIMK_ENT *) noex ;
 
 static bool	hasourdig(cchar *,int) noex ;
 
@@ -155,13 +152,13 @@ static int	isStale(int) noex ;
 extern const commandments_obj	commandments_modinfo = {
 	"commandments",
 	szof(commandments),
-	szof(commandment_cur)
+	szof(commandments_cur)
 } ;
 
 
 /* exported subroutines */
 
-int commandments_open(COMMANDMENTS *op,cchar *pr,cchar *dbname) noex {
+int commandments_open(CM *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		c = 0 ;
 
@@ -205,7 +202,7 @@ int commandments_open(COMMANDMENTS *op,cchar *pr,cchar *dbname) noex {
 /* end subroutine (commandments_open) */
 
 
-int commandments_close(COMMANDMENTS *op)
+int commandments_close(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -238,7 +235,7 @@ int commandments_close(COMMANDMENTS *op)
 /* end subroutine (commandments_close) */
 
 
-int commandments_audit(COMMANDMENTS *op)
+int commandments_audit(CM *op)
 {
 	int		rs = SR_OK ;
 
@@ -257,7 +254,7 @@ int commandments_audit(COMMANDMENTS *op)
 /* end subroutine (commandments_audit) */
 
 
-int commandments_count(COMMANDMENTS *op)
+int commandments_count(CM *op)
 {
 	int		rs ;
 
@@ -277,7 +274,7 @@ int commandments_count(COMMANDMENTS *op)
 /* end subroutine (commandments_count) */
 
 
-int commandments_max(COMMANDMENTS *op)
+int commandments_max(CM *op)
 {
 
 	if (op == NULL) return SR_FAULT ;
@@ -293,7 +290,7 @@ int commandments_max(COMMANDMENTS *op)
 /* end subroutine (commandments_max) */
 
 
-int commandments_read(COMMANDMENTS *op,char *vbuf,int vlen,uint cn)
+int commandments_read(CM *op,char *vbuf,int vlen,uint cn)
 {
 	CMI_ENT		viv ;
 	CMI_LINE	lines[COMMANDMENTS_NLINES+1] ;
@@ -342,7 +339,7 @@ int commandments_read(COMMANDMENTS *op,char *vbuf,int vlen,uint cn)
 /* end subroutine (commandments_read) */
 
 
-int commandments_curbegin(COMMANDMENTS *op,COMMANDMENTS_CUR *curp)
+int commandments_curbegin(CM *op,COMMANDMENTS_CUR *curp)
 {
 	int		rs ;
 
@@ -363,7 +360,7 @@ int commandments_curbegin(COMMANDMENTS *op,COMMANDMENTS_CUR *curp)
 /* end subroutine (commandments_curbegin) */
 
 
-int commandments_curend(COMMANDMENTS *op,COMMANDMENTS_CUR *curp)
+int commandments_curend(CM *op,COMMANDMENTS_CUR *curp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -445,7 +442,7 @@ int		vlen ;
 /* end subroutine (commandments_enum) */
 
 
-int commandments_get(COMMANDMENTS *op,int cn,char *rbuf,int rlen)
+int commandments_get(CM *op,int cn,char *rbuf,int rlen)
 {
 	return commandments_read(op,rbuf,rlen,cn) ;
 }
@@ -455,7 +452,7 @@ int commandments_get(COMMANDMENTS *op,int cn,char *rbuf,int rlen)
 /* private subroutines */
 
 
-static int commandments_argsbegin(COMMANDMENTS *op,cchar *pr,cchar *dbname)
+static int commandments_argsbegin(CM *op,cchar *pr,cchar *dbname)
 {
 	int		rs ;
 	int		size = 0 ;
@@ -474,7 +471,7 @@ static int commandments_argsbegin(COMMANDMENTS *op,cchar *pr,cchar *dbname)
 /* end subroutine (commandments_argsbegin) */
 
 
-static int commandments_argsend(COMMANDMENTS *op)
+static int commandments_argsend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -488,7 +485,7 @@ static int commandments_argsend(COMMANDMENTS *op)
 /* end subroutine (commandments_argsend) */
 
 
-static int commandments_findbegin(COMMANDMENTS *op,cchar *pr,cchar *dbname)
+static int commandments_findbegin(CM *op,cchar *pr,cchar *dbname)
 {
 	int		rs ;
 #if	CF_DEBUGS
@@ -540,7 +537,7 @@ static int commandments_findbegin(COMMANDMENTS *op,cchar *pr,cchar *dbname)
 /* end subroutine (commandments_findbegin) */
 
 
-static int commandments_findend(COMMANDMENTS *op)
+static int commandments_findend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -554,7 +551,7 @@ static int commandments_findend(COMMANDMENTS *op)
 /* end subroutine (commandments_findend) */
 
 
-static int commandments_tmpcheck(COMMANDMENTS *op,char *tbuf,USTAT *sbp,
+static int commandments_tmpcheck(CM *op,char *tbuf,USTAT *sbp,
 		cchar *dbname)
 {
 	const mode_t	dm = 0777 ;
@@ -597,7 +594,7 @@ static int commandments_tmpcheck(COMMANDMENTS *op,char *tbuf,USTAT *sbp,
 /* end subroutine (commandments_tmpcheck) */
 
 
-static int commandments_tmpcopy(COMMANDMENTS *op,char *tbuf,
+static int commandments_tmpcopy(CM *op,char *tbuf,
 		cchar *abuf, char *dbuf)
 {
 	cint	xlen = MAXPATHLEN ;
@@ -637,7 +634,7 @@ static int commandments_tmpcopy(COMMANDMENTS *op,char *tbuf,
 /* end subroutine (commandments_tmpcopy) */
 
 
-static int commandments_fileloadbegin(COMMANDMENTS *op,cchar *dbname)
+static int commandments_fileloadbegin(CM *op,cchar *dbname)
 {
 	const time_t	dt = time(NULL) ;
 	int		rs ;
@@ -663,7 +660,7 @@ static int commandments_fileloadbegin(COMMANDMENTS *op,cchar *dbname)
 /* end subroutine (commandments_fileloadbegin) */
 
 
-static int commandments_fileloadend(COMMANDMENTS *op)
+static int commandments_fileloadend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -679,7 +676,7 @@ static int commandments_fileloadend(COMMANDMENTS *op)
 /* end subroutine (commandments_fileloadend) */
 
 
-static int commandments_idxbegin(COMMANDMENTS *op,cchar *dbname)
+static int commandments_idxbegin(CM *op,cchar *dbname)
 {
 	int		rs ;
 	char		tbuf[MAXPATHLEN+1] ;
@@ -700,7 +697,7 @@ static int commandments_idxbegin(COMMANDMENTS *op,cchar *dbname)
 /* end subroutine (commandments_idxbegin) */
 
 
-static int commandments_idxend(COMMANDMENTS *op)
+static int commandments_idxend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -713,7 +710,7 @@ static int commandments_idxend(COMMANDMENTS *op)
 /* end subroutine (commandments_idxend) */
 
 
-static int commandments_idxmkname(COMMANDMENTS *op,char *tbuf,cchar *dbname)
+static int commandments_idxmkname(CM *op,char *tbuf,cchar *dbname)
 {
 	int		rs = SR_OK ;
 	int		pl = 0 ;
@@ -744,7 +741,7 @@ static int commandments_idxmkname(COMMANDMENTS *op,char *tbuf,cchar *dbname)
 /* end subroutine (commandments_idxmkname) */
 
 
-static int commandments_idxopencheck(COMMANDMENTS *op,cchar *dbname)
+static int commandments_idxopencheck(CM *op,cchar *dbname)
 {
 	CMI		*cip = &op->idx ;
 	int		rs ;
@@ -803,7 +800,7 @@ static int commandments_idxopencheck(COMMANDMENTS *op,cchar *dbname)
 /* end subroutine (commandments_idxopencheck) */
 
 
-static int commandments_idxmk(COMMANDMENTS *op,cchar *tbuf)
+static int commandments_idxmk(CM *op,cchar *tbuf)
 {
 	CMIMK		mk ;
 	const mode_t	om = 0664 ;
@@ -828,7 +825,7 @@ static int commandments_idxmk(COMMANDMENTS *op,cchar *tbuf)
 /* end subroutine (commandments_idxmk) */
 
 
-static int commandments_idxmapbegin(COMMANDMENTS *op,cchar *tbuf)
+static int commandments_idxmapbegin(CM *op,cchar *tbuf)
 {
 	int		rs ;
 #if	CF_DEBUGS
@@ -850,7 +847,7 @@ static int commandments_idxmapbegin(COMMANDMENTS *op,cchar *tbuf)
 /* end subroutine (commandments_idxmapbegin) */
 
 
-static int commandments_idxmapend(COMMANDMENTS *op)
+static int commandments_idxmapend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -865,7 +862,7 @@ static int commandments_idxmapend(COMMANDMENTS *op)
 /* end subroutine (commandments_idxmapend) */
 
 
-static int commandments_usridname(COMMANDMENTS *op,char *tbuf)
+static int commandments_usridname(CM *op,char *tbuf)
 {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
@@ -896,7 +893,7 @@ static int commandments_usridname(COMMANDMENTS *op,char *tbuf)
 /* end subroutine (commandments_usridname) */
 
 
-static int commandments_sysidname(COMMANDMENTS *op,char *tbuf)
+static int commandments_sysidname(CM *op,char *tbuf)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -947,7 +944,7 @@ static int commandments_sysidname(COMMANDMENTS *op,char *tbuf)
 /* end subroutine (commandments_sysidname) */
 
 
-static int commandments_dbmapbegin(COMMANDMENTS *op,time_t dt)
+static int commandments_dbmapbegin(CM *op,time_t dt)
 {
 	int		rs ;
 
@@ -984,7 +981,7 @@ static int commandments_dbmapbegin(COMMANDMENTS *op,time_t dt)
 /* end subroutine (commandments_dbmapbegin) */
 
 
-static int commandments_dbmapend(COMMANDMENTS *op)
+static int commandments_dbmapend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1000,7 +997,7 @@ static int commandments_dbmapend(COMMANDMENTS *op)
 /* end subroutine (commandments_dbmapend) */
 
 
-static int commandments_dbproc(COMMANDMENTS *op,CMIMK *cmp)
+static int commandments_dbproc(CM *op,CMIMK *cmp)
 {
 	MKENT		e ;
 	uint		foff = 0 ;
@@ -1110,7 +1107,7 @@ static int commandments_dbproc(COMMANDMENTS *op,CMIMK *cmp)
 /* end subroutine (commandments_dbproc) */
 
 
-static int commandments_checkupdate(COMMANDMENTS *op,time_t dt)
+static int commandments_checkupdate(CM *op,time_t dt)
 {
 	int		rs = SR_OK ;
 	int		f = false ;
@@ -1139,7 +1136,7 @@ static int commandments_checkupdate(COMMANDMENTS *op,time_t dt)
 /* end subroutine (commandments_checkupdate) */
 
 
-static int commandments_loadbuf(COMMANDMENTS *op,CMI_ENT *vivp,
+static int commandments_loadbuf(CM *op,CMI_ENT *vivp,
 		char *rbuf,int rlen)
 {
 	SBUF		b ;
@@ -1179,7 +1176,7 @@ static int commandments_loadbuf(COMMANDMENTS *op,CMI_ENT *vivp,
 /* end subroutine (commandments_loadbuf) */
 
 
-static int commandments_userhome(COMMANDMENTS *op)
+static int commandments_userhome(CM *op)
 {
 	int		rs ;
 	if (op->uhome == NULL) {
@@ -1201,9 +1198,7 @@ static int commandments_userhome(COMMANDMENTS *op)
 }
 /* end subroutine (commandments_userhome) */
 
-
-static int commandments_chownpr(COMMANDMENTS *op,cchar *tbuf)
-{
+static int commandments_chownpr(CM *op,cchar *tbuf) noex {
 	int		rs ;
 	if (op->uid < 0) op->uid = getuid() ;
 	if ((rs = commandments_ids(op)) >= 0) {
@@ -1215,9 +1210,7 @@ static int commandments_chownpr(COMMANDMENTS *op,cchar *tbuf)
 }
 /* end subroutine (commandments_chownpr) */
 
-
-static int commandments_ids(COMMANDMENTS *op)
-{
+static int commandments_ids(CM *op) noex {
 	int		rs = SR_OK ;
 	if (! op->f.ids) {
 	    USTAT	sb ;
@@ -1268,9 +1261,7 @@ static int mkent_start(MKENT *ep,int cn,uint eoff,uint elen) noex {
 }
 /* end subroutine (mkent_start) */
 
-
-static int mkent_finish(MKENT *ep)
-{
+static int mkent_finish(MKENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1291,9 +1282,7 @@ static int mkent_finish(MKENT *ep)
 }
 /* end subroutine (mkent_finish) */
 
-
-static int mkent_add(MKENT *ep,uint eoff,uint elen)
-{
+static int mkent_add(MKENT *ep,uint eoff,uint elen) noex {
 	MKENT_LINE	*elp ;
 	int		rs = SR_OK ;
 	int		ne ;
@@ -1374,9 +1363,7 @@ static int cmimkent_start(CMIMK_ENT *bvep,MKENT *ep) noex {
 }
 /* end subroutine (cmimkent_start) */
 
-
-static int cmimkent_finish(CMIMK_ENT *bvep)
-{
+static int cmimkent_finish(CMIMK_ENT *bvep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
