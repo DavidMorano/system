@@ -1180,10 +1180,10 @@ static int vesrch(cvoid **v1pp,cvoid **v2pp) noex {
 		        }
 		    }
 	        } else {
-	            rc = +1 ;
+	            rc = -1 ;
 	        }
 	    } else {
-	        rc = -1 ;
+	        rc = +1 ;
 	    }
 	} /* end if (at least one is non-null) */
 	return rc ;
