@@ -39,9 +39,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
 #include	<sys/mman.h>
-#include	<climits>
+#include	<climits>		/* |USHORT_MAX| + |UINT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -242,7 +241,7 @@ int cmi_count(cmi *op) noex {
 	int		rs ;
 	int		ne = 0 ;
 	if ((rs = cmi_magic(op)) >= 0) {
-	    CMIHDR	*hip = &op->fhi ;
+	    cmihdr	*hip = &op->fhi ;
 	    ne = hip->nents ;
 	} /* end if (magic) */
 	return (rs >= 0) ? ne : rs ;
@@ -254,7 +253,7 @@ int cmi_getinfo(cmi *op,cmi_info *ip) noex {
 	int		ne = 0 ;
 	if ((rs = cmi_magic(op)) >= 0) {
 	    if (ip) {
-	        CMIHDR	*hip = &op->fhi ;
+	        cmihdr	*hip = &op->fhi ;
 	        rs = memclear(ip) ;
 	        ip->idxmtime = op->fmi.ti_mod ;
 	        ip->idxctime = (time_t) hip->idxtime ;
@@ -311,7 +310,7 @@ int cmi_curend(cmi *op,cmi_cur *curp) noex {
 /* end subroutine (cmi_curend) */
 
 int cmi_enum(cmi *op,cmi_cur *curp,cmi_ent *bvep,char *vbuf,int vlen) noex {
-	CMIHDR		*hip ;
+	cmihdr		*hip ;
 	int		rs = SR_OK ;
 	int		vi ;
 	int		nlines = 0 ;
@@ -449,7 +448,7 @@ static int cmi_checkupdate(cmi *op,time_t dt) noex {
 
 static int cmi_proc(cmi *op,time_t dt) noex {
 	cmi_fmi		*mip = &op->fmi ;
-	CMIHDR		*hip = &op->fhi ;
+	cmihdr		*hip = &op->fhi ;
 	int		rs ;
 	int		nents = 0 ;
 	if ((rs = cmihdr(hip,1,mip->mapdata,mip->mapsize)) >= 0) {
@@ -464,7 +463,7 @@ static int cmi_proc(cmi *op,time_t dt) noex {
 
 static int cmi_verify(cmi *op,time_t dt) noex {
 	cmi_fmi		*mip = &op->fmi ;
-	CMIHDR		*hip = &op->fhi ;
+	cmihdr		*hip = &op->fhi ;
 	int		rs = SR_OK ;
 	int		size ;
 	int		f = TRUE ;
@@ -517,44 +516,36 @@ static int cmi_verify(cmi *op,time_t dt) noex {
 
 static int cmi_auditvt(cmi *op) noex {
 	cmi_fmi		*mip = &op->fmi ;
-	CMIHDR		*hip = &op->fhi ;
+	cmihdr		*hip = &op->fhi ;
 	uint		(*vt)[4] ;
 	uint		pcitcmpval = 0 ;
 	uint		citcmpval ;
 	int		rs = SR_OK ;
-	int		i, li ;
-
+	int		li ;
 	vt = mip->vt ;
-
-/* "verses" table */
-
-	for (i = 1 ; (rs >= 0) && (i < hip->vilen) ; i += 1) {
-
-/* verify no line-index is longer than the "lines" table itself */
-
+	/* "verses" table */
+	for (int i = 1 ; (rs >= 0) && (i < hip->vilen) ; i += 1) {
+	    /* verify no line-index is longer than the "lines" table itself */
 	    li = vt[i][2] ;
 	    if (li >= hip->vllen) {
 	        rs = SR_BADFMT ;
 	        break ;
 	    }
-
-/* verify all entries are ordered w/ increasing citations */
-
+	    /* verify all entries are ordered w/ increasing citations */
 	    citcmpval = vt[i][3] & 0x00FFFFFF ;
 	    if (citcmpval < pcitcmpval) {
 	        rs = SR_BADFMT ;
 	        break ;
 	    }
 	    pcitcmpval = citcmpval ;
-
 	} /* end for (record table entries) */
-
+	return rs ;
 }
 /* end subroutine (cmi_auditvt) */
 
 static int cmi_search(cmi *op,uint cn) noex {
 	cmi_fmi		*mip = &op->fmi ;
-	CMIHDR		*hip = &op->fhi ;
+	cmihdr		*hip = &op->fhi ;
 	uint		(*vt)[4] ;
 	uint		vte[4] ;
 	uint		citekey = (uint) (cn & USHORT_MAX) ;
@@ -585,7 +576,7 @@ static int cmi_search(cmi *op,uint cn) noex {
 static int cmi_loadcmd(cmi *op,cmi_ent *bvep,char *ebuf,int elen,int vi) noex {
 	cmi_line	*lines ;
 	cmi_fmi		*mip ;
-	CMIHDR		*hip ;
+	cmihdr		*hip ;
 	ulong		uebuf = (ulong) ebuf ;
 	uint		*vte ;
 	uint		(*lt)[2] ;
