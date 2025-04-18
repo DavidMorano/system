@@ -105,6 +105,7 @@ int mkfnamesuf5(char *ofname,cc *p1,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5) noex {
 /* end subroutine (mkfnamesuf5) */
 
 int mkfnamesufx(char *rbuf,int n,cc *p1,...) noex {
+	va_list		ap ;
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = maxpathlen) >= 0) {
@@ -118,10 +119,9 @@ int mkfnamesufx(char *rbuf,int n,cc *p1,...) noex {
 	        rl += rs ;
 	    }
 	    if (rs >= 0) {
-	        va_list		ap ;
 	        va_begin(ap,p1) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-	            cc		*sp = (cc *) va_arg(ap,cc *) ;
+	            cc	*sp = (cc *) va_arg(ap,cc *) ;
 		    if (sp) {
 	                rs = storebuf_strw(rbuf,rlen,rl,sp,-1) ;
 	                rl += rs ;
