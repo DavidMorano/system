@@ -501,14 +501,14 @@ static int commandment_objloadend(CMD *op) noex {
 /* end subroutine (commandment_objloadend) */
 
 static int commandment_loadcalls(CMD *op,vecstr *slp) noex {
-	modload		*lp = op->mlp ;
+	modload		*mlp = op->mlp ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
 	cchar		*sname{} ;
 	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
-	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
+	    if (cvoid *snp{} ; (rs = modload_getsym(mlp,sname,&snp)) >= 0) {
                 commandment_calls   *callp = callsp(op->callp) ;
                 c += 1 ;
                 switch (i) {
