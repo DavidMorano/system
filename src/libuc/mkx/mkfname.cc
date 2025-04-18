@@ -119,10 +119,10 @@ int mkfname6(char *rbuf,cc *p1,cc *p2,cc *p3,cc *p4,cc *p5,cc *p6) noex {
 /* end subroutine (mkfname6) */
 
 int mkfnamex(char *rbuf,int na,...) noex {
+	va_list		ap ;
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = maxpathlen) >= 0) {
-	    va_list	ap ;
 	    cint	rlen = rs ;
 	    va_begin(ap,na) ;
 	    for (int i = 0 ; (rs >= 0) && (i < na) ; i += 1) {
