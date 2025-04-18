@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int cmimk_ctor(cmimk *op,Args ... args) noex {
+static int babycalcs_ctor(babycalcs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int cmimk_ctor(cmimk *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (cmimk_ctor) */
+/* end subroutine (babycalcs_ctor) */
 
-static int cmimk_dtor(cmimk *op) noex {
+static int babycalcs_dtor(babycalcs *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (cmimk_dtor) */
+/* end subroutine (babycalcs_dtor) */
 
 template<typename ... Args>
-static inline int cmimk_magic(cmimk *op,Args ... args) noex {
+static inline int babycalcs_magic(babycalcs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == CMIMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == BABYCALCS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (cmimk_magic) */
+/* end subroutine (babycalcs_magic) */
