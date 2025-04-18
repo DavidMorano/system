@@ -81,6 +81,7 @@ constexpr char		magicstr[] = BABIESHDR_MAGICSTR ;
 
 /* exported subroutines */
 
+/* read from the (header) object into the buffer */
 int babieshdr_rd(babieshdr *ep,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
@@ -93,7 +94,7 @@ int babieshdr_rd(babieshdr *ep,char *hbuf,int hlen) noex {
 	            bl -= magicsize ;
 	    	    memcpy(bp,ep->vetu,4) ;
 	    	    bp[0] = BABIESHDR_VERSION ;
-	    	    bp[1] = ENDIAN ;
+	    	    bp[1] = charconv(ENDIAN) ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= headsize) {
@@ -110,7 +111,7 @@ int babieshdr_rd(babieshdr *ep,char *hbuf,int hlen) noex {
 	        	header[babieshdrh_btlen] = ep->btlen ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
 	            }
@@ -123,6 +124,7 @@ int babieshdr_rd(babieshdr *ep,char *hbuf,int hlen) noex {
 }
 /* end subroutine (babieshdr_rd) */
 
+/* write to the (header) object from the contents of the buffer */
 int babieshdr_wr(babieshdr *ep,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
@@ -135,11 +137,12 @@ int babieshdr_wr(babieshdr *ep,cchar *hbuf,int hlen) noex {
 	        bl -= magicsize ;
 		/* read out the VETU information */
 	        if (bl >= 4) {
+		    uchar	ech = uchar(ENDIAN) ;
 	            memcpy(ep->vetu,bp,4) ;
 	            if (ep->vetu[0] != BABIESHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
 		    }
-	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
+	            if ((rs >= 0) && (ep->vetu[1] != ech)) {
 	                rs = SR_PROTOTYPE ;
 		    }
 	            bp += 4 ;
@@ -162,7 +165,7 @@ int babieshdr_wr(babieshdr *ep,cchar *hbuf,int hlen) noex {
 	                ep->btlen = header[babieshdrh_btlen] ;
 	                bp += headsize ;
 	                bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
 		    }
