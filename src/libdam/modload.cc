@@ -48,8 +48,9 @@
 #include	<fcntl.h>
 #include	<dlfcn.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<getbufsize.h>
@@ -109,8 +110,9 @@ typedef mainv		mv ;
 struct subinfo_flags {
 	uint		id:1 ;
     	uint		libvar:1 ;
-    	uint		prs:1 ;
-    	uint		sdirs:1 ;
+    	uint		libprs:1 ;
+    	uint		libsdirs:1 ;
+	uint		liball:1 ;
     	uint		avail:1 ;
     	uint		self:1 ; 
 } ;
@@ -138,10 +140,9 @@ struct subinfo {
 	int objloadend() noex ;
 	int sofind() noex ;
 	int sofindprs(dirseen *dsp,int dlm) noex ;
-	int sofindpr(dirseen *dsp,int dlm,cchar *) noex ;
+	int sofindroot(dirseen *dsp,int dlm,cchar *) noex ;
 	int sofindsdirs(dirseen *dsp,int dlm) noex ;
 	int sofindvar(dirseen *dsp,int dlm) noex ;
-	int socheckvarc(dirseen *dsp) noex ;
 	int socheckvarc(dirseen *dsp,cc *ldnp,int ldnl,int dlm) noex ;
 	int sochecklib(dirseen *dsp,cchar *ldname,int dlm) noex ;
 	int sockliber(dirseen *dsp,cchar *ldnp,int dlm) noex ;
@@ -151,6 +152,7 @@ struct subinfo {
 
 struct vars {
 	int		maxpathlen ;
+	int		maxhostlen ;
 	operator int () noex ;
 } ;
 
@@ -207,19 +209,19 @@ constexpr cpcchar	sysprs[] = {
 	nullptr
 } ;
 
-constexpr cpcchar	exts[] = {
-	"so",
-	"o",
-	"dylib",	/* for Apple Darwin */
-	"",
-	nullptr
-} ;
-
 constexpr cpcchar	extdirs[] = {
 	"sparcv9",
 	"sparcv8",
 	"sparcv7",
 	"sparc",
+	"",
+	nullptr
+} ;
+
+constexpr cpcchar	exts[] = {
+	"so",
+	"o",
+	"dylib",	/* for ("think different") Apple Darwin */
 	"",
 	nullptr
 } ;
@@ -250,7 +252,7 @@ int modload_open(ML *op,cc *pr,cc *modfn,cc *modname,int opts,mv syms) noex {
 	    if (modfn[0] && modname[0]) {
 		static cint	rsv = var ;
 		if ((rs = rsv) >= 0) {
-	            subinfo	si(op,pr,modfn,opts,syms) ;
+	            subinfo si(op,pr,modfn,opts,syms) ;
 	            op->modname = modname ;
 	            if ((rs = si.start()) >= 0) {
 	                if ((rs = si.objload()) >= 0) {
@@ -385,11 +387,28 @@ int subinfo::setopts() noex {
     	const modloadms	sdm ;
 	cint		so = opts ;
     	int		rs = SR_OK ;
-	if (so & sdm.libvar)	fl.libvar = true ;
-	if (so & sdm.prs)	fl.prs = true ;
-	if (so & sdm.sdirs)	fl.sdirs = true ;
-	if (so & sdm.avail)	fl.avail = true ;
-	if (so & sdm.self)	fl.self = true ;
+	bool		fall = true ;
+	if (so & sdm.libvar)	{
+	    fl.libvar = true ;
+	    fall = false ;
+	}
+	if (so & sdm.prs)	{
+	    fl.libprs = true ;
+	    fall = false ;
+	}
+	if (so & sdm.sdirs)	{
+	    fl.libsdirs = true ;
+	    fall = false ;
+	}
+	if (so & sdm.avail)	{
+	    fl.avail = true ;
+	}
+	if (so & sdm.self)	{
+	    fl.self = true ;
+	}
+	if (fall) {
+	    fl.liball = true ;
+	}
 	return rs ;
 }
 /* end subroutine (subinfo::setopts) */
@@ -407,7 +426,11 @@ int subinfo::objload() noex {
 /* end subroutine (subinfo::objload) */
 
 int subinfo::objloadbegin() noex {
-	return sofind() ;
+    	int		rs ;
+	if ((rs = sofind()) == 0) {
+	    rs = SR_NOTFOUND ;
+	}
+	return rs ;
 }
 /* end subroutine (subinfo::objloadbegin) */
 
@@ -420,203 +443,235 @@ int subinfo::sofind() noex {
 	int		dlm = RTLD_LAZY ;
 	int		rs ;
 	int		rs1 ;
+	int		len = 0 ;
 	dlm |= (opts & MODLOAD_OAVAIL) ? RTLD_GLOBAL : RTLD_LOCAL ;
 	if (dirseen ds ; (rs = dirseen_start(&ds)) >= 0) {
-	    if (pr != nullptr) {
-	        rs = sofindpr(&ds,dlm,pr) ;
-	    }
-	    if ((rs < 0) && isNotPresent(rs)) {
-	        if (opts & MODLOAD_OLIBVAR) {
-	            rs = sofindvar(&ds,dlm) ;
+	    rs = 0 ;
+	    if (pr) {
+	        if ((rs = sofindroot(&ds,dlm,pr)) > 0) {
+		    len = rs ;
 		}
 	    }
-	    if ((rs < 0) && isNotPresent(rs)) {
-	        if (opts & MODLOAD_OPRS) {
-	            rs = sofindprs(&ds,dlm) ;
-		}
-	    }
-	    if ((rs < 0) && isNotPresent(rs)) {
-	        if (opts & MODLOAD_OSDIRS) {
-	            rs = sofindsdirs(&ds,dlm) ;
+	    if ((rs == 0) && (len == 0)) {
+	        if ((rs = sofindvar(&ds,dlm)) > 0) {
+		    len = rs ;
+		} else if (rs == 0) {
+		    if ((rs = sofindprs(&ds,dlm)) > 0) {
+		        len = rs ;
+		    } else if (rs == 0) {
+	                if ((rs = sofindsdirs(&ds,dlm)) > 0) {
+			    len = rs ;
+			}
+		    }
 		}
 	    }
 	    rs1 = dirseen_finish(&ds) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (dirseen) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo::sofind) */
 
-int subinfo::sofindprs(dirseen *dsp,int dlm) noex {
+int subinfo::sofindroot(dirseen *dsp,int dlm,cchar *apr) noex {
 	cint		maxpath = var.maxpathlen ;
 	cint		sz = ((var.maxpathlen + 1) * 2) ;
 	int		rs ;
 	int		rs1 ;
 	int		ai = 0 ;
-	if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
-	    char	*dn = (a + ((maxpath + 1) * ai++)) ;
-	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
-	        cint	prlen = maxpath ;
-	        char	*prbuf = (a + ((maxpath + 1) * ai++)) ;
-	        for (int i = 0 ; prnames[i] != nullptr ; i += 1) {
-	            if ((rs = mkpr(prbuf,prlen,prnames[i],dn)) >= 0) {
-	                rs = sofindpr(dsp,dlm,prbuf) ;
-	            }
-	            if ((rs >= 0) || (! isNotPresent(rs))) break ;
-	        } /* end for */
-	    } /* end if (getnodedomain) */
-	    rs1 = uc_free(a) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
-	return rs ;
-}
-/* end subroutine (subinfo::sofindprs) */
-
-int subinfo::sofindpr(dirseen *dsp,int dlm,cchar *apr) noex {
-	cint		maxpath = var.maxpathlen ;
-	int		rs ;
-	int		rs1 ;
-	int		ai = 0 ;
-	cint		sz = ((var.maxpathlen + 1) * 2) ;
+	int		len = 0 ;
 	if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
-	    char	*libdname = (a + ((maxpath + 1) * ai++)) ;
-	    if ((rs = mkpath2(libdname,apr,LIBCNAME)) >= 0) {
+	    char	*lbuf = (a + ((maxpath + 1) * ai++)) ;
+	    if ((rs = mkpath(lbuf,apr,LIBCNAME)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
-	        if ((rs = dirseen_havename(dsp,libdname,-1)) == rsn) {
-	            if (USTAT sb ; (rs = u_stat(libdname,&sb)) >= 0) {
+		len = rs ;
+	        if ((rs = dirseen_havename(dsp,lbuf,-1)) == rsn) {
+	            if (USTAT sb ; (rs = u_stat(lbuf,&sb)) >= 0) {
 		        if (S_ISDIR(sb.st_mode)) {
 	    	            if ((rs = dirseen_havedevino(dsp,&sb)) == rsn) {
-	    		        rs = sochecklib(dsp,libdname,dlm) ;
-			        if ((rs < 0) && isNotPresent(rs)) {
+	    		        if ((rs = sochecklib(dsp,lbuf,dlm)) >= 0) {
+				    rs = SR_OK ; /* ok */
+				} else if (isNotPresent(rs)) {
 	        		    char *pbuf = (a + ((maxpath + 1) * ai++)) ;
-	    		            int pl = pathclean(pbuf,libdname,-1) ;
-	    		            if (pl >= 0) {
-	        		        dirseen_add(dsp,pbuf,pl,&sb) ;
+				    len = 0 ;
+	    		            if ((rs = pathclean(pbuf,lbuf,-1)) >= 0) {
+	        		        rs = dirseen_add(dsp,pbuf,rs,&sb) ;
 				    }
 			        }
 			    } else if (rs >= 0) {
-	        	        rs = SR_NOENT ;
+	        	        rs = SR_OK ;
+				len = 0 ;
 			    }
 		        } else {
-	    		    rs = SR_NOTDIR ;
+	    		    rs = SR_OK ;
+			    len = 0 ;
 		        }
-	           } /* end if (stat) */
+		    } else if (isNotPresent(rs)) {
+			rs = SR_OK ;
+			len = 0 ;
+	            } /* end if (stat) */
 	        } else if (rs >= 0) {
-	            rs = SR_NOENT ;
+	            rs = SR_OK ;
+		    len = 0 ;
 	        }
 	    } /* end if (mkpath) */
 	    rs1 = uc_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo::sofindpr) */
 
-int subinfo::sofindsdirs(dirseen *dsp,int dlm) noex {
-	int		rs = SR_NOENT ;
-	for (int i = 0 ; sysprs[i] != nullptr ; i += 1) {
-	    cchar	*dirname = sysprs[i] ;
-	    rs = sofindpr(dsp,dlm,dirname) ;
-	    if ((rs >= 0) || (! isNotPresent(rs))) break ;
-	} /* end for */
-	return rs ;
-}
-/* end subroutine (subinfo::sofindsdirs) */
-
 int subinfo::sofindvar(dirseen *dsp,int dlm) noex {
-	int		rs = SR_NOENT ;
+	int		rs = SR_OK ;
+	int		len = 0 ;
 	cchar		*vn{} ;
 	if_constexpr (f_darwin) {
 	    vn = VARDYLIBPATH ;
 	} else {
 	    vn = VARLIBPATH ;
 	}
-	if (vn[0]) {
+	if ((fl.liball || fl.libvar) && vn[0]) {
 	    static cchar	*sp = getenv(vn) ;
 	    if (sp) {
 	        int	sl{} ;
-	        rs = SR_OK ;
 	        for (cchar *tp ; (tp = strpbrk(sp,":;")) != nullptr ; ) {
 	            sl = intconv(tp - sp) ;
 	            if (sl > 0) {
-	                rs = socheckvarc(dsp,sp,sl,dlm) ;
+	                if ((rs = socheckvarc(dsp,sp,sl,dlm)) > 0) {
+			    len = rs ;
+			}
 	            } /* end if (non-zero length) */
 	            sp = (tp + 1) ;
-	            if ((rs >= 0) || (! isNotPresent(rs))) break ;
+	            if ((rs < 0) || (len > 0)) break ;
 	        } /* end for */
-	        if ((rs < 0) && isNotPresent(rs)) {
+		if ((rs >= 0) && (len == 0)) {
 	            if (sp[0] != '\0') {
-	                rs = socheckvarc(dsp,sp,-1,dlm) ;
+	                if ((rs = socheckvarc(dsp,sp,-1,dlm)) > 0) {
+			    len = rs ;
+			}
 		    }
 	        }
 	    } /* end if (getenv) */
-	} /* end if (valid) */
-	return rs ;
+	} /* end if (selected && valid) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo::sofindvar) */
+
+int subinfo::sofindprs(dirseen *dsp,int dlm) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		len = 0 ;
+	if (fl.liball || fl.libprs) {
+	    cint	maxhost = var.maxhostlen ;
+	    cint	sz = ((var.maxhostlen + 1) + (var.maxpathlen + 1)) ;
+	    int		ai = 0 ;
+	    if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
+		cint	dl = var.maxhostlen ;
+	        char	*dn = (a + ((maxhost + 1) * ai++)) ;
+	        if ((rs = getinetdomain(dn,dl)) >= 0) {
+	            cint	prlen = var.maxpathlen ;
+	            char	*prbuf = (a + ((maxhost + 1) * ai++)) ;
+	            for (int i = 0 ; prnames[i] != nullptr ; i += 1) {
+	                if ((rs = mkpr(prbuf,prlen,prnames[i],dn)) >= 0) {
+	                    if ((rs = sofindroot(dsp,dlm,prbuf)) > 0) {
+			        len = rs ;
+			    }
+	                }
+	                if ((rs < 0) || (len > 0)) break ;
+	            } /* end for */
+	        } /* end if (getnodedomain) */
+	        rs1 = uc_free(a) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (selected) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (subinfo::sofindprs) */
+
+int subinfo::sofindsdirs(dirseen *dsp,int dlm) noex {
+	int		rs = SR_OK ;
+	int		len = 0 ;
+	if (fl.liball || fl.libsdirs) {
+	    for (int i = 0 ; sysprs[i] != nullptr ; i += 1) {
+	        cchar	*dirname = sysprs[i] ;
+	        if ((rs = sofindroot(dsp,dlm,dirname)) > 0) {
+		    len = rs ;
+		}
+	        if ((rs < 0) || (len > 0)) break ;
+	    } /* end for */
+	} /* end if (selected) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (subinfo::sofindsdirs) */
 
 int subinfo::socheckvarc(dirseen *dsp,cc *ldnp,int ldnl,int dlm) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
-	    cchar	*pp = cast_const<cchar *>(tbuf) ;
+	int		len = 0 ;
+	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    if ((rs = pathclean(tbuf,ldnp,ldnl)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
 	        cint	pl = rs ;
+	        cchar	*pp = cast_const<cchar *>(tbuf) ;
+		len = rs ;
 	        if ((rs = dirseen_havename(dsp,pp,pl)) == rsn) {
 	            if (USTAT sb ; (rs = u_stat(pp,&sb)) >= 0) {
 	                if (S_ISDIR(sb.st_mode)) {
 	                    if ((rs = dirseen_havedevino(dsp,&sb)) == rsn) {
-	                        rs = sochecklib(dsp,pp,dlm) ;
-	                        if ((rs < 0) && isNotPresent(rs)) {
-	                            dirseen_add(dsp,pp,pl,&sb) ;
+	                        if ((rs = sochecklib(dsp,pp,dlm)) >= 0) {
+				    rs = SR_OK ; /* ok */
+				} else if (isNotPresent(rs)) {
+				    len = 0 ;
+	                            rs = dirseen_add(dsp,pp,pl,&sb) ;
 	                        }
 	                    } else if (rs >= 0) {
-	                        rs = SR_NOENT ;
+	                        rs = SR_OK ;
+				len = 0 ;
 	                    }
 	                } else {
-	                    rs = SR_NOTDIR ;
+	                    rs = SR_OK ;
+			    len = 0 ;
 	                }
+		    } else if (isNotPresent(rs)) {
+			rs = 0 ;
+			len = 0 ;
 	            } /* end if (stat) */
 	        } else if (rs >= 0) {
-	            rs = SR_NOENT ;
+	            rs = SR_OK ;
+		    len = 0 ;
 	        }
 	    } /* end if (pathclean) */
 	    rs1 = uc_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (subinfo::sofindvarc) */
+/* end subroutine (subinfo::socheckvarc) */
 
 int subinfo::sochecklib(dirseen *dsp,cchar *ldname,int dlm) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dsp) {
-	    if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
-	        USTAT		sb ;
-	        cint		am = (R_OK | X_OK) ;
-	        cchar		*ldnp ;
+	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	        cint	am = (R_OK | X_OK) ;
+	        cchar	*ldnp ;
 	        mlp->sop = nullptr ;
 	        for (int i = 0 ; extdirs[i] != nullptr ; i += 1) {
 	            ldnp = ldname ;
 	            if (extdirs[i][0] != '\0') {
 	                ldnp = tbuf ;
-	                rs = mkpath2(tbuf,ldname,extdirs[i]) ;
+	                rs = mkpath(tbuf,ldname,extdirs[i]) ;
 	            }
 	            if (rs >= 0) {
-	                if ((rs = u_stat(ldnp,&sb)) >= 0) {
+	                if (USTAT sb ; (rs = u_stat(ldnp,&sb)) >= 0) {
 	                    if (S_ISDIR(sb.st_mode)) {
 			        ids	*idp = &id ;
 			        if ((rs = sperm(idp,&sb,am)) >= 0) {
 		   	            rs = sockliber(dsp,ldnp,dlm) ;
 			        } else if (isNotPresent(rs)) {
-	    		            dirseen_add(dsp,ldnp,-1,&sb) ;
-			            rs = SR_OK ;
+	    		            rs = dirseen_add(dsp,ldnp,-1,&sb) ;
 			        }
-		            } else {
-			        rs = SR_NOTDIR ;
-			    }
+			    } /* end if (is dir) */
 		        } else if (isNotPresent(rs)) {
 		            rs = SR_OK ;
 		        }
@@ -624,12 +679,12 @@ int subinfo::sochecklib(dirseen *dsp,cchar *ldname,int dlm) noex {
 	            if (mlp->sop != nullptr) break ;
 	            if (rs < 0) break ;
 	        } /* end for (extdirs) */
-	        if ((rs >= 0) && (mlp->sop == nullptr)) {
-		    rs = SR_LIBACC ;
-		}
 		rs1 = uc_free(tbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
+	    if ((rs >= 0) && (mlp->sop == nullptr)) {
+		rs = SR_LIBACC ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -638,10 +693,10 @@ int subinfo::sochecklib(dirseen *dsp,cchar *ldname,int dlm) noex {
 int subinfo::sockliber(dirseen *dsp,cchar *ldnp,int dlm) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    ids		*idp = &id ;
 	    cint	tlen = rs ;
-	    cint	am = (X_OK|R_OK) ;
+	    cint	am = (X_OK | R_OK) ;
 	    cchar	*mfn = modfn ;
 	    (void) dsp ;
 	    for (int j = 0 ; exts[j] != nullptr ; j += 1) {
@@ -665,9 +720,7 @@ int subinfo::sockliber(dirseen *dsp,cchar *ldnp,int dlm) noex {
 			    } else if (isNotPresent(rs)) {
 			        rs = SR_OK ;
 			    } /* end if (sperm) */
-		        } else {
-			    rs = SR_ISDIR ;
-		        }
+		        } /* end if (regular file) */
 		    } else if (isNotPresent(rs)) {
 		        rs = SR_OK ;
 		    } /* end if (u_stat) */
@@ -719,6 +772,9 @@ vars::operator int () noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
 	    var.maxpathlen = rs ;
+	    if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+		var.maxhostlen = rs ;
+	    }
 	}
 	return rs ;
 }
