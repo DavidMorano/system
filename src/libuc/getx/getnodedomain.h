@@ -40,8 +40,8 @@ static inline int getinetdomain(char *rbuf,int rlen) noex {
 static inline int getnetdomain(char *rbuf,int rlen) noex {
 	return getsysdomain(rbuf,rlen) ;
 }
-static inline int getdomainnamex(char *rp,int rl) noex {
-	return getsysdomain(rp,rl) ;
+static inline int getdomainnamex(char *rbuf,int rlen) noex {
+	return getsysdomain(rbuf,rlen) ;
 }
 
 EXTERNC_end
