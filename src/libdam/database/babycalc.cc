@@ -47,12 +47,8 @@
 #define	BC		babycalc
 #define	BC_INFO		babycalc_info
 
-#define	BC_MODBNAME	"babycalcs"
-#define	BC_OBJNAME	"babycalcs"
-
-#ifndef	VARLIBPATH
-#define	VARLIBPATH	"LD_LIBRARY_PATH"
-#endif
+#define	BC_MODBNAME	BABYCALC_MODBNAME
+#define	BC_OBJNAME	BABYCALC_OBJNAME
 
 
 /* imported namespaces */
@@ -102,7 +98,7 @@ static int babycalc_ctor(babycalc *op,Args ... args) noex {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
 	    if ((op->mlp = new(nothrow) modload) != np) {
-	        if (callsp p ; (p = new(nothrow) modload) != np) {
+	        if (callsp p ; (p = new(nothrow) babycalc_calls) != np) {
 		    op->callp = callsp(p) ;
 		    rs = SR_OK ;
 		}
@@ -146,7 +142,7 @@ static inline int babycalc_magic(babycalc *op,Args ... args) noex {
 
 static int	babycalc_objloadbegin(BC *,cchar *,cchar *) noex ;
 static int	babycalc_objloadend(BC *) noex ;
-static int	babycalc_loadcalls(BC *,cchar *) noex ;
+static int	babycalc_loadcalls(BC *,vecstr *) noex ;
 
 static bool	isrequired(int) noex ;
 
@@ -187,7 +183,8 @@ int babycalc_open(BC *op,cchar *pr,cchar *dbname) noex {
 	    if (pr[0]) {
 		cchar	*objname = BC_OBJNAME ;
 	        if ((rs = babycalc_objloadbegin(op,pr,objname)) >= 0) {
-	            if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
+		    callsp p = callsp(op->callp) ;
+	            if ((rs = p->open(op->obj,pr,dbname)) >= 0) {
 	                op->magic = BABYCALC_MAGIC ;
 	            }
 	            if (rs < 0) {
@@ -229,9 +226,10 @@ int babycalc_close(BC *op) noex {
 int babycalc_check(BC *op,time_t daytime) noex {
 	int		rs ;
 	if ((rs = babycalc_magic(op)) >= 0) {
+	    callsp p = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
-	    if (op->call.check) {
-	        rs = (*op->call.check)(op->obj,daytime) ;
+	    if (p->check) {
+	        rs = p->check(op->obj,daytime) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -241,22 +239,24 @@ int babycalc_check(BC *op,time_t daytime) noex {
 int babycalc_lookup(BC *op,time_t datereq,uint *rp) noex {
 	int		rs ;
 	if ((rs = babycalc_magic(op)) >= 0) {
+	    callsp p = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
-	    if (op->call.lookup) {
-	        rs = (*op->call.lookup)(op->obj,datereq,rp) ;
+	    if (p->lookup) {
+	        rs = p->lookup(op->obj,datereq,rp) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (babycalc_lookup) */
 
-int babycalc_info(BC *op,BC_INFO *ip) noex {
+int babycalc_getinfo(BC *op,BC_INFO *ip) noex {
 	int		rs ;
 	int		n = 0 ;
 	if ((rs = babycalc_magic(op)) >= 0) {
+	    callsp p = callsp(op->callp) ;
 	    BABYCALCS_INFO	bi{} ;
-	    if (op->call.info) {
-	        rs = (*op->call.info)(op->obj,&bi) ;
+	    if (p->info) {
+	        rs = p->info(op->obj,&bi) ;
 	        n = rs ;
 	    }
 	    if (ip) {
@@ -270,13 +270,13 @@ int babycalc_info(BC *op,BC_INFO *ip) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (babycalc_info) */
+/* end subroutine (babycalc_getinfo) */
 
 
 /* private subroutines */
 
-static int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
-	modload		*lp = op->mlp ;
+static int babycalc_objloadbegin(BC *op,cchar *pr,cchar *objn) noex {
+	modload		*mlp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
@@ -284,22 +284,22 @@ static int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
 	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
 	        if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
-	            cchar	*mn = CMD_MODBNAME ;
+	            cchar	*mn = BC_MODBNAME ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
 	            mo |= MODLOAD_OLIBVAR ;
 	            mo |= MODLOAD_OPRS ;
 	            mo |= MODLOAD_OSDIRS ;
 	            mo |= MODLOAD_OAVAIL ;
-	            if ((rs = modload_open(lp,pr,mn,on,mo,sv)) >= 0) {
+	            if ((rs = modload_open(mlp,pr,mn,on,mo,sv)) >= 0) {
 		        op->fl.modload = true ;
-	                if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
-			    cint	osz = op->objsize ;
-	                    op->objsize = mv[0] ;
-	                    op->cursize = mv[1] ;
+	                if (int mv[2] ; (rs = modload_getmva(mlp,mv,2)) >= 0) {
+			    cint	osz = op->objsz ;
+	                    op->objsz = mv[0] ;
+	                    op->cursz = mv[1] ;
 			    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
 	                        op->obj = vp ;
-	                        rs = commandment_loadcalls(op,&syms) ;
+	                        rs = babycalc_loadcalls(op,&syms) ;
 	                        if (rs < 0) {
 	                            uc_free(op->obj) ;
 	                            op->obj = nullptr ;
@@ -308,7 +308,7 @@ static int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	                } /* end if (modload_getmva) */
 	                if (rs < 0) {
 		            op->fl.modload = false ;
-	                    modload_close(lp) ;
+	                    modload_close(mlp) ;
 	                }
 	            } /* end if (modload_open) */
 		} /* end if (vecstr_getvec) */
@@ -317,14 +317,14 @@ static int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
-		modload_close(lp) ;
+		modload_close(mlp) ;
 	    }
 	} /* end if (vecstr-syms) */
 	return rs ;
 }
-/* end subroutine (commandment_objloadbegin) */
+/* end subroutine (babycalc_objloadbegin) */
 
-static int commandment_objloadend(CMD *op) noex {
+static int babycalc_objloadend(BC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) {
@@ -339,18 +339,18 @@ static int commandment_objloadend(CMD *op) noex {
 	}
 	return rs ;
 }
-/* end subroutine (commandment_objloadend) */
+/* end subroutine (babycalc_objloadend) */
 
-static int commandment_loadcalls(CMD *op,vecstr *slp) noex {
-	modload		*lp = op->mlp ;
+static int babycalc_loadcalls(BC *op,vecstr *slp) noex {
+	modload		*mlp = op->mlp ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
 	cchar		*sname{} ;
 	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
-	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
-                commandment_calls   *callp = callsp(op->callp) ;
+	    if (cvoid *snp{} ; (rs = modload_getsym(mlp,sname,&snp)) >= 0) {
+                babycalc_calls   *callp = callsp(op->callp) ;
                 c += 1 ;
                 switch (i) {
                 case sub_open:
@@ -377,7 +377,7 @@ static int commandment_loadcalls(CMD *op,vecstr *slp) noex {
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (commandment_loadcalls) */
+/* end subroutine (babycalc_loadcalls) */
 
 static bool isrequired(int i) noex {
 	bool		f = false ;
