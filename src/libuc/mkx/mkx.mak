@@ -69,7 +69,7 @@ OBJ10_MKX= mknoise.o mknpathx.o mknpathxw.o
 OBJ11_MKX= mkonefrom.o mkpathrooted.o mkpathx.o mkpathxw.o
 OBJ12_MKX= mkquoted.o
 OBJ13_MKX= mkrealname.o mkrevstr.o
-OBJ14_MKX= mkshlibname.o mksofname.o mkstrunique.o
+OBJ14_MKX= mkshlibname.o mkshmname.o mksofname.o mkstrunique.o
 OBJ15_MKX= mktagfname.o
 OBJ16_MKX= mkufname.o
 OBJ17_MKX= mkuserpath.o mkutmpid.o
@@ -212,18 +212,19 @@ obje_mkx.o:	$(OBJE_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJE_MKX)
 
 
-mkfdfname.o:		mkfdfname.cc $(INCS) mkfdfname.h
-mkgecosname.o:		mkgecosname.cc $(INCS) mkgecosname.h
-mkmid.o:		mkmid.cc $(INCS)
+mkfdfname.o:		mkfdfname.cc		$(INCS) mkfdfname.h
+mkgecosname.o:		mkgecosname.cc		$(INCS) mkgecosname.h
+mkmid.o:		mkmid.cc		$(INCS)
 
-mkaddrname.o:		mkaddrname.cc  $(INCS)
-mkaddrdisp.o:		mkaddrdisp.cc  $(INCS)
-mkaddrbest.o:		mkaddrbest.cc  $(INCS)
-mkaddrfrom.o:		mkaddrfrom.cc  $(INCS)
+mkaddrname.o:		mkaddrname.cc		$(INCS)
+mkaddrdisp.o:		mkaddrdisp.cc		$(INCS)
+mkaddrbest.o:		mkaddrbest.cc		$(INCS)
+mkaddrfrom.o:		mkaddrfrom.cc		$(INCS)
 
-mkbasename.o:		mkbasename.cc $(INCS)
-mkshlibname.o:		mkshlibname.cc $(INCS)
-mksofname.o:		mksofname.cc $(INCS)
+mkbasename.o:		mkbasename.cc		$(INCS)
+mkshlibname.o:		mkshlibname.cc		$(INCS)
+mkshmname.o:		mkshmname.cc		$(INCS)
+mksofname.o:		mksofname.cc		$(INCS)
 mkintfname.o:		mkintfname.cc		$(INCS)
 mkufname.o:		mkufname.cc		$(INCS)
 
@@ -232,12 +233,12 @@ mkcdpath.o:		mkcdpath.cc		$(INCS)
 mkuserpath.o:		mkuserpath.cc		$(INCS)
 mkvarpath.o:		mkvarpath.cc		$(INCS)
 
-mkaltext.o:		mkaltext.cc $(INCS)
-mkmaildirtest.o:	mkmaildirtest.cc $(INCS)
-mkstrunique.o:		mkstrunique.cc $(INCS)
-mkcleanline.o:		mkcleanline.cc $(INCS)
-mkfmtphone.o:		mkfmtphone.cc $(INCS)
-mkfingerquery.o:	mkfingerquery.cc $(INCS)
+mkaltext.o:		mkaltext.cc		$(INCS)
+mkmaildirtest.o:	mkmaildirtest.cc	$(INCS)
+mkstrunique.o:		mkstrunique.cc		$(INCS)
+mkcleanline.o:		mkcleanline.cc		$(INCS)
+mkfmtphone.o:		mkfmtphone.cc		$(INCS)
+mkfingerquery.o:	mkfingerquery.cc	$(INCS)
 
 mkpr.o:			mkpr.cc mkpr.h		$(INCS)
 
