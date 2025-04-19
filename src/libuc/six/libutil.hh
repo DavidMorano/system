@@ -16,7 +16,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| + |strnlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -46,8 +46,14 @@ constexpr int cstrlen(cchar *sp) noex {
 #ifndef	SUBROUTINE_XSTRNLEN
 #define	SUBROUTINE_XSTRNLEN
 constexpr int xstrnlen(cchar *sp,int sl) noex {
-    	csize	ssz = size_t(sl) ;
-    	return intconv(strnlen(sp,ssz)) ;
+    	int		len = 0 ;
+	if (sl >= 0) {
+    	    csize	ssz = size_t(sl) ;
+	    len = intconv(strnlen(sp,ssz)) ;
+	} else {
+	    len = intconv(strlen(sp)) ;
+	}
+    	return len ;
 }
 #endif /* SUBROUTINE_XSTRNLEN */
 
