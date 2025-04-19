@@ -73,8 +73,8 @@ struct var_head {
 	VAR_CALLS	call ;
 	void		*obj ;		/* object pointer */
 	uint		magic ;
-	int		objsize ;	/* object size */
-	int		cursize ;	/* cursor size */
+	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size */
 } ;
 
 struct varinfo_data {

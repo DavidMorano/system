@@ -266,7 +266,7 @@ int var_curbegin(VAR *op,VAR_CUR *curp) noex {
 	memclear(curp) ;
 
 	if (op->call.curbegin != nullptr) {
-	    if (void *vp{} ; (rs = uc_malloc(op->cursize,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = uc_malloc(op->cursz,&vp)) >= 0) {
 		curp->scp = vp ;
 	        if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
 	            curp->magic = VAR_MAGIC ;
@@ -412,7 +412,7 @@ int varunlink(cchar *dbnp,int dbnl) noex {
 /* private subroutines */
 
 static int var_objloadbegin(VAR *op,cchar *objname) noex {
-	MODLOAD		*lp = &op->loader ;
+	modload		*lp = &op->loader ;
 	int		rs ;
 	char		dn[MAXHOSTNAMELEN+1] ;
 	if ((rs = getnodedomain(nullptr,dn)) >= 0) {
@@ -441,9 +441,9 @@ static int var_objloadbegin(VAR *op,cchar *objname) noex {
 		        if (mainv sv{} ; (rs = vecstr_getvec(&syms,&sv)) >= 0) {
 	                    cchar	*modbname = VAR_MODBNAME ;
 			    int		mo = 0 ;
-	                    mo |= MODLOAD_OLIBVAR ;
-			    mo |= MODLOAD_OPRS ;
-			    mo |= MODLOAD_OSDIRS ;
+	                    mo |= modloadm.libvar ;
+			    mo |= modloadm.libprs ;
+			    mo |= modloadm.libsdirs ;
 	                    rs = modload_open(lp,pr,modbname,objname,mo,sv) ;
 			} /* end if (getvec) */
 	            } /* end if (ok) */
@@ -452,12 +452,10 @@ static int var_objloadbegin(VAR *op,cchar *objname) noex {
 	        } /* end if (allocation) */
 
 		if (rs >= 0) {
-		    int		mv[2] ;
-		    if ((rs = modload_getmva(lp,mv,2)) >= 0) {
-			void	*p ;
-			op->objsize = mv[0] ;
-			op->cursize = mv[1] ;
-			if ((rs = uc_malloc(op->objsize,&p)) >= 0) {
+		    if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
+			op->objsz = mv[0] ;
+			op->cursz = mv[1] ;
+			if (void *p ; (rs = uc_malloc(op->objsz,&p)) >= 0) {
 			    op->obj = p ;
 			    rs = var_loadcalls(op,objname) ;
 			    if (rs < 0) {
@@ -466,8 +464,9 @@ static int var_objloadbegin(VAR *op,cchar *objname) noex {
 			    }
 			} /* end if (memory-allocation) */
 		    } /* end if (modload_getmva) */
-		    if (rs < 0)
+		    if (rs < 0) {
 			modload_close(lp) ;
+		    }
 		} /* end if (modload_open) */
 
 	    } /* end if (mkpr) */
