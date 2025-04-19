@@ -1,4 +1,5 @@
 /* filer_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* support low-overhead file bufferring requirements */
@@ -17,7 +18,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	filer
 
 	Description:

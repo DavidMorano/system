@@ -1,4 +1,5 @@
 /* filer_obj SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* extra methods for the FILER object */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	filer
+
+	Description:
 	These are the subroutines (methods) to support the OO
 	flavored operations.
 

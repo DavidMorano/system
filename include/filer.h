@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	filer
+
+	Description:
         This little object supports some buffered file operations for
         low-overhead buffered I-O requirements.
 
