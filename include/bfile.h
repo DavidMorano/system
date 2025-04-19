@@ -243,7 +243,7 @@ struct bfile : bfile_head {
 	int wasteln(char *,int) noex ;
 	int reade(void *,int,int,int) noex ;
 	int read(void *,int) noex ;
-	int readlnto(char *,int,int) noex ;
+	int readlnto(char *,int,int = -1) noex ;
 	int readln(char *lp,int ll) noex {
 	    return readlnto(lp,ll,-1) ;
 	} ;
