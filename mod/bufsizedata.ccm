@@ -73,6 +73,9 @@ module ;
 #ifndef	_SC_FSTYPE
 #define	_SC_FSTYPE		-1
 #endif
+#ifndef	_SC_SYMBOL_MAX
+#define	_SC_SYMBOL_MAX		-1
+#endif
 #ifndef	_SC_TZNAME_MAX
 #define	_SC_TZNAME_MAX		-1
 #endif
@@ -172,6 +175,10 @@ export {
 	    case getbufsize_fs:
 	        ip->name = _SC_FSTYPE ;
 		ip->defval = FSBUFLEN ;		/* filesystem-name-buf */
+	        break ;
+	    case getbufsize_sn:
+	        ip->name = _SC_SYMBOL_MAX ;
+		ip->defval = SYMNAMELEN ;
 	        break ;
 	    case getbufsize_zn:
 	        ip->name = _SC_TZNAME_MAX ;
