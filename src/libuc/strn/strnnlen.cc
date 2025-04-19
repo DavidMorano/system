@@ -21,17 +21,17 @@
 	strnnlen
 
 	Description:
-	This subroutine computes the length of a supplied string
-	but will not examine the string for more than a specified
+	This subroutine computes the length of a supplied c-string
+	but will not examine the c-string for more than a specified
 	length.
 
 	Synopsis:
 	int strnnlen(cchar *sp,int sl,int max) noex
 
 	Arguments:
-	sp	string to be examined
-	sl	length of string (or -1)
-	nax	maximum length of string to be examined
+	sp	c-string pointer
+	sl	c-string length (or -1)
+	nax	maximum length of c-string to be examined (can be -1)
 
 	Returns:
 	len	mimimum of length of string or MIN(slen,max)
@@ -47,7 +47,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>		/* |cstrlen(3u)| */
+#include	<libutil.hh>		/* |cstrlen(3u)| + |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"strn.h"
@@ -71,6 +71,9 @@ using std::max ;			/* subroutine-template */
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 
@@ -85,12 +88,14 @@ using std::max ;			/* subroutine-template */
 int strnnlen(cchar *sp,int sl,int mlen) noex {
 	int		len = 0 ;
 	if (sp && (sl != 0) && (mlen != 0)) {
-	    if (sl >= 0) {
-	        if (mlen >= 0) sl = min(sl,mlen) ;
+	    if (sl > 0) {
+	        if (mlen > 0) {
+		    sl = min(sl,mlen) ;
+		}
 	    } else {
 	        sl = mlen ;
 	    }
-	    len = cstrnlen(sp,sl) ;
+	    len = xstrnlen(sp,sl) ; /* (sl < 0) is allowed */
 	} /* end if */
 	return len ;
 }
