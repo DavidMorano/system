@@ -43,7 +43,7 @@ struct varmk_head {
 	void		*sop ;		/* shared-object (SO) pointer */
 	void		*obj ;		/* object pointer */
 	uint		magic ;
-	int		objsize ;	/* object size */
+	int		objsz ;		/* object size */
 } ;
 
 typedef VARMK		varmk ;

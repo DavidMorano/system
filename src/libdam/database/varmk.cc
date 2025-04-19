@@ -240,10 +240,10 @@ static int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname) noex {
 	            cchar	*mn = VARMK_MODBNAME ;
 	            cchar	*on = objname ;
 	            int		mo = 0 ;
-	            mo |= MODLOAD_OLIBVAR ;
-	            mo |= MODLOAD_OPRS ;
-	            mo |= MODLOAD_OSDIRS ;
-	            mo |= MODLOAD_OAVAIL ;
+	            mo |= modloadm.libvar ;
+	            mo |= modloadm.libprs ;
+	            mo |= modloadm.libsdirs ;
+	            mo |= modloadm.avail ;
 	            rs = modload_open(lp,pr,mn,on,mo,sv) ;
 		    f_modload = (rs >= 0) ;
 	        } /* end if (getvec) */
@@ -257,11 +257,9 @@ static int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname) noex {
 	} /* end if (vecstr_start) */
 
 	if (rs >= 0) {
-	    int		mv[2] ;
-	    if ((rs = modload_getmva(lp,mv,1)) >= 0) {
-	        void	*p ;
-	        op->objsize = mv[0] ;
-	        if ((rs = uc_malloc(op->objsize,&p)) >= 0) {
+	    if (int mv[2] ; (rs = modload_getmva(lp,mv,1)) >= 0) {
+	        op->objsz = mv[0] ;
+	        if (void *p ; (rs = uc_malloc(op->objsz,&p)) >= 0) {
 	            op->obj = p ;
 	            rs = varmk_loadcalls(op,objname) ;
 	            if (rs < 0) {
