@@ -432,6 +432,11 @@ enum extrasysconfs {
 #endif
 #endif
 
+/* symbol name */
+#ifndef	SYMNAMELEN
+#define	SYMNAMELEN	100		/* symbol-name-length */
+#endif
+
 /* time-zone-name (this is the abbreviated time-zone from time immemorial) */
 #ifndef	ZNBUFLEN
 #ifdef	TZNAME_MAX
