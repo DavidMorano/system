@@ -58,6 +58,7 @@ cchar *bufsizenames[] = {
 	[getbufsize_ho] = "HO",		/* host-ent */
 	[getbufsize_sv] = "SV",		/* service-ent */
 	[getbufsize_fs] = "FS",		/* filesystem-type */
+	[getbufsize_sn] = "SN",		/* symbol-name */
 	[getbufsize_zn] = "ZN",		/* time-zone-name abbreviation */
 	[getbufsize_zi] = "ZI",		/* zone-info-name (newer concept) */
 	[getbufsize_mailaddr] = "MAILADDR",	/* mail-address */
