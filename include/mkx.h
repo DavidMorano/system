@@ -87,6 +87,14 @@ extern int	mkrevstr(char *,int) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+inline int mkshmname(char *rbuf,cchar *ip,int il,cchar *sp) noex {
+	return mkshmname(rbuf,ip,il,sp,-1) ;
+}
+
+#endif /* __cplusplus */
+
 
 #endif /* MKX_INCLUDE */
 
