@@ -32,8 +32,10 @@
 
 #define	UUNAME_MAGIC	0x99447243
 #define	UUNAME		struct uuname_head
+#define	UUNAME_FL	struct uuname_flags
 #define	UUNAME_CUR	struct uuname_cursor
-#define	UUNAME_CALLS	struct uuname_caller
+#define	UUNAME_MODBNAME	"uunames"
+#define	UUNAME_OBJNAME	"uunames"
 
 
 struct uuname_cursor {
@@ -41,31 +43,22 @@ struct uuname_cursor {
 	uint		magic ;
 } ;
 
-extern "C" {
-    struct uuname_caller {
-	int	(*open)(void *,cchar *,cchar *) noex ;
-	int	(*count)(void *) noex ;
-	int	(*exists)(void *,cchar *,int) noex ;
-	int	(*curbegin)(void *,void *) noex ;
-	int	(*enumerate)(void *,void *,char *,int) noex ;
-	int	(*curend)(void *,void *) noex ;
-	int	(*audit)(void *) noex ;
-	int	(*close)(void *) noex ;
-    } ;
-}
+struct uuname_flags {
+    	uint		modload:1 ;
+} ;
 
 struct uuname_head {
+	modload		*mlp ;
 	void		*obj ;		/* object pointer */
-	modload		*loader ;
-	UUNAME_CALLS	call ;
+	void		*callp ;
+	UUNAME_FL	fl ;
 	uint		magic ;
-	int		objsize ;	/* object size */
-	int		cursize ;	/* cursor size */
+	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size */
 } ;
 
 typedef	UUNAME		uuname ;
 typedef	UUNAME_CUR	uuname_cur ;
-typedef	UUNAME_CALLS	uuname_calls ;
 
 EXTERNC_begin
 
