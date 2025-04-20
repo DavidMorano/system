@@ -50,8 +50,8 @@ struct babycalc_flags {
 
 struct babycalc_head {
 	modload		*mlp ;		/* module-load-pointer */
-	void		*callp ;	/* calls-structure pointer */
 	void		*obj ;		/* object pointer */
+	void		*callp ;	/* calls-structure pointer */
 	BABYCALC_FL	fl ;
 	uint		magic ;
 	int		objsz ;

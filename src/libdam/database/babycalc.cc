@@ -283,21 +283,21 @@ static int babycalc_objloadbegin(BC *op,cchar *pr,cchar *objn) noex {
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
 	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
-	        if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
+	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*mn = BC_MODBNAME ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
-	            mo |= MODLOAD_OLIBVAR ;
-	            mo |= MODLOAD_OPRS ;
-	            mo |= MODLOAD_OSDIRS ;
-	            mo |= MODLOAD_OAVAIL ;
+	            mo |= modloadm.libvar ;
+	            mo |= modloadm.libprs ;
+	            mo |= modloadm.libsdirs ;
+	            mo |= modloadm.avail ;
 	            if ((rs = modload_open(mlp,pr,mn,on,mo,sv)) >= 0) {
 		        op->fl.modload = true ;
 	                if (int mv[2] ; (rs = modload_getmva(mlp,mv,2)) >= 0) {
-			    cint	osz = op->objsz ;
+			    cint	osz = mv[0] ;
 	                    op->objsz = mv[0] ;
 	                    op->cursz = mv[1] ;
-			    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
+			    if (void *vp ; (rs = uc_malloc(osz,&vp)) >= 0) {
 	                        op->obj = vp ;
 	                        rs = babycalc_loadcalls(op,&syms) ;
 	                        if (rs < 0) {
