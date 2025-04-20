@@ -29,6 +29,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<modload.h>
@@ -325,7 +326,7 @@ int commandment_curbegin(CMD *op,CMD_CUR *curp) noex {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    memclear(curp) ;
 	    if (callp->curbegin) {
-		cint	csz = op->cursize ;
+		cint	csz = op->cursz ;
 	        if (void *vp ; (rs = uc_malloc(csz,&vp)) >= 0) {
 		    curp->scp = vp ;
 		    auto 	co = callp->curbegin ;
@@ -442,21 +443,21 @@ static int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
 	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
-	        if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
+	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*mn = CMD_MODBNAME ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
-	            mo |= MODLOAD_OLIBVAR ;
-	            mo |= MODLOAD_OPRS ;
-	            mo |= MODLOAD_OSDIRS ;
-	            mo |= MODLOAD_OAVAIL ;
+	            mo |= modloadm.libvar ;
+	            mo |= modloadm.libprs ;
+	            mo |= modloadm.libsdirs ;
+	            mo |= modloadm.avail ;
 	            if ((rs = modload_open(lp,pr,mn,on,mo,sv)) >= 0) {
 		        op->fl.modload = true ;
 	                if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
-			    cint	osz = op->objsize ;
-	                    op->objsize = mv[0] ;
-	                    op->cursize = mv[1] ;
-			    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
+			    cint	osz = mv[0] ;
+	                    op->objsz = mv[0] ;
+	                    op->cursz = mv[1] ;
+			    if (void *vp ; (rs = uc_malloc(osz,&vp)) >= 0) {
 	                        op->obj = vp ;
 	                        rs = commandment_loadcalls(op,&syms) ;
 	                        if (rs < 0) {

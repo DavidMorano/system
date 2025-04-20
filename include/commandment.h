@@ -46,12 +46,12 @@ struct commandment_cursor {
 
 struct commandment_head {
 	modload		*mlp ;		/* module-load-pointer */
-	void		*callp ;
 	void		*obj ;		/* object pointer */
+	void		*callp ;
 	COMMANDMENT_FL	fl ;
 	uint		magic ;
-	int		objsize ;
-	int		cursize ;
+	int		objsz ;
+	int		cursz ;
 } ;
 
 typedef	COMMANDMENT		commandment ;
