@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int babycalcs_ctor(babycalcs *op,Args ... args) noex {
+static int votdc_ctor(votdc *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int babycalcs_ctor(babycalcs *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (babycalcs_ctor) */
+/* end subroutine (votdc_ctor) */
 
-static int babycalcs_dtor(babycalcs *op) noex {
+static int votdc_dtor(votdc *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (babycalcs_dtor) */
+/* end subroutine (votdc_dtor) */
 
 template<typename ... Args>
-static inline int babycalcs_magic(babycalcs *op,Args ... args) noex {
+static inline int votdc_magic(votdc *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == BABYCALCS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == VOTDC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (babycalcs_magic) */
+/* end subroutine (votdc_magic) */

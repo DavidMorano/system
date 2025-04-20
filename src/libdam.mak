@@ -745,6 +745,7 @@ nodesearch.o:		nodesearch.cc nodesearch.h
 termtrans.o:		termtrans.cc termtrans.h
 termout.o:		termout.cc termout.h
 modload.o:		modload.cc modload.h
+shmalloc.o:		shmalloc.cc shmalloc.h
 
 # TEXT related
 textlook.o:		textlook.cc textlook.h
