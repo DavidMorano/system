@@ -149,6 +149,10 @@ int libmalloc_fs(char **rpp) noex {
 	cint	w = getbufsize_fs ;
 	return uc_libmallocsys(w,rpp) ;
 }
+int libmalloc_sn(char **rpp) noex {
+	cint	w = getbufsize_sn ;
+	return uc_libmallocsys(w,rpp) ;
+}
 int libmalloc_zn(char **rpp) noex {
 	cint	w = getbufsize_zn ;
 	return uc_libmallocsys(w,rpp) ;
