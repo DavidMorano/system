@@ -30,6 +30,7 @@
 #include	<prgetclustername.h>
 #include	<prmktmpdir.h>
 #include	<prmkfname.h>
+#include	<propenqotd.h>
 
 
 #endif /* LIBPR_INCLUDE */
