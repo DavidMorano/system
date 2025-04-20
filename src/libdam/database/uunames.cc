@@ -305,7 +305,9 @@ static int	mkpathval(vecstr *,char *,int) noex ;
 static int	mkindfname(char *,cchar *,cchar *,cchar *,cchar *) noex ;
 #endif
 
-static int	vesrch(cvoid **,cvoid **) noex ;
+extern "C" {
+    static int	vesrch(cvoid **,cvoid **) noex ;
+}
 
 
 /* local variables */
@@ -384,7 +386,7 @@ extern const uunames_obj	uunames_modinfo = {
 /* exported subroutines */
 
 int uunames_open(UU *op,cchar *pr,cchar *dbname) noex {
-	time_t		dt = time(nullptr) ;
+	time_t		dt = getustime ;
 	int		rs ;
 	if ((rs = uunames_ctor(op,pr)) >= 0) {
 	    rs = SR_INVALID ;
@@ -485,8 +487,7 @@ int uunames_exists(UU *op,cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
 	        if ((rs = uunames_indcheck(op,0)) >= 0) {
-		    cchar	*kp{} ;
-	            if ((rs = uc_mallocstrw(sp,sl,&kp)) >= 0) {
+		    if (cchar *kp ; (rs = uc_mallocstrw(sp,sl,&kp)) >= 0) {
 			cnullptr	np{} ;
 	                kl = rs ;
 			{
@@ -560,15 +561,13 @@ static int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	char		*indfname{} ;
 	op->indfname = nullptr ;
-	if ((rs = malloc_mp(&indfname)) >= 0) {
+	if (char *indfname ; (rs = malloc_mp(&indfname)) >= 0) {
 	    cchar	*suf = INDSUF ;
 	    cchar	*ends = ENDIANSTR ;
 	    if ((rs = mkfnamesuf2(indfname,indname,suf,ends)) >= 0) {
 		cint	fl = rs ;
-	        cchar	*cp{} ;
-	        if ((rs = uc_mallocstrw(indfname,fl,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = uc_mallocstrw(indfname,fl,&cp)) >= 0) {
 		    op->indfname = cp ;
 		    if ((rs = uunames_filemapcreate(op,dt)) >= 0) {
 			rs = uunames_indlist(op) ;
@@ -581,6 +580,7 @@ static int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 	            }
 		} /* end if (memory-allocation) */
 	    } /* end if (mkfnamesuf) */
+	    rs = rsfree(rs,indfname) ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rv : rs ;
 }
@@ -611,11 +611,10 @@ static int uunames_filemapcreate(UU *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	cmode		om = 0666 ;
-	if (dt == 0) dt = time(nullptr) ;
+	if (dt == 0) dt = getustime ;
 	if ((rs = uc_open(op->indfname,of,om)) >= 0) {
-	    USTAT	sb ;
 	    cint	fd = rs ;
-	    if ((rs = uc_fstat(fd,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
 		rs = SR_NOTSUP ;
 	        if (S_ISREG(sb.st_mode)) {
 		    cnullptr	np{} ;
@@ -674,8 +673,7 @@ static int uunames_indopen(UU *op,time_t dt) noex {
 static int uunames_indopenpr(UU *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*idname{} ;
-	if ((rs = malloc_mp(&idname)) >= 0) {
+	if (char *idname ; (rs = malloc_mp(&idname)) >= 0) {
 	    if ((rs = mkpath(idname,op->pr,VARDNAME,INDDNAME)) >= 0) {
 	        rs = uunames_indopendname(op,idname,dt) ;
 	    }
@@ -691,8 +689,7 @@ static int uunames_indopentmp(UU *op,time_t dt) noex {
 	int		rs1 ;
 	cchar		*tmpdname = TMPVARDNAME ;
 	cchar		*inddname = INDDNAME ;
-	char		*idname{} ;
-	if ((rs = malloc_mp(&idname)) >= 0) {
+	if (char *idname ; (rs = malloc_mp(&idname)) >= 0) {
 	    cchar	*prname{} ;
 	    if ((rs = sfbasename(op->pr,-1,&prname)) > 0) {
 	        if ((rs = mkpath(idname,tmpdname,prname,inddname)) >= 0) {
@@ -711,9 +708,8 @@ static int uunames_indopentmp(UU *op,time_t dt) noex {
 static int uunames_indopendname(UU *op,cchar *dname,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*indname{} ;
-	if ((rs = malloc_mp(&indname)) >= 0) {
-	int		f_mk = false ;
+	if (char *indname ; (rs = malloc_mp(&indname)) >= 0) {
+	bool	f_mk = false ;
 	if ((rs = mkpath2(indname,dname,op->dbname)) >= 0) {
 	    if ((rs = uunames_indtest(op,indname,dt)) >= 0) {
 	        bool	f_ok = (rs > 0) ;
@@ -756,8 +752,7 @@ static int uunames_indtest(UU *op,cchar *indname,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	char		*indfname{} ;
-	if ((rs = malloc_mp(&indfname)) >= 0) {
+	if (char *indfname ; (rs = malloc_mp(&indfname)) >= 0) {
 	    cchar	*suf = INDSUF ;
 	    cchar	*ends = ENDIANSTR ;
 	    if ((rs = mkfnamesuf2(indfname,indname,suf,ends)) >= 0) {
@@ -787,8 +782,7 @@ static int uunames_indfn(UU *op,cchar *dname,time_t) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*indname{} ;
-	if ((rs = malloc_mp(&indname)) >= 0) {
+	if (char *indname ; (rs = malloc_mp(&indname)) >= 0) {
 	    if ((rs = checkdname(dname)) == SR_NOENT) {
 	        rs = mkdirs(dname,TMPDMODE) ;
 	    }
@@ -933,15 +927,13 @@ ret0:
 /* end subroutine (uunames_mkuunamesi) */
 
 static int uunames_envpaths(UU *op,vecstr *elp) noex {
-	vecstr		pathcomps ;
 	cnullptr	np{} ;
 	cint		vo = VECSTR_OORDERED ;
 	cint		ne = 40 ;
 	int		rs ;
 	int		rs1 ;
-	char		*pbuf{} ;
-	if ((rs = malloc_mp(&pbuf)) >= 0) {
-	    if ((rs = vecstr_start(&pathcomps,ne,vo)) >= 0) {
+	if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) {
+	    if (vecstr pc ; (rs = pc.start(ne,vo)) >= 0) {
 	        int	bl ;
 	        int	pl ;
 	        char	*bp = nullptr ;
@@ -952,35 +944,35 @@ static int uunames_envpaths(UU *op,vecstr *elp) noex {
 	            if ((rs >= 0) && (subdname != nullptr)) {
 	                if ((rs = mkpath(pbuf,op->pr,subdname)) >= 0) {
 	                    pl = rs ;
-	                    rs = vecstr_add(&pathcomps,pbuf,pl) ;
+	                    rs = pc.add(pbuf,pl) ;
 		        }
 	            } /* end if */
 	            subdname = envpops[i].sub2dname ;
 	            if ((rs >= 0) && (subdname != nullptr)) {
 	                if ((rs = mkpath2(pbuf,op->pr,subdname)) >= 0) {
 	                    pl = rs ;
-	                    rs = vecstr_add(&pathcomps,pbuf,pl) ;
+	                    rs = pc.add(pbuf,pl) ;
 		        }
 	            } /* end if */
 	            if (cchar *vp ; (rs >= 0) && ((vp = getenv(enp)) != np)) {
-	                rs = vecstr_loadpath(&pathcomps,vp) ;
+	                rs = pc.loadpath(vp) ;
 	            }
 	            if (rs >= 0) {
-	                rs = vecstr_strsize(&pathcomps) ;
+	                rs = pc.strsize() ;
 		        sz = rs ;
 	            }
 	            if ((rs >= 0) && ((rs = uc_malloc((sz+1),&bp)) >= 0)) {
 	                if ((rs = mkpathval(&pathcomps,bp,sz)) >= 0) {
 	                    bl = rs ;
-	                    rs = vecstr_envadd(elp,enp,bp,bl) ;
+	                    rs = elp->envadd(enp,bp,bl) ;
 		        }
 	                rs1 = uc_free(bp) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (memory allocation) */
-	            vecstr_delall(&pathcomps) ;
+	            pc.delall ;
 	            if (rs < 0) break ;
 	        } /* end for */
-	        rs1 = vecstr_finish(&pathcomps) ;
+	        rs1 = pc.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (vecstr) */
 	    rs1 = uc_free(pbuf) ;
@@ -1036,8 +1028,7 @@ static int uunames_indcheck(UU *op,time_t) noex {
 static int checkdname(cchar *dname) noex {
 	int		rs = SR_OK ;
 	if (dname[0] == '/') {
-	    USTAT	sb ;
-	    if ((rs = u_stat(dname,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = u_stat(dname,&sb)) >= 0) {
 		if (S_ISDIR(sb.st_mode)) {
 	    	    rs = perm(dname,-1,-1,nullptr,W_OK) ;
 		} else {
@@ -1058,9 +1049,8 @@ static int mkindfname(char *rbuf,cc *dname,cc *name,cc *suf,cc *end) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-	    sbuf	sb ;
 	    int		dnl = 0 ;
-	    if ((rs = sb.start(rbuf,rs)) >= 0) {
+	    if (sbuf sb ; (rs = sb.start(rbuf,rs)) >= 0) {
 		{
 	            if ((rs = sb.strw(dname,-1)) >= 0) {
 	                dnl = rs ;
@@ -1103,16 +1093,15 @@ static int vecstr_loadpath(vecstr *clp,cchar *pp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    sif		of(pp,-1,":;") ;
 	    int		cl ;
 	    cchar	*cp ;
 	    while ((cl = of(&cp)) > 0) {
 	        if ((rs = pathclean(tbuf,cp,cl)) >= 0) {
-	            if ((rs = vecstr_findn(clp,tbuf,cl)) == rsn) {
+	            if ((rs = clp->findn(tbuf,cl)) == rsn) {
 	                c += 1 ;
-		        rs = vecstr_add(clp,tbuf,cl) ;
+		        rs = clp->add(tbuf,cl) ;
 	            }
 		} /* end if (pathclean) */
 	        if (rs < 0) break ;
@@ -1133,7 +1122,7 @@ static int mkpathval(vecstr *clp,char *vbuf,int vbuflen) noex {
 	    cchar	*cp ;
 	    bool	f_semi = false ;
 	    vbuf[0] = '\0' ;
-	    for (int i = 0 ; vecstr_get(clp,i,&cp) >= 0 ; i += 1) {
+	    for (int i = 0 ; clp->get(i,&cp) >= 0 ; i += 1) {
 	        if (cp) {
 	            if (cp[0] != ';') {
 	                if (c++ > 0) {

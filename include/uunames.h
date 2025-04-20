@@ -38,8 +38,8 @@
 
 struct uunames_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ;
 
 struct uunames_cursor {
