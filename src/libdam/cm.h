@@ -24,15 +24,9 @@
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<unistd.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>		/* |MAXNAMELEN| */
-
 #include	<systems.h>
 #include	<sysdialer.h>
+#include	<localmisc.h>		/* |MAXNAMELEN| */
 
 
 #define	CM_MAGIC	31815926
