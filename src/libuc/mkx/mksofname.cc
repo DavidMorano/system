@@ -34,6 +34,7 @@
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
+#include	<localmisc.h>
 
 #include	"mkx.h"
 
@@ -71,38 +72,33 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 int mksofname(char *rbuf,cchar *dn,cchar *name,cchar *ext) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		len = 0 ;
 	if (rbuf && dn && name && ext) {
 	    rs = SR_INVALID ;
 	    if (dn[0] && name[0]) {
 		if ((rs = maxpathlen) >= 0) {
-		    cint	rlen = rs ;
-	            if (rs >= 0) {
-	                rs = storebuf_strw(rbuf,rlen,i,dn,-1) ;
-	                i += rs ;
-	            }
-	            if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	                rs = storebuf_chr(rbuf,rlen,i,'/') ;
-	                i += rs ;
+		    storebuf	sb(rbuf,rs) ;
+		    if ((rs = sb.strw(dn)) > 0) {
+	                if (dn[rs - 1] != '/') {
+	                    rs = sb.chr('/') ;
+			}
 	            }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(rbuf,rlen,i,name,-1) ;
-	                i += rs ;
+	                rs = sb.strw(name) ;
 	            }
 	            if (ext[0]) {
 	                if ((rs >= 0) && (ext[0] != '.')) {
-	                    rs = storebuf_chr(rbuf,rlen,i,'.') ;
-	                    i += rs ;
+	                    rs = sb.chr('.') ;
 	                }
 	                if (rs >= 0) {
-	                    rs = storebuf_strw(rbuf,rlen,i,ext,-1) ;
-	                    i += rs ;
+	                    rs = sb.strw(ext) ;
 	                }
 	            } /* end if (had extension) */
+		    len = sb.idx ;
 		} /* end if (maxpathlen) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mksofname) */
 
