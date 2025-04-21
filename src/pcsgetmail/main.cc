@@ -1,16 +1,15 @@
 /* main (PCSGETMAIL) */
+/* encoding=ISO8859-1 */
 /* lang=C99 */
 
 /* the PCSGETMAIL program */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGN	0		/* 'nprintf(3dam)' */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_LOCSETENT	0		/* |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -23,24 +22,25 @@
 
 /*******************************************************************************
 
-	This is the front-end subroutine for the GETMAIL program.
+  	Name:
+	main
 
+	Description:
+	This is the front-end subroutine for the GETMAIL program.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -52,8 +52,9 @@
 #include	<pcsconf.h>
 #include	<vecstr.h>
 #include	<field.h>
-#include	<char.h>
 #include	<ascii.h>
+#include	<mkx.h>			/* |mkmaildirtest(3uc)| */
+#include	<char.h>
 #include	<localmisc.h>
 #include	<exitcodes.h>
 
@@ -73,73 +74,23 @@
 #define	DEBFNAME	"/tmp/getmail.deb"
 
 
-/* external routines */
-
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkmaildirtest(char *,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	mkuibang(char *,int,USERINFO *) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
-extern int	getgid_def(const char *,gid_t) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-
-extern int	printhelp(bfile *,const char *,const char *,const char *) ;
-
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	proginfo_realbegin(PROGINFO *) ;
-extern int	proginfo_realend(PROGINFO *) ;
-
-extern int	proglog_begin(PROGINFO *,USERINFO *) ;
-extern int	proglog_end(PROGINFO *) ;
-extern int	proglog_print(PROGINFO *,cchar *,int) ;
-extern int	proglog_printf(PROGINFO *,cchar *,...) ;
-extern int	proglog_flush(PROGINFO *) ;
-extern int	proguserlist_begin(PROGINFO *) ;
-extern int	proguserlist_end(PROGINFO *) ;
-
-extern int	progmailbox(PROGINFO *,int,int) ;
+/* external subroutines */
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 #if	CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
 
-extern const char	makedate[] ;
+extern cchar	makedate[] ;
 
 
 /* local structures */
@@ -154,9 +105,9 @@ struct locinfo {
 	LOCINFO_FL	have, f, changed, final ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
-	PROGINFO	*pip ;
-	const char	*pr_pcs ;
-	const char	*homedname ;
+	proginfo	*pip ;
+	cchar		*pr_pcs ;
+	cchar		*homedname ;
 	uint		sum ;
 	int		mfd ;
 } ;
@@ -164,45 +115,45 @@ struct locinfo {
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
-static int	makedate_get(const char *,const char **) ;
+static int	usage(proginfo *) ;
+static int	makedate_get(cchar *,cchar **) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procsetup(PROGINFO *,ARGINFO *,BITS *,PARAMOPT *,
+static int	procopts(proginfo *,KEYOPT *) ;
+static int	procsetup(proginfo *,ARGINFO *,BITS *,PARAMOPT *,
 			cchar *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,PARAMOPT *,cchar *) ;
-static int	procnames(PROGINFO *,PARAMOPT *,cchar *,cchar *,int) ;
-static int	procmailfname(PROGINFO *) ;
-static int	procfoldercheck(PROGINFO *,const char *) ;
-static int	procthem(PROGINFO *) ;
-static int	proclog_maildirbad(PROGINFO *,cchar *,int,int) ;
+static int	procargs(proginfo *,ARGINFO *,BITS *,PARAMOPT *,cchar *) ;
+static int	procnames(proginfo *,PARAMOPT *,cchar *,cchar *,int) ;
+static int	procmailfname(proginfo *) ;
+static int	procfoldercheck(proginfo *,cchar *) ;
+static int	procthem(proginfo *) ;
+static int	proclog_maildirbad(proginfo *,cchar *,int,int) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
+static int	procuserinfo_begin(proginfo *,USERINFO *) ;
+static int	procuserinfo_end(proginfo *) ;
 
-static int	procpcsconf_begin(PROGINFO *,PCSCONF *) ;
-static int	procpcsconf_end(PROGINFO *) ;
+static int	procpcsconf_begin(proginfo *,PCSCONF *) ;
+static int	procpcsconf_end(proginfo *) ;
 
-static int	maildirs_begin(PROGINFO *,PARAMOPT *) ;
-static int	maildirs_end(PROGINFO *) ;
-static int	maildirs_env(PROGINFO *,const char *) ;
-static int	maildirs_arg(PROGINFO *,PARAMOPT *) ;
-static int	maildirs_def(PROGINFO *,const char *) ;
-static int	maildirs_add(PROGINFO *,const char *,int) ;
-static int	maildirs_accessible(PROGINFO *,cchar *,int,int) ;
+static int	maildirs_begin(proginfo *,PARAMOPT *) ;
+static int	maildirs_end(proginfo *) ;
+static int	maildirs_env(proginfo *,cchar *) ;
+static int	maildirs_arg(proginfo *,PARAMOPT *) ;
+static int	maildirs_def(proginfo *,cchar *) ;
+static int	maildirs_add(proginfo *,cchar *,int) ;
+static int	maildirs_accessible(proginfo *,cchar *,int,int) ;
 
-static int	mailusers_begin(PROGINFO *,PARAMOPT *) ;
-static int	mailusers_end(PROGINFO *) ;
-static int	mailusers_env(PROGINFO *,const char *) ;
-static int	mailusers_arg(PROGINFO *,PARAMOPT *) ;
-static int	mailusers_def(PROGINFO *,const char *) ;
-static int	mailusers_add(PROGINFO *,const char *,int) ;
+static int	mailusers_begin(proginfo *,PARAMOPT *) ;
+static int	mailusers_end(proginfo *) ;
+static int	mailusers_env(proginfo *,cchar *) ;
+static int	mailusers_arg(proginfo *,PARAMOPT *) ;
+static int	mailusers_def(proginfo *,cchar *) ;
+static int	mailusers_add(proginfo *,cchar *,int) ;
 
 #ifdef	COMMENT
-static int	forwarded(PROGINFO *,char *,int) ;
+static int	forwarded(proginfo *,char *,int) ;
 #endif
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
+static int	locinfo_start(LOCINFO *,proginfo *) ;
 static int	locinfo_finish(LOCINFO *) ;
 #if	CF_LOCSETENT
 static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
@@ -211,7 +162,7 @@ static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -265,7 +216,7 @@ static const struct pivars	initvars = {
 	VARPRPCS
 } ;
 
-static const char *akonames[] = {
+static cchar *akonames[] = {
 	"nodel",
 	NULL
 } ;
@@ -286,14 +237,14 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static const char *varmaildirs[] = {
+static cchar *varmaildirs[] = {
 	VARMAILDNAME,
 	VARMAILDNAMES,
 	VARMAILDNAMESP,
 	NULL
 } ;
 
-static const char *varmailusers[] = {
+static cchar *varmailusers[] = {
 	VARMAILUSERS,
 	VARMAILUSERSP,
 	NULL
@@ -329,17 +280,17 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	int		f_version = FALSE ;
 	int		f_makedate = FALSE ;
 	int		f_help = FALSE ;
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cfname = NULL ;
-	const char	*reportfname = NULL ;
-	const char	*jobid = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cfname = NULL ;
+	cchar	*reportfname = NULL ;
+	cchar	*jobid = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -405,7 +356,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -508,7 +459,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            rs = SR_INVALID ;
 	                    }
 	                    if ((rs >= 0) && (cp != NULL) && (cl > 0)) {
-	                        const char	*po = PO_MAILDIRS ;
+	                        cchar	*po = PO_MAILDIRS ;
 	                        rs = paramopt_loads(&aparams,po,cp,cl) ;
 	                    }
 	                    break ;
@@ -768,7 +719,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -865,7 +816,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                                rs = SR_INVALID ;
 	                        }
 	                        if ((rs >= 0) && (cp != NULL) && (cl > 0)) {
-	                            const char	*po = PO_MAILDIRS ;
+	                            cchar	*po = PO_MAILDIRS ;
 	                            rs = paramopt_loads(&aparams,po,cp,cl) ;
 	                        }
 	                        break ;
@@ -934,7 +885,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                                rs = SR_INVALID ;
 	                        }
 	                        if ((rs >= 0) && (cp != NULL) && (cl > 0)) {
-	                            const char	*po = PO_MAILUSERS ;
+	                            cchar	*po = PO_MAILUSERS ;
 	                            rs = paramopt_loads(&aparams,po,cp,cl) ;
 	                        }
 	                        break ;
@@ -1073,9 +1024,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if ((rs >= 0) && (pip->mbox == NULL)) {
 	    if ((cp = getenv(VARMBOX)) != NULL) {
 	        int		vl ;
-	        const char	*vp ;
+	        cchar	*vp ;
 	        if ((vl = sfbasename(cp,-1,&vp)) > 0) {
-	            const char	**vpp = &pip->mbox ;
+	            cchar	**vpp = &pip->mbox ;
 	            rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	        }
 	    }
@@ -1131,8 +1082,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            ARGINFO	*aip = &ainfo ;
 	                            BITS	*bop = &pargs ;
 	                            PARAMOPT	*app = &aparams ;
-	                            const char	*afn = afname ;
-	                            const char	*ofn = ofname ;
+	                            cchar	*afn = afname ;
+	                            cchar	*ofn = ofname ;
     
 	                            rs = procsetup(pip,aip,bop,app,ofn,afn) ;
 				    bytes = rs ;
@@ -1310,12 +1261,12 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+static int usage(proginfo *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-u <mailuser>] [-vp] [-l | -n] [-m <mailbox>]\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -1402,8 +1353,8 @@ int		buflen ;
 static int makedate_get(cchar md[],cchar **rpp)
 {
 	int		ch ;
-	const char	*sp ;
-	const char	*cp ;
+	cchar	*sp ;
+	cchar	*cp ;
 
 	if (rpp != NULL)
 	    *rpp = NULL ;
@@ -1433,11 +1384,11 @@ static int makedate_get(cchar md[],cchar **rpp)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(proginfo *pip,KEYOPT *kop)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1485,7 +1436,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+static int procuserinfo_begin(proginfo *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1513,12 +1464,12 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
-	    const char	*nn = pip->nodename ;
-	    const char	*dn = pip->domainname ;
+	    cchar	*nn = pip->nodename ;
+	    cchar	*dn = pip->domainname ;
 	    if ((rs = snsds(hbuf,hlen,nn,dn)) >= 0) {
-	        const char	**vpp = &pip->hostname ;
+	        cchar	**vpp = &pip->hostname ;
 	        rs = proginfo_setentry(pip,vpp,hbuf,rs) ;
 	    }
 	}
@@ -1548,7 +1499,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+static int procuserinfo_end(proginfo *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1559,7 +1510,7 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
+static int procpcsconf_begin(proginfo *pip,PCSCONF *pcp)
 {
 	int		rs = SR_OK ;
 
@@ -1575,8 +1526,8 @@ static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 	    if (DEBUGLEVEL(3)) {
 	        PCSCONF_CUR	cur ;
 	        if ((rs = pcsconf_curbegin(pcp,&cur)) >= 0) {
-	            const int	klen = KBUFLEN ;
-	            const int	vlen = VBUFLEN ;
+	            cint	klen = KBUFLEN ;
+	            cint	vlen = VBUFLEN ;
 	            int		vl ;
 	            char	kbuf[KBUFLEN+1] ;
 	            char	vbuf[VBUFLEN+1] ;
@@ -1603,7 +1554,7 @@ static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 /* end subroutine (procpcsconf_begin) */
 
 
-static int procpcsconf_end(PROGINFO *pip)
+static int procpcsconf_end(proginfo *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1619,8 +1570,8 @@ PROGINFO	*pip ;
 ARGINFO		*aip ;
 BITS		*bop ;
 PARAMOPT	*app ;
-const char	*ofn ;
-const char	*afn ;
+cchar	*ofn ;
+cchar	*afn ;
 {
 	int		rs ;
 	int		rs1 ;
@@ -1631,9 +1582,9 @@ const char	*afn ;
 #endif
 	if ((rs = procargs(pip,aip,bop,app,afn)) >= 0) {
 	    if ((rs = ids_load(&pip->id)) >= 0) {
-	        const int	fac = LOG_MAIL ;
-	        const char	*lid = pip->logid ;
-	        const char	*pn = pip->progname ;
+	        cint	fac = LOG_MAIL ;
+	        cchar	*lid = pip->logid ;
+	        cchar	*pn = pip->progname ;
 	        if ((rs = logsys_open(&pip->ls,fac,pn,lid,0)) >= 0) {
 	            pip->open.logsys = TRUE ;
 	            if ((rs = maildirs_begin(pip,app)) >= 0) {
@@ -1667,7 +1618,7 @@ const char	*afn ;
 /* end subroutine (procsetup) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
+static int procargs(proginfo *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 		cchar *afn)
 {
 	int		rs = SR_OK ;
@@ -1675,15 +1626,15 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 	int		cl ;
 	int		pan = 0 ;
 	int		c = 0 ;
-	const char	*po = PO_MAILUSERS ;
-	const char	*cp ;
+	cchar	*po = PO_MAILUSERS ;
+	cchar	*cp ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
 	if (rs >= 0) {
 	    int		ai ;
 	    int		f ;
-	    const char	**argv = aip->argv ;
+	    cchar	**argv = aip->argv ;
 	    for (ai = 1 ; (rs >= 0) && (ai < aip->argc) ; ai += 1) {
 
 	        f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
@@ -1708,7 +1659,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 	        afn = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1746,7 +1697,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 /* end subroutine (procargs) */
 
 
-static int procnames(PROGINFO *pip,PARAMOPT *app,cchar *po,cchar *lbuf,int llen)
+static int procnames(proginfo *pip,PARAMOPT *app,cchar *po,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1769,27 +1720,27 @@ static int procnames(PROGINFO *pip,PARAMOPT *app,cchar *po,cchar *lbuf,int llen)
 /* end subroutine (procnames) */
 
 
-static int procmailfname(PROGINFO *pip)
+static int procmailfname(proginfo *pip)
 {
 	int		rs = SR_OK ;
 	int		f_store = TRUE ;
-	const char	*mfname = NULL ;
+	cchar	*mfname = NULL ;
 	char		tbuf[MAXPATHLEN+1] ;
 
 	if (pip->folderdname[0] != '/') {
 	    if ((rs = mkpath2(tbuf,pip->homedname,pip->folderdname)) >= 0) {
-	        const char	**vpp = &pip->folderdname ;
+	        cchar	**vpp = &pip->folderdname ;
 	        rs = proginfo_setentry(pip,vpp,tbuf,rs) ;
 	    }
 	}
 
 	if (pip->mbox != NULL) {
-	    const char	*folder = pip->folderdname ;
+	    cchar	*folder = pip->folderdname ;
 	    if ((rs = procfoldercheck(pip,folder)) >= 0) {
 	        rs = mkpath2(tbuf,pip->folderdname,pip->mbox) ;
 	    }
 	} else if ((mfname = getenv(VARMBOX)) != NULL) {
-	    const char	*cp ;
+	    cchar	*cp ;
 	    int		cl ;
 	    f_store = FALSE ;
 	    pip->mfname = mfname ;
@@ -1802,20 +1753,20 @@ static int procmailfname(PROGINFO *pip)
 	    } else
 	        rs = SR_INVALID ;
 	} else {
-	    const char	*folder = pip->folderdname ;
+	    cchar	*folder = pip->folderdname ;
 	    pip->mbox = MAILBOX ;
 	    if ((rs = procfoldercheck(pip,folder)) >= 0) {
 	        rs = mkpath2(tbuf,pip->folderdname,pip->mbox) ;
 	    }
 	}
 	if ((rs >= 0) && f_store) {
-	    const char	**vpp = &pip->mfname ;
+	    cchar	**vpp = &pip->mfname ;
 	    rs = proginfo_setentry(pip,vpp,tbuf,rs) ;
 	}
 
 #ifdef	COMMENT
 	if ((rs >= 0) && (pip->mbfname != NULL)) {
-	    const int	am = (W_OK | R_OK) ;
+	    cint	am = (W_OK | R_OK) ;
 	    mbfname = pip->mbfname ;
 	    if ((rs = u_access(mbfname,am)) == SR_NOENT) {
 	    }
@@ -1834,9 +1785,9 @@ static int procmailfname(PROGINFO *pip)
 /* end subroutine (procmailfname) */
 
 
-static int procfoldercheck(PROGINFO *pip,const char *folder)
+static int procfoldercheck(proginfo *pip,cchar *folder)
 {
-	const int	am = (X_OK | R_OK) ;
+	cint	am = (X_OK | R_OK) ;
 	int		rs ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1853,7 +1804,7 @@ static int procfoldercheck(PROGINFO *pip,const char *folder)
 	    } /* end if (proginfo_real) */
 	}
 	if ((rs < 0) && (! pip->f.quiet)) {
-	    const char	*pn = pip->progname ;
+	    cchar	*pn = pip->progname ;
 	    bprintf(pip->efp,
 	        "%s: inaccessible folder directory (%d)\n",pn,rs) ;
 	    bprintf(pip->efp,
@@ -1868,13 +1819,13 @@ static int procfoldercheck(PROGINFO *pip,const char *folder)
 /* end subroutine (procfoldercheck) */
 
 
-static int procthem(PROGINFO *pip)
+static int procthem(proginfo *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		bytes = 0 ;
 	int		f_mfd = FALSE ;
-	const char	*mailfname = pip->mfname ;
+	cchar	*mailfname = pip->mfname ;
 
 /* get the mail if any */
 
@@ -1908,8 +1859,8 @@ static int procthem(PROGINFO *pip)
 /* do the deed */
 
 	if (rs >= 0) {
-	    const int	mfd = lip->mfd ;
-	    const int	f_lock = lip->f.lock ;
+	    cint	mfd = lip->mfd ;
+	    cint	f_lock = lip->f.lock ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -1938,7 +1889,7 @@ static int procthem(PROGINFO *pip)
 /* end subroutine (procthem) */
 
 
-static int maildirs_begin(PROGINFO *pip,PARAMOPT *app)
+static int maildirs_begin(proginfo *pip,PARAMOPT *app)
 {
 	VECSTR		*mdp = &pip->maildirs ;
 	int		rs ;
@@ -1956,7 +1907,7 @@ static int maildirs_begin(PROGINFO *pip,PARAMOPT *app)
 	if ((rs = vecstr_start(mdp,5,0)) >= 0) {
 	    int		i ;
 	    cchar	*pn = pip->progname ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    if (rs >= 0) {
 	        rs = maildirs_arg(pip,app) ;
@@ -2002,7 +1953,7 @@ static int maildirs_begin(PROGINFO *pip,PARAMOPT *app)
 /* end subroutine (maildirs_begin) */
 
 
-static int maildirs_end(PROGINFO *pip)
+static int maildirs_end(proginfo *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2015,13 +1966,13 @@ static int maildirs_end(PROGINFO *pip)
 /* end subroutine (maildirs_end) */
 
 
-static int maildirs_env(PROGINFO *pip,cchar *var)
+static int maildirs_env(proginfo *pip,cchar *var)
 {
 	VECSTR		*vlp = &pip->maildirs ;
 	int		rs = SR_OK ;
 	int		sl, cl ;
 	int		c = 0 ;
-	const char	*sp, *cp ;
+	cchar	*sp, *cp ;
 
 	if ((vlp == NULL) || (var == NULL))
 	    return SR_FAULT ;
@@ -2054,16 +2005,16 @@ static int maildirs_env(PROGINFO *pip,cchar *var)
 /* end subroutine (maildirs_env) */
 
 
-static int maildirs_arg(PROGINFO *pip,PARAMOPT *app)
+static int maildirs_arg(proginfo *pip,PARAMOPT *app)
 {
 	int		rs ;
 	int		c = 0 ;
-	const char	*qn = PO_MAILDIRS ;
+	cchar	*qn = PO_MAILDIRS ;
 
 	if ((rs = paramopt_havekey(app,qn)) > 0) {
 	    PARAMOPT_CUR	cur ;
 	    int			vl ;
-	    const char		*vp ;
+	    cchar		*vp ;
 	    if ((rs = paramopt_curbegin(app,&cur)) >= 0) {
 	        while ((vl = paramopt_enumvalues(app,qn,&cur,&vp)) >= 0) {
 	            if (vp != NULL) {
@@ -2081,14 +2032,14 @@ static int maildirs_arg(PROGINFO *pip,PARAMOPT *app)
 /* end subroutine (maildirs_arg) */
 
 
-static int maildirs_def(PROGINFO *pip,cchar varmail[])
+static int maildirs_def(proginfo *pip,cchar varmail[])
 {
 	VECSTR		*vlp = &pip->maildirs ;
 	int		rs ;
 	int		cl ;
 	int		c = 0 ;
 	int		f = TRUE ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((rs = vecstr_count(vlp)) > 0) {
 	    int		i ;
@@ -2111,7 +2062,7 @@ static int maildirs_def(PROGINFO *pip,cchar varmail[])
 	} /* end if (non-zero) */
 
 	if ((rs >= 0) && f && (c == 0) && (varmail != NULL)) {
-	    const char	*vp ;
+	    cchar	*vp ;
 	    if ((vp = getenv(varmail)) != NULL) {
 	        if ((cl = sfdirname(vp,-1,&cp)) > 0) {
 	            rs = maildirs_add(pip,cp,cl) ;
@@ -2134,7 +2085,7 @@ static int maildirs_def(PROGINFO *pip,cchar varmail[])
 /* end subroutine (maildirs_def) */
 
 
-static int maildirs_add(PROGINFO *pip,cchar *dp,int dl)
+static int maildirs_add(proginfo *pip,cchar *dp,int dl)
 {
 	vecstr		*mlp = &pip->maildirs ;
 	int		rs = SR_OK ;
@@ -2151,7 +2102,7 @@ static int maildirs_add(PROGINFO *pip,cchar *dp,int dl)
 
 	if ((dl > 0) && (dp[0] != '\0')) {
 	    if ((rs = vecstr_findn(mlp,dp,dl)) == SR_NOTFOUND) {
-	        const int	am = (W_OK|X_OK|R_OK) ;
+	        cint	am = (W_OK|X_OK|R_OK) ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	debugprintf("main/maildirs_add: NF md=%t\n",dp,dl) ;
@@ -2175,7 +2126,7 @@ static int maildirs_add(PROGINFO *pip,cchar *dp,int dl)
 /* end subroutine (maildirs_add) */
 
 
-static int maildirs_accessible(PROGINFO *pip,cchar *dp,int dl,int am)
+static int maildirs_accessible(proginfo *pip,cchar *dp,int dl,int am)
 {
 	int		rs ;
 	int		rs1 ;
@@ -2189,11 +2140,9 @@ static int maildirs_accessible(PROGINFO *pip,cchar *dp,int dl,int am)
 	}
 #endif
 	if ((rs = mkmaildirtest(mbuf,dp,dl)) >= 0) {
-	    struct ustat	sb ;
-	    if ((rs = uc_stat(mbuf,&sb)) >= 0) {
-	        NULSTR		n ;
-	        const char	*mdname ;
-	        if ((rs = nulstr_start(&n,dp,dl,&mdname)) >= 0) {
+	    if (USTAT	sb ; (rs = uc_stat(mbuf,&sb)) >= 0) {
+	        cchar		*mdname ;
+	        if (nulstr n ; (rs = nulstr_start(&n,dp,dl,&mdname)) >= 0) {
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
 	                debugprintf("main/maildirs_accessible: md=%s\n",
@@ -2246,7 +2195,7 @@ static int maildirs_accessible(PROGINFO *pip,cchar *dp,int dl,int am)
 /* end subroutine (maildirs_accessible) */
 
 
-static int mailusers_begin(PROGINFO *pip,PARAMOPT *app)
+static int mailusers_begin(proginfo *pip,PARAMOPT *app)
 {
 	VECSTR		*ulp = &pip->mailusers ;
 	int		rs ;
@@ -2254,7 +2203,7 @@ static int mailusers_begin(PROGINFO *pip,PARAMOPT *app)
 
 	if ((rs = vecstr_start(ulp,5,0)) >= 0) {
 	    int		i ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
@@ -2310,7 +2259,7 @@ static int mailusers_begin(PROGINFO *pip,PARAMOPT *app)
 /* end subroutine (mailusers_begin) */
 
 
-static int mailusers_end(PROGINFO *pip)
+static int mailusers_end(proginfo *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2323,13 +2272,13 @@ static int mailusers_end(PROGINFO *pip)
 /* end subroutine (mailusers_end) */
 
 
-static int mailusers_env(PROGINFO *pip,cchar *var)
+static int mailusers_env(proginfo *pip,cchar *var)
 {
 	VECSTR		*vlp = &pip->mailusers ;
 	int		rs = SR_OK ;
 	int		sl, cl ;
 	int		c = 0 ;
-	const char	*sp, *cp ;
+	cchar	*sp, *cp ;
 
 	if ((vlp == NULL) || (var == NULL))
 	    return SR_FAULT ;
@@ -2340,7 +2289,7 @@ static int mailusers_env(PROGINFO *pip,cchar *var)
 #endif
 
 	if ((sp = getourenv(pip->envv,var)) != NULL) {
-	    const char	*tp ;
+	    cchar	*tp ;
 
 	    sl = strlen(sp) ;
 
@@ -2384,16 +2333,16 @@ static int mailusers_env(PROGINFO *pip,cchar *var)
 /* end subroutine (mailusers_env) */
 
 
-static int mailusers_arg(PROGINFO *pip,PARAMOPT *app)
+static int mailusers_arg(proginfo *pip,PARAMOPT *app)
 {
 	int		rs ;
 	int		c = 0 ;
-	const char	*qn = PO_MAILUSERS ;
+	cchar	*qn = PO_MAILUSERS ;
 
 	if ((rs = paramopt_havekey(app,qn)) > 0) {
 	    PARAMOPT_CUR	cur ;
 	    int			vl ;
-	    const char		*vp ;
+	    cchar		*vp ;
 
 	    if ((rs = paramopt_curbegin(app,&cur)) >= 0) {
 
@@ -2416,15 +2365,15 @@ static int mailusers_arg(PROGINFO *pip,PARAMOPT *app)
 /* end subroutine (mailuserarg) */
 
 
-static int mailusers_def(PROGINFO *pip,cchar *varmail)
+static int mailusers_def(proginfo *pip,cchar *varmail)
 {
 	VECSTR		*vlp = &pip->mailusers ;
 	int		rs = SR_OK ;
 	int		cl ;
 	int		c = 0 ;
 	int		f = TRUE ;
-	const char	*username = pip->username ;
-	const char	*cp ;
+	cchar	*username = pip->username ;
+	cchar	*cp ;
 
 	if ((rs = vecstr_count(vlp)) > 0) {
 	    int	i ;
@@ -2458,7 +2407,7 @@ static int mailusers_def(PROGINFO *pip,cchar *varmail)
 #endif
 
 	if ((rs >= 0) && f && (c == 0) && (varmail != NULL)) {
-	    const char	*vp ;
+	    cchar	*vp ;
 	    if ((vp = getenv(varmail)) != NULL) {
 	        if ((cl = sfbasename(vp,-1,&cp)) > 0) {
 	            f = FALSE ;
@@ -2488,7 +2437,7 @@ static int mailusers_def(PROGINFO *pip,cchar *varmail)
 /* end subroutine (mailusers_def) */
 
 
-static int mailusers_add(PROGINFO *pip,cchar *dp,int dl)
+static int mailusers_add(proginfo *pip,cchar *dp,int dl)
 {
 	vecstr		*mlp = &pip->mailusers ;
 	int		rs = SR_OK ;
@@ -2510,10 +2459,10 @@ static int mailusers_add(PROGINFO *pip,cchar *dp,int dl)
 /* end subroutine (mailusers_add) */
 
 
-static int proclog_maildirbad(PROGINFO *pip,cchar *dp,int dl,int mrs)
+static int proclog_maildirbad(proginfo *pip,cchar *dp,int dl,int mrs)
 {
 	int		rs = SR_OK ;
-	const char	*pn = pip->progname ;
+	cchar	*pn = pip->progname ;
 
 	if (pip->efp != NULL) {
 	    cchar	*fmt = "%s: maildir=%t inaccessible (%d)\n" ;
@@ -2521,13 +2470,13 @@ static int proclog_maildirbad(PROGINFO *pip,cchar *dp,int dl,int mrs)
 	}
 
 	if (pip->open.logprog) {
-	    const char	*fmt = "maildir=%t inaccessible (%d)" ;
+	    cchar	*fmt = "maildir=%t inaccessible (%d)" ;
 	    proglog_printf(pip,fmt,dp,dl,mrs) ;
 	}
 
 	if (pip->open.logsys) {
-	    const char	*fmt = "maildir=%t inaccessible (%d)" ;
-	    const int	pri = LOG_NOTICE ;
+	    cchar	*fmt = "maildir=%t inaccessible (%d)" ;
+	    cint	pri = LOG_NOTICE ;
 	    logsys_printf(&pip->ls,pri,fmt,dp,dl,mrs) ;
 	}
 
@@ -2536,11 +2485,11 @@ static int proclog_maildirbad(PROGINFO *pip,cchar *dp,int dl,int mrs)
 /* end subroutine (proclog_maildirbad) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+static int locinfo_start(LOCINFO *lip,proginfo *pip)
 {
 	int		rs = SR_OK ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memclear(lip) ;
 	lip->pip = pip ;
 	lip->mfd = -1 ;
 
