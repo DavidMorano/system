@@ -465,8 +465,7 @@ static int cm_trysys(cm *op,SI *sip,SYSDIALER *dp,SYSDIALER_ARGS *dap,
 
 	    if (rs >= 0) {
 		if (op->c.open != NULL) {
- 	            cchar	**tav ;
-	            if ((rs = vecstr_getvec(&args,&tav)) >= 0) {
+ 	            if (mainv tav ; (rs = vecstr_getvec(&args,&tav)) >= 0) {
 	                dap->argv = tav ;
 	                rs = (op->c.open)(op->dobj,dap,sysname,svcname,av) ;
 		    }
@@ -498,8 +497,8 @@ static int cm_trysys(cm *op,SI *sip,SYSDIALER *dp,SYSDIALER_ARGS *dap,
 
 static int cm_trysysargs(cm *op,SI *sip,vecstr *alp,
 		char *abuf,int alen) noex {
-	field		fsb ;
 	int		rs ;
+	int		rs1 ;
 	uchar		terms[32] ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -507,7 +506,7 @@ static int cm_trysysargs(cm *op,SI *sip,vecstr *alp,
 
 	fieldterms(terms,0," \t") ;
 
-	if ((rs = field_start(&fsb,abuf,alen)) >= 0) {
+	if (field fsb ; (rs = field_start(&fsb,abuf,alen)) >= 0) {
 	    cint	flen = ARGBUFLEN ;
 	    int		fl ;
 	    cchar	*fp ;
@@ -517,12 +516,10 @@ static int cm_trysysargs(cm *op,SI *sip,vecstr *alp,
 	    while (rs >= 0) {
 		fl = field_sharg(&fsb,terms,fbuf,flen) ;
 		if (fl < 0) break ;
-
 		rs = vecstr_add(alp,fp,fl) ;
-
 	    } /* end while */
-
-	    field_finish(&fsb) ;
+	    rs1 = field_finish(&fsb) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 
 	return rs ;
