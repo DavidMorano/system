@@ -48,8 +48,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -73,6 +71,9 @@
 
 #undef	CH_EXPAND
 #define	CH_EXPAND	'%'
+
+
+/* imported namespaces */
 
 
 /* local typedefs */
@@ -110,7 +111,7 @@ static bufsizevar	maxpathlen(getbufsize_mp,MKVARPATH_MP) ;
 
 int mkvarpath(char *rbuf,cchar *fp,int fl) noex {
 	cint		ec = CH_EXPAND ;
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		pl = 0 ;
 	if (rbuf && fp) {
             rbuf[0] = '\0' ;
@@ -119,13 +120,12 @@ int mkvarpath(char *rbuf,cchar *fp,int fl) noex {
                 int         vl = (fl - 1) ;
                 cchar       *vp = (fp + 1) ;
                 cchar       *rp = nullptr ;
-                cchar       *tp ;
                 cchar       *cp ;
                 if (vl && (vp[0] == ec)) { /* check for prefix character */
                     vp += 1 ;
                     vl -= 1 ;
                 }
-                if ((tp = strnchr(vp,vl,'/')) != nullptr) {
+                if (cchar *tp ; (tp = strnchr(vp,vl,'/')) != nullptr) {
                     vl = intconv(tp - vp) ;
                     rp = tp ;
                 }
@@ -170,11 +170,10 @@ int mkvarpath(char *rbuf,cchar *fp,int fl) noex {
 /* local subroutines */
 
 static int mkvarpath_list(char *rbuf,cchar *pathlist,cchar *rp) noex {
-	vecstr		paths ;
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
-	if ((rs = vecstr_start(&paths,2,0)) >= 0) {
+	if (vecstr paths ; (rs = vecstr_start(&paths,2,0)) >= 0) {
 	    int		sl ;
 	    int		f_zero = false ;
 	    cchar	*sp = pathlist ;
@@ -185,7 +184,7 @@ static int mkvarpath_list(char *rbuf,cchar *pathlist,cchar *rp) noex {
 	            rs = mkvarpath_one(rbuf,&paths,sp,sl,rp) ;
 	            pl = rs ;
 	        }
-	        sp = (tp+1) ;
+	        sp = (tp + 1) ;
 	        if (((rs >= 0) && (pl > 0)) || (! isNotPresent(rs))) break ;
 	    } /* end for */
 	    if ((rs >= 0) && (pl == 0) && ((sp[0] != '\0') || (! f_zero))) {
@@ -207,7 +206,6 @@ static int mkvarpath_one(char *rbuf,vecstr *plp,cc *sp,int sl,cc *rp) noex {
 	if (sl < 0) sl = cstrlen(sp) ;
 	if ((rs = vecstr_findn(plp,sp,sl)) == rsn) {
 	    if ((rs = vecstr_add(plp,sp,sl)) >= 0) {
-	        USTAT	sb ;
 	        rs1 = mkvarpath_join(rbuf,sp,sl,rp) ;
 	        pl = rs1 ;
 	        if ((rs1 == SR_OVERFLOW) || (rs1 == SR_NAMETOOLONG)) {
@@ -215,8 +213,12 @@ static int mkvarpath_one(char *rbuf,vecstr *plp,cc *sp,int sl,cc *rp) noex {
 	            pl = 0 ;
 	        }
 	        if ((rs1 >= 0) && (pl > 0) && (rbuf[0] != '\0')) {
-	            rs = u_lstat(rbuf,&sb) ;
-	            if (rs < 0) pl = 0 ;
+	            if (USTAT sb ; (rs = u_lstat(rbuf,&sb)) >= 0) {
+			rs = 0 ; /* <- dummy action */
+		    } else if (isNotPresent(rs)) {
+			rs = SR_OK ;
+	                pl = 0 ;
+		    }
 	        }
 	    } /* end if (vecstr_add) */
 	} /* end if (not-found) */
@@ -228,14 +230,12 @@ static int mkvarpath_join(char *rbuf,cchar *sp,int sl,cchar *rp) noex {
 	int		rs ;
 	int		pl = 0 ;
 	if ((rs = maxpathlen) >= 0) {
-	    cint	maxpl = rs ;
-	    if (rs >= 0) {
-	        rs = storebuf_strw(rbuf,maxpl,pl,sp,sl) ;
-	        pl += rs ;
-	    }
-	    if ((rs >= 0) && rp) {
-	        rs = storebuf_strw(rbuf,maxpl,pl,rp,-1) ;
-	        pl += rs ;
+	    storebuf	sb(rbuf,rs) ;
+	    if ((rs = sb.strw(sp,sl)) >= 0) {
+	        if (rp) {
+	            rs = sb.strw(rp) ;
+		}
+		pl = sb.idx ;
 	    }
 	    if (rs == SR_OVERFLOW) rs = SR_NAMETOOLONG ;
 	} /* end if (maxpathlen) */
