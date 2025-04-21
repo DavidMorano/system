@@ -119,15 +119,16 @@ extern char	makedate[] ;
 /* forward references */
 
 static int	anyformat() ;
-static int	isok(int) ;
 
-static void	int_all() ;
+static bool	isok(int) noex ;
+
+static void	int_all() noex ;
 
 
 /* external variables */
 
-static int	f_signal = FALSE ;
-static int	signal_num = 0 ;
+static sig_atomic_t	f_signal = FALSE ;
+static sig_atomic_t	signal_num = 0 ;
 
 
 /* local variables */
@@ -989,9 +990,7 @@ char	*envv[] ;
 /* loop through the arguments */
 
 	if (npa > 0) {
-
 	    bfile	outfile ;
-
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -999,15 +998,10 @@ char	*envv[] ;
 #endif
 
 	    rs = bopen(&outfile,BFILE_STDOUT,"dwct",0666) ;
-
-
 	    pan = 0 ;
 	    for (i = 0 ; i <= maxai ; i += 1) {
-
 	        if (BATST(argpresent,i)) {
-
 	            int	s, uplen ;
-
 
 #if	CF_DEBUG
 	            if (pip->debuglevel > 1) {
@@ -1055,12 +1049,11 @@ char	*envv[] ;
 
 	                case dialer_tcp:
 	                    af = AF_UNSPEC ;
-	                    if ((portspec != NULL) && (portspec[0] != '\0'))
+	                    if ((portspec != NULL) && (portspec[0] != '\0')) {
 	                        rs = dialtcp(hostpart,portspec,af,timeout,0) ;
-
-	                    else
+			    } else {
 	                        rs = dialtcp(hostpart,svcspec,af,timeout,0) ;
-
+			    }
 	                    break ;
 
 	                case dialer_tcpnls:
@@ -1079,12 +1072,10 @@ char	*envv[] ;
 
 	                case dialer_uss:
 	                    cp = portspec ;
-	                    if ((cp == NULL) || (cp[0] == '\0'))
+	                    if ((cp == NULL) || (cp[0] == '\0')) {
 	                        cp = svcspec ;
-
-	                    rs = dialuss(cp,
-	                        timeout,0) ;
-
+			    }
+	                    rs = dialuss(cp, timeout,0) ;
 	                    break ;
 
 	                case dialer_ussmux:
@@ -1101,18 +1092,18 @@ char	*envv[] ;
 
 	                case dialer_ticotsord:
 	                    cp = portspec ;
-	                    if ((cp == NULL) || (cp[0] == '\0'))
+	                    if ((cp == NULL) || (cp[0] == '\0')) {
 	                        cp = svcspec ;
-
+			    }
 	                    rs = dialticotsord(cp,-1, timeout,0) ;
-
 	                    break ;
 
 	                case dialer_ticotsordnls:
 	                    rs = SR_INVALID ;
-	                    if ((portspec != NULL) && (portspec[0] != '\0'))
+	                    if ((portspec != NULL) && (portspec[0] != '\0')) {
 	                        rs = dialticotsordnls(portspec,-1,svcspec,
 	                            timeout,0) ;
+			    }
 
 	                    break ;
 
@@ -1139,45 +1130,40 @@ char	*envv[] ;
 
 #if	CF_DEBUG
 	                        if (pip->debuglevel > 1)
-	                            debugprintf("main: uc_readlinetimed() len=%d\n",
+	                            debugprintf("main: uc_readlinetimed() "
+					    "len=%d\n",
 	                                len) ;
 #endif /* CF_DEBUG */
 
 	                        if (len > 24) {
-
 	                            if (buf[len - 1] == '\n') {
-
 	                                len -= 1 ;
-	                                if (buf[len - 1] == '\r')
+	                                if (buf[len - 1] == '\r') {
 	                                    len -= 1 ;
-
+					}
 	                            }
-
 	                            buf[len] = '\0' ;
 	                            bprintf(&outfile,"%-24s %s\n",
 	                                buf,argv[i]) ;
 
-	                        } else if (len > 0)
+	                        } else if (len > 0) {
 	                            bprintf(&outfile,"%-24s %s\n",
 	                                "** short read **",argv[i]) ;
 
-	                        else if (len < 0)
+				} else if (len < 0) {
 	                            bprintf(&outfile,
 	                                "rs=%4d                  %s\n",
 	                                len,argv[i]) ;
-
-	                    } else
+				}
+	                    } else {
 	                        rs = anyformat(&outfile,s,timeout) ;
-
+			    }
 	                    u_close(s) ;
-
-	                } else
+	                } else {
 	                    bprintf(&outfile,"** no connection (%d) **\n",rs) ;
-
+			}
 	            } else {
-
 	                CM	con ;
-
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(5))
@@ -1264,15 +1250,11 @@ char	*envv[] ;
 
 	sysdialer_finish(&d) ;
 
-
 	systems_free(&sysdb) ;
-
 
 	u_close(FD_STDOUT) ;
 
-
 	ex = (rs >= 0) ? EX_OK : EX_DATAERR ;
-
 
 /* close off and get out ! */
 done:
@@ -1345,27 +1327,14 @@ badret:
 /* end subroutine (main) */
 
 
+/* local subroutines */
 
-/* LOCAL SUBROUTINES */
-
-
-
-void int_all(signum)
-int	signum ;
-{
-
-
+void int_all(int signum) noex {
 	f_signal = TRUE ;
 	signal_num = signum ;
-
 }
 
-
-static int anyformat(ofp,s,timeout)
-bfile	*ofp ;
-int	s ;
-int	timeout ;
-{
+static int anyformat(bfile *ofp,int s,int timeout) noex {
 	bfile	tmpfile ;
 
 	int	rs, i, len ;
@@ -1408,14 +1377,8 @@ int	timeout ;
 }
 /* end subroutine (anyformat) */
 
-
-static int isok(ch)
-int	ch ;
-{
-
-
+static bool isok(int ch) noex {
 	return ((ch == '\t') || (ch == '\n')) ;
 }
-
 
 
