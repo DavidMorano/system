@@ -50,10 +50,10 @@ struct calyear_calls {
 
 struct calyear_head {
 	uint		magic ;
-	MODLOAD		loader ;
+	modload		loader ;
 	void		*obj ;		/* object pointer */
-	int		objsize ;	/* object size */
-	int		cursize ;	/* cursor size */
+	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size */
 	CALYEAR_CALLS	call ;
 } ;
 

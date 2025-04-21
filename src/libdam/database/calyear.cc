@@ -222,7 +222,7 @@ int calyear_curbegin(CALYEAR *op,CALYEAR_CUR *curp) noex {
 
 	if (op->call.curbegin != NULL)  {
 	    void	*p ;
-	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
+	    if ((rs = uc_malloc(op->cursz,&p)) >= 0) {
 		curp->scp = p ;
 	        rs = (*op->call.curbegin)(op->obj,curp->scp) ;
 		if (rs < 0) {
@@ -328,11 +328,10 @@ int calyear_read(CALYEAR *op,CALYEAR_CUR *curp,CALCITE *qp,
 
 
 /* find and load the DB-access object */
-static int calyear_objloadbegin(CALYEAR *op,cchar *pr,cchar *objname)
-{
-	MODLOAD		*lp = &op->loader ;
-	VECSTR		syms ;
-	const int	n = nelem(subs) ;
+static int calyear_objloadbegin(CALYEAR *op,cchar *pr,cchar *objname) noex {
+	modload		*lp = &op->loader ;
+	vecstr		syms ;
+	cint		n = nelem(subs) ;
 	int		rs ;
 	int		rs1 ;
 	int		opts ;
@@ -344,12 +343,11 @@ static int calyear_objloadbegin(CALYEAR *op,cchar *pr,cchar *objname)
 
 	opts = VECSTR_OCOMPACT ;
 	if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
-	    const int	nlen = SYMNAMELEN ;
-	    int		i ;
-	    int		f_modload = FALSE ;
+	    cint	nlen = SYMNAMELEN ;
+	    bool	f_modload = FALSE ;
 	    char	nbuf[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
+	    for (int i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
 	        if (isrequired(i)) {
 	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 			rs = vecstr_add(&syms,nbuf,rs) ;
@@ -362,10 +360,12 @@ static int calyear_objloadbegin(CALYEAR *op,cchar *pr,cchar *objname)
 		cchar	**sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
 	            cchar	*modbname = CALYEAR_MODBNAME ;
-	            opts = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
-	            rs = modload_open(lp,pr,modbname,objname,opts,sv) ;
+		    int		mo = 0 ;
+		    mo |= moadloadm.libvar ;
+		    mo |= moadloadm.libsdirs ;
+	            rs = modload_open(lp,pr,modbname,objname,mo,sv) ;
 		}
-	    }
+	    } /* end if (ok) */
 
 	    rs1 = vecstr_finish(&syms) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -378,12 +378,10 @@ static int calyear_objloadbegin(CALYEAR *op,cchar *pr,cchar *objname)
 #endif
 
 	if (rs >= 0) {
-	    int		mv[2] ;
-	    if ((rs = modload_getmva(lp,mv,2)) >= 0) {
-		void	*p ;
-		op->objsize = mv[0] ;
-		op->cursize = mv[1] ;
-		if ((rs = uc_malloc(op->objsize,&p)) >= 0) {
+	    if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
+		op->objsz = mv[0] ;
+		op->cursz = mv[1] ;
+		if (void *p ; (rs = uc_malloc(op->objsz,&p)) >= 0) {
 		    op->obj = p ;
 		    rs = calyear_loadcalls(op,objname) ;
 		    if (rs < 0) {
@@ -419,16 +417,14 @@ static int calyear_objloadend(CALYEAR *op)
 }
 /* end subroutine (calyear_objloadend) */
 
-
-static int calyear_loadcalls(CALYEAR *op,cchar *objname)
-{
-	MODLOAD		*lp = &op->loader ;
-	const int	nlen = SYMNAMELEN ;
+static int calyear_loadcalls(CALYEAR *op,cchar *objname) noex {
+	modload		*lp = &op->loader ;
+	cint		nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 	char		nbuf[SYMNAMELEN + 1] ;
-	const void	*snp = NULL ;
+	cvoid		*snp = NULL ;
 
 	for (i = 0 ; subs[i] != NULL ; i += 1) {
 
