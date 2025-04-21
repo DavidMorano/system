@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* add constucted symbols to the object */
+/* add constucted symbols to the (VECSTRX) object */
 /* version %I% last-modified %G% */
 
 
@@ -11,9 +11,27 @@
 	= 1998-09-10, David A­D­ Morano
 	This module was originally written.
 
+	= 2025-04-18, David A-D- Morano
+	I make the buffer for holding the created symbol name
+	dynamic.  I also make the dynamic allocation permanent for
+	the lifetime of the loaded module (that this code may be
+	inside of).  Dynamic allocation (and immediate deallocation
+	after use) is fine, but what about keeping the allocation
+	around for the lifetime of the module?  Was this a good
+	idea?  Think about it for a moment (as a temporary opposing
+	advocate for evaluation purposes).  The reason that we
+	dynamically allocate and then deallocate (immediately)
+	afterwards is to take advantage of the statistical multiplexing
+	of the use of the heap memory area.  Without (immediate)
+	deallocation, we lose this advantage.  OK, I see the reasoning
+	(for immediate deallocation) but I will leave this
+	(sei-permanent dynamic allocation) in place for now.  What am
+	I doing messing with code that has worked well for ... decades?
+	Am I suddenly crazy?  Enjoy.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2025 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -42,15 +60,14 @@
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<estrings.h>
-#include	<localmisc.h>		/* |REALNAMELEN| */
+#include	<localmisc.h>
 
 #include	"vecstrx.hh"
 
 
 /* local defines */
-
-#define	SYMNAMELEN		REALNAMELEN
 
 
 /* external subroutines */
@@ -59,13 +76,25 @@
 /* external variables */
 
 
+/* local structures */
+
+namespace {
+    struct vars {
+	int	symlen ;
+	char	*symbuf ;
+	vars() noex = default ;
+	operator int () noex ;
+	~vars() ;
+    } ;
+}
+
+
 /* forward references */
 
 
-/* local structures */
-
-
 /* local variables */
+
+static vars		var ;
 
 
 /* exported variables */
@@ -74,19 +103,41 @@
 /* exported subroutines */
 
 int vecstrx::addsyms(cc *objn,mainv syms) noex {
-	cint		slen = SYMNAMELEN ;
-	int		rs = SR_OK ;
+    	static cint	rsv = var ;
+	int		rs ;
 	int		c = 0 ;
-	char		sbuf[SYMNAMELEN + 1] ;
-	for (int i = 0 ; (rs >= 0) && syms[i] ; i += 1) {
-	    cchar	*sn = syms[i] ;
-            if ((rs = sncpy(sbuf,slen,objn,"_",sn)) >= 0) {
-		c += 1 ;
-                rs = add(sbuf,rs) ;
-            }
-        } /* end for */
-	return rs ;
+	if ((rs = rsv) >= 0) {
+	    while ((rs >= 0) && syms[c]) {
+	        cchar	*sn = syms[c++] ;
+                if ((rs = sncpy(var.symbuf,var.symlen,objn,"_",sn)) >= 0) {
+                    rs = add(var.symbuf,rs) ;
+                }
+            } /* end while */
+	} /* end if (vars) */
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecstrx_addsyms) */
+
+
+/* private subroutines */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_sn)) >= 0) {
+	    symlen = rs ;
+	    if (char *p ; (rs = uc_libmalloc((symlen + 1),&p)) >= 0) {
+		symbuf = p ;
+	    }
+	}
+	return rs ;
+}
+
+vars::~vars() {
+    	if (symbuf) {
+    	    uc_libfree(symbuf) ;
+	    symbuf = nullptr ;
+	    symlen = 0 ;
+	}
+}
 
 
