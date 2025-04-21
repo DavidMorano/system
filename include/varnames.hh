@@ -109,6 +109,7 @@ struct varnames {
 	static const char systat[] ;
 	static const char netload[] ;
 	static const char provider[] ;
+	static const char folder[] ;
 } ; /* end struct (varnames) */
 
 
