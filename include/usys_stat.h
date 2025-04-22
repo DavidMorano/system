@@ -42,17 +42,22 @@
 #include	<usysdefs.h>
 
 
+/* missing from some operating systems */
+#ifndef	S_IAMB
+#define	S_IAMB		0x1FF		/* mask for the permissions field */
+#endif
 #ifndef	S_IFNAM
-#define	S_IFNAM		0x5000		/* taken from Solaris® */
+#define	S_IFNAM		0x5000		/* MicroSoft XENIX® named file */
 #endif
-
+#ifndef	S_IFDOOR
+#define	S_IFDOOR	0xD000		/* Solaris® "door" file */
+#endif
 #ifndef	S_ISNAM
-#ifdef	S_IFNAM
-#define	S_ISNAM(mode)	(((mode) & S_IFMT) == S_IFNAM)
-#else
-#define	S_ISNAM(mode)	0
+#define	S_ISNAM(fm)	(((fm) & S_IFMT) == S_IFNAM)
 #endif
-#endif /* S_ISNAM */
+#ifndef	S_ISDOOR
+#define	S_ISDOOR(fm)	(((fm) & S_IFMT) == S_IFDOOR)
+#endif
 
 
 #endif /* USYSSTAT_INCLUDE */
