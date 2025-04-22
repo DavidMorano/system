@@ -46,6 +46,8 @@
 #include	<fcntl.h>		/* |O_{x}| */
 #include	<netdb.h>		/* |NI_MAX{x}| */
 
+#include	<usys_stat.h>		/* |S_{x}| definitions */
+
 
 /* extra "open" flags */
 enum extraopenflags {
@@ -137,23 +139,6 @@ enum signalmissings {
 #endif
 #ifndef	F_RTEST
 #define	F_RTEST		12		/* new! (watch UNIX® for changes) */
-#endif
-
-/* missing from some operating systems */
-#ifndef	S_IAMB
-#define	S_IAMB		0x1FF		/* mask for the permissions field */
-#endif
-#ifndef	S_IFNAM
-#define	S_IFNAM		0x5000		/* MicroSoft XENIX® named file */
-#endif
-#ifndef	S_IFDOOR
-#define	S_IFDOOR	0xD000		/* Solaris® "door" file */
-#endif
-#ifndef	S_ISNAM
-#define	S_ISNAM(fm)	(((fm) & S_IFMT) == S_IFNAM)
-#endif
-#ifndef	S_ISDOOR
-#define	S_ISDOOR(fm)	(((fm) & S_IFMT) == S_IFDOOR)
 #endif
 
 /* system configuration */
