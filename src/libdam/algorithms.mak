@@ -59,10 +59,13 @@ OBJ0= bellmanford1.o bellmanford2.o
 OBJ1= bfs1.o
 OBJ2= dijkstra1.o dijkstra2.o
 OBJ3= partidxi.o partitionai.o
+OBJ4= msort.o
+OBJ5= sort_insertion.o sort_merge.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o obj5.o
 
-OBJ= $(OBJA)
+OBJ= $(OBJA) $(OBJB)
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -149,5 +152,13 @@ dijkstra1.o:		dijkstra1.cc	dijkstra1.hh		$(INCS)
 dijkstra2.o:		dijkstra2.cc	dijkstra2.hh		$(INCS)
 partidxi.o:		partidxi.cc	partidxi.h		$(INCS)
 partitionai.o:		partitionai.cc	partitionai.h		$(INCS)
+
+msort.o:		msort.cc	msort.h			$(INCS)
+
+sort_insertion.o:	sort_insertion.ccm			$(INCS)
+	makemodule sort_insertion
+
+sort_merge.o:		sort_merge.ccm				$(INCS)
+	makemodule sort_merge
 
 

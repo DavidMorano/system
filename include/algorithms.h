@@ -34,6 +34,7 @@
 #include	<graph.hh>
 #include	<partidxi.h>
 #include	<partitionai.h>
+#include	<msort.h>
 
 
 #endif /* ALGORITHMS_INCLUDE */
