@@ -190,8 +190,6 @@ extern int	mailmsg_loadfile(MAILMSG *,bfile *) ;
 extern int	mailmsg_loadline(MAILMSG *,cchar *,int) ;
 extern int	ema_haveaddr(EMA *,cchar *,int) ;
 
-extern int	sfsubstance(cchar *,int,cchar **) ;
-extern int	mkaddrpart(char *,int,cchar *,int) ;
 extern int	hdrextid(char *,int,cchar *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -980,7 +978,6 @@ static int procmsghdr_messageid(PROGINFO *pip,PROCDATA *pdp)
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
 	    vl = rs ;
 	    if ((rs = vecstr_add(hlp,hdr,HL_MESSAGEID)) >= 0) {
-
 	        if ((rs = hdrextid(mbuf,mlen,vp,vl)) == 0) {
 	            ml = rs ;
 	        } else if (isNotValid(rs)) {
