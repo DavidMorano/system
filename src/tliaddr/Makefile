@@ -121,14 +121,14 @@ INCS= config.h defs.h
 
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o 
 OBJ01= 
-OBJ02= progout.o
-OBJ03= prograw.o progsock.o
+OBJ02= tliaddr_outer.o
+OBJ03= tliaddr_raw.o tliaddr_sock.o
 OBJ04=
 OBJ05=
 OBJ06= 
 OBJ07= printhelp.o 
 OBJ08=
-OBJ09= sockaddress.o hostinfo.o
+OBJ09=
 OBJ10=
 OBJ11=
 OBJ12=
@@ -214,7 +214,7 @@ again:
 	rm -fr $(ALL) $(T) $(T).x
 
 clean:			again
-	rm -f *.ls *.ln *.i *.o *.so *.x *.lm
+	makeclean
 
 
 main.o:			main.c $(INCS)
@@ -225,15 +225,10 @@ proginfo.o:		proginfo.c defs.h
 
 proginfo_setpiv.o:	proginfo_setpiv.c defs.h
 
-progout.o:		progout.c $(INCS)
+tliaddr_outer.o:	tliaddr_outer.cc $(INCS)
 
-prograw.o:		prograw.c $(INCS)
+tliaddr_raw.o:		tliaddr_raw.cc $(INCS)
 
-progsock.o:		progsock.c $(INCS)
-
-
-sockaddress.o:		sockaddress.c sockaddress.h
-
-hostaddr.o:		hostaddr.c hostaddr.h
+tliaddr_sock.o:		tliaddr_sock.cc $(INCS)
 
 
