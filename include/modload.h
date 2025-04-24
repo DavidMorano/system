@@ -31,12 +31,12 @@
 #define	MODLOAD_MI		struct modload_mid
 #define	MODLOAD_MAGIC		0x99447246
 #define	MODLOAD_DEFENTS		(44 * 1000)
-#define	MODLOAD_SYMSUF		"_modinfo"
+#define	MODLOAD_SYMSUF		"modinfo"
 
 enum modloados {
     modloado_libvar,
-    modloado_prs,
-    modloado_sdirs,
+    modloado_libprs,
+    modloado_libsdirs,
     modloado_avail,
     modloado_self,
     modloado_overlast
@@ -46,8 +46,8 @@ enum modloados {
 
 struct modloadms {
     	static cint	libvar ;
-    	static cint	prs ;
-    	static cint	sdirs ;
+    	static cint	libprs ;
+    	static cint	libsdirs ;
     	static cint	avail ;
     	static cint	self ;
 } ;
@@ -56,8 +56,8 @@ struct modloadms {
 
 /* options */
 #define	MODLOAD_OLIBVAR		(1 << modloado_libvar)
-#define	MODLOAD_OPRS		(1 << modloado_prs)
-#define	MODLOAD_OSDIRS		(1 << modloado_sdirs)
+#define	MODLOAD_OLIBPRS		(1 << modloado_libprs)
+#define	MODLOAD_OLIBSDIRS	(1 << modloado_libsdirs)
 #define	MODLOAD_OAVAIL		(1 << modloado_avail)
 #define	MODLOAD_OSELF		(1 << modloado_self)
 
@@ -74,7 +74,44 @@ struct modload_head {
 	uint		magic ;
 } ;
 
+#ifdef	__cplusplus
+enum modloadmems {
+	modloadmem_close,
+	modloadmem_overlast
+} ;
+struct modload ;
+struct modload_co {
+	modload		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (modload *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (modload_co) */
+struct modload : modload_head {
+	modload_co	close ;
+	modload() noex {
+	    close(this,modloadmem_close) ;
+	} ;
+	modload(const modload &) = delete ;
+	modload &operator = (const modload &) = delete ;
+	int open(cchar *,cchar *,cchar *,int,mainv) noex ;
+	int getmv(int) noex ;
+	int getmva(int *,int) noex ;
+	int getsym(cchar *,cvoid **) noex ;
+	void dtor() noex ;
+	~modload() {
+	    dtor() ;
+	} ;
+} ; /* end struct (modload) */
+#else	/* __cplusplus */
 typedef MODLOAD		modload ;
+#endif /* __cplusplus */
+
 typedef MODLOAD_MI	modload_mi ;
 
 EXTERNC_begin
@@ -86,6 +123,8 @@ extern int modload_getsym(modload *,cchar *,cvoid **) noex ;
 extern int modload_close(modload *) noex ;
 
 EXTERNC_end
+
+extern const modloadms	modloadm ;
 
 
 #endif /* MODLOAD_INCLUDE */

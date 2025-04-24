@@ -236,10 +236,12 @@ constexpr bool		f_darwin = F_DARWIN ;
 /* exported variables */
 
 cint	modloadms::libvar	= (1 << modloado_libvar) ;
-cint	modloadms::prs		= (1 << modloado_prs) ;
-cint	modloadms::sdirs	= (1 << modloado_sdirs) ;
+cint	modloadms::libprs	= (1 << modloado_libprs) ;
+cint	modloadms::libsdirs	= (1 << modloado_libsdirs) ;
 cint	modloadms::avail	= (1 << modloado_avail) ;
 cint	modloadms::self		= (1 << modloado_self) ;
+
+const modloadms		modloadm ;
 
 
 /* exported subroutines */
@@ -392,11 +394,11 @@ int subinfo::setopts() noex {
 	    fl.libvar = true ;
 	    fall = false ;
 	}
-	if (so & sdm.prs)	{
+	if (so & sdm.libprs)	{
 	    fl.libprs = true ;
 	    fall = false ;
 	}
-	if (so & sdm.sdirs)	{
+	if (so & sdm.libsdirs)	{
 	    fl.libsdirs = true ;
 	    fall = false ;
 	}
@@ -738,7 +740,7 @@ int subinfo::sockliber(dirseen *dsp,cchar *ldnp,int dlm) noex {
 int subinfo::sotest(char *tbuf,int tlen) noex {
 	int		rs = SR_FAULT ;
 	if (mlp->sop) {
-	    if ((rs = sncpy(tbuf,tlen,mlp->modname,symsuf)) >= 0) {
+	    if ((rs = sncpy(tbuf,tlen,mlp->modname,"_",symsuf)) >= 0) {
 		cnullptr	np{} ;
 	        rs = SR_NOTFOUND ;
 	        if (void *vp ; (vp = dlsym(mlp->sop,tbuf)) != np) {
@@ -779,5 +781,40 @@ vars::operator int () noex {
 	return rs ;
 }
 /* end method (vars::operator) */
+
+int modload::open(cc *apr,cc *afn,cc *amn,int mo,mv ms) noex {
+	return modload_open(this,apr,afn,amn,mo,ms) ;
+}
+
+int modload::getmv(int vi) noex {
+	return modload_getmv(this,vi) ;
+}
+
+int modload::getmva(int *mva,int mvn) noex {
+	return modload_getmva(this,mva,mvn) ;
+}
+
+int modload::getsym(cchar *symname,cvoid **vpp) noex {
+	return modload_getsym(this,symname,vpp) ;
+}
+
+void modload::dtor() noex {
+	if (cint rs = close ; rs < 0) {
+	    ulogerror("modload",rs,"fini-close") ;
+	}
+}
+
+modload_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case modloadmem_close:
+	        rs = modload_close(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (modload_co::operator) */
 
 
