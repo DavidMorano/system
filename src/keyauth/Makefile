@@ -143,8 +143,8 @@ RM= rm -f
 INCS= config.h defs.h
 
 
-OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o 
-OBJ01= progout.o
+OBJ00= keyauth_main.o whatinfo.o proginfo.o proginfo_setpiv.o 
+OBJ01= keyauth_outer.o
 OBJ02= havenis.o
 OBJ03= 
 OBJ04=
