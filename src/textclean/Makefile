@@ -144,7 +144,7 @@ RM= rm -f
 INCS= config.h defs.h
 
 
-OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o 
+OBJ00= textclean_main.o whatinfo.o proginfo.o proginfo_setpiv.o 
 OBJ01=
 OBJ02=
 OBJ03=
