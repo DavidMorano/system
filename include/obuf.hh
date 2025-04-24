@@ -1,6 +1,6 @@
 /* obuf HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++98 */
 
 /* Output Buffer */
 /* version %I% last-modified %G% */
@@ -21,7 +21,7 @@
 	obuf
 
 	Description:
-	See the source support file ('obuf.cc') for a descruption
+	See the source support file ('obuf.cc') for a description
 	of this object.
 
 *******************************************************************************/
@@ -34,8 +34,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |strlen(3c)| */
-#include	<string>		/* <- |string(3c++)| */
+#include	<string>		/* |string(3c++)| */
 #include	<string_view>
 #include	<clanguage.h>
 #include	<utypedefs.h>

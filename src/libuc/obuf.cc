@@ -45,7 +45,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<new>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -55,7 +54,7 @@
 /* local defines */
 
 
-/* default name spaces */
+/* imported spaces */
 
 
 /* local typedefs */
