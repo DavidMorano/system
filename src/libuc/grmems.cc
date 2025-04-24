@@ -48,8 +48,6 @@
 #include	<sys/mman.h>
 #include	<grp.h>
 #include	<climits>		/* |INT_MAX| */
-#include	<cstdlib>
-#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -107,13 +105,15 @@ extern "C" {
 
 /* local structures */
 
-struct vars {
+namespace {
+    struct vars {
 	int		pagesize ;
 	int		grlen ;
 	int		usernamelen ;
 	int		groupnamelen ;
-} ;
-
+	operator int () noex ;
+    } ; /* end struct (vars) */
+}
 enum cts {
 	ct_miss,
 	ct_hit,
@@ -145,7 +145,7 @@ struct grmems_ug {
 
 template<typename ... Args>
 static int grmems_ctor(grmems *op,Args ... args) noex {
-	grmems_head	*hop = static_cast<grmems_head *>(op) ;
+	grmems_head	*hop = cast_static<grmems_head *>(op) ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -225,8 +225,6 @@ extern "C" {
     static int	cmpug(cvoid *,cvoid *) noex ;
 }
 
-static int	mkvars() noex ;
-
 
 /* local variables */
 
@@ -243,7 +241,7 @@ int grmems_start(grmems *op,int nmax,int ttl) noex {
 	if (nmax < GRMEMS_DEFMAX) nmax = GRMEMS_DEFMAX ;
 	if (ttl < GRMEMS_DEFTTL) ttl = GRMEMS_DEFTTL ;
 	if ((rs = grmems_ctor(op)) >= 0) {
-	    static cint		rsv = mkvars() ;
+	    static cint		rsv = var ;
 	    if ((rs = rsv) >= 0) {
 	        op->fd = -1 ;
 	        op->pagesize = var.pagesize ;
@@ -252,7 +250,7 @@ int grmems_start(grmems *op,int nmax,int ttl) noex {
 	            op->ttl = ttl ;
 	            op->magic = GRMEMS_MAGIC ;
 	        }
-	    } /* end if (mkvars) */
+	    } /* end if (vars) */
 	    if (rs < 0) {
 		grmems_dtor(op) ;
 	    }
@@ -692,7 +690,7 @@ static int grmems_recusers(grmems *op,time_t dt,vecobj *ulp,gid_t gid) noex {
 	        while ((ugp < (ugs+n)) && (ugp->gid == gid)) {
 	            grmems_u	u ;
 	            u.up = ugp->un ;
-	            u.ul = strnlen(ugp->un,ulen) ;
+	            u.ul = xstrnlen(ugp->un,ulen) ;
 	            rs = vecobj_add(ulp,&u) ;
 	            c += 1 ;
 	            ugp += 1 ;
@@ -742,7 +740,7 @@ static int grmems_mkugload(grmems *op,time_t dt,vecobj *ulp) noex {
 	        op->ti_access = dt ;
 	        while ((tp = strnchr(mp,ml,CH_NL)) != np) {
 	            gid_t	gid{} ;
-	            cint	len = (tp-mp) ;
+	            cint	len = intconv(tp - mp) ;
 	            if ((rs = pwentparse(mp,len,&gid)) > 0) {
 	                grmems_ug	ug ;
 		        cint		ul = rs ;
@@ -758,7 +756,7 @@ static int grmems_mkugload(grmems *op,time_t dt,vecobj *ulp) noex {
 			    }
 	                } /* end if (usergid_start) */
 	            } /* end if (pwentparse) */
-	            ml -= ((tp+1)-mp) ;
+	            ml -= intconv((tp + 1) - mp) ;
 	            mp = (tp+1) ;
 	            if (rs < 0) break ;
 	        } /* end while (reading lines) */
@@ -833,9 +831,9 @@ static int grmems_recrear(grmems *op,grmems_rec *ep) noex {
 	        if ((rs = pq_unlink(op->lrup,pep)) >= 0) {
 	            rs = pq_ins(op->lrup,pep) ;
 	            if (rs < 0) {
-	                grmems_rec	*ep = (grmems_rec *) pep ;
-	                record_finish(ep) ;
-	                uc_free(pep) ;
+	                grmems_rec	*gep = (grmems_rec *) pep ;
+	                record_finish(gep) ;
+	                uc_free(gep) ;
 	            } /* end if (error) */
 	        } /* end if (pq_unlink) */
 	    }
@@ -1039,7 +1037,7 @@ static int record_mems(grmems_rec *ep,time_t dt,int wc,
 	        	grmems_u	*up = (grmems_u *) vp ;
 		        ul = up->ul ;
 		        if (ul < 0) {
-			    ul = strnlen(up->up,ulen) ;
+			    ul = xstrnlen(up->up,ulen) ;
 			    up->ul = ul ;
 		        }
 	                sz += (ul+1) ;
@@ -1136,7 +1134,7 @@ static int usergid_start(grmems_ug *ugp,cchar *unp,int unl,gid_t gid) noex {
 	if ((rs = malloc_un(&unbuf)) >= 0) {
 	    cint	unlen = rs ;
 	    ugp->un = unbuf ;
-	    ul = strnwcpy(ugp->un,unlen,unp,unl) - ugp->un ;
+	    ul = intconv(strnwcpy(ugp->un,unlen,unp,unl) - ugp->un) ;
 	    ugp->gid = gid ;
 	} /* end if (memory-allocation) */
 	return (rs >= 0) ? ul : rs ;
@@ -1170,11 +1168,12 @@ static int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {
 	    if (cchar *tp ; (tp = strnchr(lp,ll,':')) != nullptr) {
 	        switch (fi) {
 	        case 0:
-	            ul = (tp-lp) ;
+	            ul = intconv(tp - lp) ;
 	            break ;
 	        case 3:
 	            {
-	                if (int v ; (rs = cfdeci(lp,(tp-lp),&v)) >= 0) {
+			cint	tl = intconv(tp - lp) ;
+	                if (int v ; (rs = cfdeci(lp,tl,&v)) >= 0) {
 			    fgid = true ;
 	                    *gp = gid_t(v) ;
 	                } else if (isNotValid(rs)) {
@@ -1184,7 +1183,7 @@ static int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {
 	            } /* end block */
 	            break ;
 	        } /* end switch */
-	        ll -= ((tp+1)-lp) ;
+	        ll -= intconv((tp + 1) - lp) ;
 	        lp = (tp+1) ;
 	    } /* end if (separator) */
 	} /* end for (looping through fields) */
@@ -1243,7 +1242,7 @@ static int vcmpug(cvoid **v1pp,cvoid **v2pp) noex {
 }
 /* end subroutine (vcmpug) */
 
-static int mkvars() noex {
+vars::operator int () noex {
 	int		rs ;
 	if ((rs = ucpagesize) >= 0) {
 	    var.pagesize = rs ;
@@ -1259,6 +1258,6 @@ static int mkvars() noex {
 	} /* end if (ucpagesize) */
 	return rs ;
 }
-/* end subroutine (mkvars) */
+/* end method (vars::operator) */
 
 
