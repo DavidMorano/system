@@ -28,7 +28,7 @@
 	int snxtierr(char *dbuf,int dlen,int flags) noex
 
 	Arguments:
-	dbuf		destination string buffer
+	dbuf		destination string buffer pointer
 	dlen		destination string buffer length
 	flags		open-flags
 
@@ -39,6 +39,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstdef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<uxti.h>
 #include	<sncpyx.h>
@@ -69,7 +71,7 @@ static int	findent(int) noex ;
 
 /* local variables */
 
-static constexpr struct val	vals[] = {
+static const val	vals[] = {
 	{ TBADADDR, "BADADDR", "incorrect address format" },
  	{ TBADOPT, "BADOPT", "incorrect options format" },
 	{ TACCES, "ACCESS", "illegal permissions" },
@@ -119,7 +121,7 @@ int snxtierr(char *dbuf,int dlen,int v) noex {
 	    cint	i = findent(v) ;
 	    cchar	*n ;
 	    n = (i >= 0) ? vals[i].n : "UNKNOWN" ;
-	    rs = sncpy1(dbuf,dlen,n) ;
+	    rs = sncpy(dbuf,dlen,n) ;
 	}
 	return rs ;
 }
@@ -129,7 +131,7 @@ int snxtierr(char *dbuf,int dlen,int v) noex {
 /* local subroutines */
 
 static int findent(int v) noex {
-	int		i ; /* <- used afterwards */
+	int		i ; /* used-afterwards */
 	bool		f = false ;
 	for (i = 0 ; vals[i].v >= 0 ; i += 1) {
 	    f = (v == vals[i].v) ;

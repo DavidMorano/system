@@ -39,6 +39,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstdef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<uxti.h>
 #include	<sncpy.h>
@@ -69,7 +71,7 @@ static int	findent(int) noex ;
 
 /* local variables */
 
-const val	vals[] = {
+static const val	vals[] = {
 	{ T_LISTEN, "LISTEN", "connection indication received" },
 	{ T_CONNECT, "CONNECT", "connect confirmation received" },
 	{ T_DATA, "DATA", "normal data received" },
@@ -92,8 +94,8 @@ int snxtilook(char *dbuf,int dlen,int v) noex {
 	cint		i = findent(v) ;
 	int		rs = SR_FAULT ;
 	if (dbuf) {
-	    ccha	*n = (i >= 0) ? vals[i].n : "UNKNOWN" ;
-	    rs = sncpy1(dbuf,dlen,n) ;
+	    cchar	*n = (i >= 0) ? vals[i].n : "UNKNOWN" ;
+	    rs = sncpy(dbuf,dlen,n) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -103,7 +105,7 @@ int snxtilook(char *dbuf,int dlen,int v) noex {
 /* local subroutines */
 
 static int findent(int v) noex {
-	int		i ; /* <- used afterwards */
+	int		i ; /* used-afterwards */
 	bool		f = false ;
 	for (i = 0 ; vals[i].v >= 0 ; i += 1) {
 	    f = (v == vals[i].v) ;
