@@ -39,11 +39,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdef>		/* |nullptr_t| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<uxti.h>
 #include	<sncpy.h>
+#include	<localmisc.h>
 
 
 /* local defines */
