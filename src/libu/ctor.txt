@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int votdc_ctor(votdc *op,Args ... args) noex {
+static int densitysb_ctor(densitysb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int votdc_ctor(votdc *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (votdc_ctor) */
+/* end subroutine (densitysb_ctor) */
 
-static int votdc_dtor(votdc *op) noex {
+static int densitysb_dtor(densitysb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (votdc_dtor) */
+/* end subroutine (densitysb_dtor) */
 
 template<typename ... Args>
-static inline int votdc_magic(votdc *op,Args ... args) noex {
+static inline int densitysb_magic(densitysb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == VOTDC_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == DENSITYDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (votdc_magic) */
+/* end subroutine (densitysb_magic) */
