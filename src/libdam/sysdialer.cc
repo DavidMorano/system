@@ -23,7 +23,8 @@
 	sysdialer
 
 	Description:
-	This object manages what sysdialers have been loaded so far.
+	This object manages what system-dialers (SYSDIALERS) have
+	been loaded so far.
 
 *******************************************************************************/
 
@@ -69,6 +70,7 @@
 #define	SD_PRC		sysdialer_prc
 #define	SD_MOD		sysdialer_mod
 #define	SD_MAGIC	SYSDIALER_MAGIC
+#define	SD_DNAME	"sysdialers"
 
 #define	DS		dirseen
 
@@ -77,10 +79,6 @@
 #define	NEXTS		3		/* number of extensions */
 
 #define	LIBCNAME	"lib"
-
-#ifndef	SDDNAME
-#define	SDDNAME		"sysdialers"
-#endif
 
 #ifndef	VARLIBPATH
 #define	VARLIBPATH	"LD_LIBRARY_PATH"
@@ -338,6 +336,8 @@ cint	sysdialerms::cor 	= (1 << sysdialero_cor) ;
 cint	sysdialerms::co 	= (1 << sysdialero_co) ;
 cint	sysdialerms::cl 	= (1 << sysdialero_cl) ;
 cint	sysdialerms::nargs	= (1 << sysdialero_nargs) ;
+
+sysdualerms		sysdialerm ;
 
 
 /* exported subroutines */
@@ -1065,8 +1065,8 @@ static int entry_checkdir(ent *ep,cc *libdname,cc *name) noex {
 	int		c ;
 	int		fl = 0 ;
 	void		*dhp = nullptr ;
-	cchar	*fn ;
-	cchar	*sublibdname = SDDNAME ;
+	cchar		*fn ;
+	cchar		*sublibdname = SD_DNAME ;
 	char		dname[MAXPATHLEN + 1] ;
 	char		dlfname[MAXPATHLEN + 1] ;
 	char		fname[MAXNAMELEN + 1] ;

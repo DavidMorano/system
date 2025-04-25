@@ -167,6 +167,8 @@ extern int sysdialer_finish(sysdialer *) noex ;
 
 EXTERNC_end
 
+extern sysdialerms	sysdialerm ;
+
 
 #endif /* SYSDIALER_INCLUDE */
 
