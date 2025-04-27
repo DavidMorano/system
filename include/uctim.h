@@ -22,7 +22,10 @@
 	uctim{x}
 
 	Description:
-	This is a facility to create process timers.
+	This is a facility to create process timers.  Note that unlike
+	the normal POSIX® real-time interfaces, this facility only
+	supports time resolution down to one microsecond (as opposed to
+	one nanosecond in the regular stuff).
 
 *******************************************************************************/
 
@@ -32,7 +35,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<sys/time.h>		/* i-timer types */
+#include	<time.h>		/* i-timer types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

@@ -60,6 +60,7 @@ EXTERNC_begin
 extern int	mkrealname(char *,int,cchar *,int) noex ;
 extern int	mknoise(uint *a,int n) noex ;
 extern int	mkbasename(char *,cchar *,int) noex ;
+extern int	mkcdpath(char *,cchar *,int) noex ;
 extern int	mkintfname(char *,cchar *,cchar *,cchar *) noex ;
 extern int	mktagfname(char *,cchar *,cchar *,int) noex ;
 extern int	mkmid(char *,int,cchar *,cchar *,pid_t,int) noex ;

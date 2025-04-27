@@ -28,10 +28,14 @@
 
 
 EXTERNC_begin
-
-extern int	mkmagic(char *,int,cchar *) noex ;
-
+extern int	mkmagic(char *,int,cchar *,int) noex ;
 EXTERNC_end
+
+#ifdef	__cplusplus
+static inline int mkmagic(char *dbuf,int dsz,cchar *ms) noex {
+	return mkmagic(dbuf,dsz,ms,-1) ;
+}
+#endif /* __cplusplus */
 
 
 #endif /* MKMAGIC_INCLUDE */

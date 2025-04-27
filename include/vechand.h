@@ -27,20 +27,53 @@
 #include	<usysrets.h>
 
 
-/* object defines */
 #define	VECHAND		struct vechand_head
 #define	VECHAND_FL	struct vechand_flags
 #define	VECHAND_DEFENTS	10
-/* options */
-#define	VECHAND_ODEFAULT	0
-#define	VECHAND_OREUSE		(1 << 0)	/* reuse empty slots */
-#define	VECHAND_OCOMPACT	(1 << 1)	/* means NOHOLES */
-#define	VECHAND_OSWAP		(1 << 2)	/* use swapping */
-#define	VECHAND_OSTATIONARY	(1 << 3)	/* entries should not move */
-#define	VECHAND_OCONSERVE	(1 << 4)	/* conserve space */
-#define	VECHAND_OSORTED		(1 << 5)	/* keep sorted */
-#define	VECHAND_OORDERED	(1 << 6)	/* keep ordered */
 
+/**** options
+reuse		= reuse empty slots
+compact		= do not allow for holes
+swap		= use swapping for empty slot management
+stationary	= entries do not move
+conserve	= conserve space where possible
+sorted		= maintain a sorted list
+ordered		= maintain an ordered list
+****/
+
+enum vechandos {
+    vechando_reuse,
+    vechando_compact,
+    vechando_swap,
+    vechando_stationary,
+    vechando_conserve,
+    vechando_sorted,
+    vechando_ordered,
+    vechando_overlast
+} ;
+
+#ifdef	__cplusplus	/* C++ only! */
+
+struct vechandms {
+    static int	reuse ;
+    static int	compact ;
+    static int	swap ;
+    static int	stationary ;
+    static int	conserve ;
+    static int	sorted ;
+    static int	ordered ;
+} ;
+
+#endif /* __cplusplus */
+
+#define	VECHAND_ODEFAULT	0
+#define	VECHAND_OREUSE		(1 << vechando_reuse)
+#define	VECHAND_OCOMPACT	(1 << vechando_compact)
+#define	VECHAND_OSWAP		(1 << vechando_swap)
+#define	VECHAND_OSTATIONARY	(1 << vechando_stationary)
+#define	VECHAND_OCONSERVE	(1 << vechando_conserve)
+#define	VECHAND_OSORTED		(1 << vechando_sorted)
+#define	VECHAND_OORDERED	(1 << vechando_ordered)
 
 struct vechand_flags {
 	uint		issorted:1 ;
@@ -60,7 +93,7 @@ struct vechand_head {
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
 	int		fi ;		/* free entry index */
-	VECHAND_FL	f ;
+	VECHAND_FL	fl ;
 } ; /* end struct (vechand_head) */
 
 EXTERNC_begin
@@ -156,6 +189,8 @@ extern int vechand_audit(vechand *) noex ;
 extern int vechand_finish(vechand *) noex ;
 
 EXTERNC_end
+
+extern vechandms	vechandm ;
 
 
 #endif /* VECHAND_INCLUDE */

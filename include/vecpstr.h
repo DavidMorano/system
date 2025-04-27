@@ -45,16 +45,50 @@
 #define	VECPSTR_FL		struct vecpstr_flags
 #define	VECPSTR_CH		struct vecpstr_chunk
 #define	VECPSTR_DEFENTS		10
-/* options */
-#define	VECPSTR_ODEFAULT	0
-#define	VECPSTR_OREUSE		(1 << 0)	/* reuse empty slots */
-#define	VECPSTR_OCOMPACT	(1 << 1)	/* means NOHOLES */
-#define	VECPSTR_OSWAP		(1 << 2)	/* use swapping */
-#define	VECPSTR_OSTATIONARY	(1 << 3)	/* entries should not move */
-#define	VECPSTR_OCONSERVE	(1 << 4)	/* conserve space */
-#define	VECPSTR_OSORTED		(1 << 5)	/* keep sorted */
-#define	VECPSTR_OORDERED	(1 << 6)	/* keep ordered */
 
+/**** options
+reuse		= reuse empty slots
+compact		= do not allow for holes
+swap		= use swapping for empty slot management
+stationary	= entries do not move
+conserve	= conserve space where possible
+sorted		= maintain a sorted list
+ordered		= maintain an ordered list
+****/
+
+enum vecpstros {
+    vecpstro_reuse,
+    vecpstro_compact,
+    vecpstro_swap,
+    vecpstro_stationary,
+    vecpstro_conserve,
+    vecpstro_sorted,
+    vecpstro_ordered,
+    vecpstro_overlast
+} ;
+
+#ifdef	__cplusplus	/* C++ only! */
+
+struct vecpstrms {
+    static int	reuse ;
+    static int	compact ;
+    static int	swap ;
+    static int	stationary ;
+    static int	conserve ;
+    static int	sorted ;
+    static int	ordered ;
+} ;
+
+#endif /* __cplusplus */
+
+#define	VECPSTR_ODEFAULT	0
+#define	VECPSTR_OREUSE		(1 << vecpstro_reuse)
+#define	VECPSTR_OCOMPACT	(1 << vecpstro_compact)
+#define	VECPSTR_OSWAP		(1 << vecpstro_swap)
+#define	VECPSTR_OSTATIONARY	(1 << vecpstro_stationary)
+#define	VECPSTR_OCONSERVE	(1 << vecpstro_conserve)
+#define	VECPSTR_OSORTED		(1 << vecpstro_sorted)
+#define	VECPSTR_OORDERED	(1 << vecpstro_ordered)
 
 struct vecpstr_flags {
 	uint		issorted:1 ;
@@ -80,7 +114,7 @@ struct vecpstr_head {
 	cchar		**va ;
 	vechand		*clp ;		/* chunk-list-pointer */
 	VECPSTR_CH	*chp ;		/* chunk (current) pointer */
-	VECPSTR_FL	f ;
+	VECPSTR_FL	fl ;
 	uint		magic ;
 	int		chsize ;
 	int		an ;		/* suggested add-number */
@@ -280,6 +314,8 @@ static inline int vecpstr_loaddirs(vecpstr *op,cchar *newsdname) noex {
 }
 
 EXTERNC_end
+
+extern vecpstrms	vecpstrm ;
 
 
 #endif /* VECPSTR_INCLUDE */

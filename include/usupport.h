@@ -117,7 +117,7 @@ namespace libu {
     extern int ctdecui(char *,int,uint) noex ;
     extern int ctdecul(char *,int,ulong) noex ;
     extern int ctdecull(char *,int,ulonglong) noex ;
-    static inline int sncpy(char *dp,int dl,cchar *sp) noex {
+    inline int sncpy(char *dp,int dl,cchar *sp) noex {
 	return sncpy1(dp,dl,sp) ;
     }
     template<typename T> inline int ctdec(char *,int,T v) noex {

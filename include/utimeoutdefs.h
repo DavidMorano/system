@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	utimeoutdefs
+
+	Description:
 	Timeout values for various UNIX system and UNX C-library
 	services are initialized early (as early as possible from
 	module-load time) with the default values below.  All timeout
@@ -53,7 +57,7 @@
 	improvements to what C++20 can do in terms of intialization,
 	but it is not enough (like what assembly-language would
 	offer).  Because the timeout values (held in an array of
-	integers) needs to be a global located in the static-data
+	integers) need to be a global located in the static-data
 	memory segment, C++20 does not help us with any more clever
 	initialization than we had at the beginning of this particular
 	saga (back in 1098).  So there are no code changes to any

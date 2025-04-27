@@ -42,16 +42,50 @@
 #define	VECSTR			struct vecstr_head
 #define	VECSTR_FL		struct vecstr_flags
 #define	VECSTR_DEFENTS		5
-/* options */
-#define	VECSTR_ODEFAULT		0
-#define	VECSTR_OREUSE		(1 << 0)	/* reuse empty slots */
-#define	VECSTR_OCOMPACT		(1 << 1)	/* means NOHOLES */
-#define	VECSTR_OSWAP		(1 << 2)	/* use swapping */
-#define	VECSTR_OSTATIONARY	(1 << 3)	/* entries should not move */
-#define	VECSTR_OCONSERVE	(1 << 4)	/* conserve space */
-#define	VECSTR_OSORTED		(1 << 5)	/* keep sorted */
-#define	VECSTR_OORDERED		(1 << 6)	/* keep ordered */
 
+/**** options
+reuse		= reuse empty slots
+compact		= do not allow for holes
+swap		= use swapping for empty slot management
+stationary	= entries do not move
+conserve	= conserve space where possible
+sorted		= maintain a sorted list
+ordered		= maintain an ordered list
+****/
+
+enum vecstros {
+    vecstro_reuse,
+    vecstro_compact,
+    vecstro_swap,
+    vecstro_stationary,
+    vecstro_conserve,
+    vecstro_sorted,
+    vecstro_ordered,
+    vecstro_overlast
+} ;
+
+#ifdef	__cplusplus	/* C++ only! */
+
+struct vecstrms {
+    static int	reuse ;
+    static int	compact ;
+    static int	swap ;
+    static int	stationary ;
+    static int	conserve ;
+    static int	sorted ;
+    static int	ordered ;
+} ;
+
+#endif /* __cplusplus */
+
+#define	VECSTR_ODEFAULT		0
+#define	VECSTR_OREUSE		(1 << vecstro_reuse)
+#define	VECSTR_OCOMPACT		(1 << vecstro_compact)
+#define	VECSTR_OSWAP		(1 << vecstro_swap)
+#define	VECSTR_OSTATIONARY	(1 << vecstro_stationary)
+#define	VECSTR_OCONSERVE	(1 << vecstro_conserve)
+#define	VECSTR_OSORTED		(1 << vecstro_sorted)
+#define	VECSTR_OORDERED		(1 << vecstro_ordered)
 
 struct vecstr_flags {
 	uint		issorted:1 ;
@@ -68,7 +102,7 @@ struct vecstr_flags {
 
 struct vecstr_head {
 	cchar		**va ;
-	VECSTR_FL	f ;
+	VECSTR_FL	fl ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* overlast index */
 	int		n ;		/* current extent of array */
@@ -259,6 +293,8 @@ static inline int vecstr_loaddirs(vecstr *op,cchar *newsdname) noex {
 }
 
 EXTERNC_end
+
+extern vecstrms		vecstrm ;
 
 
 #endif /* VECSTR_INCLUDE */

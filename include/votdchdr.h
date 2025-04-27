@@ -70,13 +70,14 @@ struct votdchdr_head {
 	uchar		vetu[4] ;
 } ;
 
-
 typedef	VOTDCHDR	votdchdr ;
 
 EXTERNC_begin
 
 extern int votdchdr_rd(votdchdr *,char *,int) noex ;
-extern int votdchdr_wr(ctodvhdr *,cchar *,int) noex ;
+extern int votdchdr_wr(votdchdr *,cchar *,int) noex ;
+
+extern int votdchdr_xx(votdchdr *,int,char *,int) noex ;
 
 EXTERNC_end
 

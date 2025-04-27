@@ -1,6 +1,6 @@
 /* willaddover HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C20 */
+/* lang=C20 (conformance reviewed) */
 
 /* Will an Addition Overflow? */
 /* version %I% last-modified %G% */
@@ -41,13 +41,13 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-extern bool willaddover(int n1,int n2) noex {
+inline bool willaddover(int n1,int n2) noex {
 	return willaddoveri(n1,n2) ;
 }
-extern bool willaddover(long n1,long n2) noex {
+inline bool willaddover(long n1,long n2) noex {
 	return willaddoverl(n1,n2) ;
 }
-extern bool willaddover(longlong n1,longlong n2) noex {
+inline bool willaddover(longlong n1,longlong n2) noex {
 	return willaddoverll(n1,n2) ;
 }
 

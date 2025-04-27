@@ -59,6 +59,37 @@ constexpr inline void *memcpy(T *dp,cvoid *sp) noex {
 #endif /* __cplusplus */
 #endif /* TEMPLATE_MEMCPY */
 
+#ifndef	TEMPLATE_CMEMCPY
+#define	TEMPLATE_CMEMCPY
+#ifdef	__cplusplus
+template<typename T>
+constexpr inline void *cmemcpy(T *dp,cvoid *sp,size_t dsize = -1) noex {
+    	if (dsize < 0) dsize = sizeof(T) ;
+    	return memcpy(dp,sp,dsize) ;
+}
+#endif /* __cplusplus */
+#endif	/* TEMPLATE_CMEMCPY */
+
+#ifndef	TEMPLATE_MEMCOPY
+#define	TEMPLATE_MEMCOPY
+#ifdef	__cplusplus
+template<typename T>
+constexpr void *memcopy(T *dp,cvoid *sp,int dsz = -1) noex {
+    	caddr_t		rp = nullptr ;
+	if (rp && sp) {
+    	    if (dsz < 0) dsz = szof(T) ;
+	    rp = caddr_t(dp) ;
+	    {
+		csize dsize = size_t(dsz) ;
+	        memcpy(dp,sp,dsize) ;
+	        rp += dsz ;
+	    }
+	}
+	return voidp(rp) ;
+}
+#endif /* __cplusplus */
+#endif	/* TEMPLATE_MEMCOPY */
+
 
 #endif /* MEMX_INCLUDE */
 
