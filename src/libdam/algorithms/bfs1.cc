@@ -67,15 +67,11 @@
 
 /* imported namespaces */
 
-using namespace	std ;
+using std::vector ;			/* type */
+using std::list ;			/* type */
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
 
 
 /* local structures */
@@ -96,25 +92,20 @@ int bfs1(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	int		rs = SR_OK ;
 	edgeit_t	elit ; /* edge-list-iterator */
 	edgeit_t	end ; /* edge-list-iterator */
-	int		i ;
-
-	for (i = 0 ; i < vertices ; i += 1) {
+	for (int i = 0 ; i < vertices ; i += 1) {
 	    resp[i].dist = -1 ; /* "level" */
 	    resp[i].prev = -1 ;
 	}
-
 	resp[vstart].dist = 0 ; /* "level" */
 	resp[vstart].prev = -1 ;
-
 	vq.push_back(vstart) ;
-
 	while (! vq.empty()) {
-	    const int	u = vq.front() ;
+	    cint	u = vq.front() ;
 	    {
 	        elit = edges[u].begin() ; /* this is 'list.begin()' */
 	        end = edges[u].end() ; /* this is 'list.end()' */
 	        while (elit != end) {
-	            const int	v = (*elit).dst ; /* dst vertex */
+	            cint	v = (*elit).dst ; /* dst vertex */
 	            if (resp[v].dist < 0) {
 	                resp[v].dist = (resp[u].dist + 1) ;
 	                resp[v].prev = u ;
@@ -125,7 +116,6 @@ int bfs1(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	    } /* end block */
 	    vq.pop_front() ;
 	} /* end while */
-
 	return rs ;
 }
 /* end subroutine (bfs1) */
