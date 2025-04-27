@@ -21,7 +21,7 @@
 	dijkstra2
 
 	Description:
-	This executes the Dijjstra algorithm to find the sorted
+	This executes the Dijkstra algorithm to find the sorted
 	path through a weighted graph.
 
 	Fatures:
@@ -43,13 +43,14 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<initializer_list>
 #include	<utility>
 #include	<functional>
 #include	<algorithm>
 #include	<queue>
 #include	<vector>
+#include	<list>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -61,7 +62,11 @@
 
 /* imported namespaces */
 
-using namespace	std ;
+using std::initializer_list ;		/* type */
+using std::vector ;			/* type */
+using std::list ;			/* type */
+using std::priority_queue ;		/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -85,8 +90,7 @@ struct nodeval {
 	int		v = 0 ;
 	int		dist = 0 ;
 	nodeval() { } ;
-	nodeval(int av,int ad) : v(av), dist(ad) {
-	} ;
+	nodeval(int av,int ad) : v(av), dist(ad) { } ;
 	nodeval(const nodeval &other) {
 	    v = other.v ;
   	    dist = other.dist ;
@@ -141,21 +145,17 @@ int dijkstra2(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	    nodeval	nv ;
 	    edgeit_t	elit ; /* edge-list-iterator */
 	    edgeit_t	end ; /* edge-list-iterator */
-	    int		i ;
-
-	    for (i = 0 ; i < vertices ; i += 1) visited[i] = false ;
-
-	    for (i = 0 ; i < vertices ; i += 1) {
+	    for (int i = 0 ; i < vertices ; i += 1) {
+		visited[i] = false ;
+	    }
+	    for (int i = 0 ; i < vertices ; i += 1) {
 	        resp[i].dist = INT_MAX ;
 	        resp[i].prev = -1 ;
 	    }
-
 	    resp[vstart].dist = 0 ;
-
-	    nv = {vstart,0} ;
+	    nv = { vstart, 0 } ;
 	    pq.push(nv) ;
-
-	    for (i = 0 ; i < (vertices-1) ; i += 1) {
+	    for (int i = 0 ; i < (vertices-1) ; i += 1) {
 		int	u ;
 		int	w ;
 	        nv = pq.top() ;
@@ -182,7 +182,6 @@ int dijkstra2(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	        } /* end block */
 	        pq.pop() ;
 	    } /* end for */
-
 	} else {
 	    rs = SR_NOMEM ;
 	}
