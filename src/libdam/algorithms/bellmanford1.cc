@@ -44,6 +44,7 @@
 #include	<functional>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<vector>
+#include	<list>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -55,7 +56,8 @@
 
 /* imported namespaces */
 
-using namespace	std ;
+using std::vector ;			/* type */
+using std::list ;			/* type */
 
 
 /* local typedefs */
@@ -92,41 +94,33 @@ int bellmanford1(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	edgeit_t	end ; /* edge-list-iterator */
 	cint		ne = intconv(edges.size()) ;
 	int		rs = SR_OK ;
-
 	for (int i = 0 ; i < vertices ; i += 1) {
 	    resp[i].dist = INT_MAX ;
 	    resp[i].prev = -1 ;
 	}
-
 	resp[vstart].dist = 0 ;
-
 	for (int i = 0 ; i < (vertices-1) ; i += 1) {
 	    bool	f_nochange = true ;
 	    for (int u = 0 ; u < ne ; u += 1) { /* edges(u,v) */
 	        elit = edges[u].begin() ; /* this is 'list.begin()' */
 	        end = edges[u].end() ; /* this is 'list.end()' */
-
 	        while (elit != end) {
 	            if (resp[u].dist != INT_MAX) {
 	                cint	d = resp[u].dist ;
 	                cint	w = (*elit).weight ;
 	                cint	v = (*elit).dst ; /* dst vertex */
-
 	                if ((d+w) < resp[v].dist) {
 	                    resp[v].dist = (d+w) ;
 	                    resp[v].prev = u ;
 			    f_nochange = false ;
 	                }
-
 	            } /* end if (distance to current vertex not INF) */
 	            elit++ ;
 	        } /* end while */
 	    } /* end for */
 	    if (f_nochange) break ;
 	} /* end for */
-
-/* this is the famous "extra cycle" to check for negative paths */
-
+	/* this is the famous "extra cycle" to check for negative paths */
 	for (int u = 0 ; u < ne ; u += 1) {
 	    cint	d = resp[u].dist ;
 	    cint	v = (*elit).dst ; /* dst vertex */
