@@ -76,7 +76,7 @@ OBJ13=
 OBJ14=
 OBJ15=
 
-OBJ16 = wsix.o wsnx.o wsx.o
+OBJ16 = wsix.o wsnx.o wsfx.o
 OBJ17 = six.o snx.o sfx.o rmx.o
 OBJ18 = 
 OBJ19 = 
@@ -550,19 +550,27 @@ snwcpy.o:		snwcpy.dir
 snwcpy.dir:
 	makesubdir $@
 
+# WSNX (Wide-String-NX)
 wsnx.o:			wsnx.dir
 wsnx.dir:
 	makesubdir $@
 
+# WSIX (Wide-String-Index-X)
 wsix.o:			wsix.dir
 wsix.dir:
 	makesubdir $@
 
-wsx.o:			wsx.dir
-wsx.dir:
+# WSFX (Wide-String-Find-X)
+wsfx.o:			wsfx.dir
+wsfx.dir:
 	makesubdir $@
 
-# MATXSTR
+# WSWCPYX (Wide-String-Write-Copy-X)
+wswcpyx.o:		wswcpyx.dir
+wswcpyx.dir:
+	makesubdir $@
+
+# MATXSTR (Match-X-String)
 matxstr.o:		matxstr.dir
 matxstr.dir:
 	makesubdir $@
@@ -822,6 +830,11 @@ path.o:			path.dir
 path.dir:
 	makesubdir $@
 
+# REALNAME
+realname.o:		realname.dir
+realname.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
@@ -849,7 +862,6 @@ absfn.o:		absfn.cc	absfn.h
 posname.o:		posname.cc	posname.h
 ids.o:			ids.cc		ids.h
 groupids.o:		groupids.cc	groupids.hh
-realname.o:		realname.cc	realname.h
 bits.o:			bits.cc		bits.h
 userattrdb.o:		userattrdb.cc	userattrdb.h
 pmq.o:			pmq.cc		pmq.h
@@ -899,7 +911,6 @@ termcmd.o:		termcmd.cc termcmd.h
 matparam.o:		matparam.cc matparam.h
 typenonpath.o:		typenonpath.cc typenonpath.h
 digval.o:		digval.cc digval.h
-willaddover.o:		willaddover.cc willaddover.h
 mkdirs.o:		mkdirs.cc mkdirs.h
 strcpyxc.o:		strcpyxc.cc strcpyxc.h
 stpcpyxc.o:		stpcpyxc.cc stpcpyxc.h
