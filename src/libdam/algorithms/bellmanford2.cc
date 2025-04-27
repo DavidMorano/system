@@ -44,6 +44,7 @@
 #include	<functional>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<vector>
+#include	<list>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -55,7 +56,8 @@
 
 /* imported namespaces */
 
-using namespace	std ;
+using std::vector ;			/* type */
+using std::list ;			/* type */
 
 
 /* local typedefs */
@@ -86,14 +88,11 @@ typedef graph_edger		edger_t ;
 
 int bellmanford2(res_t *resp,edger_t *edges,int vertices,int vstart) {
 	int		rs = SR_OK ;
-
 	for (int i = 0 ; i < vertices ; i += 1) {
 	    resp[i].dist = INT_MAX ;
 	    resp[i].prev = -1 ;
 	}
-
 	resp[vstart].dist = 0 ;
-
 	for (int i = 0 ; i < (vertices-1) ; i += 1) {
 	    bool	f_nochange = true ;
 	    for (int j = 0 ; j < vertices ; j += 1) { /* edges(u,v) */
@@ -111,9 +110,7 @@ int bellmanford2(res_t *resp,edger_t *edges,int vertices,int vstart) {
 	    } /* end for */
 	    if (f_nochange) break ;
 	} /* end for */
-
-/* this is the famous "extra cycle" to check for negative paths */
-
+	/* this is the famous "extra cycle" to check for negative paths */
 	for (int j = 0 ; j < vertices ; j += 1) {
 		cint	u = edges[j].src ;
 	        if (resp[u].dist != INT_MAX) {
@@ -126,7 +123,6 @@ int bellmanford2(res_t *resp,edger_t *edges,int vertices,int vstart) {
 		} /* end if (reachable) */
 	    if (rs < 0) break ;
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (bellmanford2) */
