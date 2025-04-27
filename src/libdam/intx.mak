@@ -55,12 +55,10 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= satarith.o 
+OBJ0= willaddover.o satarith.o 
 OBJ1= intsat.o intrem.o intceil.o intfloor.o
-OBJ2=
+OBJ2= 
 OBJ3=
-OBJ4=
-OBJ5=
 
 OBJA= obj0.o obj1.o
 
@@ -130,32 +128,40 @@ obj2.o:			$(OBJ2)
 obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
 
-obj4.o:			$(OBJ4)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
 
-obj5.o:			$(OBJ5)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
+willaddover.o:		mods.o willaddover.cc willaddover.h	$(INCS)
+satarith.o:		mods.o satarith.cc satarith.h	$(INCS)
+intrem.o:		mods.o intrem.cc intrem.h	$(INCS)
+intsat.o:		mods.o intsat.cc intsat.h	$(INCS)
+intfloor.o:		mods.o intfloor.cc intfloor.h	$(INCS)
+intceil.o:		mods.o intceil.cc intceil.h	$(INCS)
 
+MOBJ= valuelims.o digbufsizes.o uvariables.o intminmax.o
 
-satarith.o:		satarith.cc satarith.h mods.mod $(INCS)
-intrem.o:		intrem.cc intrem.h		$(INCS)
-intsat.o:		intsat.cc intsat.h		$(INCS)
-intfloor.o:		intfloor.cc intfloor.h		$(INCS)
-intceil.o:		intceil.cc intceil.h		$(INCS)
-
-mods.mod:		valuelims.o
+mods.o:			$(MOBJ)
+	makemodule valuelims digbufsizes
+	makemodule intminmax
+	makemodule uvariables
+	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
 
 valuelims.o:		valuelims.ccm
-	makemodule valuelims
+
+digbufsizes.o:		digbufsizes.ccm
 
 uvariables.o:		uvariables0.o uvariables1.o
 	$(LD) -r $(LDFLAGS) -o $@ uvariables0.o uvariables1.o
 
 uvariables0.o:		uvariables.ccm
+	makemodule valuelims digbufsizes
 	makemodule uvariables
 
 uvariables1.o:		uvariables1.cc uvariables.ccm
+	makemodule valuelims digbufsizes
 	makemodule uvariables
 	$(COMPILE.cc) uvariables1.cc
+
+intminmax.o:		intminmax.ccm
+	makemodule valuelims
+	makemodule intminmax
 
 
