@@ -378,6 +378,14 @@ typedef const void **		cvoidpp ;
 typedef const nullptr_t		cnullptr ;
 #endif
 
+#ifndef	TYPEDEF_CNULLOPT
+#define	TYPEDEF_CNULLOPT
+#ifdef	__cplusplus
+#include	<optional>
+typedef const std::nullopt_t	cnullopt ;
+#endif /* __cplusplus */
+#endif
+
 #ifndef	TYPEDEF_CNOTHROW
 #define	TYPEDEF_CNOTHROW
 #ifdef	__cplusplus

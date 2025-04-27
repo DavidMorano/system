@@ -48,8 +48,8 @@ constexpr int cstrlen(cchar *sp) noex {
 constexpr int xstrnlen(cchar *sp,int sl) noex {
     	int		len = 0 ;
 	if (sl >= 0) {
-    	    csize	ssz = size_t(sl) ;
-	    len = intconv(strnlen(sp,ssz)) ;
+    	    csize	ssize = size_t(sl) ;
+	    len = intconv(strnlen(sp,ssize)) ;
 	} else {
 	    len = intconv(strlen(sp)) ;
 	}

@@ -1,6 +1,6 @@
 /* intx HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C20 */
+/* lang=C20 (conformance reviewed) */
 
 /* Integer-Remaider */
 /* version %I% last-modified %G% */
@@ -25,11 +25,13 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
+#include	<willaddover.h>
+#include	<satarith.h>
+
 #include	<intceil.h>
 #include	<intfloor.h>
 #include	<intrem.h>
 #include	<intsat.h>
-#include	<satarith.h>
 
 
 #endif /* INTX_INCLUDE */
