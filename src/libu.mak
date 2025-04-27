@@ -246,13 +246,13 @@ obje.o:			$(OBJE)
 
 
 # SUPPORT
-timewatch.o:		timewatch.cc timewatch.hh
-aflag.o:		aflag.cc aflag.hh
-errtimer.o:		errtimer.cc errtimer.hh
-timeval.o:		timeval.cc timeval.h
-itimerval.o:		itimerval.cc itimerval.h
+timewatch.o:		timewatch.cc timewatch.hh	$(INCS)
+aflag.o:		aflag.cc aflag.hh		$(INCS)
+errtimer.o:		errtimer.cc errtimer.hh		$(INCS)
+timeval.o:		timeval.cc timeval.h		$(INCS)
+itimerval.o:		itimerval.cc itimerval.h	$(INCS)
 timespec.o:		timespec.cc timespec.h		$(INCS)
-itimerspec.o:		itimerspec.cc itimerspec.h
+itimerspec.o:		itimerspec.cc itimerspec.h	$(INCS)
 
 utimeout.o:		utimeout.c utimeout.h		$(INCS)
 utimeouts.o:		utimeouts.cc utimeouts.h	$(INCS)
@@ -343,6 +343,7 @@ uvariables.o:		uvariables0.o uvariables1.o
 
 uvariables0.o:		uvariables.ccm uvariables1.cc valuelims.o digbufsizes.o
 	makemodule valuelims
+	makemodule uvariables
 
 uvariables1.o:		uvariables.ccm uvariables1.cc 
 	makemodule uvariables

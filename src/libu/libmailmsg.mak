@@ -2,7 +2,7 @@
 
 T= libmailmsg
 
-ALL= $(T).o $(T).so
+ALL= $(T).o
 
 
 INDIR		?= $(REPOROOT)/bin
@@ -34,6 +34,8 @@ LINT		?= lint
 DEFS=
 
 INCS= libmailmsg.h
+
+MODS=
 
 LIBS= -luc -lu
 
@@ -110,7 +112,7 @@ so:			$(T).so
 
 
 $(T).o:			$(OBJ)
-	$(LD) -o $@ $(LDFLAGS) $(OBJ)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
 
 $(T).so:		$(OBJ) Makefile
 	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
