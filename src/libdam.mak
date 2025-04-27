@@ -188,7 +188,7 @@ OBJ79= strnwcpy.o strnncpy.o strnset.o
 
 OBJ80=  nathai.o
 OBJ81= 
-OBJ82= density.o densitystati.o densitystatll.o denpercents.o
+OBJ82=
 OBJ83= tmstrs.o shellunder.o udomain.o
 OBJ84= mktmpuserdir.o mkcaselower.o mkfmtphone.o
 OBJ85=
@@ -201,7 +201,7 @@ OBJ90=
 OBJ91=
 OBJ92= unlinkd.o mapshmtmp.o
 OBJ93= mkfnamesuf.o mkfname.o mksofname.o mkfdfname.o
-OBJ94= mkgecosname.o mkmailname.o mkrealname.o mkuiname.o mkuibang.o 
+OBJ94= mkgecosname.o mkmailname.o mkuiname.o mkuibang.o 
 OBJ95= mkaddrname.o mkbestaddr.o mkbestfrom.o mkdisphdr.o mkaltext.o
 
 OBJ96= memfile.o linehist.o langstate.o sigman.o sighand.o
@@ -237,7 +237,7 @@ OBJ122=
 OBJ123=
 OBJ124=
 OBJ125=
-OBJ126= fsdirtree.o netfile.o realname.o termstr.o filecounts.o
+OBJ126= fsdirtree.o netfile.o termstr.o filecounts.o
 OBJ127= pwcache.o grcache.o gncache.o namecache.o grmems.o
 
 OBJ128= buffer.o buffer_extras.o 
@@ -701,7 +701,6 @@ baops.o:		baops.cc baops.h
 rijndael.o:		rijndael.c rijndael.h
 librandom.o:		librandom.cc librandom.h
 
-density.o:		density.c density.h
 optval.o:		optval.cc optval.h
 
 bits.o:			bits.cc bits.h baops.h
@@ -813,11 +812,6 @@ sysvarx.o:		sysvarx.dir
 sysvarx.dir:
 	makesubdir $@
 
-# REALNAME
-realname.o:		realname.dir
-realname.dir:
-	makesubdir $@
-
 # MSGIDX
 msgidx.o:		msgidx.dir
 msgidx.dir:
@@ -861,6 +855,11 @@ lineindex.dir:
 # CLUSTER
 cluster.o:		cluster.dir
 cluster.dir:	
+	makesubdir $@
+
+# DENSITYX
+densityx.o:		densityx.dir
+densityx.dir:	
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h
