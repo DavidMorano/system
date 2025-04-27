@@ -143,10 +143,12 @@ densitydb.o:		mods.o densitydb.cc	densitydb.h	$(INCS)
 densitydbe.o:		mods.o densitydbe.cc	densitydbe.h	$(INCS)
 densitystat.o:		mods.o densitystat.cc	densitystat.h	$(INCS)
 
-mods.o:			densityx_filehead.o
-	$(LD) -r $(LDFLAGS) -o $@ densityx_filehead.o
+mods.o:			densityx_filehead.o filemagic.o
+	$(LD) -r $(LDFLAGS) -o $@ densityx_filehead.o filemagic.o
 
 densityx_filehead.o:	densityx_filehead.ccm
 	makemodule densityx_filehead
+
+filemagic.o:		filemagic.ccm
 
 
