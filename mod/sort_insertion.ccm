@@ -61,6 +61,8 @@ module ;
 
 export module sort_insertion ;
 
+using std::greater ;			/* subroutine-template */
+
 constexpr bool		f_recurse = CF_RECURSE ;
 
 export {

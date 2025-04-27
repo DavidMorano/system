@@ -46,12 +46,15 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>
 #include	<functional>
 #include	<usystem.h>
 
 export module sort_merge ;
+
+using std::greater ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
     template<typename T,typename Comp = std::greater<T>>
     void sort_merging(Comp *cmp,T a,T tmp,int ib,int im,int ie) {

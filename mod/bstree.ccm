@@ -84,7 +84,7 @@ module ;
 #include	<cstdlib>
 #include	<new>
 #include	<initializer_list>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<functional>
 #include	<stack>
 #include	<vector>
