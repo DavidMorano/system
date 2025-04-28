@@ -266,7 +266,7 @@ int var_curbegin(VAR *op,VAR_CUR *curp) noex {
 	memclear(curp) ;
 
 	if (op->call.curbegin != nullptr) {
-	    if (void *vp{} ; (rs = uc_malloc(op->cursz,&vp)) >= 0) {
+	    if (void *vp ; (rs = uc_malloc(op->cursz,&vp)) >= 0) {
 		curp->scp = vp ;
 	        if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
 	            curp->magic = VAR_MAGIC ;
