@@ -94,9 +94,9 @@ int msgbuf_finish(msgbuf *mbp) noex {
 	    if (mbp->mbuf) {
 	        rs1 = uc_free(mbp->mbuf) ;
 	        if (rs >= 0) rs = rs1 ;
-	        mbp->mbuf = NULL ;
+	        mbp->mbuf = nullptr ;
 	    }
-	    mbp->bp = NULL ;
+	    mbp->bp = nullptr ;
 	    mbp->bl = 0 ;
 	    mbp->fd = -1 ;
 	} /* end if (non-null) */
@@ -120,7 +120,7 @@ int msgbuf_read(msgbuf *mbp,cchar **rpp) noex {
 	        *rpp = mbp->bp ;
 	        len = mbp->bl ;
 	    } else {
-	        *rpp = NULL ;
+	        *rpp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -133,7 +133,7 @@ int msgbuf_adv(msgbuf *mbp,int mlen) noex {
 	if (mbp) {
 	    int		rlen ;
 	    int		opts = 0 ;
-	    char		*rbuf ;
+	    char	*rbuf ;
 	    rs = SR_OK ;
 	    if (mlen < 0) {
 	        if ((mbp->bl > 0) && (mbp->bp != mbp->mbuf)) {
