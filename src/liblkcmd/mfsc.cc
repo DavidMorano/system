@@ -1,11 +1,11 @@
-/* mfs-c (MFS CLient code) */
+/* mfs-c SUPPORT (MFS CLient code) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* MFS Client code */
 /* object to interact with the MFS server */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -13,8 +13,9 @@
 	This object module was first written.
 
 	= 2011-01-25, David A­D­ Morano
-	I added the capability to also send the 'mark', 'report', and 'exit'
-	commands to the server.  Previously these were not implemented here.
+	I added the capability to also send the 'mark', 'report',
+	and 'exit' commands to the server.  Previously these were
+	not implemented here.
 
 	= 2017-08-10, David A­D­ Morano
 	This subroutine was borrowed to code MFSERVE.
@@ -25,25 +26,28 @@
 
 /*******************************************************************************
 
-	This module obkect is a client manager for client requests.  This is
-	client-side code that interacts with the server (MFSERVE).
+  	Object:
+	mfsc
 
+	Description:
+	This module obkect is a client manager for client requests.
+	This is client-side code that interacts with the server
+	(MFSERVE).
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be fist to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<bufsizevar.hh>
 #include	<estrings.h>
 #include	<vechand.h>
 #include	<storebuf.h>
@@ -52,7 +56,7 @@
 #include	<spawnproc.h>
 #include	<ctdec.h>
 #include	<listenspec.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"mfsc.h"
 #include	"mfsmsg.h"
@@ -75,16 +79,8 @@
 #define	TMPDNAME	"/tmp"
 #endif
 
-#ifndef	COLUMNS
-#define	COLUMNS		80
-#endif
-
 #ifndef	MSGBUFLEN
 #define	MSGBUFLEN	2048
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
 #endif
 
 #define	OPTBUFLEN	(DIGBUFLEN + 4)
@@ -96,32 +92,10 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	opentmpusd(const char *,int,mode_t,char *) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-extern int	isFailConn(int) ;
-extern int	isBadSend(int) ;
-extern int	isBadRecv(int) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -132,29 +106,29 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	mfsc_setbegin(MFSC *,cchar *) ;
-static int	mfsc_setend(MFSC *) ;
-static int	mfsc_srvdname(MFSC *,char *) ;
-static int	mfsc_srvfname(MFSC *,cchar *) ;
-static int	mfsc_bind(MFSC *,int,cchar *) ;
-static int	mfsc_bufbegin(MFSC *) ;
-static int	mfsc_bufend(MFSC *) ;
-static int	mfsc_connect(MFSC *) ;
-static int	mfsc_istatus(MFSC *,MFSC_STATUS *) ;
-static int	mfsc_listenerfmt(MFSC *,char *,int,int,MFSMSG_LISTENER *) ;
+static int	mfsc_setbegin(MFSC *,cchar *) noex ;
+static int	mfsc_setend(MFSC *) noex ;
+static int	mfsc_srvdname(MFSC *,char *) noex ;
+static int	mfsc_srvfname(MFSC *,cchar *) noex ;
+static int	mfsc_bind(MFSC *,int,cchar *) noex ;
+static int	mfsc_bufbegin(MFSC *) noex ;
+static int	mfsc_bufend(MFSC *) noex ;
+static int	mfsc_connect(MFSC *) noex ;
+static int	mfsc_istatus(MFSC *,MFSC_STATUS *) noex ;
+static int	mfsc_listenerfmt(MFSC *,char *,int,int,MFSMSG_LISTENER *) noex ;
 
 #ifdef	COMMENT
-static int	mfsc_spawn(MFSC *) ;
-static int	mfsc_envload(MFSC *,ENVMGR *) ;
+static int	mfsc_spawn(MFSC *) noex ;
+static int	mfsc_envload(MFSC *,ENVMGR *) noex ;
 #endif
 
-static int	mksrvdname(char *,cchar *,cchar *,cchar *) ;
+static int	mksrvdname(char *,cchar *,cchar *,cchar *) noex ;
 
 
 /* local variables */
 
 #ifdef	COMMENT
-static cchar	*prbins[] = {
+static cpcchar		prbins[] = {
 	"bin",
 	"sbin",
 	NULL
@@ -164,17 +138,15 @@ static cchar	*prbins[] = {
 
 /* exported variables */
 
-MFSC_OBJ	mfsc = {
+mfsc_obj	mfsc_modinfo = {
 	"mfsc",
-	sizeof(MFSC)
+	sizeof(mfsc)
 } ;
 
 
 /* exported subroutines */
 
-
-int mfsc_open(MFSC *op,cchar *pr,int to)
-{
+int mfsc_open(MFSC *op,cchar *pr,int to) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -187,7 +159,7 @@ int mfsc_open(MFSC *op,cchar *pr,int to)
 	debugprintf("mfsc_open: ent pr=%s\n",pr) ;
 #endif
 
-	memset(op,0,sizeof(MFSC)) ;
+	memclear(op) ;
 	op->fd = -1 ;
 	op->to = to ;
 	op->pid = getpid() ;
@@ -213,9 +185,7 @@ int mfsc_open(MFSC *op,cchar *pr,int to)
 }
 /* end subroutine (mfsc_open) */
 
-
-int mfsc_close(MFSC *op)
-{
+int mfsc_close(MFSC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -238,9 +208,7 @@ int mfsc_close(MFSC *op)
 }
 /* end subroutine (mfsc_close) */
 
-
-int mfsc_status(MFSC *op,MFSC_STATUS *statp)
-{
+int mfsc_getstat(MFSC *op,MFSC_STATUS *statp) noex {
 	int		rs ;
 
 #if	CF_DEBUGS
@@ -263,11 +231,9 @@ int mfsc_status(MFSC *op,MFSC_STATUS *statp)
 
 	return rs ;
 }
-/* end subroutine (mfsc_status) */
+/* end subroutine (mfsc_getstat) */
 
-
-int mfsc_help(MFSC *op,char *rbuf,int rlen,int idx)
-{
+int mfsc_help(MFSC *op,char *rbuf,int rlen,int idx) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
@@ -283,16 +249,16 @@ int mfsc_help(MFSC *op,char *rbuf,int rlen,int idx)
 	if (op->f.srv) {
 	    struct mfsmsg_gethelp	mreq ;
 	    struct mfsmsg_help		mres ;
-	    const int		to = op->to ;
-	    const int		mlen = op->mlen ;
+	    cint		to = op->to ;
+	    cint		mlen = op->mlen ;
 	    char		*mbuf = op->mbuf ;
 	    mreq.tag = op->pid ;
 	    mreq.idx = (uchar) idx ;
 	    if ((rs = mfsmsg_gethelp(&mreq,0,mbuf,mlen)) >= 0) {
-	        const int	fd = op->fd ;
+	        cint	fd = op->fd ;
 	        if ((rs = u_send(fd,mbuf,rs,0)) >= 0) {
-	            const int	mf = 0 ;
-	            const int	ro = FM_TIMED ;
+	            cint	mf = 0 ;
+	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = mfsmsg_help(&mres,1,mbuf,rs)) >= 0) {
 	                    if (mres.rc == mfsmsgrc_ok) {
@@ -325,9 +291,7 @@ int mfsc_help(MFSC *op,char *rbuf,int rlen,int idx)
 }
 /* end subroutine (mfsc_help) */
 
-
-int mfsc_getval(MFSC *op,char *rbuf,int rlen,cchar *un,int w)
-{
+int mfsc_getval(MFSC *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
@@ -346,17 +310,17 @@ int mfsc_getval(MFSC *op,char *rbuf,int rlen,cchar *un,int w)
 	if (op->f.srv) {
 	    struct mfsmsg_getval	mreq ;
 	    struct mfsmsg_val		mres ;
-	    const int		to = op->to ;
-	    const int		mlen = op->mlen ;
+	    cint		to = op->to ;
+	    cint		mlen = op->mlen ;
 	    char		*mbuf = op->mbuf ;
 	    mreq.tag = op->pid ;
 	    mreq.w = (uchar) w ;
 	    strwcpy(mreq.key,un,MFSMSG_KEYLEN) ;
 	    if ((rs = mfsmsg_getval(&mreq,0,mbuf,mlen)) >= 0) {
-	        const int	fd = op->fd ;
+	        cint	fd = op->fd ;
 	        if ((rs = u_send(fd,mbuf,rs,0)) >= 0) {
-	            const int	mf = 0 ;
-	            const int	ro = FM_TIMED ;
+	            cint	mf = 0 ;
+	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = mfsmsg_val(&mres,1,mbuf,rs)) >= 0) {
 	                    if (mres.rc == mfsmsgrc_ok) {
@@ -389,9 +353,7 @@ int mfsc_getval(MFSC *op,char *rbuf,int rlen,cchar *un,int w)
 }
 /* end subroutine (mfsc_getval) */
 
-
-int mfsc_mark(MFSC *op)
-{
+int mfsc_mark(MFSC *op) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
@@ -406,15 +368,15 @@ int mfsc_mark(MFSC *op)
 	if (op->f.srv) {
 	    struct mfsmsg_mark	mreq ;
 	    struct mfsmsg_ack	mres ;
-	    const int		to = op->to ;
-	    const int		mlen = op->mlen ;
+	    cint		to = op->to ;
+	    cint		mlen = op->mlen ;
 	    char		*mbuf = op->mbuf ;
 	    mreq.tag = op->pid ;
 	    if ((rs = mfsmsg_mark(&mreq,0,mbuf,mlen)) >= 0) {
-	        const int	fd = op->fd ;
+	        cint	fd = op->fd ;
 	        if ((rs = u_send(fd,mbuf,rs,0)) >= 0) {
-	            const int	mf = 0 ;
-	            const int	ro = FM_TIMED ;
+	            cint	mf = 0 ;
+	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = mfsmsg_ack(&mres,1,mbuf,rs)) >= 0) {
 	                    if (mres.rc == mfsmsgrc_ok) {
@@ -443,9 +405,7 @@ int mfsc_mark(MFSC *op)
 }
 /* end subroutine (mfsc_mark) */
 
-
-int mfsc_exit(MFSC *op,cchar *reason)
-{
+int mfsc_exit(MFSC *op,cchar *reason) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
@@ -460,8 +420,8 @@ int mfsc_exit(MFSC *op,cchar *reason)
 	if (op->f.srv) {
 	    struct mfsmsg_exit	mreq ;
 	    struct mfsmsg_ack	mres ;
-	    const int		to = op->to ;
-	    const int		mlen = op->mlen ;
+	    cint		to = op->to ;
+	    cint		mlen = op->mlen ;
 	    char		*mbuf = op->mbuf ;
 	    mreq.tag = op->pid ;
 	    mreq.reason[0] = '\0' ;
@@ -469,10 +429,10 @@ int mfsc_exit(MFSC *op,cchar *reason)
 	        strwcpy(mreq.reason,reason,REALNAMELEN) ;
 	    }
 	    if ((rs = mfsmsg_exit(&mreq,0,mbuf,mlen)) >= 0) {
-	        const int	fd = op->fd ;
+	        cint	fd = op->fd ;
 	        if ((rs = u_send(fd,mbuf,rs,0)) >= 0) {
-	            const int	mf = 0 ;
-	            const int	ro = FM_TIMED ;
+	            cint	mf = 0 ;
+	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = mfsmsg_ack(&mres,1,mbuf,rs)) >= 0) {
 	                    if (mres.rc == mfsmsgrc_ok) {
@@ -501,9 +461,7 @@ int mfsc_exit(MFSC *op,cchar *reason)
 }
 /* end subroutine (mfsc_exit) */
 
-
-int mfsc_listener(MFSC *op,char *rbuf,int rlen,int idx)
-{
+int mfsc_listener(MFSC *op,char *rbuf,int rlen,int idx) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
@@ -519,16 +477,16 @@ int mfsc_listener(MFSC *op,char *rbuf,int rlen,int idx)
 	if (op->f.srv) {
 	    struct mfsmsg_getlistener	mreq ;
 	    struct mfsmsg_listener	mres ;
-	    const int		to = op->to ;
-	    const int		mlen = op->mlen ;
+	    cint		to = op->to ;
+	    cint		mlen = op->mlen ;
 	    char		*mbuf = op->mbuf ;
 	    mreq.tag = op->pid ;
 	    mreq.idx = (uchar) idx ;
 	    if ((rs = mfsmsg_getlistener(&mreq,0,mbuf,mlen)) >= 0) {
-	        const int	fd = op->fd ;
+	        cint	fd = op->fd ;
 	        if ((rs = u_send(fd,mbuf,rs,0)) >= 0) {
-	            const int	mf = 0 ;
-	            const int	ro = FM_TIMED ;
+	            cint	mf = 0 ;
+	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = mfsmsg_listener(&mres,1,mbuf,rs)) >= 0) {
 	                    if (mres.rc == mfsmsgrc_ok) {
@@ -560,10 +518,8 @@ int mfsc_listener(MFSC *op,char *rbuf,int rlen,int idx)
 }
 /* end subroutine (mfsc_listener) */
 
-
-int mfsc_getname(MFSC *op,char *rbuf,int rlen,cchar *un)
-{
-	const int	w = pcsnsreq_pcsname ;
+int mfsc_getname(MFSC *op,char *rbuf,int rlen,cchar *un) noex {
+	cint	w = pcsnsreq_pcsname ;
 	return mfsc_getval(op,rbuf,rlen,un,w) ;
 }
 /* end subroutine (mfsc_getname) */
@@ -571,9 +527,7 @@ int mfsc_getname(MFSC *op,char *rbuf,int rlen,cchar *un)
 
 /* local subroutines */
 
-
-static int mfsc_setbegin(MFSC *op,cchar *pr)
-{
+static int mfsc_setbegin(MFSC *op,cchar *pr) noex {
 	int		rs ;
 	int		f = FALSE ;
 	cchar		*cp ;
@@ -606,9 +560,7 @@ static int mfsc_setbegin(MFSC *op,cchar *pr)
 }
 /* end subroutine (mfsc_setbegin) */
 
-
-static int mfsc_setend(MFSC *op)
-{
+static int mfsc_setend(MFSC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -634,9 +586,7 @@ static int mfsc_setend(MFSC *op)
 }
 /* end subroutine (mfsc_setend) */
 
-
-static int mfsc_srvdname(MFSC *op,char *rbuf)
-{
+static int mfsc_srvdname(MFSC *op,char *rbuf) noex {
 	int		rs ;
 	int		rl = 0 ;
 	cchar		*td = TMPDNAME ;
@@ -646,7 +596,7 @@ static int mfsc_srvdname(MFSC *op,char *rbuf)
 	    USTAT	sb ;
 	    if ((rs = u_stat(rbuf,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
-	            const int	am = (W_OK|W_OK|X_OK) ;
+	            cint	am = (W_OK|W_OK|X_OK) ;
 	            if ((rs = perm(rbuf,-1,-1,NULL,am)) >= 0) {
 	                rl = 1 ;
 	            } else if (isNotAccess(rs)) {
@@ -661,12 +611,10 @@ static int mfsc_srvdname(MFSC *op,char *rbuf)
 }
 /* end subroutine (mfsc_srvdname) */
 
-
-static int mfsc_srvfname(MFSC *op,cchar *srvdname)
-{
+static int mfsc_srvfname(MFSC *op,cchar *srvdname) noex {
 	int		rs ;
 	int		rl = 0 ;
-	const char	*reqname = MFSC_REQNAME ;
+	cchar	*reqname = MFSC_REQNAME ;
 	char		srvfname[MAXPATHLEN + 1] ;
 
 	if ((rs = mkpath2(srvfname,srvdname,reqname)) >= 0) {
@@ -674,7 +622,7 @@ static int mfsc_srvfname(MFSC *op,cchar *srvdname)
 	    rl = rs ;
 	    if ((rs = u_stat(srvfname,&sb)) >= 0) {
 	        if (S_ISSOCK(sb.st_mode)) {
-	            const int	am = (R_OK|W_OK) ;
+	            cint	am = (R_OK|W_OK) ;
 	            if ((rs = perm(srvfname,-1,-1,NULL,am)) >= 0) {
 	                cchar	*cp ;
 	                if ((rs = uc_mallocstrw(srvfname,rl,&cp)) >= 0) {
@@ -696,9 +644,7 @@ static int mfsc_srvfname(MFSC *op,cchar *srvdname)
 }
 /* end subroutine (mfsc_srvfname) */
 
-
-static int mfsc_bind(MFSC *op,int f,cchar *srvdname)
-{
+static int mfsc_bind(MFSC *op,int f,cchar *srvdname) noex {
 	int		rs = SR_OK ;
 	int		f_err = FALSE ;
 
@@ -708,13 +654,13 @@ static int mfsc_bind(MFSC *op,int f,cchar *srvdname)
 
 	if (f) {
 	    cchar	*tn = "clientXXXXXXXX" ;
-	    char	template[MAXPATHLEN + 1] ;
+	    char	tpat[MAXPATHLEN + 1] ;
 
-	    if ((rs = mkpath2(template,srvdname,tn)) >= 0) {
-	        const mode_t	om = (S_IFSOCK | 0666) ;
-	        const int	of = (O_RDWR | O_CLOEXEC | O_MINMODE) ;
+	    if ((rs = mkpath2(tpat,srvdname,tn)) >= 0) {
+	        cmode	om = (S_IFSOCK | 0666) ;
+	        cint	of = (O_RDWR | O_CLOEXEC | O_MINMODE) ;
 	        char		fname[MAXPATHLEN + 1] ;
-	        if ((rs = opentmpusd(template,of,om,fname)) >= 0) {
+	        if ((rs = opentmpusd(tpat,of,om,fname)) >= 0) {
 	            cchar	*cp ;
 	            op->fd = rs ;
 	            u_chmod(fname,om) ;
@@ -753,10 +699,8 @@ static int mfsc_bind(MFSC *op,int f,cchar *srvdname)
 }
 /* end subroutine (mfsc_bind) */
 
-
-static int mfsc_bufbegin(MFSC *op)
-{
-	const int	blen = MSGBUFLEN ;
+static int mfsc_bufbegin(MFSC *op) noex {
+	cint	blen = MSGBUFLEN ;
 	int		rs ;
 	char		*bp ;
 	if ((rs = uc_malloc((blen+1),&bp)) >= 0) {
@@ -767,9 +711,7 @@ static int mfsc_bufbegin(MFSC *op)
 }
 /* end subroutine (mfsc_bufbegin) */
 
-
-static int mfsc_bufend(MFSC *op)
-{
+static int mfsc_bufend(MFSC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mbuf != NULL) {
@@ -782,9 +724,7 @@ static int mfsc_bufend(MFSC *op)
 }
 /* end subroutine (mfsc_bufend) */
 
-
-static int mfsc_connect(MFSC *op)
-{
+static int mfsc_connect(MFSC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = FALSE ;
@@ -795,12 +735,12 @@ static int mfsc_connect(MFSC *op)
 
 	if (op->srvfname != NULL) {
 	    SOCKADDRESS	sa ;
-	    const int	af = AF_UNIX ;
+	    cint	af = AF_UNIX ;
 	    cchar	*sfn = op->srvfname ;
 	    if ((rs = sockaddress_start(&sa,af,sfn,0,0)) >= 0) {
 	        SOCKADDR	*sap = (SOCKADDR *) &sa ;
-	        const int	sal = rs ;
-	        const int	to = op->to ;
+	        cint	sal = rs ;
+	        cint	to = op->to ;
 	        if ((rs = uc_connecte(op->fd,sap,sal,to)) >= 0) {
 	            f = TRUE ;
 	        } else if (isFailConn(rs)) {
@@ -819,9 +759,7 @@ static int mfsc_connect(MFSC *op)
 }
 /* end subroutine (mfsc_connect) */
 
-
-static int mfsc_istatus(MFSC *op,MFSC_STATUS *statp)
-{
+static int mfsc_istatus(MFSC *op,MFSC_STATUS *statp) noex {
 	int		rs = SR_OK ;
 	int		rc = 0 ;
 
@@ -830,21 +768,21 @@ static int mfsc_istatus(MFSC *op,MFSC_STATUS *statp)
 #endif
 
 	if (statp != NULL) {
-	    memset(statp,0,sizeof(MFSC_STATUS)) ;
+	    memclear(statp) ;
 	}
 
 	if (op->f.srv) {
 	    struct mfsmsg_getstatus	mreq ;
 	    struct mfsmsg_status	mres ;
-	    const int		to = op->to ;
-	    const int		mlen = op->mlen ;
+	    cint		to = op->to ;
+	    cint		mlen = op->mlen ;
 	    char		*mbuf = op->mbuf ;
 	    mreq.tag = op->pid ;
 	    if ((rs = mfsmsg_getstatus(&mreq,0,mbuf,mlen)) >= 0) {
-	        const int	fd = op->fd ;
+	        cint	fd = op->fd ;
 	        if ((rs = u_send(fd,mbuf,rs,0)) >= 0) {
-	            const int	mf = 0 ;
-	            const int	ro = FM_TIMED ;
+	            cint	mf = 0 ;
+	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = mfsmsg_status(&mres,1,mbuf,rs)) >= 0) {
 #if	CF_DEBUGS
@@ -889,17 +827,15 @@ static int mfsc_istatus(MFSC *op,MFSC_STATUS *statp)
 }
 /* end subroutine (mfsc_istatus) */
 
-
 static int mfsc_listenerfmt(MFSC *op,char *rbuf,int rlen,int idx,
-		MFSMSG_LISTENER *lp)
-{
+		MFSMSG_LISTENER *lp) noex {
 	uint		rc = lp->rc ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*fmt ;
 	if (op == NULL) return SR_FAULT ;
 	if (lp->name[0] != '\0') {
-	    const int	ls = lp->ls ;
+	    cint	ls = lp->ls ;
 	    cchar	*sn ;
 	    if (ls & LISTENSPEC_MDELPEND) {
 	        sn = "D" ;
@@ -924,20 +860,17 @@ static int mfsc_listenerfmt(MFSC *op,char *rbuf,int rlen,int idx,
 }
 /* end subroutine (mfsc_listenerfmt) */
 
-
 #ifdef	COMMENT
 
-static int mfsc_spawn(MFSC *op)
-{
+static int mfsc_spawn(MFSC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cs ;
-	int		i ;
 	int		to_run = TO_RUN ;
-	const char	*argz = MFSC_FACNAME ;
+	cchar		*argz = MFSC_FACNAME ;
 	char		pbuf[MAXPATHLEN + 1] ;
 
-	for (i = 0 ; (rs >= 0) && (prbins[i] != NULL) ; i += 1) {
+	for (int i = 0 ; (rs >= 0) && (prbins[i] != NULL) ; i += 1) {
 	    if ((rs = mkpath3(pbuf,op->pr,prbins[i],argz)) >= 0) {
 	        rs = perm(pbuf,-1,-1,NULL,X_OK) ;
 	    }
@@ -947,7 +880,7 @@ static int mfsc_spawn(MFSC *op)
 	    ENVMGR	em ;
 	    if ((rs = envmgr_start(&em)) >= 0) {
 	        if ((rs = mfsc_envload(op,&em)) >= 0) {
-	            const int	dlen = DIGBUFLEN ;
+	            cint	dlen = DIGBUFLEN ;
 	            char	dbuf[DIGBUFLEN + 1] ;
 	            if ((rs = ctdeci(dbuf,dlen,to_run)) >= 0) {
 	                char	optbuf[OPTBUFLEN + 1] ;
@@ -986,9 +919,7 @@ static int mfsc_spawn(MFSC *op)
 }
 /* end subroutine (mfsc_spawn) */
 
-
-static int mfsc_envload(MFSC *op,ENVMGR *emp)
-{
+static int mfsc_envload(MFSC *op,ENVMGR *emp) noex {
 	int		rs ;
 	if ((rs = envmgr_set(emp,VARMFSQUIET,"1",1)) >= 0) {
 	    rs = envmgr_set(emp,VARMFSPR,op->pr,-1) ;
@@ -999,10 +930,8 @@ static int mfsc_envload(MFSC *op,ENVMGR *emp)
 
 #endif /* COMMENT */
 
-
-static int mksrvdname(char *rbuf,cchar *td,cchar *pr,cchar *fn)
-{
-	const int	rlen = MAXPATHLEN ;
+static int mksrvdname(char *rbuf,cchar *td,cchar *pr,cchar *fn) noex {
+	cint	rlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
 

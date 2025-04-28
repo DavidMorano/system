@@ -1,4 +1,6 @@
-/* mfsc */
+/* mfsc HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* PCS Name-Server-Client */
 /* version %I% last-modified %G% */
@@ -17,24 +19,24 @@
 /* Copyright © 2000,2017 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MFSC_INCLUDE
-#define	MFSC_INCLUDE	1
+#define	MFSC_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* must be fist to configure */
+#include	<sys/types.h>		/* system types */
 
 
 #define	MFSC_MAGIC	0x58261222
 #define	MFSC		struct mfsc_head
-#define	MFSC_OBJ	struct mfsc_obj
+#define	MFSC_OBJ	struct mfsc_object
 #define	MFSC_FL		struct mfsc_flags
-#define	MFSC_STATUS	struct mfsc_status
+#define	MFSC_STAT	struct mfsc_status
 
 
-struct mfsc_obj {
+struct mfsc_object {
 	char		*name ;
-	uint		objsize ;
+	uint		objsz ;
+	uint		cursz ;
 } ;
 
 struct mfsc_status {
@@ -47,40 +49,37 @@ struct mfsc_flags {
 } ;
 
 struct mfsc_head {
-	uint		magic ;
-	const char	*pr ;
-	const char	*srcfname ;
-	const char	*srvfname ;
+	cchar		*pr ;
+	cchar		*srcfname ;
+	cchar		*srvfname ;
 	char		*mbuf ;
-	MFSC_FL		f ;
+	MFSC_FL		fl ;
 	pid_t		pid ;
+	uint		magic ;
 	int		mlen ;
 	int		fd ;
 	int		to ;
 } ;
 
+typedef	MFSC		mfsc ;
+typedef	MFSC_OBJ	mfsc_obj ;
+typedef	MFSC_FL		mfsc_fl ;
+typedef	MFSC_STAT	mfsc_stat ;
 
-#if	(! defined(MFSC_MASTER)) || (MFSC_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int mfsc_open(mfsc *,cchar *,int) noex ;
+extern int mfsc_getstat(mfsc *,mfsc_stat *) noex ;
+extern int mfsc_help(mfsc *,char *,int,int) noex ;
+extern int mfsc_getval(mfsc *,char *,int,cchar *,int) noex ;
+extern int mfsc_getname(mfsc *,char *,int,cchar *) noex ;
+extern int mfsc_mark(mfsc *) noex ;
+extern int mfsc_exit(mfsc *,cchar *) noex ;
+extern int mfsc_listener(mfsc *,char *,int,int) noex ;
+extern int mfsc_close(mfsc *) noex ;
 
-extern int mfsc_open(MFSC *,cchar *,int) ;
-extern int mfsc_status(MFSC *,MFSC_STATUS *) ;
-extern int mfsc_help(MFSC *,char *,int,int) ;
-extern int mfsc_getval(MFSC *,char *,int,cchar *,int) ;
-extern int mfsc_getname(MFSC *,char *,int,cchar *) ;
-extern int mfsc_mark(MFSC *) ;
-extern int mfsc_exit(MFSC *,cchar *) ;
-extern int mfsc_listener(MFSC *,char *,int,int) ;
-extern int mfsc_close(MFSC *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* MFSC_MASTER */
 
 #endif /* MFSC_INCLUDE */
 
