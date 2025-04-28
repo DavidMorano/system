@@ -35,6 +35,8 @@ DEFS=
 
 INCS= wsnx.h
 
+MODS=
+
 LIBS=
 
 
