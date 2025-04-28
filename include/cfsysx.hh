@@ -1,4 +1,4 @@
-/* cfsysx HEADER */
+/* cfsysx MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -12,7 +12,7 @@
 	This subroutine was written by being adapted from one of
 	my previous versions of the same (from the early 1980s;
 	embedded work at AT&T), which itself was adapted from an
-	original asembly-language version (in Digital Euipment Corp
+	original asembly-language version (in Digital Equipment Corp
 	VAX assembly).
 
 	= 2013-04-30, David A­D­ Morano
@@ -47,72 +47,54 @@
 
 *******************************************************************************/
 
-#ifndef	CFSYSX_INCLUDE
-#define	CFSYSX_INCLUDE
-#ifdef	__cplusplus /* everything is C++ only */
-
+module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<stdintx.h>
 #include	<snwcpy.h>
 #include	<sfx.h>
-#include	<char.h>
 #include	<checkbase.h>
-#include	<ischarx.h>
 #include	<cfutil.h>
+#include	<localmisc.h>
 
+export module cfsysx ;
 
 /* max for |int256_t| + sign */
 inline constexpr int	cfsysx_maxstack = (256+1) ;
 
-template<typename T>
-inline int cfsystox(cc *,int,T *) noex {
+template<typename T> inline int cfsystox(cc *,int,T *) noex {
 	return SR_BUGCHECK ;
 }
-
-template<>
-inline int cfsystox(cc *sp,int b,int *rp) noex {
+template<> inline int cfsystox(cc *sp,int b,int *rp) noex {
 	return uc_strtoi(sp,nullptr,b,rp) ;
 }
-
-template<>
-inline int cfsystox(cc *sp,int b,long *rp) noex {
+template<> inline int cfsystox(cc *sp,int b,long *rp) noex {
 	return uc_strtol(sp,nullptr,b,rp) ;
 }
-
-template<>
-inline int cfsystox(cc *sp,int b,longlong *rp) noex {
+template<> inline int cfsystox(cc *sp,int b,longlong *rp) noex {
 	return uc_strtoll(sp,nullptr,b,rp) ;
 }
-
-template<>
-inline int cfsystox(cc *sp,int b,uint *rp) noex {
+template<> inline int cfsystox(cc *sp,int b,uint *rp) noex {
 	return uc_strtoui(sp,nullptr,b,rp) ;
 }
-
-template<>
-inline int cfsystox(cc *sp,int b,ulong *rp) noex {
+template<> inline int cfsystox(cc *sp,int b,ulong *rp) noex {
 	return uc_strtoul(sp,nullptr,b,rp) ;
 }
-
-template<>
-inline int cfsystox(cc *sp,int b,ulonglong *rp) noex {
+template<> inline int cfsystox(cc *sp,int b,ulonglong *rp) noex {
 	return uc_strtoull(sp,nullptr,b,rp) ;
 }
 
-template<typename T>
-inline int cfsysx(cc *sp,int sl,int b,T *rp) noex {
+export {
+    template<typename T> inline int cfsysx(cc *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (sp && rp) {
 	    cchar	*nsp{} ;
 	    rs = SR_DOM ;
-	    if (int nsl ; (nsl = sfshrink(sp,sl,&nsp)) > 0) {
-	        if (nsl > 1) {
-		    cint	r = cfx::rmleadzero(nsp,nsl) ;
-		    nsp += (nsl - r) ;
-		    nsl = r ;
-		} /* end if */
+	    if (int nsl ; (nsl = cfx::sfdigs(sp,sl,&nsp)) > 0) {
 	    	if ((rs = checkbase(nsp,nsl,b)) >= 0) {
 		    if (nsp[nsl] != '\0') {
 			auto	load = snwcpyshrink ;
@@ -124,7 +106,6 @@ inline int cfsysx(cc *sp,int sl,int b,T *rp) noex {
 		                rs = cfsystox(nsp,b,rp) ;
 	                    } /* end if (loading) */
 		        } else {
-		            int		rs1 ;
 		            char	*dbuf{} ;
 		            if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
 	    	                if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
@@ -142,11 +123,7 @@ inline int cfsysx(cc *sp,int sl,int b,T *rp) noex {
 	    } /* end if (non-zero c-string) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine-template (cfsysx) */
-
-
-#endif	/* __cplusplus */
-#endif /* CFSYSX_INCLUDE */
+    } /* end subroutine-template (cfsysx) */
+} /* end export */
 
 

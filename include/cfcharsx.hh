@@ -1,4 +1,4 @@
-/* cfcharsx HEADER */
+/* cfcharsx MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -25,10 +25,7 @@
 
 *******************************************************************************/
 
-#ifndef	CFCHARSX_INCLUDE
-#define	CFCHARSX_INCLUDE
-#ifdef	__cplusplus /* everything is C++ only */
-
+module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
@@ -36,21 +33,21 @@
 #include	<charconv>
 #include	<usystem.h>
 #include	<stdintx.h>
+#include	<cfutil.h>
 #include	<localmisc.h>
 
+export module cfcharsx ;
 
-template<typename T>
-int cfcharsx(cchar *sp,int sl,int b,T *rp) noex {
-	using std::from_chars ;
-	using std::from_chars_result ;
-	using std::errc ;
+template<typename T> inline int cvt(cc *sp,int sl,int b,T *rp) noex {
+	using std::from_chars ;			/* subroutine */
+	using std::errc ;			/* enumeration */
+	using res = std::from_chars_result ;	/* type */
 	int		rs = SR_FAULT ;
-	if (sp && rp) {
-	    std::from_chars_result	r ;
-	    constexpr std::errc	ec_ok = errc() ;
+	if (sp) {
+	    constexpr errc	ec_ok = errc() ;	/* first value */
 	    T		v{} ;
 	    rs = SR_OK ;
-	    if (r = from_chars(sp,(sp+sl),v,b) ; (r.ec == ec_ok)) {
+	    if (res r = from_chars(sp,(sp+sl),v,b) ; (r.ec == ec_ok)) {
 		*rp = v ;
 	    } else {
 		using enum	std::errc ;
@@ -58,18 +55,29 @@ int cfcharsx(cchar *sp,int sl,int b,T *rp) noex {
 		case result_out_of_range:
 		    rs = SR_RANGE ;
 		    break ;
-		default:
+		case invalid_argument:
 		    rs = SR_INVALID ;
+		    break ;
+		default:
+		    rs = SR_BADFMT ;
 		    break ;
 		} /* end switch */
 	    } /* end if (failed) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine-template (cfcharsx) */
+} /* end subroutine-template (cvt) */
 
-
-#endif	/* __cplusplus */
-#endif /* CFCHARSX_INCLUDE */
+export {
+    template<typename T> inline int cfcharsx(cc *sp,int sl,int b,T *rp) noex {
+	int		rs = SR_FAULT ;
+	if (sp && rp) {
+	    cchar	*cp{} ;
+	    if (int cl ; (cl = cfx::sfchars(sp,sl,&cp)) > 0) {
+		rs = cvt(cp,cl,b,rp) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+    } /* end subroutine-template (cfcharsx) */
+} /* end export */
 
 

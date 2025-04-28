@@ -1,4 +1,4 @@
-/* cfpow HEADER */
+/* cfpow MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -28,32 +28,31 @@
 
 *******************************************************************************/
 
+module ;
+
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cerrno>
 #include	<climits>		/* for |CHAR_BIT| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<uvariables.hh>		/* |sysword.w_digtab(3u)| */
+#include	<usystem.h>		/* |cstrlen(3u)| */
 #include	<stdintx.h>
 #include	<char.h>
 #include	<ischarx.h>
 
+export module cfpow ;
 
-static uint	cfpow_maxbase = strlen(sysword.w_digtab) ;
+import uvariables ;
 
-struct cfpow_helper {
+static uint	cfpow_maxbase = xstrlen(sysword.w_digtab) ;
+
+#ifdef	COMMENT
+    struct cfpow_helper {
 	const longlong	one = 1 ;
 	longlong	llmin = 0 ;
 	longlong	llmax = 0 ;
 	ulonglong	ullmax = 0 ;
 	ulonglong	cutoff[cfpow_maxbase+1] = {} ;
 	int		cutlim[cfpow_maxbase+1] = {} ;
-	constexpr cfpow_helper() noex {
+	cfpow_helper() noex {
 	    cint	n = (CHAR_BIT * szof(longlong)) ;
 	    ullmax = ~ullmax ;
 	    llmin = (one << (n-1)) ;
@@ -63,10 +62,10 @@ struct cfpow_helper {
 		cutlim[b] = (ullmax & b) ;
 	    } /* end for */
 	} ; /* end constructor */
-} ; /* end subroutine (cfpow_helper) */
+    } ; /* end subroutine (cfpow_helper) */
+#endif /* COMMENT */
 
-template<typename T>
-struct cfpowshelp {
+    template<typename T> struct cfpowshelp {
 	cint		nb = (CHAR_BIT * szof(T)) ;
 	T		*rp = nullptr ;
 	T		val = 0 ;	/* value to create */
@@ -111,7 +110,7 @@ struct cfpowshelp {
 	int getsign() noex {
 	    int		rs = SR_FAULT ;
 	    if (rp) {
-	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl < 0) sl = cstrlen(sp) ;
 	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
@@ -141,8 +140,8 @@ struct cfpowshelp {
 		        val -= nv ;
 		    }
 		} else {
-		    if ((val > cutoff || (val == cutoff && nv > cutlim)) {
-			rs = SR_RANGE 
+		    if ((val > cutoff) || (val == cutoff && nv > cutlim)) {
+			rs = SR_RANGE ;
 		    } else {
 			val *= base;
 			val += nv ;
@@ -152,21 +151,19 @@ struct cfpowshelp {
 	    } /* end while */
 	    return rs ;
 	} ; /* end method (proc) */
-}
-/* end struct (cfpowshelp) */
+    } ; /* end struct (cfpowshelp) */
 
-template<typename T>
-int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
+export {
+    template<typename T> int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
-	    cfpowshelp	cfo(sp,sl,b,rp) ;
-	    if ((rs = getsign()) >= 0) {
-		prepare() ;
-		rs = proc() ;
+	    if (cfpowshelp cfo(sp,sl,b,rp) ; (rs = cfo.getsign()) >= 0) {
+		cfo.prepare() ;
+		rs = cfo.proc() ;
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine-template (cfalphax) */
+    } /* end subroutine-template (cfalphax) */
+} /* end export */
 
 

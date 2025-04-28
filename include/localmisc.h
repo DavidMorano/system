@@ -363,16 +363,24 @@ typedef const char		cc ;
 
 /* common digit base (bases 8, 10, 16) buffer lengths */
 
+#ifndef	BINBUFLEN
+#define	BINBUFLEN	256		/* can hold |int256_t| in binary */
+#endif
+
 #ifndef	OCTBUFLEN
 #define	OCTBUFLEN	86		/* can hold |int256_t| in octal */
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	80		/* can hold |int256_t| in decimal */
+#ifndef	DECCUFLEN
+#define	DECBUFLEN	78		/* can hold |int256_t| in decimal */
 #endif
 
 #ifndef	HEXBUFLEN
 #define	HEXBUFLEN	64		/* can hold |int256_t| in hexadecimal */
+#endif
+
+#ifndef	DIGBUFLEN
+#define	DIGBUFLEN	MAX(MAX(MAX(BINBUFLEN,OCTBUFLEN),DECBUFLEN),HEXBUFLEN)
 #endif
 
 #ifndef	REALNAMELEN

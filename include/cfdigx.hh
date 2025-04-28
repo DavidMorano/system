@@ -1,4 +1,4 @@
-/* cfdigx HEADER */
+/* cfdigx MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -12,7 +12,7 @@
 	This subroutine was written by being adapted from one of
 	my previous versions of the same (from the early 1980s;
 	embedded work at AT&T), which itself was adapted from an
-	original asembly-language version (in Digital Euipment Corp
+	original asembly-language version (in Digital Equipment Corp
 	VAX assembly).
 
 	= 2013-04-30, David A­D­ Morano
@@ -46,44 +46,29 @@
 
 *******************************************************************************/
 
-#ifndef	CFDIGX_INCLUDE
-#define	CFDIGX_INCLUDE
-#ifdef	__cplusplus /* everything is C++ only */
-
+module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<bit>
 #include	<usystem.h>
 #include	<stdintx.h>
-#include	<char.h>
 #include	<sfx.h>
-#include	<uvariables.hh>
 #include	<checkbase.h>
-#include	<ischarx.h>
+#include	<cfutil.h>
 #include	<localmisc.h>
 
+export module cfdigx ;
 
-inline int rmleadzero(cchar *sp,int sl) noex {
-	int	nsl = sl ;
-	for (int i = 0 ; (i < (sl-1)) && iszero(sp[0]) ; i += 1) {
-	    nsl -= 1 ;
-	} /* end for */
-	return nsl ;
-}
-
-template<typename T>
-int cfdigux(cc *sp,int sl,int b,T *rp) noex {
+export {
+    template<typename T> int cfdigux(cc *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp) {
 	    cchar	*nsp ;
-	    int		nsl = sfshrink(sp,sl,&nsp) ;
 	    rs = SR_INVALID ;
-	    if (nsl > 0) {
+	    if (int nsl = sfshrink(sp,sl,&nsp) ; nsl > 0) {
 	        if (nsl > 1) {
-		    cint	r = rmleadzero(nsp,nsl) ;
+		    cint	r = cfx::rmleadzero(nsp,nsl) ;
 		    nsp += (nsl - r) ;
 		    nsl = r ;
 		} /* end if */
@@ -93,11 +78,7 @@ int cfdigux(cc *sp,int sl,int b,T *rp) noex {
 	    } /* end if (non-zero c-string) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine-template (cfdigx) */
-
-
-#endif	/* __cplusplus */
-#endif /* CFDIGX_INCLUDE */
+    } /* end subroutine-template (cfdigx) */
+} /* end export */
 
 
