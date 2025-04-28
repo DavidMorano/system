@@ -123,7 +123,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>
-#include	<unistd.h>		/* |getpagesize(3c)| */
+#include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
 #include	<ctime>
