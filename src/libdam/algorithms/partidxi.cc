@@ -83,10 +83,10 @@
 int partidxi(int *a,int first,int last,int idx) noex {
 	cint		pv = a[idx] ;
 	int		pi = first ;
-	if (idx != (last-1)) {
-	    arrswapi(a,idx,(last-1)) ;
+	if (idx != (last - 1)) {
+	    arrswapi(a,idx,(last - 1)) ;
 	}
-	for (int i = first ; i < (last-1) ; i += 1) {
+	for (int i = first ; i < (last - 1) ; i += 1) {
 	    if (a[i] < pv) {
 		if (i != pi) {
 		    arrswapi(a,i,pi) ;
@@ -94,8 +94,8 @@ int partidxi(int *a,int first,int last,int idx) noex {
 		pi += 1 ;
 	    }
 	} /* end for */
-	if (pi != (last-1)) {
-	    arrswapi(a,pi,(last-1)) ;
+	if (pi != (last - 1)) {
+	    arrswapi(a,pi,(last - 1)) ;
 	}
 	return pi ;
 }
