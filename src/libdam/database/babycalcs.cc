@@ -418,21 +418,16 @@ int babycalcs_getinfo(BC *op,BC_INFO *bip) noex {
 
 static int babycalcs_shmload(BC *op,mode_t om) noex {
 	int		rs = SR_OK ;
-	int		cl ;
 	int		c = 0 ;
-	cchar	*cp ;
-
+	cchar		*cp ;
 	op->mapsize = 0 ;
 	op->table = nullptr ;
-	if (op->pagesize == 0) op->pagesize = getpagesize() ;
-
-	if ((cl = sfbasename(op->pr,-1,&cp)) > 0) {
+	if (int cl ; (cl = sfbasename(op->pr,-1,&cp)) > 0) {
 	    cchar	*postfix = BABYCALCS_SHMPOSTFIX ;
 	    char	shmname[MAXNAMELEN + 1] ;
 	    if ((rs = mkshmname(shmname,cp,cl,postfix,-1)) >= 0) {
-	        cchar	*smp ;
 	        cl = rs ;
-	        if ((rs = uc_mallocstrw(shmname,cl,&smp)) >= 0) {
+	        if (cchar *smp ; (rs = uc_mallocstrw(shmname,cl,&smp)) >= 0) {
 	            const time_t	dt = getustime ;
 	            op->shmname = smp ;
 	            if ((rs = babycalcs_shmopen(op,dt,shmname,om)) >= 0) {
@@ -472,7 +467,6 @@ static int babycalcs_shmload(BC *op,mode_t om) noex {
 	} else {
 	    rs = SR_INVALID ;
 	} /* end if (sfbasename) */
-
 	if (rs < 0) {
 	    if (op->fl.txt && (op->table != nullptr)) {
 	        op->fl.txt = false ;
@@ -483,8 +477,7 @@ static int babycalcs_shmload(BC *op,mode_t om) noex {
 	        uc_free(op->shmname) ;
 	        op->shmname = nullptr ;
 	    }
-	} /* end if (error) */
-
+	} /* end if (error handling) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (babycalcs_shmload) */
@@ -731,14 +724,9 @@ static int babycalcs_shmwr(BC *op,time_t dt,int fd,mode_t om) noex {
 	HDR		hf{} ;
 	int		rs ;
 	int		foff = 0 ;
-
 	op->shmsize = 0 ;
 	if (dt == 0) dt = getustime ;
-
-	if (op->pagesize == 0) op->pagesize = getpagesize() ;
-
 	/* prepare the file-header */
-
 	hf.vetu[0] = HDR_VERSION ;
 	hf.vetu[1] = uchar(ENDIAN) ;
 	hf.vetu[2] = 0 ;
@@ -746,9 +734,7 @@ static int babycalcs_shmwr(BC *op,time_t dt,int fd,mode_t om) noex {
 	hf.dbsize = (uint) op->dbsize ;
 	hf.dbtime = (uint) op->ti_mdb ;
 	hf.wtime = (uint) dt ;
-
 	/* process */
-
 	if ((rs = babycalcs_shmwrer(op,dt,fd,om,&hf)) >= 0) {
 	    foff = rs ;
 	    if ((rs = u_rewind(fd)) >= 0) {
@@ -762,7 +748,6 @@ static int babycalcs_shmwr(BC *op,time_t dt,int fd,mode_t om) noex {
 	        } /* end if (babieshdr_rd) */
 	    } /* end if (u_rewind) */
 	} /* end if (babycalcs_shmwrer) */
-
 	return (rs >= 0) ? foff : rs ;
 }
 /* end subroutine (babycalcs_shmwr) */
