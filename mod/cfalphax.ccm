@@ -41,7 +41,6 @@ module ;
 #include	<climits>		/* for |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -56,8 +55,7 @@ module ;
 
 export module cfalphax ;
 
-export {
-    template<stdintx T> struct cfashelp {
+template<stdintx T> struct cfashelp {
 	cint		nb = (CHAR_BIT * szof(T)) ;
 	T		*rp = nullptr ;
 	T		val = 0 ;	/* value to create */
@@ -159,18 +157,25 @@ export {
 	    *rp = (rs >= 0) ? val : 0 ;
 	    return rs ;
 	} ; /* end method (proc) */
-    } ; /* end struct (cfashelp) */
-    template<typename T> 
-    inline int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
+	operator int () noex {
+	    int		rs ;
+	    if ((rs = getsign()) >= 0) {
+		prepare() ;
+		rs = proc() ;
+	    }
+	    return rs ;
+	} ;
+} ; /* end struct (cfashelp) */
+
+export {
+    template<typename T> inline int cfalphax(cc *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
-	    if (cfashelp cfo(sp,sl,b,rp) ; (rs = cfo.getsign()) >= 0) {
-		cfo.prepare() ;
-		rs = cfo.proc() ;
-	    } /* end if */
+	   cfashelp cfo(sp,sl,b,rp) ;
+	   rs = cfo ;
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine-template (cfalphax) */
-}
+} /* end export */
 
 

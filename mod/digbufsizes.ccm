@@ -1,6 +1,6 @@
 /* digbufsizes MODULE */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* provide buffer sizes for c-string digits */
 /* version %I% last-modified %G% */
@@ -11,9 +11,20 @@
 	= 1998-11-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
+	= 2025-04-29, David A­D­ Morano
+	Now with constant-expression math (newly available w/ C++20
+	I think), we can change this whole thing (constant database
+	of values) to use a closed-form math calculation rather
+	than the old repetitive divide algorithm.  The match functions
+	used are |log2(3c++)| and |ceil(3c++)|, now both available
+	in constant-expression form.  Why was not this done back
+	in like 2020 (or earlier when constand-expression math first
+	became available?  Who knows?  It takes time to review old
+	code and update it in ways that were not originally obvious.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2025 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************* 
   	Name:
@@ -23,13 +34,42 @@
 	These subroutines facilitate determining buffer sizes for 
 	various digits in different types and number bases.
 
+	Notes:
+	1. It is 2025 (see revision above) and it is (frankly)
+	unbelievable how much simpler this whole thing became when
+	using a closed-form match equation!  Just amazing!  How did
+	the world work before constant-expression C++ math?  Also,
+	use of a facility (of whatever sort and whatever provenance)
+	to create maximum values of each integer type is now totally
+	eliminated.  Previously, with the repetitive division
+	algorithm, the maximum value for each integer type had to
+	be used (or created id necessary) for input into the old
+	algorithm.  Now that is not required with the new closed-form
+	math alogorithm.  I hope that constant-expression C++ math
+	is here to stay (and is available in all compilers that we
+	care about) because I do not ever want to return to the
+	older algorithm.  If we had to go back (if constant-expression
+	math is never not avilable, I would rather change this whole
+	thing into a non-constant-expression database than go back
+	to the older (repetitive division) algorithm.
+	2. Another note with this 2025 change: I have sort of broken
+	the fourth wall as it were since I am now -- for the very first
+	time -- using floating point math in any of this system or
+	operating-system type of code.  In the old days, floating-point
+	math (or arithmetic) was not availble in small or embedded
+	environments.  So if I ever find myself, or rather if this code
+	ever finds itself, in an environment where floating-point match
+	is not availble, I am screwed (would not know immediately what
+	to do).  I guess I would have to return this present code to
+	using the old repetitive-division algorithm.
+
 *******************************************************************************/
 
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |{x}_MAX| + |CHAR_BIT| */
-#include	<bit>			/* |countr_zero(3c++)| */
+#include	<cmath>			/* |log2(3c++)| + |ceil(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -38,115 +78,25 @@ module ;
 
 export module digbufsizes ;
 
-using std::countr_zero ;		/* subroutine */
-
 export {
     constexpr int	digbufsizes_maxbase = 64 ; /* current max-base */
     constexpr int	digbufsizes_ntypes = 10 ; /* up to types w/ 1024 bits */
     constexpr int	digbufsizes_nbases = (digbufsizes_maxbase+1) ;
 }
 
-struct lims {
-    	ulonglong	ullmax ;
-	consteval lims() noex {
-	    ullmax = 0 ;
-	    ullmax = (~ ullmax) ;
-	} ;
-} ; /* end struct (lims) */
+consteval int ndigs(int t,int b) noex {
+	cdouble		fbase = cdouble(b) ;
+	cdouble		fbits = cdouble((1 << t) * CHAR_BIT) ;
+	return int(ceil(int(fbits / log2(fbase)))) ;
+}
 
-template<typename T>
-consteval int digbufsizes_ndigitx(T v,int b) noex {
-    const uint      ub(b) ; /* unsigned division faster than signed */
-    int             n = 0 ;
-    if (b >= 2) {
-        if (v == 0) {
-            n = 1 ;
-        } else {
-            while (v != 0) {
-                n += 1 ;
-                v = (v / ub) ;
-            } /* end while */
-        } /* end if */
-    } /* end if (valid base) */
-    return n ;
-} /* end subroutine-template (digbufsizes_ndigitx) */
-
-consteval int digbufsizes_ndigits(int ntype,int base) noex {
+consteval int ndigits(int ntype,int base) noex {
     int             n = 0 ;
     if (base >= 2) {
-        switch (ntype) {
-        case 0:
-            {
-                cuchar       uc = uchar(UCHAR_MAX) ;
-                n = digbufsizes_ndigitx(uc,base) ;
-            }
-            break ;
-        case 1:
-            {
-                cushort      us = ushort(USHORT_MAX) ;
-                n = digbufsizes_ndigitx(us,base) ;
-            }
-            break ;
-        case 2:
-            {
-                cuint        ui = uint(UINT_MAX) ;
-                n = digbufsizes_ndigitx(ui,base) ;
-            }
-            break ;
-        case 3:
-            {
-                culong       ul = ulong(ULONG_MAX) ;
-                n = digbufsizes_ndigitx(ul,base) ;
-            }
-            break ;
-        case 4:
-            {
-                constexpr lims	vl ;
-		{
-                    culonglong	ull = vl.ullmax ;
-                    n = digbufsizes_ndigitx(ull,base) ;
-		}
-            }
-            break ;
-        case 5: /* 32 bytes */
-            switch (base) {
-            case 2:
-                n = 256 ;   /* 256 ÷ 1 = 256 */
-                break ;
-            case 4:
-                n = 128 ;   /* 256 ÷ 2 = 128 */
-                break ;
-            case 8:
-                n = 86 ;    /* 256 ÷ 3 = 85.4 */
-                break ;
-            case 16:
-                n = 64 ;    /* 256 ÷ 4 = 64 */
-                break ;
-            case 32:
-                n = 52 ;    /* 256 ÷ 5 = 51.2 */
-                break ;
-            case 64:
-                n = 43 ;    /* 256 ÷ 6 = 42.6 */
-                break ;
-            case 128:
-                n = 37 ;    /* 256 ÷ 7 = 36.6 */
-                break ;
-            case 256:
-            default:
-                n = 32 ;    /* 256 ÷ 8 = 32 */
-                break ;
-            } /* end switch */
-            break ;
-        default:
-	    {
-		cuint	ub = uint(base) ;
-                n = (((1 << ntype) * CHAR_BIT) / countr_zero(ub)) + 1 ;
-	    }
-	    break ;
-        } /* end switch */
+	n = ndigs(ntype,base) ;
     } /* end if (valid base) */
     return n ;
-} /* end subroutine (digbufsizes_ndigits) */
+} /* end subroutine (ndigits) */
 
 export {
     struct digbufsizes {
@@ -156,7 +106,7 @@ export {
 	consteval digbufsizes() noex {
 	    for (int b = 0 ; b < digbufsizes_nbases ; b += 1) {
 	        for (int t = 0 ; t < digbufsizes_ntypes ; t += 1) {
-		    bufsize[t][b] = (digbufsizes_ndigits(t,b) + 1) ;
+		    bufsize[t][b] = ndigits(t,b) ;
 	        }
 	    }
 	} ; /* end constructor (digbufsizes) */

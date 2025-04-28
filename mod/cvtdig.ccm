@@ -76,7 +76,7 @@ import uvariables ;
 
 constexpr int	cvtdig_maxbase = 128 ;	/* largest pow-of-two */
 
-inline constexpr int cvtdig_ffbsi(int b) noex {
+constexpr inline int cvtdig_ffbsi(int b) noex {
 	cuint		ub = uint(b) ;
 	return std::countr_zero(ub) ;
 }
@@ -92,7 +92,7 @@ export {
 	    ndig = ((n * CHAR_BIT) + nshift - 1) / nshift ;
 	    rs = SR_OVERFLOW ;
 	    if (ndig <= rlen) {
-	        const UT	mask = uint(b-1) ;
+	        const UT	mask = uint(b - 1) ;
 	        for (int i = (ndig - 1) ; i >= 0 ; i -= 1) {
 	            rbuf[i] = sysword.w_digtab[val & mask] ;
 	            val >>= nshift ;
@@ -104,4 +104,5 @@ export {
 	return (rs >= 0) ? ndig : rs ;
     } /* end subroutine-template (cvtdig) */
 }
+
 
