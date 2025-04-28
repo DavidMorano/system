@@ -40,7 +40,6 @@
 
 #include	<envstandards.h>	/* must be before others */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -82,17 +81,17 @@
 int shmalloc_init(shmalloc *op,char *strp,int ssz) noex {
 	int		rs = SR_FAULT ;
 	if (op && strp) {
-	    ulong		strv = (ulong) strp ;
-	    cint		asz = SHMALLOC_ALIGNSIZE ;
-	    char		*rp = charp(op) ;
+	    uintptr_t	strv = uintptr_t(strp) ;
+	    cint	asz = SHMALLOC_ALIGNSIZE ;
+	    char	*rp = charp(op) ;
 	    op->used = 0 ;
-	    if ((strv&(asz-1)) != 0) {
-	        cint	diff = (strv - (strv & (asz - 1))) ;
+	    if ((strv & (asz - 1)) != 0) {
+	        cint	diff = intconv(strv - (strv & (asz - 1))) ;
 	        strp += diff ;
 	        ssz -= diff ;
 	    }
 	    if (int flsz ; (flsz = ifloor(ssz,asz)) >= 0) {
-	        op->str = (strp - rp) ;
+	        op->str = intconv(strp - rp) ;
 	        op->b.bsz = flsz ;
 	        op->b.next = 0 ;
 	        {
@@ -136,15 +135,15 @@ int shmalloc_alloc(shmalloc *op,int rsz) noex {
 	        bsz += asz ; /* add the amount for our overhead */
 	        next = psp->next ;
 	        while ((next >= 0) && (next < op->b.bsz)) {
-	            fsp = (shmalloc_blk *) (strp+next) ;
+	            fsp = (shmalloc_blk *) (strp + next) ;
 	            if (fsp->bsz >= bsz) {
 			rs = SR_OK ;
 	                roff = (next+asz) ;
 	                if ((fsp->bsz - bsz) >= SHMALLOC_BSZ) {
-	                    nsp = (shmalloc_blk *) (strp+next+bsz) ;
-	                    nsp->bsz = (fsp->bsz-bsz) ;
+	                    nsp = (shmalloc_blk *) (strp + next + bsz) ;
+	                    nsp->bsz = (fsp->bsz - bsz) ;
 	                    nsp->next = fsp->next ;
-	                    psp->next = (next+bsz) ; /* update previous */
+	                    psp->next = (next + bsz) ; /* update previous */
 	                    fsp->bsz = bsz ;		/* update ourself */
 	                    fsp->next = -1 ;
 	                } else {
@@ -180,15 +179,15 @@ int shmalloc_free(shmalloc *op,int uoff) noex {
 	        int		foff ;
 	        int		comoff ;
 	        char		*strp = charp(rp + op->str) ;
-	        foff = (uoff-asz) ;
-	        fsp = (shmalloc_blk *) (strp+foff) ;
+	        foff = (uoff - asz) ;
+	        fsp = (shmalloc_blk *) (strp + foff) ;
 	        comoff = psp->next ;
 	        fsz = fsp->bsz ;
 	        if (fsz <= op->used) {
 	            while ((comoff >= 0) && (comoff < op->b.bsz)) {
-	                csp = (shmalloc_blk *) (strp+comoff) ;
+	                csp = (shmalloc_blk *) (strp + comoff) ;
 	                if (foff < comoff) {
-	                    if ((foff+fsp->bsz) == comoff) { /* merge forward */
+	                    if ((foff + fsp->bsz) == comoff) { /* merge */
 	                        psp->next = foff ;
 	                        fsp->bsz += csp->bsz ;
 	                        fsp->next = csp->next ;
@@ -198,10 +197,10 @@ int shmalloc_free(shmalloc *op,int uoff) noex {
 	                    }
 	                    op->used -= fsz ;
 	                    foff = -1 ;
-	                } else if (foff == (comoff+csp->bsz)) { /* backward */
+	                } else if (foff == (comoff + csp->bsz)) { /* backward */
 	                    csp->bsz += fsp->bsz ;
-	                    if ((comoff+csp->bsz) == csp->next) { /* forward */
-	                        nsp = (shmalloc_blk *) (strp+csp->next) ;
+	                    if ((comoff + csp->bsz) == csp->next) {
+	                        nsp = (shmalloc_blk *) (strp + csp->next) ;
 	                        csp->bsz += nsp->bsz ;
 	                        csp->next = nsp->next ;
 	                    }
@@ -249,8 +248,10 @@ int shmalloc_already(shmalloc *op,int uoff) noex {
 	        comoff = psp->next ;
 	        if (comoff < fsz) {
 	            while ((comoff >= 0) && (comoff < op->b.bsz)) {
-	                csp = (shmalloc_blk *) (strp+comoff) ;
-	                f = ((foff >= comoff) && (foff < (comoff+csp->bsz))) ;
+	                csp = (shmalloc_blk *) (strp + comoff) ;
+			f = true ;
+	                f = f && (foff >= comoff) ;
+			f = f && (foff < (comoff + csp->bsz)) ;
 	                if (f) break ;
 	                comoff = csp->next ;
 	            } /* end while */
@@ -278,7 +279,7 @@ int shmalloc_avail(shmalloc *op) noex {
 	    char	*strp = charp(rp + op->str) ;
 	    comoff = psp->next ;
 	    while (comoff >= 0) {
-	        csp = (shmalloc_blk *) (strp+comoff) ;
+	        csp = (shmalloc_blk *) (strp + comoff) ;
 	        comsz = csp->bsz ;
 	        avail += comsz ;
 	        comoff = csp->next ;
