@@ -82,14 +82,17 @@
 /* exported subroutines */
 
 int wsnwcpynarrow(wchar_t *rarr,int rlen,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	int		c ;
-	for (c = 0 ; (c < rlen) && (c < sl) && sp[c] ; c += 1) {
-	    cint	ch = mkchar(sp[c]) ;
-	    rarr[c] = ch ;
-	}
-	rarr[c] = '\0' ;
-	if ((c < sl) && (sp[c] != '\0')) rs = SR_OVERFLOW ;
+	int		rs = SR_FAULT ;
+	int		c = 0 ; /* return-value */
+	if (rarr && sp) {
+	    rs = SR_OK ;
+	    for (c = 0 ; (c < rlen) && (c < sl) && sp[c] ; c += 1) {
+	        cint	ch = mkchar(sp[c]) ;
+	        rarr[c] = ch ;
+	    }
+	    rarr[c] = '\0' ;
+	    if ((c < sl) && (sp[c] != '\0')) rs = SR_OVERFLOW ;
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (wsnwcpynarrow) */
