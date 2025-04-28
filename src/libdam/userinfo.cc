@@ -392,7 +392,7 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	            cint	sz = (uit_overlast * szof(cchar *)) ;
 	            if (void *vp{} ; (rs = uc_calloc(1,sz,&vp)) >= 0) {
 	                strstore	st ;
-	                int		*sis = static_cast<int *>(vp) ;
+	                int		*sis = cast_static<int *>(vp) ;
 	                if ((rs = strstore_start(&st,10,startsize)) >= 0) {
 	                    if ((rs = userinfo_process(uip,&st,sis,un)) >= 0) {
 	                        rs = userinfo_load(uip,&st,sis) ;
@@ -796,13 +796,13 @@ static int procinfo_pwentry(PROCINFO *pip,cchar *un) noex {
 	int		f = false ;
 	char		*pwbuf = pip->tbuf ;
 	if ((rs = procinfo_getpwuser(pip,&pw,pwbuf,pwlen,un)) >= 0) {
-	    ucentpw	*pwp = static_cast<ucentpw *>(&pw) ;
+	    ucentpw	*pwp = cast_static<ucentpw *>(&pw) ;
 	    pip->f.pw = true ;
 	    if ((rs = pwp->size()) >= 0) {
 	        int	pwsz = rs ;
 	        char	*p{} ;
 	        if ((rs = uc_malloc((pwsz+1),&p)) >= 0) {
-	            ucentpw	*tpwp = static_cast<ucentpw *>(&pip->pw) ;
+	            ucentpw	*tpwp = cast_static<ucentpw *>(&pip->pw) ;
 	            if ((rs = tpwp->load(p,pwsz,pwp)) >= 0) {
 	                pip->pwbuf = p ;
 	                pip->pwlen = pwsz ;
