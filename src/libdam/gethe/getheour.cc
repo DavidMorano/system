@@ -198,7 +198,7 @@ int gether::findcanonical() noex {
 	if (hbuf) {
 	    if ((rs = getbufsize(getbufsize_hn)) >= 0) {
 		cint	hlen = rs ;
-	        hostent	*hop = static_cast<hostentp>(hep) ;
+	        hostent	*hop = cast_static<hostentp>(hep) ;
 	        cchar	*canp ;
 	        if ((rs = hostent_getcanonical(hop,&canp)) >= 0) {
 		    rs = sncpy(hbuf,hlen,canp) ;
