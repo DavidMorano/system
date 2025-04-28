@@ -73,7 +73,7 @@ template<typename ... Args>
 static int clientinfo_ctor(clientinfo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    clientinfo_head	*hop = static_cast<clientinfo_head *>(op) ;
+	    clientinfo_head	*hop = cast_static<clientinfo_head *>(op) ;
 	    cnullptr	np{} ;
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
