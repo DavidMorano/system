@@ -146,33 +146,33 @@ export {
 	    case getbufsize_pn:		/* project-name */
 	        ip->defval = PNBUFLEN ;
 	        break ;
-	    case getbufsize_pw:
+	    case getbufsize_pw:			/* entry-password */
 	        ip->name = _SC_GETPW_R_SIZE_MAX ;
 		ip->defval = PWBUFLEN ;
 	        break ;
-	    case getbufsize_sp:
+	    case getbufsize_sp:			/* entry-shadow */
 	        ip->defval = SPBUFLEN ;
 	        break ;
-	    case getbufsize_ua:
+	    case getbufsize_ua:			/* entry-userattr */
 	        ip->defval = UABUFLEN ;
 	        break ;
-	    case getbufsize_gr:
+	    case getbufsize_gr:			/* entry-group */
 		ip->name = _SC_GETGR_R_SIZE_MAX ;
 		ip->defval = GRBUFLEN ;
 	        break ;
-	    case getbufsize_pj:
+	    case getbufsize_pj:			/* entry-project */
 		ip->defval = PJBUFLEN ;		/* project-buf */
 	        break ;
-	    case getbufsize_pr:
+	    case getbufsize_pr:			/* entry-protocol */
 		ip->defval = PRBUFLEN ;		/* protocol-buf */
 	        break ;
-	    case getbufsize_nw:
+	    case getbufsize_nw:			/* entry-network */
 		ip->defval = NWBUFLEN ;		/* network-buf */
 	        break ;
-	    case getbufsize_ho:
+	    case getbufsize_ho:			/* entry-host */
 		ip->defval = HOBUFLEN ;		/* host-buf */
 	        break ;
-	    case getbufsize_sv:
+	    case getbufsize_sv:			/* entry-service */
 		ip->defval = SVBUFLEN ;		/* service-buf */
 	        break ;
 	    case getbufsize_fs:
