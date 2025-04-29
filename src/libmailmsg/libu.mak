@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += libu.h
 
-MODS += valuelims.o digbufsizes.o uvariables.o
+MODS += valuelims.ccm digbufsizes.ccm uvariables.ccm ulibvals.ccm
 
 LIBS += -liconv
 
@@ -95,7 +95,7 @@ OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJ= obja.o objb.o objc.o objd.o obje.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -122,6 +122,9 @@ so:			$(T).so
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).a:			$(OBJ)
@@ -246,13 +249,13 @@ obje.o:			$(OBJE)
 
 
 # SUPPORT
-timewatch.o:		timewatch.cc timewatch.hh
-aflag.o:		aflag.cc aflag.hh
-errtimer.o:		errtimer.cc errtimer.hh
-timeval.o:		timeval.cc timeval.h
-itimerval.o:		itimerval.cc itimerval.h
+timewatch.o:		timewatch.cc timewatch.hh	$(INCS)
+aflag.o:		aflag.cc aflag.hh		$(INCS)
+errtimer.o:		errtimer.cc errtimer.hh		$(INCS)
+timeval.o:		timeval.cc timeval.h		$(INCS)
+itimerval.o:		itimerval.cc itimerval.h	$(INCS)
 timespec.o:		timespec.cc timespec.h		$(INCS)
-itimerspec.o:		itimerspec.cc itimerspec.h
+itimerspec.o:		itimerspec.cc itimerspec.h	$(INCS)
 
 utimeout.o:		utimeout.c utimeout.h		$(INCS)
 utimeouts.o:		utimeouts.cc utimeouts.h	$(INCS)
@@ -334,21 +337,27 @@ valuelims.o:		valuelims.ccm			$(INCS)
 	makemodule valuelims
 
 # DIGBUFSIZES
-digbufsizes.o:		digbufsizes.ccm valuelims.o
+digbufsizes.o:		valuelims.o digbufsizes.ccm
 	makemodule digbufsizes
 
 # UVARIABLES
 uvariables.o:		uvariables0.o uvariables1.o
 	$(LD) -r -o $@ $(LDFLAGS) uvariables0.o uvariables1.o
 
-uvariables0.o:		uvariables.ccm uvariables1.cc valuelims.o digbufsizes.o
-	makemodule valuelims
+uvariables0.o:		valuelims.o digbufsizes.o uvariables.ccm uvariables1.cc 
+	makemodule uvariables
 
 uvariables1.o:		uvariables.ccm uvariables1.cc 
 	makemodule uvariables
 	$(COMPILE.cc) uvariables1.cc
 
-modules:		valuelims.o digbufsizes.o uvariables.o
-	touch $@
+# ULIBVALS
+ulibvals.o:		syswords.o uvariables.o ulibvals.ccm
+
+MOBJ += valuelims.o digbufsizes.o uvariables.o ulibvals.o
+
+# MODS
+mods.o:		$(MOBJ)
+	$(LD) -r -o $@ $(LDFLAGS) $(MOBJ)
 
 
