@@ -35,6 +35,8 @@ DEFS=
 
 INCS= mktmp.h
 
+MODS +=
+
 LIBS=
 
 
@@ -93,7 +95,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_MKTMP)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MKTMP)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MKTMP)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
