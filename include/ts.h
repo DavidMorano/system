@@ -64,9 +64,9 @@ struct ts_head {
 	cchar		*fname ;
 	entbuf		*ebmp ;			/* entry-buffer-manager */
 	mapstrint	*nip ;			/* nodename index */
-	time_t		ti_open ;		/* file open time */
-	time_t		ti_access ;		/* file access time */
-	time_t		ti_mod ;		/* file modification time */
+	time_t		tiopen ;		/* file open time */
+	time_t		tiaccess ;		/* file access time */
+	time_t		timod ;			/* file modification time */
 	TS_HDR		h ;
 	TS_FL		fl ;
 	uint		magic ;
