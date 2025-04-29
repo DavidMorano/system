@@ -192,14 +192,14 @@ typedef const unixret_t		cunixret_t ;
 typedef const sysret_t		csysret_t ;
 #endif /* TYPEDEF_CSYSRET */
 
-#ifndef	TYPEDEF_SIGT
-#define	TYPEDEF_SIGT
-#if	(! defined(SYSHAS_TYPESIGT)) || (SYSHAS_TYPESIGT == 0)
+#ifndef	TYPEDEF_SIGF
+#define	TYPEDEF_SIGF
+#if	(! defined(SYSHAS_TYPESIGF)) || (SYSHAS_TYPESIGF == 0)
 EXTERNC_begin
-typedef void (*sig_t)(int) noex ;
+typedef void (*sig_f)(int) noex ;
 EXTERNC_end
 #endif /* syshas */
-#endif /* TYPEDEF_SIGT */
+#endif /* TYPEDEF_SIGF */
 
 #ifndef	TYPEDEF_VOIDF
 #define	TYPEDEF_VOIDF
@@ -241,6 +241,8 @@ typedef unsigned long		ulong ;
 typedef long double		longdouble ;
 #endif /* TYPEDEF_LONGDOUBLE */
 
+/* contstant versions */
+
 #ifndef	TYPEDEF_CBOOL
 #define	TYPEDEF_CBOOL
 typedef const bool		cbool ;
@@ -270,6 +272,16 @@ typedef const int		cint ;
 #define	TYPEDEF_CLONG
 typedef const long		clong ;
 #endif /* TYPEDEF_CULONG */
+
+#ifndef	TYPEDEF_CFLOAT
+#define	TYPEDEF_CFLOAT
+typedef const float		cfloat ;
+#endif /* TYPEDEF_CFLOAT */
+
+#ifndef	TYPEDEF_CDOUBLE
+#define	TYPEDEF_CDOUBLE
+typedef const double		cdouble ;
+#endif /* TYPEDEF_CDOUBLE */
 
 #ifndef	TYPEDEF_CLONGDOUBLE
 #define	TYPEDEF_CLONGDOUBLE
@@ -571,45 +583,6 @@ typedef const time_t		custime ;
 typedef decltype(std::nothrow)	nothrow_t ;
 #endif /* __cplusplus */
 #endif /* TYPEDEF_NOTHROW */
-
-#ifndef	TYPEDEF_ERRNO
-#define	TYPEDEF_ERRNO
-typedef int			errno_t ;
-#endif /* TYPEDEF_ERRNO */
-
-#ifndef	TYPEDEF_UNIXRET
-#define	TYPEDEF_UNIXRET
-typedef int			unixret_t ;
-#endif /* TYPEDEF_UNIXRET */
-
-#ifndef	TYPEDEF_SYSRET
-#define	TYPEDEF_SYSRET
-typedef int			sysret_t ;
-#endif /* TYPEDEF_SYSRET */
-
-#ifndef	TYPEDEF_CERRNO
-#define	TYPEDEF_CERRNO
-typedef const errno_t		cerrno_t ;
-#endif /* TYPEDEF_CERRNO */
-
-#ifndef	TYPEDEF_CUNIXRET
-#define	TYPEDEF_CUNIXRET
-typedef const unixret_t		cunixret_t ;
-#endif /* TYPEDEF_CUNIXRET */
-
-#ifndef	TYPEDEF_CSYSRET
-#define	TYPEDEF_CSYSRET
-typedef const sysret_t		csysret_t ;
-#endif /* TYPEDEF_CSYSRET */
-
-#ifndef	TYPEDEF_SIGT
-#define	TYPEDEF_SIGT
-#if	(! defined(SYSHAS_TYPESIGT)) || (SYSHAS_TYPESIGT == 0)
-EXTERNC_begin
-typedef void (*sig_t)(int) noex ;
-EXTERNC_end
-#endif /* syshas */
-#endif /* TYPEDEF_SIGT */
 
 
 #endif /* UTYPEDEFS_INCLUDE */
