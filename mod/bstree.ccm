@@ -96,8 +96,9 @@ module ;
 
 export module bstree ;
 
-template <typename T,typename Comp = std::less<T>>
-class bstree ;
+export {
+    template <typename T,typename Comp = std::less<T>> class bstree ;
+}
 
 template <typename T,typename Comp = std::less<T>>
 class bstree_iter ;
@@ -241,8 +242,8 @@ struct bstree_depth {
 	} ;
 } ; /* end method (bstree_depth) */
 
-template <typename T,typename Comp>
-class bstree {
+export {
+    template <typename T,typename Comp> class bstree {
 	typedef bstree_depth		depth_t ;
 	typedef bstree_node<T,Comp>	node ;
 	bstree_node<T,Comp>	*root = nullptr ;
@@ -582,7 +583,8 @@ public:
 		}
 	    }
 	    return d ;
-    } ; /* end method (depthrecurse) */
-} ; /* end class (bstree) */
+        } ; /* end method (depthrecurse) */
+    } ; /* end class (bstree) */
+} /* end export */
 
 
