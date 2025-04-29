@@ -35,6 +35,8 @@ DEFS +=
 
 INCS += open.h
 
+MODS +=
+
 LIBS +=
 
 
@@ -166,6 +168,5 @@ opendial.o:		opendial.cc opendial.h		$(INCS)
 splitfname.o:		splitfname.cc splitfname.h	$(INCS)
 
 opensysdbs.o:		opensysdbs.c opensysdbs.h	$(INCS)
-
 
 
