@@ -1,0 +1,80 @@
+/* ulibvals MODULE (System-Values) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* various System-Values */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2001-04-11, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Name:
+	ulibvals
+
+	Description:
+	This module contains a structure (SYSVALS) that itself
+	contains various system related integer values.
+
+	Synopsis:
+	import ulibvals
+	ulibval.{x}
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<bit>			/* |endian(3c++)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<libutil.hh>		/* |xstrlen(3u)| */
+#include	<syswords.hh>		/* |sysword(3u)| */
+#include	<localmisc.h>
+
+export module ulibvals ;
+
+export {
+    struct ulibvals {
+	static const int	endian ;
+	static const int	maxbase ;
+    } ; /* end struct (ulibvals) */
+} /* end export */
+
+export {
+    extern const ulibvals	ulibval ;
+}
+
+using std::endian ;			/* enumeration */
+
+static constexpr int mkendian() noex {
+    	using enum	endian ;	/* get the values */
+    	int	n ;
+	if_constexpr (native == little) {
+	    n = 0 ;
+	} else if_constexpr (native == big) {
+	    n = 1 ;
+	} else {
+	    n = 2 ;
+	}
+	return n ;
+} /* end subroutine (mkendian) */
+
+const int	ulibvals::endian = mkendian() ;
+const int	ulibvals::maxbase = xstrlen(sysword.w_digtab) ;
+
+const ulibvals	ulibval ;
+
+
