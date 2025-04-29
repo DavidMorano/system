@@ -31,8 +31,7 @@
 	Description:
 	This subroutine converts a value (and a base) into its
 	string representation.  It only works for bases that are a
-	power-of-two, and also only for bases up to
-	one-hundred-twenty-eight (128).
+	power-of-two, and also only for bases up to sixty-four (64).
 
 	Synopsis:
 	template<typename UT>
@@ -42,7 +41,7 @@
 	buf		result buffer
 	val		value to convert
 	n		number of bytes in given value to convert, generally:
-				1, 2, 4, 8, 16, 32, 64, 128
+				1, 2, 4, 8, 16, 32, 64
 	b		the base to use, generally:
 				2=binary
 				4=genetic
@@ -50,7 +49,6 @@
 				16=hexadecimal
 				32=
 				64=
-				128=
 
 	Returns:
 	-		length of result characters
@@ -69,12 +67,13 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>
+#include	<libutil.hh>
 
 export module cvtdig ;
 
 import uvariables ;
 
-constexpr int	cvtdig_maxbase = 128 ;	/* largest pow-of-two */
+inline cint	cvtdig_maxbase = xstrlen(sysword.w_digtab) ; /* largest base */
 
 constexpr inline int cvtdig_ffbsi(int b) noex {
 	cuint		ub = uint(b) ;
@@ -84,7 +83,7 @@ constexpr inline int cvtdig_ffbsi(int b) noex {
 
 export {
     template<typename UT>
-    constexpr int cvtdig(char *rbuf,int rlen,UT val,int n,int b) noex {
+    int cvtdig(char *rbuf,int rlen,UT val,int n,int b) noex {
 	cint		nshift = cvtdig_ffbsi(b) ;
 	int		rs = SR_INVALID ;
 	int		ndig = 0 ;
