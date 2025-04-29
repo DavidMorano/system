@@ -21,7 +21,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdarg>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -30,12 +31,12 @@
 
 
 namespace libu {
+    typedef double	dbl ;
     extern int	uloadavgd(double *,int) noex ;
     extern int	snuprintf(char *,int,cchar *,...) noex ;
     extern int	snuloadavgd(char *,int,int,double *,int) noex ;
     extern int	ctdecf(char *,int,int,double) noex ;
-    static inline int snuloadavg(char *rb,int rl,int pr,
-	    double *ap,int al) noex {
+    static inline int snuloadavg(char *rb,int rl,int pr,dbl *ap,int al) noex {
 	return snuloadavgd(rb,rl,pr,ap,al) ;
     }
 }
