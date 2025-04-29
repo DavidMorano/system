@@ -36,6 +36,10 @@ DEFS +=
 INCS += usystem.h localmisc.h
 INCS += uclibsubs.h
 
+MODS += uvariables.ccm ulibvals.ccm
+MODS += bstree.ccm sview.ccm
+MODS += mapblock.ccm memtrack.ccm addrset.ccm
+
 LIBS= -lu
 
 
@@ -451,7 +455,7 @@ strshrink.o:		strshrink.c
  
 # digit-character management
 ndigit.o:		ndigit.cc ndigit.h
-checkbase.o:		checkbase.cc checkbase.h
+checkbase.o:		mods.o checkbase.cc checkbase.h
 
 # malloc
 mallocxx.o:		mallocxx.cc mallocxx.h
@@ -946,14 +950,24 @@ ucprochave.o:		ucprochave.cc ucprochave.h
 
 # BSTREE
 bstree.o:		bstree.ccm			$(INCS)
-	makemodule bstree
 
 # SVIEW
 sview.o:		sview.ccm			$(INCS)
-	makemodule sview
 
 # BUFSIZEDATA
 bufsizedata.o:		bufsizedata.ccm			$(INCS)
 	makemodule bufsizedata
+
+# UVARIABLES
+uvariables.o:		uvariables.ccm
+
+MOBJ += uvariables.o ulibvals.o
+MOBJ += bstree.o sview.o
+MOBJ += mapblock.o memtrack.o addrset.o
+
+ulibvals.o:		ulibvals.ccm
+
+mods.o:			$(MOBJ)
+	$(LD) -r -o $@ $(LDFLAGS) $(MOBJ)
 
 
