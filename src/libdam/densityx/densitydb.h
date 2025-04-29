@@ -84,8 +84,9 @@ typedef	DENSITYDB_ENT		densitydb_ent ;
 EXTERNC_begin
 
 extern int densitydb_open(densitydb *,cchar *,int,int,int) noex ;
-extern int densitydb_check(densitydb *,time_t) noex ;
 extern int densitydb_close(densitydb *) noex ;
+extern int densitydb_check(densitydb *,time_t) noex ;
+extern int densitydb_count(densitydb *) noex ;
 extern int densitydb_curbegin(densitydb *,densitydb_cur *) noex ;
 extern int densitydb_curend(densitydb *,densitydb_cur *) noex ;
 extern int densitydb_curenum(densitydb *,densitydb_cur *,densitydb_ent *) noex ;
