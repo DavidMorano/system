@@ -33,7 +33,10 @@ LINT		?= lint
 
 DEFS=
 
-INCS= cfx.h cfsysx.hh cfutil.h
+INCS= cfx.h cfutil.h
+
+MODS += uvariables.ccm
+MODS += cfalphax.ccm cfcharsx.ccm cfdigx.ccm cfpow.ccm cfsysx.ccm
 
 LIBS=
 
@@ -64,7 +67,7 @@ OBJ5_CFX= cfxxx.o
 OBJ6_CFX= cfa26.o
 OBJ7_CFX= cfnum.o
 OBJ8_CFX= cfutil.o
-
+OBJ9_CFX=
 
 OBJA_CFX= obj0cfx.o obj1cfx.o obj2cfx.o obj3cfx.o
 OBJB_CFX= obj4cfx.o obj5cfx.o obj6cfx.o obj7cfx.o
@@ -73,12 +76,13 @@ OBJC_CFX= obj8cfx.o
 OBJ_CFX= obja_cfx.o objb_cfx.o objc_cfx.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -97,6 +101,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_CFX)
@@ -121,69 +128,83 @@ control:
 
 
 obj0cfx.o:		$(OBJ0_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_CFX)
 
 obj1cfx.o:		$(OBJ1_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_CFX)
 
 obj2cfx.o:		$(OBJ2_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_CFX)
 
 obj3cfx.o:		$(OBJ3_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_CFX)
 
 obj4cfx.o:		$(OBJ4_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_CFX)
 
 obj5cfx.o:		$(OBJ5_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_CFX)
 
 obj6cfx.o:		$(OBJ6_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6_CFX)
 
 obj7cfx.o:		$(OBJ7_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7_CFX)
 
 obj8cfx.o:		$(OBJ8_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ8_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ8_CFX)
 
 obj9cfx.o:		$(OBJ9_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ9_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ9_CFX)
 
 
 obja_cfx.o:		$(OBJA_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_CFX)
 
 objb_cfx.o:		$(OBJB_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_CFX)
 
 objc_cfx.o:		$(OBJC_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_CFX)
 
 
-cfutil.o:		cfutil.cc				$(INCS)
+cfutil.o:		cfutil.cc cfutil.h			$(INCS)
 
-cfchars.o:		cfchars.cc cfchars.h cfcharsx.hh	$(INCS)
-cfbin.o:		cfbin.cc cfbin.h			$(INCS)
-cfoct.o:		cfoct.cc cfoct.h			$(INCS)
-cfdec.o:		cfdec.cc cfdec.h			$(INCS)
-cfdecf.o:		cfdecf.cc cfdecf.h			$(INCS)
-cfdecmf.o:		cfdecmf.cc cfdecmf.h			$(INCS)
-cfdect.o:		cfdect.cc cfdect.h			$(INCS)
-cfhex.o:		cfhex.cc cfhex.h			$(INCS)
-cfxxx.o:		cfxxx.cc cfxxx.h			$(INCS)
-cfnum.o:		cfnum.cc cfnum.h			$(INCS)
-
-cfa26.o:		cfa26.cc cfa26.h cfalphax.o		$(INCS)
-	makemodule cfalphax
-	$(COMPILE.cc) cfa26.cc
+cfchars.o:		mods.o cfchars.cc cfchars.h		$(INCS)
+cfbin.o:		mods.o cfbin.cc cfbin.h			$(INCS)
+cfoct.o:		mods.o cfoct.cc cfoct.h			$(INCS)
+cfdec.o:		mods.o cfdec.cc cfdec.h			$(INCS)
+cfdecf.o:		mods.o cfdecf.cc cfdecf.h		$(INCS)
+cfdecmf.o:		mods.o cfdecmf.cc cfdecmf.h		$(INCS)
+cfdect.o:		mods.o cfdect.cc cfdect.h		$(INCS)
+cfhex.o:		mods.o cfhex.cc cfhex.h			$(INCS)
+cfxxx.o:		mods.o cfxxx.cc cfxxx.h			$(INCS)
+cfnum.o:		mods.o cfnum.cc cfnum.h			$(INCS)
+cfa26.o:		mods.o cfa26.cc cfa26.h			$(INCS)
 
 # algorithms
-cfsysx.o:		cfsysx.cc cfsysx.hh			$(INCS)
-
 cfhexstr.o:		cfhexstr.cc cfhexstr.h			$(INCS)
 
+MOBJA += uvariables.o
+MOBJB += cfalphax.o cfcharsx.o cfdigx.o cfpow.o cfsysx.o
+
+MOBJ= mobja.o mobjb.o
+
+mobja.o:		$(MOBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(MOBJA)
+
+mobjb.o:		$(MOBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(MOBJB)
+
+mods.o:			$(MOBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
+
+uvariables.o:		uvariables.ccm
+
 cfalphax.o:		cfalphax.ccm
-	makemodule cfalphax
+cfcharsx.o:		cfcharsx.ccm cfutil.h
+cfdigx.o:		cfdigx.ccm
+cfpow.o:		cfpow.ccm
+cfsysx.o:		cfsysx.ccm
 
 
