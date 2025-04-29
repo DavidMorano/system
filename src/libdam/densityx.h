@@ -18,6 +18,7 @@
 #include	<densitydb.h>
 #include	<densitydbe.h>
 #include	<densitystat.h>
+#include	<denpercents.h>
 
 
 #endif /* DENSITYX_INCLUDE */
