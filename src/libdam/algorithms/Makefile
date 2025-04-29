@@ -61,6 +61,7 @@ OBJ2= dijkstra1.o dijkstra2.o
 OBJ3= partidxi.o partitionai.o
 OBJ4= msort.o
 OBJ5= sort_insertion.o sort_merge.o
+OBJ6=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB= obj4.o obj5.o
@@ -137,6 +138,9 @@ obj4.o:			$(OBJ4)
 obj5.o:			$(OBJ5)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
 
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6)
+
 
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
@@ -156,9 +160,6 @@ partitionai.o:		partitionai.cc	partitionai.h		$(INCS)
 msort.o:		msort.cc	msort.h			$(INCS)
 
 sort_insertion.o:	sort_insertion.ccm			$(INCS)
-	makemodule sort_insertion
-
 sort_merge.o:		sort_merge.ccm				$(INCS)
-	makemodule sort_merge
 
 
