@@ -30,8 +30,8 @@ struct density_head {
 	ulong		c ;
 	uint		magic ;
 	uint		ovf ;
-	uint		nmax ;
-	uint		len ;
+	int		nmax ;
+	int		len ;
 } ;
 
 struct density_stats {
@@ -39,8 +39,8 @@ struct density_stats {
 	double		var ;
 	ulong		ovf ;
 	ulong		count ;
-	uint		nmax ;
-	uint		len ;
+	int		nmax ;
+	int		len ;
 } ;
 
 typedef	DENSITY		density ;
@@ -51,7 +51,7 @@ EXTERNC_begin
 extern int	density_start(density *,int) noex ;
 extern int	density_update(density *,int) noex ;
 extern int	density_slot(density *,int,ulong *) noex ;
-extern int	density_stats(density *,desnity_st *) noex ;
+extern int	density_getstats(density *,density_st *) noex ;
 extern int	density_finish(density *) noex ;
 
 EXTERNC_end
