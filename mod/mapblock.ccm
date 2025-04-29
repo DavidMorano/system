@@ -287,7 +287,7 @@ export {
     template<typename K,typename B> int mapblock<K,B>::icount() noex {
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
-	    rs = mp->size() ;
+	    rs = intconv(mp->size()) ;
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (mapblock::icount) */
