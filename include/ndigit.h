@@ -42,25 +42,25 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-template<typename T>
-constexpr int ndigit(T v,int b) noex {
-	int		n = 0 ;
-	if (v >= 0) {
-	    const uint	ub = uint(b) ;	/* faster? */
-	    if (b >= 2) {
-	        if (v == 0) {
-	            n = 1 ;
-	        } else {
-	            while (v != 0) {
-	                n += 1 ;
-	                v = (v / ub) ;
-	            }
-		} /* end if (non-zero positive) */
-	    } /* end if (valid base) */
-	} /* end if (valid) */
-	return n ;
+inline int ndigit(int v,int b) noex {
+	return ndigiti(v,b) ;
 }
-/* end subroutine-template (ndigit) */
+inline int ndigit(long v,int b) noex {
+	return ndigitl(v,b) ;
+}
+inline int ndigit(longlong v,int b) noex {
+	return ndigitll(v,b) ;
+}
+
+inline int ndigit(uint v,int b) noex {
+	return ndigitui(v,b) ;
+}
+inline int ndigit(ulong v,int b) noex {
+	return ndigitul(v,b) ;
+}
+inline int ndigit(ulonglong v,int b) noex {
+	return ndigitull(v,b) ;
+}
 
 #endif /* __cplusplus */
 
