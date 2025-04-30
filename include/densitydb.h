@@ -31,21 +31,17 @@
 #include	"densitydbe.h"
 
 
-#define	DENSITYDB_MAGIC		1092847456
+#define	DENSITYDB_MAGIC		0x10928474
 #define	DENSITYDB		struct densitydb_head
-#define	DENSITYDB_CUR		struct densitydb_cursor
 #define	DENSITYDB_FL		struct densitydb_flags
+#define	DENSITYDB_CUR		struct densitydb_cursor
 #define	DENSITYDB_MAGSTR	"densitydb"
-#define	DENSITYDB_MAGLEN	16
+#define	DENSITYDB_MAGSIZ	16
 /* other defines */
 #define	DENSITYDB_FILEVERSION	0
 #define	DENSITYDB_ENDIAN	ENDIAN	/* endian */
 #define	DENSITYDB_ENT		densitydbe
 
-
-struct densitydb_cursor {
-    	int		i ;
-} ;
 
 struct densitydb_flags {
 	uint		fileinit:1 ;		/* file initialized */
@@ -74,6 +70,10 @@ struct densitydb_head {
 	int		cursors ;
 	int		ebs ;		/* entry buffer size */
 	mode_t		om ;
+} ;
+
+struct densitydb_cursor {
+    	int		i ;
 } ;
 
 typedef	DENSITYDB		densitydb ;
