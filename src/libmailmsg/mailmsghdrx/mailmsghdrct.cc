@@ -28,13 +28,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
-#include	<mkpathx.h>
-#include	<char.h>
 #include	<localmisc.h>
 
 #include	"mailmsghdrct.h"
@@ -86,6 +82,7 @@ static inline int mailmsghdrct_magic(mailmsghdrct *op,Args ... args) noex {
 	return rs ;
 }
 /* end subroutine (mailmsghdrct_magic) */
+
 
 /* local variables */
 
