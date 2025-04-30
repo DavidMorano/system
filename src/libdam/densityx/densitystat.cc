@@ -8,13 +8,13 @@
 
 /* revision history:
 
-	= 2002-02-16, David A­D­ Morano
+	= 2000-02-16, David A­D­ Morano
 	This was originally written for performing some statistical
 	calculations for simulation related work.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
