@@ -24,7 +24,7 @@
 	in constant-expression form.  Why was not this done back
 	in like 2020 (or earlier when constand-expression math first
 	became available)?  Who knows?  It takes time to review old
-	code and update it in ways that were not originally availabl.
+	code and update it in ways that were not originally available.
 
 */
 
