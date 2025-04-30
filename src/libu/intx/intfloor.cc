@@ -1,6 +1,6 @@
 /* intfloor SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* Integer-Flooring */
 /* version %I% last-modified %G% */
