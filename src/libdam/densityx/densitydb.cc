@@ -67,13 +67,6 @@ import filemagic ;
 
 /* local defines */
 
-#define	DENSITYDB_FILEMAGICA	"DENSITYDBA"
-#define	DENSITYDB_FILEMAGICB	"DENSITYDBB"
-
-#define	DENSITYDB_FS		"densitydb"
-#define	DENSITYDB_FSA		"densitydba"
-#define	DENSITYDB_FSB		"densitydbb"
-
 #define	DENSITYDB_FLID		(16 + 4)
 #define	DENSITYDB_FLHEAD	filehead::bufsz
 #define	DENSITYDB_FLTOP		(DENSITYDB_FLID + DENSITYDB_FLHEAD)
@@ -140,12 +133,6 @@ namespace {
 	int		off ;			/* file offset of valid area */
 	int		len ;			/* length of valid area */
     } ; /* end struct (buffer) */
-    struct filemagic {
-	char		magic[16] ;
-	uchar		vetu[4] ;
-	int rd(char *) noex ;
-	int wr(cchar *) noex ;
-    } ; /* end struct filemagic) */
  } /* end namespace */
 
 
@@ -221,10 +208,6 @@ static int densitydb_bufbegin(DD *) noex ;
 static int densitydb_bufend(DD *) noex ;
 static int densitydb_writehead(DD *) noex ;
 
-static int filemagic(FM *,char *,int) noex ;
-
-static int matfield(cchar *,int,cchar *,int) noex ;
-
 
 /* local variables */
 
@@ -238,7 +221,7 @@ constexpr cpcchar	localfs[] = {
 	nullptr
 } ;
 
-cint		maglen		= DENSITYDB_MAGLEN ;
+cint		magsiz		= DENSITYDB_MAGSIZ ;
 
 constexpr char	magstr[]	= DENSITYDB_MAGSTR ;
 
@@ -651,7 +634,7 @@ static int densitydb_fileinit(DD *op,time_t dt) noex {
 
 /* file magic */
 
-	        strwcpy(fm.magic,DENSITYDB_FILEMAGICB,14) ;
+	        strwcpy(fm.magic,DENSITYDB_MAGSTR,14) ;
 
 	        fm.vetu[0] = DENSITYDB_FILEVERSION ;
 	        fm.vetu[1] = DENSITYDB_ENDIAN ;
@@ -710,7 +693,7 @@ static int densitydb_fileinit(DD *op,time_t dt) noex {
 
 	        filehead((fbuf + bl),1,&op->h) ;
 
-	        f = (strcmp(fm.magic,DENSITYDB_FILEMAGICB) == 0) ;
+	        f = (strcmp(fm.magic,DENSITYDB_MAGSTR) == 0) ;
 	        f = f && (fm.vetu[0] <= DENSITYDB_FILEVERSION) ;
 	        f = f && (fm.vetu[1] == DENSITYDB_ENDIAN) ;
 	        if (! f)
