@@ -1,6 +1,6 @@
 /* intceil HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C20 */
+/* lang=C20 (conformance reviewed) */
 
 /* Integer-Ceiling */
 /* version %I% last-modified %G% */

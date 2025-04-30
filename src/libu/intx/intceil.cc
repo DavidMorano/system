@@ -1,6 +1,6 @@
 /* intceil SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* Integer-Ceiling */
 /* version %I% last-modified %G% */
@@ -64,7 +64,16 @@
 /* local typedefs */
 
 
-/* local subroutine-templates */
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 template<typename T>
 T xceil(T v,int m) noex {
@@ -72,6 +81,12 @@ T xceil(T v,int m) noex {
 	return (n * m) ;
 }
 /* end subroutine-template (xceil) */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
