@@ -44,6 +44,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<bit>			/* |endian(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
