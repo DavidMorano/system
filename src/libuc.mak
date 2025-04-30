@@ -399,9 +399,6 @@ varray.o:		varray.cc varray.h
 
 lookaside.o:		lookaside.cc lookaside.h
 
-envlist.o:		envlist.cc envlist.h
-envhelp.o:		envhelp.cc envhelp.h
-
 spawner.o:		spawner.cc spawner.h
 
 nulstr.o:		nulstr.cc nulstr.h
@@ -729,6 +726,11 @@ envs.o:			envs.dir
 envs.dir:
 	makesubdir $@
 
+# ENVX
+envx.o:			envx.dir
+envx.dir:
+	makesubdir $@
+
 # FILER
 filer.o:		filer.dir
 filer.dir:
@@ -894,7 +896,6 @@ sif.o:			sif.cc		sif.hh
 bufstr.o:		bufstr.cc bufstr.h
 syspasswd.o:		syspasswd.cc syspasswd.h
 absfn.o:		absfn.cc absfn.h
-envmgr.o:		envmgr.cc envmgr.h
 
 # sring-comparisons
 vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h
@@ -921,8 +922,6 @@ stpcpyxc.o:		stpcpyxc.cc stpcpyxc.h
 
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 readln.o:		readln.cc readln.hh
-strlibval.o:		strlibval.cc strlibval.hh
-strenv.o:		strenv.cc strenv.hh
 strwcmp.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
 xperm.o:		xperm.cc xperm.h ids.h
@@ -941,12 +940,19 @@ xfile.o:		xfile.cc xfile.h
 sysmemutil.o:		sysmemutil.cc sysmemutil.h
 mailvalues.o:		mailvalues.cc mailvalues.hh
 
+# integer-conversion-to-string-digits
+strval.o:		uvariables.o strval.cc strval.h
+
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h
 umask.o:		umask.cc umask.h
 unameo.o:		unameo.cc unameo.h
 ucrand.o:		ucrand.cc ucrand.h
 ucprochave.o:		ucprochave.cc ucprochave.h
+
+# environment related string values
+strlibval.o:		strlibval.cc strlibval.hh
+strenv.o:		uvariables.o strenv.cc strenv.hh
 
 # BSTREE
 bstree.o:		bstree.ccm			$(INCS)
@@ -959,12 +965,15 @@ bufsizedata.o:		bufsizedata.ccm			$(INCS)
 	makemodule bufsizedata
 
 # UVARIABLES
-uvariables.o:		uvariables.ccm
+uvariables.o:		valuelims.o digbufsizes.o uvariables.ccm
 
+MOBJ += valuelims.o digbufsizes.o 
 MOBJ += uvariables.o ulibvals.o
 MOBJ += bstree.o sview.o
 MOBJ += mapblock.o memtrack.o addrset.o
 
+valuelims.o:		valuelims.ccm
+digbufsizes.o:		digbufsizes.ccm
 ulibvals.o:		ulibvals.ccm
 
 mods.o:			$(MOBJ)
