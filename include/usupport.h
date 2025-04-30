@@ -114,12 +114,14 @@ namespace libu {
 namespace libu {
     extern int snwcpy(char *,int,cchar *,int = -1) noex ;
     extern int sncpy1(char *,int,cchar *) noex ;
-    extern int ctdecui(char *,int,uint) noex ;
-    extern int ctdecul(char *,int,ulong) noex ;
-    extern int ctdecull(char *,int,ulonglong) noex ;
     inline int sncpy(char *dp,int dl,cchar *sp) noex {
 	return sncpy1(dp,dl,sp) ;
     }
+}
+namespace libu {
+    extern int ctdecui(char *,int,uint) noex ;
+    extern int ctdecul(char *,int,ulong) noex ;
+    extern int ctdecull(char *,int,ulonglong) noex ;
     template<typename T> inline int ctdec(char *,int,T v) noex {
 	return 0 ;
     }
