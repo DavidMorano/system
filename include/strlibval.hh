@@ -66,7 +66,7 @@ enum strlibvals {
 	strlibval_orgloc,
 	strlibval_orgcode,
 	strlibval_overlast
-} ;
+} ; /* end enum (strlibvals) */
 
 class strlibval {
 	cchar		*strp = nullptr ;
