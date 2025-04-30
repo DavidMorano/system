@@ -35,7 +35,8 @@ DEFS +=
 
 INCS += libu.h
 
-MODS += valuelims.ccm digbufsizes.ccm uvariables.ccm ulibvals.ccm
+MODS += valuelims.ccm digbufsizes.ccm uvariables.ccm 
+MODS += usysconf.ccm ulibvals.ccm
 
 LIBS += -liconv
 
@@ -351,10 +352,15 @@ uvariables1.o:		uvariables.ccm uvariables1.cc
 	makemodule uvariables
 	$(COMPILE.cc) uvariables1.cc
 
-# ULIBVALS
-ulibvals.o:		syswords.o uvariables.o ulibvals.ccm
+usysconf.o:		usysconf.ccm
 
-MOBJ += valuelims.o digbufsizes.o uvariables.o ulibvals.o
+# ULIBVALS
+ulibvals.o:		usysconf.o ulibvals.ccm
+	makemodule usysconf
+	makemodule ulibvals
+
+MOBJ += valuelims.o digbufsizes.o uvariables.o 
+MOBJ += usysconf.o ulibvals.o
 
 # MODS
 mods.o:		$(MOBJ)
