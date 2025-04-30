@@ -42,7 +42,7 @@
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>
-#include	<hasx.h>
+#include	<hasx.h>		/* |hasNotDots(3uc)| */
 #include	<localmisc.h>
 
 #include	"dirempty.h"
