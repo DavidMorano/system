@@ -34,10 +34,54 @@ struct densitydbe_head {
 	uint		utime ;		/* update time */
 } ;
 
+#ifdef	__cplusplus
+enum densitydbemems {
+    	densitydbemem_start,
+	densitydbemem_entsz,
+	densitydbemem_finish,
+	densitydbemem_overlast
+} ;
+struct densitydbe ;
+struct densitydbe_co {
+	densitydbe	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (densitydbe *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (densitydbe_co) */
+struct densitydbe : densitydbe_head {
+	densitydbe_co	start ;
+	densitydbe_co	entsz ;
+	densitydbe_co	finish ;
+	densitydbe() noex {
+	    start(this,densitydbemem_start) ;
+	    entsz(this,densitydbemem_entsz) ;
+	    finish(this,densitydbemem_finish) ;
+	} ;
+	densitydbe(const densitydbe &) = delete ;
+	densitydbe &operator = (const densitydbe &) = delete ;
+	int rd(char *,int) noex ;
+	int wr(cchar *,int) noex ;
+	operator int () noex ;
+	void dtor() noex ;
+	~densitydbe() {
+	    dtor() ;
+	} ;
+} ; /* end struct (densitydbe) */
+#else	/* __cplusplus */
 typedef	DENSITYDBE	densitydbe ;
+#endif /* __cplusplus */
+
 
 EXTERNC_begin
 
+extern int densitydbe_start(densitydbe *) noex ;
+extern int densitydbe_finish(densitydbe *) noex ;
 extern int densitydbe_rd(densitydbe *,char *,int) noex ;
 extern int densitydbe_wr(densitydbe *,cchar *,int) noex ;
 extern int densitydbe_entsz(densitydbe *) noex ;

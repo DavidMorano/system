@@ -66,6 +66,23 @@
 
 /* exported subroutines */
 
+int densitydbe_start(densitydbe *op) noex {
+    	DENSITYDBE	*hop = op ;
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+
+int densitydbe_finish(densitydbe *op) noex {
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+
 int densitydbe_wr(densitydbe *op,cchar *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
@@ -111,5 +128,45 @@ int densitydbe_entsz(densitydbe *op) noex {
 	return rs ;
 }
 /* end subroutine (densitydbe_entsz) */
+
+
+/* private subroutines */
+
+int densitydbe::wr(cchar *mbuf,int mlen) noex {
+	return densitydbe_wr(this,mbuf,mlen) ;
+}
+
+int densitydbe::rd(char *mbuf,int mlen) noex {
+	return densitydbe_rd(this,mbuf,mlen) ;
+}
+
+void densitydbe::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("densitydbe",rs,"fini-finish") ;
+	}
+}
+
+densitydbe::operator int () noex {
+	return densitydbe_entsz(this) ;
+}
+
+densitydbe_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case densitydbemem_start:
+	        rs = densitydbe_start(op) ;
+	        break ;
+	    case densitydbemem_entsz:
+	        rs = densitydbe_entsz(op) ;
+	        break ;
+	    case densitydbemem_finish:
+	        rs = densitydbe_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (densitydbe_co::operator) */
 
 
