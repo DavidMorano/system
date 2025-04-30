@@ -58,9 +58,10 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0= density.o 
-OBJ1= densityx_filehead.o densitydb.o densitydbe.o
-OBJ2= densitystati.o densitystatl.o
-OBJ3= 
+OBJ1= densityx_filehead.o densitydbe.o
+#OBJ1= densityx_filehead.o densitydb.o densitydbe.o
+OBJ2= densitystat.o denpercents.o
+OBJ3=
 
 OBJA= obj0.o obj1.o obj2.o
 
@@ -141,7 +142,9 @@ objb.o:			$(OBJB)
 density.o:		mods.o density.cc	density.h	$(INCS)
 densitydb.o:		mods.o densitydb.cc	densitydb.h	$(INCS)
 densitydbe.o:		mods.o densitydbe.cc	densitydbe.h	$(INCS)
+
 densitystat.o:		mods.o densitystat.cc	densitystat.h	$(INCS)
+denpercents.o:		denpercents.cc denpercents.h		$(INCS)
 
 mods.o:			densityx_filehead.o filemagic.o
 	$(LD) -r $(LDFLAGS) -o $@ densityx_filehead.o filemagic.o
