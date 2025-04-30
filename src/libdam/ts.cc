@@ -281,8 +281,8 @@ static inline int ts_magic(ts *op,Args ... args) noex {
 static int	ts_fileopen(ts *,time_t) noex ;
 static int	ts_fileclose(ts *) noex ;
 static int	ts_filesetinfo(ts *,time_t) noex ;
-static int	ts_lockget(ts *,time_t,int) noex ;
-static int	ts_lockrelease(ts *) noex ;
+static int	ts_lockacq(ts *,time_t,int) noex ;
+static int	ts_lockrel(ts *) noex ;
 static int	ts_filebegin(ts *,time_t) noex ;
 static int	ts_acquire(ts *,time_t,int) noex ;
 static int	ts_filecheck(ts *,time_t) noex ;
@@ -441,7 +441,7 @@ int ts_curend(ts *op,ts_cur *curp) noex {
 	if ((rs = ts_magic(op,curp)) >= 0) {
 	    bool	f = true ;
 	    if (op->fl.cursoracc) {
-	        op->ti_access = getustime ;
+	        op->tiaccess = getustime ;
 	    } /* end if */
 	    if (op->ncursors > 0) {
 	        op->ncursors -= 1 ;
@@ -449,7 +449,7 @@ int ts_curend(ts *op,ts_cur *curp) noex {
 	    f = f && (op->ncursors == 0) ;
 	    f = f && (op->fl.lockedread || op->fl.lockedwrite) ;
 	    if (f) {
-	        rs1 = ts_lockrelease(op) ;
+	        rs1 = ts_lockrel(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    curp->i = -1 ;
@@ -499,11 +499,11 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	            } /* end if */
 		    /* optionally release our lock */
 	            if (op->ncursors == 0) {
-	                rs = ts_lockrelease(op) ;
+	                rs = ts_lockrel(op) ;
 	            }
 		    /* update access time as appropriate */
 	            if (op->ncursors == 0) {
-	                op->ti_access = dt ;
+	                op->tiaccess = dt ;
 	            } else {
 	                op->fl.cursoracc = true ;
 	            }
@@ -588,12 +588,12 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	        } /* end if (updating header-table) */
 	        /* optionally release our lock if no cursor outstanding */
 	        if ((rs >= 0) && (op->ncursors == 0)) {
-	    	    rs = ts_lockrelease(op) ;
+	    	    rs = ts_lockrel(op) ;
 		}
 		/* update access time as appropriate */
 	        if (op->ncursors == 0) {
 	            if (dt == 0) dt = getustime ;
-	            op->ti_access = dt ;
+	            op->tiaccess = dt ;
 	        } else {
 	            op->fl.cursoracc = true ;
 	        }
@@ -629,8 +629,8 @@ int ts_check(ts *op,time_t dt) noex {
 	    if (op->fd >= 0) {
 	        if ((! op->fl.lockedread) && (! op->fl.lockedwrite)) {
 	            if (dt == 0) dt = getustime ;
-	            f = ((dt - op->ti_access) >= TO_ACCESS) ;
-	            f = f || ((dt - op->ti_open) >= TO_OPEN) ;
+	            f = ((dt - op->tiaccess) >= TO_ACCESS) ;
+	            f = f || ((dt - op->tiopen) >= TO_OPEN) ;
 	            if (f) {
 	                rs = ts_fileclose(op) ;
 	            }
@@ -689,13 +689,13 @@ static int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
 	} /* end if (updating header-table) */
 	/* optionally release lock if we did not have a cursor outstanding */
 	if (op->ncursors == 0) {
-	    rs1 = ts_lockrelease(op) ;
+	    rs1 = ts_lockrel(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 	/* update access time as appropriate */
 	if (op->ncursors == 0) {
 	    if (dt == 0) dt = getustime ;
-	    op->ti_access = dt ;
+	    op->tiaccess = dt ;
 	} else {
 	    op->fl.cursoracc = true ;
 	}
@@ -782,12 +782,12 @@ static int ts_acquire(ts *op,time_t dt,int f_read) noex {
 	if ((rs = ts_fileopen(op,dt)) >= 0) {
 	    bool	f ;
 	    if ((! f_read) && op->fl.lockedread) {
-	        rs = ts_lockrelease(op) ;
+	        rs = ts_lockrel(op) ;
 	    }
 	    /* capture the lock if we do not already have it */
 	    f = (op->fl.lockedread || op->fl.lockedwrite) ;
 	    if ((rs >= 0) && (! f)) {
-	        if ((rs = ts_lockget(op,dt,f_read)) >= 0) {
+	        if ((rs = ts_lockacq(op,dt,f_read)) >= 0) {
 	            f_changed = (rs > 0) ;
 	            if ((rs = ts_filecheck(op,dt)) >= 0) {
 	                f_changed = f_changed || (rs > 0) ;
@@ -811,11 +811,11 @@ static int ts_filebegin(ts *op,time_t dt) noex {
 	    op->fl.fileinit = false ;
 	    if (op->fl.writable) {
 		if (op->fl.lockedread) {
-		    rs = ts_lockrelease(op) ;
+		    rs = ts_lockrel(op) ;
 		}
 	        if ((rs >= 0) && (! op->fl.lockedwrite)) {
 	            f_locked = true ;
-	            rs = ts_lockget(op,dt,0) ;
+	            rs = ts_lockacq(op,dt,0) ;
 	        }
 		if (rs >= 0) {
 	            rs = ts_filetopwrite(op,dt) ;
@@ -826,7 +826,7 @@ static int ts_filebegin(ts *op,time_t dt) noex {
 	    /* read the file header */
 	    bool	f = (op->fl.lockedread || op->fl.lockedwrite) ;
 	    if (! f) {
-	        rs = ts_lockget(op,dt,1) ;
+	        rs = ts_lockacq(op,dt,1) ;
 	        f_locked = (rs >= 0) ;
 	    }
 	    if (rs >= 0) {
@@ -842,7 +842,7 @@ static int ts_filebegin(ts *op,time_t dt) noex {
 	} /* end if */
 	/* if we locked, we unlock it, otherwise leave it! */
 	if (f_locked) {
-	    ts_lockrelease(op) ;
+	    ts_lockrel(op) ;
 	}
 	return rs ;
 }
@@ -980,7 +980,7 @@ static int ts_headtab(ts *op,funmode fc) noex {
 /* end subroutine (ts_headtab) */
 
 /* acquire access to the file */
-static int ts_lockget(ts *op,time_t dt,int f_read) noex {
+static int ts_lockacq(ts *op,time_t dt,int f_read) noex {
 	int		rs ;
 	int		f_changed = false ;
 	if ((rs = ts_fileopen(op,dt)) >= 0) {
@@ -1015,13 +1015,13 @@ static int ts_lockget(ts *op,time_t dt,int f_read) noex {
 		    /* has the file changed at all? */
 	            if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 			f_changed = f_changed || (sb.st_size != op->filesize) ;
-			f_changed = f_changed || (sb.st_mtime != op->ti_mod) ;
+			f_changed = f_changed || (sb.st_mtime != op->timod) ;
 		        if (f_changed) {
 	    		    if (op->fl.bufvalid) {
 				op->fl.bufvalid = false ;
 			    }
 	    		    op->filesize = intsat(sb.st_size) ;
-	    		    op->ti_mod = sb.st_mtime ;
+	    		    op->timod = sb.st_mtime ;
 			} /* end if */
 	                if (op->filesize < taboff) {
 	                    op->fl.fileinit = false ;
@@ -1046,9 +1046,9 @@ static int ts_lockget(ts *op,time_t dt,int f_read) noex {
 	} /* end if (ts_fileopen) */
 	return (rs >= 0) ? f_changed : rs ;
 }
-/* end subroutine (ts_lockget) */
+/* end subroutine (ts_lockacq) */
 
-static int ts_lockrelease(ts *op) noex {
+static int ts_lockrel(ts *op) noex {
 	int		rs = SR_OK ;
 	if ((op->fl.lockedread || op->fl.lockedwrite)) {
 	    if (op->fd >= 0) {
@@ -1069,7 +1069,7 @@ static int ts_lockrelease(ts *op) noex {
 	} /* end if (there was a possible lock set) */
 	return rs ;
 }
-/* end subroutine (ts_lockrelease) */
+/* end subroutine (ts_lockrel) */
 
 static int ts_fileopen(ts *op,time_t dt) noex {
 	int	rs = SR_OK ;
@@ -1089,7 +1089,7 @@ static int ts_fileopen(ts *op,time_t dt) noex {
 	    } /* end if (creating file) */
 	    if (rs >= 0) {
 	        if (dt == 0) dt = getustime ;
-	        op->ti_open = dt ;
+	        op->tiopen = dt ;
 	        if ((rs = uc_closeonexec(op->fd,true)) >= 0) {
 	            if ((rs = ts_filesetinfo(op,dt)) >= 0) {
 	    	        rs = ts_ebufstart(op) ;
@@ -1126,7 +1126,7 @@ static int ts_filesetinfo(ts *op,time_t dt) noex {
 	(void) dt ;
 	op->fl.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
 	if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
-	    op->ti_mod = sb.st_mtime ;
+	    op->timod = sb.st_mtime ;
 	    op->filesize = intsat(sb.st_size) ;
 	    if (char *fsbuf ; (rs = malloc_fs(&fsbuf)) >= 0) {
 		cint	fslen = rs ;
