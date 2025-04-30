@@ -29,8 +29,8 @@
 #include	<atomic>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usupport.h>
 #include	<timewatch.hh>		/* |timewatch(3u)| */
 
 #include	"aflag.hh"
