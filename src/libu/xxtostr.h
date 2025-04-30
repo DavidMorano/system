@@ -63,22 +63,19 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<limits.h>		/* |LONG_MAX| */
-#include	<string.h>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usupport.h>
-#include	<varnames.hh>
+#include	<libutil.hh>		/* |cstrlen(3u)| */
+#include	<syswords.hh>
 #include	<stdintx.h>
 
 
 #ifdef	__cplusplus
 
-import uvariables ;
-
-static cint		xxtostr_maxbase = cstrlen(sysword.w_digtab) ;
+inline cint		xxtostr_maxbase = cstrlen(sysword.w_digtab) ;
 
 template<typename UT>
 inline int uxxtostr(char *endp,int b,UT v) noex {
