@@ -8,13 +8,13 @@
 
 /* revision history:
 
-	= 2002-02-16, David A­D­ Morano
+	= 2000-02-16, David A­D­ Morano
         This was written for some statistics gathering for some software
         evaluation.
 
 */
 
-/* Copyright © 2002 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -104,7 +104,7 @@ int density_start(density *op,int len) noex {
 	    if (len > 0) {
 	        cint	sz = (len + 1) * szof(ulong) ;
 	        if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
-	            op->a = p ;
+	            op->a = ulongp(p) ;
 	            memclear(op->a,sz) ;
 	            op->len = len ;
 	            op->magic = DENSITY_MAGIC ;
@@ -168,7 +168,7 @@ int density_slot(density *op,int ai,ulong *rp) noex {
 }
 /* end subroutine (density_slot) */
 
-int density_stats(density *op,density_st *sp) noex {
+int density_getstats(density *op,density_st *sp) noex {
 	int		rs ;
 	if ((rs = density_magic(op,sp)) >= 0) {
 	    cint	len = int(op->len) ;
@@ -188,6 +188,6 @@ int density_stats(density *op,density_st *sp) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (density_stats) */
+/* end subroutine (density_getstats) */
 
 
