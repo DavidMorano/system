@@ -34,7 +34,6 @@
 #include	<sncpyxc.h>		/* repeat? */
 #include	<sncpyxw.h>		/* repeat? */
 #include	<snxxx.h>
-#include	<snuuid.h>
 #include	<snadd.h>
 #include	<sntmtime.h>
 #include	<snflags.h>
