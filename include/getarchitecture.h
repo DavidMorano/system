@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* get the best approximation of the username of the current user */
+/* get the machine architecture string of the current system */
 /* version %I% last-modified %G% */
 
 
