@@ -31,17 +31,52 @@
 #define	FSDIRTREE_STAT		USTAT
 #define	FSDIRTREE_MAGIC		0x98653217
 /* options */
-#define	FSDIRTREE_MFOLLOW	(1<<0)	/* follow symbolic links */
-#define	FSDIRTREE_MLINK		(1<<1)
-#define	FSDIRTREE_MREG		(1<<2)
-#define	FSDIRTREE_MBLOCK	(1<<3)
-#define	FSDIRTREE_MCHAR		(1<<4)
-#define	FSDIRTREE_MPIPE		(1<<5)
-#define	FSDIRTREE_MSOCK		(1<<6)
-#define	FSDIRTREE_MDIR		(1<<7)
-#define	FSDIRTREE_MNOENT	(1<<8)
-#define	FSDIRTREE_MUNIQ		(1<<9)	/* unique directories */
-#define	FSDIRTREE_MUNIQDIR	FSDIRTREE_MUNIQ
+enum fsdirtreeos {
+    fsdirtreeo_follow,
+    fsdirtreeo_lnk,
+    fsdirtreeo_reg,
+    fsdirtreeo_blk,
+    fsdirtreeo_chr,
+    fsdirtreeo_pipe,
+    fsdirtreeo_sock,
+    fsdirtreeo_dir,
+    fsdirtreeo_noent,
+    fsdirtreeo_uniqfile,
+    fsdirtreeo_uniqdir,
+    fsdirtreeo_igndotfile,
+    fsdirtreeo_igndotdir,
+    fsdirtreeo_overlast
+} ; /* end enum (fsdirtreeos) */
+/* masks */
+struct fsdirtreems {
+    static int	follow ;
+    static int	lnk ;
+    static int	reg ;
+    static int	blk ;
+    static int	chr ;
+    static int	pipe ;
+    static int	sock ;
+    static int	dir ;
+    static int	noent ;
+    static int	uniqfile ;
+    static int	uniqdir ;
+    static int	igndotfile ;
+    static int	igndotdir ;
+} ; /* end struct (fsdirtreems) */
+/* options */
+#define	FSDIRTREE_MFOLLOW	(1<<	    fsdirtreeo_follow)
+#define	FSDIRTREE_MLINK		(1<<	    fsdirtreeo_lnk)
+#define	FSDIRTREE_MREG		(1<<	    fsdirtreeo_reg)
+#define	FSDIRTREE_MBLOCK	(1<<	    fsdirtreeo_blk)
+#define	FSDIRTREE_MCHAR		(1<<	    fsdirtreeo_chr)
+#define	FSDIRTREE_MPIPE		(1<<	    fsdirtreeo_pipe)
+#define	FSDIRTREE_MSOCK		(1<<	    fsdirtreeo_sock)
+#define	FSDIRTREE_MDIR		(1<<	    fsdirtreeo_dir)
+#define	FSDIRTREE_MNOENT	(1<<	    fsdirtreeo_noent)
+#define	FSDIRTREE_MUNIQFILE	(1<<	    fsdirtreeo_uniqfile)
+#define	FSDIRTREE_MUNIQDIR	(1<<	    fsdirtreeo_uniqdir)
+#define	FSDIRTREE_MIGNDOTFILE	(1<<	    fsdirtreeo_igndotfile)
+#define	FSDIRTREE_MIGNDOTDIR	(1<<	    fsdirtreeo_igndotdir)
 
 
 struct fsdirtree_flags {
@@ -59,6 +94,7 @@ struct fsdirtree_head {
 	fifostr		*dqp ;		/* directory-queue-pointer */
 	fsdir		*dirp ;		/* directory-pointer */
 	hdb		*dip ;		/* directory-id-pointer */
+	FSDIRTREE_FL	fl ;
 	uint		magic ;
 	int		opts ;
 	int		bndlen ;
@@ -66,7 +102,6 @@ struct fsdirtree_head {
 	int		bnlen ;
 	int		nlen ;
 	int		llen ;
-	FSDIRTREE_FL	f ;
 } ;
 
 typedef FSDIRTREE	fsdirtree ;
