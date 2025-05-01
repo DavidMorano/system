@@ -361,7 +361,7 @@ typedef const char		cc ;
 #define	LINEBUFLEN	MAXLINELEN
 #endif
 
-/* common digit base (bases 8, 10, 16) buffer lengths */
+/* common digit base (2, 8, 10, 16) buffer lengths (convenience defines) */
 
 #ifndef	BINBUFLEN
 #define	BINBUFLEN	256		/* can hold |int256_t| in binary */
