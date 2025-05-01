@@ -33,11 +33,11 @@
 namespace libu {
     typedef double	dbl ;
     extern int	uloadavgd(double *,int) noex ;
-    extern int	snuprintf(char *,int,cchar *,...) noex ;
-    extern int	snuloadavgd(char *,int,int,double *,int) noex ;
+    extern int	snprintf(char *,int,cchar *,...) noex ;
+    extern int	snloadavgd(char *,int,int,double *,int) noex ;
     extern int	ctdecf(char *,int,int,double) noex ;
-    static inline int snuloadavg(char *rb,int rl,int pr,dbl *ap,int al) noex {
-	return snuloadavgd(rb,rl,pr,ap,al) ;
+    static inline int snloadavg(char *rb,int rl,int pr,dbl *ap,int al) noex {
+	return snloadavgd(rb,rl,pr,ap,al) ;
     }
 }
 
