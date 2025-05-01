@@ -75,6 +75,7 @@ extern usys_mtime	getmtime ;
 #ifndef	OBJECT_GETUSTIME
 #define	OBJECT_GETUSTIME
 #ifdef	__cplusplus
+
 namespace libu {
     struct ugetustime {
 	operator time_t () noex {
@@ -85,7 +86,9 @@ namespace libu {
 	} ;
    } ; /* end struct (getustime) */
 }
+
 extern libu::ugetustime	getustime ;
+
 #endif /* __cplusplus */
 #endif /* OBJECT_GETUSTIME */
 
