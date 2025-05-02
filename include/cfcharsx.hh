@@ -31,9 +31,13 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<charconv>
-#include	<usystem.h>
-#include	<stdintx.h>
-#include	<cfutil.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<stdintx.h>		/* extended integer types */
+#include	<cfutil.h>		/* |cstrlen(3u)| */
 #include	<localmisc.h>
 
 export module cfcharsx ;
