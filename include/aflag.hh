@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2020-01-13, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services.
+	= 2011-07-12, David A­D­ Morano
+        This code was originally written.
 
 */
 
-/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	AFLAG_INCLUDE
 #define	AFLAG_INCLUDE
