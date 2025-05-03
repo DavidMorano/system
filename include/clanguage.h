@@ -124,6 +124,7 @@
 #define	cast_bit		bit_cast
 #define	cast_saturate		saturate_cast
 #define	cast_any		any_cast
+#define	assert_static		static_assert
 #endif
 #endif /* __cplusplus */
 
