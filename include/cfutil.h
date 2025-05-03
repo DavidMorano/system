@@ -33,6 +33,7 @@ namespace cfx {
     extern int	rmleadzero(cchar *,int) noex ;
     extern int	sfdigs(cchar *,int,cchar **) noex ;
     extern int	sfchars(cchar *,int,cchar **) noex ;
+    extern int	getsign(cchar *,int,bool *) noex ;
 }
 
 #endif /* __cplusplus */
