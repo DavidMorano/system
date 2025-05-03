@@ -31,16 +31,14 @@
 #include	<cfoct.h>
 #include	<cfdec.h>
 #include	<cfhex.h>
-#include	<cfchars.h>
-#include	<cfa26.h>
 #include	<cfxxx.h>
+#include	<cfchars.h>
 
 #include	<cfdect.h>
+#include	<cfa26.h>
 #include	<cfdecf.h>
 #include	<cfdecmf.h>
 #include	<cfnum.h>
-
-#include	<cfdouble.h>
 #include	<cfhexs.h>
 
 
