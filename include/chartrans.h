@@ -24,8 +24,8 @@
 
 
 #define	CHARTRANS	struct chartrans_head
-#define	CHARTRANS_SET	struct chartrans_seter
 #define	CHARTRANS_FL	struct chartrans_flags
+#define	CHARTRANS_SET	struct chartrans_seter
 #define	CHARTRANS_MAGIC	0x67298361
 #define	CHARTRANS_NCS	"UCS-4"			/* native character-set */
 
@@ -60,11 +60,11 @@ typedef	CHARTRANS_SET	chartrans_set ;
 
 EXTERNC_begin
 
-extern int chartrans_open(chartrans *,cchar *,int) noex ;
+extern int chartrans_open(chartrans *,cc *,int) noex ;
 extern int chartrans_close(chartrans *) noex ;
-extern int chartrans_transbegin(chartrans *,time_t,cchar *,int) noex ;
+extern int chartrans_transbegin(chartrans *,time_t,cc *,int) noex ;
 extern int chartrans_transend(chartrans *,int) noex ;
-extern int chartrans_transread(chartrans *,int,wchar_t *,int,cchar *,int) noex ;
+extern int chartrans_transread(chartrans *,int,wchar_t *,int,cc *,int) noex ;
 
 EXTERNC_end
 
