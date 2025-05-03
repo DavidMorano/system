@@ -49,12 +49,23 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 
+#include	<aflag.hh>
 #include	<usys.h>	/* <- auxilllary OS support */
+#include	<memx.h>
+#include	<libutil.hh>
+#include	<endian.h>
 
 #include	<usysop.h>	/* UNIX® system-operations */
 #include	<usysdata.h>	/* UNIX® system-data */
-#include	<ugetloadavg.h>
+#include	<usysutility.hh>
+#include	<usysauxinfo.h>
+#include	<usysdata.h>
+#include	<usysinfo.h>
+#include	<usystem.h>
+
 #include	<um.h>		/* UNIX® memory-management */
 #include	<uipc.h>	/* UNIX® System V IPC */
 #include	<ustr.h>	/* UNIX® STREAMS® */
@@ -64,10 +75,27 @@
 #include	<usig.h>
 #include	<uprocess.h>
 #include	<uexec.h>
+#include	<utimeoutdefs.h>
+#include	<utimeout.h>
+#include	<utimeouts.h>
+#include	<ulogerror.h>
 
+#include	<varnames.hh>
+#include	<syswords.hh>
+#include	<sysconfcmds.h>
 #include	<ptx.h>
 #include	<strnul.hh>
+#include	<mailvalues.hh>
 #include	<intx.h>
+#include	<timewatch.hh>
+#include	<timecount.hh>
+#include	<timeval.h>
+#include	<timespec.h>
+#include	<itimerval.h>
+#include	<itimerspec.h>
+
+#include	<xxtostr.h>
+#include	<strtox.h>
 
 
 #endif /* USYSCALLS_INCLUDE */
