@@ -38,8 +38,8 @@
 
 
 struct mailvalues {
-	static const int	hostnamemult ;
 	static const int	nodenamemult ;
+	static const int	hostnamemult ;
 	static const int	mailaliaslen ;
 } ; /* end struct (mailvalues) */
 
