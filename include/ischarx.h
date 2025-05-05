@@ -70,11 +70,11 @@ constexpr inline bool	isplusminus(int ch) noex {
 }
 constexpr inline bool	isabbr(int ch) noex {
 	ch &= UCHAR_MAX ;
-	return (ch == '.') || (ch == ('­' & UCHAR_MAX)) ;
+	return (ch == '.') || (ch == ('­' & UCHAR_MAX)) || (ch == '-') ;
 }
 
 constexpr inline bool	isspacetab(int ch) noex {
-	return ((ch == ' ') || (ch == '\t')) ;
+	return (ch == ' ') || (ch == '\t') ;
 }
 
 #else /* __cplusplus */
@@ -103,7 +103,7 @@ static inline bool	isabbr(int ch) noex {
 }
 
 static inline bool	isspacetab(int ch) noex {
-	return ((ch == ' ') || (ch == '\t')) ;
+	return (ch == ' ') || (ch == '\t') ;
 }
 
 #endif /* __cplusplus */
