@@ -192,6 +192,7 @@ typedef const unixret_t		cunixret_t ;
 typedef const sysret_t		csysret_t ;
 #endif /* TYPEDEF_CSYSRET */
 
+/* this next type-def is related to the one afterwards */
 #ifndef	TYPEDEF_SIGF
 #define	TYPEDEF_SIGF
 #if	(! defined(SYSHAS_TYPESIGF)) || (SYSHAS_TYPESIGF == 0)
@@ -200,6 +201,22 @@ typedef void (*sig_f)(int) noex ;
 EXTERNC_end
 #endif /* syshas */
 #endif /* TYPEDEF_SIGF */
+
+/****
+The following is declared in the Apple-Darwin operating sytem.  So
+in order to be portable everywhere else, we have to declared this
+everywhere else also.  This is done so that the following type-def
+is not accidentally declared elsewhere and used for a purpose other
+than what Apple-Darwin is using it for.
+****/
+#ifndef	TYPEDEF_SIGT
+#define	TYPEDEF_SIGT
+#if	(! defined(SYSHAS_TYPESIGT)) || (SYSHAS_TYPESIGT == 0)
+EXTERNC_begin
+typedef void (*sig_t)(int) noex ;
+EXTERNC_end
+#endif /* syshas */
+#endif /* TYPEDEF_SIGT */
 
 #ifndef	TYPEDEF_VOIDF
 #define	TYPEDEF_VOIDF
