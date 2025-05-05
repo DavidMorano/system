@@ -29,13 +29,14 @@
 
 #define	HEXDECODER_MAGIC	0x13f3c202
 #define	HEXDECODER		struct hexdecoder_head
+#define	HEXDECODER_NSTAGE	2
 
 
 struct hexdecoder_head {
 	void		*outbuf ;	/* output-buffer */
 	uint		magic ;
 	int		rl ;		/* residue length ('0' or '1') */
-	char		rb[2] ;		/* residue buffer */
+	char		rb[HEXDECODER_NSTAGE + 1] ; /* staging buffer */
 } ;
 
 typedef HEXDECODER	hexdecoder ;
