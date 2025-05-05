@@ -26,6 +26,7 @@ EXTERNC_begin
 
 extern int	base64_e(cchar *,int,char *) noex ;
 extern int	base64_d(cchar *,int,char *) noex ;
+extern int	base64_enc(int) noex ;
 extern int	base64_dec(int) noex ;
 
 EXTERNC_end
