@@ -30,6 +30,7 @@
 #define	QPDECODER_MAGIC		0x13f3c205
 #define	QPDECODER		struct qpdecoder_head
 #define	QPDECODER_FL		struct qpdecoder_flags
+#define	QPDECODER_NSTAGE	2
 
 
 struct qpdecoder_flags {
@@ -42,7 +43,7 @@ struct qpdecoder_head {
 	QPDECODER_FL	f ;
 	uint		magic ;
 	int		rl ;		/* stage length */
-	char		rb[4+1] ;	/* stage buffer */
+	char		rb[QPDECODER_NSTAGE + 1] ;	/* stage buffer */
 } ;
 
 typedef	QPDECODER	qpdecoder ;
