@@ -98,6 +98,7 @@ template<typename T> struct cfpowshelp {
 	} ; /* end method (getval) */
 	int getsign() noex {
     	    cint rs = cfx::getsign(sp,sl,&fneg) ;
+	    sp += (sl - rs) ;
 	    sl = rs ;
 	    return rs ;
 	} ; /* end if (getsign) */
