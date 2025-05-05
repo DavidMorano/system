@@ -40,6 +40,7 @@
 #include	<cfdecmf.h>
 #include	<cfnum.h>
 #include	<cfhexs.h>
+#include	<cfroman.h>
 
 
 #endif /* CFX_INCLUDE */
