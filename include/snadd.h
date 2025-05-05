@@ -40,7 +40,9 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+
 #include	<snaddw.h>
+#include	<snaddslash.h>
 
 
 EXTERNC_begin
