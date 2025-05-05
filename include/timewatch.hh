@@ -16,7 +16,7 @@
 
 */
 
-/* Copyright © 2001,2011 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001,2011 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
