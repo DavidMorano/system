@@ -158,7 +158,7 @@ struct vechand : vechand_head {
 	int sort(vechand_f) noex ;
 	void dtor() noex ;
 	operator int () noex ;
-	~vechand() {
+	destruct vechand() {
 	    dtor() ;
 	} ;
 } ; /* end struct (vechand) */
