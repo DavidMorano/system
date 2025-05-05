@@ -84,7 +84,7 @@ public:
 	strlibval &operator = (const strlibval &) = delete ;
 	operator ccharp () noex ;
 	void dtor() noex ;
-	~strlibval() {
+	destruct strlibval() {
 	    dtor() ;
 	} ;
 } ; /* end class (strlibval) */
