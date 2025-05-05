@@ -28,7 +28,6 @@
 
 #define	FSDIRTREE		struct fsdirtree_head
 #define	FSDIRTREE_FL		struct fsdirtree_flags
-#define	FSDIRTREE_STAT		USTAT
 #define	FSDIRTREE_MAGIC		0x98653217
 /* options */
 enum fsdirtreeos {
@@ -106,7 +105,6 @@ struct fsdirtree_head {
 
 typedef FSDIRTREE	fsdirtree ;
 typedef	FSDIRTREE_FL	fsdirtree_fl ;
-typedef	FSDIRTREE_STAT	fsdirtree_stat ;
 
 EXTERNC_begin
 
