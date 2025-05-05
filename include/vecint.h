@@ -193,7 +193,7 @@ struct vecint : vecint_head {
 	    return it ;
 	} ;
 	void dtor() noex ;
-	~vecint() {
+	destruct vecint() {
 	    dtor() ;
 	} ;
 } ; /* end struct (vecint) */
