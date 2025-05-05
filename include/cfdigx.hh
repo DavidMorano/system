@@ -63,8 +63,8 @@ module ;
 #include	<libutil.hh>		/* |cstrlen(3u)| */
 #include	<checkbase.h>
 #include	<cfutil.h>		/* namespace |cfx| */
-#include	<char.h>
-#include	<ischarx.h>		/* |isplusminus(2uc)| */
+#include	<char.h>		/* |CHAR_TOVAL(3uc)| */
+#include	<ischarx.h>		/* |isplusminus(3uc)| */
 #include	<localmisc.h>
 
 export module cfdigx ;
@@ -90,6 +90,7 @@ template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 	} ; /* end ctor */
 	int getsign() noex {
     	    cint rs = cfx::getsign(sp,sl,&fneg) ;
+	    sp += (sl - rs) ;
 	    sl = rs ;
 	    return rs ;
 	} ; /* end if (getsign) */
@@ -171,6 +172,7 @@ template<stdintx T> struct cfduhelp { /* Convert-From-Digit-UnSigned */
 	} ; /* end ctor */
 	int getsign() noex {
     	    cint rs = cfx::getsign(sp,sl,&fneg) ;
+	    sp += (sl - rs) ;
 	    sl = rs ;
 	    return rs ;
 	} ; /* end if (getsign) */
