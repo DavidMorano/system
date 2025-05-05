@@ -143,7 +143,7 @@ public:
 	} ;
 	int adv(int) noex ;
 	void dtor() noex ;
-	~obuf() {
+	destruct obuf() {
 	    dtor() ;
 	} ; /* end dtor */
 	operator int () noex {
