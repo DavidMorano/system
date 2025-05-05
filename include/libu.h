@@ -50,7 +50,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 
 #include	<aflag.hh>
 #include	<usys.h>	/* <- auxilllary OS support */
@@ -64,8 +63,8 @@
 #include	<usysauxinfo.h>
 #include	<usysdata.h>
 #include	<usysinfo.h>
-#include	<usystem.h>
 
+#include	<ugetloadavg.h>	/* load-average retrieval |u_getloadavg| */
 #include	<um.h>		/* UNIX® memory-management */
 #include	<uipc.h>	/* UNIX® System V IPC */
 #include	<ustr.h>	/* UNIX® STREAMS® */

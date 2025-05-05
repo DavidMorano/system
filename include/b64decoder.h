@@ -25,13 +25,14 @@
 
 #define	B64DECODER_MAGIC	0x13f3c204
 #define	B64DECODER		struct b64decoder_head
+#define	B64DECODER_NSTAGE	4
 
 
 struct b64decoder_head {
 	void		*outbuf ;	/* output-buffer */
 	uint		magic ;
 	int		rl ;		/* stage length */
-	char		rb[4+1] ;	/* stage buffer */
+	char		rb[B64DECODER_NSTAGE + 1] ;	/* stage buffer */
 } ;
 
 typedef B64DECODER	b64decoder ;
