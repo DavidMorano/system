@@ -21,7 +21,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<ctime>			/* |{x}itimer(3c)| */
+#include	<time.h>		/* |{x}itimer(3c)| + |ITIMERSPEC| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
