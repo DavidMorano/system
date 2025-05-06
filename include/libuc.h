@@ -269,8 +269,8 @@
 #include	<strwcpy.h>
 #include	<strwcpyxc.h>
 #include	<strx.h>
-#include	<sysdbfname.h>
-#include	<sysdbfnames.h>
+#include	<sysdbfn.h>
+#include	<sysdbfiles.h>
 #include	<syshas.h>
 #include	<syshasutmpx.h>
 #include	<sysmemutil.h>
