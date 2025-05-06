@@ -1,6 +1,6 @@
 /* cfalphax MODULE */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* conversion of power-base-two c-string to their binary integer types */
 /* version %I% last-modified %G% */
@@ -25,13 +25,16 @@
 	cfalphax
 
 	Description:
-	This code converts a c-string of digits (of a power-of-two
-	base) into the normal integer types: these being |int|,
-	|long|, and |longlong| and their associated unsigned
-	variations.
+	This code converts a c-string of digits (with number bases
+	from 2 to 64) into the normal integer types: these being
+	|int|, |long|, and |longlong| and their associated unsigned
+	variations.  The conversion is for signed numbers only.
+	I am considering only signed numbers for these Alpha-base
+	numbers.
 
 	Notes:
 	1. This code is limited to a maximum base of 64.
+	2. This code only handles signed numbers.
 
 *******************************************************************************/
 
@@ -46,12 +49,12 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<stdintx.h>		/* extended integer types */
 #include	<libutil.hh>		/* |xstrlen(3u)| */
-#include	<stdintx.h>
-#include	<sfx.h>
-#include	<cfutil.h>
+#include	<cfutil.h>		/* namespace |cfx| */
 #include	<char.h>
-#include	<ischarx.h>
+#include	<ischarx.h>		/* |isplusminus(2uc)| */
+#include	<localmisc.h>
 
 export module cfalphax ;
 
@@ -59,7 +62,7 @@ template<stdintx T> struct cfashelp {
 	cint		nb = (CHAR_BIT * szof(T)) ;
 	T		*rp = nullptr ;
 	T		val = 0 ;	/* value to create */
-	T		cutoff{} ;
+	T		cutoff ;
 	T		tmax = 0 ;	/* type-maximum value */
 	T		tmin{} ;	/* type-minimum value */
 	int		cutlim ;
@@ -75,30 +78,9 @@ template<stdintx T> struct cfashelp {
 	    rp = arp ;
 	} ; /* end ctor */
 	int getsign() noex {
-	    int		rs = SR_FAULT ;
-	    if (rp) {
-	        if (sl < 0) sl = xstrlen(sp) ;
-	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        if ((sl > 0) && isplusminus(*sp)) {
-	            fneg = (*sp == '-') ;
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        if (sl > 1) {
-		    cint r = cfx::rmleadzero(sp,sl) ;
-		    sp += (sl - r) ;
-		    sl = r ;
-		} else if (sl == 0) {
-		    rs = SR_INVALID ;
-		} /* end if */
-	    } /* end if (non-null) */
+    	    cint rs = cfx::getsign(sp,sl,&fneg) ;
+	    sp += (sl - rs) ;
+	    sl = rs ;
 	    return rs ;
 	} ; /* end if (getsign) */
 	void prepare() noex {
