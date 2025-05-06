@@ -129,7 +129,7 @@ struct vecsorthand : vecsorthand_head {
 	} ;
 	void dtor() noex ;
 	operator int () noex ;
-	~vecsorthand() {
+	destruct vecsorthand() {
 	    dtor() ;
 	} ;
 } ; /* end struct (vecsorthand) */
