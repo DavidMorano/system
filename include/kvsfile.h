@@ -1,4 +1,5 @@
 /* kvsfile HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* perform kf_file related functions */
@@ -27,7 +28,7 @@
 #include	<usysrets.h>
 #include	<vecobj.h>
 #include	<hdb.h>
-#include	<localmisc.h>		/* <- REALNAMELEN */
+#include	<localmisc.h>		/* |REALNAMELEN| */
 
 
 #define	KVSFILE			struct kvsfile_head
