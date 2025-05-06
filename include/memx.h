@@ -13,6 +13,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>		/* |size_t| */
 #include	<string.h>		/* |memset(3c)| + |memcpy(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
