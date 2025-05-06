@@ -361,6 +361,14 @@ typedef const char		cc ;
 #define	LINEBUFLEN	MAXLINELEN
 #endif
 
+#ifndef	NOFILE
+#define	NOFILE		20		/* UNIX® number of files */
+#endif
+
+#ifndef	TIMEBUFLEN
+#define	TIMEBUFLEN	80		/* can hold? all known date strings */
+#endif
+
 /* common digit base (2, 8, 10, 16) buffer lengths (convenience defines) */
 
 #ifndef	BINBUFLEN
@@ -371,7 +379,7 @@ typedef const char		cc ;
 #define	OCTBUFLEN	86		/* can hold |int256_t| in octal */
 #endif
 
-#ifndef	DECCUFLEN
+#ifndef	DECBUFLEN
 #define	DECBUFLEN	78		/* can hold |int256_t| in decimal */
 #endif
 
@@ -387,16 +395,8 @@ typedef const char		cc ;
 #define	REALNAMELEN	100		/* "real" name length */
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80		/* can hold? all known date strings */
-#endif
-
 #ifndef	COLUMNS
 #define	COLUMNS		80		/* historical terminal columns */
-#endif
-
-#ifndef	NOFILE
-#define	NOFILE		20		/* UNIX® number of files */
 #endif
 
 #ifndef	NULLFNAME
