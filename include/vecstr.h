@@ -228,7 +228,7 @@ struct vecstr : vecstr_head {
 	    return it ;
 	} ;
 	void dtor() noex ;
-	~vecstr() {
+	destruct vecstr() {
 	    dtor() ;
 	} ;
 } ; /* end struct (vecstr) */
