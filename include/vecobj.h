@@ -159,7 +159,7 @@ struct vecobj : vecobj_head {
 	int sort(vecobj_vcf) noex ;
 	void dtor() noex ;
 	operator int () noex ;
-	~vecobj() {
+	destruct vecobj() {
 	    dtor() ;
 	} ;
 } ; /* end struct (vecobj) */
