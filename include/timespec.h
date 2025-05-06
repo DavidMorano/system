@@ -30,7 +30,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>			/* |TIMESPEC| */
+#include	<time.h>		/* |TIMESPEC| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
