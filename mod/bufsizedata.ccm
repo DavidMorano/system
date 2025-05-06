@@ -1,6 +1,6 @@
 /* bufsizedata MODULE (primary module interface) */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* buffer-size-data (default value database) */
 /* version %I% last-modified %G% */
@@ -8,12 +8,20 @@
 
 /* revision history:
 
-	= 2014-06-17, David A­D­ Morano
+	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
+
+	= 2014-06-17, David A­D­ Morano
+	This thing was changed to use the C++14 'constexpr'
+	capabilities.
+
+	= 2023-05-15, David A-D- Morano
+	This code was "modularized" with the introduction of modules
+	in C++20.  Yes, it took this long to get around to it.
 
 */
 
-/* Copyright © 2014 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2001,2014,2023 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -26,7 +34,10 @@
 	determine any particular buffer size is make at the point
 	when a particular buffer size is required.  This data base
 	takes the most simplest of forms: an array of structures
-	(|bufsuzeitem|).  Oh, I almost forgot.  I am using the new
+	(|bufsizeitem|).  
+	
+	Notes:
+	1. (2014-06-17) Oh, I almost forgot.  I am using the new
 	|constexpr| features of C++14.  I waited for these C++14
 	enhancements to |constexpr| for these many years.  I knew
 	that the imbecilic implemention of |constexpr| in C+11
@@ -42,49 +53,14 @@ module ;
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<bufsizenames.h>
+#include	<sysconfcmds.h>
+#include	<localmisc.h>
 
-
-#ifndef	_SC_ARG_MAX
-#define	_SC_ARG_MAX		-1
-#endif
-#ifndef	_SC_NAME_MAX
-#define	_SC_NAME_MAX		-1
-#endif
-#ifndef	_SC_PATH_MAX
-#define	_SC_PATH_MAX		-1
-#endif
-#ifndef	_SC_LINE_MAX
-#define	_SC_LINE_MAX		-1
-#endif
-#ifndef	_SC_HOST_NAME_MAX		/* really the "nodename" length */
-#define	_SC_HOST_NAME_MAX	-1
-#endif
-#ifndef	_SC_LOGIN_NAME_MAX
-#define	_SC_LOGIN_NAME_MAX	-1
-#endif
-#ifndef	_SC_GETPW_R_SIZE_MAX
-#define	_SC_GETPW_R_SIZE_MAX	-1
-#endif
-#ifndef	_SC_GETGR_R_SIZE_MAX
-#define	_SC_GETGR_R_SIZE_MAX	-1
-#endif
-#ifndef	_SC_FSTYPE
-#define	_SC_FSTYPE		-1
-#endif
-#ifndef	_SC_SYMBOL_MAX
-#define	_SC_SYMBOL_MAX		-1
-#endif
-#ifndef	_SC_TZNAME_MAX
-#define	_SC_TZNAME_MAX		-1
-#endif
-#ifndef	_SC_ZONEINFO_MAX
-#define	_SC_ZONEINFO_MAX	-1
-#endif
-#ifndef	_SC_MAILADDR_MAX
-#define	_SC_MAILADDR_MAX	-1
-#endif
 
 export module bufsizedata ;
 
@@ -130,10 +106,11 @@ export {
 		ip->defval = MLBUFLEN ;
 	        break ;
 	    case getbufsize_nn:		/* node-name */
-	        ip->name = _SC_HOST_NAME_MAX ; /* <- really is "nodename" */
+	        ip->name = _SC_NODENAME_MAX ; /* <- really is "nodename" */
 		ip->defval = NNBUFLEN ;
 	        break ;
 	    case getbufsize_hn:		/* host-name */
+	        ip->name = _SC_HOSTNAME_MAX ;
 	        ip->defval = HNBUFLEN ;
 	        break ;
 	    case getbufsize_un:		/* user-name */
