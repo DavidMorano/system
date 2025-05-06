@@ -1,4 +1,4 @@
-/* sysdbfname HEADER */
+/* sysdbfn HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -17,8 +17,8 @@
 
 /* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	SYSDBFNAME_INCLUDE
-#define	SYSDBFNAME_INCLUDE
+#ifndef	SYSDBFN_INCLUDE
+#define	SYSDBFN_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -28,16 +28,16 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<sysdbfnames.h>		/* <- the money shot */
+#include	<sysdbfiles.h>		/* <- the money shot */
 
 
 EXTERNC_begin
 
-extern int sysdbfnameget(sysdbfiles,cchar *,cchar **) noex ;
+extern int sysdbfn_get(sysdbfiles,cchar *,cchar **) noex ;
 
 EXTERNC_end
 
 
-#endif /* SYSDBFNAME_INCLUDE */
+#endif /* SYSDBFN_INCLUDE */
 
 
