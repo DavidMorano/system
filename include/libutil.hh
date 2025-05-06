@@ -72,6 +72,7 @@ constexpr int xstrcspn(cchar *sp,cchar *ss) noex {
 #endif	/* SUBROUTINE_XSTRCSPN */
 
 
+
 #endif /* __cplusplus */
 #endif /* LIBUTIL_INCLUDE */
 
