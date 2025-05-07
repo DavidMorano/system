@@ -53,11 +53,11 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<stdintx.h>
+#include	<stdintx.h>		/* extended integer types */
 #include	<snwcpy.h>
 #include	<sfx.h>
 #include	<checkbase.h>
-#include	<cfutil.h>
+#include	<cfutil.h>		/* namespace |cfx| */
 #include	<localmisc.h>
 
 export module cfsysx ;
