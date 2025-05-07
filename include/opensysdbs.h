@@ -25,7 +25,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
 
 
 enum opensysdbs {
@@ -34,12 +33,12 @@ enum opensysdbs {
 	opensysdb_groupnames,
 	opensysdb_projectnames,
 	opensysdb_passwd,
+	opensysdb_shadow,
+	opensysdb_userattr,
 	opensysdb_group,
 	opensysdb_project,
 	opensysdb_realname,
 	opensysdb_shells,
-	opensysdb_shadow,
-	opensysdb_userattr,
 	opensysdb_overlast
 } ; /* end enum (opensysdbs) */
 
