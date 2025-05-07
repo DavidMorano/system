@@ -41,7 +41,7 @@ module ;
 
 export module intminmax ;
 
-import valuelims ;
+import uvariables ;			/* |valuelimit(3u)| */
 
 /* local defines */
 
@@ -68,8 +68,6 @@ import valuelims ;
 
 
 /* external variables */
-
-extern const valuelims	valuelimit ;
 
 
 /* local structures */
