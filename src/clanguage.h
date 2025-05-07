@@ -55,6 +55,12 @@
 #endif
 #endif /* __cplusplus */
 
+#ifdef	__cplusplus
+#ifndef	destruct		
+#define	destruct		compl
+#endif
+#endif /* __cplusplus */
+
 #ifndef	va_begin
 #define	va_begin(ap,arg)	va_start((ap),(arg))
 #endif
@@ -118,6 +124,7 @@
 #define	cast_bit		bit_cast
 #define	cast_saturate		saturate_cast
 #define	cast_any		any_cast
+#define	assert_static		static_assert
 #endif
 #endif /* __cplusplus */
 
