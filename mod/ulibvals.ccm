@@ -1,4 +1,4 @@
-/* ulibvals MODULE (Ukernel-Library-Values) */
+/* ulibvals1 SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -45,35 +45,15 @@ module ;
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
-#include	<syswords.hh>		/* |sysword(3u)| */
+#include	<ulogerror.h>
+#include	<sysconfcmds.h>
 #include	<localmisc.h>		/* |{xxx}BUFLEN| */
 
-export module ulibvals ;
+module ulibvals ;
 
 import usysconf ;			/* |usysconfval(3u)| */
 
-export {
-    struct ulibvals {
-	static const int	endian ;
-	static const int	maxbase ;
-	static const int	pagesz ;
-	static const int	clktck ;
-	static const int	maxarg ;
-	static const int	maxline ;
-	static const int	maxlogin ;
-	static const int	binbflen ;	/* for |int256_t| */
-	static const int	octbflen ;	/* for |int256_t| */
-	static const int	decbflen ;	/* for |int256_t| */
-	static const int	hexbflen ;	/* for |int256_t| */
-    } ; /* end struct (ulibvals) */
-} /* end export */
-
-export {
-    extern const ulibvals	ulibval ;
-}
-
-using std::endian ;			/* enumeration */
+using std::endian ;
 
 static constexpr int mkendian() noex {
     	using enum	endian ;	/* get the values */
@@ -84,17 +64,29 @@ static constexpr int mkendian() noex {
 	    n = 1 ;
 	} else {
 	    n = 2 ;
-	}
+	} /* end if_constexpr */
 	return n ;
 } /* end subroutine (mkendian) */
 
-const int	ulibvals::endian	= mkendian() ;
-const int	ulibvals::maxbase	= xstrlen(sysword.w_digtab) ;
-const int	ulibvals::pagesz	= usysconfval(_SC_PAGESIZE) ;
-const int	ulibvals::clktck	= usysconfval(_SC_CLK_TCK) ;
-const int	ulibvals::maxarg	= usysconfval(_SC_ARG_MAX) ;
-const int	ulibvals::maxline	= usysconfval(_SC_LINE_MAX) ;
-const int	ulibvals::maxlogin	= usysconfval(_SC_LOGIN_NAME_MAX) ;
+static int getval(int cmd) noex {
+    	int		rs ;
+	if ((rs = usysconfval(cmd)) < 0) {
+	    ulogerror("ulibvals",rs,"getval") ;
+	}
+	return rs ;
+} /* end subroutine (getval) */
+
+const int	ulibvals::endianval	= mkendian() ;
+const int	ulibvals::maxbase	= MAXBASE ; /* the standand value */
+const int	ulibvals::pagesz	= getval(_SC_PAGESIZE) ;
+const int	ulibvals::clktck	= getval(_SC_CLK_TCK) ;
+const int	ulibvals::maxarg	= getval(_SC_ARG_MAX) ;
+const int	ulibvals::maxline	= getval(_SC_LINE_MAX) ;
+const int	ulibvals::maxlogin	= getval(_SC_LOGIN_NAME_MAX) ;
+const int	ulibvals::maxnamelen	= getval(_SC_NAME_MAX) ;
+const int	ulibvals::maxpathlen	= getval(_SC_PATH_MAX) ;
+const int	ulibvals::nodenamelen	= getval(_SC_NODENAME_MAX) ;
+const int	ulibvals::hostnamelen	= getval(_SC_HOSTNAME_MAX) ;
 const int	ulibvals::binbflen	= BINBUFLEN ;	/* for |int256_t| */
 const int	ulibvals::octbflen	= OCTBUFLEN ;	/* for |int256_t| */
 const int	ulibvals::decbflen	= DECBUFLEN ;	/* for |int256_t| */
