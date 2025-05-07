@@ -1,4 +1,5 @@
 /* sysdbfiles SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* standard file-names */
@@ -27,6 +28,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<localmisc.h>
 
 #include	"sysdbfiles.h"
 
@@ -69,8 +72,8 @@ cpcchar		sysdbfile[] = {
 	[sysdbfile_ho] 		= "hosts",
 	[sysdbfile_sv] 		= "services",
 	[sysdbfile_sh] 		= "shells",
-	nullptr
-} ;
+	[sysdbfile_overlast]	= nullptr
+} ; /* end array (sysdbfile) */
 
 
 /* exported subroutines */
