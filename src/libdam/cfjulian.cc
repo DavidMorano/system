@@ -9,8 +9,9 @@
 /* revision history:
 
 	= 2004-08-01, David A­D­ Morano
-        This subroutine was modeled (adapated) from assembly language
-        (although there isn't the shred of similarity between the two).
+	This subroutine was modeled (adapated) from assembly language
+	(although there is not  the shred of similarity between the
+	two).
 
 */
 
@@ -23,11 +24,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<libutil.hh>		/* |cstrlen(3u)| + |xstrlen(3u)| */
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -35,6 +41,30 @@
 /* local defines */
 
 #define	CENTURY_BASE	19
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -50,7 +80,7 @@ int cfjulian(cchar *s,int slen,time_t *rp) noex {
 	cchar		*cp = s ;
 
 	if (slen < 0)
-	    slen = strlen(s) ;
+	    slen = xstrlen(s) ;
 
 	if (slen == 0)
 	    return -1 ;
