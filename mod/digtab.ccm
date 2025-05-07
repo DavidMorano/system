@@ -1,0 +1,123 @@
+/* digtab MODULE */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
+
+/* retrieve a digit from the digit-table (DIGTAB) */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-02-14, David A­D­ Morano
+	This little object module was first written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	getdig
+
+	Description:
+	Given a value we return a character digit corresponding to
+	that value as deterined by the DIGTAB look-up table.  There
+	is no error chæcking on the value given.  The given value
+	should be between zero (0) and sizty-three (63) inclusive.
+	This function facilitates the use of number bases up to
+	base-64.
+
+	Synopsis:
+	int getdig(int v) noex 
+
+	Argument:
+	v		value that we want the corresponding digit for
+
+	Returns:
+	-		the value of the digit requested
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<localmisc.h>
+
+export module digtab ;
+
+/* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+export {
+    constexpr int	maxbase = MAXBASE ;
+}
+
+struct digtaber {
+    uchar	dig[maxbase] ;
+    constexpr digtaber() noex {
+    	int	i = 0 ;
+	for (int j = 0 ; j < 10 ; j += 1) {
+	    dig[i++] = uchar('0' + j) ;
+	}
+	for (int j = 0 ; j < 26 ; j += 1) {
+	    dig[i++] = uchar('A' + j) ;
+	}
+	for (int j = 0 ; j < 26 ; j += 1) {
+	    dig[i++] = uchar('a' + j) ;
+	}
+	dig[i++] = uchar('Ø') ;
+	dig[i++] = uchar('ø') ;
+    } ; /* end ctor (digtaber) */
+    constexpr char operator [] (cint) const noex ;
+} ; /* end struct (digtab) */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+export {
+    constexpr digtaber	digtab ;
+}
+
+
+/* exported subroutines */
+
+export {
+    constexpr char digtab_enc(int v) noex {
+	return char(digtab.dig[v]) ;
+    } /* end subroutine (digtab_get) */
+    constexpr char getdig(int v) noex {
+	return char(digtab.dig[v]) ;
+    } /* end subroutine (getdig) */
+    constexpr char digtaber::operator [] (cint v) const noex {
+	return dig[v] ;
+    } ;
+} /* end export */
+
+
