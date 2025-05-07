@@ -66,6 +66,7 @@
 #include	<userinfo.h>
 #include	<userattr.h>
 #include	<getnodedomain.h>	/* |getnetdomain(3uc)| */
+#include	<getsystypenum.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
 #include	<bfile.h>
@@ -177,7 +178,6 @@ extern int	xfile(IDS *,cchar *) ;
 extern int	getnodename(char *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getnodeinfo(cchar *,char *,char *,vecstr *,cchar *) ;
-extern int	getsystypenum(char *,char *,cchar *,cchar *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getnprocessors(cchar **,int) ;
 extern int	getuid_user(cchar *,int) ;
