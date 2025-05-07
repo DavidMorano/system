@@ -1,0 +1,9 @@
+
+while read D ; do 
+  if [[ -d ${D}/gcm.cache ]] ; then
+    print -- gcm.cache=${D}/gcm.cache
+  else
+    ln -s ../gcm.cache ${D}/gcm.cache
+  fi
+done < subdirs.txt
+
