@@ -8,13 +8,13 @@
  */
 #ifdef LONGLONG
 
-
-/* David A.D. Morano commented these next two lines out and added the two 
+/****
+David A.D. Morano commented these next two lines out and added the two 
 that follow.
 
 typedef long long longlong_t;
 typedef unsigned long long ulonglong_t;
-*/
+****/
 
 typedef double    longlong_t;
 typedef double    ulonglong_t;
@@ -22,7 +22,7 @@ typedef double    ulonglong_t;
 #else
 typedef double    longlong_t;
 typedef double    ulonglong_t;
-#endif
+#endif /* LONGLONG */
 
 typedef	struct { int r[1]; } *	physadr;
 typedef	long		daddr_t;
