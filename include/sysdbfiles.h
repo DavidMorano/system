@@ -41,9 +41,9 @@ enum sysdbfiles {
 	sysdbfile_sv,			/* services */
 	sysdbfile_sh,			/* shells */
 	sysdbfile_overlast
-} ; /* end array (sysdbfiles) */
+} ; /* end enum (sysdbfiles) */
 
-extern cpcchar	sysdbfile[] ;
+extern cpcchar		sysdbfile[] ;
 
 
 #endif /* SYSDBFILES_INCLUDE */
