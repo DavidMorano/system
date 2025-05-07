@@ -68,7 +68,7 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<atomic>		/* |atomic_int)3c++)| */
+#include	<atomic>		/* |atomic_int(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -77,6 +77,8 @@ module ;
 #include	<intsat.h>
 #include	<utimeout.h>
 #include	<errtimer.hh>
+#include	<sysconfcmds.h>
+#include	<mailvalues.hh>		/* |mailvalue(3u)| */
 #include	<localmisc.h>
 
 export module usysconf ;
@@ -106,6 +108,7 @@ enum dataitems {
 	dataitem_maxarg,
 	dataitem_maxline,
 	dataitem_maxlogin,
+	dataitem_maxnode,
 	dataitem_maxhost,
 	dataitem_maxtzname,
 	dataitem_ngroups,
@@ -114,9 +117,9 @@ enum dataitems {
 } ;
 
 namespace {
-    struct uconfdatas {
+    struct ucachestore {
 	atomic_int	d[dataitem_overlast] ;
-    } ; /* end struct (uconfdatas) */
+    } ; /* end struct (ucachestore) */
     struct usysconf ;
     typedef int (usysconf::*usysconf_m)(int) ;
     struct usysconf {
@@ -128,18 +131,28 @@ namespace {
 	usysconf(long *p) noex : lp(p) { } ;
 	int mconfval(int) noex ;
 	int mconfstr(int) noex ;
-	int operator () (int) noex ;
+	int getval(int) noex ;
+	int getstr(int) noex ;
+	int synthetic(int) noex ;
 	int cache(int) noex ;
+	int callstd(int) noex ;
+	int getzoneinfo() noex ;
     } ; /* end struct (usysconf) */
 } /* end namespace */
 
 
 /* forward references */
 
+static constexpr int getmaxmailaddr() noex {
+    	cint	nnm = mailvalue.nodenamemult ;
+    	cint	hnm = mailvalue.hostnamemult ;
+    	return ((nnm * HNBUFLEN) + (hnm * NNBUFLEN)) ;
+}
+
 
 /* local variables */
 
-static uconfdatas	udata ;
+static ucachestore	udata ;
 
 constexpr size_t	minusone = -1uz ;
 
@@ -151,23 +164,26 @@ constexpr size_t	minusone = -1uz ;
 
 export {
     int usysconfval(int req,long *rp = nullptr) noex {
-	usysconf	sco(rp) ;
-	int		rs = SR_OK ;
-	sco.m = &usysconf::mconfval ;
-	switch (req) {
-	case _SC_ARG_MAX:
-	case _SC_LINE_MAX:
-	case _SC_HOST_NAME_MAX:
-	case _SC_LOGIN_NAME_MAX:
-	case _SC_TZNAME_MAX:
-	case _SC_NGROUPS_MAX:
-	case _SC_CLK_TCK:
-	    rs = sco.cache(req) ;
-	    break ;
-	default:
-	    rs = sco(req) ;
-	    break ;
-	} /* end switch */
+	int		rs = SR_NOSYS ;
+	if (req >= 0) {
+	    usysconf	sco(rp) ;
+	    sco.m = &usysconf::mconfval ;
+	    switch (req) {
+	    case _SC_ARG_MAX:
+	    case _SC_LINE_MAX:
+	    case _SC_LOGIN_NAME_MAX:
+	    case _SC_NODENAME_MAX:
+	    case _SC_HOSTNAME_MAX:
+	    case _SC_TZNAME_MAX:
+	    case _SC_NGROUPS_MAX:
+	    case _SC_CLK_TCK:
+	        rs = sco.cache(req) ;
+	        break ;
+	    default:
+	        rs = sco.getval(req) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (valid) */
 	return rs ;
     } /* end subroutine (usysconfval) */
 } /* end export */
@@ -176,14 +192,93 @@ export {
     int usysconfstr(char *rbuf,int rlen,int req) noex {
 	usysconf	sco(rbuf,rlen) ;
 	sco.m = &usysconf::mconfstr ;
-	return sco(req) ;
+	return sco.getstr(req) ;
     } /* end subroutine (usysconfstr) */
 } /* end export */
 
 
 /* local subroutines */
 
-int usysconf::operator () (int req) noex {
+int usysconf::getval(int req) noex {
+    	int		rs = SR_OK ;
+	if (req >= sysconfcmd_synthetic) {
+	    rs = synthetic(req) ;
+	} else {
+	    rs = callstd(req) ;
+	}
+    	return rs ;
+}
+/* end subroutine (usysconf::getval) */
+
+int usysconf::getstr(int req) noex {
+    	return callstd(req) ;
+}
+/* end subroutine (usysconf::getstr) */
+
+int usysconf::synthetic(int req) noex {
+    	long		val = -1 ;
+    	int		rs = SR_OK ;
+	switch (req) {
+        case sysconfcmd_maxline:
+	    val = MLBUFLEN ;
+	    break ;
+        case sysconfcmd_maxlogin:
+	    val = UNBUFLEN ;
+	    break ;
+        case sysconfcmd_maxsymbol:
+	    val = SNBUFLEN ;
+	    break ;
+        case sysconfcmd_maxtzname:
+	    val = ZNBUFLEN ;
+	    break ;
+        case sysconfcmd_maxzoneinfo:
+	    rs = getzoneinfo() ;
+	    break ;
+        case sysconfcmd_maxname:
+	    val = MNBUFLEN ;
+	    break ;
+        case sysconfcmd_maxpath:
+	    val = MPBUFLEN ;
+	    break ;
+        case sysconfcmd_maxnodename:
+	    val = NNBUFLEN ;
+	    break ;
+        case sysconfcmd_maxhostname:
+	    val = HNBUFLEN ;
+	    break ;
+	case sysconfcmd_pwent:
+	    val = PWBUFLEN ;
+	    break ;
+	case sysconfcmd_uaent:
+	    val = UABUFLEN ;
+	    break ;
+	case sysconfcmd_grent:
+	    val = GRBUFLEN ;
+	    break ;
+	case sysconfcmd_pjent:
+	    val = PJBUFLEN ;
+	    break ;
+	case sysconfcmd_fstype:
+	    val = FSBUFLEN ;
+	    break ;
+        case sysconfcmd_maxmailaddr:
+	    val = getmaxmailaddr() ;
+	    break ;
+	default:
+	    rs = SR_NOSYS ;
+	    break ;
+	} /* end switch */
+	if (lp && (val >= 0)) {
+	    *lp = (rs >= 0) ? val : 0L ;
+	}
+	if ((rs >= 0) && (val >= 0)) {
+	    rs = intsat(val) ;
+	}
+	return rs ;
+}
+/* end subroutine (usysconf::synthetic) */
+
+int usysconf::callstd(int req) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
 	errtimer	to_busy		= utimeout[uto_busy] ;
 	errtimer	to_nomem	= utimeout[uto_nomem] ;
@@ -211,7 +306,7 @@ int usysconf::operator () (int req) noex {
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
 }
-/* end subroutine (usysconf::operator) */
+/* end subroutine (usysconf::callstd) */
 
 int usysconf::mconfval(int req) noex {
 	int		rs = SR_OK ;
@@ -274,12 +369,12 @@ int usysconf::cache(int req) noex {
 	switch (req) {
 	case _SC_ARG_MAX:		ii = dataitem_maxarg ; break ;
 	case _SC_LINE_MAX:		ii = dataitem_maxline ; break ;
-	case _SC_HOST_NAME_MAX:		ii = dataitem_maxhost ; break ;
 	case _SC_LOGIN_NAME_MAX:	ii = dataitem_maxlogin ; break ;
+	case _SC_NODENAME_MAX:		ii = dataitem_maxnode ; break ;
+	case _SC_HOSTNAME_MAX:		ii = dataitem_maxhost ; break ;
 	case _SC_TZNAME_MAX:		ii = dataitem_maxtzname ; break ;
 	case _SC_NGROUPS_MAX:		ii = dataitem_ngroups ; break ;
 	case _SC_CLK_TCK:		ii = dataitem_clk ; break ;
-	    rs = (*this)(req) ;
 	    break ;
 	default:
 	    rs = SR_BUGCHECK ;
@@ -287,13 +382,20 @@ int usysconf::cache(int req) noex {
 	} /* end switch */
 	if ((rs >= 0) && (ii >= 0)) {
 	    if ((rs = udata.d[ii].load(memord_relaxed)) == 0) {
-		if ((rs = (*this)(req)) > 0) {
+		if ((rs = getval(req)) > 0) {
 		    udata.d[ii].store(rs,memord_relaxed) ;
 		}
+	    } else if (rs > 0) {
+		if (lp) *lp = long(rs) ;
 	    }
 	} /* end if */
 	return rs ;
 }
 /* end subroutine (usysconf::cache) */
+
+int usysconf::getzoneinfo() noex {
+	return getval(sysconfcmd_maxname) ;
+}
+/* end method (usysconf::getzoneinfo) */
 
 
