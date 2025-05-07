@@ -53,7 +53,6 @@
 #include	<connection.h>
 #include	<conslog.h>
 #include	<cvttemperature.h>
-#include	<datetok.h>
 #include	<dayofmonth.h>
 #include	<deffile.h>
 #include	<density.h>
