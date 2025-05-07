@@ -27,6 +27,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<localmisc.h>		/* |eol| */
 
 
 extern int readln(std::istream *,char *,int,int = eol) noex ;
