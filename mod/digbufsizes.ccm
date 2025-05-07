@@ -11,6 +11,11 @@
 	= 1998-11-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
+	= 2014-12-05, David A-D- Morano
+	This code was converted from load-time initialization to
+	compile-time initialization (using 'constexpr' compile-time
+	execution).
+
 	= 2023-10-16, David A­D­ Morano
 	This code was "modularized" with the introduction of "modules"
 	with C++20 (albeit a few years after the fact).
@@ -28,7 +33,7 @@
 
 */
 
-/* Copyright © 1998,2023,2025 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2014,2023,2025 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************* 
   	Name:
@@ -91,7 +96,7 @@ module ;
 export module digbufsizes ;
 
 export {
-    constexpr int	digbufsizes_maxbase = 64 ; /* current max-base */
+    constexpr int	digbufsizes_maxbase = MAXBASE ; /* current max-base */
     constexpr int	digbufsizes_maxtype = 10 ; /* to types w/ 1024 bits */
     constexpr int	digbufsizes_nbases = (digbufsizes_maxbase+1) ;
 }
