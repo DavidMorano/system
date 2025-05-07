@@ -71,9 +71,9 @@ module ;
 
 export module cvtdig ;
 
-import uvariables ;
+import digtab ;				/* |getdig(3u)| + |maxbase(3u)| */
 
-inline cint	cvtdig_maxbase = xstrlen(sysword.w_digtab) ; /* largest base */
+inline cint	cvtdig_maxbase = maxbase ; /* <- from |digtab(3u)| */
 
 constexpr inline int cvtdig_ffbsi(int b) noex {
 	cuint		ub = uint(b) ;
@@ -93,7 +93,8 @@ export {
 	    if (ndig <= rlen) {
 	        const UT	mask = uint(b - 1) ;
 	        for (int i = (ndig - 1) ; i >= 0 ; i -= 1) {
-	            rbuf[i] = sysword.w_digtab[val & mask] ;
+		    cint	di = int(val & mask) ; /* digit-index */
+	            rbuf[i] = getdig(di) ;
 	            val >>= nshift ;
 	        } /* end for */
 	        rbuf[ndig] = '\0' ;
