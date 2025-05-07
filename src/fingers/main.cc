@@ -57,6 +57,9 @@
 #include	<netdb.h>
 
 #include	<usystem.h>
+#include	<gethz.h>
+#include	<getax.h>
+#include	<getsystypenum.h>
 #include	<sigblocker.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -65,8 +68,6 @@
 #include	<bfile.h>
 #include	<ids.h>
 #include	<userinfo.h>
-#include	<gethz.h>
-#include	<getax.h>
 #include	<logfile.h>
 #include	<expcook.h>
 #include	<varsub.h>
@@ -149,7 +150,6 @@ extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
 extern int	getarchitecture(char *,int) ;
 extern int	getnprocessors(const char **,int) ;
 extern int	getproviderid(const char *,int) ;
-extern int	getsystypenum(char *,char *,cchar *,cchar *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getserial(const char *) ;
 extern int	mkuiname(char *,int,USERINFO *) ;
