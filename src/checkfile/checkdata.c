@@ -1,40 +1,52 @@
-/* main */
+/* checkdata SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to compress 'checkfile' data base */
+/* version %I% last-modified %G% */
 
-/*
-	David A.D. Morano
-	October 1988
+#define	CF_PRINT		0
+
+/* revision-history:
+
+	= 1988-10-01, David A-D- Morano
+	This code was original written.
+
 */
 
-
-#define		PRINT		0
-
-
+/* Copyright © 1988 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /************************************************************************
 
-	Arguments:
+  	Name:
+	main
 
+	Description:
+
+	Arguments:
 	- file name of old database
 	- file name of new database
 
-
 ************************************************************************/
 
-
-#include	"stddef.h"
- 
-#include	<sys_types.h>
+#include	<envstandards.h>	/* must be ordered fist to configure */
 #include	<sys/stat.h>
 #include	<fcntl.h>
-#include	<time.h>
 #include	<pwd.h>
-
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bfile.h>
+#include	<localmisc.h>
 
 
-
+/* local deifines */
 
 #define		MAXNAMELEN	256
 
@@ -43,15 +55,19 @@
 #define		HOLDSIZE	(NROW * NCOL * 4)
 
 
-
-extern int	stat() ;
-
-extern int	bopen(), bclose(), bflush() ;
-extern int	bread(), bwrite() ;
-extern int	breadln(), bprintf(), bgetc(), bputc() ;
+/* local namespaces */
 
 
+/* local typedefs */
 
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 struct sumentry {
 	char	name[MAXNAMELEN + 1] ;
@@ -61,25 +77,25 @@ struct sumentry {
 } ;
 
 
+/* forward references */
 
 
-int main(argc,argv)
-int	argc ;
-char	*argv[] ;
-{
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int main(int argc,mainv argv,mainv) {
 	bfile	errfile, *efp = &errfile ;
-
 	bfile	infile, *ifp = &infile ;
 	bfile	sumfile, *sfp = &sumfile ;
 	bfile	tempfile, *tfp = &tempfile ;
-
-	struct sumentry		entry ;
-
-	struct ustat	ss, *sp = &ss ;
-
-	struct passwd	*pwsp ;
-
-
+	sumentry	entry ;
+	USTAT		ss, *sp = &ss ;
+	ucpwent		*pwsp ;
 	int	i, j, rs, len ;
 	int	namelen ;
 
