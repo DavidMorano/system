@@ -55,7 +55,7 @@ struct sigblocker : sigblocker_head {
 	    finish(this,sigblockermem_finish) ;
 	} ;
 	void dtor() noex ;
-	~sigblocker() {
+	destruct sigblocker() {
 	    dtor() ;
 	}
 } ; /* end class (sigblocker) */
