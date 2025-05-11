@@ -1,23 +1,26 @@
 /* cfalphax MODULE */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
-/* conversion of power-base-two c-string to their binary integer types */
+/* conversion of c-string digits into binary integer types */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2023-05-14, David A­D­ Morano
+	= 2008-05-19, David A­D­ Morano
 	Convert numeric digit c-strings into integers.  This code
 	replaces a previous algorithm that used to be used for this
 	function.  I think that I was on drugs when I wrote that
 	previous version (but people might say the same about this
 	version also).
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 2023 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2008,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -25,13 +28,32 @@
 	cfalphax
 
 	Description:
-	This code converts a c-string of digits (of a power-of-two
-	base) into the normal integer types: these being |int|,
+	This subroutine (template) converts a c-string of
+	digits consisting of just alphabetic-type characters
+	(characters 'A' -- 'Z'), along with a number base (from
+	2 to 26) into the normal integer types: these being |int|,
 	|long|, and |longlong| and their associated unsigned
-	variations.
+	variations.  The conversion is for signed numbers only.  I
+	am considering only signed numbers for these Alpha-base
+	numbers.
+
+	Synopsis:
+    	template<typename T> 
+	inline int cfalphax(cc *sp,int sl,int b,T *rp) noex
+
+	Arguments:
+	sp		source c-string od digits pointer
+	sl		source c-string od digits length
+	b		number base to use (2-26)
+	rp		result value (of the given type) pointer
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 	Notes:
 	1. This code is limited to a maximum base of 64.
+	2. This code only handles signed numbers.
 
 *******************************************************************************/
 
@@ -41,27 +63,25 @@ module ;
 #include	<climits>		/* for |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<stdintx.h>		/* extended integer types */
 #include	<libutil.hh>		/* |xstrlen(3u)| */
-#include	<stdintx.h>
-#include	<sfx.h>
-#include	<cfutil.h>
+#include	<cfutil.hh>		/* namespace |cfx| */
 #include	<char.h>
-#include	<ischarx.h>
+#include	<ischarx.h>		/* |isplusminus(2uc)| */
+#include	<localmisc.h>
 
 export module cfalphax ;
 
-export {
-    template<stdintx T> struct cfashelp {
+template<stdintx T> struct cfashelp {
 	cint		nb = (CHAR_BIT * szof(T)) ;
 	T		*rp = nullptr ;
 	T		val = 0 ;	/* value to create */
-	T		cutoff{} ;
+	T		cutoff ;
 	T		tmax = 0 ;	/* type-maximum value */
 	T		tmin{} ;	/* type-minimum value */
 	int		cutlim ;
@@ -77,30 +97,9 @@ export {
 	    rp = arp ;
 	} ; /* end ctor */
 	int getsign() noex {
-	    int		rs = SR_FAULT ;
-	    if (rp) {
-	        if (sl < 0) sl = xstrlen(sp) ;
-	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        if ((sl > 0) && isplusminus(*sp)) {
-	            fneg = (*sp == '-') ;
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        if (sl > 1) {
-		    cint r = cfx::rmleadzero(sp,sl) ;
-		    sp += (sl - r) ;
-		    sl = r ;
-		} else if (sl == 0) {
-		    rs = SR_INVALID ;
-		} /* end if */
-	    } /* end if (non-null) */
+    	    cint rs = cfx::getsign(sp,sl,&fneg) ;
+	    sp += (sl - rs) ;
+	    sl = rs ;
 	    return rs ;
 	} ; /* end if (getsign) */
 	void prepare() noex {
@@ -159,18 +158,25 @@ export {
 	    *rp = (rs >= 0) ? val : 0 ;
 	    return rs ;
 	} ; /* end method (proc) */
-    } ; /* end struct (cfashelp) */
-    template<typename T> 
-    inline int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
+	operator int () noex {
+	    int		rs ;
+	    if ((rs = getsign()) >= 0) {
+		prepare() ;
+		rs = proc() ;
+	    }
+	    return rs ;
+	} ;
+} ; /* end struct (cfashelp) */
+
+export {
+    template<typename T> inline int cfalphax(cc *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
-	    if (cfashelp cfo(sp,sl,b,rp) ; (rs = cfo.getsign()) >= 0) {
-		cfo.prepare() ;
-		rs = cfo.proc() ;
-	    } /* end if */
+	   cfashelp cfo(sp,sl,b,rp) ;
+	   rs = cfo ;
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine-template (cfalphax) */
-}
+} /* end export */
 
 
