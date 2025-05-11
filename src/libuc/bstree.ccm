@@ -8,12 +8,15 @@
 
 /* revision history:
 
-	= 2013-03-03, David A­D­ Morano
+	= 2007-03-03, David A­D­ Morano
 	Originally written for Rightcore Network Services.
+
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
 
 */
 
-/* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2007,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -84,7 +87,7 @@ module ;
 #include	<cstdlib>
 #include	<new>
 #include	<initializer_list>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<functional>
 #include	<stack>
 #include	<vector>
@@ -96,8 +99,9 @@ module ;
 
 export module bstree ;
 
-template <typename T,typename Comp = std::less<T>>
-class bstree ;
+export {
+    template <typename T,typename Comp = std::less<T>> class bstree ;
+}
 
 template <typename T,typename Comp = std::less<T>>
 class bstree_iter ;
@@ -241,8 +245,8 @@ struct bstree_depth {
 	} ;
 } ; /* end method (bstree_depth) */
 
-template <typename T,typename Comp>
-class bstree {
+export {
+    template <typename T,typename Comp> class bstree {
 	typedef bstree_depth		depth_t ;
 	typedef bstree_node<T,Comp>	node ;
 	bstree_node<T,Comp>	*root = nullptr ;
@@ -582,7 +586,8 @@ public:
 		}
 	    }
 	    return d ;
-    } ; /* end method (depthrecurse) */
-} ; /* end class (bstree) */
+        } ; /* end method (depthrecurse) */
+    } ; /* end class (bstree) */
+} /* end export */
 
 
