@@ -1,4 +1,4 @@
-/* cfpowx MODULE */
+/* cfpowx MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -8,13 +8,16 @@
 
 /* revision history:
 
-	= 2023-05-14, David A­D­ Morano
+	= 2008-05-06, David A­D­ Morano
 	Convert numeric digit c-strings (of pow-of-two bases) into
 	integers.
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 2023 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2008,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -49,9 +52,9 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>		/* extended integer types */
-#include	<libutil.hh>		/* |cstrlen(3u)| */
+#include	<cfutil.hh>		/* namespace |cfx| + |cstrlen(3u)| */
 #include	<checkbase.h>
-#include	<cfutil.h>		/* namespace |cfx| */
+#include	<cfutil.hh>		/* namespace |cfx| */
 #include	<char.h>
 #include	<ischarx.h>		/* |isplusminus(2uc)| */
 #include	<localmisc.h>
