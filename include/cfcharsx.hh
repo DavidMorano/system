@@ -1,4 +1,4 @@
-/* cfcharsx MODULE */
+/* cfcharsx MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -8,20 +8,49 @@
 
 /* revision history:
 
-	= 2023-10,10, David A-D- Morano
+	= 2017-10-10, David A-D- Morano
 	This is originally written.
+
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
 
 */
 
-/* Copyright © 2023 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2017,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-  	Object:
+  	Name:
 	cfcharsx
 
 	Description:
-	Subroutines to convert digit strings to binary integers.
+	This subroutine-template is used to convert digit c-strings
+	to binary integers.  This object uses the uderlying (system
+	supplied) digit conversion functions to implement its
+	interface.  Note that the (so-called) system supplied
+	conversion facilities are (clandestinely) supplemented to
+	support an interger type of 128-bits (a |longlong| type).
+	But the (so-called) system does not generally support integer
+	types larger than 128 bits.  So this subroutine-template
+	|cfcharx(3uc)| also does not support integer types larger
+	than 128-bits.  Also, only digit number bases of omly a
+	maximum of 36 is supported.  So any number bases larger
+	than 36 require a differnt conversion facility, like for
+	example |cfdigx(3uc)|.
+
+	Synopsis:
+    	template<typename T> 
+	inline int cfcharsx(cc *sp,int sl,int b,T *rp) noex
+
+	Arguments:
+	sp		c-string of digits to convert pointer
+	sl		c-string of digits to convert length
+	b		number base
+	rp		pointer to resulting value (of given type)
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -37,7 +66,7 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>		/* extended integer types */
-#include	<cfutil.h>		/* |cstrlen(3u)| */
+#include	<cfutil.hh>		/* namespace |cfx| + |cstrlen(3u)| */
 #include	<localmisc.h>
 
 export module cfcharsx ;
