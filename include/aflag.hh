@@ -1,6 +1,6 @@
 /* aflag HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* atomic-flag */
 /* version %I% last-modified %G% */
@@ -26,6 +26,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 enum aflagmems {
@@ -111,7 +112,7 @@ private:
 } ; /* end struct (aflag) */
 
 
-#endif /* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* AFLAG_INCLUDE */
 
 
