@@ -1,4 +1,5 @@
 /* fmtstr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* header file for the FMTSTR subroutine */
@@ -19,10 +20,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdarg.h>
+#include	<stdarg.h>		/* |va_list(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 #include	<fmtopts.h>
 
