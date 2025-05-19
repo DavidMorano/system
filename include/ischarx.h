@@ -57,7 +57,7 @@ constexpr inline bool	isoctlatin(int ch) noex {
 	return (ch >= '0') && (ch <= '7') ;
 }
 constexpr inline bool	isnumlatin(int ch) noex {
-    	return ishexlatin(ch) || (ch == '\\') ;
+    	return ishexlatin(ch) || (ch == '\\') || (ch == 'x') ;
 }
 constexpr inline bool	iseol(int ch) noex {
 	return (ch == '\n') || (ch == '\r') ;
@@ -72,7 +72,6 @@ constexpr inline bool	isabbr(int ch) noex {
 	ch &= UCHAR_MAX ;
 	return (ch == '.') || (ch == ('­' & UCHAR_MAX)) || (ch == '-') ;
 }
-
 constexpr inline bool	isspacetab(int ch) noex {
 	return (ch == ' ') || (ch == '\t') ;
 }
@@ -86,7 +85,7 @@ static inline bool	isoctlatin(int ch) noex {
 	return (ch >= '0') && (ch <= '7') ;
 }
 static inline bool	isnumlatin(int ch) noex {
-    	return ishexlatin(ch) || (ch == '\\') ;
+    	return ishexlatin(ch) || (ch == '\\') || (ch == 'x') ;
 }
 static inline bool	iseol(int ch) noex {
 	return (ch == '\n') || (ch == '\r') ;
@@ -101,7 +100,6 @@ static inline bool	isabbr(int ch) noex {
 	ch &= UCHAR_MAX ;
 	return (ch == '.') || (ch == ('­' & UCHAR_MAX)) || (ch == '-') ;
 }
-
 static inline bool	isspacetab(int ch) noex {
 	return (ch == ' ') || (ch == '\t') ;
 }
