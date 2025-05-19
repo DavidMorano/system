@@ -10,6 +10,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	fsdir
+
+	Description:
 	Traverse a directory and read out the entries.
 
 	Implementation-note:
@@ -34,8 +38,8 @@
 
 #define	FSDIR_MAGIC	0x31415926
 #define	FSDIR		struct fsdir_head
-#define	FSDIR_ENT	struct fsdir_entry
 #define	FSDIR_FL	struct fsdir_flags
+#define	FSDIR_ENT	struct fsdir_entry
 
 
 struct fsdir_entry {
@@ -51,7 +55,7 @@ struct fsdir_flags {
 
 struct fsdir_head {
 	void		*posixp ;	/* pointer to POSIX® adapater */
-	FSDIR_FL	f ;
+	FSDIR_FL	fl ;
 	uint		magic ;
 	int		dfd ;		/* directory file-descriptor */
 } ;
@@ -126,7 +130,7 @@ struct fsdir : fsdir_head {
 	} ;
 } ; /* end struct (fsdir) */
 #else	/* __cplusplus */
-typedef struct fsdir_head	fsdir ;
+typedef FSDIR		fsdir ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
