@@ -56,6 +56,12 @@
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
+#ifndef	typealias
+#define	typealias		typedef
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
 #ifndef	destruct		
 #define	destruct		compl
 #endif
@@ -124,6 +130,12 @@
 #define	cast_bit		bit_cast
 #define	cast_saturate		saturate_cast
 #define	cast_any		any_cast
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	assert_contract
+#define	assert_contract		contract_assert
 #define	assert_static		static_assert
 #endif
 #endif /* __cplusplus */
