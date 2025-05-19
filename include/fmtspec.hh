@@ -1,4 +1,5 @@
 /* fmtspec HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* format-specification */
@@ -81,7 +82,7 @@ struct fmtspec_flags {
 } ;
 
 struct fmtspec_head {
-	FMTSPEC_FL	f ;
+	FMTSPEC_FL	fl ;
 	short		fcode ;		/* the format "code" */
 	short		width ;		/* <0 turns off */
 	short		prec ;		/* <0 turns off */
@@ -109,7 +110,7 @@ struct fmtspec : fmtspec_head {
 	    code(this,fmtspecmem_code) ;
 	    finish(this,fmtspecmem_finish) ;
 	} ;
-	int start(va_list,cchar *,int) noex ;
+	int start(va_list,cchar *,int = -1) noex ;
 } ;
 
 typedef	FMTSPEC_FL	fmtspec_fl ;
