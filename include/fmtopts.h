@@ -1,4 +1,5 @@
 /* fmtopts HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* header file for the FMTOPTS subroutine */
@@ -23,9 +24,10 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
-enum fmtsopts {
+enum fmtopts {
 	fmtopt_clean,			/* clean up the string-data */
 	fmtopt_nooverr,			/* no-overflow-error */
 	fmtopt_overlast
