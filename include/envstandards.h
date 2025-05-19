@@ -1,5 +1,6 @@
 /* envstandards (Darwin) */
 /* encoding=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
 
 
 /* revision history:
@@ -17,6 +18,9 @@
 /* Copyright © 2000,2023 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	envstandards
 
   	Description:
 	This file is included in pretty much all other user-created
