@@ -62,7 +62,7 @@ extern int grcache_start(grcache *,int,int) noex ;
 extern int grcache_lookname(grcache *,ucentgr *,char *,int,cchar *) noex ;
 extern int grcache_lookgid(grcache *,ucentgr *,char *,int,gid_t) noex ;
 extern int grcache_check(grcache *,time_t) noex ;
-extern int grcache_stats(grcache *,grcache_st *) noex ;
+extern int grcache_getstats(grcache *,grcache_st *) noex ;
 extern int grcache_finish(grcache *) noex ;
 
 EXTERNC_end
