@@ -20,14 +20,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>
 #include	<stdlib.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysflag.h>		/* |F_DARWIN| + |F_LINUX| */
 
-
-#if	(! defined(OSNAME_SunOS)) || (OSNAME_SunOS == 0)
+#if	F_DARWIN || F_LINUX
 
 EXTERNC_begin
 
@@ -35,7 +36,7 @@ extern cchar	*getexecname() noex ;
 
 EXTERNC_end
 
-#endif /* (! defined(OSNAME_SunOS)) || (OSNAME_SunOS == 0) */
+#endif /* F_DARWIN || F_LINUX */
 
 
 #endif /* GETEXECNAME_INCLUDE */
