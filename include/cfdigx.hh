@@ -106,7 +106,7 @@ template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 	cfdshelp(cchar *asp,int asl,int b,T *arp) noex : sp(asp), sl(asl) {
 	    const T	one = 1 ;
 	    tmin = (one << (nb - 1)) ;
-	    tmax = (~ tmax) & (~ tmin) ;
+	    tmax = (compl tmax) & (compl tmin) ;
 	    base = b ;
 	    rp = arp ;
 	} ; /* end ctor */
