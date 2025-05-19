@@ -58,14 +58,14 @@ extern const unsigned char	char_touc[] ;
 extern const unsigned char	char_tofc[] ;
 extern const short		char_dictorder[] ;
 
-/* test routines */
+/* test character attribute routines */
 #define	CHAR_ISSPACETAB(c)	(((c) == ' ') || ((c) == '\t'))
 #define	CHAR_ISWHITE(c)		char_iswhite(c)
 #define	CHAR_ISLC(c)		char_islc(c)
 #define	CHAR_ISUC(c)		char_isuc(c)
 #define	CHAR_ISDIG(c)		char_isdig(c)
 
-/* our super-fast conversions */
+/* my super-fast conversions */
 #define	CHAR_TOBC(c)		((c) & 0xff)
 #define	CHAR_TOLC(c)		(char_tolc[(c) & 0xff])
 #define	CHAR_TOUC(c)		(char_touc[(c) & 0xff])
