@@ -69,7 +69,7 @@ extern int gncache_start(gncache *,int,int) noex ;
 extern int gncache_add(gncache *,gid_t,char *) noex ;
 extern int gncache_lookgid(gncache *,char *,int,gid_t) noex ;
 extern int gncache_check(gncache *,time_t) noex ;
-extern int gncache_stats(gncache *,gncache_st *) noex ;
+extern int gncache_getstats(gncache *,gncache_st *) noex ;
 extern int gncache_finish(gncache *) noex ;
 
 EXTERNC_end
