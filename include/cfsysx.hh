@@ -1,4 +1,4 @@
-/* cfsysx MODULE */
+/* cfsysx MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -24,6 +24,9 @@
 	is now quite rare.  I hope that this is not a problem.  We
 	will see.
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 	= 2023-10,10, David A-D- Morano
 	I took the liberty to rewite these subroutines in terms of
 	a subroutine-template.  This did nothing to make the code
@@ -34,7 +37,7 @@
 
 */
 
-/* Copyright © 1998,2013,2023 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2013,2020,2023 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -42,8 +45,32 @@
 	cfsysx
 
 	Description:
-	Subroutines to convert digit strings intto binary integers
-	(of various types and sizes).
+	This subroutine-template is used to convert digit c-strings
+	to binary integers.  This object uses the uderlying (system
+	supplied) digit conversion functions to implement its
+	interface.  Note that the (so-called) system supplied
+	conversion facilities are (clandestinely) supplemented to
+	support an interger type of 128-bits (a |longlong| type).
+	But the (so-called) system does not generally support integer
+	types larger than 128 bits.  So this subroutine-template
+	|cfcharx(3uc)| also does not support integer types larger
+	than 128-bits.  Also, only digit number bases of omly a
+	maximum of 36 is supported.  So any number bases larger
+	than 36 require a differnt conversion facility, like for
+	example |cfdigx(3uc)|.
+
+	Synopsis:
+    	template<typename T> inline int cfsysx(cc *sp,int sl,int b,T *rp) noex
+
+	Arguments:
+	sp	digit c-string pointer (to convert to integer)
+	sl	digit c-string length  (to convert to integer)
+	b	number base
+	rp	pointer to result value (of the specified type)
+
+	Returns:
+	>=0	OK
+	<0	error (system-return)
 
 *******************************************************************************/
 
@@ -57,7 +84,7 @@ module ;
 #include	<snwcpy.h>
 #include	<sfx.h>
 #include	<checkbase.h>
-#include	<cfutil.h>		/* namespace |cfx| */
+#include	<cfutil.hh>		/* namespace |cfx| + |cstrlen(3u)| */
 #include	<localmisc.h>
 
 export module cfsysx ;
