@@ -1,4 +1,5 @@
 /* hash HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* determine if file-name (just a string) has an approved file-extension */
@@ -30,7 +31,7 @@
 EXTERNC_begin
 
 extern uint hash_again(uint,int,int) noex ;
-extern uint hash_elf(cchar *,int) noex ;
+extern uint hash_elf(cvoid *,int) noex ;
 extern uint hash_hsieh(cchar *,int) noex ;
 
 EXTERNC_end
