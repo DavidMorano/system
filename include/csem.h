@@ -44,6 +44,8 @@ struct csem_head {
 
 #ifdef	__cplusplus
 enum csemmems {
+	csemmem_incr,
+	csemmem_post,
 	csemmem_count,
 	csemmem_waiters,
 	csemmem_destroy,
@@ -57,16 +59,20 @@ struct csem_co {
 	    op = p ;
 	    w = m ;
 	} ;
-	operator int () noex ;
-	int operator () () noex { 
-	    return operator int () ;
+	int operator () (int = 1) noex ;
+	operator int () noex {
+	    return operator () () ;
 	} ;
 } ; /* end struct (csem_co) */
 struct csem : csem_head {
+	csem_co		incr ;
+	csem_co		post ;
 	csem_co		count ;
 	csem_co		waiters ;
 	csem_co		destroy ;
 	csem() noex {
+	    incr(this,csemmem_incr) ;
+	    post(this,csemmem_post) ;
 	    count(this,csemmem_count) ;
 	    waiters(this,csemmem_waiters) ;
 	    destroy(this,csemmem_destroy) ;
@@ -75,10 +81,9 @@ struct csem : csem_head {
 	csem &operator = (const csem &) = delete ;
 	int create(int = 0,int = 0) noex ;
 	int decr(int = 1,int = -1) noex ;
-	int incr(int = 1) noex ;
 	operator int () noex ;
 	void dtor() noex ;
-	~csem() {
+	destruct csem() {
 	    dtor() ;
 	} ;
 } ; /* end struct (csem) */
@@ -91,6 +96,7 @@ EXTERNC_begin
 extern int	csem_create(csem *,int,int) noex ;
 extern int	csem_decr(csem *,int,int) noex ;
 extern int	csem_incr(csem *,int) noex ;
+extern int	csem_post(csem *) noex ;
 extern int	csem_count(csem *) noex ;
 extern int	csem_waiters(csem *) noex ;
 extern int	csem_destroy(csem *) noex ;
