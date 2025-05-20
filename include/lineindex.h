@@ -23,7 +23,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |caddr_t| */
-#include	<sys/stat.h>		/* |struct stat| */
+#include	<sys/stat.h>		/* |USTAT| */
 #include	<time.h>		/* |time_t| */
 #include	<fcntl.h>		/* |mode_t| */
 #include	<clanguage.h>
