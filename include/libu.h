@@ -32,8 +32,8 @@
 #include	<sys/stat.h>
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
-#include	<sys/poll.h>
 
+#include	<poll.h>
 #include	<signal.h>
 #include	<limits.h>
 #include	<unistd.h>
@@ -52,11 +52,11 @@
 #include	<usysrets.h>
 
 #include	<aflag.hh>
-#include	<usys.h>	/* <- auxilllary OS support */
-#include	<memx.h>
 #include	<libutil.hh>
 #include	<endian.h>
+#include	<memx.h>
 
+#include	<usys.h>	/* <- auxilllary OS support */
 #include	<usysop.h>	/* UNIX® system-operations */
 #include	<usysdata.h>	/* UNIX® system-data */
 #include	<usysutility.hh>
@@ -68,11 +68,12 @@
 #include	<um.h>		/* UNIX® memory-management */
 #include	<uipc.h>	/* UNIX® System V IPC */
 #include	<ustr.h>	/* UNIX® STREAMS® */
-#include	<uopen.h>
+#include	<ufdlock.h>
 #include	<ufiledesc.h>	/* file-descriptor */
 #include	<ufileop.h>	/* file-operations */
 #include	<usig.h>
 #include	<uprocess.h>
+#include	<uatfork.h>
 #include	<uexec.h>
 #include	<utimeoutdefs.h>
 #include	<utimeout.h>
