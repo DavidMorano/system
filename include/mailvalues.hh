@@ -47,7 +47,7 @@ struct mailvalues {
 extern const mailvalues		mailvalue ;
 
 
-#endif	/* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* MAILVALUES_INCLUDE */
 
 
