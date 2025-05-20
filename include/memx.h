@@ -75,7 +75,7 @@ constexpr inline void *cmemcpy(T *dp,cvoid *sp,size_t dsize = -1) noex {
 #define	TEMPLATE_MEMCOPY
 #ifdef	__cplusplus
 template<typename T>
-constexpr void *memcopy(T *dp,cvoid *sp,int dsz = -1) noex {
+constexpr inline void *memcopy(T *dp,cvoid *sp,int dsz = -1) noex {
     	caddr_t		rp = nullptr ;
 	if (rp && sp) {
     	    if (dsz < 0) dsz = szof(T) ;
@@ -90,6 +90,17 @@ constexpr void *memcopy(T *dp,cvoid *sp,int dsz = -1) noex {
 }
 #endif /* __cplusplus */
 #endif	/* TEMPLATE_MEMCOPY */
+
+#ifndef	TEMPLATE_RESUMELIFE
+#define	TEMPLATE_RESUMELIFE
+#ifdef	__cplusplus
+template<typename T>
+constexpr inline T *resumelife(void *vp) noex {
+    	T *rp = cast_reinterpret<T *>(vp) ;
+    	return rp ;
+}
+#endif /* __cplusplus */
+#endif	/* TEMPLATE_RESUMELIFE */
 
 
 #endif /* MEMX_INCLUDE */
