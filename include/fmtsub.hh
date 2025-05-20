@@ -11,7 +11,7 @@
 	= 1998-03-01, David A­D­ Morano
 	Of course, this subroutine was inspired by the UNIX®
 	equivalent, but this is my own version for a) when I do not
-	have the UNIX® libraries around, and b. to customize it to
+	have the UNIX® libraries around, and b) to customize it to
 	what I want!
 
 */
@@ -37,11 +37,10 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<fmtspec.hh>
-
 export module fmtsub ;
 
 import fmtstrdata ;
+import fmtspec ;
 
 #define	FMTSUB		fmtsub_head
 #define	FMTSUB_FL	fmtsub_flags
@@ -53,7 +52,7 @@ export {
 	uint		mnooverr:1 ;	/* mode: return-error */
     } ;
     struct fmtsub_head {
-	char		*ubuf ;		/* user buffer */
+	char		*ubuf{} ;	/* user buffer */
 	FMTSUB_FL	fl ;		/* flags */
 	int		ulen ;		/* buffer length */
 	int		len ;		/* current buffer usage count */
@@ -91,11 +90,12 @@ export {
 	int strw(cchar *,int = -1) noex ;
 	int chr(int) noex ;
 	int blanks(int = 1) noex ;
+	int emitter(fmtspec *,cchar *,int) noex ;
 	int emit(fmtspec *,cchar *,int) noex ;
 	int formstr(fmtspec *,fmtstrdata *) noex ;
 	void dtor() noex ;
-	~fmtsub() {
-	    dtor() ;
+	destruct fmtsub() {
+	    if (ubuf) dtor() ;
 	} ;
     } ; /* end struct (fmtsub) */
     typedef	FMTSUB_FL	fmtsub_fl ;
