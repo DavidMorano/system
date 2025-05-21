@@ -28,7 +28,7 @@
 
 struct namesem_head {
 	sem_t		*sp ;
-	cchar		*name ;
+	char		*name ;
 	uint		magic ;
 } ;
 
@@ -80,7 +80,7 @@ struct namesem : namesem_head {
 	int open(cchar *,int,mode_t,uint) noex ;
 	operator int () noex ;
 	void dtor() noex ;
-	~namesem() {
+	destruct namesem() {
 	    dtor() ;
 	} ;
 } ; /* end struct (namesem) */
