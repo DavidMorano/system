@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	convert{x}
+
+	Description:
 	These subroutines are similar to the |ecvt(3c)| |fcvt(3c)|,
 	and |gcvt(3c)| POSIX® subroutines, but are reentrant. 
 
