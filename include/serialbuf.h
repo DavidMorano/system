@@ -136,8 +136,8 @@ struct serialbuf : serialbuf_head {
 	    return *this ;
 	} ;
 	void dtor() noex ;
-	~serialbuf() {
-	    dtor() ;
+	destruct serialbuf() {
+	    if (sbuf) dtor() ;
 	} ;
 } ; /* end struct (serialbuf) */
 template<> inline int serialbuf::r(char *p) noex {
