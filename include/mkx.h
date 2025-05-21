@@ -39,11 +39,8 @@
 #include	<mkutmpid.h>
 #include	<mkquoted.h>
 #include	<mkprogenv.h>
-#include	<mkpathxw.h>
-#include	<mkpathx.h>
-#include	<mkpathrooted.h>
-#include	<mknpathxw.h>
-#include	<mknpathx.h>
+#include	<mkpath.h>
+#include	<mknpath.h>
 #include	<mkmagic.h>
 #include	<mkfname.h>
 #include	<mkfdfname.h>
