@@ -27,8 +27,12 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<fmtopts.h>
+#include	<fmtopt.h>
 
+
+#ifndef	FMTSTR_NULLSTR
+#define	FMTSTR_NULLSTR		"(null)"
+#endif
 
 EXTERNC_begin
 
