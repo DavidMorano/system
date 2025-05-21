@@ -20,6 +20,7 @@
   	Object:
 	singlist
 
+	Descrption:
 	This is a container object (elements are stored within it).
 	This also is implemented as a single-linked list of nodes.
 	This object is very useful for normal queue operations
@@ -49,7 +50,12 @@
 #include	<cstdlib>
 #include	<new>
 #include	<initializer_list>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>		/* system-returns */
+#include	<localmisc.h>
 
 
 template <typename T>
