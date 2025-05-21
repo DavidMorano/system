@@ -29,7 +29,6 @@
 
 EXTERNC_begin
 
-
 extern int ndigiti(int,int) noex ;
 extern int ndigitl(long,int) noex ;
 extern int ndigitll(longlong,int) noex ;
