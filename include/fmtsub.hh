@@ -14,9 +14,12 @@
 	have the UNIX® libraries around, and b) to customize it to
 	what I want!
 
+	= 2020-02-15, David A­D­ Morano
+	I modularized (w/ C++20 modules) this code.
+
 */
 
-/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
+/* Copyright © 1998,2020 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -93,6 +96,7 @@ export {
 	int emitter(fmtspec *,cchar *,int) noex ;
 	int emit(fmtspec *,cchar *,int) noex ;
 	int formstr(fmtspec *,fmtstrdata *) noex ;
+	template<typename T> int floater(char *,int,int,int,int,int,T) noex ;
 	void dtor() noex ;
 	destruct fmtsub() {
 	    if (ubuf) dtor() ;
@@ -112,7 +116,8 @@ export {
     int fmtsub_formstr(fmtsub *,fmtspec *,fmtstrdata *) noex ;
     int fmtsub_reserve(fmtsub *,int) noex ;
     int fmtsub_audit(fmtsub *) noex ;
-    int fmtsub_floater(fmtsub *,int,double,int,int,int,char *) noex ;
+    template<typename T> 
+    int fmtsub_floater(fmtsub *,char *,int,int,int,int,int,T) noex ;
 } /* end export */
 
 
