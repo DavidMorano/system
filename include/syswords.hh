@@ -1,6 +1,6 @@
 /* syswords HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a database of commonly used system words */
 /* version %I% last-modified %G% */
@@ -81,7 +81,7 @@ struct syswords {
 extern const syswords	sysword ;
 
 
-#endif	/* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* SYSWORDS_INCLUDE */
 
 
