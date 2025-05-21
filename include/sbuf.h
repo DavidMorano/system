@@ -164,8 +164,8 @@ struct sbuf : sbuf_head {
 	    return sbuf_getlen(this) ;
 	} ;
 	void dtor() noex ;
-	~sbuf() {
-	    dtor() ;
+	destruct sbuf() {
+	    if (rbuf) dtor() ;
 	} ;
 } ; /* end struct (sbuf) */
 #else	/* __cplusplus */
