@@ -28,6 +28,7 @@
 
 #include	<mkpathx.h>
 #include	<mkpathxw.h>
+#include	<mkpathrooted.h>
 
 
 #endif /* MKPATH_INCLUDE */
