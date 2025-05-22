@@ -35,6 +35,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* system types */
+#include	<sys/time.h>		/* <- interval timers are here */
 #include	<time.h>		/* i-timer types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
