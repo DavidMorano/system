@@ -44,6 +44,7 @@ export module fmtsub ;
 
 import fmtstrdata ;
 import fmtspec ;
+import cvtfloat ;
 
 #define	FMTSUB		fmtsub_head
 #define	FMTSUB_FL	fmtsub_flags
@@ -96,7 +97,8 @@ export {
 	int emitter(fmtspec *,cchar *,int) noex ;
 	int emit(fmtspec *,cchar *,int) noex ;
 	int formstr(fmtspec *,fmtstrdata *) noex ;
-	template<typename T> int floater(char *,int,int,int,int,int,T) noex ;
+	template<typename T> 
+	int floater(char *tb,int tl,int fc,int fg,int wi,int pr,T dv) noex ;
 	void dtor() noex ;
 	destruct fmtsub() {
 	    if (ubuf) dtor() ;
@@ -116,8 +118,14 @@ export {
     int fmtsub_formstr(fmtsub *,fmtspec *,fmtstrdata *) noex ;
     int fmtsub_reserve(fmtsub *,int) noex ;
     int fmtsub_audit(fmtsub *) noex ;
-    template<typename T> 
-    int fmtsub_floater(fmtsub *,char *,int,int,int,int,int,T) noex ;
 } /* end export */
 
+template<typename T> 
+int fmtsub::floater(char *tb,int tl,int fc,int fg,int wi,int pr,T dv) noex {
+    	    int		rs ;
+	    if ((rs = cvtfloat(tb,tl,fc,fg,wi,pr,dv)) >= 0) {
+	        rs = strw(tb,rs) ;
+	    }
+	    return rs ;
+} /* end method (floater) */
 
