@@ -21,10 +21,14 @@
 
 /*******************************************************************************
 
+  	Name:
+	usys_darwin
+
+	Description:
 	This file contains the UNIX® system types that the brain-damaged
-	MacOS operating system does NOT have.  We are trying in a very
-	small way to make up for some of the immense brain-damage within
-	the Apple Darwin operating system.
+	MacOS operating system does NOT have.  We are trying in a
+	very small way to make up for some of the immense brain-damage
+	within the Apple Darwin operating system.
 
 *******************************************************************************/
 
@@ -36,7 +40,6 @@
 
 /* USYSDARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-
 
 #include	<sys/types.h>
 #include	<sys/wait.h>		/* <- type |idtype_t| is there */
@@ -51,6 +54,10 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
+#include	<usysargz.hh>
+
+/*----------------------------------------------------------------------------*/
+/* DEFINES begin */
 
 #ifndef	SIGEVENT
 #define	SIGEVENT	struct sigevent
@@ -68,6 +75,8 @@
 #define	CSIGVAL		const union sigval
 #endif
 
+/* DEFINES end */
+/*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
 /* SIGSEND begin */
@@ -106,7 +115,6 @@ EXTERNC_end
 /* SIGSEND end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
 /* SIGWAIT begin */
 #if	(!defined(SYSHAS_SIGWAIT)) || (SYSHAS_SIGWAIT == 0)
@@ -123,7 +131,6 @@ EXTERNC_end
 #endif /* (!defined(SYSHAS_SIGWAIT)) || (SYSHAS_SIGWAIT == 0) */
 /* SIGWAIT end */
 /*----------------------------------------------------------------------------*/
-
 
 /*----------------------------------------------------------------------------*/
 /* TIMER begin (POSIX real-time) */
@@ -168,7 +175,6 @@ EXTERNC_end
 /* TIMER end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
 /* RELTIMEDWAIT begin */
 #if	(!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0)
@@ -192,7 +198,6 @@ EXTERNC_end
 #endif /* (!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0) */
 /* RELTIMEDWAIT end */
 /*----------------------------------------------------------------------------*/
-
 
 /*----------------------------------------------------------------------------*/
 /* MUTEXROBUST start */
@@ -218,7 +223,6 @@ EXTERNC_end
 /* MUTEXROBUST end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
 /* UCTIMEOUT begin */
 
@@ -228,7 +232,6 @@ EXTERNC_end
 
 /* UCTIMEOUT begin */
 /*----------------------------------------------------------------------------*/
-
 
 /*----------------------------------------------------------------------------*/
 /* MEMCNTL begin */
@@ -246,7 +249,6 @@ EXTERNC_end
 #endif /* (!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0) */
 /* MEMCNTL end */
 /*----------------------------------------------------------------------------*/
-
 
 /*----------------------------------------------------------------------------*/
 /* PSEM begin (unnamed POSIX® semaphores) */
@@ -268,9 +270,8 @@ EXTERNC_end
 /* PSEM end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
-/* UTMPENT-FIELDS begin (unnamed POSIX® semaphores) */
+/* UTMPENT-FIELDS begin */
 #if	defined(SYSHAS_UTMPX) && (SYSHAS_UTMPX > 0)
 
 #ifndef	UTMPXSTRUCTGIELD_SESSION
@@ -291,7 +292,6 @@ EXTERNC_end
 /* UTMPENT_FIELDS end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
 #ifdef	COMMENT /* should not be necessary on Darwin */
 #ifndef	SUBROUTINE_RENAME
@@ -303,15 +303,21 @@ EXTERNC_end
 #endif /* COMMENT */
 /*----------------------------------------------------------------------------*/
 
-
+/*----------------------------------------------------------------------------*/
+/* SUBROUTINES begin */
 #ifdef	__cplusplus
 
-namespace libu {
+namespace usys {
     extern sysret_t darwin_usysctl(char *,int,cchar *) noex ;
+    extern sysret_t darwin_ttyname(int,char *,int) noex ; /* currently unused */
+    extern sysret_t darwin_execname(char *,int) noex ;
+    extern sysret_t darwin_argz(char *,int) noex ;
+    extern cchar *darwin_getargz() noex ;
 }
 
 #endif /* __cplusplus */
-
+/* SUBROUTINES end */
+/*----------------------------------------------------------------------------*/
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* USYSDARWIN finish */
