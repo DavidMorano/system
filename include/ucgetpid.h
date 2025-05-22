@@ -50,7 +50,7 @@ namespace libuc {
 	    return operator int () ;
 	} ;
     } ; /* end struct (ucsider) */
-}
+} /* end namespace (libuc) */
 
 extern libuc::ucpider		ucpid ;
 extern libuc::ucsider		ucsid ;
