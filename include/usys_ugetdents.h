@@ -55,7 +55,7 @@
 
 
 namespace usys {
-    extern sysret_t ugetdents(int,dirent_t *,int) noex ;
+    extern sysret_t ugetdents(int,char *,int) noex ;
 }
 
 
