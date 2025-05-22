@@ -1,6 +1,6 @@
 /* timecount HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* count-down timer */
 /* version %I% last-modified %G% */
@@ -27,7 +27,7 @@
 
 #ifndef	TIMECOUNT_INCLUDE
 #define	TIMECOUNT_INCLUDE
-#ifdef	__cplusplus
+#ifdef	__cplusplus /* C++ only! */
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -53,7 +53,7 @@ public:
 } ; /* end class (timecount) */
 
 
-#endif /* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* TIMECOUNT_INCLUDE */
 
 
