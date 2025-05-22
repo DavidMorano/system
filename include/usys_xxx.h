@@ -37,8 +37,10 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
+#include	<sys/stat.h>		/* |stat| */
 #include	<sys/wait.h>		/* <- type |idtype_t| is there */
 #include	<sys/time.h>		/* <- |TIMESPEC| is there */
+#include	<unistd.h>		/* |dup2(2)| + |pipe2(2)| */
 #include	<signal.h>		/* <- |SIGEVENT| */
 #include	<pthread.h>
 #include	<time.h>
@@ -46,7 +48,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-
 
 /*----------------------------------------------------------------------------*/
 /* SECDB begin */
@@ -57,7 +58,6 @@
 #endif /* (!defined(SYSHAS_SECDB)) || (SYSHAS_SECDB == 0) */
 /* SECDB end */
 /*----------------------------------------------------------------------------*/
-
 
 /*----------------------------------------------------------------------------*/
 /* USERATTR begin */
@@ -93,7 +93,6 @@ EXTERNC_end
 /* USERATTR end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
 /* PROJECT begin */
 #if	defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0)
@@ -119,7 +118,6 @@ extern "C" {
 /* PROJECT end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
 /* SYSV-MSG begin */
 
@@ -134,7 +132,6 @@ typedef long		sysvmsgtype ;
 
 /* SYSV-MSG end */
 /*----------------------------------------------------------------------------*/
-
 
 /*----------------------------------------------------------------------------*/
 /* MEMCNTL begin */
@@ -152,7 +149,6 @@ EXTERNC_end
 #endif /* (!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0) */
 /* MEMCNTL end */
 /*----------------------------------------------------------------------------*/
-
 
 /*----------------------------------------------------------------------------*/
 /* MEMPLOCK begin */
@@ -195,21 +191,48 @@ EXTERNC_end
 /* MEMPLOCK end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
 /* LOADAVGINT begin */
 #if	(! defined(SYSHAS_LOADAVGINT)) || (SYSHAS_LOADAVGINT == 0)
 
 #ifndef	SUBROUTINE_KLOADAVG
 #define	SUBROUTINE_KLOADAVG
-EXTERNC_begin
-extern unixret_t kloadavg(int *,int) noex ;
-EXTERNC_end
+#ifdef	__cplusplus /* C++ only! */
+namespace usys {
+    extern unixret_t kloadavg(int *,int) noex ;
+}
+#endif /* __cplusplus (C++ only) */
 #endif /* SUBROUTINE_KLOADAVG */
 
 #endif /* (! defined(SYSHAS_LOADAVGINT)) || (SYSHAS_LOADAVGINT == 0) */
 /* LOADAVGINT end */
 /*----------------------------------------------------------------------------*/
+
+/* all operating systems */
+#ifndef	SUBROUTINE_STATFILE
+#define	SUBROUTINE_STATFILE
+EXTERNC_begin
+extern int pipe2(int *,int) noex ;
+static inline unixret_t statfile(cchar *fn,USTAT *sbp) noex {
+    	return stat(fn,sbp) ;
+}
+static inline unixret_t statfilefs(cchar *fn,USTATFS *sbp) noex {
+    	return statfs(fn,sbp) ;
+}
+static inline unixret_t statfilevfs(cchar *fn,USTATVFS *sbp) noex {
+    	return statvfs(fn,sbp) ;
+}
+static inline unixret_t fstatfile(int fd,USTAT *sbp) noex {
+    	return fstat(fd,sbp) ;
+}
+static inline unixret_t dupover(int sfd,int dfd) noex {
+    	return dup2(sfd,dfd) ;
+}
+static inline unixret_t piper(int *fds,int fl) noex {
+    	return pipe2(fds,fl) ;
+}
+EXTERNC_end
+#endif /* SUBROUTINE_STATFILE */
 
 
 #endif /* USYSXXX_INCLUDE */
