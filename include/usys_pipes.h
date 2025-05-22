@@ -37,7 +37,6 @@
 /* PIPES begin */
 #if	(!defined(SYSHAS_PIPES)) || (SYSHAS_PIPES == 0)
 
-
 #include	<sys/random.h>		/* |getentropy(2)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
