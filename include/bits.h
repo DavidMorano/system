@@ -96,8 +96,8 @@ struct bits : bits_head {
 	    return count ;
 	} ;
 	void dtor() noex ;
-	~bits() {
-	    dtor() ;
+	destruct bits() {
+	    if (a) dtor() ;
 	} ;
 } ; /* end struct (bits) */
 
