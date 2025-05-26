@@ -129,15 +129,13 @@ export {
 	                if (nsl <= cfsysx_maxstack) {
 	                    char	dbuf[dlen+1] ;
 	    	            if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
-		                if (rs > 0) nsp = dbuf ;
-		                rs = cfsystox(nsp,b,rp) ;
+		                rs = cfsystox(dbuf,b,rp) ;
 	                    } /* end if (loading) */
 		        } else {
 		            char	*dbuf{} ;
 		            if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
 	    	                if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
-		                    if (rs > 0) nsp = dbuf ;
-		                    rs = cfsystox(nsp,b,rp) ;
+		                    rs = cfsystox(dbuf,b,rp) ;
 	                        } /* end if (loading) */
 			        rs1 = uc_free(dbuf) ;
 			        if (rs >= 0) rs = rs1 ;
