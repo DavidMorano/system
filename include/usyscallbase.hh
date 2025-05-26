@@ -1,6 +1,6 @@
 /* usyscallbase HEADER (UNIX® file operations) */
 /* encoding=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* translation layer interface for UNIX® equivalents */
 /* version %I% last-modified %G% */
@@ -28,7 +28,7 @@
 
 #ifndef	USYSCALLBASE_INCLUDE
 #define	USYSCALLBASE_INCLUDE
-#ifdef	__cplusplus
+#ifdef	__cplusplus /* C++ only */
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -36,6 +36,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 namespace libu {
@@ -55,7 +56,7 @@ namespace libu {
 }
 
 
-#endif /* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* USYSCALLBASE_INCLUDE */
 
 
