@@ -54,7 +54,7 @@ enum bitsmems {
 	bitsmem_extent,
 	bitsmem_count,
 	bitsmem_overlast
-} ;
+} ; /* end enum (bitsmems) */
 class bits ;
 class bits_co {
 	friend		bits ;
