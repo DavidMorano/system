@@ -153,7 +153,7 @@ struct storebuf {
 	char		*bufp ;
 	int		bufl ;
 	int		idx ;
-	storebuf() = delete ;
+	storebuf() noex : bufp(nullptr), bufl(0), idx (0) { } ;
 	storebuf(char *p,int l,int i = 0) noex : bufp(p), bufl(l), idx(i) { } ;
 	int chrs(int ch,int n) noex {
 	    cint rs = storebuf_chrs(bufp,bufl,idx,ch,n) ;
