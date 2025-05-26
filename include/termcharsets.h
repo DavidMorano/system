@@ -1,4 +1,5 @@
 /* termcharsets HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 
@@ -59,6 +60,7 @@ Z	Spanish
 ****/
 
 #endif /* COMMENT */
+
 
 #endif /* TERMCHARSETS_INCLUDE */
 
