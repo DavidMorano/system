@@ -105,11 +105,11 @@
 #endif
 
 #ifndef	STATFS
-#define	STATFS		struct statfs
+#define	STATFS		STATFS
 #endif
 
 #ifndef	STATVFS
-#define	STATVFS		struct statvfs
+#define	STATVFS		STATVFS
 #endif
 
 #ifndef	DIRENT
