@@ -34,6 +34,7 @@ EXTERNC_begin
 extern int siochr(cchar *,int,int) noex ;
 extern int sirchr(cchar *,int,int) noex ;
 extern int sicasechr(cchar *,int,int) noex ;
+
 extern int sialpha(cchar *,int) noex ;
 extern int sidigit(cchar *,int) noex ;
 extern int sialnum(cchar *,int) noex ;
@@ -43,8 +44,13 @@ extern int sinext(cchar *,int) noex ;
 extern int siskipwhite(cchar *,int) noex ;
 extern int silbrace(cchar *,int) noex ;
 extern int sileader(cchar *,int) noex ;
-extern int sibreak(cchar *,int,cchar *) noex ;
 extern int sihyphen(cchar *,int) noex ;
+
+extern int sinonoct(cchar *,int) noex ;
+extern int sinondec(cchar *,int) noex ;
+extern int sinonhex(cchar *,int) noex ;
+
+extern int sibreak(cchar *,int,cchar *) noex ;
 extern int sispan(cchar *,int,cchar *) noex ;
 extern int sicite(cchar *,int,cchar *,int) noex ;
 extern int siterm(cchar *,int,cchar *) noex ;
