@@ -35,6 +35,8 @@ DEFS +=
 
 INCS += decoder.h
 
+MODS +=
+
 LIBS +=
 
 
