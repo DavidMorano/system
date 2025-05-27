@@ -1,4 +1,5 @@
 /* keyopt HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* paramater option manipulations */
@@ -73,12 +74,27 @@ extern int keyopt_enumkeys(keyopt *,keyopt_cur *,cchar **) noex ;
 extern int keyopt_fetch(keyopt *,cchar *,keyopt_cur *,cchar **) noex ;
 extern int keyopt_enumvalues(keyopt *,cchar *,keyopt_cur *,cchar **) noex ;
 extern int keyopt_finish(keyopt *) noex ;
+extern int keyopt_lastvalue(keyopt *,cchar *,cchar **) noex ;
 
 #ifdef	COMMENT
-extern int keyopt_findvalue(keyopt *,cchar *,cchar *,int,KEYOPT_VALUE **) noex ;
+extern int keyopt_findvalue(keyopt *,cchar *,cchar *,int,keyopt_val **) noex ;
 #endif /* COMMENT */
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+static inline int keyopt_magic(keyopt *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == KEYOPT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (keyopt_magic) */
+
+#endif /* __cplusplus */
 
 
 #endif /* KEYOPT_INCLUDE */
