@@ -33,20 +33,38 @@
 #endif
 #endif /* noex */
 
+#ifndef	scharconv
+#define	scharconv		schar
+#endif
+
 #ifndef	charconv
 #define	charconv		char
 #endif
-
 #ifndef	shortconv
 #define	shortconv		short
 #endif
-
 #ifndef	intconv
 #define	intconv			int
 #endif
-
 #ifndef	longconv
 #define	longconv		long
+#endif
+
+#ifndef	ucharconv
+#define	ucharconv		uchar
+#endif
+#ifndef	ushortconv
+#define	ushortconv		ushort
+#endif
+#ifndef	uintconv
+#define	uintconv		uint
+#endif
+#ifndef	uintlongconv
+#define	ulongconv		ulong
+#endif
+
+#ifndef	floatconv
+#define	floatconv		float
 #endif
 
 #ifdef	__cplusplus

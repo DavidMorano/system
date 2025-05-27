@@ -33,13 +33,13 @@
 #include	<sys/stat.h>
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
-#include	<sys/poll.h>
 #include	<sys/socket.h>
 
 #if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)
 #include	<sys/acl.h>
 #endif
 
+#include	<poll.h>
 #include	<signal.h>
 #include	<ucontext.h>
 #include	<limits.h>
@@ -58,15 +58,14 @@
 #include	<usys.h>	/* <- auxilllary OS support */
 
 #include	<clanguage.h>
-#include	<usysdefs.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<usupport.h>
 #include	<stdintx.h>
 
 #include	<uinet.h>
-#include	<uopen.h>
 #include	<usyscalls.h>
 #include	<uxti.h>
 #include	<upthread.h>

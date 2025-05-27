@@ -30,7 +30,7 @@
 #include	<sys/time.h>		/* for |u_adjtime(3u)| */
 #include	<sys/timeb.h>		/* for |uc_ftime(3uc)| */
 #include	<sys/resource.h>
-#include	<sys/stat.h>
+#include	<sys/stat.h>		/* |USTAT| */
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
 
@@ -57,34 +57,22 @@
 
 
 /* for |stat(2)| and its many friends */
-
 #ifndef	STRUCT_USTAT
 #define	STRUCT_USTAT
-#if	defined(_LARGEFILE_SOURCE)
-#define	ustat		stat
-#else
-#if	defined(_LARGEFILE64_SOURCE)
-#define	ustat	stat64
-#else
-#define	ustat		stat
-#endif
-#endif
-#endif
+#define	USTAT		struct stat
+#endif /* STRUCT_USTAT */
+
+/* for |stat(2)| and its many friends */
+#ifndef	STRUCT_USTATFS
+#define	STRUCT_USTATFS
+#define	USTATFS		struct statfs
+#endif /* STRUCT_USTAT */
 
 /* for |statvfs(2)| and its many friends */
-
 #ifndef	STRUCT_USTATVFS
 #define	STRUCT_USTATVFS
-#if	defined(_LARGEFILE_SOURCE)
-#define	ustatvfs	statvfs
-#else
-#if	defined(_LARGEFILE64_SOURCE)
-#define	ustatvfs	statvfs64
-#else
-#define	ustatvfs	statvfs
-#endif
-#endif
-#endif
+#define	USTATVFS	struct statvfs
+#endif /* STRUCT_USTATVFS */
 
 /* PREDEFINED start */
 /* determine if some unsigned-related typedefs have already been made */
@@ -536,6 +524,20 @@ typedef const wchar_t		cwchar ;
 #ifndef	TYPEDEF_MAINV
 #define	TYPEDEF_MAINV
 typedef const char *const *	mainv ;
+#endif
+
+#ifndef	TYPEDEF_USTAT
+#define	TYPEDEF_USTAT
+typedef USTAT			ustat ;
+#endif
+
+#ifndef	TYPEDEF_USTATFS
+#define	TYPEDEF_USTATFS
+typedef USTATFS			ustatfs ;
+#endif
+#ifndef	TYPEDEF_USTATVFS
+#define	TYPEDEF_USTATVFS
+typedef USTATVFS		ustatvfs ;
 #endif
 
 #ifndef	TYPEDEF_IN4ADDRT

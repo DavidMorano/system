@@ -117,8 +117,8 @@ private:
 };
 
 int operator/(cint n,const int_fastdiv& divisor) noex {
-	int q;
-	q = (((unsigned long long)((long long)divisor.M * (long long)n)) >> 32);
+	int	q ;
+	q = int(((unsigned long)((long)divisor.M * (long)n)) >> 32) ;
 	q += n * divisor.n_add_sign;
 	if (divisor.s >= 0) {
 	    /* we rely on this to be implemented as arithmetic shift */

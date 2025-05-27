@@ -102,7 +102,7 @@
 #endif
 
 #ifndef	MKBOOL
-#define	MKBOOL(exp)	((exp)!=0)
+#define	MKBOOL(exp)	((exp) != 0)
 #endif
 
 #ifndef	UC

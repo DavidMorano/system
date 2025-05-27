@@ -1,6 +1,6 @@
 /* varnames HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a database of commonly used environment variable names */
 /* version %I% last-modified %G% */
@@ -36,6 +36,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 struct varnames {
@@ -120,7 +121,7 @@ struct varnames {
 extern const varnames	varname ;
 
 
-#endif	/* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* VARNAMES_INCLUDE */
 
 

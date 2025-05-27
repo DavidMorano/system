@@ -1,4 +1,4 @@
-/* constdiv HEADER */
+/* constdiv MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -28,7 +28,7 @@
 	can credit him right here.
 		-- David A.D. Morano
 
-	Update, found it (the reference). This algorithm is from
+	Update, found it (the reference).  This algorithm is from
 	"Hacker's Delight," second edition, ch 10, 
 	"Integer division by constant"
 
@@ -47,10 +47,7 @@
 
 *******************************************************************************/
 
-#ifndef	CONSTDIV_INCLUDE
-#define	CONSTDIV_INCLUDE
-#ifdef	__cplusplus /* everything is C++ only */
-
+module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
@@ -59,8 +56,10 @@
 #include	<usysdefs.h>
 #include	<stdintx.h>
 
+export module constdiv ;
 
-struct constdiv {
+export {
+    struct constdiv {
 	uint		m = 0 ;
 	uint		s = 0 ;
 	constexpr constdiv() = delete ;
@@ -96,20 +95,16 @@ struct constdiv {
 		s = p - 32 ;
 	    } /* end if (valid divisor) */
 	} ; /* end constructor */
-	constexpr uint operator () (uint n) noex {
+	constexpr uint operator () (uint n) const noex {
 	    ulong	hi = ulong((ulong(m) * ulong(n)) >> 32) ;
 	    uint	q ;
 	    q = uint(hi) ;
-	    if (s >= 0) {
+	    {
 		q >>= s ;
 		q += (q >> 31) ;
 	    }
 	    return q ;
-	} ;
-} ; /* end subroutine (constdiv) */
-
-
-#endif	/* __cplusplus */
-#endif /* CONSTDIV_INCLUDE */
-
+	} ; /* end method (operator) */
+    } ; /* end struct (constdiv) */
+} /* end export */
 

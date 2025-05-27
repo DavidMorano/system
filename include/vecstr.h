@@ -229,7 +229,7 @@ struct vecstr : vecstr_head {
 	} ;
 	void dtor() noex ;
 	destruct vecstr() {
-	    dtor() ;
+	    if (va) dtor() ;
 	} ;
 } ; /* end struct (vecstr) */
 #else	/* __cplusplus */

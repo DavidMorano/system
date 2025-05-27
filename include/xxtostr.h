@@ -66,7 +66,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<stdintx.h>
+#include	<stdintx.h>		/* extended integer types */
 
 
 EXTERNC_begin

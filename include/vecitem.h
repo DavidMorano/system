@@ -168,7 +168,7 @@ struct vecitem : vecitem_head {
 	} ;
 	void dtor() noex ;
 	destruct vecitem() {
-	    dtor() ;
+	    if (va) dtor() ;
 	} ;
 } ; /* end struct (vecitem) */
 #else	/* __cplusplus */

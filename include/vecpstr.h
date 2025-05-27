@@ -245,7 +245,7 @@ struct vecpstr : vecpstr_head {
 	} ;
 	void dtor() noex ;
 	destruct vecpstr() {
-	    dtor() ;
+	    if (va) dtor() ;
 	} ;
 } ; /* end struct (vecpstr) */
 #else	/* __cplusplus */

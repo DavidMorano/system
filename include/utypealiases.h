@@ -26,7 +26,7 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<sys/mount.h>		/* for |struct statfs| */
+#include	<sys/mount.h>		/* for |USTATFS| */
 #include	<sys/utsname.h>
 #include	<sys/uio.h>
 #include	<sys/times.h>		/* for |struct tms| */
@@ -36,7 +36,6 @@
 #include	<sys/stat.h>
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
-#include	<sys/poll.h>
 #include	<sys/shm.h>		/* UNIX® Sys-V IPC - Shared-Memory */
 #include	<sys/msg.h>		/* UNIX® Sys-V IPC - Message-Queues */
 #include	<sys/sem.h>		/* UNIX® Sys-V IPC - Semaphores */
@@ -46,6 +45,7 @@
 #endif
 
 #include	<ucontext.h>
+#include	<poll.h>
 #include	<signal.h>
 #include	<limits.h>
 #include	<unistd.h>
@@ -92,15 +92,15 @@
 #endif
 
 #ifndef	USTAT
-#define	USTAT		struct ustat
+#define	USTAT		struct stat
 #endif
 
-#ifndef	STATFS
-#define	STATFS		struct statfs
+#ifndef	USTATFS
+#define	USTATFS		struct statfs
 #endif
 
-#ifndef	STATVFS
-#define	STATVFS		struct statvfs
+#ifndef	USTATVFS
+#define	USTATVFS	struct statvfs
 #endif
 
 #ifndef	DIRENT
@@ -286,6 +286,12 @@
 
 #ifndef	CUSTAT
 #define	CUSTAT		const USTAT
+#endif
+#ifndef	CUSTATFS
+#define	CUSTATFS	const USTATFS
+#endif
+#ifndef	CUSTATVFS
+#define	CUSTATVFS	const USTATVFS
 #endif
 
 #ifndef	CTIMEVAL
