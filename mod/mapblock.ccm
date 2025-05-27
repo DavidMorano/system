@@ -1,4 +1,4 @@
-/* mapblock MODULE (primary module interface) */
+/* mapblock MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -13,7 +13,7 @@
 	of C++11 has allowed this (finally), due to the addition
 	(in C++11) of |unordered_map(3c++)|.
 
-	= 2025-01-27, David A­D­ Morano
+	= 2021-01-27, David A­D­ Morano
 	I am trying to turn this code into a C++ module.  Ya, we
 	will see how far that goes.  Turning code into a module is
 	pretty easy and straight forward (literally add a couple
@@ -22,7 +22,7 @@
 
 */
 
-/* Copyright © 2011,2025 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2011,2021 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 

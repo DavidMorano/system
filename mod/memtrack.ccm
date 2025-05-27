@@ -1,4 +1,4 @@
-/* memtrack MODULE (primary module interface) */
+/* memtrack MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -13,9 +13,12 @@
 	test to replace the previous memory tracking implementation
 	inside of the |ucmemalloc(3uc)| facility (so loved).
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2011,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 

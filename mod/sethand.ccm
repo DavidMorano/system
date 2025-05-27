@@ -1,4 +1,4 @@
-/* sethand MODULE (primary module interface) */
+/* sethand MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -11,9 +11,12 @@
 	= 1998-12-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -45,6 +48,7 @@ module ;
 #include	<stdexcept>
 #include	<usystem.h>
 #include	<hdb.h>
+#include	<hash.h>		/* |hash_elf(3uc)| */
 #include	<localmisc.h>
 
 #define	SETHAND_DEFENTS	10
@@ -53,7 +57,6 @@ export module sethand ;
 
 import retstat ;
 
-extern "C" uint	elfhash(cvoid *,int) noex ;
 extern "C" int	strnncmp(cchar *,int,cchar *,int) noex ;
 
 export {
@@ -75,12 +78,13 @@ export {
 	} ;
 	virtual uint	hash() {
 	   int		hv = 0 ;
-	   if (kp != nullptr) hv = elfhash(kp,kl) ;
+	   if (kp != nullptr) hv = hash_elf(kp,kl) ;
 	   return hv ;
 	} ;
 	virtual int	cmp(sethandent *e1p,sethandent *e2p) {
 	    int		rc = 0 ;
-	    cvoid	*v1p, *v2p ;
+	    cvoid	*v1p ;
+	    cvoid	*v2p ;
 	    if (int k1l ; (k1l = e1p->getkey(&v1p)) >= 0) {
 	        if (int k2l ; (k2l = e2p->getkey(&v2p)) >= 0) {
 	    	    cchar	*c1p = charp(v1p) ;
@@ -101,7 +105,7 @@ export {
 	sethandent(cvoid *akp,int akl,cvoid *avp,int avl) :
 	    kl(akl), vl(avl), kp(akp), vp(avp) {
 	} ;
-	~sethandent() {
+	destruct sethandent() {
 	    kp = nullptr ;
 	    vp = nullptr ;
 	    kl = 0 ;

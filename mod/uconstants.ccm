@@ -1,4 +1,4 @@
-/* uvariables MODULE (primary-module-interface) */
+/* uconstants MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -21,7 +21,7 @@
 /*******************************************************************************
 
   	Group:
-	uvariables
+	uconstants
 
 	Description:
 	This module contains various commonly used constants.  The
@@ -56,7 +56,7 @@ module ;
 #include	<varnames.hh>
 #include	<syswords.hh>
 
-export module uvariables ;
+export module uconstants ;
 
 export import valuelims ;
 export import digbufsizes ;

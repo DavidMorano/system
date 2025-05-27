@@ -1,4 +1,4 @@
-/* ulibvals1 SUPPORT */
+/* ulibvals MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -11,9 +11,12 @@
 	= 2001-04-11, David A-D- Morano
 	Originally written for Rightcore Network Services.
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2001,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -40,7 +43,6 @@ module ;
 #include	<unistd.h>		/* |sysconf(3c)| stuff */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<bit>			/* |endian(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -49,49 +51,30 @@ module ;
 #include	<sysconfcmds.h>
 #include	<localmisc.h>		/* |{xxx}BUFLEN| */
 
-module ulibvals ;
+export module ulibvals ;
 
-import usysconf ;			/* |usysconfval(3u)| */
+export {
+    struct ulibvals {
+	static const int	endianval ;
+	static const int	maxbase ;
+	static const int	pagesz ;
+	static const int	clktck ;
+	static const int	maxarg ;
+	static const int	maxline ;
+	static const int	maxlogin ;
+	static const int	maxnamelen ;
+	static const int	maxpathlen ;
+	static const int	nodenamelen ;
+	static const int	hostnamelen ;
+	static const int	binbflen ;	/* for |int256_t| */
+	static const int	octbflen ;	/* for |int256_t| */
+	static const int	decbflen ;	/* for |int256_t| */
+	static const int	hexbflen ;	/* for |int256_t| */
+    } ; /* end struct (ulibvals) */
+} /* end export */
 
-using std::endian ;
-
-static constexpr int mkendian() noex {
-    	using enum	endian ;	/* get the values */
-    	int	n ;
-	if_constexpr (native == little) {
-	    n = 0 ;
-	} else if_constexpr (native == big) {
-	    n = 1 ;
-	} else {
-	    n = 2 ;
-	} /* end if_constexpr */
-	return n ;
-} /* end subroutine (mkendian) */
-
-static int getval(int cmd) noex {
-    	int		rs ;
-	if ((rs = usysconfval(cmd)) < 0) {
-	    ulogerror("ulibvals",rs,"getval") ;
-	}
-	return rs ;
-} /* end subroutine (getval) */
-
-const int	ulibvals::endianval	= mkendian() ;
-const int	ulibvals::maxbase	= MAXBASE ; /* the standand value */
-const int	ulibvals::pagesz	= getval(_SC_PAGESIZE) ;
-const int	ulibvals::clktck	= getval(_SC_CLK_TCK) ;
-const int	ulibvals::maxarg	= getval(_SC_ARG_MAX) ;
-const int	ulibvals::maxline	= getval(_SC_LINE_MAX) ;
-const int	ulibvals::maxlogin	= getval(_SC_LOGIN_NAME_MAX) ;
-const int	ulibvals::maxnamelen	= getval(_SC_NAME_MAX) ;
-const int	ulibvals::maxpathlen	= getval(_SC_PATH_MAX) ;
-const int	ulibvals::nodenamelen	= getval(_SC_NODENAME_MAX) ;
-const int	ulibvals::hostnamelen	= getval(_SC_HOSTNAME_MAX) ;
-const int	ulibvals::binbflen	= BINBUFLEN ;	/* for |int256_t| */
-const int	ulibvals::octbflen	= OCTBUFLEN ;	/* for |int256_t| */
-const int	ulibvals::decbflen	= DECBUFLEN ;	/* for |int256_t| */
-const int	ulibvals::hexbflen	= HEXBUFLEN ;	/* for |int256_t| */
-
-const ulibvals	ulibval ;
+export {
+    extern const ulibvals	ulibval ;
+}
 
 

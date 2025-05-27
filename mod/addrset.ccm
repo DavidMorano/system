@@ -1,4 +1,4 @@
-/* addrset MODULE (primary module interface) */
+/* addrset MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -9,13 +9,16 @@
 /* revision history:
 
 	= 2011-04-12, David A­D­ Morano
-	This code was originally written. This is a sort of
+	This code was originally written.  This is a sort of
 	test to replace the previous memory tracking implementation
 	inside of the |ucmemalloc(3uc)| facility (so loved).
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2011,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -36,7 +39,9 @@
 	addrset::ifinish
 
 	Description:
-	Track memory blocks.
+	This is an object that tracks memory blocks.  This is
+	typically optionally used in memory allocators where tracking
+	of memory blocks serves as a sort of debugging mechanism.
 
 *******************************************************************************/
 

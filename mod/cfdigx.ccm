@@ -1,4 +1,4 @@
-/* cfdigx MODULE */
+/* cfdigx MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -24,6 +24,9 @@
 	is now quite rare.  I hope that this is not a problem.  We
 	will see.
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 	= 2023-10,10, David A-D- Morano
 	I took the liberty to rewite these subroutines in terms of
 	a subroutine-template.  This did nothing to make the code
@@ -34,7 +37,7 @@
 
 */
 
-/* Copyright © 1998,2013,2023 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2013,2020,2023 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -43,8 +46,27 @@
 	cfdigux		(un-signed)
 
 	Description:
-	Subroutines to convert digit strings to binary integers
-	(of various types).
+	These are subroutine templates to convert digit strings
+	into binary integers (of various types and sizes).  All
+	number bases from 2 through 64 are supported.  The integer
+	types |int|, |long|, and |longlong)| along with their
+	unsigned versions are supported.
+
+	Synopsis:
+    	template<typename ST> 
+	inline int cfdigsx(cc *sp,int sl,int b,ST *rp) noex
+    	template<typename UT> 
+	inline int cfdigux(cc *sp,int sl,int b,UT *rp) noex
+
+	Arguments:
+	sp		digit c-string pointer (to convert to integer)
+	sl		digit c-string length  (to convert to integer)
+	b		number base
+	rp		pinter to hold result (of the given type)
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -62,7 +84,7 @@ module ;
 #include	<stdintx.h>		/* extended integer types */
 #include	<libutil.hh>		/* |cstrlen(3u)| */
 #include	<checkbase.h>
-#include	<cfutil.h>		/* namespace |cfx| */
+#include	<cfutil.hh>		/* namespace |cfx| + |cstrlen(3u)| */
 #include	<char.h>		/* |CHAR_TOVAL(3uc)| */
 #include	<ischarx.h>		/* |isplusminus(3uc)| */
 #include	<localmisc.h>
@@ -84,7 +106,7 @@ template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 	cfdshelp(cchar *asp,int asl,int b,T *arp) noex : sp(asp), sl(asl) {
 	    const T	one = 1 ;
 	    tmin = (one << (nb - 1)) ;
-	    tmax = (~ tmax) & (~ tmin) ;
+	    tmax = (compl tmax) & (compl tmin) ;
 	    base = b ;
 	    rp = arp ;
 	} ; /* end ctor */
