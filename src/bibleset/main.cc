@@ -767,7 +767,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    pip->have.ff = TRUE ;
 	                    pip->final.ff = TRUE ;
 #if	CF_DEBUGS
-	                    debugprintf("main: cover c=%t\n",cp,cl) ;
+	                    debugprintf("main: cover c=%r\n",cp,cl) ;
 #endif
 	                    if ((rs >= 0) && (cp != NULL) && (cl > 0)) {
 	                        pip->coverfname = cp ;

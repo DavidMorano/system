@@ -368,7 +368,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    argl = strlen(argp) ;
 
 #if	CF_DEBUGS
-	    debugprintf("main: a=>%t<\n",argp,argl) ;
+	    debugprintf("main: a=>%r<\n",argp,argl) ;
 #endif
 
 	    f_optminus = (*argp == '-') ;
@@ -849,7 +849,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    bprintf(pip->efp,"%s: version %s\n",pn,VERSION) ;
 	    if (f_makedate) {
 	        cl = makedate_get(cex_makedate,&cp) ;
-	        bprintf(pip->efp,"%s: makedate %t\n",pn,cp,cl) ;
+	        bprintf(pip->efp,"%s: makedate %r\n",pn,cp,cl) ;
 	    }
 	} /* end if (version) */
 

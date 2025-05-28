@@ -822,7 +822,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	if (f_makedate) {
 	    cl = makedate_get(makedate,&cp) ;
-	    bprintf(pip->efp,"%s: makedate %t\n",
+	    bprintf(pip->efp,"%s: makedate %r\n",
 	        pip->progname,cp,cl) ;
 	} /* end if */
 
@@ -1436,7 +1436,7 @@ const char	svc[] ;
 	                        llen = 76 ;
 
 	                    bp[llen] = '\0' ;
-	                    bprintf(ofp,"%t %s\n",bp,llen,name) ;
+	                    bprintf(ofp,"%r %s\n",bp,llen,name) ;
 
 	                } else 
 	                    rs = SR_BADMSG ;

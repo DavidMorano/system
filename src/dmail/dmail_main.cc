@@ -3957,7 +3957,7 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,int ac,
 	    fmt = "%-15s argc=%u args¬\n" ;
 	    bprintf(rfp,fmt,id,ac) ;
 
-	    fmt = "%-15s a%02u=>%t<\n" ;
+	    fmt = "%-15s a%02u=>%r<\n" ;
 	    for (i = 0 ; (i < ac) && (av[i] != nullptr) ; i += 1) {
 		cchar	*ap = av[i] ;
 	        rs = bprintf(rfp,fmt,id,i,ap,al) ;

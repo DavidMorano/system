@@ -746,7 +746,7 @@ int		child_stat ;
 	            if (linebuf[len - 1] == '\n')
 	                linebuf[--len] = '\0' ;
 
-	            logfile_printf(&pip->lh,"| %t\n",linebuf,len) ;
+	            logfile_printf(&pip->lh,"| %r\n",linebuf,len) ;
 
 	            lines += 1 ;
 
@@ -795,7 +795,7 @@ int		child_stat ;
 	            if (linebuf[len - 1] == '\n')
 	                linebuf[--len] = '\0' ;
 
-	            logfile_printf(&pip->lh,"| %t\n",linebuf,len) ;
+	            logfile_printf(&pip->lh,"| %r\n",linebuf,len) ;
 
 	            lines += 1 ;
 

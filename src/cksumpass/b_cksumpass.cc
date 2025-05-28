@@ -1246,7 +1246,7 @@ static int procsum_pass(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
-	    debugprintf("b_cksumpass/procsum_pass: ent n=%t\n",np,nl) ;
+	    debugprintf("b_cksumpass/procsum_pass: ent n=%r\n",np,nl) ;
 	    debugprintf("b_cksumpass/procsum_pass: open.sum=%u\n",
 		lip->open.sum) ;
 	}
@@ -1291,7 +1291,7 @@ static int procsum_pass(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 	        cchar	*fmt ;
 	        fmt = "%s: inaccessible input (%d)\n" ;
 	        shio_printf(efp,fmt,pn,rs) ;
-	        shio_printf(efp,"%s: ifile=%t\n",pn,np,nl) ;
+	        shio_printf(efp,"%s: ifile=%r\n",pn,np,nl) ;
 	    } /* end if (shio) */
 	    rs1 = nulstr_finish(&fs) ;
 	    if (rs >= 0) rs = rs1 ;

@@ -1034,7 +1034,7 @@ VECSTR		*alp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("main: line=>%t<\n",
+	    debugprintf("main: line=>%r<\n",
 		buf,strlinelen(buf,len,40)) ;
 #endif
 

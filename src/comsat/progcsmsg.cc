@@ -268,7 +268,7 @@ int progcsmsg(PROGINFO *pip,cchar *mbuf,int mlen)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
 	    debugprintf("progcsmsg: ent\n") ;
-	    debugprintf("progcsmsg: msg=>%t<\n",mbuf,strlinelen(mbuf,mlen,40)) ;
+	    debugprintf("progcsmsg: msg=>%r<\n",mbuf,strlinelen(mbuf,mlen,40)) ;
 	}
 #endif
 
@@ -277,7 +277,7 @@ int progcsmsg(PROGINFO *pip,cchar *mbuf,int mlen)
 
 #ifdef	COMMENT
 	if (pip->debuglevel > 0) {
-	    progerr_printf(pip,"%s: msg=>%t<\n",pn,
+	    progerr_printf(pip,"%s: msg=>%r<\n",pn,
 	        mbuf,strlinelen(mbuf,mlen,40)) ;
 	}
 #endif /* COMMENT */
@@ -515,7 +515,7 @@ static int procmsginfo(PROGINFO *pip,MAILMSG *mmp,cchar *un)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("progcsmsg/procmsginfo: rs=%d from=>%t<\n",
+	    debugprintf("progcsmsg/procmsginfo: rs=%d from=>%r<\n",
 	        rs,frombuf,strlinelen(frombuf,-1,40)) ;
 #endif
 
@@ -529,7 +529,7 @@ static int procmsginfo(PROGINFO *pip,MAILMSG *mmp,cchar *un)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("progcsmsg/procmsginfo: rs=%d subj=>%t<\n",
+	    debugprintf("progcsmsg/procmsginfo: rs=%d subj=>%r<\n",
 	        rs,subjbuf,strlinelen(subjbuf,-1,40)) ;
 #endif
 
@@ -543,9 +543,9 @@ static int procmsginfo(PROGINFO *pip,MAILMSG *mmp,cchar *un)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
 	    debugprintf("progcsmsg/procmsginfo: compaction rs=%d\n",rs) ;
-	    debugprintf("progcsmsg/procmsginfo: rs=%d subj=>%t<\n",
+	    debugprintf("progcsmsg/procmsginfo: rs=%d subj=>%r<\n",
 	        rs,subjbuf,strlinelen(subjbuf,-1,40)) ;
-	    debugprintf("progcsmsg/procmsginfo: rs=%d from=>%t<\n",
+	    debugprintf("progcsmsg/procmsginfo: rs=%d from=>%r<\n",
 	        rs,frombuf,strlinelen(frombuf,-1,40)) ;
 	}
 #endif
@@ -578,7 +578,7 @@ static int procmsginfo(PROGINFO *pip,MAILMSG *mmp,cchar *un)
 	    progloglock_printf(pip,"  subj=»%s«",subjbuf) ;
 
 	    {
-	        cchar	*fmt = "¶ %s %s « %t - %t" ;
+	        cchar	*fmt = "¶ %s %s « %r - %r" ;
 	        cchar	*db = datebuf ;
 	        cchar	*fb = frombuf ;
 	        cchar	*sb = subjbuf ;
@@ -640,7 +640,7 @@ static int getdateinfo(PROGINFO *pip,char *abuf,int alen,cchar *ap,int al,
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
-	debugprintf("progcsmsg/getdateinfo: ent a=>%t<\n",ap,al) ;
+	debugprintf("progcsmsg/getdateinfo: ent a=>%r<\n",ap,al) ;
 	debugprintf("progcsmsg/getdateinfo: alen=%d\n",alen) ;
 	}
 #endif
@@ -666,7 +666,7 @@ static int getdateinfo(PROGINFO *pip,char *abuf,int alen,cchar *ap,int al,
 			len = rs ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	debugprintf("progcsmsg/getdateinfo: len=%d ab=>%t<\n",len,abuf,len) ;
+	debugprintf("progcsmsg/getdateinfo: len=%d ab=>%r<\n",len,abuf,len) ;
 #endif
 	            }
 	        }
@@ -1146,16 +1146,16 @@ static int outinfo_print(OUTINFO *oip)
 	    fmt = "%s: %s u=%s time=%s\n" ;
 	    timestr_logz(dt,tbuf) ;
 	    progerr_printf(pip,fmt,pn,tbuf,un,db) ;
-	    fmt = "%s: from=>%t<\n" ;
+	    fmt = "%s: from=>%r<\n" ;
 	    progerr_printf(pip,fmt,pn,fb,fl) ;
-	    fmt = "%s: subj=>%t<\n" ;
+	    fmt = "%s: subj=>%r<\n" ;
 	    progerr_printf(pip,fmt,pn,sb,sl) ;
 
 	    progloglock_printf(pip,"%s u=%s time=%s",tbuf,un,db) ;
 	    progloglock_printf(pip,"  from=»%s«",fb) ;
 	    progloglock_printf(pip,"  subj=»%s«",sb) ;
 
-	    fmt = "¶ %s %s « %t - %t" ;
+	    fmt = "¶ %s %s « %r - %r" ;
 	    if ((rs = bufprintf(obuf,olen,fmt,db,un,fb,fl,sb,sl)) >= 0) {
 	        const int	max = 3 ;
 	        const int	o = (TERMNOTE_OBIFF | TERMNOTE_OBELL) ;

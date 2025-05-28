@@ -441,7 +441,7 @@ const char	*envv[] ;
 	                    default:
 	                        rs = SR_INVALID ;
 	                        bprintf(pip->efp,
-	                        "%s: invalid key=%t\n",
+	                        "%s: invalid key=%r\n",
 	                        pip->progname,akp,akl) ;
 
 	                    } /* end switch */
@@ -1699,7 +1699,7 @@ badlock:
 
 	        while ((len = breadln(&lockfile,buf,BUFLEN)) > 0) {
 
-	            bprintf(pip->efp,"%s: pidfile> %t",
+	            bprintf(pip->efp,"%s: pidfile> %r",
 	                pip->progname,
 	                buf,len) ;
 
@@ -1758,7 +1758,7 @@ badlock2:
 
 	    while ((len = breadln(&lockfile,buf,BUFLEN)) > 0) {
 
-	        logfile_printf(&pip->lh,"lockfile> %t",buf,len) ;
+	        logfile_printf(&pip->lh,"lockfile> %r",buf,len) ;
 
 	    } /* end while */
 

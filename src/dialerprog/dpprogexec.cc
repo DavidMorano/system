@@ -182,7 +182,7 @@ int		argr ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-		debugprintf("progexec: si=%u argz=>%t<\n",si,cp,cl) ;
+		debugprintf("progexec: si=%u argz=>%r<\n",si,cp,cl) ;
 #endif
 
 	f_m = FALSE ;
