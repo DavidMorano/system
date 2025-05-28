@@ -87,12 +87,12 @@
 #include <unistd.h>
 #include <utmpx.h>
 #include <lastlog.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <strings.h>
 #include <ctype.h>
 #include <locale.h>
 #include <pwd.h>
-#include <stdio.h>
+#include <cstdio>
 
 #include "libcmd.h"			/* for defcntl */
 

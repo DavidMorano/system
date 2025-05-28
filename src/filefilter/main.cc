@@ -1207,7 +1207,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	            }
 
 	            if (rs < 0) {
-			fmt = "%s: processing error (%d) in file=%t\n" ;
+			fmt = "%s: processing error (%d) in file=%r\n" ;
 	                bprintf(pip->efp,fmt,pn,rs,cp,cl) ;
 	                break ;
 	            }
@@ -1293,7 +1293,7 @@ static int procfile(PROGINFO *pip,bfile *ofp,cchar fname[])
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("main/procfile: b=%t sa=%u sr=%u\n",
+	    debugprintf("main/procfile: b=%r sa=%u sr=%u\n",
 	        bnp,bnl,pip->f.sufacc,pip->f.sufrej) ;
 #endif
 
@@ -1308,7 +1308,7 @@ static int procfile(PROGINFO *pip,bfile *ofp,cchar fname[])
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("main/procfile: suf=%t \n",sp,sl) ;
+	            debugprintf("main/procfile: suf=%r \n",sp,sl) ;
 #endif
 
 /* check against the suffix-acceptance list */
@@ -1547,7 +1547,7 @@ static int procsufs(PROGINFO *pip,PARAMOPT *pop,cchar *s)
 	                    if (vl != 0) {
 #if	CF_DEBUG
 	                        if (DEBUGLEVEL(3))
-	                            debugprintf("main/procsufs: s=%t\n",vp,vl) ;
+	                            debugprintf("main/procsufs: s=%r\n",vp,vl) ;
 #endif
 	                        rs = vecpstr_add(vlp,vp,vl) ;
 

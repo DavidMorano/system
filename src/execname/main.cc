@@ -282,7 +282,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 
 #if	CF_DEBUGARGZ
-	nprintf(NDF,"main: argz=>%t<\n",
+	nprintf(NDF,"main: argz=>%r<\n",
 	    argv[0],strlinelen(argv[0],-1,40)) ;
 #endif
 
@@ -927,7 +927,7 @@ static int procexecargz(PROGINFO *pip,ARGINFO *aip,cchar *program)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
-	        debugprintf("main/procexecargz: c=>%t<\n",cp,cl) ;
+	        debugprintf("main/procexecargz: c=>%r<\n",cp,cl) ;
 #endif
 
 	    if (strcmp(argp,"-") == 0) {
@@ -1101,12 +1101,12 @@ static int procexecgo(PROGINFO *pip,ARGINFO *aip)
 	                debugprintf("main: progfname=%s\n",pep->progfname) ;
 #if	CF_DEBUGENV
 	                for (i = 0 ; ev[i] != NULL ; i += 1) {
-	                    debugprintf("main: env[%d] >%t<\n",i,
+	                    debugprintf("main: env[%d] >%r<\n",i,
 	                        ev[i],strlinelen(ev[i],-1,50)) ;
 		        }
 #endif /* CF_DEBUGENV */
 	                for (i = 0 ; av[i] != NULL ; i += 1) {
-	                    debugprintf("main: arg[%d] >%t<\n",i,
+	                    debugprintf("main: arg[%d] >%r<\n",i,
 	                        av[i],strlinelen(av[i],-1,50)) ;
 		        }
 	            }
@@ -1199,7 +1199,7 @@ static int procexecvarclean(PROGINFO *pip)
 	        if ((tp = strchr(ep,'=')) != NULL) {
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
-	                debugprintf("main/procexecvarclean: k=%t\n",
+	                debugprintf("main/procexecvarclean: k=%r\n",
 			ep,(tp-ep)) ;
 #endif
 	            if (matkeystr(envpaths,ep,-1) >= 0) {
@@ -1280,7 +1280,7 @@ static int procexecaddenv(PROGINFO *pip,cchar *kp,int kl,cchar *vp,int vl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	debugprintf("main/procexecaddenv: k=%t v=%t\n",kp,kl,vp,vl) ;
+	debugprintf("main/procexecaddenv: k=%r v=%r\n",kp,kl,vp,vl) ;
 #endif
 
 	spp = &pep->store ;
@@ -1304,8 +1304,8 @@ static int procexecvarcleanmk(PROGINFO *pip,cchar *kp,int kl,cchar *vp,int vl)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("main/procexecvarcleanmk: ent\n") ;
-	    debugprintf("main/procexecvarcleanmk: k=>%t<\n",kp,kl) ;
-	    debugprintf("main/procexecvarcleanmk: v=>%t<\n",
+	    debugprintf("main/procexecvarcleanmk: k=>%r<\n",kp,kl) ;
+	    debugprintf("main/procexecvarcleanmk: v=>%r<\n",
 	        vp,strlinelen(vp,vl,50)) ;
 	}
 #endif
@@ -1457,7 +1457,7 @@ static int sofar(cchar *bp,int bl)
 	if (bl < 0) bl = strlen(bp) ;
 	while ((tp = strnpbrk(bp,bl,":;")) != NULL) {
 	    cl = (tp - bp) ;
-	    debugprintf("sofar: %t\n",bp,cl) ;
+	    debugprintf("sofar: %r\n",bp,cl) ;
 	    bl -= ((tp + 1) - bp) ;
 	    bp = (tp + 1) ;
 	} /* end while */

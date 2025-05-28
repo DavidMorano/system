@@ -612,7 +612,7 @@ const void	*contextp ;
 	                default:
 	                    rs = SR_INVALID ;
 	                    shio_printf(pip->efp,
-	                        "%s: invalid key=%t\n",
+	                        "%s: invalid key=%r\n",
 	                        pip->progname,akp,akl) ;
 
 	                } /* end switch */
@@ -1483,7 +1483,7 @@ VECOBJ		*elp ;
 	        cp = up->ut_user ;
 	        cl = strnlen(cp,MIN(COLS_USERNAME,UTMPX_LUSER)) ;
 
-	        rs = shio_printf(ofp,"%t\n",cp,cl) ;
+	        rs = shio_printf(ofp,"%r\n",cp,cl) ;
 
 	    } else {
 

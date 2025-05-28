@@ -3307,7 +3307,7 @@ static int ourconf_read(OURCONF *ocp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	debugprintf("main/ourconf_read: k=%s v=%t\n",cparams[oi],vbuf,vl) ;
+	debugprintf("main/ourconf_read: k=%s v=%r\n",cparams[oi],vbuf,vl) ;
 #endif
 
 	                ebuf[0] = '\0' ;
@@ -3409,7 +3409,7 @@ static int ourconf_nopreload(OURCONF *ocp,cchar *sp,int sl)
 	if (pip == NULL) return SR_FAULT ; /* lint */
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	debugprintf("main/ourconf_nopreload: s=%t\n",sp,sl) ;
+	debugprintf("main/ourconf_nopreload: s=%r\n",sp,sl) ;
 #endif
 	rs = paramopt_loads(pop,po,sp,sl) ;
 	return rs ;
@@ -3450,7 +3450,7 @@ static int ourconf_ifnopreload(OURCONF *ocp)
 		vl = rs1 ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	debugprintf("main/ifnopreload: v=%t",vp,vl) ;
+	debugprintf("main/ifnopreload: v=%r",vp,vl) ;
 #endif
 		if ((vl > 0) && (vp != NULL)) {
 		    if ((rs = getuid_user(vp,vl)) >= 0) {

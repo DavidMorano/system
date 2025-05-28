@@ -694,7 +694,7 @@ char	*envv[] ;
 	            if (rs < 0) {
 
 	                bprintf(pip->efp,
-	                    "%s: processing error (%d) in file=%t\n",
+	                    "%s: processing error (%d) in file=%r\n",
 	                    pip->progname,rs,cp,cl) ;
 
 	                break ;

@@ -273,7 +273,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    argl = strlen(argp) ;
 
 #if	CF_DEBUGS
-	    debugprintf("main: a=>%t<\n",argp,argl) ;
+	    debugprintf("main: a=>%r<\n",argp,argl) ;
 #endif
 
 	    f_optminus = (*argp == '-') ;
