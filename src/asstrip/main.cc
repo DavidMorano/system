@@ -298,7 +298,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	                        default:
 	                            bprintf(efp,
-	                        "%s: invalid key=%t\n",
+	                        "%s: invalid key=%r\n",
 	                        pip->progname,akp,akl) ;
 
 	                        } /* end switch */

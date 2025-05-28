@@ -73,7 +73,7 @@ int cfbbdate(PROGINFO *pip,cchar *s,int slen,time_t *rp)
 	    return -1 ;
 
 #if	CF_DEBUGS
-	debugprintf("cfbbdate: string=%t\n",s,slen) ;
+	debugprintf("cfbbdate: string=%r\n",s,slen) ;
 #endif
 
 	name[0] = '\0' ;
@@ -87,7 +87,7 @@ int cfbbdate(PROGINFO *pip,cchar *s,int slen,time_t *rp)
 	lr = slen - i ;
 
 #if	CF_DEBUGS
-	debugprintf("cfbbdate: stripped string=%t\n",cp,lr) ;
+	debugprintf("cfbbdate: stripped string=%r\n",cp,lr) ;
 #endif
 
 	century = -1 ;

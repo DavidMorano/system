@@ -56,9 +56,9 @@
 #include	<sys/param.h>
 #include	<termios.h>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<strings.h>
-#include	<string.h>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<localmisc.h>

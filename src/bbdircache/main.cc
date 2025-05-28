@@ -1200,7 +1200,7 @@ static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
 	                c += 1 ;
-	                debugprintf("main/procpcsconf: pair> %s=%t\n",
+	                debugprintf("main/procpcsconf: pair> %s=%r\n",
 	                    kbuf,vbuf,vl) ;
 	            } /* end while */
 	            pcsconf_curend(pcp,&cur) ;
@@ -1382,7 +1382,7 @@ static int procnewsdname(PROGINFO *pip)
 	            if (vl > 0) {
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(3))
-	                    debugprintf("main/procnewsdname: d=>%t<\n",
+	                    debugprintf("main/procnewsdname: d=>%r<\n",
 				vbuf,vl) ;
 #endif
 	                rs = proginfo_setentry(pip,&pip->newsdname,vbuf,vl) ;

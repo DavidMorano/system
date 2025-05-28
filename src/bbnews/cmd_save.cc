@@ -433,7 +433,7 @@ int cmd_save(PI *pip,AENT *ap,cc *ngdir,cc *afname,int mode,cc *mailbox) noex {
 	    int		cl ;
 	    cchar	*cp ;
 	    if ((cl = sfbasename(afname,-1,&cp)) > 0) {
-	        bprintf(mfp,"%s: %t\n",HK_ARTICLEID,cp,cl) ;
+	        bprintf(mfp,"%s: %r\n",HK_ARTICLEID,cp,cl) ;
 	    }
 	}
 
