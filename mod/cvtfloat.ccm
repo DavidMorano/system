@@ -64,7 +64,6 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>
-#include	<libutil.hh>
 #include	<snx.h>			/* |snwprintf(3uc)| */
 #include	<xxtostr.h>		/* |itostr(3u)| */
 #include	<localmisc.h>

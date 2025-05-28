@@ -42,6 +42,7 @@ module ;
 
 export module fmtsub ;
 
+import libutil ;
 import fmtstrdata ;
 import fmtspec ;
 import cvtfloat ;

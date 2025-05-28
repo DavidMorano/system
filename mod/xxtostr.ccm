@@ -117,7 +117,6 @@ module ;
 #include	<usysdefs.h>		/* |MAXBASE| */
 #include	<usysrets.h>
 #include	<stdintx.h>		/* extended integers */
-#include	<libutil.hh>		/* |cstrlen(3u)| */
 #include	<syswords.hh>		/* |sysword(3u)| */
 #include	<localmisc.h>		/* ?? not-needed ?? */
 
