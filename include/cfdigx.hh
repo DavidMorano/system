@@ -82,7 +82,6 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>		/* extended integer types */
-#include	<libutil.hh>		/* |cstrlen(3u)| */
 #include	<checkbase.h>
 #include	<cfutil.hh>		/* namespace |cfx| + |cstrlen(3u)| */
 #include	<char.h>		/* |CHAR_TOVAL(3uc)| */
@@ -90,6 +89,8 @@ module ;
 #include	<localmisc.h>
 
 export module cfdigx ;
+
+import libutil ;
 
 template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 	cint		nb = (CHAR_BIT * szof(T)) ;

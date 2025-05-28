@@ -52,9 +52,7 @@
 #include	<usysrets.h>
 
 #include	<aflag.hh>
-#include	<libutil.hh>
 #include	<endian.h>
-#include	<memx.h>
 
 #include	<usys.h>	/* <- auxilllary OS support */
 #include	<usysop.h>	/* UNIX® system-operations */

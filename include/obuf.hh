@@ -41,10 +41,10 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
+import libutil ;
 
 enum obufmems {
 	obufmem_start,

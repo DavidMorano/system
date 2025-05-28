@@ -21,7 +21,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<memx.h>
 #include	<usys.h>		/* <- auxillary OS support */
 #include	<utimeout.h>
 #include	<ulogerror.h>
@@ -31,7 +30,6 @@
 #include	<aflag.hh>
 #include	<stdintx.h>
 #include	<intx.h>
-#include	<libutil.hh>
 
 
 #ifndef	TYPEDEF_MTIME

@@ -34,7 +34,6 @@ module ;
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>		/* |mach_{xx}(3u)| */
 #include	<stdintx.h>
 
 export module varithmetic ;

@@ -26,8 +26,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<libutil.hh>		/* |cstrlen(3c)| + |xstrlen(3c)| */
-
 
 namespace cfx {
     extern int	rmleadzero(cchar *,int) noex ;
