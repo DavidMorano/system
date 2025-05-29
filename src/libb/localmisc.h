@@ -25,8 +25,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<sys/socket.h>
 #include	<limits.h>
+#include	<stdlib.h>		/* |size_t| */
+#include	<string.h>		/* |memset(3c)| */
 #include	<clanguage.h>
 
 
@@ -102,7 +103,7 @@
 #endif
 
 #ifndef	MKBOOL
-#define	MKBOOL(exp)	((exp)!=0)
+#define	MKBOOL(exp)	((exp) != 0)
 #endif
 
 #ifndef	UC
@@ -429,6 +430,18 @@ static inline bool lxor(bool a1,bool a2) noex {
 }
 
 #endif /* SUBROUTINE_LEQUIV */
+
+#ifdef	__cplusplus
+#else
+#ifndef	SUBROUTINE_MEMCLEAR
+#define	SUBROUTINE_MEMCLEAR
+static inline int memclear(void *objp,int sz) noex {
+    	csize	objs = (size_t) sz ;
+    	memset(objp,0,objs) ;
+	return sz ;
+}
+#endif /* SUBROUTINE_MEMCLEAR */
+#endif /* __splusplus */
 
 
 #endif /* LOCALMISC_INCLUDE */

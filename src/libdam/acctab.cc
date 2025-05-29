@@ -61,7 +61,7 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| + |strchr(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<regex>			/* C++ REGEX; currently unused */
 #include	<usystem.h>
@@ -1191,8 +1191,8 @@ static int part_match(PARTTYPE *pp,cchar *s) noex {
 		            int		sl ;
 	                    f = false ;
 	                    if (strncmp(s,pp->patstd,(tp - pp->patstd)) == 0) {
-	                        cint	sl1 = strlen(s) ;
-	                        cint	sl2 = strlen(pp->patstd) ;
+	                        cint	sl1 = xstrlen(s) ;
+	                        cint	sl2 = xstrlen(pp->patstd) ;
 	                        tp += 1 ;
 	                        sl = pp->patstd + sl2 - tp ;
 	                        f = (strncmp(s + sl1 - sl,tp,sl) == 0) ;
