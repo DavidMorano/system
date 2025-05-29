@@ -57,10 +57,10 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 OBJ0= willaddover.o satarith.o 
 OBJ1= intsat.o intrem.o intceil.o intfloor.o
-OBJ2= 
+OBJ2= intminmax.o
 OBJ3=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
 
 OBJ= $(OBJA)
 

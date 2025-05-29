@@ -36,7 +36,7 @@ DEFS +=
 I00= usystem.h exitcodes.h localmisc.h
 I01= vechand.h vecstr.h vecitem.h vecobj.h vecint.h veclong.h vecelem.h
 I02=
-I03= field.h 
+I03=
 I04= egs.h randmwc.h librandom.h
 I05= zdb.h zos.h tmz.h zoffparts.h
 I06= termstr.h
@@ -223,7 +223,7 @@ OBJ110=
 OBJ111= 
 
 OBJ112= strmgr.o dayspec.o bcspec.o termtrans.o uiconv.o chartrans.o obuf.o
-OBJ113= qpdecoder.o b64decoder.o hexdecoder.o utf8decoder.o
+OBJ113=
 OBJ114= 
 OBJ115=
 OBJ116=
@@ -246,7 +246,7 @@ OBJ130= sbuf_termconseq.o sbuf_blanks.o
 OBJ131= paramopt.o paramopt_loadone.o
 OBJ132= serialbuf.o srvreg.o srvrege.o wordfill.o linefold.o storeitem.o dstr.o 
 OBJ133= bufstr.o stackaddr.o outstore.o
-OBJ134= mapstrint.o keyopt.o keyvals.o
+OBJ134= mapstrint.o keyopt.o keyopt_lastvalue.o keyvals.o
 OBJ135= envs.o envs_procxe.o envs_subs.o
 
 OBJ136= isSpecialObject.o isDotDir.o isValidMagic.o isStrEmpty.o
@@ -258,8 +258,8 @@ OBJ141= rmsesfiles.o dircount.o isdirempty.o
 OBJ142= prgetprogpath.o prsetfname.o prmktmpdir.o
 OBJ143=
 
-OBJ144= cfdouble.o cfdecf.o cfb26.o
-OBJ145= cfdecmf.o cfdect.o cfroman.o
+OBJ144=
+OBJ145= cfhulian.o
 OBJ146= ctb26.o cthexstr.o ctroman.o ctwords.o
 OBJ147= quickselecti.o igcd.o minmax.o isort.o
 OBJ148= fam.o fhm.o fsum.o
@@ -597,19 +597,7 @@ objv.o:			$(OBJV)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJV)
 
 
-field.o:		field.c field.h
-
-field_word.o:		field_word.c field.h
-
-field_srvarg.o:		field_srvarg.c field.h
-
 dstr.o:			dstr.c dstr.h
-
-fifostr.o:		fifostr.c fifostr.h
-
-fifoitem.o:		fifoitem.c fifoitem.h
-
-fifoelem.o:		fifoelem.c fifoelem.h
 
 keyvals.o:		keyvals.cc keyvals.h
 
@@ -713,6 +701,7 @@ inetaddr.o:		inetaddr.c inetaddr.h
 lfm.o:			lfm.cc lfm.h
 bfliner.o:		bfliner.cc bfliner.h
 keyopt.o:		keyopt.cc keyopt.h
+keyopt_lastvalue.o:	keyopt_lastval.cc keyopt.h
 codebal.o:		codebal.cc codebal.h
 strpack.o:		strpack.cc strpack.h
 strtab.o:		strtab.cc strtab.h
@@ -829,7 +818,7 @@ localget.dir:
 
 # {x}DECODER
 decoder.o:		decoder.dir
-decoder.dir:
+decoder.dir:	
 	makesubdir $@
 
 # ALGORITHMS

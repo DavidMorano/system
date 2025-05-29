@@ -35,6 +35,8 @@ DEFS +=
 
 INCS += mathdam.h
 
+MODS +=
+
 LIBS +=
 
 
@@ -99,7 +101,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
