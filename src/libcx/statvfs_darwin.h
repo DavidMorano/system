@@ -41,7 +41,7 @@ typedef __darwin_fsfilcnt_t	fsfilcnt_t;
 #endif
 
 /* Following structure is used as a statvfs/fstatvfs function parameter */
-struct statvfs {
+STATVFS {
 	unsigned long		f_bsize;	/* File system block size */
 	unsigned long		f_frsize;	/* Fundamental file system block size */
 	fsblkcnt_t	f_blocks;	/* Blocks on FS in units of f_frsize */
@@ -60,8 +60,8 @@ struct statvfs {
 #define	ST_NOSUID	0x00000002	/* Does not honor setuid/setgid */
 
 __BEGIN_DECLS
-int fstatvfs(int, struct statvfs *);
-int statvfs(const char * __restrict, struct statvfs * __restrict);
+int fstatvfs(int, STATVFS *);
+int statvfs(const char * __restrict, STATVFS * __restrict);
 __END_DECLS
 
 #endif	/* _SYS_STATVFS_H_ */

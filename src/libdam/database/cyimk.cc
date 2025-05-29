@@ -560,16 +560,16 @@ static int cyimk_filesend(CYIMK *op)
 static int cyimk_listbegin(CYIMK *op,int n)
 {
 	int		rs ;
-	int		size ;
+	int		sz ;
 	int		opts ;
 
 	opts = 0 ;
 	opts |= VECOBJ_OSTATIONARY ;
 	opts |= VECOBJ_OORDERED ;
 	opts |= VECOBJ_OCOMPACT ;
-	size = szof(struct bventry) ;
-	if ((rs = vecobj_start(&op->verses,size,n,opts)) >= 0) {
-	    rs = vecobj_start(&op->lines,size,(n * 2),opts) ;
+	sz = szof(struct bventry) ;
+	if ((rs = vecobj_start(&op->verses,sz,n,opts)) >= 0) {
+	    rs = vecobj_start(&op->lines,sz,(n * 2),opts) ;
 	    if (rs < 0) {
 	        vecobj_finish(&op->verses) ;
 	    }
@@ -643,12 +643,12 @@ static int cyimk_mkidxmain(CYIMK *op,CYIHDR *hdrp)
 	FILER		hf, *hfp = &hf ;
 	cint	nfd = op->nfd ;
 	cint	ps = getpagesize() ;
-	int		bsize ;
+	int		bsz ;
 	int		rs ;
 	int		rs1 ;
 	int		off = 0 ;
-	bsize = (ps * 4) ;
-	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
+	bsz = (ps * 4) ;
+	if ((rs = filer_start(hfp,nfd,0,bsz,0)) >= 0) {
 	    if ((rs = cyimk_mkidxhdr(op,hdrp,hfp)) >= 0) {
 	        off += rs ;
 	        if (rs >= 0) {

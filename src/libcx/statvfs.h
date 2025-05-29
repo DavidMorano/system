@@ -55,7 +55,7 @@ typedef unsigned long long	fsfilcnt64_t;
 
 
 
-typedef struct statvfs {
+typedef STATVFS {
 	unsigned long	f_bsize;	/* fundamental file system block size */
 	unsigned long	f_frsize;	/* fragment size */
 	fsblkcnt_t	f_blocks;	/* total blocks of f_frsize on fs */

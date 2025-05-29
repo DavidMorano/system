@@ -498,16 +498,16 @@ static int cmimk_filesend(cmimk *op) noex {
 
 static int cmimk_listbegin(cmimk *op,int n) noex {
 	int		rs ;
-	int		size ;
+	int		sz ;
 	int		opts ;
 
 	opts = 0 ;
 	opts |= VECOBJ_OCOMPACT ;
 	opts |= VECOBJ_OORDERED ;
 	opts |= VECOBJ_OSTATIONARY ;
-	size = szof(struct cmentry) ;
-	if ((rs = vecobj_start(op->elp,size,n,opts)) >= 0) {
-	    rs = vecobj_start(op->llp,size,(n * 2),opts) ;
+	sz = szof(struct cmentry) ;
+	if ((rs = vecobj_start(op->elp,sz,n,opts)) >= 0) {
+	    rs = vecobj_start(op->llp,sz,(n * 2),opts) ;
 	    if (rs < 0) {
 	        vecobj_finish(op->elp) ;
 	    }
@@ -577,12 +577,12 @@ static int cmimk_mkidxwrmain(cmimk *op,cmihdr *hdrp) noex {
 	filer		hf, *hfp = &hf ;
 	cint	nfd = op->nfd ;
 	cint	ps = getpagesize() ;
-	int		bsize ;
+	int		bsz ;
 	int		rs ;
 	int		rs1 ;
 	int		off = 0 ;
-	bsize = (ps * 4) ;
-	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
+	bsz = (ps * 4) ;
+	if ((rs = filer_start(hfp,nfd,0,bsz,0)) >= 0) {
 	    if ((rs = cmimk_mkidxwrhdr(op,hdrp,hfp)) >= 0) {
 	        off += rs ;
 	        if (rs >= 0) {

@@ -491,11 +491,11 @@ int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp)
 
 	if (rs >= 0) {
 	    vecobj	res ;
-	    cint	size = szof(CALENT) ;
+	    cint	sz = szof(CALENT) ;
 	    int 	vo = 0 ;
 	    vo |= VECOBJ_OORDERED ;
 	    vo |= VECOBJ_OSTATIONARY ;
-	    if ((rs = vecobj_start(&res,size,0,vo)) >= 0) {
+	    if ((rs = vecobj_start(&res,sz,0,vo)) >= 0) {
 	        CALMGR		*calp ;
 	        vechand		*clp = &op->cals ;
 	        int		i ;
@@ -678,10 +678,10 @@ int calyears_havestart(CALYEARS *op,CALCITE *qp,int y,cchar *lp,int ll)
 static int calyears_argbegin(CALYEARS *op,cchar *pr)
 {
 	int		rs ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	char		*bp ;
-	size += (strlen(pr)+1) ;
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
+	sz += (strlen(pr)+1) ;
+	if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->pr = bp ;
 	    bp = (strwcpy(bp,pr,-1)+1) ;
@@ -773,8 +773,8 @@ static int calyears_mkresults(CALYEARS *op,vecobj *rlp,CALYEARS_CUR *curp)
 	if ((n = vecobj_count(rlp)) > 0) {
 	    CALENT		*rp ;
 	    CALENT		*ep ;
-	    cint		size = (n * szof(CALENT)) ;
-	    if ((rs = uc_malloc(size,&rp)) >= 0) {
+	    cint		sz = (n * szof(CALENT)) ;
+	    if ((rs = uc_malloc(sz,&rp)) >= 0) {
 	        int	i ;
 		for (i = 0 ; vecobj_get(rlp,i,&ep) >= 0 ; i += 1) {
 	    	    if (ep != NULL) {
@@ -862,8 +862,8 @@ static int calyars_domyear(CALYEARS *op,int y,DAYOFMONTH **rpp) noex {
 		}
 	    }
 	} else if (rs == SR_NOTFOUND) {
-	    cint	dsize = szof(CALYEARS_DOMER) ;
-	    if ((rs = uc_malloc(dsize,&dop)) >= 0) {
+	    cint	dsz = szof(CALYEARS_DOMER) ;
+	    if ((rs = uc_malloc(dsz,&dop)) >= 0) {
 		int	f_ent = TRUE ;
 	        if ((rs = calyears_domerbegin(op,dop,y)) >= 0) {
 		    if ((rs = vechand_add(dlp,dop)) >= 0) {
