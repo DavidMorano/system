@@ -41,7 +41,7 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */

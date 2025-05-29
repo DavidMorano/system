@@ -18,7 +18,7 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<inttypes.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 
 
 #if defined(_LP64)

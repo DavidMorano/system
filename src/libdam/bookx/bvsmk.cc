@@ -69,12 +69,12 @@
 #include	<envstandards.h>	/* must be before others */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<estrings.h>
@@ -532,15 +532,15 @@ static int bvsmk_filesend(BVSMK *op)
 static int bvsmk_listbegin(BVSMK *op,int n)
 {
 	int		rs ;
-	int		size ;
+	int		sz ;
 	int		opts ;
 
 	opts = 0 ;
 	opts |= VECOBJ_OCOMPACT ;
 	opts |= VECOBJ_OORDERED ;
 	opts |= VECOBJ_OSTATIONARY ;
-	size = szof(BVSBOOK) ;
-	rs = vecobj_start(&op->books,size,n,opts) ;
+	sz = szof(BVSBOOK) ;
+	rs = vecobj_start(&op->books,sz,n,opts) ;
 
 	return rs ;
 }
