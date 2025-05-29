@@ -1,4 +1,9 @@
-/* cmbuf */
+/* cmbuf HEADER */
+/* encoding=ISO8859-1 */
+/* version %I% last-modified %G% */
+
+/* Connection Manager Buffer */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,20 +16,21 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CMBUF_INCLUDE
-#define	CMBUF_INCLUDE	1
+#define	CMBUF_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 
+#define	CMBUF_MAGIC	31815926
 #define	CMBUF		struct cmbuf_head
-#define	CMBUF_SPACE	struct cmbuf_space
+#define	CMBUF_SP	struct cmbuf_space
 
 
 struct cmbuf_space {
@@ -33,32 +39,27 @@ struct cmbuf_space {
 } ;
 
 struct cmbuf_head {
-	uint		magic ;
 	char		*buf ;
 	char		*bp ;
+	uint		magic ;
 	int		buflen ;
 	int		bl ;
 } ;
 
+typedef	CMBUF		cmbuf ;
+typedef	CMBUF_SP	sp ;
 
-#if	(! defined(CMBUF_MASTER)) || (CMBUF_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int cmbuf_start(cmbuf *,cchar *,int) noex ;
+extern int cmbuf_added(cmbuf *,int) noex ;
+extern int cmbuf_getspace(cmbuf *,cmbuf_sp *) noex ;
+extern int cmbuf_getline(cmbuf *,int,cchar **) noex ;
+extern int cmbuf_getlastline(cmbuf *,cchar **) noex ;
+extern int cmbuf_finish(cmbuf *) noex ;
 
-extern int cmbuf_start(CMBUF *,const char *,int) ;
-extern int cmbuf_space(CMBUF *,CMBUF_SPACE *) ;
-extern int cmbuf_added(CMBUF *,int) ;
-extern int cmbuf_getline(CMBUF *,int,const char **) ;
-extern int cmbuf_getlastline(CMBUF *,const char **) ;
-extern int cmbuf_finish(CMBUF *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* CMBUF_MASTER */
 
 #endif /* CMBUF_INCLUDE */
 

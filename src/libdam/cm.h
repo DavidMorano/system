@@ -24,6 +24,11 @@
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<unistd.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<systems.h>
 #include	<sysdialer.h>
 #include	<localmisc.h>		/* |MAXNAMELEN| */
@@ -52,7 +57,6 @@ struct cm_arguments {
 struct cm_information {
 	int		itype ;
 	int		dflags ;
-	char		dname[MAXNAMELEN + 1] ;	/* "sysdialer name" */
 } ;
 
 struct cm_head {
@@ -76,7 +80,7 @@ typedef	CM_INFO		cm_info ;
 EXTERNC_begin
 
 extern int cm_open(cm *,cmd_args *,cchar *,cchar *,mainv) noex ;
-extern int cm_getinfo(cm *,cm_info *) noex ;
+extern int cm_getinfo(cm *,char *,intcm_info *) noex ;
 extern int cm_reade(cm *,char *,int,int,int) noex ;
 extern int cm_recve(cm *,char *,int,int,int,int) noex ;
 extern int cm_recvfrome(cm *,char *,int,int,void *,int *,int,int) noex ;

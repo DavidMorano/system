@@ -45,19 +45,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<six.h>
-#include	<char.h>
 #include	<strwcpy.h>
 #include	<digval.h>		/* |digvalhex(3uc)| */
-#include	<mkchar.h>
-#include	<ischarx.h>
 #include	<obuf.hh>
+#include	<mkchar.h>
+#include	<char.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"qpdecoder.h"
@@ -128,6 +127,8 @@ static int	qpdecoder_cvt(qpdecoder *) noex ;
 
 /* local variables */
 
+cint		nstage = QPDECODER_NSTAGE ;
+
 
 /* exported variables */
 
@@ -192,13 +193,13 @@ int qpdecoder_load(qpdecoder *op,cchar *sp,int sl) noex {
 	            rs = qpdecoder_loadspace(op,sp,sl) ;
 	            c += rs ;
 	        } else {
-	            cint	nl = 2 ;
+	            cint	nl = nstage ;
 	            while ((rs >= 0) && (sl > 0)) {
 	                if (op->f.esc) {
 	                    cint	rl = op->rl ;
-	                    int		ml = min(sl,(nl-op->rl)) ;
+	                    int		ml = min(sl,(nl - op->rl)) ;
 	                    char	*rb = op->rb ;
-	                    strwcpy((rb+rl),sp,ml) ;
+	                    strwcpy((rb + rl),sp,ml) ;
 	                    op->rl += ml ;
 	                    sp += ml ;
 	                    sl -= ml ;
@@ -222,9 +223,9 @@ int qpdecoder_load(qpdecoder *op,cchar *sp,int sl) noex {
 	                        sl -= 1 ;
 	                        if ((rs >= 0) && (sl > 0)) {
 	                            cint	rl = op->rl ;
-	                            int		ml = min(sl,(nl-op->rl)) ;
+	                            int		ml = min(sl,(nl - op->rl)) ;
 	                            char	*rb = op->rb ;
-	                            strwcpy((rb+rl),sp,ml) ;
+	                            strwcpy((rb + rl),sp,ml) ;
 	                            op->rl += ml ;
 	                            sp += ml ;
 	                            sl -= ml ;
@@ -255,7 +256,7 @@ int qpdecoder_load(qpdecoder *op,cchar *sp,int sl) noex {
 
 int qpdecoder_read(qpdecoder *op,char *rbuf,int rlen) noex {
 	int		rs ;
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	if ((rs = qpdecoder_magic(op,rbuf)) >= 0) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
@@ -267,7 +268,7 @@ int qpdecoder_read(qpdecoder *op,char *rbuf,int rlen) noex {
 	            for (i = 0 ; i < ml ; i += 1) {
 			cint	ch = obp->at(i) ;
 	                rbuf[i] = charconv(ch) ;
-	            }
+	            } /* end for */
 	            rbuf[i] = '\0' ;
 	            rs = obp->adv(i) ;
 	        } else {

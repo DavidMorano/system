@@ -35,7 +35,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<new>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -205,7 +204,7 @@ int hexdecoder_read(hexdecoder *op,char *rbuf,int rlen) noex {
 	        for (i = 0 ; i < ml ; i += 1) {
 		    cint	ch = obp->at(i) ;
 		    rbuf[i] = charconv(ch) ;
-	        }
+	        } /* end for */
 	        rbuf[i] = '\0' ;
 	        rs = obp->adv(i) ;
 	    } else {
@@ -223,8 +222,8 @@ static int hexdecoder_cvt(hexdecoder *op) noex {
 	int		rs = SR_OK ;
 	cchar		*rb = op->rb ;
 	if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
-	    int	ch0 = mkchar(rb[0]) ;
-	    int	ch1 = mkchar(rb[1]) ;
+	    cint	ch0 = mkchar(rb[0]) ;
+	    cint	ch1 = mkchar(rb[1]) ;
 	    int	v = 0 ;
 	    v |= (digvalhex(ch0)<<4) ;
 	    v |= (digvalhex(ch1)<<0) ;
