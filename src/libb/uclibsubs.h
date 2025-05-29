@@ -135,7 +135,7 @@ extern int	uc_sockpair(int,int,int,int *) noex ;
 
 /* operate group */
 extern int	uc_mknod(cchar *,mode_t,dev_t) noex ;
-extern int	uc_statvfs(cchar *,STATVFS *) noex ;
+extern int	uc_statvfs(cchar *,USTATVFS *) noex ;
 extern int	uc_stat(cchar *,USTAT *) noex ;
 extern int	uc_lstat(cchar *,USTAT *) noex ;
 extern int	uc_readlink(cchar *,char *,int) noex ;
@@ -171,7 +171,6 @@ extern int	uc_rewind(int) noex ;
 
 extern int	uc_bind(int,void *,int) noex ;
 extern int	uc_joinus(int,SOCKADDR *,int,int,mode_t) noex ;
-extern int	uc_accepte(int,SOCKADDR *,int *,int) noex ;
 extern int	uc_connect(int,cvoid *,int) noex ;
 extern int	uc_connecte(int,cvoid *,int,int) noex ;
 extern int	uc_setsockopt(int,int,int,int *,int) noex ;
