@@ -455,7 +455,7 @@ static int kbdinfo_parseline(KBDINFO *op,cchar *lp,int ll)
 	int		c = 0 ;
 
 #if	CF_DEBUGS
-	debugprintf("kbdinfo_parseline: l=>%t<\n",
+	debugprintf("kbdinfo_parseline: l=>%r<\n",
 		lp,strlinelen(lp,ll,40)) ;
 #endif
 
@@ -470,7 +470,7 @@ static int kbdinfo_parseline(KBDINFO *op,cchar *lp,int ll)
 	    while ((i < n) && ((fl = field_get(&fsb,kterms,&fp)) > 0)) {
 
 #if	CF_DEBUGS
-	debugprintf("kbdinfo_parseline: i=%u f=>%t<\n",i,fp,fl) ;
+	debugprintf("kbdinfo_parseline: i=%u f=>%r<\n",i,fp,fl) ;
 #endif
 
 	        eis[i].fp = fp ;
@@ -517,7 +517,7 @@ static int kbdinfo_process(KBDINFO *op,ENTRYINFO *eis,int n)
 	{
 	    int	i ;
 	    for (i = 0 ; i < n ; i += 1)
-	    debugprintf("kbdinfo_process: eis[%u]=>%t<\n",
+	    debugprintf("kbdinfo_process: eis[%u]=>%r<\n",
 		i,eis[i].fp,eis[i].fl) ;
 	}
 #endif /* CF_DEBUGS */
@@ -544,7 +544,7 @@ static int kbdinfo_store(KBDINFO *op,int ktype,cchar *knp,int knl,
 	if (knl < 0) knl = strlen(knp) ;
 
 #if	CF_DEBUGS
-	debugprintf("kbdinfo_store: k=>%t<\n",knp,knl) ;
+	debugprintf("kbdinfo_store: k=>%r<\n",knp,knl) ;
 #endif /* CF_DEBUGS */
 
 	if (hasuc(knp,knl)) {
@@ -554,7 +554,7 @@ static int kbdinfo_store(KBDINFO *op,int ktype,cchar *knp,int knl,
 	}
 
 #if	CF_DEBUGS
-	debugprintf("kbdinfo_store: ktype=%u k=%t\n",
+	debugprintf("kbdinfo_store: ktype=%u k=%r\n",
 		ktype,knp,knl) ;
 #endif /* CF_DEBUGS */
 
@@ -624,7 +624,7 @@ static int ke_start(KBDINFO_KE *kep,int ktype,cchar *knp,int knl,
 	if (knp[0] == '\0') return SR_INVALID ;
 
 #if	CF_DEBUGS
-	debugprintf("kbdinfo/ke_start: k=%t n=%u\n",knp,knl,n) ;
+	debugprintf("kbdinfo/ke_start: k=%r n=%u\n",knp,knl,n) ;
 #endif
 
 	memset(kep,0,sizeof(KBDINFO_KE)) ;

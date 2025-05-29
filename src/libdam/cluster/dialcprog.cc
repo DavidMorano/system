@@ -1027,7 +1027,7 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 	rs = getrnode(&rd,rnode) ;
 
 #if	CF_DEBUGS
-	debugprintf("dialremote: getrnode() rs=%d rnode=%t\n",
+	debugprintf("dialremote: getrnode() rs=%d rnode=%r\n",
 	    rs,rnode,rs) ;
 #endif
 
@@ -1601,7 +1601,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	            if (f) {
 
 #if	CF_DEBUGS
-	                debugprintf("dialcprog/sendvars: a e=>%t<\n",
+	                debugprintf("dialcprog/sendvars: a e=>%r<\n",
 	                    ev[i]) ;
 #endif
 
@@ -1768,7 +1768,7 @@ static int filer_sendrecord(FILER *bp,int type,cchar *sp,int sl)
 	    return SR_TOOBIG ;
 
 #if	CF_DEBUGS
-	debugprintf("dialcprog/filer_sendrecord: t=%u s=>%t<\n",
+	debugprintf("dialcprog/filer_sendrecord: t=%u s=>%r<\n",
 	    type,sp,strlinelen(sp,sl,40)) ;
 #endif
 

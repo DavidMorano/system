@@ -311,7 +311,7 @@ int varmks_addvar(VARMKS *op,cchar k[],cchar vp[],int vl)
 	if (op->magic != VARMKS_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
-	debugprintf("varmks_addvar: k=%s v=>%t<\n",k,vp,vl) ;
+	debugprintf("varmks_addvar: k=%s v=>%r<\n",k,vp,vl) ;
 #endif
 
 	if ((rs = strtab_add(&op->keys,k,-1)) >= 0) {

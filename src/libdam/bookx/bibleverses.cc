@@ -1113,7 +1113,7 @@ static int bibleverses_indmkdata(BIBLEVERSES *op,cchar *indname,mode_t om)
 	            if ((ll > 0) && (! isempty(lp,ll))) {
 
 #if	CF_DEBUGS && CF_DEBUGMKDATA
-	                debugprintf("bibleverses_indmkdata: line>%t<\n",
+	                debugprintf("bibleverses_indmkdata: line>%r<\n",
 	                    lp,strnlen(lp,MIN(ll,40))) ;
 #endif
 
@@ -1465,7 +1465,7 @@ int		*sip ;
 	cchar	*sp = lp ;
 
 #if	CF_DEBUGS && CF_DEBUGSTART
-	debugprintf("bibleqs/isstart: ent l=>%t<\n",lp,
+	debugprintf("bibleqs/isstart: ent l=>%r<\n",lp,
 	    strlinelen(lp,ll,40)) ;
 #endif
 

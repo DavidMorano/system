@@ -679,7 +679,7 @@ int bibleqs_read(BIBLEQS *op,BIBLEQS_CUR *curp,BIBLEQS_Q *citep,
 	    ml = (op->dbmsize - recoff) ;
 
 #if	CF_DEBUGS
-	    debugprintf("bibleqs_read: line=>%t<\n",
+	    debugprintf("bibleqs_read: line=>%r<\n",
 	        mp,strnlen(mp,MIN(ml,40))) ;
 #endif
 
@@ -1178,7 +1178,7 @@ static int bibleqs_indmkeigen(BIBLEQS *op,TXTINDEXMK *tip)
 	            if (wl == 0) continue ;
 
 #if	CF_DEBUGS
-	            debugprintf("bibleqs_indmkeigen: w=%t\n",wp,wl) ;
+	            debugprintf("bibleqs_indmkeigen: w=%r\n",wp,wl) ;
 #endif
 
 	            if (i >= nkeys) {
@@ -1303,7 +1303,7 @@ static int bibleqs_indmkdata(BIBLEQS *op,TXTINDEXMK *tip)
 	    ll = (len - 1) ;
 
 #if	CF_DEBUGS
-	    debugprintf("bibleqs_indmkdata: l=>%t<\n",
+	    debugprintf("bibleqs_indmkdata: l=>%r<\n",
 		lp,strlinelen(lp,ll,40)) ;
 #endif
 
@@ -1632,7 +1632,7 @@ int		ll ;
 
 #if	CF_DEBUGS
 	debugprintf("bibleqs_havekeysline: line\n") ;
-	debugprintf(">%t<\n",lp,ll) ;
+	debugprintf(">%r<\n",lp,ll) ;
 #endif
 
 	if ((rs = field_start(&fsb,lp,ll)) >= 0) {
@@ -1650,14 +1650,14 @@ int		ll ;
 	        if (fl == 0) continue ;
 
 #if	CF_DEBUGS
-	        debugprintf("bibleqs_havekeysline: fl=%u fp=>%t<\n",
+	        debugprintf("bibleqs_havekeysline: fl=%u fp=>%r<\n",
 	            fl,fp,fl) ;
 #endif
 
 	        kl = sfword(fp,fl,&kp) ;
 
 #if	CF_DEBUGS
-	        debugprintf("bibleqs_havekeysline: kl=%u k=>%t<\n",
+	        debugprintf("bibleqs_havekeysline: kl=%u k=>%r<\n",
 	            kl,kp,kl) ;
 #endif
 
@@ -1675,7 +1675,7 @@ int		ll ;
 	        f = (rs > 0) ;
 
 #if	CF_DEBUGS
-	        debugprintf("bibleqs_havekeysline: match? w=>%t< f=%u\n",
+	        debugprintf("bibleqs_havekeysline: match? w=>%r< f=%u\n",
 	            kp,kl,f) ;
 #endif
 
@@ -1708,7 +1708,7 @@ int		sl ;
 	int		f = FALSE ;
 
 #if	CF_DEBUGS 
-	debugprintf("bibleqs_matchkeys: ent s=>%t<\n",sp,sl) ;
+	debugprintf("bibleqs_matchkeys: ent s=>%r<\n",sp,sl) ;
 #endif
 
 	if (op == NULL) return SR_FAULT ;
@@ -1736,7 +1736,7 @@ int		sl ;
 #if	CF_DEBUGS 
 	        debugprintf("bibleqs_matchkeys: xwords_get() rs=%d\n",cl) ;
 	        if (cl >= 0)
-	            debugprintf("bibleqs_matchkeys: c=>%t<\n",cp,cl) ;
+	            debugprintf("bibleqs_matchkeys: c=>%r<\n",cp,cl) ;
 #endif
 
 	        rs1 = searchkeys_process(skp,pkp,cp,cl) ;
@@ -1795,7 +1795,7 @@ int		vlen ;
 	        if (ll <= 0) break ;
 
 #if	CF_DEBUGS
-	        debugprintf("bibleqs_loadbuf: line=>%t<¬\n",
+	        debugprintf("bibleqs_loadbuf: line=>%r<¬\n",
 	            lp,strnlen(lp,MIN(ll,40))) ;
 #endif
 
@@ -2077,7 +2077,7 @@ TXTINDEXMK_TAG	*tagp ;
 	{
 	    KTAG_KEY	*ep ;
 	    for (i = 0 ; vecobj_get(&kop->keys,i,&ep) >= 0 ; i += 1) {
-	        debugprintf("ktag_mktag: key=>%t<\n",ep->kp,ep->kl) ;
+	        debugprintf("ktag_mktag: key=>%r<\n",ep->kp,ep->kl) ;
 	    }
 	}
 #endif /* CF_DEBUGS */
@@ -2094,7 +2094,7 @@ TXTINDEXMK_TAG	*tagp ;
 
 #if	CF_DEBUGS && 0
 	    for (i = 0 ; i < tagp->nkeys ; i += 1) {
-	        debugprintf("ktag_mktag: key=>%t<\n",
+	        debugprintf("ktag_mktag: key=>%r<\n",
 	            tagp->keys[i].kp, tagp->keys[i].kl) ;
 	    }
 #endif /* CF_DEBUGS */
@@ -2117,7 +2117,7 @@ int		ll ;
 	int		rs ;
 
 #if	CF_DEBUGS && CF_DEBUGPL
-	debugprintf("bibleqs/ktab_procline: ent l=>%t<\n",
+	debugprintf("bibleqs/ktab_procline: ent l=>%r<\n",
 		lp,strlinelen(lp,ll,40)) ;
 #endif
 
@@ -2133,7 +2133,7 @@ int		ll ;
 	    while ((fl = field_word(&fsb,kap->wterms,&fp)) >= 0) {
 
 #if	CF_DEBUGS && CF_DEBUGPL
-		debugprintf("bibleqs/ktab_procline: f=>%t<\n",fp,fl) ;
+		debugprintf("bibleqs/ktab_procline: f=>%r<\n",fp,fl) ;
 #endif
 
 /* remove possible apostrophe (single-quote) from leading edge */
@@ -2202,7 +2202,7 @@ int		cl ;
 	char		kbuf[KEYBUFLEN + 1] ;
 
 #if	CF_DEBUGS && CF_DEBUGPW
-	debugprintf("ktag_procword: ent k=%t\n",cp,cl) ;
+	debugprintf("ktag_procword: ent k=%r\n",cp,cl) ;
 #endif
 
 	if (cl > KEYBUFLEN)
@@ -2353,7 +2353,7 @@ static int isstart(cchar *lp,int ll,BIBLEQS_Q *qp,int *sip)
 	cchar	*sp = lp ;
 
 #if	CF_DEBUGS && CF_DEBUGSTART
-	    debugprintf("bibleqs/isstart: ent l=>%t<\n",lp,
+	    debugprintf("bibleqs/isstart: ent l=>%r<\n",lp,
 		strlinelen(lp,ll,40)) ;
 #endif
 

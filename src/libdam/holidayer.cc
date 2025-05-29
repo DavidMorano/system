@@ -327,7 +327,7 @@ int holidayer_fetchname(HO *op,uint y,cc *kp,int kl,
 	if (op->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
-	debugprintf("holidayer_fetchname: ent y=%d k=>%t<\n",y,kp,kl) ;
+	debugprintf("holidayer_fetchname: ent y=%d k=>%r<\n",y,kp,kl) ;
 	debugprintf("holidayer_fetchname: cur y=%u hop{%p}\n",
 	    curp->year,curp->hop) ;
 #endif

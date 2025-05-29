@@ -106,10 +106,10 @@ int logfile_printfold(logfile *lhp,cchar *pre,cchar *sp,int sl) noex {
 static int logfile_pfi(logfile *lhp,int li,cc *pp,int pl,cc *sp,int sl) noex {
 	int		rs ;
 	if (li == 0) {
-	    cchar	*f0 = "%s| %t" ;
+	    cchar	*f0 = "%s| %r" ;
 	    rs = logfile_printf(lhp,f0,pp,sp,sl) ;
 	} else {
-	    cchar	*f1 = "%*s| %t" ;
+	    cchar	*f1 = "%*s| %r" ;
 	    rs = logfile_printf(lhp,f1,pl," ",sp,sl) ;
 	}
 	return rs ;

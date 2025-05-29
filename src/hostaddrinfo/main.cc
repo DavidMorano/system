@@ -988,13 +988,13 @@ static int procname(PROGINFO *pip,bfile *ofp,cchar *np)
 	    while (name[nl-1] == '.') nl -= 1 ;
 
 	    if (pip->debuglevel > 0) {
-	        bprintf(pip->efp,"%s: query=%t\n", pip->progname,name,nl) ;
+	        bprintf(pip->efp,"%s: query=%r\n", pip->progname,name,nl) ;
 	    }
 
 	    if ((rs = procspecial(pip,ofp,name,nl)) == 0) {
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            debugprintf("procname: procinfo=%t\n",name,nl) ;
+	            debugprintf("procname: procinfo=%r\n",name,nl) ;
 #endif
 	        rs = procinfo(pip,ofp,chostname,name,nl) ;
 	    }
@@ -1059,7 +1059,7 @@ static int procinfo(PROGINFO *pip,bfile *ofp,char *cname,cchar *np,int nl)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("procinfo: ent n=%t\n",np,nl) ;
+	        debugprintf("procinfo: ent n=%r\n",np,nl) ;
 #endif
 
 	if (pip->verboselevel >= 2) {

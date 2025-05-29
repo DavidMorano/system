@@ -526,7 +526,7 @@ int			pl ;
 	            gpp->buf,gpp->buflen,gpp->buflen) ;
 #endif
 
-	    bprintf(gpp->ofp,"%t,\n",
+	    bprintf(gpp->ofp,"%r,\n",
 	        gpp->buf,gpp->buflen) ;
 
 	    gpp->linelen = 32 ;
@@ -555,7 +555,7 @@ int			pl ;
 #endif
 
 	rs = bufprintf((gpp->buf + gpp->buflen),BUFLEN,
-		"%t",cp,pl) ;
+		"%r",cp,pl) ;
 
 	gpp->buflen += rs ;
 

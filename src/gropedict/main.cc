@@ -1001,7 +1001,7 @@ static int process(PROGINFO *pip,DICTFILES *dp,cchar *fname)
 
 #if	CF_DEBUG && 0
 	        if (DEBUGLEVEL(2))
-	            debugprintf("process: line> %t",lbuf,len) ;
+	            debugprintf("process: line> %r",lbuf,len) ;
 #endif
 
 	        ch = (lbuf[0] & 0xff) ;

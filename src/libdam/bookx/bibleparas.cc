@@ -899,7 +899,7 @@ static int bibleparas_indmkdata(BIBLEPARAS *op,cchar indname[],mode_t om)
 	    if ((ll > 0) && (! isempty(lp,ll))) {
 
 #if	CF_DEBUGS
-	debugprintf("bibleparas_indmkdata: line>%t<\n",
+	debugprintf("bibleparas_indmkdata: line>%r<\n",
 		lp,strnlen(lp,MIN(ll,40))) ;
 #endif
 

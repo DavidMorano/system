@@ -373,7 +373,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                    default:
 	                        rs = SR_INVALID ;
 	                         printf(pip->efp,
-	                        "%s: invalid key=%t\n",
+	                        "%s: invalid key=%r\n",
 	                        pip->progname,akp,akl) ;
 
 	                    } /* end switch */
@@ -570,7 +570,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	        debugprintf("main: processing a line begin=%d end=%d\n%t",
+	        debugprintf("main: processing a line begin=%d end=%d\n%r",
 	            f_bol,f_eol,linebuf,len) ;
 #endif
 
@@ -747,7 +747,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* write out the PostScript file reference */
 
-	                bprintf(ofp,".BP %s %t\n",psfname,rline,rlen) ;
+	                bprintf(ofp,".BP %s %r\n",psfname,rline,rlen) ;
 
 	            } else {
 
@@ -762,10 +762,10 @@ int main(int argc,cchar **argv,cchar **envv)
 	                    }
 
 	                    if ((ps_noread != NULL) && (ps_noread[0] != '\0')) {
-	                        bprintf(ofp,".BP %s %t\n",
+	                        bprintf(ofp,".BP %s %r\n",
 	                            ps_noread,rline,rlen) ;
 	                    } else {
-	                        bprintf(ofp,".\\\"_ .BG %s %s %t\n",
+	                        bprintf(ofp,".\\\"_ .BG %s %s %r\n",
 	                            imatype, imafname,rline,rlen) ;
 			    }
 
@@ -781,11 +781,11 @@ int main(int argc,cchar **argv,cchar **envv)
 	                    }
 
 	                    if ((ps_noexist != NULL) && (ps_noexist[0] != '\0'))
-	                        bprintf(ofp,".BP %s %t\n",
+	                        bprintf(ofp,".BP %s %r\n",
 	                            ps_noexist,rline,rlen) ;
 
 	                    else
-	                        bprintf(ofp,".\\\"_ .BG %s %s %t\n",
+	                        bprintf(ofp,".\\\"_ .BG %s %s %r\n",
 	                            imatype, imafname,rline,rlen) ;
 
 	                    bprintf(pip->efp,

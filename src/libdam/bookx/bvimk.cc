@@ -446,14 +446,14 @@ static int bvimk_filesend(bvimk *op) noex {
 
 static int bvimk_listbegin(bvimk *op,int n) noex {
 	int		rs ;
-	int		size ;
+	int		sz ;
 	int		opts = 0 ;
 	opts |= VECOBJ_OCOMPACT ;
 	opts |= VECOBJ_OORDERED ;
 	opts |= VECOBJ_OSTATIONARY ;
-	size = szof(struct bventry) ;
-	if ((rs = vecobj_start(&op->verses,size,n,opts)) >= 0) {
-	    rs = vecobj_start(&op->lines,size,(n * 2),opts) ;
+	sz = szof(struct bventry) ;
+	if ((rs = vecobj_start(&op->verses,sz,n,opts)) >= 0) {
+	    rs = vecobj_start(&op->lines,sz,(n * 2),opts) ;
 	    if (rs < 0)
 	        vecobj_finish(&op->verses) ;
 	}
@@ -568,7 +568,7 @@ static int bvimk_mkidxwrverses(bvimk *op,bvihdr *hdrp,filer *hfp,int off)
 {
 	struct bventry	*bvep ;
 	uint		a[4] ;
-	cint	size = (4 * szof(uint)) ;
+	cint	sz = (4 * szof(uint)) ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		n = 0 ;
@@ -581,7 +581,7 @@ static int bvimk_mkidxwrverses(bvimk *op,bvihdr *hdrp,filer *hfp,int off)
 	        a[2] = bvep->li ;
 	        a[3] = bvep->citation ;
 	        n += 1 ;
-	        rs = filer_write(hfp,a,size) ;
+	        rs = filer_write(hfp,a,sz) ;
 	        wlen += rs ;
 	    }
 	    if (rs < 0) break ;
@@ -594,7 +594,7 @@ static int bvimk_mkidxwrverses(bvimk *op,bvihdr *hdrp,filer *hfp,int off)
 static int bvimk_mkidxwrlines(bvimk *op,bvihdr *hdrp,filer *hfp,int off) noex {
 	struct blentry	*blep ;
 	uint		a[4] ;
-	cint	size = (2 * szof(uint)) ;
+	cint	sz = (2 * szof(uint)) ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		n = 0 ;
@@ -605,7 +605,7 @@ static int bvimk_mkidxwrlines(bvimk *op,bvihdr *hdrp,filer *hfp,int off) noex {
 	        a[0] = blep->loff ;
 	        a[1] = blep->llen ;
 	        n += 1 ;
-	        rs = filer_write(hfp,a,size) ;
+	        rs = filer_write(hfp,a,sz) ;
 	        wlen += rs ;
 	    }
 	    if (rs < 0) break ;

@@ -116,7 +116,7 @@ char		fname[] ;
 	if (strncmp(cp,SSH_FILEMAGIC,magiclen) != 0) {
 
 #if	CF_DEBUGS
-	debugprintf("ssh_init: bad magic=>%t<\n",
+	debugprintf("ssh_init: bad magic=>%r<\n",
 		cp,strnlen(cp,14)) ;
 #endif
 
