@@ -33,8 +33,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<sfx.h>
@@ -112,6 +111,8 @@ static int	b64decoder_cvt(b64decoder *,cchar *,int) noex ;
 
 /* local variables */
 
+static cint	nstage = B64DECODER_NSTAGE ;
+
 
 /* exported variables */
 
@@ -136,7 +137,7 @@ int b64decoder_start(b64decoder *op) noex {
 	    if (rs < 0) {
 		b64decoder_dtor(op) ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (b64decoder_ctor) */
 	return rs ;
 }
 /* end subroutine (b64decoder_start) */
@@ -175,25 +176,25 @@ int b64decoder_load(b64decoder *op,cchar *sp,int sl) noex {
             if (obuf *obp ; (obp = obufp(op->outbuf)) != np) {
                 int         cl ;
                 cchar       *cp ;
-                while ((cl = nextfield(sp,sl,&cp)) > 0) {
+                while ((cl = sfnext(sp,sl,&cp)) > 0) {
                     sl -= intconv((cp + cl) - sp) ;
                     sp = (cp + cl) ;
                     if (op->rl > 0) {
                         cint        rl = op->rl ;
-                        int         ml = min(cl,(4-op->rl)) ;
+                        int         ml = min(cl,(nstage - op->rl)) ;
                         char        *rb = op->rb ;
                         strwcpy((rb+rl),cp,ml) ;
                         op->rl += ml ;
                         cp += ml ;
                         cl -= ml ;
-                        if (op->rl == 4) {
-                            rs = b64decoder_cvt(op,op->rb,4) ;
+                        if (op->rl == nstage) {
+                            rs = b64decoder_cvt(op,op->rb,nstage) ;
                             c += rs ;
                             op->rl = 0 ;
                         }
                     } /* end if (positive residue) */
-                    while ((rs >= 0) && (cl >= 4)) {
-                        cint        ml = ifloor(cl,4) ;
+                    while ((rs >= 0) && (cl >= nstage)) {
+                        cint        ml = ifloor(cl,nstage) ;
                         rs = b64decoder_cvt(op,cp,ml) ;
                         c += rs ;
                         cp += ml ;
@@ -205,7 +206,7 @@ int b64decoder_load(b64decoder *op,cchar *sp,int sl) noex {
                         op->rl = cl ;
                     } /* end if (remaining source) */
                     if (rs < 0) break ;
-                } /* end while (nextfield) */
+                } /* end while (sfnext) */
             } else {
                 rs = SR_BUGCHECK ;
             }
@@ -217,21 +218,21 @@ int b64decoder_load(b64decoder *op,cchar *sp,int sl) noex {
 int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	if ((rs = b64decoder_magic(op,rbuf)) >= 0) {
 	    rbuf[0] = '\0' ;
             rs = SR_INVALID ;
             if (rlen >= 0) {
                 rs = SR_OK ;
                 if (rlen > 0) {
-                    int		ml ;
+		    int		ml ;
                     if (obuf *obp ; (obp = obufp(op->outbuf)) != np) {
-                        cint        len = obp->len ;
-                        ml = min(len,rlen) ;
+                        cint	len = obp->len ; /* <- reading from magic */
+			ml = min(len,rlen) ;
                         for (i = 0 ; i < ml ; i += 1) {
 			    cint	ch = obp->at(i) ;
                             rbuf[i] = charconv(ch) ;
-                        }
+                        } /* end for */
                         rbuf[i] = '\0' ;
                         rs = obp->adv(i) ;
 		    } else {
@@ -253,7 +254,8 @@ static int b64decoder_cvt(b64decoder *op,cchar *cp,int cl) noex {
 	int		c = 0 ;
 	if (op->outbuf) {
 	    obuf 	*obp = obufp(op->outbuf) ;
-	    if (char *rbuf ; (rbuf = new(nothrow) char [cl+1]) != np) {
+	    rs = SR_NOMEM ;
+	    if (char *rbuf ; (rbuf = new(nothrow) char [cl + 1]) != np) {
 	        if ((c = base64_d(cp,cl,rbuf)) > 0) {
 	            rbuf[c] = '\0' ;
 	            rs = obp->add(rbuf,c) ;
@@ -261,9 +263,7 @@ static int b64decoder_cvt(b64decoder *op,cchar *cp,int cl) noex {
 	            rs = SR_ILSEQ ;
 		}
 	        delete [] rbuf ;
-	    } else { /* memory-allocation-free */
-	        rs = SR_NOMEM ;
-	    }
+	    } /* end if (new-char) */
 	} else {
 	    rs = SR_BUGCHECK ;
 	}

@@ -33,25 +33,55 @@
 #endif
 #endif /* noex */
 
+#ifndef	scharconv
+#define	scharconv		schar
+#endif
+
 #ifndef	charconv
 #define	charconv		char
 #endif
-
 #ifndef	shortconv
 #define	shortconv		short
 #endif
-
 #ifndef	intconv
 #define	intconv			int
 #endif
-
 #ifndef	longconv
 #define	longconv		long
+#endif
+
+#ifndef	ucharconv
+#define	ucharconv		uchar
+#endif
+#ifndef	ushortconv
+#define	ushortconv		ushort
+#endif
+#ifndef	uintconv
+#define	uintconv		uint
+#endif
+#ifndef	uintlongconv
+#define	ulongconv		ulong
+#endif
+
+#ifndef	floatconv
+#define	floatconv		float
 #endif
 
 #ifdef	__cplusplus
 #ifndef	restruct
 #define	restrict		__restrict__
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	typealias
+#define	typealias		typedef
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	destruct		
+#define	destruct		compl
 #endif
 #endif /* __cplusplus */
 
@@ -118,6 +148,13 @@
 #define	cast_bit		bit_cast
 #define	cast_saturate		saturate_cast
 #define	cast_any		any_cast
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	assert_contract
+#define	assert_contract		contract_assert
+#define	assert_static		static_assert
 #endif
 #endif /* __cplusplus */
 

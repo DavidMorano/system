@@ -9,10 +9,7 @@
 /* revision history:
 
 	= 1999-06-23, David A­D­ Morano
-	I updated this subroutine to just poll for machine status
-	and write the Machine Status (MS) file.  This was a cheap
-	excuse for not writing a whole new daemon program just to
-	poll for machine status.  I hope this works out! :-)
+	This was originally written.
 
 */
 
@@ -20,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	clientinfo
+
+	Description:
 	This module (not really an object) manages some of the
 	client data.  This data is stored in a structure 'clientinfo'.
 
@@ -27,15 +28,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<vecstr.h>
@@ -205,8 +205,7 @@ static int clientinfo_load(clientinfo *cip,cchar *dname,vecstr *nlp) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (cip && nlp) {
-	    char	*hnbuf{} ;
-	    if ((rs = malloc_hn(&hnbuf)) >= 0) {
+	    if (char *hnbuf ; (rs = malloc_hn(&hnbuf)) >= 0) {
 		cint		hnlen = rs ;
 	        connection	conn, *cnp = &conn ;
 	        if ((rs = connection_start(cnp,dname)) >= 0) {

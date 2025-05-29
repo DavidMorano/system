@@ -1,4 +1,4 @@
-/* sort_insertion MODULE (primary module interface) */
+/* sort_insertion MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -16,9 +16,12 @@
 	Updated to C++11, to get rid of stupid restriction on not
 	having two adjacent '>' characters!
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 2000,2013 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2000,2013,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
