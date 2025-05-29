@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} OPENSYSFS_W  "
+NAMES="${NAMES} %t "
 
 DN=/dev/null
 
@@ -11,18 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/OPENSYSFS_WUSERHOMES/s//opensysdb_userhomes/g
-g/OPENSYSFS_WUSERNAMES/s//opensysdb_usernames/g
-g/OPENSYSFS_WGROUPNAMES/s//opensysdb_groupnames/g
-g/OPENSYSFS_WPROJECTNAMES/s//opensysdb_projectnames/g
-g/OPENSYSFS_WPASSWD/s//opensysdb_passwd/g
-g/OPENSYSFS_WSHADOW/s//opensysdb_shadow/g
-g/OPENSYSFS_WUSERATTR/s//opensysdb_userattr/g
-g/OPENSYSFS_WGROUP/s//opensysdb_group/g
-g/OPENSYSFS_WPROJECT/s//opensysdb_project/g
-g/OPENSYSFS_WREALNAME/s//opensysdb_realname/g
-g/OPENSYSFS_WSHELLS/s//opensysdb_shells/g
-g/OPENSYSFS_WOVERLAST/s//opensysdb_overlast/g
+g/%t/s//%r/g
 	w
 	q
 EOF
