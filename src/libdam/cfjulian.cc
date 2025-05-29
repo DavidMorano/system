@@ -33,10 +33,10 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<libutil.hh>		/* |cstrlen(3u)| + |xstrlen(3u)| */
 #include	<char.h>
 #include	<localmisc.h>
 
+import libutil ;
 
 /* local defines */
 
