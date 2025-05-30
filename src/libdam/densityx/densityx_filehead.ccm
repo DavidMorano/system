@@ -1,4 +1,4 @@
-/* densitryx_filehead MODULE */
+/* densitryx_filehead MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -12,9 +12,12 @@
 	This code module was inspired from the mail-message-id
 	database (which is used to eliminate repeated mail messages).
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 

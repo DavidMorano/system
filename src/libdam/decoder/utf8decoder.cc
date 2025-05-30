@@ -33,12 +33,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<vector>
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mkchar.h>
@@ -69,10 +67,11 @@ using std::nothrow ;			/* constant */
 
 /* local structures */
 
-class widebuf {
+namespace {
+    class widebuf {
 	std::vector<wchar_t>	b ;
 	int			oi ;		/* output index */
-public:
+    public:
 	widebuf() noex : oi(0) { } ;
 	wchar_t operator [] (int i) const noex {
 	    wchar_t	rch = 0 ;
@@ -144,7 +143,8 @@ public:
 	    return rch ;
 	} ;
 	int adv(int al) noex ;
-} ; /* end structure (widebuf) */
+    } ; /* end structure (widebuf) */
+} /* end namespace */
 
 typedef widebuf *	widebufp ;
 
@@ -229,7 +229,7 @@ int utf8decoder_load(utf8decoder *op,cchar *sp,int sl) noex {
 		        } else if ((uch & 0xC0) == 0x80) {
 		            if (op->rem > 0) {
 			        op->rem -= 1 ;
-			        op->code |= ((uch & 0x3F) << (op->rem*6)) ;
+			        op->code |= ((uch & 0x3F) << (op->rem * 6)) ;
 			        if (op->rem == 0) {
 	            	            rs = wbp->add(op->code) ;
 		    	            c += 1 ;
@@ -279,7 +279,7 @@ int widebuf::adv(int al) noex {
 	int		rl = 0 ;
 	if (al > 0) {
 	    cint	sl = intconv(bsize) ;
-	    if (sl > (oi+al)) {
+	    if (sl > (oi + al)) {
 		rl = (sl - oi) ;
 		oi += rl ;
 	    } else {

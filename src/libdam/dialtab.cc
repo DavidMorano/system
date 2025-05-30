@@ -38,7 +38,7 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -481,8 +481,8 @@ int dialtab_search(DT *op,cchar *name,DT_ENT **depp) noex {
 		    f = f && (strchr(sp,'\\') == np) ;
 		    if (f) {
 	                if (strncmp(name,sp,(cp - sp)) == 0) {
-			    cint	l1 = strlen(name) ;
-			    int		l2 = strlen(sp) ;
+			    cint	l1 = xstrlen(name) ;
+			    int		l2 = xstrlen(sp) ;
 			    int		l ;
 	                    cp += 1 ;
 	                    l = (sp + l2 - cp) ;
