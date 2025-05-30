@@ -199,7 +199,6 @@
 #include	<stdsio.h>
 #include	<straltwchar.h>
 #include	<streamsync.h>
-#include	<strerrabbr.h>
 #include	<strfilter.h>
 #include	<stubrpc.h>
 #include	<syshelper.h>
