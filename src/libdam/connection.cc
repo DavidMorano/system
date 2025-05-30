@@ -69,7 +69,6 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<uconstants.hh>
 #include	<uinet.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -89,6 +88,7 @@
 
 #include	"connection.h"
 
+import uconstants ;
 
 /* local defines */
 

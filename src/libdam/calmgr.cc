@@ -39,7 +39,6 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<uconstants.hh>
 #include	<ucmallreg.h>
 #include	<getbufsize.h>
 #include	<getusername.h>

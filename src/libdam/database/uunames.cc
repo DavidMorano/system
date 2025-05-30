@@ -37,7 +37,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<uconstants.hh>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<endian.h>
@@ -68,7 +67,6 @@
 #include	<localmisc.h>
 
 #include	"uunames.h"
-
 
 /* local defines */
 
