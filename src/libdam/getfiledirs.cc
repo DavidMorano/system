@@ -68,7 +68,6 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strchr(3c)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<getpwd.h>
 #include	<mallocxx.h>
 #include	<ids.h>
