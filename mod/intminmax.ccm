@@ -44,7 +44,7 @@ module ;
 
 export module intminmax ;
 
-import uvariables ;			/* |valuelimit(3u)| */
+import uconstants ;			/* |valuelimit(3u)| */
 
 /* local defines */
 
