@@ -511,7 +511,7 @@ int msfile_match(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 	if (nnp == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
-	debugprintf("msfile_match: ent nnl=%d nnp=%t\n",
+	debugprintf("msfile_match: ent nnl=%d nnp=%r\n",
 	    nnl,nnp,xstrnlen(nnp,nnl)) ;
 #endif
 
@@ -522,7 +522,7 @@ int msfile_match(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 	nnl = xstrnlen(nnp,i) ;
 
 #if	CF_DEBUGS
-	debugprintf("msfile_match: nnl=%d nnp=%t\n",nnl,nnp,nnl) ;
+	debugprintf("msfile_match: nnl=%d nnp=%r\n",nnl,nnp,nnl) ;
 #endif
 
 	if (dt == 0) dt = time(nullptr) ;
@@ -587,7 +587,7 @@ int msfile_write(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 	char		*bp ;
 
 #if	CF_DEBUGS
-	debugprintf("msfile_write: ent nnl=%d nodename=%t\n",
+	debugprintf("msfile_write: ent nnl=%d nodename=%r\n",
 	    nnl,nnp,xstrnlen(nnp,nnl)) ;
 #endif /* CF_DEBUGS */
 
@@ -605,7 +605,7 @@ int msfile_write(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 	nnl = xstrnlen(nnp,i) ;
 
 #if	CF_DEBUGS && 0
-	debugprintf("msfile_write: nodename=%t\n",nnp,nnl) ;
+	debugprintf("msfile_write: nodename=%r\n",nnp,nnl) ;
 #endif
 
 	if ((rs = msfile_acquire(op,dt,1)) >= 0) {
@@ -1008,7 +1008,7 @@ static int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 	char		*np = nullptr ;
 
 #if	CF_DEBUGS
-	debugprintf("msfile_search: ent nnl=%u nodename=%t\n",
+	debugprintf("msfile_search: ent nnl=%u nodename=%r\n",
 	    nnl,nnp,xstrnlen(nnp,nnl)) ;
 #endif
 
@@ -1042,7 +1042,7 @@ static int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 /* is this a match for what we want? */
 
 #if	CF_DEBUGS
-	        debugprintf("msfile_search: i=%u db_node=%t\n",i,
+	        debugprintf("msfile_search: i=%u db_node=%r\n",i,
 	            np,xstrnlen(np,MSFILEE_LNODENAME)) ;
 #endif
 
@@ -1292,7 +1292,7 @@ static int msfile_fileverify(MS *op) noex {
 	    cint	msize = MSFILE_FILEMAGICSIZE ;
 	    cchar	*cp = op->topbuf ;
 #if	CF_DEBUGS
-	    debugprintf("msfile_fileverify: ms=%t\n",cp,strlinelen(cp,-1,40)) ;
+	    debugprintf("msfile_fileverify: ms=%r\n",cp,strlinelen(cp,-1,40)) ;
 #endif
 	    if (hasValidMagic(cp,msize,MSFILE_FILEMAGIC)) {
 	        cp += msize ;
@@ -1705,7 +1705,7 @@ static int namematch(cchar *np,cchar *nnp,int nnl)
 
 #if	CF_DEBUGS
 	debugprintf("namematch: ent np=%s\n",np) ;
-	debugprintf("namematch: nnl=%d nnp=%t\n",nnl,nnp,xstrnlen(nnp,nnl)) ;
+	debugprintf("namematch: nnl=%d nnp=%r\n",nnl,nnp,xstrnlen(nnp,nnl)) ;
 #endif
 
 	if (nnl <= MSFILEE_LNODENAME) {
