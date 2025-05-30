@@ -31,7 +31,8 @@
 #include	<sys/mman.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<new>			/* |nothrow(3c)| */
+#include	<memory>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<strpack.h>
@@ -222,7 +223,7 @@ int eigendb_addword(eigendb *op,cchar *wp,int wl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = eigendb_magic(op,wp)) >= 0) {
-	    if (wl < 0) wl = strlen(wp) ;
+	    if (wl < 0) wl = xstrlen(wp) ;
 	    if (wl > 0) {
 		cnullptr	np{} ;
 		cint		rsn = SR_NOTFOUND ;
@@ -256,7 +257,7 @@ int eigendb_addword(eigendb *op,cchar *wp,int wl) noex {
 int eigendb_exists(eigendb *op,cchar *wp,int wl) noex {
 	int		rs ;
 	if ((rs = eigendb_magic(op,wp)) >= 0) {
-	    if (wl < 0) wl = strlen(wp) ;
+	    if (wl < 0) wl = xstrlen(wp) ;
 	    if (wl > 0) {
 		cnullptr	np{} ;
 	        hdb_dat		key ;
@@ -290,7 +291,7 @@ int eigendb_curbegin(eigendb *op,eigendb_cur *curp) noex {
 	int		rs ;
 	if ((rs = eigendb_magic(op,curp)) >= 0) {
 	    rs = SR_NOMEM ;
-	    if ((curp->hcp = new(hdb_cur)) != nullptr) {
+	    if ((curp->hcp = new(nothrow) hdb_cur) != nullptr) {
 		rs = hdb_curbegin(op->dbp,curp->hcp) ;
 	    } /* end if (new-hdb_cur) */
 	} /* end if (magic) */

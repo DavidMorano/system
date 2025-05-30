@@ -51,6 +51,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<usystem.h>
+#include	<snx.h>			/* |snwprintf(3uc)| */
 #include	<sncpyx.h>
 #include	<localmisc.h>
 
@@ -63,10 +64,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	snwprintf(char *,int,cchar *,...) noex ;
-}
 
 
 /* external variables */
