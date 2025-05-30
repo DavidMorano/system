@@ -53,7 +53,6 @@
 #include	<connection.h>
 #include	<conslog.h>
 #include	<cvttemperature.h>
-#include	<datetok.h>
 #include	<dayofmonth.h>
 #include	<deffile.h>
 #include	<density.h>
@@ -200,7 +199,6 @@
 #include	<stdsio.h>
 #include	<straltwchar.h>
 #include	<streamsync.h>
-#include	<strerrabbr.h>
 #include	<strfilter.h>
 #include	<stubrpc.h>
 #include	<syshelper.h>

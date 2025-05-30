@@ -125,25 +125,25 @@ struct subinfo {
 /* forward references */
 
 static int	holidays_dbfind(HOLIDAYS *,IDS *,char *) ;
-static int	holidays_dbfinder(HOLIDAYS *,IDS *,char *,const char *) ;
+static int	holidays_dbfinder(HOLIDAYS *,IDS *,char *,cchar *) ;
 
 static int	subinfo_start(SUBINFO *,HOLIDAYS *) ;
 static int	subinfo_finish(SUBINFO *) ;
 static int	subinfo_procfile(SUBINFO *) ;
-static int	subinfo_procyear(SUBINFO *,const char *,int) ;
-static int	subinfo_procline(SUBINFO *,const char *,int) ;
-static int	subinfo_proclineval(SUBINFO *,uint,const char *,int) ;
+static int	subinfo_procyear(SUBINFO *,cchar *,int) ;
+static int	subinfo_procline(SUBINFO *,cchar *,int) ;
+static int	subinfo_proclineval(SUBINFO *,uint,cchar *,int) ;
 static int	subinfo_mkdata(SUBINFO *) ;
 static int	subinfo_mkrt(SUBINFO *) ;
 static int	subinfo_mkst(SUBINFO *) ;
 static int	subinfo_mkind(SUBINFO *,cchar *,int (*)[3],int) ;
 
 static int	getyear(time_t) ;
-static int	getcite(uint *,const char *,int) ;
+static int	getcite(uint *,cchar *,int) ;
 static int	mkcite(uint *,int,int) ;
 
 static int	indinsert(uint (*rt)[3],int (*it)[3],int,struct varentry *) ;
-static int	ismatkey(const char *,const char *,int) ;
+static int	ismatkey(cchar *,cchar *,int) ;
 
 static int	vcmprec(cvoid *,cvoid *) ;
 static int	cmprec(cvoid *,cvoid *) ;
@@ -207,7 +207,7 @@ int holidays_open(HOLIDAYS *op,cchar *pr,int year,cchar *fname) noex {
 	} /* end if */
 
 	if (rs >= 0) {
-	    const char	*cp ;
+	    cchar	*cp ;
 	    if ((rs = uc_mallocstrw(fname,fl,&cp)) >= 0) {
 	        SUBINFO	si ;
 	        op->fname = cp ;
@@ -353,13 +353,13 @@ int		vlen ;
 	uint		(*rt)[3] ;
 	uint		(*rpp)[3] ;
 	uint		scite ;
-	cint	esize = (3 * szof(uint)) ;
+	cint	esz = (3 * szof(uint)) ;
 	int		rs = SR_OK ;
 	int		ri, vi ;
 	int		rtlen ;
 	int		vl = 0 ;
-	const char	*vst ;
-	const char	*vp ;
+	cchar	*vst ;
+	cchar	*vp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (qp == NULL) return SR_FAULT ;
@@ -387,7 +387,7 @@ int		vlen ;
 
 	    uint	(*srt)[3] = (rt + 1) ;
 	    int		srtlen = (rtlen - 1) ;
-	    rpp = (uint (*)[3]) bsearch(&scite,srt,srtlen,esize,cmprec) ;
+	    rpp = (uint (*)[3]) bsearch(&scite,srt,srtlen,esz,cmprec) ;
 	    if (rpp == NULL)
 	        rs = SR_NOTFOUND ;
 
@@ -440,7 +440,7 @@ int		vlen ;
 
 int holidays_fetchname(op,kp,kl,curp,qp,vbuf,vlen)
 HOLIDAYS	*op ;
-const char	*kp ;
+cchar	*kp ;
 int		kl ;
 HOLIDAYS_CUR	*curp ;
 HOLIDAYS_CITE	*qp ;
@@ -458,9 +458,9 @@ int		vlen ;
 	int		itlen ;
 	int		vl = 0 ;
 	int		f_mat = FALSE ;
-	const char	*kst, *vst ;
-	const char	*vp ;
-	const char	*cp ;
+	cchar	*kst, *vst ;
+	cchar	*vp ;
+	cchar	*cp ;
 	char		keybuf[KEYBUFLEN + 1] ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -607,8 +607,8 @@ int		vlen ;
 	int		rs = SR_OK ;
 	int		ri, vi ;
 	int		vl = 0 ;
-	const char	*vst ;
-	const char	*vp ;
+	cchar	*vst ;
+	cchar	*vp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
@@ -684,7 +684,7 @@ static int holidays_dbfind(HOLIDAYS *op,IDS *idp,char *tmpfname)
 {
 	int		rs ;
 	int		fl = 0 ;
-	const char	*fsuf = HOLIDAYS_HOLSUF ;
+	cchar	*fsuf = HOLIDAYS_HOLSUF ;
 	char		digbuf[DIGBUFLEN + 1] ;
 	char		cname[MAXNAMELEN + 1] ;
 
@@ -712,7 +712,7 @@ static int holidays_dbfinder(HOLIDAYS *op,IDS *idp,char *tmpfname,cchar *cname)
 	int		rs1 = SR_NOENT ;
 	int		i ;
 	int		fl = 0 ;
-	const char	*hdn ;
+	cchar	*hdn ;
 
 	for (i = 0 ; holdnames[i] != NULL ; i += 1) {
 
@@ -747,10 +747,10 @@ static int subinfo_start(SUBINFO *sip,HOLIDAYS *op) noex {
 	memclear(sip) ;
 	sip->op = op ;
 	if ((rs = bopen(&sip->hfile,op->fname,"r",0666)) >= 0) {
-	    cint	size = szof(SUBINFO_REC) ;
+	    cint	sz = szof(SUBINFO_REC) ;
 	    cint	n = HOLIDAYS_DEFRECS ;
-	    if ((rs = vecobj_start(&sip->recs,size,n,0)) >= 0) {
-	        struct ustat	sb ;
+	    if ((rs = vecobj_start(&sip->recs,sz,n,0)) >= 0) {
+	        USTAT	sb ;
 	        bcontrol(&sip->hfile,BC_STAT,&sb) ;
 	        sip->fsize = sb.st_size ;
 	        if ((rs = strtab_start(&sip->kstrs,(sip->fsize/3))) >= 0) {
@@ -841,8 +841,8 @@ static int subinfo_procyear(SUBINFO *sip,cchar lbuf[],int llen)
 	int		rs = SR_ILSEQ ;
 	int		sl, cl ;
 	int		year = SR_ILSEQ ;
-	const char	*sp ;
-	const char	*cp ;
+	cchar	*sp ;
+	cchar	*cp ;
 
 	if (sip == NULL) return SR_FAULT ;
 
@@ -863,8 +863,8 @@ static int subinfo_procline(SUBINFO *sip,cchar lbuf[],int llen)
 	int		sl = llen ;
 	int		cl ;
 	int		c = 0 ;
-	const char	*sp = lbuf ;
-	const char	*cp ;
+	cchar	*sp = lbuf ;
+	cchar	*cp ;
 
 	if ((cl = nextfield(sp,sl,&cp)) > 0) {
 	    uint	cite ;
@@ -888,7 +888,7 @@ static int subinfo_proclineval(SUBINFO *sip,uint cite,cchar *sp,int sl)
 	int		rs = SR_OK ;
 	int		cl ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cl = nextfield(sp,sl,&cp)) > 0) {
 	    char	keybuf[KEYBUFLEN + 1] ;
@@ -940,7 +940,7 @@ static int subinfo_mkrt(SUBINFO *sip)
 	HOLIDAYS	*op = sip->op ;
 	uint		(*rt)[3] ;
 	int		rs = SR_OK ;
-	int		size ;
+	int		sz ;
 	int		n ;
 	int		c = 0 ;
 
@@ -950,8 +950,8 @@ static int subinfo_mkrt(SUBINFO *sip)
 	    vecobj_sort(&sip->recs,vcmprec) ;
 	}
 
-	size = (n + 2) * 3 * szof(uint) ;
-	if ((rs = uc_malloc(size,&rt)) >= 0) {
+	sz = (n + 2) * 3 * szof(uint) ;
+	if ((rs = uc_malloc(sz,&rt)) >= 0) {
 	    rt[c][0] = 0 ;
 	    rt[c][1] = 0 ;
 	    rt[c][2] = 0 ;
@@ -1033,7 +1033,7 @@ int subinfo_mkind(SUBINFO *sip,cchar kst[],int (*it)[3],int il)
 	int		ri, ki, hi ;
 	int		rtl ;
 	int		sc = 0 ;
-	const char	*kp ;
+	cchar	*kp ;
 
 	rt = op->rt ;
 	rtl = op->rtlen ;
@@ -1041,11 +1041,11 @@ int subinfo_mkind(SUBINFO *sip,cchar kst[],int (*it)[3],int il)
 #if	CF_FIRSTHASH
 	{
 	    VECOBJ		ves ;
-	    cint		size = szof(struct varentry) ;
+	    cint		sz = szof(struct varentry) ;
 	    int			opts ;
 
 	    opts = VECOBJ_OCOMPACT ;
-	    if ((rs = vecobj_start(&ves,size,rtl,opts)) >= 0) {
+	    if ((rs = vecobj_start(&ves,sz,rtl,opts)) >= 0) {
 	        int	i ;
 
 	        for (ri = 1 ; ri < rtl ; ri += 1) {
@@ -1132,7 +1132,7 @@ static int getyear(time_t dt)
 static int getcite(uint *citep,cchar *cp,int cl)
 {
 	int		rs = SR_ILSEQ ;
-	const char	*tp ;
+	cchar	*tp ;
 
 	if ((tp = strnchr(cp,cl,'/')) != NULL) {
 	    int		m, d ;

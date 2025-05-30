@@ -47,7 +47,6 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<uvariables.hh>		/* |varname| */
 #include	<vecobj.h>
 #include	<cfdec.h>
 #include	<ncol.h>		/* |charcols(3uc)| */

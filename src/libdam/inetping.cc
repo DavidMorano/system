@@ -50,8 +50,8 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<estrings.h>
@@ -320,7 +320,7 @@ static int pingoneresp(int fd,int to) noex {
 	        len = rs ;
 	        if (len > 0) {
 #if	CF_DEBUGS
-	            debugprintf("inetping/pingone: rbuf=>%t<\n",rp,len) ;
+	            debugprintf("inetping/pingone: rbuf=>%r<\n",rp,len) ;
 #endif
 	            f_found = (strnchr(rp,len,'\n') != NULL) ;
 	            tl += len ;
