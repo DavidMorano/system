@@ -41,13 +41,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<cfdec.h>
 #include	<randlc.h>
 #include	<localmisc.h>
 
 #include	"getseed.h"
 
+import uconstants ;
 
 /* local defines */
 

@@ -45,7 +45,6 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
 #include	<usysflag.h>
-#include	<uvariables.hh>
 #include	<mallocxx.h>
 #include	<getsysname.h>
 #include	<sfx.h>
@@ -55,6 +54,7 @@
 
 #include	"getostype.h"
 
+import uconstants ;
 
 /* local defines */
 

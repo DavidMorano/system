@@ -56,7 +56,6 @@
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<getutmp.h>		/* |getutmpterm(3uc)| */
 #include	<tmpx.h>
 #include	<storebuf.h>
@@ -66,6 +65,7 @@
 
 #include	"getlogx.h"
 
+import uconstants ;
 
 /* local defines */
 

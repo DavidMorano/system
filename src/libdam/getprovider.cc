@@ -85,7 +85,6 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<uvariables.hh>		/* |sysword(3u)| + |varname(3u)| */
 #include	<uinfo.h>
 #include	<mallocxx.h>
 #include	<estrings.h>		/* |sf{x}(3uc)| + |snwcpy(3uc)| */
@@ -94,6 +93,7 @@
 
 #include	"getprovider.h"
 
+import uconstants ;
 
 /* local defines */
 
