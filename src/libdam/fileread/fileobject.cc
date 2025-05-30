@@ -49,6 +49,7 @@
 
 #include	"fileobject.h"
 
+import libutil ;
 
 /* local defines */
 
