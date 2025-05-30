@@ -188,7 +188,7 @@ DEVPERMFILE	*op ;
 cchar	fname[] ;
 {
 	int	rs = SR_OK ;
-	int	size ;
+	int	sz ;
 	int	opts ;
 
 	cchar	*cp ;
@@ -231,16 +231,16 @@ cchar	fname[] ;
 /* initialize */
 
 	opts = VECOBJ_OSTATIONARY ;
-	size = szof(DEVPERMFILE_KEY) ;
-	rs = vecobj_start(&op->keys,size,10,opts) ;
+	sz = szof(DEVPERMFILE_KEY) ;
+	rs = vecobj_start(&op->keys,sz,10,opts) ;
 	if (rs < 0)
 	    goto bad1 ;
 
 /* keep this not-sorted so that the original order is maintained */
 
 	opts = 0 ;
-	size = szof(DEVPERMFILE_IE) ;
-	rs = vecobj_start(&op->entries,size,10,opts) ;
+	sz = szof(DEVPERMFILE_IE) ;
+	rs = vecobj_start(&op->entries,sz,10,opts) ;
 	if (rs < 0)
 	    goto bad2 ;
 
@@ -653,7 +653,7 @@ cchar	fname[] ;
 	    if ((*cp == '\0') || (*cp == '#')) continue ;
 
 #if	CF_DEBUGS && CF_DEBUGSFIELD
-	    debugprintf("devpermfile_fileparse: line> %t\n",
+	    debugprintf("devpermfile_fileparse: line> %r\n",
 	        cp,cl) ;
 #endif
 
@@ -712,7 +712,7 @@ int		ll ;
 	    goto ret1 ;
 
 #if	CF_DEBUGS && CF_DEBUGSFIELD
-	debugprintf("devpermfile_fileparseline: key=>%t<\n",
+	debugprintf("devpermfile_fileparseline: key=>%r<\n",
 	    fp,fl) ;
 #endif
 
@@ -735,7 +735,7 @@ int		ll ;
 
 #if	CF_DEBUGS && CF_DEBUGSFIELD
 	        debugprintf("devpermfile_fileparseline: "
-	            "field value=>%t<\n",
+	            "field value=>%r<\n",
 	            fp,fl) ;
 #endif
 
