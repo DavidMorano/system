@@ -47,7 +47,8 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<ctime>			/* |time(2)| */
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
+#include	<memory>		/* |destroy_at(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -63,6 +64,7 @@
 
 #include	"nodesfile.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -81,6 +83,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::destroy_at ;			/* subroutine */
 using std::nothrow ;			/* constant */
 
 
@@ -331,18 +334,19 @@ static int nodesfile_finents(NF *op) noex {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    while ((rs2 = hdb_curenum(elp,&cur,&key,&val)) >= 0) {
-		NF_ENT	*ep = (NF_ENT *) key.buf ;
-		if (key.buf) {
+		void	*vp = cast_const<voidp>(key.buf) ;
+		if (vp) {
+		    NF_ENT *ep = resumelifetime<NF_ENT>(vp) ;
 		    {
 		        rs1 = ep->finish() ;
 		        if (rs >= 0) rs = rs1 ;
 		    }
+		    destroy_at(ep) ;
 		    {
-			ep->~nodesfile_ent() ;
-			rs1 = uc_free(key.buf) ;
+			rs1 = uc_free(vp) ;
 		        if (rs >= 0) rs = rs1 ;
 		    }
-		}
+		} /* end if (non-null) */
 	    } /* end while */
 	    if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
 	    rs1 = hdb_curend(elp,&cur) ;
@@ -360,15 +364,15 @@ static int nodesfile_finfis(NF *op) noex {
 	int		rs2 ;
 	void *vp ;
 	for (int i = 0 ; (rs2 = flp->get(i,&vp)) >= 0 ; i += 1) {
-	    NF_FI	*fep = (NF_FI *) vp ;
 	    if (vp) {
+	        NF_FI	*fep = resumelifetime<NF_FI>(vp) ;
 		{
 		    rs1 = fep->finish() ;
 		    if (rs >= 0) rs = rs1 ;
 		}
+		destroy_at(fep) ;
 		{
-		    fep->~nodesfile_fi() ;
-		    rs1 = uc_free(fep) ;
+		    rs1 = uc_free(vp) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
 	    } /* end if (non-null) */
@@ -437,11 +441,11 @@ int nodesfile_curbegin(NF *op,NF_CUR *curp) noex {
 	                rs = hdb_curbegin(op->elp,curp->hcp) ;
 		    }
 		    if (rs < 0) {
-		        curp->hcp->~hdb_cur() ;
+		        destroy_at(curp->hcp) ;
 		    }
 		} /* end if (new-hdb_cur) */
 		if (rs < 0) {
-		    uc_free(curp->hcp) ;
+		    uc_free(vp) ;
 		    curp->hcp = nullptr ;
 		}
 	    } /* end if (m-a) */
@@ -455,13 +459,14 @@ int nodesfile_curend(NF *op,NF_CUR *curp) noex {
 	int		rs1 ;
 	if ((rs = nodesfile_magic(op,curp)) >= 0) {
 	    if (curp->hcp) {
+		void	*vp = curp->hcp ;
 		{
 	            rs1 = hdb_curend(op->elp,curp->hcp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        }
+		destroy_at(curp->hcp) ;
 		{
-		    curp->hcp->~hdb_cur() ;
-		    rs1 = uc_free(curp->hcp) ;
+		    rs1 = uc_free(vp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    curp->hcp = nullptr ;
 	        }
@@ -559,7 +564,7 @@ static int nodesfile_fnloadbegin(NF *op,cchar *fn,bfile *fp) noex {
 			    }
 		        } /* end if (file_start) */
 			if (rs < 0) {
-			    fep->~nodesfile_fi() ;
+			    destroy_at(fep) ;
 			}
 		    } /* end if (new-file) */
 		    if (rs < 0) {
@@ -576,16 +581,16 @@ static int nodesfile_fnloadend(NF *op,int fi) noex {
     	vechand		*flp = op->flp ;
     	int		rs ;
 	if (void *vp ; (rs = flp->get(fi,&vp)) >= 0) {
-	    NF_FI	*fep = (NF_FI *) vp ;
 	    if (vp) {
+	        NF_FI	*fep = resumelifetime<NF_FI>(vp) ;
 		if ((rs = flp->del(fi)) >= 0) {
 	            if ((rs = fep->finish()) >= 0) {
-			fep->~nodesfile_fi() ;
-		        rs = uc_free(fep) ;
+			destroy_at(fep) ;
+		        rs = uc_free(vp) ;
 	            }
 		}
-	    }
-	}
+	    } /* end if (non-null) */
+	} /* end if (get) */
 	return rs ;
 }
 /* end subroutine (nodesfile_fnloadend) */
@@ -596,8 +601,8 @@ static int nodesfile_fnalready(NF *op,USTAT *sbp) noex {
 	int		fal = false ;
 	void		*vp ;
 	for (int i = 0 ; (rs = flp->get(i,&vp)) >= 0 ; i += 1) {
-	    NF_FI	*fep = (NF_FI *) vp ;
 	    if (vp) {
+	        NF_FI	*fep = resumelifetime<NF_FI>(vp) ;
 	        fal = true ;
 		fal = fal && (sbp->st_dev == fep->dev) ;
 		fal = fal && (sbp->st_ino == fep->ino) ;
@@ -629,7 +634,7 @@ static int nodesfile_fnparseload(NF *op,int fi,cchar *sp,int sl) noex {
 		    }
 	        } /* end if (entry_start) */
 		if (rs < 0) {
-		    ep->~nodesfile_ent() ;
+		    destroy_at(ep) ;
 		}
 	    } /* end if (new-entry) */
 	    if (rs < 0) {
