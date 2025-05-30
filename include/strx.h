@@ -20,6 +20,7 @@
 
 #include	<strsub.h>
 #include	<strxcmp.h>
+#include	<strerrabbr.h>
 
 
 EXTERNC_begin
