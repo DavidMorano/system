@@ -1,4 +1,9 @@
-/* msumsg */
+/* msumsg HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* messages for MSU requests-responses */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -10,16 +15,12 @@
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	MSUMSG_INCLUDE
-#define	MSUMSG_INCLUDE	1
+#define	MSUMSG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-
-#include	<localmisc.h>
 
 
 struct msumsg_status {
@@ -73,7 +74,6 @@ struct msumsg_report {
 	uchar	msgtype ;		/* message type */
 } ;
 
-
 /* request types */
 enum msumsgtypes {
 	msumsgtype_status,		/* 0 */
@@ -86,7 +86,6 @@ enum msumsgtypes {
 	msumsgtype_overlast		/* 7 */
 } ;
 
-
 /* response codes */
 enum msumsgrcs {
 	msumsgrc_ok,
@@ -95,12 +94,7 @@ enum msumsgrcs {
 	msumsgrc_overlast
 } ;
 
-
-#if	(! defined(MSUMSG_MASTER)) || (MSUMSG_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int msumsg_getstatus(struct msumsg_getstatus *,int,char *,int) ;
 extern int msumsg_status(struct msumsg_status *,int,char *,int) ;
@@ -110,11 +104,8 @@ extern int msumsg_mark(struct msumsg_mark *,int,char *,int) ;
 extern int msumsg_report(struct msumsg_report *,int,char *,int) ;
 extern int msumsg_exit(struct msumsg_exit *,int,char *,int) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* MSUMSG_MASTER */
 
 #endif /* MSUMSG_INCLUDE */
 

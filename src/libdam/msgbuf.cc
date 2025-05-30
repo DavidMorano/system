@@ -66,18 +66,18 @@
 
 /* exported subroutines */
 
-int msgbuf_start(msgbuf *mbp,int fd,int bufsize,int to) noex {
+int msgbuf_start(msgbuf *mbp,int fd,int bufsz,int to) noex {
 	int		rs = SR_FAULT ;
 	if (mbp) {
 	    rs = SR_INVALID ;
 	    memclear(mbp) ;
 	    if (fd >= 0) {
-	        if (bufsize <= 0) bufsize = getpagesize() ;
+	        if (bufsz <= 0) bufsz = getpagesize() ;
 	        if (to < 1) to = TO_READ ;
 	        mbp->fd = fd ;
-	        mbp->mlen = bufsize ;
+	        mbp->mlen = bufsz ;
 	        mbp->to = to ;
-	        if (char *bp{} ; (rs = uc_malloc(bufsize,&bp)) >= 0) {
+	        if (char *bp ; (rs = uc_malloc(bufsz,&bp)) >= 0) {
 	            mbp->mbuf = bp ;
 	        }
 	    } /* end if (valid) */
