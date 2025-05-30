@@ -53,7 +53,7 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
+#include	<uconstants.hh>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>

@@ -37,7 +37,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<uvariables.hh>
+#include	<uconstants.hh>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<endian.h>
