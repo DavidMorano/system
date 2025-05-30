@@ -62,7 +62,7 @@
 #include	"localget.h"
 
 
-import uvariables ;
+import uconstants ;
 
 /* local defines */
 

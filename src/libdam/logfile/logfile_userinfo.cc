@@ -63,7 +63,7 @@
 #include	"logfile.h"
 
 
-import uvariables ;
+import uconstants ;
 
 /* local defines */
 
