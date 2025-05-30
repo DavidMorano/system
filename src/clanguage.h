@@ -68,8 +68,32 @@
 #endif
 
 #ifdef	__cplusplus
-#ifndef	restruct
+#ifndef	restrict
 #define	restrict		__restrict__
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	attrweak
+#define	attrweak		__attribute__((weak))
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	attrweakref
+#define	attrweakref(target)	__attribute__((weakref(target)))
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	attrconst
+#define	attrconst		__attribute__((const))
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	attrpure
+#define	attrpure		__attribute__((pure))
 #endif
 #endif /* __cplusplus */
 
