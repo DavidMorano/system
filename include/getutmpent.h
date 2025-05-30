@@ -62,7 +62,14 @@ struct utmpentx_head {
 	char		host[GETUTMPENT_LHOST + 1] ;
 } ;
 
+#ifdef	__cplusplus
+struct utmpentx : utmpentx_head {
+    	int get(pid_t) noex ;
+	int operator () (pid_t) noex ;
+} ;
+#else
 typedef	UTMPENTX	utmpentx ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
