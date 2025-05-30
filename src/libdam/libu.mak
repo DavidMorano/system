@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += libu.h
 
-MODS += valuelims.ccm digbufsizes.ccm uvariables.ccm 
+MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm 
 MODS += libutil.ccm
 MODS += xxtostr.ccm digtab.ccm
 MODS += usysconf.ccm ulibvals.ccm
@@ -52,7 +52,6 @@ LIBDIRS=
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -70,7 +69,7 @@ SOFL= -shared
 OBJ00= mailvalues.o endian.o 
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
-OBJ03= mods.o intx.o 
+OBJ03= umods.o intx.o 
 
 OBJ04= utimeout.o utimeouts.o 
 OBJ05= ulogerror.o strtox.o 
@@ -294,10 +293,10 @@ uacceptpass.o:		uacceptpass.cc ufdlock.h		$(INCS)
 usupport.o:		xxtostr.o usupport.cc usupport.h	$(INCS)
 
 # requires USYSBASIC
-uatfork.o:		mods.o uatfork.cc uatfork.h		$(INCS)
-uobjlock.o:		mods.o uobjlock.cc uobjlock.cc		$(INCS)
-uregfork.o:		mods.o uregfork.cc uregfork.hh		$(INCS)
-uprocess.o:		mods.o uprocess.cc uprocess.h		$(INCS)
+uatfork.o:		umods.o uatfork.cc uatfork.h		$(INCS)
+uobjlock.o:		umods.o uobjlock.cc uobjlock.cc		$(INCS)
+uregfork.o:		umods.o uregfork.cc uregfork.hh		$(INCS)
+uprocess.o:		umods.o uprocess.cc uprocess.h		$(INCS)
 
 # USYS
 usys.o:			usys.dir
@@ -352,6 +351,11 @@ syscontain.o:		syscontain.dir
 syscontain.dir:
 	makesubdir $@
 
+# UMODS
+umods.o:		umods.dir
+umods.dir:
+	makesubdir $@
+
 # OTHER
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
 um.o:			um.cc um.h			$(INCS)
@@ -374,128 +378,5 @@ xxtostr.o:		xxtostr.ccm xxtostr.h		$(INCS)
 
 strnul.o:		strnul.cc strnul.hh		$(INCS)
 mailvalues.o:		mailvalues.cc mailvalues.hh	$(INCS)
-
-# VARIOUS (module)
-digtab.o:		digtab.ccm
-usysconf.o:		usysconf.ccm
-usigset.o:		usigset.ccm
-constdiv.o:		constdiv.ccm
-builtin.o:		builtin.ccm
-libutil.o:		libutil.ccm			$(INCS)
-
-# VALUELIMS (module)
-valuelims.o:		valuelims.ccm			$(INCS)
-
-# DIGBUFSIZES (module)
-digbufsizes.o:		digbufsizes.ccm
-
-# UVARIABLES
-uvariables.o:		uvariables0.o uvariables1.o
-	$(LD) -r -o $@ $(LDFLAGS) uvariables0.o uvariables1.o
-
-uvariables0.o:		valuelims.o digbufsizes.o uvariables.ccm uvariables1.cc 
-	makemodule uvariables
-
-uvariables1.o:		uvariables.ccm uvariables1.cc 
-	makemodule uvariables
-	$(COMPILE.cc) uvariables1.cc
-
-# ULIBVALS
-ulibvals.o:		ulibvals0.o ulibvals1.o
-	$(LD) -r -o $@ $(LDFLAGS) ulibvals0.o ulibvals1.o
-
-ulibvals0.o:		usysconf.o ulibvals.ccm
-	makemodule ulibvals
-
-ulibvals1.o:		ulibvals.ccm ulibvals1.cc
-	makemodule ulibvals
-	$(COMPILE.cc) ulibvals1.cc
-
-# UNIXFNAMES
-unixfnames.o:		unixfnames0.o unixfnames1.o
-	$(LD) -r -o $@ $(LDFLAGS) unixfnames0.o unixfnames1.o
-
-unixfnames0.o:		unixfnames.ccm
-	makemodule unixfnames
-
-unixfnames1.o:		unixfnames.ccm unixfnames1.cc
-	makemodule unixfnames
-	$(COMPILE.cc) unixfnames1.cc
-
-# USIGBLOCK
-usigblock.o:		usigset.o usigblock.ccm
-	makemodule usigset
-	makemodule usigblock
-
-# UMISC
-umisc.o:		umisc0.o umisc1.o umisc2.o umisc3.o
-	$(LD) -r -o $@ $(LDFLAGS) umisc0.o umisc1.o umisc2.o umisc3.o
-
-umisc0.o:		usigset.o usigblock.o umisc.ccm
-	makemodule usigset
-	makemodule usigblock
-	makemodule umisc
-
-umisc1.o:		umisc0.o umisc1.cc 
-	makemodule umisc
-	$(COMPILE.cc) umisc1.cc
-
-umisc2.o:		umisc0.o umisc2.cc
-	makemodule umisc
-	$(COMPILE.cc) umisc2.cc
-
-umisc3.o:		umisc0.o umisc3.cc
-	makemodule umisc
-	$(COMPILE.cc) umisc3.cc
-
-# USYSBASIC
-usysbasic.o:		usysbasic0.o usysbasic1.o
-	$(LD) -r -o $@ $(LDFLAGS) usysbasic0.o usysbasic1.o
-
-usysbasic0.o:		usigset.o usigblock.o usysbasic.ccm
-	makemodule usigset
-	makemodule usigblock
-	makemodule usysbasic
-
-usysbasic1.o:		usysbasic0.o usysbasic1.cc 
-	makemodule usysbasic
-	$(COMPILE.cc) usysbasic1.cc
-
-
-# MOBJ
-MOBJ0 = valuelims.o digbufsizes.o uvariables.o 
-MOBJ1 = libutil.o
-MOBJ2 = xxtostr.o digtab.o
-MOBJ3 = usysconf.o ulibvals.o 
-MOBJ4 = usigset.o usigblock.o umisc.o
-MOBJ5 = unixfnames.o constdiv.o builtin.o
-MOBJ6 = usysbasic.o
-
-MOBJ= mobj0.o mobj1.o mobj2.o mobj3.o mobj4.o mobj5.o mobj6.o
-
-# MODS
-mods.o:			$(MOBJ)
-	$(LD) -r -o $@ $(LDFLAGS) $(MOBJ)
-
-mobj0.o:		$(MOBJ0)
-	$(LD) -r -o $@ $(LDFLAGS) $(MOBJ0)
-
-mobj1.o:		$(MOBJ1)
-	$(LD) -r -o $@ $(LDFLAGS) $(MOBJ1)
-
-mobj2.o:		$(MOBJ2)
-	$(LD) -r -o $@ $(LDFLAGS) $(MOBJ2)
-
-mobj3.o:		$(MOBJ3)
-	$(LD) -r -o $@ $(LDFLAGS) $(MOBJ3)
-
-mobj4.o:		$(MOBJ4)
-	$(LD) -r -o $@ $(LDFLAGS) $(MOBJ4)
-
-mobj5.o:		$(MOBJ5)
-	$(LD) -r -o $@ $(LDFLAGS) $(MOBJ5)
-
-mobj6.o:		$(MOBJ6)
-	$(LD) -r -o $@ $(LDFLAGS) $(MOBJ6)
 
 
