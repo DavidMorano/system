@@ -21,16 +21,16 @@
 	fsdirtreestat
 
 	Description:
-	This subroutine provides an independent stand-alone STAT
+	This subroutine provides an independent stand-alone USTAT
 	function for the FSDIRTREE object.
 
 	Synopsis:
 	int fsdirtreestat(cchar *fname,int type, FSDIRTREE_STAT *sbp) noex
 
 	Arguments:
-	fname		file-name to STAT
-	type		type of STAT: 0=regular, 1=lstat
-	sbp		ponter to a STAT block structure
+	fname		file-name to USTAT
+	type		type of USTAT: 0=regular, 1=lstat
+	sbp		ponter to a USTAT block structure
 
 	Returns:
 	>=0		OK

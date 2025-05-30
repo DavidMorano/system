@@ -22,7 +22,7 @@
 
 	Description:
 	This is the (now) famous 'filelines' subroutine.  It is the
-	fastest version of this kind of cuntion (counting lines in
+	fastest version of this kind of funtion (counting lines in
 	a text file).  Note that unlike the |fileliner(3dam)|
 	subroutine, no comment character can be specified.
 
@@ -52,6 +52,7 @@
 
 #include	"filelines.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -97,12 +98,12 @@ int filelines(cchar *fn) noex {
 		if ((rs = uc_open(fn,of,0)) >= 0) {
 		    cint	fd = rs ;
 		    if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
-			csize	fsz = size_t(sb.st_size) ;
+			csize	fsize = size_t(sb.st_size) ;
 			rs = SR_NOTSUP ;
 		        if (S_ISREG(sb.st_mode)) {
 			    rs = SR_OK ;
-			    if (fsz > 0) {
-			        rs = liner(fd,fsz) ;
+			    if (fsize > 0) {
+			        rs = liner(fd,fsize) ;
 			        lines = rs ;
 			    }
 			} /* end if (regular file) */
@@ -126,18 +127,17 @@ static int liner(int fd,csize ms) noex {
 	int		rs1 ;
 	int		lines = 0 ;
 	cnullptr	np{} ;
-	if (void *md{} ; (rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+	if (void *md ; (rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	    cint	cmd = MADV_SEQUENTIAL ;
 	    if ((rs = u_madvise(md,ms,cmd)) >= 0) {
 		size_t	ll = ms ;
 		cchar	*lp = charp(md) ;
-		cchar	*tp ;
-		while ((tp = charp(memchr(lp,'\n',ll))) != np) {
+		for (cchar *tp ; (tp = charp(memchr(lp,'\n',ll))) != np ; ) {
 		    csize	si = ((tp + 1) - lp) ;
 		    lines += 1 ;
 		    ll -= si ;
 		    lp += si ;
-		} /* end while */
+		} /* end for */
 		if (ll > 0) lines += 1 ;
 	    } /* end if (memory-advise) */
 	    rs1 = u_mmapend(md,ms) ;
