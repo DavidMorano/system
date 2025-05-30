@@ -49,7 +49,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<limits.h>
+#include	<climits>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>

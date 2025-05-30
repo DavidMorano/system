@@ -69,8 +69,8 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -340,10 +340,10 @@ static int argparse_start(struct argparse *app,cchar *args)
 	        svcl = (tp-args) ;
 	    }
 #if	CF_DEBUGS
-	    debugprintf("opendialer_tcpmux/argparse_start: ss=>%t<\n",
+	    debugprintf("opendialer_tcpmux/argparse_start: ss=>%r<\n",
 		svcp,svcl) ;
 	    debugprintf("opendialer_tcpmux/argparse_start: s=>%s<\n",sp) ;
-	    debugprintf("opendialer_tcpmux/argparse_start: p=>%t<\n",
+	    debugprintf("opendialer_tcpmux/argparse_start: p=>%r<\n",
 		portp,portl) ;
 #endif
 	    ch = (sp[0] & 0xff) ;
@@ -358,7 +358,7 @@ static int argparse_start(struct argparse *app,cchar *args)
 		    nsp = (sp+opl) ;
 	        }
 #if	CF_DEBUGS
-	    debugprintf("opendialer_tcpmux/argparse_start: o=>%t<\n",
+	    debugprintf("opendialer_tcpmux/argparse_start: o=>%r<\n",
 		opp,opl) ;
 #endif
 		kp = opp ;
@@ -371,9 +371,9 @@ static int argparse_start(struct argparse *app,cchar *args)
 		    vl = (opp+opl) - (tp+1) ;
 		}
 #if	CF_DEBUGS
-	    debugprintf("opendialer_tcpmux/argparse_start: k=%t\n",kp,kl) ;
+	    debugprintf("opendialer_tcpmux/argparse_start: k=%r\n",kp,kl) ;
 		if (vp != NULL) 
-	    debugprintf("opendialer_tcpmux/argparse_start: v=%t\n",vp,vl) ;
+	    debugprintf("opendialer_tcpmux/argparse_start: v=%r\n",vp,vl) ;
 #endif
 	        if ((oi = matstr(ops,kp,kl)) >= 0) {
 	            switch (oi) {

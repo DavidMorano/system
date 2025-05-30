@@ -71,8 +71,8 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -397,7 +397,7 @@ static int argparse_start(struct argparse *app,cchar *argz)
 		    nsp = (sp+optl) ;
 	        }
 #if	CF_DEBUGS
-	        debugprintf("opendialer_ticotsord/argparse_start: o=>%t<\n",
+	        debugprintf("opendialer_ticotsord/argparse_start: o=>%r<\n",
 		    optp,optl) ;
 #endif
 		kp = optp ;
@@ -410,9 +410,9 @@ static int argparse_start(struct argparse *app,cchar *argz)
 		    vl = ((optp+optl)-(tp+1)) ;
 		}
 #if	CF_DEBUGS
-	    debugprintf("opendialer_ticotsord/argparse_start: k=%t\n",kp,kl) ;
+	    debugprintf("opendialer_ticotsord/argparse_start: k=%r\n",kp,kl) ;
 		if (vp != NULL) 
-	    debugprintf("opendialer_ticotsord/argparse_start: v=%t\n",vp,vl) ;
+	    debugprintf("opendialer_ticotsord/argparse_start: v=%r\n",vp,vl) ;
 #endif
 	        if ((oi = matstr(ops,kp,kl)) >= 0) {
 		    int		v ;

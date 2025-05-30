@@ -71,8 +71,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<baops.h>
@@ -391,11 +391,11 @@ static int argparse_start(struct argparse *app,cchar *args)
 		}
 	    }
 #if	CF_DEBUGS
-	    debugprintf("opendialer_finger/argparse_start: s1=>%t<\n",
+	    debugprintf("opendialer_finger/argparse_start: s1=>%r<\n",
 		s1p,s1l) ;
-	    debugprintf("opendialer_finger/argparse_start: s2=>%t<\n",
+	    debugprintf("opendialer_finger/argparse_start: s2=>%r<\n",
 		s2p,s2l) ;
-	    debugprintf("opendialer_finger/argparse_start: s3=>%t<\n",
+	    debugprintf("opendialer_finger/argparse_start: s3=>%r<\n",
 		s3p,s3l) ;
 	    debugprintf("opendialer_finger/argparse_start: s=>%s<\n",sp) ;
 #endif
@@ -411,7 +411,7 @@ static int argparse_start(struct argparse *app,cchar *args)
 		    nsp = (sp+opl) ;
 	        }
 #if	CF_DEBUGS
-	    debugprintf("opendialer_finger/argparse_start: op=>%t<\n",opp,opl) ;
+	    debugprintf("opendialer_finger/argparse_start: op=>%r<\n",opp,opl) ;
 #endif
 		kp = opp ;
 		kl = opl ;
@@ -423,9 +423,9 @@ static int argparse_start(struct argparse *app,cchar *args)
 		    vl = (opp+opl) - (tp+1) ;
 		}
 #if	CF_DEBUGS
-	        debugprintf("opendialer_finger/argparse_start: k=%t\n",kp,kl) ;
+	        debugprintf("opendialer_finger/argparse_start: k=%r\n",kp,kl) ;
 		if (vp != NULL) 
-	            debugprintf("opendialer_finger/argparse_start: v=%t\n",
+	            debugprintf("opendialer_finger/argparse_start: v=%r\n",
 			vp,vl) ;
 #endif
 	        if ((oi = matstr(ops,kp,kl)) >= 0) {
