@@ -39,12 +39,12 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dlfcn.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<ctype.h>
 
 #include	<usystem.h>
@@ -1392,7 +1392,7 @@ const char	fname[] ;
 	                                rs = printuniq(pip,ofp,cp,cl) ;
 	                                wlen += rs ;
 	                            } else {
-	                                rs = shio_printf(ofp,"%t\n",cp,cl) ;
+	                                rs = shio_printf(ofp,"%r\n",cp,cl) ;
 	                                wlen += rs ;
 	                            }
 	                            if (rs < 0) break ;
@@ -1453,7 +1453,7 @@ static int procoutcounts(PROGINFO *pip,void *ofp)
 	dbp = &lip->wdb ;
 	if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
 	    struct wordent	*ep ;
-	    const char	*fmt = "%-6u %t\n" ;
+	    const char	*fmt = "%-6u %r\n" ;
 	    const char	*wp ;
 	    int		wl ;
 	    int		count ;

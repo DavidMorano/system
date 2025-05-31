@@ -49,8 +49,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1070,15 +1070,15 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 	if (nl < 0) nl = strlen(np) ;
 
 	if (pip->debuglevel > 0) {
-	    shio_printf(pip->efp,"%s: query=%t\n",pip->progname,np,nl) ;
+	    shio_printf(pip->efp,"%s: query=%r\n",pip->progname,np,nl) ;
 	}
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_mailalias/procname: query=%t\n",np,nl) ;
+	    debugprintf("b_mailalias/procname: query=%r\n",np,nl) ;
 #endif
 
-	if ((rs = shio_printf(ofp,"%t:\n",np,nl)) >= 0) {
+	if ((rs = shio_printf(ofp,"%r:\n",np,nl)) >= 0) {
 	    const int	malen = nl ;
 	    char	*mabuf ;
 	    if ((rs = uc_malloc((malen+1),&mabuf)) >= 0) {
@@ -1177,7 +1177,7 @@ static int madprint(PROGINFO *pip,SHIO *dfp,cchar *kbuf,cchar *vbuf)
 	f = f || haswhite(vbuf,-1) ;
 
 	blen = MAX((KCOLEXP - klen - 1),0) ;
-	rs = shio_printf(dfp,"%t:%t\t%s%s%s\n",
+	rs = shio_printf(dfp,"%r:%r\t%s%s%s\n",
 	    kbuf,klen,blanks,blen,
 	    ((f) ? "\042" : ""),
 	    vbuf,

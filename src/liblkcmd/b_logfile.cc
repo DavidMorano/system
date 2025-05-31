@@ -46,12 +46,12 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1176,7 +1176,7 @@ static int process(PROGINFO *pip,EXPCOOK *clp,cchar ifname[])
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(3))
-	                    debugprintf("process: l=>%t<\n",
+	                    debugprintf("process: l=>%r<\n",
 	                        lbuf,strlinelen(lbuf,ll,50)) ;
 #endif
 
@@ -1188,7 +1188,7 @@ static int process(PROGINFO *pip,EXPCOOK *clp,cchar ifname[])
 
 #if	CF_DEBUG
 	                    if (DEBUGLEVEL(3))
-	                        debugprintf("process: p=>%t<\n",
+	                        debugprintf("process: p=>%r<\n",
 	                            obuf,strlinelen(obuf,obl,50)) ;
 #endif
 
@@ -1291,7 +1291,7 @@ int		llen ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3)) {
 	            debugprintf("b_logfile/procsubs: ec_ex() rs=%d\n",rs1) ;
-	            debugprintf("b_logfile/procsubs: obuf=>%t<\n",
+	            debugprintf("b_logfile/procsubs: obuf=>%r<\n",
 	                obuf,strlinelen(obuf,obl,40)) ;
 	        }
 #endif
@@ -1430,7 +1430,7 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
 	    fmt = "%-15s argc=%u args¬\n" ;
 	    bprintf(rfp,fmt,id,ac) ;
 
-	    fmt = "%-15s a%02u=>%t<\n" ;
+	    fmt = "%-15s a%02u=>%r<\n" ;
 	    for (i = 0 ; (i < ac) && (av[i] != NULL) ; i += 1) {
 	        cchar	*ap = av[i] ;
 	        rs = bprintf(rfp,fmt,id,i,ap,al) ;

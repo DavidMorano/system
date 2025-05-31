@@ -46,11 +46,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
 #include	<time.h>
 
@@ -1871,7 +1871,7 @@ static int procmailbox(PROGINFO *pip,cchar *mbp,int mbl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_mailexpire/procmailbox: mbox=%t\n",mbp,mbl) ;
+	    debugprintf("b_mailexpire/procmailbox: mbox=%r\n",mbp,mbl) ;
 #endif
 
 	to = lip->msgto ;
@@ -1881,7 +1881,7 @@ static int procmailbox(PROGINFO *pip,cchar *mbp,int mbl)
 	}
 
 	if ((rs >= 0) && (pip->verboselevel >= 2)) {
-	    procout_printf(pip,"mb=%t to=%u\n",mp,ml,to) ;
+	    procout_printf(pip,"mb=%r to=%u\n",mp,ml,to) ;
 	}
 
 	if (rs >= 0) {
@@ -1979,7 +1979,7 @@ static int procmailboxone(PROGINFO *pip,cchar *un,cchar *mfname,int to)
 	    cchar	*pn = pip->progname ;
 	    if ((bl = sfbasename(mfname,-1,&bp)) > 0) {
 	        if (pip->debuglevel > 0) {
-	            fmt = "%s: u=%s mb=%t to=%u deleted msgs=%u\n" ;
+	            fmt = "%s: u=%s mb=%r to=%u deleted msgs=%u\n" ;
 	            shio_printf(pip->efp,fmt,pn,un,bp,bl,to,c) ;
 	        }
 	        if (pip->verboselevel >= 2) {
@@ -2402,7 +2402,7 @@ static int config_reader(CONFIG *op)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
-	                debugprintf("config_read: vbuf=>%t<\n",vbuf,vl) ;
+	                debugprintf("config_read: vbuf=>%r<\n",vbuf,vl) ;
 #endif
 
 	            ebuf[0] = '\0' ;
@@ -2414,7 +2414,7 @@ static int config_reader(CONFIG *op)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
-	                debugprintf("config_read: ebuf=>%t<\n",ebuf,el) ;
+	                debugprintf("config_read: ebuf=>%r<\n",ebuf,el) ;
 #endif
 
 	            switch (i) {
