@@ -68,8 +68,8 @@
 #include	<termios.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<ucmallreg.h>
@@ -1585,7 +1585,7 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 	                    rs = shio_write(ofp,buf,rs) ;
 	                }
 	            } else {
-	                rs = shio_printf(ofp,"%t\n",tbuf,tl) ;
+	                rs = shio_printf(ofp,"%r\n",tbuf,tl) ;
 		    }
 		} /* end if (sntmtime) */
 
@@ -1648,7 +1648,7 @@ static int procmailusers(PROGINFO *pip)
 	        while ((rs >= 0) && ((tp = strpbrk(sp,",\t ")) != NULL)) {
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("b_s/procmailusers: got=>%t<\n",sp,(tp-sp)) ;
+	            debugprintf("b_s/procmailusers: got=>%r<\n",sp,(tp-sp)) ;
 #endif
 	            if ((tp - sp) > 0) {
 	                rs = procmailuser(pip,sp,(tp - sp)) ;
@@ -1697,7 +1697,7 @@ static int procmailuser(PROGINFO *pip,cchar *sp,int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	debugprintf("b_s/procmailuser: ent un=%t\n",sp,sl) ;
+	debugprintf("b_s/procmailuser: ent un=%r\n",sp,sl) ;
 #endif
 
 	lip->mnbuf[0] = '\0' ;
@@ -2081,7 +2081,7 @@ static int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
 	                nfcols) ;
 	            debugprintf("b_s/termdatesd: nusers hb=>%s<\n",
 	                hexbuf) ;
-	            debugprintf("b_s/termdatesd: nusers rs1=%d buf=>%t<\n",
+	            debugprintf("b_s/termdatesd: nusers rs1=%d buf=>%r<\n",
 	                rs1,pbp,nfcols) ;
 	        }
 #endif /* CF_DEBUG */
@@ -2117,7 +2117,7 @@ static int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            debugprintf("b_s/termdatesd: labuf=>%t<\n",pbp,nfcols) ;
+	            debugprintf("b_s/termdatesd: labuf=>%r<\n",pbp,nfcols) ;
 #endif
 
 	    } /* end if (5-column field) */
@@ -2159,7 +2159,7 @@ static int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            debugprintf("b_s/termdatesd: mcbuf=>%t<\n",pbp,nfcols) ;
+	            debugprintf("b_s/termdatesd: mcbuf=>%r<\n",pbp,nfcols) ;
 #endif
 
 	    } /* end if (4-column field) */
@@ -2174,7 +2174,7 @@ static int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            debugprintf("b_s/termdatesd: timebuf=>%t<\n",
+	            debugprintf("b_s/termdatesd: timebuf=>%r<\n",
 	                timebuf,nfcols) ;
 #endif
 
@@ -2187,7 +2187,7 @@ static int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("b_s/termdatesd: ncols=%u\n",ncols) ;
-	    debugprintf("b_s/termdatesd: sdbuf=>%t<\n",lbuf,len) ;
+	    debugprintf("b_s/termdatesd: sdbuf=>%r<\n",lbuf,len) ;
 	}
 #endif
 
@@ -2387,7 +2387,7 @@ int		sl ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("bufdiv: ent x=%d\n",x) ;
-	    debugprintf("bufdiv: buf=>%t<\n",sp,sl) ;
+	    debugprintf("bufdiv: buf=>%r<\n",sp,sl) ;
 	}
 #endif
 

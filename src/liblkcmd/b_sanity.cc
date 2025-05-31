@@ -46,11 +46,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1307,7 +1307,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4)) {
-	                debugprintf("b_sanity/procfile: %u d=>%t<\n",len,
+	                debugprintf("b_sanity/procfile: %u d=>%r<\n",len,
 			lbuf,strlinelen(lbuf,len,50)) ;
 	            }
 #endif /* CF_DEBUG */
@@ -1330,7 +1330,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 				if ((tp-lp) > 0) {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	debugprintf("main/procfile: a%u l=>%t<\n",ll,
+	debugprintf("main/procfile: a%u l=>%r<\n",ll,
 		lp, strlinelen(lp,(tp-lp),50)) ;
 #endif
 	                            rs = procoutline(pip,ofp,lp,(tp-lp)) ;
@@ -1343,7 +1343,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 			    if ((rs >= 0) && (ll > 0)) {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	debugprintf("main/procfile: b%u l=>%t<\n",ll,
+	debugprintf("main/procfile: b%u l=>%r<\n",ll,
 		lp, strlinelen(lp,ll,50)) ;
 #endif
 	                        rs = procoutline(pip,ofp,lp,ll) ;
@@ -1383,7 +1383,7 @@ static int procoutline(PROGINFO *pip,void *ofp,cchar *lbuf,int llen) noex {
 	int		ni ;
 	int		ll ;
 	int		wlen = 0 ;
-	const char	*fmt = "%t%t\n" ;
+	const char	*fmt = "%r%r\n" ;
 	const char	*lp ;
 
 	n = lip->linelen ;

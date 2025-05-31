@@ -1368,7 +1368,7 @@ static int procfile_outer(PROGINFO *pip,SHIO *ofp,char *lbuf,int llen,SHIO *ifp)
 	        debugprintf("b_shcat/procfile: "
 	            "shio_readlines() rs=%d\n",rs) ;
 	        debugprintf("b_shcat/procfile: "
-	            "l=>%t<\n",lbuf,strlinelen(lbuf,len,60)) ;
+	            "l=>%r<\n",lbuf,strlinelen(lbuf,len,60)) ;
 #if	CF_DEBUGHEX
 	    if (rs >= 0)
 	        debugprinthex("b_shcat/procfile: d=",
@@ -1414,7 +1414,7 @@ static int procfile_reg(PROGINFO *pip,SHIO *ofp,char *lbuf,int llen,SHIO *ifp)
 	        debugprintf("b_shcat/procfile: "
 	            "shio_readlines() rs=%d\n", rs) ;
 	        debugprintf("b_shcat/procfile: "
-	            "l=>%t<\n",lbuf,strlinelen(lbuf,len,60)) ;
+	            "l=>%r<\n",lbuf,strlinelen(lbuf,len,60)) ;
 	    }
 #endif
 
@@ -1423,7 +1423,7 @@ static int procfile_reg(PROGINFO *pip,SHIO *ofp,char *lbuf,int llen,SHIO *ifp)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("b_shcat/procfile: c=>%t<\n",
+	            debugprintf("b_shcat/procfile: c=>%r<\n",
 	                lbuf,strlinelen(lbuf,len,40)) ;
 #endif
 
@@ -1501,7 +1501,7 @@ static int proclinebuf(PROGINFO *pip,SHIO *ofp,cchar *sbuf,int slen)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("shcat/proclinebuf: ent\n") ;
-	    debugprintf("shcat/proclinebuf: s=>%t<\n",sp,sl) ;
+	    debugprintf("shcat/proclinebuf: s=>%r<\n",sp,sl) ;
 	}
 #endif
 
@@ -1679,7 +1679,7 @@ static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar *lbuf,int llen)
 	            if (DEBUGLEVEL(4)) {
 	                debugprintf("b_shcat/locinfo_termoutprint: ll=%u\n",
 	                    ll) ;
-	                debugprintf("b_shcat/locinfo_termoutprint: l=>%t<\n",
+	                debugprintf("b_shcat/locinfo_termoutprint: l=>%r<\n",
 	                    lp,strlinelen(lp,ll,40)) ;
 	            }
 #endif

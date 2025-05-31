@@ -43,8 +43,8 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
 
 #include	<usystem.h>
@@ -1404,7 +1404,7 @@ static int processor_add(PROCESSOR *op,cchar *sp,int sl)
 	}
 
 #if	CF_DEBUGS
-	debugprintf("main/processor_add: line=>%t<\n",sp,sl) ;
+	debugprintf("main/processor_add: line=>%r<\n",sp,sl) ;
 #endif
 
 	while ((cl = nextfield(sp,sl,&cp)) > 0) {

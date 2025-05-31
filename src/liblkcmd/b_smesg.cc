@@ -1664,7 +1664,7 @@ static int procnoteouter(PROGINFO *pip,SHIO *ofp,LOCNOTE *onp)
 
 	if ((rs = tmtime_localtime(&tm,onp->stime)) >= 0) {
 	    cint	tlen = TIMEBUFLEN ;
-	    cchar	*fmt = "%c %s %s « %t\n" ;
+	    cchar	*fmt = "%c %s %s « %r\n" ;
 	    cchar	*tf = "%R" ;
 	    char	tbuf[TIMEBUFLEN+1] ;
 	    if (lip->f.datelong) tf = "%Y%b%d %R" ;
@@ -1878,7 +1878,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("main/procloadname: ent rn=%t\n",np,nl) ;
+	    debugprintf("main/procloadname: ent rn=%r\n",np,nl) ;
 #endif
 
 	if (nl < 0) nl = strlen(np) ;
