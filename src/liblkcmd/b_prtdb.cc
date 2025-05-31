@@ -47,8 +47,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
 
 #include	<usystem.h>
@@ -1164,7 +1164,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *kp,int kl)
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3)) {
 	        debugprintf("progkey: lpgetout() rs=%d\n",rs) ;
-	        debugprintf("progkey: v=>%t<\n",vbuf,strlinelen(vbuf,vl,40)) ;
+	        debugprintf("progkey: v=>%r<\n",vbuf,strlinelen(vbuf,vl,40)) ;
 	    }
 #endif
 	}
@@ -1173,7 +1173,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *kp,int kl)
 /* print out result */
 
 	   if (rs >= 0) {
-	       rs = shio_printf(ofp,"%t\n",vbuf,vl) ;
+	       rs = shio_printf(ofp,"%r\n",vbuf,vl) ;
 	   }
 
 	} /* end if (snwcpy) */

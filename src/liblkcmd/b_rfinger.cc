@@ -53,11 +53,11 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<vecstr.h>
@@ -71,6 +71,7 @@
 #include	<filer.h>
 #include	<termout.h>
 #include	<opendial.h>
+#include	<snwcpy.h>
 #include	<ischarx.h>
 #include	<iserror.h>
 #include	<isnot.h>
@@ -109,8 +110,6 @@
 /* external subroutines */
 
 extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	snwcpyclean(char *,int,int,cchar *,int) ;
 extern int	sncpy1(char *,int,cchar *) ;
 extern int	sncpy2(char *,int,cchar *,cchar *) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
@@ -1552,7 +1551,7 @@ static int procdialread(PROGINFO *pip,void *ofp,int s,LINEBUF *lbp) noex {
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            debugprintf("main/procdialread: ll=%d l=>%t<\n",ll,lp,ll) ;
+	            debugprintf("main/procdialread: ll=%d l=>%r<\n",ll,lp,ll) ;
 #endif
 
 		if (rs >= 0) rs = lib_sigterm() ;
@@ -2393,7 +2392,7 @@ static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar lbuf[],int llen)
 	            if (DEBUGLEVEL(4)) {
 	                debugprintf("b_rfinger/locinfo_termoutprint: ll=%u\n",
 	                    ll) ;
-	                debugprintf("b_rfinger/locinfo_termoutprint: l=>%t<\n",
+	                debugprintf("b_rfinger/locinfo_termoutprint: l=>%r<\n",
 	                    lp,strlinelen(lp,ll,40)) ;
 	            }
 #endif

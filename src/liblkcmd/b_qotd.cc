@@ -2060,7 +2060,7 @@ static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar *lbuf,int llen)
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4)) {
 	            debugprintf("b_qotd/locinfo_termoutprint: ll=%u\n",ll) ;
-	            debugprintf("b_qotd/locinfo_termoutprint: l=>%t<\n",
+	            debugprintf("b_qotd/locinfo_termoutprint: l=>%r<\n",
 	                lp,strlinelen(lp,ll,40)) ;
 	        }
 #endif

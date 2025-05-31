@@ -883,7 +883,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    if (DEBUGLEVEL(2)) {
 	        debugprintf("b_pt: def section cl=%d\n",cl) ;
 	        if (cl >= 0)
-	            debugprintf("b_pt: def section=%t\n",ccp,cl) ;
+	            debugprintf("b_pt: def section=%r\n",ccp,cl) ;
 	    }
 #endif /* CF_DEBUG */
 
@@ -1263,7 +1263,7 @@ static int procpathname(PROGINFO *pip,SHIO *ofp,cchar *pname,cchar *np,int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("procpathname: pname=>%s< name=%t\n", pname,np,nl) ;
+	    debugprintf("procpathname: pname=>%s< name=%r\n", pname,np,nl) ;
 #endif
 
 	if (isenvok(pname)) {
@@ -1322,9 +1322,9 @@ static int procpathtry(PROGINFO *pip,SHIO *ofp,int pni,cchar *np,int nl,
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
 	    debugprintf("procpathtry: ent pni=%d\n",pni) ;
-	    debugprintf("procpathtry: name=%t\n",np,nl) ;
+	    debugprintf("procpathtry: name=%r\n",np,nl) ;
 	    debugprintf("procpathtry: pathlen=%d\n",pl) ;
-	    debugprintf("procpathtry: path=%t\n",pp,pl) ;
+	    debugprintf("procpathtry: path=%r\n",pp,pl) ;
 	}
 #endif
 
@@ -1665,7 +1665,7 @@ static int procpathtry_manany(PROGINFO *pip,SHIO *ofp,pathtry *ptp)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
-	            debugprintf("procpathtry_manany: de=%t\n",dnp,dnl) ;
+	            debugprintf("procpathtry_manany: de=%r\n",dnp,dnl) ;
 #endif
 
 		if ((mni = matmandir(dnp,dnl,&tp)) >= 0) {

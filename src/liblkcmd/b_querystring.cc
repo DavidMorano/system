@@ -55,11 +55,11 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -67,13 +67,13 @@
 #include	<field.h>
 #include	<userinfo.h>
 #include	<char.h>
-#include	<querystring.h>
+#include	<querycstring>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"shio.h"
 #include	"kshlib.h"
-#include	"b_querystring.h"
+#include	"b_querycstring"
 #include	"defs.h"
 #include	"proglog.h"
 
@@ -1149,7 +1149,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *qs)
 	    }
 
 	    if (pip->debuglevel > 0) {
-	        shio_printf(pip->efp,"%s: £ »%t«\n",
+	        shio_printf(pip->efp,"%s: £ »%r«\n",
 	            pip->progname,qs,strlinelen(qs,-1,60)) ;
 	    }
 
@@ -1216,9 +1216,9 @@ static int proclog(PROGINFO *pip,cchar *kp,int kl,cchar *vp,int vl)
 	int		rs = SR_OK ;
 	if (pip->open.logprog) {
 	    LOGFILE	*lfp = &pip->lh ;
-	    cchar	*fmt = "· %t=%t" ;
+	    cchar	*fmt = "· %r=%r" ;
 	    if ((vl > 0) && (strnpbrk(vp,vl," \t+-\"\'") != NULL)) {
-	        fmt = "· %t=¦%t¦" ;
+	        fmt = "· %r=¦%r¦" ;
 	    }
 	    logfile_printf(lfp,fmt,kp,kl,vp,vl) ;
 	}

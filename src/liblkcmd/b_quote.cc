@@ -47,11 +47,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
 
 #include	<usystem.h>
@@ -1701,7 +1701,7 @@ struct config	*cfp ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
-	        debugprintf("config_read: enum k=%t\n",kp,kl) ;
+	        debugprintf("config_read: enum k=%r\n",kp,kl) ;
 #endif
 
 	    i = matpstr(params,2,kp,kl) ;
@@ -1748,7 +1748,7 @@ struct config	*cfp ;
 	                if ((! lip->final.quotedirs) && (el > 0)) {
 #if	CF_DEBUG
 			if (DEBUGLEVEL(4))
-	    		    debugprintf("config_read: caldir=%t\n",
+	    		    debugprintf("config_read: caldir=%r\n",
 				ebuf,el) ;
 #endif
 	                    rs = locinfo_loaddirs(lip,ebuf,el) ;
@@ -2095,7 +2095,7 @@ int		buflen ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("b_quote/procout: m line=>%t<¬\n",
+	            debugprintf("b_quote/procout: m line=>%r<¬\n",
 	                colbuf,strnlen(colbuf,MIN(cl,40))) ;
 #endif
 
@@ -2112,7 +2112,7 @@ int		buflen ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("b_quote/procout: e line=>%t<¬ cl=%u\n",
+	            debugprintf("b_quote/procout: e line=>%r<¬ cl=%u\n",
 	                colbuf,strnlen(colbuf,MIN(cl,40))) ;
 #endif
 
@@ -2142,7 +2142,7 @@ static int procoutline(PROGINFO *pip,int line,cchar *lp,int ll) noex {
 	int		wlen = 0 ;
 
 	indent = MIN(lip->indent,NBLANKS) ;
-	rs = shio_printf(lip->ofp,"%t%t\n",
+	rs = shio_printf(lip->ofp,"%r%r\n",
 	        blanks,indent,
 	        lp,ll) ;
 

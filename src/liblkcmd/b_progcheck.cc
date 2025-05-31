@@ -61,11 +61,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -446,7 +446,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    argl = strlen(argp) ;
 
 #if	CF_DEBUGS
-	    debugprintf("b_progcheck: a=>%t<\n",argp,argl) ;
+	    debugprintf("b_progcheck: a=>%r<\n",argp,argl) ;
 #endif
 
 	    f_optminus = (*argp == '-') ;
@@ -482,7 +482,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            }
 
 #if	CF_DEBUGS
-	            debugprintf("b_progcheck: ak=>%t<\n",akp,akl) ;
+	            debugprintf("b_progcheck: ak=>%r<\n",akp,akl) ;
 #endif
 
 	            if ((kwi = matostr(argopts,2,akp,akl)) >= 0) {

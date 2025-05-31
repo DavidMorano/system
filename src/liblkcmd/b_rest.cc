@@ -43,12 +43,12 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1175,7 +1175,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar np[],int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_rest/procspec: ent timespec=%t\n",np,nl) ;
+	    debugprintf("b_rest/procspec: ent timespec=%r\n",np,nl) ;
 #endif
 
 	if (ofp == NULL) return SR_FAULT ;
@@ -1362,7 +1362,7 @@ static int procpcsconf_begin(PROGINFO *pip)
 	            while (rs >= 0) {
 	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
-	                debugprintf("b_rest/procpcsconf: pair> %s=%t\n",
+	                debugprintf("b_rest/procpcsconf: pair> %s=%r\n",
 	                    kbuf,vbuf,vl) ;
 	            } /* end while */
 	            pcsconf_curend(pcp,&cur) ;
