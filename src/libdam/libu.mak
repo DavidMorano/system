@@ -39,9 +39,9 @@ MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm
 MODS += libutil.ccm
 MODS += xxtostr.ccm digtab.ccm
 MODS += usysconf.ccm ulibvals.ccm
-MODS += usigset.o usigblock.o umisc.o
+MODS += usigset.o usigblock.ccm umisc.ccm
 MODS += unixfnames.ccm constdiv.ccm builtin.ccm
-MODS += usysbasic.ccm
+MODS += usysbasic.ccm ureserve.cmm
 
 LIBS += -liconv -lproc
 
@@ -69,7 +69,7 @@ SOFL= -shared
 OBJ00= mailvalues.o endian.o 
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
-OBJ03= umods.o intx.o 
+OBJ03= umods.o 
 
 OBJ04= utimeout.o utimeouts.o 
 OBJ05= ulogerror.o strtox.o 
@@ -91,9 +91,9 @@ OBJ17= ptx.o uacceptpass.o
 OBJ18= timeval.o itimerval.o
 OBJ19= timespec.o itimerspec.o
 
-OBJ20= uinet.o 
-OBJ21= strnul.o uiconv.o
-OBJ22= ugetloadavg.o 
+OBJ20= uinet.o umisc.o ureserve.o
+OBJ21= strnul.o intx.o 
+OBJ22= ugetloadavg.o uiconv.o
 OBJ23= syscontain.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -354,6 +354,16 @@ syscontain.dir:
 # UMODS
 umods.o:		umods.dir
 umods.dir:
+	makesubdir $@
+
+# UMISC
+umisc.o:		umisc.dir
+umisc.dir:
+	makesubdir $@
+
+# URESERVE
+ureserve.o:		ureserve.dir
+ureserve.dir:
 	makesubdir $@
 
 # OTHER
