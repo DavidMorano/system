@@ -30,7 +30,7 @@
 
 EXTERNC_begin
 
-extern int	statvfsdir(cchar *,STATVFS *) noex ;
+extern int	statvfsdir(cchar *,USTATVFS *) noex ;
 
 EXTERNC_end
 

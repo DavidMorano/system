@@ -1,4 +1,4 @@
-/* timer MODULE (primary module interface) */
+/* timer MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -11,9 +11,12 @@
 	= 1998-12-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -33,7 +36,7 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<new>
+#include	<new>			/* |nothrow(3c++| */
 #include	<utility>
 #include	<functional>
 #include	<set>

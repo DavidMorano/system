@@ -618,7 +618,7 @@ QUOTE_QUERY	*qvp ;
 	int	rs = SR_OK ;
 	int	i ;
 	int	opts ;
-	int	size ;
+	int	sz ;
 	int	c = 0 ;
 
 #if	CF_SAFE
@@ -639,8 +639,8 @@ QUOTE_QUERY	*qvp ;
 	opts = 0 ;
 	opts |= VECOBJ_OORDERED ;
 	opts |= VECOBJ_OSTATIONARY ;
-	size = szof(QUOTE_ENT) ;
-	rs = vecobj_start(&res,size,0,opts) ;
+	sz = szof(QUOTE_ENT) ;
+	rs = vecobj_start(&res,sz,0,opts) ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -790,7 +790,7 @@ int quote_check(quote *op,time_t dt) noex {
 static int quote_dirnamescreate(quote *op,cchar **dirnames) noex {
 	int	rs = SR_OK ;
 	int	strsize ;
-	int	size ;
+	int	sz ;
 	int	i ;
 
 	char	*p ;
@@ -805,8 +805,8 @@ static int quote_dirnamescreate(quote *op,cchar **dirnames) noex {
 	    strsize += (strlen(dirnames[i]) + 1) ;
 	} /* end if */
 
-	size = (i + 1) * szof(char *) ;
-	rs = uc_malloc(size,&p) ;
+	sz = (i + 1) * szof(char *) ;
+	rs = uc_malloc(sz,&p) ;
 	if (rs < 0)
 	    goto bad0 ;
 
@@ -1023,7 +1023,7 @@ QUOTE_CUR	*curp ;
 	int	rs = SR_OK ;
 	int	n ;
 	int	i ;
-	int	size ;
+	int	sz ;
 	int	c = 0 ;
 
 
@@ -1037,8 +1037,8 @@ QUOTE_CUR	*curp ;
 	if (n <= 0)
 	    goto ret0 ;
 
-	size = n * szof(QUOTE_ENT) ;
-	rs = uc_malloc(size,&rp) ;
+	sz = n * szof(QUOTE_ENT) ;
+	rs = uc_malloc(sz,&rp) ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -1144,7 +1144,7 @@ cchar	*quotenames[] ;
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
-	int	size ;
+	int	sz ;
 	int	c = 0 ;
 
 	QDIR	*qdirp = NULL ;
@@ -1159,8 +1159,8 @@ cchar	*quotenames[] ;
 	debugprintf("quote_diropen: dirname=%s\n",dirname) ;
 #endif
 
-	size = szof(QDIR) ;
-	rs = uc_malloc(size,&p) ;
+	sz = szof(QDIR) ;
+	rs = uc_malloc(sz,&p) ;
 	if (rs < 0)
 	    goto bad0 ;
 
@@ -1224,7 +1224,7 @@ cchar	calname[] ;
 	int	rs = SR_OK ;
 	int	rs1 ;
 	int	cidx ;
-	int	size = szof(QUOTE_CAL) ;
+	int	sz = szof(QUOTE_CAL) ;
 	int	f = false ;
 
 	cchar	*suf = QUOTE_DBSUF ;
@@ -1261,7 +1261,7 @@ cchar	calname[] ;
 	if (rs < 0)
 	    goto bad0 ;
 
-	rs = uc_malloc(size,&calp) ;
+	rs = uc_malloc(sz,&calp) ;
 	if (rs < 0)
 	    goto bad0 ;
 
@@ -2235,10 +2235,10 @@ mkgo:
 	    if (! isempty(lp,ll)) {
 
 #if	CF_DEBUGS
-		debugprintf("quote_indmkdata: line=>%t<\n",
+		debugprintf("quote_indmkdata: line=>%r<\n",
 			lp,strnlen(lp,MIN(ll,40))) ;
 		if (ll > 40)
-		debugprintf("quote_indmkdata: cont=>%t<\n",
+		debugprintf("quote_indmkdata: cont=>%r<\n",
 			(lp+40),strnlen((lp+40),MIN((ll-40),40))) ;
 #endif
 
@@ -2677,9 +2677,9 @@ struct subinfo	*sip ;
 	int		rs = SR_OK ;
 
 	if (sip->username[0] == '\0') {
-	    struct passwd	pw ;
-	    cint		pwlen = getbufsize(getbufsize_pw) ;
-	    char		*pwbuf ;
+	    ucentpw	pw ;
+	    cint	pwlen = getbufsize(getbufsize_pw) ;
+	    char	*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
 	            char	*ap ;
@@ -2799,7 +2799,7 @@ int		ll ;
 	cchar		*tp, *cp ;
 
 #if	CF_DEBUGS
-	debugprintf("quote/subinfo_havestart: >%t<\n",
+	debugprintf("quote/subinfo_havestart: >%r<\n",
 		lp,strlinelen(lp,ll,40)) ;
 #endif
 
@@ -2859,7 +2859,7 @@ int		ll ;
 
 #if	CF_DEBUGS
 	debugprintf("quote/subinfo_havestart: !digitlatin\n") ;
-	debugprintf("quote/subinfo_havestart: name=>%t<\n",lp,si) ;
+	debugprintf("quote/subinfo_havestart: name=>%r<\n",lp,si) ;
 #endif
 
 		rs1 = SR_NOTSUP ;
@@ -2961,7 +2961,7 @@ int		sl ;
 
 
 #if	CF_DEBUGS
-	debugprintf("quote/subinfo_transhol: >%t<\n",sp,sl) ;
+	debugprintf("quote/subinfo_transhol: >%r<\n",sp,sl) ;
 #endif
 
 	op = sip->op ;
@@ -2985,7 +2985,7 @@ int		sl ;
 
 #if	CF_DEBUGS
 	if (np != NULL) {
-	debugprintf("quote/subinfo_transhol: n=>%t<\n",np,nl) ;
+	debugprintf("quote/subinfo_transhol: n=>%r<\n",np,nl) ;
 	debugprintf("quote/subinfo_transhol: f_neg=%u\n",f_negative) ;
 	} else
 	debugprintf("quote/subinfo_transhol: *no_number*\n") ;
@@ -3023,7 +3023,7 @@ int		sl ;
 	    char	holbuf[HOLBUFLEN + 1] ;
 
 #if	CF_DEBUGS
-	debugprintf("quote/subinfo_transhol: fq=>%t<\n",sp,sl) ;
+	debugprintf("quote/subinfo_transhol: fq=>%r<\n",sp,sl) ;
 #endif
 
 	    holidays_curbegin(holp,&hcur) ;
@@ -3134,7 +3134,7 @@ int		loff, llen ;
 
 	int	rs = SR_OK ;
 	int	ne = QUOTE_NLE ;
-	int	size ;
+	int	sz ;
 
 
 	if (ep == NULL)
@@ -3147,8 +3147,8 @@ int		loff, llen ;
 	ep->d = qp->d ;
 	ep->voff = loff ;
 	ep->vlen = llen ;
-	size = ne * szof(struct quote_eline) ;
-	rs = uc_malloc(size,&elp) ;
+	sz = ne * szof(struct quote_eline) ;
+	rs = uc_malloc(sz,&elp) ;
 
 	if (rs >= 0) {
 	    ep->lines = elp ;
@@ -3187,7 +3187,7 @@ uint		loff, llen ;
 
 	int	rs = SR_OK ;
 	int	ne ;
-	int	size ;
+	int	sz ;
 
 
 	if (ep == NULL)
@@ -3201,8 +3201,8 @@ uint		loff, llen ;
 
 	if (ep->i == ep->e) {
 	    ne = (ep->e * 2) + QUOTE_NLE ;
-	    size = ne * szof(struct quote_eline) ;
-	    rs = uc_realloc(ep->lines,size,&elp) ;
+	    sz = ne * szof(struct quote_eline) ;
+	    rs = uc_realloc(ep->lines,sz,&elp) ;
 	    if (rs >= 0) {
 	        ep->e = ne ;
 	        ep->lines = elp ;
@@ -3512,7 +3512,7 @@ QUOTE_ENT	*ep ;
 	uint	nlines = 0 ;
 
 	int	rs = SR_OK ;
-	int	size ;
+	int	sz ;
 	int	i ;
 
 
@@ -3534,8 +3534,8 @@ QUOTE_ENT	*ep ;
 	if (nlines <= UCHAR_MAX) {
 
 	    bvep->nlines = nlines ;
-	    size = (nlines + 1) * szof(CYIMK_LINE) ;
-	    rs = uc_malloc(size,&lines) ;
+	    sz = (nlines + 1) * szof(CYIMK_LINE) ;
+	    rs = uc_malloc(sz,&lines) ;
 	    if (rs >= 0) {
 
 		bvep->lines = lines ;

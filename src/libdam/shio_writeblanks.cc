@@ -43,12 +43,12 @@
 #include	<cstring>		/* |memset(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<uvariables.hh>		/* |sysword(3u)| */
 #include	<strn.h>		/* |strnset(3uc)| */
 #include	<localmisc.h>		/* |MIN| */
 
 #include	"shio.h"
 
+import uconstants ;
 
 /* local defines */
 

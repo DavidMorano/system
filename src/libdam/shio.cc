@@ -99,6 +99,7 @@
 #include	<mktmp.h>
 #include	<mkpathx.h>
 #include	<matstr.h>
+#include	<fmtstr.h>
 #include	<isoneof.h>
 #include	<localmisc.h>
 
@@ -162,8 +163,6 @@ extern int	sfreadline(Sfio_t *,char *,int) ;
 extern int	sfreadlinetimed(Sfio_t *,char *,int,int) ;
 extern int	sfisterm(Sfio_t *) ;
 #endif
-
-extern int	format(char *,int,int,cchar *,va_list) ;
 
 
 /* local structures */
@@ -737,7 +736,7 @@ int shio_vprintf(SHIO *op,cchar *fmt,va_list ap) noex {
 
 	if (op->f.nullfile) goto ret0 ;
 
-	if ((rs = format(lbuf,llen,0,fmt,ap)) > 0) {
+	if ((rs = fmtstr(lbuf,llen,0,fmt,ap)) > 0) {
 	    int	len = rs ;
 
 #if	CF_SFIO

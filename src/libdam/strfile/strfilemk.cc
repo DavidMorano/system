@@ -38,7 +38,7 @@
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<modload.h>
-#include	<snvpt.h>
+#include	<sncpyx.h>
 #include	<mkpathx.h>
 #include	<localmisc.h>
 

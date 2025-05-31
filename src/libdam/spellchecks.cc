@@ -676,7 +676,7 @@ SC_QUERY	*qvp ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		opts ;
-	int		size ;
+	int		sz ;
 	int		c = 0 ;
 
 #if	CF_SAFE
@@ -701,8 +701,8 @@ SC_QUERY	*qvp ;
 	opts = 0 ;
 	opts |= VECOBJ_OORDERED ;
 	opts |= VECOBJ_OSTATIONARY ;
-	size = szof(SC_ENT) ;
-	rs = vecobj_start(&res,size,0,opts) ;
+	sz = szof(SC_ENT) ;
+	rs = vecobj_start(&res,sz,0,opts) ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -831,7 +831,7 @@ cchar	**dirnames ;
 {
 	int	rs = SR_OK ;
 	int	strsize ;
-	int	size ;
+	int	sz ;
 	int	i ;
 
 	char	*p ;
@@ -846,8 +846,8 @@ cchar	**dirnames ;
 	    strsize += (strlen(dirnames[i]) + 1) ;
 	} /* end if */
 
-	size = (i + 1) * szof(char *) ;
-	rs = uc_malloc(size,&p) ;
+	sz = (i + 1) * szof(char *) ;
+	rs = uc_malloc(sz,&p) ;
 	if (rs < 0)
 	    goto bad0 ;
 
@@ -1059,7 +1059,7 @@ SC_CUR	*curp ;
 	int	rs = SR_OK ;
 	int	n ;
 	int	i ;
-	int	size ;
+	int	sz ;
 	int	c = 0 ;
 
 
@@ -1069,8 +1069,8 @@ SC_CUR	*curp ;
 	if (n <= 0)
 	    goto ret0 ;
 
-	size = n * szof(SC_ENT) ;
-	rs = uc_malloc(size,&rp) ;
+	sz = n * szof(SC_ENT) ;
+	rs = uc_malloc(sz,&rp) ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -1236,7 +1236,7 @@ cchar	calname[] ;
 
 	SC_CAL	*calp ;
 
-	cint	size = szof(SC_CAL) ;
+	cint	sz = szof(SC_CAL) ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -1272,7 +1272,7 @@ cchar	calname[] ;
 	if (rs < 0)
 	    goto bad0 ;
 
-	rs = uc_malloc(size,&calp) ;
+	rs = uc_malloc(sz,&calp) ;
 	if (rs < 0)
 	    goto bad0 ;
 
@@ -3012,7 +3012,7 @@ static int cachedir_start(CACHEDIR *cdp,STRDESC *dp,int nf)
 {
 	int	rs = SR_OK ;
 	int	i ;
-	int	size = 0 ;
+	int	sz = 0 ;
 	char	*bp ;
 
 	{
@@ -3022,11 +3022,11 @@ static int cachedir_start(CACHEDIR *cdp,STRDESC *dp,int nf)
 		cp = dp[i].sp ;
 		cl = dp[i].sl ;
 		if (cl < 0) cl = strlen(cp) ;
-	        size += (cl + 1) ;
+	        sz += (cl + 1) ;
 	    } /* end for */
 	}
 
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
+	if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	    cdp->a = bp ;
 	    for (i = 0 ; i < nf ; i += 1) {
 		switch (i) {
@@ -3065,7 +3065,7 @@ static int cachedir_finish(CACHEDIR *cdp)
 
 static int db_start(DB *dbp,STRDESC *dp,int nf) noex {
 	int	rs = SR_OK ;
-	int	size = 0 ;
+	int	sz = 0 ;
 
 	memclear(dbp) ;
 
@@ -3076,11 +3076,11 @@ static int db_start(DB *dbp,STRDESC *dp,int nf) noex {
 		cp = dp[i].sp ;
 		cl = dp[i].sl ;
 		if (cl < 0) cl = strlen(cp) ;
-	        size += (cl + 1) ;
+	        sz += (cl + 1) ;
 	    } /* end for */
 	}
 
-	if (char *bp ; (rs = uc_malloc(size,&bp)) >= 0) {
+	if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    cdp->a = bp ;
 	    for (int i = 0 ; i < nf ; i += 1) {
 		switch (i) {
@@ -3123,7 +3123,7 @@ static int entry_start(SC_ENT *ep,SC_CITE *qp,int loff,int llen) noex {
 
 	int		rs = SR_OK ;
 	int		ne = SC_NLE ;
-	int		size ;
+	int		sz ;
 
 	if (ep == nullptr)
 	    return SR_FAULT ;
@@ -3135,8 +3135,8 @@ static int entry_start(SC_ENT *ep,SC_CITE *qp,int loff,int llen) noex {
 	ep->voff = loff ;
 	ep->vlen = llen ;
 
-	size = ne * szof(struct spellchecks_eline) ;
-	if ((rs = uc_malloc(size,&elp)) >= 0) {
+	sz = ne * szof(struct spellchecks_eline) ;
+	if ((rs = uc_malloc(sz,&elp)) >= 0) {
 	    ep->lines = elp ;
 	    ep->e = ne ;
 	    elp->loff = loff ;
@@ -3173,7 +3173,7 @@ uint		loff, llen ;
 
 	int	rs = SR_OK ;
 	int	ne ;
-	int	size ;
+	int	sz ;
 
 
 	if (ep == nullptr)
@@ -3187,8 +3187,8 @@ uint		loff, llen ;
 
 	if (ep->i == ep->e) {
 	    ne = (ep->e * 2) + SC_NLE ;
-	    size = ne * szof(struct spellchecks_eline) ;
-	    if ((rs = uc_realloc(ep->lines,size,&elp)) >= 0) {
+	    sz = ne * szof(struct spellchecks_eline) ;
+	    if ((rs = uc_realloc(ep->lines,sz,&elp)) >= 0) {
 	        ep->e = ne ;
 	        ep->lines = elp ;
 	    }
@@ -3456,9 +3456,9 @@ SC_ENT	*ep ;
 	    nlines = ep->i ;
 	    if (nlines <= UCHAR_MAX) {
 		CYIMK_LINE	*lines ;
-	        cint	size = (nlines + 1) * szof(CYIMK_LINE) ;
+	        cint	sz = (nlines + 1) * szof(CYIMK_LINE) ;
 	        bvep->nlines = nlines ;
-	        if ((rs = uc_malloc(size,&lines)) >= 0) {
+	        if ((rs = uc_malloc(sz,&lines)) >= 0) {
 		    int	i ;
 		    bvep->lines = lines ;
 	            for (i = 0 ; i < nlines ; i += 1) {
@@ -3768,10 +3768,10 @@ static int config_read(config *op) noex {
 
 	if (op->f_p) {
 	    cint	plen = PBUFLEN ;
-	    int		size ;
+	    int		sz ;
 	    char	*pbuf ;
-	    size = (plen+1) ;
-	    if (rs = uc_malloc(size,&pbuf)) >= 0) {
+	    sz = (plen+1) ;
+	    if (rs = uc_malloc(sz,&pbuf)) >= 0) {
 	        rs = config_reader(op,pbuf,plen) ;
 		uc_free(pbuf) ;
 	    } /* end if (memory-allocation) */
@@ -3911,9 +3911,9 @@ static int config_cachedir(config *csp,cchar *pp,int pl) noex {
 	}
 
 	if ((rs >= 0) && (fi >= nf)) {
-	    cint	size = szof(CACHEDIR) ;
+	    cint	sz = szof(CACHEDIR) ;
 	    void	*p ;
-	    if ((rs = uc_malloc(size,&p)) >= 0) {
+	    if ((rs = uc_malloc(sz,&p)) >= 0) {
 		CACHEDIR	*cdp = p ;
 	        if ((rs = cachedir_start(cdp,d)) >= 0) {
 		    SUBINFO	*sip = csp->sip ;
@@ -3981,9 +3981,9 @@ static int config_db(config *csp,cchar *ebuf,int el) noex {
 		int	f_skip = (sch == '-') ;
 		if (USTAT sb ; f_skip || (u_stat(d[1],&sb) >= 0)) {
 		    if (f_skip || ((rs = sperm(&sip->id,&sb,R_OK)) >= 0)) {
-	                cint	size = szof(DB) ;
+	                cint	sz = szof(DB) ;
 	                void	*p ;
-	                if ((rs = uc_malloc(size,&p)) >= 0) {
+	                if ((rs = uc_malloc(sz,&p)) >= 0) {
 		            DB	*dbp = p ;
 	                    if ((rs = db_start(dbp,d,nf)) >= 0) {
 		                SUBINFO	*sip = csp->sip ;

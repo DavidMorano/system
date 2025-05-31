@@ -29,7 +29,7 @@
 	second attempt will succeed.
 
 	Synopsis:
-	int statvfsdir(cchar *fname,STATVFS *sbp) noex
+	int statvfsdir(cchar *fname,USTATVFS *sbp) noex
 
 	Arguments:
 	fname		source string
@@ -74,7 +74,7 @@
 
 /* forward references */
 
-static int	trydive(cchar *,STATVFS *) noex ;
+static int	trydive(cchar *,USTATVFS *) noex ;
 static int	trytouch(cchar *) noex ;
 
 
@@ -86,7 +86,7 @@ static int	trytouch(cchar *) noex ;
 
 /* exported subroutines */
 
-int statvfsdir(cchar *fname,STATVFS *sbp) noex {
+int statvfsdir(cchar *fname,USTATVFS *sbp) noex {
 	int		rs = SR_FAULT ;
 	if (fname && sbp) {
 	    if ((rs = uc_statvfs(fname,sbp)) >= 0) {
@@ -102,7 +102,7 @@ int statvfsdir(cchar *fname,STATVFS *sbp) noex {
 
 /* local subroutines */
 
-static int trydive(cchar *fname,STATVFS *sbp) noex {
+static int trydive(cchar *fname,USTATVFS *sbp) noex {
 	int		rs ;
 	int		rs1 ;
         if (USTAT sb ; (rs = uc_stat(fname,&sb)) >= 0) {
