@@ -55,9 +55,9 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<cstdarg>
 #include	<time.h>
 #include	<usystem.h>
 #include	<mktmp.h>
@@ -2147,7 +2147,7 @@ static int procdeps_incargs(PROGINFO *pip,vecstr *alp)
 	            if (rs >= 0) {
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(5))
-	                    debugprintf("b_makesafe/procdeps_get: add inc=%t\n",
+	                    debugprintf("b_makesafe/procdeps_get: add inc=%r\n",
 	                        ap,rs) ;
 #endif
 	                c += 1 ;
@@ -2203,7 +2203,7 @@ static int proclines(PROGINFO *pip,vecpstr *dp,int fd) noex {
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))
-	            debugprintf("proclines: line=>%t<\n",
+	            debugprintf("proclines: line=>%r<\n",
 	                lbuf,
 	                ((lbuf[len - 1] == '\n') ? (len - 1) : len)) ;
 #endif /* CF_DEBUG */
@@ -2257,7 +2257,7 @@ static int procline(PROGINFO *pip,vecpstr *dp,LSTATE *lsp,cchar *lbuf,int len)
 	if (DEBUGLEVEL(5)) {
 	    cint	f = lsp->f_continue ;
 	    debugprintf("b_makesafe/procline: ent\n") ;
-	    debugprintf("b_makesafe/procline: l=%t\n",lbuf,len) ;
+	    debugprintf("b_makesafe/procline: l=%r\n",lbuf,len) ;
 	    debugprintf("b_makesafe/procline: f_con=%u\n",f) ;
 	}
 #endif
@@ -2280,7 +2280,7 @@ static int procline(PROGINFO *pip,vecpstr *dp,LSTATE *lsp,cchar *lbuf,int len)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
-	        debugprintf("b_makesafe/procline: dep=%t\n",cp,cl) ;
+	        debugprintf("b_makesafe/procline: dep=%r\n",cp,cl) ;
 #endif
 
 	    rs = vecpstr_adduniq(dp,cp,cl) ;
@@ -2338,7 +2338,7 @@ static int procerr(PROGINFO *pip,VECOBJ *errp,int fd_err) noex {
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(2))
-	                debugprintf("b_makesafe/procdeps_get: line> %t\n",
+	                debugprintf("b_makesafe/procdeps_get: line> %r\n",
 	                    lbuf,len) ;
 #endif
 
@@ -3335,7 +3335,7 @@ static int debugdumpenv(cchar **envv)
 	debugprintf("main/debugdumpenv: env¬ {%p}\n",envv) ;
 	for (i = 0 ; envv[i] != NULL ; i += 1) {
 	    cchar	*ep = envv[i] ;
-	    debugprintf("main/debugdumpenv: e=%t\n",
+	    debugprintf("main/debugdumpenv: e=%r\n",
 	        ep,strlinelen(ep,-1,40)) ;
 	}
 	return i ;

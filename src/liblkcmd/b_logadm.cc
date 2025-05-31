@@ -46,12 +46,12 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mkdev.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<utmpx.h>
 
 #include	<usystem.h>
@@ -1327,21 +1327,21 @@ static int procspec(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_logadm/procspec: query=>%t<\n",qp,ql) ;
+	    debugprintf("b_logadm/procspec: query=>%r<\n",qp,ql) ;
 #endif
 
 	utp = &lip->ue ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_logadm/procspec: q=%t\n",qp,ql) ;
+	    debugprintf("b_logadm/procspec: q=%r\n",qp,ql) ;
 #endif
 
 	cvtbuf[0] = '\0' ;
 	qi = matostr(qopts,2,qp,ql) ;
 
 	if (pip->debuglevel > 0)
-	    shio_printf(pip->efp,"%s: query=%t (%d)\n",
+	    shio_printf(pip->efp,"%s: query=%r (%d)\n",
 	        pip->progname,qp,ql,qi) ;
 
 	switch (qi) {
@@ -1410,7 +1410,7 @@ static int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 	        sp = "*" ;
 	        sl = 1 ;
 	    }
-	    rs = shio_printf(ofp,"%t\n",sp,sl) ;
+	    rs = shio_printf(ofp,"%r\n",sp,sl) ;
 	    wlen += rs ;
 	} /* end if */
 
@@ -1465,7 +1465,7 @@ static int proclogin(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("main/proclogin: termline=%t\n",lp,ll) ;
+	    debugprintf("main/proclogin: termline=%r\n",lp,ll) ;
 #endif
 
 /* UTMP ID */

@@ -61,13 +61,13 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<utime.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 
@@ -1588,11 +1588,11 @@ static int procmailbox(PROGINFO *pip,SHIO *ofp,cchar *mbp,int mbl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_mbproc/procmailbox: mb=%t\n",mbp,mbl) ;
+	    debugprintf("b_mbproc/procmailbox: mb=%r\n",mbp,mbl) ;
 #endif
 
 	if (pip->debuglevel > 0) {
-	    shio_printf(pip->efp,"%s: mailbox=%t\n",pip->progname,mbp,mbl) ;
+	    shio_printf(pip->efp,"%s: mailbox=%r\n",pip->progname,mbp,mbl) ;
 	}
 
 	strdcpy1w(mbfname,MAXPATHLEN,mbp,mbl) ;
@@ -1724,9 +1724,9 @@ int		ml ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4)) {
 	        if (stap != NULL)
-	            debugprintf("b_mbproc/procout: status=>%t<\n",stap,-1) ;
+	            debugprintf("b_mbproc/procout: status=>%r<\n",stap,-1) ;
 	        if (midp != NULL)
-	            debugprintf("b_mbproc/procout: mid=>%t<\n",midp,-1) ;
+	            debugprintf("b_mbproc/procout: mid=>%r<\n",midp,-1) ;
 	    }
 #endif
 
@@ -1845,7 +1845,7 @@ MBCACHE_SCAN	*msp ;
 	char		bbuf[10+1] ;
 
 	bl = strwset(bbuf,' ',10) - bbuf ;
-	rs = shio_printf(ofp,"%s: %t\n",hdr,bbuf,bl) ;
+	rs = shio_printf(ofp,"%s: %r\n",hdr,bbuf,bl) ;
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
@@ -1871,7 +1871,7 @@ MBCACHE_SCAN	*msp ;
 
 	serial = lip->serial++ ;
 	if ((rs = mkmid(midbuf,midlen,dn,nn,pid,serial)) >= 0) {
-	    rs = shio_printf(ofp,"%s: <%t>\n",hdr,midbuf,rs) ;
+	    rs = shio_printf(ofp,"%s: <%r>\n",hdr,midbuf,rs) ;
 	    wlen += rs ;
 	}
 
@@ -1912,9 +1912,9 @@ int		ml ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4)) {
 	        if (stap != NULL)
-	            debugprintf("b_mbproc/procbase: status=>%t<\n",stap,-1) ;
+	            debugprintf("b_mbproc/procbase: status=>%r<\n",stap,-1) ;
 	        if (midp != NULL)
-	            debugprintf("b_mbproc/procbase: mid=>%t<\n",midp,-1) ;
+	            debugprintf("b_mbproc/procbase: mid=>%r<\n",midp,-1) ;
 	    }
 #endif
 
@@ -2028,7 +2028,7 @@ MBCACHE_SCAN	*msp ;
 	char		bbuf[10+1] ;
 
 	bl = strwset(bbuf,' ',10) - bbuf ;
-	rs = bprintf(yfp,"%s: %t\n",hdr,bbuf,bl) ;
+	rs = bprintf(yfp,"%s: %r\n",hdr,bbuf,bl) ;
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
@@ -2054,7 +2054,7 @@ MBCACHE_SCAN	*msp ;
 
 	serial = lip->serial++ ;
 	if ((rs = mkmid(midbuf,midlen,dn,nn,pid,serial)) >= 0) {
-	    rs = bprintf(yfp,"%s: <%t>\n",hdr,midbuf,rs) ;
+	    rs = bprintf(yfp,"%s: <%r>\n",hdr,midbuf,rs) ;
 	    wlen += rs ;
 	}
 
@@ -2293,7 +2293,7 @@ static int locinfo_yearbase(LOCINFO *lip,cchar *sp,int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("locinfo_yearbase: yb=%t\n",sp,sl) ;
+	    debugprintf("locinfo_yearbase: yb=%r\n",sp,sl) ;
 #endif
 
 	if (lip->yearbase == NULL) {
@@ -2870,7 +2870,7 @@ static int config_reader(CONFIG *csp)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
-	                debugprintf("config_read: vbuf=>%t<\n",vbuf,vl) ;
+	                debugprintf("config_read: vbuf=>%r<\n",vbuf,vl) ;
 #endif
 
 	            ebuf[0] = '\0' ;
@@ -2882,7 +2882,7 @@ static int config_reader(CONFIG *csp)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
-	                debugprintf("config_read: ebuf=>%t<\n",ebuf,el) ;
+	                debugprintf("config_read: ebuf=>%r<\n",ebuf,el) ;
 #endif
 
 	            if (el > 0) {

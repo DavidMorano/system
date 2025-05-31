@@ -66,13 +66,13 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stddef.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<cstddef>
 #include	<netdb.h>
 
 #include	<usystem.h>
@@ -2462,17 +2462,17 @@ static int outinfo_print(OUTINFO *oip,PROGINFO *pip,void *ofp,int olen)
 	    cchar	*un = mep->user ;
 	    cchar	*fb = oip->fbuf ;
 	    cchar	*sb = oip->sbuf ;
-	    cchar 	*fmt = "%s %s « %t · %t" ;
+	    cchar 	*fmt = "%s %s « %r · %r" ;
 	    char	tbuf[TIMEBUFLEN+1] ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5)) {
-	        debugprintf("b_mailnew/outinfo_print: db=>%t<\n",
+	        debugprintf("b_mailnew/outinfo_print: db=>%r<\n",
 		    db,strlinelen(db,-1,40)) ;
-	        debugprintf("b_mailnew/outinfo_print: un=%t\n",
+	        debugprintf("b_mailnew/outinfo_print: un=%r\n",
 		    un,strlinelen(un,-1,40)) ;
 	        debugprintf("b_mailnew/outinfo_print: fl=%d sl=%d\n",fl,sl) ;
-	        debugprintf("b_mailnew/outinfo_print: sb=>%t<\n",
+	        debugprintf("b_mailnew/outinfo_print: sb=>%r<\n",
 		    sb,strlinelen(sb,-1,40)) ;
 	    }
 #endif /* CF_DEBUGS */
@@ -2496,8 +2496,8 @@ static int outinfo_print(OUTINFO *oip,PROGINFO *pip,void *ofp,int olen)
 
 	        timestr_logz(pip->daytime,tbuf) ;
 	        locinfo_logprintf(lip,"%s u=%s time=%s",tbuf,un,db) ;
-	        locinfo_logprintf(lip,"  from=»%t«",fb,fl) ;
-	        locinfo_logprintf(lip,"  subj=»%t«",sb,sl) ;
+	        locinfo_logprintf(lip,"  from=»%r«",fb,fl) ;
+	        locinfo_logprintf(lip,"  subj=»%r«",sb,sl) ;
 
 	    rs1 = uc_free(obuf) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -2966,7 +2966,7 @@ static int config_read(CONFIG *op)
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
-	                    debugprintf("config_read: vbuf=>%t<\n",vbuf,vl) ;
+	                    debugprintf("config_read: vbuf=>%r<\n",vbuf,vl) ;
 #endif
 
 	                ebuf[0] = '\0' ;
@@ -2978,7 +2978,7 @@ static int config_read(CONFIG *op)
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
-	                    debugprintf("config_read: ebuf=>%t<\n",ebuf,el) ;
+	                    debugprintf("config_read: ebuf=>%r<\n",ebuf,el) ;
 #endif
 
 	                switch (i) {

@@ -58,8 +58,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<estrings.h>
@@ -1253,7 +1253,7 @@ static int locinfo_sufmap(LOCINFO *lip,cchar *sp,int sl)
 	int		rs ;
 
 #if	CF_DEBUGS
-	debugprintf("locinfo_sufmap: suf> %t <\n",sp,sl) ;
+	debugprintf("locinfo_sufmap: suf> %r <\n",sp,sl) ;
 #endif
 
 	if ((rs = procsufxxx(pip,lp,sp,sl)) >= 0) {
@@ -1283,7 +1283,7 @@ static int procsufsub(PROGINFO *pip,cchar *sp,int sl)
 	int		rs ;
 
 #if	CF_DEBUGS
-	debugprintf("procsufsub: suf> %t <\n",sp,sl) ;
+	debugprintf("procsufsub: suf> %r <\n",sp,sl) ;
 #endif
 
 	lp = &lip->sufsubs ;
@@ -1339,7 +1339,7 @@ static int procsufadd(PROGINFO *pip,vecstr *slp,cchar *sp,int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
-	    debugprintf("procsufadd: add=>%t<\n",sp,sl) ;
+	    debugprintf("procsufadd: add=>%r<\n",sp,sl) ;
 	    debugprintf("procsufadd: procsufadd() rs=%d\n",rs) ;
 	}
 #endif
@@ -2239,7 +2239,7 @@ static int procfilesuf(PROGINFO *pip,vecstr *slp,char *nfname,cchar *np,int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("main/procfilesuf: fname=%t\n",np,nl) ;
+	    debugprintf("main/procfilesuf: fname=%r\n",np,nl) ;
 #endif
 
 	if (pip == NULL) return SR_FAULT ;
