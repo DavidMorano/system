@@ -39,13 +39,13 @@ struct pingstatdb_flags {
 } ;
 
 struct pingstatdb_head {
-	uint		magic ;
-	const char	*fname ;
+	cchar		*fname ;
 	bfile		pfile ;
 	vecitem		entries ;
-	struct timeb	now ;
+	TIMEB		now ;
 	time_t		mtime ;
 	PINGSTATDB_FL	f ;
+	uint		magic ;
 	char		zname[DATER_ZNAMESIZE] ;
 } ;
 
