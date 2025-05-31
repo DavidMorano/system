@@ -154,11 +154,11 @@ int outline_value(outline *op,cchar *vp,int vl) noex {
 	                    op->c_values = 0 ;
 	                } /* end if (overflow) */
 	                if (rs >= 0) {
-	                    fmt = " %t" ;
+	                    fmt = " %r" ;
 	                    if (f_comma) {
 	                        f_comma = FALSE ;
 	                        op->f.comma = FALSE ;
-	                        fmt = ", %t" ;
+	                        fmt = ", %r" ;
 	                    }
 	                    rs = bprintf(op->ofp,fmt,cp,cl) ;
 	                    wlen += rs ;
