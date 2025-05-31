@@ -56,7 +56,7 @@ extern int	vecstr_addpathclean(vecstr *,const char *,int) ;
 /* external variables */
 
 
-/* local strutures */
+/* local structures */
 
 
 /* forward references */
