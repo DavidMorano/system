@@ -49,9 +49,9 @@
 #include	<netinet/in.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -268,12 +268,12 @@ static int mfscmder(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 	                    break ;
 	                } /* end switch */
 		    } else {
-	                    fmt = "%s: unknown cmd=%t\n" ;
+	                    fmt = "%s: unknown cmd=%r\n" ;
 	                    shio_printf(pip->efp,fmt,pn,kp,kl) ;
 			    {
 				char	tbuf[TIMEBUFLEN+1] ;
 				timestr_logz(pip->daytime,tbuf) ;
-				logprintf(pip,"%s unknown cmd=%t",tbuf,kp,kl) ;
+				logprintf(pip,"%s unknown cmd=%r",tbuf,kp,kl) ;
 			    }
 	            } /* end if (valid) */
 	        } /* end if (positive) */

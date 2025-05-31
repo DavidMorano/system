@@ -35,9 +35,9 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<vecstr.h>
@@ -448,7 +448,7 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4)) {
-	            debugprintf("config_read: ebuf=>%t<\n",ebuf,el) ;
+	            debugprintf("config_read: ebuf=>%r<\n",ebuf,el) ;
 	            debugprintf("config_read: param=%s(%u)\n",
 	                params[pi],pi) ;
 	        }

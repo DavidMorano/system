@@ -37,9 +37,9 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
 #include	<dlfcn.h>
 
@@ -241,7 +241,7 @@ int mfsbuilt_have(MFSBUILT *op,cchar *sp,int sl)
 	int		rs ;
 	int		f = 0 ;
 #if	CF_DEBUGS
-	debugprintf("mfsbuilt_have: ent s=%t\n",sp,sl) ;
+	debugprintf("mfsbuilt_have: ent s=%r\n",sp,sl) ;
 #endif
 	if (op == NULL) return SR_FAULT ;
 	if (sp == NULL) return SR_FAULT ;
@@ -271,7 +271,7 @@ int mfsbuilt_loadbegin(MFSBUILT *op,MFSERVE_INFO *ip,cchar *sp,int sl)
 	int		rs ;
 	int		f = FALSE ;
 #if	CF_DEBUGS
-	    debugprintf("mfsbuilt_loadbegin: ent s=%t\n",sp,sl) ;
+	    debugprintf("mfsbuilt_loadbegin: ent s=%r\n",sp,sl) ;
 #endif
 	if (op == NULL) return SR_FAULT ;
 	if (sp == NULL) return SR_FAULT ;
@@ -581,8 +581,8 @@ static int mfsbuilt_ent(MFSBUILT *op,cchar *sp,int sl,cchar *pp,int pl)
 	int		rs ;
 	int		c = 0 ;
 #if	CF_DEBUGS
-	debugprintf("mfsbuilt_ent: ent s=%t\n",sp,sl) ;
-	debugprintf("mfsbuilt_ent: p=%t\n",pp,pl) ;
+	debugprintf("mfsbuilt_ent: ent s=%r\n",sp,sl) ;
+	debugprintf("mfsbuilt_ent: p=%r\n",pp,pl) ;
 #endif
 	k.buf = sp ;
 	k.len = sl ;

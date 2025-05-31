@@ -1000,7 +1000,7 @@ static int mfswatch_svcaccum(PROGINFO *pip,SREQ *jep,int fd,int re)
 		    cint	ll = (tp-lbuf+1) ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("mfswatch_svcaccum: l=>%t<\n",
+	            debugprintf("mfswatch_svcaccum: l=>%r<\n",
 			lbuf,strlinelen(lbuf,ll,50)) ;
 #endif
 	            if ((rs = u_read(fd,lbuf,ll)) > 0) {
@@ -1442,7 +1442,7 @@ static int mfswatch_usersfile(PROGINFO *pip,int ofd,char *lbuf,int llen,
 	    while ((rs = uc_reade(fd,lbuf,llen,to,ro)) > 0) {
 #if	CF_DEBUG
 		if (DEBUGLEVEL(4))
-		    debugprintf("mfswatch_usersfile: l=>%t<\n",
+		    debugprintf("mfswatch_usersfile: l=>%r<\n",
 		        lbuf,strlinelen(lbuf,rs,50)) ;
 #endif
 		rs = uc_writen(ofd,lbuf,rs) ;

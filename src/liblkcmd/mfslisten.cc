@@ -32,11 +32,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
 
 #include	<usystem.h>
@@ -196,7 +196,7 @@ int mfslisten_acqadd(PROGINFO *pip,MFSLISTEN_ACQ *acp,cchar *ebuf,int elen)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("mfslisten_acqadd: ent ebuf=>%t<\n",ebuf,elen) ;
+	    debugprintf("mfslisten_acqadd: ent ebuf=>%r<\n",ebuf,elen) ;
 #endif
 
 	if (pip->f.daemon) {
