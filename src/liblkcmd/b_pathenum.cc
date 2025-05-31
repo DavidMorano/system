@@ -48,8 +48,8 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1078,7 +1078,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("procname: name=%t\n",np,nl) ;
+	    debugprintf("procname: name=%r\n",np,nl) ;
 #endif
 
 	if (isenvnameok(np,nl)) {

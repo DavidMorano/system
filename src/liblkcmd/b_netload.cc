@@ -44,11 +44,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1098,7 +1098,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_netload/procquery: req=>%t<\n",rp,rl) ;
+	    debugprintf("b_netload/procquery: req=>%r<\n",rp,rl) ;
 #endif
 
 	if (rp == NULL) return SR_FAULT ;
@@ -1113,21 +1113,21 @@ static int procquery(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    debugprintf("b_netload/procquery: r=%t\n",rp,rl) ;
+	    debugprintf("b_netload/procquery: r=%r\n",rp,rl) ;
 	    if (vp != NULL)
-	        debugprintf("b_netload/procquery: v=%t\n",vp,vl) ;
+	        debugprintf("b_netload/procquery: v=%r\n",vp,vl) ;
 	}
 #endif
 
 	if (pip->debuglevel > 0) {
-	    shio_printf(pip->efp,"%s: v=%t\n",pn,vp,vl) ;
+	    shio_printf(pip->efp,"%s: v=%r\n",pn,vp,vl) ;
 	}
 
 	cbuf[0] = '\0' ;
 	ri = matostr(qopts,2,rp,rl) ;
 
 	if (pip->debuglevel > 0) {
-	    shio_printf(pip->efp,"%s: spec=%t (%d)\n",pn,rp,rl,ri) ;
+	    shio_printf(pip->efp,"%s: spec=%r (%d)\n",pn,rp,rl,ri) ;
 	}
 
 	switch (ri) {

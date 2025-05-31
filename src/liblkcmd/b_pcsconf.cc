@@ -1357,7 +1357,7 @@ static int proclist(PROGINFO *pip,SHIO *ofp) noex {
 	            vl = rs ;
 	        }
 		if (rs >= 0) {
-	            rs = shio_printf(ofp,"%s=%t\n",kbuf,vbuf,vl) ;
+	            rs = shio_printf(ofp,"%s=%r\n",kbuf,vbuf,vl) ;
 	            wlen += rs ;
 	        }
 	    } /* end while */
@@ -1479,12 +1479,12 @@ static int procquery(PROGINFO *pip,void *ofp,cchar *qp,int ql)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("main/procquery: query=%t\n",qp,ql) ;
+	    debugprintf("main/procquery: query=%r\n",qp,ql) ;
 #endif
 
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
-	    cchar	*fmt = "%s: query=%t\n" ;
+	    cchar	*fmt = "%s: query=%r\n" ;
 	    shio_printf(pip->efp,fmt,pn,qp,ql) ;
 	}
 
@@ -1694,7 +1694,7 @@ static int procpcsdump(PROGINFO *pip,cchar *dfname)
 	                    vl = rs ;
 	                }
 			if (rs >= 0) {
-	                    rs = shio_printf(dfp,"%s=%t\n",kbuf,vbuf,vl) ;
+	                    rs = shio_printf(dfp,"%s=%r\n",kbuf,vbuf,vl) ;
 	                    wlen += rs ;
 			}
 	            } /* end while */
@@ -1820,7 +1820,7 @@ static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 	            while (rs >= 0) {
 	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
-	                debugprintf("main/procpcsconf: pair> %s=%t\n",
+	                debugprintf("main/procpcsconf: pair> %s=%r\n",
 	                    kbuf,vbuf,vl) ;
 	            } /* end while */
 	            pcsconf_curend(pcp,&cur) ;
@@ -2171,7 +2171,7 @@ static int locinfo_org(LOCINFO *lip)
 	        if (DEBUGLEVEL(5)) {
 	            debugprintf("b_pcsconf/locinfo_org: pcsnsget() rs=%d\n",
 	                rs) ;
-	            debugprintf("b_pcsconf/locinfo_org: r=>%t<\n",rp,rl) ;
+	            debugprintf("b_pcsconf/locinfo_org: r=>%r<\n",rp,rl) ;
 	        }
 #endif /* CF_DEBUG */
 	    } /* end if */

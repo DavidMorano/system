@@ -53,8 +53,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1075,7 +1075,7 @@ const char	*afname ;
 	                        "%s: error processing path (%d)\n",
 	                        pip->progname,rs) ;
 	                shio_printf(pip->efp,
-	            	    "%s: path=%t\n",
+	            	    "%s: path=%r\n",
 	            	    pip->progname,cp,-1) ;
 	            }
 
@@ -1113,7 +1113,7 @@ const char	*afname ;
 	                        "%s: error processing path (%d)\n",
 	                        pip->progname,rs) ;
 	                shio_printf(pip->efp,
-	                    "%s: path=%t\n",
+	                    "%s: path=%r\n",
 	                    pip->progname,cp,cl) ;
 	            }
 
@@ -1165,7 +1165,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar sp[],int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_pathclean/procname: name=>%t<\n",sp,sl) ;
+	    debugprintf("b_pathclean/procname: name=>%r<\n",sp,sl) ;
 #endif
 
 	while ((tp = strnpbrk(sp,sl,":;")) != NULL) {
@@ -1232,7 +1232,7 @@ static int procpath(PROGINFO *pip,cchar *sp,int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_pathclean/procpath: path=%t\n",sp,sl) ;
+	    debugprintf("b_pathclean/procpath: path=%r\n",sp,sl) ;
 #endif
 
 	pathbuf[0] = '\0' ;
@@ -1242,7 +1242,7 @@ static int procpath(PROGINFO *pip,cchar *sp,int sl)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("b_pathclean/procpath: pathclean() rs=%d\n",rs) ;
-	    debugprintf("b_pathclean/procpath: p=%t\n",pathbuf,plen) ;
+	    debugprintf("b_pathclean/procpath: p=%r\n",pathbuf,plen) ;
 	}
 #endif
 	}

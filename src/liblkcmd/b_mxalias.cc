@@ -43,8 +43,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -1019,7 +1019,7 @@ static int locinfo_outprint(LOCINFO *lip,SHIO *ofp) noex {
 	    while ((kl = hdbstr_curenum(&lip->addrs,&cur,&kp,np,np)) >= 0) {
 
 	        if (kl > 0) {
-	            rs = shio_printf(ofp,"%t\n",kp,kl) ;
+	            rs = shio_printf(ofp,"%r\n",kp,kl) ;
 	            wlen += rs ;
 	        }
 
@@ -1253,17 +1253,17 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar np[],int nl)
 	    return SR_INVALID ;
 
 	if (pip->debuglevel > 0) {
-	    shio_printf(pip->efp,"%s: query=%t\n",
+	    shio_printf(pip->efp,"%s: query=%r\n",
 	        pip->progname,np,nl) ;
 	}
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_mxalias/procname: query=%t\n",np,nl) ;
+	    debugprintf("b_mxalias/procname: query=%r\n",np,nl) ;
 #endif
 
 	if (! lip->f.addr) {
-	    rs = shio_printf(ofp,"%t:\n",np,nl) ;
+	    rs = shio_printf(ofp,"%r:\n",np,nl) ;
 	}
 
 	if (rs >= 0) {
@@ -1364,7 +1364,7 @@ static int procmxprint(PROGINFO *pip,SHIO *dfp,cchar *kbuf,cchar *vbuf) noex {
 	f = f || haswhite(vbuf,-1) ;
 
 	blen = MAX((KCOLEXP - klen - 1),0) ;
-	rs = shio_printf(dfp,"%t:%t\t%s%s%s\n",
+	rs = shio_printf(dfp,"%r:%r\t%s%s%s\n",
 	    kbuf,klen,blanks,blen,
 	    ((f) ? "\042" : ""),
 	    vbuf,
@@ -1394,7 +1394,7 @@ static int procvalprint(PROGINFO *pip,SHIO *ofp,cchar *vp,int vl)
 	    }
 	}
 
-	fmt = "  %s%t%s\n" ;
+	fmt = "  %s%r%s\n" ;
 	rs = shio_printf(ofp,fmt,spre,vp,vl,ssuf) ;
 	wlen += rs ;
 

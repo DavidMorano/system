@@ -1775,7 +1775,7 @@ static int procbacks(PROGINFO *pip)
 	    char	pbuf[MAXPATHLEN+1] ;
 
 	    if (pip->debuglevel > 0) {
-	        fmt = "%s: execname=%t\n" ;
+	        fmt = "%s: execname=%r\n" ;
 	        shio_printf(pip->efp,fmt,pn,ebuf,el) ;
 	    }
 
@@ -2609,12 +2609,12 @@ static int procregouterterm(PROGINFO *pip,void *ofp,int fd) noex {
 	        len = rs ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	debugprintf("b_motd/procregouterterm: l=>%t<\n",
+	debugprintf("b_motd/procregouterterm: l=>%r<\n",
 		lbuf,strlinelen(lbuf,len,40)) ;
 #endif
 		if (pip->debuglevel > 0) {
 		    cchar	*pn = pip->progname ;
-		    cchar	*fmt = "%s: term l=>%t<\n" ;
+		    cchar	*fmt = "%s: term l=>%r<\n" ;
 		    shio_printf(pip->efp,fmt,pn,lbuf,strlinelen(lbuf,len,60)) ;
 		}
 	        if (rs >= 0) rs = lib_sigterm() ;
@@ -2645,7 +2645,7 @@ static int procregouterfile(PROGINFO *pip,void *ofp,int fd)
 	    len = rs ;
 		if (pip->debuglevel > 0) {
 		    cchar	*pn = pip->progname ;
-		    cchar	*fmt = "%s: file l=>%t<\n" ;
+		    cchar	*fmt = "%s: file l=>%r<\n" ;
 		    shio_printf(pip->efp,fmt,pn,lbuf,strlinelen(lbuf,len,60)) ;
 		}
 	    if (rs >= 0) rs = lib_sigterm() ;
@@ -2868,7 +2868,7 @@ static int procloadadmin(PROGINFO *pip,VECPSTR *nlp,cchar *np,int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("main/loadrecip: rn=%t\n",np,nl) ;
+	    debugprintf("main/loadrecip: rn=%r\n",np,nl) ;
 #endif
 
 	if (nl < 0) nl = strlen(np) ;
@@ -3462,7 +3462,7 @@ static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar lbuf[],int llen)
 	            if (DEBUGLEVEL(4)) {
 	                debugprintf("b_motd/locinfo_termoutprint: ll=%u\n",
 	                    ll) ;
-	                debugprintf("b_motd/locinfo_termoutprint: l=>%t<\n",
+	                debugprintf("b_motd/locinfo_termoutprint: l=>%r<\n",
 	                    lp,strlinelen(lp,ll,40)) ;
 	            }
 #endif

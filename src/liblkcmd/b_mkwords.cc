@@ -42,8 +42,8 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1148,7 +1148,7 @@ static int procline(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 	                            rs = printuniq(pip,ofp,cp,cl) ;
 	                            wlen += rs ;
 	                        } else {
-	                            rs = shio_printf(ofp,"%t\n",cp,cl) ;
+	                            rs = shio_printf(ofp,"%r\n",cp,cl) ;
 	                            wlen += rs ;
 	                        }
 	                        if (rs < 0) break ;
@@ -1194,7 +1194,7 @@ static int procoutcounts(PROGINFO *pip,void *ofp)
 	dbp = &lip->wdb ;
 	if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
 	    WORDENT	*ep ;
-	    cchar	*fmt = "%-6u %t\n" ;
+	    cchar	*fmt = "%-6u %r\n" ;
 	    cchar	*wp ;
 	    int		wl ;
 	    int		count ;

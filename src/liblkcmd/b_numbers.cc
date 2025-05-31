@@ -199,7 +199,7 @@ int numpair::loadkey(cchar *sp,int sl) {
 	int	rs = SR_OK ;
 	int	si ;
 #if	CF_DEBUGS
-	debugprintf("b_numbers/numpair::loadkey: ent s=%t\n",sp,sl) ;
+	debugprintf("b_numbers/numpair::loadkey: ent s=%r\n",sp,sl) ;
 #endif
 	if ((si = sialpha(sp,sl)) >= 0) {
 	    int		ch ;
@@ -211,8 +211,8 @@ int numpair::loadkey(cchar *sp,int sl) {
 	    sp += si ;
 	    sl -= si ;
 #if	CF_DEBUGS
-	debugprintf("b_numbers/numpair::loadkey: n=%t\n",np,nl) ;
-	debugprintf("b_numbers/numpair::loadkey: s=%t\n",sp,sl) ;
+	debugprintf("b_numbers/numpair::loadkey: n=%r\n",np,nl) ;
+	debugprintf("b_numbers/numpair::loadkey: s=%r\n",sp,sl) ;
 #endif
 	    while (sl && *sp) {
 	        ch = MKCHAR(*sp) ;
@@ -222,7 +222,7 @@ int numpair::loadkey(cchar *sp,int sl) {
 		sp += 1 ;
 	    }
 #if	CF_DEBUGS
-	debugprintf("b_numbers/numpair::loadkey: a=%t\n",ap,al) ;
+	debugprintf("b_numbers/numpair::loadkey: a=%r\n",ap,al) ;
 #endif
 	    if ((rs = cfdeci(np,nl,&n)) >= 0) {
 	            if ((ki = matcasestr(keys,ap,al)) >= 0) {
@@ -1170,7 +1170,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
-	    debugprintf("b_numbers/procspec: ent spec=%t\n",np,nl) ;
+	    debugprintf("b_numbers/procspec: ent spec=%r\n",np,nl) ;
 	    debugprintf("b_numbers/procspec: def numtype=%d\n",numtype) ;
 	}
 #endif

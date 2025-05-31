@@ -982,7 +982,7 @@ static int findbase(PROGINFO *pip,const BASERECORD *basemap,
 #if	CF_DEBUG
 	if (pip->debuglevel > 2) {
 	    int nl = strnlen(bname,blen) ;
-	    debugprintf("findbase: base=>%t<\n",
+	    debugprintf("findbase: base=>%r<\n",
 	        bname,nl) ;
 	}
 #endif
@@ -1197,7 +1197,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    int	nl = strnlen(name,namelen) ;
-	    debugprintf("process: name=>%t<\n",name,nl) ;
+	    debugprintf("process: name=>%r<\n",name,nl) ;
 	}
 #endif
 
@@ -1205,7 +1205,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("process: shrunk name=>%t<\n",cp,cl) ;
+	        debugprintf("process: shrunk name=>%r<\n",cp,cl) ;
 #endif
 
 	    rs = SR_INVALID ;
@@ -1380,13 +1380,13 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
 	        break ;
 	    } /* end switch */
 	    if (rs >= 0) {
-	        rs = shio_printf(ofp,"%t\n",obufp,ol) ;
+	        rs = shio_printf(ofp,"%r\n",obufp,ol) ;
 	    }
 	} /* end if (ok) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("process: result rs=%d obuf=>%t<\n",rs,obuf,rs) ;
+	    debugprintf("process: result rs=%d obuf=>%r<\n",rs,obuf,rs) ;
 #endif
 
 	return rs ;
@@ -1431,7 +1431,7 @@ static int locinfo_base(LOCINFO *lip,cchar *sp,int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	debugprintf("b_numcvt/locinfo_base: b=>%t<\n",sp,sl) ;
+	debugprintf("b_numcvt/locinfo_base: b=>%r<\n",sp,sl) ;
 #endif
 
 	if ((tp = strnchr(sp,sl,':')) != nullptr) {
