@@ -26,8 +26,8 @@
 #include	<envstandards.h>
 
 #include	<sys/types.h>
-#include	<string.h>
-#include	<stdio.h>
+#include	<cstring>
+#include	<cstdio>
 
 #include	<usystem.h>
 

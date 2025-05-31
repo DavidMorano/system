@@ -40,8 +40,8 @@
 #include	<envstandards.h>
 
 #include	<sys/types.h>
-#include	<stdio.h>
-#include	<errno.h>
+#include	<cstdio>
+#include	<cerrno>
 
 #include	<usystem.h>
 

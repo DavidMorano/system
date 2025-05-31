@@ -9,9 +9,9 @@
 #include	<envstandards.h>
 
 #include	<sys/types.h>
-#include	<stdio.h>
-#include	<errno.h>
-#include	<stdarg.h>
+#include	<cstdio>
+#include	<cerrno>
+#include	<cstdarg>
 
 #include	<usystem.h>
 
