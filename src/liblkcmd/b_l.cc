@@ -48,11 +48,11 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1183,7 +1183,7 @@ static int procprint(PROGINFO *pip,void *ofp,VECSTR *dlp)
 	        }
 
 	        if (rs >= 0) {
-	            fmt = "%s%s%t" ;
+	            fmt = "%s%s%r" ;
 	            rs = shio_printf(ofp,fmt,fnp,suffixes[si],blanks,blen) ;
 	            wlen += rs ;
 	        }

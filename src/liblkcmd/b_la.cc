@@ -1277,7 +1277,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 	ri = matostr(qopts,2,rp,rl) ;
 
 	if (pip->debuglevel > 0) {
-	    shio_printf(pip->efp,"%s: spec=%t (%d)\n",
+	    shio_printf(pip->efp,"%s: spec=%r (%d)\n",
 	        pip->progname,rp,rl,ri) ;
 	}
 
@@ -1509,7 +1509,7 @@ static int procfs(PROGINFO *pip,char vbuf[],int vlen,int ri,cchar *sp,int sl)
 	    NULSTR	vs ;
 	    cchar	*vname ;
 	    if ((rs = nulstr_start(&vs,sp,sl,&vname)) >= 0) {
-	        struct statvfs	fi ;
+	        STATVFS	fi ;
 	        if ((rs1 = statvfsdir(vname,&fi)) >= 0) {
 	            LONG	vt ;
 	            LONG	v = -1 ;
@@ -1631,7 +1631,7 @@ static int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 	        sp = "*" ;
 	        sl = 1 ;
 	    }
-	    rs = shio_printf(ofp," %t",sp,sl) ;
+	    rs = shio_printf(ofp," %r",sp,sl) ;
 	    wlen += rs ;
 	} /* end if */
 

@@ -43,12 +43,12 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dlfcn.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<estrings.h>
@@ -1162,7 +1162,7 @@ static int procprint(PROGINFO *pip,void *ofp)
 	    const int	rl = rs ;
 	    if (pip->debuglevel > 0) {
 		cchar	*pn = pip->progname ;
-		cchar	*fmt = "%s: shlib=%t\n" ;
+		cchar	*fmt = "%s: shlib=%r\n" ;
 	        shio_printf(pip->efp,fmt,pn,rbuf,rl) ;
 	    }
 	    rs = shio_print(ofp,rbuf,rl) ;
@@ -1195,7 +1195,7 @@ static int procall(PROGINFO *pip,void *ofp)
 	            len = rs ;
 	            if (lbuf[len-1] == '\n') len -= 1 ;
 	            if (len > 0) {
-	                rs = shio_printf(ofp,"%3s %t\n",y,lbuf,len) ;
+	                rs = shio_printf(ofp,"%3s %r\n",y,lbuf,len) ;
 	                wlen += rs ;
 	            }
 	        } /* end if (reading-lines) */
@@ -1307,7 +1307,7 @@ static int procsfnmk(PROGINFO *pip,cchar *sfname,cchar *rbuf)
 	                    if (lbuf[len-1] == '\n') len -= 1 ;
 #if	CF_DEBUG
 	                    if (DEBUGLEVEL(4))
-	                        debugprintf("procsfnmk: l=>%t<\n",
+	                        debugprintf("procsfnmk: l=>%r<\n",
 	                            lbuf,strlinelen(lbuf,len,40)) ;
 #endif
 	                    if ((len > 0) && (! CHAR_ISWHITE(lbuf[0]))) {
@@ -1539,7 +1539,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_kshbi/procname: name=%t\n",np,nl) ;
+	    debugprintf("b_kshbi/procname: name=%r\n",np,nl) ;
 #endif
 
 	if ((rs = sncpy2w(nbuf,nlen,"b_",np,nl)) >= 0) {
@@ -1566,12 +1566,12 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 	    if (rs >= 0) {
 	        cchar	*ans = ((f) ? "YES" : "NO") ;
 	        if (pip->verboselevel > 0) {
-	            rs = shio_printf(ofp,"%3s %t\n",ans,np,nl) ;
+	            rs = shio_printf(ofp,"%3s %r\n",ans,np,nl) ;
 	            wlen += rs ;
 	        }
 	        if (pip->debuglevel > 0) {
 	            cchar	*pn = pip->progname ;
-	            cchar	*fmt = "%s: %3s %t\n" ;
+	            cchar	*fmt = "%s: %3s %r\n" ;
 	            shio_printf(pip->efp,fmt,pn,ans,np,nl) ;
 	        }
 	    }

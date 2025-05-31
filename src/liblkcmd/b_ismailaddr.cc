@@ -1136,7 +1136,7 @@ static int locinfo_loadnames(LOCINFO *lip,cchar *lnfname) noex {
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
-	                debugprintf("locinfo_loadnames: LOCALNAMES n=%t\n",
+	                debugprintf("locinfo_loadnames: LOCALNAMES n=%r\n",
 	                    nbuf,nbl) ;
 #endif
 
@@ -1491,7 +1491,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *namep,int namel) noex {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("ismailaddr/procname: ent namep=>%t<\n",
+	    debugprintf("ismailaddr/procname: ent namep=>%r<\n",
 	        namep,strnlen(namep,MAX(namel,60))) ;
 #endif
 
@@ -1503,7 +1503,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *namep,int namel) noex {
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2)) {
 	        debugprintf("ismailaddr/procname: addrcompact() rs=%d\n",rs) ;
-	        debugprintf("ismailaddr/procname: m=>%t<\n",mailaddr,rs) ;
+	        debugprintf("ismailaddr/procname: m=>%r<\n",mailaddr,rs) ;
 	    }
 #endif
 	    namel = rs ;
@@ -1526,7 +1526,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *namep,int namel) noex {
 #endif
 
 	if ((rs >= 0) && (pip->debuglevel > 0)) {
-	    shio_printf(pip->efp,"%s: a=%t type=%u\n",
+	    shio_printf(pip->efp,"%s: a=%r type=%u\n",
 	        pip->progname,namep,namel,type) ;
 	}
 
@@ -1587,21 +1587,21 @@ static int procname(PROGINFO *pip,void *ofp,cchar *namep,int namel) noex {
 /* debugging */
 
 	if (pip->debuglevel > 0) {
-	    fmt = "%s: %c %t\n" ;
+	    fmt = "%s: %c %r\n" ;
 	    shio_printf(pip->efp,fmt,pn,ans,namep,strnlen(namep,namel)) ;
 	} /* end if (debugging) */
 
 /* logging */
 
 	if (pip->open.logprog) {
-	    fmt = "%c %t\n" ;
+	    fmt = "%c %r\n" ;
 	    logfile_printf(&pip->lh,fmt,ans,namep,strnlen(namep,namel)) ;
 	} /* end if (logging) */
 
 /* optionally print result */
 
 	if (pip->verboselevel >= 2) {
-	    fmt = "%c %t\n" ;
+	    fmt = "%c %r\n" ;
 	    rs = shio_printf(ofp,fmt,ans,namep,strnlen(namep,namel)) ;
 	    wlen += rs ;
 	} /* end if (verbose) */
@@ -1653,7 +1653,7 @@ static int addrcompact(char *rbuf,int rlen,cchar *np,int nl)
 	if (np == NULL) return SR_FAULT ;
 
 #if	CF_DEBUGS
-	debugprintf("addrcompact: ent n=>%t<\n",np,nl) ;
+	debugprintf("addrcompact: ent n=>%r<\n",np,nl) ;
 #endif
 
 	rbuf[0] = '\0' ;
@@ -1676,7 +1676,7 @@ static int addrcompact(char *rbuf,int rlen,cchar *np,int nl)
 
 #if	CF_DEBUGS
 	debugprintf("addrcompact: near rs=%d i=%u\n",rs,i) ;
-	debugprintf("addrcompact: r=>%t<\n",rbuf,i) ;
+	debugprintf("addrcompact: r=>%r<\n",rbuf,i) ;
 #endif
 
 /* remove the stupid trailing dots! */

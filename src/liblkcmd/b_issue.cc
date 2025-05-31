@@ -1687,7 +1687,7 @@ static int procbacks(PROGINFO *pip)
 	    char	pbuf[MAXPATHLEN+1] ;
 
 	    if (pip->debuglevel > 0) {
-	        fmt = "%s: execname=%t\n" ;
+	        fmt = "%s: execname=%r\n" ;
 	        shio_printf(pip->efp,fmt,pn,ebuf,el) ;
 	    }
 
@@ -2715,7 +2715,7 @@ static int procloadadmin(PROGINFO *pip,VECPSTR *nlp,cchar np[],int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("main/loadrecip: rn=%t\n",np,nl) ;
+	    debugprintf("main/loadrecip: rn=%r\n",np,nl) ;
 #endif
 
 	if (nl < 0) nl = strlen(np) ;
@@ -3291,7 +3291,7 @@ static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar lbuf[],int llen)
 	            if (DEBUGLEVEL(4)) {
 	                debugprintf("b_issue/locinfo_termoutprint: ll=%u\n",
 	                    ll) ;
-	                debugprintf("b_issue/locinfo_termoutprint: l=>%t<\n",
+	                debugprintf("b_issue/locinfo_termoutprint: l=>%r<\n",
 	                    lp,strlinelen(lp,ll,40)) ;
 	            }
 #endif
