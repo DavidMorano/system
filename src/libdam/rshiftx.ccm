@@ -1,0 +1,27 @@
+/* rshiftx MODULE (primary-module-interface) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* right-shift an integer and result the shifted result */
+/* lang=C++20 (conformance reviewed) */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
+
+export module rshiftx ;
+
+export {
+    template<typename T> static T rshiftx(T v,int n) noex {
+	return (v >> n) ;
+    } /* end subroutine (rshiftx) */
+}
+
+
