@@ -53,8 +53,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1182,7 +1182,7 @@ static int procout_open(PROGINFO *pip,PROCOUT *pop)
 	    suf = lip->suffix ;
 	}
 
-	fmt = "%t%03u%s%t" ;
+	fmt = "%r%03u%s%r" ;
 	cp = ((suf[0] != '\0') ? "." : "") ;
 	if ((rs = bufprintf(obuf,olen,fmt,pre,11,acount,cp,suf,11)) >= 0) {
 	    if ((rs = u_open(obuf,O_FLAGS,0666)) >= 0) {

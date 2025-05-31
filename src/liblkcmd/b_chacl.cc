@@ -1225,7 +1225,7 @@ static int procacls(PROGINFO *pip,cchar *aclspec)
 	        if (rs < 0) {
 	            if (pip->debuglevel > 0) {
 	                shio_printf(pip->efp,
-	                    "%s: a bad ACL was specified (%d) >%t<\n",
+	                    "%s: a bad ACL was specified (%d) >%r<\n",
 	                    pip->progname,rs,fp,fl) ;
 	            }
 	            break ;
@@ -1279,7 +1279,7 @@ static int procacl(PROGINFO *pip,cchar *abuf,int alen)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("procacl: type=%t\n",typespec,typelen) ;
+	        debugprintf("procacl: type=%r\n",typespec,typelen) ;
 #endif
 
 	    if (tp[0] == '=') {
@@ -1291,7 +1291,7 @@ static int procacl(PROGINFO *pip,cchar *abuf,int alen)
 	        }
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            debugprintf("procacl: id=%t\n",idspec,idlen) ;
+	            debugprintf("procacl: id=%r\n",idspec,idlen) ;
 #endif
 	    } /* end if (had an ID) */
 
@@ -1305,7 +1305,7 @@ static int procacl(PROGINFO *pip,cchar *abuf,int alen)
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3)) {
 	            debugprintf("procacl: op=%u\n",ai.op) ;
-	            debugprintf("procacl: permspec=%t\n",
+	            debugprintf("procacl: permspec=%r\n",
 	                permspec,permlen) ;
 	        }
 #endif
@@ -2513,7 +2513,7 @@ static int locinfo_isfsuffix(LOCINFO *lip,cchar *fname) noex {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
-	        debugprintf("locinfo_isfsuffix: bn=%t\n",bp,bl) ;
+	        debugprintf("locinfo_isfsuffix: bn=%r\n",bp,bl) ;
 #endif
 
 	    if ((tp = strnrchr(bp,bl,'.')) != NULL) {
@@ -2540,7 +2540,7 @@ static int locinfo_isfsuffix(LOCINFO *lip,cchar *fname) noex {
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
-	                    debugprintf("locinfo_isfsuffix: s=%t\n",sp,sl) ;
+	                    debugprintf("locinfo_isfsuffix: s=%r\n",sp,sl) ;
 #endif
 
 	                f = (strncmp(cp,sp,sl) == 0) && (cp[sl] == '\0') ;
@@ -2720,7 +2720,7 @@ static int aclents_print(aclent_t *aclbuf,int nacls) noex {
 	if ((textbuf = acltotext(aclbuf,nacls)) != NULL) {
 	    sp = textbuf ;
 	    while ((tp = strchr(sp,',')) != NULL) {
-	        debugprintf("chacl/aclents_print: | %t\n",
+	        debugprintf("chacl/aclents_print: | %r\n",
 	            sp,(tp - sp)) ;
 	        sp = (tp + 1) ;
 	    } /* end while */

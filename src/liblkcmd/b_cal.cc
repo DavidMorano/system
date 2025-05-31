@@ -54,8 +54,8 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 
 #include	<usystem.h>
@@ -1213,7 +1213,7 @@ static int procline(PROGINFO *pip,int cols,cchar lp[],int ll)
 	        cchar	*cp ;
 
 	        for (i = 0 ; (cl = linefold_get(&lf,i,&cp)) >= 0 ; i += 1) {
-	            rs1 = shio_printf(fp,"%s: | %t%t\n",pn,blanks,ind,cp,cl) ;
+	            rs1 = shio_printf(fp,"%s: | %r%r\n",pn,blanks,ind,cp,cl) ;
 	            wlen += rs1 ;
 	            if (rs1 < 0) break ;
 	            ind = indent ;

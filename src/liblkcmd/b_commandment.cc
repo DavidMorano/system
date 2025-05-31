@@ -48,11 +48,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1263,7 +1263,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
-	    debugprintf("b_commandment/procspec: s=>%t<\n",
+	    debugprintf("b_commandment/procspec: s=>%r<\n",
 	        sp,strlinelen(sp,sl,40)) ;
 	    debugprintf("b_commandment/procspec: nitems=%d\n",
 	        lip->nitems) ;
@@ -1325,7 +1325,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 	} /* end if (type of query) */
 
 	    if ((rs < 0) && isNotGoodCite(rs) && lip->f.interactive) {
-		fmt = "invalid citation=>%t< (%d)\n" ;
+		fmt = "invalid citation=>%r< (%d)\n" ;
 	        rs = shio_printf(lip->ofp,fmt,sp,sl,rs) ;
 	    }
 
@@ -1352,7 +1352,7 @@ static int procstrings(PROGINFO *pip,cchar *sp,int sl)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("b_commandment/procstrings: sl=%u\n",sl) ;
-	    debugprintf("b_commandment/procstrings: s=>%t<\n",sp,sl) ;
+	    debugprintf("b_commandment/procstrings: s=>%r<\n",sp,sl) ;
 	}
 #endif
 
@@ -1383,7 +1383,7 @@ static int procstrings(PROGINFO *pip,cchar *sp,int sl)
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
 	                    debugprintf("b_commandment/procstrings: "
-			        "c=>%t<\n",cbuf,strlinelen(cbuf,cbl,40)) ;
+			        "c=>%r<\n",cbuf,strlinelen(cbuf,cbl,40)) ;
 #endif
 
 		        if ((rs = vecstr_have(&ps,cbuf,cbl)) > 0) {
@@ -1487,7 +1487,7 @@ static int procout(PROGINFO *pip,uint n,cchar *vp,int vl)
 #endif
 
 #ifdef	COMMENT
-	rs = shio_printf(lip->ofp,"%2u >%t<\n",
+	rs = shio_printf(lip->ofp,"%2u >%r<\n",
 	    n,vp,MIN(vl,20)) ;
 #endif
 
@@ -1540,10 +1540,10 @@ static int procoutline(PROGINFO *pip,int *linep,uint n,cchar *lp,int ll)
 	prec = MIN(lip->precision,NBLANKS) ;
 
 	if (*linep == 0) {
-	    rs = shio_printf(lip->ofp,"%*u %t\n",prec,n,lp,ll) ;
+	    rs = shio_printf(lip->ofp,"%*u %r\n",prec,n,lp,ll) ;
 	    wlen += rs ;
 	} else {
-	    rs = shio_printf(lip->ofp,"%t %t\n",blanks,prec,lp,ll) ;
+	    rs = shio_printf(lip->ofp,"%r %r\n",blanks,prec,lp,ll) ;
 	    wlen += rs ;
 	}
 

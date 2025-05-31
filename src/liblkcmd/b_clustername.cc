@@ -935,7 +935,7 @@ static int procnode(PROGINFO *pip,void *ofp,cchar *np,int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_clustername/procnode: node=%t\n",np,nl) ;
+	    debugprintf("b_clustername/procnode: node=%r\n",np,nl) ;
 #endif
 
 	if ((strwcmp(LOCALHOST,np,nl) == 0) || (np[0] == '-')) {

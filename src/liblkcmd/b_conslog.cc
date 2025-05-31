@@ -42,12 +42,12 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/syslog.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1330,7 +1330,7 @@ static int procsubs(PROGINFO *pip,EXPCOOK *ckp,char obuf[],int olen,
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3)) {
 	            debugprintf("b_conslog/procsubs: ec_ex() rs=%d\n",rs1) ;
-	            debugprintf("b_conslog/procsubs: obuf=>%t<\n",
+	            debugprintf("b_conslog/procsubs: obuf=>%r<\n",
 	                obuf,strlinelen(obuf,obl,40)) ;
 	        }
 #endif

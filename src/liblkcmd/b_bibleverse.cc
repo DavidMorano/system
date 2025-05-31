@@ -45,11 +45,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 
 #include	<usystem.h>
@@ -169,7 +169,7 @@ struct locinfo {
 	cchar	*ndbname ;	/* name-db name */
 	cchar	*pdbname ;	/* paragraph-db name */
 	cchar	*vdbname ;	/* verse-db name */
-	cchar	*sdbname ;	/* struture-db name */
+	cchar	*sdbname ;	/* structure-db name */
 	LOCINFO_FL	have, f, changed, final ;
 	LOCINFO_FL	open ;
 	time_t		ti_tmtime ;
@@ -1600,11 +1600,11 @@ static int procspec(PROGINFO *pip,cchar *sp,int sl)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("b_bibleverse/procspec: spec>%t<\n",sp,sl) ;
+	        debugprintf("b_bibleverse/procspec: spec>%r<\n",sp,sl) ;
 #endif
 
 	    if (pip->debuglevel > 0) {
-	        shio_printf(pip->efp,"%s: spec=\"%t\"\n",pn,sp,sl) ;
+	        shio_printf(pip->efp,"%s: spec=\"%r\"\n",pn,sp,sl) ;
 	    }
 
 	    if ((sp[0] == '+') || (sp[0] == '-')) {
@@ -1621,11 +1621,11 @@ static int procspec(PROGINFO *pip,cchar *sp,int sl)
 	            wlen += rs ;
 	        } else if (rs == 0) {
 	            if (lip->f.interactive) {
-			fmt = "citation=>%t< invalid\n" ;
+			fmt = "citation=>%r< invalid\n" ;
 	                rs = shio_printf(lip->ofp,fmt,sp,sl) ;
 		    }
 	            if (pip->debuglevel > 0) {
-			fmt = "%s: citation=>%t< invalid (%d)\n" ;
+			fmt = "%s: citation=>%r< invalid (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,sp,sl,rs) ;
 	            }
 	        } /* end if */
@@ -1670,7 +1670,7 @@ static int procspec(PROGINFO *pip,cchar *sp,int sl)
 	    } /* end if (handling different query types) */
 
 	    if ((rs < 0) && isNotGoodCite(rs) && lip->f.interactive) {
-		fmt = "invalid citation=>%t< (%d)\n" ;
+		fmt = "invalid citation=>%r< (%d)\n" ;
 	        rs = shio_printf(lip->ofp,fmt,sp,sl,rs) ;
 	    }
 
@@ -1739,7 +1739,7 @@ static int procparse(PROGINFO *pip,BIBLEVERSE_Q *qp,cchar *sp,int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	debugprintf("b_bibleverse/procparse: ent q=>%t<\n",sp,sl) ;
+	debugprintf("b_bibleverse/procparse: ent q=>%r<\n",sp,sl) ;
 #endif
 
 	if ((rs = bcspec_load(&bb,sp,sl)) >= 0) {
@@ -1876,11 +1876,11 @@ static int procmulti(PROGINFO *pip,BIBLEVERSE_Q *qp,int ndays)
 		char		specbuf[SPECBUFLEN + 1], *sp = specbuf ;
 		sl = bufprintf(specbuf,speclen,fmt,qp->b,qp->c,qp->v) ;
 		if (lip->f.interactive) {
-	    	    fmt = "citation=%t not_found\n" ;
+	    	    fmt = "citation=%r not_found\n" ;
 	    	    rs = shio_printf(lip->ofp,fmt,sp,sl) ;
 		}
 		if (pip->debuglevel > 0) {
-	    	    fmt = "%s: citation=%t not_found\n" ;
+	    	    fmt = "%s: citation=%r not_found\n" ;
 	    	    shio_printf(pip->efp,fmt,pn,sp,sl) ;
 		}
     	    } /* end if (procload) */
@@ -1973,7 +1973,7 @@ static int procoutcite(PROGINFO *pip,BIBLEVERSE_Q *qp,int ndays)
 	        if ((bbl = locinfo_booklookup(lip,bbuf,blen,qp->b)) > 0) {
 
 	            f_havebook = TRUE ;
-	            fmt = (ndays > 1) ? "%t %u:%u (%u)" : "%t %u:%u" ;
+	            fmt = (ndays > 1) ? "%r %u:%u (%u)" : "%r %u:%u" ;
 	            rs = bufprintf(cbuf,clen,fmt,bbuf,bbl,c,v,ndays) ;
 	            cl = rs ;
 	            if ((rs >= 0) && (pip->verboselevel > 0)) {
@@ -2100,7 +2100,7 @@ static int procoutline(PROGINFO *pip,int line,cchar *lp,int ll)
 
 	if (pip->verboselevel > 0) {
 	    indent = MIN(lip->indent,NBLANKS) ;
-	    fmt = "%t%t\n" ;
+	    fmt = "%r%r\n" ;
 	    rs = shio_printf(lip->ofp,fmt,blanks,indent,lp,ll) ;
 	    wlen += rs ;
 	}

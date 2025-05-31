@@ -52,11 +52,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 
 #include	<usystem.h>
@@ -1766,11 +1766,11 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_calyear/procspec: spec=>%t<\n",sp,sl) ;
+	    debugprintf("b_calyear/procspec: spec=>%r<\n",sp,sl) ;
 #endif
 
 	if (pip->debuglevel > 0) {
-	    shio_printf(pip->efp,"%s: spec=%t\n",pn,sp,sl) ;
+	    shio_printf(pip->efp,"%s: spec=%r\n",pn,sp,sl) ;
 	}
 
 	if ((sp[0] == '+') || (sp[0] == '-')) {
@@ -1801,7 +1801,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 	        } /* end if (locinfo_defdayspec) */
 	    } else {
 	        if (lip->f.interactive) {
-	            const char	*fmt = "citation=>%t< invalid\n" ;
+	            const char	*fmt = "citation=>%r< invalid\n" ;
 	            rs = shio_printf(lip->ofp,fmt,sp,sl) ;
 	        }
 	    } /* end if (dayspec) */
@@ -1809,7 +1809,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 	} /* end if */
 
 	if ((rs < 0) && isNotGoodCite(rs) && lip->f.interactive) {
-	    fmt = "invalid citation=>%t< (%d)\n" ;
+	    fmt = "invalid citation=>%r< (%d)\n" ;
 	    rs = shio_printf(lip->ofp,fmt,sp,sl,rs) ;
 	}
 
@@ -1999,7 +1999,7 @@ static int procoutcite(PROGINFO *pip,CALYEAR_CITE *qp,cchar vbuf[],int vlen)
 	        qp->y,qp->m,qp->d) ;
 	    if ((rs1 = linefold_start(&liner,50,1,vbuf,vlen)) >= 0) {
 	        for (i = 0 ; (cl = linefold_get(&liner,i,&ccp)) >= 0 ; i += 1)
-	            debugprintf("b_calyear/procoutcite: >%t<\n",ccp,cl) ;
+	            debugprintf("b_calyear/procoutcite: >%r<\n",ccp,cl) ;
 	        linefold_finish(&liner) ;
 	    }
 	}
@@ -2033,7 +2033,7 @@ static int procoutcite(PROGINFO *pip,CALYEAR_CITE *qp,cchar vbuf[],int vlen)
 
 	    if (lip->f.monthname) {
 	        const char	*mon = calstrs_months[qp->m] ;
-	        rs = bufprintf(citebuf,CITEBUFLEN,"%t-%02u",mon,3,qp->d) ;
+	        rs = bufprintf(citebuf,CITEBUFLEN,"%r-%02u",mon,3,qp->d) ;
 	        cl = rs ;
 	    } else {
 	        const int	m = (qp->m + 1) ;
@@ -2044,7 +2044,7 @@ static int procoutcite(PROGINFO *pip,CALYEAR_CITE *qp,cchar vbuf[],int vlen)
 	    if (rs >= 0) {
 	        if (lip->f.citebreak) {
 	            cbl = MIN((lip->linelen - lip->indent),clen) ;
-	            rs = shio_printf(lip->ofp,"%t\n",citebuf,cl) ;
+	            rs = shio_printf(lip->ofp,"%r\n",citebuf,cl) ;
 	            wlen += rs ;
 	            line += 1 ;
 	        } else {
@@ -2066,7 +2066,7 @@ static int procoutcite(PROGINFO *pip,CALYEAR_CITE *qp,cchar vbuf[],int vlen)
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4)) {
 	                    debugprintf("b_calyear/procoutcite: f cl=%u\n",cl) ;
-	                    debugprintf("b_calyear/procoutcite: f line=>%t<¬\n",
+	                    debugprintf("b_calyear/procoutcite: f line=>%r<¬\n",
 	                        cbuf,strnlen(cbuf,MIN(cl,40))) ;
 	                }
 #endif
@@ -2088,7 +2088,7 @@ static int procoutcite(PROGINFO *pip,CALYEAR_CITE *qp,cchar vbuf[],int vlen)
 	                        debugprintf("b_calyear/procoutcite: "
 	                            "p cl=%u\n",cl) ;
 	                        debugprintf("b_calyear/procoutcite: "
-	                            "p line=>%t<¬ \n",
+	                            "p line=>%r<¬ \n",
 	                            cbuf,strnlen(cbuf,MIN(cl,40))) ;
 	                    }
 #endif /* CF_DEBUG */
@@ -2127,7 +2127,7 @@ static int procoutline(PROGINFO *pip,int line,cchar *lp,int ll)
 	if (lip->f.citebreak || (line > 0))
 	    indent = MIN(lip->indent,NBLANKS) ;
 
-	rs = shio_printf(lip->ofp,"%t%t\n",blanks,indent,lp,ll) ;
+	rs = shio_printf(lip->ofp,"%r%r\n",blanks,indent,lp,ll) ;
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
@@ -2934,7 +2934,7 @@ static int config_read(CONFIG *cfp)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("config_read: enum k=%t\n",kp,kl) ;
+	            debugprintf("config_read: enum k=%r\n",kp,kl) ;
 #endif
 
 	        i = matpstr(params,2,kp,kl) ;
@@ -2943,7 +2943,7 @@ static int config_read(CONFIG *cfp)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("config_read: v=%t\n",vp,vl) ;
+	            debugprintf("config_read: v=%r\n",vp,vl) ;
 #endif
 
 	        ebuf[0] = '\0' ;
@@ -2957,7 +2957,7 @@ static int config_read(CONFIG *cfp)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4)) {
-	            debugprintf("config_read: e=%t\n",ebuf,el) ;
+	            debugprintf("config_read: e=%r\n",ebuf,el) ;
 	            if (i < param_overlast)
 	                debugprintf("config_read: switch=%s(%u)\n",
 	                    params[i],i) ;

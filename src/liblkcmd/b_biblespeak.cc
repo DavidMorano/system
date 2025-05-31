@@ -47,11 +47,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
 
 #include	<usystem.h>
@@ -1412,7 +1412,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_biblespeak/procspec: spec>%t<\n",sp,sl) ;
+	    debugprintf("b_biblespeak/procspec: spec>%r<\n",sp,sl) ;
 #endif
 
 	if ((rs = procparse(pip,&q,sp,sl)) >= 0) {
@@ -1523,7 +1523,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 
 	} else if (rs == 0) {
 	    if (lip->f.interactive)
-	        rs = shio_printf(lip->ofp,"citation=>%t< invalid\n",
+	        rs = shio_printf(lip->ofp,"citation=>%r< invalid\n",
 	            sp,sl) ;
 	}
 
@@ -1601,7 +1601,7 @@ static int proctitlebook(PROGINFO *pip,int nbook)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
-	        debugprintf("proctitlebook: bn=>%t<\n",bbuf,bbl) ;
+	        debugprintf("proctitlebook: bn=>%r<\n",bbuf,bbl) ;
 #endif
 
 	    if (rs >= 0) {
@@ -1614,7 +1614,7 @@ static int proctitlebook(PROGINFO *pip,int nbook)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("proctitlebook: leader=>%t<\n",
+	            debugprintf("proctitlebook: leader=>%r<\n",
 	                bbuf,(tp - bbuf)) ;
 #endif
 
@@ -1628,7 +1628,7 @@ static int proctitlebook(PROGINFO *pip,int nbook)
 	    } /* end if */
 
 	    if (rs >= 0) {
-	        rs = shio_printf(lip->ofp,"%t\n",bp,bl) ;
+	        rs = shio_printf(lip->ofp,"%r\n",bp,bl) ;
 	        wlen += rs ;
 	    }
 
@@ -1716,7 +1716,7 @@ static int procout(PROGINFO *pip,BIBLEVERSE_CITE *qp,cchar bvbuf[],int bvlen)
 #endif
 
 #ifdef	COMMENT
-	rs = shio_printf(lip->ofp,"%2u >%t<\n",
+	rs = shio_printf(lip->ofp,"%2u >%r<\n",
 	    n,bvbuf,MIN(bvlen,20)) ;
 #endif
 
@@ -1796,7 +1796,7 @@ static int procoutline(PROGINFO *pip,int line,cchar *lp,int ll)
 	int		wlen = 0 ;
 
 	indent = MIN(lip->indent,NBLANKS) ;
-	rs = shio_printf(lip->ofp,"%t%t\n", blanks,indent, lp,ll) ;
+	rs = shio_printf(lip->ofp,"%r%r\n", blanks,indent, lp,ll) ;
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
