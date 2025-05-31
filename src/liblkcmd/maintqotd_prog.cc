@@ -47,8 +47,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
 
 #include	<usystem.h>
@@ -361,7 +361,7 @@ static int checker_findprog(CHECKER *chp,char *rbuf,cchar *pp,int pl)
 	int		rl = 0 ;
 
 #if	CF_DEBUGS
-	debugprintf("checker_findprog: ent pn=%t\n",pp,pl) ;
+	debugprintf("checker_findprog: ent pn=%r\n",pp,pl) ;
 #endif
 
 	rbuf[0] = '\0' ;
@@ -373,7 +373,7 @@ static int checker_findprog(CHECKER *chp,char *rbuf,cchar *pp,int pl)
 	}
 
 #if	CF_DEBUGS
-	debugprintf("checker_findprog: pn=%t\n",pp,pl) ;
+	debugprintf("checker_findprog: pn=%r\n",pp,pl) ;
 #endif
 
 	if ((rs = prgetprogpath(chp->pr,rbuf,pp,pl)) >= 0) {
@@ -582,15 +582,15 @@ cchar		*sname ;
 static int debugoutput(cchar *ids,int fd) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	debugprintf("%t\n",ids,strlinelen(ids,80,60)) ;
+	debugprintf("%r\n",ids,strlinelen(ids,80,60)) ;
 	sleep(2) ;
 	if ((rs = uc_fsize(fd)) >= 0) {
-	    debugprintf("%t fsize=%u\n",ids,strlinelen(ids,80,60),rs) ;
+	    debugprintf("%r fsize=%u\n",ids,strlinelen(ids,80,60),rs) ;
 	    if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
 	        cint	llen = LINEBUFLEN ;
 	        char	lbuf[LINEBUFLEN+1] ;
 	        while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
-	            debugprintf("o> %t\n",
+	            debugprintf("o> %r\n",
 	                lbuf,strlinelen(lbuf,rs,70)) ;
 	        } /* end while */
 	        filer_finish(&b) ;

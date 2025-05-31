@@ -54,6 +54,7 @@
 #include	<spawner.h>
 #include	<filer.h>
 #include	<logfile.h>
+#include	<snwcpy.h>
 #include	<localmisc.h>
 
 #include	"maintqotd.h"
@@ -70,10 +71,6 @@
 #define	NULLFNAME	"/dev/null"
 #endif
 
-#ifndef	NOFILE
-#define	NOFILE		20
-#endif
-
 #ifndef	VBUFLEN
 #define	VBUFLEN		(6 * MAXPATHLEN)
 #endif
@@ -81,7 +78,6 @@
 
 /* external subroutines */
 
-extern int	snwcpyclean(char *,int,int,cchar *,int) ;
 extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
 extern int	mkpath1w(char *,cchar *,int) ;
 extern int	mkpath2w(char *,cchar *,cchar *,int) ;
@@ -339,7 +335,7 @@ cchar	*ap ;
 #if	CF_DEBUGS
 	{
 	    debugprintf("main/procsystem: mkfingerquery() rs=%d\n",rs) ;
-	    debugprintf("main/procsystem: q=>%t<\n",qp,ql) ;
+	    debugprintf("main/procsystem: q=>%r<\n",qp,ql) ;
 	}
 #endif /* CF_DEBUGS */
 
@@ -657,7 +653,7 @@ static int checker_findprog(CHECKER *chp,char *rbuf,cchar *pp,int pl)
 	int		rl = 0 ;
 
 #if	CF_DEBUGS
-	debugprintf("checker_findprog: ent pn=%t\n",pp,pl) ;
+	debugprintf("checker_findprog: ent pn=%r\n",pp,pl) ;
 #endif
 
 	rbuf[0] = '\0' ;
@@ -669,7 +665,7 @@ static int checker_findprog(CHECKER *chp,char *rbuf,cchar *pp,int pl)
 	}
 
 #if	CF_DEBUGS
-	debugprintf("checker_findprog: pn=%t\n",pp,pl) ;
+	debugprintf("checker_findprog: pn=%r\n",pp,pl) ;
 #endif
 
 	rs = prgetprogpath(chp->pr,rbuf,pp,pl) ;
@@ -852,15 +848,15 @@ cchar	*sname ;
 static int debugoutput(cchar *ids,int fd) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	debugprintf("%t\n",ids,strlinelen(ids,80,60)) ;
+	debugprintf("%r\n",ids,strlinelen(ids,80,60)) ;
 	sleep(2) ;
 	if ((rs = uc_fsize(fd)) >= 0) {
-	    debugprintf("%t fsize=%u\n",ids,strlinelen(ids,80,60),rs) ;
+	    debugprintf("%r fsize=%u\n",ids,strlinelen(ids,80,60),rs) ;
 	    if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
 	        cint	llen = LINEBUFLEN ;
 	        char	lbuf[LINEBUFLEN+1] ;
 	        while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
-	            debugprintf("o> %t\n",
+	            debugprintf("o> %r\n",
 	                lbuf,strlinelen(lbuf,rs,70)) ;
 	        } /* end while */
 	        filer_finish(&b) ;

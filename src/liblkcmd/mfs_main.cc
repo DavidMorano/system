@@ -167,7 +167,6 @@ extern int	getnprocessors(cchar **,int) ;
 extern int	getarchitecture(char *,int) ;
 extern int	getnprocessors(const char **,int) ;
 extern int	getproviderid(const char *,int) ;
-extern int	getsystypenum(char *,char *,cchar *,cchar *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getserial(const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;
@@ -1620,7 +1619,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
-	                debugprintf("mfsmain/procopt: k=%t\n",kp,kl) ;
+	                debugprintf("mfsmain/procopt: k=%r\n",kp,kl) ;
 #endif
 
 	            if ((oi = matostr(progopts,2,kp,kl)) >= 0) {
@@ -2711,7 +2710,7 @@ static int procbacks(PROGINFO *pip)
 	    char	pbuf[MAXPATHLEN+1] ;
 
 	    if (pip->debuglevel > 0) {
-	        fmt = "%s: execname=%t\n" ;
+	        fmt = "%s: execname=%r\n" ;
 	        shio_printf(pip->efp,fmt,pn,ebuf,el) ;
 	    }
 
@@ -2724,7 +2723,7 @@ static int procbacks(PROGINFO *pip)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("main/procbacks: prog=%t\n",ebuf,el) ;
+	        debugprintf("main/procbacks: prog=%r\n",ebuf,el) ;
 #endif
 
 	    if ((rs = prgetprogpath(pip->pr,pbuf,ebuf,el)) > 0) {

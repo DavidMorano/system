@@ -1409,7 +1409,7 @@ static int kshlib_autorunopt(KSHLIB *uip,cchar *sp,int sl)
 	    while (sl && CHAR_ISWHITE(sp[sl-1])) sl -= 1 ;
 	}
 #if	CF_DEBUGN
-	nprintf(NDF,"kshlib_autorunopt: opt=%t\n",sp,sl) ;
+	nprintf(NDF,"kshlib_autorunopt: opt=%r\n",sp,sl) ;
 #endif
 	if ((oi = matostr(runopts,2,sp,sl)) >= 0) {
 	    switch (oi) {
@@ -1736,7 +1736,7 @@ static int kshlib_workgener(KSHLIB *uip,SESMSG_GEN *mp)
 	int		rs ;
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_workgener: ent\n") ;
-	nprintf(NDF,"kshlib_workgener: m=>%t<\n",
+	nprintf(NDF,"kshlib_workgener: m=>%r<\n",
 	    mp->nbuf,strlinelen(mp->nbuf,-1,50)) ;
 #endif
 	if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
@@ -1748,7 +1748,7 @@ static int kshlib_workgener(KSHLIB *uip,SESMSG_GEN *mp)
 #if	CF_DEBUGN
 	    {
 		char	tbuf[TIMEBUFLEN+1] ;
-	        nprintf(NDF,"kshlib_workgener: m=>%t<\n",
+	        nprintf(NDF,"kshlib_workgener: m=>%r<\n",
 	            nbuf,strlinelen(nbuf,nl,50)) ;
 	        timestr_logz(st,tbuf) ;
 	        nprintf(NDF,"kshlib_workgener: t=%s\n",tbuf) ;
@@ -1795,7 +1795,7 @@ static int kshlib_workbiffer(KSHLIB *uip,SESMSG_BIFF *mp)
 	const int	esize = sizeof(STORENOTE) ;
 	int		rs ;
 #if	CF_DEBUGN
-	nprintf(NDF,"kshlib_workbiffer: m=>%t<\n",
+	nprintf(NDF,"kshlib_workbiffer: m=>%r<\n",
 	    mp->nbuf,strlinelen(mp->nbuf,-1,50)) ;
 #endif
 	if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
@@ -2590,7 +2590,7 @@ static int ndebugenv(cchar *s,cchar *ev[])
 	        int	i ;
 	        cchar	*dfn = NDF ;
 		cchar	*ep ;
-	        cchar	*fmt = "%s: e%03u=>%t<\n" ;
+	        cchar	*fmt = "%s: e%03u=>%r<\n" ;
 	        nprintf(dfn,"%s: env¬\n", s) ;
 	        for (i = 0 ; ev[i] != NULL ; i += 1) {
 	            ep = ev[i] ;
