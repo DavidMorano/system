@@ -42,11 +42,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<char.h>
@@ -1007,7 +1007,7 @@ static int procfile(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar fname[])
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            debugprintf("procfile: >%t<\n",lbuf,len) ;
+	            debugprintf("procfile: >%r<\n",lbuf,len) ;
 #endif
 
 /* fast forward past the search string */
@@ -1030,7 +1030,7 @@ static int procfile(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar fname[])
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
-	                debugprintf("procfile: remaining >%t<\n",sp,sl) ;
+	                debugprintf("procfile: remaining >%r<\n",sp,sl) ;
 #endif
 
 /* skip forward past and field terminators or white space */
@@ -1059,7 +1059,7 @@ static int procfile(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar fname[])
 
 #if	CF_DEBUG
 	                        if (DEBUGLEVEL(3))
-	                            debugprintf("procfile: i=%d f=>%t<\n",
+	                            debugprintf("procfile: i=%d f=>%r<\n",
 	                                i,fp,fl) ;
 #endif
 

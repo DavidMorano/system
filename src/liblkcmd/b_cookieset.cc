@@ -51,11 +51,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<ascii.h>
@@ -1058,7 +1058,7 @@ static int procfile(PROGINFO *pip,SHIO *ofp,cchar *fname,int fn,int f_eject)
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(2))
-	                    debugprintf("procfile: line=>%t<\n",sp,sl) ;
+	                    debugprintf("procfile: line=>%r<\n",sp,sl) ;
 #endif
 
 /* put out the stuff for this next cookie */
@@ -1074,7 +1074,7 @@ static int procfile(PROGINFO *pip,SHIO *ofp,cchar *fname,int fn,int f_eject)
 
 /* copy over the first line */
 
-	                shio_printf(ofp,"%t\n",sp,sl) ;
+	                shio_printf(ofp,"%r\n",sp,sl) ;
 
 /* copy over the lines until we reach the author line (if there is one) */
 
@@ -1093,7 +1093,7 @@ static int procfile(PROGINFO *pip,SHIO *ofp,cchar *fname,int fn,int f_eject)
 
 #if	CF_DEBUG
 	                    if (DEBUGLEVEL(2))
-	                        debugprintf("procfile: copy line=>%t<\n",
+	                        debugprintf("procfile: copy line=>%r<\n",
 				sp,sl) ;
 #endif
 
@@ -1101,7 +1101,7 @@ static int procfile(PROGINFO *pip,SHIO *ofp,cchar *fname,int fn,int f_eject)
 	                        ((sp[0] == '%') || 
 				(strncmp(sp,"\t\t--",4) == 0))) break ;
 
-	                    rs = shio_printf(ofp,"%t\n",sp,sl) ;
+	                    rs = shio_printf(ofp,"%r\n",sp,sl) ;
 
 	                    if (rs < 0) break ;
 	                } /* end while (skipping blank lines) */
@@ -1113,7 +1113,7 @@ static int procfile(PROGINFO *pip,SHIO *ofp,cchar *fname,int fn,int f_eject)
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(2))
-	                    debugprintf("procfile: AC line=>%t<\n",sp,sl) ;
+	                    debugprintf("procfile: AC line=>%r<\n",sp,sl) ;
 #endif
 
 	                if ((sl > 0) && (strncmp(sp,"\t\t--",4) == 0)) {
@@ -1131,7 +1131,7 @@ static int procfile(PROGINFO *pip,SHIO *ofp,cchar *fname,int fn,int f_eject)
 
 	                    if ((tp = strnchr(sp,sl,CH_LPAREN)) != NULL) {
 
-	                        shio_printf(ofp,"-- %t\n",sp,(tp - sp)) ;
+	                        shio_printf(ofp,"-- %r\n",sp,(tp - sp)) ;
 
 	                        shio_printf(ofp,".br\n") ;
 
@@ -1140,7 +1140,7 @@ static int procfile(PROGINFO *pip,SHIO *ofp,cchar *fname,int fn,int f_eject)
 
 #if	CF_DEBUG
 	                        if (DEBUGLEVEL(2))
-	                            debugprintf("procfile: rest A line=>%t<\n",
+	                            debugprintf("procfile: rest A line=>%r<\n",
 					cp, cl) ;
 #endif
 
@@ -1148,7 +1148,7 @@ static int procfile(PROGINFO *pip,SHIO *ofp,cchar *fname,int fn,int f_eject)
 	                            cl = tp - cp ;
 	                        }
 
-	                        shio_printf(ofp,"%t\n",cp,cl) ;
+	                        shio_printf(ofp,"%r\n",cp,cl) ;
 
 /* read lines until something makes us break out */
 
@@ -1167,13 +1167,13 @@ static int procfile(PROGINFO *pip,SHIO *ofp,cchar *fname,int fn,int f_eject)
 	                                sl = tp - sp ;
 	                            }
 
-	                            rs = shio_printf(ofp,"%t\n",sp,sl) ;
+	                            rs = shio_printf(ofp,"%r\n",sp,sl) ;
 
 	                            if (rs < 0) break ;
 	                        } /* end while */
 
 	                    } else {
-	                        shio_printf(ofp,"-- %t\n",sp,sl) ;
+	                        shio_printf(ofp,"-- %r\n",sp,sl) ;
 	                    }
 
 	                    shio_printf(ofp,".in -5\n") ;

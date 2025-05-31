@@ -51,11 +51,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<project.h>
@@ -1200,12 +1200,12 @@ static int procquery(PROGINFO *pip,void *ofp,cchar np[],int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("procquery: query=%t i=%d\n",
+	    debugprintf("procquery: query=%r i=%d\n",
 	        np,nl,ci) ;
 #endif
 
 	if (pip->debuglevel > 0) {
-	    shio_printf(pip->efp,"%s: query=%t(%d)\n",
+	    shio_printf(pip->efp,"%s: query=%r(%d)\n",
 	        pip->progname,np,nl,ci) ;
 	}
 

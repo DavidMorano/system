@@ -52,11 +52,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1425,7 +1425,7 @@ static int procword(PROGINFO *pip,void *ofp,cchar *fname)
 	                "shio_readintr() rs=%d\n",
 	                rs) ;
 	            if (rs >= 0)
-	                debugprintf("b_dhtext/procword: d=>%t<\n",
+	                debugprintf("b_dhtext/procword: d=>%r<\n",
 	                    lbuf,strlinelen(lbuf,len,40)) ;
 	        }
 #endif
@@ -1442,7 +1442,7 @@ static int procword(PROGINFO *pip,void *ofp,cchar *fname)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
-	                debugprintf("b_dhtext/procword: c=>%t<\n",
+	                debugprintf("b_dhtext/procword: c=>%r<\n",
 	                    lbuf,strlinelen(lbuf,len,40)) ;
 #endif
 
@@ -1688,7 +1688,7 @@ static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar lbuf[],int llen)
 	                    "maxcols=%u ll=%u\n",
 	                    maxcols,ll) ;
 	                debugprintf("b_dhtext/locinfo_termoutprint: "
-	                    "l=>%t<\n",
+	                    "l=>%r<\n",
 	                    lp,strlinelen(lp,ll,40)) ;
 	            }
 #endif /* CF_DEBUG */

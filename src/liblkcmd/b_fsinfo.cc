@@ -47,12 +47,12 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/statvfs.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -95,7 +95,7 @@ extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	statvfsdir(cchar *,struct statvfs *) ;
+extern int	statvfsdir(cchar *,STATVFS *) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	isdigitlatin(int) ;
@@ -133,7 +133,7 @@ struct locinfo_flags {
 struct locinfo {
 	PROGINFO	*pip ;
 	LOCINFO_FL	f, init ;
-	struct statvfs	fss ;
+	STATVFS	fss ;
 	cchar		*homedname ;	/* allocated */
 	cchar		*filepath ;
 } ;
@@ -1041,7 +1041,7 @@ static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
 static int procspec(PROGINFO *pip,void *ofp,cchar *rp,int rl)
 {
 	LOCINFO		*lip = pip->lip ;
-	struct statvfs	*fssp = &lip->fss ;
+	STATVFS	*fssp = &lip->fss ;
 	LONG		vt ;
 	LONG		v = -1 ;
 	const int	cvtlen = CVTBUFLEN ;
@@ -1054,7 +1054,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *rp,int rl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_fsinfo/procspec: req=>%t<\n",rp,rl) ;
+	    debugprintf("b_fsinfo/procspec: req=>%r<\n",rp,rl) ;
 #endif
 
 	if (rl < 0) rl = strlen(rp) ;
@@ -1082,10 +1082,10 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *rp,int rl)
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
 	    if (ri >= 0) {
-		fmt = "%s: spec=%t (%d)\n" ;
+		fmt = "%s: spec=%r (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,rp,rl,ri) ;
 	    } else {
-		fmt = "%s: spec=%t notfound\n" ;
+		fmt = "%s: spec=%r notfound\n" ;
 	        shio_printf(pip->efp,fmt,pn,rp,rl) ;
 	    }
 	}
