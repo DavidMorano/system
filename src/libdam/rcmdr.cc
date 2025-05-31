@@ -137,7 +137,7 @@ int		*fd2p ;
 #if	CF_DEBUGS
 	debugprintf("rcmdr: rhost=%s\n",rhost) ;
 	debugprintf("rcmdr: ruser=%s\n",ruser) ;
-	debugprintf("rcmdr: cmd=>%t<\n",
+	debugprintf("rcmdr: cmd=>%r<\n",
 	    cmd,strlinelen(cmd,-1,50)) ;
 #endif
 

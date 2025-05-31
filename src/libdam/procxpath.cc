@@ -104,7 +104,7 @@ int procxpath(VECSTR *lp,cchar *fname)
 {
 
 #if	CF_STAT
-	struct ustat	sb ;
+	USTAT		sb ;
 #endif
 
 	FIELD		fsb ;
@@ -135,7 +135,7 @@ int procxpath(VECSTR *lp,cchar *fname)
 	        lbuf[len] = '\0' ;
 
 #if	CF_DEBUGS
-	        debugprintf("procxpath: line> %t\n",lbuf,len) ;
+	        debugprintf("procxpath: line> %r\n",lbuf,len) ;
 #endif
 
 	        cp = lbuf ;
@@ -156,7 +156,7 @@ int procxpath(VECSTR *lp,cchar *fname)
 
 #if	CF_DEBUGS
 	                debugprintf("procxpath: flen=%d\n",fsb.flen) ;
-	                debugprintf("procxpath: 1 field> %t\n",fp,fl) ;
+	                debugprintf("procxpath: 1 field> %r\n",fp,fl) ;
 #endif
 
 	                pp = fp ;
@@ -190,7 +190,7 @@ int procxpath(VECSTR *lp,cchar *fname)
 	                if (f_add && (vecstr_findn(lp,pp,pl) == SR_NOTFOUND)) {
 
 #if	CF_DEBUGS
-	                    debugprintf("procxpath: add=%t\n",pp,pl) ;
+	                    debugprintf("procxpath: add=%r\n",pp,pl) ;
 #endif
 
 #if	CF_STAT
