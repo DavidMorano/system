@@ -1938,7 +1938,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                c += 1 ;
 	            } else {
 	                cchar	*pn = pip->progname ;
-	                cchar	*fmt = "%s: invalid key=>%t<\n" ;
+	                cchar	*fmt = "%s: invalid key=>%r<\n" ;
 	                shio_printf(pip->efp,fmt,pn,kp,kl) ;
 	                rs = SR_INVALID ;
 	            }
@@ -2624,7 +2624,7 @@ static int procbacks(PROGINFO *pip)
 	    char	pbuf[MAXPATHLEN+1] ;
 
 	    if (pip->debuglevel > 0) {
-	        fmt = "%s: execname=%t\n" ;
+	        fmt = "%s: execname=%r\n" ;
 	        shio_printf(pip->efp,fmt,pn,ebuf,el) ;
 	    }
 
@@ -2637,7 +2637,7 @@ static int procbacks(PROGINFO *pip)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("b_homepage/procbacks: ebuf=%t\n",ebuf,el) ;
+	        debugprintf("b_homepage/procbacks: ebuf=%r\n",ebuf,el) ;
 #endif
 
 	    if ((rs = prgetprogpath(pip->pr,pbuf,ebuf,el)) > 0) {
@@ -3669,7 +3669,7 @@ SVCFILE_ENT *sep)
 	    int		hl ;
 	    debugprintf("procdocbodymain_svcer: svc=%s\n",sep->svc) ;
 	    if ((hl = svckv_val(sep->keyvals,n,"h",&hp)) > 0) {
-	        debugprintf("procdocbodymain_svcer: h=>%t<\n",hp,hl) ;
+	        debugprintf("procdocbodymain_svcer: h=>%r<\n",hp,hl) ;
 	    }
 	}
 #endif /* CF_DEBUG */
@@ -3827,7 +3827,7 @@ static int procdocbodymain_svcerfiler(PROGINFO *pip,HTM *hdp,GATHER *glp,
 	    cchar	*t ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
-	        debugprintf("procdocbodymain_svcerfile: t=>%t<\n",vp,vl) ;
+	        debugprintf("procdocbodymain_svcerfile: t=>%r<\n",vp,vl) ;
 #endif
 	    if ((rs = nulstr_start(&ts,vp,vl,&t)) >= 0) {
 	        cchar	*svc = sep->svc ;
@@ -4121,7 +4121,7 @@ static int gather_file(GATHER *glp,cchar *svc,int f_to,cchar *fp,int fl)
 #if	CF_DEBUGS
 	debugprintf("b_homepage/gather_file: ent\n") ;
 	debugprintf("b_homepage/gather_file: svc=%s\n",svc) ;
-	debugprintf("b_homepage/gather_file: fn=%t\n",fp,fl) ;
+	debugprintf("b_homepage/gather_file: fn=%r\n",fp,fl) ;
 #endif
 
 	if (glp == NULL) return SR_FAULT ;
@@ -4265,7 +4265,7 @@ static int filedat_start(FILEDAT *fep,PROGINFO *pip,cchar *tt,int cols,
 
 #if	CF_DEBUGS
 	debugprintf("b_homepage/filedat_start: ent svc=%s\n",svc) ;
-	debugprintf("b_homepage/filedat_start: fn=%t\n",fp,fl) ;
+	debugprintf("b_homepage/filedat_start: fn=%r\n",fp,fl) ;
 #endif
 
 	memclear(fep) ;
@@ -4616,7 +4616,7 @@ static int filedat_workreadtermline(FILEDAT *fep,TERMOUT *top,char *rp,
 	int		rs ;
 	int		rl = 0 ;
 #if	CF_DEBUGS
-	debugprintf("filedat_workreadtermline: ent l=>%t<\n",
+	debugprintf("filedat_workreadtermline: ent l=>%r<\n",
 	    lbuf,strlinelen(lbuf,len,40)) ;
 #endif
 	if ((rs = termout_load(top,lbuf,len)) >= 0) {
@@ -4630,7 +4630,7 @@ static int filedat_workreadtermline(FILEDAT *fep,TERMOUT *top,char *rp,
 	        ll = termout_getline(top,i,&lp) ;
 	        if (ll < 0) break ;
 #if	CF_DEBUGS
-	        debugprintf("filedat_workreadtermline: l=>%t<\n",
+	        debugprintf("filedat_workreadtermline: l=>%r<\n",
 	            lp,strlinelen(lp,ll,30)) ;
 #endif
 	        if (lenrem > 0) {
@@ -4871,7 +4871,7 @@ static int locinfo_sethead(LOCINFO *lip,cchar *vp,int vl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("main/locinfo_sethead: v=%t\n",vp,vl) ;
+	    debugprintf("main/locinfo_sethead: v=%r\n",vp,vl) ;
 #endif
 
 	if (lip->hfname == NULL) {
@@ -4881,7 +4881,7 @@ static int locinfo_sethead(LOCINFO *lip,cchar *vp,int vl)
 	        cchar	**vpp = &lip->hfname ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            debugprintf("main/locinfo_sethead: tbuf=%t\n",tbuf,rs) ;
+	            debugprintf("main/locinfo_sethead: tbuf=%r\n",tbuf,rs) ;
 #endif
 	        rs = locinfo_setentry(lip,vpp,tbuf,rs) ;
 	    }
@@ -4954,12 +4954,12 @@ static int locinfo_svclistadds(LOCINFO *lip,cchar *sp,int sl)
 	if (pip == NULL) return SR_FAULT ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_homepage/locinfo_svclistadds: s=>%t<\n",sp,sl) ;
+	    debugprintf("b_homepage/locinfo_svclistadds: s=>%r<\n",sp,sl) ;
 #endif
 	while ((tp = strnchr(sp,sl,',')) != NULL) {
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("b_homepage/locinfo_svclistadds: svc=>%t<\n",
+	        debugprintf("b_homepage/locinfo_svclistadds: svc=>%r<\n",
 	            sp,(tp-sp)) ;
 #endif
 	    if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
@@ -4995,7 +4995,7 @@ static int locinfo_svclistadd(LOCINFO *lip,cchar *vp,int vl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("main/locinfo_svclistadd: v=%t\n",vp,vl) ;
+	    debugprintf("main/locinfo_svclistadd: v=%r\n",vp,vl) ;
 #endif
 
 	if (lip->svcs == NULL) {
@@ -5013,7 +5013,7 @@ static int locinfo_svclistadd(LOCINFO *lip,cchar *vp,int vl)
 	        if ((sl = sfnextbrk(vp,vl,st,&sp)) < 0) break ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            debugprintf("main/locinfo_svclistadd: s=>%t<\n",sp,sl) ;
+	            debugprintf("main/locinfo_svclistadd: s=>%r<\n",sp,sl) ;
 #endif
 	        if (sl > 0) {
 	            lip->have.svcs = TRUE ;
@@ -6319,7 +6319,7 @@ static int config_reader(CONFIG *csp,PARAMFILE *pfp)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
-	                debugprintf("config_reader: vbuf=>%t<\n",vbuf,vl) ;
+	                debugprintf("config_reader: vbuf=>%r<\n",vbuf,vl) ;
 #endif
 
 	            ebuf[0] = '\0' ;
@@ -6331,7 +6331,7 @@ static int config_reader(CONFIG *csp,PARAMFILE *pfp)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
-	                debugprintf("config_reader: ebuf=>%t<\n",ebuf,el) ;
+	                debugprintf("config_reader: ebuf=>%r<\n",ebuf,el) ;
 #endif
 
 	            if ((rs >= 0) && (el > 0)) {
@@ -6514,7 +6514,7 @@ static int mkourname(PROGINFO *pip,char *rbuf,cchar *inter,cchar *sp,int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_homepage/mkourname: ent int=%s s=%t\n",
+	    debugprintf("b_homepage/mkourname: ent int=%s s=%r\n",
 	        inter,sp,sl) ;
 #endif
 

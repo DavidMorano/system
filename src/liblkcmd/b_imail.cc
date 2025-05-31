@@ -83,7 +83,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/wait.h>		/* for 'WIFEXITED(3c)' */
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<utime.h>
@@ -2843,7 +2843,7 @@ static int procspec(PROGINFO *pip,cchar np[],int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_imail/procspec: name=%t\n",np,nl) ;
+	    debugprintf("b_imail/procspec: name=%r\n",np,nl) ;
 #endif
 
 	if (nl < 0)
@@ -2891,7 +2891,7 @@ static int procloadname(PROGINFO *pip,cchar np[],int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("main/loadrecip: ent rn=%t\n",np,nl) ;
+	    debugprintf("main/loadrecip: ent rn=%r\n",np,nl) ;
 #endif
 
 	if (nl < 0) nl = strlen(np) ;
@@ -4133,10 +4133,10 @@ int		mi ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
-	            debugprintf("b_imail/procmsgenv: env a=>%t<\n",cp,cl) ;
+	            debugprintf("b_imail/procmsgenv: env a=>%r<\n",cp,cl) ;
 #endif
 
-	        logfile_printf(&pip->envsum,"%4d:%2d F %t",
+	        logfile_printf(&pip->envsum,"%4d:%2d F %r",
 	            pip->msgn,i,
 	            ((cp != nullptr) ? cp : "*NA*"),cl) ;
 
@@ -4145,10 +4145,10 @@ int		mi ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
-	            debugprintf("b_imail/procmsgenv: env d=>%t<\n",cp,cl) ;
+	            debugprintf("b_imail/procmsgenv: env d=>%r<\n",cp,cl) ;
 #endif
 
-	        logfile_printf(&pip->envsum,"%4d:%2d D %t",
+	        logfile_printf(&pip->envsum,"%4d:%2d D %r",
 	            pip->msgn,i,
 	            cp,cl) ;
 
@@ -4157,11 +4157,11 @@ int		mi ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
-	            debugprintf("b_imail/procmsgenv: env r=>%t<\n",cp,cl) ;
+	            debugprintf("b_imail/procmsgenv: env r=>%r<\n",cp,cl) ;
 #endif
 
 	        if ((cp != nullptr) && (cp[0] != '\0')) {
-	            logfile_printf(&pip->envsum,"%4d:%2d R %t",
+	            logfile_printf(&pip->envsum,"%4d:%2d R %r",
 	                pip->msgn,i,
 	                cp,cl) ;
 		}
@@ -4224,7 +4224,7 @@ int		mi ;
 
 	    if (pip->open.logprog && pip->f.logprogmsg) {
 	        proglog_printf(pip,"  | %-25s", datebuf) ;
-	        proglog_printf(pip,"  |   %c %t",
+	        proglog_printf(pip,"  |   %c %r",
 	            atypes[atype],addr,MIN(al,(LOGLINELEN - TABLEN))) ;
 	    }
 
@@ -4242,7 +4242,7 @@ int		mi ;
 	    strwcpy(mip->e_from,addrbuf,MAILADDRLEN) ;
 
 	    if (pip->open.logprog && pip->f.logprogmsg) {
-	        proglog_printf(pip,"  > %t",
+	        proglog_printf(pip,"  > %r",
 	            addrbuf,MIN(sal,(LOGLINELEN - 4))) ;
 	    }
 
@@ -4502,7 +4502,7 @@ static int procmsgbody(PROGINFO *pip,filer *fbp,int mi)
 	        if ((tp = strnchr(bp,mlen,'\n')) != nullptr) {
 	            tlen = ((tp + 1) - bp) ;
 	        }
-	        debugprintf("b_imail/procmsgbody: b=>%t<\n",
+	        debugprintf("b_imail/procmsgbody: b=>%r<\n",
 	            bp,strlinelen(bp,tlen,50)) ;
 	    }
 #endif /* CF_DEBUG */
@@ -4706,7 +4706,7 @@ static int procmsghdr_all(PROGINFO *pip,filer *fbp,int mi,MSGOPTS *optp)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
-	        debugprintf("b_imail/procmsghdr_all: hdr=%t\n",kp,kl) ;
+	        debugprintf("b_imail/procmsghdr_all: hdr=%r\n",kp,kl) ;
 #endif
 
 	    if (matcasestr(skiphdrs,kp,kl) < 0) {
@@ -4715,7 +4715,7 @@ static int procmsghdr_all(PROGINFO *pip,filer *fbp,int mi,MSGOPTS *optp)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
-	                debugprintf("b_imail/procmsghdr_all: hdr=%t f_nz=%u\n",
+	                debugprintf("b_imail/procmsghdr_all: hdr=%r f_nz=%u\n",
 	                    kp,kl,f_nz) ;
 #endif
 
@@ -5629,7 +5629,7 @@ static int procmsghdr(PROGINFO *pip,filer *fbp,int mi,cchar kn[],int f_nz)
 	                    if (DEBUGLEVEL(5)) {
 	                        debugprintf("b_imail/procmsghdr: "
 	                            "hi=%d hj=%d hc=%d\n",i,j,c) ;
-	                        debugprintf("b_imail/procmsghdr_: l=>%t<\n",
+	                        debugprintf("b_imail/procmsghdr_: l=>%r<\n",
 	                            cp,strlinelen(cp,cl,50)) ;
 	                    }
 #endif
@@ -5728,7 +5728,7 @@ int		f_nz ;
 	            if (DEBUGLEVEL(5)) {
 	                debugprintf("procmsginsthdr: hi=%d hj=%d hc=%d\n",
 	                    hi,j,c) ;
-	                debugprintf("procmsginsthdr: l=>%t<\n",
+	                debugprintf("procmsginsthdr: l=>%r<\n",
 	                    cp,strlinelen(cp,cl,50)) ;
 	            }
 #endif
@@ -5788,7 +5788,7 @@ int		ll ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("procprinthdr_line: ent l=>%t<\n",
+	    debugprintf("procprinthdr_line: ent l=>%r<\n",
 	        lp,strlinelen(lp,ll,50)) ;
 #endif
 
@@ -5889,7 +5889,7 @@ static int procprinthdr(PROGINFO *pip,filer *fbp,cchar *kn,cchar *hp,int hl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("procprinthdr: h=>%t<\n",
+	    debugprintf("procprinthdr: h=>%r<\n",
 	        hp,strlinelen(hp,hl,50)) ;
 #endif
 
@@ -6367,7 +6367,7 @@ static int proclogmsg_mailer(PROGINFO *pip,int mi)
 	            int		n ;
 	            n = (LOGFILE_FMTLEN-pl-2) ;
 	            if (hl <= n) {
-	                cchar	*fmt = "  xmailer=>%t<" ;
+	                cchar	*fmt = "  xmailer=>%r<" ;
 	                rs = proglog_printf(pip,fmt,hp,hl) ;
 	            } else {
 	                rs = proglog_printfold(pip,pre,hp,hl) ;
@@ -6396,7 +6396,7 @@ static int proclogmsg_priority(PROGINFO *pip,int mi)
 	        if (hp != nullptr) {
 	            cint	ml = (LOGFILE_FMTLEN-8) ;
 	            int		rs1 ;
-	            cchar	*fmt = "  xpriority=%t" ;
+	            cchar	*fmt = "  xpriority=%r" ;
 	            rs1 = proglog_printf(pip,fmt,hp,MIN(ml,hl)) ;
 	            if (rs1 >= 0) rs = rs1 ;
 	        }
@@ -6434,14 +6434,14 @@ static int proclogmsg_org(PROGINFO *pip,int mi)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
-	        debugprintf("imail/proclogmsg_org: hl=%d h=>%t<\n",
+	        debugprintf("imail/proclogmsg_org: hl=%d h=>%r<\n",
 	            hl,hp,strlinelen(hp,hl,50)) ;
 #endif
 
 	    if ((rs >= 0) && (hp != nullptr) && (hl > 0)) {
 	        int	rs1 ;
 	        ml = (LOGFILE_FMTLEN - 8) ;
-	        rs1 = proglog_printf(pip,"  org=>%t<",hp,MIN(ml,hl)) ;
+	        rs1 = proglog_printf(pip,"  org=>%r<",hp,MIN(ml,hl)) ;
 	        if (rs1 >= 0) rs = rs1 ;
 	    }
 
@@ -6578,12 +6578,12 @@ static int proclogmsg_addrema(PROGINFO *pip,int mi,cchar *kn,EMA_ENT *ep,int m)
 	        int		dl = al ;
 	        cchar		*dp = ap ;
 	        debugprintf("b_imail/proclogmsg_addrema: al=%u\n",al) ;
-	        debugprintf("b_imail/proclogmsg_addrema: a0=>%t<\n",
+	        debugprintf("b_imail/proclogmsg_addrema: a0=>%r<\n",
 	            dp,strlinelen(dp,dl,40)) ;
 	        dp += 40 ;
 	        dl -= 40 ;
 	        if (dl > 0) {
-	            debugprintf("b_imail/proclogmsg_addrema: a1=>%t<\n",
+	            debugprintf("b_imail/proclogmsg_addrema: a1=>%r<\n",
 	                dp,strlinelen(dp,dl,40)) ;
 	        }
 	    }
@@ -6599,7 +6599,7 @@ static int proclogmsg_addrema(PROGINFO *pip,int mi,cchar *kn,EMA_ENT *ep,int m)
 	            int		n ;
 	            n = (LOGFILE_FMTLEN-pl-2) ;
 	            if (al <= n) {
-	                rs1 = proglog_printf(pip,"%s%t",pbuf,ap,al) ;
+	                rs1 = proglog_printf(pip,"%s%r",pbuf,ap,al) ;
 	            } else {
 	                rs1 = proglog_printfold(pip,pbuf,ap,al) ;
 	            }
@@ -6612,11 +6612,11 @@ static int proclogmsg_addrema(PROGINFO *pip,int mi,cchar *kn,EMA_ENT *ep,int m)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("b_imail/proclogmsg_addrema: c=>%t<\n",
+	            debugprintf("b_imail/proclogmsg_addrema: c=>%r<\n",
 	                ep->cp,ep->cl) ;
 #endif
 
-	        fmt = (ep->cl > maxnamelen) ? "    (%t¬)" : "    (%s)" ;
+	        fmt = (ep->cl > maxnamelen) ? "    (%r¬)" : "    (%s)" ;
 	        rs1 = proglog_printf(pip,fmt,ep->cp,(maxnamelen-1)) ;
 
 	    } /* end if */
@@ -6649,7 +6649,7 @@ static int proclogmsg_midhelp(PROGINFO *pip,MSGDATA *mdp)
 #endif
 	    n = (LOGFILE_FMTLEN-pl-2) ;
 	    if (vl <= n) {
-	        cchar	*fmt = "  mid=%t" ;
+	        cchar	*fmt = "  mid=%r" ;
 	        proglog_printf(pip,fmt,vp,vl) ;
 	    } else {
 	        proglog_printfold(pip,pre,vp,vl) ;
@@ -6840,7 +6840,7 @@ static int proclogmsg_subj(PROGINFO *pip,int mi)
 
 	    if ((rs >= 0) && (hl >= 0) && (hp != nullptr)) {
 	        ml = (LOGFILE_FMTLEN - 12) ;
-	        proglog_printf(pip,"  subj=>%t<",hp,MIN(ml,hl)) ;
+	        proglog_printf(pip,"  subj=>%r<",hp,MIN(ml,hl)) ;
 	    }
 
 	} /* end if (logging) */
@@ -7129,7 +7129,7 @@ static int locinfo_mailerprog(LOCINFO *lip)
 	        cchar	*cp ;
 	        debugprintf("b_imail/locinfo_mailerprog: path¬\n") ;
 	        for (i = 0 ; vecstr_get(plp,i,&cp) >= 0 ; i += 1) {
-	            debugprintf("b_imail/locinfo_mailerprog: p%u=%t\n",
+	            debugprintf("b_imail/locinfo_mailerprog: p%u=%r\n",
 	                i,cp,strlinelen(cp,-1,50)) ;
 	        }
 	    }
@@ -7249,7 +7249,7 @@ static int locinfo_setcmb(LOCINFO *lip,cchar *vp,int vl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_imail/locinfo_setcmb: v=%t\n",vp,vl) ;
+	    debugprintf("b_imail/locinfo_setcmb: v=%r\n",vp,vl) ;
 #endif
 
 	if (vl > 0) {
@@ -7796,7 +7796,7 @@ static int locinfo_loadrecip(LOCINFO *lip,cchar *np,int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("b_imail/locinfo_loadrecip: recip=%t\n",np,nl) ;
+	    debugprintf("b_imail/locinfo_loadrecip: recip=%r\n",np,nl) ;
 #endif
 
 	rs = setostr_add(&lip->recips,np,nl) ;
@@ -8109,7 +8109,7 @@ static int locinfo_cvtdate(LOCINFO *lip,char tbuf[],cchar *hp,int hl)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
-	        debugprintf("b_imail/locinfo_cvtdate: ds=>%t<\n",
+	        debugprintf("b_imail/locinfo_cvtdate: ds=>%r<\n",
 	            hp,strlinelen(hp,hl,50)) ;
 #endif
 
@@ -8204,7 +8204,7 @@ static int locinfo_xmailer(LOCINFO *lip)
 	    if (op == nullptr) op = pip->domainname ;
 	    ol = strlen(op) ;
 	    while (ol && ishigh(op[ol-1])) ol -= 1 ;
-	    fmt = (ol) ? "%s-%s (%t)" : "%s-%s" ;
+	    fmt = (ol) ? "%s-%s (%r)" : "%s-%s" ;
 	    if ((rl = bufprintf(rbuf,rlen,fmt,sn,pv,op,ol)) >= 0) {
 	        cchar	**vpp = &lip->xmailer ;
 	        rs = locinfo_setentry(lip,vpp,rbuf,rl) ;
@@ -9021,7 +9021,7 @@ static int config_reader(CONFIG *cfp)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("b_imail/config_read: enum k=%t\n",kp,kl) ;
+	            debugprintf("b_imail/config_read: enum k=%r\n",kp,kl) ;
 #endif
 
 	        if ((oi = matpstr(params,2,kp,kl)) >= 0) {
@@ -9409,7 +9409,7 @@ static int msgdata_procsender(MSGDATA *mdp,LOCINFO *lip)
 	        int	si = 0 ;
 	        fl = rs ;
 #if	CF_DEBUGS
-	        debugprintf("b_imail/msgdata_procsender: fl=%d f=>%t<\n",
+	        debugprintf("b_imail/msgdata_procsender: fl=%d f=>%r<\n",
 	            fl,fp,fl) ;
 #endif
 	        if (mdp->naddrs[msgloghdr_sender] > 0) {
@@ -9419,7 +9419,7 @@ static int msgdata_procsender(MSGDATA *mdp,LOCINFO *lip)
 	            while ((sl = ema_getbestaddr(slp,si,&sp)) >= 0) {
 #if	CF_DEBUGS
 	                debugprintf("b_imail/msgdata_procsender: i=%u\n") ;
-	                debugprintf("b_imail/msgdata_procsender: sl=%d s=?%t<\n",
+	                debugprintf("b_imail/msgdata_procsender: sl=%d s=?%r<\n",
 	                    sl,sp,sl) ;
 #endif
 	                if (sl > 0) {

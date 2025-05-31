@@ -44,8 +44,8 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
 
 #include	<usystem.h>
@@ -1098,7 +1098,7 @@ int prochost(PROGINFO *pip,PARAMOPT *pop,void *ofp,cchar *hp,int hl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("prochost: ent h=%t\n",hp,hl) ;
+	    debugprintf("prochost: ent h=%r\n",hp,hl) ;
 #endif
 
 	if ((rs = nulstr_start(&s,hp,hl,&hn)) >= 0) {

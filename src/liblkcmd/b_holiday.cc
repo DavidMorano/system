@@ -48,11 +48,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 
 #include	<usystem.h>
@@ -448,7 +448,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    argl = strlen(argp) ;
 
 #if	CF_DEBUGN
-	    nprintf(NDEBFNAME,"b_holiday: a=>%t<\n",argp,argl) ;
+	    nprintf(NDEBFNAME,"b_holiday: a=>%r<\n",argp,argl) ;
 #endif
 
 	    f_optminus = (*argp == '-') ;
@@ -1464,7 +1464,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_holiday/procspec: spec>%t<\n",sp,sl) ;
+	    debugprintf("b_holiday/procspec: spec>%r<\n",sp,sl) ;
 #endif
 
 	if ((sp[0] == '+') || (sp[0] == '-')) {
@@ -1496,7 +1496,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 	            wlen += rs ;
 	        } else {
 	            if (lip->f.interactive) {
-	                cchar	*fmt = "citation=>%t< invalid\n" ;
+	                cchar	*fmt = "citation=>%r< invalid\n" ;
 	                rs = shio_printf(lip->ofp,fmt,sp,sl) ;
 	            }
 	        } /* end if */
@@ -1505,7 +1505,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 	} /* end if */
 
 	if ((rs < 0) && isNotGoodCite(rs) && lip->f.interactive) {
-	    fmt = "invalid citation=>%t< (%d)\n" ;
+	    fmt = "invalid citation=>%r< (%d)\n" ;
 	    rs = shio_printf(lip->ofp,fmt,sp,sl,rs) ;
 	}
 
@@ -1875,7 +1875,7 @@ static int procoutenters(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 
 	    if (lip->f.monthname) {
 	        const char	*mon = calstrs_months[qp->m] ;
-	        rs = bufprintf(citebuf,CITEBUFLEN,"%t-%02u",mon,3,qp->d) ;
+	        rs = bufprintf(citebuf,CITEBUFLEN,"%r-%02u",mon,3,qp->d) ;
 	        cl = rs ;
 	    } else {
 	        const int	m = (qp->m + 1) ;
@@ -1885,7 +1885,7 @@ static int procoutenters(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 
 	    if (rs >= 0) {
 	        if (lip->f.citebreak) {
-	            rs = shio_printf(lip->ofp,"%t\n",citebuf,cl) ;
+	            rs = shio_printf(lip->ofp,"%r\n",citebuf,cl) ;
 	            wlen += rs ;
 	            line += 1 ;
 	        } else {
@@ -1901,7 +1901,7 @@ static int procoutenters(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
 	                    debugprintf("b_holiday/procoutents: "
-	                        "m line=>%t<¬\n",
+	                        "m line=>%r<¬\n",
 	                        cbuf,strnlen(cbuf,MIN(cl,40))) ;
 #endif
 
@@ -1925,7 +1925,7 @@ static int procoutenters(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 #if	CF_DEBUG
 	                    if (DEBUGLEVEL(4))
 	                        debugprintf("b_holiday/procoutents: "
-	                            "e line=>%t<¬\n",
+	                            "e line=>%r<¬\n",
 	                            cbuf,strnlen(cbuf,MIN(cl,40))) ;
 #endif
 
@@ -1962,7 +1962,7 @@ static int procoutline(PROGINFO *pip,int line,cchar *lp,int ll)
 	int		wlen = 0 ;
 
 	indent = MIN(lip->indent,NBLANKS) ;
-	rs = shio_printf(lip->ofp,"%t%t\n",blanks,indent,lp,ll) ;
+	rs = shio_printf(lip->ofp,"%r%r\n",blanks,indent,lp,ll) ;
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;

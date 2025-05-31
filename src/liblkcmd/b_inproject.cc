@@ -42,12 +42,12 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<getbufsize.h>
@@ -940,14 +940,14 @@ static int procname(PROGINFO *pip,void *ofp,cchar *np,int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_inproject/procname: name=%t\n",np,nl) ;
+	    debugprintf("b_inproject/procname: name=%r\n",np,nl) ;
 #endif
 
 	if ((rs = locinfo_inproj(lip,np,nl)) >= 0) {
 	    f = (rs > 0) ;
 
 	    if (pip->verboselevel > 1) {
-	        rs = shio_printf(ofp,"%-3s %t\n",
+	        rs = shio_printf(ofp,"%-3s %r\n",
 	            ((f) ? "YES" : "NO"),np,nl) ;
 	    }
 

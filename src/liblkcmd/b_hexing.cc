@@ -44,8 +44,8 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
 
 #include	<usystem.h>
@@ -1060,7 +1060,7 @@ static int procfile(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 
 	if ((rs >= 0) && (pip->debuglevel > 0)) {
 	    cchar	*pn = pip->progname ;
-	    cchar	*fmt = "%s: %t %d\n" ;
+	    cchar	*fmt = "%s: %r %d\n" ;
 	    shio_printf(pip->efp,fmt,pn,np,nl,wlen) ;
 	}
 
