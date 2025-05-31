@@ -38,11 +38,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<dlfcn.h>
-#include	<string.h>
-#include	<stdarg.h>
+#include	<cstring>
+#include	<cstdarg>
 
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -68,8 +68,6 @@
 extern int	snwcpy(char *,int,const char *,int) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	matstr(const char **,const char *,int) ;
-
-extern int	format(char *,int,int,const char *,va_list) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;

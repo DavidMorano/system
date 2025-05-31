@@ -34,10 +34,10 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
-#include	<string.h>
-#include	<stdarg.h>
+#include	<cstring>
+#include	<cstdarg>
 
 #include	<usystem.h>
 #include	<localmisc.h>
