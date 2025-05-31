@@ -36,11 +36,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<getbufsize.h>
@@ -1124,7 +1124,7 @@ static int procusers_begin(PROGINFO *pip,PU *pup) noex {
 	    cint	uhlen = pup->plen ;
 	    if ((rs = procuhdir(pip,pup->uhbuf,uhlen,uh)) >= 0) {
 		cmode	om = SYSMODE ;
-	        char		*uf = pup->utfname ;
+	        char	*uf = pup->utfname ;
 	        pup->uhl = rs ;
 	        if ((rs = proctmpfile(pip,uf,sd,om)) >= 0) {
 		    rs = procusers_beginer(pip,pup,sd,om) ;
@@ -1132,8 +1132,9 @@ static int procusers_begin(PROGINFO *pip,PU *pup) noex {
 	                uc_unlink(pup->utfname) ;
 	        } /* end if (tmp-file) */
 	    } /* end if (proc-user-dir) */
-	    if (rs < 0)
+	    if (rs < 0) {
 		procusers_allocend(pip,pup) ;
+	    }
 	} /* end if (procusers_allocbegin) */
 
 	return rs ;
@@ -1145,40 +1146,41 @@ static int procusers_allocbegin(PROGINFO *pip,PU *pup) noex {
 	cint		plen = MAXPATHLEN ;
 	int		rs ;
 	int		llen ;
-	int		size = 0 ;
-	char		*bp ;
+	int		sz = 0 ;
 	if (pip == nullptr) return SR_FAULT ;
-	llen = (pwlen+LINEBUFLEN) ;
-	size += (pwlen+1) ;
-	size += (3*(plen+1)) ;
-	size += (llen+1) ;
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
+	llen = (pwlen + LINEBUFLEN) ;
+	sz += (pwlen + 1) ;
+	sz += (3 * (plen + 1)) ;
+	sz += (llen + 1) ;
+	if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    pup->a = bp ;
-	    pup->pwbuf = bp ; bp += (pwlen+1) ;
+	    pup->pwbuf = bp ; bp += (pwlen + 1) ;
 	    pup->pwlen = pwlen ;
-	    pup->uhbuf = bp ; bp += (plen+1) ;
-	    pup->utfname = bp ; bp += (plen+1) ;
-	    pup->ptfname = bp ; bp += (plen+1) ;
+	    pup->uhbuf = bp ; bp += (plen + 1) ;
+	    pup->utfname = bp ; bp += (plen + 1) ;
+	    pup->ptfname = bp ; bp += (plen + 1) ;
 	    pup->plen = plen ;
-	    pup->lbuf = bp ; bp += (llen+1) ;
+	    pup->lbuf = bp ; bp += (llen + 1) ;
 	    pup->llen = llen ;
-	}
+	} /* end if (memory-ållocation) */
 	return rs ;
 }
 /* end subroutines (procusers_allocbegin) */
 
 static int procusers_allocend(PROGINFO *pip,PU *pup) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (pip == nullptr) return SR_FAULT ;
-	if (pup->a != nullptr) {
-	    rs1 = uc_free(pup->a) ;
-	    if (rs >= 0) rs = rs1 ;
-	    pup->a = nullptr ;
-	    pup->pwlen = 0 ;
-	    pup->plen = 0 ;
-	    pup->llen = 0 ;
-	}
+	if (pip) {
+	    rs = SR_OK ;
+	    if (pup->a) {
+	        rs1 = uc_free(pup->a) ;
+	        if (rs >= 0) rs = rs1 ;
+	        pup->a = nullptr ;
+	        pup->pwlen = 0 ;
+	        pup->plen = 0 ;
+	        pup->llen = 0 ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutines (procusers_allocend) */
@@ -1198,29 +1200,29 @@ static int procusers_beginer(PROGINFO *pip,PU *pup,cc *sd,mode_t om) noex {
 			bclose(&pup->ptfile) ;
 		    }
 		} /* end if (bopenmod) */
-	 	if (rs < 0)
+	 	if (rs < 0) {
 	 	    uc_unlink(pup->ptfname) ;
+		}
 	    } /* end if (tmp-file) */
-	    if (rs < 0)
+	    if (rs < 0) {
 		bclose(&pup->utfile) ;
+	    }
 	} /* end if (file-open) */
 	return rs ;
 }
 /* end subroutine (procusers_beginer) */
 
 static int procusers_end(PROGINFO *pip,PU *pup) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	cchar		*sdname = OPENSYSFS_SYSDNAME ;
-
-	if (pip == nullptr) return SR_FAULT ;
-
+	if (pip) {
+	    rs = SR_OK ;
 	if (pup->open.users) {
 	    pup->open.users = false ;
 	    rs1 = setstr_finish(&pup->users) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	if ((rs1 = bclose(&pup->ptfile)) >= 0) {
 	    cchar	*pcname = OPENSYSFS_FPASSWD ;
 	    char	pfname[MAXPATHLEN+1] ;
@@ -1228,26 +1230,30 @@ static int procusers_end(PROGINFO *pip,PU *pup) noex {
 	        rs1 = u_rename(pup->ptfname,pfname) ;
 	    }
 	}
-	if (rs1 < 0) {
-	    u_unlink(pup->ptfname) ;
+	{
+	    if (rs1 < 0) {
+	        u_unlink(pup->ptfname) ;
+	    }
+	    if (rs >= 0) rs = rs1 ;
 	}
-	if (rs >= 0) rs = rs1 ;
-
 	if ((rs1 = bclose(&pup->utfile)) >= 0) {
 	    cchar	*ucname = OPENSYSFS_FUSERNAMES ;
 	    char	ufname[MAXPATHLEN+1] ;
 	    if ((rs1 = mkpath2(ufname,sdname,ucname)) >= 0) {
 	        rs1 = u_rename(pup->utfname,ufname) ;
 	    }
+	} 
+	{
+	    if (rs1 < 0) {
+	        u_unlink(pup->utfname) ;
+	    }
+	    if (rs >= 0) rs = rs1 ;
 	}
-	if (rs1 < 0) {
-	    u_unlink(pup->utfname) ;
-	}
-	if (rs >= 0) rs = rs1 ;
-
+	{
 	rs1 = procusers_allocend(pip,pup) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (procusers_end) */

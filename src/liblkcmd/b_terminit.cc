@@ -44,11 +44,11 @@
 #include	<sys/param.h>
 #include	<sys/loadavg.h>
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
 
 #include	<usystem.h>
@@ -121,7 +121,7 @@ struct locinfo_flags {
 struct locinfo {
 	LOCINFO_FL	f, init ;
 	PROGINFO	*pip ;
-	struct statvfs	fss ;
+	STATVFS	fss ;
 } ;
 
 
@@ -946,7 +946,7 @@ static int usage(PROGINFO *pip)
 /* process a specification name */
 static int procspec(PROGINFO *pip,void *ofp,cchar req[])
 {
-	struct statvfs	*fssp = &lip->fss ;
+	STATVFS	*fssp = &lip->fss ;
 	LOCINFO		*lip = pip->lip ;
 	LONG		vt ;
 	LONG		v = -1 ;
@@ -967,7 +967,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar req[])
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    debugprintf("b_terminit/procspec: rk=%t\n",req,reqlen) ;
+	    debugprintf("b_terminit/procspec: rk=%r\n",req,reqlen) ;
 	}
 #endif
 
@@ -979,7 +979,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar req[])
 	    ri = matextra(qopts,1,req,reqlen) ;
 
 	if (pip->debuglevel > 0)
-	    shio_printf(pip->efp,"%s: spec=%t (%d)\n",
+	    shio_printf(pip->efp,"%s: spec=%r (%d)\n",
 		pip->progname,req,reqlen,ri) ;
 
 	cbp = cvtbuf ;

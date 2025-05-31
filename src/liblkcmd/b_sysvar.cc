@@ -51,8 +51,8 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1663,7 +1663,7 @@ static int procoutall(PROGINFO *pip,VAR *svp,void *ofp)
 
 	                    if (rs >= 0) {
 	                        c += 1 ;
-	                        rs = shio_printf(ofp,"%s=%t\n",kp,vbuf,vl) ;
+	                        rs = shio_printf(ofp,"%s=%r\n",kp,vbuf,vl) ;
 	                    }
 
 	                    if (rs >= 0) rs = lib_sigterm() ;
@@ -1765,7 +1765,7 @@ static int procqkey(PROGINFO *pip,void *ofp,VAR *vfp,cchar *kp,int kl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysvar/procqkey: k=>%t<\n",
+	    debugprintf("b_sysvar/procqkey: k=>%r<\n",
 	        kp,strlinelen(kp,kl,40)) ;
 #endif
 
@@ -1864,7 +1864,7 @@ static int procseter(PROGINFO *pip,cchar dbname[],gid_t gid)
 	                rs = kl ;
 
 #if	CF_DEBUG
-	                debugprintf("b_sysvar/procset: k=%s v=>%t<\n",
+	                debugprintf("b_sysvar/procset: k=%s v=>%r<\n",
 	                    kp,vp,vl) ;
 #endif
 
@@ -1967,7 +1967,7 @@ static int procvarfile(PROGINFO *pip,cchar *fnp,int fnl) noex {
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(3))
-	                    debugprintf("procvarfile: k=>%t<\n",kp,kl) ;
+	                    debugprintf("procvarfile: k=>%r<\n",kp,kl) ;
 #endif
 
 	                if ((kl == 6) && (strncasecmp(we,kp,kl) == 0)) {
@@ -1994,7 +1994,7 @@ static int procvarfile(PROGINFO *pip,cchar *fnp,int fnl) noex {
 
 #if	CF_DEBUG
 	                        if (DEBUGLEVEL(3))
-	                            debugprintf("procvarfile: v=>%t<\n",
+	                            debugprintf("procvarfile: v=>%r<\n",
 	                                vp,vl) ;
 #endif
 

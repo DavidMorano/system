@@ -1544,7 +1544,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysval/procquery: req=>%t<\n",rp,rl) ;
+	    debugprintf("b_sysval/procquery: req=>%r<\n",rp,rl) ;
 #endif
 
 	if ((tp = strnchr(rp,rl,'=')) != nullptr) {
@@ -1555,9 +1555,9 @@ static int procquery(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
-	    debugprintf("b_sysval/procquery: rk=%t\n",rp,rl) ;
+	    debugprintf("b_sysval/procquery: rk=%r\n",rp,rl) ;
 	    if (vp != nullptr)
-	        debugprintf("b_sysval/procquery: rv=%t\n",vp,vl) ;
+	        debugprintf("b_sysval/procquery: rv=%r\n",vp,vl) ;
 	}
 #endif
 
@@ -1569,7 +1569,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 #endif
 
 	if (pip->debuglevel > 0) {
-	    shio_printf(pip->efp,"%s: spec=%t (%d)\n",
+	    shio_printf(pip->efp,"%s: spec=%r (%d)\n",
 	        pip->progname,rp,rl,ri) ;
 	}
 
@@ -2088,7 +2088,7 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 		    cint	vlen = MAXNAMELEN ;
 		    char	vbuf[MAXNAMELEN+1] ;
 		    if ((rs = getvendor(vbuf,vlen)) >= 0) {
-		        rs = bufprintf(cvtbuf,cvtlen,"%2u %t",id,vbuf,rs) ;
+		        rs = bufprintf(cvtbuf,cvtlen,"%2u %r",id,vbuf,rs) ;
 	                cbp = cvtbuf ;
 	                cbl = rs ;
 		    }
@@ -2136,7 +2136,7 @@ static int procfs(PROGINFO *pip,char *cbuf,int clen,int ri,cchar *vp,int vl)
 	    NULSTR	vs ;
 	    cchar	*vname ;
 	    if ((rs = nulstr_start(&vs,vp,vl,&vname)) >= 0) {
-	        struct statvfs	fi ;
+	        STATVFS	fi ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
 	            debugprintf("b_sysval/procfs: ri=%u vname=%s\n",ri,vname) ;
@@ -2187,7 +2187,7 @@ static int procfs(PROGINFO *pip,char *cbuf,int clen,int ri,cchar *vp,int vl)
 	            case qopt_fstype:
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
-	                    debugprintf("b_sysval/procfs: basetype=%t\n",
+	                    debugprintf("b_sysval/procfs: basetype=%r\n",
 	                        fi.f_basetype,FSTYPSZ) ;
 #endif
 	                rs = snwcpy(cbuf,clen,fi.f_basetype,FSTYPSZ) ;

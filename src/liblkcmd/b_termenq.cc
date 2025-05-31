@@ -48,11 +48,11 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<estrings.h>
@@ -1355,7 +1355,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *rp,int rl)
 	}
 
 	if ((pip->debuglevel > 0) && (vp != NULL)) {
-	    fmt = "%s: v=%t\n" ;
+	    fmt = "%s: v=%r\n" ;
 	    if (vl < 0) vl = strlen(vp) ;
 	    if (vl > 0) {
 	        shio_printf(pip->efp,fmt,pn,vp,vl) ;
@@ -1364,14 +1364,14 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *rp,int rl)
 
 	if ((ri = matocasestr(qopts,2,rp,rl)) >= 0) {
 	    if (pip->debuglevel > 0) {
-		fmt = "%s: spec=%t (%d)\n" ;
+		fmt = "%s: spec=%r (%d)\n" ;
 	        shio_printf(pip->efp,fmt, pn,rp,rl,ri) ;
 	    }
 	    rs = procget(pip,ofp,ri) ;
 	    wlen += rs ;
 	} else {
 	    if (pip->debuglevel > 0) {
-		fmt = "%s: spec=%t notfound\n" ;
+		fmt = "%s: spec=%r notfound\n" ;
 	        shio_printf(pip->efp,fmt, pn,rp,rl) ;
 	    }
 	    rs = SR_INVALID ;
@@ -1488,7 +1488,7 @@ static int procenq(PROGINFO *pip,SHIO *ofp)
 	            int		i ;
 		    cchar	*ids = "termenq/procenq" ;
 	            debugprintf("termenq/procenq: rs=%d\n",rs) ;
-	            debugprintf("termenq/procenq: ab=>%t<\n",cbuf,cl) ;
+	            debugprintf("termenq/procenq: ab=>%r<\n",cbuf,cl) ;
 		    debugprinthexblock(ids,max,cbuf,cl) ;
 	            debugprintf("termenq/procenq: type=%u\n",
 				cmdp->type) ;

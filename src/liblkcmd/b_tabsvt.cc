@@ -59,13 +59,13 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
+#include	<climits>
 #include	<termios.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<bits.h>
@@ -1363,7 +1363,7 @@ cchar	termspec[] ;
 	            rs = shio_write(ofp,buf,bl) ;
 
 	    } else
-	        rs = shio_printf(ofp,"%t\n",
+	        rs = shio_printf(ofp,"%r\n",
 	            timestr_std(daytime,timebuf),19) ;
 
 	} /* end if (date) */
@@ -1798,7 +1798,7 @@ time_t		daytime ;
 				nfcols) ;
 	                debugprintf("b_s/termdate: nusers hb=>%s<\n",
 				hexbuf) ;
-	                debugprintf("b_s/termdate: nusers rs1=%d buf=>%t<\n",
+	                debugprintf("b_s/termdate: nusers rs1=%d buf=>%r<\n",
 	                    rs1,pbp,nfcols) ;
 		}
 #endif /* CF_DEBUG */
@@ -1841,7 +1841,7 @@ time_t		daytime ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
-	                debugprintf("b_s/termdate: labuf=>%t<\n",
+	                debugprintf("b_s/termdate: labuf=>%r<\n",
 	                    pbp,nfcols) ;
 #endif
 
@@ -1899,7 +1899,7 @@ time_t		daytime ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
-	                debugprintf("b_s/termdate: mcbuf=>%t<\n",
+	                debugprintf("b_s/termdate: mcbuf=>%r<\n",
 	                    pbp,nfcols) ;
 #endif
 
@@ -1916,7 +1916,7 @@ time_t		daytime ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
-	                debugprintf("b_s/termdate: timebuf=>%t<\n",
+	                debugprintf("b_s/termdate: timebuf=>%r<\n",
 	                    timebuf,nfcols) ;
 #endif
 
@@ -1933,7 +1933,7 @@ time_t		daytime ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3)) {
 	        debugprintf("b_s/termdate: ncols=%u\n",ncols) ;
-	        debugprintf("b_s/termdate: sdbuf=>%t<\n",linebuf,len) ;
+	        debugprintf("b_s/termdate: sdbuf=>%r<\n",linebuf,len) ;
 	    }
 #endif
 
@@ -2068,7 +2068,7 @@ int		buflen ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("bufdiv: ent x=%d\n",x) ;
-	    debugprintf("bufdiv: buf=>%t<\n",buf,buflen) ;
+	    debugprintf("bufdiv: buf=>%r<\n",buf,buflen) ;
 	}
 #endif
 

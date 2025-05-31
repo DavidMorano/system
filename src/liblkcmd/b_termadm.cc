@@ -40,11 +40,11 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1244,10 +1244,10 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *rp,int rl)
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
 	    if (ri >= 0) {
-		fmt = "%s: spec=%t (%d)\n" ;
+		fmt = "%s: spec=%r (%d)\n" ;
 	        shio_printf(pip->efp,fmt, pn,rp,rl,ri) ;
 	    } else {
-		fmt = "%s: spec=%t notfound\n" ;
+		fmt = "%s: spec=%r notfound\n" ;
 	        shio_printf(pip->efp,fmt, pn,rp,rl) ;
 	    }
 	}
