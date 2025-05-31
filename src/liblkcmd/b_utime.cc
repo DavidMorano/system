@@ -59,13 +59,13 @@
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<sys/loadavg.h>
-#include	<limits.h>
-#include	<signal.h>
+#include	<climits>
+#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<ctype.h>
 #include	<utmpx.h>
 #include	<netdb.h>

@@ -30,8 +30,8 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<dlfcn.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<exitcodes.h>

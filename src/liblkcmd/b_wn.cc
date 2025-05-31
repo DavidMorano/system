@@ -64,11 +64,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
 
 #include	<usystem.h>
@@ -483,7 +483,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    argl = strlen(argp) ;
 
 #if	CF_DEBUGS
-	    debugprintf("b_wn: ai=%u a=>%t<\n",ai,argp,argl) ;
+	    debugprintf("b_wn: ai=%u a=>%r<\n",ai,argp,argl) ;
 #endif
 
 	    f_optminus = (*argp == '-') ;
@@ -1489,7 +1489,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("main/procloadname: ent rn=%t\n",np,nl) ;
+	    debugprintf("main/procloadname: ent rn=%r\n",np,nl) ;
 #endif
 
 	if (nl < 0) nl = strlen(np) ;
@@ -1813,14 +1813,14 @@ static int procout(PROGINFO *pip,SHIO *ofp,VECOBJ *elp)
 	        cp = up->ut_user ;
 	        cl = strnlen(cp,MIN(COLS_USERNAME,UTMPX_LUSER)) ;
 
-	        rs = shio_printf(ofp,"%t\n",cp,cl) ;
+	        rs = shio_printf(ofp,"%r\n",cp,cl) ;
 
 	    } else if (lip->f.fmtline) {
 
 	        cp = up->ut_line ;
 	        cl = strnlen(cp,UTMPX_LLINE) ;
 
-	        rs = shio_printf(ofp,"%t\n",cp,cl) ;
+	        rs = shio_printf(ofp,"%r\n",cp,cl) ;
 
 	    } else {
 

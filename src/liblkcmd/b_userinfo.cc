@@ -213,7 +213,7 @@ struct datauser {
 	char		*pjbuf ;
 	DATAUSER_FL	init ;
 	DATAUSER_FL	have ;
-	struct statvfs	fss ;
+	STATVFS	fss ;
 	struct group	gr ;
 	struct project	pj ;
 	PWENTRY		pent ;
@@ -1662,12 +1662,12 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_userinfo/procquery: query=%t qi=%d\n",
+	    debugprintf("b_userinfo/procquery: query=%r qi=%d\n",
 	        rp,rl,qi) ;
 #endif
 
 	if (pip->debuglevel > 0) {
-	    shio_printf(pip->efp,"%s: query=%t(%d)\n",
+	    shio_printf(pip->efp,"%s: query=%r(%d)\n",
 	        pip->progname,rp,rl,qi) ;
 	}
 
@@ -2330,7 +2330,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	        rs = datauser_statvfs(&pdp->du) ;
 	    }
 	    if ((rs >= 0) && pdp->du.have.statvfs) {
-	        struct statvfs	*fssp = &pdp->du.fss ;
+	        STATVFS	*fssp = &pdp->du.fss ;
 	        LONG		vt ;
 	        LONG		v = -1 ;
 	        sp = cbuf ;
@@ -2429,7 +2429,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("procquery: fin rs=%d sl=%d\n",rs,sl) ;
 	    if (sp != nullptr)
-	        debugprintf("procquery: c=>%t<\n",
+	        debugprintf("procquery: c=>%r<\n",
 	            sp,strlinelen(sp,sl,50)) ;
 	}
 #endif /* CF_DEBUG */
@@ -2512,7 +2512,7 @@ static int procquery_name(PROGINFO *pip,PROGDATA *pdp,
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("b_userinfo/procquery_name: ret rs=%d sl=%u\n",rs,sl) ;
-	    debugprintf("b_userinfo/procquery_name: ret r=>%t<\n",sp,sl) ;
+	    debugprintf("b_userinfo/procquery_name: ret r=>%r<\n",sp,sl) ;
 	}
 #endif
 	return (rs >= 0) ? sl : rs ;
@@ -2579,7 +2579,7 @@ static int procquery_fullname(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("b_userinfo/procquery_fname: ret rs=%d sl=%u\n",rs,sl) ;
-	    debugprintf("b_userinfo/procquery_fname: ret r=>%t<\n",sp,sl) ;
+	    debugprintf("b_userinfo/procquery_fname: ret r=>%r<\n",sp,sl) ;
 	}
 #endif
 	return (rs >= 0) ? sl : rs ;
@@ -3904,7 +3904,7 @@ static int datauser_orgloc(DATAUSER *dup)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_userinfo/_orgloc: ret rs=%d orgloc=%t\n",rs,bp,len) ;
+	    debugprintf("b_userinfo/_orgloc: ret rs=%d orgloc=%r\n",rs,bp,len) ;
 #endif
 
 	return (rs >= 0) ? len : rs ;

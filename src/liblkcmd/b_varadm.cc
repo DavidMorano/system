@@ -131,7 +131,7 @@ extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
 extern int	bufprintf(char *,int,const char *,...) ;
-extern int	statvfsdir(const char *,struct statvfs *) ;
+extern int	statvfsdir(const char *,STATVFS *) ;
 
 extern int	proginfo_setpiv(struct proginfo *,const char *,
 			const struct pivars *) ;
@@ -1327,7 +1327,7 @@ const char	req[] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    debugprintf("b_varadm/procspec: rk=%t\n",req,reqlen) ;
+	    debugprintf("b_varadm/procspec: rk=%r\n",req,reqlen) ;
 		if (vp != NULL)
 	    debugprintf("b_varadm/procspec: rv=%s\n",vp) ;
 	}
@@ -1338,7 +1338,7 @@ const char	req[] ;
 	ri = matostr(qopts,2,req,reqlen) ;
 
 	if (pip->debuglevel > 0)
-	    shio_printf(pip->efp,"%s: spec=%t (%d)\n",
+	    shio_printf(pip->efp,"%s: spec=%r (%d)\n",
 		pip->progname,req,reqlen,ri) ;
 
 	switch (ri) {
@@ -1471,7 +1471,7 @@ const char	req[] ;
 	case qopt_fsflags:
 	    if (vp == NULL) vp = lip->fname ;
 	    if (vp != NULL) {
-		struct statvfs	fi ;
+		STATVFS	fi ;
 		rs1 = statvfsdir(vp,&fi) ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -1781,7 +1781,7 @@ int		vl ;
 	    {
 	        struct proginfo	*pip = lip->pip ;
 	        if (DEBUGLEVEL(5))
-	            debugprintf("b_imail/locinfo_setentry: vlen=%u v=>%t<\n",
+	            debugprintf("b_imail/locinfo_setentry: vlen=%u v=>%r<\n",
 	                vnlen,vp,vnlen) ;
 	    }
 #endif

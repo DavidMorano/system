@@ -48,8 +48,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
 
 #include	<usystem.h>
@@ -1707,14 +1707,14 @@ static int proclist(PROGINFO *pip)
 	                        if (DEBUGLEVEL(3)) {
 	                            debugprintf("main/proclist: "
 	                                "filecounts_read() rs=%d\n",nl) ;
-	                            debugprintf("main/proclist: n=%t\n",nbuf,nl) ;
+	                            debugprintf("main/proclist: n=%r\n",nbuf,nl) ;
 	                        }
 #endif
 
 	                        if (rs >= 0) {
 	                            SHIO	*ofp = lip->ofp ;
 	                            const int	v = fci.value ;
-	                            cchar	*fmt = "%*u %-*s %t\n" ;
+	                            cchar	*fmt = "%*u %-*s %r\n" ;
 	                            c += 1 ;
 	                            nfl = FILECOUNTS_NUMDIGITS ;
 	                            tfl = FILECOUNTS_LOGZLEN ;
@@ -1919,7 +1919,7 @@ static int procqs(PROGINFO *pip,cchar *qs)
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(3))
-	                    debugprintf("main/procqs: db=>%t< cn=>%t<\n", 
+	                    debugprintf("main/procqs: db=>%r< cn=>%r<\n", 
 	                        ci.dbp,ci.dbl, ci.cnp,ci.cnl) ;
 #endif
 
@@ -2400,7 +2400,7 @@ static int config_read(CONFIG *csp)
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
-	                    debugprintf("config_read: vbuf=>%t<\n",vbuf,vl) ;
+	                    debugprintf("config_read: vbuf=>%r<\n",vbuf,vl) ;
 #endif
 
 	                ebuf[0] = '\0' ;
@@ -2412,7 +2412,7 @@ static int config_read(CONFIG *csp)
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
-	                    debugprintf("config_read: ebuf=>%t<\n",ebuf,el) ;
+	                    debugprintf("config_read: ebuf=>%r<\n",ebuf,el) ;
 #endif
 
 	                if (el > 0) {

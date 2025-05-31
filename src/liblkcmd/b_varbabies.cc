@@ -43,12 +43,12 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<signal.h>
+#include	<climits>
+#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<ctype.h>
 #include	<time.h>
 
@@ -1290,7 +1290,7 @@ uint		*rp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_varbabies/locinfo_lookup: name=%t\n",
+	    debugprintf("b_varbabies/locinfo_lookup: name=%r\n",
 		dbuf,strlinelen(dbuf,dlen,50)) ;
 #endif
 
