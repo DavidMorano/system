@@ -121,7 +121,7 @@ struct realname : realname_head {
 	int mailname(char *,int) noex ;
 	int mat(realname *) noex ;
 	void dtor() noex ;
-	~realname() {
+	destruct realname() {
 	    dtor() ;
 	} ;
 } ; /* end struct (realname) */

@@ -71,7 +71,7 @@ struct strmgr : strmgr_head {
 	int str(cchar *,int = -1) noex ;
 	int chr(int) noex ;
 	void dtor() noex ;
-	~strmgr() {
+	destruct strmgr() {
 	    dtor() ;
 	} ;
 } ; /* end struct (strmgr) */
