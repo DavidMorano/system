@@ -32,8 +32,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -148,7 +148,7 @@ int msudebug_lockprint(PROGINFO *pip,cchar *place)
 	        char		lbuf[LINEBUFLEN+1] ;
 	        while ((rs1 = breadln(&lf,lbuf,llen)) > 0) {
 	            int	ll = strllen(lbuf,rs1,60) ;
-	            debugprintf("msudebug_lockprint: >%t<\n",lbuf,ll) ;
+	            debugprintf("msudebug_lockprint: >%r<\n",lbuf,ll) ;
 	        }
 	        bclose(&lf) ;
 	    }

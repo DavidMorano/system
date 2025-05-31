@@ -33,8 +33,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -149,7 +149,7 @@ int pcsdebug_lockprint(PROGINFO *pip,cchar *place)
 	        char		lbuf[LINEBUFLEN+1] ;
 	        while ((rs1 = breadln(&lf,lbuf,llen)) > 0) {
 	            int	ll = strllen(lbuf,rs1,60) ;
-	            debugprintf("pcsdebug_lockprint: >%t<\n",lbuf,ll) ;
+	            debugprintf("pcsdebug_lockprint: >%r<\n",lbuf,ll) ;
 	        }
 	        bclose(&lf) ;
 	    }

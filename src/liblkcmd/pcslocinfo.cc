@@ -41,9 +41,9 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
 
 #include	<usystem.h>
@@ -642,7 +642,7 @@ int locinfo_nslook(LOCINFO *lip,char *rbuf,int rlen,cchar *un,int w)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	debugprintf("locinfo_nslook: ret rs=%d\n",rs) ;
-	debugprintf("locinfo_nslook: r=%t\n",rbuf,rs) ;
+	debugprintf("locinfo_nslook: r=%r\n",rbuf,rs) ;
 	}
 #endif
 	return rs ;

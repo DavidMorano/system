@@ -56,8 +56,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<sigblocker.h>
@@ -246,7 +246,7 @@ static int rmsesdir(IDS *idp,char *pbuf,int plen)
 	int		rs ;
 	int		c = 0 ;
 #if	CF_DEBUGN
-	nprintf(NDF,"rmsesdir: ent d=%t\n",pbuf,plen) ;
+	nprintf(NDF,"rmsesdir: ent d=%r\n",pbuf,plen) ;
 #endif
 	if ((rs = u_stat(pbuf,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
@@ -445,7 +445,7 @@ static int isNotRunning(cchar *np,int nl)
 	int		f = FALSE ;
 	if (nl < 0) nl = strlen(np) ;
 #if	CF_DEBUGN
-	nprintf(NDF,"isNotRunning: n=%t\n",np,nl) ;
+	nprintf(NDF,"isNotRunning: n=%r\n",np,nl) ;
 #endif
 	if ((nl > 1) && ((sch == 'p') || (sch == 's'))) {
 	    uint	uv ;

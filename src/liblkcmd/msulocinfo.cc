@@ -40,9 +40,9 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>

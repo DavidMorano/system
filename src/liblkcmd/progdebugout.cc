@@ -26,8 +26,8 @@
 
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<linefold.h>
@@ -166,7 +166,7 @@ static int procline(PROGINFO *pip,int columns,cchar *lp,int ll)
 	        int	ind = 0 ;
 	        int	i ;
 	        int	cl ;
-		cchar	*fmt = "%s: | %t%t\n" ;
+		cchar	*fmt = "%s: | %r%r\n" ;
 	        cchar	*cp ;
 	        for (i = 0 ; (cl = linefold_get(&lf,i,&cp)) >= 0 ; i += 1) {
 	            rs1 = shio_printf(efp,fmt,pn,blanks,ind,cp,cl) ;

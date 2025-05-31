@@ -32,10 +32,10 @@
 
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
+#include	<cstdarg>
 
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -264,7 +264,7 @@ int loginvalidcmd(PROGINFO *pip,cchar *cmd)
 
 	if (pip->open.logprog) {
 	    const int	cl = strnlen(cmd,40) ;
-	    const char	*fmt = "%s invalid cmd=%t" ;
+	    const char	*fmt = "%s invalid cmd=%r" ;
 	    char	timebuf[TIMEBUFLEN + 1] ;
 	    timestr_logz(pip->daytime,timebuf) ;
 	    rs = proglog_printf(pip,fmt,timebuf,cmd,cl) ;

@@ -316,7 +316,7 @@ int loginvalidcmd(PROGINFO *pip,cchar *cmd) noex {
 	int		rs = SR_OK ;
 	if (pip->open.logprog) {
 	    cint	cl = strnlen(cmd,40) ;
-	    cchar	*fmt = "%s invalid cmd=%t" ;
+	    cchar	*fmt = "%s invalid cmd=%r" ;
 	    char	timebuf[TIMEBUFLEN + 1] ;
 	    timestr_logz(pip->daytime,timebuf) ;
 	    rs = logfile_printf(&pip->lh,fmt,timebuf,cmd,cl) ;
