@@ -1468,7 +1468,7 @@ static int procoutcite(PROGINFO *pip,BIBLEQ_Q *qp,int edays)
 	        if ((bbl = locinfo_nlookup(lip,qp->b,bbuf,blen)) > 0) {
 
 	            f_havebook = TRUE ;
-	            fmt = (edays > 0) ? "%t %u:%u (%u)" : "%t %u:%u" ;
+	            fmt = (edays > 0) ? "%r %u:%u (%u)" : "%r %u:%u" ;
 	            rs = bufprintf(cbuf,clen,fmt,bbuf,bbl,c,v,(edays+1)) ;
 	            cl = rs ;
 	            if (rs >= 0) {
@@ -1575,7 +1575,7 @@ static int procoutline(PROGINFO *pip,cchar *lp,int ll)
 	int		wlen = 0 ;
 
 	indent = MIN(lip->indent,NBLANKS) ;
-	rs = shio_printf(lip->ofp,"%t%t\n", blanks,indent, lp,ll) ;
+	rs = shio_printf(lip->ofp,"%r%r\n", blanks,indent, lp,ll) ;
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;

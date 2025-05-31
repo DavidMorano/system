@@ -42,12 +42,12 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1008,11 +1008,11 @@ static int procspec(PROGINFO *pip,void *ofp,cchar np[],int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_babies/procspec: name=%t\n",np,nl) ;
+	    debugprintf("b_babies/procspec: name=%r\n",np,nl) ;
 #endif
 
 	if (pip->debuglevel > 0) {
-	    shio_printf(pip->efp,"%s: reqdate=%t\n",pip->progname,np,nl) ;
+	    shio_printf(pip->efp,"%s: reqdate=%r\n",pip->progname,np,nl) ;
 	}
 
 	rs = locinfo_lookup(lip,np,nl,&count) ;
@@ -1144,7 +1144,7 @@ static int locinfo_lookup(LOCINFO *lip,cchar *np,int nl,uint *rp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_babies/locinfo_lookup: ent q=%t\n",np,nl) ;
+	    debugprintf("b_babies/locinfo_lookup: ent q=%r\n",np,nl) ;
 #endif
 
 	if (nl < 0) nl = strlen(np) ;
@@ -1155,7 +1155,7 @@ static int locinfo_lookup(LOCINFO *lip,cchar *np,int nl,uint *rp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_babies/locinfo_lookup: mid1 rs=%d q=%t\n",
+	    debugprintf("b_babies/locinfo_lookup: mid1 rs=%d q=%r\n",
 	        rs,np,strlinelen(np,nl,50)) ;
 #endif
 

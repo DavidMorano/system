@@ -46,11 +46,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -1141,7 +1141,7 @@ static int procspec(PROGINFO *pip,cchar *sp,int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_biblebook/process: spec>%t<\n",sp,sl) ;
+	    debugprintf("b_biblebook/process: spec>%r<\n",sp,sl) ;
 #endif
 
 /* ok, two cases: decimal-digit or string */
@@ -1219,7 +1219,7 @@ static int procspec(PROGINFO *pip,cchar *sp,int sl)
 	} /* end if */
 
 	    if ((rs < 0) && isNotGoodCite(rs) && lip->f.interactive) {
-		fmt = "invalid citation=>%t< (%d)\n" ;
+		fmt = "invalid citation=>%r< (%d)\n" ;
 	        rs = shio_printf(lip->ofp,fmt,sp,sl,rs) ;
 	    }
 
@@ -1270,7 +1270,7 @@ static int procout(PROGINFO *pip,int n,cchar *sp,int sl)
 	if (pip->verboselevel > 0) {
 	    LOCINFO	*lip = pip->lip ;
 	    const int	prec = MIN(lip->precision,NBLANKS) ;
-	    rs = shio_printf(lip->ofp,"%*u %t\n",prec,n,sp,sl) ;
+	    rs = shio_printf(lip->ofp,"%*u %r\n",prec,n,sp,sl) ;
 	    wlen += rs ;
 	}
 

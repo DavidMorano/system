@@ -42,9 +42,9 @@
 #include	<envstandards.h>
 
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<stdio.h>
-#include	<errno.h>
+#include	<climits>
+#include	<cstdio>
+#include	<cerrno>
 
 #include	<usystem.h>
 
