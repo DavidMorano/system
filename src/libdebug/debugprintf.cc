@@ -20,7 +20,7 @@
 /*******************************************************************************
 
 	This subroutine does a printf-like function but for the
-	special error output facility. It calls 'format(3dam)' as
+	special error output facility. It calls |format(3dam)| as
 	might be expected but besides that it tries to be as simple
 	as possible, so that it depends on as little other stuff
 	as possible.
@@ -100,7 +100,7 @@
 #include	<hasx.h>
 #include	<cfdec.h>
 #include	<strwcpy.h>
-#include	<format.h>
+#include	<fmtstr.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -242,6 +242,7 @@ void debugprint_fini() noex {
 /* end subroutine (debugprint_fini) */
 
 int debugprintf(cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -257,9 +258,8 @@ int debugprintf(cchar *fmt,...) noex {
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 	    {
-	        va_list	ap ;
 	        va_begin(ap,fmt) ;
-	        if ((len = format(lbuf,llen,fm,fmt,ap)) >= 0) {
+	        if ((len = fmtstr(lbuf,llen,fm,fmt,ap)) >= 0) {
 	            rs = debugprint(lbuf,len) ;
 	            wlen += rs ;
 	        } else {
@@ -290,7 +290,7 @@ int debugvprintf(cchar *fmt,va_list ap) noex {
 	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
-	    if ((len = format(lbuf,llen,fm,fmt,ap)) >= 0) {
+	    if ((len = fmtstr(lbuf,llen,fm,fmt,ap)) >= 0) {
 	        rs = debugprint(lbuf,len) ;
 	        wlen += rs ;
 	    } else {

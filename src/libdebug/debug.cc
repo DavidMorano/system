@@ -194,7 +194,7 @@ int debugprinthex(cchar *ids,int maxcols,cchar *sp,int sl) noex {
 
 	if ((rs = mkhexnstr(pbuf,plen,maxcols,sp,sl)) >= 0) {
 	    if (idlen > 0) {
-	        rs = debugprintf("%t %s\n",ids,idlen,pbuf) ;
+	        rs = debugprintf("%r %s\n",ids,idlen,pbuf) ;
 	    } else {
 	        rs = debugprintf("%s\n",pbuf) ;
 	    }

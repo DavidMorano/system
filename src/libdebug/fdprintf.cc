@@ -26,7 +26,7 @@
 
 	Arguments:
 	fd		file descriptor to write to
-	format		standard format string
+	fmt		standard format string
 	...		enverything else
 
 	Returns:
@@ -41,6 +41,7 @@
 #include	<cstring>
 #include	<cstdarg>
 #include	<usystem.h>
+#include	<fmtstr.h>
 #include	<localmisc.h>
 
 
@@ -51,8 +52,6 @@
 
 
 /* external subroutines */
-
-extern int	format(char *,int,int,cchar *,va_list) noex ;
 
 
 /* local variables */
@@ -96,7 +95,7 @@ int fdprintf(int fd,cchar *fmt,...) noex {
 
 	va_begin(ap,fmt) ;
 
-	len = format(buf,BUFLEN,1,fmt,ap) ;
+	len = fmtstr(buf,BUFLEN,1,fmt,ap) ;
 
 	va_end(ap) ;
 

@@ -29,7 +29,7 @@
 
 	Arguments:
 	filename	file to print to
-	format		standard format string
+	fmt		standard format string
 	...		enverything else
 
 	Returns:
@@ -70,10 +70,10 @@
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<rmx.h>
-#include	<localmisc.h>		/* |COLUMNS| */
 #include	<debug.h>
+#include	<fmtstr.h>
+#include	<localmisc.h>
 
-#include	"format.h"
 #include	"nprintf.h"
 
 
@@ -166,7 +166,7 @@ int nprintf(cchar *fn,cchar *fmt,...) noex {
 	            cint	flen = FBUFLEN ;
 	            char	fbuf[FBUFLEN + 1] ;
 	            va_begin(ap,fmt) ;
-	            if ((rs = format(fbuf,flen,1,fmt,ap)) > 0) {
+	            if ((rs = fmtstr(fbuf,flen,1,fmt,ap)) > 0) {
 		        fl = rs ;
 		        rs = nprint(fn,fbuf,fl) ;
 	            }

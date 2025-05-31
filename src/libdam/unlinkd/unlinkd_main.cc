@@ -49,7 +49,6 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<getnodename.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>

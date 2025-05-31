@@ -30,9 +30,9 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<storebuf.h>
@@ -102,7 +102,7 @@ int debugfork(const char *s)
 	    char	rbuf[RBUFLEN+1] ;
 	    while ((rs = uc_reade(fd,rbuf,rlen,to,opts)) > 0) {
 	        int	len = rs ;
-	        debugprintf("debugfork: l=>%t<\n",
+	        debugprintf("debugfork: l=>%r<\n",
 	            rbuf,strlinelen(rbuf,len,40)) ;
 	    } /* end while */
 	    u_close(fd) ;

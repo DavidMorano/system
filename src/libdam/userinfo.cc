@@ -70,7 +70,6 @@
 #include	<grp.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -99,6 +98,7 @@
 
 #include	"userinfo.h"
 
+import uconstants ;
 
 /* local defines */
 

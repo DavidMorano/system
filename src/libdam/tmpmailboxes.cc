@@ -45,7 +45,6 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<getnodename.h>
 #include	<mallocxx.h>
 #include	<estrings.h>		/* |sncpy{x}(3uc)| */
@@ -56,6 +55,7 @@
 
 #include	"tmpmailboxes.h"
 
+import uconstants ;
 
 /* local defines */
 
