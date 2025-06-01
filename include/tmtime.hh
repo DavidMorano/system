@@ -33,7 +33,7 @@
 
 
 struct tmtime {
-	char	*zname{} ;	/* time-zone name abbreviation */
+	char	*zname{} ;	/* time-zone name abbreviation (allocated) */
 	int	sec ;		/* 0-61 (for up to two leap-seconds) */
 	int	min ;		/* 0-59 */
 	int	hour ;		/* 0-23 */
@@ -56,8 +56,8 @@ struct tmtime {
 	int mktime(time_t *) noex ;
 	int adjtime(time_t *) noex ;
 	void dtor() noex ;
-	~tmtime() {
-	    dtor() ;
+	destruct tmtime() {
+	    if (zname) dtor() ;
 	} ;
 } ; /* end struct (tmtime) */
 

@@ -114,7 +114,7 @@ private:
 		}
 	}
 	friend int operator/(cint divident,const int_fastdiv& divisor) noex ;
-};
+} ;
 
 int operator/(cint n,const int_fastdiv& divisor) noex {
 	int	q ;

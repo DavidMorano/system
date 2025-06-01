@@ -116,8 +116,8 @@ public:
 	int read(dirent *,char *,int) noex ;
 	int seek(off_t) noex ;
 	void dtor() noex ;
-	~posixdirent() {
-	    dtor() ;
+	destruct posixdirent() {
+	    if (debuf) dtor() ;
 	}
 } ; /* end struct (posixdirent) */
 

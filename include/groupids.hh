@@ -76,7 +76,7 @@ struct groupids {
 	groupids &operator = (const groupids &) = delete ;
 	int get(gid_t **) noex ;
 	void dtor() noex ;
-	~groupids() {
+	destruct groupids() {
 	    dtor() ;
 	} ;
     private:

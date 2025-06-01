@@ -113,7 +113,7 @@ public:
 	    }
 	    return (*this) ;
 	} ;
-	~singlist_iter() {
+	destruct singlist_iter() {
 	    n = nullptr ;
 	} ;
 	friend bool operator == (const singlist_iter<T> &i1,
@@ -234,7 +234,7 @@ public:
 	    instail(v) ;
 	    return (*this) ;
 	} ;
-	~singlist() {
+	destruct singlist() {
 	    singlist_node<T>	*nn, *n = head ;
 	    while (n != nullptr) {
 		nn = n->next ;
