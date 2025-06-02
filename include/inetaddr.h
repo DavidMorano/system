@@ -27,8 +27,8 @@
 
 struct inetaddr_head {
 	union {
-	    struct in_addr	a ;
-	    char		straddr[sizeof(struct in_addr)] ;
+	    INADDR4	a ;
+	    char	straddr[sizeof(INADDR4)] ;
 	} ;
 } ;
 
@@ -59,8 +59,10 @@ struct inetaddr : inetaddr_head {
 	inetaddr(const inetaddr &) = delete ;
 	inetaddr &operator = (const inetaddr &) = delete ;
 	int start(cvoid *) noex ;
+#ifdef	COMMENT
 	int startstr(cchar *,int = -1) noex ;
 	int startdot(cchar *,int = -1) noex ;
+#endif /* COMMENT */
 	int gethexaddr(char *,int) noex ;
 	int getdotaddr(char *,int) noex ;
 } ; /* end struct (inetaddr) */
@@ -71,11 +73,14 @@ typedef INETADDR	inetaddr ;
 EXTERNC_begin
 
 extern int inetaddr_start(inetaddr *,cvoid *) noex ;
-extern int inetaddr_startstr(inetaddr *,cchar *,int) noex ;
-extern int inetaddr_startdot(inetaddr *,cchar *,int) noex ;
 extern int inetaddr_gethexaddr(inetaddr *,char *,int) noex ;
 extern int inetaddr_getdotaddr(inetaddr *,char *,int) noex ;
 extern int inetaddr_finish(inetaddr *) noex ;
+
+#ifdef	COMMENT
+extern int inetaddr_startstr(inetaddr *,cchar *,int) noex ;
+extern int inetaddr_startdot(inetaddr *,cchar *,int) noex ;
+#endif /* COMMENT */
 
 EXTERNC_end
 

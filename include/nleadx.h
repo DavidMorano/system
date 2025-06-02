@@ -1,8 +1,8 @@
-/* ucx HEADER */
+/* nleadx HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* miscellaneous LINUC interfaces */
+/* find leading substrings */
 /* version %I% last-modified %G% */
 
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	UCX_INCLUDE
-#define	UCX_INCLUDE
+#ifndef	NLEADX_INCLUDE
+#define	NLEADX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -24,14 +24,11 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
 
-#include	<ucinetconv.h>
-#include	<ucmemalloc.h>
-#include	<uctc.h>
-#include	<ucttyname.h>
+#include	<nleadkeystr.h>
+#include	<nleadstr.h>
 
 
-#endif /* UCX_INCLUDE */
+#endif /* NLEADX_INCLUDE */
 
 

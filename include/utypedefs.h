@@ -128,7 +128,10 @@ typedef in_addr_t		in4_addr_t ;
 
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 #if	defined(OSNUM) && (OSNUM <= 9)
+#ifndef	TYPEDEF_IN6ADDRT
+#define	TYPEDEF_IN6ADDRT
 typedef struct in6_addr		in6_addr_t ;
+#endif
 #endif
 #endif
 

@@ -48,6 +48,8 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<utility>		/* |pair(3c++)| */
 #include	<unordered_map>
@@ -142,7 +144,6 @@ enum mapblockmems {
 	mapblockmem_overlast
 } ; /* end enum (mapblockmems) */
 
-export {
     template<typename K,typename B> struct mapblock_co {
 	typedef mapblock<K,B>	mb_t ;
 	mb_t		*op = nullptr ;
@@ -156,6 +157,8 @@ export {
 	    return operator () () ;
 	} ;
     } ; /* end struct (mapblock_co) */
+
+export {
     template<typename K,typename B> class mapblock {
 	friend mapblock_co<K,B> ;
 	std::unordered_map<K,B>			*mp = nullptr ;
@@ -200,6 +203,8 @@ export {
 	} ; /* end dtor */
 	friend iterator ;
     } ; /* end class (mapblock) */
+} /* end export (mapblock) */
+
     template<typename K,typename B> int mapblock<K,B>::istart(int n) noex {
 	typedef decltype(std::nothrow)	nothrow_t ;
 	int		rs = SR_INVALID ;
@@ -307,6 +312,5 @@ export {
 	} /* end switch */
 	return rs ;
     } /* end method (mapblock_co::operator) */
-} /* end export (mapblock) */
 
 
