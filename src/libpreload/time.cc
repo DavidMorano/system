@@ -42,7 +42,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<usystem.h>
 #include	<localmisc.h>
 
