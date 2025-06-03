@@ -1,6 +1,6 @@
 /* syswords HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a database of commonly used system words */
 /* version %I% last-modified %G% */
@@ -50,6 +50,10 @@ struct syswords {
 	static const char w_users[] ;
 	static const char w_help[] ;
 	static const char w_lib[] ;
+	static const char w_share[] ;
+	static const char w_main[] ;
+	static const char w_info[] ;
+	static const char w_var[] ;
 	static const char w_bindir[] ;
 	static const char w_sbindir[] ;
 	static const char w_usrdir[] ;
@@ -59,12 +63,15 @@ struct syswords {
 	static const char w_vardir[] ;
 	static const char w_procdir[] ;
 	static const char w_sysdbdir[] ;
+	static const char w_devstdin[] ;
+	static const char w_devstdout[] ;
+	static const char w_devstderr[] ;
+	static const char w_devstdlog[] ;
 	static const char w_devnull[] ;
 	static const char w_devrandom[] ;
 	static const char w_maildir[] ;
-	static const char w_usrlocaldir[] ;
 	static const char w_vartmpdir[] ;
-	static const char w_digtab[] ;
+	static const char w_usrlocaldir[] ;
 	static const char w_blanks[] ;
 	static const char w_defprovider[] ;
 	static const char w_localhost[] ;
@@ -74,7 +81,7 @@ struct syswords {
 extern const syswords	sysword ;
 
 
-#endif	/* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* SYSWORDS_INCLUDE */
 
 
