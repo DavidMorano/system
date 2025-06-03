@@ -114,6 +114,7 @@ extern int u_wait(int *sp) noex ;
 extern int u_waitid(idtype_t idtype,id_t id,siginfo_t *sip,int opts) noex ;
 extern int u_waitpid(pid_t pid,int *sp,int flags) noex ;
 extern int u_nanosleep(CTIMESPEC *,TIMESPEC *) noex ;
+extern int u_getcwd(char *,int) noex ;
 
 EXTERNC_end
 

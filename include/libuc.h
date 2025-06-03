@@ -238,7 +238,6 @@
 #include	<spawner.h>
 #include	<spawnproc.h>
 #include	<spwdent.h>
-#include	<stdfnames.h>
 #include	<stdorder.h>
 #include	<storebuf.h>
 #include	<storeitem.h>

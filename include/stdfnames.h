@@ -57,7 +57,7 @@ enum stdfiles {
 	stdfile_log,
 	stdfile_null,
 	stdfile_overlast
-} ;
+} ; /* end enum (stdfiles) */
 
 extern cchar	*const stdfnames[] ;
 

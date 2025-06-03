@@ -77,6 +77,7 @@
 #include	<utimeout.h>
 #include	<utimeouts.h>
 #include	<ulogerror.h>
+#include	<umemalloc.hh>
 
 #include	<varnames.hh>
 #include	<syswords.hh>
@@ -91,6 +92,7 @@
 #include	<timespec.h>
 #include	<itimerval.h>
 #include	<itimerspec.h>
+#include	<stdfnames.h>
 
 #include	<xxtostr.h>
 #include	<strtox.h>
