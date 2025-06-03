@@ -889,16 +889,6 @@ dfsb1.o:		dfsb1.cc dfsb.ccm		$(INCS)
 	makemodule dfsb
 	$(COMPILE.cc) dfsb1.cc
 
-# FONCE
-fonce.o:		fonce0.o fonce1.o		$(INCS)
-	makemodule fonce
-	$(LD) -r -o $@ $(LDFLAGS) fonce0.o fonce1.o
-fonce0.o:		fonce.ccm			$(INCS)
-	makemodule fonce
-fonce1.o:		fonce1.cc fonce.ccm		$(INCS)
-	makemodule fonce
-	$(COMPILE.cc) fonce1.cc
-
 sort_merge.o:		sort_merge.ccm			$(INCS)
 	makemodule sort_merge
 
