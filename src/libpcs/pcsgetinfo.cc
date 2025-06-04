@@ -393,7 +393,7 @@ int		nt ;
 #if	CF_DEBUGS
 	debugprintf("pcsgetnames: ret rs=%d\n",rs) ;
 	if (rs >= 0)
-	    debugprintf("pcsgetnames: name=>%t<\n",rbuf,rs) ;
+	    debugprintf("pcsgetnames: name=>%r<\n",rbuf,rs) ;
 #endif
 
 	return rs ;
@@ -735,7 +735,7 @@ static int getname_sysdb(SUBINFO *sip,int nt)
 #endif /* COMMENT */
 
 #if	CF_DEBUGS
-	debugprintf("pcsnames/getname_sysdb: rn=>%t<\n",sip->rbuf,sip->rlen) ;
+	debugprintf("pcsnames/getname_sysdb: rn=>%r<\n",sip->rbuf,sip->rlen) ;
 	debugprintf("pcsnames/getname_sysdb: ret rs=%d len=%u\n",rs,len) ;
 #endif
 

@@ -73,7 +73,6 @@
 #include	<project.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<bfile.h>
@@ -95,6 +94,7 @@
 
 #include	"pcsgetnames.h"
 
+import uconstants ;
 
 /* local defines */
 
