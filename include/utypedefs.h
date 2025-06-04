@@ -121,6 +121,29 @@
 
 /* types */
 
+#ifndef	TYPEDEF_INTOFFT
+#define	TYPEDEF_INTOFFT
+typedef int			intoff_t ;
+#endif /* TYPEDEF_INTOFFT */
+
+#ifndef	TYPEDEF_NOTHROW
+#define	TYPEDEF_NOTHROW
+#ifdef	__cplusplus
+#include			<new>		/* |nothrow(3c++)| */
+typedef decltype(std::nothrow)	nothrow_t ;
+#endif /* __cplusplus */
+#endif /* TYPEDEF_NOTHROW */
+
+/* handle some really brain-damaged systems -- like MacOS-X Darwin®! */
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+#if	defined(OSNUM) && (OSNUM <= 7)
+#ifndef	TYPEDEF_ID
+#define	TYPEDEF_ID
+typedef int			id_t ;
+#endif /* TYPEDEF_ID */
+#endif
+#endif
+
 #ifndef	TYPEDEF_IN4ADDRT
 #define	TYPEDEF_IN4ADDRT
 typedef in_addr_t		in4_addr_t ;
@@ -134,24 +157,6 @@ typedef struct in6_addr		in6_addr_t ;
 #endif
 #endif
 #endif
-
-/* handle some really brain-damaged systems -- like MacOS-X Darwin®! */
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#if	defined(OSNUM) && (OSNUM <= 7)
-#ifndef	TYPEDEF_ID
-#define	TYPEDEF_ID
-typedef int			id_t ;
-#endif /* TYPEDEF_ID */
-#endif
-#endif
-
-#ifndef	TYPEDEF_NOTHROW
-#define	TYPEDEF_NOTHROW
-#ifdef	__cplusplus
-#include			<new>		/* |nothrow(3c++)| */
-typedef decltype(std::nothrow)	nothrow_t ;
-#endif /* __cplusplus */
-#endif /* TYPEDEF_NOTHROW */
 
 #ifndef	TYPEDEF_ERRNO
 #define	TYPEDEF_ERRNO
@@ -409,6 +414,7 @@ typedef const std::nullopt_t	cnullopt ;
 #ifndef	TYPEDEF_CNOTHROW
 #define	TYPEDEF_CNOTHROW
 #ifdef	__cplusplus
+#include			<new>		/* |nothrow(3c++)| */
 typedef const nothrow_t		cnothrow ;
 #endif /* __cplusplus */
 #endif
@@ -543,27 +549,6 @@ typedef USTATFS			ustatfs ;
 typedef USTATVFS		ustatvfs ;
 #endif
 
-#ifndef	TYPEDEF_IN4ADDRT
-#define	TYPEDEF_IN4ADDRT
-typedef in_addr_t		in4_addr_t ;
-#endif
-
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#if	defined(OSNUM) && (OSNUM <= 9)
-typedef struct in6_addr		in6_addr_t ;
-#endif
-#endif
-
-/* handle some really brain-damaged systems -- like MacOS-X Darwin®! */
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#if	defined(OSNUM) && (OSNUM <= 7)
-#ifndef	TYPEDEF_ID
-#define	TYPEDEF_ID
-typedef int			id_t ;
-#endif /* TYPEDEF_ID */
-#endif
-#endif
-
 #ifndef	TYPEDEF_VOIDF
 #define	TYPEDEF_VOIDF
 EXTERNC_begin
@@ -598,13 +583,6 @@ typedef time_t			ustime ;
 #define	TYPEDEF_CUSTIME
 typedef const time_t		custime ;
 #endif
-
-#ifndef	TYPEDEF_NOTHROW
-#define	TYPEDEF_NOTHROW
-#ifdef	__cplusplus
-typedef decltype(std::nothrow)	nothrow_t ;
-#endif /* __cplusplus */
-#endif /* TYPEDEF_NOTHROW */
 
 
 #endif /* UTYPEDEFS_INCLUDE */

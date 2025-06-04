@@ -25,7 +25,7 @@
 	operating system in an OS-independent way by regualr callers.
 
 	Synosis:
-	int ugetdents(int fd,dirent *rbuf,int rlen) noex
+	int ugetdents(int fd,void *rbuf,int rlen) noex
 
 	Arguments:
 	fd		file-descriptor
@@ -55,7 +55,7 @@
 
 
 namespace usys {
-    extern sysret_t ugetdents(int,char *,int) noex ;
+    extern sysret_t ugetdents(int,void *,int) noex ;
 }
 
 

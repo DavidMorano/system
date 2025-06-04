@@ -57,7 +57,6 @@ struct fsdir_head {
 	dev_t		dev ;
 	FSDIR_FL	fl ;
 	uint		magic ;
-	int		dfd ;		/* directory file-descriptor */
 } ;
 
 typedef	FSDIR_FL	fsdir_fl ;
@@ -126,8 +125,9 @@ struct fsdir : fsdir_head {
 	int seek(off_t = 0z) noex ;
 	void dtor() noex ;
 	destruct fsdir() {
-	    dtor() ;
+	    if (posixp || (magic != 0)) dtor() ;
 	} ;
+	int isdir(cchar *) noex ;
 } ; /* end struct (fsdir) */
 #else	/* __cplusplus */
 typedef FSDIR		fsdir ;
