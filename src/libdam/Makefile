@@ -280,7 +280,7 @@ OBJ160= tabcols.o nextfield.o nextfieldterm.o nextqtoken.o
 OBJ161= nusers.o mesg.o initnow.o 
 OBJ162= getfiledirs.o findfilepath.o findfile.o
 OBJ163= cvttemperature.o bufprintf.o xfile.o
-OBJ164= mapex.o strsigabbr.o strerrabbr.o strlocktype.o straltwchar.o
+OBJ164= mapex.o strsigabbr.o strerrabbr.o strlocktype.o
 OBJ165= emainfo.o getdig.o
 OBJ166= listentcp.o listenudp.o listenuss.o listenusd.o 
 OBJ167= listenpass.o listenconn.o
@@ -888,16 +888,6 @@ dfsb0.o:		dfsb.ccm			$(INCS)
 dfsb1.o:		dfsb1.cc dfsb.ccm		$(INCS)
 	makemodule dfsb
 	$(COMPILE.cc) dfsb1.cc
-
-# FONCE
-fonce.o:		fonce0.o fonce1.o		$(INCS)
-	makemodule fonce
-	$(LD) -r -o $@ $(LDFLAGS) fonce0.o fonce1.o
-fonce0.o:		fonce.ccm			$(INCS)
-	makemodule fonce
-fonce1.o:		fonce1.cc fonce.ccm		$(INCS)
-	makemodule fonce
-	$(COMPILE.cc) fonce1.cc
 
 sort_merge.o:		sort_merge.ccm			$(INCS)
 	makemodule sort_merge

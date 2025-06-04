@@ -336,7 +336,7 @@ static int nodesfile_finents(NF *op) noex {
 	    while ((rs2 = hdb_curenum(elp,&cur,&key,&val)) >= 0) {
 		void	*vp = cast_const<voidp>(key.buf) ;
 		if (vp) {
-		    NF_ENT *ep = resumelifetime<NF_ENT>(vp) ;
+		    NF_ENT *ep = resumelife<NF_ENT>(vp) ;
 		    {
 		        rs1 = ep->finish() ;
 		        if (rs >= 0) rs = rs1 ;
@@ -365,7 +365,7 @@ static int nodesfile_finfis(NF *op) noex {
 	void *vp ;
 	for (int i = 0 ; (rs2 = flp->get(i,&vp)) >= 0 ; i += 1) {
 	    if (vp) {
-	        NF_FI	*fep = resumelifetime<NF_FI>(vp) ;
+	        NF_FI	*fep = resumelife<NF_FI>(vp) ;
 		{
 		    rs1 = fep->finish() ;
 		    if (rs >= 0) rs = rs1 ;
@@ -582,7 +582,7 @@ static int nodesfile_fnloadend(NF *op,int fi) noex {
     	int		rs ;
 	if (void *vp ; (rs = flp->get(fi,&vp)) >= 0) {
 	    if (vp) {
-	        NF_FI	*fep = resumelifetime<NF_FI>(vp) ;
+	        NF_FI	*fep = resumelife<NF_FI>(vp) ;
 		if ((rs = flp->del(fi)) >= 0) {
 	            if ((rs = fep->finish()) >= 0) {
 			destroy_at(fep) ;
@@ -602,7 +602,7 @@ static int nodesfile_fnalready(NF *op,USTAT *sbp) noex {
 	void		*vp ;
 	for (int i = 0 ; (rs = flp->get(i,&vp)) >= 0 ; i += 1) {
 	    if (vp) {
-	        NF_FI	*fep = resumelifetime<NF_FI>(vp) ;
+	        NF_FI	*fep = resumelife<NF_FI>(vp) ;
 	        fal = true ;
 		fal = fal && (sbp->st_dev == fep->dev) ;
 		fal = fal && (sbp->st_ino == fep->ino) ;

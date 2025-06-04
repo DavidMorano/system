@@ -1,23 +1,30 @@
-/* msu-locinfo */
+/* msu-locinfo HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* MSU-locinfo (extra code) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
-	Originally written for Rightcore Network Services.
+   	= 1998-02-15, David A­D­ Morano
+	I originally wrote this.
+
+	= 2011-01-25, David A­D­ Morano
+	I had to separate this code due to AST-code conflicts over
+	the system socket structure definitions.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2011 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MSULOCINFO_INCLUDE
-#define	MSULOCINFO_INCLUDE	1
+#define	MSULOCINFO_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be ordered fist to configure */
 #include	<sys/types.h>
-
 #include	<vecstr.h>
 #include	<msfile.h>
 #include	<lfm.h>
@@ -81,32 +88,28 @@ struct locinfo {
 	char		cmd[LOGIDLEN + 1] ;	/* for MSU */
 } ;
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	locinfo_start(LOCINFO *,PROGINFO *) noex ;
+extern int	locinfo_finish(LOCINFO *) noex ;
+extern int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) noex ;
+extern int	locinfo_rootname(LOCINFO *) noex ;
+extern int	locinfo_defs(LOCINFO *) noex ;
+extern int	locinfo_lockbegin(LOCINFO *) noex ;
+extern int	locinfo_lockcheck(LOCINFO *) noex ;
+extern int	locinfo_lockend(LOCINFO *) noex ;
+extern int	locinfo_defreg(LOCINFO *) noex ;
+extern int	locinfo_defdaemon(LOCINFO *) noex ;
+extern int	locinfo_tmpourdname(LOCINFO *) noex ;
+extern int	locinfo_msfile(LOCINFO *) noex ;
+extern int	locinfo_reqfname(LOCINFO *) noex ;
+extern int	locinfo_ipcpid(LOCINFO *,int) noex ;
+extern int	locinfo_gidrootname(LOCINFO *) noex ;
+extern int	locinfo_reqexit(LOCINFO *,cchar *) noex ;
+extern int	locinfo_isreqexit(LOCINFO *) noex ;
 
-extern int	locinfo_start(LOCINFO *,PROGINFO *) ;
-extern int	locinfo_finish(LOCINFO *) ;
-extern int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-extern int	locinfo_rootname(LOCINFO *) ;
-extern int	locinfo_defs(LOCINFO *) ;
-extern int	locinfo_lockbegin(LOCINFO *) ;
-extern int	locinfo_lockcheck(LOCINFO *) ;
-extern int	locinfo_lockend(LOCINFO *) ;
-extern int	locinfo_defreg(LOCINFO *) ;
-extern int	locinfo_defdaemon(LOCINFO *) ;
-extern int	locinfo_tmpourdname(LOCINFO *) ;
-extern int	locinfo_msfile(LOCINFO *) ;
-extern int	locinfo_reqfname(LOCINFO *) ;
-extern int	locinfo_ipcpid(LOCINFO *,int) ;
-extern int	locinfo_gidrootname(LOCINFO *) ;
-extern int	locinfo_reqexit(LOCINFO *,cchar *) ;
-extern int	locinfo_isreqexit(LOCINFO *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* MSULOCINFO_INCLUDE */
 

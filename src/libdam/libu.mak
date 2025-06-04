@@ -94,7 +94,7 @@ OBJ19= timespec.o itimerspec.o
 OBJ20= uinet.o umisc.o ureserve.o
 OBJ21= strnul.o intx.o 
 OBJ22= ugetloadavg.o uiconv.o
-OBJ23= syscontain.o
+OBJ23= syscontain.o stdfnames.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -138,28 +138,19 @@ so:			$(T).so
 	makemodule $(*)
 
 
-$(T).a:			$(OBJ)
-	$(AR) $(ARFLAGS) -rc $(T).a $?
-
-$(T).o:			$(OBJ) Makefile localmisc.h
+$(T).o:			$(OBJ) Makefile $(INCS)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
 
-$(T).so:		$(OBJ) Makefile localmisc.h
+$(T).so:		$(OBJ) Makefile $(INCS)
 	$(LD) -o $@ $(SOFL) $(LDFLAGS) $(OBJ) $(LIBINFO)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order order:	$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 install-pre:
 	filefind . -s h | makenewer -af - -d $(INCDIR)
 
 install:		$(ALL) Makefile
-	ranlib $(T).a
 	install -S -p -m 0775 $(T).so $(LIBDIR)
 
 install-incs:		$(INSTALLINCS)
@@ -333,9 +324,6 @@ ulock.o:		ulock.dir
 ulock.dir:
 	makesubdir $@
 
-# POSIX Message Queue
-pmq.o:			pmq.cc pmq.h			$(INCS)
-
 # POSIX® synchronization mechanisms
 ptx.o:			ptx.dir
 ptx.dir:
@@ -388,5 +376,6 @@ xxtostr.o:		xxtostr.ccm xxtostr.h		$(INCS)
 
 strnul.o:		strnul.cc strnul.hh		$(INCS)
 mailvalues.o:		mailvalues.cc mailvalues.hh	$(INCS)
+stdfnames.o:		stdfnames.c stdfnames.h		$(INCS)
 
 
