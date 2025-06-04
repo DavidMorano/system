@@ -30,7 +30,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<sysdbfname.h>
+#include	<sysdbfn.h>
 #include	<localmisc.h>
 
 #include	"ucenumxx.h"
@@ -72,9 +72,9 @@ constexpr sysdbfiles	w = sysdbfile_pj ;
 int sysproject_open(sysproject *op,cchar *efname) noex {
 	ucenumxxco<sysproject_ent>	ueo(op,mxx) ;
 	int		rs ;
-	if (cchar *rp{} ; (rs = sysdbfnameget(w,efname,&rp)) >= 0) {
+	if (cchar *rp{} ; (rs = sysdbfn_get(w,efname,&rp)) >= 0) {
 	    rs = ueo.open(rp) ;
-	} /* end if (sysdbfnameget) */
+	} /* end if (sysdbfn_get) */
 	return rs ;
 }
 /* end if (sysproject_open) */

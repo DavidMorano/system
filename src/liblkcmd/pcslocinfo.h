@@ -1,23 +1,29 @@
-/* pcs-locinfo */
+/* pcs-locinfo HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* PCS-locinfo (extra code) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
+   	= 1998-02-15, David A­D­ Morano
+	I originally wrote this.
+
 	= 2011-01-25, David A­D­ Morano
-	Originally written for Rightcore Network Services.
+	I modified this in some way.
 
 */
 
-/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2011 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PCSLOCINFO_INCLUDE
-#define	PCSLOCINFO_INCLUDE	1
+#define	PCSLOCINFO_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be ordered fist to configure */
 #include	<sys/types.h>
-
 #include	<vecstr.h>
 #include	<keyopt.h>
 #include	<msfile.h>
@@ -108,40 +114,36 @@ struct locinfo {
 	char		cmd[LOGIDLEN + 1] ;	/* for PCS */
 } ;
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	locinfo_start(LOCINFO *,PROGINFO *) noex ;
+extern int	locinfo_finish(LOCINFO *) noex ;
+extern int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) noex ;
+extern int	locinfo_rootname(LOCINFO *) noex ;
+extern int	locinfo_defs(LOCINFO *) noex ;
+extern int	locinfo_lockbegin(LOCINFO *) noex ;
+extern int	locinfo_lockcheck(LOCINFO *) noex ;
+extern int	locinfo_lockend(LOCINFO *) noex ;
+extern int	locinfo_defreg(LOCINFO *) noex ;
+extern int	locinfo_defdaemon(LOCINFO *) noex ;
+extern int	locinfo_tmpourdir(LOCINFO *) noex ;
+extern int	locinfo_msfile(LOCINFO *) noex ;
+extern int	locinfo_reqfname(LOCINFO *) noex ;
+extern int	locinfo_ipcpid(LOCINFO *,int) noex ;
+extern int	locinfo_rootids(LOCINFO *) noex ;
+extern int	locinfo_nsbegin(LOCINFO *) noex ;
+extern int	locinfo_nsend(LOCINFO *) noex ;
+extern int	locinfo_nslook(LOCINFO *,char *,int,cchar *,int) noex ;
+extern int	locinfo_dirmaint(LOCINFO *) noex ;
+extern int	locinfo_cmdsload(LOCINFO *,cchar *,int) noex ;
+extern int	locinfo_cmdscount(LOCINFO *) noex ;
+extern int	locinfo_reqexit(LOCINFO *,cchar *) noex ;
+extern int	locinfo_isreqexit(LOCINFO *) noex ;
+extern int	locinfo_newreq(LOCINFO *,int) noex ;
+extern int	locinfo_getreqs(LOCINFO *) noex ;
 
-extern int	locinfo_start(LOCINFO *,PROGINFO *) ;
-extern int	locinfo_finish(LOCINFO *) ;
-extern int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-extern int	locinfo_rootname(LOCINFO *) ;
-extern int	locinfo_defs(LOCINFO *) ;
-extern int	locinfo_lockbegin(LOCINFO *) ;
-extern int	locinfo_lockcheck(LOCINFO *) ;
-extern int	locinfo_lockend(LOCINFO *) ;
-extern int	locinfo_defreg(LOCINFO *) ;
-extern int	locinfo_defdaemon(LOCINFO *) ;
-extern int	locinfo_tmpourdir(LOCINFO *) ;
-extern int	locinfo_msfile(LOCINFO *) ;
-extern int	locinfo_reqfname(LOCINFO *) ;
-extern int	locinfo_ipcpid(LOCINFO *,int) ;
-extern int	locinfo_rootids(LOCINFO *) ;
-extern int	locinfo_nsbegin(LOCINFO *) ;
-extern int	locinfo_nsend(LOCINFO *) ;
-extern int	locinfo_nslook(LOCINFO *,char *,int,cchar *,int) ;
-extern int	locinfo_dirmaint(LOCINFO *) ;
-extern int	locinfo_cmdsload(LOCINFO *,cchar *,int) ;
-extern int	locinfo_cmdscount(LOCINFO *) ;
-extern int	locinfo_reqexit(LOCINFO *,cchar *) ;
-extern int	locinfo_isreqexit(LOCINFO *) ;
-extern int	locinfo_newreq(LOCINFO *,int) ;
-extern int	locinfo_getreqs(LOCINFO *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* PCSLOCINFO_INCLUDE */
 

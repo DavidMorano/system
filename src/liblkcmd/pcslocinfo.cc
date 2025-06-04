@@ -1,8 +1,9 @@
-/* pcs-locinfo */
+/* pcs-locinfo SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* PCS-locinfo (extra code) */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -10,28 +11,31 @@
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 #define	CF_DEBUGDUMP	0		/* debug-dump */
 
-
 /* revision history:
 
+   	= 1998-02-15, David A­D­ Morano
+	I originally wrote this.
+
 	= 2011-01-25, David A­D­ Morano
-        I had to separate this code due to AST-code conflicts over the system
-        socket structure definitions.
+	I had to separate this code due to AST-code conflicts over
+	the system socket structure definitions.
 
 */
 
-/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2011 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-        This is extra PCS code that was sepeated out from the main source due to
-        AST-code conflicts (see notes elsewhere also).
+  	Name:
+	pcslocinfo
 
+	Description:
+	This is extra PCS code that was sepeated out from the main
+	source due to AST-code conflicts (see notes elsewhere also).
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -45,7 +49,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<vecstr.h>
