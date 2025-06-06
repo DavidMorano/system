@@ -25,8 +25,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<sys/socket.h>
 #include	<limits.h>
+#include	<stdlib.h>		/* |size_t| */
+#include	<string.h>		/* |memset(3c)| */
 #include	<clanguage.h>
 
 
@@ -102,7 +103,7 @@
 #endif
 
 #ifndef	MKBOOL
-#define	MKBOOL(exp)	((exp)!=0)
+#define	MKBOOL(exp)	((exp) != 0)
 #endif
 
 #ifndef	UC
@@ -361,7 +362,15 @@ typedef const char		cc ;
 #define	LINEBUFLEN	MAXLINELEN
 #endif
 
-/* common digit base (bases 8, 10, 16) buffer lengths */
+#ifndef	NOFILE
+#define	NOFILE		20		/* UNIX® number of files */
+#endif
+
+#ifndef	TIMEBUFLEN
+#define	TIMEBUFLEN	80		/* can hold? all known date strings */
+#endif
+
+/* common digit base (2, 8, 10, 16) buffer lengths (convenience defines) */
 
 #ifndef	BINBUFLEN
 #define	BINBUFLEN	256		/* can hold |int256_t| in binary */
@@ -371,7 +380,7 @@ typedef const char		cc ;
 #define	OCTBUFLEN	86		/* can hold |int256_t| in octal */
 #endif
 
-#ifndef	DECCUFLEN
+#ifndef	DECBUFLEN
 #define	DECBUFLEN	78		/* can hold |int256_t| in decimal */
 #endif
 
@@ -387,16 +396,8 @@ typedef const char		cc ;
 #define	REALNAMELEN	100		/* "real" name length */
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80		/* can hold? all known date strings */
-#endif
-
 #ifndef	COLUMNS
 #define	COLUMNS		80		/* historical terminal columns */
-#endif
-
-#ifndef	NOFILE
-#define	NOFILE		20		/* UNIX® number of files */
 #endif
 
 #ifndef	NULLFNAME
@@ -417,6 +418,8 @@ typedef const char		cc ;
 
 #define	eol		'\n'
 
+#ifndef	SUBROUTINE_LEQUIV
+#define	SUBROUTINE_LEQUIV
 
 static inline bool lequiv(bool a1,bool a2) noex {
 	return LEQUIV(a1,a2) ;
@@ -425,6 +428,20 @@ static inline bool lequiv(bool a1,bool a2) noex {
 static inline bool lxor(bool a1,bool a2) noex {
 	return LXOR(a1,a2) ;
 }
+
+#endif /* SUBROUTINE_LEQUIV */
+
+#ifdef	__cplusplus
+#else
+#ifndef	SUBROUTINE_MEMCLEAR
+#define	SUBROUTINE_MEMCLEAR
+static inline int memclear(void *objp,int sz) noex {
+    	csize	objs = (size_t) sz ;
+    	memset(objp,0,objs) ;
+	return sz ;
+}
+#endif /* SUBROUTINE_MEMCLEAR */
+#endif /* __splusplus */
 
 
 #endif /* LOCALMISC_INCLUDE */

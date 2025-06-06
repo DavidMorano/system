@@ -27,12 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<stdarg.h>
+#include	<cstdarg>
 #include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>

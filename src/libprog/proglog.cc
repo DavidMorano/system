@@ -33,7 +33,7 @@
 #include	<bfile.h>
 #include	<logfile.h>
 #include	<userinfo.h>
-#include	<format.h>
+#include	<fmtstr.h>
 #include	<nulstr.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
@@ -232,7 +232,7 @@ int proglog_vprintf(proginfo *pip,cchar *fmt,va_list ap) noex {
 	        char	*fbuf{} ;
 		if ((rs = malloc_ml(&fbuf)) >= 0) {
 		    cint	flen = rs ;
-	            if ((rs = format(fbuf,flen,0x01,fmt,ap)) >= 0) {
+	            if ((rs = fmtstr(fbuf,flen,0x01,fmt,ap)) >= 0) {
 	                rs = proglog_print(pip,fbuf,rs) ;
 	                wlen = rs ;
 		    }
@@ -313,7 +313,7 @@ int proglog_ssvprintf(proginfo *pip,cchar *id,cchar *fmt,va_list ap) noex {
 	        char	*fbuf{} ;
 		if ((rs = malloc_ml(&fbuf)) >= 0) {
 		    cint	flen = rs ;
-	            if ((rs = format(fbuf,flen,0x01,fmt,ap)) >= 0) {
+	            if ((rs = fmtstr(fbuf,flen,0x01,fmt,ap)) >= 0) {
 	                rs = proglog_ssprint(pip,id,fbuf,rs) ;
 	                wlen = rs ;
 	            }

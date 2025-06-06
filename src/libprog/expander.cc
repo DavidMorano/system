@@ -49,7 +49,7 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -101,7 +101,7 @@ int		rlen ;
 	len = strnlen(sbuf,slen) ;
 
 #if	CF_DEBUGS
-	debugprintf("expnader: buf=>%t<\n",sbuf,len) ;
+	debugprintf("expnader: buf=>%r<\n",sbuf,len) ;
 #endif
 
 	while ((len > 0) && (elen < rlen)) {
@@ -188,7 +188,7 @@ int		rlen ;
 #if	CF_DEBUGS
 	debugprintf("expander: ret rs=%d elen=%d\n",rs,elen) ;
 	if (rs >= 0)
-	debugprintf("expnader: ebuf=>%t<\n",rbuf,elen) ;
+	debugprintf("expnader: ebuf=>%r<\n",rbuf,elen) ;
 #endif
 
 	return (rs >= 0) ? elen : rs ;

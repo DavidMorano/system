@@ -317,7 +317,7 @@ static int sysinfo_setdomainlog(int name,char *rbuf,long len,long rc) noex {
 	    cint	fd = rs ;
 	    if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
 		cint	rl = int(len & INT_MAX) ;
-		cchar	*fmt = "setoncdomain dn=%t (%ld)\n" ;
+		cchar	*fmt = "setoncdomain dn=%r (%ld)\n" ;
 		filer_printf(&b,fmt,rbuf,rl,rc) ;
 		rs1 = filer_finish(&b) ;
 		if (rs >= 0) rs = rs1 ;

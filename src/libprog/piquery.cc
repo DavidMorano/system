@@ -282,7 +282,7 @@ cchar	dbname[] ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
-	                debugprintf("progquery/procdb: line=>%t<\n",
+	                debugprintf("progquery/procdb: line=>%r<\n",
 	                    lbuf,strlinelen(lbuf,len,60)) ;
 #endif
 
@@ -487,7 +487,7 @@ static int procout(PROGINFO *pip,bfile *ofp,TEXTLOOK_TAG *tagp) noex {
 
 	if ((rs = bufprintf(obuf,olen,fmt,fn,recoff,reclen)) >= 0) {
 	    len = rs ;
-	    rs = bprintf(ofp,"%t",obuf,len) ;
+	    rs = bprintf(ofp,"%r",obuf,len) ;
 	    wlen += rs ;
 	}
 

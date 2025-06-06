@@ -138,7 +138,7 @@ static int procfile(PI *pip,cchar *sp,int sl,cchar *fname) noex {
 	            if (lbuf[len - 1] == '\n') len -= 1 ;
 	            if (len > 0) {
 	                if ((line == 0) && sp) {
-	                    proglog_printf(pip,"%t>",sp,sl) ;
+	                    proglog_printf(pip,"%r>",sp,sl) ;
 		        }
 	                if (rs >= 0) {
 	                    rs = procline(pip,columns,lbuf,len) ;
@@ -170,7 +170,7 @@ static int procline(PI *pip,int columns,cchar *lp,int ll) noex {
 	    if ((rs = linefold_start(lfdp,textlen,indent,lp,ll)) >= 0) {
 	        int	cl ;
 	        int	ind = 0 ;
-		cchar	*fmt = "| %t%t\n" ;
+		cchar	*fmt = "| %r%r\n" ;
 	        cchar	*cp ;
 		auto lf_get = linefold_get ;
 	        for (int i = 0 ; (cl = lf_get(lfdp,i,&cp)) >= 0 ; i += 1) {

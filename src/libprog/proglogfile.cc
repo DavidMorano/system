@@ -22,26 +22,22 @@
 
 	Here we do some log-file handling.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
-
+#include	<cstdlib>
+#include	<cstring>
+#include	<cstdarg>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<bfile.h>
 #include	<logfile.h>
-#include	<format.h>
+#include	<fmtstr.h>
 #include	<userinfo.h>
 #include	<localmisc.h>
 
@@ -192,9 +188,9 @@ int progloger_vprintf(PROGINFO *pip,cchar *fmt,va_list ap)
 	if (fmt == NULL) return SR_FAULT ;
 
 	if (pip->open.logprog) {
-	    const int	flen = LINEBUFLEN ;
+	    cint	flen = LINEBUFLEN ;
 	    char	fbuf[LINEBUFLEN+1] ;
-	    if ((rs = format(fbuf,flen,0x01,fmt,ap)) >= 0) {
+	    if ((rs = fmtstr(fbuf,flen,0x01,fmt,ap)) >= 0) {
 	        rs = progloger_print(pip,fbuf,rs) ;
 	        wlen = rs ;
 	    }
