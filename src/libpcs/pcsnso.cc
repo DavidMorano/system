@@ -1005,7 +1005,7 @@ static int getname_sysdb(SUBINFO *sip)
 	} /* end if */
 
 #if	CF_DEBUGS
-	debugprintf("pcsnames/getname_sysdb: rn=>%t<\n",sip->rbuf,sip->rlen) ;
+	debugprintf("pcsnames/getname_sysdb: rn=>%r<\n",sip->rbuf,sip->rlen) ;
 	debugprintf("pcsnames/getname_sysdb: ret rs=%d len=%u\n",rs,len) ;
 #endif
 

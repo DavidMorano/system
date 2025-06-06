@@ -915,7 +915,7 @@ static int subinfo_opensource(SI *sip,cchar *qf,cchar *sep) noex {
 	    ap = (sp + strlen(sp)) ;
 	}
 #if	CF_DEBUGS
-	debugprintf("maintqotd/subinfo_opensource: svc=%t\n",sp,sl) ;
+	debugprintf("maintqotd/subinfo_opensource: svc=%r\n",sp,sl) ;
 	debugprintf("maintqotd/subinfo_opensource: a=%s\n",ap) ;
 #endif
 
@@ -1403,7 +1403,7 @@ static int config_reader(CONFIG *csp,char *ebuf,int elen) noex {
 
 #if	CF_DEBUGS
 	                    debugprintf("mqintqotd/config_read: "
-				"vbuf=>%t<\n",vbuf,vl) ;
+				"vbuf=>%r<\n",vbuf,vl) ;
 #endif
 
 	                ebuf[0] = '\0' ;
@@ -1415,7 +1415,7 @@ static int config_reader(CONFIG *csp,char *ebuf,int elen) noex {
 
 #if	CF_DEBUGS
 	                debugprintf("maintqotd/config_read: "
-				"ebuf=>%t<\n",ebuf,el) ;
+				"ebuf=>%r<\n",ebuf,el) ;
 #endif
 
 	                if (el > 0) {

@@ -69,7 +69,7 @@ SOFL= -shared
 OBJ00= mailvalues.o endian.o 
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
-OBJ03= umods.o 
+OBJ03= umods.o  usysflag.o
 
 OBJ04= utimeout.o utimeouts.o 
 OBJ05= ulogerror.o strtox.o 
@@ -275,6 +275,7 @@ itimerval.o:		itimerval.cc itimerval.h		$(INCS)
 timespec.o:		timespec.cc timespec.h			$(INCS)
 itimerspec.o:		itimerspec.cc itimerspec.h		$(INCS)
 
+usysflag.o:		usysflag.cc usysflag.h			$(INCS)
 utimeout.o:		utimeout.c utimeout.h			$(INCS)
 utimeouts.o:		utimeouts.cc utimeouts.h		$(INCS)
 usyscallbase.o:		usyscallbase.cc usyscallbase.hh		$(INCS)
