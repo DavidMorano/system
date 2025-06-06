@@ -1,58 +1,33 @@
-# MAKEFILE
+# MAKEFILE (l)
 
 T= l
-
 ALL= $(T)
 
-SRCROOT= $(LOCAL)
 
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
-BINDIR= $(SRCROOT)/bin
-INCDIR= $(SRCROOT)/include
-LIBDIR= $(SRCROOT)/lib
-MANDIR= $(SRCROOT)/man/man1
-HELPDIR= $(SRCROOT)/share/help
-
-LDCRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-
-
-CC= $(CGS_CC)
-GPP= $(CGS_GPP)
-
-GPPFLAGS= $(CGS_CXXFLAGS)
-CCOPTS_GCCALL= -pthreads -fexceptions
-CCOPTS_CCALL= -MT
-
-CCOPTS_GCCOPTSGPP= $(CGS_CXXFLAGS)
-CCOPTS_GCCOPTSPARC= -mcpu=ultrasparc
-CCOPTS_GCCLIBSPARC= -mno-app-regs
-
-CCOPTS= $(CCOPTS_GCCALL) -O $(CCOPTS_GCCOPTSPARC)
-#CCOPTS= $(CCOPTS_GCCALL) -g -O
-#CCOPTS= $(CCOPTS_GCCALL) -g -pg
-#CCOPTS= $(CCOPTS_GCCALL) -g -Wstrict-aliasing
-#CCOPTS= $(CCOPTS_GCCALL) -g -Wall
-
-CCOPTS_GCCLIB= -fpic $(CCOPTS_GCCLIBSPARC)
-
-#CCOPTS= $(CCOPTS_CCALL) -g -xs
-
-# HyperSPARC
-# regular
-#CCOPTS= -xO5 -xtarget=ss20/hs22 -xdepend
-# profiling 'prof(1)'
-#CCOPTS= -p -xO5 -xtarget=ss20/hs22 -xdepend
-# profiling 'gprof(1)' 
-#CCOPTS= -xpg -xO5 -xtarget=ss20/hs22 -xdepend
-
-# UltraSPARC
-# regular
-#CCOPTS= -xO5 -xtarget=ultra -xsafe=mem -xdepend
-# profiling 'prof(1)'
-#CCOPTS= -p -xO5 -xtarget=ultra -xsafe=mem -xdepend
-# profiling 'gprof(1)' 
-#CCOPTS= -xpg -xO5 -xtarget=ultra -xsafe=mem -xdepend
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEF0=
@@ -66,85 +41,30 @@ DEF7= $(LF_DEFS)
 
 DEFS= $(DEF0) $(DEF1) $(DEF2) $(DEF3) $(DEF4) $(DEF5) $(DEF6) $(DEF7)
 
-
-INCDIRS= -I$(INCDIR)
-
-CPPFLAGS= $(DEFS) $(INCDIRS)
-
-CFLAGS= $(CCOPTS)
-
-#LD= $(CC)
-#LD= cc
-LD= ld
-
-
-LDRPATH=
-
-# regular
-LDFLAGS= -m $(LF_LDFLAGS) -R$(LIBDIR):$(CGS_RPATH)
-# for profiling
-LDFLAGS_P= $(LF_LDFLAGS) -L/usr/lib/libp # -R$(LIBDIR)
-
-
-LIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
-
-LIB0=
-LIB1= -ldam -lb
-LIB2=
-LIB3= -luc -lu
-LIB4= $(CGS_LIBS)
-LIB5= 
-LIB6= -lsecdb -lproject -lpthread -lrt -lxnet -lsocket -lnsl
-LIB7= -ldl -lc
-
-LIBS= $(LIB0) $(LIB1) $(LIB2) $(LIB3) $(LIB4) $(LIB5) $(LIB6) $(LIB7)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-
-VALUES= $(VALDIR)/$(CGS_VALUES)
-
-CRT1= $(LDCRTDIR)/crt1.o
-CRTI= $(LDCRTDIR)/crti.o
-CRTBEGIN= $(LDCRTDIR)/crtbegin.o
-MCRT1= $(LDCRTDIR)/mcrt1.o
-GCRT1= $(LDCRTDIR)/gcrt1.o
-CRTEND= $(LDCRTDIR)/crtend.o
-CRTN= $(LDCRTDIR)/crtn.o
-
-CRTFRONT= $(CRT1) $(CRTI) $(VALUES) $(CRTBEGIN)
-CRTBACK= $(CRTEND) $(CRTN)
-
-# for regular (no profiling)
-CRT0= $(CRT1) $(CRTI) $(VALUES)
-# for 'prof(1)'
-MCRT0= $(CRTI) $(MCRT1) $(VALUES)
-# for 'gprof(1)'
-GCRT0= $(CRTI) $(GCRT1) $(VALUES)
-
-CRTC= makedate.o
-
-LINT= lint
-LINTFLAGS= -uxn -Dlint
-
-NM= nm
-NMFLAGS= -xs -v
-
-CXREF= cxref
-CXREFFLAGS= -R -s
-
-CPP= cpp
-
-LORDER= lorder
-TSORT= tsort
-
-RM= rm -f
-
-
 INCS= b_$(T).h defs.h
 
+MODS += vecbool.ccm fonce.ccm argmgr.ccm
 
-OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o 
+LIBS= -luo -lu
+
+
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# xxx
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+OBJ00= l_main.o whatinfo.o proginfo.o proginfo_setpiv.o 
 OBJ01= b_$(T).o
 OBJ02= 
 OBJ03= 
@@ -166,44 +86,37 @@ OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
 
 OBJ= $(OBJA) $(OBJB)
 
-# for regular (no profiling)
-OBJS= $(CRTFRONT) $(OBJ) $(CRTC) $(CRTBACK)
-# for 'prof(1)'
-MOBJS= $(MCRT0) $(OBJ) $(CRTC)
-# for 'gprof(1)'
-GOBJS= $(GCRT0) $(OBJ) $(CRTC)
-
-
 SRC= $(OBJ:.c=.o)
 
 
-.SUFFIXES:		.ls .i .cx .cs
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).x
 
 all:			$(ALL)
 
-.cc.o:
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-.c.o:
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $<
-
-.c.ln:
-	$(LINT) -c -u $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
-.c.cx:
-	$(CXREF) -C $(CXREFFLAGS) $(CPPFLAGS) $<
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
-.c.cs:
-	$(CXREF) $(CXREFFLAGS) $(CPPFLAGS) -o $(*).cs $<
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
+.c.o:
+	$(COMPILE.c) $<
+
+.cc.o:
+	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T):			$(T).ee
@@ -282,27 +195,9 @@ sesmsg.o:		sesmsg.c sesmsg.h
 
 msgdata.o:		msgdata.c msgdata.h
 
-sighand.o:		sighand.c sighand.h
-
 
 shio.o:			shio.c shio.h
 
-userinfo.o:		userinfo.c userinfo.h
 
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-vecstr.o:		vecstr.c vecstr.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-fsdir.o:		fsdir.c fsdir.h
 
 

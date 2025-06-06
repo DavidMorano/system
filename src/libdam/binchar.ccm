@@ -18,6 +18,8 @@ module ;
 
 export module binchar ;
 
+import rshiftx ;
+
 export {
     template<typename T> int binchar(T num,int i) noex {
 	return (rshiftx(num,i) & 1) + '0' ;
