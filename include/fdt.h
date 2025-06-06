@@ -1,20 +1,21 @@
-/* fdt */
+/* fdt HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 #ifndef	FDT_INCLUDE
-#define	FDT_INCLUDE	1
+#define	FDT_INCLUDE
 
 
+#include	<envstandards.h>	/* must be ordered fist to configure */
 #include	<sys/types.h>
-
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 #include	"ucb.h"
 
 
 #define	FDT		struct fdt_head
-#define	FDT_ENT	strict fdt_ent
+#define	FDT_ENT		struct fdt_ent
 #define	FDT_MAGIC	0x77336556
 
 
@@ -28,23 +29,17 @@ struct fdt_head {
 	vecobj		entries ;
 } ;
 
+typedef FDT		fdt ;
+typedef FDT_ENT		fdt_ent ;
 
-#if	(! defined(UCB_MASTER)) || (UCB_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	fdt_alloc(FDT *,int,UCB **) noex ;
+extern int	fdt_get(FDT *,int,UCB **) noex ;
+extern int	fdt_free(FDT *,int) noex ;
+extern int	fdt_getentry(FDT *,int,FDT_ENT *) noex ;
 
-extern int	fdt_alloc(FDT *,int,UCB **) ;
-extern int	fdt_get(FDT *,int,UCB **) ;
-extern int	fdt_free(FDT *,int) ;
-extern int	fdt_getentry(FDT *,int,FDT_ENT *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* FDT_MASTER */
+EXTERNC_end
 
 
 #endif /* FDT_INCLUDE */

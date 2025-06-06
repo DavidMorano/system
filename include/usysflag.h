@@ -44,6 +44,18 @@
 #define	F_LINUX		0
 #endif
 
+#ifdef	__cplusplus
+
+struct usysflags {
+    	static const bool	sunos ;
+    	static const bool	darwin ;
+    	static const bool	linux ;
+} ;
+
+extern const usysflags		usysflag ;
+
+#endif /* __cplusplus */
+
 
 #endif /* USYSFLAG_INCLUDE */
 

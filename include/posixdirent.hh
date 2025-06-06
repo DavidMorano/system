@@ -21,8 +21,8 @@
 	posixdirent
 
 	Description:
-	See the 'cc' file for more information (and commentary) on
-	this object.
+	See the support source file for more information (and
+	commentary) on this object.
 
 *******************************************************************************/
 
@@ -39,6 +39,9 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<dirent.h>
+
+
+#define	POSIXDIRENT_MAGIC	0x97634525
 
 
 struct posixdirent ;
@@ -96,7 +99,8 @@ class posixdirent {
 	int dirtell() noex ;
 	int dirseek() noex ;
 	int dirrewind() noex ;
-	int setup(cchar *) noex ;
+	int bufbegin(cchar *) noex ;
+	int bufend() noex ;
 	int callout(posixdirent_m) noex ;
 	int itell(off_t *) noex ;
 	int irewind() noex ;
@@ -105,6 +109,7 @@ public:
 	posixdirent_te	tell ;
 	posixdirent_co	rewind ;
 	posixdirent_co	close ;
+	uint		magic ;
 	posixdirent() noex {
 	    tell(this,posixdirentmem_tell) ;
 	    rewind(this,posixdirentmem_rewind) ;
@@ -117,7 +122,7 @@ public:
 	int seek(off_t) noex ;
 	void dtor() noex ;
 	destruct posixdirent() {
-	    if (debuf) dtor() ;
+	    if (magic) dtor() ;
 	}
 } ; /* end struct (posixdirent) */
 

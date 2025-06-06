@@ -101,7 +101,7 @@ struct fifostr : fifostr_head {
 	int curenum(fifostr_cur *,char *,int) noex ;
 	int curdel(fifostr_cur *) noex ;
 	void dtor() noex ;
-	~fifostr() {
+	destruct fifostr() {
 	    dtor() ;
 	} ;
 } ; /* end struct (fifostr) */

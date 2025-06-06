@@ -36,7 +36,8 @@
 #include	<sys/mount.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdint.h>
+#include	<stddef.h>		/* |size_t| */
+#include	<stdint.h>		/* |uint32_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -90,6 +91,16 @@ extern int u_xattrget(cc *,cc *,void *,size_t,uint32_t,int) noex ;
 extern int u_xattrset(cc *,cc *,cvoid *,size_t,uint32_t,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+namespace libu {
+    inline int uresolvepath(cchar *fn,char *rbuf,int rlen) noex {
+	return u_resolvepath(fn,rbuf,rlen) ;
+    }
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* UFILEOP_INCLUDE */

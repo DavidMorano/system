@@ -55,6 +55,7 @@
 #include	<endian.h>
 
 #include	<usys.h>	/* <- auxilllary OS support */
+#include	<usysflag.h>
 #include	<usysop.h>	/* UNIX® system-operations */
 #include	<usysdata.h>	/* UNIX® system-data */
 #include	<usysutility.hh>
