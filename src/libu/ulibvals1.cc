@@ -87,10 +87,11 @@ const int	ulibvals::maxnamelen	= getval(_SC_NAME_MAX) ;
 const int	ulibvals::maxpathlen	= getval(_SC_PATH_MAX) ;
 const int	ulibvals::nodenamelen	= getval(_SC_NODENAME_MAX) ;
 const int	ulibvals::hostnamelen	= getval(_SC_HOSTNAME_MAX) ;
-const int	ulibvals::binbflen	= BINBUFLEN ;	/* for |int256_t| */
-const int	ulibvals::octbflen	= OCTBUFLEN ;	/* for |int256_t| */
-const int	ulibvals::decbflen	= DECBUFLEN ;	/* for |int256_t| */
-const int	ulibvals::hexbflen	= HEXBUFLEN ;	/* for |int256_t| */
+const int	ulibvals::binbuflen	= BINBUFLEN ;	/* for |int256_t| */
+const int	ulibvals::octbuflen	= OCTBUFLEN ;	/* for |int256_t| */
+const int	ulibvals::decbuflen	= DECBUFLEN ;	/* for |int256_t| */
+const int	ulibvals::hexbuflen	= HEXBUFLEN ;	/* for |int256_t| */
+const int	ulibvals::digbuflen	= DIGBUFLEN ;	/* for |int256_t| */
 
 const ulibvals	ulibval ;
 

@@ -40,8 +40,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdio>		/* |snprintf(3c)| */
@@ -50,8 +48,6 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<getfdfile.h>		/* <- for |FD_STDxxx| */
 #include	<localmisc.h>
 
@@ -94,7 +90,7 @@ namespace {
 	int		c = 0 ;
 	int record(cchar *,int,cchar * = nullptr) noex ;
 	void fini() noex ;
-	~ulogerrmgr() noex {
+	destruct ulogerrmgr() noex {
 	    fini() ;
 	} ;
     } ; /* end struct ulogerrmgr) */
@@ -172,10 +168,11 @@ void ulogerrmgr::fini() noex {
 		char	wbuf[wlen+1] ;
 		write(fd,announce,strlen(announce)) ;
 	        for (int i = 0 ; i < c ; i += 1) {
+		    csize	wsize = size_t(wlen + 1) ;
 	            cint	err = ents[i].err ;
 	            cchar	*id = ents[c].id ;
 	            cchar	*msg = ents[c].msg ;
-		    if (int wl ; (wl = snfmt(wbuf,wlen,fmt,id,err,msg)) > 0) {
+		    if (int wl ; (wl = snfmt(wbuf,wsize,fmt,id,err,msg)) > 0) {
 		        write(fd,wbuf,wl) ;
 		    } /* end if (snprintf) */
 		} /* end for */

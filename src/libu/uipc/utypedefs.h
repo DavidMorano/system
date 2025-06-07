@@ -30,7 +30,7 @@
 #include	<sys/time.h>		/* for |u_adjtime(3u)| */
 #include	<sys/timeb.h>		/* for |uc_ftime(3uc)| */
 #include	<sys/resource.h>
-#include	<sys/stat.h>
+#include	<sys/stat.h>		/* |USTAT| */
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
 
@@ -57,34 +57,22 @@
 
 
 /* for |stat(2)| and its many friends */
-
 #ifndef	STRUCT_USTAT
 #define	STRUCT_USTAT
-#if	defined(_LARGEFILE_SOURCE)
-#define	ustat		stat
-#else
-#if	defined(_LARGEFILE64_SOURCE)
-#define	ustat	stat64
-#else
-#define	ustat		stat
-#endif
-#endif
-#endif
+#define	USTAT		struct stat
+#endif /* STRUCT_USTAT */
+
+/* for |stat(2)| and its many friends */
+#ifndef	STRUCT_USTATFS
+#define	STRUCT_USTATFS
+#define	USTATFS		struct statfs
+#endif /* STRUCT_USTAT */
 
 /* for |statvfs(2)| and its many friends */
-
 #ifndef	STRUCT_USTATVFS
 #define	STRUCT_USTATVFS
-#if	defined(_LARGEFILE_SOURCE)
-#define	ustatvfs	statvfs
-#else
-#if	defined(_LARGEFILE64_SOURCE)
-#define	ustatvfs	statvfs64
-#else
-#define	ustatvfs	statvfs
-#endif
-#endif
-#endif
+#define	USTATVFS	struct statvfs
+#endif /* STRUCT_USTATVFS */
 
 /* PREDEFINED start */
 /* determine if some unsigned-related typedefs have already been made */
@@ -133,16 +121,18 @@
 
 /* types */
 
-#ifndef	TYPEDEF_IN4ADDRT
-#define	TYPEDEF_IN4ADDRT
-typedef in_addr_t		in4_addr_t ;
-#endif
+#ifndef	TYPEDEF_INTOFFT
+#define	TYPEDEF_INTOFFT
+typedef int			intoff_t ;
+#endif /* TYPEDEF_INTOFFT */
 
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#if	defined(OSNUM) && (OSNUM <= 9)
-typedef struct in6_addr		in6_addr_t ;
-#endif
-#endif
+#ifndef	TYPEDEF_NOTHROW
+#define	TYPEDEF_NOTHROW
+#ifdef	__cplusplus
+#include			<new>		/* |nothrow(3c++)| */
+typedef decltype(std::nothrow)	nothrow_t ;
+#endif /* __cplusplus */
+#endif /* TYPEDEF_NOTHROW */
 
 /* handle some really brain-damaged systems -- like MacOS-X Darwin®! */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
@@ -154,13 +144,19 @@ typedef int			id_t ;
 #endif
 #endif
 
-#ifndef	TYPEDEF_NOTHROW
-#define	TYPEDEF_NOTHROW
-#ifdef	__cplusplus
-#include			<new>		/* |nothrow(3c++)| */
-typedef decltype(std::nothrow)	nothrow_t ;
-#endif /* __cplusplus */
-#endif /* TYPEDEF_NOTHROW */
+#ifndef	TYPEDEF_IN4ADDRT
+#define	TYPEDEF_IN4ADDRT
+typedef in_addr_t		in4_addr_t ;
+#endif
+
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+#if	defined(OSNUM) && (OSNUM <= 9)
+#ifndef	TYPEDEF_IN6ADDRT
+#define	TYPEDEF_IN6ADDRT
+typedef struct in6_addr		in6_addr_t ;
+#endif
+#endif
+#endif
 
 #ifndef	TYPEDEF_ERRNO
 #define	TYPEDEF_ERRNO
@@ -192,6 +188,7 @@ typedef const unixret_t		cunixret_t ;
 typedef const sysret_t		csysret_t ;
 #endif /* TYPEDEF_CSYSRET */
 
+/* this next type-def is related to the one afterwards */
 #ifndef	TYPEDEF_SIGF
 #define	TYPEDEF_SIGF
 #if	(! defined(SYSHAS_TYPESIGF)) || (SYSHAS_TYPESIGF == 0)
@@ -200,6 +197,22 @@ typedef void (*sig_f)(int) noex ;
 EXTERNC_end
 #endif /* syshas */
 #endif /* TYPEDEF_SIGF */
+
+/****
+The following is declared in the Apple-Darwin operating sytem.  So
+in order to be portable everywhere else, we have to declared this
+everywhere else also.  This is done so that the following type-def
+is not accidentally declared elsewhere and used for a purpose other
+than what Apple-Darwin is using it for.
+****/
+#ifndef	TYPEDEF_SIGT
+#define	TYPEDEF_SIGT
+#if	(! defined(SYSHAS_TYPESIGT)) || (SYSHAS_TYPESIGT == 0)
+EXTERNC_begin
+typedef void (*sig_t)(int) noex ;
+EXTERNC_end
+#endif /* syshas */
+#endif /* TYPEDEF_SIGT */
 
 #ifndef	TYPEDEF_VOIDF
 #define	TYPEDEF_VOIDF
@@ -401,6 +414,7 @@ typedef const std::nullopt_t	cnullopt ;
 #ifndef	TYPEDEF_CNOTHROW
 #define	TYPEDEF_CNOTHROW
 #ifdef	__cplusplus
+#include			<new>		/* |nothrow(3c++)| */
 typedef const nothrow_t		cnothrow ;
 #endif /* __cplusplus */
 #endif
@@ -521,25 +535,18 @@ typedef const wchar_t		cwchar ;
 typedef const char *const *	mainv ;
 #endif
 
-#ifndef	TYPEDEF_IN4ADDRT
-#define	TYPEDEF_IN4ADDRT
-typedef in_addr_t		in4_addr_t ;
+#ifndef	TYPEDEF_USTAT
+#define	TYPEDEF_USTAT
+typedef USTAT			ustat ;
 #endif
 
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#if	defined(OSNUM) && (OSNUM <= 9)
-typedef struct in6_addr		in6_addr_t ;
+#ifndef	TYPEDEF_USTATFS
+#define	TYPEDEF_USTATFS
+typedef USTATFS			ustatfs ;
 #endif
-#endif
-
-/* handle some really brain-damaged systems -- like MacOS-X Darwin®! */
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#if	defined(OSNUM) && (OSNUM <= 7)
-#ifndef	TYPEDEF_ID
-#define	TYPEDEF_ID
-typedef int			id_t ;
-#endif /* TYPEDEF_ID */
-#endif
+#ifndef	TYPEDEF_USTATVFS
+#define	TYPEDEF_USTATVFS
+typedef USTATVFS		ustatvfs ;
 #endif
 
 #ifndef	TYPEDEF_VOIDF
@@ -576,13 +583,6 @@ typedef time_t			ustime ;
 #define	TYPEDEF_CUSTIME
 typedef const time_t		custime ;
 #endif
-
-#ifndef	TYPEDEF_NOTHROW
-#define	TYPEDEF_NOTHROW
-#ifdef	__cplusplus
-typedef decltype(std::nothrow)	nothrow_t ;
-#endif /* __cplusplus */
-#endif /* TYPEDEF_NOTHROW */
 
 
 #endif /* UTYPEDEFS_INCLUDE */
