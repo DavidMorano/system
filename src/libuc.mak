@@ -36,7 +36,6 @@ DEFS +=
 INCS += usystem.h localmisc.h
 INCS += uclibsubs.h
 
-MODS += uvariables.ccm ulibvals.ccm
 MODS += bstree.ccm sview.ccm
 MODS += mapblock.ccm memtrack.ccm addrset.ccm
 
@@ -49,7 +48,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -60,13 +58,36 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
+OBJ00_MOD += valuelims.o digbufsizes.o 
+OBJ01_MOD += uvariables.o ulibvals.o
+OBJ02_MOD += bufsizedata.o
+OBJ03_MOD += bstree.o sview.o
+OBJ04_MOD += mapblock.o memtrack.o addrset.o
+OBJ05_MOD +=
+OBJ06_MOD +=
+
+OBJA_MOD= obj00_mod.o obj01_mod.o obj02_mod.o obj03_mod.o
+OBJB_MOD= obj04_mod.o
+
+OBJ_MOD= obja_mod.o objb_mod.o
+
+OBJ00_INIT=
+OBJ01_INIT=
+OBJ02_INIT=
+OBJ03_INIT=
+
+OBJ04_INIT=
+OBJ05_INIT=
+OBJ06_INIT=
+OBJ07_INIT=
+
 OBJ00= matxstr.o toxc.o char.o 
 OBJ01= strn.o strnxcmp.o sif.o
 OBJ02= snwcpy.o strcpyxc.o strwcpy.o strdcpy.o
-OBJ03= stdfnames.o strw.o
+OBJ03= strw.o
 
 OBJ04= isx.o
-OBJ05= nleadstr.o nleadkeystr.o
+OBJ05= nleadx.o
 OBJ06= mapex.o
 OBJ07=
 
@@ -151,8 +172,8 @@ $(T).o:			$(OBJ)
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order:		$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order
@@ -374,12 +395,6 @@ uc_safesleep.o:		uc_safesleep.cc
 uc_openinfo.o:		uc_openinfo.c opensysfs.h
 uc_openuser.o:		uc_openuser.c opensysfs.h
 
-# FSDIR
-posixdirent.o:		posixdirent.cc posixdirent.hh
-fsdir.o:		fsdir.cc fsdir.h
-sunos_fsdir.o:		sunos_fsdir.cc sunos_fsdir.h posixdirent.hh
-darwin_fsdir.o:		darwin_fsdir.cc darwin_fsdir.h posixdirent.hh
-
 hostinfo.o:		hostinfo.cc hostinfo.h
 hostaddr.o:		hostaddr.cc hostaddr.h
 hostent.o:		hostent.cc hostent.h
@@ -445,8 +460,6 @@ termconseq.o:		termconseq.cc termconseq.h
 termescseq.o:		termescseq.cc termescseq.h
 
 tmtime.o:		tmtime.cc tmtime.h
-
-fmtstr.o:		fmtstr.cc fmtstr.h
 
 strshrink.o:		strshrink.c
  
@@ -841,6 +854,46 @@ realname.o:		realname.dir
 realname.dir:
 	makesubdir $@
 
+# CACHES
+caches.o:		caches.dir
+caches.dir:
+	makesubdir $@
+
+# FSDIR
+fsdir.o:		fsdir.dir
+fsdir.dir:
+	makesubdir $@
+
+# FMTSTR
+fmtstr.o:		fmtstr.dir
+fmtstr.dir:
+	makesubdir $@
+
+# INETADDRX
+inetaddrx.o:		inetaddrx.dir
+inetaddrx.dir:
+	makesubdir $@
+
+# EMA
+ema.o:			ema.dir
+ema.dir:
+	makesubdir $@
+
+# NLEADX
+nleadx.o:		nleadx.dir
+nleadx.dir:
+	makesubdir $@
+
+# FONCE
+fonce.o:		fonce0.o fonce1.o		$(INCS)
+	makemodule fonce
+	$(LD) -r -o $@ $(LDFLAGS) fonce0.o fonce1.o
+fonce0.o:		fonce.ccm			$(INCS)
+	makemodule fonce
+fonce1.o:		fonce1.cc fonce.ccm		$(INCS)
+	makemodule fonce
+	$(COMPILE.cc) fonce1.cc
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
@@ -903,9 +956,9 @@ vstrkeycmpx.o:		vstrkeycmpx.cc vstrkeycmpx.h
 vstrkeydictcmp.o:	vstrkeydictcmp.cc vstrkeycmpx.h
 
 # string-constants
-stdfnames.o:		stdfnames.c stdfnames.h
-syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
-sysdbfname.o:		sysdbfname.cc sysdbfname.h
+syhsdbfiles.o:		sysdbfiles.c sysdbfiles.h
+sysdbfn.o:		sysdbfn.cc sysdbfn.h
+opensysdbs.o:		opensysdbs.c opensysdbs.h
 
 # UTILITY
 splitfname.o:		splitfname.cc splitfname.h
@@ -938,7 +991,7 @@ dictdiff.o:		dictdiff.cc dictdiff.h
 rsfree.o:		rsfree.cc rsfree.h
 xfile.o:		xfile.cc xfile.h
 sysmemutil.o:		sysmemutil.cc sysmemutil.h
-mailvalues.o:		mailvalues.cc mailvalues.hh
+bitrotate.o:		bitrotate.cc bitrotate.h
 
 # integer-conversion-to-string-digits
 strval.o:		uvariables.o strval.cc strval.h
@@ -962,21 +1015,49 @@ sview.o:		sview.ccm			$(INCS)
 
 # BUFSIZEDATA
 bufsizedata.o:		bufsizedata.ccm			$(INCS)
-	makemodule bufsizedata
 
 # UVARIABLES
 uvariables.o:		valuelims.o digbufsizes.o uvariables.ccm
 
-MOBJ += valuelims.o digbufsizes.o 
-MOBJ += uvariables.o ulibvals.o
-MOBJ += bstree.o sview.o
-MOBJ += mapblock.o memtrack.o addrset.o
 
 valuelims.o:		valuelims.ccm
 digbufsizes.o:		digbufsizes.ccm
 ulibvals.o:		ulibvals.ccm
 
-mods.o:			$(MOBJ)
-	$(LD) -r -o $@ $(LDFLAGS) $(MOBJ)
+
+obj00_mod.o:		$(OBJ00_MOD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ00_MOD)
+
+obj01_mod.o:		$(OBJ01_MOD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ01_MOD)
+
+obj02_mod.o:		$(OBJ02_MOD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ02_MOD)
+
+obj03_mod.o:		$(OBJ03_MOD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ03_MOD)
+
+obj04_mod.o:		$(OBJ04_MOD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ04_MOD)
+
+obj05_mod.o:		$(OBJ05_MOD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ05_MOD)
+
+obj06_mod.o:		$(OBJ06_MOD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ06_MOD)
+
+
+obja_mod.o:		$(OBJA_MOD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJA_MOD)
+
+objb_mod.o:		$(OBJB_MOD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJB_MOD)
+
+
+obj_mod.o:		$(OBJ_MOD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ_MOD)
+
+mods.o:			$(OBJ_MOD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ_MOD)
 
 

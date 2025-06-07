@@ -20,13 +20,14 @@
 #include	<usysrets.h>		/* |base64_d| can return an SR */
 
 
-extern const uchar	base64_et[] ;
-extern const uchar	base64_dt[] ;
+extern cuchar	base64_et[] ;
 
 EXTERNC_begin
 
-extern int		base64_e(cchar *,int,char *) noex ;
-extern int		base64_d(cchar *,int,char *) noex ;
+extern int	base64_e(cchar *,int,char *) noex ;
+extern int	base64_d(cchar *,int,char *) noex ;
+extern int	base64_enc(int) noex ;
+extern int	base64_dec(int) noex ;
 
 EXTERNC_end
 

@@ -72,10 +72,10 @@
 #define	CH_RBRACE	0x7D		/* brace right */
 #define	CH_DEL		0x7F		/* delete */
 
-#define	CH_B0		0x80
-#define	CH_B1		0x81
-#define	CH_B2		0x82
-#define	CH_B3		0x83
+#define	CH_B0		0x80		/* ?? */
+#define	CH_B1		0x81		/* ?? */
+#define	CH_B2		0x82		/* ?? */
+#define	CH_B3		0x83		/* ?? */
 #define	CH_IND		0x84		/* index */
 #define	CH_NEL		0x85		/* next line */
 #define	CH_SSA		0x86
@@ -99,6 +99,7 @@
 #define	CH_EPA		0x97
 #define	CH_SOS		0x98		/* start of string */
 /* code-0x99 is not specifically defined */
+#define	CH_99		0x99		/* ?? - can someone look this up? */
 #define	CH_DECID	0x9A		/* DEC private identification */
 #define	CH_CSI		0x9B		/* control sequence introducer */
 #define	CH_ST		0x9C		/* string terminator */
@@ -111,16 +112,17 @@
 
 /* aliases: some extras because they appear now and then */
 
+#define	CH_BELL		CH_BEL		/* bell */
 #define	CH_NL		CH_LF		/* new-line */
 #define	CH_EOL		CH_LF		/* end-of-line */
-#define	CH_XON		0x11
-#define	CH_XOFF		0x13
-#define	CH_RIND		CH_RI		/* reverse index */
-#define	CH_SPACE	CH_SP		/* space */
+#define	CH_XON		CH_DC1		/* control-Q */
+#define	CH_XOFF		CH_DC3		/* control-S */
 #define	CH_SYNC		CH_SYN		/* sync */
+#define	CH_SPACE	CH_SP		/* space */
 #define	CH_APOSTROPHE	CH_SQUOTE	/* apostrophe */
 #define	CH_QUOTE	CH_DQUOTE	/* quote double */
-#define	CH_BELL		CH_BEL		/* bell */
+#define	CH_SLASH	CH_FSLASH	/* slash forward */
+#define	CH_RIND		CH_RI		/* reverse index */
 
 
 #endif /* ASCII_INCLUDE */
