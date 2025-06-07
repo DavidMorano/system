@@ -17,8 +17,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<linefold.h>
 #include	<bfile.h>
@@ -159,7 +159,7 @@ static int procline(PROGINFO *pip,int columns,cchar *lp,int ll)
 	        int	cl ;
 	        cchar	*cp ;
 	        for (i = 0 ; (cl = linefold_get(&lf,i,&cp)) >= 0 ; i += 1) {
-	            rs1 = shio_printf(fp,"%s: | %t%t\n",pn,blanks,ind,cp,cl) ;
+	            rs1 = shio_printf(fp,"%s: | %r%r\n",pn,blanks,ind,cp,cl) ;
 	            wlen += rs1 ;
 	            if (rs1 < 0) break ;
 	            ind = indent ;

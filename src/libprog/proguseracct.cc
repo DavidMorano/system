@@ -413,7 +413,7 @@ static int proguseracct_copyover(PROGINFO *pip,int ofd,int fd)
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(5))
-	                    debugprintf("proguseracct_copyover: line=>%t<\n",
+	                    debugprintf("proguseracct_copyover: line=>%r<\n",
 	                        clp,strnlen(clp,cll,40)) ;
 #endif
 
@@ -508,7 +508,7 @@ static int proguseracct_prints(PROGINFO *pip,FILER *fbp,char *cbuf,int cbl,
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
-	            debugprintf("proguseracct_prints: line=>%t<\n",
+	            debugprintf("proguseracct_prints: line=>%r<\n",
 	                lp,strnlen(lp,ll,40)) ;
 #endif
 
@@ -523,7 +523,7 @@ static int proguseracct_prints(PROGINFO *pip,FILER *fbp,char *cbuf,int cbl,
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
-	            debugprintf("proguseracct_prints: clean=>%t<\n",
+	            debugprintf("proguseracct_prints: clean=>%r<\n",
 	                clp,strnlen(clp,cll,40)) ;
 #endif
 

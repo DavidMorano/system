@@ -393,7 +393,7 @@ int progmsgs(PROGINFO *pip,bfile *ifp,bfile *tfp,vecobj *fip,vecobj *rlp) noex {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	                debugprintf("mailmsgstage_gathermsg: line=>%t<\n",
+	                debugprintf("mailmsgstage_gathermsg: line=>%r<\n",
 	                    lp,strlinelen(lp,ll,40)) ;
 #endif
 
@@ -649,7 +649,7 @@ static int procmsgenv(PROGINFO *pip,PROCDATA *pdp)
 		int	cl ;
 	        cchar	*cp = pdp->efrom ;
 		cl = strnlen(cp,(LOGLINELEN - 4)) ;
-	        proglog_printf(pip,"  F %t",cp,cl) ;
+	        proglog_printf(pip,"  F %r",cp,cl) ;
 	    }
 	} /* end if */
 
@@ -707,10 +707,10 @@ static int procmsgenver(PROGINFO *pip,PROCDATA *pdp,char *addrbuf,int addrlen)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
-	            debugprintf("progmsgs/procmsgenver: env a=>%t<\n",cp,cl) ;
+	            debugprintf("progmsgs/procmsgenver: env a=>%r<\n",cp,cl) ;
 #endif
 
-	        logfile_printf(&pip->envsum,"%4d:%2d F %t",
+	        logfile_printf(&pip->envsum,"%4d:%2d F %r",
 	            pip->nmsgs,i,
 	            ((cp != nullptr) ? cp : "*NA*"),cl) ;
 
@@ -719,10 +719,10 @@ static int procmsgenver(PROGINFO *pip,PROCDATA *pdp,char *addrbuf,int addrlen)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
-	            debugprintf("progmsgs/procmsgenver: env d=>%t<\n",cp,cl) ;
+	            debugprintf("progmsgs/procmsgenver: env d=>%r<\n",cp,cl) ;
 #endif
 
-	        fmt = "%4d:%2d D %t" ;
+	        fmt = "%4d:%2d D %r" ;
 	        logfile_printf(&pip->envsum,fmt,pip->nmsgs,i,cp,cl) ;
 
 	        cp = mep->r.ep ;
@@ -730,11 +730,11 @@ static int procmsgenver(PROGINFO *pip,PROCDATA *pdp,char *addrbuf,int addrlen)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
-	            debugprintf("progmsgs/procmsgenver: env r=>%t<\n",cp,cl) ;
+	            debugprintf("progmsgs/procmsgenver: env r=>%r<\n",cp,cl) ;
 #endif
 
 	        if ((cp != nullptr) && (cp[0] != '\0')) {
-	            logfile_printf(&pip->envsum,"%4d:%2d R %t",
+	            logfile_printf(&pip->envsum,"%4d:%2d R %r",
 	                pip->nmsgs,i,
 	                cp,cl) ;
 		}
@@ -813,7 +813,7 @@ static int procmsgenver(PROGINFO *pip,PROCDATA *pdp,char *addrbuf,int addrlen)
 
 	        if (pip->open.logprog && pip->f.logmsg) {
 	            proglog_printf(pip,"  | %-25s", dbuf) ;
-	            proglog_printf(pip,"  |   %c %t",
+	            proglog_printf(pip,"  |   %c %r",
 	                atypes[atype],addr,MIN(al,(LOGLINELEN - TABLEN))) ;
 	        }
 
@@ -839,7 +839,7 @@ static int procmsgenver(PROGINFO *pip,PROCDATA *pdp,char *addrbuf,int addrlen)
 	    strwcpy(mip->e_from,addrbuf,MAILADDRLEN) ;
 
 	    if (pip->open.logprog && pip->f.logmsg) {
-	        proglog_printf(pip,"  > %t",
+	        proglog_printf(pip,"  > %r",
 	            addrbuf,MIN(sal,(LOGLINELEN - 4))) ;
 	    }
 
@@ -951,9 +951,9 @@ static int procmsghdr_messageid(PROGINFO *pip,PROCDATA *pdp)
 	        cl = MIN(sl,(LOGLINELEN - TABLEN)) ;
 	        if (f_first) {
 	            f_first = FALSE ;
-	            fmt = "  mid=| %t" ;
+	            fmt = "  mid=| %r" ;
 	        } else {
-	            fmt = "      | %t" ;
+	            fmt = "      | %r" ;
 		}
 	        proglog_printf(pip,fmt,cp,cl) ;
 	        sp += cl ;
@@ -1074,7 +1074,7 @@ static int procmsghdr_xmailer(PROGINFO *pip,PROCDATA *pdp)
 
 	        proglog_printf(pip,"  xmailer %u",(n - i - 1)) ;
 
-	        fmt = (strchr(vp,' ') != nullptr) ? "    >%t<" : "    %t" ;
+	        fmt = (strchr(vp,' ') != nullptr) ? "    >%r<" : "    %r" ;
 	        proglog_printf(pip,fmt,vp,vl) ;
 
 	    } /* end for */
@@ -1124,7 +1124,7 @@ static int procmsghdr_received(PROGINFO *pip,PROCDATA *pdp)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))
-	            debugprintf("progmsgs/procmsg: i=%u r=>%t<\n",
+	            debugprintf("progmsgs/procmsg: i=%u r=>%r<\n",
 	                i,vp,strlinelen(vp,vl,40)) ;
 #endif
 
@@ -1145,7 +1145,7 @@ static int procmsghdr_received(PROGINFO *pip,PROCDATA *pdp)
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(2))
-	                    debugprintf("progmsgs/procmsg: j=%u r=>%t<\n",
+	                    debugprintf("progmsgs/procmsg: j=%u r=>%r<\n",
 	                        j,rp,strlinelen(rp,rl,40)) ;
 #endif
 
@@ -1227,7 +1227,7 @@ static int procmsghdr_replyto(PROGINFO *pip,PROCDATA *pdp)
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2)) {
 	        debugprintf("progmsgs/procmsg: mailmsg_hdrval() rs=%d\n",rs) ;
-	        debugprintf("progmsgs/procmsg: REPLYTO v=>%t<\n",
+	        debugprintf("progmsgs/procmsg: REPLYTO v=>%r<\n",
 	            vp,strlinelen(vp,vl,40)) ;
 	    }
 #endif
@@ -1271,7 +1271,7 @@ static int procmsghdr_errorsto(PROGINFO *pip,PROCDATA *pdp)
 	    vl = rs ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("progmsgs/procmsghdr_errorsto: v=%t\n",vp,vl) ;
+	    debugprintf("progmsgs/procmsghdr_errorsto: v=%r\n",vp,vl) ;
 #endif
 	    rs = procmsglogaddr(pip,mip->h_errorsto,hdr,vp,vl) ;
 	} else if (rs == SR_NOTFOUND) {
@@ -1374,7 +1374,7 @@ static int procmsghdr_xpriority(PROGINFO *pip,PROCDATA *pdp)
 	        hl = rs ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	debugprintf("progmsgs/procmsghdr_xpriority: h=%t\n",hp,hl) ;
+	debugprintf("progmsgs/procmsghdr_xpriority: h=%r\n",hp,hl) ;
 #endif
 	        if ((rs = comparse_start(&com,hp,hl)) >= 0) {
 		    cchar	*vp ;
@@ -1383,7 +1383,7 @@ static int procmsghdr_xpriority(PROGINFO *pip,PROCDATA *pdp)
 		        int	vl = rs ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	debugprintf("progmsgs/procmsghdr_xpriority: v=%t\n",vp,vl) ;
+	debugprintf("progmsgs/procmsghdr_xpriority: v=%r\n",vp,vl) ;
 #endif
 	                if ((rs = comparse_getcom(&com,&cp)) >= 0) {
 		            cint	plen = 20 ;
@@ -1400,10 +1400,10 @@ static int procmsghdr_xpriority(PROGINFO *pip,PROCDATA *pdp)
 	                            hnl = strlen(hnp) ;
 
 		            if (rs >= 0) {
-			        cchar	*fmt = "  %t=%t (%t)" ;
+			        cchar	*fmt = "  %r=%r (%r)" ;
 			        if (vl > plen) vl = plen ;
 			        if (cl > plen) cl = plen ;
-			        if (cl == 0) fmt = "  %t=%t" ;
+			        if (cl == 0) fmt = "  %r=%r" ;
 			        proglog_printf(pip,fmt,hnp,hnl,vp,vl,cp,cl) ;
 		            }
 
@@ -1643,7 +1643,7 @@ static int procmsgouthdr_clen(PROGINFO *pip,PROCDATA *pdp)
 	    off_t	coff ;
 	    btell(pdp->tfp,&coff) ;
 	    pdp->off_clen = coff ;
-	    rs = bprintf(pdp->tfp,"%t\n",blanks,NBLANKS) ;
+	    rs = bprintf(pdp->tfp,"%r\n",blanks,NBLANKS) ;
 	    pdp->tlen += rs ;
 	}
 
@@ -1680,7 +1680,7 @@ static int procmsgouthdr_clines(PROGINFO *pip,PROCDATA *pdp)
 	        off_t	coff ;
 	        btell(pdp->tfp,&coff) ;
 	        pdp->off_clines = coff ;
-	        rs = bprintf(pdp->tfp,"%t\n",blanks,NBLANKS) ;
+	        rs = bprintf(pdp->tfp,"%r\n",blanks,NBLANKS) ;
 	        pdp->tlen += rs ;
 	    }
 
@@ -1755,7 +1755,7 @@ static int procmsgouthdr_remaining(PROGINFO *pip,PROCDATA *pdp)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
-	        debugprintf("progmsgs/procmsgouthdr_remaining: hdr=%t\n",
+	        debugprintf("progmsgs/procmsgouthdr_remaining: hdr=%r\n",
 	            kp,kl) ;
 #endif
 
@@ -1822,7 +1822,7 @@ static int procmsgouthdr_status(PROGINFO *pip,PROCDATA *pdp)
 	}
 
 	if (rs >= 0) {
-	    rs = bprintf(pdp->tfp,"%s: %t\n",hdr,vp,vl) ;
+	    rs = bprintf(pdp->tfp,"%s: %r\n",hdr,vp,vl) ;
 	    pdp->tlen += rs ;
 	}
 
@@ -2024,7 +2024,7 @@ static int procmsgouthdr_date(PROGINFO *pip,PROCDATA *pdp)
 	            } else if (isNotValid(rs)) {
 	                rs = SR_OK ;
 	                if (pip->f.logmsg) {
-	                    proglog_printf(pip,"  bad_date=>%t<",vp,vl) ;
+	                    proglog_printf(pip,"  bad_date=>%r<",vp,vl) ;
 		        }
 	            }
 
@@ -2081,7 +2081,7 @@ static int procmsgouthdr_subject(PROGINFO *pip,PROCDATA *pdp)
 	        strdcpyclean(mip->h_subject,MAILADDRLEN,'¿',cp,cl) ;
 
 	        if (pip->f.logmsg) {
-	            proglog_printf(pip,"  subject=>%t<",
+	            proglog_printf(pip,"  subject=>%r<",
 	                mip->h_subject,MIN(cl,50)) ;
 		}
 
@@ -2144,7 +2144,7 @@ static int procmsgouthdr_articleid(PROGINFO *pip,PROCDATA *pdp)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("progmsgs/procmsgouthdr_articleid: a=%t\n",
+	            debugprintf("progmsgs/procmsgouthdr_articleid: a=%r\n",
 			cp,ml) ;
 #endif
 
@@ -2152,7 +2152,7 @@ static int procmsgouthdr_articleid(PROGINFO *pip,PROCDATA *pdp)
 
 	        if (pip->f.logmsg) {
 		    int	ll = MIN(ml,50) ;
-	            proglog_printf(pip,"  articleid=%t",cp,ll) ;
+	            proglog_printf(pip,"  articleid=%r",cp,ll) ;
 		}
 
 	    } /* end if */
@@ -2210,7 +2210,7 @@ static int procmsgouthdr_deliveredto(PROGINFO *pip,PROCDATA *pdp)
 #if	CF_DEBUG
 		    if (DEBUGLEVEL(4))
 	 		debugprintf("progmsgs/procmsgouthdr_deliveredto: "
-				"recip=%t\n",
+				"recip=%r\n",
 				cp,cl) ;
 #endif
 
@@ -2219,7 +2219,7 @@ static int procmsgouthdr_deliveredto(PROGINFO *pip,PROCDATA *pdp)
 #if	CF_DEBUG
 		    if (DEBUGLEVEL(4))
 	 		debugprintf("progmsgs/procmsgouthdr_deliveredto: "
-			    "nl=%u n=%t\n",nl,np,nl) ;
+			    "nl=%u n=%r\n",nl,np,nl) ;
 #endif
 		        if ((hlen+cl+nl+5) > mlen) {
 			    nl = (mlen - (hlen+cl+5)) ;
@@ -2229,7 +2229,7 @@ static int procmsgouthdr_deliveredto(PROGINFO *pip,PROCDATA *pdp)
 			"shortening new nl=%u\n",nl) ;
 #endif
 			}
-			rs1 = bufprintf(ebuf,elen,"%t (%t)",cp,cl,np,nl) ;
+			rs1 = bufprintf(ebuf,elen,"%r (%r)",cp,cl,np,nl) ;
 			    if (rs1 >= 0) {
 				cl = rs1 ;
 			        cp = ebuf ;
@@ -2248,7 +2248,7 @@ static int procmsgouthdr_deliveredto(PROGINFO *pip,PROCDATA *pdp)
 	                    pdp->tlen += rs ;
 	                    if (pip->f.logmsg) {
 		                cint	ml = MIN(cl,50) ;
-	                        proglog_printf(pip,"  %s»%t",hdr,cp,ml) ;
+	                        proglog_printf(pip,"  %s»%r",hdr,cp,ml) ;
 		            }
 			} /* end if (print-hdr) */
 	            } /* end if */
@@ -2341,7 +2341,7 @@ static int procmsgoutbody(PROGINFO *pip,PROCDATA *pdp)
 
 #if	CF_DEBUG && CF_DEBUGBODY
 	        if (DEBUGLEVEL(4)) {
-	            debugprintf("progmsgs/procmsgoutbody: ll=%u body=>%t<\n",
+	            debugprintf("progmsgs/procmsgoutbody: ll=%u body=>%r<\n",
 	                ll,lp,strlinelen(lp,ll,45)) ;
 	            debugprintf("progmsgs/procmsgoutbody: f_eol=%u\n",f_eol) ;
 		}
@@ -2393,7 +2393,7 @@ static int procmsgoutbody(PROGINFO *pip,PROCDATA *pdp)
 
 #if	CF_DEBUG && CF_DEBUGBODY
 	        if (DEBUGLEVEL(4)) {
-	            debugprintf("progmsgs/procmsgoutbody: ll=%u body=>%t<\n",
+	            debugprintf("progmsgs/procmsgoutbody: ll=%u body=>%r<\n",
 	                ll,lp,strlinelen(lp,ll,45)) ;
 	            debugprintf("progmsgs/procmsgoutbody: f_eol=%u\n",f_eol) ;
 		}
@@ -2567,7 +2567,7 @@ static int procmsgct(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("progmsgs/procmsgct: hdr=>%t<\n",hp,hl) ;
+	    debugprintf("progmsgs/procmsgct: hdr=>%r<\n",hp,hl) ;
 #endif
 
 	if ((rs = mhcom_start(&c,hp,hl)) >= 0) {
@@ -2577,7 +2577,7 @@ static int procmsgct(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("progmsgs/procmsgct: v=>%t<\n",vp,vl) ;
+	            debugprintf("progmsgs/procmsgct: v=>%r<\n",vp,vl) ;
 #endif
 
 	        if ((tp = strnchr(vp,vl,';')) != nullptr)
@@ -2619,7 +2619,7 @@ static int procmsgce(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("progmsgs/procmsgce: hdr=>%t<\n",hp,hl) ;
+	    debugprintf("progmsgs/procmsgce: hdr=>%r<\n",hp,hl) ;
 #endif
 
 	if ((rs = comparse_start(&com,hp,hl)) >= 0) {
@@ -2629,7 +2629,7 @@ static int procmsgce(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("progmsgs/procmsgce: v=>%t<\n",vp,vl) ;
+	            debugprintf("progmsgs/procmsgce: v=>%r<\n",vp,vl) ;
 #endif
 
 	        if ((tp = strnchr(vp,vl,';')) != nullptr)
@@ -2773,7 +2773,7 @@ int		al ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("procmsglogaddr: ent a=>%t<\n",
+	    debugprintf("procmsglogaddr: ent a=>%r<\n",
 	        ap,strlinelen(ap,al,40)) ;
 #endif
 
@@ -2804,13 +2804,13 @@ int		al ;
 			    if (rs >= 0) {
 
 	                    cl = strnlen(cp,(LOGLINELEN -2 -hnl -1)) ;
-	                    proglog_printf(pip,"  %s=%t",hnp,cp,cl) ;
+	                    proglog_printf(pip,"  %s=%r",hnp,cp,cl) ;
 
 	                    sp = ep->cp ; /* EMA-comment */
 	                    if (sp != nullptr) {
 
 	                        if ((cl = sfsubstance(sp,ep->cl,&cp)) > 0) {
-	                            cchar	*fmt = "    (%t)" ;
+	                            cchar	*fmt = "    (%r)" ;
 	                            cl = MIN(cl,(LOGLINELEN -4 -2)) ;
 	                            proglog_printf(pip,fmt,cp,cl) ;
 	                        }
@@ -2822,7 +2822,7 @@ int		al ;
 
 	                        sp = ep->ap ; /* EMA-address */
 	                        if ((cl = sfsubstance(sp,ep->al,&cp)) > 0) {
-				    cchar	*fmt = "    (%t)" ;
+				    cchar	*fmt = "    (%r)" ;
 	                            cl = MIN(cl,(LOGLINELEN -4 -2)) ;
 	                            proglog_printf(pip,fmt,cp,cl) ;
 	                        }

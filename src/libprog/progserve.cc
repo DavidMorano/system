@@ -706,10 +706,10 @@ const char	*argz ;
 	}
 
 	if (pip->open.logprog) {
-	    proglog_printf(pip,"server=%t",enp,enl) ;
+	    proglog_printf(pip,"server=%r",enp,enl) ;
 	}
 	if (pip->debuglevel > 0) {
-	    bprintf(pip->efp,"%s: server=%t\n",pip->progname,enp,enl) ;
+	    bprintf(pip->efp,"%s: server=%r\n",pip->progname,enp,enl) ;
 	}
 
 /* can we execute this service daemon? */
@@ -887,9 +887,9 @@ const char	*argz ;
 	while ((cl > 0) && (cp[cl-1] == '/')) cl -= 1 ;
 
 	if (pip->open.logprog)
-	    proglog_printf(pip,"server=%t",cp,cl) ;
+	    proglog_printf(pip,"server=%r",cp,cl) ;
 	if (pip->debuglevel > 0)
-	    bprintf(pip->efp,"%s: server=%t",pip->progname,cp,cl) ;
+	    bprintf(pip->efp,"%s: server=%r",pip->progname,cp,cl) ;
 
 /* can we execute this service daemon? */
 

@@ -1,4 +1,4 @@
-/* main SUPPORT (filoex) */
+/* filex_main SUPPORT (filex) */
 /* encoding=ISO8859-1 */
 /* lang=C++11 */
 
@@ -24,6 +24,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	filex_main
+
+	Description:
 	This is a fairly generic front-end subroutine for a program.
 
 *******************************************************************************/
@@ -40,6 +44,8 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<ucmallreg.h>
+#include	<getourenv.h>
 #include	<mallocxx.h>
 #include	<estrings.h>
 #include	<sighand.h>
@@ -59,9 +65,7 @@
 #include	<cfdec.h>
 #include	<field.h>
 #include	<nulstr.h>
-#include	<ucmallreg.h>
 #include	<vstrxcmp.h>
-#include	<getourenv.h>
 #include	<nleadstr.h>
 #include	<matxstr.h>
 #include	<isnot.h>
@@ -619,7 +623,7 @@ int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
 	SIGHAND		sm ;
-	BITS		pargs ;
+	bits		pargs ;
 	keyopt		akopts ;
 	bfile		errfile ;
 
@@ -1563,12 +1567,12 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* help file */
 
-	if (f_help)
+	if (f_help) {
 	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
+	}
 
 	if (f_version || f_help || f_usage)
 	    goto retearly ;
-
 
 	ex = EX_OK ;
 
