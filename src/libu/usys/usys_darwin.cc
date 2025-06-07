@@ -2,21 +2,18 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* define various sytem (global) variables */
+/* define some missing or special subroutines for Apple-Darwin */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2001-04-11, David D-A- Morano
+	= 1998-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
-
-	= 2014-06-27, David D-A- Morano
-	I updated this to use the 'constexpr' capability of C++14.
 
 */
 
-/* Copyright © 2001,2014 David D-A- Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -24,7 +21,17 @@
 	usys_darwin
 
 	Description:
-	We defines some system (global) variables in this module.
+	I define some subroutine that are either missing or that
+	are specially needed by the Apple-Darwin operating system.
+	The more stuff that is in here means that Apple-Darwin is
+	missing more stuff (noramlly the case) than other operating
+	systems that have more of the normal stuff in them.
+
+	Notes:
+	1. the Apple-Darwin operating system is normally missing a
+	log of stuff as compared with other operating systems.  The
+	missing stuff is all throughout this entire code base,
+	rather than just missig in this area.
 
 *******************************************************************************/
 
@@ -33,19 +40,20 @@
 /* USYS_DARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
-
 #include	<sys/types.h>
-#include	<sys/mman.h>
 #include	<unistd.h>		/* |getdomainname(3darwin)| */
 #include	<cerrno>
-#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usyscallbase.hh>
+#include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<usyscallbase.hh>	/* |usyscallbase(3u)| */
 #include	<intsat.h>
+#include	<localmisc.h>
 
 #include	"usys_darwin.h"
 
@@ -75,7 +83,7 @@ namespace {
         } ;
 	int isysctl() noex ;
     } ; /* end struct (syscaller) */
-}
+} /* end namespace */
 
 /*----------------------------------------------------------------------------*/
 /* TIMER begin */
@@ -117,7 +125,6 @@ EXTERNC_end
 /* TIMER end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
 /* RELTIMEDWAIT begin */
 #if	(!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0)
@@ -134,7 +141,6 @@ errno_t pthread_cond_reltimedwait_np(PTC *op,PTM *mp,CTIMESPEC *) noex {
 /* RELTIMEDWAIT end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
 /* MEMCNTL begin */
 errno_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
@@ -150,33 +156,61 @@ errno_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 /* MEMCNTL end */
 /*----------------------------------------------------------------------------*/
 
-namespace libu {
-    sysret_t darwin_usysctl(char *obuf,int olen,cchar *name) noex {
-	syscaller	syscall ;
-	int		rs = SR_FAULT ;
-	syscall.m = &syscaller::isysctl ;
-	if (obuf && name) {
-	    rs = SR_INVALID ;
-	    if (olen >= 0) {
-	        rs = syscall(obuf,olen,name) ;
-	    }
+/*----------------------------------------------------------------------------*/
+/* PSEM begin (unnamed POSIX® semaphores) */
+#if	(!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0)
+
+EXTERNC_begin
+
+unixret_t darwinsem_init(sem_t *semp,int,unsigned int) noex {
+    	int		rs = SR_FAULT ;
+	if (semp) {
+	    rs = SR_NOSYS ;
 	}
 	return rs ;
-    } /* end subroutine (darwin_usysctl) */
 }
+
+unixret_t darwinsem_destroy(sem_t *semp) noex {
+    	int		rs = SR_FAULT ;
+	if (semp) {
+	    rs = SR_NOSYS ;
+	}
+	return rs ;
+}
+
+EXTERNC_end
+
+#endif /* (!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0) */
+/* PSEM end */
+/*----------------------------------------------------------------------------*/
+
+namespace usys {
+    sysret_t darwin_usysctl(char *obuf,int olen,cchar *name) noex {
+	int		rs = SR_FAULT ;
+	if (obuf && name) {
+	    rs = SR_INVALID ;
+	    if (olen > 0) {
+	        syscaller syscall ;
+	        syscall.m = &syscaller::isysctl ;
+	        rs = syscall(obuf,olen,name) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+    } /* end subroutine (darwin_usysctl) */
+} /* end namespace (usys) */
 
 int syscaller::isysctl() noex {
 	cnullptr	np{} ;
-	size_t		osz = size_t(olen) ;
+	size_t		osize = size_t(olen) ;
 	int		rs ;
 	int		len = 0 ;
-        if ((rs = sysctlbyname(name,obuf,&osz,np,0uz)) >= 0) {
-            len = intsat(osz) ;
+        if ((rs = sysctlbyname(name,obuf,&osize,np,0uz)) >= 0) {
+            len = intsat(osize) ;
             obuf[len] = '\0' ;
         } else {
             rs = (- errno) ;
 	}
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end method (syscaller:isysctl) */
 
