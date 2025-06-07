@@ -119,14 +119,14 @@ int ptm_getprioceiling(ptm *op,int *oldp) noex {
 }
 /* end subroutine (ptm_getprioceiling) */
 
-int prm_lockbegin(ptm *op) noex {
+int ptm_lockbegin(ptm *op) noex {
 	ucptm		pmo ;
 	pmo.m = &ucptm::lock ;
 	return pmo(op) ;
 }
-/* end subroutine (prm_lockbegin) */
+/* end subroutine (ptm_lockbegin) */
 
-int prm_lockbeginto(ptm *op,int to) noex {
+int ptm_lockbeginto(ptm *op,int to) noex {
 	ucptm		pmo ;
 	if (to >= 0) {
 	    pmo.mto = int((to * 1000) & INT_MAX) ;
@@ -136,14 +136,14 @@ int prm_lockbeginto(ptm *op,int to) noex {
 	}
 	return pmo(op) ;
 }
-/* end subroutine (prm_lockbeginto) */
+/* end subroutine (ptm_lockbeginto) */
 
-int prm_lockbegintry(ptm *op) noex {
+int ptm_lockbegintry(ptm *op) noex {
 	ucptm		pmo ;
 	pmo.m = &ucptm::locktry ;
 	return pmo(op) ;
 }
-/* end subroutine (prm_lockbegintry) */
+/* end subroutine (ptm_lockbegintry) */
 
 int ptm_lockend(ptm *op) noex {
 	int		rs = SR_FAULT ;
@@ -249,7 +249,7 @@ int ptm_co::operator () (int to) noex {
 	        rs = ptm_destroy(op) ;
 	        break ;
 	    case ptmmem_lockbegin:
-	        rs = prm_lockbeginto(op,to) ;
+	        rs = ptm_lockbeginto(op,to) ;
 	        break ;
 	    case ptmmem_lockend:
 	        rs = ptm_lockend(op) ;

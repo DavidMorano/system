@@ -53,7 +53,7 @@ struct ptca : pthread_condattr_t {
 	ptca &operator = (const ptca &) = delete ;
 	int	getpshared(int *) noex ;
 	void dtor() noex ;
-	~ptca() {
+	destruct ptca() {
 	    dtor() ;
 	} ; /* end dtor (ptca) */
 } ; /* end class (ptca) */

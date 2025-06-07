@@ -65,12 +65,12 @@ struct pta : pthread_attr_t {
 	int setstackaddr(void *) noex ;
 	int setstacksize(size_t) noex ;
 	void dtor() noex ;
-	~pta() {
+	destruct pta() {
 	    dtor() ;
 	} ; /* end dtor (pta) */
 } ; /* end class (pta) */
 #else
-typedef PTA		pta ;
+typedef PTA	pta ;
 #endif /* __cplusplus */
 
 EXTERNC_begin

@@ -20,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<pthread.h>
+#include	<pthread.h>		/* |pthread_cond_t| */
 #include	<time.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -80,7 +80,7 @@ struct ptc : pthread_cond_t {
 	int timedwait(ptm *,CTIMESPEC *) noex ;
 	int reltimedwaitnp(ptm *,CTIMESPEC *) noex ;
 	void dtor() noex ;
-	~ptc() {
+	destruct ptc() {
 	    dtor() ;
 	} ; /* end dtor (ptc) */
 } ; /* end class (ptc) */

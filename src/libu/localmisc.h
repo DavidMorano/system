@@ -25,8 +25,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<sys/socket.h>
 #include	<limits.h>
+#include	<stdlib.h>		/* |size_t| */
+#include	<string.h>		/* |memset(3c)| */
 #include	<clanguage.h>
 
 
@@ -102,7 +103,7 @@
 #endif
 
 #ifndef	MKBOOL
-#define	MKBOOL(exp)	((exp)!=0)
+#define	MKBOOL(exp)	((exp) != 0)
 #endif
 
 #ifndef	UC
@@ -361,34 +362,42 @@ typedef const char		cc ;
 #define	LINEBUFLEN	MAXLINELEN
 #endif
 
-/* common digit base (bases 8, 10, 16) buffer lengths */
-
-#ifndef	OCTBUFLEN
-#define	OCTBUFLEN	86		/* can hold |int256_t| in octal */
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	80		/* can hold |int256_t| in decimal */
-#endif
-
-#ifndef	HEXBUFLEN
-#define	HEXBUFLEN	64		/* can hold |int256_t| in hexadecimal */
-#endif
-
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100		/* "real" name length */
+#ifndef	NOFILE
+#define	NOFILE		20		/* UNIX® number of files */
 #endif
 
 #ifndef	TIMEBUFLEN
 #define	TIMEBUFLEN	80		/* can hold? all known date strings */
 #endif
 
-#ifndef	COLUMNS
-#define	COLUMNS		80		/* historical terminal columns */
+/* common digit base (2, 8, 10, 16) buffer lengths (convenience defines) */
+
+#ifndef	BINBUFLEN
+#define	BINBUFLEN	256		/* can hold |int256_t| in binary */
 #endif
 
-#ifndef	NOFILE
-#define	NOFILE		20		/* UNIX® number of files */
+#ifndef	OCTBUFLEN
+#define	OCTBUFLEN	86		/* can hold |int256_t| in octal */
+#endif
+
+#ifndef	DECBUFLEN
+#define	DECBUFLEN	78		/* can hold |int256_t| in decimal */
+#endif
+
+#ifndef	HEXBUFLEN
+#define	HEXBUFLEN	64		/* can hold |int256_t| in hexadecimal */
+#endif
+
+#ifndef	DIGBUFLEN
+#define	DIGBUFLEN	MAX(MAX(MAX(BINBUFLEN,OCTBUFLEN),DECBUFLEN),HEXBUFLEN)
+#endif
+
+#ifndef	REALNAMELEN
+#define	REALNAMELEN	100		/* "real" name length */
+#endif
+
+#ifndef	COLUMNS
+#define	COLUMNS		80		/* historical terminal columns */
 #endif
 
 #ifndef	NULLFNAME
@@ -409,6 +418,8 @@ typedef const char		cc ;
 
 #define	eol		'\n'
 
+#ifndef	SUBROUTINE_LEQUIV
+#define	SUBROUTINE_LEQUIV
 
 static inline bool lequiv(bool a1,bool a2) noex {
 	return LEQUIV(a1,a2) ;
@@ -417,6 +428,20 @@ static inline bool lequiv(bool a1,bool a2) noex {
 static inline bool lxor(bool a1,bool a2) noex {
 	return LXOR(a1,a2) ;
 }
+
+#endif /* SUBROUTINE_LEQUIV */
+
+#ifdef	__cplusplus
+#else
+#ifndef	SUBROUTINE_MEMCLEAR
+#define	SUBROUTINE_MEMCLEAR
+static inline int memclear(void *objp,int sz) noex {
+    	csize	objs = (size_t) sz ;
+    	memset(objp,0,objs) ;
+	return sz ;
+}
+#endif /* SUBROUTINE_MEMCLEAR */
+#endif /* __splusplus */
 
 
 #endif /* LOCALMISC_INCLUDE */
