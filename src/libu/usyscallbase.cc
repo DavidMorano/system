@@ -110,6 +110,9 @@ int usyscallbase::handler() noex {
                     case SR_NOMEM:
                         r = to_nomem(rs) ;
                         break ;
+                    case SR_NOSPC:
+                        r = to_nospc(rs) ;
+		        break ;
 	            case SR_NOSR:
                         r = to_nosr(rs) ;
 		        break ;
@@ -124,9 +127,6 @@ int usyscallbase::handler() noex {
                         break ;
 	            case SR_NOLCK:
                         r = to_nolck(rs) ;
-		        break ;
-                    case SR_NOSPC:
-                        r = to_nospc(rs) ;
 		        break ;
 	            case SR_DQUOT:
                         r = to_dquot(rs) ;

@@ -22,7 +22,7 @@
 	libu::ctdecf
 
 	Description:
-	Convert a |double| to a string.
+	Convert a |double| to a decimal digit-string.
 
 	Synopsis:
 	int libu::ctdecf(char *rbuf,int rlen,int prec,double v) noex
@@ -44,7 +44,7 @@
 #include	<unistd.h>		/* |sleep(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdio>		/* |snprintf(3c)| */
+#include	<cstdio>		/* |vsnprintf(3c)| */
 #include	<cstring>		/* |strlcpy(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)|  */
@@ -52,9 +52,11 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<utimeout.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscallbase.hh>
+#include	<usyscallbase.hh>	/* |usyscallbase(3u)| */
+#include	<utimeout.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"usysutility.hh"
@@ -114,7 +116,7 @@ namespace {
         } ;
 	int std_getloadavg() noex ;
     } ; /* end struct (syscaller) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -152,61 +154,67 @@ namespace libu {
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if (prec >= 0) {
-		try {
-		    string	s = "%." + to_string(prec) + "f" ;
-		    {
-			cchar	*fmt = s.c_str() ;
-	        	rs = snuprintf(rbuf,rlen,fmt,prec,v) ;
-			len = rs ;
-		    }
-		} catch (...) {
-		    rs = SR_NOMEM ;
-		}
+		rs = snprintf(rbuf,rlen,"%.*f",prec,v) ;
+		len = rs ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (ctdecf) */
-    int snuvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
+    int snvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf && fmt && ap) {
 	    rs = SR_INVALID ;
 	    if ((rlen >= 0) && fmt[0]) {
-		int	to_nomem = utimeout[uto_nomem] ;
-		bool	fexit = false ;
+		errtimer	to_again	= utimeout[uto_again] ;
+		errtimer	to_nomem	= utimeout[uto_nomem] ;
+		errtimer	to_nosr		= utimeout[uto_nosr] ;
+		errtimer	to_nobufs	= utimeout[uto_nobufs] ;
+		errtimer	to_nospc	= utimeout[uto_nospc] ;
+		reterr		r ;
 		repeat {
 		    if ((rs = std_vsnprintf(rbuf,rlen,fmt,ap)) < 0) {
+			r(rs) ;
 			switch (rs) {
-			case SR_NOMEM:
-			    if (to_nomem-- > 0) {
-				msleep(1000) ;
-			    } else {
-				fexit = true ;
-			    }
-			    break ;
 			case SR_AGAIN:
+			    r = to_again(rs) ;
+			    break ;
+			case SR_NOMEM:
+			    r = to_nomem(rs) ;
+			    break ;
+			case SR_NOSR:
+			    r = to_nosr(rs) ;
+			    break ;
+			case SR_NOBUFS:
+			    r = to_nobufs(rs) ;
+			    break ;
+			case SR_NOSPC:
+			    r = to_nospc(rs) ;
+			    break ;
 			case SR_INTR:
+			    r(false) ;
 			    break ;
 			} /* end switch */
+			rs = r ;
 		    } /* end if (error) */
-		} until ((rs >= 0) || fexit) ;
+		} until ((rs >= 0) || r.fexit) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (snuvprintf) */
-    int snuprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
+    } /* end subroutine (snvprintf) */
+    int snprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (rbuf && fmt) {
 	    rs = SR_INVALID ;
 	    if ((rlen >= 0) && fmt[0]) {
 		va_begin(ap,fmt) ;
-		rs = snuvprintf(rbuf,rlen,fmt,ap) ;
+		rs = snvprintf(rbuf,rlen,fmt,ap) ;
 		va_end(ap) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (snuprintf) */
-    int	snuloadavgd(char *rbuf,int rlen,int prec,double *dlap,int dlan) noex {
+    } /* end subroutine (snprintf) */
+    int	snloadavgd(char *rbuf,int rlen,int prec,double *dlap,int dlan) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf && dlap) {
@@ -215,8 +223,8 @@ namespace libu {
 	    if ((rlen >= 0) && (prec >= 0) && (dlan >= 0)) {
 		try {
 		    string	s ;
-		    cint	dlen = DIGBUFLEN ;
-		    char	dbuf[DIGBUFLEN + 1] ;
+		    cint	dlen = DECBUFLEN ;
+		    char	dbuf[DECBUFLEN + 1] ;
 		    rs = SR_OK ;
 		    for (int i = 0 ; (rs >= SR_OK) && (i < dlan) ; i += 1) {
 			if (i > 0) s += ' ' ;
@@ -236,8 +244,8 @@ namespace libu {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-    } /* end subroutine (snuloadavgd) */
-}
+    } /* end subroutine (snloadavgd) */
+} /* end namespace (libu) */
 
 
 /* local subroutines */
@@ -252,9 +260,9 @@ int syscaller::std_getloadavg() noex {
 /* end method (syscaller::std_getloadavg) */
 
 static int std_vsnprintf(char *rbuf,int rlen,cc *fmt,va_list ap) noex {
-	csize		rsz = size_t(rlen + 1) ;
+	csize		rsize = size_t(rlen + 1) ;
 	int		rs ;
-	if ((rs = vsnprintf(rbuf,rsz,fmt,ap)) >= 0) {
+	if ((rs = vsnprintf(rbuf,rsize,fmt,ap)) >= 0) {
 	    if (rs > rlen) {
 	        rs = SR_OVERFLOW ;
 	    }

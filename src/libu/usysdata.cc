@@ -22,6 +22,8 @@
 	u_uname
 	u_getnodename
 	u_getauxinfo
+    	libu::loadhostid
+    	libu::ugethostid
 
 	Description:
 	Retrieve some operating system and machine information.
@@ -30,6 +32,9 @@
 	int u_uname(utsname *up) noex
 	int u_getnodename(char *rbuf,int rlen) noex
 	int u_getauxinfo(char *rbuf,int rlen,int req) noex
+	int u_gethostid(ulong *) noex
+    	int libu::loadhostid(char *,int) noex
+    	int libu::ugethostid(ulong *) noex
 
 	Arguments:
 	up		UTSNAME object pointer
@@ -69,11 +74,12 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/utsname.h>
-#include	<climits>		/* |INT_MAX| */
 #include	<cerrno>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* <- for |strcmp(3c)| */
 #include	<utility>		/* |unreachable(3c++)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -83,10 +89,11 @@
 #include	<usupport.h>		/* <- most of |libu| namespace */
 #include	<usysauxinfo.h>		/* the request codes */
 #include	<usyscallbase.hh>
-#include	<localmisc.h>		/* |NODENAMELEN| */
+#include	<localmisc.h>
 
 #include	"usysdata.h"
 
+import ulibvals ;			/* |ulibval(3u)| */
 
 /* local defines */
 
@@ -141,7 +148,7 @@ namespace {
 	int std_uname() noex ;
 	int std_gethostid() noex ;
     } ; /* end struct (syscaller) */
-}
+} /* end namespace */
 
 namespace {
     constexpr int	nitems = 4 ;
@@ -150,7 +157,7 @@ namespace {
 	cchar		*machine ;
 	cchar		*platform ;
 	cchar		*hwprovider ;
-	~umachiner() {
+	destruct umachiner() {
 	    delete mbuf ;
 	    mbuf = nullptr ;
 	    mlen = 0 ;
@@ -166,11 +173,11 @@ namespace {
 	int start() noex ;
 	int finish() noex ;
 	int load() noex ;
-	~datobj() {
+	destruct datobj() {
 	    (void) finish() ;
  	} ;
     } ; /* end struct (datobj) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -198,13 +205,13 @@ constexpr int		reqs[] = {
 	SAI_HWPROVIDER
 } ;
 
-constexpr int		datlen = NODENAMELEN ;
+static cint		datlen = ulibval.nodenamelen ;
 
 constexpr cchar		defmachine[] = "Intel(R) Core(TM) i7" ;
 
-constexpr bool		f_sunos		= F_SUNOS ;
-constexpr bool		f_darwin	= F_DARWIN ;
-constexpr bool		f_linux		= F_LINUX ;
+constexpr cbool		f_sunos		= F_SUNOS ;
+constexpr cbool		f_darwin	= F_DARWIN ;
+constexpr cbool		f_linux		= F_LINUX ;
 
 
 /* exported variables */
@@ -239,7 +246,7 @@ int u_getnodename(char *rbuf,int rlen) noex {
 		    len = rs ;
 		}
 	        delete utsp ;
-	    } /* end if (new-utsname) */
+	    } /* end if (utsname) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
@@ -273,15 +280,6 @@ int u_gethostid(ulong *idp) noex {
 /* end subroutine (u_getauxinfo) */
 
 namespace libu {
-    sysret_t loadhostid(char *dp,int dl) noex {
-	int		rs = SR_FAULT ;
-	if (dp) {
-	    if (ulong hid ; (rs = ugethostid(&hid)) >= 0) {	
-		rs = ctdec(dp,dl,hid) ;
-	    }
-	}
-	return rs ;
-    }
     sysret_t ugethostid(ulong *idp) noex {
 	int		rs = SR_FAULT ;
 	if (idp) {
@@ -290,8 +288,17 @@ namespace libu {
 	    rs = sc(idp) ;
 	} /* end if (non-null) */
 	return rs ;
-    }
-}
+    } /* end subroutine (ugethostid) */
+    sysret_t loadhostid(char *dp,int dl) noex {
+	int		rs = SR_FAULT ;
+	if (dp) {
+	    if (ulong hid ; (rs = ugethostid(&hid)) >= 0) {	
+		rs = ctdec(dp,dl,hid) ;
+	    }
+	}
+	return rs ;
+    } /* end subroutine (loadhostid) */
+} /* end namespace (libu) */
 
 
 /* local subroutines */
