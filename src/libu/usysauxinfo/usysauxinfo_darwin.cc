@@ -8,15 +8,15 @@
 
 /* revision history:
 
-	= 2001-04-11, David D-A- Morano
+	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
-	= 2014-06-27, David D-A- Morano
+	= 2014-06-27, David A-D- Morano
 	I updated this to use the 'constexpr' capability of C++14.
 
 */
 
-/* Copyright © 2001,2014 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001,2014 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -33,10 +33,8 @@
 /* USYSAUXINFO_DARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
-#include	<sys/types.h>
 #include	<sys/sysctl.h>		/* <- Darwin |sysctl(3c)| */
 #include	<unistd.h>
-#include	<climits>
 #include	<cerrno>
 #include	<new>
 #include	<clanguage.h>
@@ -49,6 +47,8 @@
 #include	"usysauxinfo_darwin.h"
 
 using namespace	libu ;
+
+using usys::darwin_usysctl ;
 
 namespace libu {
     extern sysret_t loadhostid(char *,int) noex ;
