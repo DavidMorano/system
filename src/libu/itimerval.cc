@@ -46,11 +46,14 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<ctime>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"itimerval.h"
 
+import libutil ;
 
 /* local defines */
 

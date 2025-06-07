@@ -24,12 +24,12 @@
 	These subroutines manipulate ITIMERSPEC objects.
 
 	Synopsis:
-	int itimerspec_load(ITIMERSPEC *tsp,time_t sec,long nsec) noex
+	int itimerspec_load(ITIMERSPEC *tsp,CTIMESPEC *vp,CTIMESPEC *ip) noex {
 
 	Arguments:
 	tsp		pointer to ITIMERSPEC
-	sec		seconds
-	nsec		nanoseconds
+	vp		pointer to TIMESPEC for the "value"
+	ip		pointer to TIMESPEC for the "interval"
 
 	Returns:
 	>=0		OK
@@ -44,13 +44,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/time.h>		/* <- interval timers are here */
 #include	<ctime>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"itimerspec.h"
 
+import libutil ;
 
 /* local defines */
 
