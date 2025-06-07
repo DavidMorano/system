@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2001-04-11, David D-A- Morano
+	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2001 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -51,7 +51,7 @@
 
 #include	"usys_usendfile.h"
 
-#if	defined(OSNAME_SunOS) && (SYSHAS_SunOS > 0) 
+#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) 
 
 namespace usys {
     sysret_t usendfile(int fd,int s,off_t fo,size_t c) noex {
@@ -69,12 +69,13 @@ namespace usys {
     } /* end subroutine (usendfile) */
 }
 
-#elif	defined(OSNAME_Darwin) && (SYSHAS_Darwin > 0) 
+#elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) 
 
 namespace usys {
     sysret_t usendfile(int fd,int s,off_t fo,size_t c) noex {
 	int		rs = SR_BADFD ;
 	int		len = 0 ;
+	(void) c ;
 	if ((fd >= 0) && (s >= 0) && (fo >= 0)) {
 	    off_t	res = 0 ;
 	    if ((rs = sendfile(fd,s,fo,&res,nullptr,0)) >= 0) {

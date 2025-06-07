@@ -32,8 +32,8 @@
 #include	<sys/stat.h>
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
-#include	<sys/poll.h>
 
+#include	<poll.h>
 #include	<signal.h>
 #include	<limits.h>
 #include	<unistd.h>
@@ -49,25 +49,54 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
+
+#include	<aflag.hh>
+#include	<endian.h>
 
 #include	<usys.h>	/* <- auxilllary OS support */
-
+#include	<usysflag.h>
 #include	<usysop.h>	/* UNIX® system-operations */
 #include	<usysdata.h>	/* UNIX® system-data */
-#include	<ugetloadavg.h>
+#include	<usysutility.hh>
+#include	<usysauxinfo.h>
+#include	<usysdata.h>
+#include	<usysinfo.h>
+
+#include	<ugetloadavg.h>	/* load-average retrieval |u_getloadavg| */
 #include	<um.h>		/* UNIX® memory-management */
 #include	<uipc.h>	/* UNIX® System V IPC */
 #include	<ustr.h>	/* UNIX® STREAMS® */
-#include	<uopen.h>
+#include	<ufdlock.h>
 #include	<ufiledesc.h>	/* file-descriptor */
 #include	<ufileop.h>	/* file-operations */
 #include	<usig.h>
 #include	<uprocess.h>
+#include	<uatfork.h>
 #include	<uexec.h>
+#include	<utimeoutdefs.h>
+#include	<utimeout.h>
+#include	<utimeouts.h>
+#include	<ulogerror.h>
+#include	<umemalloc.hh>
 
+#include	<varnames.hh>
+#include	<syswords.hh>
+#include	<sysconfcmds.h>
 #include	<ptx.h>
 #include	<strnul.hh>
+#include	<mailvalues.hh>
 #include	<intx.h>
+#include	<timewatch.hh>
+#include	<timecount.hh>
+#include	<timeval.h>
+#include	<timespec.h>
+#include	<itimerval.h>
+#include	<itimerspec.h>
+#include	<stdfnames.h>
+
+#include	<xxtostr.h>
+#include	<strtox.h>
 
 
 #endif /* USYSCALLS_INCLUDE */

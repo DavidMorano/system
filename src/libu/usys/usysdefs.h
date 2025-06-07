@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2001-04-11, David D-A- Morano
+	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2001 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -421,6 +421,9 @@ enum extrasysconfs {
 #ifndef	SYMNAMELEN
 #define	SYMNAMELEN	100		/* symbol-name-length (really 255) */
 #endif
+#ifndef	SNBUFLEN
+#define	SNBUFLEN	SYMNAMELEN	/* symbol-name-length (really 255) */
+#endif
 
 /* time-zone-name (this is the abbreviated time-zone from time immemorial) */
 #ifndef	ZNBUFLEN
@@ -475,6 +478,10 @@ enum extrasysconfs {
 /* for |poll(2)| */
 #ifndef	POLL_INTMULT
 #define	POLL_INTMULT	1000		/* poll-interval-multiplier (to secs) */
+#endif
+
+#ifndef	MAXBASE
+#define	MAXBASE		64		/* standard (common) value */
 #endif
 
 /* C-C++ memory order */
