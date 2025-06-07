@@ -1,4 +1,4 @@
-/* digtab MODULE */
+/* digtab MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -34,7 +34,7 @@
 	(for some now-unknown historical reason).
 
 	Synopsis:
-	int getdig(int v) noex 
+	char getdig(int v) noex 
     	char digtab_enc(int v) noex
 
 	Argument:
@@ -51,7 +51,7 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
+#include	<utypedefs.h>		/* |MAXBASE| */
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<localmisc.h>
@@ -123,7 +123,7 @@ export {
     } /* end subroutine (getdig) */
     constexpr char digtaber::operator [] (cint v) const noex {
 	return dig[v] ;
-    } ;
+    }
 } /* end export */
 
 

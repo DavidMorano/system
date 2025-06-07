@@ -116,14 +116,14 @@ int	to ;
 #if	CF_DEBUGS
 	    debugprintf("sfreadline: sfpeek() rl=%d\n",pl) ;
 		if (pl >= 0)
-	    debugprintf("sfreadline: peek=>%t<\n",
+	    debugprintf("sfreadline: peek=>%r<\n",
 		rbp,strlinelen(rbp,pl,60)) ;
 #endif
 
 		    if (pl > 0) {
 		        if ((tp = strnchr(rbp,pl,'\n')) != NULL) {
 #if	CF_DEBUGS
-	    debugprintf("sfreadline: got frag=>%t<\n",
+	    debugprintf("sfreadline: got frag=>%r<\n",
 		rbp,strlinelen(rbp,(tp-rbp),60)) ;
 #endif
 			    len = sfread(fp,rbp,(tp+1-rbp)) ;
@@ -136,7 +136,7 @@ int	to ;
 			        rl = -1 ;
 #if	CF_DEBUGS
 		if (rl >= 0)
-	    debugprintf("sfreadline: got line=>%t<\n",
+	    debugprintf("sfreadline: got line=>%r<\n",
 		rbuf,strlinelen(rbuf,rl,60)) ;
 #endif
 			    break ;

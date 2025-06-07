@@ -1,6 +1,6 @@
 /* satarith SUPPORT (Integer-Saturation) */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* perform a variety of integer saturation addition-subtractions */
 /* version %I% last-modified %G% */
@@ -21,13 +21,25 @@
 	satarith
 
 	Description:
-	We provide some saturated add operations.
+	I provide some saturated add operations.
 
 	Synopsis:
-	T {x}addsat(T,T) noex
+	template<typename T>
+	T {x}addsat(T v1,T v2) noex
+
+	Arguments:
+	{x}		type of arguments: i, l, ll, ui, ul, ull
+	v1		value to add
+	v2		value to add
 
 	Returns:
 	-		result
+
+	Implementation-notes:
+	Remember that in the C and C++ languages, overflow on signed
+	integers is undefined-behavior (UB).  And remember that
+	you have to avoid UB before it can happen.  Hence the use
+	of |willaddover(3u)|.
 
 *******************************************************************************/
 
@@ -40,26 +52,14 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<stdintx.h>		/* extended integer types */
+#include	<willaddover.h>
 #include	<localmisc.h>
 
 #include	"satarith.h"
 
-
-import uvariables ;
+import intminmax ;
 
 /* local defines */
-
-#ifndef	LONGLONG_MIN
-#define	LONGLONG_MIN	valuelimit.llmin
-#endif
-
-#ifndef	LONGLONG_MAX
-#define	LONGLONG_MAX	valuelimit.llmax
-#endif
-
-#ifndef	ULONGLONG_MAX
-#define	ULONGLONG_MAX	valuelimit.ullmax
-#endif
 
 
 /* local namespaces */
@@ -74,10 +74,36 @@ import uvariables ;
 /* external variables */
 
 
-/* local structures */
+/* local structures and expressions */
 
 
 /* forward references */
+
+template<typename T> static T xsaddsat(T v1,T v2) noex {
+    	T		vr = 0 ;
+    	if (willaddover(v1,v2)) {
+	    if (v1 >= 0) {
+	        if (v2 >= 0) {
+		    vr = vsmax<T> ;
+	        }
+	    } else {
+	        if (v2 < 0) {
+		    vr = vsmin<T> ;
+	        }
+	    }
+	} else {
+	    vr = (v1 + v2) ;
+	}
+	return vr ;
+}
+/* end subroutine (xsaddsat) */
+
+template<typename T> static T xuaddsat(T v1,T v2) noex {
+	T		vr = (v1 + v2) ;
+	if ((vr < v1) || (vr < v2)) vr = vumax<T> ;
+	return vr ;
+}
+/* end subroutine (xuaddsat) */
 
 
 /* local variables */
@@ -89,71 +115,32 @@ import uvariables ;
 /* exported subroutines */
 
 int iaddsat(int v1,int v2) noex {
-	int		vr = (v1+v2) ;
-	if (v1 >= 0) {
-	    if (v2 >= 0) {
-		if (vr < 0) vr = INT_MAX ;
-	    }
-	} else {
-	    if (v2 < 0) {
-		if (vr >= 0) vr = INT_MIN ;
-	    }
-	}
-	return vr ;
+    	return xsaddsat(v1,v2) ;
 }
 /* end subroutine (iaddsat) */
 
 long laddsat(long v1,long v2) noex {
-	long		vr = (v1+v2) ;
-	if (v1 >= 0) {
-	    if (v2 >= 0) {
-		if (vr < 0) vr = LONG_MAX ;
-	    }
-	} else {
-	    if (v2 < 0) {
-		if (vr >= 0) vr = LONG_MIN ;
-	    }
-	}
-	return vr ;
+    	return xsaddsat(v1,v2) ;
 }
 /* end subroutine (laddsat) */
 
 longlong lladdsat(longlong v1,longlong v2) noex {
-	longlong	vr = (v1+v2) ;
-	if (v1 >= 0) {
-	    if (v2 >= 0) {
-		if (vr < 0) vr = LONGLONG_MAX ;
-	    }
-	} else {
-	    if (v2 < 0) {
-		if (vr >= 0) vr = LONGLONG_MIN ;
-	    }
-	}
-	return vr ;
+    	return xsaddsat(v1,v2) ;
 }
 /* end subroutine (lladdsat) */
 
 uint uaddsat(uint v1,uint v2) noex {
-	const uint	m = (~ INT_MAX) ;
-	uint		vr = (v1+v2) ;
-	if ((v1&m) && (v2&m)) vr = UINT_MAX ;
-	return vr ;
+	return xuaddsat(v1,v2) ;
 }
 /* end subroutine (uaddsat) */
 
 ulong uladdsat(ulong v1,ulong v2) noex {
-	const ulong	m = (~ LONG_MAX) ;
-	ulong		vr = (v1+v2) ;
-	if ((v1&m) && (v2&m)) vr = ULONG_MAX ;
-	return vr ;
+	return xuaddsat(v1,v2) ;
 }
 /* end subroutine (uladdsat) */
 
 ulonglong ulladdsat(ulonglong v1,ulonglong v2) noex {
-	const ulonglong	m = (~ LONGLONG_MAX) ;
-	ulonglong	vr = (v1+v2) ;
-	if ((v1&m) && (v2&m)) vr = ULONGLONG_MAX ;
-	return vr ;
+	return xuaddsat(v1,v2) ;
 }
 /* end subroutine (ulladdsat) */
 

@@ -1,13 +1,22 @@
 #!/usr/extra/bin/ksh
 # INSTALL-LIBU
 
+: ${EXTRA:=/usr/extra}
+: ${USRLCOAL:=/usr/local}
+
 ma so
 
-LIBS="libu.so libu.a"
+LIBS="libu.o libu.so libu.dylib"
 
-TDIRS+=" ${HOME}/github/system/lib ${HOME}/lib "
-TDIRS+=" /usr/extra/lib "
-TDIRS+=" /usr/local/lib "
+TDIRS+=" ${HOME}/github/system/lib"
+TDIRS+=" ${HOME}/github/other/lib"
+TDIRS+=" ${HOME}/lib "
+TDIRS+=" ${EXTRA}/lib "
+TDIRS+=" ${USRLOCAL}/lib "
+
+if [[ libu.so -ef libu.dylib ]] ; then :
+  ln -f libu.so libu.dylib
+fi
 
 for LIB in ${LIBS} ; do
   if [[ -r "${LIB}" ]] ; then

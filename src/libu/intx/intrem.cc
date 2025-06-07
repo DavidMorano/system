@@ -1,6 +1,6 @@
 /* intrem SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* integer remainder */
 /* version %I% last-modified %G% */

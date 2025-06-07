@@ -1,6 +1,6 @@
 /* intrem HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C20 */
+/* lang=C20 (conformance reviewed) */
 
 /* Integer-Remaider */
 /* version %I% last-modified %G% */
@@ -39,23 +39,23 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-static inline int rem(int v,int d) noex {
+inline int rem(int v,int d) noex {
 	return irem(v,d) ;
 }
-static inline long rem(long v,int d) noex {
+inline long rem(long v,int d) noex {
 	return lrem(v,d) ;
 }
-static inline longlong rem(longlong v,int d) noex {
+inline longlong rem(longlong v,int d) noex {
 	return llrem(v,d) ;
 }
 
-static inline uint rem(uint v,int d) noex {
+inline uint rem(uint v,int d) noex {
 	return urem(v,d) ;
 }
-static inline ulong rem(ulong v,int d) noex {
+inline ulong rem(ulong v,int d) noex {
 	return ulrem(v,d) ;
 }
-static inline ulonglong rem(ulonglong v,int d) noex {
+inline ulonglong rem(ulonglong v,int d) noex {
 	return ullrem(v,d) ;
 }
 

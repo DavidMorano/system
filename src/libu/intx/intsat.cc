@@ -1,6 +1,6 @@
 /* intsat SUPPORT (Integer-Saturation) */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* Integer Saturation (clamping) */
 /* version %I% last-modified %G% */
@@ -21,7 +21,18 @@
 	intsat
 
 	Description:
-	We provide some saturated add operations.
+	I provide some saturated add operations.
+
+	Synopsis:
+	int intsatl(long v) noex
+	int intsatll(longlong v) noex
+	int intsato(off_t v) noex
+	int intsatui(uint v) noex
+	int intsatul(ulong v) noex
+	int intsatull(ulonglong v) noex
+
+	Returns:
+	-	an integer value possibly saturated at min or max limit
 
 *******************************************************************************/
 
@@ -56,7 +67,7 @@
 /* forward references */
 
 template<typename T>
-int intsatx(T v) noex {
+int intsatsx(T v) noex {
 	int	r = int(v) ;
 	if (v > INT_MAX) {
 	    r = INT_MAX ;
@@ -65,7 +76,7 @@ int intsatx(T v) noex {
 	}
 	return r ;
 }
-/* end subroutine-template (intsatx) */
+/* end subroutine-template (intsatsx) */
 
 template<typename UT>
 int intsatux(UT v) noex {
@@ -82,15 +93,15 @@ int intsatux(UT v) noex {
 /* exported subroutines */
 
 int intsatl(long v) noex {
-	return intsatx(v) ;
+	return intsatsx(v) ;
 }
 
 int intsato(off_t v) noex {
-	return intsatx(v) ;
+	return intsatsx(v) ;
 }
 
 int intsatll(longlong v) noex {
-	return intsatx(v) ;
+	return intsatsx(v) ;
 }
 
 int intsatui(uint v) noex {

@@ -55,8 +55,8 @@ extern cchar	*endianstr ;
 #include	<bit>			/* |endian(3c++)| */
 
 struct machendianinfo {
-	cbool islittle	= (std::endian::native == std::endian::little) ;
-	cbool isbig	= (std::endian::native == std::endian::big) ;
+	static cbool islittle	= (std::endian::native == std::endian::little) ;
+	static cbool isbig	= (std::endian::native == std::endian::big) ;
 } ;
 
 constexpr machendianinfo	machendian ;

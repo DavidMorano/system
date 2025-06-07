@@ -1,6 +1,6 @@
 /* errtimer HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* error-timer */
 /* version %I% last-modified %G% */
@@ -28,7 +28,7 @@
 
 #ifndef	ERRTIMER_INCLUDE
 #define	ERRTIMER_INCLUDE
-#ifdef	__cplusplus
+#ifdef	__cplusplus /* C++ only! */
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -74,7 +74,7 @@ struct errtimer {
 } ; /* end struct (errtimer) */
 
 
-#endif /* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* ERRTIMER_INCLUDE */
 
 
