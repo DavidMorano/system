@@ -203,7 +203,7 @@ export {
 /* local subroutines */
 
 int usysconf::getval(int req) noex {
-    	int		rs = SR_OK ;
+    	int		rs ;
 	if (req >= sysconfcmd_synthetic) {
 	    rs = synthetic(req) ;
 	} else {
@@ -312,7 +312,7 @@ int usysconf::callstd(int req) noex {
 /* end subroutine (usysconf::callstd) */
 
 int usysconf::mconfval(int req) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	errno = 0 ;
 	if (long res ; (res = sysconf(req)) >= 0L) {
 	    if (lp) *lp = res ;
@@ -325,9 +325,9 @@ int usysconf::mconfval(int req) noex {
 /* end subroutine (usysconf::mconfval) */
 
 int usysconf::mconfstr(int req) noex {
-	size_t		res ;
+	size_t		res ; /* used-multiple-times */
 	int		rs = SR_OK ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (rlen > 0) {
 	    rs = SR_FAULT ;
 	    errno = 0 ;

@@ -121,7 +121,7 @@ namespace {
 
 /* exported subroutines */
 
-    int uatfork(void_f b,void_f ap,void_f ac) noex {
+int uatfork(void_f b,void_f ap,void_f ac) noex {
 	int		rs = SR_FAULT ;
 	if (b || ap || ac) {
 	    ucaller	po(b,ap,ac) ;
@@ -129,8 +129,8 @@ namespace {
 	    rs = po ;
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (uatfork) */
-    int uatexit(void_f func) noex {
+} /* end subroutine (uatfork) */
+int uatexit(void_f func) noex {
 	int		rs = SR_FAULT ;
 	if (func) {
 	    ucaller	aeo(func) ;
@@ -138,8 +138,8 @@ namespace {
 	    rs = aeo ;
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (uatexit) */
-    int ustatfile(cchar *afn,ustat *asp) noex {
+} /* end subroutine (uatexit) */
+int ustatfile(cchar *afn,ustat *asp) noex {
 	int		rs = SR_FAULT ;
 	if (afn && asp) {
 	    rs = SR_INVALID ;
@@ -150,8 +150,8 @@ namespace {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (ustatfile) */
-    int ustatfilefs(cchar *afn,ustatfs *asp) noex {
+} /* end subroutine (ustatfile) */
+int ustatfilefs(cchar *afn,ustatfs *asp) noex {
 	int		rs = SR_FAULT ;
 	if (afn && asp) {
 	    rs = SR_INVALID ;
@@ -162,8 +162,8 @@ namespace {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (ustatfilefs) */
-    int ustatfilevfs(cchar *afn,ustatfs *asp) noex {
+} /* end subroutine (ustatfilefs) */
+int ustatfilevfs(cchar *afn,ustatfs *asp) noex {
 	int		rs = SR_FAULT ;
 	if (afn && asp) {
 	    rs = SR_INVALID ;
@@ -174,8 +174,8 @@ namespace {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (ustatfilevfs) */
-    int ugetcwd(char *rb,int rl) noex {
+} /* end subroutine (ustatfilevfs) */
+int ugetcwd(char *rb,int rl) noex {
 	int		rs = SR_FAULT ;
 	if (rb) {
 	    rs = SR_INVALID ;
@@ -186,8 +186,8 @@ namespace {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (ugetcwd) */
-    int uaccess(cchar *afn,int am) noex {
+} /* end subroutine (ugetcwd) */
+int uaccess(cchar *afn,int am) noex {
 	int		rs = SR_FAULT ;
 	if (afn) {
 	    rs = SR_INVALID ;
@@ -198,8 +198,8 @@ namespace {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (uaccess) */
-    int udiraccess(cchar *afn,int am) noex {
+} /* end subroutine (uaccess) */
+int udiraccess(cchar *afn,int am) noex {
 	int		rs = SR_FAULT ;
 	if (afn) {
 	    rs = SR_INVALID ;
@@ -213,7 +213,7 @@ namespace {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (udiraccess) */
+} /* end subroutine (udiraccess) */
 
 
 /* local subroutines */

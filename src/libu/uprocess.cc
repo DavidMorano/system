@@ -20,7 +20,7 @@
 
 	Names:
 	u_alarm
-	u_atfork
+	u_atexit
 	u_exit
 	u_fork
 	u_getgroups
@@ -45,6 +45,7 @@
 	u_waitid
 	u_waitpid
 	u_nanosleep
+	u_getcwd
 
 
 	Name:
@@ -145,7 +146,6 @@
 #include	<cstdint>		/* |uintptr_t| */
 #include	<cstdarg>		/* |uintptr_t| */
 #include	<utility>		/* |unreachable(3c++)| */
-#include	<bit>			/* |bit_cast(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -158,6 +158,7 @@
 
 #include	"uprocess.h"
 
+import usysbasic ;
 
 /* local defines */
 
@@ -166,7 +167,6 @@
 
 using namespace	uprocess ;		/* namespace */
 
-using std::bit_cast ;			/* subroutine-template */
 using std::unreachable ;		/* subroutine (instrinsic) */
 
 
@@ -215,7 +215,6 @@ namespace {
 	void submem(uprocer_m mem) noex {
 	    m = mem ;
 	} ;
-	int iatfork() noex ;
 	int ifork() noex ;
 	int ivfork() noex ;
 	int isetuid() noex ;
@@ -259,12 +258,10 @@ int u_alarm(cuint secs) noex {
 }
 /* end subroutine (u_alarm) */
 
-int u_atfork(void_f b,void_f ap,void_f ac) noex {
-	uprocer		po(b,ap,ac) ;
-	po.m = &uprocer::iatfork ;
-	return po() ;
+int u_atexit(void_f b) noex {
+    	return uatexit(b) ;
 }
-/* end subroutine (u_atfork) */
+/* end subroutine (u_atexit) */
 
 int u_exit(int ex) noex {
 	_exit(ex) ;
@@ -514,17 +511,13 @@ int u_nanosleep(CTIMESPEC *tsp,TIMESPEC *rtsp) noex {
 }
 /* end subroutine (u_nanosleep) */
 
+int u_getcwd(char *pbuf,int plen) noex {
+    	return ugetcwd(pbuf,plen) ;
+}
+/* end subroutine (u_getcwd) */
+
 
 /* local subroutines */
-
-int uprocer::iatfork() noex {
-	int		rs ;
-	if ((rs = pthread_atfork(bf,apf,acf)) < 0) {
-	    rs = (- errno) ;
-	}
-	return rs ;
-}
-/* end method (uprocer::iatfork) */
 
 int uprocer::ifork() noex {
 	int		rs = SR_OK ;
