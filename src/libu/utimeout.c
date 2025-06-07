@@ -72,7 +72,7 @@
 /* external variables */
 
 
-/* local strutures */
+/* local structures */
 
 
 /* forward references */
@@ -113,11 +113,9 @@ int utimeout[uto_overlast] = {
 int u_timeout(int w,int val) noex {
 	int		rs = SR_INVALID ;
 	if ((w >= 0) && (w < uto_overlast) && (val != 0)) {
+	    rs = utimeout[w] ;
 	    if (val > 0) {
 		utimeout[w] = val ;
-		rs = val ;
-	    } else {
-		rs = utimeout[w] ;
 	    }
 	} /* end if (valid) */
 	return rs ;

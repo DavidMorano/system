@@ -1,6 +1,6 @@
 /* usysutility HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* utility subroutines */
 /* version %I% last-modified %G% */
@@ -17,11 +17,13 @@
 
 #ifndef	USYSUTILITY_INCLUDE
 #define	USYSUTILITY_INCLUDE
-#ifdef	__cplusplus
+#ifdef	__cplusplus /* C++ only) */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdarg>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>		/* |va_list(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -30,18 +32,21 @@
 
 
 namespace libu {
+    typedef double	dbl ;
     extern int	uloadavgd(double *,int) noex ;
-    extern int	snuprintf(char *,int,cchar *,...) noex ;
-    extern int	snuloadavgd(char *,int,int,double *,int) noex ;
+    extern int	snprintf(char *,int,cchar *,...) noex ;
+    extern int	snvprintf(char *,int,cchar *,va_list) noex ;
+    extern int	snloadavgd(char *,int,int,double *,int) noex ;
     extern int	ctdecf(char *,int,int,double) noex ;
-    static inline int snuloadavg(char *rb,int rl,int pr,
-	    double *ap,int al) noex {
-	return snuloadavgd(rb,rl,pr,ap,al) ;
+#ifdef	COMMENT
+    static inline int snloadavg(char *rb,int rl,int pr,dbl *ap,int al) noex {
+	return snloadavgd(rb,rl,pr,ap,al) ;
     }
-}
+#endif /* COMMENT */
+} /* end namespace (libu) */
 
 
-#endif /* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* USYSUTILITY_INCLUDE */
 
 

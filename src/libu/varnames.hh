@@ -1,6 +1,6 @@
 /* varnames HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a database of commonly used environment variable names */
 /* version %I% last-modified %G% */
@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	varnames
+
+	Description:
 	This object contains various commonly used environment variable
 	names.
 
@@ -32,6 +36,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 struct varnames {
@@ -109,13 +114,14 @@ struct varnames {
 	static const char systat[] ;
 	static const char netload[] ;
 	static const char provider[] ;
+	static const char folder[] ;
 } ; /* end struct (varnames) */
 
 
 extern const varnames	varname ;
 
 
-#endif	/* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* VARNAMES_INCLUDE */
 
 

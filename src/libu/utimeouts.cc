@@ -47,10 +47,7 @@
 /* external variables */
 
 
-/* external variables */
-
-
-/* local strutures */
+/* local structures */
 
 namespace {
     struct utimeouts {

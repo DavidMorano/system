@@ -1,4 +1,4 @@
-/* xxtostr MODULE */
+/* xxtostr MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -30,10 +30,19 @@
 	sxxtostr
 
 	Description:
-	These subroutines convert an integer (signed or unsigned
-	of various sized types) into a c-string representation that
-	is placed into the caller supplied buffer (of specified
-	length).
+	These subroutine templates convert an integer (signed or
+	unsigned of various sized types) into a c-string digit
+	representation that is placed into the caller supplied
+	buffer (of specified length).  A numerical base is also
+	supplied by the caller and must be between 2 and 64.  Only
+	upper-case hexadecimal digit charactes are supported
+	(characters '0' through '9' and 'A' through 'Z').  Convert
+	your hexadecimal digit c-string to upper case before
+	conversion.  The upport part of numerical base higher than
+	36 are represented by the lower-case alphabetic characters
+	('a' through 'z').  Only types of |int| (32-bits), |long|
+	(64-bits), and |longlong| (128-bits) and their unsigned
+	cousins and aliases are supported.
 
 	Synopsis:
 	template<typename UT,typename ST>
@@ -48,6 +57,36 @@
 	Returns:
 	>=0		length of buffer used by the conversion
 	<0		error in the conversion
+
+	Group:
+    	itostr
+    	ltostr
+    	lltostr
+    	uitostr
+    	ultostr
+    	ulltostr
+
+	Description:
+	These subroutines (w/ C-language linkage) are supplied for
+	base-10 operations.  The same integer types as above are
+	supported.  As might be notes (by some astute observers)
+	subroutines with these same names are supplied on (pretty
+	much now historical) System V Release 4 based operating
+	systems (an example of which was Solaris® and the more
+	modern Illumos®).
+
+	Synopsis:
+    	char *itostr(int v,char *endp) noex
+    	char *ltostr(long v,char *endp) noex
+    	char *lltostr(longlong v,char *endp) noex
+    	char *uitostr(uint uv,char *endp) noex
+    	char *ultostr(ulong uv,char *endp) noex
+    	char *ulltostr(ulonglong uv,char *endp) noex
+
+	Arguments:
+	v	signed value to convert
+	uv	unsigned value to convert
+	endp	the ending pointer position of a supplied buffer
 
 	Notes:
 	As it stands now, these subroutines do not perform any funny
@@ -75,10 +114,9 @@ module ;
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysdefs.h>		/* |MAXBASE| */
 #include	<usysrets.h>
-#include	<stdintx.h>		/* extended integes */
-#include	<libutil.hh>		/* |cstrlen(3u)| */
+#include	<stdintx.h>		/* extended integers */
 #include	<syswords.hh>		/* |sysword(3u)| */
 #include	<localmisc.h>		/* ?? not-needed ?? */
 
@@ -100,11 +138,11 @@ import digtab ;				/* |getdig(3u)| */
 
 /* forward references */
 
-inline cint		xxtostr_maxbase = MAXBASE ; /* standard value */
+constexpr cint		xxtostr_maxbase = MAXBASE ; /* standard value */
 
 export {
     template<typename UT>
-    inline int uxxtostr(char *endp,int b,UT v) noex {
+    constexpr inline int uxxtostr(char *endp,int b,UT v) noex {
 	uint		ub = uint(b) ;
 	int		rs = SR_FAULT ;
 	char		*rp = endp ;
@@ -156,15 +194,14 @@ export {
 
 export {
     template<typename UT,typename ST>
-    inline constexpr int sxxtostr(char *endp,int b,ST v) noex {
+    constexpr inline int sxxtostr(char *endp,int b,ST v) noex {
 	UT		ulv = (UT) v ;
 	int		rs = SR_FAULT ;
 	char		*rp = nullptr ;
 	if (v < 0) ulv = (- ulv) ;
 	if (endp) {
-	    if ((rs  = uxxtostr(endp,b,ulv)) >= 0) {
-		cint	len = rs ;
-		rp = (endp - len) ;
+	    if ((rs = uxxtostr(endp,b,ulv)) >= 0) {
+		rp = (endp - rs) ;
 	        if (v < 0) *--rp = '-' ;
 	    }
 	}
@@ -183,82 +220,50 @@ constexpr int		b = 10 ;
 
 /* exported subroutines */
 
-extern "C" {
+export {
+    template<typename UT,typename T> 
+    constexpr inline char *stostr(T v,char *endp) noex {
+	int		rs ;
+	char		*rp = nullptr ;
+	if ((rs = sxxtostr<UT>(endp,b,v)) >= 0) {
+	    rp = (endp - rs) ;
+	} else {
+	    errno = (- rs) ;
+	}
+	return (rs >= 0) ? rp : nullptr ;
+    }
+    template<typename UT> 
+    constexpr inline char *utostr(UT uv,char *endp) noex {
+	char		*rp = nullptr ;
+	int		rs ;
+	if ((rs = uxxtostr(endp,b,uv)) >= 0) {
+	    rp = (endp - rs) ;
+	} else {
+	    errno = (- rs) ;
+	}
+	return (rs >= 0) ? rp : nullptr ;
+    }
+} /* end export */
+
+export extern "C" {
     char *itostr(int v,char *endp) noex {
-	int		rs ;
-	char		*rp = nullptr ;
-	if ((rs = sxxtostr<uint>(endp,b,v)) >= 0) {
-	    rp = (endp - rs) ;
-	} else {
-	    errno = (-rs) ;
-	}
-	return (rs >= 0) ? rp : nullptr ;
+	return stostr<uint>(v,endp) ;
     }
-} /* end extern */
-
-extern "C" {
     char *ltostr(long v,char *endp) noex {
-	int		rs ;
-	char		*rp = nullptr ;
-	if ((rs = sxxtostr<ulong>(endp,b,v)) >= 0) {
-	    rp = (endp - rs) ;
-	} else {
-	    errno = (-rs) ;
-	}
-	return (rs >= 0) ? rp : nullptr ;
+	return stostr<ulong>(v,endp) ;
     }
-} /* end extern */
-
-extern "C" {
     char *lltostr(longlong v,char *endp) noex {
-	int		rs ;
-	char		*rp = nullptr ;
-	if ((rs = sxxtostr<ulonglong>(endp,b,v)) >= 0) {
-	    rp = (endp - rs) ;
-	} else {
-	    errno = (-rs) ;
-	}
-	return (rs >= 0) ? rp : nullptr ;
+	return stostr<ulonglong>(v,endp) ;
     }
-} /* end extern */
-
-extern "C" {
     char *uitostr(uint uv,char *endp) noex {
-	char		*rp = nullptr ;
-	int		rs ;
-	if ((rs = uxxtostr(endp,b,uv)) >= 0) {
-	    rp = (endp - rs) ;
-	} else {
-	    errno = (-rs) ;
-	}
-	return (rs >= 0) ? rp : nullptr ;
+	return utostr(uv,endp) ;
     }
-} /* end extern */
-
-extern "C" {
     char *ultostr(ulong uv,char *endp) noex {
-	char		*rp = nullptr ;
-	int		rs ;
-	if ((rs = uxxtostr(endp,b,uv)) >= 0) {
-	    rp = (endp - rs) ;
-	} else {
-	    errno = (-rs) ;
-	}
-	return (rs >= 0) ? rp : nullptr ;
+	return utostr(uv,endp) ;
     }
-} /* end extern */
-
-extern "C" {
     char *ulltostr(ulonglong uv,char *endp) noex {
-	char		*rp = nullptr ;
-	int		rs ;
-	if ((rs = uxxtostr(endp,b,uv)) >= 0) {
-	    rp = (endp - rs) ;
-	} else {
-	    errno = (-rs) ;
-	}
-	return (rs >= 0) ? rp : nullptr ;
+	return utostr(uv,endp) ;
     }
-} /* end extern */
+} /* end export (extern) */
 
 
