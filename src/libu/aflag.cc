@@ -8,15 +8,19 @@
 
 /* revision history:
 
-	= 1998-04-10, David A­D­ Morano
+	= 2011-07-12, David A­D­ Morano
         This code was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Object:
+	aflag
+
+	Description:
 	This object provides an atomic flag that can be used for a 
 	variety of purposes.  Two of the more populate purposes is
 	to provide for:

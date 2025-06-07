@@ -1,6 +1,6 @@
 /* aflag HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* atomic-flag */
 /* version %I% last-modified %G% */
@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2020-01-13, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services.
+	= 2011-07-12, David A­D­ Morano
+        This code was originally written.
 
 */
 
-/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	AFLAG_INCLUDE
 #define	AFLAG_INCLUDE
@@ -26,6 +26,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 enum aflagmems {
@@ -111,7 +112,7 @@ private:
 } ; /* end struct (aflag) */
 
 
-#endif /* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* AFLAG_INCLUDE */
 
 
