@@ -97,6 +97,7 @@ struct fsdir_co {
 	fsdir		*op = nullptr ;
 	int		w = -1 ;
 	void operator () (fsdir *p,int m) noex {
+	    magic = 0 ;
 	    op = p ;
 	    w = m ;
 	} ;
@@ -125,7 +126,7 @@ struct fsdir : fsdir_head {
 	int seek(off_t = 0z) noex ;
 	void dtor() noex ;
 	destruct fsdir() {
-	    if (posixp || (magic != 0)) dtor() ;
+	    if (posixp || magic) dtor() ;
 	} ;
 	int isdir(cchar *) noex ;
 } ; /* end struct (fsdir) */

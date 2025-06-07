@@ -109,7 +109,7 @@ public:
 	posixdirent_te	tell ;
 	posixdirent_co	rewind ;
 	posixdirent_co	close ;
-	uint		magic ;
+	uint		magic{} ;
 	posixdirent() noex {
 	    tell(this,posixdirentmem_tell) ;
 	    rewind(this,posixdirentmem_rewind) ;
