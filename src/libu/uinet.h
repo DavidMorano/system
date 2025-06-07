@@ -1,4 +1,5 @@
 /* uinet HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® Internet-Address support */
@@ -16,8 +17,12 @@
 
 /*******************************************************************************
 
+  	Group:
+	uinet
+
+	Description:
 	This file contains some support for the UNIX® Internet-Address
-	 related operations.
+	related operations.
 
 *******************************************************************************/
 
@@ -33,6 +38,7 @@
 #include	<clanguage.h>		/* |MAX| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 #ifndef	PF_INET4

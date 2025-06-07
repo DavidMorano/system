@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	ugetloadavg
+
+	Description:
 	This file contains the UNIX system types that the brain-damaged
 	MacOS operating system does NOT have.  We are trying in a
 	very small way to make up for some of the immense brain-damage
@@ -43,15 +47,9 @@
 #define LOADAVG_NSTATS		3	/* maximum load-averages available */
 #endif
 
-
-#ifdef	__cplusplus
-namespace libu {
-    extern int	dloadavg(double *,int) noex ;
-}
-#endif /* __cplusplus */
-
 EXTERNC_begin
 extern int	u_getloadavg(uint *,int) noex ;
+extern int	u_loadavgd(double *,int) noex ;
 EXTERNC_end
 
 

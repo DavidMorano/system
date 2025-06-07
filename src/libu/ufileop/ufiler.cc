@@ -12,9 +12,18 @@
 	This subroutine was written for Rightcore Network Services
 	(RNS).
 
+	= 2025-06-04, David A­D­ Morano
+	I enhanced one of the subroutine in here.  I enhanced the
+	|u_resolvepath(3u)| subroutine to allow the caller-supplied
+	result buffer length to be unspecified (that is to be
+	negative).  The value of the maximum-path-length will be
+	used instead.  This can be dnagerous for the careless caller,
+	but I think I have a use for this in implementing the
+	|uc_realpath(3uc)| subroutine in the LIBUC library.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2025 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -78,6 +87,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>		/* system types */
+#include	<sys/param.h>		/* standard says this is necessary */
 #include	<sys/stat.h>		/* |S_IFMT| */
 #include	<sys/xattr.h>		/* is this now ubiquitous? */
 #include	<unistd.h>
@@ -85,7 +95,6 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdarg>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -97,6 +106,7 @@
 
 #include	"ufileop.h"
 
+import ulibvals ;
 
 /* local defines */
 
@@ -131,10 +141,12 @@ namespace {
 	cchar		*dfn ;
 	cchar		*xaname ;
 	cvoid		*xaval ;
+	char		*rbuf ;
 	dev_t		dev ;
 	size_t		sz ;
 	uint32_t	foff ;
 	int		oo ;
+	int		rlen ;
 	mode_t		fm ;
 	ufiler() noex { } ;
 	ufiler(mode_t om,dev_t d = 0) noex : fm(om), dev(d) { } ;
@@ -146,6 +158,7 @@ namespace {
 	    foff = fo ;
 	    oo = o ;
 	} ;
+	ufiler(char *rb,int rl) noex : rbuf(rb), rlen(rl) { } ;
 	int callstd(cchar *fn) noex override {
 	    int		rs = SR_BUGCHECK ;
 	    if (m) {
@@ -159,6 +172,7 @@ namespace {
 	int imkdir(cchar *) noex ;
 	int imknod(cchar *) noex ;
 	int irename(cchar *) noex ;
+	int iresolvepath(cchar *) noex ;
 	int irmdir(cchar *) noex ;
 	int isymlink(cchar *) noex ;
 	int ixattrget(cchar *) noex ;
@@ -168,6 +182,16 @@ namespace {
 
 
 /* forward references */
+
+static int getrlen(int rlen) noex {
+	int		rs ;
+	if ((rs = rlen) < 0) {
+	    rs = ulibval.maxpathlen ;
+	}
+	return rs ;
+} /* end subroutine (getrlen) */
+
+static sysret_t	std_resolvepath(cchar *,char *,int) noex ;
 
 
 /* local variables */
@@ -220,8 +244,7 @@ int u_minmod(cchar *name,mode_t m) noex {
 	if (name) {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
-	        USTAT	sb ;
-	        if ((rs = u_stat(name,&sb)) >= 0) {
+	        if (USTAT sb ; (rs = u_stat(name,&sb)) >= 0) {
 	            cmode	om = (sb.st_mode & (~ S_IFMT)) ;
 	            cmode	nm = (m & (~ S_IFMT)) ;
 	            if ((om & nm) != nm) {
@@ -347,26 +370,12 @@ int u_rename(cchar *fn,cchar *dfn) noex {
 /* end subroutine (u_rename) */
 
 int u_resolvepath(cchar *fn,char *rbuf,int rlen) noex {
-	int		rs = SR_FAULT ;
-	if (fn && rbuf) {
-	    rs = SR_INVALID ;
-	    rbuf[0] = '\0' ;
-	    if (fn[0]) {
-		csize	rsz = size_t(rlen) ;
-	        repeat {
-	            if ((rs = resolvepath(fn,rbuf,rsz)) >= 0) {
-		        if (rs <= rlen) {
-			    rbuf[rs] = '\0' ;
-		        } else {
-			    rbuf[rlen] = '\0' ;
-			    rs = SR_OVERFLOW ;
-		        }
-		    } else if (rs < 0) {
-		        rs = (- errno) ;
-	            }
-	        } until (rs != SR_INTR) ;
-	    } /* end if (valid) */
-	} /* end if (non-null) */
+    	int		rs ;
+	if ((rs = getrlen(rlen)) >= 0) {
+	    ufiler	fo(rbuf,rs) ;
+	    fo.m = &ufiler::iresolvepath ;
+	    rs = fo(fn) ;
+	} /* end if (getrlen) */
 	return rs ;
 }
 /* end subroutine (u_resolvepath) */
@@ -381,7 +390,7 @@ int u_rmdir(cchar *fn) noex {
 int u_stat(cchar *fn,USTAT *sbp) noex {
 	int		rs ;
 	repeat {
-	    if ((rs = stat(fn,sbp)) < 0) {
+	    if ((rs = statfile(fn,sbp)) < 0) {
 		rs = (- errno) ;
 	    }
 	} until (rs != SR_INTR) ;
@@ -389,7 +398,7 @@ int u_stat(cchar *fn,USTAT *sbp) noex {
 }
 /* end subroutine (u_stat) */
 
-int u_statfs(cchar *fn,STATFS *sbp) noex {
+int u_statfs(cchar *fn,USTATFS *sbp) noex {
 	int		rs ;
 	repeat {
 	    if ((rs = statfs(fn,sbp)) < 0) {
@@ -400,7 +409,7 @@ int u_statfs(cchar *fn,STATFS *sbp) noex {
 }
 /* end subroutine (u_statfs) */
 
-int u_statvfs(cchar *fn,STATVFS *sbp) noex {
+int u_statvfs(cchar *fn,USTATVFS *sbp) noex {
 	int		rs ;
 	repeat {
 	    if ((rs = statvfs(fn,sbp)) < 0) {
@@ -482,6 +491,11 @@ int ufiler::irename(cchar *fn) noex {
 }
 /* end method (ufiler::irename) */
 
+int ufiler::iresolvepath(cchar *fn) noex {
+    	return std_resolvepath(fn,rbuf,rlen) ;
+}
+/* end method (ufiler::iresolvepath) */
+
 int ufiler::irmdir(cchar *fn) noex {
 	int		rs ;
 	if ((rs = rmdir(fn)) < 0) {
@@ -520,5 +534,30 @@ int ufiler::ixattrset(cchar *fn) noex {
 	return rs ;
 }
 /* end method (ufiler::ixattrset) */
+
+static sysret_t std_resolvepath(cchar *fn,char *rbuf,int rlen) noex {
+	int		rs = SR_FAULT ;
+	if (fn && rbuf) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (fn[0]) {
+		csize	rsize = size_t(rlen) ;
+	        repeat {
+	            if ((rs = resolvepath(fn,rbuf,rsize)) >= 0) {
+		        if (rs <= rlen) {
+			    rbuf[rs] = '\0' ;
+		        } else {
+			    rbuf[rlen] = '\0' ;
+			    rs = SR_OVERFLOW ;
+		        }
+		    } else if (rs < 0) {
+		        rs = (- errno) ;
+	            }
+	        } until (rs != SR_INTR) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (std_resolvepath) */
 
 

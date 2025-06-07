@@ -28,11 +28,9 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<climits>		/* |INT_MAX| */
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -149,6 +147,6 @@ namespace ufileop {
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (ufileopbase::operator) */
-}
+} /* end namespace (ufileop) */
 
 

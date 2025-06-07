@@ -44,12 +44,13 @@ enum filetypes {
 	filetype_door,			/* 13 */
 	filetype_wht,			/* 14 - "event port" on Solaris® */
 	filetype_unassigned15,		/* 15 */
-	filetype_overlast
-} ;
+	filetype_overlast,
+	filetype_pipe = filetype_fifo
+} ; /* end enum (filestypes */
 
 
 #ifndef	DT_UNKNOWN
-#define	DT_UNKNOWN	filetype_reg
+#define	DT_UNKNOWN	0
 #endif
 
 #ifndef	DT_FIFO
@@ -90,6 +91,14 @@ enum filetypes {
 
 #ifndef	DT_WHT
 #define	DT_WHT		filetype_wht
+#endif
+
+#ifndef	DT_PIPE
+#define	DT_PIPE		filetype_fifo
+#endif
+
+#ifndef	DT_OVERLAST
+#define	DT_OVERLAST	filetype_overlast
 #endif
 
 

@@ -11,13 +11,13 @@
 	= 2001-04-23, David A­D­ Morano
 	Well Solaris-8 supplied this new capability.  I have no idea
 	about any status as a standard of any sort but this is a
-	lot easier than using 'kstat(3kstat)'! I continued to use
-	(and still do) 'kstat(3kstat)' on Solaris-8 since it first
+	lot easier than using |kstat(3kstat)|! I continued to use
+	(and still do) |kstat(3kstat)| on Solaris-8 since it first
 	came out.  Originally I resisted investigating how to get
 	the direct load averages out of the kernel besides using
-	'kstat(3kstat)'.  A little investigation (easy) showed that
+	|kstat(3kstat)|.  A little investigation (easy) showed that
 	they had implemented a new system call to do it.  I guess
-	that they were also getting tired of using 'kstat(3kstat)'
+	that they were also getting tired of using |kstat(3kstat)|
 	for kernel load averages!
 
 */
@@ -71,11 +71,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<cerrno>
-#include	<cstdlib>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<usysflag.h>
+#include	<usys.h>		/* |kloadavg(3u)| */
+#include	<utimeout.h>
 #include	<errtimer.hh>
 #include	<localmisc.h>
 
@@ -92,6 +98,8 @@
 
 
 /* imported namespaces */
+
+using usys::kloadavg ;
 
 
 /* local typedefs */
@@ -131,7 +139,7 @@ int u_getloadavg(uint *la,int n) noex {
 	    if (n > 0) {
 	        if (n > maxloadavgs) n = maxloadavgs ;
 		if_constexpr (f_kloadavg) {
-		    int		*ila = (int *) la ;
+		    int		*ila = intp(la) ;
 	            if ((rs = kloadavg(ila,n)) < 0) {
 	                rs = (- errno) ;
 	            }
@@ -144,8 +152,7 @@ int u_getloadavg(uint *la,int n) noex {
 }
 /* end subroutine (u_getloadavg) */
 
-namespace libu {
-    sysret_t dloadavg(double *dla,int n) noex {
+sysret_t u_loadavgd(double *dla,int n) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
 	errtimer	to_busy		= utimeout[uto_busy] ;
 	errtimer	to_nomem	= utimeout[uto_nomem] ;
@@ -172,8 +179,7 @@ namespace libu {
 	    } /* end if (error) */
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
-    } /* end subroutine (dloadavg) */
-}
+} /* end subroutine (u_loadavgd) */
 
 
 /* local subroutines */
@@ -185,9 +191,8 @@ static sysret_t make_ugetloadavg(uint *la,int n) noex {
 	if (la) {
 	    rs = SR_INVALID ;
 	    if (n > 0) {
-	        double	d[nmax] ;
 	        if (n > nmax) n = nmax ;
-	        if ((rs = libu::dloadavg(d,n)) >= 0) {
+	        if (double d[nmax] ; (rs = u_loadavgd(d,n)) >= 0) {
 		    rn = rs ;
 	            for (int i = 0 ; i < n ; i += 1) {
 	                la[i] = uint(d[i] * FSCALE) ;
@@ -199,7 +204,7 @@ static sysret_t make_ugetloadavg(uint *la,int n) noex {
 }
 /* end subroutine (make_ugetloadavg) */
 
-sysret_t std_getloadavg(double *dla,int n) noex {
+static sysret_t std_getloadavg(double *dla,int n) noex {
 	int		rs ;
 	if ((rs = getloadavg(dla,n)) < 0) {
 	    rs = (- errno) ;

@@ -31,13 +31,13 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<usyscalls.h>
 #include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"uiconv.h"
 
+import libutil ;
 
 /* local defines */
 
