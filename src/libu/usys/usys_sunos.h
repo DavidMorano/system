@@ -20,8 +20,12 @@
 
 /*******************************************************************************
 
-	This file contains the UNIX® system types and preprocessor symbols
-	that may not be provided.
+  	Name:
+	usys_sunos
+
+	Description:
+	This file contains the UNIX® system types and preprocessor
+	symbols that may not be provided.
 
 *******************************************************************************/
 
@@ -49,7 +53,6 @@
 #include	<sys/lock.h>		/* <- for |plock(2)| */
 #include	<user_attr.h>		/* <- money shot (one of) */
 
-
 /*----------------------------------------------------------------------------*/
 /* USERATTR begin */
 #if	(!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
@@ -63,7 +66,6 @@ typedef userattr_t	userattr ;
 /* USERATTR end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
 /* UCTIMEOUT begin */
 
@@ -74,22 +76,22 @@ typedef userattr_t	userattr ;
 /* UCTIMEOUT end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
 /* LOADAVGINT begin */
 #if	defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0)
 
 #ifndef	SUBROUTINE_KLOADAVG
 #define	SUBROUTINE_KLOADAVG
-EXTERNC_begin
-extern unixret_t kloadavg(int *,int) noex ;
-EXTERNC_end
+#ifdef	__cplusplus /* C++ only! */
+namespace usys {
+    extern unixret_t kloadavg(int *,int) noex ;
+}
+#endif /* __cplusplus (C++ only) */
 #endif /* SUBROUTINE_KLOADAVG */
 
 #endif /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 /* LOADAVGINT end */
 /*----------------------------------------------------------------------------*/
-
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 /* USYSSUNOS finish */

@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2001-04-11, David D-A- Morano
+	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2001 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -40,7 +40,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
-#include	<sys/mount.h>		/* |struct statfs| */
+#include	<sys/mount.h>		/* |USTATFS| */
 #include	<sys/statvfs.h>
 #include	<unistd.h>
 #include	<cerrno>
@@ -55,6 +55,7 @@
 
 #include	"usys_ufstype.h"
 
+import libutil ;
 
 /* imported namespaces */
 
@@ -64,8 +65,8 @@ using libu::snwcpy ;
 /* external subroutines */
 
 extern "C" {
-    extern int	u_fstatfs(int,STATFS *) noex ;
-    extern int	u_fstatvfs(int,STATVFS *) noex ;
+    extern int	u_fstatfs(int,USTATFS *) noex ;
+    extern int	u_fstatvfs(int,USTATVFS *) noex ;
 }
 
 /* exported subroutines */
@@ -76,10 +77,9 @@ namespace libu {
     sysret_t ufstype(char *nbuf,int nlen,int fd) noex {
 	int		rs = SR_FAULT ;
 	if (nbuf) {
-	    STATVFS	vsb ;
-	    if ((rs = u_fstatvfs(fd,&vsb)) >= 0) {
+	    if (USTATVFS vsb ; (rs = u_fstatvfs(fd,&vsb)) >= 0) {
 	        cchar	*cp = vsb.f_basetype ;
-	        cint	cl = strnlen(vsb.f_basetype,FSTYPSZ) ;
+	        cint	cl = xstrnlen(vsb.f_basetype,FSTYPSZ) ;
 	        rs = snwcpy(nbuf,nlen,cp,cl) ;
 	    }
 	} /* end if (non-null) */
@@ -93,7 +93,7 @@ namespace libu {
     sysret_t ufstype(char *nbuf,int nlen,int fd) noex {
 	int		rs = SR_FAULT ;
 	if (nbuf) {
-	    if (STATFS	sb ; (rs = u_fstatfs(fd,&sb)) >= 0) {
+	    if (USTATFS sb ; (rs = u_fstatfs(fd,&sb)) >= 0) {
 	        cchar	*cp = sb.f_fstypename ;
 	        cint	cl = cstrnlen(sb.f_fstypename,MFSNAMELEN) ;
 	        rs = snwcpy(nbuf,nlen,cp,cl) ;

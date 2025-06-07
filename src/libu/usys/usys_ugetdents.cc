@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2001-04-11, David D-A- Morano
+	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2001 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -25,15 +25,23 @@
 	operating system in an OS-independent way by regualr callers.
 
 	Synosis:
-	int ugetdents(int fd,dirent_t *rbuf,int rlen) noex
+	int ugetdents(int fd,void *rbuf,int rlen) noex
 
 	Arguments:
+	fd		file-descrptor for the open directory
 	rbuf		result buffer pointer
 	rlen		result buffer length
 
 	Returns:
 	>=0		length of result
 	<0		error code (- errno)
+
+	Notes:
+	1. Apple-Darwin has depracated their version of |getdents(2)|.
+	So we do not even pretend to try to support any version of
+	|getdents(2)| on Apple-Darwin.  I did try to use the
+	Apple-Darwin version at the beginning, but that eventually
+	preved to be unwise and futile.
 
 *******************************************************************************/
 
@@ -48,10 +56,10 @@
 
 #include	"usys_ugetdents.h"
 
-#if	defined(OSNAME_SunOS) && (SYSHAS_SunOS > 0) 
+#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) 
 
 namespace usys {
-    sysret_t ugetdents(int fd,dirent_t *rbuf,int rlen) noex {
+    sysret_t ugetdents(int fd,void *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf) {
@@ -71,10 +79,10 @@ namespace usys {
     } /* end subroutine (ugetdents) */
 }
 
-#elif	defined(OSNAME_Darwin) && (SYSHAS_Darwin > 0) 
+#elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) 
 
 namespace usys {
-    sysret_t ugetdents(int fd,dirent_t *rbuf,int rlen) noex {
+    sysret_t ugetdents(int fd,void *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf) {
@@ -82,13 +90,7 @@ namespace usys {
 	    if (rlen >= 0) {
 		rs = SR_BADF ;
 		if (fd >= 0) {
-		    csize	vsz = size_t(rlen) ;
-		    char	*vbuf = charp(rbuf) ;
-		    off_t	off{} ;
-		    rs = SR_OK ;
-		    if (int rc ; (rc = getdirentries64(fd,vbuf,vsz,&off)) < 0) {
-			rs = (- errno) ;
-		    }
+		    rs = SR_NOSYS ;
 	        } /* end if (not-bad FD) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -96,10 +98,10 @@ namespace usys {
     } /* end subroutine (ugetdents) */
 }
 
-#elif	defined(OSNAME_Linux) && (SYSHAS_Liunx > 0) 
+#elif	defined(OSNAME_Linux) && (OSNAME_Liunx > 0) 
 
 namespace usys {
-    sysret_t ugetdents(int fd,dirent_t *rbuf,int rlen) noex {
+    sysret_t ugetdents(int fd,void *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf) {
@@ -122,7 +124,7 @@ namespace usys {
 #else /* any other operating system */
 
 namespace usys {
-    sysret_t ugetdents(int fd,dirent_t *rbuf,int rlen) noex {
+    sysret_t ugetdents(int fd,void *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf) {

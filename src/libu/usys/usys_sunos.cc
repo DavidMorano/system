@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2001-04-11, David D-A- Morano
+	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2001 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -75,11 +75,13 @@ sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 /*----------------------------------------------------------------------------*/
 /* LOADAVGINT begin */
 #if	defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0)
-
-unixret_t kloadavg(int *la,int n) noex {
+#ifdef	__cplusplus /* C++ only! */
+namespace usys {
+    unixret_t kloadavg(int *la,int n) noex {
 	return __getloadavg(la,n) ;
+    }
 }
-
+#endif /* __cplusplus (C++ only) */
 #endif /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 /* LOADAVGINT end */
 /*----------------------------------------------------------------------------*/
