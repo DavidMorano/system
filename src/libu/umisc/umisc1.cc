@@ -14,14 +14,17 @@
 	is quite a bit -- like almost all of it).  I will refrain
 	from naming names (at least at this time).
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
 	Module:
-	ureserve
+	umisc
 
 	Description:
 	This module provides miscellaneous UNIX® or other
@@ -70,6 +73,14 @@ static int cstrlcpy(char *dp,cchar *sp,int sl) noex {
 	return int(strlcpy(dp,sp,ssize)) ;
 }
 
+static int getrlen(int plen) noex {
+    	int		rs = SR_INVALID ;
+	if (plen > 0) {
+	    rs = plen ;
+	}
+	return rs ;
+} /* end subroutine (getrlen) */
+
 
 /* local variables */
 
@@ -104,8 +115,7 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 	int		pl = 0 ;
 	if (pbuf) {
 	    char	*bp = pbuf ;
-	    rs = SR_INVALID ;
-	    if ((rs = plen) >= 0) {
+	    if ((rs = getrlen(plen)) >= 0) {
 	        int	rlen = (rs + 1) ;
 	        va_begin(ap,n) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
@@ -131,7 +141,7 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 		    } /* end if */
 	        } /* end for */
 	        va_end(ap) ;
-	    } /* end if (valid) */
+	    } /* end if (getrlen) */
 	    *bp = '\0' ; /* in case of overflow */
 	    pl = intconv(bp - pbuf) ;
 	} /* end if (non-null) */

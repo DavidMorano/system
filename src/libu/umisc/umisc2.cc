@@ -11,14 +11,17 @@
 	= 1998-07-19, David A­D­ Morano
 	This code was originally written.
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
   	Module:
-	ureserve
+	umisc
 
 	Description:
 	This module provides miscellaneous UNIX® or other
@@ -41,8 +44,6 @@ module ;
 
 module umisc ;
 
-import libutil ;
-
 using libu::snwcpy ;
 
 /* local defines */
@@ -64,6 +65,14 @@ using libu::snwcpy ;
 
 
 /* forward references */
+
+static int getrlen(int plen) noex {
+    	int		rs = SR_INVALID ;
+	if (plen > 0) {
+	    rs = plen ;
+	}
+	return rs ;
+} /* end subroutine (getrlen) */
 
 
 /* local variables */
@@ -111,8 +120,7 @@ int mknpathxw(char *pbuf,int plen,int n,...) noex {
 	int		pl = 0 ;
 	char		*bp = pbuf ;
 	if (pbuf) {
-	    rs = SR_INVALID ;
-	    if ((rs = plen) >= 0) {
+	    if ((rs = getrlen(plen)) >= 0) {
 	        int	bl = rs ;
 	        int	sl = -1 ;
 	        va_begin(ap,n) ;
@@ -142,7 +150,7 @@ int mknpathxw(char *pbuf,int plen,int n,...) noex {
 	        *bp = '\0' ; /* in case of overflow */
 		pl = intconv(bp - pbuf) ;
 	        va_end(ap) ;
-	    } /* end if (getplen) */
+	    } /* end if (getrlen) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
 }

@@ -11,14 +11,17 @@
 	= 1998-07-19, David A­D­ Morano
 	This code was originally written.
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
   	Module:
-	ureserve
+	umisc
 
 	Description:
 	This module provides miscellaneous UNIX® or other
@@ -73,6 +76,7 @@ int snaddw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf && sp) {
+	    rs = SR_INVALID ;
  	    if (i >= 0) {	
 	        char	*bp = (rbuf + i) ;
 	        rs = SR_OK ;

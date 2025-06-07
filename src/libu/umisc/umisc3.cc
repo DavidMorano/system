@@ -11,14 +11,17 @@
 	= 1998-07-19, David A­D­ Morano
 	This code was originally written.
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
   	Module:
-	ureserve
+	umisc
 
 	Description:
 	This module provides miscellaneous UNIX® or other
@@ -31,7 +34,7 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdarg>
+#include	<cstdarg>		/* |va_list| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -40,8 +43,6 @@ module ;
 #include	<localmisc.h>		/* |eol| */
 
 module umisc ;
-
-import libutil ;
 
 /* local defines */
 
@@ -137,6 +138,5 @@ static int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	return (rs >= 0) ? pl : rs ;
 }
 /* end subroutine (local_pathadd) */
-
 
 

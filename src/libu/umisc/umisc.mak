@@ -59,7 +59,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 DEPMODS += usigset.ccm usigblock.ccm
 
 OBJ00= umisc0.o umisc1.o umisc2.o umisc3.o
-OBJ01= umisc4.o umisc5.o umisc6.o
+OBJ01= umisc4.o umisc5.o umisc6.o umisc7.o
 OBJ02= 
 OBJ03= 
 
@@ -176,6 +176,10 @@ umisc5.o:		umisc5.cc umisc.ccm
 	$(COMPILE.cc) $<
 
 umisc6.o:		umisc6.cc umisc.ccm
+	makemodule umisc
+	$(COMPILE.cc) $<
+
+umisc7.o:		umisc7.cc umisc.ccm
 	makemodule umisc
 	$(COMPILE.cc) $<
 
