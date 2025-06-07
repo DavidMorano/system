@@ -8,17 +8,26 @@
 
 /* revision history:
 
-	= 2001-04-11, David D-A- Morano
+	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2001 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Name:
+	usys_resolvepath
+
+	Description:
 	For those operating systems that do not have |resolvepath(2)|
 	we try to define it.
+
+	Notes:
+	1. I implement this using the C-language library function
+	|realpath(3c)|.  That function is inherently thread-safe,
+	so no problems there.
 
 *******************************************************************************/
 
@@ -27,6 +36,7 @@
 /* RESOLVEPATH start */
 #if	(!defined(SYSHAS_RESOLVEPATH)) || (SYSHAS_RESOLVEPATH == 0)
 
+#include	<sys/param.h>		/* standard says this is necessary */
 #include	<climits>		/* |PATH_MAX| + |INT_MAX| */
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
@@ -38,14 +48,15 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>		/* |cstrlen(3u)| */
 
 #include	"usys_resolvepath.h"
+
+import libutil ;
 
 unixret_t resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
 	cint		rlen = int(rsz & INT_MAX) ;
 	unixret_t	rc = 0 ;
-	int		rl = 0 ;
+	int		rl = 0 ; /* return-value */
 	if (rbuf) {
 	    cnullptr	np{} ;
 	    if (fname[0] && (rlen >= 0)) {
@@ -58,7 +69,7 @@ unixret_t resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
 		    }
 		    free(rp) ;
 		} else {
-		    rc = -1 ;
+		    rc = -1 ; /* ERRNO is already set by |realpath| */
 		} /* end if (realpath) */
 	    } else {
 		rc = -1 ;
@@ -69,7 +80,7 @@ unixret_t resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
 	    errno = EFAULT ;
 	} /* end if (non-null) */
 	return (rc >= 0) ? rl : rc ;
-}
+} /* end subroutine (resolvepath) */
 
 #endif /* (!defined(SYSHAS_RESOLVEPATH)) || (SYSHAS_RESOLVEPATH == 0) */
 /* RESOLVEPATH end */

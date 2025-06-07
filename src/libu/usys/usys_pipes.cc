@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2001-04-11, David D-A- Morano
+	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2001 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -31,6 +31,7 @@
 /* PIPES start */
 #if	(!defined(SYSHAS_PIPES)) || (SYSHAS_PIPES == 0)
 
+#include	<unistd.h>		/* |pipe(2)| */
 #include	<cerrno>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
@@ -38,6 +39,7 @@
 #include	<utypealiases.h>
 #include	<usysflag.h>
 #include	<usysrets.h>
+#include	<usupport.h>
 
 #include	"usys.h"
 #include	"usys_pipes.h"
