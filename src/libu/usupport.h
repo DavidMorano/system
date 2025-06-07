@@ -21,7 +21,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<memx.h>
 #include	<usys.h>		/* <- auxillary OS support */
 #include	<utimeout.h>
 #include	<ulogerror.h>
@@ -31,7 +30,6 @@
 #include	<aflag.hh>
 #include	<stdintx.h>
 #include	<intx.h>
-#include	<libutil.hh>
 
 
 #ifndef	TYPEDEF_MTIME
@@ -75,6 +73,7 @@ extern usys_mtime	getmtime ;
 #ifndef	OBJECT_GETUSTIME
 #define	OBJECT_GETUSTIME
 #ifdef	__cplusplus
+
 namespace libu {
     struct ugetustime {
 	operator time_t () noex {
@@ -85,7 +84,9 @@ namespace libu {
 	} ;
    } ; /* end struct (getustime) */
 }
+
 extern libu::ugetustime	getustime ;
+
 #endif /* __cplusplus */
 #endif /* OBJECT_GETUSTIME */
 
@@ -114,12 +115,14 @@ namespace libu {
 namespace libu {
     extern int snwcpy(char *,int,cchar *,int = -1) noex ;
     extern int sncpy1(char *,int,cchar *) noex ;
+    inline int sncpy(char *dp,int dl,cchar *sp) noex {
+	return sncpy1(dp,dl,sp) ;
+    }
+}
+namespace libu {
     extern int ctdecui(char *,int,uint) noex ;
     extern int ctdecul(char *,int,ulong) noex ;
     extern int ctdecull(char *,int,ulonglong) noex ;
-    static inline int sncpy(char *dp,int dl,cchar *sp) noex {
-	return sncpy1(dp,dl,sp) ;
-    }
     template<typename T> inline int ctdec(char *,int,T v) noex {
 	return 0 ;
     }

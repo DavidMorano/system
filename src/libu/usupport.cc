@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1998-03-26, David A­D­ Morano
-	This was frsit written to give a little bit to UNIX® what
+	This was first written to give a little bit to UNIX® what
 	we have in our own circuit-pack OSes!
 
 */
@@ -45,28 +45,26 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* MUST be frsit to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>		/* |gethostid(3c)| */
 #include	<poll.h>
 #include	<cerrno>
-#include	<climits>		/* |INT_MAX| */
 #include	<ctime>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |memset(3c)| + |strlcpy(3c)| */
-#include	<new>
-#include	<usysrets.h>
+#include	<new>			/* |nothrow(3c++)| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usyscalls.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<intsat.h>
 #include	<stdintx.h>
-#include	<xxtostr.h>
+#include	<xxtostr.h>		/* |{x}tostr(3u)| */
 #include	<strtox.h>
 #include	<strnul.hh>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<localmisc.h>		/* |DECBUFLEN| */
 
 #include	"usupport.h"
 
@@ -151,7 +149,7 @@ namespace libu {
 	*dp = '\0' ;
 	return dp ;
     }
-}
+} /* end namespace (libu) */
 
 namespace libu {
     int sncpy1(char *dbuf,int dlen,cchar *sp) noex {
@@ -176,13 +174,13 @@ namespace libu {
 	        if (sl > dl) {
 	            rs = sncpy1(dp,dl,sp) ;
 	        } else {
-	            rs = int(strwcpy(dp,sp,sl) - dp) ;
+	            rs = intconv(strwcpy(dp,sp,sl) - dp) ;
 		}
 	    } else {
 	        rs = sncpy1(dp,dl,sp) ;
 	    }
 	} else {
-	    rs = int(strwcpy(dp,sp,sl) - dp) ;
+	    rs = intconv(strwcpy(dp,sp,sl) - dp) ;
 	}
 	return rs ;
     }
@@ -216,10 +214,10 @@ namespace libu {
 	if (dbuf && fmt && tmp) {
 	    rs = SR_INVALID ;
 	    if (dlen >= 0) {
-	        csize	dsz = size_t(dlen + 1) ;
-	        if (size_t rsz ; (rsz = strftime(dbuf,dsz,fmt,tmp)) > 0) {
-	            rs = intsat(rsz) ;
-	        } else if (rsz == 0) {
+	        csize	dsize = size_t(dlen + 1) ;
+	        if (size_t rsize ; (rsize = strftime(dbuf,dsize,fmt,tmp)) > 0) {
+	            rs = intsat(rsize) ;
+	        } else if (rsize == 0) {
 	            dbuf[0] = '\0' ;
 	            rs = SR_OVERFLOW ;
 	        }
@@ -234,9 +232,9 @@ namespace libu {
     static int ctdecx(charp (*ctx)(T,char *),char *dp,int dl,T uv) noex {
 	int		rs = SR_FAULT ;
 	if (dp) {
-	    cint	dlen = DIGBUFLEN ;
-	    char	dbuf[DIGBUFLEN + 1] ;
-	    char	*bp = ctx(uv,(dbuf+dlen)) ;
+	    cint	dlen = DECBUFLEN ;
+	    char	dbuf[DECBUFLEN + 1] ;
+	    char	*bp = ctx(uv,(dbuf + dlen)) ;
 	    rs = sncpy(dp,dl,bp) ;
 	}
 	return rs ;
@@ -282,6 +280,7 @@ namespace libu {
 	return cfdecx(strtoxll,sp,sl,rp) ;
     }
 } /* end namespace (libu) */
+
 
 /* local subroutines */
 

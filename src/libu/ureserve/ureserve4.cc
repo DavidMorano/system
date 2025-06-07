@@ -20,7 +20,7 @@
 
 /*******************************************************************************
 
-  	Family:
+	Module:
 	ureserve
 
 	Description:
@@ -38,7 +38,6 @@ module ;
 #include	<cstdlib>
 #include	<vector>
 #include	<string>
-#include	<iostream>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -116,7 +115,7 @@ int vecstr::adduniq(cchar *sp,int sl) noex {
 
 int vecstr::find(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
-	int		c = -1 ;
+	int		c = -1 ; /* return-value */
 	if (sp) {
     	    rs = SR_NOTOPEN ;
 	    if (fl.open) {
@@ -129,6 +128,7 @@ int vecstr::find(cchar *sp,int sl) noex {
 			if (f) break ;
 			c += 1 ;
 		    } /* end for */
+		    rs = SR_OK ;
 	        } catch (...) {
 		    rs = SR_NOMEM ;
 	        }
