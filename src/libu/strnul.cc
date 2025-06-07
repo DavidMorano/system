@@ -30,9 +30,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
-#include	<new>
-#include	<usystem.h>
+#include	<new>			/* |nothrow(3c++)| */
+#include	<usyscalls.h>
 #include	<ulogerror.h>
 #include	<localmisc.h>
 

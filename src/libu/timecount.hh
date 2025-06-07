@@ -1,6 +1,6 @@
 /* timecount HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* count-down timer */
 /* version %I% last-modified %G% */
@@ -11,22 +11,23 @@
 	= 2001-04-11, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
-	= 2011-02-23, David A­D­ Morano
-	I updated this to be able to accept lambdas (w/ C++11)
-
 */
 
-/* Copyright © 2001,2011 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Object:
+	timecount
+
+	Description:
 	This object provides a glorified count-down timer.
 
 *******************************************************************************/
 
 #ifndef	TIMECOUNT_INCLUDE
 #define	TIMECOUNT_INCLUDE
-#ifdef	__cplusplus
+#ifdef	__cplusplus /* C++ only! */
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -52,7 +53,7 @@ public:
 } ; /* end class (timecount) */
 
 
-#endif /* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* TIMECOUNT_INCLUDE */
 
 

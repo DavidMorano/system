@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* conversion of a decimal c-sting to the type |longlong| */
+/* conversion of a decimal c-string to the type |longlong| */
 /* version %I% last-modified %G% */
 
 
@@ -65,7 +65,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>
-#include	<climits>		/* for |CHAR_BIT| */
+#include	<climits>		/* |CHAR_BIT| + |strtol(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |strtol(3c)| */
 #include	<cctype>
@@ -74,6 +74,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<stdintx.h>
+#include	<localmisc.h>
 
 #include	"strtox.h"
 
@@ -114,7 +115,7 @@ struct llhelper {
 	    llmax = longlong(ullmax >> 1) ;
 	    for (uint b = 2 ; b <= maxbase ; b += 1) {
 		cutoff[b] = (ullmax / b) ;
-		cutlim[b] = int(ullmax & b) ;
+		cutlim[b] = int(ullmax % b) ;
 	    } /* end for */
 	} ; /* end constructor */
 } ; /* end subroutine (llhelper) */
@@ -191,24 +192,12 @@ int strtoxi(cchar *sp,char **epp,int b) noex {
 	strtox(sp,epp,b,&v) ;
 	return v ;
 }
-/* end subroutine (uc_strtoi) */
-
-uint strtoxui(cchar *sp,char **epp,int b) noex {
-    	uint	uv{} ;
-	strtox(sp,epp,b,&uv) ;
-	return uv ;
-}
-/* end subroutine (uc_strtoui) */
+/* end subroutine (strtoxi) */
 
 long strtoxl(cchar *sp,char **epp,int b) noex {
 	return strtol(sp,epp,b) ;
 }
-/* end subroutine (uc_strtol) */
-
-ulong strtoxul(cchar *sp,char **epp,int b) noex {
-    	return strtoul(sp,epp,b) ;
-}
-/* end subroutine (uc_strtoul) */
+/* end subroutine (strtoxl) */
 
 longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 	longlong acc, cutoff;
@@ -264,14 +253,14 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 	cutoff /= base;
 	if (neg) {
 		if (cutlim > 0) {
-			cutlim -= base;
-			cutoff += 1;
+			cutlim -= base ;
+			cutoff += 1 ;
 		}
-		cutlim = -cutlim;
+		cutlim = -cutlim ;
 	}
 	for (acc = 0, vany = 0 ; ; c = (unsigned char) *s++) {
 		if (isdigit(c)) {
-			c -= '0';
+			c -= '0' ;
 		} else if (isalpha(c)) {
 			c -= isupper(c) ? ('A' - 10) : ('a' - 10) ;
 		} else {
@@ -283,23 +272,23 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 			continue;
 		if (neg) {
 			if (acc < cutoff || (acc == cutoff && c > cutlim)) {
-				vany = -1;
+				vany = -1 ;
 				acc = llhelp.llmin ;
-				errno = ERANGE;
+				errno = ERANGE ;
 			} else {
-				vany = 1;
-				acc *= base;
-				acc -= c;
+				vany = 1 ;
+				acc *= base ;
+				acc -= c ;
 			}
 		} else {
 			if (acc > cutoff || (acc == cutoff && c > cutlim)) {
-				vany = -1;
+				vany = -1 ;
 				acc = llhelp.llmax ;
-				errno = ERANGE;
+				errno = ERANGE ;
 			} else {
-				vany = 1;
-				acc *= base;
-				acc += c;
+				vany = 1 ;
+				acc *= base ;
+				acc += c ;
 			}
 		}
 	} /* end for */
@@ -310,6 +299,18 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 }
 /* end subroutine (strtoxll) */
 
+uint strtoxui(cchar *sp,char **epp,int b) noex {
+    	uint	uv{} ;
+	strtox(sp,epp,b,&uv) ;
+	return uv ;
+}
+/* end subroutine (strtoxui) */
+
+ulong strtoxul(cchar *sp,char **epp,int b) noex {
+    	return strtoul(sp,epp,b) ;
+}
+/* end subroutine (strtouxl) */
+
 /*
  * Convert a string to a |ulonglong|.
  *
@@ -318,10 +319,12 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
  */
 
 ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
-	ulonglong	acc, cutoff;
-	const char *s;
-	int c;
-	int neg, vany, cutlim;
+	ulonglong	cutoff = llhelp.cutoff[base] ;
+	ulonglong	acc ;
+	const char	*s;
+	int		cutlim = llhelp.cutlim[base] ;
+	int		c;
+	int		neg, vany ;
 	/*
 	 * See strtoq for comments as to the logic used.
 	 */
@@ -348,8 +351,6 @@ ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
 		base = ((c == '0') ? 8 : 10) ;
 	}
 
-	    cutoff = llhelp.cutoff[base] ;
-	    cutlim = llhelp.cutlim[base] ;
 	for (acc = 0, vany = 0 ; ; c = (unsigned char) *s++) {
 		if (isdigit(c)) {
 			c -= '0';
@@ -362,11 +363,11 @@ ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
 		if (vany < 0)
 			continue;
 		if (acc > cutoff || (acc == cutoff && c > cutlim)) {
-			vany = -1;
+			vany = -1 ;
 			acc = llhelp.ullmax ;
-			errno = ERANGE;
+			errno = ERANGE ;
 		} else {
-			vany = 1;
+			vany = 1 ;
 			acc *= base ;
 			acc += c ;
 		}

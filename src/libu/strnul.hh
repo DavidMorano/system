@@ -1,6 +1,6 @@
 /* strnul HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* assert a NUL-terminated string given a counted c-string */
 /* version %I% last-modified %G% */
@@ -17,15 +17,13 @@
 
 #ifndef	STRNUL_INCLUDE
 #define	STRNUL_INCLUDE
-#ifdef	__cplusplus
+#ifdef	__cplusplus /* C++ only! */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<string>
 #include	<string_view>
-#include	<iostream>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -69,7 +67,7 @@ struct strnul {
 	    return operator () (ap,al) ;
 	} ; /* end method */
 	operator ccharp () noex ;
-	~strnul() {
+	destruct strnul() {
 	    if (as) {
 		delete [] as ;
 		as = nullptr ;
@@ -78,7 +76,7 @@ struct strnul {
 } ; /* end struct (strnul) */
 
 
-#endif /* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* STRNUL_INCLUDE */
 
 

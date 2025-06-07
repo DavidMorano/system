@@ -23,7 +23,7 @@
 
 /*******************************************************************************
 
-	Object:
+	Module:
 	vecbool
 
 	Description:
@@ -46,7 +46,6 @@ module ;
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<vector>
-#include	<unordered_set>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -75,18 +74,8 @@ using std::nothrow ;			/* constant */
 /* external variables */
 
 
-/* forwards references */
+/* local structures */
 
-
-/* local variables */
-
-
-/* exported variables */
-
-
-/* exported subroutines */
-
-export {
     enum vecboolmems {
 	vecboolmem_start,
 	vecboolmem_finish,
@@ -96,6 +85,11 @@ export {
 	vecboolmem_clr,
 	vecboolmem_tst,
 	vecboolmem_overlast
+    } ; /* end enum (vecvoolmems) */
+
+export {
+    struct vecbool_fl {
+	uint		open:1 ;
     } ;
     struct vecbool ;
     struct vecbool_co {
@@ -117,6 +111,7 @@ export {
 	vecbool_co	set ;
 	vecbool_co	clr ;
 	vecbool_co	tst ;
+	vecbool_fl	fl{} ;
 	vecbool() noex {
 	    start(this,vecboolmem_start) ;
 	    finish(this,vecboolmem_finish) ;
@@ -130,9 +125,25 @@ export {
 	operator int () noex {
 	    return int(size()) ;
 	} ;
+	void dtor() noex ;
+	destruct vecbool() {
+	    if (fl.open) dtor() ;
+	} ;
     private:
 	int adj(int) noex ;
     } ; /* end struct (vecbool) */
 } /* end export */
+
+
+/* forwards references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
 
 
