@@ -33,7 +33,6 @@
 #include	<sys/types.h>		/* system types */
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<fcntl.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -91,12 +90,11 @@ extern int u_fchmod(int,mode_t) noex ;
 extern int u_fchown(int,uid_t,gid_t) noex ;
 extern int u_close(int) noex ;
 extern int u_fstat(int,USTAT *) noex ;
-extern int u_fstatfs(int,STATFS *) noex ;
-extern int u_fstatvfs(int,STATVFS *) noex ;
+extern int u_fstatfs(int,USTATFS *) noex ;
+extern int u_fstatvfs(int,USTATVFS *) noex ;
 extern int u_fpathconf(int,int,long *) noex ;
 extern int u_fstype(int,char *,int) noex ;
 extern int u_fsync(int) noex ;
-extern int u_fcntl(int,int,...) noex ;
 extern int u_ftruncate(int,off_t) noex ;
 extern int u_ioctl(int,int,...) noex ;
 extern int u_lockf(int,int,off_t) noex ;
@@ -107,7 +105,7 @@ extern int u_readv(int,IOVEC *,int) noex ;
 extern int u_seeko(int,off_t,int,off_t *) noex ;
 extern int u_write(int,cvoid *,int) noex ;
 extern int u_writev(int,CIOVEC *,int) noex ;
-extern int u_getdents(int,dirent_t *,int) noex ;
+extern int u_getdents(int,void *,int) noex ;
 
 /* special aliases */
 extern int u_sockaddrrem(int,void *,int *) noex ;

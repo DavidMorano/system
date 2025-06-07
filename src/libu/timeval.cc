@@ -11,12 +11,9 @@
 	= 1998-11-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
-	= 2014-03-24, David A­D­ Morano
-	I added the |init()| method.
-
 */
 
-/* Copyright © 1998,2014 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -32,7 +29,7 @@
 #include	<ctime>			/* |TIMEVAL| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"timeval.h"

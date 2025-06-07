@@ -1,6 +1,6 @@
 /* timewatch HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* watch time and variables simultaneously */
 /* version %I% last-modified %G% */
@@ -16,7 +16,7 @@
 
 */
 
-/* Copyright © 2001,2011 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001,2011 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -69,7 +69,7 @@ public:
 } ; /* end class (timewatch) */
 
 
-#endif	/* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* TIMEWATCH_INCLUDE */
 
 

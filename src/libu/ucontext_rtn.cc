@@ -33,7 +33,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<ucontext.h>
-#include	<usystem.h>
+#include	<usyscalls.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
 
