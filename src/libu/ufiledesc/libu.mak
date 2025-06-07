@@ -35,10 +35,15 @@ DEFS +=
 
 INCS += libu.h
 
-MODS += valuelims.ccm digbufsizes.ccm uvariables.ccm 
+MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm 
+MODS += libutil.ccm
+MODS += xxtostr.ccm digtab.ccm
 MODS += usysconf.ccm ulibvals.ccm
+MODS += usigset.o usigblock.ccm umisc.ccm
+MODS += unixfnames.ccm constdiv.ccm builtin.ccm
+MODS += usysbasic.ccm ureserve.cmm
 
-LIBS += -liconv
+LIBS += -liconv -lproc
 
 
 INCDIRS=
@@ -47,7 +52,6 @@ LIBDIRS=
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -62,38 +66,44 @@ LDFLAGS		?= $(MAKELDFLAGS)
 SOFL= -shared
 
 
-OBJ00= endian.o intx.o strnul.o
+OBJ00= mailvalues.o endian.o 
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
-OBJ03= strtox.o xxtostr.o
+OBJ03= umods.o  usysflag.o
 
-OBJ04= usupport.o usyscallbase.o
-OBJ05= utimeout.o ugetloadavg.o
-OBJ06= utimeouts.o uiconv.o
-OBJ07= ulogerror.o uinet.o
+OBJ04= utimeout.o utimeouts.o 
+OBJ05= ulogerror.o strtox.o 
+OBJ06= usupport.o 
+OBJ07= umemalloc.o uobjlock.o
 
-OBJ08= usys.o 
-OBJ09= usysop.o uipc.o 
-OBJ10= usig.o uexec.o
-OBJ11= uopen.o ustr.o 
+OBJ08= usys.o usyscallbase.o
+OBJ09= uregfork.o uatfork.o ufdlock.o 
+OBJ10= usig.o uexec.o uipc.o 
+OBJ11= usysutility.o ustr.o
 
-OBJ12= usysdata.o usysauxinfo.o usysutility.o
+OBJ12= usysdata.o usysauxinfo.o 
 OBJ13= ufileop.o ufiledesc.o 
 OBJ14= um.o uprocess.o
-OBJ15= uvariables.o
+OBJ15= usysop.o 
 
 OBJ16= syswords.o varnames.o
-OBJ17= valuelims.o digbufsizes.o
+OBJ17= ptx.o uacceptpass.o 
 OBJ18= timeval.o itimerval.o
 OBJ19= timespec.o itimerspec.o
+
+OBJ20= uinet.o umisc.o ureserve.o
+OBJ21= strnul.o intx.o 
+OBJ22= ugetloadavg.o uiconv.o
+OBJ23= syscontain.o stdfnames.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
+OBJF= obj20.o obj21.o obj22.o obj23.o
 
-OBJ= obja.o objb.o objc.o objd.o obje.o
+OBJ= obja.o objb.o objc.o objd.o obje.o objf.o
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -128,28 +138,19 @@ so:			$(T).so
 	makemodule $(*)
 
 
-$(T).a:			$(OBJ)
-	$(AR) $(ARFLAGS) -rc $(T).a $?
-
-$(T).o:			$(OBJ) Makefile localmisc.h
+$(T).o:			$(OBJ) Makefile $(INCS)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
 
-$(T).so:		$(OBJ) Makefile localmisc.h
+$(T).so:		$(OBJ) Makefile $(INCS)
 	$(LD) -o $@ $(SOFL) $(LDFLAGS) $(OBJ) $(LIBINFO)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order order:	$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 install-pre:
 	filefind . -s h | makenewer -af - -d $(INCDIR)
 
 install:		$(ALL) Makefile
-	ranlib $(T).a
 	install -S -p -m 0775 $(T).so $(LIBDIR)
 
 install-incs:		$(INSTALLINCS)
@@ -163,6 +164,7 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmobj
 
 control:
 	(uname -n ; date) > Control
@@ -232,6 +234,18 @@ obj18.o:		$(OBJ18)
 obj19.o:		$(OBJ19)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ19)
 
+obj20.o:		$(OBJ20)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ20)
+
+obj21.o:		$(OBJ21)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ21)
+
+obj22.o:		$(OBJ22)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ22)
+
+obj23.o:		$(OBJ23)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ23)
+
 
 obja.o:			$(OBJA)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
@@ -248,30 +262,43 @@ objd.o:			$(OBJD)
 obje.o:			$(OBJE)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJE)
 
+objf.o:			$(OBJF)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJF)
+
 
 # SUPPORT
-timewatch.o:		timewatch.cc timewatch.hh	$(INCS)
-aflag.o:		aflag.cc aflag.hh		$(INCS)
-errtimer.o:		errtimer.cc errtimer.hh		$(INCS)
-timeval.o:		timeval.cc timeval.h		$(INCS)
-itimerval.o:		itimerval.cc itimerval.h	$(INCS)
-timespec.o:		timespec.cc timespec.h		$(INCS)
-itimerspec.o:		itimerspec.cc itimerspec.h	$(INCS)
+timewatch.o:		timewatch.cc timewatch.hh		$(INCS)
+aflag.o:		aflag.cc aflag.hh			$(INCS)
+errtimer.o:		errtimer.cc errtimer.hh			$(INCS)
+timeval.o:		timeval.cc timeval.h			$(INCS)
+itimerval.o:		itimerval.cc itimerval.h		$(INCS)
+timespec.o:		timespec.cc timespec.h			$(INCS)
+itimerspec.o:		itimerspec.cc itimerspec.h		$(INCS)
 
-utimeout.o:		utimeout.c utimeout.h		$(INCS)
-utimeouts.o:		utimeouts.cc utimeouts.h	$(INCS)
-usupport.o:		usupport.cc usupport.h		#(INCS)
-usyscallbase.o:		usyscallbase.cc usyscallbase.hh	#(INCS)
-usysutility.o:		usysutility.cc usysutility.hh	$(INCS)
-usysdata.o:		usysdata.cc usysdata.h		$(INCS)
+usysflag.o:		usysflag.cc usysflag.h			$(INCS)
+utimeout.o:		utimeout.c utimeout.h			$(INCS)
+utimeouts.o:		utimeouts.cc utimeouts.h		$(INCS)
+usyscallbase.o:		usyscallbase.cc usyscallbase.hh		$(INCS)
+usysutility.o:		usysutility.cc usysutility.hh		$(INCS)
+usysdata.o:		usysdata.cc usysdata.h			$(INCS)
+uacceptpass.o:		uacceptpass.cc ufdlock.h		$(INCS)
+usupport.o:		xxtostr.o usupport.cc usupport.h	$(INCS)
+
+# requires USYSBASIC
+uatfork.o:		umods.o uatfork.cc uatfork.h		$(INCS)
+uobjlock.o:		umods.o uobjlock.cc uobjlock.cc		$(INCS)
+uregfork.o:		umods.o uregfork.cc uregfork.hh		$(INCS)
+uprocess.o:		umods.o uprocess.cc uprocess.h		$(INCS)
 
 # USYS
 usys.o:			usys.dir
 usys.dir:
 	makesubdir $@
 
-# UOPEN
-uopen.o:		uopen.cc uopen.h
+# UFDLOCK
+ufdlock.o:		ufdlock.dir
+ufdlock.dir:
+	makesubdir $@
 
 # UFILEDESC
 ufiledesc.o:		ufiledesc.dir
@@ -298,9 +325,6 @@ ulock.o:		ulock.dir
 ulock.dir:
 	makesubdir $@
 
-# POSIX Message Queue
-pmq.o:			pmq.cc pmq.h			$(INCS)
-
 # POSIX® synchronization mechanisms
 ptx.o:			ptx.dir
 ptx.dir:
@@ -311,59 +335,48 @@ intx.o:			intx.dir
 intx.dir:
 	makesubdir $@
 
+# UCONTAIN
+syscontain.o:		syscontain.dir
+syscontain.dir:
+	makesubdir $@
+
+# UMODS
+umods.o:		umods.dir
+umods.dir:
+	makesubdir $@
+
+# UMISC
+umisc.o:		umisc.dir
+umisc.dir:
+	makesubdir $@
+
+# URESERVE
+ureserve.o:		ureserve.dir
+ureserve.dir:
+	makesubdir $@
+
 # OTHER
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
 um.o:			um.cc um.h			$(INCS)
 usig.o:			usig.cc usig.h			$(INCS)
-uprocess.o:		uprocess.cc uprocess.h		$(INCS)
 usysop.o:		usysop.cc usysop.h		$(INCS)
 ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
 uexec.o:		uexec.cc uexec.h		$(INCS)
 uinet.o:		uinet.cc uinet.h		$(INCS)
 uiconv.o:		uiconv.cc uiconv.h		$(INCS)
+ufcntl.o:		ufcntl.cc			$(INCS)
 
 syswords.o:		syswords.cc syswords.hh		$(INCS)
 varnames.o:		varnames.cc varnames.hh		$(INCS)
-endian.o::		endian.cc endian.h		$(INCS)
+endian.o:		endian.cc endian.h		$(INCS)
 
 timecount.o:		timecount.cc timecount.hh	$(INCS)
 
 strtox.o:		strtox.cc strtox.h		$(INCS)
-xxtostr.o:		xxtostr.cc xxtostr.h		$(INCS)
+xxtostr.o:		xxtostr.ccm xxtostr.h		$(INCS)
 
 strnul.o:		strnul.cc strnul.hh		$(INCS)
-
-# VALUELIMS
-valuelims.o:		valuelims.ccm			$(INCS)
-	makemodule valuelims
-
-# DIGBUFSIZES
-digbufsizes.o:		valuelims.o digbufsizes.ccm
-	makemodule digbufsizes
-
-# UVARIABLES
-uvariables.o:		uvariables0.o uvariables1.o
-	$(LD) -r -o $@ $(LDFLAGS) uvariables0.o uvariables1.o
-
-uvariables0.o:		valuelims.o digbufsizes.o uvariables.ccm uvariables1.cc 
-	makemodule uvariables
-
-uvariables1.o:		uvariables.ccm uvariables1.cc 
-	makemodule uvariables
-	$(COMPILE.cc) uvariables1.cc
-
-usysconf.o:		usysconf.ccm
-
-# ULIBVALS
-ulibvals.o:		usysconf.o ulibvals.ccm
-	makemodule usysconf
-	makemodule ulibvals
-
-MOBJ += valuelims.o digbufsizes.o uvariables.o 
-MOBJ += usysconf.o ulibvals.o
-
-# MODS
-mods.o:		$(MOBJ)
-	$(LD) -r -o $@ $(LDFLAGS) $(MOBJ)
+mailvalues.o:		mailvalues.cc mailvalues.hh	$(INCS)
+stdfnames.o:		stdfnames.c stdfnames.h		$(INCS)
 
 

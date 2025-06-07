@@ -35,6 +35,8 @@ DEFS +=
 
 INCS += ufiledesc.h
 
+MODS +=
+
 LIBS +=
 
 
@@ -44,7 +46,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,9 +56,9 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= ufiledescbase.o usocket.o 
+OBJ0= ufiledescbase.o 
 OBJ1= uconnect.o uregular.o 
-OBJ2= ufcntl.o uacceptpass.o
+OBJ2= usocket.o 
 OBJ3= ugetdents.o
 
 OBJA_UFILEDESC= obj0.o obj1.o
@@ -66,7 +67,7 @@ OBJB_UFILEDESC= obj2.o obj3.o
 OBJ_UFILEDESC= obja.o objb.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -92,17 +93,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_UFILEDESC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UFILEDESC)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_UFILEDESC)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -115,23 +114,23 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
 
 obj1.o:			$(OBJ1)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
 
 obj2.o:			$(OBJ2)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
 
 obj3.o:			$(OBJ3)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
 
 
 obja.o:			$(OBJA_UFILEDESC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_UFILEDESC)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_UFILEDESC)
 
 objb.o:			$(OBJB_UFILEDESC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_UFILEDESC)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_UFILEDESC)
 
 
 ufiledescbase.o:	ufiledescbase.cc	$(INCS)
@@ -139,8 +138,6 @@ ufiledescbase.o:	ufiledescbase.cc	$(INCS)
 usocket.o:		usocket.cc		$(INCS)
 uconnect.o:		uconnect.cc		$(INCS)
 uregular.o:		uregular.cc		$(INCS)
-uacceptpass.o:		uacceptpass.cc		$(INCS)
-ufcntl.o:		ufcntl.cc		$(INCS)
 ugetdents.o:		ugetdents.cc		$(INCS)
 usockaddr.o:		usockaddr.cc		$(INCS)
 

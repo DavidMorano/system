@@ -59,12 +59,15 @@
 #include	<poll.h>
 #include	<cerrno>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
 #include	"ufiledesc.h"
 
+import libutil ;
 
 /* local defines */
 

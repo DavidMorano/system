@@ -1,4 +1,4 @@
-/* uopen HEADER */
+/* ufdlock HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -26,7 +26,10 @@
 	u_dup
 	u_dupmin
 	u_dupminee
+	u_dupover
 	u_dup2
+	u_fcntl
+	u_close
 	u_socketpair
 	u_pipe
 	u_pipe2
@@ -37,8 +40,8 @@
 
 *******************************************************************************/
 
-#ifndef	UOPEN_INCLUDE
-#define	UOPEN_INCLUDE
+#ifndef	UFDLOCK_INCLUDE
+#define	UFDLOCK_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -58,11 +61,13 @@ extern int u_creat(cchar *,mode_t) noex ;
 extern int u_openat(int,cchar *,int,mode_t) noex ;
 extern int u_socket(int,int,int) noex ;
 extern int u_accept(int,SOCKADDR *,int *) noex ;
-extern int u_acceptpass(int) noex ;
+extern int u_acceptpass(int,STRRECVFD *,int) noex ;
 extern int u_dup(int) noex ;
-extern int u_dup2(int,int) noex ;
 extern int u_dupmin(int,int) noex ;
 extern int u_dupminer(int,int,int) noex ;
+extern int u_dupover(int,int) noex ;
+extern int u_fcntl(int,int,...) noex ;
+extern int u_close(int) noex ;
 /* special */
 extern int u_socketpair(int,int,int,int *) noex ;
 extern int u_pipe(int *) noex ;
@@ -73,18 +78,25 @@ static inline int u_pipes(int *pipes,int of) noex {
 	return u_pipe2(pipes,of) ;
 }
 
+extern int ufdlock_init() noex ;
+extern int ufdlock_fini() noex ;
+
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-namespace uopen {
-   extern sysret_t uopen_lockbegin() noex ;
-   extern sysret_t uopen_lockend() noex ;
+namespace libu {
+    extern sysret_t ufdlock_lockbegin() noex ;
+    extern sysret_t ufdlock_lockend() noex ;
+}
+
+namespace libu {
+    extern int special_acceptpass(int,STRRECVFD *,int) noex ;
 }
 
 #endif /* __cplusplus */
 
 
-#endif /* UOPEN_INCLUDE */
+#endif /* UFDLOCK_INCLUDE */
 
 

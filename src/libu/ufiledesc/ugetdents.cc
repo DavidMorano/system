@@ -31,7 +31,7 @@
 	be avoided.
 
 	Synopsis:
-	int u_getdents(int fd,dirent_t *dbuf,int dsz) noex
+	int u_getdents(int fd,void *dbuf,int dsz) noex
 
 	Returns:
 	>=0		size of data returned
@@ -76,9 +76,9 @@ namespace {
     typedef int (udirop::*udirop_m)(int) noex ;
     struct udirop : ufiledescbase {
 	udirop_m	m ;
-	dirent_t	*dbuf ;
+	void		*dbuf ;
 	int		dlen ;
-	udirop(udirop_m mem,dirent_t *b,int l) noex : m(mem) { 
+	udirop(udirop_m mem,void *b,int l) noex : m(mem) { 
 	    dbuf = b ;
 	    dlen = l ;
 	} ;
@@ -105,12 +105,12 @@ namespace {
 
 /* exported subroutines */
 
-int u_getdents(int fd,dirent_t *dbuf,int dlen) noex {
+int u_getdents(int fd,void *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf) {
 	    rs = SR_INVALID ;
 	    if (dlen >= 0) {
-		udirop		diro(&udirop::igetdents,dbuf,dlen) ;
+		udirop diro(&udirop::igetdents,dbuf,dlen) ;
 		rs = diro(fd) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */

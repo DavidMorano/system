@@ -18,7 +18,6 @@
 	u_fchdir
 	u_fchmod
 	u_fchown
-	u_close
 	u_poll
 	u_fstat
 	u_fstatfs
@@ -246,7 +245,6 @@ namespace {
 	void submem(uregular_m mem) noex {
 	    m = mem ;
 	} ;
-	int iclose(int) noex ;
 	int ipoll(int) noex ;
 	int ifsync(int) noex ;
 	int iftruncate(int) noex ;
@@ -267,9 +265,9 @@ namespace {
 
 /* local variables */
 
-constexpr bool		f_acl = F_ACL ;		/* future use */
-constexpr bool		f_sunos = F_SUNOS ;	/* this is really Solaris® */
-constexpr bool		f_darwin = F_DARWIN ;
+constexpr cbool		f_acl = F_ACL ;		/* future use */
+constexpr cbool		f_sunos = F_SUNOS ;	/* this is really Solaris® */
+constexpr cbool		f_darwin = F_DARWIN ;
 
 
 /* exported variables */
@@ -393,14 +391,6 @@ int u_fchown(int fd,uid_t uid,gid_t gid) noex {
 }
 /* end subroutine (u_fchown) */
 
-int u_close(int fd) noex {
-	uregular	ro ;
-	ro.m = &uregular::iclose ;
-	ro.f.fclose = true ;		/* special treatment */
-	return ro(fd) ;
-}
-/* end subroutine (u_close) */
-
 int u_fstat(int fd,USTAT *ssp) noex {
 	int		rs = SR_FAULT ;
 	if (ssp) {
@@ -417,7 +407,7 @@ int u_fstat(int fd,USTAT *ssp) noex {
 }
 /* end subroutine (u_fstat) */
 
-int u_fstatfs(int fd,STATFS *ssp) noex {
+int u_fstatfs(int fd,USTATFS *ssp) noex {
 	int		rs = SR_FAULT ;
 	if (ssp) {
 	    repeat {
@@ -430,7 +420,7 @@ int u_fstatfs(int fd,STATFS *ssp) noex {
 }
 /* end subroutine (u_fstatfs) */
 
-int u_fstatvfs(int fd,STATVFS *sbp) noex {
+int u_fstatvfs(int fd,USTATVFS *sbp) noex {
 	int		rs = SR_FAULT ;
 	if (sbp) {
 	    repeat {
@@ -589,15 +579,6 @@ int u_poll(POLLFD *fds,int n,int to) noex {
 
 
 /* local subroutines */
-
-int uregular::iclose(int fd) noex {
-	int		rs ;
-	if ((rs = close(fd)) < 0) {
-	    rs = (- errno) ;
-	}
-	return rs ;
-}
-/* end method (uregular::iclose) */
 
 /* this is a special case (could be moved in the future) */
 int uregular::ipoll(int) noex {

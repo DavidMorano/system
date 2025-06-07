@@ -81,7 +81,7 @@ using namespace	ufiledesc ;		/* namespace */
 /* external variables */
 
 
-/* local strutures */
+/* local structures */
 
 
 /* forward refeferences */
