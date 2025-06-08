@@ -35,7 +35,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
@@ -161,7 +160,7 @@ int bufstr_strw(bufstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (char *bp ; (rs = bufstr_extend(op,sl,&bp)) >= 0) {
 	        strwcpy(bp,sp,sl) ;
 	        op->len += sl ;
