@@ -65,6 +65,6 @@ export {
 	    mklonglong() ;
 	} ;
     } ; /* end subroutine (valuelims) */
-}
+} /* end export */
 
 
