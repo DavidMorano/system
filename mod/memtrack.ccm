@@ -105,9 +105,9 @@ export {
 	memtrack_co	finish ;
 	uint		magic = 0 ;
 	constexpr memtrack() noex {
-	    start(this,memtrackmem_start) ;
-	    finish(this,memtrackmem_finish) ;
-	    count(this,memtrackmem_count) ;
+	    start	(this,memtrackmem_start) ;
+	    finish	(this,memtrackmem_finish) ;
+	    count	(this,memtrackmem_count) ;
 	} ; /* end ctor */
 	memtrack(const memtrack &) = delete ;
 	memtrack &operator = (const memtrack &) = delete ;

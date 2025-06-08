@@ -61,7 +61,6 @@ module ;
 #include	<sysconfcmds.h>
 #include	<localmisc.h>
 
-
 export module bufsizedata ;
 
 export {
