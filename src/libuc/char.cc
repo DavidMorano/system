@@ -9,36 +9,52 @@
 /* revision history:
 
 	= 1998-04-05, David A­D­ Morano
-	This module was adapted from assembly lanauge.
+	This module was adapted from assembly langauge.
 
-	= 2011-08-19, David A­D­ Morano
+	= 2014-08-19, David A­D­ Morano
 	I changed this to use the C++ |bitset| object instead of
 	an array of bytes for the single-bit truth-value observers.
+	This was not really necessary since an array of |char|s
+	treated as an array of bits was completely fine and worked
+	just fine (essentially identical to the use of |bitset(3c++)|).
+
+	= 2023-04-08, David A­D­ Morano
+	I am taking advantage of the C++23 constant-expresssion
+	enhancement |bitset(3c++)| to make the lookup tables
+	constant-expression capable.
 
 */
 
-/* Copyright © 1998,2011 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2014,2023 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	Name:
+	Group:
 	char
 
 	Description:
 	This module provides some character conversion tables for
-	use in the 'C' locale (using the ISO-Latin-1 character set).
-	These tables are provided for fast conversions when the
-	locale is not necessary to be changable.  Only 8-bit
-	characters are supported (ISO-Latin-1 character set).  For
-	other character sets, use the system-supplied facilities.
+	use in either the 'C' locale or when using the ISO-Latin-1
+	character set (locale 'en_US.ISO8859-1').  These tables are
+	provided for fast conversions when the locale is not necessary
+	to be changable.  Only 8-bit characters are supported
+	(ISO-Latin-1 character set).  For other character sets, use
+	the system-supplied facilities.
 
-	Extra-note: Note that non-breaking-white-space (NBSP)
-	characters are *not* considered to be white-space!
+	Notes: 
+	1. Note that non-breaking-white-space (NBSP) characters are
+	*not* considered to be white-space!
+	2. The data tables below that convert characters to a certain
+	"case" (upper, lower, and fold) are created by a supporting
+	program (forget is name right now).  The table below that
+	converts to a dictionary order is also created by an external
+	program.  Someday, those tables should be created at module
+	load-time.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<bitset>		/* <- the money shot! */
@@ -46,15 +62,12 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<localmisc.h>		/* |UC(3misc)| */
 
 #include	"char.h"
 
 
 /* local defines */
-
-#ifndef	UC
-#define	UC(ch)		uchar(ch)
-#endif
 
 
 /* imported namespaces */
@@ -76,9 +89,9 @@ using std::bitset ;			/* type */
 namespace {
     constexpr int   chtablen = (UCHAR_MAX + 1) ;
     struct charinfo {
-	bitset<chtablen>	iswhite{} ;
-	bitset<chtablen>	islc{} ;
-	bitset<chtablen>	isuc{} ;
+	bitset<chtablen>	iswhite ;
+	bitset<chtablen>	islc ;
+	bitset<chtablen>	isuc ;
 	uchar			toval[chtablen] ;
 	constexpr void mkiswhite() noex ;
 	constexpr void mkislc() noex ;
@@ -91,7 +104,7 @@ namespace {
 	    mktoval() ;
 	} ;
     } ; /* end struct (charinfo) */
-}
+} /* end namespace */
 
 constexpr void charinfo::mkiswhite() noex {
 	constexpr char	w[] = " \t\f\v\r" ;
@@ -129,17 +142,17 @@ constexpr void charinfo::mkisuc() noex {
 constexpr void charinfo::mktoval() noex {
         for (int ch = 0 ; ch < chtablen ; ch += 1) {
             if ((ch >= '0') && (ch <= '9')) {
-                toval[ch] = (ch - '0') ;
+                toval[ch] = uchar(ch - '0') ;
             } else if ((ch >= 'A') && (ch <= 'Z')) {
-                toval[ch] = ((ch - 'A') + 10) ;
+                toval[ch] = uchar((ch - 'A') + 10) ;
             } else if ((ch >= 'a') && (ch <= 'z')) {
-                toval[ch] = ((ch - 'a') + 36) ;
+                toval[ch] = uchar((ch - 'a') + 36) ;
             } else if (ch == UC('Ø')) {
                 toval[ch] = 62 ;
             } else if (ch == UC('ø')) {
                 toval[ch] = 63 ;
             } else {
-                toval[ch] = 0xff ;
+                toval[ch] = UCHAR_MAX ;
             }
         } /* end for */
 }
@@ -154,7 +167,7 @@ constexpr charinfo	char_data ;
 /* exported variables */
 
 /* convert characters to lower case */
-const unsigned char char_tolc[] = {
+const unsigned char chardata_tolc[] = {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
@@ -187,10 +200,10 @@ const unsigned char char_tolc[] = {
 	0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef,
 	0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7,
 	0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
-} ;
+} ; /* end array (chardata_tolc) */
 
 /* convert characters to upper case */
-const unsigned char char_touc[] = {
+const unsigned char chardata_touc[] = {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
@@ -223,10 +236,10 @@ const unsigned char char_touc[] = {
 	0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf,
 	0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xf7,
 	0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xff
-} ;
+} ; /* end array (chardata_touc) */
 
 /* convert characters to folded case */
-const unsigned char char_tofc[] = {
+const unsigned char chardata_tofc[] = {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
@@ -259,10 +272,10 @@ const unsigned char char_tofc[] = {
 	0x45, 0x45, 0x45, 0x45, 0x49, 0x49, 0x49, 0x49,
 	0xd0, 0x4e, 0x4f, 0x4f, 0x4f, 0x4f, 0x4f, 0xf7,
 	0xd8, 0x55, 0x55, 0x55, 0x55, 0x59, 0xde, 0x59
-} ;
+} ; /* end array (chardata_tofc) */
 
 /* dictionary-collating-ordinal */
-const short	char_dictorder[] = {
+const short	chardata_dictorder[] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -295,7 +308,7 @@ const short	char_dictorder[] = {
 	0x0411, 0x0410, 0x0412, 0x0413, 0x0421, 0x0420, 0x0422, 0x0423,
 	0x042d, 0x0431, 0x043a, 0x0439, 0x043b, 0x043d, 0x043c, 0x0000,
 	0x043f, 0x0451, 0x0450, 0x0452, 0x0453, 0x045d, 0x0462, 0x045e
-} ;
+} ; /* end array (chardata_dictorder) */
 
 
 /* exported variables */
@@ -304,19 +317,19 @@ const short	char_dictorder[] = {
 /* exported subroutines */
 
 bool char_iswhite(int ch) noex {
-	return char_data.iswhite[ch & 0xff] ;
+	return char_data.iswhite[ch & UCHAR_MAX] ;
 }
 
 bool char_islc(int ch) noex {
-	return char_data.islc[ch & 0xff] ;
+	return char_data.islc[ch & UCHAR_MAX] ;
 }
 
 bool char_isuc(int ch) noex {
-	return char_data.isuc[ch & 0xff] ;
+	return char_data.isuc[ch & UCHAR_MAX] ;
 }
 
 int char_toval(int ch) noex {
-	return char_data.toval[ch & 0xff] ;
+	return char_data.toval[ch & UCHAR_MAX] ;
 }
 
 

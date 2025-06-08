@@ -34,20 +34,25 @@
 
 	Returns:
 	>=0		OK
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<sfx.h>			/* |sfshrink(3uc)| */
-#include	<ischarx.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| below */
+#include	<char.h>
+#include	<ischarx.h>		/* |iszero(3uc)| */
+#include	<localmisc.h>
 
-#include	"cfutil.h"
+#include	"cfutil.hh"
 
+import libutil ;
 
 /* local defines */
 
@@ -74,12 +79,11 @@
 
 namespace cfx {
     int rmleadzero(cchar *sp,int sl) noex {
-	int	nsl = sl ;
-	for (int i = 0 ; (i < (sl-1)) && iszero(*sp) ; i += 1) {
-	    nsl -= 1 ;
-	} /* end for */
-	return nsl ;
-    }
+	if ((sl > 1) && iszero(*sp)) {
+	    sl -= 1 ;
+	}
+	return sl ;
+    } /* end subroutine (rmleadzero) */
     int sfdigs(cchar *nsp,int nsl,cchar **rpp) noex {
 	int	rl = nsl ;
 	cchar	*sp = nsp ;
@@ -92,7 +96,54 @@ namespace cfx {
 	}
 	*rpp = sp ;
 	return rl ;
-    }
+    } /* end subroutine (cfdigs) */
+    int sfchars(cchar *nsp,int nsl,cchar **rpp) noex {
+	int	rl = 0 ;
+	cchar	*sp = nsp ;
+	if (int sl ; (sl = sfshrink(nsp,nsl,&sp)) > 0) {
+	    auto islead = [] (char ch) noex {
+		return ((ch == ' ') || (ch == '+') || (ch == '0')) ;
+	    } ;
+	    while ((sl > 0) && islead(*sp)) {
+		sp += 1 ;
+		sl -= 1 ;
+	    }
+	    rl = sl ;
+	} /* end if (shshrink) */
+	*rpp = sp ;
+	return rl ;
+    } /* end subroutine (cfchars) */
+} /* end namespace (cfx) */
+
+namespace cfx {
+    int getsign(cchar *sp,int sl,bool *fnegp) noex {
+	int		rs = SR_FAULT ;
+	if (sp && fnegp) {
+	    if (sl < 0) sl = xstrlen(sp) ;
+	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	    }
+	    if ((sl > 0) && isplusminus(*sp)) {
+	        *fnegp = (*sp == '-') ;
+	        sp += 1 ;
+	        sl -= 1 ;
+	    }
+	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	    }
+	    if (sl > 1) {
+		if (iszero(*sp)) {
+		    sp += 1 ;
+		    sl -= 1 ;
+		}
+	    } else if (sl == 0) {
+		rs = SR_INVALID ;
+	    } /* end if */
+	} /* end if (non-null) */
+	return (rs >= 0) ? sl : rs ;
+    } ; /* end if (getsign) */
 } /* end namespace (cfx) */
 
 

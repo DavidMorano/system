@@ -1,4 +1,4 @@
-/* cfsysx MODULE */
+/* cfsysx MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -45,11 +45,19 @@
 	cfsysx
 
 	Description:
-	This is a subroutine (template) to convert digit strings
-	into binary integers (of various types and sizes).  All
-	number bases from 2 through 64 are supported.  The integer
-	types |int|, |long|, and |longlong)| along with their
-	unsigned versions are supported.
+	This subroutine-template is used to convert digit c-strings
+	to binary integers.  This object uses the uderlying (system
+	supplied) digit conversion functions to implement its
+	interface.  Note that the (so-called) system supplied
+	conversion facilities are (clandestinely) supplemented to
+	support an interger type of 128-bits (a |longlong| type).
+	But the (so-called) system does not generally support integer
+	types larger than 128 bits.  So this subroutine-template
+	|cfcharx(3uc)| also does not support integer types larger
+	than 128-bits.  Also, only digit number bases of omly a
+	maximum of 36 is supported.  So any number bases larger
+	than 36 require a differnt conversion facility, like for
+	example |cfdigx(3uc)|.
 
 	Synopsis:
     	template<typename T> inline int cfsysx(cc *sp,int sl,int b,T *rp) noex
@@ -121,15 +129,13 @@ export {
 	                if (nsl <= cfsysx_maxstack) {
 	                    char	dbuf[dlen+1] ;
 	    	            if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
-		                if (rs > 0) nsp = dbuf ;
-		                rs = cfsystox(nsp,b,rp) ;
+		                rs = cfsystox(dbuf,b,rp) ;
 	                    } /* end if (loading) */
 		        } else {
 		            char	*dbuf{} ;
 		            if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
 	    	                if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
-		                    if (rs > 0) nsp = dbuf ;
-		                    rs = cfsystox(nsp,b,rp) ;
+		                    rs = cfsystox(dbuf,b,rp) ;
 	                        } /* end if (loading) */
 			        rs1 = uc_free(dbuf) ;
 			        if (rs >= 0) rs = rs1 ;
