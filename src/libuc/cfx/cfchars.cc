@@ -12,7 +12,7 @@
 	This subroutine was written by being adapted from one of
 	my previous versions of the same (from the early 1980s;
 	embedded work at AT&T), which itself was adapted from an
-	original asembly-language version (in Digital Euipment Corp
+	original asembly-language version (in Digital Equipment Corp
 	VAX assembly).
 
 	= 2013-04-30, David A­D­ Morano
@@ -25,10 +25,10 @@
 
 	= 2023-10,10, David A-D- Morano
 	I took the liberty to rewite these subroutines in terms of
-	a subroutine-template. This did nothing to make the code
-	faster in any way. After template expansion the code is the
+	a subroutine-template.  This did nothing to make the code
+	faster in any way.  After template expansion the code is the
 	same as before.  All type-versions of the former subroutines
-	are now in a single subroutine-template. I guess that I had
+	are now in a single subroutine-template.  I guess that I had
 	too much idle time on my hands.
 
 */
@@ -55,10 +55,11 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>
-#include	<cfcharsx.hh>		/* <- the money shot! */
+#include	<localmisc.h>
 
 #include	"cfchars.h"
 
+import cfcharsx ;
 
 /* local defines */
 

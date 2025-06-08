@@ -1,4 +1,4 @@
-/* cfcharsx MODULE */
+/* cfcharsx MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -24,7 +24,19 @@
 	cfcharsx
 
 	Description:
-	Subroutines to convert digit strings to binary integers.
+	This subroutine-template is used to convert digit c-strings
+	to binary integers.  This object uses the uderlying (system
+	supplied) digit conversion functions to implement its
+	interface.  Note that the (so-called) system supplied
+	conversion facilities are (clandestinely) supplemented to
+	support an interger type of 128-bits (a |longlong| type).
+	But the (so-called) system does not generally support integer
+	types larger than 128 bits.  So this subroutine-template
+	|cfcharx(3uc)| also does not support integer types larger
+	than 128-bits.  Also, only digit number bases of omly a
+	maximum of 36 is supported.  So any number bases larger
+	than 36 require a differnt conversion facility, like for
+	example |cfdigx(3uc)|.
 
 	Synopsis:
     	template<typename T> 

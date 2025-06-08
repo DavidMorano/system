@@ -33,10 +33,9 @@ LINT		?= lint
 
 DEFS=
 
-INCS= cfx.h cfutil.h
+INCS= cfx.h cfutil.hh
 
-MODS += uvariables.ccm
-MODS += cfalphax.ccm cfcharsx.ccm cfdigx.ccm cfpow.ccm cfsysx.ccm
+MODS += cfalphax.ccm cfcharsx.ccm cfdigx.ccm cfpowx.ccm cfsysx.ccm
 
 LIBS=
 
@@ -58,7 +57,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_CFX= cfchars.o cfhexstr.o
+OBJ0_CFX= mods.o
 OBJ1_CFX= cfbin.o 
 OBJ2_CFX= cfoct.o
 OBJ3_CFX= cfdec.o cfdecf.o cfdecmf.o cfdect.o
@@ -67,7 +66,7 @@ OBJ5_CFX= cfxxx.o
 OBJ6_CFX= cfa26.o
 OBJ7_CFX= cfnum.o
 OBJ8_CFX= cfutil.o
-OBJ9_CFX=
+OBJ9_CFX= cfchars.o cfhexstr.o cfroman.o
 
 OBJA_CFX= obj0cfx.o obj1cfx.o obj2cfx.o obj3cfx.o
 OBJB_CFX= obj4cfx.o obj5cfx.o obj6cfx.o obj7cfx.o
@@ -107,7 +106,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_CFX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_CFX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -168,7 +167,7 @@ objc_cfx.o:		$(OBJC_CFX)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_CFX)
 
 
-cfutil.o:		cfutil.cc cfutil.h			$(INCS)
+cfutil.o:		cfutil.cc cfutil.hh			$(INCS)
 
 cfchars.o:		mods.o cfchars.cc cfchars.h		$(INCS)
 cfbin.o:		mods.o cfbin.cc cfbin.h			$(INCS)
@@ -181,30 +180,20 @@ cfhex.o:		mods.o cfhex.cc cfhex.h			$(INCS)
 cfxxx.o:		mods.o cfxxx.cc cfxxx.h			$(INCS)
 cfnum.o:		mods.o cfnum.cc cfnum.h			$(INCS)
 cfa26.o:		mods.o cfa26.cc cfa26.h			$(INCS)
+cfroman.o:		cfroman.cc cfroman.h			$(INCS)
 
 # algorithms
 cfhexstr.o:		cfhexstr.cc cfhexstr.h			$(INCS)
 
-MOBJA += uvariables.o
-MOBJB += cfalphax.o cfcharsx.o cfdigx.o cfpow.o cfsysx.o
-
-MOBJ= mobja.o mobjb.o
-
-mobja.o:		$(MOBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(MOBJA)
-
-mobjb.o:		$(MOBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(MOBJB)
+MOBJ= cfalphax.o cfcharsx.o cfdigx.o cfpowx.o cfsysx.o
 
 mods.o:			$(MOBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
 
-uvariables.o:		uvariables.ccm
-
-cfalphax.o:		cfalphax.ccm
-cfcharsx.o:		cfcharsx.ccm cfutil.h
-cfdigx.o:		cfdigx.ccm
-cfpow.o:		cfpow.ccm
-cfsysx.o:		cfsysx.ccm
+cfalphax.o:		cfalphax.ccm	cfutil.hh
+cfcharsx.o:		cfcharsx.ccm	cfutil.hh
+cfdigx.o:		cfdigx.ccm	cfutil.hh
+cfpowx.o:		cfpowx.ccm	cfutil.hh
+cfsysx.o:		cfsysx.ccm	cfutil.hh
 
 

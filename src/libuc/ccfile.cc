@@ -116,7 +116,7 @@ namespace {
 	    name[stdfile_log] = "/dev/fd/3" ;
 	} ; /* end ctor */
     } ; /* end struct (devnames) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -173,6 +173,7 @@ int ccfile::open(cchar *fn,cchar *ofs,mode_t) noex {
 		        rs = SR_NOENT ;
 		        if (good()) {
 			    if (of & ios::in) fl.freading = true ;
+			    fl.fopened = true ;
 		            rs = SR_OK ;
 		        }
 		    } /*& end if (not fnulling) */
@@ -183,7 +184,7 @@ int ccfile::open(cchar *fn,cchar *ofs,mode_t) noex {
 }
 /* end method (ccfile::open) */
 
-int ccfile::open(strview sv,cchar *ofs,mode_t om) noex {
+int ccfile::open(const strview &sv,cchar *ofs,mode_t om) noex {
 	csize		svz = sv.length() ;
 	cchar		*svp = sv.data() ;
 	int		rs = SR_FAULT ;
@@ -208,10 +209,11 @@ int ccfile::readln(char *ibuf,int ilen,int dch) noex {
 	        try {
 		    rs = SR_BADFMT ;
 	            if (bool(getline(ibuf,(ilen+1),char(dch)))) {
-		        if ((rs = gcount()) <= ilen) {
+			cint gcnt = int(gcount()) ;
+		        if ((rs = gcnt) <= ilen) {
 			    len = rs ;
 			    if (len > 0) {
-			        ibuf[len-1] = dch ;
+			        ibuf[len-1] = char(dch) ;
 			        ibuf[len] = '\0' ;
 			    }
 		        } else {
@@ -242,9 +244,8 @@ int ccfile::readln(string &s,int dch) noex {
 	int		rs = SR_OK ;
 	if (! fl.fnulling) {
 	    cint	llen = MAXLINE ;
-	    char	*lbuf ;
 	    rs = SR_NOMEM ;
-	    if ((lbuf = new(nothrow) char[llen+1]) != nullptr) {
+	    if (char *lbuf ; (lbuf = new(nothrow) char[llen+1]) != nullptr) {
 	        if ((rs = readln(lbuf,llen,char(dch))) >= 0) {
 		    lbuf[rs] = '\0' ;
 		    try {
@@ -310,12 +311,13 @@ int ccfile::seek(off_t o,int w) noex {
 
 int ccfile::iclose() noex {
 	int		rs = SR_OK ;
-	if (! fl.fnulling) {
+	if ((! fl.fnulling) && fl.fopened) {
 	    clear() ;
 	    fstream::close() ; /* superclass */
 	    if (fail()) {
 	        rs = SR_IO ;
 	    }
+	    fl.fopened = false ;
 	} /* end if (not-fnulling) */
 	return rs ;
 }

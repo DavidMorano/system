@@ -56,6 +56,7 @@ struct ccfile_co {
 struct ccfile_fl {
 	uint		fnulling:1 ;
 	uint		freading:1 ;
+	uint		fopened:1 ;
 } ;
 
 struct ccfile : std::fstream {
@@ -71,14 +72,14 @@ struct ccfile : std::fstream {
 	ccfile(const ccfile &) = delete ;
 	ccfile &operator = (const ccfile &) = delete ;
 	int open(cchar *,cchar * = nullptr,mode_t = 0) noex ;
-	int open(const strview,cchar * = nullptr,mode_t = 0) noex ;
+	int open(const strview &,cchar * = nullptr,mode_t = 0) noex ;
 	int readln(char *,int,int = 0) noex ;
 	int readln(std::string &,int = 0) noex ;
 	int seek(off_t = 0z,int = -1) noex ;
 	int write(cvoid *,int) noex ;
 	void dtor() noex ;
-	~ccfile() {
-	    dtor() ;
+	destruct ccfile() {
+	    if (fl.fopened) dtor() ;
 	} ;
 private:
 	int irewind() noex ;

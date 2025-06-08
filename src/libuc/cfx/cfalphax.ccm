@@ -1,4 +1,4 @@
-/* cfalphax MODULE */
+/* cfalphax MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -69,7 +69,6 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>		/* extended integer types */
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<cfutil.hh>		/* namespace |cfx| */
 #include	<char.h>
 #include	<ischarx.h>		/* |isplusminus(2uc)| */
@@ -92,7 +91,7 @@ template<stdintx T> struct cfashelp {
 	cfashelp(cchar *asp,int asl,int b,T *arp) noex : sp(asp), sl(asl) {
 	    const T	one = 1 ;
 	    tmin = (one << (nb - 1)) ;
-	    tmax = (~ tmax) & (~ tmin) ;
+	    tmax = (compl tmax) & (compl tmin) ;
 	    base = b ;
 	    rp = arp ;
 	} ; /* end ctor */
