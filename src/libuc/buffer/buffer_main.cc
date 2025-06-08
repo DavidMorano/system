@@ -39,7 +39,7 @@
 
 	Returns:
 	>=0		the total length of the filled up buffer so far!
-	<0		error
+	<0		error (system-return)
 
 	Note:
 	This module is not completely protected against calling
@@ -54,12 +54,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<libmallocxx.h>
 #include	<stdintx.h>
-#include	<format.h>
+#include	<fmtstr.h>
 #include	<strwcpy.h>
 #include	<ctbin.h>
 #include	<ctoct.h>
@@ -70,6 +69,7 @@
 
 #include	"buffer.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -275,7 +275,7 @@ int buffer_vprintf(buffer *op,cchar *fmt,va_list ap) noex {
 	if (op && fmt) {
 	    if (char *lbuf ; (rs = libmalloc_ml(&lbuf)) >= 0) {
 		cint	llen = rs ;
-	        if ((rs = format(lbuf,llen,0x01,fmt,ap)) >= 0) {
+	        if ((rs = fmtstr(lbuf,llen,0x01,fmt,ap)) >= 0) {
 	            rs = buffer_strw(op,lbuf,rs) ;
 	        }
 		rs1 = uc_libfree(lbuf) ;

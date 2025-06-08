@@ -91,8 +91,8 @@ struct buffer : buffer_head {
 	template<typename Decimal> int dec(Decimal) noex ;
 	template<typename Hexadecimal> int hex(Hexadecimal) noex ;
 	void dtor() noex ;
-	~buffer() {
-	    dtor() ;
+	destruct buffer() {
+	    if (dbuf) dtor() ;
 	} ;
 } ; /* end struct (buffer) */
 #else	/* __cplusplus */

@@ -75,9 +75,9 @@ namespace {
     struct alloc {
 	typedef digit	*digitp ;
 	digit		*a ;
-	int		asize ;
-	alloc(digit *p,int sz) noex : a(p), asize(sz) { } ;
-	int resize(int nsize) noex ;
+	int		asz ;
+	alloc(digit *p,int sz) noex : a(p), asz(sz) { } ;
+	int resize(int nsz) noex ;
     } ; /* end struct (alloc) */
 }
 
@@ -96,7 +96,7 @@ static int		ffbsarr(digit *,int) noex ;
 constexpr int		minwords = BITS_MINWORDS ;
 constexpr int		nawords = BITS_SHORTDIGS ;
 constexpr int		nabits = (BITS_SHORTDIGS * BITS_BPW) ;
-constexpr int		dsize = int(szof(digit)) ;
+constexpr int		dsz = int(szof(digit)) ;
 
 
 /* exported variables */
@@ -293,15 +293,15 @@ static void bits_naclear(bits *op) noex {
 
 static int bits_alloc(bits *op,int nn) noex {
 	cint		bpw = BITS_BPW ;
-	cint		asize = ((op->nwords - nawords) * dsize) ;
+	cint		asz = ((op->nwords - nawords) * dsz) ;
 	int		rs = SR_OK ;
 	if (nn >= op->nbits) {
-	    alloc	ao(op->a,asize) ;
-	    cint	nsize = nsizecalc(op->nbits,nn) ;
-	    if ((rs = ao.resize(nsize)) > 0) {
+	    alloc	ao(op->a,asz) ;
+	    cint	nsz = nsizecalc(op->nbits,nn) ;
+	    if ((rs = ao.resize(nsz)) > 0) {
 	        op->a = ao.a ;
-	        op->nwords = ((rs / dsize) + nawords) ;
-		op->nbits = (((rs / dsize) + nawords) * bpw) ;
+	        op->nwords = ((rs / dsz) + nawords) ;
+		op->nbits = (((rs / dsz) + nawords) * bpw) ;
 	    }
 	} /* end if (needed) */
 	return rs ;
@@ -309,8 +309,7 @@ static int bits_alloc(bits *op,int nn) noex {
 /* end subroutine (bits_alloc) */
 
 void bits::dtor() noex {
-	cint		rs = finish ;
-	if (rs < 0) {
+	if (cint rs = finish ; rs < 0) {
 	    ulogerror("bits",rs,"dtor-finish") ;
 	}
 }
@@ -358,24 +357,24 @@ int bits_co::operator [] (int a) noex {
 }
 /* end method (bits_co::operator) */
 
-int alloc::resize(int nsize) noex {
+int alloc::resize(int nsz) noex {
 	int		rs = SR_OK ;
 	int		rsize = 0 ;
-	if (nsize > asize) {
+	if (nsz > asz) {
 	    caddr_t	na{} ;
 	    if (a == nullptr) {
-	        if ((rs = uc_libmalloc(nsize,&na)) >= 0) {
-	            memclear(na,nsize) ;
+	        if ((rs = uc_libmalloc(nsz,&na)) >= 0) {
+	            memclear(na,nsz) ;
 		}
 	    } else {
-	        if ((rs = uc_librealloc(a,nsize,&na)) >= 0) {
-	            memclear((na + asize),(nsize - asize)) ;
+	        if ((rs = uc_librealloc(a,nsz,&na)) >= 0) {
+	            memclear((na + asz),(nsz - asz)) ;
 		}
 	    }
 	    if (rs >= 0) {
 	        a = digitp(na) ;
-		asize = nsize ;
-		rsize = nsize ;
+		asz = nsz ;
+		rsize = nsz ;
 	    } /* end if (ok) */
 	} /* end if (allocation or reallocation needed) */
 	return (rs >= 0) ? rsize : rs ;
@@ -384,13 +383,13 @@ int alloc::resize(int nsize) noex {
 
 static int nsizecalc(int obits,int nbits) noex {
 	int		nw = iceil((nbits - obits),BITS_BPW) ;
-	int		nsize = 0 ;
+	int		nsz = 0 ;
 	if (nw > nawords) {
 	    nw -= nawords ;
 	    if (nw < minwords) nw = minwords ;
-	    nsize = (nw * dsize) ;
+	    nsz = (nw * dsz) ;
 	}
-	return nsize ;
+	return nsz ;
 }
 /* end subroutine (nsizecalc) */
 

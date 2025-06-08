@@ -50,8 +50,8 @@
 
 #include	"buffer.h"
 
-
-import uvariables ;
+import libutil ;
+import uconstants ;
 
 /* local defines */
 
