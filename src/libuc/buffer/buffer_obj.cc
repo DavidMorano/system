@@ -39,7 +39,7 @@
 
 	Returns:
 	>=0		the total length of the filled up buffer so far!
-	<0		error
+	<0		error (system-return)
 
 	Note:
 	This module is not completely protected against calling

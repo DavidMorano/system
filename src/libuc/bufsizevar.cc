@@ -47,7 +47,7 @@
 /* external variables */
 
 
-/* local strutures */
+/* local structures */
 
 
 /* forward references */

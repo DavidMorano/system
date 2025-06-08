@@ -28,7 +28,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstdarg>
 #include	<usystem.h>
-#include	<format.h>
+#include	<fmtstr.h>
 #include	<localmisc.h>
 
 #include	"bufprintf.h"
@@ -52,12 +52,12 @@
 /* exported subroutines */
 
 int bufprintf(char *dbuf,int dlen,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (dbuf && fmt) {
-	    va_list	ap ;
 	    cint	m = 0 ;
 	    va_begin(ap,fmt) ;
-	    rs = format(dbuf,dlen,m,fmt,ap) ;
+	    rs = fmtstr(dbuf,dlen,m,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -68,7 +68,7 @@ int bufvprintf(char *dbuf,int dlen,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf && fmt && ap) {
 	    cint	m = 0 ;
-	    rs = format(dbuf,dlen,m,fmt,ap) ;
+	    rs = fmtstr(dbuf,dlen,m,fmt,ap) ;
 	} /* end if (non-null) */
 	return rs ;
 }

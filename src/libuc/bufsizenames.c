@@ -1,6 +1,6 @@
 /* bufsizenames SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C23 (MUST-BE C-language) */
+/* lang=C23 (MUST-BE C-language; conformance reviewed to C23) */
 
 /* enumerate the various system buffer-size names */
 /* version %I% last-modified %G% */
@@ -23,8 +23,9 @@
 	Description:
 	This file contains the enumerations for the various system
 	buffer-size names.  This code module MUST-BE written in the
-	C-language.  The reason is because C++ does NOT support the
-	language feature used below.
+	C-language.  The reason is because C++ does NOT (officially)
+	support the language feature (according to its ISO standard)
+	used below.
 
 *******************************************************************************/
 
@@ -48,21 +49,21 @@ cchar *bufsizenames[] = {
 	[getbufsize_un] = "UN",		/* user-name */
 	[getbufsize_gn] = "GN",		/* group-name */
 	[getbufsize_pn] = "PN",		/* project-name */
-	[getbufsize_pw] = "PW",		/* passwd */
-	[getbufsize_sp] = "SP",		/* shadow */
-	[getbufsize_ua] = "UA",		/* user-attr */
-	[getbufsize_gr] = "GR",		/* group */
-	[getbufsize_pj] = "PJ",		/* project */
-	[getbufsize_pr] = "PR",		/* protocol-ent */
-	[getbufsize_nw] = "NW",		/* network-ent */
-	[getbufsize_ho] = "HO",		/* host-ent */
-	[getbufsize_sv] = "SV",		/* service-ent */
+	[getbufsize_pw] = "PW",		/* entry-passwd */
+	[getbufsize_sp] = "SP",		/* entry-shadow */
+	[getbufsize_ua] = "UA",		/* entry-userattr */
+	[getbufsize_gr] = "GR",		/* entry-group */
+	[getbufsize_pj] = "PJ",		/* entry-project */
+	[getbufsize_pr] = "PR",		/* entry-protocol */
+	[getbufsize_nw] = "NW",		/* entry-network */
+	[getbufsize_ho] = "HO",		/* entry-host */
+	[getbufsize_sv] = "SV",		/* entry-servicet */
 	[getbufsize_fs] = "FS",		/* filesystem-type */
 	[getbufsize_sn] = "SN",		/* symbol-name */
 	[getbufsize_zn] = "ZN",		/* time-zone-name abbreviation */
 	[getbufsize_zi] = "ZI",		/* zone-info-name (newer concept) */
 	[getbufsize_mailaddr] = "MAILADDR",	/* mail-address */
-	nullptr
+	[getbufsize_overlast] = nullptr
 } ; /* end array (bufsizenames) */
 
 

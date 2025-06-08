@@ -51,6 +51,7 @@
 
 #include	"buffer.h"
 
+import libutil ;
 
 /* local defines */
 
