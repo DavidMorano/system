@@ -40,7 +40,6 @@ export module varithmetic ;
 
 typedef ulong	digit ;
 
-
 constexpr int addone(digit &r,digit v) noex {
 	r = v + 1 ;
 	return int((r < v) || (r == 0)) ;

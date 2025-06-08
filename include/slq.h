@@ -67,9 +67,9 @@ struct slq : slq_head {
 	slq_co		audit ;
 	slq_co		finish ;
 	slq() noex {
-	    start(this,slqmem_start) ;
-	    audit(this,slqmem_audit) ;
-	    finish(this,slqmem_finish) ;
+	    start	(this,slqmem_start) ;
+	    audit	(this,slqmem_audit) ;
+	    finish	(this,slqmem_finish) ;
 	} ;
 	slq(const slq &) = delete ;
 	slq &operator = (const slq &) = delete ;
@@ -79,7 +79,7 @@ struct slq : slq_head {
 	int gettail(slq_ent **) noex ;
 	int rem(slq_ent **) noex ;
 	void dtor() noex ;
-	~slq() {
+	destruct slq() {
 	    dtor() ;
 	} ;
 } ; /* end struct (slq) */

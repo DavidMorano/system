@@ -84,10 +84,10 @@ struct fifostr : fifostr_head {
 	fifostr_co	count ;
 	fifostr_co	finish ;
 	fifostr() noex {
-	    start(this,fifostrmem_start) ;
-	    headlen(this,fifostrmem_headlen) ;
-	    count(this,fifostrmem_count) ;
-	    finish(this,fifostrmem_finish) ;
+	    start	(this,fifostrmem_start) ;
+	    headlen	(this,fifostrmem_headlen) ;
+	    count	(this,fifostrmem_count) ;
+	    finish	(this,fifostrmem_finish) ;
 	} ;
 	fifostr(const fifostr &) = delete ;
 	fifostr &operator = (const fifostr &) = delete ;
@@ -102,7 +102,7 @@ struct fifostr : fifostr_head {
 	int curdel(fifostr_cur *) noex ;
 	void dtor() noex ;
 	destruct fifostr() {
-	    dtor() ;
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (fifostr) */
 #else	/* __cplusplus */

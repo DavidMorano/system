@@ -159,15 +159,15 @@ struct vecint : vecint_head {
 	vecint_co	audit ;
 	vecint_co	finish ;
 	vecint() noex {
-	    start(this,0) ;
-	    extent(this,vecintmem_extent) ;
-	    count(this,vecintmem_count) ;
-	    delall(this,vecintmem_delall) ;
-	    sort(this,vecintmem_sort) ;
-	    setsorted(this,vecintmem_setsorted) ;
-	    resize(this,vecintmem_resize) ;
-	    audit(this,vecintmem_audit) ;
-	    finish(this,vecintmem_finish) ;
+	    start	(this,0) ;
+	    extent	(this,vecintmem_extent) ;
+	    count	(this,vecintmem_count) ;
+	    delall	(this,vecintmem_delall) ;
+	    sort	(this,vecintmem_sort) ;
+	    setsorted	(this,vecintmem_setsorted) ;
+	    resize	(this,vecintmem_resize) ;
+	    audit	(this,vecintmem_audit) ;
+	    finish	(this,vecintmem_finish) ;
 	} ;
 	vecint(const vecint &) = delete ;
 	vecint &operator = (const vecint &) = delete ;
@@ -194,7 +194,7 @@ struct vecint : vecint_head {
 	} ;
 	void dtor() noex ;
 	destruct vecint() {
-	    dtor() ;
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (vecint) */
 #else	/* __cplusplus */

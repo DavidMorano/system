@@ -1,4 +1,6 @@
-/* dispatcher */
+/* dispatcher HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* dispatcher object */
 /* version %I% last-modified %G% */
@@ -6,24 +8,26 @@
 
 /* revision history:
 
-	= 2004-03-01, David AÂ­DÂ­ Morano
+	= 2004-03-01, David A-D- Morano
 	This code was originally written.
 
 */
 
-/* Copyright Â© 2004 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	This object is work dispatcher.  It dispatches work jobs to a pool
-	of threads (created and managed by this object).
+  	Object:
+	dispatcher
 
+	Description:
+	This object is work dispatcher.  It dispatches work jobs
+	to a pool of threads (created and managed by this object).
 
 *******************************************************************************/
 
-
 #ifndef	DISPATCHER_INCLUDE
-#define	DISPATCHER_INCLUDE	1
+#define	DISPATCHER_INCLUDE
 
 
 #include	<envstandards.h>	/* must be before others */

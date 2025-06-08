@@ -203,14 +203,14 @@ struct vecpstr : vecpstr_head {
 	vecpstr_co	audit ;
 	vecpstr_co	finish ;
 	vecpstr() noex {
-	    addcspath(this,vecpstrmem_addcspath) ;
-	    count(this,vecpstrmem_count) ;
-	    delall(this,vecpstrmem_delall) ;
-	    strsize(this,vecpstrmem_strsize) ;
-	    recsize(this,vecpstrmem_recsize) ;
-	    recsize(this,vecpstrmem_recsize) ;
-	    audit(this,vecpstrmem_audit) ;
-	    finish(this,vecpstrmem_finish) ;
+	    addcspath	(this,vecpstrmem_addcspath) ;
+	    count	(this,vecpstrmem_count) ;
+	    delall	(this,vecpstrmem_delall) ;
+	    strsize	(this,vecpstrmem_strsize) ;
+	    recsize	(this,vecpstrmem_recsize) ;
+	    recsize	(this,vecpstrmem_recsize) ;
+	    audit	(this,vecpstrmem_audit) ;
+	    finish	(this,vecpstrmem_finish) ;
 	} ;
 	vecpstr(const vecpstr &) = delete ;
 	vecpstr &operator = (const vecpstr &) = delete ;
@@ -245,7 +245,7 @@ struct vecpstr : vecpstr_head {
 	} ;
 	void dtor() noex ;
 	destruct vecpstr() {
-	    if (va) dtor() ;
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (vecpstr) */
 #else	/* __cplusplus */
