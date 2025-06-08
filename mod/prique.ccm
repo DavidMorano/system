@@ -107,10 +107,10 @@ export {
 	constexpr int		ins(const K *) noex ;
 	constexpr int		get(const K *) noex ;
 	constexpr prique() noex {
-	    start(this,priquemem_start) ;
-	    finish(this,priquemem_finish) ;
-	    count(this,priquemem_count) ;
-	    rem(this) ;
+	    start	(this,priquemem_start) ;
+	    finish	(this,priquemem_finish) ;
+	    count	(this,priquemem_count) ;
+	    rem		(this) ;
 	} ; /* end ctor) */
 	constexpr ~prique() {
 	    if (mp) {
@@ -126,6 +126,8 @@ export {
 	constexpr int		icount() noex ;
 	constexpr int		irem(K * = nullptr) noex ;
     } ; /* end class (prique) */
+} /* end export (prique) */
+
     template<typename K> constexpr int prique<K>::istart(int n) noex {
 	int		rs = SR_INVALID ;
 	if (n >= 0) {
@@ -235,6 +237,5 @@ export {
 	}
 	return rs ;
     } /* end method (prique_co::operator) */
-} /* end export (prique) */
 
 
