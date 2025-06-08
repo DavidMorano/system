@@ -12,7 +12,7 @@
 	This subroutine was written by being adapted from one of
 	my previous versions of the same (from the early 1980s;
 	embedded work at AT&T), which itself was adapted from an
-	original asembly-language version (in Digital Euipment Corp
+	original asembly-language version (in Digital Equipment Corp
 	VAX assembly).
 
 	= 2013-04-30, David A­D­ Morano
@@ -51,10 +51,11 @@
 #include	<cstdlib>
 #include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
 #include	<stdintx.h>
+#include	<localmisc.h>
 
-#include	"cfsysx.hh"
 #include	"cfoct.h"
 
+import cfsysx ;				/* |cfsysx(3uc)| */
 
 /* local defines */
 

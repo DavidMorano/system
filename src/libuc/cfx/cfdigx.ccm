@@ -1,4 +1,4 @@
-/* cfdigx MODULE */
+/* cfdigx MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -46,8 +46,11 @@
 	cfdigux		(un-signed)
 
 	Description:
-	Subroutines to convert digit strings to binary integers
-	(of various types).
+	These are subroutine templates to convert digit strings
+	into binary integers (of various types and sizes).  All
+	number bases from 2 through 64 are supported.  The integer
+	types |int|, |long|, and |longlong)| along with their
+	unsigned versions are supported.
 
 	Synopsis:
     	template<typename ST> 
@@ -79,7 +82,6 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>		/* extended integer types */
-#include	<libutil.hh>		/* |cstrlen(3u)| */
 #include	<checkbase.h>
 #include	<cfutil.hh>		/* namespace |cfx| + |cstrlen(3u)| */
 #include	<char.h>		/* |CHAR_TOVAL(3uc)| */
@@ -87,6 +89,8 @@ module ;
 #include	<localmisc.h>
 
 export module cfdigx ;
+
+import libutil ;
 
 template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 	cint		nb = (CHAR_BIT * szof(T)) ;
@@ -103,7 +107,7 @@ template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 	cfdshelp(cchar *asp,int asl,int b,T *arp) noex : sp(asp), sl(asl) {
 	    const T	one = 1 ;
 	    tmin = (one << (nb - 1)) ;
-	    tmax = (~ tmax) & (~ tmin) ;
+	    tmax = (compl tmax) & (compl tmin) ;
 	    base = b ;
 	    rp = arp ;
 	} ; /* end ctor */

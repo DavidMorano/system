@@ -148,7 +148,7 @@ int cfnumx(cchar *sp,int sl,T *rp) noex {
 	                    break ;
 	                } /* end switch */
 	            } else if (bp[0] == '0') {
-	                rs = cfoct((bp+1),(bl-1),rp) ;
+	                rs = cfoct((bp + 1),(bl - 1),rp) ;
 	            } else {
 	                rs = cfdec(bp,bl,rp) ;
 		    }

@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0		OK
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -48,7 +48,7 @@
 #include	<localmisc.h>		/* <- for |DIGBUFLEN| below */
 
 #include	"cfdecf.h"
-#include	"cfutil.h"
+#include	"cfutil.hh"
 
 
 /* local defines */

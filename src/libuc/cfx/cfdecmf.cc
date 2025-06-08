@@ -50,15 +50,16 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strnlen(3c)| */
 #include	<usystem.h>
+#include	<intsat.h>
 #include	<ascii.h>
 #include	<cfdec.h>
 #include	<char.h>
 #include	<toxc.h>
-#include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"cfdecmf.h"
 
+import libutil ;
 
 /* local defines */
 
