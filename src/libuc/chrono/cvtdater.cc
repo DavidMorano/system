@@ -45,6 +45,7 @@
 
 #include	"cvtdater.h"
 
+import libutil ;
 
 /* local defines */
 

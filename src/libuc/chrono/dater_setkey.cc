@@ -63,6 +63,7 @@
 
 #include	"dater.h"
 
+import libutil ;
 
 /* local defines */
 

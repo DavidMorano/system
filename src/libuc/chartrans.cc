@@ -27,12 +27,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |wchar_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>		/* |libutil| */
+#include	<usystem.h>		/* |libutil(3u)| */
 #include	<mallocxx.h>
 #include	<storebuf.h>
 #include	<utf8decoder.h>
@@ -47,6 +46,7 @@
 /* local defines */
 
 #define	CT		chartrans
+#define	CT_SET		chartrans_set
 
 
 /* imported namespaces */
@@ -345,7 +345,7 @@ static int chartrans_setclose(CT *op,int txid) noex {
 
 static int chartrans_sethave(CT *op,cchar *sp,int sl) noex {
 	chartrans_set	*setp ;
-	int		i ; /* used afterwards */
+	int		i ; /* used-afterwards */
 	int		f = false ;
 	for (i = 0 ; i < op->nmax ; i += 1) {
 	    setp = (op->sets + i) ;

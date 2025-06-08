@@ -69,25 +69,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<getmjd.h>		/* |getyrd(3uc)| */
 #include	<calstrs.h>
 #include	<estrings.h>
 #include	<cfdec.h>
 #include	<six.h>
 #include	<char.h>
 #include	<mkchar.h>
-#include	<ischarx.h>
 #include	<hasx.h>
-#include	<getmjd.h>		/* |getyrd(3uc)| */
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"dayspec.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -187,7 +187,7 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	    case 6:
 	    case 5:
 	        yp = sp ;
-	        yl = min(4,(sl-4)) ;
+	        yl = min(4,(sl - 4)) ;
 	        sp += 4 ;
 	        sl -= 4 ;
 		fallthrough ;
@@ -195,7 +195,7 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	    case 4:
 	    case 3:
 	        mp = sp ;
-	        ml = min(2,(sl-2)) ;
+	        ml = min(2,(sl - 2)) ;
 	        sp += 2 ;
 	        sl -= 2 ;
 		fallthrough ;
@@ -203,7 +203,7 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	    case 2:
 	    case 1:
 	        dp = sp ;
-	        dl = min(2,(sl-0)) ;
+	        dl = min(2,(sl - 0)) ;
 		break ;
 	    } /* end switch */
 	} else {
@@ -229,7 +229,7 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 		    }
 		}
 		if (sl > 0) {
-		    int		ch = mkchar(sp[0]) ;
+		    cint	ch = mkchar(sp[0]) ;
 		    f_dig = isalphalatin(ch) ;
 	        }
 	        if ((ti = siourbrk(sp,sl,f_dig)) >= 0) {
@@ -238,8 +238,8 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	                ml = ti ;
 		    }
 		    {
-	                dp = (sp+ti) ;
-	                dl = (sl-ti) ;
+	                dp = (sp + ti) ;
+	                dl = (sl - ti) ;
 		    }
 		    if (sl > 0) {
 		        if ((si = sialnum(dp,dl)) > 0) {
@@ -252,14 +252,14 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 		    case 4:
 		    case 3:
 	        	mp = sp ;
-	        	ml = min(2,(sl-2)) ;
+	        	ml = min(2,(sl - 2)) ;
 	        	sp += 2 ;
 	        	sl -= 2 ;
 			/* FALLTHROUGH */
 		    case 2:
 		    case 1:
 	                dp = sp ;
-	        	dl = min(2,(sl-0)) ;
+	        	dl = min(2,(sl - 0)) ;
 			break ;
 		    default:
 			rs = SR_INVALID ;
@@ -306,7 +306,7 @@ static int parsemonth(cchar *mp,int ml) noex {
 /* end subroutine (parsemonth) */
 
 static int siourbrk(cchar *sp,int sl,int f_dig) noex {
-	int		i = -1 ; /* used afterwards */
+	int		i = -1 ; /* return-value */
 	bool		f = false ;
 	for (i = 0 ; i < sl ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;

@@ -65,7 +65,6 @@
 #include	<ctime>			/* |time_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<getdefzdata.h>
@@ -91,6 +90,7 @@
 
 #include	"dater.h"
 
+import libutil ;
 
 /* local defines */
 
