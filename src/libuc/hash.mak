@@ -35,6 +35,8 @@ DEFS=
 
 INCS= hash.h
 
+MODS +=
+
 LIBS=
 
 
@@ -61,7 +63,7 @@ OBJ1= hashindex.o
 OBJ_HASH= obj0.o obj1.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -89,7 +91,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_HASH)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_HASH)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_HASH)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -110,10 +112,10 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
 
 obj1.o:			$(OBJ1)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
 
 
 hash_again.o:		hash_again.cc			$(INCS)

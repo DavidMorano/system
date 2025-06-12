@@ -1,9 +1,30 @@
 /* hash_hsieh SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* this is the "super-fast" hash function by Paul Hsieh (2004-2008) */
 /* version %I% last-modified %G% */
 
+
+/*******************************************************************************
+
+  	Name:
+	hash_hsieh
+
+	Description:
+	This is a popular hash function originally written by Paul Hsieh.
+
+	Synopsis:
+	uint hash_hsieh(cchar *data,int len) noex
+
+	Arguments:
+	data	dats buffer pointer
+	len	date buffer length
+
+	Returns:
+	-	the hash value (an unsigned int)
+
+*******************************************************************************/
 
 #include	<envstandards.h>	/* first to configure */
 #include	<cstddef>		/* |nullptr_t| */

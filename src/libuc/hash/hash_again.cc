@@ -1,5 +1,6 @@
 /* hash_again SUPPORT */
-/* lang=C++20 */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* create a hash from an exiting hash */
 /* version %I% last-modified %G% */
@@ -35,19 +36,26 @@
 	Returns:
 	value		the hash value (unsigned)
 
+	Notes:
+	1. This (below) is just one way to get a new hash from an
+	old on.  Most of the code that deals with hashes are doing
+	their own procedure for making a new hash from an old one.
+	And for best results, a new hash should often include some
+	of the original material that was hashed in the first place.
+	And that is exactly what a lot (maybe most) hashing related
+	code does already.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdint>
-#include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<randlc.h>
-#include	<urotate.h>
+#include	<bitrotate.h>
 #include	<localmisc.h>
 
 #include	"hash.h"
@@ -82,7 +90,7 @@
 
 /* local variables */
 
-constexpr bool		f_randlc = CF_RANDLC ;
+constexpr cbool		f_randlc = CF_RANDLC ;
 
 
 /* exported variables */
@@ -96,7 +104,7 @@ uint hash_again(uint ohash,int c,int nskip) noex {
 	    if_constexpr (f_randlc) {
 	        nhash = randlc(ohash + c) ;
 	    } else {
-	        nhash = urotate(ohash,NROT) + c ;
+	        nhash = bitrotate(ohash,NROT) + c ;
 	    }
 	    if (ohash == nhash) {
 		nhash = (ohash + 1) ;

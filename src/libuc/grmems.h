@@ -20,7 +20,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>

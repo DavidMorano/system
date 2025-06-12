@@ -1,4 +1,5 @@
 /* hash_elf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform the hash done in processing ELF files */
@@ -27,7 +28,7 @@
 	UNIX® System V Release 4 operating system.
 
 	Synopsis:
-	uint hash_elf(cchar *sp,int sl) noex
+	uint hash_elf(cvoid *sp,int sl) noex
 
 	Arguments:
 	sp		buffer to be hashed
@@ -60,11 +61,11 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"hash.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -95,7 +96,8 @@
 
 /* exported subroutines */
 
-uint hash_elf(cchar *sp,int sl) noex {
+uint hash_elf(cvoid *vp,int sl) noex {
+    	char		*sp = charp(vp) ;
 	unsigned	h = 0 ;
 	unsigned	g ;
 	unsigned	v ;

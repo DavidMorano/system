@@ -1,4 +1,5 @@
 /* hashindex SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* create an index from a hash value */
@@ -25,6 +26,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>		/* |MODP2| */
 
 #include	"hashindex.h"
