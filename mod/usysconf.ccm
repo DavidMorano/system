@@ -111,6 +111,8 @@ enum dataitems {
 	dataitem_maxarg,
 	dataitem_maxline,
 	dataitem_maxlogin,
+	dataitem_maxusername,
+	dataitem_maxgroupname,
 	dataitem_maxnode,
 	dataitem_maxhost,
 	dataitem_maxtzname,
@@ -175,7 +177,8 @@ export {
 	    case _SC_ARG_MAX:
 	    case _SC_LINE_MAX:
 	    case _SC_LOGIN_NAME_MAX:
-	    case _SC_NODENAME_MAX:
+	    case _SC_USERNAME_MAX:
+	    case _SC_GROUPNAME_MAX:
 	    case _SC_HOSTNAME_MAX:
 	    case _SC_TZNAME_MAX:
 	    case _SC_NGROUPS_MAX:
@@ -242,6 +245,12 @@ int usysconf::synthetic(int req) noex {
 	    break ;
         case sysconfcmd_maxpath:
 	    val = MPBUFLEN ;
+	    break ;
+        case sysconfcmd_maxusername:
+	    val = UNBUFLEN ;
+	    break ;
+        case sysconfcmd_maxgroupname:
+	    val = GNBUFLEN ;
 	    break ;
         case sysconfcmd_maxnodename:
 	    val = NNBUFLEN ;
