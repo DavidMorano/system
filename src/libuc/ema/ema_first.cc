@@ -59,32 +59,34 @@
 
 int ema_first(ema *op,cchar **rpp) noex {
 	int		rs ;
-	int		rl = 0 ;
-	cchar		*rp = nullptr ;
-	ema_ent		*ep{} ;
-	for (int i = 0 ; (rs = ema_get(op,i,&ep)) >= 0 ; i += 1) {
-	    if (ep) {
-		if ((ep->rp != nullptr) || (ep->ap != nullptr)) {
-		    if (rl == 0) {
-			rl = ep->rl ;
-			rp = ep->rp ;
+	int		rl = 0 ; /* return-value */
+	if ((rs = ema_magic(op)) >= 0) {
+	    cchar	*rp = nullptr ;
+	    ema_ent	*ep{} ;
+	    for (int i = 0 ; (rs = ema_get(op,i,&ep)) >= 0 ; i += 1) {
+	        if (ep) {
+		    if (ep->rp || ep->ap) {
+		        if (rl == 0) {
+			    rl = ep->rl ;
+			    rp = ep->rp ;
+		        }
+		        if (rl == 0) {
+			    rl = ep->al ;
+			    rp = ep->ap ;
+		        }
 		    }
-		    if (rl == 0) {
-			rl = ep->al ;
-			rp = ep->ap ;
-		    }
-		}
+	        }
+	        if (rl > 0) break ;
+	    } /* end for */
+	    if (rs >= 0) {
+	        if (rpp) {
+		    *rpp = (rl > 0) ? rp : nullptr ;
+	        }
+	    } else if (rs == SR_NOTFOUND) {
+	        if (rpp) *rpp = nullptr ;
+	        rs = SR_OK ;
 	    }
-	    if (rl > 0) break ;
-	} /* end for */
-	if (rs >= 0) {
-	    if (rpp) {
-		*rpp = (rl > 0) ? rp : nullptr ;
-	    }
-	} else if (rs == SR_NOTFOUND) {
-	    if (rpp) *rpp = nullptr ;
-	    rs = SR_OK ;
-	}
+	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (ema_first) */

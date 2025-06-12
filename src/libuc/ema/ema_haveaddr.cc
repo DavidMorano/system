@@ -29,10 +29,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |strncmp(3c)| */
 #include	<usystem.h>
-#include	<ema.h>
 #include	<localmisc.h>
+
+#include	"ema.h"
 
 import libutil ;
 
@@ -63,8 +64,8 @@ int ema_haveaddr(ema *op,cchar *ap,int al) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		f = false ;
-	if (op && ap) {
+	int		f = false ; /* return-value */
+	if ((rs = ema_magic(op,ap)) >= 0) {
 	    ema_ent	*ep{} ;
 	    if (al < 0) al = cstrlen(ap) ;
 	    rs = SR_OK ;
@@ -85,7 +86,7 @@ int ema_haveaddr(ema *op,cchar *ap,int al) noex {
 	        }
 	    } /* end for */
 	    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
-	} /* end if (null-pointer) */
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 } 
 /* end subroutine (ema_haveaddr) */

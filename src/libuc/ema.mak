@@ -35,7 +35,7 @@ DEFS=
 
 INCS= ema.h
 
-MODS +=
+MODS += ema_asstr.ccm ema_entry.ccm ema_parts.ccm
 
 LIBS=
 
@@ -56,9 +56,11 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
+DEPS_EMA += ema_asstr.o ema_entry.o ema_parts.o
+
 OBJ0= ema_main.o ema_obj.o
 OBJ1= ema_haveaddr.o ema_first.o
-OBJ2= asstr.o parts.o entry.o
+OBJ2= $(DEPS_EMA)
 
 OBJ_EMA= obj0.o obj1.o obj2.o
 
@@ -94,7 +96,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_EMA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_EMA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -122,13 +124,16 @@ obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
 
 
-ema_main.o:		ema_main.cc parts.hh asstr.hh entry.hh	$(INCS)
+ema_main.o:		ema_main.cc $(DEPS_EMA)			$(INCS)
 ema_obj.o:		ema_obj.cc				$(INCS)
 ema_haveaddr.o:		ema_haveaddr.cc				$(INCS)
 ema_first.o:		ema_first.cc				$(INCS)
 
-parts.o:		parts.cc parts.hh asstr.hh		$(INCS)
-asstr.o:		asstr.cc asstr.hh			$(INCS)
-entry.o:		entry.cc entry.hh 			$(INCS)
+ema_parts.o:		ema_parts.ccm ema_asstr.o		$(INCS)
+	makemodule ema_asstr
+	makemodule ema_parts
+
+ema_asstr.o:		ema_asstr.ccm				$(INCS)
+ema_entry.o:		ema_entry.ccm				$(INCS)
 
 

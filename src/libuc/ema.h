@@ -20,7 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vechand.h>
 
 
@@ -118,6 +122,7 @@ struct ema : ema_head {
 	    start(this,emamem_start) ;
 	    count(this,emamem_count) ;
 	    finish(this,emamem_finish) ;
+	    magic = 0 ;
 	} ;
 	ema(const ema &) = delete ;
 	ema &operator = (const ema &) = delete ;
@@ -129,8 +134,8 @@ struct ema : ema_head {
 	int haveaddr(cchar *,int = -1) noex ;
 	int first(cchar **) noex ;
 	void dtor() noex ;
-	~ema() {
-	    dtor() ;
+	destruct ema() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (ema) */
 #else	/* __cplusplus */

@@ -32,7 +32,6 @@
 #include	<sys/stat.h>		/* |USTAT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -43,6 +42,7 @@
 
 #include	"dirseen.h"
 
+import libutil ;
 
 /* local defines */
 

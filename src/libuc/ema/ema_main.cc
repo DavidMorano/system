@@ -5,7 +5,7 @@
 /* E-Mail Address */
 /* version %I% last-modified %G% */
 
-#define	CF_ADDENT	1		/* enable 'ema_addent()' */
+#define	CF_ADDENT	1		/* enable |ema_addent()| */
 #define	CF_COMPACT	0		/* compact address on storage */
 #define	CF_ALTCOMPACT	1		/* use alternative compacter */
 
@@ -36,15 +36,16 @@
 #include	<mallocstuff.h>
 #include	<strn.h>
 #include	<char.h>
+#include	<vechand.h>
 #include	<ascii.h>
 #include	<localmisc.h>
 
 #include	"ema.h"
-#include	"entry.hh"
-#include	"asstr.hh"
-#include	"parts.hh"
 
 import libutil ;
+import ema_entry ;
+import ema_asstr ;
+import ema_parts ;
 
 /* local defines */
 
@@ -77,12 +78,12 @@ typedef ema_ent	*	entp ;
 
 template<typename ... Args>
 static inline int ema_ctor(ema *op,Args ... args) noex {
+    	EMA		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
-	    op->n = 0 ;
+	    memclear(hop) ;
 	    if ((op->elp = new(nothrow) vechand) != np) {
 		rs = SR_OK ;
 	    }
@@ -125,12 +126,10 @@ static int	malloccompactstr(cchar *,int,char **) noex ;
 /* exported subroutines */
 
 int ema_start(ema *op) noex {
-    	EMA		*hop = op ;
 	int		rs ;
 	if ((rs = ema_ctor(op)) >= 0) {
 	    cint	vn = EMA_DEFENTS ;
 	    cint	vo = 0 ;
-	    memclear(hop) ;
 	    if ((rs = vechand_start(op->elp,vn,vo)) >= 0) {
 	        op->magic = EMA_MAGIC ;
 	    }
@@ -147,24 +146,26 @@ int ema_finish(ema *op) noex {
 	int		rs1 ;
 	if ((rs = ema_magic(op)) >= 0) {
 	    op->n = -1 ;
-	    void	*vp{} ;
-	    for (int i = 0 ; vechand_get(op->elp,i,&vp) >= 0 ; i += 1) {
-	        if (vp) {
+	    if (op->elp) {
+	        void	*vp{} ;
+	        for (int i = 0 ; vechand_get(op->elp,i,&vp) >= 0 ; i += 1) {
 		    ema_ent	*ep = entp(vp) ;
-		    {
-	                rs1 = entry_finish(ep) ;
-	                if (rs >= 0) rs = rs1 ;
-		    }
-		    {
-	                rs1 = uc_free(ep) ;
-	                if (rs >= 0) rs = rs1 ;
-		    }
-	        } /* end if (non-null) */
-	    } /* end for */
-	    {
-	        rs1 = vechand_finish(op->elp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
+	            if (vp) {
+		        {
+	                    rs1 = entry_finish(ep) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+		        {
+	                    rs1 = uc_free(ep) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+	            } /* end if (non-null) */
+	        } /* end for */
+	        {
+	            rs1 = vechand_finish(op->elp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	    } /* end if (non-null) */
 	    {
 	        rs1 = ema_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -180,7 +181,7 @@ int ema_parse(ema *op,cchar *sp,int sl) noex {
 	if ((rs = ema_magic(op,sp)) >= 0) {
 	    asstr	desc ;
 	    if (sl < 0) sl = cstrlen(sp) ;
-	    desc.sp = (char *) sp ;
+	    desc.sp = charp(sp) ;
 	    desc.sl = sl ;
 	    if ((rs = ema_parseit(op,&desc)) > 0) {
 	        op->n += rs ;
@@ -206,8 +207,7 @@ int ema_addent(ema *op,ema_ent *ep) noex {
 int ema_get(ema *op,int i,ema_ent **epp) noex {
 	int		rs ;
 	if ((rs = ema_magic(op,epp)) >= 0) {
-	    void	*vp{} ;
-	    if ((rs = vechand_get(op->elp,i,&vp)) >= 0) {
+	    if (void *vp ; (rs = vechand_get(op->elp,i,&vp)) >= 0) {
 	        *epp = entp(vp) ;
 	    }
 	} /* end if (magic) */
@@ -220,10 +220,9 @@ int ema_getbestaddr(ema *op,int i,cchar **rpp) noex {
 	int		rl = 0 ;
 	if ((rs = ema_magic(op)) >= 0) {
 	    cchar	*rp = nullptr ;
-	    void	*vp{} ;
-	    if ((rs = vechand_get(op->elp,i,&vp)) >= 0) {
+	    if (void *vp ; (rs = vechand_get(op->elp,i,&vp)) >= 0) {
+		ema_ent		*ep = entp(vp) ;
 	        if (vp) {
-		    ema_ent		*ep = entp(vp) ;
 	    	    if ((rl == 0) && (ep->rp != nullptr) && (ep->rl > 0)) {
 		        rp = ep->rp ;
 		        rl = ep->rl ;
@@ -253,13 +252,16 @@ int ema_count(ema *op) noex {
 /* end subroutine (ema_count) */
 
 int ema_addents(ema *op,ema *oop) noex {
-	int		rs = SR_OK ;
-	void		*vp{} ;
-	for (int i = 0 ; vechand_get(oop->elp,i,&vp) >= 0 ; i += 1) {
-	    ema_ent	*oep = entp(vp) ;
-	    rs = ema_addentone(op,oep) ;
-	    if (rs < 0) break ;
-	} /* end for */
+	int		rs ;
+	if ((rs = ema_magic(op)) >= 0) {
+	    vechand	*elp = oop->elp ;
+	    void	*vp{} ;
+	    for (int i = 0 ; elp->get(i,&vp) >= 0 ; i += 1) {
+	        ema_ent	*oep = entp(vp) ;
+	        rs = ema_addentone(op,oep) ;
+	        if (rs < 0) break ;
+	    } /* end for */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ema_addents) */
@@ -286,17 +288,17 @@ namespace ema_ns {
 static int ema_parseit(ema *op,asstr *bp) noex {
 	asstr		as[si_overlast] ;
 	ema		*nlp = nullptr ;
+	cchar		*orig ;
 	int		rs = SR_OK ;
 	int		sz ;
-	int		sl, olen ;
+	int		sl ;
+	int		olen ;
 	int		pstate = si_address ;
 	int		state ;
-	int		ch ;
-	int		n = 0 ;
+	int		n = 0 ; /* return-value */
 	int		c_comment = 0 ;
-	int		f_quote = FALSE ;
-	int		f_exit = FALSE ;
-	cchar		*orig ;
+	bool		f_quote = false ;
+	bool		f_exit = false ;
 	/* skip over any leading white space */
 	asstr_skipwhite(bp) ;
 	/* initialize for this entry */
@@ -304,7 +306,7 @@ static int ema_parseit(ema *op,asstr *bp) noex {
 	partsbegin(as) ;
 	/* start scanning */
 	state = si_address ;
-	while ((! f_exit) && ((ch = asstr_get(bp)) >= 0)) {
+	for (int ch ; (! f_exit) && ((ch = asstr_get(bp)) >= 0) ; ) {
 	    switch (ch) {
 	    case '\\':
 	        if (f_quote) {
@@ -408,7 +410,7 @@ static int ema_parseit(ema *op,asstr *bp) noex {
 	    case ';':
 	        if ((state == si_address) && 
 	            (! f_quote) && (c_comment == 0)) {
-	            f_exit = TRUE ;
+	            f_exit = true ;
 	            olen = intconv(bp->sp - orig) ;
 	            asstr_adv(bp) ;
 	        } else {
@@ -438,7 +440,7 @@ static int ema_parseit(ema *op,asstr *bp) noex {
 	            asstr_adv(bp) ;
 	        }
 	        break ;
-/* I think that these cases are just some optimizations (not required) */
+	    /* that these cases are just some optimizations */
 	    case '\n':
 	    case '\r':
 	    case '\v':
@@ -482,8 +484,7 @@ static int ema_parseit(ema *op,asstr *bp) noex {
 	        break ;
 	    } /* end switch */
 	    if (rs < 0) break ;
-	} /* end while */
-
+	} /* end for */
 #ifdef	COMMENT /* not needed here */
 	if (rs >= 0) {
 	    asstr	*asp = (as+si_comment) ;
@@ -491,13 +492,11 @@ static int ema_parseit(ema *op,asstr *bp) noex {
 	        int	pch = asstr_getprev(asp) ;
 	        if (CHAR_ISWHITE(pch)) asstr_backwhite(asp) ;
 	    }
-	}
+	} /* end if (ok) */
 #endif /* COMMENT */
-
 	if (! f_exit) {
 	    olen = intconv(bp->sp - orig) ;
 	}
-
 	if (rs >= 0) {
 	    if ((olen > 0) && (partslen(as) > 0)) {
 	        n += 1 ;
@@ -510,15 +509,13 @@ static int ema_parseit(ema *op,asstr *bp) noex {
 	            nlp = nullptr ;
 	        }
 	    } /* end if */
-	} /* end if */
-
+	} /* end if (ok) */
 	if (rs < 0) {
 	    if (nlp != nullptr) {
 	        ema_finish(nlp) ;
 	        uc_free(nlp) ;
 	    }
-	}
-
+	} /* end if (error) */
 	partsend(as) ;
 	op->n += n ;
 	return (rs >= 0) ? n : rs ;
@@ -526,12 +523,12 @@ static int ema_parseit(ema *op,asstr *bp) noex {
 /* end subroutine (ema_parseit) */
 
 static int ema_load(ema *op,cchar *orig,int olen,asstr *as,ema *nlp) noex {
-	ema_ent		*ep = nullptr ;
 	int		rs = SR_OK ;
 	if (olen < 0) olen = cstrlen(orig) ;
 	if (olen > 0) {
 	    cint	sz = szof(ema_ent) ;
-	    if ((rs = uc_malloc(sz,&ep)) >= 0) {
+	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+		ema_ent		*ep = entp(vp) ;
 	        if ((rs = entry_start(ep)) >= 0) {
 	            int		sl ;
 	            cchar	*sp ;
@@ -605,7 +602,8 @@ static int ema_load(ema *op,cchar *orig,int olen,asstr *as,ema *nlp) noex {
 static int ema_addentone(ema *op,ema_ent *ep) noex {
 	cint		sz = szof(ema_ent) ;
 	int		rs ;
-	if (ema_ent *nep ; (rs = uc_malloc(sz,&nep)) >= 0) {
+	if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	    ema_ent *nep = entp(vp) ;
 	    if ((rs = entry_startload(nep,ep)) >= 0) {
 	        if ((rs = vechand_add(op->elp,nep)) >= 0) {
 	            op->n += 1 ;
@@ -632,8 +630,8 @@ static int ema_debugprint(ema *op,cchar *s) noex {
 	debugprintf("ema_debugprint: n=%u\n",op->n) ;
 	void		*vp{} ;
 	for (int i = 0 ; vechand_get(op->elp,i,&vp) >= 0 ; i += 1) {
+	    ema_ent	*ep = entp(vp) ;
 	    if (vp) {
-		ema_ent	*ep = entp(vp) ;
 	        entry_debugprint(ep,s) ;
 	    }
 	} /* end for */
@@ -649,8 +647,8 @@ static int ema_debugprint(ema *op,cchar *s) noex {
 static int malloccompactstr(cchar *sp,int sl,char **rpp) noex {
 	int		rs ;
 	int		sz ;
-	int		len = 0 ;
-	int		f_quote = FALSE ;
+	int		len = 0 ; /* return-value */
+	int		f_quote = false ;
 	uchar		*buf{} ;
 	if (sl < 0) sl = cstrlen(sp) ;
 	sz = (sl + 1) ;
@@ -683,34 +681,34 @@ static int malloccompactstr(cchar *sp,int sl,char **rpp) noex {
 #else /* CF_ALTCOMPACT */
 
 static int malloccompactstr(cchar *sp,int sl,char **rpp) noex {
-	asstr		s ;
-	int		rs = SR_OK ;
-	int		ch ;
-	int		len ;
-	int		f_quote = FALSE ;
-	asstr_start(&s) ;
+	int		rs ;
+	int		len = 0 ; /* return-value */
 	if (sl < 0) sl = cstrlen(sp) ;
-	while ((rs >= 0) && (sl > 0)) {
-	    cint	ch = mkchar(*sp) ;
-	    switch (ch) {
-	    case CH_DQUOTE:
-	        f_quote = (! f_quote) ;
-		fallthrough ;
-		/* FALLTHROUGH */
-	    default:
-	        if (f_quote || (! CHAR_ISWHITE(ch))) {
-	            rs = asstr_addchr(&s,ch) ;
-	        }
-	        break ;
-	    } /* end switch */
-	    sp += 1 ;
-	    sl -= 1 ;
-	} /* end while */
-	len = s.sl ;
-	if (rpp) {
-	    *rpp = (rs >= 0) ? mallocstrw(s.sp,s.sl) : nullptr ;
-	}
-	asstr_finish(&s) ;
+	if (asstr s ; (rs = asstr_start(&s)) >= 0) {
+	    bool	f_quote = false ;
+	    while ((rs >= 0) && (sl > 0)) {
+	        cint	ch = mkchar(*sp) ;
+	        switch (ch) {
+	        case CH_DQUOTE:
+	            f_quote = (! f_quote) ;
+		    fallthrough ;
+		    /* FALLTHROUGH */
+	        default:
+	            if (f_quote || (! CHAR_ISWHITE(ch))) {
+	                rs = asstr_addchr(&s,ch) ;
+	            }
+	            break ;
+	        } /* end switch */
+	        sp += 1 ;
+	        sl -= 1 ;
+	    } /* end while */
+	    len = s.sl ;
+	    if (rpp) {
+	        *rpp = (rs >= 0) ? mallocstrw(s.sp,s.sl) : nullptr ;
+	    }
+	    rs1 = asstr_finish(&s) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (asstr) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (malloccompactstr) */
