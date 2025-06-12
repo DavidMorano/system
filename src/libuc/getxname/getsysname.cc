@@ -50,7 +50,7 @@
 #include	"getsysname.h"
 
 
-import uvariables ;
+import uconstants ;
 
 /* local defines */
 

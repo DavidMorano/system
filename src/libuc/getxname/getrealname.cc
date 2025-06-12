@@ -56,7 +56,7 @@
 #include	<getusername.h>
 #include	<getax.h>
 #include	<mkx.h>			/* |getgecosname(3uc)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"getrealname.h"
 

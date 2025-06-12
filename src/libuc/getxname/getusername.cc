@@ -7,7 +7,6 @@
 
 #define	CF_UTMPACC	1		/* use |utmpacc(3uc)| */
 #define	CF_GETUTMPNAME	1		/* use |getutmpname(3dam)| */
-#define	CF_UCPWCACHE	1		/* use |ucgetpw(3uc)| */
 
 /* revision history:
 
@@ -150,14 +149,6 @@
 
 
 /* local defines */
-
-#if	CF_UCPWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#define	GETPW_UID	ucpwcache_uid
-#else
-#define	GETPW_NAME	getpw_name
-#define	GETPW_UID	getpw_uid
-#endif /* CF_UCPWCACHE */
 
 #define	GETXSTATE	struct getxusername_state
 
@@ -483,7 +474,7 @@ static int getxusername_map(getxuser *xup) noex {
 static int getxusername_uid(getxuser *xup) noex {
 	int		rs ;
 	xup->unl = 0 ;
-	if ((rs = GETPW_UID(xup->pwp,xup->pwbuf,xup->pwlen,xup->uid)) >= 0) {
+	if ((rs = getpwx_uid(xup->pwp,xup->pwbuf,xup->pwlen,xup->uid)) >= 0) {
 	    if (xup->pwp->pw_name[0] != '\0') {
 		xup->pwl = rs ;
 	    } else {
@@ -523,14 +514,14 @@ static int getxusername_lookup(getxuser *xup,cchar *sp) noex {
 	if ((rs = vecstr_find(xup->nlp,sp)) == SR_NOTFOUND) {
 	    cint	pwlen = xup->pwlen ;
 	    char	*pwbuf = xup->pwbuf ;
-	    if ((rs = GETPW_NAME(xup->pwp,pwbuf,pwlen,sp)) >= 0) {
+	    if ((rs = getpwx_name(xup->pwp,pwbuf,pwlen,sp)) >= 0) {
 	        if (xup->pwp->pw_uid == xup->uid) {
 		    xup->pwl = rs ;
 	            pwl = rs ;
 		} else {
 		    rs = SR_NOTFOUND ;
 		}
-	    } /* end if (GETPW_NAME) */
+	    } /* end if (getpwx_name) */
 	    if (rs == SR_NOTFOUND) {
 	        rs = vecstr_add(xup->nlp,sp,-1) ;
 	    }

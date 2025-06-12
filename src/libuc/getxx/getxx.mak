@@ -35,6 +35,8 @@ DEFS=
 
 INCS= getxx.h
 
+MODS +=
+
 LIBS=
 
 
@@ -60,14 +62,13 @@ OBJ1_GETXX= getnw.o
 OBJ2_GETXX= getpr.o
 OBJ3_GETXX= getsv.o getus.o
 
-
 OBJA_GETXX= obj0_getxx.o obj1_getxx.o
 OBJB_GETXX= obj2_getxx.o obj3_getxx.o
 
 OBJ_GETXX= $(OBJA_GETXX) $(OBJB_GETXX)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -93,9 +94,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_GETXX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_GETXX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_GETXX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -115,16 +119,16 @@ control:
 	(uname -n ; date) > Control
 
 obj0_getxx.o:	$(OBJ0_GETXX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_GETXX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_GETXX)
 
 obj1_getxx.o:	$(OBJ1_GETXX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_GETXX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_GETXX)
 
 obj2_getxx.o:	$(OBJ2_GETXX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_GETXX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_GETXX)
 
 obj3_getxx.o:	$(OBJ3_GETXX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_GETXX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_GETXX)
 
 
 getax.o:		getax.cc getax.h $(INCS)
