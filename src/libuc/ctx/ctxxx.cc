@@ -51,13 +51,13 @@
 	As it stands now, these subroutines do not perform any funny
 	business in trying to make this process faster! These
 	subroutines are, therefore, probably the slowest such
-	conversions routinely available. To really move (execute)
+	conversions routinely available.  To really move (execute)
 	quickly through the division-related aspects of the require
 	algorithm, one would have to use assembly language where
 	both the quotient and the reminder of a division are produced
-	simultaneously (since each are needed to continue). This,
+	simultaneously (since each are needed to continue).  This,
 	of course, assumes that the underlying machine architecture
-	has such instructions. But short of assembly (and and the
+	has such instructions.  But short of assembly (and and the
 	required machine instructions) this present implemtnation
 	is adequate.
 
@@ -67,18 +67,16 @@
 #include	<climits>		/* |ULONG_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<bit>			/* |countr_zero(3c++)| */
 #include	<usystem.h>		/* memory-allocation */
-#include	<syswords.hh>
 #include	<stdintx.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
 
 #include	"ctxxx.h"
 
-
-import uvariables ;
+import digtab ;				/* |getdig(3u)| + |maxbase(3u)| */
+import uconstants ;			/* |digbufsize(3u)| */
 
 /* local defines */
 
@@ -95,6 +93,9 @@ import uvariables ;
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 static inline constexpr int ffbsi(int b) noex {
@@ -105,15 +106,13 @@ static inline constexpr int ffbsi(int b) noex {
 
 /* local variables */
 
-static cint		maxbase = xstrlen(sysword.w_digtab) ;
-
-constexpr int		maxstack = (1024+1) ;
+constexpr int		maxstack = (256+1) ;	/* |int256_t| in binary */
 
 
 /* local subroutine-templates */
 
 template<typename UT>
-static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
+static constexpr int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	cuint		ub(b) ;
 	int		rl = 0 ;
 	char		*rp = (dbuf + dlen) ;
@@ -126,16 +125,16 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	        while ((v & vmask) != 0UL) {
 	            nv = v / ub ;
 		    di = int(v - (nv * ub)) ;
-		    *--rp = sysword.w_digtab[di] ;
+		    *--rp = getdig(di) ;
 		    v = nv ;
 	        } /* end while (slower) */
 	        {
-		    ulong	lv = (ulong) v ;
+		    ulong	lv = ulong(v) ;
 		    ulong	nlv ;
 		    while (lv != 0) {
 	                nlv = lv / ub ;
 			di = int(lv - (nlv * ub)) ;
-	                *--rp = sysword.w_digtab[di] ;
+	                *--rp = getdig(di) ;
 	                lv = nlv ;
 		    } /* end while */
 		    v = lv ;
@@ -145,7 +144,7 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	        while (v != 0) {
 	            nv = v / ub ;
 		    di = int(v - (nv * ub)) ;
-		    *--rp = sysword.w_digtab[di] ;
+		    *--rp = getdig(di) ;
 	            v = nv ;
 	        } /* end while (regular) */
 	    } /* end if_constexpr (size-of-operand) */
@@ -158,10 +157,11 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 /* end subroutine (ctxxxx) */
 
 template<typename UT,typename ST>
-int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
+static int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 	UT		ulv = (UT) v ;
 	cint		n = szof(ST) ;
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (v < 0) ulv = (- ulv) ;
 	if (dp) {
 	    cint	t = ffbsi(n) ;
@@ -170,13 +170,11 @@ int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 	        cint	dlen = digbufsize.bufsize[t][b] ;
 		int	len ;
 		if (dlen > maxstack) {
-		    int		rs1 ;
-		    char	*dbuf{} ;
-		    if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
+		    if (char *dbuf ; (rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
 			{
 		            len = ctxxxx(dbuf,dlen,b,ulv) ;
 		            if (v < 0) dbuf[dlen-(++len)] = '-' ;
-		            rs = sncpy1(dp,dl,(dbuf + dlen - len)) ;
+		            rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 			}
 			rs1 = uc_free(dbuf) ;
 			if (rs >= 0) rs = rs1 ;
@@ -185,7 +183,7 @@ int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 		    char	dbuf[dlen+1] ;
 		    len = ctxxxx(dbuf,dlen,b,ulv) ;
 		    if (v < 0) dbuf[dlen-(++len)] = '-' ;
-		    rs = sncpy1(dp,dl,(dbuf + dlen - len)) ;
+		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 		} /* end block */
 	   } /* end if (supported base) */
 	} /* end if (non-null) */
@@ -194,7 +192,7 @@ int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 /* end subroutine-template (sctxxxx) */
 
 template<typename UT>
-int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
+static int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
 	cint		n = szof(UT) ;
 	int		rs = SR_FAULT ;
 	if (dp) {
@@ -206,7 +204,7 @@ int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
 		{
 		    char	dbuf[dlen+1] ;
 		    len = ctxxxx(dbuf,dlen,b,uv) ;
-		    rs = sncpy1(dp,dl,(dbuf + dlen - len)) ;
+		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 		} /* end block */
 	    } /* end if (base supported) */
 	} /* end if (non-null) */

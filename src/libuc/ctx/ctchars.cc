@@ -42,13 +42,13 @@
 	As it stands now, these subroutines do not perform any funny
 	business in trying to make this process faster! These
 	subroutines are, therefore, probably the slowest such
-	conversions routinely available. To really move (execute)
+	conversions routinely available.  To really move (execute)
 	quickly through the division-related aspects of the require
 	algorithm, one would have to use assembly language where
 	both the quotient and the reminder of a division are produced
-	simultaneously (since each are needed to continue). This,
+	simultaneously (since each are needed to continue).  This,
 	of course, assumes that the underlying machine architecture
-	has such instructions. But short of assembly (and and the
+	has such instructions.  But short of assembly (and and the
 	required machine instructions) this present implemtnation
 	is adequate.
 
@@ -95,18 +95,12 @@ using std::errc ;
 
 /* forward references */
 
-
-/* local variables */
-
-
-/* local subroutine-templates */
-
 template<typename T>
-static int ctcharsx(char *dbuf,int dlen,int base,T &v) noex {
+static constexpr int ctcharsx(char *dbuf,int dlen,int base,T &v) noex {
 	to_chars_result	r ;
 	constexpr errc	ec_ok = errc() ;
 	int		rs = SR_OK ;
-	char	*ep = (dbuf+dlen) ;
+	char		*ep = (dbuf + dlen) ;
 	dbuf[0] = '\0' ;
 	if (r = to_chars(dbuf,ep,v,base) ; (r.ec == ec_ok)) {
 	    *r.ptr = '\0' ;
@@ -124,7 +118,10 @@ static int ctcharsx(char *dbuf,int dlen,int base,T &v) noex {
 	} /* end if (handle errors) */
 	return rs ;
 }
-/* end subroutine (ctcharsx) */
+/* end subroutine-template (ctcharsx) */
+
+
+/* local variables */
 
 
 /* exported variables */

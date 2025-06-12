@@ -49,13 +49,13 @@
 	As it stands now, these subroutines do not perform any funny
 	business in trying to make this process faster! These
 	subroutines are, therefore, probably the slowest such
-	conversions routinely available. To really move (execute)
+	conversions routinely available.  To really move (execute)
 	quickly through the division-related aspects of the require
 	algorithm, one would have to use assembly language where
 	both the quotient and the reminder of a division are produced
-	simultaneously (since each are needed to continue). This,
+	simultaneously (since each are needed to continue).  This,
 	of course, assumes that the underlying machine architecture
-	has such instructions. But short of assembly (and and the
+	has such instructions.  But short of assembly (and and the
 	required machine instructions) this present implemtnation
 	is adequate.
 
@@ -64,7 +64,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<bit>			/* <- for |countr_zero(3c++)| */
+#include	<cstring>		/* |ULONG_MAX| */
+#include	<bit>			/* |countr_zero(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -74,12 +75,9 @@
 
 #include	"ctdec.h"
 
-
-import uvariables ;
+import uconstants ;			/* |digbufsize(3u)| */
 
 /* local defines */
-
-using std::countr_zero ;		/* subroutine-template */
 
 
 /* imported namespaces */
@@ -101,7 +99,7 @@ using std::countr_zero ;		/* subroutine-template */
 
 static inline constexpr int ffbsi(int b) noex {
 	cuint	n = uint(b) ;
-	return countr_zero(n) ;	/* <- first bit set */
+	return std::countr_zero(n) ;	/* <- first bit set */
 }
 
 
@@ -113,22 +111,22 @@ static constexpr int	base = 10 ;
 /* local subroutine-templates */
 
 template<typename UT>
-static int ctdecx(char *dbuf,int dlen,UT v) noex {
+static constexpr int ctdecx(char *dbuf,int dlen,UT v) noex {
 	char		*rp = (dbuf + dlen) ;
 	int		rl = 0 ;
 	*rp = '\0' ;
 	if (v != 0) {
 	    constexpr uint	ub = uint(base) ;
 	    if_constexpr (szof(UT) > szof(ulong)) {
-	        const UT	vmask(~ULONG_MAX) ;
+	        const UT	vmask(~ ULONG_MAX) ;
 	        UT		nv ;
 	        while ((v & vmask) != 0UL) {
 	            nv = v / ub ;
-	            *--rp = (char) ((v - (nv * ub)) + '0') ;
+	            *--rp = char((v - (nv * ub)) + '0') ;
 	            v = nv ;
 	        } /* end while (slower) */
 	        {
-		    ulong	lv = (ulong) v ;
+		    ulong	lv = ulong(v) ;
 		    ulong	nlv ;
 		    while (lv != 0) {
 	                nlv = lv / ub ;
@@ -141,7 +139,7 @@ static int ctdecx(char *dbuf,int dlen,UT v) noex {
 		UT		nv ;
 	        while (v != 0) {
 	            nv = v / ub ;
-	            *--rp = (char) ((v - (nv * ub)) + '0') ;
+	            *--rp = char((v - (nv * ub)) + '0') ;
 	            v = nv ;
 	        } /* end while (regular) */
 	    } /* end if (constexpr) */
@@ -154,7 +152,7 @@ static int ctdecx(char *dbuf,int dlen,UT v) noex {
 /* end subroutine (ctdecx) */
 
 template<typename UT,typename ST>
-int sctdecx(char *dp,int dl,const ST &v) noex {
+static int sctdecx(char *dp,int dl,const ST &v) noex {
 	UT		ulv = (UT) v ;
 	cint		n = szof(ST) ;
 	int		rs = SR_FAULT ;
@@ -168,7 +166,7 @@ int sctdecx(char *dp,int dl,const ST &v) noex {
 		    int		len ;
 		    len = ctdecx(dbuf,dlen,ulv) ;
 		    if (v < 0) dbuf[dlen-(++len)] = '-' ;
-		    rs = sncpy1(dp,dl,(dbuf + dlen - len)) ;
+		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 		} /* end block */
 	   } /* end block */
 	} /* end if (non-null) */
@@ -177,7 +175,7 @@ int sctdecx(char *dp,int dl,const ST &v) noex {
 /* end subroutine-template (sctdecx) */
 
 template<typename UT>
-int uctdecx(char *dp,int dl,const UT &uv) noex {
+static int uctdecx(char *dp,int dl,const UT &uv) noex {
 	cint		n = szof(UT) ;
 	int		rs = SR_FAULT ;
 	if (dp) {
@@ -188,7 +186,7 @@ int uctdecx(char *dp,int dl,const UT &uv) noex {
 		    char	dbuf[dlen+1] ;
 		    int		len ;
 		    len = ctdecx(dbuf,dlen,uv) ;
-		    rs = sncpy1(dp,dl,(dbuf + dlen - len)) ;
+		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 		} /* end block */
 	    } /* end block */
 	} /* end if (non-null) */

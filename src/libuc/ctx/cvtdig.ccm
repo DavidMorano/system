@@ -1,4 +1,4 @@
-/* cvtdig MODULE */
+/* cvtdig MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -73,7 +73,6 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>
-#include	<libutil.hh>
 
 export module cvtdig ;
 
@@ -109,6 +108,6 @@ export {
 	} /* end if (valid base) */
 	return (rs >= 0) ? ndig : rs ;
     } /* end subroutine-template (cvtdig) */
-}
+} /* end export */
 
 

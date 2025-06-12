@@ -54,10 +54,12 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<convertx.h>		/* <- the money shot! */
 #include	<localmisc.h>
 
+#include	"ctdecf.h"
+
+import libutil ;
 
 /* local defines */
 

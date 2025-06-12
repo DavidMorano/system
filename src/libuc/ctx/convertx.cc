@@ -39,6 +39,7 @@
 	prec		precision (places after the decimal point)
 	dpp		pointer to |int| to receive position of decimal point
 	fsign		pointer to |int| to receive sign of result
+	trailing	??
 	buf		buffer to receive result
 
 	Returns:
@@ -48,7 +49,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
