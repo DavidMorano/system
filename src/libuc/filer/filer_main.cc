@@ -28,7 +28,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
+#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
@@ -42,11 +42,12 @@
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
 #include	<intfloor.h>
-#include	<format.h>
+#include	<fmtstr.h>
 #include	<localmisc.h>
 
 #include	"filer.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -443,7 +444,7 @@ int filer_vprintf(filer *op,cchar *fmt,va_list ap) noex {
 	    if ((rs = maxlinelen) >= 0) {
 		cint	llen = rs ;
 		if (char *lbuf{} ; (rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
-	    	    if ((rs = format(lbuf,llen,0,fmt,ap)) >= 0) {
+	    	    if ((rs = fmtstr(lbuf,llen,0,fmt,ap)) >= 0) {
 	    	        rs = filer_write(op,lbuf,rs) ;
 			wlen = rs ;
 		    }

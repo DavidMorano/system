@@ -1,4 +1,5 @@
 /* testfmtspec SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* test the FMTSPEC object */
@@ -16,12 +17,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	testfmtspec
+
+	Description:
 	This program shows (prints out) object addresess.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdarg>
@@ -37,8 +41,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"fmtspec.hh"
-
+import fmtspec ;
 
 /* local defines */
 

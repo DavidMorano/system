@@ -47,14 +47,15 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>		/* |memclear(3u)| */
+#include	<cstring>
+#include	<usystem.h>
 #include	<baops.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"fieldterms.h"
 
+import libutil ;
 
 /* local defines */
 

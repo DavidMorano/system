@@ -48,7 +48,6 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<mallocxx.h>
 #include	<getprogpath.h>
 #include	<ids.h>
@@ -60,6 +59,7 @@
 
 #include	"findxfile.h"
 
+import uconstants ;
 
 /* local defines */
 

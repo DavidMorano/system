@@ -96,7 +96,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>		/* |xstrlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<baops.h>
@@ -108,6 +107,7 @@
 
 #include	"field.h"
 
+import libutil ;
 
 /* local defines */
 
