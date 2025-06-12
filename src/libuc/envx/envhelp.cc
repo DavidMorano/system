@@ -63,6 +63,7 @@
 
 #include	"envhelp.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -84,7 +85,7 @@ using std::nothrow ;			/* constant */
 
 /* external variables */
 
-extern cchar	**environ ; /* what is should be  */
+extern cchar	**environ ; /* what it should be  */
 
 
 /* forward reference */

@@ -39,6 +39,7 @@
 
 #include	"envlist.h"
 
+import libutil ;
 
 /* local defines */
 
