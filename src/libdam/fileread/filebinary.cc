@@ -8,18 +8,18 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-11-01, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
-	= 2018-10-01, David A.D. Morano
+	= 2018-10-01, David A-D- Morano
 	I refactored for some clarity.
 
-	= 2018-10-02, David A.D. Morano
+	= 2018-10-02, David A-D- Morano
 	I changed to use buffered file operation.
 
 */
 
-/* Copyright © 1998,2018 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2018 David A-D- Morano.  All rights reserved. */
 
 /******************************************************************************
 

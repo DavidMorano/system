@@ -9,13 +9,13 @@
 
 /*******************************************************************************
 
-	= 1987-09-05, David A.D. Morano
+	= 1987-09-05, David A-D- Morano
 	This code was originally written for the
 	TEXTSET program.
 
 *******************************************************************************/
 
-/* Copyright © 1987 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1987 David A-D- Morano.  All rights reserved. */
 /* Use is subject to license terms. */
 
 /*******************************************************************************

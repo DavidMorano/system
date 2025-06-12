@@ -11,7 +11,7 @@
 	= 2016-06-29, David A­D­ Morano
 	This was really made from scratch.
 
-	= 2018-12-14, David A.D. Morano
+	= 2018-12-14, David A-D- Morano
 	Made a small enhancement for error handling.
 
 */
