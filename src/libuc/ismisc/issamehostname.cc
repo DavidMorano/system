@@ -46,11 +46,11 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>		/* |LEQUIV(3dam)| */
 
 #include	"ismisc.h"
 
+import libutil ;
 
 /* local defines */
 

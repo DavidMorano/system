@@ -35,6 +35,8 @@ DEFS +=
 
 INCS += intx.h
 
+MODS +=
+
 LIBS +=
 
 
@@ -57,10 +59,10 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 OBJ0= willaddover.o satarith.o 
 OBJ1= intsat.o intrem.o intceil.o intfloor.o
-OBJ2= 
+OBJ2= intminmax.o
 OBJ3=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
 
 OBJ= $(OBJA)
 
@@ -136,29 +138,29 @@ intsat.o:		mods.o intsat.cc intsat.h	$(INCS)
 intfloor.o:		mods.o intfloor.cc intfloor.h	$(INCS)
 intceil.o:		mods.o intceil.cc intceil.h	$(INCS)
 
-MOBJ= valuelims.o digbufsizes.o uvariables.o intminmax.o
+MOBJ= valuelims.o digbufsizes.o uconstants.o intminmax.o
 
 mods.o:			$(MOBJ)
 	makemodule valuelims digbufsizes
 	makemodule intminmax
-	makemodule uvariables
+	makemodule uconstants
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
 
 valuelims.o:		valuelims.ccm
 
 digbufsizes.o:		digbufsizes.ccm
 
-uvariables.o:		uvariables0.o uvariables1.o
-	$(LD) -r $(LDFLAGS) -o $@ uvariables0.o uvariables1.o
+uconstants.o:		uconstants0.o uconstants1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-uvariables0.o:		uvariables.ccm
+uconstants0.o:		uconstants.ccm
 	makemodule valuelims digbufsizes
-	makemodule uvariables
+	makemodule uconstants
 
-uvariables1.o:		uvariables1.cc uvariables.ccm
+uconstants1.o:		uconstants1.cc uconstants.ccm
 	makemodule valuelims digbufsizes
-	makemodule uvariables
-	$(COMPILE.cc) uvariables1.cc
+	makemodule uconstants
+	$(COMPILE.cc) $<
 
 intminmax.o:		intminmax.ccm
 	makemodule valuelims

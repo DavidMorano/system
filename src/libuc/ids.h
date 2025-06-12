@@ -73,7 +73,7 @@ struct ids : ids_head {
 	ids &operator = (const ids &) = delete ;
 	int copy(const ids *) noex ;
 	void dtor() noex ;
-	~ids() {
+	destruct ids() {
 	    dtor() ;
 	} ;
 } ; /* end struct (ids) */
