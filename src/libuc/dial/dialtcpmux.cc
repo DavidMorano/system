@@ -74,6 +74,7 @@
 
 #include	"dialtcp.h"
 
+import libutil ;
 
 /* local defines */
 

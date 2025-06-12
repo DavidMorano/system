@@ -1,4 +1,4 @@
-/* digbufsizes MODULE */
+/* digbufsizes MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -11,24 +11,29 @@
 	= 1998-11-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
+	= 2014-12-05, David A-D- Morano
+	This code was converted from load-time initialization to
+	compile-time initialization (using 'constexpr' compile-time
+	execution).
+
 	= 2023-10-16, David A­D­ Morano
 	This code was "modularized" with the introduction of "modules"
 	with C++20 (albeit a few years after the fact).
 
 	= 2025-04-29, David A­D­ Morano
-	Now with constant-expression math (newly available w/ C++20
-	I think), we can change this whole thing (constant database
-	of values) to use a closed-form math calculation rather
-	than the old repetitive divide algorithm.  The math functions
-	used are |log2(3c++)| and |ceil(3c++)|, now both available
-	in constant-expression form.  Why was not this done back
-	in like 2020 (or earlier when constand-expression math first
-	became available)?  Who knows?  It takes time to review old
-	code and update it in ways that were not originally available.
+	Now with constant-expression math (newly available w/ C++26),
+	I can change this whole thing (constant database of values)
+	to use a closed-form math calculation rather than the old
+	repetitive divide algorithm.  The math functions used are
+	|log2(3c++)| and |ceil(3c++)|, now both available in
+	constant-expression form.  It so happens that GGG-14 now
+	has most of the old math functions in constand-expression
+	flavor (a year earlier than required, but who is complaining).
+	So I jumped onto that.  Enjoy.
 
 */
 
-/* Copyright © 1998,2023,2025 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2014,2023,2025 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************* 
   	Name:
@@ -85,13 +90,13 @@ module ;
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysdefs.h>		/* |MAXBASE| */
 #include	<stdintx.h>
 
 export module digbufsizes ;
 
 export {
-    constexpr int	digbufsizes_maxbase = 64 ; /* current max-base */
+    constexpr int	digbufsizes_maxbase = MAXBASE ; /* current max-base */
     constexpr int	digbufsizes_maxtype = 10 ; /* to types w/ 1024 bits */
     constexpr int	digbufsizes_nbases = (digbufsizes_maxbase+1) ;
 }
@@ -112,8 +117,8 @@ export {
 	cint		ntypes = (digbufsizes_maxtype+1) ;
 	ushort		bufsize[digbufsizes_maxtype+1][digbufsizes_nbases] ;
 	consteval digbufsizes() noex {
-	    for (int b = 0 ; b < digbufsizes_nbases ; b += 1) {
-	        for (int t = 0 ; t < (digbufsizes_maxtype+1) ; t += 1) {
+	    for (int b = 0 ; b < nbases ; b += 1) {
+	        for (int t = 0 ; t < ntypes ; t += 1) {
 		    bufsize[t][b] = ndigits(t,b) ;
 	        }
 	    }

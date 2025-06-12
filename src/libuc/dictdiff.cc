@@ -56,10 +56,6 @@
 
 /* external subroutines */
 
-extern "C" {
-    int	dictdiff(int,int) noex ;
-}
-
 
 /* external variables */
 

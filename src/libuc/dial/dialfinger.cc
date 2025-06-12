@@ -69,7 +69,6 @@
 #include	<fcntl.h>
 #include	<csignal>
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -80,6 +79,7 @@
 
 #include	"dial.h"
 
+import libutil ;
 
 /* local defines */
 
