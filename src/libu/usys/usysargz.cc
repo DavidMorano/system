@@ -80,10 +80,8 @@ using std::nothrow ;			/* constant */
 
 cint		tlen = MAXPATH ;
 
-namespace usys {
-    static void oncefunc(usysargz *op) noex {
+static void oncefunc(usys::usysargz *op) noex {
 	op->initonce() ;
-    }
 }
 
 namespace usys {
