@@ -7,19 +7,19 @@
 
 /* revision history:
 
-	= 1995-05-01, David A­D­ Morano
+	= 1995-05-01, David A-D- Morano
 	This code module was completely rewritten to replace any
 	original garbage that was here before.  In other words, the
 	same old story: old garbage code needing to be replaced
 	in entirety just to get something working with new code
 	interfaces.  Cannot we all think "reusuable"?
 
-	= 1998-11-22, David A­D­ Morano
+	= 1998-11-22, David A-D- Morano
         I did some clean-up.
 
 */
 
-/* Copyright © 1995,1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1995,1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
  *									
@@ -30,7 +30,7 @@
  *									
  * Authors of the contents of this file:				
  *									
-		David A.D. Morano
+		David A-D- Morano
 
 *									
 *	FUNCTIONAL DESCRIPTION:						

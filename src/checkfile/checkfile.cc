@@ -2,7 +2,7 @@
 /* lang=C20 */
 
 /*
-	David A.D. Morano
+	David A-D- Morano
 	October 1988
 */
 

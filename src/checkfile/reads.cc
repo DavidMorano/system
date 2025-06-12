@@ -1,7 +1,7 @@
 /* program to read in names and call shell with names as arguments */
 
 /*
-	David A.D. Morano
+	David A-D- Morano
 	September 85
 */
 

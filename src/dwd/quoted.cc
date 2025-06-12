@@ -6,7 +6,7 @@
 
 /* revision history:
 
-	= David A.D. Morano, November 1991
+	= David A-D- Morano, November 1991
 	This code was originally written.
 
 

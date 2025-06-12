@@ -8,10 +8,10 @@
 
 /* revision history:
 
-	= 1989-03-01, David A.D. Morano
+	= 1989-03-01, David A-D- Morano
 	This code was originally written.
 
-	= 2007-08-22, David A.D. Morano
+	= 2007-08-22, David A-D- Morano
 	I refactored and enhanced this for use on MacOS.  MacOS is
 	a brain-damaged system and needs some help.  But I could
 	not easily port the full (featured) versions of these same
@@ -22,7 +22,7 @@
 
 */
 
-/* Copyright © 1989,2007 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1989,2007 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
