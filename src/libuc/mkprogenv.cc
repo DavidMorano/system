@@ -36,7 +36,7 @@
 
 	Returns:
 	>=0		OK
-	<0		error
+	<0		error (system-return)
 
 
 	Name:
@@ -50,7 +50,7 @@
 
 	Returns:
 	>=0		OK
-	<0		error
+	<0		error (system-return)
 
 	Notes:
 	1. We use |gethz()| rather than |uc_sysconfval()| because it
@@ -71,7 +71,6 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<uinfo.h>
 #include	<userattrdb.h>
 #include	<getbufsize.h>
@@ -98,6 +97,7 @@
 
 #include	"mkprogenv.h"
 
+import uconstants ;
 
 /* local defines */
 

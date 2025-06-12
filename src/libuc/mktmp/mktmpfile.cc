@@ -47,18 +47,21 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
-#include	<usystem.h>
 #include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"mktmp.h"
 
+import libutil ;
 
 /* local defines */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_close(int) noex ;
+}
 
 
 /* external variables */
@@ -83,7 +86,7 @@ int mktmpfile(char *rbuf,cchar *inname,mode_t om) noex {
 	int		rs ;
 	if ((rs = opentmpfile(inname,of,om,rbuf)) >= 0) {
 	    if ((rs = uc_close(rs)) >= 0) {
-	        rs = xstrlen(rbuf) ;
+	        rs = cstrlen(rbuf) ;
 	    }
 	} /* end if (opentmpfile) */
 	return rs ;

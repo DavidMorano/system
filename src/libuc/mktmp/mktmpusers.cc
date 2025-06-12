@@ -39,13 +39,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<getusername.h>
 #include	<syswords.hh>
@@ -104,9 +102,8 @@ int mktmpusers(char *rbuf) noex {
             if (tmpdir != nullptr) {
                 cchar       *users = sysword.w_users ;
                 if ((rs = mkpath(rbuf,tmpdir,users)) >= 0) {
-                    USTAT   sb ;
                     rl = rs ;
-                    if ((rs = uc_stat(rbuf,&sb)) >= 0) {
+                    if (USTAT sb ; (rs = uc_stat(rbuf,&sb)) >= 0) {
                         if (! S_ISDIR(sb.st_mode)) {
                             if ((rs = rmdirs(rbuf)) >= 0) {
                                 rs = tmpusers(rbuf) ;

@@ -38,15 +38,12 @@
 *****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctime>
 #include	<usystem.h>
 #include	<mkfile.h>
 #include	<localmisc.h>
