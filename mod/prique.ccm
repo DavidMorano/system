@@ -112,7 +112,7 @@ export {
 	    count	(this,priquemem_count) ;
 	    rem		(this) ;
 	} ; /* end ctor) */
-	constexpr ~prique() {
+	constexpr destruct prique() {
 	    if (mp) {
 	        delete mp ;
 		mp = nullptr ;
