@@ -63,9 +63,10 @@ OBJ2_OPEN= opendefstds.o opensysfs.o opentmp.o
 OBJ3_OPEN= openusd.o 
 OBJ4_OPEN= openqotd.o opensys_banner.o
 OBJ5_OPEN= splitfname.o opendial.o
+OBJ6_OPEN= opensysdbs.o
 
 OBJA= obj0_open.o obj1_open.o obj2_open.o 
-OBJB= obj3_open.o obj4_open.o obj5_open.o
+OBJB= obj3_open.o obj4_open.o obj5_open.o obj6_open.o
 
 OBJ_OPEN= obja.o objb.o
 
@@ -139,6 +140,9 @@ obj4_open.o:		$(OBJ4_OPEN)
 obj5_open.o:		$(OBJ5_OPEN)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_OPEN)
 
+obj6_open.o:		$(OBJ6_OPEN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6_OPEN)
+
 
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
@@ -166,7 +170,6 @@ opendial.o:		opendial.cc opendial.h		$(INCS)
 
 # associated
 splitfname.o:		splitfname.cc splitfname.h	$(INCS)
-
 opensysdbs.o:		opensysdbs.c opensysdbs.h	$(INCS)
 
 

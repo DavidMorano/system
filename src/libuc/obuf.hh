@@ -41,10 +41,10 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
+import libutil ;
 
 enum obufmems {
 	obufmem_start,
@@ -143,7 +143,7 @@ public:
 	} ;
 	int adv(int) noex ;
 	void dtor() noex ;
-	~obuf() {
+	destruct obuf() {
 	    dtor() ;
 	} ; /* end dtor */
 	operator int () noex {

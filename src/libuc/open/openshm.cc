@@ -42,10 +42,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<ctime>			/* <- |time(2)| */
 #include	<climits>		/* <- for |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<ctime>			/* <- |time(2)| */
 #include	<usystem.h>
 #include	<syswords.hh>
 #include	<bufsizevar.hh>
@@ -57,6 +57,7 @@
 
 #include	"openshm.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -83,7 +84,7 @@
 /* forward references */
 
 static int	randinit(ulong *) noex ;
-static int	mkshmname(char *,int,ulong) noex ;
+static int	mktmpname(char *,int,ulong) noex ;
 
 
 /* local variables */
@@ -128,7 +129,7 @@ int openshmtmp(char *rbuf,int rlen,mode_t om) noex {
 	                cint	of = (O_CREAT | O_EXCL | O_RDWR) ;
 	                cint	ntries = NTRIES ;
 	                for (int i = 0 ; i < ntries ; i += 1) {
-	                    if ((rs = mkshmname(rbuf,rlen,rv)) >= 0) {
+	                    if ((rs = mktmpname(rbuf,rlen,rv)) >= 0) {
 	                        rs = uc_openshm(rbuf,of,om) ;
 	                        fd = rs ;
 	                    }
@@ -169,7 +170,7 @@ static int randinit(ulong *rvp) noex {
 }
 /* end subroutine (randinit) */
 
-static int mkshmname(char *rbuf,int rlen,ulong rv) noex {
+static int mktmpname(char *rbuf,int rlen,ulong rv) noex {
 	cint		elen = EBUFLEN ;
 	int		rs ;
 	cchar		*tpre = sysword.w_tmpdir ;
@@ -181,6 +182,6 @@ static int mkshmname(char *rbuf,int rlen,ulong rv) noex {
 	}
 	return rs ;
 }
-/* end subroutine (mkshmname) */
+/* end subroutine (mktmpname) */
 
 

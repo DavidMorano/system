@@ -120,7 +120,6 @@
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<csignal>		/* |sig_atomic_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
@@ -142,6 +141,7 @@
 #include	"maintqotd.h"
 #include	"openqotd.h"
 
+import libutil ;
 
 /* local defines */
 

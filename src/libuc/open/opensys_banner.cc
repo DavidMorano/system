@@ -31,7 +31,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -46,6 +45,7 @@
 
 #include	"opensys.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -110,10 +110,10 @@ int opensys_banner(cchar *fname,int of,mode_t om) noex {
 	        const time_t	dt = time(nullptr) ;
 	        int		f_top = true ;
 	        cchar		*tspec = "%e %b %T" ;
-	        if (TMTIME tm ; (rs = tmtime_gmtime(&tm,dt)) >= 0) {
+	        if (TMTIME tmd ; (rs = tmtime_gmtime(&tmd,dt)) >= 0) {
 	            cint	tlen = TIMEBUFLEN ;
 	            char	tbuf[TIMEBUFLEN+1] ;
-	            if ((rs = sntmtime(tbuf,tlen,&tm,tspec)) >= 0) {
+	            if ((rs = sntmtime(tbuf,tlen,&tmd,tspec)) >= 0) {
 	                rs = process(tbuf,f_top) ;
 	                fd = rs ;
 	            }

@@ -27,10 +27,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
-#include	"opensysfs.h"
+#include	"opensysdbs.h"
 
 
 /* local defines */
@@ -59,20 +62,20 @@
 
 /* exported variables */
 
-cpcchar		opensysdbs[] = {
-	[opensysdbi_userhomes]		= "userhomes",
-	[opensysdbi_usernames]		= "usernames",
-	[opensysdbi_groupnames]		= "groupnames",
-	[opensysdbi_projectnames]	= "projectnames",
-	[opensysdbi_passwd]		= "passwd",
-	[opensysdbi_group]		= "group",
-	[opensysdbi_project]		= "project",
-	[opensysdbi_realname]		= "realname",
-	[opensysdbi_shells]		= "shells",
-	[opensysdbi_shadow]		= "shadow",
-	[opensysdbi_userattr]		= "userattr",
-	[opensysdbi_overlast]		= (cchar *) nullptr
-} ;
+cpcchar		opensysdb[] = {
+	[opensysdb_userhomes]		= "userhomes",
+	[opensysdb_usernames]		= "usernames",
+	[opensysdb_groupnames]		= "groupnames",
+	[opensysdb_projectnames]	= "projectnames",
+	[opensysdb_passwd]		= "passwd",
+	[opensysdb_shadow]		= "shadow",
+	[opensysdb_userattr]		= "userattr",
+	[opensysdb_group]		= "group",
+	[opensysdb_project]		= "project",
+	[opensysdb_realname]		= "realname",
+	[opensysdb_shells]		= "shells",
+	[opensysdb_overlast]		= nullptr
+} ; /* end array (opensysdb) */
 
 
 /* exported subroutines */
