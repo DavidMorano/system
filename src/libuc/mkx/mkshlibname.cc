@@ -32,7 +32,6 @@
 #include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
@@ -40,6 +39,7 @@
 
 #include	"mkx.h"
 
+import libutil ;
 
 /* local defines */
 

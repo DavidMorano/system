@@ -60,7 +60,6 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<pwd.h>
 #include	<usystem.h>
 #include	<varnames.hh>
@@ -86,6 +85,7 @@
 
 #include	"mkpr.h"
 
+import libutil ;
 
 /* local defines */
 

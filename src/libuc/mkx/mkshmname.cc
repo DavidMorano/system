@@ -54,6 +54,7 @@
 
 #include	"mkx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -77,7 +78,7 @@
 /* external variables */
 
 
-/* local strutures */
+/* local structures */
 
 
 /* forward references */

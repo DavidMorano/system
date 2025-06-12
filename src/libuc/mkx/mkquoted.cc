@@ -61,7 +61,6 @@
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<baops.h>
@@ -75,6 +74,7 @@
 
 #include	"mkquoted.h"
 
+import libutil ;
 
 /* local defines */
 

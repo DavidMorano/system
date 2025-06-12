@@ -35,7 +35,7 @@
 
 	Returns:
 	>=0		length of resulting c-string
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
