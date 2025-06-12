@@ -8,24 +8,19 @@
 
 /* revision history:
 
-	= 2001-04-11, David D-A- Morano
+	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
-	= 2014-06-27, David D-A- Morano
+	= 2014-06-27, David A-D- Morano
 	I updated this to use the 'constexpr' capability of C++14
-	(a very small improvement, hardly worth it). The 'constexpr'
+	(a very small improvement, hardly worth it).  The 'constexpr'
 	capability in C++11 was garbage, in my opinion, and I could
 	hardly wait until they finally fixed it (which they did in
 	C++14).
 
-	= 2020-03-16, David D-A- Morano
-	I am back. I changed the 'constexpr' (there is only one in
-	the code below) into a 'constinit' sort-of just for fun.
-	Welcome to C++20!
-
 */
 
-/* Copyright © 2001,2014,2020 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001,2014 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -311,7 +306,7 @@ int ubufsize::def(int w) noex {
 /* yes; I call myself recursively - repeatedly (deal with it) */
 int ubufsize::zoneinfo(int w) noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
 	    bs[w] = rs ;
 	}
 	return rs ;

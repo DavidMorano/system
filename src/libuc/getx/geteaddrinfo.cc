@@ -63,7 +63,7 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |xstrlen(3c)| + |strcmp(3c)| */
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
@@ -78,6 +78,7 @@
 
 #include	"geteaddrinfo.h"
 
+import libutil ;
 
 /* local defines */
 

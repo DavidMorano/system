@@ -50,11 +50,11 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<matkeystr.h>
 
 #include	"getev.h"
 
+import libutil ;
 
 /* local defines */
 

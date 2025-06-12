@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2001-04-11, David A­D­ Morano
+	= 1998-07-01, David A­D­ Morano
 	This was originally written.
 
 */
 
-/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -48,8 +48,7 @@
 
 #include	"getarchitecture.h"
 
-
-import uvariables ;
+import uconstants ;
 
 /* local defines */
 

@@ -32,7 +32,7 @@
 
 	Returns:
 	>=0		a file-descriptor (FD) number 
-	<0		error:
+	<0		error: (system-return)
 				SR_FAULT
 				SR_INVALID
 				SR_DOM
@@ -45,7 +45,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |xstrlen(3c)| */
 #include	<usystem.h>
 #include	<stdfnames.h>
 #include	<cfdec.h>
@@ -57,6 +56,7 @@
 
 #include	"getfdfile.h"
 
+import libutil ;
 
 /* local defines */
 

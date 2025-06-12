@@ -50,12 +50,12 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>
 #include	<strn.h>
 #include	<matkeystr.h>
 
 #include	"getenver.h"
 
+import libutil ;
 
 /* local defines */
 

@@ -17,7 +17,9 @@
 
 /*******************************************************************************
 
-	Name:
+	Names:
+	ncolchar
+	ncolstr
 	getcols
 
 	Description:
@@ -25,6 +27,8 @@
 	the number of columns specified.
 
 	Synopsis:
+	int ncolchar(int,int,int) noex
+	int ncolstr(int,int,cchar *,int) noex
 	int getcols(int ntab,int ccol,int ncols,cchar *lbuf,int llen) noex
 
 	Arguments:
@@ -48,11 +52,11 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<libutil.hh>		/* |xstrlen(3c)| */
 #include	<localmisc.h>
 
 #include	"getcols.h"		/* |charcols(3uc)| */
 
+import libutil ;
 
 /* local defines */
 
@@ -79,7 +83,7 @@
 
 int getcols(int ntab,int ccol,int ncols,cchar *lbuf,int llen) noex {
 	cint		tcol = (ccol + ncols) ;
-	int		i = 0 ; /* used-afterwards */
+	int		i = 0 ; /* return-value */
 	if (llen < 0) llen = xstrlen(lbuf) ;
 	if (ccol < tcol) {
 	    for (i = 0 ; (ccol < tcol) && (i < llen) ; i += 1) {

@@ -45,7 +45,7 @@
 
 	Returns:
 	>=0		resulting address-family index
-	<0		error
+	<0		error (system-return)
 
 
 	Name:
@@ -231,7 +231,7 @@ int getaf(cchar *sp,int sl) noex {
 	            if (al > 0) {
 	                CADDRFAM	*afs = addrfamilies ;
 	                cint		n = 2 ;
-	                int		i{} ; /* used afterwards */
+	                int		i{} ; /* used-afterwards */
 	                int		m ;
 	                for (i = 0 ; afs[i].name ; i += 1) {
 	                    cchar	*anp = afs[i].name ;
