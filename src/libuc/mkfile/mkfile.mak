@@ -35,7 +35,7 @@ DEFS=
 
 INCS= mkfile.h
 
-MODS=
+MODS +=
 
 LIBS=
 

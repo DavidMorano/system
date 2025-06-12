@@ -13,7 +13,7 @@
 
 	= 1999-04-19, David A­D­ Morano
 	I made a correction for short filenames when the host name
-	is less than 4 characters long!
+	is less than 4 characters long.
 
 */
 
@@ -45,18 +45,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
-#include	<mallocxx.h>
 #include	<getnodename.h>
+#include	<mallocxx.h>
 #include	<base64.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
@@ -124,7 +120,7 @@ static int mkform(char *rbuf,cchar *dname,mode_t fm) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (char *nbuf{} ; (rs = malloc_nn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = malloc_nn(&nbuf)) >= 0) {
 	    int		nlen = rs ;
 	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
 		cint	pl = PREFIXLEN ;

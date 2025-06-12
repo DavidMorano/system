@@ -44,7 +44,6 @@
 #include	<climits>		/* |INT_MAX| + |PID_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* for |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<sbuf.h>
@@ -56,6 +55,7 @@
 
 #include	"mklogid.h"
 
+import libutil ;
 
 /* local defines */
 

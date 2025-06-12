@@ -43,13 +43,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strcmp(3c)| */
+#include	<cstring>		/* |strcmp(3c)| + |strchr(3c)| */
 #include	<usystem.h>
 #include	<ids.h>
 #include	<libmallocxx.h>
@@ -67,6 +65,9 @@
 
 
 /* external variables */
+
+
+/* local structues */
 
 
 /* forward references */
@@ -132,7 +133,7 @@ static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *dirbuf{} ; (rs = libmalloc_mp(&dirbuf)) >= 0) {
+	if (char *dirbuf ; (rs = libmalloc_mp(&dirbuf)) >= 0) {
             if ((rs = mkpath(dirbuf,dname)) >= 0) {
                 cchar       *dp = dirbuf ;
                 for (char *bp ; (bp = strchr(dp,'/')) != np ; ) {

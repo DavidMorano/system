@@ -41,20 +41,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdio>
-#include	<cstring>
+#include	<cstdio>		/* |snprintf(3c)| */
 #include	<usystem.h>
-#include	<bufsizevar.hh>
 #include	<gettmpdname.h>
+#include	<bufsizevar.hh>
 #include	<mkpathx.h>
+#include	<mkfnamesuf.h>
 #include	<sncpyx.h>
 #include	<snaddw.h>
 #include	<snx.h>
@@ -85,8 +82,8 @@
 
 /* local structures */
 
-struct tryer {
-	TM		tmdat ;
+namespace {
+    struct tryer {
 	cchar		*dname ;
 	cchar		*ext ;
 	char		*rbuf ;
@@ -101,7 +98,8 @@ struct tryer {
 	} ; /* end ctor */
 	operator int () noex ;
 	int looper() noex ;
-} ; /* end struct (tryer) */
+    } ; /* end struct (tryer) */
+} /* end namespace */
 
 
 /* forward references */
@@ -117,9 +115,9 @@ static int mker(char *rbuf,cc *dname,cc *fs,mode_t fm) noex {
 
 /* local variables */
 
-static cchar		*defdname ;	/* <- thread-safe */
-
 static bufsizevar	maxpathlen(getbufsize_mp) ;
+
+static cchar		*defdname ;	/* <- thread-safe */
 
 
 /* exported variables */
@@ -155,7 +153,7 @@ tryer::operator int () noex {
 	if ((rs = maxpathlen) >= 0) {
 	    custime	dt = getustime ;
 	    rlen = rs ;
-	    if ((rs = uc_localtime(&dt,&tmdat)) >= 0) {
+	    if (TM tmdat ; (rs = uc_localtime(&dt,&tmdat)) >= 0) {
 	        if ((rs = mkpath(rbuf,dname)) >= 0) {
 		    rl = rs ;
 		    if ((rs = snaddw(rbuf,rlen,rl,"/d",-1)) >= 0) {
@@ -176,12 +174,12 @@ tryer::operator int () noex {
 int tryer::looper() noex {
 	cint		nalpha = 26 ;
 	cint		ml = MAXNLOOP ;
-	cmode		om = (fm & 0777) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
+	cmode		om = (fm & 0777) ;
 	for (int loop = 0 ; (loop < ml) && (rs == 0) ; loop += 1) {
-	    char	*bp = (rbuf+rl) ;
-	    int		bl = (rlen-rl) ;
+	    char	*bp = (rbuf + rl) ;
+	    int		bl = (rlen - rl) ;
 	    if ((loop >= 0) && (loop < nalpha)) {
 	        *bp++ = charconv('a' + loop) ;
 		*bp = '\0' ;
@@ -193,12 +191,11 @@ int tryer::looper() noex {
 		bl -= rs ;
 	    } /* end if */
 	    if (rs >= 0) {
-	        cint	fl = (rl+rs) ;
-		if ((rs = sncpy((rbuf+fl),(rlen-fl),".",ext)) >= 0) {
-		    len = (fl+rs) ;
-	            if ((rs = uc_open(rbuf,O_FLAGS,om)) >= 0) {
-		        cint	fd = rs ;
-		        uc_close(fd) ;
+	        cint	fl = (rl + rs) ;
+		if ((rs = sncpy((rbuf + fl),(rlen - fl),".",ext)) >= 0) {
+		    len = (fl + rs) ;
+	            if ((rs = u_open(rbuf,O_FLAGS,om)) >= 0) {
+		        u_close(rs) ;
 	            } else if (isNotAccess(rs)) {
 		        rs = SR_OK ;
 	            }
