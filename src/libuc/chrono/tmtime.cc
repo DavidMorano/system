@@ -64,6 +64,7 @@
 
 #include	"tmtime.hh"
 
+import libutil ;
 
 /* local defines */
 

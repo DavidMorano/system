@@ -71,12 +71,13 @@ OBJB_CHRONO= obj2.o obj3.o
 OBJ_CHRONO= $(OBJA_CHRONO) $(OBJB_CHRONO)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -95,6 +96,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).so:		$(OBJ_CHRONO) Makefile
@@ -122,22 +126,22 @@ control:
 
 
 obj0.o:			$(OBJ0_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_CHRONO)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_CHRONO)
 
 obj1.o:			$(OBJ1_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_CHRONO)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_CHRONO)
 
 obj2.o:			$(OBJ2_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_CHRONO)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_CHRONO)
 
 obj3.o:			$(OBJ3_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_CHRONO)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_CHRONO)
 
 obj0_dater.o:		$(OBJ0_DATER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DATER)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_DATER)
 
 obj1_dater.o:		$(OBJ1_DATER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_DATER)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_DATER)
 
 dater.o:		$(OBJ_DATER)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ_DATER) $(LIBINFO)

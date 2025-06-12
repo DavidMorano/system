@@ -8,13 +8,13 @@
 
 /* revision history:
 
-	= 2023-10-08, David A.D. Morano
+	= 2023-10-08, David A-D- Morano
 	This is written as some interim hack for some code that
 	cannot otherwise be linked with the main LIBUC code library.
 
 */
 
-/* Copyright © 2023 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2023 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 

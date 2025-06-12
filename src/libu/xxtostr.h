@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-11-01, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
 	= 2024-01-15, David A-D- Morano
@@ -16,7 +16,7 @@
 
 */
 
-/* Copyright (c) 1998,2024 David A­D­ Morano.  All rights reserved. */
+/* Copyright (c) 1998,2024 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -53,7 +53,7 @@
 	of the "convert-to-string" numeric conversion subroutine-templates
 	in C++, there has never been a standardized implementation
 	of these kinds of conversion functions.
-		-- 2024-01-15, David A.D. Morano
+		-- 2024-01-15, David A-D- Morano
 
 *******************************************************************************/
 
