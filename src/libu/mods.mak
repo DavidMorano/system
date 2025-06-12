@@ -231,55 +231,55 @@ valuelims.o:		valuelims.ccm			$(INCS)
 # DIGBUFSIZES (module)
 digbufsizes.o:		digbufsizes.ccm
 
-# UVARIABLES
+# UCONSTANTS
 uconstants.o:		uconstants0.o uconstants1.o
-	$(LD) -r -o $@ $(LDFLAGS) uconstants0.o uconstants1.o
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
-uconstants0.o:		valuelims.o digbufsizes.o uconstants.ccm uconstants1.cc 
+uconstants0.o:		uconstants.ccm valuelims.o digbufsizes.o 
 	makemodule uconstants
 
-uconstants1.o:		uconstants.ccm uconstants1.cc 
+uconstants1.o:		uconstants1.cc uconstants.ccm 
 	makemodule uconstants
-	$(COMPILE.cc) uconstants1.cc
+	$(COMPILE.cc) $<
 
 # ULIBVALS
 ulibvals.o:		ulibvals0.o ulibvals1.o
-	$(LD) -r -o $@ $(LDFLAGS) ulibvals0.o ulibvals1.o
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
-ulibvals0.o:		usysconf.o ulibvals.ccm
+ulibvals0.o:		ulibvals.ccm usysconf.o 
 	makemodule ulibvals
 
-ulibvals1.o:		ulibvals.ccm ulibvals1.cc
+ulibvals1.o:		ulibvals1.cc ulibvals.ccm 
 	makemodule ulibvals
-	$(COMPILE.cc) ulibvals1.cc
+	$(COMPILE.cc) $<
 
 # UNIXFNAMES
 unixfnames.o:		unixfnames0.o unixfnames1.o
-	$(LD) -r -o $@ $(LDFLAGS) unixfnames0.o unixfnames1.o
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 unixfnames0.o:		unixfnames.ccm
 	makemodule unixfnames
 
-unixfnames1.o:		unixfnames.ccm unixfnames1.cc
+unixfnames1.o:		unixfnames1.cc unixfnames.ccm 
 	makemodule unixfnames
-	$(COMPILE.cc) unixfnames1.cc
+	$(COMPILE.cc) $<
 
 # USIGBLOCK
-usigblock.o:		usigset.o usigblock.ccm
+usigblock.o:		usigblock.ccm usigset.o 
 	makemodule usigset
 	makemodule usigblock
 
 # USYSBASIC
 usysbasic.o:		usysbasic0.o usysbasic1.o
-	$(LD) -r -o $@ $(LDFLAGS) usysbasic0.o usysbasic1.o
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
-usysbasic0.o:		usigset.o usigblock.o usysbasic.ccm
+usysbasic0.o:		usysbasic.ccm usigset.o usigblock.o 
 	makemodule usigset
 	makemodule usigblock
 	makemodule usysbasic
 
-usysbasic1.o:		usysbasic0.o usysbasic1.cc 
+usysbasic1.o:		usysbasic1.cc usysbasic.ccm
 	makemodule usysbasic
-	$(COMPILE.cc) usysbasic1.cc
+	$(COMPILE.cc) $<
 
 

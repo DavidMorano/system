@@ -151,7 +151,7 @@ valuelims.o:		valuelims.ccm
 digbufsizes.o:		digbufsizes.ccm
 
 uconstants.o:		uconstants0.o uconstants1.o
-	$(LD) -r $(LDFLAGS) -o $@ uconstants0.o uconstants1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 uconstants0.o:		uconstants.ccm
 	makemodule valuelims digbufsizes
@@ -160,7 +160,7 @@ uconstants0.o:		uconstants.ccm
 uconstants1.o:		uconstants1.cc uconstants.ccm
 	makemodule valuelims digbufsizes
 	makemodule uconstants
-	$(COMPILE.cc) uconstants1.cc
+	$(COMPILE.cc) $<
 
 intminmax.o:		intminmax.ccm
 	makemodule valuelims

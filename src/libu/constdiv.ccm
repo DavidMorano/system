@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-11-01, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -26,7 +26,7 @@
 	the name of the person who invented this.  If you know
 	or remember who he was, please let me know so that I
 	can credit him right here.
-		-- David A.D. Morano
+		-- David A-D- Morano
 
 	Update, found it (the reference).  This algorithm is from
 	"Hacker's Delight," second edition, ch 10, 
