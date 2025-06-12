@@ -46,10 +46,10 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<usystem.h>
 #include	<filereadln.h>
 #include	<sncpyx.h>
-#include	<hasx.h>		/* |hascontent(3uc)| */
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -123,8 +123,8 @@ int getnisdomain(char *rbuf,int rlen) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (rlen >= 0) {
-	 	nisfind		no(rbuf,rlen) ;
-		rs = no ;
+	 	nisfind	 nis(rbuf,rlen) ;
+		rs = nis ;
 	    }
 	} /* end if (non-null) */
 	return rs ;

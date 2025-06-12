@@ -37,7 +37,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stddef.h>
+#include	<stddef.h>		/* |nullptr_t| */
 #include	<stdlib.h>
 #include	<string.h>		/* |strcmp(3c)| */
 #include	<clanguage.h>

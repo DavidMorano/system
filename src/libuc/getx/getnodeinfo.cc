@@ -64,7 +64,6 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -77,6 +76,7 @@
 
 #include	"getnodeinfo.h"
 
+import libutil ;
 
 /* local defines */
 

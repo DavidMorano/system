@@ -39,8 +39,6 @@ enum gethzes {
 
 #ifdef	__cplusplus
 
-EXTERNC_begin
-
 namespace ucgetx {
     struct gethzer {
 	int operator () (int = 0) noex ;
@@ -51,8 +49,6 @@ namespace ucgetx {
 }
 
 extern ucgetx::gethzer	gethz ;
-
-EXTERNC_end
 
 #endif /* __cplusplus */
 

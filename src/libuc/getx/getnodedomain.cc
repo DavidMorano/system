@@ -74,7 +74,6 @@
 #include	<climits>		/* for |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* for |getenv(3c)| */
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<uinfo.h>
@@ -96,6 +95,7 @@
 
 #include	"getnodedomain.h"
 
+import libutil ;
 
 /* local defines */
 

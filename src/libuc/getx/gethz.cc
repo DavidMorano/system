@@ -63,7 +63,7 @@
 #include	"gethz.h"
 
 
-import uvariables ;
+import uconstants ;
 
 /* local defines */
 
@@ -180,7 +180,7 @@ int hzmgr::tryenv(int w) noex {
 int hzmgr::tryconf(int w) noex {
 	int		rs = SR_OK ;
 	if ((hz == 0) && ((w == gethz_any) || (w == gethz_conf))) {
-	    if (int cmd ; (cmd = _SC_CLK_TCK) >= 0) {
+	    if (cint cmd = _SC_CLK_TCK ; cmd >= 0) {
 	        if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
 		    hz = rs ;
 	        } else if (isNotValid(rs) || isNotSupport(rs)) {

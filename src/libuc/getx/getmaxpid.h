@@ -29,9 +29,9 @@
 				1	system processes (where available)
 
 	Returns:
-	<0		error
-	==0		?
 	>0		MAXPID value
+	==0		?
+	<0		error (system-return)
 
 	Notes:
 	+ We try to get a dynamic value if we can, otherwise we let
