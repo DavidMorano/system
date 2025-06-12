@@ -63,6 +63,7 @@ OBJ2= getnodename.o getournetname.o
 OBJ3= getrealname.o getsysname.o 
 OBJ4= getusername.o getprojname.o
 OBJ5= gettmpdname.o getfname.o
+OBJ6=
 
 OBJA= obj0.o obj1.o obj2.o 
 OBJB= obj3.o obj4.o obj5.o
@@ -138,6 +139,9 @@ obj4.o:			$(OBJ4)
 
 obj5.o:			$(OBJ5)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6)
 
 
 obja.o:			$(OBJA)

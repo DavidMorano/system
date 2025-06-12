@@ -48,7 +48,6 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
@@ -73,6 +72,7 @@
 
 #include	"getuserorg.h"
 
+import libutil ;
 
 /* local defines */
 

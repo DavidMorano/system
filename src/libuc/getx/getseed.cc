@@ -37,7 +37,7 @@
 #include	<sys/types.h>
 #include	<sys/time.h>		/* |gettimeofday(3c)| */
 #include	<unistd.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
@@ -48,7 +48,7 @@
 #include	"getseed.h"
 
 
-import uvariables ;
+import uconstants ;
 
 /* local defines */
 
@@ -83,14 +83,13 @@ cbool			f_gethrtime = CF_GETHRTIME ;
 
 int getseed(int seed) noex {
     	static cchar	*randp = getenv(varrand) ;
-	TIMEVAL		tv ;
 	cnullptr	np{} ;
 	cint		pid = getpid() ;
 	cint		uid = getuid() ;
 	cint		v1 = getppid() ;
 	cint		v2 = getpgrp() ;
 	int		rs ;
-	if ((rs = uc_gettimeofday(&tv,np)) >= 0) {
+	if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,np)) >= 0) {
 	    cint	usec = intconv(tv.tv_usec) ;
 	    cint	rsec = intconv(tv.tv_sec) ;
 	    uint	rv = 0 ;
@@ -111,7 +110,7 @@ int getseed(int seed) noex {
 	        rv += uint(h) ;
 	        h >>= szof(uint) ;
 	        rv += uint(h) ;
-	    }
+	    } /* end if_constexpr (f_gethrtime) */
 	    rs = (rv & INT_MAX) ;
 	} /* end if (uc_gettimeofday) */
 	return rs ;

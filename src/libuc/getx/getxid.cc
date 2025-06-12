@@ -159,7 +159,7 @@ int getuid_name(cchar *sp,int sl) noex {
 	    if (sp[0]) {
 	        cchar	*nn{} ;
 	        if (nulstr ns ; (rs = ns.start(sp,sl,&nn)) >= 0) {
-	            if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	            if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
 	                ucentpw	pw{} ; 
 	                cint	pwlen = rs ;
 			auto	getpw = GETPW_NAME ;
@@ -205,7 +205,7 @@ int getgid_name(cchar *sp,int sl) noex {
 	    if (sp[0]) {
 	        cchar	*name{} ;
 	        if (nulstr ns ; (rs = ns.start(sp,sl,&name)) >= 0) {
-	            if (char *grbuf{} ; (rs = malloc_gr(&grbuf)) >= 0) {
+	            if (char *grbuf ; (rs = malloc_gr(&grbuf)) >= 0) {
 	                cint	grlen = rs ;
 		        {
 	                    ucentgr	gr{} ;
@@ -267,7 +267,7 @@ int getpjid_name(cchar *sp,int sl) noex {
 	    if (sp[0]) {
 	        cchar	*name{} ;
 	        if (nulstr ns ; (rs = ns.start(sp,sl,&name)) >= 0) {
-	            if (char *pjbuf{} ; (rs = malloc_pj(&pjbuf)) >= 0) {
+	            if (char *pjbuf ; (rs = malloc_pj(&pjbuf)) >= 0) {
 	                cint	pjlen = rs ;
 		        {
 	                    ucentpj	pj{} ;

@@ -33,7 +33,6 @@
 #include	<getchostname.h>
 #include	<getcols.h>
 #include	<getdefzdata.h>
-#include	<getdig.h>
 #include	<geteaddrinfo.h>
 #include	<getenver.h>
 #include	<getev.h>

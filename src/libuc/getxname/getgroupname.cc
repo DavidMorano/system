@@ -59,7 +59,7 @@
 #include	"getgroupname.h"
 
 
-import uvariables ;
+import uconstants ;
 
 /* local defines */
 

@@ -38,6 +38,7 @@
 #include	<getsysname.h>
 #include	<gettmpdname.h>
 #include	<getusername.h>
+#include	<getpwx.h>
 
 
 #endif /* GETXNAME_INCLUDE */

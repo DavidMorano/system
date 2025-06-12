@@ -104,7 +104,7 @@ namespace {
 	int load(vecstr *) noex ;
 	int entfins() noex ;
     } ; /* end struct (userterms) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -310,7 +310,7 @@ static int revsortfunc(cvoid **v1pp,cvoid **v2pp) noex {
 	    TE	*f1p = *f1pp ;
 	    TE	*f2p = *f2pp ;
 	    if (f1p || f2p) {
-		rc = 1 ;
+		rc = +1 ;
 	        if (f1p) {
 		    rc = -1 ;
 		    if (f2p) {

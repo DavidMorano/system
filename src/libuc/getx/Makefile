@@ -56,7 +56,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ00= getaddr.o getaf.o getarchitecture.o getbufsize.o
-OBJ01= getcols.o getdefzdata.o getdig.o geteaddrinfo.o
+OBJ01= getcols.o getdefzdata.o geteaddrinfo.o
 OBJ02= getenver.o getev.o getfdfile.o
 OBJ03= gethz.o getmailgid.o getmjd.o
 OBJ04= getnfile.o getngroups.o getnodedomain.o
@@ -68,7 +68,7 @@ OBJ09= getseed.o getserial.o getserv.o
 OBJ10= getsocktype.o getsyslogx.o getsystypenum.o
 OBJ11= getuserhome.o getuserorg.o getuserterms.o
 OBJ12= getxid.o getopendial.o getmaxpid.o
-OBJ13= getnisdomain.o
+OBJ13= getnisdomain.o getpwx.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o 
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -194,7 +194,6 @@ getaf.o:		getaf.cc		getaf.h			$(INCS)
 getarchitecture.o:	getarchitecture.cc	getarchitecture.h	$(INCS)
 getcols.o:		getcols.cc		getcols.h		$(INCS)
 getdefzdata.o:		getdefzdata.cc		getdefzdata.h		$(INCS)
-getdig.o:		getdig.cc		getdig.h		$(INCS)
 geteaddrinfo.o:		geteaddrinfo.cc		geteaddrinfo.h		$(INCS)
 getenver.o:		getenver.cc		getenver.h		$(INCS)
 getev.o:		getev.cc		getev.h			$(INCS)
@@ -230,5 +229,6 @@ getxid.o:		getxid.cc		getxid.h		$(INCS)
 getopendial.o:		getopendial.c		getopendial.h		$(INCS)
 getmaxpid.o:		getmaxpid.cc		getmaxpid.h		$(INCS)
 getnisdomain.o:		getnisdomain.cc		getnisdomain.h		$(INCS)
+getpwx.o:		getpwx.cc		getpwx.h		$(INCS)
 
 
