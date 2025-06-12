@@ -67,8 +67,6 @@ OBJA= obj00.o obj01.o
 OBJB= 
 OBJC= 
 OBJD= 
-OBJE= 
-OBJF= 
 
 OBJ= obja.o 
 
@@ -150,7 +148,7 @@ usigblock.ccm:
 	ln mod/usigblock.ccm .
 
 
-umisc0.o:		$(DEPMODS) umisc.ccm
+umisc0.o:		umisc.ccm $(DEPMODS) 
 	makemodule usigset
 	makemodule usigblock
 	makemodule umisc

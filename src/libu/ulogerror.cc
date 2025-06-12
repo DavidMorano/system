@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2023-10-08, David A.D. Morano
+	= 2023-10-08, David A-D- Morano
 	This is a new thing, because, why now?
 	
 */
 
-/* Copyright © 2023 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2023 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
