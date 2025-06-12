@@ -539,7 +539,6 @@ typedef const char *const *	mainv ;
 #define	TYPEDEF_USTAT
 typedef USTAT			ustat ;
 #endif
-
 #ifndef	TYPEDEF_USTATFS
 #define	TYPEDEF_USTATFS
 typedef USTATFS			ustatfs ;
@@ -547,6 +546,19 @@ typedef USTATFS			ustatfs ;
 #ifndef	TYPEDEF_USTATVFS
 #define	TYPEDEF_USTATVFS
 typedef USTATVFS		ustatvfs ;
+#endif
+
+#ifndef	TYPEDEF_CUSTAT
+#define	TYPEDEF_CUSTAT
+typedef const USTAT		custat ;
+#endif
+#ifndef	TYPEDEF_CUSTATFS
+#define	TYPEDEF_CUSTATFS
+typedef const USTATFS		custatfs ;
+#endif
+#ifndef	TYPEDEF_CUSTATVFS
+#define	TYPEDEF_CUSTATVFS
+typedef const USTATVFS		custatvfs ;
 #endif
 
 #ifndef	TYPEDEF_VOIDF

@@ -51,6 +51,8 @@ enum sysconfcmds {
     sysconfcmd_maxzoneinfo,
     sysconfcmd_maxname,
     sysconfcmd_maxpath,
+    sysconfcmd_maxusername,
+    sysconfcmd_maxgroupname,
     sysconfcmd_maxnodename,
     sysconfcmd_maxhostname,
     sysconfcmd_maxmailaddr,
@@ -74,6 +76,12 @@ enum sysconfcmds {
 #endif
 #ifndef	_SC_PATH_MAX
 #define	_SC_PATH_MAX		sysconfcmd_maxpath
+#endif
+#ifndef	_SC_USERNAME_MAX
+#define	_SC_USERNAME_MAX	sysconfcmd_maxusername
+#endif
+#ifndef	_SC_GROUPNAME_MAX
+#define	_SC_GROUPNAME_MAX	sysconfcmd_maxgroupname
 #endif
 #ifndef	_SC_HOST_NAME_MAX	/* really the node-name length */
 #define	_SC_HOST_NAME_MAX	sysconfcmd_maxnodename

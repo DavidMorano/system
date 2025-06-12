@@ -9,10 +9,10 @@
 
 /* revision history:
 
-	= 1998-02-14, David A­D­ Morano
+	= 1998-02-14, David A-D- Morano
 	This code was originally written.
 
-	= 1998-03-26, David A­D­ Morano
+	= 1998-03-26, David A-D- Morano
 	This subroutine was updated to handle the case where a file
 	descriptor was in non-blocking mode during an initial
 	|connect()| operation, was then put into blocking mode, and
@@ -21,7 +21,7 @@
 	we detect if we are now in blocking mode and we will wait
 	for the connect to complete.
 
-	= 2017-05-08, David A.D. Morano
+	= 2017-05-08, David A-D- Morano
 	I do not think it is a good idea to ever turn ON the
 	compile-time CF_ISCONN switch. That would return SR_OK
 	instead of SR_ISCONN when the connection is complete and
@@ -31,7 +31,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -192,8 +192,8 @@ static int connsub_proc(CS *cip) noex {
 	bool		f_exit = false ;
 
 	repeat {
-	    if ((rs = connect(s,sap,sal)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
+	    if ((rs = connect(s,sap,sal)) < 0) {
+		rs = (- errno) ;
 	        switch (rs) {
 	        case SR_NOBUFS:
 	            if (to_nobufs-- > 0) {

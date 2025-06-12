@@ -282,7 +282,6 @@ usyscallbase.o:		usyscallbase.cc usyscallbase.hh		$(INCS)
 usysutility.o:		usysutility.cc usysutility.hh		$(INCS)
 usysdata.o:		usysdata.cc usysdata.h			$(INCS)
 uacceptpass.o:		uacceptpass.cc ufdlock.h		$(INCS)
-usupport.o:		xxtostr.o usupport.cc usupport.h	$(INCS)
 
 # requires USYSBASIC
 uatfork.o:		umods.o uatfork.cc uatfork.h		$(INCS)
@@ -353,6 +352,11 @@ umisc.dir:
 # URESERVE
 ureserve.o:		ureserve.dir
 ureserve.dir:
+	makesubdir $@
+
+# USUPPORT
+usupport.o:		usupport.dir
+usupport.dir:
 	makesubdir $@
 
 # OTHER
