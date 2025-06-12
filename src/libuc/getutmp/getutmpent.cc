@@ -58,7 +58,7 @@
 #include	"getutmpent.h"
 
 
-import uvariables ;
+import uconstants ;
 
 /* local defines */
 
@@ -202,7 +202,7 @@ int getutmpline(char *rbuf,int rlen,pid_t sid) noex {
 
 ufinder::operator int () noex {
 	int		rs = SR_OK ;
-	for (const auto &m : mems) {
+	for (cauto &m : mems) {
 	    rs = (this->*m)() ;
 	    if (rs != 0) break ;
 	} /* end for */
@@ -231,7 +231,7 @@ int ufinder::tryline() noex {
 	static cint	oursid = getsid(0) ;
 	int		rs = SR_OK ;
 	if (sid == oursid) {
-	    for (const auto &vn : utmpenvs) {
+	    for (cauto &vn : utmpenvs) {
 	        if (cchar *line ; (line = getenv(vn)) != nullptr) {
 	            rs = utmpacc_entline(&ae,aebuf,aelen,line,-1) ;
 	        }
@@ -276,5 +276,13 @@ static int utmpent_load(utmpentx *ep,utmpacc_ent *aep) noex {
 	return rs ;
 }
 /* end subroutine (utmpent_load) */
+
+int utmpentx::get(pid_t pid) noex {
+	return getutmpent(this,pid) ;
+}
+
+int utmpentx::operator () (pid_t pid) noex {
+	return getutmpent(this,pid) ;
+}
 
 

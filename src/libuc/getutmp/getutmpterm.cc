@@ -68,7 +68,7 @@
 #include	"getutmpterm.h"
 
 
-import uvariables ;
+import uconstants ;
 
 /* local defines */
 
@@ -96,7 +96,7 @@ import uvariables ;
 int getutmpterm(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    if (utmpentx ute ; (rs = getutmpent(&ute,sid)) >= 0) {
+	    if (utmpentx ute ; (rs = ute(sid)) >= 0) {
 		cchar	*devdir = sysword.w_devdir ;
                 rs = mknpath(rbuf,rlen,devdir,ute.line) ;
 	    } /* end if (getutmpent) */

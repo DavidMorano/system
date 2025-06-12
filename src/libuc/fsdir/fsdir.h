@@ -97,7 +97,6 @@ struct fsdir_co {
 	fsdir		*op = nullptr ;
 	int		w = -1 ;
 	void operator () (fsdir *p,int m) noex {
-	    magic = 0 ;
 	    op = p ;
 	    w = m ;
 	} ;
@@ -114,11 +113,12 @@ struct fsdir : fsdir_head {
 	fsdir_co	audit ;
 	fsdir_co	close ;
 	fsdir(cchar *n = nullptr) noex {
-	    open(this,n) ;
-	    tell(this,fsdirmem_tell) ;
-	    rewind(this,fsdirmem_rewind) ;
-	    audit(this,fsdirmem_audit) ;
-	    close(this,fsdirmem_close) ;
+	    open	(this,n) ;
+	    tell	(this,fsdirmem_tell) ;
+	    rewind	(this,fsdirmem_rewind) ;
+	    audit	(this,fsdirmem_audit) ;
+	    close	(this,fsdirmem_close) ;
+	    magic = 0 ;
 	} ; /* end ctor */
 	fsdir(const fsdir &) = delete ;
 	fsdir &operator = (const fsdir &) = delete ;
