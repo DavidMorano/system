@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-05-01, David A.D. Morano
+	= 1998-05-01, David A-D- Morano
 	This subroutine is originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 

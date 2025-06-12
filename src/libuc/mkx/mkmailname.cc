@@ -38,12 +38,6 @@
 	>=0		length of extracted mailname string
 	<0		error (system-return)
 
-*	SUBROUTINES CALLED:						
-*		Only system routines are called.
-*
-*	GLOBAL VARIABLES USED:						
-*		None!!  AS IT SHOULD BE!!
-*
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -51,6 +45,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<realname.h>
+#include	<localmisc.h>
 
 #include	"mkx.h"
 
@@ -89,13 +84,12 @@ int mkmailname(char *rbuf,int rlen,cchar *gp,int gl) noex {
 	int		rs1 ;
 	int		rl = 0 ;
 	if (rbuf && gp) {
-	    realname	rn ;
-	    if ((rs = realname_start(&rn,gp,gl)) >= 0) {
+	    if (realname rn ; (rs = rn.start(gp,gl)) >= 0) {
 	        {
-	            rs = realname_mailname(&rn,rbuf,rlen) ;
+	            rs = rn.mailname(rbuf,rlen) ;
 		    rl = rs ;
 	        }
-	        rs1 = realname_finish(&rn) ;
+	        rs1 = rn.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (readlname) */
 	} /* end if (non-null) */

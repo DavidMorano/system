@@ -32,6 +32,7 @@ extern int mknpath2w(char *,int,cc *,cc *,int) noex ;
 extern int mknpath3w(char *,int,cc *,cc *,cc *,int) noex ;
 extern int mknpath4w(char *,int,cc *,cc *,cc *,cc *,int) noex ;
 extern int mknpath5w(char *,int,cc *,cc *,cc *,cc *,cc *,int) noex ;
+extern int mknpath6w(char *,int,cc *,cc *,cc *,cc *,cc *,cc *,int) noex ;
 
 EXTERNC_end
 
@@ -52,6 +53,10 @@ inline int mknpathw(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,int sl) noex {
 inline int mknpathw(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,
 		cc *s5,int sl) noex {
 	return mknpathxw(pp,pl,5,s1,s2,s3,s4,s5,sl) ;
+}
+inline int mknpathw(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,
+		cc *s5,cc *s6,int sl) noex {
+	return mknpathxw(pp,pl,6,s1,s2,s3,s4,s5,s6,sl) ;
 }
 
 #endif /* __cplusplus */

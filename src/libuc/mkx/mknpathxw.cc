@@ -58,7 +58,7 @@
 /* external variables */
 
 
-/* local strutures */
+/* local structures */
 
 namespace {
     struct maxpather {

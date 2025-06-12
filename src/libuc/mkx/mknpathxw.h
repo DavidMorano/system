@@ -38,6 +38,8 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
+#ifdef	COMMENT
+
 inline int mknpathw(char *pp,int pl,cc *s1,int sl) noex {
 	return mknpathxw(pp,pl,1,s1,sl) ;
 }
@@ -59,6 +61,17 @@ inline int mknpathw(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,
 		cc *s5,cc *s6,int sl) noex {
 	return mknpathxw(pp,pl,6,s1,s2,s3,s4,s5,s6,sl) ;
 }
+
+#else
+
+template<typename ... Args>
+inline int mknpath(char *dp,int dl,Args ... args,int sl) noex {
+	cint	na = npack(Args) ;
+	return mknpathxw(dp,dl,na,args ...,sl) ;
+}
+
+
+#endif /* COMMENT */
 
 #endif /* __cplusplus */
 

@@ -32,9 +32,10 @@
 
 	Description:
 	This subroutine acquires some of the noise from the system.
-	It basically just looks at the process IDs that exist at
-	the moment of the call and returns a random sequence of
-	data based on that.
+	Currently (unlike previously) this subroutine just calls
+	the system |uc_rand(3uc)| subroutine to get some high quality
+	random data, rather than trying to fabricate something itself
+	(like it did previously).
 
 	Synopsis:
 	int mknoise(uint *a,int n) noex
