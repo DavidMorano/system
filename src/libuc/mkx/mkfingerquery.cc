@@ -89,8 +89,7 @@ int mkfingerquery(char *qbuf,int qlen,int f_long,cchar *up,mainv av) noex {
 	if (qbuf && up) {
 	    rs = SR_INVALID ;
 	    if (qlen > 0) {
-	        sbuf	b ;
-	        if ((rs = b.start(qbuf,qlen)) >= 0) {
+	        if (sbuf b ; (rs = b.start(qbuf,qlen)) >= 0) {
 	            rs = b.strw(up,-1) ;
 	            if ((rs >= 0) && f_long) {
 		        b.strw(" /W",3) ;

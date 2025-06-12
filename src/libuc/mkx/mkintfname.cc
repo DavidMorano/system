@@ -9,9 +9,9 @@
 /* revision history:
 
 	= 2001-12-03, David A­D­ Morano
-	This code was born out of frustration with cleaning up bad
-	legacy code (of which there is quite a bit -- like almost
-	all of it).
+	This code was pulled out of (like several other procedures
+	like this) some encompassing code (which itself needed
+	to create "open-intercept" file-names).
 
 */
 
@@ -45,11 +45,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdarg>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
@@ -58,13 +55,16 @@
 #include	"mkx.h"
 
 
+/* local defines */
+
+
 /* external subroutines */
 
 
 /* external variables */
 
 
-/* local strutures */
+/* local structures */
 
 
 /* forward references */
@@ -82,36 +82,29 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 int mkintfname(char *rbuf,cchar *dn,cchar *prn,cchar *inter) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		rl = 0 ;
 	if (rbuf && prn && inter) {
+	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = maxpathlen) >= 0) {
-		cint	rlen = rs ;
-	        if ((rs >= 0) && dn && dn[0]) {
-	            if (rs >= 0) {
-	                rs = storebuf_strw(rbuf,rlen,i,dn,-1) ;
-	                i += rs ;
-	            }
-	            if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	                rs = storebuf_chr(rbuf,rlen,i,'/') ;
-	                i += rs ;
-	            }
-	        } /* end if (had a directory) */
-	        if (rs >= 0) {
-	            rs = storebuf_strw(rbuf,rlen,i,prn,-1) ;
-	            i += rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = storebuf_chr(rbuf,rlen,i,'º') ;
-	            i += rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = storebuf_strw(rbuf,rlen,i,inter,-1) ;
-	            i += rs ;
-	        }
-	    } /* end if (maxpathlen) */
+	    if (prn[0] && inter[0]) {
+	        if ((rs = maxpathlen) >= 0) {
+		    storebuf	sb(rbuf,rs) ;
+	            if (dn && dn[0]) {
+	                rs = sb.str(dn) ;
+		    }
+		    if (rs >= 0) {
+	                if (int i = sb.idx ; (i > 0) && (rbuf[i - 1] != '/')) {
+	                    rs = sb.chr('/') ;
+	                }
+	            } /* end if (had a directory) */
+	            if (rs >= 0) rs = sb.str(prn) ;
+	            if (rs >= 0) rs = sb.chr('º') ;
+	            if (rs >= 0) rs = sb.str(inter) ;
+	            rl = sb.idx ;
+	        } /* end if (maxpathlen) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mkintfname) */
 

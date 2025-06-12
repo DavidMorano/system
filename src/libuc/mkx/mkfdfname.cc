@@ -38,7 +38,7 @@
 
 	Returns:
 	>=0		length of created string
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 

@@ -19,17 +19,30 @@
 
 /*******************************************************************************
 
+  	Name:
+	mkmaildirtest
+
+	Description:
 	This subroutine constructs a filename suitable for testing
 	whether a mail-directory is accessible or not.
+
+	Synopsis:
+	int mkmaildirtest(char *rbuf,cchar *dp,int dl) noex
+
+	Arguments:
+	rbuf		result buffer (must be MAXPATHLEN long)
+	dp		directory-path c-string pointer
+	dl		directory-path c-string length
+
+	Returns:
+	>=0		length of resuling file-name path
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdarg>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
@@ -49,7 +62,7 @@
 /* external variables */
 
 
-/* local strutures */
+/* local structures */
 
 
 /* forward references */
@@ -59,6 +72,8 @@
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
+constexpr char		saved[] = MAILDIR_SAVED ;
+
 
 /* exported variables */
 
@@ -67,26 +82,22 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 int mkmaildirtest(char *rbuf,cchar *dp,int dl) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		len = 0 ;
 	if (rbuf && dp) {
 	    if ((rs = maxpathlen) >= 0) {
-	        cint	rlen = rs ;
-	        cchar	*saved = MAILDIR_SAVED ;
-	        if (rs >= 0) {
-	            rs = storebuf_strw(rbuf,rlen,i,dp,dl) ;
-	            i += rs ;
-	        }
-	        if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	            rs = storebuf_chr(rbuf,rlen,i,'/') ;
-	            i += rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = storebuf_strw(rbuf,rlen,i,saved,-1) ;
-	            i += rs ;
+		storebuf	sb(rbuf,rs) ;
+		if ((rs = sb.strw(dp,dl)) >= 0) {
+	            if ((rs > 0) && (rbuf[rs - 1] != '/')) {
+	                rs = sb.chr('/') ;
+		    }
+	            if (rs >= 0) {
+	                rs = sb.strw(saved) ;
+			len = sb.idx ;
+		    }
 	        }
 	    } /* end if (maxpathlen) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mkmaildirtest) */
 

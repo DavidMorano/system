@@ -130,7 +130,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strnlen(3c)| + |strnchr(3c)| */
+#include	<cstring>		/* |strnchr(3c)| */
 #include	<usystem.h>
 #include	<strn.h>
 #include	<sncpyx.h>
@@ -139,6 +139,7 @@
 
 #include	"mkgecosname.h"
 
+import libutil ;
 
 /* local defines */
 

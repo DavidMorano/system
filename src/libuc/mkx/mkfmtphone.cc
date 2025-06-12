@@ -117,7 +117,7 @@ int mkfmtphone(char *dbuf,int dlen,cchar *pp,int pl) noex {
 			    dl = b.finish ;
 			    if (rs >= 0) rs = dl ;
 			} /* end if (sbuf) */
-	            } /* end if (sncpyopaque) */
+	            } /* end if (snwcpyopaque) */
 	            rs1 = uc_free(tbuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */

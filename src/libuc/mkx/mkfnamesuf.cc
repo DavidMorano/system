@@ -38,7 +38,7 @@
 
 	Returns:
 	>=0		OK, length of resulting filename
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -109,26 +109,23 @@ int mkfnamesufx(char *rbuf,int n,cc *p1,...) noex {
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = maxpathlen) >= 0) {
-	    cint	rlen = rs ;
-	    if (rs >= 0) {
-	        rs = storebuf_strw(rbuf,rlen,rl,p1,-1) ;
-	        rl += rs ;
+	    storebuf	sb(rbuf,rs) ;
+	    if ((rs = sb.str(p1)) >= 0) {
+	        if (n > 0) {
+	            rs = sb.chr('.') ;
+		}
+	        if (rs >= 0) {
+	            va_begin(ap,p1) ;
+	            for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
+	                cc	*sp = (cc *) va_arg(ap,cc *) ;
+		        if (sp) {
+	                    rs = sb.str(sp) ;
+		        }
+	            } /* end for */
+	            va_end(ap) ;
+	        } /* end if (ok) */
+	        rl = sb.idx ;
 	    }
-	    if ((rs >= 0) && (n > 0)) {
-	        rs = storebuf_chr(rbuf,rlen,rl,'.') ;
-	        rl += rs ;
-	    }
-	    if (rs >= 0) {
-	        va_begin(ap,p1) ;
-	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-	            cc	*sp = (cc *) va_arg(ap,cc *) ;
-		    if (sp) {
-	                rs = storebuf_strw(rbuf,rlen,rl,sp,-1) ;
-	                rl += rs ;
-		    }
-	        } /* end for */
-	        va_end(ap) ;
-	    } /* end if (ok) */
 	} /* end if (maxpathlen) */
 	return (rs >= 0) ? rl : rs ;
 }

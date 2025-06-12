@@ -123,15 +123,15 @@ int mkfnamex(char *rbuf,int na,...) noex {
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = maxpathlen) >= 0) {
-	    cint	rlen = rs ;
+	    storebuf	sb(rbuf,rs) ;
 	    va_begin(ap,na) ;
 	    for (int i = 0 ; (rs >= 0) && (i < na) ; i += 1) {
 	        cc	*sp = (cc *) va_arg(ap,cc *) ;
 		if (sp) {
-	            rs = storebuf_strw(rbuf,rlen,rl,sp,-1) ;
-	            rl += rs ;
+	            rs = sb.str(sp) ;
 		}
 	    } /* end for */
+	    rl = sb.idx ;
 	    va_end(ap) ;
 	} /* end if (maxpathlen) */
 	return (rs >= 0) ? rl : rs ;

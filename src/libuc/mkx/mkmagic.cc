@@ -29,10 +29,10 @@
 	(usualy) of a file in order to identify it (its purpose).
 
 	Synopsis:
-	int mkmagic(char *robj,int rsz,cchar *ms) noex
+	int mkmagic(char *rbuf,int rsz,cchar *ms,int ml = -1) noex
 
 	Arguments:
-	robj		result buffer pointer
+	rbuf		result buffer pointer
 	rsz		result buffer size (not NUL-terminator)
 	ms		source c-string
 
@@ -45,13 +45,13 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |strsz(3c)| + |memset(3c)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"mkmagic.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -76,17 +76,17 @@
 
 /* exported subroutines */
 
-int mkmagic(char *robj,int rsz,cchar *ms) noex {
+int mkmagic(char *rbuf,int rsz,cchar *ms,int ml) noex {
 	int		rs = SR_FAULT ;
-	if (robj && ms) {
+	if (rbuf && ms) {
 	    rs = SR_INVALID ;
-	    robj[0] = '\0' ;
+	    rbuf[0] = '\0' ;
 	    if ((rsz >= 2) && ms[0]) {
-	        if (cint mslen = xstrlen(ms) ; (mslen+1) <= rsz) {
-	            char	*bp = strwcpy(robj,ms,-1) ;
+	        if (cint mslen = xstrnlen(ms,ml) ; (mslen+1) <= rsz) {
+	            char	*bp = strwcpy(rbuf,ms,ml) ;
 	            rs = SR_OK ;
 	            *bp++ = '\n' ;
-	            if (cint zl = intconv((robj + rsz) - bp) ; zl > 0) {
+	            if (cint zl = intconv((rbuf + rsz) - bp) ; zl > 0) {
 	                memclear(bp,zl) ;
 		    }
 	        } else {
