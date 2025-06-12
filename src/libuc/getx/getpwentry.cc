@@ -50,6 +50,7 @@
 #include	"pwentry.h"
 #include	"getpwentry.h"
 
+import libutil ;
 
 /* local defines */
 

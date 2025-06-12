@@ -51,7 +51,7 @@
 	getpwds
 
 	Description:
-	If you also want to get the internal 'STAT' block from the
+	If you also want to get the internal 'USTAT' block from the
 	file-system (sort of as a free-bee of using this subroutine),
 	use the form of this call as:
 
@@ -59,7 +59,7 @@
 	int getpwds(USTAT *sbp,char *pwbuf,int pwlen) noex
 
 	Arguments:
-	sbp		STAT block pointer to receive result
+	sbp		USTAT block pointer to receive result
 	pwbuf		present-working buffer pointer
 	pwlen		prsent-working buffer length
 
@@ -72,16 +72,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* <- |getenv(3c)| */
-#include	<cstring>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
-#include	<varnames.hh>
+#include	<varnames.hh>		/* |varname(3u)| */
 #include	<bufsizevar.hh>
 #include	<sncpyx.h>
 #include	<isnot.h>
 
 #include	"getpwd.h"
 
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -120,31 +120,30 @@ int getpwds(USTAT *sbp,char *pwbuf,int pwlen) noex {
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
 	if (pwbuf) {
-	    cchar	*vn = varname.pwd ;
 	    pwbuf[0] = '\0' ;
 	    if ((rs = maxpathlen) >= 0) {
-		static cchar	*pwd = getenv(vn) ;
+		static cchar	*pwd = getenv(varname.pwd) ;
 	        if (pwlen < 0) pwlen = rs ;
-		rs = SR_NOENT ;
 	        if (pwd != nullptr) {
 	            USTAT	*ssbp, sb1, sb2 ;
 	            if ((rs = u_stat(pwd,&sb1)) >= 0) {
 		        ssbp = (sbp) ? sbp : &sb2 ;
 	                if ((rs = u_stat(".",ssbp)) >= 0) {
 			    bool	f = true ;
-			    rs = SR_NOENT ;
 	                    f = f && (sb1.st_dev == ssbp->st_dev) ;
 			    f = f && (sb1.st_ino == ssbp->st_ino) ;
 			    if (f) {
-		                rs = sncpy1(pwbuf,pwlen,pwd) ;
+		                rs = sncpy(pwbuf,pwlen,pwd) ;
 			        pl = rs ;
 		            }
+			} else if (isNotPresent(rs)) {
+			    rs = SR_OK ;
 	                } /* end if (stat) */
 		    } else if (isNotPresent(rs)) {
 			rs = SR_OK ;
 	            } /* end if (stat) */
 	        } /* end if (quickie) */
-	        if ((rs == SR_NOENT) || (pl == 0)) {
+	        if ((rs >= 0) && (pl == 0)) {
 	            if ((rs = uc_getcwd(pwbuf,pwlen)) >= 0) {
 	                pl = rs ;
 	                if (sbp) {

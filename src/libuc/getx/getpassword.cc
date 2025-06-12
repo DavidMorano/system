@@ -34,13 +34,13 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ischarx.h>
 #include	<usystem.h>
 
 #include	"getpassword.h"
 
+import libutil ;
 
 /* local defines */
 

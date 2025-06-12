@@ -63,7 +63,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -89,6 +88,7 @@
 
 #include	"getuserhome.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -98,8 +98,8 @@
 #define	GETPW_NAME	getpw_name
 #endif /* CF_UCPWCACHE */
 
-#define	SUBINFO		struct subinfo
-#define	SUBINFO_FL	struct subinfo_flags
+#define	SUBINFO		subinfo
+#define	SUBINFO_FL	subinfo_flags
 
 
 /* imported namespaces */

@@ -29,10 +29,10 @@
 	int getsystypenum(char *rbuf,char *nbuf,cc *sysname,cc *release) noex
 
 	Arguments:
-	tbuf		buffer for 'osts' result
-	nbuf		buffer for 'osnum' result
-	sysname		specified SYSNAME string
-	release		specified RELEASE string
+	tbuf		result buffer for 'osts' result
+	nbuf		result buffer for 'osnum' result
+	sysname		specified SYSNAME c-string
+	release		specified RELEASE c-string
 
 	Returns:
 	>=0		OK
@@ -41,11 +41,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| + |strchr(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<matstr.h>
@@ -54,6 +52,7 @@
 
 #include	"getsystypenum.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -140,8 +139,8 @@ int getsystypenum(char *tbuf,char *nbuf,cchar *sysname,cchar *release) noex {
 /* local subroutines */
 
 static int getfield(cchar *sp,int n,cchar **rpp) noex {
-	int		i = 0 ;
-	int		cl = -1 ;
+	int		i = 0 ; /* used-afterwards */
+	int		cl = -1 ; /* return-value */
 	cchar		*tp ;
 	cchar		*cp = nullptr ;
 	while ((tp = strchr(sp,'.')) != nullptr) {
@@ -150,7 +149,7 @@ static int getfield(cchar *sp,int n,cchar **rpp) noex {
 		cl = intconv(tp - sp) ;
 		break ;
 	    }
-	    sp = (tp+1) ;
+	    sp = (tp + 1) ;
 	    i += 1 ;
 	} /* end if */
 	if ((cp == nullptr) && sp[0] && (i == n)) {

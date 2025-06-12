@@ -43,7 +43,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<getpwd.h>
@@ -57,6 +56,7 @@
 
 #include	"getprogpath.h"
 
+import libutil ;
 
 /* local defines */
 
