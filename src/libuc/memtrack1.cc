@@ -1,4 +1,4 @@
-/* memtrack SUPPORT */
+/* memtrack1 MODULE */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -59,7 +59,6 @@ module ;
 #include	<utility>		/* |std::unreachable()| */
 #include	<new>			/* |nothrow| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 
 module memtrack ;
 

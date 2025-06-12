@@ -45,19 +45,19 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |xstrlen(3c)| */
+#include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<toxc.h>
 #include	<nleadstr.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"matstr.h"		/* <- needed for default case */
 #include	"matostr.h"
 
+import libutil ;
 
 /* local defines */
 

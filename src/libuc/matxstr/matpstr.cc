@@ -64,12 +64,12 @@
 #include	<usysdefs.h>
 #include	<toxc.h>
 #include	<nleadstr.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"matstr.h"		/* <- needed for one case */
 #include	"matpstr.h"
 
+import libutil ;
 
 /* local defines */
 

@@ -1,4 +1,4 @@
-/* memtrack MODULE (primary module interface) */
+/* memtrack MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -13,9 +13,12 @@
 	test to replace the previous memory tracking implementation
 	inside of the |ucmemalloc(3uc)| facility (so loved).
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2011,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -46,15 +49,15 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<uvariables.hh>
-
-/* local defines */
-
-#define	MEMTRACK_MAGIC	0x65821293
+#include	<localmisc.h>
 
 export module memtrack ;
 
 import mapblock ;
+
+/* local defines */
+
+#define	MEMTRACK_MAGIC	0x65821293
 
 /* local stuff */
 
@@ -102,9 +105,9 @@ export {
 	memtrack_co	finish ;
 	uint		magic = 0 ;
 	constexpr memtrack() noex {
-	    start(this,memtrackmem_start) ;
-	    finish(this,memtrackmem_finish) ;
-	    count(this,memtrackmem_count) ;
+	    start	(this,memtrackmem_start) ;
+	    finish	(this,memtrackmem_finish) ;
+	    count	(this,memtrackmem_count) ;
 	} ; /* end ctor */
 	memtrack(const memtrack &) = delete ;
 	memtrack &operator = (const memtrack &) = delete ;

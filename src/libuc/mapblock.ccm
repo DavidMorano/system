@@ -1,4 +1,4 @@
-/* mapblock MODULE (primary module interface) */
+/* mapblock MODULE (primary-module-interface) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -13,7 +13,7 @@
 	of C++11 has allowed this (finally), due to the addition
 	(in C++11) of |unordered_map(3c++)|.
 
-	= 2025-01-27, David A­D­ Morano
+	= 2021-01-27, David A­D­ Morano
 	I am trying to turn this code into a C++ module.  Ya, we
 	will see how far that goes.  Turning code into a module is
 	pretty easy and straight forward (literally add a couple
@@ -22,7 +22,7 @@
 
 */
 
-/* Copyright © 2011,2025 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2011,2021 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -48,6 +48,8 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<utility>		/* |pair(3c++)| */
 #include	<unordered_map>
@@ -142,7 +144,6 @@ enum mapblockmems {
 	mapblockmem_overlast
 } ; /* end enum (mapblockmems) */
 
-export {
     template<typename K,typename B> struct mapblock_co {
 	typedef mapblock<K,B>	mb_t ;
 	mb_t		*op = nullptr ;
@@ -156,6 +157,8 @@ export {
 	    return operator () () ;
 	} ;
     } ; /* end struct (mapblock_co) */
+
+export {
     template<typename K,typename B> class mapblock {
 	friend mapblock_co<K,B> ;
 	std::unordered_map<K,B>			*mp = nullptr ;
@@ -188,11 +191,11 @@ export {
 	    return it ;
 	} ;
 	constexpr mapblock() noex {
-	    start(this,mapblockmem_start) ;
-	    finish(this,mapblockmem_finish) ;
-	    count(this,mapblockmem_count) ;
+	    start	(this,mapblockmem_start) ;
+	    finish	(this,mapblockmem_finish) ;
+	    count	(this,mapblockmem_count) ;
 	} ; /* end ctor) */
-	~mapblock() {
+	destruct mapblock() {
 	    if (mp) {
 	        delete mp ;
 		mp = nullptr ;
@@ -200,6 +203,8 @@ export {
 	} ; /* end dtor */
 	friend iterator ;
     } ; /* end class (mapblock) */
+} /* end export (mapblock) */
+
     template<typename K,typename B> int mapblock<K,B>::istart(int n) noex {
 	typedef decltype(std::nothrow)	nothrow_t ;
 	int		rs = SR_INVALID ;
@@ -287,7 +292,7 @@ export {
     template<typename K,typename B> int mapblock<K,B>::icount() noex {
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
-	    rs = mp->size() ;
+	    rs = intconv(mp->size()) ;
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (mapblock::icount) */
@@ -307,6 +312,5 @@ export {
 	} /* end switch */
 	return rs ;
     } /* end method (mapblock_co::operator) */
-} /* end export (mapblock) */
 
 

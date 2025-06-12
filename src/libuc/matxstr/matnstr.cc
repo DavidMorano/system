@@ -50,11 +50,11 @@
 #include	<usysdefs.h>
 #include	<nleadstr.h>
 #include	<mkchar.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"matxstr.h"
 
+import libutil ;
 
 /* local defines */
 
