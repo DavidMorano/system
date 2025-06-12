@@ -94,6 +94,7 @@
 
 #include	"tmz.hh"
 
+import libutil ;
 
 /* local defines */
 

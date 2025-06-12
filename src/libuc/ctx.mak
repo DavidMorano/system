@@ -2,7 +2,7 @@
 
 T= ctx
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -36,7 +35,8 @@ DEFS=
 
 INCS= ctx.h
 
-MODS += uvariables.ccm cvtdig.ccm 
+MODS += uconstants.ccm digtab.ccm cvtdig.ccm cvtfloat.ccm
+MODS += fmtflag.ccm
 
 LIBS=
 
@@ -47,7 +47,6 @@ LIBDIRS= -L${LIBDIR}
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -68,10 +67,8 @@ OBJ5_CTX= cta26.o
 OBJ6_CTX= ctroman.o ctwords.o
 OBJ7_CTX= cvtdig.o
 
-
 OBJA_CTX= obj0ctx.o obj1ctx.o obj2ctx.o obj3ctx.o
 OBJB_CTX= obj4ctx.o obj5ctx.o obj6ctx.o obj7ctx.o
-
 
 OBJ_CTX= obja_ctx.o objb_ctx.o
 
@@ -109,16 +106,9 @@ all:			$(ALL)
 $(T).o:			$(OBJ_CTX)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_CTX)
 
-$(T).a:			$(OBJ_CTX)
-	$(AR) $(ARFLAGS) -rc $@ $?
-
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
 	rm -f $(ALL)
@@ -175,12 +165,18 @@ ctxxx.o:		mods.o ctxxx.cc ctxxx.h		$(INCS)
 ctroman.o:		mods.o ctroman.cc ctroman.h	$(INCS)
 ctwords.o:		mods.o ctwords.cc ctwords.hh	$(INCS)
 
-MOBJ= uvariables.o cvtdig.o
+MOBJ += uconstants.o digtab.o cvtdig.o cvtfloat.o
+MOBJ += fmtflag.o
 
 mods.o:			$(MOBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
 
-variables.o:		uvariables.ccm
+variables.o:		uconstants.ccm
+digtab.o:		digtab.ccm
+
 cvtdig.o:		cvtdig.ccm 			$(INCS)
+cvtfloat.o:		cvtfloat.ccm 			$(INCS)
+
+fmtflag.o:		fmtflag.ccm			$(INCS)
 
 

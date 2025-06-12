@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-08-10, David A.D. Morano
+	= 1998-08-10, David A-D- Morano
 	This was written from scratch.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 

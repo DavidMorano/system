@@ -66,7 +66,7 @@ struct tmz_co {
 } ; /* end struct (tmz_co) */
 
 struct tmz {
-	char		*zname{} ;	/* dynamically alocated */
+	char		*zname{} ;	/* dynamically allocated */
 	tmz_co		clear ;
 	tmz_co		init ;
 	tmz_co		isset ;
@@ -100,8 +100,8 @@ struct tmz {
 	int	setzone(cchar *,int) noex ;
 	int	gettm(TM *) noex ;
 	void dtor() noex ;
-	~tmz() {
-	    dtor() ;
+	destruct tmz() {
+	    if (zname) dtor() ;
 	} ;
 } ; /* end struct (tmz) */
 
