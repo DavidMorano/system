@@ -18,7 +18,7 @@
 	I grabbed the previous version and modified it to use a
 	look-aside buffer for the entry-node structures.  This is
 	used instead of |malloc(3c)| to get and release node
-	strutures.  The look-aside manager uses |malloc(3c)| to
+	structures.  The look-aside manager uses |malloc(3c)| to
 	extend the look-aside entries.  Entries released back to the
 	look-aside manager are not given back to |malloc(3c)| (via
 	|free(3c)| at the present time -- not so easy to do).  Anyway,
@@ -105,8 +105,8 @@
 	c		the key-comparison function
 
 	Returns:
-	<0		error
 	>=0		OK
+	<0		error (system-return)
 
 	Note - for storing an item into the DB:
 
@@ -138,6 +138,7 @@
 
 #include	"hdb.h"
 
+import libutil ;
 
 /* local defines */
 

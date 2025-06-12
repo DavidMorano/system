@@ -31,8 +31,8 @@
 	op		pointer to object
 
 	Returns:
-	<0		error
 	>=0		number of group IDs returned
+	<0		error (system-return)
 
 	Notes:
 	We allocate dynamically rather than use NGROUPS_MAX.
@@ -172,10 +172,9 @@ int ids_copy(ids *op,const ids *otherp) noex {
 	    if ((rs = ids_ngids(otherp)) >= 0) {
 	        cint	n = rs ;
 	        int	sz = 0 ;
-	        void	*p{} ;
-	        sz += ((n + 1) * sizeof(gid_t)) ;
-	        if ((rs = uc_libmalloc(sz,&p)) >= 0) {
-	            int		i = 0 ; /* <- used afterwards */
+	        sz += intconv((n + 1) * sizeof(gid_t)) ;
+	        if (void *p ; (rs = uc_libmalloc(sz,&p)) >= 0) {
+	            int		i = 0 ; /* <- used-afterwards */
 		    op->gids = (gid_t *) p ;
 		    for (i = 0 ; otherp->gids[i] ; i += 1) {
 		        op->gids[i] = otherp->gids[i] ;

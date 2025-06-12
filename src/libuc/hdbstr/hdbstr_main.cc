@@ -34,7 +34,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<hdb.h>
 #include	<strwcpy.h>
@@ -43,6 +42,7 @@
 
 #include	"hdbstr.h"
 
+import libutil ;
 
 /* local defines */
 

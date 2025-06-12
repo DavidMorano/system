@@ -69,7 +69,7 @@ extern bool hasallbase(cchar *,int,int) noex ;
 extern bool hasallchr(cchar *,int,int) noex ;
 
 static inline bool hascontent(cchar *fp,int fl) noex {
-	return (! hasnotempty(fp,fl)) ;
+	return hasnotempty(fp,fl) ;
 }
 static inline bool hasfnamespecial(cchar *fp,int fl) noex {
 	return (matstr(stdfnames,fp,fl) >= 0) ;

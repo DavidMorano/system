@@ -311,11 +311,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>		/* |strlen(3c)| + |strcmp(3c)| */
-#include	<uvariables.hh>
-#include	<usupport.h>		/* |cstrlen(3u)| */
+#include	<cstring>		/* |strcmp(3c)| */
+#include	<usupport.h>		/* |cstrlen(3u)| + |xstrlen(3u)| */
 #include	<ascii.h>
 #include	<strn.h>
+#include	<syswords.hh>		/* *unused* - see |ulibvals(3u)| */
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
@@ -323,6 +323,7 @@
 
 #include	"hasx.h"
 
+import ulibvals ;			/* |ulibval(3u)| */
 
 /* local defines */
 
@@ -345,7 +346,7 @@ static bool	hasINET4Num(cchar *,int) noex ;
 
 /* local variables */
 
-static cint		maxbase = strlen(sysword.w_digtab) ;
+static cint		maxbase = ulibval.maxbase ;
 
 constexpr bool		f_hasnotdotswitch = CF_HASNOTDOTSWITCH ;
 

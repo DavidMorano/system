@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int densitysb_ctor(densitysb *op,Args ... args) noex {
+static int argmgr_ctor(argmgr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,26 @@ static int densitysb_ctor(densitysb *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (densitysb_ctor) */
+/* end subroutine (argmgr_ctor) */
 
-static int densitysb_dtor(densitysb *op) noex {
+static int argmgr_dtor(argmgr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (densitysb_dtor) */
+/* end subroutine (argmgr_dtor) */
 
 template<typename ... Args>
-static inline int densitysb_magic(densitysb *op,Args ... args) noex {
+static inline int argmgr_magic(argmgr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == DENSITYDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == ARGMGR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (densitysb_magic) */
+/* end subroutine (argmgr_magic) */
+
+
+
