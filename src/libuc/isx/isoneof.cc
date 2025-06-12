@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* test is an integer is one of a group of integers */
+/* test if an integer is one of a group of integers */
 /* version %I% last-modified %G% */
 
 
@@ -30,7 +30,7 @@
 
 	Arguments:
 	rets		array of (constant) integers to check against
-	rs		return-status from a file access
+	rs		value to test for in the array
 
 	Returns:
 	TRUE		matched
@@ -74,8 +74,7 @@
 bool isoneof(cint *a,int rs) noex {
 	bool		f = false ;
 	for (int i = 0 ; a[i] != 0 ; i += 1) {
-	    f = (rs == a[i]) ;
-	    if (f) break ;
+	    if ((f = (rs == a[i]))) break ;
 	} /* end if */
 	return f ;
 }

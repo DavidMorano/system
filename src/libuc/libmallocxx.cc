@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0		nominally -> (strlen(string) + 1)
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 

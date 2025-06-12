@@ -62,7 +62,7 @@ OBJ01= mailmsgmatx.o mailmsghdrx.o
 OBJ02= recip.o retpath.o envmat.o lkmail.o
 OBJ03= mhcom.o mcmsg.o comsatmsg.o mimetypes.o 
 
-OBJ04= ema.o emainfo.o comparse.o
+OBJ04= comparse.o
 OBJ05= mbcache.o contypevals.o contentencodings.o
 OBJ06= whitelist.o splitaddr.o csro.o
 OBJ07= filer_mailsup.o mailalias.o mailfiles.o
@@ -221,11 +221,6 @@ mailalias.dir:
 # MAILFILES
 mailfiles.o:		mailfiles.dir
 mailfiles.dir:
-	makesubdir $@
-
-# EMA
-ema.o:		ema.dir
-ema.dir:
 	makesubdir $@
 
 # HDRX

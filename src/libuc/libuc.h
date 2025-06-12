@@ -238,7 +238,6 @@
 #include	<spawner.h>
 #include	<spawnproc.h>
 #include	<spwdent.h>
-#include	<stdfnames.h>
 #include	<stdorder.h>
 #include	<storebuf.h>
 #include	<storeitem.h>
@@ -269,8 +268,8 @@
 #include	<strwcpy.h>
 #include	<strwcpyxc.h>
 #include	<strx.h>
-#include	<sysdbfname.h>
-#include	<sysdbfnames.h>
+#include	<sysdbfn.h>
+#include	<sysdbfiles.h>
 #include	<syshas.h>
 #include	<syshasutmpx.h>
 #include	<sysmemutil.h>
