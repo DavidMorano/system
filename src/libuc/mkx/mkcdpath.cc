@@ -1,6 +1,6 @@
 /* mkcdpath SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++11 */
+/* lang=C++20 (conformance reviewed) */
 
 /* try to make a prefix-variable path of type CDPATH */
 /* version %I% last-modified %G% */
@@ -33,55 +33,58 @@
 	pl		source path length
 
 	Returns:
-	<0		error
-	==0		no expansion
 	>0		expansion
+	==0		no expansion
+	<0		error (system-return)
 
 	Implementation note:
 	Yes, we do not add extra slash characters between components
-	of file paths (reasonably). And we are not ashamed of this
-	practice. We do not though, remove extra slashes that are
+	of file paths (reasonably).  And we are not ashamed of this
+	practice.  We do not though, remove extra slashes that are
 	already preent (although we could if we wanted, to be extra
 	smart about it).
 
 	Form:
 	¬[<varname>]/<path>
 
+	Given (for example):
+	CDPATH=/home/tools
+
 	Example:
 	¬/stage/daytime
 	¬cdpath/stage/daytime
 
+	Results:
+	/home/tools/stage/daytime
+	/home/tools/stage/daytime
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<new>
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>		/* |strnchr(3c)| */
+#include	<new>			/* |nothrow(3c++) */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
-#include	<strwcpy.h>
 #include	<storebuf.h>
 #include	<sfx.h>
 #include	<strn.h>
-#include	<isnot.h>
+#include	<strwcpy.h>
 #include	<mkchar.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
-import  uvariables ;
+#include	"mkx.h"
+
+import libutil ;
+import  uconstants ;
 
 /* local defines */
 
 #define	MKCDPATH_MP	(4*1024)
 
-#undef	CH_EXPAND
-#define	CH_EXPAND	MKCHAR('¬')
-
-#ifndef	VARCDPATH
-#define	VARCDPATH	"CDPATH"
-#endif
+#define	CH_OUREXPAND	MKCHAR('¬')
 
 
 /* external subroutines */
@@ -98,67 +101,76 @@ extern "C" cchar	*getenver(cchar *,int) noex ;
 /* local structures */
 
 namespace {
-    class mkcdpathsub {
-	int		vl = 0 ;
-	int		sl ;
-	int		bl = 0 ;
+    class mksub {
 	cchar		*plist = nullptr ;
 	cchar		*vp = nullptr ;
 	cchar		*sp ;
 	cchar		*bp = nullptr ;
 	char		*ebuf ;
+	int		vl = 0 ;
+	int		sl ;
+	int		bl = 0 ;
+	int		el = 0 ;
     public:
-	mkcdpathsub(char *abuf,cchar *asp,int asl) noex : sl(asl), sp(asp) {
+	mksub(char *abuf,cchar *asp,int asl) noex : sl(asl), sp(asp) {
 	    ebuf = abuf ;
 	    vp = sp ;
 	} ;
 	int getvarname() noex {
-	    cchar	*tp ;
-	    if ((tp = strnchr(sp,sl,'/')) != nullptr) {
+	    if (cchar *tp ; (tp = strnchr(sp,sl,'/')) != nullptr) {
 		vl = intconv(tp - sp) ;
 		sl -= intconv((tp + 1) - sp) ;
-		sp = (tp+1) ;
+		sp = (tp + 1) ;
 	    }
 	    return vl ;
 	} ;
 	int getplist() noex {
-	     int	rs = SR_OK ;
-	     if (vl > 0) {
-		char	*vn ;
-		if ((vn = new char [vl+1]) != nullptr) {
+	    cnothrow	nt{} ;
+	    cnullptr	np{} ;
+	    int		rs = SR_OK ;
+	    if (vl > 0) {
+		if (char *vn ; (vn = new(nt) char [vl+1]) != np) {
 		    strwcpyuc(vn,vp,vl) ;
 		    plist = getenver(vn,vl) ;
 		    delete [] vn ;
 		} else {
 		    rs = SR_NOMEM ;
 	 	} /* end if (m-a-f) */
-	     } else {
-		plist = getenv(varname.cdpath) ;
-	     }
-	     return rs ;
+	    } else {
+		static cchar	*vvp = getenv(varname.cdpath) ;
+		plist = vvp ;
+	    }
+	    return rs ;
 	} ;
 	int getbasename() noex {
 	    if ((bl = sfbasename(sp,sl,&bp)) > 0) {
-		sl = intconv(bp -sp - 1) ;
+		sl = intconv(bp - sp - 1) ;
 	    }
 	    return sl ;
 	} ;
-	int testpaths() noex ;
 	int testpath(cchar *,int) noex ;
 	int mkjoin(cchar *,int) noex ;
-	int mkresult(int) noex ;
-    } ; /* end class (mkcdpathsub) */
-}
+	int testpaths() noex ;
+	int mkresult() noex ;
+    } ; /* end class (mksub) */
+    typedef int (mksub::*mksub_m)() noex ;
+} /* end namespace */
 
 
 /* forward references */
-
-extern "C" int	mkcdpath(char *,cchar *,int) noex ;
 
 
 /* local variables */
 
 static bufsizevar	maxpathlen(getbufsize_mp,MKCDPATH_MP) ;
+
+static const mksub_m	mems[] = {
+    &mksub::getvarname,
+    &mksub::getplist,
+    &mksub::getbasename,
+    &mksub::testpaths,
+    &mksub::mkresult
+} ;
 
 
 /* exported variables */
@@ -167,25 +179,25 @@ static bufsizevar	maxpathlen(getbufsize_mp,MKCDPATH_MP) ;
 /* exported subroutines */
 
 int mkcdpath(char *ebuf,cchar *fp,int fl) noex {
+    	cnothrow	nt{} ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		el = 0 ;
 	if (ebuf && fp) {
-	    cint	ec = CH_EXPAND ;
+	    cint	ec = CH_OUREXPAND ;
 	    ebuf[0] = '\0' ;
 	    if (fl < 0) fl = cstrlen(fp) ;
 	    if ((fl > 0) && (mkchar(fp[0]) == ec)) {
-	        mkcdpathsub 	*sip = new mkcdpathsub(ebuf,(fp+1),(fl+1)) ;
-	        if ((rs = sip->getvarname()) >= 0) {
-		    if ((rs = sip->getplist()) >= 0) {
-		        if ((rs = sip->getbasename()) >= 0) {
-			    if ((rs = sip->testpaths()) > 0) {
-			        rs = sip->mkresult(rs) ;
-			        el = rs ;
-		            }
-		        }
-		    } /* end if (mkcdpathsub::getplist) */
-	        } /* end if (mkcdpathsub::getvarname) */
-	        delete sip ;
+		cint	sl = (fl + 1) ;
+		cchar	*sp = (fp + 1) ;
+	        if (mksub *sip ; (sip = new(nt) mksub(ebuf,sp,sl)) != np) {
+		    for (cauto &m : mems) {
+			rs = (sip->*m)() ;
+			if (rs <= 0) break ;
+		    } /* end for */
+		    el = rs ;
+	            delete sip ;
+		} /* end if (m-a-f) */
 	    } /* end if (have one) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? el : rs ;
@@ -195,10 +207,9 @@ int mkcdpath(char *ebuf,cchar *fp,int fl) noex {
 
 /* local srubroutines */
 
-int mkcdpathsub::testpaths() noex {
+int mksub::testpaths() noex {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
-	int		el = 0 ;
 	if (plist != nullptr) {
 	    int		pl = cstrlen(plist) ;
 	    cchar	*pp = plist ;
@@ -209,7 +220,7 @@ int mkcdpathsub::testpaths() noex {
 		    el = rs ;
 	        }
 		pl -= intconv((tp + 1) - pp) ;
-	        pp = (tp+1) ;
+	        pp = (tp + 1) ;
 		if (rs != 0) break ;
 	    } /* end for */
 	    if ((rs == 0) && (pl > 0)) {
@@ -219,50 +230,48 @@ int mkcdpathsub::testpaths() noex {
 	} /* end if (plist) */
 	return (rs >= 0) ? el : rs ;
 }
-/* end subroutine (mkcdpathsub::testpaths) */
+/* end subroutine (mksub::testpaths) */
 
-int mkcdpathsub::testpath(cchar *cp,int cl) noex {
+int mksub::testpath(cchar *cp,int cl) noex {
 	int		rs ;
-	int		el = 0 ;
 	if ((rs = mkjoin(cp,cl)) >= 0) {
-	    USTAT	sb ;
-	    el = rs ;
-	    if ((rs = u_stat(ebuf,&sb)) >= 0) {
-		rs = 0 ;
+	    cint	jl = rs ;
+	    if (USTAT sb ; (rs = u_stat(ebuf,&sb)) >= 0) {
+		if (S_ISDIR(sb.st_mode)) {
+		    rs = jl ;
+		} else {
+		    rs = SR_OK ;
+		}
 	    } else if (isNotPresent(rs)) {
-		el = 0 ;
 		rs = SR_OK ;
 	    }
 	} /* end if (mkjoin) */
-	return (rs >= 0) ? el : rs ;
+	return rs ;
 }
-/* end subroutine (mkcdpathsub::testpath) */
+/* end subroutine (mksub::testpath) */
 
-int mkcdpathsub::mkjoin(cchar *cp,int cl) noex {
+int mksub::mkjoin(cchar *cp,int cl) noex {
 	int		rs ;
-	int		el = 0 ;
+	int		len = 0 ;
 	if ((rs = maxpathlen) >= 0) {
-	    cint		elen = rs ;
-	    if (rs >= 0) {
-	        rs = storebuf_strw(ebuf,elen,el,cp,cl) ;
-	        el += rs ;
-	    }
-	    if ((rs >= 0) && el && (ebuf[el-1] != '/')) {
-	        rs = storebuf_chr(ebuf,elen,el,'/') ;
-	        el += rs ;
-	    }
-	    if (rs >= 0) {
-	        rs = storebuf_strw(ebuf,elen,el,sp,sl) ;
-	        el += rs ;
+	    storebuf	sb(ebuf,rs) ;
+	    if ((rs = sb.strw(cp,cl)) >= 0) {
+	        if ((rs > 0) && (ebuf[rs - 1] != '/')) {
+	            rs = sb.chr('/') ;
+		}
+	        if (rs >= 0) {
+	            rs = sb.strw(sp,sl) ;
+		    len = sb.idx ;
+		}
 	    }
 	} /* end if (maxpathlen) */
-	return (rs >= 0) ? el : rs ;
+	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (mkcdpathsub::mkjoin) */
+/* end subroutine (mksub::mkjoin) */
 
-int mkcdpathsub::mkresult(int el) noex {
+int mksub::mkresult() noex {
 	return pathaddw(ebuf,el,bp,bl) ;
 }
-/* end subroutine (mkcdpathsub::mkresult) */
+/* end subroutine (mksub::mkresult) */
 
 

@@ -56,7 +56,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ema.h>
@@ -65,6 +64,7 @@
 
 #include	"mkx.h"
 
+import libutil ;
 
 /* local defines */
 

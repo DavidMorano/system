@@ -69,6 +69,9 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 
@@ -85,9 +88,8 @@ int mkaddrbest(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (rbuf && abuf) {
-	    ema		a ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = ema_start(&a)) >= 0) {
+	    if (ema a ; (rs = ema_start(&a)) >= 0) {
 	        if ((rs = ema_parse(&a,abuf,alen)) >= 0) {
 	            ema_ent	*ep ;
 	            for (int i = 0 ; ema_get(&a,i,&ep) >= 0 ; i += 1) {
@@ -107,9 +109,8 @@ int mkaddrbest(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	                        }
 			    }
 	                    if (sl > 0) {
-			        int	al ;
 			        cchar	*ap ;
-			        if ((al = sfshrink(sp,sl,&ap)) > 0) {
+			        if (int al ; (al = sfshrink(sp,sl,&ap)) > 0) {
 	                            rs = snwcpy(rbuf,rlen,ap,al) ;
 	                            len = rs ;
 			        }

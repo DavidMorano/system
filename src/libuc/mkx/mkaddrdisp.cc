@@ -43,7 +43,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<field.h>
 #include	<sbuf.h>
@@ -51,6 +51,7 @@
 
 #include	"mkx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -62,6 +63,9 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -81,7 +85,7 @@ using std::nullptr_t ;			/* type */
 
 /* local variables */
 
-constexpr bool	f_nonstandard = CF_NONSTANDARD ;
+cbool		f_nonstandard = CF_NONSTANDARD ;
 
 
 /* exported variables */
@@ -94,16 +98,16 @@ int mkaddrdisp(char *abuf,int alen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (abuf && sp) {
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (sbuf b ; (rs = b.start(abuf,alen)) >= 0) {
 	        cint	flen = sl ;
 	        if (char *fbuf ; (rs = uc_malloc((flen+1),&fbuf)) >= 0) {
-	            if (field fsb ; (rs = field_start(&fsb,sp,sl)) >= 0) {
+	            if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
 			cnullptr	np{} ;
-	                cchar		*fp = fbuf ;
 	                int		fl ;
 	                int		c = 0 ;
-	                while ((fl = field_sharg(&fsb,np,fbuf,flen)) >= 0) {
+	                while ((fl = fsb.sharg(np,fbuf,flen)) >= 0) {
+	                    cchar	*fp = fbuf ;
 	                    if (fl > 0) {
 				if_constexpr (f_nonstandard) {
 	                            if (c++ > 0) {
@@ -116,12 +120,12 @@ int mkaddrdisp(char *abuf,int alen,cchar *sp,int sl) noex {
 			    } /* end if (non-zero positive) */
 	                    if (rs < 0) break ;
 	                } /* end while */
-	                rs1 = field_finish(&fsb) ;
+	                rs1 = fsb.finish ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (field) */
 	            rs1 = uc_free(fbuf) ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (memory allocation) */
+	        } /* end if (m-a-f) */
 	        len = b.finish ;
 	        if (rs >= 0) rs = len ;
 	    } /* end if (sbuf) */
