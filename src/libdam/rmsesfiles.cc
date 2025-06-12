@@ -8,11 +8,11 @@
 
 /* revision history:
 
-	= 1998-03-01, David A­D­ Morano
+	= 1998-03-01, David A-D- Morano
 	This subroutine was written for Rightcore Network Services
 	(RNS).
 
-	= 2018-07-02 David A.D. Morano
+	= 2018-07-02 David A-D- Morano
 	Enhanced for slightly better error checking on PID values.
 
 */

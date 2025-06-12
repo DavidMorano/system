@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 2008-09-01, David A­D­ Morano
-	This code was originally written.
+	This subroutine was originally written.
 
 */
 
