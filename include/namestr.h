@@ -58,8 +58,9 @@ struct namestr : namestr_head {
 	namestr_co	skipwhite ;
 	namestr_co	finish ;
 	namestr() noex {
-	    skipwhite(this,namestrmem_skipwhite) ;
-	    finish(this,namestrmem_finish) ;
+	    skipwhite	(this,namestrmem_skipwhite) ;
+	    finish	(this,namestrmem_finish) ;
+	    strp = nullptr ;
 	} ;
 	namestr(const namestr &) = delete ;
 	namestr &operator = (const namestr &) = delete ;
@@ -67,8 +68,8 @@ struct namestr : namestr_head {
 	int next(cchar **,int *,int *) noex ;
 	int brk(cchar *,cchar **) noex ;
 	void dtor() noex ;
-	~namestr() {
-	    dtor() ;
+	destruct namestr() {
+	    if (strp) dtor() ;
 	} ;
 } ; /* end struct (namestr) */
 #else	/* __cplusplus */
