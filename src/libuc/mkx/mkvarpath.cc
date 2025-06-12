@@ -33,9 +33,9 @@
 	pl		source path length
 
 	Returns:
-	<0		error
-	==0		no expansion
 	>0		expansion
+	==0		no expansion
+	<0		error (system-return)
 
 	Example:
 	Given a CDPARH variable of:
@@ -50,7 +50,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
@@ -64,6 +63,7 @@
 
 #include	"mkx.h"
 
+import libutil ;
 
 /* local defines */
 

@@ -114,7 +114,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |strlen(3c)| */
 #include	<algorithm>
 #include	<usystem.h>
 #include	<strnxchr.h>
@@ -122,6 +121,7 @@
 
 #include	"mkutmpid.h"
 
+import libutil ;
 
 /* local defines */
 

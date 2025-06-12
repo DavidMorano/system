@@ -47,7 +47,6 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<clanguage.h>
@@ -62,6 +61,7 @@
 
 #include	"mkx.h"
 
+import libutil ;
 
 /* local defines */
 

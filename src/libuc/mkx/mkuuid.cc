@@ -58,7 +58,7 @@
 #include	<climits>		/* |UINT_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* <- for |memclear| */
+#include	<usystem.h>
 #include	<mallocxx.h>
 #include	<getnodename.h>
 #include	<getrand.h>
@@ -68,6 +68,7 @@
 
 #include	"mkuuid.h"
 
+import libutil ;
 
 /* local defines */
 

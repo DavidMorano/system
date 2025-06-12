@@ -44,6 +44,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<mkpathxw.h>
+#include	<localmisc.h>
 
 #include	"mkx.h"
 

@@ -59,15 +59,16 @@ OBJ2_SNX= snfilemode.o snflags.o snfsflags.o sninetaddr.o
 OBJ3_SNX= snkeyval.o snloadavg.o snopenflags.o snpollflags.o
 OBJ4_SNX= snrealname.o snshellunder.o snsigabbr.o sntid.o
 OBJ5_SNX= sntmtime.o snuuid.o snxxx.o snwprintf.o
+OBJ6_SNX= snaddslash.o snclean.o
 
-OBJA_SNX= obj0_sfx.o obj1_sfx.o
-OBJB_SNX= obj2_sfx.o obj3_sfx.o
-OBJC_SNX= obj4_sfx.o obj5_sfx.o
+OBJA_SNX= obj0_snx.o obj1_snx.o
+OBJB_SNX= obj2_snx.o obj3_snx.o
+OBJC_SNX= obj4_snx.o obj5_snx.o obj6_snx.o
 
 OBJ_SNX= obja.o objb.o objc.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -93,9 +94,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_SNX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_SNX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -115,45 +119,49 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_sfx.o:		$(OBJ0_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SNX)
+obj0_snx.o:		$(OBJ0_SNX) $(INCS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_SNX)
 
-obj1_sfx.o:		$(OBJ1_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SNX)
+obj1_snx.o:		$(OBJ1_SNX) $(INCS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_SNX)
 
-obj2_sfx.o:		$(OBJ2_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SNX)
+obj2_snx.o:		$(OBJ2_SNX) $(INCS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_SNX)
 
-obj3_sfx.o:		$(OBJ3_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SNX)
+obj3_snx.o:		$(OBJ3_SNX) $(INCS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_SNX)
 
-obj4_sfx.o:		$(OBJ4_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SNX)
+obj4_snx.o:		$(OBJ4_SNX) $(INCS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_SNX)
 
-obj5_sfx.o:		$(OBJ5_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_SNX)
+obj5_snx.o:		$(OBJ5_SNX) $(INCS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_SNX)
+
+obj6_snx.o:		$(OBJ6_SNX) $(INCS)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6_SNX)
 
 
 obja.o:			$(OBJA_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_SNX)
 
 objb.o:			$(OBJB_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_SNX)
 
 objc.o:			$(OBJC_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_SNX)
 
 
-snuuid.o:		snuuid.cc		$(INCS)
-sntid.o:		sntid.cc		$(INCS)
-snerrabbr.o:		snerrabbr.cc		$(INCS)
-sntmtime.o:		sntmtime.cc sntmtime.h	$(INCS)
-snadd.o:		snadd.cc snadd.h	$(INCS)
-snaddw.o:		snaddw.cc snaddw.h	$(INCS)
-snwprintf.o:		snwprintf.cc		$(INCS)
-snclean.o:		snclean.cc snclean.h	$(INCS)
-sncpyx.o:		sncpyx.cc sncpyx.h	$(INCS)
-sncpyxw.o:		sncpyxw.cc sncpyxw.h	$(INCS)
-sncpyxc.o:		sncpyxc.cc sncpyxc.h	$(INCS)
+snuuid.o:		snuuid.cc			$(INCS)
+sntid.o:		sntid.cc			$(INCS)
+snerrabbr.o:		snerrabbr.cc			$(INCS)
+sntmtime.o:		sntmtime.cc sntmtime.h		$(INCS)
+snadd.o:		snadd.cc snadd.h		$(INCS)
+snaddw.o:		snaddw.cc snaddw.h		$(INCS)
+snaddslash.o:		snaddslash.cc snaddslash.h	$(INCS)
+snwprintf.o:		snwprintf.cc			$(INCS)
+snclean.o:		snclean.cc snclean.h		$(INCS)
+sncpyx.o:		sncpyx.cc sncpyx.h		$(INCS)
+sncpyxw.o:		sncpyxw.cc sncpyxw.h		$(INCS)
+sncpyxc.o:		sncpyxc.cc sncpyxc.h		$(INCS)
 
 
