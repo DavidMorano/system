@@ -234,21 +234,4 @@ proginfo.o:		proginfo.c defs.h
 
 proginfo_setpiv.o:	proginfo_setpiv.c defs.h
 
-progname.o:		progname.c $(INCS)
-
-checkname.o:		checkname.c $(INCS)
-
-checklink.o:		checklink.c $(INCS)
-
-removename.o:		removename.c removename.h vecpstr.h
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c vecstr.h
-
-vecstr_env.o:		vecstr_env.c vecstr.h
-
-vecstr.o:		vecstr.c vecstr.h
-
-vecpstr.o:		vecpstr.c vecpstr.h
-
 

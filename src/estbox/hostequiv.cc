@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	- David A.D. Morano, 96/11/21
+	- David A-D- Morano, 96/11/21
 
 	This program was started by copying from the RSLOW program.
 
 
-	- David A.D. Morano, 96/12/12
+	- David A-D- Morano, 96/12/12
 
 	I modified the program to take the username and password
 	from a specified file (for better security).

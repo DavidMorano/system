@@ -6,12 +6,12 @@
 
 /* revision history:
 
-	= 1997-02-17, David A.D. Morano
+	= 1997-02-17, David A-D- Morano
 	Originally written for some systems without this.
 
 */
 
-/* Copyright (c) 2997 David A.D. Morano. All rights reserved. */
+/* Copyright (c) 2997 David A-D- Morano. All rights reserved. */
 
 #include	<envstandards.h>
 #include	<sys/types.h>
