@@ -1,0 +1,13 @@
+SYSDBFNAME
+
+#include	<sysdbfname.h>
+
+
+	int		rs ;
+	cchafr		*fname = "xxx" ;
+	if (cchar *fn{} ; (rs = sysdbfnameget(sysdbfname_pw,fname,&fn)) >= 0) {
+		ts = to.open(fn) ;
+	}
+	return rs ;
+
+
