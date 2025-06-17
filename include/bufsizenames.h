@@ -1,5 +1,5 @@
 /* bufsizenames HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* list the various system buffer-size names (as strings) */

@@ -1,5 +1,5 @@
 /* bufsizevar HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* this provides a variable with a buffer-size */
