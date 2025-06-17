@@ -1,5 +1,5 @@
 /* constdiv MODULE */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform division of a 32-bit value by a constant w/o using division */
