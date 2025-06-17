@@ -1,5 +1,5 @@
 /* bellmanford-2 HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* Bellman-Ford algorithm for shortest path through graph */

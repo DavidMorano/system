@@ -1,5 +1,5 @@
 /* babieshdr HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* header management for BABIES shared-memory segment */
