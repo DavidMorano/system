@@ -1,5 +1,5 @@
 /* cfjulian HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* convert from an elapsed time format to a time-type value */
