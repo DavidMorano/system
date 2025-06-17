@@ -1,5 +1,5 @@
 /* acctab HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* perform access-table file related functions */
