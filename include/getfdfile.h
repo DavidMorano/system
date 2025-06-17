@@ -1,5 +1,5 @@
 /* getfdfile HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* try to divine a file-descriptor out of a file-name */

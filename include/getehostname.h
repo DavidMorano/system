@@ -1,5 +1,5 @@
 /* gethehostname HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* get a HOSTENT for a given INET name */
