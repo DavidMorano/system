@@ -1,5 +1,5 @@
 /* cyihdr HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* Calendar-Year-Index DB header (text-index for CYI-INDEX file) */
