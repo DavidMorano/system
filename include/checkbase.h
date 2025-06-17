@@ -1,5 +1,5 @@
 /* checkbase HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* test whether a string is composed of all characters of a given base */
