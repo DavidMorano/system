@@ -1,5 +1,5 @@
 /* ctdec HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutines to convert an integer to a decimal string */
