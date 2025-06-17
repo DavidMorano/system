@@ -1,5 +1,5 @@
 /* bvses HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* access manager interface to a Bible Verse Structure DB */
