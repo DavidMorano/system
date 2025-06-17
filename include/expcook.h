@@ -1,5 +1,5 @@
 /* expcook HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* Expand-Cookie - creates the substitution variables for cookie escapes */

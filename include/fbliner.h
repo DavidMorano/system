@@ -1,5 +1,5 @@
 /* fbliner HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* file-buf (now FILER) file-read line handling */
