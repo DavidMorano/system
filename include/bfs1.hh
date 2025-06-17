@@ -1,5 +1,5 @@
 /* bfs-1 HEADER (Breath-First-Search-1) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* Dijkstra (shortest path through graph) */
