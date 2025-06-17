@@ -1,5 +1,5 @@
 /* epsem HEADER (emulated POSIX® Semaphore) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* unnamed POSIX© Semaphore (EPSEM) */
