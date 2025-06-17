@@ -1,5 +1,5 @@
 /* getclustername HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* get the cluster-name of the current machine cluster */
