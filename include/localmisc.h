@@ -1,5 +1,5 @@
 /* localmisc HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* miscellaneous stuff which essentially every program wants! */
