@@ -1,5 +1,5 @@
 /* mailmsghdrs HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* put all of the mail-message header values of a message into an array */
