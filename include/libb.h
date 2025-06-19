@@ -1,5 +1,5 @@
 /* bfile HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* header file for the Basic I-O library package */
