@@ -1,5 +1,5 @@
 /* getuserorg HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* get the best approximation of the username of the current user */
