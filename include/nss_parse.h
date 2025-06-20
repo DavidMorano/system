@@ -1,4 +1,5 @@
 /* nss_parse HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* Name-Server-Switch (NSS) database parsing support */
