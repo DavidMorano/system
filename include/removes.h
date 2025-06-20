@@ -1,25 +1,26 @@
-/* rmdirs HEADER */
+/* removes HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* make a series of possibly hierarchical directories */
+/* convert a single character to a given case */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-04-10, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	RMDIRS_INCLUDE
-#define	RMDIRS_INCLUDE
+#ifndef	REMOVES_INCLUDE
+#define	REMOVES_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<limits.h>		/* |UCHAR_MAX| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -29,16 +30,11 @@
 
 EXTERNC_begin
 
-extern int removes(cchar *) noex ;
-extern int rmdirfiles(cchar *,cchar *,int) noex ;
-
-static inline int rmdirs(cchar *dn) noex {
-	return removes(dn) ;
-}
+extern int	removes(cchar *) noex ;
 
 EXTERNC_end
 
 
-#endif /* RMDIRS_INCLUDE */
+#endif /* REMOVES_INCLUDE */
 
 
