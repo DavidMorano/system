@@ -1,5 +1,5 @@
 /* serialbuf HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* object that serializes various types into a given buffer */
