@@ -1,5 +1,5 @@
 /* ng HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* search (and other things) a newsgroup list for a newsgroup name */
