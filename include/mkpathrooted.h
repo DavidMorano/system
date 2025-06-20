@@ -1,5 +1,5 @@
 /* mkpathrooted HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* make a file rooted from the present-working-directory (PWD) */
