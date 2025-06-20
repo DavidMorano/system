@@ -1,8 +1,8 @@
-/* strnwcpyxc HEADER */
+/* strnxbrk HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* string-copy variant */
+/* find a character in a counted c-string */
 /* version %I% last-modified %G% */
 
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRNWCPYXC_INCLUDE
-#define	STRNWCPYXC_INCLUDE
+#ifndef	STRNXBRK_INCLUDE
+#define	STRNXBRK_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -28,14 +28,20 @@
 
 EXTERNC_begin
 
-extern char	* strnwcpybc (char *,int,cchar *,int) noex ;
-extern char	* strnwcpylc (char *,int,cchar *,int) noex ;
-extern char	* strnwcpyuc (char *,int,cchar *,int) noex ;
-extern char	* strnwcpyfc (char *,int,cchar *,int) noex ;
+extern char *strnobrk(cchar *,int,cchar *) noex ;
+extern char *strnrbrk(cchar *,int,cchar *) noex ;
+
+static inline char *strnbrk(cchar *sp,int sl,cchar *ss) noex {
+	return strnobrk(sp,sl,ss) ;
+}
+
+static inline char *strnpbrk(cchar *sp,int sl,cchar *ss) noex {
+	return strnobrk(sp,sl,ss) ;
+}
 
 EXTERNC_end
 
 
-#endif /* STRNWCPYXC_INCLUDE */
+#endif /* STRNXBRK_INCLUDE */
 
 
