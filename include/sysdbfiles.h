@@ -1,5 +1,5 @@
 /* sysdbfiles HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* standard byte-order serializations */

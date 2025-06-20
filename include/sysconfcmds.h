@@ -1,5 +1,5 @@
 /* sysconfcmds HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* system-configuation-commands */
@@ -53,6 +53,7 @@ enum sysconfcmds {
     sysconfcmd_maxpath,
     sysconfcmd_maxusername,
     sysconfcmd_maxgroupname,
+    sysconfcmd_maxprojectname,
     sysconfcmd_maxnodename,
     sysconfcmd_maxhostname,
     sysconfcmd_maxmailaddr,
@@ -83,19 +84,26 @@ enum sysconfcmds {
 #ifndef	_SC_GROUPNAME_MAX
 #define	_SC_GROUPNAME_MAX	sysconfcmd_maxgroupname
 #endif
-#ifndef	_SC_HOST_NAME_MAX	/* really the node-name length */
-#define	_SC_HOST_NAME_MAX	sysconfcmd_maxnodename
+#ifndef	_SC_PROJECTNAME_MAX
+#define	_SC_PROJECTNAME_MAX	sysconfcmd_maxprojectname
 #endif
+
 #ifndef	_SC_NODENAME_MAX
-#ifdef	_SC_HOST_NAME_MAX	/* really the node-name length */
-#define	_SC_NODENAME_MAX	_SC_HOST_NAME_MAX
-#else
 #define	_SC_NODENAME_MAX	sysconfcmd_maxnodename
-#endif
 #endif /* _SC_NODENAME_MAX */
+
 #ifndef	_SC_HOSTNAME_MAX
+#ifdef	_SC_HOST_NAME_MAX	/* really the node-name length */
+#define	_SC_HOSTNAME_MAX	_SC_HOST_NAME_MAX
+#else
 #define	_SC_HOSTNAME_MAX	sysconfcmd_maxhostname
 #endif
+#endif /* _SC_HOSTNAME_MAX */
+
+#ifndef	_SC_HOST_NAME_MAX	/* really the node-name length */
+#define	_SC_HOST_NAME_MAX	sysconfcmd_maxhostname
+#endif /* _SC_HOST_NAME_MAX */
+
 #ifndef	_SC_GETPW_R_SIZE_MAX
 #define	_SC_GETPW_R_SIZE_MAX	sysconfcmd_pwent
 #endif
