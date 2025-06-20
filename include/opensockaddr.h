@@ -1,5 +1,5 @@
 /* opensockaddr HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* open a connection to a socket by a SOCKADDR */
