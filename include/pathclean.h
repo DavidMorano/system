@@ -1,5 +1,5 @@
 /* pathclean HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* add a c-string to the end of an existing path c-string */
