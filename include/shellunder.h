@@ -1,5 +1,5 @@
 /* shellunder HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* parse a c-string into the shell-under information components */

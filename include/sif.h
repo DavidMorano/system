@@ -1,8 +1,8 @@
-/* sifext HEADER */
+/* sif HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
-/* determine if file-name (just a string) has an approved file-extension */
+/* String-Interate-Find (SIF) object */
 /* version %I% last-modified %G% */
 
 
@@ -15,11 +15,14 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	SIFEXT_INCLUDE
-#define	SIFEXT_INCLUDE
+#ifndef	SIF_INCLUDE
+#define	SIF_INCLUDE
+#ifdef	__cplusplus
 
 
-#include	<envstandards.h>	/* MUST be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -27,13 +30,7 @@
 #include	<usysrets.h>
 
 
-EXTERNC_begin
-
-extern int	sifext(cchar *,int,mainv) noex ;
-
-EXTERNC_end
-
-
-#endif /* SIFEXT_INCLUDE */
+#endif /* __cplusplus */
+#endif /* SIF_INCLUDE */
 
 
