@@ -1,5 +1,5 @@
 /* ndigit HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* calculate the number of digits in a given integer given a number-base */
