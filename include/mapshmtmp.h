@@ -1,5 +1,5 @@
 /* mapshmtmp HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* map shared-mmemory temporary segment */
