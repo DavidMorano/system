@@ -1,5 +1,5 @@
 /* opentmp HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* open a tempoary file (one that is removed immediately) */
