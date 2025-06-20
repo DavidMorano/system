@@ -1,5 +1,5 @@
 /* splitfname HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* split a file-name into its 'dirname" and its 'basename' */
