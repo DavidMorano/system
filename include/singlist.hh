@@ -1,5 +1,5 @@
 /* singlist HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++98 */
 
 /* regular (no-frills) singly-linked pointer queue (not-circular) */

@@ -1,5 +1,5 @@
 /* six HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* string-index operations */
@@ -27,6 +27,8 @@
 #include	<usysrets.h>
 
 #include	<sifext.h>
+#include	<siwht.h>
+#include	<sixbrk.h>
 
 
 EXTERNC_begin
@@ -34,6 +36,7 @@ EXTERNC_begin
 extern int siochr(cchar *,int,int) noex ;
 extern int sirchr(cchar *,int,int) noex ;
 extern int sicasechr(cchar *,int,int) noex ;
+extern int sifield(cchar *,int,int) noex ;
 
 extern int sialpha(cchar *,int) noex ;
 extern int sidigit(cchar *,int) noex ;
@@ -50,7 +53,6 @@ extern int sinonoct(cchar *,int) noex ;
 extern int sinondec(cchar *,int) noex ;
 extern int sinonhex(cchar *,int) noex ;
 
-extern int sibreak(cchar *,int,cchar *) noex ;
 extern int sispan(cchar *,int,cchar *) noex ;
 extern int sicite(cchar *,int,cchar *,int) noex ;
 extern int siterm(cchar *,int,cchar *) noex ;
@@ -59,14 +61,17 @@ extern int sibasesub(cchar *,int,cchar *) noex ;
 extern int sicasesub(cchar *,int,cchar *) noex ;
 extern int sifoldsub(cchar *,int,cchar *) noex ;
 
-static inline int sisub(cchar *sp,int sl,cchar *ss) noex {
-	return sibasesub(sp,sl,ss) ;
-}
 static inline int sichr(cchar *sp,int sl,int sch) noex {
 	return siochr(sp,sl,sch) ;
 }
 static inline int sibrk(cchar *sp,int sl,cchar *ss) noex {
-	return sibreak(sp,sl,ss) ;
+    	return siobrk(sp,sl,ss) ;
+}
+static inline int sibreak(cchar *sp,int sl,cchar *ss) noex {
+	return sibrk(sp,sl,ss) ;
+}
+static inline int sisub(cchar *sp,int sl,cchar *ss) noex {
+	return sibasesub(sp,sl,ss) ;
 }
 
 EXTERNC_end
