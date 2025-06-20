@@ -1,5 +1,5 @@
 /* mkchar HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* make a character (8-bit) out of an integer */
@@ -35,11 +35,18 @@
 
 
 #ifndef	MKCHAR
-#define	MKCHAR(ch)	mkchar(ch)
+#define	MKCHAR(ch)	(ch & UCHAR_MAX)
 #endif /* MKCHAR */
 
 
-#ifdef	__cplusplus
+#ifdef	MODULE
+
+extern int mkchar(int ch) noex {
+	return (ch & UCHAR_MAX) ;
+}
+
+#else /* MODULE */
+#if	defined(__cplusplus)
 
 constexpr inline int mkchar(int ch) noex {
 	return (ch & UCHAR_MAX) ;
@@ -53,6 +60,7 @@ static inline int mkchar(int ch) noex {
 }
 
 #endif /* _cplusplus */
+#endif /* MODULE */
 
 
 #endif /* MKCHAR_INCLUDE */
