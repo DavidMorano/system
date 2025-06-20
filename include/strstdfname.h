@@ -1,5 +1,5 @@
 /* strstdfname HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* return a c-string for a standard filename */
