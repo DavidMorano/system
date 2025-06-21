@@ -61,9 +61,9 @@ struct mailalias_information {
 
 struct mailalias_finfo {
 	ino_t		ino ;
-	dev_t		dev ;
 	time_t		mtime ;
 	size_t		fsize ;
+	dev_t		dev ;
 } ;
 
 struct mailalias_flags {

@@ -13,11 +13,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<usystem.h>		/* for |ino_t| */
+#include	<time.h>		/* |time_t| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 #include	<keyvals.h>
-#include	<localmisc.h>
 
 
 #define	MXALIAS		struct mxalias_head

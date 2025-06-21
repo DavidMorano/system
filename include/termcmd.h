@@ -1,5 +1,5 @@
 /* termcmd HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* clear out the TERMCMD object */

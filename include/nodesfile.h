@@ -30,8 +30,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<fcntl.h>		/* |ino_t| + |dev_t| */
 #include	<time.h>		/* |time_t| */
 #include	<usystem.h>
 #include	<vechand.h>
