@@ -1,5 +1,5 @@
 /* userports HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* query the USERPOTS database for entries */
@@ -44,8 +44,8 @@ struct userports_flags {
 
 struct userports_file {
 	ino_t		ino ;
-	dev_t		dev ;
 	time_t		mtime ;
+	dev_t		dev ;
 } ;
 
 struct userports_head {
