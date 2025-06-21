@@ -1,5 +1,5 @@
 /* vecstr HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* vector-string container (Vector-String) */
@@ -160,9 +160,10 @@ struct vecstr_iter {
 	    return rp ;
 	} ;
 	vecstr_iter operator + (int) const noex ;
-	vecstr_iter operator += (int) noex ;
+	vecstr_iter &operator += (int) noex ;
 	vecstr_iter operator ++ () noex ; /* pre */
 	vecstr_iter operator ++ (int) noex ; /* post */
+    private:
 	void increment(int = 1) noex ;
 } ; /* end struct vecstr_iter) */
 struct vecstr ;
@@ -196,6 +197,7 @@ struct vecstr : vecstr_head {
 	    cksize(this,vecstrmem_cksize) ;
 	    audit(this,vecstrmem_audit) ;
 	    finish(this,vecstrmem_finish) ;
+	    va = nullptr ;
 	} ;
 	vecstr(const vecstr &) = delete ;
 	vecstr &operator = (const vecstr &) = delete ;

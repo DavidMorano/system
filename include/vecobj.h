@@ -1,5 +1,5 @@
 /* vecobj HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* vector-object */
@@ -140,10 +140,11 @@ struct vecobj : vecobj_head {
 	vecobj_co	audit ;
 	vecobj_co	finish ;
 	vecobj() noex {
-	    count(this,vecobjmem_count) ;
-	    delall(this,vecobjmem_delall) ;
-	    audit(this,vecobjmem_audit) ;
-	    finish(this,vecobjmem_finish) ;
+	    count	(this,vecobjmem_count) ;
+	    delall	(this,vecobjmem_delall) ;
+	    audit	(this,vecobjmem_audit) ;
+	    finish	(this,vecobjmem_finish) ;
+	    va = nullptr ;
 	} ;
 	vecobj(const vecobj &) = delete ;
 	vecobj &operator = (const vecobj &) = delete ;
@@ -160,7 +161,7 @@ struct vecobj : vecobj_head {
 	void dtor() noex ;
 	operator int () noex ;
 	destruct vecobj() {
-	    dtor() ;
+	    if (va) dtor() ;
 	} ;
 } ; /* end struct (vecobj) */
 #else	/* __cplusplus */

@@ -1,5 +1,5 @@
 /* vecsorthand HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* vector of sorted handles */
@@ -108,9 +108,10 @@ struct vecsorthand : vecsorthand_head {
 	vecsorthand_co	del ;
 	vecsorthand_co	finish ;
 	vecsorthand() noex {
-	    count(this,vecsorthandmem_count) ;
-	    del(this,vecsorthandmem_del) ;
-	    finish(this,vecsorthandmem_finish) ;
+	    count	(this,vecsorthandmem_count) ;
+	    del		(this,vecsorthandmem_del) ;
+	    finish	(this,vecsorthandmem_finish) ;
+	    va = nullptr ;
 	} ;
 	vecsorthand(const vecsorthand &) = delete ;
 	vecsorthand &operator = (const vecsorthand &) = delete ;
@@ -130,7 +131,7 @@ struct vecsorthand : vecsorthand_head {
 	void dtor() noex ;
 	operator int () noex ;
 	destruct vecsorthand() {
-	    dtor() ;
+	    if (va) dtor() ;
 	} ;
 } ; /* end struct (vecsorthand) */
 #else	/* __cplusplus */
