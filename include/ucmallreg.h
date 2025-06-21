@@ -1,5 +1,5 @@
 /* ucmallreg HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* support object for UNIX® C-language library Memory-Allocation management */
