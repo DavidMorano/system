@@ -1,5 +1,5 @@
 /* usupport HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® kernel support subroutines */
@@ -143,6 +143,11 @@ namespace libu {
     }
 } /* end namespace (libu) */
 namespace libu {
+    extern int cfdec(cchar *,int,int *) noex ;
+    extern int cfdec(cchar *,int,long *) noex ;
+    extern int cfdec(cchar *,int,longlong *) noex ;
+}
+namespace libu {
     extern int ctdecui(char *,int,uint) noex ;
     extern int ctdecul(char *,int,ulong) noex ;
     extern int ctdecull(char *,int,ulonglong) noex ;
@@ -163,11 +168,6 @@ namespace libu {
     extern int ustrftime(char *,int,cchar *,CTM *) noex ;
     extern int uitimer_get(int,ITIMERVAL *) noex ;
     extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
-}
-namespace libu {
-    extern int cfdec(cchar *,int,int *) noex ;
-    extern int cfdec(cchar *,int,long *) noex ;
-    extern int cfdec(cchar *,int,longlong *) noex ;
 }
 #endif /* __cplusplus */
 
