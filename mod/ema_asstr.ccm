@@ -1,5 +1,5 @@
 /* ema_asstr MODULE (primary module interface) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* AS-String (asstr) -- used within EMA */
@@ -37,10 +37,8 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<ucmemalloc.h>
-#include	<strn.h>
-#include	<ascii.h>
-#include	<mkchar.h>
 #include	<char.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 export module ema_asstr ;
@@ -168,7 +166,7 @@ namespace emaobj {
 
     int asstr_get(asstr *asp) noex {
 	int		rs = SR_FAULT ;
-	int		ch = 0 ;
+	int		ch = 0 ; /* return-value */
 	if (asp) {
 	    rs = SR_OK ;
 	    if (asp->sl > 0) {
