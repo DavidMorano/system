@@ -101,7 +101,7 @@
 #endif
 
 #ifndef	USTAT
-#define	USTAT		struct ustat
+#define	USTAT		ustat
 #endif
 
 #ifndef	STATFS
