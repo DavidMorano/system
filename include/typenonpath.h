@@ -1,5 +1,5 @@
 /* typenonpath HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* determine the type of nonpath in give counted c-string (filename) */
