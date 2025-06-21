@@ -1,5 +1,5 @@
 /* utypedefs HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* virtual-system definitions */
@@ -73,6 +73,13 @@
 #define	STRUCT_USTATVFS
 #define	USTATVFS	struct statvfs
 #endif /* STRUCT_USTATVFS */
+
+/* for |poll(2)| and its many friends */
+#ifndef	STRUCT_UPOLLFD
+#define	STRUCT_UPOLLFD
+#define	UPOLLFD		struct pollfd
+#endif /* STRUCT_USTAT */
+
 
 /* PREDEFINED start */
 /* determine if some unsigned-related typedefs have already been made */
@@ -464,6 +471,33 @@ typedef unsigned int *		uintp ;
 typedef unsigned long *		ulongp ;
 #endif
 
+#ifndef	TYPEDEF_CHARPP
+#define	TYPEDEF_CHARPP
+typedef char **			charpp ;
+#endif
+
+/* usigned (pointer-to-pointer-to) */
+#ifndef	TYPEDEF_UCHARPP
+#define	TYPEDEF_UCHARPP
+typedef unsigned char **	ucharpp ;
+#endif
+
+#ifndef	TYPEDEF_USHORTPP
+#define	TYPEDEF_USHORTPP
+typedef unsigned short **	ushortpp ;
+#endif
+
+#ifndef	TYPEDEF_UINTPP
+#define	TYPEDEF_UINTPP
+typedef unsigned int **		uintpp ;
+#endif
+
+#ifndef	TYPEDEF_ULONGPP
+#define	TYPEDEF_ULONGPP
+typedef unsigned long **	ulongpp ;
+#endif
+
+/* constant (pointer-to) */
 #ifndef	TYPEDEF_CCHARP
 #define	TYPEDEF_CCHARP
 typedef const char *		ccharp ;
@@ -484,6 +518,7 @@ typedef const int *		cintp ;
 typedef const long *		clongp ;
 #endif
 
+/* constant (pointer-to-unsigned) */
 #ifndef	TYPEDEF_CUCHARP
 #define	TYPEDEF_CUCHARP
 typedef const unsigned char *	cucharp ;
@@ -505,14 +540,24 @@ typedef const unsigned long *	culongp ;
 #endif
 
 /* special types for characters */
-#ifndef	TYPEDEF_CHARPP
-#define	TYPEDEF_CHARPP
-typedef char **			charpp ;
-#endif
-
 #ifndef	TYPEDEF_CCHARPP
 #define	TYPEDEF_CCHARPP
 typedef const char **		ccharpp ;
+#endif
+
+#ifndef	TYPEDEF_CSHORTPP
+#define	TYPEDEF_CSHORTPP
+typedef const short **		cshortpp ;
+#endif
+
+#ifndef	TYPEDEF_CINTPP
+#define	TYPEDEF_CINTPP
+typedef const int **		cintpp ;
+#endif
+
+#ifndef	TYPEDEF_CLONGPP
+#define	TYPEDEF_CLONGPP
+typedef const long **		clongpp ;
 #endif
 
 #ifndef	TYPEDEF_CPCCHAR
@@ -523,6 +568,26 @@ typedef const char *const	cpcchar ;
 #ifndef	TYPEDEF_CPCCHARP	/* same as |mainv| */
 #define	TYPEDEF_CPCCHARP	/* same as |mainv| */
 typedef const char *const *	cpccharp ;
+#endif
+
+#ifndef	TYPEDEF_CUCHARPP
+#define	TYPEDEF_CUCHARPP
+typedef const unsigned char **	cucharpp ;
+#endif
+
+#ifndef	TYPEDEF_CUSHORTPP
+#define	TYPEDEF_CUSHORTPP
+typedef const unsigned short **	cushortpp ;
+#endif
+
+#ifndef	TYPEDEF_CUINTPP
+#define	TYPEDEF_CUINTPP
+typedef const unsigned int **	cuintpp ;
+#endif
+
+#ifndef	TYPEDEF_CULONGPP
+#define	TYPEDEF_CULONGPP
+typedef const unsigned long **	culongpp ;
 #endif
 
 #ifndef	TYPEDEF_CWCHAR
@@ -546,6 +611,11 @@ typedef USTATFS			ustatfs ;
 #ifndef	TYPEDEF_USTATVFS
 #define	TYPEDEF_USTATVFS
 typedef USTATVFS		ustatvfs ;
+#endif
+
+#ifndef	TYPEDEF_UPOLLFD
+#define	TYPEDEF_UPOLLFD
+typedef UPOLLFD			upollfd ;
 #endif
 
 #ifndef	TYPEDEF_CUSTAT
