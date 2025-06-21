@@ -1,5 +1,5 @@
 /* vecint HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* vector integer operations */
@@ -168,6 +168,7 @@ struct vecint : vecint_head {
 	    resize	(this,vecintmem_resize) ;
 	    audit	(this,vecintmem_audit) ;
 	    finish	(this,vecintmem_finish) ;
+	    magic = 0 ;
 	} ;
 	vecint(const vecint &) = delete ;
 	vecint &operator = (const vecint &) = delete ;

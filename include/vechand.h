@@ -1,5 +1,5 @@
 /* vechand HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* vector list structure (Vector Handle) */
@@ -136,13 +136,14 @@ struct vechand : vechand_head {
 	vechand_co	audit ;
 	vechand_co	finish ;
 	vechand() noex {
-	    count(this,vechandmem_count) ;
-	    setsorted(this,vechandmem_setsorted) ;
-	    issorted(this,vechandmem_issorted) ;
-	    delall(this,vechandmem_delall) ;
-	    extent(this,vechandmem_extent) ;
-	    audit(this,vechandmem_audit) ;
-	    finish(this,vechandmem_finish) ;
+	    count	(this,vechandmem_count) ;
+	    setsorted	(this,vechandmem_setsorted) ;
+	    issorted	(this,vechandmem_issorted) ;
+	    delall	(this,vechandmem_delall) ;
+	    extent	(this,vechandmem_extent) ;
+	    audit	(this,vechandmem_audit) ;
+	    finish	(this,vechandmem_finish) ;
+	    va = nullptr ;
 	} ;
 	vechand(const vechand &) = delete ;
 	vechand &operator = (const vechand &) = delete ;
@@ -159,7 +160,7 @@ struct vechand : vechand_head {
 	void dtor() noex ;
 	operator int () noex ;
 	destruct vechand() {
-	    dtor() ;
+	    if (va) dtor() ;
 	} ;
 } ; /* end struct (vechand) */
 #else	/* __cplusplus */

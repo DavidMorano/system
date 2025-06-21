@@ -1,5 +1,5 @@
 /* vecitem HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector¯item operations */
@@ -142,10 +142,11 @@ struct vecitem : vecitem_head {
 	vecitem_co	audit ;
 	vecitem_co	finish ;
 	vecitem() noex {
-	    del(this,vecitemmem_del) ;
-	    count(this,vecitemmem_count) ;
-	    audit(this,vecitemmem_audit) ;
-	    finish(this,vecitemmem_finish) ;
+	    del		(this,vecitemmem_del) ;
+	    count	(this,vecitemmem_count) ;
+	    audit	(this,vecitemmem_audit) ;
+	    finish	(this,vecitemmem_finish) ;
+	    va = nullptr ;
 	} ;
 	vecitem(const vecitem &) = delete ;
 	vecitem &operator = (const vecitem &) = delete ;

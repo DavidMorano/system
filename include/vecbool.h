@@ -1,8 +1,8 @@
-/* vec HEADER */
+/* vecbool HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* vector operatins */
+/* string-index operations */
 /* version %I% last-modified %G% */
 
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	VEC_INCLUDE
-#define	VEC_INCLUDE
+#ifndef	VECBOOL_INCLUDE
+#define	VECBOOL_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -26,19 +26,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<raqhand.h>
-#include	<recarr.h>
-#include	<vecelem.h>
-#include	<vechand.h>
-#include	<vecitem.h>
-#include	<vecobj.h>
-#include	<vecpstr.h>
-#include	<vecsorthand.h>
-#include	<vecstr.h>
-#include	<vecint.h>
-#include	<veclong.h>
 
-
-#endif /* VEC_INCLUDE */
+#endif /* VECBOOL_INCLUDE */
 
 
