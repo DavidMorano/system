@@ -1,5 +1,5 @@
 /* usyscalls HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */
@@ -61,7 +61,6 @@
 #include	<usysutility.hh>
 #include	<usysauxinfo.h>
 #include	<usysdata.h>
-#include	<usysinfo.h>
 
 #include	<ugetloadavg.h>	/* load-average retrieval |u_getloadavg| */
 #include	<um.h>		/* UNIX® memory-management */
