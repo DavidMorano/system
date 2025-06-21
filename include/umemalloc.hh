@@ -1,5 +1,5 @@
 /* umemalloc HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* memory allocation facility (for library use) */
@@ -29,13 +29,13 @@
 
 
 namespace libu {
-    extern int umallocstrw(cchar *,int,cchar **) noex ;
-    extern int umalloc(int,void *) noex ;
-    extern int uvalloc(int,void *) noex ;
-    extern int ucalloc(int,int,void *) noex ;
-    extern int urealloc(void *,int,void *) noex ;
-    extern int ufree(void *) noex ;
-    extern int rsufree(int,void *) noex ;
+    extern int umemallocstrw(cchar *,int,cchar **) noex ;
+    extern int umemalloc(int,void *) noex ;
+    extern int umemvalloc(int,void *) noex ;
+    extern int umemcalloc(int,int,void *) noex ;
+    extern int umemrealloc(void *,int,void *) noex ;
+    extern int umemfree(void *) noex ;
+    extern int umemrsfree(int,void *) noex ;
 }
 
 

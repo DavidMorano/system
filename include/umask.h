@@ -1,5 +1,5 @@
 /* umask HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® information (a cache for |umask(2)| and sisters) */
