@@ -116,8 +116,8 @@ struct sysdialer_head {
 
 struct sysdialer_module {
 	void		*dhp ;		/* SO-dlopen handle */
-	dev_t		dev ;
 	ino_t		ino ;
+	dev_t		dev ;
 	int		count ;
 } ;
 

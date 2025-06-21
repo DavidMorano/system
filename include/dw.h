@@ -14,7 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<sys/stat.h>		/* |dev_t| + |ino_t| */
+#include	<sys/stat.h>
 #include	<time.h>		/* |time_t| */
 #include	<stdlib.h>		/* |size_t| */
 #include	<vecstr.h>

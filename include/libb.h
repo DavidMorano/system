@@ -159,9 +159,9 @@ struct bfile_head {
 	char		*bp ;		/* current pointer into buffer */
 	void		*escp ;		/* escape-pointer */
 	ino_t		ino ;
-	dev_t		dev ;
 	size_t		offset ; 	/* user view */
 	size_t		fsize ;		/* current? file size */
+	dev_t		dev ;
 	BFILE_FL	f ;
 	uint		magic ;
 	int		fd ;

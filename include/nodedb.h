@@ -21,7 +21,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>		/* for |ino_t| */
+#include	<time.h>		/* |time_t| */
 #include	<vecobj.h>
 #include	<hdb.h>
 
