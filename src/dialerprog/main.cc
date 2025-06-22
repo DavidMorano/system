@@ -203,7 +203,7 @@ static cchar	*sysfiles[] = {
 int main(int argc,cchar **argv,cchar **envv)
 {
 	PROGINFO	pi, *pip = &pi ;
-	struct ustat	sb ;
+	ustat	sb ;
 	struct sigaction	sigs ;
 	KEYOPT		akopts ;
 	USERINFO	u ;

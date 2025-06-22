@@ -107,7 +107,7 @@ int		f_statdisplay ;
 MAILFILES	*mfp ;
 {
 	struct sigaction	sigs ;
-	struct ustat	sb, ss, *sp = &ss ;
+	ustat	sb, ss, *sp = &ss ;
 	struct pollfd	fds[2] ;
 	sigset_t	signalmask ;
 	DISPLAY		d ;
