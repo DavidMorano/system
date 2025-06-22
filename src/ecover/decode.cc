@@ -118,7 +118,7 @@ ECMSG		*emp ;
 int		ifd, ofd ;
 {
 	struct msgstate	ms ;
-	struct ustat	sb ;
+	ustat	sb ;
 	ULONG		key[NOPWORDS] ;
 	ULONG		vector[NOPWORDS] ;
 	ULONG		mask[NOPWORDS] ;

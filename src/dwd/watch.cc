@@ -105,7 +105,7 @@ extern char	*timevalstr_ulog(struct timeval *,char *) ;
 
 /* forward references */
 
-static int	dirtest(int,char *,struct ustat *) ;
+static int	dirtest(int,char *,ustat *) ;
 
 static void	makejobid(struct proginfo *,int *,char *) ;
 static void	int_term() ;
@@ -145,7 +145,7 @@ int		maxjobs, filetime ;
 {
 	struct pollfd	fds[2] ;
 
-	struct ustat	ssb, dsb, jsb ;
+	ustat	ssb, dsb, jsb ;
 
 	struct timeval	tod ;
 
@@ -1282,7 +1282,7 @@ char	filename[] ;
 static int dirtest(dfd,dirname,sbp)
 int		dfd ;
 char		dirname[] ;
-struct ustat	*sbp ;
+ustat	*sbp ;
 {
 	int	rs ;
 

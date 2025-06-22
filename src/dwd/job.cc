@@ -1,5 +1,5 @@
 /* job SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* perform various functions on a job */
@@ -185,7 +185,7 @@ int job_start(jhp,jep,pip,sbp,sfp)
 JOB		*jhp ;
 struct jobentry	*jep ;
 struct proginfo	*pip ;
-struct ustat	*sbp ;
+ustat	*sbp ;
 SRVTAB		*sfp ;
 {
 	struct passwd	pe ;
@@ -696,7 +696,7 @@ struct jobentry	*jep ;
 struct proginfo	*pip ;
 int		child_stat ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	bfile		file, *fp = &file ;
 

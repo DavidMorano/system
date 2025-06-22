@@ -173,7 +173,7 @@ int		argc ;
 const char	*argv[] ;
 const char	*envv[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	PROGINFO	pi, *pip = &pi ;
 	USERINFO	u ;
 	CONFIGFILE	cf ;

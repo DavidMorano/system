@@ -119,7 +119,7 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecti(const char *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	issamehostname(const char *,const char *,const char *) ;
 extern int	isdigitlatin(int) ;
 
@@ -276,7 +276,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	struct sigaction	sigs ;
 	PROGINFO	g, *pip = &g ;
 	struct conninfo	cf ;
-	struct ustat	sb ;
+	ustat	sb ;
 	USERINFO	u ;
 	RECIPIENT	recips ;
 	SYSTEMS		sysdb ;

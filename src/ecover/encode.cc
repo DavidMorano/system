@@ -111,7 +111,7 @@ ECMSG		*emp ;
 int		ifd, ofd ;
 {
 	ECMSGDESC	md ;
-	struct ustat	stat_i ;
+	ustat	stat_i ;
 	ULONG		key[NOPWORDS] ;
 	ULONG		vector[NOPWORDS] ;
 	ULONG		data[NOPWORDS] ;

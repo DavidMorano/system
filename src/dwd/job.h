@@ -29,7 +29,7 @@ extern int job_init(JOB *) ;
 extern int job_add(JOB *,struct jobentry *) ;
 extern int job_del(JOB *,int) ;
 extern int job_start(JOB *,struct jobentry *,
-		struct proginfo *,struct ustat *,SRVTAB *) ;
+		struct proginfo *,ustat *,SRVTAB *) ;
 extern int job_findpid(JOB *,struct proginfo *,int,struct jobentry **) ;
 extern int job_search(JOB *,struct proginfo *,char *,struct jobentry **) ;
 extern int job_get(JOB *,struct proginfo *,int,struct jobentry **) ;

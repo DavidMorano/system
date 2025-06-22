@@ -159,7 +159,7 @@ extern char	**environ ;
 
 /* local structures */
 
-struct ustats {
+USTAT {
 	uint		total ;
 	uint		cachehits ;
 } ;
@@ -178,7 +178,7 @@ struct locinfo {
 	vecstr		stores ;
 	struct locinfo_flags	have, f, changed, final ;
 	struct locinfo_flags	open ;
-	struct ustats		s ;
+	ustat		s ;
 	NAMECACHE		nc ;
 	int			to_cache ;
 	char			username[USERNAMELEN + 1] ;

@@ -188,7 +188,7 @@ char	*envv[] ;
 	struct sigaction	san ;
 	struct sigaction	sao[nelem(sigints) + nelem(sigignores)] ;
 	struct sockaddr	*sap ;
-	struct ustat	sb ;
+	ustat	sb ;
 	PROGINFO	pi, *pip = &pi ;
 	USERINFO	u ;
 	SOCKADDRESS	sa ;
@@ -1073,7 +1073,7 @@ int		salen ;
 {
 	struct havemsg_request	m0 ;
 	struct havemsg_report	m1 ;
-	struct ustat		sb ;
+	ustat		sb ;
 	int	rs, rs1, mbl, cl ;
 	int	msgtype ;
 	int	mflags = 0 ;
