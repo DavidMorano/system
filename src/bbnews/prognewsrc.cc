@@ -1,21 +1,22 @@
 /* prognewsrc */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* prog-newsrc */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 
-
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 	= 1998-02-10, David A­D­ Morano
-        Slightly modified to isolate all of the BBNEWSRC code into confined
-        spaces.
+	Slightly modified to isolate all of the BBNEWSRC code into
+	confined spaces.
 
 */
 
@@ -23,12 +24,10 @@
 
 /*******************************************************************************
 
-        We have isolated the BBNEWSRC code (so that it can be more easily
-        changed-modernized) in the future!
-
+	We have isolated the BBNEWSRC code (so that it can be more
+	easily changed-modernized) in the future!
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 
@@ -60,25 +59,21 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matocasestr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	matocasestr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern const char	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
@@ -125,7 +120,7 @@ int prognewsrc(PROGINFO *pip,MKDIRLIST *dlp,cchar ufname[])
 	if ((rs = bbnewsrc_open(&ugs,ufname,0)) >= 0) {
 	    time_t	utime ;
 	    int		f_sub ;
-	    const char	*ung ;
+	    cchar	*ung ;
 
 	    while ((rs = bbnewsrc_read(&ugs,&ue)) > 0) {
 

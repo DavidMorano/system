@@ -1,5 +1,5 @@
 /* proglinecheck SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* check the number of lines on the terminal */
@@ -76,7 +76,6 @@ extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	nextfield(cchar *,int,cchar **) ;
-extern int	strwcmp(cchar *,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -85,12 +84,7 @@ extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strshrink(char *) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */

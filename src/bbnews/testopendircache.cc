@@ -100,7 +100,7 @@ int main(int argc,const char **argv,const char **envv)
 	        debugprintf("main: fn=%s\n",fn) ;
 #endif
 	        if ((rs1 = pcsopendircache(pr,fn,of,om,to)) >= 0) {
-	            struct ustat	sb ;
+	            ustat	sb ;
 	            int		fd = rs1 ;
 #if	CF_DEBUGS
 	            debugprintf("main: pcsopendircache() rs=%d\n",rs1) ;

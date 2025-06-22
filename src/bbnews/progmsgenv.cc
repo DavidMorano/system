@@ -1,17 +1,18 @@
 /* progmsgenv */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* create an environment data */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 
-
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 	= 1998-11-22, David A­D­ Morano
         I did some clean-up.
@@ -24,9 +25,7 @@
 
 	We figure ot the user-newsrc file here.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 
@@ -63,9 +62,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugprinthex(const char *,int,const char *,int) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */

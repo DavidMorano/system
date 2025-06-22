@@ -1,11 +1,12 @@
 /* proglinecheck */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* check the number of lines on the terminal */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	1		/* run-time debugging */
-
 
 /* revision history:
 
@@ -33,22 +34,16 @@
 /*******************************************************************************
 
 	Synopsis:
-
-	int proglinecheck(pip)
-	struct proginfo	*pip ;
+	int proglinecheck(proginfo *pip) noex
 
 	Arguments:
-
 	pip		program information pointer
 
 	Returns:
-
 	<0		error
 	>=0		flag
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 
@@ -81,7 +76,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	sfshrink(const char *,int,const char **) ;
 extern int	nextfield(const char *,int,const char **) ;
-extern int	strwcmp(const char *,const char *,int) ;
 extern int	getfiledirs(const char *,const char *,const char *,vecstr *) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 
@@ -91,12 +85,7 @@ extern int	debugprinthex(const char *,int,const char *,int) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
 
-extern const char	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 extern char	*strshrink(char *) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */

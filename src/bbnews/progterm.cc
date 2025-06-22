@@ -1,21 +1,21 @@
 /* progterm */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program terminal mode */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_TERMSTORE	0		/* use 'termstore()' */
 #define	CF_INTERCMD	1		/* alloc inter-commands */
 
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-        This code module was originally written but was modeled after some
-        preexisting code. This whole program has been rewritten from the ground
-        up.
+	This code module was originally written but was modeled
+	after some preexisting code.  This whole program has been
+	rewritten from the ground up.
 
 */
 
@@ -23,13 +23,11 @@
 
 /*******************************************************************************
 
-        This is the front-end subroutine for the PCS program VMAIL. There is a
-        good bit of setup in this subroutine before the program goes
-        interactive.
-
+	This is the front-end subroutine for the PCS program VMAIL.
+	There is a good bit of setup in this subroutine before the
+	program goes interactive.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -79,8 +77,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
 
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strncpylow(char *,const char *,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
