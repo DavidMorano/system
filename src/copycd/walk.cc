@@ -59,7 +59,7 @@ char	basedir[] ;
 int	(*uf)() ;
 void	*uarg ;
 {
-	struct ustat	se ;
+	ustat	se ;
 
 	fsdir		dir ;
 	fsdir_ent	ds ;

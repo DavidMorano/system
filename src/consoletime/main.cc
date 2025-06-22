@@ -103,7 +103,7 @@ extern int	cfdecti(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	getnprocessors(cchar **,int) ;
 extern int	termconseq(char *,int,int,int,int,int,int) ;
 extern int	acceptpass(int, struct strrecvfd *,int) ;
@@ -323,7 +323,7 @@ static cchar	*msglogdevs[] = {
 int main(int argc,cchar **argv,cchar **envv)
 {
 	PROGINFO	pi, *pip = &pi ;
-	struct ustat	sb ;
+	ustat	sb ;
 	SIGHAND		sm ;
 	BITS		pargs ;
 	KEYOPT		akopts ;
@@ -1488,7 +1488,7 @@ static int proconce(PROGINFO *pip,cchar ofname[])
 
 #ifdef	OPTIONAL
 	{
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    rs = u_stat(ofname,&sb) ;
 	    if ((rs >= 0) && S_ISDIR(sb.st_mode))
 	        rs = SR_ISDIR ;
@@ -1544,7 +1544,7 @@ static int procout(PROGINFO *pip,cchar ofname[],gid_t gid)
 /* ARGSUSED */
 static int procprint(PROGINFO *pip,int fd,gid_t gid)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	SBUF		b ;
 	const int	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
@@ -1770,7 +1770,7 @@ static int procinfo_check(PROGINFO *pip)
 
 static int msglogdev(IDS *idp,cchar *fname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		f = FALSE ;
 

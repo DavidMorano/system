@@ -113,7 +113,7 @@ char	*envv[] ;
 
 	struct proginfo	pi, *pip = &pi ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	PARAMOPT	aparams ;
 
