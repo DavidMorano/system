@@ -1,6 +1,9 @@
 /* calworder */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* word management */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
@@ -21,6 +24,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -44,7 +48,7 @@ extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
 extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	sibreak(cchar *,int,cchar *) ;
+extern int	sibrk(cchar *,int,cchar *) ;
 extern int	siskipwhite(cchar *,int) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	matcasestr(cchar **,cchar *,int) ;
@@ -59,10 +63,6 @@ extern int	isdigitlatin(int) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* local structures */

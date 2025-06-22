@@ -66,7 +66,7 @@ const char	basedir[] ;
 {
 	struct dirent	*dep ;
 
-	struct ustat	se ;
+	ustat	se ;
 
 	FSDIR		dir ;
 	FSDIR_ENT	ds ;
