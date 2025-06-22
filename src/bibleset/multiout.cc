@@ -1,16 +1,17 @@
 /* multiout */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* output multiple stuff w/ an object for convenience */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
 	= 2009-04-01, David A­D­ Morano
-        This subroutine was written as an enhancement for adding back-matter
-        (end pages) to the output document.
+	This subroutine was written as an enhancement for adding
+	back-matter (end pages) to the output document.
 
 */
 
@@ -20,17 +21,16 @@
 
 	This subroutine does something! :-)
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstdarg>
 #include	<cstring>
 #include	<ctype.h>
-#include	<cstdarg>
 
 #include	<usystem.h>
 #include	<bfile.h>
@@ -47,10 +47,6 @@
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
 #endif
-
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */

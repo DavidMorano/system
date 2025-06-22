@@ -1,7 +1,9 @@
-/* progfile */
+/* bibleset_progfile SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a bible-database file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
@@ -10,7 +12,6 @@
 #define	CF_CHAPTERLARGE	1		/* user larger pointsize */
 #define	CF_NUMLEADHALF	0		/* leading space for verse numbers */
 #define	CF_NUMTRAILHALF	1		/* leading space for verse numbers */
-
 
 /* revision history:
 
@@ -26,25 +27,24 @@
 
 	Read the given file and process it. (ya, right!)
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<wordfill.h>
 #include	<storebuf.h>
-#include	<char.h>
 #include	<ascii.h>
 #include	<linecenter.h>
+#include	<strn.h>
+#include	<six.h>			/* |sileader(3uc)| */
+#include	<char.h>
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -74,7 +74,7 @@
 
 /* external subroutines */
 
-extern int	sibreak(cchar *,int,cchar *) ;
+extern int	sibrk(cchar *,int,cchar *) ;
 extern int	siskipwhite(cchar *,int) ;
 extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	nextfield(cchar *,int,cchar **) ;
@@ -89,10 +89,6 @@ extern int	bprintln(bfile *,cchar *,int) ;
 extern int	progoutmtheader(struct proginfo *,bfile *) ;
 extern int	progoutmtfooter(struct proginfo *,bfile *) ;
 
-#ifdef	COMMENT
-extern int	sileader(cchar *,int) ;
-#endif
-
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
@@ -100,9 +96,6 @@ extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -974,7 +967,7 @@ int		buflen ;
 
 	sp = buf ;
 	sl = buflen ;
-	if ((tp = strnpbrk(sp,sl,"[]")) != NULL) {
+	if ((tp = strnbrk(sp,sl,"[]")) != NULL) {
 
 	    if (*tp == '[') {
 	        cp = (char *) sp ;
@@ -1039,7 +1032,7 @@ int		sl ;
 	char		fixbuf[FIXBUFLEN + 1] ;
 	char		colbuf[LINEBUFLEN + 1] ;
 
-	if ((tp = strnpbrk(sp,sl,"[]")) != NULL) {
+	if ((tp = strnbrk(sp,sl,"[]")) != NULL) {
 
 	    if (*tp == '[') {
 	        cp = (char *) sp ;
@@ -1215,7 +1208,7 @@ int		sl ;
 	    debugprintf("procfile/mkfixbuf: 2>%r<\n",sp,sl) ;
 #endif
 
-	while ((tp = strnpbrk(sp,sl,"[]")) != NULL) {
+	while ((tp = strnbrk(sp,sl,"[]")) != NULL) {
 
 	    cp = sp ;
 	    cl = (tp - sp) ;

@@ -1,17 +1,18 @@
 /* progout */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* perform some output processsing activities */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 
-
 /* revision history:
 
 	= 2009-04-01, David A­D­ Morano
-	This subroutine was written as an enhancement for adding back-matter
-	(end pages) to the output document.
+	This subroutine was written as an enhancement for adding
+	back-matter (end pages) to the output document.
 
 */
 
@@ -21,9 +22,7 @@
 
 	This subroutine creates header and foot specifications.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -35,6 +34,7 @@
 #include	<usystem.h>
 #include	<tmtime.hh>
 #include	<bfile.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -48,26 +48,22 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	ctdecui(char *,int,uint) ;
-extern int	bprintlns(bfile *,int,const char *,int) ;
-extern int	bprintln(bfile *,const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	bprintlns(bfile *,int,cchar *,int) ;
+extern int	bprintln(bfile *,cchar *,int) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
 extern int	progfront(PROGINFO *,bfile *) ;
-
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -272,7 +268,7 @@ int progoutend(PROGINFO *pip,bfile *ofp)
 	int		rs = SR_OK ;
 	int		ncols ;
 	int		wlen = 0 ;
-	const char	*fmt ;
+	cchar	*fmt ;
 
 /* back-matter begin */
 

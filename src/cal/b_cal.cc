@@ -1,20 +1,22 @@
-/* b_cal */
+/* b_cal SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* generic (more of less) front-end subroutine */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 
-
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	The program was written from scratch to do what the previous program by
-	the same name did.  This program (command) takes arguments in a variety
-	of weirdo ways (much more so than the original UNIX® CAL(1) program
-	did) so watch out for the mess.
+	The program was written from scratch to do what the previous
+	program by the same name did.  This program (command) takes
+	arguments in a variety of weirdo ways (much more so than
+	the original UNIX® CAL(1) program did) so watch out for the
+	mess.
 
 */
 
@@ -22,21 +24,22 @@
 
 /*******************************************************************************
 
-	This is really not generic now that I have modified it!  This
-	subroutine is now most of this program except for the fact that we
-	'spawn(3dam)' the UNIX® '/usr/bin/cal' program!
+  	Name:
+	b_cal
+
+	Description:
+	This is really not generic now that I have modified it!
+	This subroutine is now most of this program except for the
+	fact that we 'spawn(3dam)' the UNIX® '/usr/bin/cal' program!
 
 	Implementation notes:
-
-	Watch out for how those arguments work and interact with each other.
-	They are a bitch.  This command should be compatible with the arguments
-	that can be given to UNIX® CAL(1) so a good bit of care went into how
-	arguments can be specified and interpreted (so as not to break
-	compatibility).
-
+	Watch out for how those arguments work and interact with
+	each other.  They are a bitch.  This command should be
+	compatible with the arguments that can be given to UNIX®
+	CAL(1) so a good bit of care went into how arguments can
+	be specified and interpreted (so as not to break compatibility).
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -65,6 +68,7 @@
 #include	<spawnproc.h>
 #include	<linefold.h>
 #include	<filer.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -1243,7 +1247,7 @@ static int getstuff(PROGINFO *pip,struct monyear *myp,cchar s[])
 	if (pip == NULL) return SR_FAULT ; /* lint */
 	myp->m = -1 ;
 	myp->y = -1 ;
-	if ((tp = strpbrk(s,"/-")) != NULL) {
+	if ((tp = strbrk(s,"/-")) != NULL) {
 
 	    if (tp[0] == '-') {
 

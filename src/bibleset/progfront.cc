@@ -1,18 +1,19 @@
 /* progfront */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process the back-matter information */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_PROGOFF	1		/* use 'progoffwrite()' */
 
-
 /* revision history:
 
 	= 2009-04-01, David A­D­ Morano
-	This subroutine was written as an enhancement for adding back-matter
-	(end pages) to the output document.
+	This subroutine was written as an enhancement for adding
+	back-matter (end pages) to the output document.
 
 */
 
@@ -20,18 +21,18 @@
 
 /*******************************************************************************
 
-	This subroutine just adds some code to output come end-pages that are
-	just really some trailing blank pages.  This is supposed to end the
-	whole document.  The document should end on an even page (which will
-	form the back cover of the whole document).
-
+	This subroutine just adds some code to output come end-pages
+	that are just really some trailing blank pages.  This is
+	supposed to end the whole document.  The document should
+	end on an even page (which will form the back cover of the
+	whole document).
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctype.h>
@@ -50,16 +51,13 @@
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	ctdecui(char *,int,uint) ;
-extern int	hasalluc(const char *,int) ;
-extern int	bprintlns(bfile *,int,const char *,int) ;
-extern int	bprintln(bfile *,const char *,int) ;
-
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern int	hasalluc(cchar *,int) ;
+extern int	bprintlns(bfile *,int,cchar *,int) ;
+extern int	bprintln(bfile *,cchar *,int) ;
 
 
 /* external variables */
