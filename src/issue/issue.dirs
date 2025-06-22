@@ -1,0 +1,16 @@
+# ISSUE.DIRS (for ISSUE)
+
+# format of table:
+#
+# admin		directory_of_ISSUEs
+#
+
+admin		~/var/issue
+local		~/var/issue
+pcs		~/var/issue
+uucp		~/var/issue
+
+#admin		~/var/more
+#admin		~/var/mm
+
+
