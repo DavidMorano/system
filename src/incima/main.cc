@@ -154,7 +154,7 @@ static const char	*psdir[] = {
 /* ARGSUSED */
 int main(int argc,cchar **argv,cchar **envv)
 {
-	struct ustat	sa, sb ;
+	ustat	sa, sb ;
 	struct utimbuf	ft ;
 	PROGINFO	pi, *pip = &pi ;
 
