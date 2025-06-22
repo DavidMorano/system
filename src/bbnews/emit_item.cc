@@ -1,5 +1,5 @@
 /* emit_article SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* emit (process) an article */
@@ -86,6 +86,7 @@
 #include	<usystem.h>
 #include	<getfiledirs.h>
 #include	<bfile.h>
+#include	<strx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -110,9 +111,9 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
 
 extern int	cmd_save() ;
 extern int	cmd_printout() ;
@@ -127,12 +128,12 @@ extern int	bbcpy(char *,char *) ;
 extern int	hmatch() ;
 extern int	term_linecheck(struct proginfo *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
 
-extern const char	*monthname[] ;
+extern cchar	*monthname[] ;
 
 
 /* forward references */
@@ -140,7 +141,7 @@ extern const char	*monthname[] ;
 static int	deluser() ;
 static int	delremote() ;
 static int	isus() ;
-static int	hastabs(const char *) ;
+static int	hastabs(cchar *) ;
 
 static void	rslowit() ;
 static void	onintr() ;
@@ -178,14 +179,14 @@ struct proginfo	*pip ;
 MKDIRLIST_ENT	*dsp ;
 int		ai ;
 ARTLIST_ENT	*ap ;
-const char	ngdir[] ;
-const char	af[] ;
+cchar	ngdir[] ;
+cchar	af[] ;
 {
 	struct passwd	*pp ;
 
 	struct tm	ts, *timep ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	bfile		afile, *afp = &afile ;
 	bfile		helpfname, *hfp = &helpfname ;
@@ -207,9 +208,9 @@ const char	af[] ;
 	int		f_from = FALSE ;
 	int		f_articleid = FALSE ;
 	int		f_shown = FALSE ;
-	const char	*cp, *cp2 ;
-	const char	*sp, *fmt ;
-	const char	*oflags ;
+	cchar	*cp, *cp2 ;
+	cchar	*sp, *fmt ;
+	cchar	*oflags ;
 	char		linebuf[LINEBUFLEN + 1], *lbp ;
 	char		outbuf[(2*LINEBUFLEN) + 1], *obp ;
 	char		hv_subject[LINEBUFLEN + 1] ;
@@ -516,7 +517,7 @@ start:
 	            cp) ;
 #endif
 
-	        if ((cp2 = strpbrk(cp,"/;\t ")) != NULL)
+	        if ((cp2 = strbrk(cp,"/;\t ")) != NULL)
 			*cp2 = '\0' ;
 
 	        if (strncasecmp(cp,"text",4) != 0) {
@@ -1671,26 +1672,16 @@ char	cmd[] ;
 }
 /* end subroutine (rslowit) */
 
-
-static int hastabs(s)
-const char	s[] ;
-{
-
-
-	while (*s && (*s != '\t'))
+static int hastabs(* s) noex {
+	while (*s && (*s != '\t')) {
 		s += 1 ;
-
+	}
 	return ((*s) ? TRUE : FALSE) ;
 }
 /* end subroutine (hastabs) */
 
-
-static void onintr()
-{
-
-
+static void onintr() noex {
 	longjmp(jmpenv, 1) ;
 }
-
 
 

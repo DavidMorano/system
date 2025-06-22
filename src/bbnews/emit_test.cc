@@ -1,5 +1,5 @@
 /* emit_test SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* version %I% last-modified %G% */
@@ -85,6 +85,9 @@
 #include	<usystem.h>
 #include	<getfiledirs.h>
 #include	<bfile.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<strx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -139,12 +142,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -204,7 +201,7 @@ cchar	ngdir[] ;
 cchar	af[] ;
 {
 	struct passwd	*pp ;
-	struct ustat	sb ;
+	ustat	sb ;
 	bfile		afile, *afp = &afile ;
 	bfile		helpfname, *hfp = &helpfname ;
 	bfile		savefile, *sfp = &savefile ;
@@ -1225,7 +1222,7 @@ prompt:
 		int		f_new = FALSE ;
 		cchar	*tp ;
 		char		mbname[MAXNAMELEN+1] ;
-		while ((tp = strpbrk(resp," ,\t")) != NULL) {
+		while ((tp = strbrk(resp," ,\t")) != NULL) {
 		    if ((rs = sncpy1w(mbname,mblen,resp,(tp-resp))) > 0) {
 			f_new = f_new || (strcmp(mbname,"new") == 0) ;
 	                rs = cmd_save(pip,ap,ngdir,afname,m,mbname) ;

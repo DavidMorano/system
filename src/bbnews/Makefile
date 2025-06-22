@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (bbnews)
 
 T= bbnews
 

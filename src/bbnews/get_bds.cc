@@ -95,7 +95,7 @@ char		bb_dir[], bb_bds[] ;
 char		ufname[] ;
 struct userstat	**ubpp ;
 {
-	struct ustat	sn, ss, stbuf ;
+	ustat	sn, ss, stbuf ;
 	struct userstat	us ;
 	MKDIRLIST	*pdp ;
 	BBNEWSRC	ung ;
@@ -646,7 +646,7 @@ bad1:
 
 static int dir_func(fnp,fsp,dsp)
 char		*fnp ;
-struct ustat	*fsp ;
+ustat	*fsp ;
 MKDIRLIST	*dsp ;
 {
 

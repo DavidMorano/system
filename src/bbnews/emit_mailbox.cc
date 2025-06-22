@@ -1,11 +1,12 @@
 /* emit_mailbox */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* emit (process) an article */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
-
 
 /* revision history:
 
@@ -13,8 +14,8 @@
 	- added a mode to intercept for mailbox use
 
 	= 1994-12-01, David A­D­ Morano
-        - modified to only print out header fields that a user is normally
-        interested in
+	Modified to only print out header fields that a user is
+	normally interested in.
 
 	= 1995-07-01, David A­D­ Morano
 	- extensively modified to add:
@@ -32,11 +33,11 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine is one of the "EMIT" subroutines used for
 	"emitting" articles in different ways.
 
 	Synopsis:
-
 	int emit_mailbox(pip,dsp,ai,aep,ngdir,af)
 	struct proginfo	*pip ;
 	MKDIRLIST_ENT	*dsp ;
@@ -46,7 +47,6 @@
 	char		af[] ;
 
 	Arguments:
-
 	pip		program information pointer
 	dsp		user structure pointer
 	ai		article index within newsgroup
@@ -55,13 +55,10 @@
 	af		article base file name
 
 	Returns:
-
 	<0		error
 	>=0		EMIT-code
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 
@@ -94,34 +91,29 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	strwcmp(const char *,const char *,int) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1w(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
 extern int	getusername(char *,int,uid_t) ;
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 
 extern int	progmsgenv_begin(struct proginfo *) ;
 extern int	progmsgenv_envstr(struct proginfo *,char *,int) ;
 extern int	progmsgenv_end(struct proginfo *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern const char	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern cchar	*getourenv(cchar **,cchar *) ;
 
 
 /* external variables */
@@ -143,15 +135,15 @@ struct proginfo	*pip ;
 MKDIRLIST_ENT	*dsp ;
 int		ai ;
 ARTLIST_ENT	*ap ;
-const char	ngdir[] ;
-const char	af[] ;
+cchar	ngdir[] ;
+cchar	af[] ;
 {
 	bfile	*ofp = pip->ofp ;
 
 	int	rs = SR_OK ;
 	int	wlen = 0 ;
 
-	const char	*nd = pip->newsdname ;
+	cchar	*nd = pip->newsdname ;
 
 	char	afname[MAXPATHLEN + 1] ;
 
@@ -169,7 +161,7 @@ const char	af[] ;
 	if ((rs = mkpath3(afname,nd,ngdir,af)) >= 0) {
 	    bfile	afile, *afp = &afile ;
 	    if ((rs = bopen(afp,afname,"r",0666)) >= 0) {
-		const int	llen = LINEBUFLEN ;
+		cint	llen = LINEBUFLEN ;
 		int		len ;
 		int		line = 0 ;
 		char		lbuf[LINEBUFLEN+1] ;
@@ -231,14 +223,14 @@ bfile		*afp ;
 	int	wlen = 0 ;
 
 	if ((rs = bstat(afp,&sb)) >= 0) {
-	    const int	ulen = USERNAMELEN ;
+	    cint	ulen = USERNAMELEN ;
 	    char	ubuf[USERNAMELEN+1] ;
 	    if ((rs = getusername(ubuf,ulen,sb.st_uid)) >= 0) {
-		const int	dlen = MSGENVDATELEN ;
+		cint	dlen = MSGENVDATELEN ;
 		char		dbuf[MSGENVDATELEN+1] ;
 		if ((rs = progmsgenv_envstr(pip,dbuf,dlen)) >= 0) {
-		    const int	elen = MSGENVLEN ;
-		    const char	*fmt = "From %s %s" ;
+		    cint	elen = MSGENVLEN ;
+		    cchar	*fmt = "From %s %s" ;
 		    char	ebuf[MSGENVLEN+1] ;
 		    if ((rs = bufprintf(ebuf,elen,fmt,ubuf,dbuf)) >= 0) {
 			rs = bprintln(ofp,ebuf,rs) ;

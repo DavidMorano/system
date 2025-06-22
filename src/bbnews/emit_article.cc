@@ -1,5 +1,5 @@
 /* emit_article SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* emit (process) an article */
@@ -82,6 +82,9 @@
 #include	<usystem.h>
 #include	<getfiledirs.h>
 #include	<bfile.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<strx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -106,17 +109,17 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	strwcmp(const char *,const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1w(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	strwcmp(cchar *,cchar *,int) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 
 extern int	cmd_save() ;
 extern int	cmd_printout() ;
@@ -127,35 +130,29 @@ extern int	cmd_output() ;
 extern int	cmd_reply() ;
 #endif
 
-extern int	bbcpy(char *,const char *) ;
+extern int	bbcpy(char *,cchar *) ;
 extern int	hmatch(cchar *,cchar *) ;
 extern int	proglinecheck(struct proginfo *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern const char	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
 
-extern const char	*monthname[] ;
+extern cchar	*monthname[] ;
 
 
 /* forward references */
 
 static int	deluser() ;
-static int	hastabs(const char *) ;
+static int	hastabs(cchar *) ;
 
 #if	CF_ISUS
-static int	isus(bfile *,const char *) ;
+static int	isus(bfile *,cchar *) ;
 #endif
 
 #if	CF_DEKREMOTE
@@ -195,11 +192,11 @@ struct proginfo	*pip ;
 MKDIRLIST_ENT	*dsp ;
 int		ai ;
 ARTLIST_ENT	*ap ;
-const char	ngdir[] ;
-const char	af[] ;
+cchar	ngdir[] ;
+cchar	af[] ;
 {
 	struct passwd	*pp ;
-	struct ustat	sb ;
+	ustat	sb ;
 	bfile		afile, *afp = &afile ;
 	bfile		helpfname, *hfp = &helpfname ;
 	bfile		savefile, *sfp = &savefile ;
@@ -220,12 +217,12 @@ const char	af[] ;
 	int		f_articleid = FALSE ;
 	int		f_shown = FALSE ;
 	int		f_a, f_b, f_c, f_d, f_e, f_f ;
-	const char	*un = pip->username ;
-	const char	*fmt ;
-	const char	*cp, *cp2 ;
-	const char	*ofname ;
-	const char	*oflags ;
-	const char	*resp ;
+	cchar	*un = pip->username ;
+	cchar	*fmt ;
+	cchar	*cp, *cp2 ;
+	cchar	*ofname ;
+	cchar	*oflags ;
+	cchar	*resp ;
 
 	char		lbuf[LINEBUFLEN + 1], *lbp ;
 	char		outbuf[(2*LINEBUFLEN) + 1], *obp ;
@@ -1220,9 +1217,9 @@ prompt:
 	        const int	m = SMODE_MAILBOX ;
 		const int	mblen = MAXNAMELEN ;
 		int		f_new = FALSE ;
-		const char	*tp ;
+		cchar	*tp ;
 		char		mbname[MAXNAMELEN+1] ;
-		while ((tp = strpbrk(resp," ,\t")) != NULL) {
+		while ((tp = strbrk(resp," ,\t")) != NULL) {
 		    if ((rs = sncpy1w(mbname,mblen,resp,(tp-resp))) > 0) {
 			f_new = f_new || (strcmp(mbname,"new") == 0) ;
 	                rs = cmd_save(pip,ap,ngdir,afname,m,mbname) ;
@@ -1460,8 +1457,8 @@ ret0:
 /* is the specified user allow to perform deletes? */
 static int deluser(pip,deleteusers,username)
 struct proginfo	*pip ;
-const char	*deleteusers[] ;
-const char	username[] ;
+cchar	*deleteusers[] ;
+cchar	username[] ;
 {
 	int	i ;
 
@@ -1610,14 +1607,14 @@ char		afname[] ;
 #if	CF_ISUS
 static int isus(nfp,hostbuf)
 bfile		*nfp ;
-const char	hostbuf[] ;
+cchar	hostbuf[] ;
 {
 	const int	llen = LINEBUFLEN ;
 	int		rs ;
 	int		cl ;
 	int		f = FALSE ;
-	const char	*lbp ;
-	const char	*cp ;
+	cchar	*lbp ;
+	cchar	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
 

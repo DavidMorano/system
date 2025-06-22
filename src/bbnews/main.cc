@@ -1,5 +1,5 @@
 /* main SUPPORT (bbnews) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* BB-News reader */
@@ -65,6 +65,7 @@
 #include	<pcspoll.h>
 #include	<mailmsghdrs.h>
 #include	<initnow.h>
+#include	<getourenv.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -129,10 +130,6 @@ extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
