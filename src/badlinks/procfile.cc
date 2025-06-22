@@ -70,7 +70,7 @@
 /* external subroutines */
 
 extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	checklink(struct proginfo *,const char *,struct ustat *) ;
+extern int	checklink(struct proginfo *,const char *,ustat *) ;
 
 
 /* external variables */
@@ -83,7 +83,7 @@ int procfile(pip,basedname)
 struct proginfo	*pip ;
 const char	basedname[] ;
 {
-	struct ustat	se ;
+	ustat	se ;
 
 	FSDIR		dir ;
 

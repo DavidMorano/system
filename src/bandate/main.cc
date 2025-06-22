@@ -1,17 +1,19 @@
 /* main (bandate) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* whole program for BANDATE */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debugging memory allocations */
 
-
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -22,12 +24,9 @@
 	Write ("date") the current date on the banner read on STDIN.
 
 	Synopsis:
-
 	$ banner <string> | bandate 
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 
@@ -39,6 +38,7 @@
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<tmtime.hh>
 #include	<sntmtime.h>
 #include	<bfile.h>
@@ -68,14 +68,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strnprbrk(const char *,int,const char *) ;
 
 
 /* external variables */

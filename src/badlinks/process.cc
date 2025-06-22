@@ -56,7 +56,7 @@
 /* external subroutines */
 
 extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	checklink(struct proginfo *,char *,struct ustat *) ;
+extern int	checklink(struct proginfo *,char *,ustat *) ;
 
 
 /* external variables */
@@ -77,7 +77,7 @@ char		basedir[] ;
 
 	struct dirent	*dep ;
 
-	struct ustat	se ;
+	ustat	se ;
 
 	int	rs ;
 	int	blen, len, slen, dlen, wlen ;

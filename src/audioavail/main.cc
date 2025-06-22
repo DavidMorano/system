@@ -422,7 +422,7 @@ char	*envv[] ;
 /* OK, we do it */
 
 	{
-	    struct ustat	sb ;
+	    ustat	sb ;
 
 	    int	f_avail = TRUE ;
 

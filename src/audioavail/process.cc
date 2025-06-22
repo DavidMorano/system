@@ -79,7 +79,7 @@ bfile		*ofp ;
 char		devdname[] ;
 char		name[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs, len ;
 
