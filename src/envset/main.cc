@@ -1,5 +1,5 @@
 /* main SUPPORT (envset) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* set environment for a user (usually at login) */
@@ -172,7 +172,7 @@ extern int	vecstr_envget(vecstr *,cchar *,cchar **) ;
 extern int	vecstr_loadfile(vecstr *,int,cchar *) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	xfile(IDS *,cchar *) ;
 extern int	getnodename(char *,int) ;
@@ -3050,7 +3050,7 @@ static int loadcooks(PROGINFO *pip)
 
 static int loaddefsfile(PROGINFO *pip,cchar *dfname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		**envv = pip->envv ;
@@ -3118,7 +3118,7 @@ static int loaddefs(PROGINFO *pip,cchar *sched[])
 
 static int loadxfile(PROGINFO *pip,cchar xfname[])
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = FALSE ;

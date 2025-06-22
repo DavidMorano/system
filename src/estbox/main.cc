@@ -122,7 +122,7 @@ int main(argc,argv)
 int	argc ;
 char	**argv ;
 {
-	struct ustat	sb, isb, osb, esb ;
+	ustat	sb, isb, osb, esb ;
 
 	struct tm	*timep ;
 

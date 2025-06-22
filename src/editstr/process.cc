@@ -1,19 +1,18 @@
-/* process */
+/* editstr_process SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* time-time debug print-outs */
 
-
 /* revision history:
 
 	= 96/03/01, David A­D­ Morano
-
 	The subroutine was adapted from others programs that
 	did similar types of functions.
-
 
 */
 
@@ -21,21 +20,21 @@
 
 /******************************************************************************
 
-	This subroutine just provides optional expansion of directories.
-	The real work is done by the PROCFILE subroutine.
-
+  	Description:
+	This subroutine just provides optional expansion of
+	directories.  The real work is done by the PROCFILE subroutine.
 
 ******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 
@@ -67,10 +66,6 @@ extern int	sfbasename(const char *,int,const char **) ;
 
 extern int	procfile(struct proginfo *,PARAMOPT *,const char *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -98,7 +93,7 @@ struct proginfo	*pip ;
 PARAMOPT	*pop ;
 const char	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 	int	c ;

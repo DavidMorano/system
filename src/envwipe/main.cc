@@ -95,7 +95,7 @@ char	*envv[] ;
 {
 	vecstr		exports = obj_vecstr(20,0) ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	FILE		*efp = NULL ;
 

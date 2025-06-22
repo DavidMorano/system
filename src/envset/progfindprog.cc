@@ -1,35 +1,33 @@
 /* progfindprog */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* find the program to execute */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	CF_DEBUG	0		/* debug print-outs switchable */
-
 
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-
 	This code was originally written.
-
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-/**************************************************************************
+/*******************************************************************************
+
+  	Name:
+	progfindprog
 
 	Synopsis:
-
 	int progfindprog()
 
+*******************************************************************************/
 
-**************************************************************************/
-
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -46,6 +44,7 @@
 #include	<bfile.h>
 #include	<ids.h>
 #include	<vecstr.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 
 #include	"localmisc.h"
@@ -110,7 +109,7 @@ extern int	vecstr_loadfile(vecstr *,int,const char *) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	getprogpath(IDS *,VECSTR *,char *,const char *,int) ;
 
 extern int	progdefprog(struct proginfo *,const char **) ;
@@ -315,7 +314,7 @@ const char	*pp ;
 
 
 	c = 0 ;
-	while ((cp = strpbrk(pp,":;")) != NULL) {
+	while ((cp = strbrk(pp,":;")) != NULL) {
 
 	    cl = pathclean(tmpfname,pp,(cp - pp)) ;
 
@@ -353,7 +352,7 @@ static int xfile(idp,fname)
 IDS		*idp ;
 const char	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 

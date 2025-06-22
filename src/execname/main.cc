@@ -1,8 +1,9 @@
 /* main */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to exec a program with the named arg0 */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
@@ -15,7 +16,6 @@
 #define	CF_SOFAR	0		/* sofar() ? */
 #define	CF_ISBADENV	0		/* use |isbadenv()| */
 
-
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
@@ -27,17 +27,14 @@
 
 /*******************************************************************************
 
-        This subroutine is pretty much the whole little program here. This
-        program really just allows for the changing of ARG[0] when a program is
-        executed.
+	This subroutine is pretty much the whole little program
+	here. This program really just allows for the changing of
+	ARG[0] when a program is executed.
 
 	Synopsis:
-
 	$ execname <prog> [<arg0> [<arg1 ...>]]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -50,13 +47,15 @@
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<ucmallreg.h>
+#include	<getourenv.h>
 #include	<ids.h>
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<vechand.h>
 #include	<strpack.h>
 #include	<dirlist.h>
-#include	<ucmallreg.h>
+#include	<strn.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -100,7 +99,7 @@ extern int	optvalue(const char *,int) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,void *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	findfilepath(const char *,char *,const char *,int) ;
 extern int	getprogpath(IDS *,VECSTR *,char *,const char *,int) ;
 extern int	vecstr_adduniq(VECSTR *,const char *,int) ;
@@ -121,12 +120,6 @@ extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif /* CF_DEBUGS */
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -1455,7 +1448,7 @@ static int sofar(cchar *bp,int bl)
 	int		cl ;
 	const char	*tp ;
 	if (bl < 0) bl = strlen(bp) ;
-	while ((tp = strnpbrk(bp,bl,":;")) != NULL) {
+	while ((tp = strnbrk(bp,bl,":;")) != NULL) {
 	    cl = (tp - bp) ;
 	    debugprintf("sofar: %r\n",bp,cl) ;
 	    bl -= ((tp + 1) - bp) ;

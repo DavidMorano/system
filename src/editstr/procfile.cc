@@ -1,4 +1,5 @@
-/* procfile SUPPORT */
+/* editstr_procfile SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* process a file */
@@ -37,6 +38,7 @@
 #include	<paramopt.h>
 #include	<vecstr.h>
 #include	<mailmsgmathdr.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -58,10 +60,6 @@ extern int	matcasestr(cchar **,cchar *,int) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
 
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnrchr(cchar *,int,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -158,9 +156,7 @@ cchar	fname[] ;
 #endif
 
 	if (! f_skipfile) {
-
-	    struct ustat	sb ;
-
+	    ustat	sb ;
 
 	    rs1 = u_stat(fname,&sb) ;
 

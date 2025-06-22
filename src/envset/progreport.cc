@@ -1,12 +1,12 @@
 /* progreport */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* subroutines to report (pretty much) a fatal program of some sort */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
-
 
 /* revision history:
 
@@ -14,8 +14,8 @@
 	This program was originally written.
 
 	= 2017-09-11, David A­D­ Morano
-        Taken out of existing code to try to make more useful for a wider range
-        of programs.
+	Taken out of existing code to try to make more useful for
+	a wider range of programs.
 
 */
 
@@ -23,12 +23,11 @@
 
 /*******************************************************************************
 
-	These are support subroutines for making a report (to a file) of some
-	of the information related to how the calling program was invoked.
-
+	These are support subroutines for making a report (to a
+	file) of some of the information related to how the calling
+	program was invoked.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -36,6 +35,7 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 
@@ -55,23 +55,17 @@
 /* external subroutines */
 
 extern int	getpwd(char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,void *,int) ;
-extern int	hasprintbad(const char *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,void *,int) ;
+extern int	hasprintbad(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 extern int	debugprinthex(cchar *,int,cchar *,int) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif /* CF_DEBUGS */
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -215,7 +209,7 @@ static int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m)
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = mkdirs(rdname,m)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = uc_stat(rdname,&sb)) >= 0) {
 	        const mode_t	dm = (m|S_ISVTX) ;
 		const uid_t	uid = getuid() ;

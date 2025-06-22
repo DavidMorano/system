@@ -165,7 +165,7 @@ char	*argv[] ;
 char	*envv[] ;
 {
 	PROGINFO	pi, *pip = &pi ;
-	struct ustat	sb ;
+	ustat	sb ;
 	USERINFO	u ;
 	PARAMOPT	aparams ;
 	bfile		errfile, teefile ;
