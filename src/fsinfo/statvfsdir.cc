@@ -91,7 +91,7 @@ static int	trytouch(const char *) ;
 
 int statvfsdir(cchar *fname,STATVFS *sbp)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		rs1 ;
 

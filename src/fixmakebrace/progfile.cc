@@ -1,30 +1,28 @@
-/* procfile */
+/* procfile SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* time-time debug print-outs */
 
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-        The subroutine was adapted from others programs that did similar types
-        of functions.
+	The subroutine was adapted from others programs that did
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-/******************************************************************************
+/*******************************************************************************
 
-        This subroutine provides the actual check and fix on the files
-        specified.
+	This subroutine provides the actual check and fix on the
+	files specified.
 
-
-******************************************************************************/
-
+*******************************************************************************/
 
 #include	<envstandards.h>
 
@@ -43,7 +41,6 @@
 #include	<nulstr.h>
 #include	<localmisc.h>
 
-#include	"config.h"
 #include	"defs.h"
 
 
@@ -66,12 +63,6 @@ extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 

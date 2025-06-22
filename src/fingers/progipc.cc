@@ -311,7 +311,7 @@ static int progipcbeginshared(PROGINFO *pip,mode_t om,char *fname)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    int	rs1 ;
 	    int	fd = ipp->fd_req ;
 	    rs1 = u_fstat(fd,&sb) ;

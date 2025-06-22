@@ -123,7 +123,7 @@ int progjobdir(PROGINFO *pip,char *jobdname)
 /* check if a directory exists and has the correct permissions */
 static int procdircheck(PROGINFO *pip,cchar *dname,mode_t dm)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 
 	if ((rs = u_stat(dname,&sb)) >= 0) {

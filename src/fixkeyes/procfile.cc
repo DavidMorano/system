@@ -75,7 +75,7 @@ int		f_eject ;
 {
 	bfile		infile, *ifp = &infile ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	i ;
 	int	page = 0 ;
