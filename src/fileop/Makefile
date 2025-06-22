@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gxx
@@ -34,8 +33,10 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += usystem.h localmisc.h
-INCS += uclibsubs.h
+INCS += fileop_config.h
+INCS +=
+
+MODS +=
 
 LIBS=
 
@@ -46,7 +47,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,7 +57,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o 
+OBJ00= fileop_main.o whatinfo.o proginfo.o proginfo_setpiv.o 
 OBJ01= 
 OBJ02=
 OBJ03=
@@ -82,12 +82,13 @@ OBJ= $(OBJA) $(OBJB)
 SRC= $(OBJ:.c=.o)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).x
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -106,6 +107,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T):			$(T).ee
@@ -170,7 +174,7 @@ control:
 	date >> Control
 
 
-main.o:			main.cc $(INCS)
+fileop_main.o:		fileop_main.cc 				$(INCS)
 
 whatinfo.o:		whatinfo.c config.h
 

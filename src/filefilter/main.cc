@@ -1271,7 +1271,7 @@ static int procin(PROGINFO *pip,bfile *ofp,cchar ifn[])
 static int procfile(PROGINFO *pip,bfile *ofp,cchar fname[])
 {
 	struct fileuniq	uf, *ufp ;
-	struct ustat	sb ;
+	ustat	sb ;
 	HDB_DATUM	key, val ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1575,7 +1575,7 @@ static int procnoprog(PROGINFO *pip,struct fileuniq *ufp,cchar fname[])
 	if (pip == NULL) return SR_FAULT ;
 
 	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    int			fd = rs ;
 
 	    if (! ufp->f_valid) {

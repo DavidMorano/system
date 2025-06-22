@@ -1,12 +1,12 @@
 /* progreport */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* subroutines to report (pretty much) a fatal program of some sort */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
-
 
 /* revision history:
 
@@ -14,8 +14,8 @@
 	This program was originally written.
 
 	= 2017-09-11, David A­D­ Morano
-        Taken out of existing code to try to make more useful for a wider range
-        of programs.
+	Taken out of existing code to try to make more useful for
+	a wider range of programs.
 
 */
 
@@ -23,12 +23,11 @@
 
 /*******************************************************************************
 
-	These are support subroutines for making a report (to a file) of some
-	of the information related to how the calling program was invoked.
-
+	These are support subroutines for making a report (to a
+	file) of some of the information related to how the calling
+	program was invoked.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -67,12 +66,6 @@ extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif /* CF_DEBUGS */
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-
 
 /* external variables */
 
@@ -98,7 +91,7 @@ static int	mktmpreportdir(char *,cchar *,cchar *,mode_t) ;
 
 int mkreport(PROGINFO *pip,int argc,cchar **argv,int rv)
 {
-	const int	ulen = USERNAMELEN ;
+	cint	ulen = USERNAMELEN ;
 	int		rs ;
 	char		ubuf[USERNAMELEN+1] ;
 
@@ -113,12 +106,12 @@ int mkreport(PROGINFO *pip,int argc,cchar **argv,int rv)
 	    if ((rs = mktmpreportdir(rbuf,ubuf,dname,dm)) >= 0) {
 	        char	fbuf[MAXPATHLEN+1] ;
 	        if ((rs = mkreportfile(pip,fbuf,rbuf)) >= 0) {
-	            const int	nlen = NODENAMELEN ;
+	            cint	nlen = NODENAMELEN ;
 	            char	nbuf[NODENAMELEN+1] ;
 	            if (pip->pid == 0) pip->pid = getpid() ;
 	            if ((rs = getnodename(nbuf,nlen)) >= 0) {
-	                const int	llen = LOGIDLEN ;
-	                const int	v = pip->pid ;
+	                cint	llen = LOGIDLEN ;
+	                cint	v = pip->pid ;
 	                cchar		*onn = pip->nodename ;
 	                char		lbuf[LOGIDLEN+1] ;
 	                pip->nodename = nbuf ;
@@ -149,7 +142,7 @@ static int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
 	int		rs ;
 
 	if ((rs = tmtime_localtime(&mt,dt)) >= 0) {
-	    const int	tlen = TIMEBUFLEN ;
+	    cint	tlen = TIMEBUFLEN ;
 	    cchar	*fmt = "r%y%m%d%H%M%S" ;
 	    char	tbuf[TIMEBUFLEN+1] ;
 	    if ((rs = sntmtime(tbuf,tlen,&mt,fmt)) >= 0) {
@@ -172,7 +165,7 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
 	char		tbuf[TIMEBUFLEN+1] ;
 	timestr_logz(dt,tbuf) ;
 	if ((rs = bopen(rfp,fbuf,"wct",0666)) >= 0) {
-	    const int	al = DISARGLEN ;
+	    cint	al = DISARGLEN ;
 	    int		v = pip->pid ;
 	    int		i ;
 
@@ -215,7 +208,7 @@ static int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m)
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = mkdirs(rdname,m)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = uc_stat(rdname,&sb)) >= 0) {
 	        const mode_t	dm = (m|S_ISVTX) ;
 		const uid_t	uid = getuid() ;
