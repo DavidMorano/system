@@ -212,7 +212,7 @@ FILEWATCH	*op ;
 time_t		daytime ;
 bfile		*ofp ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	off_t	boff ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -370,7 +370,7 @@ time_t		daytime ;
 char		linebuf[] ;
 int		linelen ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	off_t	boff ;
 	int		rs = SR_OK ;
 	int		len, ml ;
@@ -537,7 +537,7 @@ time_t		daytime ;
 const char	fname[] ;
 int		off ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	off_t	boff ;
 	off_t	offset ;
 	int		rs = SR_OK ;

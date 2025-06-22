@@ -1,11 +1,13 @@
 #!/usr/extra/bin/ksh
 # MAKEIT
 
+#BUILDTYPE=debug
 BUILDTYPE=develop
 #BUILDTYPE=deliver
 
 
-export REPOROOT=$( reporoot )
+#export REPOROOT=$( reporoot )
+export REPOROOT=${HOME}/github/system
 
 PN=${0##/*}
 ex=0

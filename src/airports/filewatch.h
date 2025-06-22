@@ -55,17 +55,17 @@ struct filewatch_flags {
 } ;
 
 struct filewatch_head {
-	const char	*fname ;
+	cchar		*fname ;
 	char		*lp ;
 	char		*buf ;
 	STRFILTER	*sfp ;
-	FILEWATCH_FL	f ;
 	bfile		wfile ;
 	time_t		lastcheck ;
 	time_t		lastchange ;
 	time_t		opentime ;
 	ino_t		ino ;
 	dev_t		dev ;
+	FILEWATCH_FL	f ;
 	uint		offset ;
 	int		interval ;
 	int		cut ;

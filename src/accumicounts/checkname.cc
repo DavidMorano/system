@@ -84,10 +84,10 @@ static int	addsize() ;
 
 int checkname(name,sbp,ckp)
 char		name[] ;
-struct ustat	*sbp ;
+ustat	*sbp ;
 struct checkparams	*ckp ;
 {
-	struct ustat	sb2 ;
+	ustat	sb2 ;
 
 	struct proginfo	*pip = ckp->pip ;
 

@@ -160,7 +160,7 @@ LFM		*lfp ;
 {
 	struct pollfd		fds[4] ;
 
-	struct ustat		sb ;
+	ustat		sb ;
 
 	struct msghdr	ipcmsg ;
 
@@ -897,7 +897,7 @@ char		fname[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 
-		struct ustat	sb1 ;
+		ustat	sb1 ;
 
 		u_stat(buf,&sb1) ;
 
@@ -928,7 +928,7 @@ char		fname[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 
-		struct ustat	sb1 ;
+		ustat	sb1 ;
 
 		int	cl ;
 
@@ -954,7 +954,7 @@ char		fname[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 
-		struct ustat	sb1 ;
+		ustat	sb1 ;
 
 		int	cl ;
 

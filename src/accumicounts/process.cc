@@ -87,7 +87,7 @@ struct proginfo	*pip ;
 char		name[] ;
 PARAMOPT	*pp ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	bfile	ifile ;
 
