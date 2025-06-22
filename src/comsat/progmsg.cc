@@ -300,7 +300,7 @@ int progcsmsg(PROGINFO *pip,cchar *mbuf,int mlen)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4)) {
-	                struct ustat	sb ;
+	                ustat	sb ;
 	                int		rs1 = u_stat(mailfname,&sb) ;
 	                debugprintf("progcsmsg: u_stat() rs1=%d msize=%llu\n",
 	                    rs1,sb.st_size) ;
@@ -314,7 +314,7 @@ int progcsmsg(PROGINFO *pip,cchar *mbuf,int mlen)
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4)) {
-	                    struct ustat	sb ;
+	                    ustat	sb ;
 	                    cchar		*fmt ;
 	                    int		rs1 = u_fstat(mfd,&sb) ;
 	                    debugprintf("progcsmsg: mfd=%u\n",mfd) ;

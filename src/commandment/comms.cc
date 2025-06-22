@@ -173,7 +173,7 @@ int commandments_open(COMMANDMENTS *op,cchar pr[],cchar dbname[])
 	    if (rs >= 0) rs = getuserhome(hbuf,MAXPATHLEN,ubuf) ;
 	    if (rs >= 0) rs = mkpath3(tmpfname,hbuf,cname,dbname) ;
 	    if (rs >= 0) {
-	        struct ustat	sb ;
+	        ustat	sb ;
 		rs = u_stat(tmpfname,&sb) ;
 		if ((rs >= 0) && (! S_ISREG(sb.st_mode))) rs = SR_ISDIR ;
 		if (isNotAccess(rs)) {
@@ -415,7 +415,7 @@ static int commandments_filemapbegin(COMMANDMENTS *op)
 	int		rs ;
 
 	if ((rs = u_open(op->fname,O_RDONLY,0666)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    const int		fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
@@ -592,7 +592,7 @@ static int commandments_checkupdate(COMMANDMENTS *op,time_t dt)
 	int		f = FALSE ;
 
 	if (op->ncursors == 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if (dt == 0) dt = time(NULL) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
 	    op->ti_lastcheck = dt ;

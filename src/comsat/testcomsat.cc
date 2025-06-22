@@ -1,23 +1,26 @@
 /* testcomsat */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* test seding COMAST messages */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* debug print-outs */
 
-
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace the previous
-        mail-delivery program for PCS, written around 1990 or so and which also
-        served for a time to filter environment for the SENDMAIL daemon.
+	This code module was completely rewritten to replace the
+	previous mail-delivery program for PCS, written around 1990
+	or so and which also served for a time to filter environment
+	for the SENDMAIL daemon.
 
 	= 2004-02-17, David A­D­ Morano
-        This was modified to add the MSGID object. That is a database that
-        stores message IDs. We used it to eliminate duplicate mail deliveries
-        which as of late are coming from several popular sources!
+	This was modified to add the MSGID object. That is a database
+	that stores message IDs. We used it to eliminate duplicate
+	mail deliveries which as of late are coming from several
+	popular sources!
 
 */
 
@@ -27,9 +30,7 @@
 
 	This program tests sending (fake) COMSAT messages.
 
-
 ******************************************************************************/
-
 
 #include	<envstandards.h>
 
@@ -100,9 +101,6 @@ extern int	strlinelen(const char *,int,int) ;
 #endif
 
 extern char	*strdcpy3(char *,int,const char *,const char *,const char *) ;
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 

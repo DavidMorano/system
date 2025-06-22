@@ -1,5 +1,5 @@
 /* main SUPPORT (comsat) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* COMSAT server */
@@ -45,10 +45,12 @@
 #include	<sys/timeb.h>		/* for 'struct timeb' */
 #include	<netinet/in.h>
 #include	<termios.h>
-#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdlib>
 #include	<cstring>
 #include	<syslog.h>
@@ -70,8 +72,10 @@
 #include	<openport.h>
 #include	<spawner.h>
 #include	<buffer.h>
-#include	<ascii.h>
 #include	<initnow.h>
+#include	<ascii.h>
+#include	<strn.h>		/* |strnrbrk(3uc)| */
+#include	<timestr.h>
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<isfiledesc.h>
@@ -175,12 +179,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strrpbrk(cchar *,cchar *) ;
-extern char	*strnrpbrk(cchar *,int,cchar *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -1463,7 +1461,7 @@ static int procback(PROGINFO *pip) noex {
 	    debugprintf("main/procback: mid2 rs=%d\n",rs) ;
 #endif
 
-	    if ((tp = strnrpbrk(ebuf,el,"/.")) != NULL) {
+	    if ((tp = strnrbrk(ebuf,el,"/.")) != NULL) {
 	        if (tp[0] == '.') ebuf[tp-ebuf] = '\0' ;
 	    }
 
