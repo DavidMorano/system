@@ -1,5 +1,5 @@
 /* bopencmd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* BASIC INPUT OUTPUT package */
@@ -95,7 +95,7 @@ int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 
 #if	CF_DEBUGS
 	{
-	struct ustat	sb ;
+	ustat	sb ;
 	if (u_fstat(2,&sb) >= 0)
 	    debugprintf("bopencmd: FD=2 is there!\n") ;
 	}
