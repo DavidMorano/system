@@ -1,24 +1,27 @@
-/* progcomsat */
+/* dmail_progcomsat SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* handle COMAST matters */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable print-outs */
 #define	CF_ISSAMEHOST	1		/* use 'issamehostname(3dam)' */
 
-
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-	This code module was completely rewritten to replace the previous
-	mail-delivery program for PCS, written around 1990 or so and which also
-	served for a time to filter environment for the SENDMAIL daemon.
+	This code module was completely rewritten to replace the
+	previous mail-delivery program for PCS, written around 1990
+	or so and which also served for a time to filter environment
+	for the SENDMAIL daemon.
 
 	= 2004-02-17, David A­D­ Morano
-	This was modified to add the MSGID object.  That is a database that
-	stores message IDs.  We used it to eliminate duplicate mail deliveries
-	which as of late are coming from several popular sources!
+	This was modified to add the MSGID object.  That is a
+	database that stores message IDs.  We used it to eliminate
+	duplicate mail deliveries which as of late are coming from
+	several popular sources!
 
 */
 
@@ -28,11 +31,9 @@
 
 	This module provides the handling for COMSAT matters.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -112,9 +113,6 @@ extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 

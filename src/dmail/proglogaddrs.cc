@@ -1,11 +1,12 @@
-/* proglogaddrs */
+/* dmail_proglogaddrs SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* log messages addresses */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
-
 
 /* revision history:
 
@@ -13,8 +14,9 @@
 	This code was originally written.
 
 	= 1999-02-01, David A­D­ Morano
-        I added a little code to "post" articles that do not have a valid
-        newsgroup to a special "dead article" directory in the BB spool area.
+	I added a little code to "post" articles that do not have
+	a valid newsgroup to a special "dead article" directory in
+	the BB spool area.
 
 */
 
@@ -22,19 +24,19 @@
 
 /*******************************************************************************
 
-        This module processes one or more mail messages (in appropriate mailbox
-        format if more than one) on STDIN. The output is a single file that is
-        ready to be added to each individual mailbox in the spool area.
+  	Description:
+	This module processes one or more mail messages (in appropriate
+	mailbox format if more than one) on STDIN.  The output is a
+	single file that is ready to be added to each individual
+	mailbox in the spool area.
 
 	Things to do:
 
-	Change use of 'sfsubstance()'.
-
+	Change use of |sfsubstance()|.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -110,16 +112,13 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	cfdeci(cchar *,int,int *) ;
 
-extern int	sfsubstance(const char *,int,const char **) ;
+extern int	sfsubstance(cchar *,int,cchar **) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*timestr_edate(time_t,char *) ;
 extern char	*timestr_hdate(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
@@ -188,7 +187,7 @@ int		hi ;
 	int		rs1 ;
 	int		sl ;
 	cchar		*sp ;
-	const char	*hkey ;
+	cchar	*hkey ;
 
 	hkey = mailmsghdrs_names[hi] ;
 
@@ -201,7 +200,7 @@ int		hi ;
 	            int		c = 0 ;
 	            int		cl ;
 	            int		f_route ;
-	            const char	*cp ;
+	            cchar	*cp ;
 	            for (j = 0 ; ema_get(&a,j,&ep) >= 0 ; j += 1) {
 
 	                f_route = TRUE ;

@@ -1,5 +1,5 @@
-/* parsenodespec SUPPORT */
-/* encoding=ISO8859-1 */
+/* dmail_parsenodespec SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* parse a COMSAT node specification into node and port */
@@ -61,6 +61,7 @@
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<getportnum.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -85,9 +86,6 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*strdcpy1(char *,int,cchar *) ;
 extern char	*strdcpy1w(char *,int,cchar *,int) ;
 extern char	*timestr_log(time_t,char *) ;

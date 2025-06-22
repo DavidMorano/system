@@ -77,7 +77,7 @@ const char	*envv[] ;
 	bfile		errfile, *efp = &errfile ;
 
 #ifdef	COMMENT
-	struct ustat	ss ;
+	ustat	ss ;
 #endif
 
 	uid_t		uid, euid ;
