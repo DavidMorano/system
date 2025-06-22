@@ -169,6 +169,9 @@ namespace libu {
     extern int uitimer_get(int,ITIMERVAL *) noex ;
     extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
 }
+namespace libu {
+    extern bool hasnotdots(cchar *,int) noex ;
+}
 #endif /* __cplusplus */
 
 

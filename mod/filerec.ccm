@@ -1,4 +1,4 @@
-/* fonce MODULE (primary-module-interface) */
+/* filerec MODULE (primary-module-interface) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -23,14 +23,14 @@
 /*******************************************************************************
 
 	Name:
-	fonce
+	filerec
 
 	Description:
 	This object implements a set with a key consisting of
 	device and inode numbers.
 
 	Symopsis:
-	int fonce_start(int n = 0) noex
+	int filerec_start(int n = 0) noex
 
 	Arguments:
 	n		suggested starting possible number of elements
@@ -58,48 +58,49 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-export module fonce ;
+export module filerec ;
 
 export {
-    struct fonce_devino {
+    struct filerec_devino {
+	cchar		*fname{} ;
 	ino_t		ino ;
 	dev_t		dev ;
-	fonce_devino(dev_t d,ino_t i) noex : dev(d), ino(i) { } ;
+	filerec_devino(dev_t d,ino_t i) noex : dev(d), ino(i) { } ;
 	size_t hashval() const noex {
 	    return size_t(dev + ino) ;
 	} ;
-	bool equal_to(const fonce_devino &o) noex {
+	bool equal_to(const filerec_devino &o) noex {
 	    return ((dev == o.dev) && (ino == o.ino)) ;
 	} ;
-    } ; /* end struct (fonce_devino) */
+    } ; /* end struct (filerec_devino) */
     namespace std {
-        template<> struct hash<fonce_devino> {
-	    size_t operator() (const fonce_devino &di) const noex {
+        template<> struct hash<filerec_devino> {
+	    size_t operator() (const filerec_devino &di) const noex {
 	        return di.hashval() ;
 	    } ;
-        } ; /* end struct-template (hash<fonce_devino>) */
-        template<> struct equal_to<fonce_devino> {
-	    typedef const fonce_devino	cdi ;
+        } ; /* end struct-template (hash<filerec_devino>) */
+        template<> struct equal_to<filerec_devino> {
+	    typedef const filerec_devino	cdi ;
 	    size_t operator() (cdi &lhs,cdi &rhs) const noex {
 	        return ((lhs.dev == rhs.dev) && (lhs.ino == rhs.ino)) ;
 	    } ;
-        } ; /* end struct-template (hash<fonce_devino>) */
+        } ; /* end struct-template (hash<filerec_devino>) */
     } /* end namespace) */
 } /* end export */
 
-enum foncemems {
-	foncemem_start,
-	foncemem_finish,
-	foncemem_count,
-	foncemem_overlast
-} ; /* end enum (foncemems) */
+enum filerecmems {
+	filerecmem_start,
+	filerecmem_finish,
+	filerecmem_count,
+	filerecmem_overlast
+} ; /* end enum (filerecmems) */
 
 export {
-    struct fonce ;
-    struct fonce_co {
-	fonce		*op = nullptr ;
+    struct filerec ;
+    struct filerec_co {
+	filerec		*op = nullptr ;
 	int		w = -1 ;
-	constexpr void operator () (fonce *p,int m) noex {
+	constexpr void operator () (filerec *p,int m) noex {
 	    op = p ;
 	    w = m ;
 	} ;
@@ -107,32 +108,34 @@ export {
 	operator int () noex {
 	    return operator () () ;
 	} ;
-    } ; /* end struct (fonce_co) */
-    struct fonce {
-	friend fonce_co ;
-	typedef std::unordered_set<fonce_devino>	stype ;
-	typedef fonce_devino	key_type ;
-	fonce(const fonce &) = delete ;
-	fonce &operator = (const fonce &) = delete ;
+    } ; /* end struct (filerec_co) */
+    struct filerec {
+	friend filerec_co ;
+	typedef std::unordered_set<filerec_devino>	stype ;
+	typedef filerec_devino	key_type ;
+	filerec(const filerec &) = delete ;
+	filerec &operator = (const filerec &) = delete ;
 	stype		*setp = nullptr ;
-	fonce_co	start ;
-	fonce_co	finish ;
-	fonce_co	count ;
-	fonce() noex {
-	    start	(this,foncemem_start) ;
-	    finish	(this,foncemem_finish) ;
-	    count	(this,foncemem_count) ;
+	filerec_co	start ;
+	filerec_co	finish ;
+	filerec_co	count ;
+	filerec() noex {
+	    start	(this,filerecmem_start) ;
+	    finish	(this,filerecmem_finish) ;
+	    count	(this,filerecmem_count) ;
 	} ; /* end ctor) */
 	void dtor() noex ;
-	destruct fonce() {
+	operator int () noex ;
+	destruct filerec() {
 	    if (setp) dtor() ;
 	} ; /* end dtor */
-	int		checkin(CUSTAT *) noex ;
+	int		checkin(custat *,cchar *) noex ;
     private:
 	int		istart(int) noex ;
 	int		ifinish() noex ;
 	int		icount() noex ;
-    } ; /* end class (fonce) */
+	int		finents() noex ;
+    } ; /* end class (filerec) */
 } /* end export */
 
 

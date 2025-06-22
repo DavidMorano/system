@@ -1,4 +1,4 @@
-/* removes HEADER */
+/* urmdirs HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	REMOVES_INCLUDE
-#define	REMOVES_INCLUDE
+#ifndef	URMDIRS_INCLUDE
+#define	URMDIRS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -29,11 +29,11 @@
 
 EXTERNC_begin
 
-extern int	removes(cchar *) noex ;
+extern int	u_rmdirs(cchar *) noex ;
 
 EXTERNC_end
 
 
-#endif /* REMOVES_INCLUDE */
+#endif /* URMDIRS_INCLUDE */
 
 
