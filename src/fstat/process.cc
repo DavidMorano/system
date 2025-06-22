@@ -71,7 +71,7 @@ bfile		*ofp ;
 char		filename[] ;
 PARAMOPT	*pp ;
 {
-	struct ustat	ss, *sp = &ss ;
+	ustat	ss, *sp = &ss ;
 
 	struct tm	*ftsp ;
 

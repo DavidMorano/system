@@ -625,7 +625,7 @@ int		c ;
 static int dictfiles_setup(op)
 DICTFILES	*op ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	IDS	us ;
 

@@ -301,7 +301,7 @@ static int procmacro(PROGINFO *pip,SUBINFO *pcp,cchar *lp,int ll,int li)
 
 	            rs1 = SR_OK ;
 	            if (cp[0] != '/') {
-	                struct ustat	sb ;
+	                ustat	sb ;
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(3))

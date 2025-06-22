@@ -307,7 +307,7 @@ int bdb_finish(BDB *op)
 
 int bdb_add(BDB *op,cchar *fname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;

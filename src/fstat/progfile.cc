@@ -72,7 +72,7 @@ bfile		*ofp ;
 char		fname[] ;
 PARAMOPT	*pp ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	TMTIME		ts ;
 

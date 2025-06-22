@@ -66,7 +66,7 @@ bfile		*ofp ;
 char		fname[] ;
 PARAMOPT	*pp ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	struct tm	*ftsp ;
 
