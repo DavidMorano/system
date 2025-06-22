@@ -143,7 +143,7 @@ struct locinfo {
 	LOCINFO_FL	have, f, changed, final ;
 	LOCINFO_FL	init, open ;
 	PROGINFO	*pip ;
-	struct ustat	isb ;
+	ustat	isb ;
 	vecstr		stores ;
 	const char	**argv ;
 	const char	*argname ;
@@ -1327,7 +1327,7 @@ static int procdial(PROGINFO *pip,cchar *rhostname,cchar *rcmdname) noex {
 #endif
 
 	if (! lip->f.noinput) {
-	    struct ustat	isb ;
+	    ustat	isb ;
 	    const char		*ifname = lip->ifname ;
 
 	    if ((ifname != NULL) && (ifname[0] != '\0')) {

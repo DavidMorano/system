@@ -112,7 +112,7 @@ int		mxu ;
 {
 	struct pollfd	fds[NFDS] ;
 	struct fpstat	fp[NFDS] ;
-	struct ustat	sb ;
+	ustat	sb ;
 	time_t		ti_pollsanity ;
 	time_t		ti_sanity ;
 	const int	pollinput = (POLLIN|POLLRDNORM|POLLRDBAND|POLLPRI) ;

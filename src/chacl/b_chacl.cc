@@ -1,4 +1,5 @@
 /* b_chacl SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* change ACLs (on OSes that have them) */
@@ -48,6 +49,9 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<ugetpw.h>
+#include	<getourenv.h>
+#include	<getax.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -55,8 +59,7 @@
 #include	<field.h>
 #include	<vecobj.h>
 #include	<fsdirtree.h>
-#include	<getax.h>
-#include	<ugetpw.h>
+#include	<strn.h>
 #include	<mkchar.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -157,12 +160,7 @@ extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strdcp1w(char *,int,cchar *,int) ;
-extern char	*strnrchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_logz(time_t,char *) ;
 extern char	*timestr_elapsed(time_t,char *) ;
 
@@ -1268,7 +1266,7 @@ static int procacl(PROGINFO *pip,cchar *abuf,int alen)
 	int		rs = SR_OK ;
 	cchar		*tp ;
 
-	if ((tp = strnpbrk(abuf,alen,"=+-")) != NULL) {
+	if ((tp = strnbrk(abuf,alen,"=+-")) != NULL) {
 	    aclinfo	ai ;
 	    int		idlen = 0 ;
 	    int		typelen = (tp - abuf) ;
@@ -1286,7 +1284,7 @@ static int procacl(PROGINFO *pip,cchar *abuf,int alen)
 	        cchar	*sp = (tp + 1) ;
 	        int	sl = ((abuf + alen) - idspec) ;
 	        idspec = (tp + 1) ;
-	        if ((tp = strnpbrk(sp,sl,"+-")) != NULL) {
+	        if ((tp = strnbrk(sp,sl,"+-")) != NULL) {
 	            idlen = (tp - idspec) ;
 	        }
 #if	CF_DEBUG
@@ -1594,7 +1592,7 @@ static int procnamer(PROGINFO *pip,cchar *fname)
 
 	dtopts |= ((lip->f.follow) ? FSDIRTREE_MFOLLOW : 0) ;
 	if ((rs = fsdirtree_open(&dt,fname,dtopts)) >= 0) {
-	    struct ustat	esb ;
+	    ustat	esb ;
 	    const int		mpl = MAXPATHLEN ;
 	    char		dename[MAXPATHLEN + 1] ;
 	    char		tmpfname[MAXPATHLEN + 1] ;

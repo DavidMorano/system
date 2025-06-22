@@ -88,7 +88,7 @@
 
 /* external subroutines */
 
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	getpwd(char *,int) ;
 
@@ -387,7 +387,7 @@ IDS		*idp ;
 const char	fname[] ;
 int		mode ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 

@@ -114,7 +114,7 @@ int		mxu ;
 	struct sigaction	sigs, oldsigs ;
 	struct pollfd	fds[NFDS] ;
 	struct fpstat	fp[NFDS] ;
-	struct ustat	sb ;
+	ustat	sb ;
 	sigset_t	signalmask ;
 	time_t		t_pollsanity ;
 	time_t		t_sanity ;
