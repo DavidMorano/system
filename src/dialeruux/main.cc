@@ -196,7 +196,7 @@ const char	*envv[] ;
 {
 	struct sigaction	sigs ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	struct proginfo	g, *pip = &g ;
 

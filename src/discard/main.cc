@@ -1,5 +1,5 @@
 /* main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* generic (pretty much) front-end program subroutine */
@@ -234,7 +234,7 @@ char	*envv[] ;
 {
 	PROGINFO		pi, *pip = &pi ;
 	struct openstuff	oo ;
-	struct ustat		sb ;
+	ustat		sb ;
 	struct group		ge ;
 	USERINFO		u ;
 
