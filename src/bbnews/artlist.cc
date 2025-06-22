@@ -328,7 +328,7 @@ int artlist_getentry(ARTLIST *alp,int i,ARTLIST_ENT **epp)
 /* initialize an article entry */
 static int entry_start(ARTLIST_ENT *ep,DATER *dp,cchar *ngdir,cchar *name)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	const char	*cp ;
 

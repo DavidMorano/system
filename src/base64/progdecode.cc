@@ -1,18 +1,17 @@
 /* progdecode */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* decode a file (encoded in BASE64) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time debugging */
 
-
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-
 	The subroutine was newly written.
-
 
 */
 
@@ -20,29 +19,25 @@
 
 /******************************************************************************
 
+  	Description:
 	This module does the work of decoding the BASE64 input.
 
 	Synopsis:
-
 	int progdecode(pip,ofp,name)
 	PROGINFO	*pip ;
 	bfile		*ofp ;
 	char		name[] ;
 
 	Arguments:
-
 	pip		program information pointer
 	name		filename
 	ofp		(BIO) output file pointer
 
 	Returns:
-
 	>=		OK
-	<0		error
-
+	<0		error (system-return)
 
 ******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -58,6 +53,7 @@
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<bfile.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"b64decoder.h"
@@ -78,10 +74,6 @@ extern int	base64_d(const char *,int,char *) ;
 extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -217,7 +209,7 @@ int		sl ;
 	int		wlen = 0 ;
 	cchar		*cp ;
 
-	while ((cp = strnpbrk(sp,sl,"\r\n")) != NULL) {
+	while ((cp = strnbrk(sp,sl,"\r\n")) != NULL) {
 
 	    if (*crp && (*sp != '\n')) {
 	        *crp = FALSE ;

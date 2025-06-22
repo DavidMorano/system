@@ -1,5 +1,5 @@
 /* bbinter SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* the user bbinterface (command bbinterpreter) for VMAIL */
@@ -142,7 +142,7 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	pcsmailcheck(const char *,char *,int,const char *) ;
 extern int	mkdirs(const char *,mode_t) ;
@@ -460,7 +460,7 @@ int bbinter_start(iap,pip)
 BBINTER		*iap ;
 PROGINFO	*pip ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	DISPLAY_ARGS	da ;
 
@@ -2336,7 +2336,7 @@ int		mblen ;
 {
 	PROGINFO	*pip = iap->pip ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -4438,7 +4438,7 @@ int		mblen ;
 {
 	PROGINFO	*pip = iap->pip ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -4651,7 +4651,7 @@ const char	pathprefix[] ;
 {
 	PROGINFO	*pip = iap->pip ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs = SR_OK ;
 	int	rs1 = SR_OK ;

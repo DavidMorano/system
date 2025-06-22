@@ -1,10 +1,11 @@
 /* testpollobj */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a test POLLOBJ object for PCSPOLLS */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	1		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -20,16 +21,14 @@
 	This object is a test POLLOBJ for PCSPOLLS.
 
 	Synopsis:
-
 	int testpollobj_start(op,pr,sn,envv,pcp)
 	PCSPOLLS	*op ;
-	const char	*pr ;
-	const char	*sn ;
-	const char	**envv ;
+	cchar	*pr ;
+	cchar	*sn ;
+	cchar	**envv ;
 	PCSCONF		*pcp ;
 
 	Arguments:
-
 	op		object pointer
 	pr		program-root
 	sn		search-name (of program calling us)
@@ -37,13 +36,10 @@
 	pcp		PCSCONF pointer
 
 	Returns:
-
 	>=0		OK
 	<0		error code
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be before others */
 
@@ -80,25 +76,22 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	pathadd(char *,int,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	hasNotDots(const char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	pathadd(char *,int,cchar *) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	hasNotDots(cchar *,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 extern char	*timestr_log(time_t,char *) ;
 #endif
-
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -120,9 +113,9 @@ struct testpollobj_head {
 
 struct work_args {
 	TESTPOLLOBJ	*op ;
-	const char	*pr ;
-	const char	*sn ;
-	const char	**envv ;
+	cchar	*pr ;
+	cchar	*sn ;
+	cchar	**envv ;
 	PCSCONF		*pcp ;
 } ;
 
@@ -174,9 +167,9 @@ PCSPOLLS_NAME	testpollobj = {
 
 int testpollobj_start(op,pr,sn,envv,pcp)
 TESTPOLLOBJ	*op ;
-const char	*pr ;
-const char	*sn ;
-const char	**envv ;
+cchar	*pr ;
+cchar	*sn ;
+cchar	**envv ;
 PCSCONF		*pcp ;
 {
 	WORKARGS	*wap ;
@@ -296,9 +289,9 @@ int		cmd ;
 static int workargs_load(wap,op,pr,sn,envv,pcp)
 WORKARGS	*wap ;
 TESTPOLLOBJ	*op ;
-const char	*pr ;
-const char	*sn ;
-const char	**envv ;
+cchar	*pr ;
+cchar	*sn ;
+cchar	**envv ;
 PCSCONF		*pcp ;
 {
 	memset(wap,0,sizeof(WORKARGS)) ;
@@ -366,7 +359,7 @@ static int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*pr, *sn ;
+	cchar	*pr, *sn ;
 
 	if (wp == NULL) return SR_FAULT ;
 

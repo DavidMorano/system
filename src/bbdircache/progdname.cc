@@ -167,7 +167,7 @@ static int procdiffer(PROGINFO *pip,VECPSTR *dlp,cchar *newsdname)
 	    const char	*dc = DIRCACHEFNAME ;
 	    char	dcfname[MAXPATHLEN+1] ;
 	    if ((rs = mkpath2(dcfname,newsdname,dc)) >= 0) {
-	        struct ustat	sb ;
+	        ustat	sb ;
 	        if ((rs = uc_stat(dcfname,&sb)) >= 0) {
 	            bfile	cfile, *cfp = &cfile ;
 	            const int	fsize = (sb.st_size & INT_MAX) ;
