@@ -114,7 +114,7 @@ char	*envv[] ;
 {
 	struct proginfo	pi, *pip = &pi ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	bfile		infile, *ifp = &infile ;
 	bfile		outfile, *ofp = &outfile ;
@@ -515,7 +515,7 @@ badarg:
 static int isfileok(fname)
 const char	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 	int	fd ;

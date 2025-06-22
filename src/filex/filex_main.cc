@@ -1,8 +1,8 @@
 /* filex_main SUPPORT (filex) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
-/* front-end subroutine for the FILEOP program */
+/* front-end subroutine for the FILEX program */
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
@@ -61,13 +61,16 @@
 #include	<mkdirs.h>
 #include	<fileobject.h>
 #include	<filelines.h>
+#include	<strn.h>
 #include	<bwops.h>
 #include	<cfdec.h>
 #include	<field.h>
 #include	<nulstr.h>
-#include	<vstrxcmp.h>
+#include	<vstrcmpx.h>
+#include	<strwcmp.h>
 #include	<nleadstr.h>
 #include	<matxstr.h>
+#include	<timestr.h>
 #include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -113,7 +116,6 @@ extern "C" {
 /* external subroutines */
 
 extern "C" int	mkuserpath(char *,cchar *,cchar *,int) ;
-extern "C" int	strwcmp(cchar *,cchar *,int) ;
 
 extern "C" int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern "C" int	proginfo_setpiv(PI *,cchar *,const struct pivars *) ;
@@ -127,14 +129,22 @@ extern "C" int	strlinelen(cchar *,int,int) ;
 extern "C" int	nprintf(cchar *,cchar *,...) ;
 #endif
 
-extern "C" cchar	*getourenv(cchar **,cchar *) noex ;
-
-extern "C" char	*strnrchr(cchar *,int,int) ;
-extern "C" char	*strnchr(cchar *,int,int) ;
-extern "C" char	*timestr_log(time_t,char *) ;
-
 
 /* local structures */
+
+enum fts {
+	ft_r, /* regular-file */
+	ft_d,
+	ft_b,
+	ft_c,
+	ft_p,
+	ft_n, /* name-file (XENIX) */
+	ft_l,
+	ft_s,
+	ft_D, /* door (Solaris) */
+	ft_e, /* exists */
+	ft_overlast
+} ;
 
 struct fileinfo_flags {
 	uint		dangle:1 ;
@@ -155,13 +165,13 @@ struct fileid {
 	dev_t		dev ;
 } ;
 
-struct tardir { /* placed for best packing */
+struct tardir {
 	cchar		*dname ;
 	ino_t		ino ;
 	dev_t		dev ;
 } ;
 
-struct linkinfo { /* placed for best packing */
+struct linkinfo {
 	cchar		*fname ;
 	ino_t		ino ;
 	dev_t		dev ;
@@ -171,136 +181,116 @@ struct linkinfo { /* placed for best packing */
 
 /* forward references */
 
-static uint	linkhash(cvoid *,int) ;
-static uint	diridhash(cvoid *,int) ;
-static uint	fileidhash(cvoid *,int) ;
+static uint	linkhash(cvoid *,int) noex ;
+static uint	diridhash(cvoid *,int) noex ;
+static uint	fileidhash(cvoid *,int) noex ;
 
-static int	usage(PI *) ;
+static int	usage(PI *) noex ;
 
-static int	loadfnos(PI *) ;
+static int	loadfnos(PI *) noex ;
 
-static int	procsig(PI *) ;
-static int	procopts(PI *,keyopt *) ;
-static int	procfts(PI *) ;
-static int	process(PI *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procargs(PI *,ARGINFO *,BITS *,cchar *) ;
-static int	procnames(PI *,cchar *,int) ;
-static int	procname(PI *,cchar *) ;
-static int	procdir(PI *,cchar *,USTAT *) ;
-static int	procdirs(PI *,cchar *,int,USTAT *) ;
-static int	procother(PI *,cchar *,USTAT *) ;
-static int	procothers(PI *,cchar *,USTAT *,FILEINFO *) ;
-static int	procprune(PI *,cchar *) ;
-static int	procprintfts(PI *,cchar *) ;
-static int	procprintsufs(PI *,cchar *) ;
+static int	procsig(PI *) noex ;
+static int	procopts(PI *,keyopt *) noex ;
+static int	procfts(PI *) noex ;
+static int	process(PI *,ARGINFO *,BITS *,cchar *,cchar *) noex ;
+static int	procargs(PI *,ARGINFO *,BITS *,cchar *) noex ;
+static int	procnames(PI *,cchar *,int) noex ;
+static int	procname(PI *,cchar *) noex ;
+static int	procdir(PI *,cchar *,USTAT *) noex ;
+static int	procdirs(PI *,cchar *,int,USTAT *) noex ;
+static int	procother(PI *,cchar *,USTAT *) noex ;
+static int	procothers(PI *,cchar *,USTAT *,FILEINFO *) noex ;
+static int	procprune(PI *,cchar *) noex ;
+static int	procprintfts(PI *,cchar *) noex ;
+static int	procprintsufs(PI *,cchar *) noex ;
 
-static int	proctars_begin(PI *) ;
-static int	proctars_end(PI *) ;
-static int	proctars_check(PI *) ;
-static int	proctars_checkerr(PI *,cchar *,int) ;
-static int	proctars_same(PI *,USTAT *) ;
-static int	proctars_load(PI *,cchar *,USTAT *) ;
-static int	proctars_fins(PI *) ;
-static int	proctars_notalready(PI *,USTAT *) ;
+static int	proctars_begin(PI *) noex ;
+static int	proctars_end(PI *) noex ;
+static int	proctars_check(PI *) noex ;
+static int	proctars_checkerr(PI *,cchar *,int) noex ;
+static int	proctars_same(PI *,USTAT *) noex ;
+static int	proctars_load(PI *,cchar *,USTAT *) noex ;
+static int	proctars_fins(PI *) noex ;
+static int	proctars_notalready(PI *,USTAT *) noex ;
 
-static int	procsuf_begin(PI *) ;
-static int	procsuf_load(PI *,int,cchar *,int) ;
-static int	procsuf_have(PI *,cchar *,int) ;
-static int	procsuf_end(PI *) ;
+static int	procsuf_begin(PI *) noex ;
+static int	procsuf_load(PI *,int,cchar *,int) noex ;
+static int	procsuf_have(PI *,cchar *,int) noex ;
+static int	procsuf_end(PI *) noex ;
 
-static int	procrm_begin(PI *) ;
-static int	procrm_add(PI *,cchar *,int) ;
-static int	procrm_end(PI *) ;
+static int	procrm_begin(PI *) noex ;
+static int	procrm_add(PI *,cchar *,int) noex ;
+static int	procrm_end(PI *) noex ;
 
-static int	proclines_begin(PI *) ;
-static int	proclines_end(PI *) ;
+static int	proclines_begin(PI *) noex ;
+static int	proclines_end(PI *) noex ;
 
-static int	procdir_begin(PI *) ;
-static int	procdir_have(PI *,dev_t,ino_t,cchar *,int) ;
-static int	procdir_addid(PI *,dev_t,ino_t) ;
-static int	procdir_haveprefix(PI *,cchar *,int) ;
-static int	procdir_addprefix(PI *,cchar *,int) ;
-static int	procdir_end(PI *) ;
+static int	procdir_begin(PI *) noex ;
+static int	procdir_have(PI *,dev_t,ino_t,cchar *,int) noex ;
+static int	procdir_addid(PI *,dev_t,ino_t) noex ;
+static int	procdir_haveprefix(PI *,cchar *,int) noex ;
+static int	procdir_addprefix(PI *,cchar *,int) noex ;
+static int	procdir_end(PI *) noex ;
 
-static int	procuniq_begin(PI *) ;
-static int	procuniq_end(PI *) ;
-static int	procuniq_have(PI *,dev_t,ino_t) ;
-static int	procuniq_addid(PI *,dev_t,ino_t) ;
+static int	procuniq_begin(PI *) noex ;
+static int	procuniq_end(PI *) noex ;
+static int	procuniq_have(PI *,dev_t,ino_t) noex ;
+static int	procuniq_addid(PI *,dev_t,ino_t) noex ;
 
-static int	procprune_begin(PI *,cchar *) ;
-static int	procprune_end(PI *) ;
-static int	procprune_loadfile(PI *,cchar *) ;
-static int	procprune_size(PI *,int *) ;
+static int	procprune_begin(PI *,cchar *) noex ;
+static int	procprune_end(PI *) noex ;
+static int	procprune_loadfile(PI *,cchar *) noex ;
+static int	procprune_size(PI *,int *) noex ;
 
-static int	proclink_begin(PI *) ;
-static int	proclink_add(PI *,dev_t,ino_t,mode_t,cchar *) ;
-static int	proclink_have(PI *,dev_t,ino_t,LI **) ;
-static int	proclink_end(PI *) ;
-static int	proclink_fins(PI *) ;
+static int	proclink_begin(PI *) noex ;
+static int	proclink_add(PI *,dev_t,ino_t,mode_t,cchar *) noex ;
+static int	proclink_have(PI *,dev_t,ino_t,LI **) noex ;
+static int	proclink_end(PI *) noex ;
+static int	proclink_fins(PI *) noex ;
 
-static int	procsize(PI *,cchar *, USTAT *,FILEINFO *) ;
-static int	proclink(PI *,cchar *, USTAT *,FILEINFO *) ;
-static int	procsync(PI *,cchar *, USTAT *,FILEINFO *) ;
-static int	procrm(PI *,cchar *, USTAT *,FILEINFO *) ;
-static int	proclines(PI *,cchar *, USTAT *,FILEINFO *) ;
+static int	procsize(PI *,cchar *, USTAT *,FILEINFO *) noex ;
+static int	proclink(PI *,cchar *, USTAT *,FILEINFO *) noex ;
+static int	procsync(PI *,cchar *, USTAT *,FILEINFO *) noex ;
+static int	procrm(PI *,cchar *, USTAT *,FILEINFO *) noex ;
+static int	proclines(PI *,cchar *, USTAT *,FILEINFO *) noex ;
 
-static int	procsynclink(PI *,cchar *, USTAT *,LI *) ;
-static int	procsyncer(PI *,cchar *, USTAT *) ;
+static int	procsynclink(PI *,cchar *, USTAT *,LI *) noex ;
+static int	procsyncer(PI *,cchar *, USTAT *) noex ;
 
-static int	procsyncer_reg(PI *,cchar *, USTAT *) ;
-static int	procsyncer_dir(PI *,cchar *, USTAT *) ;
-static int	procsyncer_lnk(PI *,cchar *, USTAT *) ;
-static int	procsyncer_fifo(PI *,cchar *, USTAT *) ;
-static int	procsyncer_sock(PI *,cchar *, USTAT *) ;
+static int	procsyncer_reg(PI *,cchar *, USTAT *) noex ;
+static int	procsyncer_dir(PI *,cchar *, USTAT *) noex ;
+static int	procsyncer_lnk(PI *,cchar *, USTAT *) noex ;
+static int	procsyncer_fifo(PI *,cchar *, USTAT *) noex ;
+static int	procsyncer_sock(PI *,cchar *, USTAT *) noex ;
 
-static int	tardir_start(TARDIR *,cchar *,USTAT *) ;
-static int	tardir_finish(TARDIR *) ;
-static int	tardir_match(TARDIR *,USTAT *) ;
+static int	tardir_start(TARDIR *,cchar *,USTAT *) noex ;
+static int	tardir_finish(TARDIR *) noex ;
+static int	tardir_match(TARDIR *,USTAT *) noex ;
 
-static int	fileinfo_loadfts(FILEINFO *,USTAT *) ;
+static int	fileinfo_loadfts(FILEINFO *,USTAT *) noex ;
 
-static int	linkinfo_start(LI *,dev_t,ino_t,mode_t,cchar *) ;
-static int	linkinfo_finish(LI *) ;
+static int	linkinfo_start(LI *,dev_t,ino_t,mode_t,cchar *) noex ;
+static int	linkinfo_finish(LI *) noex ;
 
-static int	dirid_start(DIRID *,dev_t,ino_t) ;
-static int	dirid_finish(DIRID *) ;
+static int	dirid_start(DIRID *,dev_t,ino_t) noex ;
+static int	dirid_finish(DIRID *) noex ;
 
-static int	fileid_start(FILEID *,dev_t,ino_t) ;
-static int	fileid_finish(FILEID *) ;
+static int	fileid_start(FILEID *,dev_t,ino_t) noex ;
+static int	fileid_finish(FILEID *) noex ;
 
-static int	mkpdirs(cchar *,mode_t) ;
+static int	mkpdirs(cchar *,mode_t) noex ;
 
-static int	linkcmp(struct linkinfo *,struct linkinfo *,int) ;
-static int	diridcmp(struct dirid *,struct dirid *,int) ;
-static int	fileidcmp(struct fileid *,struct fileid *,int) ;
+static int	linkcmp(struct linkinfo *,struct linkinfo *,int) noex ;
+static int	diridcmp(struct dirid *,struct dirid *,int) noex ;
+static int	fileidcmp(struct fileid *,struct fileid *,int) noex ;
 
 static bool	isNotStat(int) noex ;
 
 #if	CF_DEBUG
-static cchar	*strfiletype(USTAT *) ;
+static cchar	*strfiletype(USTAT *) noex ;
 #endif
 
-static void	main_sighand(int,siginfo_t *,void *) ;
-
-
-/* external variables */
-
-
-/* local structures */
-
-enum fts {
-	ft_r, /* regular-file */
-	ft_d,
-	ft_b,
-	ft_c,
-	ft_p,
-	ft_n, /* name-file (XENIX) */
-	ft_l,
-	ft_s,
-	ft_D, /* door (Solaris) */
-	ft_e, /* exists */
-	ft_overlast
-} ;
+static void	main_sighand(int,siginfo_t *,void *) noex ;
 
 
 /* local variables */
@@ -350,7 +340,7 @@ enum progmodes {
 	progmode_overlast
 } ;
 
-static constexpr cpcchar	progmodes[] = {
+static constexpr cpcchar	prognames[] = {
 	"filesize",
 	"filefind",
 	"filelinker",
@@ -611,7 +601,7 @@ static constexpr mapex		mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
+} ; /* end array )mapex) */
 
 
 /* exported variables */
@@ -760,17 +750,20 @@ int main(int argc,mainv argv,mainv envv) {
 	                case argopt_root:
 	                    if (f_optequal) {
 	                        f_optequal = false ;
-	                        if (avl)
+	                        if (avl) {
 	                            pr = avp ;
+				}
 	                    } else {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
-	                            if (argl)
+	                            if (argl) {
 	                                pr = argp ;
-	                        } else
+				    }
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                    }
 	                    break ;
 
@@ -784,15 +777,17 @@ int main(int argc,mainv argv,mainv envv) {
 	                            keyopt	*kop = &akopts ;
 	                            rs = keyopt_loads(kop,argp,argl) ;
 	                        }
-	                    } else
+	                    } else {
 	                        rs = SR_INVALID ;
+			    }
 	                    break ;
 
 /* version */
 	                case argopt_version:
 	                    f_version = true ;
-	                    if (f_optequal)
+	                    if (f_optequal) {
 	                        rs = SR_INVALID ;
+			    }
 	                    break ;
 
 /* verbose */
@@ -811,17 +806,20 @@ int main(int argc,mainv argv,mainv envv) {
 	                case argopt_tmpdir:
 	                    if (f_optequal) {
 	                        f_optequal = false ;
-	                        if (avl)
+	                        if (avl) {
 	                            pip->tmpdname = avp ;
+				}
 	                    } else {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
-	                            if (argl)
+	                            if (argl) {
 	                                pip->tmpdname = argp ;
-	                        } else
+				    }
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                    }
 	                    break ;
 
@@ -839,25 +837,29 @@ int main(int argc,mainv argv,mainv envv) {
 	                            paramopt	*app = &pip->aparams ;
 	                            rs = paramopt_loadu(app,argp,argl) ;
 	                        }
-	                    } else
+	                    } else {
 	                        rs = SR_INVALID ;
+			    }
 	                    break ;
 
 /* program mode */
 	                case argopt_pm:
 	                    if (f_optequal) {
 	                        f_optequal = false ;
-	                        if (avl)
+	                        if (avl) {
 	                            pmspec = avp ;
+				}
 	                    } else {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
-	                            if (argl)
+	                            if (argl) {
 	                                pmspec = argp ;
-	                        } else
+				    }
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                    }
 	                    break ;
 
@@ -865,17 +867,20 @@ int main(int argc,mainv argv,mainv envv) {
 	                case argopt_sn:
 	                    if (f_optequal) {
 	                        f_optequal = false ;
-	                        if (avl)
+	                        if (avl) {
 	                            sn = avp ;
+				}
 	                    } else {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
-	                            if (argl)
+	                            if (argl) {
 	                                sn = argp ;
-	                        } else
+				    }
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                    }
 	                    break ;
 
@@ -883,17 +888,20 @@ int main(int argc,mainv argv,mainv envv) {
 	                case argopt_af:
 	                    if (f_optequal) {
 	                        f_optequal = false ;
-	                        if (avl)
+	                        if (avl) {
 	                            afname = avp ;
+				}
 	                    } else {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
-	                            if (argl)
+	                            if (argl) {
 	                                afname = argp ;
-	                        } else
+				    }
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                    }
 	                    break ;
 
@@ -908,10 +916,12 @@ int main(int argc,mainv argv,mainv envv) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
-	                            if (argl)
+	                            if (argl) {
 	                                efname = argp ;
-	                        } else
+				    }
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                    }
 	                    break ;
 
@@ -919,17 +929,20 @@ int main(int argc,mainv argv,mainv envv) {
 	                case argopt_of:
 	                    if (f_optequal) {
 	                        f_optequal = false ;
-	                        if (avl)
+	                        if (avl) {
 	                            ofname = avp ;
+				}
 	                    } else {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
-	                            if (argl)
+	                            if (argl) {
 	                                ofname = argp ;
-	                        } else
+				    }
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                    }
 	                    break ;
 
@@ -939,10 +952,12 @@ int main(int argc,mainv argv,mainv envv) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
-	                        if (argl)
+	                        if (argl) {
 	                            pfname = argp ;
-	                    } else
+				}
+	                    } else {
 	                        rs = SR_INVALID ;
+			    }
 	                    break ;
 
 /* younger-file */
@@ -951,10 +966,12 @@ int main(int argc,mainv argv,mainv envv) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
-	                        if (argl)
+	                        if (argl) {
 	                            yfname = argp ;
-	                    } else
+				}
+	                    } else {
 	                        rs = SR_INVALID ;
+			    }
 	                    break ;
 
 /* follow symbolic links */
@@ -1030,8 +1047,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                                cp = argp ;
 	                                cl = argl ;
 	                            }
-	                        } else
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                    }
 	                    if ((rs >= 0) && (cp != nullptr)) {
 	                        rs = optvalue(cp,cl) ;
@@ -1079,8 +1097,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                            rs = cfdecti(argp,argl,&v) ;
 	                            pip->older = v ;
 	                        }
-	                    } else
+	                    } else {
 	                        rs = SR_INVALID ;
+			    }
 	                    break ;
 
 /* accessed */
@@ -1095,8 +1114,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                            rs = cfdecti(argp,argl,&v) ;
 	                            pip->accessed = v ;
 	                        }
-	                    } else
+	                    } else {
 	                        rs = SR_INVALID ;
+			    }
 	                    break ;
 
 /* suffix-accept */
@@ -1109,8 +1129,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                            pip->final.sufacc = true ;
 	                            rs = procsuf_load(pip,suf_acc,argp,argl) ;
 	                        }
-	                    } else
+	                    } else {
 	                        rs = SR_INVALID ;
+			    }
 	                    break ;
 
 /* suffix-reject */
@@ -1123,8 +1144,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                            pip->final.sufrej = true ;
 	                            rs = procsuf_load(pip,suf_rej,argp,argl) ;
 	                        }
-	                    } else
+	                    } else {
 	                        rs = SR_INVALID ;
+			    }
 	                    break ;
 
 /* younger-interval */
@@ -1139,8 +1161,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                            rs = cfdecti(argp,argl,&v) ;
 	                            pip->younger = v ;
 	                        }
-	                    } else
+	                    } else {
 	                        rs = SR_INVALID ;
+			    }
 	                    break ;
 
 /* prune components */
@@ -1155,8 +1178,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                            rs = paramopt_loads(app,po,argp,argl) ;
 	                            pip->f.prune |= (rs > 0) ;
 	                        }
-	                    } else
+	                    } else {
 	                        rs = SR_INVALID ;
+			    }
 	                    break ;
 
 /* summary mode (for "lines") */
@@ -1221,14 +1245,16 @@ int main(int argc,mainv argv,mainv envv) {
 	                            argl = strlen(argp) ;
 	                            if (argl)
 	                                pr = argp ;
-	                        } else
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                        break ;
 
 	                    case 'V':
 	                        f_version = true ;
-	                        if (f_optequal)
+	                        if (f_optequal) {
 	                            rs = SR_INVALID ;
+				}
 	                        break ;
 
 /* continue on error */
@@ -1293,8 +1319,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                                    cp = argp ;
 	                                    cl = argl ;
 	                                }
-	                            } else
+	                            } else {
 	                                rs = SR_INVALID ;
+				    }
 	                        }
 	                        if ((rs >= 0) && (cp != nullptr)) {
 	                            rs = optvalue(cp,cl) ;
@@ -1317,8 +1344,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
-	                        } else
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                        break ;
 
 /* quiet */
@@ -1367,8 +1395,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                                    cp = argp ;
 	                                    cl = argl ;
 	                                }
-	                            } else
+	                            } else {
 	                                rs = SR_INVALID ;
+				    }
 	                        }
 	                        if ((rs >= 0) && (cp != nullptr)) {
 	                            pip->final.sufreq = true ;
@@ -1387,8 +1416,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                                cchar		*po = po_fts ;
 	                                rs = paramopt_loads(app,po,argp,argl) ;
 	                            }
-	                        } else
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                        break ;
 
 /* unique */
@@ -1428,8 +1458,9 @@ int main(int argc,mainv argv,mainv envv) {
 	                                rs = cfdecti(argp,argl,&v) ;
 	                                pip->younger = v ;
 	                            }
-	                        } else
+	                        } else {
 	                            rs = SR_INVALID ;
+				}
 	                        break ;
 
 /* allow zero number of arguments */
@@ -1540,7 +1571,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	if (pmspec == nullptr) pmspec = pip->progname ;
 
-	pip->progmode = matstr(progmodes,pmspec,-1) ;
+	pip->progmode = matstr(prognames,pmspec,-1) ;
 
 	if (pip->progmode < 0)
 	    pip->progmode = progmode_filesize ;
@@ -1549,7 +1580,7 @@ int main(int argc,mainv argv,mainv envv) {
 	if (DEBUGLEVEL(4)) {
 	    if (pip->progmode >= 0) {
 	        debugprintf("main: progmode=%s(%u)\n",
-	            progmodes[pip->progmode],pip->progmode) ;
+	            prognames[pip->progmode],pip->progmode) ;
 	    } else
 	        debugprintf("main: progmode=NONE\n") ;
 	}
@@ -1559,7 +1590,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    bfile	*efp = (bfile *) pip->efp ;
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt = "%s: progmode=%s(%u)\n" ;
-	    bprintf(efp,fmt,pn,progmodes[pip->progmode],pip->progmode) ;
+	    bprintf(efp,fmt,pn,prognames[pip->progmode],pip->progmode) ;
 	}
 
 	if (f_usage)
@@ -1823,7 +1854,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        cint	size = (10*sizeof(uint)) ;
+	        cint	size = (10*szof(uint)) ;
 	        cchar		*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -3449,11 +3480,15 @@ static int proctars_end(PI *pip) noex {
 #endif
 	if (pip->open.tardirs) {
 	    vechand	*tlp = &pip->tardirs ;
+	    {
 	    rs1 = proctars_fins(pip) ;
 	    if (rs >= 0) rs = rs1 ;
 	    pip->open.tardirs = false ;
+	    }
+	    {
 	    rs1 = vechand_finish(tlp) ;
 	    if (rs >= 0) rs = rs1 ;
+	    }
 	}
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -3578,7 +3613,7 @@ static int proctars_same(PI *pip,USTAT *sbp) noex {
 
 static int proctars_load(PI *pip,cchar *name,USTAT *sbp) noex {
 	TARDIR		*tdp ;
-	cint		osize = sizeof(TARDIR) ;
+	cint		osize = szof(TARDIR) ;
 	int		rs ;
 	int		c = 0 ;
 #ifdef	COMMENT
@@ -3599,8 +3634,9 @@ static int proctars_load(PI *pip,cchar *name,USTAT *sbp) noex {
 	                tardir_finish(tdp) ;
 	            }
 	        }
-	        if (rs < 0)
+	        if (rs < 0) {
 	            uc_free(tdp) ;
+		}
 	    } /* end if (m-a) */
 	} /* end if (proctars_notalready) */
 	return (rs >= 0) ? c : rs ;
@@ -3665,15 +3701,12 @@ static int procsuf_have(PI *pip,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-
 	if (sl < 0) sl = strlen(sp) ;
-
 	if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
 	    int		vl ;
 	    int		m ;
 	    cchar	*key = po_sufreq ;
 	    cchar	*vp ;
-
 	    while (rs >= 0) {
 	        vl = paramopt_fetch(pop,key,&cur,&vp) ;
 	        if (vl == SR_NOTFOUND) break ;
@@ -3684,11 +3717,9 @@ static int procsuf_have(PI *pip,cchar *sp,int sl) noex {
 	            if (f) break ;
 	        }
 	    } /* end while */
-
 	    rs1 = paramopt_curend(pop,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (paramopt-cur) */
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (procsuf_have) */
@@ -3699,15 +3730,12 @@ static int procsuf_begin(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*po = nullptr ;
-
 	for (int si = 0 ; si < suf_overlast ; si += 1) {
 	    int	f = false ;
-
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
 	        debugprintf("main/procsuf_begin: si=%u c=%u\n",si,c) ;
 #endif
-
 	    switch (si) {
 	    case suf_req:
 	        f = pip->have.sufreq ;
@@ -3731,20 +3759,16 @@ static int procsuf_begin(PI *pip) noex {
 	        }
 	        break ;
 	    } /* end switch */
-
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
 	        debugprintf("main/procsuf_begin: si=%u f=%u\n",si,f) ;
 #endif
-
 	    if (f) {
 	        int n = paramopt_countvals(pop,po) ;
-
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
 	            debugprintf("main/procsuf_begin: si=%u n=%u\n",si,n) ;
 #endif
-
 	        if (n > 0) {
 	            paramopt_cur	cur ;
 	            if ((rs = vecpstr_start(vlp,n,0,0)) >= 0) {
@@ -3769,14 +3793,12 @@ static int procsuf_begin(PI *pip) noex {
 	                        if ((rs >= 0) && (vl > 0)) {
 	                            rs = vecpstr_adduniq(vlp,vp,vl) ;
 	                            if (rs < INT_MAX) c += 1 ;
-
 #if	CF_DEBUG
 	                            if (DEBUGLEVEL(3) && (rs < INT_MAX))
 	                                debugprintf("main/procsuf_begin: "
 	                                    "suf=%r\n",
 	                                    vp,vl) ;
 #endif
-
 	                        }
 	                    } /* end while */
 	                    paramopt_curend(pop,&cur) ;
@@ -3797,14 +3819,11 @@ static int procsuf_begin(PI *pip) noex {
 	            } /* end if (vecpstr_start) */
 	        } /* end if (n) */
 	    } /* end if */
-
 	} /* end for */
-
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("main/procsuf_begin: ret rs=%d c=%u\n",rs,c) ;
 #endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procsuf_begin) */
@@ -3814,7 +3833,6 @@ static int procsuf_end(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f ;
-
 	for (int i = 0 ; i < suf_overlast ; i += 1) {
 	    slp = (pip->sufs + i) ;
 	    f = false ;
@@ -3837,7 +3855,6 @@ static int procsuf_end(PI *pip) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (procsuf_end) */
@@ -3848,9 +3865,7 @@ static int procsuf_load(PI *pip,int si,cchar *ap,int al) noex {
 	int		c = 0 ;
 	cchar		*po ;
 	cchar		*var ;
-
 	if (ap != nullptr) {
-
 	    switch (si) {
 	    case suf_req:
 	        po = po_sufreq ;
@@ -3868,7 +3883,6 @@ static int procsuf_load(PI *pip,int si,cchar *ap,int al) noex {
 	        rs = SR_NOANODE ;
 	        break ;
 	    } /* end switch */
-
 	    if (rs >= 0) {
 	        if (strwcmp("-",ap,al) != 0) {
 	            if (strwcmp("+",ap,al) == 0) {
@@ -3877,7 +3891,7 @@ static int procsuf_load(PI *pip,int si,cchar *ap,int al) noex {
 	            }
 	            if (ap != nullptr) {
 	                if ((rs = paramopt_loads(pop,po,ap,al)) > 0) {
-	                c = rs ;
+	                    c = rs ;
 	                    switch (si) {
 	                    case suf_req:
 	                        pip->have.sufreq = true ;
@@ -3893,32 +3907,28 @@ static int procsuf_load(PI *pip,int si,cchar *ap,int al) noex {
 	            }
 	        } /* end if */
 	    } /* end if (ok) */
-
 	} /* end if (non-null) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procsuf_load) */
 
 static int procrm_begin(PI *pip) noex {
 	int		rs ;
-
+	{
 	rs = vecpstr_start(&pip->rmdirs,0,0,0) ;
 	pip->f.rmdirs = (rs >= 0) ;
-
+	}
 	return rs ;
 }
 /* end subroutine (procrm_begin) */
 
 static int procrm_add(PI *pip,cchar *dp,int dl) noex {
 	int		rs ;
-
 	if (dl < 0) dl = strlen(dp) ;
-
-	if ((dl > 0) && (dp[dl-1] == '/')) dl -=1 ;
-
+	if ((dl > 0) && (dp[dl-1] == '/')) {
+	    dl -=1 ;
+	}
 	rs = vecpstr_add(&pip->rmdirs,dp,dl) ;
-
 	return rs ;
 }
 /* end subroutine (procrm_add) */
@@ -3971,7 +3981,6 @@ static int procdir_begin(PI *pip) noex {
 	cint		n = 50 ;
 	cint		at = 1 ;	/* use |lookaside(3dam)| */
 	int		rs ;
-
 	if ((rs = hdb_start(dbp,n,at,hf,cf)) >= 0) {
 	    hdbstr	*ndp = &pip->dirnames ;
 	    if ((rs = hdbstr_start(ndp,0)) >= 0) {
@@ -3980,7 +3989,6 @@ static int procdir_begin(PI *pip) noex {
 	    if (rs < 0)
 	        hdb_finish(dbp) ;
 	} /* end if (hdb_start) */
-
 	return rs ;
 }
 /* end subroutine (procdir_begin) */
@@ -3992,37 +4000,31 @@ static int procdir_end(PI *pip) noex {
 	hdb_dat		val ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (pip->open.dirs) {
 	    pip->open.dirs = false ;
-
 	    if ((rs1 = hdb_curbegin(dbp,&cur)) >= 0) {
 	        DIRID	*dip ;
-
 	        while (hdb_curenum(dbp,&cur,&key,&val) >= 0) {
 	            dip = (DIRID *) val.buf ;
-
 	            if (dip != nullptr) {
 	                dirid_finish(dip) ;
 	                rs1 = uc_free(dip) ;
 	                if (rs >= 0) rs = rs1 ;
 	            }
-
 	        } /* end while (enum) */
-
 	        rs1 = hdb_curend(dbp,&cur) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
 	    if (rs >= 0) rs = rs1 ;
-
+	    {
 	    rs1 = hdb_finish(&pip->dirs) ;
 	    if (rs >= 0) rs = rs1 ;
-
+	    }
+	    {
 	    rs1 = hdbstr_finish(&pip->dirnames) ;
 	    if (rs >= 0) rs = rs1 ;
-
+	    }
 	} /* end if (was activated) */
-
 	return rs ;
 }
 /* end subroutine (procdir_end) */
@@ -4033,12 +4035,10 @@ static int procdir_have(PI *pip,dev_t dev,ino_t ino,cchar *sp,int nl) noex {
 	hdb_dat		val ;
 	DIRID		did ;
 	int		rs ;
-
 	did.ino = ino ;
 	did.dev = dev ;
-
 	key.buf = &did ;
-	key.len = sizeof(ino_t) + sizeof(dev_t) ;
+	key.len = szof(ino_t) + szof(dev_t) ;
 	if ((rs = hdb_fetch(dbp,key,nullptr,&val)) >= 0) {
 	    if ((rs = hdbstr_add(&pip->dirnames,sp,nl,nullptr,0)) >= 0) {
 	        rs = 1 ;
@@ -4048,23 +4048,21 @@ static int procdir_have(PI *pip,dev_t dev,ino_t ino,cchar *sp,int nl) noex {
 	        rs = 0 ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (procdir_have) */
 
 static int procdir_addid(PI *pip,dev_t dev,ino_t ino) noex {
 	DIRID		*dip ;
-	cint		sz = sizeof(DIRID) ;
+	cint		sz = szof(DIRID) ;
 	int		rs ;
-
 	if ((rs = uc_malloc(sz,&dip)) >= 0) {
 	    if ((rs = dirid_start(dip,dev,ino)) >= 0) {
 	        hdb		*dbp = &pip->dirs ;
 	        hdb_dat		key ;
 	        hdb_dat		val ;
 	        key.buf = dip ;
-	        key.len = sizeof(ino_t) + sizeof(dev_t) ;
+	        key.len = szof(ino_t) + szof(dev_t) ;
 	        val.buf = dip ;
 	        val.len = sz ;
 	        rs = hdb_store(dbp,key,val) ;
@@ -4076,7 +4074,6 @@ static int procdir_addid(PI *pip,dev_t dev,ino_t ino) noex {
 	        uc_free(dip) ;
 	    }
 	} /* end if (memory-allocation) */
-
 	return rs ;
 }
 /* end subroutine (procdir_addid) */
@@ -4176,7 +4173,7 @@ static int procuniq_have(PI *pip,dev_t dev,ino_t ino) noex {
 	fid.dev = dev ;
 
 	key.buf = &fid ;
-	key.len = sizeof(ino_t) + sizeof(dev_t) ;
+	key.len = szof(ino_t) + szof(dev_t) ;
 	if ((rs = hdb_fetch(dbp,key,nullptr,&val)) >= 0) {
 	    rs = 1 ;
 	} else if (rs == SR_NOTFOUND) {
@@ -4191,7 +4188,7 @@ static int procuniq_have(PI *pip,dev_t dev,ino_t ino) noex {
 
 static int procuniq_addid(PI *pip,dev_t dev,ino_t ino) noex {
 	FILEID		*dip ;
-	cint		sz = sizeof(FILEID) ;
+	cint		sz = szof(FILEID) ;
 	int		rs ;
 
 	if ((rs = uc_malloc(sz,&dip)) >= 0) {
@@ -4199,7 +4196,7 @@ static int procuniq_addid(PI *pip,dev_t dev,ino_t ino) noex {
 	        hdb		*dbp = &pip->files ;
 	        hdb_dat	key, val ;
 	        key.buf = dip ;
-	        key.len = sizeof(ino_t) + sizeof(dev_t) ;
+	        key.len = szof(ino_t) + szof(dev_t) ;
 	        val.buf = dip ;
 	        val.len = sz ;
 	        rs = hdb_store(dbp,key,val) ;
@@ -4233,7 +4230,7 @@ static int procprune_begin(PI *pip,cchar *pfname) noex {
 	                    cchar	*po = po_prune ;
 	                    cchar	*vp ;
 	                    char	**pa = (char **) bp ;
-	                    bp += ((n+1)*sizeof(void *)) ;
+	                    bp += ((n+1)*szof(void *)) ;
 	                    while (rs >= 0) {
 	                        vl = paramopt_fetch(pop,po,&cur,&vp) ;
 	                        if (vl == SR_NOTFOUND) break ;
@@ -4327,11 +4324,11 @@ static int procprune_size(PI *pip,int *sizep) noex {
 	        rs = vl ;
 	        if ((rs >= 0) && (vl > 0)) {
 	            c += 1 ;
-	            sz += sizeof(void *) ;
+	            sz += szof(void *) ;
 	            sz += (strnlen(vp,vl)+1) ;
 	        }
 	    } /* end while */
-	    sz += sizeof(void *) ;
+	    sz += szof(void *) ;
 	    rs1 = paramopt_curend(pop,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (paramopt-cur) */
@@ -4347,10 +4344,10 @@ static int proclink_begin(PI *pip) noex {
 	cint	n = 50 ;
 	cint	at = 1 ;	/* use 'lookaside(3dam)' */
 	int		rs ;
-
+	{
 	rs = hdb_start(dbp,n,at,hf,cf) ;
 	pip->open.links = (rs >= 0) ;
-
+	}
 	return rs ;
 }
 /* end subroutine (proclink_begin) */
@@ -4382,13 +4379,19 @@ static int proclink_fins(PI *pip) noex {
 	    while ((rs1 = hdb_curenum(dbp,&cur,&key,&val)) >= 0) {
 	        lip = (LI *) val.buf ;
 	        if (lip != nullptr) {
+		    {
 	            rs1 = linkinfo_finish(lip) ;
 	            if (rs >= 0) rs = rs1 ;
+		    }
+		    {
 	            rs1 = uc_free(lip) ;
 	            if (rs >= 0) rs = rs1 ;
+		    }
 	        }
 	    } /* end while (enum) */
-	    if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
+	    if ((rs >= 0) && (rs1 != SR_NOTFOUND)) {
+		rs = rs1 ;
+	    }
 	    rs1 = hdb_curend(dbp,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (hdb-cur) */
@@ -4401,9 +4404,8 @@ static int proclink_add(PI *pip,dev_t dev,ino_t ino,mode_t m,cchar *fp) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = proclink_have(pip,dev,ino,nullptr)) == 0) {
-	    LINKINFO	*lip ;
-	    cint	lsize = sizeof(LINKINFO) ;
-	    if ((rs = uc_malloc(lsize,&lip)) >= 0) {
+	    cint	lsize = szof(LINKINFO) ;
+	    if (LINKINFO *lip ; (rs = uc_malloc(lsize,&lip)) >= 0) {
 	        if ((rs = linkinfo_start(lip,dev,ino,m,fp)) >= 0) {
 	            hdb		*dbp = &pip->links ;
 	            hdb_dat	key, val ;
@@ -4413,11 +4415,13 @@ static int proclink_add(PI *pip,dev_t dev,ino_t ino,mode_t m,cchar *fp) noex {
 	            val.buf = lip ;
 	            val.len = lsize ;
 	            rs = hdb_store(dbp,key,val) ;
-	            if (rs < 0)
+	            if (rs < 0) {
 	                linkinfo_finish(lip) ;
+		    }
 	        } /* end if (linkinfo) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            uc_free(lip) ;
+		}
 	    } /* end if (memory-allocation) */
 	} /* end if (needed to add) */
 	return (rs >= 0) ? f : rs ;
@@ -4429,12 +4433,12 @@ static int proclink_have(PI *pip,dev_t dev,ino_t ino,LI **rpp) noex {
 	hdb		*dbp = &pip->links ;
 	hdb_dat		key ;
 	hdb_dat		val ;
-	cint		lsize = sizeof(LINKINFO) ;
+	cint		lsize = szof(LINKINFO) ;
 	int		rs ;
-
+	{
 	li.dev = dev ;
 	li.ino = ino ;
-
+	}
 	key.buf = &li ;
 	key.len = lsize ;
 	if ((rs = hdb_fetch(dbp,key,nullptr,&val)) >= 0) {
@@ -4451,16 +4455,16 @@ static int procsize(PI *pip,cchar *name,USTAT *sbp, FILEINFO *ckp) noex {
 	size_t		bytes ;
 	size_t		sz = sbp->st_size ;
 	int		rs ;
-
 	if (name == nullptr) return SR_FAULT ;
-
+	{
 	bytes = pip->bytes ;
 	bytes += (sz % MEGABYTE) ;
-
+	}
+	{
 	pip->bytes = (bytes % MEGABYTE) ;
 	pip->megabytes += (bytes / MEGABYTE) ;
 	pip->megabytes += (sz / MEGABYTE) ;
-
+	}
 	rs = int(sz & INT_MAX) ;
 	return rs ;
 }
@@ -4468,17 +4472,14 @@ static int procsize(PI *pip,cchar *name,USTAT *sbp, FILEINFO *ckp) noex {
 
 static int proclink(PI *pip,cchar *name,USTAT *sbp, FILEINFO *ckp) noex {
 	int		rs = SR_OK ;
-	int		f_linked = false ;
-
+	int		f_linked = false ; /* return-value */
 	if (sbp->st_dev == pip->tardev) {
-	    const mode_t	dm = 0775 ;
-	    int			w = 0 ;
-	    char		tarfname[MAXPATHLEN + 1] ;
+	    int		w = 0 ;
+	    cmode	dm = 0775 ;
+	    char	tarfname[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath2(tarfname,pip->tardname,name)) >= 0) {
-	        USTAT	tsb ;
-	        int	f_dolink = true ;
-
-	        if ((rs = uc_lstat(tarfname,&tsb)) >= 0) {
+	        bool	f_dolink = true ;
+	        if (USTAT tsb ; (rs = uc_lstat(tarfname,&tsb)) >= 0) {
 	            if (S_ISDIR(sbp->st_mode)) {
 	                if (S_ISDIR(tsb.st_mode)) {
 	                    f_dolink = false ;
@@ -4487,7 +4488,7 @@ static int proclink(PI *pip,cchar *name,USTAT *sbp, FILEINFO *ckp) noex {
 	                    rs = uc_unlink(tarfname) ;
 	                }
 		    } else {
-	                int	f = true ;
+	                bool	f = true ;
 	                f = f && (tsb.st_dev == sbp->st_dev) ;
 	                f = f && (tsb.st_ino == sbp->st_ino) ;
 	                if (f) {
@@ -4531,19 +4532,16 @@ static int proclink(PI *pip,cchar *name,USTAT *sbp, FILEINFO *ckp) noex {
 	                }
 		    } /* end if */
 	        } /* end if (dolink) */
-
 	        if ((rs == SR_EXIST) && (! pip->f.quiet)) {
 	    	    bfile	*efp = (bfile *) pip->efp ;
 	            cchar	*pn = pip->progname ;
 	            bprintf(efp,"%s: exists w=%u\n",pn,w) ;
 	        }
-
 	    } /* end if (mkpath) */
 	} else {
 	    pip->c_linkerr += 1 ;
 	    rs = SR_XDEV ;
 	}
-
 	return (rs >= 0) ? f_linked : rs ;
 }
 /* end subroutine (proclink) */
@@ -4553,29 +4551,22 @@ static int procsync(PI *pip,cchar *name,USTAT *sbp,FILEINFO *ckp) noex {
 	dev_t		dev = sbp->st_dev ;
 	ino_t		ino = sbp->st_ino ;
 	int		rs ;
-
-/* do we have a link to this file already? */
-
+	/* do we have a link to this file already? */
 	if ((rs = proclink_have(pip,dev,ino,&lip)) > 0) {
 	    cint	f_samepath = (strcmp(lip->fname,name) == 0) ;
-
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
 	        debugprintf("main/procsync: mid1 rs=%d f_samepath=%u\n",
 	            rs,f_samepath) ;
 #endif
-
 	    if (f_samepath || ((rs = procsynclink(pip,name,sbp,lip)) == 0)) {
 	        rs = procsyncer(pip,name,sbp) ;
 	    }
-
 	} else if (rs == 0) {
-
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
 	        debugprintf("main/procsync: mid2 rs=%d\n",rs) ;
 #endif
-
 	    rs = procsyncer(pip,name,sbp) ;
 
 	} /* end if (proclink_have) */
@@ -4603,19 +4594,16 @@ static int procsynclink(PI *pip,cchar *name,USTAT *sbp,LI *lip) noex {
 #endif
 
 	if ((rs = mkpath2(pbuf,pip->tardname,lip->fname)) >= 0) {
-	    USTAT	psb ;
-	    if ((rs = uc_lstat(pbuf,&psb)) >= 0) {
+	    if (USTAT psb ; (rs = uc_lstat(pbuf,&psb)) >= 0) {
 	        const dev_t	dev = psb.st_dev ;
 	        const ino_t	ino = psb.st_ino ;
 	        if (dev == pip->tardev) {
 	            char	dstfname[MAXPATHLEN + 1] ;
 	            if ((rs = mkpath2(dstfname,pip->tardname,name)) >= 0) {
-	                USTAT	dsb ;
 	                cmode	dm = DMODE ;
 	                cmode	m = lip->mode ;
 	                bool	f_dolink = true ;
-
-	                if ((rs = uc_lstat(dstfname,&dsb)) >= 0) {
+	                if (USTAT dsb ; (rs = uc_lstat(dstfname,&dsb)) >= 0) {
 	                    if (! S_ISDIR(m)) {
 	                        int	f = true ;
 	                        f = f && (dev == dsb.st_dev) ;
@@ -4665,7 +4653,6 @@ static int procsynclink(PI *pip,cchar *name,USTAT *sbp,LI *lip) noex {
 	                        }
 	                    }
 	                } /* end if (dolink) */
-
 	            } /* end if (mkpath) */
 	        } /* end if (same file-system) */
 	    } else if (isNotStat(rs)) {
@@ -4685,6 +4672,7 @@ static int procsynclink(PI *pip,cchar *name,USTAT *sbp,LI *lip) noex {
 
 static int procsyncer(PI *pip,cchar *name,USTAT *sbp) noex {
 	int		rs = SR_OK ;
+	int		c = 0 ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -4705,8 +4693,7 @@ static int procsyncer(PI *pip,cchar *name,USTAT *sbp) noex {
 	    rs = proclink_add(pip,dev,ino,m,name) ;
 	}
 	if (rs >= 0) {
-	    SIGBLOCK	blocker ;
-	    if ((rs = sigblocker_start(&blocker,nullptr)) >= 0) {
+	    if (sigblocker blk ; (rs = blk.start(nullptr)) >= 0) {
 	        if (S_ISREG(sbp->st_mode)) {
 	            rs = procsyncer_reg(pip,name,sbp) ;
 	        } else if (S_ISDIR(sbp->st_mode)) {
@@ -4718,7 +4705,9 @@ static int procsyncer(PI *pip,cchar *name,USTAT *sbp) noex {
 	        } else if (S_ISSOCK(sbp->st_mode)) {
 	            rs = procsyncer_sock(pip,name,sbp) ;
 	        } /* end if */
-	        sigblocker_finish(&blocker) ;
+		c = rs ;
+	        rs1 = blk.finish ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (blocking signals) */
 	} /* end if (ok) */
 
@@ -4727,12 +4716,11 @@ static int procsyncer(PI *pip,cchar *name,USTAT *sbp) noex {
 	    debugprintf("main/procsyncer: ret rs=%d\n",rs) ;
 #endif
 
-	return rs ;
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procsyncer) */
 
 static int procsyncer_reg(PI *pip,cchar *name,USTAT *sbp) noex {
-	USTAT		dsb ;
 	off_t		dfsize = 0 ;
 	cmode		dm = DMODE ;
 	cmode		nm = (sbp->st_mode & (~ S_IFMT)) | 0600 ;
@@ -4766,10 +4754,9 @@ static int procsyncer_reg(PI *pip,cchar *name,USTAT *sbp) noex {
 	    debugprintf("main/procsyncer_reg: dstfname=%s\n",dstfname) ;
 #endif
 
-	if ((rs = u_lstat(dstfname,&dsb)) >= 0) {
-
+	if (USTAT dsb ; (rs = u_lstat(dstfname,&dsb)) >= 0) {
 	    if (S_ISREG(dsb.st_mode)) {
-	        int	f = false ;
+	        bool	f = false ;
 	        duid = dsb.st_uid ;
 	        dfsize = (off_t) dsb.st_size ;
 #if	CF_DEBUG
@@ -5023,7 +5010,6 @@ ret0:
 /* end subroutine (procsyncer_reg) */
 
 static int procsyncer_dir(PI *pip,cchar *name,USTAT *sbp) noex {
-	USTAT		dsb ;
 	cmode		nm = (sbp->st_mode & (~ S_IFMT)) | DMODE ;
 	uid_t		duid = -1 ;
 	int		rs = SR_OK ;
@@ -5040,8 +5026,7 @@ static int procsyncer_dir(PI *pip,cchar *name,USTAT *sbp) noex {
 
 /* continue */
 
-	if ((rs = u_lstat(dstfname,&dsb)) >= 0) {
-
+	if (USTAT dsb ; (rs = u_lstat(dstfname,&dsb)) >= 0) {
 	    duid = dsb.st_uid ;
 	    if (S_ISDIR(dsb.st_mode)) {
 	        f_mtime = (dsb.st_mtime != sbp->st_mtime) ;
@@ -5053,7 +5038,6 @@ static int procsyncer_dir(PI *pip,cchar *name,USTAT *sbp) noex {
 	        f_create = true ;
 	        rs = uc_unlink(dstfname) ;
 	    }
-
 	} else if (isNotStat(rs)) {
 	    f_create = true ;
 
@@ -5099,9 +5083,8 @@ static int procsyncer_dir(PI *pip,cchar *name,USTAT *sbp) noex {
 	    cchar	*dnp ;
 	    if ((dnl = sfdirname(dstfname,-1,&dnp)) > 0) {
 	        if ((rs = mkpath1w(tmpfname,dnp,dnl)) >= 0) {
-	            USTAT	sb ;
-	            int		f = false ;
-	            if ((rs = u_lstat(tmpfname,&sb)) >= 0) {
+	            boolt		f = false ;
+	            if (USTAT sb ; (rs = u_lstat(tmpfname,&sb)) >= 0) {
 	                if (S_ISLNK(sb.st_mode)) {
 	                    if ((rs = u_stat(tmpfname,&sb)) >= 0) {
 	                        f = (! S_ISDIR(sb.st_mode)) ;
@@ -5136,7 +5119,7 @@ static int procsyncer_dir(PI *pip,cchar *name,USTAT *sbp) noex {
 	        f_updated = true ;
 	        if (f_mode) rs = u_chmod(dstfname,nm) ;
 	        if ((rs >= 0) && f_mtime) {
-	            struct utimbuf	ut ;
+	            UTIMBUF	ut ;
 	            ut.actime = sbp->st_atime ;
 	            ut.modtime = sbp->st_mtime ;
 	            uc_utime(dstfname,&ut) ;
@@ -5157,12 +5140,11 @@ ret0:
 /* end subroutine (procsyncer_dir) */
 
 static int procsyncer_lnk(PI *pip,cchar *name,USTAT *sbp) noex {
-	USTAT		dsb ;
-	cmode		dm = DMODE ;
 	int		rs = SR_OK ;
 	int		f_create = false ;
 	int		f_update = false ;
 	int		f_updated = false ;
+	cmode		dm = DMODE ;
 	char		dstfname[MAXPATHLEN + 1] ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		dstlink[MAXPATHLEN + 1] ;
@@ -5175,10 +5157,9 @@ static int procsyncer_lnk(PI *pip,cchar *name,USTAT *sbp) noex {
 
 /* continue */
 
-	if ((rs = u_lstat(dstfname,&dsb)) >= 0) {
-
+	if (USTAT dsb ; (rs = u_lstat(dstfname,&dsb)) >= 0) {
 	    if (S_ISLNK(dsb.st_mode)) {
-	        int	f = true ;
+	        bool	f = true ;
 	        f = f && (dsb.st_size == sbp->st_size) ;
 	        if (f) {
 	            rs = u_readlink(dstfname,tmpfname,MAXPATHLEN) ;
@@ -5195,7 +5176,6 @@ static int procsyncer_lnk(PI *pip,cchar *name,USTAT *sbp) noex {
 	            rs = uc_unlink(dstfname) ;
 	        }
 	    }
-
 	} else if (isNotStat(rs)) {
 	    f_create = true ;
 	    if (rs == SR_NOTDIR) {
@@ -5398,9 +5378,8 @@ static int fileinfo_loadfts(FILEINFO *ckp,USTAT *sbp) noex {
 
 static int linkinfo_start(LI *lip,dev_t dev,ino_t ino,mode_t m,cc *fp) noex {
 	int		rs ;
-	cchar		*cp ;
 	lip->fname = nullptr ;
-	if ((rs = uc_mallocstrw(fp,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = uc_mallocstrw(fp,-1,&cp)) >= 0) {
 	    lip->dev = dev ;
 	    lip->ino = ino ;
 	    lip->mode = m ;
@@ -5425,9 +5404,8 @@ static int linkinfo_finish(LI *lip) noex {
 /* make *parent* directories as needed */
 static int mkpdirs(cchar *tarfname,mode_t dm) noex {
 	int		rs = SR_OK ;
-	int		dl ;
 	cchar		*dp ;
-	if ((dl = sfdirname(tarfname,-1,&dp)) > 0) {
+	if (int dl ; (dl = sfdirname(tarfname,-1,&dp)) > 0) {
 	    char	dname[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath1w(dname,dp,dl)) >= 0) {
 	        if ((rs = uc_unlink(dname)) >= 0) {
@@ -5455,7 +5433,7 @@ static uint linkhash(cvoid *vp,int vl) noex {
 	    h = h ^ ((sa[0] << 16) | sa[1]) ;
 	}
 	{
-	    cint	isize = sizeof(ino_t) ;
+	    cint	isize = szof(ino_t) ;
 	    sa = (ushort *) &lip->ino ;
 	    h = h ^ ((sa[1] << 16) | sa[0]) ;
 	    h = h ^ ((sa[0] << 16) | sa[1]) ;
@@ -5468,31 +5446,16 @@ static uint linkhash(cvoid *vp,int vl) noex {
 }
 /* end subroutine (linkhash) */
 
-static int linkcmp(LI *e1p,LINKINFO *e2p,int len) noex {
-	int		rc ;
-	(void) len ;
-	if ((rc = (e1p->dev - e2p->dev)) == 0) { /* reverse sort! */
-	    int64_t	d ;
-	    if ((d = (e1p->ino - e2p->ino)) > 0) {
-	        rc = 1 ;
-	    } else if (d < 0) {
-	        rc = -1 ;
-	    }
-	}
-	return rc ;
-}
-/* end subroutine (linkcmp) */
-
 static uint diridhash(cvoid *vp,int vl) noex {
 	const uint	uvl = (uint) vl ;
 	uint		h = 0 ;
 	ushort		*sa = (ushort *) vp ;
 	h = h ^ ((sa[1] << 16) | sa[0]) ;
 	h = h ^ ((sa[0] << 16) | sa[1]) ;
-	if (uvl > sizeof(uint)) {
+	if (uvl > szof(uint)) {
 	    h = h ^ ((sa[3] << 16) | sa[2]) ;
 	    h = h ^ ((sa[2] << 16) | sa[3]) ;
-	    if (uvl > sizeof(ulong)) {
+	    if (uvl > szof(ulong)) {
 	        h = h ^ ((sa[5] << 16) | sa[4]) ;
 	        h = h ^ ((sa[4] << 16) | sa[5]) ;
 	        if (uvl > (4*3)) {
@@ -5511,10 +5474,10 @@ static uint fileidhash(cvoid *vp,int vl) noex {
 	ushort		*sa = (ushort *) vp ;
 	h = h ^ ((sa[1] << 16) | sa[0]) ;
 	h = h ^ ((sa[0] << 16) | sa[1]) ;
-	if (uvl > sizeof(uint)) {
+	if (uvl > szof(uint)) {
 	    h = h ^ ((sa[3] << 16) | sa[2]) ;
 	    h = h ^ ((sa[2] << 16) | sa[3]) ;
-	    if (uvl > sizeof(ulong)) {
+	    if (uvl > szof(ulong)) {
 	        h = h ^ ((sa[5] << 16) | sa[4]) ;
 	        h = h ^ ((sa[4] << 16) | sa[5]) ;
 	        if (uvl > (4*3)) {
@@ -5526,6 +5489,20 @@ static uint fileidhash(cvoid *vp,int vl) noex {
 	return h ;
 }
 /* end subroutine (fileidhash) */
+
+static int linkcmp(LI *e1p,LINKINFO *e2p,int len) noex {
+	int		rc ;
+	(void) len ;
+	if ((rc = (e1p->dev - e2p->dev)) == 0) { /* reverse sort! */
+	    if (int64_t d ; (d = (e1p->ino - e2p->ino)) > 0) {
+	        rc = 1 ;
+	    } else if (d < 0) {
+	        rc = -1 ;
+	    }
+	}
+	return rc ;
+}
+/* end subroutine (linkcmp) */
 
 static int diridcmp(struct dirid *e1p,struct dirid *e2p,int len) noex {
 	int		rc ;
@@ -5546,8 +5523,7 @@ static int fileidcmp(struct fileid *e1p,struct fileid *e2p,int len) noex {
 	int		rc ;
 	(void) len ;
 	if ((rc = (e1p->dev - e2p->dev)) == 0) { /* reverse sort! */
-	    int64_t	d ;
-	    if ((d = (e1p->ino - e2p->ino)) > 0) {
+	    if (int64_t d ; (d = (e1p->ino - e2p->ino)) > 0) {
 	        rc = 1 ;
 	    } else if (d < 0) {
 	        rc = -1 ;

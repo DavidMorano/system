@@ -78,7 +78,7 @@ int		fn ;
 {
 	bfile		infile, *ifp = &infile ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs = SR_OK ;
 	int	lines, len ;

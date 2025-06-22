@@ -1,6 +1,6 @@
-# MAKEFILE (fileop)
+# MAKEFILE (filex)
 
-T= fileop
+T= filex
 
 ALL= $(T)
 
@@ -57,7 +57,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o 
+OBJ00= filex_main.o whatinfo.o proginfo.o proginfo_setpiv.o 
 OBJ01= 
 OBJ02=
 OBJ03=
@@ -174,7 +174,7 @@ control:
 	date >> Control
 
 
-main.o:			main.cc $(INCS)
+filex_main.o:		filex_main.cc $(INCS)
 
 whatinfo.o:		whatinfo.c config.h
 
