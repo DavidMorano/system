@@ -1,10 +1,11 @@
 /* tagtrack */
+/* charset=ISO8859-1 */
+/* version %I% last-modified %G% */
 
 /* track tags in DWB documents */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -20,18 +21,12 @@
 
 /******************************************************************************
 
-        This code module (object) maintains a citation database. It stores the
-        citation keys, and a count for each, that are found within the document
-        text.
-
-	No emumeration is required since only lookups by key are needed.
-
+	This code module (object) maintains a citation database.
+	It stores the citation keys, and a count for each, that are
+	found within the document text.  No emumeration is required
+	since only lookups by key are needed.
 
 ******************************************************************************/
-
-
-#define	TAGTRACK_MASTER	0
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -43,6 +38,7 @@
 
 #include	<usystem.h>
 #include	<nulstr.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"tagtrack.h"
@@ -67,10 +63,6 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -231,7 +223,7 @@ int		ll ;
 		        f_macro = TRUE ;
 			{
 			    cchar	*tp ;
-			    while ((tp = strnpbrk(lp,ll," ,\t")) != NULL) {
+			    while ((tp = strnbrk(lp,ll," ,\t")) != NULL) {
 				if ((nl = sfnext(lp,(tp-lp),&np)) > 0) {
 			    	    rs = tagtrack_addmac(op,np,nl) ;
 				}

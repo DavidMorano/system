@@ -1,32 +1,28 @@
 /* procfile */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_FOOTER	1		/* include a footer? */
 
-
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-
 	The program was written from scratch to do what the previous
 	program by the same name did.
 
-
 	= 2004-02-09, David A­D­ Morano
-
-	No it wasn't (referring to the above).	I snarfed this from
-	another program with that previous change note! :-)  Almost every
-	subroutine starts from a previous one.	Why do we keep the old
-	change notes?
-
-	Also, what was the previous program by the same name?
-	Never mind, it doesn't really matter since I have gutted
-	this subroutine almost to the bone! :-)
-
+	No it was not (referring to the above).  I snarfed this
+	from another program with that previous change note! :-)
+	Almost every subroutine starts from a previous one.  Why
+	do we keep the old change notes?  Also, what was the previous
+	program by the same name?  Never mind, it doesn't really
+	matter since I have gutted this subroutine almost to the
+	bone! :-)
 
 */
 
@@ -36,9 +32,7 @@
 
 	This subroutine processes one file at a time.  
 
-
 ******************************************************************************/
-
 
 #include	<envstandards.h>
 
@@ -56,10 +50,12 @@
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<baops.h>
-#include	<char.h>
 #include	<field.h>
 #include	<sbuf.h>
 #include	<realname.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -101,8 +97,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	bprintlns(bfile *,int,const char *,int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*timestr_log(time_t, char *) ;
 
 
@@ -160,7 +154,7 @@ struct proginfo	*pip ;
 struct procfile	*pfp ;
 const char	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	SBUF	b ;
 
@@ -736,7 +730,7 @@ time_t		*rtp ;
 	day = -1 ;
 	if (slen > 1) {
 
-	    if ((tp = strnpbrk(s,slen," \t,")) != NULL) {
+	    if ((tp = strnbrk(s,slen," \t,")) != NULL) {
 
 	        if (cfdeci(s,(tp - s),&day) < 0)
 	            day = -1 ;
@@ -771,7 +765,7 @@ time_t		*rtp ;
 
 	    cp = (char *) s ;
 	    cl = slen ;
-	    if ((tp = strnpbrk(s,slen," (")) != NULL) {
+	    if ((tp = strnbrk(s,slen," (")) != NULL) {
 		cl = (tp - s) ;
 		slen -= cl ;
 

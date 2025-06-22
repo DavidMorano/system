@@ -68,7 +68,7 @@ bfile		*ofp ;
 char		basedir[] ;
 char		name[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs, len ;
 
