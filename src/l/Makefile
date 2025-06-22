@@ -43,7 +43,7 @@ DEFS= $(DEF0) $(DEF1) $(DEF2) $(DEF3) $(DEF4) $(DEF5) $(DEF6) $(DEF7)
 
 INCS= b_$(T).h defs.h
 
-MODS += vecbool.ccm fonce.ccm argmgr.ccm
+MODS +=
 
 LIBS= -luo -lu
 
