@@ -1,5 +1,5 @@
 /* bopenremote SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* execute a command remotely */
@@ -27,11 +27,12 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctime>
 #include	<usystem.h>
 #include	<mkfile.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -470,7 +471,7 @@ cchar	**nvpp ;
 	cp = vs ;
 	rlen = buflen ;
 	blen = 0 ;
-	while ((tp = strpbrk(cp,"\\\"")) != NULL) {
+	while ((tp = strbrk(cp,"\\\"")) != NULL) {
 
 #if	CF_DEBUGS
 	    debugprintf("bopenremote: got one\n") ;

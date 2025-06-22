@@ -1,5 +1,5 @@
 /* bopenrcmde SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* execute a command remotely */
@@ -36,6 +36,7 @@
 #include	<ctime>
 #include	<usystem.h>
 #include	<getnodename.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -441,7 +442,7 @@ char		**nvpp ;
 	cp = vs ;
 	rlen = buflen ;
 	blen = 0 ;
-	while ((cp1 = strpbrk(cp,"\\\"")) != NULL) {
+	while ((cp1 = strbrk(cp,"\\\"")) != NULL) {
 
 #if	CF_DEBUGS
 	    debugprintf("bopenrcmde: got one\n") ;

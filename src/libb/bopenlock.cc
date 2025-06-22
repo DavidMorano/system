@@ -1,5 +1,5 @@
 /* bopenlock SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* program to catpure a lock based on whether a file exists or not */
