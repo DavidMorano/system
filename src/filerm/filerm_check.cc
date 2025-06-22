@@ -1,5 +1,5 @@
 /* filerm_check SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* check a directory entry for a match */
@@ -71,7 +71,7 @@
 
 /* external subroutines */
 
-extern int	checklink(char *,struct ustat *,struct proginfo *) ;
+extern int	checklink(char *,ustat *,struct proginfo *) ;
 
 
 /* external variables */
@@ -237,7 +237,7 @@ cchar	pdirname[] ;
 cchar	dirname[] ;
 int		pdirlen ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	FSDIR		dir ;
 	FSDIR_ENT	slot ;

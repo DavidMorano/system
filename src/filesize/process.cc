@@ -83,7 +83,7 @@ struct proginfo	*pip ;
 char		name[] ;
 PARAMOPT	*pp ;
 {
-	struct ustat		sb, sb2 ;
+	ustat		sb, sb2 ;
 
 	struct checkparams	ck ;
 

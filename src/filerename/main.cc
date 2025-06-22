@@ -114,7 +114,7 @@ static int	procspecs(PROGINFO *,void *,cchar *,int) ;
 static int	procspec(PROGINFO *,void *,cchar *,int) ;
 static int	procspecer(PROGINFO *,void *,cchar *) ;
 
-static int	checkname(const char *, struct ustat *, PROGINFO *) ;
+static int	checkname(const char *, ustat *, PROGINFO *) ;
 
 
 /* local variables */
@@ -980,7 +980,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *np,int nl)
 
 static int procspecer(PROGINFO *pip,void *ofp,cchar name[])
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 
 	if (name == NULL)
@@ -1011,7 +1011,7 @@ static int procspecer(PROGINFO *pip,void *ofp,cchar name[])
 	        debugprintf("main/procspecer: LINK\n") ;
 #endif
 	    if (pip->f.follow) {
-		struct ustat	sb2 ;
+		ustat	sb2 ;
 	        if ((rs = u_stat(name,&sb2)) >= 0) {
 		    if (S_ISDIR(sb2.st_mode)) {
 	        	wopts = (pip->f.follow) ? WDT_MFOLLOW : 0 ;
@@ -1059,9 +1059,9 @@ static int procspecer(PROGINFO *pip,void *ofp,cchar name[])
 /* end subroutine (procspecer) */
 
 
-static int checkname(cchar *name,struct ustat *sbp,PROGINFO *pip)
+static int checkname(cchar *name,ustat *sbp,PROGINFO *pip)
 {
-	struct ustat	sb2 ;
+	ustat	sb2 ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		dirlen, len, nnlen ;

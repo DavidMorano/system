@@ -23,7 +23,7 @@
 
 	int checklink(name,sbp,pip)
 	char		name[] ;
-	struct ustat	*sbp ;
+	ustat	*sbp ;
 	struct proginfo	*pip ;
 
 	Arguments:
@@ -77,10 +77,10 @@
 
 int checklink(name,sbp,pip)
 char		name[] ;
-struct ustat	*sbp ;
+ustat	*sbp ;
 struct proginfo	*pip ;
 {
-	struct ustat	sb2 ;
+	ustat	sb2 ;
 
 	int	rs1 ;
 
