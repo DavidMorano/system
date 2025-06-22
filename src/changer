@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} A.D. "
+NAMES="${NAMES} ustat "
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/A.D./s//A-D-/g
+g/struct ustat/s//ustat/g
 	w
 	q
 EOF

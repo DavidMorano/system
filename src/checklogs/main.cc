@@ -1,13 +1,13 @@
-/* main */
+/* checklogs_main SUPPOER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* generic (pretty much) front end program subroutine */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -20,19 +20,18 @@
 
 /*******************************************************************************
 
-	This subroutine forms the front-end part of a generic PCS type of
-	program.  This front-end is used in a variety of PCS programs.
-
-	This code was originally part of the Personal Communication
-	Services (PCS) package but can also be used independently from it.
-	Historically, this was developed as part of an effort to maintain high
-	function (and reliable) email communications in the face of
-	increasingly draconian security restrictions imposed on the computers
-	in the DEFINITY development organization.
-
+  	Description:
+	This subroutine forms the front-end part of a generic PCS
+	type of program.  This front-end is used in a variety of
+	PCS programs.  This code was originally part of the Personal
+	Communication Services (PCS) package but can also be used
+	independently from it.  Historically, this was developed
+	as part of an effort to maintain high function (and reliable)
+	email communications in the face of increasingly draconian
+	security restrictions imposed on the computers in the
+	DEFINITY development organization.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -48,6 +47,8 @@
 #include	<ctype.h>
 
 #include	<usystem.h>
+#include	<getourenv.h>
+#include	<getax.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<bfile.h>
@@ -55,7 +56,7 @@
 #include	<vecstr.h>
 #include	<userinfo.h>
 #include	<storebuf.h>
-#include	<getax.h>
+#include	<strn.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -70,37 +71,37 @@
 
 extern int	snsd(char *,int,cchar *,uint) ;
 extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfkey(char *,int,const char **) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	cfdecmfui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfkey(char *,int,cchar **) ;
+extern int	vstrkeycmp(cchar **,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	cfdecmfi(cchar *,int,int *) ;
+extern int	cfdecmfui(cchar *,int,uint *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	perm(char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
+extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;
 extern int	isNotAccess(int) ;
 extern int	isFailOpen(int) ;
 
-extern int	printhelp(bfile *,const char *,const char *,const char *) ;
+extern int	printhelp(bfile *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	progtab(PROGINFO *,const char *,int) ;
+extern int	progtab(PROGINFO *,cchar *,int) ;
 
 extern int	proglog_begin(PROGINFO *,USERINFO *) ;
 extern int	proglog_end(PROGINFO *) ;
@@ -109,16 +110,12 @@ extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 extern int	proglog_flush(PROGINFO *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -139,8 +136,8 @@ static int	procuserinfo_logid(PROGINFO *) ;
 
 static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
 
-static int	procenvlogtabs(PROGINFO *,const char *) ;
-static int	procenvlogtab(PROGINFO *,const char *,int) ;
+static int	procenvlogtabs(PROGINFO *,cchar *) ;
+static int	procenvlogtab(PROGINFO *,cchar *,int) ;
 static int	procuserlogtab(PROGINFO *) ;
 
 static int	procuser_envload(PROGINFO *,vecstr *) ;
@@ -148,7 +145,7 @@ static int	procuser_envload(PROGINFO *,vecstr *) ;
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"TMPDIR",
 	"VERSION",
@@ -200,7 +197,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*deflogtabs[] = {
+static cchar	*deflogtabs[] = {
 	"%e/%n/%n.%f",
 	"%e/%n/%u.%f",
 	"%e/%n/%f",
@@ -239,15 +236,15 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	int		f_version = FALSE ;
 	int		f_usage = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*hfname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*hfname = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -830,8 +827,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<logtab(s)> ...] [-af <afile>] [-s <size>]\n" ;
 	if (rs >- 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -974,9 +971,9 @@ static int procenvlogtabs(PROGINFO *pip,cchar *sp)
 	int		rs = SR_OK ;
 	int		sl = strlen(sp) ;
 	int		c = 0 ;
-	const char	*tp ;
+	cchar	*tp ;
 
-	while ((tp = strnpbrk(sp,sl,", \t")) != NULL) {
+	while ((tp = strnbrk(sp,sl,", \t")) != NULL) {
 
 	    rs = procenvlogtab(pip,sp,(tp - sp)) ;
 	    c += rs ;
