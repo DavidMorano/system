@@ -1,5 +1,5 @@
 /* bfs-1 SUPPORT (Breath-First-Search-1) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* Breath-First-Search (shortest route through un-weighted graph) */

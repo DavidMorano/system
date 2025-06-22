@@ -1,5 +1,5 @@
 /* msort SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* My-Sort (another implementation of Quick-Sort) */

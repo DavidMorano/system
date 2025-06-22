@@ -1,5 +1,5 @@
 /* dijkstra-2 SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* Dijkstra (shortest path through graph) */
