@@ -486,7 +486,7 @@ print()
 		if (p->pwd != 0 && !AlreadyPrinted(p->pwd->pw_uid)) {
 			AnyMail(p->pwd->pw_name);
 			if (hack) {
-				struct ustat sbuf;
+				ustat sbuf;
 
 				s = malloc(strlen(p->pwd->pw_dir) +
 					sizeof (PROJ));
@@ -505,7 +505,7 @@ print()
 				}
 			}
 			if (plan) {
-				struct ustat sbuf;
+				ustat sbuf;
 
 				s = malloc(strlen(p->pwd->pw_dir) +
 					sizeof (PLAN));
@@ -787,9 +787,9 @@ fwclose()
 void
 findidle(struct person *pers)
 {
-	struct ustat ttystatus;
+	ustat ttystatus;
 #ifdef sun
-	struct ustat inputdevstatus;
+	ustat inputdevstatus;
 #endif
 #define	TTYLEN (sizeof ("/dev/") - 1)
 	static char buffer[TTYLEN + LMAX + 1] = "/dev/";
@@ -1079,7 +1079,7 @@ netfinger(char *name)
 void
 AnyMail(char *name)
 {
-	struct ustat buf;		/* space for file status buffer */
+	ustat buf;		/* space for file status buffer */
 	char *mbxdir = MAILDIR; 	/* string with path preamble */
 	char *mbxpath;			/* space for entire pathname */
 

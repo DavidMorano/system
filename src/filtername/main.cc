@@ -137,7 +137,7 @@ char	*envv[] ;
 {
 	struct proginfo	pi, *pip = &pi ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	HDBSTR	mdb ;
 
@@ -846,7 +846,7 @@ struct proginfo	*pip ;
 static int isfileok(fname)
 const char	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 	int	fd ;

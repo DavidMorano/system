@@ -1,5 +1,5 @@
 /* main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* generic (pretty much) front end program subroutine */
@@ -144,7 +144,7 @@ extern int	ctdeci(char *,int,int) ;
 extern int	ctdecl(char *,int,long) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
 extern int	getarchitecture(char *,int) ;
@@ -3032,7 +3032,7 @@ static int loaddefs(PROGINFO *pip,cchar *dfname,cchar **s1,cchar **s2)
 
 static int loaddefsfile(PROGINFO *pip,cchar *dfname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		f = FALSE ;
 
@@ -3102,7 +3102,7 @@ static int loaddefsfind(PROGINFO *pip,cchar *sched[])
 
 static int loadxfile(PROGINFO *pip,cchar *xfname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		f = FALSE ;
 

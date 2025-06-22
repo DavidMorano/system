@@ -112,7 +112,7 @@ struct proginfo	*pip ;
 
 	if (pip->stampfname[0] != '\0') {
 	    const char	*sf = pip->stampfname ;
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    pip->daytime = time(NULL) ;
 	    f_process = TRUE ;
 	    if (u_stat(sf,&sb) >= 0) {
