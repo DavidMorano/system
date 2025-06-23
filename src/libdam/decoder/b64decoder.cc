@@ -1,5 +1,5 @@
 /* b64decoder SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* Base-64 (B64) decoding */
