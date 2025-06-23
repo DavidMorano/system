@@ -33,9 +33,7 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdio>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<iostream>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -46,12 +44,12 @@ module ;
 
 module argmgr ;
 
+import debug ;				/* |deb{xx}(3u)| */
+
 /* local defines */
 
 
 /* imported namespaces */
-
-using std::cerr ;			/* variable */
 
 
 /* local typedefs */
@@ -82,17 +80,21 @@ using std::cerr ;			/* variable */
 
 bool argmgr_iter::operator != (const argmgr_iter &o) noex {
 	bool		f = false ;
-	fprintf(stderr,"iter-oper-ne: ent ai=%d\n",ai) ;
+	if_constexpr (f_debug) {
+	    debprintf(__func__,"ent ai=%d\n",ai) ;
+	}
 	if (op && (ai < o.ai)) {
     	    int		rs ;
 	    if (cchar *ap ; (rs = op->get(ai,&ap)) > 0) {
 	        ai = rs ;
 	        f = bool(ap) ;
 	    } else if (rs < 0) {
-	        ulogerror("argmgr_iter",rs,"operator-!=") ;
+	        ulogerror(__func__,rs,"operator-!=") ;
 	    } /* end if */
 	}
-	fprintf(stderr,"iter-oper-ne: ret ai=%d f=%u\n",ai,f) ;
+	if_constexpr (f_debug) {
+	    debprintf(__func__,"ret ai=%d f=%u\n",ai,f) ;
+	}
 	return f ;
 } /* end method (argmgr_iter::operator) */
 
@@ -104,7 +106,7 @@ bool argmgr_iter::operator < (const argmgr_iter &o) noex {
 	        ai = rs ;
 	        f = bool(ap) ;
 	    } else if (rs < 0) {
-	        ulogerror("argmgr_iter",rs,"operator-<") ;
+	        ulogerror(__func__,rs,"operator-<") ;
 	    } /* end if */
 	}
 	return f ;
@@ -113,21 +115,25 @@ bool argmgr_iter::operator < (const argmgr_iter &o) noex {
 ccharp argmgr_iter::operator * () noex {
 	cchar		*rp = nullptr ;
 	if (op) {
-	    fprintf(stderr,"iter::oper-deref: ai=%d\n",ai) ;
+	    if_constexpr (f_debug) {
+	        debprintf(__func__,"ent ai=%d\n",ai) ;
+	    }
 	    if (int rs ; (rs = op->present(ai)) > 0) {
-	    fprintf(stderr,"iter::oper-deref: present=YES\n") ;
+	        if_constexpr (f_debug) {
+	            debprintf(__func__,"present=YES\n") ;
+		}
 	        if (cchar *ap ; (rs = op->get(ai,&ap)) > 0) {
 	            rp = ap ;
 	        } else if (rs < 0) {
-	            ulogerror("argmgr_iter",rs,"operator-deref") ;
+	            ulogerror(__func__,rs,"operator-deref") ;
 	        } /* end if */
 	    } else {
-	        ulogerror("argmgr_iter",rs,"operator-deref") ;
+	        ulogerror(__func__,rs,"operator-deref") ;
 	    } /* end if (present) */
 	}
-	{
-	    cchar *fmt = "iter::oper-deref: ret rp=%s\n" ;
-	    fprintf(stderr,fmt,((rp) ? "ok" : "null")) ;
+	if_constexpr (f_debug) {
+	    cchar *fmt = "ret rp=%s\n" ;
+	    debprintf(__func__,fmt,((rp) ? "ok" : "null")) ;
 	}
 	return rp ;
 } /* end method (argmgr_iter::operator) */
