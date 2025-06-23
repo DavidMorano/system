@@ -1,5 +1,5 @@
 /* dialcprog SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* dial to a program on the local cluster */

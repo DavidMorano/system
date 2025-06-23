@@ -1,5 +1,5 @@
 /* cksum HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* perform the POSIX 1003.2 CRC checksum algorithm */
