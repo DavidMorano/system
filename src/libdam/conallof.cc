@@ -1,5 +1,5 @@
 /* conallof SUPPORT (contains-all-of) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* does the given string have all of the given characters? */
