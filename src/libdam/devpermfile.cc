@@ -1,5 +1,5 @@
 /* devpermfile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* read in a file of parameters */
@@ -528,7 +528,7 @@ int devpermfile_check(op,daytime)
 DEVPERMFILE	*op ;
 time_t		daytime ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		f_changed = FALSE ;
 	int		f = FALSE ;
@@ -587,7 +587,7 @@ static int devpermfile_fileparse(op,fname)
 DEVPERMFILE	*op ;
 cchar	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	bfile		loadfile, *lfp = &loadfile ;
 
