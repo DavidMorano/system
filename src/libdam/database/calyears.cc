@@ -1,5 +1,5 @@
 /* calyears SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* CALYEARS object implementation */
@@ -624,7 +624,7 @@ int calyears_havestart(CALYEARS *op,CALCITE *qp,int y,cchar *lp,int ll)
 
 	ch = MKCHAR(lp[0]) ;
 	if (! CHAR_ISWHITE(ch)) {
-	    if ((si = sibreak(lp,ll," \t")) >= 3) {
+	    if ((si = sibrk(lp,ll," \t")) >= 3) {
 		if (isdigitlatin(ch)) {
 		    cchar	*tp ;
 	    	    if ((tp = strnchr(lp,ll,'/')) != NULL) {
@@ -634,7 +634,7 @@ int calyears_havestart(CALYEARS *op,CALCITE *qp,int y,cchar *lp,int ll)
 	        	    qp->m = (rs & UCHAR_MAX) ;
 	            	    cp = (tp + 1) ;
 	            	    cl = ((lp + ll) - cp) ;
-	            	    if ((tp = strnpbrk(cp,cl," \t")) != NULL) {
+	            	    if ((tp = strnbrk(cp,cl," \t")) != NULL) {
 			        cl = (tp - cp) ;
 			    }
 	            	    if ((rs = calyears_mkday(op,y,qp->m,cp,cl)) >= 0) {
@@ -1049,7 +1049,7 @@ static int calyears_transhol(CALYEARS *op,CALCITE *qp,int y,
 
 	np = NULL ;
 	nl = 0 ;
-	if ((tp = strnpbrk(sp,sl,"+-")) != NULL) {
+	if ((tp = strnbrk(sp,sl,"+-")) != NULL) {
 	    np = (tp + 1) ;
 	    nl = (sl - ((tp + 1) - sp)) ;
 	    sl = (tp - sp) ;
@@ -1428,7 +1428,7 @@ static int subinfo_loadnames(SUBINFO *sip,vecstr *nlp,cchar *dirname) noex {
 
 	if (sip == NULL) return SR_FAULT ;
 	if ((rs = fsdir_open(&dir,dirname)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    int			nl ;
 	    cchar		*calsuf = CALYEARS_DBSUF ;
 	    cchar		*tp ;
@@ -1518,7 +1518,7 @@ static int subinfo_checkdname(SUBINFO *sip,cchar *dname) noex {
 	int		rs = SR_OK ;
 
 	if (dname[0] == '/') {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = uc_stat(dname,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 	            if ((rs = subinfo_ids(sip)) >= 0) {

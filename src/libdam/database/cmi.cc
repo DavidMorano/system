@@ -1,5 +1,5 @@
 /* cmi SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* read or audit a ComMandment Index (CMI) database */
