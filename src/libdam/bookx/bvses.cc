@@ -1,5 +1,5 @@
 /* bvses SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* read or audit a BVSES (Bible Verse Structure) database */
@@ -432,7 +432,7 @@ static int bvses_mapbegin(BVSES *op,time_t dt)
 	    return SR_FAULT ;
 
 	if ((rs = u_open(op->fname,O_RDONLY,0666)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    int			fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 
@@ -497,7 +497,7 @@ static int bvses_checkupdate(BVSES *op,time_t dt)
 	if (op->ncursors == 0) {
 	    if (dt <= 0) dt = time(NULL) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
-	        struct ustat	sb ;
+	        ustat	sb ;
 	        BVSES_FMI	*mip = &op->fmi ;
 	        op->ti_lastcheck = dt ;
 	        if ((rs1 = u_stat(op->fname,&sb)) >= 0) {

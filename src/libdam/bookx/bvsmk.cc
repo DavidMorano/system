@@ -1,5 +1,5 @@
 /* bvsmk SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* make a BVS database */
@@ -82,6 +82,7 @@
 #include	<filer.h>
 #include	<nulstr.h>
 #include	<opentmp.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"bvsmk.h"
@@ -120,11 +121,6 @@ extern int	isNotPresent(int) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -882,7 +878,7 @@ static int mknifname(char *rbuf,int type,cchar *id,cchar *db,cchar *suf)
 
 static int unlinkstale(cchar *fn,int to)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	const time_t	dt = time(NULL) ;
 	int		rs ;
 	if ((rs = uc_stat(fn,&sb)) >= 0) {
