@@ -1,5 +1,5 @@
 /* pwi SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* PassWord Index manager */
@@ -669,14 +669,14 @@ static int realname_isextra(realname *op,pwdesc *pdp,cchar *un) noex {
 	int		f = false ;
 	if (cchar *lp{} ; (rs = realname_getlast(op,&lp)) >= 0) {
 	    cint	ll = rs ;
-	    if (strnpbrk(lp,ll,extras) == nullptr) {
+	    if (strnbrk(lp,ll,extras) == nullptr) {
 		ucentpw		*pwp = pdp->pwp ;
 		cint		pwlen = pdp->pwlen ;
 		char		*pwbuf = pdp->pwbuf ;
 		if ((rs = GETPW_NAME(pwp,pwbuf,pwlen,un)) > 0) {
 		    cchar	*gecos = pwp->pw_gecos ;
 		    if (cchar *sp{} ; (rs = getgecosname(gecos,-1,&sp)) > 0) {
-			f = (strnpbrk(sp,rs,extras) != nullptr) ;
+			f = (strnbrk(sp,rs,extras) != nullptr) ;
 		    }
 		} else if (rs == SR_NOTFOUND) {
 		    rs = SR_OK ;
