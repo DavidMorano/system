@@ -1,5 +1,5 @@
 /* vmail_prof SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
@@ -22,14 +22,14 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<signal.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<csignal>
+#include	<cstring>
 #include	<time.h>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<curses.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 #include	<logfile.h>
 #include	<bfile.h>

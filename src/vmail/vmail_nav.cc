@@ -1,5 +1,5 @@
 /* vmail_nav SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* navigate among the mail message in the current mailbox */
@@ -38,7 +38,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<curses.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 #include	<bfile.h>
 #include	<localmisc.h>

@@ -1,5 +1,5 @@
 /* inter SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* the user interface (command interpreter) for VMAIL */
@@ -26,7 +26,7 @@
         This is a complete rewrite of the (utter) trash that performed
         this function previously.
 
-	= 2018-11-30. David A.D. Morano
+	= 2018-11-30. David A-D- Morano
 	Fixed handling escape sequences during cooked-read responses
 	(rare but possible. I am pretty sure that this did work once.
 
@@ -626,7 +626,7 @@ int inter_cmd(INTER *iap)
 	    cchar	*pp = INTER_IPROMPT ;
 	    char	*np = iap->numbuf ;
 	    iap->f.cmdprompt = TRUE ;
-	    fmt = "%s %t\v" ;
+	    fmt = "%s %r\v" ;
 	    rs = display_input(&iap->di,fmt,pp,np,nl) ;
 	}
 
@@ -894,7 +894,7 @@ static int inter_prefixer(INTER *iap,cchar *pathprefix)
 	if ((rs >= 0) && (rs1 >= 0)) {
 	    cchar	*px = iap->pathprefix ;
 	    if ((px == NULL) || (strcmp(px,ndp) != 0)) {
-		struct ustat	sb ;
+		ustat	sb ;
 
 	        rs1 = u_stat(ndp,&sb) ;
 
@@ -1268,7 +1268,7 @@ static int inter_loadcmdkey(INTER *iap,cchar *sp,int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("inter_loadcmdkey: v=>%t<\n",sp,sl) ;
+	    debugprintf("inter_loadcmdkey: v=>%r<\n",sp,sl) ;
 #endif
 
 	if (sl < 0) sl = ((sp != NULL) ? strlen(sp) : 0) ;
@@ -1278,7 +1278,7 @@ static int inter_loadcmdkey(INTER *iap,cchar *sp,int sl)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("inter_loadcmdkey: f=>%t<\n",fp,fl) ;
+	        debugprintf("inter_loadcmdkey: f=>%r<\n",fp,fl) ;
 #endif
 
 	    fs[i].fp = fp ;
@@ -1323,7 +1323,7 @@ static int inter_loadcmdkeyone(INTER *iap,INTER_FSTR *fs)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("inter_loadcmdkeyone: termtype=%t\n",cp,cl) ;
+	    debugprintf("inter_loadcmdkeyone: termtype=%r\n",cp,cl) ;
 #endif
 
 #ifdef	COMMENT
@@ -1345,7 +1345,7 @@ static int inter_loadcmdkeyone(INTER *iap,INTER_FSTR *fs)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("inter_loadcmdkeyone: keyname=%t\n",
+	        debugprintf("inter_loadcmdkeyone: keyname=%r\n",
 	            fs[2].fp,fs[2].fl) ;
 #endif
 
@@ -2446,7 +2446,7 @@ static int inter_checkchild(INTER *iap,int f_check)
 static int inter_mailbeginer(INTER *iap,cchar *mbname,int mblen)
 {
 	PROGINFO	*pip = iap->pip ;
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f_access = FALSE ;
@@ -2499,7 +2499,7 @@ static int inter_mailbeginer(INTER *iap,cchar *mbname,int mblen)
 
 	if (rs >= 0) {
 	    DISPLAY	*dip = &iap->di ;
-	    if ((rs = display_input(dip,"mb=%t\v",mbname,mblen)) >= 0) {
+	    if ((rs = display_input(dip,"mb=%r\v",mbname,mblen)) >= 0) {
 	        iap->f.setmbname = TRUE ;
 	        rs = display_setmbname(dip,mbname,mblen) ;
 	    }
@@ -2638,7 +2638,7 @@ static int inter_mailender(INTER *iap,int f_quick)
 	        cl = sfshrink(rbuf,rl,&cp) ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4)) {
-	            debugprintf("inter_mailend: sfshrink() cl=%d c=>%t<\n",
+	            debugprintf("inter_mailend: sfshrink() cl=%d c=>%r<\n",
 	                cl,cp,cl) ;
 	            debugprinthex("inter_mailend: c=",40,cp,cl) ;
 	        }
@@ -3263,10 +3263,10 @@ static int inter_cmdpage(INTER *iap,int argnum)
 	    cint		mi = rs ;
 	    if ((rs = mbcache_msgscan(&iap->mc,mi,&msp)) >= 0) {
 	        if (msp->boff >= 0) {
-		    cint	ilen = MAILADDRLEN ;
+		    cint	ilen = MAILA-D-LEN ;
 		    cchar	*midp = msp->vs[mbcachemf_hdrmid] ;
 		    cchar	*mfp = NULL ;
-		    char	ibuf[MAILADDRLEN + 1] ;
+		    char	ibuf[MAILA-D-LEN + 1] ;
 
 	            if ((midp == NULL) || (midp[0] == '\0')) {
 	                midp = ibuf ;
@@ -3327,10 +3327,10 @@ static int inter_cmdbodyer(INTER *iap,int mi,cchar *rp,int rl)
 	int		rs ;
 	if ((rs = mbcache_msgscan(&iap->mc,mi,&msp)) >= 0) {
 	    if (msp->boff >= 0) {
-		cint	ilen = MAILADDRLEN ;
+		cint	ilen = MAILA-D-LEN ;
 		cchar	*midp = msp->vs[mbcachemf_hdrmid] ;
 		cchar	*mfp ;
-		char		ibuf[MAILADDRLEN + 1] ;
+		char		ibuf[MAILA-D-LEN + 1] ;
 
 	        if ((midp == NULL) || (midp[0] == '\0')) {
 	            midp = ibuf ;
@@ -3514,7 +3514,7 @@ static int inter_cmdmove(INTER *iap,int argnum)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
-	            debugprintf("inter_cmdmove: response=>%t<\n",
+	            debugprintf("inter_cmdmove: response=>%r<\n",
 	                response,strlinelen(response,rl,60)) ;
 #endif
 
@@ -3681,7 +3681,7 @@ static int inter_cmdsubject(INTER *iap,int argnum)
 	    char	disbuf[DISBUFLEN+1] = { 0 } ;
 #if	CF_DEBUG
 		if (DEBUGLEVEL(5))
-			debugprintf("inter/cmdsubject: b=>%t<\n",
+			debugprintf("inter/cmdsubject: b=>%r<\n",
 			vp,strlinelen(vp,vl,40)) ;
 #endif
 	    if (vp != NULL) {
@@ -3697,7 +3697,7 @@ static int inter_cmdsubject(INTER *iap,int argnum)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
 		cint	n = COLUMNS ;
-		debugprintf("inter/cmdsubject: dl=%d d=>%t<\n",
+		debugprintf("inter/cmdsubject: dl=%d d=>%r<\n",
 			dl,disbuf,strlinelen(disbuf,dl,40)) ;
 		debugprinthexblock("inter_cmdsubject:",n,disbuf,dl) ;
 	}
@@ -3753,7 +3753,7 @@ static int inter_msgoutfile(INTER *iap,cchar *cp,int cl,off_t moff,int mlen)
 		    if (moff >= 0) {
 	                if ((rs = u_seek(iap->mfd,moff,SEEK_SET)) >= 0) {
 	                    if ((rs1 = uc_copy(iap->mfd,ofd,mlen)) >= 0) {
-	                        fmt = "size=%u file=%t\v" ;
+	                        fmt = "size=%u file=%r\v" ;
 	                        rs = inter_info(iap,FALSE,fmt,rs1,cp,cl) ;
 	                    } else {
 	                        fmt = "file-copy-error (%d)\v" ;
@@ -3767,7 +3767,7 @@ static int inter_msgoutfile(INTER *iap,cchar *cp,int cl,off_t moff,int mlen)
 	            rs = inter_info(iap,TRUE,fmt,rs1,ofname) ;
 	        }
 	    } else
-	        inter_info(iap,TRUE,"invalid file=%t\v",cp,cl) ;
+	        inter_info(iap,TRUE,"invalid file=%r\v",cp,cl) ;
 	} /* end if (ok) */
 
 #if	CF_DEBUG
@@ -4364,7 +4364,7 @@ static int inter_scancheck(INTER *iap,int si,int n)
 	                    debugprintf("inter_scancheck: vs[from]=>%s<\n",
 	                        msp->vs[mbcachemf_scanfrom]) ;
 	                    cp = msp->vs[mbcachemf_hdrsubject] ;
-	                    debugprintf("inter_scancheck: vs[subject]=>%t<\n",
+	                    debugprintf("inter_scancheck: vs[subject]=>%r<\n",
 	                        cp,strlinelen(cp,-1,45)) ;
 	                    debugprintf("inter_scancheck: vs[date]=>%s<\n",
 	                        msp->vs[mbcachemf_scandate]) ;
@@ -4442,7 +4442,7 @@ int inter_input(INTER *iap,char *lbuf,int llen,cchar *fmt,...)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("inter_input: uterm_read() rs=%d\n",rs) ;
-	    debugprintf("inter_input: l=>%t<\n",
+	    debugprintf("inter_input: l=>%r<\n",
 	        lbuf,strlinelen(lbuf,len,40)) ;
 	}
 #endif
@@ -4539,7 +4539,7 @@ static int inter_change(INTER *iap)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("inter_change: mb=>%t<\n",cp,cl) ;
+	    debugprintf("inter_change: mb=>%r<\n",cp,cl) ;
 #endif
 
 	if (cl <= 0)
@@ -4594,13 +4594,13 @@ static int inter_havemb(INTER *iap,cchar *mbname,int mblen)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("inter_havemb: mbname=>%t<\n",mbname,mblen) ;
+	    debugprintf("inter_havemb: mbname=>%r<\n",mbname,mblen) ;
 #endif
 	if ((mbname != NULL) && (mbname[0] != '\0')) {
 	    if (pip->folderdname != NULL) {
 	        cchar	*fdn = pip->folderdname ;
 	        if ((rs1 = mkpath2w(mbfname,fdn,mbname,mblen)) >= 0) {
-	            struct ustat	sb ;
+	            ustat	sb ;
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
 	                debugprintf("inter_havemb: mkpath2w() rs=%d mbf=%s\n",
@@ -4669,7 +4669,7 @@ static int inter_cmdpathprefix(INTER *iap)
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3)) {
 	        debugprintf("inter_cmdpathprefix: inter_input() rs=%d\n",rs) ;
-	        debugprintf("inter_cmdpathprefix: r=>%t<\n",rbuf,rl) ;
+	        debugprintf("inter_cmdpathprefix: r=>%r<\n",rbuf,rl) ;
 	    }
 #endif
 
@@ -4691,7 +4691,7 @@ static int inter_cmdpathprefix(INTER *iap)
 	                rs = inter_info(iap,FALSE,"dir=%s\v",px) ;
 		    }
 	        } else {
-	            cchar	*fmt = "inaccessible dir=%t\v" ;
+	            cchar	*fmt = "inaccessible dir=%r\v" ;
 	            rs = inter_info(iap,TRUE,fmt,cp,cl) ;
 	        } /* end if */
 	    } /* end if (positive response) */
@@ -4948,7 +4948,7 @@ static int inter_msgviewopener(INTER *iap,int mi,MBCACHE_SCAN *msp)
 	int		rs = SR_OK ;
 	int		nl = 0 ;
 	cchar	*midp = msp->vs[mbcachemf_hdrmid] ;
-	char		msgid[MAILADDRLEN + 1] ;
+	char		msgid[MAILA-D-LEN + 1] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
@@ -4961,7 +4961,7 @@ static int inter_msgviewopener(INTER *iap,int mi,MBCACHE_SCAN *msp)
 
 	if ((midp == NULL) || (midp[0] == '\0')) {
 	    midp = msgid ;
-	    rs = snsdd(msgid,MAILADDRLEN,iap->mbname,iap->miscanpoint) ;
+	    rs = snsdd(msgid,MAILA-D-LEN,iap->mbname,iap->miscanpoint) ;
 	}
 
 #if	CF_DEBUG

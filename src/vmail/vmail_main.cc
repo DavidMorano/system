@@ -1,5 +1,5 @@
-/* main SUPPORT (VMAIL) */
-/* encoding=ISO8859-1 */
+/* vmail_main SUPPORT (VMAIL) */
+/* charset=ISO8859-1 */
 /* lang=C89 */
 
 /* the VMAIL program */
@@ -48,9 +48,9 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<ucmallreg.h>
-#include	<userinfo.h>
+#include	<getourenv.h>
 #include	<gethz.h>
-#include	<toxc.h>
+#include	<userinfo.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -64,6 +64,9 @@
 #include	<mkpathx.h>
 #include	<expcook.h>
 #include	<cfdec.h>
+#include	<strn.h>
+#include	<strx.h>
+#include	<toxc.h>
 #include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -102,11 +105,6 @@ extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*strncpylow(char *,cchar *,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 extern char	*timestr_elapsed(time_t,char *) ;
 
@@ -1675,7 +1673,7 @@ static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 	            while (rs >= 0) {
 	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
-	                debugprintf("b_rest/procpcsconf: pair> %s=%t\n",
+	                debugprintf("b_rest/procpcsconf: pair> %s=%r\n",
 	                    kbuf,vbuf,vl) ;
 	            } /* end while */
 	            pcsconf_curend(pcp,&cur) ;
@@ -1823,7 +1821,7 @@ static int procscanspec(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("main/procscanspec: S svspec=>%t<\n",cp,cl) ;
+	    debugprintf("main/procscanspec: S svspec=>%r<\n",cp,cl) ;
 #endif
 
 	if ((rs >= 0) && (cp != nullptr) && (cp[0] != '\0')) {
@@ -1835,7 +1833,7 @@ static int procscanspec(PROGINFO *pip)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("main/procscanspec: P svspec=>%t<\n",cp,cl) ;
+	        debugprintf("main/procscanspec: P svspec=>%r<\n",cp,cl) ;
 #endif
 
 	    rs = cfdeci(cp,cl,&pip->svlines) ;
@@ -2016,7 +2014,7 @@ static int procmailusers_env(PROGINFO *pip,cchar *var)
 
 	    sl = strlen(sp) ;
 
-	    while ((tp = strnpbrk(sp,sl," :,\t\n")) != nullptr) {
+	    while ((tp = strnbrk(sp,sl," :,\t\n")) != nullptr) {
 	        if ((cl = sfshrink(sp,(tp - sp),&cp)) > 0) {
 	            if (cl > USERNAMELEN) cl = USERNAMELEN ;
 	            rs = procmailusers_add(pip,cp,cl) ;
@@ -2158,7 +2156,7 @@ static int procmailusers_add(PROGINFO *pip,cchar *dp,int dl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	debugprintf("main/procmailusers_add: ent d=%t\n",dp,dl) ;
+	debugprintf("main/procmailusers_add: ent d=%r\n",dp,dl) ;
 #endif
 
 	if (dp == nullptr) return SR_FAULT ;
@@ -2263,7 +2261,7 @@ static int procmaildirs(PROGINFO *pip,PARAMOPT *pop)
 	for (i = 0 ; varmaildirs[i] != nullptr ; i += 1) {
 	    cchar	*var = varmaildirs[i] ;
 	    if ((dns = getourenv(envv,var)) != nullptr) {
-	        while ((tp = strpbrk(dns," :,\t\n")) != nullptr) {
+	        while ((tp = strbrk(dns," :,\t\n")) != nullptr) {
 	            rs = procmaildir(pip,pop,dns,(tp-dns)) ;
 	            if (rs < 0) break ;
 	            c += rs ;

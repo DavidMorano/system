@@ -80,7 +80,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<curses.h>
 
 #include	<usystem.h>
@@ -104,7 +104,7 @@
 
 extern int	mkpath1(char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	mkmailbox(struct proginfo *,const char *) ;
 extern int	search() ;
 
@@ -372,8 +372,8 @@ int	len ;	/* length of given array */
 static int getnewmail(pip)
 struct proginfo	*pip ;
 {
-	struct ustat	sf ;
-	struct ustat	sb ;
+	ustat	sf ;
+	ustat	sb ;
 
 	struct flock	fl ;
 

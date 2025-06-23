@@ -78,8 +78,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bfile.h>
@@ -114,7 +114,7 @@
 extern int	mkpath1(char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	sfbasename(const char *,int,const char **) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	lockend(int,int,int,int) ;
 extern int	pcsgetprog(const char *,char *,const char *) ;
@@ -210,7 +210,7 @@ int progmailget(PROGINFO *pip,PARAMOPT *app)
 	    if ((mb != NULL) && (mb[0] != '\0')) {
 	        char	infname[MAXPATHLEN + 1] ;
 	        if ((rs = mkpath2(infname,folder,mb)) >= 0) {
-	            struct ustat	sb ;
+	            ustat	sb ;
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
 	                debugprintf("progmailget: infname=%s\n",infname) ;
@@ -697,7 +697,7 @@ struct muinfo	*mip ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5)) {
-	            debugprintf("progmailget/procmkenvusers: ubuf=%t\n",
+	            debugprintf("progmailget/procmkenvusers: ubuf=%r\n",
 	                ubuf,strlinelen(ubuf,ul,40)) ;
 	        }
 #endif /* CF_DEBUG */
@@ -735,7 +735,7 @@ struct muinfo	*mip ;
 	    int	i ;
 	    debugprintf("procmailget/_erumer: env¬\n") ;
 	    for (i = 0 ; ev[i] != NULL ; i += 1)
-	        debugprintf("procmailget/~erumer: e[%03u]»%t\n",i,
+	        debugprintf("procmailget/~erumer: e[%03u]»%r\n",i,
 	            ev[i],strlinelen(ev[i],-1,50)) ;
 	}
 #endif /* CF_DEBUG */
