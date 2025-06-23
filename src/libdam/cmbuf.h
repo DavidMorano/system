@@ -1,5 +1,5 @@
 /* cmbuf HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* version %I% last-modified %G% */
 
 /* Connection Manager Buffer */
