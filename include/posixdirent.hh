@@ -32,13 +32,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |dirent| */
+#include	<sys/types.h>		/* |off_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<dirent.h>
+#include	<dirent.h>		/* |DIR(3c)| + |dirent_t(3c)| */
 
 
 #define	POSIXDIRENT_MAGIC	0x97634525

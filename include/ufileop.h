@@ -80,7 +80,6 @@ extern int u_readlink(cchar *,char *,int) noex ;
 extern int u_rename(cchar *,cchar *) noex ;
 extern int u_resolvepath(cchar *,char *,int) noex ;
 extern int u_rmdir(cchar *) noex ;
-extern int u_rmdirs(cchar *) noex ;
 extern int u_stat(cchar *,USTAT *) noex ;
 extern int u_statfs(cchar *,USTATFS *) noex ;
 extern int u_statvfs(cchar *,USTATVFS *) noex ;

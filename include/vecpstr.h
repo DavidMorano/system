@@ -65,7 +65,7 @@ enum vecpstros {
     vecpstro_sorted,
     vecpstro_ordered,
     vecpstro_overlast
-} ;
+} ; /* end enum (vecpstros) */
 
 #ifdef	__cplusplus	/* C++ only! */
 
@@ -77,7 +77,7 @@ struct vecpstrms {
     static int	conserve ;
     static int	sorted ;
     static int	ordered ;
-} ;
+} ; /* end struct (vecpstrms) */
 
 #endif /* __cplusplus */
 
@@ -101,14 +101,14 @@ struct vecpstr_flags {
 	uint		oordered:1 ;
 	uint		oconserve:1 ;
 	uint		stsize:1 ;
-} ;
+} ; /* end struct (vecpstr_flags) */
 
 struct vecpstr_chunk {
 	char		*tab ;		/* table pointer */
 	int		tabsize ;	/* tab-bytes allocated extent */
 	int		tablen ;	/* tab-bytes amount used */
 	int		count ;		/* number of items */
-} ;
+} ; /* end struct (vecpstr_chunk) */
 
 struct vecpstr_head {
 	cchar		**va ;
@@ -117,11 +117,11 @@ struct vecpstr_head {
 	VECPSTR_FL	fl ;
 	uint		magic ;
 	int		chsize ;
-	int		an ;		/* suggested add-number */
-	int		c ;		/* total item count */
-	int		i ;		/* index */
-	int		n ;		/* extent */
-	int		fi ;		/* first-index */
+	int		addnum ;	/* suggested add-number */
+	int		cnt ;		/* total item count */
+	int		idx ;		/* index */
+	int		ext ;		/* extent */
+	int		fidx ;		/* first-index */
 	int		stsize ;	/* string table size */
 } ; /* end struct (vecpstr_head) */
 
@@ -143,7 +143,7 @@ enum vecpstrmems {
 	vecpstrmem_audit,
 	vecpstrmem_finish,
 	vecpstrmem_overlast
-} ;
+} ; /* end enum (vecpstrmems) */
 struct vecpstr_iter {
 	cchar		**va = nullptr ;
 	int		i = -1 ;
@@ -182,6 +182,16 @@ struct vecpstr_iter {
 	void increment(int = 1) noex ;
 } ; /* end struct vecpstr_iter) */
 struct vecpstr ;
+struct vecpstr_st {
+	vecpstr		*op = nullptr ;
+	void operator () (vecpstr *p) noex {
+	    op = p ;
+	} ;
+	int operator () (int = 0,int = 0,int = 0) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (vecpstr_st) */
 struct vecpstr_co {
 	vecpstr		*op = nullptr ;
 	int		w = -1 ;
@@ -195,6 +205,7 @@ struct vecpstr_co {
 	} ;
 } ; /* end struct (vecpstr_co) */
 struct vecpstr : vecpstr_head {
+	vecpstr_st	start ;
 	vecpstr_co	addcspath ;
 	vecpstr_co	count ;
 	vecpstr_co	delall ;
@@ -204,6 +215,7 @@ struct vecpstr : vecpstr_head {
 	vecpstr_co	audit ;
 	vecpstr_co	finish ;
 	vecpstr() noex {
+	    start	(this) ;
 	    addcspath	(this,vecpstrmem_addcspath) ;
 	    count	(this,vecpstrmem_count) ;
 	    delall	(this,vecpstrmem_delall) ;
@@ -213,10 +225,9 @@ struct vecpstr : vecpstr_head {
 	    audit	(this,vecpstrmem_audit) ;
 	    finish	(this,vecpstrmem_finish) ;
 	    magic = 0 ;
-	} ;
+	} ; /* end ctor */
 	vecpstr(const vecpstr &) = delete ;
 	vecpstr &operator = (const vecpstr &) = delete ;
-	int start(int = 0,int = 0,int = 0) noex ;
 	int add(cchar *,int = -1) noex ;
 	int adduniq(cchar *,int = -1) noex ;
 	int addsyms(cchar *,mainv) noex ;
@@ -238,11 +249,11 @@ struct vecpstr : vecpstr_head {
 	int sort(vecpstr_f = nullptr) noex ;
 	operator int () noex ;
 	vecpstr_iter begin() noex {
-	    vecpstr_iter		it(va,0,i) ;
+	    vecpstr_iter		it(va,0,idx) ;
 	    return it ;
 	} ;
 	vecpstr_iter end() noex {
-	    vecpstr_iter		it(va,i,i) ;
+	    vecpstr_iter		it(va,idx,idx) ;
 	    return it ;
 	} ;
 	void dtor() noex ;
