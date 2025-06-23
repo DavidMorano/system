@@ -1,5 +1,5 @@
 /* commandments SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* COMMANDMENTS object implementation */
@@ -1113,7 +1113,7 @@ static int commandments_checkupdate(CM *op,time_t dt)
 	int		f = false ;
 
 	if (op->ncursors == 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if (dt == 0) dt = time(NULL) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
 	        op->ti_lastcheck = dt ;

@@ -1,5 +1,5 @@
 /* cyimk SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* Calendar-Year-Index DB-make (make a CYI database) */
@@ -379,7 +379,7 @@ static int cyimk_idbegin(CYIMK *op,cchar *dname,int year) noex {
 
 static int cyimk_idxdir(CYIMK *op,IDS *idp,cchar *ydname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	const mode_t	dm = 0777 ;
 	cint	nrs = SR_NOENT ;
 	int		rs = SR_OK ;
@@ -908,7 +908,7 @@ static int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf)
 
 static int unlinkstale(cchar *fn,int to)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	const time_t	dt = time(NULL) ;
 	int		rs ;
 	if ((rs = uc_stat(fn,&sb)) >= 0) {
