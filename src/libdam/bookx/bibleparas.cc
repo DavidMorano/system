@@ -1,5 +1,5 @@
 /* bibleparas SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* BIBLEPARAS implementation */
@@ -513,7 +513,7 @@ static int bibleparas_dbmapcreate(BIBLEPARAS *op,time_t dt)
 #endif
 
 	if ((rs = u_open(op->dbfname,O_RDONLY,0666)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    int			fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
@@ -572,7 +572,7 @@ static int bibleparas_dbmapdestroy(BIBLEPARAS *op)
 
 static int bibleparas_checkupdate(BIBLEPARAS *op,time_t dt)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 
@@ -1077,7 +1077,7 @@ static int checkdname(cchar dname[])
 	int		rs = SR_OK ;
 
 	if (dname[0] == '/') {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = u_stat(dname,&sb)) >= 0) {
 		if (! S_ISDIR(sb.st_mode)) rs = SR_NOTDIR ;
 		if (rs >= 0) {
@@ -1136,7 +1136,7 @@ static int isstart(cchar *lp,int ll,BIBLEPARAS_Q *qp,int *sip)
 
 	    cp = sp ;
 	    cl = sl ;
-	    if ((tp = strnpbrk(sp,sl,": \t\n")) != NULL) {
+	    if ((tp = strnbrk(sp,sl,": \t\n")) != NULL) {
 		cl = (tp - sp) ;
 		sl -= ((tp + 1) - sp) ;
 		sp = (tp + 1) ;

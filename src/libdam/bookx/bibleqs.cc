@@ -1,5 +1,5 @@
 /* bibleqs SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* bible-query database manager */
@@ -2372,7 +2372,7 @@ static int isstart(cchar *lp,int ll,BIBLEQS_Q *qp,int *sip)
 
 	    cp = sp ;
 	    cl = sl ;
-	    if ((tp = strnpbrk(sp,sl,": \t\n")) != NULL) {
+	    if ((tp = strnbrk(sp,sl,": \t\n")) != NULL) {
 	        cl = (tp - sp) ;
 	        sl -= ((tp + 1) - sp) ;
 	        sp = (tp + 1) ;

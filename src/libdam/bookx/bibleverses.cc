@@ -1,5 +1,5 @@
 /* bibleverses SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* BIBLEVERSES implementation */
@@ -630,7 +630,7 @@ static int bibleverses_dbmapcreate(BIBLEVERSES *op,time_t dt)
 #endif
 
 	if ((rs = u_open(op->dbfname,O_RDONLY,0666)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    cint		fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
@@ -712,7 +712,7 @@ static int bibleverses_checkupdate(BIBLEVERSES *op,time_t dt)
 	if (op->ncursors == 0) {
 	    if (dt <= 0) dt = time(NULL) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
-	        struct ustat	sb ;
+	        ustat	sb ;
 	        op->ti_lastcheck = dt ;
 	        if ((rs = u_stat(op->dbfname,&sb)) >= 0) {
 	            f = f || (sb.st_mtime > op->ti_db) ;
@@ -1416,7 +1416,7 @@ static int checkdname(cchar *dname)
 	int		rs = SR_OK ;
 
 	if (dname[0] == '/') {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = u_stat(dname,&sb)) >= 0) {
 	        if (! S_ISDIR(sb.st_mode)) rs = SR_NOTDIR ;
 	        if (rs >= 0) {
@@ -1485,7 +1485,7 @@ int		*sip ;
 
 	        cp = sp ;
 	        cl = sl ;
-	        if ((tp = strnpbrk(sp,sl,": \t\n")) != NULL) {
+	        if ((tp = strnbrk(sp,sl,": \t\n")) != NULL) {
 	            cl = (tp - sp) ;
 	            sl -= ((tp + 1) - sp) ;
 	            sp = (tp + 1) ;
