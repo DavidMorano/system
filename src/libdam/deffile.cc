@@ -1,5 +1,5 @@
 /* deffile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* read in a Solaris "default" file of variables */
