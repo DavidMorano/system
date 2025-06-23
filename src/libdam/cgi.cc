@@ -1,5 +1,5 @@
 /* cgi SUPPORT (cgi creation and output) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* hack to output the HTTP headers */

@@ -128,7 +128,7 @@ int chowns(cchar *dname,uid_t uid,gid_t gid)
 
 static int checkdir(CHECKINFO *cip,cchar *dirbuf)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 
 	if ((rs = u_stat(dirbuf,&sb)) >= 0) {
