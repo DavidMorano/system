@@ -1,5 +1,5 @@
 /* uunames SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* uunames-query database manager */
@@ -60,13 +60,14 @@
 #include	<mkpathx.h>
 #include	<pathadd.h>
 #include	<pathclean.h>
-#include	<sif.hh>
 #include	<strwcpy.h>
 #include	<char.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"uunames.h"
+
+import sif ;
 
 /* local defines */
 

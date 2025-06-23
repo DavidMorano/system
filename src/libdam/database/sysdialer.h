@@ -1,5 +1,5 @@
 /* sysdialer HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* system-dialer storage object */
@@ -116,8 +116,8 @@ struct sysdialer_head {
 
 struct sysdialer_module {
 	void		*dhp ;		/* SO-dlopen handle */
-	dev_t		dev ;
 	ino_t		ino ;
+	dev_t		dev ;
 	int		count ;
 } ;
 
