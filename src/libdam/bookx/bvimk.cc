@@ -1,5 +1,5 @@
 /* bvimk SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* make a BVI database */
@@ -719,7 +719,7 @@ static int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf)
 
 static int unlinkstale(cchar *fn,int to)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	const time_t	dt = time(NULL) ;
 	int		rs ;
 	if ((rs = uc_stat(fn,&sb)) >= 0) {
