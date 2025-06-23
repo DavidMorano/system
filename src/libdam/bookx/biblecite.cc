@@ -1,10 +1,11 @@
 /* biblecite */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a possible bible citation */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* used for little object below */
-
 
 /* revision history:
 
@@ -17,10 +18,10 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine determines if a string is a bible citation.
 
 	Synopsis:
-
 	int isbiblecite(sp,sl,bcp,sip)
 	cchar	*sp ;
 	int		sl ;
@@ -29,26 +30,24 @@
 
 	Arguments:
 
-
 	Returns:
-
 	>=0		OK
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be before others */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<char.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"biblecite.h"
@@ -72,9 +71,6 @@ extern int	isdigitlatin(int) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -120,7 +116,7 @@ int isbiblecite(BIBLECITE *qp,cchar *lp,int ll,int *sip) noex {
 
 	    cp = sp ;
 	    cl = sl ;
-	    if ((tp = strnpbrk(sp,sl,": \t\n")) != NULL) {
+	    if ((tp = strnbrk(sp,sl,": \t\n")) != NULL) {
 	        cl = (tp - sp) ;
 	        sl -= ((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
