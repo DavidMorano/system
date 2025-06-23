@@ -339,7 +339,7 @@ int	wline ;
 #ifdef	COMMENT
 		debugprintf("scanlong: fixfrom() rs=%d\n",rs1) ;
 #endif
-		debugprintf("scanlong: mkdislpayable() work=%t\n",
+		debugprintf("scanlong: mkdislpayable() work=%r\n",
 			work,strnlen(work,LINEBUFLEN)) ;
 	}
 #endif /* CF_DEBUG */
@@ -395,7 +395,7 @@ int	wline ;
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
-	        debugprintf("scanlong: msg_headervalue() rs=%d date=>%t<\n",
+	        debugprintf("scanlong: msg_headervalue() rs=%d date=>%r<\n",
 			rs,sp,MAX(0,rs)) ;
 #endif
 

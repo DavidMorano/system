@@ -1,19 +1,21 @@
-/* main */
+/* xtmpdirs_main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* XTMPDIRS (X-Windows Temporary-Directories) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_DEFLOGSIZE	0		/* default log-size */
 
-
 /* revision history:
 
 	= 2011-03-17, David A­D­ Morano
-        I created this -- after about needing it for 20 years -- because I am
-        tired of the little flaws in the X11 startup sequence.
+	I created this -- after about needing it for 20 years --
+	because I am tired of the little flaws in the X11 startup
+	sequence.
 
 */
 
@@ -21,15 +23,13 @@
 
 /*******************************************************************************
 
-	This little program ensures that the proper directories are present,
-	and with the correct permissions, in the system TMP directory in order
-	for X11 to start up correctly.
-
+	This little program ensures that the proper directories are
+	present, and with the correct permissions, in the system
+	TMP directory in order for X11 to start up correctly.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -44,13 +44,14 @@
 #include	<sysexits.h>
 
 #include	<usystem.h>
+#include	<getourenv.h>
+#include	<getax.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<bfile.h>
 #include	<ids.h>
 #include	<userinfo.h>
 #include	<logfile.h>
-#include	<getax.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -100,12 +101,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -838,7 +833,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 static int proctmp(PROGINFO *pip)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	if ((rs = u_stat(pip->tmpdname,&sb)) >= 0) {
 	    pip->uid_tmp = sb.st_uid ;
@@ -866,7 +861,7 @@ static int procdir(PROGINFO *pip,cchar *dname)
 	int		rs ;
 	char		xdname[MAXPATHLEN + 1] ;
 	if ((rs = mkpath2(xdname,pip->tmpdname,dname)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    const mode_t	dm = DIRMODE ;
 	    if ((rs = u_stat(xdname,&sb)) >= 0) {
 		rs = procdirer(pip,xdname,dm) ;

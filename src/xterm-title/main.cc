@@ -102,7 +102,7 @@ int	argc ;
 char	*argv[] ;
 char	*envv[] ;
 {
-	struct ustat		sb ;
+	ustat		sb ;
 
 	struct utsname		uts ;
 

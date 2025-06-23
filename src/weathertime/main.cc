@@ -507,7 +507,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	debugprintf("main: len=%d linebuf=>%t<\n",
+	debugprintf("main: len=%d linebuf=>%r<\n",
 		len,linebuf,strnlen(linebuf,30)) ;
 #endif
 
@@ -527,7 +527,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	debugprintf("main: field=%t\n",
+	debugprintf("main: field=%r\n",
 		of.fp,of.flen) ;
 #endif
 

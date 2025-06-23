@@ -1,21 +1,21 @@
 /* progterm */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program terminal mode */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_TERMSTORE	0		/* use 'termstore()' */
 #define	CF_INTERCMD	1		/* alloc inter-commands */
 
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-        This code module was originally written but was modeled after some
-        preexisting code. This whole program has been rewritten from the ground
-        up.
+	This code module was originally written but was modeled
+	after some preexisting code. This whole program has been
+	rewritten from the ground up.
 
 */
 
@@ -38,9 +38,9 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
 #include	<tzfile.h>
 #include	<netdb.h>
@@ -80,8 +80,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*strncpylow(char *,cchar *,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
