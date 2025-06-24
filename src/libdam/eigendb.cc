@@ -1,5 +1,5 @@
 /* eigendb SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* store eigen words in a database */
@@ -43,7 +43,6 @@
 #include	<strn.h>
 #include	<six.h>
 #include	<sfx.h>
-#include	<sif.hh>
 #include	<strwcpyx.h>
 #include	<linebuffer.h>
 #include	<char.h>
@@ -52,6 +51,8 @@
 
 #include	"eigendb.h"
 
+import libutil ;
+import sif ;
 
 /* local defines */
 
@@ -433,9 +434,8 @@ static int eigendb_fileline(eigendb *op,cchar *lbuf,int llen) noex {
 	cchar		*sp{} ;
 	if (int sl ; (sl = sfcontent(lbuf,llen,&sp)) > 0) {
 	    sif		sfo(sp,sl) ;
-	    int		cl ;
 	    cchar	*cp{} ;
-	    while ((cl = sfo.next(&cp)) > 0) {
+	    for (int cl ; (cl = sfo.next(&cp)) > 0 ; ) {
 		c += 1 ;
 		rs = eigendb_addword(op,cp,cl) ;
 		if (rs < 0) break ;

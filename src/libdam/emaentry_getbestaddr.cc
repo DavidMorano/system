@@ -1,5 +1,5 @@
 /* emaentry_getbestaddr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* get the "best" address out of an EMA-entry address specification */

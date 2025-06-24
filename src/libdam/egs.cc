@@ -1,5 +1,5 @@
 /* egs SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* entropy gathering and manipulation */

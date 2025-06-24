@@ -1,5 +1,5 @@
 /* eigendb HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* store eigen words in a database */
