@@ -1,5 +1,5 @@
 /* printhelp HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* print out a help file if we have one */
