@@ -1,5 +1,5 @@
 /* lfm SUPPORT (Lock File Manager) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage file-lock operations */
@@ -686,7 +686,7 @@ int parser::pnodeuser(int len) noex {
 int parser::ptimebanner(int len) noex {
     	cnullptr	np{} ;
     	int		rs = SR_OK ;
-	if (cc *tp{} ; (tp = strnpbrk(lbp->lbuf,len," \t")) != np) {
+	if (cc *tp{} ; (tp = strnbrk(lbp->lbuf,len," \t")) != np) {
 	    cchar	*sp = (tp + 1) ;
 	    cint	sl = len - ((tp + 1) - lbp->lbuf) ;
 	    cchar	*cp ;

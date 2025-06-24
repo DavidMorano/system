@@ -1,5 +1,5 @@
 /* lfm HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* manage file-lock operations */
@@ -43,8 +43,8 @@
 
 
 struct lfm_information {
-	dev_t		dev ;
 	ino_t		ino ;
+	dev_t		dev ;
 	int		tocheck ;	/* check interval */
 } ;
 

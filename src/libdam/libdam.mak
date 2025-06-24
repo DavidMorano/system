@@ -851,6 +851,11 @@ densityx.o:		densityx.dir
 densityx.dir:	
 	makesubdir $@
 
+# ARGMGR
+argmgr.o:		argmgr.dir
+argmgr.dir:
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 
