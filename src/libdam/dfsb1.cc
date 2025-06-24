@@ -1,5 +1,5 @@
 /* dfsb SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* Depth-First-Search (visit all nodes through un-weighted graph) */
