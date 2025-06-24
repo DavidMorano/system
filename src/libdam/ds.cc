@@ -1,5 +1,5 @@
 /* ds SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* low-level terminal-display manager */
@@ -46,6 +46,7 @@
 
 #include	"ds.h"
 
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
