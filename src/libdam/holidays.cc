@@ -1,5 +1,5 @@
 /* holidays SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* access for the HOLIDAYS database */
@@ -707,7 +707,7 @@ static int holidays_dbfind(HOLIDAYS *op,IDS *idp,char *tmpfname)
 
 static int holidays_dbfinder(HOLIDAYS *op,IDS *idp,char *tmpfname,cchar *cname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_NOENT ;
 	int		i ;

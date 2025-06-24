@@ -1,5 +1,5 @@
 /* holidayer SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* access for the HOLIDAYER database */
@@ -556,7 +556,7 @@ static int holidayer_yearfile(HO *op,char *hfname,uint y) noex {
 	    cchar	*dn = holdnames[i] ;
 	    if ((rs = holidayer_dirok(op,dn)) > 0) {
 	        if ((rs = holidayer_mkfname(op,hfname,dn,y)) > 0) {
-	            struct ustat	sb ;
+	            ustat	sb ;
 	            const int		pl = rs ;
 	            if ((rs = uc_stat(hfname,&sb)) >= 0) {
 	                if (isOurMode(sb.st_mode)) {

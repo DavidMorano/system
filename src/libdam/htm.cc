@@ -1,5 +1,5 @@
 /* htm SUPPORT (HTML creation and output) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* hack to output HTML */

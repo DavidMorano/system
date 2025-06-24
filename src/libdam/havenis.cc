@@ -1,5 +1,5 @@
 /* havenis SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* do we have NIS running? */
@@ -56,7 +56,7 @@
 
 int havenis()
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	const int	nrs = SR_NOENT ;
 	int		rs ;
 	int		f = FALSE ;
