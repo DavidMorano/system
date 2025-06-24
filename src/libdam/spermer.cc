@@ -26,7 +26,7 @@
 
 	int sperm(idp,sbp,am)
 	IDS		*idp ;
-	struct ustat	*sbp ;
+	ustat	*sbp ;
 	int		am ;
 
 	Arguments:
@@ -81,7 +81,7 @@ extern int	strlinelen(const char *,int,int) ;
 /* local structures */
 
 struct try {
-	struct ustat	*sbp ;
+	ustat	*sbp ;
 	IDS		*idp ;
 	int		am ;
 } ;
@@ -89,7 +89,7 @@ struct try {
 
 /* forward references */
 
-static int try_start(TRY *,IDS *,struct ustat *,int) ;
+static int try_start(TRY *,IDS *,ustat *,int) ;
 static int try_finish(TRY *) ;
 static int try_filetype(TRY *) ;
 static int try_root(TRY *) ;
@@ -113,7 +113,7 @@ static int	(*tries[])(TRY *) = {
 /* exported subroutines */
 
 
-int sperm(IDS *idp,struct ustat *sbp,int am)
+int sperm(IDS *idp,ustat *sbp,int am)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -143,7 +143,7 @@ int sperm(IDS *idp,struct ustat *sbp,int am)
 /* local subroutines */
 
 
-static int try_start(TRY *tip,IDS *idp,struct ustat *sbp,int am)
+static int try_start(TRY *tip,IDS *idp,ustat *sbp,int am)
 {
 	tip->idp = idp ;
 	tip->sbp = sbp ;
@@ -163,7 +163,7 @@ static int try_finish(TRY *tip)
 
 static int try_filetype(TRY *tip)
 {
-	struct ustat	*sbp = tip->sbp ;
+	ustat	*sbp = tip->sbp ;
 	const int	ft = (tip->am & S_IFMT) ;
 	int		rs = SR_OK ;
 	if ((ft != 0) && ((sbp->st_mode & S_IFMT) != ft)) {
@@ -184,7 +184,7 @@ static int try_root(TRY *tip)
 
 static int try_user(TRY *tip)
 {
-	struct ustat	*sbp = tip->sbp ;
+	ustat	*sbp = tip->sbp ;
 	IDS		*idp = tip->idp ;
 	const int	am = (tip->am & 0007) ;
 	int		rs = SR_OK ;
@@ -199,7 +199,7 @@ static int try_user(TRY *tip)
 
 static int try_group(TRY *tip)
 {
-	struct ustat	*sbp = tip->sbp ;
+	ustat	*sbp = tip->sbp ;
 	IDS		*idp = tip->idp ;
 	const int	am = (tip->am & 0007) ;
 	int		rs = SR_OK ;
@@ -225,7 +225,7 @@ static int try_group(TRY *tip)
 
 static int try_other(TRY *tip)
 {
-	struct ustat	*sbp = tip->sbp ;
+	ustat	*sbp = tip->sbp ;
 	const int	am = (tip->am & 0007) ;
 	int		rs ;
 	{

@@ -1,5 +1,5 @@
 /* spellchecks SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* SPELLCHECKS object implementation */
@@ -2759,7 +2759,7 @@ int		ll ;
 	if (CHAR_ISWHITE(lp[0])) /* continuation */
 	    goto ret0 ;
 
-	si = sibreak(lp,ll," \t") ;
+	si = sibrk(lp,ll," \t") ;
 	if (si < 3) {
 	    rs1 = SR_ILSEQ ;
 	    goto ret1 ;
@@ -2777,7 +2777,7 @@ int		ll ;
 		if (rs1 >= 0) {
 	            cp = (tp + 1) ;
 	            cl = ((lp + ll) - cp) ;
-		    if ((tp = strnpbrk(cp,cl," \t")) != nullptr)
+		    if ((tp = strnbrk(cp,cl," \t")) != nullptr)
 			cl = (tp - cp) ;
 
 	            rs1 = subinfo_mkday(sip,qp->m,cp,cl) ;
@@ -2887,7 +2887,7 @@ int		sl ;
 
 	np = nullptr ;
 	nl = 0 ;
-	if ((tp = strnpbrk(sp,sl,"+-")) != nullptr) {
+	if ((tp = strnbrk(sp,sl,"+-")) != nullptr) {
 		np = (tp + 1) ;
 		nl = (sl - ((tp + 1) - sp)) ;
 		sl = (tp - sp) ;

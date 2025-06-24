@@ -1,5 +1,5 @@
 /* srventry SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* build up a server entry piece-meal as it were */
