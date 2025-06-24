@@ -1,5 +1,5 @@
 /* removename SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* remove a named file-system object (and its descendants if any) */

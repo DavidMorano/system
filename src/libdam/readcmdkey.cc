@@ -1,5 +1,5 @@
 /* readcmdkey SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* read a "command" type of key (keyboard key-press) from the keyboard */

@@ -1,5 +1,5 @@
 /* rcmdr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get connection to remote command (unpriviledged) */
@@ -602,7 +602,7 @@ static void dump(int fd1,int fd2)
 static int showdev(fd)
 int	fd ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	rs = u_fstat(fd,&sb) ;
 	debugprintf("rcmdr: fd=%d rs=%d ino=%u dev=%08x\n",
