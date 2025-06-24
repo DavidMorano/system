@@ -1,5 +1,5 @@
 /* opendialer_ticotsord SUPPORT (NOT-FINISHED) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* open-dialer (ticotsord) */
@@ -57,22 +57,23 @@
 	Returns:
 
 	>=0		file-descriptor
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"opendialer_ticotsord.h"
@@ -101,10 +102,6 @@ extern int	uc_openprog(cchar *,int,cchar **,cchar **) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* local structures */
@@ -254,7 +251,7 @@ static int argparse_start(struct argparse *app,cchar *argz)
 
 	if (argz[0] == '\0') goto ret0 ;
 
-	if ((tp = strpbrk(argz,",:")) != NULL) {
+	if ((tp = strbrk(argz,",:")) != NULL) {
 	    int		oi ;
 	    int		v ;
 	    int		kl, vl ;
