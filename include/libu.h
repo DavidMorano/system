@@ -96,6 +96,7 @@
 
 #include	<xxtostr.h>
 #include	<strtox.h>
+#include	<baops.h>
 
 
 #endif /* USYSCALLS_INCLUDE */

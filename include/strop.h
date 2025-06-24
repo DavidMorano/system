@@ -68,7 +68,7 @@ struct strop : strop_head {
 	} ;
 	strop(const strop &) = delete ;
 	strop &operator = (const strop &) = delete ;
-	int start(cchar *,int) noex ;
+	int start(cchar *,int = -1) noex ;
 	int breakfield(cchar *,cchar **) noex ;
 	int whitechr(int) noex ;		/* skip wht until */
 	int findchr(int) noex ;
@@ -76,8 +76,8 @@ struct strop : strop_head {
 	int spanterm(cchar *) noex ;
 	int span(cchar *) noex ;
 	void dtor() noex ;
-	~strop() {
-	    dtor() ;
+	destruct strop() {
+	    if (sp) dtor() ;
 	} ;
 } ; /* end struct (strop) */
 #else	/* __cplusplus */

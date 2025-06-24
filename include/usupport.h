@@ -31,6 +31,12 @@
 #include	<stdintx.h>
 #include	<intx.h>
 
+#include	<usupport_hasx.h>
+#include	<usupport_itimer.h>
+#include	<usupport_sncpyx.h>
+#include	<usupport_ctdec.h>
+#include	<usupport_cfdec.h>
+
 
 #ifndef	TYPEDEF_MTIME
 #define	TYPEDEF_MTIME
@@ -115,62 +121,9 @@ namespace libu {
 namespace libu {
     extern int snwcpy(char *,int,cchar *,int = -1) noex ;
 }
-namespace libu {
-    extern int sncpyx(char *,int,int,...) noex ;
-    inline int sncpy1(char *dp,int dl,cc *s1) noex {
-	return sncpyx(dp,dl,1,s1) ;
-    }
-    inline int sncpy2(char *dp,int dl,cc *s1,cc *s2) noex {
-	return sncpyx(dp,dl,2,s1,s2) ;
-    }
-    inline int sncpy3(char *dp,int dl,cc *s1,cc *s2,cc *s3) noex {
-	return sncpyx(dp,dl,3,s1,s2,s3) ;
-    }
-    inline int sncpy4(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4) noex {
-	return sncpyx(dp,dl,4,s1,s2,s3,s4) ;
-    }
-    inline int sncpy5(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5) noex {
-	return sncpyx(dp,dl,5,s1,s2,s3,s4,s5) ;
-    }
-    inline int sncpy6(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,
-	    cc *s6) noex {
-	return sncpyx(dp,dl,6,s1,s2,s3,s4,s5,s6) ;
-    }
-    template<typename ... Args>
-    inline int sncpy(char *dp,int dl,Args ... args) noex {
-        cint            na = npack(Args) ;
-        return sncpyx(dp,dl,na,args ...) ;
-    }
-} /* end namespace (libu) */
-namespace libu {
-    extern int cfdec(cchar *,int,int *) noex ;
-    extern int cfdec(cchar *,int,long *) noex ;
-    extern int cfdec(cchar *,int,longlong *) noex ;
-}
-namespace libu {
-    extern int ctdecui(char *,int,uint) noex ;
-    extern int ctdecul(char *,int,ulong) noex ;
-    extern int ctdecull(char *,int,ulonglong) noex ;
-    template<typename T> inline int ctdec(char *,int,T v) noex {
-	return 0 ;
-    }
-    template<> inline int ctdec(char *dp,int dl,uint v) noex {
-	return ctdecui(dp,dl,v) ;
-    }
-    template<> inline int ctdec(char *dp,int dl,ulong v) noex {
-	return ctdecul(dp,dl,v) ;
-    }
-    template<> inline int ctdec(char *dp,int dl,ulonglong v) noex {
-	return ctdecull(dp,dl,v) ;
-    }
-}
+
 namespace libu {
     extern int ustrftime(char *,int,cchar *,CTM *) noex ;
-    extern int uitimer_get(int,ITIMERVAL *) noex ;
-    extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
-}
-namespace libu {
-    extern bool hasnotdots(cchar *,int) noex ;
 }
 #endif /* __cplusplus */
 
