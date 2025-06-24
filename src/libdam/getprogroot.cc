@@ -1,5 +1,5 @@
 /* getprogroot SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the program root directory */
@@ -63,6 +63,7 @@
 #include	<dirseen.h>
 #include	<nulstr.h>
 #include	<strn.h>
+#include	<strx.h>
 #include	<mkpathx.h>
 #include	<mkpathxw.h>
 #include	<mkpr.h>
@@ -213,7 +214,7 @@ static int subinfo_other(SI *sip,char *obuf,cc *sp,int sl) noex {
 	sip->prlen = 0 ;
 	if (valp) {
 	    cchar	*tp ;
-	    while ((tp = strpbrk(valp,":;")) != nullptr) {
+	    while ((tp = strbrk(valp,":;")) != nullptr) {
 	        {
 	            rs = subinfo_check(sip,valp,(tp - valp),obuf,sp,sl) ;
 	            outlen = rs ;
