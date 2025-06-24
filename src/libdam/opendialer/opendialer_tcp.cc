@@ -1,5 +1,5 @@
 /* opendialer_tcp SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* open-dialer (tcp) */
@@ -70,6 +70,9 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"opendialer_tcp.h"
@@ -92,10 +95,6 @@ extern int	getaf(cchar *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	dialtcp(cchar *,cchar *,int,int,int) ;
 extern int	uc_openprog(cchar *,int,cchar **,cchar **) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* local structures */
@@ -225,7 +224,7 @@ static int argparse_start(struct argparse *app,cchar *argz) noex {
 
 	if (argz[0] == '\0') goto ret0 ;
 
-	if ((tp = strpbrk(argz,",:")) != nullptr) {
+	if ((tp = strbrk(argz,",:")) != nullptr) {
 	    int		oi ;
 	    int		v ;
 	    int		kl, vl ;

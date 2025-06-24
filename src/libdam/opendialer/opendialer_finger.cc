@@ -1,20 +1,19 @@
 /* opendialer_finger SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* open-dialer (finger) */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-	This code was started by taking the corresponding code from the
-	TCP-family module.  In retrospect, that was a mistake.  Rather I should
-	have started this code by using the corresponding UUX dialer module.
+	This code was started by taking the corresponding code from
+	the TCP-family module.  In retrospect, that was a mistake.
+	Rather I should have started this code by using the
+	corresponding UUX dialer module.
 
 */
 
@@ -25,15 +24,12 @@
 	This is an open-dialer.
 
 	The file-name corresponding to this dialer looks like:
-
 		finger¥[<af>:]<host>[:<port>]:<svc>[,to=<to>][­<arg(s)>]
 
 	Example:
-
 		finger¥rca:daytime
 
 	Synopsis:
-
 	int opendialer_finger(pr,prn,svc,of,om,argv,envv,to)
 	cchar	*pr ;
 	cchar	*prn ;
@@ -45,7 +41,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	svc		service name
@@ -56,13 +51,10 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
 	<0		error
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -83,6 +75,9 @@
 #include	<sbuf.h>
 #include	<nulstr.h>
 #include	<logfile.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -127,11 +122,6 @@ extern int	dialfinger(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*strdcpy1(char *,int,cchar *) ;
 
 
 /* local structures */
@@ -361,7 +351,7 @@ static int argparse_start(struct argparse *app,cchar *args)
 
 	if ((args == NULL) || (args[0] == '\0')) goto ret0 ;
 
-	if ((tp = strpbrk(args,",:")) != NULL) {
+	if ((tp = strbrk(args,",:")) != NULL) {
 	    int		oi ;
 	    int		v ;
 	    int		kl, vl ;
@@ -377,7 +367,7 @@ static int argparse_start(struct argparse *app,cchar *args)
 #if	CF_DEBUGS
 	    debugprintf("opendialer_finger/argparse_start: s=%s\n",sp) ;
 #endif
-	        if ((tp = strpbrk(sp,":,")) != NULL) {
+	        if ((tp = strbrk(sp,":,")) != NULL) {
 		    s2l = (tp-sp) ;
 	    	    sp = (tp+1) ;
 	    	    if (tp[0] == ':') {

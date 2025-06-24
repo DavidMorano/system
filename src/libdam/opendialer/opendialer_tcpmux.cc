@@ -1,5 +1,5 @@
 /* opendialer_tcpmux SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* open-dialer (tcpmux) */
@@ -32,7 +32,6 @@
 		tcpmux¥rca:daytime
 
 	Synopsis:
-
 	int opendialer_tcpmux(pr,prn,svc,of,om,argv,envv,to)
 	cchar	*pr ;
 	cchar	*prn ;
@@ -44,7 +43,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	svc		service name
@@ -55,13 +53,10 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -69,10 +64,14 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"opendialer_tcpmux.h"
@@ -100,10 +99,6 @@ extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* local structures */
@@ -295,7 +290,7 @@ static int argparse_start(struct argparse *app,cchar *args)
 
 	if (args[0] == '\0') goto ret0 ;
 
-	if ((tp = strpbrk(args,",:")) != NULL) {
+	if ((tp = strbrk(args,",:")) != NULL) {
 	    int		oi ;
 	    int		v ;
 	    int		kl, vl ;
@@ -313,7 +308,7 @@ static int argparse_start(struct argparse *app,cchar *args)
 #if	CF_DEBUGS
 	    debugprintf("opendialer_tcpmux/argparse_start: s=%s\n",sp) ;
 #endif
-	        if ((tp = strpbrk(sp,":,")) != NULL) {
+	        if ((tp = strbrk(sp,":,")) != NULL) {
 		    portl = (tp-sp) ;
 		    svcl = (tp-sp) ;
 	    	    if (tp[0] == ':') {
