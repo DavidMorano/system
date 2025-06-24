@@ -1,5 +1,5 @@
 /* querystr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* Query-String manager */
@@ -368,7 +368,7 @@ int subinfo::procpair(cchar *sbuf,int slen) noex {
 	            vp += 1 ;
 	            vl -= 1 ;
 	        }
-	        if ((vl > 0) && ((strnpbrk(vp,vl,"%+\t")) != nullptr)) {
+	        if ((vl > 0) && ((strnbrk(vp,vl,"%+\t")) != nullptr)) {
 	            if ((rs = tsize(vl)) >= 0) {
 	                rs = fixval(tbuf,tlen,vp,vl) ;
 	                vl = rs ;
@@ -391,7 +391,7 @@ int subinfo::fixval(char *rbuf,int rlen,cchar *vp,int vl) noex {
 	    cchar	*tp ;
 	    char	*rp = rbuf ;
 	    if (vl > rlen) vl = rlen ;
-	    while ((tp = strnpbrk(vp,vl,"%+\t")) != nullptr) {
+	    while ((tp = strnbrk(vp,vl,"%+\t")) != nullptr) {
 	        cint	sch = mkchar(*tp) ;
 	        if ((tp-vp) > 0) {
 	            rp = strwcpy(rp,vp,(tp-vp)) ;

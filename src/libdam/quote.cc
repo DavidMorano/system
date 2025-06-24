@@ -1,5 +1,5 @@
 /* quote SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* quote database operations */
@@ -57,7 +57,6 @@
 #include	<mktmp.h>
 #include	<vecobj.h>
 #include	<sbuf.h>
-#include	<char.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<tmtime.hh>
@@ -66,6 +65,9 @@
 #include	<txtindexmk.h>
 #include	<textlook.h>
 #include	<hash.h>		/* |hash_elf(3dam)| */
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"quote.h"
@@ -140,7 +142,7 @@ extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	sfdirname(cchar *,int,cchar **) ;
 extern int	siskipwhite(cchar *,int) ;
-extern int	sibreak(cchar *,int,cchar *) ;
+extern int	sibrk(cchar *,int,cchar *) ;
 extern int	nextfield(cchar *,int,cchar **) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	matcasestr(cchar **,cchar *,int) ;
@@ -151,17 +153,13 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecui(cchar *,int,uint *) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(ids *,struct ustat *,int) ;
+extern int	sperm(ids *,ustat *,int) ;
 extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* local structures */
@@ -1217,7 +1215,7 @@ struct subinfo	*sip ;
 cchar	dirname[] ;
 cchar	calname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	QUOTE_CAL	*calp ;
 
@@ -1321,7 +1319,7 @@ time_t		daytime ;
 {
 	struct subinfo	si ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -1539,7 +1537,7 @@ QDIR		*qdirp ;
 struct subinfo	*sip ;
 cchar	dbdname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	cint	dmode = QDIR_DBDIRMODE ;
 
@@ -1580,7 +1578,7 @@ QDIR		*qdirp ;
 cchar	dirname[] ;
 time_t		mtime ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	FSDIR		d ;
 
@@ -1773,7 +1771,7 @@ static int cal_dbmapcreate(calp,daytime)
 QUOTE_CAL	*calp ;
 time_t		daytime ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs = SR_OK ;
 	int	fd ;
@@ -2035,7 +2033,7 @@ QUOTE_CAL	*calp ;
 cchar	dname[] ;
 mode_t		mode ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 
@@ -2591,7 +2589,7 @@ static int subinfo_havedir(sip,tmpdname)
 struct subinfo	*sip ;
 char		tmpdname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -2729,7 +2727,7 @@ struct subinfo	*sip ;
 vecstr		*nlp ;
 cchar	dirname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	FSDIR		dir ;
 
@@ -2806,7 +2804,7 @@ int		ll ;
 	if (CHAR_ISWHITE(lp[0])) /* continuation */
 	    goto ret0 ;
 
-	si = sibreak(lp,ll," \t") ;
+	si = sibrk(lp,ll," \t") ;
 	if (si < 3) {
 	    rs1 = SR_ILSEQ ;
 	    goto ret1 ;
@@ -2833,7 +2831,7 @@ int		ll ;
 		if (rs1 >= 0) {
 	            cp = (tp + 1) ;
 	            cl = ((lp + ll) - cp) ;
-		    if ((tp = strnpbrk(cp,cl," \t")) != NULL)
+		    if ((tp = strnbrk(cp,cl," \t")) != NULL)
 			cl = (tp - cp) ;
 
 	            rs1 = subinfo_mkday(sip,qp->m,cp,cl) ;
@@ -2971,7 +2969,7 @@ int		sl ;
 
 	np = NULL ;
 	nl = 0 ;
-	if ((tp = strnpbrk(sp,sl,"+-")) != NULL) {
+	if ((tp = strnbrk(sp,sl,"+-")) != NULL) {
 		np = (tp + 1) ;
 		nl = (sl - ((tp + 1) - sp)) ;
 		sl = (tp - sp) ;
@@ -3098,7 +3096,7 @@ static int subinfo_checkdname(sip,dname)
 struct subinfo	*sip ;
 cchar	dname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs = SR_OK ;
 
