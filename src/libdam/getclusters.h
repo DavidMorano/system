@@ -1,5 +1,5 @@
 /* getclusters HEADER (Check-ONC) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* get all clusters for the specified nodename */
