@@ -1,5 +1,5 @@
 /* sysdialer SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* system-dialer storage object */
@@ -50,6 +50,7 @@
 #include	<dirseen.h>
 #include	<strn.h>		/* |strnrchr(3uc)| */
 #include	<strwcpy.h>
+#include	<strx.h>
 #include	<mkpathx.h>
 #include	<mkfname.h>
 #include	<pathclean.h>
@@ -778,7 +779,7 @@ int sofind::sofindvar(SD *op) noex {
 
 	if (sp != nullptr) {
 
-	while ((tp = strpbrk(sp,":;")) != nullptr) {
+	while ((tp = strbrk(sp,":;")) != nullptr) {
 
 	    if ((tp - sp) > 0) {
 

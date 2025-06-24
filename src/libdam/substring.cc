@@ -1,5 +1,5 @@
 /* substring SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* routine to match a substring within a larger string */

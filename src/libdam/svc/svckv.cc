@@ -155,7 +155,7 @@ int svckv_svcopts(cchar *(*kv)[2],int n) noex {
 	    int		cl ;
 	    cchar	*cp ;
 	    cchar	*tp ;
-	    while ((tp = strnpbrk(vp,vl," ,")) != nullptr) {
+	    while ((tp = strnbrk(vp,vl," ,")) != nullptr) {
 	        if ((cl = sfshrink(vp,(tp-vp),&cp)) > 0) {
 	            if (int ii ; (ii = matstr(svcopts,cp,cl)) >= 0) {
 	                ow |= (1 << ii) ;
