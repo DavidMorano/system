@@ -1,5 +1,5 @@
 /* rtags SUPPORT (Result-Tags) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* store result tags from a query */
