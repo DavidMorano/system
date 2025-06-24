@@ -1,5 +1,5 @@
 /* binexp HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 (conformance reviewed) */
 
 /* calculate an exponetion yieling a double floating result */
