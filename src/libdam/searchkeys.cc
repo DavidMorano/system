@@ -1,5 +1,5 @@
 /* searchkeys SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* provides management for search-keys */
@@ -46,6 +46,7 @@
 #include	<strpack.h>
 #include	<nleadstr.h>
 #include	<strwcpy.h>
+#include	<strx.h>
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>		/* |NATURALWORDLEN| */
@@ -457,7 +458,7 @@ static int searchkeys_buildadd(SK *op,BUILD *bip,cchar *phrase) noex {
 	    bool	f_buildphrase = true ;
 	    cchar	*tp ;
 	    cchar	*sp = phrase ;
-	    while ((tp = strpbrk(sp," \t,")) != nullptr) {
+	    while ((tp = strbrk(sp," \t,")) != nullptr) {
 	        if ((tp - sp) > 0) {
 	            rs = searchkeys_buildaddword(op,&bpe,sp,(tp - sp)) ;
 		}

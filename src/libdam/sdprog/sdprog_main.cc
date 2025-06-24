@@ -1,5 +1,5 @@
 /* sdprog SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* SYSDIALER "prog" dialer */
@@ -56,6 +56,7 @@
 #include	<nulstr.h>
 #include	<logfile.h>
 #include	<sysdialer.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -2587,7 +2588,7 @@ cchar		*pp ;
 	    return SR_FAULT ;
 
 	c = 0 ;
-	while ((cp = strpbrk(pp,":;")) != nullptr) {
+	while ((cp = strbrk(pp,":;")) != nullptr) {
 
 	    cl = pathclean(tmpfname,pp,(cp - pp)) ;
 

@@ -1,5 +1,5 @@
 /* sesmsg SIPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* create and parse the internal messages */
