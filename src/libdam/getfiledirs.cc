@@ -1,5 +1,5 @@
 /* getfiledirs SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* find all directories that contain a specified file */
@@ -79,13 +79,13 @@
 #include	<pathadd.h>
 #include	<strwcpy.h>
 #include	<sfx.h>
-#include	<sif.hh>
 #include	<mkchar.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"getfiledirs.h"
 
+import sif ;
 
 /* local defines */
 
