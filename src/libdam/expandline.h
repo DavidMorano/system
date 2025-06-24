@@ -1,5 +1,5 @@
 /* expandline HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutine to expand a line out for TROFF rendering */

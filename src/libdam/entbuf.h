@@ -1,5 +1,5 @@
 /* entbuf HEADER (Entry-Buffer) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* manage entry buffering of a file */
