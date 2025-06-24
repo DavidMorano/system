@@ -1,5 +1,5 @@
 /* keyopt_lastvalue SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* get the last value (among multiple values) from the key-options */
