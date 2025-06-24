@@ -1,5 +1,5 @@
 /* kbdinfo SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* version %I% last-modified %G% */
 
 /* keyboard-information database access */
@@ -44,6 +44,7 @@
 #include	<vecobj.h>
 #include	<bfile.h>
 #include	<field.h>
+#include	<strwcpyx.h>
 #include	<localmisc.h>
 
 #include	"keysymer.h"
@@ -60,35 +61,25 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matocasestr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfnumi(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	hasuc(const char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath2w(char *,cchar *,cchar *,int) ;
+extern int	sfskipwhite(cchar *,int,cchar **) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	matocasestr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfnumi(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	hasuc(cchar *,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpyblanks(char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strncpylc(char *,const char *,int) ;
-extern char	*strncpyuc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*strnrpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -97,20 +88,20 @@ extern char	*strnrpbrk(const char *,int,const char *) ;
 /* local structures */
 
 struct entryinfo {
-	const char	*fp ;
+	cchar	*fp ;
 	int		fl ;
 } ;
 
 
 /* forward references */
 
-static int kbdinfo_parse(KBDINFO *,const char *) ;
-static int kbdinfo_parseline(KBDINFO *,const char *,int) ;
+static int kbdinfo_parse(KBDINFO *,cchar *) ;
+static int kbdinfo_parseline(KBDINFO *,cchar *,int) ;
 static int kbdinfo_process(KBDINFO *,ENTRYINFO *,int) ;
-static int kbdinfo_store(KBDINFO *,int,const char *,int,ENTRYINFO *,int) ;
+static int kbdinfo_store(KBDINFO *,int,cchar *,int,ENTRYINFO *,int) ;
 static int kbdinfo_kefins(KBDINFO *) ;
 
-static int ke_start(KBDINFO_KE *,int,const char *,int,ENTRYINFO *,int) ;
+static int ke_start(KBDINFO_KE *,int,cchar *,int,ENTRYINFO *,int) ;
 static int ke_finish(KBDINFO_KE *) ;
 
 static int vcmpfind(const void *,const void *) ;
@@ -118,7 +109,7 @@ static int vcmpfind(const void *,const void *) ;
 
 /* local variables */
 
-static const char	*keytypes[KBDINFO_TOVERLAST + 1] = {
+static cchar	*keytypes[KBDINFO_TOVERLAST + 1] = {
 	"reg",
 	"esc",
 	"csi",
@@ -140,11 +131,12 @@ static const uchar	kterms[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int kbdinfo_open(KBDINFO *op,KEYSYMER *ksp,cchar *fname)
-{
+int kbdinfo_open(KBDINFO *op,KEYSYMER *ksp,cchar *fname) {
 	int		rs = SR_OK ;
 	int		size ;
 	int		opts ;
@@ -241,7 +233,7 @@ int kbdinfo_lookup(KBDINFO *op,char *ksbuf,int kslen,TERMCMD *cmdp)
 {
 	KBDINFO_KE	te{} ;
 	KBDINFO_KE	*ep ;
-	const int	nps = 4 ;
+	cint	nps = 4 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ktype ;
@@ -259,7 +251,7 @@ int kbdinfo_lookup(KBDINFO *op,char *ksbuf,int kslen,TERMCMD *cmdp)
 	te.name = cmdp->name ;
 	te.p = params ;
 	if (cmdp->p[0] >= 0) {
-	    const int	n = MIN(nps,TERMCMD_NP) ;
+	    cint	n = MIN(nps,TERMCMD_NP) ;
 	    int	i ;
 	    for (i = 0 ; i < n ; i += 1) {
 	        te.p[i] = cmdp->p[i] ;
@@ -411,7 +403,7 @@ static int kbdinfo_parse(KBDINFO *op,cchar *fname)
 	if (fname == NULL) return SR_FAULT ;
 
 	if ((rs = bopen(dfp,fname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    int		sl ;
 	    cchar	*sp ;
@@ -462,10 +454,10 @@ static int kbdinfo_parseline(KBDINFO *op,cchar *lp,int ll)
 	memset(eis,0,sizeof(ENTRYINFO)*nelem(eis)) ;
 
 	if ((rs = field_start(&fsb,lp,ll)) >= 0) {
-	    const int	n = nelem(eis) ;
+	    cint	n = nelem(eis) ;
 	    int		i = 0 ;
 	    int		fl ;
-	    const char	*fp ;
+	    cchar	*fp ;
 
 	    while ((i < n) && ((fl = field_get(&fsb,kterms,&fp)) > 0)) {
 
@@ -511,7 +503,7 @@ static int kbdinfo_process(KBDINFO *op,ENTRYINFO *eis,int n)
 	int		ktl = eis[1].fl ;
 	int		ktype ;
 	int		c = 0 ;
-	const char	*ktp = eis[1].fp ;
+	cchar	*ktp = eis[1].fp ;
 
 #if	CF_DEBUGS
 	{
@@ -548,7 +540,7 @@ static int kbdinfo_store(KBDINFO *op,int ktype,cchar *knp,int knl,
 #endif /* CF_DEBUGS */
 
 	if (hasuc(knp,knl)) {
-	    const int	ml = MIN(knl,KBDINFO_KEYNAMELEN) ;
+	    cint	ml = MIN(knl,KBDINFO_KEYNAMELEN) ;
 	    knl = strwcpylc(keybuf,knp,ml) - keybuf ;
 	    knp = keybuf ;
 	}
@@ -593,10 +585,10 @@ static int kbdinfo_kefins(KBDINFO *op)
 
 #ifdef	COMMENT
 struct kbdinfo_e {
-	const char	*a		/* the memory allocation */
-	const char	*keyname ;	/* keysym-name */
-	const char	*istr ;
-	const char	*dstr ;
+	cchar	*a		/* the memory allocation */
+	cchar	*keyname ;	/* keysym-name */
+	cchar	*istr ;
+	cchar	*dstr ;
 	short		*p ;		/* parameters */
 	int		type ;		/* key type */
 	int		name ;		/* key name */
@@ -610,9 +602,8 @@ F7              FKEY	-	-	18
 
 
 static int ke_start(KBDINFO_KE *kep,int ktype,cchar *knp,int knl,
-		ENTRYINFO *eis,int n)
-{
-	const int	oi = 4 ;
+		ENTRYINFO *eis,int n) {
+	cint	oi = 4 ;
 	int		rs ;
 	int		nparams = 0 ;
 	int		size = 0 ;
@@ -637,9 +628,9 @@ static int ke_start(KBDINFO_KE *kep,int ktype,cchar *knp,int knl,
 	    kep->name = name ;
 	}
 
-	size += (strnlen(knp,knl) + 1) ;
+	size += (xstrnlen(knp,knl) + 1) ;
 	if (n > 3) {
-	    size += (strnlen(eis[3].fp,eis[3].fl) + 1) ;
+	    size += (xstrnlen(eis[3].fp,eis[3].fl) + 1) ;
 	} else {
 	    size += 1 ;
 	}
@@ -664,7 +655,7 @@ static int ke_start(KBDINFO_KE *kep,int ktype,cchar *knp,int knl,
 	    int		fl ;
 	    int		v ;
 	    short	*pp ;
-	    const char	*fp ;
+	    cchar	*fp ;
 
 	    kep->a = bp ;
 	    kep->nparams = nparams ;

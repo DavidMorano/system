@@ -402,7 +402,7 @@ static int jobdb_delit(JOBDB *jlp,int i,JOBDB_ENT *jep)
 /* check if the spool directory is present */
 static int jobdb_checkdir(JOBDB *jlp)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	const int	rsn = SR_NOENT ;
 	int		rs ;
 

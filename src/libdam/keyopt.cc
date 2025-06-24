@@ -1,5 +1,5 @@
 /* keyopt SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* paramater option manipulations */
@@ -142,7 +142,7 @@ int keyopt_loads(keyopt *op,cchar *sp,int sl) noex {
 	    cchar	*cp ;
 	    int		cl ;
 	    if (sl <= 0) sl = xstrlen(sp) ;
-	    while ((tp = strnpbrk(sp,sl,",\t\n\r ")) != nullptr) {
+	    while ((tp = strnbrk(sp,sl,",\t\n\r ")) != nullptr) {
 	        cp = sp ;
 	        cl = intconv(tp - sp) ;
 	        if (cl > 0) {

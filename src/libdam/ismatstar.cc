@@ -1,5 +1,5 @@
 /* ismatstar SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* see if a string matches a "starmat" ('*') expresssion */

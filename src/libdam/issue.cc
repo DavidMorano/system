@@ -1,5 +1,5 @@
 /* issue SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* object to help and manage "issue" messages */
@@ -57,14 +57,14 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getbufsize.h>
+#include	<getusername.h>
+#include	<getax.h>
 #include	<estrings.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<vechand.h>
-#include	<getax.h>
-#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getusername.h>
 #include	<ptm.h>
 #include	<lockrw.h>
 #include	<paramfile.h>
@@ -75,6 +75,8 @@
 #include	<sncpyx.h>
 #include	<mknpathx.h>
 #include	<mkpathx.h>
+#include	<strn.h>
+#include	<strdcpy.h>
 #include	<localmisc.h>
 
 #include	"issue.h"
@@ -137,7 +139,7 @@ extern int	sncpyuc(char *,int,cchar *) ;
 extern int	sichr(cchar *,int,int) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	ctdecui(char *,int,uint) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
@@ -152,15 +154,6 @@ extern int	nprintf(cchar *,...) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strdcpy1(char *,int,cchar *) ;
-extern char	*strdcpy2(char *,int,cchar *,cchar *) ;
-extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern char	*strdcpy4(char *,int,cchar *,cchar *,cchar *,cchar *) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -945,7 +938,7 @@ static int mapper_processor(ISSUE_MAPPER *mmp,cchar **ev,cchar **adms,
 /* end subroutine (mapper_processor) */
 
 static int mapper_mapload(ISSUE_MAPPER *mmp) noex {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
@@ -1311,7 +1304,7 @@ static int mapdir_processor(ISSUE_MAPDIR *ep,cchar **ev,
 	    f_continue = ((dn != nullptr) && (dn[0] != '\0')) ;
 	}
 	if (f_continue) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs1 = u_stat(dn,&sb)) >= 0) {
 	        VECSTR		nums ;
 	        cint	envlen = ENVBUFLEN ;
@@ -1339,7 +1332,7 @@ static int mapdir_processor(ISSUE_MAPDIR *ep,cchar **ev,
 	                            if (strcmp((tp+1),name) == 0) {
 	                	    int		f = TRUE ;
 	                	    cchar	*digp ;
-	                	    digp = strnpbrk(den,(tp-den),"0123456789") ;
+	                	    digp = strnbrk(den,(tp-den),"0123456789") ;
 	                	    if (digp != nullptr) {
 	                    	        f = hasalldig(digp,(tp-digp)) ;
 				    }
