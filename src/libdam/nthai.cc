@@ -1,5 +1,5 @@
 /* nthai SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++98 */
 
 /* find the Nth index-value function (for an array of integers) */

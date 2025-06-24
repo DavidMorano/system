@@ -1,5 +1,5 @@
 /* nodesfile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* read (process) a standard UNIX® "nodes" file */
@@ -54,7 +54,6 @@
 #include	<mallocxx.h>
 #include	<estrings.h>
 #include	<sfx.h>
-#include	<sif.hh>
 #include	<hdb.h>
 #include	<linebuffer.h>
 #include	<bfile.h>
@@ -65,6 +64,7 @@
 #include	"nodesfile.h"
 
 import libutil ;
+import sif ;
 
 /* local defines */
 
@@ -102,8 +102,8 @@ namespace {
     struct nodesfile_fi {
 	cchar		*fname ;
 	ino_t		ino ;
-	dev_t		dev ;
 	time_t		timod ;
+	dev_t		dev ;
 	int start(cc *,dev_t,ino_t,time_t) noex ;
 	int finish() noex ;
     } ;
