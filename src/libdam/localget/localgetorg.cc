@@ -1,5 +1,5 @@
 /* localgetorg SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the organization name (string) for a specified user-name */
