@@ -1,5 +1,5 @@
 /* siletter SUPPORT (String-Index-Letter) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* String-Index-Letter string searching function */
