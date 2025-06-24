@@ -1,5 +1,5 @@
 /* strfilemks SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a STRFILE database */
@@ -88,6 +88,7 @@
 #include	<sncpyx.h>
 #include	<mkpath.h>
 #include	<sfx.h>
+#include	<strn.h>
 #include	<strwcpy.h>
 #include	<endian.h>
 #include	<localmisc.h>
@@ -139,9 +140,6 @@ extern int	getpwd(char *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	vstrkeycmp(cchar *,cchar *) ;
 extern int	isNotPresent(int) ;
-
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -397,7 +395,7 @@ static int strfilemks_addfiler(STRFILEMKS *op,MAPFILE *mfp)
 	    cchar	*tp, *lp ;
 	    cchar	*mp = mfp->mdata ;
 
-	    while ((tp = strnpbrk(mp,ml,"\n#")) != NULL) {
+	    while ((tp = strnbrk(mp,ml,"\n#")) != NULL) {
 	        lp = mp ;
 	        ll = (tp - mp) ;
 	        len = ((tp + 1) - mp) ;
