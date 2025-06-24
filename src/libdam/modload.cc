@@ -1,5 +1,5 @@
 /* modload SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* module-load management */
@@ -64,6 +64,7 @@
 #include	<mkx.h>			/* |mksofname(3uc)| */
 #include	<mkpr.h>
 #include	<xperm.h>
+#include	<strx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -536,7 +537,7 @@ int subinfo::sofindvar(dirseen *dsp,int dlm) noex {
 	    static cchar	*sp = getenv(vn) ;
 	    if (sp) {
 	        int	sl{} ;
-	        for (cchar *tp ; (tp = strpbrk(sp,":;")) != nullptr ; ) {
+	        for (cchar *tp ; (tp = strbrk(sp,":;")) != nullptr ; ) {
 	            sl = intconv(tp - sp) ;
 	            if (sl > 0) {
 	                if ((rs = socheckvarc(dsp,sp,sl,dlm)) > 0) {

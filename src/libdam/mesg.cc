@@ -62,7 +62,7 @@
 int mesg(flag)
 int	flag ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 	int	i, rc ;

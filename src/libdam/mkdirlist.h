@@ -1,5 +1,5 @@
 /* mkdirlist HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* create a list of the newsgroup directories */
@@ -52,9 +52,9 @@ struct mkdirlist_ent {
 	cchar		*name ;
 	MKDIRLIST_ENT	*link ;
 	ino_t		ino ;
-	dev_t		dev ;
 	time_t		mtime ;
 	time_t		utime ;
+	dev_t		dev ;
 	MKDIRLIST_OFL	fl ;
 	int		nlen ;
 	int		narticles ;
