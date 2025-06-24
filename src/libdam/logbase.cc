@@ -1,5 +1,5 @@
 /* logbase SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* calculate the log of a number given the base also */
