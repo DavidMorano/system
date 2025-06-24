@@ -1,5 +1,5 @@
 /* paramopt_loadone SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* load one parameter (similar to 'paramopt_loadu(3dam)' but special) */
@@ -69,7 +69,7 @@ int paramopt_loadone(paramopt *op,cchar *sp,int sl) noex {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    }
-	    if (int si ; (si = sibreak(sp,sl," \t=,")) >= 0) {
+	    if (int si ; (si = sibrk(sp,sl," \t=,")) >= 0) {
 	        cchar	*keyname ;
 	        if (nulstr kn ; (rs = kn.start(sp,i,&keyname)) >= 0) {
 	            sp += si ;

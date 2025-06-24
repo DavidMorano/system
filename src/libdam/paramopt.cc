@@ -1,5 +1,5 @@
 /* paramopt SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* paramater option manipulations */
@@ -166,7 +166,7 @@ int paramopt_loadu(PO *op,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	if ((rs = paramopt_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    if (int si ; (si = sibreak(sp,sl,"=\t")) >= 0) {
+	    if (int si ; (si = sibrk(sp,sl,"=\t")) >= 0) {
 	        cchar	*cp{} ;
 	        if (int cl ; (cl = sfshrink((sp + si),(sl- si),&cp)) > 0) {
 		    if (char *name{} ; (rs = uc_malloc((cl+1),&name)) >= 0) {
@@ -203,7 +203,7 @@ int paramopt_loads(PO *op,cchar *name,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	if ((rs = paramopt_magic(op,name,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    for (int si ; (si = sibreak(sp,sl," :,\t\r\n\v\f")) >= 0 ; ) {
+	    for (int si ; (si = sibrk(sp,sl," :,\t\r\n\v\f")) >= 0 ; ) {
 	        cchar	*cp = (sp+si) ;
 	        if (si > 0) {
 	            rs = paramopt_load(op,name,sp,si) ;
