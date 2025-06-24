@@ -1,5 +1,5 @@
 /* statmsg SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* object to help (manage) STATMSG messages */
@@ -1356,7 +1356,7 @@ static int mapdir_processor(MD *ep,cchar **ev,cchar *,cchar *kn,int fd) noex {
 	            		if (tp && (strcmp((tp+1),suf) == 0)) {
 				    int		f = true ;
 	   			    cchar	*digp ;
-	                	    digp = strnpbrk(den,(tp-den),"0123456789") ;
+	                	    digp = strnbrk(den,(tp-den),"0123456789") ;
 	                	    if (digp != nullptr) {
 	                    		f = hasalldig(digp,(tp-digp)) ;
 				    }
