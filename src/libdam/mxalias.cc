@@ -1,5 +1,5 @@
 /* mxalias SUPPORT (Mail-X Alies) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage a MXALIAS (Mail-X Alias) object */
@@ -130,8 +130,8 @@ namespace {
 struct mxalias_file {
 	cchar		*fname ;
 	ino_t		ino ;
-	dev_t		dev ;
 	time_t		timod ;
+	dev_t		dev ;
 	int		size ;
 } ;
 

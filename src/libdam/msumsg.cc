@@ -1,6 +1,6 @@
 /* msumsg SUPPORT */
 /* lang=C++20 (conformance reviewed) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* messages for MSU requests-responses */
 /* version %I% last-modified %G% */
