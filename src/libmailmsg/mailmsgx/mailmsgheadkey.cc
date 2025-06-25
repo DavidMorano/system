@@ -1,5 +1,5 @@
 /* mailmsgheadkey SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* extract the key from a mail-msg header field (c-string) */
