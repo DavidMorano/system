@@ -1,5 +1,5 @@
 /* builtin SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* built-in services */
@@ -1368,7 +1368,7 @@ PROGINFO	*pip ;
 
 #else /* OPTIONAL */
 	{
-	    struct ustat	sb ;
+	    ustat	sb ;
 
 	    rs = u_stat(dname,&sb) ;
 	    if ((rs < 0) || ((sb.st_mode & S_ISVTX) != S_ISVTX)) {

@@ -11,13 +11,13 @@
 
 /* revision history:
 
-	= 1998, David A.D. Morano
+	= 1998, David A-D- Morano
 	I added the ability to specify the "address_from"
 	for the case when we add an envelope header to the message.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 

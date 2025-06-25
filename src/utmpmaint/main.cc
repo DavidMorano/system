@@ -1,7 +1,9 @@
 /* main (MAINTUTMP) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* perform some maintenance on the UTMPX database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* run-time debugging */
 #define	CF_DEBUG	0		/* compile-time debugging */
@@ -9,12 +11,11 @@
 #define	CF_SYSLEN	0		/* use UTMPX 'syslen' */
 #define	CF_LOCSETENT	0		/* |locinfo_setentry()| */
 
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-        The program was written from scratch to do what the previous program by
-        the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 */
 
@@ -22,11 +23,10 @@
 
 /*******************************************************************************
 
-	This is a fairly generic front-end subroutine for small programs.
-
+	This is a fairly generic front-end subroutine for small
+	programs.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -42,6 +42,7 @@
 #include	<time.h>
 
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<sighand.h>
 #include	<bfile.h>
 #include	<bits.h>
@@ -50,6 +51,7 @@
 #include	<paramopt.h>
 #include	<mapstrint.h>
 #include	<tmpx.h>
+#include	<strn.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -73,45 +75,41 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath2w(char *,cchar *,cchar *,int) ;
 extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
-extern int	makedate_date(const char *,const char **) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
+extern int	makedate_date(cchar *,cchar **) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
 
-extern const char	utmpmaint_makedate[] ;
+extern cchar	utmpmaint_makedate[] ;
 
 
 /* local structures */
@@ -146,10 +144,10 @@ static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 static int	procopts(PROGINFO *,KEYOPT *) ;
 static int	procargs(PROGINFO *,ARGINFO *,BITS *,
 			MAPSTRINT *,cchar *,cchar *,cchar *) ;
-static int	procname(PROGINFO *,MAPSTRINT *,const char *,int) ;
-static int	procmaint(PROGINFO *,const char *) ;
+static int	procname(PROGINFO *,MAPSTRINT *,cchar *,int) ;
+static int	procmaint(PROGINFO *,cchar *) ;
 static int	procmaintbake(PROGINFO *,void *,size_t,int) ;
-static int	proclist(PROGINFO *,bfile *,MAPSTRINT *,const char *) ;
+static int	proclist(PROGINFO *,bfile *,MAPSTRINT *,cchar *) ;
 static int	procuser(PROGINFO *,MAPSTRINT *,cchar *,int,int *) ;
 
 static void	main_sighand(int,siginfo_t *,void *) ;
@@ -184,7 +182,7 @@ static const int	sigints[] = {
 	0
 } ;
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -232,7 +230,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"print",
 	"hdr",
 	NULL
@@ -275,16 +273,16 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		f_help = FALSE ;
 	int		f_makedate = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*dbfname = NULL ;
-	const char	*fmt ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*dbfname = NULL ;
+	cchar	*fmt ;
+	cchar	*cp ;
 
 
 	if_exit = 0 ;
@@ -349,7 +347,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    if (ai == 0) continue ;
 
 	    argp = argv[ai] ;
-	    argl = strlen(argp) ;
+	    argl = xstrlen(argp) ;
 
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
@@ -418,7 +416,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                pip->tmpdname = argp ;
 	                        } else
@@ -440,7 +438,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                dbfname = argp ;
 	                        } else
@@ -458,7 +456,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                sn = argp ;
 	                        } else
@@ -476,7 +474,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            afname = argp ;
 	                        } else
 	                            rs = SR_INVALID ;
@@ -493,7 +491,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                efname = argp ;
 	                        } else
@@ -511,7 +509,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            ofname = argp ;
 	                        } else
 	                            rs = SR_INVALID ;
@@ -582,7 +580,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl) {
 					KEYOPT	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
@@ -623,7 +621,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                            if (argr > 0) {
 	                                argp = argv[++ai] ;
 	                                argr -= 1 ;
-	                                argl = strlen(argp) ;
+	                                argl = xstrlen(argp) ;
 	                                if (argl) {
 	                                    cp = argp ;
 	                                    cl = argl ;
@@ -703,7 +701,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    bprintf(pip->efp,"%s: version %s\n",pn,VERSION) ;
 	    if (f_makedate) {
 	        cl = makedate_date(utmpmaint_makedate,&cp) ;
-	        bprintf(pip->efp,"%s: makedate %t\n",pn,cp,cl) ;
+	        bprintf(pip->efp,"%s: makedate %r\n",pn,cp,cl) ;
 	    }
 	} /* end if */
 
@@ -930,8 +928,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-db <dbfile>] [-m] [-l] [<name>[=<type>]]\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -1022,7 +1020,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getenv(VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1086,9 +1084,9 @@ PROGINFO	*pip ;
 ARGINFO		*aip ;
 BITS		*bop ;
 MAPSTRINT	*nlp ;
-const char	*dbfn ;
-const char	*ofn ;
-const char	*afn ;
+cchar	*dbfn ;
+cchar	*ofn ;
+cchar	*afn ;
 {
 	LOCINFO		*lip = pip->lip ;
 	bfile		ofile, *ofp = &ofile ;
@@ -1194,12 +1192,12 @@ static int procname(PROGINFO *pip,MAPSTRINT *nlp,cchar *np,int nl)
 	int		rs = SR_OK ;
 	int		v = -1 ;
 	int		cl ;
-	const char	*tp ;
-	const char	*cp ;
+	cchar	*tp ;
+	cchar	*cp ;
 
 	if (pip == NULL) return SR_FAULT ;
 
-	if (nl < 0) nl = strlen(np) ;
+	if (nl < 0) nl = xstrlen(np) ;
 
 	if ((tp = strnchr(np,nl,'=')) != NULL) {
 	    nl = (tp-np) ;
@@ -1408,7 +1406,7 @@ static int proclist(PROGINFO *pip,bfile *ofp,MAPSTRINT *nlp,cchar *dbfn)
 	                        timebuf) ;
 
 #if	CF_SYSLEN
-	                    bprintf(ofp, "sl=%u host=%t\n",
+	                    bprintf(ofp, "sl=%u host=%r\n",
 	                        up->ut_syslen,
 	                        up->ut_host,strnlen(up->ut_host,TMPX_LHOST)) ;
 #endif

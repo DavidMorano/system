@@ -1,5 +1,5 @@
 /* main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* UTMP program */
@@ -709,7 +709,7 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid) noex {
 	    }
 
 	} else if ((! lip->f.yes) && (! lip->f.no)) {
-	    fmt = "id=%-4t line=%-12t user=%-12t sid=%-5u ses=%u host=%t\n" ;
+	    fmt = "id=%-4t line=%-12t user=%-12t sid=%-5u ses=%u host=%r\n" ;
 
 	    if (up != NULL) {
 

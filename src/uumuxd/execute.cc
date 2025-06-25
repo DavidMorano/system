@@ -1,5 +1,5 @@
 /* execute SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* execute a server daemon program */
@@ -8,16 +8,16 @@
 
 /* revision history:
 
-	= David A.D. Morano, July 1986
+	= David A-D- Morano, July 1986
 	This program was originally written.
 
-	= David A.D. Morano, July 1998
+	= David A-D- Morano, July 1998
 	I added the ability to specify the "address_from"
 	for the case when we add an envelope header to the message.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /**************************************************************************
 
