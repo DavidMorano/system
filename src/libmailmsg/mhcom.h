@@ -1,5 +1,5 @@
 /* mhcom HEADER (Message Header Comment) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* comment-parse (for RFC822) small strings (like for stupid RFC822 date) */

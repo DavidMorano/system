@@ -1,5 +1,5 @@
 /* mbcache SUPPORT (MailBox-Cache) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* cache mailbox items */
