@@ -1,5 +1,5 @@
-/* main SUPPORT */
-/* encoding=ISO8859-1 */
+/* username_main SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* fairly generic (PCS) front-end */
@@ -75,6 +75,7 @@
 #include	<grp.h>
 #include	<usystem.h>
 #include	<ucmallreg.h>
+#include	<getourenv.h>
 #include	<getportnum.h>
 #include	<getax.h>
 #include	<getx.h>
@@ -95,6 +96,7 @@
 #include	<sfx.h>
 #include	<snx.h>
 #include	<sncpyx.h>
+#include	<strwcpy.h>
 #include	<mkx.h>
 #include	<mktmp.h>
 #include	<logsys.h>
@@ -165,13 +167,8 @@ extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
 extern char	*strdcpy1w(char *,int,cchar *,int) ;
 extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
@@ -1517,7 +1514,7 @@ int main(int argc,mainv argv,mainv envv) {
 #endif
 
 	if (pip->progmode == progmode_dmail) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 
 	    if ((pip->maildname == NULL) || (pip->maildname[0] == '\0'))
 	        pip->maildname = SPOOLDNAME ;
@@ -1957,7 +1954,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    rs = u_fstat(tfd,&sb) ;
 	    debugprintf("main: u_fstat() rs=%d tfd=%d size=%lu\n",
 	        rs,tfd,sb.st_size) ;
@@ -3019,7 +3016,7 @@ int		nl ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("main/loadrecip: rn=%t\n",np,nl) ;
+	    debugprintf("main/loadrecip: rn=%r\n",np,nl) ;
 #endif
 
 	if (nl < 0) nl = strlen(np) ;
@@ -3902,7 +3899,7 @@ static int procmboxes(struct proginfo *pip,cchar *sp,int sl)
 
 	if (sl < 0) sl = strlen(sp) ;
 
-	while ((tp = strnpbrk(sp,sl,", :")) != NULL) {
+	while ((tp = strnbrk(sp,sl,", :")) != NULL) {
 	    if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
 	        c += 1 ;
 	        rs = locinfo_mboxadd(lip,cp,cl) ;
@@ -4271,7 +4268,7 @@ static int debugrecips(struct proginfo *pip,VECOBJ *rlp)
 	    for (i = 0 ; vecobj_get(rlp,i,&rp) >= 0 ; i += 1) {
 	        if ((rs = recip_get(rp,&cp)) > 0) {
 	            cl = rs ;
-	            debugprintf("main/debugrecips: r=%t\n",cp,cl) ;
+	            debugprintf("main/debugrecips: r=%r\n",cp,cl) ;
 	        }
 	        if (rs < 0) break ;
 	    } /* end for */
