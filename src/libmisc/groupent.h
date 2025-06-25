@@ -1,5 +1,5 @@
 /* groupent HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutines for simple GROUP object (from UNIX® library-3c) management */

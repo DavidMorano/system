@@ -1,5 +1,5 @@
 /* whitelist SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* whitelist mail address management */
@@ -41,6 +41,7 @@
 #include	<strn.h>
 #include	<sncpyx.h>
 #include	<snwcpyx.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"splitaddr.h"
@@ -257,7 +258,7 @@ int whitelist_prematch(whitelist *op,cchar *ta) noex {
 	    if (ta[0]) {
 	        vecstr	*lp = op->wlp ;
 	        if_constexpr (f_partial) {
-	             if (strpbrk(ta,"@!") != nullptr) {
+	             if (strbrk(ta,"@!") != nullptr) {
 	                 if ((rs = vecstr_search(lp,ta,vcmpaddr,np)) >= 0) {
 	                     f = true ;
 	                 }
