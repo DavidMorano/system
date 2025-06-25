@@ -1,5 +1,5 @@
 /* wordfill HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* text (word) fill */
@@ -35,11 +35,11 @@
 #include	<fifostr.h>
 #include	<strn.h>
 #include	<sfx.h>
-#include	<sif.hh>
 #include	<localmisc.h>
 
 #include	"wordfill.h"
 
+import sif ;
 
 /* local defines */
 

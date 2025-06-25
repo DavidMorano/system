@@ -1,5 +1,5 @@
 /* wdt SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* walk directory tree */
@@ -47,7 +47,7 @@
 	name encountered.
 
 	Synopsis:
-	int checkname(cchar *name,struct ustat *sbp,void *uarg)
+	int checkname(cchar *name,ustat *sbp,void *uarg)
 
 	Arguments:
 	name		name (string)
@@ -250,7 +250,7 @@ static int subinfo_procname(SI *sip,cchar *dbuf,int dlen) noex {
 	        rs = fifostr_add(&sip->fs,dbuf,dlen) ;
 	    } else if (S_ISLNK(sb.st_mode)) {
 	        if (sip->wopts & WDT_MFOLLOW) {
-	            struct ustat	sbb ;
+	            ustat	sbb ;
 	            if ((rs = u_stat(dbuf,&sbb)) >= 0) {
 	                if (S_ISDIR(sbb.st_mode)) {
 	                    rs = fifostr_add(&sip->fs,dbuf,dlen) ;

@@ -1,5 +1,5 @@
 /* votdc HEADER (VOTD Shared-memory management) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* VOTDs system Cache management */

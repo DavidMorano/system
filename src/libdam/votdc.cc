@@ -1,5 +1,5 @@
 /* votdc HEADER (VOTD Cache management) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* VOTDs system Cache management */
