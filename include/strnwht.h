@@ -34,14 +34,6 @@ extern char *strnwhtchr(cchar *,int,int) noex ;
 
 EXTERNC_end
 
-#ifdef	__cplusplus
-
-import chrset ;
-char *strnwhtbrk(cchar *sp,int sl,const chrset &) noex ;
-char *strnwhtchr(cchar *sp,int sl,const chrset &) noex ;
-
-#endif /* __spluplus */
-
 
 #endif /* STRNWHT_INCLUDE */
 
