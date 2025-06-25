@@ -1,5 +1,5 @@
 /* hdrdecode SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++98 */
 
 /* mail-header weirdo-string decoding */
