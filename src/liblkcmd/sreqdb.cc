@@ -1,5 +1,5 @@
 /* sreqdb SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform various functions on a job */
@@ -543,7 +543,7 @@ static int sreqdb_delit(SREQDB *jlp,int ji,SREQ *jep)
 #if	CF_CHECKDIR
 static int sreqdb_checkdir(SREQDB *jlp)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 
 	if ((rs = u_stat(jlp->tmpdname,&sb)) >= 0) {
