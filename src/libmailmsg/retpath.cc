@@ -1,5 +1,5 @@
 /* retpath SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* process the "retpath" NEWS object */
@@ -122,7 +122,7 @@ int retpath_parse(retpath *plp,cchar *sp,int sl) noex {
 	    cchar	*cp ;
 	    if (sl < 0) sl = cstrlen(sp) ;
 	    rs = SR_OK ;
-	    for (cchar *tp ; (tp = strnpbrk(sp,sl,"!@,%:")) != np ; ) {
+	    for (cchar *tp ; (tp = strnbrk(sp,sl,"!@,%:")) != np ; ) {
 		cint	ll = intconv(tp - sp) ;
 	        if ((cl = sfshrink(sp,ll,&cp)) > 0) {
 	            n += 1 ;

@@ -1,5 +1,5 @@
 /* splitaddr HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* mail address management */
@@ -50,7 +50,7 @@
 #include	<strings.h>		/* |strcasecmp(3c)| + |strlen(3c)| */
 #include	<usystem.h>
 #include	<vechand.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnrbrk(3uc)| */
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -149,7 +149,7 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	            bool	f = false ;
 	            op->mailaddr = charp(bp) ;
 		    strwcpy(bp,ap,al) ;
-	            for (cc *tp ; (tp = strnrpbrk(bp,bl,".@")) != np ; ) {
+	            for (cc *tp ; (tp = strnrbrk(bp,bl,".@")) != np ; ) {
 	                f = (*tp == '@') ;
 	                n += 1 ;
 	                rs = vechand_add(op->comp,(tp+1)) ;
