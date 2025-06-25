@@ -1,5 +1,5 @@
 /* csro HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* email ComSat Receive Offset (CSRO) processing */

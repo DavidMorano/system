@@ -1,5 +1,5 @@
 /* contentencodings HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* content-encodings for mail message headers */
