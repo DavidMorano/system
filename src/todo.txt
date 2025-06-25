@@ -4,11 +4,14 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
-densityx
+ufcntl		?? weirdo problem
+ucopen
 uctim
 libuc		fix to completely compile!
+ucopen		needs dynamic allocation
 fsdirtree	needs pointer implementation and a lot of cleanup
 sysdialer
+cm
 mailmsghdrct	mess
 memfile		can we just trash this?
 quote
@@ -25,7 +28,6 @@ spawnproc	block structure; actually this is a huge mess
 termnote	could use some break-down of large subs into smaller ones
 ipasswd
 nettime		add 'constexpr if'
-msgidx		(msgid, msgide)
 statmsg
 motd
 var

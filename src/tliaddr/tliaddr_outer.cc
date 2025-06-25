@@ -33,9 +33,9 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<cstdarg>
 
 #include	<usystem.h>
 #include	<bfile.h>

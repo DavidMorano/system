@@ -32,8 +32,8 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -84,7 +84,7 @@ int prograw(PROGINFO *pip,cchar *familyname,cchar *netaddr1,cchar *netaddr2)
 		const int	hexlen = HEXBUFLEN ;
 	        char		hexbuf[HEXBUFLEN + 1] ;
 	        if ((rs = makehex(hexbuf,hexlen,netaddr1,-1)) >= 0) {
-		    rs = progout_printf(pip,"%t\n",hexbuf,rs) ;
+		    rs = progout_printf(pip,"%r\n",hexbuf,rs) ;
 		}
 	        rs1 = progout_close(pip) ;
 		if (rs >= 0) rs = rs1 ;

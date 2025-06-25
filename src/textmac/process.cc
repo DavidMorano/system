@@ -442,7 +442,7 @@ const char	fname[] ;
 
 #if	CF_DEBUG
 	            {
-	                struct ustat	a ;
+	                ustat	a ;
 
 
 	                if (pip->debuglevel > 1) {

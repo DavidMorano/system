@@ -233,7 +233,7 @@ const char	fname[] ;
 
 #if	CF_DEBUG
 	            {
-	                struct ustat	a ;
+	                ustat	a ;
 	                if (pip->debuglevel > 1) {
 	                    bcontrol(ifp,BC_STAT,&a) ;
 	                    debugprintf("process: BIO size=%ld\n",a.st_size) ;

@@ -9,14 +9,14 @@
 
 /* revistion history :
 
-	= 1987-09-10, David A.D. Morano
+	= 1987-09-10, David A-D- Morano
 
 	This code was originally written.
 
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************
 

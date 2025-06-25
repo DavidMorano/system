@@ -1,5 +1,5 @@
 /* progsock SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutine to process socket interface type addresses */
@@ -247,7 +247,7 @@ static int procsocker(PROGINFO *pip,int af,cchar *naddr,int port)
 
 	        if ((rs = progout_open(pip)) >= 0) {
 		    {
-	                rs = progout_printf(pip,"\\x%t\n",hbuf,hl) ;
+	                rs = progout_printf(pip,"\\x%r\n",hbuf,hl) ;
 		        wlen += rs ;
 		    }
 	            rs1 = progout_close(pip) ;
