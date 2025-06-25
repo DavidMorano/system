@@ -1,5 +1,5 @@
 /* td HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* Terminal-Display manager */
@@ -118,7 +118,7 @@ extern int td_ew(td *,int,int,int) noex ;
 extern int td_el(td *,int,int) noex ;
 extern int td_ec(td *,int,int) noex ;
 extern int td_check(td *) noex ;
-extern int td_position(td *,int,td_pos *) noex ;
+extern int td_getpos(td *,int,td_pos *) noex ;
 
 EXTERNC_end
 

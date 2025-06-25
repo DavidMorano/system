@@ -1,5 +1,5 @@
 /* td SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* Terminal Display (TD) library */
@@ -41,7 +41,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |abs(3c)| */
 #include	<cstdarg>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| * |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -59,6 +58,7 @@
 
 #include	"td.h"
 
+import libutil ;			/* |memclear(3u)| + |xstrlen(3u)| */
 
 /* local defines */
 
@@ -572,7 +572,7 @@ int td_pwritegr(td *tdp,int wn,int r,int c,int gr,cchar *wbuf,int wlen) noex {
 	int		len = 0 ;
 	if ((rs = td_magic(tdp,wbuf)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (wlen < 0) wlen = strlen(wbuf) ;
+	    if (wlen < 0) wlen = xstrlen(wbuf) ;
 	    if (wn >= 0) {
 	        td_win	*wp ;
 	        if ((rs = vecitem_get(tdp->wlp,wn,&wp)) >= 0) {
@@ -702,7 +702,7 @@ int td_check(td *tdp) noex {
 }
 /* end subroutine (td_check) */
 
-int td_position(td *tdp,int wn,td_pos *pp) noex {
+int td_getpos(td *tdp,int wn,td_pos *pp) noex {
 	int		rs ;
 	if ((rs = td_magic(tdp,pp)) >= 0) {
 	    td_win	*wp ;
@@ -933,7 +933,7 @@ static int td_procstr(td *tdp,td_win *wp,int gr,cchar *sbuf,int slen) noex {
 	bool		f_gr = false ;
 	sp = sbuf ;
 	sl = slen ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	if ((sl > 0) && (gr & grmask)) {
 	    cint	a1 = (gr & TD_GRBOLD) ? ANSIGR_BOLD : -1 ;
 	    cint	a2 = (gr & TD_GRUNDER) ? ANSIGR_UNDER : -1 ;
@@ -1102,7 +1102,7 @@ static int td_store(td *tdp,cchar *bp,int bl) noex {
 	int		rs = SR_OK ;
 	int		rlen = (tdp->buflen - tdp->curlen) ;
 	int		len = 0 ;
-	if (bl < 0) bl = strlen(bp) ;
+	if (bl < 0) bl = xstrlen(bp) ;
 	if (bl > rlen) {
 	    rs = u_write(tdp->tfd,tdp->buf,tdp->curlen) ;
 	    tdp->curlen = 0 ;
