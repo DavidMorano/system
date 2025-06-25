@@ -1,5 +1,5 @@
 /* txtindexes SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* read or audit a TXTINDEX database */
@@ -1217,7 +1217,7 @@ static int tag_parse(TI_TAG *tagp,char *rbuf,int rlen,cchar *sp,int sl) noex {
 			tagp->recoff = uv ;
 	                sl -= ((tp + 1) - sp) ;
 	                sp = (tp + 1) ;
-	                if ((tp = strnpbrk(sp,sl,"\t ")) != nullptr) {
+	                if ((tp = strnbrk(sp,sl,"\t ")) != nullptr) {
 	                    sl = (tp - sp) ;
 	                }
 	                tagp->reclen = INT_MAX ;

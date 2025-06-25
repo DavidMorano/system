@@ -1,5 +1,5 @@
 /* txtindex HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* interface to TXTINDEX database management */
