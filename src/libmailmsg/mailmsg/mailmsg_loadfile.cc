@@ -1,5 +1,5 @@
 /* mailmsg_loadfile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* load the header-lines from a MAILMSG file into the object */
