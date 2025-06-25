@@ -1154,7 +1154,7 @@ static int process(PROGINFO *pip,EXPCOOK *clp,cchar ifname[])
 	}
 
 	if (! f_stdin) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    int	rs1 = u_stat(ifname,&sb) ;
 	    if (rs1 >= 0) f_fifo = S_ISFIFO(sb.st_mode) ;
 	}
@@ -1454,7 +1454,7 @@ static int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m)
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = mkdirs(rdname,m)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = uc_stat(rdname,&sb)) >= 0) {
 	        const mode_t	dm = (m|S_ISVTX) ;
 		const uid_t	uid = getuid() ;

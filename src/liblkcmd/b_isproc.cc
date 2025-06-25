@@ -156,7 +156,7 @@ static int	locinfo_query(LOCINFO *,cchar *,int) ;
 static int	locinfo_procopts(LOCINFO *) ;
 static int	locinfo_intage(LOCINFO *,cchar *,cchar *) ;
 static int	locinfo_queries(LOCINFO *) ;
-static int	locinfo_procage(LOCINFO *,struct ustat *) ;
+static int	locinfo_procage(LOCINFO *,ustat *) ;
 static int	locinfo_pcurbegin(LOCINFO *,LOCINFO_PCUR *) ;
 static int	locinfo_pcurend(LOCINFO *,LOCINFO_PCUR *) ;
 static int	locinfo_pget(LOCINFO *,LOCINFO_PCUR *,cchar **) ;
@@ -1147,7 +1147,7 @@ static int procfiles(PROGINFO *pip)
 
 static int procfile(PROGINFO *pip,cchar *fname)
 {
-	struct ustat	usb ;
+	ustat	usb ;
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		f_ok = FALSE ;
@@ -1383,7 +1383,7 @@ static int locinfo_queries(LOCINFO *lip)
 /* end subroutine (locinfo_queries) */
 
 
-static int locinfo_procage(LOCINFO *lip,struct ustat *sbp)
+static int locinfo_procage(LOCINFO *lip,ustat *sbp)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;

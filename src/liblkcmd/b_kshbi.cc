@@ -222,7 +222,7 @@ static int	locinfo_storedirtmp(LOCINFO *,char *) ;
 static int	locinfo_tmpcheck(LOCINFO *) ;
 static int	locinfo_tmpmaint(LOCINFO *) ;
 static int	locinfo_chown(LOCINFO *,cchar *) ;
-static int	locinfo_fchmodown(LOCINFO *,int,struct ustat *,mode_t) ;
+static int	locinfo_fchmodown(LOCINFO *,int,ustat *,mode_t) ;
 static int	locinfo_loadprids(LOCINFO *) ;
 
 static int	locinfo_libdirfind(LOCINFO *,char *) ;
@@ -1252,11 +1252,11 @@ static int procsfner(PROGINFO *pip,char *sfname,cchar *rbuf)
 	        if ((rs = locinfo_tmpcheck(lip)) >= 0) {
 	            cchar	*sdname = lip->storedname ;
 	            if ((rs = mkpath2w(sfname,sdname,cp,cl)) >= 0) {
-	                struct ustat	sb ;
+	                ustat	sb ;
 	                const int	rsn = SR_NOENT ;
 	                pl = rs ;
 	                if ((rs = uc_stat(sfname,&sb)) >= 0) {
-	                    struct ustat	lsb ;
+	                    ustat	lsb ;
 	                    if ((rs = uc_stat(rbuf,&lsb)) >= 0) {
 	                        if (lsb.st_mtime > sb.st_mtime) {
 	                            rs = procsfnmk(pip,sfname,rbuf) ;
@@ -1793,7 +1793,7 @@ static int locinfo_libdirsearcher(LOCINFO *lip,char *rbuf,cchar *dp,vecstr *nlp)
 
 static int locinfo_libdirtest(LOCINFO *lip,char *rbuf)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 #if	CF_DEBUGS
 	debugprintf("b_kshbi/locinfo_libdirtest: ent name=%s\n",rbuf) ;
@@ -1855,7 +1855,7 @@ static int locinfo_libdirpr(LOCINFO *lip)
 	int		rs ;
 	char		tbuf[MAXPATHLEN+1] ;
 	if ((rs = mkpath2(tbuf,pip->pr,"lib")) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if (uc_stat(tbuf,&sb) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 	            rs = locinfo_libdiradd(lip,tbuf) ;
@@ -2125,7 +2125,7 @@ static int locinfo_dircheck(LOCINFO *lip,cchar *dname)
 #endif
 
 	{
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    const uid_t		euid = pip->euid ;
 	    const mode_t	dm = (0777 | S_ISGID) ;
 	    const int		rsn = SR_NOENT ;
@@ -2219,7 +2219,7 @@ static int locinfo_tmpmaint(LOCINFO *lip)
 	    const mode_t	om = 0666 ;
 	    const int		of = (O_WRONLY|O_CREAT) ;
 	    if ((rs = u_open(tsfname,of,om)) >= 0) {
-	        struct ustat	usb ;
+	        ustat	usb ;
 	        const int	fd = rs ;
 	        if ((rs = u_fstat(fd,&usb)) >= 0) {
 	            time_t	dt = pip->daytime ;
@@ -2271,7 +2271,7 @@ static int locinfo_chown(LOCINFO *lip,cchar *fname)
 /* end subroutine (locinfo_chown) */
 
 
-static int locinfo_fchmodown(LOCINFO *lip,int fd,struct ustat *sbp,mode_t mm)
+static int locinfo_fchmodown(LOCINFO *lip,int fd,ustat *sbp,mode_t mm)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2303,7 +2303,7 @@ static int locinfo_loadprids(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	if (lip->uid_pr < 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = u_stat(pip->pr,&sb)) >= 0) {
 	        lip->uid_pr = sb.st_uid ;
 	        lip->gid_pr = sb.st_gid ;

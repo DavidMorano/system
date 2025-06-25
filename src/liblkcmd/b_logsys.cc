@@ -1,4 +1,5 @@
 /* b_logsys SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* utility to log message to the system logger facility */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_logsys
+
+	Description:
 	This is a built-in command to the KSH shell. This little
 	program looks up a number in a database and returns the
 	corresponding string.
@@ -49,16 +54,17 @@
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<getsyslogx.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
 #include	<userinfo.h>
-#include	<char.h>
 #include	<logsys.h>
 #include	<expcook.h>
 #include	<linefold.h>
 #include	<strn.h>
-#include	<getsyslogx.h>
+#include	<strx.h>
+#include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -1088,7 +1094,7 @@ static int processor(PROGINFO *pip,LOGSYS *lsp,EXPCOOK *ckp,cchar ifn[])
 	}
 
 	if (! f_stdin) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    int	rs1 = u_stat(ifn,&sb) ;
 	    if (rs1 >= 0) f_fifo = S_ISFIFO(sb.st_mode) ;
 	}
@@ -1401,7 +1407,7 @@ static int locinfo_logparams(LOCINFO *lip,cchar *facs,cchar *tags,cchar *pris)
 	if ((pris != NULL) && (pris[0] != '\0')) {
 	    cchar	*sp = pris ;
 	    cchar	*tp ;
-	    if ((tp = strpbrk(sp,":.")) != NULL) {
+	    if ((tp = strbrk(sp,":.")) != NULL) {
 	        seps.s[la_fac].sp = sp ;
 	        seps.s[la_fac].sl = (tp-sp) ;
 	        seps.s[la_pri].sp = (tp+1) ;
@@ -1498,7 +1504,7 @@ static int sepstrs_load(SEPSTRS *ssp,cchar sp[],int sl)
 	    cchar	*cp ;
 
 	    n += 1 ;
-	    if ((tp = strnpbrk(sp,sl,":.")) != NULL) {
+	    if ((tp = strnbrk(sp,sl,":.")) != NULL) {
 
 	        n += 1 ;
 	        ssp->s[la_fac].sp = sp ;
@@ -1508,7 +1514,7 @@ static int sepstrs_load(SEPSTRS *ssp,cchar sp[],int sl)
 
 	        cp = (tp + 1) ;
 	        cl = ((sp + sl) - cp) ;
-	        if ((tp = strnpbrk(cp,cl,":.")) != NULL) {
+	        if ((tp = strnbrk(cp,cl,":.")) != NULL) {
 	            n += 1 ;
 	            ssp->s[la_tag].sp = cp ;
 	            ssp->s[la_tag].sl = (tp - cp) ;

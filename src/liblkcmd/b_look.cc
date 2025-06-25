@@ -1,5 +1,5 @@
 /* b_look SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* this is the LOOK program (for looking up words in a dictionary) */
@@ -59,10 +59,13 @@
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<bits.h>
 #include	<vecobj.h>
-#include	<char.h>
 #include	<naturalwords.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -118,12 +121,6 @@ extern int	debugprinthex(const char *,int,const char *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -943,7 +940,7 @@ static int procsort(PROGINFO *pip,void *ofp,cchar fname[])
 	    const mode_t	operms = 0666 ;
 	    const int		oflags = O_RDONLY ;
 	    if ((rs = uc_open(fname,oflags,operms)) >= 0) {
-	        struct ustat	sb ;
+	        ustat	sb ;
 	        int	fd = rs ;
 	        if (((rs = u_fstat(fd,&sb)) >= 0) && S_ISREG(sb.st_mode)) {
 	            const size_t	fs = (size_t) (sb.st_size & LONG_MAX) ;

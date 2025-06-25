@@ -826,7 +826,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 /* process a file */
 static int procfile(PROGINFO *pip,PROGDATA *pdp,cchar *name)
 {
-	struct ustat	usb ;
+	ustat	usb ;
 	int		rs ;
 
 	if (name == NULL) return SR_FAULT ;
