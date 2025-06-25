@@ -1,5 +1,5 @@
 /* mailbox_getfrom SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a FROM address from a mail message */

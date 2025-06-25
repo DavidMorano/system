@@ -1,5 +1,5 @@
 /* mailfiles SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage mail files (mailboxes) */
@@ -39,7 +39,6 @@
 #include	<strwcpy.h>
 #include	<strn.h>
 #include	<sfx.h>
-#include	<sif.hh>
 #include	<isnot.h>
 #include	<localmisc.h>
 
