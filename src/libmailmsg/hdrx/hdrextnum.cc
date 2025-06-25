@@ -1,5 +1,5 @@
 /* hdrextnum SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* comment separate (parse) a mail header field value */
@@ -98,7 +98,7 @@ int hdrextnum(cchar *sp,int sl) noex {
 	    char	digbuf[digbuflen + 1] ;
 	    if ((rs = hdrextnum_ext(digbuf,sp,sl)) > 0) {
 	        int	len = rs ;
-	        if (int si ; (si = sibreak(digbuf,len," \t")) >= 0) {
+	        if (int si ; (si = sibrk(digbuf,len," \t")) >= 0) {
 		    len = si ;
 	        }
 	        rs = cfdeci(digbuf,len,&v) ;
