@@ -1,5 +1,5 @@
 /* systems SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* get machine dialing information from UUCP "Systems" DB */
@@ -100,10 +100,10 @@ namespace {
 
 struct systems_file {
 	cchar		*fname ;
-	dev_t		dev ;
-	ino_t		ino ;
 	time_t		timod ;
 	size_t		fsize ;
+	dev_t		dev ;
+	ino_t		ino ;
 } ;
 
 typedef systems_file *	filep ;
