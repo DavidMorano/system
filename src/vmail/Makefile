@@ -155,7 +155,7 @@ OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o proginfo_rootname.o
 OBJ01= progopts.o progconfig.o progterm.o progmailget.o proguserlist.o
 OBJ02= proglog.o progvmerr.o
 OBJ03= inter.o inter_trans.o
-OBJ04= display.o ds.o 
+OBJ04=
 OBJ05= mailmsgviewer.o
 OBJ06= timestr_scandate.o digit3.o
 OBJ07= printhelp.o kshlib.o sesmsg.o msgdata.o
@@ -362,8 +362,6 @@ inter.o:		kbdinfo.h cmdmap.h subprocs.h
 inter_trans.o:		inter_trans.c inter.h ${INCS}
 
 display.o:		display.cc display.h $(INCS) ds.h
-
-ds.o:			ds.c ds.h $(INCS) td.h termstr.h
 
 mailmsgviewer.o:	mailmsgviewer.c mailmsgviewer.h
 

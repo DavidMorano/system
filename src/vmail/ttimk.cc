@@ -1,11 +1,12 @@
 /* ttimk */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* make a Termianl-Translate-Index file management database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CH_MINMOD	1		/* ensure minimum file mode */
-
 
 /* revision history:
 
@@ -131,11 +132,6 @@ extern int	iceil(int,int) ;
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -764,7 +760,7 @@ static int ttimk_nfcreate(op,fsuf)
 TTIMK		*op ;
 const char	fsuf[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		rs1 ;
 	int		nfl ;
@@ -927,7 +923,7 @@ const char	outfname[] ;
 static int ttimk_fexists(op)
 TTIMK		*op ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f ;

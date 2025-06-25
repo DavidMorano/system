@@ -65,7 +65,7 @@ struct proginfo	*pip ;
 char		fullname[] ;
 const char	boxname[] ;
 {
-	struct ustat	ss ;
+	ustat	ss ;
 
 	int	rs = SR_NOENT ;
 	int	cl ;

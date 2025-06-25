@@ -1,5 +1,5 @@
 /* periph SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* utility subroutines */
@@ -10,13 +10,13 @@
 
 /* revision history:
 
-	= 1994-01-10 David A.D. Morano
+	= 1994-01-10 David A-D- Morano
 	Oh my!  What a piece of garbage!  I am taking this on to
 	try and clean some of it up!
 
 */
 
-/* Copyright © 1994 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1994 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 

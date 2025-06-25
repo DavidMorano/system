@@ -493,7 +493,7 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("progconf_read: enum k=%t\n",kp,kl) ;
+	            debugprintf("progconf_read: enum k=%r\n",kp,kl) ;
 #endif
 
 	        pi = matpstr(params,2,kp,kl) ;
@@ -514,7 +514,7 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4)) {
-	            debugprintf("progconf_read: ebuf=>%t<\n",
+	            debugprintf("progconf_read: ebuf=>%r<\n",
 	                ebuf,strlinelen(ebuf,el,50)) ;
 	            debugprintf("progconf_read: switch=%s(%u)\n",
 	                params[pi],pi) ;

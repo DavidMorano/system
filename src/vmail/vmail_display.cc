@@ -1,4 +1,5 @@
-/* display SUPPORT */
+/* vmail_display SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage the display for VMAIL */
@@ -12,7 +13,7 @@
 
 /* revision history:
 
-	= 1998-01-10 David A.D. Morano
+	= 1998-01-10 David A-D- Morano
 	This is a complete rewrite of the previous set of subroutines
 	(might not be able to even call them an object) of the same
 	name. This present module does fairly well qualify indeed
@@ -20,10 +21,14 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Object:
+	vmail_display
+
+	Description:
 	This subroutine displays the message to the screen.
 
 *******************************************************************************/
@@ -212,7 +217,7 @@ static cchar	blanks[] = "                    " ;
 static const struct scantitle	scantitles[] = {
 	{ "FROM", COL_SCANFROM },
 	{ "SUBJECT", COL_SCANSUBJECT },
-	{ "DATE", COL_SCANDATE },
+	{ "DATE", COL_SCA-D-TE },
 	{ "LINES", COL_SCANLINES },
 	{ NULL, 0 }
 } ;
@@ -963,7 +968,7 @@ int display_viewload(DISPLAY *op,int ln,cchar *sp,int sl)
 	        dp = sp ;
 	        dl = sl ;
 	    }
-	    rs = ds_printf(&op->ds,w,"%t\v",dp,dl) ;
+	    rs = ds_printf(&op->ds,w,"%r\v",dp,dl) ;
 	} /* end if */
 
 	return rs ;
@@ -1234,7 +1239,7 @@ static int display_hdcvt(DISPLAY *op,cchar *sp,int sl)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("display_hdcvt: ent sl=%d\n",sl) ;
-	    debugprintf("display_hdcvt: s=>%t<\n",
+	    debugprintf("display_hdcvt: s=>%r<\n",
 		sp,strlinelen(sp,sl,40)) ;
 	}
 #endif
@@ -1727,7 +1732,7 @@ int display_midmsgs(DISPLAY *op,int total,int current)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
-	        debugprintf("display_nmsgs: ds_pwrite() rs=%d >%t<\n",
+	        debugprintf("display_nmsgs: ds_pwrite() rs=%d >%r<\n",
 	            rs,fp,fl) ;
 #endif
 
@@ -2174,8 +2179,8 @@ int display_rbot(DISPLAY *op)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
 	    debugprintf("display_rbot: ll=%d\n",ll) ;
-	    debugprintf("display_rbot: la=>%t<\n",lp,40) ;
-	    debugprintf("display_rbot: lb=>%t<\n",(lp+40),40) ;
+	    debugprintf("display_rbot: la=>%r<\n",lp,40) ;
+	    debugprintf("display_rbot: lb=>%r<\n",(lp+40),40) ;
 	}
 #endif
 
@@ -2734,7 +2739,7 @@ static int display_setstzone(DISPLAY *op)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("display_setstzone: st=>%t<\n",fp,fl) ;
+	    debugprintf("display_setstzone: st=>%r<\n",fp,fl) ;
 #endif
 
 	return (rs >= 0) ? len : rs ;
@@ -3240,7 +3245,7 @@ static int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp)
 	                if (dl < 0) dl = strlen(dp) ;
 
 #if	CF_DEBUGS
-	                debugprintf("scanline_fill: d=>%t<\n",dp,dl) ;
+	                debugprintf("scanline_fill: d=>%r<\n",dp,dl) ;
 #endif
 
 	                if (f_check) {
@@ -3283,7 +3288,7 @@ static int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp)
 	                slp->data = (char *) ccp ;
 
 #if	CF_DEBUGS
-	                debugprintf("scanline_fill: ll=%u lp=>%t<\n",
+	                debugprintf("scanline_fill: ll=%u lp=>%r<\n",
 	                    ll,lp,strlinelen(lp,ll,40)) ;
 	                debugprintf("scanline_fill: uc_mallocstrw() rs=%d\n",
 				rs) ;

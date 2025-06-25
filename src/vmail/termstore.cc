@@ -46,7 +46,7 @@ int termstore_save(tsp,tfd)
 struct termstore	*tsp ;
 int			tfd ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int		rs ;
 
@@ -78,7 +78,7 @@ int termstore_restore(tsp,tfd)
 struct termstore	*tsp ;
 int			tfd ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int		rs ;
 
