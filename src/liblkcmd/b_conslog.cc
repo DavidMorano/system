@@ -1,4 +1,5 @@
 /* b_conslog SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* utility to log message to the system logger facility */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_conslog
+
+	Description:
 	This is a built-in command to the KSH shell.  This little
 	program looks up a number in a database and returns the
 	corresponding string.
@@ -42,14 +47,16 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/syslog.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<getsyslogx.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -60,7 +67,7 @@
 #include	<expcook.h>
 #include	<linefold.h>
 #include	<strn.h>
-#include	<getsyslogx.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -1172,7 +1179,7 @@ static int processer(PROGINFO *pip,CONSLOG *lsp,EXPCOOK *ckp,cchar ifn[])
 	}
 
 	if (! f_stdin) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    int	rs1 = u_stat(ifn,&sb) ;
 	    if (rs1 >= 0) f_fifo = S_ISFIFO(sb.st_mode) ;
 	}
@@ -1512,7 +1519,7 @@ static int locinfo_logparams(LOCINFO *lip,cchar *facspec,cchar *prispec)
 	if ((prispec != NULL) && (prispec[0] != '\0')) {
 	    cchar	*sp = prispec ;
 	    cchar	*tp ;
-	    if ((tp = strpbrk(sp,":.")) != NULL) {
+	    if ((tp = strbrk(sp,":.")) != NULL) {
 	        seps.s[la_fac].sp = sp ;
 	        seps.s[la_fac].sl = (tp-sp) ;
 	        seps.s[la_pri].sp = (tp+1) ;
@@ -1590,7 +1597,7 @@ static int sepstrs_load(struct sepstrs *ssp,cchar sp[],int sl)
 	    cchar	*tp ;
 
 	    n += 1 ;
-	    if ((tp = strnpbrk(sp,sl,":.")) != NULL) {
+	    if ((tp = strnbrk(sp,sl,":.")) != NULL) {
 	        n += 1 ;
 	        ssp->s[la_fac].sp = sp ;
 	        ssp->s[la_fac].sl = (tp - sp) ;

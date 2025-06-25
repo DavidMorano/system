@@ -96,7 +96,7 @@ extern int	cfdecti(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
 extern int	getgid_group(cchar *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	fileobject(const char *) ;
 extern int	filebinary(const char *) ;
 extern int	isdigitlatin(int) ;
@@ -156,17 +156,17 @@ struct locinfo_ftypes {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
-	LOCINFO_FL	open ;
 	LOCINFO_FTS	ft ;
 	PROGINFO	*pip ;
+	cchar		*group_tar ;
 	KEYOPT		akopts ;
 	PARAMOPT	aparams ;
 	dev_t		same_d ;
 	ino_t		same_i ;
-	IDS		id ;
+	ids		id ;
 	gid_t		gid_tar ;
-	const char	*group_tar ;
+	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	open ;
 	int		nsame ;
 	int		intage ;
 } ;
@@ -1141,7 +1141,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* process a file (carefully follow the logic in this subroutine) */
 static int procfile(PROGINFO *pip,cchar fname[])
 {
-	struct ustat	usb ;
+	ustat	usb ;
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;

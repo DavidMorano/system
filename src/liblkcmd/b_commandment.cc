@@ -1,5 +1,5 @@
 /* b_commandment SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* translate a commandment number to its corresponding entry (string) */

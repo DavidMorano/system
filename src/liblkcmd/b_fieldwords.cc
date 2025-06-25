@@ -1,13 +1,13 @@
-/* b_fieldwords */
+/* b_fieldwords SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to return a user's home login directory */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -21,12 +21,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ fieldwords [<word>,<word>, ...] [-V]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -45,6 +42,7 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 
@@ -52,6 +50,7 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<estrings.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -947,7 +946,7 @@ static int procwords(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar *words)
 	if (words == NULL) return SR_FAULT ;
 
 	sp = words ;
-	while ((tp = strpbrk(sp," \t,:")) != NULL) {
+	while ((tp = strbrk(sp," \t,:")) != NULL) {
 	    if ((cl = sfshrink(sp,(tp - sp),&cp)) > 0) {
 	        c += 1 ;
 	        rs = shio_print(ofp,cp,cl) ;

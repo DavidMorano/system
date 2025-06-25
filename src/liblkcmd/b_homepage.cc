@@ -1,5 +1,5 @@
 /* b_homepage SUPPORT (HOMEPAGE) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* program to create a "home" webpage in corporate environment */
@@ -61,12 +61,14 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<ugetpw.h>
 #include	<ucmallreg.h>
+#include	<getourenv.h>
 #include	<estrings.h>
 #include	<getbufsize.h>
 #include	<intceil.h>
@@ -95,7 +97,9 @@
 #include	<lfm.h>
 #include	<tmtime.hh>
 #include	<querystr.h>
+#include	<strn.h>		/* |strnrbrk(3uc)| */
 #include	<sfx.h>
+#include	<strwcpy.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -210,12 +214,6 @@ extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*strnrpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 extern char	*timestr_elapsed(time_t,char *) ;
@@ -825,7 +823,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    if (ai == 0) continue ;
 
 	    argp = argv[ai] ;
-	    argl = strlen(argp) ;
+	    argl = xstrlen(argp) ;
 
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
@@ -892,7 +890,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                pip->tmpdname = argp ;
 	                        } else
@@ -909,7 +907,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = xstrlen(argp) ;
 	                        if (argl)
 	                            pr = argp ;
 	                    } else
@@ -926,7 +924,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                sn = argp ;
 	                        } else
@@ -943,7 +941,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                afname = argp ;
 	                        } else
@@ -961,7 +959,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                efname = argp ;
 	                        } else
@@ -978,7 +976,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                ofname = argp ;
 	                        } else
@@ -996,7 +994,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                cfname = argp ;
 	                        } else
@@ -1014,7 +1012,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                pip->lfname = argp ;
 	                        } else
@@ -1032,7 +1030,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                wfname = argp ;
 	                        } else
@@ -1052,7 +1050,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                cp = argp ;
 	                        } else
@@ -1075,7 +1073,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                qs = argp ;
 	                        } else
@@ -1102,7 +1100,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = xstrlen(argp) ;
 	                        if (argl) {
 	                            rs = locinfo_svclistadds(lip,argp,argl) ;
 	                        }
@@ -1132,7 +1130,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                cfname = argp ;
 	                        } else
@@ -1161,7 +1159,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                pr = argp ;
 	                        } else
@@ -1173,7 +1171,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                lip->termtype = argp ;
 	                        } else
@@ -1219,7 +1217,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl) {
 	                                KEYOPT	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
@@ -1238,7 +1236,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl) {
 	                                ulong	ulw ;
 	                                rs = cfdecmful(argp,argl,&ulw) ;
@@ -1264,7 +1262,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = xstrlen(argp) ;
 	                            if (argl)
 	                                un = argp ;
 	                        } else
@@ -2628,7 +2626,7 @@ static int procbacks(PROGINFO *pip)
 	        shio_printf(pip->efp,fmt,pn,ebuf,el) ;
 	    }
 
-	    if ((tp = strnrpbrk(ebuf,el,"/.")) != NULL) {
+	    if ((tp = strnrbrk(ebuf,el,"/.")) != NULL) {
 	        if (tp[0] == '.') {
 	            el = (tp-ebuf) ;
 	            ebuf[el] = '\0' ;
@@ -3544,7 +3542,7 @@ static int procdocbodyfooterleft(PROGINFO *pip,HTM *hdp)
 	if ((rs = htm_tagbegin(hdp,"div","left",NULL,NULL)) >= 0) {
 	    LOCINFO	*lip = pip->lip ;
 	    if ((rs = htm_tagbegin(hdp,"p","center",NULL,NULL)) >= 0) {
-	        const int	hlen = (strlen(lip->webmaster)+10) ;
+	        const int	hlen = (xstrlen(lip->webmaster)+10) ;
 	        cchar		*n = NULL ;
 	        cchar		*class = "center" ;
 	        cchar		*title = lip->webmaster ;
@@ -4274,10 +4272,10 @@ static int filedat_start(FILEDAT *fep,PROGINFO *pip,cchar *tt,int cols,
 	fep->to = to ;
 	fep->f_stackcheck = CF_STACKCHECK ;
 
-	size += (strlen(svc)+1) ;
-	size += (strnlen(fp,fl)+1) ;
+	size += (xstrlen(svc)+1) ;
+	size += (xstrnlen(fp,fl)+1) ;
 	if (tt != NULL) {
-	    size += (strlen(tt)+1) ;
+	    size += (xstrlen(tt)+1) ;
 	}
 	if ((rs = uc_malloc(size,&bp)) >= 0) {
 	    const int	dsize = FILEDAT_DSIZE ;
@@ -4777,7 +4775,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 	        oi = vecstr_findaddr(slp,*epp) ;
 	    }
 	    if (vp != NULL) {
-	        len = strnlen(vp,vl) ;
+	        len = xstrnlen(vp,vl) ;
 	        rs = vecstr_store(slp,vp,len,epp) ;
 	    } else {
 	        *epp = NULL ;
@@ -5008,7 +5006,7 @@ static int locinfo_svclistadd(LOCINFO *lip,cchar *vp,int vl)
 	    cchar	st[] = { 
 	        CH_FS, 0 		} ;
 	    cchar	*sp ;
-	    if (vl < 0) vl = strlen(vp) ;
+	    if (vl < 0) vl = xstrlen(vp) ;
 	    while (vl > 0) {
 	        if ((sl = sfnextbrk(vp,vl,st,&sp)) < 0) break ;
 #if	CF_DEBUG
@@ -5645,7 +5643,7 @@ int locinfo_tmpourdname(LOCINFO *lip)
 	        }
 	    } /* end if */
 	} else {
-	    pl = strlen(lip->tmpourdname) ;
+	    pl = xstrlen(lip->tmpourdname) ;
 	}
 
 	return (rs >= 0) ? pl : rs ;

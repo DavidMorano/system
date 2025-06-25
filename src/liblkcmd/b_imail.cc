@@ -1,5 +1,5 @@
 /* b_imail SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in to return load averages */
@@ -93,6 +93,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<ucmallreg.h>
+#include	<getourenv.h>
 #include	<mktmp.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -129,7 +130,10 @@
 #include	<snuuid.h>
 #include	<pcsns.h>
 #include	<opentmp.h>
+#include	<strn.h>
 #include	<strw.h>		/* |strwset(3uc)| */
+#include	<strwcpy.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
@@ -280,13 +284,6 @@ extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strwcpyuc(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_edate(time_t,char *) ;
 extern char	*timestr_hdate(time_t,char *) ;
@@ -684,7 +681,7 @@ static int	locinfo_opentmpfile(LOCINFO *,char *,int,cchar *) ;
 static int	locinfo_tmpcheck(LOCINFO *) ;
 static int	locinfo_tmpmaint(LOCINFO *) ;
 static int	locinfo_tmpdone(LOCINFO *) ;
-static int	locinfo_fchmodown(LOCINFO *,int,struct ustat *,mode_t) ;
+static int	locinfo_fchmodown(LOCINFO *,int,ustat *,mode_t) ;
 static int	locinfo_cvtdate(LOCINFO *,char *,cchar *,int) ;
 static int	locinfo_msgpriority(LOCINFO *,cchar *,int) ;
 static int	locinfo_xmailer(LOCINFO *) ;
@@ -2854,7 +2851,7 @@ static int procspec(PROGINFO *pip,cchar np[],int nl)
 
 	    if ((rs = mkbestaddr(bestaddr,nl,np,nl)) >= 0) {
 	        cint	bal = rs ;
-	        if ((bal > 1) && (strnpbrk(bestaddr,bal,"@!") != nullptr)) {
+	        if ((bal > 1) && (strnbrk(bestaddr,bal,"@!") != nullptr)) {
 	            rs = locinfo_loadrecip(lip,bestaddr,bal) ;
 	            c += rs ;
 	        } else {
@@ -7432,7 +7429,7 @@ static int locinfo_cmbfname(LOCINFO *lip,char mbfname[])
 	            rs = mkpath1(mbfname,mb) ;
 	            len = rs ;
 	        } else {
-	            struct ustat	sb ;
+	            ustat	sb ;
 	            char		mfdname[MAXPATHLEN+1] ;
 
 	            if (mf[0] == '/') {
@@ -8020,7 +8017,7 @@ static int locinfo_tmpmaint(LOCINFO *lip)
 	    const mode_t	om = 0666 ;
 	    cint		of = (O_WRONLY|O_CREAT) ;
 	    if ((rs = u_open(tsfname,of,om)) >= 0) {
-	        struct ustat	usb ;
+	        ustat	usb ;
 	        cint	fd = rs ;
 	        if ((rs = u_fstat(fd,&usb)) >= 0) {
 	            time_t	dt = pip->daytime ;
@@ -8067,7 +8064,7 @@ static int locinfo_tmpdone(LOCINFO *lip)
 /* end subroutine (locinfo_tmpdone) */
 
 
-static int locinfo_fchmodown(LOCINFO *lip,int fd,struct ustat *sbp,mode_t mm)
+static int locinfo_fchmodown(LOCINFO *lip,int fd,ustat *sbp,mode_t mm)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -8237,7 +8234,7 @@ static int locinfo_loadprids(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	if (lip->uid_pr < 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = u_stat(pip->pr,&sb)) >= 0) {
 	        lip->uid_pr = sb.st_uid ;
 	        lip->gid_pr = sb.st_gid ;
@@ -8461,7 +8458,7 @@ static int locinfo_folderdname(LOCINFO *lip)
 	    if (rs >= 0) {
 	        cint	tl = rs ;
 	        cint	rsn = SR_NOENT ;
-	        struct ustat	sb ;
+	        ustat	sb ;
 	        if ((rs = uc_stat(tbuf,&sb)) == rsn) {
 	            if ((rs = mkdirs(tbuf,0775)) >= 0) {
 	                if (pip->euid != pip->uid) {
@@ -9781,7 +9778,7 @@ static int loadpathspec(PROGINFO *pip,cchar *pp)
 	int		c = 0 ;
 	cchar		*tp ;
 
-	while ((tp = strpbrk(pp,":;")) != nullptr) {
+	while ((tp = strbrk(pp,":;")) != nullptr) {
 	    pl = (tp - pp) ;
 	    rs = loadpathcomp(pip,pp,pl) ;
 	    c += rs ;

@@ -1,5 +1,5 @@
 /* b_ismailaddr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in to test for local mail-addresses */
@@ -63,6 +63,8 @@
 #include	<pwd.h>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<getax.h>
+#include	<getourenv.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<userinfo.h>
@@ -71,7 +73,7 @@
 #include	<kvsfile.h>
 #include	<nulstr.h>
 #include	<storebuf.h>
-#include	<getax.h>
+#include	<strn.h>
 #include	<pwi.h>
 #include	<prgetclustername.h>
 #include	<mailaddr.h>
@@ -141,11 +143,6 @@ extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_elapsed(time_t,char *) ;
 
@@ -1659,7 +1656,7 @@ static int addrcompact(char *rbuf,int rlen,cchar *np,int nl)
 	rbuf[0] = '\0' ;
 	if (nl < 0) nl = strlen(np) ;
 
-	while ((tp = strnpbrk(np,nl," \t")) != NULL) {
+	while ((tp = strnbrk(np,nl," \t")) != NULL) {
 	    if ((tp-np) > 0) {
 	        rs = storebuf_strw(rbuf,rlen,i,np,(tp-np)) ;
 	        i += rs ;
