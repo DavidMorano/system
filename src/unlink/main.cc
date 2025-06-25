@@ -539,7 +539,7 @@ const char	*envv[] ;
 	    argl = strlen(argp) ;
 
 #if	CF_DEBUGS
-	    debugprintf("main: arg consider=>%t<\n",argp,argl) ;
+	    debugprintf("main: arg consider=>%r<\n",argp,argl) ;
 #endif
 
 	    f_optminus = (*argp == '-') ;
@@ -1304,7 +1304,7 @@ const char	*envv[] ;
 
 	if ((rs >= 0) && (pip->younger == 0)) {
 	    if ((yfname != NULL) && (yfname[0] != '\0')) {
-	        struct ustat	sb ;
+	        ustat	sb ;
 	        int rs1 = uc_stat(yfname,&sb) ;
 	        if (rs1 >= 0) {
 	            pip->have.younger = TRUE ;
@@ -1948,7 +1948,7 @@ struct proginfo	*pip ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            debugprintf("main/procfts: v=%t\n",vp,vl) ;
+	            debugprintf("main/procfts: v=%r\n",vp,vl) ;
 #endif
 
 	        if (fti >= 0) {
@@ -2380,7 +2380,7 @@ FSDIRTREE_STAT	*sbp ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("main/procother: suf=%t \n",sp,sl) ;
+	            debugprintf("main/procother: suf=%r \n",sp,sl) ;
 #endif
 
 /* check against the suffix-required list */
@@ -2649,7 +2649,7 @@ struct proginfo	*pip ;
 #if	CF_DEBUG
 	                            if (DEBUGLEVEL(3) && (rs < INT_MAX))
 	                                debugprintf("main/procsufbegin: "
-					    "suf=%t\n",
+					    "suf=%r\n",
 	                                    vp,vl) ;
 #endif
 
@@ -2831,7 +2831,7 @@ const char	*po ;
 
 	    while ((vl = paramopt_fetch(pop,po,&cur,&vp)) >= 0) {
 
-	        rs1 = bprintf(pip->efp,"%s: ft=%t\n", pip->progname,vp,vl) ;
+	        rs1 = bprintf(pip->efp,"%s: ft=%r\n", pip->progname,vp,vl) ;
 	        if (rs1 > 0) wlen += rs1 ;
 
 	    } /* end while */
@@ -2867,7 +2867,7 @@ const char	*po ;
 
 	    while ((vl = paramopt_fetch(pop,po,&cur,&vp)) >= 0) {
 
-	        rs1 = bprintf(pip->efp,"%s: suf=%t\n",pip->progname,vp,vl) ;
+	        rs1 = bprintf(pip->efp,"%s: suf=%r\n",pip->progname,vp,vl) ;
 	        if (rs1 > 0) wlen += rs1 ;
 
 	    } /* end while */
@@ -3383,7 +3383,7 @@ FSDIRTREE_STAT	*sbp ;
 {
 	struct utimbuf	ut ;
 
-	struct ustat	dsb ;
+	ustat	dsb ;
 
 	size_t		fsize = 0 ;
 
@@ -3460,7 +3460,7 @@ FSDIRTREE_STAT	*sbp ;
 	        dnl = sfdirname(dstfname,-1,&dnp) ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            debugprintf("main/procsyncer_reg: dst dname=%t\n",dnp,dnl) ;
+	            debugprintf("main/procsyncer_reg: dst dname=%r\n",dnp,dnl) ;
 #endif
 	        rs = SR_OK ;
 	        if (dnl > 0) {
@@ -3499,7 +3499,7 @@ FSDIRTREE_STAT	*sbp ;
 	    if (dnl > 0) {
 	        rs = mkpath1w(tmpfname,dnp,dnl) ;
 	        if (rs >= 0) {
-	            struct ustat	sb ;
+	            ustat	sb ;
 	            int	rs1 = u_lstat(tmpfname,&sb) ;
 	            int	f = FALSE ;
 	            if (rs1 >= 0) {
@@ -3632,7 +3632,7 @@ FSDIRTREE_STAT	*sbp ;
 {
 	struct utimbuf	ut ;
 
-	struct ustat	dsb ;
+	ustat	dsb ;
 
 	const mode_t	nm = (sbp->st_mode & (~ S_IFMT)) | DMODE ;
 
@@ -3719,7 +3719,7 @@ FSDIRTREE_STAT	*sbp ;
 	    if (dnl > 0) {
 	        rs = mkpath1w(tmpfname,dnp,dnl) ;
 	        if (rs >= 0) {
-	            struct ustat	sb ;
+	            ustat	sb ;
 	            int	rs1 = u_lstat(tmpfname,&sb) ;
 	            int	f = FALSE ;
 	            if (rs1 >= 0) {
@@ -3767,7 +3767,7 @@ struct proginfo	*pip ;
 const char	name[] ;
 FSDIRTREE_STAT	*sbp ;
 {
-	struct ustat	dsb ;
+	ustat	dsb ;
 
 	const mode_t	dm = DMODE ;
 
@@ -3864,7 +3864,7 @@ FSDIRTREE_STAT	*sbp ;
 	    if (dnl > 0) {
 	        rs = mkpath1w(tmpfname,dnp,dnl) ;
 	        if (rs >= 0) {
-	            struct ustat	sb ;
+	            ustat	sb ;
 	            int	rs1 = u_lstat(tmpfname,&sb) ;
 	            int	f = FALSE ;
 	            if (rs1 >= 0) {

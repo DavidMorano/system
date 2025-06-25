@@ -80,7 +80,7 @@ struct proginfo	*pip ;
 const char	namespec[] ;
 ULONG		trunclen ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	ULONG	flen ;
 

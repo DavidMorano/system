@@ -93,7 +93,7 @@ const char	*envv[] ;
 
 	struct sigaction	ss ;
 	sigset_t	signalmask ;
-	struct ustat	sb ;
+	ustat	sb ;
 	struct dirstat	*dsp ;
 	struct tm	ts, *timep ;
 	struct utimbuf	ft ;

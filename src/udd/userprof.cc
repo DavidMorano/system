@@ -63,7 +63,7 @@ struct utsname		uts ;
 int userprof(up)
 struct userprof	*up ;
 {
-	struct ustat		stats ;
+	ustat		stats ;
 
 	struct tm		*timep ;
 

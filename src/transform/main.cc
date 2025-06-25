@@ -133,7 +133,7 @@ const char	*argv[] ;
 const char	*envp[] ;
 {
 	struct proginfo	g, *pip = &g ;
-	struct ustat	sb ;
+	ustat	sb ;
 	bfile		errfile, *efp = &errfile ;
 	bfile		infile, *ifp = &infile ;
 	bfile		outfile, *ofp = &outfile ;

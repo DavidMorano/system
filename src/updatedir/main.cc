@@ -8,11 +8,11 @@
 
 
 /*
-	= 1992-03-01, David A.D. Morano
+	= 1992-03-01, David A-D- Morano
 	
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 

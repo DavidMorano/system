@@ -154,7 +154,7 @@ static int	(*scheds[])(SUBINFO *) = {
 
 int unlinkd(cchar *fname,int delay)
 {
-	struct stat	sb ;
+	USTAT	sb ;
 	int		rs ;
 	int		rs1 ;
 
@@ -225,7 +225,7 @@ static int subinfo_fork(SUBINFO *sip)
 	int		rs1 ;
 
 	if ((rs = u_fork()) == 0) {
-	    struct stat	sb ;
+	    USTAT	sb ;
 	    time_t	ti_expire ;
 	    pid_t	pid = rs ;
 	    int		i ;

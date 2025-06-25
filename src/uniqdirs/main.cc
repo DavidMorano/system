@@ -1,5 +1,5 @@
 /* main SUPPORT (UNIQDIRS) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* generic fron-end subroutine */
@@ -1008,7 +1008,7 @@ static int locinfo_diradd(LOCINFO *lip,cchar *sp,int sl)
 	if (pip == NULL) return SR_FAULT ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("main/locinfo_diradd: dir=%t\n",sp,sl) ;
+	    debugprintf("main/locinfo_diradd: dir=%r\n",sp,sl) ;
 #endif
 	rs = dirdb_add(dirp,sp,sl) ;
 	return rs ;

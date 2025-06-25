@@ -847,7 +847,7 @@ int		nl ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("process: np=>%t<\n",np,nl) ;
+	    debugprintf("process: np=>%r<\n",np,nl) ;
 #endif
 
 	flen = lip->trunclen ;
@@ -897,7 +897,7 @@ int		nl ;
 	    rs = fperm(fd,-1,-1,NULL,W_OK) ;
 
 	if (rs >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 		if (S_ISREG(sb.st_mode)) {
 		    if (pip->debuglevel > 0) {
