@@ -1,5 +1,5 @@
 /* mailfiles_parse SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* subroutine to parse MAILPATH */
@@ -48,9 +48,10 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strpbrk(3c)| */
+#include	<cstring>		/* |strbrk(3c)| */
 #include	<usystem.h>
 #include	<cfdec.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"mailfiles.h"
@@ -86,7 +87,7 @@ int mailfiles_parse(mailfiles *op,cchar *mailpath) noex {
 	if ((rs = mailfiles_magic(op,mailpath)) >= 0) {
 	    bool	fdone = false ;
 	    cchar	*cp = mailpath ;
-	    for (cc *tp ; (tp = strpbrk(cp,":?")) != np ; ) {
+	    for (cc *tp ; (tp = strbrk(cp,":?")) != np ; ) {
 		if ((tp - cp) >= 0) {
 		    cint	cl = intconv(tp - cp) ;
 	            rs = mailfiles_add(op,cp,cl) ;
