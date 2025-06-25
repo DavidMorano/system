@@ -1,5 +1,5 @@
 /* mailalias HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* manage local mail-aliases */
@@ -62,9 +62,9 @@ struct mailalias_information {
 
 struct mailalias_finfo {
 	ino_t		ino ;
-	dev_t		dev ;
 	time_t		mtime ;
 	size_t		fsize ;
+	dev_t		dev ;
 } ;
 
 struct mailalias_flags {
