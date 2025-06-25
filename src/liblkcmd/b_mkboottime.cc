@@ -1032,7 +1032,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *fp,int fl)
 	    NULSTR	ns ;
 	    cchar	*fname ;
 	    if ((rs = nulstr_start(&ns,fp,fl,&fname)) >= 0) {
-	        struct ustat	sb ;
+	        ustat	sb ;
 	        const mode_t	om = 0664 ;
 
 	        if ((rs = u_stat(fname,&sb)) == SR_NOENT) {

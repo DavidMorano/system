@@ -1,14 +1,14 @@
 /* b_pathenum */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* front-end subroutine */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	CF_DEBUG	0		/* debug print-outs switchable */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_GETEV	1		/* use 'getev(3dam)' */
-
 
 /* revision history:
 
@@ -21,16 +21,14 @@
 
 /*******************************************************************************
 
-	This is the front-end for retrieving environment variables and
-	outputting them in a packaged-up format for SHELL interpretation.
+	This is the front-end for retrieving environment variables
+	and outputting them in a packaged-up format for SHELL
+	interpretation.
 
 	Synopsis:
-
 	$ pathenum <varname>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -52,9 +50,11 @@
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<nulstr.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -73,15 +73,15 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	getev(const char **,const char *,int,const char **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
+extern int	getev(cchar **,cchar *,int,cchar **) ;
 extern int	isalnumlatin(int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -92,16 +92,11 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -114,7 +109,7 @@ extern char	**environ ;		/* definition required by AT&T AST */
 struct locinfo {
 	uint		magic ;
 	PROGINFO	*pip ;
-	const char	*es ;
+	cchar	*es ;
 } ;
 
 
@@ -126,24 +121,24 @@ static int	usage(PROGINFO *) ;
 
 static int	procopts(PROGINFO *,KEYOPT *) ;
 static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procname(PROGINFO *,SHIO *,const char *,int) ;
-static int	printit(PROGINFO *,SHIO *,const char *,int) ;
-static int	isenvnameok(const char *,int) ;
+static int	procname(PROGINFO *,SHIO *,cchar *,int) ;
+static int	printit(PROGINFO *,SHIO *,cchar *,int) ;
+static int	isenvnameok(cchar *,int) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_setes(LOCINFO *,const char *) ;
-static int	locinfo_getes(LOCINFO *,const char **) ;
+static int	locinfo_setes(LOCINFO *,cchar *) ;
+static int	locinfo_getes(LOCINFO *,cchar **) ;
 static int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_DEBUG || CF_DEBUGS
-static int	locinfo_debug(LOCINFO *,const char *) ;
-static int	strdeblen(const char *) ;
+static int	locinfo_debug(LOCINFO *,cchar *) ;
+static int	strdeblen(cchar *) ;
 #endif
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"DEBUG",
@@ -192,7 +187,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"es",
 	NULL
 } ;
@@ -213,7 +208,7 @@ int b_pathenum(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -259,14 +254,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -688,8 +683,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ainfo.ai_pos = ai_pos ;
 
 	if (rs >= 0) {
-	    const char	*ofn = ofname ;
-	    const char	*afn = afname ;
+	    cchar	*ofn = ofname ;
+	    cchar	*afn = afname ;
 	    rs = procargs(pip,&ainfo,&pargs,ofn,afn) ;
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;
@@ -767,8 +762,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	if (pip->efp != NULL) {
 
@@ -837,7 +832,7 @@ static int locinfo_finish(LOCINFO *lip)
 static int locinfo_setes(LOCINFO *lip,cchar *es)
 {
 	int		rs = SR_OK ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (lip == NULL) return SR_FAULT ;
 
@@ -910,7 +905,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -968,7 +963,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	if ((rs = shio_open(ofp,ofn,"r",0666)) >= 0) {
 	    int		pan = 0 ;
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    if (rs >= 0) {
 	        int	ai ;
@@ -1082,7 +1077,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 #endif
 
 	if (isenvnameok(np,nl)) {
-	    const char	*sp ;
+	    cchar	*sp ;
 
 #if	CF_GETEV
 	    rs = getev(pip->envv,np,nl,&sp) ;
@@ -1104,9 +1099,9 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 #endif
 
 	    if (rs >= 0) {
-	        const char	*tp ;
+	        cchar	*tp ;
 
-	        while ((tp = strpbrk(sp,":;")) != NULL) {
+	        while ((tp = strbrk(sp,":;")) != NULL) {
 
 	            c += 1 ;
 	            rs = printit(pip,ofp,sp,(tp - sp)) ;
@@ -1162,7 +1157,7 @@ static int printit(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 /* handle an empty string with the option of an empty-string value */
 
 	if (sl == 0) {
-	    const char	*es ;
+	    cchar	*es ;
 	    if ((rs = locinfo_getes(lip,&es)) > 0) {
 	        if (es != NULL) {
 	            sp = es ;

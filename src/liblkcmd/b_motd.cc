@@ -1,4 +1,5 @@
 /* b_motd SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in for Message-of-the-Day (MOTD) */
@@ -48,6 +49,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This is a built-in command to the KSH shell.  It should
 	also be able to be made into a stand-alone program without
 	much (if almost any) difficulty, but I have not done that
@@ -98,17 +100,22 @@
 #include	<sys/wait.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<csignal>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<pwd.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<ugetpw.h>
 #include	<ucmallreg.h>
 #include	<getbufsize.h>
+#include	<getusername.h>
+#include	<getutmpent.h>
+#include	<getoutenv.h>
+#include	<getax.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -116,11 +123,7 @@
 #include	<vecstr.h>
 #include	<vecpstr.h>
 #include	<vecobj.h>
-#include	<getax.h>
-#include	<ugetpw.h>
-#include	<getusername.h>
 #include	<lfm.h>
-#include	<getutmpent.h>
 #include	<fsdir.h>
 #include	<ptm.h>
 #include	<filer.h>
@@ -133,6 +136,9 @@
 #include	<buffer.h>
 #include	<spawner.h>
 #include	<opentmp.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<timestr.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -146,11 +152,6 @@
 
 
 /* local typedefs */
-
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
-typedef const char	cchar ;
-#endif
 
 
 /* local defines */
@@ -245,7 +246,7 @@ extern int	mkgecosname(char *,int,cchar *) ;
 extern int	termwritable(cchar *) ;
 extern int	acceptpass(int,struct strrecvfd *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
@@ -275,17 +276,6 @@ extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strdcpy2(char *,int,cchar *,cchar *) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnrpbrk(cchar *,int,cchar *) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -420,7 +410,7 @@ static int	locinfo_mdname(LOCINFO *) ;
 static int	locinfo_tmpcheck(LOCINFO *) ;
 static int	locinfo_tmpmaint(LOCINFO *) ;
 static int	locinfo_tmpdone(LOCINFO *) ;
-static int	locinfo_fchmodown(LOCINFO *,int,struct ustat *,mode_t) ;
+static int	locinfo_fchmodown(LOCINFO *,int,ustat *,mode_t) ;
 static int	locinfo_getgid(LOCINFO *) ;
 static int	locinfo_chgrp(LOCINFO *,cchar *) ;
 static int	locinfo_termoutbegin(LOCINFO *,void *) ;
@@ -1733,7 +1723,7 @@ static int procbackcheck(PROGINFO *pip)
 
 static int procmntcheck(PROGINFO *pip)
 {
-	struct ustat	usb ;
+	ustat	usb ;
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	cchar		*pn = pip->progname ;
@@ -1779,7 +1769,7 @@ static int procbacks(PROGINFO *pip)
 	        shio_printf(pip->efp,fmt,pn,ebuf,el) ;
 	    }
 
-	    if ((tp = strnrpbrk(ebuf,el,"/.")) != NULL) {
+	    if ((tp = strnrbrk(ebuf,el,"/.")) != NULL) {
 	        if (tp[0] == '.') {
 	            el = (tp-ebuf) ;
 	            ebuf[el] = '\0' ;
@@ -3074,7 +3064,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 		oi = vecstr_findaddr(slp,*epp) ;
 	    }
 	    if (vp != NULL) {
-	        len = strnlen(vp,vl) ;
+	        len = xstrnlen(vp,vl) ;
 	        rs = vecstr_store(slp,vp,len,epp) ;
 	    } else {
 	        *epp = NULL ;
@@ -3238,7 +3228,7 @@ static int locinfo_tmpmaint(LOCINFO *lip)
 	    const mode_t	om = 0666 ;
 	    const int		of = (O_WRONLY|O_CREAT) ;
 	    if ((rs = u_open(tsfname,of,om)) >= 0) {
-	        struct ustat	usb ;
+	        ustat	usb ;
 	        const int	fd = rs ;
 	        if ((rs = u_fstat(fd,&usb)) >= 0) {
 	            time_t	dt = pip->daytime ;
@@ -3285,7 +3275,7 @@ static int locinfo_tmpdone(LOCINFO *lip)
 /* end subroutine (locinfo_tmpdone) */
 
 
-static int locinfo_fchmodown(LOCINFO *lip,int fd,struct ustat *sbp,mode_t mm)
+static int locinfo_fchmodown(LOCINFO *lip,int fd,ustat *sbp,mode_t mm)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -3650,7 +3640,7 @@ static int locinfo_loadprids(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	if (lip->uid_pr < 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = u_stat(pip->pr,&sb)) >= 0) {
 	        lip->uid_pr = sb.st_uid ;
 	        lip->gid_pr = sb.st_gid ;

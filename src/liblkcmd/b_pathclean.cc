@@ -1,8 +1,9 @@
 /* b_pathclean */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* front-end subroutine */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	CF_DEBUG	0		/* debug print-outs switchable */
@@ -10,7 +11,6 @@
 #define	CF_VECSTRDELALL	1		/* use 'vecstr_delall(3dam)' */
 #define	CF_DYNAMICALLOC	0		/* dynamic stack allocation */
 #define	CF_LOCLOADPATHS	0		/* "locinfo_loadpaths()| */
-
 
 /* revision history:
 
@@ -24,17 +24,13 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ pathclean path(s) [-j]
 
 	Notes:
-
-	This is not entirely pretty everywhere.  But it works, and is certainly
-	well enough for the present purposes.
-
+	This is not entirely pretty everywhere.  But it works, and
+	is certainly well enough for the present purposes.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -57,11 +53,13 @@
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<paramopt.h>
 #include	<storebuf.h>
+#include	<strn.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -82,18 +80,18 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	vecstr_adduniq(VECSTR *,const char *,int) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
+extern int	pathclean(char *,cchar *,int) ;
+extern int	vecstr_adduniq(VECSTR *,cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;
@@ -103,17 +101,11 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -146,26 +138,26 @@ static int	usage(PROGINFO *) ;
 
 static int	procopts(PROGINFO *,KEYOPT *) ;
 static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procname(PROGINFO *,SHIO *,const char *,int) ;
-static int	procpath(PROGINFO *,const char *,int) ;
+static int	procname(PROGINFO *,SHIO *,cchar *,int) ;
+static int	procpath(PROGINFO *,cchar *,int) ;
 static int	procjoin(PROGINFO *,SHIO *) ;
-static int	printit(PROGINFO *,SHIO *,const char *) ;
+static int	printit(PROGINFO *,SHIO *,cchar *) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
 static int	locinfo_nmax(LOCINFO *,int) ;
-static int	locinfo_loadpath(LOCINFO *,const char *,int) ;
+static int	locinfo_loadpath(LOCINFO *,cchar *,int) ;
 static int	locinfo_mkjoin(LOCINFO *,char *,int) ;
 static int	locinfo_finishpaths(LOCINFO *) ;
 static int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_LOCLOADPATHS
-static int	locinfo_loadpaths(LOCINFO *,const char *,int) ;
+static int	locinfo_loadpaths(LOCINFO *,cchar *,int) ;
 #endif /* CF_LOCLOADPATHS */
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"DEBUG",
@@ -214,7 +206,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"join",
 	"exists",
 	NULL
@@ -237,7 +229,7 @@ int b_pathclean(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -284,14 +276,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -701,8 +693,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ainfo.ai_pos = ai_pos ;
 
 	if (rs >= 0) {
-	    const char	*ofn = ofname ;
-	    const char	*afn = afname ;
+	    cchar	*ofn = ofname ;
+	    cchar	*afn = afname ;
 	    rs = procargs(pip,&ainfo,&pargs,ofn,afn) ;
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;
@@ -784,8 +776,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	if (pip->efp != NULL) {
 
@@ -848,7 +840,7 @@ static int locinfo_loadpaths(LOCINFO *lip,cchar *sp,int sl)
 	int		rs = SR_OK ;
 	int		cl ;
 	cchar		*tp, *cp ;
-	while ((tp = strnpbrk(sp,sl," \r\n\t,")) != NULL) {
+	while ((tp = strnbrk(sp,sl," \r\n\t,")) != NULL) {
 
 	    cp = sp ;
 	    cl = (tp - sp) ;
@@ -894,7 +886,7 @@ static int locinfo_mkjoin(LOCINFO *lip,char pbuf[],int plen)
 	int		bl = 0 ;
 	int		c = 0 ;
 	int		f_semi = FALSE ;
-	const char	*sp ;
+	cchar	*sp ;
 
 	for (i = 0 ; vecstr_get(&lip->paths,i,&sp) >= 0 ; i += 1) {
 	    if (sp == NULL) continue ;
@@ -903,7 +895,7 @@ static int locinfo_mkjoin(LOCINFO *lip,char pbuf[],int plen)
 
 		rs1 = SR_OK ;
 		if (lip->f.exists) {
-		    struct ustat	sb ;
+		    ustat	sb ;
 		    rs1 = u_stat(sp,&sb) ;
 		    if ((rs1 >= 0) && (! S_ISDIR(sb.st_mode))) 
 			rs1 = SR_NOTDIR ;
@@ -959,7 +951,7 @@ static int locinfo_finishpaths(LOCINFO *lip)
 #else /* CF_VECSTRDELALL */
 	{
 	    int		i ;
-	    const char	*sp ;
+	    cchar	*sp ;
 	    for (i = 0 ; vecstr_get(&lip->paths,i,&sp) >= 0 ; i += 1) {
 	        if (sp == NULL) continue ;
 	        rs1 = vecstr_del(&lip->paths,i--) ;
@@ -978,7 +970,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1039,8 +1031,8 @@ static int procargs(pip,aip,bop,ofname,afname)
 PROGINFO	*pip ;
 ARGINFO	*aip ;
 BITS		*bop ;
-const char	*ofname ;
-const char	*afname ;
+cchar	*ofname ;
+cchar	*afname ;
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1054,7 +1046,7 @@ const char	*afname ;
 	    LOCINFO	*lip = pip->lip ;
 	    int		pan = 0 ;
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    if (rs >= 0) {
 		int	ai ;
@@ -1157,7 +1149,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar sp[],int sl)
 	int		rs = SR_OK ;
 	int		cl ;
 	int		c = 0 ;
-	const char	*tp, *cp ;
+	cchar	*tp, *cp ;
 
 	if (sp == NULL) return SR_FAULT ;
 
@@ -1168,7 +1160,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar sp[],int sl)
 	    debugprintf("b_pathclean/procname: name=>%r<\n",sp,sl) ;
 #endif
 
-	while ((tp = strnpbrk(sp,sl,":;")) != NULL) {
+	while ((tp = strnbrk(sp,sl,":;")) != NULL) {
 
 	    cp = sp ;
 	    cl = (tp - sp) ;

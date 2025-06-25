@@ -1,4 +1,5 @@
 /* b_mxalias SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* front-end subroutine */
@@ -46,15 +47,17 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<getusername.h>
+#include	<getourenv.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
 #include	<estrings.h>
 #include	<ascii.h>
 #include	<hdbstr.h>
-#include	<getusername.h>
 #include	<ucmallreg.h>
 #include	<sfx.h>
+#include	<strn.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -95,7 +98,7 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecui(cchar *,int,uint *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	haswhite(cchar *,int) ;
 extern int	isalphalatin(int) ;
 extern int	isdigitlatin(int) ;
@@ -111,12 +114,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */

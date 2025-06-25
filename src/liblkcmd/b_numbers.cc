@@ -1,4 +1,5 @@
 /* b_numbers SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* SHELL built-in to return load averages */
@@ -43,12 +44,14 @@
 #include	<cstring>
 #include	<ctime>
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
 #include	<estrings.h>
 #include	<cfdec.h>
 #include	<pow.h>
+#include	<strn.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -97,10 +100,6 @@ extern "C" int	debugclose() ;
 extern "C" int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern "C" cchar	*getourenv(cchar **,cchar *) ;
-
-extern "C" char	*strwcpy(char *,cchar *,int) ;
-extern "C" char	*strnpbrk(cchar *,int,cchar *) ;
 extern "C" char	*timestr_log(time_t,char *) ;
 extern "C" char	*timestr_elapsed(time_t,char *) ;
 
@@ -180,7 +179,7 @@ struct numpair {
 	    if (hasalpha(sp,sl)) {
 		rs = loadkey(sp,sl) ;
 	    } else {
-	        if ((tp = strnpbrk(sp,sl,",:-жн╖д \t")) != NULL) {
+	        if ((tp = strnbrk(sp,sl,",:-жн╖д \t")) != NULL) {
 		    kp = (tp+1) ;
 		    kl = ((sp+sl)-(tp+1)) ;
 		    nl = (tp-sp) ;

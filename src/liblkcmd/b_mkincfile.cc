@@ -994,7 +994,7 @@ static int procdata(PROGINFO *pip,void *ofp,cchar *fname)
 #endif
 
 	if ((rs = shio_open(ifp,fname,"r",0666)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = shio_stat(ifp,&sb)) >= 0) {
 
 	        if (rs >= 0) {
