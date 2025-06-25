@@ -1,12 +1,12 @@
-/* mfs-config */
+/* mfs-config SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* handle MFS configuration functions */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-
 
 /* revision history:
 
@@ -22,29 +22,29 @@
 
 /*******************************************************************************
 
-        These subroutines form part of the MFS program (yes, getting a little
-        bit more complicated every day now).
-
+  	Description:
+	These subroutines form part of the MFS program (yes, getting
+	a little bit more complicated every day now).
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<paramfile.h>
 #include	<expcook.h>
 #include	<logfile.h>
 #include	<prmkfname.h>
+#include	<strwcpy.h>
+#include	<strwcmp.h>
 #include	<localmisc.h>
 
 #include	"mfsmain.h"
@@ -58,7 +58,7 @@
 
 #ifndef	TYPEDEF_CCHAR
 #define	TYPEDEF_CCHAR	1
-typedef const char	cchar ;
+typedef cchar	cchar ;
 #endif
 
 
@@ -87,42 +87,31 @@ typedef const char	cchar ;
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	cfdecmfi(cchar *,int,int *) ;
 extern int	ctdeci(char *,int,int) ;
-extern int	optbool(const char *,int) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	strwcmp(const char *,const char *,int) ;
+extern int	optbool(cchar *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnrpbrk(cchar *,int,cchar *) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */

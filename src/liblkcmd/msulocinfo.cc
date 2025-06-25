@@ -1,5 +1,5 @@
 /* msu-locinfo SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* MSU-locinfo (extra code) */
@@ -416,7 +416,7 @@ int locinfo_tmpourdname(LOCINFO *lip)
 
 	    if (rs >= 0) {
 	        if ((rs = mkpath3(tmpourdname,tn,rn,sn)) >= 0) {
-		    struct ustat	sb ;
+		    ustat	sb ;
 	            pl = rs ;
 	            if ((rs = u_stat(tmpourdname,&sb)) >= 0) {
 	    		int		f_needmode = FALSE ;
@@ -721,7 +721,7 @@ static int locinfo_lockbeginone(LOCINFO *lip,LFM *lfp,cchar *lockfname)
 
 	    cl = sfdirname(lockfname,-1,&cp) ;
 	    if ((rs = mkpath1w(tmpfname,cp,cl)) >= 0) {
-		struct ustat	usb ;
+		ustat	usb ;
 		rs1 = u_stat(tmpfname,&usb) ;
 		if ((rs1 >= 0) && (! S_ISDIR(usb.st_mode))) rs1 = SR_NOTDIR ;
 		if (rs1 == SR_NOENT) {

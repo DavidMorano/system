@@ -568,7 +568,7 @@ static int msuclients_bind(MSUCLIENTS *op,int f)
 
 static int msuclients_connect(MSUCLIENTS *op)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 
 #if	CF_DEBUGS

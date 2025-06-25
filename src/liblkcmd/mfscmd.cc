@@ -1,18 +1,18 @@
-/* mfs-cmd */
+/* mfs-cmd SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* client-side code to initiate commands to the server */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
-
 
 /* revision history:
 
 	= 2008-09-01, David A­D­ Morano
-        This subroutine was adopted from the DWD program. I may not have changed
-        all of the comments correctly though!
+	This subroutine was adopted from the DWD program. I may not
+	have changed all of the comments correctly though!
 
 	= 2017-08-10, David A­D­ Morano
 	This subroutine was borrowed to code MFSERVE.
@@ -23,12 +23,14 @@
 
 /*******************************************************************************
 
-        These subroutines handle some IPC related functions. This is client-side
-        code which interacts with the server code (within the server (MFSERVE).
-
+  	Description:
+	These subroutines handle some IPC related functions. This
+	is client-side code which interacts with the server code
+	(within the server (MFSERVE).
 
 *******************************************************************************/
 
+#include	<envstandards.h>	/* MUST be first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -40,8 +42,6 @@
 #include	<shell.h>
 #endif
 
-#include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -50,10 +50,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
+#include	<timestr.h>
 #include	<localmisc.h>
 
 #include	"shio.h"
@@ -71,12 +72,12 @@
 /* external subroutines */
 
 extern int	snddd(char *,int,uint,uint) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	matostr(const char **,int,const char *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	isNotPresent(int) ;
 extern int	isBadSend(int) ;
 
@@ -88,11 +89,6 @@ extern int	progreqfile(PROGINFO *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*getourenv(cchar **,cchar *) ;
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnrpbrk(cchar *,int,cchar *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -135,11 +131,12 @@ enum cmds {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int mfscmd(PROGINFO *pip,cchar *ofn)
-{
+int mfscmd(PROGINFO *pip,cchar *ofn) {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		rs1 ;
