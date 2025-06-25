@@ -1,5 +1,5 @@
 /* ourmsginfo SUPPORT (Our_Message-Information) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* load and store certain mail-message information from the headers */
