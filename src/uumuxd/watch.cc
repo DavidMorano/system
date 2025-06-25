@@ -135,7 +135,7 @@ BUILTIN		*bip ;
 
 	struct sockaddr_in	from ;
 
-	struct ustat		sb ;
+	ustat		sb ;
 
 	JOBDB		jdb ;
 
@@ -513,7 +513,7 @@ VECSTR		*elp ;
 SRVTAB		*sfp ;
 BUILTIN		*bip ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	JOBDB		jdb ;
 
@@ -566,7 +566,7 @@ BUILTIN		*bip ;
 	    pid = uc_fork() ;
 
 	    if (pid == 0) {
-		struct ustat	sb ;
+		ustat	sb ;
 
 /* we are now the CHILD!! */
 
@@ -698,7 +698,7 @@ char	s[] ;
 {
 	bfile		file, *fp = &file ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int		tlen, len ;
 

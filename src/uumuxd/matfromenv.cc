@@ -63,7 +63,7 @@
 /* external subroutines */
 
 extern int	matcasestr(const char **,const char *,int) ;
-extern int	sibreak(const char *,int,const char *) ;
+extern int	sibrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -215,10 +215,10 @@ int		slen ;
 		return 0 ;
 
 #ifdef	COMMENT
-	    if (sibreak(from,(cp - from),":,;/") >= 0)
+	    if (sibrk(from,(cp - from),":,;/") >= 0)
 	        return 0 ;
 
-	    if (sibreak(from,(cp - from),"!@%") >= 0)
+	    if (sibrk(from,(cp - from),"!@%") >= 0)
 	        return fromindex ;
 #endif /* COMMENT */
 

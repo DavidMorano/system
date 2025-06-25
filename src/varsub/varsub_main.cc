@@ -1484,8 +1484,8 @@ char		fzfname[] ;
 {
 	bfile		filterfile, *ffp = &filterfile ;
 	bfile		fzfile, *zfp = &fzfile ;
-	struct ustat	fzstat ;
-	struct ustat	fstat ;
+	ustat	fzstat ;
+	ustat	fstat ;
 	FIELD		fsb ;
 	long		fzmagic ;
 	int	rs ;

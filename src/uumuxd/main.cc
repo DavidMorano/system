@@ -1,5 +1,5 @@
 /* main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* generic (pretty much) front end program subroutine */
@@ -191,7 +191,7 @@ char	*argv[], *envv[] ;
 	bfile		logfile ;
 	bfile		pidfile ;
 
-	struct ustat		sb ;
+	ustat		sb ;
 
 	struct global		*gp = &g ;
 

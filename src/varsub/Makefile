@@ -147,7 +147,7 @@ RM= rm -f
 INCS= config.h defs.h varsub.h
 
 
-OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o 
+OBJ00= varsub_main.o whatinfo.o proginfo.o proginfo_setpiv.o 
 OBJ01= 
 OBJ02=
 OBJ03= 
@@ -272,41 +272,12 @@ control:
 	date >> Control
 
 
-main.o:			main.c $(INCS)
+varsub_main.o:		varsub_main.cc				$(INCS)
 
 whatinfo.o:		whatinfo.c config.h
 
 proginfo.o:		proginfo.c defs.h
 
 proginfo_setpiv.o:	proginfo_setpiv.c defs.h
-
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-vecstr.o:		vecstr.c vecstr.h
-
-varsub.o:		varsub.c varsub.h
-
-varsub_loadfile.o:	varsub_loadfile.c varsub.h
-
-varsub_extra.o:		varsub_extras.c varsub.h
-
-buffer.o:		buffer.c buffer.h
-
-vecobj.o:		vecobj.c vecobj.h lookaside.h
-
-lookaside.o:		lookaside.c lookaside.h pq.h
-
-pq.o:			pq.c pq.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
 
 

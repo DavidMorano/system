@@ -158,7 +158,7 @@ int	argc ;
 char	*argv[] ;
 char	*envv[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	struct proginfo	pi, *pip = &pi ;
 
@@ -795,7 +795,7 @@ char	*envv[] ;
 /* open a block to enumerate the server entries */
 
 	{
-	    struct ustat	sb ;
+	    ustat	sb ;
 
 	    MSGID		db ;
 
