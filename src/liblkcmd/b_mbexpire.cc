@@ -943,7 +943,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 static int procmailbox(PROGINFO *pip,void *ofp,cchar *msfname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;

@@ -1,14 +1,14 @@
 /* b_mailalias */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* front-end subroutine */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	CF_DEBUG	0		/* debug print-outs switchable */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_LOCSETENT	0		/* allow |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -21,16 +21,13 @@
 
 /*******************************************************************************
 
-	This little program looks up system mail-alias names and prints out the
-	corresponding values.
+	This little program looks up system mail-alias names and
+	prints out the corresponding values.
 
 	Synopsis:
-
 	$ mailalias <alias(es)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -53,12 +50,14 @@
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
 #include	<estrings.h>
 #include	<ids.h>
 #include	<nulstr.h>
+#include	<strn.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -106,7 +105,7 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	haswhite(const char *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isalphalatin(int) ;
@@ -123,11 +122,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */

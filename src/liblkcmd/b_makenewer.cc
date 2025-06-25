@@ -1,5 +1,5 @@
 /* b_makenewer SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in to return load averages */
@@ -62,6 +62,7 @@
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<estrings.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -70,6 +71,8 @@
 #include	<field.h>
 #include	<fsdirtree.h>
 #include	<sigblocker.h>
+#include	<strn.h>
+#include	<strwcpy.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -93,19 +96,19 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	removes(const char *) ;
-extern int	mkdirs(const char *,mode_t) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	sfskipwhite(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
+extern int	vstrkeycmp(cchar **,cchar **) ;
+extern int	removes(cchar *) ;
+extern int	mkdirs(cchar *,mode_t) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -115,18 +118,12 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -158,7 +155,7 @@ struct locinfo {
 	PROGINFO	*pip ;
 	vecstr		sufmaps ;
 	vecstr		sufsubs ;
-	const char	*tardname ;
+	cchar	*tardname ;
 	uid_t		euid ;
 	int		younger ;
 	int		c_processed ;
@@ -168,12 +165,12 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,const char **,const char **,void *) ;
+static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_tardname(LOCINFO *,const char *) ;
+static int	locinfo_tardname(LOCINFO *,cchar *) ;
 static int	locinfo_sufbegin(LOCINFO *) ;
 static int	locinfo_sufend(LOCINFO *) ;
 static int	locinfo_sufmap(LOCINFO *,cchar *,int) ;
@@ -181,33 +178,33 @@ static int	locinfo_finish(LOCINFO *) ;
 
 static int	procopts(PROGINFO *,KEYOPT *) ;
 static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procsufsub(PROGINFO *,const char *,int) ;
-static int	procsufxxx(PROGINFO *,vecstr *,const char *,int) ;
-static int	procsufadd(PROGINFO *,vecstr *,const char *,int) ;
-static int	proctouchfile(PROGINFO *,const char *) ;
-static int	procname(PROGINFO *,void *,const char *) ;
+static int	procsufsub(PROGINFO *,cchar *,int) ;
+static int	procsufxxx(PROGINFO *,vecstr *,cchar *,int) ;
+static int	procsufadd(PROGINFO *,vecstr *,cchar *,int) ;
+static int	proctouchfile(PROGINFO *,cchar *) ;
+static int	procname(PROGINFO *,void *,cchar *) ;
 static int	procdir(PROGINFO *,void *,cchar *,FSDIRTREESTAT *) ;
 static int	procfile(PROGINFO *,void *,cchar *,FSDIRTREESTAT *) ;
-static int	procfiler(PROGINFO *,void *,struct ustat *,cchar *) ;
-static int	procdisposition(PROGINFO *,const char *,int) ;
+static int	procfiler(PROGINFO *,void *,ustat *,cchar *) ;
+static int	procdisposition(PROGINFO *,cchar *,int) ;
 static int	procfilesuf(PROGINFO *,vecstr *,char *,cchar *,int) ;
 static int	openaccess(cchar *,int,mode_t,int) ;
 
-static int	procout_begin(PROGINFO *,void *,const char *) ;
+static int	procout_begin(PROGINFO *,void *,cchar *) ;
 static int	procout_end(PROGINFO *,void *) ;
 
-static int	mknewfname(char *,const char *,const char *,cchar *,cchar *) ;
+static int	mknewfname(char *,cchar *,cchar *,cchar *,cchar *) ;
 
-static int	sufclean(char *,int,const char *,int) ;
+static int	sufclean(char *,int,cchar *,int) ;
 
 #ifdef	COMMENT
-static int	mkpdirs(const char *,mode_t) ;
+static int	mkpdirs(cchar *,mode_t) ;
 #endif
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -257,7 +254,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"rmfile",
 	"rmsuf",
 	"follow",
@@ -277,7 +274,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	*suffers[] = {
+static cchar	*suffers[] = {
 	"sufsub",
 	"sufmap",
 	NULL
@@ -300,7 +297,7 @@ int b_makenewer(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -329,7 +326,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	struct ustat	sb ;
+	ustat	sb ;
 	BITS		pargs ;
 	KEYOPT		akopts ;
 	SHIO		errfile ;
@@ -350,16 +347,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_version = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*tardname = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*touchfname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*tardname = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*touchfname = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -1039,8 +1036,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* done */
 	if ((rs < 0) && (! pip->f.quiet)) {
-	    const char	*pn = pip->progname ;
-	    const char	*fmt = "%s: could not perform function (%d)\n" ;
+	    cchar	*pn = pip->progname ;
+	    cchar	*fmt = "%s: could not perform function (%d)\n" ;
 	    shio_printf(pip->efp,fmt,pn,rs) ;
 	}
 
@@ -1134,8 +1131,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	if (pip->efp != NULL) {
 
@@ -1230,7 +1227,7 @@ static int locinfo_sufend(LOCINFO *lip)
 /* end subroutine (locinfo_sufend) */
 
 
-static int locinfo_tardname(LOCINFO *lip,const char *tardname)
+static int locinfo_tardname(LOCINFO *lip,cchar *tardname)
 {
 
 	if (lip == NULL)
@@ -1298,7 +1295,7 @@ static int procsufxxx(PROGINFO *pip,vecstr *slp,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*tp ;
+	cchar	*tp ;
 
 	if (sl < 0) sl = strlen(sp) ;
 
@@ -1355,7 +1352,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1574,7 +1571,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procout_begin(PROGINFO *pip,void *ofp,const char *ofn)
+static int procout_begin(PROGINFO *pip,void *ofp,cchar *ofn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1598,7 +1595,7 @@ static int procout_end(PROGINFO *pip,void *ofp)
 	int		rs1 ;
 
 	if (lip->f.print || (pip->verboselevel > 1)) {
-	    const char	*pn = pip->progname ;
+	    cchar	*pn = pip->progname ;
 	    rs1 = shio_close(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    if (rs1 < 0) {
@@ -1906,10 +1903,10 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname,FSDIRTREESTAT *sbp)
 /* end subroutine (procfile) */
 
 
-static int procfiler(PROGINFO *pip,void *ofp,struct ustat *ssbp,cchar *fname)
+static int procfiler(PROGINFO *pip,void *ofp,ustat *ssbp,cchar *fname)
 {
 	LOCINFO		*lip = pip->lip ;
-	struct ustat	dsb ;
+	ustat	dsb ;
 	const mode_t	nm = (ssbp->st_mode & (~ S_IFMT)) | 0600 ;
 	uid_t		duid = -1 ;
 	size_t		fsize = 0 ;
@@ -1919,8 +1916,8 @@ static int procfiler(PROGINFO *pip,void *ofp,struct ustat *ssbp,cchar *fname)
 	int		f_create = FALSE ;
 	int		f_update = FALSE ;
 	int		f_updated = FALSE ;
-	const char	*tardname ;
-	const char	*bfp ;
+	cchar	*tardname ;
+	cchar	*bfp ;
 	char		altfname[MAXPATHLEN + 2] ;
 	char		dstfname[MAXPATHLEN + 2] ;
 	char		tmpfname[MAXPATHLEN + 1] ;
@@ -2030,7 +2027,7 @@ static int procfiler(PROGINFO *pip,void *ofp,struct ustat *ssbp,cchar *fname)
 	    cchar	*dnp ;
 	    if ((dnl = sfdirname(dstfname,-1,&dnp)) > 0) {
 	        if ((rs = mkpath1w(tmpfname,dnp,dnl)) >= 0) {
-	            struct ustat	sb ;
+	            ustat	sb ;
 	            const mode_t	dm = 0775 ;
 	            int			rs1 = u_lstat(tmpfname,&sb) ;
 	            int			f = FALSE ;
@@ -2234,8 +2231,8 @@ static int procfilesuf(PROGINFO *pip,vecstr *slp,char *nfname,cchar *np,int nl)
 	int		rs1 ;
 	int		bnl ;
 	int		fl = 0 ;
-	const char	*tp ;
-	const char	*bnp ;
+	cchar	*tp ;
+	cchar	*bnp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -2295,7 +2292,7 @@ static int openaccess(cchar *dstfname,int of,mode_t nm,int f_create)
 #endif
 	if ((rs == SR_ACCESS) && (! f_create)) {
 	    int		dnl ;
-	    const char	*dnp ;
+	    cchar	*dnp ;
 	    if ((dnl = sfdirname(dstfname,-1,&dnp)) > 0) {
 		char	tbuf[MAXPATHLEN+1] ;
 	        if ((rs = mkpath1w(tbuf,dnp,dnl)) >= 0) {
@@ -2405,7 +2402,7 @@ static int sufclean(char *rbuf,int rlen,cchar *sp,int sl)
 
 
 #ifdef	COMMENT
-static int mkpdirs(const char *tarfname,mode_t dm)
+static int mkpdirs(cchar *tarfname,mode_t dm)
 {
 	int		rs = SR_OK ;
 	int		dl ;

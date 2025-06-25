@@ -1,5 +1,5 @@
 /* b_mjd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is a SHELL built-in version of |mjd(1)| */

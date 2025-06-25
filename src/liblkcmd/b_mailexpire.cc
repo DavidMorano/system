@@ -1,15 +1,15 @@
 /* b_mailexpire */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* front-end to MailExpire */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_LOCPRINTF	0		/* |locinfo_eprintf()| */
 #define	CF_CONFIGCHECK	0		/* |config_check()| */
-
 
 /* revision history:
 
@@ -25,12 +25,9 @@
 	We expire old mail messages.
 
 	Synopsis:
-
 	$ mailexpire <mbfile(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -55,6 +52,7 @@
 #include	<time.h>
 
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<userinfo.h>
@@ -65,8 +63,9 @@
 #include	<vecstr.h>
 #include	<sysusernames.h>
 #include	<mailbox.h>
-#include	<toxc.h>
 #include	<prmkfname.h>
+#include	<strn.h>
+#include	<toxc.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -131,7 +130,7 @@ extern int	optvalue(cchar *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getuserhome(char *,int,cchar *) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -147,12 +146,6 @@ extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -1585,7 +1578,7 @@ static int procmailusers_env(PROGINFO *pip,cchar *var)
 	    int		cl ;
 	    cchar	*tp, *cp ;
 
-	    while ((tp = strnpbrk(sp,sl," :,\t\n")) != NULL) {
+	    while ((tp = strnbrk(sp,sl," :,\t\n")) != NULL) {
 
 	        if ((cl = sfshrink(sp,(tp - sp),&cp)) > 0) {
 	            if (cl > USERNAMELEN) cl = USERNAMELEN ;
@@ -1896,7 +1889,7 @@ static int procmailbox(PROGINFO *pip,cchar *mbp,int mbl)
 	            if ((rs = getuserhome(hbuf,hlen,mup)) >= 0) {
 	                char	mbuf[MAXPATHLEN+1] ;
 	                if ((rs = mkpath3w(mbuf,hbuf,folder,mp,ml)) > 0) {
-	                    struct ustat	sb ;
+	                    ustat	sb ;
 	                    if (u_stat(mbuf,&sb) >= 0) {
 	                        if ((rs = sperm(idp,&sb,am)) >= 0) {
 	                            rs = procmailboxone(pip,mup,mbuf,to) ;

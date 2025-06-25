@@ -1,13 +1,13 @@
 /* b_mailforward */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* update the machine status for the current machine */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -20,37 +20,33 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  It should also be able to
-	be made into a stand-alone program without much (if almost any)
-	difficulty, but I have not done that yet (we already have a MSU program
-	out there).
-
-	Note that special care needed to be taken with the child processes
-	because we cannot let them ever return normally !  They cannot return
-	since they would be returning to a KSH program that thinks it is alive
-	(!) and that geneally causes some sort of problem or another.  That is
-	just some weird thing asking for trouble.  So we have to take care to
-	force child processes to exit explicitly.  Child processes are only
+	This is a built-in command to the KSH shell.  It should
+	also be able to be made into a stand-alone program without
+	much (if almost any) difficulty, but I have not done that
+	yet (we already have a MSU program out there).  Note that
+	special care needed to be taken with the child processes
+	because we cannot let them ever return normally !  They
+	cannot return since they would be returning to a KSH program
+	that thinks it is alive (!) and that geneally causes some
+	sort of problem or another.  That is just some weird thing
+	asking for trouble.  So we have to take care to force child
+	processes to exit explicitly.  Child processes are only
 	created when run in "daemon" mode.
 
 	Synopsis:
-
 	$ mailforward <addr(s)>
 
-
 	Implementation note:
-
-	It is difficult to close files when run as a SHELL builtin!  We want to
-	close files when we run in the background, but when running as a SHELL
-	builtin, we cannot close file descriptors untill after we fork (else we
-	corrupt the enclosing SHELL).  However, we want to keep the files
-	associated with persistent objects open across the fork.  This problem
-	is under review.  Currently, there is not an adequate self-contained
-	solution.
-
+	It is difficult to close files when run as a SHELL builtin!
+	We want to close files when we run in the background, but
+	when running as a SHELL builtin, we cannot close file
+	descriptors untill after we fork (else we corrupt the
+	enclosing SHELL).  However, we want to keep the files
+	associated with persistent objects open across the fork.
+	This problem is under review.  Currently, there is not an
+	adequate self-contained solution.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -77,6 +73,7 @@
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecint.h>
@@ -87,6 +84,8 @@
 #include	<expcook.h>
 #include	<logfile.h>
 #include	<prmkfname.h>
+#include	<strn.h>
+#include	<strwcpy.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -123,26 +122,26 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	mklogid(char *,int,const char *,int,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfskipwhite(cchar *,int,cchar **) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
+extern int	mklogid(char *,int,cchar *,int,int) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
+extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,cchar *,cchar *) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -152,16 +151,12 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 extern char	*timestr_loga(time_t,char *) ;
@@ -202,13 +197,13 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 static int	usage(PROGINFO *) ;
 
 static int	progstate_start(PROGSTATE *,PROGINFO *) ;
-static int	progstate_nums(PROGSTATE *,const char *,int) ;
-static int	progstate_ema(PROGSTATE *,const char *,int) ;
+static int	progstate_nums(PROGSTATE *,cchar *,int) ;
+static int	progstate_ema(PROGSTATE *,cchar *,int) ;
 static int	progstate_finish(PROGSTATE *) ;
 
 static int	procmailbox(PROGINFO *,PROGSTATE *) ;
 
-static int	config_start(CONFIG *,PROGINFO *,const char *) ;
+static int	config_start(CONFIG *,PROGINFO *,cchar *) ;
 static int	config_check(CONFIG *) ;
 static int	config_read(CONFIG *) ;
 static int	config_finish(CONFIG *) ;
@@ -216,7 +211,7 @@ static int	config_finish(CONFIG *) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"VERSION",
 	"VERBOSE",
 	"ROOT",
@@ -244,7 +239,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	*sched1[] = {
+static cchar	*sched1[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -252,7 +247,7 @@ static const char	*sched1[] = {
 	NULL
 } ;
 
-static const char	*params[] = {
+static cchar	*params[] = {
 	"cmd",
 	"maildir",
 	"loglen",
@@ -305,7 +300,7 @@ int b_mailforward(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -333,8 +328,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	PROGSTATE	ps, *psp = &ps ;
-	struct ustat	sb ;
-	struct ustat	*sbp = (struct ustat *) &sb ;
+	ustat	sb ;
+	ustat	*sbp = (ustat *) &sb ;
 	CONFIG	co ;
 	BITS		pargs ;
 	KEYOPT		akopts ;
@@ -365,17 +360,17 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_list = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cfname = NULL ;
-	const char	*maildname = NULL ;
-	const char	*mailuser = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cfname = NULL ;
+	cchar	*maildname = NULL ;
+	cchar	*mailuser = NULL ;
+	cchar	*cp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 
@@ -1129,8 +1124,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-speed[=name]] [-msfile file]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1212,20 +1207,20 @@ static int progstate_finish(PROGSTATE *psp)
 /* get numbers */
 static int progstate_nums(psp,ap,al)
 PROGSTATE	*psp ;
-const char	*ap ;
+cchar	*ap ;
 int		al ;
 {
 	int		rs = SR_OK ;
 	int		cl ;
 	int		v ;
 	int		c = 0 ;
-	const char	*tp ;
-	const char	*cp ;
+	cchar	*tp ;
+	cchar	*cp ;
 
 	if (al < 0)
 		al = strlen(ap) ;
 
-	while ((rs >= 0) && al && ((tp = strnpbrk(ap,al," \t,")) != NULL)) {
+	while ((rs >= 0) && al && ((tp = strnbrk(ap,al," \t,")) != NULL)) {
 
 		cp = (char *) ap ;
 		cl = (tp - ap) ;
@@ -1327,7 +1322,7 @@ static int config_start(CONFIG *op,PROGINFO *pip,cchar *cfname)
 	        debugprintf("config_start: cfname=%s\n",tmpfname) ;
 #endif
 
-	    rs = paramfile_open(&op->p,(const char **) pip->envv,tmpfname) ;
+	    rs = paramfile_open(&op->p,(cchar **) pip->envv,tmpfname) ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))

@@ -1,8 +1,9 @@
 /* b_mbproc */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a MAILBOX (in certain ways) */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -12,7 +13,6 @@
 #define	CF_CONFIG	1		/* config */
 #define	CF_CONFIGREAD	1		/* |config_read()| */
 #define	CF_LOGID	1		/* |locinfo_logid()| */
-
 
 /* revision history:
 
@@ -25,26 +25,23 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  It should also be able to
-	be made into a stand-alone program without much (if almost any)
-	difficulty, but I have not done that yet (we already have a MSU program
-	out there).
-
-	Note that special care needed to be taken with the child processes
-	because we cannot let them ever return normally!  They cannot return
-	since they would be returning to a KSH program that thinks it is alive
-	(!) and that geneally causes some sort of problem or another.  That is
-	just some weird thing asking for trouble.  So we have to take care to
-	force child processes to exit explicitly.  Child processes are only
+	This is a built-in command to the KSH shell.  It should
+	also be able to be made into a stand-alone program without
+	much (if almost any) difficulty, but I have not done that
+	yet (we already have a MSU program out there).  Note that
+	special care needed to be taken with the child processes
+	because we cannot let them ever return normally!  They
+	cannot return since they would be returning to a KSH program
+	that thinks it is alive (!) and that geneally causes some
+	sort of problem or another.  That is just some weird thing
+	asking for trouble.  So we have to take care to force child
+	processes to exit explicitly.  Child processes are only
 	created when run in "daemon" mode.
 
 	Synopsis:
-
 	$ mailnew [-u <user>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -73,6 +70,7 @@
 
 #include	<usystem.h>
 #include	<ucmallreg.h>
+#include	<getourenv.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -88,10 +86,11 @@
 #include	<mailbox.h>
 #include	<mailmsghdrs.h>
 #include	<mbcache.h>
-#include	<char.h>
 #include	<bfile.h>
 #include	<tmtime.hh>
 #include	<strw.h>		/* |strwset(3uc)| */
+#include	<strn.h>
+#include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -190,12 +189,6 @@ extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*strdcpy1w(char *,int,const char *,int) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;

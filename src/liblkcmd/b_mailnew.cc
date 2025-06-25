@@ -1,8 +1,9 @@
-/* b_mailnew */
+/* b_mailnew SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* update the machine status for the current machine */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -10,7 +11,6 @@
 #define	CF_LOCSETENT	0		/* |locinfo_setentry()| */
 #define	CF_LOCEPRINTF	0		/* |locinfo_eprintf()| */
 #define	CF_CONFIGCHECK	0		/* |config_check()| */
-
 
 /* revision history:
 
@@ -23,21 +23,24 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  It should also be able to
-	be made into a stand-alone program without much (if almost any)
-	difficulty, but I have not done that yet (we already have a MSU program
-	out there).
+  	Name:
+	b_mailnew
 
-	Note that special care needed to be taken with the child processes
-	because we cannot let them ever return normally!  They cannot return
-	since they would be returning to a KSH program that thinks it is alive
-	(!) and that geneally causes some sort of problem or another.  That is
-	just some weird thing asking for trouble.  So we have to take care to
-	force child processes to exit explicitly.  Child processes are only
+	Description:
+	This is a built-in command to the KSH shell.  It should
+	also be able to be made into a stand-alone program without
+	much (if almost any) difficulty, but I have not done that
+	yet (we already have a MSU program out there).  Note that
+	special care needed to be taken with the child processes
+	because we cannot let them ever return normally!  They
+	cannot return since they would be returning to a KSH program
+	that thinks it is alive (!) and that geneally causes some
+	sort of problem or another.  That is just some weird thing
+	asking for trouble.  So we have to take care to force child
+	processes to exit explicitly.  Child processes are only
 	created when run in "daemon" mode.
 
 	Synopsis:
-
 	$ mailnew [-u <user>]
 
 	Notes:
@@ -47,9 +50,7 @@
 	- default	hh:mm			(5 bytes)
 	- long		CC-Mmm-DD hh:mm		(15 bytes)
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -76,7 +77,7 @@
 #include	<netdb.h>
 
 #include	<usystem.h>
-#include	<char.h>
+#include	<getourenv.h>
 #include	<tmtime.hh>
 #include	<sntmtime.h>
 #include	<bits.h>
@@ -94,6 +95,10 @@
 #include	<mbcache.h>
 #include	<hdrdecode.h>
 #include	<prmkfname.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<strx.h>
+#include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -193,15 +198,7 @@ extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpycompact(char *,cchar *,int) ;
 extern char	*strdcpycompact(char *,int,cchar *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strwcpywide(char *,int *,wchar_t *,int) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 extern char	*timestr_elapsed(time_t,char *) ;
@@ -1867,7 +1864,7 @@ static int procmaildirs(PROGINFO *pip,PARAMOPT *pop)
 
 	    for (i = 0 ; varmaildirs[i] != NULL ; i += 1) {
 	        if ((dns = getourenv(pip->envv,varmaildirs[i])) != NULL) {
-	            while ((tp = strpbrk(dns," :,\t\n")) != NULL) {
+	            while ((tp = strbrk(dns," :,\t\n")) != NULL) {
 	                rs = procmaildir(pip,pop,dns,(tp-dns)) ;
 	                c += rs ;
 	                dns = (tp+1) ;
@@ -1912,7 +1909,7 @@ static int procmaildir(PROGINFO *pip,PARAMOPT *pop,cchar *dp,int dl)
 	if ((rs = paramopt_haveval(pop,po,dp,dl)) == 0) {
 	    char	dname[MAXPATHLEN+1] ;
 	    if ((rs = mkpath1w(dname,dp,dl)) > 0) {
-	        struct ustat	sb ;
+	        ustat	sb ;
 	        if ((rs = u_stat(dname,&sb)) >= 0) {
 	            rs = paramopt_loads(pop,po,dp,dl) ;
 	            c += rs ;
@@ -1981,7 +1978,7 @@ static int procmailusers_env(PROGINFO *pip,cchar *var)
 
 	    sl = strlen(sp) ;
 
-	    while ((tp = strnpbrk(sp,sl," :,\t\n")) != NULL) {
+	    while ((tp = strnbrk(sp,sl," :,\t\n")) != NULL) {
 
 	        if ((cl = sfshrink(sp,(tp - sp),&cp)) > 0) {
 	            if (cl > USERNAMELEN) cl = USERNAMELEN ;
