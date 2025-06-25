@@ -112,7 +112,7 @@ extern int	sfskipwhite(const char *,int,const char **) ;
 extern int	sfshrink(const char *,int,const char **) ;
 extern int	siskipwhite(const char *,int) ;
 extern int	sicasesub(const char *,int,const char *) ;
-extern int	sibreak(const char *,int,const char *) ;
+extern int	sibrk(const char *,int,const char *) ;
 extern int	nextfield(const char *,int,const char **) ;
 extern int	nleadcasestr(const char *,const char *,int) ;
 extern int	matstr(const char **,const char *,int) ;
@@ -1808,7 +1808,7 @@ static int proclines(PROGINFO *pip,WORDFILL *wp,cchar bvbuf[],int bvlen)
 {
 	int		rs = SR_OK ;
 
-	if (strnpbrk(bvbuf,bvlen,"[]") != NULL) {
+	if (strnbrk(bvbuf,bvlen,"[]") != NULL) {
 	    rs = procwords(pip,wp,bvbuf,bvlen) ;
 	} else {
 	    rs = wordfill_addlines(wp,bvbuf,bvlen) ;
@@ -1871,14 +1871,14 @@ static int procword(PROGINFO *pip,WORDFILL *wp,cchar *cp,int cl)
 
 	if (cl > 0) {
 
-	    if (strnpbrk(cp,cl,"[]") != NULL) {
+	    if (strnbrk(cp,cl,"[]") != NULL) {
 
 	        if (cp[0] == CH_LBRACK) {
 	            cp += 1 ;
 	            cl -= 1 ;
 	        }
 
-	        if (strnpbrk(cp,cl,"[]") != NULL) {
+	        if (strnbrk(cp,cl,"[]") != NULL) {
 	            rs = mkwordclean(wordbuf,WORDBUFLEN,cp,cl) ;
 	            cl = rs ;
 	            cp = wordbuf ;

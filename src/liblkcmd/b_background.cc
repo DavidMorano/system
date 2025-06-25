@@ -336,9 +336,9 @@ const char	*envv[] ;
 
 	struct session	sinfo ;
 
-	struct ustat32	sb ;
+	ustat32	sb ;
 
-	struct ustat	*sbp = (struct ustat *) &sb ;
+	ustat	*sbp = (ustat *) &sb ;
 
 	sigset_t	oldsigmask, newsigmask ;
 

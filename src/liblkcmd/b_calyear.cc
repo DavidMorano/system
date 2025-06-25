@@ -2300,7 +2300,7 @@ static int locinfo_loaddirs(LOCINFO *lip,cchar dp[],int dl)
 	    int		sl = (dl >= 0) ? dl : strlen(dp) ;
 	    cchar	*sp = dp ;
 	    cchar	*tp ;
-	    while ((rs >= 0) && ((tp = strnpbrk(sp,sl,":;")) != NULL)) {
+	    while ((rs >= 0) && ((tp = strnbrk(sp,sl,":;")) != NULL)) {
 	        rs = locinfo_loaddir(lip,sp,(tp - sp)) ;
 	        c += rs ;
 	        sl -= ((tp + 1) - sp) ;
@@ -2353,7 +2353,7 @@ static int locinfo_loadnames(LOCINFO *lip,cchar dp[],int dl)
 	    const char	*tp ;
 	    const char	*sp = dp ;
 	    int		sl = (dl >= 0) ? dl : strlen(dp) ;
-	    while ((tp = strnpbrk(sp,sl,":;. \t\r\n")) != NULL) {
+	    while ((tp = strnbrk(sp,sl,":;. \t\r\n")) != NULL) {
 	        rs = locinfo_loadname(lip,sp,(tp - sp)) ;
 	        c += rs ;
 	        sl -= ((tp + 1) - sp) ;

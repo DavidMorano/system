@@ -1023,7 +1023,7 @@ static int procfile(PROGINFO *pip,PROCOUT *pop,cchar *fn)
 
 static int procdata(PROGINFO *pip,PROCOUT *pop,int ifd)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		wlen = 0 ;
