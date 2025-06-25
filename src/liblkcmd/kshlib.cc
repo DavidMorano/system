@@ -1,9 +1,9 @@
-/* kshlib */
+/* kshlib SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C89 */
 
 /* library initialization for KSH built-in command libraries */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUGN	0		/* extra-special debugging */
@@ -14,7 +14,6 @@
 #define	CF_KSHRUN	1		/* run background under KSH */
 #define	CF_MQ		0		/* need |kshlib_mq()| */
 #define	CF_LOCMALSTRW	0		/* use local |mallocstrw()| */
-
 
 /* revision history:
 
@@ -35,13 +34,15 @@
 	lib_init
 
 	Description:
-        This subroutine is called by KSH when it loads this shared library. We
-        use this call to initialize some things that are partuclar to when
-        executing from within KSH. One of these is to set the underlying memory
-        management facility to implement a MUTEX lock around its operations.
-        This helps guard against a failure if the KSH-native version of the
-        normal memory management subroutines are somehow linked in (loaded)
-        rather than the standard default UNIX® system subroutines.
+	This subroutine is called by KSH when it loads this shared
+	library.  We use this call to initialize some things that
+	are partuclar to when executing from within KSH.  One of
+	these is to set the underlying memory management facility
+	to implement a MUTEX lock around its operations.  This helps
+	guard against a failure if the KSH-native version of the
+	normal memory management subroutines are somehow linked in
+	(loaded) rather than the standard default UNIX® system
+	subroutines.
 
 	Synopsis:
 	void lib_init(int flags,void *cxp)
@@ -56,35 +57,40 @@
 
 	------------------------------------------------------------------------
 	Name:
-
 	lib_initenviron
 
 	Description:
-        This subroutine is used to set the environment inside the
-        builtin-command (CMD) link-group to the same environment of our caller
-        (usually the SHELL itself). Depending on how this module is loaded, it
-        may be in the link-group of its parent (not at all unusual) or it may be
-        in its own link-group. In theory it could even be on its own link-map,
-        but that is not at all a typical situation so we ignore that for our
-        purposes. If this modeule is loaded into its own link-group, some means
-        has to be provided to set the 'environ' variable (above) to the
-        envionment of the calling parent (at least set to something). When the
-        builtin commands are called by the SHELL, they (the builtin commands)
-        are called directly from it. But the CMD link-group has its own copy of
-        the 'environ' variable which would not have yet been set at all by
-        anybody (any subroutine anywhere). So when CMDs are called by the SHELL,
-        the CMD subroutine itself calls 'lib_initenviron()' in order to set the
-        CMD link-group copy of the 'environ' variable to the same as what exists
-        wihtin the SHELL itself.
-        When CMDs are not called by the SHELL, but rather by some other means,
-        some other way to set the 'environ' variable has to be established.
-        Possible other ways are:
-        1. this subroutine is not linked in, so there is *no* separate copy of
-        'environ' in the first place (completely typical in regular programs)
-        2. by the caller instead calling the CMD subroutine though an
-        intermediate subroutine (like named 'lib_caller()') and which gets its
-        internal 'environ' copy set with that subroutine before the CMD
-        subroutine is called in turn.
+	This subroutine is used to set the environment inside the
+	builtin-command (CMD) link-group to the same environment
+	of our caller (usually the SHELL itself). Depending on how
+	this module is loaded, it may be in the link-group of its
+	parent (not at all unusual) or it may be in its own link-group.
+	In theory it could even be on its own link-map, but that
+	is not at all a typical situation so we ignore that for our
+	purposes. If this modeule is loaded into its own link-group,
+	some means has to be provided to set the 'environ' variable
+	(above) to the envionment of the calling parent (at least
+	set to something). When the builtin commands are called by
+	the SHELL, they (the builtin commands) are called directly
+	from it. But the CMD link-group has its own copy of the
+	'environ' variable which would not have yet been set at all
+	by anybody (any subroutine anywhere). So when CMDs are
+	called by the SHELL, the CMD subroutine itself calls
+	'lib_initenviron()' in order to set the CMD link-group copy
+	of the 'environ' variable to the same as what exists wihtin
+	the SHELL itself.  When CMDs are not called by the SHELL,
+	but rather by some other means, some other way to set the
+	'environ' variable has to be established.  Possible other
+	ways are:
+
+	1. this subroutine is not linked in, so there is *no*
+	separate copy of 'environ' in the first place (completely
+	typical in regular programs)
+
+	2. by the caller instead calling the CMD subroutine though
+	an intermediate subroutine (like named 'lib_caller()') and
+	which gets its internal 'environ' copy set with that
+	subroutine before the CMD subroutine is called in turn.
 
 	Synopsis:
 	int lib_initenviron(void *cxp)
@@ -99,21 +105,22 @@
 
 	------------------------------------------------------------------------
 	Name:
-
 	lib_caller
 
 	Description:
-	What in the world does this subroutine do?
-        This subroutine lets us call a command (CMD) function, otherwise known
-        as a command "builtin" (from the SHELL language on the subject) while
-        giving it an arbitrary environment determined by the caller. In the
-        infinite (short-sighted) wisdom of the creators of the builtin command
-        interface, it was neglected to provide the capability to pass an
-        arbitrary environment (like what is possible -- but not often used) with
-        regular UNIX® process calls (using 'exec(2)' and friends). Without this
-        subroutine, and having to call the command function directory, there is
-        no way to pass or to create a unique environment for the function since
-        it is forced to simply inherit the environment of the caller.
+	What in the world does this subroutine do?  This subroutine
+	lets us call a command (CMD) function, otherwise known as
+	a command "builtin" (from the SHELL language on the subject)
+	while giving it an arbitrary environment determined by the
+	caller. In the infinite (short-sighted) wisdom of the
+	creators of the builtin command interface, it was neglected
+	to provide the capability to pass an arbitrary environment
+	(like what is possible -- but not often used) with regular
+	UNIX® process calls (using 'exec(2)' and friends). Without
+	this subroutine, and having to call the command function
+	directory, there is no way to pass or to create a unique
+	environment for the function since it is forced to simply
+	inherit the environment of the caller.
 
 	Synopsis:
 	int lib_caller(func,argc,argv,envv,cxp)
@@ -136,33 +143,34 @@
 
 	------------------------------------------------------------------------
 	Name:
-
 	lib_initmemalloc
 
 	Description:
-        When CF_LOCKMEMALLOC is set (non-zero) above, the LOCKMEMALLOC facility
-        is (possibly) made available for use. Actual use depends on whether the
-        module (LOCKMEMALLOC) is available somewhere in the current link-map. If
-        it is indeed available, we turn it on (with the proper command). We do
-        this (turn it ON) because the KSH program does not provide mutex locks
-        around its memory allocation subroutines (which emulate |malloc(3c)| and
-        friends). Of course KSH does not use any of the standard system
-        subroutines because, well, that would be way too easy wouldn't it? The
-        KSH program thinks that it is better than everyone else and so it uses
-        its own memory-allocation facility. One problem: it did not protect its
-        own facility with mutex locks. It did not do this because the shell is
-        single threaded throughout. But this causes problems (like program
-        crashes) when some dynmically loaded code splits into a multi-threaded
-        mode. Yes, bang, a mess of the underlying memory-allocation system and
-        the expected program crash as a result. The use of the LOCKMEMALLOC
-        facility places mutex locks around all calls to the underlying memory
-        allocation subroutines. This can help but also might still not be enough
-        (since some shell code can still be used even within multi-threaded
-        code). But every little bit helps.
-        One would think that everything today is multi-thread safe, but NO.
-        There are still some hold-outs, and these hold-outs make it bad for
-        everybody!
-	Well, there it is.
+	When CF_LOCKMEMALLOC is set (non-zero) above, the LOCKMEMALLOC
+	facility is (possibly) made available for use. Actual use
+	depends on whether the module (LOCKMEMALLOC) is available
+	somewhere in the current link-map. If it is indeed available,
+	we turn it on (with the proper command). We do this (turn
+	it ON) because the KSH program does not provide mutex locks
+	around its memory allocation subroutines (which emulate
+	|malloc(3c)| and friends). Of course KSH does not use any
+	of the standard system subroutines because, well, that would
+	be way too easy wouldn't it? The KSH program thinks that
+	it is better than everyone else and so it uses its own
+	memory-allocation facility. One problem: it did not protect
+	its own facility with mutex locks. It did not do this because
+	the shell is single threaded throughout. But this causes
+	problems (like program crashes) when some dynmically loaded
+	code splits into a multi-threaded mode. Yes, bang, a mess
+	of the underlying memory-allocation system and the expected
+	program crash as a result. The use of the LOCKMEMALLOC
+	facility places mutex locks around all calls to the underlying
+	memory allocation subroutines. This can help but also might
+	still not be enough (since some shell code can still be
+	used even within multi-threaded code). But every little bit
+	helps.  One would think that everything today is multi-thread
+	safe, but NO.  There are still some hold-outs, and these
+	hold-outs make it bad for everybody!  Well, there it is.
 
 	Synospsis:
 	int lib_initmemalloc(int f)
@@ -178,22 +186,18 @@
 	Notes:
 
 	= Forked
-        We get forked, screwed, turned, rotated, twisted, yanked and pulled --
-        and probably a few other things. So we have to be very careful about
-        knowing who we are (our PID) and if the state of our address space and
-        threads are still valid.  This whole business is a real fork turner!
+	We get forked, screwed, turned, rotated, twisted, yanked
+	and pulled -- and probably a few other things. So we have
+	to be very careful about knowing who we are (our PID) and
+	if the state of our address space and threads are still
+	valid.  This whole business is a real fork turner!
 
 	= Aligned integer types?
 	"aligned |int|s are already atomic"
-        Well, yes, on almost every platform except for the old (original) DEC
-        Alpha architecture.
-
+	Well, yes, on almost every platform except for the old
+	(original) DEC Alpha architecture.
 
 *******************************************************************************/
-
-
-#define	KSHLIB_MASTER	1	/* claim excemption from own forwards */
-
 
 #include	<envstandards.h>
 
@@ -203,9 +207,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<csignal>
 #include	<dlfcn.h>
 #include	<poll.h>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 
 #include	<usystem.h>
@@ -219,6 +225,7 @@
 #include	<char.h>
 #include	<utmpacc.h>
 #include	<tmtime.hh>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -1368,7 +1375,7 @@ static int kshlib_autorun(KSHLIB *uip,cchar **envv)
 	    uip->f_autorun = TRUE ;
 	    if ((vp = getourenv(envv,VARKSHLIBRUN)) != NULL) {
 		cchar	*tp ;
-		while ((tp = strpbrk(vp," ,:")) != NULL) {
+		while ((tp = strbrk(vp," ,:")) != NULL) {
 		    if ((tp-vp) > 0) {
 		        rs = kshlib_autorunopt(uip,vp,(tp-vp)) ;
 			c += 1 ;
@@ -2522,7 +2529,7 @@ static int mallocstrw(cchar *sp,int sl,cchar **rpp)
 
 static int sdir(cchar *dname,int am)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	const mode_t	dm = 0777 ;
 	const int	nrs = SR_NOTFOUND ;
 	int		rs ;

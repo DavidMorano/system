@@ -1,5 +1,5 @@
 /* mfs-main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* update the machine status for the current machine */
@@ -87,12 +87,14 @@
 #include	<time.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<uinfo.h>
-#include	<userinfo.h>
 #include	<ugetpid.h>
 #include	<ugetpw.h>
+#include	<uinfo.h>
+#include	<ucmallreg.h>
+#include	<userinfo.h>
 #include	<getax.h>
 #include	<getusername.h>
+#include	<getourenv.h>
 #include	<gethz.h>
 #include	<estrings.h>
 #include	<cfdec.h>
@@ -100,9 +102,10 @@
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<ascii.h>
-#include	<toxc.h>
+#include	<strn.h>
 #include	<spawner.h>
-#include	<ucmallreg.h>
+#include	<timestr.h>
+#include	<toxc.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -172,7 +175,7 @@ extern int	getserial(const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;
 extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
 extern int	mkdirs(cchar *,mode_t) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	securefile(cchar *,uid_t,gid_t) ;
@@ -205,14 +208,6 @@ extern int	mfsdebug_lockprint(PROGINFO *,cchar *) ;
 extern int	zprintf(cchar *,cchar *,...) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnrpbrk(cchar *,int,cchar *) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
-
 
 /* external variables */
 
@@ -224,7 +219,7 @@ extern char	**environ ;
 
 /* forward references */
 
-static int	mfsmain(int,cchar *[],cchar *[],void *) ;
+static int	mfsmain(int,mainv,mainv,void *) ;
 
 static int	usage(PROGINFO *) ;
 
@@ -2469,7 +2464,7 @@ static int procpidfname(PROGINFO *pip)
 
 	    f_changed = TRUE ;
 	    if ((rs = mkpath2(rundname,pip->pr,RUNDNAME)) >= 0) {
-	        struct ustat	sb ;
+	        ustat	sb ;
 	        const int	rsn = SR_NOENT ;
 	        if ((rs = uc_stat(rundname,&sb)) >= 0) {
 	            if (! S_ISDIR(sb.st_mode)) rs = SR_NOTDIR ;
@@ -2669,7 +2664,7 @@ static int procmntcheck(PROGINFO *pip)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	if (lip->mntfname != NULL) {
-	    struct ustat	usb ;
+	    ustat	usb ;
 	    cchar		*pn = pip->progname ;
 	    cchar		*fmt ;
 	    if ((rs = u_stat(lip->mntfname,&usb)) >= 0) {
@@ -2714,7 +2709,7 @@ static int procbacks(PROGINFO *pip)
 	        shio_printf(pip->efp,fmt,pn,ebuf,el) ;
 	    }
 
-	    if ((tp = strnrpbrk(ebuf,el,"/.")) != NULL) {
+	    if ((tp = strnrbrk(ebuf,el,"/.")) != NULL) {
 	        if (tp[0] == '.') {
 	            el = (tp-ebuf) ;
 	            ebuf[el] = '\0' ;
