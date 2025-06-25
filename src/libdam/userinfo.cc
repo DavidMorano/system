@@ -1,5 +1,5 @@
 /* userinfo SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get user information from various databases */
