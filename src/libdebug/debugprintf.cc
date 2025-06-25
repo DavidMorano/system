@@ -424,7 +424,7 @@ int debugsetfd(int fd) noex {
 
 	ef.fd = 0 ; /* special case (use zero) */
 	if (fd >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((fd < FD_MAX) && ((rs = u_fstat(fd,&sb)) >= 0)) {
 	        ef.fd = fd ;
 	        ef.size = sb.st_size ;
@@ -465,7 +465,7 @@ int debugopen(cchar *fname) noex {
 	} /* end if */
 
 	if (rs >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    ef.fd = fd ;
 	    ef.size = 0 ;
 	    if ((rs = u_fstat(ef.fd,&sb)) >= 0) {
