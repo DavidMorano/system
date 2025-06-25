@@ -1,5 +1,5 @@
 /* b_smesg SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* this is an enhanced SHELL built-in version of 'mesg(1)' */
@@ -206,7 +206,7 @@ static int	usage(PROGINFO *) ;
 static int	procopts(PROGINFO *,KEYOPT *) ;
 static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
 static int	procmesg(PROGINFO *,SHIO *) ;
-static int	procmesgout(PROGINFO *,SHIO *,cchar *,struct ustat *) ;
+static int	procmesgout(PROGINFO *,SHIO *,cchar *,ustat *) ;
 static int	procnotes(PROGINFO *,ARGINFO *,BITS *,SHIO *,cchar *) ;
 static int	procnotesout(PROGINFO *,SHIO *) ;
 static int	procnoteouter(PROGINFO *,SHIO *,LOCNOTE *) ;
@@ -1450,7 +1450,7 @@ static int procmesg(PROGINFO *pip,SHIO *ofp)
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = locinfo_termdevbegin(lip)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    cchar		*termdev = lip->termdev ;
 	    if ((rs = uc_stat(termdev,&sb)) >= 0) {
 	        rs = procmesgout(pip,ofp,termdev,&sb) ;
@@ -1464,7 +1464,7 @@ static int procmesg(PROGINFO *pip,SHIO *ofp)
 /* end subroutine (procmesg) */
 
 
-static int procmesgout(PROGINFO *pip,SHIO *ofp,cchar *td,struct ustat *usbp)
+static int procmesgout(PROGINFO *pip,SHIO *ofp,cchar *td,ustat *usbp)
 {
 	LOCINFO		*lip = pip->lip ;
 	mode_t		newmode = usbp->st_mode ;
@@ -2405,7 +2405,7 @@ static int locinfo_typesadds(LOCINFO *lip,cchar *argp,int argl)
 	    int		sl = argl ;
 	    cchar	*sp = argp ;
 	    cchar	*tp ;
-	    while ((tp = strnpbrk(sp,sl," ,\t ")) != nullptr) {
+	    while ((tp = strnbrk(sp,sl," ,\t ")) != nullptr) {
 		if ((tp-sp) > 0) {
 		    rs = locinfo_typesadder(lip,sp,(tp-sp)) ;
 		    c += rs ;

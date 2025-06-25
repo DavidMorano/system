@@ -1277,7 +1277,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 	}
 
 	if (! f_stdin) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    int	rs1 = u_stat(fname,&sb) ;
 	    if (rs1 >= 0) f_fifo = S_ISFIFO(sb.st_mode) ;
 	}

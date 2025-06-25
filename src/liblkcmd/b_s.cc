@@ -1,5 +1,5 @@
 /* b_s SUPPORT (s) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* language=C89 */
 
 /* KSH built-in version of 's(1d)' */
@@ -73,6 +73,8 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<ucmallreg.h>
+#include	<getourenv.h>
+#include	<getusername.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -80,8 +82,9 @@
 #include	<sntmtime.h>
 #include	<sbuf.h>
 #include	<termstr.h>
-#include	<getusername.h>
 #include	<strw.h>		/* |strwset(3uc)| */
+#include	<strx.h>
+#include	<strwcpy.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 #include	<debug.h>
@@ -187,17 +190,6 @@ extern int	isNotPresent(int) ;
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,cchar *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*timestr_std(time_t,char *) ;
 extern char	*timestr_log(time_t,char *) ;
 
@@ -1645,7 +1637,7 @@ static int procmailusers(PROGINFO *pip)
 	    if ((sp = getourenv(pip->envv,var)) != NULL) {
 	        cchar	*tp ;
 		rs = 0 ;
-	        while ((rs >= 0) && ((tp = strpbrk(sp,",\t ")) != NULL)) {
+	        while ((rs >= 0) && ((tp = strbrk(sp,",\t ")) != NULL)) {
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
 	            debugprintf("b_s/procmailusers: got=>%r<\n",sp,(tp-sp)) ;
@@ -2551,7 +2543,7 @@ static int locinfo_prpcs(LOCINFO *lip,cchar *prpcs)
 	int		rs = SR_OK ;
 	if (lip->f.mailcheck) {
 	    if ((prpcs != NULL) && (prpcs[0] != '\0')) {
-		struct ustat	sb ;
+		ustat	sb ;
 		if ((rs = uc_stat(prpcs,&sb)) >= 0) {
 		    if (S_ISDIR(sb.st_mode)) {
 	                lip->prpcs = prpcs ;

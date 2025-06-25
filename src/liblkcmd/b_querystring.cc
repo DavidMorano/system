@@ -1,4 +1,5 @@
 /* b_querystring SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in to return load averages */
@@ -66,8 +67,10 @@
 #include	<keyopt.h>
 #include	<field.h>
 #include	<userinfo.h>
-#include	<char.h>
 #include	<querycstring>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -82,7 +85,7 @@
 
 #ifndef	TYPEDEF_CCHAR
 #define	TYPEDEF_CCHAR	1
-typedef const char	cchar ;
+typedef cchar	cchar ;
 #endif
 
 
@@ -96,11 +99,11 @@ typedef const char	cchar ;
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	sfskipwhite(cchar *,int,cchar **) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	matostr(cchar **,int,cchar *,int) ;
@@ -117,19 +120,13 @@ extern int	isNotPresent(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -153,7 +150,7 @@ struct locinfo_flags {
 struct locinfo {
 	LOCINFO_FL	have, f, changed, final ;
 	PROGINFO	*pip ;
-	const char	*utfname ;
+	cchar	*utfname ;
 	time_t		btime ;		/* machine boot-time */
 	uint		nprocs ;
 	uint		ncpus ;
@@ -179,7 +176,7 @@ static int	procuserinfo_logid(PROGINFO *) ;
 static int	procargs(PROGINFO *,ARGINFO *,BITS *,
 			cchar *,cchar *,cchar *,cchar *) ;
 static int	procinput(PROGINFO *,void *,cchar *) ;
-static int	procname(PROGINFO *,void *, const char *) ;
+static int	procname(PROGINFO *,void *, cchar *) ;
 static int	proclogline(PROGINFO *,cchar *) ;
 static int	proclog(PROGINFO *,cchar *,int,cchar *,int) ;
 
@@ -193,7 +190,7 @@ static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -245,7 +242,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"dummy",
 	NULL
 } ;
@@ -266,7 +263,7 @@ int b_querystring(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    cchar	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -312,16 +309,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*qs = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*qs = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -381,7 +378,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -581,7 +578,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -890,8 +887,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-qs <querystring>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -912,7 +909,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -968,13 +965,13 @@ static int procargs(pip,aip,bop,ofn,afn,ifn,qs)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 BITS		*bop ;
-const char	*ofn ;
-const char	*afn ;
-const char	*ifn ;
-const char	*qs ;
+cchar	*ofn ;
+cchar	*afn ;
+cchar	*ifn ;
+cchar	*qs ;
 {
 	SHIO		ofile, *ofp = &ofile ;
-	const int	to_open = -1 ;
+	cint	to_open = -1 ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1017,7 +1014,7 @@ const char	*qs ;
 	        if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
 	            while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1091,7 +1088,7 @@ static int procinput(PROGINFO *pip,void *ofp,cchar *ifn)
 	if (strcmp(ifn,"-") == 0) ifn = STDFNIN ;
 
 	if ((rs = shio_open(ifp,ifn,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		cl ;
 	    cchar	*cp ;
 	    char	lbuf[LINEBUFLEN + 1] ;
@@ -1217,7 +1214,7 @@ static int proclog(PROGINFO *pip,cchar *kp,int kl,cchar *vp,int vl)
 	if (pip->open.logprog) {
 	    LOGFILE	*lfp = &pip->lh ;
 	    cchar	*fmt = "· %r=%r" ;
-	    if ((vl > 0) && (strnpbrk(vp,vl," \t+-\"\'") != NULL)) {
+	    if ((vl > 0) && (strnbrk(vp,vl," \t+-\"\'") != NULL)) {
 	        fmt = "· %r=¦%r¦" ;
 	    }
 	    logfile_printf(lfp,fmt,kp,kl,vp,vl) ;
@@ -1248,7 +1245,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1284,13 +1281,13 @@ static int procuserinfo_logid(PROGINFO *pip)
 	if ((rs = lib_runmode()) >= 0) {
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
-	            const int	s = rs ;
-	            const int	plen = LOGIDLEN ;
-	            const int	pv = pip->pid ;
+	            cint	s = rs ;
+	            cint	plen = LOGIDLEN ;
+	            cint	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
-	                const int	slen = LOGIDLEN ;
+	                cint	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;

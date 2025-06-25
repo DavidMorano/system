@@ -1,4 +1,5 @@
 /* b_pt SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* SHELL built-in to find an item */
@@ -54,6 +55,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<estrings.h>
 #include	<cfdec.h>
 #include	<bits.h>
@@ -62,6 +64,8 @@
 #include	<ids.h>
 #include	<sbuf.h>
 #include	<fsdir.h>
+#include	<strn.h>
+#include	<strx.h>
 #include	<ischarx.h>
 #include	<iserror.h>
 #include	<isnot.h>
@@ -114,7 +118,7 @@ extern "C" int	matostr(cchar **,int,cchar *,int) ;
 extern "C" int	matpstr(cchar **,int,cchar *,int) ;
 extern "C" int	optbool(cchar *,int) ;
 extern "C" int	optvalue(cchar *,int) ;
-extern "C" int	sperm(IDS *,struct ustat *,int) ;
+extern "C" int	sperm(IDS *,ustat *,int) ;
 
 extern "C" int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern "C" int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
@@ -129,13 +133,6 @@ extern "C" int	strlinelen(cchar *,int,int) ;
 #if	CF_DEBUGN
 extern "C" int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern "C" cchar	*getourenv(cchar **,cchar *) ;
-
-extern "C" char	*strwcpy(char *,const char *,int) ;
-extern "C" char	*strnpbrk(const char *,int,const char *) ;
-extern "C" char	*strnchr(const char *,int,int) ;
-extern "C" char	*strnrchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -159,8 +156,8 @@ struct locinfo_ptypes {
 
 struct locinfo {
 	PROGINFO	*pip ;
-	const char	*po_pathnames ;
-	const char	*po_sections ;
+	cchar	*po_pathnames ;
+	cchar	*po_sections ;
 	LOCINFO_PT	pt ;
 	PARAMOPT	lists ;
 	IDS		id ;
@@ -172,7 +169,7 @@ struct locinfo {
 
 struct pathtry {
 	USTAT		*sbp ;
-	const char	*name ;
+	cchar	*name ;
 	char		*fname ;
 	int		namelen ;
 	int		pathlen ;
@@ -197,7 +194,7 @@ static int	usage(PROGINFO *) ;
 
 static int	procopts(PROGINFO *,KEYOPT *) ;
 static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procname(PROGINFO *,SHIO *,const char *) ;
+static int	procname(PROGINFO *,SHIO *,cchar *) ;
 static int	procpathname(PROGINFO *,SHIO *,cchar *,cchar *,int) ;
 static int	procpathtry(PROGINFO *,SHIO *,int,cchar *,int,cchar *,int) ;
 static int	procpathtry_cd(PROGINFO *,SHIO *,pathtry *) ;
@@ -224,12 +221,12 @@ static int	locinfo_finish(LOCINFO *) ;
 static int	locinfo_notdone(LOCINFO *,int) ;
 
 static int	matmandir(cchar *,int,cchar **) ;
-static int	isenvok(const char *) ;
+static int	isenvok(cchar *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"DEBUG",
@@ -278,7 +275,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"es",
 	NULL
 } ;
@@ -288,7 +285,7 @@ enum progopts {
 	progopt_overlast
 } ;
 
-static const char	*pathnames[] = {
+static cchar	*pathnames[] = {
 	VARCDPATH,
 	VARPATH,
 	VARFPATH,
@@ -312,13 +309,13 @@ enum pathnames {
 	pathname_overlast
 } ;
 
-static const char	*mannames[] = {
+static cchar	*mannames[] = {
 	"man",
 	"sman",
 	NULL
 } ;
 
-static const char	*libexts[] = {
+static cchar	*libexts[] = {
 	"so",
 	"a",
 	NULL
@@ -335,7 +332,7 @@ int b_pt(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -382,14 +379,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -696,7 +693,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                const char	*po = PO_PATHNAMES ;
+	                                cchar	*po = PO_PATHNAMES ;
 	                                rs = paramopt_loads(&li.lists,po,
 	                                    argp,argl) ;
 	                            }
@@ -715,7 +712,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                const char	*po = PO_SECTIONS ;
+	                                cchar	*po = PO_SECTIONS ;
 	                                rs = paramopt_loads(&li.lists,po,
 	                                    argp,argl) ;
 	                            }
@@ -875,7 +872,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 #if	CF_DEFSECTION
 	if (rs >= 0) {
-	    const char	*ccp ;
+	    cchar	*ccp ;
 
 	    cl = paramopt_fetch(&li.lists,PO_SECTIONS,NULL,&ccp) ;
 
@@ -1029,7 +1026,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1279,7 +1276,7 @@ static int procpathname(PROGINFO *pip,SHIO *ofp,cchar *pname,cchar *np,int nl)
 	        if (pip->debuglevel > 0) {
 	            shio_printf(efp,"%s: pni=%d\n", pip->progname,pni) ;
 	        }
-	        while ((tp = strpbrk(sp,":;")) != NULL) {
+	        while ((tp = strbrk(sp,":;")) != NULL) {
 		    if ((rs = locinfo_notdone(lip,0)) > 0) {
 	                rs = procpathtry(pip,ofp,pni,np,nl,sp,(tp-sp)) ;
 		        c += rs ;
@@ -1342,7 +1339,7 @@ static int procpathtry(PROGINFO *pip,SHIO *ofp,int pni,cchar *np,int nl,
 	}
 
 	if (pl == 0) {
-	    memset(&sb,0,sizeof(struct ustat)) ;
+	    memset(&sb,0,sizeof(ustat)) ;
 	}
 
 /* switch on individual path type */
@@ -1942,7 +1939,7 @@ static int locinfo_pathspecs(LOCINFO *lip,int nmax)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*kn = PO_PATHNAMES ;
+	cchar	*kn = PO_PATHNAMES ;
 
 /* maximum entries to print out */
 
@@ -2008,7 +2005,7 @@ static int locinfo_pathdef(LOCINFO *lip)
 	PARAMOPT	*pop = &lip->lists ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*kn = PO_PATHNAMES ;
+	cchar	*kn = PO_PATHNAMES ;
 
 	if ((rs = paramopt_fetch(pop,kn,NULL,NULL)) == SR_NOTFOUND) {
 	    c += 1 ;

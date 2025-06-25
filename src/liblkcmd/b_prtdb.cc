@@ -1,13 +1,14 @@
 /* b_prtdb */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* the front-end of the PRTDB program */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_LPGET	1		/* test LPGET */
-
 
 /* revision history:
 
@@ -21,14 +22,13 @@
 
 /*******************************************************************************
 
-        This subroutine is the front-end for a program that accesses several
-        possible databases in order to find the value for specified keys. We use
-        the PRINTER environment variable to find the default printer to lookup
-        keys for when an explicit printer is not specified.
-
+	This subroutine is the front-end for a program that accesses
+	several possible databases in order to find the value for
+	specified keys.  We use the PRINTER environment variable to
+	find the default printer to lookup keys for when an explicit
+	printer is not specified.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -53,7 +53,9 @@
 
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<char.h>
+#include	<getusername.h>
+#include	<getourenv.h>
+#include	<getax.h>
 #include	<keyopt.h>
 #include	<bits.h>
 #include	<ids.h>
@@ -61,8 +63,9 @@
 #include	<vecstr.h>
 #include	<field.h>
 #include	<paramopt.h>
-#include	<getax.h>
-#include	<getusername.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -100,14 +103,14 @@ extern int	mkpath1(char *,cchar *) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	pathclean(char *,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	getprogpath(IDS *,vecstr *,char *,cchar *,int) ;
@@ -122,17 +125,11 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const PIVARS *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -185,7 +182,7 @@ static int	locinfo_getprinter(LOCINFO *) ;
 
 /* local variables */
 
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"prtdb",
 	NULL
 } ;
@@ -195,7 +192,7 @@ enum progmodes {
 	progmode_overlast
 } ;
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -316,15 +313,15 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	int		f_version = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pm = NULL ;
-	const char	*sn = NULL ;
-	const char	*pr = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pm = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -375,7 +372,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -634,7 +631,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -965,8 +962,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s <key(s)> [...] [-af {<afile>|-}]\n",
 	    rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1032,7 +1029,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	        if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1116,7 +1113,7 @@ static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 static int procspec(PROGINFO *pip,void *ofp,cchar *kp,int kl)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	klen = KBUFLEN ;
+	cint	klen = KBUFLEN ;
 	int		rs ;
 	int		vl = 0 ;
 	char		kbuf[KBUFLEN+1] ;
@@ -1124,9 +1121,9 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *kp,int kl)
 	if (kp == NULL) return SR_FAULT ;
 
 	if ((rs = snwcpy(kbuf,klen,kp,kl)) >= 0) {
-	    const int	rsn = SR_NOTFOUND ;
-	    const int	vlen = VBUFLEN ;
-	    const char	*pp ;
+	    cint	rsn = SR_NOTFOUND ;
+	    cint	vlen = VBUFLEN ;
+	    cchar	*pp ;
 	    char	vbuf[VBUFLEN + 1] ;
 
 #if	CF_DEBUG
@@ -1236,11 +1233,11 @@ static int lpgetout(PROGINFO *pip,char *vbuf,int vlen,cchar *pt,cchar *key)
 	av[i] = NULL ;
 
 	if ((rs = bopenprog(ofp,progfname,"r",av,pip->envv)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		f_gotit ;
 	    int		f_first ;
 	    int		len ;
-	    const char	*tp ;
+	    cchar	*tp ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
 #if	CF_DEBUG
@@ -1287,7 +1284,7 @@ static int lpgetout(PROGINFO *pip,char *vbuf,int vlen,cchar *pt,cchar *key)
 	                f_first = FALSE ;
 	            }
 
-	            tp = strnpbrk(cp,cl,"=-") ;
+	            tp = strnbrk(cp,cl,"=-") ;
 
 	            if ((tp != NULL) && (tp[0] == '=')) {
 
@@ -1391,7 +1388,7 @@ static int locinfo_userinfo(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		hl = 0 ;
 	if (lip->un != NULL) {
-	    const int	hlen = MAXPATHLEN ;
+	    cint	hlen = MAXPATHLEN ;
 	    char	hbuf[MAXPATHLEN+1] ;
 	    if ((rs = getuserhome(hbuf,hlen,lip->un)) >= 0) {
 	        cchar	**vpp = &lip->udname ;
@@ -1400,11 +1397,11 @@ static int locinfo_userinfo(LOCINFO *lip)
 	    }
 	} else {
 	    struct passwd	pw ;
-	    const int		pwlen = getbufsize(getbufsize_pw) ;
+	    cint		pwlen = getbufsize(getbufsize_pw) ;
 	    char		*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
-	            const int	unlen = USERNAMELEN ;
+	            cint	unlen = USERNAMELEN ;
 	            if ((rs = sncpy1(lip->unbuf,unlen,pw.pw_name)) >= 0) {
 	                cchar	**vpp = &lip->udname ;
 	                rs = locinfo_setentry(lip,vpp,pw.pw_dir,-1) ;
@@ -1456,7 +1453,7 @@ static int locinfo_getprinter(LOCINFO *lip)
 	}
 	if (lip->printer == NULL) {
 	    PROGINFO	*pip = lip->pip ;
-	    const int	vlen = VBUFLEN ;
+	    cint	vlen = VBUFLEN ;
 	    cchar	*def = DEFPRINTER ;
 	    cchar	*key = DEFPRINTERKEY ;
 	    char	vbuf[VBUFLEN+1] ;
