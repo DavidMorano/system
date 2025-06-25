@@ -169,7 +169,7 @@ extern char	**environ ;		/* definition required by AT&T AST */
 
 /* local structures */
 
-struct ustats {
+USTAT {
 	uint		total ;
 	uint		cachehits ;
 } ;
@@ -204,7 +204,7 @@ struct locinfo_flags {
 struct locinfo {
 	cchar		*utfname ;
 	PROGINFO	*pip ;
-	struct ustats	s ;
+	ustat	s ;
 	LOCINFO_FL	have, f, changed, final ;
 	LOCINFO_FL	open ;
 	NAMECACHE	nc ;
@@ -1723,7 +1723,7 @@ static int procbiffable(PROGINFO *pip,TMPX_ENT *up)
 	char		dname[MAXPATHLEN+1] ;
 
 	if ((rs = mkpath2w(dname,DEVDNAME,up->ut_line,ullen)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = u_stat(dname,&sb)) >= 0) {
 	        const mode_t	tm = sb.st_mode ;
 	        f = (tm & S_IWGRP) ;

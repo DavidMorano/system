@@ -1014,7 +1014,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 static int gettimes(PROGINFO *pip,TOUCH_INFO *spip,cchar reffname[])
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 
 	if ((rs = u_stat(reffname,&sb)) >= 0) {
@@ -1105,7 +1105,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,TOUCH_INFO *spip,
 
 static int procfile(PROGINFO *pip,TOUCH_INFO *spip,cchar fname[])
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	LOCINFO		*lip = pip->lip ;
 	const int	nrs = SR_NOENT ;
 	int		rs ;

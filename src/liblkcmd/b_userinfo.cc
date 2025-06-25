@@ -1,5 +1,5 @@
 /* b_userinfo SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in: return various user information */

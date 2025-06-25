@@ -146,7 +146,7 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_envfile(vecstr *,cchar *) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	isalnumlatin(int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -1442,8 +1442,8 @@ static int procsysdefs(PROGINFO *pip)
 static int procsysdef(PROGINFO *pip,cchar fname[])
 {
 	LOCINFO	*lip = pip->lip ;
-	struct ustat	usb ;
-	struct ustat	*sbp ;
+	ustat	usb ;
+	ustat	*sbp ;
 	vecstr		lvars ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1820,7 +1820,7 @@ static int procqkey(PROGINFO *pip,void *ofp,VAR *vfp,cchar *kp,int kl)
 
 static int procset(PROGINFO *pip,cchar dbname[])
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	if (dbname == NULL) return SR_FAULT ;
 	if ((rs = u_stat(pip->pr,&sb)) >= 0) {

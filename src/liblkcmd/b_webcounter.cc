@@ -1,4 +1,5 @@
 /* b_webcounter SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is a generic "main" module for the WEBCOUNTER program */
@@ -53,6 +54,7 @@
 #include	<time.h>
 
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<estrings.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -65,6 +67,7 @@
 #include	<mapstrint.h>
 #include	<prmkfname.h>
 #include	<querystr.h>
+#include	<strn.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -95,20 +98,20 @@
 
 /* external subroutines */
 
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
 extern int	mklogidpre(char *,int,cchar *,int) ;
 extern int	mklogidsub(char *,int,cchar *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfskipwhite(cchar *,int,cchar **) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfdecmfi(cchar *,int,int *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
+extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;
@@ -120,16 +123,11 @@ extern int	proguserlist_begin(PROGINFO *) ;
 extern int	proguserlist_end(PROGINFO *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -158,8 +156,8 @@ struct locinfo {
 	PROGINFO	*pip ;
 	vecstr		sufmaps ;
 	vecstr		sufsubs ;
-	const char	*basedname ;
-	const char	*dbname ;
+	cchar	*basedname ;
+	cchar	*dbname ;
 	void		*ofp ;
 } ;
 
@@ -200,10 +198,10 @@ static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
 static int	procuserinfo_end(PROGINFO *) ;
 static int	procuserinfo_logid(PROGINFO *) ;
 
-static int	procourconf_begin(PROGINFO *,PARAMOPT *,const char *) ;
+static int	procourconf_begin(PROGINFO *,PARAMOPT *,cchar *) ;
 static int	procourconf_end(PROGINFO *) ;
 
-static int	procout_begin(PROGINFO *,void *,const char *) ;
+static int	procout_begin(PROGINFO *,void *,cchar *) ;
 static int	procout_end(PROGINFO *) ;
 
 static int	procopts(PROGINFO *,KEYOPT *) ;
@@ -225,12 +223,12 @@ static int	config_finish(CONFIG *) ;
 static int	config_check(CONFIG *) ;
 #endif /* COMMENT */
 
-static int	mkourname(char *,const char *,const char *,const char *,int) ;
+static int	mkourname(char *,cchar *,cchar *,cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -286,7 +284,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"print",
 	"add",
 	"inc",
@@ -304,14 +302,14 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	*csched[] = {
+static cchar	*csched[] = {
 	"%p/etc/%n/%n.%f",
 	"%p/etc/%n/%f",
 	"%p/etc/%n.%f",
 	NULL
 } ;
 
-static const char	*cparams[] = {
+static cchar	*cparams[] = {
 	"basedir",
 	"basedb",
 	"logfile",
@@ -327,7 +325,7 @@ enum cparams {
 	cparam_overlast
 } ;
 
-static const char	*qkeys[] = {
+static cchar	*qkeys[] = {
 	"db",
 	"n",
 	"c",
@@ -352,7 +350,7 @@ int b_webcounter(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    cchar	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -400,16 +398,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_version = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cfname = NULL ;
-	const char	*qs = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cfname = NULL ;
+	cchar	*qs = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -862,7 +860,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                                rs = SR_INVALID ;
 	                        }
 	                        if ((rs >= 0) && (cp != NULL)) {
-	                            const char	*po = PO_OPTION ;
+	                            cchar	*po = PO_OPTION ;
 	                            rs = paramopt_loads(&aparams,po,cp,cl) ;
 	                        }
 	                        break ;
@@ -1078,7 +1076,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
-	    const char	*fmt = NULL ;
+	    cchar	*fmt = NULL ;
 	    switch (rs) {
 	    case SR_NOENT:
 	        ex = EX_NOINPUT ;
@@ -1174,8 +1172,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-db <db>] [<name(s)> ...] [-af <afile>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1200,7 +1198,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1354,7 +1352,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 	                const int	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
-	                    const char	**vpp = &pip->logid ;
+	                    cchar	**vpp = &pip->logid ;
 	                    rs = proginfo_setentry(pip,vpp,sbuf,rs) ;
 	                }
 	            }
@@ -1441,7 +1439,7 @@ static int procout_begin(PROGINFO *pip,void *ofp,cchar *ofname)
 	        ofname = STDFNOUT ;
 
 	    if ((rs = shio_open(ofp,ofname,"wct",0666)) >= 0) {
-	        const char	*fmt ;
+	        cchar	*fmt ;
 	        fmt = "    count date			  counter-name" ;
 	        lip->ofp = ofp ;
 
@@ -1589,8 +1587,8 @@ static int procname(PROGINFO *pip,MAPSTRINT *nlp,cchar *np,int nl)
 	int		rs = SR_OK ;
 	int		v = -1 ;
 	int		cl ;
-	const char	*tp ;
-	const char	*cp ;
+	cchar	*tp ;
+	cchar	*cp ;
 
 	if (pip == NULL) return SR_FAULT ;
 	if (nl < 0) nl = strnlen(np,nl) ;
@@ -1612,12 +1610,12 @@ static int procname(PROGINFO *pip,MAPSTRINT *nlp,cchar *np,int nl)
 /* end subroutine (procname) */
 
 
-static int procdebugdb(PROGINFO *pip,const char *qs)
+static int procdebugdb(PROGINFO *pip,cchar *qs)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	if (pip->debuglevel > 0) {
-	    const char	*pn = pip->progname ;
+	    cchar	*pn = pip->progname ;
 	    if (lip->basedname != NULL) {
 	        shio_printf(pip->efp,"%s: dbdir=%s\n",pn,lip->basedname) ;
 	    }
@@ -1651,8 +1649,8 @@ static int proclist(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
-	const char	*basedname ;
-	const char	*dbfn ;
+	cchar	*basedname ;
+	cchar	*dbfn ;
 	char		tbuf[MAXPATHLEN + 1] ;
 
 	basedname = lip->basedname ;
@@ -2138,7 +2136,7 @@ static int locinfo_basedir(LOCINFO *lip,cchar *vp,int vl)
 	    cchar	*pr = pip->pr ;
 	    char	tbuf[MAXPATHLEN+1] ;
 	    if ((rs = mkourname(tbuf,pr,inter,vp,vl)) >= 0) {
-	        const char	**vpp = &lip->basedname ;
+	        cchar	**vpp = &lip->basedname ;
 	        rs = locinfo_setentry(lip,vpp,tbuf,rs) ;
 	    }
 	}
@@ -2176,7 +2174,7 @@ static int config_start(CONFIG *csp,PROGINFO *pip,PARAMOPT *app,cchar *cfname)
 	}
 
 	if (rs >= 0) {
-	    const char	**envv = pip->envv ;
+	    cchar	**envv = pip->envv ;
 	    if ((rs = paramfile_open(&csp->p,envv,cfname)) >= 0) {
 	        if ((rs = config_cookbegin(csp)) >= 0) {
 	            csp->f_p = TRUE ;
@@ -2242,8 +2240,8 @@ static int config_cookbegin(CONFIG *csp)
 	    int		i ;
 	    int		kch ;
 	    int		vl ;
-	    const char	*ks = "PSNDHRU" ;
-	    const char	*vp ;
+	    cchar	*ks = "PSNDHRU" ;
+	    cchar	*vp ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    char	kbuf[2] ;
 
@@ -2267,8 +2265,8 @@ static int config_cookbegin(CONFIG *csp)
 	            break ;
 	        case 'H':
 	            {
-	                const char	*nn = pip->nodename ;
-	                const char	*dn = pip->domainname ;
+	                cchar	*nn = pip->nodename ;
+	                cchar	*dn = pip->domainname ;
 	                rs = snsds(hbuf,hlen,nn,dn) ;
 	                vl = rs ;
 	                vp = hbuf ;

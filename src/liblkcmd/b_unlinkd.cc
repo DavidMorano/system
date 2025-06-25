@@ -402,7 +402,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	struct session	sinfo ;
-	struct ustat	sb, *sbp = (struct ustat *) &sb ;
+	ustat	sb, *sbp = (ustat *) &sb ;
 	struct config	co ;
 	BITS		pargs ;
 	KEYOPT		akopts ;
