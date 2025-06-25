@@ -95,7 +95,7 @@ PROGINFO	*pip ;
 char		basedir[] ;
 char		name[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 	int	f_softcar ;

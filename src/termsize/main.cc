@@ -328,7 +328,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            if ((bi = substring(bp,blen,";")) >= 0) {
 
 #if	CF_DEBUGS
-bprintf(efp,"bi %d - buf %t\n",bi,bp,blen) ;
+bprintf(efp,"bi %d - buf %r\n",bi,bp,blen) ;
 #endif
 
 	                if (cfdeci(bp,bi,&t1) < 0) 
@@ -346,7 +346,7 @@ bprintf(efp,"bi %d - buf %t\n",bi,bp,blen) ;
 	            if ((bi = substring(bp,blen,"T")) >= 0) {
 
 #if	CF_DEBUGS
-bprintf(efp,"bi %d - buf %t\n",bi,bp,blen) ;
+bprintf(efp,"bi %d - buf %r\n",bi,bp,blen) ;
 #endif
 
 	                if (cfdeci(bp,bi,&t2) < 0) 
