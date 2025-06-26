@@ -1,5 +1,5 @@
 /* main SUPPORT (pingstat) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* generic (pretty much) front end program subroutine */
@@ -399,7 +399,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    argl = strlen(argp) ;
 
 #if	CF_DEBUGS
-	    debugprintf("main: a=>%t<\n",argp,argl) ;
+	    debugprintf("main: a=>%r<\n",argp,argl) ;
 #endif
 
 	    f_optminus = (*argp == '-') ;
@@ -435,7 +435,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            }
 
 #if	CF_DEBUGS
-	            debugprintf("main: ak=>%t<\n",akp,akl) ;
+	            debugprintf("main: ak=>%r<\n",akp,akl) ;
 #endif
 
 	            if ((kwi = matostr(argopts,2,akp,akl)) >= 0) {
@@ -961,7 +961,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    bprintf(pip->efp,"%s: version %s\n",pn,VERSION) ;
 	    if (f_makedate) {
 	        cl = makedate_get(pingstat_makedate,&cp) ;
-	        bprintf(pip->efp,"%s: makedate %t\n",pn,cp,cl) ;
+	        bprintf(pip->efp,"%s: makedate %r\n",pn,cp,cl) ;
 	    }
 	}
 

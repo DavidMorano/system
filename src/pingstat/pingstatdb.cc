@@ -792,7 +792,7 @@ int pingstatdb_check(PINGSTATDB *psp,time_t daytime)
 /* check on the status of the file entry cache */
 static int pingstatdb_checkcache(PINGSTATDB *psp)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		f_cached = psp->f.cached ;
 

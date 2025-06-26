@@ -103,7 +103,7 @@ const char	fname[] ;
 /* open the user's PINGTAB file (if present) */
 
 	if ((rs = bopen(&ptp->pfile,fname,"r",0664)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = bcontrol(&ptp->pfile,BC_STAT,&sb)) >= 0) {
 	        if (! S_ISDIR(sb.st_mode)) {
 	            ptp->magic = PINGTAB_MAGIC ;

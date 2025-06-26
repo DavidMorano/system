@@ -1,5 +1,5 @@
 /* main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* program to send echo data to a remote host (and back) */
@@ -469,7 +469,7 @@ char	*envv[] ;
 	                default:
 	                    rs = SR_INVALID ;
 	                    bprintf(pip->efp,
-	                        "%s: invalid key=%t\n",
+	                        "%s: invalid key=%r\n",
 	                        pip->progname,akp,akl) ;
 
 	                } /* end switch (key words) */

@@ -193,7 +193,7 @@ BUILTIN		*bip ;
 
 	struct sigaction	sigs ;
 
-	struct ustat		sb ;
+	ustat		sb ;
 
 	struct clientinfo	ci, *cip = &ci ;
 
@@ -1235,7 +1235,7 @@ char	s[] ;
 {
 	bfile		file, *fp = &file ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int		tlen, len ;
 
@@ -1689,7 +1689,7 @@ char		fname[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 
-		struct ustat	sb1 ;
+		ustat	sb1 ;
 
 		u_stat(buf,&sb1) ;
 
@@ -1720,7 +1720,7 @@ char		fname[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 
-		struct ustat	sb1 ;
+		ustat	sb1 ;
 
 		int	cl ;
 
@@ -1746,7 +1746,7 @@ char		fname[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 
-		struct ustat	sb1 ;
+		ustat	sb1 ;
 
 		int	cl ;
 

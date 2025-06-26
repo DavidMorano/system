@@ -65,7 +65,7 @@ extern char	*strshrink(char *) ;
 
 /* local structures */
 
-struct ustate {
+ustate {
 	bfile	outfile ;
 	int	facts ;
 	int	f_active ;
@@ -96,9 +96,9 @@ int		fn ;
 {
 	bfile		infile, *ifp = &infile ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
-	struct ustate	s ;
+	ustate	s ;
 
 	int	len, rs ;
 	int	facts ;
@@ -212,7 +212,7 @@ badinfile:
 
 static void procinit(gp,sp)
 struct proginfo	*gp ;
-struct ustate	*sp ;
+ustate	*sp ;
 {
 
 
@@ -227,7 +227,7 @@ struct ustate	*sp ;
 
 static int procfree(gp,sp)
 struct proginfo	*gp ;
-struct ustate	*sp ;
+ustate	*sp ;
 {
 
 
@@ -239,7 +239,7 @@ struct ustate	*sp ;
 
 static void procopen(gp,sp)
 struct proginfo	*gp ;
-struct ustate	*sp ;
+ustate	*sp ;
 {
 	char	timebuf[TIMEBUFLEN + 1] ;
 
@@ -272,7 +272,7 @@ struct ustate	*sp ;
 
 static void procclose(gp,sp)
 struct proginfo	*gp ;
-struct ustate	*sp ;
+ustate	*sp ;
 {
 	char	cmdbuf[CMDLEN + 1] ;
 
@@ -339,7 +339,7 @@ struct ustate	*sp ;
 
 static void procitem(gp,sp,linebuf)
 struct proginfo	*gp ;
-struct ustate	*sp ;
+ustate	*sp ;
 char		linebuf[] ;
 {
 
