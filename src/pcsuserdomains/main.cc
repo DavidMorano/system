@@ -253,7 +253,7 @@ static const struct errmsg	errmsgs[] = {
 
 int main(int argc,cchar *argv[],cchar *envv[])
 {
-	struct ustat		sb ;
+	ustat		sb ;
 	struct proginfo		pi, *pip = &pi ;
 	struct userinfo		u ;
 	struct configfile	cf ;
@@ -3228,7 +3228,7 @@ int		mintime ;
 {
 	bfile	tsfile ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	time_t	daytime ;
 

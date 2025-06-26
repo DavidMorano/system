@@ -161,7 +161,7 @@ int pcsinfoset(cchar *pr,cchar *nbuf,int nlen,cchar *un,int nt)
 
 static int rmnames(cchar *pr,cchar *nfname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 

@@ -95,7 +95,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	        debugprintf("main: fn=%s\n",fn) ;
 #endif
 	        if ((rs = uc_open(fn,of,0666)) >= 0) {
-	            struct ustat	sb ;
+	            ustat	sb ;
 	            int			fd = rs ;
 #if	CF_DEBUGS
 	            debugprintf("main: uc_open() rs=%d\n",rs) ;

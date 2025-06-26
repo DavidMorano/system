@@ -293,7 +293,7 @@ char	*envv[] ;
 
 	struct servent	*sep ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	USERINFO	u ;
 
@@ -622,7 +622,7 @@ char	*envv[] ;
 	                    default:
 	                        rs = SR_INVALID ;
 	                        bprintf(pip->efp,
-	                        "%s: invalid key=%t\n",
+	                        "%s: invalid key=%r\n",
 	                        pip->progname,akp,akl) ;
 
 	                    } /* end switch */
@@ -2080,7 +2080,7 @@ badpidlock:
 
 	    while ((len = breadln(&pidfile,buf,BUFLEN)) > 0) {
 
-	        bprintf(pip->efp,"%s: pidfile> %t",
+	        bprintf(pip->efp,"%s: pidfile> %r",
 	            pip->progname,
 	            buf,len) ;
 
@@ -2445,7 +2445,7 @@ struct proginfo	*pip ;
 const char	dname[] ;
 int		mode ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 
@@ -2505,7 +2505,7 @@ static int checkfiledir(pip,fname)
 struct proginfo	*pip ;
 const char	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 	int	sl ;

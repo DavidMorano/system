@@ -80,7 +80,7 @@ struct proginfo	*pip ;
 bfile		*ofp ;
 const char	newsdname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	FSDIRTREE	dir ;
 
