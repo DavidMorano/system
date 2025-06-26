@@ -1,5 +1,5 @@
 /* syshas HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* specify what features each operating system has */
@@ -246,6 +246,12 @@
 /* Solaris®: |sig_t| */
 #define	SYSHAS_TYPESIGT		0
 
+/* Solaris®: |getexecname| */
+#define	SYSHAS_GETEXECNAME	1
+
+/* Solaris®: |libproc| */
+#define	SYSHAS_LIBPROC		0
+
 /******************************************************************************/
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
@@ -481,6 +487,12 @@
 /* Darwin®: |sig_t| */
 #define	SYSHAS_TYPESIGT		1
 
+/* Darwin®: |getexecname| */
+#define	SYSHAS_GETEXECNAME	0
+
+/* Darwin®: |libproc| */
+#define	SYSHAS_LIBPROC		1
+
 /******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
@@ -695,6 +707,12 @@
 
 /* Linux: |sig_t| */
 #define	SYSHAS_TYPESIGT		0
+
+/* Linux®: |getexecname| */
+#define	SYSHAS_GETEXECNAME	0
+
+/* Linux®: |libproc| */
+#define	SYSHAS_LIBPROC		0
 
 /******************************************************************************/
 #endif /* OSNAME */

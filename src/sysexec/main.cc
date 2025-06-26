@@ -85,7 +85,7 @@ extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecti(cchar *,int,int *) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	isNotPresent(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
@@ -325,7 +325,7 @@ static int proc_devino(PROGINFO *pip)
 #endif
 
 	if ((rs = proginfo_getename(pip,tbuf,tlen)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 #if	CF_DEBUGS
 	    debugprintf("main/proc_devino: ent tbuf=%s\n",tbuf) ;
 #endif
@@ -388,7 +388,7 @@ static int proc_find(PROGINFO *pip,ENVHELP *elp,cchar *bn,cchar *argv[])
 
 static int proc_progok(PROGINFO *pip,cchar *progfname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		f = FALSE ;
 #if	CF_DEBUGS

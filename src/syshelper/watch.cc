@@ -147,7 +147,7 @@ BUILTIN		*bip ;
 
 	struct sigaction	sigs ;
 
-	struct ustat		sb ;
+	ustat		sb ;
 
 	struct clientinfo	ci, *cip = &ci ;
 
@@ -856,7 +856,7 @@ char	s[] ;
 {
 	bfile		file, *fp = &file ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int		tlen, len ;
 
