@@ -284,7 +284,7 @@ char	*envv[] ;
 	                if ((kwi = matstr(argopts,akp,akl)) >= 0) {
 
 #if	CF_DEBUGS
-	                    debugprintf("main: option keyword=%t kwi=%d\n",
+	                    debugprintf("main: option keyword=%r kwi=%d\n",
 	                        akp,akl,kwi) ;
 #endif
 
