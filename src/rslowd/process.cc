@@ -91,7 +91,7 @@ struct vecelem	*aqp ;
 {
 	bfile			afile, *afp = &afile ;
 
-	struct ustat		sb ;
+	ustat		sb ;
 
 	struct msg		amsg, *msgp = &amsg ;
 

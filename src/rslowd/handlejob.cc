@@ -1,5 +1,5 @@
 /* handlejob SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* perform various functions on a job */
@@ -107,12 +107,12 @@ struct argparams {
 int handlejob_start(jep,jfp,sbp,sep)
 struct jobentry	*jep ;
 bfile		*jfp ;
-struct ustat	*sbp ;
+ustat	*sbp ;
 struct srventry	*sep ;
 {
 	struct group	ge, *gp ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	vecstr	args ;
 
@@ -572,7 +572,7 @@ int		child_stat ;
 {
 	bfile		file, *fp = &file ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int		len ;
 

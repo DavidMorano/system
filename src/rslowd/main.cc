@@ -157,7 +157,7 @@ char	*envv[] ;
 	bfile		logfile ;
 	bfile		pidfile ;
 
-	struct ustat		sb ;
+	ustat		sb ;
 
 	struct proginfo		g, *pip = &g ;
 

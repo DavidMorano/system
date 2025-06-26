@@ -137,7 +137,7 @@ JOBDB		*jlp ;
 
 	struct dirent	*dep ;
 
-	struct ustat	isb, ssb, dsb, jsb ;
+	ustat	isb, ssb, dsb, jsb ;
 
 	struct timeval	tod ;
 
@@ -1032,7 +1032,7 @@ char	filename[] ;
 static int dirtest(dfd,n,sbp)
 int		dfd ;
 char		n[] ;
-struct ustat	*sbp ;
+ustat	*sbp ;
 {
 	int	rs ;
 

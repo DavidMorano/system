@@ -1,23 +1,20 @@
-/* handle */
+/* rslow_handle SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* handle certain job conditions */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	1		/* run-time */
-
 
 /* revision history:
 
 	= 1991-09-10, David A­D­ Morano
-
 	This subroutine was adopted from the DWD program.
-
 
 */
 
 /* Copyright © 1991 David A­D­ Morano.  All rights reserved. */
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -25,12 +22,14 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
 #include	<poll.h>
-#include	<time.h>
+#include	<csignal>
+#include	<ctime.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 
 #include	<usystem.h>
@@ -43,8 +42,9 @@
 #include	<mailmsg.h>
 #include	<mailmsghdrs.h>
 #include	<ema.h>
-#include	<char.h>
 #include	<srvfile.h>
+#include	<strx.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"jobdb.h"
@@ -129,7 +129,7 @@ int handle_new(wsp,jlp,jep,sbp,slp)
 struct watchstate	*wsp ;
 JOBDB		*jlp ;
 struct jobentry	*jep ;
-struct ustat	*sbp ;
+ustat	*sbp ;
 struct vecelem	*slp ;
 {
 	bfile		infile, *ifp = &infile ;
@@ -219,7 +219,7 @@ badopen:
 static int handle_enter(wsp,jep,sbp,slp,ifp,offset,linebuf,linelen)
 struct watchstate	*wsp ;
 struct jobentry	*jep ;
-struct ustat	*sbp ;
+ustat	*sbp ;
 struct vecelem	*slp ;
 bfile		*ifp ;
 off_t		offset ;
@@ -318,7 +318,7 @@ int	linelen ;
 	debugprintf("handle_enter: queuespec=%s\n",queuespec) ;
 #endif
 
-	if ((cp = strpbrk(queuespec,"!:")) != NULL) {
+	if ((cp = strbrk(queuespec,"!:")) != NULL) {
 
 	    *cp++ = '\0' ;
 	    queue_machine = strshrink(queuespec) ;
@@ -387,7 +387,7 @@ int	linelen ;
 	cp1[l] = '\0' ;
 	vecstrinit(&jep->srvargs,5,VSP_SORTED) ;
 
-	while ((cp = strpbrk(cp1," \t\n\r\v")) != NULL) {
+	while ((cp = strbrk(cp1," \t\n\r\v")) != NULL) {
 
 	    vecstradd(&jep->srvargs,cp1,cp - cp1) ;
 
@@ -590,7 +590,7 @@ handle_noexec:
 int handle_compute(wsp,slp,jsbp,jep)
 struct watchstate	*wsp ;
 struct vecelem		*slp ;
-struct ustat		*jsbp ;
+ustat		*jsbp ;
 struct jobentry		*jep ;
 {
 	struct srvenry	*sep ;
@@ -673,7 +673,7 @@ int handle_add(wsp,jlp,filename,jsbp,jepp)
 struct watchstate	*wsp ;
 JOBDB		*jlp ;
 char		filename[] ;
-struct ustat	*jsbp ;
+ustat	*jsbp ;
 struct jobentry	**jepp ;
 {
 	struct jobentry		je ;

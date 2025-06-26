@@ -1,23 +1,20 @@
-/* jobsched */
+/* rslowd_jobsched SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* schedule the jobs around */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	1		/* run-time debugging */
-
 
 /* revision history:
 
 	= 1998-09-10, David A­D­ Morano
-
 	This subroutine was adopted from the DWD program.
-
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -28,13 +25,15 @@
 #include	<sys/time.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<time.h>
-#include	<dirent.h>
-#include	<climits>
-#include	<cstring>
 #include	<poll.h>
+#include	<dirent.h>
 #include	<ftw.h>
+#include	<csignal>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bfile.h>
@@ -46,6 +45,7 @@
 #include	<msg.h>
 #include	<msgheaders.h>
 #include	<ema.h>
+#include	<strx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -63,11 +63,11 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	cfdeci(cchar *,int,int *) ;
 extern int	getpwd(char *,int) ;
-extern int	matfromenv(const char *,int) ;
-extern int	matmsghead(const char *,int,char *,int *) ;
+extern int	matfromenv(cchar *,int) ;
+extern int	matmsghead(cchar *,int,char *,int *) ;
 extern int	jobdb_search(), jobdb_findpid() ;
 extern int	handlejob_start(), handlejob_end() ;
 
@@ -102,13 +102,11 @@ static int	handle_enter() ;
 #define	FUN_EXIT	1
 
 
-static const char	*funtab[] = {
+static cchar	*funtab[] = {
 	"REPORT",
 	"EXIT",
 	NULL
 } ;
-
-
 
 
 /*******************************************************************************
@@ -137,7 +135,7 @@ int handle_new(wsp,jlp,jep,sbp,slp)
 struct watchstate	*wsp ;
 JOBDB		*jlp ;
 struct jobentry	*jep ;
-struct ustat	*sbp ;
+ustat	*sbp ;
 struct vecelem	*slp ;
 {
 	struct sigaction	sigs ;
@@ -231,7 +229,7 @@ ret0:
 static int handle_enter(wsp,jep,sbp,slp,ifp,offset,linebuf,linelen)
 struct watchstate	*wsp ;
 struct jobentry	*jep ;
-struct ustat	*sbp ;
+ustat	*sbp ;
 struct vecelem	*slp ;
 bfile		*ifp ;
 off_t		offset ;
@@ -329,7 +327,7 @@ int	linelen ;
 	debugprintf("handle_enter: queuespec=%s\n",queuespec) ;
 #endif
 
-	if ((cp = strpbrk(queuespec,"!:")) != NULL) {
+	if ((cp = strbrk(queuespec,"!:")) != NULL) {
 
 	    *cp++ = '\0' ;
 	    queue_machine = strshrink(queuespec) ;
@@ -398,7 +396,7 @@ int	linelen ;
 	cp1[l] = '\0' ;
 	vecstrinit(&jep->srvargs,5,VSP_SORTED) ;
 
-	while ((cp = strpbrk(cp1," \t\n\r\v")) != NULL) {
+	while ((cp = strbrk(cp1," \t\n\r\v")) != NULL) {
 
 	    vecstradd(&jep->srvargs,cp1,cp - cp1) ;
 
@@ -600,7 +598,7 @@ int handle_add(wsp,jlp,filename,jsbp,jepp)
 struct watchstate	*wsp ;
 JOBDB		*jlp ;
 char		filename[] ;
-struct ustat	*jsbp ;
+ustat	*jsbp ;
 struct jobentry	**jepp ;
 {
 	struct jobentry		je ;

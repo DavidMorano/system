@@ -1,40 +1,34 @@
-/* main (rslow) */
+/* rslow_main (rslow) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to submit a job for the RSLOW daemon */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0
 #define	CF_DEBUG	0
 #define	CF_RFILE	1
 #define	CF_UUCP		1
 
-
 /* revision history:
 
 	= 94-12-01, David A­D­ Morano
-
 	This program completely (I think) can replace any existing
 	'rslow' programs.  Some elements of some previous 'rslow' 
 	programs may have been used but it is all mixed in now.
 
-
 	- 96-06-06, David A­D­ Morano
-
-	Added code to create directories in the UUCPPUBLIC
-	area so that any soft links pointing into here (for user 'pcs')
+	Added code to create directories in the UUCPPUBLIC area so
+	that any soft links pointing into here (for user 'pcs')
 	will point to something that exists !
 
-
 	- 97-01-29, David A­D­ Morano
-
 	I added code to the command invocation for an optional
 	authorization file for use when 'rexec' is the transport
-	to PCS.  A default in PROGRAMROOT is used otherwise.
-
-	I also added some crap code to check for certain machine
+	to PCS.  A default in PROGRAMROOT is used otherwise.  I
+	also added some crap code to check for certain machine
 	aliases for those local machines that do not have uniform
 	INET and UUCP access.
-
 
 */
 
@@ -48,30 +42,31 @@
 
 **************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<sys/utsname.h>
-#include	<cstdlib>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
 #include	<usystem.h>
+#include	<getax.h>
 #include	<bfile.h>
 #include	<logfile.h>
 #include	<userinfo.h>
 #include	<vecelem.h>
 #include	<netfile.h>
-#include	<getax.h>
 #include	<mallocstuff.h>
 #include	<rex.h>
 #include	<quoteshellarg.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -89,8 +84,8 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	unlinkd(char *,int) ;
 extern int	hostequiv() ;
 extern int	dialtab_start(), dialtab_search(), dialtab_finish() ;
@@ -119,7 +114,7 @@ static int	checkuucppublic() ;
 
 struct global	g ;
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"TMPDIR",
 	"VERSION",
 	"VERBOSE",
@@ -149,7 +144,7 @@ char	*argv[] ;
 
 	vecelem		ne ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	struct tm	*timep ;
 
@@ -194,37 +189,37 @@ char	*argv[] ;
 	int	jfd, tfd, rfd, efd ;
 	int	childstat ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*progname ;
-	const char	*ifname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*jobfname = NULL ;
-	const char	*authfname = NULL ;
-	const char	*jobid ;
-	const char	*cmd_uucico ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*progname ;
+	cchar	*ifname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*jobfname = NULL ;
+	cchar	*authfname = NULL ;
+	cchar	*jobid ;
+	cchar	*cmd_uucico ;
 	char	tmpfname[MAXPATHLEN + 1] ;
 	char	buf[BUFLEN + 1], *bp ;
 	char	userbuf[USERBUFLEN + 1] ;
 	char	u_buf[100], p_buf[100] ;
-	const char	*address_errors = NULL ;
-	const char	*address_sender = NULL ;
-	const char	*address_from = NULL ;
-	const char	*address_error = NULL ;
-	const char	*address_reply = NULL ;
-	const char	*name_from = NULL ;
-	const char	*name_to = NULL ;
-	const char	*user = NULL ;
-	const char	*kickhost = NULL ;
-	const char	*tmpdir = NULL ;
-	const char	*queuespec = NULL ;
-	const char	*servicename = NULL ;
-	const char	*queue_machine, *queue_path ;
-	const char	*queue_uumachine, *queue_inmachine ;
-	const char	*local_path = NULL ;
-	const char	*copy_path = NULL ;
-	const char	*cp, *cp1 ;
+	cchar	*address_errors = NULL ;
+	cchar	*address_sender = NULL ;
+	cchar	*address_from = NULL ;
+	cchar	*address_error = NULL ;
+	cchar	*address_reply = NULL ;
+	cchar	*name_from = NULL ;
+	cchar	*name_to = NULL ;
+	cchar	*user = NULL ;
+	cchar	*kickhost = NULL ;
+	cchar	*tmpdir = NULL ;
+	cchar	*queuespec = NULL ;
+	cchar	*servicename = NULL ;
+	cchar	*queue_machine, *queue_path ;
+	cchar	*queue_uumachine, *queue_inmachine ;
+	cchar	*local_path = NULL ;
+	cchar	*copy_path = NULL ;
+	cchar	*cp, *cp1 ;
 	char	cmdbuf[CMDBUFLEN + 1] ;
-	const char	*ssp ;
+	cchar	*ssp ;
 
 
 #if	CF_DEBUGS
@@ -1034,7 +1029,7 @@ char	*argv[] ;
 
 	cp1 = mallocstr(queuespec) ;
 
-	if ((cp = strpbrk(cp1,"!:")) != NULL) {
+	if ((cp = strbrk(cp1,"!:")) != NULL) {
 
 	    *cp++ = '\0' ;
 	    queue_path = cp ;
@@ -1070,7 +1065,7 @@ char	*argv[] ;
 
 	    address_reply = strshrink(address_reply) ;
 
-	    if (((cp = strpbrk(address_reply,"!\\@%/=")) == NULL) &&
+	    if (((cp = strbrk(address_reply,"!\\@%/=")) == NULL) &&
 	        ((pp = getpwnam(address_reply)) != NULL)) {
 
 	        name_to = ns_mailname(pp->pw_gecos) ;
@@ -1112,7 +1107,7 @@ char	*argv[] ;
 
 	    address_from = strshrink(address_from) ;
 
-	    if (((cp = strpbrk(address_from,"!\\@%/=")) == NULL) &&
+	    if (((cp = strbrk(address_from,"!\\@%/=")) == NULL) &&
 	        ((pp = getpwnam(address_from)) != NULL)) {
 
 	        name_from = ns_mailname(pp->pw_gecos) ;

@@ -1,5 +1,5 @@
-/* main SUPPORT (RSHE) */
-/* encoding=ISO8859-1 */
+/* rshe_main SUPPORT (RSHE) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* program to run a program remotely inheriting the local environment */
@@ -77,15 +77,16 @@
 #include	<grp.h>
 #include	<usystem.h>
 #include	<getfiledirs.h>
+#include	<getusername.h>
+#include	<getchostname.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<vecstr.h>
 #include	<userinfo.h>
 #include	<logfile.h>
 #include	<bufstr.h>
-#include	<getusername.h>
-#include	<getchostname.h>
 #include	<mallocstuff.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -105,10 +106,10 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
 extern int	getpwd(char *,int) ;
 
 extern char	*strbasename(char *) ;
@@ -129,14 +130,14 @@ struct jobinfo {
 
 /* forward references */
 
-static int	quotevalue(struct proginfo *,const char *,BUFSTR *) ;
+static int	quotevalue(struct proginfo *,cchar *,BUFSTR *) ;
 static int	getcanonical(char *,char *,char *,char *) ;
 static int	send_rxenv(struct proginfo *,struct jobinfo *,char *) ;
 static int	proc_rxenv(struct proginfo *,struct jobinfo *,char *,int) ;
 static int	send_procenv(struct proginfo *,struct jobinfo *) ;
-static int	proc_env(struct proginfo *,struct jobinfo *,const char *,int,
-			const char *) ;
-static int	strnncmp(const char *,int,const char *,int) ;
+static int	proc_env(struct proginfo *,struct jobinfo *,cchar *,int,
+			cchar *) ;
+static int	strnncmp(cchar *,int,cchar *,int) ;
 
 static void	bdump() ;
 
@@ -236,7 +237,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	memset(pip,0,sizeof(struct proginfo)) ;
 
-	pip->envv = (const char **) envv ;
+	pip->envv = (cchar **) envv ;
 	pip->progname = strbasename(argv[0]) ;
 
 	if (bopen(efp,BFILE_STDERR,"dwca",0666) >= 0) {
@@ -1399,7 +1400,7 @@ char		key[] ;
 int		klen ;
 {
 	int		elen ;
-	const char	**ep ;
+	cchar	**ep ;
 	char		*cp ;
 
 #if	CF_DEBUG
@@ -1435,7 +1436,7 @@ struct jobinfo	*jip ;
 {
 	int		rs = SR_OK ;
 	int		i, klen ;
-	const char	**ep ;
+	cchar	**ep ;
 	char		*cp ;
 
 /* write out our process environment to the remote command */
@@ -1494,7 +1495,7 @@ struct jobinfo	*jip ;
 static int proc_env(pip,jip,kp,klen,vp)
 struct proginfo	*pip ;
 struct jobinfo	*jip ;
-const char	*kp, *vp ;
+cchar	*kp, *vp ;
 int		klen ;
 {
 	BUFSTR		value ;
@@ -1581,13 +1582,13 @@ int		klen ;
 /* quote a string for SHELL escaping */
 static int quotevalue(pip,vs,bsp)
 struct proginfo	*pip ;
-const char	vs[] ;
+cchar	vs[] ;
 BUFSTR		*bsp ;
 {
 	int		f_got = FALSE ;
 	int		rs = 0 ;
-	const char	*tp ;
-	const char	*cp ;
+	cchar	*tp ;
+	cchar	*cp ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 2)
@@ -1595,7 +1596,7 @@ BUFSTR		*bsp ;
 #endif
 
 	cp = vs ;
-	while ((tp = strpbrk(cp,"\\\"'$")) != NULL) {
+	while ((tp = strbrk(cp,"\\\"'$")) != NULL) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 2)
@@ -1670,7 +1671,7 @@ bfile	*f1p, *f2p ;
 
 
 static int strnncmp(s1,n1,s2,n2)
-const char	s1[], s2[] ;
+cchar	s1[], s2[] ;
 int		n1, n2 ;
 {
 	int		rs ;

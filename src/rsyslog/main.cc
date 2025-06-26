@@ -1,5 +1,5 @@
 /* main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* small (rather generic) front-end subroutine */
@@ -101,7 +101,7 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecfi(const char *,int,int *) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,
 			const char *,const char *) ;
 extern int	pcstrustuser(const char *,const char *) ;
@@ -265,7 +265,7 @@ char	*envv[] ;
 {
 	struct sigaction	sigs ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	struct proginfo	pi, *pip = &pi ;
 
