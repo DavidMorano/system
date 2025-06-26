@@ -236,7 +236,7 @@ void		scramble() ;
 
 struct global	g ;
 
-struct ustat     statbuf ;
+ustat     statbuf ;
 
 char		spfname[] = "/etc/shadow" ;
 char            pathname[MAXPATHLEN + 1] ;
@@ -259,7 +259,7 @@ char	*envv[] ;
 
 	struct utsname		uts ;
 
-	struct ustat		sb ;
+	ustat		sb ;
 
 	int	f1, f2, f3 ;
 	int	argr, argl, aol, avl, npa, maxai, kwi ;
@@ -731,7 +731,7 @@ struct auth_args	*a ;
 
 	struct spwd	*spp ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int             c1, c2 ;
 	int		f_psswdv = FALSE ;

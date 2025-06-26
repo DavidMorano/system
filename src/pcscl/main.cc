@@ -1267,7 +1267,7 @@ char	*envv[] ;
 
 	if (f_append && pip->f.seekable) {
 
-		struct ustat	sb ;
+		ustat	sb ;
 
 		int		ch ;
 

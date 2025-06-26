@@ -188,7 +188,7 @@ struct pr_start_results {
 char           *authproc();
 char           *pr_start();
 char           *pr_init();
-struct ustat     statbuf;
+ustat     statbuf;
 
 char            pathname[MAXPATHLEN];
 char            new_pathname[MAXPATHLEN];
@@ -295,7 +295,7 @@ main (Argc, Argv) int Argc; char * Argv[]; {
     extern          xdr_string_array();
     void            Dispatch ();
 
-    struct ustat sb;
+    ustat sb;
 
     strcpy (spoolname, SPOOLDIR);
 
@@ -845,7 +845,7 @@ run_ps630(file, options)
 issock(fd)
         int fd;
 {
-        struct ustat st;
+        ustat st;
 
         if (fstat(fd, &st) < 0) {
                 return (0);

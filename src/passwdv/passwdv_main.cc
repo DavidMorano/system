@@ -1,5 +1,5 @@
 /* main SUPPORT (passwdv) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* main module for the 'passwdv' program */

@@ -83,7 +83,7 @@
 extern int	mkpath1(char *,cchar *) ;
 extern int	pathadd(char *,int,cchar *) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	removes(cchar *) ;
 extern int	hasNotDots(cchar *,int) ;
 extern int	isNotValid(int) ;

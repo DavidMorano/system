@@ -194,7 +194,7 @@ const char	pr[] ;
 const char	name[] ;
 const char	*exts[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		i, j, k ;
 	int		fl = 0 ;
 	const char	*lp = NULL ;

@@ -1,18 +1,18 @@
-/* pcscmd */
+/* pcscmd SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* handle IPC-related things */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
-
 
 /* revision history:
 
 	= 2008-09-01, David A­D­ Morano
-        This subroutine was adopted from the DWD program. I may not have changed
-        all of the comments correctly though!
+	This subroutine was adopted from the DWD program. I may not
+	have changed all of the comments correctly though!
 
 */
 
@@ -22,9 +22,7 @@
 
 	These subroutines handle some IPC related functions.
 
-
 *******************************************************************************/
-
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -45,12 +43,13 @@
 #include	<netinet/in.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<pcsnsc.h>
+#include	<timestr.h>
 #include	<localmisc.h>
 
 #include	"pcsmsg.h"
@@ -84,11 +83,6 @@ extern int	progreqfile(PROGINFO *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*getourenv(cchar **,cchar *) ;
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnrpbrk(cchar *,int,cchar *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -236,12 +230,12 @@ static int pcscmder(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 	                    break ;
 	                } /* end switch */
 	            } else {
-	                fmt = "%s: unknown cmd=%t\n" ;
+	                fmt = "%s: unknown cmd=%r\n" ;
 	                shio_printf(pip->efp,fmt,pn,kp,kl) ;
 	                {
 	                    char	tbuf[TIMEBUFLEN+1] ;
 	                    timestr_logz(pip->daytime,tbuf) ;
-	                    logprintf(pip,"%s unknown cmd=%t",tbuf,kp,kl) ;
+	                    logprintf(pip,"%s unknown cmd=%r",tbuf,kp,kl) ;
 	                }
 	            } /* end if (valid) */
 	        } /* end if (positive) */
