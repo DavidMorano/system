@@ -239,7 +239,7 @@ struct subinfo {
 	cchar		*ndbname ;	/* name-db name */
 	cchar		*pdbname ;	/* paragraph-db name */
 	cchar		*vdbname ;	/* verse-db name */
-	cchar		*sdbname ;	/* struture-db name */
+	cchar		*sdbname ;	/* structure-db name */
 	SUBINFO_FL	have, f, changed, final ;
 	SUBINFO_FL	open ;
 	time_t		dt ;
@@ -1423,7 +1423,7 @@ static int procallcacheoutcite(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep) noex {
 	            rs = subinfo_booklookup(sip,nbuf,nlen,b) ;
 	        }
 	        if (rs >= 0) {
-	            fmt = "%t %u:%u\n" ;
+	            fmt = "%r %u:%u\n" ;
 	            rs = filer_printf(sip->ofp,fmt,nbuf,rs,c,v) ;
 	            wlen += rs ;
 	        }
@@ -1678,7 +1678,7 @@ static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
 	            cint	nlen = vip->nlen ;
 	            cchar	*nbuf = vip->nbuf ;
 	            f_havebook = true ;
-	            fmt = (ndays > 1) ? "%t %u:%u (%u)" : "%t %u:%u" ;
+	            fmt = (ndays > 1) ? "%r %u:%u (%u)" : "%r %u:%u" ;
 	            rs = bufprintf(cbuf,clen,fmt,nbuf,nlen,c,v,ndays) ;
 	            cl = rs ;
 	            if (rs >= 0) {
@@ -1750,7 +1750,7 @@ static int procoutcite(SUBINFO *sip,bibleverse_q *qp,int ndays) noex {
 	        if ((bbl = subinfo_booklookup(sip,bbuf,blen,b)) > 0) {
 
 	            f_havebook = true ;
-	            fmt = (ndays > 1) ? "%t %u:%u (%u)" : "%t %u:%u" ;
+	            fmt = (ndays > 1) ? "%r %u:%u (%u)" : "%r %u:%u" ;
 	            rs = bufprintf(cbuf,clen,fmt,bbuf,bbl,c,v,ndays) ;
 	            cl = rs ;
 	            if (rs >= 0) {
@@ -1853,7 +1853,7 @@ static int procoutline(SUBINFO *sip,int line,cchar *lp,int ll) noex {
 	cchar		*fmt ;
 
 	indent = MIN(sip->indent,NBLANKS) ;
-	fmt = "%t%t\n" ;
+	fmt = "%r%r\n" ;
 	rs = filer_printf(sip->ofp,fmt,blanks,indent,lp,ll) ;
 	wlen += rs ;
 

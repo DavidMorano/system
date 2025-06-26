@@ -70,8 +70,8 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>		/* for 'strftime(3c)' */
 
 #include	<usystem.h>
@@ -561,7 +561,7 @@ int		to ;
 #if	CF_DEBUGN
 	    {
 		cchar	*fn = NDEBFNAME ;
-	        nprintf(fn,"opensvc_logwelcome: localgetorgloc() rs=%d ol=%t\n",
+	        nprintf(fn,"opensvc_logwelcome: localgetorgloc() rs=%d ol=%r\n",
 		    rs,olbuf,strlinelen(olbuf,oll,40)) ;
 	    }
 #endif

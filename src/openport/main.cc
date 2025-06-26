@@ -1,5 +1,5 @@
 /* main (openport) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* program to create and bind a socket (OPENPORT setuid program) */
@@ -1321,10 +1321,10 @@ static int proclistquery(PROGINFO *pip,USERPORTS *dbp,bfile *ofp,VECPSTR *alp)
 
 #if	CF_DEBUG
 	        debugprintf("main/proclistquery: parsequery() pl=%d\n",pl) ;
-	        debugprintf("main/proclistquery: uid=%t\n",q.uidp,q.uidl) ;
-	        debugprintf("main/proclistquery: proto=%t\n",
+	        debugprintf("main/proclistquery: uid=%r\n",q.uidp,q.uidl) ;
+	        debugprintf("main/proclistquery: proto=%r\n",
 			q.protop,q.protol) ;
-	        debugprintf("main/proclistquery: port=%t\n",q.portp,q.portl) ;
+	        debugprintf("main/proclistquery: port=%r\n",q.portp,q.portl) ;
 #endif
 
 	        if (pl == 0) continue ;

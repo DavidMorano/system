@@ -91,7 +91,7 @@ char	*envv[] ;
 	    while (field_get(&fsb,NULL) >= 0) {
 
 #if	CF_DEBUGS
-	debugprintf("main: 1 gp=>%t<\n",fsb.fp,fsb.flen) ;
+	debugprintf("main: 1 gp=>%r<\n",fsb.fp,fsb.flen) ;
 #endif
 
 	        if (cfdeci(fsb.fp,fsb.flen,&value) >= 0) {
@@ -109,7 +109,7 @@ char	*envv[] ;
 #endif
 
 	            bprintf(efp,
-	                "%s: \"%t\" is not a valid decimal number\n",
+	                "%s: \"%r\" is not a valid decimal number\n",
 	                g.progname,fsb.fp,fsb.flen) ;
 
 		}

@@ -226,7 +226,7 @@ int		to ;
 static int ow_avail(sip)
 OW		*sip ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		fd = -1 ;
 	const char	*pr = sip->pr ;
@@ -465,7 +465,7 @@ OW		*sip ;
 const char	dname[] ;
 mode_t		m ;
 {
-	struct ustat	usb ;
+	ustat	usb ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;

@@ -1199,7 +1199,7 @@ static int procsearch(PROGINFO *pip,VECSTR *nlp)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
-	                debugprintf("procsearch: l=>%t<\n",
+	                debugprintf("procsearch: l=>%r<\n",
 	                    lbuf,strlinelen(lbuf,len,40)) ;
 #endif
 
@@ -1256,7 +1256,7 @@ static int procsearchline(PROGINFO *pip,VECSTR *nlp,char lbuf[],int len)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
-	                debugprintf("procsearchline: pid=%u c=%t\n",
+	                debugprintf("procsearchline: pid=%u c=%r\n",
 	                    pid,cmdp,strlinelen(cmdp,cmdl,40)) ;
 #endif
 
