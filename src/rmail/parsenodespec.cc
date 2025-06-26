@@ -1,16 +1,17 @@
-/* parsenodespec */
+/* rmail_parsenodespec SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* parse a COMSAT node specification into node and port */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 */
 
@@ -18,18 +19,18 @@
 
 /******************************************************************************
 
-	This little subroutine just parses out a node specification.  A node
-	specification looks like:
+  	Description:
+	This little subroutine just parses out a node specification.
+	A node specification looks like:
 
 		hostname[:port]
 
-	The port can be either numeric or all alpha.  If the parse is
-	successful, the port number is returned.  If no port number (or name)
-	was within the specification, the default port that was passed by the
-	caller is returned instead.
+	The port can be either numeric or all alpha.  If the parse
+	is successful, the port number is returned.  If no port
+	number (or name) was within the specification, the default
+	port that was passed by the caller is returned instead.
 
 	Synopsis:
-
 	int parsenodespec(PROGINFO *pip,char rbuf[],cchar *nsp,int nsl)
 	PROGINFO	*pip ;
 	char		rbuf[] ;
@@ -37,22 +38,18 @@
 	int		nsl ;
 
 	Arguments:
-
 	pip		pointer to program information
 	rbuf		user supplied buffer
 	nsp		pointer to node-specification
 	nsl		length of node-specification
 
 	Returns:
-
 	>=0		port number that was parsed out
-	<0		error
-
+	<0		error (system-return)
 
 ******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -67,6 +64,7 @@
 
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -84,23 +82,20 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
 extern int	getportnum(cchar *,cchar *) ;
 extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
@@ -125,16 +120,17 @@ typedef unsigned int	in_addr_t ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* external subroutines */
 
-
-int parsenodespec(PROGINFO *pip,char rbuf[],cchar *nsp,int nsl)
-{
+int parsenodespec(PROGINFO *pip,char rbuf[],cchar *nsp,int nsl) noex {
 	int		rs = SR_OK ;
 	int		nl, pl ;
 	int		port = 0 ;
-	const char	*tp ;
-	const char	*np, *pp ;
+	cchar	*tp ;
+	cchar	*np, *pp ;
 
 	if (pip == NULL) return SR_FAULT ;
 

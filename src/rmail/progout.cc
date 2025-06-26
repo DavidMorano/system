@@ -397,7 +397,7 @@ MAILMSGATT_ENT	*ep ;
 
 	        if (ep->clen < 0) {
 
-	            struct ustat	sb ;
+	            ustat	sb ;
 
 	            rs1 = bcontrol(ifp,BC_STAT,&sb) ;
 	            if ((rs1 >= 0) && S_ISREG(sb.st_mode))

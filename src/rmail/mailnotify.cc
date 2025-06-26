@@ -1,5 +1,5 @@
-/* prognotify SUPPORT */
-/* encoding=ISO8859-1 */
+/* rmail_prognotify SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* fairly generic (PCS) subroutine */
@@ -53,6 +53,7 @@
 #include	<sockaddress.h>
 #include	<mcmsg.h>
 #include	<recip.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -104,8 +105,6 @@ extern int	isNotPresent(int) ;
 extern int	parsenodespec(PROGINFO *,char *,const char *,int) ;
 
 extern char	*strdcpy3(char *,int,const char *,const char *,const char *) ;
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*strbasename(char *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;

@@ -1,5 +1,5 @@
-/* main SUPPORT (DMAIL) */
-/* encoding=ISO8859-1 */
+/* rmail_main SUPPORT (DMAIL) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* fairly generic (PCS) front-end */
@@ -57,6 +57,7 @@
 #include	<ucmallreg.h>
 #include	<getbufsize.h>
 #include	<getportnum.h>
+#include	<getourenv.h>
 #include	<getx.h>
 #include	<getxname.h>
 #include	<getax.h>
@@ -88,6 +89,8 @@
 #include	<mkdirs.h>
 #include	<cfdec.h>
 #include	<xperm.h>
+#include	<strn.h>
+#include	<strx.h>
 #include	<matxstr.h>
 #include	<isnot.h>
 #include	<exitcodes.h>
@@ -165,13 +168,8 @@ extern int	mkrealname(char *,int,cchar *,int) ;
 extern int	vecobj_recipadd(vecobj *,cchar *,int) ;
 extern int	vecobj_recipfins(vecobj *) ;
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
 extern char	*strdcpy1w(char *,int,cchar *,int) ;
 extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
@@ -3163,7 +3161,7 @@ static int procrecip_addrchecker(PROGINFO *pip,LOOKADDR_USER *curp,
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
-	if ((a[0] != '\0') && (strpbrk(a,"@!") != nullptr)) {
+	if ((a[0] != '\0') && (strbrk(a,"@!") != nullptr)) {
 	            LOOKADDR	*lap = &lip->la ;
 	            rs = lookaddr_usercheck(lap,curp,a,f_spam) ;
 	            f_spam = rs ;
@@ -3348,7 +3346,7 @@ static int procmboxes(PROGINFO *pip,cchar *sp,int sl)
 
 	if (sl < 0) sl = strlen(sp) ;
 
-	while ((tp = strnpbrk(sp,sl,", :")) != nullptr) {
+	while ((tp = strnbrk(sp,sl,", :")) != nullptr) {
 	    if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
 	        c += 1 ;
 	        rs = locinfo_mboxadd(lip,cp,cl) ;
@@ -3511,7 +3509,7 @@ static int procmaildirs(PROGINFO *pip,PARAMOPT *pop)
 	    for (i = 0 ; varmaildirs[i] != nullptr ; i += 1) {
 	        dns = getourenv(pip->envv,varmaildirs[i]) ;
 	        if (dns != nullptr) {
-	            while ((tp = strpbrk(dns," :,\t\n")) != nullptr) {
+	            while ((tp = strbrk(dns," :,\t\n")) != nullptr) {
 	                rs = procmaildir(pip,pop,dns,(tp-dns)) ;
 	                if (rs < 0) break ;
 	                c += rs ;
@@ -3957,7 +3955,7 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,int ac,
 	    fmt = "%-15s argc=%u args¬\n" ;
 	    bprintf(rfp,fmt,id,ac) ;
 
-	    fmt = "%-15s a%02u=>%t<\n" ;
+	    fmt = "%-15s a%02u=>%r<\n" ;
 	    for (i = 0 ; (i < ac) && (av[i] != nullptr) ; i += 1) {
 		cchar	*ap = av[i] ;
 	        rs = bprintf(rfp,fmt,id,i,ap,al) ;

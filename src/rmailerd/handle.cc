@@ -1,5 +1,5 @@
 /* handle SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* handle this connection of messages */
@@ -304,7 +304,7 @@ int handle(proginfo *pip,int s,vecstr *elp) noex {
 	    fsize = -1 ;
 	    if (f_seekable = (bseek(ifp,0L,SEEK_CUR) >= 0)) {
 
-	        struct ustat	sb ;
+	        ustat	sb ;
 
 
 	        bcontrol(ifp,BC_STAT,&sb) ;

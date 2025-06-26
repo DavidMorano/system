@@ -1,11 +1,12 @@
-/* proglogaddrs */
+/* rmail_proglogaddrs SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* log messages addresses */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
-
 
 /* revision history:
 
@@ -13,8 +14,9 @@
 	This code was originally written.
 
 	= 1999-02-01, David A­D­ Morano
-        I added a little code to "post" articles that do not have a valid
-        newsgroup to a special "dead article" directory in the BB spool area.
+	I added a little code to "post" articles that do not have
+	a valid newsgroup to a special "dead article" directory in
+	the BB spool area.
 
 */
 
@@ -22,19 +24,19 @@
 
 /*******************************************************************************
 
-        This module processes one or more mail messages (in appropriate mailbox
-        format if more than one) on STDIN. The output is a single file that is
-        ready to be added to each individual mailbox in the spool area.
+  	Description:
+	This module processes one or more mail messages (in appropriate
+	mailbox format if more than one) on STDIN.  The output is a
+	single file that is ready to be added to each individual
+	mailbox in the spool area.
 
 	Things to do:
 
 	Change use of 'sfsubstance()'.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -42,6 +44,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
@@ -52,11 +55,12 @@
 #include	<logfile.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
-#include	<char.h>
 #include	<mailmsg.h>
 #include	<mailmsghdrs.h>
 #include	<ema.h>
 #include	<emainfo.h>
+#include	<strn.h>
+#include	<char.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -116,9 +120,6 @@ extern int	cfdeci(const char *,int,int *) ;
 
 extern int	sfsubstance(const char *,int,const char **) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*timestr_edate(time_t,char *) ;
 extern char	*timestr_hdate(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
