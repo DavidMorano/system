@@ -1,5 +1,5 @@
 /* main SUPPORT (pcspasswd) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* main module for the 'passwdv' program */

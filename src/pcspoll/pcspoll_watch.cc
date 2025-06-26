@@ -123,7 +123,7 @@ extern int	mklogidsub(char *,int,cchar *,int) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	nextfield(cchar *,int,cchar **) ;
 extern int	cfdeci(char *,int,int *) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
 extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
@@ -283,7 +283,7 @@ vecstr		*snp ;
 	        for (i = 0 ; vecstr_get(elp,i,&cp) >= 0 ; i += 1) {
 		    if (cp == NULL) continue ;
 		    n += 1 ;
-	            debugprintf("progwatch: e=>%t<\n",
+	            debugprintf("progwatch: e=>%r<\n",
 			cp,strlinelen(cp,-1,50)) ;
 	        } /* end while (vecstr-get) */
 	    } /* end if */
@@ -425,7 +425,7 @@ vecstr		*snp ;
 	    varsub_curbegin(slp,&c) ;
 	    while (varsub_curenum(slp,&c,&kp,&vp) >= 0) {
 		n += 1 ;
-	        debugprintf("progwatch: k=%s v=%t\n",kp,
+	        debugprintf("progwatch: k=%s v=%r\n",kp,
 		    vp,strlinelen(vp,-1,40)) ;
 	    } /* end while (enum) */
 	    varsub_curend(slp,&c) ;
@@ -971,7 +971,7 @@ struct proginfo	*pip ;
 	                for (i = 0 ; vecstr_get(pcp->elp,i,&cp) >= 0 ; i += 1) {
 	                    if (cp == NULL) continue ;
 	                    debugprintf("procruncheck: CP=%p\n",cp) ;
-	                    debugprintf("procruncheck: export> %t\n",
+	                    debugprintf("procruncheck: export> %r\n",
 	                        cp,strnlen(cp,50)) ;
 	                } /* end for */
 #endif /* COMMENT */
@@ -1271,7 +1271,7 @@ cchar	*pfname ;
 		        int		al ;
 		        cchar	*ap ;
 		        if ((al = sfbasename(av[0],-1,&ap)) > 0)
-	                    logfile_printf(&pip->lh,"server=%t\n",ap,al) ;
+	                    logfile_printf(&pip->lh,"server=%r\n",ap,al) ;
 		    }
 	            logfile_flush(&pip->lh) ;
 	        } /* end if (log-open) */
@@ -1475,7 +1475,7 @@ SVCFILE_ENT	*sep ;
 SVCENTRY_ARGS	*pap ;
 {
 	struct subinfo	*pcp = pip->sip ;
-	struct ustat	sb ;
+	ustat	sb ;
 	SVCENTRY	*pep ;
 	bfile		tsfile ;
 	mode_t		oldmask ;
@@ -2281,7 +2281,7 @@ static int proclogsecurity(struct proginfo *pip,cchar *pfname)
 	    if (pip->debuglevel > 0) {
 		char	timebuf[TIMEBUFLEN+1] ;
 	        timestr_logz(pip->daytime,timebuf) ;
-	        bprintf(pip->efp,"%s: %s server=%t\n",
+	        bprintf(pip->efp,"%s: %s server=%r\n",
 	            pip->progname,timebuf,ap,al) ;
 	    }
 
@@ -2339,7 +2339,7 @@ static int procxfile(pip,fname)
 struct proginfo	*pip ;
 cchar	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 
 	if ((rs = u_stat(fname,&sb)) >= 0) {

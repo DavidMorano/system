@@ -426,7 +426,7 @@ char	*envv[] ;
 	                    f_usage = TRUE ;
 	                    rs = SR_INVALID ;
 	                    bprintf(pip->efp,
-	                        "%s: invalid key=%t\n",
+	                        "%s: invalid key=%r\n",
 	                        pip->progname,akp,akl) ;
 
 	                } /* end switch (key words) */
@@ -891,7 +891,7 @@ struct proginfo	*pip ;
 static int dirok(dirname)
 const char	dirname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 	int	preumask ;

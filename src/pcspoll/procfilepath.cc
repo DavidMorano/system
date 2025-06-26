@@ -90,7 +90,7 @@ const char	programroot[] ;
 const char	fname[] ;
 VECSTR		*lp ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	FIELD	fsb ;
 

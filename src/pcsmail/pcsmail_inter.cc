@@ -1,4 +1,5 @@
 /* pcsmail_inter SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* collect the mail-message to send, interactively */
@@ -23,17 +24,20 @@
 #include	<cerrno>
 #include	<csignal>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<baops.h>
 #include	<logfile.h>
 #include	<bfile.h>
-#include	<char.h>
 #include	<ascii.h>
 #include	<userinfo.h>
 #include	<pcsconf.h>
+#include	<strx.h>
+#include	<char.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"prompt.h"
@@ -454,7 +458,7 @@ int inter()
 /* setup local or internet from field */
 
 	    if ((tonames != 0) && 
-	        (strpbrk(recipient,"@_") != NULL) || f_internet)
+	        (strbrk(recipient,"@_") != NULL) || f_internet)
 
 /* this is going internet */
 

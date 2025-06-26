@@ -1,11 +1,10 @@
 /* config */
 
-/* 
-	= David A.D. Morano, 94/01/06
+/* revision history:
 
+	= 1994-01-06, David A-D- Morano
 
 */
-
 
 #define	VERSION		"3.2-beta"
 

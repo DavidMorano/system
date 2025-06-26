@@ -1,13 +1,15 @@
-/* main SUPPORT */
-/* encoding=ISO8859-1 */
+/* pcsmail_main SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
+
+/* retrieve PCS mail messages */
+/* version %I% last-modified %G% */
 
 #define	CF_NOSEND	1
 
 /*******************************************************************************
 
 	= 94-01-06, David A­D­ Morano 
-
 	This subroutine was adopted from the 'main' subroutine of the
 	old PCS SENDMAIL program.
 
@@ -36,11 +38,12 @@
 #include	<baops.h>
 #include	<logfile.h>
 #include	<bfile.h>
-#include	<char.h>
 #include	<ascii.h>
 #include	<userinfo.h>
 #include	<pcsconf.h>
 #include	<vecstr.h>
+#include	<strx.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -1223,7 +1226,7 @@ int main(int argc,mainv argv,mainv)
 
 	if ((g.debuglevel > 0) && (options != NULL)) {
 
-	    while ((cp = strpbrk(options,",:")) != NULL) {
+	    while ((cp = strbrk(options,",:")) != NULL) {
 
 	        *cp++ = '\0' ;
 	        debugprintf("main: opt> %s\n",options) ;

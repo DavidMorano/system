@@ -94,7 +94,7 @@ int	argc ;
 char	*argv[] ;
 char	*envv[] ;
 {
-	struct ustat	statbuf ;
+	ustat	statbuf ;
 
 	struct proginfo	pi, *pip = &pi ;
 
