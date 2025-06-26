@@ -124,7 +124,7 @@ struct modinfo {
 	VECSTR		*flp ;
 	char		*mailfname ;
 	char		*mlfname ;
-	struct ustat	mdsb ;
+	ustat	mdsb ;
 	time_t		daytime ;
 	int		lilen ;
 	int		mfd ;
@@ -143,8 +143,8 @@ static int	mailcopy_forwarded(vecstr *,const char *,int) ;
 static int	ourlock() ;
 #endif /* COMMENT */
 
-static int	maillock_create(struct proginfo *,const char *,struct ustat *) ;
-static int	maillock_unlink(struct proginfo *,const char *,struct ustat *) ;
+static int	maillock_create(struct proginfo *,const char *,ustat *) ;
+static int	maillock_unlink(struct proginfo *,const char *,ustat *) ;
 
 static int	mklockinfo(struct proginfo *,char *,int,time_t) ;
 
@@ -174,7 +174,7 @@ const char	maildname[] ;
 const char	mailuser[] ;
 {
 	struct modinfo	mi, *mip = &mi ;
-	struct ustat	sf ;
+	ustat	sf ;
 	time_t		starttime ;
 	off_t	offset ;
 	const int	pm = (R_OK|W_OK) ;
@@ -351,7 +351,7 @@ struct modinfo	*mip ;
 	int		tlen = 0 ;
 
 	if ((rs = sigblocker_start(&blocker,sigblocks)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    int			lfd ;
 	    int			j ;
 	    const char		*mlfname = mip->mlfname ;
@@ -514,9 +514,9 @@ int	fd, cmd, timeout ;
 static int maillock_create(pip,mlfname,maildir_sbp)
 struct proginfo	*pip ;
 const char	mlfname[] ;
-struct ustat	*maildir_sbp ;
+ustat	*maildir_sbp ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		lfd = -1 ;
 
@@ -621,7 +621,7 @@ ret0:
 static int maillock_unlink(pip,mlfname,maildir_sbp)
 struct proginfo	*pip ;
 const char	mlfname[] ;
-struct ustat	*maildir_sbp ;
+ustat	*maildir_sbp ;
 {
 	int		rs = SR_ACCES ;
 

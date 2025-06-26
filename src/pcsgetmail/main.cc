@@ -1,5 +1,5 @@
 /* main (PCSGETMAIL) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C99 */
 
 /* the PCSGETMAIL program */
@@ -959,7 +959,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	        VERSION,(pip->f.sysv_ct) ? "SYSV" : "BSD") ;
 	    if (f_makedate) {
 	        cl = makedate_get(makedate,&cp) ;
-	        bprintf(pip->efp,"%s: makedate %t\n",pn,cp,cl) ;
+	        bprintf(pip->efp,"%s: makedate %r\n",pn,cp,cl) ;
 	    }
 	} /* end if */
 
@@ -1534,7 +1534,7 @@ static int procpcsconf_begin(proginfo *pip,PCSCONF *pcp)
 	            while (rs >= 0) {
 	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
-	                debugprintf("main/procpcsconf: pair> %s=%t\n",
+	                debugprintf("main/procpcsconf: pair> %s=%r\n",
 	                    kbuf,vbuf,vl) ;
 	            } /* end while */
 	            pcsconf_curend(pcp,&cur) ;
@@ -1981,7 +1981,7 @@ static int maildirs_env(proginfo *pip,cchar *var)
 	    cchar	*tp ;
 	    sl = strlen(sp) ;
 
-	    while ((tp = strnpbrk(sp,sl," ,:\t\n")) != NULL) {
+	    while ((tp = strnbrk(sp,sl," ,:\t\n")) != NULL) {
 	        if ((cl = sfshrink(sp,(tp - sp),&cp)) > 0) {
 	            rs = maildirs_add(pip,cp,cl) ;
 	            c += rs ;
@@ -2097,7 +2097,7 @@ static int maildirs_add(proginfo *pip,cchar *dp,int dl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	debugprintf("main/maildirs_add: ent md=%t\n",dp,dl) ;
+	debugprintf("main/maildirs_add: ent md=%r\n",dp,dl) ;
 #endif
 
 	if ((dl > 0) && (dp[0] != '\0')) {
@@ -2105,7 +2105,7 @@ static int maildirs_add(proginfo *pip,cchar *dp,int dl)
 	        cint	am = (W_OK|X_OK|R_OK) ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	debugprintf("main/maildirs_add: NF md=%t\n",dp,dl) ;
+	debugprintf("main/maildirs_add: NF md=%r\n",dp,dl) ;
 #endif
 	        if ((rs = maildirs_accessible(pip,dp,dl,am)) > 0) {
 	            c += 1 ;
@@ -2135,7 +2135,7 @@ static int maildirs_accessible(proginfo *pip,cchar *dp,int dl,int am)
 	if (pip == NULL) return SR_FAULT ; /* ¥ GCC and LINT */
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
-	debugprintf("main/maildirs_accessible: ent md=%t\n",dp,dl) ;
+	debugprintf("main/maildirs_accessible: ent md=%r\n",dp,dl) ;
 	debugprintf("main/maildirs_accessible: egid=%d\n",getegid()) ;
 	}
 #endif
@@ -2295,11 +2295,11 @@ static int mailusers_env(proginfo *pip,cchar *var)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
-	        debugprintf("main/mailusers_env: mu=%t\n",
+	        debugprintf("main/mailusers_env: mu=%r\n",
 	            sp,strlinelen(sp,sl,50)) ;
 #endif
 
-	    while ((tp = strnpbrk(sp,sl," ,:\t\n")) != NULL) {
+	    while ((tp = strnbrk(sp,sl," ,:\t\n")) != NULL) {
 
 	        if ((cl = sfshrink(sp,(tp - sp),&cp)) > 0) {
 	            rs = mailusers_add(pip,cp,cl) ;
@@ -2465,17 +2465,17 @@ static int proclog_maildirbad(proginfo *pip,cchar *dp,int dl,int mrs)
 	cchar	*pn = pip->progname ;
 
 	if (pip->efp != NULL) {
-	    cchar	*fmt = "%s: maildir=%t inaccessible (%d)\n" ;
+	    cchar	*fmt = "%s: maildir=%r inaccessible (%d)\n" ;
 	    bprintf(pip->efp,fmt,pn,dp,dl,mrs) ;
 	}
 
 	if (pip->open.logprog) {
-	    cchar	*fmt = "maildir=%t inaccessible (%d)" ;
+	    cchar	*fmt = "maildir=%r inaccessible (%d)" ;
 	    proglog_printf(pip,fmt,dp,dl,mrs) ;
 	}
 
 	if (pip->open.logsys) {
-	    cchar	*fmt = "maildir=%t inaccessible (%d)" ;
+	    cchar	*fmt = "maildir=%r inaccessible (%d)" ;
 	    cint	pri = LOG_NOTICE ;
 	    logsys_printf(&pip->ls,pri,fmt,dp,dl,mrs) ;
 	}

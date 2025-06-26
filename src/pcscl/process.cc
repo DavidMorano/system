@@ -94,7 +94,7 @@ struct proginfo	*pip ;
 bfile		*ofp ;
 char		filename[] ;
 {
-	struct ustat	stat_i ;
+	ustat	stat_i ;
 
 	MSGMATENV	me ;
 

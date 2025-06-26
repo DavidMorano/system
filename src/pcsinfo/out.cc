@@ -451,7 +451,7 @@ MSGATTACH_ENT	*ep ;
 	            (ep->code == CE_BINARY)) {
 
 	            if (ep->clen < 0) {
-	                struct ustat	sb ;
+	                ustat	sb ;
 
 	                if ((bcontrol(ifp,BC_STAT,&sb) >= 0) &&
 	                    S_ISREG(sb.st_mode))
