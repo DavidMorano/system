@@ -230,7 +230,7 @@ char	*argv[], *envv[] ;
 	bfile		logfile ;
 	bfile		pidfile ;
 
-	struct ustat		sb ;
+	ustat		sb ;
 
 	struct proginfo		g, *pip = &g ;
 
@@ -2686,7 +2686,7 @@ VECSTR		*elp ;
 static int checkspooldir(pip)
 struct proginfo	*pip ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 
@@ -2745,7 +2745,7 @@ static int checkfiledir(pip,fname)
 struct proginfo	*pip ;
 char		fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs, sl ;
 

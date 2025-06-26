@@ -232,7 +232,7 @@ char	*envv[] ;
 	        if ((len > 1) && (bp[len - 2] == '\r')) {
 
 	            count_m += 1 ;
-	            bprintf(ofp,"%t\n",bp,len - 2) ;
+	            bprintf(ofp,"%r\n",bp,len - 2) ;
 
 	        } else
 	            bwrite(ofp,bp,len) ;

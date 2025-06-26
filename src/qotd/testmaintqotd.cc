@@ -107,7 +107,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            const int	to = -1 ;
 	            int		mjd = rs ;
 	            if ((rs1 = maintqotd(pr,mjd,of,to)) >= 0) {
-	                struct ustat	sb ;
+	                ustat	sb ;
 	                int		fd = rs1 ;
 #if	CF_DEBUGS
 	                debugprintf("main: maintqotd() rs=%d\n",rs1) ;

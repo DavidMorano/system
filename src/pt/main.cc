@@ -1,5 +1,5 @@
-/* main SUPPORT (liblkcmd) */
-/* encoding=ISO8859-1 */
+/* l_main SUPPORT (liblkcmd) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* generic front-end for SHELL built-ins */
@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	main
+
+	Description:
 	This is the front-end to make the various SHELL (KSH)
 	built-in commands into stand-alone programs.
 

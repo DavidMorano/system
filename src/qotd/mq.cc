@@ -163,7 +163,7 @@ extern int	getprogpath(IDS *,vecstr *,char *,cchar *,int) ;
 extern int	getprogexec(char *,int) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	mklogid(char *,int,cchar *,int,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_addpathclean(vecstr *,cchar *,int) ;
@@ -420,7 +420,7 @@ int maintqotd(cchar *pr,int mjd,int of,int to)
 static int subinfo_start(MAINTQOTD *sip,time_t dt,cchar *pr,
 		int of,int to,int mjd)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 
 	if (dt == 0) dt = time(NULL) ;
@@ -1176,7 +1176,7 @@ static int subinfo_addprbin(MAINTQOTD *sip,vecstr *plp,cchar *pr,cchar *prbin)
 	int		c = 0 ;
 	char		tbuf[MAXPATHLEN+1] ;
 	if ((rs = mkpath2(tbuf,pr,prbin)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    const int		tl = rs ;
 	    if ((rs = u_stat(tbuf,&sb)) >= 0) {
 		if (S_ISDIR(sb.st_mode)) {
@@ -1211,7 +1211,7 @@ static int subinfo_id(MAINTQOTD *sip)
 
 static int subinfo_dircheck(MAINTQOTD *sip,cchar *dname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	const mode_t	dm = (0777 | S_ISGID) ;
 	const uid_t	euid = sip->euid ;
 	const int	nrs = SR_NOENT ;
@@ -1779,7 +1779,7 @@ static int opendef(MAINTQOTD *sip)
 #if	CF_DEBUGS
 static int debugmode(cchar *ids,cchar *s,cchar *fname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	if ((rs = u_stat(fname,&sb)) >= 0) {
 	    char	mstr[100+1] ;
@@ -1797,7 +1797,7 @@ static int debugmode(cchar *ids,cchar *s,cchar *fname)
 #if	CF_DEBUGS
 static int debugfmode(cchar *id,cchar *s,int fd)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 		char	mstr[100+1] ;
 		u_fstat(fd,&sb) ;
