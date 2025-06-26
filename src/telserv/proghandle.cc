@@ -500,7 +500,7 @@ del_env(const char *name)
 static int
 issock(int fd)
 {
-	struct ustat stats;
+	ustat stats;
 
 	if (fstat(fd, &stats) == -1)
 		return (0);
@@ -861,7 +861,7 @@ struct sockaddr_storage *who;
 #else /* SYSV */
 
 	for (c = 'p'; c <= 's'; c++) {
-		struct ustat stb;
+		ustat stb;
 
 		line = "/dev/ptyXX";
 		line[strlen("/dev/pty")] = c;
@@ -2777,7 +2777,7 @@ rmut()
 	int found = 0;
 	struct utmp *u, *utmp;
 	int nutmp;
-	struct ustat statbf;
+	ustat statbf;
 	struct	utmp wtmp;
 	char	wtmpf[]	= WTMP_FILE;
 	char	utmpf[] = UTMP_FILE;
@@ -3523,7 +3523,7 @@ static int fd_allzero(fd_set *sp)
 #if	CF_DEBUG || CF_DEBUGS
 static int debugfstat(cchar *s,int fd)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int	rs1 = SR_BADF ;
 	if (fd >= 0)
 	rs1 = u_fstat(fd,&sb) ;
