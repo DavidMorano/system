@@ -168,7 +168,7 @@ main(int ac, char *av[])
 
 	/* send the data files */
 	for (tmp = optind; tmp < ac; tmp++) {
-		struct ustat st;
+		ustat st;
 		int fd;
 		int	mflags = 0 ;
 		char *ptr;
