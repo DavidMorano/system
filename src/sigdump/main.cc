@@ -269,7 +269,7 @@ static int readthem(name,fp)
 char	name[] ;
 bfile	*fp ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	struct sigdumpmsg_request	m0 ;
 

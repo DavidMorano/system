@@ -1,5 +1,5 @@
 /* main (sname) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* program to EXEC a program with the named INPUT file and ARG0 */
@@ -8,16 +8,16 @@
 
 /* revision history:
 
-	= 1990-11-00, David A.D. Morano
+	= 1990-11-00, David A-D- Morano
 	This program was originally written.
 
-	= 1997-01-00, David A.D. Morano
+	= 1997-01-00, David A-D- Morano
 	I fixed a potentially fatal bug when incorrect arguments
 	are given !
 
 */
 
-/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2017 David A-D- Morano.  All rights reserved. */
 /* Use is subject to license terms. */
 
 /**************************************************************************
@@ -74,7 +74,7 @@ int main(int argc,mainv argv,mainv envv) {
 	struct passwd	*pp ;
 
 #ifdef	COMMENT
-	struct ustat	ss ;
+	ustat	ss ;
 #endif
 
 	uid_t	uid ;

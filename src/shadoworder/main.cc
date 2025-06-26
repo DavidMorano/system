@@ -1086,7 +1086,7 @@ static int procpwverify(PROGINFO *pip,PARAMOPT *app,bfile *ofp,VECOBJ *pfp)
 		cchar	*up = pwfields[0].up ;
 		fmt = "%s: PASSWD error line=%u (%d)\n" ;
 	        bprintf(pip->efp,fmt,pn,line,rs) ;
-		fmt = "%s: PASSWD rec-name=%t\n" ;
+		fmt = "%s: PASSWD rec-name=%r\n" ;
 	        bprintf(pip->efp,fmt,pn,up,ul) ;
 	    }
 
@@ -1411,7 +1411,7 @@ PROGINFO	*pip ;
 PARAMOPT	*app ;
 VECOBJ		*pfp ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	size_t		msize ;
 	uint		lo = 0 ;
 	int		rs = SR_OK ;
@@ -1468,7 +1468,7 @@ VECOBJ		*pfp ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("main/procpf: line=>%t<\n",lp,ll) ;
+	        debugprintf("main/procpf: line=>%r<\n",lp,ll) ;
 #endif
 
 	    if ((tp = strnchr(lp,ll,'#')) != NULL)
