@@ -1,4 +1,5 @@
 /* progprinthdr SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* print messages addresses */
@@ -35,9 +36,9 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<cstdarg>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bfile.h>
@@ -46,6 +47,7 @@
 #include	<ema.h>
 #include	<emainfo.h>
 #include	<outline.h>
+#include	<strn.h>
 #include	<sfx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
@@ -93,10 +95,6 @@ extern int	sncpy1(char *,int,const char *) ;
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(const char *,...) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -521,7 +519,7 @@ static int procoutvalue(PROGINFO *pip,bfile *ofp,OUTLINE *ldp,cchar *v,int vlen)
 	            f_linestart = FALSE ;
 	        }
 
-	        fmt = (f_linestart) ? " %t" : "%t" ;
+	        fmt = (f_linestart) ? " %r" : "%r" ;
 	        if (rs >= 0) {
 	            rs = bprintf(ofp,fmt,cp,cl) ;
 	            wlen += rs ;

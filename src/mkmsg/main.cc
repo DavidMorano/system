@@ -1706,7 +1706,7 @@ static int procpcsconf_begin(PROGINFO *pip)
 	            while (rs >= 0) {
 	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
-	                debugprintf("main/procpcsconf: pair> %s=%t\n",
+	                debugprintf("main/procpcsconf: pair> %s=%r\n",
 	                    kbuf,vbuf,vl) ;
 	            } /* end while */
 	            pcsconf_curend(pcp,&cur) ;
@@ -2435,7 +2435,7 @@ static int logmsghead(PROGINFO *pip,int name,cchar *vp)
 	    if (vp != NULL) {
 	        const int	vl = strnlen(vp,cmax) ;
 	        const char	*fmt ;
-	        fmt = (name != hname_msgid) ? "%s=>%t<\n" : "%s=%t" ;
+	        fmt = (name != hname_msgid) ? "%s=>%r<\n" : "%s=%r" ;
 	        rs = proglog_printf(pip,fmt,hname[name],vp,vl) ;
 	    }
 	} /* end if (cmax) */
@@ -2465,7 +2465,7 @@ static int logmsgaddr(PROGINFO *pip,int name,EMA *ap)
 	                const int	cl = strnlen(cp,cmax) ;
 		        cchar	*kn = hname[name] ;
 	                c += 1 ;
-	                rs = proglog_printf(pip,"%s=%t\n",kn,cp,cl) ;
+	                rs = proglog_printf(pip,"%s=%r\n",kn,cp,cl) ;
 	            }
 		}
 	    } /* end for */
@@ -2605,7 +2605,7 @@ static int locinfo_prstat(LOCINFO *lip)
 	int		rs = SR_OK ;
 
 	if (lip->uid_pr < 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = u_stat(pip->pr,&sb)) >= 0) {
 	        lip->uid_pr = sb.st_uid ;
 	        lip->gid_pr = sb.st_gid ;

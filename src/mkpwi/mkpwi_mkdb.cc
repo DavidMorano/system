@@ -481,7 +481,7 @@ static int procentry(PI *pip,STRTAB *stp,RECORDER *rtp,cchar *username,
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("procentry: username=%s\n",username) ;
-	    debugprintf("procentry: rname=>%t<\n",nbuf,nlen) ;
+	    debugprintf("procentry: rname=>%r<\n",nbuf,nlen) ;
 	}
 #endif
 

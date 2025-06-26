@@ -1018,7 +1018,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    bprintf(pip->efp,"%s: version %s\n",pip->progname,VERSION) ;
 	    if (f_makedate) {
 	        cl = makedate_get(mkindexing_makedate,&cp) ;
-	        bprintf(pip->efp,"%s: makedate %t\n", pip->progname,cp,cl) ;
+	        bprintf(pip->efp,"%s: makedate %r\n", pip->progname,cp,cl) ;
 	    }
 	} /* end if */
 

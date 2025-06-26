@@ -1,4 +1,5 @@
 /* mkcmds HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* names string storage: purpose? */
