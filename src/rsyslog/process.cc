@@ -92,7 +92,7 @@ PARAMOPT	*app ;
 bfile		*ofp ;
 const char	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	off_t	moff ;
 

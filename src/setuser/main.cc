@@ -63,7 +63,7 @@ char	*envv[] ;
 	struct passwd	*pwp ;
 
 #ifdef	COMMENT
-	struct ustat	ss ;
+	ustat	ss ;
 #endif
 
 	bfile		errfile, *efp = &errfile ;

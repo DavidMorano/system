@@ -93,7 +93,7 @@ char	*envv[] ;
 	struct fzentry	f[NFILTERS] ;
 
 #ifdef	COMMENT
-	struct ustat	statbuf ;
+	ustat	statbuf ;
 #endif
 
 	struct gdata	g, *gdp = &g ;
@@ -544,8 +544,8 @@ int		*fbuflenp ;
 	bfile	filterfile, *ffp = &filterfile ;
 	bfile	fzfile, *zfp = &fzfile ;
 
-	struct ustat	fzstat ;
-	struct ustat	fstat ;
+	ustat	fzstat ;
+	ustat	fstat ;
 
 	FIELD	fsb ;
 

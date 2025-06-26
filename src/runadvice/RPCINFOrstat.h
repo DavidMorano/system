@@ -49,7 +49,7 @@ struct rstat_timeval {
 };
 typedef struct rstat_timeval rstat_timeval;
 
-struct ustatsvar {
+struct statsvar {
 	struct {
 		u_int cp_time_len;
 		int *cp_time_val;
@@ -73,9 +73,9 @@ struct ustatsvar {
 	rstat_timeval boottime;
 	rstat_timeval curtime;
 };
-typedef struct ustatsvar statsvar;
+typedef struct statsvar statsvar;
 
-struct ustatstime {
+struct statstime {
 	int cp_time[RSTAT_CPUSTATES];
 	int dk_xfer[RSTAT_DK_NDRIVE];
 	u_int v_pgpgin;
@@ -93,10 +93,10 @@ struct ustatstime {
 	rstat_timeval curtime;
 	int if_opackets;
 };
-typedef struct ustatstime statstime;
+typedef struct statstime statstime;
 
 #if defined(__STDC__) || defined(__cplusplus)
-enum clnt_stat rstat(char *, struct ustatstime *);
+enum clnt_stat rstat(char *, ustatstime *);
 int havedisk(char *);
 #else
 enum clnt_stat rstat();

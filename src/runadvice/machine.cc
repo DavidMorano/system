@@ -130,7 +130,7 @@ vecitem	*mhp ;
 char		hostname[] ;
 double		loadaverage ;
 {
-	struct ustatstime	*rstatp ;
+	ustatstime	*rstatp ;
 
 	struct machine		m ;
 
@@ -142,7 +142,7 @@ double		loadaverage ;
 /* allocate pieces for use in machine structures, et cetera */
 
 	if ((rstatp = 
-	    (struct ustatstime *) malloc(sizeof(struct ustatstime))) == NULL)
+	    (ustatstime *) malloc(sizeof(ustatstime))) == NULL)
 	    goto badalloc2 ;
 
 	len = strlen(hostname) ;
@@ -226,7 +226,7 @@ badalloc2:
 int machineupdate(mhp)
 machinehead	*mhp ;
 {
-	struct ustatstime	*rstatp ;
+	ustatstime	*rstatp ;
 
 	struct machine		*mp ;
 
@@ -433,7 +433,7 @@ int		ttl ;
 static int machineupdateone(mp)
 struct machine	*mp ;
 {
-	struct ustatstime	*rstatp ;
+	ustatstime	*rstatp ;
 
 	bfile		infile ;
 	bfile		outfile ;
