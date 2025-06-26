@@ -291,7 +291,7 @@ const char	fname[] ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(5))
-	                debugprintf("procdata: carryover=>%t<\n",ep,el) ;
+	                debugprintf("procdata: carryover=>%r<\n",ep,el) ;
 #endif
 
 	        } /* end if (needed to carry stuff forward) */
@@ -308,7 +308,7 @@ const char	fname[] ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
-	            debugprintf("procdata: word=%t\n",cp,cl) ;
+	            debugprintf("procdata: word=%r\n",cp,cl) ;
 #endif
 
 	        hi = hash_elf(cp,cl) & himask ;
@@ -420,7 +420,7 @@ const char	fname[] ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
-	            debugprintf("procdata: next carryover=>%t<\n",ep,el) ;
+	            debugprintf("procdata: next carryover=>%r<\n",ep,el) ;
 #endif
 
 	        strncpy(lbuf,ep,el) ;

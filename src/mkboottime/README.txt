@@ -1,7 +1,7 @@
 MKBOOTTIME
 
-This is a KSH shell built-in command.  It creates a file with a modification
-time equal to the boot-time of the system.
+This is a KSH shell built-in command.  It creates a file with a
+modification time equal to the boot-time of the system.
 
 Synopsis:
 $ mkboottime <file(s)> [-af <afile>] [-utf <utmp>] [-V]

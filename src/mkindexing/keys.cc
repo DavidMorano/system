@@ -30,9 +30,9 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<limits.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<climits>
 
 #include	<usystem.h>
 #include	<bfile.h>
@@ -105,7 +105,7 @@ int keys_add(PROGINFO *pip,HDB *dbp,cchar *sp,int sl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("keys_add: key=%t klen=%d\n",sp,sl,sl) ;
+	    debugprintf("keys_add: key=%r klen=%d\n",sp,sl,sl) ;
 #endif
 
 	key.len = sl ;
