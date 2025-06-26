@@ -1438,7 +1438,7 @@ char	*envv[] ;
 
 	        while ((cl = eigendb_enum(&eigendb,&cur,&cp)) >= 0) {
 
-	            debugprintf("main: eigen> %t\n",cp,cl) ;
+	            debugprintf("main: eigen> %r\n",cp,cl) ;
 	        }
 
 	        eigendb_curend(&eigendb,&cur) ;

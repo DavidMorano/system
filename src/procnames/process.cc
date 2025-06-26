@@ -88,7 +88,7 @@ static int	process_record(PROGINFO *,bfile *,struct record *) ;
 
 int process(PROGINFO *pip,cchar *fname)
 {
-	struct ustat	sb, sb2 ;
+	ustat	sb, sb2 ;
 	struct record	e ;
 	bfile		infile, *ifp = &infile ;
 	int		rs, rl ;

@@ -1,8 +1,9 @@
-/* main */
+/* progswitch_main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to switch programs */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* run-time debugging */
@@ -10,12 +11,11 @@
 #define	CF_DEBUGMALL	1		/* debug memory allocations */
 #define	CF_PROCESN	0		/* need |procesn()| */
 
-
 /* revision history:
 
 	= 1999-03-01, David A­D­ Morano
-	This code was originally adapted from one of the programs used
-	with the hardware CAD systems.
+	This code was originally adapted from one of the programs
+	used with the hardware CAD systems.
 
 */
 
@@ -23,24 +23,21 @@
 
 /*******************************************************************************
 
-	This program takes its own invocation name and looks it up in a program
-	map to find possible filepaths to an executable to execute.  If it
-	doesn't find the program in the map, or if all of the program names
-	listed in the map are not executable for some reason, then the program
-	executable search PATH is searched.
-
-	In all cases, some care is taken so as to not accidentally execute
-	ourselves (again)!
+  	Description:
+	This program takes its own invocation name and looks it up
+	in a program map to find possible filepaths to an executable
+	to execute.  If it doesn't find the program in the map, or
+	if all of the program names listed in the map are not
+	executable for some reason, then the program executable
+	search PATH is searched.  In all cases, some care is taken
+	so as to not accidentally execute ourselves (again)!
 
 	Synopsis:
-
 	$ <name> <arguments_for_name>
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -49,10 +46,12 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<bfile.h>
 #include	<ids.h>
 #include	<vecstr.h>
@@ -60,6 +59,7 @@
 #include	<varsub.h>
 #include	<sbuf.h>
 #include	<kvsfile.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -92,47 +92,40 @@ extern int	sncpy1w(char *,int,cchar *,int) ;
 extern int	sncpy1(char *,int,cchar *) ;
 extern int	sncpy2(char *,int,cchar *,cchar *) ;
 extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,const char *,int) ;
+extern int	mkpath1w(char *,cchar *,int) ;
 extern int	mkpath1(char *,cchar *) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	rmext(cchar *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
+extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	isNotPresent(int) ;
 extern int	isNotAccess(int) ;
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	vecstr_envfile(vecstr *,const char *) ;
+extern int	vecstr_envfile(vecstr *,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 #if	CF_DEBUGN
 extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnsub(cchar *,int,cchar *) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -164,13 +157,13 @@ static int	procesn(PROGINFO *,char *,int) ;
 #endif
 
 static int	progmk(PROGINFO *,char *,int,cchar *,int,cchar *) ;
-static int	progok(PROGINFO *,const char *) ;
+static int	progok(PROGINFO *,cchar *) ;
 
 
 /* local variables */
 
 #ifdef	COMMENT
-static const char	*roots[] = {
+static cchar	*roots[] = {
 	    "HOME",
 	    "LOCAL",
 	    "AST",
@@ -201,14 +194,14 @@ static const struct mapex	mapexs[] = {
 	    { SR_NOSPC, EX_TEMPFAIL },
 	    { 0, 0 }} ;
 
-static const char	*sched0[] = { /* map-directory file */
+static cchar	*sched0[] = { /* map-directory file */
 	    "%p/etc/%n/%n.%f",
 	    "%p/etc/%n/%f",
 	    "%p/etc/%n.%f",
 	    NULL
 } ;
 
-static const char	*sched1[] = { /* "defs" file */
+static cchar	*sched1[] = { /* "defs" file */
 	    "%p/etc/%n/%n.%f",
 	    "%p/etc/%n/%f",
 	    "%p/etc/%n.%f",
@@ -233,9 +226,9 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		rs1 ;
 	int		ex = EX_OSERR ;
 
-	const char	*pr = NULL ;
-	const char	*progname = NULL ;
-	const char	*cp ;
+	cchar	*pr = NULL ;
+	cchar	*progname = NULL ;
+	cchar	*cp ;
 	char		tarname[MAXNAMELEN + 1] ;
 
 
@@ -590,7 +583,7 @@ static int procesn(PROGINFO *pip,char *ebuf,int elen)
 	cchar		*progename = pip->progename ;
 	ebuf[0] = '\0' ;
 	if (progename != NULL) {
-	    if (strpbrk(progename,"/.") != NULL) {
+	    if (strbrk(progename,"/.") != NULL) {
 	        int	bnl ;
 	        cchar	*bnp ;
 	        if ((bnl = sfbasename(progename,-1,&bnp)) > 0) {
@@ -934,7 +927,7 @@ static int progmk(PROGINFO *pip,char *rbuf,int rlen,cchar *pp,int pl,cchar *pn)
 
 static int progok(PROGINFO *pip,cchar *progfname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		f = FALSE ;
 

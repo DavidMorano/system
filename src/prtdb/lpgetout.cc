@@ -1,11 +1,12 @@
 /* lpgetout */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* capture output from LPGET program */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
-
 
 /* revision history:
 
@@ -21,9 +22,7 @@
         This subroutine uses the LPGET program to retrieve a key from the
         PRINTERS database.
 
-
 ******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -38,6 +37,8 @@
 
 #include	<usystem.h>
 #include	<bfile.h>
+#include	<strn.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -60,12 +61,6 @@ extern int	sfdirname(const char *,int,const char **) ;
 extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern const char	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -128,8 +123,9 @@ const char	key[] ;
 	if ((cl = sfbasename(progfname,-1,&cp)) > 0) {
 		ml = MIN(MAXNAMELEN,cl) ;
 		strwcpy(progname,cp,ml) ;
-	} else
+	} else {
 		sncpy1(progname,MAXNAMELEN,progfname) ;
+	}
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -189,7 +185,7 @@ const char	key[] ;
 		    } else
 			f_first = FALSE ;
 
-	            tp = strnpbrk(cp,cl,"=-") ;
+	            tp = strnbrk(cp,cl,"=-") ;
 
 		    if ((tp != NULL) && (tp[0] == '=')) {
 
