@@ -36,12 +36,9 @@
 	These server programs have widely differing functions, but they start
 	by initializing in similar ways.  Hence this subroutine.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/systeminfo.h>
@@ -49,13 +46,15 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<time.h>
 #include	<grp.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<getsystypenum.h>
+#include	<getax.h>
 #include	<sigblocker.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -68,7 +67,6 @@
 #include	<expcook.h>
 #include	<varsub.h>
 #include	<storebuf.h>
-#include	<getax.h>
 #include	<char.h>
 #include	<ucmallreg.h>
 #include	<exitcodes.h>
@@ -141,14 +139,13 @@ extern int	ctdeci(char *,int,int) ;
 extern int	ctdecl(char *,int,long) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
 extern int	gethz(int) ;
 extern int	getarchitecture(char *,int) ;
 extern int	getnprocessors(const char **,int) ;
 extern int	getproviderid(const char *,int) ;
-extern int	getsystypenum(char *,char *,cchar *,cchar *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getserial(const char *) ;
 extern int	mkuiname(char *,int,USERINFO *) ;
@@ -554,7 +551,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 #if	CF_DEBUGS && CF_DEBUGARGZ
 	nprintf(DEBUGFNAME,"argz(%p)\n",argv[0]) ;
-	nprintf(DEBUGFNAME,"argz=>%t<\n",
+	nprintf(DEBUGFNAME,"argz=>%r<\n",
 	    argv[0],strlinelen(argv[0],-1,40)) ;
 #endif
 
@@ -2172,7 +2169,7 @@ int progexports(PROGINFO *pip,cchar *s)
 	debugprintf("main/progexports: elp={%p}\n",&pip->exports) ;
 	for (i = 0 ; vecstr_get(&pip->exports,i,&cp) >= 0 ; i += 1) {
 	    if (cp == NULL) continue ;
-	    debugprintf("main/progexports: %s e=>%t<\n",
+	    debugprintf("main/progexports: %s e=>%r<\n",
 	        s,cp,strlinelen(cp,-1,40)) ;
 	}
 	return SR_OK ;
@@ -2414,8 +2411,8 @@ static int procenvextra(PROGINFO *pip)
 
 #if	CF_DEBUG && CF_DEBUGENV
 	    if (DEBUGLEVEL(4)) {
-	        debugprintf("main/procenvextra: env can=%t\n",kp,kl) ;
-	        debugprintf("main/procenvextra: env v=>%t<\n",
+	        debugprintf("main/procenvextra: env can=%r\n",kp,kl) ;
+	        debugprintf("main/procenvextra: env v=>%r<\n",
 	            vp,strlinelen(vp,vl,40)) ;
 	    }
 #endif
@@ -2562,7 +2559,7 @@ static int procenvsysvar(PROGINFO *pip,cchar sysvardb[])
 #if	CF_DEBUG && CF_DEBUGENV
 	            if (DEBUGLEVEL(3)) {
 	                debugprintf("procenvsysvar: sysvar_enum() rs=%d\n",rs) ;
-	                debugprintf("procenvsysvar: k=%s v=>%t<\n",kbuf,
+	                debugprintf("procenvsysvar: k=%s v=>%r<\n",kbuf,
 	                    vbuf,strnnlen(vbuf,vl,40)) ;
 	            }
 #endif
@@ -2582,7 +2579,7 @@ static int procenvsysvar(PROGINFO *pip,cchar sysvardb[])
 
 #if	CF_DEBUG && CF_DEBUGENV
 	                if (DEBUGLEVEL(3))
-	                    debugprintf("procenvsysvar: defpath=>%t<\n",
+	                    debugprintf("procenvsysvar: defpath=>%r<\n",
 	                        vbuf,strnnlen(vbuf,vl,40)) ;
 #endif
 
@@ -2986,7 +2983,7 @@ static int loadcooks(PROGINFO *pip)
 	    if ((rs >= 0) && (vp != NULL)) {
 #if	CF_DEBUG
 		if (DEBUGLEVEL(3))
-		debugprintf("main/loadcooks: k=%s v=>%t<\n",cooks[ci],vp,vl) ;
+		debugprintf("main/loadcooks: k=%s v=>%r<\n",cooks[ci],vp,vl) ;
 #endif
 	        rs = expcook_add(cop,cooks[ci],vp,vl) ;
 	    }
@@ -3031,7 +3028,7 @@ static int loaddefs(PROGINFO *pip,cchar *dfname,cchar **s1,cchar **s2)
 
 static int loaddefsfile(PROGINFO *pip,cchar *dfname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		f = FALSE ;
 
@@ -3101,7 +3098,7 @@ static int loaddefsfind(PROGINFO *pip,cchar *sched[])
 
 static int loadxfile(PROGINFO *pip,cchar *xfname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		f = FALSE ;
 

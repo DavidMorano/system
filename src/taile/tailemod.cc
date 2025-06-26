@@ -494,7 +494,7 @@ const char	dname[] ;
 const char	name[] ;
 TAILEMOD_MODULE	**mpp ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	TAILEMOD_INFO	*dip ;
 

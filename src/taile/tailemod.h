@@ -1,8 +1,10 @@
-/* tailemod */
+/* tailemod HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 #ifndef	TAILEMOD_INCLUDE
-#define	TAILEMOD_INCLUDE	1
+#define	TAILEMOD_INCLUDE
 
 
 #define	TAILEMOD_MAGIC	31815927
@@ -39,7 +41,7 @@ struct tailemod_flags {
 struct tailemod_head {
 	unsigned long	magic ;
 	char		*pr ;
-	const char	**dirs ;
+	cchar	**dirs ;
 	struct tailemod_flags	f ;
 	vecobj		modules ;		/* shared objects */
 	vecobj		entries ;		/* name entries */
@@ -64,7 +66,7 @@ struct tailemod_module {
 } ;
 
 struct tailemod_ent {
-	const char	*name ;
+	cchar	*name ;
 	struct tailemod_module	*mp ;
 	struct tailemod_calls	c ;
 	int		size ;		/* object size */
@@ -72,25 +74,24 @@ struct tailemod_ent {
 } ;
 
 struct tailemod_i {
-	const char	*name ;		/* module name */
+	cchar		*name ;		/* module name */
 	int		size ;		/* module object size */
 	int		flags ;		/* module flags */
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(TAILEMOD_MASTER)) || (TAILEMOD_MASTER == 0)
+extern int tailemod_start(TAILEMOD *,cchar *,cchar **) noex ;
+extern int tailemod_load(TAILEMOD *,cchar *) noex ;
+extern int tailemod_unload(TAILEMOD *,cchar *) noex ;
+extern int tailemod_store(TAILEMOD *,cchar *,int) noex ;
+extern int tailemod_check(TAILEMOD *,time_t) noex ;
+extern int tailemod_getline(TAILEMOD *,char *,int) noex ;
+extern int tailemod_summary(TAILEMOD *,char *,int) noex ;
+extern int tailemod_finish(TAILEMOD *,char *,int) noex ;
+extern int tailemod_finish(TAILEMOD *) noex ;
 
-extern int tailemod_start(TAILEMOD *,const char *,const char **) ;
-extern int tailemod_load(TAILEMOD *,const char *) ;
-extern int tailemod_unload(TAILEMOD *,const char *) ;
-extern int tailemod_store(TAILEMOD *,const char *,int) ;
-extern int tailemod_check(TAILEMOD *,time_t) ;
-extern int tailemod_getline(TAILEMOD *,char *,int) ;
-extern int tailemod_summary(TAILEMOD *,char *,int) ;
-extern int tailemod_finish(TAILEMOD *,char *,int) ;
-extern int tailemod_finish(TAILEMOD *) ;
-
-#endif /* TAILEMOD_MASTER */
+EXTERNC_end
 
 
 #endif /* TAILEMOD_INCLUDE */

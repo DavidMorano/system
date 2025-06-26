@@ -164,7 +164,7 @@ static const struct mapex	mapexs[] = {
 
 int main(int argc,cchar *argv[],cchar *envv[])
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
 	BITS		pargs ;

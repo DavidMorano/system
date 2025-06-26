@@ -138,7 +138,7 @@ static int checkinfo_start(CHECKINFO *cip,mode_t dm)
 
 static int checkinfo_dir(CHECKINFO *cip,cchar *dirbuf)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 
 	if (((rs = u_stat(dirbuf,&sb)) >= 0) && (sb.st_uid == cip->uid)) {
