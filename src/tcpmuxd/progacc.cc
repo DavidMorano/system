@@ -199,7 +199,7 @@ int progaccopen(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
-	debugprintf("progaccopen: search cp=%t\n",cp,cl) ;
+	debugprintf("progaccopen: search cp=%r\n",cp,cl) ;
 	debugprintf("progaccopen: search rs=%d\n", rs) ;
 	debugprintf("progaccopen: accfname=%s\n",pip->accfname) ;
 	debugprintf("progaccopen: f_secreq=%u\n",f_secreq) ;
