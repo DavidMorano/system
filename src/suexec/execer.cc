@@ -27,7 +27,7 @@
 
 	int execer(pip,sbp,interpreter,shallarg,progfname,argc,argv) ;
 	struct proginfo	*pip ;
-	struct ustat	*sbp ;
+	ustat	*sbp ;
 	char	interpreter[] ;
 	char	interpretarg[] ;
 	char	progfname[] ;
@@ -85,7 +85,7 @@ extern int	findfilepath(const char *,char *,const char *,int) ;
 
 int execer(pip,sbp,interpreter,interpretarg,progfname,argc,argv,envv)
 struct proginfo	*pip ;
-struct ustat	*sbp ;
+ustat	*sbp ;
 char		interpreter[], interpretarg[] ;
 char		progfname[] ;
 int		argc ;

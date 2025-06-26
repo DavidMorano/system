@@ -941,7 +941,7 @@ const char	*envv[] ;
 
 	                if (rs < 0) {
 	                    bprintf(pip->efp,
-	                        "%s: processing error (%d) with value=>%t<\n",
+	                        "%s: processing error (%d) with value=>%r<\n",
 	                        pip->progname,rs,cp,cl) ;
 	                    break ;
 	                }
@@ -991,7 +991,7 @@ const char	*envv[] ;
 	                if (rs < 0) {
 
 	                    bprintf(pip->efp,
-	                        "%s: processing error (%d) with value=>%t<\n",
+	                        "%s: processing error (%d) with value=>%r<\n",
 	                        pip->progname,rs,cp,cl) ;
 
 	                    break ;
@@ -1199,13 +1199,13 @@ int			slen ;
 		sl = (tp - sp) ;
 
 #if	CF_DEBUGS
-	debugprintf("main/processor_add: line=>%t<\n",sp,sl) ;
+	debugprintf("main/processor_add: line=>%r<\n",sp,sl) ;
 #endif
 
 	while ((cl = nextfield(sp,sl,&cp)) > 0) {
 
 #if	CF_DEBUGS
-	    debugprintf("main/processor_add: str=>%t<\n",cp,cl) ;
+	    debugprintf("main/processor_add: str=>%r<\n",cp,cl) ;
 #endif
 
 	    rs = cfdecf(cp,cl,&fnum) ;

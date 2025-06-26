@@ -76,7 +76,7 @@ char	*envv[] ;
 	    linebuf[len] = '\0' ;
 
 #if	CF_DEBUGS
-	debugprintf("main: line=>%t<\n",
+	debugprintf("main: line=>%r<\n",
 		linebuf,((linebuf[len - 1] == '\n') ? (len - 1) : len)) ;
 #endif
 
@@ -85,7 +85,7 @@ char	*envv[] ;
 	        cl = len - i ;
 
 #if	CF_DEBUGS
-	debugprintf("main: cp=>%t<\n",
+	debugprintf("main: cp=>%r<\n",
 		cp,((cp[cl - 1] == '\n') ? (cl - 1) : cl)) ;
 #endif
 
@@ -132,7 +132,7 @@ char	**rpp ;
 	}
 
 #if	CF_DEBUGS
-	debugprintf("main: sp=>%t<\n",
+	debugprintf("main: sp=>%r<\n",
 		sp,MAX(((sp[sl - 1] == '\n') ? (sl - 1) : sl),0)) ;
 #endif
 

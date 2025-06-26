@@ -40,7 +40,7 @@
 	Synopsis:
 
 	int currentdir(sbp,filepath,file)
-	struct ustat	*sbp ;
+	ustat	*sbp ;
 	char	filepath[] ;
 	char	file[] ;
 
@@ -96,11 +96,11 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 
 int currentdir(sbp,filepath,file)
-struct ustat	*sbp ;
+ustat	*sbp ;
 char		filepath[] ;
 char		file[] ;
 {
-	struct ustat	sb1, sb2 ;
+	ustat	sb1, sb2 ;
 
 	int	rs, len ;
 	int	dirlen ;

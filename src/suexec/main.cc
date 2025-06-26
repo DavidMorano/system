@@ -74,7 +74,7 @@ extern int	sfbasename(const char *,int,const char **) ;
 extern int	nextfield(const char *,int,const char **) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	findfilepath(const char *,char *,const char *,int) ;
-extern int	execer(struct proginfo *,struct ustat *,char *,char *,char *,
+extern int	execer(struct proginfo *,ustat *,char *,char *,char *,
 			int,char **,char **) ;
 
 extern cchar	*getourenv(cchar **,cchar *) ;
@@ -130,7 +130,7 @@ int	argc ;
 char	*argv[] ;
 char	*envv[] ;
 {
-	struct ustat	pwd_sb, sb ;
+	ustat	pwd_sb, sb ;
 
 	struct proginfo	pi, *pip = &pi ;
 
