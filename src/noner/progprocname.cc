@@ -95,7 +95,7 @@ struct proginfo	*pip ;
 PARAMOPT	*pop ;
 cchar	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 	int	rs1 ;
@@ -201,7 +201,7 @@ struct proginfo	*pip ;
 PARAMOPT	*pop ;
 cchar	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	FSDIRTREE	dt ;
 

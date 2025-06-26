@@ -1196,7 +1196,7 @@ KEYOPT		*kop ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	debugprintf("main/procopts: opt=>%t<\n",kp,kl) ;
+	debugprintf("main/procopts: opt=>%r<\n",kp,kl) ;
 #endif
 
 /* get the first value for this key */
@@ -1205,7 +1205,7 @@ KEYOPT		*kop ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	debugprintf("main/procopts: opt_value=>%t<\n",vp,vl) ;
+	debugprintf("main/procopts: opt_value=>%r<\n",vp,vl) ;
 #endif
 
 /* do we support this option? */

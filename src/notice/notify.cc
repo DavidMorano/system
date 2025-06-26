@@ -282,7 +282,7 @@ const char	termfname[] ;
 const char	mbuf[] ;
 int		mlen ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	const int	oflags = (O_WRONLY | O_NOCTTY) ;
 

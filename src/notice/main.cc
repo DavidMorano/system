@@ -1304,13 +1304,13 @@ static int procname(PROGINFO *pip,cchar *mbuf,int mlen,cchar *np,int nl)
 
 	        if ((pip->debuglevel > 0) && (rs == 0)) {
 	            bprintf(pip->efp,
-	                "%s: could not notify userspec >%t<\n",
+	                "%s: could not notify userspec >%r<\n",
 	                pip->progname,np,nl) ;
 		}
 
 	        if ((pip->debuglevel >= 2) && (rs >= 0)) {
 	            bprintf(pip->efp,
-	                "%s: userspec >%t< notified=%u\n",
+	                "%s: userspec >%r< notified=%u\n",
 	                pip->progname,np,nl,rs) ;
 		}
 
@@ -1339,8 +1339,8 @@ static int procnotify(PROGINFO *pip,cchar mbuf[],int mlen,cchar up[],int ul)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
-	    debugprintf("procnotify: ent us=%t\n",up,ul) ;
-	    debugprintf("procnotify: mlen=%d mbuf=%t\n",
+	    debugprintf("procnotify: ent us=%r\n",up,ul) ;
+	    debugprintf("procnotify: mlen=%d mbuf=%r\n",
 	        mlen,mbuf,strlinelen(mbuf,mlen,45)) ;
 	}
 #endif
@@ -1369,10 +1369,10 @@ static int procnotify(PROGINFO *pip,cchar mbuf[],int mlen,cchar up[],int ul)
 	    }
 
 	if (pip->open.logprog)
-	    proglog_printf(pip,"recip=%t",up,ul) ;
+	    proglog_printf(pip,"recip=%r",up,ul) ;
 
 	if (pip->debuglevel > 0)
-	    bprintf(pip->efp,"%s: recip=%t\n",pn,up,ul) ;
+	    bprintf(pip->efp,"%s: recip=%r\n",pn,up,ul) ;
 
 	    if ((rs = locinfo_already(lip,up,ul)) == 0) {
 	        if (rs >= 0) {
@@ -1552,7 +1552,7 @@ static int noteone(PROGINFO *pip,cchar termfname[],cchar mbuf[],int mlen)
 	int		n = 0 ;
 
 	if ((rs = uc_open(termfname,oflags,0666)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    const int		fd = rs ;
 
 #if	CF_DEBUG
@@ -1619,7 +1619,7 @@ int		tlen ;
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("writenotice: fd_termdev=%d tlen=%d \n",
 	        fd_termdev,tlen) ;
-	    debugprintf("writenotice: tlen=%d tbuf=%t\n",
+	    debugprintf("writenotice: tlen=%d tbuf=%r\n",
 	        tlen,tbuf,strlinelen(tbuf,tlen,45)) ;
 	}
 #endif
@@ -1645,7 +1645,7 @@ int		tlen ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("writenotice: line=>%t<\n",cp,cl) ;
+	            debugprintf("writenotice: line=>%r<\n",cp,cl) ;
 #endif
 
 	        sbuf_strw(&out,cp,cl) ;
@@ -1664,7 +1664,7 @@ int		tlen ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("writenotice: line=>%t<\n",cp,cl) ;
+	            debugprintf("writenotice: line=>%r<\n",cp,cl) ;
 #endif
 
 	        sbuf_strw(&out,cp,cl) ;

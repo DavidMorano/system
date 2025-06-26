@@ -156,7 +156,7 @@ cchar	fname[] ;
 
 	if (! f_skipfile) {
 
-	    struct ustat	sb ;
+	    ustat	sb ;
 
 
 	    rs1 = u_stat(fname,&sb) ;

@@ -1361,7 +1361,7 @@ static int procserver(PROGINFO *pip,vecobj *rlp,cchar *np,int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("main/procserver: ent name=%t\n",np,nl) ;
+	    debugprintf("main/procserver: ent name=%r\n",np,nl) ;
 #endif
 
 	if ((rs = snwcpy(hbuf,hlen,np,nl)) >= 0) {
@@ -1429,9 +1429,9 @@ static int procserver(PROGINFO *pip,vecobj *rlp,cchar *np,int nl)
 	            const int	osl = rs ;
 	            int		bl ;
 
-	            fmt = "%-23s %s %2u %2u %t (%d)" ;
+	            fmt = "%-23s %s %2u %2u %r (%d)" ;
 	            if (rs1 >= 0)
-	                fmt = "%-23s %s %2u %2u %t"  ;
+	                fmt = "%-23s %s %2u %2u %r"  ;
 
 	            rs = bufprintf(buf,BUFLEN,fmt,timebuf,moffbuf,
 	                nte.proto,nte.pf, 
