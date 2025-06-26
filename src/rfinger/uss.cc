@@ -95,7 +95,7 @@ extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecti(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	mkpr(char *,int,const char *,const char *) ;
@@ -1458,7 +1458,7 @@ static int subinfo_logfile(SUBINFO *sip)
 
 static int subinfo_dirok(SUBINFO *sip,cchar *d,int dlen)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	NULSTR		ss ;
 	int		rs = SR_OK ;
 	int		rs1 ;

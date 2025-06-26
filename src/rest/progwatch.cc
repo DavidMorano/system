@@ -292,7 +292,7 @@ static const struct mapex	mapexs[] = {
 int progwatch(PROGINFO *pip,vecstr *nlp)
 {
 	struct sigaction	sigs ;
-	struct ustat	sb ;
+	ustat	sb ;
 	SUBINFO		winfo, *wip = &winfo ;
 	sigset_t	signalmask ;
 	int		rs = SR_OK ;
@@ -1875,7 +1875,7 @@ static int procwatchnew(PROGINFO *pip,SUBINFO *wip,CLIENTINFO *cip)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4)) {
-	        struct ustat	sb ;
+	        ustat	sb ;
 	        int	rs1 ;
 	        rs1 = u_fstat(cip->fd_input,&sb) ;
 	        debugprintf("procwatchnew: fd=%d u_fstat() rs=%d "

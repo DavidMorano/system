@@ -11,16 +11,16 @@
 
 /* revision history:
 
-	- 1996-11-21, David A.D. Morano
+	- 1996-11-21, David A-D- Morano
 	This program was started by copying from the RSLOW program.
 
-	- 1996-12-12, David A.D. Morano
+	- 1996-12-12, David A-D- Morano
         I modified the program to take the username and password from a
         specified file (for better security).
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -179,8 +179,8 @@ int main(int argc,mainv argv,mainv envv) {
 	int	f_envfile, f_rxport ;
 	int	rfd, rfd2 ;
 	int	port = -1 ;
-	int	pollinput = POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI ;
-	int	polloutput = POLLWRNORM | POLLWRBAND ;
+	int	pollinput = POLLIN | POLLRDNORM | POLLRDBA-D-| POLLPRI ;
+	int	polloutput = POLLWRNORM | POLLWRBA-D-;
 	int	sanityfailures = 0 ;
 
 	char	*argp, *aop, *akp, *avp ;
@@ -208,7 +208,7 @@ int main(int argc,mainv argv,mainv envv) {
 	g.progname = strbasename(argv[0]) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VA-D-BUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
@@ -1640,7 +1640,7 @@ goodrexec:
 	fds[0].fd = -1 ;
 	if (! f_noinput) {
 	    fds[0].fd = ifd ;
-	    fds[0].events = POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI ;
+	    fds[0].events = POLLIN | POLLRDNORM | POLLRDBA-D-| POLLPRI ;
 	} else {
 	    f_eof0 = TRUE ;
 	    if ((fstat(rfd,&sb) >= 0) && 
@@ -1655,7 +1655,7 @@ goodrexec:
 	fds[1].fd = -1 ;
 	if ((rs = fstat(ofd,&osb)) >= 0) {
 	    fds[1].fd = ofd ;
-	    fds[1].events = POLLWRNORM | POLLWRBAND ;
+	    fds[1].events = POLLWRNORM | POLLWRBA-D-;
 	}
 
 /* standard error */
@@ -1664,19 +1664,19 @@ goodrexec:
 	if (fstat(2,&esb) >= 0) {
 	    bflush(efp) ;
 	    fds[2].fd = 2 ;
-	    fds[2].events = POLLWRNORM | POLLWRBAND ;
+	    fds[2].events = POLLWRNORM | POLLWRBA-D-;
 	}
 
 /* remote socket */
 
 	fds[3].fd = rfd ;
-	fds[3].events = POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI ;
-	fds[3].events |= (fds[3].events | POLLWRNORM | POLLWRBAND) ;
+	fds[3].events = POLLIN | POLLRDNORM | POLLRDBA-D-| POLLPRI ;
+	fds[3].events |= (fds[3].events | POLLWRNORM | POLLWRBA-D- ;
 
 /* remote error socket */
 
 	fds[4].fd = rfd2 ;
-	fds[4].events = POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI ;
+	fds[4].events = POLLIN | POLLRDNORM | POLLRDBA-D-| POLLPRI ;
 
 
 /* do it */

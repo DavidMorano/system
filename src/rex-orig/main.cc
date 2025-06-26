@@ -11,17 +11,17 @@
 
 /* revision history:
 
-	- David A.D. Morano, 96/11/21
+	- David A-D- Morano, 96/11/21
 	This program was started by copying from the RSLOW program.
 
-	- David A.D. Morano, 96/12/12
+	- David A-D- Morano, 96/12/12
 	I modified the program to take the username and password
 	from a specified file (for better security).
 
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /**************************************************************************
 
@@ -130,7 +130,7 @@ char	*argv[] ;
 {
 	bfile		errfile, *efp = &errfile ;
 
-	struct ustat	sb, isb, osb, esb ;
+	ustat	sb, isb, osb, esb ;
 
 	struct tm	*timep ;
 
@@ -173,8 +173,8 @@ char	*argv[] ;
 	int	f_envfile, f_rxport ;
 	int	rfd, rfd2 ;
 	int	port = -1 ;
-	int	pollinput = POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI ;
-	int	polloutput = POLLWRNORM | POLLWRBAND ;
+	int	pollinput = POLLIN | POLLRDNORM | POLLRDBA-D-| POLLPRI ;
+	int	polloutput = POLLWRNORM | POLLWRBA-D-;
 	int	sanityfailures = 0 ;
 
 	char	*argp, *aop, *akp, *avp ;
@@ -1715,7 +1715,7 @@ goodrexec:
 	if (! f_noinput) {
 
 	    fds[0].fd = ifd ;
-	    fds[0].events = POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI ;
+	    fds[0].events = POLLIN | POLLRDNORM | POLLRDBA-D-| POLLPRI ;
 
 	} else {
 
@@ -1735,7 +1735,7 @@ goodrexec:
 	if ((rs = fstat(ofd,&osb)) >= 0) {
 
 	    fds[1].fd = ofd ;
-	    fds[1].events = POLLWRNORM | POLLWRBAND ;
+	    fds[1].events = POLLWRNORM | POLLWRBA-D-;
 
 	}
 
@@ -1747,20 +1747,20 @@ goodrexec:
 	    bflush(efp) ;
 
 	    fds[2].fd = 2 ;
-	    fds[2].events = POLLWRNORM | POLLWRBAND ;
+	    fds[2].events = POLLWRNORM | POLLWRBA-D-;
 
 	}
 
 /* remote socket */
 
 	fds[3].fd = rfd ;
-	fds[3].events = POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI ;
-	fds[3].events |= (fds[3].events | POLLWRNORM | POLLWRBAND) ;
+	fds[3].events = POLLIN | POLLRDNORM | POLLRDBA-D-| POLLPRI ;
+	fds[3].events |= (fds[3].events | POLLWRNORM | POLLWRBA-D- ;
 
 /* remote error socket */
 
 	fds[4].fd = rfd2 ;
-	fds[4].events = POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI ;
+	fds[4].events = POLLIN | POLLRDNORM | POLLRDBA-D-| POLLPRI ;
 
 
 /* do it */
