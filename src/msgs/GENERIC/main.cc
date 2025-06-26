@@ -227,7 +227,7 @@ int argc; char *argv[];
 
 	if (clean || bounds == NULL) {	/* relocate message bounds */
 		struct direct *dp;
-		struct stat stbuf;
+		USTAT stbuf;
 		bool seenany = NO;
 		DIR	*dirp;
 

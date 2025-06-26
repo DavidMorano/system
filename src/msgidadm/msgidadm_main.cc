@@ -1,5 +1,5 @@
 /* msgidadm_main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* test template */
@@ -1085,7 +1085,7 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    debugprintf("main: 2 msgid_open() rs=%d\n",rs) ;
 	    mkfnamesuf1(tmpfname,dbfname,"msgid") ;
 	    u_stat(tmpfname,&sb) ;
@@ -1223,7 +1223,7 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 
 	        strwcpy(recipbuf,ep->recipient,NCOLSRECIP) ;
 
-	        rs = bprintf(ofp,"%-*s %-14s %5u %t%c\n",
+	        rs = bprintf(ofp,"%-*s %-14s %5u %r%c\n",
 	            NCOLSRECIP,recipbuf,
 	            timestr_log(t,timebuf),
 	            ep->count,
@@ -1246,7 +1246,7 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 	            chend = 0xAC ;
 	        } /* end if */
 
-	        rs = bprintf(ofp,"  %t%c\n",cp,cl,chend) ;
+	        rs = bprintf(ofp,"  %r%c\n",cp,cl,chend) ;
 
 	    } /* end if */
 

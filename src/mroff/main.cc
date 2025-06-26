@@ -142,7 +142,7 @@ char	*envp[] ;
 {
 	struct proginfo	g, *pip = &g ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	struct group	ge, *gp ;
 
@@ -390,7 +390,7 @@ char	*envp[] ;
 				rs = SR_INVALID ;
 				f_usage = TRUE ;
 	                        bprintf(efp,
-	                        "%s: invalid key=%t\n",
+	                        "%s: invalid key=%r\n",
 	                        pip->progname,akp,akl) ;
 
 	                    } /* end switch */

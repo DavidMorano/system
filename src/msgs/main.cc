@@ -1,7 +1,9 @@
-/* msgs */
+/* msgs SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to post and manage messages on a UNIX system */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0	/* compile-time */
 #define	CF_DEBUG	0	/* run-time */
@@ -17,17 +19,13 @@
 #define	CF_PCSUSERFILE	1	/* write a PCS style user file? */
 #define	CF_PCSCONF	0	/* call 'pcsconf(3pcs)' */
 
-
 /* revision history:
 
 	= 1995-04-01, David A­D­ Morano
-
-	Extensively revised to allow compatibility with the old AT&T
-	BCS Personal Communication System (PCS) utilities.
-
+	Extensively revised to allow compatibility with the old
+	AT&T BCS Personal Communication System (PCS) utilities.
 
 */
-
 
 /*
  * Copyright (c) 1980 Regents of the University of California.
@@ -75,9 +73,7 @@ static char damid[] = "@(#)msgs	5.2a (AT&T) 95/07/30" ;
  *	<num>	print message number <num>
  *	h	print out the help file contents
  
-
 *************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -103,11 +99,12 @@ static char damid[] = "@(#)msgs	5.2a (AT&T) 95/07/30" ;
 
 #include	<usystem.h>
 #include	<bfile.h>
-#include	<char.h>
 #include	<userinfo.h>
 #include	<logfile.h>
 #include	<pcsconf.h>
 #include	<mallocstuff.h>
+#include	<strx.h>
+#include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -282,7 +279,7 @@ const char	*envv[] ;
 {
 	struct proginfo	g ;
 
-	struct ustat	sb, sb2 ;
+	ustat	sb, sb2 ;
 
 	struct flock	fl ;
 
@@ -832,7 +829,7 @@ const char	*envv[] ;
 	if (f_clean || (! g.f.bounds)) {
 	    DIR			*dirp ;
 	    struct dirent	*dp ;
-	    struct ustat	stbuf ;
+	    ustat	stbuf ;
 	    bool_t		f_seenany = NO ;
 	    int		firstmsg_old, lastmsg_old ;
 	    int		f_changed ;
@@ -1090,7 +1087,7 @@ const char	*envv[] ;
 	            u.organization,
 	            VERSION,(g.f.sysv_ct) ? "SYSV" : "BSD") ;
 
-		if (strpbrk(fromname," \t") != NULL) {
+		if (strbrk(fromname," \t") != NULL) {
 	            fmt = "From:           (%s) %s@%s\n" ;
 
 		} else
@@ -1134,7 +1131,7 @@ const char	*envv[] ;
 			break ;
 
 #if	CF_DEBUGS
-	        debugprintf("main: line>%t<\n",
+	        debugprintf("main: line>%r<\n",
 			inbuf,strlinelen(inbuf,-1,40)) ;
 	        debugprintf("main: f_seensubj=%u\n",f_seensubj) ;
 #endif
@@ -1144,7 +1141,7 @@ const char	*envv[] ;
 #if	CF_DEBUG
 		if (g.f.debug) {
 	            debugprintf("main: f_envfrom=%u\n",f_envfrom) ;
-	            debugprintf("main: inbuf5=>%t<\n",
+	            debugprintf("main: inbuf5=>%r<\n",
 			inbuf,strlinelen(inbuf,-1,5)) ;
 		}
 #endif
@@ -1207,7 +1204,7 @@ const char	*envv[] ;
 	                if (! f_from) {
 				const char	*fmt ;
 
-				if (strpbrk(fromname," \t") != NULL) {
+				if (strbrk(fromname," \t") != NULL) {
 	                        fmt = "From:           (%s) %s@%s\n" ;
 				} else
 	                        fmt = "From:           (%s) <%s@%s>\n" ;
