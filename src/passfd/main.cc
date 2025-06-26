@@ -678,7 +678,7 @@ static int usage(PROGINFO *pip)
 
 static int procpassfd(PROGINFO *pip,cchar *pfname,int fd_input)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 
 	if (pfname == NULL) return SR_FAULT ;
@@ -719,7 +719,7 @@ static int procpassfd(PROGINFO *pip,cchar *pfname,int fd_input)
 static int procserve(PROGINFO *pip,cchar *pfname,cchar *sfname,mode_t om)
 {
 	struct pollfd	fds[2] ;
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		to = POLLINT ;
 	int		pto ;

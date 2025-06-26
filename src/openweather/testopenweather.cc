@@ -100,7 +100,7 @@ int main(int argc,const char **argv,const char **envv)
 	        debugprintf("main: ws=%s\n",ws) ;
 #endif
 	        if ((rs1 = openweather(pr,ws,of,to)) >= 0) {
-	            struct ustat	sb ;
+	            ustat	sb ;
 	            int		fd = rs1 ;
 #if	CF_DEBUGS
 	            debugprintf("main: openweather() rs=%d\n",rs1) ;

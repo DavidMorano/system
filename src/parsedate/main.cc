@@ -110,7 +110,7 @@ char	*argv[] ;
 
 	struct tm	ts, *timep ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	argr, argl, aol, akl, avl, npa, maxai, kwi ;
 	int	ngi, i, j ;

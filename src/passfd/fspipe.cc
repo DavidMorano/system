@@ -807,7 +807,7 @@ static int entry_openlocal(ep,f_listen)
 FSPIPE_ENT	*ep ;
 int		f_listen ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 	int	fd ;
@@ -848,7 +848,7 @@ static int entry_openinet(ep,f_listen)
 FSPIPE_ENT	*ep ;
 int		f_listen ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 	int	fd ;

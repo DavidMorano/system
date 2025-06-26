@@ -323,7 +323,7 @@ OW		*sip ;
 
 
 	if (sip->pruid < 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    rs = u_stat(sip->pr,&sb) ;
 	    if (rs >= 0) {
 	        sip->pruid = sb.st_uid ;
@@ -387,7 +387,7 @@ int ow_logprintf(OW *sip,const char *fmt,...)
 int ow_tmpourdname(sip)
 OW		*sip ;
 {
-	struct ustat	usb ;
+	ustat	usb ;
 
 	mode_t	dmode = 0775 ;
 
@@ -676,7 +676,7 @@ OW		*sip ;
 	    } else if (isNotPresent(rs)) {
 	        char	dname[MAXPATHLEN+1] ;
 	        if ((rs = mkpath2(dname,sip->tmpdname,sip->rootname)) >= 0) {
-	            struct ustat	sb ;
+	            ustat	sb ;
 	            if ((rs1 = u_stat(dname,&sb)) >= 0) {
 	                if (S_ISDIR(sb.st_mode)) {
 	                    sip->gid_rootname = sb.st_gid ;

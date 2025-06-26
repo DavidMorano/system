@@ -339,7 +339,7 @@ const char	*envv[] ;
 	                        rs = SR_INVALID ;
 	                        f_usage = TRUE ;
 	                        bprintf(pip->efp,
-	                        "%s: invalid key=%t\n",
+	                        "%s: invalid key=%r\n",
 	                        pip->progname,akp,akl) ;
 
 	                    } /* end switch */

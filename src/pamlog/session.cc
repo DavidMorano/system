@@ -191,7 +191,7 @@ int		argc ;
 const char	**argv ;
 {
 	struct modinfo	mi, *mip = &mi ;
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	argr, argl, aol, akl, avl ;
 	int	maxai, pan, npa, kwi, ai ;
