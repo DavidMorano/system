@@ -1397,7 +1397,7 @@ static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 	            while (rs >= 0) {
 	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
-	                debugprintf("main/procpcsconf: pair> %s=%t\n",
+	                debugprintf("main/procpcsconf: pair> %s=%r\n",
 	                    kbuf,vbuf,vl) ;
 	            } /* end while */
 	            pcsconf_curend(pcp,&cur) ;
@@ -1765,7 +1765,7 @@ int		nl ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("main/procartload: ent ng=%t\n",np,nl) ;
+	    debugprintf("main/procartload: ent ng=%r\n",np,nl) ;
 #endif
 
 	if (nl < 0) nl = strlen(np) ;
@@ -1780,7 +1780,7 @@ int		nl ;
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
 	                debugprintf("main/procartload: "
-	                    "ngdname=%t\n",np,nl) ;
+	                    "ngdname=%r\n",np,nl) ;
 #endif
 
 	            rs = procartloader(pip,tip,ngdname,ngdlen,sp) ;
@@ -1789,10 +1789,10 @@ int		nl ;
 	            if (pip->debuglevel > 0) {
 	                cchar	*fmt ;
 	                if (rs >= 0) {
-	                    fmt = "%s: posted ng=%t\n" ;
+	                    fmt = "%s: posted ng=%r\n" ;
 	                    bprintf(pip->efp,fmt,pn,np,nl) ;
 	                } else {
-	                    fmt = "%s: error ng=%t (%d)\n" ;
+	                    fmt = "%s: error ng=%r (%d)\n" ;
 	                    bprintf(pip->efp,fmt,pn,np,nl,rs) ;
 	                }
 	            } /* end if (debugging) */
@@ -1806,7 +1806,7 @@ int		nl ;
 
 	        } else if ((rs == 0) || (rs == SR_NOTFOUND)) {
 	            if (pip->debuglevel > 0) {
-			cchar	*fmt = "%s: not-found ng=%t\n" ;
+			cchar	*fmt = "%s: not-found ng=%r\n" ;
 	                bprintf(pip->efp,fmt,pn,np,nl) ;
 		    }
 	            rs = SR_OK ;
@@ -1833,7 +1833,7 @@ char		ngdname[] ;
 int		ngdlen ;
 cchar		*sp ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		rs1 ;
 
@@ -1956,7 +1956,7 @@ static int procnewsdname(PROGINFO *pip)
 	                cchar	**vpp = &pip->newsdname ;
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(3))
-	                    debugprintf("main/procnewsdname: d=>%t<\n",
+	                    debugprintf("main/procnewsdname: d=>%r<\n",
 	                        vbuf,vl) ;
 #endif
 	                rs = proginfo_setentry(pip,vpp,vbuf,vl) ;
@@ -2151,7 +2151,7 @@ static int locinfo_mkhdrfrom(LOCINFO *lip)
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
 	        debugprintf("b_imail/locinfo_mkhdrfrom: "
-			"def_from=>%t<\n", lip->hdrfromaddr,
+			"def_from=>%r<\n", lip->hdrfromaddr,
 			strlinelen(lip->hdrfromaddr,len,40)) ;
 #endif
 
@@ -2417,7 +2417,7 @@ int progexpiration(PROGINFO *pip,cchar **rpp)
 
 static int pcsconf_mkdir(PCSCONF *pp,char *name,more_t mode)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	uid_t		uid_pcs ;
 	gid_t		gid_pcs ;
 	mode_t		um ;

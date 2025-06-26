@@ -123,7 +123,7 @@ struct article	*ap ;
 char		afname[] ;
 char		host[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	bfile		pfile, *pfp = &pfile ;
 	bfile		afile, *afp = &afile ;

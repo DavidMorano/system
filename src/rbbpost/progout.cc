@@ -411,7 +411,7 @@ MAILMSGATTENT	*ep ;
 	        if ((rs >= 0) && (ep->cte == CE_BINARY)) {
 
 	            if (ep->clen < 0) {
-	                struct ustat	sb ;
+	                ustat	sb ;
 	                if ((rs1 = bcontrol(ifp,BC_STAT,&sb)) >= 0) {
 	                    if (S_ISREG(sb.st_mode)) {
 	                        ep->clen = (int) sb.st_size ;

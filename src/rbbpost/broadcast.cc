@@ -99,7 +99,7 @@ struct proginfo	*pip ;
 vecitem		*aqp ;
 BBHOSTS		*bhp, *bnp ;
 {
-	struct ustat		sb ;
+	ustat		sb ;
 
 	struct newsgroup	*ngp ;
 
