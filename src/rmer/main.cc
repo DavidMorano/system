@@ -1,5 +1,5 @@
 /* main SUPPORT (rmer) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* front-end subroutine for the RMER program */
@@ -1108,7 +1108,7 @@ static int procthem(PROGINFO *pip,vecobj *flp)
 
 static int filecheck(PROGINFO *pip,cchar *fname,time_t ti_e)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = FALSE ;

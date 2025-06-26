@@ -287,7 +287,7 @@ struct sockaddr_storage *fromp;
 #ifdef SYSV
 	char *tz, *tzenv;
 	struct spwd *shpwd;
-	struct ustat statb;
+	ustat statb;
 #endif /* SYSV */
 
 	int	rs = SR_OK ;

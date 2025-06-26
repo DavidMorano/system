@@ -507,7 +507,7 @@ int		ofd, efd ;
 #endif
 
 	} else if (mode == IM_SEEK) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 
 #if	CF_DEBUG
 	    off_t	offset2 ;

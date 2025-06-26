@@ -559,7 +559,7 @@ struct proginfo	*gp ;
 int		fd ;
 const char	s[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	bfile	file, *fp = &file ;
 

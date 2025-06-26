@@ -131,7 +131,7 @@ VECSTR		*elp ;
 
 	struct sockaddr_in	from ;
 
-	struct ustat		sb ;
+	ustat		sb ;
 
 	pid_t		pid ;
 

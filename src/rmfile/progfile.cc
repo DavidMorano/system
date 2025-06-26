@@ -94,7 +94,7 @@ struct proginfo	*pip ;
 int		delay ;
 const char	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs = SR_OK ;
 

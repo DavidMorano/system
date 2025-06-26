@@ -235,7 +235,7 @@ int main(int argc,cchar **argv,cchar **envv)
 {
 	PROGINFO		pi, *pip = &pi ;
 	struct sockaddr_in	sa_server ;
-	struct ustat		sb ;
+	ustat		sb ;
 
 	struct group	ge ;
 	USERINFO	u ;
@@ -2046,7 +2046,7 @@ badpidlock:
 
 	    while ((len = breadln(&pidfile,buf,BUFLEN)) > 0) {
 
-	        bprintf(pip->efp,"%s: pidfile> %t",
+	        bprintf(pip->efp,"%s: pidfile> %r",
 	            pip->progname,
 	            buf,len) ;
 
