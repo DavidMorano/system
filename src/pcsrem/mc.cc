@@ -16,7 +16,7 @@
 #include "cstdio"
 #include "sys/types.h"
 #include "sys/stat.h"
-struct ustat sbuf;
+ustat sbuf;
 mc(since)
 time_t since;
 {

@@ -1,5 +1,5 @@
 /* watch SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* process the service names given us */
@@ -105,7 +105,7 @@ extern int	snsds(char *,int,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	cfdeci(char *,int,int *) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
 extern int	pcsgetprog(const char *,char *,const char *) ;
@@ -1554,7 +1554,7 @@ PROGENTRY_ARGS	*pap ;
 
 	PROGENTRY	*pep ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	mode_t	oldmask ;
 
@@ -2128,7 +2128,7 @@ struct proginfo	*pip ;
 int		fd ;
 const char	s[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	bfile		file, *fp = &file ;
 
@@ -2303,7 +2303,7 @@ static int xfile(pip,fname)
 struct proginfo	*pip ;
 const char	fname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 

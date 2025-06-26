@@ -1,8 +1,9 @@
-/* progprocess */
+/* pcspoll_progprocess SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* handle some service processing */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
@@ -10,12 +11,11 @@
 #define	CF_SETRUID	1		/* use 'setreuid(2)' */
 #define	CF_SETEUID	0		/* already done in 'main()' */
 
-
 /* revision history:
 
 	= 2008-09-01, David A­D­ Morano
-	This subroutine was borrowed and modified from previous generic
-	front-end 'main' subroutines!
+	This subroutine was borrowed and modified from previous
+	generic front-end 'main' subroutines!
 
 */
 
@@ -25,18 +25,17 @@
 
 	Prepare to do some servicing.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 
@@ -51,6 +50,7 @@
 #include	<getax.h>
 #include	<svcfile.h>
 #include	<acctab.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -615,7 +615,7 @@ const char	*pp ;
 	int		c = 0 ;
 	const char	*tp ;
 
-	while ((tp = strpbrk(pp,":;")) != NULL) {
+	while ((tp = strbrk(pp,":;")) != NULL) {
 	    rs = loadpather(pip,plp,pp,(tp - pp)) ;
 	    pp = (tp + 1) ;
 	    if (rs < 0) break ;
