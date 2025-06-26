@@ -1,15 +1,16 @@
-/* main (mktofc) */
+/* main SUPPORT (mktofc) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* Make To Folded Case */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-06-29, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -17,25 +18,22 @@
 
 /*******************************************************************************
 
-        This program makes a C-language fragment that is an array of unsigned
-        characters that constitutes a translation table used to fold characters
-        down to their base case (or character).
-
-        This is especially necessary for folding ISO-Ltin-1 characters down to
-        the representative regular ASCII capital character.
-
+  	Description:
+	This program makes a C-language fragment that is an array
+	of unsigned characters that constitutes a translation table
+	used to fold characters down to their base case (or character).
+	This is especially necessary for folding 'ISO-Ltin-1'
+	characters down to the representative regular ASCII capital
+	character.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<cstdio>
-
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<localmisc.h>
@@ -53,7 +51,7 @@
 /* external subroutines */
 
 extern int	freadline(FILE *,char *,int) ;
-extern int	nextfield(const char *,int,const char **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
 extern int	isalnumlatin(int) ;
 
 
@@ -65,12 +63,12 @@ static int	printout(FILE *,const uchar *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int,mainv,mainv envv) {
 	FILE		*ifp = stdin ;
 	FILE		*ofp = stdout ;
 	int		i ;
@@ -78,8 +76,8 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		len ;
 	int		ll, cl ;
 	uchar		a[256] ;
-	const char	*lp ;
-	const char	*cp ;
+	cchar	*lp ;
+	cchar	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
 #if	CF_DEBUGS 
@@ -102,7 +100,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    if ((len == 0) || (lbuf[0] == '#')) continue ;
 
 #if	CF_DEBUGS
-	    debugprintf("main: line=>%t<\n",lbuf,len) ;
+	    debugprintf("main: line=>%r<\n",lbuf,len) ;
 #endif
 
 	    lp = lbuf ;

@@ -815,7 +815,7 @@ PROGINFO	*pip ;
 static int proctmpuser(pip)
 PROGINFO	*pip ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	const int	tmpuserdmode = TMPUSERDMODE ;
 
@@ -874,7 +874,7 @@ PROGINFO	*pip ;
 bfile		*ofp ;
 const char	name[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -936,7 +936,7 @@ ret0:
 static int dirok(dname)
 const char	dname[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 	int	preumask ;
@@ -981,7 +981,7 @@ static int ensuremode(tmpdname,m)
 const char	tmpdname[] ;
 mode_t		m ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	rs ;
 	int	f = FALSE ;

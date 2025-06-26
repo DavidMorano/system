@@ -246,7 +246,7 @@ int progoutfin(PROGINFO *pip,BDB *bdbp,CITEDB *cdbp,cchar *ofname)
 	                                while (be.keyvals[i][0] != NULL) {
 	                                    debugprintf("progout: k=%s\n",
 	                                        be.keyvals[i][0]) ;
-	                                    debugprintf("progout: v=%t\n",
+	                                    debugprintf("progout: v=%r\n",
 	                                        be.keyvals[i][1],
 	                                        strnlen(be.keyvals[i][1],40)) ;
 	                                    i += 1 ;
