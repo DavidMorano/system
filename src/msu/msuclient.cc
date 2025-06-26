@@ -448,7 +448,7 @@ static int msuclient_shmcreate(MSUCLIENT *op,cchar *dbname,mode_t om)
 static int msuclient_shmcreater(MSUCLIENT *op,LOADINFO *lip,int shmi,
 		cchar *shmname)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_OK ;
 	int		fd = -1 ;
 	int		oflags ;

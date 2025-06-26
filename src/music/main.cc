@@ -150,7 +150,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	bopen(ofp,BFILE_STDOUT,"wct",0666) ;
 
 #if	CF_DEBUGS
-	debugprintf("main: argc=%d\n argv[1]=%t\n",argc,
+	debugprintf("main: argc=%d\n argv[1]=%r\n",argc,
 	    argv[1],((argc > 1) ? strlen(argv[1]) : 0)) ;
 #endif
 
