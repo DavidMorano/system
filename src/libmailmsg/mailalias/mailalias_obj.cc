@@ -107,6 +107,7 @@
 #include	"mailaliashdr.h"
 #include	"dbmake.hh"
 
+import libutil ;
 
 /* local defines */
 
@@ -467,7 +468,7 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 				    bp = strwcpy(kbuf,(op->skey + ai),cl) ;
 	                	    vl = intconv(bp - kbuf) ;
 	                         } else {
-	                             vl = cstrlen(op->skey + ai) ;
+	                             vl = lenstr(op->skey + ai) ;
 	                         }
 	                         if (vbuf != nullptr) {
 	                             cl = var.mailaddrlen ;
@@ -526,7 +527,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
                                 hl = intconv(cp - keybuf) ;
                             } else {
                                 hp = aname ;
-                                hl = cstrlen(aname) ;
+                                hl = lenstr(aname) ;
                             } /* end if */
                             khash = hash_elf(hp,hl) ;
                             hi = hashindex(khash,op->rilen) ;
@@ -590,7 +591,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
                                 cp = strwcpy(vbuf,(op->sval + vi),cl) ;
                                 vl = intconv(cp - vbuf) ;
                             } else {
-                                vl = cstrlen(op->sval + vi) ;
+                                vl = lenstr(op->sval + vi) ;
                             }
                             /* update cursor */
                             curp->i = hi ;
@@ -651,7 +652,7 @@ static int mailalias_opener(MA *op) noex {
 	if ((rs = maxpathlen) >= 0) {
 	    cint	maxpath = rs ;
 	    cint	sz = ((rs + 1) * 2) ;
-	    if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
 		cchar	*pname = op->apname ;
 	        cchar	*fe = MAILALIAS_FSUF ;
 	        char	endstr[2] ;
@@ -1017,11 +1018,9 @@ static int mailalias_dbmake(MA *op,time_t dt) noex {
 	if (dt == 0) dt = time(nullptr) ;
 /* get the directory of the DB file and see if it is writable to us */
 	if ((cl = sfdirname(op->dbfname,-1,&cp)) > 0) {
-	    char	*dbuf{} ;
-	    if ((rs = malloc_mp(&dbuf)) >= 0) {
+	    if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
 	        if ((rs = mkpath1w(dbuf,cp,cl)) >= 0) {
-	            USTAT	sb ;
-	            if ((rs = u_stat(dbuf,&sb)) >= 0) {
+	            if (ustat sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
 			if (S_ISDIR(sb.st_mode)) {
 	                    rs = sperm(op->idp,&sb,W_OK) ;
 			} else {
@@ -1051,8 +1050,7 @@ static int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
 	if ((rs = maxpathlen) >= 0) {
 	    cint	maxpath = rs ;
 	    cint	sz = ((rs + 1) * 3) ;
-	    char	*a{} ;
-	    if ((rs = uc_malloc(sz,&a)) >= 0) {
+	    if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
 		int	ai = 0 ;
 	        cint	clen = rs ;
 	        cchar	*pat = "dbmkXXXXXX" ;
@@ -1136,13 +1134,12 @@ static int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
 		    cchar	*magp = MAILALIAS_MAGICSTR ;
 	            if ((rs = mailalias_aprofile(op,dt)) >= 0) {
 	                dbmake	data(&recs,&skeys,&svals,fd) ;
-	                char	*tbuf{} ;
 			data.rectab = op->rectab ;
 			data.ropts = op->ropts ;
 			data.setmagic(magp,mags) ;
 			data.setnshift(nshift) ;
 			data.setversion(MAILALIAS_FILEVERSION) ;
-			if ((rs = malloc_mp(&tbuf)) >= 0) {
+	                if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	                    for (int i = 0 ; op->aprofile[i] ; i += 1) {
 	                        cchar	*cp = charp(op->aprofile[i]) ;
 	                        if (*cp != '/') {
@@ -1193,12 +1190,10 @@ static int mailalias_fileold(MA *op,time_t dt) noex {
 	int		rs1 ;
 	int		f = false ;
 	if ((rs = mailalias_aprofile(op,dt)) >= 0) {
-	    char	*tbuf{} ;
-	    if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	        USTAT	sb ;
-	        cchar	*cp ;
 	        for (int i = 0 ; op->aprofile[i] ; i += 1) {
-	            cp = charp(op->aprofile[i]) ;
+	            cchar *cp = charp(op->aprofile[i]) ;
 	            if (*cp != '/') {
 	                cp = tbuf ;
 	                mkpath(tbuf,op->pr,op->aprofile[i]) ;
@@ -1220,8 +1215,7 @@ static int mailalias_aprofile(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((dt - op->ti_aprofile) >= TO_APROFILE) {
-	    char	*tbuf{} ;
-	    if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	        USTAT	sb ;
 	        cchar	*profp = nullptr ;
 		cint	tlen = rs ;

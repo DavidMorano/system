@@ -72,6 +72,7 @@
 
 #include	"mkdirlist.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -237,7 +238,7 @@ int mkdirlist_finish(mkdirlist *op) noex {
 	        rs1 = mkdirlist_finents(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->dlp) {
 	        rs1 = vechand_finish(op->dlp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -254,8 +255,8 @@ int mkdirlist_finish(mkdirlist *op) noex {
 int mkdirlist_get(mkdirlist *op,int i,ENT **epp) noex {
 	int		rs ;
 	if ((rs = mkdirlist_magic(op,epp)) >= 0) {
-	    void	*vp{} ;
-	    if ((rs = vechand_get(op->dlp,i,&vp)) >= 0) {
+	    vechand	*dlp = op->dlp ;
+	    if (void *vp ; (rs = dlp->get(i,&vp)) >= 0) {
 		*epp = entp(vp) ;
 	    }
 	} /* end if (magic) */
@@ -267,22 +268,22 @@ int mkdirlist_link(mkdirlist *op) noex {
 	int		rs ;
 	if ((rs = mkdirlist_magic(op)) >= 0) {
 	    vechand	*dlp = op->dlp ;
-	    void	*vp{} ;
-	    for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
+	    void	*vp ;
+	    for (int i = 0 ; dlp->get(i,&vp) >= 0 ; i += 1) {
 	    	mkdirlist_ent	*ep = entp(vp) ;
 	        if (vp) {
 	            if (! ep->fl.link) {
 	    	        mkdirlist_ent	*pep = ep ;
 		        auto		vg = vechand_get ;
 	                for (int j = (i+1) ; vg(dlp,j,&vp) >= 0 ; j += 1) {
-	    	    	    mkdirlist_ent	*ep = entp(vp) ;
+	    	    	    mkdirlist_ent	*oep = entp(vp) ;
 	                    if (vp) {
 				cchar		*n1 = pep->name ;
-				cchar		*n2 = ep->name ;
+				cchar		*n2 = oep->name ;
 	                        if ((! ep->fl.link) && (bbcmp(n1,n2) == 0)) {
-	                            pep->link = ep ;
-	                            ep->fl.link = true ;
-	                            pep = ep ;
+	                            pep->link = oep ;
+	                            oep->fl.link = true ;
+	                            pep = oep ;
 	                        } /* end if (board match) */
         		    } /* end if (non-null entry) */
 	                } /* end for (inner) */
@@ -298,8 +299,9 @@ int mkdirlist_showdef(mkdirlist *op) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = mkdirlist_magic(op)) >= 0) {
-	    void	*vp{} ;
-	    for (int i = 0 ; vechand_get(op->dlp,i,&vp) >= 0 ; i += 1) {
+	    vechand	*dlp = op->dlp ;
+	    void	*vp ;
+	    for (int i = 0 ; dlp->get(i,&vp) >= 0 ; i += 1) {
 	        mkdirlist_ent	*ep = entp(vp) ;
 	        if (vp) {
 	            rs = entry_showdef(ep) ;
@@ -321,7 +323,7 @@ int mkdirlist_show(mkdirlist *op,cchar *ng,int order) noex {
 		vechand		*dlp = op->dlp ;
 		void		*vp{} ;
 		rs = SR_OK ;
-	        for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
+	        for (int i = 0 ; dlp->get(i,&vp) >= 0 ; i += 1) {
 	            mkdirlist_ent	*ep = entp(vp) ;
 	            if (vp) {
 	                rs = entry_show(ep,ng,order) ;
@@ -344,7 +346,7 @@ int mkdirlist_ung(mkdirlist *op,cc *ung,time_t utime,int f_sub,int order) noex {
 	        vechand		*dlp = op->dlp ;
 		void		*vp{} ;
 		rs = SR_OK ;
-	        for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
+	        for (int i = 0 ; dlp->get(i,&vp) >= 0 ; i += 1) {
 	            mkdirlist_ent	*ep = entp(vp) ;
 	            if (vp) {
 	                rs = entry_matung(ep,ung,utime,f_sub,order) ;
@@ -545,7 +547,7 @@ static int entry_matung(ENT *ep,cc *ung,time_t ut,int f_sub,int order) noex {
 	    if (bbcmp(ung,ep->name) == 0) {
 	        rs = 1 ;
 	        ep->fl.seen = true ;
-	        ep->fl.subscribe = f_sub ;
+	        ep->fl.subscribe = !!f_sub ;
 	        ep->utime = ut ;
 		ep->order = order ;
 	    } /* end if (name match) */

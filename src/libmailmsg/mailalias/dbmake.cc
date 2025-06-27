@@ -93,6 +93,7 @@
 #include	"dbmake.hh"
 #include	"mailaliashdr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -482,7 +483,7 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	                record	*rep = recordp(vp) ;
 	                int	c = 0 ;
 	                kp = charp(skey + rep->key) ;
-	                kl = cstrlen(kp) ;
+	                kl = lenstr(kp) ;
 	                khash = hash_elf(kp,kl) ;
 	                hi = hashindex(khash,n) ;
 	                if ((ropts & DBMAKE_OSEC) && (it[hi][0] != 0)) {

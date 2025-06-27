@@ -40,7 +40,6 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
@@ -65,10 +64,11 @@
 
 #include	"mxalias.h"
 
+import libutil ;
 
 /* local defines */
 
-#define	MXALIAS_FILE	struct mxalias_file
+#define	MXALIAS_FILE	mxalias_file
 #define	MXALIAS_SYSDB	"/etc/mail/mailx.rc"
 #define	MXALIAS_USERDB	".mailrc"
 #define	MXALIAS_KEYWORD	"alias"
@@ -132,7 +132,7 @@ struct mxalias_file {
 	ino_t		ino ;
 	time_t		timod ;
 	dev_t		dev ;
-	int		size ;
+	size_t		fsize ;
 } ;
 
 struct bufdesc {
@@ -565,7 +565,7 @@ int mxalias_curread(MA *op,MA_CUR *curp,char *vbuf,int vlen) noex {
 	                rs = sncpy1(vbuf,vlen,vp) ;
 	                vl = rs ;
 	            } else {
-	                vl = strlen(vp) ;
+	                vl = lenstr(vp) ;
 	            }
 	            if (rs >= 0) {
 	                curp->i = ni ;
@@ -611,7 +611,7 @@ static int mxalias_userdname(MA *op) noex {
 		rs = rsfree(rs,hbuf) ;
 	    } /* end if (m-a-f) */
 	} else {
-	    hl = strlen(op->userdname) ;
+	    hl = lenstr(op->userdname) ;
 	} /* end if (null) */
 	return (rs >= 0) ? hl : rs ;
 }
@@ -759,7 +759,7 @@ static int mxalias_fileparse(MA *op,int fi) noex {
     	vecobj		*flp = op->flp ;
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	void		*vp{} ;
 	if ((rs = flp->get(fi,&vp)) >= 0) {
 	    MA_FI	*fep = (MA_FI *) vp ;
@@ -772,7 +772,7 @@ static int mxalias_fileparse(MA *op,int fi) noex {
 	                        fep->dev = sb.st_dev ;
 	                        fep->ino = sb.st_ino ;
 	                        fep->timod = sb.st_mtime ;
-	                        fep->size = sb.st_size ;
+	                        fep->fsize = sb.st_size ;
 	                        rs = mxalias_fileparser(op,fi,lfp) ;
 	                        c += rs ;
 	                    } /* end if (needed update) */
@@ -798,11 +798,11 @@ static int mxalias_fileparser(MA *op,int fi,bfile *lfp) noex {
 	cint		llen = var.maxlinelen ;
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if (BD bd ; (rs = bufdesc_start(&bd,llen)) >= 0) {
 	    char	*lbuf = bd.lbuf ;
 	    while ((rs = breadln(lfp,lbuf,llen)) > 0) {
-	        cchar	*cp{} ;
+	        cchar	*cp ;
 		if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
 	             rs = mxalias_fileparseln(op,fi,&bd,cp,cl) ;
 	             c += rs ;
@@ -819,9 +819,9 @@ static int mxalias_fileparser(MA *op,int fi,bfile *lfp) noex {
 static int mxalias_fileparseln(MA *op,int fi,BD *bdp,cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
-	    cchar	*fp{} ;
+	    cchar	*fp ;
 	    if (int fl ; (fl = fsb.get(kterms,&fp)) > 0) {
 	        if (int ki ; (ki = matstr(keywords,fp,fl)) >= 0) {
 	            switch (ki) {
@@ -854,7 +854,7 @@ static int mxalias_fileparseln_alias(MA *op,int fi,BD *bdp,field *fsbp) noex {
 	int		rs = SR_OK ;
 	int		fl ;
 	int		c_field = 0 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	char		*kbuf = bdp->kbuf ;
 	char		*fbuf = bdp->fbuf ;
 	(void) fi ;
@@ -896,7 +896,7 @@ static int mxalias_fileparseln_unalias(MA *op,int fi,BD *bdp,field *fsbp) noex {
 static int mxalias_fileparseln_source(MA *op,int fi,BD *bdp,field *fsbp) noex {
 	cint		flen = bdp->flen ;
 	int		rs ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	char		*fbuf = bdp->fbuf ;
 	(void) fi ;
 	if ((rs = fsbp->sharg(vterms,fbuf,flen)) > 0) {
@@ -928,8 +928,7 @@ static int mxalias_filedel(MA *op,int fi) noex {
     	vecobj		*flp = op->flp ;
 	int		rs ;
 	int		rs1 ;
-	void		*vp{} ;
-	if ((rs = flp->get(fi,&vp)) >= 0) {
+	if (void *vp ; (rs = flp->get(fi,&vp)) >= 0) {
 	    MA_FI	*fep = (MA_FI *) vp ;
 	    if (vp) {
 		{
@@ -980,7 +979,7 @@ static int mxalias_filechanged(MA *op,USTAT *sbp) noex {
 static int mxalias_fileold(MA *op,time_t daytime) noex {
 	int		rs ;
 	int		rs1 ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	if ((rs = mxalias_aprofile(op,daytime)) >= 0) {
 	    if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	        USTAT	sb ;
@@ -1018,7 +1017,7 @@ static int mxalias_mkuserfname(MA *op,char *fname) noex {
 static int mxalias_addvals(MA *op,vecstr *klp,vecstr *vlp,cchar *kp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if (kp[0] != '\0') {
 	    keyvals_cur	kcur ;
 	    cint	rsn = SR_NOTFOUND ;
@@ -1058,17 +1057,17 @@ static int mxalias_addvals(MA *op,vecstr *klp,vecstr *vlp,cchar *kp) noex {
 
 static int mxalias_mkvals(MA *op,MA_CUR *curp,vecstr *vlp) noex {
 	int		rs = SR_FAULT ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if (op) {
 	    if ((rs = vlp->count) > 0) {
 	        int	sz = (rs + 1) * szof(char **) ;
-	        if (void *p{} ; (rs = uc_malloc(sz,&p)) >= 0) {
+	        if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
 	            cchar	*cp{} ;
 	            curp->vals = charpp(p) ; /* store allocation here */
 	            sz = 1 ;
 	            for (int i = 0 ; vlp->get(i,&cp) >= 0 ; i += 1) {
 	                if (cp) {
-	                    sz += (strlen(cp) + 1) ;
+	                    sz += (lenstr(cp) + 1) ;
 		        }
 	            } /* end for */
 	            if ((rs = uc_malloc(sz,&p)) >= 0) {
@@ -1137,7 +1136,7 @@ static int file_start(MA_FI *fep,USTAT *sbp,cchar *fname) noex {
 	    memclear(fep) ;
 	    if_constexpr (f_comment) {
 	        fep->timod = sbp->st_mtime ;
-	        fep->size = sbp->st_size ;
+	        fep->fsize = sbp->st_size ;
 	        fep->dev = sbp->st_dev ;
 	        fep->ino = sbp->st_ino ;
 	    } /* end if_constexpr (f_comment) */
@@ -1210,9 +1209,15 @@ static int cmpfe(MA_FI *e1p,MA_FI *e2p) noex {
 	if (e1p || e2p) {
 	    if (e1p) {
 	        if (e2p) {
-	            if ((rc = (e1p->dev - e2p->dev)) == 0) {
-	                rc = (e1p->ino - e2p->ino) ;
-	            }
+		    if ((e1p->dev - e2p->dev) == 0) {
+		        if ((e1p->ino - e2p->ino) == 0) {
+			    rc = 0 ;
+		        } else {
+			    rc = (e1p->ino > 0) ? 1 : -1 ;
+		        }
+		    } else {
+			rc = (e1p->dev > 0) ? 1 : -1 ;
+		    }
 	        } else {
 	            rc = -1 ;
 		}

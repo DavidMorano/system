@@ -81,6 +81,7 @@
 
 #include	"wdt.h"
 
+import libutil ;
 
 /* local defines */
 
