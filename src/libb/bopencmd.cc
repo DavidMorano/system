@@ -44,8 +44,10 @@
 #include	<strwcpy.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+
 #include	"bfile.h"
 
+import libutil ;
 
 /* local defines */
 
