@@ -1,0 +1,216 @@
+/* filerec1 SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* implement a map container of blocks (of a given structure) */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2011-04-12, David A­D­ Morano
+	This code was originally written.  Only the introduction
+	of C++11 has allowed this (finally), due to the addition
+	(in C++11) of |unordered_map(3c++)|.
+
+*/
+
+/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	filerec
+
+	Description:
+	This object implements a map container of blocks (of a given
+	structure).
+
+	Symopsis:
+	int filerec_start(int n = 0) noex
+
+	Arguments:
+	n		suggested starting length
+
+	Returns:
+	>=0		ok
+	<0		error (system-return)
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/stat.h>
+#include	<unistd.h>
+#include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<new>
+#include	<utility>		/* |pair(3c++)| */
+#include	<unordered_set>
+#include	<usyscalls.h>
+#include	<ulogerror.h>
+#include	<localmisc.h>
+
+module filerec ;
+
+/* local defines */
+
+#define	FONCE_DEFTABLEN		100
+
+
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::unordered_set ;              /* type */
+using std::pair ;                       /* type */
+using libu::umemallocstrw ;		/* subroutine */
+using libu::umemalloc ;			/* subroutine */
+using libu::umemfree ;			/* subroutine */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+typedef filerec::stype::iterator	setiter ;
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+
+/* local subroutines (methods) */
+
+int filerec::istart(int n) noex {
+	cnullptr	np{} ;
+	int		rs = SR_INVALID ;
+	if (n >= 0) {
+	    if (n == 0) n = FONCE_DEFTABLEN ;
+	    try {
+	        rs = SR_NOMEM ;
+	        if ((setp = new(nothrow) stype(n)) != np) {
+	            rs = SR_OK ;
+	        } /* end if (new-stype) */
+	    } catch (...) {
+		rs = SR_NOMEM ;
+	    }
+	} /* end if (valid) */
+	return rs ;
+} /* end method (filerec::istart) */
+
+int filerec::ifinish() noex {
+	int		rs = SR_NOTOPEN ;
+	int		rs1 ;
+	if (setp) {
+	    rs = SR_OK ;
+	    {
+		rs1 = finents() ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    delete setp ;
+	    setp = nullptr ;
+	} /* end if (open) */
+	return rs ;
+} /* end method (filerec::ifinish) */
+
+int filerec::checkin(custat *sbp,cchar *fn) noex {
+	int		rs = SR_FAULT ;
+	int		f = false ;
+	if (sbp) {
+	    rs = SR_BUGCHECK ;
+	    if (setp) {
+	        filerec_devino	k(sbp->st_dev,sbp->st_ino) ;
+		if (! setp->contains(k)) {
+		    if (cchar *cp ; (rs = umemallocstrw(fn,-1,&cp)) >= 0) {
+			k.fname = cp ;
+		        try {
+	                    pair<setiter,bool>	ret = setp->insert(k) ;
+		            rs = SR_OK ;
+		            f = ret.second ;
+		        } catch (...) {
+		            rs = SR_NOMEM ;
+		        }
+		        if (rs < 0) {
+			    char *bp = cast_const<charp>(cp) ;
+			    umemfree(bp) ;
+			    k.fname = nullptr ;
+			}
+		    } /* end if (memory-allocation) */
+		} /* end if (already) */
+	    } /* end if (initialize) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? f : rs ;
+} /* end method (filerec::checkin) */
+
+int filerec::icount() noex {
+	int		rs = SR_BUGCHECK ;
+	if (setp) {
+	    csize cnt = setp->size() ;
+	    rs = intconv(cnt) ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (filerec::icount) */
+
+int filerec::finents() noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	{
+	    stype::iterator	ite = setp->end() ;
+	    for (stype::iterator it = setp->begin() ; it != ite ; ++it) {
+		char **fpp = cast_const<charpp>(&it->fname) ;
+		char *bp = cast_const<charp>(it->fname) ;
+		rs1 = umemfree(bp) ;
+		if (rs >= 0) rs = rs1 ;
+		*fpp = nullptr ;
+	    } /* end for */
+	} /* end block */
+	return rs ;
+} /* end method (filerec::finents) */
+
+void filerec::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("filerec",rs,"fini-finish") ;
+	}
+} /* end method (filerec::dtor) */
+
+filerec::operator int () noex {
+    	return icount() ;
+} /* end method (filerec::operator) */
+
+int filerec_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case filerecmem_start:
+	        rs = op->istart(a) ;
+	        break ;
+	    case filerecmem_finish:
+	        rs = op->ifinish() ;
+	        break ;
+	    case filerecmem_count:
+	        rs = op->icount() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (filerec_co::operator) */
+
+
