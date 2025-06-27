@@ -1,0 +1,36 @@
+FSDIR (historical information)
+
+
+
+	This code module provides a platform independent implementation
+	of UNIX® file system directory access subroutines.
+
+	Oh!  Did I mention it?  What a f___ing pain the combination
+	of different memory models and different OSes is?!!!!!!!!!!!!
+
+	Oh, and one final thing.  This whole API to read file-system
+	directories sucks!  In fact, it sucks cock meat!  Deal with it!
+
+	Oh!  One more thing.  Solaris UNIX® sucks!  It sucks cock meat.
+	Solaris appears to have a bug in it where it writes a large
+	amount of garbage data to the 'struct dirent' structure entry
+	that is supposed to hold the directory file name.  It writes
+	garbage to that entry longer than both MAXNAMELEN and MAXPATHLEN.
+	It seems to require a character array of at least DIRBUF bytes
+	in length (1048 in this case) -- defined in the stupid Solaris
+	'/usr/include/dirent.h' include-file -- in order to prevent
+	the OS |readdir_r(3c)| implementation from overflowing that
+	character array.  This is likely just a coincidence and not
+	an actual intended behavior.  But an array size larger than 1024
+	(or generally larger than MAXNAMELEN) is required nonetheless.
+
+	The problem appears to be especially prevalent when reading
+	directories that are actually indirect mount points (abstractions)
+	maintained by the Solaris |automountd(1m)| system server.
+	It may be that this whole bug is just a bug of some sort with the
+	AUTOMOUNT server, but I do not know for sure where it originates
+	from.  In any event, the problem seems to be unique to Solaris
+	(otherwise known as SlowLaris) -- the garbage operating system
+	that it is.
+
+
