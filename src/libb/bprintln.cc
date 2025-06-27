@@ -48,6 +48,7 @@
 
 #include	"bfile.h"
 
+import libutil ;
 
 /* local defines */
 
