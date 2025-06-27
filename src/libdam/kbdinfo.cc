@@ -5,7 +5,6 @@
 /* keyboard-information database access */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -18,13 +17,13 @@
 
 /*******************************************************************************
 
-  	Name:
+  	Object:
 	kbdinfo
 
 	Description:
-        This object provides access to a keyboard-information database. This
-        information is used in creating the name of a key pressed on a
-        particular keyboard.
+	This object provides access to a keyboard-information
+	database.  This information is used in creating the name
+	of a key pressed on a particular keyboard.
 
         Notes: 
 	There is much to be desired with the implementation of this
@@ -39,47 +38,51 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<vecobj.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<strwcpyx.h>
+#include	<sncpyx.h>
+#include	<mkpathx.h>
+#include	<sfx.h>
+#include	<strwcpy.h>
+#include	<matstr.h>
+#include	<matxstr.h>
+#include	<cfnum.h>
+#include	<hasx.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
+#include	<termcmd.h>
 
 #include	"keysymer.h"
 #include	"kbdinfo.h"
 
+import libutil ;
 
 /* local defines */
 
-#define	KBDINFO_KEYNAMELEN	60
+#define	KI		kbdinfo
+#define	KI_KEYNAMELEN	60
+#define	KI_ENT		kbdinfo_ent
+#define	KI_CUR		kbdinfo_cur
 
 #undef	ENTRYINFO
-#define	ENTRYINFO		struct entryinfo
+#define	ENTRYINFO	entryinfo
+
+
+/* imported namespaces */
+
+using std::min ;			/* type */
+using std::max ;			/* type */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath2w(char *,cchar *,cchar *,int) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	matocasestr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfnumi(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	hasuc(cchar *,int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -88,38 +91,68 @@ extern int	strlinelen(cchar *,int,int) ;
 /* local structures */
 
 struct entryinfo {
-	cchar	*fp ;
+	cchar		*fp ;
 	int		fl ;
 } ;
 
 
 /* forward references */
 
-static int kbdinfo_parse(KBDINFO *,cchar *) ;
-static int kbdinfo_parseline(KBDINFO *,cchar *,int) ;
-static int kbdinfo_process(KBDINFO *,ENTRYINFO *,int) ;
-static int kbdinfo_store(KBDINFO *,int,cchar *,int,ENTRYINFO *,int) ;
-static int kbdinfo_kefins(KBDINFO *) ;
+template<typename ... Args>
+static int kbdinfo_ctor(kbdinfo *op,Args ... args) noex {
+    	KBDINFO		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (kbdinfo_ctor) */
 
-static int ke_start(KBDINFO_KE *,int,cchar *,int,ENTRYINFO *,int) ;
-static int ke_finish(KBDINFO_KE *) ;
+static int kbdinfo_dtor(kbdinfo *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (kbdinfo_dtor) */
 
-static int vcmpfind(const void *,const void *) ;
+template<typename ... Args>
+static inline int kbdinfo_magic(kbdinfo *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == KBDINFO_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (kbdinfo_magic) */
+
+static int kbdinfo_parse(KI *,cchar *) noex ;
+static int kbdinfo_parseline(KI *,cchar *,int) noex ;
+static int kbdinfo_process(KI *,ENTRYINFO *,int) noex ;
+static int kbdinfo_store(KI *,int,cchar *,int,ENTRYINFO *,int) noex ;
+static int kbdinfo_kefins(KI *) noex ;
+
+static int ke_start(KI_ENT *,int,cchar *,int,ENTRYINFO *,int) noex ;
+static int ke_finish(KI_ENT *) noex ;
+
+static int vcmpfind(cvoid **,cvoid **) noex ;
 
 
 /* local variables */
 
-static cchar	*keytypes[KBDINFO_TOVERLAST + 1] = {
+constexpr cpcchar	keytypes[KBDINFO_TOVERLAST + 1] = {
 	"reg",
 	"esc",
 	"csi",
 	"dcs",
 	"pf",
 	"fkey",
-	NULL
-} ;
+	nullptr
+} ; /* end array (keytypes) */
 
-static const uchar	kterms[] = {
+constexpr char		kterms[] = {
 	0x00, 0x3E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -128,7 +161,7 @@ static const uchar	kterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array (kterms) */
 
 
 /* exported variables */
@@ -136,452 +169,305 @@ static const uchar	kterms[] = {
 
 /* exported subroutines */
 
-int kbdinfo_open(KBDINFO *op,KEYSYMER *ksp,cchar *fname) {
-	int		rs = SR_OK ;
-	int		size ;
-	int		opts ;
-	int		i ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
-
-	if (fname[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-	op->ksp = ksp ;
-
-	opts = VECOBJ_OSORTED ;
-	size = szof(KBDINFO_KE) ;
-	for (i = 0 ; (rs >= 0) && (i < KBDINFO_TOVERLAST) ; i += 1) {
-	    rs = vecobj_start(&op->types[i],size,4,opts) ;
-	} /* end for */
-	if (rs >= 0) {
-	    if ((rs = kbdinfo_parse(op,fname)) >= 0) {
-		op->magic = KBDINFO_MAGIC ;
-	    }
+int kbdinfo_open(KI *op,keysymer *ksp,cchar *fname) noex {
+	int		rs ;
+	if ((rs = kbdinfo_ctor(op,ksp,fname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+	        cint	vsz = szof(KI_ENT) ;
+	        cint	vo = VECOBJ_OSORTED ;
+	        cint	ve = 4 ;
+	        cint	n = KBDINFO_TOVERLAST ;
+		int	i ; /* used-afterwards */
+	        op->ksp = ksp ;
+	        for (i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
+		    vecobj *tlp = (op->types + i) ;
+	            rs = tlp->start(vsz,ve,vo) ;
+	        } /* end for */
+	        if (rs >= 0) {
+	            if ((rs = kbdinfo_parse(op,fname)) >= 0) {
+		        op->magic = KBDINFO_MAGIC ;
+	            }
+	            if (rs < 0) {
+		        kbdinfo_kefins(op) ;
+		        for (i = 0 ; i < n ; i += 1) {
+			    vecobj *tlp = (op->types + i) ;
+	    	            tlp->finish() ;
+		        }
+	            } /* end if (error) */
+	        } else {
+		    /* variable 'i' from above */
+	            for (int j = 0 ; j < i ; j += 1) {
+			vecobj *tlp = (op->types + j) ;
+	                tlp->finish() ;
+	            }
+	        } /* end if */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-		kbdinfo_kefins(op) ;
-		for (i = 0 ; i < KBDINFO_TOVERLAST ; i += 1) {
-	    	    vecobj_finish(&op->types[i]) ;
-		}
+		kbdinfo_dtor(op) ;
 	    }
-	} else {
-	    int	j ;
-	    for (j = 0 ; j < i ; j += 1) {
-	        vecobj_finish(&op->types[j]) ;
-	    }
-	}
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_open: ret rs=%d\n",rs) ;
-#endif
-
+	} /* end if (kbdinfo_ctor) */
 	return rs ;
 }
 /* end subroutine (kbdinfo_open) */
 
-
-int kbdinfo_close(KBDINFO *op)
-{
-	int		rs = SR_OK ;
+int kbdinfo_close(KI *op) noex {
+	int		rs ;
 	int		rs1 ;
-	int		i ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != KBDINFO_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_close: ent\n") ;
-#endif
-
-	rs1 = kbdinfo_kefins(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	for (i = 0 ; i < KBDINFO_TOVERLAST ; i += 1) {
-	    rs1 = vecobj_finish(&op->types[i]) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = kbdinfo_magic(op)) >= 0) {
+	    {
+	        rs1 = kbdinfo_kefins(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    for (int i = 0 ; i < KBDINFO_TOVERLAST ; i += 1) {
+	        vecobj *tlp = (op->types + i) ;
+	        rs1 = tlp->finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end for f */
+	    {
+		rs1 = kbdinfo_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (kbdinfo_close) */
 
-
-int kbdinfo_count(KBDINFO *op)
-{
-	int		rs = SR_OK ;
-	int		i ;
-	int		count = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != KBDINFO_MAGIC) return SR_NOTOPEN ;
-
-	for (i = 0 ; (rs >= 0) && (i < KBDINFO_TOVERLAST) ; i += 1) {
-	    rs = vecobj_count(op->types + i) ;
-	    count += rs ;
-	} /* end for */
-
+int kbdinfo_count(KI *op) noex {
+	int		rs ;
+	int		count = 0 ; /* return-value */
+	if ((rs = kbdinfo_magic(op)) >= 0) {
+    	    cint	n = KBDINFO_TOVERLAST ;
+	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
+	        vecobj *tlp = (op->types + i) ;
+	        rs = tlp->count ;
+	        count += rs ;
+	    } /* end for */
+	} /* end if (kbdinfo_magic) */
 	return (rs >= 0) ? count : rs ;
 }
 /* end subroutine (kbdinfo_count) */
 
-
-int kbdinfo_lookup(KBDINFO *op,char *ksbuf,int kslen,TERMCMD *cmdp)
-{
-	KBDINFO_KE	te{} ;
-	KBDINFO_KE	*ep ;
-	cint	nps = 4 ;
-	int		rs = SR_OK ;
+int kbdinfo_lookup(KI *op,char *ksbuf,int kslen,termcmd *cmdp) noex {
+	cint		nps = 4 ;
+	int		rs ;
 	int		rs1 ;
-	int		ktype ;
-	int		keynum = 0 ;
-	short		params[4] ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (cmdp == NULL) return SR_FAULT ;
-
-	if (op->magic != KBDINFO_MAGIC) return SR_NOTOPEN ;
-
-	ktype = (cmdp->name == '~') ? KBDINFO_TFKEY : cmdp->type ;
-
-	te.type = ktype ;
-	te.name = cmdp->name ;
-	te.p = params ;
-	if (cmdp->p[0] >= 0) {
-	    cint	n = MIN(nps,TERMCMD_NP) ;
-	    int	i ;
-	    for (i = 0 ; i < n ; i += 1) {
-	        te.p[i] = cmdp->p[i] ;
-		if (cmdp->p[i] < 0) break ;
+	int		keynum = 0 ; /* return-value */
+	if ((rs = kbdinfo_magic(op,ksbuf,cmdp)) >= 0) {
+	    int		ktype = kbdinfot_fkey ;
+	    short	params[nps + 1] ;
+	    if (cmdp->name != '~') {
+	        ktype = cmdp->type ;
 	    }
-	    te.nparams = i ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_lookup: ktype=%d\n",te.type) ;
-	debugprintf("kbdinfo_lookup: kname=%d\n",te.name) ;
-	debugprintf("kbdinfo_lookup: nparams=%d\n",te.nparams) ;
-	debugprintf("kbdinfo_lookup: p0=%hd\n",te.p[0]) ;
-#endif
-
-	rs = vecobj_search(&op->types[ktype],&te,vcmpfind,&ep) ;
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_lookup: vecobj_search() rs=%d\n",rs) ;
-#endif
-
-	if ((rs >= 0) && (ep != NULL)) {
-
-#if	CF_DEBUGS
-	    debugprintf("kbdinfo_lookup: keyname=%s\n",ep->keyname) ;
-#endif
-
-	    if (ep->keynum < 0) {
-	        if (op->ksp != NULL) {
-	            rs1 = keysymer_lookup(op->ksp,ep->keyname,-1) ;
-
-#if	CF_DEBUGS
-	            debugprintf("kbdinfo_lookup: keysymer_lookup() rs1=%d\n",
-	                rs1) ;
-#endif
-
-	            if (rs1 >= 0) {
-	                ep->keynum = rs1 ;
-	                keynum = rs1 ;
-	            }
+	    KI_ENT	te{} ;
+	    te.type = ktype ;
+	    te.name = cmdp->name ;
+	    te.p = params ;
+	    if (cmdp->p[0] >= 0) {
+	        cint	n = MIN(nps,TERMCMD_NP) ;
+	        int	i ; /* used-afterwards */
+	        for (i = 0 ; i < n ; i += 1) {
+	            te.p[i] = cmdp->p[i] ;
+		    if (cmdp->p[i] < 0) break ;
 	        }
-	    } else
-	        keynum = ep->keynum ;
-
-	    if (ksbuf != NULL) {
-		rs = sncpy1(ksbuf,kslen,ep->keyname) ;
-	    }
-
-	} else {
-
-	    if (ksbuf != NULL) ksbuf[0] = '\0' ;
-
-	} /* end if */
-
+	        te.nparams = i ;
+	    } /* end if */
+	    void *vp ;
+	    vecobj *tlp = (op->types + ktype) ;
+	    if ((rs = tlp->search(&te,vcmpfind,&vp)) >= 0) {
+	        KI_ENT	*ep = (KI_ENT *) vp ;
+	        if (vp) {
+	            if (ep->keynum < 0) {
+	                if (op->ksp != nullptr) {
+	                    rs1 = keysymer_lookup(op->ksp,ep->keyname,-1) ;
+        
+	                    if (rs1 >= 0) {
+	                        ep->keynum = rs1 ;
+	                        keynum = rs1 ;
+	                    }
+	                }
+	            } else {
+	                keynum = ep->keynum ;
+	            }
+	            if (ksbuf) {
+		        rs = sncpy1(ksbuf,kslen,ep->keyname) ;
+	            }
+	        } /* end if (non-null) */
+	    } else {
+	        if (ksbuf) ksbuf[0] = '\0' ;
+	    } /* end if */
+	} /* end if (magic) */
 	return (rs >= 0) ? keynum : rs ;
 }
 /* end subroutine (kbdinfo_lookup) */
 
-
-int kbdinfo_curbegin(KBDINFO *op,KBDINFO_CUR *curp)
-{
-
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (op->magic != KBDINFO_MAGIC) return SR_NOTOPEN ;
-
-	memset(curp,0,sizeof(KBDINFO_CUR)) ;
-
-	curp->i = -1 ;
-	return SR_OK ;
+int kbdinfo_curbegin(KI *op,KI_CUR *curp) noex {
+    	int		rs ;
+	if ((rs = kbdinfo_magic(op,curp)) >= 0) {
+	    rs = memclear(curp) ;
+	    curp->i = -1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (kbdinfo_curbegin) */
 
-
-int kbdinfo_curend(KBDINFO *op,KBDINFO_CUR *curp)
-{
-
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (op->magic != KBDINFO_MAGIC) return SR_NOTOPEN ;
-
-	memset(curp,0,sizeof(KBDINFO_CUR)) ;
-
-	curp->i = -1 ;
-	return SR_OK ;
+int kbdinfo_curend(KI *op,KI_CUR *curp) noex {
+    	int		rs ;
+	if ((rs = kbdinfo_magic(op,curp)) >= 0) {
+	    rs = memclear(curp) ;
+	    curp->i = -1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (kbdinfo_curend) */
 
-
-int kbdinfo_enum(KBDINFO *op,KBDINFO_CUR *curp,KBDINFO_KE **rpp)
-{
-	int		rs = SR_OK ;
-	int		i, j ;
-	int		nl = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (rpp == NULL) return SR_FAULT ;
-
-	if (op->magic != KBDINFO_MAGIC) return SR_NOTOPEN ;
-
-	memset(curp,0,sizeof(KBDINFO_CUR)) ;
-
-	i = curp->i ;
-	if (i < 0) {
-	    i = 0 ;
-	    j = 0 ;
-	} else
-	    j = (curp->j + 1) ;
-
-	if (i < KBDINFO_TOVERLAST) {
-	    rs = vecobj_get((op->types + i),j,rpp) ;
-	    if ((rs == SR_NOTFOUND) && (i < KBDINFO_TOVERLAST)) {
-	        i += 1 ;
+int kbdinfo_curenum(KI *op,KI_CUR *curp,KI_ENT **rpp) noex {
+	int		rs ;
+	int		nl = 0 ; /* return-value */
+	if ((rs = kbdinfo_magic(op,curp,rpp)) >= 0) {
+	    cint	n  = KBDINFO_TOVERLAST ;
+	    int	i = curp->i ;
+	    int j ;
+	    if (i < 0) {
+	        i = 0 ;
 	        j = 0 ;
-	        rs = vecobj_get((op->types + i),j,rpp) ;
+	    } else {
+	        j = (curp->j + 1) ;
 	    }
-	}
-
-	if ((rs >= 0) && (*rpp != NULL)) {
-	    curp->i = i ;
-	    curp->j = j ;
-	    if ((*rpp)->keyname != NULL) {
-	        nl = strlen((*rpp)->keyname) ;
+	    if (i < n) {
+	        void	*vp ;
+	        if ((rs = vecobj_get((op->types + i),j,&vp)) >= 0) {
+		    *rpp = (KI_ENT *) vp ;
+	        } else if ((rs == SR_NOTFOUND) && (i < n)) {
+	            i += 1 ;
+	            j = 0 ;
+		    vecobj	*tlp = (op->types + i) ;
+	            if ((rs = tlp->get(j,&vp)) >= 0) {
+		        *rpp = (KI_ENT *) vp ;
+		    }
+	        }
+	    } /* end if (within) */
+	    if ((rs >= 0) && (*rpp != nullptr)) {
+	        curp->i = i ;
+	        curp->j = j ;
+	        if ((*rpp)->keyname != nullptr) {
+	            nl = lenstr((*rpp)->keyname) ;
+	        }
 	    }
-	}
-
+	} /* end if (magic) */
 	return (rs >= 0) ? nl : rs ;
 }
-/* end subroutine (kbdinfo_enum) */
+/* end subroutine (kbdinfo_curenum) */
 
 
 /* private subroutines */
 
-
-static int kbdinfo_parse(KBDINFO *op,cchar *fname)
-{
-	bfile		dfile, *dfp = &dfile ;
-	int		rs ;
+static int kbdinfo_parse(KI *op,cchar *fname) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_parse: fname=%s\n",fname) ;
-#endif
-
-	if (fname == NULL) return SR_FAULT ;
-
-	if ((rs = bopen(dfp,fname,"r",0666)) >= 0) {
-	    cint	llen = LINEBUFLEN ;
-	    int		len ;
-	    int		sl ;
-	    cchar	*sp ;
-	    char	lbuf[LINEBUFLEN + 1] ;
-
-	    while ((rs = breadln(dfp,lbuf,llen)) > 0) {
-	        len = rs ;
-
-		if (lbuf[len-1] == '\n') len -= 1 ;
-		lbuf[len] = '\0' ;
-
-		if ((sl = sfskipwhite(lbuf,len,&sp)) > 0) {
-	            if (sp[0] != '#') {
-	                if ((rs = kbdinfo_parseline(op,sp,sl)) > 0) {
-	                    c += 1 ;
+	if (fname) {
+	    if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+		cint	llen = rs ;
+	        if (bfile df ; (rs = df.open(fname,"r",0)) >= 0) {
+	            while ((rs = df.readln(lbuf,llen)) > 0) {
+			cchar	*sp ;
+			if (int sl ; (sl = sfcontent(lbuf,rs,&sp)) > 0) {
+	                    if ((rs = kbdinfo_parseline(op,sp,sl)) > 0) {
+	                        c += 1 ;
+			    }
 			}
-		    }
-	        }
-
-	        if (rs < 0) break ;
-	    } /* end while */
-
-	    rs1 = bclose(dfp) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (open-file) */
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_parse: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	                if (rs < 0) break ;
+		    } /* end while */
+	            rs1 = df.close ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (open-file) */
+	        rs = rsfree(rs,lbuf) ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (kbdinfo_parse) */
 
-
-static int kbdinfo_parseline(KBDINFO *op,cchar *lp,int ll)
-{
-	ENTRYINFO	eis[20] ;
-	FIELD		fsb ;
+static int kbdinfo_parseline(KI *op,cchar *lp,int ll) noex {
+	ENTRYINFO	eis[20] = {} ;
 	int		rs ;
-	int		c = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_parseline: l=>%r<\n",
-		lp,strlinelen(lp,ll,40)) ;
-#endif
-
-	memset(eis,0,sizeof(ENTRYINFO)*nelem(eis)) ;
-
-	if ((rs = field_start(&fsb,lp,ll)) >= 0) {
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
 	    cint	n = nelem(eis) ;
-	    int		i = 0 ;
-	    int		fl ;
+	    int		i = 0 ; /* used-afterwards */
 	    cchar	*fp ;
-
-	    while ((i < n) && ((fl = field_get(&fsb,kterms,&fp)) > 0)) {
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_parseline: i=%u f=>%r<\n",i,fp,fl) ;
-#endif
-
+	    for (int fl ; (i < n) && ((fl = fsb.get(kterms,&fp)) > 0) ; ) {
 	        eis[i].fp = fp ;
 	        eis[i].fl = fl ;
-
 		i += 1 ;
 	        if (fsb.term == '#') break ;
 	    } /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_parseline: mid i=%u\n",i) ;
-#endif
-
 	    if (i >= 3) {
 	        rs = kbdinfo_process(op,eis,i) ;
 	        c = rs ;
 	    }
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_parseline: _process() rs=%u\n",rs) ;
-#endif
-
-	    field_finish(&fsb) ;
+	    rs1 = field_finish(&fsb) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_parseline: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (kbdinfo_parseline) */
 
-
-static int kbdinfo_process(KBDINFO *op,ENTRYINFO *eis,int n)
-{
+static int kbdinfo_process(KI *op,ENTRYINFO *eis,int n) noex {
 	int		rs = SR_OK ;
 	int		ktl = eis[1].fl ;
-	int		ktype ;
-	int		c = 0 ;
-	cchar	*ktp = eis[1].fp ;
-
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    for (i = 0 ; i < n ; i += 1)
-	    debugprintf("kbdinfo_process: eis[%u]=>%r<\n",
-		i,eis[i].fp,eis[i].fl) ;
-	}
-#endif /* CF_DEBUGS */
-
-	if ((ktype = matocasestr(keytypes,2,ktp,ktl)) >= 0) {
+	int		c = 0 ; /* return-value */
+	cchar		*ktp = eis[1].fp ;
+	if (int ktype ; (ktype = matocasestr(keytypes,2,ktp,ktl)) >= 0) {
 	    int		knl = eis[0].fl ;
 	    cchar	*knp = eis[0].fp ;
 	    c = 1 ;
 	    rs = kbdinfo_store(op,ktype,knp,knl,eis,n) ;
 	} /* end if (match) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (kbdinfo_process) */
 
-
-static int kbdinfo_store(KBDINFO *op,int ktype,cchar *knp,int knl,
-		ENTRYINFO *eis,int n)
-{
-	KBDINFO_KE	e ;
+static int kbdinfo_store(KI *op,int ktype,cchar *knp,int knl,
+		ENTRYINFO *eis,int n) noex {
 	int		rs = SR_OK ;
-	char		keybuf[KBDINFO_KEYNAMELEN + 1] ;
-
-	if (knl < 0) knl = strlen(knp) ;
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_store: k=>%r<\n",knp,knl) ;
-#endif /* CF_DEBUGS */
-
+	char		keybuf[KI_KEYNAMELEN + 1] ;
+	if (knl < 0) knl = lenstr(knp) ;
 	if (hasuc(knp,knl)) {
-	    cint	ml = MIN(knl,KBDINFO_KEYNAMELEN) ;
-	    knl = strwcpylc(keybuf,knp,ml) - keybuf ;
+	    cint	ml = MIN(knl,KI_KEYNAMELEN) ;
+	    knl = intconv(strwcpylc(keybuf,knp,ml) - keybuf) ;
 	    knp = keybuf ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo_store: ktype=%u k=%r\n",
-		ktype,knp,knl) ;
-#endif /* CF_DEBUGS */
-
-	if ((rs = ke_start(&e,ktype,knp,knl,eis,n)) >= 0) {
+	if (KI_ENT e ; (rs = ke_start(&e,ktype,knp,knl,eis,n)) >= 0) {
 	    rs = vecobj_add((op->types + ktype),&e) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        ke_finish(&e) ;
+	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (kbdinfo_store) */
 
-
-static int kbdinfo_kefins(KBDINFO *op)
-{
-	KBDINFO_KE	*ep ;
+static int kbdinfo_kefins(KI *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
-
-	for (i = 0 ; i < KBDINFO_TOVERLAST ; i += 1) {
-	    int	j ;
-	    for (j = 0 ; vecobj_get(&op->types[i],j,&ep) >= 0 ; j += 1) {
-	        if (ep != NULL) {
+	for (int i = 0 ; i < KBDINFO_TOVERLAST ; i += 1) {
+	    vecobj	*tlp = (op->types + i) ;
+	    void	*vp ;
+	    for (int j = 0 ; tlp->get(j,&vp) >= 0 ; j += 1) {
+		KI_ENT	*ep = (KI_ENT *) vp ;
+	        if (vp) {
 	            rs1 = ke_finish(ep) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	    } /* end for */
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (kbdinfo_kefins) */
-
 
 #ifdef	COMMENT
 struct kbdinfo_e {
@@ -600,57 +486,39 @@ F6              FKEY	-	-	17
 F7              FKEY	-	-	18
 #endif /* COMMENT */
 
-
-static int ke_start(KBDINFO_KE *kep,int ktype,cchar *knp,int knl,
-		ENTRYINFO *eis,int n) {
-	cint	oi = 4 ;
-	int		rs ;
+static int ke_start(KI_ENT *kep,int ktype,cchar *knp,int knl,
+		ENTRYINFO *eis,int n) noex {
+	cint		oi = 4 ;
+	int		rs = SR_FAULT ;
 	int		nparams = 0 ;
-	int		size = 0 ;
-	char		*bp ;
-
-	if (kep == NULL) return SR_FAULT ;
-	if (knp == NULL) return SR_FAULT ;
-
-	if (knp[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("kbdinfo/ke_start: k=%r n=%u\n",knp,knl,n) ;
-#endif
-
-	memset(kep,0,sizeof(KBDINFO_KE)) ;
+	int		sz = 0 ;
+	if (kep && knp) {
+	    rs = SR_INVALID ;
+	    if (knp[0]) {
+	        rs = memclear(kep) ;
 	kep->type = ktype ;
 	kep->keynum = -1 ;
-
 	{
 	    int	name = (eis[2].fp[0] & 0xff) ;
 	    if (ktype == KBDINFO_TFKEY) name = '~' ;
 	    kep->name = name ;
 	}
-
-	size += (xstrnlen(knp,knl) + 1) ;
+	sz += (xstrnlen(knp,knl) + 1) ;
 	if (n > 3) {
-	    size += (xstrnlen(eis[3].fp,eis[3].fl) + 1) ;
+	    sz += (xstrnlen(eis[3].fp,eis[3].fl) + 1) ;
 	} else {
-	    size += 1 ;
+	    sz += 1 ;
 	}
-
 	if (n > oi) {
-	    int	i ;
-	    for (i = oi ; i < n ; i += 1) {
+	    for (int i = oi ; i < n ; i += 1) {
 	        if ((eis[i].fl > 0) && (eis[i].fp[0] != '-')) {
 		    nparams = (i+1-oi) ;
 	        }
 	    }
-	    size += (nparams*sizeof(short)) ;
+	    sz += (nparams * szof(short)) ;
 	}
 
-#if	CF_DEBUGS
-		debugprintf("kbdinfo/ke_start: nparams=%u size=%u\n",
-		nparams,size) ;
-#endif
-
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
+	if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    int		pi ;
 	    int		fl ;
 	    int		v ;
@@ -666,17 +534,14 @@ static int ke_start(KBDINFO_KE *kep,int ktype,cchar *knp,int knl,
 		fl = eis[pi+oi].fl ;
 		fp = eis[pi+oi].fp ;
 		if (fl > 0) {
-		    if ((fp != NULL) && (fp[0] != '-')) {
+		    if ((fp != nullptr) && (fp[0] != '-')) {
 		        rs = cfnumi(fp,fl,&v) ;
 		    }
 		}
-#if	CF_DEBUGS
-		debugprintf("kbdinfo/ke_start: pi=%u v=%d\n",pi,v) ;
-#endif
 		pp[pi] = (v & SHORT_MAX) ;
 		if (rs < 0) break ;
 	    } /* end for */
-	    bp += (nparams*sizeof(short)) ;
+	    bp += (nparams * szof(short)) ;
 
 	    if (rs >= 0) {
 	        kep->keyname = bp ;
@@ -696,66 +561,64 @@ static int ke_start(KBDINFO_KE *kep,int ktype,cchar *knp,int knl,
 
 	    if (rs < 0) {
 		uc_free(kep->a) ;
-		kep->a = NULL ;
+		kep->a = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
 
-#if	CF_DEBUGS
-	debugprintf("kbdinfo/ke_start: ret rs=%d\n",rs) ;
-	if ((rs >= 0) && (kep->nparams > 0)) {
-	    int	pi ;
-	    for (pi = 0 ; pi < kep->nparams ; pi += 1) {
-		debugprintf("kbdinfo/ke_start: p[%u]=%hd\n",
-			pi,kep->p[pi]) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
-
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ke_start) */
 
-
-static int ke_finish(KBDINFO_KE *kep)
-{
-	int		rs = SR_OK ;
+static int ke_finish(KI_ENT *kep) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (kep == NULL) return SR_FAULT ;
-
-	if (kep->a != NULL) {
-	    rs1 = uc_free(kep->a) ;
-	    if (rs >= 0) rs = rs1 ;
-	    kep->a = NULL ;
-	}
-
+	if (kep) {
+	    rs = SR_OK ;
+	    if (kep->a) {
+	        rs1 = uc_free(kep->a) ;
+	        if (rs >= 0) rs = rs1 ;
+	        kep->a = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ke_finish) */
 
-static int vcmpfind(cvoid *v1pp,cvoid *v2pp) noex {
-	KBDINFO_KE	**e1pp = (KBDINFO_KE **) v1pp ;
-	KBDINFO_KE	**e2pp = (KBDINFO_KE **) v2pp ;
-	int		rc = 0 ;
-	if ((*e1pp != NULL) || (*e2pp != NULL)) {
-	    if (*e1pp != NULL) {
-	        if (*e2pp != NULL) {
-	            if ((rc = ((*e1pp)->name - (*e2pp)->name)) == 0) {
-	                if (((*e1pp)->nparams > 0) && ((*e2pp)->nparams > 0)) {
-		            rc = ((*e1pp)->p[0] - (*e2pp)->p[0]) ;
-	                } else if ((*e1pp)->nparams > 0) {
-		            rc = +1 ;
-	                } else if ((*e2pp)->nparams > 0) {
-		            rc = -1 ;
-	                } else {
-		            rc = 0 ;
-	                }
-	            }
-	        } else
-	            rc = -1 ;
-	    } else
-	        rc = +1 ;
+static int cmpent(KI_ENT *e1p,KI_ENT *e2p) noex {
+    	int		rc ;
+	if ((rc = (e1p->name - e2p->name)) == 0) {
+	    if ((e1p->nparams > 0) && (e2p->nparams > 0)) {
+		rc = (e1p->p[0] - e2p->p[0]) ;
+	    } else if (e1p->nparams > 0) {
+		rc = +1 ;
+	    } else if (e2p->nparams > 0) {
+		rc = -1 ;
+	    }
 	}
+	return rc ;
+} /* end subroutine (cmpent) */
+
+static int vcmpfind(cvoid **v1pp,cvoid **v2pp) noex {
+	KI_ENT		**e1pp = (KI_ENT **) v1pp ;
+	KI_ENT		**e2pp = (KI_ENT **) v2pp ;
+	int		rc = 0 ;
+	{
+	    KI_ENT	*e1p = (KI_ENT *) *e1pp ;
+	    KI_ENT	*e2p = (KI_ENT *) *e2pp ;
+	    if (e1p || e2p) {
+	        if (e1p) {
+	            if (e2p) {
+		        rc = cmpent(e1p,e2p) ;
+	            } else {
+	                rc = -1 ;
+		    }
+	        } else {
+	            rc = +1 ;
+	        }
+	    }
+	} /* end block */
 	return rc ;
 }
 /* end subroutine (vcmpfind) */

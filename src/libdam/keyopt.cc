@@ -44,6 +44,7 @@
 
 #include	"keyopt.h"
 
+import libutil ;			/* |xtrlen(3u)| */
 
 /* local defines */
 
@@ -135,24 +136,21 @@ int keyopt_finish(keyopt *op) noex {
 /* end subroutine (keyopt_finish) */
 
 int keyopt_loads(keyopt *op,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if ((rs = keyopt_magic(op,sp)) >= 0) {
-	    cchar	*tp ;
-	    cchar	*cp ;
-	    int		cl ;
 	    if (sl <= 0) sl = xstrlen(sp) ;
-	    while ((tp = strnbrk(sp,sl,",\t\n\r ")) != nullptr) {
-	        cp = sp ;
-	        cl = intconv(tp - sp) ;
-	        if (cl > 0) {
+	    for (cchar *tp ; (tp = strnbrk(sp,sl,",\t\n\r ")) != np ; ) {
+	        cchar	*cp = sp ;
+	        if (cint cl = intconv(tp - sp) ; cl > 0) {
 	            rs = keyopt_loadpair(op,cp,cl) ;
 	            c += rs ;
 	        }
 	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
-	    } /* end while */
+	    } /* end for */
 	    if ((rs >= 0) && (sl > 0)) {
 	        rs = keyopt_loadpair(op,sp,sl) ;
 	        c += rs ;
@@ -179,17 +177,17 @@ int keyopt_loadvalue(keyopt *op,cchar *key,cchar *vbuf,int vlen) noex {
 	    cchar	*tp ;
 	    cchar	*cp ;
 	    int		klen ;
-/* clean up the value a little */
+	    /* clean up the value a little */
 	    if (vlen < 0) vlen = (vbuf) ? xstrlen(vbuf) : 0 ;
-/* do we have one of these named keys already? */
+	    /* do we have one of these named keys already? */
 	    klen = -1 ;
 	    if ((tp = strchr(key,'=')) != nullptr) {
 	        klen = intconv(tp - key) ;
 	    }
 	    if (keyopt_findkey(op,key,klen,&pp) == SR_NOTFOUND) {
-	        cint	nsize = sizeof(NAM) ;
-/* make a new parameter header block */
-	        if ((rs = uc_malloc(nsize,&pp)) >= 0) {
+	        cint	nsz = szof(NAM) ;
+	        /* make a new parameter header block */
+	        if ((rs = uc_malloc(nsz,&pp)) >= 0) {
 	            pp->count = 0 ;
 	            pp->next = nullptr ;
 	            pp->head = nullptr ;
@@ -213,8 +211,8 @@ int keyopt_loadvalue(keyopt *op,cchar *key,cchar *vbuf,int vlen) noex {
 	    } /* end if (adding a new parameter block on the list) */
     /* OK, now we have the parameter block that we are looking for in 'pp' */
 	    if (rs >= 0) {
-	        cint	vsize = sizeof(VAL) ;
-	        if ((rs = uc_malloc(vsize,&nvp)) >= 0) {
+	        cint	vsz = szof(VAL) ;
+	        if ((rs = uc_malloc(vsz,&nvp)) >= 0) {
 	            nvp->next = nullptr ;
 	            nvp->value = nullptr ;
 	            if (vbuf != nullptr) {
@@ -289,7 +287,7 @@ int keyopt_fetch(keyopt *op,cchar *kname,CUR *curp,cchar **rpp) noex {
 	        curp->valuep = nullptr ;
 	    }
 	    if (curp->keyp == nullptr) {
-/* do we have this key? */
+		/* do we have this key? */
 	        klen = -1 ;
 	        if ((tp = strchr(kname,'=')) != nullptr) {
 	            klen = intconv(tp - kname) ;
@@ -384,7 +382,7 @@ int keyopt_findvalue(keyopt *op,cc *key,cc *value,int vlen,VAL **rpp) noex {
 	    cchar	*tp ;
 	    int		klen = -1 ;
 	    if (vlen < 0) vlen = xstrlen(value) ;
-/* do we have this key? */
+	    /* do we have this key? */
 	    if ((tp = strchr(key,'=')) != nullptr) {
 	        klen = intconv(tp - key) ;
 	    }
@@ -422,14 +420,12 @@ static int keyopt_loadpair(keyopt *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (sp) {
 	    cchar	*keyp{} ;
-	    int		klen ;
 	    rs = SR_OK ;
-	    if ((klen = sfshrink(sp,sl,&keyp)) > 0) {
+	    if (int klen ; (klen = sfshrink(sp,sl,&keyp)) > 0) {
 	        int	vlen = 0 ;
 	        cchar	*valuep = nullptr ;
-	        cchar	*tp ;
 	        char	keybuf[KEYBUFLEN + 1] ;
-	        if ((tp = strnchr(keyp,klen,'=')) != nullptr) {
+	        if (cchar *tp ; (tp = strnchr(keyp,klen,'=')) != nullptr) {
 	            valuep = (tp + 1) ;
 	            vlen = intconv((keyp + klen) - valuep) ;
 	            klen = intconv(tp - keyp) ;

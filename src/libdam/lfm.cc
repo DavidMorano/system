@@ -61,7 +61,6 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<cstdarg>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -88,6 +87,7 @@
 
 #include	"lfm.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -663,12 +663,12 @@ int parser::pnodeuser(int len) noex {
 	cchar		*sp = lbp->lbuf ;
 	cchar		*cp ;
 	if (cc *tp{} ; (tp = strnchr(sp,sl,'!')) != np) {
-	    sl = (tp - lbp->lbuf) ;
+	    sl = intconv(tp - lbp->lbuf) ;
 	    if ((cl = sfshrink(sp,sl,&cp)) > 0) {
 		if (cc *ip{} ; (rs = sip->strw(cp,cl,&ip)) >= 0) {
 		    lcp->nodename = ip ;
 		}
-		sl = len - ((tp + 1) - sp) ;
+		sl = len - intconv((tp + 1) - sp) ;
 		sp = (tp + 1) ;
 	    } /* end if (sfshrink) */
 	} /* end if */
@@ -688,7 +688,7 @@ int parser::ptimebanner(int len) noex {
     	int		rs = SR_OK ;
 	if (cc *tp{} ; (tp = strnbrk(lbp->lbuf,len," \t")) != np) {
 	    cchar	*sp = (tp + 1) ;
-	    cint	sl = len - ((tp + 1) - lbp->lbuf) ;
+	    cint	sl = len - intconv((tp + 1) - lbp->lbuf) ;
 	    cchar	*cp ;
 	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) >= 0) {
 		if (cc *ip{} ; (rs = sip->strw(cp,cl,&ip)) >= 0) {
@@ -778,12 +778,12 @@ static int lfm_lockreadpid(lfm *op) noex {
 	int		rs ;
 	int		v = 0 ;
 	if ((rs = u_rewind(lfd)) >= 0) {
-	    if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	    if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
 	        cint	llen = rs ;
 	        if ((rs = u_read(lfd,lbuf,llen)) >= 0) {
 	            int		len = rs ;
-	            if (cchar *tp{} ; (tp = strnchr(lbuf,len,'\n')) != np) {
-			len = (tp - lbuf) ;
+	            if (cchar *tp ; (tp = strnchr(lbuf,len,'\n')) != np) {
+			len = intconv(tp - lbuf) ;
 	            }
 	            rs = cfdeci(lbuf,len,&v) ;
 	            v &= INT_MAX ;
@@ -801,7 +801,7 @@ static int lfm_lockwritedate(lfm *op,time_t dt) noex {
 	    int		tl ;
 	    char	tbuf[TIMEBUFLEN+2] ;
 	    timestr_logz(dt,tbuf) ;
-	    tl = strlen(tbuf) ;
+	    tl = lenstr(tbuf) ;
 	    rs = u_write(op->lfd,tbuf,tl) ;
 	} /* end if (u_seek) */
 	return rs ;
