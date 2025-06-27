@@ -29,7 +29,7 @@
 #define	LFM_MAGIC		0x8a7b7c6d
 #define	LFM			struct lfm_head
 #define	LFM_IN			struct lfm_information
-#define	LFM_CH			struct lfm_check
+#define	LFM_CH			struct lfm_checkdata
 /* lock-file types */
 #define	LFM_TRECORD		0		/* record lock */
 #define	LFM_TCREATE		1		/* old create file 0444 */
@@ -48,7 +48,7 @@ struct lfm_information {
 	int		tocheck ;	/* check interval */
 } ;
 
-struct lfm_check {
+struct lfm_checkdata {
 	cchar		*nodename ;	/* lock node name */
 	cchar		*username ;	/* lock user name */
 	cchar		*banner ;	/* banner */
@@ -60,12 +60,12 @@ struct lfm_check {
 struct lfm_head {
 	cchar		*lfname ;	/* file name (processed) */
 	ino_t		ino ;
-	dev_t		dev ;
 	off_t		odate ;		/* offset to date */
 	off_t		orewind ;	/* offset to start of write area */
 	off_t		owrite ;	/* offset past last write */
 	time_t		ti_check ;	/* last check on lock */
 	time_t		ti_stat ;	/* last 'stat(2)' on lock */
+	dev_t		dev ;
 	pid_t		pid ;		/* our PID */
 	pid_t		pid_lock ;	/* old times sake */
 	uint		magic ;

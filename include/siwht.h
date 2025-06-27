@@ -35,13 +35,6 @@ extern int	siwhtchr(cchar *,int,int) noex ;
 
 EXTERNC_end
 
-#ifdef	__cplusplus
-
-import chrset ;
-extern int	siwhtbrk(cchar *,int,const chrset &) noex ;
-
-#endif /* __cplusplus */
-
 
 #endif /* SIWHT_INCLUDE */
 

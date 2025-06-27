@@ -631,6 +631,15 @@ typedef const USTATFS		custatfs ;
 typedef const USTATVFS		custatvfs ;
 #endif
 
+#ifndef	TYPEDEF_CDEV
+#define	TYPEDEF_CDEV
+typedef const dev_t		cdev ;
+#endif
+#ifndef	TYPEDEF_CINO
+#define	TYPEDEF_CINO
+typedef const ino_t		cino ;
+#endif
+
 #ifndef	TYPEDEF_VOIDF
 #define	TYPEDEF_VOIDF
 EXTERNC_begin

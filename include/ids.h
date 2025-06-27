@@ -74,7 +74,7 @@ struct ids : ids_head {
 	int copy(const ids *) noex ;
 	void dtor() noex ;
 	destruct ids() {
-	    dtor() ;
+	    if (gids) dtor() ;
 	} ;
 } ; /* end struct (ids) */
 #else	/* __cplusplus */

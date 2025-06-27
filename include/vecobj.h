@@ -69,7 +69,7 @@ struct vecobjms {
 
 #endif /* __cplusplus */
 
-#define	VECOBJ_ODEFAULT	0
+#define	VECOBJ_ODEFAULT		0
 #define	VECOBJ_OREUSE		(1 << vecobjo_reuse)
 #define	VECOBJ_OCOMPACT		(1 << vecobjo_compact)
 #define	VECOBJ_OSWAP		(1 << vecobjo_swap)
