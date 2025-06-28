@@ -61,8 +61,8 @@ extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	pathclean(char *,cchar *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,USTAT *,int) ;
+extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
+extern int	permid(IDS *,USTAT *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
@@ -272,7 +272,7 @@ static int subinfo_proc(SUBINFO *sip)
 	        int	kl ;
 	        char	pbuf[PARAMBUFLEN+1] ;
 	        while (rs >= 0) {
-	            kl = paramfile_enum(pfp,&cur,&pe,pbuf,plen) ;
+	            kl = paramfile_curenum(pfp,&cur,&pe,pbuf,plen) ;
 	            if (kl == SR_NOTFOUND) break ;
 	            rs = kl ;
 		    if (rs >= 0) {

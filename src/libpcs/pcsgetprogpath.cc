@@ -83,7 +83,7 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	mkpath1w(char *,const char *,int) ;
 extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	prgetprogpath(const char *,char *,const char *,int) ;
 

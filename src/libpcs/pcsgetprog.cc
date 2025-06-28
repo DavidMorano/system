@@ -1,5 +1,5 @@
 /* pcsgetprog SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* get the path to a program that is used within the PCS system */
@@ -100,7 +100,7 @@ extern char	*strnchr(const char *,int,int) ;
 /* exported subroutines */
 
 int pcsgetprog(cchar *pcsroot,char *output,cchar *name) noex {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs = SR_NOTFOUND ;
 	int		namelen ;
 	int		outlen = 0 ;

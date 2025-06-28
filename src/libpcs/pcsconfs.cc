@@ -1,4 +1,5 @@
 /* pcsconfs SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface to query the PCS configuration-variable database */
@@ -37,6 +38,7 @@
 #include	<fsdir.h>
 #include	<varmk.h>
 #include	<paramfile.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"pcsconfs.h"
@@ -190,9 +192,9 @@ extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	nextfield(cchar *,int,cchar **) ;
 extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	pathclean(char *,cchar *,int) ;
-extern int	sperm(ids *,USTAT *,int) ;
+extern int	permid(ids *,USTAT *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
+extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	hasuc(cchar *,int) ;
 extern int	isalnumlatin(int) ;
@@ -206,10 +208,7 @@ extern int	hasNotDots(cchar *,int) ;
 extern int	isNotPresent(int) ;
 extern int	isOneOf(cint *,int) ;
 
-extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -816,7 +815,7 @@ static int confvars_proc(CONFVARS *sip) noex {
 	            char	pbuf[PARAMBUFLEN+1] ;
 
 	            while (rs >= 0) {
-	                kl = paramfile_enum(pfp,&cur,&pe,pbuf,plen) ;
+	                kl = paramfile_curenum(pfp,&cur,&pe,pbuf,plen) ;
 	                if (kl == SR_NOTFOUND) break ;
 	                rs = kl ;
 	                if (rs < 0) break ;

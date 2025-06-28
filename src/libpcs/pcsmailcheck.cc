@@ -1,5 +1,5 @@
 /* pcsmailcheck SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* determine if the given user has mail (as PCS determines it) */
@@ -90,6 +90,7 @@
 #include	<vecstr.h>
 #include	<dirlist.h>
 #include	<mailbox.h>
+#include	<strn.h>
 #include	<hdrdecode.h>
 #include	<localmisc.h>
 
@@ -169,9 +170,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 
@@ -495,7 +493,7 @@ static int subinfo_getsysmail(SUBINFO *sip)
 
 static int subinfo_mailfile(SUBINFO *sip)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -678,7 +676,7 @@ static int maildirs_varmaildirs(SUBINFO *sip,cchar *sp)
 
 	sl = strlen(sp) ;
 
-	while ((tp = strnpbrk(sp,sl," \t,:;")) != NULL) {
+	while ((tp = strnbrk(sp,sl," \t,:;")) != NULL) {
 	    if ((cl = sfshrink(sp,(tp - sp),&cp)) > 0) {
 	        rs = maildirs_add(sip,cp,cl) ;
 	        c += rs ;

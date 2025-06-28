@@ -86,7 +86,7 @@ vecstr		*setp ;
 const char	username[] ;
 char		buf[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	bfile	nfile, *nfp = &nfile ;
 
