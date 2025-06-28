@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += syscontain.h
 
-MODS += vecbool.ccm
+MODS +=
 
 LIBS +=
 
@@ -46,7 +46,6 @@ LIBDIRS += -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,7 +56,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= vecbool.o
+OBJ0= syscontain_null.o
 OBJ1=
 OBJ2=
 OBJ3=
@@ -100,13 +99,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	$(RM) $(ALL)
@@ -131,20 +125,11 @@ obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
 
 
-MOBJ= vecbool.o
+MOBJ=
 
 mods.o:			$(MOBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
 
-# MOD vecbool
-vecbool.o:		vecbool0.o vecbool1.o
-	$(CXX) -r -o  $@ $(LDFLAGS) vecbool0.o vecbool1.o
-
-vecbool0.o:		vecbool.ccm
-	makemodule vecbool
-
-vecbool1.o:		vecbool.ccm vecbool1.cc
-	makemodule vecbool
-	$(COMPILE.cc) vecbool1.cc
+syscontain_null.o:	syscontain_null.cc
 
 
