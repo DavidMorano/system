@@ -1,5 +1,5 @@
 /* udup (UNIX® Memory-Management) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® Memory-Management interface */
