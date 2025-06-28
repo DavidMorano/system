@@ -6,7 +6,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_WRITETO	1		/* time out writes */
-#define	CF_PARAMXFILE	1		/* use |paramfile(3dam)| */
+#define	CF_PARAMFILE	1		/* use |paramfile(3dam)| */
 
 /* revision history:
 
@@ -889,7 +889,7 @@ static int mapper_check(MA *mmp,time_t dt) noex {
 
 	    if ((dt - mmp->ti_check) >= TO_MAPCHECK) {
 
-#if	CF_PARAMXFILE
+#if	CF_PARAMFILE
 	        if ((rs = paramfile_check(&mmp->dirsfile,dt)) > 0) {
 
 	            {
@@ -901,7 +901,7 @@ static int mapper_check(MA *mmp,time_t dt) noex {
 	            nchanged = rs ;
 
 	        } /* end if */
-#else /* CF_PARAMXFILE */
+#else /* CF_PARAMFILE */
 	        {
 	            USTAT	sb ;
 
@@ -922,7 +922,7 @@ static int mapper_check(MA *mmp,time_t dt) noex {
 
 	            mmp->ti_check = dt ;
 	        }
-#endif /* CF_PARAMXFILE */
+#endif /* CF_PARAMFILE */
 
 	    } /* end if (map-object check) */
 
@@ -982,7 +982,7 @@ static int mapper_processor(MA *mmp,cc **ev,cc **adms,
 }
 /* end subroutine (mapper_processor) */
 
-#if	CF_PARAMXFILE
+#if	CF_PARAMFILE
 static int mapper_mapload(MA *mmp) noex {
 	PF		*pfp = &mmp->dirsfile ;
 	PF_ENT	pe ;
@@ -1041,7 +1041,7 @@ static int mapper_mapload(MA *mmp) noex {
 }
 /* end subroutine (mapper_mapload) */
 
-#else /* CF_PARAMXFILE */
+#else /* CF_PARAMFILE */
 
 static int mapper_mapload(MA *mmp) noex {
 	bfile		mfile, *mfp = &mfile ;
@@ -1098,7 +1098,7 @@ static int mapper_mapload(MA *mmp) noex {
 }
 /* end subroutine (mapper_mapload) */
 
-#endif /* CF_PARAMXFILE */
+#endif /* CF_PARAMFILE */
 
 static int mapper_mapadd(MA *mmp,cchar *kp,int kl,cchar *vp,int vl) noex {
 	cint		sz = szof(MD) ;

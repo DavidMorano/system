@@ -52,7 +52,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<dial.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<cfdec.h>
 #include	<netorder.h>
 #include	<egscmd.hh>

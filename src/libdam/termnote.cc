@@ -115,7 +115,7 @@
 #include	<termconseq.h>
 #include	<ncol.h>		/* |charcols(3uc)| */
 #include	<pow.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<timestr.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
@@ -680,7 +680,7 @@ int disuser::loadtermsx(vecstr *llp,int o) noex {
                             }
                         }
                         if ((rs1 >= 0) && f_go) {
-                            rs1 = sperm(op->idp,&sb,W_OK) ;
+                            rs1 = permid(op->idp,&sb,W_OK) ;
                             if (rs1 >= 0) {
                                 ut.atime = sb.st_atime ;
                                 rs = vecobj_add(tlp,&ut) ;

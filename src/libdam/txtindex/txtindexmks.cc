@@ -99,7 +99,7 @@
 #include	<strw.h>
 #include	<strn.h>
 #include	<hash.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<char.h>
 #include	<hasx.h>
 #include	<ischarx.h>

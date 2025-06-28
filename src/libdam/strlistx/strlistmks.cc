@@ -62,7 +62,7 @@
 #include	<strtab.h>
 #include	<filer.h>
 #include	<getpwd.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<opentmp.h>
 #include	<sbuf.h>
 #include	<sfx.h>

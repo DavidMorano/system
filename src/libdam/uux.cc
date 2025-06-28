@@ -54,6 +54,7 @@
 #include	<logfile.h>
 #include	<getusername.h>
 #include	<userinfo.h>
+#include	<permx.h>
 #include	<localmisc.h>
 
 #include	"uux.h"
@@ -141,7 +142,7 @@ struct subinfo {
 	SYSDIALER_ARGS	*ap ;
 	struct subinfo_allocs	a ;
 	struct subinfo_flags	f ;
-	IDS		id ;
+	ids		id ;
 } ;
 
 
@@ -172,14 +173,6 @@ SYSDIALER_INFO	uux_mod = {
 
 /* local variables */
 
-static cchar *argopts[] = {
-	"ROOT",
-	"RN",
-	"sn",
-	"lf",
-	nullptr
-} ;
-
 enum argopts {
 	argopt_root,
 	argopt_rn,
@@ -188,8 +181,11 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static cchar *procopts[] = {
-	"log",
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"RN",
+	"sn",
+	"lf",
 	nullptr
 } ;
 
@@ -198,22 +194,21 @@ enum procopts {
 	procopt_overlast
 } ;
 
+constexpr cpcchar	procopts[] = {
+	"log",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int uux_open(op,ap,hostname,svcname,av)
-UUX		*op ;
-SYSDIALER_ARGS	*ap ;
-cchar	hostname[] ;
-cchar	svcname[] ;
-cchar	*av[] ;
-{
-	struct subinfo	si, *sip = &si ;
-
+int uux_open(UUX *op,SD_ARGS *ap,cc *hostname,cc *svcname,mainv av) noex {
+	subinfo	si, *sip = &si ;
 	int	rs ;
 	int	opts = 0 ;
-
 
 	if (op == nullptr) return SR_FAULT ;
 	if (ap == nullptr) return SR_FAULT ;
@@ -1243,10 +1238,8 @@ int		dlen ;
 	rs1 = u_stat(dnp,&sb) ;
 
 	if ((rs1 >= 0) && S_ISDIR(sb.st_mode)) {
-
-	    rs1 = sperm(&sip->id,&sb,(R_OK | X_OK)) ;
+	    rs1 = permid(&sip->id,&sb,(R_OK | X_OK)) ;
 	    f = (rs1 >= 0) ;
-
 	} /* end if */
 
 	nulstr_finish(&ss) ;

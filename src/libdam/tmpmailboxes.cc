@@ -49,7 +49,7 @@
 #include	<mallocxx.h>
 #include	<estrings.h>		/* |sncpy{x}(3uc)| */
 #include	<mkpr.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 

@@ -30,7 +30,7 @@
 #define	STATMSG_ID	struct statmsg_ident
 #define	STATMSG_MAP	struct statmsg_mapper
 #define	STATMSG_FL	struct statmsg_flags
-#define	STATMSG_CK	struct statmsg_check
+#define	STATMSG_CK	struct statmsg_checkdata
 
 
 struct statmsg_ident {
@@ -56,22 +56,22 @@ struct statmsg_flags {
 	uint		sorted:1 ;
 } ;
 
-struct statmsg_check {
-	ptm		m ;
+struct statmsg_checkdata {
+	ptm		mx ;
 	time_t		ti_lastcheck ;	/* needs mutex protection */
 	int		nmaps ;
 } ;
 
 struct statmsg_head {
 	STATMSG_MAP	mapper ;
-	ptm		m ;		/* this is for all of the data */
+	ptm		mx ;		/* this is for all of the data */
 	cchar		**envv ;
 	cchar		*useralloc ;
 	cchar		*username ;
 	cchar		*userhome ;
 	cchar		*fe ;		/* file-ending */
 	time_t		ti_lastcheck ;
-	STATMSG_FL	f ;
+	STATMSG_FL	fl ;
 	uint		magic ;
 	int		nmaps ;
 	int		nenv ;

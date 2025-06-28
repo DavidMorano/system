@@ -49,7 +49,7 @@
 #include	<clusterdb.h>
 #include	<ids.h>
 #include	<mkpathx.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<isnot.h>
 #include	<iserror.h>
 #include	<localmisc.h>
@@ -284,7 +284,7 @@ static int sysnamedb_nodebegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath(tbuf,pr,NODEFNAME)) >= 0) {
 	        if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
-	            if ((rs = sperm(idp,&sb,R_OK)) >= 0) {
+	            if ((rs = permid(idp,&sb,R_OK)) >= 0) {
 	                nodedb	*ndp = op->nlp ;
 	                if ((rs = nodedb_open(ndp,tbuf)) >= 0) {
 	                    op->fl.node = true ;
@@ -320,7 +320,7 @@ static int sysnamedb_clusterbegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath(tbuf,pr,CLUSTERFNAME)) >= 0) {
 	        if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
-	            if ((rs = sperm(idp,&sb,R_OK)) >= 0) {
+	            if ((rs = permid(idp,&sb,R_OK)) >= 0) {
 	                clusterdb	*ndp = op->clp ;
 	                if ((rs = clusterdb_open(ndp,tbuf)) >= 0) {
 	                    op->fl.clu = true ;
