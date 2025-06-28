@@ -1,10 +1,11 @@
 /* loguser (LOGUSER) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a PCSPOLLS module for performing LOGUSER pseudo-polls */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -31,7 +32,6 @@
 	PCSCONF		*pcp ;
 
 	Arguments:
-
 	op		object pointer
 	pr		program-root
 	sn		search-name (of program calling us)
@@ -39,13 +39,10 @@
 	pcp		PCSCONF pointer
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be before others */
 
@@ -61,6 +58,7 @@
 #include	<upt.h>
 #include	<userinfo.h>
 #include	<logfile.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"pcspolls.h"
@@ -100,12 +98,6 @@ extern int	isNotPresent(int) ;
 extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -346,7 +338,7 @@ static int mklogentry(cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp)
 	char		lfname[MAXPATHLEN+1] ;
 
 	if ((rs = mkpath3(lfname,pr,lcname,lbname)) >= 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = u_stat(lfname,&sb)) >= 0) {
 		USERINFO	u ;
 		if ((rs = userinfo_start(&u,NULL)) >= 0) {

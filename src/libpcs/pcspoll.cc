@@ -150,7 +150,7 @@ int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn)
 	    return SR_BUGCHECK ;
 
 	{
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    const char	*lc = LIBCNAME ;
 	    const char	*pc = POLLSCNAME ;
 	    char	pollsdname[MAXPATHLEN+1] ;

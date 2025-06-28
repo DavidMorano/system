@@ -1,4 +1,5 @@
-/* pcsnso SUPPORT */
+* pcsnso SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* PCS-NAME-SERVER query database manager */
@@ -35,20 +36,21 @@
 #include	<project.h>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<ugetpw.h>
 #include	<getbufsize.h>
+#include	<getusername.h>
+#include	<getax.h>
 #include	<estrings.h>
-#include	<char.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>
 #include	<expcook.h>
 #include	<ascii.h>
 #include	<field.h>
 #include	<sbuf.h>
-#include	<getax.h>
-#include	<ugetpw.h>
-#include	<getusername.h>
 #include	<gecos.h>
 #include	<filereadln.h>
+#include	<strwcpy.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"pcsnso.h"
@@ -181,7 +183,7 @@ extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	getgecosname(const char *,int,const char **) ;
@@ -199,11 +201,6 @@ extern int	isBadRecv(int) ;
 extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* exported variables */

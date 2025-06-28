@@ -1,28 +1,30 @@
 /* pcstrustuser */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* is a user a PCS-trusted user */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_PCSGROUP	1		/* include pcs-group check */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 
-
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-	This code module was completely rewritten to replace any original
-	garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 	= 2013-06-04, David A­D­ Morano
-	"Turn down the heat!"  That is what I used to say when one of my
-	circuits that I was designing started to get a little too heavy in the
-	power-consumption department!  This subroutine here was a little bit
-	that way; namely, overly heavy!  I have turned down the heat a bit by
-	rewriting this subroutine substantially and making it into a more
-	simple process of finding whether a username can be trusted or not.  It
-	isn't like this subroutine is used everywhere, so let's not overdue
-	this whole process.
+	"Turn down the heat!"  That is what I used to say when one
+	of my circuits that I was designing started to get a little
+	too heavy in the power-consumption department!  This
+	subroutine here was a little bit that way; namely, overly
+	heavy!  I have turned down the heat a bit by rewriting this
+	subroutine substantially and making it into a more simple
+	process of finding whether a username can be trusted or
+	not.  It is not like this subroutine is used everywhere, so
+	let us not overdue this whole process.
 
 */
 
@@ -30,26 +32,24 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine checks to see if a user is a PCS-trusted user.
 
 	Notes:
-
-	There is not strict order needed to find the "correct" thing here.  We
-	just search to see if the given username is supposed to be trusted or
-	not (a binary decision).  So order of searching is flexible.  Since we
-	can search in whatever order we want, what we are going to try to do
-	here is to search in the order of increasing complexity (increasing
-	time) of search.
-
-	Is going to the system name-server cache faster than going to a file in
-	the file-system?  In theory the name-server cache could respond with an
-	answer *without* ever going to any file-systems, so we are going to
-	consider the name-server faster than a file-system file lookup.  You
+	There is not strict order needed to find the "correct" thing
+	here.  We just search to see if the given username is
+	supposed to be trusted or not (a binary decision).  So order
+	of searching is flexible.  Since we can search in whatever
+	order we want, what we are going to try to do here is to
+	search in the order of increasing complexity (increasing
+	time) of search.  Is going to the system name-server cache
+	faster than going to a file in the file-system?  In theory
+	the name-server cache could respond with an answer *without*
+	ever going to any file-systems, so we are going to consider
+	the name-server faster than a file-system file lookup.  You
 	mileage may vary.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -63,11 +63,12 @@
 #include	<cstring>
 
 #include	<usystem.h>
-#include	<getbufsize.h>
-#include	<vecstr.h>
-#include	<getax.h>
 #include	<ugetpw.h>
+#include	<getbufsize.h>
 #include	<getusername.h>
+#include	<getax.h>
+#include	<strwcpy.h>
+#include	<vecstr.h>
 #include	<localmisc.h>
 
 
@@ -86,17 +87,14 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_loadfile(vecstr *,int,const char *) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
+extern int	vecstr_loadfile(vecstr *,int,cchar *) ;
+extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	isNotPresent(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -110,8 +108,8 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	const char	*pr ;		/* passed argument */
-	const char	*un ;		/* passed argument */
+	cchar	*pr ;		/* passed argument */
+	cchar	*un ;		/* passed argument */
 	struct subinfo_flags	f ;
 	uid_t		uid_pr, uid_un ;
 	gid_t		gid_pr, gid_un ;
@@ -124,7 +122,7 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,const char *,const char *) ;
+static int	subinfo_start(SUBINFO *,cchar *,cchar *) ;
 static int	subinfo_finish(SUBINFO *) ;
 static int	subinfo_idpr(SUBINFO *) ;
 static int	subinfo_idun(SUBINFO *) ;
@@ -137,7 +135,7 @@ static int	subinfo_prgroup(SUBINFO *) ;
 
 /* local variables */
 
-static const char	*trustedusers[] = {
+static cchar	*trustedusers[] = {
 	"root",
 	"uucp",
 	"nuucp",
@@ -155,7 +153,7 @@ static const char	*trustedusers[] = {
 	NULL
 } ;
 
-static const char	*sched[] = {
+static cchar	*sched[] = {
 	"%r/etc/pcs.%f",
 	"%r/etc/%f",
 	NULL
@@ -204,7 +202,7 @@ int pcstrustuser(cchar pr[],cchar un[])
 /* local subroutines */
 
 
-static int subinfo_start(SUBINFO *sip,const char *pr,const char *un)
+static int subinfo_start(SUBINFO *sip,cchar *pr,cchar *un)
 {
 	int		rs = SR_OK ;
 
@@ -234,7 +232,7 @@ static int subinfo_finish(SUBINFO *sip)
 static int subinfo_listdb(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
-	const char	*un = sip->un ;
+	cchar	*un = sip->un ;
 
 	if (un[0] == '-') {
 	    rs = subinfo_idun(sip) ;
@@ -257,13 +255,13 @@ static int subinfo_filedb(SUBINFO *sip)
 	int		rs ;
 	int		rs1 ;
 	int		f = FALSE ;
-	const char	*tfname = TRUSTFNAME ;
-	const char	*pr = sip->pr ;
-	const char	*un = sip->un ;
+	cchar	*tfname = TRUSTFNAME ;
+	cchar	*pr = sip->pr ;
+	cchar	*un = sip->un ;
 
 	if ((rs = vecstr_start(&svs,6,0)) >= 0) {
 	    if ((rs = vecstr_envset(&svs,"r",pr,-1)) >= 0) {
-	        const int	tlen = MAXPATHLEN ;
+	        cint	tlen = MAXPATHLEN ;
 	        char		tbuf[MAXPATHLEN + 1] ;
 	        if ((rs1 = permsched(sched,&svs,tbuf,tlen,tfname,R_OK)) >= 0) {
 
@@ -301,8 +299,8 @@ static int subinfo_idpr(SUBINFO *sip)
 	int		rs = SR_OK ;
 
 	if (! sip->f.id_pr) {
-	    struct ustat	sb ;
-	    const char		*pr = sip->pr ;
+	    ustat	sb ;
+	    cchar		*pr = sip->pr ;
 	    sip->f.id_pr = TRUE ;
 	    if (u_stat(pr,&sb) >= 0) {
 	        sip->uid_pr = sb.st_uid ;
@@ -323,14 +321,14 @@ static int subinfo_idun(SUBINFO *sip)
 
 	if (! sip->f.id_un) {
 	    struct passwd	pw ;
-	    const int		pwlen = getbufsize(getbufsize_pw) ;
-	    const char		*un = sip->un ;
+	    cint		pwlen = getbufsize(getbufsize_pw) ;
+	    cchar		*un = sip->un ;
 	    char		*pwbuf ;
 	    sip->f.id_un = TRUE ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if (un[0] == '-') {
 	            if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
-			const int	ulen = USERNAMELEN ;
+			cint	ulen = USERNAMELEN ;
 			cchar		*un = pw.pw_name ;
 	                len = (strwcpy(sip->unbuf,un,ulen) - sip->unbuf) ;
 	                sip->un = sip->unbuf ;
@@ -374,14 +372,13 @@ static int subinfo_prgroup(SUBINFO *sip)
 /* check if username is in the PCS group */
 
 	if ((rs >= 0) && (! f)) {
-	    struct group	gr ;
-	    const int		grlen = getbufsize(getbufsize_gr) ;
+	    GROUP	gr ;
+	    cint		grlen = getbufsize(getbufsize_gr) ;
 	    int			rs1 ;
-	    int			i ;
 	    char		*grbuf ;
 	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
 	        if ((rs1 = uc_getgrgid(sip->gid_pr,&gr,grbuf,grlen)) >= 0) {
-	            for (i = 0 ; gr.gr_mem[i] != NULL ; i += 1) {
+	            for (int i = 0 ; gr.gr_mem[i] != NULL ; i += 1) {
 	                f = (strcmp(gr.gr_mem[i],sip->un) == 0) ;
 	                if (f) break ;
 	            }

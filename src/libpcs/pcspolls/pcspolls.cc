@@ -1,4 +1,5 @@
 /* pcspolls SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* management interface to the PCSPOLL loadable-object poll facility */
@@ -56,6 +57,7 @@
 #include	<storebuf.h>
 #include	<upt.h>
 #include	<six.h>
+#include	<strwcpy.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 
@@ -110,11 +112,6 @@ extern int	debugprintf(const char *,...) ;
 #if	CF_DEUGN
 extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -693,15 +690,9 @@ static int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen)
 	int		rs1 ;
 	int		c = 0 ;
 	if (tip == NULL) return SR_FAULT ;
-#if	CF_DEBUGS
-	debugprintf("pcspolls/work_objloads: ent dl=%d db=%s\n",dlen,dbuf) ;
-#endif
 	if ((rs = fsdir_open(&d,dbuf)) >= 0) {
 	    int		nl ;
 	    cchar	*np ;
-#if	CF_DEBUGS
-	debugprintf("pcspolls/work_objloads: fsdir_open() rs=%d\n",rs) ;
-#endif
 	    while ((rs = fsdir_read(&d,&e)) > 0) {
 	        np = e.name ;
 	        nl = rs ;
@@ -709,15 +700,8 @@ static int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen)
 	            int	ol ;
 	            if ((ol = sifext(np,nl,exts)) > 0) {
 	                if ((rs = pathadd(dbuf,dlen,np)) >= 0) {
-#if	CF_DEBUGS
-	debugprintf("pcspolls/work_objloads: db=%s\n",dbuf) ;
-	debugprintf("pcspolls/work_objloads: _objloadcheck() \n") ;
-#endif
 	                    rs = work_objloadcheck(wp,dbuf,np,ol) ;
 	                    c += rs ;
-#if	CF_DEBUGS
-	debugprintf("pcspolls/work_objloads: _objloadcheck() rs=%d\n",rs) ;
-#endif
 	                } /* end if (pathadd) */
 	            } /* end if (has proper suffix) */
 	        } /* end if (not-dots) */
@@ -727,9 +711,6 @@ static int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen)
 	    rs1 = fsdir_close(&d) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (fsdir) */
-#if	CF_DEBUGS
-	debugprintf("pcspolls/work_objloads: ret rs=%d c=%u\n",rs,c) ;
-#endif
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (work_objloads) */
@@ -737,7 +718,7 @@ static int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen)
 
 static int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	struct pollinfo	oi ;
 	int		rs ;
 	int		c = 0 ;

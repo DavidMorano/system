@@ -1,12 +1,13 @@
 /* testcrash (TESTCRASH) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a PCSPOLLS module for performing TESTCRASH polls */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_WORK		1		/* work */
 #define	CF_ENABLE	1		/* enabled */
-
 
 /* revision history:
 
@@ -20,11 +21,9 @@
 /*******************************************************************************
 
 	Description:
-
 	This object is a PCSPOLLS module for performing TESTCRASH polls.
 
 	Synopsis:
-
 	int testcrash_start(op,pr,sn,envv,pcp)
 	PCSPOLLS	*op ;
 	const char	*pr ;
@@ -33,7 +32,6 @@
 	PCSCONF		*pcp ;
 
 	Arguments:
-
 	op		object pointer
 	pr		program-root
 	sn		search-name (of program calling us)
@@ -41,13 +39,10 @@
 	pcp		PCSCONF pointer
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be before others */
 
@@ -99,10 +94,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_log(time_t,char *) ;
 
 
