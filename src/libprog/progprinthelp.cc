@@ -54,7 +54,7 @@
 #include	<vecstr.h>
 #include	<bfile.h>
 #include	<mkpathx.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 

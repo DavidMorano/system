@@ -2879,7 +2879,7 @@ static int procmailmsg_spamflag(PROGINFO *pip,MAILMSG *msgp)
 
 	    if (! f_spam) {
 
-	        if ((tp = strnpbrk(sp,sl,",;")) != nullptr)
+	        if ((tp = strnbrk(sp,sl,",;")) != nullptr)
 	            sl = (tp - sp) ;
 
 	        cl = sfshrink(sp,sl,&cp) ;
@@ -2918,7 +2918,7 @@ static int procmailmsg_spamstatus(PROGINFO *pip,MAILMSG *msgp)
 
 	    if (! f_spam) {
 
-	        if ((tp = strnpbrk(sp,sl,",;")) != nullptr)
+	        if ((tp = strnbrk(sp,sl,",;")) != nullptr)
 	            sl = (tp - sp) ;
 
 	        cl = sfshrink(sp,sl,&cp) ;

@@ -1,5 +1,5 @@
 /* pwilookup SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* wrapper functon dealing with the PWI object */

@@ -608,7 +608,7 @@ static int getline(int llen,cchar *sp,int sl)
 	if (sl > 0) {
 
 	    len = MIN(sl,llen) ;
-	    if ((tp = strnpbrk(sp,len,"\r\n")) != NULL) {
+	    if ((tp = strnbrk(sp,len,"\r\n")) != NULL) {
 	        len = ((tp + 1) - sp) ;
 	    }
 

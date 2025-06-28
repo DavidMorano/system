@@ -1,4 +1,5 @@
 /* progserve SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* handle a connect request for a service */
@@ -38,6 +39,8 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<getourenv.h>
+#include	<getax.h>
 #include	<field.h>
 #include	<vecstr.h>
 #include	<hostent.h>
@@ -47,10 +50,11 @@
 #include	<svcfile.h>
 #include	<connection.h>
 #include	<storebuf.h>
-#include	<char.h>
 #include	<expcook.h>
-#include	<getax.h>
 #include	<ids.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -123,30 +127,30 @@
 /* external subroutines */
 
 extern int	sninetaddr(char *,int,int,const void *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	mkpath3w(char *,const char *,const char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkbasename(char *,const char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath2w(char *,cchar *,cchar *,int) ;
+extern int	mkpath3w(char *,cchar *,cchar *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkbasename(char *,cchar *,int) ;
 extern int	mkshlibname(char *,cchar *,int) ;
 extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	sfbaselib(cchar *,int,cchar **) ;
 extern int	nextfield(cchar *,int,cchar **) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	nlspeername(const char *,const char *,char *) ;
-extern int	getprogpath(IDS *,vecstr *,char *,const char *,int) ;
-extern int	netgroupcheck(const char *,vecstr *,vecstr *) ;
+extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	vstrkeycmp(cchar **,cchar **) ;
+extern int	nlspeername(cchar *,cchar *,char *) ;
+extern int	getprogpath(IDS *,vecstr *,char *,cchar *,int) ;
+extern int	netgroupcheck(cchar *,vecstr *,vecstr *) ;
 extern int	mkquoted(char *,int,cchar *,int) ;
-extern int	optbool(const char *,int) ;
+extern int	optbool(cchar *,int) ;
 extern int	isasocket(int) ;
 extern int	uc_waitwritable(int,int) ;
 
-extern int	progsrvargs(PROGINFO *,vecstr *,const char *) ;
+extern int	progsrvargs(PROGINFO *,vecstr *,cchar *) ;
 extern int	progshlib(PROGINFO *,cchar *,cchar *,vecstr *,cchar *,int) ;
 extern int	progexec(PROGINFO *,cchar *,cchar *,vecstr *) ;
 
@@ -155,16 +159,10 @@ extern int	proguseracctmat(PROGINFO *,struct passwd *,char *,int,cchar *) ;
 extern int	proguseracctexec(PROGINFO *,CLIENTINFO *,struct passwd *) ;
 #endif /* P_FINGERS */
 
-extern int	xfile(IDS *,const char *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
+extern int	xfile(IDS *,cchar *) ;
 
 extern char	*strdcpy1(char *,int,cchar *,int) ;
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 extern char	*strbasename(char *) ;
 
@@ -232,8 +230,8 @@ STANDING	*sop ;
 BUILTIN		*bop ;
 CLIENTINFO	*cip ;
 vecstr		*nelp ;
-const char	svcspec[] ;
-const char	*sav[] ;
+cchar	svcspec[] ;
+cchar	*sav[] ;
 {
 	SVCFILE_ENT	ste ;
 	int		rs = SR_OK ;
@@ -241,8 +239,8 @@ const char	*sav[] ;
 	int		si ;
 	int		svcspeclen ;
 	int		f_served = FALSE ;
-	const char	*svcspecp = svcspec ;
-	const char	*tp, *cp ;
+	cchar	*svcspecp = svcspec ;
+	cchar	*tp, *cp ;
 	char		svcbuf[SVCSPECLEN + 1] ;
 	char		stebuf[STEBUFLEN + 1] ;
 	char		timebuf[TIMEBUFLEN + 1] ;
@@ -303,7 +301,7 @@ const char	*sav[] ;
 	    rs = vecstr_envadd(&pip->exports,VARHOME,pip->homedname,-1) ;
 
 	if (rs >= 0) {
-	    const char	*varterm = VARTERM ;
+	    cchar	*varterm = VARTERM ;
 
 	    rs1 = vecstr_search(&pip->exports,varterm,vstrkeycmp,&cp) ;
 	    if ((rs1 == SR_NOTFOUND) && (nelp != NULL)) {
@@ -433,7 +431,7 @@ static int procserver(pip,cip,step,sav)
 PROGINFO	*pip ;
 CLIENTINFO	*cip ;
 SVCFILE_ENT	*step ;
-const char	*sav[] ;
+cchar	*sav[] ;
 {
 	PROCSE		se ;
 	PROCSE_ARGS	sea{} ;
@@ -448,7 +446,7 @@ const char	*sav[] ;
 	int		f_served = FALSE ;
 	int		f_failcont = TRUE ;
 	int		f_cont = TRUE ;
-	const char	*argz ;
+	cchar	*argz ;
 
 	if (cip == NULL) return SR_FAULT ;
 	if (step == NULL) return SR_FAULT ;
@@ -563,7 +561,7 @@ const char	*sav[] ;
 #endif
 
 	if (! f_served) {
-	    const char	*msg = "no server configured" ;
+	    cchar	*msg = "no server configured" ;
 	    if (pip->open.logprog)
 	        proglog_printf(pip,"%s (%d)",msg,rs) ;
 	    bprintf(pip->efp,"%s: %s (%d)\n",pip->progname,msg,rs) ;
@@ -596,7 +594,7 @@ PROGINFO	*pip ;
 CLIENTINFO	*cip ;
 PROCSE		*sep ;
 VECSTR		*alp ;
-const char	*argz ;
+cchar	*argz ;
 {
 	USTAT		sb ;
 	mode_t		operms ;
@@ -605,7 +603,7 @@ const char	*argz ;
 	int		oflags ;
 	int		to = TO_SENDFD ;
 	int		f_served = FALSE ;
-	const char	*passfname = sep->a.passfile ;
+	cchar	*passfname = sep->a.passfile ;
 
 	if (passfname == NULL)
 	    goto ret0 ;
@@ -653,17 +651,17 @@ PROGINFO	*pip ;
 CLIENTINFO	*cip ;
 PROCSE		*sep ;
 VECSTR		*alp ;
-const char	*argz ;
+cchar	*argz ;
 {
 	const int	nlen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	int		pnl ;
 	int		enl = 0 ;
-	const char	*program = sep->a.sharedobj ;
-	const char	*pnp ;
-	const char	*tp ;
-	const char	*enp = NULL ;	/* shlib entry-point */
-	const char	*cp ;
+	cchar	*program = sep->a.sharedobj ;
+	cchar	*pnp ;
+	cchar	*tp ;
+	cchar	*enp = NULL ;	/* shlib entry-point */
+	cchar	*cp ;
 	char		progfname[MAXPATHLEN + 1] ;
 	char		shlibname[MAXNAMELEN + 1] ;
 	char		argzbuf[MAXNAMELEN + 1] ;
@@ -678,7 +676,7 @@ const char	*argz ;
 	pnl = sfshrink(program,-1,&pnp) ;
 
 	if ((tp = strnchr(pnp,pnl,':')) == NULL) {
-	    tp = strnpbrk(pnp,pnl," \t") ;
+	    tp = strnbrk(pnp,pnl," \t") ;
 	}
 
 	if (tp != NULL) {
@@ -839,15 +837,15 @@ PROGINFO	*pip ;
 CLIENTINFO	*cip ;
 PROCSE		*sep ;
 VECSTR		*alp ;
-const char	*argz ;
+cchar	*argz ;
 {
 	int		rs = SR_OK ;
 	int		pnl ;
 	int		cl ;
-	const char	*program ;
-	const char	*pnp ;
-	const char	*ccp ;
-	const char	*cp ;
+	cchar	*program ;
+	cchar	*pnp ;
+	cchar	*ccp ;
+	cchar	*cp ;
 	char		progfname[MAXPATHLEN + 1] ;
 	char		argzbuf[MAXNAMELEN + 1] ;
 
@@ -1013,8 +1011,8 @@ static int procfindprog(pip,plp,prdirs,progfname,pnp,pnl)
 PROGINFO	*pip ;
 char		progfname[] ;
 vecstr		*plp ;
-const char	*prdirs[] ;
-const char	pnp[] ;
+cchar	*prdirs[] ;
+cchar	pnp[] ;
 int		pnl ;
 {
 	int		rs = SR_OK ;
@@ -1150,7 +1148,7 @@ static int loadcooks(PROGINFO *pip,CLIENTINFO *cip,cchar **sav)
 	    const int	alen = MAXPATHLEN ;
 	    const int	vlen = INETX_ADDRSTRLEN ;
 	    int		af = sockaddress_getaf(&cip->sa) ;
-	    const char	*name = "ipaddr" ;
+	    cchar	*name = "ipaddr" ;
 	    char	abuf[MAXPATHLEN+1] ;
 	    char	vbuf[INETX_ADDRSTRLEN+1] = { 0 } ;
 	    switch (af) {
