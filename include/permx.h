@@ -1,4 +1,4 @@
-/* xpermid HEADER */
+/* permx HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -26,8 +26,8 @@
 
 ******************************************************************************/
 
-#ifndef	XPERM_INCLUDE
-#define	XPERM_INCLUDE
+#ifndef	PERMX_INCLUDE
+#define	PERMX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -44,7 +44,7 @@
 
 EXTERNC_begin
 
-extern int permid(ids *,USTAT *,int) noex ;
+extern int permid(ids *,ustat *,int) noex ;
 extern int perm(cchar *,uid_t,gid_t,const gid_t *,int) noex ;
 extern int permf(int,uid_t,gid_t,const gid_t *,int) noex ;
 extern int permsched(mainv,vecstr *,char *,int,cc *,mode_t) noex ;
@@ -52,6 +52,6 @@ extern int permsched(mainv,vecstr *,char *,int,cc *,mode_t) noex ;
 EXTERNC_end
 
 
-#endif /* XPERM_INCLUDE */
+#endif /* PERMX_INCLUDE */
 
 

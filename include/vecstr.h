@@ -167,6 +167,26 @@ struct vecstr_iter {
 	void increment(int = 1) noex ;
 } ; /* end struct vecstr_iter) */
 struct vecstr ;
+struct vecstr_st {
+	vecstr		*op = nullptr ;
+	void operator () (vecstr *p) noex {
+	    op = p ;
+	} ;
+	int operator () (int = 0,int = 0) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (vecstr_st) */
+struct vecstr_so {
+	vecstr		*op = nullptr ;
+	void init(vecstr *p) noex {
+	    op = p ;
+	} ;
+	int operator () (vecstr_f = nullptr) noex ;
+	operator int () noex {
+	    return operator () (nullptr) ;
+	} ;
+} ; /* end struct (vecstr_so) */
 struct vecstr_co {
 	vecstr		*op = nullptr ;
 	int		w = -1 ;
@@ -180,6 +200,8 @@ struct vecstr_co {
 	} ;
 } ; /* end struct (vecstr_co) */
 struct vecstr : vecstr_head {
+	vecstr_st	start ;
+	vecstr_so	sort ;
 	vecstr_co	addcspath ;
 	vecstr_co	count ;
 	vecstr_co	delall ;
@@ -189,6 +211,7 @@ struct vecstr : vecstr_head {
 	vecstr_co	audit ;
 	vecstr_co	finish ;
 	vecstr() noex {
+	    start(this) ;
 	    addcspath(this,vecstrmem_addcspath) ;
 	    count(this,vecstrmem_count) ;
 	    delall(this,vecstrmem_delall) ;
@@ -197,11 +220,11 @@ struct vecstr : vecstr_head {
 	    cksize(this,vecstrmem_cksize) ;
 	    audit(this,vecstrmem_audit) ;
 	    finish(this,vecstrmem_finish) ;
+	    sort.init(this) ;
 	    va = nullptr ;
 	} ;
 	vecstr(const vecstr &) = delete ;
 	vecstr &operator = (const vecstr &) = delete ;
-	int start(int = 0,int = 0) noex ;
 	int add(cchar *,int = -1) noex ;
 	int adduniq(cchar *,int = -1) noex ;
 	int addsyms(cchar *,mainv) noex ;

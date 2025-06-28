@@ -40,7 +40,7 @@ struct strpack_head {
 	int		chsize ;
 	int		totalsize ;
 	int		c ;		/* total count */
-} ;
+} ; /* end struct (strpack_head) */
 
 #ifdef	__cplusplus
 enum strpackmems {
@@ -49,7 +49,7 @@ enum strpackmems {
 	strpackmem_size,
 	strpackmem_finish,
 	strpackmem_overlast
-} ;
+} ; /* end enum (strpackmems) */
 struct strpack ;
 struct strpack_co {
 	strpack		*op = nullptr ;
@@ -78,8 +78,8 @@ struct strpack : strpack_head {
 	strpack &operator = (const strpack &) = delete ;
 	int store(cchar *,int = -1,cchar ** = nullptr) noex ;
 	void dtor() noex ;
-	~strpack() {
-	    dtor() ;
+	destruct strpack() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (strpack) */
 #else	/* __cplusplus */

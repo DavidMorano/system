@@ -142,7 +142,7 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	pcsmailcheck(const char *,char *,int,const char *) ;
 extern int	mkdirs(const char *,mode_t) ;
@@ -571,7 +571,7 @@ PROGINFO	*pip ;
 	    }
 
 	    if ((rs >= 0) && (rs1 >= 0))
-		rs1 = sperm(&pip->id,&sb,R_OK) ;
+		rs1 = permid(&pip->id,&sb,R_OK) ;
 
 #if	CF_KBDINFO
 	    if ((rs >= 0) && (rs1 >= 0)) {
@@ -2369,9 +2369,9 @@ int		mblen ;
 
 	f_access = ((rs1 >= 0) && S_ISREG(sb.st_mode)) ;
 	if (f_access) {
-	    rs1 = sperm(&pip->id,&sb,(R_OK | W_OK)) ;
+	    rs1 = permid(&pip->id,&sb,(R_OK | W_OK)) ;
 	    if (rs1 == SR_ACCES) {
-	        rs1 = sperm(&pip->id,&sb,(R_OK)) ;
+	        rs1 = permid(&pip->id,&sb,(R_OK)) ;
 	        f_readonly = (rs1 >= 0) ;
 	    }
 	    f_access = (rs1 >= 0) ;

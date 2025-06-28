@@ -14,6 +14,7 @@ module ;
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstdarg>
 #include	<cstring>		/* |strlen(3c)| + |strnlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -23,16 +24,6 @@ module ;
 export module libutil ;
 
 export {
-    constexpr inline char *strcopy(char *dp,cchar *sp,int sl = -1) noex {
-	char	*rp ;
-	if (sl >= 0) {
-	    csize ssize = size_t(sl) ;
-	    rp = stpncpy(dp,sp,ssize) ;
-	} else {
-	    rp = stpcpy(dp,sp) ;
-	}
-	return rp ;
-    }
     constexpr inline int cstrnlen(cchar *sp,int sl = -1) noex {
     	cchar		*cp = sp ;
 	while (sl && *cp++) {
@@ -74,6 +65,22 @@ export {
     constexpr inline int xstrcspn(cchar *sp,cchar *ss) noex {
     	return intconv(strcspn(sp,ss)) ;
     }
+} /* end export */
+
+export {
+    constexpr inline char *strcopy(char *dp,cchar *sp,int sl = -1) noex {
+	char	*rp ;
+	if (sl >= 0) {
+	    csize ssize = size_t(sl) ;
+	    rp = stpncpy(dp,sp,ssize) ;
+	} else {
+	    rp = stpcpy(dp,sp) ;
+	}
+	return rp ;
+    }
+} /* end export */
+
+export {
     constexpr inline char *strcpy(char *dp,cchar *ss,int n) noex {
 	char	*rp ;
 	if (n >= 0) {
@@ -144,6 +151,33 @@ export {
 	}
 	return voidp(rp) ;
     } /* end subroutine (memcopy) */
+} /* end export */
+
+export {
+    int lenstrarr(mainv a) noex {
+    	int	n = -1 ; /* return-value */
+	if (a) {
+	    for (n = 0 ; a[n] ; n += 1) ;
+	}
+	return n ;
+    }
+} /* end export */
+
+export {
+    int loadstrs(cc **strs,int n,...) noex {
+    	va_list		ap ;
+	int		i = -1 ; /* return-value */
+	if (strs) {
+	    va_begin(ap,n) ;
+	    for (i = 0 ; i < n ; i += 1) {
+		cc *cp = (ccharp) va_arg(ap,charp) ;
+		strs[i] = cp ;
+	    } /* end for */
+	    strs[i] = nullptr ;
+	    va_end(ap) ;
+	}
+	return i ;
+    } /* end subroutine (loadstrs) */
 } /* end export */
 
 export {

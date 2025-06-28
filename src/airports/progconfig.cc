@@ -406,7 +406,7 @@ struct proginfo	*pip ;
 
 	while (rs >= 0) {
 
-	    kl = paramfile_enum(&pip->params,&cur,&pe,pbuf,PBUFLEN) ;
+	    kl = paramfile_curenum(&pip->params,&cur,&pe,pbuf,PBUFLEN) ;
 	    if (kl == SR_NOTFOUND)
 		break ;
 
