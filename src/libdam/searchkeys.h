@@ -37,7 +37,7 @@ struct searchkeys_cursor {
 
 struct searchkeys_kword {
 	cchar		*kp ;
-	char		kl ;
+	int		kl ;
 } ;
 
 struct searchkeys_kphrase {

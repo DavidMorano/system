@@ -39,7 +39,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<vecobj.h>
@@ -55,6 +55,7 @@
 #include	"naturalwords.h"
 #include	"xwords.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -460,7 +461,8 @@ static int searchkeys_buildadd(SK *op,BUILD *bip,cchar *phrase) noex {
 	    cchar	*sp = phrase ;
 	    while ((tp = strbrk(sp," \t,")) != nullptr) {
 	        if ((tp - sp) > 0) {
-	            rs = searchkeys_buildaddword(op,&bpe,sp,(tp - sp)) ;
+		    cint tl = intconv(tp - sp) ;
+	            rs = searchkeys_buildaddword(op,&bpe,sp,tl) ;
 		}
 	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
@@ -506,7 +508,7 @@ static int searchkeys_buildaddword(SK *op,BUILD_PH *bpp,cc *wp,int wl) noex {
 	int		kl ;
 	cchar		*kp = wp ;
 	char		keybuf[KEYBUFLEN + 1] ;
-	if (wl < 0) wl = strlen(wp) ;
+	if (wl < 0) wl = lenstr(wp) ;
 	kl = wl ;
 	if (kl > KEYBUFLEN) kl = KEYBUFLEN ;
 	if (hasuc(kp,kl)) {
@@ -750,7 +752,7 @@ static int buildphrase_add(BUILD_PH *bpp,cchar *kp,int kl) noex {
 	int		rs = SR_FAULT ;
 	if (bpp) {
 	    SK_KW	ke ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = lenstr(kp) ;
 	    ke.kp = kp ;
 	    ke.kl = kl ;
 	    rs = vecobj_add(&bpp->words,&ke) ;
@@ -796,7 +798,7 @@ static int buildphrase_havekey(BUILD_PH *bpp,cchar *kp,int kl) noex {
 	if (bpp && kp) {
 	    vecobj	*wlp = &bpp->words ;
 	    void	*vp{} ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = lenstr(kp) ;
 	    for (int i = 0 ; wlp->get(i,&vp) >= 0 ; i += 1) {
 	        SK_KW	*kep = (SK_KW *) vp ;
 	        if (vp) {

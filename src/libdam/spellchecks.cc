@@ -58,7 +58,7 @@
 #include	<getusername.h>
 #include	<getuserhome.h>
 #include	<mkdirs.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<fsdir.h>
 #include	<paramfile.h>
 #include	<ascii.h>
@@ -1260,7 +1260,7 @@ cchar	calname[] ;
 	rs1 = u_stat(tmpfname,&sb) ;
 
 	if (rs1 >= 0)
-	    rs1 = sperm(&sip->id,&sb,R_OK) ;
+	    rs1 = permid(&sip->id,&sb,R_OK) ;
 
 	if (rs1 < 0)
 	    goto bad0 ;
@@ -2999,7 +2999,7 @@ cchar	dname[] ;
 	if (rs >= 0) {
 	    rs = subinfo_ids(sip) ;
 	    if (rs >= 0)
-	        rs = sperm(&sip->id,&sb,W_OK) ;
+	        rs = permid(&sip->id,&sb,W_OK) ;
 	}
 
 ret0:
@@ -3798,7 +3798,7 @@ static int config_reader(config *op,char *pbuf,int plen) noex {
 	    char	ebuf[EBUFLEN + 1] ;
 
 	    while (rs >= 0) {
-	        kl = paramfile_enum(pfp,&cur,&pe,pbuf,plen) ;
+	        kl = paramfile_curenum(pfp,&cur,&pe,pbuf,plen) ;
 	        if (kl == SR_NOTFOUND) break ;
 	        rs = kl ;
 	        if (rs < 0) break ;
@@ -3980,7 +3980,7 @@ static int config_db(config *csp,cchar *ebuf,int el) noex {
 	    if (rs >= 0) {
 		int	f_skip = (sch == '-') ;
 		if (USTAT sb ; f_skip || (u_stat(d[1],&sb) >= 0)) {
-		    if (f_skip || ((rs = sperm(&sip->id,&sb,R_OK)) >= 0)) {
+		    if (f_skip || ((rs = permid(&sip->id,&sb,R_OK)) >= 0)) {
 	                cint	sz = szof(DB) ;
 	                void	*p ;
 	                if ((rs = uc_malloc(sz,&p)) >= 0) {

@@ -153,7 +153,7 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecui(cchar *,int,uint *) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(ids *,ustat *,int) ;
+extern int	permid(ids *,ustat *,int) ;
 extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUGS
@@ -1241,7 +1241,7 @@ cchar	calname[] ;
 
 	rs1 = u_stat(tmpfname,&sb) ;
 	if (rs1 >= 0)
-	    rs1 = sperm(&sip->id,&sb,R_OK) ;
+	    rs1 = permid(&sip->id,&sb,R_OK) ;
 
 #if	CF_DEBUGS
 	debugprintf("quote_qdircreate: fn=%s (%d)\n",tmpfname,rs1) ;
@@ -1562,7 +1562,7 @@ cchar	dbdname[] ;
 	if ((rs >= 0) && (! qdirp->f.writedbdir)) {
 	    rs = subinfo_ids(sip) ;
 	    if (rs >= 0) {
-	        rs1 = sperm(&sip->id,&sb,W_OK) ;
+	        rs1 = permid(&sip->id,&sb,W_OK) ;
 		qdirp->f.writedbdir = (rs1 >= 0) ;
 	    }
 	}
@@ -3114,7 +3114,7 @@ cchar	dname[] ;
 	if (rs >= 0) {
 	    rs = subinfo_ids(sip) ;
 	    if (rs >= 0)
-	        rs = sperm(&sip->id,&sb,W_OK) ;
+	        rs = permid(&sip->id,&sb,W_OK) ;
 	}
 
 ret0:

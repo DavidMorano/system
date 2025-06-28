@@ -46,7 +46,7 @@
 #include	<strwcpy.h>
 #include	<mkpathx.h>
 #include	<mkdirs.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<ctdec.h>
 #include	<sesmsg.h>
 #include	<msgdata.h>

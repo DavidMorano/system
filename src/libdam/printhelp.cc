@@ -61,7 +61,7 @@
 #include	<strwcpy.h>
 #include	<mkpathx.h>
 #include	<mkchar.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<getx.h>		/* |getnodedomain(3uc)| */
 #include	<rmx.h>
 #include	<isnot.h>

@@ -68,7 +68,7 @@
 #include	<ids.h>
 #include	<fsdir.h>
 #include	<vecpstr.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<pathadd.h>
 #include	<mkpathx.h>
 #include	<sfx.h>
@@ -259,7 +259,7 @@ static int rmsesdir(ids *idp,char *pbuf,int plen) noex {
 	if (USTAT sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        cint	am = (R_OK|W_OK|X_OK) ;
-	        if ((rs = sperm(idp,&sb,am)) >= 0) {
+	        if ((rs = permid(idp,&sb,am)) >= 0) {
 	            if ((rs = rmdirfiles(pbuf,plen)) > 0) {
 	                cchar	*cp{} ;
 	                c += rs ;

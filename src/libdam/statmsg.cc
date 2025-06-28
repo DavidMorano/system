@@ -6,7 +6,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_WRITETO	1		/* time out writes */
-#define	CF_PARAMFILE	1		/* use |paramfile(3dam)| */
+#define	CF_PARAMXFILE	1		/* use |paramfile(3dam)| */
 
 /* revision history:
 
@@ -69,12 +69,13 @@
 #include	<bfile.h>
 #include	<fsdir.h>
 #include	<ascii.h>
+#include	<strn.h>
 #include	<sfx.h>
 #include	<snx.h>
 #include	<mkx.h>
 #include	<strwcpy.h>
 #include	<nleadstr.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<writeto.h>
 #include	<matxstr.h>
 #include	<ctdec.h>
@@ -84,18 +85,24 @@
 
 #include	"statmsg.h"
 
+import libutil ;
 
 /* local defines */
 
-#define	STATMSG_DEFGROUP	"default"
-#define	STATMSG_ALLGROUP	"all"
-#define	STATMSG_NAME		"statmsg"
-#define	STATMSG_SUF		"sm"
-#define	STATMSG_DIRSFNAME	"dirs"
-#define	MAMAGIC	0x21367425
-
+#define	SM_MAGIC	STATMSG_MAGIC
+#define	SM_DEFGROUP	"default"
+#define	SM_ALLGROUP	"all"
+#define	SM_NAME		"statmsg"
+#define	SM_SUF		"sm"
+#define	SM_DIRSFNAME	"dirs"
 #define	SM		statmsg
 #define	SM_ID		statmsg_id
+
+#define	MAMAGIC		0x21367425
+
+#define	PF		paramfile
+#define	PF_ENT		paramfile_ent
+#define	PF_CUR		paramfile_cur
 
 #define	MA		statmsg_mapper
 
@@ -123,10 +130,6 @@
 
 #undef	ENVBUFLEN
 #define	ENVBUFLEN	(10 + MAX(ADMINLEN,MAXPATHLEN))
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
 
 #ifndef	POLL_INTMULT
 #define	POLL_INTMULT	1000
@@ -167,7 +170,7 @@ using std::nothrow ;			/* constant */
 
 /* external variables */
 
-mainv		environ ;
+extern mainv	environ ;
 
 
 /* local structures */
@@ -186,23 +189,23 @@ typedef statmsg_mapdir *	mdp ;
 
 /* forward references */
 
-static int	statmsg_userbegin(STATMSG *,cchar *) noex ;
-static int	statmsg_userend(STATMSG *) noex ;
+static int	statmsg_userbegin(SM *,cchar *) noex ;
+static int	statmsg_userend(SM *) noex ;
 
-static int	statmsg_mapfind(STATMSG *,time_t) noex ;
-static int	statmsg_maplose(STATMSG *) noex ;
-static int	statmsg_mapfname(STATMSG *,char *) noex ;
-static int	statmsg_schedload(STATMSG *,vecstr *) noex ;
-static int	statmsg_checker(STATMSG *,time_t) noex ;
-static int	statmsg_envbegin(STATMSG *) noex ;
-static int	statmsg_envend(STATMSG *) noex ;
-static int	statmsg_envadds(STATMSG *,strpack *,cchar **,
-			STATMSG_ID *,cchar *) noex ;
-static int	statmsg_envstore(STATMSG *,strpack *,cchar **,int,
+static int	statmsg_mapfind(SM *,time_t) noex ;
+static int	statmsg_maplose(SM *) noex ;
+static int	statmsg_mapfname(SM *,char *) noex ;
+static int	statmsg_schedload(SM *,vecstr *) noex ;
+static int	statmsg_checker(SM *,time_t) noex ;
+static int	statmsg_envbegin(SM *) noex ;
+static int	statmsg_envend(SM *) noex ;
+static int	statmsg_envadds(SM *,strpack *,cchar **,
+			SM_ID *,cchar *) noex ;
+static int	statmsg_envstore(SM *,strpack *,cchar **,int,
 			cchar *,int) noex ;
-static int 	statmsg_processor(STATMSG *,cchar **,cchar **,
+static int 	statmsg_processor(SM *,cchar **,cchar **,
 			cchar *,cchar *,int) noex ;
-static int	statmsg_idcheck(STATMSG *,STATMSG_ID *,char *) noex ;
+static int	statmsg_idcheck(SM *,SM_ID *,char *) noex ;
 
 static int	mapper_start(MA *,time_t,cchar *,cchar *,
 			cchar *) noex ;
@@ -283,7 +286,7 @@ constexpr cpcchar	envstrs[] = {
 constexpr uid_t		uidend = -1 ;
 constexpr gid_t		gidend = -1 ;
 
-constexpr char		envpre[] = "STATMSG_" ;	/* environment prefix */
+constexpr char		envpre[] = "SM_" ;	/* environment prefix */
 
 constexpr bool		f_writeto = CF_WRITETO ;
 
@@ -293,7 +296,7 @@ constexpr bool		f_writeto = CF_WRITETO ;
 
 /* exported subroutines */
 
-int statmsg_open(STATMSG *op,cchar *username) noex {
+int statmsg_open(SM *op,cchar *username) noex {
 	custime		dt = time(nullptr) ;
 	int		rs ;
 
@@ -303,14 +306,14 @@ int statmsg_open(STATMSG *op,cchar *username) noex {
 	if (username[0] == '\0') return SR_INVALID ;
 
 	memclear(op) ;
-	op->fe = STATMSG_DIRSFNAME ;
+	op->fe = SM_DIRSFNAME ;
 
-	if ((rs = ptm_create(&op->m,nullptr)) >= 0) {
+	if ((rs = ptm_create(&op->mx,nullptr)) >= 0) {
 	    if ((rs = statmsg_userbegin(op,username)) >= 0) {
 		if ((rs = statmsg_mapfind(op,dt)) >= 0) {
 		    if ((rs = statmsg_envbegin(op)) >= 0) {
 			op->ti_lastcheck = dt ;
-			op->magic = STATMSG_MAGIC ;
+			op->magic = SM_MAGIC ;
 		    }
 		    if (rs < 0) {
 			statmsg_maplose(op) ;
@@ -321,7 +324,7 @@ int statmsg_open(STATMSG *op,cchar *username) noex {
 		}
 	    }
 	    if (rs < 0) {
-		ptm_destroy(&op->m) ;
+		ptm_destroy(&op->mx) ;
 	    }
 	} /* end if (ptm) */
 
@@ -329,13 +332,13 @@ int statmsg_open(STATMSG *op,cchar *username) noex {
 }
 /* end subroutine (statmsg_open) */
 
-int statmsg_close(STATMSG *op) noex {
+int statmsg_close(SM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != STATMSG_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != SM_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = statmsg_envend(op) ;
 	if (rs >= 0) rs = rs1 ;
@@ -346,7 +349,7 @@ int statmsg_close(STATMSG *op) noex {
 	rs1 = statmsg_userend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	rs1 = ptm_destroy(&op->m) ;
+	rs1 = ptm_destroy(&op->mx) ;
 	if (rs >= 0) rs = rs1 ;
 
 	op->magic = 0 ;
@@ -354,12 +357,12 @@ int statmsg_close(STATMSG *op) noex {
 }
 /* end subroutine (statmsg_close) */
 
-int statmsg_check(STATMSG *op,time_t dt) noex {
+int statmsg_check(SM *op,time_t dt) noex {
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != STATMSG_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != SM_MAGIC) return SR_NOTOPEN ;
 
 	rs = statmsg_checker(op,dt) ;
 
@@ -367,8 +370,8 @@ int statmsg_check(STATMSG *op,time_t dt) noex {
 }
 /* end subroutine (statmsg_check) */
 
-int statmsg_process(STATMSG *op,cchar *gn,cchar **adms,cchar *kn,int fd) noex {
-	STATMSG_ID	id{} ;
+int statmsg_process(SM *op,cchar *gn,cchar **adms,cchar *kn,int fd) noex {
+	SM_ID	id{} ;
 	int		rs ;
 	id.groupname = gn ;
 	id.uid = -1 ;
@@ -379,9 +382,9 @@ int statmsg_process(STATMSG *op,cchar *gn,cchar **adms,cchar *kn,int fd) noex {
 }
 /* end subroutine (statmsg_process) */
 
-int statmsg_processid(STATMSG *op,STATMSG_ID *idp,cc **adms,
+int statmsg_processid(SM *op,SM_ID *idp,cc **adms,
 		cc *kn,int fd) noex {
-	STATMSG_ID	id ;
+	SM_ID	id ;
 	int		rs ;
 	int		wlen = 0 ;
 	cchar		*groupname ;
@@ -391,7 +394,7 @@ int statmsg_processid(STATMSG *op,STATMSG_ID *idp,cc **adms,
 	if (op == nullptr) return SR_FAULT ;
 	if (idp == nullptr) return SR_FAULT ;
 
-	if (op->magic != STATMSG_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != SM_MAGIC) return SR_NOTOPEN ;
 
 	if (fd < 0) return SR_BADF ;
 
@@ -413,9 +416,8 @@ int statmsg_processid(STATMSG *op,STATMSG_ID *idp,cc **adms,
 	if ((rs = statmsg_idcheck(op,&id,ubuf)) >= 0) {
 	    cint	n = nelem(envstrs) ;
 	    int		sz ;
-	    void	*p ;
 	    sz = (op->nenv + n + 1) * szof(cchar *) ;
-	    if ((rs = uc_malloc(sz,&p)) >= 0) {
+	    if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
 	        strpack		packer ;
 	        cchar	**ev = (cchar **) p ;
 
@@ -437,7 +439,7 @@ int statmsg_processid(STATMSG *op,STATMSG_ID *idp,cc **adms,
 }
 /* end subroutine (statmsg_processid) */
 
-int statmsgid_load(STATMSG_ID *idp,cc *un,cc *gn,uid_t uid,gid_t gid) noex {
+int statmsgid_load(SM_ID *idp,cc *un,cc *gn,uid_t uid,gid_t gid) noex {
 
 	if (idp == nullptr) return SR_FAULT ;
 
@@ -454,7 +456,7 @@ int statmsgid_load(STATMSG_ID *idp,cc *un,cc *gn,uid_t uid,gid_t gid) noex {
 
 /* private subroutines */
 
-static int statmsg_userbegin(STATMSG *op,cchar *username) noex {
+static int statmsg_userbegin(SM *op,cchar *username) noex {
 	cint	hlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	char		hbuf[MAXPATHLEN+1] ;
@@ -472,10 +474,9 @@ static int statmsg_userbegin(STATMSG *op,cchar *username) noex {
 	if (rs >= 0) {
 	    if ((rs = getuserhome(hbuf,hlen,username)) >= 0) {
 		int	sz = 0 ;
-		char	*bp ;
-		sz += (strlen(username) + 1) ;
-		sz += (strlen(hbuf) + 1) ;
-		if ((rs = uc_malloc(sz,&bp)) >= 0) {
+		sz += (lenstr(username) + 1) ;
+		sz += (lenstr(hbuf) + 1) ;
+		if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
 		    op->useralloc = bp ;
 		    op->username = bp ;
 		    bp = (strwcpy(bp,username,-1) + 1) ;
@@ -489,7 +490,7 @@ static int statmsg_userbegin(STATMSG *op,cchar *username) noex {
 }
 /* end subroutine (statmsg_userbegin) */
 
-static int statmsg_userend(STATMSG *op) noex {
+static int statmsg_userend(SM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->useralloc != nullptr) {
@@ -503,7 +504,7 @@ static int statmsg_userend(STATMSG *op) noex {
 }
 /* end subroutine (statmsg_userend) */
 
-static int statmsg_mapfind(STATMSG *op,time_t dt) noex {
+static int statmsg_mapfind(SM *op,time_t dt) noex {
 	int		rs ;
 	char		mapfname[MAXPATHLEN + 1] ;
 	mapfname[0] = '\0' ;
@@ -520,7 +521,7 @@ static int statmsg_mapfind(STATMSG *op,time_t dt) noex {
 }
 /* end subroutine (statmsg_mapfind) */
 
-static int statmsg_maplose(STATMSG *op) noex {
+static int statmsg_maplose(SM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->nmaps > 0) {
@@ -532,7 +533,7 @@ static int statmsg_maplose(STATMSG *op) noex {
 }
 /* end subroutine (statmsg_maplose) */
 
-static int statmsg_mapfname(STATMSG *op,char *fbuf) noex {
+static int statmsg_mapfname(SM *op,char *fbuf) noex {
 	vecstr		scheds ;
 	int		rs ;
 	int		rs1 ;
@@ -560,10 +561,10 @@ static int statmsg_mapfname(STATMSG *op,char *fbuf) noex {
 }
 /* end subroutine (statmsg_mapfname) */
 
-static int statmsg_schedload(STATMSG *op,vecstr *slp) noex {
+static int statmsg_schedload(SM *op,vecstr *slp) noex {
 	int		rs = SR_OK ;
 	cchar		*keys = "pen" ;
-	cchar		*name = STATMSG_NAME ;
+	cchar		*name = SM_NAME ;
 	for (int i = 0 ; keys[i] != '\0' ; i += 1) {
 	    cint	kch = MKCHAR(keys[i]) ;
 	    int		vl = -1 ;
@@ -580,8 +581,8 @@ static int statmsg_schedload(STATMSG *op,vecstr *slp) noex {
 		break ;
 	    } /* end switch */
 	    if ((rs >= 0) && (vp != nullptr)) {
-		char	kbuf[2] = { 0, 0 } ;
-		kbuf[0] = kch ;
+		char	kbuf[2] = {} ;
+		kbuf[0] = char(kch) ;
 		rs = vecstr_envset(slp,kbuf,vp,vl) ;
 	    }
 	    if (rs < 0) break ;
@@ -590,12 +591,12 @@ static int statmsg_schedload(STATMSG *op,vecstr *slp) noex {
 }
 /* end subroutine (statmsg_schedload) */
 
-static int statmsg_checker(STATMSG *op,time_t dt) noex {
+static int statmsg_checker(SM *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		nchanged = 0 ;
 
 	if (op->nmaps > 0) {
-	if ((rs = ptm_lock(&op->m)) >= 0) {
+	if ((rs = ptm_lock(&op->mx)) >= 0) {
 	    if (dt == 0) dt = time(nullptr) ;
 
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
@@ -606,7 +607,7 @@ static int statmsg_checker(STATMSG *op,time_t dt) noex {
 
 	    } /* end if */
 
-	    ptm_unlock(&op->m) ;
+	    ptm_unlock(&op->mx) ;
 	} /* end if (mutex) */
 	} /* end if (positive) */
 
@@ -614,18 +615,17 @@ static int statmsg_checker(STATMSG *op,time_t dt) noex {
 }
 /* end subroutine (statmsg_checker) */
 
-static int statmsg_envbegin(STATMSG *op) noex {
+static int statmsg_envbegin(SM *op) noex {
 	int		rs = SR_OK ;
 	int		sz ;
 	int		i ;
 	int		c = 0 ;
 	int		f ;
-	void		*p ;
 
 	for (i = 0 ; environ[i] != nullptr ; i += 1) ;
 
 	sz = (i + 1) * szof(cchar *) ;
-	if ((rs = uc_malloc(sz,&p)) >= 0) {
+	if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
 	    cchar	*ep ;
 	    cchar	**va = (cchar **) p ;
 	    op->envv = va ;
@@ -634,9 +634,12 @@ static int statmsg_envbegin(STATMSG *op) noex {
 	        f = true ;
 	        f = f && (ep[0] != '-') ;
 	        f = f && (matstr(envbad,ep,-1) < 0) ;
-	        if (f && (ep[0] == 'M')) f = (strncmp(envpre,ep,5) != 0) ;
-	        if (f)
+	        if (f && (ep[0] == 'M')) {
+		    f = (strncmp(envpre,ep,5) != 0) ;
+		}
+	        if (f) {
 	            va[c++] = ep ;
+		}
 	    } /* end for */
 	    va[c] = nullptr ;
 	    op->nenv = c ;
@@ -646,22 +649,20 @@ static int statmsg_envbegin(STATMSG *op) noex {
 }
 /* end subroutine (statmsg_envbegin) */
 
-static int statmsg_envend(STATMSG *op) noex {
+static int statmsg_envend(SM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->envv != nullptr) {
 	    rs1 = uc_free(op->envv) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->envv = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (statmsg_envend) */
 
-static int statmsg_envadds(STATMSG *op,strpack *spp,cchar **ev,
-		STATMSG_ID *idp,cchar *kn) noex {
+static int statmsg_envadds(SM *op,strpack *spp,cchar **ev,
+		SM_ID *idp,cchar *kn) noex {
 	uint		uv ;
 	cint	envlen = ENVBUFLEN ;
 	int		rs = SR_OK ;
@@ -732,7 +733,7 @@ static int statmsg_envadds(STATMSG *op,strpack *spp,cchar **ev,
 }
 /* end subroutine (statmsg_envadds) */
 
-static int statmsg_envstore(STATMSG *op,strpack *spp,cchar **ev,int n,
+static int statmsg_envstore(SM *op,strpack *spp,cchar **ev,int n,
 		cchar *ep,int el) noex {
 	int		rs = SR_OK ;
 
@@ -750,7 +751,7 @@ static int statmsg_envstore(STATMSG *op,strpack *spp,cchar **ev,int n,
 }
 /* end subroutine (statmsg_envstore) */
 
-static int statmsg_idcheck(STATMSG *op,STATMSG_ID *idp,char *ubuf) noex {
+static int statmsg_idcheck(SM *op,SM_ID *idp,char *ubuf) noex {
 	int		rs = SR_OK ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -779,7 +780,7 @@ static int statmsg_idcheck(STATMSG *op,STATMSG_ID *idp,char *ubuf) noex {
 }
 /* end subroutine (statmsg_idcheck) */
 
-static int statmsg_processor(STATMSG *op,cchar **ev,cchar **adms,cchar *gn,
+static int statmsg_processor(SM *op,cchar **ev,cchar **adms,cchar *gn,
 		cchar *kn,int fd) noex {
 	int		rs ;
 	int		wlen = 0 ;
@@ -798,39 +799,41 @@ static int statmsg_processor(STATMSG *op,cchar **ev,cchar **adms,cchar *gn,
 static int mapper_start(MA *mmp,time_t dt,cc *un,cc *uh,cc *fname) noex {
 	cint	to = TO_MAPCHECK ;
 	int		rs ;
-	cchar		**evp = (cchar **) environ ;
-	cchar		*ccp ;
-
+	mainv		evp = mainv(environ) ;
 	memclear(mmp) ;
 	mmp->username = un ;
 	mmp->userhome = uh ;
 
 	if ((rs = lockrw_create(&mmp->rwm,0)) >= 0) {
-	    if ((rs = uc_mallocstrw(fname,-1,&ccp)) >= 0) {
-	        mmp->fname = ccp ;
+	    if (cc *cp ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	        mmp->fname = cp ;
 	        if ((rs = vechand_start(&mmp->mapdirs,4,0)) >= 0) {
-		    PARAMFILE	*dfp = &mmp->dirsfile ;
-	            if ((rs = paramfile_open(dfp,evp,ccp)) >= 0) {
+		    PF	*dfp = &mmp->dirsfile ;
+	            if ((rs = paramfile_open(dfp,evp,cp)) >= 0) {
 	                if ((rs = paramfile_checkint(dfp,to)) >= 0) {
 	                    mmp->magic = MAMAGIC ;
 	                    rs = mapper_mapload(mmp) ;
 	                    mmp->ti_check = dt ;
-			    if (rs < 0)
+			    if (rs < 0) {
 			        mmp->magic = 0 ;
+			    }
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 		            paramfile_close(&mmp->dirsfile) ;
+			}
 	            } /* end if (paramfile_open) */
-	            if (rs < 0)
+	            if (rs < 0) {
 		        vechand_finish(&mmp->mapdirs) ;
+		    }
 	        } /* end if (vechand_start) */
 	        if (rs < 0) {
 	            uc_free(mmp->fname) ;
 	            mmp->fname = nullptr ;
 	        }
 	    } /* end if (memory-allocation) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        lockrw_destroy(&mmp->rwm) ;
+	    }
 	} /* end if (lockrw_create) */
 
 	return rs ;
@@ -886,7 +889,7 @@ static int mapper_check(MA *mmp,time_t dt) noex {
 
 	    if ((dt - mmp->ti_check) >= TO_MAPCHECK) {
 
-#if	CF_PARAMFILE
+#if	CF_PARAMXFILE
 	        if ((rs = paramfile_check(&mmp->dirsfile,dt)) > 0) {
 
 	            {
@@ -898,7 +901,7 @@ static int mapper_check(MA *mmp,time_t dt) noex {
 	            nchanged = rs ;
 
 	        } /* end if */
-#else /* CF_PARAMFILE */
+#else /* CF_PARAMXFILE */
 	        {
 	            USTAT	sb ;
 
@@ -919,7 +922,7 @@ static int mapper_check(MA *mmp,time_t dt) noex {
 
 	            mmp->ti_check = dt ;
 	        }
-#endif /* CF_PARAMFILE */
+#endif /* CF_PARAMXFILE */
 
 	    } /* end if (map-object check) */
 
@@ -979,12 +982,11 @@ static int mapper_processor(MA *mmp,cc **ev,cc **adms,
 }
 /* end subroutine (mapper_processor) */
 
-#if	CF_PARAMFILE
+#if	CF_PARAMXFILE
 static int mapper_mapload(MA *mmp) noex {
-	USTAT	sb ;
-	PARAMFILE	*pfp = &mmp->dirsfile ;
-	PARAMFILE_ENT	pe ;
-	PARAMFILE_CUR	cur ;
+	PF		*pfp = &mmp->dirsfile ;
+	PF_ENT	pe ;
+	PF_CUR	cur ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
@@ -992,7 +994,7 @@ static int mapper_mapload(MA *mmp) noex {
 
 	if (mmp->magic != MAMAGIC) return SR_NOTOPEN ;
 
-	if ((rs = u_stat(mmp->fname,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(mmp->fname,&sb)) >= 0) {
 	    mmp->ti_mtime = sb.st_mtime ;
 	    if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
 	        cint	plen = PBUFLEN ;
@@ -1003,7 +1005,7 @@ static int mapper_mapload(MA *mmp) noex {
 
 	        while (rs >= 0) {
 
-	            kl = paramfile_enum(pfp,&cur,&pe,pbuf,plen) ;
+	            kl = paramfile_curenum(pfp,&cur,&pe,pbuf,plen) ;
 	            if (kl == SR_NOTFOUND) break ;
 	            rs = kl ;
 	            if (rs < 0) break ;
@@ -1039,7 +1041,7 @@ static int mapper_mapload(MA *mmp) noex {
 }
 /* end subroutine (mapper_mapload) */
 
-#else /* CF_PARAMFILE */
+#else /* CF_PARAMXFILE */
 
 static int mapper_mapload(MA *mmp) noex {
 	bfile		mfile, *mfp = &mfile ;
@@ -1096,26 +1098,27 @@ static int mapper_mapload(MA *mmp) noex {
 }
 /* end subroutine (mapper_mapload) */
 
-#endif /* CF_PARAMFILE */
+#endif /* CF_PARAMXFILE */
 
 static int mapper_mapadd(MA *mmp,cchar *kp,int kl,cchar *vp,int vl) noex {
-	MD	*ep ;
-	cint	sz = szof(MD) ;
+	cint		sz = szof(MD) ;
 	int		rs ;
 
 	if ((kp == nullptr) || (vp == nullptr)) return SR_FAULT ;
 	if ((kl == 0) || (vl == 0)) return SR_INVALID ;
 
-	if ((rs = uc_malloc(sz,&ep)) >= 0) {
+	if (MD *ep ; (rs = uc_malloc(sz,&ep)) >= 0) {
 	    cchar	*un = mmp->username ;
 	    cchar	*uh = mmp->userhome ;
 	    if ((rs = mapdir_start(ep,un,uh,kp,kl,vp,vl)) >= 0) {
 	        rs = vechand_add(&mmp->mapdirs,ep) ;
-	        if (rs < 0)
+	        if (rs < 0) {
 	            mapdir_finish(ep) ;
+		}
 	    }
-	    if (rs < 0)
+	    if (rs < 0) {
 	        uc_free(ep) ;
+	    }
 	} /* end if (memory-allocation) */
 
 	return rs ;
@@ -1155,8 +1158,8 @@ static int mapper_mapfins(MA *mmp) noex {
 }
 /* end subroutine (mapper_mapfins) */
 
-static int mapdir_start(MD *ep,cchar *un,cchar *uh,
-		cchar *kp,int kl,cchar *vp,int vl) noex {
+static int mapdir_start(MD *ep,cc *un,cc *uh,
+		cc *kp,int kl,cc *vp,int vl) noex {
 	int		rs = SR_OK ;
 
 	if (ep == nullptr) return SR_FAULT ;
@@ -1170,15 +1173,14 @@ static int mapdir_start(MD *ep,cchar *un,cchar *uh,
 	ep->userhome = uh ;
 
 	if (kl < 0)
-	    kl = strlen(kp) ;
+	    kl = lenstr(kp) ;
 
 	if (vl < 0)
-	    vl = strlen(vp) ;
+	    vl = lenstr(vp) ;
 
 	{
 	    cint	sz = (kl + 1 + vl + 1) ;
-	    char	*bp ;
-	    if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	    if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	        ep->admin = bp ;
 		bp = strwcpy(bp,kp,kl) + 1 ;
 		ep->dirname = bp ;
@@ -1314,11 +1316,11 @@ static int mapdir_expander(MD *ep) noex {
 static int mapdir_processor(MD *ep,cchar **ev,cchar *,cchar *kn,int fd) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		wlen = 0 ;
+	int		wlen = 0 ; /* return-value */
 	int		f_continue = true ;
-	cchar		*defname = STATMSG_DEFGROUP ;
-	cchar		*allname = STATMSG_ALLGROUP ;
-	cchar		*suf = STATMSG_SUF ;
+	cchar		*defname = SM_DEFGROUP ;
+	cchar		*allname = SM_ALLGROUP ;
+	cchar		*suf = SM_SUF ;
 	cchar		*dn = ep->dirname ;
 	char		env_admin[ENVBUFLEN+1] ;
 	char		env_admindir[ENVBUFLEN+1] ;
@@ -1342,8 +1344,7 @@ static int mapdir_processor(MD *ep,cchar **ev,cchar *,cchar *kn,int fd) noex {
 	        ev[n+2] = nullptr ;
 	        if ((rs = vecstr_start(&nums,0,0)) >= 0) {
 	            cchar	*strs[5] ;
-			char	*nbuf{} ;
-		    if ((rs = malloc_mn(&nbuf)) >= 0) {
+		    if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
 	            fsdir	d ;
 	            fsdir_ent	de ;
 			cint	nlen = rs ;
@@ -1354,11 +1355,14 @@ static int mapdir_processor(MD *ep,cchar **ev,cchar *,cchar *kn,int fd) noex {
 	                    if (den[0] != '.') {
 	                	cchar	*tp = strchr(den,'.') ;
 	            		if (tp && (strcmp((tp+1),suf) == 0)) {
-				    int		f = true ;
+				    int		tl ;
+				    bool	f = true ;
 	   			    cchar	*digp ;
-	                	    digp = strnbrk(den,(tp-den),"0123456789") ;
-	                	    if (digp != nullptr) {
-	                    		f = hasalldig(digp,(tp-digp)) ;
+				    tl = intconv(tp - den) ;
+	                	    digp = strnbrk(den,tl,"0123456789") ;
+	                	    if (digp) {
+					tl = intconv(tp - digp) ;
+	                    		f = hasalldig(digp,tl) ;
 				    }
 				    if (f) {
 	                	        if ((kn[0] != '\0') && (kn[0] != '-')) {
@@ -1369,9 +1373,10 @@ static int mapdir_processor(MD *ep,cchar **ev,cchar *,cchar *kn,int fd) noex {
 	                		}
 				    }
 	                	    if (f) {
-	                    		rs = vecstr_add(&nums,den,(tp-den)) ;
+					tl = intconv(tp - den) ;
+	                    		rs = vecstr_add(&nums,den,tl) ;
 				    }
-	            		} /* end if (have an STATMSG file) */
+	            		} /* end if (have an SM file) */
 			    }
 	           	    if (rs < 0) break ;
 	        	} /* end while (reading directory entries) */
@@ -1439,7 +1444,7 @@ static int mapdir_processorthem(MD *ep,cchar **ev,cchar *dn,
 
 static int mapdir_processorone(MD *ep,cchar **ev,cchar *dn,
 		vecstr *blp,cchar *kn,int fd) noex {
-	cint	kl = strlen(kn) ;
+	cint	kl = lenstr(kn) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -1473,7 +1478,7 @@ static int mapdir_procout(MD *ep,cchar **ev,cchar *dn,cchar *bn,int fd) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	cchar		*suf = STATMSG_SUF ;
+	cchar		*suf = SM_SUF ;
 	char		cname[MAXNAMELEN + 1] ;
 	char		fname[MAXPATHLEN + 1] ;
 
@@ -1495,7 +1500,7 @@ static int mapdir_procout(MD *ep,cchar **ev,cchar *dn,cchar *bn,int fd) noex {
 /* end subroutine (mapdir_procout) */
 
 static int mapdir_procouter(MD *ep,cchar **ev,cchar *fn,int ofd) noex {
-	const mode_t	operms = 0664 ;
+	cmode	operms = 0664 ;
 	cint	oflags = O_RDONLY ;
 	cint	to_open = TO_OPEN ;
 	cint	to_read = TO_READ ;
@@ -1574,7 +1579,7 @@ static int narr(mainv ev) noex {
 static bool isBaseMatch(cchar *den,cchar *bname,cchar *digp) noex {
 	bool		f = false ;
 	if (digp == nullptr) {
-	    int	bl = strlen(bname) ;
+	    int	bl = lenstr(bname) ;
 	    int	m = nleadstr(den,bname,bl) ;
 	    f = (m == bl) && (den[m] == '.') ;
 	} else {
