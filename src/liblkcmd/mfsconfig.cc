@@ -414,7 +414,7 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	    cchar	*kp, *vp ;
 
 	    while (rs >= 0) {
-	        kl = paramfile_enum(pfp,&cur,&pe,pbuf,plen) ;
+	        kl = paramfile_curenum(pfp,&cur,&pe,pbuf,plen) ;
 	        if (kl == SR_NOTFOUND) break ;
 	        rs = kl ;
 	        if (rs < 0) break ;

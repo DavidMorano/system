@@ -175,7 +175,7 @@ extern int	getserial(const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;
 extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
 extern int	mkdirs(cchar *,mode_t) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	securefile(cchar *,uid_t,gid_t) ;
@@ -2669,7 +2669,7 @@ static int procmntcheck(PROGINFO *pip)
 	    cchar		*fmt ;
 	    if ((rs = u_stat(lip->mntfname,&usb)) >= 0) {
 	        if (S_ISREG(usb.st_mode)) {
-	            rs = sperm(&pip->id,&usb,W_OK) ;
+	            rs = permid(&pip->id,&usb,W_OK) ;
 	        } else
 	            rs = SR_BUSY ;
 	        if (rs < 0) {

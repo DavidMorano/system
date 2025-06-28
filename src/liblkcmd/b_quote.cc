@@ -1692,7 +1692,7 @@ struct config	*cfp ;
 	    char	*pr = pip->pr ;
 
 	while (rs >= 0) {
-	    kl = paramfile_enum(pfp,&cur,&pe,pbuf,PBUFLEN) ;
+	    kl = paramfile_curenum(pfp,&cur,&pe,pbuf,PBUFLEN) ;
 	    if (kl <= 0) break ;
 
 	    kp = pe.key ;

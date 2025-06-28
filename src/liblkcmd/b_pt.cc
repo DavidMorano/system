@@ -118,7 +118,7 @@ extern "C" int	matostr(cchar **,int,cchar *,int) ;
 extern "C" int	matpstr(cchar **,int,cchar *,int) ;
 extern "C" int	optbool(cchar *,int) ;
 extern "C" int	optvalue(cchar *,int) ;
-extern "C" int	sperm(IDS *,ustat *,int) ;
+extern "C" int	permid(IDS *,ustat *,int) ;
 
 extern "C" int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern "C" int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
@@ -1395,7 +1395,7 @@ static int procpathtry_cd(PROGINFO *pip,SHIO *ofp,pathtry *ptp)
 	    if ((rs = uc_stat(ptp->fname,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 		    const int	am = (X_OK | R_OK) ;
-	            if ((rs = sperm(&lip->id,&sb,am)) >= 0) {
+	            if ((rs = permid(&lip->id,&sb,am)) >= 0) {
 	    		rs = printit(pip,ofp,ptp->fname) ;
 	    		c += 1 ;
 		    } else if (isNotAccess(rs)) {
@@ -1423,7 +1423,7 @@ static int procpathtry_exec(PROGINFO *pip,SHIO *ofp,pathtry *ptp)
 	    if ((rs = uc_stat(ptp->fname,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
 		    const int	am = X_OK ;
-		    if ((rs = sperm(&lip->id,&sb,am)) >= 0) {
+		    if ((rs = permid(&lip->id,&sb,am)) >= 0) {
 	                rs = printit(pip,ofp,ptp->fname) ;
 	                c += 1 ;
 		    } else if (isNotAccess(rs)) {
@@ -1456,7 +1456,7 @@ static int procpathtry_func(PROGINFO *pip,SHIO *ofp,pathtry *ptp)
 	    if ((rs = uc_stat(ptp->fname,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
 		    const int	am = R_OK ;
-	            if ((rs = sperm(&lip->id,&sb,am)) >= 0) {
+	            if ((rs = permid(&lip->id,&sb,am)) >= 0) {
 	                rs = printit(pip,ofp,ptp->fname) ;
 	                c += 1 ;
 		    } else if (isNotAccess(rs)) {
@@ -1548,7 +1548,7 @@ static int procpathtry_liber(PROGINFO *pip,SHIO *ofp,pathtry *ptp)
 	if ((rs = uc_stat(ptp->fname,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
 		const int	am = R_OK ;
-	        if ((rs = sperm(&lip->id,&sb,am)) >= 0) {
+	        if ((rs = permid(&lip->id,&sb,am)) >= 0) {
 	            rs = printit(pip,ofp,ptp->fname) ;
 	            c += 1 ;
 		} else if (isNotAccess(rs)) {
@@ -1601,7 +1601,7 @@ static int procpathtry_man(PROGINFO *pip,SHIO *ofp,pathtry *ptp)
 	                if ((rs = uc_stat(ptp->fname,&sb)) >= 0) {
 	                    if (S_ISREG(sb.st_mode)) {
 				const int	am = R_OK ;
-	                        if ((rs = sperm(&lip->id,&sb,am)) >= 0) {
+	                        if ((rs = permid(&lip->id,&sb,am)) >= 0) {
 	                	    rs = printit(pip,ofp,ptp->fname) ;
 	                	    c += 1 ;
 				} else if (isNotAccess(rs)) {
@@ -1705,7 +1705,7 @@ static int procpathtry_maner(PROGINFO *pip,SHIO *ofp,pathtry *ptp,
 			if ((rs = uc_stat(ptp->fname,&sb)) >= 0) {
 			    if (S_ISREG(sb.st_mode)) {
 				const int	am = R_OK ;
-				if ((rs = sperm(&lip->id,&sb,am)) >= 0) {
+				if ((rs = permid(&lip->id,&sb,am)) >= 0) {
 	            		    rs = printit(pip,ofp,ptp->fname) ;
 	            		    c += 1 ;
 				} else if (isNotAccess(rs)) {
@@ -1737,7 +1737,7 @@ static int procpathtry_inc(PROGINFO *pip,SHIO *ofp,pathtry *ptp)
 	    if ((rs = uc_stat(ptp->fname,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
 		    const int	am = R_OK ;
-	            if ((rs = sperm(&lip->id,&sb,am)) >= 0) {
+	            if ((rs = permid(&lip->id,&sb,am)) >= 0) {
 	                rs = printit(pip,ofp,ptp->fname) ;
 	                c += 1 ;
 		    } else if (isNotAccess(rs)) {
@@ -1790,7 +1790,7 @@ static int procqualname(PROGINFO *pip,SHIO *ofp,cchar *fname)
 	    if ((rs >= 0) && lip->pt.e) {
 	        if (S_ISREG(sb.st_mode)) {
 		    const int	am = X_OK ;
-	            if ((rs = sperm(&lip->id,&sb,am)) >= 0) {
+	            if ((rs = permid(&lip->id,&sb,am)) >= 0) {
 	                rs = printit(pip,ofp,fname) ;
 	                c += 1 ;
 		    } else if (isNotAccess(rs)) {

@@ -146,7 +146,7 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_envfile(vecstr *,cchar *) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	isalnumlatin(int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -1464,7 +1464,7 @@ static int procsysdef(PROGINFO *pip,cchar fname[])
 	sbp = &usb ;
 	rs1 = u_stat(fname,sbp) ;
 	if (rs1 >= 0)
-	    rs1 = sperm(&pip->id,sbp,R_OK) ;
+	    rs1 = permid(&pip->id,sbp,R_OK) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))

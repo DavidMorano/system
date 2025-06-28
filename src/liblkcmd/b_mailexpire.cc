@@ -130,7 +130,7 @@ extern int	optvalue(cchar *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getuserhome(char *,int,cchar *) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -1891,7 +1891,7 @@ static int procmailbox(PROGINFO *pip,cchar *mbp,int mbl)
 	                if ((rs = mkpath3w(mbuf,hbuf,folder,mp,ml)) > 0) {
 	                    ustat	sb ;
 	                    if (u_stat(mbuf,&sb) >= 0) {
-	                        if ((rs = sperm(idp,&sb,am)) >= 0) {
+	                        if ((rs = permid(idp,&sb,am)) >= 0) {
 	                            rs = procmailboxone(pip,mup,mbuf,to) ;
 	                            c += rs ;
 	                        } else if (isNotPresent(rs))
