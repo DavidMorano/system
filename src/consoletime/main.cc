@@ -103,7 +103,7 @@ extern int	cfdecti(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	getnprocessors(cchar **,int) ;
 extern int	termconseq(char *,int,int,int,int,int,int) ;
 extern int	acceptpass(int, struct strrecvfd *,int) ;
@@ -1779,7 +1779,7 @@ static int msglogdev(IDS *idp,cchar *fname)
 	if (fname[0] == '\0') return SR_INVALID ;
 
 	if ((rs = u_stat(fname,&sb)) >= 0) {
-	    if ((rs = sperm(idp,&sb,W_OK)) >= 0) {
+	    if ((rs = permid(idp,&sb,W_OK)) >= 0) {
 	        f = f || S_ISCHR(sb.st_mode) ;
 	        f = f || S_ISFIFO(sb.st_mode) ;
 	        f = f || S_ISSOCK(sb.st_mode) ;

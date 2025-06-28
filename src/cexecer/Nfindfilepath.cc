@@ -7,7 +7,7 @@
 #define	CF_PREPENDPWD	0	/* prepend PWD when encountered ? */
 #define	CF_FILEPATH	1	/* always return a file path */
 #define	CF_FILEPATHLEN	0	/* always return a file path length */
-#define	CF_SPERM	0	/* use 'sperm()' */
+#define	CF_SPERM	0	/* use 'permid()' */
 
 
 /* revision history:
@@ -88,7 +88,7 @@
 
 /* external subroutines */
 
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	getpwd(char *,int) ;
 
@@ -408,7 +408,7 @@ int		mode ;
 	    if (S_ISREG(sb.st_mode))  {
 
 #if	CF_SPERM
-		rs = sperm(idp,&sb,mode) ;
+		rs = permid(idp,&sb,mode) ;
 #else
 		rs = perm(fname,-1,-1,NULL,mode) ;
 #endif

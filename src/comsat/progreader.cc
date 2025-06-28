@@ -105,7 +105,7 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int,int *) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	getnprocessors(const char **,int) ;
