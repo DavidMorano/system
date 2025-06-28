@@ -71,7 +71,7 @@
 #include	<getpwd.h>
 #include	<mallocxx.h>
 #include	<ids.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<strlibval.hh>
 #include	<vecstr.h>
 #include	<mkpath.h>
@@ -306,7 +306,7 @@ int getter::checkname(bool fdir,int am) noex {
 	if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
 	    cmode	pm = sb.st_mode ;
 	    if ((fdir && S_ISDIR(pm)) || ((!fdir) && S_ISREG(pm))) {
-	        if ((rs = sperm(&id,&sb,am)) >= 0) {
+	        if ((rs = permid(&id,&sb,am)) >= 0) {
 	            c = 1 ;
 	        } else if (isNotAccess(rs)) {
 		    rs = SR_OK ;

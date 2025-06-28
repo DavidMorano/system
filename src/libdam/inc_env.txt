@@ -1,0 +1,1 @@
+#include	<envstandards.h>	/* must be ordered first to configure */

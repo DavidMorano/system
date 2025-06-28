@@ -690,6 +690,7 @@ rijndael.o:		rijndael.c rijndael.h
 librandom.o:		librandom.cc librandom.h
 
 optval.o:		optval.cc optval.h
+mesg.o:			mesg.cc mesg.h
 
 bits.o:			bits.cc bits.h baops.h
 dialtab.o:		dialtab.cc dialtab.h

@@ -46,6 +46,7 @@
 #include	<hash.h>		/* |hash_elf(3dam)| */
 #include	<hashindex.h>
 #include	<nextpowtwo.h>
+#include	<permx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -124,8 +125,8 @@ struct subinfo {
 
 /* forward references */
 
-static int	holidays_dbfind(HOLIDAYS *,IDS *,char *) ;
-static int	holidays_dbfinder(HOLIDAYS *,IDS *,char *,cchar *) ;
+static int	holidays_dbfind(HOLIDAYS *,ids *,char *) ;
+static int	holidays_dbfinder(HOLIDAYS *,ids *,char *,cchar *) ;
 
 static int	subinfo_start(SUBINFO *,HOLIDAYS *) ;
 static int	subinfo_finish(SUBINFO *) ;
@@ -194,7 +195,7 @@ int holidays_open(HOLIDAYS *op,cchar *pr,int year,cchar *fname) noex {
 	op->pr = pr ;
 
 	if ((fname == NULL) || (fname[0] == '\0')) {
-	    IDS	id ;
+	    ids	id ;
 
 	    if ((ids_load(&id)) >= 0) {
 	        rs = holidays_dbfind(op,&id,tmpfname) ;
@@ -680,7 +681,7 @@ int holidays_check(HOLIDAYS *op,time_t dt)
 /* private subroutines */
 
 
-static int holidays_dbfind(HOLIDAYS *op,IDS *idp,char *tmpfname)
+static int holidays_dbfind(HOLIDAYS *op,ids *idp,char *tmpfname)
 {
 	int		rs ;
 	int		fl = 0 ;
@@ -704,9 +705,8 @@ static int holidays_dbfind(HOLIDAYS *op,IDS *idp,char *tmpfname)
 }
 /* end subroutine (holidays_dbfind) */
 
-
-static int holidays_dbfinder(HOLIDAYS *op,IDS *idp,char *tmpfname,cchar *cname)
-{
+static int holidays_dbfinder(HOLIDAYS *op,ids *idp,char *tmpfname,
+		cchar *cname) {
 	ustat	sb ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_NOENT ;
@@ -727,7 +727,7 @@ static int holidays_dbfinder(HOLIDAYS *op,IDS *idp,char *tmpfname,cchar *cname)
 	    if (rs >= 0) {
 	        rs1 = u_stat(tmpfname,&sb) ;
 	        if (rs1 >= 0)
-	            rs1 = sperm(idp,&sb,R_OK) ;
+	            rs1 = permid(idp,&sb,R_OK) ;
 	    }
 
 	    if (rs1 >= 0)

@@ -59,7 +59,7 @@
 #include	<mallocxx.h>
 #include	<getusername.h>
 #include	<getuserhome.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<char.h>
 #include	<hasx.h>
 #include	<ischarx.h>

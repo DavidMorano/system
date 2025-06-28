@@ -47,7 +47,7 @@
 #include	<vecobj.h>
 #include	<bfile.h>
 #include	<tmtime.hh>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<ctdec.h>
 #include	<char.h>
 #include	<isnot.h>
@@ -561,7 +561,7 @@ static int holidayer_yearfile(HO *op,char *hfname,uint y) noex {
 	            if ((rs = uc_stat(hfname,&sb)) >= 0) {
 	                if (isOurMode(sb.st_mode)) {
 	                    const int	am = (R_OK) ;
-	                    if ((rs = sperm(&op->id,&sb,am)) >= 0) {
+	                    if ((rs = permid(&op->id,&sb,am)) >= 0) {
 	                        len = pl ;
 	                    } else if (isNotAccess(rs)) {
 	                        rs = SR_OK ;
@@ -604,7 +604,7 @@ static int holidayer_dirok(HO *op,cchar *dn) noex {
 	    if ((rs = uc_stat(dbuf,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 	            cint	am = (R_OK|X_OK) ;
-	            if ((rs = sperm(&op->id,&sb,am)) >= 0) {
+	            if ((rs = permid(&op->id,&sb,am)) >= 0) {
 	                f = true ;
 	            }
 	        }

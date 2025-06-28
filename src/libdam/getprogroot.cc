@@ -67,7 +67,7 @@
 #include	<mkpathx.h>
 #include	<mkpathxw.h>
 #include	<mkpr.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -331,7 +331,7 @@ static int subinfo_dirstat(SI *sip,USTAT *sbp,cc *d,int dlen) noex {
 	    if ((rs = u_stat(dnp,sbp)) >= 0) {
 	        rs = SR_NOTFOUND ;
 	        if (S_ISDIR(sbp->st_mode))
-	            rs = sperm(&sip->id,sbp,X_OK) ;
+	            rs = permid(&sip->id,sbp,X_OK) ;
 	    }
 	    rs1 = ns.finish ;
 	    if (rs >= 0) rs = rs1 ;
@@ -358,7 +358,7 @@ static int subinfo_xfile(SI *sip,cc *name) noex {
 	if (USTAT sb ; (rs = u_stat(name,&sb)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode)) {
-	        rs = sperm(&sip->id,&sb,X_OK) ;
+	        rs = permid(&sip->id,&sb,X_OK) ;
 	    }
 	}
 	return rs ;
