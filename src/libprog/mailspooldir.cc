@@ -1,5 +1,5 @@
 /* mailspooldir SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* check for a valid mail spool directory */
@@ -65,7 +65,7 @@
 #include	<sfx.h>
 #include	<mkpathx.h>
 #include	<strwcpy.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<localmisc.h>
 
 #include	"proginfo.hh"
