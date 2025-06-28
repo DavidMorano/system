@@ -1,5 +1,5 @@
 /* nss_parse SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* Name-Server-Switch (NSS) database parsing support */
@@ -51,6 +51,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 /* modification by David A-D- Morano */

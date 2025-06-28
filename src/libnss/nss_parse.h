@@ -1,5 +1,5 @@
 /* nss_parse HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* Name-Server-Switch (NSS) database parsing support */
@@ -44,6 +44,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<strx.h>
 
 #ifdef	COMMENT /* modification by David A-D- Morano */
 #include <sys/socket.h>

@@ -620,7 +620,7 @@ const char	pr[] ;
 const char	stampfname[] ;
 int		mintime ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	bfile	tsfile ;
 

@@ -816,7 +816,7 @@ static int pcsconf_getpcsids(PCSCONF *op)
 	int		rs = SR_OK ;
 
 	if (op->uid_pcs < 0) {
-	    struct ustat	sb ;
+	    ustat	sb ;
 	    if ((rs = u_stat(op->pr,&sb)) >= 0) {
 		op->uid_pcs = sb.st_uid ;
 		op->gid_pcs = sb.st_gid ;

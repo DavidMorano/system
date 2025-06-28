@@ -274,7 +274,7 @@ int config_reader(CONFIG *cfp,char *pbuf,char *ebuf,char *tbuf)
 	    cchar	*kp, *vp ;
 
 	    while (rs >= 0) {
-	        kl = paramfile_enum(pfp,&cur,&pe,pbuf,PBUFLEN) ;
+	        kl = paramfile_curenum(pfp,&cur,&pe,pbuf,PBUFLEN) ;
 	        if (kl == SR_NOTFOUND) break ;
 	        rs = kl ;
 	        if (rs < 0) break ;
