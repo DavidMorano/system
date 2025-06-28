@@ -63,7 +63,7 @@
 #include	<mkpathx.h>
 #include	<mkx.h>			/* |mksofname(3uc)| */
 #include	<mkpr.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<strx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -669,7 +669,7 @@ int subinfo::sochecklib(dirseen *dsp,cchar *ldname,int dlm) noex {
 	                if (USTAT sb ; (rs = u_stat(ldnp,&sb)) >= 0) {
 	                    if (S_ISDIR(sb.st_mode)) {
 			        ids	*idp = &id ;
-			        if ((rs = sperm(idp,&sb,am)) >= 0) {
+			        if ((rs = permid(idp,&sb,am)) >= 0) {
 		   	            rs = sockliber(dsp,ldnp,dlm) ;
 			        } else if (isNotPresent(rs)) {
 	    		            rs = dirseen_add(dsp,ldnp,-1,&sb) ;
@@ -706,7 +706,7 @@ int subinfo::sockliber(dirseen *dsp,cchar *ldnp,int dlm) noex {
 	        if ((rs = mksofname(tbuf,ldnp,mfn,exts[j])) >= 0) {
 	            if (USTAT sb ; (rs = u_stat(tbuf,&sb)) >= 0) {
 		        if (S_ISREG(sb.st_mode)) {
-			    if ((rs = sperm(idp,&sb,am)) >= 0) {
+			    if ((rs = permid(idp,&sb,am)) >= 0) {
 			        cnullptr	np{} ;
 				void		*sop ;
 			        if ((sop = dlopen(tbuf,dlm)) != np) {
@@ -722,7 +722,7 @@ int subinfo::sockliber(dirseen *dsp,cchar *ldnp,int dlm) noex {
 			        } /* end if (dlopen) */
 			    } else if (isNotPresent(rs)) {
 			        rs = SR_OK ;
-			    } /* end if (sperm) */
+			    } /* end if (permid) */
 		        } /* end if (regular file) */
 		    } else if (isNotPresent(rs)) {
 		        rs = SR_OK ;

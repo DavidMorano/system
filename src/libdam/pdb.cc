@@ -58,12 +58,13 @@
 #include	<vecstr.h>
 #include	<mkpathx.h>
 #include	<sncpyx.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"pdb.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -171,10 +172,10 @@ int pdb_open(pdb *op,cchar *pr,cchar *ur,cchar *uname,cchar *fname) noex {
 		static cint	rsv = var.mkvars() ;
 		if ((rs = rsv) >= 0) {
 	            int		sz = 0 ;
-	            sz += (strlen(pr)+1) ;
-	            sz += (strlen(ur)+1) ;
-	            sz += (strlen(uname)+1) ;
-	            sz += (strlen(fname)+1) ;
+	            sz += (lenstr(pr)+1) ;
+	            sz += (lenstr(ur)+1) ;
+	            sz += (lenstr(uname)+1) ;
+	            sz += (lenstr(fname)+1) ;
 	            if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	                op->a = bp ;
 	                op->pr = bp ;
@@ -311,10 +312,10 @@ static int pdb_dbopen(pdb *op,int w) noex {
 	int		rs = SR_OK ;
 	if (op->dt == 0) op->dt = getustime ;
 	if (! dbp->f_open) {
-	    cint	intfind = (op->dt - dbp->ti_find) ;
+	    cint	intfind = intsat(op->dt - dbp->ti_find) ;
 	    /* do not try to open if already tried */
 	    if (intfind >= PDB_TOFIND) {
-	        if (char *dbuf{} ; (rs = malloc_mp(&dbuf)) >= 0) {
+	        if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
 	            dbp->ti_find = op->dt ;
 	            /* try to open the DB file */
 	            dbuf[0] = '\0' ;

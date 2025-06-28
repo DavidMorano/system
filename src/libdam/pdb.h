@@ -58,7 +58,7 @@ struct pdb_head {
 	cchar		*fname ;
 	PDB_DB		dbs[pdb_overlast] ;
 	time_t		dt ;
-	unsigned long	magic ;
+	uint		magic ;
 } ;
 
 typedef	PDB		pdb ;
