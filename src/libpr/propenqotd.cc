@@ -1,5 +1,5 @@
 /* propenqotd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* open a channel (file-descriptor) to the quote-of-the-day (QOTD) */
@@ -1082,7 +1082,7 @@ static int subinfo_addprbin(SI *sip,vecstr *plp,cchar *pr,
 	    if ((rs = u_stat(tbuf,&sb)) >= 0) {
 		if (S_ISDIR(sb.st_mode)) {
 		    cint	am = (R_OK|X_OK) ;
-		    if ((rs = sperm(&sip->id,&sb,am)) >= 0) {
+		    if ((rs = permid(&sip->id,&sb,am)) >= 0) {
 			rs = vecstr_adduniq(plp,tbuf,tl) ;
 			if (rs < INT_MAX) c += 1 ;
 		    } else if (isNotPresent(rs)) {
