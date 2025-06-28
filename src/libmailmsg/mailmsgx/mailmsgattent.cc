@@ -44,7 +44,7 @@
 #include	<contentencodings.h>
 #include	<ismmclass.h>
 #include	<stdfnames.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<mktmp.h>
 #include	<sfx.h>
 #include	<six.h>
