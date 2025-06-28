@@ -36,12 +36,12 @@ DEFS +=
 INCS += libu.h
 
 MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm 
-MODS += libutil.ccm
-MODS += xxtostr.ccm digtab.ccm
+MODS += libutil.ccm chrset.ccm
+MODS += digtab.ccm xxtostr.ccm 
 MODS += usysconf.ccm ulibvals.ccm
 MODS += usigset.o usigblock.ccm umisc.ccm
 MODS += unixfnames.ccm constdiv.ccm builtin.ccm
-MODS += usysbasic.ccm ureserve.cmm
+MODS += usysbasic.ccm ureserve.cmm vecbool.ccm
 
 LIBS += -liconv -lproc
 
@@ -73,28 +73,33 @@ OBJ03= umods.o  usysflag.o
 
 OBJ04= utimeout.o utimeouts.o 
 OBJ05= ulogerror.o strtox.o 
-OBJ06= usupport.o 
+OBJ06= usupport.o umisc.o
 OBJ07= umemalloc.o uobjlock.o
 
-OBJ08= usys.o usyscallbase.o
+OBJ08= usys.o usyscallbase.o usysutility.o 
 OBJ09= uregfork.o uatfork.o ufdlock.o 
 OBJ10= usig.o uexec.o uipc.o 
-OBJ11= usysutility.o ustr.o
+OBJ11= ustr.o
 
 OBJ12= usysdata.o usysauxinfo.o 
 OBJ13= ufileop.o ufiledesc.o 
 OBJ14= um.o uprocess.o
-OBJ15= usysop.o 
+OBJ15= usysop.o vecbool.o
 
 OBJ16= syswords.o varnames.o
 OBJ17= ptx.o uacceptpass.o 
 OBJ18= timeval.o itimerval.o
 OBJ19= timespec.o itimerspec.o
 
-OBJ20= uinet.o umisc.o ureserve.o
-OBJ21= strnul.o intx.o 
+OBJ20= uinet.o ureserve.o
+OBJ21= strnul.o intx.o chrset.o
 OBJ22= ugetloadavg.o uiconv.o
 OBJ23= syscontain.o stdfnames.o
+
+OBJ24= posixdirent.o
+OBJ25= fonce.o filerec.o
+OBJ26=
+OBJ27=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -102,8 +107,9 @@ OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
+OBJG= obj24.o obj25.o
 
-OBJ= obja.o objb.o objc.o objd.o obje.o objf.o
+OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -246,6 +252,18 @@ obj22.o:		$(OBJ22)
 obj23.o:		$(OBJ23)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ23)
 
+obj24.o:		$(OBJ24)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ24)
+
+obj25.o:		$(OBJ25)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ25)
+
+obj26.o:		$(OBJ26)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ26)
+
+obj27.o:		$(OBJ27)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ27)
+
 
 obja.o:			$(OBJA)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
@@ -264,6 +282,9 @@ obje.o:			$(OBJE)
 
 objf.o:			$(OBJF)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJF)
+
+objg.o:			$(OBJG)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJG)
 
 
 # SUPPORT
@@ -359,6 +380,23 @@ usupport.o:		usupport.dir
 usupport.dir:
 	makesubdir $@
 
+# VECBOOL
+vecbool.o:		vecbool.dir
+vecbool.dir:
+	makesubdir $@
+
+# FONCE
+fonce.o:		fonce.dir
+fonce.dir:
+	makesubdir $@
+
+# FILEREC
+filerec.o:		filerec.dir
+filerec.dir:
+	makesubdir $@
+
+chrset.o:		chrset.ccm
+
 # OTHER
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
 um.o:			um.cc um.h			$(INCS)
@@ -382,5 +420,8 @@ xxtostr.o:		xxtostr.ccm xxtostr.h		$(INCS)
 strnul.o:		strnul.cc strnul.hh		$(INCS)
 mailvalues.o:		mailvalues.cc mailvalues.hh	$(INCS)
 stdfnames.o:		stdfnames.c stdfnames.h		$(INCS)
+
+posixdirent.o:		posixdirent.cc posixdirent.hh	$(INCS)
+baops.o:		baops.c baops.h			$(INCS)
 
 
