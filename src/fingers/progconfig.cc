@@ -423,7 +423,7 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 	if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
 
 	    while (rs >= 0) {
-		kl = paramfile_enum(pfp,&cur,&pe,pbuf,plen) ;
+		kl = paramfile_curenum(pfp,&cur,&pe,pbuf,plen) ;
 	            if (kl == SR_NOTFOUND) break ;
 	            rs = kl ;
 	            if (rs < 0) break ;

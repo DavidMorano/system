@@ -171,8 +171,8 @@ extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_envget(vecstr *,cchar *,cchar **) ;
 extern int	vecstr_loadfile(vecstr *,int,cchar *) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	xfile(IDS *,cchar *) ;
 extern int	getnodename(char *,int) ;
@@ -3061,7 +3061,7 @@ static int loaddefsfile(PROGINFO *pip,cchar *dfname)
 	}
 
 	if (rs1 >= 0) {
-	    if ((rs1 = sperm(&pip->id,&sb,R_OK)) >= 0) {
+	    if ((rs1 = permid(&pip->id,&sb,R_OK)) >= 0) {
 	        if (pip->debuglevel > 0) {
 	            cchar	*pn = pip->progname ;
 	            bprintf(pip->efp,"%s: def=%s\n",pn,dfname) ;
@@ -3135,11 +3135,11 @@ static int loadxfile(PROGINFO *pip,cchar xfname[])
 	    rs1 = SR_NOENT ;
 
 	if (rs1 >= 0)
-	    rs1 = sperm(&pip->id,&sb,R_OK) ;
+	    rs1 = permid(&pip->id,&sb,R_OK) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("envset/loadxfile: sperm() rs=%d\n",rs1) ;
+	    debugprintf("envset/loadxfile: permid() rs=%d\n",rs1) ;
 #endif
 
 	f = (rs1 >= 0) ;

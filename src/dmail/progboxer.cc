@@ -104,7 +104,7 @@
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	pathadd(char *,int,cchar *) ;
-extern int	sperm(IDS *,USTAT *,int) ;
+extern int	permid(IDS *,USTAT *,int) ;
 extern int	isOneOf(const int *,int) ;
 
 extern int	locinfo_mboxget(LOCINFO *,int,cchar **) ;

@@ -99,7 +99,7 @@ extern int	optvalue(const char *,int) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,void *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	findfilepath(const char *,char *,const char *,int) ;
 extern int	getprogpath(IDS *,VECSTR *,char *,const char *,int) ;
 extern int	vecstr_adduniq(VECSTR *,const char *,int) ;

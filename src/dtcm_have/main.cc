@@ -119,7 +119,7 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecti(const char *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	issamehostname(const char *,const char *,const char *) ;
 extern int	isdigitlatin(int) ;
 
@@ -1062,7 +1062,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	                rs1 = SR_NOENT ;
 	                if (! S_ISDIR(sb.st_mode))
-	                    rs1 = sperm(&pip->id,&sb,R_OK) ;
+	                    rs1 = permid(&pip->id,&sb,R_OK) ;
 
 	            }
 
