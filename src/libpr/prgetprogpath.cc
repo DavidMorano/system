@@ -1,5 +1,5 @@
 /* prgetprogpath SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the path to a program that is used within the PCS system */
@@ -67,7 +67,8 @@
 #include	<pathadd.h>
 #include	<storebuf.h>
 #include	<strn.h>
-#include	<xperm.h>
+#include	<strx.h>
+#include	<permx.h>
 #include	<isoneof.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -276,7 +277,7 @@ static int subinfo_tryother(subinfo *sip,char *rbuf,cchar *sp,int sl) noex {
 	if (path) {
 	    cchar	*pp = path ;
 	    cchar	*tp ;
-	    while (((tp = strpbrk(pp,":;")) != nullptr) && (rl == 0)) {
+	    while (((tp = strbrk(pp,":;")) != nullptr) && (rl == 0)) {
 	        rs = subinfo_tryothercheck(sip,pp,(tp - pp),rbuf,sp,sl) ;
 	        rl = rs ;
 	        pp = (tp + 1) ;
@@ -323,7 +324,7 @@ static int subinfo_xfile(subinfo *sip,cchar *name) noex {
 	if ((rs = u_stat(name,&sb)) >= 0) {
 	    rs = SR_NOENT ;
 	    if (S_ISREG(sb.st_mode)) {
-	        rs = sperm(&sip->id,&sb,X_OK) ;
+	        rs = permid(&sip->id,&sb,X_OK) ;
 	    }
 	}
 	return rs ;

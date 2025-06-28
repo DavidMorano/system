@@ -1,5 +1,5 @@
 /* prgetclustername SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a cluster name given a nodename */
@@ -98,7 +98,7 @@
 #include	<sncpyx.h>
 #include	<mkpathx.h>
 #include	<ids.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
