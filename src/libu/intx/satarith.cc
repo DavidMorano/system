@@ -1,5 +1,5 @@
 /* satarith SUPPORT (Integer-Saturation) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* perform a variety of integer saturation addition-subtractions */
