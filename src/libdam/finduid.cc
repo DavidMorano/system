@@ -60,6 +60,7 @@
 
 #include	"finduid.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -270,14 +271,14 @@ int finduid_check(finduid *op,time_t dt) noex {
 }
 /* end subroutine (finduid_check) */
 
-int finduid_stats(finduid *op,finduid_st *sp) noex {
+int finduid_getstats(finduid *op,finduid_st *sp) noex {
 	int		rs ;
 	if ((rs = finduid_magic(op,sp)) >= 0) {
 	    *sp = op->s ;
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (finduid_stats) */
+/* end subroutine (finduid_getstats) */
 
 
 /* private subroutines */

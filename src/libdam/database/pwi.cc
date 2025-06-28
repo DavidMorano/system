@@ -73,7 +73,7 @@
 #include	<spawnproc.h>
 #include	<getnodename.h>
 #include	<prgetclustername.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<char.h>
 #include	<hasx.h>
 #include	<isnot.h>

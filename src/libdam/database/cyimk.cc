@@ -358,7 +358,7 @@ static int cyimk_idbegin(CYIMK *op,cchar *dname,int year) noex {
 	    op->gid = sb.st_gid ;
 	    op->uid = sb.st_uid ;
 	    if (ids id ; (rs = ids_load(&id)) >= 0) {
-	        if ((rs = sperm(&id,&sb,am)) >= 0) {
+	        if ((rs = permid(&id,&sb,am)) >= 0) {
 	            char	ydname[MAXPATHLEN+1] ;
 	            if ((rs = mkydname(ydname,dname,year)) >= 0) {
 		        if ((rs = cyimk_idxdir(op,&id,ydname)) >= 0) {
@@ -368,7 +368,7 @@ static int cyimk_idbegin(CYIMK *op,cchar *dname,int year) noex {
 	                    }
 		        } /* end if (cyimk_idxdir) */
 	            } /* end if (mkydname) */
-		} /* end if (sperm) */
+		} /* end if (permid) */
 		ids_release(&id) ;
 	    } /* end if (ids) */
 	} /* end if */
@@ -387,14 +387,14 @@ static int cyimk_idxdir(CYIMK *op,IDS *idp,cchar *ydname)
 	    cint	am = (W_OK|X_OK) ;
 	    uid_t	uid_yd = sb.st_uid ;
 	    gid_t	gid_yd = sb.st_gid ;
-	    if ((rs = sperm(idp,&sb,am)) >= 0) {
+	    if ((rs = permid(idp,&sb,am)) >= 0) {
 		uid_t	uid = geteuid() ;
 		if (uid == uid_yd) {
 		    if ((uid_yd != op->uid) || (gid_yd != op->gid)) {
 			rs = cyimk_minown(op,ydname,dm) ;
 		    }
 		}
-	    } /* end if (sperm) */
+	    } /* end if (permid) */
 	} else if (rs == nrs) {
 	    if ((rs = mkdirs(ydname,dm)) >= 0) {
 		rs = cyimk_minown(op,ydname,dm) ;

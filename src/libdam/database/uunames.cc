@@ -48,7 +48,7 @@
 #include	<sbuf.h>
 #include	<ids.h>
 #include	<mkdirs.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<ascii.h>
 #include	<baops.h>
 #include	<sbuf.h>

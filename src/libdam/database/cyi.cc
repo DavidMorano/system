@@ -62,7 +62,7 @@
 #include	<snx.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<char.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -431,7 +431,7 @@ static int cyi_dbfindname(cyi *op,ids *idp,time_t dt,char *tbuf,
 		        if ((rs = mkpath2(tbuf,ydname,cbuf)) >= 0) {
 			    if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 			        cint	am = (R_OK) ;
-			        if ((rs = sperm(idp,&sb,am)) >= 0) {
+			        if ((rs = permid(idp,&sb,am)) >= 0) {
 	                            tl = rs ;
 	                            rs = cyi_dbfindone(op,dt,cal,tbuf) ;
 			        }

@@ -68,7 +68,7 @@ extern int finduid_start(finduid *,int,int) noex ;
 extern int finduid_lookup(finduid *,char *,int,uid_t) noex ;
 extern int finduid_invalidate(finduid *,cchar *) noex ;
 extern int finduid_check(finduid *,time_t) noex ;
-extern int finduid_stats(finduid *,finduid_st *) noex ;
+extern int finduid_getstats(finduid *,finduid_st *) noex ;
 extern int finduid_finish(finduid *) noex ;
 
 EXTERNC_end
