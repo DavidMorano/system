@@ -135,7 +135,7 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	msleep(int) ;
 extern int	findfilepath(cchar *,char *,cchar *,int) ;
-extern int	sperm(IDS *,USTAT *,int) ;
+extern int	permid(IDS *,USTAT *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecpstr_adduniq(vecpstr *,cchar *,int) ;
@@ -1657,7 +1657,7 @@ static int procfile(PROGINFO *pip,DISP *dop,cchar *fname)
 	if (fname[0] != '-') {
 	    USTAT	sb ;
 	    if ((rs = u_stat(fname,&sb)) >= 0) {
-	        if ((rs = sperm(&lip->id,&sb,R_OK)) >= 0) {
+	        if ((rs = permid(&lip->id,&sb,R_OK)) >= 0) {
 	            rs = disp_addwork(dop,fname,-1) ;
 	        } else if (isNotAccess(rs)) {
 	            rs = SR_OK ;

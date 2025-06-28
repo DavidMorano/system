@@ -185,7 +185,7 @@ extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,mode_t) ;
 extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	sperm(IDS *,USTAT *,int) ;
+extern int	permid(IDS *,USTAT *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	rmdirfiles(cchar *,cchar *,int) ;
@@ -2584,7 +2584,7 @@ static int procmntcheck(PROGINFO *pip)
 	    cchar	*fmt ;
 	    if ((rs = u_stat(lip->mntfname,&usb)) >= 0) {
 	        if (S_ISREG(usb.st_mode)) {
-	            rs = sperm(&pip->id,&usb,W_OK) ;
+	            rs = permid(&pip->id,&usb,W_OK) ;
 	        } else {
 	            rs = SR_BUSY ;
 	        }
@@ -3209,7 +3209,7 @@ static int procpage_begin(PROGINFO *pip,char *dbuf)
 	                            "u_rename() rs=%d\n",rs) ;
 #endif
 	                }
-	            } else if ((rs = sperm(&pip->id,&sb,am)) == SR_ACCESS) {
+	            } else if ((rs = permid(&pip->id,&sb,am)) == SR_ACCESS) {
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
 	                    debugprintf("procpage_begin: ACCESS\n") ;

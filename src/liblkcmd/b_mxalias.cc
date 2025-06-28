@@ -98,7 +98,7 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecui(cchar *,int,uint *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	haswhite(cchar *,int) ;
 extern int	isalphalatin(int) ;
 extern int	isdigitlatin(int) ;

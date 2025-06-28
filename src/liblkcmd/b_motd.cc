@@ -246,7 +246,7 @@ extern int	mkgecosname(char *,int,cchar *) ;
 extern int	termwritable(cchar *) ;
 extern int	acceptpass(int,struct strrecvfd *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
@@ -1730,7 +1730,7 @@ static int procmntcheck(PROGINFO *pip)
 	cchar		*fmt ;
 	if ((rs = u_stat(lip->mntfname,&usb)) >= 0) {
 	    if (S_ISREG(usb.st_mode)) {
-	        rs = sperm(&pip->id,&usb,W_OK) ;
+	        rs = permid(&pip->id,&usb,W_OK) ;
 	    } else
 	        rs = SR_BUSY ;
 	    if (rs < 0) {
