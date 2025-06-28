@@ -75,7 +75,7 @@ extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecti(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	mkpr(char *,int,const char *,const char *) ;
@@ -984,7 +984,7 @@ int		dlen ;
 
 	if ((rs1 >= 0) && S_ISDIR(sb.st_mode)) {
 
-	    rs1 = sperm(&sip->id,&sb,(R_OK | X_OK)) ;
+	    rs1 = permid(&sip->id,&sb,(R_OK | X_OK)) ;
 	    f = (rs1 >= 0) ;
 
 	} /* end if */
