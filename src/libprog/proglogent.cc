@@ -1,5 +1,5 @@
 /* proglogent SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* check a file name */
@@ -144,7 +144,7 @@ int proglogent(proginfo *pip,cchar *name,int logsize) noex {
 	    rs = checkstar(pip,fname,logsize) ;
 
 	} else {
-	    struct ustat	sb ;
+	    ustat	sb ;
 
 	    if ((rs1 = u_stat(fname,&sb)) >= 0) {
 

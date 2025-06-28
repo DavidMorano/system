@@ -1,5 +1,5 @@
 /* proginfo_setpiv SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* utility for KSH built-in commands */
@@ -235,7 +235,7 @@ static int dircheck(ids *idp,cchar *dname) noex {
 	if ((rs = u_stat(dname,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        cint	am = (R_OK|X_OK) ;
-	        rs = sperm(idp,&sb,am) ;
+	        rs = permid(idp,&sb,am) ;
 	    } else {
 	        rs = SR_NOTDIR ;
 	    }

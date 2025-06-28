@@ -1,5 +1,5 @@
 /* proglogout SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* process the service names given us */
