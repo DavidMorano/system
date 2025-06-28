@@ -60,7 +60,7 @@ struct motd_head {
 	MOTD_MR		mapper ;
 	ptm		*mxp ;		/* this is for all of the data */
 	finduid		*ufp ;
-	cchar		**envv ;
+	mainv		envv ;
 	cchar		*pr ;
 	cchar		*fe ;		/* file-ending */
 	time_t		ti_lastcheck ;
@@ -79,8 +79,8 @@ EXTERNC_begin
 
 extern int	motd_open(motd *,cchar *) noex ;
 extern int	motd_check(motd *,time_t) noex ;
-extern int	motd_process(motd *,cchar *,cchar **,int) noex ;
-extern int	motd_processid(motd *,motd_id *,cchar **,int) noex ;
+extern int	motd_process(motd *,cchar *,mainv,int) noex ;
+extern int	motd_processid(motd *,motd_id *,mainv,int) noex ;
 extern int	motd_close(motd *) noex ;
 
 extern int	motdid_load(motd_id *,cchar *,cchar *,uid_t,gid_t) noex ;

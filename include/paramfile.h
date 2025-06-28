@@ -52,7 +52,7 @@ struct paramfile_flags {
 } ;
 
 struct paramfile_head {
-	cchar		**envv ;	/* program startup environment */
+	mainv		envv ;		/* program startup environment */
 	cchar		*a ;		/* memory allocation */
 	char		*lbuf ;
 	char		*fbuf ;
@@ -61,7 +61,7 @@ struct paramfile_head {
 	varsub		*defp ;		/* defines */
 	varsub		*envp ;		/* environment-variables */
 	time_t		ti_check ;	/* time last checked */
-	PARAMFILE_FL	f ;
+	PARAMFILE_FL	fl ;
 	uint		magic ;
 	int		llen ;
 	int		flen ;
@@ -88,14 +88,14 @@ typedef PARAMFILE_ENT		paramfile_ent ;
 
 EXTERNC_begin
 
-extern int paramfile_open(paramfile *,cchar **,cchar *) noex ;
+extern int paramfile_open(paramfile *,mainv,cchar *) noex ;
 extern int paramfile_fileadd(paramfile *,cchar *) noex ;
 extern int paramfile_setdefines(paramfile *,vecstr *) noex ;
 extern int paramfile_curbegin(paramfile *,paramfile_cur *) noex ;
 extern int paramfile_curend(paramfile *,paramfile_cur *) noex ;
 extern int paramfile_fetch(paramfile *,cchar *,paramfile_cur *,
 		char *,int) noex ;
-extern int paramfile_enum(paramfile *,paramfile_cur *,paramfile_ent *,
+extern int paramfile_curenum(paramfile *,paramfile_cur *,paramfile_ent *,
 		char *,int) noex ;
 extern int paramfile_checkint(paramfile *,int) noex ;
 extern int paramfile_check(paramfile *,time_t) noex ;

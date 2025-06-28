@@ -310,7 +310,7 @@
 #include	<willaddover.h>
 #include	<xclustername.h>
 #include	<xfile.h>
-#include	<xperm.h>
+#include	<permx.h>
 
 #endif /* LIBUC_INCLUDE */
 
