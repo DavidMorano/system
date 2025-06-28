@@ -196,7 +196,7 @@
 extern int	strkeycmp(cchar *,cchar *) ;
 extern int	vstrkeycmp(cchar **,cchar **) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	sperm(IDS *,USTAT	 *,int) ;
+extern int	permid(IDS *,USTAT	 *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	getnodename(char *,int) ;
@@ -542,7 +542,7 @@ int dialcprog(cchar *pr,cchar *node,cchar *fname,mainv av,mainv ev,
 	                rs1 = SR_ISDIR ;
 
 	            if (rs1 >= 0)
-	                rs1 = sperm(&id,&sb,R_OK) ;
+	                rs1 = permid(&id,&sb,R_OK) ;
 
 #endif /* COMMENT */
 

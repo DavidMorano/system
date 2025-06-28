@@ -1522,7 +1522,7 @@ static int subinfo_checkdname(SUBINFO *sip,cchar *dname) noex {
 	    if ((rs = uc_stat(dname,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 	            if ((rs = subinfo_ids(sip)) >= 0) {
-	                rs = sperm(&sip->id,&sb,W_OK) ;
+	                rs = permid(&sip->id,&sb,W_OK) ;
 		    }
 		} else {
 	            rs = SR_NOTDIR ;
@@ -1542,7 +1542,7 @@ static int subinfo_regacc(SUBINFO *sip,cchar *fn,int am) noex {
 	if (USTAT sb ; (rs = u_stat(fn,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
 	        if ((rs = subinfo_ids(sip)) >= 0) {
-	            if ((rs = sperm(&sip->id,&sb,am)) >= 0) {
+	            if ((rs = permid(&sip->id,&sb,am)) >= 0) {
 		        f = TRUE ;
 	            } else if (isNotAccess(rs)) {
 		        rs = SR_OK ;

@@ -61,7 +61,7 @@
 #include	<sbuf.h>
 #include	<vecstr.h>
 #include	<outbuf.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<vstrkeycmpx.h>
 #include	<localmisc.h>
 

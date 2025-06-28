@@ -950,7 +950,7 @@ static int bibleqs_dirok(BIBLEQS *op,DIRSEEN *dsp,IDS *idp,
 	    if ((rs = uc_stat(dp,&sb)) >= 0) {
 		if ((rs = dirseen_havedevino(dsp,&sb)) == rsn) {
 		    cint	am = (W_OK|R_OK|X_OK) ;
-		    if ((rs = sperm(idp,&sb,am)) >= 0) {
+		    if ((rs = permid(idp,&sb,am)) >= 0) {
 			f_ok = TRUE ;
 		    } else if (isNotPresent(rs)) {
 			rs = dirseen_add(dsp,dp,dl,&sb) ;
@@ -2481,7 +2481,7 @@ int		minwlen ;
 	        rs = SR_ISDIR ;
 
 	    if (rs >= 0)
-	        rs = sperm(&id,&sb,R_OK) ;
+	        rs = permid(&id,&sb,R_OK) ;
 
 #if	CF_DEBUGS
 	    debugprintf("bibleqs/eigenfind: fname=%s rs=%d\n",
