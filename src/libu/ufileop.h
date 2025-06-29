@@ -1,5 +1,5 @@
 /* ufileop HEADER (UNIX® file operations) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -43,7 +43,8 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usupport.h>
+
+#include	<urmdirs.h>
 
 
 #ifdef	__cplusplus

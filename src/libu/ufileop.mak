@@ -35,6 +35,8 @@ DEFS +=
 
 INCS += ufileop.h
 
+MODS += libutil.ccm
+
 LIBS +=
 
 
@@ -44,7 +46,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,11 +58,12 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 OBJA_UFILEOP= ufileopbase.o ufiler.o
 OBJB_UFILEOP= uutime.o uutimes.o
+OBJC_UFILEOP= urmdirs.o
 
-OBJ_UFILEOP= obja_ufileop.o objb_ufileop.o
+OBJ_UFILEOP= obja_ufileop.o objb_ufileop.o objc_ufileop.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -87,17 +89,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_UFILEOP)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UFILEOP)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -109,16 +109,20 @@ control:
 	(uname -n ; date) > Control
 
 
-obja_ufileop.o:	$(OBJA_UFILEOP)
+obja_ufileop.o:		$(OBJA_UFILEOP)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_UFILEOP)
 
-objb_ufileop.o:	$(OBJB_UFILEOP)
+objb_ufileop.o:		$(OBJB_UFILEOP)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_UFILEOP)
 
+objc_ufileop.o:		$(OBJC_UFILEOP)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_UFILEOP)
 
-ufileopbase.o:		ufileopbase.cc	$(INCS)
-ufiler.o:		ufiler.cc	$(INCS)
-uutime.o:		uutime.cc 	$(INCS)
-uutimes.o:		uutimes.cc 	$(INCS)
+
+ufileopbase.o:		ufileopbase.cc			$(INCS)
+ufiler.o:		ufiler.cc			$(INCS)
+uutime.o:		uutime.cc 			$(INCS)
+uutimes.o:		uutimes.cc 			$(INCS)
+urmdirs.o:		urmdirs.cc urmdirs.h		$(INCS)
 
 
