@@ -39,6 +39,9 @@ enum ptmmems {
 	ptmmem_lockbegin,
 	ptmmem_lockend,
 	ptmmem_overlast
+} ; /* end enum (ptmmems) */
+struct ptm_fl {
+    	uint		open:1 ;
 } ;
 struct ptm ;
 struct ptm_creater {
@@ -70,6 +73,7 @@ struct ptm : pthread_mutex_t {
 	ptm_co		destroy ;
 	ptm_co		lockbegin ;
 	ptm_co		lockend ;
+	ptm_fl		fl{} ;
 	constexpr ptm() noex {
 	    create(this,ptmmem_create) ;
 	    destroy(this,ptmmem_destroy) ;
@@ -80,7 +84,7 @@ struct ptm : pthread_mutex_t {
 	ptm &operator = (const ptm &) = delete ;
 	void dtor() noex ;
 	destruct ptm() {
-	    dtor() ;
+	    if (fl.open) dtor() ;
 	} ; /* end dtor (ptm) */
 } ; /* end class (ptm) */
 #else

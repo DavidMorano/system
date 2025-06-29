@@ -26,17 +26,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<pthread.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<usupport.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>
 
 #include	"ptm.h"
@@ -68,7 +68,7 @@ namespace {
 	int locktry(ptm *) noex ;
 	int operator () (ptm *) noex ;
     } ; /* end struct (ucptm) */
-}
+} /* end namespace */
 
 
 /* local variables */
@@ -80,9 +80,15 @@ namespace {
 /* exported subroutines */
 
 int ptm_create(ptm *op,ptma *ap) noex {
-	ucptm		pmo(ap) ;
-	pmo.m = &ucptm::create ;
-	return pmo(op) ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    ucptm	pmo(ap) ;
+	    pmo.m = &ucptm::create ;
+	    if ((rs = pmo(op)) >= 0) {
+		op->fl.open = true ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (ptm_create) */
 
@@ -92,6 +98,7 @@ int ptm_destroy(ptm *op) noex {
 	    if ((rs = pthread_mutex_destroy(op)) > 0) {
 	        rs = (- rs) ;
 	    }
+	    op->fl.open = false ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -120,28 +127,40 @@ int ptm_getprioceiling(ptm *op,int *oldp) noex {
 /* end subroutine (ptm_getprioceiling) */
 
 int ptm_lockbegin(ptm *op) noex {
-	ucptm		pmo ;
-	pmo.m = &ucptm::lock ;
-	return pmo(op) ;
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    ucptm	pmo ;
+	    pmo.m = &ucptm::lock ;
+	    rs = pmo(op) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (ptm_lockbegin) */
 
 int ptm_lockbeginto(ptm *op,int to) noex {
-	ucptm		pmo ;
-	if (to >= 0) {
-	    pmo.mto = int((to * 1000) & INT_MAX) ;
-	    pmo.m = &ucptm::locktry ;
-	} else {
-	    pmo.m = &ucptm::lock ;
-	}
-	return pmo(op) ;
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    ucptm	pmo ;
+	    if (to >= 0) {
+	        pmo.mto = int((to * 1000) & INT_MAX) ;
+	        pmo.m = &ucptm::locktry ;
+	    } else {
+	        pmo.m = &ucptm::lock ;
+	    }
+	    rs = pmo(op) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (ptm_lockbeginto) */
 
 int ptm_lockbegintry(ptm *op) noex {
-	ucptm		pmo ;
-	pmo.m = &ucptm::locktry ;
-	return pmo(op) ;
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    ucptm	pmo ;
+	    pmo.m = &ucptm::locktry ;
+	    rs = pmo(op) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (ptm_lockbegintry) */
 
@@ -160,44 +179,39 @@ int ptm_lockend(ptm *op) noex {
 /* local subroutines */
 
 int ucptm::operator () (ptm *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    int		to_nomem = utimeout[uto_nomem] ;
-	    int		to_again = utimeout[uto_again] ;
-	    bool	f_exit = false ;
-	    repeat {
-	        if ((rs = (this->*m)(op)) < 0) {
-		    switch (rs) {
-	            case SR_NOMEM:
-	                if (to_nomem-- > 0) {
-		            msleep(1000) ;
-		        } else {
-	                    f_exit = true ;
-		        }
-	                break ;
-		    case SR_AGAIN:
-		        if (to_again-- > 0) {
-			    msleep(1000) ;
-	 	        } else {
-			    f_exit = true ;
-		        }
-		        break ;
-		    case SR_BUSY:
-		        if (mto-- > 0) {
-	    		    msleep(1) ;
-		        } else {
-			    f_exit = true ;
-		        }
-		        break ;
-		    case SR_INTR:
-	                break ;
-		    default:
-		        f_exit = true ;
-		        break ;
-		    } /* end switch */
-	        } /* end if (error) */
-	    } until ((rs >= 0) || f_exit) ;
-	} /* end if (non-null) */
+	errtimer	to_nomem	= utimeout[uto_nomem] ;
+	errtimer	to_nobufs	= utimeout[uto_nobufs] ;
+	errtimer	to_again	= utimeout[uto_again] ;
+	errtimer	to_busy		= utimeout[uto_busy] ;
+	errtimer	to_io		= utimeout[uto_io] ;
+	reterr		r ;
+	int		rs ;
+	repeat {
+	    if ((rs = (this->*m)(op)) < 0) {
+                r(rs) ;                 /* <- default causes exit */
+                switch (rs) {
+                case SR_NOMEM:
+                    r = to_nomem(rs) ;
+                    break ;
+                case SR_NOBUFS:
+                    r = to_nobufs(rs) ;
+                    break ;
+                case SR_AGAIN:
+                    r = to_again(rs) ;
+                    break ;
+                case SR_BUSY:
+                    r = to_busy(rs) ;
+                    break ;
+                case SR_IO:
+                    r = to_io(rs) ;
+                    break ;
+                case SR_INTR:
+                    r(false) ;
+                    break ;
+                } /* end switch */
+                rs = r ;
+	    } /* end if (error) */
+	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
 }
 /* end subroutine (ucptm::operator) */

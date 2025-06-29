@@ -81,8 +81,6 @@ int ptma_create(ptma *op) noex {
 	    repeat {
 	        if ((rs = pthread_mutexattr_init(op)) > 0) {
 		    rs = (- rs) ;
-		}
-	        if (rs < 0) {
 	            switch (rs) {
 	            case SR_NOMEM:
 	                if (to_nomem-- > 0) {
@@ -99,6 +97,9 @@ int ptma_create(ptma *op) noex {
 		    } /* end switch */
 	        } /* end if (error) */
 	    } until ((rs >= 0) || f_exit) ;
+	    if (rs >= 0) {
+	        op->fl.open = true ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -110,6 +111,7 @@ int ptma_destroy(ptma *op) noex {
 	    if ((rs = pthread_mutexattr_destroy(op)) > 0) {
 	        rs = (- rs) ;
 	    }
+	    op->fl.open = false ;
 	} /* end if (non-null) */
 	return rs ;
 }

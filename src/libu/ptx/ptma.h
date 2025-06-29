@@ -35,8 +35,11 @@ enum ptmamems {
 	ptmamem_overlast
 } ;
 struct ptma ;
+struct ptma_fl {
+    	uint		open:1 ;
+} ;
 struct ptma_co {
-        ptma             *op = nullptr ;
+        ptma		*op = nullptr ;
         int             w = -1 ;
         constexpr void operator () (ptma *p,int m) noex {
             op = p ;
@@ -52,6 +55,7 @@ struct ptma : pthread_mutexattr_t {
 	ptma_co		setpshared ;
 	ptma_co		setrobustnp ;
 	ptma_co		settype ;
+	ptma_fl		fl{} ;
 	constexpr ptma() noex {
 	    create(this,ptmamem_create) ;
 	    destroy(this,ptmamem_destroy) ;
@@ -70,7 +74,7 @@ struct ptma : pthread_mutexattr_t {
 	int	gettype(int *) noex ;
 	void dtor() noex ;
 	destruct ptma() {
-	    dtor() ;
+	    if (fl.open) dtor() ;
 	} ; /* end dtor (ptma) */
 } ; /* end class (ptma) */
 #else
