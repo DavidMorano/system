@@ -1,5 +1,5 @@
 /* main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* front-end (everything) for MAILPOLLD */
@@ -845,13 +845,13 @@ int main(int argc,mainv argv,mainv envv) {
 
 #if	CF_DEBUG
 	            if (pip->debuglevel > 1)
-	                debugprintf("main: msg len=%d >%t<\n",len,buf,len) ;
+	                debugprintf("main: msg len=%d >%r<\n",len,buf,len) ;
 #endif
 
 	            sl = nextfield(buf,len,&sp) ;
 
 	            sp[sl] = '\0' ;
-	            logfile_printf(&pip->lh,"username=%t\n",
+	            logfile_printf(&pip->lh,"username=%r\n",
 	                sp,MIN(sl,LOGIDLEN)) ;
 
 	        }

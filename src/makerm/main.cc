@@ -100,7 +100,7 @@ enum argopts {
 int main(int argc,cchar *argv[],cchar *envv[])
 {
 	struct proginfo	pi, *pip = &pi ;
-	struct ustat	sb ;
+	ustat	sb ;
 
 	bfile	errfile, *efp = &errfile ;
 	bfile	outfile, *ofp = &outfile ;
