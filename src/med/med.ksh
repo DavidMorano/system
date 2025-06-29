@@ -1,4 +1,4 @@
-#!/usr/bin/ksh
+#!/usr/extra/bin/ksh
 # MED (PCS program)
 
 RF_AUDIO=0
@@ -18,10 +18,8 @@ PROG_DOMAINNAME=/bin/domainname
 PROG_CP=/bin/cp
 
 
-OS_SYSTEM=$( ${PROG_UNAME} -s )
-OS_RELEASE=$( ${PROG_UNAME} -r )
-ARCH=$( ${PROG_UNAME} -p )
-
+: ${OSNAME:=$( sysname )}
+: ${OSREL:=$( release )}
 
 getinetdomain() {
   if [ -n "${LOCALDOMAIN}" ] ; then

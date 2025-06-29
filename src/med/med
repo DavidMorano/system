@@ -1,8 +1,8 @@
-#!/usr/bin/ksh
+#!/usr/extra/bin/ksh
 # MED (PCS program)
 
-F_AUDIO=0
-F_NOTICE=0
+RF_AUDIO=0
+RF_NOTICE=0
 
 MU=dam
 NUSERS="dam morano"
@@ -18,10 +18,8 @@ PROG_DOMAINNAME=/bin/domainname
 PROG_CP=/bin/cp
 
 
-OS_SYSTEM=$( ${PROG_UNAME} -s )
-OS_RELEASE=$( ${PROG_UNAME} -r )
-ARCH=$( ${PROG_UNAME} -p )
-
+: ${OSNAME:=$( sysname )}
+: ${OSREL:=$( release )}
 
 getinetdomain() {
   if [ -n "${LOCALDOMAIN}" ] ; then
@@ -191,11 +189,11 @@ if [[ -s $TF ]] ; then
   RS=$?
   log "dmail ex=${RS}"
 
-  if [[ $F_NOTCE -ne 0 ]] ; then
+  if [[ $RF_NOTCE -ne 0 ]] ; then
     echo "new mail arrived\007" | ${PROG_WRITE} $NUSERS
   fi
 
-  if [[ $F_AUDIO -ne 0 ]] ; then
+  if [[ $RF_AUDIO -ne 0 ]] ; then
     if audioavail ; then :
 #      audial -audio rca:0 -volume 30 -spacing 200 -duration 300 12 &
       audioplay -v 5 ${PCS}/lib/sounds/shark.au

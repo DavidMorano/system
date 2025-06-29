@@ -1,5 +1,5 @@
 /* main SUPPORT (mesg) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* generic front-end subroutine */
@@ -103,7 +103,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 	struct proginfo		pi, *pip = &pi ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	int	argr, argl, aol, akl, avl, npa, maxai, kwi ;
 	int	pan ;

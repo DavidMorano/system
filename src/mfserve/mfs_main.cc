@@ -1,5 +1,5 @@
 /* mfs-main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* update the machine status for the current machine */
@@ -87,12 +87,14 @@
 #include	<time.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<uinfo.h>
-#include	<userinfo.h>
 #include	<ugetpid.h>
 #include	<ugetpw.h>
+#include	<uinfo.h>
+#include	<ucmallreg.h>
+#include	<userinfo.h>
 #include	<getax.h>
 #include	<getusername.h>
+#include	<getourenv.h>
 #include	<gethz.h>
 #include	<estrings.h>
 #include	<cfdec.h>
@@ -100,9 +102,10 @@
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<ascii.h>
-#include	<toxc.h>
+#include	<strn.h>
 #include	<spawner.h>
-#include	<ucmallreg.h>
+#include	<timestr.h>
+#include	<toxc.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -167,13 +170,12 @@ extern int	getnprocessors(cchar **,int) ;
 extern int	getarchitecture(char *,int) ;
 extern int	getnprocessors(const char **,int) ;
 extern int	getproviderid(const char *,int) ;
-extern int	getsystypenum(char *,char *,cchar *,cchar *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getserial(const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;
 extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
 extern int	mkdirs(cchar *,mode_t) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	securefile(cchar *,uid_t,gid_t) ;
@@ -206,14 +208,6 @@ extern int	mfsdebug_lockprint(PROGINFO *,cchar *) ;
 extern int	zprintf(cchar *,cchar *,...) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnrpbrk(cchar *,int,cchar *) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
-
 
 /* external variables */
 
@@ -225,7 +219,7 @@ extern char	**environ ;
 
 /* forward references */
 
-static int	mfsmain(int,cchar *[],cchar *[],void *) ;
+static int	mfsmain(int,mainv,mainv,void *) ;
 
 static int	usage(PROGINFO *) ;
 
@@ -1620,7 +1614,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
-	                debugprintf("mfsmain/procopt: k=%t\n",kp,kl) ;
+	                debugprintf("mfsmain/procopt: k=%r\n",kp,kl) ;
 #endif
 
 	            if ((oi = matostr(progopts,2,kp,kl)) >= 0) {
@@ -2470,7 +2464,7 @@ static int procpidfname(PROGINFO *pip)
 
 	    f_changed = TRUE ;
 	    if ((rs = mkpath2(rundname,pip->pr,RUNDNAME)) >= 0) {
-	        struct ustat	sb ;
+	        ustat	sb ;
 	        const int	rsn = SR_NOENT ;
 	        if ((rs = uc_stat(rundname,&sb)) >= 0) {
 	            if (! S_ISDIR(sb.st_mode)) rs = SR_NOTDIR ;
@@ -2670,12 +2664,12 @@ static int procmntcheck(PROGINFO *pip)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	if (lip->mntfname != NULL) {
-	    struct ustat	usb ;
+	    ustat	usb ;
 	    cchar		*pn = pip->progname ;
 	    cchar		*fmt ;
 	    if ((rs = u_stat(lip->mntfname,&usb)) >= 0) {
 	        if (S_ISREG(usb.st_mode)) {
-	            rs = sperm(&pip->id,&usb,W_OK) ;
+	            rs = permid(&pip->id,&usb,W_OK) ;
 	        } else
 	            rs = SR_BUSY ;
 	        if (rs < 0) {
@@ -2711,11 +2705,11 @@ static int procbacks(PROGINFO *pip)
 	    char	pbuf[MAXPATHLEN+1] ;
 
 	    if (pip->debuglevel > 0) {
-	        fmt = "%s: execname=%t\n" ;
+	        fmt = "%s: execname=%r\n" ;
 	        shio_printf(pip->efp,fmt,pn,ebuf,el) ;
 	    }
 
-	    if ((tp = strnrpbrk(ebuf,el,"/.")) != NULL) {
+	    if ((tp = strnrbrk(ebuf,el,"/.")) != NULL) {
 	        if (tp[0] == '.') {
 	            el = (tp-ebuf) ;
 	            ebuf[el] = '\0' ;
@@ -2724,7 +2718,7 @@ static int procbacks(PROGINFO *pip)
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("main/procbacks: prog=%t\n",ebuf,el) ;
+	        debugprintf("main/procbacks: prog=%r\n",ebuf,el) ;
 #endif
 
 	    if ((rs = prgetprogpath(pip->pr,pbuf,ebuf,el)) > 0) {

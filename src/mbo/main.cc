@@ -46,6 +46,8 @@
 #include	<syslog.h>
 
 #include	<usystem.h>
+#include	<getax.h>
+#include	<getourenv.h>
 #include	<baops.h>
 #include	<keyopt.h>
 #include	<bfile.h>
@@ -56,11 +58,11 @@
 #include	<sbuf.h>
 #include	<sockaddress.h>
 #include	<mallocstuff.h>
-#include	<getax.h>
 #include	<userinfo.h>
 #include	<pcsconf.h>
 #include	<mailmsgid.h>
 #include	<ctdec.h>
+#include	<strwcpy.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -118,11 +120,7 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
 extern char	*strdcpy3(char *,int,const char *,const char *,const char *) ;
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*strbasename(char *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
@@ -232,7 +230,7 @@ int	argc ;
 char	*argv[] ;
 char	*envv[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	struct proginfo	pi, *pip = &pi ;
 	struct group	ge ;
 	PCSCONF		p ;
@@ -558,7 +556,7 @@ char	*envv[] ;
 	                    default:
 	                        rs = SR_INVALID ;
 	                        bprintf(pip->efp,
-	                        "%s: invalid key=%t\n",
+	                        "%s: invalid key=%r\n",
 	                        pip->progname,akp,akl) ;
 
 	                    } /* end switch (key words) */
