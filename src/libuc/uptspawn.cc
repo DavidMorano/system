@@ -1,5 +1,5 @@
 /* uptspawn SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® POSIX Thread manipulation */
@@ -102,14 +102,14 @@ static void	*uptruner(void *) noex ;
 
 int uptspawn(pthread_t *rp,pthread_attr_t *ptap,objsub_t start,
 		void *op,void *arg) noex {
-	OURARGS		*oap ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rv = 0 ;
 	if (rp && start) {
-	    cint	osize = sizeof(OURARGS) ;
-	    if ((rs = uc_libmalloc(osize,&oap)) >= 0) {
-	        sigset_t	nsm, osm ;
+	    cint	osz = szof(OURARGS) ;
+	    if (OURARGS *oap ; (rs = uc_libmalloc(osz,&oap)) >= 0) {
+	        sigset_t	nsm ;
+	        sigset_t	osm ;
 	        uc_sigsetfill(&nsm) ;
 	        if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 		    {
@@ -138,7 +138,7 @@ static int uptcreator(pthread_t *rp,pthread_attr_t *ptap,void *arg) noex {
 	int		rs ;
 	bool		f_exit = false ;
 	repeat {
-	    rc = SR_OK ;
+	    rs = SR_OK ;
 	    if (errno_t ec ; (ec = pthread_create(rp,ptap,uptruner,arg)) > 0) {
 		rs = (- ec) ;
 	    }

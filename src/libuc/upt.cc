@@ -1,5 +1,5 @@
 /* upt SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® POSIX Thread manipulation */
@@ -33,12 +33,11 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<csignal>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdint>
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<hasx.h>
 #include	<cfdec.h>
 #include	<localmisc.h>
@@ -48,8 +47,8 @@
 
 /* local defines */
 
-#ifndef	PTA
-#define	PTA		pthread_attr_t
+#ifndef	pta
+#define	pta		pthread_attr_t
 #endif
 
 
@@ -75,7 +74,7 @@ struct ourarg {
 
 /* forward references */
 
-static int	uptcreator(pthread_t *,PTA *,void *) noex ;
+static int	uptcreator(pthread_t *,pta *,void *) noex ;
 
 static void	*uptruner(void *) noex ;
 
@@ -88,15 +87,14 @@ static void	*uptruner(void *) noex ;
 
 /* exported subroutines */
 
-int uptcreate(pthread_t *rp,PTA *ptap,uptsub_f start,void *arg) noex {
+int uptcreate(pthread_t *rp,pta *ptap,uptsub_f start,void *arg) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		tid = -1 ;
 	if (rp && start) {
-	    cint	osize = sizeof(struct ourarg) ;
-	    void	*vp{} ;
-	    if ((rs = uc_libmalloc(osize,&vp)) >= 0) {
-	        struct ourarg	*oap = (struct ourarg *) vp ;
+	    cint	osz = szof(struct ourarg) ;
+	    if (void *vp ; (rs = uc_libmalloc(osz,&vp)) >= 0) {
+	        ourarg	*oap = (ourarg *) vp ;
 	        sigset_t	osm ;
 	        sigset_t	nsm ;
 	        uc_sigsetfill(&nsm) ;
@@ -301,7 +299,7 @@ int uptncpus(int w) noex {
 
 /* local subroutines */
 
-static int uptcreator(pthread_t *rp,PTA *ptap,void *arg) noex {
+static int uptcreator(pthread_t *rp,pta *ptap,void *arg) noex {
 	int		to_nomem = utimeout[uto_nomem] ;
 	int		rs ;
 	bool		f_exit = false ;
