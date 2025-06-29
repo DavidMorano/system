@@ -1,5 +1,5 @@
 /* wsinul SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get length of a wide-string */
@@ -30,7 +30,8 @@
 	wsp	the source string that is to be copied
 
 	Returns:
-	-	the character pointer to the end of the destination
+	>=0	the character pointer to the end of the destination
+	<0	error (null-pointer)
 
 *******************************************************************************/
 
@@ -73,8 +74,10 @@
 /* exported subroutines */
 
 int wsinul(const wchar_t *wsp) noex {
-	int	i = 0 ;
-	while (wsp[i]) i += 1 ;
+	int	i = -1 ; /* return-value */
+	if (wsp) {
+	    for (i = 0 ; wsp[i] ; i += 1) ;
+	}
 	return i ;
 }
 /* end subroutine (wsinul) */

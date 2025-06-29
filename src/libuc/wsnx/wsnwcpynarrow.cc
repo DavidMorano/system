@@ -1,5 +1,5 @@
 /* wsnwcpynarrow SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy a narrow source string to a wide-string recipient */

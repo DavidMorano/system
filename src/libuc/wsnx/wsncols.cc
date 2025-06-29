@@ -1,5 +1,5 @@
 /* wsncols SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* calculate the number of columns used by a wide-string */
@@ -38,7 +38,8 @@
 	wsl		wide-string length (in characters)
 
 	Returns:
-	-		number of columns used up
+	>=0		number of columns used up
+	<0		error (null-pointer)
 
 *******************************************************************************/
 
@@ -81,15 +82,19 @@
 /* exported subroutines */
 
 int wsncolstr(int ntab,int scol,const wchar_t *wsp,int wsl) noex {
-	int		col = scol ;
-	while (wsl-- && *wsp) {
-	    if (*wsp++ == CH_TAB) {
-		col += tabcols(ntab,col) ;
-	    } else {
-		col += 1 ;
-	    }
-	} /* end while */
-	return (col - scol) ;
+    	int		nc = -1 ; /* return-value */
+	if (wsp) {
+	    int		col = scol ;
+	    while (wsl-- && *wsp) {
+	        if (*wsp++ == CH_TAB) {
+		    col += tabcols(ntab,col) ;
+	        } else {
+		    col += 1 ;
+	        }
+	    } /* end while */
+	    nc = (col - scol) ;
+	} /* end if (non-null) */
+	return nc ;
 }
 /* end subroutine (wsncols) */
 

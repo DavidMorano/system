@@ -1,8 +1,8 @@
 /* wsixchr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* search for a character in a wide-string */
+/* search for a character in a wide-string, either obverse or reverse */
 /* version %I% last-modified %G% */
 
 
@@ -49,7 +49,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
-#include	"wsix.h"
+#include	"wsix.h"		/* |wsinul(3uc)| */
 
 
 /* local defines */
@@ -64,34 +64,43 @@
 /* local variables */
 
 
+/* forward reference */
+
+
+/* local variables */
+
+
 /* exported variables */
 
 
 /* exported subroutines */
 
 int wsiochr(const wchar_t *wsp,int wsl,int sch) noex {
-	int		i ;
+	int		i = -1 ; /* return-value */
 	bool		f = false ;
-	if (wsl < 0) wsl = wsinul(wsp) ;
-	for (i = 0 ; wsl-- && wsp[i] ; i += 1) {
-	    f = (wsp[i] == sch) ;
-	    if (f) break ;
-	} /* end for */
+	if (wsp) {
+	    if (wsl < 0) wsl = wsinul(wsp) ;
+	    for (i = 0 ; wsl-- && wsp[i] ; i += 1) {
+	        f = (wsp[i] == sch) ;
+	        if (f) break ;
+	    } /* end for */
+	} /* end if (non-null) */
 	return (f) ? i : -1 ;
 }
 /* end subroutine (wsiochr) */
 
 int wsirchr(const wchar_t *wsp,int wsl,int sch) noex {
-	int		i ;
+	int		i = -1 ; /* return-value */
 	bool		f = false ;
-	if (wsl < 0) wsl = wsinul(wsp) ;
-	for (i = (wsl-1) ; i >= 0 ; i -= 1) {
-	    f = (wsp[i] == sch) ;
-	    if (f) break ;
-	} /* end for */
+	if (wsp) {
+	    if (wsl < 0) wsl = wsinul(wsp) ;
+	    for (i = (wsl-1) ; i >= 0 ; i -= 1) {
+	        f = (wsp[i] == sch) ;
+	        if (f) break ;
+	    } /* end for */
+	} /* end if (non-null) */
 	return (f) ? i : -1 ;
 }
 /* end subroutine (wsirchr) */
-
 
 
