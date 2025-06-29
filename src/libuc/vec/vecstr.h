@@ -1,5 +1,5 @@
 /* vecstr HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* vector-string container (Vector-String) */
@@ -42,16 +42,50 @@
 #define	VECSTR			struct vecstr_head
 #define	VECSTR_FL		struct vecstr_flags
 #define	VECSTR_DEFENTS		5
-/* options */
-#define	VECSTR_ODEFAULT		0
-#define	VECSTR_OREUSE		(1 << 0)	/* reuse empty slots */
-#define	VECSTR_OCOMPACT		(1 << 1)	/* means NOHOLES */
-#define	VECSTR_OSWAP		(1 << 2)	/* use swapping */
-#define	VECSTR_OSTATIONARY	(1 << 3)	/* entries should not move */
-#define	VECSTR_OCONSERVE	(1 << 4)	/* conserve space */
-#define	VECSTR_OSORTED		(1 << 5)	/* keep sorted */
-#define	VECSTR_OORDERED		(1 << 6)	/* keep ordered */
 
+/**** options
+reuse		= reuse empty slots
+compact		= do not allow for holes
+swap		= use swapping for empty slot management
+stationary	= entries do not move
+conserve	= conserve space where possible
+sorted		= maintain a sorted list
+ordered		= maintain an ordered list
+****/
+
+enum vecstros {
+    vecstro_reuse,
+    vecstro_compact,
+    vecstro_swap,
+    vecstro_stationary,
+    vecstro_conserve,
+    vecstro_sorted,
+    vecstro_ordered,
+    vecstro_overlast
+} ;
+
+#ifdef	__cplusplus	/* C++ only! */
+
+struct vecstrms {
+    static int	reuse ;
+    static int	compact ;
+    static int	swap ;
+    static int	stationary ;
+    static int	conserve ;
+    static int	sorted ;
+    static int	ordered ;
+} ;
+
+#endif /* __cplusplus */
+
+#define	VECSTR_ODEFAULT		0
+#define	VECSTR_OREUSE		(1 << vecstro_reuse)
+#define	VECSTR_OCOMPACT		(1 << vecstro_compact)
+#define	VECSTR_OSWAP		(1 << vecstro_swap)
+#define	VECSTR_OSTATIONARY	(1 << vecstro_stationary)
+#define	VECSTR_OCONSERVE	(1 << vecstro_conserve)
+#define	VECSTR_OSORTED		(1 << vecstro_sorted)
+#define	VECSTR_OORDERED		(1 << vecstro_ordered)
 
 struct vecstr_flags {
 	uint		issorted:1 ;
@@ -68,7 +102,7 @@ struct vecstr_flags {
 
 struct vecstr_head {
 	cchar		**va ;
-	VECSTR_FL	f ;
+	VECSTR_FL	fl ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* overlast index */
 	int		n ;		/* current extent of array */
@@ -126,12 +160,33 @@ struct vecstr_iter {
 	    return rp ;
 	} ;
 	vecstr_iter operator + (int) const noex ;
-	vecstr_iter operator += (int) noex ;
+	vecstr_iter &operator += (int) noex ;
 	vecstr_iter operator ++ () noex ; /* pre */
 	vecstr_iter operator ++ (int) noex ; /* post */
+    private:
 	void increment(int = 1) noex ;
 } ; /* end struct vecstr_iter) */
 struct vecstr ;
+struct vecstr_st {
+	vecstr		*op = nullptr ;
+	void operator () (vecstr *p) noex {
+	    op = p ;
+	} ;
+	int operator () (int = 0,int = 0) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (vecstr_st) */
+struct vecstr_so {
+	vecstr		*op = nullptr ;
+	void init(vecstr *p) noex {
+	    op = p ;
+	} ;
+	int operator () (vecstr_f = nullptr) noex ;
+	operator int () noex {
+	    return operator () (nullptr) ;
+	} ;
+} ; /* end struct (vecstr_so) */
 struct vecstr_co {
 	vecstr		*op = nullptr ;
 	int		w = -1 ;
@@ -145,6 +200,8 @@ struct vecstr_co {
 	} ;
 } ; /* end struct (vecstr_co) */
 struct vecstr : vecstr_head {
+	vecstr_st	start ;
+	vecstr_so	sort ;
 	vecstr_co	addcspath ;
 	vecstr_co	count ;
 	vecstr_co	delall ;
@@ -154,6 +211,7 @@ struct vecstr : vecstr_head {
 	vecstr_co	audit ;
 	vecstr_co	finish ;
 	vecstr() noex {
+	    start(this) ;
 	    addcspath(this,vecstrmem_addcspath) ;
 	    count(this,vecstrmem_count) ;
 	    delall(this,vecstrmem_delall) ;
@@ -162,10 +220,11 @@ struct vecstr : vecstr_head {
 	    cksize(this,vecstrmem_cksize) ;
 	    audit(this,vecstrmem_audit) ;
 	    finish(this,vecstrmem_finish) ;
+	    sort.init(this) ;
+	    va = nullptr ;
 	} ;
 	vecstr(const vecstr &) = delete ;
 	vecstr &operator = (const vecstr &) = delete ;
-	int start(int = 0,int = 0) noex ;
 	int add(cchar *,int = -1) noex ;
 	int adduniq(cchar *,int = -1) noex ;
 	int addsyms(cchar *,mainv) noex ;
@@ -194,8 +253,8 @@ struct vecstr : vecstr_head {
 	    return it ;
 	} ;
 	void dtor() noex ;
-	~vecstr() {
-	    dtor() ;
+	destruct vecstr() {
+	    if (va) dtor() ;
 	} ;
 } ; /* end struct (vecstr) */
 #else	/* __cplusplus */
@@ -259,6 +318,8 @@ static inline int vecstr_loaddirs(vecstr *op,cchar *newsdname) noex {
 }
 
 EXTERNC_end
+
+extern vecstrms		vecstrm ;
 
 
 #endif /* VECSTR_INCLUDE */

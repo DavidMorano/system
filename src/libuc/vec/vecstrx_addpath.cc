@@ -1,5 +1,5 @@
 /* vecstrx_addpath SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* add a "path" compnent to the string-list */
@@ -66,7 +66,6 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<libmallocxx.h>		/* <- currently unused */
@@ -76,6 +75,7 @@
 
 #include	"vecstrx.hh"
 
+import libutil ;
 
 /* local defines */
 
@@ -129,14 +129,13 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 		    cint	plen = rs ;
 		    if (char *pbuf{} ; (rs = mall((plen+1),&pbuf)) >= 0) {
 	                cchar	*tp ;
-	                while ((tp = strnpbrk(lp,ll,":;")) != nullptr) {
-		            if ((tp-lp) >= 0) {
-				cint	pl = intconv(tp - lp) ;
-				rs = vecstrx_addone(this,pbuf,lp,pl) ;
+	                while ((tp = strnbrk(lp,ll,":;")) != nullptr) {
+			    if (cint tl = intconv(tp - lp) ; tl >= 0) {
+				rs = vecstrx_addone(this,pbuf,lp,tl) ;
 				c += rs ;
 		            }
-		            ll -= intconv((tp+1)-lp) ;
-		            lp = (tp+1) ;
+		            ll -= intconv((tp + 1) - lp) ;
+		            lp = (tp + 1) ;
 		            if (rs < 0) break ;
 	                } /* end while */
 	                if ((rs >= 0) && (ll > 0)) {
@@ -161,9 +160,8 @@ int vecstrx::addpath(cchar *lp,int ll) noex {
 	    if (ll < 0) ll = xstrlen(lp) ;
 	    if (ll > 0) {
 	        cchar	*tp ;
-	        while ((tp = strnpbrk(lp,ll,":;")) != nullptr) {
-		    if ((tp-lp) >= 0) {
-			cint	tl = intconv(tp - lp) ;
+	        while ((tp = strnbrk(lp,ll,":;")) != nullptr) {
+		    if (cint tl = intconv(tp - lp) ; tl >= 0) {
 		        rs = adduniq(lp,tl) ;
 		        if (rs < INT_MAX) c += 1 ;
 		    }

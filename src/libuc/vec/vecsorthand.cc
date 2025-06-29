@@ -1,5 +1,5 @@
 /* vecsorthand SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* vector of sorted handles */
@@ -80,11 +80,12 @@ static int vecsorthand_ctor(vecsorthand *op,Args ... args) noex {
 /* end subroutine (vecsorthand_ctor) */
 
 static int	vecsorthand_extend(vecsorthand *) noex ;
-
 static int	topidx(int) noex ;
 
 
 /* local variables */
+
+cint		defents = VECSORTHAND_DEFENTS ;
 
 
 /* exported variables */
@@ -94,7 +95,7 @@ static int	topidx(int) noex ;
 
 int vecsorthand_start(vecsorthand *op,cmp_f cmpfunc,int vn) noex {
 	int		rs ;
-	if (vn <= 1) vn = VECSORTHAND_DEFENTS ;
+	if (vn <= 1) vn = defents ;
 	if ((rs = vecsorthand_ctor(op,cmpfunc)) >= 0) {
 	    cint	sz = (szof(void **) * (vn + 1)) ;
 	    if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
@@ -293,7 +294,7 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 static int vecsorthand_extend(vecsorthand *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->e) {
-	    cint	ndef = VECSORTHAND_DEFENTS ;
+	    cint	ndef = defents ;
 	    int		ne ;
 	    int		sz ;
 	    void	**nva{} ;
