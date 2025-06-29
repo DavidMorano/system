@@ -486,7 +486,7 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 	    char	ebuf[EBUFLEN + 1] ;
 
 	    while (rs >= 0) {
-	        kl = paramfile_enum(pfp,&cur,&pe,pbuf,plen) ;
+	        kl = paramfile_curenum(pfp,&cur,&pe,pbuf,plen) ;
 	        if (kl == SR_NOTFOUND) break ;
 	        rs = kl ;
 	        if (rs < 0) break ;

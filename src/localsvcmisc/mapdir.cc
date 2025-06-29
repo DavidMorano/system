@@ -5,7 +5,7 @@ const char	*ev[] ;
 const char	groupname[] ;
 int		fd ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 
 	VECSTR		nums ;
 
@@ -61,7 +61,7 @@ int		fd ;
 	                const char	*digp ;
 	                int	f = TRUE ;
 
-	                digp = strnpbrk(den,(tp-den),"0123456789") ;
+	                digp = strnbrk(den,(tp-den),"0123456789") ;
 	                if (digp != NULL)
 	                    f = hasalldig(digp,(tp-digp)) ;
 
