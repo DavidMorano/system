@@ -1,5 +1,5 @@
 /* uinfo SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® information (a cache for |uname(2)| and sisters) */
@@ -61,7 +61,8 @@
 #include	<sys/utsname.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strnlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
+#include	<memory>		/* |destroy_a(3c++)| */
 #include	<usystem.h>
 #include	<ucsysauxinfo.h>
 #include	<getbufsize.h>
@@ -75,6 +76,16 @@
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::destroy_at ;			/* subroutine */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -102,7 +113,7 @@ namespace {
     struct setname {
 	uinfo_infoname	tmpname ;
 	char		*strp = nullptr ;
-	~setname() {
+	destruct setname() {
 	    if (strp) {
 	        uc_libfree(strp) ;
 	        strp = nullptr ;
@@ -112,7 +123,7 @@ namespace {
     struct setaux {
 	uinfo_infoaux	tmpaux ;
 	char		*strp = nullptr ;
-	~setaux() {
+	destruct setaux() {
 	    if (strp) {
 	        uc_libfree(strp) ;
 	        strp = nullptr ;
@@ -120,8 +131,8 @@ namespace {
 	}
     } ; /* end struct (setaux) */
     struct uinfo_alloc {
-	cchar		*name ;	/* string allocation for "name" */
-	cchar		*aux ;	/* string allocation for "aux" */
+	char		*name ;	/* string allocation for "name" */
+	char		*aux ;	/* string allocation for "aux" */
     } ; /* end struct (uinfo_alloc) */
     struct uinfo {
 	ptm		mx ;		/* data mutex */
@@ -147,13 +158,13 @@ namespace {
 	void atforkafter() noex {
 	    mx.lockend() ;
 	} ;
-	~uinfo() noex {
+	destruct uinfo() noex {
 	    if (cint rs = fini() ; rs < 0) {
 	        ulogerror("uinfo",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor (uinfo) */
     } ; /* end struct (uinfo) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -231,13 +242,13 @@ int uinfo::init() noex {
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
-	            int		rs = SR_OK ;
+	            int		rsl = SR_OK ;
 	            if (!finit) {
-		        rs = SR_LOCKLOST ;		/* <- failure */
+		        rsl = SR_LOCKLOST ;		/* <- failure */
 	            } else if (finitdone) {
-		        rs = 1 ;			/* <- OK ready */
+		        rsl = 1 ;			/* <- OK ready */
 	            }
-	            return rs ;
+	            return rsl ;
 	        } ; /* end lambda (lamb) */
 	        rs = tw(lamb) ;		/* <- time-watching occurs in there */
 	    } /* end if (initialization) */
@@ -311,34 +322,37 @@ int uinfo::getname_setup() noex {
 /* end method (uinfo::getname_setup) */
 
 int uinfo::getname_load(setname *setp) noex {
-	cint		usz = szof(UTSNAME) ;
+    	cnullptr	np{} ;
+	cint		usz = szof(utsname) ;
 	int		rs ;
 	int		rs1 ;
-	if (void *vp{} ; (rs = uc_libmalloc(usz,&vp)) >= 0) {
-	    UTSNAME	*utsp = (UTSNAME *) vp ;
-            if ((rs = u_uname(utsp)) >= 0) {
-                cint    nlen = (szof(utsp->sysname) - 1) ;
-                int     sz = 0 ;
-                sz += (strnlen(utsp->sysname,nlen) + 1) ;
-                sz += (strnlen(utsp->nodename,nlen) + 1) ;
-                sz += (strnlen(utsp->release,nlen) + 1) ;
-                sz += (strnlen(utsp->version,nlen) + 1) ;
-                sz += (strnlen(utsp->machine,nlen) + 1) ;
-                if (char *bp{} ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
-                    setp->strp = bp ;
-                    setp->tmpname.sysname = bp ;
-                    bp = (strwcpy(bp,utsp->sysname,nlen) + 1) ;
-                    setp->tmpname.nodename = bp ;
-                    bp = (strwcpy(bp,utsp->nodename,nlen) + 1) ;
-                    setp->tmpname.release = bp ;
-                    bp = (strwcpy(bp,utsp->release,nlen) + 1) ;
-                    setp->tmpname.version = bp ;
-                    bp = (strwcpy(bp,utsp->version,nlen) + 1) ;
-                    setp->tmpname.machine = bp ;
-                    bp = (strwcpy(bp,utsp->machine,nlen) + 1) ;
-                } /* end if (memory-allocation) */
-            } /* end if (uname) */
-	    rs1 = uc_libfree(utsp) ;
+	if (void *vp ; (rs = uc_libmalloc(usz,&vp)) >= 0) {
+	    if (utsname *utsp ; (utsp = new(vp) utsname) != np) {
+                if ((rs = u_uname(utsp)) >= 0) {
+                    cint    nlen = (szof(utsp->sysname) - 1) ;
+                    int     sz = 0 ;
+                    sz += (xstrnlen(utsp->sysname,nlen) + 1) ;
+                    sz += (xstrnlen(utsp->nodename,nlen) + 1) ;
+                    sz += (xstrnlen(utsp->release,nlen) + 1) ;
+                    sz += (xstrnlen(utsp->version,nlen) + 1) ;
+                    sz += (xstrnlen(utsp->machine,nlen) + 1) ;
+                    if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+                        setp->strp = bp ;
+                        setp->tmpname.sysname = bp ;
+                        bp = (strwcpy(bp,utsp->sysname,nlen) + 1) ;
+                        setp->tmpname.nodename = bp ;
+                        bp = (strwcpy(bp,utsp->nodename,nlen) + 1) ;
+                        setp->tmpname.release = bp ;
+                        bp = (strwcpy(bp,utsp->release,nlen) + 1) ;
+                        setp->tmpname.version = bp ;
+                        bp = (strwcpy(bp,utsp->version,nlen) + 1) ;
+                        setp->tmpname.machine = bp ;
+                        bp = (strwcpy(bp,utsp->machine,nlen) + 1) ;
+                    } /* end if (memory-allocation) */
+                } /* end if (u_uname) */
+	        destroy_at(utsp) ;
+	    } /* end if (utsname) */
+	    rs1 = uc_libfree(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -399,54 +413,57 @@ int uinfo::getaux_setup() noex {
 /* end method (uinfo::getaux_setup) */
 
 int uinfo::getaux_load(setaux *setp) noex {
+    	cnullptr	np{} ;
 	cint		usz = szof(auxinfo) ;
 	int		rs ;
 	int		rs1 ;
-	if (void *vp{} ; (rs = uc_libmalloc(usz,&vp)) >= 0) {
-	    auxinfo	*tap = (auxinfo *) vp ;
-	    if ((rs = tap->start()) >= 0) {
-                if ((rs = tap->load()) >= 0) {
-                    cint    nlen = tap->flen ;
-                    int     sz = 0 ;
-                    sz += (strnlen(tap->architecture,nlen) + 1) ;
-                    sz += (strnlen(tap->platform,nlen) + 1) ;
-                    sz += (strnlen(tap->hwprovider,nlen) + 1) ;
-                    sz += (strnlen(tap->hwserial,nlen) + 1) ;
-                    sz += (strnlen(tap->nisdomain,nlen) + 1) ;
-                    if (char *bp{} ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
-                        cchar   *sp ;
-                        setp->strp = bp ;
-		        {
-                            setp->tmpaux.architecture = bp ;
-                            sp = tap->architecture ;
-                            bp = (strwcpy(bp,sp,nlen) + 1) ;
-		        }
-		        {
-                            setp->tmpaux.platform = bp ;
-                            sp = tap->platform ;
-                            bp = (strwcpy(bp,sp,nlen) + 1) ;
-		        }
-		        {
-                            setp->tmpaux.hwprovider = bp ;
-                            sp = tap->hwprovider ;
-                            bp = (strwcpy(bp,sp,nlen) + 1) ;
-		        }
-		        {
-                            setp->tmpaux.hwserial = bp ;
-                            sp = tap->hwserial ;
-                            bp = (strwcpy(bp,sp,nlen) + 1) ;
-		        }
-		        {
-                            setp->tmpaux.nisdomain = bp ;
-                            sp = tap->nisdomain ;
-                            bp = (strwcpy(bp,sp,nlen) + 1) ;
-		        }
-                    } /* end if (memory-allocation) */
-                } /* end if (uinfo_auxload) */
-	    	rs1 = tap->finish() ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (tmpaux) */
-	    rs1 = uc_libfree(tap) ;
+	if (void *vp ; (rs = uc_libmalloc(usz,&vp)) >= 0) {
+	    if (auxinfo *tap ; (tap = new(vp) auxinfo) != np) {
+	        if ((rs = tap->start()) >= 0) {
+                    if ((rs = tap->load()) >= 0) {
+                        cint    nlen = tap->flen ;
+                        int     sz = 0 ;
+                        sz += (xstrnlen(tap->architecture,nlen) + 1) ;
+                        sz += (xstrnlen(tap->platform,nlen) + 1) ;
+                        sz += (xstrnlen(tap->hwprovider,nlen) + 1) ;
+                        sz += (xstrnlen(tap->hwserial,nlen) + 1) ;
+                        sz += (xstrnlen(tap->nisdomain,nlen) + 1) ;
+                        if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+                            cchar   *sp ;
+                            setp->strp = bp ;
+		            {
+                                setp->tmpaux.architecture = bp ;
+                                sp = tap->architecture ;
+                                bp = (strwcpy(bp,sp,nlen) + 1) ;
+		            }
+		            {
+                                setp->tmpaux.platform = bp ;
+                                sp = tap->platform ;
+                                bp = (strwcpy(bp,sp,nlen) + 1) ;
+		            }
+		            {
+                                setp->tmpaux.hwprovider = bp ;
+                                sp = tap->hwprovider ;
+                                bp = (strwcpy(bp,sp,nlen) + 1) ;
+		            }
+		            {
+                                setp->tmpaux.hwserial = bp ;
+                                sp = tap->hwserial ;
+                                bp = (strwcpy(bp,sp,nlen) + 1) ;
+		            }
+		            {
+                                setp->tmpaux.nisdomain = bp ;
+                                sp = tap->nisdomain ;
+                                bp = (strwcpy(bp,sp,nlen) + 1) ;
+		            }
+                        } /* end if (memory-allocation) */
+                    } /* end if (uinfo_auxload) */
+	    	    rs1 = tap->finish() ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (start-finish) */
+	        destroy_at(tap) ;
+	    } /* end if (auxinfo) */
+	    rs1 = uc_libfree(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -483,7 +500,7 @@ int auxinfo::start() noex {
 	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
 	    cint	sz = (nfields * (rs + 1)) ;
 	    flen = rs ;
-	    if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
 		int	ai = 0 ;
 		a = charp(vp) ;
 		{

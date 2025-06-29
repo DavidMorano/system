@@ -1,5 +1,5 @@
 /* umask SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® UMASK (file-creation-mask) management */
@@ -51,6 +51,9 @@
 /* local typedefs */
 
 
+/* exported variables */
+
+
 /* external subroutines */
 
 
@@ -72,13 +75,13 @@ namespace {
 	void forkafter() noex {
 	    mx.lockend() ;
 	} ;
-	~umasker() {
+	destruct umasker() {
             if (cint rs = fini() ; rs < 0) {
                 ulogerror("umask",rs,"dtor-fini") ;
             }
 	} ;
     } ; /* end struct (umasker) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -175,13 +178,13 @@ int umasker::init() noex {
             } else if (! finitdone) { 
                 timewatch       tw(to) ;
                 auto lamb = [this] () -> int {
-                    int         rs = SR_OK ;
+                    int         rsl = SR_OK ;
                     if (!finit) {
-                        rs = SR_LOCKLOST ;              /* <- failure */
+                        rsl = SR_LOCKLOST ;              /* <- failure */
                     } else if (finitdone) {
-                        rs = 1 ;                        /* <- OK ready */
+                        rsl = 1 ;                        /* <- OK ready */
                     }                       
-                    return rs ;
+                    return rsl ;
                 } ; /* end lambda (lamb) */ 
                 rs = tw(lamb) ;         /* <- time-watching occurs in there */
 	    } /* end if */
@@ -214,13 +217,14 @@ int umasker::fini() noex {
 int umasker::get() noex {
 	int		rs ;
 	int		rs1 ;
-	int		cmask = 0 ;
+	int		omask = 0 ;
 	if ((rs = init()) >= 0) {
 	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
 	        if ((rs = mx.lockbegin) >= 0) { /* single */
 		    {
-			cmask = umask(0) ; /* in case of race! */
-			umask(cmask) ;
+			mode_t cm = umask(0) ; /* in case of race! */
+			umask(cm) ;
+			omask = int(cm) ;
 		    }
 	            rs1 = mx.lockend ;
 		    if (rs >= 0) rs = rs1 ;
@@ -229,8 +233,8 @@ int umasker::get() noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (forklock) */
 	} /* end if (init) */
-	cmask &= INT_MAX ;
-	return (rs >= 0) ? cmask : rs ;
+	omask &= INT_MAX ;
+	return (rs >= 0) ? omask : rs ;
 }
 /* end method (umasker::get) */
 
