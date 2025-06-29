@@ -1,5 +1,5 @@
 /* ucsigset HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
@@ -20,7 +20,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<signal.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

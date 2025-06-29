@@ -1,5 +1,5 @@
 /* ucstrtod SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -17,10 +17,15 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<localmisc.h>
 
 #include	"ucstrtod.h"
 
@@ -63,7 +68,7 @@ int uc_strtod(cchar *startp,char **endpp,double *rp) noex {
 	    if (errno) {
 		rs = (- errno) ;
 	    } else {
-		rs = (ep - startp) ;
+		rs = intconv(ep - startp) ;
 		if (endpp) *endpp = ep ;
 	    }
 	} /* end if (non-null) */

@@ -1,5 +1,5 @@
 /* strtod HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 
@@ -24,19 +24,11 @@
 #include	<stdintx.h>
 
 
-#ifdef	__cplusplus
+EXTERNC_begin
 
-extern "C" {
-    extern longlong strtolonglong(const char *,char **,int) noex ;
-    extern ulonglong strtoulonglong(const char *,char **,int) noex ;
-}
+extern int uc_strtod(cchar *,char **,double *) noex ;
 
-#else /* __cplusplus */
-
-extern longlong strtolonglong(const char *,char **,int) noex ;
-extern ulonglong strtoulonglong(const char *,char **,int) noex ;
-
-#endif /* __cplusplus */
+EXTERNC_end
 
 
 #endif /* STRTOD_INCLUDE */
