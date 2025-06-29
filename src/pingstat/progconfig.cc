@@ -283,11 +283,11 @@ int progconf_read(PROGINFO *pip)
 
 	while (rs >= 0) {
 
-	    kl = paramfile_enum(&pip->params,&cur,&pe,pbuf,PBUFLEN) ;
+	    kl = paramfile_curenum(&pip->params,&cur,&pe,pbuf,PBUFLEN) ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
-	        debugprintf("progconf_read: paramfile_enum() rs=%d\n",
+	        debugprintf("progconf_read: paramfile_curenum() rs=%d\n",
 	            kl) ;
 #endif
 

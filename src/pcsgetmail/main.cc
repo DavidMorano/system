@@ -2155,13 +2155,13 @@ static int maildirs_accessible(proginfo *pip,cchar *dp,int dl,int am)
 				"u_stat() rs=%d\n", rs) ;
 #endif
 	                if (S_ISDIR(sb.st_mode)) {
-	                    if ((rs = sperm(&pip->id,&sb,am)) >= 0) {
+	                    if ((rs = permid(&pip->id,&sb,am)) >= 0) {
 	                        f = TRUE ;
 	                    } else if (isNotPresent(rs)) {
 #if	CF_DEBUG
 	                    if (DEBUGLEVEL(3))
 	                        debugprintf("main/maildirs_accessible: "
-	                            "sperm() rs=%d\n",rs) ;
+	                            "permid() rs=%d\n",rs) ;
 #endif
 	                        rs = SR_OK ;
 			    }

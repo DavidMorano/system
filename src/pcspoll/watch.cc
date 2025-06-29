@@ -16,7 +16,7 @@
 #define	CF_LOGONLY	0		/* log exit only w/ daemon? */
 #define	CF_POLL		1		/* use 'poll(2)'? */
 #define	CF_LOGFILECHECK	1		/* logfile check */
-#define	CF_SPERM	1		/* use 'sperm(3dam)' */
+#define	CF_SPERM	1		/* use 'permid(3dam)' */
 
 /* revision history:
 
@@ -105,9 +105,9 @@ extern int	snsds(char *,int,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	cfdeci(char *,int,int *) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
+extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
 extern int	pcsgetprog(const char *,char *,const char *) ;
 extern int	pcsgetprogpath(const char *,char *,const char *) ;
 extern int	getpwd(char *,int) ;
@@ -2316,7 +2316,7 @@ const char	fname[] ;
 	    if (S_ISREG(sb.st_mode)) {
 
 #if	CF_SPERM
-		rs = sperm(&pip->ids,&sb,X_OK) ;
+		rs = permid(&pip->ids,&sb,X_OK) ;
 #else
 	        rs = perm(fname,-1,-1,NULL,X_OK) ;
 #endif

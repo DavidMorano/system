@@ -17,7 +17,7 @@
 #define	CF_ACCTABFREE	0		/* free up ACCTAB occassionally? */
 #define	CF_LOGONLY	0		/* log exit only w/ daemon? */
 #define	CF_POLL		1		/* use 'poll(2)'? */
-#define	CF_SPERM	1		/* use 'sperm(3dam)' */
+#define	CF_SPERM	1		/* use 'permid(3dam)' */
 #define	CF_SLOWGROW	1		/* slowly grow polling interval */
 #define	CF_ENVLOCAL	0		/* use only local environment */
 #define	CF_MKSUBLOGID	1		/* use 'mklogidsub(3dam)' */
@@ -123,9 +123,9 @@ extern int	mklogidsub(char *,int,cchar *,int) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	nextfield(cchar *,int,cchar **) ;
 extern int	cfdeci(char *,int,int *) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
+extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
 extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
 extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,
 			mode_t) ;
@@ -2346,7 +2346,7 @@ cchar	fname[] ;
 	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode)) {
 #if	CF_SPERM
-	        rs = sperm(&pip->id,&sb,X_OK) ;
+	        rs = permid(&pip->id,&sb,X_OK) ;
 #else
 	        rs = perm(fname,-1,-1,NULL,X_OK) ;
 #endif
