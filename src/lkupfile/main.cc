@@ -163,7 +163,7 @@ char	*argv[] ;
 char	*envv[] ;
 {
 	PROGINFO	pi, *pip = &pi ;
-	struct ustat	sb ;
+	ustat	sb ;
 	PARAMOPT	aparams ;
 	bfile		errfile ;
 	bfile		outfile, *ofp = &outfile ;

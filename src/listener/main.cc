@@ -166,7 +166,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	struct msghdr	mh ;
 	struct pollfd	fds[3] ;
 	struct iovec	vecs[NIOVECS] ;
-	struct ustat	sb ;
+	ustat	sb ;
 	PROGINFO	pi, *pip = &pi ;
 	USERINFO	u ;
 	LFM		lk ;

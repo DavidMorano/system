@@ -213,7 +213,7 @@ static const char	*sched3[] = {
 
 int main(int argc,cchar **argv,cchar **envv)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	PROGINFO	pi, *pip = &pi ;
 	struct group	ge ;
 	USERINFO	u ;

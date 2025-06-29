@@ -76,7 +76,7 @@ bfile		*ofp ;
 char		lockfname[] ;
 int		timeout, to_remove ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	cchar		*cp ;
 	char		timebuf[TIMEBUFLEN + 1] ;

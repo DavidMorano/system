@@ -223,7 +223,7 @@ int	argc ;
 char	*argv[] ;
 char	*envv[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	struct group	ge ;
 	struct proginfo	pi, *pip = &pi ;
 	USERINFO	u ;

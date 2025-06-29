@@ -509,7 +509,7 @@ PROGINFO	*pip ;
 int	fd ;
 char	s[] ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	bfile		file, *fp = &file ;
 	int		tlen, len ;
 	char		lbuf[LINELEN + 1] ;

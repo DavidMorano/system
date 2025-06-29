@@ -78,7 +78,7 @@ bfile		*ofp ;
 const char	lockfname[] ;
 int		timeout, to_remove ;
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	time_t		daytime ;
 	int		rs ;
 	int		i, fd ;
