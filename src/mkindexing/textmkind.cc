@@ -75,7 +75,7 @@
 
 extern int	sfshrink(const char *,int,const char **) ;
 extern int	sfword(const char *,int,const char **) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	getnprocessors(const char **,int) ;
 extern int	field_word(FIELD *,const uchar *,const char **) ;
 
@@ -682,7 +682,7 @@ const char	fname[] ;
 
 	    rs1 = u_stat(fname,&sb) ;
 	    if (rs1 >= 0)
-	        rs1 = sperm(&sip->id,&sb,R_OK) ;
+	        rs1 = permid(&sip->id,&sb,R_OK) ;
 
 	} /* end if (flie check) */
 

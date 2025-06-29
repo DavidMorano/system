@@ -39,7 +39,7 @@ extern "C" {
 
 extern int progids_begin(PROGINFO *) ;
 extern int progids_end(PROGINFO *) ;
-extern int progids_sperm(PROGINFO *,ustat *,int) ;
+extern int progids_permid(PROGINFO *,ustat *,int) ;
  
 #ifdef	__cplusplus
 }

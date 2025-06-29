@@ -138,7 +138,7 @@ extern int	ctdeci(char *,int,int) ;
 extern int	ctdecl(char *,int,long) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
 extern int	getarchitecture(char *,int) ;
@@ -3037,7 +3037,7 @@ static int loaddefsfile(PROGINFO *pip,cchar *dfname)
 
 	if ((rs = u_stat(dfname,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
-	        if ((rs = sperm(&pip->id,&sb,R_OK)) >= 0) {
+	        if ((rs = permid(&pip->id,&sb,R_OK)) >= 0) {
 		    VECSTR	*defp = &pip->defs ;
 		    EXPCOOK	*ecp = &pip->cooks ;
 		    cchar	**envv = pip->envv ;
@@ -3112,7 +3112,7 @@ static int loadxfile(PROGINFO *pip,cchar *xfname)
 
 	if ((rs = u_stat(xfname,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
-	        if ((rs = sperm(&pip->id,&sb,R_OK)) >= 0) {
+	        if ((rs = permid(&pip->id,&sb,R_OK)) >= 0) {
 		    if ((rs = securefile(xfname,pip->euid,pip->egid)) >= 0) {
 	    		pip->f.secure_path = TRUE ;
 		    } else if (isNotPresent(rs)) {

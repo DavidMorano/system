@@ -89,7 +89,7 @@ extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	sfskipwhite(cchar *,int,cchar **) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	getnprocessors(cchar **,int) ;
 extern int	isNotPresent(int) ;
 extern int	isNotAccess(int) ;
@@ -575,7 +575,7 @@ static int subinfo_procfile(SUBINFO *sip,DISP *dop,cchar *fname)
 	if (fname[0] != '-') {
 	    USTAT	sb ;
 	    if ((rs = u_stat(fname,&sb)) >= 0) {
-	        if ((rs = sperm(&sip->id,&sb,R_OK)) >= 0) {
+	        if ((rs = permid(&sip->id,&sb,R_OK)) >= 0) {
 	            rs = disp_addwork(dop,fname,-1) ;
 	        } else if (isNotAccess(rs)) {
 		    if (pip->f.iacc) {

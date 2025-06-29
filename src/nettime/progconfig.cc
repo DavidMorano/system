@@ -413,7 +413,7 @@ struct config	*cfp ;
 
 	    while (rs >= 0) {
 
-	        kl = paramfile_enum(pfp,&cur,&pe,pbuf,PBUFLEN) ;
+	        kl = paramfile_curenum(pfp,&cur,&pe,pbuf,PBUFLEN) ;
 	        if (kl == SR_NOTFOUND)
 		    break ;
 

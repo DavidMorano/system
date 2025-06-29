@@ -387,7 +387,7 @@ static int procdnamecheck(PROGINFO *pip,cchar *dname,mode_t m)
 	    if (S_ISDIR(sb.st_mode)) {
 	        const int	nrs = SR_NOENT ;
 		const int	am = (X_OK|W_OK) ;
-	        if ((rs = progids_sperm(pip,&sb,am)) == nrs) {
+	        if ((rs = progids_permid(pip,&sb,am)) == nrs) {
 	            rs = mkdirs(dname,m) ;
 	        }
 	    } else {

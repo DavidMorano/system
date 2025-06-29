@@ -73,15 +73,15 @@ int progids_end(PROGINFO *pip) noex {
 }
 /* end subroutine (progids_end) */
 
-extern int progids_sperm(PROGINFO *pip,USTAT *sbp,int am) noex {
+extern int progids_permid(PROGINFO *pip,USTAT *sbp,int am) noex {
 	int		rs ;
 	if (pip->open.ids) {
-	   rs = sperm(&pip->id,sbp,am) ;
+	   rs = permid(&pip->id,sbp,am) ;
 	} else {
 	    rs = SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (progids_sperm) */
+/* end subroutine (progids_permid) */
 
 
