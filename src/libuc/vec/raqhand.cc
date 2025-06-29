@@ -1,5 +1,5 @@
 /* raqhand SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* random-access queue operations */
@@ -38,6 +38,7 @@
 
 #include	"raqhand.h"
 
+import libutil ;
 
 /* local defines */
 
