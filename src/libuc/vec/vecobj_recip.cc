@@ -1,5 +1,5 @@
 /* vecobj_recip SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* extend the VECOBJ object w/ some recipient handling */
@@ -39,7 +39,6 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<vecobj.h>
@@ -47,6 +46,7 @@
 
 #include	"recip.h"
 
+import libutil ;
 
 /* local defines */
 

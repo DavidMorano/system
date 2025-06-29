@@ -1,5 +1,5 @@
 /* vecobj_strsort SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector object list operations (vstrsort) */
@@ -80,8 +80,8 @@ int vecobj_strsort(vecobj *op,vecobj_vcf vcmp) noex {
 	if (op && vcmp) {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
-	        if (! op->f.issorted) {
-	            op->f.issorted = true ;
+	        if (! op->fl.issorted) {
+	            op->fl.issorted = true ;
 	            if (op->c > 1) {
 			vstrsort_cf	scf = vstrsort_cf(vcmp) ;
 	                vstrsort(op->va,op->i,scf) ;

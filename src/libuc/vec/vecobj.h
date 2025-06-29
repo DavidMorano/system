@@ -1,5 +1,5 @@
 /* vecobj HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* vector-object */
@@ -33,16 +33,50 @@
 #define	VECOBJ_FL		struct vecobj_flags
 #define	VECOBJ_CUR		struct vecobj_cursor
 #define	VECOBJ_DEFENTS		10
-/* options */
-#define	VECOBJ_ODEFAULT		0
-#define	VECOBJ_OREUSE		(1 << 0)	/* reuse empty slots */
-#define	VECOBJ_OCOMPACT		(1 << 1)	/* means NOHOLES */
-#define	VECOBJ_OSWAP		(1 << 2)	/* use swapping */
-#define	VECOBJ_OSTATIONARY	(1 << 3)	/* entries should not move */
-#define	VECOBJ_OCONSERVE	(1 << 4)	/* conserve space */
-#define	VECOBJ_OSORTED		(1 << 5)	/* keep sorted */
-#define	VECOBJ_OORDERED		(1 << 6)	/* keep ordered */
 
+/**** options
+reuse		= reuse empty slots
+compact		= do not allow for holes
+swap		= use swapping for empty slot management
+stationary	= entries do not move
+conserve	= conserve space where possible
+sorted		= maintain a sorted list
+ordered		= maintain an ordered list
+****/
+
+enum vecobjos {
+    vecobjo_reuse,
+    vecobjo_compact,
+    vecobjo_swap,
+    vecobjo_stationary,
+    vecobjo_conserve,
+    vecobjo_sorted,
+    vecobjo_ordered,
+    vecobjo_overlast
+} ;
+
+#ifdef	__cplusplus	/* C++ only! */
+
+struct vecobjms {
+    static int	reuse ;
+    static int	compact ;
+    static int	swap ;
+    static int	stationary ;
+    static int	conserve ;
+    static int	sorted ;
+    static int	ordered ;
+} ;
+
+#endif /* __cplusplus */
+
+#define	VECOBJ_ODEFAULT		0
+#define	VECOBJ_OREUSE		(1 << vecobjo_reuse)
+#define	VECOBJ_OCOMPACT		(1 << vecobjo_compact)
+#define	VECOBJ_OSWAP		(1 << vecobjo_swap)
+#define	VECOBJ_OSTATIONARY	(1 << vecobjo_stationary)
+#define	VECOBJ_OCONSERVE	(1 << vecobjo_conserve)
+#define	VECOBJ_OSORTED		(1 << vecobjo_sorted)
+#define	VECOBJ_OORDERED		(1 << vecobjo_ordered)
 
 struct vecobj_flags {
 	uint		issorted:1 ;
@@ -59,7 +93,7 @@ struct vecobj_flags {
 struct vecobj_head {
 	void		**va ;
 	lookaside	*lap ;
-	VECOBJ_FL	f ;
+	VECOBJ_FL	fl ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
@@ -106,10 +140,11 @@ struct vecobj : vecobj_head {
 	vecobj_co	audit ;
 	vecobj_co	finish ;
 	vecobj() noex {
-	    count(this,vecobjmem_count) ;
-	    delall(this,vecobjmem_delall) ;
-	    audit(this,vecobjmem_audit) ;
-	    finish(this,vecobjmem_finish) ;
+	    count	(this,vecobjmem_count) ;
+	    delall	(this,vecobjmem_delall) ;
+	    audit	(this,vecobjmem_audit) ;
+	    finish	(this,vecobjmem_finish) ;
+	    va = nullptr ;
 	} ;
 	vecobj(const vecobj &) = delete ;
 	vecobj &operator = (const vecobj &) = delete ;
@@ -125,8 +160,8 @@ struct vecobj : vecobj_head {
 	int sort(vecobj_vcf) noex ;
 	void dtor() noex ;
 	operator int () noex ;
-	~vecobj() {
-	    dtor() ;
+	destruct vecobj() {
+	    if (va) dtor() ;
 	} ;
 } ; /* end struct (vecobj) */
 #else	/* __cplusplus */
@@ -159,6 +194,8 @@ extern int vecobj_finish(vecobj *) noex ;
 extern int vecobj_addnew(vecobj *,void **) noex ;
 
 EXTERNC_end
+
+extern vecobjms		vecobjm ;
 
 
 #endif /* VECOBJ_INCLUDE */
