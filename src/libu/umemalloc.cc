@@ -1,5 +1,5 @@
 /* umemalloc SUPPORT (3uc) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -71,17 +71,17 @@ import libutil ;
 /* local structures */
 
 namespace {
-    struct umemalloc ;
-    typedef int (umemalloc::*uclibmalloc_m)(int,void *) noex ;
-    struct umemalloc {
-	uclibmalloc_m	m ;
+    struct umember ;
+    typedef int (umember::*umember_m)(int,void *) noex ;
+    struct umember {
+	umember_m	m ;
 	void		*cp ;		/* constant-void-pointer */
-	umemalloc(void *op = nullptr) noex : cp(op) { } ;
+	umember(void *op = nullptr) noex : cp(op) { } ;
 	int operator () (int,void *) noex ;
 	int stdmalloc(int,void *) noex ;
 	int stdvalloc(int,void *) noex ;
 	int stdrealloc(int,void *) noex ;
-    } ; /* end struct (umemalloc) */
+    } ; /* end struct (umember) */
 }
 
 
@@ -97,52 +97,52 @@ namespace {
 /* exported subroutines */
 
 namespace libu {
-    int umallocstrw(cchar *sp,int sl,cchar **rpp) noex {
+    int umemallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rpp) {
 	    if (sl < 0) sl = xstrlen(sp) ;
-	    if (char *bp ; (rs = umalloc((sl + 1),&bp)) >= 0) {
+	    if (char *bp ; (rs = umemalloc((sl + 1),&bp)) >= 0) {
 	        *rpp = bp ;
 	        strncpy(bp,sp,sl) ;
 	        bp[sl] = '\0' ;
 	    } else {
 		*rpp = nullptr ;
-	    } /* end if (umalloc) */
+	    } /* end if (umemalloc) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? sl : rs ;
-    } /* end subroutine (umallocstrw) */
-    int umalloc(int sz,void *vp) noex {
-	umemalloc	lmo ;
-	lmo.m = &umemalloc::stdmalloc ;
+    } /* end subroutine (umemallocstrw) */
+    int umemalloc(int sz,void *vp) noex {
+	umember	lmo ;
+	lmo.m = &umember::stdmalloc ;
 	return lmo(sz,vp) ;
-    } /* end subroutine (umalloc) */
-    int ucalloc(int ne,int esz,void *vp) noex {
+    } /* end subroutine (umemalloc) */
+    int umemcalloc(int ne,int esz,void *vp) noex {
 	cint		sz = (ne * esz) ;
 	int		rs ;
-	if ((rs = umalloc(sz,vp)) >= 0) {
+	if ((rs = umemalloc(sz,vp)) >= 0) {
 	    memset(vp,0,sz) ;
 	}
 	return (rs >= 0) ? sz : rs ;
     } /* end subroutine (ucalloc) */
-    int uvalloc(int sz,void *vp) noex {
-	umemalloc	lmo ;
-	lmo.m = &umemalloc::stdvalloc ;
+    int umemvalloc(int sz,void *vp) noex {
+	umember	lmo ;
+	lmo.m = &umember::stdvalloc ;
 	return lmo(sz,vp) ;
     } /* end subroutine (uvalloc) */
-    int urealloc(void *cp,int sz,void *vp) noex {
+    int umemrealloc(void *cp,int sz,void *vp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) {
 	    const uintptr_t	v = uintptr_t(cp) ;
 	    rs = SR_BADFMT ;
 	    if ((v & 3) == 0) {
-	        umemalloc	lmo(cp) ;
-	        lmo.m = &umemalloc::stdrealloc ;
+	        umember	lmo(cp) ;
+	        lmo.m = &umember::stdrealloc ;
 	        rs = lmo(sz,vp) ;
 	    } /* end if (aligned correctly) */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (urealloc) */
-    int ufree(void *cp) noex {
+    int umemfree(void *cp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) {
 	    const uintptr_t	v = uintptr_t(cp) ;
@@ -154,23 +154,23 @@ namespace libu {
 	    } /* end if (valid address alignment) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (ufree) */
-    int rslibfree(int rs,void *p) noex {
+    } /* end subroutine (umemfree) */
+    int umemrsfree(int rs,void *p) noex {
 	if (p) {
-    	    if (cint rs1 = ufree(p) ; rs >= 0) {
+    	    if (cint rs1 = umemfree(p) ; rs >= 0) {
 		rs = rs1 ;
 	    }
 	} else {
     	    if (rs >= 0) rs = SR_FAULT ;
 	}
 	return rs ;
-    } /* end subroutine (rslibfree) */
+    } /* end subroutine (ursfree) */
 } /* end namespace (libu) */
 
 
 /* local subroutines */
 
-int umemalloc::operator () (int sz,void *vp) noex {
+int umember::operator () (int sz,void *vp) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
 	errtimer	to_busy		= utimeout[uto_busy] ;
 	errtimer	to_nomem	= utimeout[uto_nomem] ;
@@ -203,9 +203,9 @@ int umemalloc::operator () (int sz,void *vp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (umemalloc::operator) */
+/* end subroutine (umember::operator) */
 
-int umemalloc::stdmalloc(int sz,void *vp) noex {
+int umember::stdmalloc(int sz,void *vp) noex {
 	csize		msize = size_t(sz) ;
 	int		rs ;
 	void		**rpp = voidpp(vp) ;
@@ -219,9 +219,9 @@ int umemalloc::stdmalloc(int sz,void *vp) noex {
 	}
 	return rs ;
 }
-/* end method (umemalloc::stdmalloc) */
+/* end method (umember::stdmalloc) */
 
-int umemalloc::stdvalloc(int sz,void *vp) noex {
+int umember::stdvalloc(int sz,void *vp) noex {
 	csize		msize = size_t(sz) ;
 	int		rs ;
 	void		**rpp = voidpp(vp) ;
@@ -235,9 +235,9 @@ int umemalloc::stdvalloc(int sz,void *vp) noex {
 	}
 	return rs ;
 }
-/* end method (umemalloc::stdvalloc) */
+/* end method (umember::stdvalloc) */
 
-int umemalloc::stdrealloc(int sz,void *vp) noex {
+int umember::stdrealloc(int sz,void *vp) noex {
 	csize		msize = size_t(sz) ;
 	void		*fvp = cast_const<voidp>(cp) ;
 	void		**rpp = voidpp(vp) ;
@@ -252,6 +252,6 @@ int umemalloc::stdrealloc(int sz,void *vp) noex {
 	}
 	return rs ;
 }
-/* end method (umemalloc::stdrealloc) */
+/* end method (umember::stdrealloc) */
 
 
