@@ -1,5 +1,5 @@
 /* vecstrx_envfile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* process an environment file */
@@ -64,6 +64,7 @@
 
 #include	"vecstrx.hh"
 
+import libutil ;
 
 /* local defines */
 
@@ -100,7 +101,7 @@ namespace {
     struct subinfo {
 	vecstrx		*vsp ;
 	cchar		*ft ;		/* field-terms */
-	cchar		*a ;		/* allocation */
+	char		*a ;		/* allocation */
 	char		*lbuf ;
 	char		*ebuf ;
 	int		llen ;
@@ -208,7 +209,7 @@ int subinfo::start() noex {
 	int		sz = 0 ;
 	llen = var.linebuflen ;
 	sz += (2 * (llen + 1)) ;
-	if (char *bp{} ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
 	    a = bp ;
 	    lbuf = bp ;
 	    bp += (llen + 1) ;
@@ -299,7 +300,7 @@ static int mkterms() noex {
 vars::operator int () noex {
 	int		rs ;
 	if ((rs = ucmaxline) >= 0) {
-	    var.linebuflen = (rs * LINEBUFMULT) ;
+	    linebuflen = (rs * LINEBUFMULT) ;
 	}
 	return rs ;
 }

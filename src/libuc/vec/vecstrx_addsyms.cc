@@ -1,5 +1,5 @@
 /* vecstrx_addsyms SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* add constucted symbols to the (VECSTRX) object */
@@ -25,9 +25,9 @@
 	of the use of the heap memory area.  Without (immediate)
 	deallocation, we lose this advantage.  OK, I see the reasoning
 	(for immediate deallocation) but I will leave this
-	(sei-permanent dynamic allocation) in place for now.  What am
-	I doing messing with code that has worked well for ... decades?
-	Am I suddenly crazy?  Enjoy.
+	(sei-permanent dynamic allocation) in place for now.  What
+	am I doing messing with code that has worked well for ...
+	decades?  Am I suddenly crazy?  Enjoy.
 
 */
 
@@ -58,7 +58,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<estrings.h>
@@ -80,8 +79,8 @@
 
 namespace {
     struct vars {
-	int	symlen ;
-	char	*symbuf ;
+	char		*symbuf ;
+	int		symlen ;
 	vars() noex = default ;
 	operator int () noex ;
 	~vars() ;
@@ -103,17 +102,19 @@ static vars		var ;
 /* exported subroutines */
 
 int vecstrx::addsyms(cc *objn,mainv syms) noex {
-    	static cint	rsv = var ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if ((rs = rsv) >= 0) {
-	    while ((rs >= 0) && syms[c]) {
-	        cchar	*sn = syms[c++] ;
-                if ((rs = sncpy(var.symbuf,var.symlen,objn,"_",sn)) >= 0) {
-                    rs = add(var.symbuf,rs) ;
-                }
-            } /* end while */
-	} /* end if (vars) */
+	if (objn && syms) {
+    	    static cint		rsv = var ;
+	    if ((rs = rsv) >= 0) {
+	        while ((rs >= 0) && syms[c]) {
+	            cchar	*sn = syms[c++] ;
+                    if ((rs = sncpy(var.symbuf,var.symlen,objn,"_",sn)) >= 0) {
+                        rs = add(var.symbuf,rs) ;
+                    }
+                } /* end while */
+	    } /* end if (vars) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecstrx_addsyms) */
@@ -131,6 +132,7 @@ vars::operator int () noex {
 	}
 	return rs ;
 }
+/* end method (vars:operator) */
 
 vars::~vars() {
     	if (symbuf) {
@@ -139,5 +141,6 @@ vars::~vars() {
 	    symlen = 0 ;
 	}
 }
+/* end method (vars:dtor) */
 
 

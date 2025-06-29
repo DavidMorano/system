@@ -1,5 +1,5 @@
 /* vecstrx_adduniqs SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* add string(s) to a vector-string object */
@@ -35,7 +35,7 @@
 
 	Returns:
 	>=0		number of strings entered
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -43,13 +43,13 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<localmisc.h>
 
 #include	"vecstrx.hh"
 
+import libutil ;
 
 /* local defines */
 
@@ -83,11 +83,11 @@ int vecstrx::adduniqs(cchar *sp,int sl) noex {
 	    cchar	*tp ;
 	    rs = SR_OK ;
 	    if (sl < 0) sl = xstrlen(sp) ;
-	    while ((tp = strnpbrk(sp,sl," ,")) != nullptr) {
+	    while ((tp = strnbrk(sp,sl," ,")) != nullptr) {
 		cint	tl = intconv(tp - sp) ;
 	        if ((cl = sfshrink(sp,tl,&cp)) > 0) {
 	            rs = adduniq(cp,cl) ;
-	            c += ((rs < INT_MAX) ? 1 : 0) ;
+	            c += (rs < INT_MAX) ;
 	        }
 	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
@@ -96,7 +96,7 @@ int vecstrx::adduniqs(cchar *sp,int sl) noex {
 	    if ((rs >= 0) && (sl > 0)) {
 	        if ((cl = sfshrink(sp,sl,&cp)) > 0) {
 	            rs = adduniq(cp,cl) ;
-	            c += ((rs < INT_MAX) ? 1 : 0) ;
+	            c += (rs < INT_MAX) ;
 	        }
 	    }
 	} /* end if (non-null) */

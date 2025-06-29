@@ -1,5 +1,5 @@
 /* vecstrx_adds SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* add white-space separated substrings */
@@ -41,13 +41,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<localmisc.h>
 
 #include	"vecstrx.hh"
 
+import libutil ;
 
 /* local defines */
 
@@ -58,10 +58,10 @@
 /* external variables */
 
 
-/* forward references */
-
-
 /* local structures */
+
+
+/* forward references */
 
 
 /* local variables */

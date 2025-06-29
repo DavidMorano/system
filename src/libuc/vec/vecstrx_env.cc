@@ -1,5 +1,5 @@
 /* vecstrx_env SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++23 */
 
 /* environment-type string handling */
@@ -19,6 +19,9 @@
 
 	Name:
 	vecstrx_envadd
+	vecstrx_envadds
+	vecstrx_envset
+	vecstrx_envget
 
 	Description:
 	This subroutine extends the VECSTR object to add a key-value
@@ -30,12 +33,15 @@
 
 	Synopsis:
 	int vecstrx_envadd(vecstrx *op,cchar *kp,cchar *vp,int vl) noex
+	int vecstrx::envadds(cchar *sp,int sl) noex
+	int vecstrx::envset(cchar *kp,cchar *vp,int vl) noex
+	int vecstrx::envget(cchar *kp,cchar **rpp) noex
 
 	Arguments:
 	op		vecstrx string to add to
-	kp		pointer to key string
-	vp		pointer to value string
-	bl		length of value string
+	kp		key string pointer
+	vp		value string pointer
+	bl		value string length
 
 	Returns:
 	>=0		OK
@@ -47,7 +53,6 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<strn.h>
 #include	<strwcpy.h>
@@ -57,6 +62,7 @@
 
 #include	"vecstrx.hh"
 
+import libutil ;
 
 /* local defines */
 
@@ -110,7 +116,7 @@ int vecstrx::envadds(cchar *sp,int sl) noex {
 	    cchar	*tp ;
 	    rs = SR_OK ;
 	    if (sl < 0) sl = xstrlen(sp) ;
-	    while ((tp = strnpbrk(sp,sl," \t\r\n,")) != nullptr) {
+	    while ((tp = strnbrk(sp,sl," \t\r\n,")) != nullptr) {
 	        cint	cl = intconv(tp - sp) ;
 	        cchar	*cp = sp ;
 	        if (cl > 0) {
