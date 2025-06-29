@@ -212,11 +212,11 @@ namespace {
 	int allocbegin() noex ;
 	int allocend() noex ;
 	int opener() noex ;
-	~starter() {
+	destruct starter() {
 	    (void) allocend() ;
 	} ; /* end if (dtor) */
     } ; /* end struct (starter) */
-}
+} /* end namespace */
 
 int lfm_start(lfm *op,cc *fname,int type,int to,lfm_ch *lcp,
 		cc *nn,cc *un,cc *bn) noex {
@@ -425,6 +425,7 @@ int lfm_check(lfm *op,lfm_ch *cip,time_t dt) noex {
 /* end subroutine (lfm_check) */
 
 int lfm_printf(lfm *op,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = lfm_magic(op,fmt)) >= 0) {
@@ -439,7 +440,6 @@ int lfm_printf(lfm *op,cchar *fmt,...) noex {
 	        if (rs >= 0) {
 	            /* seek up to the proper place to start writing */
 	            if ((rs = u_seek(op->lfd,op->owrite,SEEK_SET)) >= 0) {
-	                va_list		ap ;
 		        if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
 	                    va_begin(ap,fmt) ;
 		            cint	llen = rs ;
@@ -542,7 +542,7 @@ static int lfm_startcheck(lfm *op,time_t dt) noex {
 	cint		type = op->type ;
 	int		rs ;
 	cchar		*lfn = op->lfname ;
-	if (USTAT sb ; (rs = u_stat(lfn,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(lfn,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
 	        cint	to = op->tolock ;
 	        op->ti_check = dt ;
@@ -603,7 +603,7 @@ static int lfm_lockload(lfm *op,lfm_ch *lcp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = check_init(lcp)) > 0) {
-	    if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	    if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
 	        cint	llen = rs ;
 	        cint	of = O_RDONLY ;
 	        cmode	om = 0666 ;
@@ -662,7 +662,7 @@ int parser::pnodeuser(int len) noex {
 	int		cl ;
 	cchar		*sp = lbp->lbuf ;
 	cchar		*cp ;
-	if (cc *tp{} ; (tp = strnchr(sp,sl,'!')) != np) {
+	if (cc *tp ; (tp = strnchr(sp,sl,'!')) != np) {
 	    sl = intconv(tp - lbp->lbuf) ;
 	    if ((cl = sfshrink(sp,sl,&cp)) > 0) {
 		if (cc *ip{} ; (rs = sip->strw(cp,cl,&ip)) >= 0) {

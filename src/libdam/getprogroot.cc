@@ -52,9 +52,9 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<getnodename.h>
+#include	<getnodedomain.h>
 #include	<bufsizevar.hh>
 #include	<varnames.hh>
 #include	<mallocxx.h>
@@ -73,6 +73,7 @@
 
 #include	"getprogroot.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -137,7 +138,7 @@ int getprogroot(cc *pr,mainv prnames,int *prlenp,char *obuf,cc *name) noex {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
 	        subinfo		si, *sip = &si ;
-	        int		namelen = strlen(name) ;
+	        int		namelen = lenstr(name) ;
 	        bool		f_changed = false ;
 	        obuf[0] = '\0' ;
 	        while ((namelen > 0) && (name[namelen - 1] == '/')) {
@@ -213,15 +214,15 @@ static int subinfo_other(SI *sip,char *obuf,cc *sp,int sl) noex {
 	static cchar	*valp = getenv(varpath) ;
 	sip->prlen = 0 ;
 	if (valp) {
-	    cchar	*tp ;
-	    while ((tp = strbrk(valp,":;")) != nullptr) {
+	    for (cc *tp ; (tp = strbrk(valp,":;")) != nullptr ; ) {
 	        {
-	            rs = subinfo_check(sip,valp,(tp - valp),obuf,sp,sl) ;
+		    cint tl = intconv(tp - valp) ;
+	            rs = subinfo_check(sip,valp,tl,obuf,sp,sl) ;
 	            outlen = rs ;
 	        }
 	        valp = (tp + 1) ;
 	        if ((rs >= 0) || (rs == SR_NOMEM)) break ;
-	    } /* end while */
+	    } /* end for */
 	    if ((rs < 0) && (rs != SR_NOMEM) && (valp[0] != '\0')) {
 	        rs = subinfo_check(sip,valp,-1,obuf,sp,sl) ;
 	        outlen = rs ;
@@ -314,7 +315,7 @@ static int subinfo_pr(SI *sip,cc *pr,char *obuf,cc *sp,int sl) noex {
 	        }
 	    } /* end if */
 	    if (rs >= 0) {
-	        sip->prlen = strlen(pr) ;
+	        sip->prlen = lenstr(pr) ;
 	    }
 	    rs1 = uc_free(dbuf) ;
 	    if (rs >= 0) rs = rs1 ;

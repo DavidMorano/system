@@ -5,7 +5,6 @@
 /* Addres-Look-List */
 /* version %I% last-modified %G% */
 
-#define	CF_UCPWCACHE	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -68,17 +67,12 @@
 
 #include	"lookaddr.h"
 
+import libutil ;
 
 /* local defines */
 
 #define	LA		lookaddr
 #define	LA_US		lookaddr_us
-
-#if	CF_UCPWCACHE
-#define	GETPW_NAME	ugetpw_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UCPWCACHE */
 
 #define	LISTDNAME	"etc/mail"
 #define	WLFNAME		"whitelist"
