@@ -25,7 +25,6 @@
 #include	<paramfile.h>
 #include	<finduid.h>
 #include	<vechand.h>
-#include	<localmisc.h>
 
 
 #define	MOTD_MAGIC	0x75648941

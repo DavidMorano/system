@@ -82,9 +82,48 @@ struct paramfile_cursor {
 	int		i ;
 } ;
 
-typedef PARAMFILE		paramfile ;
 typedef PARAMFILE_CUR		paramfile_cur ;
 typedef PARAMFILE_ENT		paramfile_ent ;
+
+#ifdef	__cplusplus
+enum paramfilemems {
+    	paramfilemem_checkint,
+    	paramfilemem_close,
+	paramfilemem_overlast
+} ; /* end enum (paramfilemems) */
+struct paramfile ;
+struct paramfile_co {
+	paramfile	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (paramfile *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 1) noex ;
+	operator int () noex {
+	    return operator () (1) ;
+	}
+} ; /* end struct (paramfile_co) */
+struct paramfile : paramfile_head {
+    	paramfile_co	checkint ;
+    	paramfile_co	close ;
+	paramfile() noex {
+	    checkint(this,paramfilemem_checkint) ;
+	    close(this,paramfilemem_close) ;
+	} ;
+    	int open(mainv,cchar * = nullptr) noex ;
+	int curbegin(paramfile_cur *) noex ;
+	int curend(paramfile_cur *) noex ;
+	int curenum(paramfile_cur *,paramfile_ent *,char *,int) noex ;
+	int check(time_t = 0L) noex ;
+	void dtor() noex ;
+	destruct paramfile() {
+	    if (magic) dtor() ;
+	} ;
+} ; /* end struct (paramfile) */
+#else
+typedef PARAMFILE		paramfile ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
