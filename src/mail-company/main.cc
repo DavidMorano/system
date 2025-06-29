@@ -1,29 +1,29 @@
-/* cmail */
+/* cmail SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to deliver company email */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0
 #define	CF_DEBUG	0
 #define	CF_REXECTEST	0
 
-
 /* revision history:
 
-	- 1998-12-01, David A.D. Morano
+	- 1998-12-01, David A-D- Morano
 	This program completely (I think) can replace any existing
 	'rslow' programs.  Some elements of some previous 'rslow' 
 	programs may have been used but it is all mixed in now.
 
-	- 1992-12-21, David A.D. Morano
+	- 1992-12-21, David A-D- Morano
 	Added code to create directories in the UUCPPUBLIC
 	area so that any soft links pointing into here (for user 'pcs')
 	will point to something that exists !
 
-
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /**************************************************************************
 
@@ -31,11 +31,9 @@
 	$ cmail [-f from_address]
 		[-i input] address [address ...] < input
 
-
 **************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -47,11 +45,14 @@
 #include	<pwd.h>
 #include	<grp.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
-#include	<time.h>
 #include	<cerrno>
-
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<usystem.h>
 #include	<bfile.h>
 #include	<logfile.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -65,12 +66,12 @@
 
 /* external subroutines */
 
-extern int	mktmpfile(char *,mode_t,const char *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 
 
 /* define command option words */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"TMPDIR",
 	"VERSION",
 	"VERBOSE",
@@ -126,7 +127,7 @@ char	*argv[] ;
 	bfile		tmpfile, *tfp = &tmpfile ;
 	bfile		*fpa[3], file0, file1, file2  ;
 
-	struct ustat	sb ;
+	ustat	sb ;
 
 	struct tm	*timep ;
 
@@ -164,32 +165,32 @@ char	*argv[] ;
 	int	jfd, rfd, efd ;
 	int	childstat ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*progname ;
-	const char	*ifname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*jobfname = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*progname ;
+	cchar	*ifname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*jobfname = NULL ;
 	char	nodename[1024], domainname[1024] ;
-	const char	*jobid ;
-	const char	*cmd_uucico ;
+	cchar	*jobid ;
+	cchar	*cmd_uucico ;
 	char	tmpfname[MAXPATHLEN + 1] ;
 	char	buf[BUFLEN + 1] ;
-	const char	*address_errors = NULL ;
-	const char	*address_sender = NULL ;
-	const char	*address_from = NULL ;
-	const char	*address_error = NULL ;
-	const char	*address_reply = NULL ;
-	const char	*name_from = NULL ;
-	const char	*name_to = NULL ;
-	const char	*user = NULL ;
-	const char	*kickhost = NULL ;
-	const char	*tmpdir = NULL ;
-	const char	*queuespec = NULL ;
-	const char	*servicename = NULL ;
-	const char	*queue_machine, *queue_path ;
-	const char	*local_path = DEFQUEUEPATH ;
-	const char	*copy_path = NULL ;
-	const char	*cp, *cp1, *cp2 ;
+	cchar	*address_errors = NULL ;
+	cchar	*address_sender = NULL ;
+	cchar	*address_from = NULL ;
+	cchar	*address_error = NULL ;
+	cchar	*address_reply = NULL ;
+	cchar	*name_from = NULL ;
+	cchar	*name_to = NULL ;
+	cchar	*user = NULL ;
+	cchar	*kickhost = NULL ;
+	cchar	*tmpdir = NULL ;
+	cchar	*queuespec = NULL ;
+	cchar	*servicename = NULL ;
+	cchar	*queue_machine, *queue_path ;
+	cchar	*local_path = DEFQUEUEPATH ;
+	cchar	*copy_path = NULL ;
+	cchar	*cp, *cp1, *cp2 ;
 	char	cmdbuf[(2 * MAXPATHLEN) + 1] ;
 	char	ahostname[2048 + 1] ;
 	char	*ahost = ahostname ;
@@ -801,7 +802,7 @@ char	*argv[] ;
 
 	    address_reply = strshrink(address_reply) ;
 
-	    if (((cp = strpbrk(address_reply,"!\\@%/=")) == NULL) &&
+	    if (((cp = strbrk(address_reply,"!\\@%/=")) == NULL) &&
 	        ((pp = getpwnam(address_reply)) != NULL)) {
 
 	        name_to = ns_mailname(pp->pw_gecos) ;
@@ -844,7 +845,7 @@ char	*argv[] ;
 
 	    address_from = strshrink(address_from) ;
 
-	    if (((cp = strpbrk(address_from,"!\\@%/=")) == NULL) &&
+	    if (((cp = strbrk(address_from,"!\\@%/=")) == NULL) &&
 	        ((pp = getpwnam(address_from)) != NULL)) {
 
 	        name_from = ns_mailname(pp->pw_gecos) ;

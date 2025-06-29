@@ -1,7 +1,7 @@
 /* deal with digital line terminations */
 
 /*
-	David A.D. Morano
+	David A-D- Morano
 	August 1988
 */
 

@@ -1,5 +1,5 @@
-/* main SUPPORT */
-/* encoding=ISO8859-1 */
+/* mailbox_out_main SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* fairly generic (PCS) front-end */
@@ -51,6 +51,7 @@
 #include	<syslog.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<getourenv.h>
 #include	<getax.h>
 #include	<getx.h>
 #include	<getxname.h>
@@ -72,6 +73,7 @@
 #include	<mkx.h>
 #include	<mktmp.h>
 #include	<cfdec.h>
+#include	<strwcpy.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -108,11 +110,7 @@ extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	process(struct proginfo *,bfile *,bfile *,vecobj *) ;
 extern int	deliver(struct proginfo *,int,struct recip *) ;
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
 extern char	*strdcpy3(char *,int,const char *,const char *,const char *) ;
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
@@ -583,7 +581,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        f_usage = TRUE ;
 	                        f_done = TRUE ;
 				bprintf(pip->efp,
-	                        "%s: invalid key=%t\n",
+	                        "%s: invalid key=%r\n",
 	                        pip->progname,akp,akl) ;
 
 	                        break ;

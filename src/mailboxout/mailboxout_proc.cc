@@ -1,5 +1,5 @@
 /* mailboxout_proc SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* process the input messages and spool them up */
@@ -247,7 +247,7 @@ int process(proginfo *pip,bfile *ifp,bfile *tfp,vecobj *fip) noex {
 	    if (DEBUGLEVEL(4)) {
 	        debugprintf("process: bottom loop\n") ;
 		if (len > 0)
-		debugprintf("process: line=>%t<\n",
+		debugprintf("process: line=>%r<\n",
 			lbuf,
 			((lbuf[len - 1] == '\n') ? (len - 1) : len)) ;
 	    }
@@ -353,7 +353,7 @@ int		len ;
 
 	    for (i = 0 ; msg_getheader(msgp,i,&mhp) >= 0 ; i += 1) {
 
-	        debugprintf("procmsg: %s> %t\n",mhp->name,
+	        debugprintf("procmsg: %s> %r\n",mhp->name,
 	            mhp->value,MIN(mhp->vlen,50)) ;
 
 	    }
@@ -427,7 +427,7 @@ int		len ;
 #endif
 
 	if (pip->open.logfile)
-	logfile_printf(&pip->lh,"  F %t",
+	logfile_printf(&pip->lh,"  F %r",
 	    mdp->efrom,strnlen(mdp->efrom,(LOGMAXLINELEN - 4))) ;
 
 
@@ -490,10 +490,10 @@ int		len ;
 	        if (f_first) {
 
 	            f_first = FALSE ;
-	            fmt = "  mid=| %t" ;
+	            fmt = "  mid=| %r" ;
 
 	        } else
-	            fmt = "      | %t" ;
+	            fmt = "      | %r" ;
 
 		if (pip->open.logfile)
 	            logfile_printf(&pip->lh,fmt, cp,cl) ;
@@ -558,7 +558,7 @@ int		len ;
 	            cp = ep->address ;
 
 	        if ((cp != NULL) && pip->open.logfile)
-	            logfile_printf(&pip->lh,"  sender=%t",
+	            logfile_printf(&pip->lh,"  sender=%r",
 	                cp,strnlen(cp,(LOGMAXLINELEN - 9))) ;
 
 	    } /* end for */
@@ -579,7 +579,7 @@ int		len ;
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("procmsg: errorsto i=%d \n", rs1) ;
 		if (rs1 >= 0)
-	    debugprintf("procmsg: errorsto i=%d value=>%t<\n",
+	    debugprintf("procmsg: errorsto i=%d value=>%r<\n",
 	    	rs1,mhp->value,mhp->vlen) ;
 	}
 #endif
@@ -601,7 +601,7 @@ int		len ;
 	            cp = ep->address ;
 
 	        if ((cp != NULL) && pip->open.logfile)
-	            logfile_printf(&pip->lh,"  errorsto=%t",
+	            logfile_printf(&pip->lh,"  errorsto=%r",
 	                cp,strnlen(cp,(LOGMAXLINELEN - 11))) ;
 
 	    } /* end for */
@@ -653,7 +653,7 @@ int		len ;
 
 	} else {
 
-	    rs1 = bprintf(mdp->tfp,"%t: %s\n",
+	    rs1 = bprintf(mdp->tfp,"%r: %s\n",
 	        mailmsghdrs_names[HI_RETURNPATH],HL_RETURNPATH,
 	        mdp->efrom) ;
 
@@ -814,7 +814,7 @@ int		len ;
 
 		    if (pip->open.logfile) {
 
-	            logfile_printf(&pip->lh,"  from=%t",
+	            logfile_printf(&pip->lh,"  from=%r",
 	                cp,strnlen(cp,(LOGMAXLINELEN - 7))) ;
 
 		    sp = ep->comment ;
@@ -823,7 +823,7 @@ int		len ;
 			cl = sfcomment(sp,ep->clen,&cp) ;
 
 			if (cl > 0)
-	            	    logfile_printf(&pip->lh,"       (%t)",
+	            	    logfile_printf(&pip->lh,"       (%r)",
 	                	cp,MIN(cl,(LOGMAXLINELEN - 9))) ;
 
 		    }
@@ -873,7 +873,7 @@ int		len ;
 
 	        if (cp != NULL) {
 
-	            logfile_printf(&pip->lh,"  to=%t",
+	            logfile_printf(&pip->lh,"  to=%r",
 	                cp,strnlen(cp,(LOGMAXLINELEN - 7))) ;
 
 		    sp = ep->comment ;
@@ -882,7 +882,7 @@ int		len ;
 			cl = sfcomment(sp,ep->clen,&cp) ;
 
 			if (cl > 0)
-	            	    logfile_printf(&pip->lh,"       (%t)",
+	            	    logfile_printf(&pip->lh,"       (%r)",
 	                	cp,MIN(cl,(LOGMAXLINELEN - 9))) ;
 
 		    }
@@ -973,7 +973,7 @@ int		len ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1)
-	    debugprintf("procmsg: tmz zname=>%t< offset=%d\n",
+	    debugprintf("procmsg: tmz zname=>%r< offset=%d\n",
 		info.zname,strnlen(info.zname,TMZ_ZNAMESIZE),info.zoff) ;
 #endif
 
@@ -997,7 +997,7 @@ int		len ;
 	        rs = dater_setmsg(&pip->tmpdate,mhp->value,mhp->vlen) ;
 
 		if (rs < 0)
-	            logfile_printf(&pip->lh,"  bad_date=>%t<",
+	            logfile_printf(&pip->lh,"  bad_date=>%r<",
 	                mhp->value,mhp->vlen) ;
 
 	    }
@@ -1147,7 +1147,7 @@ int		len ;
 
 #if	CF_DEBUG
 	        if (pip->debuglevel > 1)
-	            debugprintf("procmsg: body line> %t",lbuf,len) ;
+	            debugprintf("procmsg: body line> %r",lbuf,len) ;
 #endif
 
 	        if (f_bol && hasfmat(lbuf,len)) {
@@ -1386,7 +1386,7 @@ int		addrlen ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4)) {
-	        debugprintf("procmsgenv: sal=%d addrbuf=%t\n",
+	        debugprintf("procmsgenv: sal=%d addrbuf=%r\n",
 	            sal,addrbuf,strnlen(addrbuf,sal)) ;
 	        debugprintf("procmsgenv: emainfo() \n") ;
 	    }
@@ -1397,7 +1397,7 @@ int		addrlen ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4)) {
 	        debugprintf("procmsgenv: emainfo() rs=%d\n",rs) ;
-	        debugprintf("procmsgenv: ai.host=%t ai.local=%t\n",
+	        debugprintf("procmsgenv: ai.host=%r ai.local=%r\n",
 	            ai.host,ai.hlen,ai.local,ai.llen) ;
 	    }
 #endif
@@ -1407,10 +1407,10 @@ int		addrlen ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4)) {
-	        debugprintf("procmsgenv: emainfo_mktype() rs=%d addrbuf=%t\n",
+	        debugprintf("procmsgenv: emainfo_mktype() rs=%d addrbuf=%r\n",
 	            sl,
 	            addrbuf,strnlen(addrbuf,al)) ;
-	        debugprintf("procmsgenv: addr=%t\n",
+	        debugprintf("procmsgenv: addr=%r\n",
 	            ap,sl) ;
 	    }
 #endif
@@ -1424,9 +1424,9 @@ int		addrlen ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
-	        debugprintf("procmsgenv: addrbuf=%t\n",
+	        debugprintf("procmsgenv: addrbuf=%r\n",
 	            addrbuf,strnlen(addrbuf,al)) ;
-	    debugprintf("procmsgenv: addr=%t\n",addr,al) ;
+	    debugprintf("procmsgenv: addr=%r\n",addr,al) ;
 #endif
 
 	    if (pip->open.logfile) {
@@ -1434,7 +1434,7 @@ int		addrlen ;
 	    logfile_printf(&pip->lh,"  | %-25s",
 	        datebuf) ;
 
-	    logfile_printf(&pip->lh,"  |   %c %t",
+	    logfile_printf(&pip->lh,"  |   %c %r",
 	        atypes[atype],addr,MIN(al,(LOGMAXLINELEN - 8))) ;
 
 	    }
@@ -1453,13 +1453,13 @@ int		addrlen ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4)) {
-	        debugprintf("procmsgenv: sal=%d addrbuf=%t\n",
+	        debugprintf("procmsgenv: sal=%d addrbuf=%r\n",
 	            sal,addrbuf,sal) ;
 	    }
 #endif
 
 	    if (pip->open.logfile)
-	    logfile_printf(&pip->lh,"  > %t",
+	    logfile_printf(&pip->lh,"  > %r",
 	        addrbuf,MIN(sal,(LOGMAXLINELEN - 4))) ;
 
 	    dater_gettime(&mip->edate,&mip->etime) ;
@@ -1585,7 +1585,7 @@ int		nlen, mode ;
 	    debugprintf("ph_write: line=%d\n",line) ;
 #endif
 
-	        rs = bprintf(afp,"%t: ",
+	        rs = bprintf(afp,"%r: ",
 	            name,nlen) ;
 
 		if (rs >= 0)
@@ -1598,7 +1598,7 @@ int		nlen, mode ;
 	if (pip->debuglevel > 1) {
 	    debugprintf("ph_write: linelen=%d\n",
 		mlp->llen) ;
-	    debugprintf("ph_write: line=>%t<\n",
+	    debugprintf("ph_write: line=>%r<\n",
 		mlp->line,mlp->llen) ;
 	    debugprintf("ph_write: f_bol=%d f_eol=%d\n",
 		mlp->f_bol,mlp->f_eol) ;
@@ -1608,12 +1608,12 @@ int		nlen, mode ;
 	            if (mlp->llen > 0) {
 
 	                if (line == 0)
-	                    rs = bprintf(afp,"%t%s",
+	                    rs = bprintf(afp,"%r%s",
 	                        mlp->line,mlp->llen,
 	                        (mlp->f_eol ? "\n" : "")) ;
 
 	                else
-	                    rs = bprintf(afp,"%s%t%s",
+	                    rs = bprintf(afp,"%s%r%s",
 	                        (mlp->f_bol ? "\t" : " "),
 	                        mlp->line,mlp->llen,
 	                        (mlp->f_eol ? "\n" : "")) ;
@@ -1638,7 +1638,7 @@ int		nlen, mode ;
 
 /* write the header the as a single value string (if it fits) */
 
-	    rs = bprintf(afp,"%t: %t\n",
+	    rs = bprintf(afp,"%r: %r\n",
 	        name,nlen,
 	        mhp->value,mhp->vlen) ;
 
@@ -1654,7 +1654,7 @@ int		nlen, mode ;
 	    char	*cp ;
 
 
-	    rs = bprintf(afp,"%t:",name,nlen) ;
+	    rs = bprintf(afp,"%r:",name,nlen) ;
 
 		if (rs >= 0)
 			tlen += rs ;
@@ -1670,9 +1670,9 @@ int		nlen, mode ;
 
 	        if (cl > lenr) {
 	            lenr = (MSG_MAXLINELEN - 7) ;
-	            rs = bprintf(afp,"\n\t%t",cp,cl) ;
+	            rs = bprintf(afp,"\n\t%r",cp,cl) ;
 	        } else
-	            rs = bprintf(afp," %t",cp,cl) ;
+	            rs = bprintf(afp," %r",cp,cl) ;
 
 		if (rs >= 0)
 			tlen += rs ;
@@ -1699,7 +1699,7 @@ int		nlen, mode ;
 	    mip = mhp->i ;
 	    if (mip != NULL) {
 
-	        rs = bprintf(afp,"%t: %t",
+	        rs = bprintf(afp,"%r: %r",
 	            name,nlen,
 	            mip->value,mip->vlen) ;
 
@@ -1711,7 +1711,7 @@ int		nlen, mode ;
 
 	    while (mip != NULL) {
 
-	        rs = bprintf(afp,",\n\t%t",
+	        rs = bprintf(afp,",\n\t%r",
 	            mip->value,mip->vlen) ;
 
 		if (rs >= 0)

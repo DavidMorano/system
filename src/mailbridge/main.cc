@@ -92,7 +92,7 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,
 			const char *,const char *) ;
 extern int	pcspoll(const char *,const char *,PCSCONF *,VECSTR *) ;
@@ -231,7 +231,7 @@ char	*envv[] ;
 {
 	struct proginfo	pi, *pip = &pi ;
 	struct sigaction	sigs ;
-	struct ustat	sb ;
+	ustat	sb ;
 	PCSCONF		p ;
 	USERINFO	u ;
 	SYSTEMS		sysdb ;
@@ -517,7 +517,7 @@ char	*envv[] ;
 	                default:
 	                    rs = SR_INVALID ;
 	                    bprintf(pip->efp,
-	                        "%s: invalid key=%t\n",
+	                        "%s: invalid key=%r\n",
 	                        pip->progname,akp,akl) ;
 
 	                } /* end switch (key words) */
@@ -1125,7 +1125,7 @@ char	*envv[] ;
 
 	                rs1 = SR_NOENT ;
 	                if (! S_ISDIR(sb.st_mode))
-	                    rs1 = sperm(&pip->id,&sb,R_OK) ;
+	                    rs1 = permid(&pip->id,&sb,R_OK) ;
 
 	            }
 
