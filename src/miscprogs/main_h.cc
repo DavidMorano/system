@@ -4,11 +4,8 @@
 
 #define		ESC	(char) 0x1B
 
-int main()
-{
+int main() {
 	printf("%1c[H",ESC) ;
-
-	fflush(stdout) ;
-
 	return 0 ;
 }
+

@@ -1,6 +1,6 @@
-# MAKEFILE (for 'misc')
+# MAKEFILE (miscprogs)
 
-T= misc
+T= miscprogs
 
 #SRCROOT= $(LOCAL)
 

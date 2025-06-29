@@ -268,7 +268,7 @@ static int prochavefile(PROGINFO *pip,cchar *fname)
 	if (fname[0] == '\0') return SR_INVALID ;
 	if ((rs = u_stat(fname,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
-		rs = progids_sperm(pip,&sb,R_OK) ;
+		rs = progids_permid(pip,&sb,R_OK) ;
 		rc = rs ;
 	    } else {
 		rs = SR_ISDIR ;

@@ -88,7 +88,7 @@
 extern int	sfshrink(const char *,int,const char **) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	sfdirname(const char *,int,const char **) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	getnprocessors(const char **,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -590,7 +590,7 @@ const char	fname[] ;
 
 	    rs1 = u_stat(fname,&sb) ;
 	    if (rs1 >= 0)
-	        rs1 = sperm(&sip->id,&sb,R_OK) ;
+	        rs1 = permid(&sip->id,&sb,R_OK) ;
 
 	    if (rs1 < 0)
 	        ereport(pip,fname,rs1) ;

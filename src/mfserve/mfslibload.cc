@@ -1,23 +1,22 @@
 /* mfs-libload */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
-/* try to load a shared-lib into the MFSERVE daemon */
+/* try to load s shared-lib into the MFSERVE daemon */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable at invocation */
 
-
 /* revision history:
 
-	= 2017-08-10, David AÂ­DÂ­ Morano
+	= 2017-08-10, David A­D­ Morano
 	This subroutine was borrowed or inspired from |progserve()| and
 	|progshlib()| from the TCPMUXD family of server programs.
 
 */
 
-/* Copyright Â© 2011,2017 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2011,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -25,9 +24,7 @@
         library object into the program in order to call a Acommand" from within
         the shared library.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -41,6 +38,7 @@
 
 #include	<usystem.h>
 #include	<estrings.h>
+#include	<strn.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -91,10 +89,6 @@ extern "C" int	isNotPresent(int) ;
 extern "C" int	debugprintf(const char *,...) ;
 extern "C" int	strllen(const char *,int,int) ;
 #endif
-
-extern "C" char	*strwcpy(char *,const char *,int) ;
-extern "C" char	*strnchr(cchar *,int,int) ;
-extern "C" char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -180,7 +174,7 @@ int libinfo::soparse(const SREQ *jep)
 	    cchar	*tp ;
 	    rs = lnl ;
 	    if ((tp = strnchr(lnp,lnl,':')) == NULL) {
-	        tp = strnpbrk(lnp,lnl," \t") ;
+	        tp = strnbrk(lnp,lnl," \t") ;
 	    }
 	    if (tp != NULL) {
 	        enl = sfshrink((tp+1),((lnp+lnl)-(tp+1)),&enp) ;
@@ -253,7 +247,7 @@ int libinfo::findlib(PROGINFO *pip,char *rbuf)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
-	    debugprintf("progserve/procfindprog: lfn=%t\n",lnp,lnl) ;
+	    debugprintf("progserve/procfindprog: lfn=%r\n",lnp,lnl) ;
 #endif
 
 	if (lnp[0] == '/') {

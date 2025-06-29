@@ -1,2 +1,2 @@
-MISC (miscellaneous stuff)
+MISCPROGS (miscellaneous programs)
 

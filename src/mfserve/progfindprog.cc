@@ -108,8 +108,8 @@ extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_loadfile(vecstr *,int,const char *) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	getprogpath(IDS *,VECSTR *,char *,const char *,int) ;
 
 extern int	progdefprog(struct proginfo *,const char **) ;
@@ -362,7 +362,7 @@ const char	fname[] ;
 
 	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode))
-	        rs = sperm(idp,&sb,X_OK) ;
+	        rs = permid(idp,&sb,X_OK) ;
 
 	}
 
