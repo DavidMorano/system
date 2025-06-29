@@ -1,5 +1,5 @@
 /* ucstrtox SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -78,7 +78,7 @@ constexpr static inline bool bit(T v,int n) noex {
 }
 
 template<typename T>
-void strtox(cchar *,char **,int,T *rp) noex {
+static void strtox(cchar *,char **,int,T *rp) noex {
 	*rp = 0 ;
 }
 
@@ -142,14 +142,14 @@ void strtox(cchar *sp,char **epp,int b,ulonglong *rp) noex {
 }
 
 template<typename T>
-int ucstrtox(cchar *sp,cchar **epp,int b,T *rp) noex {
+static int ucstrtox(cchar *sp,cchar **epp,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
 	    char	*endp = nullptr ;
 	    errno = 0 ;
 	    strtox(sp,&endp,b,rp) ;
 	    if (epp) *epp = endp ;
-	    rs = (errno != 0) ? (- errno) : (endp - sp) ;
+	    rs = (errno != 0) ? (- errno) : intconv(endp - sp) ;
 	}
 	return rs ;
 }

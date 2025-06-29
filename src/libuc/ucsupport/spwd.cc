@@ -1,5 +1,5 @@
 /* spwd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* define various sytem (global) variables */
@@ -8,15 +8,15 @@
 
 /* revision history:
 
-	= 2001-04-11, David D-A- Morano
+	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
-	= 2014-06-27, David D-A- Morano
+	= 2014-06-27, David A-D- Morano
 	I updated this to use the 'constexpr' capability of C++14.
 
 */
 
-/* Copyright © 2001,2014 David D-A- Morano.  All rights reserved. */
+/* Copyright © 2001,2014 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -45,6 +45,7 @@
 #include	"ucsupport.h"
 #include	"spwd.h"
 
+import libutil ;
 
 /* local defines */
 
