@@ -1,5 +1,5 @@
 /* vecitem SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector-item operations */
@@ -34,12 +34,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
 #include	"vecitem.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -130,8 +130,7 @@ int vecitem_start(vecitem *op,int n,int opts) noex {
 	    memclear(hop) ;	/* <- potentially dangerous if type changes */
 	    if ((rs = vecitem_setopts(op,opts)) >= 0) {
 	        cint	sz = (n + 1) * szof(char **) ;
-		void	*vp{} ;
-	        if ((rs = uc_malloc(sz,&vp)) >= 0) {
+		if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
 		    op->va = (void **) vp ;
 	            op->va[0] = nullptr ;
 	            op->n = n ;
@@ -172,11 +171,10 @@ int vecitem_add(vecitem *op,cvoid *ep,int el) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op && ep) {
-	    char	*bp = nullptr ;
 	    bool	f_done = false ;
 	    bool	f ;
 	    if (el < 0) el = xstrlen(charp(ep)) ;
-	    if ((rs = uc_malloc((el+1),&bp)) >= 0) {
+	    if (char *bp ; (rs = uc_malloc((el+1),&bp)) >= 0) {
 	        memcpy(bp,ep,el) ;
 	        bp[el] = '\0' ;
 	        f = (op->f.oreuse || op->f.oconserve) && (! op->f.oordered) ;

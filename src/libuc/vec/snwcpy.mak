@@ -35,6 +35,8 @@ DEFS=
 
 INCS= snwcpy.h snwcpyx.h snwcpyxc.h
 
+MODS +=
+
 LIBS=
 
 
@@ -60,21 +62,22 @@ OBJ1_SNWCPYX= snwcpyclean.o snwcpylatin.o
 OBJ2_SNWCPYX= snwcpyshrink.o snwcpycompact.o
 OBJ3_SNWCPYX= snwcpyer.o snwcpyrev.o
 OBJ4_SNWCPYX= snwcpyhyphen.o snwcpywidehdr.o
-OBJ5_SNWCPYX=
+OBJ5_SNWCPYX= snwcpyexpesc.o
 
 OBJA_SNWCPYX= obj0.o obj1.o
 OBJB_SNWCPYX= obj2.o obj3.o
-OBJC_SNWCPYX= obj4.o
+OBJC_SNWCPYX= obj4.o obj5.o
 
 OBJ_SNWCPYX= obja.o objb.o objc.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -94,17 +97,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_SNWCPYX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SNWCPYX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
 	rm -f $(ALL)
@@ -155,5 +156,6 @@ snwcpyrev.o:		snwcpyrev.cc		$(INCS)
 snwcpyshrink.o:		snwcpyshrink.cc		$(INCS)
 snwcpywidehdr.o:	snwcpywidehdr.cc	$(INCS)
 snwcpyxc.o:		snwcpyxc.cc		$(INCS)
+snwcpyexpesc.o:		snwcpyexpesc.cc		$(INCS)
 
 

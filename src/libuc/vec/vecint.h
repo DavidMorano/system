@@ -1,5 +1,5 @@
 /* vecint HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* vector integer operations */
@@ -159,15 +159,16 @@ struct vecint : vecint_head {
 	vecint_co	audit ;
 	vecint_co	finish ;
 	vecint() noex {
-	    start(this,0) ;
-	    extent(this,vecintmem_extent) ;
-	    count(this,vecintmem_count) ;
-	    delall(this,vecintmem_delall) ;
-	    sort(this,vecintmem_sort) ;
-	    setsorted(this,vecintmem_setsorted) ;
-	    resize(this,vecintmem_resize) ;
-	    audit(this,vecintmem_audit) ;
-	    finish(this,vecintmem_finish) ;
+	    start	(this,0) ;
+	    extent	(this,vecintmem_extent) ;
+	    count	(this,vecintmem_count) ;
+	    delall	(this,vecintmem_delall) ;
+	    sort	(this,vecintmem_sort) ;
+	    setsorted	(this,vecintmem_setsorted) ;
+	    resize	(this,vecintmem_resize) ;
+	    audit	(this,vecintmem_audit) ;
+	    finish	(this,vecintmem_finish) ;
+	    magic = 0 ;
 	} ;
 	vecint(const vecint &) = delete ;
 	vecint &operator = (const vecint &) = delete ;
@@ -193,8 +194,8 @@ struct vecint : vecint_head {
 	    return it ;
 	} ;
 	void dtor() noex ;
-	~vecint() {
-	    dtor() ;
+	destruct vecint() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (vecint) */
 #else	/* __cplusplus */

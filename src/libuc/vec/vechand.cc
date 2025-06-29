@@ -1,5 +1,5 @@
 /* vechand SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector list operations */
@@ -26,6 +26,15 @@
 	copy the structure pointed to by the passed pointer.  The
 	caller is responsible for keeping the original data in scope
 	during the whole life span of the vector list.
+
+	Options:
+	reuse		= reuse empty slots
+	compact		= do not allow for holes
+	swap		= use swapping for empty slot management
+	stationary	= entries do not move
+	conserve	= conserve space where possible
+	sorted		= maintain a sorted list
+	ordered		= maintain an ordered list
 
 *******************************************************************************/
 
@@ -75,26 +84,23 @@ static int	vechand_validx(vechand *,int) noex ;
 
 /* local subroutines */
 
-consteval int mkoptmask() noex {
-	int		m = 0 ;
-	m |= VECHAND_OREUSE ;
-	m |= VECHAND_OCOMPACT ;
-	m |= VECHAND_OSWAP ;
-	m |= VECHAND_OSTATIONARY ;
-	m |= VECHAND_OCONSERVE ;
-	m |= VECHAND_OSORTED ;
-	m |= VECHAND_OORDERED ;
-	return m ;
-}
-/* end subroutine (mkoptmask) */
-
 
 /* local variables */
 
-constexpr int		optmask = mkoptmask() ;
+cint		defents = VECHAND_DEFENTS ;
 
 
 /* exported variables */
+
+int vechandms::reuse		= (1 << vechando_reuse) ;
+int vechandms::compact		= (1 << vechando_compact) ;
+int vechandms::swap		= (1 << vechando_swap) ;
+int vechandms::stationary	= (1 << vechando_stationary) ;
+int vechandms::conserve		= (1 << vechando_conserve) ;
+int vechandms::sorted		= (1 << vechando_sorted) ;
+int vechandms::ordered		= (1 << vechando_ordered) ;
+
+vechandms	vechandm ;
 
 
 /* exported subroutines */
@@ -102,14 +108,14 @@ constexpr int		optmask = mkoptmask() ;
 int vechand_start(vechand *op,int vn,int vo) noex {
 	int		rs ;
 	if ((rs = vechand_ctor(op)) >= 0) {
-	    if (vn <= 1) vn = VECHAND_DEFENTS ;
+	    if (vn <= 1) vn = defents ;
 	    if ((rs = vechand_setopts(op,vo)) >= 0) {
 	        cint	sz = (vn + 1) * szof(cvoid **) ;
 	        if (void **va ; (rs = uc_libmalloc(sz,&va)) >= 0) {
 		    op->va = va ;
 	            op->va[0] = nullptr ;
 	            op->n = vn ;
-	            op->f.issorted = false ;
+	            op->fl.issorted = false ;
 	        } /* end if (memory-allocation) */
 	    } /* end if (options) */
 	} /* end if (non-null) */
@@ -142,14 +148,14 @@ int vechand_add(vechand *op,cvoid *nep) noex {
 	    if ((rs = vechand_extend(op)) >= 0) {
 	        bool	f_done = false ;
 	        bool	f ;
-	        f = (op->f.oreuse || op->f.oconserve) && (! op->f.oordered) ;
+	        f = (op->fl.oreuse || op->fl.oconserve) && (! op->fl.oordered) ;
 	        if (f && (op->c < op->i)) {
 	            i = op->fi ;
 	            while ((i < op->i) && (op->va[i] != nullptr)) {
 	                i += 1 ;
 	            }
 	            if (i < op->i) {
-	                op->va[i] = (void *) nep ;
+	                op->va[i] = voidp(nep) ;
 	                op->fi = i + 1 ;
 	                f_done = true ;
 	            } else {
@@ -162,12 +168,12 @@ int vechand_add(vechand *op,cvoid *nep) noex {
 	            }
 	            if (rs >= 0) {
 	                i = op->i ;
-	                op->va[op->i++] = (void *) nep ;
+	                op->va[op->i++] = voidp(nep) ;
 	                op->va[op->i] = nullptr ;
 	            }
 	        } /* end if (added elsewhere) */
 	        if (rs >= 0) op->c += 1 ;	/* increment list count */
-	        op->f.issorted = false ;
+	        op->fl.issorted = false ;
 	    } /* end if (extended) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
@@ -218,18 +224,19 @@ int vechand_search(vechand *op,cv *ep,vechand_vcmp vcf,void **rpp) noex {
 	if (op && ep && vcf) {
 	    rs = SR_NOENT ;
 	    if (op->va) {
+		csize	nsize = size_t(op->i) ;
 		csize	esize = szof(void *) ;
-	        if (op->f.osorted && (! op->f.issorted)) {
-	            op->f.issorted = true ;
+	        if (op->fl.osorted && (! op->fl.issorted)) {
+	            op->fl.issorted = true ;
 	            if (op->c > 1) {
 			qsort_f		scf = qsort_f(vcf) ;
-		        qsort(op->va,op->i,esize,scf) ;
+		        qsort(op->va,nsize,esize,scf) ;
 	            }
 	        }
-	        if (op->f.issorted) {
+	        if (op->fl.issorted) {
 		    qsort_f	scf = qsort_f(vcf) ;
 	            void	**spp ;
-	            spp = (void **) bsearch(&ep,op->va,op->i,esize,scf) ;
+	            spp = (void **) bsearch(&ep,op->va,nsize,esize,scf) ;
 	            rs = SR_NOTFOUND ;
 	            if (spp) {
 	                i = intconv(spp - op->va) ;
@@ -237,7 +244,7 @@ int vechand_search(vechand *op,cv *ep,vechand_vcmp vcf,void **rpp) noex {
 	            }
 	        } else {
 	            for (i = 0 ; i < op->i ; i += 1) {
-	                cvoid	*lep = (cvoid *) op->va[i] ;
+	                cvoid	*lep = cvoidp(op->va[i]) ;
 	                if (lep) {
 	                    if ((*vcf)(&ep,&lep) == 0) break ;
 		        }
@@ -280,12 +287,12 @@ int vechand_del(vechand *op,int i) noex {
 		if ((rs = vechand_validx(op,i)) >= 0) {
 	            bool	f_fi = false ;
 		    op->c -= 1 ;
-		    if (op->f.ostationary) {
+		    if (op->fl.ostationary) {
 	    		op->va[i] = nullptr ;
 	    		if (i == (op->i - 1)) op->i -= 1 ;
 	    		f_fi = true ;
-		    } else if (op->f.issorted || op->f.oordered) {
-	                if (op->f.ocompact) {
+		    } else if (op->fl.issorted || op->fl.oordered) {
+	                if (op->fl.ocompact) {
 		            int	j ;
 	                    op->i -= 1 ;
 	                    for (j = i ; j < op->i ; j += 1) {
@@ -298,19 +305,19 @@ int vechand_del(vechand *op,int i) noex {
 	                    f_fi = true ;
 	                } /* end if */
 	            } else {
-			bool	f = (op->f.oswap || op->f.ocompact)  ;
+			bool	f = (op->fl.oswap || op->fl.ocompact)  ;
 			f = f && (i < (op->i - 1)) ;
 			if (f) {
 	                    op->va[i] = op->va[op->i - 1] ;
 	                    op->va[--op->i] = nullptr ;
-	                    op->f.issorted = false ;
+	                    op->fl.issorted = false ;
 	                } else {
 	                    op->va[i] = nullptr ;
 	                    if (i == (op->i - 1)) op->i -= 1 ;
 	                    f_fi = true ;
 	                } /* end if */
 	            } /* end if */
-	            if (op->f.oconserve) {
+	            if (op->fl.oconserve) {
 	                while (op->i > i) {
 	                    if (op->va[op->i - 1] != nullptr) break ;
 	                    op->i -= 1 ;
@@ -371,12 +378,13 @@ int vechand_sort(vechand *op,vechand_vcmp vcf) noex {
 	    rs = SR_OK ;
 	    if (op->va) {
 		c = op->c ;
-	        if (! op->f.issorted) {
-	            op->f.issorted = true ;
+	        if (! op->fl.issorted) {
+	            op->fl.issorted = true ;
 	            if (op->c > 1) {
+			csize		nsize = size_t(op->i) ;
 			csize		esize = szof(void *) ;
 			qsort_f		scf = qsort_f(vcf) ;
-	                qsort(op->va,op->i,esize,scf) ;
+	                qsort(op->va,nsize,esize,scf) ;
 		    }
 	        } /* end if (not sorted) */
 	    } /* end if (had entries) */
@@ -390,7 +398,7 @@ int vechand_issorted(vechand *op) noex {
 	int		f_issorted = false ;
 	if (op) {
 	    rs = SR_OK ;
-	    f_issorted = op->f.issorted ;
+	    f_issorted = op->fl.issorted ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_issorted : rs ;
 }
@@ -401,7 +409,7 @@ int vechand_setsorted(vechand *op) noex {
 	int		c = 0 ;
 	if (op) {
 	    rs = SR_OK ;
-	    op->f.issorted = true ;
+	    op->fl.issorted = true ;
 	    c = op->c ;
 	}
 	return (rs >= 0) ? c : rs ;
@@ -413,8 +421,8 @@ int vechand_getvec(vechand *op,void *rp) noex {
 	int		i = 0 ;
 	if (op && rp) {
 	    if ((rs = vechand_extend(op)) >= 0) {
-	        void	**rpp = (void **) rp ;
-	        *rpp = (void *) op->va ;
+	        void	**rpp = voidpp(rp) ;
+	        *rpp = voidp(op->va) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
@@ -467,18 +475,32 @@ static int vechand_ctor(vechand *op) noex {
 }
 /* end subroutine (vechand_ctor) */
 
+static int mkoptmask() noex {
+	int		m = 0 ;
+	m |= vechandm.reuse ;
+	m |= vechandm.compact ;
+	m |= vechandm.swap ;
+	m |= vechandm.stationary ;
+	m |= vechandm.conserve ;
+	m |= vechandm.sorted ;
+	m |= vechandm.ordered ;
+	return m ;
+}
+/* end subroutine (mkoptmask) */
+
 static int vechand_setopts(vechand *op,int vo) noex {
+	static cint	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
-	    op->f = {} ;
-	    if (vo & VECHAND_OREUSE) op->f.oreuse = 1 ;
-	    if (vo & VECHAND_OSWAP) op->f.oswap = 1 ;
-	    if (vo & VECHAND_OSTATIONARY) op->f.ostationary = 1 ;
-	    if (vo & VECHAND_OCOMPACT) op->f.ocompact = 1 ;
-	    if (vo & VECHAND_OSORTED) op->f.osorted = 1 ;
-	    if (vo & VECHAND_OORDERED) op->f.oordered = 1 ;
-	    if (vo & VECHAND_OCONSERVE) op->f.oconserve = 1 ;
+	    op->fl = {} ;
+	    if (vo & vechandm.reuse)		op->fl.oreuse = true ;
+	    if (vo & vechandm.swap)		op->fl.oswap = true ;
+	    if (vo & vechandm.stationary)	op->fl.ostationary = true ;
+	    if (vo & vechandm.compact)		op->fl.ocompact = true ;
+	    if (vo & vechandm.sorted)		op->fl.osorted = true ;
+	    if (vo & vechandm.ordered)		op->fl.oordered = true ;
+	    if (vo & vechandm.conserve)		op->fl.oconserve = true ;
 	} /* end if (valid options) */
 	return rs ;
 }
@@ -491,7 +513,7 @@ static int vechand_extend(vechand *op) noex {
 	    int		sz ;
 	    void	*nva ;
 	    if (op->va == nullptr) {
-	        nn = VECHAND_DEFENTS ;
+	        nn = defents ;
 	        sz = (nn + 1) * szof(void **) ;
 	        rs = uc_libmalloc(sz,&nva) ;
 	    } else {

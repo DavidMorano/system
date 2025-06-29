@@ -1,5 +1,5 @@
 /* vecelem SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector element-list operations */
@@ -366,7 +366,7 @@ static int vecelem_extend(vecelem *op) noex {
 	        rs = uc_librealloc(op->va,size,&va) ;
 	    } /* end if */
 	    if (rs >= 0) {
-	        op->va = va ;
+	        op->va = caddr_t(va) ;
 	        op->n = nn ;
 		op->va[op->i] = nullptr ;
 	    }
