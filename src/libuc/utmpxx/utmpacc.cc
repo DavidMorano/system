@@ -1,5 +1,5 @@
 /* utmpacc SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® UTMP access management */
@@ -8,15 +8,15 @@
 
 /* revision history:
 
-	= 1998-02-01, David A­D­ Morano
+	= 1998-02-01, David A-D- Morano
 	Originally written for Rightcore Network Services.
 
-	= 2018-11-21, David A.D. Morano
+	= 2018-11-21, David A-D- Morano
 	I enhanced the caching of different entry types.
 
 */
 
-/* Copyright © 1998,2018 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2018 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -84,6 +84,7 @@
 
 #include	"utmpacc.h"
 
+import libutil ;
 
 /* local defines */
 #define	UTMPACC_ITEM		struct utmpacc_i
@@ -324,11 +325,11 @@ int utmpacc_curbegin(utmpacc_cur *curp) noex {
 	    cnullptr	np{} ;
 	    cint	csz = szof(utmpacc_icur) ;
 	    curp->icursor = nullptr ;
-	    if (void *vp{} ; (rs = uc_malloc(csz,&vp)) >= 0) {
+	    if (void *vp ; (rs = uc_libmalloc(csz,&vp)) >= 0) {
 		cint		usz = szof(UTMPX) ;
 	        utmpacc_icur	*icurp = (utmpacc_icur *) vp ;
 		memclear(icurp) ;
-		if ((rs = uc_malloc(usz,&vp)) >= 0) {
+		if ((rs = uc_libmalloc(usz,&vp)) >= 0) {
 		    UTMPX	*ufp = (UTMPX *) vp ;
 		    cint	of = (O_CLOEXEC | O_MINFD) ;
 		    cmode	om = 0664 ;
@@ -350,12 +351,12 @@ int utmpacc_curbegin(utmpacc_cur *curp) noex {
 		        }
 		    } /* end if (opentmp) */
 		    if (rs < 0) {
-			uc_free(ufp) ;
+			uc_libfree(ufp) ;
 			icurp->utmpfentp = nullptr ;
 		    }
 		} /* end if (memory-allocation) */
 		if (rs < 0) {
-		    uc_free(icurp) ;
+		    uc_libfree(icurp) ;
 		    curp->icursor = nullptr ;
 		}
 	    } /* end if (mempory-allocation) */
@@ -406,7 +407,7 @@ int utmpacc_curend(utmpacc_cur *curp) noex {
 		        icurp->fd = -1 ;
 		    }
 		    if (icurp->utmpfentp) {
-			rs1 = uc_free(icurp->utmpfentp) ;
+			rs1 = uc_libfree(icurp->utmpfentp) ;
 			if (rs >= 0) rs = rs1 ;
 			icurp->utmpfentp = nullptr ;
 		    }
@@ -415,7 +416,7 @@ int utmpacc_curend(utmpacc_cur *curp) noex {
 		    rs = SR_BADFMT ;
 		} /* end if (good cursor-magic) */
 		{
-		    rs1 = uc_free(curp->icursor) ;
+		    rs1 = uc_libfree(curp->icursor) ;
 		    if (rs >= 0) rs = rs1 ;
 		    curp->icursor = nullptr ;
 		}

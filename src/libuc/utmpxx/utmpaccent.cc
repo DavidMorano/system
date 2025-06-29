@@ -1,5 +1,5 @@
 /* utmpaccent SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UTMPACCENT management */
@@ -47,7 +47,6 @@
 #include	<utmpx.h>		/* |UTMPX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<storeitem.h>
 #include	<strwcpy.h>
@@ -55,6 +54,7 @@
 
 #include	"utmpaccent.h"
 
+import libutil ;
 
 /* local defines */
 
