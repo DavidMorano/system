@@ -1,5 +1,5 @@
 /* uterm_readcmd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* read a ANSI terminal command from the input (from the terminal) */
@@ -58,6 +58,7 @@
 #include	"uterm.h"
 #include	"termcmd.h"
 
+import libutil ;
 
 /* local defines */
 

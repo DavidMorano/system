@@ -1,5 +1,5 @@
 /* uterm_main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* "UNIX Terminal" helper routines */
@@ -46,7 +46,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<baops.h>
@@ -62,6 +61,7 @@
 
 #include	"uterm.h"
 
+import libutil ;
 
 /* local defines */
 
