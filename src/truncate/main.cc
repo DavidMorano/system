@@ -73,7 +73,7 @@ extern int	cfdecmfui(const char *,int,int *) ;
 extern int	cfdecmfull(const char *,int,ULONG *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
+extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
 
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(struct proginfo *,const char *,
@@ -894,7 +894,7 @@ int		nl ;
 	    rs = u_open(fname,O_WRONLY,0666) ;
 	    fd = rs ;
 	} else
-	    rs = fperm(fd,-1,-1,NULL,W_OK) ;
+	    rs = permf(fd,-1,-1,NULL,W_OK) ;
 
 	if (rs >= 0) {
 	    ustat	sb ;

@@ -4,10 +4,13 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
+motd
+statmsg
+issue		*done*
 ufcntl		?? weirdo problem
-ucopen
 uctim
 libuc		fix to completely compile!
+ucopen
 ucopen		needs dynamic allocation
 fsdirtree	needs pointer implementation and a lot of cleanup
 sysdialer
@@ -28,8 +31,6 @@ spawnproc	block structure; actually this is a huge mess
 termnote	could use some break-down of large subs into smaller ones
 ipasswd
 nettime		add 'constexpr if'
-statmsg
-motd
 var
 vars
 varmk

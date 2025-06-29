@@ -700,7 +700,7 @@ char	*envv[] ;
 #endif
 
 	if (pfd >= 0)
-	    rs = fperm(pfd,pip->uid,pip->gid,NULL,X_OK) ;
+	    rs = permf(pfd,pip->uid,pip->gid,NULL,X_OK) ;
 
 	else
 	    rs = perm(pp,pip->uid,pip->gid,NULL,X_OK) ;

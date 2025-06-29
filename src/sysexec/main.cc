@@ -85,7 +85,7 @@ extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecti(cchar *,int,int *) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	isNotPresent(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
@@ -406,13 +406,13 @@ static int proc_progok(PROGINFO *pip,cchar *progfname)
 	    }
 #endif /* CF_DEBUGS */
 	    if (S_ISREG(sb.st_mode)) {
-	        if ((rs = sperm(&pip->id,&sb,X_OK)) >= 0) {
+	        if ((rs = permid(&pip->id,&sb,X_OK)) >= 0) {
 	            if ((sb.st_dev != pip->dev) || (sb.st_ino != pip->ino)) {
 	                f = TRUE ;
 	            }
 	        } else if (isNotPresent(rs)) {
 #if	CF_DEBUGS
-	            debugprintf("main/proc_progok: sperm() rs=%d\n",rs) ;
+	            debugprintf("main/proc_progok: permid() rs=%d\n",rs) ;
 #endif
 	            rs = SR_OK ;
 	        }
