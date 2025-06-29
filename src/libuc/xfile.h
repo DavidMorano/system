@@ -1,5 +1,5 @@
 /* xfile HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* check if a given file is eXecutable */

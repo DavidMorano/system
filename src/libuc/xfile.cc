@@ -1,5 +1,5 @@
 /* xfile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* eXecutable File? */
@@ -45,7 +45,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<ids.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<localmisc.h>
 
 #include	"xfile.h"
@@ -78,7 +78,7 @@ int xfile(ids *idp,cchar *fname) noex {
 	    if (fname[0]) {
 	        if (USTAT sb ; (rs = uc_stat(fname,&sb)) >= 0) {
 	            if (S_ISREG(sb.st_mode)) {
-		        rs = sperm(idp,&sb,X_OK) ;
+		        rs = permid(idp,&sb,X_OK) ;
 	            } else {
 	                rs = SR_NOTFOUND ;
 	            }
