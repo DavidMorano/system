@@ -1,5 +1,5 @@
 /* usem SUPPORT (UNIX® System V IPC - Semaphores) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */

@@ -1,5 +1,5 @@
 /* umsg SUPPORT (UNIX® System-V IPC Messaging) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++23 */
 
 /* UNIX® System V IPC Messaging (MSG) subroutine interface */
