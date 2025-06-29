@@ -1,5 +1,5 @@
 /* ucsysconf SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -70,6 +70,7 @@
 #include	<atomic>
 #include	<usystem.h>
 #include	<errtimer.hh>
+#include	<sysconfcmds.h>
 #include	<localmisc.h>
 
 #include	"ucsysconf.h"
@@ -110,9 +111,9 @@ enum dataitems {
 } ;
 
 namespace {
-    struct ucconfdatas {
+    struct ucdatamgr {
 	atomic_int	d[dataitem_overlast] ;
-    } ; /* end struct (ucconfdatas) */
+    } ; /* end struct (ucdatamgr) */
     struct ucsysconf ;
     typedef int (ucsysconf::*usysconf_m)(int) ;
     struct ucsysconf {
@@ -126,6 +127,10 @@ namespace {
 	int mconfstr(int) noex ;
 	int operator () (int) noex ;
 	int cache(int) noex ;
+	int getval(int) noex ;
+	int getstr(int) noex ;
+	int getstd(int) noex ;
+	int getsynthetic(int) noex ;
     } ; /* end struct (ucsysconf) */
 }
 
@@ -135,7 +140,9 @@ namespace {
 
 /* local variables */
 
-static ucconfdatas	ucdata ;
+static ucdatamgr	ucdata ;
+
+constexpr size_t	minusone = -1uz ;
 
 
 /* exported variables */
@@ -160,7 +167,7 @@ int uc_sysconfval(int req,long *rp) noex {
 	    rs = sco.cache(req) ;
 	    break ;
 	default:
-	    rs = sco(req) ;
+	    rs = sco.getval(req) ;
 	    break ;
 	} /* end switch */
 	return rs ;
@@ -170,14 +177,28 @@ int uc_sysconfval(int req,long *rp) noex {
 int uc_sysconfstr(char *rbuf,int rlen,int req) noex {
 	ucsysconf	sco(rbuf,rlen) ;
 	sco.m = &ucsysconf::mconfstr ;
-	return sco(req) ;
+	return sco.getstr(req) ;
 }
 /* end subroutine (uc_sysconfstr) */
 
 
 /* local subroutines */
 
-int ucsysconf::operator () (int req) noex {
+int ucsysconf::getval(int req) noex {
+    	int		rs ;
+	if (req >= sysconfcmd_synthetic) {
+	    rs = getsynthetic(req) ;
+	} else {
+	    rs = getstd(req) ;
+	}
+	return rs ;
+}
+
+int ucsysconf::getstr(int req) noex {
+    	return getstd(req) ;
+}
+
+int ucsysconf::getstd(int req) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
 	errtimer	to_busy		= utimeout[uto_busy] ;
 	errtimer	to_nomem	= utimeout[uto_nomem] ;
@@ -205,7 +226,7 @@ int ucsysconf::operator () (int req) noex {
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
 }
-/* end subroutine (ucsysconf::operator) */
+/* end subroutine (ucsysconf::getstd) */
 
 int ucsysconf::mconfval(int req) noex {
 	int		rs = SR_OK ;
@@ -224,30 +245,34 @@ int ucsysconf::mconfstr(int req) noex {
 	size_t		res ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	errno = 0 ;
 	if (rlen > 0) {
 	    rs = SR_FAULT ;
+	    errno = 0 ;
 	    if (rbuf) {
 	        csize	rsz = (rlen+1) ;
 		rs = SR_OK ;
-	        if ((res = confstr(req,rbuf,rsz)) == 0uz) {
-	            rs = (errno) ? (- errno) : SR_NOTSUP ;
-	        } else if (res > 0) {
+	        if ((res = confstr(req,rbuf,rsz)) > 0uz) {
 	            if (res <= rsz) {
-	                len = intsat(res-1) ;
+	                len = intsat(res - 1) ;
 	            } else {
 		        rs = SR_OVERFLOW ;
 		    }
+	        } else if (res == 0uz) {
+	            rs = (errno) ? (- errno) : SR_NOTSUP ;
+		} else if (res == minusone) {
+	            rs = (errno) ? (- errno) : SR_NOTSUP ;
 		} else {
 		    rs = SR_NOSYS ;	/* not defined in documentation */
 	        } /* end if */
 	    } /* end if (non-null) */
 	} else if (rlen == 0) {
 	    cnullptr	np{} ;
-	    if ((res = confstr(req,np,0uz)) == 0uz) {
+	    if ((res = confstr(req,np,0uz)) > 0uz) {
+	        len = intsat(res - 1) ;
+	    } else if (res == 0uz) {
 	        rs = (errno) ? (- errno) : SR_NOTSUP ;
-	    } else if (res > 0) {
-	        len = intsat(res-1) ;
+	    } else if (res == minusone) {
+	        rs = (errno) ? (- errno) : SR_NOTSUP ;
 	    } else {
 		rs = SR_NOSYS ;
 	    }
@@ -269,7 +294,6 @@ int ucsysconf::cache(int req) noex {
 	case _SC_TZNAME_MAX:		ii = dataitem_maxtzname ; break ;
 	case _SC_NGROUPS_MAX:		ii = dataitem_ngroups ; break ;
 	case _SC_CLK_TCK:		ii = dataitem_clk ; break ;
-	    rs = (*this)(req) ;
 	    break ;
 	default:
 	    rs = SR_BUGCHECK ;
@@ -277,14 +301,36 @@ int ucsysconf::cache(int req) noex {
 	} /* end switch */
 	if ((rs >= 0) && (ii >= 0)) {
 	    if ((rs = ucdata.d[ii].load(memord_relaxed)) == 0) {
-		if ((rs = (*this)(req)) > 0) {
+		if ((rs = getval(req)) > 0) {
 		    ucdata.d[ii].store(rs,memord_relaxed) ;
 		}
+	    } else if (rs > 0) {
+	        if (lp) *lp = long(rs) ;
 	    }
 	} /* end if */
 	return rs ;
 }
 /* end subroutine (ucsysconf::cache) */
+
+int ucsysconf::getsynthetic(int req) noex {
+    	long		val = -1 ;
+    	int		rs = SR_OK ;
+	switch (req) {
+	case sysconfcmd_maxzoneinfo:
+	    val = ZIBUFLEN ;
+	    break ;
+	default:
+	    rs = SR_NOSYS ;
+	    break ;
+	} /* end switch */
+	if (lp && (val >= 0)) {
+	    *lp = (rs >= 0) ? val : 0L ;
+	}
+	if ((rs >= 0) && (val >= 0)) {
+	    rs = intsat(val) ;
+	}
+	return rs ;
+}
 
 namespace libuc {
     ucmaxliner::operator int () noex {

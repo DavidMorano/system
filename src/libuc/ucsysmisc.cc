@@ -1,5 +1,5 @@
 /* ucsysmisc SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -293,6 +293,6 @@ namespace libuc {
     int ucnprocesser::operator () (int w) noex {
 	return uc_nprocessors(w) ;
     } /* end method (ucprocesser::operator) */
-}
+} /* end namespace (libuc) */
 
 
