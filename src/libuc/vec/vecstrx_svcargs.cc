@@ -1,5 +1,5 @@
 /* vecstrx_svcargs SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* load service arguments */
@@ -31,7 +31,6 @@
 #include	<climits>		/* for |CHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<field.h>
 #include	<fieldterms.h>
@@ -43,6 +42,7 @@
 
 #include	"vecstrx.hh"
 
+import libutil ;
 
 /* local defines */
 
