@@ -1,5 +1,5 @@
 /* uctim HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* interface component for UNIX® library-3c */
@@ -22,7 +22,10 @@
 	uctim{x}
 
 	Description:
-	This is a facility to create process timers.
+	This is a facility to create process timers.  Note that unlike
+	the normal POSIX® real-time interfaces, this facility only
+	supports time resolution down to one microsecond (as opposed to
+	one nanosecond in the regular stuff).
 
 *******************************************************************************/
 
@@ -32,7 +35,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<sys/time.h>		/* i-timer types */
+#include	<sys/time.h>		/* <- interval timers are here */
+#include	<time.h>		/* i-timer types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

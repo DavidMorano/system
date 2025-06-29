@@ -1,5 +1,5 @@
 /* uctimer SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -45,7 +45,7 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<cerrno>
-#include	<ctime>
+#include	<ctime>			/* |{x}itimer(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>

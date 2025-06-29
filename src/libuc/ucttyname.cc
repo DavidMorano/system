@@ -1,6 +1,6 @@
 /* ucttyname SUPPORT */
-/* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
 /* get the filename (path) of a terminal device */
@@ -18,20 +18,30 @@
 
 /*******************************************************************************
 
+  	Name:
+	uc_ttyname
+
+	Description:
 	This subroutine gets the filepath of a terminal device under
 	'/dev/'.
+
+	Notes:
+	The infernal subroutine |ttyname_rp(3u)| returns '0' if
+	successful and |errno| if failure (mostly overflow).
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>		/* |ttyname_r(3c)| */
 #include	<fcntl.h>
-#include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>		/* |strnlen(3c)| */
-#include	<usystem.h>
-#include	<usysflag.h>
+#include	<cstdlib>
+#include	<usyscalls.h>
+#include	<localmisc.h>
 
+#include	"ucttyname.h"
+
+import libutil ;
 
 /* local defines */
 
@@ -67,8 +77,8 @@ int uc_ttyname(int fd,char *dbuf,int dlen) noex {
 	    if (fd >= 0) {
 		rs = SR_INVALID ;
 		if (dlen >= 0) {
-		    if ((rs = ttyname_rp(fd,dbuf,dlen)) >= 0) {
-	    	        len = strnlen(dbuf,dlen) ;
+		    if ((rs = ttyname_rp(fd,dbuf,dlen)) == 0) {
+	    	        len = xstrnlen(dbuf,dlen) ;
 		    } else {
 			rs = (- rs) ; /* returned an ERRNO code */
 		    }

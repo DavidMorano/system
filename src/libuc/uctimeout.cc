@@ -1,5 +1,5 @@
 /* uctimeout SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* interface components for UNIX® library-3c */
@@ -10,15 +10,15 @@
 
 /* revision history:
 
-	= 2014-04-04, David A­D­ Morano
+	= 2014-04-04, David A-D- Morano
 	Originally written for Rightcore Network Services.
 
-	= 2018-10-12, David A.D. Morano
+	= 2018-10-12, David A-D- Morano
 	Added some small error resiliency to |uctimeout_enterpri()|.
 
 */
 
-/* Copyright © 2014,2018 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2014,2018 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -176,7 +176,7 @@ namespace {
 	int disprecv() noex ;
 	int disphandle() noex ;
 	int dispjobdel(TIMEOUT *) noex ;
-	~uctimeout() noex {
+	destruct uctimeout() noex {
 	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("uctimeout",rs,"dtor-fini") ;
 	    }
@@ -206,11 +206,11 @@ extern "C" {
 
 consteval int mkopts() noex {
 	int	vo = 0 ;
-	vo |= VECHAND_OSTATIONARY ;
-	vo |= VECHAND_OREUSE ;
-	vo |= VECHAND_OCOMPACT ;
-	vo |= VECHAND_OSWAP ;
-	vo |= VECHAND_OCONSERVE ;
+	vo |= VECHA-D-OSTATIONARY ;
+	vo |= VECHA-D-OREUSE ;
+	vo |= VECHA-D-OCOMPACT ;
+	vo |= VECHA-D-OSWAP ;
+	vo |= VECHA-D-OCONSERVE ;
 	return vo ;
 }
 

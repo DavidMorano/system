@@ -1,5 +1,5 @@
 /* uctim SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* interface components for UNIX® library-3c */
@@ -28,7 +28,15 @@
 
 	Description:
 	This module creates per-process (virtual) time-of-day timers
-	for callers.
+	for callers.  This interface (these subroutines) are meant
+	to mimic the POSIX® real-time per-process timer facility.
+	Why was this necessary?  Becuase somt (stupid) operatoring
+	systems which will not be named but have the initials --
+	Apple Darwin -- do not have the POSIX® rea-time per-process
+	timers.  Just a note: unlinke the POSIX® real-time per-process
+	timers, this favility only uses a timer resolution of
+	microseconds rather than nanoseconds (which the POSIX®
+	interface uses).
 
 	Synopsis:
 	int uc_timcreate(itcontrol *itcp) noex
@@ -52,13 +60,13 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
+#include	<sys/time.h>		/* <- interval timers are here */
 #include	<pthread.h>		/* |PTHREAD_SCOPE_SYSTEM| */
 #include	<ucontext.h>
 #include	<csignal>
-#include	<ctime>
+#include	<ctime>			/* i-timer types */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<queue>
 #include	<usystem.h>
 #include	<upt.h>
@@ -172,7 +180,6 @@ namespace {
 	int cmd_destroy(int,uctimarg *) noex ;
 	int cmd_set(int,uctimarg *) noex ;
 	int cmd_get(int,uctimarg *) noex ;
-	int cmdcancel(int,uctimarg *) noex ;
 	int cmd_over(int,uctimarg *) noex ;
 	int cmdsub(cmdsubs,int,uctimarg *) noex ;
 	int capbegin(int = -1) noex ;
@@ -205,7 +212,7 @@ namespace {
 	int disprecv() noex ;
 	int disphandle() noex ;
 	int dispjobdel(itcontrol *) noex ;
-	~uctim() noex {
+	destruct uctim() noex {
 	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("uctim",rs,"dtor-fini") ;
 	    }
@@ -227,25 +234,10 @@ extern "C" {
     static void	uctim_exit() noex ;
 }
 
-consteval int mkopts() noex {
-	int	vo = 0 ;
-	vo |= VECHAND_OREUSE ;
-	vo |= VECHAND_OCOMPACT ;
-	vo |= VECHAND_OSWAP ;
-	vo |= VECHAND_OSTATIONARY ;
-	vo |= VECHAND_OCONSERVE ;
-	vo |= VECHAND_OSORTED ;
-	vo |= VECHAND_OORDERED ;
-	return vo ;
-}
-/* end subroutine (mkopts) */
-
 
 /* local variables */
 
 static uctim		uctim_data ;
-
-constexpr int		vopts = mkopts() ;
 
 constexpr bool		f_childthrs = CF_CHILDTHRS ;
 
@@ -445,8 +437,7 @@ int uctim::cmd_set(int id,uctimarg *argp) noex {
 	    cint	esz = szof(itcontrol) ;
 	    if (itcontrol *ep ; (rs = uc_libmalloc(esz,&ep)) >= 0) {
 	        if ((rs = mx.lockbegin) >= 0) {
-	            vechand	*elp = &ents ;
-	            if ((rs = vechand_add(elp,ep)) >= 0) {
+	            if ((rs = ents.add(ep)) >= 0) {
 	                cint	ei = rs ;
 	                *ep = *valp ;
 	                {
@@ -454,7 +445,7 @@ int uctim::cmd_set(int id,uctimarg *argp) noex {
 	                    rs = enterpri(ep) ;
 	                }
 	                if (rs < 0) {
-	                    vechand_del(elp,ei) ;
+	                    ents.del(ei) ;
 			}
 	            } /* end if (vechand_add) */
 	            rs1 = mx.lockend ;
@@ -473,12 +464,11 @@ int uctim::cmd_destroy(int id,uctimarg *argp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mx.lockbegin) >= 0) {
-	    vechand	*elp = &ents ;
 	    cint	id = valp->id ;
-	    if (void *vp ; (rs = vechand_get(elp,id,&vp)) >= 0) {
+	    if (void *vp ; (rs = ents.get(id,&vp)) >= 0) {
 	        itcontrol	*ep = (itcontrol *) vp ;
 	        cint		ei = rs ;
-	        if ((rs = vechand_del(elp,ei)) >= 0) {
+	        if ((rs = ents.del(ei)) >= 0) {
 	            cint	rsn = SR_NOTFOUND ;
 		    bool	f_free = false ;
 	            if ((rs = pqp->delhand(ep)) >= 0) {
@@ -501,7 +491,7 @@ int uctim::cmd_destroy(int id,uctimarg *argp) noex {
 	} /* end if (ptm) */
 	return rs ;
 }
-/* end subroutine (uctim_cmdcancel) */
+/* end subroutine (uctim::cmd_destroy) */
 
 int uctim::cmd_over(int id,uctimarg *argp) noex {
     	int		rs = SR_OK ;
@@ -603,8 +593,8 @@ int uctim::workbegin() noex {
 	int		rs = SR_OK ;
 	if (! fl.workready) {
 	    cint	vn = 0 ;
-	    cint	vo = vopts ;
-	    if ((rs = vechand_start(&ents,vn,vo)) >= 0) {
+	    cint	vo = (vechandm.compact | vechandm.ordered) ;
+	    if ((rs = ents.start(vn,vo)) >= 0) {
 	        if ((rs = priqbegin()) >= 0) {
 	            if ((rs = sigbegin()) >= 0) {
 	                if ((rs = timerbegin()) >= 0) {
@@ -629,7 +619,7 @@ int uctim::workbegin() noex {
 	            }
 	        } /* end if (uctim::pribegin) */
 	        if (rs < 0) {
-	            vechand_finish(&ents) ;
+	            ents.finish() ;
 	        }
 	    } /* end if (vechand_start) */
 	} /* end if (needed) */
@@ -666,7 +656,7 @@ int uctim::workend() noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = vechand_finish(&ents) ;
+	        rs1 = ents.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    fl.workready = false ;
@@ -676,13 +666,12 @@ int uctim::workend() noex {
 /* end subroutine (uctim::workend) */
 
 int uctim::workfins() noex {
-	vechand		*elp = &ents ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	void		*top{} ;
-	for (int i = 0 ; vechand_get(elp,i,&top) >= 0 ; i += 1) {
-	    if (top) {
-	        rs1 = uc_libfree(top) ;
+	void		*otp{} ;
+	for (int i = 0 ; ents.get(i,&otp) >= 0 ; i += 1) {
+	    if (otp) {
+	        rs1 = uc_libfree(otp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end for */
@@ -1098,7 +1087,7 @@ int uctim::dispjobdel(itcontrol *tep) noex {
 	int		rs1 ;
 	int		f = false ;
         if ((rs = capbegin(to)) >= 0) {
-	    if ((rs = vechand_delhand(&ents,tep)) >= 0) {
+	    if ((rs = ents.delhand(tep)) >= 0) {
 		f = true ;
 	    } else if (rs == SR_NOTFOUND) {
 		rs = SR_OK ;

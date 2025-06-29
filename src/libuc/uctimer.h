@@ -1,5 +1,5 @@
 /* uctimer HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* interface component for UNIX® library-3c */
@@ -21,7 +21,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<signal.h>
+#include	<time.h>		/* |{x}itimer(3c)| + |ITIMERSPEC| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
