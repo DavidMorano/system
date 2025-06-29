@@ -91,7 +91,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -124,6 +124,7 @@
 
 #include	"termnote.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -435,21 +436,21 @@ int termnote_check(termnote *op,time_t dt) noex {
 }
 /* end subroutine (termnote_check) */
 
-int termnote_write(termnote *op,cc **rpp,int m,int o,cc *sbuf,int slen) noex {
+int termnote_write(termnote *op,cc **rpp,int mw,int o,cc *sbuf,int slen) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if ((rs = termnote_magic(op,rpp,sbuf)) >= 0) {
 	    if (rpp[0] != nullptr) {
 	        time_t		dt = 0 ;
-	        if (m < 1) m = INT_MAX ;
+	        if (mw < 1) mw = INT_MAX ;
 	        if ((rs >= 0) && op->open.lf) {
 	            char	sublogid[LOGIDLEN+1] ;
 	            char	tbuf[TIMEBUFLEN+1] ;
 	            if ((rs = snsdd(sublogid,LOGIDLEN,op->logid,op->sn)) >= 0) {
 		        if ((rs = logfile_setid(op->lfp,sublogid)) >= 0) {
-		            cbool	fbel = ((o & TERMNOTE_OBELL)?1:0) ;
-		            cbool	fbiff = ((o & TERMNOTE_OBIFF)?1:0) ;
-		            cbool	fall = ((o & TERMNOTE_OALL)?1:0) ;
+		            cbool	fbel = !!(o & TERMNOTE_OBELL) ;
+		            cbool	fbiff = !!(o & TERMNOTE_OBIFF) ;
+		            cbool	fall = !!(o & TERMNOTE_OALL) ;
 		            cchar	*fmt ;
 		            if (dt == 0) dt = getustime ;
 		            timestr_logz(dt,tbuf),
@@ -458,13 +459,13 @@ int termnote_write(termnote *op,cc **rpp,int m,int o,cc *sbuf,int slen) noex {
 		        }
 	            }
 	        } /* end if (logging) */
-	        if (slen < 0) slen = strlen(sbuf) ;
+	        if (slen < 0) slen = lenstr(sbuf) ;
 	        if ((rs >= 0) && (slen > 0)) {
-        /* ok, now we really go */
-	            rs = termnote_writer(op,rpp,m,o,sbuf,slen) ;
+        	    /* ok, now we really go */
+	            rs = termnote_writer(op,rpp,mw,o,sbuf,slen) ;
 	            c = rs ;
 	            if ((rs >= 0) && op->open.lf) {
-	                int	n = (LOGIDLEN - 1 - strlen(op->logid)) ;
+	                int	n = (LOGIDLEN - 1 - lenstr(op->logid)) ;
 	                int	m ;
 	                m = (n < 10) ? ipow(10,n) : INT_MAX ;
 	                op->sn = ((op->sn + 1) % m) ;
@@ -494,16 +495,16 @@ static int termnote_writer(termnote *op,cchar **rpp,int m,int o,
 	if ((rs = buffer_start(&ob,bsize)) >= 0) {
 	    cint	maxlines = TERMNOTE_MAXLINES ;
 	    int		lines = 0 ;
-	    cchar	*tp ;
-	    while ((tp = strnchr(sp,sl,'\n')) != nullptr) {
+	    for (cchar *tp ; (tp = strnchr(sp,sl,'\n')) != nullptr ; ) {
 		if (lines < maxlines) {
-	            rs = termnote_bufline(op,&ob,sp,(tp - sp)) ;
+		    cint tl = intconv(tp - sp) ;
+	            rs = termnote_bufline(op,&ob,sp,tl) ;
 		    lines += 1 ;
 		}
-	        sl -= ((tp + 1) - sp) ;
+	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
-	    } /* end while */
+	    } /* end for */
 	    if ((rs >= 0) && (sl > 0)) {
 		if (lines < maxlines) {
 	             rs = termnote_bufline(op,&ob,sp,sl) ;
@@ -538,7 +539,7 @@ static int termnote_bufline(termnote *op,buffer *obp,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op) {
-	    if (ll < 0) ll = strlen(lp) ;
+	    if (ll < 0) ll = lenstr(lp) ;
 	    if (lp[ll-1] == '\n') ll -= 1 ;
 	    if (ll > 0) {
 	        linefold	lf ;
@@ -665,7 +666,7 @@ int disuser::loadtermsx(vecstr *llp,int o) noex {
 	char		termfname[TERMDEVLEN+1] ;
         for (int i = 0 ; vecstr_get(llp,i,&lp) >= 0 ; i += 1) {
             if (lp == nullptr) continue ;
-            ll = strlen(lp) ;
+            ll = lenstr(lp) ;
             if (ll > 0) {
                 if ((rs = mkpath2w(termfname,devdname,lp,ll)) >= 0) {
                     cint	tl = rs ;
@@ -872,7 +873,7 @@ static int termnote_username(termnote *op) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
-	   rl = strlen(op->username) ;
+	   rl = lenstr(op->username) ;
 	}
 	return (rs >= 0) ? rl : rs ;
 }
@@ -895,7 +896,7 @@ static int termnote_nodename(termnote *op) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
-	    rl = strlen(op->nodename) ;
+	    rl = lenstr(op->nodename) ;
 	}
 	return (rs >= 0) ? rl : rs ;
 }
@@ -935,7 +936,7 @@ static int mkclean(char *obuf,int olen,cchar *sp,int sl) noex {
 	int		i ; /* used afterwards */
 	for (i = 0 ; (i < olen) && (i < sl) ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
-	    obuf[i] = (isourbad(ch)) ? '¿' : ch ;
+	    obuf[i] = char((isourbad(ch)) ? mkchar('¿') : ch) ;
 	} /* end for */
 	return i ;
 }
@@ -983,7 +984,7 @@ static int vcmpatime(cvoid **v1pp,cvoid **v2pp) noex {
 	    if (e1p || e2p) {
 	        if (e1p) {
 	            if (e2p) {
-	                rc = e2p->atime - e1p->atime ;
+	                rc = intsat(e2p->atime - e1p->atime) ;
 	            } else {
 	                rc = -1 ;
 		    }

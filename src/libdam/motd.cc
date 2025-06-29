@@ -93,6 +93,8 @@
 #include	<getxid.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getusername.h>
+#include	<getpwx.h>
+#include	<mallocxx.h>
 #include	<ptma.h>
 #include	<ptm.h>
 #include	<lockrw.h>
@@ -129,13 +131,7 @@ import libutil ;
 
 #define	MR		motd_mr
 
-#if	CF_UCPWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UCPWCACHE */
-
-#define	NDF		"motd.deb"
+#define	SP		strpack
 
 #ifndef	MAXNAMELEN
 #define	MAXNAMELEN	256
@@ -207,6 +203,36 @@ typedef MD *		mdp ;
 
 
 /* forward references */
+
+template<typename ... Args>
+static int motd_ctor(motd *op,Args ... args) noex {
+    	MOTD		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (motd_ctor) */
+
+static int motd_dtor(motd *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (motd_dtor) */
+
+template<typename ... Args>
+static inline int motd_magic(motd *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == MOTD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (motd_magic) */
 
 static int	motd_mapfind(motd *,time_t) noex ;
 static int	motd_maplose(motd *) noex ;
@@ -287,9 +313,12 @@ constexpr cpcchar	envstrs[] = {
 constexpr uid_t		uidend = -1 ;
 constexpr gid_t		gidend = -1 ;
 
-constexpr char		envpre[] = "MOTD_" ;	/* environment prefix */
+cchar			envpre[] = "MOTD_" ;	/* environment prefix */
 
-constexpr bool		f_writeto = CF_WRITETO ;
+cint			msgbuflen = MSGBUFLEN ;
+cint			envlen = ENVBUFLEN ;
+
+cbool			f_writeto = CF_WRITETO ;
 
 
 /* exported variables */
@@ -300,156 +329,140 @@ constexpr bool		f_writeto = CF_WRITETO ;
 int motd_open(motd *op,cchar *pr) noex {
 	custime		dt = getustime ;
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-	op->fe = MOTD_DIRSFNAME ;
-	if (cchar *cp ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
-	    op->pr = cp ;
-	    if ((rs = ptm_create(op->mxp,nullptr)) >= 0) {
-	        if ((rs = motd_mapfind(op,dt)) >= 0) {
-	            if ((rs = motd_envbegin(op)) >= 0) {
-	                op->ti_lastcheck = dt ;
-	                op->magic = MOTD_MAGIC ;
-	            } /* end if (envbegin) */
+	if ((rs = motd_ctor(op,pr)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+	        op->fe = MOTD_DIRSFNAME ;
+	        if (cchar *cp ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	            op->pr = cp ;
+	            if ((rs = ptm_create(op->mxp,nullptr)) >= 0) {
+	                if ((rs = motd_mapfind(op,dt)) >= 0) {
+	                    if ((rs = motd_envbegin(op)) >= 0) {
+	                        op->ti_lastcheck = dt ;
+	                        op->magic = MOTD_MAGIC ;
+	                    } /* end if (envbegin) */
+	                    if (rs < 0) {
+	                        motd_maplose(op) ;
+		            }
+	                } /* end if (mapfind) */
+	                if (rs < 0) {
+	                    ptm_destroy(op->mxp) ;
+		        }
+	            } /* end if (ptm_begin) */
 	            if (rs < 0) {
-	                motd_maplose(op) ;
-		    }
-	        } /* end if (mapfind) */
-	        if (rs < 0) {
-	            ptm_destroy(op->mxp) ;
-		}
-	    } /* end if (ptm_begin) */
+		        uc_free(op->pr) ;
+		        op->pr = nullptr ;
+	            }
+	        } /* end if (memory-allocation) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-		uc_free(op->pr) ;
-		op->pr = nullptr ;
+		motd_dtor(op) ;
 	    }
-	} /* end if (memory-allocation) */
-
+	} /* end if (motd_ctor) */
 	return rs ;
 }
 /* end subroutine (motd_open) */
 
 int motd_close(motd *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MOTD_MAGIC) return SR_NOTOPEN ;
-	{
-	rs1 = motd_ufindend(op) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	{
-	rs1 = motd_envend(op) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	{
-	rs1 = motd_maplose(op) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	{
-	rs1 = ptm_destroy(op->mxp) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	if (op->pr) {
-	    rs1 = uc_free(op->pr) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->pr = nullptr ;
-	}
-	op->magic = 0 ;
-
+	if ((rs = motd_magic(op)) >= 0) {
+	    {
+	        rs1 = motd_ufindend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = motd_envend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = motd_maplose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = ptm_destroy(op->mxp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->pr) {
+	        rs1 = uc_free(op->pr) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->pr = nullptr ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (motd_close) */
 
 int motd_check(motd *op,time_t dt) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MOTD_MAGIC) return SR_NOTOPEN ;
-
-	rs = motd_checker(op,dt) ;
-
+	if ((rs = motd_magic(op)) >= 0) {
+	    rs = motd_checker(op,dt) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (motd_check) */
 
 int motd_process(motd *op,cchar *groupname,mainv admins,int fd) noex {
-	motd_id		id{} ;
 	int		rs ;
-	id.groupname = groupname ;
-	id.uid = -1 ;
-	id.gid = -1 ;
-	rs = motd_processid(op,&id,admins,fd) ;
+	if ((rs = motd_magic(op,groupname)) >= 0) {
+	    motd_id	id{} ;
+	    id.groupname = groupname ;
+	    id.uid = -1 ;
+	    id.gid = -1 ;
+	    rs = motd_processid(op,&id,admins,fd) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (motd_process) */
 
+static int motd_procidx(motd *,motd_id *,mv,int,cc *) noex ;
+
 int motd_processid(motd *op,motd_id *idp,mainv admins,int fd) noex {
-	motd_id		id{} ;
 	int		rs ;
-	int		wlen = 0 ;
-	cchar		*groupname ;
-	char		ubuf[USERNAMELEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (idp == nullptr) return SR_FAULT ;
-
-	if (op->magic != MOTD_MAGIC) return SR_NOTOPEN ;
-
-	if (fd < 0) return SR_BADF ;
-
-	groupname = idp->groupname ;
-	if (groupname == nullptr)
-	    return SR_FAULT ;
-
-	if (groupname[0] == '\0')
-	    return SR_INVALID ;
-
-/* fill in some missing elements */
-
-	id = *idp ;			/* copy for possible modification */
-	if ((rs = motd_idcheck(op,&id,ubuf)) >= 0) {
-	    cint	n = nelem(envstrs) ;
-	    int		sz ;
-	    sz = (op->nenv + n + 1) * szof(cchar *) ;
-	    if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
-	        strpack	packer ;
-	        cchar	**ev = (cchar **) p ;
-	        if ((rs = strpack_start(&packer,128)) >= 0) {
-	            if ((rs = motd_envadds(op,&packer,ev,&id)) >= 0) {
-	                rs = motd_processor(op,ev,admins,groupname,fd) ;
-	                wlen = rs ;
-	            }
-	            strpack_finish(&packer) ;
-	        } /* end if (packer) */
-	        uc_free(p) ;
-	    } /* end if (memory allocation) */
-	} /* end if (motd_idcheck) */
-
+	int		wlen = 0 ; /* return-value */
+	if ((rs = motd_magic(op,idp)) >= 0) {
+	    rs = SR_BADF ;
+	    if (fd >= 0) {
+		cchar	*groupname = idp->groupname ;
+		rs = SR_INVALID ;
+	        if (groupname[0]) {
+		    rs = motd_procidx(op,idp,admins,fd,groupname) ;
+		    wlen = rs ;
+	        } /* end if (valid) */
+	    } /* end if (open) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (motd_processid) */
 
-int motdid_load(motd_id *idp,cchar *un,cchar *gn,uid_t uid,gid_t gid) noex {
-	if (idp == nullptr) return SR_FAULT ;
-
-	memclear(idp) ;
-	idp->uid = uid ;
-	idp->gid = gid ;
-	idp->username = un ;
-	idp->groupname = gn ;
-
-	return SR_OK ;
-}
-/* end subroutine (motdid_load) */
+static int motd_procidx(motd *op,motd_id *idp,mv admins,int fd,cc *gn) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ; /* return-value */
+	if (char *ubuf ; (rs = malloc_un(&ubuf)) >= 0) {
+	    cint	n = nelem(envstrs) ;
+	    if ((rs = motd_idcheck(op,idp,ubuf)) >= 0) {
+	        cint	sz = (op->nenv + n + 1) * szof(cchar *) ;
+	        if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	            cchar	**ev = (cchar **) p ;
+	            if (SP packer ; (rs = packer.start(128)) >= 0) {
+			motd_id id{} ;
+	                if ((rs = motd_envadds(op,&packer,ev,&id)) >= 0) {
+	                    rs = motd_processor(op,ev,admins,gn,fd) ;
+	                    wlen = rs ;
+	                }
+	                rs1 = packer.finish ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (packer) */
+	            rs1 = uc_free(p) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (memory allocation) */
+	    } /* end if (motd_idcheck) */
+	    rs = rsfree(rs,ubuf) ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (motd_procidx) */
 
 
 /* private subroutines */
@@ -551,16 +564,19 @@ static int motd_schedload(motd *op,vecstr *slp) noex {
 
 static int motd_checker(motd *op,time_t dt) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		nchanged = 0 ;
 	if (op->nmaps > 0) {
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
-	        if (dt == 0) dt = getustime ;
+	    ptm *mxp = op->mxp ;
+	    if (dt == 0) dt = getustime ;
+	    if ((rs = mxp->lockbegin) >= 0) {
 	        if ((dt - op->ti_lastcheck) >= TO_CHECK) {
 	            rs = mapper_check(&op->mapper,dt) ;
 	            nchanged = rs ;
 	            op->ti_lastcheck = dt ;
 	        } /* end if */
-	        ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
 	} /* end if (positive) */
 	return (rs >= 0) ? nchanged : rs ;
@@ -568,24 +584,20 @@ static int motd_checker(motd *op,time_t dt) noex {
 /* end subroutine (motd_checker) */
 
 static int motd_envbegin(motd *op) noex {
-	cint		es = envpre[0] ;
+	cint		es = mkchar(envpre[0]) ;
 	cint		envprelen = lenstr(envpre) ;
 	int		rs = SR_OK ;
 	int		sz ;
-	int		i ;
-	int		c = 0 ;
-	int		f ;
-
-	for (i = 0 ; environ[i] != nullptr ; i += 1) ;
-
-	sz = (i + 1) * szof(cchar *) ;
+	int		n = lenstrarr(environ) ;
+	int		c = 0 ; /* return-value */
+	sz = (n + 1) * szof(cchar *) ;
 	if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
 	    cchar	*ep ;
 	    cchar	**va = (cchar **) p ;
 	    op->envv = va ;
-	    for (i = 0 ; environ[i] != nullptr ; i += 1) {
+	    for (int i = 0 ; environ[i] ; i += 1) {
+	        bool	f = true ;
 	        ep = environ[i] ;
-	        f = true ;
 	        f = f && (ep[0] != '_') ;
 	        f = f && (matstr(envbad,ep,-1) < 0) ;
 	        if (f && (ep[0] == es)) {
@@ -598,7 +610,6 @@ static int motd_envbegin(motd *op) noex {
 	    va[c] = nullptr ;
 	    op->nenv = c ;
 	} /* end if (memory-allocation) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (motd_envbegin) */
@@ -606,19 +617,16 @@ static int motd_envbegin(motd *op) noex {
 static int motd_envend(motd *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op->envv != nullptr) {
+	if (op->envv) {
 	    rs1 = uc_free(op->envv) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->envv = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (motd_envend) */
 
 static int motd_envadds(motd *op,strpack *spp,ccharpp ev,motd_id *idp) noex {
-	cint		envlen = ENVBUFLEN ;
 	uint		uv ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -629,11 +637,9 @@ static int motd_envadds(motd *op,strpack *spp,ccharpp ev,motd_id *idp) noex {
 	cchar		*cp ;
 	char		envbuf[ENVBUFLEN + 1] ;
 	char		digbuf[DIGBUFLEN + 1] ;
-
 	for (n = 0 ; n < op->nenv ; n += 1) {
 	    ev[n] = envv[n] ;
 	}
-
 	for (i = 0 ; (rs >= 0) && (envstrs[i] != nullptr) ; i += 1) {
 	    envbuf[0] = '\0' ;
 	    el = -1 ;
@@ -677,7 +683,6 @@ static int motd_envadds(motd *op,strpack *spp,ccharpp ev,motd_id *idp) noex {
 	    }
 	} /* end for */
 	ev[n] = nullptr ; /* very important! */
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (motd_envadds) */
@@ -779,10 +784,11 @@ static int motd_ufindend(motd *op) noex {
 static int motd_ufindlook(motd *op,char *ubuf,uid_t uid) noex {
 	int		rs ;
 	int		rs1 ;
-	int		ul = 0 ;
+	int		ul = 0 ; /* return-value */
 	if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	    ptm *mxp = op->mxp ;
 	    cint	ulen = rs ;
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	    if ((rs = mxp->lockbegin) >= 0) {
 	        if (! op->open.ufind) {
 		    rs = motd_ufindbegin(op) ;
 		}
@@ -790,7 +796,7 @@ static int motd_ufindlook(motd *op,char *ubuf,uid_t uid) noex {
 	            rs = finduid_lookup(op->ufp,ubuf,ulen,uid) ;
 		    ul = rs ;
 	        } /* end if */
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
 	} /* end if (getbusize) */
@@ -1252,7 +1258,7 @@ static int mapdir_expander(MD *ep) noex {
 	        cint		pwlen = rs ;
 	        char		*pwbuf ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
-	            if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
+	            if ((rs = getpwx_name(&pw,pwbuf,pwlen,un)) >= 0) {
 		        cchar	*uh = pw.pw_dir ;
 	    	        char	hbuf[MAXPATHLEN + 1] ;
 	                if (pp != nullptr) {
@@ -1263,9 +1269,10 @@ static int mapdir_expander(MD *ep) noex {
 	                    fl = rs ;
 	                }
 	                if (rs >= 0) {
-	                    cchar	*cp ;
-	                    rs = uc_mallocstrw(hbuf,fl,&cp) ;
-	                    if (rs >= 0) ep->dname = cp ;
+			    cauto mall = uc_mallocstrw ;
+	                    if (cc *cp ; (rs = mall(hbuf,fl,&cp)) >= 0) {
+	                        ep->dname = cp ;
+			    }
 	                }
 		    } else if (isNotPresent(rs)) {
 		        rs = SR_OK ;
@@ -1294,7 +1301,6 @@ static int mapdir_processor(MD *ep,ccharpp ev,cchar *gn,int fd) noex {
 	    f_continue = ((dn != nullptr) && (dn[0] != '\0')) ;
 	}
 	if (f_continue) {
-	    cint	envlen = ENVBUFLEN ;
 	    int		n ;
 	    cchar	*pre = envpre ;
 	    cchar	*post ;
