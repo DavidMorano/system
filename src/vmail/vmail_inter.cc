@@ -1002,7 +1002,7 @@ static int inter_cmdkbd(INTER *iap,KEYSYMER *ksp)
 		USTAT	sb ;
 		if ((rs = u_stat(tbuf,&sb)) >= 0) {
 		    cint	am = R_OK ;
-		    if ((rs = sperm(&pip->id,&sb,am)) >= 0) {
+		    if ((rs = permid(&pip->id,&sb,am)) >= 0) {
 			KBDINFO	*kip = &iap->ki ;
 			if ((rs = kbdinfo_open(kip,ksp,tbuf)) >= 0) {
 			    iap->open.kbdinfo = TRUE ;
@@ -2476,9 +2476,9 @@ static int inter_mailbeginer(INTER *iap,cchar *mbname,int mblen)
 
 	f_access = ((rs1 >= 0) && S_ISREG(sb.st_mode)) ;
 	if (f_access) {
-	    rs1 = sperm(&pip->id,&sb,(R_OK | W_OK)) ;
+	    rs1 = permid(&pip->id,&sb,(R_OK | W_OK)) ;
 	    if (rs1 == SR_ACCES) {
-	        rs1 = sperm(&pip->id,&sb,(R_OK)) ;
+	        rs1 = permid(&pip->id,&sb,(R_OK)) ;
 	        f_readonly = (rs1 >= 0) ;
 	    }
 	    f_access = (rs1 >= 0) ;

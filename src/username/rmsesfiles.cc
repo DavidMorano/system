@@ -83,7 +83,7 @@
 extern int	mkpath1(char *,cchar *) ;
 extern int	pathadd(char *,int,cchar *) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	removes(cchar *) ;
 extern int	hasNotDots(cchar *,int) ;
 extern int	isNotValid(int) ;
@@ -251,13 +251,13 @@ static int rmsesdir(IDS *idp,char *pbuf,int plen)
 	if ((rs = u_stat(pbuf,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        const int	am = (R_OK|W_OK|X_OK) ;
-	        if ((rs = sperm(idp,&sb,am)) >= 0) {
+	        if ((rs = permid(idp,&sb,am)) >= 0) {
 #if	CF_DEBUGN
 	{
 		const int	ulen = USERNAMELEN ;
 		char		ubuf[USERNAMELEN+1] ;
 		getusername(ubuf,ulen,sb.st_uid) ;
-	            nprintf(NDF,"rmsesdir: sperm() rs=%d\n",rs) ;
+	            nprintf(NDF,"rmsesdir: permid() rs=%d\n",rs) ;
 		nprintf(NDF,"rmsesdir: u=%s\n",ubuf) ;
 	}
 #endif
@@ -273,7 +273,7 @@ static int rmsesdir(IDS *idp,char *pbuf,int plen)
 	            } /* end if (rmdirfiles) */
 	        } else if (isNotAccess(rs)) {
 #if	CF_DEBUGN
-	            nprintf(NDF,"rmsesdir: sperm() NOACCESS rs=%d\n",rs) ;
+	            nprintf(NDF,"rmsesdir: permid() NOACCESS rs=%d\n",rs) ;
 #endif
 	            rs = SR_OK ;
 	        }

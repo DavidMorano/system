@@ -54,7 +54,7 @@
 
 extern int	cfdecmfui(const char *,int,int *) ;
 extern int	cfdecmfull(const char *,int,ULONG *) ;
-extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
+extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
 extern int	uc_ftruncate(int,off_t) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
@@ -148,11 +148,11 @@ ULONG		trunclen ;
 		fd = rs ;
 
 	} else
-		rs = fperm(fd,-1,-1,NULL,W_OK) ;
+		rs = permf(fd,-1,-1,NULL,W_OK) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("process: u_open()/fperm() rs=%d\n",rs) ;
+	    debugprintf("process: u_open()/permf() rs=%d\n",rs) ;
 #endif
 
 	if (rs < 0)

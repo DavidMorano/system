@@ -114,7 +114,7 @@
 extern int	mkpath1(char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	sfbasename(const char *,int,const char **) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	lockend(int,int,int,int) ;
 extern int	pcsgetprog(const char *,char *,const char *) ;
@@ -420,7 +420,7 @@ static int procmuc(PROGINFO *pip,PARAMOPT *app,const char *mup)
 	                }
 #else /* CF_ACCESS */
 	                if (sb.st_size > 0) {
-	                    rs1 = sperm(&pip->id,&sb,am) ;
+	                    rs1 = permid(&pip->id,&sb,am) ;
 	                    if (rs1 >= 0) c += 1 ;
 	                }
 #endif /* CF_ACCESS */

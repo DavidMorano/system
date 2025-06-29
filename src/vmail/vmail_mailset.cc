@@ -104,7 +104,7 @@
 
 extern int	mkpath1(char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	mkmailbox(struct proginfo *,const char *) ;
 extern int	search() ;
 
@@ -462,7 +462,7 @@ struct proginfo	*pip ;
 
 	    if ((u_stat(msfname,&sb) >= 0) && (sb.st_size > 0) &&
 	        (! S_ISDIR(sb.stmode)) &&
-	        (sperm(&pip->id,&sb,(R_OK | W_OK)) >= 0)) {
+	        (permid(&pip->id,&sb,(R_OK | W_OK)) >= 0)) {
 
 
 #if	CF_SPAWNPROC

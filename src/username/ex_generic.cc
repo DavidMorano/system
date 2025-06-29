@@ -106,7 +106,7 @@
 #include	<msgid.h>
 #include	<whitelist.h>
 #include	<recip.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

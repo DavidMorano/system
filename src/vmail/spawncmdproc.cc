@@ -75,7 +75,7 @@ extern int	nleadstr(const char *,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	bufvprintf(char *,int,const char *,va_list) ;
 extern int	bufprintf(char *,int,const char *,...) ;
