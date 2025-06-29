@@ -101,7 +101,7 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecfi(const char *,int,int *) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,
 			const char *,const char *) ;
 extern int	pcstrustuser(const char *,const char *) ;
@@ -1098,7 +1098,7 @@ char	*envv[] ;
 
 	                    rs1 = SR_NOENT ;
 	                        if (! S_ISDIR(sb.st_mode))
-	                        rs1 = sperm(&pip->id,&sb,R_OK) ;
+	                        rs1 = permid(&pip->id,&sb,R_OK) ;
 
 	                }
 

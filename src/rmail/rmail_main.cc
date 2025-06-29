@@ -88,7 +88,7 @@
 #include	<mktmp.h>
 #include	<mkdirs.h>
 #include	<cfdec.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<strn.h>
 #include	<strx.h>
 #include	<matxstr.h>
@@ -2088,7 +2088,7 @@ static int procmaildname_add(PROGINFO *pip,cchar *vp,int vl) noex {
 	    if ((rs = uc_stat(dname,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 		    IDS		*idp = &pip->id ;
-	            if ((rs = sperm(idp,&sb,W_OK)) >= 0) {
+	            if ((rs = permid(idp,&sb,W_OK)) >= 0) {
 	                rs = vecstr_adduniq(&pip->maildirs,vp,vl) ;
 	                if (rs < INT_MAX) c += 1 ;
 	                if (rs > 0) {

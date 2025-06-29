@@ -104,7 +104,7 @@ extern int	cfdecti(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
@@ -938,7 +938,7 @@ static int progok(PROGINFO *pip,cchar *progfname)
 #endif
 
 	if ((rs = u_stat(progfname,&sb)) >= 0) {
-	    if ((rs = sperm(&pip->id,&sb,X_OK)) >= 0) {
+	    if ((rs = permid(&pip->id,&sb,X_OK)) >= 0) {
 	        f = TRUE ;
 	        if ((sb.st_dev == pip->dev) && (sb.st_ino == pip->ino)) {
 	            f = FALSE ;

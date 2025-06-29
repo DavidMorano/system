@@ -163,7 +163,7 @@ extern int	getprogpath(IDS *,vecstr *,char *,cchar *,int) ;
 extern int	getprogexec(char *,int) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	mklogid(char *,int,cchar *,int,int) ;
-extern int	sperm(IDS *,ustat *,int) ;
+extern int	permid(IDS *,ustat *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_addpathclean(vecstr *,cchar *,int) ;
@@ -1181,7 +1181,7 @@ static int subinfo_addprbin(MAINTQOTD *sip,vecstr *plp,cchar *pr,cchar *prbin)
 	    if ((rs = u_stat(tbuf,&sb)) >= 0) {
 		if (S_ISDIR(sb.st_mode)) {
 		    const int	am = (R_OK|X_OK) ;
-		    if ((rs = sperm(&sip->id,&sb,am)) >= 0) {
+		    if ((rs = permid(&sip->id,&sb,am)) >= 0) {
 			rs = vecstr_adduniq(plp,tbuf,tl) ;
 			if (rs < INT_MAX) c += 1 ;
 		    } else if (isNotPresent(rs)) {
