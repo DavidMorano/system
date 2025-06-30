@@ -198,7 +198,7 @@ int checkonc(cc *pr,cc *unetname,cc *uname,cc *afname) noex {
 	if ((a_username[0] != '\0') && (! f_uname))
 	    vecstr_adduniq(&unames,a_username,-1) ;
 
-/* try to get a program root if we don't have one already! */
+/* try to get a program root if we do not have one already! */
 
 	if (pr == NULL)
 	    pr = getenv(VARPCS) ;

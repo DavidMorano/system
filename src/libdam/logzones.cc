@@ -54,7 +54,7 @@
 	search the whole database file linearly when we have to
 	find a name-offset match.  We are also not caching any
 	entries either.  So we just search it again whenever we
-	need to.  Now don't get your underwear in a bunch over this.
+	need to.  Now do not get your underwear in a bunch over this.
 
 	Also, we do compaisons of fields in their ASCII string form.
 	Other things like this always did comparisons in their

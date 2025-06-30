@@ -34,7 +34,7 @@
 	Implementation notes:
 	When processing, we time-out writes to the caller-supplied
 	file-descriptor because we do not know if it is a non-regular
-	file that might be flow-controlled.  We don't wait forever
+	file that might be flow-controlled.  We do not wait forever
 	for those sorts of outputs.  So let us say that the output
 	is a terminal that is currently flow-controlled.  We will
 	time-out on our writes and the user will not get this whole
@@ -113,7 +113,7 @@
 #include	<matxstr.h>
 #include	<mkchar.h>
 #include	<isnot.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<localmisc.h>		/* |diglen| */
 
 #include	"motd.h"
 
@@ -317,6 +317,7 @@ cchar			envpre[] = "MOTD_" ;	/* environment prefix */
 
 cint			msgbuflen = MSGBUFLEN ;
 cint			envlen = ENVBUFLEN ;
+cint			diglen = DECBUFLEN ;
 
 cbool			f_writeto = CF_WRITETO ;
 
@@ -626,40 +627,42 @@ static int motd_envend(motd *op) noex {
 }
 /* end subroutine (motd_envend) */
 
+static int mkdigenv(char *ebuf,int elen,cc *pre,cc *key,uint uv) noex {
+    	int	rs ;
+    	char	digbuf[diglen + 1] ;
+	if ((rs = ctdec(digbuf,diglen,uv)) >= 0) {
+	    rs = sncpy(ebuf,elen,pre,key,"=",digbuf) ;
+	}
+	return rs ;
+} /* end subroutine (mkdigenv) */
+
 static int motd_envadds(motd *op,strpack *spp,ccharpp ev,motd_id *idp) noex {
-	uint		uv ;
 	int		rs = SR_OK ;
-	int		i ;
-	int		el ;
 	int		n = 0 ; /* return-value */
 	mainv		envv = op->envv ;
 	cchar		*pre = envpre ;
 	cchar		*cp ;
-	char		envbuf[ENVBUFLEN + 1] ;
-	char		digbuf[DIGBUFLEN + 1] ;
+	char		envbuf[envlen + 1] ;
 	for (n = 0 ; n < op->nenv ; n += 1) {
 	    ev[n] = envv[n] ;
 	}
-	for (i = 0 ; (rs >= 0) && (envstrs[i] != nullptr) ; i += 1) {
+	for (int i = 0 ; (rs >= 0) && envstrs[i] ; i += 1) {
+	    uint	uv = INT_MAX ;
+	    int		el = -1 ;
 	    envbuf[0] = '\0' ;
-	    el = -1 ;
 	    switch (i) {
 	    case envstr_uid:
 	        if (idp->uid != uidend) {
 	            uv = idp->uid ;
-	            if ((rs = ctdecui(digbuf,DIGBUFLEN,uv)) >= 0) {
-	                rs = sncpy4(envbuf,envlen,pre,envstrs[i],"=",digbuf) ;
-	                el = rs ;
-	            }
+		    rs = mkdigenv(envbuf,envlen,pre,envstrs[i],uv) ;
+		    el = rs ;
 	        }
 	        break ;
 	    case envstr_gid:
 	        if (idp->gid != gidend) {
 	            uv = idp->gid ;
-	            if ((rs = ctdecui(digbuf,DIGBUFLEN,uv)) >= 0) {
-	                rs = sncpy4(envbuf,envlen,pre,envstrs[i],"=",digbuf) ;
-	                el = rs ;
-	            }
+		    rs = mkdigenv(envbuf,envlen,pre,envstrs[i],uv) ;
+		    el = rs ;
 	        }
 	        break ;
 	    case envstr_username:
@@ -1306,8 +1309,8 @@ static int mapdir_processor(MD *ep,ccharpp ev,cchar *gn,int fd) noex {
 	    cchar	*post ;
 	    cchar	*defname = MOTD_DEFGROUP ;
 	    cchar	*allname = MOTD_ALLGROUP ;
-	    char	env_admin[ENVBUFLEN+1] ;
-	    char	env_admindir[ENVBUFLEN+1] ;
+	    char	env_admin[envlen+1] ;
+	    char	env_admindir[envlen+1] ;
 	    post = envstrs[envstr_admin] ;
 	    strdcpy4(env_admin,envlen,pre,post,"=",ep->admin) ;
 	    post = envstrs[envstr_admindir] ;

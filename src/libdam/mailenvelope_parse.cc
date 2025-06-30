@@ -17,38 +17,32 @@
 
 /******************************************************************************
 
-	I don't know!
+  	Description:
+	I do not know!
 
 	Synopsis:
-
 	int mailenvelope_parse(mep,linebuf)
 	struct mailenvelope	*mep ;
 	char			linebuf[] ;
 
 	Arguments:
-
 	mep		object pointer
 	linebuf		buffer containing data to parse
 
 	Returns:
-
-
+	>=0		OK
+	<0		error (system-return)
 
 ******************************************************************************/
 
-
-#define	MAILENVELOPE_MASTER	1
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<strings.h>
-
 #include	<usystem.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -63,9 +57,9 @@
 
 /* external subroutines */
 
-extern int	sfsub(const char *,int,const char *,const char **) ;
+extern int	sfsub(cchar *,int,cchar *,cchar **) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -90,8 +84,8 @@ char		linebuf[] ;
 	int	i ;
 	int	len ;
 
-	const char	*rp ;
-	const char	*cp, *cp1 ;
+	cchar	*rp ;
+	cchar	*cp, *cp1 ;
 
 
 #if	CF_DEBUGS

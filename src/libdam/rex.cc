@@ -27,16 +27,13 @@
 	rex
 
 	Description:
-	The subroutine either returns a FD for the remote command's
-	standard input and standard output or it returns an error
-	which is indicated by a negative valued return.
-
-	If 'fd2p' is non-NULL, a secondary channel to the standard
-	error of the remote command is created also.
-
-	Depending on the arguments to the subroutine call, both
-	the INET 'exec' or 'shell' services may be invoked to
-	try and make a connection to the remote host.
+	The subroutine either returns a FD for the standard-input
+	of the remote command or it returns an error that is indicated
+	by a negative valued return.  If 'fd2p' is non-nullptr, a
+	secondary channel to the standard error of the remote command
+	is created also.  Depending on the arguments to the subroutine
+	call, both the INET 'exec' or 'shell' services may be invoked
+	to try and make a connection to the remote host.
 
 	Synopsis:
 	int rex(cc *rhost,rex_au *ap,int ro,cc *pg,mv argv,int *fd2p,
@@ -92,6 +89,7 @@
 
 #include	"rex.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -206,69 +204,69 @@ int rexer::mainsub() noex {
 	int		rfd = -1 ;
 	int		port = -1 ;
 	cchar	*args[2] ;
-	cchar	*username = NULL ;
+	cchar	*username = nullptr ;
 	char		buf[BUFLEN + 1], *bp ;
 	char		cmdbuf[CMDBUFLEN + 1] ;
 	char		hostname[MAXHOSTNAMELEN + 1] ;
 	char		ahostname[MAXHOSTNAMELEN + 1] ;
-	cchar	*password = NULL ;
+	cchar	*password = nullptr ;
 	cchar	*authorization = "any" ;
-	cchar	*cp ;
 	char		*ahost = ahostname ;
 
-	if ((rhost == NULL) || (rhost[0] == '\0'))
+	if ((rhost == nullptr) || (rhost[0] == '\0'))
 	    goto badhost ;
 
-	if ((program == NULL) || (program[0] == '\0'))
+	if ((program == nullptr) || (program[0] == '\0'))
 	    goto badprog ;
 
-	if (argv == NULL) {
-	    cchar	*ccp ;
-
-	    sfbasename(program,-1,&ccp) ;
-
-	    args[0] = ccp ;
-	    args[1] = NULL ;
+	if (argv == nullptr) {
+	    cchar *cp ;
+	    if (int cl ; (cl = sfbasename(program,-1,&cp)) > 0) {
+	        args[0] = cp ;
+	    } else {
+		args[0] = "unknown" ;
+	    }
+	    args[1] = nullptr ;
 	    argv = args ;
-
 	} /* end if */
 
 /* laod up some authorization information that we have */
 
-	if (auth != NULL) {
+	if (auth != nullptr) {
 
-	    if (auth->username != NULL) 
+	    if (auth->username != nullptr) 
 		username = auth->username ;
 
-	    if (auth->password != NULL) 
+	    if (auth->password != nullptr) 
 		password = auth->password ;
 
-	    if (auth->res != NULL) 
+	    if (auth->res != nullptr) 
 		authorization = auth->res ;
 
 	} /* end if */
 
-	if ((username == NULL) || (username[0] == '\0'))
+	if ((username == nullptr) || (username[0] == '\0'))
 	    username = u.username ;
 
 /* process the 'rhost' to see if there is a port (or service) also */
 
-	if ((cp = strchr(rhost,':')) != NULL) {
+	if (cc *tp ; (tp = strchr(rhost,':')) != nullptr) {
 
-	    strwcpy(hostname,rhost,cp - rhost) ;
+	    cint tl = intconv(tp - rhost) ;
+	    strwcpy(hostname,rhost,tl) ;
 
-	    cp += 1 ;
-	    if (cfdec(cp,-1,&port) < 0) {
+	    tp += 1 ;
+	    if (cfdec(tp,-1,&port) < 0) {
 
 	        port = -1 ;
 
 #ifdef	COMMENT
 	        sp = getservbyname_r(cp, "tcp", &se,cmdbuf,CMDBUFLEN) ;
 #else
-		rs = getsv_name(&se,cmdbuf,CMDBUFLEN,cp,"tcp") ;
+		rs = getsv_name(&se,cmdbuf,CMDBUFLEN,tp,"tcp") ;
 #endif
-	        if (sp != NULL) {
-	            port = (int) ntohs(sp->s_port) ;
+	        if (sp != nullptr) {
+	            port = ntohs(sp->s_port) ;
 	        }
 
 	    } /* end if (bad decimal conversion) */
@@ -286,7 +284,7 @@ int rexer::mainsub() noex {
 #else
 	    rs = getsv_name(&se,cmdbuf,CMDBUFLEN,"exec","tcp") ;
 #endif
-	    if (sp == NULL) {
+	    if (sp == nullptr) {
 #ifdef	COMMENT
 	        sp = getservbyname_r("rexec", "tcp", &se,cmdbuf,CMDBUFLEN) ;
 #else
@@ -294,8 +292,8 @@ int rexer::mainsub() noex {
 #endif
 	    }
 
-	    if (sp != NULL) {
-	        port = (int) ntohs(sp->s_port) ;
+	    if (sp != nullptr) {
+	        port = ntohs(sp->s_port) ;
 	    } else {
 	        port = REX_DEFEXECSERVICE ;
 	    }
@@ -306,9 +304,9 @@ int rexer::mainsub() noex {
 
 	len = bufprintf(cmdbuf,CMDBUFLEN,"%s",program) ;
 
-	if ((argv != NULL) && (argv[0] != NULL)) {
+	if ((argv != nullptr) && (argv[0] != nullptr)) {
 
-	    for (i = 1 ; argv[i] != NULL ; i += 1) {
+	    for (i = 1 ; argv[i] != nullptr ; i += 1) {
 
 		bp = buf ;
 	        l = mkquoted(buf,BUFLEN,argv[i],-1) ;
@@ -323,7 +321,7 @@ int rexer::mainsub() noex {
 
 	    } /* end for */
 
-	} /* end if ('argv' not NULL) */
+	} /* end if ('argv' not nullptr) */
 
 /* now we want to make sure that our remote hostname is INET translatable */
 
@@ -344,7 +342,7 @@ int rexer::mainsub() noex {
 
 /* try the supplied password that we have been given */
 
-	if (password != NULL) {
+	if (password != nullptr) {
 
 	    ahost = ahostname ;
 	    strcpy(ahostname,hostname) ;
@@ -353,7 +351,7 @@ int rexer::mainsub() noex {
 	    rs = rexecl(&ahost,port,username,
 	        password, cmdbuf,fd2p) ;
 #else
-	    if (password == NULL) password = "" ;
+	    if (password == nullptr) password = "" ;
 
 	    rs = rexec(&ahost,port,username,
 	        password, cmdbuf,fd2p) ;
@@ -370,15 +368,15 @@ int rexer::mainsub() noex {
 /* process any NETRC files that we can find */
 /* try to find a matching NETRC entry for the host/user pair that we have */
 
-	if ((auth != NULL) && (auth->machinev != NULL) &&
+	if ((auth != nullptr) && (auth->machinev != nullptr) &&
 	    (strncmp(authorization,"r",1) != 0)) {
 
 	    rs = -1 ;
-	    for (i = 0 ; (mp = auth->machinev[i]) != NULL ; i += 1) {
+	    for (i = 0 ; (mp = auth->machinev[i]) != nullptr ; i += 1) {
 
-	        if ((mp->machine == NULL) ||
-	            (mp->login == NULL) ||
-	            (mp->password == NULL)) continue ;
+	        if ((mp->machine == nullptr) ||
+	            (mp->login == nullptr) ||
+	            (mp->password == nullptr)) continue ;
 
 	        if ((hostequiv(hostname,mp->machine,u.domainname)) &&
 	            (strcmp(mp->login,username) == 0)) {
@@ -391,7 +389,7 @@ int rexer::mainsub() noex {
 	                mp->password, cmdbuf,fd2p) ;
 #else
 	            password = mp->password ;
-	            if (password == NULL) password = "" ;
+	            if (password == nullptr) password = "" ;
 
 	            rs = rexec(&ahost,port,username,
 	                password, cmdbuf,fd2p) ;
@@ -451,19 +449,19 @@ int rexer::mainsub() noex {
 	if (rs >= 0) 
 		goto goodrexec ;
 
-/* we couldn't get through with a NULL password */
+/* we couldn't get through with a nullptr password */
 
 
 /* try to find a matching NETRC entry for the host only */
 
-	if ((auth != NULL) && (auth->machinev != NULL) &&
+	if ((auth != nullptr) && (auth->machinev != nullptr) &&
 	    (strncmp(authorization,"r",1) != 0)) {
 
 	    rs = -1 ;
-	    for (i = 0 ; (mp = auth->machinev[i]) != NULL ; i += 1) {
+	    for (i = 0 ; (mp = auth->machinev[i]) != nullptr ; i += 1) {
 
-	        if ((mp->machine == NULL) ||
-	            (mp->login == NULL)) continue ;
+	        if ((mp->machine == nullptr) ||
+	            (mp->login == nullptr)) continue ;
 
 	        if (hostequiv(hostname,mp->machine,u.domainname) &&
 	            (strcasecmp(mp->login,username) != 0)) {
@@ -476,7 +474,7 @@ int rexer::mainsub() noex {
 	                mp->password, cmdbuf,fd2p) ;
 #else
 	            password = mp->password ;
-	            if (password == NULL) password = "" ;
+	            if (password == nullptr) password = "" ;
 
 	            rs = rexec(&ahost,port,mp->login,
 	                password, cmdbuf,fd2p) ;
@@ -522,13 +520,13 @@ int rexer::mainsub() noex {
 /* we got in! */
 goodsupply:
 goodrcmdu:
-	if (mpp != NULL)
-	    *mpp = NULL ;
+	if (mpp != nullptr)
+	    *mpp = nullptr ;
 
 	goto done ;
 
 goodrexec:
-	if (mpp != NULL)
+	if (mpp != nullptr)
 	    *mpp = mp ;
 
 done:
@@ -570,40 +568,40 @@ badunreach:
 /* local subroutines */
 
 static int hostequiv(cc *h1,cc *h2,cc *localdomain) noex {
-	int	f_h1 = FALSE, f_h2 = FALSE ;
+	int	f_h1 = false, f_h2 = false ;
 	int	len1, len2 ;
 	char	*cp1, *cp2 ;
 
-	if ((cp1 = strchr(h1,'.')) != NULL) 
-		f_h1 = TRUE ;
+	if ((cp1 = strchr(h1,'.')) != nullptr) 
+		f_h1 = true ;
 
-	if ((cp2 = strchr(h2,'.')) != NULL) 
-		f_h2 = TRUE ;
+	if ((cp2 = strchr(h2,'.')) != nullptr) 
+		f_h2 = true ;
 
 	if (LEQUIV(f_h1,f_h2))
 	    return (! strcasecmp(h1,h2)) ;
 
 	if (f_h1) {
 
-	    len1 = cp1 - h1 ;
-	    len2 = strlen(h2) ;
+	    len1 = intconv(cp1 - h1) ;
+	    len2 = lenstr(h2) ;
 
-	    if (len1 != len2) return FALSE ;
+	    if (len1 != len2) return false ;
 
 	    cp1 += 1 ;
-	    if (strcasecmp(cp1,localdomain) != 0) return FALSE ;
+	    if (strcasecmp(cp1,localdomain) != 0) return false ;
 
 	    return (strncasecmp(h1,h2,len1) == 0) ;
 
 	} /* end if */
 
-	len1 = strlen(h1) ;
+	len1 = lenstr(h1) ;
 
-	len2 = cp2 - h2 ;
-	if (len1 != len2) return FALSE ;
+	len2 = intconv(cp2 - h2) ;
+	if (len1 != len2) return false ;
 
 	cp2 += 1 ;
-	if (strcasecmp(cp2,localdomain) != 0) return FALSE ;
+	if (strcasecmp(cp2,localdomain) != 0) return false ;
 
 	return (strncasecmp(h1,h2,len2) == 0) ;
 }

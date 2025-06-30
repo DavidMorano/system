@@ -72,6 +72,7 @@
 
 #include	"netfile.h"
 
+import libutil ;
 
 /* local defines */
 
