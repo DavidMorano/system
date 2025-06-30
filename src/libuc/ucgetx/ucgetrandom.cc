@@ -1,5 +1,5 @@
 /* ucgetrandom SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -28,7 +28,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |caddr_t| */
 #include	<sys/random.h>		/* |getentropy(2)| */
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */

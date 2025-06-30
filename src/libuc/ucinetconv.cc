@@ -1,5 +1,5 @@
 /* ucinetconv SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -72,13 +72,19 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<cerrno>
-#include	<cstring>		/* <- |strlen(3c)| */
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<uinet.h>
 #include	<localmisc.h>
 
 #include	"ucinetconv.h"
 
+import libutil ;			/* |xstrlen(3u)| */
 
 /* local defines */
 
@@ -117,8 +123,7 @@ int uc_inetnetpton(void *dbuf,int dlen,int af,cchar *straddr) noex {
 	if (dbuf && straddr) {
 	    rs = SR_INVALID ;
 	    if ((af >= 0) && (dlen > 0)) {
-	        int	rv ;
-	        if ((rv = inet_net_pton(af,straddr,dbuf,dlen)) > 0) {
+	        if (int rv ; (rv = inet_net_pton(af,straddr,dbuf,dlen)) > 0) {
 		    rs = (af == AF_INET4) ? inet4addrlen : inet6addrlen ;
 		} else if (rv == 0) {
 	            rs = SR_INVALID ;
@@ -136,8 +141,7 @@ int uc_inetpton(void *binaddr,int af,cchar *straddr) noex {
 	if (binaddr && straddr) {
 	    rs = SR_INVALID ;
 	    if (af >= 0) {
-	        int	rv ;
-	        if ((rv = inet_pton(af,straddr,binaddr)) > 0) {
+	        if (int rv ; (rv = inet_pton(af,straddr,binaddr)) > 0) {
 		    rs = (af == AF_INET4) ? inet4addrlen : inet6addrlen ;
 		} else if (rv == 0) {
 	            rs = SR_INVALID ;
@@ -151,15 +155,15 @@ int uc_inetpton(void *binaddr,int af,cchar *straddr) noex {
 /* end subroutine (uc_inetpton) */
 
 int uc_inetntop(char *rbuf,int rlen,int af,cvoid *binaddr) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (rbuf && binaddr) {
 	    rs = SR_INVALID ;
 	    if ((af >= 0) && (rlen > 0)) {
-	        cchar	*rp ;
-	        if ((rp = inet_ntop(af,binaddr,rbuf,rlen)) != nullptr) {
-		    rs = strlen(rbuf) ;
+	        if (cc *rp ; (rp = inet_ntop(af,binaddr,rbuf,rlen)) != np) {
+		    rs = xstrlen(rbuf) ;
 		} else {
-		    rs = (-errno) ;
+		    rs = (- errno) ;
 		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
