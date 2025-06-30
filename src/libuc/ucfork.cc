@@ -1,5 +1,5 @@
 /* ucfork SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -80,7 +80,7 @@ namespace {
 	int stdfork() noex ;
 	int lockbegin(int) noex ;
 	int lockend() noex ;
-	~ucfork() noex {
+	destruct ucfork() noex {
 	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("ucfork",rs,"dtor-fini") ;
 	    }
@@ -139,25 +139,25 @@ int ucfork::init() noex {
 	        if ((rs = lock.create) >= 0) {
 	            if ((rs = uc_atexit(ucfork_exit)) >= 0) {
 	                f = true ;
-	                bool(finitdone.set) ;
+	                finitdone.set() ;
 	            }
 	            if (rs < 0) {
 	                lock.destroy() ;
 	            }
 	        } /* end if (lockrw-create) */
 	        if (rs < 0) {
-	            bool(finit.clear) ;
+	            finit.clear() ;
 		}
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
-	            int		rs = SR_OK ;
+	            int		rsl = SR_OK ;
 	            if (!finit) {
-		        rs = SR_LOCKLOST ;
+		        rsl = SR_LOCKLOST ;
 	            } else if (finitdone) {
-		        rs = 1 ;
+		        rsl = 1 ;
 	            }
-	            return rs ;
+	            return rsl ;
 	        } ; /* end lambda */
 	        rs = tw(lamb) ;
 	    } /* end if (initialization) */
@@ -184,22 +184,20 @@ int ucfork::fini() noex {
 /* end method (ucfork::fini) */
 
 int ucfork::stdfork() noex {
-	sigblocker	b ;
 	int		rs ;
 	int		rs1 ;
 	int		pid = 0 ;
-	if ((rs = b.start) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) {
 	    if ((rs = init()) >= 0) {
 	        if ((rs = lock.wrlock) >= 0) {
-	            rs = u_fork() ;
-		    pid = rs ;
-	            if (rs == 0) { /* child */
+	            if ((rs = u_fork()) == 0) { /* child */
 	                fini() ;
 			uc_setpid(0) ;
 	                if ((rs = init()) > 0) {
 	                    rs = 0 ;
 	                }
 	            } else if (rs > 0) {
+			pid = rs ;
 	                lock.unlock() ;
 	            }
 	        } /* end if (lockrw) */
