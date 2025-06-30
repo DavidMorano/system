@@ -1,5 +1,5 @@
 /* ucgetloadavg SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -43,7 +43,7 @@
 
 /* imported namespaces */
 
-using libu::dloadavg ;			/* internal library subroutine */
+using libu::uloadavgd ;			/* internal library subroutine */
 
 
 /* local typedefs */
@@ -70,7 +70,7 @@ using libu::dloadavg ;			/* internal library subroutine */
 /* exported subroutines */
 
 int uc_getloadavg(double *dla,int n) noex {
-	return dloadavg(dla,n) ;
+	return uloadavgd(dla,n) ;
 }
 /* end subroutine (uc_getloadavg) */
 

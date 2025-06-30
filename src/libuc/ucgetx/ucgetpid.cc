@@ -1,5 +1,5 @@
 /* ucgetpid SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -85,7 +85,6 @@ namespace {
 	aflag		finitdone ;
 	int init() noex ;
 	int fini() noex ;
-	int igetpid() noex ;
         void atforkbefore() noex {
 	    mx.lockbegin() ;
         }
@@ -96,11 +95,12 @@ namespace {
 	    pid = 0 ;
 	    mx.lockend() ;
         }
-	~ucgetpid() noex {
+	destruct ucgetpid() noex {
 	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("ucgetpid",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor */
+	int igetpid() noex ;
     } ; /* end structure (ucgetpid) */
 }
 
@@ -260,6 +260,6 @@ namespace libuc {
     ucsider::operator int () noex {
     	return u_getsid(0) ;
     } /* end method (ucpider::operator) */
-}
+} /* end namespace (libuc) */
 
 

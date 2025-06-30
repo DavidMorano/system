@@ -1,5 +1,5 @@
 /* ucgethostname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -27,15 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3cu)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
+import libutil ;
 
 /* local defines */
 

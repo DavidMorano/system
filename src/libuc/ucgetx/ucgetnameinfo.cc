@@ -1,5 +1,5 @@
 /* ucgetnameinfo SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -51,11 +51,11 @@
 #include	<arpa/inet.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strnlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<localmisc.h>
 
+import libutil ;
 
 /* local defines */
 

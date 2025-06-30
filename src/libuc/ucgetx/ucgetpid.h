@@ -1,5 +1,5 @@
 /* ucgetpid HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* slightly tuned UNIX® look-alike for |getpid(2)| */
@@ -50,7 +50,7 @@ namespace libuc {
 	    return operator int () ;
 	} ;
     } ; /* end struct (ucsider) */
-}
+} /* end namespace (libuc) */
 
 extern libuc::ucpider		ucpid ;
 extern libuc::ucsider		ucsid ;
