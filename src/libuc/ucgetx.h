@@ -1,5 +1,5 @@
 /* ucgetx HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutines to retrieve various system information items */
@@ -56,8 +56,7 @@ extern int	uc_getnetname(char *) noex ;
 extern int	uc_getrusage(int,RUSAGE *) noex ;
 
 /* NETWORK SOCKADDR combined database */
-extern int	uc_getnameinfo(const SOCKADDR *,int,
-			char *,int,char *,int,int) noex ;
+extern int	uc_getnameinfo(CSOCKADDR *,int,char *,int,char *,int,int) noex ;
 
 /* why was this missing? */
 extern int	uc_getlogin(char *,int) noex ;

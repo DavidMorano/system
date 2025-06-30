@@ -1,11 +1,12 @@
 /* ucgetcwd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
 /* get the current working directory */
 /* version %I% last-modified %G% */
 
+#define	CF_UGETCWD	1		/* use |ugetcwd(3u)| */
 
 /* revision history:
 
@@ -19,12 +20,12 @@
 /*******************************************************************************
 
   	Name:
-	uc_getpwd
+	uc_getcwd
 
 	Description:
 	This subroutine returns the Current Working Directory (CWD).
 	If you wanted the Present Working Directory (PWD), you
-	should be calling |getpwd(3uc)|.
+	should be calling |getcwd(3uc)|.
 
 *******************************************************************************/
 
@@ -33,13 +34,19 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |strnlen(3c)| */
 #include	<usystem.h>
 #include	<usupport.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>
 
+import libutil ;
+import usysbasic ;
 
 /* local defines */
+
+#ifndef	CF_UGETCWD
+#define	CF_UGETCWD	1		/* use |ugetcwd(3u)| */
+#endif
 
 
 /* imported namespaces */
@@ -62,7 +69,7 @@ namespace {
 	int		cwlen ;
 	ucgetcwd(char *b,int l) noex : cwbuf(b), cwlen(l) { } ;
 	int stdgetcwd() noex ;
-	int operator () () noex ;
+	operator int () noex ;
     } ; /* end struct (ucgetcwd) */
 }
 
@@ -71,6 +78,8 @@ namespace {
 
 
 /* local variables */
+
+cbool		f_ugetcwd = bool(CF_UGETCWD) ;
 
 
 /* exported variables */
@@ -81,9 +90,13 @@ namespace {
 int uc_getcwd(char *cwbuf,int cwlen) noex {
 	int		rs = SR_FAULT ;
 	if (cwbuf) {
-	    ucgetcwd	aeo(cwbuf,cwlen) ;
-	    aeo.m = &ucgetcwd::stdgetcwd ;
-	    rs = aeo() ;
+	    if_constexpr (f_ugetcwd) {
+		rs = ugetcwd(cwbuf,cwlen) ;
+	    } else {
+	        ucgetcwd aeo(cwbuf,cwlen) ;
+	        aeo.m = &ucgetcwd::stdgetcwd ;
+	        rs = aeo ;
+	    } /* end if_constexpr (f_ugetcwd) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -92,44 +105,35 @@ int uc_getcwd(char *cwbuf,int cwlen) noex {
 
 /* local subroutines */
 
-int ucgetcwd::operator () () noex {
-	int		to_again = utimeout[uto_again] ;
-	int		to_nomem = utimeout[uto_nomem] ;
-	int		rs = SR_OK ;
-	bool		f_exit = false ;
+ucgetcwd::operator int () noex {
+	errtimer	to_again = utimeout[uto_again] ;
+	errtimer	to_nomem = utimeout[uto_nomem] ;
+	reterr		r ;
+	int		rs ;
 	repeat {
             if ((rs = (this->*m)()) < 0) {
+		r(rs) ;
                 switch (rs) {
                 case SR_AGAIN:
-                    if (to_again-- > 0) {
-                        msleep(1000) ;
-                    } else {
-                        f_exit = true ;
-                    }
+		    r = to_again(rs) ;
                     break ;
                 case SR_NOMEM:
-                    if (to_nomem-- > 0) {
-                        msleep(1000) ;
-                    } else {
-                        f_exit = true ;
-                    }
-                    break ;
+		    r = to_nomem(rs) ;
+		    break ;
                 case SR_INTR:
-                    break ;
-                default:
-                    f_exit = true ;
+		    r(false) ;
                     break ;
                 } /* end switch */
             } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
+	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
 }
 /* end subroutine (ucgetcwd::operator) */
 
 int ucgetcwd::stdgetcwd() noex {
 	int		rs ;
-	if (getcwd(cwbuf,cwlen) != nullptr) {
-	    rs = xstrnlen(cwbuf,cwlen) ;
+	if (cchar *rp ; (rp = getcwd(cwbuf,(cwlen+1))) != nullptr) {
+	    rs = xstrnlen(rp,cwlen) ;
 	} else {
 	    rs = (- errno) ;
 	}
