@@ -1,5 +1,5 @@
 /* usys_darwinexec SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* retrieve the full path of the current process executable file */
