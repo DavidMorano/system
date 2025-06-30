@@ -1,5 +1,5 @@
 /* ureserve4 MODULE */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* reserved interfaces */
@@ -36,8 +36,11 @@ module ;
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<stdexcept>		/* |std::out_of_range(3c++)| */
 #include	<vector>
 #include	<string>
+#include	<string_view>
+#include	<algorithm>		/* |ranges::sort(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -57,9 +60,14 @@ import libutil ;			/* |xstrlen(3u)| */
 /* imported namespaces */
 
 using std::string ;			/* type */
+using std::string_view ;		/* type */
+using std::ranges::sort ;		/* niebloid */
+using std::ranges::binary_search ;	/* niebloid */
 
 
 /* local typedefs */
+
+typedef string_view		strview ;
 
 
 /* external subroutines */
@@ -91,6 +99,7 @@ int vecstr::add(cchar *sp,int sl) noex {
 	        try {
 	            string	s(sp,msl) ;
 		    push_back(s) ;
+		    fl.sorted = false ;
 		    {
 			csize cnt = size() ;
 		        rs = intconv(cnt - 1) ;
@@ -101,7 +110,7 @@ int vecstr::add(cchar *sp,int sl) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end method (vecstr::add) */
 
 int vecstr::adduniq(cchar *sp,int sl) noex {
     	int		rs ;
@@ -111,7 +120,7 @@ int vecstr::adduniq(cchar *sp,int sl) noex {
 	    rs = add(sp,sl) ;
 	}
 	return rs ;
-}
+} /* end method (vecstr::adduniq) */
 
 int vecstr::find(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
@@ -119,24 +128,58 @@ int vecstr::find(cchar *sp,int sl) noex {
 	if (sp) {
     	    rs = SR_NOTOPEN ;
 	    if (fl.open) {
-		bool	f = false ;
 		if (sl < 0) sl = xstrlen(sp) ;
-	        try {
-	            string	s(sp,sl) ;
-		    for (cauto &e : (*this)) {
-			f = (e == s) ;
-			if (f) break ;
-			c += 1 ;
-		    } /* end for */
-		    rs = SR_OK ;
-	        } catch (...) {
-		    rs = SR_NOMEM ;
-	        }
-		if (! f) rs = SR_NOTFOUND ;
+		rs = ifind(sp,sl) ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 } /* end method (vecstr::find) */
+
+int vecstr::search(cchar *sp,int sl) noex {
+    	cint		rsn = SR_NOTFOUND ;
+    	int		rs = SR_FAULT ;
+	int		f = false ;
+	if (sp) {
+	    rs = SR_NOTOPEN ;
+	    if (fl.open) {
+		if (sl < 0) sl = xstrlen(sp) ;
+		if (fl.sorted) {
+    		    strview	s(sp,sl) ;
+    		    rs = int(binary_search(*this,s)) ;
+		} else {
+		    if ((rs = ifind(sp,sl)) >= 0) {
+			f = true ;
+		    } else if (rs == rsn) {
+			rs = SR_OK ;
+		    }
+		} /* end if (sorted or not) */
+	    } /* end if (open) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? f : rs ;
+} /* end method (vecstr::search) */
+
+int vecstr::get(int ai,ccharpp rpp) noex {
+    	int		rs = SR_NOTOPEN ;
+	if (fl.open) {
+	    csize cnt = size() ;
+	    if (ai >= 0) {
+		cint	n = intconv(cnt) ;
+		rs = SR_NOTFOUND ;
+		if (ai < n) {
+		    try {
+		        string &s = at(ai) ;
+	    	        rs = SR_OK ;
+		        if (rpp) {
+			    *rpp = s.c_str() ;
+			}
+		    } catch (const std::out_of_range &) {
+		        rs = SR_BUGCHECK ;
+		    }
+		} /* end if (request in-range) */
+	    }
+	}
+	return rs ;
+} /* end method (vecstr::get) */
 
 int vecstr::del(int ai) noex {
     	int		rs = SR_NOTOPEN ;
@@ -145,6 +188,7 @@ int vecstr::del(int ai) noex {
 	    rs = SR_INVALID ;
 	    if (ai >= 0) {
 		cint	n = intconv(cnt) ;
+		rs = SR_NOTFOUND ;
 		if (ai < n) {
 		    iterator it = begin() ;
 		    erase(it + ai) ;
@@ -220,6 +264,34 @@ int vecstr::ifinish() noex {
 	return rs ;
 }
 
+int vecstr::isort() noex {
+    	int		rs = SR_NOTOPEN ;
+	if (fl.open) {
+	    std::ranges::sort(*this) ;
+	    fl.sorted = true ;
+	    rs = SR_OK ;
+	}
+	return rs ;
+} /* end method (vecstr::isort) */
+
+int vecstr::ifind(cchar *sp,int sl) noex {
+    	int		rs = SR_OK ;
+	int		idx = 0 ; /* return-value */
+	try {
+	    string	s(sp,sl) ;
+	    bool	f = false ;
+	    for (cauto &e : (*this)) {
+		f = (e == s) ;
+		if (f) break ;
+		idx += 1 ;
+	    } /* end for */
+	    if (! f) rs = SR_NOTFOUND ;
+	} catch (...) {
+	    rs = SR_NOMEM ;
+	}
+	return (rs >= 0) ? idx : rs ;
+} /* end method (vecstr::ifind) */
+
 int vecstr::idelall() noex {
     	int		rs = SR_NOTOPEN ;
 	if (fl.open) {
@@ -227,7 +299,16 @@ int vecstr::idelall() noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
+} /* end method (vecstr::idelall) */
+
+int vecstr::icount() const noex {
+    	int		rs = SR_NOTOPEN ;
+	if (fl.open) {
+	    csize cnt = size() ;
+	    rs = intconv(cnt) ;
+	}
+	return rs ;
+} /* end method (vecstr::icount) */
 
 void vecstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
@@ -252,10 +333,10 @@ int vecstr_co::operator () (int a) noex {
 	        rs = op->istart(a) ;
 	        break ;
 	    case vecstrmem_count:
-		{
-		    csize c = op->size() ;
-		    rs = intconv(c) ;
-		}
+		rs = op->icount() ;
+	        break ;
+	    case vecstrmem_sort:
+	        rs = op->isort() ;
 	        break ;
 	    case vecstrmem_delall:
 	        rs = op->idelall() ;
