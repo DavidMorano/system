@@ -1,5 +1,5 @@
 /* uc_stat SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -66,7 +66,7 @@ extern int	hasvarpathprefix(const char *,int) ;
 /* exported subroutines */
 
 
-int uc_stat(cchar *fname,struct ustat *sbp)
+int uc_stat(cchar *fname,ustat *sbp)
 {
 	int		rs = SR_OK ;
 	int		fl ;

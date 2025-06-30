@@ -1,5 +1,5 @@
 /* uc_system */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
@@ -22,9 +22,9 @@
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<fcntl.h>
-#include	<errno.h>
+#include	<cerrno>
 
 #include	<usystem.h>
 #include	<localmisc.h>

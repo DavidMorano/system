@@ -1,5 +1,5 @@
 /* uc_writedesc SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* version %I% last-modified %G% */
 
 /* interface component for UNIX® library-3c */

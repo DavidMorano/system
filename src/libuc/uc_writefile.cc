@@ -1,5 +1,5 @@
 /* uc_writefile */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
@@ -24,22 +24,17 @@
         descriptor.
 
 	Synopsis:
-
 	int uc_writefile(int ofd,cchar *fname)
 
 	Arguments:
-
 	ofd		source file descriptor
 	fname		file to write to output file-descriptor
 
 	Returns:
-
-	<0		error
 	>=0		length copied
-
+	<0		error (system-return)
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>

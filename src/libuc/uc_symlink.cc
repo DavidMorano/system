@@ -1,5 +1,5 @@
 /* uc_symlink */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* POSIX shared-meory ("shm(3rt)') file-unlink */

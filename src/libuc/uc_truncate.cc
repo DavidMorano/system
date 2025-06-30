@@ -1,5 +1,5 @@
 /* uc_truncate */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
@@ -31,7 +31,7 @@
 #include	<sys/uio.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 
 #include	<usystem.h>
 #include	<localmisc.h>
