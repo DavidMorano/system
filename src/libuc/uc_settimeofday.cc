@@ -1,5 +1,5 @@
 /* uc_settimeofday */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* set the current time of day */
@@ -32,8 +32,8 @@
 #include	<sys/param.h>
 #include	<sys/time.h>
 #include	<unistd.h>
-#include	<string.h>
-#include	<errno.h>
+#include	<cstring>
+#include	<cerrno>
 
 #include	<usystem.h>
 #include	<localmisc.h>

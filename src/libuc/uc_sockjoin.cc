@@ -1,5 +1,5 @@
 /* uc_sockjoin */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* join a UNIX®-Socket-Datagram */
@@ -24,7 +24,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>

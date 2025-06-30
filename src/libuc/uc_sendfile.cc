@@ -1,5 +1,5 @@
 /* uc_sendfile */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* UNIX® write system call subroutine */
@@ -22,7 +22,7 @@
 
 #include	<sys/types.h>
 #include	<sys/sendfile.h>
-#include	<limits.h>
+#include	<climits>
 
 #include	<usystem.h>
 #include	<localmisc.h>

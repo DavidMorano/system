@@ -1,5 +1,5 @@
 /* uc_setpriority */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* set a process priority (old style) */
@@ -36,7 +36,7 @@
 #include	<sys/resource.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<errno.h>
+#include	<cerrno>
 
 #include	<usystem.h>
 #include	<localmisc.h>
