@@ -1,5 +1,5 @@
 /* ucentpj SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTPJ object management */
@@ -43,12 +43,12 @@
 #include	<six.h>
 #include	<intceil.h>
 #include	<cfdec.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"ucentpj.h"
 #include	"ucentxx.hh"
 
+import libutil ;
 
 /* local defines */
 
