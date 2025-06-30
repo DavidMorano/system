@@ -1,5 +1,5 @@
 /* ucnprocs SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -19,7 +19,7 @@
 
 */
 
-/* Copyright © 1998,2019 David D-A- Morano.  All rights reserved. */
+/* Copyright © 1997,2019 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -185,28 +185,28 @@ int procer::fsdent() noex {
 	int		rs1 ;
 	int		n = 0 ;
         if ((rs = fsdir_open(&d,dn)) >= 0) {
-                switch (w) {
-                case ucproctype_all:		/* all processes */
-                    {
-                        while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
-                            cint    ch = mkchar(de.name[0]) ;
-                            if (isdigitlatin(ch)) {
-                                n += 1 ;
-                            }
-                        } /* end while */
-                    } /* end block */
-                    break ;
-                case ucproctype_sys:		/* system processes */
-                case ucproctype_user:		/* all-user processes */
-                case ucproctype_session:	/* session processes */
-                case ucproctype_group:		/* group processes */
-		    rs = selection() ;
-		    n = rs ;
-		    break ;
-                default:
-                    rs = SR_NOSYS ;
-                    break ;
-                } /* end switch */
+            switch (w) {
+            case ucproctype_all:		/* all processes */
+                {
+                    while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
+                        cint    ch = mkchar(de.name[0]) ;
+                        if (isdigitlatin(ch)) {
+                            n += 1 ;
+                        }
+                    } /* end while */
+                } /* end block */
+                break ;
+            case ucproctype_sys:		/* system processes */
+            case ucproctype_user:		/* all-user processes */
+            case ucproctype_session:	/* session processes */
+            case ucproctype_group:		/* group processes */
+		rs = selection() ;
+		n = rs ;
+		break ;
+            default:
+                rs = SR_NOSYS ;
+                break ;
+            } /* end switch */
             rs1 = fsdir_close(&d) ;
             if (rs >= 0) rs = rs1 ;
 	} /* end if (fsdir) */
@@ -218,7 +218,7 @@ int procer::selection() noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (char *pbuf{} ; (rs = libmalloc_mp(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = libmalloc_mp(&pbuf)) >= 0) {
 	    if ((rs = mkpath1(pbuf,dn)) >= 0) {
 		cint    pl = rs ;
 		while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
