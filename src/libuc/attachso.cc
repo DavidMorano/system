@@ -1,5 +1,5 @@
 /* attachso SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* attach a shared-object to the current process */
@@ -57,7 +57,7 @@
 #include	<storebuf.h>
 #include	<mkx.h>
 #include	<ids.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<isoneof.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -244,7 +244,7 @@ static int subinfo_sofind(SI *sip) noex {
 		    } else {
 		        if (USTAT sb ; (rs = u_stat(dname,&sb)) >= 0) {
 	                    if (S_ISDIR(sb.st_mode)) {
-	                	rs = sperm(&id,&sb,soperm) ;
+	                	rs = permid(&id,&sb,soperm) ;
 			    } else {
 			        rs = SR_NOTDIR ;
 			    }
@@ -282,7 +282,7 @@ static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 	                rs1 = SR_ISDIR ;
 		    }
 	            if (rs1 >= 0) {
-	                rs1 = sperm(idp,&sb,soperm) ;
+	                rs1 = permid(idp,&sb,soperm) ;
 		    }
 	            if (rs1 >= 0) {
 	                sip->sop = dlopen(sofname,sip->dlmode) ;
