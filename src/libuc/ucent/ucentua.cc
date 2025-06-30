@@ -1,5 +1,5 @@
 /* ucentua SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTUA object management */
@@ -31,7 +31,6 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -48,6 +47,7 @@
 #include	"ucentua.h"
 #include	"ucentxx.hh"
 
+import libutil ;
 
 /* local defines */
 
@@ -343,7 +343,7 @@ static int si_attrload(SI *sip,kv_t *kvp,int i,cchar *ep) noex {
 	    vp = (tp + 1) ;
 	    el = intconv(tp - ep) ;
 	} else {
-	    vp = (ep+xstrlen(ep)) ;
+	    vp = (ep + xstrlen(ep)) ;
 	}
 	{
 	    if (cchar *crp{} ; (rs = sip->strw(ep,el,&crp)) >= 0) {

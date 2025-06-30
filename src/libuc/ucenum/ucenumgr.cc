@@ -1,5 +1,5 @@
 /* ucenumgr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* enumerate system SYSDB-XX entries */
@@ -32,7 +32,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<sysdbfname.h>
+#include	<sysdbfn.h>
 #include	<localmisc.h>
 
 #include	"ucenumxx.h"
@@ -77,9 +77,9 @@ constexpr sysdbfiles	w = sysdbfile_gr ;
 int ucenumgr_open(ucenumgr *op,cchar *efname) noex {
 	ucenumxxco<ucenumgr_ent>	ueo(op,mxx) ;
 	int		rs ;
-	if (cchar *rp{} ; (rs = sysdbfnameget(w,efname,&rp)) >= 0) {
+	if (cchar *rp ; (rs = sysdbfn_get(w,efname,&rp)) >= 0) {
 	    rs = ueo.open(rp) ;
-	} /* end if (sysdbfnameget) */
+	} /* end if (sysdbfn_get) */
 	return rs ;
 }
 /* end if (ucenumgr_open) */

@@ -1,5 +1,5 @@
 /* ucentxx SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTXX object management support routines */
@@ -103,7 +103,7 @@ namespace ucent {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*tp ;
-	while ((tp = strnpbrk(sp,sl," ,")) != nullptr) {
+	while ((tp = strnbrk(sp,sl," ,")) != nullptr) {
 	    if (cint tl = intconv(tp - sp) ; tl > 0) {
 		c += 1 ;
 		rs = si_loadname(sip,ulp,sp,tl) ;
