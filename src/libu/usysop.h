@@ -1,5 +1,5 @@
 /* usysop HEADER (UNIX® system operations) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* translation layer interface for UNIX® equivalents */
