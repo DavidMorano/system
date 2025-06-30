@@ -1,5 +1,5 @@
 /* ucentho SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTHO object management */
@@ -33,7 +33,6 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -51,6 +50,7 @@
 #include	"ucentho.h"
 #include	"ucentxx.hh"
 
+import libutil ;
 
 /* local defines */
 

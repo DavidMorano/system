@@ -1,5 +1,5 @@
 /* ucentgr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTGR object management */
@@ -43,12 +43,12 @@
 #include	<sfx.h>
 #include	<intceil.h>
 #include	<cfdec.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"ucentgr.h"
 #include	"ucentxx.hh"
 
+import libutil ;
 
 /* local defines */
 
