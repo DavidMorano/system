@@ -41,6 +41,7 @@ struct issue_mapper {
 struct issue_flags {
 	uint		sorted:1 ;
 } ;
+
 struct issue_head {
 	ISSUE_MAP	mapper ;
 	ptm		mx ;		/* this is for all of the data */

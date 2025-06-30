@@ -59,7 +59,7 @@ typedef	REX_AU		rex_au ;
 EXTERNC_begin
 
 extern int rex(cc *,rex_au *,int,cc *,mainv,mainv,int *,
-		netfile_ent **mpp) noex ;
+	netfile_ent **mpp) noex ;
 
 EXTERNC_end
 
