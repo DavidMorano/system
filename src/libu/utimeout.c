@@ -1,5 +1,5 @@
 /* utimeout SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 (MUST be C-lang) */
 
 /* manage UNIX® kernal-call (and std-c library) timeouts */
