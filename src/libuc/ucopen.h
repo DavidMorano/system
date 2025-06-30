@@ -1,5 +1,5 @@
 /* ucopen HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* additional UNIX® support */
@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	ucopen
+
+	Description:
 	Additional (or supplemental) support for UNIX® limits.
 
 *******************************************************************************/
@@ -37,6 +41,9 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
+
+#include	<ucopeninfo.h>
 
 
 EXTERNC_begin
@@ -61,20 +68,20 @@ extern int uc_openpass(cchar *,int,int,int) noex ;
 extern int uc_openuser(cchar *,cchar *,int,mode_t,int) noex ;
 extern int uc_openprog(cchar *,int,mainv,mainv) noex ;
 extern int uc_opendialer(cchar *,cchar *,int,mode_t,
-			cchar **,cchar **,int) noex ;
+			mainv,mainv,int) noex ;
 extern int uc_openfsvc(cchar *,cchar *,cchar *,int,mode_t,
-			cchar **,cchar **,int) noex ;
+			mainv,mainv,int) noex ;
 extern int uc_openusvc(cchar *,cchar *,cchar *,int,mode_t,
-			cchar **,cchar **,int) noex ;
+			mainv,mainv,int) noex ;
 extern int uc_openfint(cchar *,cchar *,cchar *,
 			cchar *, cchar *, int,mode_t,
-			cchar **,cchar **,int) noex ;
+			mainv,mainv,int) noex ;
 extern int uc_opensys(cchar *,int,mode_t,mainv,int,int) noex ;
 extern int uc_opendev(cchar *,int,mode_t,mainv,int,int) noex ;
 extern int uc_opensysdb(int,int,mode_t) noex ;
 extern int uc_openpt(int) noex ;
-extern int	uc_openshm(cchar *,int,mode_t) noex ;
-extern int	uc_openshmto(cchar *,int,mode_t,int) noex ;
+extern int uc_openshm(cchar *,int,mode_t) noex ;
+extern int uc_openshmto(cchar *,int,mode_t,int) noex ;
 
 static inline int uc_dup(int fd) noex {
 	return uc_dupmin(fd,0) ;

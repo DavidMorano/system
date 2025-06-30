@@ -55,24 +55,24 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ00= ucopenmain.o ucaccepte.o
+OBJ00= mods.o ucopenmain.o ucaccepte.o
 OBJ01= ucopensysdb.o ucopenuser.o
-OBJ02= ucopeninfo.o ucopenpt.o ucopenshm.o
+OBJ02= ucopeninfo.o ucopenpt.o 
 OBJ03= ucopensocket.o ucopensys.o
 
-OBJ04= uc_opendev.o uc_opendialer.o
-OBJ05= uc_openfint.o uc_openfsvc.o
-OBJ06= uc_openfs.o uc_openpass.o
-OBJ07= uc_openprog.o uc_openproto.o
+OBJ04= ucopendev.o ucopendialer.o
+OBJ05= ucopenfint.o ucopenfsvc.o ucopenusvc.o
+OBJ06= ucopenfs.o ucopenpass.o
+OBJ07= ucopenprog.o ucopenproto.o
 
-OBJ08= uc_openpsem.o uc_openusvc.o
-OBJ09= uc_create.o
-OBJ10=
-OBJ11=
+OBJ08= ucopenshm.o
+OBJ09= uccreate.o
+OBJ10= ucopenxsvc.o
+OBJ11= 
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
-OBJC= obj08.o obj09.o
+OBJC= obj08.o obj09.o obj10.o 
 
 OBJ_UCOPEN= obja.o objb.o objc.o
 
@@ -108,7 +108,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_UCOPEN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UCOPEN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_UCOPEN)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -129,41 +129,53 @@ control:
 
 
 obj00.o:		$(OBJ00)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ00)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ00)
 
 obj01.o:		$(OBJ01)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ01)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ01)
 
 obj02.o:		$(OBJ02)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ02)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ02)
 
 obj03.o:		$(OBJ03)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ03)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ03)
 
 obj04.o:		$(OBJ04)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ04)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ04)
 
 obj05.o:		$(OBJ05)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ05)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ05)
 
 obj06.o:		$(OBJ06)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ06)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ06)
 
 obj07.o:		$(OBJ07)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ07)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ07)
+
+obj08.o:		$(OBJ08)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ08)
+
+obj09.o:		$(OBJ09)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ09)
+
+obj10.o:		$(OBJ10)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ10)
+
+obj11.o:		$(OBJ11)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ11)
 
 
 obja.o:			$(OBJA)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
 
 objb.o:			$(OBJB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 objc.o:			$(OBJC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJC)
 
 objd.o:			$(OBJD)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJD)
 
 
 ucopenmain.o:		ucopenmain.cc		$(INCS)
@@ -176,16 +188,35 @@ ucopensys.o:		ucopensys.cc		$(INCS)
 ucopensysdb.o:		ucopensysdb.cc		$(INCS)
 ucopenuser.o:		ucopenuser.cc		$(INCS)
 
-uc_create.o:		uc_create.cc		$(INCS)
-uc_opendev.o:		uc_opendev.cc		$(INCS)
-uc_opendialer.o:	uc_opendialer.cc	$(INCS)
-uc_openfint.o:		uc_openfint.cc		$(INCS)
-uc_openfs.o:		uc_openfs.cc		$(INCS)
-uc_openfsvc.o:		uc_openfsvc.cc		$(INCS)
-uc_openpass.o:		uc_openpass.cc		$(INCS)
-uc_openprog.o:		uc_openprog.cc		$(INCS)
-uc_openproto.o:		uc_openproto.cc		$(INCS)
-uc_openpsem.o:		uc_openpsem.cc		$(INCS)
-uc_openusvc.o:		uc_openusvc.cc		$(INCS)
+uccreate.o:		uccreate.cc		$(INCS)
+ucopendev.o:		ucopendev.cc		$(INCS)
+ucopendialer.o:		ucopendialer.cc		$(INCS)
+ucopenfs.o:		ucopenfs.cc		$(INCS)
+ucopenpass.o:		ucopenpass.cc		$(INCS)
+ucopenprog.o:		ucopenprog.cc		$(INCS)
+ucopenproto.o:		ucopenproto.cc		$(INCS)
+
+ucopenfsvc.o:		ucopenfsvc.cc openxsvc.ccm		$(INCS)
+	makemodule openxsvc
+	$(COMPILE.cc) $(*).cc
+
+ucopenfint.o:		ucopenfint.cc openxsvc.ccm		$(INCS)
+	makemodule openxsvc
+	$(COMPILE.cc) $(*).cc
+
+ucopenusvc.o:		ucopenusvc.cc openxsvc.ccm		$(INCS)
+	makemodule openxsvc
+	$(COMPILE.cc) $(*).cc
+
+# UTILITY
+ucopenxsvc.o:		ucopenxsvc.cc openxsvc.ccm 		$(INCS)
+	makemodule openxsvc
+	$(COMPILE.cc) $(*).cc
+
+mods.o:			openxsvc.o
+	$(LD) -r $(LDFLAGS) -o $@ openxsvc.o
+
+# MODS
+openxsvc.o:		openxsvc.ccm				$(INCS)
 
 
