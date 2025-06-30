@@ -1,5 +1,5 @@
 /* usys_xxx HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* miscelllaneous (XXX) operating system support */
@@ -44,6 +44,7 @@
 #include	<signal.h>		/* <- |SIGEVENT| */
 #include	<pthread.h>
 #include	<time.h>
+#include	<string.h>		/* |strpbrk(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -225,14 +226,26 @@ static inline unixret_t statfilevfs(cchar *fn,USTATVFS *sbp) noex {
 static inline unixret_t fstatfile(int fd,USTAT *sbp) noex {
     	return fstat(fd,sbp) ;
 }
+EXTERNC_end
+#endif /* SUBROUTINE_STATFILE */
+
+#ifndef	SUBROUTINE_DUPOVER
+#define	SUBROUTINE_DUPOVER
+EXTERNC_begin
 static inline unixret_t dupover(int sfd,int dfd) noex {
     	return dup2(sfd,dfd) ;
 }
+EXTERNC_end
+#endif /* SUBROUTINE_DUPOVER */
+
+#ifndef	SUBROUTINE_PIPER
+#define	SUBROUTINE_PIPER
+EXTERNC_begin
 static inline unixret_t piper(int *fds,int fl) noex {
     	return pipe2(fds,fl) ;
 }
 EXTERNC_end
-#endif /* SUBROUTINE_STATFILE */
+#endif /* SUBROUTINE_PIPER */
 
 
 #endif /* USYSXXX_INCLUDE */

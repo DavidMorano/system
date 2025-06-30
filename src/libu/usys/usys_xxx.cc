@@ -1,5 +1,5 @@
 /* usys_xxx SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® system emulated support */
@@ -122,5 +122,23 @@ namespace usys {
 #endif /* (! defined(SYSHAS_LOADAVGINT)) || (SYSHAS_LOADAVGINT == 0) */
 /* LOADAVGINT end */
 /*----------------------------------------------------------------------------*/
+
+#ifndef	SUBROUTINE_STROCHR
+#define	SUBROUTINE_STROCHR
+EXTERNC_begin
+extern char *strochr(cchar *sp,int sch) noex {
+    	return strchr(sp,sch) ;
+}
+EXTERNC_end
+#endif /* SUBROUTINE_STROCHR */
+
+#ifndef	SUBROUTINE_STRBRK
+#define	SUBROUTINE_STRBRK
+EXTERNC_begin
+extern char *strbrk(cchar *sp,cchar *ss) noex {
+    	return strpbrk(sp,ss) ;
+}
+EXTERNC_end
+#endif /* SUBROUTINE_STRBRK */
 
 

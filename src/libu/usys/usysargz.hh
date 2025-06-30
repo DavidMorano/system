@@ -1,5 +1,5 @@
 /* usysargx HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* retrievd the ARGZ value from the system for the current process */
