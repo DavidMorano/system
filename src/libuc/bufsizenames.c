@@ -1,5 +1,5 @@
 /* bufsizenames SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C23 (MUST-BE C-language; conformance reviewed to C23) */
 
 /* enumerate the various system buffer-size names */

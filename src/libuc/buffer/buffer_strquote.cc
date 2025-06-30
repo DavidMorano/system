@@ -1,5 +1,5 @@
 /* buffer_strquote SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* take a string and insert it into the buffer in quoted form */
@@ -86,14 +86,14 @@ int buffer_strquote(buffer *op,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (sl < 0) sl = xstrlen(sp) ;
-	if (strnpbrk(sp,sl," \t\r\n\v\f\b\"\\") != nullptr) {
+	if (strnbrk(sp,sl," \t\r\n\v\f\b\"\\") != nullptr) {
 	    cint	sz = ((2 * sl) + 3) ;
 	    if (char *ap ; (rs = uc_malloc(sz,&ap)) >= 0) {
 	        cchar	*tp ;
 		char	*bp = ap ;
 		{
 		    *bp++ = qch ;
-		    while ((tp = strnpbrk(sp,sl,"\"\\")) != nullptr) {
+		    while ((tp = strnbrk(sp,sl,"\"\\")) != nullptr) {
 			cint	tl = intconv(tp - sp) ;
 		        bp = strwcpy(bp,sp,tl) ;
 		        *bp++ = CH_BSLASH ;
