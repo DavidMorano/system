@@ -1268,7 +1268,7 @@ static int getline(int linelen,cchar *sp,int sl) noex {
 	if (sl > 0) {
 	    cchar	*tp ;
 	    len = MIN(sl,linelen) ;
-	    if ((tp = strnpbrk(sp,len,"\r\n")) != nullptr) {
+	    if ((tp = strnbrk(sp,len,"\r\n")) != nullptr) {
 	        len = ((tp + 1) - sp) ;
 	    }
 	    if ((len > 0) && (len < sl) && CHAR_ISEND(sp[len])) {

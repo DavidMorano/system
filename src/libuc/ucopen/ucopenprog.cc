@@ -73,7 +73,7 @@
 #include	<mkpathx.h>
 #include	<mkprogenv.h>
 #include	<spawnproc.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<localmisc.h>
 
 

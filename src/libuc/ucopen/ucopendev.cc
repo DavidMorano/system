@@ -1,12 +1,11 @@
 /* ucopendev SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* open special overlay mount under the '/dev' directory*/
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -29,21 +28,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strnchr(3c)| */
 #include	<usystem.h>
 #include	<getx.h>
 #include	<opensysfs.h>
 #include	<mkpathx.h>
+#include	<strn.h>		/* |strnchr(3c)| */
 #include	<strwcpy.h>
 #include	<matstr.h>
 #include	<localmisc.h>
 
+import libutil ;
 
 /* local defines */
 
@@ -52,18 +50,26 @@
 #define	INETARGS	struct inetargs
 
 
+/* imported namespaces */
+
+using libuc::opensysfs ;
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	dialtcp(cchar *,cchar *,int,int,int) ;
-extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;
-extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
-extern int	dialudp(cchar *,cchar *,int,int,int) ;
+extern int	dialtcp(cchar *,cchar *,int,int,int) noex ;
+extern int	dialtcpnls(cchar *,cchar *,int,cchar *,int,int) noex ;
+extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) noex ;
+extern int	dialudp(cchar *,cchar *,int,int,int) noex ;
 
 
 /* local structures */
 
 struct argitem {
-	const char	*p ;
+	cchar		*p ;
 	int		l ;
 } ;
 
@@ -76,30 +82,21 @@ enum das {
 } ;
 
 struct inetargs {
-	struct argitem	ia[da_overlast] ;
-	const char	*a ;		/* memory allocation */
+	argitem		ia[da_overlast] ;
+	char		*a ;		/* memory allocation */
 } ;
 
 
 /* forward references */
 
-static int opendev_default(cchar *,int,mode_t) ;
-static int opendev_inet(int,cchar *,int,int,int) ;
+static int opendev_default(cchar *,int,mode_t) noex ;
+static int opendev_inet(int,cchar *,int,int,int) noex ;
 
-static int inetargs_start(INETARGS *,cchar *,int) ;
-static int inetargs_finish(INETARGS *) ;
+static int inetargs_start(INETARGS *,cchar *,int) noex ;
+static int inetargs_finish(INETARGS *) noex ;
 
 
 /* local variables */
-
-static const char	*devnames[] = {
-	"users",
-	"groups",
-	"projects",
-	"tcp",
-	"udp",
-	NULL
-} ;
 
 enum devnames {
 	devname_users,
@@ -110,36 +107,43 @@ enum devnames {
 	devname_overlast
 } ;
 
-static const int	whiches[] = {
-	OPENSYSFS_WUSERNAMES,
-	OPENSYSFS_WGROUPNAMES,
-	OPENSYSFS_WPROJECTNAMES,
-	-1
+static cpcchar			devnames[] = {
+	"users",
+	"groups",
+	"projects",
+	"tcp",
+	"udp",
+	nullptr
 } ;
+
+static const opensysdbs		whiches[] = {
+	opensysdb_usernames,
+	opensysdb_groupnames,
+	opensysdb_projectnames
+} ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
 int uc_opendev(cchar *fname,int of,mode_t om,mainv envv,int to,int opts) noex {
 	int		rs = SR_OK ;
 	int		fl = -1 ;
 	int		fi ;
-	int		f_more = FALSE ;
+	int		f_more = false ;
 	cchar		*tp ;
+	(void) envv ;
+	(void) opts ;
 
-#if	CF_DEBUGS
-	debugprintf("uc_opendev: fname=%s\n",fname) ;
-#endif
-
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 	if (fname[0] == '\0') return SR_INVALID ;
 
 	while (fname[0] == '/') fname += 1 ;
 
-	if ((tp = strchr(fname,'/')) != NULL) {
-	    fl = (tp-fname) ;
+	if ((tp = strchr(fname,'/')) != nullptr) {
+	    fl = intconv(tp - fname) ;
 	    while (fl && (fname[fl-1] == '/')) fl -= 1 ;
 	    while (tp[0] == '/') tp += 1 ;
 	    f_more = (tp[0] != '\0') ;
@@ -151,7 +155,7 @@ int uc_opendev(cchar *fname,int of,mode_t om,mainv envv,int to,int opts) noex {
 	    case devname_groups:
 	    case devname_projects:
 		{
-	            int	w = whiches[fi] ;
+	            opensysdbs	w = whiches[fi] ;
 	            rs = opensysfs(w,of,-1) ;
 		}
 		break ;
@@ -173,10 +177,6 @@ int uc_opendev(cchar *fname,int of,mode_t om,mainv envv,int to,int opts) noex {
 	    rs = opendev_default(fname,of,om) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("uc_opendev: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (uc_opendev) */
@@ -184,21 +184,19 @@ int uc_opendev(cchar *fname,int of,mode_t om,mainv envv,int to,int opts) noex {
 
 /* private subroutines */
 
-
-static int opendev_default(cchar *fname,int of,mode_t om)
-{
+static int opendev_default(cchar *fname,int of,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	int		fd = -1 ;
 	cchar		*devdname = OPENDEV_DEVDNAME ;
 	char		*fnbuf ;
 
-	size += (strlen(devdname) + 1) ;
-	size += 1 ;
-	size += (strlen(fname) + 1) ;
-	size += 1 ;
-	if ((rs = uc_libmalloc(size,&fnbuf)) >= 0) {
+	sz += intconv(xstrlen(devdname) + 1) ;
+	sz += 1 ;
+	sz += intconv(xstrlen(fname) + 1) ;
+	sz += 1 ;
+	if ((rs = uc_libmalloc(sz,&fnbuf)) >= 0) {
 	    if ((rs = mkpath2(fnbuf,devdname,fname)) >= 0) {
 	        rs = u_open(fnbuf,of,om) ;
 		fd = rs ;
@@ -212,27 +210,25 @@ static int opendev_default(cchar *fname,int of,mode_t om)
 }
 /* end subroutine (opendev_default) */
 
-
-static int opendev_inet(int fi,cchar *fname,int of,int to,int no)
-{
+static int opendev_inet(int fi,cchar *fname,int of,int to,int ne) noex {
 	INETARGS	ia ;
 	int		rs ;
 	int		fd = -1 ;
 
 	if ((rs = inetargs_start(&ia,fname,-1)) >= 0) {
-	    const char	*a = ia.ia[da_af].p ;
-	    const char	*h = ia.ia[da_host].p ;
-	    const char	*s = ia.ia[da_svc].p ;
-	    if ((h != NULL) && (h[0] != '\0')) {
+	    cchar	*a = ia.ia[da_af].p ;
+	    cchar	*h = ia.ia[da_host].p ;
+	    cchar	*s = ia.ia[da_svc].p ;
+	    if ((h != nullptr) && (h[0] != '\0')) {
 	        int	af = AF_UNSPEC ;
-		if ((a != NULL) && (a[0] != '\0')) af = getaf(a) ;
+		if ((a != nullptr) && (a[0] != '\0')) af = getaf(a) ;
 		switch (fi) {
 	        case devname_tcp:
-	            rs = dialtcp(h,s,af,to,no) ;
+	            rs = dialtcp(h,s,af,to,ne) ;
 		    fd = rs ;
 		    break ;
 	        case devname_udp:
-	            rs = dialudp(h,s,af,to,no) ;
+	            rs = dialudp(h,s,af,to,ne) ;
 		    fd = rs ;
 		    break ;
 		} /* end switch */
@@ -243,20 +239,19 @@ static int opendev_inet(int fi,cchar *fname,int of,int to,int no)
 	} /* end if (inetargs) */
 
 	if ((rs >= 0) && (of & O_CLOEXEC)) {
-	    rs = uc_closeonexec(fd,TRUE) ;
-	    if (rs < 0)
+	    rs = uc_closeonexec(fd,true) ;
+	    if (rs < 0) {
 		u_close(fd) ;
+	    }
 	}
 
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (opendev_inet) */
 
-static int inetargs_start(INETARGS *iap,const char *sp,int sl) noex {
+static int inetargs_start(INETARGS *iap,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	int		cl ;
-	cchar		*tp, *cp ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = xstrlen(sp) ;
 	memclear(iap) ;
 	while (sl && (sp[0] == '/')) {
 	    sp += 1 ;
@@ -264,50 +259,50 @@ static int inetargs_start(INETARGS *iap,const char *sp,int sl) noex {
 	}
 	iap->ia[da_proto].l = sl ;
 	iap->ia[da_proto].p = sp ;
-	if ((tp = strnchr(sp,sl,'/')) != NULL) {
-	    iap->ia[da_host].l = (tp-sp) ;
-	    sl -= ((tp+1)-sp) ;
-	    sp = (tp+1) ;
+	if (cchar *tp ; (tp = strnchr(sp,sl,'/')) != nullptr) {
+	    int		cl ;
+	    cchar	*cp ;
+	    iap->ia[da_host].l = intconv(tp - sp) ;
+	    sl -= intconv((tp + 1) - sp) ;
+	    sp = (tp + 1) ;
 	    iap->ia[da_host].l = sl ;
 	    iap->ia[da_host].p = sp ;
-	    if ((tp = strnchr(sp,sl,'/')) != NULL) {
-	        iap->ia[da_host].l = (tp-sp) ;
-	        sl -= ((tp+1)-sp) ;
-	        sp = (tp+1) ;
+	    if ((tp = strnchr(sp,sl,'/')) != nullptr) {
+	        iap->ia[da_host].l = intconv(tp - sp) ;
+	        sl -= intconv((tp + 1) - sp) ;
+	        sp = (tp + 1) ;
 	  	cl = sl ;
 		cp = sp ;
-	        if ((tp = strnchr(sp,sl,'/')) != NULL) {
-	            cl = (tp-sp) ;
+	        if ((tp = strnchr(sp,sl,'/')) != nullptr) {
+	            cl = intconv(tp - sp) ;
 		}
 	        iap->ia[da_svc].l = cl ;
 	        iap->ia[da_svc].p = cp ;
-		if ((tp = strnchr(cp,cl,'.')) != NULL) {
-	            iap->ia[da_af].l = (tp-cp) ;
+		if ((tp = strnchr(cp,cl,'.')) != nullptr) {
+	            iap->ia[da_af].l = intconv(tp - cp) ;
 	            iap->ia[da_af].p = cp ;
-	            iap->ia[da_svc].l = ((cp+cl)-(tp+1)) ;
-	            iap->ia[da_svc].p = (tp+1) ;
+	            iap->ia[da_svc].l = intconv((cp + cl) - (tp + 1)) ;
+	            iap->ia[da_svc].p = (tp + 1) ;
 		}
 	    }
 	}
 
 	{
-	    int		size = 0 ;
-	    int		i ;
-	    char	*bp ;
-	    for (i = 0 ; i < da_overlast ; i += 1) {
-		if ((iap->ia[i].l < 0) && (iap->ia[i].p != NULL)) {
-		    iap->ia[i].l = strlen(iap->ia[i].p) ;
+	    int		sz = 0 ;
+	    for (int i = 0 ; i < da_overlast ; i += 1) {
+		if ((iap->ia[i].l < 0) && (iap->ia[i].p != nullptr)) {
+		    iap->ia[i].l = xstrlen(iap->ia[i].p) ;
 		}
 	    } /* end for */
-	    for (i = 0 ; i < da_overlast ; i += 1) {
-		size += (iap->ia[i].p != NULL) ? (iap->ia[i].l+1) : 1 ;
+	    for (int i = 0 ; i < da_overlast ; i += 1) {
+		sz += (iap->ia[i].p != nullptr) ? (iap->ia[i].l+1) : 1 ;
 	    }
-	    if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	    if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
 		cchar	*asp ;
 		iap->a = bp ;
-	        for (i = 0 ; i < da_overlast ; i += 1) {
+	        for (int i = 0 ; i < da_overlast ; i += 1) {
 		    asp = bp ;
-		    if (iap->ia[i].p != NULL) {
+		    if (iap->ia[i].p != nullptr) {
 			bp = (strwcpy(bp,iap->ia[i].p,iap->ia[i].l) + 1) ;
 		    } else {
 			*bp++ = '\0' ;
@@ -321,15 +316,13 @@ static int inetargs_start(INETARGS *iap,const char *sp,int sl) noex {
 }
 /* end subroutine (inetargs_start) */
 
-
-static int inetargs_finish(INETARGS *iap)
-{
+static int inetargs_finish(INETARGS *iap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (iap->a != NULL) {
+	if (iap->a != nullptr) {
 	    rs1 = uc_libfree(iap->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    iap->a = NULL ;
+	    iap->a = nullptr ;
 	}
 	return rs ;
 }

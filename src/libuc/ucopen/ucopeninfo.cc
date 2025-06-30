@@ -1,5 +1,5 @@
 /* ucopeninfo SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -83,7 +83,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<unistd.h>
@@ -91,21 +90,28 @@
 #include	<poll.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<pwd.h>
-#include	<netdb.h>
 #include	<usystem.h>
+#include	<getax.h>
+#include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
+#include	<getuserhome.h>		/* |getuserhome(3uc)| */
 #include	<libmallocxx.h>
 #include	<vecstr.h>
-#include	<getax.h>
 #include	<typenonpath.h>
-#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
+#include	<snwcpy.h>
+#include	<snx.h>
+#include	<mkx.h>
+#include	<mkpathx.h>
+#include	<sfx.h>			/* |sfdirname(3uc)| */
 #include	<matstr.h>
+#include	<strx.h>
 #include	<mkchar.h>
+#include	<hasx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"ucopeninfo.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -128,32 +134,6 @@
 
 
 /* external subroutines */
-
-extern int	snopenflags(char *,int,int) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	haslc(cchar *,int) ;
-extern int	hascdpath(cchar *,int) ;
-extern int	hasvarpathprefix(cchar *,int) ;
-extern int	sichr(cchar *,int,int) ;
-extern int	getinetdomain(char *,int) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	mkuserpath(char *,cchar *,cchar *,int) ;
-extern int	mkvarpath(char *,cchar *,int) ;
-extern int	mkcdpath(char *,cchar *,int) ;
-extern int	isOneOf(cint *,int) ;
-extern int	isNotPresent(int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strwcpyuc(char *,cchar *,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*strdcpy1(char *,int,cchar *) ;
 
 
 /* external variables */
@@ -377,8 +357,7 @@ static int open_eval(ucopeninfo *oip) noex {
 	    } else {
 	        if (hasvarpathprefix(oip->fname,-1) && (efname == nullptr)) {
 	            cint	sz = (MAXPATHLEN + 1) ;
-	            void	*p ;
-	            if ((rs = uc_libmalloc(sz,&p)) >= 0) {
+	            if (void *p ; (rs = uc_libmalloc(sz,&p)) >= 0) {
 	                efname = charp(p) ;
 	                efname[0] = '\0' ;
 	                if ((rs = mkvarpath(efname,oip->fname,-1)) > 0) {
@@ -432,7 +411,6 @@ static int open_othertry(ucopeninfo *oip,int *fdp,char *ofname) noex {
 	        {
 	            cint	of = oip->oflags ;
 	            cint	to = oip->to ;
-	            int		rs1 ;
 	            cchar	*fn = oip->fname ;
 
 	            if ((rs1 = FUNCSTAT(oip->fname,&sb)) >= 0) {
@@ -463,7 +441,9 @@ static int open_othertry(ucopeninfo *oip,int *fdp,char *ofname) noex {
 	        break ;
 	    } /* end switch */
 	} /* end if */
-	if ((rs >= 0) && (fd >= 0)) *fdp = fd ;
+	if ((rs >= 0) && (fd >= 0)) {
+	    *fdp = fd ;
+	}
 	return rs ;
 }
 /* end subroutine (open_othertry) */
@@ -491,7 +471,6 @@ static int open_otherlink(ucopeninfo *oip,int *fdp,char *ofname) noex {
 	    } else {
 	        int		cl ;
 	        cchar		*cp ;
-	        cchar		*fn = oip->fname ;
 	        char		dname[MAXPATHLEN + 1] ;
 
 	        if ((cl = sfdirname(fn,-1,&cp)) > 0) {
@@ -595,15 +574,16 @@ static int open_nonpath(ucopeninfo *oip,int npi) noex {
 	cchar		*tp ;
 	char		brkbuf[4] ;
 
-	brkbuf[0] = nch ;
-	brkbuf[1] = (char) 0xAD ;
+	brkbuf[0] = char(nch) ;
+	brkbuf[1] = char(0xAD) ;
 	brkbuf[2] = '/' ;
 	brkbuf[3] = 0 ;
-	if ((tp = strpbrk(fname,brkbuf)) != nullptr) {
+	if ((tp = strbrk(fname,brkbuf)) != nullptr) {
 
 	    if (mkchar(tp[0]) == nch) {
 	        char	prn[PRNBUFLEN+1] ;
-	        if ((rs = sncpy1w(prn,nlen,fname,(tp - fname))) >= 0) {
+		cint	tl = intconv(tp - fname) ;
+	        if ((rs = sncpy1w(prn,nlen,fname,tl)) >= 0) {
 	            cchar	*sp = (tp+1) ;
 	            if (sp[0] != '\0') {
 	                rs = open_nonpather(oip,npi,prn,sp) ;
@@ -643,20 +623,20 @@ static int open_nonpather(ucopeninfo *oip,int npi,cchar *prn,cchar *sp) noex {
 	    brkbuf[0] = (char) 0xAD ;
 	    brkbuf[1] = ':' ;
 	    brkbuf[2] = 0 ;
-	    if ((tp = strpbrk(sp,brkbuf)) != nullptr) {
+	    if ((tp = strbrk(sp,brkbuf)) != nullptr) {
 	        cint	ch = mkchar(*tp) ;
 	        int		cl = -1 ;
 	        cchar		*cp = sp ;
 
 	        if (ch == ':') {
-	            sl = (tp-sp) ;
+	            sl = intconv(tp - sp) ;
 	            cp = (tp+1) ;
 	            tp = strchr(cp,0xAD) ;
 	        }
 
 	        if (tp != nullptr) {
 
-	            cl = (tp-cp) ;
+	            cl = intconv(tp - cp) ;
 	            if (sl < 0) {
 	                sl = cl ; /* or » if (ch != ':') sl = cl « */
 	            }
@@ -754,7 +734,8 @@ static int openproger(cchar *fname,int oflags,mainv ev) noex {
 	        pfp = fnp ;
 	        if ((svcp = strchr(fnp,0xAD)) != nullptr) {
 	            pfp = progfname ;
-	            if ((rs = mkpath1w(progfname,fnp,(svcp - fnp))) >= 0) {
+		    cint	tl = intconv(svcp - fnp) ;
+	            if ((rs = mkpath1w(progfname,fnp,tl)) >= 0) {
 	                if ((rs = vecstr_add(&args,pfp,rs)) >= 0) {
 	                    rs = loadargs(&args,(svcp+1)) ;
 	                }
@@ -764,7 +745,7 @@ static int openproger(cchar *fname,int oflags,mainv ev) noex {
 	        }
 
 	        if (rs >= 0) {
-	    	    cchar	**av = nullptr ;
+	    	    mainv	av = nullptr ;
 	            if ((rs = vecstr_getvec(&args,&av)) >= 0) {
 
 	                if ((pfp[0] == '/') && (pfp[1] == '%')) pfp += 1 ;
@@ -775,7 +756,9 @@ static int openproger(cchar *fname,int oflags,mainv ev) noex {
 
 	        rs1 = vecstr_finish(&args) ;
 	        if (rs >= 0) rs = rs1 ;
-		if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+		if ((rs < 0) && (fd >= 0)) {
+		    u_close(fd) ;
+		}
 	    } /* end if (args) */
 
 	} /* end if (mkuserpath) */
@@ -816,7 +799,6 @@ static int waitready(int fd,int oflags,int timeout) noex {
 	    POLLFD	polls[NPOLLS] = {} ;
 	    time_t	ti_timeout ;
 	    time_t	daytime = time(nullptr) ;
-	    int		sz = NPOLLS * szof(POLLFD) ;
 	    int		pollto = ((timeout > 0) ? POLL_INTMULT : 0) ;
 
 	    polls[0].fd = fd ;
@@ -825,7 +807,7 @@ static int waitready(int fd,int oflags,int timeout) noex {
 
 	    ti_timeout = daytime + timeout ;
 	    while (rs >= 0) {
-	        if ((rs = u_poll(polls,1,pollto)) > 0) {
+	        if ((rs = u_poll(polls,NPOLLS,pollto)) > 0) {
 	            cint	re = polls[0].revents ;
 	            if ((rs = pollok(re)) >= 0) {
 	                if (f_rdonly) {
@@ -879,7 +861,8 @@ static int getnormalfs(cchar *fname,cchar **rpp) noex {
 	    }
 
 	    if ((tp = strchr(pp,'/')) != nullptr) {
-	        pi = matstr(normalfs,pp,(tp - pp)) ;
+		cint	tl = intconv(tp - pp) ;
+	        pi = matstr(normalfs,pp,tl) ;
 	        *rpp = (pi >= 0) ? tp : nullptr ;
 	    } else {
 	        rs = SR_NOENT ;
@@ -906,10 +889,10 @@ static int getprefixfs(cchar *fname,cchar **rpp) noex {
 	    while (*pp && (pp[0] == '/')) pp += 1 ;
 
 	    if ((tp = strchr(pp,'/')) != nullptr) {
-	        pl = (tp-pp) ;
+	        pl = intconv(tp - pp) ;
 	    } else {
-	        pl = strlen(pp) ;
-	        tp = (pp+pl) ;
+	        pl = xstrlen(pp) ;
+	        tp = (pp + pl) ;
 	    }
 
 	    if ((pi = matstr(prefixfs,pp,pl)) >= 0) {
@@ -967,8 +950,9 @@ static int loadargs(vecstr *alp,cchar *sp) noex {
 	    cchar		*tp ;
 
 	    while ((tp = strchr(sp,0xAD)) != nullptr) {
+		cint	tl = intconv(tp - sp) ;
 	        c += 1 ;
-	        rs = vecstr_add(alp,sp,(tp - sp)) ;
+	        rs = vecstr_add(alp,sp,tl) ;
 	        sp = (tp+1) ;
 	        if (rs < 0) break ;
 	    } /* end while */

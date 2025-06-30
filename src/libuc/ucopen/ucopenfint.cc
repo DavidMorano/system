@@ -112,7 +112,7 @@
 #include	<sncpyx.h>
 #include	<mkx.h>			/* |mksofname(3uc)| */
 #include	<mkpathx.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<isoneof.h>
 #include	<isnot.h>
 #include	<localmisc.h>

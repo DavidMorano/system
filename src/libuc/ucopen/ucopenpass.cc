@@ -50,7 +50,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<localmisc.h>
 
 

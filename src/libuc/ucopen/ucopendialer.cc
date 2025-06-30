@@ -90,7 +90,7 @@
 #include	<mkx.h>
 #include	<mkpr.h>
 #include	<mkpathx.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -318,7 +318,7 @@ static int subinfo_exts(SI *sip,cchar *pr,cchar *sdn,char *sfn) noex {
 	    if ((rs = mksofname(sfn,sdn,prn,soexts[i])) >= 0) {
 	        if ((rs = u_stat(sfn,&sb)) >= 0) {
 		    if (S_ISREG(sb.st_mode)) {
-	                if ((rs = sperm(&sip->id,&sb,am)) >= 0) {
+	                if ((rs = permid(&sip->id,&sb,am)) >= 0) {
 			    rs = subinfo_searchlib(sip,pr,sfn) ;
 			    f = rs ;
 			} else if (rs == SR_ACCESS) {
