@@ -1,5 +1,5 @@
 /* uc_killpg */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* send a kill-signal to a process group */
@@ -19,34 +19,28 @@
 
 /*******************************************************************************
 
+  	Description:
 	Send a signal to a process group.
 
 	Synopsis:
-
 	int uc_killpg(pgrp,signo)
 	pid_t		pgrp ;
 	int		signo ;
 
 	Arguments:
-
 	pgrp		program group ID
 	signo		signal number
 
 	Returns:
-
-	<0		error
 	>=0		OK
-
+	<0		error (system-return
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<signal.h>
-#include	<errno.h>
-
+#include	<csignal>
+#include	<cerrno>
 #include	<usystem.h>
 #include	<localmisc.h>
 

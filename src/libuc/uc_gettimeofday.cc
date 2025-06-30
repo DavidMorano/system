@@ -1,5 +1,5 @@
 /* uc_gettimeofday */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* interface component for UNIX®Â® library-3c */
@@ -38,7 +38,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/time.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<unistd.h>
 #include	<usystem.h>
 #include	<localmisc.h>

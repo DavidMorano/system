@@ -1,5 +1,5 @@
 /* uc_inproj */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* project DB access */
@@ -25,35 +25,29 @@
 	database access subroutines.
 
 	Symopsis:
-
 	int uc_inproj(cchar *username,cchar *projname,char *rbuf,int rlen)
 
 	Arguments:
-
 	username	user to check
 	projname	project to check
 	rbuf		buffer to hold internal project entry data
 	rlen		length of supplied buffer
 
 	Returns:
-
-	<0		error
-	==0		NO (user not in project)
 	>0		YES (user is in project)
-
+	==0		NO (user not in project)
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<errno.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<cerrno>
 #include	<project.h>
 
 #include	<usystem.h>

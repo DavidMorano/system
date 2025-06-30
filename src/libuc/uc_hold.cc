@@ -1,5 +1,5 @@
 /* uc_sighold */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* interface component for UNIX® library-3c */
@@ -17,8 +17,8 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<signal.h>
-#include	<errno.h>
+#include	<csignal>
+#include	<cerrno>
 #include	<usystem.h>
 #include	<localmisc.h>
 

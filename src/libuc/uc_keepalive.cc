@@ -1,5 +1,5 @@
 /* uc_keepalive */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* set the KeepAlive mode on a (socket) file descriptor */

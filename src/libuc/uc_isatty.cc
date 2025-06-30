@@ -1,5 +1,5 @@
 /* uc_isatty SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine is the given file-descriptor references a terminal device */
