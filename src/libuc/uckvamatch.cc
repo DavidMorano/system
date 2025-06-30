@@ -1,5 +1,5 @@
 /* uckvamatch SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -37,7 +37,7 @@
 	>=0		key-name found and this is the length (including zero)
 	SR_NOTFOUND	key-name not found
 	SR_NOSYS	function not implemented on this system
-	<0		other error
+	<0		error (system-return)
 
 *******************************************************************************/
 

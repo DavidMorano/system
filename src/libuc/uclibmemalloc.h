@@ -1,5 +1,5 @@
 /* uclibmemalloc HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* memory allocation facility (for library use) */
@@ -34,10 +34,10 @@ extern int uc_libmallocsys(int,char **) noex ;
 extern int uc_libmalloc(int,void *) noex ;
 extern int uc_libvalloc(int,void *) noex ;
 extern int uc_libcalloc(int,int,void *) noex ;
-extern int uc_librealloc(cvoid *,int,void *) noex ;
-extern int uc_libfree(cvoid *) noex ;
+extern int uc_librealloc(void *,int,void *) noex ;
+extern int uc_libfree(void *) noex ;
 
-extern int rslibfree(int,cvoid *) noex ;
+extern int rslibfree(int,void *) noex ;
 
 EXTERNC_end
 

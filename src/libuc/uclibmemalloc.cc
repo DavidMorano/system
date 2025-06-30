@@ -1,5 +1,5 @@
 /* uclibmemalloc SUPPORT (3uc) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -35,10 +35,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cerrno>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<errtimer.hh>
@@ -46,6 +44,7 @@
 
 #include	"uclibmemalloc.h"
 
+import libutil ;			/* |xstrlen(3u)| */
 
 /* local defines */
 
@@ -69,8 +68,8 @@ namespace {
     typedef int (uclibmemalloc::*uclibmalloc_m)(int,void *) noex ;
     struct uclibmemalloc {
 	uclibmalloc_m	m ;
-	cvoid		*cp ;		/* constant-void-pointer */
-	uclibmemalloc(cvoid *op = nullptr) noex : cp(op) { } ;
+	void		*cp ;		/* constant-void-pointer */
+	uclibmemalloc(void *op = nullptr) noex : cp(op) { } ;
 	int operator () (int,void *) noex ;
 	int stdmalloc(int,void *) noex ;
 	int stdvalloc(int,void *) noex ;
@@ -92,17 +91,21 @@ namespace {
 
 int uc_libmallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
+	int		rl = 0 ;
 	if (sp && rpp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = xstrlen(sp) ;
 	    if (char *bp ; (rs = uc_libmalloc((sl+1),&bp)) >= 0) {
 	        *rpp = bp ;
-	        strncpy(bp,sp,sl) ;
-	        bp[sl] = '\0' ;
+		{
+	            char *ep = stpncpy(bp,sp,sl) ;
+		    *ep = '\0' ;
+		    rl = intconv(ep - bp) ;
+		}
 	    } else {
 		*rpp = nullptr ;
 	    } /* end if (uc_libmalloc) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? sl : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (uc_libmallocstrw) */
 
@@ -146,7 +149,7 @@ int uc_libvalloc(int sz,void *vp) noex {
 }
 /* end subroutine (uc_libvalloc) */
 
-int uc_librealloc(cvoid *cp,int sz,void *vp) noex {
+int uc_librealloc(void *cp,int sz,void *vp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) {
 	    const uintptr_t	v = uintptr_t(cp) ;
@@ -161,7 +164,7 @@ int uc_librealloc(cvoid *cp,int sz,void *vp) noex {
 }
 /* end subroutine (uc_librealloc) */
 
-int uc_libfree(cvoid *cp) noex {
+int uc_libfree(void *cp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) {
 	    const uintptr_t	v = uintptr_t(cp) ;
@@ -176,9 +179,9 @@ int uc_libfree(cvoid *cp) noex {
 }
 /* end subroutine (uc_libfree) */
 
-int rslibfree(int rs,cvoid *p) noex {
+int rslibfree(int rs,void *p) noex {
 	if (p) {
-    	    if (cint rs1 = uc_free(p) ; rs >= 0) {
+    	    if (cint rs1 = uc_libfree(p) ; rs >= 0) {
 		rs = rs1 ;
 	    }
 	} else {
