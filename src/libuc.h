@@ -1,5 +1,5 @@
 /* libuc HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* revision history:
@@ -310,7 +310,7 @@
 #include	<willaddover.h>
 #include	<xclustername.h>
 #include	<xfile.h>
-#include	<xperm.h>
+#include	<permx.h>
 
 #endif /* LIBUC_INCLUDE */
 

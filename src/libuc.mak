@@ -36,8 +36,9 @@ DEFS +=
 INCS += usystem.h localmisc.h
 INCS += uclibsubs.h
 
-MODS += bstree.ccm sview.ccm
+MODS += bstree.ccm sview.ccm strfilter.ccm
 MODS += mapblock.ccm memtrack.ccm addrset.ccm
+MODS += sif.ccm
 
 LIBS= -lu
 
@@ -59,11 +60,11 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ00_MOD += valuelims.o digbufsizes.o 
-OBJ01_MOD += uvariables.o ulibvals.o
+OBJ01_MOD += uconstants.o ulibvals.o
 OBJ02_MOD += bufsizedata.o
 OBJ03_MOD += bstree.o sview.o
 OBJ04_MOD += mapblock.o memtrack.o addrset.o
-OBJ05_MOD +=
+OBJ05_MOD += strfilter.o
 OBJ06_MOD +=
 
 OBJA_MOD= obj00_mod.o obj01_mod.o obj02_mod.o obj03_mod.o
@@ -82,7 +83,7 @@ OBJ06_INIT=
 OBJ07_INIT=
 
 OBJ00= matxstr.o toxc.o char.o 
-OBJ01= strn.o strnxcmp.o sif.o
+OBJ01= strn.o strnxcmp.o
 OBJ02= snwcpy.o strcpyxc.o strwcpy.o strdcpy.o
 OBJ03= strw.o
 
@@ -101,8 +102,8 @@ OBJ13=
 OBJ14=
 OBJ15=
 
-OBJ16 = wsix.o wsnx.o wsfx.o
-OBJ17 = six.o snx.o sfx.o rmx.o
+OBJ16 = six.o snx.o sfx.o sif.o rmx.o
+OBJ17 = wsix.o wsnx.o wsfx.o
 OBJ18 = 
 OBJ19 = 
 
@@ -404,9 +405,6 @@ sockaddress.o:		sockaddress.cc sockaddress.h
 storeitem.o:		storeitem.cc storeitem.h
 storebuf.o:		storebuf.cc storebuf.h
 
-obuf.o:			obuf.cc obuf.hh
-
-baops.o:		baops.c baops.h
 strop.o:		strop.cc strop.h
 dstr.o:			dstr.cc dstr.h
 
@@ -513,7 +511,7 @@ uctim.o:		uctim.cc uctim.h itcontrol.h
 uctimer.o:		uctimer.cc uctimer.h
 
 # misc-character
-toxc.o:			toxc.c toxc.h
+toxc.o:			toxc.cc toxc.h
 char.o:			char.cc char.h
 hasx.o:			hasx.cc hasx.h char.h ischarx.h
 
@@ -884,15 +882,25 @@ nleadx.o:		nleadx.dir
 nleadx.dir:
 	makesubdir $@
 
-# FONCE
-fonce.o:		fonce0.o fonce1.o		$(INCS)
-	makemodule fonce
-	$(LD) -r -o $@ $(LDFLAGS) fonce0.o fonce1.o
-fonce0.o:		fonce.ccm			$(INCS)
-	makemodule fonce
-fonce1.o:		fonce1.cc fonce.ccm		$(INCS)
-	makemodule fonce
-	$(COMPILE.cc) fonce1.cc
+# SIF
+sif.o:			sif.dir
+sif.dir:
+	makesubdir $@
+
+# STRFILTER
+strfilter.o:		strfilter.dir
+strfilter.dir:
+	makesubdir $@
+
+# OBUF
+obuf.o:			obuf.dir
+obuf.dir:
+	makesubdir $@
+
+# PERMX
+permx.o:		permx.dir
+permx.dir:
+	makesubdir $@
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -945,10 +953,9 @@ thrcomm.o:		thrcomm.cc	thrcomm.h
 thrbase.o:		thrbase.cc	thrbase.h thrcomm.h
 pwentry.o:		pwentry.cc	pwentry.h
 pwfile.o:		pwfile.cc	pwfile.h
-sif.o:			sif.cc		sif.hh
-bufstr.o:		bufstr.cc bufstr.h
-syspasswd.o:		syspasswd.cc syspasswd.h
-absfn.o:		absfn.cc absfn.h
+bufstr.o:		bufstr.cc	bufstr.h
+syspasswd.o:		syspasswd.cc	syspasswd.h
+absfn.o:		absfn.cc	absfn.h
 
 # sring-comparisons
 vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h
@@ -977,7 +984,6 @@ inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 readln.o:		readln.cc readln.hh
 strwcmp.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
-xperm.o:		xperm.cc xperm.h ids.h
 sysnoise.o:		sysnoise.cc sysnoise.h
 findfilepath.o:		findfilepath.cc findfilepath.h
 findxfile.o:		findxfile.cc findxfile.h
@@ -994,7 +1000,7 @@ sysmemutil.o:		sysmemutil.cc sysmemutil.h
 bitrotate.o:		bitrotate.cc bitrotate.h
 
 # integer-conversion-to-string-digits
-strval.o:		uvariables.o strval.cc strval.h
+strval.o:		uconstants.o strval.cc strval.h
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h
@@ -1005,7 +1011,7 @@ ucprochave.o:		ucprochave.cc ucprochave.h
 
 # environment related string values
 strlibval.o:		strlibval.cc strlibval.hh
-strenv.o:		uvariables.o strenv.cc strenv.hh
+strenv.o:		uconstants.o strenv.cc strenv.hh
 
 # BSTREE
 bstree.o:		bstree.ccm			$(INCS)
@@ -1016,8 +1022,8 @@ sview.o:		sview.ccm			$(INCS)
 # BUFSIZEDATA
 bufsizedata.o:		bufsizedata.ccm			$(INCS)
 
-# UVARIABLES
-uvariables.o:		valuelims.o digbufsizes.o uvariables.ccm
+# UCONSTABTS
+uconstants.o:		valuelims.o digbufsizes.o uconstants.ccm
 
 
 valuelims.o:		valuelims.ccm
