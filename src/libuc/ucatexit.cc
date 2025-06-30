@@ -1,6 +1,6 @@
 /* ucatexit SUPPORT */
-/* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface components for UNIX® library-3c */
 /* process exit handling */
@@ -28,13 +28,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
 #include	<cerrno>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |atexit(3c)| */
 #include	<usystem.h>
+#include	<errtimer.hh>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -44,10 +43,6 @@
 
 
 /* local typedefs */
-
-extern "C" {
-    typedef void	(*atexit_f)(void) noex ;
-}
 
 
 /* external subroutines */
@@ -63,12 +58,12 @@ namespace {
     typedef int (ucatexit::*mem_m)() noex ;
     struct ucatexit {
 	mem_m		m ;
-	atexit_f	func ;
-	ucatexit(atexit_f f) noex : func(f) { } ;
+	void_f	func ;
+	ucatexit(void_f f) noex : func(f) { } ;
 	int stdatexit() noex ;
 	int operator () () noex ;
     } ; /* end struct (ucatexit) */
-}
+} /* end namespace */
 
 
 /* local variables */
@@ -79,10 +74,14 @@ namespace {
 
 /* exported subroutines */
 
-int uc_atexit(atexit_f f) noex {
-	ucatexit	aeo(f) ;
-	aeo.m = &ucatexit::stdatexit ;
-	return aeo() ;
+int uc_atexit(void_f func) noex {
+    	int		rs = SR_FAULT ;
+	if (func) {
+	    ucatexit	aeo(func) ;
+	    aeo.m = &ucatexit::stdatexit ;
+	    rs = aeo() ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (uc_atexit) */
 
@@ -90,44 +89,34 @@ int uc_atexit(atexit_f f) noex {
 /* local subroutines */
 
 int ucatexit::operator () () noex {
-	int		to_again = utimeout[uto_again] ;
-	int		to_nomem = utimeout[uto_nomem] ;
-	int		rs = SR_OK ;
-	bool		f_exit = false ;
+	errtimer	to_again = utimeout[uto_again] ;
+	errtimer	to_nomem = utimeout[uto_nomem] ;
+	reterr		r ;
+	int		rs ;
 	repeat {
             if ((rs = (this->*m)()) < 0) {
+		r(rs) ;
                 switch (rs) {
                 case SR_AGAIN:
-                    if (to_again-- > 0) {
-                        msleep(1000) ;
-                    } else {
-                        f_exit = true ;
-                    }
+		    r = to_again(rs) ;
                     break ;
                 case SR_NOMEM:
-                    if (to_nomem-- > 0) {
-                        msleep(1000) ;
-                    } else {
-                        f_exit = true ;
-                    }
+		    r = to_nomem(rs) ;
                     break ;
                 case SR_INTR:
-                    break ;
-                default:
-                    f_exit = true ;
+		    r(false) ;
                     break ;
                 } /* end switch */
             } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
+	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
 }
 /* end subroutine (ucatexit::operator) */
 
 int ucatexit::stdatexit() noex {
-	int		rs = SR_FAULT ;
-	if (func) {
-	    rs = SR_OK ;
-	    if (atexit(func) < 0) rs = (- errno) ;
+	int		rs ;
+	if ((rs = atexit(func)) < 0) {
+	    rs = (- errno) ;
 	}
 	return rs ;
 }

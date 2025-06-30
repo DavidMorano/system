@@ -1,5 +1,5 @@
 /* ucclustername SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -35,7 +35,7 @@
 	Returns:
 	==0		could not get a cluster name
 	>0		string length of cluster name
-	<0		some other error
+	<0		error (system-return)
 
 	Design note:
 
