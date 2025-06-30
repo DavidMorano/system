@@ -1,5 +1,5 @@
 /* usupport_main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® kernel support subroutines */
@@ -111,7 +111,7 @@ usys_mtime		mtime ;
 
 mtime_t umtime(void) noex {
 	mtime_t		t ;
-	mtime_t		m = 0 ;
+	mtime_t		m = 0 ; /* return-value */
 	if (TIMEVAL tv ; gettimeofday(&tv,nullptr) >= 0) {
 	    t = tv.tv_sec ;
 	    m += (t * onethousand) ;
@@ -172,28 +172,6 @@ namespace libu {
 } /* end namespace (libu) */
 
 namespace libu {
-    sysret_t uitimer_get(int w,ITIMERVAL *otvp) noex {
-	int		rs = SR_FAULT ;
-	if (otvp) {
-	    repeat {
-	        if ((rs = getitimer(w,otvp)) < 0) {
-		    rs = (- errno) ;
-	        }
-	    } until (rs != SR_INTR) ;
-	} /* end if (non-null) */
-	return rs ;
-    }
-    sysret_t uitimer_set(int w,CITIMERVAL *ntvp,ITIMERVAL *otvp) noex {
-	int		rs = SR_FAULT ;
-	if (ntvp && otvp) {
-	    repeat {
-	        if ((rs = setitimer(w,ntvp,otvp)) < 0) {
-		    rs = (- errno) ;
-	        }
-	    } until (rs != SR_INTR) ;
-	} /* end if (non-null) */
-	return rs ;
-    }
     sysret_t ustrftime(char *dbuf,int dlen,cchar *fmt,CTM *tmp) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf && fmt && tmp) {
@@ -212,65 +190,11 @@ namespace libu {
     }
 } /* end namespace (libu) */
 
-namespace libu {
-    template<typename T>
-    static int ctdecx(charp (*ctx)(T,char *),char *dp,int dl,T uv) noex {
-	int		rs = SR_FAULT ;
-	if (dp) {
-	    cint	dlen = DECBUFLEN ;
-	    char	dbuf[DECBUFLEN + 1] ;
-	    char	*bp = ctx(uv,(dbuf + dlen)) ;
-	    rs = sncpy(dp,dl,bp) ;
-	}
-	return rs ;
-    }
-    int ctdecui(char *dp,int dl,uint uv) noex {
-	return ctdecx(uitostr,dp,dl,uv) ;
-    }
-    int ctdecul(char *dp,int dl,ulong uv) noex {
-	return ctdecx(ultostr,dp,dl,uv) ;
-    }
-    int ctdecull(char *dp,int dl,ulonglong uv) noex {
-	return ctdecx(ulltostr,dp,dl,uv) ;
-    }
-} /* end namespace (libu) */
-
-namespace libu {
-    template<typename T>
-    static int cfdecx(T (*cfx)(cc *,char **,int),cc *sp,int sl,T *rp) noex {
-	cint		b = 10 ;
-	int		rs = SR_FAULT ;
-	char		*endp{} ; /* <- unused */
-	if (sp) {
-	    T		v{} ;
-	    strnul	str(sp,sl) ;
-	    errno = 0 ;
-	    v = cfx(str,&endp,b) ;
-	    if (rp) *rp = v ;
-	    if (errno) {
-		rs = (- errno) ;
-	    } else {
-		rs = intsat(v) ;
-	    }
-	} /* end if (non-null) */
-	return rs ;
-    } /* end subroutine-template (cfdecx) */
-    int cfdec(cchar *sp,int sl,int *rp) noex {
-	return cfdecx(strtoxi,sp,sl,rp) ;
-    }
-    int cfdec(cchar *sp,int sl,long *rp) noex {
-	return cfdecx(strtoxl,sp,sl,rp) ;
-    }
-    int cfdec(cchar *sp,int sl,longlong *rp) noex {
-	return cfdecx(strtoxll,sp,sl,rp) ;
-    }
-} /* end namespace (libu) */
-
 
 /* local subroutines */
 
 static int isleep(int mto) noex {
-	POLLFD		fds[1] = {} ;
+	POLLFD		fds[1] = {} ; /* no entries actually used */
 	int		rs ;
 	bool		fexit = false ;
 	repeat {

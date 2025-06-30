@@ -1,5 +1,5 @@
 /* usupport_sncpyx SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® kernel support subroutines */
@@ -44,7 +44,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdarg>		/* |va_list(3c)| + |va_arg(3c)| */
 #include	<cstring>		/* |memset(3c)| + |strlcpy(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -52,7 +51,7 @@
 #include	<usysrets.h>
 #include	<localmisc.h>
 
-#include	"usupport.h"
+#include	"usupport_sncpyx.h"
 
 
 /* local defines */
