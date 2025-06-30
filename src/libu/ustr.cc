@@ -1,5 +1,5 @@
 /* ustr SUPPORT (UNIX® STREAMS®) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++23 */
 
 /* UNIX® STREAMS management system-call subroutines */

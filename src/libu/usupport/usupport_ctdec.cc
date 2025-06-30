@@ -46,27 +46,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>		/* |gethostid(3c)| */
-#include	<poll.h>
-#include	<cerrno>
-#include	<ctime>
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>		/* |memset(3c)| + |strlcpy(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<intsat.h>
 #include	<stdintx.h>
 #include	<xxtostr.h>		/* |{x}tostr(3u)| */
-#include	<strtox.h>
-#include	<strnul.hh>
 #include	<localmisc.h>		/* |DECBUFLEN| */
 
-#include	"usupport.h"
+#include	"usupport_sncpyx.h"
+#include	"usupport_ctdec.h"
 
 
 /* local defines */

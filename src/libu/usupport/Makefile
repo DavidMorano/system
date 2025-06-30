@@ -57,8 +57,10 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0= usupport_main.o usupport_sncpyx.o
+OBJ1= usupport_itimer.o usupport_hasx.o
+OBJ2= usupport_cfdec.o usupport_ctdec.o
 
-OBJA= obj0.o 
+OBJA= obj0.o obj1.o obj2.o
 
 OBJ= obja.o
 
@@ -142,7 +144,11 @@ objb.o:			$(OBJB)
 
 
 usupport_main.o:	usupport_main.cc			$(INCS)
+usupport_itimer.o:	usupport_itimer.cc			$(INCS)
 usupport_sncpyx.o:	usupport_sncpyx.cc			$(INCS)
+usupport_cfdec.o:	usupport_cfdec.cc			$(INCS)
+usupport_ctdec.o:	usupport_ctdec.cc			$(INCS)
+usupport_hasx.o:	usupport_hasx.cc			$(INCS)
 
 
 
