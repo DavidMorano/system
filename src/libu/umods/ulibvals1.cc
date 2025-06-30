@@ -1,5 +1,5 @@
 /* ulibvals1 MODULE */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* retrieve various Ukernel-Library-Values */
@@ -44,7 +44,7 @@ module ;
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysdefs.h>		/* |MAXBASE| */
 #include	<ulogerror.h>
 #include	<sysconfcmds.h>
 #include	<localmisc.h>		/* |{xxx}BUFLEN| */
@@ -77,16 +77,18 @@ static int getval(int cmd) noex {
 } /* end subroutine (getval) */
 
 const int	ulibvals::endianval	= mkendian() ;
-const int	ulibvals::maxbase	= MAXBASE ; /* the standand value */
 const int	ulibvals::pagesz	= getval(_SC_PAGESIZE) ;
 const int	ulibvals::clktck	= getval(_SC_CLK_TCK) ;
+const int	ulibvals::maxbase	= MAXBASE ; /* the standard value */
 const int	ulibvals::maxarg	= getval(_SC_ARG_MAX) ;
 const int	ulibvals::maxline	= getval(_SC_LINE_MAX) ;
 const int	ulibvals::maxlogin	= getval(_SC_LOGIN_NAME_MAX) ;
+const int	ulibvals::maxgroups	= getval(_SC_NGROUPS_MAX) ;
 const int	ulibvals::maxnamelen	= getval(_SC_NAME_MAX) ;
 const int	ulibvals::maxpathlen	= getval(_SC_PATH_MAX) ;
 const int	ulibvals::usernamelen	= getval(_SC_USERNAME_MAX) ;
 const int	ulibvals::groupnamelen	= getval(_SC_GROUPNAME_MAX) ;
+const int	ulibvals::projnamelen	= getval(_SC_PROJECTNAME_MAX) ;
 const int	ulibvals::nodenamelen	= getval(_SC_NODENAME_MAX) ;
 const int	ulibvals::hostnamelen	= getval(_SC_HOSTNAME_MAX) ;
 const int	ulibvals::binbuflen	= BINBUFLEN ;	/* for |int256_t| */
