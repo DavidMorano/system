@@ -1,5 +1,5 @@
 /* bitrotate SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform a bit rotation of an unsigned integer */
