@@ -1,5 +1,5 @@
 /* uc_realpath SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* resolve a path without symbolic or relative components */
@@ -25,19 +25,25 @@
 	This subroutine takes an existing path and creates a new path
 	that does not contain either symbolic or relative components.
 
+	Notes:
+	1. This subroutine needs to be enhanced to deal w/ temporary
+	system resource outages.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/param.h>		/* standard says this is necessary */
 #include	<climits>
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |realpath(3c)| */
-#include	<cstring>		/* |strlen(3c)| + |strcpy(3c)| */
+#include	<cstring>		/* |strcpy(3c)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<mkpathx.h>
 #include	<localmisc.h>
 
+import libutil ;
 
 /* local defines */
 
@@ -66,7 +72,7 @@ constexpr bool		f_mkpath = CF_MKPATH ;
 
 int uc_realpath(cchar *fname,char *rbuf) noex {
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;
+	int		rl = 0 ; /* return-value */
 	if (fname && rbuf) {
 	    cnullptr	np{} ;
 	    rs = SR_INVALID ;
@@ -75,6 +81,7 @@ int uc_realpath(cchar *fname,char *rbuf) noex {
 	            if (char *rp ; (rp = realpath(fname,np)) != np) {
 			rs = mkpath(rbuf,rp) ;
 			rl = rs ;
+			free(rp) ;
 		    } else {
 		        rs = (- errno) ;
 		    } /* end if (realpath) */
@@ -82,12 +89,13 @@ int uc_realpath(cchar *fname,char *rbuf) noex {
 		    if ((rs = maxpathlen) >= 0) {
 		        cint	rlen = rs ;
 	                if (char *rp ; (rp = realpath(fname,np)) != np) {
-		            if ((rl = strlen(rp)) <= rlen) {
+		            if ((rl = xstrlen(rp)) <= rlen) {
 		                strcpy(rbuf,rp) ;
 			        rs = SR_OK ;
 		            } else {
 			        rs = SR_OVERFLOW ;
 		            }
+			    free(rp) ;
 		        } else {
 		            rs = (- errno) ;
 		        } /* end if (realpath) */

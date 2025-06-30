@@ -1,5 +1,5 @@
 /* uc_reade SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -271,7 +271,7 @@ int uc_reade(int fd,void *vbuf,int ulen,int to,int opts)
 
 static int subinfo_start(SUBINFO *sip,int fd,char *ubuf,int ulen,int to,int ro)
 {
-	struct ustat	sb ;
+	ustat	sb ;
 	int		rs ;
 	int		rs1 ;
 
