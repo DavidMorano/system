@@ -1,5 +1,5 @@
 /* uc_getauid */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 
@@ -18,22 +18,22 @@
 
 /*******************************************************************************
 
-        This subroutine retrieves from the system the Audit-UID of the current
-        process.
+  	Name:
+	uc_getauid
+
+	Description:
+	This subroutine retrieves from the system the Audit-UID of
+	the current process.
 
 	Synopsis:
-
 	int uc_getauid()
 
 	Arguments:
-
 	*node*
 
 	Returns:
-
 	>=0		UID of process (as an integer)
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -42,9 +42,9 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 
 #if	SYSHAS_AUDIT
 #include	<bsm/audit.h>

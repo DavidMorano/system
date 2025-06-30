@@ -1,5 +1,5 @@
 /* uc_fpassfd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* pass a file-descriptor to a file-descriptor */
@@ -39,8 +39,8 @@
 #include	<envstandards.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 

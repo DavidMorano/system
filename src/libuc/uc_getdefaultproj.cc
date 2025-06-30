@@ -1,5 +1,5 @@
 /* uc_getdefaultproj SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -8,17 +8,17 @@
 
 /* revision history:
 
-	= 1998-06-16, David A­D­ Morano
+	= 1998-06-16, David A-D- Morano
 	This code was originally written.
 
-	= 2018-10-03, David A.D. Morano
+	= 2018-10-03, David A-D- Morano
 	Several typos in the introductory comments below have been
 	fixed. Of course, it should not have taken twenty years to
 	have seen (found) and have fixed these!
 
 */
 
-/* Copyright © 1998,2018 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2018 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
