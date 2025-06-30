@@ -1,5 +1,5 @@
 /* ucopensys SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -17,16 +17,21 @@
 
 /*******************************************************************************
 
+  	Name:
+	uc_opensys
+
+	Description:
 	This subroutine attempts to open a special system-wide
 	resource of some kind.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>		/* |strnrchr(3c)| */
 #include	<usystem.h>
 #include	<opensysfs.h>
 #include	<ipasswd.h>
@@ -34,13 +39,17 @@
 #include	<sfx.h>
 #include	<matstr.h>
 #include	<strwcmp.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
+import libutil ;
 
 /* local defines */
 
 
 /* imported namespaces */
+
+using libuc::opensysfs ;
 
 
 /* local typedefs */
@@ -83,7 +92,7 @@ enum sysnames {
 	sysname_overlast
 } ; /* end enum (sysnames) */
 
-static constexpr cpcchar	sysnames[] = {
+static constexpr cpcchar	sysname[] = {
 	"userhomes",
 	"usernames",
 	"groupnames",
@@ -95,30 +104,29 @@ static constexpr cpcchar	sysnames[] = {
 	"group",
 	"project",
 	"realname",
-	OPENSYSFS_FSHELLS,
-	OPENSYSFS_FSHADOW,
+	"shells",
+	"shadow",
 	"userattr",
 	"banner",
 	"bandate",
 	nullptr
 } ;
 
-static constexpr int	whiches[] = {
-	OPENSYSFS_WUSERHOMES,
-	OPENSYSFS_WUSERNAMES,
-	OPENSYSFS_WGROUPNAMES,
-	OPENSYSFS_WPROJECTNAMES,
-	OPENSYSFS_WUSERNAMES,
-	OPENSYSFS_WGROUPNAMES,
-	OPENSYSFS_WPROJECTNAMES,
-	OPENSYSFS_WPASSWD,
-	OPENSYSFS_WGROUP,
-	OPENSYSFS_WPROJECT,
-	OPENSYSFS_WREALNAME,
-	OPENSYSFS_WSHELLS,
-	OPENSYSFS_WSHADOW,
-	OPENSYSFS_WUSERATTR,
-	-1
+static const opensysdbs		whiches[] = {
+	opensysdb_userhomes,
+	opensysdb_usernames,
+	opensysdb_groupnames,
+	opensysdb_projectnames,
+	opensysdb_usernames,
+	opensysdb_groupnames,
+	opensysdb_projectnames,
+	opensysdb_passwd,
+	opensysdb_group,
+	opensysdb_project,
+	opensysdb_realname,
+	opensysdb_shells,
+	opensysdb_shadow,
+	opensysdb_userattr
 } ; /* end array (whiches) */
 
 
@@ -137,15 +145,15 @@ int uc_opensys(cc *fname,int of,mode_t om,mainv envv,int to,int oo) noex {
 	    /* take off any leading slashes */
 	    while (fname[0] == '/') fname += 1 ;
 	    /* take off the '/sys' componenent */
-	    if (cchar *tp ; (tp = strpbrk(fname,"/­")) != nullptr) {
-	        fl = (tp-fname) ;
+	    if (cchar *tp ; (tp = strbrk(fname,"/­")) != nullptr) {
+	        fl = intconv(tp - fname) ;
 	    }
 	    {
 	        if (int len ; (len = isRealName(fname,fl)) > 0) {
 		    fl = len ;
 	        }
 	    }
-	    if (int fi ; (fi = matstr(sysnames,fname,fl)) >= 0) {
+	    if (int fi ; (fi = matstr(sysname,fname,fl)) >= 0) {
 	        switch (fi) {
 	        case sysname_userhomes:
 	        case sysname_usernames:
@@ -162,7 +170,7 @@ int uc_opensys(cc *fname,int of,mode_t om,mainv envv,int to,int oo) noex {
 	        case sysname_shadow:
 	        case sysname_userattr:
 		    {
-	                int	w = whiches[fi] ;
+	                opensysdbs	w = whiches[fi] ;
 	                rs = opensysfs(w,of,-1) ;
 		    }
 		    break ;
@@ -187,18 +195,17 @@ int uc_opensys(cc *fname,int of,mode_t om,mainv envv,int to,int oo) noex {
 
 static int isRealName(cchar *fname,int fl) noex {
 	int		len = 0 ;
-	int		cl ;
 	cchar		*cp ;
-	if ((cl = sfbasename(fname,fl,&cp)) > 0) {
+	if (int cl ; (cl = sfbasename(fname,fl,&cp)) > 0) {
 	    cchar	*suf = IPASSWD_SUF ;
-	    cchar	*tp ;
-	    if ((tp = strnrchr(cp,cl,'.')) != nullptr) {
-		cint	w = sysname_realname ;
-		cint	suflen = strlen(suf) ;
-		if (strncmp((tp+1),suf,suflen) == 0) {
-		    cchar	*rn = sysnames[w] ;
-		    if (strwcmp(rn,cp,(tp-cp)) == 0) {
-			len = (tp-fname) ;
+	    if (cchar *tp ; (tp = strnrchr(cp,cl,'.')) != nullptr) {
+		sysnames	w = sysname_realname ;
+		cint		suflen = xstrlen(suf) ;
+		if (strncmp((tp + 1),suf,suflen) == 0) {
+		    cint	tl = intconv(tp - cp) ;
+		    cchar	*rn = sysname[w] ;
+		    if (strwcmp(rn,cp,tl) == 0) {
+			len = intconv(tp - fname) ;
 		    }
 		}
 	    }

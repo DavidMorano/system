@@ -1,5 +1,5 @@
 /* ucopensocket SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a UNIX® domain socket */
@@ -18,15 +18,17 @@
 
 /*******************************************************************************
 
-	This subroutine is used to open a UNIX® domain socket pretty
-	much as if it was a regular UNIX® file.	This is something that
-	(sadly) cannot be done with sockets normally.
+  	Name:
+	uc_opensocket
 
+	Description:
+	This subroutine is used to open a UNIX® domain socket pretty
+	much as if it was a regular UNIX® file.	 This is something that
+	(sadly) cannot be done with sockets normally.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<sys/socket.h>
@@ -35,7 +37,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<netdb.h>
+#include	<netdb.h>		/* |htons(3net)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -45,7 +47,7 @@
 #include	<inetaddr.h>
 #include	<opentmp.h>
 #include	<mkpathx.h>
-#include	<strwcpyx.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 
@@ -55,13 +57,6 @@
 #define	TO_NOSR		(5 * 60)
 
 #define	BUFLEN		(MAXPATHLEN + 4)
-
-#if	defined(IRIX) && (! defined(TYPEDEF_INADDRT))
-#define	TYPEDEF_INADDRT	1
-
-typedef unsigned int	in_addr_t ;
-
-#endif
 
 #ifndef	POLL_INTMULT
 #define	POLL_INTMULT	1000
@@ -92,7 +87,7 @@ static int	makeconn(int,int,SOCKADDR *,int, int) noex ;
 
 /* exported subroutines */
 
-int uc_opensocket(cchar *fname,int oflags,int timeout) noex {
+int uc_opensocket(cchar *fname,int oflags,int to) noex {
 	SOCKADDR	*sap ;
 	cint		pf = PF_UNIX ;
 	cint		st = SOCK_STREAM ;
@@ -106,17 +101,17 @@ int uc_opensocket(cchar *fname,int oflags,int timeout) noex {
 	if (fname[0] == '\0') return SR_INVALID ;
 
 	sap = (SOCKADDR *) buf ;
-	sap->sa_family = htons(AF_UNIX) ;
-	cl = (strwcpy(sap->sa_data,fname,MAXPATHLEN) - sap->sa_data) ;
+	sap->sa_family = AF_UNIX ;
+	cl = intconv(strwcpy(sap->sa_data,fname,MAXPATHLEN) - sap->sa_data) ;
 
 #ifdef	OPTIONAL
 	sap->sa_data[MAXPATHLEN] = '\0' ;
 #endif
 
-	rs = makeconn(pf,st,sap,(cl + 2),timeout) ;
+	rs = makeconn(pf,st,sap,(cl + 2),to) ;
 	s = rs ;
 	if (rs == SR_PROTOTYPE) {
-	    rs = makeconn(pf,st,sap,(cl + 2),timeout) ;
+	    rs = makeconn(pf,st,sap,(cl + 2),to) ;
 	    s = rs ;
 	}
 
@@ -135,7 +130,7 @@ int uc_opensocket(cchar *fname,int oflags,int timeout) noex {
 
 /* local subroutines */
 
-static int makeconn(int pf,int ptype,SOCKADDR *sap,int sal,int timeout) noex {
+static int makeconn(int pf,int ptype,SOCKADDR *sap,int sal,int to) noex {
 	int		rs ;
 	int		s = 0 ;
 	char	sfname[MAXPATHLEN+1] = { 0 } ;
@@ -143,10 +138,12 @@ static int makeconn(int pf,int ptype,SOCKADDR *sap,int sal,int timeout) noex {
 #if	CF_OPENTMPFILE
 	if (ptype == SOCK_DGRAM) {
 	    cchar	*cp ;
-	    char	template[MAXPATHLEN + 1] ;
-	    if ((cp = getenv(VARTMPDNAME)) == NULL) cp = TMPDNAME ;
-	    mkpath2(template,cp,"openXXXXXXXXXX") ;
-	    rs = opentmpusd(template,O_RDWR,0666,sfname) ;
+	    char	tpat[MAXPATHLEN + 1] ;
+	    if ((cp = getenv(VARTMPDNAME)) == NULL) {
+		cp = TMPDNAME ;
+	    }
+	    mkpath2(tpat,cp,"openXXXXXXXXXX") ;
+	    rs = opentmpusd(tpat,O_RDWR,0666,sfname) ;
 	    s = rs ;
 	} else {
 	    rs = u_socket(pf,ptype,0) ;
@@ -158,7 +155,7 @@ static int makeconn(int pf,int ptype,SOCKADDR *sap,int sal,int timeout) noex {
 #endif /* CF_OPENTMPFILE */
 
 	if (rs >= 0) {
-	    rs = uc_connecte(s,sap,sal,timeout) ;
+	    rs = uc_connecte(s,sap,sal,to) ;
 	}
 	if (rs < 0) u_close(s) ;
 

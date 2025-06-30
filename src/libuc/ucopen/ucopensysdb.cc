@@ -1,5 +1,5 @@
 /* ucopensysdb SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a system-database (SYSBD) file */
@@ -28,7 +28,7 @@
 	given its enumeration constant value.
 
 	Synopsis:
-	int uc_opensysdb(int id,int oflags,int operms) noex
+	int uc_opensysdb(sysdbfiles id,int oflags,int operms) noex
 
 	Arguments:
 	id		SYSDB file ID
@@ -42,9 +42,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
-#include	<syswords.hh>
-#include	<sysdbfnames.h>
+#include	<syswords.hh>		/* |sysword(3u)| */
+#include	<sysdbfiles.h>		/* |sysdbfile(uc)| */
 #include	<libmallocxx.h>
 #include	<mknpathx.h>
 #include	<localmisc.h>
@@ -81,14 +83,14 @@ static cchar	*prefix = sysword.w_sysdbdir ;
 
 /* exported subroutines */
 
-int uc_opensysdb(int id,int oflags,mode_t operms) noex {
+int uc_opensysdb(sysdbfiles id,int oflags,mode_t operms) noex {
 	int		rs = SR_INVALID ;
 	int		rs1 ;
 	int		fd = -1 ;
 	if ((id >= 0) && (id < sysdbfile_overlast)) {
 	    if (char *nbuf ; (rs = libmalloc_mn(&nbuf)) >= 0) {
 		cint	nlen = rs ;
-		cchar	*sysdbname = sysdbfnames[id] ;
+		cchar	*sysdbname = sysdbfile[id] ;
 		if ((rs = mknpath(nbuf,nlen,prefix,sysdbname)) >= 0) {
 		    rs = uc_open(nbuf,oflags,operms) ;
 		    fd = rs ;

@@ -1,5 +1,5 @@
 /* ucopeninfo HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* additional UNIX® limits support */
@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	ucopeninfo
+
+	Description:
 	Additional support for the UNIX® OPEN facility.
 
 *******************************************************************************/
@@ -29,12 +33,14 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>
 #include	<unistd.h>
-#include	<fcntl.h>
+#include	<fcntl.h>		/* |mode_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	UCOPENINFO	ucopeninfo_head
@@ -56,6 +62,7 @@ EXTERNC_begin
 
 extern int	uc_openex(cchar *,int,mode_t,int,int) noex ;
 extern int	uc_openinfo(ucopeninfo *) noex ;
+extern int	uc_openuserinfo(ucopeninfo *) noex ;
 
 EXTERNC_end
 

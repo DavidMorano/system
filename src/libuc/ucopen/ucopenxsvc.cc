@@ -105,7 +105,7 @@
 #include	<sncpyx.h>
 #include	<mkx.h>			/* |mksofname(3uc)| */
 #include	<mkpathx.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<isoneof.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -357,7 +357,7 @@ int subinfo::exts(char *fbuf) noex {
 	    if ((rs = mksofname(fbuf,sdn,svc,e)) >= 0) {
 	        if (USTAT sb ; (rs = u_stat(fbuf,&sb)) >= 0) {
 		    if (S_ISREG(sb.st_mode)) {
-	                if ((rs = sperm(&id,&sb,am)) >= 0) {
+	                if ((rs = permid(&id,&sb,am)) >= 0) {
 			    rs = searchlib(fbuf) ;
 			    f = rs ;
 			} else if (isNoAcc(rs)) {
