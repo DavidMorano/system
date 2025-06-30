@@ -1,5 +1,5 @@
 /* uc_piper */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* interface component for UNIX®Â® library-3c */
 /* create pipes but moved up to a minimum FD number */
@@ -23,24 +23,19 @@
 	resulting FDs that are at or above a minimum FD value.
 
 	Synopsis:
-
 	int uc_piper(pipes,minfd)
 	int	pipes[2] ;
 	int	minfd ;
 
 	Arguments:
-
 	pipes		resulting array of two pipes
 	minfd		minimum number where new FD will move to
 
 	Returns:
-
 	>=0		the new FD
-	<0		error
-
+	<0		error (system-return)
 
 	Notes:
-
 	In the old days (or on many BSD type UNIX®Â® systems) the
 	two resulting pipe ends were unidirectional as follows:
 
@@ -54,18 +49,14 @@
 	Data written to either end is available for reading from
 	the opposite end.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 

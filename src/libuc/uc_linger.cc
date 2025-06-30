@@ -1,5 +1,5 @@
 /* uc_linger */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 /* set (or unset) a LINGER time-out on a socket */
@@ -25,7 +25,7 @@
 #include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<localmisc.h>

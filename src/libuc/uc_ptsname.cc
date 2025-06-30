@@ -1,5 +1,5 @@
 /* uc_ptsname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX®Â® library-3c */
@@ -13,7 +13,7 @@
 	This is written to get a portable (reentrant and thread-safe)
 	version of PTRNAME as we can get.
 
-	= 2018-10-03, David A.D. Morano
+	= 2018-10-03, David A-D- Morano
 	I modernized this by replacing custom path creation crap
 	with a call to the |snsd(3uc)| subroutine.
 
@@ -63,7 +63,7 @@
 #define	PTSPREFIX	"/dev/pts/"	/* slave name */
 #define	PTSPREFIXLEN	9		/* length of above string */
 #define	PTSMAXLEN	32		/* slave name length */
-#define	PTSMAXDEVS	1000000000	/* rather arbitrary */
+#define	PTSMA-D-VS	1000000000	/* rather arbitrary */
 
 
 /* external subroutines */
@@ -87,7 +87,7 @@ int uc_ptsname(int fd,char *nbuf,int nlen) noex {
 	        USTAT	sb ;
 	        if ((rs = u_fstat(fd,&sb)) >= 0) {
 		    uint	minordev = minor(sb.st_rdev) ;
-		    if (minordev < PTSMAXDEVS) {
+		    if (minordev < PTSMA-D-VS) {
 		        if ((rs = snsd(nbuf,nlen,PTSPREFIX,minordev)) >= 0) {
 			    len = rs ;
 		            rs = u_access(nbuf,0) ;
