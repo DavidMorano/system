@@ -1,5 +1,5 @@
 /* ucprogdata SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* interface components for UNIX® library-3c */
@@ -37,7 +37,7 @@
 	SR_OK		if OK
 	SR_NOTFOUND	if could not get something needed for correct operation
 	SR_ISDIR	database file was a directory (admin error)
-	<0		some other error
+	<0		error (system-return)
 
 	Design note:
 

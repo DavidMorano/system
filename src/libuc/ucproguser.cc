@@ -1,5 +1,5 @@
 /* ucproguser SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* interface components for UNIX® library-3c */
@@ -35,7 +35,7 @@
 	Returns:
 	==0		could not get a name
 	>0		string length of found username
-	<0		some other error
+	<0		error (system-return)
 
 	Design note:
 
@@ -125,14 +125,14 @@ namespace {
     struct ucproguser {
 	ptm		mx ;		/* data mutex */
 	time_t		et ;
+	cchar		*username ;	/* memory-allocated */
+	cchar		*userhome ;	/* memory-allocated */
 	uid_t		uid ;
 	int		ttl ;		/* time-to-live */
 	vaflag		f_void ;
 	vaflag		f_init ;
 	vaflag		f_initdone ;
-	cchar		*username ;	/* memory-allocated */
-	cchar		*userhome ;	/* memory-allocated */
-	~ucproguser() {
+	destruct ucproguser() {
 	    if (cint rs = ucproguser_fini() ; rs < 0) {
 		ulogerror("ucproguser",rs,"dtor-fini") ;
 	    }
@@ -326,11 +326,9 @@ static int ucproguser_namer(UCPU *uip,cchar *cbuf,int clen) noex {
 static int ucproguser_namealloc(UCPU *uip,cchar *cbuf,int clen) noex {
 	int		rs = SR_BUGCHECK ;
 	if (uip->username == nullptr) {
-		cchar	*up ;
-		if ((rs =  uc_libmallocstrw(cbuf,clen,&up)) >= 0) {
-		    uip->username = up ;
-		} /* end if (m-a) */	
-	    /* end if (m-a) */
+	    if (cchar *up ; (rs =  uc_libmallocstrw(cbuf,clen,&up)) >= 0) {
+		uip->username = up ;
+	    } /* end if (m-a) */	
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -340,7 +338,8 @@ static int ucproguser_namefree(UCPU *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->username) {
-	    rs1 = uc_libfree(uip->username) ;
+	    char *bp = cast_const<charp>(uip->username) ;
+	    rs1 = uc_libfree(bp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    uip->username = nullptr ;
 	}
@@ -352,12 +351,14 @@ static int ucproguser_nameend(UCPU *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->userhome) {
-	    rs1 = uc_libfree(uip->userhome) ;
+	    char *bp = cast_const<charp>(uip->userhome) ;
+	    rs1 = uc_libfree(bp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    uip->userhome = nullptr ;
 	}
 	if (uip->username) {
-	    rs1 = uc_libfree(uip->username) ;
+	    char *bp = cast_const<charp>(uip->username) ;
+	    rs1 = uc_libfree(bp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    uip->username = nullptr ;
 	}
