@@ -169,7 +169,7 @@ int rfile(cc *rhost,REX_AUTH *auth,cc *rfilename,int flags,mode_t mode) noex {
 
 	srs = fd ;
 
-/* we have a connection, let's try to make the best use of it ! */
+/* we have a connection, let us try to make the best use of it! */
 
 	if ((flags & O_WRONLY) || (flags & O_APPEND)) {
 
