@@ -1,5 +1,5 @@
-/* char HEADER */
-/* encoding=ISO8859-1 */
+/* charinit HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* fast character text and conversion facility */
@@ -41,8 +41,8 @@
 
 ******************************************************************************/
 
-#ifndef	CHAR_INCLUDE
-#define	CHAR_INCLUDE
+#ifndef	CHARINIT_INCLUDE
+#define	CHARINIT_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -56,21 +56,21 @@
 extern const short		char_dictorder[] ;
 
 /* test character attribute routines */
-#define	CHAR_ISSPACETAB(c)	(((c) == ' ') || ((c) == '\t'))
-#define	CHAR_ISWHITE(c)		char_iswhite(c)
-#define	CHAR_ISLC(c)		char_islc(c)
-#define	CHAR_ISUC(c)		char_isuc(c)
-#define	CHAR_ISDIG(c)		char_isdig(c)
+#define	CHARINIT_ISSPACETAB(c)	(((c) == ' ') || ((c) == '\t'))
+#define	CHARINIT_ISWHITE(c)		char_iswhite(c)
+#define	CHARINIT_ISLC(c)		char_islc(c)
+#define	CHARINIT_ISUC(c)		char_isuc(c)
+#define	CHARINIT_ISDIG(c)		char_isdig(c)
 
 /* my super-fast conversions */
-#define	CHAR_TOBC(c)		((c) & 0xff)
-#define	CHAR_TOLC(c)		char_tolc(c)
-#define	CHAR_TOUC(c)		char_touc(c)
-#define	CHAR_TOFC(c)		char_tofc(c)
-#define	CHAR_TOVAL(c)		char_toval(c) ;
+#define	CHARINIT_TOBC(c)		((c) & 0xff)
+#define	CHARINIT_TOLC(c)		char_tolc(c)
+#define	CHARINIT_TOUC(c)		char_touc(c)
+#define	CHARINIT_TOFC(c)		char_tofc(c)
+#define	CHARINIT_TOVAL(c)		char_toval(c) ;
 
 /* dictionary-collating-ordinal */
-#define	CHAR_DICTORDER(c)	(char_dictorder[(c) & 0xff])
+#define	CHARINIT_DICTORDER(c)	(char_dictorder[(c) & 0xff])
 
 EXTERNC_begin
 
@@ -79,7 +79,7 @@ extern bool char_islc(int) noex ;
 extern bool char_isuc(int) noex ;
 
 static inline bool char_isspacetab(int ch) noex {
-	return CHAR_ISSPACETAB(ch) ;
+	return CHARINIT_ISSPACETAB(ch) ;
 }
 
 extern int char_tolc(int) noex ;
@@ -104,6 +104,6 @@ static inline bool char_isdig(int ch) noex {
 #endif /* __cplusplus */
 
 
-#endif /* CHAR_INCLUDE */
+#endif /* CHARINIT_INCLUDE */
 
 
