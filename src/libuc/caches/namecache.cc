@@ -1,12 +1,11 @@
 /* namecache SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* real-name cache (from UNIX® System PASSWD database) */
 /* version %I% last-modified %G% */
 
 #define	CF_FULLNAME	0		/* use fullname? */
-#define	CF_PWCACHE	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -35,9 +34,9 @@
 #include	<cstring>		/* |strncmp(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<getax.h>
-#include	<ucpwcache.h>
+#include	<getpwx.h>
+#include	<mallocxx.h>
 #include	<realname.h>
 #include	<mkgecosname.h>
 #include	<strwcpy.h>
@@ -57,12 +56,6 @@ import libutil ;
 #ifndef	GNAMELEN
 #define	GNAMELEN	REALNAMELEN	/* GECOS name length */
 #endif
-
-#if	CF_PWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_PWCACHE */
 
 #ifndef	CF_FULLNAME
 #define	CF_FULLNAME	0		/* use fullname? */
@@ -267,7 +260,7 @@ int namecache_lookup(NC *op,cchar *un,cchar **rpp) noex {
 	                ep->ti_access = dt ;
 	                if (dt > (ep->ti_init + op->ttl)) {
 		            ep->ti_init = dt ;
-	                    if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
+	                    if ((rs = getpwx_name(&pw,pwbuf,pwlen,un)) >= 0) {
 		                cchar	*gecos = pw.pw_gecos ;
 	                        if ((rs = mkaname(rbuf,rlen,gecos)) >= 0) {
 		                    rl = rs ;
@@ -285,7 +278,7 @@ int namecache_lookup(NC *op,cchar *un,cchar **rpp) noex {
 		            }
 	                }
 	            } else if (rs == SR_NOTFOUND) {
-	                if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
+	                if ((rs = getpwx_name(&pw,pwbuf,pwlen,un)) >= 0) {
 		            cchar	*gecos = pw.pw_gecos ;
 	                    if ((rs = mkaname(rbuf,rlen,gecos)) >= 0) {
 		                rl = rs ;

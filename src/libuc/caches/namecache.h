@@ -1,5 +1,5 @@
 /* namecache HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* real-name cache (from UNIX® System PASSWD database) */
