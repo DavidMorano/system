@@ -1,5 +1,5 @@
 /* field_svcargs SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* parse a field object into service envelope items */
