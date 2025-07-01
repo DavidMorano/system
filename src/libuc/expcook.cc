@@ -1,5 +1,5 @@
 /* expcook SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* Expand-Cookie - creates the substitution variables for cookie escapes */
