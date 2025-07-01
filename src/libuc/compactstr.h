@@ -1,5 +1,5 @@
 /* compactstr HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* compact (remove white-space) a c-string inplace */
