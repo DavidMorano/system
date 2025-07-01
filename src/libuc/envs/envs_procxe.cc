@@ -1,5 +1,5 @@
 /* envs_procxe SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* process an environment file */
@@ -289,7 +289,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	    sl -= 1 ;
 	}
 /* extract any dependencies (if we have any) */
-	if (((tp = strnpbrk(sp,sl,scl)) != np) && (*tp == '?')) {
+	if (((tp = strnbrk(sp,sl,scl)) != np) && (*tp == '?')) {
 	    cint	tl = intconv(tp - sp) ;
 	    if ((rs = deps(sp,tl)) > 0) {
 	        sl -= intconv((tp + 1) - sp) ;
@@ -311,7 +311,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        }
-	        while ((tp = strnpbrk(sp,1,strassign)) != nullptr) {
+	        while ((tp = strnbrk(sp,1,strassign)) != nullptr) {
 	            cint	ach = mkchar(tp[0]) ;
 	            switch (ach) {
 	            case '+':

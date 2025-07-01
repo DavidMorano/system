@@ -1,5 +1,5 @@
 /* envs_subs SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* process the cookie substitutions for environment variables */
@@ -286,7 +286,7 @@ int subinfo::procpathsplit(vecstr *plp,cchar *vp,int vl) noex {
 	    if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
 	        int	pl, cl ;
 	        cchar	*tp, *cp ;
-	        while ((tp = strnpbrk(vp,vl,":;")) != nullptr) {
+	        while ((tp = strnbrk(vp,vl,":;")) != nullptr) {
 	            cp = vp ;
 	            cl = intconv(tp - vp) ;
 	            c += 1 ;
