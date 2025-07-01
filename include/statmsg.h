@@ -23,6 +23,7 @@
 #include	<lockrw.h>
 #include	<paramfile.h>
 #include	<vechand.h>
+#include	<userid.hh>
 
 
 #define	STATMSG_MAGIC	0x75648942
@@ -88,12 +89,15 @@ EXTERNC_begin
 extern int statmsg_open(statmsg *,cchar *) noex ;
 extern int statmsg_check(statmsg *,time_t) noex ;
 extern int statmsg_process(statmsg *,cchar *,cchar **,cchar *,int) noex ;
-extern int statmsg_processid(statmsg *,statmsg_id *,cchar **,cchar *,int) noex ;
 extern int statmsg_close(statmsg *) noex ;
 
-extern int statmsgid_load(statmsg_id *,cchar *,cchar *,uid_t,gid_t) noex ;
-
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+extern int statmsg_processid(statmsg *,userid *,cchar **,cchar *,int) noex ;
+
+#endif /* __cplusplus */
 
 
 #endif /* STATMSG_INCLUDE */

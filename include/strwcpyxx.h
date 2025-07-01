@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stddef.h>		/* <- for |wchar_t| */
+#include	<stddef.h>		/* |nullptr_t| + |wchar_t| */
+#include	<stdlib.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
