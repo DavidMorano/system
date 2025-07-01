@@ -1,5 +1,5 @@
 /* nlsmsg HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* information to create and read an NLS-connect message */
