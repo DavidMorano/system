@@ -1,5 +1,5 @@
 /* dirlist SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* directory list manager */
@@ -59,6 +59,7 @@
 
 #include	"dirlist.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -223,12 +224,12 @@ int dirlist_semi(dirlist *op) noex { /* add a semicolon as an entry */
 /* end subroutine (dirlist_semi) */
 
 int dirlist_adds(dirlist *op,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = dirlist_magic(op,sp)) >= 0) {
-	    cchar	*tp ;
 	    if (sl < 0) sl = cstrlen(sp) ;
-	    while ((tp = strnpbrk(sp,sl,":; \t,")) != nullptr) {
+	    for (cc *tp ; (tp = strnbrk(sp,sl,":; \t,")) != np ; ) {
 	        cchar	*cp = sp ;
 	        cint	cl = intconv(tp - sp) ;
 	        if (rs >= 0) {
@@ -241,7 +242,7 @@ int dirlist_adds(dirlist *op,cchar *sp,int sl) noex {
 	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
-	    } /* end while */
+	    } /* end for */
 	    if ((rs >= 0) && (sl > 0)) {
 	        rs = dirlist_add(op,sp,sl) ;
 	        c += rs ;
