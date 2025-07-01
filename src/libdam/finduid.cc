@@ -44,11 +44,9 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -64,8 +62,8 @@ import libutil ;
 
 /* local defines */
 
-#define	INTUTOPEN	(1*60*60)
-#define	INTUTCHECK	(5*60)
+#define	INTUTOPEN	(1 * 60 * 60)	/* poll interval */
+#define	INTUTCHECK	(5 * 60)	/* poll interval */
 
 #ifndef	CF_TMPXEARLY
 #define	CF_TMPXEARLY	0		/* open TMPX early */
@@ -152,6 +150,7 @@ static int finduid_magic(finduid *op,Args ... args) noex {
 /* end subroutine (finduid_magic) */
 
 static int	finduid_lookuper(finduid *,char *,int,uid_t) noex ;
+static int	finduid_tmpxready(finduid *) noex ;
 static int	finduid_tmpxopen(finduid *) noex ;
 static int	finduid_tmpxclose(finduid *) noex ;
 
@@ -229,10 +228,7 @@ int finduid_lookup(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	    op->s.total += 1 ;
 	    ubuf[0] = '\0' ;
 	    if ((rs = ptm_lock(op->mxp)) >= 0) {
-	        if (! op->open.ut) {
-		    rs = finduid_tmpxopen(op) ;
-	        }
-	        if (rs >= 0) {
+		if ((rs = finduid_tmpxready(op)) >= 0) {
 		    rs = finduid_lookuper(op,ubuf,ulen,uid) ;
 		    ul = rs ;
 	        } /* end if (ok) */
@@ -287,17 +283,18 @@ static int finduid_lookuper(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	int		rs ;
 	int		rs1 = SR_OK ;
 	int		ul = 0 ;
-	if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	    tmpx	*txp = op->utp ;
 	    cint	utype = TMPX_TPROCUSER ;
-	    int		pwlen = rs ;
-	    if (tmpx_cur uc{} ; (rs = tmpx_curbegin(op->utp,&uc)) >= 0) {
-	    	tmpx_ent	ue ;
+	    cint	pwlen = rs ;
+	    if (tmpx_cur uc ; (rs = txp->curbegin(&uc)) >= 0) {
 		pwcache		*pwc = op->ucp ;
 		ucentpw		pw ;
 		time_t		ti_create = 0 ;
 		time_t		ut ;
+	    	tmpx_ent	ue ;
 	        while (rs >= 0) { /* loop finding latest */
-		    rs1 = tmpx_curenum(op->utp,&uc,&ue) ;
+		    rs1 = txp->curenum(&uc,&ue) ;
 		    if (rs1 == SR_NOTFOUND) break ;
 		    ut = ue.ut_tv.tv_sec ;
 	            if ((ue.ut_type == utype) && (ut > ti_create)) {
@@ -316,7 +313,7 @@ static int finduid_lookuper(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 		    } /* end if (got a user process) */
 	        } /* end while (finding latest entry) */
 	        if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-		rs1 = tmpx_curend(op->utp,&uc) ;
+		rs1 = txp->curend(&uc) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (TMPX cursor) */
 	    rs1 = uc_free(pwbuf) ;
@@ -325,6 +322,14 @@ static int finduid_lookuper(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	return (rs >= 0) ? ul : rs ;
 }
 /* end subroutine (finduid_lookuper) */
+
+static int finduid_tmpxready(finduid *op) noex {
+    	int		rs = SR_OK ;
+	if (! op->open.ut) {
+	    rs = finduid_tmpxopen(op) ;
+	}
+	return rs ;
+} /* end subroutine (finduid_tmpxready) */
 
 static int finduid_tmpxopen(finduid *op) noex {
     	cnullptr	np{} ;

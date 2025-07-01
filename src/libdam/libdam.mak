@@ -736,6 +736,7 @@ termout.o:		termout.cc termout.h
 modload.o:		modload.cc modload.h
 shmalloc.o:		shmalloc.cc shmalloc.h
 kbdinfo.o:		kbdinfo.cc kbdinfo.h
+userid.o:		userid.cc userid.hh
 
 # TEXT related
 textlook.o:		textlook.cc textlook.h
