@@ -143,10 +143,10 @@ namespace libu {
     char *strwcpy(char *dp,cchar *sp,int sl) noex {
 	if (sl >= 0) {
 	    while (sl-- && *sp) *dp++ = *sp++ ;
+	    *dp = '\0' ;
 	} else {
-	    while (*sp) *dp++ = *sp++ ;
+	    dp = stpcpy(dp,sp) ;
 	} /* end if */
-	*dp = '\0' ;
 	return dp ;
     }
 } /* end namespace (libu) */
