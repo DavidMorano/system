@@ -1,5 +1,5 @@
 /* dater_setkey SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* handle parsing a supplied date string using a key format identifier */

@@ -1,5 +1,5 @@
 /* dater_main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* general dater object */
@@ -831,7 +831,7 @@ static int dater_ldtmz(dater *op,tmz *tp) noex {
 static int dater_ldzname(dater *op,cchar *sp,int sl) noex {
     	int		rs = SR_OK ;
 	int		len = 0 ;
-	if (cchar *tp ; (tp = strnpbrk(sp,sl," \t")) != nullptr) {
+	if (cchar *tp ; (tp = strnbrk(sp,sl," \t")) != nullptr) {
 	    sl = intconv(tp - sp) ;
 	}
 	if ((rs = znlen) >= 0) {
