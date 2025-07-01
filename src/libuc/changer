@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} A.D. "
+NAMES="${NAMES} paramfile_enum "
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/A.D./s//A-D-/g
+g/paramfile_enum/s//paramfile_curenum/g
 	w
 	q
 EOF

@@ -35,7 +35,8 @@ DEFS=
 
 INCS= cfx.h cfutil.hh
 
-MODS += cfalphax.ccm cfcharsx.ccm cfdigx.ccm cfpowx.ccm cfsysx.ccm
+MODS += cfalphax.ccm cfcharsx.ccm cfdigx.ccm
+MODS += cfpowx.ccm cfsysx.ccm
 
 LIBS=
 
@@ -110,11 +111,6 @@ $(T).o:			$(OBJ_CFX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
 	rm -f $(ALL)
