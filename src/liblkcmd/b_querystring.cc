@@ -141,7 +141,6 @@ struct locinfo_flags {
 	uint		init:1 ;
 	uint		nocache:1 ;
 	uint		nprocs:1 ;
-	uint		ncpus:1 ;
 	uint		btime:1 ;
 	uint		rnum:1 ;
 	uint		mem:1 ;
@@ -153,7 +152,6 @@ struct locinfo {
 	cchar	*utfname ;
 	time_t		btime ;		/* machine boot-time */
 	uint		nprocs ;
-	uint		ncpus ;
 	uint		rnum ;
 	uint		pmt ;		/* physical-memory-total */
 	uint		pma ;		/* physical-memory-avail */

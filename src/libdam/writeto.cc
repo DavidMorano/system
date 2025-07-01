@@ -55,7 +55,7 @@
 /* exported subroutines */
 
 int writeto(int wfd,cchar *wbuf,int wlen,int wto) noex {
-	return uc-writeto(wfd,wbuf,wlen,wto) ;
+	return uc_writeto(wfd,wbuf,wlen,wto) ;
 }
 /* end subroutine (writeto) */
 

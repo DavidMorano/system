@@ -24,9 +24,6 @@
 #include	<usysrets.h>
 
 
-#define	USERID_MAGIC	0x75648942
-
-
 enum useridmems {
     	useridmem_finish,
     	useridmem_overlast
