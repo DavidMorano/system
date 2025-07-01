@@ -1,5 +1,5 @@
 /* dialussnls SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* dial out to a server listening on UNIX® LISTEN */
