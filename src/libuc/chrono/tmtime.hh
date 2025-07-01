@@ -1,5 +1,5 @@
 /* tmtime HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is supposed to provide OS-independent time management operations */
