@@ -1,5 +1,5 @@
 /* clusterdb SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage a database of cluster names */

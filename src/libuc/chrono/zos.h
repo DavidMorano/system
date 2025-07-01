@@ -1,5 +1,5 @@
 /* zos HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* time-zone offset string management */
