@@ -1,5 +1,5 @@
 /* dialhttp SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* dial out to the web */
@@ -62,22 +62,23 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<getnodename.h>
+#include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
+#include	<getprogpath.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<varnames.hh>
 #include	<estrings.h>
 #include	<ids.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<vecstr.h>
 #include	<sbuf.h>
 #include	<pathclean.h>
 #include	<mkpr.h>
 #include	<mkpathx.h>
 #include	<ctdec.h>
+#include	<strx.h>
 #include	<isnot.h>
-#include	<getnodename.h>
-#include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
-#include	<getprogpath.h>
 #include	<localmisc.h>
 
 #include	"dialtcp.h"
@@ -248,7 +249,7 @@ static int findprprog(ids *idp,vecstr *plp,char *rbuf,cchar *pn) noex {
 	                                rl = rs ;
 	                                if ((rs = u_stat(rbuf,&sb)) >= 0) {
 	                                    if (S_ISREG(sb.st_mode)) {
-	                                        rs = sperm(idp,&sb,perms) ;
+	                                        rs = permid(idp,&sb,perms) ;
 	                                        if (isNotAccess(rs)) {
 	                                            rl = 0 ;
 	                                        }
@@ -318,7 +319,7 @@ static int loadpath(vecstr *plp) noex {
 	if (cchar *pp ; (pp = getenv(vn)) != nullptr) {
 	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	        cchar	*tp ;
-	        while ((tp = strpbrk(pp,":;")) != nullptr) {
+	        while ((tp = strbrk(pp,":;")) != nullptr) {
 		    cint	pl = intconv(tp - pp) ;
 	            if ((rs = pathclean(tbuf,pp,pl)) >= 0) {
 			rs = vecstr_adduniq(plp,tbuf,rs) ;

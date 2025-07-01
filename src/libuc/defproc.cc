@@ -1,5 +1,5 @@
 /* defproc SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* process a "def" (define) file */
@@ -207,7 +207,7 @@ static int procline(SI *lip,cchar *lbuf,int llen) noex {
 	    sl -= 1 ;
 	}
 /* extract any dependencies (if we have any) */
-	tp = strnpbrk(sp,sl," \t?+=#") ;
+	tp = strnbrk(sp,sl," \t?+=#") ;
 	if ((tp != nullptr) && (*tp == '?')) {
 	    if ((rs1 = checkdeps(lip,sp,(tp - sp))) > 0) {
 	        sl -= ((tp + 1) - sp) ;
@@ -216,7 +216,7 @@ static int procline(SI *lip,cchar *lbuf,int llen) noex {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        }
-	        tp = strnpbrk(sp,sl," \t+=#") ;
+	        tp = strnbrk(sp,sl," \t+=#") ;
 	    } else {
 		f_done = true ;
 	    }
