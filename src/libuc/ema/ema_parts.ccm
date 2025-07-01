@@ -1,5 +1,5 @@
 /* ema_parts MODULE (primary module interface) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* AS-String (parts) -- used within EMA */
@@ -42,8 +42,6 @@ export module ema_parts ;
 import ema_asstr ;
 
 using namespace::emaobj ;		/* namespace */
-using std::nullptr_t ;			/* type */
-using std::nothrow ;			/* constant */
 
 export {
     namespace emaobj {
