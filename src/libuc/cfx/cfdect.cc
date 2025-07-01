@@ -1,5 +1,5 @@
 /* cfdect SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert from a decimal string with time codes on the end */
@@ -84,7 +84,7 @@ int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        }
-	        while ((tp = strnpbrk(sp,sl,"YMWDwdhms")) != nullptr) {
+	        while ((tp = strnbrk(sp,sl,"YMWDwdhms")) != nullptr) {
 		    cint	mch = mkchar(*tp) ;
 		    cint	tl = intconv(tp - sp) ;
 	            rs = convert(sp,tl,mch,&res) ;
