@@ -30,7 +30,6 @@
 	(also specified by the caller).
 
 	Implementation notes:
-
 	When processing, we time-out writes to the caller-supplied
 	file-descriptor because we do not  know if it is a non-regular
 	file that might be flow-controlled.  We do not wait forever
@@ -50,17 +49,18 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |environ| */
-#include	<cstring>
+#include	<cstring>		/* |UINT_MAX| */
 #include	<usystem.h>
+#include	<getax.h>
+#include	<getusername.h>
+#include	<getuserhome.h>
+#include	<getxid.h>
+#include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<estrings.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<vechand.h>
-#include	<getax.h>
-#include	<getusername.h>
-#include	<getuserhome.h>
-#include	<getxid.h>
 #include	<ptma.h>
 #include	<ptm.h>
 #include	<lockrw.h>
@@ -79,13 +79,14 @@
 #include	<writeto.h>
 #include	<matxstr.h>
 #include	<ctdec.h>
+#include	<mkchar.h>
 #include	<hasx.h>
 #include	<isnot.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<localmisc.h>		/* |DECBUFLEN| */
 
 #include	"statmsg.h"
 
-import libutil ;
+import libutil ;			/* |loadstrs(3u)| */
 
 /* local defines */
 
@@ -96,7 +97,6 @@ import libutil ;
 #define	SM_SUF		"sm"
 #define	SM_DIRSFNAME	"dirs"
 #define	SM		statmsg
-#define	SM_ID		statmsg_id
 
 #define	MAMAGIC		0x21367425
 
@@ -107,6 +107,8 @@ import libutil ;
 #define	MA		statmsg_mapper
 
 #define	MD		statmsg_mapdir
+
+#define	VS		vecstr
 
 #define	NDEBFNAME	"statmsg.deb"
 
@@ -154,6 +156,9 @@ import libutil ;
 #ifndef	CF_WRITETO
 #define	CF_WRITETO	1		/* time out writes */
 #endif
+#ifndef	CF_PARAMFILE
+#define	CF_PARAMFILE	1		/* use |paramfile(3dam)| */
+#endif
 
 
 /* imported namespaces */
@@ -163,6 +168,8 @@ using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
+
+typedef	mainv		mv ;
 
 
 /* external subroutines */
@@ -186,8 +193,50 @@ struct statmsg_mapdir {
 
 typedef statmsg_mapdir *	mdp ;
 
+namespace {
+    struct vars {
+	int	maxnamelen ;
+	int	maxpathlen ;
+	int	maxlinelen ;
+	int	usernamelen ;
+	int	envlen ;
+	int	parambuflen ;
+	operator int () noex ;
+    } ; /* end struct */
+}
+
 
 /* forward references */
+
+template<typename ... Args>
+static int statmsg_ctor(statmsg *op,Args ... args) noex {
+    	STATMSG		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (statmsg_ctor) */
+
+static int statmsg_dtor(statmsg *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (statmsg_dtor) */
+
+template<typename ... Args>
+static inline int statmsg_magic(statmsg *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == STATMSG_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (statmsg_magic) */
 
 static int	statmsg_userbegin(SM *,cchar *) noex ;
 static int	statmsg_userend(SM *) noex ;
@@ -200,21 +249,17 @@ static int	statmsg_checker(SM *,time_t) noex ;
 static int	statmsg_envbegin(SM *) noex ;
 static int	statmsg_envend(SM *) noex ;
 static int	statmsg_envadds(SM *,strpack *,cchar **,
-			SM_ID *,cchar *) noex ;
+			userid *,cchar *) noex ;
 static int	statmsg_envstore(SM *,strpack *,cchar **,int,
 			cchar *,int) noex ;
-static int 	statmsg_processor(SM *,cchar **,cchar **,
-			cchar *,cchar *,int) noex ;
-static int	statmsg_idcheck(SM *,SM_ID *,char *) noex ;
+static int 	statmsg_processor(SM *,cc **,mainv,cc *,cc *,int) noex ;
 
 static int	mapper_start(MA *,time_t,cchar *,cchar *,
 			cchar *) noex ;
 static int	mapper_finish(MA *) noex ;
 static int	mapper_check(MA *,time_t) noex ;
-static int	mapper_process(MA *,cchar **,cchar **,
-			cchar *,cchar *,int) noex ;
-static int	mapper_processor(MA *,cchar **,cchar **,
-			cchar *,cchar *,int) noex ;
+static int	mapper_process(MA *,cc **,mainv,cc *,cc *,int) noex ;
+static int	mapper_processor(MA *,cc **,mainv,cc *,cc *,int) noex ;
 static int	mapper_mapload(MA *) noex ;
 static int	mapper_mapadd(MA *,cchar *,int,
 			cchar *,int) noex ;
@@ -223,23 +268,19 @@ static int	mapper_mapfins(MA *) noex ;
 static int	mapdir_start(MD *,cchar *,
 			cchar *,cchar *,int,cchar *,int) noex ;
 static int	mapdir_finish(MD *) noex ;
-static int	mapdir_process(MD *,cchar **,cchar **,
-			cchar *,cchar *,int) noex ;
+static int	mapdir_process(MD *,cc **,mainv,cc *,cc *,int) noex ;
 static int	mapdir_expand(MD *) noex ;
 static int	mapdir_expander(MD *) noex ;
 static int	mapdir_processor(MD *,cchar **,
 			cchar *,cchar *,int) noex ;
 static int	mapdir_processorthem(MD *,cchar **,
-			cchar *,vecstr *,cchar **,int) noex ;
+			cchar *,vecstr *,mainv,int) noex ;
 static int	mapdir_processorone(MD *,cchar **,
 			cchar *,vecstr *,cchar *,int) noex ;
 static int	mapdir_procout(MD *,cchar **,cchar *,
 			cchar *,int) noex ;
 static int	mapdir_procouter(MD *,cchar **,
 			cchar *,int) noex ;
-
-static int	loadstrs(cchar **,cchar *,cchar *,cchar *,cchar *) noex ;
-static int	narr(mainv) noex ;
 
 static bool	isBaseMatch(cchar *,cchar *,cchar *) noex ;
 
@@ -283,12 +324,18 @@ constexpr cpcchar	envstrs[] = {
 	nullptr
 } ;
 
+static vars		var ;
+
 constexpr uid_t		uidend = -1 ;
 constexpr gid_t		gidend = -1 ;
 
-constexpr char		envpre[] = "SM_" ;	/* environment prefix */
+cchar			envpre[] = "STATMSG_" ;	/* environment prefix */
 
-constexpr bool		f_writeto = CF_WRITETO ;
+cint			msgbuflen	= MSGBUFLEN ;
+cint			diglen		= DECBUFLEN ;
+
+cbool			f_writeto 	= CF_WRITETO ;
+cbool			f_paramfile 	= CF_PARAMFILE ;
 
 
 /* exported variables */
@@ -297,195 +344,183 @@ constexpr bool		f_writeto = CF_WRITETO ;
 /* exported subroutines */
 
 int statmsg_open(SM *op,cchar *username) noex {
-	custime		dt = time(nullptr) ;
+	custime		dt = getustime ;
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (username == nullptr) return SR_FAULT ;
-
-	if (username[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-	op->fe = SM_DIRSFNAME ;
-
-	if ((rs = ptm_create(&op->mx,nullptr)) >= 0) {
-	    if ((rs = statmsg_userbegin(op,username)) >= 0) {
-		if ((rs = statmsg_mapfind(op,dt)) >= 0) {
-		    if ((rs = statmsg_envbegin(op)) >= 0) {
-			op->ti_lastcheck = dt ;
-			op->magic = SM_MAGIC ;
-		    }
-		    if (rs < 0) {
-			statmsg_maplose(op) ;
-		    }
-		}
-		if (rs < 0) {
-		    statmsg_userend(op) ;
-		}
-	    }
+	if ((rs = statmsg_ctor(op,username)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (username[0]) {
+		if ((rs = var) >= 0) {
+	            op->fe = SM_DIRSFNAME ;
+	            if ((rs = ptm_create(&op->mx,nullptr)) >= 0) {
+	                if ((rs = statmsg_userbegin(op,username)) >= 0) {
+		            if ((rs = statmsg_mapfind(op,dt)) >= 0) {
+		                if ((rs = statmsg_envbegin(op)) >= 0) {
+			            op->ti_lastcheck = dt ;
+			            op->magic = SM_MAGIC ;
+		                }
+		                if (rs < 0) {
+			            statmsg_maplose(op) ;
+		                }
+		            }
+		            if (rs < 0) {
+		                statmsg_userend(op) ;
+		            }
+	                }
+	                if (rs < 0) {
+		            ptm_destroy(&op->mx) ;
+	                }
+	            } /* end if (ptm) */
+	        } /* end if (vars) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-		ptm_destroy(&op->mx) ;
+		statmsg_dtor(op) ;
 	    }
-	} /* end if (ptm) */
-
+	} /* end if (statmsg_ctor) */
 	return rs ;
 }
 /* end subroutine (statmsg_open) */
 
 int statmsg_close(SM *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != SM_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = statmsg_envend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = statmsg_maplose(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = statmsg_userend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = ptm_destroy(&op->mx) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = statmsg_magic(op)) >= 0) {
+	    {
+	        rs1 = statmsg_envend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = statmsg_maplose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = statmsg_userend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = ptm_destroy(&op->mx) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = statmsg_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (statmsg_close) */
 
 int statmsg_check(SM *op,time_t dt) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != SM_MAGIC) return SR_NOTOPEN ;
-
-	rs = statmsg_checker(op,dt) ;
-
+	if ((rs = statmsg_magic(op)) >= 0) {
+	    rs = statmsg_checker(op,dt) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (statmsg_check) */
 
 int statmsg_process(SM *op,cchar *gn,cchar **adms,cchar *kn,int fd) noex {
-	SM_ID	id{} ;
 	int		rs ;
-	id.groupname = gn ;
-	id.uid = -1 ;
-	id.gid = -1 ;
-	rs = statmsg_processid(op,&id,adms,kn,fd) ;
-
-	return rs ;
+	int		rs1 ;
+	int		rv = 0 ; /* return-value */
+	if ((rs = statmsg_magic(op,adms,kn)) >= 0) {
+	    if (userid id ; (rs = id.start(nullptr,gn)) >= 0) {
+		{
+		    rs = statmsg_processid(op,&id,adms,kn,fd) ;
+		    rv = rs ; /* not used */
+		}
+		rs1 = id.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (userid) */
+	} /* end if (magic) */
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (statmsg_process) */
 
-int statmsg_processid(SM *op,SM_ID *idp,cc **adms,
-		cc *kn,int fd) noex {
-	SM_ID	id ;
+static int statmsg_procidx(statmsg *,userid *,mv,int,cc *) noex ;
+
+int statmsg_processid(SM *op,userid *idp,cc **adms,cc *kn,int fd) noex {
 	int		rs ;
-	int		wlen = 0 ;
-	cchar		*groupname ;
-	char		ubuf[USERNAMELEN + 1] ;
-	char		kbuf[2] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (idp == nullptr) return SR_FAULT ;
-
-	if (op->magic != SM_MAGIC) return SR_NOTOPEN ;
-
-	if (fd < 0) return SR_BADF ;
-
-	groupname = idp->groupname ;
-	if (groupname == nullptr)
-	    return SR_FAULT ;
-
-	if (groupname[0] == '\0')
-	    return SR_INVALID ;
-
-	if (kn == nullptr) {
-	    kn = kbuf ;
-	    kbuf[0] = '\0' ;
-	}
-
-/* fill in some missing elements */
-
-	id = *idp ;			/* copy for possible modification */
-	if ((rs = statmsg_idcheck(op,&id,ubuf)) >= 0) {
-	    cint	n = nelem(envstrs) ;
-	    int		sz ;
-	    sz = (op->nenv + n + 1) * szof(cchar *) ;
-	    if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
-	        strpack		packer ;
-	        cchar	**ev = (cchar **) p ;
-
-	    if ((rs = strpack_start(&packer,128)) >= 0) {
-
-	        if ((rs = statmsg_envadds(op,&packer,ev,&id,kn)) >= 0) {
-	            rs = statmsg_processor(op,ev,adms,groupname,kn,fd) ;
-	            wlen = rs ;
-	        }
-
-	        strpack_finish(&packer) ;
-	    } /* end if (packer) */
-
-	    uc_free(p) ;
-	} /* end if (memory allocation) */
-	} /* end if (statmsg_idcheck) */
-
+	int		wlen = 0 ; /* return-value */
+	if ((rs = statmsg_magic(op,idp,adms,kn)) >= 0) {
+	    rs = SR_BADF ;
+	    if (fd >= 0) {
+		cchar	*groupname = idp->groupname ;
+		rs = SR_INVALID ;
+	        if (groupname[0]) {
+		    rs = statmsg_procidx(op,idp,adms,fd,kn) ;
+		    wlen = rs ;
+	        } /* end if (valid) */
+	    } /* end if (open) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (statmsg_processid) */
+} /* end subroutine (statmsg_processid) */
 
-int statmsgid_load(SM_ID *idp,cc *un,cc *gn,uid_t uid,gid_t gid) noex {
-
-	if (idp == nullptr) return SR_FAULT ;
-
-	memclear(idp) ;
-	idp->uid = uid ;
-	idp->gid = gid ;
-	idp->username = un ;
-	idp->groupname = gn ;
-
-	return SR_OK ;
-}
-/* end subroutine (statmsgid_load) */
+static int statmsg_procidx(statmsg *op,userid *idp,mv adms,int fd,cc *kn) noex {
+	cint		n = nelem(envstrs) ;
+    	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ; /* return-value */
+	char		kbuf[2] = {} ;
+	if (kn == nullptr) kn = kbuf ;
+	{
+	    cint	sz = (op->nenv + n + 1) * szof(cchar *) ;
+	    if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+		cchar	**ev = (cchar **) p ;
+		if (strpack packer ; (rs = packer.start(128)) >= 0) {
+	            if ((rs = statmsg_envadds(op,&packer,ev,idp,kn)) >= 0) {
+			cchar	*gn = idp->groupname ;
+	                rs = statmsg_processor(op,ev,adms,gn,kn,fd) ;
+	                wlen = rs ;
+	            }
+	            rs1 = packer.finish ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (packer) */
+	        rs1 = uc_free(p) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (memory allocation) */
+	} /* end block */
+	return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (statmsg_procidx) */
 
 
 /* private subroutines */
 
 static int statmsg_userbegin(SM *op,cchar *username) noex {
-	cint	hlen = MAXPATHLEN ;
-	int		rs = SR_OK ;
-	char		hbuf[MAXPATHLEN+1] ;
-	char		ubuf[USERNAMELEN+1] ;
-
-	if (username == nullptr) return SR_FAULT ;
-
-	if (username[0] == '\0') return SR_INVALID ;
-
-	if (username[0] == '-') {
-	    rs = getusername(ubuf,USERNAMELEN,-1) ;
-	    username = ubuf ;
-	}
-
-	if (rs >= 0) {
-	    if ((rs = getuserhome(hbuf,hlen,username)) >= 0) {
-		int	sz = 0 ;
-		sz += (lenstr(username) + 1) ;
-		sz += (lenstr(hbuf) + 1) ;
-		if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
-		    op->useralloc = bp ;
-		    op->username = bp ;
-		    bp = (strwcpy(bp,username,-1) + 1) ;
-		    op->userhome = bp ;
-		    bp = (strwcpy(bp,hbuf,-1) + 1) ;
-		} /* end if (memory-allocation) */
-	    } /* end if (getuserhome) */
-	} /* end if (ok) */
-
+	int		rs = SR_FAULT ;
+	if (op && username) {
+	    rs = SR_INVALID ;
+	    if (username[0]) {
+		cint maxpath = var.maxpathlen ;
+		cint asz = ((var.maxpathlen + 1) + (var.usernamelen + 1)) ;
+		int ai = 0 ;
+		if (char *a ; (rs = uc_malloc(asz,&a)) >= 0) {
+		    cint	hlen = var.maxpathlen ;
+		    cint	ulen = var.usernamelen ;
+		    char	*hbuf = (a + ((maxpath + 1) * ai++)) ;
+		    char	*ubuf = (a + ((maxpath + 1) * ai++)) ;
+	            if (username[0] == '-') {
+	                rs = getusername(ubuf,ulen,-1) ;
+	                username = ubuf ;
+	            }
+	            if (rs >= 0) {
+	                if ((rs = getuserhome(hbuf,hlen,username)) >= 0) {
+		            int	sz = 0 ;
+		            sz += (lenstr(username) + 1) ;
+		            sz += (lenstr(hbuf) + 1) ;
+		            if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
+		                op->useralloc = bp ;
+		                op->username = bp ;
+		                bp = (strwcpy(bp,username,-1) + 1) ;
+		                op->userhome = bp ;
+		                bp = (strwcpy(bp,hbuf,-1) + 1) ;
+		            } /* end if (memory-allocation) */
+	                } /* end if (getuserhome) */
+	            } /* end if (ok) */
+		    rs = rsfree(rs,a) ;
+		} /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (statmsg_userbegin) */
@@ -493,7 +528,7 @@ static int statmsg_userbegin(SM *op,cchar *username) noex {
 static int statmsg_userend(SM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->useralloc != nullptr) {
+	if (op->useralloc) {
 	    rs1 = uc_free(op->useralloc) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->useralloc = nullptr ;
@@ -506,17 +541,19 @@ static int statmsg_userend(SM *op) noex {
 
 static int statmsg_mapfind(SM *op,time_t dt) noex {
 	int		rs ;
-	char		mapfname[MAXPATHLEN + 1] ;
-	mapfname[0] = '\0' ;
-	if ((rs = statmsg_mapfname(op,mapfname)) >= 0) {
-	    if (mapfname[0] != '\0') {
-		cchar	*un = op->username ;
-		cchar	*uh = op->userhome ;
-	        if ((rs = mapper_start(&op->mapper,dt,un,uh,mapfname)) >= 0) {
-	            op->nmaps += 1 ;
-		}
-	    }
-	}
+	if (char *mbuf ; (rs = malloc_mp(&mbuf)) >= 0) {
+	    mbuf[0] = '\0' ;
+	    if ((rs = statmsg_mapfname(op,mbuf)) >= 0) {
+	        if (mbuf[0]) {
+		    cchar	*un = op->username ;
+		    cchar	*uh = op->userhome ;
+	            if ((rs = mapper_start(&op->mapper,dt,un,uh,mbuf)) >= 0) {
+	                op->nmaps += 1 ;
+		    }
+	        }
+	    } /* end if (statmsg_mapfname) */
+	    rs = rsfree(rs,mbuf) ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (statmsg_mapfind) */
@@ -534,39 +571,35 @@ static int statmsg_maplose(SM *op) noex {
 /* end subroutine (statmsg_maplose) */
 
 static int statmsg_mapfname(SM *op,char *fbuf) noex {
-	vecstr		scheds ;
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
-
+	int		c = 0 ; /* return-value */
 	fbuf[0] = '\0' ;
-	if ((rs = vecstr_start(&scheds,6,0)) >= 0) {
+	if (vecstr scheds ; (rs = scheds.start(6,0)) >= 0) {
 	    if ((rs = statmsg_schedload(op,&scheds)) >= 0) {
-		cint	flen = MAXPATHLEN ;
-	        rs1 = permsched(schedmaps,&scheds,fbuf,flen,op->fe,R_OK) ;
-	        if ((rs1 == SR_NOENT) || (rs1 == SR_ACCESS)) {
-	            if (rs1 == SR_NOENT) {
-	                fbuf[0] = '\0' ;
-	            } else
-	                rs = rs1 ;
-	        } else if (rs1 == SR_OK) {
-	            c = 1 ;
-		} else
-		    rs = rs1 ;
+	    	cint	am = R_OK ;
+		cint	flen = var.maxpathlen ;
+		cchar	*fe = op->fe ;
+	        if ((rs = permsched(schedmaps,&scheds,fbuf,flen,fe,am)) >= 0) {
+		    c = 1 ;
+		} else if (isNotAccess(rs)) {
+		    rs = SR_OK ;
+		    fbuf[0] = '\0' ;
+		}
 	    } /* end if (statmsg-schedload) */
-	    vecstr_finish(&scheds) ;
+	    rs1 = scheds.finish ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (statmsg_mapfname) */
 
 static int statmsg_schedload(SM *op,vecstr *slp) noex {
 	int		rs = SR_OK ;
-	cchar		*keys = "pen" ;
-	cchar		*name = SM_NAME ;
+	cchar		keys[] = "pen" ;
+	cchar		name[] = SM_NAME ;
 	for (int i = 0 ; keys[i] != '\0' ; i += 1) {
-	    cint	kch = MKCHAR(keys[i]) ;
+	    cint	kch = mkchar(keys[i]) ;
 	    int		vl = -1 ;
 	    cchar	*vp = nullptr ;
 	    switch (kch) {
@@ -580,7 +613,7 @@ static int statmsg_schedload(SM *op,vecstr *slp) noex {
 		vp = name ;
 		break ;
 	    } /* end switch */
-	    if ((rs >= 0) && (vp != nullptr)) {
+	    if ((rs >= 0) && vp) {
 		char	kbuf[2] = {} ;
 		kbuf[0] = char(kch) ;
 		rs = vecstr_envset(slp,kbuf,vp,vl) ;
@@ -593,58 +626,50 @@ static int statmsg_schedload(SM *op,vecstr *slp) noex {
 
 static int statmsg_checker(SM *op,time_t dt) noex {
 	int		rs = SR_OK ;
-	int		nchanged = 0 ;
-
+	int		rs1 ;
+	int		nchanged = 0 ;/* return-value */
 	if (op->nmaps > 0) {
-	if ((rs = ptm_lock(&op->mx)) >= 0) {
-	    if (dt == 0) dt = time(nullptr) ;
-
-	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
-
-	        rs = mapper_check(&op->mapper,dt) ;
-	        nchanged = rs ;
-	        op->ti_lastcheck = dt ;
-
-	    } /* end if */
-
-	    ptm_unlock(&op->mx) ;
-	} /* end if (mutex) */
+	    ptm	*mxp = &op->mx ;
+	    if ((rs = mxp->lockbegin) >= 0) {
+	        if (dt == 0) dt = getustime ;
+	        if ((dt - op->ti_lastcheck) >= TO_CHECK) {
+	            rs = mapper_check(&op->mapper,dt) ;
+	            nchanged = rs ;
+	            op->ti_lastcheck = dt ;
+	        } /* end if (timed out) */
+	        rs1 = mxp->lockend ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (mutex) */
 	} /* end if (positive) */
-
 	return (rs >= 0) ? nchanged : rs ;
 }
 /* end subroutine (statmsg_checker) */
 
 static int statmsg_envbegin(SM *op) noex {
 	int		rs = SR_OK ;
-	int		sz ;
-	int		i ;
-	int		c = 0 ;
-	int		f ;
-
-	for (i = 0 ; environ[i] != nullptr ; i += 1) ;
-
-	sz = (i + 1) * szof(cchar *) ;
-	if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
-	    cchar	*ep ;
-	    cchar	**va = (cchar **) p ;
-	    op->envv = va ;
-	    for (i = 0 ; environ[i] != nullptr ; i += 1) {
-	        ep = environ[i] ;
-	        f = true ;
-	        f = f && (ep[0] != '-') ;
-	        f = f && (matstr(envbad,ep,-1) < 0) ;
-	        if (f && (ep[0] == 'M')) {
-		    f = (strncmp(envpre,ep,5) != 0) ;
-		}
-	        if (f) {
-	            va[c++] = ep ;
-		}
-	    } /* end for */
-	    va[c] = nullptr ;
-	    op->nenv = c ;
-	} /* end if (memory-allocation) */
-
+	int		n = lenstrarr(environ) ;
+	int		c = 0 ; /* return-value */
+	{
+	    cint	sz = (n + 1) * szof(cchar *) ;
+	    if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	        cchar	**va = ccharpp(p) ;
+	        op->envv = va ;
+	        for (int i = 0 ; environ[i] ; i += 1) {
+	            bool	f = true ;
+	            cchar	*ep = environ[i] ;
+	            f = f && (ep[0] != '-') ;
+	            f = f && (matstr(envbad,ep,-1) < 0) ;
+	            if (f && (ep[0] == 'M')) {
+		        f = (strncmp(envpre,ep,5) != 0) ;
+		    }
+	            if (f) {
+	                va[c++] = ep ;
+		    }
+	        } /* end for */
+	        va[c] = nullptr ;
+	        op->nenv = c ;
+	    } /* end if (memory-allocation) */
+	} /* end block */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (statmsg_envbegin) */
@@ -652,7 +677,7 @@ static int statmsg_envbegin(SM *op) noex {
 static int statmsg_envend(SM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->envv != nullptr) {
+	if (op->envv) {
 	    rs1 = uc_free(op->envv) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->envv = nullptr ;
@@ -661,44 +686,45 @@ static int statmsg_envend(SM *op) noex {
 }
 /* end subroutine (statmsg_envend) */
 
+static int mkdigenv(char *ebuf,int elen,cc *pre,cc *key,uint uv) noex {
+    	int	rs ;
+    	char	digbuf[diglen + 1] ;
+	if ((rs = ctdec(digbuf,diglen,uv)) >= 0) {
+	    rs = sncpy(ebuf,elen,pre,key,"=",digbuf) ;
+	}
+	return rs ;
+} /* end subroutine (mkdigenv) */
+
 static int statmsg_envadds(SM *op,strpack *spp,cchar **ev,
-		SM_ID *idp,cchar *kn) noex {
-	uint		uv ;
-	cint	envlen = ENVBUFLEN ;
+		userid *idp,cchar *kn) noex {
+    	cint		envlen = var.envlen ;
 	int		rs = SR_OK ;
-	int		n, i ;
-	int		el ;
-	cchar		**envv = op->envv ;
-	cchar		*es ;
-	cchar		*cp ;
-	char		envbuf[ENVBUFLEN + 1] ;
-	char		digbuf[DIGBUFLEN + 1] ;
-
-	for (n = 0 ; n < op->nenv ; n += 1) ev[n] = envv[n] ;
-
-	for (i = 0 ; (rs >= 0) && (envstrs[i] != nullptr) ; i += 1) {
+	int		n ;
+	mainv		envv = op->envv ;
+	cchar		*pre = envpre ;
+	char		envbuf[var.envlen + 1] ;
+	for (n = 0 ; n < op->nenv ; n += 1) {
+	    ev[n] = envv[n] ;
+	}
+	for (int i = 0 ; (rs >= 0) && envstrs[i] ; i += 1) {
+	    uint	uv = UINT_MAX ;
+	    int		el = -1 ;
+	    cchar	*es = envstrs[i] ;
+	    cchar	*cp ;
 	    envbuf[0] = '\0' ;
-	    es = envstrs[i] ;
-	    el = -1 ;
 	    switch (i) {
 	    case envstr_uid:
 	        if (idp->uid != uidend) {
 	            uv = idp->uid ;
-	            rs = ctdecui(digbuf,DIGBUFLEN,uv) ;
-	            if (rs >= 0) {
-	                rs = sncpy4(envbuf,envlen,envpre,es,"=",digbuf) ;
-	                el = rs ;
-	            }
+		    rs = mkdigenv(envbuf,envlen,pre,es,uv) ;
+		    el = rs ;
 	        }
 	        break ;
 	    case envstr_gid:
 	        if (idp->gid != gidend) {
 	            uv = idp->gid ;
-	            rs = ctdecui(digbuf,DIGBUFLEN,uv) ;
-	            if (rs >= 0) {
-	                rs = sncpy4(envbuf,envlen,envpre,es,"=",digbuf) ;
-	                el = rs ;
-	            }
+		    rs = mkdigenv(envbuf,envlen,pre,es,uv) ;
+		    el = rs ;
 	        }
 	        break ;
 	    case envstr_username:
@@ -727,83 +753,49 @@ static int statmsg_envadds(SM *op,strpack *spp,cchar **ev,
 	        if (rs > 0) n += 1 ;
 	    }
 	} /* end for */
-	ev[n] = nullptr ; /* very important! */
-
+	{
+	    ev[n] = nullptr ; /* very important! */
+	}
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (statmsg_envadds) */
 
-static int statmsg_envstore(SM *op,strpack *spp,cchar **ev,int n,
-		cchar *ep,int el) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (ep != nullptr) {
-	    cchar	*cp ;
-	    if ((rs = strpack_store(spp,ep,el,&cp)) >= 0) {
-	        ev[n++] = cp ;
-	        rs = n ;
+static int statmsg_envstore(SM *op,strpack *spp,cc **ev,int n,
+		cc *ep,int el) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (ep) {
+	        if (cc *cp ; (rs = strpack_store(spp,ep,el,&cp)) >= 0) {
+	            ev[n++] = cp ;
+	            rs = n ;
+	        }
 	    }
-	}
-
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (statmsg_envstore) */
 
-static int statmsg_idcheck(SM *op,SM_ID *idp,char *ubuf) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (idp->groupname == nullptr) return SR_FAULT ;
-
-	if (idp->groupname[0] == '\0') return SR_INVALID ;
-
-	if ((rs >= 0) && (idp->uid == uidend)) {
-	    idp->uid = getuid() ;
-	}
-
-	if ((rs >= 0) && (idp->gid == gidend)) {
-	    rs = getgid_group(idp->groupname,-1) ;
-	    idp->gid = rs ;
-	}
-
-	if (rs >= 0) {
-	    cchar	*tun = idp->username ;
-	    if ((tun == nullptr) || (tun[0] == '\0') || (tun[0] == '-')) {
-	        rs = getusername(ubuf,USERNAMELEN,idp->uid) ;
-	        idp->username = ubuf ;
-	    }
-	}
-
-	return rs ;
-}
-/* end subroutine (statmsg_idcheck) */
-
-static int statmsg_processor(SM *op,cchar **ev,cchar **adms,cchar *gn,
-		cchar *kn,int fd) noex {
+static int statmsg_processor(SM *op,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	int		rs ;
 	int		wlen = 0 ;
-
 	if ((rs = statmsg_checker(op,0)) >= 0) {
 	    if (op->nmaps > 0) {
 	        rs = mapper_process(&op->mapper,ev,adms,gn,kn,fd) ;
 	        wlen += rs ;
 	    }
 	}
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (statmsg_processor) */
 
 static int mapper_start(MA *mmp,time_t dt,cc *un,cc *uh,cc *fname) noex {
-	cint	to = TO_MAPCHECK ;
+	cint		to = TO_MAPCHECK ;
 	int		rs ;
 	mainv		evp = mainv(environ) ;
 	memclear(mmp) ;
 	mmp->username = un ;
 	mmp->userhome = uh ;
-
 	if ((rs = lockrw_create(&mmp->rwm,0)) >= 0) {
 	    if (cc *cp ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
 	        mmp->fname = cp ;
@@ -835,403 +827,371 @@ static int mapper_start(MA *mmp,time_t dt,cc *un,cc *uh,cc *fname) noex {
 	        lockrw_destroy(&mmp->rwm) ;
 	    }
 	} /* end if (lockrw_create) */
-
 	return rs ;
 }
 /* end subroutine (mapper_start) */
 
 static int mapper_finish(MA *mmp) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (mmp == nullptr) return SR_FAULT ;
-
-	if (mmp->magic != MAMAGIC) return SR_NOTOPEN ;
-
-	rs1 = paramfile_close(&mmp->dirsfile) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = mapper_mapfins(mmp) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = vechand_finish(&mmp->mapdirs) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (mmp->fname != nullptr) {
-	    rs1 = uc_free(mmp->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    mmp->fname = nullptr ;
-	}
-
-	rs1 = lockrw_destroy(&mmp->rwm) ;
-	if (rs >= 0) rs = rs1 ;
-
-	mmp->magic = 0 ;
-
+	if (mmp) {
+	    rs = SR_NOTOPEN ;
+	    if (mmp->magic == MAMAGIC) {
+		rs = SR_OK ;
+	        {
+	            rs1 = paramfile_close(&mmp->dirsfile) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+	            rs1 = mapper_mapfins(mmp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+	            rs1 = vechand_finish(&mmp->mapdirs) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        if (mmp->fname) {
+	            rs1 = uc_free(mmp->fname) ;
+	            if (rs >= 0) rs = rs1 ;
+	            mmp->fname = nullptr ;
+	        }
+	        {
+	            rs1 = lockrw_destroy(&mmp->rwm) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        mmp->magic = 0 ;
+	    } /* end if (magic) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mapper_finish) */
 
 static int mapper_check(MA *mmp,time_t dt) noex {
-	cint	to_lock = TO_LOCK ;
-	int		rs = SR_OK ;
+	cint		to_lock = TO_LOCK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		nchanged = 0 ;
-
-	if (mmp == nullptr) return SR_FAULT ;
-
-	if (mmp->magic != MAMAGIC) return SR_NOTOPEN ;
-
-	if ((rs = lockrw_wrlock(&mmp->rwm,to_lock)) >= 0) {
-
-	    if (dt == 0)
-	        dt = time(nullptr) ;
-
-	    if ((dt - mmp->ti_check) >= TO_MAPCHECK) {
-
-#if	CF_PARAMFILE
-	        if ((rs = paramfile_check(&mmp->dirsfile,dt)) > 0) {
-
-	            {
-	                mapper_mapfins(mmp) ;
-	                vechand_delall(&mmp->mapdirs) ;
-	            }
-
-	            rs = mapper_mapload(mmp) ;
-	            nchanged = rs ;
-
-	        } /* end if */
-#else /* CF_PARAMFILE */
-	        {
-	            USTAT	sb ;
-
-	            int	rs1 = u_stat(mmp->fname,&sb) ;
-
-
-	            if ((rs1 >= 0) && (sb.st_mtime > mmp->ti_mtime)) {
-
-	                {
-	                    mapper_mapfins(mmp) ;
-	                    vechand_delall(&mmp->mapdirs) ;
-	                }
-
-	                rs = mapper_mapload(mmp) ;
-	                nchanged = rs ;
-
-	            } /* end if (file mtime check) */
-
-	            mmp->ti_check = dt ;
-	        }
-#endif /* CF_PARAMFILE */
-
-	    } /* end if (map-object check) */
-
-	    rs1 = lockrw_unlock(&mmp->rwm) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (read-write lock) */
-
+	int		nchanged = 0 ; /*return-value */
+	if (mmp) {
+	    rs = SR_NOTOPEN ;
+	    if (mmp->magic == MAMAGIC) {
+	         if ((rs = lockrw_wrlock(&mmp->rwm,to_lock)) >= 0) {
+	             if (dt == 0) dt = getustime ;
+	             if ((dt - mmp->ti_check) >= TO_MAPCHECK) {
+		         if_constexpr (f_paramfile) {
+			     paramfile *pfp = &mmp->dirsfile ;
+	                     if ((rs = pfp->check(dt)) > 0) {
+	                         {
+	                             mapper_mapfins(mmp) ;
+	                             vechand_delall(&mmp->mapdirs) ;
+	                         }
+	                         rs = mapper_mapload(mmp) ;
+	                         nchanged = rs ;
+	                     } /* end if */
+		         } else {
+			     cchar *fn = mmp->fname ;
+	                     if (ustat sb ; (rs = u_stat(fn,&sb)) >= 0) {
+	            	        if (sb.st_mtime > mmp->ti_mtime) {
+	                            mapper_mapfins(mmp) ;
+	                            vechand_delall(&mmp->mapdirs) ;
+				} else if (isNotPresent(rs)) {
+				    rs = SR_OK ;
+				}
+				if (rs >= 0) {
+	                            rs = mapper_mapload(mmp) ;
+	                            nchanged = rs ;
+				} /* end if (OK) */
+	                    } /* end if (file mtime check) */
+	                    mmp->ti_check = dt ;
+	                } /* end if_constexpr (f_paramfile) */
+	            } /* end if (map-object check) */
+	            rs1 = lockrw_unlock(&mmp->rwm) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (read-write lock) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? nchanged : rs ;
 }
 /* end subroutine (mapper_check) */
 
-static int mapper_process(MA *mmp,cc **ev,cc **adms,
-		cc *gn,cc *kn,int fd) noex {
-	cint	to_lock = TO_LOCK ;
-	int		rs = SR_OK ;
+static int mapper_process(MA *mmp,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
+	cint		to_lock = TO_LOCK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		wlen = 0 ;
-
-	if (mmp == nullptr) return SR_FAULT ;
-
-	if (mmp->magic != MAMAGIC) return SR_NOTOPEN ;
-
-	if ((rs = lockrw_rdlock(&mmp->rwm,to_lock)) >= 0) {
-	    {
-	        rs = mapper_processor(mmp,ev,adms,gn,kn,fd) ;
-	        wlen += rs ;
-	    }
-	    rs1 = lockrw_unlock(&mmp->rwm) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (read-write lock) */
-
+	int		wlen = 0 ; /* return-value */
+	if (mmp) {
+	    rs = SR_NOTOPEN ;
+	    if (mmp->magic == MAMAGIC) {
+	        lockrw	*lp = &mmp->rwm ;
+	        if ((rs = lockrw_rdlock(lp,to_lock)) >= 0) {
+	            {
+	                rs = mapper_processor(mmp,ev,adms,gn,kn,fd) ;
+	                wlen += rs ;
+	            }
+	            rs1 = lockrw_unlock(lp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (read-write lock) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (mapper_process) */
 
-static int mapper_processor(MA *mmp,cc **ev,cc **adms,
-		cc *gn,cc *kn,int fd) noex {
-	int		rs = SR_OK ;
-	int		i ;
+static int mapper_processor(MA *mmp,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
+	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-
-	if (mmp == nullptr) return SR_FAULT ;
-
-	if (mmp->magic != MAMAGIC) return SR_NOTOPEN ;
-
-	void	*vp{} ;
-	for (i = 0 ; vechand_get(&mmp->mapdirs,i,&vp) >= 0 ; i += 1) {
-	    if (vp) {
-		MD	*ep = mdp(vp) ;
-	        rs = mapdir_process(ep,ev,adms,gn,kn,fd) ;
-	        wlen += rs ;
-	    }
-	    if (rs < 0) break ;
-	} /* end for */
-
+	if (mmp) {
+	    rs = SR_NOTOPEN ;
+	    if (mmp->magic == MAMAGIC) {
+	        vechand		*mlp = &mmp->mapdirs ;
+	        void		*vp{} ;
+		rs = SR_OK ;
+	        for (int i = 0 ; mlp->get(i,&vp) >= 0 ; i += 1) {
+		    MD	*ep = mdp(vp) ;
+	            if (vp) {
+	                rs = mapdir_process(ep,ev,adms,gn,kn,fd) ;
+	                wlen += rs ;
+	            }
+	            if (rs < 0) break ;
+	        } /* end for */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (mapper_processor) */
 
-#if	CF_PARAMFILE
-static int mapper_mapload(MA *mmp) noex {
-	PF		*pfp = &mmp->dirsfile ;
-	PF_ENT	pe ;
-	PF_CUR	cur ;
-	int		rs = SR_OK ;
-	int		c = 0 ;
-
-	if (mmp == nullptr) return SR_FAULT ;
-
-	if (mmp->magic != MAMAGIC) return SR_NOTOPEN ;
-
+static int mapper_maploadparam(MA *mmp) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
 	if (ustat sb ; (rs = u_stat(mmp->fname,&sb)) >= 0) {
+	    cint	plen = var.parambuflen ;
 	    mmp->ti_mtime = sb.st_mtime ;
-	    if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
-	        cint	plen = PBUFLEN ;
-		int		kl, vl ;
-		int		fl ;
-		cchar		*kp, *vp ;
-		char		pbuf[PBUFLEN + 1] ;
-
-	        while (rs >= 0) {
-
-	            kl = paramfile_curenum(pfp,&cur,&pe,pbuf,plen) ;
-	            if (kl == SR_NOTFOUND) break ;
-	            rs = kl ;
-	            if (rs < 0) break ;
-
-	            kp = pe.key ;
-	            vp = pe.value ;
-	            vl = pe.vlen ;
-
-	            while ((fl = sichr(vp,vl,CH_FS)) >= 0) {
-			if (fl > 0) {
-	                    c += 1 ;
-	                    rs = mapper_mapadd(mmp,kp,kl,vp,fl) ;
-			}
-			vl -= (fl+1) ;
-			vp = (vp+(fl+1)) ;
+	    if (char *pbuf ; (rs = uc_malloc((plen + 1),&pbuf)) >= 0) {
+	        PF	*pfp = &mmp->dirsfile ;
+	        PF_ENT	pe ;
+	        if (PF_CUR cur ; (rs = pfp->curbegin(&cur)) >= 0) {
+		    int		kl, vl ;
+		    int		fl ;
+		    cchar	*kp, *vp ;
+	            while (rs >= 0) {
+	                kl = pfp->curenum(&cur,&pe,pbuf,plen) ;
+	                if (kl == SR_NOTFOUND) break ;
+	                rs = kl ;
 	                if (rs < 0) break ;
+	                kp = pe.key ;
+	                vp = pe.value ;
+	                vl = pe.vlen ;
+	                while ((fl = sichr(vp,vl,CH_FS)) >= 0) {
+			    if (fl > 0) {
+	                        c += 1 ;
+	                        rs = mapper_mapadd(mmp,kp,kl,vp,fl) ;
+			    }
+			    vl -= (fl+1) ;
+			    vp = (vp+(fl+1)) ;
+	                    if (rs < 0) break ;
+	                } /* end while */
+    
+		        if ((rs >= 0) && (vl > 0)) {
+	                    c += 1 ;
+	                    rs = mapper_mapadd(mmp,kp,kl,vp,vl) ;
+		        }
 	            } /* end while */
-
-		    if ((rs >= 0) && (vl > 0)) {
-	                c += 1 ;
-	                rs = mapper_mapadd(mmp,kp,kl,vp,vl) ;
-		    }
-
-	        } /* end while */
-
-	        paramfile_curend(&mmp->dirsfile,&cur) ;
-	    } /* end if (paramfile-cursor) */
+	            rs1 = pfp->curend(&cur) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (paramfile-cursor) */
+		rs = rsfree(rs,pbuf) ;
+	    } /* end if (m-a-f) */
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
 	} /* end if (stat) */
-
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mapper_mapload) */
+} /* end subroutine (mapper_maploadparam) */
 
-#else /* CF_PARAMFILE */
+static int mapper_maploadfiler(MA *,cchar *,int) noex ;
+
+static int mapper_maploadfile(MA *mmp) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+	    cint	llen = rs ;
+	    cmode	om = 0 ;
+	    if (bfile mf ; (rs = mf.open(mmp->fname,"r",om)) >= 0) {
+	        if (ustat sb ; (rs = mf.control(BC_STAT,&sb)) >= 0) {
+		    mmp->ti_mtime = sb.st_mtime ;
+		    while ((rs = mf.readln(lbuf,llen)) > 0) {
+			cchar	*cp{} ;
+			if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
+			    rs = mapper_maploadfiler(mmp,cp,cl) ;
+			    c += rs ;
+			}
+	    	        if (rs < 0) break ;
+		    } /* end while (reading lines) */
+	        } /* end if (bcontrol) */
+	        rs1 = mf.close ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (file-open) */
+	    rs = rsfree(rs,lbuf) ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (mapper_maploadfile) */
+
+static int mapper_maploadfiler(MA *mmp,cchar *sp,int sl) noex {
+    	int		rs = SR_OK ;
+	int		c = 0 ;
+	cchar	*kp ;
+  	if (int kl ; (kl = sfnext(sp,sl,&kp)) > 0) {
+	    sl -= intconv((kp + kl) - sp) ;
+	    sp = (kp + kl) ;
+	    cchar	*vap ;
+	    if (int val ; (val = sfnext(sp,sl,&vap)) > 0) {
+	        c += 1 ;
+	        rs = mapper_mapadd(mmp,kp,kl,vap,val) ;
+	    }
+	} /* end if (key) */
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (mapper_maploadfiler) */
 
 static int mapper_mapload(MA *mmp) noex {
-	bfile		mfile, *mfp = &mfile ;
-	int		rs = SR_OK ;
-	int		rs1 ;
-	int		kl, vl ;
-	int		sl ;
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	cchar		*tp, *sp ;
-	cchar		*kp, *vp ;
-
-	if (mmp == nullptr) return SR_FAULT ;
-
-	if (mmp->magic != MAMAGIC) return SR_NOTOPEN ;
-
-	if ((rs1 = bopen(mfp,mmp->fname,"r",0666)) >= 0) {
-	    USTAT	sb ;
-	    if ((rs = bcontrol(mfp,BC_STAT,&sb)) >= 0) {
-		cint	llen ;
-		int		len ;
-		char		lbuf[LINEBUFLEN + 1] ;
-
-		mmp->ti_mtime = sb.st_mtime ;
-		while ((rs = breadln(mfp,lbuf,llen)) > 0) {
-	    	    len = rs ;
-
-	    sp = lbuf ;
-	    sl = len ;
-	    if (sp[0] == '#') continue ;
-
-	    if ((tp = strnchr(sp,sl,'#')) != nullptr)
-	        sl = (tp - sp) ;
-
-	    kl = nextfield(sp,sl,&kp) ;
-	    if (kl == 0) continue ;
-
-	    sl -= ((kp + kl) - sp) ;
-	    sp = (kp + kl) ;
-
-	    vl = nextfield(sp,sl,&vp) ;
-	    if (vl == 0) continue ;
-
-	    c += 1 ;
-	    rs = mapper_mapadd(mmp,kp,kl,vp,vl) ;
-
-	    	if (rs < 0) break ;
-		} /* end while (reading lines) */
-
-	    } /* end if (bcontrol) */
-	    bclose(mfp) ;
-	} /* end if (file-open) */
-
+	if (mmp) {
+	    rs = SR_NOTOPEN ;
+	    if (mmp->magic == MAMAGIC) {
+    	        if_constexpr (f_paramfile) {
+		    rs = mapper_maploadparam(mmp) ;
+		    c = rs ;
+		} else {
+		    rs = mapper_maploadfile(mmp) ;
+		    c = rs ;
+		} /* end if_constexpr (f_paramfile) */
+	    } /* end if (magic) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mapper_mapload) */
 
-#endif /* CF_PARAMFILE */
-
-static int mapper_mapadd(MA *mmp,cchar *kp,int kl,cchar *vp,int vl) noex {
+static int mapper_mapadd(MA *mmp,cc *kp,int kl,cc *vap,int val) noex {
 	cint		sz = szof(MD) ;
-	int		rs ;
-
-	if ((kp == nullptr) || (vp == nullptr)) return SR_FAULT ;
-	if ((kl == 0) || (vl == 0)) return SR_INVALID ;
-
-	if (MD *ep ; (rs = uc_malloc(sz,&ep)) >= 0) {
-	    cchar	*un = mmp->username ;
-	    cchar	*uh = mmp->userhome ;
-	    if ((rs = mapdir_start(ep,un,uh,kp,kl,vp,vl)) >= 0) {
-	        rs = vechand_add(&mmp->mapdirs,ep) ;
-	        if (rs < 0) {
-	            mapdir_finish(ep) ;
-		}
-	    }
-	    if (rs < 0) {
-	        uc_free(ep) ;
-	    }
-	} /* end if (memory-allocation) */
-
+	int		rs = SR_FAULT ;
+	if (mmp && kp && vap) {
+	    rs = SR_INVALID ;
+	    if ((kl > 0) && (val > 0)) {
+	        if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	            MD		*ep = (MD *) vp ;
+	            cchar	*un = mmp->username ;
+	            cchar	*uh = mmp->userhome ;
+	            if ((rs = mapdir_start(ep,un,uh,kp,kl,vap,val)) >= 0) {
+	                rs = vechand_add(&mmp->mapdirs,ep) ;
+	                if (rs < 0) {
+	                    mapdir_finish(ep) ;
+		        }
+	            } /* end if (mapdir_start) */
+	            if (rs < 0) {
+	                uc_free(ep) ;
+	            }
+	        } /* end if (memory-allocation) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mapper_mapadd) */
 
 static int mapper_mapfins(MA *mmp) noex {
-	vechand		*mlp = &mmp->mapdirs ;
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		i ;
-
-	if (mmp == nullptr) return SR_FAULT ;
-
-	if (mmp->magic != MAMAGIC) return SR_NOTOPEN ;
-
-	void	*vp{} ;
-	for (i = 0 ; vechand_get(mlp,i,&vp) >= 0 ; i += 1) {
-	    if (vp) {
-		MD	*ep = mdp(vp) ;
-		{
-	        rs1 = mapdir_finish(ep) ;
-	        if (rs >= 0) rs = rs1 ;
-		}
-		{
-	        rs1 = vechand_del(mlp,i--) ;
-	        if (rs >= 0) rs = rs1 ;
-		}
-		{
-	        rs1 = uc_free(ep) ;
-	        if (rs >= 0) rs = rs1 ;
-		}
-	    }
-	} /* end for */
-
+	if (mmp) {
+	    rs =  SR_NOTOPEN ;
+	    if (mmp->magic == MAMAGIC) {
+		vechand		*mlp = &mmp->mapdirs ;
+	        void		*vp{} ;
+		rs = SR_OK ;
+	        for (int i = 0 ; mlp->get(i,&vp) >= 0 ; i += 1) {
+		    MD	*ep = mdp(vp) ;
+	            if (vp) {
+		        {
+	                    rs1 = mapdir_finish(ep) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+		        {
+	                    rs1 = vechand_del(mlp,i--) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+		        {
+	                    rs1 = uc_free(ep) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+	            }
+	        } /* end for */
+	    } /* end if (magic) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mapper_mapfins) */
 
 static int mapdir_start(MD *ep,cc *un,cc *uh,
 		cc *kp,int kl,cc *vp,int vl) noex {
-	int		rs = SR_OK ;
-
-	if (ep == nullptr) return SR_FAULT ;
-	if (kp == nullptr) return SR_FAULT ;
-	if (vp == nullptr) return SR_FAULT ;
-
-	if ((kl == 0) || (vl == 0)) return SR_INVALID ;
-
-	memclear(ep) ;
-	ep->username = un ;
-	ep->userhome = uh ;
-
-	if (kl < 0)
-	    kl = lenstr(kp) ;
-
-	if (vl < 0)
-	    vl = lenstr(vp) ;
-
-	{
-	    cint	sz = (kl + 1 + vl + 1) ;
-	    if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
-	        ep->admin = bp ;
-		bp = strwcpy(bp,kp,kl) + 1 ;
-		ep->dirname = bp ;
-		bp = strwcpy(bp,vp,vl) + 1 ;
-		rs = lockrw_create(&ep->rwm,0) ;
-		if (rs < 0) {
-	    	    uc_free(ep->admin) ;
-		    ep->admin = nullptr ;
-		}
-	    } /* end if (memory-allocation) */
-	} /* end block */
-
+	int		rs = SR_FAULT ;
+	if (ep && kp && vp) {
+	    memclear(ep) ;
+	    rs = SR_INVALID ;
+	    if ((kl > 0) && (vl > 0)) {
+	        ep->username = un ;
+	        ep->userhome = uh ;
+	        if (kl < 0) kl = lenstr(kp) ;
+	        if (vl < 0) vl = lenstr(vp) ;
+	        {
+	            cint	sz = (kl + 1 + vl + 1) ;
+	            if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
+	                ep->admin = bp ;
+		        bp = strwcpy(bp,kp,kl) + 1 ;
+		        ep->dirname = bp ;
+		        bp = strwcpy(bp,vp,vl) + 1 ;
+		        rs = lockrw_create(&ep->rwm,0) ;
+		        if (rs < 0) {
+	    	            uc_free(ep->admin) ;
+		            ep->admin = nullptr ;
+		        } /* end if (error) */
+	            } /* end if (memory-allocation) */
+	        } /* end block */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mapdir_start) */
 
 static int mapdir_finish(MD *ep) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	if (ep->dname != nullptr) {
-	    rs1 = uc_free(ep->dname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    ep->dname = nullptr ;
-	}
-
-	rs1 = lockrw_destroy(&ep->rwm) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (ep->admin != nullptr) {
-	    rs1 = uc_free(ep->admin) ;
-	    if (rs >= 0) rs = rs1 ;
-	    ep->admin = nullptr ;
-	    ep->dirname = nullptr ;
-	}
-
+	if (ep) {
+	    rs = SR_OK ;
+	    if (ep->dname) {
+	        rs1 = uc_free(ep->dname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        ep->dname = nullptr ;
+	    }
+	    {
+	        rs1 = lockrw_destroy(&ep->rwm) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (ep->admin) {
+	        rs1 = uc_free(ep->admin) ;
+	        if (rs >= 0) rs = rs1 ;
+	        ep->admin = nullptr ;
+	        ep->dirname = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mapdir_finish) */
 
-static int mapdir_process(MD *ep,cchar **ev,cchar **adms,
-		cchar *gn,cchar *kn,int fd) noex {
-	cint	to_lock = TO_LOCK ;
+static int mapdir_process(MD *ep,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
+	cint		to_lock = TO_LOCK ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
-
 	if (ep->dirname[0] != '\0') {
-	    int	f_continue = true ;
+	    bool	f_continue = true ;
 	    if ((adms != nullptr) && (adms[0] != nullptr)) {
 	        f_continue = (matstr(adms,ep->admin,-1) >= 0) ;
 	    } /* end if (adms) */
@@ -1254,87 +1214,75 @@ static int mapdir_process(MD *ep,cchar **ev,cchar **adms,
 		} /* end if (ok) */
 	    } /* end if (continued) */
 	} /* end if */
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (mapdir_process) */
 
 static int mapdir_expand(MD *ep) noex {
-	cint	to_lock = TO_LOCK ;
+	cint		to_lock = TO_LOCK ;
 	int		rs ;
 	int		rs1 ;
-
 	if ((rs = lockrw_wrlock(&ep->rwm,to_lock)) >= 0) {
-
 	    if ((ep->dirname[0] != '/') && (ep->dname == nullptr)) {
 	        rs = mapdir_expander(ep) ;
 	    } /* end if */
-
 	    rs1 = lockrw_unlock(&ep->rwm) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (read-write lock) */
-
 	return rs ;
 }
 /* end subroutine (mapdir_expand) */
 
 static int mapdir_expander(MD *ep) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_INVALID ;
 	int		pl = 0 ;
-
-	if (ep->dirname != nullptr) {
-	    cchar	*pp ;
-	    char	tmpfname[MAXPATHLEN + 1] ;
-
-	if (ep->dirname[0] == '~') {
-	    pp = tmpfname ;
-	    rs = mkuserpath(tmpfname,ep->username,ep->dirname,-1) ;
-	    pl = rs ;
-	} else if (ep->dirname[0] != '/') {
-	    pp = tmpfname ;
-	    rs = mkpath2(tmpfname,ep->userhome,ep->dirname) ;
-	    pl = rs ;
-	} else {
-	    pp = ep->dirname ;
-	    pl = -1 ;
-	}
-	   
-	    if (rs >= 0) {
-		cchar	*cp ;
-	        rs = uc_mallocstrw(pp,pl,&cp) ;
-	        if (rs >= 0) ep->dname = cp ;
-		if (pl < 0) pl = (rs-1) ;
-	    }
-
-	} else
-		rs = SR_INVALID ;
-
+	if (ep->dirname) {
+	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	        cchar	*pp ;
+	        if (ep->dirname[0] == '~') {
+	            pp = tbuf ;
+	            rs = mkuserpath(tbuf,ep->username,ep->dirname,-1) ;
+	            pl = rs ;
+	        } else if (ep->dirname[0] != '/') {
+	            pp = tbuf ;
+	            rs = mkpath(tbuf,ep->userhome,ep->dirname) ;
+	            pl = rs ;
+	        } else {
+	            pp = ep->dirname ;
+	            pl = -1 ;
+	        }
+	        if (rs >= 0) {
+		    if (cchar *cp ; (rs = uc_mallocstrw(pp,pl,&cp)) >= 0) {
+	                ep->dname = cp ;
+		        if (pl < 0) pl = rs ;
+		    } /* end if (memory-allocation) */
+	        } /* end if (OK) */
+	        rs = rsfree(rs,tbuf) ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
 }
 /* end subroutine (mapdir_expander) */
 
 static int mapdir_processor(MD *ep,cchar **ev,cchar *,cchar *kn,int fd) noex {
+    	cint		envlen = var.envlen ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ; /* return-value */
-	int		f_continue = true ;
-	cchar		*defname = SM_DEFGROUP ;
-	cchar		*allname = SM_ALLGROUP ;
-	cchar		*suf = SM_SUF ;
+	bool		f_continue = true ;
+	cchar		defname[] = SM_DEFGROUP ;
+	cchar		allname[] = SM_ALLGROUP ;
+	cchar		suf[] = SM_SUF ;
 	cchar		*dn = ep->dirname ;
-	char		env_admin[ENVBUFLEN+1] ;
-	char		env_admindir[ENVBUFLEN+1] ;
-
+	char		env_admin[var.envlen +1] ;
+	char		env_admindir[var.envlen +1] ;
 	if (dn[0] == '~') {
 	    dn = ep->dname ;
 	    f_continue = ((dn != nullptr) && (dn[0] != '\0')) ;
 	}
 	if (f_continue) {
-		USTAT	sb ;
-	    if ((rs1 = u_stat(dn,&sb)) >= 0) {
-		vecstr	nums ;
-	        cint	envlen = ENVBUFLEN ;
-		int	n = narr(ev) ;
+	    if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
+		int	n = lenstrarr(ev) ;
 	        cchar	*post = envstrs[envstr_admin] ;
 	        strdcpy4(env_admin,envlen,envpre,post,"=",ep->admin) ;
 	        post = envstrs[envstr_admindir] ;
@@ -1342,14 +1290,14 @@ static int mapdir_processor(MD *ep,cchar **ev,cchar *,cchar *kn,int fd) noex {
 	        ev[n+0] = env_admin ;
 	        ev[n+1] = env_admindir ;
 	        ev[n+2] = nullptr ;
-	        if ((rs = vecstr_start(&nums,0,0)) >= 0) {
-	            cchar	*strs[5] ;
+		cint	nstrs = 4 ;
+		if (vecstr nums ; (rs = nums.start(0,0)) >= 0) {
+	            cchar	*strs[nstrs + 1] ;
 		    if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
-	            fsdir	d ;
-	            fsdir_ent	de ;
-			cint	nlen = rs ;
-	            loadstrs(strs,kn,defname,allname,suf) ;
-	            if ((rs = fsdir_open(&d,dn)) >= 0) {
+		    cint	nlen = rs ;
+	            loadstrs(strs,nstrs,kn,defname,allname,suf) ;
+	            if (fsdir d ; (rs = fsdir_open(&d,dn)) >= 0) {
+	                fsdir_ent	de ;
 	                while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
 	                    cchar	*den = de.name ;
 	                    if (den[0] != '.') {
@@ -1397,184 +1345,142 @@ static int mapdir_processor(MD *ep,cchar **ev,cchar *,cchar *kn,int fd) noex {
 		{
 	    	    ev[n] = nullptr ;
 		}
+	    } else if (isNotAccess(rs)) {
+		rs = SR_OK ;
 	    } /* end if (u_stat) */
 	} /* end if (continued) */
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (mapdir_processor) */
 
-static int mapdir_processorthem(MD *ep,cchar **ev,cchar *dn,
-		vecstr *blp,cchar **strs,int fd) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-	int		wlen = 0 ;
+static int mapdir_processorthem(MD *ep,cc **ev,cc *dn,
+		vecstr *blp,mv strs,int fd) noex {
+	int		rs ;
+	int		wlen = 0 ; /* return-value */
 	cchar		*kn = strs[0] ;
-	char		kbuf[2] ;
-
-	if (kn[0] == '-') {
-	    kn = kbuf ;
-	    kbuf[0] = '\0' ;
-	}
-
-	rs1 = mapdir_processorone(ep,ev,dn,blp,kn,fd) ;
-
-	if (kn[0] != '\0') {
-
-	if (isNotPresent(rs1)) {
+	char		kbuf[2] = {} ;
+	if (kn[0] == '-') kn = kbuf ; /* <- blank out */
+	if ((rs = mapdir_processorone(ep,ev,dn,blp,kn,fd)) >= 0) {
+	    wlen += rs ;
+	} else if (isNotPresent(rs)) {
 	    kn = strs[1] ;
-	    rs1 = mapdir_processorone(ep,ev,dn,blp,kn,fd) ;
-	    if (! isNotPresent(rs1)) rs = rs1 ;
-	} else {
-	    rs = rs1 ;
+	    if ((rs = mapdir_processorone(ep,ev,dn,blp,kn,fd)) >= 0) {
+	        wlen += rs ;
+	    } else if (isNotPresent(rs)) {
+	        kn = strs[2] ;
+	        if ((rs = mapdir_processorone(ep,ev,dn,blp,kn,fd)) >= 0) {
+		} else if (isNotPresent(rs)) {
+		    rs = SR_OK ;
+		}
+	    }
 	}
-	if (rs > 0) wlen += rs ;
-	if (rs >= 0) {
-	    kn = strs[2] ;
-	    rs1 = mapdir_processorone(ep,ev,dn,blp,kn,fd) ;
-	    if (! isNotPresent(rs1)) rs = rs1 ;
-	    if (rs > 0) wlen += rs ;
-	}
-
-	} /* end if */
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (mapdir_processorthem) */
 
-static int mapdir_processorone(MD *ep,cchar **ev,cchar *dn,
-		vecstr *blp,cchar *kn,int fd) noex {
-	cint	kl = lenstr(kn) ;
+static int mapdir_processorone(MD *ep,cc **ev,cc *dn,
+		VS *blp,cc *kn,int fd) noex {
+	cint		kl = lenstr(kn) ;
 	int		rs = SR_OK ;
-	int		rs1 ;
-	int		i ;
 	int		c = 0 ;
-	int		wlen = 0 ;
+	int		wlen = 0 ; /* return-value */
 	cchar		*bep ;
-
-	for (i = 0 ; vecstr_get(blp,i,&bep) >= 0 ; i += 1) {
-	    if (bep != nullptr) {
-
-	    if (strncmp(bep,kn,kl) == 0) {
-	        c += 1 ;
-	        rs1 = mapdir_procout(ep,ev,dn,bep,fd) ;
-	        if (rs1 >= 0) {
-	            wlen += rs1 ;
-	        } else if (! isNotPresent(rs1))
-	            rs = rs1 ;
-	    }
-
+	for (int i = 0 ; blp->get(i,&bep) >= 0 ; i += 1) {
+	    if (bep) {
+	        if (strncmp(bep,kn,kl) == 0) {
+	            c += 1 ;
+	            if ((rs = mapdir_procout(ep,ev,dn,bep,fd)) >= 0) {
+	                wlen += rs ;
+	            } else if (isNotPresent(rs)) {
+	                rs = SR_OK ;
+	            }
+	        } /* end if (strncmp) */
 	    }
 	    if (rs < 0) break ;
 	} /* end for */
-
 	if ((rs >= 0) && (c == 0)) rs = SR_NOENT ;
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (mapdir_processorone) */
 
 static int mapdir_procout(MD *ep,cchar **ev,cchar *dn,cchar *bn,int fd) noex {
-	int		rs = SR_OK ;
+	cint		sz = (2 * (var.maxpathlen + 1)) ;
+	cint		maxpath = var.maxpathlen ;
+	int		rs ;
 	int		rs1 ;
-	int		wlen = 0 ;
-	cchar		*suf = SM_SUF ;
-	char		cname[MAXNAMELEN + 1] ;
-	char		fname[MAXPATHLEN + 1] ;
-
-/* we ignore buffer overflow here */
-
-	rs1 = snsds(cname,MAXNAMELEN,bn,suf) ;
-	if (rs1 >= 0)
-	    rs1 = mkpath2(fname,dn,cname) ;
-
-	if (rs1 >= 0) {
-	    rs = mapdir_procouter(ep,ev,fname,fd) ;
-	    wlen += rs ;
-	}
-
-	if ((rs >= 0) && (rs1 == SR_OVERFLOW)) rs = SR_NOENT ;
-
+	int		wlen = 0 ; /* return-value */
+	int		ai = 0 ;
+	cchar		suf[] = SM_SUF ;
+	if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    char	*fname = (a + ((maxpath + 1) * ai++)) ;
+	    char	*cname = (a + ((maxpath + 1) * ai++)) ;
+	    if ((rs = snsds(cname,maxpath,bn,suf)) >= 0) {
+	        if ((rs = mkpath(fname,dn,cname)) >= 0) {
+	            rs = mapdir_procouter(ep,ev,fname,fd) ;
+	            wlen += rs ;
+		}
+	    }
+	    rs1 = uc_free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (mapdir_procout) */
 
 static int mapdir_procouter(MD *ep,cchar **ev,cchar *fn,int ofd) noex {
-	cmode	operms = 0664 ;
-	cint	oflags = O_RDONLY ;
-	cint	to_open = TO_OPEN ;
-	cint	to_read = TO_READ ;
-	cint	to_write = TO_WRITE ;
-	int		rs ;
-	int		wlen = 0 ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	if ((rs = uc_openenv(fn,oflags,operms,ev,to_open)) >= 0) {
-	    cint	mfd = rs ;
+	cint		to_open = TO_OPEN ;
+	cint		to_read = TO_READ ;
+	cint		to_write = TO_WRITE ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		wlen = 0 ; /* return-value */
+	if (ep && ev && fn) {
 	    cint	olen = MSGBUFLEN ;
-	    char	obuf[MSGBUFLEN + 1] ;
-
-	    if_constexpr (f_writeto) {
-	        while ((rs = uc_reade(mfd,obuf,olen,to_read,0)) > 0) {
-	            rs = writeto(ofd,obuf,rs,to_write) ;
-	            wlen += rs ;
-	            if (rs < 0) break ;
-	        } /* end while */
-	    } else {
-	        rs = uc_writedesc(ofd,mfd,-1) ;
-	        wlen += rs ;
-	    } /* end if_constexpr (f_writeto) */
-
-	    u_close(mfd) ;
-	} /* end if (open) */
-
+	    if (char *obuf ; (rs = uc_malloc((olen + 1),&obuf)) >= 0) {
+		cint	of = O_RDONLY ;
+		cmode	om = 0 ;
+	        if ((rs = uc_openenv(fn,of,om,ev,to_open)) >= 0) {
+	            cint	mfd = rs ;
+	            if_constexpr (f_writeto) {
+	                while ((rs = uc_reade(mfd,obuf,olen,to_read,0)) > 0) {
+	                    rs = writeto(ofd,obuf,rs,to_write) ;
+	                    wlen += rs ;
+	                    if (rs < 0) break ;
+	                } /* end while */
+	            } else {
+	                rs = uc_writedesc(ofd,mfd,-1) ;
+	                wlen += rs ;
+	            } /* end if_constexpr (f_writeto) */
+	            rs1 = u_close(mfd) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (open) */
+		rs = rsfree(rs,obuf) ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (mapdir_procouter) */
 
-static int loadstrs(cc **strs,cc *gn,cc *def,cc *all,cc *name) noex {
-	int		i = 0 ;
-
-#ifdef	COMMENT
-	{
-	    cchar	*cp ;
-	    for (i = 0 ; i < 4 ; i += 1) {
-	        switch (i) {
-	        case 0: 
-	            cp = gn ; 
-	            break ;
-	        case 1: 
-	            cp = def ; 
-	            break ;
-	        case 2: 
-	            cp = all ; 
-	            break ;
-	        case 3: 
-	            cp = name ; 
-	            break ;
-	        } /* end switch */
-	        strs[i] = cp ;
-	    } /* end for */
-	}
-#else
-	strs[i++] = gn ;
-	strs[i++] = def ;
-	strs[i++] = all ;
-	strs[i++] = name ;
-#endif /* COMMENT */
-	strs[i] = nullptr ;
-
-	return SR_OK ;
-}
-/* end subroutine (loadstrs) */
-
-static int narr(mainv ev) noex {
-	int		c = 0 ;
-	while (ev[c]) c += 1 ;
-	return c ;
-}
-/* end subroutine (narr) */
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = maxpathlen) == 0) {
+	    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+		maxnamelen = rs ;
+	        if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	            maxpathlen = rs ;
+		    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
+			maxlinelen = rs ;
+		        if ((rs = getbufsize(getbufsize_un)) >= 0) {
+		            usernamelen = rs ;
+			    envlen = (2 * maxpathlen) ;
+			    parambuflen = maxpathlen ;
+			}
+		    }
+		}
+	    }
+	} /* end if (needed) */
+	return rs ;
+} /* end method (vars::operator) */
 
 static bool isBaseMatch(cchar *den,cchar *bname,cchar *digp) noex {
 	bool		f = false ;
@@ -1583,7 +1489,8 @@ static bool isBaseMatch(cchar *den,cchar *bname,cchar *digp) noex {
 	    int	m = nleadstr(den,bname,bl) ;
 	    f = (m == bl) && (den[m] == '.') ;
 	} else {
-	    f = (strncmp(den,bname,(digp-den)) == 0) ;
+	    csize nsize = size_t(digp - den) ;
+	    f = (strncmp(den,bname,nsize) == 0) ;
 	}
 	return f ;
 }

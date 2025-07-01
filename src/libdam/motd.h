@@ -25,6 +25,7 @@
 #include	<paramfile.h>
 #include	<finduid.h>
 #include	<vechand.h>
+#include	<userid.hh>
 
 
 #define	MOTD_MAGIC	0x75648941
@@ -79,12 +80,15 @@ EXTERNC_begin
 extern int	motd_open(motd *,cchar *) noex ;
 extern int	motd_check(motd *,time_t) noex ;
 extern int	motd_process(motd *,cchar *,mainv,int) noex ;
-extern int	motd_processid(motd *,motd_id *,mainv,int) noex ;
 extern int	motd_close(motd *) noex ;
 
-extern int	motdid_load(motd_id *,cchar *,cchar *,uid_t,gid_t) noex ;
-
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+extern int	motd_processid(motd *,userid *,mainv,int) noex ;
+
+#endif /* __cplusplus */
 
 
 #endif /* MOTD_INCLUDE */

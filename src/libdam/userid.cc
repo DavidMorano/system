@@ -26,11 +26,12 @@
 	This object implment a user-identity.
 
 	Synopsis:
-	int userid(cc *username,cc *groupname,uid_t uid,gid_t gid) noex
+	int userid_start(userid *op,cc *un,cc *gn,uid_t uid,gid_t gid) noex
+	int userid_finish() noex ;
 	
 	Arguments:
-	username	c-string of user-name
-	groupname	c-string of group-name
+	un		c-string of user-name
+	gn		c-string of group-name
 	uid		user-ID
 	gid		group-ID
 
@@ -41,19 +42,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<sys/types.h>		/* system types */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstring>		/* |stpcpy(3c)| */
 #include	<string>
 #include	<usystem.h>
+#include	<getusername.h>
+#include	<getgroupname.h>
 #include	<mallocxx.h>
 #include	<localmisc.h>
 
 #include	"userid.hh"
 
+import libutil ;
 
 /* local defines */
 
@@ -95,8 +97,11 @@ namespace {
 	    gid = g ;
 	} ;
 	operator int () noex ;
+	int getun() noex ;
 	int getgn() noex ;
+	int loadgn(gid_t) noex ;
 	int alloc() noex ;
+	void loadids(const ucentpw *) noex ;
     } ; /* end struct(submgr) */
 } /* end namespace */
 
@@ -148,14 +153,14 @@ int userid_finish(userid *op) noex {
 submgr::operator int () noex {
     	int		rs = SR_OK ;
 	if (un) {
-		op->username = un ;
-		if (gn) {
-		    op->groupname = gn ;
-		} else {
-		    rs = getgn() ;
-		}
+	    op->username = un ;
+	    if (gn) {
+		op->groupname = gn ;
+	    } else {
+		rs = getgn() ;
+	    }
 	} else {
-		rs = 0 ;
+	    rs = getun() ;
 	}
 	if (rs >= 0) {
 	    rs = alloc() ;
@@ -168,19 +173,100 @@ int submgr::getgn() noex {
 	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
 	    cint	pwlen = rs ;
 	    if (ucentpw pw ; (rs = pw.getnam(pwbuf,pwlen,un)) >= 0) {
-		rs = 0 ;
+		if (gn == nullptr) {
+		    rs = loadgn(pw.pw_gid) ;
+		}
+		loadids(&pw) ;
 	    } /* end if (pw.getname) */
 	    rs = rsfree(rs,pwbuf) ;
 	} /* end if (m-a-f) */
 	return rs ;
 } /* end method (submgr::getgn) */
 
+int submgr::getun() noex {
+    	int		rs ;
+	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	    cint	pwlen = rs ;
+	    if (ucentpw pw ; (rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
+		{
+		    tun = pw.pw_name ;
+		    fl.tun = true ;
+		}
+		if (gn == nullptr) {
+		    rs = loadgn(pw.pw_gid) ;
+		}
+		loadids(&pw) ;
+	    } /* end if (getpwusername) */
+	    rs = rsfree(rs,pwbuf) ;
+	} /* end if (m-a-f) */
+	return rs ;
+} /* end method (submgr::getun) */
+
+int submgr::loadgn(gid_t pwgid) noex {
+    	int		rs ;
+        if (char *gnbuf ; (rs = malloc_gn(&gnbuf)) >= 0) {
+            if ((rs = getgroupname(gnbuf,rs,pwgid)) >= 0) {
+                try {
+                    tgn = gnbuf ;
+                    fl.tgn = true ;
+                } catch (...) {
+                    rs = SR_NOMEM ;
+                }
+            } /* end if (getgroupname) */
+            rs = rsfree(rs,gnbuf) ;
+        } /* end if (m-a-f) */
+	return rs ;
+} /* end method (submgr::loadgn) */
+
 int submgr::alloc() noex {
     	int		rs = SR_OK ;
 	int		sz = 0 ;
-	(void) sz ;
-
-
+	cchar		*ucp{} ;
+	cchar		*gcp{} ;
+	if (un) {
+	    sz = (lenstr(un) + 1) ;
+	    ucp = un ;
+	} else {
+	    sz += int(tun.size() + 1) ;
+	    ucp = tun.c_str() ;
+	}
+	if (gn) {
+	    sz += (lenstr(gn) + 1) ;
+	    gcp = gn ;
+	} else {
+	    sz += int(tgn.size() + 1) ;
+	    gcp = tgn.c_str() ;
+	}
+	if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    op->username = a ;
+	    a = (stpcpy(a,ucp) + 1) ;
+	    op->groupname = a ;
+	    a = (stpcpy(a,gcp) + 1) ;
+	} /* end if (memory-allocation) */
 	return rs ;
 } /* end method (submgr::alloc) */
+
+void submgr::loadids(const ucentpw *pwp) noex {
+	op->uid = (uid == uidend) ? pwp->pw_uid : uid ;
+	op->gid = (gid == gidend) ? pwp->pw_gid : gid ;
+} /* end method (submgr::loadids) */
+
+void userid::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("userid",rs,"dtor-finish") ;
+	}
+} /* end method (submgr::dtor) */
+
+userid_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case useridmem_finish:
+	        rs = userid_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (userid_co::operator) */
+
 
