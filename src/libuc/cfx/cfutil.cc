@@ -119,7 +119,7 @@ namespace cfx {
     int getsign(cchar *sp,int sl,bool *fnegp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && fnegp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;

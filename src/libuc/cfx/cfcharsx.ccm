@@ -66,7 +66,7 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>		/* extended integer types */
-#include	<cfutil.hh>		/* namespace |cfx| + |cstrlen(3u)| */
+#include	<cfutil.hh>		/* namespace |cfx| + |lenstr(3u)| */
 #include	<localmisc.h>
 
 export module cfcharsx ;

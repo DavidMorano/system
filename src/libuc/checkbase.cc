@@ -43,7 +43,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* |xstrlen(3u)| + ret-status */
+#include	<usystem.h>		/* |lenstr(3u)| + ret-status */
 #include	<hasx.h>
 #include	<localmisc.h>
 

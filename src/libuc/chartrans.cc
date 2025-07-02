@@ -195,7 +195,7 @@ int chartrans_transbegin(CT *op,time_t dt,cchar *sp,int sl) noex {
 	if ((rs = chartrans_magic(op,sp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
-	       if (sl < 0) sl = xstrlen(sp) ;
+	       if (sl < 0) sl = lenstr(sp) ;
 	       if ((rs = chartrans_sethave(op,sp,sl)) >= 0) {
 	           txid = rs ;
 	           op->sets[txid].uc += 1 ;
@@ -240,7 +240,7 @@ int chartrans_transread(CT *op,int txid,wchr *rcp,int rcl,cc *sp,int sl) noex {
 	if ((rs = chartrans_magic(op,rcp,sp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if ((txid >= 0) && (txid < op->nmax) && (rcl >= 0)) {
-	        if (sl < 0) sl = xstrlen(sp) ;
+	        if (sl < 0) sl = lenstr(sp) ;
 	        chartrans_set	*setp = (op->sets + txid) ;
 	        if (setp->pc >= 0) {
 		    switch (setp->pc) {

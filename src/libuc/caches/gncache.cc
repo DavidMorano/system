@@ -392,7 +392,7 @@ static int gncache_searchgid(GN *op,rec **rpp,gid_t gid) noex {
 	    if (f) break ;
 	} /* end for */
 	if ((rs >= 0) && f && rp) {
-	    gl = xstrlen(rp->gn) ;
+	    gl = lenstr(rp->gn) ;
 	}
 	if (rpp) {
 	    *rpp = ((rs >= 0) && f) ? rp : nullptr ;
@@ -586,7 +586,7 @@ static int record_update(rec *rp,time_t dt,cchar *gn) noex {
 /* end subroutine (record_update) */
 
 static int record_access(rec *rp,time_t dt) noex {
-	cint		gl = xstrlen(rp->gn) ;
+	cint		gl = lenstr(rp->gn) ;
 	rp->ti_access = dt ;
 	return gl ;
 }
