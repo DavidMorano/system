@@ -283,9 +283,9 @@ int srvtab_match(srvtab *op,cchar *service,srvtab_ent **sepp) noex {
 	        if (strncmp(service,sp,cp - sp) == 0) {
 
 	            cp += 1 ;
-	            l1 = xstrlen(service) ;
+	            l1 = lenstr(service) ;
 
-	            l2 = xstrlen(sp) ;
+	            l2 = lenstr(sp) ;
 
 	            sl = sp + l2 - cp ;
 
@@ -909,7 +909,7 @@ static int stradd(cchar **spp,cchar *s,int slen) noex {
 	    char	*cp ;
 	    char	*osp = (char *) sp ;
 
-	    sl = xstrlen(sp) ;
+	    sl = lenstr(sp) ;
 
 	    len += (sl + 1) ;
 	    if ((rs = uc_realloc(osp,len,&cp)) >= 0) {

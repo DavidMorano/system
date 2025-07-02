@@ -489,7 +489,7 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	    if (nnl >= 0) {
 	        idx = min(nnl,var.entsz) ;
 	    }
-	    nnl = xstrnlen(nnp,idx) ;
+	    nnl = lenstr(nnp,idx) ;
 	    if (dt == 0) dt = getustime ;
 	    if ((rs = ts_acquire(op,dt,1)) >= 0) {
 	        if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
@@ -525,7 +525,7 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	    if (nnl >= 0) {
 	        i = min(nnl,var.entsz) ;
 	    }
-	    nnl = xstrnlen(nnp,i) ;
+	    nnl = lenstr(nnp,i) ;
 	    if ((rs = ts_acquire(op,dt,1)) >= 0) {
 		if (tse ew ; (rs = ew.start) >= 0) {
 	            if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
@@ -743,7 +743,7 @@ static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	int		ei = 0 ;
 	bool		f_found = false ;
 	char		*bp = nullptr ;
-	if (nnl < 0) nnl = xstrlen(nnp) ;
+	if (nnl < 0) nnl = lenstr(nnp) ;
 	if (tse ew ; (rs = ew.start) >= 0) {
 	    while ((rs >= 0) && (! f_found)) {
 	        int		i ; /* used-afterwards */
@@ -916,7 +916,7 @@ static int ts_filetopread(ts *op) noex {
 /* end subroutine (ts_filetopread) */
 
 static int ts_fileverify(ts *op) noex {
-	static cint	magl = xstrlen(magstr) ;
+	static cint	magl = lenstr(magstr) ;
 	cchar		*magp = magstr ;
 	int		rs = SR_INVALID ;
 	bool		f ;
@@ -1182,7 +1182,7 @@ static int ts_readentry(ts *op,int ei,char **rpp) noex {
 		    if ((rs = ew.wr(bp)) >= 0) {
 		        {
 	                    cchar	*kp = ew.keyname ;
-			    cint	kl = xstrlen(ew.keyname) ;
+			    cint	kl = lenstr(ew.keyname) ;
 	                    rs = ts_index(op,kp,kl,ei) ;
 		        }
 		    } /* end if (tse_wr) */
@@ -1205,16 +1205,16 @@ static int ts_index(ts *op,cchar *sp,int sl,int ei) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs  ;
 	int		ei2 ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if ((rs = mapstrint_fetch(op->nip,sp,sl,nullptr,&ei2)) >= 0) {
 	    if (ei != ei2) {
 	        if ((rs = mapstrint_delkey(op->nip,sp,sl)) >= 0) {
-	            cint	nl2 = xstrnlen(sp,TSE_LKEYNAME) ;
+	            cint	nl2 = lenstr(sp,TSE_LKEYNAME) ;
 	            rs = mapstrint_add(op->nip,sp,nl2,ei) ;
 		}
 	    }
 	} else if (rs == rsn) {
-	    cint	nl2 = xstrnlen(sp,TSE_LKEYNAME) ;
+	    cint	nl2 = lenstr(sp,TSE_LKEYNAME) ;
 	    rs = mapstrint_add(op->nip,sp,nl2,ei) ;
 	} /* end if (not found) */
 	return rs ;

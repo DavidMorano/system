@@ -299,7 +299,7 @@ int varsub_del(varsub *op,cchar *k,int klen) noex {
 	int		rs1 ;
 	if ((rs = varsub_magic(op,k)) >= 0) {
 	    vechand	*elp = op->slp ;
-	    if (klen < 0) klen = xstrlen(k) ;
+	    if (klen < 0) klen = lenstr(k) ;
 	    if (klen > 0) {
 	        ent	te ;
 	        void	*vp{} ;
@@ -330,7 +330,7 @@ int varsub_find(varsub *op,cchar *k,int klen,cchar **vpp,int *vlenp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	if ((rs = varsub_magic(op,k)) >= 0) {
-	    if (klen < 0) klen = xstrlen(k) ;
+	    if (klen < 0) klen = lenstr(k) ;
 	    if ((rs = varsub_sort(op)) >= 0) {
 	        rs = varsub_getval(op,k,klen,vpp) ;
 	        vl = rs ;
@@ -344,7 +344,7 @@ int varsub_find(varsub *op,cchar *k,int klen,cchar **vpp,int *vlenp) noex {
 int varsub_fetch(varsub *op,cchar *k,int klen,cchar **vpp) noex {
 	int		rs ;
 	if ((rs = varsub_magic(op,k)) >= 0) {
-	    if (klen < 0) klen = xstrlen(k) ;
+	    if (klen < 0) klen = lenstr(k) ;
 	    if ((rs = varsub_sort(op)) >= 0) {
 	        rs = varsub_getval(op,k,klen,vpp) ;
 	    }
@@ -420,7 +420,7 @@ int varsub_exp(varsub *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 	    if ((rs = maxlinelen) >= 0) {
 		cint	mll = rs ;
 	        rs = SR_TOOBIG ;
-	        if (slen < 0) slen = xstrlen(sbuf) ;
+	        if (slen < 0) slen = lenstr(sbuf) ;
 	        if (dlen < 0) dlen = mll ;
 	        op->badline = -1 ;
 	        if (dlen >= slen) {
@@ -447,7 +447,7 @@ int varsub_exp(varsub *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 int varsub_expbuf(varsub *op,buffer *bufp,cchar *sbuf,int slen) noex {
 	int		rs ;
 	if ((rs = varsub_magic(op,bufp,sbuf)) >= 0) {
-	    if (slen < 0) slen = xstrlen(sbuf) ;
+	    if (slen < 0) slen = lenstr(sbuf) ;
 	    if ((rs = varsub_sort(op)) >= 0) {
 	        rs = varsub_procvalue(op,bufp,sbuf,slen) ;
 	    }
@@ -579,8 +579,8 @@ static int varsub_procsub(varsub *op,buffer *bufp,cchar *kp,int kl) noex {
 
 static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	int		rs ;
-	if (klen < 0) klen = xstrlen(k) ;
-	if (vlen < 0) vlen = (v) ? xstrlen(v) : 0 ;
+	if (klen < 0) klen = lenstr(k) ;
+	if (vlen < 0) vlen = (v) ? lenstr(v) : 0 ;
 	if (ent tmp ; (rs = entry_tmp(&tmp,k,klen,v,vlen)) >= 0) {
 	    vechand	*elp = op->slp ;
 	    int		rs1 ;
@@ -621,8 +621,8 @@ static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 
 static int varsub_iaddq(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	int		rs = SR_INVALID ;
-	if (klen < 0) klen = xstrlen(k) ;
-	if (vlen < 0) vlen = (v != nullptr) ? xstrlen(v) : 0 ;
+	if (klen < 0) klen = lenstr(k) ;
+	if (vlen < 0) vlen = (v != nullptr) ? lenstr(v) : 0 ;
 	if (klen > 0) {
 	    vechand	*elp = op->slp ;
 	    cint	msize = szof(ent) ;
@@ -661,7 +661,7 @@ static int varsub_getval(varsub *op,cchar *kp,int kl,cchar **vpp) noex {
 	ent		*ep{} ;
 	int		rs = SR_DOM ;
 	int		vl = 0 ;
-	if (kl < 0) kl = xstrlen(kp) ;
+	if (kl < 0) kl = lenstr(kp) ;
 	if (kl > 0) {
 	    vechand	*slp = op->slp ;
 	    ent		te{} ;
@@ -759,9 +759,9 @@ static int varsub_entfins(varsub *op) noex {
 
 static int entry_start(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_DOM ;
-	if (kl < 0) kl = xstrlen(kp) ;
+	if (kl < 0) kl = lenstr(kp) ;
 	if (vl < 0) {
-	    vl = (vp) ? xstrlen(vp) : 0 ;
+	    vl = (vp) ? lenstr(vp) : 0 ;
 	}
 	/* allocate buffers for the key and its value respectively */
 	if (kl > 0) {
@@ -799,7 +799,7 @@ static int entry_keycmp(ent *ep,ent *eap) noex {
 
 static int entry_tmp(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_DOM ;
-	if (kl < 0) kl = xstrlen(kp) ;
+	if (kl < 0) kl = lenstr(kp) ;
 	if (kl > 0) {
 	    rs = SR_OK ;
 	    ep->kp = kp ;

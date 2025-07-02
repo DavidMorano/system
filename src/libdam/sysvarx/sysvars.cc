@@ -496,8 +496,8 @@ int sysvars_count(SVS *op) noex {
 static int sysvars_infoloadbegin(SVS *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		sz = 0 ;
-	sz += (xstrlen(pr) + 1) ;
-	sz += (xstrlen(dbname) + 1) ;
+	sz += (lenstr(pr) + 1) ;
+	sz += (lenstr(dbname) + 1) ;
 	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->pr = bp ;

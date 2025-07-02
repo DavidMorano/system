@@ -1,7 +1,5 @@
 algorithms
 argmgr
-bookx
-cluster
 configvars
 database
 decoder

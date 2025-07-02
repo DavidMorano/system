@@ -58,7 +58,7 @@
 
 #include	"td.h"
 
-import libutil ;			/* |memclear(3u)| + |xstrlen(3u)| */
+import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 
 /* local defines */
 
@@ -572,7 +572,7 @@ int td_pwritegr(td *tdp,int wn,int r,int c,int gr,cchar *wbuf,int wlen) noex {
 	int		len = 0 ;
 	if ((rs = td_magic(tdp,wbuf)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (wlen < 0) wlen = xstrlen(wbuf) ;
+	    if (wlen < 0) wlen = lenstr(wbuf) ;
 	    if (wn >= 0) {
 	        td_win	*wp ;
 	        if ((rs = vecitem_get(tdp->wlp,wn,&wp)) >= 0) {
@@ -933,7 +933,7 @@ static int td_procstr(td *tdp,td_win *wp,int gr,cchar *sbuf,int slen) noex {
 	bool		f_gr = false ;
 	sp = sbuf ;
 	sl = slen ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if ((sl > 0) && (gr & grmask)) {
 	    cint	a1 = (gr & TD_GRBOLD) ? ANSIGR_BOLD : -1 ;
 	    cint	a2 = (gr & TD_GRUNDER) ? ANSIGR_UNDER : -1 ;
@@ -1102,7 +1102,7 @@ static int td_store(td *tdp,cchar *bp,int bl) noex {
 	int		rs = SR_OK ;
 	int		rlen = (tdp->buflen - tdp->curlen) ;
 	int		len = 0 ;
-	if (bl < 0) bl = xstrlen(bp) ;
+	if (bl < 0) bl = lenstr(bp) ;
 	if (bl > rlen) {
 	    rs = u_write(tdp->tfd,tdp->buf,tdp->curlen) ;
 	    tdp->curlen = 0 ;

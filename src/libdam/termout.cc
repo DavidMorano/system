@@ -480,7 +480,7 @@ int termout_load(termout *op,cchar *sbuf,int slen) noex {
 	int		rs ;
 	int		ln = 0 ;
 	if ((rs = termout_magic(op,sbuf)) >= 0) {
-	    if (slen < 0) slen = xstrlen(sbuf) ;
+	    if (slen < 0) slen = lenstr(sbuf) ;
 	    rs = termout_process(op,sbuf,slen) ;
 	    ln = rs ;
 	} /* end if (magic) */
@@ -835,7 +835,7 @@ static int termout_loadch(termout *op,ustring &line,int ft,int ch) noex {
 static int gettermattr(cchar *tstr,int tlen) noex {
 	int		ta = 0 ;
 	if (tstr != nullptr) {
-	    if (tlen < 0) tlen = xstrlen(tstr) ;
+	    if (tlen < 0) tlen = lenstr(tstr) ;
 	    for (int i = 0 ; terms[i].name ; i += 1) {
 	        cchar	*sp = terms[i].name ;
 	        if (strwcmp(sp,tstr,tlen) == 0) {

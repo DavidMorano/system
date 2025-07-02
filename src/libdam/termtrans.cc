@@ -804,7 +804,7 @@ static int termtrans_loadch(TT *op,string &line,int ft,int ach) noex {
 static int gettermattr(cchar *tstr,int tlen) noex {
 	int		ta = 0 ;
 	if (tstr != nullptr) {
-	    if (tlen < 0) tlen = xstrlen(tstr) ;
+	    if (tlen < 0) tlen = lenstr(tstr) ;
 	    for (int i = 0 ; terms[i].name != nullptr ; i += 1) {
 	        cchar	*sp = terms[i].name ;
 	        if (strwcmp(sp,tstr,tlen) == 0) {
