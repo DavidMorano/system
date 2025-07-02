@@ -227,7 +227,7 @@ int buffer_strw(buffer *op,cchar *sbuf,int slen) noex {
 	int		len = 0 ;
 	if (op && sbuf) {
 	    if ((rs = op->len) >= 0) {
-	        if (slen < 0) slen = xstrlen(sbuf) ;
+	        if (slen < 0) slen = lenstr(sbuf) ;
 	        if ((rs = buffer_ext(op,slen)) >= 0) {
 	            char	*bp = (op->dbuf + op->len) ;
 	            len = intconv(strwcpy(bp,sbuf,slen) - bp) ;
@@ -257,7 +257,7 @@ int buffer_buf(buffer *op,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	if (op && sbuf) {
 	    if ((rs = op->len) >= 0) {
-	        if (slen < 0) slen = xstrlen(sbuf) ;
+	        if (slen < 0) slen = lenstr(sbuf) ;
 	        if ((rs = buffer_ext(op,slen)) >= 0) {
 	            char	*bp = (op->dbuf + op->len) ;
 	            memcpy(bp,sbuf,slen) ;

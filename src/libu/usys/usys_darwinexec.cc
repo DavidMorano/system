@@ -238,7 +238,7 @@ int namer::pwd() noex {
 	if (az[0] != '/') {
 	    if ((rs = ugetcwd(rbuf,rlen)) >= 0) {
 		int	rl = rs ;
-		if (cint pl = xstrlen(az) ; pl <= (rlen - (rl + 1))) {
+		if (cint pl = lenstr(az) ; pl <= (rlen - (rl + 1))) {
 		    rbuf[rl++] = '/' ;
 		    strcpy((rbuf + rl),az) ;
 		    rs = verify(rl + pl) ;
@@ -252,7 +252,7 @@ int namer::verify(int len) noex {
     	int		rs ;
 	if (ustat sb ; (rs = ustatfile(rbuf,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode) && (sb.st_mode & 0111)) {
-		rs = (len >= 0) ? len : xstrlen(rbuf) ;
+		rs = (len >= 0) ? len : lenstr(rbuf) ;
 	    } else {
 		rs = SR_OK ;
 	    }
@@ -332,7 +332,7 @@ int namer::path() noex {
 			if (rs != 0) break ;
 		    } /* end for */
 		    if ((rs == 0) && (len == 0) && paths[0]) {
-			cint pl = xstrlen(paths) ;
+			cint pl = lenstr(paths) ;
 			rs = pathmk(paths,pl) ;
 			len = rs ;
 		    } /* end if (remainder) */

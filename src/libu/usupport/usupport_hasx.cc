@@ -50,7 +50,7 @@
 
 #include	"usupport_hasx.h"
 
-import libutil ;			/* |xstrlen(3u)| */
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -85,7 +85,7 @@ namespace libu {
     bool hasnotdots(cchar *sp,int sl) noex {
 	bool		f = true ;
 	if (sp[0] == '.') {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    {
 	        if (sl <= 2) {
 	            f = (sl != 1) ;

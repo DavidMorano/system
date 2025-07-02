@@ -84,7 +84,7 @@ int buffer_stropaque(buffer *op,cchar *sp,int sl) noex {
 	int		cl ;
 	int		len = 0 ;
 	cchar		*cp{} ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	    rs = buffer_strw(op,cp,cl) ;
 	    len += rs ;

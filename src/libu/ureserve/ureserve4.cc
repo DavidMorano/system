@@ -52,7 +52,7 @@ module ;
 
 module ureserve ;
 
-import libutil ;			/* |xstrlen(3u)| */
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -128,7 +128,7 @@ int vecstr::find(cchar *sp,int sl) noex {
 	if (sp) {
     	    rs = SR_NOTOPEN ;
 	    if (fl.open) {
-		if (sl < 0) sl = xstrlen(sp) ;
+		if (sl < 0) sl = lenstr(sp) ;
 		rs = ifind(sp,sl) ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -142,7 +142,7 @@ int vecstr::search(cchar *sp,int sl) noex {
 	if (sp) {
 	    rs = SR_NOTOPEN ;
 	    if (fl.open) {
-		if (sl < 0) sl = xstrlen(sp) ;
+		if (sl < 0) sl = lenstr(sp) ;
 		if (fl.sorted) {
     		    strview	s(sp,sl) ;
     		    rs = int(binary_search(*this,s)) ;

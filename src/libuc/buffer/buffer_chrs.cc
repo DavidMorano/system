@@ -76,7 +76,7 @@ using std::max ;			/* subroutine-template */
 
 namespace {
     struct blanker {
-	cint	l = xstrlen(sysword.w_blanks) ;
+	cint	l = lenstr(sysword.w_blanks) ;
 	cchar	*p = sysword.w_blanks ;
     } ; /* end struct (blanker) */
 }

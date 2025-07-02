@@ -313,7 +313,7 @@ sysret_t ucaller::stdgetcwd() noex {
     	csize		rsize = size_t(rlen) ;
 	int		rs = SR_OK ;
 	if (char *rp ; (rp = getcwd(rbuf,(rsize+1))) != np) {
-	    rs = xstrlen(rp) ;
+	    rs = lenstr(rp) ;
 	} else {
 	    rs = (- errno) ;
 	}
