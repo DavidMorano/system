@@ -1,5 +1,5 @@
 /* getpwd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the Present-Working-Directory (PWD) of the process */

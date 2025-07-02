@@ -1,11 +1,10 @@
 /* getpwentry SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutines to access the 'passwd' and 'group' databases */
 /* version %I% last-modified %G% */
 
-#define	CF_PWCACHE	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -41,6 +40,7 @@
 #include	<getax.h>
 #include	<gecos.h>
 #include	<getusername.h>
+#include	<getpwx.h>
 #include	<storeitem.h>
 #include	<strn.h>
 #include	<snwcpy.h>
@@ -53,14 +53,6 @@
 import libutil ;
 
 /* local defines */
-
-#if	CF_PWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#define	GETPW_UID	ugpwcache_uid
-#else
-#define	GETPW_NAME	getpw_name
-#define	GETPW_UID	getpw_uid
-#endif /* CF_PWCACHE */
 
 #if	defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0)
 #define	F_SHADOW	1
@@ -122,7 +114,7 @@ int getpwentry_name(pwentry *uep,char *ebuf,int elen,cchar *name) noex {
 	    if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
 	        ucentpw		pw ;
 	        cint		pwlen = rs ;
-	        if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,name)) >= 0) {
+	        if ((rs = getpwx_name(&pw,pwbuf,pwlen,name)) >= 0) {
 	            rs = getpwentry_load(uep,ebuf,elen,&pw) ;
 	        }
 	        rs1 = uc_free(pwbuf) ;

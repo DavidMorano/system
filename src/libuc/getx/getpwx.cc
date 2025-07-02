@@ -1,8 +1,8 @@
 /* getpwx SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* get the best approximation of the user's username */
+/* get a password entry (either straight or cached) */
 /* version %I% last-modified %G% */
 
 
@@ -30,7 +30,6 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<pwd.h>
 #include	<usystem.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getax.h>
