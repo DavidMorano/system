@@ -1,5 +1,5 @@
 /* getopendial SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 ( <- MUST be plain C-language) */
 
 /* get the OPENDIAL code for a dialer specification (string) */

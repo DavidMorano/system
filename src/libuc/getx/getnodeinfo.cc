@@ -1,5 +1,5 @@
 /* getnodeinfo SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a cluster name given a nodename */
@@ -176,7 +176,7 @@ static int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
                                 rs = sncpy1(cbuf,clen,ste.clu) ;
                                 len = rs ;
                             } else {
-                                len = xstrlen(ste.clu) ;
+                                len = lenstr(ste.clu) ;
                                 }
                             if ((rs >= 0) && sbuf) {
                                 rs = sncpy(sbuf,slen,ste.sys) ;

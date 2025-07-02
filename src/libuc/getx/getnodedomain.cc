@@ -1,5 +1,5 @@
 /* getnodedomain SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the local node-name and INET domain name */
@@ -373,7 +373,7 @@ static int try_inituname(TRY *tip) noex {
 	    tip->f.inituname = true ;
 	    if (uinfo_names uin ; (rs = uinfo_name(&uin)) >= 0) {
 	        cchar	*sp = uin.nodename ;
-	        int	sl = xstrlen(uin.nodename) ;
+	        int	sl = lenstr(uin.nodename) ;
 	        if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	            tip->f.uname = true ;
 	            tip->sysnodename = cp ;
@@ -631,7 +631,7 @@ static int try_guess(TRY *tip) noex {
 	        rs = 0 ;
 	        for (int i = 0 ; ga[i].name ; i += 1) {
 	            cchar	*gnp = ga[i].name ;
-		    cint	gnl = xstrlen(ga[i].name) ;
+		    cint	gnl = lenstr(ga[i].name) ;
 	            if (int m ; (m = nleadstr(gnp,nn,-1)) >= gnl) {
 	                if (m > m_max) {
 	                    m_max = m ;
