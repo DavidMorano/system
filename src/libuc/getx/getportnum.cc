@@ -1,5 +1,5 @@
 /* getportnum SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get an INET port number */
@@ -97,7 +97,7 @@ int getportnum(cchar *pn,cchar *ps) noex {
 	if (ps) {
 	    rs = SR_INVALID ;
 	    if (ps[0]) {
-		cint	pl = xstrlen(ps) ;
+		cint	pl = lenstr(ps) ;
 	        if (hasalldig(ps,pl)) {
 	            rs = cfdeci(ps,pl,&port) ;
 	        } /* end if */

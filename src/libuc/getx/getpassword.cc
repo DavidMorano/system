@@ -1,5 +1,5 @@
 /* getpassword SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* read a password from the user's terminal */
@@ -84,7 +84,7 @@ int getpassword(cchar *prompt,char *passbuf,int passlen) noex {
 	            TERMIOS	nterm = oterm ;
 		    nterm.c_lflag &= (~ ECHO) ;
 	            if ((rs = uc_tcattrset(fd,TCSADRAIN,&nterm)) >= 0) {
-	                cint	pl = xstrlen(prompt) ;
+	                cint	pl = lenstr(prompt) ;
 	                if ((rs = uc_write(fd,prompt,pl)) >= 0) {
 	                    passbuf[0] = '\0' ;
 	                    rs = u_read(fd,passbuf,passlen) ;

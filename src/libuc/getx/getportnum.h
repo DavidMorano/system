@@ -1,5 +1,5 @@
 /* getportnum HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* retrieve an Internet port number */
