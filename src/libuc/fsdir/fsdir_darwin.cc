@@ -1,5 +1,5 @@
 /* fsdir_darwin SUPPORT (Darwin) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* object to read directory entries in the UNIX® file system */
@@ -48,8 +48,6 @@
 
 #if	F_DARWIN
 
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/dirent.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -58,8 +56,7 @@
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<memory>		/* |destroy_at(3c++)| */
-#include	<usystem.h>
-#include	<umemalloc.hh>
+#include	<usyscalls.h>
 #include	<intsat.h>
 #include	<localmisc.h>
 #include	<posixdirent.hh>
@@ -73,9 +70,9 @@
 /* imported namespaces */
 
 using std::destroy_at ;			/* subroutine */
-using libu::umalloc ;
-using libu::ufree ;
-using libu::snwcpy ;
+using libu::umemalloc ;			/* subroutine */
+using libu::umemfree ;			/* subroutine */
+using libu::snwcpy ;			/* subroutine */
 
 
 /* local typedefs */
@@ -113,8 +110,8 @@ static int	fsdir_end(fsdir *) noex ;
 
 /* local variables */
 
-constexpr auto		mallo	= umalloc ;
-constexpr auto		mfree	= ufree ;
+constexpr auto		mallo	= umemalloc ;
+constexpr auto		mfree	= umemfree ;
 
 
 /* exported variables */

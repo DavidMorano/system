@@ -127,96 +127,96 @@ obj03.o:		$(OBJ03)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ03)
 
 
-DEPS_MAIN	+= $(MODS) mods.o fmtstr_main.cc
+DEPS_MAIN	+= $(MODS) mods.o
 DEPS_OBJ	+= $(MODS)
-DEPS_SUB	+= fmtflag.ccm fmtutil.ccm fmtstrdata.ccm fmtspec.ccm
-DEPS_SUB	+= fmtspec.ccm fmtsub.ccm
+DEPS_SUB	+= fmtflag.o fmtutil.o fmtstrdata.o fmtspec.o 
+DEPS_SUB	+= cvtfloat.o
 DEPS_SPEC	+= 
 
 
 fmtopt.o:		fmtopt.cc fmtopt.h			$(INCS)
 
-fmtstr_main.o:		$(DEPS_MAIN)				$(INCS)
+fmtstr_main.o:		fmtstr_main.cc $(DEPS_MAIN)		$(INCS)
 	makemodule fmtflag
 	makemodule fmtstrdata
 	makemodule fmtutil
 	makemodule fmtsub
 	makemodule fmtobj
-	$(COMPILE.cc) fmtstr_main.cc
+	$(COMPILE.cc) $<
 
 mods.o:			$(MOBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
 
 fmtobj.o:		fmtobj0.o fmtobj1.o
-	$(LD) -r $(LDFLAGS) -o $@ fmtobj0.o fmtobj1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-fmtobj0.o:		$(DEPS_OBJ) fmtobj.ccm			$(INCS)
+fmtobj0.o:		fmtobj.ccm $(DEPS_OBJ)			$(INCS)
 	makemodule fmtstrdata
 	makemodule fmtspec
 	makemodule fmtsub
 	makemodule fmtobj
 
-fmtobj1.o:		$(DEPS_OBJ) fmtobj.ccm fmtobj1.cc	$(INCS)
+fmtobj1.o:		fmtobj1.cc fmtobj.ccm $(DEPS_OBJ)	$(INCS)
 	makemodule cvtfloat
 	makemodule fmtutil
 	makemodule fmtstrdata
 	makemodule fmtspec
 	makemodule fmtsub
 	makemodule fmtobj
-	$(COMPILE.cc) fmtobj1.cc
+	$(COMPILE.cc) $<
 
 fmtstrdata.o:		fmtstrdata.ccm				$(INCS)
 fmtutil.o:		fmtutil.ccm				$(INCS)
 fmtflag.o:		fmtflag.ccm				$(ICNS)
 
-fmtsub.o:		$(MOBJ_SUB)				$(INCS)
+fmtsub.o:		$(MOBJ_SUB) $				$(INCS)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ_SUB)
 
-fmtsub0.o:		$(DEPS_SUB) fmtsub.ccm			$(INCS)
+fmtsub0.o:		fmtsub.ccm $(DEPS_SUB)			$(INCS)
 	makemodule fmtflag
 	makemodule fmtutil
 	makemodule fmtstrdata
 	makemodule fmtspec
 	makemodule fmtsub
 
-fmtsub1.o:		$(DEPS_SUB) fmtsub.ccm fmtsub1.cc	$(INCS)
+fmtsub1.o:		fmtsub1.cc fmtsub.ccm $(DEPS_SUB)	$(INCS)
 	makemodule fmtflag
 	makemodule fmtutil
 	makemodule fmtstrdata
 	makemodule fmtspec
 	makemodule fmtsub
-	$(COMPILE.cc) fmtsub1.cc
+	$(COMPILE.cc) $<
 
-fmtsub2.o:		$(DEPS_SUB) fmtsub.ccm fmtsub2.cc	$(INCS)
+fmtsub2.o:		fmtsub2.cc fmtsub.ccm $(DEPS_SUB)	$(INCS)
 	makemodule fmtflag
 	makemodule fmtutil
 	makemodule fmtstrdata
 	makemodule fmtspec
 	makemodule fmtsub
-	$(COMPILE.cc) fmtsub2.cc
+	$(COMPILE.cc) $<
 
-fmtsub3.o:		$(DEPS_SUB) fmtsub.ccm fmtsub3.cc	$(INCS)
+fmtsub3.o:		fmtsub3.cc fmtsub.ccm $(DEPS_SUB)	$(INCS)
 	makemodule fmtflag
 	makemodule fmtutil
 	makemodule fmtstrdata
 	makemodule fmtspec
 	makemodule fmtsub
-	$(COMPILE.cc) fmtsub3.cc
+	$(COMPILE.cc) $<
 
 fmtspec.o:		$(MOBJ_SPEC)				$(INCS)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ_SPEC)
 
-fmtspec0.o:		$(DEPS_SPEC) fmtspec.ccm		$(INCS)
+fmtspec0.o:		fmtsub.ccm $(DEPS_SPEC)			$(INCS)
 	makemodule fmtspec
 
-fmtspec1.o:		$(DEPS_SPEC) fmtspec.ccm fmtspec1.cc	$(INCS)
+fmtspec1.o:		fmtspec1.cc fmtspec.ccm $(DEPS_SPEC)	$(INCS)
 	makemodule fmtspec
-	$(COMPILE.cc) fmtspec1.cc
+	$(COMPILE.cc) $<
 
 m.o:			cvtfloat.o
-	$(LD) -r $(LDFLAGS) -o $@ cvtfloat.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-cvtfloat.o:		fmtflag.ccm cvtfloat.ccm
+cvtfloat.o:		cvtfloat.ccm fmtflag.ccm
 	makemodule fmtflag
 	makemodule cvtfloat
 

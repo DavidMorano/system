@@ -56,12 +56,11 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= posixdirent.o
+OBJ0= fsdir_xx.o
 OBJ1= fsdir_other.o
 OBJ2= fsdir_darwin.o
-OBJ3= fsdir_xx.o
 
-OBJ= obj0.o obj1.o obj2.o obj3.o
+OBJ= obj0.o obj1.o obj2.o
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -122,8 +121,6 @@ obj2.o:			$(OBJ2)
 obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
 
-
-posixdirent.o:		posixdirent.cc posixdirent.hh	$(INCS)
 
 fsdir_other.o:		fsdir_other.cc			$(INCS)
 fsdir_darwin.o:		fsdir_darwin.cc			$(INCS)
