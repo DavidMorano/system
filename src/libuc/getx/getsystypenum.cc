@@ -1,5 +1,5 @@
 /* getsystypenum SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the 'osts' and 'osnum' for the current system and release */
@@ -154,7 +154,7 @@ static int getfield(cchar *sp,int n,cchar **rpp) noex {
 	} /* end if */
 	if ((cp == nullptr) && sp[0] && (i == n)) {
 	    cp = sp ;
-	    cl = xstrlen(sp) ;
+	    cl = lenstr(sp) ;
 	}
 	if (rpp) {
 	    *rpp = cp ;

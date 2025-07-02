@@ -1,11 +1,10 @@
 /* getuserhome SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the home directory of the specified user */
 /* version %I% last-modified %G% */
 
-#define	CF_UCPWCACHE	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -77,6 +76,7 @@
 #include	<getax.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getusername.h>
+#include	<getpwx.h>
 #include	<sfx.h>
 #include	<mkpathx.h>
 #include	<hasx.h>
@@ -91,12 +91,6 @@
 import libutil ;
 
 /* local defines */
-
-#if	CF_UCPWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UCPWCACHE */
 
 #define	SUBINFO		subinfo
 #define	SUBINFO_FL	subinfo_flags
@@ -245,7 +239,7 @@ static int subinfo_getpw(subinfo *sip) noex {
 	                rs = getpwusername(pwp,sip->pwbuf,pwlen,uid) ;
 	            }
 	        } else {
-	            rs = GETPW_NAME(pwp,sip->pwbuf,pwlen,un) ;
+	            rs = getpwx_name(pwp,sip->pwbuf,pwlen,un) ;
 	        }
 	    } else {
 	        rs = getpwusername(pwp,sip->pwbuf,pwlen,-1) ;
