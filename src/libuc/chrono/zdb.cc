@@ -219,7 +219,7 @@ int zdb_nameoff(zdb *op,cchar *sp,int sl,int zoff) noex {
 	    bool	f = false ;
 	    rs = SR_NOTFOUND ;
 	    memclear(op) ;
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
     	    /* lookup by name and offset (if we have an offset) */
 	    if (zoff != TZO_EMPTY) {
 	        for (i = 0 ; zones[i].name ; i += 1) {
@@ -252,7 +252,7 @@ int zdb_setname(zdb *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    rs = SR_NOTFOUND ;
 	    memclear(op) ;
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((i = findname(sp,sl)) >= 0) {
 		rs = SR_OK ;
 	        op->name = zones[i].name ;

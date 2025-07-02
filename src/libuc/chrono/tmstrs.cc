@@ -107,7 +107,7 @@ constexpr bool		f_threeyear = CF_THREEYEAR ;
 
 int tmstrsday(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if ((sl >= 1) && (sl <= 9)) {
 	    switch (TWOCHARS(TOUPPER(sp[0]),TOLOWER(sp[1]))) {
 	    case TWOCHARS('S', 'u'):
@@ -139,7 +139,7 @@ int tmstrsday(cchar *sp,int sl) noex {
 
 int tmstrsmonth(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (sl >= 3) {
 	    switch (TWOCHARS(TOUPPER(sp[0]),TOLOWER(sp[1]))) {
 	    case TWOCHARS('J', 'a'):
@@ -182,7 +182,7 @@ int tmstrsmonth(cchar *sp,int sl) noex {
 int tmstrsyear(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
 	int		year = 0 ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if ((sl >= 1) && (sl <= 5)) {
 	    if ((rs = cfdeci(sp,sl,&year)) >= 0) {
 	        switch (sl) {

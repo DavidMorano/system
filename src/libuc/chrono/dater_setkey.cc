@@ -143,7 +143,7 @@ int dater_setkey(dater *op,cc *dsp,int dsl,TIMEB *nowp,cc *zn) noex {
 	int		rs  ;
 	if ((rs = dater_magic(op,dsp,nowp,zn)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (dsl < 0) dsl = xstrlen(dsp) ;
+	    if (dsl < 0) dsl = lenstr(dsp) ;
 	    if (dsp[0]) {
 		datehelp dh(op,dsp,dsl,nowp,zn) ;
 		rs = dh ;

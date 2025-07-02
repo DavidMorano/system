@@ -241,7 +241,7 @@ int dater_setcopy(dater *op,dater *d2p) noex {
 int dater_setstd(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (tmz stz ; (rs = tmz_xstd(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
@@ -259,7 +259,7 @@ int dater_setmsg(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (comparse vc ; (rs = comparse_start(&vc,sp,sl)) >= 0) {
 	        cchar	*vp{} ;
 	        if (int vl ; (rs = comparse_getval(&vc,&vp)) >= 0) {
@@ -286,7 +286,7 @@ int dater_setmsg(dater *op,cchar *sp,int sl) noex {
 int dater_setstrdig(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (tmz stz ; (rs = tmz_xstrdig(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
@@ -311,7 +311,7 @@ to the dater object.
 int dater_setlogz(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (tmz stz ; (rs = tmz_xlogz(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
@@ -328,7 +328,7 @@ int dater_setlogz(dater *op,cchar *sp,int sl) noex {
 int dater_settouch(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (tmz stz ; (rs = tmz_xtouch(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;
@@ -345,7 +345,7 @@ int dater_settouch(dater *op,cchar *sp,int sl) noex {
 int dater_settoucht(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (tmz stz ; (rs = tmz_xtoucht(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
 	        dater_ldtmz(op,&stz) ;

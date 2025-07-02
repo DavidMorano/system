@@ -307,7 +307,7 @@ int subinfo::addstrw(cchar *sp,int sl) noex {
 	if (! f.ov) {
 	    cint	rlen = (ulen - len) ;
 	    rs = SR_OK ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sl > rlen) f.ov = true ;
 	    ml = min(sl,rlen) ;
 	    if (ml > 0) {

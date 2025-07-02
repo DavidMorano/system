@@ -252,7 +252,7 @@ static int getmuxlen(int svclen,mainv sargs) noex {
 	if (sargs) {
 	    for (int i = 0 ; sargs[i] ; i += 1) {
 		cchar	*sap = sargs[i] ;
-		ml += cstrlen(sap + 3) ;
+		ml += lenstr(sap + 3) ;
 	    } /* end for */
 	} /* end if */
 	return ml ;

@@ -179,7 +179,7 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	cchar		*yp = nullptr ;
 	cchar		*mp = nullptr ;
 	cchar		*dp = nullptr ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (hasalldig(sp,sl)) {
 	    switch (sl) {
 	    case 8:

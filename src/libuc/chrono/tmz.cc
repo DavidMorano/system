@@ -201,7 +201,7 @@ int tmz_init(tmz *op) noex {
 int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    op->st.tm_year = -1 ;
@@ -227,7 +227,7 @@ int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 	    } /* end for */
 	    if (rs >= 0) {
 		cint	znl = var.znlen ;
-	        rs = xstrnlen(op->zname,znl) ;
+	        rs = lenstr(op->zname,znl) ;
 	    }
 	    if (rs < 0) {
 		op->dtor() ;
@@ -242,7 +242,7 @@ int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		zl = 0 ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    op->st.tm_year = -1 ;
@@ -284,7 +284,7 @@ int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 	    }
 	    if (rs >= 0) {
 		cint	znl = var.znlen ;
-	        rs = xstrnlen(op->zname,znl) ;
+	        rs = lenstr(op->zname,znl) ;
 	        zl = rs ; /* return value for subroutine */
 	    }
 	    if (rs < 0) {
@@ -300,7 +300,7 @@ int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    stp->tm_year = -1 ;
@@ -362,7 +362,7 @@ int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
             TM		*stp = &op->st ;
-            if (sl < 0) sl = xstrlen(sp) ;
+            if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
             op->zoff = SHORT_MIN ;
             stp->tm_year = -1 ;
@@ -446,7 +446,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	int		zl = 0 ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    stp->tm_year = -1 ;
@@ -547,7 +547,7 @@ int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
 	int		zl = 0 ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
-            if (sl < 0) sl = xstrlen(sp) ;
+            if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
             op->zoff = SHORT_MIN ;
             stp->tm_year = -1 ;
@@ -617,7 +617,7 @@ int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
                             }
                             if (sl && ((ch = mkchar(*sp)),isalphalatin(ch))) {
                                 rs = tmz_proczname(op,sp,sl) ;
-                                zl = xstrlen(op->zname) ;
+                                zl = lenstr(op->zname) ;
                             }
                         } else {
                             rs = SR_INVALID ;
@@ -640,7 +640,7 @@ int tmz_xday(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = tmz_ctor(op,sp)) >= 0) {
 	    TM		*stp = &op->st ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    stp->tm_year = -1 ;
