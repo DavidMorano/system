@@ -1,5 +1,5 @@
 /* getserv SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a network service number (port) given protocol-name and service-name */
