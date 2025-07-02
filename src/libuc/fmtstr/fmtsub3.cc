@@ -1,5 +1,5 @@
 /* fmtsub3 MODULE */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to format string output */
@@ -161,7 +161,7 @@ int fmtsub_emit(fmtsub *op,fmtspec *fsp,cchar *sp,int sl) noex {
 	if (op && fsp) {
 	    rs = SR_OK ;
 	    if (sp && (fsp->fcode > 0)) {
-		if (sl < 0) sl = xstrlen(sp) ;
+		if (sl < 0) sl = lenstr(sp) ;
 		{
 		    subinfo si(op,fsp,sp,sl) ;
 		    rs = si ;

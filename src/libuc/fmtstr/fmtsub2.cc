@@ -1,5 +1,5 @@
 /* fmtsub2 MODULE */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to format string output */
@@ -100,7 +100,7 @@ constexpr fmtoptms	fopt ;
 
 constexpr cchar		blanka[] = "        " ;
 
-constexpr cint		blankn = cstrlen(blanka) ;
+constexpr cint		blankn = lenstr(blanka) ;
 
 constexpr bool		f_cleanstr = CF_CLEANSTR ;
 
@@ -159,7 +159,7 @@ int fmtsub_strw(fmtsub *op,cchar *sp,int sl) noex {
 	int		ml = 0 ;
 	if (! op->fl.ov) {
 	    int		rlen ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rlen = (op->ulen - op->len) ;
 	    if (sl > rlen) op->fl.ov = true ;
 	    ml = min(sl,rlen) ;
@@ -202,7 +202,7 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	char		*abuf = nullptr ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if_constexpr (f_cleanstr) {
 	    if (op->fl.mclean) {
 	        int	hl = sl ;
@@ -309,7 +309,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	    }
 	   /* currently not needed if we did the string conversion above */
 	    if ((sl != 0) && (! (f_wint || f_wchar))) {
-	        sl = xstrnlen(sp,sl) ;
+	        sl = lenstr(sp,sl) ;
 	    }
 	    /* modify the string length based on precision (truncate on left) */
 	    if ((prec >= 0) && (sl > prec)) {
