@@ -1,5 +1,5 @@
 /* filer_writers SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* extra write methods for the FILER object */
@@ -149,7 +149,7 @@ using std::max ;			/* subroutine-template */
 
 namespace {
     struct blanker {
-	cint	l = xstrlen(sysword.w_blanks) ;
+	cint	l = lenstr(sysword.w_blanks) ;
 	cchar	*p = sysword.w_blanks ;
     } ; /* end struct (blanker) */
     struct zeroer {
@@ -196,7 +196,7 @@ int filer_writefill(filer *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = filer_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = (xstrlen(sp) + 1) ;
+	    if (sl < 0) sl = (lenstr(sp) + 1) ;
 	    if ((rs = filer_write(op,sp,sl)) >= 0) {
 	        cint	asize = szof(int) ;
 	        wlen = rs ;

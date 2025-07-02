@@ -1,5 +1,5 @@
 /* filer_main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* support low-overhead file bufferring requirements */
@@ -363,7 +363,7 @@ int filer_write(filer *op,cvoid *abuf,int alen) noex {
 	    int		len ;
 	    cchar	*abp = charp(abuf) ;
 	    op->f.write = true ;
-	    if (alen < 0) alen = xstrlen(abp) ;
+	    if (alen < 0) alen = lenstr(abp) ;
 	    alenr = alen ;
 	    while ((rs >= 0) && (alenr > 0)) {
 	        if ((rs >= 0) && (op->len == 0) && (alenr >= op->dlen)) {
@@ -415,7 +415,7 @@ int filer_println(filer *op,cchar *sp,int sl) noex {
 	if ((rs = filer_magic(op,sp)) >= 0) {
 	    int		reslen ;
 	    bool	feol = false ;
-	    sl = xstrnlen(sp,sl) ;
+	    sl = lenstr(sp,sl) ;
 	    feol = feol || (sl == 0) ;
 	    feol = feol || (sp[sl-1] != '\n') ;
 	    reslen = (feol) ? (sl+1) : sl ;
