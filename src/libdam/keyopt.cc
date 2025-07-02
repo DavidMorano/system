@@ -34,7 +34,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strncmp(3c)| */
-#include	<usystem.h>		/* |xstrlen(3u)| */
+#include	<usystem.h>		/* |lenstr(3u)| */
 #include	<sfx.h>
 #include	<strn.h>
 #include	<strkeycmp.h>
@@ -140,7 +140,7 @@ int keyopt_loads(keyopt *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ; /* return-value */
 	if ((rs = keyopt_magic(op,sp)) >= 0) {
-	    if (sl <= 0) sl = xstrlen(sp) ;
+	    if (sl <= 0) sl = lenstr(sp) ;
 	    for (cchar *tp ; (tp = strnbrk(sp,sl,",\t\n\r ")) != np ; ) {
 	        cchar	*cp = sp ;
 	        if (cint cl = intconv(tp - sp) ; cl > 0) {
@@ -178,7 +178,7 @@ int keyopt_loadvalue(keyopt *op,cchar *key,cchar *vbuf,int vlen) noex {
 	    cchar	*cp ;
 	    int		klen ;
 	    /* clean up the value a little */
-	    if (vlen < 0) vlen = (vbuf) ? xstrlen(vbuf) : 0 ;
+	    if (vlen < 0) vlen = (vbuf) ? lenstr(vbuf) : 0 ;
 	    /* do we have one of these named keys already? */
 	    klen = -1 ;
 	    if ((tp = strchr(key,'=')) != nullptr) {
@@ -266,7 +266,7 @@ int keyopt_enumkeys(keyopt *op,CUR *curp,cchar **rpp) noex {
 	    curp->keyp = kp ;
 	    if (kp != nullptr) {
 	        if (rpp != nullptr) *rpp = kp->name ;
-	        rs = xstrlen(kp->name) ;
+	        rs = lenstr(kp->name) ;
 	    } /* end if */
 	} /* end if (magic) */
 	return rs ;
@@ -312,7 +312,7 @@ int keyopt_fetch(keyopt *op,cchar *kname,CUR *curp,cchar **rpp) noex {
 	            if (rpp) *rpp = vp->value ;
 	            rs = 0 ;
 	            if (vp->value != nullptr) {
-	                rs = xstrlen(vp->value) ;
+	                rs = lenstr(vp->value) ;
 	            }
 	            curp->valuep = vp ;
 	        } /* end if */
@@ -381,13 +381,13 @@ int keyopt_findvalue(keyopt *op,cc *key,cc *value,int vlen,VAL **rpp) noex {
 	    NAM		*kp ;
 	    cchar	*tp ;
 	    int		klen = -1 ;
-	    if (vlen < 0) vlen = xstrlen(value) ;
+	    if (vlen < 0) vlen = lenstr(value) ;
 	    /* do we have this key? */
 	    if ((tp = strchr(key,'=')) != nullptr) {
 	        klen = intconv(tp - key) ;
 	    }
 	    if ((rs = keyopt_findkey(op,key,klen,&kp)) >= 0) {
-	        if (vlen < 0) vlen = xstrlen(value) ;
+	        if (vlen < 0) vlen = lenstr(value) ;
 	        rs = keyname_findv(kp,value,vlen,rpp) ;
 	    }
 	} /* end if (magic) */
@@ -471,7 +471,7 @@ static int keyname_incri(NAM *pp) noex {
 static int keyname_findv(NAM *pp,cchar *vbuf,int vlen,VAL **rp) noex {
 	VAL		*vp ;
 	bool		f = false ;
-	if (vlen < 0) vlen = xstrlen(vbuf) ;
+	if (vlen < 0) vlen = lenstr(vbuf) ;
 	for (vp = pp->head ; vp != nullptr ; vp = vp->next) {
 	    f = (strncmp(vp->value,vbuf,vlen) == 0) ;
 	    f = f && (vp->value[vlen] == '\0') ;

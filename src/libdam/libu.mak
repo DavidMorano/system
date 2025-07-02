@@ -98,7 +98,7 @@ OBJ23= syscontain.o stdfnames.o
 
 OBJ24= posixdirent.o
 OBJ25= fonce.o filerec.o
-OBJ26=
+OBJ26= libutil.o
 OBJ27=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -107,7 +107,7 @@ OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
-OBJG= obj24.o obj25.o
+OBJG= obj24.o obj25.o obj26.o
 
 OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 
@@ -393,6 +393,11 @@ fonce.dir:
 # FILEREC
 filerec.o:		filerec.dir
 filerec.dir:
+	makesubdir $@
+
+# LIBUTIL
+libutil.o:		libutil.dir
+libutil.dir:
 	makesubdir $@
 
 chrset.o:		chrset.ccm

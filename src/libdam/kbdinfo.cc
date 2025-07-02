@@ -503,9 +503,9 @@ static int ke_start(KI_ENT *kep,int ktype,cchar *knp,int knl,
 	    if (ktype == KBDINFO_TFKEY) name = '~' ;
 	    kep->name = name ;
 	}
-	sz += (xstrnlen(knp,knl) + 1) ;
+	sz += (lenstr(knp,knl) + 1) ;
 	if (n > 3) {
-	    sz += (xstrnlen(eis[3].fp,eis[3].fl) + 1) ;
+	    sz += (lenstr(eis[3].fp,eis[3].fl) + 1) ;
 	} else {
 	    sz += 1 ;
 	}

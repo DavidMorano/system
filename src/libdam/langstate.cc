@@ -23,12 +23,15 @@
 
 /*******************************************************************************
 
+  	Object:
+	langstate
+
+	Description:
 	We track the parse state of C-language type input.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -40,6 +43,7 @@
 
 #include	"langstate.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -209,7 +213,7 @@ int langstate_proc(langstate *op,int ln,int ch) noex {
 }
 /* end subroutine (langstate_proc) */
 
-int langstate_stat(langstate *op,langstate_info *sbp) noex {
+int langstate_getstat(langstate *op,langstate_info *sbp) noex {
 	int		rs ;
 	int		type = langstatetype_clear ;
 	if ((rs = langstate_magic(op,sbp)) >= 0) {
@@ -226,6 +230,6 @@ int langstate_stat(langstate *op,langstate_info *sbp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? type : rs ;
 }
-/* end subroutine (langstate_stat) */
+/* end subroutine (langstate_getstat) */
 
 

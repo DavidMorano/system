@@ -28,7 +28,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<vecobj.h>
 
 
 #define	LANGSTATE_MAGIC		0x13f3c204
@@ -73,7 +72,7 @@ EXTERNC_begin
 
 extern int langstate_start(langstate *) noex ;
 extern int langstate_proc(langstate *,int,int) noex ;
-extern int langstate_stat(langstate *,langstate_info *) noex ;
+extern int langstate_getstat(langstate *,langstate_info *) noex ;
 extern int langstate_finish(langstate *) noex ;
 
 EXTERNC_end

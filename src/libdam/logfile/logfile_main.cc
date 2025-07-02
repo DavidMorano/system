@@ -414,7 +414,7 @@ int logfile_write(logfile *op,cchar *sp,int sl) noex {
 	    int		bl ;
 	    cchar	*bp ;
 	    char	tmpbuf[TMPBUFLEN+ 1] ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sp[sl-1] == '\n') sl -= 1 ;
 	    colstate_load(&cs,linelen,(logidlen + 1)) ;
 	    clen = colstate_linecols(&cs,sp,sl) ;
@@ -629,7 +629,7 @@ static int logfile_mkentry(logfile *op,time_t dt,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		rlen = (op->bufsize - op->len) ;
 	int		ll ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	ll = (LOGFILE_LOGIDLEN+1+sl) ;
 	{
 	    if ((ll+1) > rlen) rs = logfile_iflush(op) ;
@@ -675,7 +675,7 @@ static int colstate_linecols(COLSTATE *csp,cchar *sbuf,int slen) noex {
 	int		i ; /* used afterwards */
 	int		cols ;
 	int		rcols ;
-	if (slen < 0) slen = xstrlen(sbuf) ;
+	if (slen < 0) slen = lenstr(sbuf) ;
 	rcols = (csp->ncols - csp->ncol) ;
 	for (i = 0 ; (rcols > 0) && (i < slen) ; i += 1) {
 	    cols = charcols(NTABCOLS,csp->ncol,sbuf[i]) ;
