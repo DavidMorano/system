@@ -512,14 +512,14 @@ int msfile_match(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 
 #if	CF_DEBUGS
 	debugprintf("msfile_match: ent nnl=%d nnp=%r\n",
-	    nnl,nnp,xstrnlen(nnp,nnl)) ;
+	    nnl,nnp,lenstr(nnp,nnl)) ;
 #endif
 
 	if (nnl >= 0) {
 	    i = MIN(nnl,MSFILE_NODENAMELEN) ;
 	}
 
-	nnl = xstrnlen(nnp,i) ;
+	nnl = lenstr(nnp,i) ;
 
 #if	CF_DEBUGS
 	debugprintf("msfile_match: nnl=%d nnp=%r\n",nnl,nnp,nnl) ;
@@ -588,7 +588,7 @@ int msfile_write(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 
 #if	CF_DEBUGS
 	debugprintf("msfile_write: ent nnl=%d nodename=%r\n",
-	    nnl,nnp,xstrnlen(nnp,nnl)) ;
+	    nnl,nnp,lenstr(nnp,nnl)) ;
 #endif /* CF_DEBUGS */
 
 #if	CF_SAFE
@@ -602,7 +602,7 @@ int msfile_write(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 	if (nnl >= 0)
 	    i = MIN(nnl,MSFILE_NODENAMELEN) ;
 
-	nnl = xstrnlen(nnp,i) ;
+	nnl = lenstr(nnp,i) ;
 
 #if	CF_DEBUGS && 0
 	debugprintf("msfile_write: nodename=%r\n",nnp,nnl) ;
@@ -742,7 +742,7 @@ int msfile_update(MS *op,time_t dt,MS_ENT *ep) noex {
 
 /* do the search */
 
-	    nnl = xstrnlen(nnp,MSFILE_NODENAMELEN) ;
+	    nnl = lenstr(nnp,MSFILE_NODENAMELEN) ;
 	    if (nnl > 0) {
 
 	        if ((rs = msfile_findname(op,nnp,nnl,&bp)) >= 0) {
@@ -1009,11 +1009,11 @@ static int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 
 #if	CF_DEBUGS
 	debugprintf("msfile_search: ent nnl=%u nodename=%r\n",
-	    nnl,nnp,xstrnlen(nnp,nnl)) ;
+	    nnl,nnp,lenstr(nnp,nnl)) ;
 #endif
 
 	if (nnl < 0)
-	    nnl = xstrlen(nnp) ;
+	    nnl = lenstr(nnp) ;
 
 #if	CF_DEBUGS 
 	debugprintf("msfile_search: nnl=%u pagesize=%u ebs=%u\n",
@@ -1043,7 +1043,7 @@ static int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 
 #if	CF_DEBUGS
 	        debugprintf("msfile_search: i=%u db_node=%r\n",i,
-	            np,xstrnlen(np,MSFILEE_LNODENAME)) ;
+	            np,lenstr(np,MSFILEE_LNODENAME)) ;
 #endif
 
 	        if (namematch(np,nnp,nnl)) {
@@ -1635,7 +1635,7 @@ static int msfile_readentry(MS *op,int ei,char **rpp) noex {
 	        int	nl ;
 	        char	*np ;
 	        np = bp + MSFILEE_ONODENAME ;
-	        nl = xstrnlen(np,MSFILEE_LNODENAME) ;
+	        nl = lenstr(np,MSFILEE_LNODENAME) ;
 	        rs = msfile_index(op,np,nl,ei) ;
 	    } /* end if (got an entry) */
 #endif /* CF_NIENUM */
@@ -1659,7 +1659,7 @@ static int msfile_index(MS *op,cchar *np,int nl,int ei) noex {
 	int		ei2 ;
 
 	if (nl < 0)
-	    nl = xstrlen(np) ;
+	    nl = lenstr(np) ;
 
 	rs1 = mapstrint_fetch(&op->ni,np,nl,nullptr,&ei2) ;
 
@@ -1669,7 +1669,7 @@ static int msfile_index(MS *op,cchar *np,int nl,int ei) noex {
 	}
 
 	if (rs1 == SR_NOTFOUND) {
-	    int	nl2 = xstrnlen(np,MSFILEE_LNODENAME) ;
+	    int	nl2 = lenstr(np,MSFILEE_LNODENAME) ;
 	    mapstrint_add(&op->ni,np,nl2,ei) ;
 	} /* end if (not found) */
 
@@ -1705,7 +1705,7 @@ static int namematch(cchar *np,cchar *nnp,int nnl)
 
 #if	CF_DEBUGS
 	debugprintf("namematch: ent np=%s\n",np) ;
-	debugprintf("namematch: nnl=%d nnp=%r\n",nnl,nnp,xstrnlen(nnp,nnl)) ;
+	debugprintf("namematch: nnl=%d nnp=%r\n",nnl,nnp,lenstr(nnp,nnl)) ;
 #endif
 
 	if (nnl <= MSFILEE_LNODENAME) {

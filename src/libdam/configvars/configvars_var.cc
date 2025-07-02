@@ -49,6 +49,7 @@
 
 #include	"configvarsobj.hh"
 
+import libutil ;
 
 /* local namespaces */
 
@@ -91,9 +92,9 @@ namespace configvars_obj {
 	if (cep && kp) {
 	    int		len{} ;
 	    memclear(cep) ;
-	    if (kl < 0) kl = xstrlen(kp) ;
+	    if (kl < 0) kl = lenstr(kp) ;
 	    if (vp) {
-	        if (vl < 0) vl = xstrlen(vp) ;
+	        if (vl < 0) vl = lenstr(vp) ;
 	    } else {
 		vl = 0 ;
 	    }

@@ -48,6 +48,7 @@
 
 #include	"configvarsobj.hh"
 
+import libutil ;
 
 /* local defines */
 
@@ -102,7 +103,7 @@ namespace configvars_obj {
 	            if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 	                vip = &cfp->unsets ;
 		        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
-			    rs = xstrlen(filename) ;
+			    rs = lenstr(filename) ;
 		        }
 		        if (rs < 0) {
 			    vecobj_finish(&cfp->exports) ;
@@ -149,8 +150,8 @@ namespace configvars_obj {
 	if ((rs >= 0) && vip) {
 	    void	*vp{} ;
 	    for (int i = 0 ; vecobj_get(vip,i,&vp) >= 0 ; i += 1) {
+	    	CV_VAR	*vep = (CV_VAR *) vp ;
 	        if (vp) {
-	    	    CV_VAR	*vep = (CV_VAR *) vp ;
 	            rs1 = var_finish(vep) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }

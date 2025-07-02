@@ -166,7 +166,7 @@ int hexdecoder_load(hexdecoder *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = hexdecoder_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
 	        while ((rs >= 0) && (sl > 0) && *sp) {
 		    cint	ch = mkchar(*sp) ;

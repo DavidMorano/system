@@ -172,7 +172,7 @@ int b64decoder_load(b64decoder *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = b64decoder_magic(op,sp)) >= 0) {
-            if (sl < 0) sl = xstrlen(sp) ;
+            if (sl < 0) sl = lenstr(sp) ;
             if (obuf *obp ; (obp = obufp(op->outbuf)) != np) {
                 int         cl ;
                 cchar       *cp ;
