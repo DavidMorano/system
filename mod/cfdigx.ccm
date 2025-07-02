@@ -83,7 +83,7 @@ module ;
 #include	<usysrets.h>
 #include	<stdintx.h>		/* extended integer types */
 #include	<checkbase.h>
-#include	<cfutil.hh>		/* namespace |cfx| + |cstrlen(3u)| */
+#include	<cfutil.hh>		/* namespace |cfx| + |lenstr(3u)| */
 #include	<char.h>		/* |CHAR_TOVAL(3uc)| */
 #include	<ischarx.h>		/* |isplusminus(3uc)| */
 #include	<localmisc.h>
