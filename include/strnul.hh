@@ -30,7 +30,7 @@
 #include	<usysdefs.h>
 
 
-#define	STRNUL_SHORTLEN	128		/* "short-string optimization" */
+#define	STRNUL_SHORTLEN		64	/* "short-string optimization" */
 
 
 struct strnul {

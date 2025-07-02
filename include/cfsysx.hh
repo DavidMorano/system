@@ -84,7 +84,7 @@ module ;
 #include	<snwcpy.h>
 #include	<sfx.h>
 #include	<checkbase.h>
-#include	<cfutil.hh>		/* namespace |cfx| + |cstrlen(3u)| */
+#include	<cfutil.hh>		/* namespace |cfx| + |lenstr(3u)| */
 #include	<localmisc.h>
 
 export module cfsysx ;
