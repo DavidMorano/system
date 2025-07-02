@@ -69,7 +69,6 @@ LIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -360,7 +359,7 @@ OBJFILE2= objq.o objr.o objs.o objt.o obju.o objv.o
 OBJFILE= $(OBJFILE0) $(OBJFILE1) $(OBJFILE2)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -390,6 +389,9 @@ a:			$(T).a
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ) Makefile
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
@@ -400,8 +402,8 @@ $(T).so:		$(OBJ) Makefile
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order:		$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order

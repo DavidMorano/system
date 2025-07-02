@@ -80,7 +80,7 @@ int cfjulian(cchar *s,int slen,time_t *rp) noex {
 	cchar		*cp = s ;
 
 	if (slen < 0)
-	    slen = xstrlen(s) ;
+	    slen = lenstr(s) ;
 
 	if (slen == 0)
 	    return -1 ;

@@ -1191,8 +1191,8 @@ static int part_match(PARTTYPE *pp,cchar *s) noex {
 		            int		sl ;
 	                    f = false ;
 	                    if (strncmp(s,pp->patstd,(tp - pp->patstd)) == 0) {
-	                        cint	sl1 = xstrlen(s) ;
-	                        cint	sl2 = xstrlen(pp->patstd) ;
+	                        cint	sl1 = lenstr(s) ;
+	                        cint	sl2 = lenstr(pp->patstd) ;
 	                        tp += 1 ;
 	                        sl = pp->patstd + sl2 - tp ;
 	                        f = (strncmp(s + sl1 - sl,tp,sl) == 0) ;
