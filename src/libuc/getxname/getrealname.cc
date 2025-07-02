@@ -1,11 +1,10 @@
 /* getrealname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to find the real-name of a user (given a username) */
 /* version %I% last-modified %G% */
 
-#define	CF_PWCACHE	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -46,15 +45,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<ucpwcache.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
-#include	<getusername.h>
 #include	<getax.h>
+#include	<getpwx.h>
+#include	<getusername.h>
+#include	<mallocxx.h>
 #include	<mkx.h>			/* |getgecosname(3uc)| */
 #include	<localmisc.h>		/* |REALNAMELEN| */
 
@@ -62,13 +60,6 @@
 
 
 /* local defines */
-
-#if	CF_PWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_PWCACHE */
-#undef	COMMENT
 
 #ifndef	REALNAMELEN
 #define	REALNAMELEN	100		/* real name length */
@@ -109,12 +100,11 @@ int getrealname(char *rbuf,int rlen,cchar *un) noex {
 	int		rl = 0 ;
 	if (rlen < 0) rlen = REALNAMELEN ;
 	if (rbuf) {
-	    char	*pwbuf{} ;
-	    if ((rs = malloc_pw(&pwbuf)) >= 0) {
+	    if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
 	        ucentpw	pw ;
 	        cint	pwlen = rs ;
 	        if ((rs = getpwname(&pw,pwbuf,pwlen,un)) >= 0) {
-	            cchar	*gp{} ;
+	            cchar *gp ;
 	            if ((rs = getgecosname(pw.pw_gecos,-1,&gp)) > 0) {
 		        rs = mkrealname(rbuf,rlen,gp,rs) ;
 			rl = rs ;
@@ -134,7 +124,7 @@ int getrealname(char *rbuf,int rlen,cchar *un) noex {
 static int getpwname(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	int		rs ;
 	if (un && (un[0] != '\0') && (un[0] != '-')) {
-	    rs = GETPW_NAME(pwp,pwbuf,pwlen,un) ;
+	    rs = getpwx_name(pwp,pwbuf,pwlen,un) ;
 	} else {
 	    rs = getpwusername(pwp,pwbuf,pwlen,-1) ;
 	}
