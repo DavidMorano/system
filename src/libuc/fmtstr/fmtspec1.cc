@@ -1,5 +1,5 @@
 /* fmrspec1 MODULE */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* format-specification */
@@ -104,7 +104,7 @@ constexpr cshort	ten = short(10) ;
 int fmtspec::start(va_list ap,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (ap && sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    fcode = 0 ;
 	    width = -1 ;
 	    prec = -1 ;

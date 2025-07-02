@@ -1,5 +1,5 @@
 /* fmtobj1 MODULE */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to format string output */
@@ -343,7 +343,7 @@ int fmtobj::code_exp(va_list ap) noex {
         strdata		sd ;
         cchar		*sp = (cchar *) va_arg(ap,char *) ;
 	if (sp) {
-	    if (cint sl = xstrlen(sp) ; sl >= 0) {
+	    if (cint sl = lenstr(sp) ; sl >= 0) {
 		if (char *bufp ; (bufp = new(nothrow) char[sl+1]) != np) {
 		    cint bufl = sl ;
 		    if ((rs = snwcpyexpesc(bufp,bufl,sp,sl)) >= 0) {

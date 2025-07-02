@@ -1,5 +1,5 @@
 /* fmtopt SUÞPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* options for |fmtstr(3uc)| */
