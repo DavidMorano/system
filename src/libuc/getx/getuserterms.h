@@ -1,5 +1,5 @@
 /* getuserterms HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* get a list (returned as vector of c-strings) of the logged in user terms */

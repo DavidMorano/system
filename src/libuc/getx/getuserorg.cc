@@ -1,12 +1,11 @@
 /* getuserorg SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the organization name (string) for a specified user-name */
 /* version %I% last-modified %G% */
 
 #define	CF_ORGSYS	0		/* get from system? */
-#define	CF_UPWCACHE	1		/* use |ucpwcache(3uc)| */
 
 /* revision history:
 
@@ -56,12 +55,13 @@
 #include	<usystem.h>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
-#include	<varnames.hh>
-#include	<syswords.hh>
+#include	<getpwx.h>
 #include	<getax.h>
 #include	<getusername.h>
 #include	<getuserhome.h>
+#include	<mallocxx.h>
+#include	<varnames.hh>
+#include	<syswords.hh>
 #include	<gecos.h>
 #include	<filereadln.h>
 #include	<sncpyx.h>
@@ -76,15 +76,7 @@ import libutil ;
 
 /* local defines */
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ucpwcache_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
-
-#define	SUBINFO		struct subinfo
-
-#define	SI		SUBINFO
+#define	SI		subinfo
 
 #undef	ORGCNAME
 #define	ORGCNAME	"organization"
@@ -141,7 +133,7 @@ int getuserorg(char *rbuf,int rlen,cchar *un) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (un[0]) {
-	        SUBINFO		si, *sip = &si ;
+	        subinfo		si, *sip = &si ;
 		cchar		*on = orgname ;
 	        if ((rs = subinfo_start(&si,on,rbuf,rlen,un)) >= 0) {
 	            for (int i = 0 ; i < 3 ; i += 1) {
@@ -278,7 +270,7 @@ static int getuserorg_passwd(SI *sip) noex {
 	    if (sip->un[0] == '-') {
 	        rs = getpwusername(&pw,pwbuf,pwlen,-1) ;
 	    } else {
-	        rs = GETPW_NAME(&pw,pwbuf,pwlen,sip->un) ;
+	        rs = getpwx_name(&pw,pwbuf,pwlen,sip->un) ;
 	    }
 	    if (rs >= 0) {
 	        if (gecos g ; (rs = gecos_start(&g,pw.pw_gecos,-1)) >= 0) {

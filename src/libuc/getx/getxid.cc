@@ -1,11 +1,10 @@
 /* getxid SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get various IDs by various means */
 /* version %I% last-modified %G% */
 
-#define	CF_UCPWCACHE	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -103,10 +102,10 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<getax.h>
+#include	<getpwx.h>
 #include	<mallocxx.h>
 #include	<nulstr.h>
-#include	<getax.h>
-#include	<ucpwcache.h>
 #include	<cfdec.h>
 #include	<hasx.h>
 #include	<localmisc.h>
@@ -115,12 +114,6 @@
 
 
 /* local defines */
-
-#if	CF_UCPWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UCPWCACHE */
 
 
 /* external subroutines */
@@ -162,7 +155,7 @@ int getuid_name(cchar *sp,int sl) noex {
 	            if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
 	                ucentpw	pw{} ; 
 	                cint	pwlen = rs ;
-			auto	getpw = GETPW_NAME ;
+			cauto	getpw = getpwx_name ;
 			if ((rs = getpw(&pw,pwbuf,pwlen,nn)) >= 0) {
 	                    uid = pw.pw_uid ;
 		        }
@@ -207,9 +200,8 @@ int getgid_name(cchar *sp,int sl) noex {
 	        if (nulstr ns ; (rs = ns.start(sp,sl,&name)) >= 0) {
 	            if (char *grbuf ; (rs = malloc_gr(&grbuf)) >= 0) {
 	                cint	grlen = rs ;
-		        {
-	                    ucentgr	gr{} ;
-	                    rs = getgr_name(&gr,grbuf,grlen,name) ;
+	                ucentgr	gr{} ;
+			if ((rs = getgr_name(&gr,grbuf,grlen,name)) >= 0) {
 	                    gid = gr.gr_gid ;
 		        }
 	                rs1 = uc_free(grbuf) ;
@@ -269,9 +261,8 @@ int getpjid_name(cchar *sp,int sl) noex {
 	        if (nulstr ns ; (rs = ns.start(sp,sl,&name)) >= 0) {
 	            if (char *pjbuf ; (rs = malloc_pj(&pjbuf)) >= 0) {
 	                cint	pjlen = rs ;
-		        {
-	                    ucentpj	pj{} ;
-	                    rs = getpj_name(&pj,pjbuf,pjlen,name) ;
+		        ucentpj pj ;
+		        if ((rs = getpj_name(&pj,pjbuf,pjlen,name)) >= 0) {
 	                    pjid = pj.pj_projid ;
 		        }
 	                rs1 = uc_free(pjbuf) ;

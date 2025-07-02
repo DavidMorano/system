@@ -1,5 +1,5 @@
 /* getxid HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* get certain system IDs based on a specified name */
