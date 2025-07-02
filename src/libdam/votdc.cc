@@ -64,6 +64,7 @@
 #include	"votdc.h"
 #include	"votdchdr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -698,8 +699,8 @@ int votdc_vcurenum(votdc *op,VOTDC_VCUR *curp,votdc_cite *citep,
 static int votdc_strbegin(votdc *op,cchar *pr,cchar *lang) noex {
 	int		rs ;
 	int		sz = 0 ;
-	sz += (xstrlen(pr) + 1) ;
-	sz += (xstrlen(lang) + 1) ;
+	sz += (lenstr(pr) + 1) ;
+	sz += (lenstr(lang) + 1) ;
 	if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->pr = bp ;
@@ -1524,7 +1525,7 @@ static int verse_load(votdc_verse *vep,time_t dt,int wm,shmalloc *vap,
 		char *vstr,votdc_cite *citep,int mjd,cc *valp,int vall) noex {
 	int		rs ;
 	int		voff = 0 ;
-	if (vall < 0) vall = xstrlen(valp) ;
+	if (vall < 0) vall = lenstr(valp) ;
 	if ((rs = shmalloc_alloc(vap,(vall + 1))) >= 0) {
 	    char	*bp = (vstr + rs) ;
 	    voff = rs ;
@@ -1579,7 +1580,7 @@ static int book_load(votdc_book *blp,shmalloc *bap,char *bsp,time_t dt,
 	blp->atime = dt ;
 	blp->wmark = wm ;
 	for (int i = 0 ; (i < n) && tv[i] ; i += 1) {
-	    cint	bl = xstrlen(tv[i]) ;
+	    cint	bl = lenstr(tv[i]) ;
 	    if ((rs = shmalloc_alloc(bap,(bl+1))) >= 0) {
 		blp->b[i] = rs ;
 		bp = (bsp+rs) ;
@@ -1650,7 +1651,7 @@ static int titlecache_load(VOTDC_TC *tcp,int wm,cc *lang,
 	for (int i = 0 ; i < n ; i += 1) {
 	    cp = (bstr + boffs[i]) ;
 	    sz += szof(cchar *) ;
-	    sz += (xstrlen(cp) + 1) ;
+	    sz += (lenstr(cp) + 1) ;
 	} /* end for */
 	if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    int		i ; /* used-afterwards */
