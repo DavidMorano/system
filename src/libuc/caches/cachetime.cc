@@ -198,7 +198,7 @@ int cachetime_lookup(CT *op,cchar *sp,int sl,time_t *timep) noex {
 	int		rs1 ;
 	int		rv = 0 ;
 	if ((rs = cachetime_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rs = ptm_lock(op->mxp)) >= 0) {
 		{
 	            rs = cachetime_lookuper(op,sp,sl,timep) ;
@@ -315,7 +315,7 @@ static int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
 	    if ((rs = uc_malloc(sz,&ep)) >= 0) {
 	        if ((rs = entry_start(ep,sp,sl)) >= 0) {
 	    	    key.buf = ep->name ;
-	    	    key.len = xstrlen(ep->name) ;
+	    	    key.len = lenstr(ep->name) ;
 	            val.buf = ep ;
 	    	    val.len = sz ;
 	    	    if ((rs = hdb_store(op->dbp,key,val)) >= 0) {

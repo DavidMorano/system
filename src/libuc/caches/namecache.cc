@@ -217,7 +217,7 @@ int namecache_add(NC *op,cchar *un,cchar *rnp,int rnl) noex {
 	        hdb_dat		key ;
 	        hdb_dat		val{} ;
 	        key.buf = un ;
-	        key.len = xstrlen(un) ;
+	        key.len = lenstr(un) ;
 	        if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
 	            NC_ENT	*ep = (NC_ENT *) val.buf ;
 	            rs = entry_update(ep,rnp,rnl) ;
@@ -254,7 +254,7 @@ int namecache_lookup(NC *op,cchar *un,cchar **rpp) noex {
 	            cint	rlen = REALNAMELEN ;
 	            char	rbuf[REALNAMELEN + 1] ;
 	            key.buf = un ;
-	            key.len = xstrlen(un) ;
+	            key.len = lenstr(un) ;
 	            if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
 	                ep = (NC_ENT *) val.buf ;
 	                ep->ti_access = dt ;
@@ -330,7 +330,7 @@ static int namecache_newent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 	        hdb_dat		key ;
 	        hdb_dat		val{} ;
 	        key.buf = ep->username ;
-	        key.len = xstrlen(ep->username) ;
+	        key.len = lenstr(ep->username) ;
 	        val.buf = ep ;
 	        val.len = msize ;
 	        if ((rs = hdb_store(op->dbp,key,val)) >= 0) {
@@ -410,7 +410,7 @@ static int entry_start(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
 	    rs = SR_INVALID ;
 	    memclear(ep) ;
 	    if (up[0]) {
-	        if (rl < 0) rl = xstrlen(rp) ;
+	        if (rl < 0) rl = lenstr(rp) ;
 	        ep->ti_init = dt ;
 	        ep->ti_access = dt ;
 	        ep->realnamelen = rl ;
@@ -444,7 +444,7 @@ static int entry_update(NC_ENT *ep,cchar *rp,int rl) noex {
 	int		f_changed = false ;
 	if (ep && rp) {
 	    rs = SR_OK ;
-	    if (rl < 0) rl = xstrlen(rp) ;
+	    if (rl < 0) rl = lenstr(rp) ;
 	    f_changed = true ;
 	    f_changed = f_changed && (strncmp(ep->realname,rp,rl) == 0) ;
 	    f_changed = f_changed && (ep->realname[rl] == '\0') ;
@@ -473,8 +473,8 @@ static int entry_loadnames(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
 	    uc_free(ep->a) ;
 	    ep->a = nullptr ;
 	}
-	sz += (xstrlen(up)+1) ;
-	sz += (xstrnlen(rp,rl)+1) ;
+	sz += (lenstr(up)+1) ;
+	sz += (lenstr(rp,rl)+1) ;
 	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    ep->a = bp ;
 	    ep->username = bp ;

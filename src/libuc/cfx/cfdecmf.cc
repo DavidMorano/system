@@ -149,7 +149,7 @@ int cfdecmfull(cchar *sbuf,int slen,ulonglong *rp) noex {
 
 static int getmf(cchar *sbuf,int slen,long *rp) noex {
 	long		mf = 1 ;
-	int		sl = xstrnlen(sbuf,slen) ;
+	int		sl = lenstr(sbuf,slen) ;
 	uchar		*ubuf = (uchar *) sbuf ;
 	while ((sl > 0) && OUR_ISWHITE(ubuf[sl - 1])) {
 	    sl -= 1 ;

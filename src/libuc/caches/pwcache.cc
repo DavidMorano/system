@@ -241,7 +241,7 @@ int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
                 int		ct = 0 ;
                 op->s.total += 1 ;
                 key.buf = un ;
-                key.len = cstrlen(un) ;
+                key.len = lenstr(un) ;
                 if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
                     ep = (rec *) val.buf ;
                     ct = ct_hit ;
@@ -309,7 +309,7 @@ int pwcache_invalidate(pwcache *op,cchar *un) noex {
                 hdb_dat   key ;
                 hdb_dat   val{} ;
                 key.buf = un ;
-                key.len = cstrlen(un) ;
+                key.len = lenstr(un) ;
                 if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
                     rec     *ep = (rec *) val.buf ;
                     f_found = true ;
@@ -470,7 +470,7 @@ static int pwcache_recstart(pwcache *op,time_t dt,rec *ep,ureq *rp) noex {
             cint	rsz = szof(rec) ;
             pwl = rs ;
             key.buf = ep->un ;
-            key.len = cstrlen(ep->un) ;
+            key.len = lenstr(ep->un) ;
             val.buf = ep ;
             val.len = rsz ;
             rs = hdb_store(op->dbp,key,val) ;
@@ -523,7 +523,7 @@ static int pwcache_recdel(pwcache *op,rec *ep) noex {
 	{
             hdb_dat	key ;
             key.buf = ep->un ;
-            key.len = cstrlen(ep->un) ;
+            key.len = lenstr(ep->un) ;
             rs1 = hdb_delkey(op->dbp,key) ;
             if (rs >= 0) rs = rs1 ;
 	}

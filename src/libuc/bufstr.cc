@@ -160,7 +160,7 @@ int bufstr_strw(bufstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (char *bp ; (rs = bufstr_extend(op,sl,&bp)) >= 0) {
 	        strwcpy(bp,sp,sl) ;
 	        op->len += sl ;
