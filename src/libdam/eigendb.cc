@@ -224,7 +224,7 @@ int eigendb_addword(eigendb *op,cchar *wp,int wl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = eigendb_magic(op,wp)) >= 0) {
-	    if (wl < 0) wl = xstrlen(wp) ;
+	    if (wl < 0) wl = lenstr(wp) ;
 	    if (wl > 0) {
 		cnullptr	np{} ;
 		cint		rsn = SR_NOTFOUND ;
@@ -258,7 +258,7 @@ int eigendb_addword(eigendb *op,cchar *wp,int wl) noex {
 int eigendb_exists(eigendb *op,cchar *wp,int wl) noex {
 	int		rs ;
 	if ((rs = eigendb_magic(op,wp)) >= 0) {
-	    if (wl < 0) wl = xstrlen(wp) ;
+	    if (wl < 0) wl = lenstr(wp) ;
 	    if (wl > 0) {
 		cnullptr	np{} ;
 	        hdb_dat		key ;

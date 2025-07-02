@@ -481,8 +481,8 @@ int dialtab_search(DT *op,cchar *name,DT_ENT **depp) noex {
 		    f = f && (strchr(sp,'\\') == np) ;
 		    if (f) {
 	                if (strncmp(name,sp,(cp - sp)) == 0) {
-			    cint	l1 = xstrlen(name) ;
-			    int		l2 = xstrlen(sp) ;
+			    cint	l1 = lenstr(name) ;
+			    int		l2 = lenstr(sp) ;
 			    int		l ;
 	                    cp += 1 ;
 	                    l = (sp + l2 - cp) ;

@@ -102,7 +102,7 @@ namespace {
 	} ;
 	int add(cchar *sp,int sl = -1) noex {
 	    int		rs ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    try {
 	        for (int i = 0 ; i < sl ; i += 1) {
 		    b.push_back(sp[i]) ;
@@ -209,7 +209,7 @@ int utf8decoder_load(utf8decoder *op,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	if ((rs = utf8decoder_magic(op,sp)) >= 0) {
 	    cnullptr	np{} ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (widebuf *wbp ; (wbp = widebufp(op->outbuf)) != np) {
 	        while ((rs >= 0) && (sl-- > 0)) {
 		    const wchar_t	uch = mkchar(*sp++) ;

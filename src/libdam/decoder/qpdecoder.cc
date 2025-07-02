@@ -187,7 +187,7 @@ int qpdecoder_load(qpdecoder *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = qpdecoder_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
 	        if (op->f.space) {
 	            rs = qpdecoder_loadspace(op,sp,sl) ;

@@ -453,7 +453,7 @@ int ipasswd_fetch(ipasswd *op,realname *rp,ipasswd_cur *curp,
                         cp = strwcpy(up,(op->stab + ui),IPASSWD_USERNAMELEN) ;
                         ul = intconv(cp - up) ;
                     } else {
-                        ul = xstrlen(op->stab + ui) ;
+                        ul = lenstr(op->stab + ui) ;
                     }
                     /* update cursor */
                     if (f_cur) {
@@ -563,7 +563,7 @@ int ipasswd_curenum(ipasswd *op,ipasswd_cur *curp,char *ubuf,cc **sa,
 	                            cp = strwcpy(ubuf,(op->stab + ui),ulen) ;
 	                            ul = intconv(cp - ubuf) ;
 	                        } else {
-	                            ul = xstrlen(op->stab + ui) ;
+	                            ul = lenstr(op->stab + ui) ;
 	                        }
 				/* update the cursor */
 	            		curp->i[0] = ri ;
@@ -783,7 +783,7 @@ int ipasswd_curfetch(ipasswd *op,ipasswd_cur *curp,int opts,char *ubuf,
 	                    cp = strwcpy(ubuf,(op->stab + ui),ulen) ;
 	                    ul = intconv(cp - ubuf) ;
 	                } else {
-	                    ul = xstrlen(op->stab + ui) ;
+	                    ul = lenstr(op->stab + ui) ;
 	                }
 
 /* update cursor */
@@ -1141,7 +1141,7 @@ static int detOurSuf(cchar *suf,cchar *fname,int fl) noex {
 	if ((cl = sfbasename(fname,fl,&cp)) > 0) {
 	    cchar	*tp ;
 	    if ((tp = strnrchr(cp,cl,'.')) != nullptr) {
-	        cint	suflen = xstrlen(suf) ;
+	        cint	suflen = lenstr(suf) ;
 	        if (strncmp((tp+1),suf,suflen) == 0) {
 	            len = intconv(tp - fname) ;
 	        }
