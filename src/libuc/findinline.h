@@ -1,5 +1,5 @@
 /* findinline JEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* find a TeX-type in-line text escape */

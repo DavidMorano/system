@@ -1,5 +1,5 @@
 /* findfilepath SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to try to find a file in the specified directory path */
@@ -62,7 +62,7 @@
 #include	<mkpathx.h>
 #include	<ids.h>
 #include	<getpwd.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -178,7 +178,7 @@ static int fileperm(ids *idp,cchar *fn,int am) noex {
 	int		f = false ;
 	if (USTAT sb ; (rs = u_stat(fn,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode))  {
-	        if ((rs = sperm(idp,&sb,am)) >= 0) {
+	        if ((rs = permid(idp,&sb,am)) >= 0) {
 		    f = true ;
 		} else if (isNotAccess(rs)) {
 		    rs = SR_OK ;

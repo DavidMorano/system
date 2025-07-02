@@ -1,5 +1,5 @@
 /* findxfile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find an executable file */
@@ -55,6 +55,7 @@
 #include	<mkpathx.h>
 #include	<pathclean.h>
 #include	<xfile.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"findxfile.h"
@@ -93,6 +94,7 @@ import uconstants ;
 /* exported subroutines */
 
 int findxfile(ids *idp,char *rbuf,cchar *pn) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -109,12 +111,12 @@ int findxfile(ids *idp,char *rbuf,cchar *pn) noex {
 	            if (vecstr plist ; (rs = plist.start(vn,vo)) >= 0) {
 		        cchar	*sp = path ;
 	                if (char *cbuf{} ; (rs = malloc_mp(&cbuf)) >= 0) {
-		            cchar	*tp ;
-	                    while ((tp = strpbrk(sp,":;")) != nullptr) {
-	                        if ((tp-sp) == 0) {
+	                    for (cc *tp ; (tp = strbrk(sp,":;")) != np ; ) {
+				cint tl = intconv(tp - sp) ;
+	                        if ((tp - sp) == 0) {
 	                            f_pwd = true ;
 		                }
-	                        if ((rs = pathclean(cbuf,sp,(tp - sp))) >= 0) {
+	                        if ((rs = pathclean(cbuf,sp,tl)) >= 0) {
 	                            rs = plist.adduniq(cbuf,rs) ;
 	                        }
 	                        sp = (tp + 1) ;
