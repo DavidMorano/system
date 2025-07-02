@@ -1,5 +1,5 @@
 /* getmailgid SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the GID for the group 'mail' or the mail-spool area */

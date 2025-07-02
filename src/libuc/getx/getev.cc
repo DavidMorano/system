@@ -1,5 +1,5 @@
 /* getev SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get an environment variable by name */
@@ -87,7 +87,7 @@ int getev(mainv envv,cchar *kp,int kl,cchar **rpp) noex {
 	        if (int ei ; (ei = matkeystr(envv,kp,kl)) >= 0) {
 	            if ((vp = strchr(envv[ei],'=')) != nullptr) {
 	                vp += 1 ;
-	                vl = xstrlen(vp) ;
+	                vl = lenstr(vp) ;
 	            }
 	        } else {
 	            rs = SR_NOTFOUND ;

@@ -1,5 +1,5 @@
 /* geteaddrinfo SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to get a canonical hostname */
@@ -234,7 +234,7 @@ static int subinfo_domain(SUBINFO *mip) noex {
 	    if ((rs = malloc_hn(&dbuf)) >= 0) {
 	        if ((rs = getnodedomain(nullptr,dbuf)) >= 0) {
 	            cchar	*dp{} ;
-	            len = xstrlen(dbuf) ;
+	            len = lenstr(dbuf) ;
 	            if ((rs = uc_mallocstrw(dbuf,len,&dp)) >= 0) {
 	                mip->domainname = dp ;
 		    }
@@ -243,7 +243,7 @@ static int subinfo_domain(SUBINFO *mip) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
-	    len = xstrlen(mip->domainname) ;
+	    len = lenstr(mip->domainname) ;
 	}
 	return (rs >= 0) ? len : rs ;
 }

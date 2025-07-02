@@ -1,5 +1,5 @@
 /* gethz HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* get the HZ ("hertz") value from the operating system */

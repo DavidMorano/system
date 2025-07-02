@@ -1,5 +1,5 @@
 /* getfdfile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get an FD out of an FD-File name (if there is one) */
@@ -89,7 +89,7 @@ int getfdfilex(cchar *fp,int fl) noex {
 	int 		fd = -1 ;
 	if (fp) {
 	    rs = SR_INVALID ;
-	    if (fl < 0) fl = xstrlen(fp) ;
+	    if (fl < 0) fl = lenstr(fp) ;
 	    if ((fl > 0) && fp[0]) {
 		rs = SR_DOM ;
 		if ((fl >= 2) && isstar(fp[0])) {
@@ -123,7 +123,7 @@ int getfdfilex(cchar *fp,int fl) noex {
 static int extfd(cchar *sp,int sl) noex {
 	int		rs = SR_DOM ;
 	int		fd = -1 ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if ((sl > 0) && isstar(*sp)) {
 	   rs = SR_BADFD ;
 	   sp += 1 ;
