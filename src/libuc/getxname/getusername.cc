@@ -1,5 +1,5 @@
 /* getusername SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the best approximation of the user's username */
@@ -120,7 +120,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* <- for |uid_t| */
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
@@ -150,7 +149,7 @@
 
 /* local defines */
 
-#define	GETXSTATE	struct getxusername_state
+#define	GETXSTATE	getxusername_state
 
 #define	DEBFNAME	"/var/tmp/debuguid.txt"
 

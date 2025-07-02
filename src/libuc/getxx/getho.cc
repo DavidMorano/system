@@ -1,5 +1,5 @@
 /* getho SUPPORT (Get Host Entry) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a host entry from the system database */
