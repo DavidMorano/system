@@ -1,5 +1,5 @@
 /* gecos SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* parse a GECOS field located in a buffer */
@@ -335,8 +335,8 @@ int gecoshelp::finish() noex {
 void gecoshelp::organization() noex {
 	if (cchar *tp ; (tp = strnchr(bp,bl,'-')) != np) {
 	    bool	f = false ;
-	    f = f || (strnpbrk(tp,(bl - (tp - bp)),brkleft) != nullptr) ;
-	    f = f || (strnpbrk(bp,(tp - bp),brkleft) == nullptr) ;
+	    f = f || (strnbrk(tp,(bl - (tp - bp)),brkleft) != nullptr) ;
+	    f = f || (strnbrk(bp,(tp - bp),brkleft) == nullptr) ;
 	    if (f) {
 	        n += 1 ;
 	        op->vals[gecosval_organization].vp = bp ;
@@ -349,7 +349,7 @@ void gecoshelp::organization() noex {
 /* end method (gecoshelp::organization) */
 
 void gecoshelp::realname() noex {
-	if (cchar *tp ; (tp = strnpbrk(bp,bl,brkleft)) != np) {
+	if (cchar *tp ; (tp = strnbrk(bp,bl,brkleft)) != np) {
 	    if (tp[0] == CH_LPAREN) fparen = true ;
 	    n += 1 ;
 	    op->vals[gecosval_realname].vp = bp ;
@@ -366,7 +366,7 @@ void gecoshelp::realname() noex {
 /* end method (gecoshelp::realname) */
 
 void gecoshelp::account() noex {
-	if (cchar *tp ; fparen && ((tp = strnpbrk(bp,bl,brkright)) != np)) {
+	if (cchar *tp ; fparen && ((tp = strnbrk(bp,bl,brkright)) != np)) {
 	    if (tp[0] == CH_RPAREN) fparen = false ;
 	    if (tp - bp) {
 	        n += 1 ;
@@ -386,7 +386,7 @@ void gecoshelp::account() noex {
 
 void gecoshelp::bin() noex {
 	if (fparen) {
-	    if (cchar *tp ; (tp = strnpbrk(bp,bl,brkright)) != np) {
+	    if (cchar *tp ; (tp = strnbrk(bp,bl,brkright)) != np) {
 	        if (tp[0] == CH_RPAREN) fparen = false ;
 	        if ((tp - bp) && (op->vals[gecosval_bin].vp == nullptr)) {
 	            n += 1 ;
@@ -406,7 +406,7 @@ void gecoshelp::bin() noex {
 /* end method (gecoshelp::bin) */
 
 void gecoshelp::office() noex {
-	if (cchar *tp ; (tp = strnpbrk(bp,bl,brkright)) != np) {
+	if (cchar *tp ; (tp = strnbrk(bp,bl,brkright)) != np) {
 	    if (tp - bp) {
 	        n += 1 ;
 	        op->vals[gecosval_office].vp = bp ;
@@ -424,7 +424,7 @@ void gecoshelp::office() noex {
 /* end method (gecoshelp::office) */
 
 void gecoshelp::wphone() noex {
-	if (cchar *tp ; (tp = strnpbrk(bp,bl,brkright)) != np) {
+	if (cchar *tp ; (tp = strnbrk(bp,bl,brkright)) != np) {
 	    if (tp - bp) {
 	        n += 1 ;
 	        op->vals[gecosval_wphone].vp = bp ;
@@ -442,7 +442,7 @@ void gecoshelp::wphone() noex {
 /* end method (gecoshelp::wphone) */
 
 void gecoshelp::hphone() noex {
-	if (cchar *tp ; (tp = strnpbrk(bp,bl,brkright)) != np) {
+	if (cchar *tp ; (tp = strnbrk(bp,bl,brkright)) != np) {
 	    if (tp - bp) {
 	        n += 1 ;
 	        op->vals[gecosval_hphone].vp = bp ;
@@ -460,7 +460,7 @@ void gecoshelp::hphone() noex {
 /* end method (gecoshelp::hphone) */
 
 void gecoshelp::printer() noex {
-	if (cchar *tp ; (tp = strnpbrk(bp,bl,brkright)) != np) {
+	if (cchar *tp ; (tp = strnbrk(bp,bl,brkright)) != np) {
 	    if (tp - bp) {
 	        n += 1 ;
 	        op->vals[gecosval_printer].vp = bp ;
