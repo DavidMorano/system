@@ -244,7 +244,7 @@ int subinfo::expln(cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (strnchr(sp,sl,'%') != nullptr) {
 	    cint	bsz = (sl + 20) ;
 	    if (buffer b ; (rs = b.start(bsz)) >= 0) {
@@ -550,7 +550,7 @@ int subinfo::def(buffer *bp,cchar *kp,int kl) noex {
 		bool	f_found = false ;
 	        if ((rs = vecstr_searchl(dlp,kp,kl,vs,&cp)) >= 0) {
 		    f_found = true ;
-	            cl = xstrlen(cp) ;
+	            cl = lenstr(cp) ;
 	            if (cc *tp ; (tp = strchr(cp,'=')) != nullptr) {
 	                cl -= intconv((tp + 1) - cp) ;
 	                cp = (tp + 1) ;

@@ -228,7 +228,7 @@ int dirlist_adds(dirlist *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = dirlist_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    for (cc *tp ; (tp = strnbrk(sp,sl,":; \t,")) != np ; ) {
 	        cchar	*cp = sp ;
 	        cint	cl = intconv(tp - sp) ;
@@ -257,7 +257,7 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		f_added = false ;
 	if ((rs = dirlist_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) {
 	        int	pl{} ;
 	        if ((sl == 0) || ((sl == 1) && (sp[0] == '.'))) {

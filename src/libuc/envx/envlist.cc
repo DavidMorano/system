@@ -164,11 +164,11 @@ int envlist_addkeyval(envlist *op,cchar *kp,cchar *vp,int vl) noex {
 	int		rs1 ;
 	int		ridx = 0 ;
 	if (op && kp) {
-	    int		kl = xstrlen(kp) ;
+	    int		kl = lenstr(kp) ;
 	    int		sz = 1 ;
 	    sz += (kl+1) ;
 	    if (vp) {
-	        if (vl < 0) vl = xstrlen(vp) ;
+	        if (vl < 0) vl = lenstr(vp) ;
 	        sz += vl ;
 	    }
 	    if (char *ep{} ; (rs = uc_malloc(sz,&ep)) >= 0) {
@@ -196,7 +196,7 @@ int envlist_add(envlist *op,cchar *sp,int sl) noex {
 	    ENVLIST_DBDATA	key ;
 	    ENVLIST_DBDATA	val ;
 	    int			kl ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    kl = sl ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
 		kl = intconv(tp - sp) ; /* overwrite previous value */
@@ -228,7 +228,7 @@ int envlist_present(envlist *op,cchar *sp,int sl,cchar **rpp) noex {
 	    ENVLIST_DBDATA	key ;
 	    ENVLIST_DBDATA	val{} ;
 	    int			kl = 0 ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    kl += sl ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
 		kl = intconv(tp - sp) ; /* overwrite previous value */

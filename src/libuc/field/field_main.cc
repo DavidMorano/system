@@ -165,7 +165,7 @@ int field_start(field *fsbp,cchar *lp,int ll) noex {
 	    fsbp->fp = nullptr ;
 	    fsbp->fl = 0 ;
 	    fsbp->term = '\0' ;
-	    if (ll < 0) ll = xstrlen(lp) ;
+	    if (ll < 0) ll = lenstr(lp) ;
 	    while ((ll > 0) && char_iswhite(*lp)) {
 	        lp += 1 ;
 	        ll -= 1 ;

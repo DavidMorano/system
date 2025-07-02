@@ -74,7 +74,7 @@ namespace {
 	int		namelen ;
 	dirseen_ent() noex : name(nullptr), namelen(0), dev(0L), ino(0L) { } ;
 	dirseen_ent(cchar *sp,int sl = -1) noex : name(sp) {
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    namelen = sl ;
 	} ;
 	dirseen_ent(dev_t d,ino_t i) noex : dev(d), ino(i) { } ;
@@ -174,7 +174,7 @@ int dirseen_add(dirseen *op,cchar *sp,int sl,USTAT *sbp) noex {
 	            pp = "." ;
 	            pl = 1 ;
 	        } else {
-	            if (pl < 0) pl = cstrlen(pp) ;
+	            if (pl < 0) pl = lenstr(pp) ;
 	 	}
 	        if ((rs = entry_start(&e,pp,pl,dev,ino)) >= 0) {
 	            op->strsize += rs ;

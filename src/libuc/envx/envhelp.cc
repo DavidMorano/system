@@ -197,10 +197,10 @@ int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
 	if (op && kp) {
 	    vechand	*elp = op->elp ;
 	    int		elen = 1 ; /* for the equals sign character */
-	    elen += xstrlen(kp) ;
+	    elen += lenstr(kp) ;
 	    if (vp) {
-	        if (vl < 0) vl = xstrlen(vp) ;
-	        elen += xstrnlen(vp,vl) ;
+	        if (vl < 0) vl = lenstr(vp) ;
+	        elen += lenstr(vp,vl) ;
 	    }
 	    if (char *ebuf{} ; (rs = uc_malloc((elen+1),&ebuf)) >= 0) {
 	        cchar		*ep{} ;

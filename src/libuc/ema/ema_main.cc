@@ -180,7 +180,7 @@ int ema_parse(ema *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = ema_magic(op,sp)) >= 0) {
 	    asstr	desc ;
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    desc.sp = charp(sp) ;
 	    desc.sl = sl ;
 	    if ((rs = ema_parseit(op,&desc)) > 0) {
@@ -524,7 +524,7 @@ static int ema_parseit(ema *op,asstr *bp) noex {
 
 static int ema_load(ema *op,cchar *orig,int olen,asstr *as,ema *nlp) noex {
 	int		rs = SR_OK ;
-	if (olen < 0) olen = cstrlen(orig) ;
+	if (olen < 0) olen = lenstr(orig) ;
 	if (olen > 0) {
 	    cint	sz = szof(ema_ent) ;
 	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
@@ -537,7 +537,7 @@ static int ema_load(ema *op,cchar *orig,int olen,asstr *as,ema *nlp) noex {
 	                if (as[i].sp && as[i].sp[0]) {
 	                    sp = as[i].sp ;
 	                    sl = as[i].sl ;
-	                    if (sl < 0) sl = cstrlen(sp) ;
+	                    if (sl < 0) sl = lenstr(sp) ;
 	                    switch (i) {
 	                    case si_address:
 	                        if ((sl >= 1) &&
@@ -650,7 +650,7 @@ static int malloccompactstr(cchar *sp,int sl,char **rpp) noex {
 	int		len = 0 ; /* return-value */
 	int		f_quote = false ;
 	uchar		*buf{} ;
-	if (sl < 0) sl = cstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	sz = (sl + 1) ;
 	if ((rs = uc_malloc(sz,&buf)) >= 0) {
 	    uchar	*bp = buf ;
@@ -683,7 +683,7 @@ static int malloccompactstr(cchar *sp,int sl,char **rpp) noex {
 static int malloccompactstr(cchar *sp,int sl,char **rpp) noex {
 	int		rs ;
 	int		len = 0 ; /* return-value */
-	if (sl < 0) sl = cstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (asstr s ; (rs = asstr_start(&s)) >= 0) {
 	    bool	f_quote = false ;
 	    while ((rs >= 0) && (sl > 0)) {
