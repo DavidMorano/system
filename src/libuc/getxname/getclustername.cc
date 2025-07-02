@@ -1,5 +1,5 @@
 /* getclustername SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a cluster name given a nodename */
@@ -86,7 +86,7 @@
 #include	<sncpyx.h>
 #include	<mkpathx.h>
 #include	<ids.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -258,10 +258,10 @@ int searcher::getprs() noex {
 		        for (cauto &pr : prs) {
 		            if ((rs = mkpath(pbuf,nodefname)) >= 0) {
 			        if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
-			            if ((rs = sperm(&id,&sb,am)) >= 0) {
+			            if ((rs = permid(&id,&sb,am)) >= 0) {
     				        rs = prgetclustername(pr,rbuf,rlen,nn) ;
     				        len = rs ;
-				    } /* end if (sperm) */
+				    } /* end if (permid) */
 			        } /* end if (stat) */
 		            } /* end if (mkpath) */
 		            if (rs != 0) break ;

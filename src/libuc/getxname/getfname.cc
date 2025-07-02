@@ -1,5 +1,5 @@
 /* getfname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++21 */
 
 /* get a file name according to rules */
@@ -64,7 +64,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<mkpathx.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 

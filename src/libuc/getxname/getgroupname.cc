@@ -1,5 +1,5 @@
 /* getgroupname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a groupname by GID */
@@ -181,7 +181,7 @@ int helper::finish() noex {
 
 helper::operator int () noex {
 	int		rs = SR_OK ;
-	for (const auto &m : mems) {
+	for (cauto &m : mems) {
 	    rs = (this->*m)() ;
 	    if (rs != SR_OK) break ;
 	}
