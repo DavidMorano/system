@@ -1265,8 +1265,8 @@ static int filehead(MSGID_FH *hp,cfm fm,char *mbuf) noex {
 
 static uint keyhash(msgid_key *kp) noex {
 	uint		khash = 0 ;
-	cint		reclen = xstrnlen(kp->recip,var.lrecip) ;
-	cint		midlen = xstrnlen(kp->msgid,var.lmsgid) ;
+	cint		reclen = lenstr(kp->recip,var.lrecip) ;
+	cint		midlen = lenstr(kp->msgid,var.lmsgid) ;
 	khash += hash_elf(kp->recip,reclen) ;
 	khash += hash_elf(kp->msgid,midlen) ;
 	return khash ;

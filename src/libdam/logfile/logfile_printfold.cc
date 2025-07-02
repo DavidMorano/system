@@ -72,7 +72,7 @@ static int logfile_pfi(logfile *,int,cchar *,int,cchar *,int) noex ;
 /* exported subroutines */
 
 int logfile_printfold(logfile *lhp,cchar *pre,cchar *sp,int sl) noex {
-	cint		pl = xstrlen(pre) ;
+	cint		pl = lenstr(pre) ;
 	int		rs ;
 	int		rs1 ;
 	int		n ;

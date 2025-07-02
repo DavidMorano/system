@@ -224,7 +224,7 @@ int msgide::rdu(char *mbuf,int mlen) noex {
 int msgide::loadrec(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (sp) {
-	    if (sl < 0) sl = xstrnlen(sp,len.recipient) ;
+	    if (sl < 0) sl = lenstr(sp,len.recipient) ;
 	    rs = SR_INVALID ;
 	    if (sl > 0) {
 		rs = snwcpy(recipient,len.recipient,sp,sl) ;
@@ -237,7 +237,7 @@ int msgide::loadrec(cchar *sp,int sl) noex {
 int msgide::loadmid(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (sp) {
-	    if (sl < 0) sl = xstrnlen(sp,len.messageid) ;
+	    if (sl < 0) sl = lenstr(sp,len.messageid) ;
 	    rs = SR_INVALID ;
 	    if (sl > 0) {
 		rs = snwcpy(messageid,len.messageid,sp,sl) ;

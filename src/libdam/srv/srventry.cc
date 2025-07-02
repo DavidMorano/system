@@ -262,7 +262,7 @@ static int expand(cchar *buf,int len,SE_ARGS *esap,
 	    return 0 ;
 
 	if (len < 0)
-	    len = xstrlen(buf) ;
+	    len = lenstr(buf) ;
 
 	rlen -= 1 ;			/* reserve for zero terminator */
 	while ((len > 0) && (elen < rlen)) {
@@ -278,23 +278,23 @@ static int expand(cchar *buf,int len,SE_ARGS *esap,
 	        switch ((int) *bp) {
 	        case 'V':
 	            cp = esap->version ;
-	            sl = xstrlen(cp) ;
+	            sl = lenstr(cp) ;
 	            break ;
 	        case 'S':
 	            cp = esap->searchname ;
-	            sl = xstrlen(cp) ;
+	            sl = lenstr(cp) ;
 	            break ;
 	        case 'R':
 	            cp = esap->programroot ;
-	            sl = xstrlen(cp) ;
+	            sl = lenstr(cp) ;
 	            break ;
 	        case 'N':
 	            cp = esap->nodename ;
-	            sl = xstrlen(cp) ;
+	            sl = lenstr(cp) ;
 	            break ;
 	        case 'D':
 	            cp = esap->domainname ;
-	            sl = xstrlen(cp) ;
+	            sl = lenstr(cp) ;
 	            break ;
 	        case 'H':
 	            sl = -1 ;
@@ -308,28 +308,28 @@ static int expand(cchar *buf,int len,SE_ARGS *esap,
 	                cp = esap->hostname ;
 		    }
 	            if (sl < 0) {
-	                sl = xstrlen(cp) ;
+	                sl = lenstr(cp) ;
 		    }
 	            break ;
 
 		case 'U':
 	            cp = esap->username ;
 	            if (cp != nullptr)
-	                sl = xstrlen(cp) ;
+	                sl = lenstr(cp) ;
 
 		    break ;
 
 	        case 'P':
 	            cp = esap->peername ;
 	            if (cp != nullptr)
-	                sl = xstrlen(cp) ;
+	                sl = lenstr(cp) ;
 
 	            break ;
 
 	        case 's':
 	            cp = esap->service ;
 	            if (cp != nullptr)
-	                sl = xstrlen(cp) ;
+	                sl = lenstr(cp) ;
 
 	            break ;
 
@@ -337,28 +337,28 @@ static int expand(cchar *buf,int len,SE_ARGS *esap,
 
 	            cp = esap->svcargs ;
 	            if (cp != nullptr)
-	                sl = xstrlen(cp) ;
+	                sl = lenstr(cp) ;
 
 	            break ;
 
 	        case 'h':
 	            cp = esap->nethost ;
 	            if (cp != nullptr)
-	                sl = xstrlen(cp) ;
+	                sl = lenstr(cp) ;
 
 	            break ;
 
 	        case 'u':
 	            cp = esap->netuser ;
 	            if (cp != nullptr)
-	                sl = xstrlen(cp) ;
+	                sl = lenstr(cp) ;
 
 	            break ;
 
 	        case 'p':
 	            cp = esap->netpass ;
 	            if (cp != nullptr)
-	                sl = xstrlen(cp) ;
+	                sl = lenstr(cp) ;
 
 	            break ;
 
