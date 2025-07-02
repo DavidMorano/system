@@ -1,5 +1,5 @@
 /* getenver SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the value of an environment variable */
@@ -79,7 +79,7 @@ extern mainv	environ ;
 cchar *getenver(cchar *kp,int kl) noex {
 	cchar		*vp = nullptr ;
 	if (kp) {
-	    if (kl < 0) kl = xstrlen(kp) ;
+	    if (kl < 0) kl = lenstr(kp) ;
 	    if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
 		kl = intconv(tp - kp) ;
 	    }

@@ -1,5 +1,5 @@
 /* getcols SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* calculate number of columns used by a line of characters */
@@ -46,7 +46,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |nxstrlen(3c)| */
+#include	<cstring>		/* |nlenstr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -84,7 +84,7 @@ import libutil ;
 int getcols(int ntab,int ccol,int ncols,cchar *lbuf,int llen) noex {
 	cint		tcol = (ccol + ncols) ;
 	int		i = 0 ; /* return-value */
-	if (llen < 0) llen = xstrlen(lbuf) ;
+	if (llen < 0) llen = lenstr(lbuf) ;
 	if (ccol < tcol) {
 	    for (i = 0 ; (ccol < tcol) && (i < llen) ; i += 1) {
 	        cint	cols = charcols(ntab,ccol,lbuf[i]) ;
