@@ -75,7 +75,7 @@ import libutil ;
 
 cchar *strbasename(cchar *s) noex {
 	int		si = 0 ;
-	int		sl = xstrlen(s) ;
+	int		sl = lenstr(s) ;
 	/* remove trailing slash characters */
 	while ((sl > 1) && (s[sl - 1] == '/')) {
 	    sl -= 1 ;

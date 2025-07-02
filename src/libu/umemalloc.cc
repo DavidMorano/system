@@ -100,7 +100,7 @@ namespace libu {
     int umemallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rpp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (char *bp ; (rs = umemalloc((sl + 1),&bp)) >= 0) {
 	        *rpp = bp ;
 	        strncpy(bp,sp,sl) ;

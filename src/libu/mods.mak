@@ -36,7 +36,7 @@ DEFS +=
 INCS += umods.h
 
 MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm 
-MODS += libutil.ccm bitop.ccm
+MODS += bitop.ccm
 MODS += xxtostr.ccm digtab.ccm
 MODS += usysconf.ccm ulibvals.ccm
 MODS += usigset.o usigblock.o
@@ -67,7 +67,7 @@ SOFL= -shared
 
 
 OBJ00_UMODS = valuelims.o digbufsizes.o 
-OBJ01_UMODS = uconstants.o libutil.o
+OBJ01_UMODS = uconstants.o
 OBJ02_UMODS = xxtostr.o digtab.o bitop.o
 OBJ03_UMODS = usysconf.o ulibvals.o 
 OBJ04_UMODS = usigset.o usigblock.o 
@@ -223,7 +223,6 @@ usigset.o:		usigset.ccm
 constdiv.o:		constdiv.ccm
 builtin.o:		builtin.ccm
 bitop.o:		bitop.ccm
-libutil.o:		libutil.ccm			$(INCS)
 
 # VALUELIMS (module)
 valuelims.o:		valuelims.ccm			$(INCS)
