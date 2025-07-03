@@ -1,5 +1,5 @@
 /* manstr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* special string manipulations */
@@ -57,7 +57,7 @@ namespace {
 	    return CHAR_ISWHITE(ch) && (ch != sch) ;
 	} ;
     } ; /* end struct (whitestop) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -107,7 +107,7 @@ int manstr_breakfield(manstr *sop,cchar *ss,cchar **rpp) noex {
 	        }
 	        if (sop->sl > 0) {
 	            *rpp = sop->sp ;
-	            if ((si = sibreak(sop->sp,sop->sl,ss)) >= 0) {
+	            if ((si = sibrk(sop->sp,sop->sl,ss)) >= 0) {
 	                rl = si ;
 	                sop->sp += (si + 1) ;
 	                sop->sl -= (si + 1) ;
@@ -134,8 +134,7 @@ int manstr_whitechr(manstr *sop,int sch) noex {
 /* end subroutine (manstr_whitecolon) */
 
 int manstr_span(manstr *sop,cchar *stuff) noex {
-	int		si ;
-	if ((si = sispan(sop->sp,sop->sl,stuff)) > 0) {
+	if (int si ; (si = sispan(sop->sp,sop->sl,stuff)) > 0) {
 	    sop->sp += si ;
 	    sop->sl -= si ;
 	}
