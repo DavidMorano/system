@@ -1,5 +1,5 @@
 /* hasnonpath SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine if the given string represent a non-path filename */
@@ -92,7 +92,7 @@ bool hasnonpath(cchar *fp,int fl) noex {
 	if (fl < 0) fl = strlen(fp) ;
 	if (f) {
 	    f = false ;
-	    if (cchar *tp ; (tp = strnpbrk(fp,fl,nonpaths)) != nullptr) {
+	    if (cchar *tp ; (tp = strnbrk(fp,fl,nonpaths)) != nullptr) {
 	        if (((tp - fp) > 0) && (tp[1] != '\0')) {
 	            f = sichr(nonpaths,-1,*tp) ;
 	        }

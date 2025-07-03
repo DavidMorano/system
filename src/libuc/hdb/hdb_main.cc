@@ -1,5 +1,5 @@
 /* hdb_main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* general-purpose in-core hashing */
@@ -288,7 +288,7 @@ static inline int defcmpfun(cvoid *s1,cvoid *s2,int sl) noex {
 
 static inline int voidlen(cvoid *buf) noex {
 	cchar	*s = charp(buf) ;
-	return xstrlen(s) ;
+	return lenstr(s) ;
 }
 
 consteval CUR mkcurnull() noex {

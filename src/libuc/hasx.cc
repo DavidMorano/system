@@ -1,5 +1,5 @@
 /* hasx SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* has a counted c-string some characteristic? */
@@ -312,7 +312,10 @@
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |strcmp(3c)| */
-#include	<usupport.h>		/* |cstrlen(3u)| + |xstrlen(3u)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<ascii.h>
 #include	<strn.h>
 #include	<syswords.hh>		/* *unused* - see |ulibvals(3u)| */
@@ -323,6 +326,7 @@
 
 #include	"hasx.h"
 
+import libutil ;			/* |lenstr(3u)| */
 import ulibvals ;			/* |ulibval(3u)| */
 
 /* local defines */
@@ -336,6 +340,15 @@ import ulibvals ;			/* |ulibval(3u)| */
 
 
 /* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -422,7 +435,7 @@ bool hasempty(cchar *sp,int sl) noex {
 bool hasdots(cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp[0] == '.') {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    f = f || (sl == 1) ;
 	    f = f || ((sl == 2) && (sp[1] == '.')) ;
 	}
@@ -726,7 +739,7 @@ bool hasmacro(cchar *lp,int ll) noex {
 /* end subroutine (hasmacro) */
 
 bool hasvalidmagic(cchar *tbuf,int tlen,cchar *ms) noex {
-	cint		ml = strlen(ms) ;
+	cint		ml = lenstr(ms) ;
 	bool		f = false ;
 	if (tlen >= (ml + 1)) {
 	    f = true ;
@@ -740,7 +753,7 @@ bool hasvalidmagic(cchar *tbuf,int tlen,cchar *ms) noex {
 bool hasnotdots(cchar *sp,int sl) noex {
 	bool		f = true ;
 	if (sp[0] == '.') {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if_constexpr (f_hasnotdotswitch) {
 	        switch (sl) {
 	        case 1:
@@ -753,7 +766,7 @@ bool hasnotdots(cchar *sp,int sl) noex {
 	    } else {
 	        if (sl <= 2) {
 	            f = (sl != 1) ;
-	            if ((!f) && (sl == 2)) f = (sp[1] != '.') ;
+	            if ((! f) && (sl == 2)) f = (sp[1] != '.') ;
 	        }
 	    } /* end if_constexpr (f_hasnotdotswitch) */
 	} /* end if (had a leading dot) */
@@ -776,7 +789,7 @@ bool hasnotempty(cchar *sp,int sl) noex {
 
 bool hasmealone(cchar *sp,int sl) noex {
 	bool		f = false ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (sl == 1) {
 	    cint	ch = mkchar(*sp) ;
 	    switch (ch) {
@@ -795,12 +808,13 @@ bool hasinet4addrstr(cchar *sp,int sl) noex {
 	bool		f = true ;
 	int		c = 0 ;
 	cchar		*tp ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	while ((tp = strnchr(sp,sl,'.')) != nullptr) {
-	    f = hasINET4Num(sp,(tp-sp)) ;
+	    cint tl = intconv(tp - sp) ;
+	    f = hasINET4Num(sp,tl) ;
 	    if (! f) break ;
-	    sl -= ((tp+1)-sp) ;
-	    sp = (tp+1) ;
+	    sl -= intconv((tp + 1) - sp) ;
+	    sp = (tp + 1) ;
 	    c += 1 ;
 	} /* end while */
 	if (f && (sl > 0)) {
