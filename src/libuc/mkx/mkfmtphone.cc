@@ -1,5 +1,5 @@
 /* mkfmtphone SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* similar to |snwcpy(3dam)| but formatting a phone number */
@@ -84,7 +84,7 @@ int mkfmtphone(char *dbuf,int dlen,cchar *pp,int pl) noex {
 	int		sl ;
 	cchar		*sp ;
 	if ((sl = sfshrink(pp,pl,&sp)) > 0) {
-	    if (strnpbrk(sp,sl,"-()") == nullptr) {
+	    if (strnbrk(sp,sl,"-()") == nullptr) {
 	        cint	tlen = sl ;
 	        char	*tbuf ;
 	        if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {

@@ -1,5 +1,5 @@
 /* mkexpandpath SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make an expanded path */
@@ -87,7 +87,7 @@ int mkexpandpath(char *rbuf,cchar *pp,int pl) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (rbuf && pp) {
-	    if (pl < 0) pl = cstrlen(pp) ;
+	    if (pl < 0) pl = lenstr(pp) ;
 	    rbuf[0] = '\0' ;
 	    if ((rs = mkuserpath(rbuf,nullptr,pp,pl)) == 0) {
 	        if ((rs = mkvarpath(rbuf,pp,pl)) == 0) {
