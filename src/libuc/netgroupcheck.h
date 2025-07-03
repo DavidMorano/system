@@ -1,5 +1,5 @@
 /* netgroupcheck HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* Make-a-Quoted c-string (from a source c-string) */
