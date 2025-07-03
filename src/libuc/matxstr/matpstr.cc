@@ -1,5 +1,5 @@
 /* matpstr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* match a partial string */
@@ -140,7 +140,7 @@ int matpfoldstr(mainv a,int n,cchar *sp,int sl) noex {
 
 int mater::matpxstr(mainv a,int n,cchar *sp,int sl) noex {
 	int		si = -1 ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (n >= 0) {
 	    cint	lch = toxc(sp[0]) ;
 	    int		m_max = 0 ;
