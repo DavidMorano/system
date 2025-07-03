@@ -1,5 +1,5 @@
 /* mkcdpath SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* try to make a prefix-variable path of type CDPATH */
@@ -70,6 +70,7 @@
 #include	<storebuf.h>
 #include	<sfx.h>
 #include	<strn.h>
+#include	<pathadd.h>
 #include	<strwcpy.h>
 #include	<mkchar.h>
 #include	<isnot.h>
@@ -78,7 +79,7 @@
 #include	"mkx.h"
 
 import libutil ;
-import  uconstants ;
+import uconstants ;
 
 /* local defines */
 
@@ -88,9 +89,6 @@ import  uconstants ;
 
 
 /* external subroutines */
-
-extern "C" int	pathadd(char *,int,cchar *) noex ;
-extern "C" int	pathaddw(char *,int,cchar *,int) noex ;
 
 extern "C" cchar	*getenver(cchar *,int) noex ;
 
@@ -186,7 +184,7 @@ int mkcdpath(char *ebuf,cchar *fp,int fl) noex {
 	if (ebuf && fp) {
 	    cint	ec = CH_OUREXPAND ;
 	    ebuf[0] = '\0' ;
-	    if (fl < 0) fl = cstrlen(fp) ;
+	    if (fl < 0) fl = lenstr(fp) ;
 	    if ((fl > 0) && (mkchar(fp[0]) == ec)) {
 		cint	sl = (fl + 1) ;
 		cchar	*sp = (fp + 1) ;
@@ -211,7 +209,7 @@ int mksub::testpaths() noex {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	if (plist != nullptr) {
-	    int		pl = cstrlen(plist) ;
+	    int		pl = lenstr(plist) ;
 	    cchar	*pp = plist ;
 	    for (cchar *tp ; (tp = strnchr(pp,pl,':')) != np ; ) {
 		cint	ll = intconv(tp - pp) ;

@@ -1,5 +1,5 @@
 /* mkdisplayable SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* clean up some text string for printing to terminal */
@@ -88,7 +88,7 @@ int mkdisplayable(char *rbuf,int rlen,cchar *sp,int sl) noex {
 	    if (sbuf s ; (rs = s.start(rbuf,rlen)) >= 0) {
 	        int	pch = 0 ;
 	        bool	f_shift = false ;
-		if (sl < 0) sl = cstrlen(sp) ;
+		if (sl < 0) sl = lenstr(sp) ;
 	        for (int i = 0 ; (i < sl) && sp[i] ; i += 1) {
 	            cint	ch = mkchar(sp[i]) ;
 	            switch (ch) {

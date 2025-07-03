@@ -1,5 +1,5 @@
 /* mkaddrfrom SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* try to divine the best "from" address from a raw source string */

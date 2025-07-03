@@ -1,5 +1,5 @@
 /* mkcleanline SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* create a clean (cleaned up) line of text */
@@ -111,7 +111,7 @@ int mkcleanline(char *lp,int ll,int m) noex {
 	int		len = 0 ;
 	if (lp) {
 	    MFLAGS	mf{} ;
-	    if (ll < 0) ll = cstrlen(lp) ;
+	    if (ll < 0) ll = lenstr(lp) ;
 	    while ((ll > 0) && isend(lp[ll - 1])) {
 	        ll -= 1 ;
 	    }
