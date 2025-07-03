@@ -1,5 +1,5 @@
 /* mkvarpath SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to make a prefix-variable path */
@@ -115,7 +115,7 @@ int mkvarpath(char *rbuf,cchar *fp,int fl) noex {
 	int		pl = 0 ;
 	if (rbuf && fp) {
             rbuf[0] = '\0' ;
-            if (fl < 0) fl = cstrlen(fp) ;
+            if (fl < 0) fl = lenstr(fp) ;
             if ((fp[0] == ec) || ((fp[0] == '/') && fl && (fp[1] == ec))) {
                 int         vl = (fl - 1) ;
                 cchar       *vp = (fp + 1) ;
@@ -203,7 +203,7 @@ static int mkvarpath_one(char *rbuf,vecstr *plp,cc *sp,int sl,cc *rp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
-	if (sl < 0) sl = cstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if ((rs = vecstr_findn(plp,sp,sl)) == rsn) {
 	    if ((rs = vecstr_add(plp,sp,sl)) >= 0) {
 	        rs1 = mkvarpath_join(rbuf,sp,sl,rp) ;
