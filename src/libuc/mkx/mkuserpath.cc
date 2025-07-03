@@ -1,11 +1,10 @@
 /* mkuserpath SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a user-path */
 /* version %I% last-modified %G% */
 
-#define	CF_UCPWCACHE	1		/* use |ucpwcache(3uc)| */
 
 /* revision history:
 
@@ -43,7 +42,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -52,7 +50,7 @@
 #include	<clanguage.h>
 #include	<getbufsize.h>
 #include	<getax.h>
-#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
+#include	<getpwx.h>
 #include	<getusername.h>
 #include	<mkpathx.h>
 #include	<strwcpy.h>
@@ -64,12 +62,6 @@
 import libutil ;
 
 /* local defines */
-
-#if	CF_UCPWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UCPWCACHE */
 
 
 /* imported namespaces */
@@ -114,7 +106,7 @@ int mkuserpath(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 	if (rbuf && pp) {
 	    rbuf[0] = '\0' ;
 	    rs = SR_OK ;
-	    if (pl < 0) pl = cstrlen(pp) ;
+	    if (pl < 0) pl = lenstr(pp) ;
 	    while ((pl > 0) && (pp[0] == '/')) {
 	        pp += 1 ;
 	        pl -= 1 ;
@@ -140,7 +132,7 @@ static int mkpathsquiggle(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 	int		rs ;
 	int		ul = pl ;
 	cchar		*up = pp ;
-	if (pl < 0) pl = cstrlen(pp) ;
+	if (pl < 0) pl = lenstr(pp) ;
 	if (cchar *tp{} ; (tp = strnchr(pp,pl,'/')) != nullptr) {
 	    ul = intconv(tp - pp) ;
 	    pl -= intconv((tp + 1) - pp) ;
@@ -204,12 +196,12 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
 	        if ((rs = getbufsize(getbufsize_pw)) >= 0) {
 	            ucentpw	pw ;
 	            cint	pwlen = rs ;
-	            char	*pwbuf{} ;
+	            char	*pwbuf ;
 	            if ((rs = uc_libmalloc((pwlen+1),&pwbuf)) >= 0) {
 	                if ((un[0] == '\0') || (un[0] == '-')) {
 	                    rs = getpwusername(&pw,pwbuf,pwlen,-1) ;
 	                } else {
-	                    rs = GETPW_NAME(&pw,pwbuf,pwlen,un) ;
+	                    rs = getpwx_name(&pw,pwbuf,pwlen,un) ;
 	                }
 	                if (rs >= 0) {
 		            cchar	*dir = pw.pw_dir ;

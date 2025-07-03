@@ -1,5 +1,5 @@
 /* mkutmpid SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a UTMPX entry ID (c_string) */
@@ -224,7 +224,7 @@ tmper::operator int () noex {
 	    if (rlen >= 1) {
 		rs = SR_DOM ;
 	        memclear(rbuf,rlen) ;
-	        if (slen < 0) slen = cstrlen(sbuf) ;
+	        if (slen < 0) slen = lenstr(sbuf) ;
 		if (slen > 0) {
 		    if (cchar *lp ; (rs = extdev(&lp)) >= 0) {
 		        cint	ll = rs ;
@@ -242,7 +242,7 @@ tmper::operator int () noex {
 /* end method (tmper::operator) */
 
 int tmper::extdev(cchar **rpp) noex {
-	static constexpr int	dl = cstrlen(dpre) ;
+	static constexpr int	dl = lenstr(dpre) ;
 	int		rs = SR_OK ;
 	int		ll = slen ;
 	cchar		*lp = sbuf ;
@@ -271,7 +271,7 @@ int tmper::subdirs(cchar *lp,int ll) noex {
 	        cchar	*pp{} ;
 	        for (i = 0 ; prefixes[i].name ; i += 1) {
 	            pp = prefixes[i].name ;
-	            pl = cstrlen(pp) ;
+	            pl = lenstr(pp) ;
 	            if ((pl == sl) && (strncmp(pp,sp,pl) == 0)) break ;
 	        } /* end for */
 	        if (prefixes[i].name && pp && pl) {
@@ -293,7 +293,7 @@ int tmper::basename(cchar *lp,int ll) noex {
 	    cchar	*pp{} ;
 	    for (i = 0 ; prefixes[i].name ; i += 1) {
 	        pp = prefixes[i].name ;
-	        pl = cstrlen(pp) ;
+	        pl = lenstr(pp) ;
 	        if ((pl <= cl) && (strncmp(pp,lp,pl) == 0)) break ;
 	    } /* end for */
 	    if (prefixes[i].name && pp && pl) {
@@ -312,7 +312,7 @@ int tmper::special(cchar *lp,int ll) noex {
 	    cchar	*pp{} ;
 	    for (i = 0 ; specials[i].name ; i += 1) {
 	        pp = specials[i].name ;
-		pl = cstrlen(pp) ;
+		pl = lenstr(pp) ;
 	        if (strcmp(pp,lp) == 0) break ;
 	    } /* end for */
 	    if (prefixes[i].name && pp && pl) {

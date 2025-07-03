@@ -1,5 +1,5 @@
 /* uiname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to divine the best real name from a USERINFO object */
