@@ -1,5 +1,5 @@
 /* memfile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* provides a memory-mapped file for writing */

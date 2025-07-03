@@ -1,5 +1,5 @@
 /* matsubstr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* match a string w/ various case handling */
