@@ -1,5 +1,5 @@
 /* inetaddr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* object to manipulate INET4 adresses */
@@ -141,7 +141,7 @@ int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 	    cchar	*ap = addrp ;
 	    char	abuf[alen + 1] ;
 	    rs = SR_OK ;
-	    if (addrl < 0) addrl = xstrlen(addrp) ;
+	    if (addrl < 0) addrl = lenstr(addrp) ;
 	    while (CHAR_ISWHITE(*ap)) {
 	        ap += 1 ;
 	        addrl -= 1 ;
@@ -180,7 +180,7 @@ int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex {
 	    cchar	*ap = addrp ;
 	    char	abuf[(inet4addrlen* 4) + 1] ;
 	    rs = SR_OK ;
-	    if (addrl < 0) addrl = xstrlen(addrp) ;
+	    if (addrl < 0) addrl = lenstr(addrp) ;
 	    while (CHAR_ISWHITE(*ap)) {
 	        ap += 1 ;
 	        addrl -= 1 ;
