@@ -64,7 +64,7 @@ OBJ03= mhcom.o mcmsg.o comsatmsg.o mimetypes.o
 
 OBJ04= comparse.o
 OBJ05= mbcache.o contypevals.o contentencodings.o
-OBJ06= whitelist.o splitaddr.o csro.o
+OBJ06= whitelist.o lookaddr.o splitaddr.o csro.o
 OBJ07= filer_mailsup.o mailalias.o mailfiles.o
 
 OBJ08= hdrx.o stackaddr.o
@@ -249,6 +249,7 @@ mimetypes.o:		mimetypes.cc mimetypes.h		$(INCS)
 outema.o:		outema.cc outema.h			$(INCS)
 comparse.o:		comparse.cc comparse.h			$(INCS)
 whitelist.o:		whitelist.cc whitelist.h		$(INCS)
+lookaddr.o:		lookaddr.cc lookaddr.h			$(INCS)
 splitaddr.o:		splitaddr.cc splitaddr.h		$(INCS)
 stackaddr.o:		stackaddr.cc stackaddr.h		$(INCS)
 retpath.o:		retpath.cc retpath.h			$(INCS)

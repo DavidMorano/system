@@ -46,6 +46,7 @@
 
 #include	"lkmail.h"
 
+import libutil ;
 
 /* local defines */
 

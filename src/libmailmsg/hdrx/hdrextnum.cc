@@ -57,6 +57,7 @@
 
 #include	"hdrextnum.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -114,7 +115,7 @@ int hdrextnum(cchar *sp,int sl) noex {
 int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	int		rs ;
 	int		vl = 0 ;
-	if (sl < 0) sl = cstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	/* skip over any leading white space */
 	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;
