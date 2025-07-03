@@ -1,5 +1,5 @@
 /* mklogid SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a log-ID c-string, suitable for logging purposes */
@@ -101,7 +101,7 @@ namespace {
 
 /* forward references */
 
-static int	mkmaxstrlen(int,int) noex ;
+static int	mkmalenstr(int,int) noex ;
 
 
 /* local variables */
@@ -126,12 +126,12 @@ int mklogid(char *rbuf,int rlen,cchar *sp,int sl,int v) noex {
 	        static cint	rsm = logdigmax ;
 	        if ((rs = rsm) >= 0) {
 	            cint	maxdigs = rs ;
-		    if ((rs = mkmaxstrlen(maxdigs,rlen)) >= 0) {
+		    if ((rs = mkmalenstr(maxdigs,rlen)) >= 0) {
 			loghelp		lo(rbuf,rlen,sp,sl,v) ;
-		        cint		maxstrlen = rs ;
-			rs = lo.valcvt(maxdigs,maxstrlen) ;
+		        cint		malenstr = rs ;
+			rs = lo.valcvt(maxdigs,malenstr) ;
 			rl = rs ;
-		    } /* end if (mkmaxstrlen) */
+		    } /* end if (mkmalenstr) */
 		} /* end if (ndigit) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -142,13 +142,13 @@ int mklogid(char *rbuf,int rlen,cchar *sp,int sl,int v) noex {
 
 /* local subroutines */
 
-int loghelp::valcvt(int maxdigs,int maxstrlen) noex {
+int loghelp::valcvt(int maxdigs,int malenstr) noex {
 	cint		dlen = DIGBUFLEN ;
 	int		rs ;
 	int		rl = 0 ;
 	int		modval ;
 	char		dbuf[DIGBUFLEN + 1] ;
-	sl = xstrnlen(sp,sl) ;
+	sl = lenstr(sp,sl) ;
 	modval = (maxdigs < 10) ? ipow(10,maxdigs) : INT_MAX ;
 	val = (val % modval) ; /* limits the decimal part to 'maxdigs' */
 	if ((rs = ctdec(dbuf,dlen,val)) >= 0) {
@@ -158,7 +158,7 @@ int loghelp::valcvt(int maxdigs,int maxstrlen) noex {
 	    len = (sl + dl) ;
 	    ml = (len > rlen) ? (len - rlen) : 0 ;
 	    {
-		rs = layout(dbuf,dl,maxstrlen,ml) ;
+		rs = layout(dbuf,dl,malenstr,ml) ;
 		rl = rs ;
 	    }
 	} /* end if (cfdec) */
@@ -166,7 +166,7 @@ int loghelp::valcvt(int maxdigs,int maxstrlen) noex {
 }
 /* end method (loghelp::valcvt) */
 
-int loghelp::layout(cchar *dp,int dl,int maxstrlen,int ml) noex {
+int loghelp::layout(cchar *dp,int dl,int malenstr,int ml) noex {
 	int		rs ;
 	int		rs1 ;
 	if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
@@ -179,13 +179,13 @@ int loghelp::layout(cchar *dp,int dl,int maxstrlen,int ml) noex {
             } else {
                 sp += 2 ;
                 sl -= 2 ;
-                if (sl <= maxstrlen) {
+                if (sl <= malenstr) {
                     b.strw(sp,sl) ;
                     b.strw(dp,dl) ;
                 } else {
-                    cint        len = max(sl,maxstrlen) + dl ;
+                    cint        len = max(sl,malenstr) + dl ;
                     ml = (len <= rlen) ? len : (len - rlen) ;
-                    b.strw(sp,min(sl,maxstrlen)) ;
+                    b.strw(sp,min(sl,malenstr)) ;
                     b.strw((dp + ml),(dl - ml)) ;
                 } /* end if */
             } /* end if */
@@ -196,20 +196,20 @@ int loghelp::layout(cchar *dp,int dl,int maxstrlen,int ml) noex {
 }
 /* end method (loghelp::layout) */
 
-static int mkmaxstrlen(int maxdigs,int rlen) noex {
+static int mkmalenstr(int maxdigs,int rlen) noex {
 	int		rs = SR_OK ;
-	int		maxstrlen = 0 ;
+	int		malenstr = 0 ;
 	if (rlen > maxdigs) {
-	    maxstrlen = (rlen - maxdigs) ;
+	    malenstr = (rlen - maxdigs) ;
 	} else if (rlen < 0) {
-	    maxstrlen = (logidlen - maxdigs) ;
+	    malenstr = (logidlen - maxdigs) ;
 	    rlen = logidlen ;
 	} else {
 	    rs = SR_OVERFLOW ;
 	}
-	return (rs >= 0) ? maxstrlen : rs ;
+	return (rs >= 0) ? malenstr : rs ;
 }
-/* end subroutine (mkmaxstrlen) */
+/* end subroutine (mkmalenstr) */
 
 namespace libuc {
     int logdigmaxer::mkdigmax() noex {

@@ -1,5 +1,5 @@
 /* mklogidsub SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a sub (or serial) log-ID */
@@ -129,7 +129,7 @@ int mklogidsub(char *dbuf,int dlen,cchar *bname,int v) noex {
         	}
         	if (rs >= 0) {
         	    bp = bname ;
-        	    bl = xstrlen(bname) ;
+        	    bl = lenstr(bname) ;
         	    if ((bl + 1 + vl) > dlen) {
         	        dmax = MAXDIG ;
         	        if (vl > dmax) {

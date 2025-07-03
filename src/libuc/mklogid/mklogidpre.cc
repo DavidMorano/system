@@ -1,5 +1,5 @@
 /* mklogidpre SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a prefix log ID (PrefixLogId) */
@@ -101,7 +101,7 @@ int mklogidpre(char *rbuf,int rlen,cchar *nodename,int v) noex {
 	int		rs = SR_FAULT ;
 	int		tl = 0 ;
 	if (rbuf && nodename) {
-	    int		nl = xstrlen(nodename) ;
+	    int		nl = lenstr(nodename) ;
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (v >= 0) {
