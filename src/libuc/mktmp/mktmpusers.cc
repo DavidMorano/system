@@ -1,5 +1,5 @@
 /* mktmpusers SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make the USERS directory in TMP directory */
