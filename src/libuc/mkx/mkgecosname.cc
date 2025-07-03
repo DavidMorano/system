@@ -1,5 +1,5 @@
 /* mkgecosname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make (or get) a GECOS name out of the raw PASSWD c-string */
@@ -207,7 +207,7 @@ int getgecosname(cchar *gbuf,int glen,cchar **rpp) noex {
 	    bool	f = true ;
 	    rs = SR_OK ;
 	    if (glen < 0) {
-		glen = cstrnlen(gbuf,maxgecoslen) ;
+		glen = lenstr(gbuf,maxgecoslen) ;
 	    }
 	    f = f && ((cp = strnchr(gbuf,glen,'-')) != np) ;
 	    {
