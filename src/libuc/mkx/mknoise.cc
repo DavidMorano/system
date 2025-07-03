@@ -1,5 +1,5 @@
 /* mknoise SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* retrieve process ID related noise from the system */
