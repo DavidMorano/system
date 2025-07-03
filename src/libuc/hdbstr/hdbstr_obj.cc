@@ -1,5 +1,5 @@
 /* hdbstr_obj SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* Key-Value Hash DataBase for Strings */

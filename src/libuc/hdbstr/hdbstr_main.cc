@@ -1,5 +1,5 @@
 /* hdbstr_main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* Key-Value Hash DataBase for Strings */
@@ -179,10 +179,10 @@ int hdbstr_add(hdbstr *op,cchar *kstr,int klen,cchar *vstr,int vlen) noex {
 	int		rs ;
 	if ((rs = hdbstr_magic(op,kstr)) >= 0) {
 	    int		sz ;
-	    if (klen < 0) klen = xstrlen(kstr) ;
+	    if (klen < 0) klen = lenstr(kstr) ;
 	    if (vstr) {
 	        if (vlen < 0) {
-	            vlen = xstrlen(vstr) ;
+	            vlen = lenstr(vstr) ;
 	        }
 	    } else {
 	        vlen = 0 ;
@@ -240,7 +240,7 @@ int hdbstr_fetch(hdbstr *op,cc *kstr,int klen,hc *curp,cc **rpp) noex {
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
 	    key.buf = kstr ;
-	    key.len = (klen < 0) ? xstrlen(kstr) : klen ;
+	    key.len = (klen < 0) ? lenstr(kstr) : klen ;
 	    if (rpp) *rpp = nullptr ;
 	    if ((rs = hdb_fetch(op,key,curp,&val)) >= 0) {
 	        vl = val.len ;
@@ -263,7 +263,7 @@ int hdbstr_fetchrec(hdbstr *op,cc *kstr,int klen,hc *curp,cc **kpp,cc **vpp,
 	    hdb_dat	val{} ;
 	    hdb_dat	rkey{} ;
 	    key.buf = kstr ;
-	    key.len = (klen < 0) ? xstrlen(kstr) : klen ;
+	    key.len = (klen < 0) ? lenstr(kstr) : klen ;
 	    if (kpp) *kpp = nullptr ;
 	    if ((rs = hdb_fetchrec(op,key,curp,&rkey,&val)) >= 0) {
 	        if (kpp) {
@@ -323,7 +323,7 @@ int hdbstr_nextkey(hdbstr *op,cchar *kstr,int klen,hc *curp) noex {
 	if ((rs = hdbstr_magic(op,kstr,curp)) >= 0) {
 	     hdb_dat	key ;
 	     key.buf = kstr ;
-	     key.len = (klen < 0) ? xstrlen(kstr) : klen ;
+	     key.len = (klen < 0) ? lenstr(kstr) : klen ;
 	     rs = hdb_nextrec(op,key,curp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -336,7 +336,7 @@ int hdbstr_delkey(hdbstr *op,cchar *kstr,int klen) noex {
 	if ((rs = hdbstr_magic(op,kstr)) >= 0) {
 	    hdb_dat	skey ;
 	    skey.buf = kstr ;
-	    skey.len = (klen < 0) ? xstrlen(kstr) : klen ;
+	    skey.len = (klen < 0) ? lenstr(kstr) : klen ;
 	    /* delete all of the data associated with this key */
 	    int		rs1 = SR_OK ;
 	    if (hdb_cur cur ; (rs = hdb_curbegin(op,&cur)) >= 0) {
