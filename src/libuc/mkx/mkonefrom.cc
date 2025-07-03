@@ -1,5 +1,5 @@
 /* mkonefrom SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to divine the best "from" address from a raw source string */
@@ -119,7 +119,7 @@ int mkonefrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 	    fbuf[0] = '\0' ;
 	    if (sp[0]) {
 		rs = SR_OK ;
-	        if (sl < 0) sl = cstrlen(sp) ;
+	        if (sl < 0) sl = lenstr(sp) ;
 	        if (sl > 0)  {
 	            if (ema a ; (rs = a.start) >= 0) {
 	                if ((rs = a.parse(sp,sl)) >= 0) {
