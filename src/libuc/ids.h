@@ -1,5 +1,5 @@
 /* ids HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* ID acquisition and stoage */
@@ -74,7 +74,7 @@ struct ids : ids_head {
 	int copy(const ids *) noex ;
 	void dtor() noex ;
 	destruct ids() {
-	    dtor() ;
+	    if (gids) dtor() ;
 	} ;
 } ; /* end struct (ids) */
 #else	/* __cplusplus */

@@ -1,5 +1,5 @@
 /* ids SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* load up the process identification information (IDs) */
@@ -40,7 +40,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<unistd.h>		/* for |getgroups(2)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -67,6 +67,13 @@ using std::nullptr_t ;			/* type */
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int	maxgroups ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
 
 /* forward references */
 
@@ -76,6 +83,8 @@ static int	ids_ngids(const ids *) noex ;
 
 
 /* local variables */
+
+static vars		var ;
 
 static constexpr gid_t	gidend = gid_t(-1) ;
 
@@ -87,23 +96,23 @@ static constexpr gid_t	gidend = gid_t(-1) ;
 
 int ids_load(ids *op) noex {
 	int		rs ;
-	int		ng = 0 ;
+	int		ng = 0 ; /* return-value */
 	if ((rs = ids_ctor(op)) >= 0) {
-	    cnullptr	np{} ;
-	    if ((rs = u_getgroups(0,np)) >= 0) {
+	    if ((rs = var) >= 0) {
+		cint	nmax = rs ;
 	        cint	sz = ((rs + 1) * szof(gid_t)) ;
-	        ng = rs ;
-	        if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+	        if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
 		    op->gids = (gid_t *) vp ;
-		    if ((rs = u_getgroups(ng,op->gids)) >= 0) {
+		    if ((rs = u_getgroups(nmax,op->gids)) >= 0) {
+			ng = rs ;
 		        op->gids[ng] = gidend ;
 		    }
 		    if (rs < 0) {
 		        uc_libfree(op->gids) ;
 		        op->gids = nullptr ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (m-a) */
-	    } /* end if (ids_data) */
+	    } /* end if (vars) */
 	    if (rs < 0) {	
 		ids_dtor(op) ;
 	    }
@@ -172,7 +181,7 @@ int ids_copy(ids *op,const ids *otherp) noex {
 	    if ((rs = ids_ngids(otherp)) >= 0) {
 	        cint	n = rs ;
 	        int	sz = 0 ;
-	        sz += intconv((n + 1) * sizeof(gid_t)) ;
+	        sz += intconv((n + 1) * szof(gid_t)) ;
 	        if (void *p ; (rs = uc_libmalloc(sz,&p)) >= 0) {
 	            int		i = 0 ; /* <- used-afterwards */
 		    op->gids = (gid_t *) p ;
@@ -185,7 +194,7 @@ int ids_copy(ids *op,const ids *otherp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ids_refresh) */
+/* end subroutine (ids_copy) */
 
 
 /* private subroutines */
@@ -225,20 +234,22 @@ static int ids_ngids(const ids *op) noex {
 
 ids_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	switch (w) {
-	case idsmem_load:
-	    rs = ids_load(op) ;
-	    break ;
-	case idsmem_ngroups:
-	    rs = ids_ngroups(op) ;
-	    break ;
-	case idsmem_release:
-	    rs = ids_release(op) ;
-	    break ;
-	case idsmem_refresh:
-	    rs = ids_refresh(op) ;
-	    break ;
-	} /* end switch */
+	if (op) {
+	    switch (w) {
+	    case idsmem_load:
+	        rs = ids_load(op) ;
+	        break ;
+	    case idsmem_ngroups:
+	        rs = ids_ngroups(op) ;
+	        break ;
+	    case idsmem_release:
+	        rs = ids_release(op) ;
+	        break ;
+	    case idsmem_refresh:
+	        rs = ids_refresh(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (ids_co::operator) */
@@ -252,5 +263,16 @@ void ids::dtor() noex {
 	    ulogerror("ids",rs,"fini-release") ;
 	}
 }
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = maxgroups) == 0) {
+	    cint	cmd = _SC_NGROUPS_MAX ;
+	    if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
+	        maxgroups = rs ;
+	    } /* end if */
+	} /* end if (needed) */
+	return rs ;
+} /* end method (vars::operator) */
 
 
