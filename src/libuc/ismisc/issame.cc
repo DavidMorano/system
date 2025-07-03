@@ -1,5 +1,5 @@
 /* issamehostname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* rough equivalency hostname check */
@@ -126,7 +126,7 @@ samehelp::operator bool () noex {
 
 bool samehelp::tryh1() noex {
 	cint		len1 = intconv(cp1 - h1) ;
-	cint		len2 = xstrlen(h2) ;
+	cint		len2 = lenstr(h2) ;
 	bool		f = false ;
 	if (len1 == len2) {
 	    cp1 += 1 ;
@@ -139,7 +139,7 @@ bool samehelp::tryh1() noex {
 /* end method (tryh1) */
 
 bool samehelp::tryh2() noex {
-	cint		len1 = xstrlen(h1) ;
+	cint		len1 = lenstr(h1) ;
 	cint		len2 = intconv(cp2 - h2) ;
 	bool		f = false ;
 	if (len1 == len2) {
