@@ -84,6 +84,7 @@
 
 #include	"acctab.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -398,8 +399,8 @@ int acctab_allowed(acctab *op,cchar *ng,cchar *ma,cchar *un,cchar *pw) noex {
 	        	void		*vp{} ; /* used in two blocks below */
 		        /* search the STD entries first */
 	                slp = op->stdalp ;
-	                if ((rs = vecobj_curbegin(slp,&cur)) >= 0) {
-		            auto	vif = vecobj_fetch ;
+	                if ((rs = slp->curbegin(&cur)) >= 0) {
+		            auto	vif = vecobj_curfetch ;
 			    auto	vcf = vcmpent ;
 	                    while ((rs1 = vif(slp,&ae,&cur,vcf,&vp)) >= 0) {
 		                aep = entp(vp) ;
@@ -409,7 +410,7 @@ int acctab_allowed(acctab *op,cchar *ng,cchar *ma,cchar *un,cchar *pw) noex {
 	                        }
 	                    } /* end while */
 	                    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
-	                    rs1 = vecobj_curend(slp,&cur) ;
+	                    rs1 = slp->curend(&cur) ;
 			    if (rs >= 0) rs = rs1 ;
 	                } /* end if (vecobj-cur) */
 		        /* search the RGX entries (if necessary) */
@@ -483,7 +484,7 @@ int acctab_find(acctab *op,cc *netgroup,acctab_ent **sepp) noex {
 	    cchar	*sp ;
 	    bool	f = false ;
 	    void	*vp{} ;
-	    for (i = 0 ; vecobj_get(slp,i,&vp) >= 0 ; i += 1) {
+	    for (i = 0 ; slp->get(i,&vp) >= 0 ; i += 1) {
 		*sepp = entp(vp) ;
 	        if (*sepp == nullptr) continue ;
 	        sp = (*sepp)->netgroup ;
@@ -579,10 +580,11 @@ int acctab_check(acctab *op) noex {
 /* private subroutines */
 
 static int acctab_filefins(acctab *op) noex {
+    	vecobj		*flp = op->flp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
-	for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
+	for (int i = 0 ; flp->get(i,&vp) >= 0 ; i += 1) {
 	    ACCTAB_FI	*fep = (ACCTAB_FI *) vp ;
 	    if (vp) {
 	        rs1 = file_finish(fep) ;
@@ -594,10 +596,11 @@ static int acctab_filefins(acctab *op) noex {
 /* end subroutine (acctab_filefins) */
 
 static int acctab_filechecks(acctab *op,time_t dt) noex {
+    	vecobj		*flp = op->flp ;
 	int		rs = SR_OK ;
 	int		c_changed = false ;
 	void		*vp{} ;
-	for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
+	for (int i = 0 ; flp->get(i,&vp) >= 0 ; i += 1) {
 	    ACCTAB_FI	*fep = (ACCTAB_FI *) vp ;
 	    if (vp) {
 		if ((rs = file_changed(fep,dt)) > 0) {
@@ -775,7 +778,7 @@ static int acctab_filedump(acctab *op,int fi) noex {
 	for (int j = 0 ; j < 2 ; j += 1) {
 	    slp = (j == 0) ? op->stdalp : op->rgxalp ;
 	    void	*vp{} ;
-	    for (int i = 0 ; (rs2 = vecobj_get(slp,i,&vp)) >= 0 ; i += 1) {
+	    for (int i = 0 ; (rs2 = slp->get(i,&vp)) >= 0 ; i += 1) {
 	        acctab_ent	*sep = entp(vp) ;
 	        if (vp) {
 	            if ((sep->fi == fi) || (fi < 0)) {
@@ -784,7 +787,7 @@ static int acctab_filedump(acctab *op,int fi) noex {
 	                    if (rs >= 0) rs = rs1 ;
 			}
 			{
-	                    rs1 = vecobj_del(slp,i--) ;
+	                    rs1 = slp->del(i--) ;
 	                    if (rs >= 0) rs = rs1 ;
 			}
 	            } /* end if (found matching entry) */
@@ -1194,7 +1197,7 @@ static int part_match(PARTTYPE *pp,cchar *s) noex {
 	                        cint	sl1 = lenstr(s) ;
 	                        cint	sl2 = lenstr(pp->patstd) ;
 	                        tp += 1 ;
-	                        sl = pp->patstd + sl2 - tp ;
+	                        sl = intconv(pp->patstd + sl2 - tp) ;
 	                        f = (strncmp(s + sl1 - sl,tp,sl) == 0) ;
 	                    } /* end if */
 	                } else {

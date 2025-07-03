@@ -739,6 +739,9 @@ modload.o:		modload.cc modload.h
 shmalloc.o:		shmalloc.cc shmalloc.h
 kbdinfo.o:		kbdinfo.cc kbdinfo.h
 userid.o:		userid.cc userid.hh
+motd.o:			motd.cc		motd.h
+issue.o:		issue.cc	issue.h
+statmsg.o:		statmsg.cc	statmsg.h
 
 # TEXT related
 textlook.o:		textlook.cc textlook.h
