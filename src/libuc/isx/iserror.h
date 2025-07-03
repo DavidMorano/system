@@ -1,5 +1,5 @@
 /* iserror HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* is an error code (per an integer) a part of a class of errors? */
