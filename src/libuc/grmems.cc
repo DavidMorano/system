@@ -1,5 +1,5 @@
 /* grmems SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® group membership access and cache */
@@ -688,7 +688,7 @@ static int grmems_recusers(grmems *op,time_t dt,vecobj *ulp,gid_t gid) noex {
 	        while ((ugp < (ugs + vn)) && (ugp->gid == gid)) {
 	            grmems_u	u{} ;
 	            u.up = ugp->un ;
-	            u.ul = xstrnlen(ugp->un,ulen) ;
+	            u.ul = lenstr(ugp->un,ulen) ;
 	            rs = ulp->add(&u) ;
 	            c += 1 ;
 	            ugp += 1 ;
@@ -1032,7 +1032,7 @@ static int record_mems(grmems_rec *ep,time_t dt,int wc,
 	        	grmems_u	*up = (grmems_u *) vp ;
 		        ul = up->ul ;
 		        if (ul < 0) {
-			    ul = xstrnlen(up->up,ulen) ;
+			    ul = lenstr(up->up,ulen) ;
 			    up->ul = ul ;
 		        }
 	                sz += (ul+1) ;

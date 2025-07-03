@@ -47,6 +47,7 @@
 #include	"splitaddr.h"
 #include	"whitelist.h"
 
+import libutil ;
 
 /* local defines */
 

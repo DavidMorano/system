@@ -37,7 +37,6 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlcpy(3c)| */
 #include	<cstdarg>		/* |va_list(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
