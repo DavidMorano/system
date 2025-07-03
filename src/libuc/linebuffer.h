@@ -1,5 +1,5 @@
 /* linebuffer HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* provide a line-buffer of the system-defined line-length */
