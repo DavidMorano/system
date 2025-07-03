@@ -1,5 +1,5 @@
 /* mktmpfile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a temporary file */
@@ -86,7 +86,7 @@ int mktmpfile(char *rbuf,cchar *inname,mode_t om) noex {
 	int		rs ;
 	if ((rs = opentmpfile(inname,of,om,rbuf)) >= 0) {
 	    if ((rs = uc_close(rs)) >= 0) {
-	        rs = cstrlen(rbuf) ;
+	        rs = lenstr(rbuf) ;
 	    }
 	} /* end if (opentmpfile) */
 	return rs ;
