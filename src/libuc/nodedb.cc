@@ -1,5 +1,5 @@
 /* nodedb SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* magement for the NODE-DB file */
@@ -43,7 +43,7 @@
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strcmp(3c)| + |strlen(3c)| */
+#include	<cstring>		/* <- for |strcmp(3c)| + |lenstr(3c)| */
 #include	<ctime>
 #include	<netdb.h>
 #include	<usystem.h>
@@ -65,6 +65,7 @@
 
 #include	"nodedb.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -127,9 +128,9 @@ typedef cchar		*(*keytabp)[2] ;
 struct nodedb_file {
 	cchar		*fname ;
 	time_t		timod ;
-	dev_t		dev ;
-	ino_t		ino ;
 	size_t		fsize ;
+	ino_t		ino ;
+	dev_t		dev ;
 } ;
 
 struct nodedb_keyname {
@@ -423,7 +424,7 @@ int nodedb_enum(ND *op,ND_C *curp,ND_E *ep,char *ebuf,int elen) noex {
 	            rs = entry_load(ep,ebuf,elen,iep) ;
 	            svclen = rs ;
 	        } else {
-	            svclen = strlen(iep->svc) ;
+	            svclen = lenstr(iep->svc) ;
 	        }
 	    } /* end if (had an entry) */
 	} /* end if (magic) */
@@ -440,14 +441,14 @@ int nodedb_fetch(ND *op,cc *svcbuf,ND_C *curp,
 	    hdb_dat	val{} ;
 	    hdb_cur	*ecp = curp->ecp ;
 	    key.buf = svcbuf ;
-	    key.len = strlen(svcbuf) ;
+	    key.len = lenstr(svcbuf) ;
 	    if ((rs = hdb_fetch(op->entsp,key,ecp,&val)) >= 0) {
 	        NODEDB_IE	*iep = (NODEDB_IE *) val.buf ;
 	        if (ep && ebuf) {
 	            rs = entry_load(ep,ebuf,elen,iep) ;
 	            svclen = rs ;
 	        } else {
-	            svclen = strlen(iep->svc) ;
+	            svclen = lenstr(iep->svc) ;
 	        }
 	    } /* end if (hdb_fetch) */
 	} /* end if (magic) */
@@ -673,7 +674,7 @@ static int nodedb_addentry(nodedb *op,int fi,SE *sep) noex {
 	            hdb_dat	key ;
 	            hdb_dat	val ;
 	            key.buf = iep->svc ;
-	            key.len = strlen(iep->svc) ;
+	            key.len = lenstr(iep->svc) ;
 	            val.buf = iep ;
 	            val.len = szof(NODEDB_IE) ;
 	            rs = hdb_store(op->entsp,key,val) ;
@@ -820,7 +821,7 @@ static int ientry_start(NODEDB_IE *iep,int fi,SE *sep) noex {
 	                    cp = sep->sys ;
 	                    break ;
 	                } /* end switch */
-	                sz += (strlen(cp) + 1) ;
+	                sz += (lenstr(cp) + 1) ;
 	            } /* end for */
 		    /* allocate */
 	            iep->tsize = sz ;
@@ -903,7 +904,7 @@ static int svcentry_start(SE *sep,lineinfo *lip) noex {
 	    for (int i = 0 ; i < 3 ; i += 1) {
 	        int	cl = lip->f[i].fl ;
 	        cchar	*cp = lip->f[i].fp ;
-	        if (cl < 0) cl = strlen(cp) ;
+	        if (cl < 0) cl = lenstr(cp) ;
 	        sz += (cl + 1) ;
 	    } /* end for */
 	    if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
@@ -946,10 +947,10 @@ static int svcentry_addkey(SE *sep,cc *kp,int kl,cc *ap,int al) noex {
 	if (sep && kp) {
 	    rs = SR_INVALID ;
  	    if ((kl != 0) && kp[0]) {
-	        if (kl < 0) kl = strlen(kp) ;
+	        if (kl < 0) kl = lenstr(kp) ;
 	        sz += (kl + 1) ;
 	        if (ap != nullptr) {
-	            if (al < 0) al = strlen(ap) ;
+	            if (al < 0) al = lenstr(ap) ;
 	            sz += (al + 1) ;
 	        } else {
 	            sz += 1 ;
@@ -1029,7 +1030,7 @@ static int entry_load(ND_E *ep,char *ebuf,int elen,ND_I *iep) noex {
 	    /* copy in the nodename */
 	    ep->svc = bp ;
 	    bp = (strwcpy(bp,iep->svc,-1) + 1) ;
-	    svclen = (bp - ep->svc - 1) ;
+	    svclen = intconv(bp - ep->svc - 1) ;
 	    /* copy in the clustername */
 	    ep->clu = bp ;
 	    if (iep->clu) {

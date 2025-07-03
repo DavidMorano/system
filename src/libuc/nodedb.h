@@ -1,5 +1,5 @@
 /* nodedb HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* magement for the NODE-DB file */
@@ -21,7 +21,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>		/* for |ino_t| */
+#include	<time.h>		/* |time_t| */
 #include	<vecobj.h>
 #include	<hdb.h>
 
