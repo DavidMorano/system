@@ -1,5 +1,5 @@
 /* matnstr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* match a counted string */
@@ -82,7 +82,7 @@ import libutil ;
 int matnstr(mainv a,cchar *sp,int sl) noex {
 	cint		lc = sp[0] ; /* ok: everything promotes the same */
 	int		i{} ; /* used-afterwards */
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	for (i = 0 ; a[i] ; i += 1) {
 	    if ((lc == a[i][0]) && (strncmp(a[i],sp,sl) == 0)) break ;
 	} /* end for */

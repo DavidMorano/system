@@ -1,5 +1,5 @@
 /* matlocalfs SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine is the given counted c-string is a local-filesystem name */
