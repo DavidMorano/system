@@ -1,5 +1,5 @@
 /* isnot HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* is an error code (per an integer) not part of a class of something? */

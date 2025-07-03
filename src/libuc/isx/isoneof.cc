@@ -1,5 +1,5 @@
 /* isoneof SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* test if an integer is one of a group of integers */
