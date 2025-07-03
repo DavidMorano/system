@@ -1,5 +1,5 @@
 /* mkaddrdisp SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* create (in a buffer) a sort of nice mail address for display purposes */
@@ -98,7 +98,7 @@ int mkaddrdisp(char *abuf,int alen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (abuf && sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sbuf b ; (rs = b.start(abuf,alen)) >= 0) {
 	        cint	flen = sl ;
 	        if (char *fbuf ; (rs = uc_malloc((flen+1),&fbuf)) >= 0) {

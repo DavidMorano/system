@@ -1,5 +1,5 @@
 /* mkaddrname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the best address-name, if one exists */
@@ -129,7 +129,7 @@ int mkaddrname(char *fbuf,int flen,cchar *sp,int sl) noex {
 	int		len = 0 ;
 	if (fbuf && sp) {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    fbuf[0] = '\0' ;
 	    if (sl > 0)  {
 	        if (ema a ; (rs = a.start) >= 0) {

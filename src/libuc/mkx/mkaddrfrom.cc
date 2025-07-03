@@ -1,5 +1,5 @@
 /* mkaddrfrom SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* try to divine the best "from" address from a raw source string */
@@ -126,7 +126,7 @@ int mkaddrfrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	    fbuf[0] = '\0' ;
 	    if (sp[0]) {
-	        if (sl < 0) sl = cstrlen(sp) ;
+	        if (sl < 0) sl = lenstr(sp) ;
 	        if (sl > 0)  {
 	            rs = mkaddrx(fbuf,flen,sp,sl) ;
 		    len = rs ;
