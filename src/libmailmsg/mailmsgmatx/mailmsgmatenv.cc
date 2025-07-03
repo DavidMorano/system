@@ -85,6 +85,7 @@
 
 #include	"mailmsgmatenv.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -133,7 +134,7 @@ int mailmsgmatenv(mmenvdat *mep,cchar *sp,int sl) noex {
 	if (mep && sp) {
 	    bool	f_start = true ;
 	    rs = memclear(hop) ;		/* dangerous */
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    while (sl && iseol(sp[sl-1])) sl -= 1 ;
 	    if ((sl > 0) && (*sp == '>')) {
 	        sp += 1 ;
@@ -240,7 +241,7 @@ static int mmenvdat_datefin(mmenvdat *mep,cchar *rp,int rl) noex {
 static int mmenvdat_remote(mmenvdat *mep,cchar *sp,int sl) noex {
 	int		skip = 0 ;
 	if ((sl > 0) && (mep->rt >= 0)) {
-	    cint	el = cstrlen(exts[mep->rt]) ;
+	    cint	el = lenstr(exts[mep->rt]) ;
 	    int		cl ;
 	    cchar	*cp ;
 	    sp += el ;

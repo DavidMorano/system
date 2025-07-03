@@ -35,6 +35,7 @@
 
 #include	"mailmsghdrct.h"
 
+import libutil ;
 
 /* local defines */
 

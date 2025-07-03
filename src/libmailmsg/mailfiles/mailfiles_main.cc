@@ -44,6 +44,7 @@
 
 #include	"mailfiles.h"
 
+import libutil ;
 
 /* local defines */
 

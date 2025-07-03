@@ -74,6 +74,7 @@
 #include	"mailmsgmatenv.h"
 #include	"mailmsgmathdr.h"
 
+import libutil ;
 
 /* local defines */
 

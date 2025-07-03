@@ -89,6 +89,7 @@
 
 #include	"mailmsg.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -294,7 +295,7 @@ int mailmsg_finish(mailmsg *op) noex {
 int mailmsg_loadline(mailmsg *op,cchar *lp,int ll) noex {
 	int		rs ;
 	if ((rs = mailmsg_magic(op,lp)) >= 0) {
-	    if (ll < 0) ll = cstrlen(lp) ;
+	    if (ll < 0) ll = lenstr(lp) ;
 	    while ((ll > 0) && ISEND(lp[ll-1])) {
 	        ll -= 1 ;
 	    }
@@ -649,7 +650,7 @@ static int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,cc *hp,int hl) noex {
 	int		rs ;
 	int		i ; /* used-afterwards */
 	int		f = false ;
-	if (hl < 0) hl = cstrlen(hp) ;
+	if (hl < 0) hl = lenstr(hp) ;
 	*hnpp = nullptr ;
 	void	*vp{} ;
 	for (i = 0 ; (rs = vecobj_get(op->hlp,i,&vp)) >= 0 ; i += 1) {

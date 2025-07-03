@@ -38,6 +38,7 @@
 #include	"mailmsg.h"
 #include	"mailmsg_envget.h"
 
+import libutil ;
 
 /* local defines */
 

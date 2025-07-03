@@ -60,7 +60,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<climits>		/* |UINT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -79,6 +78,7 @@
 
 #include	"mailmsghdrfold.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -150,7 +150,7 @@ int mailmsghdrfold_start(MF *op,int mcols,int ln,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    rs = SR_INVALID ;
 	    if ((mcols >= 1) && (ln >= 0)) {
-		if (sl < 0) sl = cstrlen(sp) ;
+		if (sl < 0) sl = lenstr(sp) ;
 	        rs = memclear(hop) ;
 	        op->mcols = mcols ;
 	        op->ln = ln ;
