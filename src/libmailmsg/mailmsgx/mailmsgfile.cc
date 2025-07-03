@@ -74,6 +74,7 @@
 
 #include	"mailmsgfile.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -286,7 +287,7 @@ int mailmsgfile_msginfo(MMF *op,MMF_MI **mipp,cc *msgid) noex {
 	            hdb_dat	key ;
 	            hdb_dat	val ;
 	            key.buf = msgid ;
-	            key.len = cstrlen(msgid) ;
+	            key.len = lenstr(msgid) ;
 	            if ((rs = hdb_fetch(op->flp,key,np,&val)) >= 0) {
 	                *mipp = (MMF_MI *) val.buf ;
 	                vlines = (*mipp)->vlines ;
@@ -349,7 +350,7 @@ static int mailmsgfile_newx(MMF *op,cc *mid,int mfd,off_t bo,int bl) noex {
 	hdb_dat		key ;
 	hdb_dat		val ;
 	key.buf = mid ;
-	key.len = cstrlen(mid) ;
+	key.len = lenstr(mid) ;
 	if ((rs = hdb_fetch(op->flp,key,nullptr,&val)) >= 0) {
 	    MMF_MI	*mip = (MMF_MI *) val.buf ;
 	    vlines = mip->vlines ;
@@ -590,7 +591,7 @@ static int mailmsgfile_store(MMF *op,MMF_MI *mip) noex {
 	        hdb_dat	val ;
 	        *ep = *mip ; /* copy */
 	        key.buf = ep->mid ;
-	        key.len = cstrlen(ep->mid) ;
+	        key.len = lenstr(ep->mid) ;
 	        val.buf = ep ;
 	        val.len = sz ;
 	        rs = hdb_store(op->flp,key,val) ;
@@ -741,8 +742,8 @@ static int mailmsgfile_checkerxxx(MMF *op,vecpstr *flp,
 static int mi_start(MMF_MI *mip,cc *msgid,cc *mfname,int blen) noex {
 	int		rs = SR_FAULT ;
 	if (mip) {
-	    cint	milen = cstrlen(msgid) ;
-	    cint	mflen = cstrlen(mfname) ;
+	    cint	milen = lenstr(msgid) ;
+	    cint	mflen = lenstr(mfname) ;
 	    int		sz = 0 ;
 	    char	*bp = nullptr ;
 	    memclear(mip) ;

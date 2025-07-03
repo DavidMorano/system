@@ -35,13 +35,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<vecitem.h>
 #include	<localmisc.h>
 
 #include	"mailmsgatt.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -107,7 +107,7 @@ int mailmsgatt_add(mailmsgatt *op,cc *ct,cc *ce,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && ct && sp) {
 	    mailmsgattent	ve ;
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rs = mailmsgattent_start(&ve,ct,ce,sp,sl)) >= 0) {
 	        cint	esz = szof(mailmsgattent) ;
 	        rs = vecitem_add(op,&ve,esz) ;

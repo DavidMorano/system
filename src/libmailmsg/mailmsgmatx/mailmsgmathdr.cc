@@ -61,6 +61,7 @@
 
 #include	"mailmsgmathdr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -101,7 +102,7 @@ int mailmsgmathdr(cchar *sp,int sl,int *ip) noex {
 	    int		tl ;
 	    int		kl = 0 ;
 	    cchar	*tp = sp ;
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (ip) {
 	        *ip = 0 ;
 	    }

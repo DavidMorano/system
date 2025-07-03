@@ -81,12 +81,10 @@
 
 #include	"mailmsgstage.h"
 
+import libutil ;
+import uconstants ;
 
 /* local defines */
-
-#ifndef	VARTMPDNAME
-#define	VARTMPDNAME	"TMPDIR"
-#endif
 
 #ifndef	HDRNAMELEN
 #define	HDRNAMELEN	80
@@ -178,7 +176,10 @@ int mailmsgstage_start(MMS *op,int ifd,int to,int mmo) noex {
 		op->to = to ;
 	        op->f.useclen = bool(mmo & MAILMSGSTAGE_OUSECLEN) ;
 	        op->f.useclines = bool(mmo & MAILMSGSTAGE_OUSECLINES) ;
-	        if (tmpdn == np) tmpdn = getenv(VARTMPDNAME) ;
+	        if (tmpdn == np) {
+		    static cchar *vap = getenv(varname.tmpdir) ;
+		    tmpdn = vap ;
+		}
 	        if (tmpdn == np) tmpdn = MAILMSGSTAGE_TMPDNAME ;
 		if ((rs = uc_malloc(osz,&vp)) >= 0) {
 		    op->mlp = (vechand *) vp ;

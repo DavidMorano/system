@@ -56,6 +56,7 @@
 
 #include	"mailmsgattent.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -117,7 +118,7 @@ int mailmsgattent_start(MME *op,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
     	MAILMSGATTENT	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && ct && nbuf) {
-	    if (nlen < 0) nlen = cstrlen(nbuf) ;
+	    if (nlen < 0) nlen = lenstr(nbuf) ;
 	    rs = memclear(hop) ;
 	    op->cte = -1 ;
 	    op->clen = -1 ;
@@ -133,7 +134,7 @@ int mailmsgattent_start(MME *op,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
 	    }
 	    if (rs >= 0) {
 	       if (ct && (op->ext == nullptr) && (op->type == nullptr)) {
-	            cint	cl = cstrlen(ct) ;
+	            cint	cl = lenstr(ct) ;
 		    rs = mailmsgattent_startct(op,ct,cl) ;
 	        } /* end if */
 	    } /* end if (ok) */

@@ -68,6 +68,7 @@
 
 #include	"mailspool.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -247,7 +248,7 @@ int mailspool_setlockinfo(MS *op,cchar *wbuf,int wlen) noex {
 	if ((rs = mailspool_magic(op,wbuf)) >= 0) {
 	    cint	of = O_WRONLY ;
 	    cmode	om = 0666 ;
-	    if (wlen < 0) wlen = cstrlen(wbuf) ;
+	    if (wlen < 0) wlen = lenstr(wbuf) ;
 	    if ((rs = u_open(op->lfname,of,om)) >= 0) {
 	        cint	fd = rs ;
 		{

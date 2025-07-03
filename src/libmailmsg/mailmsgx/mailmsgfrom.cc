@@ -36,6 +36,7 @@
 
 #include	"mailmsgfrom.h"
 
+import libutil ;
 
 /* local defines */
 

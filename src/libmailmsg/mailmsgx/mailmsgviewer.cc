@@ -43,6 +43,7 @@
 
 #include	"mailmsgviewer.h"
 
+import libutil ;
 
 /* local defines */
 
