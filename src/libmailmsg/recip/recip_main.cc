@@ -39,6 +39,7 @@
 
 #include	"recip.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -174,7 +175,7 @@ int recip_get(recip *op,cchar **rpp) noex {
 	    cchar	*rp = nullptr ;
 	    if (op->recipient) {
 	        rp = op->recipient ;
-	        rs = cstrlen(rp) ;
+	        rs = lenstr(rp) ;
 	    } else {
 	        rs = SR_NOTOPEN ;
 	    }
@@ -205,7 +206,7 @@ int recip_setname(recip *op,cchar *sp,int sl) noex {
 	        op->name = nullptr ;
 	    }
 	    if (sp[0]) {
-	        if (sl < 0) sl = cstrlen(sp) ;
+	        if (sl < 0) sl = lenstr(sp) ;
 	        if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	            op->name = cp ;
 	        } /* end if (m-a) */
@@ -224,7 +225,7 @@ int recip_setmailspool(recip *op,cchar *sp,int sl) noex {
 	        op->maildname = nullptr ;
 	    }
 	    if (sp[0]) {
-	        if (sl < 0) sl = cstrlen(sp) ;
+	        if (sl < 0) sl = lenstr(sp) ;
 	        if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	            op->maildname = cp ;
 	        } /* end if (m-a) */
@@ -273,7 +274,7 @@ int recip_match(recip *op,cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
 		rs = SR_OK ;
-	        if (sl < 0) sl = cstrlen(sp) ;
+	        if (sl < 0) sl = lenstr(sp) ;
 	        if (op->recipient) {
 	            f = (strwcmp(op->recipient,sp,sl) == 0) ;
 	        }
@@ -326,7 +327,7 @@ int recip_getname(recip *op,cchar **rpp) noex {
 	        *rpp = op->name ;
 	    }
 	    if (op->name) {
-	        rs = cstrlen(op->name) ;
+	        rs = lenstr(op->name) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -340,7 +341,7 @@ int recip_getmailspool(recip *op,cchar **rpp) noex {
 	        *rpp = op->maildname ;
 	    }
 	    if (op->maildname) {
-	        rs = cstrlen(op->maildname) ;
+	        rs = lenstr(op->maildname) ;
 	    }
 	} /* end if (magic) */
 	return rs ;

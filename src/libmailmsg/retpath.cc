@@ -48,6 +48,7 @@
 
 #include	"retpath.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -120,7 +121,7 @@ int retpath_parse(retpath *plp,cchar *sp,int sl) noex {
 	if (plp && sp) {
 	    int		cl ;
 	    cchar	*cp ;
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = SR_OK ;
 	    for (cchar *tp ; (tp = strnbrk(sp,sl,"!@,%:")) != np ; ) {
 		cint	ll = intconv(tp - sp) ;

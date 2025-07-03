@@ -49,6 +49,7 @@
 
 #include	"msgentry.h"
 
+import libutil ;
 
 /* local defines */
 

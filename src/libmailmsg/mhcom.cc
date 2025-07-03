@@ -43,6 +43,7 @@
 
 #include	"mhcom.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -96,7 +97,7 @@ int mhcom_start(mhcom *op,cchar *sp,int sl) noex {
 	    int		sz ;
 	    int		buflen ;
 	    memclear(hop) ;
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
