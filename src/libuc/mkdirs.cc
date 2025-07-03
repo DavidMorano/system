@@ -1,5 +1,5 @@
 /* mkdirs SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make all directories in a directory path */
@@ -52,7 +52,7 @@
 #include	<ids.h>
 #include	<libmallocxx.h>
 #include	<mkpathx.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<localmisc.h>
 
 #include	"mkdirs.h"
@@ -115,7 +115,7 @@ static int procdir(ids *idp,cchar *dirbuf,mode_t dm) noex {
 	int		rs ;
 	if (USTAT sb ; (rs = uc_stat(dirbuf,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
-	        rs = sperm(idp,&sb,X_OK) ;
+	        rs = permid(idp,&sb,X_OK) ;
 	        if (rs > 0) rs = 0 ;
 	    } else {
 	        rs = SR_NOTDIR ;
