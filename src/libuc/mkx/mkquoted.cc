@@ -1,5 +1,5 @@
 /* mkquoted SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* quote arguments for safe passage through a SHELL */
@@ -101,7 +101,7 @@ namespace {
 	int		alen ;
 	bool		f_white ;
 	quoter(char *qp,int ql,cchar *ap,int al) noex {
-	    if (al < 0) al = cstrlen(ap) ;
+	    if (al < 0) al = lenstr(ap) ;
 	    qbuf = qp ;
 	    abuf = ap ;
 	    qlen = ql ;

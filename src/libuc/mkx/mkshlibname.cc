@@ -1,5 +1,5 @@
 /* mkshlibname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make the filename for a shared library (shared object) */
@@ -79,7 +79,7 @@ int mkshlibname(char *shlibname,cchar *pnp,int pnl) noex {
 	    rs = SR_INVALID ;
 	    if (pnp[0]) {
 	        cchar	*lc = "lib" ;
-		if (pnl < 0) pnl = cstrlen(pnp) ;
+		if (pnl < 0) pnl = lenstr(pnp) ;
 		if ((rs = maxnamelen) >= 0) {
 		    storebuf	sb(shlibname,rs) ;
 	            bool	f = ((pnl >= 3) && (strncmp(pnp,lc,3) == 0)) ;

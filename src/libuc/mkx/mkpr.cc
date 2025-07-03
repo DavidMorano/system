@@ -1,11 +1,10 @@
 /* mkpr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make program-root */
 /* version %I% last-modified %G% */
 
-#define	CF_UCPWCACHE	0		/* use |ucpwcache(3uc)| */
 
 /* revision history:
 
@@ -52,7 +51,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -62,15 +60,13 @@
 #include	<cstdlib>
 #include	<pwd.h>
 #include	<usystem.h>
-#include	<varnames.hh>
 #include	<getbufsize.h>
+#include	<getpwx.h>
 #include	<getuserhome.h>
+#include	<varnames.hh>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<ids.h>
-#include	<getax.h>
-#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getusername.h>
 #include	<fsdir.h>
 #include	<sncpyx.h>
 #include	<sncpyxc.h>
@@ -78,7 +74,7 @@
 #include	<nleadstr.h>
 #include	<mkpathx.h>
 #include	<mkpathxw.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<hasx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -90,12 +86,6 @@ import libutil ;
 /* local defines */
 
 #define	STACKBUFLEN	64
-
-#if	CF_UCPWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UCPWCACHE */
 
 #ifndef	VARHOME
 #define	VARHOME		"HOME"
@@ -367,7 +357,7 @@ static int subinfo_dirok(SI *sip,cchar *dname,mode_t dm) noex {
 	    if ((rs = subinfo_checkid(sip)) >= 0) {
 	        rs = SR_NOTDIR ;
 	        if (S_ISDIR(sb.st_mode) && sip->open.ids) {
-	            rs = sperm(&sip->id,&sb,dm) ;
+	            rs = permid(&sip->id,&sb,dm) ;
 		}
 	    }
 	} /* end if (uc_stat) */
@@ -423,7 +413,7 @@ static int subinfo_domain(SI *sip,char *rbuf,int rlen) noex {
 	    sip->domain = getenv(vn) ;
 	}
 	if (sip->domain && sip->domain[0]) {
-	    int		dnl = cstrlen(sip->domain) ;
+	    int		dnl = lenstr(sip->domain) ;
 	    cchar	*dnp = sip->domain ;
 	    while ((dnl > 0) && (dnp[dnl-1] == '.')) dnl -= 1 ;
 	    if (dnl > 0) {
@@ -483,13 +473,11 @@ static int subinfo_user(SI *sip,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*pwbuf{} ;
-	if ((rs = malloc_pw(&pwbuf)) >= 0) {
+	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
 	    ucentpw	pw ;
 	    cint	pwlen = rs ;
-	    if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,sip->dname)) >= 0) {
-	        char	*tbuf{} ;
-		if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    if ((rs = getpwx_name(&pw,pwbuf,pwlen,sip->dname)) >= 0) {
+	        if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 		    cchar	*d = pw.pw_dir ;
 		    cchar	*swd = SWDFNAME ;
 	            if ((rs = mkpath2(tbuf,d,swd)) >= 0) {
@@ -499,7 +487,7 @@ static int subinfo_user(SI *sip,char *rbuf,int rlen) noex {
 		    rs1 = uc_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
-	    } /* end if (GETPW_NAME) */
+	    } /* end if (getpwx_name) */
 	    rs1 = uc_free(pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
@@ -508,11 +496,10 @@ static int subinfo_user(SI *sip,char *rbuf,int rlen) noex {
 /* end subroutine (subinfo_user) */
 
 static int subinfo_users(SI *sip,char *rbuf,int rlen,cc *sym,cc *d) noex {
-	USTAT		sb ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-        if ((rs = u_lstat(sym,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_lstat(sym,&sb)) >= 0) {
             if (S_ISLNK(sb.st_mode)) {
                 if ((rs = u_readlink(sym,rbuf,rlen)) >= 0) {
                     cint     bl = rs ;
@@ -546,12 +533,11 @@ static int subinfo_users(SI *sip,char *rbuf,int rlen,cc *sym,cc *d) noex {
 
 static int subinfo_prmap(SI *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
-	int		i = 0 ;		/* used afterwards */
-	int		m ;
-	int		len = 0 ;
+	int		i = 0 ; /* used afterwards */
+	int		len = 0 ; /* return-value */
 	for (i = 0 ; prmaps[i].prname ; i += 1) {
 	    cchar	*pn = prmaps[i].prname ;
-	    if ((m = nleadstr(pn,sip->dname,-1)) > 0) {
+	    if (int m ; (m = nleadstr(pn,sip->dname,-1)) > 0) {
 	        if ((pn[m] == '\0') && (sip->dname[m] == '\0')) {
 	            break ;
 		}
@@ -571,13 +557,11 @@ static int subinfo_home(SI *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
-	cchar		*hn ;
-	if ((hn = getenv(VARHOME)) != nullptr) {
+	if (cc *hn ; (hn = getenv(VARHOME)) != nullptr) {
 	    rs = subinfo_homer(sip,rbuf,rlen,hn) ;
 	    len = rs ;
 	} else {
-	    char	*hbuf{} ;
-	    if ((rs = malloc_mp(&hbuf)) >= 0) {
+	    if (char *hbuf ; (rs = malloc_mp(&hbuf)) >= 0) {
 		cint	hlen = rs ;
 	        if ((rs = getuserhome(hbuf,hlen,"-")) >= 0) {
 	    	    rs = subinfo_homer(sip,rbuf,rlen,hbuf) ;

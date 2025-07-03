@@ -1,5 +1,5 @@
 /* mkshmname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a shared-object filename from components */
@@ -102,7 +102,7 @@ int mkshmname(char *shmbuf,cchar *fp,int fl,cchar *dp,int dl) noex {
 	    int		ml ;
 	    if ((rs = sb.chr('/')) >= 0) {
 	        if (fp[0] == '/') {
-	            if (fl < 0) fl = xstrlen(fp) ;
+	            if (fl < 0) fl = lenstr(fp) ;
 	            fp += 1 ;
 	            fl -= 1 ;
 	        }

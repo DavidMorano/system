@@ -1,5 +1,5 @@
 /* mkrevstr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* reverse the characters in a string in place */
@@ -60,7 +60,7 @@ import libutil ;
 int mkrevstr(char *bp,int bl) noex {
 	int		rs = SR_FAULT ;
 	if (bp) {
-	    if (bl < 0) bl = cstrlen(bp) ;
+	    if (bl < 0) bl = lenstr(bp) ;
 	    for (int i = 0 ; i < (bl/2) ; i += 1) {
 	        int	ch = bp[i] ;
 	        bp[i] = bp[bl-i-1] ;
