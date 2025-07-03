@@ -1,5 +1,5 @@
 /* mapex HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* map status-return (SR) values to program exit-codes (EX) */

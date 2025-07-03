@@ -1,5 +1,5 @@
 /* mapstrint SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* Map (database) for String-Integer pairs */
@@ -131,7 +131,7 @@ int mapstrint_add(MSI *dbp,cchar *kstr,int klen,int ival) noex {
 	int		rs = SR_FAULT ;
 	if (dbp && kstr) {
 	    rs = SR_INVALID ;
-	    if (klen < 0) klen = xstrlen(kstr) ;
+	    if (klen < 0) klen = lenstr(kstr) ;
 	    if (klen > 0) {
 	        cint	sz = szof(int) + klen + 1 ;
 	        if (int *ip{} ; (rs = uc_malloc(sz,&ip)) >= 0) {
@@ -196,7 +196,7 @@ int mapstrint_fetch(MSI *dbp,cchar *kstr,int klen,cur *curp,int *vp) noex {
 	if (dbp && kstr) {
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
-	    if (klen < 0) klen = xstrlen(kstr) ;
+	    if (klen < 0) klen = lenstr(kstr) ;
 	    key.buf = kstr ;
 	    key.len = klen ;
 	    if ((rs = hdb_fetch(dbp,key,curp,&val)) >= 0) {
@@ -218,7 +218,7 @@ int mapstrint_fetchrec(MSI *dbp,cc *kstr,int klen,cur *curp,
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
 	    hdb_dat	rkey{} ;
-	    if (klen < 0) klen = xstrlen(kstr) ;
+	    if (klen < 0) klen = lenstr(kstr) ;
 	    key.buf = kstr ;
 	    key.len = klen ;
 	    if (kpp) *kpp = nullptr ;
@@ -272,7 +272,7 @@ int mapstrint_nextkey(MSI *dbp,cchar *kstr,int klen,mapstrint_cur *curp) noex {
 	int		rs = SR_FAULT ;
 	if (dbp && kstr && curp) {
 	    hdb_dat	key ;
-	    if (klen < 0) klen = xstrlen(kstr) ;
+	    if (klen < 0) klen = lenstr(kstr) ;
 	    key.buf = kstr ;
 	    key.len = klen ;
 	    rs = hdb_nextrec(dbp,key,curp) ;
@@ -288,7 +288,7 @@ int mapstrint_delkey(MSI *dbp,cchar *kstr,int klen) noex {
 	int		rs1 ;
 	int		rs2 ;
 	if (dbp && kstr) {
-	    if (klen < 0) klen = xstrlen(kstr) ;
+	    if (klen < 0) klen = lenstr(kstr) ;
 	    /* delete all of the data associated with this key */
 	    if (hdb_cur kcur ; (rs = hdb_curbegin(dbp,&kcur)) >= 0) {
 	        hdb_dat		skey ;
