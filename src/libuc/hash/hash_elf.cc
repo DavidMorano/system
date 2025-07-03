@@ -1,5 +1,5 @@
 /* hash_elf SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform the hash done in processing ELF files */
@@ -101,7 +101,7 @@ uint hash_elf(cvoid *vp,int sl) noex {
 	unsigned	h = 0 ;
 	unsigned	g ;
 	unsigned	v ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	while (sl-- > 0) {
 	    v = uchar(*sp++) ;
 	    h <<= 4 ;

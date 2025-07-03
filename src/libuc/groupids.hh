@@ -1,5 +1,5 @@
 /* groupids HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* group-ID fetch (UNIX® group-IDs) */

@@ -1,5 +1,5 @@
 /* hashindex SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* create an index from a hash value */
