@@ -1,5 +1,5 @@
 /* mklogid HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* make a log-ID c-string, suitable for logging purposes */
