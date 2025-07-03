@@ -46,13 +46,11 @@
 
 #include	"comparse.h"
 
+import libutil ;
 
 /* local defines */
 
 #define	COMPARSE_DEFSIZE	80
-#define	COMPARSE_SVALUE		0
-#define	COMPARSE_SCOMMENT	1
-#define	COMPARSE_SOVERLAST	2
 
 
 /* external subroutines */
@@ -62,6 +60,12 @@
 
 
 /* local structures */
+
+enum states {
+    	state_value,
+	state_comment,
+	state_overlast
+} ; /* end enum (states) */
 
 namespace {
     struct vars {
@@ -107,7 +111,7 @@ int comparse_start(comparse *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    static cint		rsv = var ;
 	    memclear(hop) ;
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rs = rsv) >= 0) {
 		op->mailaddrlen = var.mailaddrlen ;
 		op->mailcommlen = var.mailcommlen ;
@@ -170,7 +174,7 @@ int comparse_getcom(comparse *op,cchar **rpp) noex {
 
 int comparse_bake(comparse *op,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
-	buffer		as[COMPARSE_SOVERLAST] ;
+	buffer		as[state_overlast] ;
 	cint		defsize = COMPARSE_DEFSIZE ;
 	int		rs ;
 	int		rs1 ;
@@ -181,8 +185,8 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	}
 	if ((rs = buffer_start(&as[0],defsize)) >= 0) {
 	    if ((rs = buffer_start(&as[1],defsize)) >= 0) {
-	        int	pstate = COMPARSE_SVALUE ;
-	        int	state = COMPARSE_SVALUE ;
+	        int	pstate = state_value ;
+	        int	state = state_value ;
 		int	pc ;
 	        int	c_comment = 0 ;
 		bool	f_quote = false ;
@@ -215,7 +219,7 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	                            buffer_chr((as + state),' ') ;
 				}
 	                        pstate = state ;
-	                        state = COMPARSE_SCOMMENT ;
+	                        state = state_comment ;
 	                        pc = buffer_getprev(as + state) ;
 	                        if ((pc >= 0) && (! chiswh(pc))) {
 	                            buffer_chr((as + state),' ') ;
@@ -265,7 +269,7 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 			/* FALLTHROUGH */
 	            default:
 	                if (c_comment > 0) {
-	                    buffer_chr((as + COMPARSE_SCOMMENT),*sp++) ;
+	                    buffer_chr((as + state_comment),*sp++) ;
 	                } else {
 	                    buffer_chr((as + state),*sp++) ;
 			}
@@ -274,7 +278,7 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	            } /* end switch */
 	        } /* end while (scanning characters) */
 	        if (rs >= 0) {
-	            int		w = COMPARSE_SCOMMENT ;
+	            int		w = state_comment ;
 	            if (cchar *bp ; (rs = buffer_get((as+w),&bp)) >= 0) {
 	                int	bl = rs ;
 	                while (bl && chiswh(bp[bl-1])) {
@@ -283,7 +287,7 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	                if (cchar *cp ; (rs = uc_mallocstrw(bp,bl,&cp)) >= 0) {
 	                    op->com.sp = cp ;
 	                    op->com.sl = bl ;
-	                    w = COMPARSE_SVALUE ;
+	                    w = state_value ;
 	                    if ((rs = buffer_get((as+w),&bp)) >= 0) {
 	                        bl = rs ;
 	                        while (bl && chiswh(bp[bl-1])) {

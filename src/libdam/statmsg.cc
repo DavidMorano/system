@@ -218,8 +218,7 @@ static int	statmsg_schedload(SM *,vecstr *) noex ;
 static int	statmsg_checker(SM *,time_t) noex ;
 static int	statmsg_envbegin(SM *) noex ;
 static int	statmsg_envend(SM *) noex ;
-static int	statmsg_envadds(SM *,strpack *,cchar **,
-			userid *,cchar *) noex ;
+static int	statmsg_envadds(SM *,strpack *,cc **,userid *,cc *) noex ;
 static int	statmsg_envstore(SM *,strpack *,cchar **,int,
 			cchar *,int) noex ;
 static int 	statmsg_processor(SM *,cc **,mainv,cc *,cc *,int) noex ;
@@ -238,14 +237,12 @@ static int	mapper_mapfins(MA *) noex ;
 static int	mapdir_start(MD *,cchar *,
 			cchar *,cchar *,int,cchar *,int) noex ;
 static int	mapdir_finish(MD *) noex ;
-static int	mapdir_process(MD *,cc **,mainv,cc *,cc *,int) noex ;
+static int	mapdir_proc(MD *,cc **,mainv,cc *,cc *,int) noex ;
 static int	mapdir_expand(MD *) noex ;
 static int	mapdir_expander(MD *) noex ;
-static int	mapdir_processor(MD *,cchar **,
-			cchar *,cchar *,int) noex ;
-static int	mapdir_processorthem(MD *,cchar **,
-			cchar *,vecstr *,mainv,int) noex ;
-static int	mapdir_processorone(MD *,cchar **,
+static int	mapdir_procer(MD *,cc **,cc *,cc *,int) noex ;
+static int	mapdir_procerthem(MD *,cc **,cc *,vecstr *,mainv,int) noex ;
+static int	mapdir_procerone(MD *,cchar **,
 			cchar *,vecstr *,cchar *,int) noex ;
 static int	mapdir_procout(MD *,cchar **,cchar *,
 			cchar *,int) noex ;
@@ -658,73 +655,70 @@ static int statmsg_envend(SM *op) noex {
 
 static int mkdigenv(char *ebuf,int elen,cc *pre,cc *key,uint uv) noex {
     	int	rs ;
-    	char	digbuf[diglen + 1] ;
-	if ((rs = ctdec(digbuf,diglen,uv)) >= 0) {
+    	if (char digbuf[diglen + 1] ; (rs = ctdec(digbuf,diglen,uv)) >= 0) {
 	    rs = sncpy(ebuf,elen,pre,key,"=",digbuf) ;
 	}
 	return rs ;
 } /* end subroutine (mkdigenv) */
 
 static int statmsg_envadds(SM *op,SP *spp,cc **ev,userid *idp,cc *kn) noex {
-    	cint		envlen = var.envlen ;
-	int		rs = SR_OK ;
-	int		n ;
+    	cint		elen = var.envlen ;
+	int		rs ;
+	int		n ; /* return-value */
 	mainv		envv = op->envv ;
-	cchar		*pre = envpre ;
-	char		envbuf[var.envlen + 1] ;
 	for (n = 0 ; n < op->nenv ; n += 1) {
 	    ev[n] = envv[n] ;
 	}
-	for (int i = 0 ; (rs >= 0) && envstrs[i] ; i += 1) {
-	    uint	uv = UINT_MAX ;
-	    int		el = -1 ;
-	    cchar	*es = envstrs[i] ;
-	    cchar	*cp ;
-	    envbuf[0] = '\0' ;
-	    switch (i) {
-	    case envstr_uid:
-	        if (idp->uid != uidend) {
-	            uv = idp->uid ;
-		    rs = mkdigenv(envbuf,envlen,pre,es,uv) ;
-		    el = rs ;
+	if (char *ebuf ; (rs = uc_malloc((elen + 1),&ebuf)) >= 0) {
+	    cchar	*pre = envpre ;
+	    for (int i = 0 ; (rs >= 0) && envstrs[i] ; i += 1) {
+	        uint	uv = UINT_MAX ;
+	        int	el = -1 ;
+	        cchar	*es = envstrs[i] ;
+	        cchar	*cp ;
+	        ebuf[0] = '\0' ;
+	        switch (i) {
+	        case envstr_uid:
+	            if ((uv = idp->uid) != uidend) {
+		        rs = mkdigenv(ebuf,elen,pre,es,uv) ;
+		        el = rs ;
+	            }
+	            break ;
+	        case envstr_gid:
+	            if ((uv = idp->gid) != gidend) {
+		        rs = mkdigenv(ebuf,elen,pre,es,uv) ;
+		        el = rs ;
+	            }
+	            break ;
+	        case envstr_username:
+	            cp = idp->username ;
+	            if ((cp != nullptr) && (cp[0] != '\0')) {
+	                rs = sncpy(ebuf,elen,pre,es,"=",cp) ;
+	                el = rs ;
+	            }
+	            break ;
+	        case envstr_groupname:
+	            cp = idp->groupname ;
+	            if ((cp != nullptr) && (cp[0] != '\0')) {
+	                rs = sncpy(ebuf,elen,pre,es,"=",cp) ;
+	                el = rs ;
+	            }
+	            break ;
+	        case envstr_keyname:
+	            if ((kn != nullptr) && (kn[0] != '\0')) {
+	                rs = sncpy(ebuf,elen,pre,es,"=",kn) ;
+	                el = rs ;
+	            }
+	            break ;
+	        } /* end switch */
+	        if ((rs >= 0) && (ebuf[0] != '\0')) {
+	            rs = statmsg_envstore(op,spp,ev,n,ebuf,el) ;
+	            if (rs > 0) n += 1 ;
 	        }
-	        break ;
-	    case envstr_gid:
-	        if (idp->gid != gidend) {
-	            uv = idp->gid ;
-		    rs = mkdigenv(envbuf,envlen,pre,es,uv) ;
-		    el = rs ;
-	        }
-	        break ;
-	    case envstr_username:
-	        cp = idp->username ;
-	        if ((cp != nullptr) && (cp[0] != '\0')) {
-	            rs = sncpy4(envbuf,envlen,envpre,es,"=",cp) ;
-	            el = rs ;
-	        }
-	        break ;
-	    case envstr_groupname:
-	        cp = idp->groupname ;
-	        if ((cp != nullptr) && (cp[0] != '\0')) {
-	            rs = sncpy4(envbuf,envlen,envpre,es,"=",cp) ;
-	            el = rs ;
-	        }
-	        break ;
-	    case envstr_keyname:
-	        if ((kn != nullptr) && (kn[0] != '\0')) {
-	            rs = sncpy4(envbuf,envlen,envpre,es,"=",kn) ;
-	            el = rs ;
-	        }
-	        break ;
-	    } /* end switch */
-	    if ((rs >= 0) && (envbuf[0] != '\0')) {
-	        rs = statmsg_envstore(op,spp,ev,n,envbuf,el) ;
-	        if (rs > 0) n += 1 ;
-	    }
-	} /* end for */
-	{
-	    ev[n] = nullptr ; /* very important! */
-	}
+	    } /* end for */
+	    rs = rsfree(rs,ebuf) ;
+	} /* end if (m-a-f) */
+	ev[n] = nullptr ; /* very important! */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (statmsg_envadds) */
@@ -916,7 +910,7 @@ static int mapper_processor(MA *mmp,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	        for (int i = 0 ; mlp->get(i,&vp) >= 0 ; i += 1) {
 		    MD	*ep = mapdirp(vp) ;
 	            if (vp) {
-	                rs = mapdir_process(ep,ev,adms,gn,kn,fd) ;
+	                rs = mapdir_proc(ep,ev,adms,gn,kn,fd) ;
 	                wlen += rs ;
 	            }
 	            if (rs < 0) break ;
@@ -1152,7 +1146,7 @@ static int mapdir_finish(MD *ep) noex {
 }
 /* end subroutine (mapdir_finish) */
 
-static int mapdir_process(MD *ep,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
+static int mapdir_proc(MD *ep,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	cint		to_lock = TO_LOCK ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1171,7 +1165,7 @@ static int mapdir_process(MD *ep,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	                if ((rs = lockrw_rdlock(&ep->rwm,to_lock)) >= 0) {
 			    cchar	*dn = ep->dirname ;
 	                    if ((dn[0] != '~') || (ep->dname != nullptr)) {
-	                        rs = mapdir_processor(ep,ev,gn,kn,fd) ;
+	                        rs = mapdir_procer(ep,ev,gn,kn,fd) ;
 	            		wlen += rs ;
 	    		    } /* end if */
 	    		    rs1 = lockrw_unlock(&ep->rwm) ;
@@ -1183,7 +1177,7 @@ static int mapdir_process(MD *ep,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	} /* end if */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (mapdir_process) */
+/* end subroutine (mapdir_proc) */
 
 static int mapdir_expand(MD *ep) noex {
 	cint		to_lock = TO_LOCK ;
@@ -1233,105 +1227,121 @@ static int mapdir_expander(MD *ep) noex {
 }
 /* end subroutine (mapdir_expander) */
 
-static int mapdir_processor(MD *ep,cchar **ev,cchar *,cchar *kn,int fd) noex {
-    	cint		envlen = var.envlen ;
+static int vecstr_envload(VS *,cc *,cc *,cc *) noex ;
+
+static int mapdir_procerv(MD *,cc **,cc *,mv,int,cc *) noex ;
+
+static int mapdir_procer(MD *mdp,cc **ev,cc *gn,cc *kn,int fd) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ; /* return-value */
 	bool		f_continue = true ;
-	cchar		defname[] = SM_DEFGROUP ;
-	cchar		allname[] = SM_ALLGROUP ;
-	cchar		suf[] = SM_SUF ;
-	cchar		*dn = ep->dirname ;
+	cchar		*dn = mdp->dirname ;
 	if (dn[0] == '~') {
-	    dn = ep->dname ;
+	    dn = mdp->dname ;
 	    f_continue = ((dn != nullptr) && (dn[0] != '\0')) ;
 	}
 	if (f_continue) {
-	    char	env_admin[var.envlen +1] ;
-	    char	env_admindir[var.envlen +1] ;
 	    if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
-		int	n = lenstrarr(ev) ;
-	        cchar	*post = envstrs[envstr_admin] ;
-	        strdcpy(env_admin,envlen,envpre,post,"=",ep->admin) ;
-	        post = envstrs[envstr_admindir] ;
-	        strdcpy(env_admindir,envlen,envpre,post,"=",dn) ;
-	        ev[n+0] = env_admin ;
-	        ev[n+1] = env_admindir ;
-	        ev[n+2] = nullptr ;
-		cint	nstrs = 4 ;
-		if (vecstr nums ; (rs = nums.start(0,0)) >= 0) {
-	            cchar	*strs[nstrs + 1] ;
-		    if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
-		    cint	nlen = rs ;
-	            loadstrs(strs,nstrs,kn,defname,allname,suf) ;
-	            if (fsdir d ; (rs = fsdir_open(&d,dn)) >= 0) {
-	                fsdir_ent	de ;
-	                while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
-	                    cchar	*den = de.name ;
-	                    if (den[0] != '.') {
-	                	cchar	*tp = strchr(den,'.') ;
-	            		if (tp && (strcmp((tp+1),suf) == 0)) {
-				    int		tl ;
-				    bool	f = true ;
-	   			    cchar	*digp ;
-				    tl = intconv(tp - den) ;
-	                	    digp = strnbrk(den,tl,"0123456789") ;
-	                	    if (digp) {
-					tl = intconv(tp - digp) ;
-	                    		f = hasalldig(digp,tl) ;
-				    }
-				    if (f) {
-	                	        if ((kn[0] != '\0') && (kn[0] != '-')) {
-			    		    for (int i = 0 ; i < 3 ; i += 1) {
-					    f = isBaseMatch(den,strs[i],digp) ;
-					    if (f) break ;
-			    		    } /* end for */
-	                		}
-				    }
-	                	    if (f) {
-					tl = intconv(tp - den) ;
-	                    		rs = vecstr_add(&nums,den,tl) ;
-				    }
-	            		} /* end if (have an SM file) */
-			    }
-	           	    if (rs < 0) break ;
-	        	} /* end while (reading directory entries) */
-	        	rs1 = fsdir_close(&d) ;
-			if (rs >= 0) rs = rs1 ;
-	  	    } /* end if (fsdir) */
-			rs1 = uc_free(nbuf) ;
-			if (rs >= 0) rs = rs1 ;
-		    } /* end if (m-a-f) */
-		    if (rs >= 0) {
-	        	vecstr_sort(&nums,nullptr) ;
-	        	rs = mapdir_processorthem(ep,ev,dn,&nums,strs,fd) ;
-	        	wlen += rs ;
-	   	    } /* end if */
-	   	    rs1 = vecstr_finish(&nums) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (vecstr-nums) */
-		{
-	    	    ev[n] = nullptr ;
-		}
+	        if (VS el ; (rs = el.start) >= 0) {
+	            cchar	*pre = envpre ;
+		    if ((rs = vecstr_envload(&el,pre,mdp->admin,dn)) >= 0) {
+	        	cint	n = lenstrarr(ev) ;
+		        int	c = 0 ;
+		        cchar	*es ;
+		        for (int i = 0 ; el.get(i,&es) >= 0 ; i += 1, c += 1) {
+	    	            ev[n+i] = es ;
+		        }
+	                ev[n+c] = nullptr ;
+		        cint	nstrs = 4 ;
+		        {
+		            cchar	defname[] = SM_DEFGROUP ;
+		            cchar	allname[] = SM_ALLGROUP ;
+	                    cchar	*strs[nstrs + 1] ;
+	                    loadstrs(strs,nstrs,gn,kn,defname,allname) ;
+		            rs = mapdir_procerv(mdp,ev,dn,strs,fd,kn) ;
+			    wlen = rs ;
+		        }
+	    		ev[n] = nullptr ;
+		    } /* end if (vecstr_envload) */
+	            rs1 = el.finish ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (vecstr) */
 	    } else if (isNotAccess(rs)) {
 		rs = SR_OK ;
 	    } /* end if (u_stat) */
 	} /* end if (continued) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (mapdir_processor) */
+/* end subroutine (mapdir_procer) */
 
-static int mapdir_processorthem(MD *mdp,cc **ev,cc *dn,
-		vecstr *blp,mv strs,int fd) noex {
+static int mapdir_procerv(MD *mdp,cc **ev,cc *dn,mv strs,int fd,cc *kn) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ; /* return-value */
+	cchar		suf[] = SM_SUF ;
+        if (vecstr nums ; (rs = nums.start) >= 0) {
+            if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
+                cint	nlen = rs ;
+                if (fsdir d ; (rs = d.open(dn)) >= 0) {
+                    for (fsdir_ent de ; (rs = d.read(&de,nbuf,nlen)) > 0 ; ) {
+                        cchar       *den = nbuf ;
+                        if (den[0] != '.') {
+                            cchar   *tp = strchr(den,'.') ;
+                            if (tp && (strcmp((tp+1),suf) == 0)) {
+                                int         tl ;
+                                bool        f = true ;
+                                cchar       *digp ;
+                                tl = intconv(tp - den) ;
+                                digp = strnbrk(den,tl,"0123456789") ;
+                                if (digp) {
+                                    tl = intconv(tp - digp) ;
+                                    f = hasalldig(digp,tl) ;
+                                }
+                                if (f) {
+                                    if ((kn[0] != '\0') && (kn[0] != '-')) {
+                                        for (int i = 0 ; strs[i] ; i += 1) {
+					    cchar	*sp = strs[i] ;
+                                            f = isBaseMatch(den,sp,digp) ;
+                                            if (f) break ;
+                                        } /* end for */
+                                    }
+                                }
+                                if (f) {
+                                    tl = intconv(tp - den) ;
+                                    rs = nums.add(den,tl) ;
+                                }
+                            } /* end if (have an SM file) */
+                        }
+                        if (rs < 0) break ;
+                    } /* end while (reading directory entries) */
+                    rs1 = d.close ;
+                    if (rs >= 0) rs = rs1 ;
+                } /* end if (fsdir) */
+                rs1 = uc_free(nbuf) ;
+                if (rs >= 0) rs = rs1 ;
+            } /* end if (m-a-f) */
+            if (rs >= 0) {
+                nums.sort() ;
+                rs = mapdir_procerthem(mdp,ev,dn,&nums,strs,fd) ;
+                wlen += rs ;
+            } /* end if */
+            rs1 = nums.finish ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (vecstr-nums) */
+	return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (mapdir_procerv) */
+
+static int mapdir_procerthem(MD *mdp,cc **ev,cc *dn,
+		VS *blp,mv strs,int fd) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
 	if (mdp) {
 	    bool	fcont = true ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; (rs >= 0) && fcont && strs[i] ; i += 1) {
-	        cchar	*kn = strs[i] ;
-		if ((rs = mapdir_processorone(mdp,ev,dn,blp,kn,fd)) >= 0) {
+	        cchar	*sp = strs[i] ;
+		if ((rs = mapdir_procerone(mdp,ev,dn,blp,sp,fd)) >= 0) {
 	    	    wlen += rs ;
 		    fcont = false ;
 		} else if (isNotPresent(rs)) {
@@ -1341,9 +1351,9 @@ static int mapdir_processorthem(MD *mdp,cc **ev,cc *dn,
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (mapdir_processorthem) */
+/* end subroutine (mapdir_procerthem) */
 
-static int mapdir_processorone(MD *ep,cc **ev,cc *dn,
+static int mapdir_procerone(MD *ep,cc **ev,cc *dn,
 		VS *blp,cc *kn,int fd) noex {
 	cint		kl = lenstr(kn) ;
 	int		rs = SR_OK ;
@@ -1366,7 +1376,7 @@ static int mapdir_processorone(MD *ep,cc **ev,cc *dn,
 	if ((rs >= 0) && (c == 0)) rs = SR_NOENT ;
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (mapdir_processorone) */
+/* end subroutine (mapdir_procerone) */
 
 static int mapdir_procout(MD *ep,cchar **ev,cchar *dn,cchar *bn,int fd) noex {
 	cint		sz = ((var.maxpathlen + 1) + (var.maxnamelen + 1)) ;
@@ -1408,7 +1418,8 @@ static int mapdir_procouter(MD *ep,cchar **ev,cchar *fn,int ofd) noex {
 	        if ((rs = uc_openenv(fn,of,om,ev,to_open)) >= 0) {
 	            cint	mfd = rs ;
 	            if_constexpr (f_writeto) {
-	                while ((rs = uc_reade(mfd,obuf,olen,to_read,0)) > 0) {
+			cint	to = to_read ;
+	                while ((rs = uc_reade(mfd,obuf,olen,to,0)) > 0) {
 	                    rs = writeto(ofd,obuf,rs,to_write) ;
 	                    wlen += rs ;
 	                    if (rs < 0) break ;
@@ -1430,13 +1441,13 @@ static int mapdir_procouter(MD *ep,cchar **ev,cchar *fn,int ofd) noex {
 vars::operator int () noex {
     	int		rs ;
 	if ((rs = maxpathlen) == 0) {
-	    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
-		maxnamelen = rs ;
-	        if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-	            maxpathlen = rs ;
+	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	        maxpathlen = rs ;
+	        if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+		    maxnamelen = rs ;
 		    if ((rs = getbufsize(getbufsize_un)) >= 0) {
 		        usernamelen = rs ;
-			envlen = (2 * maxpathlen) ;
+			envlen = maxnamelen ;
 			parambuflen = maxpathlen ;
 		    }
 		}
@@ -1445,15 +1456,45 @@ vars::operator int () noex {
 	return rs ;
 } /* end method (vars::operator) */
 
+static int vecstr_envload(VS *op,cc *pre,cc *adm,cc *dn) noex {
+    	int		rs ;
+	int		c = 0 ;
+	if (char *pbuf ; (rs = malloc_sn(&pbuf)) >= 0) {
+	    cint	plen = rs ;
+            for (int i = 0 ; (rs >= 0) && (i < 2) ; i += 1) {
+                cchar       *post{} ;
+                cchar       *valp{} ;
+                switch (i) {
+                case 0:
+                    post = envstrs[envstr_admin] ;
+                    valp = adm ;
+                    break ;
+                case 1:
+                    post = envstrs[envstr_admindir] ;
+                    valp = dn ;
+                    break ;
+                } /* end switch */
+                if (post) {
+                    if ((rs = sncpy(pbuf,plen,pre,post)) >= 0) {
+                        rs = op->envadd(pbuf,valp) ;
+			c += 1 ;
+                    }
+                }
+            } /* end for */
+            rs = rsfree(rs,pbuf) ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (vecstr_envload) */
+
 static bool isBaseMatch(cchar *den,cchar *bname,cchar *digp) noex {
 	bool		f = false ;
-	if (digp == nullptr) {
+	if (digp) {
+	    csize nsize = size_t(digp - den) ;
+	    f = (strncmp(den,bname,nsize) == 0) ;
+	} else {
 	    int	bl = lenstr(bname) ;
 	    int	m = nleadstr(den,bname,bl) ;
 	    f = (m == bl) && (den[m] == '.') ;
-	} else {
-	    csize nsize = size_t(digp - den) ;
-	    f = (strncmp(den,bname,nsize) == 0) ;
 	}
 	return f ;
 }

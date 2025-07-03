@@ -43,7 +43,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| + |strlen(3c)| */
-#include	<usystem.h>		/* |cstrlen(3u)| */
+#include	<usystem.h>		/* |lenstr(3u)| */
 #include	<matstr.h>
 #include	<char.h>
 #include	<ischarx.h>
@@ -51,6 +51,7 @@
 
 #include	"envmat.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -85,7 +86,7 @@ int envmat(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (sp) {
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = SR_OK ;
 	    if ((sl > 5) && (sp[0] == 'F') && (sp[1] == 'r')) {
 		f = (strncmp((sp+2),"om ",3) == 0) ;
