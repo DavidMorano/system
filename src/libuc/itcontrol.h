@@ -1,5 +1,5 @@
 /* itcontrol HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C99 */
 
 /* interval-timer control (block) */

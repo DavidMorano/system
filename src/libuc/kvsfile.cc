@@ -1,5 +1,5 @@
 /* kvsfile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform kf_file related functions */
@@ -480,7 +480,7 @@ int kvsfile_fetch(kf *op,cc *kbuf,kf_cur *curp,char *vbuf,int vlen) noex {
 	    cchar	*kp = kbuf ;
 	    cchar	*vp ;
 	    if (kbuf[0] == '\0') kp = "default" ;
-	    kl = xstrlen(kp) ;
+	    kl = lenstr(kp) ;
 	    key.buf = kp ;
 	    key.len = kl ;
 	    if ((rs = hdb_fetch(op->elp,key,ecp,&val)) >= 0) {
@@ -770,7 +770,7 @@ static int kvsfile_addentry(kvsfile *op,kf_ent *nep) noex {
 	    val.len = szof(kf_ent) ;
 	    if ((rs = hdb_store(op->kvlp,key,val)) >= 0) {
 	        key.buf = kep->kname ;
-	        key.len = xstrlen(kep->kname) ;
+	        key.len = lenstr(kep->kname) ;
 	        val.buf = ep ;
 	        val.len = szof(kf_ent) ;
 	        rs = hdb_store(op->elp,key,val) ;
