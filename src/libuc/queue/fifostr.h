@@ -1,5 +1,5 @@
 /* fifostr HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* FIFO string operations */
@@ -84,10 +84,10 @@ struct fifostr : fifostr_head {
 	fifostr_co	count ;
 	fifostr_co	finish ;
 	fifostr() noex {
-	    start(this,fifostrmem_start) ;
-	    headlen(this,fifostrmem_headlen) ;
-	    count(this,fifostrmem_count) ;
-	    finish(this,fifostrmem_finish) ;
+	    start	(this,fifostrmem_start) ;
+	    headlen	(this,fifostrmem_headlen) ;
+	    count	(this,fifostrmem_count) ;
+	    finish	(this,fifostrmem_finish) ;
 	} ;
 	fifostr(const fifostr &) = delete ;
 	fifostr &operator = (const fifostr &) = delete ;
@@ -101,8 +101,8 @@ struct fifostr : fifostr_head {
 	int curenum(fifostr_cur *,char *,int) noex ;
 	int curdel(fifostr_cur *) noex ;
 	void dtor() noex ;
-	~fifostr() {
-	    dtor() ;
+	destruct fifostr() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (fifostr) */
 #else	/* __cplusplus */

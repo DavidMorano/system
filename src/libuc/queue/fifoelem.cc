@@ -1,5 +1,5 @@
 /* fifoelem SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* FIFO string operations */
@@ -27,7 +27,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
@@ -36,6 +35,7 @@
 
 #include	"fifoelem.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -304,7 +304,7 @@ int fifoelem_present(fifoelem *op,cv *vsp,int vsl,fifoelem_cmp scmp) noex {
 	    int		sl = vsl ;
 	    cchar	*sp = charp(vsp) ;
 	    if (vsl < 0) {
-		sl = xstrlen(sp) ;
+		sl = lenstr(sp) ;
 	    }
 	    if (scmp == nullptr) scmp = fifoelem_cmp(strcmp) ;
 	    auto entcmp = [&sp,&sl,scmp] (FE_ENT *ep) {
@@ -336,7 +336,7 @@ static int entry_start(FE_ENT *ep,cvoid *vsp,int vsl) noex {
 	int		rs ;
 	if (vsl < 0) {
 	    cchar	*cp = charp(vsp) ;
-	    vsl = xstrlen(cp) ;
+	    vsl = lenstr(cp) ;
 	}
 	ep->prev = ep->next = nullptr ;
 	cchar	*sp = charp(vsp) ;

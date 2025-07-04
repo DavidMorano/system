@@ -1,5 +1,5 @@
 /* fifoitem SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* FIFO string operations */
@@ -36,6 +36,7 @@
 
 #include	"fifoitem.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -310,7 +311,7 @@ int fifoitem_present(fifoitem *op,cv *sp,int sl,fifoitem_cmp scmp) noex {
 	if ((rs = fifoitem_magic(op,sp)) >= 0) {
 	    if (sl < 0) {
 		cchar	*cp = charp(sp) ;
-		sl = xstrlen(cp) ;
+		sl = lenstr(cp) ;
 	    }
 	    if (scmp == nullptr) scmp = fifoitem_cmp(strcmp) ;
 	    auto entcmp = [&sp,&sl,scmp] (FI_ENT *ep) {
@@ -341,7 +342,7 @@ int fifoitem_present(fifoitem *op,cv *sp,int sl,fifoitem_cmp scmp) noex {
 static int entry_start(fifoitem_ent *ep,cvoid *vp,int sl) noex {
 	int		rs ;
 	cchar		*sp = ccharp(vp) ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	ep->next = nullptr ;
 	ep->prev = nullptr ;
 	if (cvoid *dp ; (rs = uc_mallocbuf(sp,sl,&dp)) >= 0) {

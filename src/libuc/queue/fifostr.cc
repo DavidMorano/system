@@ -1,5 +1,5 @@
 /* fifostr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* FIFO string operations */
@@ -31,7 +31,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<snwcpy.h>
 #include	<strwcpy.h>
@@ -39,8 +38,17 @@
 
 #include	"fifostr.h"
 
+import libutil ;
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef fifostr_ent *	entp ;
 
 
 /* external subroutines */
@@ -108,11 +116,11 @@ int fifostr_add(fifostr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = fifostr_magic(op,sp)) >= 0) {
-	    fifostr_ent		*ep = nullptr ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    {
 	        cint	sz = szof(fifostr_ent) + (sl + 1) ;
-	        if ((rs = uc_libmalloc(sz,&ep)) >= 0) {
+		if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+	    	    fifostr_ent		*ep = entp(vp) ;
 	            ep->slen = sl ;
 	            {
 	                char	*bp = cast_reinterpret<charp>(ep) ;
