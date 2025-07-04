@@ -1,5 +1,5 @@
 /* sfnext SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find a sub-string within a larger string (given some criteria) */
@@ -62,6 +62,7 @@
 	Returns:
 	>0		length of found field
 	==0		no field found or a NL character was encountered
+	<0		does not happen
 
 
 	Name:
@@ -70,8 +71,8 @@
 	Description:
 	This subroutine will extract the next white-space-separated
 	or a combination of white-space and a trailing termination
-	character c-string from a counted source c-string.
-	The returned string is white-space shrunken.
+	character c-string from a counted source c-string.  The
+	returned string is white-space shrunken.
 
 	Synopsis:
 	int sfnextbrk(cchar *sp,int sl,cchar *terms,cchar **spp) noex
@@ -85,6 +86,7 @@
 	Returns:
 	>0		length of found field
 	==0		no field found or a NL character was encountered
+	<0		does not happen
 
 *******************************************************************************/
 
@@ -92,11 +94,12 @@
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strchr(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<baops.h>		/* |batst(2uc)| */
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -139,7 +142,7 @@ namespace {
 	    return f ;
 	} ;
    } ; /* end struct (sfnextx) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -176,7 +179,7 @@ int sfnextbrk(cchar *sp,int sl,cchar *bstr,cchar **rpp) noex {
 	struct esfx : sfnextx {
 	    cchar	*bstr ;
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
-	    bool termx (int ch) noex override final {
+	    bool termx(int ch) noex override final {
 		return (strchr(bstr,ch) != nullptr) ;
 	    } ;
 	} ; /* end struct */
@@ -187,6 +190,24 @@ int sfnextbrk(cchar *sp,int sl,cchar *bstr,cchar **rpp) noex {
 	} /* end if (non-null) */
 	return rl ;
 }
+
+int sfnextterm(cchar *sp,int sl,cchar *terms,cchar **rpp) noex {
+	int		rl = -1 ;
+	struct esfx : sfnextx {
+	    cchar	*terms ;
+	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
+	    bool termx (int ch) noex override final {
+		return batst(terms,ch) ;
+	    } ;
+	} ; /* end struct */
+	if (terms) {
+	    esfx	sf(sp,sl,rpp) ;
+	    sf.terms = terms ;
+	    rl = sf ;
+	} /* end if (non-null) */
+	return rl ;
+}
+/* end subroutine (sfnextterm) */
 
 
 /* local subroutines */

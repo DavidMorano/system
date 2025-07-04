@@ -1,5 +1,5 @@
 /* sfkey SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the key part of a compound string */
@@ -53,11 +53,11 @@
 #include	<usysdefs.h>
 #include	<strn.h>
 #include	<char.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -85,7 +85,7 @@
 int sfkey(cchar *sp,int sl,cchar **rpp) noex {
 	int		kl = -1 ;
 	if (sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
 	        kl = intconv(tp - sp) ;
 	        while ((kl > 0) && CHAR_ISWHITE(sp[kl - 1])) {

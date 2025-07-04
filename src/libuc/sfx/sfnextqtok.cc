@@ -1,8 +1,8 @@
 /* sfnextqtok SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* find the next quoted string token */
+/* find the Next-Quoted-Sstring-Token */
 /* version %I% last-modified %G% */
 
 
@@ -17,11 +17,14 @@
 
 /*******************************************************************************
 
+  	Name:
+	sfnextqtok
+
+	Description:
 	This subroutine finds the next quoted string token in a
 	given string.
 
 	Synopsis:
-
 	int sfnextqtok(cchar *sp,int sl,cchar **rpp) noex
 
 	Arguments:
@@ -32,22 +35,21 @@
 	Returns:
 	>0		lenght of found string token
 	==0		no more token strings were found
+	<0		not curently possible
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<char.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -84,7 +86,7 @@ extern "C" {
 
 int sfnextqtok(cchar *sp,int sl,cchar **rpp) noex {
 	int		len = 0 ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	/* skip over whitespace */
 	while (sl && CHAR_ISWHITE(sp[0])) {
 	    sp += 1 ;

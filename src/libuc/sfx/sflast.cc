@@ -1,5 +1,5 @@
 /* sflast SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the last <n> characters in a given string */
@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-03-23, David D-A- Morano
+	= 1998-03-23, David A-D- Morano
 	This code was originally written.
 
 */
@@ -42,19 +42,33 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>		/* possible future use */
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -69,7 +83,7 @@
 /* exported subroutines */
 
 int sflast(cchar *sp,int sl,int n,cchar **rpp) noex {
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if ((n >= 0) && (sl > n)) {
 	    sl = n ;
 	    sp += (sl-n) ;

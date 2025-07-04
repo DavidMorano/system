@@ -1,5 +1,5 @@
 /* sfkeyval SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the value part of a key-value pair in a c-string */
@@ -55,12 +55,12 @@
 #include	<six.h>
 #include	<ischarx.h>
 #include	<strwcmp.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<char.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -88,7 +88,7 @@
 int sfcontent(cchar *sp,int sl,cchar **rpp) noex {
 	int		rl = 0 ;
 	cchar		*rp = nullptr ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (sl > 0) {
 	    if (int si ; (si = sichr(sp,sl,'#')) > 0) {
 		rl = sfshrink(sp,si,&rp) ;

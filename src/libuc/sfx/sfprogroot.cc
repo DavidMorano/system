@@ -1,5 +1,5 @@
 /* sfprogroot SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to find a program-root in a given c-string */
