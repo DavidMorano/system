@@ -1,5 +1,5 @@
 /* splitfname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* split a file-name into its 'dirname' and its 'basename' */
@@ -41,13 +41,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<strn.h>		/* |strnrchr(3uc)| */
 #include	<localmisc.h>
 
 #include	"splitfname.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -75,7 +75,7 @@
 int splitfname_split(splitfname *op,cchar *fp,int fl) noex {
 	int		rs = SR_FAULT ;
 	if (op && fp) {
-	    if (fl < 0) fl = xstrlen(fp) ;
+	    if (fl < 0) fl = lenstr(fp) ;
 	    op->dp = fp ;
 	    op->dl = fl ;
 	    op->bp = fp ;

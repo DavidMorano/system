@@ -1,5 +1,5 @@
 /* opentmp SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make and open a temporary file */
@@ -80,7 +80,7 @@
 #include	"opentmp.h"
 
 
-import uvariables ;
+import uconstants ;
 
 /* local defines */
 
@@ -517,11 +517,11 @@ static int randload(ulong *rvp) noex {
 	    if ((rs = ucpid) >= 0) {
 		cuint	pid = rs ;
 	        ulong	rv = 0 ;
-	        ulong	v = sid ;
+	        ulong	v = sid ;	/* mix in |sid| */
 	        rv += (v << 48) ;
-	        v = pid ;
+	        v = pid ;		/* mix in |pid| */
 	        rv += (v << 32) ;
-	        v = uid ;
+	        v = uid ;		/* mix in |uid| */
 	        rv += (v << 16) ;
 	        if (TIMEVAL tod ; (rs = uc_gettimeofday(&tod,np)) >= 0) {
 	            v = tod.tv_sec ;

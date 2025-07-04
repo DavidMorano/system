@@ -1,5 +1,5 @@
 /* ourmjd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* test whether a string is composed of our MJD specifiction */
@@ -41,7 +41,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -54,6 +53,7 @@
 
 #include	"ourmjd.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -86,7 +86,7 @@
 
 int ourmjd(cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if ((sl > 1) && (CHAR_TOLC(sp[0]) == 'm')) {
 	    sp += 1 ;
 	    sl -= 1 ;
