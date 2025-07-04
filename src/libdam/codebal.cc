@@ -32,7 +32,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<new>
 #include	<vector>
 #include	<usystem.h>
@@ -143,7 +143,7 @@ int codebal_load(codebal *op,cchar *sp,int sl) noex {
 	int		rs ;
 	bool		f_fail = false ;
 	if ((rs = codebal_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    while (sl-- && *sp) {
 	        cint	ch = mkchar(*sp++) ;
 	        int	w ;

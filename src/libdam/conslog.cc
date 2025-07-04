@@ -255,7 +255,7 @@ int conslog_write(CONSLOG *op,int logpri,cchar *wbuf,int wlen)
 	if (wbuf == nullptr) return SR_FAULT ;
 
 	if (wlen < 0)
-	    wlen = strlen(wbuf) ;
+	    wlen = lenstr(wbuf) ;
 
 	while (wlen && iseol(wbuf[wlen-1])) {
 	    wlen -= 1 ;

@@ -416,7 +416,7 @@ static int cm_loadcooks(cm *op,SI *sip,EC *cookp,cm_args *ap,
 	size = 1 ;
 	if ((rs >= 0) && (av != nullptr)) {
 	    for (i = 0 ; av[i] != nullptr ; i += 1) {
-		size += (strlen(av[i]) + 1) ;
+		size += (lenstr(av[i]) + 1) ;
 	    }
 	}
 

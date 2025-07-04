@@ -65,7 +65,7 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| + |memcpy(3c)| */
+#include	<cstring>		/* |lenstr(3c)| + |memcpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
@@ -440,7 +440,7 @@ int sub_mknames::adddots(int af) noex {
 /* private subroutines */
 
 static int connection_addname(CON *cnp,vecstr *nlp,cc *name) noex {
-	int		sl = strlen(name) ;
+	int		sl = lenstr(name) ;
 	int		rs ;
 	int		n = 0 ;
 	if ((rs = nlp->adduniq(name,sl)) >= 0) {

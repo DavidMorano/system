@@ -33,7 +33,7 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* for |lenstr(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
