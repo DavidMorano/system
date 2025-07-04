@@ -1,5 +1,5 @@
 /* sfcenter SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string-find the center sub-string */
@@ -49,11 +49,11 @@
 #include	<usysdefs.h>
 #include	<strn.h>
 #include	<mkchar.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -81,7 +81,7 @@
 int sfcenter(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		cl = -1 ;
 	cchar		*cp = nullptr ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (sl >= 2) {
 	    int		sch = mkchar(ss[0]) ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {

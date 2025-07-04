@@ -1,5 +1,5 @@
 /* sfcookkey SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string-find a cookie key */
@@ -53,11 +53,11 @@
 #include	<usysdefs.h>
 #include	<ascii.h>
 #include	<strn.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -91,7 +91,7 @@ int sfcookkey(cchar *sp,int sl,cchar **rpp) noex {
 	cint		sch = CH_COOK ;
 	int		cl = -1 ;
 	cchar		*cp = nullptr ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (sl >= 1) {
 	    cchar	*ss = "{}" ;
 	    cchar	*tp ;

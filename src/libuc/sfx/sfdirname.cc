@@ -1,5 +1,5 @@
 /* sfdirname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the directory part out of a file name path */
@@ -65,11 +65,11 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -103,7 +103,7 @@
 int sfdirname(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		i ; /* used-afterwards */
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	while ((sl > 0) && (sp[sl - 1] == '/'))  {
 	    sl -= 1 ;
 	}

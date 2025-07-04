@@ -1,5 +1,5 @@
 /* sfbrk SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* return a sub-string starting at a break character, if one is found */
@@ -47,7 +47,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -82,7 +81,7 @@
 
 int sfbrk(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
 	bool		f = false ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	while (sl && *sp) {
 	    for (int j = 0 ; sb[j] ; j += 1) {
 	        f = (*sp == sb[j]) ;

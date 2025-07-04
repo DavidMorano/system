@@ -1,5 +1,5 @@
 /* sfbasename SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the base file name out of a path */
@@ -46,13 +46,34 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -61,21 +82,25 @@
 /* exported subroutines */
 
 int sfbasename(cchar *sp,int sl,cchar **rpp) noex {
-	int		si ;
-	if (sl < 0) sl = xstrlen(sp) ;
-	while ((sl > 1) && (sp[sl - 1] == '/')) {
-	    sl -= 1 ;
-	}
-	for (si = sl ; si > 0 ; si -= 1) {
-	    if (sp[si - 1] == '/') break ;
-	}
-	if ((sl == 1) && (si == 1) && (sp[0] == '/')) {
-	    si -= 1 ;
-	}
-	if (rpp) {
-	    *rpp = (sp + si) ;
-	}
-	return (sl - si) ;
+	int		rl = -1 ; /* return-value */
+	cchar		*rp = nullptr ;
+	if (sp) {
+	    int		si ; /* used-afterwards */
+	    if (sl < 0) sl = lenstr(sp) ;
+	    while ((sl > 1) && (sp[sl - 1] == '/')) {
+	        sl -= 1 ;
+	    }
+	    for (si = sl ; si > 0 ; si -= 1) {
+	        if (sp[si - 1] == '/') break ;
+	    }
+	    if ((sl == 1) && (si == 1) && (sp[0] == '/')) {
+	        si -= 1 ;
+	    }
+	    rp = (sp + si) ;
+	    rl = (sl - si) ;
+	} /* end if (non-null) */
+	if (rpp) *rpp = rp ;
+	return rl ;
 }
 /* end subroutine (sfbasename) */
 

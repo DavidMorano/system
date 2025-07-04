@@ -1,5 +1,5 @@
 /* sfdequote SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the dequoted sub-string of the given string */
@@ -48,11 +48,11 @@
 #include	<usysdefs.h>
 #include	<ascii.h>
 #include	<char.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -80,7 +80,7 @@ static int	isours(int) noex ;
 /* exported subroutines */
 
 int sfdequote(cchar *sp,int sl,cchar **rpp) noex {
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	while (sl && isours(sp[0])) {
 	    sp += 1 ;
 	    sl -= 1 ;

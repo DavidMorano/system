@@ -1,5 +1,5 @@
 /* sfcasesub SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* match a substring within a larger string */
@@ -52,11 +52,11 @@
 #include	<nleadstr.h>		/* |nleadcasestr(3uc)| */
 #include	<toxc.h>
 #include	<char.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -87,10 +87,10 @@ int sfcasesub(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
 	if (sp && s2) {
 	    int		i = 0 ;
 	    f = true ;
-	    s2len = xstrlen(s2) ;
+	    s2len = lenstr(s2) ;
 	    if (s2len > 0) {
 	        f = false ;
-	        if (sl < 0) sl = xstrlen(sp) ;
+	        if (sl < 0) sl = lenstr(sp) ;
 	        if (s2len <= sl) {
 	            cint	s2lead = CHAR_TOLC(s2[0]) ;
 	            for (i = 0 ; i <= (sl-s2len) ; i += 1) {

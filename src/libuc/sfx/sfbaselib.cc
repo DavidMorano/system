@@ -1,5 +1,5 @@
 /* sfbaselib SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string-find a base-library name */
@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0	length of result "thing" 
-	<0	error
+	<0	error (system-return)
 
 *******************************************************************************/
 
@@ -47,11 +47,11 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<estrings.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
