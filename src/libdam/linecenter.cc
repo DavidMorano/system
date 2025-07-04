@@ -197,7 +197,7 @@ int linecenter_addword(LC *op,cc *lbuf,int llen) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = linecenter_magic(op,lbuf)) >= 0) {
-	    if (llen < 0) llen = strlen(lbuf) ;
+	    if (llen < 0) llen = lenstr(lbuf) ;
 	    if (llen > 0) {
 	        c += 1 ;
 	        rs = fifostr_add(op->sqp,lbuf,llen) ;
@@ -217,7 +217,7 @@ int linecenter_addline(LC *op,cc *lbuf,int llen) noex {
 	if ((rs = linecenter_magic(op,lbuf)) >= 0) {
 	    int		sl, cl ;
 	    cchar	*sp, *cp ;
-	    if (llen < 0) llen = strlen(lbuf) ;
+	    if (llen < 0) llen = lenstr(lbuf) ;
 	    sp = lbuf ;
 	    sl = llen ;
 	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
@@ -241,7 +241,7 @@ int linecenter_addlines(LC *op,cc *lbuf,int llen) noex {
 	if ((rs = linecenter_magic(op,lbuf)) >= 0) {
 	    int		sl, cl ;
 	    cchar	*tp, *sp, *cp ;
-	    if (llen < 0) llen = strlen(lbuf) ;
+	    if (llen < 0) llen = lenstr(lbuf) ;
 	    sp = lbuf ;
 	    sl = llen ;
 	    while (sl > 0) {
@@ -284,7 +284,7 @@ int linecenter_getline(LC *op,int i,cchar **lpp) noex {
 		*lpp = nullptr ;
 	        if (i < op->li) {
 	            *lpp = op->lines[i] ;
-	            len = strlen(*lpp) ;
+	            len = lenstr(*lpp) ;
 		    rs = SR_OK ;
 	        } else {
 	            rs = SR_NOTFOUND ;

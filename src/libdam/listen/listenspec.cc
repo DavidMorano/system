@@ -628,7 +628,7 @@ static int listenspec_tcpbegin(LS *op,int ac,mv av) noex {
 	                }
 	                if (n == 0) {
 	                    cp = LISTENSPEC_DEFPORT ;
-	                    cl = strlen(cp) ;
+	                    cl = lenstr(cp) ;
 	                    sz = (cl + 1) ;
 	                    a.port.sp = cp ;
 	                    a.port.sl = cl ;
@@ -1259,7 +1259,7 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 	for (ai = 0 ; (ai < ac) && (av[ai] != nullptr) ; ai += 1) {
 	    ar -= 1 ;
 	    fp = av[ai] ;
-	    fl = strlen(fp) ;
+	    fl = lenstr(fp) ;
 	    f_optminus = (fp[0] == '-') ;
 	    f_optplus = (fp[0] == '+') ;
 	    if ((fl > 1) && (f_optminus || f_optplus) && (! aip->f_adash)) {
@@ -1309,7 +1309,7 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 	                            if (ar > 0) {
 	                                ar -= 1 ;
 	                                fp = av[++ai] ;
-	                                fl = strlen(fp) ;
+	                                fl = lenstr(fp) ;
 	                                if (fl > 0) {
 	                                    rs1 = cfnumui(fp,fl,&uv) ;
 	                                    if (rs1 >= 0) {
@@ -1499,7 +1499,7 @@ static int listenspec_prlocal(LS *op) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
-	    rs = strlen(op->prlocal) ;
+	    rs = lenstr(op->prlocal) ;
 	}
 	return rs ;
 }
@@ -1527,7 +1527,7 @@ static int tcp_nfield(cchar *fp,int fl) noex {
 
 static int tcpaddr_load(TCPADDR *ap,cchar *sp,int sl) noex {
 	int		n = 0 ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	memclear(ap) ;
 	if (sl > 0) {
 	    int		cl ;
@@ -1594,7 +1594,7 @@ static int arginfo_get(ARGINFO *aip,int i,cchar **rpp) noex {
 		if (vp) {
 		    *rpp = charp(vp) ;
 	            if (*rpp) {
-	                rs = strlen(*rpp) ;
+	                rs = lenstr(*rpp) ;
 	            }
 		} else {
 		    if (rpp) *rpp = nullptr ;

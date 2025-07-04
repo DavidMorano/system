@@ -37,7 +37,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<strings.h>		/* |strncasecmp(3c)| + |strlen(3c)| */
+#include	<strings.h>		/* |strncasecmp(3c)| + |lenstr(3c)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<estrings.h>
@@ -221,7 +221,7 @@ int keysymer_lookup(keysymer *op,cchar *kp,int kl) noex {
 	    rs = SR_INVALID ;
 	    if (kp[0]) {
 	        char	knbuf[keylen + 1] ;
-	        if (kl < 0) kl = strlen(kp) ;
+	        if (kl < 0) kl = lenstr(kp) ;
 	        if (hasuc(kp,kl)) {
 	            kl = strwcpylc(knbuf,kp,min(kl,keylen)) - knbuf ;
 	            kp = knbuf ;
@@ -309,7 +309,7 @@ static int keysymer_parse(keysymer *op,cchar *fname) noex {
 static int keysymer_parseln(keysymer *op,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	if (ll < 0) ll = strlen(lp) ;
+	if (ll < 0) ll = lenstr(lp) ;
 	if ((ll > 1) && (lp[0] == '#')) {
 	    int		sl = (ll-1) ;
 	    cchar	*sp = (lp+1) ;
@@ -392,7 +392,7 @@ static int keysymer_finishthem(keysymer *op) noex {
 static int keysymer_seen(keysymer *op,cchar *sp,int sl,int *rp) noex {
 	int		rs = SR_INVALID ;
 	int		v = 0 ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (cchar *tp ; (tp = strnchr(sp,sl,'_')) != nullptr) {
 	    int		kl = ((sp + sl) - (tp + 1)) ;
 	    cchar	*kp = (tp + 1) ;
@@ -416,7 +416,7 @@ static int cfliteral(cchar *sp,int sl,int *rp) noex {
 	cint		sch = CH_SQUOTE ;
 	int		rs = SR_INVALID ;
 	int		v = 0 ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if ((sl > 1) && (sp[0] == sch)) {
 	    sp += 1 ;
 	    sl -= 1 ;

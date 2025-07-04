@@ -45,7 +45,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<cfdec.h>
@@ -271,7 +271,7 @@ static int linefold_process(linefold *op,int cols,int ind,
 	cchar		*sp ;
 	cchar		*lp ;
 	params_load(&p,cols,ind) ;
-	if (llen < 0) llen = strlen(lbuf) ;
+	if (llen < 0) llen = lenstr(lbuf) ;
 	sp = lbuf ;
 	sl = llen ;
 	while ((ll = params_nextline(&p,sp,sl,&lp)) > 0) {

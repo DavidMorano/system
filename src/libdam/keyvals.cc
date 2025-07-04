@@ -32,7 +32,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t(3c++)| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -267,7 +267,7 @@ int keyvals_add(keyvals *op,int fi,cc *kp,cc *vp,int vl) noex {
 	if ((rs = keyvals_magic(op,kp,vp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (*kp) {
-	        if (vl < 0) vl = strlen(vp) ;
+	        if (vl < 0) vl = lenstr(vp) ;
 	        if (KEY *kep{} ; (rs = keyvals_keyget(op,kp,&kep)) >= 0) {
 	            KEYVALS_ENT		ve ;
 	            cint		ki = rs ;
@@ -417,7 +417,7 @@ int keyvals_fetch(keyvals *op,cchar *kp,CUR *curp,cchar **vpp) noex {
 	        int		kl ;
 	        cchar		*valp = nullptr ;
 	        if (kp[0] == '\0') kp = "default" ;
-	        kl = strlen(kp) ;
+	        kl = lenstr(kp) ;
 	        key.buf = kp ;
 	        key.len = kl ;
 	        if ((rs = hdb_fetch(op->bykeyp,key,curp->ecp,&val)) >= 0) {
@@ -489,7 +489,7 @@ int keyvals_delkey(keyvals *op,cchar *kp,int kl) noex {
 	        /* delete all keyvals w/ this key */
 	        if ((rs = hdb_curbegin(bykeyp,&cur)) >= 0) {
 	            key.buf = kp ;
-	            key.len = strlen(kp) ;
+	            key.len = lenstr(kp) ;
 	            while ((rs1 = hdb_fetch(bykeyp,key,&cur,&val)) >= 0) {
 		        c += 1 ;
 	                hdb_curdel(bykeyp,&cur,0) ;
@@ -733,7 +733,7 @@ static int key_start(KEY *kep,cchar *ksp,int ksl) noex {
 	if (kep && ksp) {
 	    rs = memclear(kep) ;
 	    if (ksp[0]) {
-	        if (ksl < 0) ksl = strlen(ksp) ;
+	        if (ksl < 0) ksl = lenstr(ksp) ;
 	        if (cchar *sp{} ; (rs = uc_mallocstrw(ksp,ksl,&sp)) >= 0) {
 		    kep->kp = sp ;
 	            kep->kl = rs ;

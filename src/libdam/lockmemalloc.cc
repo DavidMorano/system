@@ -97,7 +97,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<ptm.h>
 #include	<localmisc.h>
@@ -241,7 +241,7 @@ int uc_libmallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	if (sp && rpp) {
 	    rs = SR_OK ;
 	    *rpp = nullptr ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    sz = (sl + 1) ;
 	    if (char *bp{} ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
 	        *rpp = bp ;

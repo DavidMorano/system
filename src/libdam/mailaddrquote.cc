@@ -44,7 +44,7 @@
 #include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<baops.h>
 #include	<ascii.h>
@@ -147,7 +147,7 @@ int mailaddrquote_start(MAQ *op,cc *abuf,int alen,cc **rpp) noex {
 	cchar		*rp = nullptr ;
 	if ((rs = mailaddrquote_ctor(op,abuf)) >= 0) {
 	    static cint		rsf = fieldterms(qterms,0,qchars) ;
-	    if (alen < 0) alen = strlen(abuf) ;
+	    if (alen < 0) alen = lenstr(abuf) ;
 	    if ((rs = rsf) >= 0) {
 	        cbool	f_white = haswhite(abuf,alen) ;
 	        rp = abuf ;
