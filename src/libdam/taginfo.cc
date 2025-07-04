@@ -120,7 +120,7 @@ int		sl ;
 #if	CF_STRNLEN
 	sl = strnlen(sp,sl) ;
 #else
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 #endif
 
 #if	CF_DEBUGS

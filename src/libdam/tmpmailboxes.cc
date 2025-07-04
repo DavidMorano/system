@@ -38,14 +38,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<getnodename.h>
+#include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
 #include	<mallocxx.h>
 #include	<estrings.h>		/* |sncpy{x}(3uc)| */
 #include	<mkpr.h>
@@ -55,6 +55,7 @@
 
 #include	"tmpmailboxes.h"
 
+import libutil ;
 import uconstants ;
 
 /* local defines */
@@ -118,7 +119,7 @@ int tmpmailboxes(char *rbuf,int rlen) noex {
 	        if ((rs = uc_mkdir(tmpmb,dm)) >= 0) {
 		    if ((rs = uc_minmod(tmpmb,dm)) >= 0) {
 		        cint	n = PC_CHOWNRES ; /* chown-restricted */
-		        rl = strlen(tmpmb) ;
+		        rl = lenstr(tmpmb) ;
 	                if ((rs = uc_pathconf(tmpmb,n,nullptr)) == 0) {
 			    if ((rs = chownpcs(tmpmb)) >= 0) {
 			        rs = SR_OK ;
@@ -145,14 +146,14 @@ int tmpmailboxes(char *rbuf,int rlen) noex {
 
 static int deftmpdir(char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
+	static cchar	*evp = getenv(varname.tmpdir) ;
 	cchar		*tmpdir = sysword.w_tmpdir ;
-	static cchar	*cp = getenv(varname.tmpdir) ;
-	if (cp) {
-	    if (USTAT sb ; (rs = uc_stat(cp,&sb)) >= 0) {
+	if (evp) {
+	    if (USTAT sb ; (rs = uc_stat(evp,&sb)) >= 0) {
 		if (S_ISDIR(sb.st_mode)) {
 		    cint	am = (R_OK|W_OK|X_OK) ;
-		    if ((rs = perm(cp,-1,-1,nullptr,am)) >= 0) {
-	                rs = sncpy(rbuf,rlen,cp) ;
+		    if ((rs = perm(evp,-1,-1,nullptr,am)) >= 0) {
+	                rs = sncpy(rbuf,rlen,evp) ;
 		    } else if (isNotAccess(rs)) {
 	                rs = sncpy(rbuf,rlen,tmpdir) ;
 		    }

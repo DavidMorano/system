@@ -49,7 +49,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<new>
 #include	<initializer_list>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
@@ -67,6 +67,7 @@
 
 #include	"termout.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -221,7 +222,7 @@ namespace {
 	    } /* end for */
 	} ; /* end method (load) */
     } ; /* end struct (termout_gch) */
-}
+} /* end namespace */
 
 class termout_line {
 	cchar		*lbuf ;
@@ -429,13 +430,14 @@ int termout_start(termout *op,cchar *tstr,int tlen,int ncols) noex {
 /* end subroutine (termout_start) */
 
 static int termout_starts(termout *op) noex {
+    	typedef		vector<ustring>	vecus ;
 	cnullptr	np{} ;
     	int		rs = SR_NOMEM ;
 	try {
 	    if (vector<GCH> *cvp ; (cvp = new(nothrow) vector<GCH>) != np) {
-	    	vector<ustring>	*lvp ;
+		vecus	*lvp ;
 	        op->cvp = voidp(cvp) ;
-	        if ((lvp = new(nothrow) vector<ustring>) != np) {
+	    	if ((lvp = new(nothrow) vecus) != np) {
 		    rs = SR_OK ;
 		    op->lvp = voidp(lvp) ;
 	            op->magic = TERMOUT_MAGIC ;
@@ -453,11 +455,12 @@ static int termout_starts(termout *op) noex {
 /* end subroutine (termout_starts) */
 
 int termout_finish(termout *op) noex {
+    	typedef		vector<ustring>	vecus ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = termout_magic(op)) >= 0) {
 	    if (op->lvp) {
-	        vector<ustring> *lvp = (vector<ustring> *) op->lvp ;
+		vecus *lvp = (vecus *) op->lvp ;
 	        delete lvp ; /* calls all 'ustring' destructors */
 	        op->lvp = nullptr ;
 	    }
@@ -489,13 +492,13 @@ int termout_load(termout *op,cchar *sbuf,int slen) noex {
 /* end subroutine (termout_load) */
 
 int termout_getline(termout *op,int i,cchar **lpp) noex {
+    	typedef		vector<ustring>	vecus ;
 	int		rs ;
 	int		ll = 0 ;
 	if ((rs = termout_magic(op,lpp)) >= 0) {
 	    cnullptr	np{} ;
 	    rs = SR_BUGCHECK ;
-	    vector<ustring> *lvp ; 
-	    if ((lvp = ((vector<ustring> *) op->lvp)) != np) {
+	    if (vecus *lvp = (vecus *) op->lvp ; lvp != np) {
 	        csize	ui = size_t(i) ;
 		rs = SR_NOTFOUND ;
 	        if (ui < lvp->size()) {
@@ -525,7 +528,7 @@ static int termout_process(termout *op,cchar *sbuf,int slen) noex {
 	{
 	    int	sz, rsz ;
 	    sz = cvp->size() ;
-	    rsz = (slen+10) ;
+	    rsz = (slen + 10) ;
 	    if (sz < rsz) cvp->reserve(rsz) ;
 	}
 #endif /* COMMENT */
@@ -670,10 +673,9 @@ static int termout_loadgr(termout *op,ustring &line,int pgr,int gr) noex {
 	int		n ;
 	int		sz ;
 	int		len = 0 ;
-	char		*grbuf ;
 	n = flbsi(grmask) + 1 ;
 	sz = ((2*n)+1+1) ; /* size according to algorithm below */
-	if ((grbuf = new(nothrow) char[sz]) != nullptr) {
+	if (char *grbuf ; (grbuf = new(nothrow) char[sz]) != nullptr) {
 	    int		gl = 0 ;
 	    int		ogr = pgr ;
 	    int		bgr = pgr ;
@@ -683,7 +685,7 @@ static int termout_loadgr(termout *op,ustring &line,int pgr,int gr) noex {
 	    if (ogr != (bgr & grmask)) { /* partial gr-off */
 	        if (op->termattr & TA_MOFFIND) {
 		    for (int i = 0 ; i < n ; i += 1) {
-		        if ((ogr>>i)&1) {
+		        if ((ogr >> i) & 1) {
 			    switch (i) {
 			    case GR_VBOLD:
 			        gch = ANSIGR_OFFBOLD ;
@@ -751,9 +753,8 @@ static int termout_loadcs(termout *op,ustring &line,int n,cc *pp,int pl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (op) {
-	    int		i = 0 ;
-	    while ((rs >= 0) && (i < pl)) {
-	        cint	ml = min(4,(pl-i)) ;
+	    for (int i = 0 ; (rs >= 0) && (i < pl) ; ) {
+	        cint	ml = min(4,(pl - i)) ;
 	        int	a1 = -1 ;
 	        int	a2 = -1 ;
 	        int	a3 = -1 ;
@@ -788,8 +789,8 @@ static int termout_loadcs(termout *op,ustring &line,int n,cc *pp,int pl) noex {
 		        len += dl ;
 		        line.append(ucp,dl) ;
 		    }
-	        }
-	    } /* end while */
+	        } /* endif (non-zero positive) */
+	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
@@ -849,8 +850,8 @@ static int gettermattr(cchar *tstr,int tlen) noex {
 /* end subroutine (gettermattr) */
 
 static bool isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
-	int		i ; /* used afterwards */
-	bool		f = false ;
+	int		i ; /* used-afterwards */
+	bool		f = false ; /* return-value */
 	for (i = 0 ; specials[i].ch1 > 0 ; i += 1) {
 	    f = ((specials[i].ch1 == ch1) && (specials[i].ch2 == ch2)) ;
 	    if (f) break ;

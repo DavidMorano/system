@@ -572,7 +572,7 @@ static int sysrealname_curload(SRN *op,SRN_CUR *curp,
 	    sasize = ((sn + 1) * szof(cchar *)) ;
 	    ssize += sasize ;
 	    for (int i = 0 ; i < sn ; i += 1) {
-	        ssize += (strlen(sa[i]) + 1) ;
+	        ssize += (lenstr(sa[i]) + 1) ;
 	    }
 	    if (char *bp{} ; (rs = uc_malloc(ssize,&bp)) >= 0) {
 	        int	i{} ; /* used-afterwards */

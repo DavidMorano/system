@@ -690,7 +690,7 @@ static int sysvar_deffetch(SV *op,cc *kp,int kl,SV_DC *dcp,
 		        rs = sncpy1(vbuf,vlen,valp) ;
 		        vl = rs ;
 	            } else {
-		        vl = strlen(valp) ;
+		        vl = lenstr(valp) ;
 		    }
 	        }
 	        if (rs >= 0) {
@@ -730,7 +730,7 @@ static int sysvar_defenum(SV *op,SV_DC *dcp,char *kbuf,int klen,
 		    rs = sncpy1(vbuf,vlen,valp) ;
 		    vl = rs ;
 	        } else {
-		    vl = strlen(valp) ;
+		    vl = lenstr(valp) ;
 		}
 	    }
 	    if (rs >= 0) {

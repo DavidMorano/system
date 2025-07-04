@@ -33,7 +33,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<vector>
 #include	<string>
@@ -52,6 +52,7 @@
 
 #include	"termtrans.h"
 
+import libutil ;
 
 /* local defines */
 

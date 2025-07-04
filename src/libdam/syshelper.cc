@@ -212,7 +212,7 @@ int syshelper_read(SH *op,char *rbuf,int rlen) noex {
 int syshelper_write(SH *op,cchar *wbuf,int wlen) noex {
 	int		rs ;
 	int		wl = 0 ;
-	if (wlen < 0) wlen = cstrlen(wbuf) ;
+	if (wlen < 0) wlen = clenstr(wbuf) ;
 	if ((rs = syshelper_magic(op,wbuf)) >= 0) {
 	    cint	clen = min(UCHAR_MAX,CMDBUFLEN) ;
 	    int		bits ;
