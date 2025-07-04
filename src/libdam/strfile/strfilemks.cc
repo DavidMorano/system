@@ -1716,7 +1716,7 @@ static int filer_writefill(filer *bp,cchar *wbuf,iknt elen) noex {
 	int		len ;
 
 	if (wlen < 0) {
-	    wlen = (strlen(wbuf) + 1) ;
+	    wlen = (lenstr(wbuf) + 1) ;
 	}
 
 	rs = filer_write(bp,wbuf,wlen) ;

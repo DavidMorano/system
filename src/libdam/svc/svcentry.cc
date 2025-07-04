@@ -58,7 +58,7 @@
 #include	<ctime>			/* |time_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
@@ -643,7 +643,7 @@ static int svcentry_proc(SE *op,cc *inbuf,ARGS *esap,char *obuf,int olen) noex {
 	                ibp = vbuf ;
 	    	    }
 		} else {
-	    	    ibl = strlen(ibp) ;
+	    	    ibl = lenstr(ibp) ;
 		}
 		if (rs >= 0) {
 	            if ((rs = args_expand(esap,obuf,olen,ibp,ibl)) >= 0) {
@@ -707,7 +707,7 @@ static int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
 	    cnullptr	np{} ;
 	    rbuf[0] = '\0' ;
 	    if ((sl != 0) && sp[0]) {
-	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl < 0) sl = lenstr(sp) ;
 	        if (char *hbuf{} ; (rs = malloc_hn(&hbuf)) >= 0) {
 		    cint	sch = '%' ;
 		    cint	hlen = rs ;
@@ -728,19 +728,19 @@ static int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
 				break ;
 	                    case 'V':
 	                        cp = esap->version ;
-	                        cl = strlen(cp) ;
+	                        cl = lenstr(cp) ;
 	                        break ;
 	                    case 'R':
 	                        cp = esap->programroot ;
-	                        cl = strlen(cp) ;
+	                        cl = lenstr(cp) ;
 	                        break ;
 	                    case 'N':
 	                        cp = esap->nodename ;
-	                        cl = strlen(cp) ;
+	                        cl = lenstr(cp) ;
 	                        break ;
 	                    case 'D':
 	                        cp = esap->domainname ;
-	                        cl = strlen(cp) ;
+	                        cl = lenstr(cp) ;
 	                        break ;
 	                    case 'H':
 	                        cl = -1 ;
@@ -753,24 +753,24 @@ static int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
 	                        } else {
 	                            cp = esap->hostname ;
 		                }
-	                        if (cl < 0) sl = strlen(cp) ;
+	                        if (cl < 0) sl = lenstr(cp) ;
 	                        break ;
 	                    case 'U':
 	                        cp = esap->username ;
-	                        cl = strlen(cp) ;
+	                        cl = lenstr(cp) ;
 	                        break ;
 	                    case 'G':
 	                        cp = esap->groupname ;
-	                        cl = strlen(cp) ;
+	                        cl = lenstr(cp) ;
 	                        break ;
 	                    case 's':
 	                        cp = esap->service ;
-	                        if (cp) cl = strlen(cp) ;
+	                        if (cp) cl = lenstr(cp) ;
 	                        break ;
 	                    case 'i':
 	                        if (esap->interval != nullptr) {
 	                            cp = esap->interval ;
-	                            if (cp) cl = strlen(cp) ;
+	                            if (cp) cl = lenstr(cp) ;
 	                        } else {
 	                            cp = "1" ;
 	                            cl = 1 ;
@@ -815,7 +815,7 @@ static int vecstr_procargs(vecstr *alp,char *abuf) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (alp && abuf) {
-	    cint	alen = strlen(abuf) ;
+	    cint	alen = lenstr(abuf) ;
 	    if (abuf[0]) {
 	        cint	flen = alen ;
 		if (char *fbuf{} ; (rs = uc_malloc((flen+1),&fbuf)) >= 0) {

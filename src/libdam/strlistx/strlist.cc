@@ -320,7 +320,7 @@ int strlist_curlook(SL *op,SL_CUR *curp,cchar *kp,int kl) noex {
                 curp = &dcur ;
                 curp->i = 0 ;
             }
-            if (kl < 0) kl = strlen(kp) ;
+            if (kl < 0) kl = lenstr(kp) ;
             kst = mip->kst ;
             rt = mip->rt ;
             it = mip->it ;
@@ -598,7 +598,7 @@ static int strlist_ouraudit(SL *op) noex {
 	    }
 	    if (rs >= 0) {
 	        cp = (kst + ki) ;
-	        cl = strlen(cp) ;
+	        cl = lenstr(cp) ;
 	        if (cp[-1] != '\0') {
 	            rs = SR_BADFMT ;
 	        }

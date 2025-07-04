@@ -37,7 +37,7 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
@@ -507,7 +507,7 @@ int svcfile_curenum(svcfile *op,svcfile_cur *curp,svcfile_ent *ep,
 	                    rs = entry_load(ep,ebuf,elen,iep) ;
 	                    svclen = rs ;
 	                } else {
-	                    svclen = strlen(iep->svc) ;
+	                    svclen = lenstr(iep->svc) ;
 	                }
 	            } /* end if (had an entry) */
 	        } /* end if (valid) */
@@ -544,14 +544,14 @@ int svcfile_curfetch(svcfile *op,cc *svcname,svcfile_cur *curp,svcfile_ent *ep,
 	        } /* end if */
 	        if (rs >= 0) {
 	            key.buf = svcname ;
-	            key.len = strlen(svcname) ;
+	            key.len = lenstr(svcname) ;
 	            if ((rs = hdb_fetch(op->elp,key,ecp,&val)) >= 0) {
 	                IENT	*iep = (IENT *) val.buf ;
 	                if ((ep != nullptr) && (ebuf != nullptr)) {
 	                    rs = entry_load(ep,ebuf,elen,iep) ;
 	                    svclen = rs ;
 	                } else {
-	                    svclen = strlen(iep->svc) ;
+	                    svclen = lenstr(iep->svc) ;
 	                }
 	            } /* end if (had an entry) */
 	            if (curp == nullptr) {
@@ -924,7 +924,7 @@ static int svcfile_already(svcfile *op,cchar *svcname) noex {
 	int		rs ;
 	{
 	    key.buf = svcname ;
-	    key.len = strlen(svcname) ;
+	    key.len = lenstr(svcname) ;
 	    rs = hdb_fetch(op->elp,key,nullptr,nullptr) ;
 	}
 	return rs ;
@@ -1195,8 +1195,8 @@ static int svcentry_finish(SVCENTRY *sep) noex {
 static int svcentry_addkey(SVCENTRY *sep,cc *kp,int kl,cc *ap,int al) noex {
 	int		rs ;
 	int		sz = 0 ;
-	if (kl < 0) kl = strlen(kp) ;
-	if (al < 0) al = strlen(ap) ;
+	if (kl < 0) kl = lenstr(kp) ;
+	if (al < 0) al = lenstr(ap) ;
 	sz += (kl+1) ;
 	sz += (al+1) ;
 	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
@@ -1227,7 +1227,7 @@ static int svcentry_nkeys(SVCENTRY *sep) noex {
 
 static int svcentry_size(SVCENTRY *sep) noex {
 	int		sz = 0 ;
-	sz += (strlen(sep->svc) + 1) ;
+	sz += (lenstr(sep->svc) + 1) ;
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(&sep->keys,i,&vp) >= 0 ; i += 1) {
 	    SVCENTRY_KEY	*kep = (SVCENTRY_KEY *) vp ;
@@ -1245,7 +1245,7 @@ static int ientry_loadstr(IENT *iep,char *bp,SVCENTRY *nep) noex {
 	int		sl = 0 ;
 	if (iep && bp && nep) {
 	int		j = 0 ; /* used-afterwards */
-	sl = strlen(nep->svc) ;
+	sl = lenstr(nep->svc) ;
 	iep->svc = bp ;
 	bp = (strwcpy(bp,nep->svc,sl)+1) ;
 	void	*vp{} ;

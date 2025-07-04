@@ -24,7 +24,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<nleadstr.h>
@@ -85,11 +85,11 @@ int svckv_val(cchar *(*kv)[2],int n,cchar *sp,cchar **vpp) noex {
 	int		vl = 0 ;
 	if (vpp) *vpp = nullptr ;
 	for (int i = 0 ; i < n ; i += 1) {
-	    cint	kl = strlen(kv[i][0]) ;
+	    cint	kl = lenstr(kv[i][0]) ;
 	    cchar	*kp = kv[i][0] ;
 	    if (ourmat(sp,kp,kl)) {
 	        if (vpp) *vpp = kv[i][1] ;
-	        vl = strlen(kv[i][1]) ;
+	        vl = lenstr(kv[i][1]) ;
 	        break ;
 	    }
 	} /* end for */

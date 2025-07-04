@@ -64,7 +64,7 @@ int streamsync_start(streamsync *ssp,cchar *st,int stlen) noex {
 	int		sz ;
 	if (ssp && st) {
 	    rs = SR_INVALID ;
-	    if (stlen < 0) stlen = strlen(st) ;
+	    if (stlen < 0) stlen = lenstr(st) ;
 	    memclear(ssp) ;
 	    if (stlen >= 1) {
 	        char	*p ;

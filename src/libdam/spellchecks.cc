@@ -44,20 +44,21 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<endian.h>
 #include	<getbufsize.h>
-#include	<mktmp.h>
+#include	<getusername.h>
+#include	<getuserhome.h>
+#include	<endian.h>
 #include	<estrings.h>
 #include	<vecobj.h>
 #include	<sbuf.h>
-#include	<char.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<vechand.h>
 #include	<tmtime.hh>
-#include	<getusername.h>
-#include	<getuserhome.h>
 #include	<mkdirs.h>
+#include	<mktmp.h>
+#include	<mkpathx.h>
+#include	<mkfnamesuf.h>
 #include	<permx.h>
 #include	<fsdir.h>
 #include	<paramfile.h>
@@ -67,18 +68,18 @@
 #include	<sfx.h>
 #include	<six.h>
 #include	<snx.h>
-#include	<mkpathx.h>
-#include	<mkfnamesuf.h>
 #include	<strwcpy.h>
 #include	<cfdec.h>
 #include	<strlist.h>
 #include	<strlistmk.h>
 #include	<matxstr.h>		/* |matpstr(3uc)| */
+#include	<char.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"spellchecks.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -843,7 +844,7 @@ cchar	**dirnames ;
 
 	strsize = 1 ;
 	for (i = 0 ; dirnames[i] != nullptr ; i += 1) {
-	    strsize += (strlen(dirnames[i]) + 1) ;
+	    strsize += (lenstr(dirnames[i]) + 1) ;
 	} /* end if */
 
 	sz = (i + 1) * szof(char *) ;
@@ -2344,7 +2345,7 @@ int		vl ;
 	    if (*epp != nullptr) oi = vecstr_findaddr(&sip->stores,*epp) ;
 
 	    if (vp != nullptr) {
-		vnlen = strnlen(vp,vl) ;
+		vnlen = lenstr(vp,vl) ;
 	        if ((rs = vecstr_add(&sip->stores,vp,vnlen)) >= 0) {
 	            rs = vecstr_get(&sip->stores,rs,epp) ;
 	        } /* end if (added new entry) */
@@ -3021,7 +3022,7 @@ static int cachedir_start(CACHEDIR *cdp,STRDESC *dp,int nf)
 	    for (i = 0 ; i < nf ; i += 1) {
 		cp = dp[i].sp ;
 		cl = dp[i].sl ;
-		if (cl < 0) cl = strlen(cp) ;
+		if (cl < 0) cl = lenstr(cp) ;
 	        sz += (cl + 1) ;
 	    } /* end for */
 	}
@@ -3075,7 +3076,7 @@ static int db_start(DB *dbp,STRDESC *dp,int nf) noex {
 	    for (int i = 0 ; i < nf ; i += 1) {
 		cp = dp[i].sp ;
 		cl = dp[i].sl ;
-		if (cl < 0) cl = strlen(cp) ;
+		if (cl < 0) cl = lenstr(cp) ;
 	        sz += (cl + 1) ;
 	    } /* end for */
 	}
