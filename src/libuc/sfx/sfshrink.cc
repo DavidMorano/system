@@ -1,5 +1,5 @@
 /* sfshrink SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* remove leading and trailing white space */
@@ -48,12 +48,12 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>		/* possible future use */
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<char.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -89,7 +89,7 @@ int sfshrink(cchar *sp,int sl,cchar **rpp) noex {
 	    while (CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	    }
-	    sl = xstrlen(sp) ;
+	    sl = lenstr(sp) ;
 	} else {
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;

@@ -1,5 +1,5 @@
 /* sfsub SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* match a substring within a larger string */
@@ -50,11 +50,11 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<strnxcmp.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -91,10 +91,10 @@ int sfsub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	if (sp && ss) {
 	    int		i = 0 ;
 	    f = true ;
-	    sslen = xstrlen(ss) ;
+	    sslen = lenstr(ss) ;
 	    if (sslen > 0) {
 		f = false ;
-	        if (sl < 0) sl = xstrlen(sp) ;
+	        if (sl < 0) sl = lenstr(sp) ;
 	        if (sslen <= sl) {
 	            for (i = 0 ; i <= (sl-sslen) ; i += 1) {
 		        f = ((sslen == 0) || (sp[i] == ss[0])) ;

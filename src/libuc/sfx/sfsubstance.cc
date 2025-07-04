@@ -1,5 +1,5 @@
 /* sfsubstance SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find substantive part of string (strip garbage around items) */
@@ -38,7 +38,7 @@
 
 	Returns:
 	>=0	length of result
-	<0	error
+	<0	error (system-return)
 
 *******************************************************************************/
 
@@ -52,13 +52,13 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>		/* possible future use */
 #include	<ascii.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<char.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -87,7 +87,7 @@ static bool	isnotours(int) noex ;
 
 int sfsubstance(cchar *sp,int sl,cchar **cpp) noex {
 	int		ch ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	while (sl > 0) {
 	    ch = mkchar(sp[0]) ;
 	    if (isnotours(ch)) break ;

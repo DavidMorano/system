@@ -1,5 +1,5 @@
 /* sfthing SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string-find a thing */
@@ -44,27 +44,25 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |strnchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<ascii.h>
 #include	<strn.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
-#define	DEBLEN(slen,m)	(((slen) >= 0) ? MIN((slen),(m)) : (m))
-
-#undef	CH_THING
-#define	CH_THING	'$'
+#undef	CHX_THING
+#define	CHX_THING	'$'
 
 
 /* external subroutines */
@@ -85,6 +83,8 @@ static bool	isour(int) noex ;
 
 /* local variables */
 
+cint		chx = CHX_THING ;
+
 
 /* exported variables */
 
@@ -92,20 +92,22 @@ static bool	isour(int) noex ;
 /* exported subroutines */
 
 int sfthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
-	int		cl = -1 ;
+    	cnullptr	np{} ;
+	int		cl = -1 ; /* return-value */
 	cchar		*cp = nullptr ;
-	if (sl < 0) sl = xstrlen(sp) ;
-	if (sl >= 4) {
-	    cchar	*tp ;
-	    while ((tp = strnchr(sp,sl,CH_THING)) != nullptr) {
-	        sl -= intconv(tp - sp) ;
-	        sp = tp ;
-	        cl = getthing(sp,sl,ss,&cp) ;
-	        if (cl >= 0) break ;
-	        sl -= 1 ;
-	        sp += 1 ;
-	    } /* end while */
-	} /* end if */
+	if (sp) {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    if (sl >= 4) {
+	        for (cchar *tp ; (tp = strnchr(sp,sl,chx)) != np ; ) {
+	            sl -= intconv(tp - sp) ;
+	            sp = tp ;
+	            cl = getthing(sp,sl,ss,&cp) ;
+	            if (cl >= 0) break ;
+	            sl -= 1 ;
+	            sp += 1 ;
+	        } /* end for */
+	    } /* end if */
+	} /* end if (non-null) */
 	if (rpp) {
 	    *rpp = (cl >= 0) ? cp : nullptr ;
 	}
@@ -120,7 +122,7 @@ static int getthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		cl = 0 ;
 	bool		f = false ;
 	cchar		*cp = nullptr ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (sl > 0) {
 	    char	buf[3] ;
 	    buf[0] = '$' ;
@@ -133,7 +135,7 @@ static int getthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	            cl = intconv(tp - cp) ;
 	            f = hasgood(cp,cl) ;
 	        }
-	    }
+	    } /* end if */
 	} /* end if (positive) */
 	if (rpp) {
 	    *rpp = (f) ? cp : nullptr ;

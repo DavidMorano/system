@@ -1,5 +1,5 @@
 /* sfwhitedot SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a substring present *before* the first dot */
@@ -47,7 +47,7 @@
 
 	Returns:
 	>=0		length of retrieved nodename
-	<0		error
+	<0		error (system-return)
 
 	Philosophy:
 	The terminator is *required* in order for a non-empty result
@@ -64,12 +64,12 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<strn.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<char.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -132,7 +132,7 @@ int sub_sfxchr::operator () (cchar *sp,int sl,int sch,cchar **rpp) noex {
 	int		rl = -1 ;
 	cchar		*rp = nullptr ;
 	if (sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sl > 0) {
 	        while (sl && CHAR_ISWHITE(*sp)) {
 	            sp += 1 ;
