@@ -40,14 +40,12 @@
 	except to process the fact that it has a value (which is
 	supposed to be the name of the newly defined macro) and the
 	actual definition (or body of the macro) on the next line.
-
 	If there is no 'machine' key associated with some 'login'
 	key, then we make a fake nullptr machine grouping, but only
-	one of these within the whole 'netrc' file!
-
-	If there are more than one 'login', 'account', or what have
-	you, key associated with a single 'machine' key, then we
-	ignore all but the last one.
+	one of these within the whole 'netrc' file!  If there are
+	more than one 'login', 'account', or what have you, key
+	associated with a single 'machine' key, then we ignore all
+	but the last one.
 
 *******************************************************************************/
 
@@ -81,7 +79,7 @@ import libutil ;
 
 #define	NS		netstate
 
-#define	KEYBUFLEN	10		/* strlen("password") */
+#define	KEYBUFLEN	10		/* lenstr("password") */
 
 
 /* imported namespaces */
@@ -309,11 +307,10 @@ static int netfile_parseln(NF *vep,netstate *nsp,cchar *lp,int ll) noex {
 	char		kbuf[KEYBUFLEN+1] ;
 	bool		f_macdef = false ;
         if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
-            int     fl ;
             cchar   *ft = fterms ;
             cchar   *fp ;
             bool    f_default = false ;
-            while ((fl = fsb.get(ft,&fp)) > 0) {
+            for (int fl ; (fl = fsb.get(ft,&fp)) > 0 ; ) {
                 cint        ml = min(klen,fl) ;
                 strwcpylc(kbuf,fp,ml) ;
                 if (int nki ; (nki = matpstr(netkeys,2,kbuf,ml)) >= 0) {
@@ -365,8 +362,8 @@ static int netfile_item(NF *vep,netstate *nsp,int nki,cc *sp,int sl) noex {
 	if ((nii == netitem_machine) || (nii < 0)) {
 	    if ((rs = netstate_ready(nsp)) > 0) {
 		if (NF_ENT e ; (rs = entry_start(&e,nsp)) >= 0) {
-		    cint	esize = szof(NF_ENT) ;
-	            if ((rs = vecitem_add(vep,&e,esize)) >= 0) {
+		    cint	esz = szof(NF_ENT) ;
+	            if ((rs = vecitem_add(vep,&e,esz)) >= 0) {
 	                cint	ei = rs ;
 	                rs = netstate_reset(nsp) ;
 	                if (rs < 0) {

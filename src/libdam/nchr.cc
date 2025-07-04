@@ -42,7 +42,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -94,7 +94,7 @@ int nchr(cchar *sp,int sl,int sch) noex {
 	int		n = 0 ;
 	if_constexpr (f_strnchr) {
 	    cchar	*tp ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((tp = strnchr(sp,sl,sch)) != nullptr) {
 	        n += 1 ;
 	        sl -= ((tp+1)-sp) ;

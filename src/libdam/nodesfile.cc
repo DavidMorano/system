@@ -45,7 +45,7 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<ctime>			/* |time(2)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<memory>		/* |destroy_at(3c++)| */
@@ -412,7 +412,7 @@ int nodesfile_have(NF *op,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		fal = false ;
 	if ((rs = nodesfile_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = clenstr(sp) ;
 	    if (NF_ENT e ; (rs = e.start(sp,sl,0)) >= 0) {
 	        hdb		*elp = op->elp ;
 	        hdb_dat		key ;

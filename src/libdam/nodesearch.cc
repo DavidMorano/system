@@ -41,7 +41,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocstuff.h>
@@ -215,7 +215,7 @@ int nodesearch_search(NS *op,cc *sp,int sl) noex {
 	int		rs ;
 	int		f_found = false ;
 	if ((rs = nodesearch_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rs = nodesfile_search(op->nfp,sp,sl)) >= 0) {
 	        f_found = true ;
 	    }

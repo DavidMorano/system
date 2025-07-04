@@ -28,7 +28,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<cfdec.h>
 #include	<cfa26.h>
@@ -89,7 +89,7 @@ int numincr_load(numincr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) {
 	    int		ch ;
-	    if (sl < 0) sl= strlen(sp) ;
+	    if (sl < 0) sl= lenstr(sp) ;
 	    if (op->prec < sl) {
 	        op->prec = sl ;
 	    }

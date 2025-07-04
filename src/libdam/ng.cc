@@ -197,7 +197,7 @@ int ng_addparse(NG *ngp,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		n = 0 ;
 	if (ngp && sp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (ema aid ; (rs = ema_start(&aid)) >= 0) {
 	        if ((rs = ema_parse(&aid,sp,sl)) > 0) {
 		    ema_ent	*ep ;

@@ -107,7 +107,7 @@ int nlspeername(cchar *addr,cchar *dn,char *pn) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (addr && pn) {
-	    cint	al = strlen(addr) ;
+	    cint	al = lenstr(addr) ;
 	    rs = SR_INVALID ;
 	    pn[0] = '\0' ;
 	    if (al >= 16) {
