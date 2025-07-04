@@ -1,5 +1,5 @@
 /* csem SUPPORT (Counting Semaphore) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* Counting-Semaphore (CSEM) */
@@ -22,6 +22,7 @@
 	csem_destroy
 	csem_decr
 	csem_incr
+	csem_post
 	csem_count
 	csem_waiters
 
@@ -44,6 +45,7 @@
 	int csem_destroy(csem *op) noex
 	int csem_decr(csem *op,int c,int to) noex
 	int csem_incr(csem *op,int c) noex
+	int csem_post(csem *op) noex
 	int csem_count(csem *op) noex
 	int csem_waiters(csem *op) noex
 
@@ -245,6 +247,10 @@ int csem_incr(csem *op,int c) noex {
 }
 /* end subroutine (csem_incr) */
 
+int csem_post(csem *op) noex {
+    	return csem_incr(op,1) ;
+}
+
 int csem_count(csem *op) noex {
 	int		rs ;
 	int		rs1 ;
@@ -336,10 +342,6 @@ int csem::decr(int c,int to) noex {
     	return csem_decr(this,c,to) ;
 }
 
-int csem::incr(int c) noex {
-    	return csem_incr(this,c) ;
-}
-
 void csem::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
 	    ulogerror("csem",rs,"fini-destroy") ;
@@ -354,10 +356,16 @@ csem::operator int () noex {
 	return rs ;
 }
 
-csem_co::operator int () noex {
+int csem_co::operator () (int c) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
+	    case csemmem_incr:
+	        rs = csem_incr(op,c) ;
+	        break ;
+	    case csemmem_post:
+	        rs = csem_incr(op,1) ;
+	        break ;
 	    case csemmem_count:
 	        rs = csem_count(op) ;
 	        break ;

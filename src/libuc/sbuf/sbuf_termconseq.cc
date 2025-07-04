@@ -1,5 +1,5 @@
 /* sbuf_termconseq SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* extra method for the storage buffer (SBuf) object */

@@ -1,8 +1,8 @@
 /* epsem HEADER (emulated POSIX® Semaphore) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* unnamed POSIX© Semaphore (PSEM) */
+/* unnamed POSIX© Semaphore (EPSEM) */
 /* version %I% last-modified %G% */
 
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
   	Object:
-	psem
+	epsem
 
 	Description:
 	These are "unnamed" POSIX® semaphores.  This module implements
@@ -31,8 +31,8 @@
 
 *******************************************************************************/
 
-#ifndef	PSEM_INCLUDE
-#define	PSEM_INCLUDE
+#ifndef	EPSEM_INCLUDE
+#define	EPSEM_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -44,23 +44,23 @@
 #include	<csem.h>		/* <- counting semaphore (DAM) */
 
 
-#define	PSEM		csem		/* <- the "money" shot */
+#define	EPSEM		csem		/* <- the "money" shot */
 
 #ifdef	__cplusplus
-enum psemmems {
-	psemmem_wait,
-	psemmem_waiter,
-	psemmem_trywait,
-	psemmem_post,
-	psemmem_count,
-    	psemmem_destroy,
-	psemmem_overlast
+enum epsemmems {
+	epsemmem_wait,
+	epsemmem_waiter,
+	epsemmem_trywait,
+	epsemmem_post,
+	epsemmem_count,
+    	epsemmem_destroy,
+	epsemmem_overlast
 } ;
-struct psem ;
-struct psem_co {
-	psem		*op = nullptr ;
+struct epsem ;
+struct epsem_co {
+	epsem		*op = nullptr ;
 	int		w = -1 ;
-	void operator () (psem *p,int m) noex {
+	void operator () (epsem *p,int m) noex {
 	    op = p ;
 	    w = m ;
 	} ;
@@ -68,48 +68,48 @@ struct psem_co {
 	operator int () noex {
 	    return operator () () ;
 	} ;
-} ; /* end struct (psem_co) */
-struct psem : csem {
-	psem_co		wait ;
-	psem_co		waiter ;
-	psem_co		trywait ;
-	psem_co		post ;
-	psem_co		count ;
-	psem_co		destroy ;
-	psem() noex {
-	    wait(this,psemmem_wait) ;
-	    waiter(this,psemmem_waiter) ;
-	    trywait(this,psemmem_trywait) ;
-	    post(this,psemmem_post) ;
-	    count(this,psemmem_count) ;
-	    destroy(this,psemmem_destroy) ;
+} ; /* end struct (epsem_co) */
+struct epsem : csem {
+	epsem_co		wait ;
+	epsem_co		waiter ;
+	epsem_co		trywait ;
+	epsem_co		post ;
+	epsem_co		count ;
+	epsem_co		destroy ;
+	epsem() noex {
+	    wait(this,epsemmem_wait) ;
+	    waiter(this,epsemmem_waiter) ;
+	    trywait(this,epsemmem_trywait) ;
+	    post(this,epsemmem_post) ;
+	    count(this,epsemmem_count) ;
+	    destroy(this,epsemmem_destroy) ;
 	} ;
-	psem(const psem &) = delete ;
-	psem &operator = (const psem &) = delete ;
+	epsem(const epsem &) = delete ;
+	epsem &operator = (const epsem &) = delete ;
 	int create(int = 0,int = -1) noex ;
 	operator int () noex ;
 	void dtor() noex ;
-	~psem() {
+	destruct epsem() {
 	    dtor() ;
 	} ;
-} ; /* end struct (psem) */
+} ; /* end struct (epsem) */
 #else	/* __cplusplus */
-typedef PSEM		psem ;
+typedef EPSEM		epsem ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
 
-extern int	psem_create(psem *,int,int) noex ;
-extern int	psem_destroy(psem *) noex ;
-extern int	psem_wait(psem *) noex ;
-extern int	psem_waiter(psem *,int) noex ;
-extern int	psem_trywait(psem *) noex ;
-extern int	psem_post(psem *) noex ;
-extern int	psem_count(psem *) noex ;
+extern int	epsem_create(epsem *,int,int) noex ;
+extern int	epsem_destroy(epsem *) noex ;
+extern int	epsem_wait(epsem *) noex ;
+extern int	epsem_waiter(epsem *,int) noex ;
+extern int	epsem_trywait(epsem *) noex ;
+extern int	epsem_post(epsem *) noex ;
+extern int	epsem_count(epsem *) noex ;
 
 EXTERNC_end
 
 
-#endif /* PSEM_INCLUDE */
+#endif /* EPSEM_INCLUDE */
 
 

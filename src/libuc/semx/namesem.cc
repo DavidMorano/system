@@ -1,5 +1,5 @@
 /* namesem SUPPORT (named semaphore) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -40,7 +40,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<semaphore.h>
+#include	<semaphore.h>		/* POSIX® semaphores */
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
@@ -60,6 +60,7 @@
 
 #include	"namesem.h"
 
+import libutil ;
 
 /* local defines */
 

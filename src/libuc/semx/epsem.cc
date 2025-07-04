@@ -1,5 +1,5 @@
 /* epsem SUPPORT (emulated POSIX® Semaphore) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* unnamed POSIX© Semaphore (PSEM) */
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
   	Object:
-	psem
+	epsem
 
 	Description:
 	This module provides a sanitized version of the standard
@@ -69,85 +69,89 @@
 
 /* exported subroutines */
 
-int psem_create(psem *op,int pshared,int cnt) noex {
+int epsem_create(epsem *op,int pshared,int cnt) noex {
 	return csem_create(op,pshared,cnt) ;
 }
-/* end subroutine (psem_create) */
+/* end subroutine (epsem_create) */
 
-int psem_destroy(psem *op) noex {
+int epsem_destroy(epsem *op) noex {
 	return csem_destroy(op) ;
 }
-/* end subroutine (psem_destroy) */
+/* end subroutine (epsem_destroy) */
 
-int psem_wait(psem *op) noex {
+int epsem_wait(epsem *op) noex {
 	return csem_decr(op,1,-1) ;
 }
-/* end subroutine (psem_wait) */
+/* end subroutine (epsem_wait) */
 
-int psem_waiter(psem *op,int to) noex {
+int epsem_waiter(epsem *op,int to) noex {
 	return csem_decr(op,1,to) ;
 }
-/* end subroutine (psem_waiter) */
+/* end subroutine (epsem_waiter) */
 
-int psem_trywait(psem *op) noex {
+int epsem_trywait(epsem *op) noex {
 	cint		rsto = SR_TIMEDOUT ;
 	int		rs ;
 	if ((rs = csem_decr(op,1,0)) == rsto) {
-	    rs = SR_AGAIN ;		/* <- required by |psem(3uc)| */
+	    rs = SR_AGAIN ;		/* <- required by |epsem(3uc)| */
 	}
 	return rs ;
 }
-/* end subroutine (psem_trywait) */
+/* end subroutine (epsem_trywait) */
 
-int psem_post(psem *op) noex {
+int epsem_post(epsem *op) noex {
 	return csem_incr(op,1) ;
 }
-/* end subroutine (psem_post) */
+/* end subroutine (epsem_post) */
 
-int psem_count(psem *op) noex {
+int epsem_count(epsem *op) noex {
 	return csem_count(op) ;
 }
+/* end subroutine (epsem_count) */
 
-int psem::create(int pshared,int acnt) noex {
-	return psem_create(this,pshared,acnt) ;
+
+/* local subroutines */
+
+int epsem::create(int pshared,int acnt) noex {
+	return epsem_create(this,pshared,acnt) ;
 }
 
-psem::operator int () noex {
+epsem::operator int () noex {
 	return csem_count(this) ;
 }
 
-void psem::dtor() noex {
+void epsem::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
-	    ulogerror("psem",rs,"fini-destroy") ;
+	    ulogerror("epsem",rs,"fini-destroy") ;
 	}
 }
 
-int psem_co::operator () (int a) noex {
+int epsem_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
-	    case psemmem_wait:
-	        rs = psem_wait(op) ;
+	    case epsemmem_wait:
+	        rs = epsem_wait(op) ;
 	        break ;
-	    case psemmem_waiter:
-	        rs = psem_waiter(op,a) ;
+	    case epsemmem_waiter:
+	        rs = epsem_waiter(op,a) ;
 	        break ;
-	    case psemmem_trywait:
-	        rs = psem_trywait(op) ;
+	    case epsemmem_trywait:
+	        rs = epsem_trywait(op) ;
 	        break ;
-	    case psemmem_post:
-	        rs = psem_post(op) ;
+	    case epsemmem_post:
+	        rs = epsem_post(op) ;
 	        break ;
-	    case psemmem_count:
-	        rs = psem_count(op) ;
+	    case epsemmem_count:
+	        rs = epsem_count(op) ;
 	        break ;
-	    case psemmem_destroy:
-	        rs = psem_destroy(op) ;
+	    case epsemmem_destroy:
+	        rs = epsem_destroy(op) ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (psem_co::operator) */
+/* end method (epsem_co::operator) */
 
 
