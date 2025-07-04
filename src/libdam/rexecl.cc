@@ -220,13 +220,13 @@ int		*fd2p ;
 	if (password == NULL)
 	    password = "" ;
 
-	if ((ulen = strlen(username)) > 16) {
+	if ((ulen = lenstr(username)) > 16) {
 
 	    srs = SR_PROTO ;
 	    goto badret ;
 	}
 
-	if ((plen = strlen(password)) > 16) {
+	if ((plen = lenstr(password)) > 16) {
 
 	    srs = SR_PROTO ;
 	    goto badret ;
@@ -238,7 +238,7 @@ int		*fd2p ;
 	    goto badret ;
 	}
 
-	if ((cmdlen = strlen(command)) > CMDLEN) {
+	if ((cmdlen = lenstr(command)) > CMDLEN) {
 
 	    srs = SR_2BIG ;
 	    goto badret ;
@@ -612,7 +612,7 @@ int	f_err ;
 	    i,rs) ;
 #endif
 
-	len = strlen(command) + 1 ;
+	len = lenstr(command) + 1 ;
 
 	i = 0 ;
 	while ((i < len) && 

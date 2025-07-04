@@ -29,7 +29,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<sfx.h>
 #include	<strn.h>
@@ -38,6 +37,7 @@
 
 #include	"siletter.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -71,17 +71,18 @@
 int siletter(siletter_res *lsp,cchar *sp,int sl) noex {
 	SILETTER_RES	*hop = lsp ;
 	int		rs = SR_FAULT ;
-	int		si = 0 ;
+	int		si = 0 ; /* return-value */
 	if (lsp && sp) {
-	    memclear(hop) ;
+	    rs = memclear(hop) ;
 	    if (sl > 0) {
 	        if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != nullptr) {
 	            cchar	*cp{} ;
-	            if (int cl ; (cl = sfshrink(sp,(tp - sp),&cp)) > 0) {
+		    cint	tl = intconv(tp - cp) ;
+	            if (int cl ; (cl = sfshrink(sp,tl,&cp)) > 0) {
 	                if (hasalluc(cp,cl)) {
 	                    lsp->lp = cp ;
 	                    lsp->ll = cl ;
-	                    si = ((tp + 1) - sp) ;
+	                    si = intconv((tp + 1) - sp) ;
 		        }
 	            } /* end if (shrink) */
 	        } /* end if (had a period) */

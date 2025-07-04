@@ -60,7 +60,7 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<sigblocker.h>
@@ -399,7 +399,7 @@ static bool isNotRunning(cchar *sp,int sl) noex {
 	cint		sch = mkchar(sp[0]) ;
 	int		rs = SR_OK ;
 	int		f = false ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if ((sl > 1) && ((sch == 'p') || (sch == 's'))) {
 	    sp += 1 ;
 	    sl -= 1 ;

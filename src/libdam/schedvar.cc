@@ -41,7 +41,7 @@
 #include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| + |strchr(3c)| */
+#include	<cstring>		/* |lenstr(3c)| + |strchr(3c)| */
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
@@ -54,6 +54,7 @@
 
 #include	"schedvar.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -189,7 +190,7 @@ int schedvar_curenum(SV *op,SV_C *curp,char *kbuf,int klen,
 	    vecstr	*slp = op->slp ;
 	    cnullptr	np{} ;
 	    int		i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
-	    cchar	*cp ;
+	    cchar	*cp{} ;
 	    kbuf[0] = '\0' ;
 	    if (vbuf) vbuf[0] = '\0' ;
 	    while (((rs = slp->get(i,&cp)) >= 0) && (cp == np)) {
@@ -197,14 +198,14 @@ int schedvar_curenum(SV *op,SV_C *curp,char *kbuf,int klen,
 	    }
 	    if (rs >= 0) {
 	        int	kl = -1 ;
-		cchar	*tp ;
-	        if ((tp = strchr(cp,'=')) != nullptr) {
-	            kl = (tp - cp) ;
+		cchar	*vap = nullptr ;
+		if (cchar *tp ; (tp = strchr(cp,'=')) != nullptr) {
+	            kl = intconv(tp - cp) ;
+		    vap = (tp + 1) ;
 	        }
 	        if ((rs = snwcpy(kbuf,klen,cp,kl)) >= 0) {
-	    	    if (vbuf && tp) {
-	                cp = (tp + 1) ;
-	                rs = sncpy1(vbuf,vlen,cp) ;
+	    	    if (vbuf && vap) {
+	                rs = sncpy1(vbuf,vlen,vap) ;
 	                vl = rs ;
 	    	    }
 		}
@@ -248,7 +249,7 @@ int schedvar_expand(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
 	    rs = SR_TOOBIG ;
 	    dbuf[0] = '\0' ;
 	    if (dlen > 0) {
-	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl < 0) sl = lenstr(sp) ;
 		rs = schedvar_exper(op,dbuf,dlen,sp,sl) ;
 		len = rs ;
 	    } /* end if (valid) */

@@ -1068,7 +1068,7 @@ static int subinfo_procargs(SUBINFO *sip)
 
 	    argp = argv[++ai] ;
 	    argr -= 1 ;
-	    argl = strlen(argp) ;
+	    argl = lenstr(argp) ;
 
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
@@ -1117,7 +1117,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl)
 	                            sip->pr = argp ;
 				} else
@@ -1135,7 +1135,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl)
 	                            sip->prn = argp ;
 				} else
@@ -1153,7 +1153,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl)
 	                            sip->searchname = argp ;
 				} else
@@ -1172,7 +1172,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl)
 	                            sip->logfname = argp ;
 				} else
@@ -1191,7 +1191,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl)
 	                            sip->pvfname = argp ;
 				} else
@@ -1208,7 +1208,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl)
 	                            sip->dfname = avp ;
 				} else
@@ -1225,7 +1225,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl)
 	                            sip->xfname = argp ;
 				} else
@@ -1242,7 +1242,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl)
 	                            sip->efname = argp ;
 				} else
@@ -1268,7 +1268,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl) {
 	                            rs = keyopt_loads(&akopts,argp,argl) ;
 				}
@@ -1281,7 +1281,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl) {
 	                            rs = vecstr_envadds(&sip->aenvs,
 	                                argp,argl) ;
@@ -1650,7 +1650,7 @@ static int subinfo_sasize(SUBINFO *sip)
 	argv = (cchar	 **) (sip->argv + sip->argi) ;
 	for (i = 0 ; (i < argr) && (argv[i] != nullptr) ; i += 1) {
 	    if (i >= 1) {
-		size += (strlen(argv[i]) + 1) ;
+		size += (lenstr(argv[i]) + 1) ;
 	    }
 	} /* end for */
 

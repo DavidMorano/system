@@ -77,7 +77,7 @@ extern "C" {
 
 namespace {
     struct blanker {
-	cint	l = strlen(sysword.w_blanks) ;
+	cint	l = lenstr(sysword.w_blanks) ;
 	cchar	*p = sysword.w_blanks ;
     } ; /* end struct (blanker) */
 }

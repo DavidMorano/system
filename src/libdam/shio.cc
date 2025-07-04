@@ -642,7 +642,7 @@ int shio_write(SHIO *op,cvoid *lbuf,int llen) noex {
 
 #if	CF_SFIO
 	if (op->f.sfio) {
-	    if (llen < 0) llen = strlen(lbuf) ;
+	    if (llen < 0) llen = lenstr(lbuf) ;
 	    rs = shio_sfcheckwrite(op,lbuf,llen) ;
 	    wlen = rs ;
 	} else {
@@ -682,7 +682,7 @@ int shio_println(SHIO *op,cchar *lbuf,int llen) noex {
 
 #if	CF_SFIO
 	if (op->f.sfio) {
-	    if (llen < 0) llen = strlen(lbuf) ;
+	    if (llen < 0) llen = lenstr(lbuf) ;
 	    rs = shio_shprintln(op,lbuf,llen) ;
 	    wlen += rs ;
 	} else {
@@ -1223,7 +1223,7 @@ static int shio_bclose(SHIO *op) noex {
 static int shio_shprintln(SHIO *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if (llen < 0) llen = strlen(lbuf) ;
+	if (llen < 0) llen = lenstr(lbuf) ;
 	if ((rs = shio_sfiscook(op)) > 0) {
 	    if ((rs = shio_sfcookwrite(op,lbuf,llen)) >= 0) {
 	        wlen += rs ;
@@ -1354,7 +1354,7 @@ static int shio_sfcookflush(SHIO *op) noex {
 
 static int shio_sfcheckwrite(SHIO *op,cchar *lbuf,int llen) noex {
 	int		rs ;
-	if (llen < 0) llen = strlen(lbuf) ;
+	if (llen < 0) llen = lenstr(lbuf) ;
 	if ((rs = shio_sfiscook(op)) > 0) {
 	    rs = shio_sfcookwrite(op,lbuf,llen) ;
 	} else if (rs == 0) {

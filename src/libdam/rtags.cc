@@ -271,7 +271,7 @@ int rtags_add(rtags *op,RT_TAG *tip,cchar *fp,int fl) noex {
 	                    if (void *vp{} ; (rs = flp->get(fi,&vp)) >= 0) {
 	            	        FNAME	*fep = (FNAME *) vp ;
 	                        key.buf = fep->name ;
-	                        key.len = strlen(fep->name) ;
+	                        key.len = lenstr(fep->name) ;
 	                        val.buf = fep ;
 	                        val.len = szof(FNAME) ;
 	                        rs = hdb_store(op->hdp,key,val) ;
