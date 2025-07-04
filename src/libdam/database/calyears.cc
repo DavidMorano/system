@@ -680,7 +680,7 @@ static int calyears_argbegin(CALYEARS *op,cchar *pr)
 	int		rs ;
 	int		sz = 0 ;
 	char		*bp ;
-	sz += (strlen(pr)+1) ;
+	sz += (lenstr(pr)+1) ;
 	if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->pr = bp ;

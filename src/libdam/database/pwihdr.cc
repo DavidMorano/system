@@ -107,7 +107,7 @@ int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
 			header[pwihdr_reclen] = op->reclen ;
 			header[pwihdr_recsize] = op->recsize ;
 			header[pwihdr_strtab] = op->strtab ;
-			header[pwihdr_strlen] = op->strlen ;
+			header[pwihdr_lenstr] = op->lenstr ;
 			header[pwihdr_strsize] = op->strsize ;
 			header[pwihdr_idxlen] = op->idxlen ;
 			header[pwihdr_idxsize] = op->idxsize ;
@@ -161,7 +161,7 @@ int pwihdr_wr(pwihdr *op,cchar *hbuf,int hlen) noex {
 	                op->reclen = header[pwihdr_reclen] ;
 	                op->recsize = header[pwihdr_recsize] ;
 	                op->strtab = header[pwihdr_strtab] ;
-	                op->strlen = header[pwihdr_strlen] ;
+	                op->lenstr = header[pwihdr_lenstr] ;
 	                op->strsize = header[pwihdr_strsize] ;
 	                op->idxlen = header[pwihdr_idxlen] ;
 	                op->idxsize = header[pwihdr_idxsize] ;

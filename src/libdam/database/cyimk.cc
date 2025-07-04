@@ -699,7 +699,7 @@ static int cyimk_mkidxstrs(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
 	if ((rs = pathclean(tbuf,op->idname,-1)) >= 0) {
 	    int	tl = rs ;
 	    if ((rs = filer_writefill(hfp,tbuf,(tl+1))) >= 0) {
-	        tl = strlen(op->cname) ;
+	        tl = lenstr(op->cname) ;
 	        off += rs ;
 	        wlen += rs ;
 	        hdrp->caloff = off ;

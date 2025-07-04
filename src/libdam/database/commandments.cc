@@ -457,8 +457,8 @@ static int commandments_argsbegin(CM *op,cchar *pr,cchar *dbname)
 	int		rs ;
 	int		size = 0 ;
 	char		*bp ;
-	size += (strlen(pr)+1) ;
-	size += (strlen(dbname)+1) ;
+	size += (lenstr(pr)+1) ;
+	size += (lenstr(dbname)+1) ;
 	if ((rs = uc_malloc(size,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->pr = bp ;
@@ -601,7 +601,7 @@ static int commandments_tmpcopy(CM *op,char *tbuf,
 	int		rs ;
 	char		*xbuf ;
 	if ((rs = uc_malloc((xlen+1),&xbuf)) >= 0) {
-	    cint	dlen = strlen(dbuf) ;
+	    cint	dlen = lenstr(dbuf) ;
 	    cchar	*ft = "cmdXXXXXXXXXXX" ;
 	    if ((rs = pathadd(dbuf,dlen,ft)) >= 0) {
 		const mode_t	om = 0664 ;
@@ -886,7 +886,7 @@ static int commandments_usridname(CM *op,char *tbuf)
 		} /* end if (uc_stat) */
 	    } /* end if (mkpath) */
 	} else {
-	    rl = strlen(tbuf) ;
+	    rl = lenstr(tbuf) ;
 	}
 	return (rs >= 0) ? rl : rs ;
 }
@@ -934,7 +934,7 @@ static int commandments_sysidname(CM *op,char *tbuf)
 		rs = SR_NOENT ;
 	    }
 	} else {
-	    rl = strlen(tbuf) ;
+	    rl = lenstr(tbuf) ;
 	}
 #if	CF_DEBUGS
 	debugprintf("commandments_sysidname: ret rs=%d rl=%u\n",rs,rl) ;
@@ -1192,7 +1192,7 @@ static int commandments_userhome(CM *op)
 		uc_free(hbuf) ;
 	    } /* end if (m-a-f) */
 	} else {
-	    rs = strlen(op->uhome) ;
+	    rs = lenstr(op->uhome) ;
 	}
 	return rs ;
 }

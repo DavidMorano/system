@@ -39,7 +39,7 @@ struct ttihdr_head {
 	uint		rectab ;	/* record-table */
 	uint		reclen ;	/* recotd-table-length */
 	uint		ostrtab ;	/* overflow-string-table */
-	uint		olenstr ;	/* overflow-string-table length */
+	uint		ostrlen ;	/* overflow-string-table length */
 	uchar		vetu[4] ;	/* VETU */
 } ;
 

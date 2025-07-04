@@ -359,7 +359,7 @@ int pwi_lookup(pwi *op,char *rbuf,int rlen,cchar *name) noex {
     	int		rs ;
 	int		ul = 0 ;
 	if ((rs = pwi_magic(op,rbuf,name)) >= 0) {
-	    cint	nl = strlen(name) ;
+	    cint	nl = lenstr(name) ;
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (name[0]) {

@@ -984,7 +984,7 @@ static int prcache_lookup(prcache *pcp,int i,cchar **rpp) noex {
 	if ((rs >= 0) && (pcp->prs[i][0] != '\0')) {
 	    *rpp = pcp->prs[i] ;
 	    if ((*rpp)[0] != '\0')
-		len = cstrlen(*rpp) ;
+		len = clenstr(*rpp) ;
 	}
 
 ret0:
@@ -1092,7 +1092,7 @@ static int entry_checkdir(ent *ep,cc *libdname,cc *name) noex {
 
 /* read the directory looking for the prefix name parts */
 
-	namelen = cstrlen(name) ;
+	namelen = clenstr(name) ;
 
 	rs = vecstr_loadexts(&enames,dname,name,namelen) ;
 	c = rs ;
