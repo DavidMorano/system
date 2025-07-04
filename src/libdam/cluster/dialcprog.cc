@@ -83,7 +83,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<estrings.h>
@@ -1762,7 +1762,7 @@ static int filer_sendrecord(FILER *bp,int type,cchar *sp,int sl)
 	char		data[3] ;
 
 	if (sl < 0)
-	    sl = strlen(sp) ;
+	    sl = lenstr(sp) ;
 
 	if ((sl >= USHRT_MAX) || (sl > VBUFLEN))
 	    return SR_TOOBIG ;

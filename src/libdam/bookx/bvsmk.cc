@@ -194,8 +194,8 @@ int bvsmk_open(BVSMK *op,cchar *pr,cchar db[],int of,mode_t om)
 	op->f.ofcreat = MKBOOL(of & O_CREAT) ;
 	op->f.ofexcl = MKBOOL(of & O_EXCL) ;
 
-	size += (strlen(pr)+1) ;
-	size += (strlen(db)+1) ;
+	size += (lenstr(pr)+1) ;
+	size += (lenstr(db)+1) ;
 	if ((rs = uc_malloc(size,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->pr = bp ;

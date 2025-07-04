@@ -580,7 +580,7 @@ static int biblebook_loadnameslocal(BIBLEBOOK *op) noex {
 	char		*mp ;
 
 	for (n = 0 ; booknames[n] != nullptr ; n += 1) {
-	    namesize += (strlen(booknames[n]) + 1) ;
+	    namesize += (lenstr(booknames[n]) + 1) ;
 	}
 
 	sizetab = (n + 1) * szof(cchar *) ;

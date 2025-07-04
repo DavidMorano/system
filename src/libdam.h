@@ -225,7 +225,6 @@
 #include	<utmpx_solaris.h>
 #include	<uux.h>
 #include	<votdc.h>
-#include	<vsetstr.h>
 #include	<wdt.h>
 #include	<wordfill.h>
 #include	<writeto.h>

@@ -139,7 +139,7 @@ int biblecur_check(biblecur *op,cchar *sqp,int sql) noex {
 	if ((rs = biblecur_magic(op,sqp)) >= 0) {
 	    int		sl = sql ;
 	    cchar	*sp = sqp ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    while (sl && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;

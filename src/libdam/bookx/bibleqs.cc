@@ -1235,7 +1235,7 @@ static int bibleqs_indmkeigen(BIBLEQS *op,TXTINDEXMK *tip)
 
 	    for (i = 0 ; (i < nkeys) && (strongseigens[i] != NULL) ; i += 1) {
 	        wp = strongseigens[i] ;
-	        wl = strlen(wp) ;
+	        wl = lenstr(wp) ;
 	        keys[i].kp = wp ;
 	        keys[i].kl = wl ;
 	    } /* end while */

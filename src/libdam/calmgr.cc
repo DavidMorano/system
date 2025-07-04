@@ -36,7 +36,7 @@
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<ucmallreg.h>
@@ -351,8 +351,8 @@ int calmgr_audit(calmgr *op) noex {
 static int calmgr_argbegin(calmgr *op,cchar *dn,cchar *cn) noex {
 	int		rs ;
 	int		sz = 0 ;
-	sz += (strlen(dn)+1) ;
-	sz += (strlen(cn)+1) ;
+	sz += (lenstr(dn)+1) ;
+	sz += (lenstr(cn)+1) ;
 	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->dn = bp ;
