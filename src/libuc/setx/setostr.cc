@@ -1,5 +1,5 @@
 /* setostr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* ordered set of strings */
@@ -29,7 +29,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<new>			/* |nothrow(3c++) */
 #include	<utility>		/* |pair(3c++)| */
 #include	<string>		/* |string(3c++)| */
@@ -39,6 +38,7 @@
 
 #include	"setostr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -117,7 +117,7 @@ int setostr_already(setostr *op,cchar *sp,int sl) noex {
 	if ((rs = setostr_magic(op,sp)) >= 0) {
 	    cnullptr	np{} ;
 	    setstr	*setp  = setstrp(op->setp) ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (string *strp ; (strp = new(nothrow) string(sp,sl)) != np) {
 	        iter	ite = setp->end() ;
 	        if (iter it ; (it = setp->find(*strp)) == ite) {
@@ -136,7 +136,7 @@ int setostr_add(setostr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = setostr_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    setstr	*setp  = setstrp(op->setp) ;
 	    pair<iter,bool>	ret ;
 	    string	v(sp,sl) ;
@@ -152,7 +152,7 @@ int setostr_del(setostr *op,cchar *sp,int sl) noex {
 	int		f = false ;
 	if ((rs = setostr_magic(op)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    {
 	        iter	ite = setp->end() ;
 	        string	v(sp,sl) ;
