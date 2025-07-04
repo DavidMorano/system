@@ -165,7 +165,7 @@ static char	*strwebhex(char *,cchar *,int) noex ;
 int querystr_start(querystr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = querystr_ctor(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
 	        cint	llen = rs ;
 	        if ((rs = strpack_start(op->spp,llen)) >= 0) {
@@ -227,7 +227,7 @@ int querystr_already(querystr *op,cchar *kstr,int klen) noex {
 	if (op && kstr) {
 	    cint	n = op->n ;
 	    rs = SR_OK ;
-	    if (klen < 0) klen = strlen(kstr) ;
+	    if (klen < 0) klen = lenstr(kstr) ;
 	    for (int i = 0 ; i < n ; i += 1) {
 	        f = (strwcmp(op->kv[i][0],kstr,klen) == 0) ;
 	        if (f) break ;
@@ -263,7 +263,7 @@ int querystr_fetch(querystr *op,cc *kstr,int klen,cur *curp,cc **rpp) noex {
 	int		vl = 0 ;
 	if (op && curp) {
 	    rs = SR_OK ;
-	    if (klen < 0) klen = strlen(kstr) ;
+	    if (klen < 0) klen = lenstr(kstr) ;
 	    if (op->n > 0) {
 	        int		i = (curp->i + 1) ;
 	        if (i < op->n) {
@@ -277,7 +277,7 @@ int querystr_fetch(querystr *op,cc *kstr,int klen,cur *curp,cc **rpp) noex {
 	            if (f) {
 		        cchar	*vp = kv[i][1] ;
 		        curp->i = i ;
-		        vl = strlen(vp) ;
+		        vl = lenstr(vp) ;
 		        if (rpp != nullptr) *rpp = vp ;
 	            } else {
 	                rs = SR_NOTFOUND ;
@@ -308,7 +308,7 @@ int querystr_curenum(querystr *op,cur *curp,cc **kpp,cc **vpp) noex {
 		    }
 	            {
 		        cchar	*vp = kv[i][1] ;
-		        vl = strlen(vp) ;
+		        vl = lenstr(vp) ;
 		        if (vpp != nullptr) *vpp = vp ;
 	            }
 		    curp->i = i ;
@@ -350,7 +350,7 @@ int subinfo::procpair(cchar *sbuf,int slen) noex {
 	int		rs = SR_OK ;
 	int		sl ;
 	cchar		*sp ;
-	if (slen < 0) slen = strlen(sbuf) ;
+	if (slen < 0) slen = lenstr(sbuf) ;
 	if ((sl = sfshrink(sbuf,slen,&sp)) > 0) {
 	    int		kl = sl ;
 	    int		vl = 0 ;

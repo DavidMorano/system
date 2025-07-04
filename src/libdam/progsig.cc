@@ -706,7 +706,7 @@ static int progsig_workgener(progsig *uip,SESMSG_GEN *mp) noex {
 	if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
 	    time_t	st = mp->stime ;
 	    cint	mt = mp->msgtype ;
-	    cint	nlen = strlen(mp->nbuf) ;
+	    cint	nlen = lenstr(mp->nbuf) ;
 	    cchar	*nbuf = mp->nbuf ;
 	    cchar	*un = mp->user ;
 	    if ((rs = snote_start(ep,mt,st,un,nbuf,nlen)) >= 0) {
@@ -747,7 +747,7 @@ static int progsig_workbiffer(progsig *uip,SESMSG_BIFF *mp) noex {
 	if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
 	    time_t	st = mp->stime ;
 	    cint	mt = mp->msgtype ;
-	    cint	nlen = strlen(mp->nbuf) ;
+	    cint	nlen = lenstr(mp->nbuf) ;
 	    cchar	*un = mp->user ;
 	    cchar	*nbuf = mp->nbuf ;
 	    if ((rs = snote_start(ep,mt,st,un,nbuf,nlen)) >= 0) {
@@ -1084,9 +1084,9 @@ static int snote_start(SN *ep,int mt,time_t st,cc *un,cc *mdp,int mdl) noex {
 	    int		sz = 0 ;
 	    ep->stime = st ;
 	    ep->type = mt ;
-	    if (mdl < 0) mdl = strlen(mdp) ;
+	    if (mdl < 0) mdl = lenstr(mdp) ;
 	    sz += (mdl + 1) ;
-	    sz += (strlen(un) + 1) ;
+	    sz += (lenstr(un) + 1) ;
 	    if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	        ep->a = bp ;
 	        ep->user = bp ;
@@ -1121,7 +1121,7 @@ static int libmalstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (rpp) {
 	    char	*bp ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rs = uc_libmalloc((sl+1),&bp)) >= 0) {
 	        *rpp = bp ;
 	        strwcpy(bp,sp,sl) ;

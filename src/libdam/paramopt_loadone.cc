@@ -32,7 +32,7 @@
 #include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<nulstr.h>
 #include	<six.h>
@@ -64,7 +64,7 @@ int paramopt_loadone(paramopt *op,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		i = 0 ;
 	if ((rs = paramopt_magic(op,sp)) >= 0) {
-	    if (sl <= 0) sl = strlen(sp) ;
+	    if (sl <= 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;

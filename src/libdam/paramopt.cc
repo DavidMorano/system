@@ -165,7 +165,7 @@ int paramopt_loadu(PO *op,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = paramopt_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (int si ; (si = sibrk(sp,sl,"=\t")) >= 0) {
 	        cchar	*cp{} ;
 	        if (int cl ; (cl = sfshrink((sp + si),(sl- si),&cp)) > 0) {
@@ -202,7 +202,7 @@ int paramopt_loads(PO *op,cchar *name,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = paramopt_magic(op,name,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    for (int si ; (si = sibrk(sp,sl," :,\t\r\n\v\f")) >= 0 ; ) {
 	        cchar	*cp = (sp+si) ;
 	        if (si > 0) {
@@ -231,7 +231,7 @@ int paramopt_load(PO *op,cchar *name,cchar *vbuf,int vlen) noex {
 	    if (name[0]) {
 	        cchar	*vp{} ;
 		rs = SR_OK ;
-	        if (vlen < 0) vlen = strlen(vbuf) ;
+	        if (vlen < 0) vlen = lenstr(vbuf) ;
 	        if (int vl ; (vl = sfshrink(vbuf,vlen,&vp)) > 0) {
 	            PO_VAL	*ovp ;
 	            PO_VAL	*nvp ;
@@ -339,7 +339,7 @@ int paramopt_curenumkeys(PO *op,PO_CUR *curp,cchar **rpp) noex {
 	    if (kp != nullptr) {
 	        curp->keyp = kp ;	/* update to the current key-pointer */
 	        if (rpp != nullptr) *rpp = kp->name ;
-	        kl = strlen(kp->name) ;
+	        kl = lenstr(kp->name) ;
 	    } else {
 	        rs = SR_NOTFOUND ;
 	    }
@@ -375,7 +375,7 @@ int paramopt_fetch(PO *op,cchar *key,PO_CUR *curp,cchar **rpp) noex {
 	        } /* end if */
 	        if ((rs >= 0) && (kp && vp)) {
 	            if (rpp) *rpp = vp->value ;
-	            if (vp->value) vl = strlen(vp->value) ;
+	            if (vp->value) vl = lenstr(vp->value) ;
 	            curp->valp = vp ;
 	        } else {
 	            rs = SR_NOTFOUND ;
@@ -514,7 +514,7 @@ static int paramopt_findvalue(PO *op,cc *key,cc *val,int vlen,
 	int		rs ;
 	if ((rs = paramopt_magic(op)) >= 0) {
 	    PO_NAME	*kp{} ;
-	    if (vlen < 0) vlen = strlen(val) ;
+	    if (vlen < 0) vlen = lenstr(val) ;
 	    if ((rs = paramopt_findkey(op,key,&kp)) >= 0) {
 	        rs = name_vfind(kp,val,vlen,rpp) ;
 	    }
@@ -551,7 +551,7 @@ static int name_vfind(PO_NAME *pp,cchar *vp,int vl,PO_VAL **rpp) noex {
 	PO_VAL		*vep = nullptr ;
 	int		c = 0 ;
 	bool		f = false ;
-	if (vl < 0) vl = strlen(vp) ;
+	if (vl < 0) vl = lenstr(vp) ;
 	for (vep = pp->head ; vep ; vep = vep->next) {
 	    f = (strncmp(vep->value,vp,vl) == 0) ;
 	    f = f && (vep->value[vl] == '\0') ;

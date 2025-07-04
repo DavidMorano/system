@@ -146,13 +146,13 @@ int		*fd2p ;
 	if ((rhost == NULL) || (rhost[0] == '\0'))
 	    return SR_INVALID ;
 
-	if ((ruser != NULL) && (strlen(ruser) > USERNAMELEN))
+	if ((ruser != NULL) && (lenstr(ruser) > USERNAMELEN))
 	    return SR_TOOBIG ;
 
 	if ((cmd == NULL) || (cmd[0] == '\0'))
 	    return SR_INVALID ;
 
-	if ((strlen(cmd) + 6) > CMDLEN)
+	if ((lenstr(cmd) + 6) > CMDLEN)
 	    return SR_2BIG ;
 
 #if	CF_DEBUGS

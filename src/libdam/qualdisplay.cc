@@ -162,7 +162,7 @@ int		newdisplaylen ;
 	        debugprintf("qualdisplay: it was OK already\n") ;
 #endif
 
-	        len = strlen(olddisplay) ;
+	        len = lenstr(olddisplay) ;
 
 	        bp = newdisplay ;
 	        bp = strwcpy(bp,olddisplay,MIN(LENLEFT,len)) ;
