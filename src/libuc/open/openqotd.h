@@ -1,5 +1,5 @@
 /* openqotd HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* open a channel (file-descriptor) to the quote-of-the-day (QOTD) */

@@ -1,5 +1,5 @@
 /* openqotd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a channel (file-descriptor) to the quote-of-the-day (QOTD) */
@@ -495,7 +495,7 @@ static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
 	    if (fsdir d ; (rs = fsdir_open(&d,qfname)) >= 0) {
 	        fsdir_ent	de ;
 	        USTAT		sb ;
-	        cint		dlen = xstrlen(qfname) ;
+	        cint		dlen = lenstr(qfname) ;
 	        while ((rs = fsdir_read(&d,&de,ebuf,elen)) > 0) {
 	            cint	el = rs ;
 	            cchar	*ep = de.name ;

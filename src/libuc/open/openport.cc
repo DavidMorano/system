@@ -1,5 +1,5 @@
 /* openport SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* proxy-open a socket port for the calling program */
@@ -63,7 +63,7 @@
 #include	<vecstr.h>
 #include	<spawnproc.h>
 #include	<getusername.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<matxstr.h>
 #include	<isnot.h>
 #include	<localmisc.h>		/* |MSGBUFLEN| */
