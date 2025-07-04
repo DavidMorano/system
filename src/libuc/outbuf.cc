@@ -1,5 +1,5 @@
 /* outbuf SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* output buffer management (really?) */
@@ -33,6 +33,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<bufsizevar.hh>

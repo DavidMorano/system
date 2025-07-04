@@ -1,5 +1,5 @@
 /* paramfile HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* object to handle parameter files */
@@ -52,7 +52,7 @@ struct paramfile_flags {
 } ;
 
 struct paramfile_head {
-	cchar		**envv ;	/* program startup environment */
+	mainv		envv ;		/* program startup environment */
 	cchar		*a ;		/* memory allocation */
 	char		*lbuf ;
 	char		*fbuf ;
@@ -61,7 +61,7 @@ struct paramfile_head {
 	varsub		*defp ;		/* defines */
 	varsub		*envp ;		/* environment-variables */
 	time_t		ti_check ;	/* time last checked */
-	PARAMFILE_FL	f ;
+	PARAMFILE_FL	fl ;
 	uint		magic ;
 	int		llen ;
 	int		flen ;
@@ -82,20 +82,59 @@ struct paramfile_cursor {
 	int		i ;
 } ;
 
-typedef PARAMFILE		paramfile ;
 typedef PARAMFILE_CUR		paramfile_cur ;
 typedef PARAMFILE_ENT		paramfile_ent ;
 
+#ifdef	__cplusplus
+enum paramfilemems {
+    	paramfilemem_checkint,
+    	paramfilemem_close,
+	paramfilemem_overlast
+} ; /* end enum (paramfilemems) */
+struct paramfile ;
+struct paramfile_co {
+	paramfile	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (paramfile *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 1) noex ;
+	operator int () noex {
+	    return operator () (1) ;
+	}
+} ; /* end struct (paramfile_co) */
+struct paramfile : paramfile_head {
+    	paramfile_co	checkint ;
+    	paramfile_co	close ;
+	paramfile() noex {
+	    checkint(this,paramfilemem_checkint) ;
+	    close(this,paramfilemem_close) ;
+	} ;
+    	int open(mainv,cchar * = nullptr) noex ;
+	int curbegin(paramfile_cur *) noex ;
+	int curend(paramfile_cur *) noex ;
+	int curenum(paramfile_cur *,paramfile_ent *,char *,int) noex ;
+	int check(time_t = 0L) noex ;
+	void dtor() noex ;
+	destruct paramfile() {
+	    if (magic) dtor() ;
+	} ;
+} ; /* end struct (paramfile) */
+#else
+typedef PARAMFILE		paramfile ;
+#endif /* __cplusplus */
+
 EXTERNC_begin
 
-extern int paramfile_open(paramfile *,cchar **,cchar *) noex ;
+extern int paramfile_open(paramfile *,mainv,cchar *) noex ;
 extern int paramfile_fileadd(paramfile *,cchar *) noex ;
 extern int paramfile_setdefines(paramfile *,vecstr *) noex ;
 extern int paramfile_curbegin(paramfile *,paramfile_cur *) noex ;
 extern int paramfile_curend(paramfile *,paramfile_cur *) noex ;
 extern int paramfile_fetch(paramfile *,cchar *,paramfile_cur *,
 		char *,int) noex ;
-extern int paramfile_enum(paramfile *,paramfile_cur *,paramfile_ent *,
+extern int paramfile_curenum(paramfile *,paramfile_cur *,paramfile_ent *,
 		char *,int) noex ;
 extern int paramfile_checkint(paramfile *,int) noex ;
 extern int paramfile_check(paramfile *,time_t) noex ;

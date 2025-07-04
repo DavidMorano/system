@@ -1,5 +1,5 @@
 /* paramfile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* read in a file of parameters */
@@ -19,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	paramfile
+
+	Description:
 	This object reads in the parameter file and makes the
 	parameter pairs available thought a key search.
 
@@ -39,6 +43,8 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<ulogerror.h>
+#include	<getpwd.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<ascii.h>
@@ -47,19 +53,19 @@
 #include	<fieldterms.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
-#include	<char.h>
-#include	<mkchar.h>
 #include	<buffer.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
+#include	<mkpathrooted.h>
 #include	<sfx.h>
 #include	<strwcpy.h>
-#include	<getpwd.h>
-#include	<mkpathrooted.h>
+#include	<char.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"paramfile.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -102,9 +108,9 @@ typedef PF_F	*filep ;
 struct paramfile_file {
 	cchar		*fname ;
 	time_t		mtime ;
-	dev_t		dev ;
-	ino_t		ino ;
 	size_t		fsize ;
+	ino_t		ino ;
+	dev_t		dev ;
 } ;
 
 
@@ -122,7 +128,7 @@ static inline int paramfile_ctor(paramfile *op,Args ... args) noex {
 	    op->a = nullptr ;
 	    op->lbuf = nullptr ;
 	    op->fbuf = nullptr ;
-	    op->f = {} ;
+	    op->fl = {} ;
 	    op->ti_check = 0 ;
 	    op->magic = 0 ;
 	    op->llen = 0 ;
@@ -239,22 +245,22 @@ static bufsizevar	maxlinelen(getbufsize_ml) ;
 
 /* exported subroutines */
 
-int paramfile_open(PF *op,cchar **envv,cchar *fname) noex {
+int paramfile_open(PF *op,mainv envv,cchar *fname) noex {
 	static cint	srs = mkterms() ;
 	int		rs ;
 	if ((rs = srs) >= 0) {
 	    if ((rs = paramfile_ctor(op)) >= 0) {
 		vecobj	*flp = op->filep ;
-	        int	esize = sizeof(PF_F) ;
+	        int	esz = szof(PF_F) ;
 	        int	vo = VECOBJ_OSTATIONARY ;
 	        op->envv = envv ;
 	        op->intcheck = PARAMFILE_INTCHECK ;
 	        op->ti_check = time(nullptr) ;
-	        if ((rs = vecobj_start(flp,esize,10,vo)) >= 0) {
+	        if ((rs = vecobj_start(flp,esz,10,vo)) >= 0) {
 		    vecobj	*elp = op->entsp ;
 	            vo = (VECOBJ_OCOMPACT | VECOBJ_OORDERED) ;
-	            esize = sizeof(PF_E) ;
-	            if ((rs = vecobj_start(elp,esize,10,vo)) >= 0) {
+	            esz = szof(PF_E) ;
+	            if ((rs = vecobj_start(elp,esz,10,vo)) >= 0) {
 	                if (op->envv) {
 	                    rs = paramfile_envbegin(op) ;
 	                }
@@ -294,8 +300,8 @@ int paramfile_close(PF *op) noex {
 	        rs1 = paramfile_filefins(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->f.definit) {
-	        op->f.definit = false ;
+	    if (op->fl.definit) {
+	        op->fl.definit = false ;
 	        rs1 = varsub_finish(op->defp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -406,11 +412,11 @@ int paramfile_fetch(PF *op,cchar *ks,PF_C *curp,char *vbuf,int vlen) noex {
 	        } else {
 		    vog_f	vget = vecobj_get ;
 	            int		j = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	            int		i{} ;	/* <- used afterwards */
+	            int		i ; /* <- used-afterwards */
 	            void	*vp{} ;
-	            for (int i = j ; (rs = vget(slp,i,&vp)) >= 0 ; i += 1) {
+	            for (i = j ; (rs = vget(slp,i,&vp)) >= 0 ; i += 1) {
+	                pep = entp(vp) ;
 		        if (vp) {
-	                    PF_E	*pep = entp(vp) ;
 	                    if (pep->key) {
 	                        if (strcmp(ks,pep->key) == 0) break ;
 		            }
@@ -421,8 +427,7 @@ int paramfile_fetch(PF *op,cchar *ks,PF_C *curp,char *vbuf,int vlen) noex {
 	            }
 	        } /* end if */
 	        if ((rs >= 0) && pep) {
-		    cchar	*cp{} ;
-	            if ((rs = paramfile_entsub(op,pep,&cp)) >= 0) {
+		    if (cc *cp ; (rs = paramfile_entsub(op,pep,&cp)) >= 0) {
 	                vl = rs ;
 	                if (vbuf) {
 	                    rs = sncpy1(vbuf,vlen,cp) ;
@@ -435,7 +440,7 @@ int paramfile_fetch(PF *op,cchar *ks,PF_C *curp,char *vbuf,int vlen) noex {
 }
 /* end subroutine (paramfile_fetch) */
 
-int paramfile_enum(PF *op,PF_C *curp,PF_E *ep,char *ebuf,int elen) noex {
+int paramfile_curenum(PF *op,PF_C *curp,PF_E *ep,char *ebuf,int elen) noex {
 	int		rs ;
 	int		kl = 0 ;
 	if ((rs = paramfile_magic(op,curp,ep,ebuf)) >= 0) {
@@ -472,7 +477,7 @@ int paramfile_enum(PF *op,PF_C *curp,PF_E *ep,char *ebuf,int elen) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
 }
-/* end subroutine (paramfile_enum) */
+/* end subroutine (paramfile_curenum) */
 
 int paramfile_checkint(PF *op,int intcheck) noex {
 	int		rs ;
@@ -702,7 +707,7 @@ static int paramfile_entsub(PF *op,PF_E *pep,cchar **rpp) noex {
 	            bool	f_exptry = false ;
 	            cchar	*rvp = nullptr ;
 	            if ((rs = buffer_start(&b,start)) >= 0) {
-	                if (op->f.definit) {
+	                if (op->fl.definit) {
 		            varsub	*dlp = op->defp ;
 		            int		sl = pep->olen ;
 		            cchar	*sp = pep->oval ;
@@ -712,7 +717,7 @@ static int paramfile_entsub(PF *op,PF_E *pep,cchar **rpp) noex {
 	                } /* end if */
 	                if ((! f_exptry) || (rs == SR_NOTFOUND)) {
 	                    rs = SR_OK ;
-	                    if (! op->f.envload) {
+	                    if (! op->fl.envload) {
 	                        rs = paramfile_envload(op) ;
 		            }
 	                    if (rs >= 0) {
@@ -845,10 +850,10 @@ static int paramfile_filedel(PF *op,int fi) noex {
 
 static int paramfile_envbegin(PF *op) noex {
 	int		rs = SR_OK ;
-	if (! op->f.envinit) {
+	if (! op->fl.envinit) {
 	    cint	vao = 0 ;
 	    rs = varsub_start(op->envp,vao) ;
-	    op->f.envinit = (rs >= 0) ;
+	    op->fl.envinit = (rs >= 0) ;
 	} /* end if */
 	return rs ;
 }
@@ -857,8 +862,8 @@ static int paramfile_envbegin(PF *op) noex {
 static int paramfile_envend(PF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.envinit) {
-	    op->f.envinit = false ;
+	if (op->fl.envinit) {
+	    op->fl.envinit = false ;
 	    rs1 = varsub_finish(op->envp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -868,9 +873,9 @@ static int paramfile_envend(PF *op) noex {
 
 static int paramfile_envload(PF *op) noex {
 	int		rs = SR_OK ;
-	if ((op->envv != nullptr) && (! op->f.envload)) {
-	    op->f.envload = true ;
-	    if (! op->f.envinit) {
+	if ((op->envv != nullptr) && (! op->fl.envload)) {
+	    op->fl.envload = true ;
+	    if (! op->fl.envinit) {
 	        rs = paramfile_envbegin(op) ;
 	    }
 	    if (rs >= 0) {
@@ -883,10 +888,10 @@ static int paramfile_envload(PF *op) noex {
 
 static int paramfile_defbegin(PF *op,vecstr *dvp) noex {
 	int		rs = SR_OK ;
-	if (! op->f.definit) {
+	if (! op->fl.definit) {
 	    cint	vao = VARSUB_OBADNOKEY ;
 	    rs = varsub_start(op->defp,vao) ;
-	    op->f.definit = (rs >= 0) ;
+	    op->fl.definit = (rs >= 0) ;
 	}
 	if ((rs >= 0) && (dvp != nullptr)) {
 	    rs = paramfile_defload(op,dvp) ;
@@ -898,8 +903,8 @@ static int paramfile_defbegin(PF *op,vecstr *dvp) noex {
 static int paramfile_defend(PF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.definit) {
-	    op->f.definit = false ;
+	if (op->fl.definit) {
+	    op->fl.definit = false ;
 	    rs1 = varsub_finish(op->defp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -914,7 +919,8 @@ static int paramfile_defload(PF *op,vecstr *dvp) noex {
 	    for (int i = 0 ; vecstr_get(dvp,i,&cp) >= 0 ; i += 1) {
 	        if (cp) {
 	            if ((tp = strchr(cp,'=')) != nullptr) {
-	                rs = varsub_add(op->defp,cp,(tp - cp),(tp + 1),-1) ;
+			cint tl = intconv(tp - cp) ;
+	                rs = varsub_add(op->defp,cp,tl,(tp + 1),-1) ;
 	            } else {
 	                rs = varsub_add(op->defp,cp,-1,nullptr,0) ;
 		    }
@@ -931,9 +937,9 @@ static int paramfile_entrels(PF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
-	for (int i = 0 ; vecobj_get(slp,i,&vp) >= 0 ; i += 1) {
+	for (int i = 0 ; slp->get(i,&vp) >= 0 ; i += 1) {
+	    PF_E	*pep = entp(vp) ;
 	    if (vp) {
-		PF_E	*pep = entp(vp) ;
 	        rs1 = entry_release(pep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -942,12 +948,53 @@ static int paramfile_entrels(PF *op) noex {
 }
 /* end subroutine (paramfile_entrels) */
 
+int paramfile::open(mainv ev,cchar *fname) noex {
+	return paramfile_open(this,ev,fname) ;
+}
+
+int paramfile::curbegin(PF_C *curp) noex {
+	return paramfile_curbegin(this,curp) ;
+}
+
+int paramfile::curend(PF_C *curp) noex {
+	return paramfile_curend(this,curp) ;
+}
+
+int paramfile::curenum(PF_C *curp,PF_E *ep,char *rbuf,int rlen) noex {
+	return paramfile_curenum(this,curp,ep,rbuf,rlen) ;
+}
+
+int paramfile::check(time_t dt) noex {
+	return paramfile_check(this,dt) ;
+}
+
+void paramfile::dtor() noex {
+	if (cint rs = close ; rs < 0) {
+	    ulogerror("paramfile",rs,"fini-close") ;
+	}
+} /* end method (paramfile::dtor) */
+
+int paramfile_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case paramfilemem_checkint:
+	        rs = paramfile_checkint(op,a) ;
+	        break ;
+	    case paramfilemem_close:
+	        rs = paramfile_close(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (paramfile_co::operator) */
+
 static int file_start(PF_F *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	if (fep && fname) {
-	    cchar	*cp{} ;
 	    memclear(fep) ;
-	    if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
 	        fep->fname = cp ;
 	    }
 	} /* end if (non-null) */
@@ -977,7 +1024,7 @@ static int entry_start(PF_E *pep,int fi,cc *kp,int kl,VS *vsp,int olen) noex {
 	    void	*vp{} ;
 	    memclear(pep) ;
 	    pep->fi = fi ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = lenstr(kp) ;
 	    pep->klen = kl ;
 	    pep->olen = olen ;
 	    bsize = (kl + 1 + olen + 1) + 10 ;

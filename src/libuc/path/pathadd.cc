@@ -1,5 +1,5 @@
 /* pathadd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* add a component (c-string) to an existing path (c-string) */
@@ -75,9 +75,11 @@
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
+#include	<localmisc.h>
 
 #include	"pathadd.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -117,8 +119,8 @@ int pathnaddw(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	if (pbuf && sp) {
 	    rs = SR_INVALID ;
 	    if ((plen >= 0) && (pl >= 0)) {
-		    rs = local_pathadd(pbuf,plen,pl,sp,sl) ;
-		    pl = rs ;
+		rs = local_pathadd(pbuf,plen,pl,sp,sl) ;
+		pl = rs ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
@@ -126,18 +128,18 @@ int pathnaddw(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 /* end subroutine (pathnaddw) */
 
 int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (pbuf) {
 	    rs = SR_INVALID ;
 	    if ((plen >= 0) && (pl >= 0)) {
-		    va_list	ap ;
-	            va_begin(ap,n) ;
-	            for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
-		        cchar	*sp = (char *) va_arg(ap,char *) ;
-		        rs = local_pathadd(pbuf,plen,pl,sp,-1) ;
-		        pl = rs ;
-	            } /* end for */
-	            va_end(ap) ;
+	        va_begin(ap,n) ;
+	        for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
+		    cchar	*sp = (char *) va_arg(ap,char *) ;
+		    rs = local_pathadd(pbuf,plen,pl,sp,-1) ;
+		    pl = rs ;
+	        } /* end for */
+	        va_end(ap) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
@@ -161,12 +163,12 @@ int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 /* end subroutine (pathaddw) */
 
 int pathaddx(char *pbuf,int pl,int n,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (pbuf) {
 	    rs = SR_INVALID ;
 	    if (pl >= 0) {
 	        if ((rs = maxpathlen) >= 0) {
-		    va_list	ap ;
 		    cint	plen = rs ;
 	            va_begin(ap,n) ;
 	            for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
