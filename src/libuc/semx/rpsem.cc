@@ -1,5 +1,5 @@
 /* rpsem SUPPORT ("real" POSIX® Semaphore) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* POSIX© unnamed Semaphore (PSEM) */
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
   	Object:
-	psem
+	rpsem
 
 	Description:
 	This module provides a sanitized version of the standard
@@ -50,7 +50,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<semaphore.h>
+#include	<semaphore.h>		/* POSIX® semaphores */
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
@@ -62,6 +62,13 @@
 
 
 /* local defines */
+
+/****
+This "define" crap below is needed in order to avoid a compiler
+error (on Apple-Darwin).  Apple-Darwin has marked the two subroutine
+callas below as "depracated."  So in order to avoid that crap, I need to
+do the following.
+****/
 
 #if	(!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0)
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
@@ -100,21 +107,23 @@
 
 /* exported subroutines */
 
-int psem_create(psem *op,int pshared,int acnt) noex {
+int rpsem_create(rpsem *op,int pshared,int acnt) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    cint	ic = (acnt & INT_MAX) ;
-	    repeat {
-	        if ((rs = sem_init(&op->ps,pshared,ic)) < 0) {
-		    rs = (- errno) ;
-	        }
-	    } until (rs != SR_INTR) ;
+	    rs = SR_INVALID ;
+	    if (acnt > 0) {
+	        repeat {
+	            if ((rs = sem_init(&op->ps,pshared,acnt)) < 0) {
+		        rs = (- errno) ;
+	            }
+	        } until (rs != SR_INTR) ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (psem_create) */
+/* end subroutine (rpsem_create) */
 
-int psem_destroy(psem *op) noex {
+int rpsem_destroy(rpsem *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    repeat {
@@ -125,9 +134,9 @@ int psem_destroy(psem *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (psem_destroy) */
+/* end subroutine (rpsem_destroy) */
 
-int psem_waiti(psem *op) noex {
+int rpsem_wait(rpsem *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    repeat {
@@ -138,22 +147,9 @@ int psem_waiti(psem *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (psem_waiti) */
+/* end subroutine (rpsem_wait) */
 
-int psem_wait(psem *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    repeat {
-	        if ((rs = sem_wait(&op->ps)) < 0) {
-		    rs = (- errno) ;
-	        }
-	    } until (rs != SR_INTR) ;
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (psem_wait) */
-
-int psem_trywait(psem *op) noex {
+int rpsem_trywait(rpsem *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    repeat {
@@ -164,9 +160,9 @@ int psem_trywait(psem *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (psem_trywait) */
+/* end subroutine (rpsem_trywait) */
 
-int psem_waiter(psem *op,int to) noex {
+int rpsem_waiter(rpsem *op,int to) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (to < 0) to = (INT_MAX / (2 * NLPS)) ;
@@ -197,9 +193,9 @@ int psem_waiter(psem *op,int to) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (psem_waiter) */
+/* end subroutine (rpsem_waiter) */
 
-int psem_post(psem *op) noex {
+int rpsem_post(rpsem *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    repeat {
@@ -210,66 +206,69 @@ int psem_post(psem *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (psem_post) */
+/* end subroutine (rpsem_post) */
 
-int psem_count(psem *op) noex {
+int rpsem_count(rpsem *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op) {
-	    while ((rs = psem_trywait(op)) >= 0) {
+	    while ((rs = rpsem_trywait(op)) >= 0) {
 		c += 1 ;
 	    } /* end while */
 	    if (rs == SR_AGAIN) {
 		rs = SR_OK ;
 		for (int i = 0 ; (rs >= 0) && (i < c) ; i += 1) {
-		    rs = psem_post(op) ;
+		    rs = rpsem_post(op) ;
 		} /* end for */
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (psem_count) */
+/* end subroutine (rpsem_count) */
 
-int psem::create(int pshared,int acnt) noex {
-	return psem_create(this,pshared,acnt) ;
+
+/* local subroutines */
+
+int rpsem::create(int pshared,int acnt) noex {
+	return rpsem_create(this,pshared,acnt) ;
 }
 
-psem::operator int () noex {
-	return psem_count(this) ;
+rpsem::operator int () noex {
+	return rpsem_count(this) ;
 }
 
-void psem::dtor() noex {
+void rpsem::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
-	    ulogerror("psem",rs,"fini-destroy") ;
+	    ulogerror("rpsem",rs,"fini-destroy") ;
 	}
 }
 
-int psem_co::operator () (int a) noex {
+int rpsem_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
-	    case psemmem_wait:
-	        rs = psem_wait(op) ;
+	    case rpsemmem_wait:
+	        rs = rpsem_wait(op) ;
 	        break ;
-	    case psemmem_waiter:
-	        rs = psem_waiter(op,a) ;
+	    case rpsemmem_waiter:
+	        rs = rpsem_waiter(op,a) ;
 	        break ;
-	    case psemmem_trywait:
-	        rs = psem_trywait(op) ;
+	    case rpsemmem_trywait:
+	        rs = rpsem_trywait(op) ;
 	        break ;
-	    case psemmem_post:
-	        rs = psem_post(op) ;
+	    case rpsemmem_post:
+	        rs = rpsem_post(op) ;
 	        break ;
-	    case psemmem_count:
-	        rs = psem_count(op) ;
+	    case rpsemmem_count:
+	        rs = rpsem_count(op) ;
 	        break ;
-	    case psemmem_destroy:
-	        rs = psem_destroy(op) ;
+	    case rpsemmem_destroy:
+	        rs = rpsem_destroy(op) ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (psem_co::operator) */
+/* end method (rpsem_co::operator) */
 
 

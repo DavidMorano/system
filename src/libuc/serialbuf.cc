@@ -1,5 +1,5 @@
 /* serialbuf SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* serializing buffer object handling */
@@ -109,7 +109,7 @@ static int serialbuf_szok(serialbuf *op,int sz) noex {
 
 template<typename T>
 static int serialbuf_rx(serialbuf *op,T *rp) noex {
-	cint		sz = sizeof(T) ;
+	cint		sz = szof(T) ;
 	int		rs ;
 	if ((rs = serialbuf_rok(op,rp,sz)) >= 0) {
 	    cchar	*sp = (op->sbuf + op->i) ;
@@ -122,7 +122,7 @@ static int serialbuf_rx(serialbuf *op,T *rp) noex {
 
 template<typename T>
 static int serialbuf_rxa(serialbuf *op,T *rp,int n) noex {
-	cint		sz = sizeof(T) ;
+	cint		sz = szof(T) ;
 	for (int i = 0 ; (op->i >= 0) && (i < n) ; i += 1) {
 	    if ((op->slen - op->i) >= sz) {
 		cchar	*sp = (op->sbuf + op->i) ;
@@ -138,7 +138,7 @@ static int serialbuf_rxa(serialbuf *op,T *rp,int n) noex {
 
 template<typename T>
 static int serialbuf_wx(serialbuf *op,T v) noex {
-	cint		sz = sizeof(T) ;
+	cint		sz = szof(T) ;
 	int		rs ;
 	if ((rs = serialbuf_szok(op,sz)) >= 0) {
 	    char	*bp = (op->sbuf + op->i) ;
@@ -151,11 +151,11 @@ static int serialbuf_wx(serialbuf *op,T v) noex {
 
 template<typename T>
 static int serialbuf_wxa(serialbuf *op,T *wa,int n) noex {
-	cint		sz = sizeof(T) ;
+	cint		sz = szof(T) ;
 	for (int i = 0 ; (op->i >= 0) && (i < n) ; i += 1) {
 	    if ((op->slen - op->i) >= sz) {
 		char	*bp = (op->sbuf + op->slen) ;
-	        stdorder_wi(bp,wa[i]) ;
+	        stdorder_w(bp,wa[i]) ;
 	        op->i += sz ;
 	    } else {
 	        op->i = SR_TOOBIG ;
@@ -259,7 +259,7 @@ int serialbuf_robj(serialbuf *op,void *rp,int rl) noex {
 /* end subroutine (serialbuf_robj) */
 
 int serialbuf_rc(serialbuf *op,char *rp) noex {
-	cint		sz = sizeof(char) ;
+	cint		sz = szof(char) ;
 	int		rs ;
 	if ((rs = serialbuf_rok(op,rp,sz)) >= 0) {
 	    cchar	*sp = (op->sbuf + op->i) ;
@@ -311,7 +311,7 @@ int serialbuf_rstrn(serialbuf *op,char *rbuf,int rlen) noex {
 	int		rl = 0 ;
 	if ((rs = serialbuf_rok(op,rbuf,rlen)) >= 0) {
 	    cchar	*sp = (op->sbuf + op->i) ;
-	    rl = strwcpy(rbuf,sp,rlen) - rbuf ;
+	    rl = intconv(strwcpy(rbuf,sp,rlen) - rbuf) ;
 	    op->i += rl ;
 	} /* end if (valid) */
 	return (rs >= 0) ? rl : rs ;
@@ -425,7 +425,7 @@ int serialbuf_wobj(serialbuf *op,cvoid *wp,int wl) noex {
 /* end subroutine (serialbuf_wobj) */
 
 int serialbuf_wc(serialbuf *op,char ch) noex {
-	cint		sz = sizeof(char) ;
+	cint		sz = szof(char) ;
 	int		rs ;
 	if ((rs = serialbuf_szok(op,sz)) >= 0) {
 	    char	*bp = (op->sbuf + op->slen) ;
@@ -491,7 +491,7 @@ int serialbuf_wstrw(serialbuf *op,cchar *wbuf,int wlen) noex {
 	int		wl = 0 ;
 	if ((rs = serialbuf_wok(op,wbuf,(wlen+1))) >= 0) {
 	    char	*bp = (op->sbuf + op->i) ;
-	    wl = strwcpy(bp,wbuf,wlen) - bp ;
+	    wl = intconv(strwcpy(bp,wbuf,wlen) - bp) ;
 	    op->i += wl ;
 	}
 	return (rs >= 0) ? wl : rs ;

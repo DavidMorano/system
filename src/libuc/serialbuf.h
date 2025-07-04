@@ -1,5 +1,5 @@
 /* serialbuf HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* object that serializes various types into a given buffer */
@@ -136,8 +136,8 @@ struct serialbuf : serialbuf_head {
 	    return *this ;
 	} ;
 	void dtor() noex ;
-	~serialbuf() {
-	    dtor() ;
+	destruct serialbuf() {
+	    if (sbuf) dtor() ;
 	} ;
 } ; /* end struct (serialbuf) */
 template<> inline int serialbuf::r(char *p) noex {

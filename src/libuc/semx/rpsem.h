@@ -1,8 +1,8 @@
 /* rpsem HEADER ("real" POSIX® Semaphore) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* POSIX© unnamed Semaphore (PSEM) */
+/* POSIX© unnamed Semaphore (RPSEM) */
 /* version %I% last-modified %G% */
 
 
@@ -18,19 +18,19 @@
 /*******************************************************************************
 
   	Object:
-	psem
+	rpsem
 
 	Description:
 	These are (real) "unnamed" POSIX® semaphores.
 
 *******************************************************************************/
 
-#ifndef	PSEM_INCLUDE
-#define	PSEM_INCLUDE
+#ifndef	RPSEM_INCLUDE
+#define	RPSEM_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<semaphore.h>
+#include	<semaphore.h>		/* POSIX® semaphores */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -38,27 +38,27 @@
 #include	<usysrets.h>
 
 
-#define	PSEM		struct psem_head
+#define	RPSEM		struct rpsem_head
 
-struct psem_head {
+struct rpsem_head {
 	sem_t		ps ;
 } ;
 
 #ifdef	__cplusplus
-enum psemmems {
-	psemmem_wait,
-	psemmem_waiter,
-	psemmem_trywait,
-	psemmem_post,
-	psemmem_count,
-    	psemmem_destroy,
-	psemmem_overlast
+enum rpsemmems {
+	rpsemmem_wait,
+	rpsemmem_waiter,
+	rpsemmem_trywait,
+	rpsemmem_post,
+	rpsemmem_count,
+    	rpsemmem_destroy,
+	rpsemmem_overlast
 } ;
-struct psem ;
-struct psem_co {
-	psem		*op = nullptr ;
+struct rpsem ;
+struct rpsem_co {
+	rpsem		*op = nullptr ;
 	int		w = -1 ;
-	void operator () (psem *p,int m) noex {
+	void operator () (rpsem *p,int m) noex {
 	    op = p ;
 	    w = m ;
 	} ;
@@ -66,48 +66,48 @@ struct psem_co {
 	operator int () noex {
 	    return operator () () ;
 	} ;
-} ; /* end struct (psem_co) */
-struct psem : psem_head {
-	psem_co		wait ;
-	psem_co		waiter ;
-	psem_co		trywait ;
-	psem_co		post ;
-	psem_co		count ;
-	psem_co		destroy ;
-	psem() noex {
-	    wait(this,psemmem_wait) ;
-	    waiter(this,psemmem_waiter) ;
-	    trywait(this,psemmem_trywait) ;
-	    post(this,psemmem_post) ;
-	    count(this,psemmem_count) ;
-	    destroy(this,psemmem_destroy) ;
+} ; /* end struct (rpsem_co) */
+struct rpsem : rpsem_head {
+	rpsem_co		wait ;
+	rpsem_co		waiter ;
+	rpsem_co		trywait ;
+	rpsem_co		post ;
+	rpsem_co		count ;
+	rpsem_co		destroy ;
+	rpsem() noex {
+	    wait(this,rpsemmem_wait) ;
+	    waiter(this,rpsemmem_waiter) ;
+	    trywait(this,rpsemmem_trywait) ;
+	    post(this,rpsemmem_post) ;
+	    count(this,rpsemmem_count) ;
+	    destroy(this,rpsemmem_destroy) ;
 	} ;
-	psem(const psem &) = delete ;
-	psem &operator = (const psem &) = delete ;
+	rpsem(const rpsem &) = delete ;
+	rpsem &operator = (const rpsem &) = delete ;
 	int create(int = 0,int = -1) noex ;
 	operator int () noex ;
 	void dtor() noex ;
-	~psem() {
+	destruct rpsem() {
 	    dtor() ;
 	} ;
-} ; /* end struct (psem) */
+} ; /* end struct (rpsem) */
 #else	/* __cplusplus */
-typedef PSEM		psem ;
+typedef RPSEM		rpsem ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
 
-extern int	psem_create(psem *,int,int) noex ;
-extern int	psem_destroy(psem *) noex ;
-extern int	psem_wait(psem *) noex ;
-extern int	psem_waiter(psem *,int) noex ;
-extern int	psem_trywait(psem *) noex ;
-extern int	psem_post(psem *) noex ;
-extern int	psem_count(psem *) noex ;
+extern int	rpsem_create(rpsem *,int,int) noex ;
+extern int	rpsem_destroy(rpsem *) noex ;
+extern int	rpsem_wait(rpsem *) noex ;
+extern int	rpsem_waiter(rpsem *,int) noex ;
+extern int	rpsem_trywait(rpsem *) noex ;
+extern int	rpsem_post(rpsem *) noex ;
+extern int	rpsem_count(rpsem *) noex ;
 
 EXTERNC_end
 
 
-#endif /* PSEM_INCLUDE */
+#endif /* RPSEM_INCLUDE */
 
 

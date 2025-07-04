@@ -1,5 +1,5 @@
 /* namesem HEADER (named semaphore) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® -- named -- Counting Semaphore (NAMESEM) */
@@ -28,7 +28,7 @@
 
 struct namesem_head {
 	sem_t		*sp ;
-	cchar		*name ;
+	char		*name ;
 	uint		magic ;
 } ;
 
@@ -80,7 +80,7 @@ struct namesem : namesem_head {
 	int open(cchar *,int,mode_t,uint) noex ;
 	operator int () noex ;
 	void dtor() noex ;
-	~namesem() {
+	destruct namesem() {
 	    dtor() ;
 	} ;
 } ; /* end struct (namesem) */
