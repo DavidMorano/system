@@ -1,5 +1,5 @@
 /* openshm SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a share-memory file in shared memory (really private) */
@@ -91,7 +91,7 @@ static int	mktmpname(char *,int,ulong) noex ;
 
 static bufsizevar	maxnamelen(getbufsize_mn) ;
 
-static cint		tmplen = xstrlen(sysword.w_tmpdir) ;
+static cint		tmplen = lenstr(sysword.w_tmpdir) ;
 
 
 /* exported variables */

@@ -1,5 +1,5 @@
 /* opensysdbs HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* database name for use w/ the |opensysfs(3uc)| subroutine */
@@ -19,22 +19,30 @@
 #define	OPENSYSDBS_INCLUDE
 
 
-enum opensysdbis {
-	opensysdbi_userhomes,
-	opensysdbi_usernames,
-	opensysdbi_groupnames,
-	opensysdbi_projectnames,
-	opensysdbi_passwd,
-	opensysdbi_group,
-	opensysdbi_project,
-	opensysdbi_realname,
-	opensysdbi_shells,
-	opensysdbi_shadow,
-	opensysdbi_userattr,
-	opensysdbi_overlast
-} ;
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>		/* ?? */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 
-extern cpcchar		opensysdbs[] ;
+
+enum opensysdbs {
+	opensysdb_userhomes,
+	opensysdb_usernames,
+	opensysdb_groupnames,
+	opensysdb_projectnames,
+	opensysdb_passwd,
+	opensysdb_shadow,
+	opensysdb_userattr,
+	opensysdb_group,
+	opensysdb_project,
+	opensysdb_realname,
+	opensysdb_shells,
+	opensysdb_overlast
+} ; /* end enum (opensysdbs) */
+
+extern cpcchar		opensysdb[] ;
 
 
 #endif /* OPENSYSDBS_INCLUDE */

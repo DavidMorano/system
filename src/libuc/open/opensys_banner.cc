@@ -1,5 +1,5 @@
 /* opensys_banner SUPPORT (opem-system-banner) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* Open the System Banner */
@@ -238,7 +238,7 @@ static int procfile_reg(filer *wfp,cchar *ds,int f_top) noex {
 
 static int printend(filer *wfp,cchar *ds,cchar *lbuf,int len) noex {
 	cint		cols = COLUMNS ;
-	cint		dl = xstrlen(ds) ;
+	cint		dl = lenstr(ds) ;
 	int		rs = SR_OK ;
 	int		breaklen ;
 	int		ml ;

@@ -1,5 +1,5 @@
 /* opensysdbs SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* database name for use w/ the |opensysfs(3uc)| subroutine */
