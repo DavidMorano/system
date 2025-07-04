@@ -47,7 +47,7 @@
 #include	<envstandards.h>	/* must be ordered first to configure */
 #include	<cerrno>
 #include	<cstdio>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* for |lenstr(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -93,7 +93,7 @@ int freadln(FILE *fp,char *rbuf,int rlen) noex {
 		if (errno == 0) {
 		    rs = SR_OK ;
 		    if (bp) {
-			len = strlen(bp) ;
+			len = lenstr(bp) ;
 		    } else if (ferror(fp)) {
 	                clearerr(fp) ;
 	                rs = SR_IO ;

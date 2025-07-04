@@ -43,7 +43,7 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| + |memcmp(3c)| */
+#include	<cstring>		/* |lenstr(3c)| + |memcmp(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -70,7 +70,7 @@ import libutil ;
 
 constexpr char		magstr[] = "\177ELF" ;
 
-constexpr cint		maglen = cstrlen(magstr) ;
+constexpr cint		maglen = clenstr(magstr) ;
 
 
 /* exported variables */

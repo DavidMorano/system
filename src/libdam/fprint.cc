@@ -57,7 +57,7 @@ int		llen ;
 	if (lbuf == NULL)
 	    return SR_FAULT ;
 
-	if (llen < 0) llen = strlen(lbuf) ;
+	if (llen < 0) llen = lenstr(lbuf) ;
 
 	if (llen > 0) {
 	    rs = fbwrite(fp,lbuf,llen) ;

@@ -622,7 +622,7 @@ static int holidayer_mkdir(HO *op,char *rbuf,cchar *dn) noex {
 	int		i = 0 ;
 	if (dn[0] != '/') {
 	    cchar	*pr = op->pr ;
-	    const int	prl = strlen(op->pr) ;
+	    const int	prl = lenstr(op->pr) ;
 	    if ((rs = storebuf_strw(rbuf,rlen,i,pr,prl)) >= 0) {
 	        i += rs ;
 	        if (pr[prl-1] != '/') {
@@ -647,7 +647,7 @@ static int holidayer_mkfname(HO *op,char *rbuf,cchar *dn,uint y) noex {
 	cchar		*prefix = HOLIDAYER_FPR ;
 
 	if (dn[0] != '/') {
-	    cint	prl = strlen(pr) ;
+	    cint	prl = lenstr(pr) ;
 	    if ((rs = storebuf_strw(rbuf,rlen,i,pr,prl)) >= 0) {
 	        i += rs ;
 	        if (pr[prl-1] != '/') {

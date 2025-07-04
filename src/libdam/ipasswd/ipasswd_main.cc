@@ -879,7 +879,7 @@ static int ipasswd_hdrloader(ipasswd *op) noex {
 	op->rtlen = table[pwihdr_reclen] ;
 	op->rtsize = table[pwihdr_recsize] ;
 	op->stab = ccharp(op->mapdata + table[pwihdr_strtab]) ;
-	op->stcount = table[pwihdr_strlen] ;
+	op->stcount = table[pwihdr_lenstr] ;
 	op->stsize = table[pwihdr_strsize] ;
 	op->rilen = table[pwihdr_idxlen] ;
 	op->recind[0] = (uint (*)[2]) (op->mapdata + table[pwihdr_idxl1]) ;

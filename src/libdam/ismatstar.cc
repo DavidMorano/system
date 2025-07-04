@@ -89,8 +89,8 @@ bool ismatstar(cchar *se,cchar *s) noex {
 	if (cchar *tp ; (tp = strchr(se,'*')) != nullptr) {
 	    f = false ;
 	    if (int sl ; strncmp(s,se,(tp - se)) == 0) {
-	        cint	sl1 = strlen(s) ;
-	        cint	sl2 = strlen(se) ;
+	        cint	sl1 = lenstr(s) ;
+	        cint	sl2 = lenstr(se) ;
 	        tp += 1 ;
 	        sl = (se + sl2) - tp ;
 	        f = (strncmp((s + sl1 - sl),tp,sl) == 0) ;

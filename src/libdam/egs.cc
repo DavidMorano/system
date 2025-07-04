@@ -210,7 +210,7 @@ int egs_read(egs *op,char *rbuf,int rlen) noex {
 int egs_write(egs *op,cchar *wbuf,int wlen) noex {
 	int		rs ;
 	int		wl = 0 ;
-	if (wlen < 0) wlen = cstrlen(wbuf) ;
+	if (wlen < 0) wlen = clenstr(wbuf) ;
 	if ((rs = egs_magic(op,wbuf)) >= 0) {
 	    cint	clen = min(UCHAR_MAX,CMDBUFLEN) ;
 	    int		bits ;

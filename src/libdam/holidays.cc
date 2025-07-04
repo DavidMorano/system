@@ -421,7 +421,7 @@ int		vlen ;
 	        rs = sncpy1(vbuf,vlen,vp) ;
 	        vl = rs ;
 	    } else
-	        vl = strlen(vp) ;
+	        vl = lenstr(vp) ;
 
 	    if (qp != NULL) {
 	        uint	cite = rt[ri][0] ;
@@ -475,7 +475,7 @@ int		vlen ;
 	}
 
 	if (kl < 0)
-	    kl = strlen(kp) ;
+	    kl = lenstr(kp) ;
 
 	if (hasuc(kp,kl)) {
 	    if (kl > KEYBUFLEN) kl = KEYBUFLEN ;
@@ -579,7 +579,7 @@ int		vlen ;
 	        rs = sncpy1(vbuf,vlen,vp) ;
 	        vl = rs ;
 	    } else
-	        vl = strlen(vp) ;
+	        vl = lenstr(vp) ;
 
 	    if (qp != NULL) {
 	        uint	cite = rt[ri][0] ;
@@ -636,7 +636,7 @@ int		vlen ;
 	            rs = sncpy1(vbuf,vlen,vp) ;
 	            vl = rs ;
 	        } else
-	            vl = strlen(vp) ;
+	            vl = lenstr(vp) ;
 
 	        if (qp != NULL) {
 	            uint	cite = rt[ri][0] ;

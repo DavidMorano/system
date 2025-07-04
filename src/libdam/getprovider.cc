@@ -83,7 +83,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<uinfo.h>
 #include	<mallocxx.h>
@@ -160,7 +160,7 @@ int getproviderid(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
 	int		id = 0 ;
 	if (sp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    for (int m, i = 0 ; providers[i].codename ; i += 1) {
 	        cchar	*bs = providers[i].codename ;
 	        m = nleadstr(bs,sp,sl) ;
