@@ -63,7 +63,7 @@ obuf::obuf(cchar *sp,int sl) noex : oi(0) {
 	    len(this,obufmem_len) ;
 	    if (sp) {
 	        if (sl < 0) {
-		    sl = xstrlen(sp) ;
+		    sl = lenstr(sp) ;
 		}
 		try {
 		    strview sv(sp,sl) ;
@@ -85,7 +85,7 @@ int obuf::operator [] (int i) const noex {
 
 int obuf::add(cchar *sp,int sl) noex {
 	    int		rs = SR_OK ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    try {
 		strview sv(sp,sl) ;
 		b += sv ;
