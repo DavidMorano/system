@@ -1,5 +1,5 @@
-/* prique MODULE (primary module interface) */
-/* encoding=ISO8859-1 */
+/* prique MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* implement a queue container of objects */
@@ -11,9 +11,12 @@
 	= 2011-04-12, David A­D­ Morano
 	This code was originally written. 
 
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
 */
 
-/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2011,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -104,12 +107,12 @@ export {
 	constexpr int		ins(const K *) noex ;
 	constexpr int		get(const K *) noex ;
 	constexpr prique() noex {
-	    start(this,priquemem_start) ;
-	    finish(this,priquemem_finish) ;
-	    count(this,priquemem_count) ;
-	    rem(this) ;
+	    start	(this,priquemem_start) ;
+	    finish	(this,priquemem_finish) ;
+	    count	(this,priquemem_count) ;
+	    rem		(this) ;
 	} ; /* end ctor) */
-	constexpr ~prique() {
+	constexpr destruct prique() {
 	    if (mp) {
 	        delete mp ;
 		mp = nullptr ;
@@ -123,6 +126,8 @@ export {
 	constexpr int		icount() noex ;
 	constexpr int		irem(K * = nullptr) noex ;
     } ; /* end class (prique) */
+} /* end export (prique) */
+
     template<typename K> constexpr int prique<K>::istart(int n) noex {
 	int		rs = SR_INVALID ;
 	if (n >= 0) {
@@ -232,6 +237,5 @@ export {
 	}
 	return rs ;
     } /* end method (prique_co::operator) */
-} /* end export (prique) */
 
 

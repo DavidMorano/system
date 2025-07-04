@@ -1,5 +1,5 @@
 /* pwentry HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* PW-ENTRY object and interface */
@@ -8,10 +8,10 @@
 
 /* revision history:
 
-	= 1998-00-00, David A.D. Morano
+	= 1998-00-00, David A-D- Morano
 	This was originally written.
 
-	= 2018-12-21, David A.D. Morano
+	= 2018-12-21, David A-D- Morano
 	Added |pwentrybufsize(3dam)|.  I added this to facilitate
 	buffer allocations for using this object.
 

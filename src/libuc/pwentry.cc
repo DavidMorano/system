@@ -1,5 +1,5 @@
 /* pwentry SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* some miscellaneous PWENTRY subroutines */
@@ -11,7 +11,7 @@
 	= 1998-09-01, David A-D- Morano
 	This program was originally written.
 
-	= 2018-12-21, David A.D. Morano
+	= 2018-12-21, David A-D- Morano
 	Added |pwentrybufsize(3dam)|.  I added this to facilitate
 	buffer allocations for using this object.
 
