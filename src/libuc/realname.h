@@ -1,5 +1,5 @@
 /* realname HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* manipulate real names */
@@ -103,8 +103,9 @@ struct realname : realname_head {
     	realname_esther	start ;
 	realname_co	finish ;
 	realname() noex {
-	    start.init(this,0) ;
-	    finish(this,realnamemem_finish) ;
+	    start.init	(this,0) ;
+	    finish	(this,realnamemem_finish) ;
+	    stbuf = nullptr ;
 	} ;
 	realname(const realname &) = delete ;
 	realname &operator = (const realname &) = delete ;
@@ -121,8 +122,8 @@ struct realname : realname_head {
 	int mailname(char *,int) noex ;
 	int mat(realname *) noex ;
 	void dtor() noex ;
-	~realname() {
-	    dtor() ;
+	destruct realname() {
+	    if (stbuf) dtor() ;
 	} ;
 } ; /* end struct (realname) */
 #else	/* __cplusplus */

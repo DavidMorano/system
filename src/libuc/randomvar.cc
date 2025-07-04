@@ -1,5 +1,5 @@
 /* randomvar SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* random number generation object */
@@ -85,7 +85,6 @@
 #include	<cstdlib>		/* UNIX® system subroutines */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
 #include	<usupport.h>		/* |libu::cfdec(3u)| */
 #include	<randlc.h>
 #include	<isnot.h>
@@ -93,6 +92,7 @@
 
 #include	"randomvar.h"
 
+import uconstants ;
 
 /* local defines */
 

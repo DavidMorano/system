@@ -1,5 +1,5 @@
 /* randlc HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* implement Linear-Congruential random-number generator (RNG) */

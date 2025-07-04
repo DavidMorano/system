@@ -1,5 +1,5 @@
 /* namestr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* manipulate real names */
@@ -29,8 +29,6 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<new>
 #include	<usystem.h>
 #include	<six.h>
@@ -41,6 +39,7 @@
 
 #include	"namestr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -48,8 +47,6 @@
 /* imported nameopaces */
 
 using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -81,7 +78,7 @@ int namestr_start(namestr *op,cchar *sbuf,int slen) noex {
 	if (op && sbuf) {
 	    rs = SR_OK ;
 	    op->strp = sbuf ;
-	    op->strl = (slen >= 0) ? slen : xstrlen(sbuf) ;
+	    op->strl = (slen >= 0) ? slen : lenstr(sbuf) ;
 	}
 	return rs ;
 }
@@ -117,7 +114,7 @@ int namestr_brk(namestr *op,cchar *bs,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
 	int		idx = 0 ;
 	if (op && bs) {
-	    cint	si = sibreak(op->strp,op->strl,bs) ;
+	    cint	si = sibrk(op->strp,op->strl,bs) ;
 	    rs = SR_OK ;
 	    *rpp = (si >= 0) ? (op->strp + si) : nullptr ;
 	    idx = si ;

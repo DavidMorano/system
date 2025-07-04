@@ -1,5 +1,5 @@
 /* readln SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* read characters from Standard-Input (STDIN) */
@@ -81,6 +81,9 @@ using std::istream ;			/* type */
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 
@@ -100,10 +103,11 @@ int readln(istream *isp,char *ibuf,int ilen,int dch) noex {
 	    try {
 		rs = SR_BADFMT ;
 	        if (bool(isp->getline(ibuf,(ilen+1),char(dch)))) {
-		    if ((rs = isp->gcount()) <= ilen) {
+		    csize	qsize = isp->gcount() ;
+		    if ((rs = int(qsize)) <= ilen) {
 			len = rs ;
 			if (len > 0) {
-			    ibuf[len-1]= dch ;
+			    ibuf[len - 1] = char(dch) ;
 			    ibuf[len] = '\0' ;
 			}
 		    } else {
