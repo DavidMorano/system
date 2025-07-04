@@ -431,7 +431,7 @@ int txtindexmks_addeigens(TIM *op,TIM_KEY *eigens,int n) noex {
 	        for (int i = 0 ; i < n ; i += 1) {
 	            cchar	*kp = charp(eigens[i].kp) ;
 	            int		kl = eigens[i].kl ;
-	            if (kl < 0) kl = strlen(kp) ;
+	            if (kl < 0) kl = lenstr(kp) ;
 	            if (hasuc(kp,kl)) {
 	                if (kl > keylen) kl = keylen ;
 	                strwcpylc(keybuf,kp,kl) ;
@@ -1199,7 +1199,7 @@ static int txtindexmks_printeigener(TIM *op,printeigen *ap) noex {
 	        		debugprintf(fmt,i,si,(estab + si)) ;
 			    }
 	    		    sp = (estab + si) ;
-	    		    sl = strlen(sp) ;
+	    		    sl = lenstr(sp) ;
 	    		    rs1 = strtabfind(estab,eitab,eilen,ns,sp,sl) ;
 	    		    fmt = "txtindexmks_printeigen: stabfind() rs=%d\n";
 	    		    debugprintf(fmt,rs1) ;

@@ -55,7 +55,7 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3++)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
@@ -79,6 +79,7 @@
 
 #include	"useraccdb.h"
 
+import libutil ;
 
 /* local defines */
 #define	USERACCDB_LOGDNAME	"var/log"
@@ -283,8 +284,8 @@ int useraccdb_close(UAD *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = useraccdb_magic(op)) >= 0) {
-	    if (op->f.dater) {
-	        op->f.dater = false ;
+	    if (op->fl.dater) {
+	        op->fl.dater = false ;
 	        rs1 = dater_finish(op->dmp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -560,18 +561,18 @@ static int useraccdb_fileclose(UAD *op) noex {
 static int useraccdb_lock(UAD *op,int f) noex {
 	int		rs = SR_OK ;
 	if (f) {
-	    if (! op->f.locked) {
+	    if (! op->fl.locked) {
 	        rs = u_rewind(op->fd) ;
 	        if (rs >= 0) {
 	            rs = uc_lockf(op->fd,F_LOCK,0z) ;
-	            if (rs >= 0) op->f.locked = true ;
+	            if (rs >= 0) op->fl.locked = true ;
 	        }
 	    }
 	} else {
-	    if (op->f.locked) {
+	    if (op->fl.locked) {
 	        rs = u_rewind(op->fd) ;
 	        if (rs >= 0) {
-	            op->f.locked = false ;
+	            op->fl.locked = false ;
 	            rs = uc_lockf(op->fd,F_UNLOCK,0z) ;
 	        }
 	    }
@@ -605,12 +606,12 @@ static int useraccdb_recproc(UAD *op,UAD_REC *recp) noex {
 
 static int useraccdb_doit(UAD *op,time_t *timep,cc *tsp,int tsl) noex {
 	int		rs = SR_OK ;
-	if (! op->f.dater) {
+	if (! op->fl.dater) {
 	    if (char *znbuf ; (rs = malloc_zn(&znbuf)) >= 0) {
 		cint	znlen = rs ;
 	        if (TIMEB now ; (rs = initnow(&now,znbuf,znlen)) >= 0) {
 	            rs = dater_start(op->dmp,&now,znbuf,rs) ;
-	            op->f.dater = (rs >= 0) ;
+	            op->fl.dater = (rs >= 0) ;
 	        } /* end if (initnow) */
 		rs = rsfree(rs,znbuf) ;
 	    } /* end if (m-a-f) */
@@ -767,7 +768,7 @@ static int upinfo_mkrec(UPI *uip,UPI_REC *urp,char *rbuf,int rlen,
 	    }
 	    if (rs >= 0) {
 	        rbp = strwcpy(rbp,uip->tbuf,UAFILE_LDATE) ;
-	        rl = (rbp - rbuf) ;
+	        rl = intconv(rbp - rbuf) ;
 	    }
 	    if ((rs >= 0) && (! urp->found)) {
 	        cchar	*up = (type) ? uip->arguser : totaluser ;
@@ -780,7 +781,7 @@ static int upinfo_mkrec(UPI *uip,UPI_REC *urp,char *rbuf,int rlen,
 	            *rbp++ = CH_RPAREN ;
 	        }
 	        *rbp++ = '\n' ;
-	        rl = (rbp - rbuf) ;
+	        rl = intconv(rbp - rbuf) ;
 	    }
 	} /* end if (valid) */
 	return (rs >= 0) ? rl : rs ;
@@ -816,14 +817,14 @@ static int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
 	cl = sfnext(lp,ll,&cp) ;
 	recp->userstr.sp = cp ;
 	recp->userstr.sl = min(cl,UAFILE_MAXUSERLEN) ;
-	ll = ((lp+ll)-(cp+cl)) ;
-	lp = (cp+cl) ;
+	ll = intconv((lp + ll) - (cp + cl)) ;
+	lp = (cp + cl) ;
 	if (cchar *tp{} ; (tp = strnchr(lp,ll,CH_LPAREN)) != nullptr) {
-	    ll = ((lp+ll)-(tp+1)) ;
-	    lp = (tp+1) ;
+	    ll = intconv((lp + ll) - (tp + 1)) ;
+	    lp = (tp + 1) ;
 	    cp = lp ;
 	    if ((tp = strnchr(lp,ll,CH_RPAREN)) != nullptr) {
-	        cl = (tp-lp) ;
+	        cl = intconv(tp - lp) ;
 	        recp->namestr.sp = cp ;
 	        recp->namestr.sl = min(cl,UAFILE_MAXNAMELEN) ;
 	    }
@@ -857,7 +858,7 @@ static int entry_load(UAD_ENT *ep,char *ebuf,int elen,UAD_REC *recp) noex {
 static int mkts(char *tbuf,int tlen,time_t t) noex {
 	int		tl = 0 ;
 	timestr_logz(t,tbuf) ;
-	tl = strlen(tbuf) ;
+	tl = lenstr(tbuf) ;
 	if (tl < tlen) {
 	    char	*bp = (tbuf + tl) ;
 	    cint	bl = (tlen - tl) ;

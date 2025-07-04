@@ -353,7 +353,7 @@ const char	queue_machine[] ;
 
 /* find the part of the machine name that we like */
 
-	    i = strlen(queue_machine) ;
+	    i = lenstr(queue_machine) ;
 
 	    if ((cp = strchr(queue_machine,'.')) != NULL)
 	        i = (cp - queue_machine) ;
@@ -368,7 +368,7 @@ const char	queue_machine[] ;
 	        buf[l] = '\0' ;
 	        cp = strshrink(buf) ;
 
-	        j = strlen(cp) ;
+	        j = lenstr(cp) ;
 
 	        if ((i == j) && (strncasecmp(cp,queue_machine,i) == 0)) {
 

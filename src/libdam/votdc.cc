@@ -1008,7 +1008,7 @@ static int votdc_shmwriter(votdc *op,time_t dt,int fd,votdchdr *hdrp,
 	            foff += rs ;
 		    size = VOTDC_BSTRSIZE ;
 		    hdrp->bstroff = foff ;
-		    hdrp->bstrlen = size ;
+		    hdrp->blenstr = size ;
 		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
@@ -1019,7 +1019,7 @@ static int votdc_shmwriter(votdc *op,time_t dt,int fd,votdchdr *hdrp,
 	            foff += rs ;
 		    size = VOTDC_VSTRSIZE ;
 		    hdrp->vstroff = foff ;
-		    hdrp->vstrlen = size ;
+		    hdrp->vlenstr = size ;
 		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
@@ -1061,8 +1061,8 @@ static int votdc_shmhdrin(votdc *op,votdchdr *hdrp) noex {
 
 static int votdc_allocinit(votdc *op,votdchdr *hdrp) noex {
 	int		rs ;
-	if ((rs = shmalloc_init(op->ball,op->bstr,hdrp->bstrlen)) >= 0) {
-	    rs = shmalloc_init(op->vall,op->vstr,hdrp->vstrlen) ;
+	if ((rs = shmalloc_init(op->ball,op->bstr,hdrp->blenstr)) >= 0) {
+	    rs = shmalloc_init(op->vall,op->vstr,hdrp->vlenstr) ;
 	    if (rs < 0) {
 	        shmalloc_fini(op->ball) ;
 	    }
@@ -1144,8 +1144,8 @@ static int votdc_verify(votdc *op) noex {
 	f = f && ((hdrp->recoff + (hdrp->reclen * sz)) < ushmsz) ;
 	f = f && ((hdrp->balloff + hdrp->ballsize) < ushmsz) ;
 	f = f && ((hdrp->valloff + hdrp->vallsize) < ushmsz) ;
-	f = f && ((hdrp->bstroff + hdrp->bstrlen) < ushmsz) ;
-	f = f && ((hdrp->vstroff + hdrp->vstrlen) < ushmsz) ;
+	f = f && ((hdrp->bstroff + hdrp->blenstr) < ushmsz) ;
+	f = f && ((hdrp->vstroff + hdrp->vlenstr) < ushmsz) ;
 	if (! f) rs = SR_BADFMT ;
 	return rs ;
 }

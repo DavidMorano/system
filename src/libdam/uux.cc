@@ -630,7 +630,7 @@ struct subinfo	*sip ;
 
 	    argp = argv[++ai] ;
 	    argr -= 1 ;
-	    argl = strlen(argp) ;
+	    argl = lenstr(argp) ;
 
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
@@ -687,7 +687,7 @@ struct subinfo	*sip ;
 
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 
 	                        if (argl)
 	                            sip->pr = argp ;
@@ -713,7 +713,7 @@ struct subinfo	*sip ;
 
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 
 	                        if (argl)
 	                            sip->prn = argp ;
@@ -739,7 +739,7 @@ struct subinfo	*sip ;
 
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 
 	                        if (argl)
 	                            sip->searchname = argp ;
@@ -766,7 +766,7 @@ struct subinfo	*sip ;
 
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 
 	                        if (argl)
 	                            sip->logfname = argp ;
@@ -796,7 +796,7 @@ struct subinfo	*sip ;
 
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 
 	                        if (argl)
 	                            sip->pr = argp ;
@@ -812,7 +812,7 @@ struct subinfo	*sip ;
 
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 
 	                        if (argl)
 	                            rs = keyopt_loads(&akopts,argp,argl) ;
@@ -828,7 +828,7 @@ struct subinfo	*sip ;
 
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 
 	                        if (argl)
 	                            sip->username = argp ;
@@ -844,7 +844,7 @@ struct subinfo	*sip ;
 
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 
 	                        if (argl)
 	                            sip->username = argp ;

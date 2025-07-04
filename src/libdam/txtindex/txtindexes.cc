@@ -424,7 +424,7 @@ int txtindexes_iseigen(txtindexes *op,cchar *kp,int kl) noex {
 	if ((rs = txtindexes_magic(op,kp)) >= 0) {
 	    int		klen = KEYBUFLEN ;
 	    char	kbuf[KEYBUFLEN + 1] ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = lenstr(kp) ;
 	    if (kl > klen) kl = klen ;
 	    if (hasuc(kp,kl)) {
 	        strwcpylc(kbuf,kp,kl) ;
@@ -1144,7 +1144,7 @@ static int txtindexes_auditeigen(txtindexes *op) noex {
 	    while ((cp < ecp) && cp[0]) {
 	        uint	si = (cp - estab) ;
 	        int	j{} ; /* used-afterwards */
-	        cl = strlen(cp) ;
+	        cl = lenstr(cp) ;
 	        for (j = 0 ; j < erlen ; j += 1) {
 	            if (si == ertab[j])
 	                break ;
@@ -1287,8 +1287,8 @@ static int vcmpkey(cchar **s1pp,cchar **s2pp) noex {
 	if (s1 || s2) {
 	    if (s1) {
 	        if (s2) {
-	            cint	l1 = strlen(s1) ;
-	            cint 	l2 = strlen(s2) ;
+	            cint	l1 = lenstr(s1) ;
+	            cint 	l2 = lenstr(s2) ;
 	            if ((rc = (l2 - l1)) == 0) {
 	                rc = strcmp(s2,s1) ;
 		    }
