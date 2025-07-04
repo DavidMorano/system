@@ -349,7 +349,7 @@ static int argparse_start(struct argparse *app,cchar *args)
 	            opl = (tp-sp) ;
 		    nsp = (tp+1) ;
 	        } else {
-	            opl = strlen(sp) ;
+	            opl = lenstr(sp) ;
 		    nsp = (sp+opl) ;
 	        }
 #if	CF_DEBUGS
@@ -399,15 +399,15 @@ static int argparse_start(struct argparse *app,cchar *args)
 	        int	size = 0 ;
 	        char	*bp ;
 	        if (hostp != NULL) {
-	            if (hostl < 0) hostl = strlen(hostp) ;
+	            if (hostl < 0) hostl = lenstr(hostp) ;
 	            size += (hostl + 1) ;
 	        }
 	        if (portp != NULL) {
-	            if (portl < 0) portl = strlen(portp) ;
+	            if (portl < 0) portl = lenstr(portp) ;
 	            size += (portl + 1) ;
 	        }
 	        if (svcp != NULL) {
-	            if (svcl < 0) svcl = strlen(svcp) ;
+	            if (svcl < 0) svcl = lenstr(svcp) ;
 	            size += (svcl + 1) ;
 	        }
 	        if ((rs = uc_malloc(size,&bp)) >= 0) {

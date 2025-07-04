@@ -122,7 +122,7 @@ int		to ;
 	    const int	wfd = pipes[1] ;
 	    fd = pipes[0] ;
 
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 
 	    rs = u_write(wfd,sp,sl) ;
 

@@ -388,7 +388,7 @@ static int argparse_start(struct argparse *app,cchar *argz)
 	            optl = (tp-sp) ;
 		    nsp = (tp+1) ;
 	        } else {
-	            optl = strlen(sp) ;
+	            optl = lenstr(sp) ;
 		    nsp = (sp+optl) ;
 	        }
 #if	CF_DEBUGS
@@ -432,7 +432,7 @@ static int argparse_start(struct argparse *app,cchar *argz)
 	        int	size = 0 ;
 	        char	*bp ;
 	        if (svcp != NULL) {
-	            if (svcl < 0) svcl = strlen(svcp) ;
+	            if (svcl < 0) svcl = lenstr(svcp) ;
 	            size += (svcl + 1) ;
 	        }
 	        if ((rs = uc_malloc(size,&bp)) >= 0) {

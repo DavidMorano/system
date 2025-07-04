@@ -39,7 +39,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |lenstr(3c)| */
 #include	<usystem.h>
 #include	<matostr.h>
 #include	<cfnum.h>
@@ -90,7 +90,7 @@ int optval(cchar *sp,int sl) noex {
 	int		v = 0 ;
 	if (sp) {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sl > 0) {
 		if (int hi ; (hi = matocasestr(hits,1,sp,sl)) >= 0) {
 	            v = (hi & 1) ;

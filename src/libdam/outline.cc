@@ -33,7 +33,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
@@ -109,7 +109,7 @@ int outline_item(outline *op,cchar *vp,int vl) noex {
 	int		wlen = 0 ;
 	if (op && vp) {
 	    rs = SR_OK ;
-	    if (vl < 0) vl = strlen(vp) ;
+	    if (vl < 0) vl = lenstr(vp) ;
 	    if (vl > 0) {
 	        op->f.comma = true ;
 	        rs = outline_value(op,vp,vl) ;
@@ -132,7 +132,7 @@ int outline_value(outline *op,cchar *vp,int vl) noex {
 	        int	f_comma = FALSE ;
 	        cchar	*fmt ;
 	        cchar	*tp, *cp ;
-	        if (vl < 0) vl = strlen(vp) ;
+	        if (vl < 0) vl = lenstr(vp) ;
 	        op->c_values = 0 ;
 	        while ((rs >= 0) && (vl > 0)) {
 	            if ((cl = sfnext(vp,vl,&cp)) > 0) {
@@ -188,7 +188,7 @@ int outline_write(outline *op,cchar *vp,int vl) noex {
 	int		wlen = 0 ;
 	if (op && vp) {
 	    rs = SR_OK ;
-	    if (vl < 0) vl = strlen(vp) ;
+	    if (vl < 0) vl = lenstr(vp) ;
 	    if (vl > 0) {
 	        if ((rs = bwrite(op->ofp,vp,vl)) >= 0) {
 	            wlen += rs ;

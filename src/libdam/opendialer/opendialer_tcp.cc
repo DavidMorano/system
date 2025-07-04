@@ -251,7 +251,7 @@ static int argparse_start(struct argparse *app,cchar *argz) noex {
 	            opl = (tp-sp) ;
 		    nsp = (tp+1) ;
 	        } else {
-	            opl = strlen(sp) ;
+	            opl = lenstr(sp) ;
 		    nsp = (sp+opl) ;
 	        }
 		kp = opp ;
@@ -286,11 +286,11 @@ static int argparse_start(struct argparse *app,cchar *argz) noex {
 	        int	sz = 0 ;
 	        char	*bp ;
 	        if (hostp != nullptr) {
-	            if (hostl < 0) hostl = strlen(hostp) ;
+	            if (hostl < 0) hostl = lenstr(hostp) ;
 	            sz += (hostl + 1) ;
 	        }
 	        if (portp != nullptr) {
-	            if (portl < 0) portl = strlen(portp) ;
+	            if (portl < 0) portl = lenstr(portp) ;
 	            sz += (portl + 1) ;
 	        }
 	        if ((rs = uc_malloc(sz,&bp)) >= 0) {

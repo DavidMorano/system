@@ -35,7 +35,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
@@ -133,7 +133,7 @@ int outstore_strw(outstore *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    cint	slen = OUTSTORE_SLEN ;
 	    int		rlen ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (op->dbuf) {
 	        rlen = (op->dlen-op->len) ;
 	        if (sl > rlen) {
