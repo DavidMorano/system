@@ -39,6 +39,7 @@
 
 #include	"wordfill.h"
 
+import libutil ;
 import sif ;
 
 /* local defines */
@@ -161,7 +162,7 @@ int wordfill_addword(wordfill *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = wordfill_magic(op,lbuf)) >= 0) {
-	    if (llen < 0) llen = strlen(lbuf) ;
+	    if (llen < 0) llen = lenstr(lbuf) ;
 	    if (llen > 0) {
 	        c += 1 ;
 	        if ((rs = fifostr_add(op->sqp,lbuf,llen)) >= 0) {
@@ -178,7 +179,7 @@ int wordfill_addline(wordfill *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = wordfill_magic(op,lbuf)) >= 0) {
-	    if (llen < 0) llen = strlen(lbuf) ;
+	    if (llen < 0) llen = lenstr(lbuf) ;
 	    if (llen > 0) {
 		sif	so(lbuf,llen) ;
 		int	cl ;
@@ -200,25 +201,24 @@ int wordfill_addlines(wordfill *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = wordfill_magic(op,lbuf)) >= 0) {
-	    int		ll = (llen < 0) ? int(strlen(lbuf)) : llen ;
+	    int		ll = (llen < 0) ? int(lenstr(lbuf)) : llen ;
 	    cchar	*lp = lbuf ;
-	    cchar	*tp ;
-	    while ((tp = strnchr(lp,ll,'\n')) != nullptr) {
+	    for (cchar *tp ; (tp = strnchr(lp,ll,'\n')) != nullptr ; ) {
 		cchar	*sp ;
-		if (int sl ; (sl = sfcontent(lp,(tp-lp),&sp)) > 0) {
+		cint tl = intconv(tp - lp) ;
+		if (int sl ; (sl = sfcontent(lp,tl,&sp)) > 0) {
 		    sif		so(sp,sl) ;
-		    int		cl ;
 		    cchar	*cp ;
-		    while ((cl = so(&cp)) > 0) {
+		    for (int cl ; (cl = so(&cp)) > 0 ; ) {
 	                c += 1 ;
 	                rs = fifostr_add(op->sqp,cp,cl) ;
 		        op->wc += 1 ;
 		        op->chrc += cl ;
 			if (rs < 0) break ;
-	            } /* end while */
+	            } /* end for */
 		} /* end if (sfcontent) */
-		ll -= ((tp+1) - lp) ;
-		lp = (tp+1) ;
+		ll -= intconv((tp + 1) - lp) ;
+		lp = (tp + 1) ;
 	        if (rs < 0) break ;
 	    } /* end while */
 	} /* end if (magic) */

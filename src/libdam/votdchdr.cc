@@ -125,9 +125,9 @@ int votdchdr_wr(votdchdr *ep,cchar *hbuf,int hlen) noex {
 	                ep->valloff = header[votdchdrh_valloff] ;
 	                ep->vallsize = header[votdchdrh_vallsize] ;
 	                ep->bstroff = header[votdchdrh_bstroff] ;
-	                ep->bstrlen = header[votdchdrh_bstrlen] ;
+	                ep->blenstr = header[votdchdrh_blenstr] ;
 	                ep->vstroff = header[votdchdrh_vstroff] ;
-	                ep->vstrlen = header[votdchdrh_vstrlen] ;
+	                ep->vlenstr = header[votdchdrh_vlenstr] ;
 	                bp += headsz ;
 	                bl -= headsz ;
 	            } else {
@@ -175,9 +175,9 @@ int votdchdr_rd(votdchdr *ep,char *hbuf,int hlen) noex {
 	        	header[votdchdrh_valloff] = ep->valloff ;
 	        	header[votdchdrh_vallsize] = ep->vallsize ;
 	        	header[votdchdrh_bstroff] = ep->bstroff ;
-	        	header[votdchdrh_bstrlen] = ep->bstrlen ;
+	        	header[votdchdrh_blenstr] = ep->blenstr ;
 	        	header[votdchdrh_vstroff] = ep->vstroff ;
-	        	header[votdchdrh_vstrlen] = ep->vstrlen ;
+	        	header[votdchdrh_vlenstr] = ep->vlenstr ;
 	        	bp += headsz ;
 	        	bl -= headsz ;
 			len = intconv(bp - hbuf) ;
