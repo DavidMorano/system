@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gpp
@@ -36,6 +35,8 @@ DEFS=
 
 INCS= sfx.h
 
+MODS +=
+
 LIBS=
 
 
@@ -44,6 +45,7 @@ INCDIRS=
 LIBDIRS= -L$(LIBDIR)
 
 
+RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -61,7 +63,7 @@ OBJ3_SFX= sfrootname.o sfshrink.o sfskipwhite.o sfsub.o
 OBJ4_SFX= sfcasesub.o sfsubstance.o sfthing.o 
 OBJ5_SFX= sfwhitedot.o sfword.o sfprogname.o
 OBJ6_SFX= sfnext.o sfnextqtok.o sfkeyval.o 
-OBJ7_SFX= sfsign.o
+OBJ7_SFX= sfsign.o sfext.o
 
 OBJA_SFX= obj0_sfx.o obj1_sfx.o
 OBJB_SFX= obj2_sfx.o obj3_sfx.o
@@ -74,12 +76,13 @@ OBJG1_SFX= objc_sfx.o objd_sfx.o
 OBJ_SFX= $(OBJG0_SFX) $(OBJG1_SFX)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -99,6 +102,9 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_SFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SFX)
@@ -106,8 +112,8 @@ $(T).o:			$(OBJ_SFX)
 $(T).a:			$(OBJ_SFX)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order:		$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order

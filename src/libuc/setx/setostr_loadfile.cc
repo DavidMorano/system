@@ -1,5 +1,5 @@
 /* setostr_loadfile SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* load strings from a file */
@@ -68,7 +68,6 @@
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<mallocxx.h>
 #include	<linebuffer.h>
 #include	<intsat.h>
 #include	<filer.h>

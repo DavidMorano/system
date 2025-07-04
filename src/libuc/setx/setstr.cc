@@ -1,5 +1,5 @@
 /* setstr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* set of strings */
@@ -30,13 +30,13 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<string>
 #include	<usystem.h>
 #include	<localmisc.h>
 
 #include	"setstr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -103,7 +103,7 @@ int setstr_already(setstr *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    key.buf = sp ;
 	    key.len = sl ;
 	    val.buf = sp ;
@@ -123,7 +123,7 @@ int setstr_add(setstr *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    key.buf = sp ;
 	    key.len = sl ;
 	    val.buf = sp ;
@@ -151,7 +151,7 @@ int setstr_del(setstr *op,cchar *sp,int sl) noex {
 	if (op && sp) {
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    key.buf = sp ;
 	    key.len = sl ;
 	    if ((rs = hdb_fetch(op,key,nullptr,&val)) >= 0) {
@@ -160,7 +160,7 @@ int setstr_del(setstr *op,cchar *sp,int sl) noex {
 	            rs1 = hdb_delkey(op,key) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
-		{
+		if (asp) {
 	            rs1 = uc_free(asp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
