@@ -1,5 +1,5 @@
 /* pathclean SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* cleanup a path */
@@ -41,7 +41,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strnlen(3c)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<strwcpy.h>
@@ -49,6 +48,7 @@
 
 #include	"pathclean.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -114,7 +114,7 @@ int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 	        int	nc = 0 ;
 	        bool	f_prev = false ;
 	        cchar	*pp = spathbuf ;
-	        if (int pl ; (pl = cstrnlen(spathbuf,spathlen)) > 0) {
+	        if (int pl ; (pl = lenstr(spathbuf,spathlen)) > 0) {
 	            if (pathbuf pb ; (rs = pb.start(rbuf,rlen)) >= 0) {
 	                if (*pp == '/') {
 	                    pp += 1 ;

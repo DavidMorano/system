@@ -52,7 +52,7 @@
 
 #include	"pmq.h"
 
-import libutil ;			/* |xstrlen(3u)| */
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -375,7 +375,7 @@ int uc_unlinkpmq(cchar *name) noex {
 /* local subroutines */
 
 static int pmq_nameload(pmq *op,cchar *name) noex {
-	int		cl = xstrlen(name) ;
+	int		cl = lenstr(name) ;
 	int		rs = SR_OK ;
 	cchar		*prefix = "" ;
 	if (name[0] != '/') {

@@ -1,5 +1,5 @@
 /* permsched SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find a file according to rules */
@@ -86,7 +86,7 @@
 #include	<vstrkeycmpx.h>
 #include	<localmisc.h>
 
-#include	"xperm.h"
+#include	"permx.h"
 
 
 /* local defines */
@@ -141,7 +141,7 @@ int permsched(mv sched,vecstr *nsp,char *rbuf,int rlen,cc *fn,pm am) noex {
 	                    USTAT	sb ;
 	                    sl = rs ;
 	                    if ((rs = uc_stat(rbuf,&sb)) >= 0) {
-	                        rs = sperm(&id,&sb,am) ;
+	                        rs = permid(&id,&sb,am) ;
 	                    }
 	                } /* end if (schedexpand) */
 	                if (rs >= 0) break ;
