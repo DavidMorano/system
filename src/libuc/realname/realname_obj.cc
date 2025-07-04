@@ -1,5 +1,5 @@
 /* realname_obj SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* manipulate real names */
@@ -91,6 +91,12 @@ using std::nothrow ;			/* constant */
 
 /* local subroutines */
 
+void realname::dtor() noex {
+	if (cint rs = int(finish) ; rs < 0) {
+	    ulogerror("realname",rs,"fini-finish") ;
+	}
+}
+
 int realname_esther::operator () () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
@@ -158,10 +164,17 @@ int realname_esther::operator () (dstr *dsp) noex {
 	return rs ;
 }
 
-void realname::dtor() noex {
-	if (cint rs = int(finish) ; rs < 0) {
-	    ulogerror("realname",rs,"fini-finish") ;
-	}
+realname_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case realnamemem_finish:
+	        rs = realname_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
 }
+/* end method (realname_co::operator) */
 
 

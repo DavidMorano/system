@@ -1,5 +1,5 @@
 /* realname_main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* manipulate real names */
@@ -49,11 +49,12 @@
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
-#include	<localmisc.h>		/* |REALNAME| */
+#include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"realname.h"
 #include	"namestr.h"
 
+import libutil ;
 
 /* local defines */
 
