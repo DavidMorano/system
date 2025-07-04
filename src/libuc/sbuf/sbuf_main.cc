@@ -1,5 +1,5 @@
 /* sbuf_main SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* storage buffer (SBuf) object */
@@ -57,10 +57,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<format.h>
+#include	<fmtstr.h>
 #include	<ctbin.h>
 #include	<ctoct.h>
 #include	<ctdec.h>
@@ -70,14 +69,14 @@
 
 #include	"sbuf.h"
 
-
-import uvariables ;
+import libutil ;
+import uconstants ;
 
 /* local defines */
 
-#define	SBUF_RBUF	(sbp->rbuf)
-#define	SBUF_RLEN	(sbp->rlen)
-#define	SBUF_INDEX	(sbp->index)
+#define	SBUF_RBUF	(op->rbuf)
+#define	SBUF_RLEN	(op->rlen)
+#define	SBUF_INDEX	(op->index)
 
 
 /* imported namespaces */
@@ -101,7 +100,7 @@ using std::nothrow ;			/* constant */
 
 namespace {
     struct blanker {
-	cint	l = xstrlen(sysword.w_blanks) ;
+	cint	l = lenstr(sysword.w_blanks) ;
 	cchar	*p = sysword.w_blanks ;
     } ; /* end struct (blanker) */
 }
@@ -112,11 +111,11 @@ namespace {
 static int	sbuf_addstrw(sbuf *,cchar *,int) noex ;
 
 template<typename T>
-static inline int sbuf_xxxx(sbuf *sbp,int (*ctxxx)(char *,int,T),T v) noex {
+static inline int sbuf_xxxx(sbuf *op,int (*ctxxx)(char *,int,T),T v) noex {
 	cint		dlen = DIGBUFLEN ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (sbp) {
+	if (op) {
 	    if ((rs = SBUF_INDEX) >= 0) {
 	        cint		bl = (SBUF_RLEN-SBUF_INDEX) ;
 	        if (bl >= dlen) {
@@ -129,7 +128,7 @@ static inline int sbuf_xxxx(sbuf *sbp,int (*ctxxx)(char *,int,T),T v) noex {
 	            char	dbuf[dlen+1] ;
 	            if ((rs = ctxxx(dbuf,dlen,v)) >= 0) {
 	                len = rs ;
-	                rs = sbuf_addstrw(sbp,dbuf,len) ;
+	                rs = sbuf_addstrw(op,dbuf,len) ;
 	            }
 	        } /* end if */
 	    } /* end if (not in error mode) */
@@ -139,26 +138,26 @@ static inline int sbuf_xxxx(sbuf *sbp,int (*ctxxx)(char *,int,T),T v) noex {
 /* end subroutine-template (sbuf_xxxx) */
 
 template<typename T>
-static inline int sbuf_binx(sbuf *sbp,T v) noex {
-	return sbuf_xxxx(sbp,ctbin,v) ;
+static inline int sbuf_binx(sbuf *op,T v) noex {
+	return sbuf_xxxx(op,ctbin,v) ;
 }
 /* end subroutine-template (sbuf_binx) */
 
 template<typename T>
-static inline int sbuf_octx(sbuf *sbp,T v) noex {
-	return sbuf_xxxx(sbp,ctoct,v) ;
+static inline int sbuf_octx(sbuf *op,T v) noex {
+	return sbuf_xxxx(op,ctoct,v) ;
 }
 /* end subroutine-template (sbuf_octx) */
 
 template<typename T>
-static inline int sbuf_decx(sbuf *sbp,T v) noex {
-	return sbuf_xxxx(sbp,ctdec,v) ;
+static inline int sbuf_decx(sbuf *op,T v) noex {
+	return sbuf_xxxx(op,ctdec,v) ;
 }
 /* end subroutine-template (sbuf_decx) */
 
 template<typename T>
-static inline int sbuf_hexx(sbuf *sbp,T v) noex {
-	return sbuf_xxxx(sbp,cthex,v) ;
+static inline int sbuf_hexx(sbuf *op,T v) noex {
+	return sbuf_xxxx(op,cthex,v) ;
 }
 /* end subroutine-template (sbuf_hexx) */
 
@@ -173,9 +172,9 @@ static blanker			bo ;	/* so-called "blank" object */
 
 /* exported subroutines */
 
-int sbuf_start(sbuf *sbp,char *dbuf,int dlen) noex {
+int sbuf_start(sbuf *op,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
-	if (sbp && dbuf) {
+	if (op && dbuf) {
 	    rs = SR_INVALID ;
 	    if (dlen > 0) {
 	        rs = SR_OK ;
@@ -189,22 +188,25 @@ int sbuf_start(sbuf *sbp,char *dbuf,int dlen) noex {
 }
 /* end subroutine (sbuf_start) */
 
-int sbuf_finish(sbuf *sbp) noex {
+int sbuf_finish(sbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (sbp) {
-	    if ((rs = SBUF_INDEX) >= 0) {
-	        SBUF_RBUF = nullptr ;
-	        SBUF_RLEN = 0 ;
-	        SBUF_INDEX = SR_NOTOPEN ;
-	    }
-	}
+	if (op) {
+	    rs = SR_NOTOPEN ;
+	    if (op->rbuf) {
+	        if ((rs = SBUF_INDEX) >= 0) {
+	            SBUF_RBUF = nullptr ;
+	            SBUF_RLEN = 0 ;
+	            SBUF_INDEX = SR_NOTOPEN ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sbuf_finish) */
 
-int sbuf_reset(sbuf *sbp) noex {
+int sbuf_reset(sbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (sbp) {
+	if (op) {
 	    char	*bp = SBUF_RBUF ;
 	    rs = SR_OK ;
 	    SBUF_INDEX = 0 ;
@@ -214,10 +216,10 @@ int sbuf_reset(sbuf *sbp) noex {
 }
 /* end subroutine (sbuf_reset) */
 
-int sbuf_buf(sbuf *sbp,cchar *sp,int sl) noex {
+int sbuf_buf(sbuf *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (sbp && sp) {
+	if (op && sp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
 	        char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
 	        if (SBUF_RLEN < 0) {
@@ -253,11 +255,11 @@ int sbuf_buf(sbuf *sbp,cchar *sp,int sl) noex {
 }
 /* end subroutine (sbuf_buf) */
 
-int sbuf_strw(sbuf *sbp,cchar *sp,int sl) noex {
+int sbuf_strw(sbuf *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (sbp && sp) {
+	if (op && sp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
-		rs = sbuf_addstrw(sbp,sp,sl) ;
+		rs = sbuf_addstrw(op,sp,sl) ;
 	    }
 	}
 	return rs ;
@@ -281,125 +283,125 @@ int sbuf_strs(sbuf *bp,int sch,mainv sv) noex {
 }
 /* end subroutine (sbuf_strs) */
 
-int sbuf_bini(sbuf *sbp,int v) noex {
-	return sbuf_binx(sbp,v) ;
+int sbuf_bini(sbuf *op,int v) noex {
+	return sbuf_binx(op,v) ;
 }
 /* end subroutine (sbuf_bini) */
 
-int sbuf_binl(sbuf *sbp,long v) noex {
-	return sbuf_binx(sbp,v) ;
+int sbuf_binl(sbuf *op,long v) noex {
+	return sbuf_binx(op,v) ;
 }
 /* end subroutine (sbuf_binl) */
 
-int sbuf_binll(sbuf *sbp,longlong v) noex {
-	return sbuf_binx(sbp,v) ;
+int sbuf_binll(sbuf *op,longlong v) noex {
+	return sbuf_binx(op,v) ;
 }
 /* end subroutine (sbuf_binll) */
 
-int sbuf_binui(sbuf *sbp,uint v) noex {
-	return sbuf_binx(sbp,v) ;
+int sbuf_binui(sbuf *op,uint v) noex {
+	return sbuf_binx(op,v) ;
 }
 /* end subroutine (sbuf_binui) */
 
-int sbuf_binul(sbuf *sbp,ulong v) noex {
-	return sbuf_binx(sbp,v) ;
+int sbuf_binul(sbuf *op,ulong v) noex {
+	return sbuf_binx(op,v) ;
 }
 /* end subroutine (sbuf_binul) */
 
-int sbuf_binull(sbuf *sbp,ulonglong v) noex {
-	return sbuf_binx(sbp,v) ;
+int sbuf_binull(sbuf *op,ulonglong v) noex {
+	return sbuf_binx(op,v) ;
 }
 /* end subroutine (sbuf_binull) */
 
-int sbuf_octi(sbuf *sbp,int v) noex {
-	return sbuf_octx(sbp,v) ;
+int sbuf_octi(sbuf *op,int v) noex {
+	return sbuf_octx(op,v) ;
 }
 /* end subroutine (sbuf_octi) */
 
-int sbuf_octl(sbuf *sbp,long v) noex {
-	return sbuf_octx(sbp,v) ;
+int sbuf_octl(sbuf *op,long v) noex {
+	return sbuf_octx(op,v) ;
 }
 /* end subroutine (sbuf_octl) */
 
-int sbuf_octll(sbuf *sbp,longlong v) noex {
-	return sbuf_octx(sbp,v) ;
+int sbuf_octll(sbuf *op,longlong v) noex {
+	return sbuf_octx(op,v) ;
 }
 /* end subroutine (sbuf_octll) */
 
-int sbuf_octui(sbuf *sbp,uint v) noex {
-	return sbuf_octx(sbp,v) ;
+int sbuf_octui(sbuf *op,uint v) noex {
+	return sbuf_octx(op,v) ;
 }
 /* end subroutine (sbuf_octui) */
 
-int sbuf_octul(sbuf *sbp,ulong v) noex {
-	return sbuf_octx(sbp,v) ;
+int sbuf_octul(sbuf *op,ulong v) noex {
+	return sbuf_octx(op,v) ;
 }
 /* end subroutine (sbuf_octul) */
 
-int sbuf_octull(sbuf *sbp,ulonglong v) noex {
-	return sbuf_octx(sbp,v) ;
+int sbuf_octull(sbuf *op,ulonglong v) noex {
+	return sbuf_octx(op,v) ;
 }
 /* end subroutine (sbuf_octull) */
 
-int sbuf_deci(sbuf *sbp,int v) noex {
-	return sbuf_decx(sbp,v) ;
+int sbuf_deci(sbuf *op,int v) noex {
+	return sbuf_decx(op,v) ;
 }
 /* end subroutine (sbuf_deci) */
 
-int sbuf_decl(sbuf *sbp,long v) noex {
-	return sbuf_decx(sbp,v) ;
+int sbuf_decl(sbuf *op,long v) noex {
+	return sbuf_decx(op,v) ;
 }
 /* end subroutine (sbuf_decl) */
 
-int sbuf_decll(sbuf *sbp,longlong v) noex {
-	return sbuf_decx(sbp,v) ;
+int sbuf_decll(sbuf *op,longlong v) noex {
+	return sbuf_decx(op,v) ;
 }
 /* end subroutine (sbuf_decll) */
 
-int sbuf_decui(sbuf *sbp,uint v) noex {
-	return sbuf_decx(sbp,v) ;
+int sbuf_decui(sbuf *op,uint v) noex {
+	return sbuf_decx(op,v) ;
 }
 /* end subroutine (sbuf_decui) */
 
-int sbuf_decul(sbuf *sbp,ulong v) noex {
-	return sbuf_decx(sbp,v) ;
+int sbuf_decul(sbuf *op,ulong v) noex {
+	return sbuf_decx(op,v) ;
 }
 /* end subroutine (sbuf_decul) */
 
-int sbuf_decull(sbuf *sbp,ulonglong v) noex {
-	return sbuf_decx(sbp,v) ;
+int sbuf_decull(sbuf *op,ulonglong v) noex {
+	return sbuf_decx(op,v) ;
 }
 /* end subroutine (sbuf_decull) */
 
-int sbuf_hexc(sbuf *sbp,char v) noex {
+int sbuf_hexc(sbuf *op,char v) noex {
 	uchar		uv = uchar(v) ;
-	return sbuf_hexuc(sbp,uv) ;
+	return sbuf_hexuc(op,uv) ;
 }
 /* end subroutine (sbuf_hexc) */
 
-int sbuf_hexi(sbuf *sbp,int v) noex {
+int sbuf_hexi(sbuf *op,int v) noex {
 	uint		uv = uint(v) ;
-	return sbuf_hexx(sbp,uv) ;
+	return sbuf_hexx(op,uv) ;
 }
 /* end subroutine (sbuf_hexi) */
 
-int sbuf_hexl(sbuf *sbp,long v) noex {
+int sbuf_hexl(sbuf *op,long v) noex {
 	ulong		uv = ulong(v) ;
-	return sbuf_hexx(sbp,uv) ;
+	return sbuf_hexx(op,uv) ;
 }
 /* end subroutine (sbuf_hexl) */
 
-int sbuf_hexll(sbuf *sbp,longlong v) noex {
+int sbuf_hexll(sbuf *op,longlong v) noex {
 	ulonglong	uv = ulonglong(v) ;
-	return sbuf_hexx(sbp,uv) ;
+	return sbuf_hexx(op,uv) ;
 }
 /* end subroutine (sbuf_hexll) */
 
-int sbuf_hexuc(sbuf *sbp,uchar v) noex {
+int sbuf_hexuc(sbuf *op,uchar v) noex {
 	cint		hlen = (2 * szof(uchar)) ; /* unsigned character */
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (sbp) {
+	if (op) {
 	    if ((rs = SBUF_INDEX) >= 0) {
 		cint	bl = (SBUF_RLEN-SBUF_INDEX) ;
 		rs = SR_OVERFLOW ;
@@ -416,25 +418,25 @@ int sbuf_hexuc(sbuf *sbp,uchar v) noex {
 }
 /* end subroutine (sbuf_hexuc) */
 
-int sbuf_hexui(sbuf *sbp,uint v) noex {
-	return sbuf_hexx(sbp,v) ;
+int sbuf_hexui(sbuf *op,uint v) noex {
+	return sbuf_hexx(op,v) ;
 }
 /* end subroutine (sbuf_hexui) */
 
-int sbuf_hexul(sbuf *sbp,ulong v) noex {
-	return sbuf_hexx(sbp,v) ;
+int sbuf_hexul(sbuf *op,ulong v) noex {
+	return sbuf_hexx(op,v) ;
 }
 /* end subroutine (sbuf_hexul) */
 
-int sbuf_hexull(sbuf *sbp,ulonglong v) noex {
-	return sbuf_hexx(sbp,v) ;
+int sbuf_hexull(sbuf *op,ulonglong v) noex {
+	return sbuf_hexx(op,v) ;
 }
 /* end subroutine (sbuf_hexull) */
 
-int sbuf_chr(sbuf *sbp,int ch) noex {
+int sbuf_chr(sbuf *op,int ch) noex {
 	cint		len = 1 ;
 	int		rs = SR_FAULT ;
-	if (sbp) {
+	if (op) {
 	    if ((rs = SBUF_INDEX) >= 0) {
 	        cint	bl = (SBUF_RLEN - SBUF_INDEX) ;
 	        char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
@@ -454,9 +456,9 @@ int sbuf_chr(sbuf *sbp,int ch) noex {
 /* end subroutine (sbuf_chr) */
 
 /* store a character (n-times) */
-int sbuf_chrs(sbuf *sbp,int ch,int len) noex {
+int sbuf_chrs(sbuf *op,int ch,int len) noex {
 	int		rs = SR_FAULT ;
-	if (sbp) {
+	if (op) {
 	    if ((rs = SBUF_INDEX) >= 0) {
 		rs = SR_INVALID ;
 		if (len >= 0) {
@@ -480,15 +482,15 @@ int sbuf_chrs(sbuf *sbp,int ch,int len) noex {
 }
 /* end subroutine (sbuf_chrs) */
 
-int sbuf_blanks(sbuf *sbp,int n) noex {
+int sbuf_blanks(sbuf *op,int n) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (sbp) {
+	if (op) {
 	    if ((rs = SBUF_INDEX) >= 0) {
 		if (n >= 0) {
 	            while ((rs >= 0) && (len < n)) {
 	                cint	ml = min((n - len),bo.l) ;
-	                rs = sbuf_addstrw(sbp,bo.p,ml) ;
+	                rs = sbuf_addstrw(op,bo.p,ml) ;
 	                len += rs ;
 	            } /* end while */
 		} /* end if (valid) */
@@ -498,17 +500,17 @@ int sbuf_blanks(sbuf *sbp,int n) noex {
 }
 /* end subroutine (sbuf_blanks) */
 
-int sbuf_vprintf(sbuf *sbp,cchar *fmt,va_list ap) noex {
+int sbuf_vprintf(sbuf *op,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (sbp && fmt && ap) {
+	if (op && fmt && ap) {
 	    rs = SR_INVALID ;
 	    if (fmt[0]) {
 	        if ((rs = SBUF_INDEX) >= 0) {
 	            cint	fm = 0x01 ; /* *will* error out on overflow! */
 	            cint	dl = (SBUF_RLEN - SBUF_INDEX) ;
 	            char	*dp = (SBUF_RBUF + SBUF_INDEX) ;
-	            if ((rs = format(dp,dl,fm,fmt,ap)) >= 0) {
+	            if ((rs = fmtstr(dp,dl,fm,fmt,ap)) >= 0) {
 	                len = rs ;
 		        SBUF_INDEX += len ;
 	            } else {
@@ -534,9 +536,9 @@ int sbuf_printf(sbuf *op,cchar *fmt,...) noex {
 }
 /* end subroutine (sbuf_printf) */
 
-int sbuf_adv(sbuf *sbp,int adv,char **dpp) noex {
+int sbuf_adv(sbuf *op,int adv,char **dpp) noex {
 	int		rs = SR_FAULT ;
-	if (sbp) {
+	if (op) {
 	    if (dpp) *dpp = nullptr ;
 	    if ((rs = SBUF_INDEX) >= 0) {
 	        if ((SBUF_RLEN - SBUF_INDEX) >= adv) {
@@ -552,9 +554,9 @@ int sbuf_adv(sbuf *sbp,int adv,char **dpp) noex {
 /* end subroutine (sbuf_adv) */
 
 /* get the remaining length in the buffer */
-int sbuf_rem(sbuf *sbp) noex {
+int sbuf_rem(sbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (sbp) {
+	if (op) {
 	    if ((rs = SBUF_INDEX) >= 0) {
 	        rs = (SBUF_RLEN-SBUF_INDEX) ;
 	    }
@@ -564,9 +566,9 @@ int sbuf_rem(sbuf *sbp) noex {
 /* end subroutine (sbuf_rem) */
 
 /* get the length filled so far */
-int sbuf_getlen(sbuf *sbp) noex {
+int sbuf_getlen(sbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (sbp) {
+	if (op) {
 	    rs = SBUF_INDEX ;
 	}
 	return rs ;
@@ -574,10 +576,10 @@ int sbuf_getlen(sbuf *sbp) noex {
 /* end subroutine (sbuf_getlen) */
 
 /* get the length filled so far */
-int sbuf_getbuf(sbuf *sbp,cchar **rpp) noex {
+int sbuf_getbuf(sbuf *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (sbp) {
-	    if (rpp) *rpp = sbp->rbuf ;
+	if (op) {
+	    if (rpp) *rpp = op->rbuf ;
 	    rs = SBUF_INDEX ;
 	}
 	return rs ;
@@ -585,9 +587,9 @@ int sbuf_getbuf(sbuf *sbp,cchar **rpp) noex {
 /* end subroutine (sbuf_getbuf) */
 
 /* get the pointer in the buffer to the next character */
-int sbuf_getpoint(sbuf *sbp,cchar **rpp) noex {
+int sbuf_getpoint(sbuf *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (sbp) {
+	if (op) {
 	    rs = SBUF_INDEX ;
 	    if (rpp) {
 	        *rpp = (SBUF_RBUF + SBUF_INDEX) ;
@@ -598,9 +600,9 @@ int sbuf_getpoint(sbuf *sbp,cchar **rpp) noex {
 /* end subroutine (sbuf_getpoint) */
 
 /* get (retrieve) the previous character (if there is one) */
-int sbuf_getprev(sbuf *sbp) noex {
+int sbuf_getprev(sbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (sbp) {
+	if (op) {
 	    if ((rs = SBUF_INDEX) >= 0) {
 	        rs = mkchar(SBUF_RBUF[SBUF_INDEX - 1]) ;
 	    }
@@ -665,7 +667,7 @@ void sbuf::dtor() noex {
 
 /* private subroutines */
 
-static int sbuf_addstrw(sbuf *sbp,cchar *sp,int sl) noex {
+static int sbuf_addstrw(sbuf *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	char		*bp = (SBUF_RBUF + SBUF_INDEX) ;

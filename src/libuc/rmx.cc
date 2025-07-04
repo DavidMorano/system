@@ -1,5 +1,5 @@
 /* rmx SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* remove characters from the end of the given c-string */
@@ -51,7 +51,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -63,6 +62,7 @@
 
 #include	"rmx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -101,7 +101,7 @@ constexpr cpcchar	exts[] = {
 	"csh",
 	"osf",
 	nullptr
-} ;
+} ; /* end array (exts) */
 
 
 /* exported variables */
@@ -110,8 +110,8 @@ constexpr cpcchar	exts[] = {
 /* exported subroutines */
 
 int rmeol(cchar *sp,int sl) noex {
-	if (sl < 0) sl = strlen(sp) ;
-	while (sl && iseol(sp[sl-1])) {
+	if (sl < 0) sl = lenstr(sp) ;
+	while (sl && iseol(sp[sl - 1])) {
 	    sl -= 1 ;
 	}
 	return sl ;
@@ -119,30 +119,30 @@ int rmeol(cchar *sp,int sl) noex {
 /* end subroutine (rmeol) */
 
 int rmochr(cchar *sp,int sl,int ch) noex {
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (cchar *tp ; (tp = strnochr(sp,sl,ch)) != nullptr) {
-	    sl = (tp-sp) ;
+	    sl = intconv(tp - sp) ;
 	} /* end if */
 	return sl ;
 }
 /* end subroutine (rmochr) */
 
 int rmrchr(cchar *sp,int sl,int ch) noex {
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (cchar *tp ; (tp = strnrchr(sp,sl,ch)) != nullptr) {
-	    sl = (tp-sp) ;
+	    sl = intconv(tp - sp) ;
 	} /* end if */
 	return sl ;
 }
 /* end subroutine (rmrchr) */
 
 int rmext(cchar *sp,int sl) noex {
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (cchar *tp ; (tp = strnrchr(sp,sl,'.')) != nullptr) {
-	    cint	el = ((sp+sl)-(tp+1)) ;
-	    cchar	*ep = (tp+1) ;
+	    cint	el = intconv((sp + sl) - (tp + 1)) ;
+	    cchar	*ep = (tp + 1) ;
 	    if (matstr(exts,ep,el) >= 0) {
-	        sl = (tp-sp) ;
+	        sl = intconv(tp - sp) ;
 	    }
 	} /* end if */
 	return sl ;
@@ -150,8 +150,8 @@ int rmext(cchar *sp,int sl) noex {
 /* end subroutine (rmext) */
 
 int rmtrailchr(cchar *sp,int sl,int sch) noex {
-	if (sl < 0) sl = strlen(sp) ;
-	while ((sl > 1) && (sp[sl-1] == sch)) {
+	if (sl < 0) sl = lenstr(sp) ;
+	while ((sl > 1) && (sp[sl - 1] == char(sch))) {
 	   sl -= 1 ;
 	}
 	return sl ;
@@ -160,7 +160,7 @@ int rmtrailchr(cchar *sp,int sl,int sch) noex {
 
 int rmcomment(cchar *lp,int ll) noex {
 	int		rl ;
-	if (ll < 0) ll = strlen(lp) ;
+	if (ll < 0) ll = lenstr(lp) ;
 	if ((rl = rmochr(lp,ll,'#')) == ll) {
 	   rl = rmeol(lp,ll) ;
 	}

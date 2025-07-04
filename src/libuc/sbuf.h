@@ -1,5 +1,5 @@
 /* sbuf HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* storage buffer (SBuf) object */
@@ -164,8 +164,8 @@ struct sbuf : sbuf_head {
 	    return sbuf_getlen(this) ;
 	} ;
 	void dtor() noex ;
-	~sbuf() {
-	    dtor() ;
+	destruct sbuf() {
+	    if (rbuf) dtor() ;
 	} ;
 } ; /* end struct (sbuf) */
 #else	/* __cplusplus */
