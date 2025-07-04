@@ -52,7 +52,7 @@ struct useraccdb_head {
 	time_t		ti_mod ;
 	ino_t		ino ;
 	dev_t		dev ;
-	USERACCDB_FL	f ;
+	USERACCDB_FL	fl ;
 	uint		magic ;
 	int		fd ;
 } ;

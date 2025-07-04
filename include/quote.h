@@ -24,6 +24,7 @@
 
 
 #define	QUOTE		struct quote_head
+#define	QUOTE_FL	struct quote_flags
 #define	QUOTE_OBJ	struct quote_object
 #define	QUOTE_CUR	struct quote_cursor
 #define	QUOTE_MAGIC	0x99447245
@@ -54,13 +55,14 @@ struct quote_head {
 	char		*dirstrtab ;
 	vechand		dirs ;			/* directories */
 	vecstr		tmpfiles ;
-	QUOTE_FL	f ;
+	QUOTE_FL	fl ;
 	uint		magic ;
 	int		nentries ;
 	int		ncursors ;
 } ;
 
 typedef	QUOTE		quote ;
+typedef	QUOTE_FL	quote_fl ;
 typedef	QUOTE_OBJ	quote_obj ;
 typedef	QUOTE_CUR	quote_cur ;
 

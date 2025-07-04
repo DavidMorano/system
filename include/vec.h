@@ -37,6 +37,7 @@
 #include	<vecstr.h>
 #include	<vecint.h>
 #include	<veclong.h>
+#include	<vsetstr.h>
 
 
 #endif /* VEC_INCLUDE */

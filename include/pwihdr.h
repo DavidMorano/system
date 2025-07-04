@@ -35,7 +35,7 @@ enum pwihdrs {
 	pwihdr_reclen,
 	pwihdr_recsize,
 	pwihdr_strtab,
-	pwihdr_strlen,
+	pwihdr_lenstr,
 	pwihdr_strsize,
 	pwihdr_idxlen,
 	pwihdr_idxsize,
@@ -55,7 +55,7 @@ struct pwihdr_head {
 	uint		recsize ;
 	uint		reclen ;
 	uint		strtab ;
-	uint		strlen ;
+	uint		lenstr ;
 	uint		strsize ;
 	uint		idxlen ;
 	uint		idxsize ;

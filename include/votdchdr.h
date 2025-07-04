@@ -41,9 +41,9 @@ enum votdchdrhs {
 	votdchdrh_valloff,		/* SHM allocator (for verses) */
 	votdchdrh_vallsize,
 	votdchdrh_bstroff,		/* book-name string table */
-	votdchdrh_bstrlen,
+	votdchdrh_blenstr,
 	votdchdrh_vstroff,		/* verse string table */
-	votdchdrh_vstrlen,
+	votdchdrh_vlenstr,
 	votdchdrh_overlast
 } ;
 
@@ -64,9 +64,9 @@ struct votdchdr_head {
 	uint		valloff ;	/* verse SHM allocator object */
 	uint		vallsize ;
 	uint		bstroff ;	/* book-name string table (aligned) */
-	uint		bstrlen ;
+	uint		blenstr ;
 	uint		vstroff ;	/* verse string table (aligned) */
-	uint		vstrlen ;
+	uint		vlenstr ;
 	uchar		vetu[4] ;
 } ;
 
