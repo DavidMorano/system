@@ -39,7 +39,7 @@
 char *dirname(char *s)
 {
 	int		si ;
-	int		sl = strlen(s) ;
+	int		sl = lenstr(s) ;
 
 /* remove trailing slash characters */
 

@@ -308,7 +308,7 @@ int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,char vbuf[],int vlen)
 	}
 
 	if (kl < 0)
-	    kl = strlen(kp) ;
+	    kl = lenstr(kp) ;
 
 	if (vbuf != NULL)
 	    vbuf[0] = '\0' ;
@@ -407,7 +407,7 @@ int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,char vbuf[],int vlen)
 	        rs = sncpy1(vbuf,vlen,vp) ;
 	        vl = rs ;
 	    } else
-	        vl = strlen(vp) ;
+	        vl = lenstr(vp) ;
 
 	    if (rs >= 0)
 	        curp->i = hi ;
@@ -454,7 +454,7 @@ int vars_enum(VARS *op,VARS_CUR *curp,char *kbuf,int klen,char *vbuf,int vlen)
 			rs = sncpy1(vbuf,vlen,vp) ;
 			vl = rs ;
 		    } else {
-			vl = strlen(vp) ;
+			vl = lenstr(vp) ;
 		    }
 		} /* end if */
 		if (rs >= 0)
@@ -680,7 +680,7 @@ static int vars_ouraudit(VARS *op)
 
 	    if (rs >= 0) {
 	        cp = (kst + ki) ;
-	        cl = strlen(cp) ;
+	        cl = lenstr(cp) ;
 
 	        if (cp[-1] != '\0')
 	            rs = SR_BADFMT ;

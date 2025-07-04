@@ -813,7 +813,7 @@ local int entry_load(DW_ENT *dep,IENT *iep,cchar *rbuf) noex {
 	    dep->state = iep->state ;
 	    dep->name = rbuf ;
 	    if (rbuf) {
-		rs = cstrlen(rbuf) ;
+		rs = clenstr(rbuf) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;

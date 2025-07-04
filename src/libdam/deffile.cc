@@ -230,10 +230,10 @@ int deffile_curenum(DF *op,DF_CUR *curp,char *kbuf,int klen,cchar **rpp) noex {
 	            kl = (tp-ep) ;
 	            vp = (tp+1) ;
 	        } else {
-	            kl = strlen(ep) ;
+	            kl = lenstr(ep) ;
 	            vp = (ep+kl) ;
 	        }
-	        vl = strlen(vp) ;
+	        vl = lenstr(vp) ;
 	        if ((rs = snwcpy(kbuf,klen,ep,kl)) >= 0) {
 	            if (rpp) *rpp = vp ;
 	            curp->i = i ;

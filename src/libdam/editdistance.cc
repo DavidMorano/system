@@ -71,8 +71,8 @@ static int	miner(int,int,int) ;
 
 int editdistance(cchar *a,cchar *b)
 {
-	int		al = strlen(a) ;
-	int		bl = strlen(b) ;
+	int		al = lenstr(a) ;
+	int		bl = lenstr(b) ;
 	int		rs = SR_OK ;
 	int		n ;
 	int		el = 0 ;

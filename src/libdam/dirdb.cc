@@ -36,7 +36,7 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -213,7 +213,7 @@ int dirdb_add(dirdb *op,cchar *dp,int dl) noex {
 	if ((rs = dirdb_magic(op,dp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (dp[0]) {
-	        if (dl < 0) dl = strlen(dp) ;
+	        if (dl < 0) dl = lenstr(dp) ;
 	        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	             if ((rs = mkpath1w(tbuf,dp,dl)) >= 0) {
 	                 if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
@@ -317,7 +317,7 @@ int dirdb_curenum(dirdb *op,dirdb_cur *curp,dirdb_ent **epp) noex {
 	    if (void *vp{} ; (rs = vechand_get(op->dlp,i,&vp)) >= 0) {
 		*epp = entp(vp) ;
 	        curp->i = i ;
-	        len = strlen((*epp)->name) ;
+	        len = lenstr((*epp)->name) ;
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
@@ -362,7 +362,7 @@ static int dirdb_adding(dirdb *op,USTAT *sbp,cchar *sp,int sl) noex {
 
 static int dirdb_alreadyentry(dirdb *op,dirdb_ent *ep) noex {
 	int		rs = SR_OK ;
-	int		dnamel = strlen(ep->name) ;
+	int		dnamel = lenstr(ep->name) ;
 	int		cl ;
 	int		f = false ;
 	cchar		*dnamep = ep->name ;
@@ -385,7 +385,7 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 	int		rs1 ;
 	int		f = false ;
 	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
-	    if (nlen < 0) nlen = strlen(name) ;
+	    if (nlen < 0) nlen = lenstr(name) ;
 	    if ((rs = mkpath1w(tbuf,name,nlen)) >= 0) {
 	        if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 	            dirdb_fid	fid{} ;
@@ -414,7 +414,7 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 static int entry_start(dirdb_ent *ep,cc *sp,int sl,USTAT *sbp,int count) noex {
 	int		rs = SR_FAULT ;
 	if (ep) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(ep) ;
 	    ep->fid.ino = sbp->st_ino ;
 	    ep->fid.dev = sbp->st_dev ;

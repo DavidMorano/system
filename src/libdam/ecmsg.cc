@@ -93,7 +93,7 @@ int ecmsg_finish(ecmsg *op) noex {
 int ecmsg_loadbuf(ecmsg *op,cchar *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
 	if (op && mbuf) {
-	    if (mlen < 0) mlen = strlen(mbuf) ;
+	    if (mlen < 0) mlen = lenstr(mbuf) ;
 	    if (mlen > ECMSG_MAXBUFLEN) mlen = ECMSG_MAXBUFLEN ;
 	    if (op->ebuf) {
 	        uc_free(op->ebuf) ;

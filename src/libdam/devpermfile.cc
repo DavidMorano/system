@@ -972,7 +972,7 @@ int		dl ;
 	cchar	*bp ;
 
 
-	if (dl < 0) dl = strlen(dp) ;
+	if (dl < 0) dl = lenstr(dp) ;
 
 	bl = sfbasename(dp,dl,&bp) ;
 
@@ -1080,7 +1080,7 @@ cchar	key[] ;
 	DEVPERMFILE_KEY	*kep ;
 
 	int	rs1 ;
-	int	conlen = strlen(key) ;
+	int	conlen = lenstr(key) ;
 	int	ci = iep->ci ;
 	int	f = FALSE ;
 
@@ -1115,7 +1115,7 @@ int		conlen ;
 	if (console[0] == '\0')
 	    return SR_INVALID ;
 
-	if (conlen < 0) conlen = strlen(console) ;
+	if (conlen < 0) conlen = lenstr(console) ;
 
 	memclear(kep) ;
 	rs = uc_mallocstrw(console,conlen,&cp) ;
@@ -1182,7 +1182,7 @@ int		keylen ;
 	cchar	*cp = kep->console ;
 
 
-	if (keylen < 0) keylen = strlen(key) ;
+	if (keylen < 0) keylen = lenstr(key) ;
 
 	f = (keylen == cl) ;
 	f = f && (strncmp(cp,key,cl) == 0) ;
@@ -1217,7 +1217,7 @@ int		keylen ;
 {
 
 
-	if (keylen < 0) keylen = strlen(key) ;
+	if (keylen < 0) keylen = lenstr(key) ;
 
 	kep->console = key ;
 	kep->conlen = keylen ;
@@ -1250,7 +1250,7 @@ int		dl ;
 	memclear(iep) ;
 	iep->ci = ci ;
 	iep->dmode = m ;
-	if (dl < 0) dl = strlen(dp) ;
+	if (dl < 0) dl = lenstr(dp) ;
 
 	rs = uc_mallocstrw(dp,dl,&cp) ;
 	if (rs < 0)
@@ -1471,7 +1471,7 @@ static int vcmpentry(DEVPERMFILE_ENT **e1pp,DEVPERMFILE_ENT **e2pp) noex {
 
 static mode_t modeparse(cchar *mp,int ml) noex {
 	mode_t	m = 0600 ;
-	if (ml < 0) ml = strlen(mp) ;
+	if (ml < 0) ml = lenstr(mp) ;
 	if (ml > 0) {
 		int	rs1 ;
 		int	v ;

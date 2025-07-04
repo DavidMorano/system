@@ -106,7 +106,7 @@ int ttihdr_rd(ttihdr *op,char *hbuf,int hlen) noex {
                     bl -= magicsize ;
                     memcpy(bp,op->vetu,4) ;
                     bp[0] = TTIHDR_VERSION ;
-                    bp[1] = ENDIAN ;
+                    bp[1] = char(ENDIAN) ;
                     bp += 4 ;
                     bl -= 4 ;
                     if (bl >= headsize) {
@@ -119,7 +119,7 @@ int ttihdr_rd(ttihdr *op,char *hbuf,int hlen) noex {
 	        	header[hi_ostrlen] = op->ostrlen ;
                         bp += headsize ;
                         bl -= headsize ;
-                        len = (bp - hbuf) ;
+                        len = intconv(bp - hbuf) ;
                     } else {
                         rs = SR_OVERFLOW ;
                     } /* end if */
@@ -167,7 +167,7 @@ int ttihdr_wr(ttihdr *op,cchar *hbuf,int hlen) noex {
 	                op->ostrlen = header[hi_ostrlen] ;
 	                bp += headsize ;
 	                bl -= headsize ;
-		        len = (bp - hbuf) ;
+		        len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
 	            }
