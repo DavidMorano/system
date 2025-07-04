@@ -1,5 +1,5 @@
 /* shellunder SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* parse out the shell-under information (as might be present) */
@@ -32,8 +32,8 @@
 	under		given string containing shell-under information
 
 	Returns:
-	>=0	length of program-execution filename
-	<0	error (system-return)
+	>=0		length of program-execution filename
+	<0		error (system-return)
 
 	= Implementation notes:
 	The "shell-under" string takes the form:
@@ -49,8 +49,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system-types */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>		/* <- |strchr(3c)| */
-#include	<usystem.h>
+#include	<cstring>		/* |strchr(3c)| */
+#include	<usystem.h>		/* |lenstr(3u)| */
 #include	<cfdec.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -94,7 +94,7 @@ int shellunder_load(shellunder_dat *op,cchar *under) noex {
 	            cchar	*dp = (under+1) ;
 	            cchar	*tp = strchr(under,'*') ;
 	            if (tp) {
-	                dl = (tp-dp) ;
+	                dl = intconv(tp - dp) ;
 	                under = (tp+1) ;
 	                if (int v ; (rs = cfdeci(dp,dl,&v)) >= 0) {
 	                    op->pid = pid_t(v) ;
@@ -108,7 +108,7 @@ int shellunder_load(shellunder_dat *op,cchar *under) noex {
 			under += 1 ;
 		    }
 	            op->progename = under ;
-	            pl = strlen(under) ;
+	            pl = lenstr(under) ;
 	        }
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */

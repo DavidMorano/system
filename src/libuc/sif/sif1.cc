@@ -120,7 +120,7 @@ int sif::operator () (cchar **rpp) noex {
 	    } else if (sch) {
 		rl = nextchr(rpp) ;
 	    } else {
-		if (sl < 0) sl = xstrlen(sp) ;
+		if (sl < 0) sl = lenstr(sp) ;
 		if ((rl = sfnext(sp,sl,&rp)) > 0) {
 		    sl -= intconv((rp + rl) - sp) ;
 		    sp = (rp + rl) ;
@@ -138,7 +138,7 @@ int sif::next(cchar **rpp) noex {
 	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rl = sfnext(sp,sl,&rp)) > 0) {
 		sl -= intconv((rp + rl) - sp) ;
 		sp = (rp + rl) ;
@@ -157,7 +157,7 @@ int sif::nextbrk(cchar **rpp) noex {
 	if_constexpr (f_debug) debprintf(__func__,"ent sl=%d\n",sl) ;
 	if (sp && (sstr || sch) && rpp) {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && (rl <= 0)) {
 		if_constexpr (f_debug) {
 		    strnul sr(sp,sl) ;
@@ -187,7 +187,7 @@ int sif::spchr(cchar **rpp) noex {
 	cchar		*rp = nullptr ;
 	if (sp && sch && rpp) {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && (rl <= 0)) {
 	        if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
 		    cint tl = intconv(tp - sp) ;
@@ -212,7 +212,7 @@ int sif::spbrk(cchar **rpp) noex {
 	cchar		*rp = nullptr ;
 	if (sp && sstr && rpp) {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && (rl <= 0)) {
 	        if (cchar *tp ; (tp = strnbrk(sp,sl,sstr)) != nullptr) {
 		    cint tl = intconv(tp - sp) ;
@@ -237,7 +237,7 @@ int sif::chr(cchar **rpp) noex {
 	cchar		*rp = nullptr ;
 	if (sp && sch && rpp) {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
 		rp = sp ;
 		rl = intconv(tp - sp) ;
@@ -261,7 +261,7 @@ int sif::brk(cchar **rpp) noex {
 	cchar		*rp = nullptr ;
 	if (sp && sstr && rpp) {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (cchar *tp ; (tp = strnbrk(sp,sl,sstr)) != nullptr) {
 		rp = sp ;
 		rl = intconv(tp - sp) ;

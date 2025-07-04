@@ -1,5 +1,5 @@
 /* shellunder HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* parse a c-string into the shell-under information components */
@@ -36,7 +36,7 @@ EXTERNC_begin
 extern int	shellunder_load(shellunder_dat *,cchar *) noex ;
 
 static inline int shellunder_wr(shellunder_dat *sup,cchar *sp) noex {
-	return shellunder_load(sup,sp) noex ;
+	return shellunder_load(sup,sp) ;
 }
 
 EXTERNC_end
