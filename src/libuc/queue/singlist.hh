@@ -1,5 +1,5 @@
 /* singlist HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++98 */
 
 /* regular (no-frills) singly-linked pointer queue (not-circular) */
@@ -20,6 +20,7 @@
   	Object:
 	singlist
 
+	Descrption:
 	This is a container object (elements are stored within it).
 	This also is implemented as a single-linked list of nodes.
 	This object is very useful for normal queue operations
@@ -49,7 +50,12 @@
 #include	<cstdlib>
 #include	<new>
 #include	<initializer_list>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>		/* system-returns */
+#include	<localmisc.h>
 
 
 template <typename T>
@@ -107,7 +113,7 @@ public:
 	    }
 	    return (*this) ;
 	} ;
-	~singlist_iter() {
+	destruct singlist_iter() {
 	    n = nullptr ;
 	} ;
 	friend bool operator == (const singlist_iter<T> &i1,
@@ -228,7 +234,7 @@ public:
 	    instail(v) ;
 	    return (*this) ;
 	} ;
-	~singlist() {
+	destruct singlist() {
 	    singlist_node<T>	*nn, *n = head ;
 	    while (n != nullptr) {
 		nn = n->next ;

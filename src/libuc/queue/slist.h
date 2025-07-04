@@ -1,5 +1,5 @@
 /* slist HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* regular (no-frills) pointer queue */
@@ -74,9 +74,9 @@ struct slist : slist_head {
 	slist_co	audit ;
 	slist_co	finish ;
 	slist() noex {
-	    start(this,slistmem_start) ;
-	    audit(this,slistmem_audit) ;
-	    finish(this,slistmem_finish) ;
+	    start	(this,slistmem_start) ;
+	    audit	(this,slistmem_audit) ;
+	    finish	(this,slistmem_finish) ;
 	} ;
 	slist(const slist &) = delete ;
 	slist &operator = (const slist &) = delete ;
@@ -91,7 +91,7 @@ struct slist : slist_head {
 	int curenum(slist_cur *,slist_ent **) noex ;
 	int curend(slist_cur *) noex ;
 	void dtor() noex ;
-	~slist() {
+	destruct slist() {
 	    dtor() ;
 	} ;
 } ; /* end struct (slist) */

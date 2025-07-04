@@ -1,5 +1,5 @@
 /* slq SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* Single-list-Queue - regular (no-frills) single list pointer queue */

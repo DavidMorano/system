@@ -1,5 +1,5 @@
 /* quoteshellarg SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutine to quote arguments for safe passage through a SHELL */
