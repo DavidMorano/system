@@ -67,19 +67,21 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 /* exported subroutines */
 
-int outbuf_start(outbuf *oop,char *obuf,int olen) noex {
+int outbuf_start(outbuf *op,char *obuf,int olen) noex {
 	int		rs = SR_FAULT ;
-	if (oop && obuf) {
+	if (op && obuf) {
+	    op->obuf = nullptr ;
+	    op->olen = 0 ;
+	    op->f_alloc = false ;
 	    rs = SR_INVALID ;
 	    if (olen != 0) {
 	        rs = SR_OK ;
-	        oop->f_alloc = false ;
-	        oop->obuf = obuf ;
+	        op->obuf = obuf ;
 	        if (olen >= 0) {
-	            oop->olen = olen ;
+	            op->olen = olen ;
 	        } else {
 		    if ((rs = maxpathlen) >= 0) {
-	               oop->olen = rs ;
+	               op->olen = rs ;
 		    }
 	        }
 	    } /* end if (valid) */
@@ -88,41 +90,41 @@ int outbuf_start(outbuf *oop,char *obuf,int olen) noex {
 }
 /* end subroutine (outbuf_start) */
 
-int outbuf_finish(outbuf *oop) noex {
+int outbuf_finish(outbuf *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (oop) {
+	if (op) {
 	    rs = SR_OK ;
-	    if (oop->f_alloc && oop->obuf) {
-	        rs1 = uc_free(oop->obuf) ;
+	    if (op->f_alloc && op->obuf) {
+	        rs1 = uc_free(op->obuf) ;
 	        if (rs >= 0) rs = rs1 ;
-	        oop->obuf = nullptr ;
+	        op->obuf = nullptr ;
 	    }
-	    oop->f_alloc = false ;
+	    op->f_alloc = false ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (outbuf_finish) */
 
-int outbuf_get(outbuf *oop,char **onpp) noex {
+int outbuf_get(outbuf *op,cchar **onpp) noex {
 	int		rs = SR_FAULT ;
-	if (oop && onpp) {
+	if (op && onpp) {
 	    rs = SR_OK ;
-	    if (oop->f_alloc) {
-	        oop->obuf[0] = '\0' ;
-	        *onpp = oop->obuf ;
+	    if (op->f_alloc) {
+	        op->obuf[0] = '\0' ;
+	        *onpp = op->obuf ;
 	    } else {
-	        if (oop->obuf == nullptr) {
-		    cint	sz = (oop->olen + 1) ;
+	        if (op->obuf == nullptr) {
+		    cint	sz = (op->olen + 1) ;
 	            if (char *vp{} ; (rs = uc_valloc(sz,&vp)) >= 0) {
-	                oop->obuf = vp ;
-	                oop->f_alloc = true ;
-	                oop->obuf[0] = '\0' ;
-	                *onpp = oop->obuf ;
+	                op->obuf = vp ;
+	                op->f_alloc = true ;
+	                op->obuf[0] = '\0' ;
+	                *onpp = op->obuf ;
 	            }
 	        } else {
-	            oop->obuf[0] = '\0' ;
-	            *onpp = oop->obuf ;
+	            op->obuf[0] = '\0' ;
+	            *onpp = op->obuf ;
 	            rs = SR_OK ;
 	        } /* end if */
 	    } /* end if */
@@ -130,5 +132,33 @@ int outbuf_get(outbuf *oop,char **onpp) noex {
 	return rs ;
 }
 /* end subroutine (outbuf_get) */
+
+int outbuf::get(cchar **rpp) noex {
+	return outbuf_get(this,rpp) ;
+}
+
+void outbuf::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("outbuf",rs,"dtor-finish") ;
+	}
+}
+
+outbuf::operator int () noex {
+    	return olen ;
+}
+
+outbuf_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case outbufmem_finish:
+	        rs = outbuf_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (outbuf_co::operator) */
+
 
 

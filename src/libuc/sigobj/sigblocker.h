@@ -1,5 +1,5 @@
 /* sigblocker HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* little object to block signals */
@@ -55,7 +55,7 @@ struct sigblocker : sigblocker_head {
 	    finish(this,sigblockermem_finish) ;
 	} ;
 	void dtor() noex ;
-	~sigblocker() {
+	destruct sigblocker() {
 	    dtor() ;
 	}
 } ; /* end class (sigblocker) */

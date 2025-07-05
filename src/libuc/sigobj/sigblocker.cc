@@ -1,5 +1,5 @@
 /* sigblocker SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* block process signals */
@@ -65,14 +65,14 @@ int sigblocker_start(sigblocker *op,cint *sigs) noex {
 	    sigset_t	nsm ;
 	    rs = SR_OK ;
 	    if (sigs) {
-	        uc_sigsetempty(&nsm) ;
-	        for (int i = 0 ; (rs >= 0) && (sigs[i] > 0) ; i += 1) {
-	            rs = uc_sigsetadd(&nsm,sigs[i]) ;
-	        }
+	        if ((rs = uc_sigsetempty(&nsm)) >= 0) {
+	            for (int i = 0 ; (rs >= 0) && (sigs[i] > 0) ; i += 1) {
+	                rs = uc_sigsetadd(&nsm,sigs[i]) ;
+	            }
+		}
 	    } else {
 	        rs = uc_sigsetfill(&nsm) ;
 	    }
-    
 	    if (rs >= 0) {
 	        rs = u_sigmask(SIG_BLOCK,&nsm,&op->osm) ;
 	    } /* end if */
