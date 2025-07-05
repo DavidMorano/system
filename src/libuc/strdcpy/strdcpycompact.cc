@@ -1,5 +1,5 @@
 /* strdcpycompact SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* counted-string copy while compacting white-space from the source */
@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-08-10 David A.D. Morano
+	= 1998-08-10 David A-D- Morano
 	This was written from scratch.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -67,12 +67,12 @@
 #include	<ascii.h>
 #include	<sfx.h>
 #include	<strmgr.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<nleadstr.h>
 #include	<localmisc.h>
 
 #include	"strdcpy.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -110,7 +110,7 @@ char *strdcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	    int		rs1 ;
 	    int		dl = 0 ;
 	    if (dlen < 0) dlen = INT_MAX ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (strmgr m ; (rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
 		int	cl ;
 	        cchar	*cp{} ;
