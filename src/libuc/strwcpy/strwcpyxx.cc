@@ -1,5 +1,5 @@
 /* strwcpyxx SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy a c-string to a maximum extent */
@@ -128,7 +128,6 @@
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -141,6 +140,7 @@
 
 #include	"strwcpyxx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -180,7 +180,7 @@ char *strwcpycompact(char *dp,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	int		cl ;
 	cchar		*cp ;
-	if (sl < 0) sl = cstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	    if (c++ > 0) {
 	        *dp++ =  ' ' ;
@@ -213,7 +213,7 @@ char *strwcpyopaque(char *dp,cchar *sp,int sl) noex {
 /* end subroutine (strwcpyopaque) */
 
 char *strwcpyrev(char *dp,cchar *sp,int sl) noex {
-	if (sl < 0) sl = cstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	for (int i = (sl-1) ; i >= 0 ; i += 1) {
 	    *dp++ = sp[i] ;
 	} /* end for */

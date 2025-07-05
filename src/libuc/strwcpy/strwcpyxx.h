@@ -1,5 +1,5 @@
 /* strwcpyxx HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* string-copy variant */
@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stddef.h>		/* <- for |wchar_t| */
+#include	<stddef.h>		/* |nullptr_t| + |wchar_t| */
+#include	<stdlib.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
