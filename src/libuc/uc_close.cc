@@ -1,5 +1,5 @@
 /* uc_close */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* interface component for UNIX® library-3c */
@@ -55,7 +55,7 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 

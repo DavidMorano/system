@@ -1,5 +1,5 @@
 /* uc_exit */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* regular exit (like |exit(3c)|) */
@@ -25,7 +25,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<usystem.h>
 
 

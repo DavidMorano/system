@@ -1,5 +1,5 @@
 /* uc_createfile */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 

@@ -1,5 +1,5 @@
 /* uc_cfsetospeed */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
 
@@ -24,8 +24,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<stdlib.h>
-#include	<errno.h>
+#include	<cstdlib>
+#include	<cerrno>
 
 #include	<usystem.h>
 
