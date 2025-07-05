@@ -1,5 +1,5 @@
 /* termcmd HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* clear out the TERMCMD object */
@@ -54,7 +54,7 @@ struct termcmd_flags {
 struct termcmd_head {
 	short		type ;		/* terminal-command type */
 	short		name ;		/* "final" */
-	TERMCMD_FL	f ;
+	TERMCMD_FL	fl ;
 	short		p[TERMCMD_NP] ;	/* parameters */
 	char		istr[TERMCMD_ISIZE+1] ;
 	char		dstr[TERMCMD_DSIZE+1] ;

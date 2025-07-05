@@ -1,5 +1,5 @@
 /* termcharset SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* set the terminal character sets */
@@ -41,17 +41,19 @@
 
 	Returns:
 	>=0		OK
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
@@ -73,7 +75,7 @@
 
 /* local variables */
 
-static const int	inter[4][2] = {
+static cint	inter[4][2] = {
 	{ '\050', 0 },			/* G0 */
 	{ '\051', '-' },		/* G1 */
 	{ '*', '.' },			/* G2 */

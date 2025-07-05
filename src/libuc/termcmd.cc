@@ -1,5 +1,5 @@
 /* termcmd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* clear out the TERMCMD object */
@@ -77,9 +77,9 @@ int termcmd_clear(termcmd *ckp) noex {
 	    ckp->name = 0 ;
 	    ckp->istr[0] = '\0' ;
 	    ckp->dstr[0] = '\0' ;
-	    ckp->f.fpriv = false ;
-	    ckp->f.iover = false ;
-	    ckp->f.dover = false ;
+	    ckp->fl.fpriv = false ;
+	    ckp->fl.iover = false ;
+	    ckp->fl.dover = false ;
 	    for (int i = 0 ; i < TERMCMD_NP ; i += 1) {
 	        ckp->p[i] = TERMCMD_PEOL ;
 	    }

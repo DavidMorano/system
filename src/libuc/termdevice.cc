@@ -1,5 +1,5 @@
 /* termdevice SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* find the name of the device for the given file descriptor */
@@ -11,15 +11,16 @@
 	= 1998-06-15, David A­D­ Morano
 	This code was originally written. This was also inspired
 	by the fact that the Sun Solaris 2.5.1 POSIX version of
-	'ttyname_r' does not appear to work. I got the idea for
+	|ttyname_r(3c)| does not appear to work.  I got the idea for
 	this subroutine from the GNU standard C library implementation.
 	It seems like Slowlaris 5.x certainly had a lot of buggy
 	problems (sockets, I-O, virtual memory, more)!
 
 	= 2011-10-12, David A­D­ Morano
-        I am changing the order of attempts to put 'ttyname_r(3c)' before
-        forking a process. Even though we are still on Slowlaris we hope that
-        |ttyname_r(3c)\ is now working properly!
+	I am changing the order of attempts to put |ttyname_r(3c)|
+	before forking a process. Even though we are still on
+	Slowlaris we hope that |ttyname_r(3c)| is now working
+	properly!
 
 */
 
@@ -35,7 +36,7 @@
 	terminal FD is open, in the caller specified buffer.
 
 	Synopsis:
-	int termdevice(int fd,char *dbuf,int dben) noex[
+	int termdevice(int fd,char *dbuf,int dben) noex
 
 	Arguments:
 	fd		file descriptor
@@ -54,26 +55,24 @@
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<sys/wait.h>
-#if	defined(OSNAME_SunOS)
-#include	<sys/mkdev.h>
-#endif
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<limits.h>
-#include	<stddef.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<sncpyx.h>
+#include	<snwcpy.h>
+#include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
+#include	"termdevice.h"
+
+import libutil ;
 
 /* local defines */
-
-#ifndef	TERMBUFLEN
-#define	TERMBUFLEN	(MAXPATHLEN + 20)
-#endif
 
 #undef	MINBUFLEN
 #define	MINBUFLEN	32
@@ -104,78 +103,74 @@
 
 #define	TO_READ		20		/* timeout waiting for sub-process */
 
-#define	SUBINFO		struct subinfo
-#define	SUBINFO_FL	struct subinfo_flags
+#define	SUBINFO		subinfo
+#define	SUBINFO_FL	subinfo_flags
 
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	isNotPresent(int) ;
 
-extern char	*strwcpy(char *,char *,int) ;
+/* external variables */
 
 
 /* local structures */
 
-struct subinfo_flags {
+namespace {
+    struct subinfo_fl {
 	uint		init:1 ;
-} ;
-
-struct subinfo {
+    } ;
+    struct subinfo {
 	char		*dbuf ;
-	SUBINFO_FL	f ;
+	subinfo_fl	fl ;
 	int		dlen ;
 	int		fd ;
-} ;
+	int start(char *,int,int) noex ;
+	int finish() noex ;
+	int var() noex ;
+	int ttyname() noex ;
+	int fork() noex ;
+    } ; /* end struct (subinfo) */
+} /* end namespace */
+
+typedef int (subinfo::*subinfo_m)() noex ;
 
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,char *,int,int) ;
-static int	subinfo_finish(SUBINFO *) ;
-
-static int	getname_var(SUBINFO *) ;
-static int	getname_ttyname(SUBINFO *) ;
-static int	getname_fork(SUBINFO *) ;
-
 
 /* local variables */
 
-static int	(*getnames[])(SUBINFO *) = {
-	getname_var,
-	getname_ttyname,
-	getname_fork,
-	NULL
-} ;
+constexpr static subinfo_m	getnames[] = {
+	&subinfo::var,
+	&subinfo::ttyname,
+	&subinfo::fork
+} ; /* end array (subinfo_m) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int termdevice(char *dbuf,int dlen,int fd)
-{
+int termdevice(char *dbuf,int dlen,int fd) noex {
 	int		rs = SR_NOENT ;
+	int		rs1 ;
 
 	if (fd < 0) return SR_BADF ;
 
-	if (dbuf == NULL) return SR_FAULT ;
+	if (dbuf == nullptr) return SR_FAULT ;
 
 	if (dlen < MINBUFLEN) return SR_OVERFLOW ;
 
 	if (isatty(fd)) {
-	    SUBINFO	si ;
 	    dbuf[0] = '\0' ;
-	    if ((rs = subinfo_start(&si,dbuf,dlen,fd)) >= 0) {
-	        int	i ;
-	        for (i = 0 ; getnames[i] != NULL ; i += 1) {
-	            rs = (getnames[i])(&si) ;
+	    if (subinfo si ; (rs = si.start(dbuf,dlen,fd)) >= 0) {
+	        for (cauto &m : getnames) {
+	            rs = (si.*m)() ;
 	            if (rs != 0) break ;
 	        } /* end for */
-	        subinfo_finish(&si) ;
+	        rs1 = si.finish() ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (subinfo) */
 	} else {
 	    rs = SR_NOTTY ;
@@ -188,42 +183,33 @@ int termdevice(char *dbuf,int dlen,int fd)
 
 /* local subroutines */
 
-
-static int subinfo_start(SUBINFO *sip,char *dbuf,int dlen,int fd)
-{
-	int		rs = SR_OK ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
-	sip->fd = fd ;
-	sip->dbuf = dbuf ;
-	sip->dlen = dlen ;
-
+int subinfo::start(char *db,int dl,int afd) noex {
+	int		rs = SR_FAULT ;
+	if (db) {
+	    rs = SR_OK ;
+	    fd = afd ;
+	    dbuf = db ;
+	    dlen = dl ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
-	if (sip == NULL) return SR_FAULT ;
+int subinfo::finish() noex {
 	return SR_OK ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int getname_var(SUBINFO *sip)
-{
-	struct ustat	st1, st2 ;
+int subinfo::var() noex {
 	int		rs ;
-	int		len = 0 ;
-
-	if ((rs = u_fstat(sip->fd,&st1)) >= 0) {
-	    cchar	*cp ;
-	    if ((cp = getenv(VARTERMDEV)) != NULL) {
-	        if ((rs = u_stat(cp,&st2)) >= 0) {
+	int		len = 0 ; /* return-value */
+	if (ustat st1 ; (rs = u_fstat(fd,&st1)) >= 0) {
+	    cc *vn = VARTERMDEV ;
+	    if (cchar *cp ; (cp = getenv(vn)) != nullptr) {
+		if (ustat st2 ; (rs = u_stat(cp,&st2)) >= 0) {
 	            rs = SR_NOENT ;
 	            if (st1.st_rdev == st2.st_rdev) {
-	                rs = sncpy1(sip->dbuf,sip->dlen,cp) ;
+	                rs = sncpy1(dbuf,dlen,cp) ;
 	                len = rs ;
 	            }
 	        } else if (isNotPresent(rs)) {
@@ -236,46 +222,36 @@ static int getname_var(SUBINFO *sip)
 }
 /* end subroutine (getname_var) */
 
-
-static int getname_ttyname(SUBINFO *sip)
-{
+int subinfo::ttyname() noex {
 	int		rs ;
 	int		len = 0 ;
-
-	if ((rs = uc_ttyname(sip->fd,sip->dbuf,sip->dlen)) >= 0) {
-	    len = strlen(sip->dbuf) ;
+	if ((rs = uc_ttyname(fd,dbuf,dlen)) >= 0) {
+	    len = lenstr(dbuf) ;
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
 	}
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getname_ttyname) */
 
-
-static int getname_fork(SUBINFO *sip)
-{
+int subinfo::fork() noex {
 	int		rs ;
-	int		len = 0 ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
 	int		pfds[2] ;
-
 	if ((rs = u_pipe(pfds)) >= 0) {
-	    const int	dlen = MAXPATHLEN ;
-	    int		i = 0 ;
+	    cint	tlen = MAXPATHLEN ;
 	    int		cs ;
-	    int		fd = sip->fd ;
-	    char	dbuf[MAXPATHLEN + 2] = { '\0' } ;
+	    char	tbuf[tlen + 2] = {} ;
 
 	    if ((rs = uc_fork()) == 0) {
-	        const char	*av[3] ;
-
-#if	CF_DEBUGS
-	        debugprintf("termdevice: child process\n") ;
-#endif
+	        cchar	*av[3] ;
 
 	        u_close(pfds[0]) ; /* not used */
 
-	        for (i = 0 ; i < 3 ; i += 1) u_close(i) ;
+	        for (int i = 0 ; i < 3 ; i += 1) {
+		    u_close(i) ;
+		}
 
 	        u_dup(fd) ;
 	        u_close(fd) ;		/* done using it */
@@ -286,7 +262,7 @@ static int getname_fork(SUBINFO *sip)
 	        u_open(NULLFNAME,O_WRONLY,0666) ;
 
 	        av[0] = "tty" ;
-	        av[1] = NULL ;
+	        av[1] = nullptr ;
 
 	        u_execv(PROG_TTY,av) ;
 
@@ -294,27 +270,25 @@ static int getname_fork(SUBINFO *sip)
 
 	    } else if (rs > 0) {
 	        const pid_t	pid_child = rs ;
-	        const int	to = TO_READ ;
-	        const int	opts = FM_TIMED ;
+	        cint	to = TO_READ ;
+	        cint	opts = FM_TIMED ;
 
 	        u_close(pfds[1]) ;	/* not used */
 	        pfds[1] = -1 ;
 
-	        if ((rs = uc_reade(pfds[0],dbuf,dlen,to,opts)) > 0) {
+	        if ((rs = uc_reade(pfds[0],tbuf,tlen,to,opts)) > 0) {
 	            len = rs ;
+		    int i ; /* used-afterwards */
 	            for (i = 0 ; i < len ; i += 1) {
-	                if (dbuf[i] == '\n') break ;
+	                if (tbuf[i] == '\n') break ;
 	            }
 	            if (i == len) rs = SR_RANGE ;
-	            dbuf[i] = '\0' ;
-	        } /* end if */
-
-#if	CF_DEBUGS
-	        debugprintf("termdevice: termdevice=%s\n",dbuf) ;
-#endif
-
-	        u_waitpid(pid_child,&cs,0) ;
-
+	            tbuf[i] = '\0' ;
+	            rs = snwcpy(dbuf,dlen,tbuf,i) ;
+	            len = rs ;
+		} /* end uc_ucreade) */
+	    	rs1 = u_waitpid(pid_child,&cs,0) ;
+		if (rs >= 0) rs = rs1 ;
 	    } else {
 	        rs = SR_BADE ;
 	    }
@@ -323,12 +297,6 @@ static int getname_fork(SUBINFO *sip)
 	    if (pfds[1] >= 0) {
 	        u_close(pfds[1]) ;
 	    }
-
-	    if (rs >= 0) {
-	        rs = snwcpy(sip->dbuf,sip->dlen,dbuf,i) ;
-	        len = rs ;
-	    }
-
 	} /* end if (pipe) */
 
 	return (rs >= 0) ? len : rs ;
