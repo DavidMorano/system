@@ -262,7 +262,7 @@ int vecpstr_add(vecpstr *op,cchar *sp,int sl) noex {
 int vecpstr_adduniq(vecpstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rs = vecpstr_findn(op,sp,sl)) >= 0) {
 	        rs = INT_MAX ;
 	    } else if (rs == SR_NOTFOUND) {
@@ -278,10 +278,10 @@ int vecpstr_addkeyval(vecpstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		i = 0 ;
 	if ((rs = vecpstr_magic(op,kp)) >= 0) {
             int     amount = 0 ;
-            if (kl < 0) kl = xstrlen(kp) ;
+            if (kl < 0) kl = lenstr(kp) ;
             amount += (kl+1) ;
             if (vp) {
-                if (vl < 0) vl = xstrlen(vp) ;
+                if (vl < 0) vl = lenstr(vp) ;
                 amount += (vl+1) ;
             }
             if ((rs = vecpstr_extstr(op,amount)) >= 0) {
@@ -302,7 +302,7 @@ int vecpstr_insert(vecpstr *op,int ii,cchar *sp,int sl) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = vecpstr_validx(op,ii)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((op->idx + 1) > op->ext) {
 	        rs = vecpstr_extvec(op) ;
 	    }
@@ -323,7 +323,7 @@ int vecpstr_store(vecpstr *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = vecpstr_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    {
 	        cint	amount = (sl + 1) ;
 	        cchar	*cp = nullptr ;
@@ -388,7 +388,7 @@ int vecpstr_del(vecpstr *op,int i) noex {
             if (op->va[i] != nullptr) {
                 op->cnt -= 1 ;            /* decrement list count */
                 if (op->fl.stsize) {
-                    op->stsize -= (xstrlen(op->va[i]) + 1) ;
+                    op->stsize -= (lenstr(op->va[i]) + 1) ;
                 }
             } /* end if (freeing the actual string data) */
             if (op->fl.ostationary) {
@@ -573,7 +573,7 @@ int vecpstr_findn(vecpstr *op,cchar *sp,int sl) noex {
 	    int		sch = sp[0] ; /* ok: since all get promoted similarly */
 	    int		i ; /* <- used-afterwards */
 	    rs = SR_NOTFOUND ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    for (i = 0 ; i < op->idx ; i += 1) {
 	        cchar	*ep = op->va[i] ;
 	        if (ep && (sch == ep[0])) {
@@ -623,7 +623,7 @@ int vecpstr_strsize(vecpstr *op) noex {
                 for (int i = 0 ; i < op->idx ; i += 1) {
                     cchar   *ep = op->va[i] ;
                     if (ep) {
-                        stsize += (xstrlen(ep) + 1) ;
+                        stsize += (lenstr(ep) + 1) ;
                     }
                 } /* end for */
                 op->stsize = stsize ;
@@ -705,7 +705,7 @@ int vecpstr_recmk(vecpstr *op,int *rec,int recsize) noex {
                     cchar   *ep = op->va[i] ;
                     if (ep) {
                         rec[c++] = si ;
-                        si += (xstrlen(ep) + 1) ;
+                        si += (lenstr(ep) + 1) ;
                     }
                 } /* end for */
                 rec[c] = -1 ;

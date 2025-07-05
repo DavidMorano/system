@@ -123,7 +123,7 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 	int		c = 0 ;
 	if (lp) {
 	    rs = SR_OK ;
-	    if (ll < 0) ll = xstrlen(lp) ;
+	    if (ll < 0) ll = lenstr(lp) ;
 	    if (ll > 0) {
 		if ((rs = maxpathlen) >= 0) {
 		    cint	plen = rs ;
@@ -157,7 +157,7 @@ int vecstrx::addpath(cchar *lp,int ll) noex {
 	int		c = 0 ;
 	if (lp) {
 	    rs = SR_OK ;
-	    if (ll < 0) ll = xstrlen(lp) ;
+	    if (ll < 0) ll = lenstr(lp) ;
 	    if (ll > 0) {
 	        cchar	*tp ;
 	        while ((tp = strnbrk(lp,ll,":;")) != nullptr) {

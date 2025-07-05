@@ -522,9 +522,9 @@ namespace {
 	int first(cur *) noex ;
 	int next(cur *) noex ;
     } ; /* end struct (sub_fetch) */
-}
+} /* end namespace */
 
-int vecobj_fetch(vecobj *op,cvoid *ep,cur *curp,c_f vcf,void **rpp) noex {
+int vecobj_curfetch(vecobj *op,cvoid *ep,cur *curp,c_f vcf,void **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op && ep && vcf) {
@@ -552,7 +552,7 @@ int vecobj_fetch(vecobj *op,cvoid *ep,cur *curp,c_f vcf,void **rpp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (vecobj_fetch) */
+/* end subroutine (vecobj_curfetch) */
 
 int vecobj_search(vecobj *op,cvoid *ep,vecobj_vcf vcf,void **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -849,6 +849,18 @@ int vecobj::search(cvoid *ep,vecobj_vcf vcf,void **rpp) noex {
 
 int vecobj::sort(vecobj_vcf vcf) noex {
 	return vecobj_sort(this,vcf) ;
+}
+
+int vecobj::curbegin(vecobj_cur *curp) noex {
+	return vecobj_curbegin(this,curp) ;
+}
+
+int vecobj::curend(vecobj_cur *curp) noex {
+	return vecobj_curend(this,curp) ;
+}
+
+int vecobj::curfetch(cvoid *ep,cur *curp,c_f vcf,void **rpp) noex {
+	return vecobj_curfetch(this,ep,curp,vcf,rpp) ;
 }
 
 void vecobj::dtor() noex {

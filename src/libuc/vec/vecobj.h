@@ -158,6 +158,9 @@ struct vecobj : vecobj_head {
 	int del(int = -1) noex ;
 	int search(cvoid *,vecobj_vcf,void **) noex ;
 	int sort(vecobj_vcf) noex ;
+	int curbegin(vecobj_cur *) noex ;
+	int curfetch(cvoid *,vecobj_cur *,vecobj_vcf,void **) noex ;
+	int curend(vecobj_cur *) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct vecobj() {
@@ -184,7 +187,8 @@ extern int vecobj_sort(vecobj *,vecobj_vcf) noex ;
 extern int vecobj_setsorted(vecobj *) noex ;
 extern int vecobj_find(vecobj *,cvoid *) noex ;
 extern int vecobj_curbegin(vecobj *,vecobj_cur *) noex ;
-extern int vecobj_fetch(vecobj *,cvoid *,vecobj_cur *,vecobj_vcf,void **) noex ;
+extern int vecobj_curfetch(vecobj *,cvoid *,vecobj_cur *,
+		vecobj_vcf,void **) noex ;
 extern int vecobj_curend(vecobj *,vecobj_cur *) noex ;
 extern int vecobj_search(vecobj *,cvoid *,vecobj_vcf,void **) noex ;
 extern int vecobj_get(vecobj *,int,void **) noex ;

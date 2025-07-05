@@ -173,7 +173,7 @@ int vecitem_add(vecitem *op,cvoid *ep,int el) noex {
 	if (op && ep) {
 	    bool	f_done = false ;
 	    bool	f ;
-	    if (el < 0) el = xstrlen(charp(ep)) ;
+	    if (el < 0) el = lenstr(charp(ep)) ;
 	    if (char *bp ; (rs = uc_malloc((el+1),&bp)) >= 0) {
 	        memcpy(bp,ep,el) ;
 	        bp[el] = '\0' ;

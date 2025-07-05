@@ -82,7 +82,7 @@ int vecstrx::adduniqs(cchar *sp,int sl) noex {
 	    cchar	*cp ;
 	    cchar	*tp ;
 	    rs = SR_OK ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((tp = strnbrk(sp,sl," ,")) != nullptr) {
 		cint	tl = intconv(tp - sp) ;
 	        if ((cl = sfshrink(sp,tl,&cp)) > 0) {
