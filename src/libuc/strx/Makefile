@@ -35,6 +35,8 @@ DEFS +=
 
 INCS += strx.h
 
+MODS +=
+
 LIBS +=
 
 
@@ -44,7 +46,6 @@ LIBDIRS += -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,9 +56,9 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= strrpbrk.o
-OBJ1= strwhite.o
-OBJ2= strsub.o
+OBJ0= strxbrk.o straltwchar.o
+OBJ1= strsigabbr.o strerrabbr.o
+OBJ2= strsub.o strwhite.o 
 OBJ3= strbasename.o strdirname.o
 
 OBJA= obj0.o obj1.o obj2.o
@@ -66,7 +67,7 @@ OBJA= obj0.o obj1.o obj2.o
 OBJ= $(OBJA)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -92,12 +93,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order:		$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order
@@ -133,15 +137,18 @@ obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-strrpbrk.o:		strrpbrk.cc		$(INCS)
-strwhite.o:		strwhite.cc		$(INCS)
-strsub.o:		strsub.cc strsub.h	$(INCS)
+strxbrk.o:		strxbrk.cc				$(INCS)
+strwhite.o:		strwhite.cc				$(INCS)
+strsub.o:		strsub.cc strsub.h			$(INCS)
+strerrabbr.o:		strerrabbr.cc strerrabbr.h		$(INCS)
+strsigabbr.o:		strsigabbr.cc strsigabbr.h		$(INCS)
+straltwchar.o:		straltwchar.cc straltwchar.h		$(INCS)
 
-strbasename.o:		strbasename.cc		$(INCS)
-strdirname.o:		strdirname.cc		$(INCS)
+strbasename.o:		strbasename.cc				$(INCS)
+strdirname.o:		strdirname.cc				$(INCS)
 
 # 2014-12-26, David A-D- Morano
 # I retired the ass of this subroutine (below).
-#strwildsub.o:		strwildsub.cc		$(INCS)
+#strwildsub.o:		strwildsub.cc				$(INCS)
 
 
