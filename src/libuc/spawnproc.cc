@@ -1,5 +1,5 @@
 /* spawnproc SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* spawn a local program */
@@ -74,7 +74,6 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<usysflag.h>
-#include	<uvariables.hh>
 #include	<ucgetpid.h>
 #include	<getbufsize.h>
 #include	<getpwd.h>
@@ -86,13 +85,14 @@
 #include	<mkpathx.h>
 #include	<snx.h>
 #include	<sfx.h>
-#include	<xperm.h>
+#include	<permx.h>
 #include	<matxstr.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"spawnproc.h"
 
+import uconstants ;
 
 /* local defines */
 
@@ -591,7 +591,7 @@ static int findprog(char *pwd,char *pbuf,cchar *fname) noex {
 	                pl = rs ;
 	                if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
 	                    cint	am = X_OK ;
-	                    rs = sperm(&id,&sb,am) ;
+	                    rs = permid(&id,&sb,am) ;
 	                }
 	            } /* end if (mkpath) */
 	        } /* end if (ok) */

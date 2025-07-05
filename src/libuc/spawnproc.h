@@ -1,4 +1,4 @@
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* spawnproc HEADER */
 /* lang=C20 */
 
