@@ -95,7 +95,7 @@ int vecstrx::svcargs(int *fp,cchar *abuf) noex {
 
 static int vecstrx_arger(vecstrx *vsp,int *fp,cchar *abuf) noex {
     	cnullptr	np{} ;
-	cint		alen = xstrlen(abuf) ;
+	cint		alen = lenstr(abuf) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -144,7 +144,7 @@ static int mkterms() noex {
 static int hasLong(cchar *sp,int sl) noex {
 	int		f = false ;
 	if (sp[0] == '/') {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sl >= 2) {
 		cint	sch = mkchar(sp[1]) ;
 		f = (tolc(sch) == 'w') ;

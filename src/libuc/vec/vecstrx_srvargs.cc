@@ -94,7 +94,7 @@ int vecstrx::srvargs(cchar *abuf) noex {
 /* local subroutines */
 
 static int vecstrx_arger(vecstrx *vsp,cchar *abuf) noex {
-	cint		alen = xstrlen(abuf) ;
+	cint		alen = lenstr(abuf) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;

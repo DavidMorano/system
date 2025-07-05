@@ -4,9 +4,6 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
-motd
-statmsg
-issue		*done*
 ufcntl		?? weirdo problem
 uctim
 libuc		fix to completely compile!
@@ -50,4 +47,7 @@ dialcprog	incredible mess (maybe not worth refactoring)
 dialuux		a mess
 logsys		mess -- cannot compile on macOS-Darwin (no STREAMS®)
 icalmk		mess, junk, or not even finished
+motd		*done*
+statmsg		*done*
+issue		*done*
 

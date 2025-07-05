@@ -1,19 +1,21 @@
-/* opensvc_statmsg */
+/* opensvc_statmsg SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* LOCAL facility open-service (statmsg) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGMASTER	0		/* pretend that we are master */
 #define	CF_DEBUGN	0		/* extra-special debugging */
 
-
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-        This code was started by taking the corresponding code from the
-        TCP-family module. In retrospect, that was a mistake. Rather I should
-        have started this code by using the corresponding UUX dialer module.
+	This code was started by taking the corresponding code from
+	the TCP-family module. In retrospect, that was a mistake.
+	Rather I should have started this code by using the
+	corresponding UUX dialer module.
 
 */
 
@@ -21,22 +23,16 @@
 
 /*******************************************************************************
 
+  	Name:
+	opensvc_statmsg
 
+	Description:
 	This is an open-facility-service module.
 
 	Synopsis:
-
-	int opensvc_statmsg(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
-	int		of ;
-	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
-	int		to ;
+	int opensvc_statmsg(cc *pr,cc *prn,int of,cm om,mv argv,mv envv,int to)
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	of		open-flags
@@ -46,46 +42,51 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
-	<0		error
-
+	<0		error (system-return)
 
 	= Implementation notes:
 
-        Why do we go through so much trouble to find and load the LIBLKCMD
-        shared-orject ourselves when we could have let the run-time linker do it
-        for us? The reason that we do it for ourselves is that in this way the
-        shared-object that this subroutine is a part of does not need to specify
-        the LIBLKCMD shared-object as a dependency. By not making another
-        dependency of the the shared-object that this subroutine is a part of we
-        dramatically reduce the run-time linker work done whenever this (the
-        current) shared-object is loaded. Also, our own search for LIBLKCMD is a
-        little bit faster than that of the run-time linker. A local search of
-        something like a LIBLKCMD shared-object should be performed whenever we
-        have mixed subroutines made a part of the same shared-object. That is:
-        subroutines that need LIBLKCMD (or something like it) and those that do
-        not. In this way the subroutines that do not need a complex object such
-        as LIBLKCMD do not have to suffer the pretty great cost of loading it by
-        the run-time linker. Also, note the fact that a shared-object such as
-        LIBLKCMD is *already* attached to the parent object is *not* determined
-        until after the run-time linker searches all of the myriad directories
-        in the LD_LIBRARY_PATH. This just adds to the unnecessary filesystem
-        searches for subroutines that do not require something like LIBLKCMD.
+	Why do we go through so much trouble to find and load the
+	LIBLKCMD shared-orject ourselves when we could have let the
+	run-time linker do it for us? The reason that we do it for
+	ourselves is that in this way the shared-object that this
+	subroutine is a part of does not need to specify the LIBLKCMD
+	shared-object as a dependency. By not making another
+	dependency of the the shared-object that this subroutine
+	is a part of we dramatically reduce the run-time linker
+	work done whenever this (the current) shared-object is
+	loaded. Also, our own search for LIBLKCMD is a little bit
+	faster than that of the run-time linker. A local search of
+	something like a LIBLKCMD shared-object should be performed
+	whenever we have mixed subroutines made a part of the same
+	shared-object. That is: subroutines that need LIBLKCMD (or
+	something like it) and those that do not. In this way the
+	subroutines that do not need a complex object such as
+	LIBLKCMD do not have to suffer the pretty great cost of
+	loading it by the run-time linker. Also, note the fact that
+	a shared-object such as LIBLKCMD is *already* attached to
+	the parent object is *not* determined until after the
+	run-time linker searches all of the myriad directories in
+	the LD_LIBRARY_PATH. This just adds to the unnecessary
+	filesystem searches for subroutines that do not require
+	something like LIBLKCMD.
 
-        Besides the subtleties of using the run-time linker in an indiscriminate
-        manner, trying to invoke a function like LOGINBLURB by loading the whole
-        shell-builtin command by the same name seems to be a huge waste of time
-        as compared with invoking some simple subroutine that mades the same
-        output as the LOGINBLURB shell-builtin does! What we sometimes do to use
-        an existing piece of some code is often quite amazingly complex!
+	Besides the subtleties of using the run-time linker in an
+	indiscriminate manner, trying to invoke a function like
+	LOGINBLURB by loading the whole shell-builtin command by
+	the same name seems to be a huge waste of time as compared
+	with invoking some simple subroutine that mades the same
+	output as the LOGINBLURB shell-builtin does! What we sometimes
+	do to use an existing piece of some code is often quite
+	amazingly complex!
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -99,6 +100,7 @@
 #include	"opensvc_statmsg.h"
 #include	"defs.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -132,34 +134,34 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpyuc(char *,int,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	sncpyuc(char *,int,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	ctdeci(char *,int,int) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	cfdeci(cchar *,int,int *) ;
 extern int	getnodename(char *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getgroupname(char *,int,gid_t) ;
-extern int	nusers(const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	nusers(cchar *) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	isdigitlatin(int) ;
 extern int	isSpecialObject(void *) ;
 
 #if	CF_DEBUGS || CF_DEBUGN
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
-extern cchar	*getourenv(const char **,const char *) ;
+extern cchar	*getourenv(cchar **,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -178,7 +180,7 @@ static cchar	*argopts[] = {
 	"sn",
 	"ru",
 	"pru",
-	NULL
+	nullptr
 } ;
 
 enum argopts {
@@ -194,12 +196,12 @@ enum argopts {
 
 
 int opensvc_statmsg(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	BITS		pargs ;
@@ -208,7 +210,7 @@ int		to ;
 	STATMSG_ID	mid ;
 	gid_t		gid = -1 ;
 	uid_t		uid = -1 ;
-	const int	am = (of & O_ACCMODE) ;
+	cint	am = (of & O_ACCMODE) ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs = SR_OK ;
@@ -217,23 +219,23 @@ int		to ;
 	int		pipes[2] ;
 	int		fd = -1 ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_akopts = FALSE ;
+	int		f_akopts = false ;
 	int		f ;
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*sn = "conslog" ;
-	const char	*un = NULL ;
-	const char	*gn = NULL ;
-	const char	*pru = NULL ;
-	const char	*kn = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = nullptr ;
+	cchar	*sn = "conslog" ;
+	cchar	*un = nullptr ;
+	cchar	*gn = nullptr ;
+	cchar	*pru = nullptr ;
+	cchar	*kn = nullptr ;
+	cchar	*cp ;
 	char		ubuf[USERNAMELEN+1] ;
 	char		gbuf[GROUPNAMELEN+1] ;
 	char		admbuf[USERNAMELEN+1] ;
 	char		keybuf[GROUPNAMELEN+1] ;
 
-	if (argv != NULL) {
-	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
+	if (argv != nullptr) {
+	    for (argc = 0 ; argv[argc] != nullptr ; argc += 1) ;
 	}
 
 /* start parsing the arguments */
@@ -247,7 +249,7 @@ int		to ;
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -258,7 +260,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int ach = MKCHAR(argp[1]) ;
+		cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -274,15 +276,15 @@ int		to ;
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	            f_optequal = false ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -307,7 +309,7 @@ int		to ;
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -327,7 +329,7 @@ int		to ;
 	                case argopt_ru:
 	                case argopt_pru:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pru = avp ;
 	                    } else {
@@ -353,7 +355,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -439,7 +441,7 @@ int		to ;
 #endif
 
 #if	CF_DEBUGS && CF_DEBUGMASTER
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
@@ -454,12 +456,12 @@ int		to ;
 
 /* do we need a default argument? */
 
-	if ((pru == NULL) || (pru[0] == '\0') || (pru[0] == '-')) {
+	if ((pru == nullptr) || (pru[0] == '\0') || (pru[0] == '-')) {
 	    pru = getourenv(envv,VARMOTDADMIN) ;
-	    if ((pru == NULL) || (pru[0] == '\0')) {
+	    if ((pru == nullptr) || (pru[0] == '\0')) {
 	        pru = getourenv(envv,VARISSUEADMIN) ;
 	    }
-	    if ((pru == NULL) || (pru[0] == '\0')) {
+	    if ((pru == nullptr) || (pru[0] == '\0')) {
 		pru = prn ;
 	    }
 	} /* end if (pr-username) */
@@ -467,11 +469,11 @@ int		to ;
 
 /* default user as necessary */
 
-	if ((rs >= 0) && ((un == NULL) || (un[0] == '\0'))) {
+	if ((rs >= 0) && ((un == nullptr) || (un[0] == '\0'))) {
 	    un = getourenv(envv,VARMOTDUSER) ;
-	    if ((un == NULL) || (un[0] == '\0')) {
+	    if ((un == nullptr) || (un[0] == '\0')) {
 	        cchar	*uidp = getourenv(envv,VARMOTDUID) ;
-	        if ((uidp != NULL) && (uidp[0] != '\0')) {
+	        if ((uidp != nullptr) && (uidp[0] != '\0')) {
 	            int		v ;
 	            if ((rs = cfdeci(uidp,-1,&v)) >= 0) {
 	                uid = v ;
@@ -481,17 +483,17 @@ int		to ;
 	        }
 	    }
 	} /* end if (default username) */
-	if ((rs >= 0) && ((un == NULL) || (un[0] == '\0'))) un = "-" ;
+	if ((rs >= 0) && ((un == nullptr) || (un[0] == '\0'))) un = "-" ;
 
 	if (uid < 0) uid = getuid() ;
 
 /* default group as necessary */
 
-	if ((rs >= 0) && ((gn == NULL) || (gn[0] == '\0') || (gn[0] == '-'))) {
+	if ((rs >= 0) && ((gn == nullptr) || (gn[0] == '\0') || (gn[0] == '-'))) {
 	    gn = getourenv(envv,VARMOTDGROUP) ;
-	    if ((gn == NULL) || (gn[0] == '\0')) {
+	    if ((gn == nullptr) || (gn[0] == '\0')) {
 		cchar	*gidp = getourenv(envv,VARMOTDGID) ;
-		if ((gidp != NULL) && (gidp[0] != '\0')) {
+		if ((gidp != nullptr) && (gidp[0] != '\0')) {
 		    int		v ;
 		    rs = cfdeci(gidp,-1,&v) ;
 		    gid = v ;
@@ -510,7 +512,7 @@ int		to ;
 
 /* default keyname as necessary */
 
-	if ((rs >= 0) && (kn != NULL)) {
+	if ((rs >= 0) && (kn != nullptr)) {
 	    if (strcmp(kn,"%g") == 0) {
 	        kn = gn ;
 	    } else if (strcmp(kn,"%u") == 0) {
@@ -518,8 +520,8 @@ int		to ;
 	    }
 	}
 
-	if ((rs >= 0) && ((kn == NULL) || (kn[0] == '\0') || (kn[0] == '-'))) {
-	    if (kn == NULL) {
+	if ((rs >= 0) && ((kn == nullptr) || (kn[0] == '\0') || (kn[0] == '-'))) {
+	    if (kn == nullptr) {
 		kn = keybuf ;
 	        keybuf[0] = '\0' ;
 	    }
@@ -554,7 +556,7 @@ int		to ;
 
 	    for (ai = 1 ; ai < argc ; ai += 1) {
 	        f = (ai <= ai_max) && (bits_test(&pargs,ai) > 0) ;
-	        f = f || ((ai > ai_pos) && (argv[ai] != NULL)) ;
+	        f = f || ((ai > ai_pos) && (argv[ai] != nullptr)) ;
 	        if (f) {
 		    cp = argv[ai] ;
 		    rs = vechand_add(&adms,cp) ;
@@ -564,34 +566,28 @@ int		to ;
 	    } /* end for */
 
 	    if (rs >= 0) {
-	        cchar	**av = NULL ;
+	        cchar	**av = nullptr ;
 	        if ((rs = vechand_getvec(&adms,&av)) >= 0) {
-
-	            if ((rs = opentmp(NULL,0,0664)) >= 0) {
-	                STATMSG	m ;
+	            if ((rs = opentmp(nullptr,0,0664)) >= 0) {
 	                fd = rs ;
-
-	                if ((rs = statmsg_open(&m,pru)) >= 0) {
+	                if (statmsg m ; (rs = statmsg_open(&m,pru)) >= 0) {
 			    {
 	                        rs = statmsg_processid(&m,&mid,av,kn,fd) ;
 			    }
 		            statmsg_close(&m) ;
 	                } /* end if (statmsg) */
-
 	                if (rs >= 0) u_rewind(fd) ;
 	                if (rs < 0) u_close(fd) ;
 	            } /* end if */
-
 	        } /* end if (vechand-getvec) */
 	    } /* end if (good) */
-
 	    vechand_finish(&adms) ;
 	} /* end if (vechand-adms) */
 	} /* end if (ok) */
 
 badarg:
 	if (f_akopts) {
-	    f_akopts = FALSE ;
+	    f_akopts = false ;
 	    keyopt_finish(&akopts) ;
 	}
 

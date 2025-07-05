@@ -113,20 +113,17 @@ int vecstrx::envadds(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (sp) {
-	    cchar	*tp ;
 	    rs = SR_OK ;
-	    if (sl < 0) sl = xstrlen(sp) ;
-	    while ((tp = strnbrk(sp,sl," \t\r\n,")) != nullptr) {
-	        cint	cl = intconv(tp - sp) ;
-	        cchar	*cp = sp ;
-	        if (cl > 0) {
-	            rs = vecstrx_addwithin(this,cp,cl) ;
+	    if (sl < 0) sl = lenstr(sp) ;
+	    for (cc *tp ; (tp = strnbrk(sp,sl," \t\r\n,")) != nullptr ; ) {
+	        if (cint tl = intconv(tp - sp) ; tl > 0) {
+	            rs = vecstrx_addwithin(this,sp,tl) ;
 	            if (rs > 0) c += 1 ;
 	        } /* end if */
 	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
-	    } /* end while */
+	    } /* end for */
 	    if ((rs >= 0) && (sl > 0)) {
 	        rs = vecstrx_addwithin(this,sp,sl) ;
 	        if (rs > 0) c += 1 ;
@@ -158,14 +155,14 @@ int vecstrx::envget(cchar *kp,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (kp) {
-	    cchar	*rp{} ;
+	    cchar	*rp = nullptr ;
 	    if (rpp) *rpp = nullptr ;
 	    if (cchar *ep ; (rs = finder(kp,vstrkeycmp,&ep)) >= 0) {
 	        if (cchar *tp ; (tp = strchr(ep,'=')) != nullptr) {
 	            rp = (tp + 1) ;
-	            rl = xstrlen(tp + 1) ;
+	            rl = lenstr(tp + 1) ;
 	        } else {
-	            rp = (ep + strlen(ep)) ; /* <- NUL character */
+	            rp = (ep + lenstr(ep)) ; /* <- NUL character */
 		}
 	    } /* end if (finder) */
 	    if (rpp) *rpp = rp ;
@@ -181,7 +178,7 @@ static int vecstrx_addwithin(vecstrx *op,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		f_added = false ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;

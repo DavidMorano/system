@@ -119,7 +119,7 @@ namespace {
 	int		l ;
 	static cchar	p[] ;
 	constexpr eword() noex {
-	    l = cstrlen(WORDEXPORT) ;
+	    l = lenstr(WORDEXPORT) ;
 	} ;
     } ;
     constexpr char eword::p[] = WORDEXPORT ;

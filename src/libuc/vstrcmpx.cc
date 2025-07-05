@@ -55,6 +55,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<mkchar.h>
+#include	<localmisc.h>
 
 #include	"vstrcmpx.h"
 
@@ -81,8 +82,8 @@
 
 static int vstrcmpx(cchar **s1pp,cchar **s2pp) noex {
 	int		rc = 0 ;
-	cchar		*s1 = charp(*s1pp) ;
-	cchar		*s2 = charp(*s2pp) ;
+	cchar		*s1 = *s1pp ;
+	cchar		*s2 = *s2pp ;
 	if (s1 || s2) {
 	    rc = +1 ;
 	    if (s1) {
