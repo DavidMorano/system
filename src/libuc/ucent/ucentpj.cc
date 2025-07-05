@@ -93,7 +93,7 @@ int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (this && pjbuf && sp) {
 	    PROJECT *pep = this ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(pep) ;
 	    if (storeitem si ; (rs = si.start(pjbuf,pjlen)) >= 0) {
 	        int	fi = 0 ;
@@ -255,23 +255,23 @@ int ucentpj::size() noex {
 	    int		sz = 1 ;
 	    int		i = 0 ;
 	    if (pj_name) {
-	        sz += (xstrlen(pj_name) + 1) ;
+	        sz += (lenstr(pj_name) + 1) ;
 	    }
 	    if (pj_comment) {
-	        sz += (xstrlen(pj_comment) + 1) ;
+	        sz += (lenstr(pj_comment) + 1) ;
 	    }
 	    if (pj_attr) {
-	        sz += (xstrlen(pj_attr) + 1) ;
+	        sz += (lenstr(pj_attr) + 1) ;
 	    }
 	    if (pj_users) {
 	        for (i = 0 ; pj_users[i] ; i += 1) {
-	            sz += (xstrlen(pj_users[i]) + 1) ;
+	            sz += (lenstr(pj_users[i]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if */
 	    if (pj_groups) {
 	        for (i = 0 ; pj_groups[i] ; i += 1) {
-	            sz += (xstrlen(pj_groups[i]) + 1) ;
+	            sz += (lenstr(pj_groups[i]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if */

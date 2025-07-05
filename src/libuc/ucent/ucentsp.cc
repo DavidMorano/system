@@ -90,7 +90,7 @@ int ucentsp::parse(char *spbuf,int splen,cchar *sp,int sl) noex {
 	if (spbuf && sp) {
 	    SPWD *sep = this ;
 	    memclear(sep) ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (storeitem si ; (rs = si.start(spbuf,splen)) >= 0) {
 	        int		fi = 0 ;
 	        for (int idx ; (idx = sichr(sp,sl,':')) >= 0 ; ) {
@@ -202,10 +202,10 @@ int ucentsp::size() noex {
 	if (this) {
 	    int		sz = 1 ;
 	    if (sp_namp) {
-	        sz += (xstrlen(sp_namp) + 1) ;
+	        sz += (lenstr(sp_namp) + 1) ;
 	    }
 	    if (sp_pwdp) {
-	        sz += (xstrlen(sp_pwdp) + 1) ;
+	        sz += (lenstr(sp_pwdp) + 1) ;
 	    }
 	    rs = sz ;
 	} /* end if (non-null) */
@@ -288,7 +288,7 @@ static int ucentsp_parsedefs(ucentsp *spp,SI *sip,int sfi) noex {
 	    cchar	**vpp = ccharpp(&spp->sp_pwdp) ;
 	    cchar	*sp = spp->sp_namp ;
 	    cchar	*vp ;
-	    vp = (sp + xstrlen(sp)) ;
+	    vp = (sp + lenstr(sp)) ;
 	    sfi += 1 ;
 	    rs = sip->strw(vp,0,vpp) ;
 	}

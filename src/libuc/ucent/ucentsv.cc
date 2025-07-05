@@ -1,5 +1,5 @@
 /* ucentsv SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTSV object management */
@@ -33,7 +33,6 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -50,6 +49,7 @@
 #include	"ucentsv.h"
 #include	"ucentxx.hh"
 
+import libutil ;
 
 /* local defines */
 
@@ -98,7 +98,7 @@ int ucentsv::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (this && ebuf && sp) {
 	    SERVENT *sep = this ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(sep) ;
 	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
 	        cchar	*cp{} ;
@@ -206,12 +206,12 @@ int ucentsv::size() noex {
 	if (this) {
 	    int		sz = 1 ;
 	    if (s_name) {
-	        sz += (xstrlen(s_name) + 1) ;
+	        sz += (lenstr(s_name) + 1) ;
 	    }
 	    if (s_aliases) {
 	        int	i ; /* used-afterwards */
 	        for (i = 0 ; s_aliases[i] ; i += 1) {
-	            sz += (xstrlen(s_aliases[i]) + 1) ;
+	            sz += (lenstr(s_aliases[i]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if (group members) */

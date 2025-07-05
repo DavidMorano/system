@@ -133,7 +133,7 @@ ucgetcwd::operator int () noex {
 int ucgetcwd::stdgetcwd() noex {
 	int		rs ;
 	if (cchar *rp ; (rp = getcwd(cwbuf,(cwlen+1))) != nullptr) {
-	    rs = xstrnlen(rp,cwlen) ;
+	    rs = lenstr(rp,cwlen) ;
 	} else {
 	    rs = (- errno) ;
 	}

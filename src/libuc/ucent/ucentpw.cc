@@ -90,7 +90,7 @@ int ucentpw::parse(char *pwbuf,int pwlen,cc *sp,int sl) noex {
 	if (this && pwbuf && sp) {
 	    PASSWD *pep = this ;
 	    memclear(pep) ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (storeitem si ; (rs = si.start(pwbuf,pwlen)) >= 0) {
 	        int		fi = 0 ;
 	        for (int idx ; (idx = sichr(sp,sl,':')) >= 0 ; ) {
@@ -187,19 +187,19 @@ int ucentpw::size() noex {
 	if (this) {
 	    int		sz = 1 ;
 	    if (pw_name) {
-	        sz += (xstrlen(pw_name)+1) ;
+	        sz += (lenstr(pw_name)+1) ;
 	    }
 	    if (pw_passwd) {
-	        sz += (xstrlen(pw_passwd)+1) ;
+	        sz += (lenstr(pw_passwd)+1) ;
 	    }
 	    if (pw_gecos) {
-	        sz += (xstrlen(pw_gecos)+1) ;
+	        sz += (lenstr(pw_gecos)+1) ;
 	    }
 	    if (pw_dir) {
-	        sz += (xstrlen(pw_dir)+1) ;
+	        sz += (lenstr(pw_dir)+1) ;
 	    }
 	    if (pw_shell) {
-	        sz += (xstrlen(pw_shell)+1) ;
+	        sz += (lenstr(pw_shell)+1) ;
 	    }
 	    rs = sz ;
 	} /* end if (non-null) */
@@ -267,7 +267,7 @@ static int ucentpw_parsedefs(ucentpw *pwp,storeitem *sip,int sfi) noex {
 	    cchar	**vpp = ccharpp(&pwp->pw_shell) ;
 	    cchar	*sp = pwp->pw_name ;
 	    cchar	*vp ;
-	    vp = (sp + xstrlen(sp)) ;
+	    vp = (sp + lenstr(sp)) ;
 	    sfi += 1 ;
 	    rs = sip->strw(vp,0,vpp) ;
 	}

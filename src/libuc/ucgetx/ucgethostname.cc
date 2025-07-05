@@ -79,7 +79,7 @@ int uc_gethostname(char *hbuf,int hlen) noex {
 		csize	hsz = size_t(hlen + 1) ;
 	        if ((rs = gethostname(hbuf,hsz)) >= 0) {
 	            hbuf[hlen] = '\0' ;
-	            rs = xstrlen(hbuf) ;
+	            rs = lenstr(hbuf) ;
 	        } else {
 	            rs = (- errno) ;
 	        }

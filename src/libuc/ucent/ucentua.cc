@@ -98,7 +98,7 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	int		wlen = 0 ;
 	if (this && uabuf && sp) {
 	    USERATTR *uep = this ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = memclear(uep) ;
 	    if ((sl > 0) && (sp[0] != '#')) {
 	        if (storeitem si ; (rs = si.start(uabuf,ualen)) >= 0) {
@@ -247,15 +247,15 @@ int ucentua::size() noex {
 	    int		sz = 1 ;
 	    kva_t	*kvap = attr ;
 	    if (name) {
-	        sz += (xstrlen(name)+1) ;
+	        sz += (lenstr(name)+1) ;
 	    }
 	    if (attr) {
 	        kv_t	*kvp = kvap->data ;
 	        cint	n = kvap->length ;
 	        sz += szof(kva_t) ;
 	        for (int i = 0 ; i < n ; i += 1) {
-	            sz += (xstrlen(kvp[i].key)+1) ;
-	            sz += (xstrlen(kvp[i].value)+1) ;
+	            sz += (lenstr(kvp[i].key)+1) ;
+	            sz += (lenstr(kvp[i].value)+1) ;
 	        } /* end for */
 	        sz += ((n+1)*szof(kv_t)) ;
 	    } /* end if */
@@ -343,7 +343,7 @@ static int si_attrload(SI *sip,kv_t *kvp,int i,cchar *ep) noex {
 	    vp = (tp + 1) ;
 	    el = intconv(tp - ep) ;
 	} else {
-	    vp = (ep + xstrlen(ep)) ;
+	    vp = (ep + lenstr(ep)) ;
 	}
 	{
 	    if (cchar *crp{} ; (rs = sip->strw(ep,el,&crp)) >= 0) {

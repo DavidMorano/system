@@ -95,7 +95,7 @@ int ucentpr::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (this && ebuf && sp) {
 	    PROTOENT *pep = this ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(pep) ;
 	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
 	        cchar	*cp{} ;
@@ -207,12 +207,12 @@ int ucentpr::size() noex {
 	if (this) {
 	    int		sz = 1 ;
 	    if (p_name) {
-	        sz += (xstrlen(p_name) + 1) ;
+	        sz += (lenstr(p_name) + 1) ;
 	    }
 	    if (p_aliases) {
 	        int	i ; /* used-afterwards */
 	        for (i = 0 ; p_aliases[i] ; i += 1) {
-	            sz += (xstrlen(p_aliases[i]) + 1) ;
+	            sz += (lenstr(p_aliases[i]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1) * szof(cchar *)) ;
 	    } /* end if (group members) */

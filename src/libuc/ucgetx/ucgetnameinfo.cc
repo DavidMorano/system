@@ -184,7 +184,7 @@ int uc_getnameinfo(const SA *sap,int sal,char *hbuf,int hlen,
 	                } /* end switch */
 	            } /* end if (some sort of error condition) */
 	        } until ((rs >= 0) || f_exit) ;
-	        rs = xstrnlen(hbuf,hlen) ;
+	        rs = lenstr(hbuf,hlen) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
