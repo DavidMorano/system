@@ -956,6 +956,7 @@ pwfile.o:		pwfile.cc	pwfile.h
 bufstr.o:		bufstr.cc	bufstr.h
 syspasswd.o:		syspasswd.cc	syspasswd.h
 absfn.o:		absfn.cc	absfn.h
+outbuf.o:		outbuf.cc	outbuf.h
 
 # sring-comparisons
 vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h

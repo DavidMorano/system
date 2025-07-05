@@ -30,7 +30,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |lenstr(3c)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<getpwd.h>
@@ -40,6 +40,7 @@
 
 #include	"absfn.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -73,7 +74,7 @@ static int	absfn_loadnul(absfn *,cchar *,int,cchar **) noex ;
 int absfn_start(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp && rpp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = SR_OK ;
 	    op->as = nullptr ;
 	    *rpp = sp ;
@@ -97,7 +98,8 @@ int absfn_finish(absfn *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->as) {
-	        rs1 = uc_libfree(op->as) ;
+		char *bp = cast_const<charp>(op->as) ;
+	        rs1 = uc_libfree(bp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->as = nullptr ;
 	    }

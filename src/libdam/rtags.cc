@@ -29,7 +29,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -43,6 +42,7 @@
 
 #include	"rtags.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -390,7 +390,7 @@ int rtags_curenum(rtags *op,CUR *curp,RT_TAG *tip,char *rb,int rl) noex {
 	if ((rs = rtags_magic(op,curp,tip)) >= 0) {
 	    ptm		*mxp = op->mxp ;
 	    if ((rs = mxp->lockbegin) >= 0) {
-		RT_TAG	*tep{} ;
+		RT_TAG	*tep{} ; /* used-throughout */
 	        int	i = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	        void	*vp{} ;
 	        while ((rs = vecobj_get(op->tlp,i,&vp)) >= 0) {
@@ -404,7 +404,6 @@ int rtags_curenum(rtags *op,CUR *curp,RT_TAG *tip,char *rb,int rl) noex {
 	            tip->recoff = tep->recoff ; /* fill in partial result */
 	            tip->reclen = tep->reclen ; /* fill in partial result */
 		    tip->fi = tep->fi ;		/* fill in partial result */
-		    void	*vp{} ;
 	            if ((rs = flp->get(tep->fi,&vp)) >= 0) {
 	                FNAME	*fep = (FNAME *) vp ;
 	                if (vp) {
