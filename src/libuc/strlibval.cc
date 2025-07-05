@@ -1,5 +1,5 @@
 /* strlibval SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* this object provides a pointer to a library string-value */
@@ -33,8 +33,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdlib>		/* for |getenv(3c)| */
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<usystem.h>		/* |utimeout(3u)| */
 #include	<timewatch.hh>
 #include	<varnames.hh>
 #include	<syswords.hh>
@@ -44,6 +45,7 @@
 #include	<mallocstuff.h>
 #include	<mkpathx.h>
 #include	<sncpyx.h>
+#include	<varnames.hh>		/* |varname(3u)| */
 #include	<localmisc.h>
 
 #include	"strlibval.hh"
@@ -66,7 +68,7 @@
 /* external variables */
 
 
-/* local strutures */
+/* local structures */
 
 namespace {
     struct strvarenv {
@@ -101,8 +103,7 @@ constexpr strvarenv::strvarenv() noex {
 	name[strlibval_organization]	= varname.organization ;
 	name[strlibval_orgloc]		= varname.orgloc ;
 	name[strlibval_orgcode]		= varname.orgcode ;
-}
-/* end method (strvarenv::ctor) */
+} /* end method (strvarenv::ctor) */
 
 
 /* forward references */
@@ -216,7 +217,7 @@ ccharp strlibval::strmaildir() noex {
 /* end method (strlibval::strmaildir) */
 
 ccharp strlibval::strpath() noex {
-	cchar	*rp = nullptr ;
+	cchar	*rp = nullptr ; /* return-value */
 	if (cchar *vn ; (vn = enver.name[w]) != nullptr) {
 	    if ((rp = getenv(vn)) == nullptr) {
 		int	rs ;

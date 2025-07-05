@@ -1,5 +1,5 @@
 /* strlibval HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* provide a pointer to a library string-value */
@@ -66,7 +66,7 @@ enum strlibvals {
 	strlibval_orgloc,
 	strlibval_orgcode,
 	strlibval_overlast
-} ;
+} ; /* end enum (strlibvals) */
 
 class strlibval {
 	cchar		*strp = nullptr ;
@@ -84,7 +84,7 @@ public:
 	strlibval &operator = (const strlibval &) = delete ;
 	operator ccharp () noex ;
 	void dtor() noex ;
-	~strlibval() {
+	destruct strlibval() {
 	    dtor() ;
 	} ;
 } ; /* end class (strlibval) */

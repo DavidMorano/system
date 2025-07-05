@@ -1,5 +1,5 @@
 /* strlinelen HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* calculate the number of characters in a c-string up to a given maximum */
