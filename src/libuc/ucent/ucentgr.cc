@@ -94,7 +94,7 @@ int ucentgr::parse(char *grbuf,int grlen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (this && grbuf && sp) {
 	    GROUP *gep = this ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(gep) ; /* shallow copy */
 	    if (storeitem si ; (rs = si.start(grbuf,grlen)) >= 0) {
 	        int	fi = 0 ;
@@ -219,15 +219,15 @@ int ucentgr::size() noex {
 	if (this) {
 	    int		sz = 1 ;
 	    if (gr_name) {
-	        sz += (xstrlen(gr_name) + 1) ;
+	        sz += (lenstr(gr_name) + 1) ;
 	    }
 	    if (gr_passwd) {
-	        sz += (xstrlen(gr_passwd) + 1) ;
+	        sz += (lenstr(gr_passwd) + 1) ;
 	    }
 	    if (gr_mem) {
 	        int	i = 0 ;
 	        while (gr_mem[i]) {
-	            sz += (xstrlen(gr_mem[i++]) + 1) ;
+	            sz += (lenstr(gr_mem[i++]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if (group members) */

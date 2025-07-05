@@ -129,7 +129,7 @@ int ucentnw::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (this && ebuf && sp) {
 	    NETENT *nep = this ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(nep) ;
 	    n_addrtype = AF_INET4 ;		/* <- mandatory */
 	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
@@ -241,12 +241,12 @@ int ucentnw::size() noex {
 	if (this) {
 	    int		sz = 1 ;
 	    if (n_name) {
-	        sz += (xstrlen(n_name) + 1) ;
+	        sz += (lenstr(n_name) + 1) ;
 	    }
 	    if (n_aliases) {
 	        int	i ; /* used-afterwards */
 	        for (i = 0 ; n_aliases[i] ; i += 1) {
-	            sz += (xstrlen(n_aliases[i]) + 1) ;
+	            sz += (lenstr(n_aliases[i]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if (name-list aliases) */

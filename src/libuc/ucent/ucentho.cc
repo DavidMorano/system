@@ -131,7 +131,7 @@ int ucentho::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (this && ebuf && sp) {
 	    HOSTENT *hep = this ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(hep) ;
 	    h_addrtype = AF_INET4 ;	/* <- mandatory */
 	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
@@ -241,12 +241,12 @@ int ucentho::size() noex {
 	if (this) {
 	    int		sz = 1 ;
 	    if (h_name) {
-	        sz += (xstrlen(h_name) + 1) ;
+	        sz += (lenstr(h_name) + 1) ;
 	    }
 	    if (h_aliases) {
 	        int	i = 0 ; /* used-afterwards */
 	        for (i = 0 ; h_aliases[i] ; i += 1) {
-	            sz += (xstrlen(h_aliases[i]) + 1) ;
+	            sz += (lenstr(h_aliases[i]) + 1) ;
 	        } /* end for */
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if (name-alias list) */
