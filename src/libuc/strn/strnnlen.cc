@@ -1,5 +1,5 @@
 /* strnnlen SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* calculate the length of a counted c-string */
@@ -47,11 +47,11 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>		/* |cstrlen(3u)| + |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"strn.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -95,7 +95,7 @@ int strnnlen(cchar *sp,int sl,int mlen) noex {
 	    } else {
 	        sl = mlen ;
 	    }
-	    len = xstrnlen(sp,sl) ; /* (sl < 0) is allowed */
+	    len = lenstr(sp,sl) ; /* (sl < 0) is allowed */
 	} /* end if */
 	return len ;
 }

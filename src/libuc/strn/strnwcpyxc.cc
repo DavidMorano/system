@@ -1,5 +1,5 @@
 /* strnwcpyxc SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* copy a counted c-string to a sized destination buffer */
