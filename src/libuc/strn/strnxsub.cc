@@ -1,5 +1,5 @@
 /* strnxsub SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find a substring within a larger string */
@@ -66,11 +66,11 @@
 #include	<toxc.h>
 #include	<nleadstr.h>
 #include	<char.h>
-#include	<libutil.hh>		/* |cstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"strnxsub.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -148,7 +148,7 @@ char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 char *strncasesub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
 	if (sp && ss) {
-	    cint	sslen = cstrlen(ss) ;
+	    cint	sslen = lenstr(ss) ;
 	    rp = charp(sp) ;
 	    if (sslen > 0) {
 		if (sl >= 0) {
@@ -168,9 +168,9 @@ char *strncasesub(cchar *sp,int sl,cchar *ss) noex {
 }
 /* end subroutine (strncasesub) */
 
-char *strbfoldsub(cchar *sp,int sl,cchar *ss) {
+char *strnfoldsub(cchar *sp,int sl,cchar *ss) noex {
 	strner		so(tofc,nleadfoldstr) ;
-	cint		sslen = cstrlen(ss) ;
+	cint		sslen = lenstr(ss) ;
     	return so.strnxsub(sp,sl,ss,sslen) ;
 }
 /* end subroutine (strnfoldsub) */
@@ -180,7 +180,7 @@ char *strbfoldsub(cchar *sp,int sl,cchar *ss) {
 
 char *strner::strnxsub(cchar *sp,int sl,cchar *ss,int sslen) noex {
 	char		*rp = nullptr ;
-        if (sl < 0) sl = cstrlen(sp) ;
+        if (sl < 0) sl = lenstr(sp) ;
         if (sslen <= sl) {
             cint        sslead = toxc(ss[0]) ;
             int         i ; /* used-afterwards */
@@ -193,7 +193,7 @@ char *strner::strnxsub(cchar *sp,int sl,cchar *ss,int sslen) noex {
                 } /* end if */
             } /* end for */
             rp = charp((f) ? (sp + i) : nullptr) ;
-        } /* end if */
+        } /* end if (valid) */
 	return rp ;
 }
 /* end method (strner::strnxsub) */

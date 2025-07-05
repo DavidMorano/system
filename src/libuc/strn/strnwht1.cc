@@ -103,7 +103,7 @@ extern "C" {
     char *strnwht(cchar *sp,int sl) noex {
 	char		*rsp = nullptr ;
 	if (sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sl >= 0) {	
 	        cchar	*lsp = (sp + sl) ;
 	        bool	f = false ;
@@ -143,7 +143,7 @@ extern "C++" {
     char *strnwhtbrk(cchar *sp,int sl,const chrset &sset) noex {
 	char		*rsp = nullptr ;
 	if (sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sl >= 0) {	
 	        cchar	*lsp = (sp + sl) ;
 	        bool	f = false ;

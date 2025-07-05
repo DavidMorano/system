@@ -109,7 +109,7 @@ char *strnrbrk(cchar *sp,int sl,cchar *ss) noex {
 	bool		f = false ;
 	char		*rsp = nullptr ;
 	if (sp && ss) {
-	    if (sl < 0) sl = cstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rsp = charp(sp + sl) ;
 	    while (--rsp >= sp) {
 	        cint	ch = mkchar(*rsp) ;
