@@ -1,5 +1,5 @@
 /* tmpx_getsessions SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get all of the terminals where the given user is logged in */

@@ -1,5 +1,5 @@
 /* typenonpath SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine the type of nonpath in given counted c-string (filename) */
@@ -93,7 +93,7 @@ bool typenonpath(cchar *fp,int fl) noex {
 	    if (fl < 0) fl = strlen(fp) ;
 	    if ((fl > 0) && (fp[0] != '/')) {
 	        cnullptr	np{} ;
-	        if (cchar *tp ; (tp = strnpbrk(fp,fl,nonpaths)) != np) {
+	        if (cchar *tp ; (tp = strnbrk(fp,fl,nonpaths)) != np) {
 	            if (((tp - fp) > 0) && (tp[1] != '\0')) {
 	                t = sichr(nonpaths,-1,*tp) ;
 	            }
