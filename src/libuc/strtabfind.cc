@@ -1,5 +1,5 @@
 /* strtabfind SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find a string in tables created by a STRTAB object */
@@ -51,10 +51,9 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<nleadstr.h>
-#include	<hash.h>
+#include	<hash.h>	/* |hash_elf(3uc)| + |hash_again(3uc)| */
 #include	<hashindex.h>
 #include	<localmisc.h>
 
@@ -62,10 +61,6 @@
 
 
 /* local defines */
-
-#ifndef	MODP2
-#define	MODP2(v,n)	((v) & ((n) - 1))
-#endif
 
 
 /* imported namespaces */
@@ -102,44 +97,47 @@ static bool	ismatkey(cchar *,cchar *,int) noex ;
 /* exported subroutines */
 
 int strtabfind(cc *tab,it_t it,int itlen,int nskip,cc *sp,int sl) noex {
-	uint		khash ;
-	uint		nhash ;
-	uint		chash ;
-	int		nhi ;
-	int		hi ;
-	int		nmax ;
-	int		j ; /* used-afterwards */
-	int		si = -1 ;
-	int		sc = 0 ; /* Skip-Count */
-	bool		f_mathash = false ;
-	bool		f_mat = false ;
-	nmax = itlen + nskip ;
-	khash = hash_elf(sp,sl) ;
-	chash = (khash & INT_MAX) ;
-	nhash = khash ;
-	hi = hashindex(nhash,itlen) ;
-        for (j = 0 ; (j < nmax) && ((si = it[hi][0]) > 0) ; j += 1) {
-	    f_mathash = ((it[hi][1] & INT_MAX) == chash) ;
-	    if (f_mathash) break ;
-	    if ((it[hi][1] & (~ INT_MAX)) == 0) {
-		break ;
-	    }
-	    nhash = hash_again(nhash,j,nskip) ;
+    	int		rs = SR_FAULT ;
+	int		sc = 0 ; /* return-value Skip-Count */
+	if (tab && it && sp) {
+	    uint	khash = hash_elf(sp,sl) ;
+	    uint	nhash ;
+	    uint	chash ;
+	    cint	nmax = (itlen + nskip) ;
+	    int		nhi ;
+	    int		hi ;
+	    int		j ; /* used-afterwards */
+	    int		si = -1 ;
+	    bool	f_mathash = false ;
+	    bool	f_mat = false ;
+	    rs =  SR_OK ;
+	    chash = (khash & INT_MAX) ;
+	    nhash = khash ;
 	    hi = hashindex(nhash,itlen) ;
-	} /* end for */
-	sc += j ;
-	if ((si > 0) && f_mathash) {
-	    while ((si = it[hi][0]) > 0) {
-	        cchar	*cp = (tab + si) ;
-	        f_mat = (cp[0] == sp[0]) && ismatkey(cp,sp,sl) ;
-	        if (f_mat) break ;
-		nhi = it[hi][2] ;
-		if (nhi == 0) break ;
-		hi = nhi ;
-		sc += 1 ;
-	    } /* end while */
-	} /* end if */
-	return (f_mat) ? sc : SR_NOTFOUND ;
+            for (j = 0 ; (j < nmax) && ((si = it[hi][0]) > 0) ; j += 1) {
+	        f_mathash = ((it[hi][1] & INT_MAX) == chash) ;
+	        if (f_mathash) break ;
+	        if ((it[hi][1] & (~ INT_MAX)) == 0) {
+		    break ;
+	        }
+	        nhash = hash_again(nhash,j,nskip) ;
+	        hi = hashindex(nhash,itlen) ;
+	    } /* end for */
+	    sc += j ;
+	    if ((si > 0) && f_mathash) {
+	        while ((si = it[hi][0]) > 0) {
+	            cchar	*cp = (tab + si) ;
+	            f_mat = (cp[0] == sp[0]) && ismatkey(cp,sp,sl) ;
+	            if (f_mat) break ;
+		    nhi = it[hi][2] ;
+		    if (nhi == 0) break ;
+		    hi = nhi ;
+		    sc += 1 ;
+	        } /* end while */
+	    } /* end if */
+	    if (! f_mat) rs = SR_NOTFOUND ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? sc : rs ;
 }
 /* end subroutine (strtabfind) */
 
@@ -149,7 +147,7 @@ int strtabfind(cc *tab,it_t it,int itlen,int nskip,cc *sp,int sl) noex {
 static bool ismatkey(cchar *key,cchar *kp,int kl) noex {
 	bool		f = (key[0] == kp[0]) ;
 	if (f) {
-	    int	m = nleadstr(key,kp,kl) ;
+	    cint	m = nleadstr(key,kp,kl) ;
 	    f = (m == kl) && (key[m] == '\0') ;
 	}
 	return f ;

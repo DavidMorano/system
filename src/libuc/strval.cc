@@ -1,5 +1,5 @@
 /* strval SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* String-Value */
@@ -32,20 +32,32 @@
 	strval
 
 	Description:
-	Create a string out of a decimal number and return a pointer
-	to the given buffer.  This kind of function is used in
-	special circumstances where an economy of code is valued
-	over other considerations (like debugging code, for example).
+	Create a string out of a decimal number (given as an 32-bit
+	integer) and return a pointer to the given buffer (which
+	is also supplied by the caller).  The integer is converted
+	to decimal digits assuming a base-10 representation.  This
+	kind of function is used in special circumstances where an
+	economy of code is valued over other considerations (like
+	debugging code, for example).
 
 	Synopsis:
-	cchar *strval(char *tbuf,int v) noex
+	cchar *strval(char *rbuf,int v) noex
 
 	Arguments:
-	tbuf		temporary buffer
-	v		value to represent
+	rbuf		temporary buffer to store resuling conversion
+	v		value to represent (convert to digits)
 
 	Returns:
 	-		pointer to temporary buffer w/ value representation
+
+	Notes:
+	1. Why the incredible fuss over such a simple function?  I
+	guess (because I hardly know myself) that the reason is to
+	take up as little buffer space (which is also copletely
+	supplied by the caller anyway) on the stack, where presumably
+	the buffer is allocated by the caller.  This function is
+	very historical and I do not really know what all the reasons
+	were in the establishment of its calling API.
 
 *******************************************************************************/
 
@@ -56,12 +68,16 @@
 #include	<usystem.h>
 #include	<strdcpyx.h>
 #include	<ctdec.h>
-#include	<localmisc.h>		/* for |DIGBUFLEN| */
+#include	<localmisc.h>		/* for |DECBUFLEN| */
 
 #include	"strval.h"
 
+import uconstants ;			/* |digbufsize(3u)| */
 
 /* local defines */
+
+#define	NUMBASE		10		/* base-10 */
+#define	TYPELOG		2		/* |int32_t| */
 
 
 /* imported namespaces */
@@ -84,6 +100,8 @@
 
 /* local variables */
 
+static cint		rlen = digbufsize.bufsize[TYPELOG][NUMBASE] ;
+
 
 /* exported variables */
 
@@ -91,13 +109,12 @@
 /* exported subroutines */
 
 cchar *strval(char *rbuf,cint val) noex {
-	cint		rlen = DIGBUFLEN ;
-	if ((val >= 0) && (val < INT_MAX)) {
+	if ((val >= 0) && (val >= 0)) {
 	    if (ctdec(rbuf,rlen,val) < 0) {
-	        strdcpy(rbuf,rlen,"bad") ;
+	        strdcpy(rbuf,rlen,"invalid") ;
 	    }
 	} else {
-	    strdcpy(rbuf,rlen,"max") ;
+	    strdcpy(rbuf,rlen,"negative") ;
 	}
 	return rbuf ;
 }
