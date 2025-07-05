@@ -1,5 +1,5 @@
 /* strop SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string-operations */
@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	strop
+
+	Description:
 	This object allows for some specialized manipulations on a
 	counted-string object.
 
@@ -26,11 +30,11 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
+#include	<ulogerror.h>
 #include	<six.h>
 #include	<baops.h>
 #include	<char.h>
@@ -39,6 +43,7 @@
 
 #include	"strop.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -86,7 +91,7 @@ static bool isterm(strop *sop,cchar *terms) noex {
 int strop_start(strop *sop,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (sop && sp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    sop->sp = sp ;
 	    sop->sl = sl ;
 	    rs = sop->sl ;
@@ -110,14 +115,13 @@ int strop_breakfield(strop *sop,cchar *ss,cchar **rpp) noex {
 	int		rl = -1 ;
 	*rpp = nullptr ;
 	if (sop->sl > 0) {
-	    int		si ;
-	    if ((si = siskipwhite(sop->sp,sop->sl)) > 0) {
+	    if (int si ; (si = siskipwhite(sop->sp,sop->sl)) > 0) {
 	        sop->sp += si ;
 	        sop->sl -= si ;
 	    }
 	    if (sop->sl > 0) {
 	        *rpp = sop->sp ;
-	        if ((si = sibreak(sop->sp,sop->sl,ss)) >= 0) {
+	        if (int si ; (si = sibrk(sop->sp,sop->sl,ss)) >= 0) {
 	            rl = si ;
 	            sop->sp += (si + 1) ;
 	            sop->sl -= (si + 1) ;
@@ -132,8 +136,7 @@ int strop_breakfield(strop *sop,cchar *ss,cchar **rpp) noex {
 /* end subroutine (strop_breakfield) */
 
 int strop_white(strop *sop) noex {
-	int		si ;
-	if ((si = siskipwhite(sop->sp,sop->sl)) > 0) {
+	if (int si ; (si = siskipwhite(sop->sp,sop->sl)) > 0) {
 	    sop->sp += si ;
 	    sop->sl -= si ;
 	}
@@ -189,8 +192,8 @@ int strop_span(strop *sop,cchar *ss) noex {
 
 /* local subroutines */
 
-int strop::start(cchar *sp,int sl) noex {
-	return strop_start(this,sp,sl) ;
+int strop::start(cchar *ap,int al) noex {
+	return strop_start(this,ap,al) ;
 }
 int strop::breakfield(cchar *ss,cchar **rpp) noex {
 	return strop_breakfield(this,ss,rpp) ;
@@ -211,41 +214,43 @@ int strop::span(cchar *ss) noex {
 	return strop_span(this,ss) ;
 }
 
-strop_co::operator int () noex {
-	int		rs = SR_BUGCHECK ;
-	switch (w) {
-	case stropmem_remlen:
-	    rs = op->sl ;
-	    break ;
-	case stropmem_inc:
-	    rs = 0 ;
-	    if (op->sl > 0) {
-		rs = 1 ;
-	        op->sp += 1 ;
-	        op->sl -= 1 ;
-	    }
-	    break ;
-	case stropmem_white:
-	    rs = strop_white(op) ;
-	    break ;
-	case stropmem_whitedash:
-	    rs = strop_whitechr(op,'-') ;
-	    break ;
-	case stropmem_whitecolon:
-	    rs = strop_whitechr(op,':') ;
-	    break ;
-	case stropmem_finish:
-	    rs = strop_finish(op) ;
-	    break ;
-	} /* end switch */
-	return rs ;
-}
-/* end method (strop_co::operator) */
-
 void strop::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("strop",rs,"fini-finish") ;
 	}
 }
+
+strop_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	   switch (w) {
+	   case stropmem_remlen:
+	       rs = op->sl ;
+	       break ;
+	   case stropmem_inc:
+	       rs = 0 ;
+	       if (op->sl > 0) {
+		   rs = 1 ;
+	           op->sp += 1 ;
+	           op->sl -= 1 ;
+	       }
+	       break ;
+	   case stropmem_white:
+	       rs = strop_white(op) ;
+	       break ;
+	   case stropmem_whitedash:
+	       rs = strop_whitechr(op,'-') ;
+	       break ;
+	   case stropmem_whitecolon:
+	       rs = strop_whitechr(op,':') ;
+	       break ;
+	   case stropmem_finish:
+	       rs = strop_finish(op) ;
+	       break ;
+	   } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (strop_co::operator) */
 
 
