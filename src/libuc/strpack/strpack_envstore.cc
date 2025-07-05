@@ -1,5 +1,5 @@
 /* strpack_envstore SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* packed-string object (add environment variable) */
@@ -45,14 +45,13 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"strpack.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -94,10 +93,10 @@ int strpack_envstorer(SP *op,cc *kp,int kl,cc *vp,int vl,cc **rpp) noex {
 	int		len = 0 ;
 	if ((rs = strpack_magic(op,kp)) >= 0) {
 	    int		sz = 1 ;
-	    if (kl < 0) kl = xstrlen(kp) ;
+	    if (kl < 0) kl = lenstr(kp) ;
 	    sz += (kl+1) ;
 	    if (vp) {
-	        if (vl < 0) vl = xstrlen(vp) ;
+	        if (vl < 0) vl = lenstr(vp) ;
 	        sz += vl ;
 	    }
 	    if (char *ep{} ; (rs = uc_malloc(sz,&ep)) >= 0) {

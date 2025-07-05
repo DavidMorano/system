@@ -1,5 +1,5 @@
 /* strpack SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string pack object */
@@ -41,7 +41,7 @@
 
 	Returns:
 	>=0		the total length of the filled up strpack so far!
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -54,11 +54,11 @@
 #include	<usystem.h>
 #include	<vechand.h>
 #include	<strwcpy.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"strpack.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -137,9 +137,9 @@ constexpr bool		f_prealloc = CF_PREALLOC ;
 
 int strpack_start(strpack *op,int chsize) noex {
 	int		rs ;
+	if (chsize < STRPACK_CHSIZE) chsize = STRPACK_CHSIZE ;
 	if ((rs = strpack_ctor(op)) >= 0) {
 	    cint	vo = VECHAND_OORDERED ;
-	    if (chsize < STRPACK_CHSIZE) chsize = STRPACK_CHSIZE ;
 	    op->chsize = chsize ;
 	    if ((rs = vechand_start(op->clp,0,vo)) >= 0) {
 		if_constexpr (f_prealloc) {
@@ -186,7 +186,7 @@ int strpack_finish(strpack *op) noex {
 int strpack_store(strpack *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	if ((rs = strpack_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    {
 	        strpack_ch	*chp = op->chp ;
 	        int		amount = (sl + 1) ;
@@ -233,9 +233,8 @@ int strpack_size(strpack *op) noex {
 static int strpack_chunknew(strpack *op,int amount) noex {
 	cint		csz = szof(strpack_ch) ;
 	int		rs ;
-	void		*vp{} ;
 	if (op->chsize > amount) amount = op->chsize ;
-	if ((rs = uc_libmalloc(csz,&vp)) >= 0) {
+	if (void *vp ; (rs = uc_libmalloc(csz,&vp)) >= 0) {
 	    strpack_ch	*cep = chunkp(vp) ;
 	    if ((rs = chunk_start(cep,(amount + 1))) >= 0) {
 	        if ((rs = vechand_add(op->clp,cep)) >= 0) {
@@ -263,8 +262,8 @@ static int strpack_chunkfins(strpack *op) noex {
 	int		rs1 ;
 	void		*vp{} ;
 	for (int i = 0 ; vechand_get(clp,i,&vp) >= 0 ; i += 1) {
+	    strpack_ch	*chp = chunkp(vp) ;
 	    if (vp) {
-	        strpack_ch	*chp = chunkp(vp) ;
 		{
 	            rs1 = chunk_finish(chp) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -283,9 +282,8 @@ static int chunk_start(strpack_ch *cnp,int csz) noex {
 	int		rs = SR_INVALID ;
 	memclear(cnp) ;
 	if (csz > 0) {
-	    void	*vp{} ;
 	    cnp->csz = csz ;
-	    if ((rs = uc_libmalloc(csz,&vp)) >= 0) {
+	    if (void *vp ; (rs = uc_libmalloc(csz,&vp)) >= 0) {
 	        cnp->cdata = charp(vp) ;
 	    }
 	}

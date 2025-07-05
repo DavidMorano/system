@@ -1,5 +1,5 @@
 /* strpack_obj SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string pack object */
@@ -40,19 +40,16 @@
 
 	Returns:
 	>=0		the total length of the filled up strpack so far!
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<new>
 #include	<usystem.h>
-#include	<vechand.h>
-#include	<strwcpy.h>
+#include	<ulogerror.h>
 #include	<localmisc.h>
 
 #include	"strpack.h"
