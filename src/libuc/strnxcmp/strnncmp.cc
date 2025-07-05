@@ -1,5 +1,5 @@
 /* strnncmp SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* compare the minimum common characters of two strings */
@@ -52,11 +52,11 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>
 #include	<localmisc.h>
 
 #include	"strnxcmp.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -92,8 +92,8 @@ using std::max ;			/* subroutine-template */
 
 int strnncmp(cchar *s1,int n1,cchar *s2,int n2) noex {
 	int		rc ;
-	if (n1 < 0) n1 = xstrlen(s1) ;
-	if (n2 < 0) n2 = xstrlen(s2) ;
+	if (n1 < 0) n1 = lenstr(s1) ;
+	if (n2 < 0) n2 = lenstr(s2) ;
 	{
 	    cint	n = min(n1,n2) ;
 	    if ((rc = strncmp(s1,s2,n)) == 0) {

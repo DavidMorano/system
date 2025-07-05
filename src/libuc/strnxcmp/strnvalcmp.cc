@@ -1,5 +1,5 @@
 /* strnvalcmp SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string field comparisons */
@@ -53,11 +53,11 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>
 #include	<localmisc.h>
 
 #include	"strnxcmp.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -90,7 +90,7 @@
 
 int strnvalcmp(cchar *sp,cchar *vp,int vl) noex {
 	int		rc = -1 ;
-	if (vl < 0) vl = xstrlen(vp) ;
+	if (vl < 0) vl = lenstr(vp) ;
 	if (cchar *tp ; (tp = strchr(sp,'=')) != nullptr) {
 	    sp = (tp+1) ;
 	    while (*sp) {

@@ -1,5 +1,5 @@
 /* strnndictcmp SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string compare using dictionary order */
@@ -79,11 +79,11 @@
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
-#include	<libutil.hh>
 #include	<localmisc.h>
 
 #include	"strnxcmp.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -130,8 +130,8 @@ static int	strdocmp(cchar *,cchar *,int) noex ;
 int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex {
 	int		rs ;
 	int		rc = 0 ;
-	if (s1len < 0) s1len = xstrlen(s1) ;
-	if (s2len < 0) s2len = xstrlen(s2) ;
+	if (s1len < 0) s1len = lenstr(s1) ;
+	if (s2len < 0) s2len = lenstr(s2) ;
 	if (DCH dc1 ; (rs = dch_start(&dc1,s1,s1len)) >= 0) {
 	    if (DCH dc2 ; (rs = dch_start(&dc2,s2,s2len)) >= 0) {
 		int	fch1 ;

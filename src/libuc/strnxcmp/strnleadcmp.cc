@@ -1,5 +1,5 @@
 /* strnleadcmp SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* check if string 's2' is a leading substring of string 's1' */
@@ -43,16 +43,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>
 #include	<localmisc.h>
 
 #include	"strnxcmp.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -88,7 +88,7 @@
 
 int strnleadcmp(cchar *s1,cchar *s2,int lr) noex {
 	int		f = true ;
-	if (lr < 0) lr = xstrlen(s2) ;
+	if (lr < 0) lr = lenstr(s2) ;
 	while (lr-- > 0) {
 	    f = (*s2++ == *s1++) ;
 	    if (! f) break ;
