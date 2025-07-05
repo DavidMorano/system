@@ -192,9 +192,9 @@ static int opendev_default(cchar *fname,int of,mode_t om) noex {
 	cchar		*devdname = OPENDEV_DEVDNAME ;
 	char		*fnbuf ;
 
-	sz += intconv(xstrlen(devdname) + 1) ;
+	sz += intconv(lenstr(devdname) + 1) ;
 	sz += 1 ;
-	sz += intconv(xstrlen(fname) + 1) ;
+	sz += intconv(lenstr(fname) + 1) ;
 	sz += 1 ;
 	if ((rs = uc_libmalloc(sz,&fnbuf)) >= 0) {
 	    if ((rs = mkpath2(fnbuf,devdname,fname)) >= 0) {
@@ -251,7 +251,7 @@ static int opendev_inet(int fi,cchar *fname,int of,int to,int ne) noex {
 
 static int inetargs_start(INETARGS *iap,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	memclear(iap) ;
 	while (sl && (sp[0] == '/')) {
 	    sp += 1 ;
@@ -291,7 +291,7 @@ static int inetargs_start(INETARGS *iap,cchar *sp,int sl) noex {
 	    int		sz = 0 ;
 	    for (int i = 0 ; i < da_overlast ; i += 1) {
 		if ((iap->ia[i].l < 0) && (iap->ia[i].p != nullptr)) {
-		    iap->ia[i].l = xstrlen(iap->ia[i].p) ;
+		    iap->ia[i].l = lenstr(iap->ia[i].p) ;
 		}
 	    } /* end for */
 	    for (int i = 0 ; i < da_overlast ; i += 1) {

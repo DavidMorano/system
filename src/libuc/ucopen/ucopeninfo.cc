@@ -891,7 +891,7 @@ static int getprefixfs(cchar *fname,cchar **rpp) noex {
 	    if ((tp = strchr(pp,'/')) != nullptr) {
 	        pl = intconv(tp - pp) ;
 	    } else {
-	        pl = xstrlen(pp) ;
+	        pl = lenstr(pp) ;
 	        tp = (pp + pl) ;
 	    }
 

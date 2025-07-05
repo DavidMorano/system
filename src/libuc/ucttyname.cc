@@ -78,7 +78,7 @@ int uc_ttyname(int fd,char *dbuf,int dlen) noex {
 		rs = SR_INVALID ;
 		if (dlen >= 0) {
 		    if ((rs = ttyname_rp(fd,dbuf,dlen)) == 0) {
-	    	        len = xstrnlen(dbuf,dlen) ;
+	    	        len = lenstr(dbuf,dlen) ;
 		    } else {
 			rs = (- rs) ; /* returned an ERRNO code */
 		    }

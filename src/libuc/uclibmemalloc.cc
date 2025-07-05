@@ -44,7 +44,7 @@
 
 #include	"uclibmemalloc.h"
 
-import libutil ;			/* |xstrlen(3u)| */
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -93,7 +93,7 @@ int uc_libmallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (sp && rpp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (char *bp ; (rs = uc_libmalloc((sl+1),&bp)) >= 0) {
 	        *rpp = bp ;
 		{

@@ -236,7 +236,7 @@ static int mkprogenv_load(MKPROGENV *pep,cchar *pfn,mainv argv) noex {
 	    if (argv != nullptr) ap = argv[0] ;
 	    if (ap == nullptr) al = sfbasename(pfn,-1,&ap) ;
 	    if ((rs = mkprogenv_envset(pep,"_A0",ap,al)) >= 0) {
-		cint	sulen = (xstrlen(pfn)+22) ;
+		cint	sulen = (lenstr(pfn)+22) ;
 		if (char *subuf ; (rs = uc_malloc((sulen+1),&subuf)) >= 0) {
 		    if ((rs = ucpid) >= 0 {
 	    	        const pid_t	pid = rs ;

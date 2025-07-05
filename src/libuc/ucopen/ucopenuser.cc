@@ -179,7 +179,7 @@ int uc_openuserpath(ucopeninfo *oip) noex {
 	    ul = intconv(tp - fp) ;
 	    fp = (tp+1) ;
 	} else {
-	    fp += xstrlen(fp) ;
+	    fp += lenstr(fp) ;
 	}
 
 	if (un[0] != '\0') {

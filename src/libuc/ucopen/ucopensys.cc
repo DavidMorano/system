@@ -200,7 +200,7 @@ static int isRealName(cchar *fname,int fl) noex {
 	    cchar	*suf = IPASSWD_SUF ;
 	    if (cchar *tp ; (tp = strnrchr(cp,cl,'.')) != nullptr) {
 		sysnames	w = sysname_realname ;
-		cint		suflen = xstrlen(suf) ;
+		cint		suflen = lenstr(suf) ;
 		if (strncmp((tp + 1),suf,suflen) == 0) {
 		    cint	tl = intconv(tp - cp) ;
 		    cchar	*rn = sysname[w] ;

@@ -811,20 +811,20 @@ static int inetargs_alloc(inetargs *iap) noex {
 	int		sz = 0 ;
 #ifdef	COMMENT
 	if (iap->protop != nullptr) {
-	    sz += (xstrnlen(iap->protop,iap->protol) + 1) ;
+	    sz += (lenstr(iap->protop,iap->protol) + 1) ;
 	}
 #endif /* COMMENT */
 	if (iap->afp != nullptr) {
-	    sz += (xstrnlen(iap->afp,iap->afl) + 1) ;
+	    sz += (lenstr(iap->afp,iap->afl) + 1) ;
 	}
 	if (iap->hostp != nullptr) {
-	    sz += (xstrnlen(iap->hostp,iap->hostl) + 1) ;
+	    sz += (lenstr(iap->hostp,iap->hostl) + 1) ;
 	}
 	if (iap->portp != nullptr) {
-	    sz += (xstrnlen(iap->portp,iap->portl) + 1) ;
+	    sz += (lenstr(iap->portp,iap->portl) + 1) ;
 	}
 	if (iap->svcp != nullptr) {
-	    sz += (xstrnlen(iap->svcp,iap->svcl) + 1) ;
+	    sz += (lenstr(iap->svcp,iap->svcl) + 1) ;
 	}
 	if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
 	    cchar	*cp ;
@@ -867,7 +867,7 @@ static int ticotsordargs_start(TICOTSORDARGS *tap,char *abuf,int alen,
 		cchar *pp,int pl) noex {
 	int		rs ;
 	memclear(tap) ;
-	if (pl < 0) pl = xstrlen(pp) ;
+	if (pl < 0) pl = lenstr(pp) ;
 	if ((rs = storeitem_start(&tap->ss,abuf,alen)) >= 0) {
 	    cchar	*tp ;
 	    while (pl && (pp[0] == '/')) {
