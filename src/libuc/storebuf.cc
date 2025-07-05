@@ -1,5 +1,5 @@
 /* storebuf SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* storage buffer manipulation subroutines */
@@ -166,7 +166,7 @@ int storebuf_chrs(char *rbuf,int rlen,int idx,int ch,int n) noex {
 		rs = SR_OK ;
 	        if ((rlen < 0) || ((rlen - idx) >= n)) {
 		    for (int i = 0 ; i < n ; i += 1) {
-	                *bp++ = ch ;
+	                *bp++ = char(ch) ;
 		    }
 	        } else {
 	            rs = SR_OVERFLOW ;
@@ -186,7 +186,7 @@ int storebuf_chr(char *rbuf,int rlen,int i,int ch) noex {
 	        char	*bp = (rbuf + i) ;
 		rs = SR_OK ;
 	        if ((rlen < 0) || ((rlen - i) >= 1)) {
-	            *bp++ = ch ;
+	            *bp++ = char(ch) ;
 	        } else {
 	            rs = SR_OVERFLOW ;
 	        }
@@ -232,7 +232,7 @@ int storebuf_buf(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	            } /* end if */
 	        } /* end if */
 	        *bp = '\0' ;
-		len = (bp - (rbuf + i)) ;
+		len = intconv(bp - (rbuf + i)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -276,7 +276,7 @@ int storebuf_strw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	            } /* end if */
 	        } /* end if */
 	        *bp = '\0' ;
-		len = (bp - (rbuf + i)) ;
+		len = intconv(bp - (rbuf + i)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;

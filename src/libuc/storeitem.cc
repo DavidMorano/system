@@ -1,5 +1,5 @@
 /* storeitem SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++23 */
 
 /* storage object */
@@ -47,7 +47,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdint>
-#include	<cstring>
 #include	<bit>
 #include	<usystem.h>
 #include	<ctdec.h>
