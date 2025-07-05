@@ -1,5 +1,5 @@
 /* timestr_elapsed SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert UNIX time into an elapsed time character string */
@@ -26,11 +26,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<tzfile.h>
-#include	<ctime>
+#include	<ctime>			/* |time_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdio>
 #include	<usystem.h>
 #include	<usupport.h>		/* |ulogerror(3u)| */
 #include	<snx.h>

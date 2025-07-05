@@ -1,5 +1,5 @@
 /* timest_nist SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert UNIX® time into a Julian like character string */
@@ -48,11 +48,11 @@
 #include	<snx.h>
 #include	<getmjd.h>
 #include	<nistinfo.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"timestr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -114,7 +114,7 @@ char *timestr_nist(time_t t,nistinfo *nip,char *tbuf) noex {
 	                        if (tslp->tm_isdst) tt = 50 ;
 	                    }
 	                    if (nip->org[0] != '\0') {
-			        cint	ol = xstrlen(nip->org) ;
+			        cint	ol = lenstr(nip->org) ;
 			        if (ol > olen) {
 			            nip->org[olen] = '\0' ;
 			        }

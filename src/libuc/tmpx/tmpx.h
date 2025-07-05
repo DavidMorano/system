@@ -1,5 +1,5 @@
 /* tmpx HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* object to facilitate UTMPX management */
