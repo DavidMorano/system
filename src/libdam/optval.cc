@@ -49,6 +49,7 @@
 
 #include	"optval.h"
 
+import libutil ;
 
 /* local defines */
 

@@ -36,11 +36,12 @@
 #include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
-#include	<localmisc.h>		/* |NTABCOLS| */
+#include	<localmisc.h>		/* |NTABCOLS| + |COLUMNS| */
 
 #include	"outline.h"
 #include	"contentencodings.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -73,10 +74,11 @@
 
 int outline_start(outline *op,bfile *ofp,int maxlen) noex {
 	int		rs = SR_FAULT ;
+	if (maxlen <= 0) maxlen = COLUMNS ;
 	if (op && ofp) {
 	    rs = memclear(op) ;
 	    op->maxlen = maxlen ;
-	    op->rlen = (maxlen -1) ;
+	    op->rlen = (maxlen - 1) ;
 	    op->ofp = ofp ;
 	} /* end if (non-null) */
 	return rs ;
@@ -111,7 +113,7 @@ int outline_item(outline *op,cchar *vp,int vl) noex {
 	    rs = SR_OK ;
 	    if (vl < 0) vl = lenstr(vp) ;
 	    if (vl > 0) {
-	        op->f.comma = true ;
+	        op->fl.comma = true ;
 	        rs = outline_value(op,vp,vl) ;
 	        wlen += rs ;
 	        op->c_items += 1 ;
@@ -136,14 +138,14 @@ int outline_value(outline *op,cchar *vp,int vl) noex {
 	        op->c_values = 0 ;
 	        while ((rs >= 0) && (vl > 0)) {
 	            if ((cl = sfnext(vp,vl,&cp)) > 0) {
-	                f_comma = (op->f.comma && (op->c_items > 0)) ;
+	                f_comma = (op->fl.comma && (op->c_items > 0)) ;
 	                nlen = outline_needlength(op,cl) ;
 	                if (nlen > op->rlen) {
 	                    if (op->llen > 0) {
 	                        fmt = "\n" ;
 	                        if (f_comma) {
 	                            f_comma = FALSE ;
-	                            op->f.comma = FALSE ;
+	                            op->fl.comma = FALSE ;
 	                            fmt = ",\n" ;
 	                        }
 	                        rs = bwrite(op->ofp,fmt,-1) ;
@@ -157,7 +159,7 @@ int outline_value(outline *op,cchar *vp,int vl) noex {
 	                    fmt = " %r" ;
 	                    if (f_comma) {
 	                        f_comma = FALSE ;
-	                        op->f.comma = FALSE ;
+	                        op->fl.comma = FALSE ;
 	                        fmt = ", %r" ;
 	                    }
 	                    rs = bprintf(op->ofp,fmt,cp,cl) ;
@@ -166,11 +168,11 @@ int outline_value(outline *op,cchar *vp,int vl) noex {
 	                    op->rlen -= rs ;
 	                } /* end if (ok) */
 	                op->c_values += 1 ;
-	                cl2 = ((cp+cl) - vp) ;
+	                cl2 = intconv((cp + cl) - vp) ;
 	                vp += cl2 ;
 	                vl -= cl2 ;
 	            } else if ((tp = strnchr(vp,vl,'\n')) != nullptr) {
-	                vl -= ((tp + 1) - vp) ;
+	                vl -= intconv((tp + 1) - vp) ;
 	                vp = (tp + 1) ;
 	            } else {
 	                vl = 0 ;
@@ -203,22 +205,32 @@ int outline_write(outline *op,cchar *vp,int vl) noex {
 /* end subroutine (outline_write) */
 
 int outline_printf(outline *op,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (op && fmt) {
-	    va_list	ap ;
 	    va_begin(ap,fmt) ;
+	    rs = outline_vprintf(op,fmt,ap) ;
+	    wlen = rs ;
+	    va_end(ap) ;
+	}
+	return (rs >= 0) ? wlen : rs ;
+}
+
+int outline_vprintf(outline *op,cchar *fmt,va_list ap) noex {
+	int		rs = SR_FAULT ;
+	int		wlen = 0 ;
+	if (op && fmt) {
 	    if ((rs = bvprintf(op->ofp,fmt,ap)) >= 0) {
 	        wlen += rs ;
 	        op->wlen += rs ;
 	        op->llen += rs ;
 	        op->rlen -= rs ;
 	    } /* end if (bvprintf) */
-	    va_end(ap) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (outline_printf) */
+/* end subroutine (outline_vprintf) */
 
 int outline_needlength(outline *op,int cl) noex {
 	int		rs = SR_FAULT ;
@@ -228,12 +240,70 @@ int outline_needlength(outline *op,int cl) noex {
 	    if (op->llen == 0) {
 	        nlen += 1 ;
 	    }
-	    if (op->f.comma && (op->c_items > 0)) {
+	    if (op->fl.comma && (op->c_items > 0)) {
 	        nlen += 1 ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? nlen : rs ;
 }
 /* end subroutine (outline_needlength) */
+
+int outline::start(bfile *fp,int ml) noex {
+	return outline_start(this,fp,ml) ;
+}
+
+int outline::item(cchar *vp,int vl) noex {
+	return outline_item(this,vp,vl) ;
+}
+
+int outline::value(cchar *vp,int vl) noex {
+	return outline_value(this,vp,vl) ;
+}
+
+int outline::write(cchar *vp,int vl) noex {
+	return outline_write(this,vp,vl) ;
+}
+
+int outline::printf(cchar *fmt,...) noex {
+    	va_list		ap ;
+	int		rs = SR_FAULT ;
+	if (fmt) {
+	    va_begin(ap,fmt) ;
+	    rs = outline_vprintf(this,fmt,ap) ;
+	    va_end(ap) ;
+	}
+	return rs ;
+}
+
+int outline::needlength(int cl) noex {
+	return outline_needlength(this,cl) ;
+}
+
+void outline::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("outline",rs,"fini-finish") ;
+	}
+}
+
+outline::operator int () noex {
+    	int		rs = SR_NOTOPEN ;
+	if (ofp) {
+	    rs = llen ;
+	}
+	return rs ;
+}
+
+outline_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case outlinemem_finish:
+	        rs = outline_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (outline_co::operator) */
 
 

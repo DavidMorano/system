@@ -244,7 +244,7 @@ OBJ129= buffer_stropaque.o buffer_strcompact.o buffer_strquote.o
 OBJ130= sbuf_termconseq.o sbuf_blanks.o
 OBJ131= paramopt.o paramopt_loadone.o
 OBJ132= serialbuf.o srvreg.o srvrege.o wordfill.o linefold.o storeitem.o dstr.o 
-OBJ133= bufstr.o stackaddr.o outstore.o
+OBJ133= bufstr.o stackaddr.o outstore.o outline.o
 OBJ134= mapstrint.o keyopt.o keyopt_lastvalue.o keyvals.o
 OBJ135= envs.o envs_procxe.o envs_subs.o
 
@@ -612,8 +612,8 @@ egs.o:			egs.cc egs.h
 
 sha1.o:			sha1.c sha1.h
 
-outstore.o:		outstore.cc outstore.h
-outbuf.o:		outbuf.cc outbuf.h
+outline.o:		outline.cc	outline.h
+outstore.o:		outstore.cc	outstore.h
 
 strmgr.o:		strmgr.c strmgr.h
 

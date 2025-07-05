@@ -108,7 +108,7 @@ struct keyvals : keyvals_head {
 	    return it ;
 	} ;
 	void dtor() noex ;
-	~keyvals() {
+	destruct keyvals() {
 	    dtor() ;
 	} ;
 } ; /* end struct (keyvals) */

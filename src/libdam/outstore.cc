@@ -43,6 +43,7 @@
 
 #include	"outstore.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -83,6 +84,7 @@ int outstore_start(outstore *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = memclear(hop) ;
+	    op->fl.open = true ;
 	}
 	return rs ;
 }
@@ -101,6 +103,7 @@ int outstore_finish(outstore *op) noex {
 	    }
 	    op->sbuf[0] = '\0' ;
 	    op->len = 0 ;
+	    op->fl.open = false ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -137,34 +140,34 @@ int outstore_strw(outstore *op,cchar *sp,int sl) noex {
 	    if (op->dbuf) {
 	        rlen = (op->dlen-op->len) ;
 	        if (sl > rlen) {
-		    cint	dlen = (op->dlen+sl+slen) ;
+		    cint	dlen = (op->dlen + sl + slen) ;
 		    char	*dp{} ;
-		    if ((rs = uc_realloc(op->dbuf,(dlen+1),&dp)) >= 0) {
-		        char	*rp = (dp+op->len) ;
+		    if ((rs = uc_realloc(op->dbuf,(dlen + 1),&dp)) >= 0) {
+		        char	*rp = (dp + op->len) ;
 		        op->dbuf = dp ;
 		        op->dlen = dlen ;
-		        rs = (strwcpy(rp,sp,sl) - rp) ;
+		        rs = intconv(strwcpy(rp,sp,sl) - rp) ;
 		        op->len += rs ;
 		    }
 	        } else {
-		    char	*rp = (op->dbuf+op->len) ;
-		    rs = (strwcpy(rp,sp,sl) - rp) ;
+		    char	*rp = (op->dbuf + op->len) ;
+		    rs = intconv(strwcpy(rp,sp,sl) - rp) ;
 		    op->len += rs ;
 	        }
 	    } else {
-	        rlen = (slen-op->len) ;
+	        rlen = (slen - op->len) ;
 	        if (sl > rlen) {
-		    cint	dlen = max((sl+slen),(2*slen)) ;
-		    if (char *dp{} ; (rs = uc_malloc((dlen+1),&dp)) >= 0) {
+		    cint	dlen = max((sl + slen),(2 * slen)) ;
+		    if (char *dp{} ; (rs = uc_malloc((dlen + 1),&dp)) >= 0) {
 		        op->dlen = dlen ;
 		        op->dbuf = dp ;
 		        dp = strwcpy(dp,op->sbuf,op->len) ;
-		        rs = (strwcpy(dp,sp,sl) - dp) ;
+		        rs = intconv(strwcpy(dp,sp,sl) - dp) ;
 		        op->len += rs ;
 		    } /* end if (memory-allocation) */
 	        } else {
-		    char	*rp = (op->sbuf+op->len) ;
-		    rs = (strwcpy(rp,sp,sl) - rp) ;
+		    char	*rp = (op->sbuf + op->len) ;
+		    rs = intconv(strwcpy(rp,sp,sl) - rp) ;
 		    op->len += rs ;
 	        }
 	    } /* end if (current mode) */
@@ -172,5 +175,51 @@ int outstore_strw(outstore *op,cchar *sp,int sl) noex {
 	return rs ;
 }
 /* end subroutine (outstore_strw) */
+
+int outstore::get(cchar **app) noex {
+	return outstore_get(this,app) ;
+}
+
+int outstore::strw(cchar *sp,int sl) noex {
+	return outstore_strw(this,sp,sl) ;
+}
+
+int outstore::str(cchar *sp,int sl) noex {
+	return outstore_strw(this,sp,sl) ;
+}
+
+void outstore::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("outstore",rs,"fini-finish") ;
+	}
+}
+
+outstore::operator int () noex {
+    	int		rs = SR_NOTOPEN ;
+	if (fl.open) {
+	    rs = len ;
+	}
+	return rs ;
+}
+
+outstore_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case outstoremem_start:
+	        rs = outstore_start(op) ;
+	        break ;
+	    case outstoremem_clear:
+	        rs = outstore_clear(op) ;
+	        break ;
+	    case outstoremem_finish:
+	        rs = outstore_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (outstore_co::operator) */
+
 
 
