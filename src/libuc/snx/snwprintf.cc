@@ -1,5 +1,5 @@
 /* snwprintf SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform a c-string creation function similar to |snprintf(3c)| */
@@ -26,7 +26,7 @@
 
 	Synopsis:
 	int snwprintf(char *rbuf,int rlen,cchar *fmt,...) noex
-	int vsnwprint(char *rbuf,int rlen,cchar *fmt,va_list *ap) noex
+	int snwvprintf(char *rbuf,int rlen,cchar *fmt,va_list *ap) noex
 
 	Arguments:
 	rbuf		c-string buffer pointer
@@ -38,6 +38,25 @@
 	>=0		length of written c-string to result buffer
 	<0		error (system-return)
 
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -45,7 +64,11 @@
 #include	<cstdarg>
 #include	<cstdio>
 #include	<algorithm>		/* |min(3c++)| + |mac(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"snx.h"
@@ -91,7 +114,8 @@ int snwvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 	if (rbuf && fmt && ap) {
 	    rs = SR_INVALID ;
 	    if ((rlen >= 0) && fmt[0]) {
-		if ((rs = vsnprintf(rbuf,(rlen+1),fmt,ap)) >= 0) {
+		csize	rsize = size_t(rlen) ;
+		if ((rs = vsnprintf(rbuf,(rsize+1),fmt,ap)) >= 0) {
 		    len = min(rs,rlen) ;
 		} else {
 		    rs = SR_BADFMT ;

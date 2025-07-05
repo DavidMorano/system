@@ -1,5 +1,5 @@
 /* sntmtime SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string of time-component values */
@@ -21,7 +21,7 @@
 	sntmtime
 
 	Description:
-	Ths subroutine is similar to |sncpy1(3dam)| but it takes a
+	Ths subroutine is similar to |sncpy1(3uc)| but it takes a
 	broken-out time-specification (a la object TMTIME) and
 	creates the corresponding string in the destination buffer.
 	A format specifiction is supplied to determine what the
@@ -88,6 +88,25 @@
 
 	All other TMTIME-object values must be within (and assumed
 	to be within) proper range.
+
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
 
 *******************************************************************************/
 
