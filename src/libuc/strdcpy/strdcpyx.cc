@@ -1,5 +1,5 @@
 /* strdcpyx SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* concatenate strings */
@@ -69,7 +69,7 @@
 /* external variables */
 
 
-/* local strutures */
+/* local structures */
 
 
 /* forward references */
