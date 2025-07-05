@@ -1,5 +1,5 @@
 /* tabexpand SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* expand TAB characters to the appropriate number of spaces */
@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-08-10 David A.D. Morano
+	= 1998-08-10 David A-D- Morano
 	This was written from scratch.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 

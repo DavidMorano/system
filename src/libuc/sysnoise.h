@@ -1,5 +1,5 @@
 /* sysnoise HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* retrieve some system noise (pswudo-random data) */
