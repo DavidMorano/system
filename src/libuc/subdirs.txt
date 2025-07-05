@@ -1,13 +1,17 @@
 buffer
+caches
 cfx
 chrono
 ctx
 dial
 dirseen
+ema
 envs
 envx
 field
 filer
+fmtstr
+fsdir
 getutmp
 getx
 getxname
@@ -15,6 +19,7 @@ getxx
 hash
 hdb
 hdbstr
+inetaddrx
 isfiledesc
 ismisc
 isx
@@ -24,6 +29,7 @@ mkfile
 mklogid
 mktmp
 mkx
+nleadx
 open
 path
 pow
@@ -65,3 +71,4 @@ wsfx
 wsix
 wsnx
 wswcpyx
+permx
