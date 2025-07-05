@@ -1,5 +1,5 @@
 /* strstore SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string storeage-table object */
@@ -38,7 +38,7 @@
 
 	Returns:
 	>=0		the total length of the filled up strstore so far!
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 

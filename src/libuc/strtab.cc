@@ -1,5 +1,5 @@
 /* strtab SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string table object */
@@ -9,67 +9,68 @@
 /* revision history:
 
 	= 1998-03-24, David A­D­ Morano
-	This object module was morphed from some previous one. I
+	This object module was morphed from some previous one.  I
 	do not remember what the previous one was.
 
 	= 2023-11-07, David A-D- Morano
-	:-) It is now years later. Yes, I have to laugh at how long
-	it has been. Let me calculate ... (2023-1998) ... OK, not
-	that bad, only 25 years ago! :-) 1998 seemed like yesterday!
-	In fact the 20 years prior to 1998 seemed like yesterday!
-	I do not really know why I am laughing right now.  Some of
-	this surrounding code dates from the early 1980s. I crack
-	up a little bit realizing just how long some code pieces
-	can last -- and stay somewhat relevant.  I remember sitting
-	at my desk back in late 1995 or so, and remembering about
-	code that I had written in the 1980s or early 1990s. I
-	remember thinking that any code that I write (at that time)
-	needed to possibly last a long time (and therefore should
-	be carefully coded for longevity).  I thought this because
-	I was reminiscing back then at how long the code that I had
-	written many years before (the prior 13 years or so) had
-	already lasted and was still being used at that time.  This
-	is even more funny now, bcause some of the container objects
-	(and other codes pieces, like a lot of string manipulation
-	stuff) that I still have and use (now) date from the early
-	and mid-1980s.  OK, now to the serious stuff. I came back
-	in here looking to see what it looked like (just in general)
-	and found a preprocessor symbol |STRTAB_ALLOCOBJ|. That
-	symbol controlled which of two allocators this present
-	object (STRTAB) would use to allocate whatever (something
-	to do with its internal guts, maybe the "chunks"). If that
-	symbol was set (to something non-zero) an allocator object
-	named |allocobj| would be used. Otherwise the allocator
-	object |lookaside| would be used.  It was set to '0' so
-	that the |lookaside| object was being used. I do remember
-	(vaguely) writing that |allocobj| object (yes, a long time
-	ago). But on to the funny (weird) part: I can no longer
-	find that old |allocobj| object ANYWHERE! :-)  Again, I am
-	not sure why I am laughing.  It does not even appear to be
-	in any of the old archives I have checked (albeit I have
-	not been totally exhausive in searching through them).
-	Somehow through the years, that old object (|allocobj|) has
-	been lost. I can only take a wild guess at what must have
-	(somehow) happened.  I am going to guess that this present
-	object (|strtab|) was the last one to even reference the
-	old |allocobj| object. And since this present |strtab| had
-	the use of that allocation object compile-time compiled
-	OUT, it left open the possibility for the |allocobj| object
-	to somehow get deleted from the code base without it ever
-	becoming apparent (through any possible compilations of
-	various code modules) that a deletion occurred. OK, now to
-	what I actually changed here (after that rather long
-	introduction).  I removed the preprocessor symbol
-	|STRTAB_ALLOCOBJ| along with any references (symbols or
-	otherwise) of the old |allocobj| object. So it is no longer
-	possible to compile with the choice of the two old allocators.
-	Now only the |lookaside| object is used for internal
-	allocations. Whew.  That is it. Postscript: Am I sorry for
-	the loss of the old |allocobj| object.  Yes, of course I
-	am.  I am curious about what was in that old object.  But
-	apparently, at some point it was (or I) deemed the |lookaside|
-	object to be a better (presumably faster) allocator. So
-	maybe I should not mourn the loss of that too excessively.
+	:-) It is now years later.  Yes, I have to laugh at how
+	long it has been.  Let me calculate ... (2023-1998) ... OK,
+	not that bad, only 25 years ago! :-)  The year 1998 seemed
+	like yesterday!  In fact the 20 years prior to 1998 seemed
+	like yesterday!  I do not really know why I am laughing
+	right now.  Some of this surrounding code dates from the
+	early 1980s.  I crack up a little bit realizing just how
+	long some code pieces can last -- and stay somewhat relevant.
+	I remember sitting at my desk back in late 1995 or so, and
+	remembering about code that I had written in the 1980s or
+	early 1990s.  I remember thinking that any code that I write
+	(at that time) needed to possibly last a long time (and
+	therefore should be carefully coded for longevity).  I
+	thought this because I was reminiscing back then at how
+	long the code that I had written many years before (the
+	prior 13 years or so) had already lasted and was still being
+	used at that time.  This is even more funny now, bcause
+	some of the container objects (and other codes pieces, like
+	a lot of string manipulation stuff) that I still have and
+	use (now) date from the early and mid-1980s.  OK, now to
+	the serious stuff.  I came back in here looking to see what
+	it looked like (just in general) and found a preprocessor
+	symbol |STRTAB_ALLOCOBJ|.  That symbol controlled which of
+	two allocators this present object (STRTAB) would use to
+	allocate whatever (something to do with its internal guts,
+	maybe the "chunks").  If that symbol was set (to something
+	non-zero) an allocator object named |allocobj| would be
+	used.  Otherwise the allocator object |lookaside| would be
+	used.  It was set to '0' so that the |lookaside| object was
+	being used.  I do remember (vaguely) writing that |allocobj|
+	object (yes, a long time ago).  But on to the funny (weird)
+	part: I can no longer find that old |allocobj| object
+	ANYWHERE! :-)  Again, I am not sure why I am laughing.  It
+	does not even appear to be in any of the old archives I
+	have checked (albeit I have not been totally exhausive in
+	searching through them).  Somehow through the years, that
+	old object (|allocobj|) has been lost.  I can only take a
+	wild guess at what must have (somehow) happened.  I am going
+	to guess that this present object (|strtab|) was the last
+	one to even reference the old |allocobj| object.  And since
+	this present |strtab| had the use of that allocation object
+	compile-time compiled OUT, it left open the possibility for
+	the |allocobj| object to somehow get deleted from the code
+	base without it ever becoming apparent (through any possible
+	compilations of various code modules) that a deletion
+	occurred.  OK, now to what I actually changed here (after
+	that rather long introduction).  I removed the preprocessor
+	symbol |STRTAB_ALLOCOBJ| along with any references (symbols
+	or otherwise) of the old |allocobj| object.  So it is no
+	longer possible to compile with the choice of the two old
+	allocators.  Now only the |lookaside| object is used for
+	internal allocations.  Whew.  That is it. Postscript: Am I
+	sorry for the loss of the old |allocobj| object.  Yes, of
+	course I am.  I am curious about what was in that old object.
+	But apparently, at some point it was (or I) deemed the
+	|lookaside| object to be a better (presumably faster)
+	allocator.  So maybe I should not mourn the loss of that
+	too excessively.
 
 */
 
@@ -83,7 +84,7 @@
 	Description:
 	This object module creates and manages a string table object.
 	This string table can later be written to a file or otherwise
-	stored some way so that it can be used in-place later. This
+	stored some way so that it can be used in-place later.  This
 	is often useful for cache files or ELF code object files.
 
 	Arguments:
@@ -92,13 +93,12 @@
 
 	Returns:
 	>=0		the total length of the filled up strtab so far!
-	<0		error
+	<0		error (system-return)
 
         Note: 
 	The index table (optionally) generated by this OBJECT using
-	»hash-linking« to track down matches. It does not use
-	»key-linking«.  searching the generated index table must
-	also use
+	»hash-linking« to track down matches.  It does not use
+	»key-linking«.  
 
 *******************************************************************************/
 
@@ -332,7 +332,7 @@ int strtab_add(strtab *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		vi = 0 ;
 	if ((rs = strtab_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    {
 		hdb_dat	key{} ;
 		hdb_dat	val{} ;
@@ -355,7 +355,7 @@ int strtab_addfast(strtab *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		vi = 0 ;
 	if ((rs = strtab_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 		rs = strtab_stuff(op,sp,sl) ;
 		vi = rs ;
 	} /* end if (magic) */
@@ -367,7 +367,7 @@ int strtab_already(strtab *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		vi = 0 ;
 	if ((rs = strtab_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    {
 	        hdb_dat	key{} ;
 	        hdb_dat	val{} ;
@@ -548,7 +548,7 @@ int strtab_indmk(strtab *op,int (*it)[3],int itsize,int nskip) noex {
 			    int		c ;
 			    void	*vp{} ;
 	                    for (int i = 0 ; vg(&ses,i,&vp) >= 0 ; i += 1) {
-	    	        	strentry *sep = static_cast<strentry *>(vp) ;
+	    	        	strentry *sep = cast_static<strentry *>(vp) ;
 	                        khash = sep->khash ;
 	                        si = sep->si ;
 	                        hi = sep->hi ;
