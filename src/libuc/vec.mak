@@ -35,6 +35,8 @@ DEFS=
 
 INCS= vec.h
 
+MODS += 
+
 LIBS=
 
 
@@ -44,7 +46,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -100,7 +101,7 @@ OBJ_VECOBJ+= obja_vecobj.o objb_vecobj.o
 # vecxx
 OBJA_VEC= obj_vecstr.o obj_vecpstr.o obj_vecstrx.o
 OBJB_VEC= vechand.o vecitem.o vecsorthand.o
-OBJC_VEC= vecint.o veclong.o
+OBJC_VEC= vecint.o veclong.o vsetstr.o
 OBJD_VEC= recarr.o raqhand.o obj_vecobj.o
 
 
@@ -262,6 +263,7 @@ vecint.o:		vecint.cc vecint.h
 veclong.o:		veclong.cc veclong.h
 vecitem.o:		vecitem.cc vecitem.h
 vecsorthand.o:		vecsorthand.cc vecsorthand.h
+vsetstr.o:		vsetstr.cc		vsetstr.h	$(INCS)
 
 raqhand.o:		raqhand.cc raqhand.h
 recarr.o:		recarr.cc recarr.h

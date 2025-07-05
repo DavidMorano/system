@@ -331,11 +331,11 @@ int uinfo::getname_load(setname *setp) noex {
                 if ((rs = u_uname(utsp)) >= 0) {
                     cint    nlen = (szof(utsp->sysname) - 1) ;
                     int     sz = 0 ;
-                    sz += (xstrnlen(utsp->sysname,nlen) + 1) ;
-                    sz += (xstrnlen(utsp->nodename,nlen) + 1) ;
-                    sz += (xstrnlen(utsp->release,nlen) + 1) ;
-                    sz += (xstrnlen(utsp->version,nlen) + 1) ;
-                    sz += (xstrnlen(utsp->machine,nlen) + 1) ;
+                    sz += (lenstr(utsp->sysname,nlen) + 1) ;
+                    sz += (lenstr(utsp->nodename,nlen) + 1) ;
+                    sz += (lenstr(utsp->release,nlen) + 1) ;
+                    sz += (lenstr(utsp->version,nlen) + 1) ;
+                    sz += (lenstr(utsp->machine,nlen) + 1) ;
                     if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
                         setp->strp = bp ;
                         setp->tmpname.sysname = bp ;
@@ -423,11 +423,11 @@ int uinfo::getaux_load(setaux *setp) noex {
                     if ((rs = tap->load()) >= 0) {
                         cint    nlen = tap->flen ;
                         int     sz = 0 ;
-                        sz += (xstrnlen(tap->architecture,nlen) + 1) ;
-                        sz += (xstrnlen(tap->platform,nlen) + 1) ;
-                        sz += (xstrnlen(tap->hwprovider,nlen) + 1) ;
-                        sz += (xstrnlen(tap->hwserial,nlen) + 1) ;
-                        sz += (xstrnlen(tap->nisdomain,nlen) + 1) ;
+                        sz += (lenstr(tap->architecture,nlen) + 1) ;
+                        sz += (lenstr(tap->platform,nlen) + 1) ;
+                        sz += (lenstr(tap->hwprovider,nlen) + 1) ;
+                        sz += (lenstr(tap->hwserial,nlen) + 1) ;
+                        sz += (lenstr(tap->nisdomain,nlen) + 1) ;
                         if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
                             cchar   *sp ;
                             setp->strp = bp ;

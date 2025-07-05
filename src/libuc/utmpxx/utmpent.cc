@@ -199,7 +199,7 @@ int utmpent_getsession(utmpent *op) noex {
 int utmpent_getid(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = xstrnlen(op->ut_id,UTMPENT_LID) ;
+	    rs = lenstr(op->ut_id,UTMPENT_LID) ;
 	    if (rpp) *rpp = op->ut_id ;
 	}
 	return rs ;
@@ -209,7 +209,7 @@ int utmpent_getid(utmpent *op,cchar **rpp) noex {
 int utmpent_getline(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = xstrnlen(op->ut_line,UTMPENT_LLINE) ;
+	    rs = lenstr(op->ut_line,UTMPENT_LLINE) ;
 	    if (rpp) *rpp = op->ut_line ;
 	}
 	return rs ;
@@ -219,7 +219,7 @@ int utmpent_getline(utmpent *op,cchar **rpp) noex {
 int utmpent_getuser(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = xstrnlen(op->ut_user,UTMPENT_LUSER) ;
+	    rs = lenstr(op->ut_user,UTMPENT_LUSER) ;
 	    if (rpp) *rpp = op->ut_user ;
 	}
 	return rs ;
@@ -229,7 +229,7 @@ int utmpent_getuser(utmpent *op,cchar **rpp) noex {
 int utmpent_gethost(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = xstrnlen(op->ut_host,UTMPENT_LHOST) ;
+	    rs = lenstr(op->ut_host,UTMPENT_LHOST) ;
 #if	CF_SYSLEN
 	    if (op->ut_syslen > 0) {
 	        if (rs > op->ut_syslen) rs = op->ut_syslen ;

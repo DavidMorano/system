@@ -558,7 +558,7 @@ int uterm_write(uterm *op,cchar *wbuf,int wlen) noex {
 	int		tlen = 0 ;
 	if ((rs = uterm_magic(op)) >= 0) {
 	    if (! op->f.cntl_o) {
-	        if (wlen < 0) wlen = xstrlen(wbuf) ;
+	        if (wlen < 0) wlen = lenstr(wbuf) ;
 	        if (op->mode & fm_rawout) {
 	            rs = u_write(op->fd,wbuf,wlen) ;
 		    tlen = rs ;
@@ -814,7 +814,7 @@ static int uterm_writeproc(uterm *op,cchar *buf,int buflen) noex {
 static int tty_wps(uterm *op,cchar *ubuf,int ulen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ulen < 0) ulen = xstrlen(ubuf) ;
+	if (ulen < 0) ulen = lenstr(ubuf) ;
 	if (ulen > 0) {
 	    if (int ci ; (ci = sinotprint(ubuf,ulen)) >= 0) {
 	        if (buffer pb ; (rs = buffer_start(&pb,ulen)) >= 0) {
@@ -1051,7 +1051,7 @@ static int tty_risr(uterm *op,cchar *sp,int sl) noex {
 
 static int tty_echo(uterm *op,cchar *ebuf,int elen) noex {
 	int		rs = SR_OK ;
-	if (elen < 0) elen = xstrlen(ebuf) ;
+	if (elen < 0) elen = lenstr(ebuf) ;
 	if (elen > 0) {
 	    rs = u_write(op->fd,ebuf,elen) ;
 	}

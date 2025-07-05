@@ -129,13 +129,13 @@ int utmpaccent_size(cutmpaccent *uep) noex {
 	int		sz = 0 ;
 	if (uep) {
 	    if (uep->user) {
-	        sz += (xstrlen(uep->user) + 1) ;
+	        sz += (lenstr(uep->user) + 1) ;
 	    }
 	    if (uep->line) {
-	        sz += (xstrlen(uep->line) + 1) ;
+	        sz += (lenstr(uep->line) + 1) ;
 	    }
 	    if (uep->host) {
-	        sz += (xstrlen(uep->host) + 1) ;
+	        sz += (lenstr(uep->host) + 1) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
