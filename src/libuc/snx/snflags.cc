@@ -1,5 +1,5 @@
 /* snflags SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string version of some flags */
@@ -23,18 +23,39 @@
 	Description:
 	Ths object is used in the creation of flags strings.
 
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>		/* <- for |memclear(3u)| */
+#include	<usystem.h>
 #include	<storebuf.h>
+#include	<ascii.h>
 #include	<localmisc.h>
 
 #include	"snflags.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -83,7 +104,7 @@ int snflags_addstrw(snflags *op,cchar *sp,int sl) noex {
 	    rs = SR_OK ;
 	    if ((sl > 0) || sp[0]) {
 	        if (op->c++ > 0) {
-	            cint	ch_comma = ',' ;
+	            cint	ch_comma = CH_COMMA ;
 	            rs = storebuf_chr(op->bp,op->bl,op->bi,ch_comma) ;
 	            op->bi += rs ;
 		    rl += rs ;

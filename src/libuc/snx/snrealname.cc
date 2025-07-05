@@ -1,5 +1,5 @@
 /* snrealname SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string-copy a real-name (consisting of parts) */
@@ -37,10 +37,29 @@
 	>=0		resulting length
 	<0		error (system-return)
 
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |INT_MAX| */
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
@@ -79,24 +98,27 @@
 
 /* exported subroutines */
 
-int snrealname(char *dbuf,int dlen,cchar **a,int n) noex {
-	int		rs = SR_OK ;
-	int		si = 0 ;
-	int		c = 0 ;
-	if (n < 0) n = INT_MAX ;
-	for (int i = 0 ; (rs >= 0) && (i < n) && a[i] ; i += 1) {
-	    if (a[i][0] != '\0') {
-		if (c++ > 0) {
-		    rs = storebuf_chr(dbuf,dlen,si,'.') ;
-		    si += rs ;
-		}
-		if (rs >= 0) {
-	    	    rs = storebuf_strw(dbuf,dlen,si,a[i],-1) ;
-		    si += rs ;
+int snrealname(char *dbuf,int dlen,mainv a,int n) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (dbuf && a) {
+	    storebuf	sb(dbuf,dlen) ;
+	    int		c = 0 ;
+	    rs = SR_OK ;
+	    if (n < 0) n = INT_MAX ;
+	    for (int i = 0 ; (rs >= 0) && (i < n) && a[i] ; i += 1) {
+	        if (a[i][0] != '\0') {
+		    if (c++ > 0) {
+		        rs = sb.chr('.') ;
+		    }
+		    if (rs >= 0) {
+	    	        rs = sb.strw(a[i]) ;
+	            }
 	        }
-	    }
-	} /* end for */
-	return (rs >= 0) ? si : rs ;
+	    } /* end for */
+	    len = sb.idx ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (snrealname) */
 

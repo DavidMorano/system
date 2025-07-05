@@ -1,11 +1,11 @@
 /* sninetaddr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string version of INET addresses */
 /* version %I% last-modified %G% */
 
-#define	CF_CTHEXUC	1		/* use |cthexuc(3dam)| */
+#define	CF_CTHEXUC	1		/* use |cthexuc(3uc)| */
 
 /* revision history:
 
@@ -38,20 +38,39 @@
 	>=0		number of bytes in result
 	<0		error (system-return)
 
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<netinet/in.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<algorithm>		/* |min(3c++)|+ |max(3c++)| */
 #include	<usystem.h>
 #include	<inetaddr.h>
 #include	<sncpyx.h>
 #include	<strdcpyx.h>
 #include	<cthex.h>
 #include	<mkchar.h>
-#include	<localmisc.h>		/* |MIN| + |DIGBUFLEN| */
+#include	<localmisc.h>		/* |MAX| + |HEXBUFLEN| */
 
 #include	"snx.h"
 
@@ -111,7 +130,7 @@ static int sninet6(char *,int,cchar *) noex ;
 
 /* local variables */
 
-constexpr int		diglen = DIGBUFLEN ;
+constexpr int		diglen = HEXBUFLEN ;
 
 constexpr bool		f_cthexuc = CF_CTHEXUC ;
 
@@ -149,9 +168,9 @@ int sninetaddr(char *dbuf,int dlen,int af,cchar *addr) noex {
 static int snunix(char *dbuf,int dlen,cchar *addr) noex {
 	int		rs ;
 	if_constexpr (f_cthexuc) {
-	    rs = intconv(strdcpy1(dbuf,dlen,addr) - dbuf) ;
+	    rs = intconv(strdcpy(dbuf,dlen,addr) - dbuf) ;
 	} else {
-	    rs = sncpy1(dbuf,dlen,addr) ;
+	    rs = sncpy(dbuf,dlen,addr) ;
 	}
 	return rs ;
 }

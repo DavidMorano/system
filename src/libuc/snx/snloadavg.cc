@@ -1,6 +1,6 @@
 /* snloadavg SUPPORT */
-/* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* make string version of a load-average */
 /* version %I% last-modified %G% */
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	snloadacg
+	snloadavg
 
 	Description:
 	Ths subroutine creates a string that represents a load-average
@@ -27,11 +27,11 @@
 	fractional part.
 
 	Synopsis:
-	int snloadavg(char *dbuf,int dlen,uint *la,int w,int p,int fill) noex
+	int snloadavg(char *rbuf,int rlen,uint *la,int w,int p,int fill) noex
 	
 	Arguments:
-	dbuf		destination string buffer
-	dlen		destination string buffer length
+	rbuf		destination string buffer
+	rlen		destination string buffer length
 	la		load-average (32-bit unsigned fixed-point)
 	w		width
 	p		precision
@@ -41,13 +41,31 @@
 	>=0		number of bytes in result
 	<0		error (system-return)
 
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>		/* |FSCALE| + |FSHIFT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<ctdec.h>
@@ -58,8 +76,6 @@
 
 /* local defines */
 
-#define	PARTS		struct parts
-
 
 /* external subroutines */
 
@@ -69,16 +85,17 @@
 
 /* local structures */
 
-struct parts {
-	uint	parti ;
-	uint	partf ;
-} ;
+namespace {
+    struct parts {
+	uint		parti ;
+	uint		partf ;
+	int load(uint) noex ;
+	int round(int) noex ;
+    } ; /* end struct (parts) */
+}
 
 
 /* forward references */
-
-static int	parts_load(PARTS *,uint) noex ;
-static int	parts_round(PARTS *,int) noex ;
 
 
 /* local variables */
@@ -89,11 +106,12 @@ static int	parts_round(PARTS *,int) noex ;
 
 /* exported subroutines */
 
-int snloadavg(char *dbuf,int dlen,uint la,int w,int p,int fill) noex {
+int snloadavg(char *rbuf,int rlen,uint la,int w,int p,int fill) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
-	if (dbuf) {
-	    PARTS	partla, *pp = &partla ;
+	int		len = 0 ; /* return-value */
+	if (rbuf) {
+	    storebuf	buf(rbuf,rlen) ;
+	    parts	pa ;
 	    cint	diglen = DIGBUFLEN ;
 	    int		zfprec ;
 	    int		dl ;
@@ -102,11 +120,11 @@ int snloadavg(char *dbuf,int dlen,uint la,int w,int p,int fill) noex {
 	    char	digbuf[DIGBUFLEN+1] ;
 	    rs = SR_OK ;
 	    if (p > 3) p = 3 ;
-/* calculate parts */
-	    parts_load(pp,la) ;
-/* round out the value according to the specified precision */
-	    parts_round(pp,p) ;
-/* calculate some parameters */
+	    /* calculate parts */
+	    pa.load(la) ;
+	    /* round out the value according to the specified precision */
+	    pa.round(p) ;
+	    /* calculate some parameters */
 	    if (w >= 0) {
 	        if (p > 0) {
 	            prec = (w - 1 - p) ;
@@ -115,73 +133,70 @@ int snloadavg(char *dbuf,int dlen,uint la,int w,int p,int fill) noex {
 	        }
 	        if (prec < 0) prec = 0 ;
 	    } /* end if */
-/* put the resulting string together */
+	    /* put the resulting string together */
 	    zfprec = (fill == 0) ? prec : 0 ;
 	    dp = digbuf ;
-	    if ((rs = ctdecpui(digbuf,diglen,zfprec,pp->parti)) >= 0) {
+	    if ((rs = ctdecpui(digbuf,diglen,zfprec,pa.parti)) >= 0) {
 	        dl = rs ;
 	        if ((prec >= 0) && (prec < dl)) {
 	            dp += (dl-prec) ;
 	            dl = prec ;
 	        }
-	        rs = storebuf_strw(dbuf,dlen,i,dp,dl) ;
-	        i += rs ;
+	        rs = buf.strw(dp,dl) ;
 	    } /* end if (ctdec) */
 	    if ((rs >= 0) && (p >= 0)) {
-	        if ((rs = storebuf_chr(dbuf,dlen,i,'.')) >= 0) {
-	            i += rs ;
+	        if ((rs = buf.chr('.')) >= 0) {
 	            if (p > 0) {
-	                if ((rs = ctdecpui(digbuf,diglen,p,pp->partf)) >= 0) {
+	                if ((rs = ctdecpui(digbuf,diglen,p,pa.partf)) >= 0) {
 	                    dl = rs ;
 	                    if (dl > p) dl = p ;
-	                    rs = storebuf_strw(dbuf,dlen,i,digbuf,dl) ;
-	                    i += rs ;
+	                    rs = buf.strw(digbuf,dl) ;
 	                } /* end if (ctdec) */
 		    } /* end if (p positive) */
 	        } /* end if (storebuf_chr) */
 	    } /* end if */
+	    len = buf.idx ;
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (snloadavg) */
 
 
 /* local subroutines */
 
-static int parts_load(PARTS *pp,uint la) noex {
-	uint		partf = (la & (FSCALE-1)) ;
+int parts::load(uint la) noex {
+	partf = (la & (FSCALE - 1)) ;
 	partf = (partf * 1000) ;
 	partf = (partf / FSCALE) ;
-	pp->parti = (la >> FSHIFT) ;
-	pp->partf = partf ;
+	parti = (la >> FSHIFT) ;
 	return 0 ;
 }
-/* end subroutine (parts_load) */
+/* end method (parts::load) */
 
-static int parts_round(PARTS *pp,int prec) noex {
+int parts::round(int prec) noex {
 	int		r ;
 	switch (prec) {
 	case 3: /* no change needed */
 	    break ;
 	case 2:
-	    r = (pp->partf % 10) ;
-	    if (r >= 5) pp->partf += (10-r) ;
+	    r = (partf % 10) ;
+	    if (r >= 5) partf += (10 - r) ;
 	    break ;
 	case 1:
-	    r = (pp->partf % 100) ;
-	    if (r >= 50) pp->partf += (100-r) ;
+	    r = (partf % 100) ;
+	    if (r >= 50) partf += (100 - r) ;
 	    break ;
 	case 0:
-	    r = pp->partf ;
-	    if (r >= 500) pp->partf += (1000-r) ;
+	    r = partf ;
+	    if (r >= 500) partf += (1000 - r) ;
 	    break ;
 	} /* end switch */
-	if (pp->partf >= 1000) {
-	    pp->partf = (pp->partf % 1000) ;
-	    pp->parti += 1 ;
+	if (partf >= 1000) {
+	    partf = (partf % 1000) ;
+	    parti += 1 ;
 	}
 	return 0 ;
 }
-/* end subroutine (parts_round) */
+/* end method (parts::round) */
 
 

@@ -1,5 +1,5 @@
 /* snpollflags SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string version of the poll-event flags */
@@ -36,6 +36,25 @@
 	>=0		number of bytes in result
 	<0		error (system-return)
 
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -45,7 +64,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<storebuf.h>
 #include	<localmisc.h>
 
 #include	"snflags.h"
@@ -111,13 +129,13 @@ int snpollflags(char *dbuf,int dlen,int flags) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dbuf) {
-	    if (snflags ss ; (rs = snflags_start(&ss,dbuf,dlen)) >= 0) {
+	    if (snflags ss ; (rs = ss.start(dbuf,dlen)) >= 0) {
 	        for (int i = 0 ; (rs >= 0) && fs_poll[i].f ; i += 1) {
 	            if (flags & fs_poll[i].f) {
-	                rs = snflags_addstr(&ss,fs_poll[i].s) ;
+	                rs = ss.addstr(fs_poll[i].s) ;
 		    }
 	        } /* end for */
-	        rs1 = snflags_finish(&ss) ;
+	        rs1 = ss.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (snflags) */
 	} /* end if (non-null) */

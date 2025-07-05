@@ -1,5 +1,5 @@
 /* snopenflags SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string version of the open-call flags */
@@ -36,6 +36,25 @@
 	>=0		number of bytes in result
 	<0		error (system-return)
 
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -51,8 +70,6 @@
 
 /* local defines */
 
-#define	FLAGSTRS	struct flagstrs
-
 
 /* external subroutines */
 
@@ -63,7 +80,7 @@
 /* local structures */
 
 struct flagstrs {
-	int		f ;
+	int		fl ;
 	cchar		*s ;
 } ;
 
@@ -126,8 +143,7 @@ int snopenflags(char *dbuf,int dlen,int flags) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dbuf) {
-	    snflags	ss ;
-	    if ((rs = snflags_start(&ss,dbuf,dlen)) >= 0) {
+	    if (snflags	ss ; (rs = ss.start(dbuf,dlen)) >= 0) {
 	        cint	am = (flags & O_ACCMODE) ;
 	        cchar	*ms = nullptr ;
 	        switch (am) {
@@ -145,14 +161,14 @@ int snopenflags(char *dbuf,int dlen,int flags) noex {
 		    break ;
 	        } /* end switch */
 	        if (ms) {
-		    rs = snflags_addstr(&ss,ms) ;
+		    rs = ss.addstr(ms) ;
 	        }
-	        for (int i = 0 ; (rs >= 0) && fs_open[i].f ; i += 1) {
-	            if (flags & fs_open[i].f) {
-	                rs = snflags_addstr(&ss,fs_open[i].s) ;
+	        for (int i = 0 ; (rs >= 0) && fs_open[i].fl ; i += 1) {
+	            if (flags & fs_open[i].fl) {
+	                rs = ss.addstr(fs_open[i].s) ;
 		    }
 	        } /* end for */
-	        rs1 = snflags_finish(&ss) ;
+	        rs1 = ss.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (snflags) */
 	} /* end if (non-null) */
