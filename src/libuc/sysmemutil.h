@@ -1,5 +1,5 @@
 /* sysmemutil HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* retrieve the utilization (in a percentage of total) of system memory */
