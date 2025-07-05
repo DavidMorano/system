@@ -35,6 +35,8 @@ DEFS=
 
 INCS= strn.h
 
+MODS +=
+
 LIBS=
 
 
@@ -44,7 +46,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,7 +58,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 OBJ0_STRN= strncpyxc.o strnwcpyxc.o 
 OBJ1_STRN= strnnlen.o
-OBJ2_STRN= strnxchr.o strnxpbrk.o strnxsub.o
+OBJ2_STRN= strnxchr.o strnxbrk.o strnxsub.o strnwht.o
 OBJ3_STRN= strnset.o 
 
 OBJA_STRN= obj0_strn.o obj1_strn.o
@@ -66,7 +67,7 @@ OBJB_STRN= obj2_strn.o obj3_strn.o
 OBJ_STRN= $(OBJA_STRN) $(OBJB_STRN)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -92,17 +93,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_STRN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_STRN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_STRN)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -115,25 +114,34 @@ control:
 
 
 obj0_strn.o:	$(OBJ0_STRN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_STRN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_STRN)
 
 obj1_strn.o:	$(OBJ1_STRN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_STRN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_STRN)
 
 obj2_strn.o:	$(OBJ2_STRN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_STRN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_STRN)
 
 obj3_strn.o:	$(OBJ3_STRN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_STRN)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_STRN)
 
 
 strnxsub.o:		strnxsub.cc	strnxsub.h	$(INCS)
 strnxchr.o:		strnxchr.cc	strnxchr.h	$(INCS)
-strnxpbrk.o:		strnxpbrk.cc	strnxpbrk.h	$(INCS)
+strnxbrk.o:		strnxbrk.cc	strnxbrk.h	$(INCS)
 
 strnnlen.o:		strnnlen.cc			$(INCS)
 strnset.o:		strnset.cc			$(INCS)
 strncpyxc.o:		strncpyxc.cc	strncpyxc.h	$(INCS)
 strnwcpyxc.o:		strnwcpyxc.cc	strnwcpyxc.h	$(INCS)
+
+# STRNWHY
+strnwht.o:		strnwht0.o strnwht1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+strnwht0.o:		strnwht.ccm
+strnwht1.o:		strnwht1.cc strnwht.ccm		$(INCS)
+	makemodule strnwht
+	$(COMPILE.cc) $<
 
 
