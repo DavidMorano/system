@@ -1,5 +1,5 @@
 /* strenv HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* provide a pointer to a library string-value */
@@ -35,8 +35,11 @@
 #ifdef	__cplusplus /* everything is C++ only */
 
 
-#include	<envstandards.h>	/* first to configure */
-#include	<usystem.h>
+#include	<envstandards.h>	/* must be ordered fist to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 enum strenvs {
@@ -61,7 +64,7 @@ enum strenvs {
 	strenv_orgloc,
 	strenv_orgcode,
 	strenv_overlast
-} ;
+} ; /* end enum (strenvs) */
 
 class strenv {
 	cchar		*strp = nullptr ;

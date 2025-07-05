@@ -1,5 +1,5 @@
 /* strenv SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* this object provides a pointer to a library string-value */
@@ -33,22 +33,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdlib>		/* for |getenv(3c)| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<timewatch.hh>
 #include	<bufsizevar.hh>
-#include	<getbufsize.h>
 #include	<ptm.h>
 #include	<mallocxx.h>
 #include	<mallocstuff.h>
 #include	<mkpathx.h>
 #include	<sncpyx.h>
+#include	<varnames.hh>		/* |varname(3u)| */
 #include	<localmisc.h>
 
 #include	"strenv.hh"
 
-
-import uvariables ;
+import uconstants ;
 
 /* local defines */
 
@@ -72,7 +73,7 @@ extern "C" {
 /* external variables */
 
 
-/* local strutures */
+/* local structures */
 
 namespace {
     struct strvarenv {
@@ -100,6 +101,7 @@ namespace {
 	} ;
     } ; /* end struct (valstore_co) */
     struct valstore {
+	friend		valstore_co ;
 	cchar		*strp[strenv_overlast] ;
 	char		*ma[strenv_overlast] ;	/* memory-allocation */
 	bool		facc[strenv_overlast] ;
@@ -117,18 +119,6 @@ namespace {
 	    monbegin(this,valstoremem_monbegin) ;
 	    monend(this,valstoremem_monend) ;
 	} ; /* end ctor */
-	int iinit() noex ;
-	int ifini() noex ;
-	int imonbegin() noex {
-	    int		rs ;
-	    if ((rs = init) >= 0) {
-		rs = mx.lockbegin ;
-	    }
-	    return rs ;
-	} ;
-	int imonend() noex {
-	    return mx.lockend ;
-	} ;
 	int valget(int,cchar **) noex ;
 	int valtmpdir(int) noex ;
 	int valmaildir(int) noex ;
@@ -141,11 +131,24 @@ namespace {
 	    mx.lockend() ;
         }
 	void dtor() noex ;
-	~valstore() {
+	destruct valstore() {
 	    dtor() ;
 	} ;
+    private:
+	int iinit() noex ;
+	int ifini() noex ;
+	int imonbegin() noex {
+	    int		rs ;
+	    if ((rs = init) >= 0) {
+		rs = mx.lockbegin ;
+	    }
+	    return rs ;
+	} ;
+	int imonend() noex {
+	    return mx.lockend ;
+	} ;
     } ; /* end struct (valstore) */
-}
+} /* end namespace */
 
 constexpr strvarenv::strvarenv() noex {
 	name[strenv_path] 		= varname.path ;
@@ -168,8 +171,7 @@ constexpr strvarenv::strvarenv() noex {
 	name[strenv_organization]	= varname.organization ;
 	name[strenv_orgloc] 		= varname.orgloc ;
 	name[strenv_orgcode] 		= varname.orgcode ;
-}
-/* end method (strvarenv::ctor) */
+} /* end method (strvarenv::ctor) */
 
 
 /* forward references */
@@ -327,7 +329,7 @@ int valstore::valget(int aw,cchar **rpp) noex {
 int valstore::valtmpdir(int aw) noex {
 	int		rs = SR_OK ;
 	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
-	    cchar *rp ; 
+	    cchar	*rp ;
 	    if ((rp = getenv(vn)) == nullptr) {
 		rp = sysword.w_tmpdir ;
 	    } /* end if (env-variable access) */
@@ -341,7 +343,7 @@ int valstore::valtmpdir(int aw) noex {
 int valstore::valmaildir(int aw) noex {
 	int		rs = SR_OK ;
 	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
-	    cchar *rp ; 
+	    cchar	*rp ;
 	    if ((rp = getenv(vn)) == nullptr) {
 		rp = sysword.w_maildir ;
 	    } /* end if (env-variable access) */
@@ -360,14 +362,14 @@ int valstore::valpath(int aw) noex {
 	    if ((rp = getenv(vn)) == nullptr) {
 		if ((rs = maxpathlen) >= 0) {
 		    cint	tlen = (rs * PLMULT) ;
-		    if (char *tbuf{} ; (rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
+		    if (char *tbuf ; (rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		        cchar	*usrlocal = sysword.w_usrlocaldir ;
 		        if ((rs = mkpath(tbuf,usrlocal,"bin")) >= 0) {
 			    int		tl = rs ;
 			    if ((rs = sncpy((tbuf+tl),(tlen-tl),":")) >= 0) {
 		                cint	cmd = _CS_PATH ;
-			        cint	clen = (tlen - (tl+rs)) ;
-			        char	*cbuf = (tbuf + (tl+rs)) ;
+			        cint	clen = (tlen - (tl + rs)) ;
+			        char	*cbuf = (tbuf + (tl + rs)) ;
 			        tl += rs ;
 		                if ((rs = uc_sysconfstr(cbuf,clen,cmd)) >= 0) {
 			            tl += rs ;
@@ -398,8 +400,7 @@ int valstore::valenv(int aw) noex {
 /* end method (valstore::valenv) */
 
 void valstore::dtor() noex {
-	cint		rs = fini() ;
-	if (rs < 0) {
+	if (cint rs = fini() ; rs < 0) {
 	    ulogerror("strenv",rs,"dtor-fini") ;
 	}
 }

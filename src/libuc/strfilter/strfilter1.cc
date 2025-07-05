@@ -160,7 +160,7 @@ int strfilter::add(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = SR_INVALID ;
 	    if (sl > 0) {
     	        rs = SR_NOTOPEN ;
@@ -187,7 +187,7 @@ int strfilter::add(cchar *sp,int sl) noex {
 int strfilter::have(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
 	if (sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = SR_INVALID ;
 	    if (sl > 0) {
 	        rs = ihave(sp,sl) ;
@@ -224,7 +224,7 @@ int strfilter::iready() noex {
 
 int strfilter::iaddone(cchar *cp,int cl) noex {
     	int		rs ;
-	if (cl < 0) cl = xstrlen(cp) ;
+	if (cl < 0) cl = lenstr(cp) ;
 	if ((rs = ihave(cp,cl)) == 0) {
 	    if ((rs = inschrs(cp,cl)) >= 0) {
 		rs = vecstr::add(cp,cl) ;

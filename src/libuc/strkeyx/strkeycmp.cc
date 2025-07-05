@@ -1,4 +1,5 @@
 /* strkeycmp SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* string key comparison */
