@@ -89,7 +89,7 @@ char *strobrk(cchar *s,cchar *ss) noex {
 } /* end subroutine (strobrk) */
 
 char *strrbrk(cchar *s,cchar *ss) noex {
-	cint		n = cstrlen(s) ;
+	cint		n = lenstr(s) ;
 	bool		f = false ;
 	char		*rsp ;
 	rsp = charp(s + n) ;

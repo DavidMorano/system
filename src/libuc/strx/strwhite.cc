@@ -1,10 +1,11 @@
 /* strwhite SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the next white space character in a string */
 /* version %I% last-modified %G% */
 
+#define	CF_STRBRK	0		/* use |strbrk(3c)| */
 
 /* revision history:
 
@@ -23,10 +24,9 @@
 	Description:
 	This subroutine will scan a string and return the first
 	white-space-like character found.  This subroutine is really
-	just a short cut for something like:
+	just a short-cut for something like:
 
-		char *strpbrk(s," \v\t\r\n")
-		const char	s[] ;
+		char *strpbrk(cchar *s," \t\v\f\r\n")
 
 	Synopsis:
 	char *strwhite(cchar *s) noex
@@ -48,13 +48,18 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<char.h>
+#include	<char.h>		/* |char_iswhite(3uc)| */
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"strx.h"
 
 
 /* local defines */
+
+#ifndef	CF_STRBRK
+#define	CF_STRBRK	0		/* use |strbrk(3c)| */
+#endif
 
 
 /* external subroutines */
@@ -71,6 +76,8 @@
 
 /* local variables */
 
+cbool		f_strbrk = CF_STRBRK ;
+
 
 /* exported variables */
 
@@ -78,7 +85,18 @@
 /* exported subroutines */
 
 char *strwhite(cchar *s) noex {
-	return strpbrk(s," \t\r\n\v") ;
+    	char		*rsp = nullptr ;
+	if (s) {
+	    if_constexpr (f_strbrk) {
+		rsp = strpbrk(s," \t\v\f\r\n") ;
+	    } else {
+	        for (int ch ; ((ch = mkchar(*s))) ; s += 1) {
+		    if (char_iswhite(ch) || (ch == 'n')) break ;
+	        }
+	    } /* end if_constexpr (f_strbrk) */
+	    rsp = charp(s) ;
+	} /* end if (non-null) */
+	return rsp ;
 }
 /* end subroutine (strwhite) */
 
