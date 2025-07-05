@@ -1,5 +1,5 @@
 /* strmgr HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* string manager */
@@ -71,8 +71,8 @@ struct strmgr : strmgr_head {
 	int str(cchar *,int = -1) noex ;
 	int chr(int) noex ;
 	void dtor() noex ;
-	~strmgr() {
-	    dtor() ;
+	destruct strmgr() {
+	    if (dp) dtor() ;
 	} ;
 } ; /* end struct (strmgr) */
 #else	/* __cplusplus */

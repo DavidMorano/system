@@ -1,5 +1,5 @@
 /* strlocktype HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* provide c-string for a given UNIX® file-lock type */
