@@ -1,5 +1,5 @@
 /* sigaction SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutines to manipulate SIGACTION values */
@@ -34,6 +34,7 @@
 
 #include	"sigaction.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -85,7 +86,7 @@ int sigaction_load(SIGACTION *sap,sigset_t *ssp,int fl,siginfohand_f h) noex {
 	    rs = memclear(sap) ;
 	    sap->sa_mask = *ssp ;
 	    sap->sa_flags = fl ;
-	    sap->sa_handler = cast_reinterpret<sig_t>(voidp(h)) ;
+	    sap->sa_handler = cast_reinterpret<sig_f>(voidp(h)) ;
 	} /* end if (non-null) */
 	return rs ;
 }
