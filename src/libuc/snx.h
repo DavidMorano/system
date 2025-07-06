@@ -1,5 +1,5 @@
 /* snx HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* counted c-string operations */
@@ -34,7 +34,6 @@
 #include	<sncpyxc.h>		/* repeat? */
 #include	<sncpyxw.h>		/* repeat? */
 #include	<snxxx.h>
-#include	<snuuid.h>
 #include	<snadd.h>
 #include	<sntmtime.h>
 #include	<snflags.h>
@@ -55,11 +54,11 @@ extern int snshellunder(char *,int,pid_t,cchar *) noex ;
 extern int snfilemode(char *,int,mode_t) noex ;
 extern int sntid(char *,int,pthread_t) noex ;
 extern int snerrabbr(char *,int,int) noex ;
-extern int snwvprintf(char *,int,cchar *,va_list) noex ;
-extern int snwprintf(char *,int,cchar *,...) noex ;
-extern int snrealname(char *,int,cchar **,int) noex ;
+extern int snrealname(char *,int,mainv,int) noex ;
 extern int snloadavg(char *,int,uint,int,int,int) noex ;
 extern int snkeyval(char *,int,cchar *,int,cchar *,int) noex ;
+extern int snwvprintf(char *,int,cchar *,va_list) noex ;
+extern int snwprintf(char *,int,cchar *,...) noex ;
 
 static inline int snkeval(char *dp,int dl,cchar *k,cchar *vp,int vl) noex {
     	return snkeyval(dp,dl,k,-1,vp,vl) ;

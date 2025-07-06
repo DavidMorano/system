@@ -1,5 +1,5 @@
 /* snwcpywidehdr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* counted-string copy while compacting white-space from the source */
@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-01-10 David A.D. Morano
+	= 1998-01-10 David A-D- Morano
 	This was written from scratch.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -21,7 +21,7 @@
 	snwcpywidehdr
 
 	Description:
-	Similar to |snwcpycompact(3dam)| except that the source
+	Similar to |snwcpycompact(3uc)| except that the source
 	consists of wide-characters. This is meant to be used on
 	wide-character strongs taken from mail-msg header values
 	(consisting of string data).
@@ -36,33 +36,39 @@
 	sl		source string length
 
 	Returns:
-	<0		error
 	>=0		resulting string length
+	<0		error (system-return)
 
 	Implemetation note:
-	We could have used either |sbuf(3dam)| or |storebuf(3dam)|
+	We could have used either |sbuf(3uc)| or |storebuf(3uc)|
 	or what a few other subroutines of this ilk have done. But
 	this subroutine was written at a time before resort to those
 	interfaces was automatic.  It is a little messy, but it
 	works just fine as it is!
 
 	See-also:
-	snwcpy(3dam),
-	snwcpylatin(3dam), 
-	snwcpyopaque(3dam), 
-	snwcpywidehdr(3dam), 
-	snwcpyclean(3dam), 
-	snwcpyhyphen(3dam), 
+	snwcpy(3uc),
+	snwcpylatin(3uc), 
+	snwcpyopaque(3uc), 
+	snwcpywidehdr(3uc), 
+	snwcpyclean(3uc), 
+	snwcpyhyphen(3uc), 
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* presumably for |wchar_t| type */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<ascii.h>
 #include	<strmgr.h>
+#include	<straltwchar.h>
 #include	<ischarx.h>
+#include	<localmisc.h>
 
 #include	"snwcpyx.h"
 
@@ -75,7 +81,6 @@
 extern "C" {
     extern int		wsfnext(cwchar *,int,cwchar **) noex ;
     extern int		wsnlen(cwchar *,int) noex ;
-    extern cchar	*straltwchar(uint) noex ;
 }
 
 
@@ -97,35 +102,35 @@ extern "C" {
 /* exported subroutines */
 
 int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int wsl) noex {
-	strmgr		m ;
 	int		rs ;
 	int		rs1 ;
 	int		dl = 0 ;
 	if (dlen < 0) dlen = INT_MAX ;
 	if (wsl < 0) wsl = wsnlen(wsp,-1) ;
-	if ((rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
+	if (strmgr m ; (rs = m.start(dbuf,dlen)) >= 0) {
 	    int		wl ;
 	    cwchar	*wp ;
 	    while ((wl = wsfnext(wsp,wsl,&wp)) > 0) {
 	        if (dl > 0) {
-	            rs = strmgr_chr(&m,' ') ;
+	            rs = m.chr(' ') ;
 	            if (rs >= 0) dl += 1 ;
 	        }
 	        if (rs >= 0) {
 	            uint	wch ;
-	            int		i ;
-		    cchar	*ss ;
+		    int		i ; /* used-afterwards */
 	            for (i = 0 ; (rs >= 0) && (i < wl) && wp[i] ; i += 1) {
 	                if ((wch = (uint) wp[i]) > UCHAR_MAX) {
-			    if ((ss = straltwchar(wch)) != NULL) {
-	                        rs = strmgr_str(&m,ss,-1) ;
+			    if (cc *ss ; (ss = straltwchar(wch)) != nullptr) {
+	                        rs = m.str(ss,-1) ;
 			    } else {
 			        wch = '¿' ;
-	                        rs = strmgr_chr(&m,wch) ;
+	                        rs = m.chr(wch) ;
 			    }
 			} else {
-			    if (isprintbad(wch)) wch = '¿' ;
-	                    rs = strmgr_chr(&m,wch) ;
+			    if (isprintbad(wch)) {
+				wch = '¿' ;
+			    }
+	                    rs = m.chr(wch) ;
 			}
 	            } /* end for */
 	            if (rs >= 0) dl += i ;
@@ -134,7 +139,7 @@ int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int wsl) noex {
 	        wsp = (wp + wl) ;
 	        if (rs < 0) break ;
 	    } /* end while (looping through string pieces) */
-	    rs1 = strmgr_finish(&m) ;
+	    rs1 = m.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (strmgr) */
 	dbuf[dl] = '\0' ;

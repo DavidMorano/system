@@ -1,5 +1,5 @@
 /* snwcpyxc SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy a c-string to desination with a given case */
@@ -69,7 +69,9 @@ int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	    sl -= 1 ;
 	}
 	*dp = '\0' ;
-	if ((sl == 0) || (sp[i] == '\0')) dl = intconv(dp - dbuf) ;
+	if ((sl == 0) || (sp[i] == '\0')) {
+	    dl = intconv(dp - dbuf) ;
+	}
 	return dl ;
 }
 /* end subroutine-template (snwcpyxc) */
