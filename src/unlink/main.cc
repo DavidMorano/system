@@ -1935,7 +1935,7 @@ struct proginfo	*pip ;
 
 	    while (rs >= 0) {
 
-	        vl = paramopt_fetch(pop,po_fts,&cur,&vp) ;
+	        vl = paramopt_curfetch(pop,po_fts,&cur,&vp) ;
 	        if (vl == SR_NOTFOUND) break ;
 
 	        if (vl == 0) continue ;
@@ -2543,7 +2543,7 @@ int		sl ;
 	if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
 
 	    while (rs >= 0) {
-	        vl = paramopt_fetch(pop,key,&cur,&vp) ;
+	        vl = paramopt_curfetch(pop,key,&cur,&vp) ;
 	        if (vl == SR_NOTFOUND) break ;
 	        rs = vl ;
 	        if ((rs >= 0) && (sl == vl)) {
@@ -2638,7 +2638,7 @@ struct proginfo	*pip ;
 	                    int	vl ;
 	                    const char	*vp ;
 	                    while (rs >= 0) {
-	                        vl = paramopt_fetch(pop,po,&cur,&vp) ;
+	                        vl = paramopt_curfetch(pop,po,&cur,&vp) ;
 	                        if (vl == SR_NOTFOUND)
 	                            break ;
 	                        rs = vl ;
@@ -2829,7 +2829,7 @@ const char	*po ;
 
 	if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
 
-	    while ((vl = paramopt_fetch(pop,po,&cur,&vp)) >= 0) {
+	    while ((vl = paramopt_curfetch(pop,po,&cur,&vp)) >= 0) {
 
 	        rs1 = bprintf(pip->efp,"%s: ft=%r\n", pip->progname,vp,vl) ;
 	        if (rs1 > 0) wlen += rs1 ;
@@ -2865,7 +2865,7 @@ const char	*po ;
 
 	if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
 
-	    while ((vl = paramopt_fetch(pop,po,&cur,&vp)) >= 0) {
+	    while ((vl = paramopt_curfetch(pop,po,&cur,&vp)) >= 0) {
 
 	        rs1 = bprintf(pip->efp,"%s: suf=%r\n",pip->progname,vp,vl) ;
 	        if (rs1 > 0) wlen += rs1 ;

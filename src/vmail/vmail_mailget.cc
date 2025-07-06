@@ -394,7 +394,7 @@ static int procmuc(PROGINFO *pip,PARAMOPT *app,const char *mup)
 	    USTAT	sb ;
 	    char	msfname[MAXPATHLEN+1] ;
 
-	    while (paramopt_enumvalues(app,po,&cur,&ccp) >= 0) {
+	    while (paramopt_curenumval(app,po,&cur,&ccp) >= 0) {
 	        if (ccp != NULL) {
 
 #if	CF_DEBUG

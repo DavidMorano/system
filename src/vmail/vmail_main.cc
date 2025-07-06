@@ -2052,7 +2052,7 @@ static int procmailusers_arg(PROGINFO *pip,PARAMOPT *app)
 	        int	cl ;
 	        cchar	*cp ;
 
-	        while ((cl = paramopt_enumvalues(app,po,&cur,&cp)) >= 0) {
+	        while ((cl = paramopt_curenumval(app,po,&cur,&cp)) >= 0) {
 	            if (cp != nullptr) {
 	                if ((cp[0] == '-') || (cp[0] == '+')) {
 	                    cp = pip->username ;
@@ -2234,7 +2234,7 @@ static int procmaildirs_report(PROGINFO *pip,PARAMOPT *pop)
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt = "%s: md=%s\n" ;
 	    cchar	*cp ;
-	    while ((rs1 = paramopt_fetch(pop,po,&cur,&cp)) >= 0) {
+	    while ((rs1 = paramopt_curfetch(pop,po,&cur,&cp)) >= 0) {
 		if (pip->debuglevel > 0) {
 		    bprintf(pip->efp,fmt,pn,cp) ;
 		}
