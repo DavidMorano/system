@@ -2674,7 +2674,7 @@ static int procloadadmins(PROGINFO *pip,vecpstr *nlp,PARAMOPT *app)
 	    cchar	*po = PO_ADMIN ;
 	    cchar	*cp ;
 	    while (rs >= 0) {
-	        cl = paramopt_fetch(app,po,&pcur,&cp) ;
+	        cl = paramopt_curfetch(app,po,&pcur,&cp) ;
 	        if (cl == SR_NOTFOUND) break ;
 	        rs = cl ;
 	        if ((rs >= 0) && (cl > 0)) {

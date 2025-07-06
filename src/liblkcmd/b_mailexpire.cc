@@ -1619,7 +1619,7 @@ static int procmailusers_arg(PROGINFO *pip,PARAMOPT *app)
 
 	    if ((rs = paramopt_curbegin(app,&cur)) >= 0) {
 
-	        while ((cl = paramopt_enumvalues(app,po,&cur,&cp)) >= 0) {
+	        while ((cl = paramopt_curenumval(app,po,&cur,&cp)) >= 0) {
 	            if (cp != NULL) {
 	                if ((cp[0] == '-') || (cp[0] == '+')) {
 	                    cp = pip->username ;
