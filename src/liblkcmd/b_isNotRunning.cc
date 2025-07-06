@@ -1338,7 +1338,7 @@ static int locinfo_queries(LOCINFO *lip)
 		int	vl ;
 		cchar	*vp ;
 	        while (rs >= 0) {
-		    vl = paramopt_enumvalues(pop,po,&cur,&vp) ;
+		    vl = paramopt_curenumval(pop,po,&cur,&vp) ;
 		    if (vl == SR_NOTFOUND) break ;
 		    rs = vl ;
 		    if ((rs >= 0) && (vl > 0)) {
@@ -1417,7 +1417,7 @@ static int locinfo_pget(LOCINFO *lip,LOCINFO_PCUR *lpcurp,cchar **rpp)
 	cchar		*po = PO_PIDFILE ;
 	cchar		*vp ;
 	while (rs >= 0) {
-	    vl = paramopt_enumvalues(pop,po,pcurp,&vp) ;
+	    vl = paramopt_curenumval(pop,po,pcurp,&vp) ;
 	    if (vl == SR_NOTFOUND) break ;
 	    rs = vl ;
 	    if (rs > 0) {
