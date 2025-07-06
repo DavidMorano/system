@@ -46,7 +46,6 @@ LIBDIRS += -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,12 +56,12 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= sialnum.o sialpha.o sibasename.o sibreak.o
+OBJ0= sialnum.o sialpha.o sibasename.o sixbrk.o
 OBJ1= sixchr.o sicasechr.o sicite.o sidigit.o 
 OBJ2= sihyphen.o silbrace.o sileader.o
 OBJ3= siskipwhite.o sispan.o sisub.o
-OBJ4= sifext.o sinext.o
-OBJ5= sidquote.o siterm.o
+OBJ4= sifext.o sinext.o sinon.o
+OBJ5= sidquote.o siterm.o siwht.o
 
 OBJA= obj0.o obj1.o obj2.o 
 OBJB= obj3.o obj4.o obj5.o
@@ -103,13 +102,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	$(RM) $(ALL)
@@ -139,6 +133,12 @@ obj4.o:			$(OBJ4)
 obj5.o:			$(OBJ5)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
 
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6)
+
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7)
+
 
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
@@ -151,7 +151,7 @@ sifext.o:		sifext.cc sifext.h	$(INCS)
 sialnum.o:		sialnum.cc		$(INCS)
 sialpha.o:		sialpha.cc		$(INCS)
 sibasename.o:		sibasename.cc		$(INCS)
-sibreak.o:		sibreak.cc		$(INCS)
+sixbrk.o:		sixbrk.cc		$(INCS)
 sicasechr.o:		sicasechr.cc		$(INCS)
 sicite.o:		sicite.cc		$(INCS)
 sidigit.o:		sidigit.cc		$(INCS)
@@ -165,5 +165,18 @@ sispan.o:		sispan.cc		$(INCS)
 sisub.o:		sisub.cc		$(INCS)
 siterm.o:		siterm.cc		$(INCS)
 sixchr.o:		sixchr.cc		$(INCS)
+isnon.o:		isnon.cc		$(INCS)
+sifield.o:		sifield.cc		$(INCS)
+
+# SIWHT
+siwht.o:		siwht0.o siwht1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+siwht0.o:		siwht.ccm		$(INCS)
+	makemodule siwht
+
+siwht1.o:		siwht1.cc siwht.ccm	$(INCS)
+	makemodule siwht
+	$(COMPILE.cc) $<
 
 
