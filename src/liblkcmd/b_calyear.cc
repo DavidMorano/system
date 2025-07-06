@@ -1683,7 +1683,7 @@ static int procnames(PROGINFO *pip,PARAMOPT *app)
 	if ((rs = paramopt_curbegin(app,&cur)) >= 0) {
 
 	    while (rs >= 0) {
-	        nl = paramopt_fetch(app,po_name,&cur,&np) ;
+	        nl = paramopt_curfetch(app,po_name,&cur,&np) ;
 	        if (nl == SR_NOTFOUND) break ;
 	        rs = nl ;
 	        if (rs < 0) break ;
