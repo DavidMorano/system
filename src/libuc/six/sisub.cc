@@ -1,5 +1,5 @@
 /* sisub SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the string-index of a sub-stringin the given c-string */
@@ -62,13 +62,13 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<ascii.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<nleadstr.h>
 #include	<toxc.h>
 #include	<localmisc.h>
 
 #include	"six.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -97,10 +97,10 @@ extern "C" {
 
 template<toxc_f toxc,nleadxstr_f nleadxstr>
 int sixsub(cchar *sp,int sl,cchar *ss) noex {
-	cint		sslen = xstrlen(ss) ;
+	cint		sslen = lenstr(ss) ;
 	int		i{} ; /* used-afterwards */
 	bool		f = false ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (sslen <= sl) {
 	    cint	sslead = toxc(ss[0]) ;
 	    int		m ;

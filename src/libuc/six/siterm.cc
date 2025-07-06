@@ -1,5 +1,5 @@
 /* siterm SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the index in a c-string up to a terminator character */
@@ -49,13 +49,13 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<baops.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<toxc.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"six.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -78,9 +78,9 @@
 /* exported subroutines */
 
 int siterm(cchar *sp,int sl,cchar *terms) noex {
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	bool		f = false ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
 	    f = batst(terms,ch) ;
