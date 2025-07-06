@@ -1,5 +1,5 @@
 /* sinext SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* return index to end of next string-field */
@@ -46,7 +46,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<ascii.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<toxc.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
@@ -54,6 +53,7 @@
 
 #include	"six.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -70,7 +70,7 @@
 
 int sinext(cchar *sp,int sl) noex {
 	int		i = 0 ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	while ((i < sl) && ISWHITE(sp[i])) {
 	    i += 1 ;
 	}
