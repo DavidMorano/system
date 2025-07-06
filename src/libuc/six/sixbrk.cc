@@ -135,7 +135,7 @@ int siobrk(cchar *sp,int sl,const chrset &sset) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	if (sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sl >= 0) {
 	        for (i = 0 ; sl && sp[i] ; i += 1) {
 		    cint	ch = mkchar(sp[i]) ;
@@ -152,7 +152,7 @@ int sirbrk(cchar *sp,int sl,cchar *ss) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	if (sp && ss) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sl > 0) {
 	        cnullptr	np{} ;
 	        for (i = (sl - 1) ; i >= 0 ; i -= 1) {
@@ -169,7 +169,7 @@ int sirbrk(cchar *sp,int sl,const chrset &sset) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	if (sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sl > 0) {
 	        for (i = (sl - 1) ; i >= 0 ; i -= 1) {
 		    cint	ch = mkchar(sp[i]) ;

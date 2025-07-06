@@ -1,5 +1,5 @@
-/* sichr SUPPORT */
-/* encoding=ISO8859-1 */
+/* sixchr SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to find the index of a character in a given string */
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	sichr
+	siochr
 	sirchr
 
 	Description:
@@ -28,7 +28,8 @@
 	within the given string.
 
 	Synopsis:
-	int sichr(cchar *sp,int sl,int sch) noex
+	int siochr(cchar *sp,int sl,int sch) noex
+	int sirchr(cchar *sp,int sl,int sch) noex
 
 	Arguments:
 	sp	string to be examined
@@ -45,17 +46,16 @@
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"six.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -72,25 +72,27 @@
 /* exported subroutines */
 
 int siochr(cchar *sp,int sl,int sch) noex {
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	sch &= UCHAR_MAX ;
-	for (i = 0 ; sl-- && sp[i] ; i += 1) {
-	    cint	ch = mkchar(sp[i]) ;
-	    f = (ch == sch) ;
-	    if (f) break ;
-	} /* end for */
+	if (sp) {
+	    for (i = 0 ; sl-- && sp[i] ; i += 1) {
+	        cint	ch = mkchar(sp[i]) ;
+	        f = (ch == sch) ;
+	        if (f) break ;
+	    } /* end for */
+	} /* end if (non-null) */
 	return (f) ? i : -1 ;
 }
 /* end subroutine (siochr) */
 
 int sirchr(cchar *sp,int sl,int sch) noex {
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	sch &= UCHAR_MAX ;
 	if (sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
-	    for (i = (sl-1) ; i >= 0 ; i -= 1) {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    for (i = (sl - 1) ; i >= 0 ; i -= 1) {
 	        cint	ch = mkchar(sp[i]) ;
 		if ((f = (ch == sch))) break ;
 	    }
