@@ -1,5 +1,5 @@
 /* snaddw SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* append a counted c-string to a given counted c-string */
@@ -43,6 +43,25 @@
 	This subroutine sbould be the same as (the older)
 	|storebuf_strw(3uc)|.
 
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -81,6 +100,7 @@ int snaddw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf && sp) {
+	    rs = SR_INVALID ;
  	    if (i >= 0) {	
 	        char	*bp = (rbuf + i) ;
 	        rs = SR_OK ;

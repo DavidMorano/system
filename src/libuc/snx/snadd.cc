@@ -1,5 +1,5 @@
 /* snadd SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* append a c-string to a given counted c-string */
@@ -28,9 +28,9 @@
 	int snaddx(char *rbuf,int rlen,int rl,int n,...) noex
 
 	Arguments:
-	rbuf		c-string buffer pointer
-	rlen		c-string buffer length
-	rl		length of buffer already filled
+	rbuf		result c-string buffer pointer
+	rlen		result c-string buffer length
+	rl		length of result buffer already filled
 	sp		new c-string pointer to be added
 	sl		new c-string length to be added
 
@@ -43,12 +43,33 @@
 	This subroutine should be the same as (the older)
 	|storebuf_str(3uc)|.
 
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdarg>
 #include	<usystem.h>
+#include	<localmisc.h>
 
 #include	"snadd.h"
 
@@ -93,6 +114,6 @@ int snaddx(char *rbuf,int rlen,int rl,int n,...) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (snadd) */
+/* end subroutine (snaddx) */
 
 

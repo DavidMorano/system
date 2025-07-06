@@ -1,5 +1,5 @@
 /* snclean SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* clean up a c-string of text */
@@ -36,14 +36,35 @@
 	>=0		length of result c-string
 	<0		error code (system-return)
 
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -60,15 +81,12 @@
 /* external variables */
 
 
-/* external variables */
-
-
 /* local structures */
 
 
 /* forward references */
 
-static bool	ischarok(int) noex ;
+static inline bool	ischarok(int) noex ;
 
 
 /* local variables */
@@ -80,28 +98,25 @@ static bool	ischarok(int) noex ;
 /* exported subroutines */
 
 int snclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
+    	cint		chs = mkchar('¿') ;
 	int		rs = SR_FAULT ;
-	int		dl = 0 ;
+	int		dl = 0 ; /* return-value */
 	if (dbuf && sp) {
 	    rs = SR_INVALID ;
 	    if (dlen >= 0) {
 	        rs = SR_OK ;
-	        if (sl < 0) sl = INT_MAX ;
-	        for (int i = 0 ; (rs >= 0) && (i < sl) && sp[i] ; i += 1) {
-	            cint	ch = mkchar(sp[i]) ;
-		    if (i < dlen) {
-	                if (isprintlatin(ch) || ischarok(ch)) {
-		            dbuf[i] = sp[i] ;
-		            dl += 1 ;
-	                } else {
-		            dbuf[i] = '¿' ;
-		            dl += 1 ;
-	                }
+		while (dlen-- && sl && *sp) {
+	            if (cint ch = mkchar(*sp) ; ischarok(ch)) {
+		        dbuf[dl++] = char(ch) ;
 		    } else {
-			rs = SR_OVERFLOW ;
+		        dbuf[dl++] = char(chs) ;
 		    }
-	        } /* end for */
+		    sp += 1 ;
+		    sl -= 1 ;
+		} /* end while */
+		if (sl && *sp) rs = SR_OVERFLOW ;
 	    } /* end if (valid) */
+	    dbuf[dl] = '\0' ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
 }
@@ -111,7 +126,9 @@ int snclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
 /* local subroutines */
 
 static bool ischarok(int ch) noex {
-	return ((ch == '\t') || (ch == '\n')) ;
+    	bool	f = isprintlatin(ch) ;
+	f = f || (ch == '\t') || (ch == '\n') ;
+	return f ;
 }
 /* end subroutine (ischarok) */
 

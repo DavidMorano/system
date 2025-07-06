@@ -1,5 +1,5 @@
 /* snadd HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* append a c-string to a given counted c-string */
@@ -40,7 +40,9 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+
 #include	<snaddw.h>
+#include	<snaddslash.h>
 
 
 EXTERNC_begin
