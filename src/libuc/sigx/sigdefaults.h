@@ -1,5 +1,5 @@
 /* sigdefaults HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C99 */
 
 /* set a set of signals totheir default behavioe */

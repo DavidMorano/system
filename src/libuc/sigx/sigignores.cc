@@ -1,5 +1,5 @@
 /* sigignores SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* ignores a group of signals */
@@ -51,7 +51,7 @@
 /* external variables */
 
 
-/* local strutures */
+/* local structures */
 
 
 /* forward references */
