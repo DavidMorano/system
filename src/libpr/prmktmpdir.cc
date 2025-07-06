@@ -51,7 +51,6 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -170,7 +169,7 @@ int prmktmpdir(cchar *pr,char *rbuf,cc *tmpdname,cc *dname,mode_t m) noex {
 			} /* end if (stat) */
 	            } /* end if (mkpath) */
 	        } else {
-	            len = strlen(rbuf) ;
+	            len = lenstr(rbuf) ;
 	 	}
 	        if ((rs >= 0) && (! f_prtmp)) {
 	            rs = subinfo_chown(sip,prtmpdname) ;

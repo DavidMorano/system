@@ -339,7 +339,7 @@ OBJ23=
 
 OBJ24= sfreadline.o sfisterm.o 
 OBJ25= printhelp.o
-OBJ26= shio.o shio_printdline.o shio_writeblanks.o
+OBJ26= shio.o
 OBJ27= cgi.o htm.o
 OBJ28= svckv.o svcent.o
 OBJ29= 
@@ -1052,55 +1052,18 @@ printhelp.o:		printhelp.c shio.h
 kshlib.o:		kshlib.c $(INCS) sesmsg.h msgdata.h
 	$(CC) -c $(ASTCFLAGS) $(ASTCPPFLAGS) $<
 
-shio.o:			shio.c shio.h
-	$(CC) -c $(ASTCFLAGS) $(ASTCPPFLAGS) $<
-
-shio_writeblanks.o:	shio_writeblanks.c shio.h
-	$(CC) -c $(ASTCFLAGS) $(ASTCPPFLAGS) $(*).c
-
-shio_printdline.o:	shio_printdline.c shio.h
-	$(CC) -c $(ASTCFLAGS) $(ASTCPPFLAGS) $(*).c
-
 cgi.o:			cgi.c cgi.h
 	$(CC) -c $(ASTCFLAGS) $(ASTCPPFLAGS) $(*).c
 
 htm.o:			htm.c htm.h
 	$(CC) -c $(ASTCFLAGS) $(ASTCPPFLAGS) $(*).c
 
+shio.o:			shio.dir
+shio_dir:
+	makesubdir $@
+
 
 # AST library compile end
-
-
-# PCS regulars
-
-pcsmailcheck.o:		pcsmailcheck.c
-	$(CC) -c $(PCSCFLAGS) $(PCSCPPFLAGS) $<
-
-pcsgetprogpath.o:	pcsgetprogpath.c
-	$(CC) -c $(PCSCFLAGS) $(PCSCPPFLAGS) $<
-
-pcsinfoset.o:		pcsinfoset.c
-	$(CC) -c $(PCSCFLAGS) $(PCSCPPFLAGS) $<
-
-pcsgetorg.o:		pcsgetorg.c
-	$(CC) -c $(PCSCFLAGS) $(PCSCPPFLAGS) $<
-
-pcsgetfacility.o:	pcsgetfacility.c
-	$(CC) -c $(PCSCFLAGS) $(PCSCPPFLAGS) $<
-
-# PCS objects
-
-pcsns.o:		pcsns.c pcsns.h
-	$(CC) -c $(PCSCFLAGS) $(PCSCPPFLAGS) $<
-
-pcsnsmgr.o:		pcsnsmgr.c pcsnsmgr.h
-	$(CC) -c $(PCSCFLAGS) $(PCSCPPFLAGS) $<
-
-pcsnsrecs.o:		pcsnsrecs.c pcsnsrecs.h
-	$(CC) -c $(PCSCFLAGS) $(PCSCPPFLAGS) $<
-
-pcsnsc.o:		pcsnsc.c pcsnsc.h
-	$(CC) -c $(PCSCFLAGS) $(PCSCPPFLAGS) $<
 
 
 # regular
