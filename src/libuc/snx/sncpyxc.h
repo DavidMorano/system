@@ -1,5 +1,5 @@
 /* sncpyxc HEADER */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* copy a c-string to a given case */
@@ -22,6 +22,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
 

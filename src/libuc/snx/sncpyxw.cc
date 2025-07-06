@@ -1,5 +1,5 @@
 /* sncpyxw SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* concatenate strings */
@@ -12,7 +12,7 @@
 	This subroutine was written for Rightcore Network Services.
 
 	= 1999-12-03, David A­D­ Morano
-	This was updated to use 'strlcpy(3c)' when it was rumored
+	This was updated to use |strlcpy(3c)| when it was rumored
 	to be coming as a new standard.  We are currently using our
 	own implementation of that, but when it is supported by
 	vendors this will all seemlessly transistion to using the
@@ -32,11 +32,30 @@
 	string.
 
 	Notes:
-	These sorts of subroutines (|sncpyw(3dam)|, |sncpy(3dam)|,
+	These sorts of subroutines (|sncpyw(3uc)|, |sncpy(3uc)|,
 	etc) are quite carefully crafted in order to avoid buffer
 	overflow and segfaults as well as leaving the destination
 	buffer NUL-terminated.  Please observe and be careful with
 	any possible modifications.
+
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
 
 *******************************************************************************/
 
@@ -116,7 +135,7 @@ int sncpyxw(char *dp,int dl,int n,...) noex {
 	char		*bp = dp ;
 	if (dl < 0) dl = (INT_MAX - 1) ;
 	if (dp) {
-	    size_t	rlen = (dl+1) ;
+	    size_t	rmlen = (dl + 1) ;
 	    va_begin(ap,n) ;
 	    rs = SR_OK ;
 	    dp[0] = '\0' ;
@@ -124,20 +143,20 @@ int sncpyxw(char *dp,int dl,int n,...) noex {
 		size_t	ml ;
 	        cc	*sp = (const char *) va_arg(ap,char *) ;
 	        if (i < (n-1)) {
-	            ml = strlcpy(bp,sp,rlen) ;
-	            if (ml < rlen) bp += ml ;
-	        } else { /* emulate 'strlcpy(3c)' but w/ given length */
+	            ml = strlcpy(bp,sp,rmlen) ;
+	            if (ml < rmlen) bp += ml ;
+	        } else { /* emulate |strlcpy(3c)| but w/ given length */
 	            int		sl = (int) va_arg(ap,int) ;
 		    ml = 0 ;
-		    while ((ml < (rlen-1)) && sl-- && *sp) {
+		    while ((ml < (rmlen-1)) && sl-- && *sp) {
 		        *bp++ = *sp++ ;
 		        ml += 1 ;
 		    }
 		    *bp = '\0' ;
 		    if ((sl != 0) && *sp) ml += 1 ; /* error condition */
 	        } /* end if */
-	        if (ml < rlen) {
-		    rlen -= ml ;
+	        if (ml < rmlen) {
+		    rmlen -= ml ;
 		} else {
 		    rs = SR_OVERFLOW ;
 		}
