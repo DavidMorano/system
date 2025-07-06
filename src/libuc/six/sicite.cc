@@ -1,5 +1,5 @@
 /* sicite SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* string-index to a citation escape */
@@ -29,7 +29,7 @@
 	sicite
 
 	Description:
-	This subroutine finds the index up to a citation escape. The 
+	This subroutine finds the index up to a citation escape.  The 
 	caller must also supply an escape "name" that is also required
 	to be matched in order to get a hit.
 
@@ -43,23 +43,20 @@
 	el		escape c-string length
 
 	Returns:
-	-		index up to start of escape sequence
+	>=0		index to start of escape sequence
+	<0		caller-usage-error (should not normally happen)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strncmp(3c)| */
+#include	<cstring>		/* |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<ascii.h>
-#include	<strn.h>
-#include	<toxc.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
+#include	<strn.h>		/* |strnchr(3uc)| */
 #include	<localmisc.h>
 
 #include	"six.h"
@@ -89,18 +86,19 @@
 /* exported subroutines */
 
 int sicite(cchar *sp,int sl,cchar *ep,int el) noex {
-	int		cl = sl ;
-	int		si = -1 ;
-	cchar		*tp ;
-	cchar		*cp = sp ;
-	while ((tp = strnchr(cp,cl,'\\')) != nullptr) {
-	    if (strncmp((tp + 1),ep,el) == 0) {
-	        si = intconv(tp - sp) ;
-	        break ;
-	    }
-	    cl -= intconv((tp + 1) - cp) ;
-	    cp = (tp + 1) ;
-	} /* end while */
+	int		si = -1 ; /* return-value */
+	if (sp && ep) {
+	    int		cl = sl ;
+	    cchar	*cp = sp ;
+	    for (cchar *tp ; (tp = strnchr(cp,cl,'\\')) != nullptr ; ) {
+	        if (strncmp((tp + 1),ep,el) == 0) {
+	            si = intconv(tp - sp) ;
+	            break ;
+	        }
+	        cl -= intconv((tp + 1) - cp) ;
+	        cp = (tp + 1) ;
+	    } /* end for */
+	} /* end if (non-null) */
 	return si ;
 }
 /* end subroutine (sicite) */

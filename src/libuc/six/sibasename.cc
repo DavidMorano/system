@@ -1,5 +1,5 @@
 /* sibasename SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the base file name out of a file-path */
@@ -32,27 +32,25 @@
 	sl	length of given path string (can be -1)
 
 	Returns:
-	+	index of found string
+	>=	index of found string
+	<0	caller-usage-error (should not normally happen)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<ascii.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
-#include	<toxc.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"six.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -84,14 +82,16 @@
 /* exported subroutines */
 
 int sibasename(cchar *sp,int sl) noex {
-	int		si{} ; /* used-afterwards */
-	if (sl < 0) sl = xstrlen(sp) ;
-	while ((sl > 0) && (sp[sl - 1] == '/'))  {
-	    sl -= 1 ;
-	}
-	for (si = sl ; si > 0 ; si -= 1) {
-	    if (sp[si - 1] == '/') break ;
-	}
+	int		si = -1 ; /* return-value */
+	if (sp) {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    while ((sl > 0) && (sp[sl - 1] == '/'))  {
+	        sl -= 1 ;
+	    }
+	    for (si = sl ; si > 0 ; si -= 1) {
+	        if (sp[si - 1] == '/') break ;
+	    }
+	} /* end if (non-null) */
 	return si ;
 }
 /* end subroutine (sibasename) */
