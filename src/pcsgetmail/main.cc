@@ -2016,7 +2016,7 @@ static int maildirs_arg(proginfo *pip,PARAMOPT *app)
 	    int			vl ;
 	    cchar		*vp ;
 	    if ((rs = paramopt_curbegin(app,&cur)) >= 0) {
-	        while ((vl = paramopt_enumvalues(app,qn,&cur,&vp)) >= 0) {
+	        while ((vl = paramopt_curenumval(app,qn,&cur,&vp)) >= 0) {
 	            if (vp != NULL) {
 	                rs = maildirs_add(pip,vp,vl) ;
 	                c += rs ;
@@ -2346,7 +2346,7 @@ static int mailusers_arg(proginfo *pip,PARAMOPT *app)
 
 	    if ((rs = paramopt_curbegin(app,&cur)) >= 0) {
 
-	        while ((vl = paramopt_enumvalues(app,qn,&cur,&vp)) >= 0) {
+	        while ((vl = paramopt_curenumval(app,qn,&cur,&vp)) >= 0) {
 	            if (vp == NULL) continue ;
 
 	            rs = mailusers_add(pip,vp,vl) ;

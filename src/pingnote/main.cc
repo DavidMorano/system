@@ -897,7 +897,7 @@ char	*envv[] ;
 
 	    while (rs >= 0) {
 
-	        phl = paramopt_fetch(&aparams,PO_PINGHOST,&pcur,&php) ;
+	        phl = paramopt_curfetch(&aparams,PO_PINGHOST,&pcur,&php) ;
 	 	if (phl < 0)
 		    break ;
 

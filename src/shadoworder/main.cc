@@ -806,7 +806,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    PARAMOPT_CUR	cur ;
 	    cchar		*po = PO_OPTION ;
 	    if ((rs = paramopt_curbegin(&aparams,&cur)) >= 0) {
-	    while (paramopt_enumvalues(&aparams,po,&cur,&cp) >= 0) {
+	    while (paramopt_curenumval(&aparams,po,&cur,&cp) >= 0) {
 	        if (cp == NULL) continue ;
 	        if ((kwi = matostr(progopts,2,cp,-1)) >= 0) {
 	            switch (kwi) {
