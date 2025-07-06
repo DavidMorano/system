@@ -1,5 +1,5 @@
 /* snwcpycompact SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* counted-string copy while compacting white-space from the source */
@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-08-10 David A.D. Morano
+	= 1998-08-10 David A-D- Morano
 	This was written from scratch.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -21,7 +21,7 @@
 	snwcpycompact
 
 	Description:
-	Similar to |snwcpy(3dam)| except that we copy the source
+	Similar to |snwcpy(3uc)| except that we copy the source
 	to the destination while removing extra white-space from
 	the source.
 
@@ -35,23 +35,23 @@
 	sl		source string length
 
 	Returns:
-	<0		error
 	>=0		resulting string length
+	<0		error (system-return)
 
 	Implemetation note:
-	We could have used either |sbuf(3dam)| or |storebuf(3dam)|
+	We could have used either |sbuf(3uc)| or |storebuf(3uc)|
 	or some other subroutines of this ilk, but this subroutine
 	was written at a time before resort to those interfaces was
 	automatic. It is a little messy, but it works just fine as
 	it is!
 
 	See-also:
-	snwcpy(3dam),
-	snwcpylatin(3dam), 
-	snwcpyopaque(3dam), 
-	snwcpycompact(3dam), 
-	snwcpyclean(3dam), 
-	snwcpyhyphen(3dam), 
+	snwcpy(3uc),
+	snwcpylatin(3uc), 
+	snwcpyopaque(3uc), 
+	snwcpycompact(3uc), 
+	snwcpyclean(3uc), 
+	snwcpyhyphen(3uc), 
 
 *******************************************************************************/
 
@@ -61,11 +61,11 @@
 #include	<usystem.h>
 #include	<strmgr.h>
 #include	<sfx.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"snwcpyx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -93,9 +93,9 @@
 int snwcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
-	int		dl = 0 ;
+	int		dl = 0 ; /* return-value */
 	if (dlen < 0) dlen = INT_MAX ;
-	if (sl < 0) sl = xstrlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (strmgr m ; (rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
 	    int		cl ;
 	    cchar	*cp ;

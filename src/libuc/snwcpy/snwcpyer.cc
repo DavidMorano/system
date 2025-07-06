@@ -1,5 +1,5 @@
 /* snwcpyer SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* special (excellent) string-copy type of subroutine! */
@@ -70,11 +70,10 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| (not currently used) */
+#include	<sncpyx.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
-#include	"strwcpy.h"
-#include	"sncpyx.h"
 #include	"snwcpy.h"
 
 
