@@ -45,8 +45,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<ascii.h>
-#include	<toxc.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -100,15 +98,15 @@ static int sinon(cchar *sp,int sl,isnon_f isx) noex {
 
 /* exported subroutines */
 
-extern int sinonoct(cchar *sp,int sl) noex {
+int sinonoct(cchar *sp,int sl) noex {
     	return sinon(sp,sl,isoctlatin) ;
 }
 
-extern int sinondec(cchar *sp,int sl) noex {
+int sinondec(cchar *sp,int sl) noex {
     	return sinon(sp,sl,isdeclatin) ;
 }
 
-extern int sinonhex(cchar *sp,int sl) noex {
+int sinonhex(cchar *sp,int sl) noex {
     	return sinon(sp,sl,ishexlatin) ;
 }
 
