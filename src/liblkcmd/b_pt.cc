@@ -874,7 +874,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (rs >= 0) {
 	    cchar	*ccp ;
 
-	    cl = paramopt_fetch(&li.lists,PO_SECTIONS,NULL,&ccp) ;
+	    cl = paramopt_curfetch(&li.lists,PO_SECTIONS,NULL,&ccp) ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2)) {
@@ -1224,7 +1224,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar *np)
 	    if ((rs = paramopt_curbegin(plp,&cur)) >= 0) {
 
 	        while (rs >= 0) {
-	            vl = paramopt_enumvalues(plp,kn,&cur,&vp) ;
+	            vl = paramopt_curenumval(plp,kn,&cur,&vp) ;
 	            if (vl == SR_NOTFOUND) break ;
 	            rs = vl ;
 	            if ((rs >= 0) && (vp != NULL)) {
@@ -1588,7 +1588,7 @@ static int procpathtry_man(PROGINFO *pip,SHIO *ofp,pathtry *ptp)
 	if ((rs = paramopt_curbegin(plp,&cur)) >= 0) {
 
 	    while (rs >= 0) {
-	        vl = paramopt_enumvalues(plp,kn,&cur,&vp) ;
+	        vl = paramopt_curenumval(plp,kn,&cur,&vp) ;
 	        if (vl == SR_NOTFOUND) break ;
 	        rs = vl ;
 	        if ((rs >= 0) && (vp == NULL)) continue ;
@@ -2007,7 +2007,7 @@ static int locinfo_pathdef(LOCINFO *lip)
 	int		c = 0 ;
 	cchar	*kn = PO_PATHNAMES ;
 
-	if ((rs = paramopt_fetch(pop,kn,NULL,NULL)) == SR_NOTFOUND) {
+	if ((rs = paramopt_curfetch(pop,kn,NULL,NULL)) == SR_NOTFOUND) {
 	    c += 1 ;
 	    rs = paramopt_load(pop,kn,VARPATH,-1) ;
 	} /* end if */
