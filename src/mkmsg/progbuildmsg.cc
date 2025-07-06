@@ -604,7 +604,7 @@ static int progbuildmsgothers(PROGINFO *pip,PARAMOPT *hlp,int f_date)
 	    cchar	*kp, *vp ;
 
 	    while (rs >= 0) {
-	        kl = paramopt_enumkeys(hlp,&kcur,&kp) ;
+	        kl = paramopt_curenumkey(hlp,&kcur,&kp) ;
 	        if (kl == SR_NOTFOUND) break ;
 	        rs = kl ;
 	        if (rs <= 0) break ;
@@ -617,7 +617,7 @@ static int progbuildmsgothers(PROGINFO *pip,PARAMOPT *hlp,int f_date)
 	        if ((rs = paramopt_curbegin(hlp,&vcur)) >= 0) {
 
 	            while (rs >= 0) {
-	                vl = paramopt_enumvalues(hlp,kp,&vcur,&vp) ;
+	                vl = paramopt_curenumval(hlp,kp,&vcur,&vp) ;
 	                if (vl == SR_NOTFOUND) break ;
 	                rs = vl ;
 #if	CF_DEBUG

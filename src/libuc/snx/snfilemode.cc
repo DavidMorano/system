@@ -1,5 +1,5 @@
 /* snfilemode SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string version of the file-mode flags */
@@ -36,6 +36,25 @@
 	>=0		number of bytes in result
 	<0		error (system-return)
 
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -47,29 +66,13 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<ctoct.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |OCTBUFLEN| */
 
 #include	"snflags.h"
 #include	"snx.h"
 
 
 /* local defines */
-
-#ifndef	OCTBUFLEN
-#define	OCTBUFLEN	47
-#endif
-
-#ifndef	S_IAMB
-#define	S_IAMB		0x1FF
-#endif
-
-#ifndef	S_IFNAM
-#define	S_IFNAM		0x5000		/* MicroSoft XENIX® named file */
-#endif
-
-#ifndef	S_IFDOOR
-#define	S_IFDOOR	0xD000		/* Solaris® "door" file */
-#endif
 
 
 /* imported namespaces */

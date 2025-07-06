@@ -1,5 +1,5 @@
 /* snerrabbr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make the string repreentation of a system-error return number */
@@ -35,6 +35,25 @@
 	Returns:
 	>=0		number of bytes in result
 	<0		error (system-return)
+
+	See-also:
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
 
 *******************************************************************************/
 
