@@ -788,7 +788,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	        if ((rs = paramopt_curbegin(&aparams,&cur)) >= 0) {
 	            cchar	*po = PO_OPTION ;
 
-	            while (paramopt_enumvalues(&aparams,po,&cur,&cp) >= 0) {
+	            while (paramopt_curenumval(&aparams,po,&cur,&cp) >= 0) {
 	                if (cp != NULL) {
 
 	                    if ((kwi = matostr(progopts,2,cp,-1)) >= 0) {
@@ -965,7 +965,7 @@ int findbibfile(PROGINFO *pip,PARAMOPT *app,cchar *fname,char *tmpfname)
 	    if ((paramopt_curbegin(app,&cur)) >= 0) {
 	        cchar	*po = PO_BIBDIR ;
 
-	        while (paramopt_enumvalues(app,po,&cur,&cp) >= 0) {
+	        while (paramopt_curenumval(app,po,&cur,&cp) >= 0) {
 
 	            fl = mkpath2(tmpfname,cp,fname) ;
 
@@ -1188,7 +1188,7 @@ static int loadbibfiles(PROGINFO *pip,PARAMOPT *app,BDB *bdbp)
 	    if ((rs = paramopt_curbegin(app,&cur)) >= 0) {
 		cchar		*cp ;
 		char		tmpfname[MAXPATHLEN + 1] ;
-	        while (paramopt_enumvalues(app,po,&cur,&cp) >= 0) {
+	        while (paramopt_curenumval(app,po,&cur,&cp) >= 0) {
 
 	            rs1 = SR_OK ;
 	            if (cp[0] != '/') {

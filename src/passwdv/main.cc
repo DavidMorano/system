@@ -773,7 +773,7 @@ static int procgather(PROGINFO *pip,PARAMOPT *pop) noex {
 	if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
 	    cchar	*po = PO_OPTION ;
 	    cchar	*cp ;
-	    while ((rs1 = paramopt_enumvalues(pop,po,&cur,&cp)) >= 0) {
+	    while ((rs1 = paramopt_curenumval(pop,po,&cur,&cp)) >= 0) {
 	            if (cp) {
 	                if (int i ; (i = matostr(aknopts,2,cp,-1)) >= 0) {
 	                    switch (i) {

@@ -894,7 +894,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	        if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
 
-	            while (paramopt_enumvalues(pop,po,&cur,&vp) >= 0) {
+	            while (paramopt_curenumval(pop,po,&cur,&vp) >= 0) {
 	                if (vp == NULL) continue ;
 
 	                pip->f.suffix = TRUE ;
@@ -920,7 +920,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	            if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
 
-	                while (paramopt_enumvalues(&aparams,po,&cur,&vp) >= 0) {
+	                while (paramopt_curenumval(&aparams,po,&cur,&vp) >= 0) {
 	                    if (vp == NULL) continue ;
 
 	                    if ((kwi = matostr(progopts,1,vp,-1)) >= 0) {

@@ -879,7 +879,7 @@ char	*envv[] ;
 	    paramopt_curbegin(&aparams,&cur) ;
 
 	    while (rs >= 0) {
-	        vl = paramopt_enumvalues(&aparams,PO_SUFFIX,&cur,&vp) ;
+	        vl = paramopt_curenumval(&aparams,PO_SUFFIX,&cur,&vp) ;
 		if (vl == SR_NOTFOUND)
 		    break ;
 
@@ -916,7 +916,7 @@ char	*envv[] ;
 	    paramopt_curbegin(&aparams,&cur) ;
 
 	    while (rs >= 0) {
-	        vl = paramopt_enumvalues(&aparams,PO_OPTION,&cur,&vp) ;
+	        vl = paramopt_curenumval(&aparams,PO_OPTION,&cur,&vp) ;
 		if (vl == SR_NOTFOUND)
 		    break ;
 
