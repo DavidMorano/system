@@ -784,7 +784,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    PARAMOPT_CUR	cur ;
 	    const char		*po = PO_OPTION ;
 	    if ((rs = paramopt_curbegin(&aparams,&cur)) >= 0) {
-	        while (paramopt_enumvalues(&aparams,po,&cur,&cp) >= 0) {
+	        while (paramopt_curenumval(&aparams,po,&cur,&cp) >= 0) {
 	            if (cp == NULL) continue ;
 	            if ((kwi = matostr(progopts,2,cp,-1)) >= 0) {
 	                switch (kwi) {

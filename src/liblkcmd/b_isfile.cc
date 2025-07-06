@@ -1469,7 +1469,7 @@ static int locinfo_ftypes(LOCINFO *lip)
 
 	    while (rs >= 0) {
 
-	        vl = paramopt_fetch(&lip->aparams,PO_TYPE,&cur,&vp) ;
+	        vl = paramopt_curfetch(&lip->aparams,PO_TYPE,&cur,&vp) ;
 	        if (vl == SR_NOTFOUND) break ;
 	        if (vl == 0) continue ;
 	        rs = vl ;
