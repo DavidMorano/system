@@ -2431,7 +2431,7 @@ static int locinfo_ftypes(LOCINFO *lip) noex {
 	    int			fti ;
 	    cchar		*sp ;
 	    while (rs >= 0) {
-	        sl = paramopt_fetch(&lip->aparams,PO_TYPE,&cur,&sp) ;
+	        sl = paramopt_curfetch(&lip->aparams,PO_TYPE,&cur,&sp) ;
 	        if (sl == SR_NOTFOUND) break ;
 	        if (sl == 0) continue ;
 	        rs = sl ;
@@ -2526,7 +2526,7 @@ static int locinfo_isfsuffix(LOCINFO *lip,cchar *fname) noex {
 
 	            while (rs >= 0) {
 
-	                sl = paramopt_fetch(pp,po,&cur,&sp) ;
+	                sl = paramopt_curfetch(pp,po,&cur,&sp) ;
 	                if (sl == SR_NOTFOUND)
 	                    break ;
 
