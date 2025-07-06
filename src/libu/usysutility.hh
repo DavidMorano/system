@@ -38,11 +38,6 @@ namespace libu {
     extern int	snvprintf(char *,int,cchar *,va_list) noex ;
     extern int	snloadavgd(char *,int,int,double *,int) noex ;
     extern int	ctdecf(char *,int,int,double) noex ;
-#ifdef	COMMENT
-    static inline int snloadavg(char *rb,int rl,int pr,dbl *ap,int al) noex {
-	return snloadavgd(rb,rl,pr,ap,al) ;
-    }
-#endif /* COMMENT */
 } /* end namespace (libu) */
 
 
