@@ -959,9 +959,9 @@ absfn.o:		absfn.cc	absfn.h
 outbuf.o:		outbuf.cc	outbuf.h
 
 # sring-comparisons
-vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h
-vstrkeycmpx.o:		vstrkeycmpx.cc vstrkeycmpx.h
-vstrkeydictcmp.o:	vstrkeydictcmp.cc vstrkeycmpx.h
+vstr.o:			vstr.dir
+vstr.dir:
+	makesubdir $@
 
 # string-constants
 syhsdbfiles.o:		sysdbfiles.c sysdbfiles.h
