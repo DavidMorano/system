@@ -1,5 +1,5 @@
 /* sialnum SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to find the index of an alpha-numeric character */
@@ -64,7 +64,7 @@
 /* exported subroutines */
 
 int sialnum(cchar *sp,int sl) noex {
-	int		i{} ; /* used-afterwards */
+	int		i ; /* return-value */
 	bool		f = false ;
 	for (i = 0 ; sl && sp[i] ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
