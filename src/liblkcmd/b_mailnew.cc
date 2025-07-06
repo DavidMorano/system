@@ -1671,7 +1671,7 @@ static int procmailboxes(PROGINFO *pip,PARAMOPT *app)
 	    const char	*mup ;
 	    char	msfname[MAXPATHLEN+1] ;
 
-	    while ((ml = paramopt_fetch(app,po,&cur,&mp)) >= 0) {
+	    while ((ml = paramopt_curfetch(app,po,&cur,&mp)) >= 0) {
 	        int	mc = 0 ;
 
 	        if (pip->debuglevel > 0) {
@@ -2021,7 +2021,7 @@ static int procmailusers_arg(PROGINFO *pip,PARAMOPT *app)
 
 	    if ((rs = paramopt_curbegin(app,&cur)) >= 0) {
 
-	        while ((cl = paramopt_enumvalues(app,po,&cur,&cp)) >= 0) {
+	        while ((cl = paramopt_curenumval(app,po,&cur,&cp)) >= 0) {
 	            if (cp != NULL) {
 
 	            if ((cp[0] == '-') || (cp[0] == '+')) {
