@@ -1,23 +1,19 @@
 /* snwcpyshrink SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy the shrunken part of a source string */
 /* version %I% last-modified %G% */
 
-#define	CF_ONEPASS	1		/* try one-pass over the string */
 
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
 	This code was originally written.
 
-	= 2017-08-23, David A­D­ Morano
-	I added the experimental one-pass version.
-
 */
 
-/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -49,12 +45,15 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<ascii.h>
-#include	<strmgr.h>
-#include	<sfx.h>
-#include	<strn.h>
-#include	<char.h>
+#include	<sfx.h>			/* |sfshrink(3uc)| */
+#include	<strn.h>		/* |strnchr(3uc)| */
+#include	<localmisc.h>
 
 #include	"snwcpy.h"		/* also for |snwcpy(3uc)| */
 
@@ -86,8 +85,6 @@
 
 /* local variables */
 
-constexpr bool		f_onepass = CF_ONEPASS ;
-
 
 /* exported variables */
 
@@ -95,30 +92,17 @@ constexpr bool		f_onepass = CF_ONEPASS ;
 /* exported subroutines */
 
 int snwcpyshrink(char *dbuf,int dlen,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-	cchar		*cp ;
-	dbuf[0] = '\0' ;
-	if_constexpr (f_onepass) {
-	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
-	        if (strmgr d ; (rs = d.start(dbuf,dlen)) >= 0) {
-		    while ((rs >= 0) && cl--) {
-		        if (*cp == CH_NL) break ;
-		        rs = d.chr(*cp) ;
-		        cp += 1 ;
-		    } /* end while */
-		    rs1 = d.finish ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (strmgr) */
-	    } /* end if (sfshrink) */
-	} else {
-	    if (cchar *tp ; (tp = strnchr(sp,sl,CH_NL)) != nullptr) {
-	        sl = (tp - sp) ;
-	    }
-	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
-	        rs = snwcpy(dbuf,dlen,cp,cl) ;
-	    }
-	} /* end if_constexpr (f_onepass) */
+	int		rs = SR_FAULT ;
+	if (dbuf && sp) {
+	    cchar	*cp ;
+	    rs = SR_OK ;
+	        if (cchar *tp ; (tp = strnchr(sp,sl,CH_NL)) != nullptr) {
+	            sl = intconv(tp - sp) ;
+	        }
+	        if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
+	            rs = snwcpy(dbuf,dlen,cp,cl) ;
+	        }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (snwcpyshrink) */

@@ -141,7 +141,7 @@ constexpr cint		chx_sub = mkchar('¿') ;
 int snwcpyexpesc(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf && sp) {
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    {
 	        expmgr eo(dbuf,dlen,sp,sl) ;
 	        rs = eo ;

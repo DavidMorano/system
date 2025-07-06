@@ -1,8 +1,8 @@
 /* snwcpyhyphen SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* similar to |snwcpy(3dam)| w/ exceptions */
+/* similar to |snwcpy(3uc)| w/ exceptions */
 /* version %I% last-modified %G% */
 
 
@@ -10,7 +10,7 @@
 
 	= 2001-03-14, David A­D­ Morano
 	This subroutine was written as a hack to get a subroutine
-	with the calling sematic of |snwcpy(3dam)| but with the
+	with the calling sematic of |snwcpy(3uc)| but with the
 	twist that any underscore characters found in the source
 	string are converted into hyphen characters in the destination.
 
@@ -24,7 +24,7 @@
 	snwcpyhyphen
 
 	Description:
-	This subroutine is similar to |snwcpy(3dam)| except that
+	This subroutine is similar to |snwcpy(3uc)| except that
 	any underscore characters found in the source string are
 	substituted for hyphen characters in the target destination
 	string.
@@ -42,18 +42,25 @@
 	PASSWD databases.
 
 	See-also:
-	snwcpy(3dam),
-	snwcpylatin(3dam), 
-	snwcpyopaque(3dam), 
-	snwcpycompact(3dam), 
-	snwcpyclean(3dam), 
-	snwcpyhyphen(3dam),
+	snwcpy(3uc),
+	snwcpylatin(3uc), 
+	snwcpyopaque(3uc), 
+	snwcpycompact(3uc), 
+	snwcpyclean(3uc), 
+	snwcpyhyphen(3uc),
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<mkchar.h>
+#include	<localmisc.h>
 
 #include	"snwcpyx.h"
 
@@ -62,6 +69,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -79,17 +89,19 @@
 /* exported subroutines */
 
 int snwcpyhyphen(char *dbuf,int dlen,cchar *sp,int sl) noex {
-	int		dl = 0 ;
-	int		ch ;
-	int		rs = SR_OK ;
-	while (dlen-- && sl && *sp) {
-	    ch = mkchar(*sp++) ;
-	    if (ch == '_') ch = '-' ;
-	    dbuf[dl++] = char(ch) ;
-	    sl -= 1 ;
-	} /* end while */
-	if ((sl != 0) && (*sp != '\0')) rs = SR_OVERFLOW ;
-	dbuf[dl] = '\0' ;
+	int		rs = SR_FAULT ;
+	int		dl = 0 ; /* return-value */
+	if (dbuf && sp) {
+	    rs = SR_OK ;
+	    while (dlen-- && sl && *sp) {
+	        int ch = mkchar(*sp++) ;
+	        if (ch == '_') ch = '-' ;
+	        dbuf[dl++] = char(ch) ;
+	        sl -= 1 ;
+	    } /* end while */
+	    if (sl && *sp) rs = SR_OVERFLOW ;
+	    dbuf[dl] = '\0' ;
+	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
 }
 /* end subroutine (snwcpyhyphen) */

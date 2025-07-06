@@ -1,5 +1,5 @@
 /* snwcpyrev SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy in reverse the characters from a source to a destiation */
@@ -17,21 +17,41 @@
 
 /*******************************************************************************
 
+  	Name:
+	snwcpyrev
+
+	Description:
 	Copy characters to a destiation string in reverse order
 	from a source string.
+
+	Synopsis:
+	int snwcpyrev(char *dbuf,int dlen,cchar *sp,int sl) noex
+
+	Arguments:
+	dbuf		destination buffer pointer
+	dlen		destination buffer length
+	sp		soure c-string pointer
+	sl		soure c-string length
+
+	Returns:
+	>=0		number of characters placed in the destination
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
-#include	<ascii.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"snwcpyx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -48,9 +68,6 @@
 /* forward references */
 
 
-/* external variables */
-
-
 /* local variables */
 
 
@@ -63,9 +80,9 @@ int snwcpyrev(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf && sp) {
 	    rs = SR_OVERFLOW ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((dlen < 0) || (dlen >= sl)) {
-	        int	i ; /* used afterwards */
+	        int	i ; /* used-afterwards */
 	        for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
 	            dbuf[i] = sp[sl-i-1] ;
 	        } /* end for */

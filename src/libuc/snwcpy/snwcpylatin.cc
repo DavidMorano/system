@@ -1,5 +1,5 @@
 /* snwcpylatin SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* special (excellent) string-copy type of subroutine! */
@@ -22,9 +22,10 @@
 	snwcpylatin
 
 	Description:
-	This is essentially the same as the |snwcpy(3dam)| subroutine
+	This is essentially the same as the |snwcpy(3uc)| subroutine
 	except that non-printable characters are replaced with a
-	stuff-mark character.
+	stuff-mark character.  Actually, this is identical to
+	the |snwcpyclean(3uc)| subroutine.
 
 	Synopsis:
 	int snwcpylatin(char *dp,int dl,cchar *sp,int sl) noex
@@ -37,27 +38,31 @@
 
 	Returns:
 	>=0		number of bytes in result
-	<0		error
-
+	<0		error (system-return)
 
 	Notes:
-	This subroutine just calls either the |sncpy1(3dam)| or the
-	|strwcpy(3dam)| subroutine based on the arguments.
+	This subroutine just calls the |snwcpyclean(3uc)|
+	subroutine w/ our substitution character.
 
 	See-also:
-	snwcpy(3dam),
-	snwcpylatin(3dam), 
-	snwcpyopaque(3dam), 
-	snwcpycompact(3dam), 
-	snwcpyclean(3dam), 
-	snwcpyhyphen(3dam),
+	snwcpy(3uc),
+	snwcpylatin(3uc), 
+	snwcpyopaque(3uc), 
+	snwcpycompact(3uc), 
+	snwcpyclean(3uc), 
+	snwcpyhyphen(3uc),
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<localmisc.h>
 
 #include	"snwcpyx.h"
 
@@ -71,25 +76,23 @@
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
 /* exported variables */
 
 
 /* exported subroutines */
 
 int snwcpylatin(char *dbuf,int dlen,cchar *sp,int sl) noex {
-	int		dl = 0 ;
-	int		rs = SR_OK ;
-	while (dlen-- && sl && *sp) {
-	    int		ch = mkchar(*sp++) ;
-	    if (! isprintlatin(ch)) {
-		ch = ('-' + 128) ;
-	    }
-	    dbuf[dl++] = char(ch) ;
-	    sl -= 1 ;
-	} /* end while */
-	if ((sl != 0) && (*sp != '\0')) rs = SR_OVERFLOW ;
-	dbuf[dl] = '\0' ;
-	return (rs >= 0) ? dl : rs ;
+    	cint	sch = ('-' + 128) ;
+    	return snwcpyclean(dbuf,dlen,sch,sp,sl) ;
 }
 /* end subroutine (snwcpylatin) */
 
