@@ -1,5 +1,5 @@
 /* sidquote SUPPORT (string-index double-quote) */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the index of the character past a double-quoted string */

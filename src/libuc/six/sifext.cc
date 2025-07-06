@@ -1,5 +1,5 @@
 /* sifext SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine if file-name (just a c-string) has an approved file-extension */
@@ -38,23 +38,22 @@
 	>0              has an approved extension (and this is
 			base-str length)
 
-*******************************************************************************/
+******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<strn.h>		/* |strnrchr(3uc)| */
 #include	<matstr.h>
-#include	<strn.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
 #include	<localmisc.h>
 
 #include	"sifext.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -81,7 +80,7 @@
 
 int sifext(cchar *fp,int fl,mainv exts) noex {
 	int		si = -1 ;
-	if (fl < 0) fl = xstrlen(fp) ;
+	if (fl < 0) fl = lenstr(fp) ;
 	if (cchar *tp ; (tp = strnrchr(fp,fl,'.')) != nullptr) {
 	    cint	el = intconv((fp + fl) - (tp + 1)) ;
 	    cchar	*ep = (tp + 1) ;
