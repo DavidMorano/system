@@ -1,11 +1,11 @@
 /* sihyphen SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find a hyphen (a fake hyphen of two minus characters) in a string */
 /* version %I% last-modified %G% */
 
-#define	CF_STRNCHR	0		/* use |strnchr(3dam)| */
+#define	CF_STRNCHR	0		/* use |strnchr(3uc)| */
 
 /* revision history:
 
@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0	index of found hyphen
-	-1	hyphen not found
+	<0	hyphen not found (or caller-usage-error)
 
 *******************************************************************************/
 
@@ -46,19 +46,18 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<ascii.h>
-#include	<strn.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
+#include	<strn.h>		/* |strnchr(3uc)| */
 #include	<toxc.h>
 #include	<localmisc.h>
 
 #include	"six.h"
 
+import libutil ;
 
 /* local defines */
 
 #ifndef	CF_STRNCHR
-#define	CF_STRNCHR	0		/* use |strnchr(3dam)| */
+#define	CF_STRNCHR	0		/* use |strnchr(3uc)| */
 #endif
 
 
@@ -94,25 +93,27 @@ cbool		f_strnchr = CF_STRNCHR ;
 /* exported subroutines */
 
 int sihyphen(cchar *sp,int sl) noex {
-	int		si = 0 ;
+	int		si = 0 ; /* return-value */
 	bool		f = false ;
-	if (sl < 0) sl = xstrlen(sp) ;
-	if_constexpr (f_strnchr) {
-	    cchar	*tp ;
-	    while ((sl >= 2) && ((tp = strnchr(sp,sl,'-')) != nullptr)) {
-	        si += (tp-sp) ;
-	        f = (((tp-sp)+1) < sl) && (tp[1] == '-') ;
-	        if (f) break ;
-	        si += 1 ;
-	        sl -= ((tp+1)-sp) ;
-	        sp = (tp+1) ;
-	    } /* end while */
-	} else {
-	    for (si = 0 ; (si < (sl-1)) && sp[si] ; si += 1) {
-	        f = (sp[si] == '-') && (sp[si + 1] == '-') ;
-	        if (f) break ;
-	    } /* end for */
-	} /* end if_constexpr (f_strnchr) */
+	if (sp) {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    if_constexpr (f_strnchr) {
+	        cchar	*tp ;
+	        while ((sl >= 2) && ((tp = strnchr(sp,sl,'-')) != nullptr)) {
+	            si += intconv(tp - sp) ;
+	            f = (intconv((tp - sp) + 1) < sl) && (tp[1] == '-') ;
+	            if (f) break ;
+	            si += 1 ;
+	            sl -= intconv((tp + 1) - sp) ;
+	            sp = (tp + 1) ;
+	        } /* end while */
+	    } else {
+	        for (si = 0 ; (si < (sl - 1)) && sp[si] ; si += 1) {
+	            f = (sp[si] == '-') && (sp[si + 1] == '-') ;
+	            if (f) break ;
+	        } /* end for */
+	    } /* end if_constexpr (f_strnchr) */
+	} /* end if (non-null) */
 	return (f) ? si : -1 ;
 }
 /* end subroutine (sihyphen) */
