@@ -1796,7 +1796,7 @@ PARAMOPT	*app ;
 
 	    while (rs >= 0) {
 
-	        rs1 = paramopt_fetch(app,po_name,&cur,&np) ;
+	        rs1 = paramopt_curfetch(app,po_name,&cur,&np) ;
 		nl = rs ;
 	        if (rs1 == SR_NOTFOUND) break ;
 		rs = rs1 ;

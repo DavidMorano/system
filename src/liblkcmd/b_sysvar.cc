@@ -1377,7 +1377,7 @@ static int procfiles(PROGINFO *pip,PARAMOPT *app)
 	    cchar	*np ;
 
 	    while (rs >= 0) {
-	        nl = paramopt_fetch(app,po_name,&cur,&np) ;
+	        nl = paramopt_curfetch(app,po_name,&cur,&np) ;
 	        if (nl < 0) break ;
 	        if (nl == 0) continue ;
 	        rs = nl ;
