@@ -35,6 +35,8 @@ DEFS=
 
 INCS= mkx.h
 
+MODS +=
+
 LIBS=
 
 
@@ -58,7 +60,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 OBJ00_MKX= mkaddrname.o mkaddrdisp.o mkaddrbest.o mkaddrfrom.o
 OBJ01_MKX= mkaltext.o
 OBJ02_MKX= mkcaselower.o mkcdpath.o mkcexsync.o mkbasename.o
-OBJ03_MKX= mkchar.o mkcleanline.o
+OBJ03_MKX= mkcleanline.o
 OBJ04_MKX= mkdisplayable.o
 OBJ05_MKX= mkexpandpath.o mkfdfname.o mkfingerquery.o 
 OBJ06_MKX= mkfmtphone.o mkfname.o mkfnamesuf.o
@@ -85,7 +87,7 @@ OBJE_MKX= obj16_mkx.o obj17_mkx.o obj18_mkx.o obj19_mkx.o
 OBJ_MKX= obja_mkx.o objb_mkx.o objc_mkx.o objd_mkx.o obje_mkx.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -110,9 +112,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_MKX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MKX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MKX)
 
 $(T).a:			$(OBJ_MKX)
 	$(AR) $(ARFLAGS) -rc $@ $?
@@ -211,6 +216,13 @@ objd_mkx.o:	$(OBJD_MKX)
 obje_mkx.o:	$(OBJE_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJE_MKX)
 
+
+mkpathrooted.o:		mkpathrooted.cc	mkpath.h	$(INCS)
+mkpathx.o:		mkpathx.cc	mkpath.h	$(INCS)
+mkpathxw.o:		mkpathxw.cc	mkpath.h	$(INCS)
+
+mknpathx.o:		mknpathx.cc	mknpath.h	$(INCS)
+mknpathxw.o:		mknpathxw.cc	mknpath.h	$(INCS)
 
 mkfdfname.o:		mkfdfname.cc		$(INCS) mkfdfname.h
 mkgecosname.o:		mkgecosname.cc		$(INCS) mkgecosname.h

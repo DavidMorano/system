@@ -1,5 +1,5 @@
 /* snabbr SUPPORT */
-/* encoding=ISO8859-1 */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy an abbreviation of a groups of words */
@@ -27,25 +27,33 @@
 	int snabbr(char *dp,int dl,cchar *sp,int sl) noex
 
 	Arguments:
-	dp		destination string buffer
+	dp		destination string buffer pointer
 	dl		destination string buffer length
-	sp		source string
+	sp		source string pointer
 	sl		source string length
 
 	Returns:
 	>=0		number of bytes in result
-	<0		error
+	<0		error (system-return)
 
 	See-also:
-	snwcpy(3dam),
-	snwcpylatin(3dam), 
-	snwcpyopaque(3dam), 
-	snwcpycompact(3dam), 
-	snwcpyclean(3dam), 
-	snwcpyhyphen(3dam), 
-	snwcpylc(3dam),
-	snwcpyuc(3dam),
-	snwcpyfc(3dam),
+	snfsflags(3uc)
+	snopenflags(3uc)
+	snpollflags(3uc)
+	snxtilook(3uc)
+	sninetaddr(3uc)
+	snsigabbr(3uc)
+	snabbr(3uc)
+	snshellunder(3uc)
+	snfilemode(3uc)
+	sntid(3uc)
+	snerrabbr(3uc)
+	snrealname(3uc)
+	snloadavg(3uc)
+	snkeyval(3uc)
+	snwvprintf(3uc)
+	snwprintf(3uc)
+	snkeval(3uc)
 
 *******************************************************************************/
 
@@ -53,39 +61,53 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<sfx.h>
-#include	<libutil.hh>		/* |xstrlen(3u)| */
-#include	<toxc.h>
+#include	<sfx.h>			/* |sfnext(3uc)| */
+#include	<toxc.h>		/* |chtouc(3uc)| (for GCC b*llsh*t) */
 #include	<localmisc.h>
 
 #include	"snx.h"
 
+import libutil ;
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
 
 
-/* external variables */
+/* exported variables */
 
 
 /* exported subroutines */
 
 int snabbr(char *dp,int dl,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	if (dp && sp) {
 	    int		cl ;
 	    cchar	*cp{} ;
 	    rs = SR_OK ;
 	    if (dl < 0) dl = INT_MAX ;
-	    if (sl < 0) sl = xstrlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	        if (i < dl) {
 	            dp[i++] = chtouc(cp[0]) ; /* <- GCC conversion complaint */
