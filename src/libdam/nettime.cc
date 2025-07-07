@@ -82,6 +82,7 @@
 
 #include	"nettime.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -140,15 +141,9 @@ struct udpargs {
 namespace {
     struct vars {
 	int		maxpathlen ;
-	int mkvars() noex {
-	    int		rs ;
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-		maxpathlen = rs ;
-	    }
-	    return rs ;
-	} ;
+	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -187,19 +182,19 @@ constexpr int	connagains[] = {
 	SR_AFNOSUPPORT,
 	SR_TIMEDOUT,
 	0
-} ;
+} ; /* end array (connagains) */
 
 static vars		var ;
 
-constexpr int		tslen = TIMEBUFLEN ;
-constexpr int		onemillion = 1000000 ;
+constexpr int		tslen		= TIMEBUFLEN ;
+constexpr int		onemillion	= 1000000 ;
 
-constexpr char		inetsvc[] = INETSVC_TIME ;
+constexpr char		inetsvc[]	= INETSVC_TIME ;
 
-constexpr bool		f_useudp = CF_USEUDP ;
-constexpr bool		f_udpmux = CF_UDPMUX ;
-constexpr bool		f_solaris = CF_SOLARIS ;
-constexpr bool		f_connectudp = CF_CONNECTUDP ;
+constexpr bool		f_useudp	= CF_USEUDP ;
+constexpr bool		f_udpmux	= CF_UDPMUX ;
+constexpr bool		f_solaris	= CF_SOLARIS ;
+constexpr bool		f_connectudp	= CF_CONNECTUDP ;
 
 
 /* exported variables */
@@ -214,7 +209,7 @@ int getnettime(nettime *ntp,int proto,int af,cc *hostname,cc *svc,int to) noex {
 	    rs = SR_INVALID ;
 	    memclear(ntp) ;
 	    if ((proto >= 0) && (af >= 0) && hostname[0]) {
-	        static cint	rsv = var.mkvars() ;
+	        static cint	rsv = var ;
 	        if ((rs = rsv) >= 0) {
 	            bool	f = ((proto == IPPROTO_UDP) || (proto <= 0)) ;
 		    if ((svc == nullptr) || (svc[0] == '\0')) {
@@ -288,7 +283,8 @@ static int nettime_udp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 /* end subroutine (nettime_udp) */
 
 static int nettime_tcp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
-	TIMEVAL		netstart, netend ;
+	TIMEVAL		netstart ;
+	TIMEVAL		netend ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		s = -1 ;
@@ -300,7 +296,7 @@ static int nettime_tcp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 
 	ntp->proto = IPPROTO_TCP ;
 
-/* retrieve network data */
+	/* retrieve network data */
 
 	gettimeofday(&netstart,nullptr) ;
 
@@ -335,7 +331,8 @@ static int nettime_tcp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 		}
 	    }
 
-	    u_close(s) ;
+	    rs1 = u_close(s) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 
 /* process network data */
@@ -371,29 +368,27 @@ static int nettime_tcp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 #if	CF_USEUDP
 
 static int nettime_udptrythem(UA *uap,char *tsbuf) noex {
-	AI	hint{} ;
-	vechand		alist ;
+	AI		hint{} ;
 	hostaddr	ha ;
 	cint		proto = IPPROTO_UDP ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		pf ;
 	int		f_got = false ;
 
 	uap->proto = proto ;
 	hint.ai_protocol = proto ;
 
 	if (uap->af >= 0) {
-	    int pf = getprotofamily(uap->af) ;
-	    if (pf >= 0) {
+	    if (cint pf = getprotofamily(uap->af) ; pf >= 0) {
 	        uap->pf = pf ;
 	        hint.ai_family = pf ;
 	    }
 	}
 
-	if ((rs = vechand_start(&alist,2,0)) >= 0) {
+	if (vechand alist ; (rs = vechand_start(&alist,2,0)) >= 0) {
 	    cchar	*hn = uap->hostname ;
 	    if ((rs = hostaddr_start(&ha,hn,uap->svc,&hint)) >= 0) {
+		int pf ;
 
 	        if (((! f_got) && (rs >= 0)) || connagain(rs)) {
 	            pf = PF_INET4 ;
@@ -425,7 +420,8 @@ static int nettime_udptrythem(UA *uap,char *tsbuf) noex {
 	        hostaddr_finish(&ha) ;
 	        if ((rs >= 0) && (uap->c == 0)) rs = SR_PROTONOSUPPORT ;
 	    } /* end if (initialized host addresses) */
-	    vechand_finish(&alist) ;
+	    rs1 = vechand_finish(&alist) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
 
 	return (rs >= 0) ? f_got : rs ;
@@ -438,9 +434,8 @@ static int nettime_udptrysome(UA *uap,char *tsbuf,vechand *alp,
 	int		rs1 ;
 	int		f_got = false ;
 	if (hostaddr_cur cur ; (rs = hostaddr_curbegin(hap,&cur)) >= 0) {
-	    AI	*aip ;
 	    bool	f ;
-	    while (hostaddr_curenum(hap,&cur,&aip) >= 0) {
+	    for (AI *aip ; hostaddr_curenum(hap,&cur,&aip) >= 0 ; ) {
 	        cint	proto = aip->ai_protocol ;
 	        f = ((proto == uap->proto) || (proto <= 0)) ;
 	        f = f && ((pf == PF_UNSPEC) || (pf == aip->ai_family)) ;
@@ -456,7 +451,7 @@ static int nettime_udptrysome(UA *uap,char *tsbuf,vechand *alp,
 	            }
 	            if (f_got) break ;
 	        } /* end if (match) */
-	    } /* end while */
+	    } /* end for */
 	    rs1 = hostaddr_curend(hap,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
@@ -465,13 +460,12 @@ static int nettime_udptrysome(UA *uap,char *tsbuf,vechand *alp,
 /* end subroutine (nettime_udptrysome) */
 
 static int nettime_udptryone(UA *uap,char *tsbuf,AI *aip) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
 	int		pf = aip->ai_family ;
 	int		st = aip->ai_socktype ;
 	int		proto = uap->proto ;
-	int		i ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 
 	uap->ntp->pf = aip->ai_family ;
 	if ((rs = u_socket(pf,st,proto)) >= 0) {
@@ -479,7 +473,7 @@ static int nettime_udptryone(UA *uap,char *tsbuf,AI *aip) noex {
 	    if_constexpr (f_connectudp) {
 	        rs = u_connect(fd,aip->ai_addr,aip->ai_addrlen) ;
 	    }
-	    for (i = 0 ; (rs >= 0) && (i < NTRIES) ; i += 1) {
+	    for (int i = 0 ; (rs >= 0) && (i < NTRIES) ; i += 1) {
 	        rs = nettime_udptryoner(uap,tsbuf,aip,fd) ;
 	        f = (rs > 0) ;
 		if_constexpr (f_solaris) {
@@ -583,14 +577,14 @@ static uint64_t utime_timeval(TIMEVAL *tvp) noex {
 /* end subroutine (utime_timeval) */
 
 static uint64_t utime_tcpcalc(uint64_t uti2,uint64_t uti1) noex {
-	uint64_t	utid = uti2 - uti1 ;
+	uint64_t	utid = (uti2 - uti1) ;
 	uint64_t	r{} ;
 	{
-	    double	d = utid ;
+	    longdouble	d = cast_static<longdouble>(utid) ;
 	    d = ((d * 3) / 4) ;		/* formula for TCP */
-	    utid = d ;
+	    utid = cast_static<uint64_t>(d) ;
 	}
-	r = uti1 + utid ;
+	r = (uti1 + utid) ;
 	return r ;
 }
 /* end subroutine (utime_tcpcalc) */
@@ -599,9 +593,9 @@ static uint64_t utime_udpcalc(uint64_t uti2,uint64_t uti1) noex {
 	uint64_t	utid = uti2 - uti1 ;
 	uint64_t	r{} ;
 	{
-	    double	d = utid ;
+	    longdouble	d = cast_static<longdouble>(utid) ;
 	    d = (d / 2) ;		/* formula for UDP */
-	    utid = d ;
+	    utid = cast_static<uint64_t>(d) ;
 	}
 	r = uti1 + utid ;
 	return r ;
@@ -612,7 +606,7 @@ static int tv_loadusec(TIMEVAL *tvp,int64_t uti) noex {
 	int		rs = SR_FAULT ;
 	if (tvp) {
 	    tvp->tv_sec = (uti / onemillion) ;
-	    tvp->tv_usec = (uti % onemillion) ;
+	    tvp->tv_usec = cast_static<suseconds_t>(uti % onemillion) ;
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -646,7 +640,8 @@ static int connagain(int rs) noex {
 static int isaddrsame(cvoid *addr1,cvoid *addr2) noex {
 	sockaddress	*sa1p = (sockaddress *) addr1 ;
 	sockaddress	*sa2p = (sockaddress *) addr2 ;
-	int		af1, af2 ;
+	int		af1{} ;
+	int		af2{} ;
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (rs >= 0) {
@@ -791,5 +786,13 @@ static int mkprintscope(char *printaddr,int printalen,SOCKADDR *ssap) noex {
 /* end subroutine (mkprintscope) */
 
 #endif /* COMMENT */
+
+vars::operator int () noex {
+	    int		rs ;
+	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+		maxpathlen = rs ;
+	    }
+	    return rs ;
+} /* end method (vars::operator) */
 
 

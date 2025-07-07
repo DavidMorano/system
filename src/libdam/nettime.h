@@ -13,8 +13,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/time.h>		/* system-time related types */
+#include	<sys/time.h>		/* |TIMEVAL| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
