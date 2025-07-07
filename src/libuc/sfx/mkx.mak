@@ -76,7 +76,7 @@ OBJ15_MKX= mktagfname.o
 OBJ16_MKX= mkufname.o
 OBJ17_MKX= mkuserpath.o mkutmpid.o
 OBJ18_MKX= mkuuid.o mkvarpath.o
-OBJ19_MKX= mkpr.o
+OBJ19_MKX= mkpr.o mkxdisp.o
 
 OBJA_MKX= obj00_mkx.o obj01_mkx.o obj02_mkx.o obj03_mkx.o
 OBJB_MKX= obj04_mkx.o obj05_mkx.o obj06_mkx.o obj07_mkx.o
@@ -245,13 +245,14 @@ mkcdpath.o:		mkcdpath.cc		$(INCS)
 mkuserpath.o:		mkuserpath.cc		$(INCS)
 mkvarpath.o:		mkvarpath.cc		$(INCS)
 
-mkaltext.o:		mkaltext.cc		$(INCS)
-mkmaildirtest.o:	mkmaildirtest.cc	$(INCS)
-mkstrunique.o:		mkstrunique.cc		$(INCS)
-mkcleanline.o:		mkcleanline.cc		$(INCS)
-mkfmtphone.o:		mkfmtphone.cc		$(INCS)
-mkfingerquery.o:	mkfingerquery.cc	$(INCS)
+mkaltext.o:		mkaltext.cc				$(INCS)
+mkmaildirtest.o:	mkmaildirtest.cc			$(INCS)
+mkstrunique.o:		mkstrunique.cc				$(INCS)
+mkcleanline.o:		mkcleanline.cc				$(INCS)
+mkfmtphone.o:		mkfmtphone.cc				$(INCS)
+mkfingerquery.o:	mkfingerquery.cc			$(INCS)
 
-mkpr.o:			mkpr.cc mkpr.h		$(INCS)
+mkpr.o:			mkpr.cc mkpr.h				$(INCS)
+mkxdisp.o:		mkxdisp.cc	mkxdisp.h		$(INCS)
 
 
