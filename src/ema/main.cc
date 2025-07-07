@@ -804,18 +804,18 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    const char	*ccp ;
 	    debugprintf("main: parameter keys are:\n") ;
 	    paramopt_curbegin(&aparams,&c) ;
-	    while (paramopt_enumkeys(&aparams,&c,&ccp) >= 0) {
+	    while (paramopt_curenumkey(&aparams,&c,&ccp) >= 0) {
 	        debugprintf("main: key=%s\n",ccp) ;
 	    }
 	    paramopt_curend(&aparams,&c) ;
 	    debugprintf("main: headers are:\n") ;
 	    paramopt_curbegin(&aparams,&c) ;
-	    while (paramopt_enumvalues(&aparams,PO_HEADER,&c,&ccp) >= 0)
+	    while (paramopt_curenumval(&aparams,PO_HEADER,&c,&ccp) >= 0)
 	        debugprintf("main: header=%s\n",ccp) ;
 	    paramopt_curend(&aparams,&c) ;
 	    debugprintf("main: subparts are:\n") ;
 	    paramopt_curbegin(&aparams,&c) ;
-	    while (paramopt_enumvalues(&aparams,PO_SUBPART,&c,&ccp) >= 0)
+	    while (paramopt_curenumval(&aparams,PO_SUBPART,&c,&ccp) >= 0)
 	        debugprintf("main: header=%s\n",ccp) ;
 	    paramopt_curend(&aparams,&c) ;
 	} /* end block */
@@ -1046,7 +1046,7 @@ static int procsubpart(PROGINFO *pip,PARAMOPT *pop,CMD_LOCAL *lsp)
 	    cchar	*vp ;
 	    while (rs >= 0) {
 
-	            vl = paramopt_enumvalues(pop,po,&c,&vp) ;
+	            vl = paramopt_curenumval(pop,po,&c,&vp) ;
 	            if (vl == SR_NOTFOUND) break ;
 	            rs = vl ;
 	            if (rs < 0) break ;
