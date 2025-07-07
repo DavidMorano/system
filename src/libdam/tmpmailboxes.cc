@@ -100,7 +100,7 @@ int tmpmailboxes(char *rbuf,int rlen) noex {
 	if (rbuf) {
 	    cchar	*tmpmb = TMPMAILBOXES ;
 	    rbuf[0] = '\0' ;
-	    if (USTAT sb ; (rs = uc_stat(tmpmb,&sb)) >= 0) {
+	    if (ustat sb ; (rs = uc_stat(tmpmb,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 		    cint	am = (R_OK|W_OK|X_OK) ;
 		    if ((rs = perm(tmpmb,-1,-1,nullptr,am)) >= 0) {
@@ -149,7 +149,7 @@ static int deftmpdir(char *rbuf,int rlen) noex {
 	static cchar	*evp = getenv(varname.tmpdir) ;
 	cchar		*tmpdir = sysword.w_tmpdir ;
 	if (evp) {
-	    if (USTAT sb ; (rs = uc_stat(evp,&sb)) >= 0) {
+	    if (ustat sb ; (rs = uc_stat(evp,&sb)) >= 0) {
 		if (S_ISDIR(sb.st_mode)) {
 		    cint	am = (R_OK|W_OK|X_OK) ;
 		    if ((rs = perm(evp,-1,-1,nullptr,am)) >= 0) {
@@ -180,7 +180,7 @@ static int chownpcs(cchar *dname) noex {
 	             cint	prlen = rs ;
 	    	     cchar	*prname = PRNAME ;
 	             if ((rs = mkpr(prbuf,prlen,prname,dname)) >= 0) {
-	 	         if (USTAT sb ; (rs = uc_stat(prbuf,&sb)) >= 0) {
+	 	         if (ustat sb ; (rs = uc_stat(prbuf,&sb)) >= 0) {
 		             const uid_t	uid_pcs = sb.st_uid ;
 		             const gid_t	gid_pcs = sb.st_gid ;
 		             rs = uc_chown(dname,uid_pcs,gid_pcs) ;
