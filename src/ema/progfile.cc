@@ -207,7 +207,7 @@ const char	fname[] ;
 	                const char	*po = PO_HEADER ;
 	                const char	*hp ;
 	                while (rs >= 0) {
-	                    hl = paramopt_enumvalues(pp,po,&cur,&hp) ;
+	                    hl = paramopt_curenumval(pp,po,&cur,&hp) ;
 	                    if (hl == SR_NOTFOUND) break ;
 	                    rs = hl ;
 
