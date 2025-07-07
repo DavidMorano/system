@@ -44,6 +44,7 @@
 
 #include	"procse.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -58,15 +59,16 @@
 
 /* local structures */
 
-struct vars {
+namespace {
+    struct vars {
 	int		maxpathlen ;	/* set but not currently used */
 	int		ebuflen ;
-} ;
+	operator int () noex ;
+    } ;
+} /* end namespace */
 
 
 /* forward references */
-
-static int	mkvars() noex ;
 
 
 /* local variables */
@@ -83,13 +85,13 @@ int procse_start(procse *op,cchar **envv,varsub *vsp,procse_args *esap) noex {
 	PROCSE		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && esap) {
-	    static cint		rsv = mkvars() ;
+	    static cint		rsv = var ;
 	    memclear(hop) ;
 	    if ((rs = rsv) >= 0) {
 	        op->envv = envv ;
 	        op->vsp = vsp ;
 	        op->ap = esap ;
-	    } /* end if (mkvars) */
+	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -158,8 +160,8 @@ namespace {
 	int start() noex ;
 	int finish() noex ;
 	int proc(cchar *,cchar **) noex ;
-	int stageone(procse *,cc *) noex ;
-	int stagetwo(expcook *,int,cchar **) noex ;
+	int stageone(cc *) noex ;
+	int stagetwo(int,cchar **) noex ;
     } ; /* end struct (subproc) */
 }
 
@@ -190,7 +192,7 @@ int subproc::finish() noex {
 }
 /* end method (subproc::finish) */
 
-int subproc::stageone(procse *op,cc *inbuf) noex {
+int subproc::stageone(cc *inbuf) noex {
 	int		rs = SR_OK ;
 	int		vl = 0 ;
 	if (op->vsp != nullptr) {
@@ -204,11 +206,11 @@ int subproc::stageone(procse *op,cc *inbuf) noex {
 }
 /* end method (subproc::stageone) */
 
-int subproc::stagetwo(expcook *ecp,int vl,cchar **opp) noex {
+int subproc::stagetwo(int vl,cchar **opp) noex {
 	int		rs = SR_OK ;
 	int		el = 0 ;
 	int		fl = 0 ;
-	if (ecp != nullptr) {
+	if (ecp) {
 	    rs = expcook_exp(ecp,0,ebuf,elen,vbuf,vl) ;
 	    el = rs ;
 	} else {
@@ -228,10 +230,10 @@ int subproc::stagetwo(expcook *ecp,int vl,cchar **opp) noex {
 
 int subproc::proc(cchar *inbuf,cchar **opp) noex {
 	int		rs ;
-	char		fl = 0 ;
+	int		fl = 0 ;
 	*opp = nullptr ;
-	if ((rs = stageone(op,inbuf)) >= 0) {
-	    rs = stagetwo(ecp,rs,opp) ;
+	if ((rs = stageone(inbuf)) >= 0) {
+	    rs = stagetwo(rs,opp) ;
 	    fl = rs ;
 	} /* end if (ok) */
 	return (rs >= 0) ? fl : rs ;
@@ -242,8 +244,7 @@ int procse_process(procse *op,expcook *ecp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) {
-	    subproc	so(op,ecp) ;
-	    if ((rs = so.start()) >= 0) {
+	    if (subproc	so(op,ecp) ; (rs = so.start()) >= 0) {
 	        procse_args	*ap = op->ap ;
 	        if ((rs >= 0) && (ap->passfile != nullptr)) {
 	            rs = so.proc(ap->passfile,&op->a.passfile) ;
@@ -280,7 +281,7 @@ int procse_process(procse *op,expcook *ecp) noex {
 }
 /* end subroutine (procse_process) */
 
-static int mkvars() noex {
+vars::operator int () noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
 	    var.maxpathlen = rs ;
@@ -288,6 +289,6 @@ static int mkvars() noex {
 	}
 	return rs ;
 }
-/* end subroutine (mkvars) */
+/* end subroutine (vars::operator) */
 
 
