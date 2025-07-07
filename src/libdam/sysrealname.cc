@@ -26,12 +26,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<dlfcn.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -47,6 +44,7 @@
 
 #include	"sysrealname.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -208,7 +206,7 @@ constexpr cpcchar	subs[] = {
 	nullptr
 } ;
 
-constexpr char		pr[] = "/usr/extra" ;
+constexpr char		extradir[] = "/usr/extra" ;
 
 
 /* exported variables */
@@ -221,11 +219,12 @@ int sysrealname_open(SRN *op,cchar *dbname) noex {
 	if (dbname == nullptr) dbname = SYSREALNAME_DBNAME ;
 	if ((rs = sysrealname_ctor(op)) >= 0) {
 	    cchar	*objname = SRN_OBJNAME ;
+	    cchar	*pr = extradir ;
 	    if ((rs = sysrealname_objloadbegin(op,pr,objname)) >= 0) {
                 sysrealname_calls    *callp = callsp(op->callp) ;
 		rs = SR_NOSYS ;
 		if (op->callp) {
-		    auto co = callp->open ;
+		    cauto co = callp->open ;
 	            if ((rs = co(op->obj,dbname)) >= 0) {
 	                op->magic = SYSREALNAME_MAGIC ;
 	            }
@@ -246,7 +245,7 @@ int sysrealname_close(SRN *op) noex {
             sysrealname_calls    *callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->close) {
-		auto co = callp->close ;
+		cauto co = callp->close ;
 	        rs1 = co(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -272,7 +271,7 @@ int sysrealname_getinfo(SRN *op,SRN_INFO *ip) noex {
 	    IPW_INFO		iinfo{} ;
 	    rs = SR_NOSYS ;
 	    if (callp->getinfo) {
-		auto co = callp->getinfo ;
+		cauto co = callp->getinfo ;
 	        rs = co(op->obj,&iinfo) ;
 	        n = rs ;
 	    }
@@ -302,7 +301,7 @@ int sysrealname_curbegin(SRN *op,SRN_CUR *curp) noex {
 	    memclear(curp) ;
 	    if (callp->curbegin) {
 	        if (void *vp{} ; (rs = uc_malloc(csz,&vp)) >= 0) {
-		    auto co = callp->curbegin ;
+		    cauto co = callp->curbegin ;
 		    IPW_CUR	*icurp = (IPW_CUR *) curp->scp ;
 		    curp->scp = vp ;
 	            if ((rs = co(op->obj,icurp)) >= 0) {
@@ -328,7 +327,7 @@ int sysrealname_curend(SRN *op,SRN_CUR *curp) noex {
 	    if (curp->magic == SRN_CURMAGIC) {
 		rs = SR_OK ;
 	        if (callp->curend) {
-		    auto 	co = callp->curend ;
+		    cauto 	co = callp->curend ;
 		    IPW_CUR	*icurp = (IPW_CUR *) curp->scp ;
 		    if (icurp) {
 	                rs1 = co(op->obj,icurp) ;
@@ -395,7 +394,7 @@ int sysrealname_curlookread(SRN *op,SRN_CUR *curp,char *rbuf) noex {
 	    if (curp->magic == SRN_CURMAGIC) {
 		rs = SR_NOSYS ;
 	        if (callp->curfetch) {
-		    auto	co = callp->curfetch ;
+		    cauto	co = callp->curfetch ;
 	            IPW_CUR	*icp = (IPW_CUR *) curp->scp ;
 	            cint	rsn = SR_NOTFOUND ;
 	            cint	sn = curp->sn ;
@@ -420,7 +419,7 @@ int sysrealname_curenum(SRN *op,SRN_CUR *curp,char *ubuf,
 	    if (curp->magic == SRN_CURMAGIC) {
 		rs = SR_NOSYS ;
 	        if (callp->curenum) {
-		    auto 	co = callp->curenum ;
+		    cauto 	co = callp->curenum ;
 	            IPW_CUR	*icurp = (IPW_CUR *) curp->scp ;
 	            rs = co(op->obj,icurp,ubuf,sa,rbuf,rlen) ;
 		}
@@ -436,7 +435,7 @@ int sysrealname_audit(SRN *op) noex {
             sysrealname_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->audit) {
-		auto co = callp->audit ;
+		cauto co = callp->audit ;
 	        rs = co(op->obj) ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -459,10 +458,10 @@ static int sysrealname_objloadbegin(SRN *op,cchar *pr,cchar *objn) noex {
 	            cchar	*mn = SRN_MODBNAME ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
-	            mo |= MODLOAD_OLIBVAR ;
-	            mo |= MODLOAD_OPRS ;
-	            mo |= MODLOAD_OSDIRS ;
-	            mo |= MODLOAD_OAVAIL ;
+	            mo |= modloadm.libvar ;
+	            mo |= modloadm.libprs ;
+	            mo |= modloadm.libsdirs ;
+	            mo |= modloadm.avail ;
 	            if ((rs = modload_open(lp,pr,mn,on,mo,sv)) >= 0) {
 		        op->fl.modload = true ;
 	                if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
