@@ -2311,7 +2311,7 @@ static int procfts(PROGINFO *pip)
 	if (rs >= 0) {
 	    if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
 	        while (rs >= 0) {
-	            vl = paramopt_fetch(pop,po_fts,&cur,&vp) ;
+	            vl = paramopt_curfetch(pop,po_fts,&cur,&vp) ;
 	            if (vl == SR_NOTFOUND) break ;
 	            rs = vl ;
 	            if (rs < 0) break ;
@@ -3295,7 +3295,7 @@ static int procprune(PROGINFO *pip,cchar *name)
 	        cchar	*po = po_prune ;
 	        cchar	*vp ;
 	        while (rs >= 0) {
-	            vl = paramopt_fetch(pop,po,&cur,&vp) ;
+	            vl = paramopt_curfetch(pop,po,&cur,&vp) ;
 	            if (vl == SR_NOTFOUND) break ;
 	            rs = vl ;
 #if	CF_DEBUG
@@ -3340,7 +3340,7 @@ static int procprintfts(PROGINFO *pip,cchar *po)
 	        cchar	*pn = pip->progname ;
 	        cchar	*vp ;
 
-	        while ((vl = paramopt_fetch(pop,po,&cur,&vp)) >= 0) {
+	        while ((vl = paramopt_curfetch(pop,po,&cur,&vp)) >= 0) {
 	            rs1 = bprintf(efp,"%s: ft=%r\n",pn,vp,vl) ;
 	            if (rs1 > 0) wlen += rs1 ;
 	            if (rs1 < 0) break ;
@@ -3370,7 +3370,7 @@ static int procprintsufs(PROGINFO *pip,cchar *po)
 	        cchar	*pn = pip->progname ;
 	        cchar	*vp ;
 
-	        while ((vl = paramopt_fetch(pop,po,&cur,&vp)) >= 0) {
+	        while ((vl = paramopt_curfetch(pop,po,&cur,&vp)) >= 0) {
 	            rs1 = bprintf(efp,"%s: suf=%r\n",pn,vp,vl) ;
 	            if (rs1 > 0) wlen += rs1 ;
 	            if (rs1 < 0) break ;
@@ -3543,7 +3543,7 @@ static int proctars_check(PROGINFO *pip)
 	        int		vl ;
 	        cchar		*vp ;
 	        char		td[MAXPATHLEN+1] ;
-	        while ((rs1 = paramopt_enumvalues(pop,po,&cur,&vp)) >= 0) {
+	        while ((rs1 = paramopt_curenumval(pop,po,&cur,&vp)) >= 0) {
 	            vl = rs1 ;
 	            if ((rs1 > 0) && (vp != nullptr)) {
 	                if (pip->debuglevel > 0) {
@@ -3749,7 +3749,7 @@ static int procsuf_have(PROGINFO *pip,cchar *sp,int sl)
 	    cchar	*vp ;
 
 	    while (rs >= 0) {
-	        vl = paramopt_fetch(pop,key,&cur,&vp) ;
+	        vl = paramopt_curfetch(pop,key,&cur,&vp) ;
 	        if (vl == SR_NOTFOUND) break ;
 	        rs = vl ;
 	        if ((rs >= 0) && (sl == vl)) {
@@ -3840,7 +3840,7 @@ static int procsuf_begin(PROGINFO *pip)
 	                    int		vl ;
 	                    cchar	*vp ;
 	                    while (rs >= 0) {
-	                        vl = paramopt_fetch(pop,po,&cur,&vp) ;
+	                        vl = paramopt_curfetch(pop,po,&cur,&vp) ;
 	                        if (vl == SR_NOTFOUND) break ;
 	                        rs = vl ;
 	                        if ((rs >= 0) && (vl > 0)) {
@@ -4382,7 +4382,7 @@ static int procprune_begin(PROGINFO *pip,cchar *pfname)
 	                    char	**pa = (char **) bp ;
 	                    bp += ((n+1)*sizeof(void *)) ;
 	                    while (rs >= 0) {
-	                        vl = paramopt_fetch(pop,po,&cur,&vp) ;
+	                        vl = paramopt_curfetch(pop,po,&cur,&vp) ;
 	                        if (vl == SR_NOTFOUND) break ;
 	                        rs = vl ;
 	                        if ((rs >= 0) && (vl > 0)) {
@@ -4475,7 +4475,7 @@ static int procprune_size(PROGINFO *pip,int *sizep)
 	    cchar	*po = po_prune ;
 	    cchar	*vp ;
 	    while (rs >= 0) {
-	        vl = paramopt_fetch(pop,po,&cur,&vp) ;
+	        vl = paramopt_curfetch(pop,po,&cur,&vp) ;
 	        if (vl == SR_NOTFOUND) break ;
 	        rs = vl ;
 	        if ((rs >= 0) && (vl > 0)) {

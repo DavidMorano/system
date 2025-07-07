@@ -593,7 +593,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	    paramopt_curbegin(&param,&cur) ;
 
-	    while (paramopt_enumkeys(&param,&cur,&cp) >= 0) {
+	    while (paramopt_curenumkey(&param,&cur,&cp) >= 0) {
 
 	        if ((kwi = optmatch(argopts,cp,-1)) >= 0) {
 
