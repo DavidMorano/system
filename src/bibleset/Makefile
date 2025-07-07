@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (bibleset)
 
 T= bibleset
 
@@ -152,7 +152,7 @@ INCS= $(INC00) $(INC01) $(INC02) $(INC03)
 
 
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o 
-OBJ01= progfile.o progout.o progoff.o progfront.o 
+OBJ01= bibleset_proc.o progout.o progoff.o progfront.o 
 OBJ02= multiout.o biblecur.o
 OBJ03= linecenter.o 
 OBJ04=
