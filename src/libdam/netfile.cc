@@ -192,7 +192,7 @@ int netfile_open(NF *vep,cchar *netfname) noex {
 		cint	vn = 10 ;
 		cint	vo = 0 ;
 	        if ((rs = vecitem_start(vep,vn,vo)) >= 0) {
-	            if (USTAT sb ; (rs = uc_stat(netfname,&sb)) >= 0) {
+	            if (ustat sb ; (rs = uc_stat(netfname,&sb)) >= 0) {
 	                if (! S_ISDIR(sb.st_mode)) {
 	                    if (netstate ns ; (rs = netstate_start(&ns)) >= 0) {
 				{
