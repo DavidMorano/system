@@ -81,6 +81,7 @@
 
 #include	"rmsesfiles.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -177,10 +178,10 @@ static int rmsesfiler(ids *idp,char *pbuf,cchar *dname) noex {
 	if ((rs = mkpath(pbuf,dname)) >= 0) {
 	    cint	pl = rs ;
 	    if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
-		cint		nlen = rs ;
+		cint	nlen = rs ;
 	        if (sigblocker s ; (rs = s.start) >= 0) {
 	            if ((rs = lockbegin(pbuf,pl)) >= 0) {
-	                cint		lfd = rs ;
+	                cint	lfd = rs ;
 	                if (fsdir d ; (rs = fsdir_open(&d,pbuf)) >= 0) {
 	                    fsdir_ent	de ;
 	                    while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
@@ -256,7 +257,7 @@ static int lockend(char *pbuf,int plen,int lfd) noex {
 static int rmsesdir(ids *idp,char *pbuf,int plen) noex {
 	int		rs ;
 	int		c = 0 ;
-	if (USTAT sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        cint	am = (R_OK|W_OK|X_OK) ;
 	        if ((rs = permid(idp,&sb,am)) >= 0) {
@@ -287,8 +288,8 @@ static int rmdirfiles(char *pbuf,int plen) noex {
 	if (pbuf) {
 	    rs = SR_INVALID ;
 	    if (pbuf[0]) {
-	        cint		vn = RMSESFILES_NENT ;
-		cint		vo = 0 ;
+	        cint	vn = RMSESFILES_NENT ;
+		cint	vo = 0 ;
 	        if (vecpstr files ; (rs = files.start(0,vn,vo)) >= 0) {
 	            int		c = 0 ;
 	            if ((rs = vecpstr_dirload(&files,pbuf,plen)) > 0) {
@@ -314,7 +315,7 @@ static int vecpstr_dirload(vecpstr *flp,char *pbuf,int plen) noex {
 	int		c = 0 ;
 	strnul		dname(pbuf,plen) ;
 	if (cchar *dn = dname ; dn != nullptr) {
-	    if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
+	    if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
 		cint	nlen = rs ;
 	        if (fsdir dir ; (rs = fsdir_open(&dir,dn)) >= 0) {
 	            fsdir_ent	de ;

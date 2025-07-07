@@ -30,7 +30,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<vector>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -47,6 +46,7 @@
 
 #include	"querystr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -55,6 +55,8 @@
 
 using std::nullptr_t ;			/* type */
 using std::vector ;			/* type */
+using std::min ;			/* subroutine (template) */
+using std::max ;			/* subroutine (template) */
 using std::nothrow ;			/* constant */
 
 
@@ -91,14 +93,14 @@ namespace {
 	int		tlen = 0 ;
     public:
 	subinfo(querystr *aop) noex : op(aop) { } ;
-	~subinfo() {
+	destruct subinfo() {
 	    if (tbuf != nullptr) {
 		uc_free(tbuf) ;
 		tbuf = nullptr ;
 		tlen = 0 ;
 	    }
 	    op = nullptr ;
-	} ;
+	} ; /* end dtor */
 	int tsize(int nlen) noex {
 	     int	rs = 0 ;
 	     if (nlen > tlen) {
@@ -107,17 +109,17 @@ namespace {
 		    tbuf = nullptr ;
 	        }
 		tlen = nlen ;
-		rs = uc_malloc((tlen+1),&tbuf) ;
+		rs = uc_malloc((tlen + 1),&tbuf) ;
 	     }
 	     return rs ;
-	} ;
+	} ; /* end if (tsize) */
 	int split(cchar *,int) noex ;
 	int procpair(cchar *,int) noex ;
 	int fixval(char *,int,cchar *,int) noex ;
 	int load() noex ;
 	int store(cchar *,int,cchar *,int) noex ;
     } ; /* end struct (subinfo) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -167,11 +169,9 @@ int querystr_start(querystr *op,cchar *sp,int sl) noex {
 	if ((rs = querystr_ctor(op,sp)) >= 0) {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
-	        cint	llen = rs ;
-	        if ((rs = strpack_start(op->spp,llen)) >= 0) {
-	            subinfo		si(op) ;
+	        if ((rs = strpack_start(op->spp,rs)) >= 0) {
 	            op->open.packer = true ;
-	            if ((rs = si.split(sp,sl)) >= 0) {
+	            if (subinfo si(op) ; (rs = si.split(sp,sl)) >= 0) {
 		        rs = si.load() ;
 	            } /* end if (subinfo) */
 	            if (rs < 0) {
@@ -265,7 +265,7 @@ int querystr_fetch(querystr *op,cc *kstr,int klen,cur *curp,cc **rpp) noex {
 	    rs = SR_OK ;
 	    if (klen < 0) klen = lenstr(kstr) ;
 	    if (op->n > 0) {
-	        int		i = (curp->i + 1) ;
+	        int	i = (curp->i + 1) ; /* not constant ; incr below */
 	        if (i < op->n) {
 	            cchar	*(*kv)[2] = op->kv ;
 	            bool	f = false ;
@@ -299,7 +299,7 @@ int querystr_curenum(querystr *op,cur *curp,cc **kpp,cc **vpp) noex {
 	if (op && curp) {
 	    rs = SR_OK ;
 	    if (op->n > 0) {
-	        int	i = (curp->i + 1) ;
+	        cint	i = (curp->i + 1) ;
 	        if (i < op->n) {
 	            cchar	*(*kv)[2] = op->kv ;
 		    {
@@ -328,15 +328,14 @@ int querystr_curenum(querystr *op,cur *curp,cc **kpp,cc **vpp) noex {
 
 int subinfo::split(cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	cchar		*tp ;
-	while ((tp = strnchr(sp,sl,'&')) != nullptr) {
-	    cint	cl = (tp-sp) ;
+	for (cchar *tp ; (tp = strnchr(sp,sl,'&')) != nullptr ; ) {
+	    cint	cl = intconv(tp - sp) ;
 	    cchar	*cp = sp ;
 	    if (cl > 0) {
 	        rs = procpair(cp,cl) ;
 	    }
-	    sl -= ((tp+1)-sp) ;
-	    sp = (tp+1) ;
+	    sl -= intconv((tp + 1) - sp) ;
+	    sp = (tp + 1) ;
 	    if (rs < 0) break ;
 	} /* end while */
 	if ((rs >= 0) && (sl > 0)) {
@@ -348,21 +347,19 @@ int subinfo::split(cchar *sp,int sl) noex {
 
 int subinfo::procpair(cchar *sbuf,int slen) noex {
 	int		rs = SR_OK ;
-	int		sl ;
 	cchar		*sp ;
 	if (slen < 0) slen = lenstr(sbuf) ;
-	if ((sl = sfshrink(sbuf,slen,&sp)) > 0) {
+	if (int sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) {
 	    int		kl = sl ;
 	    int		vl = 0 ;
-	    cchar	*tp ;
 	    cchar	*kp = sp ;
 	    cchar	*vp = nullptr ;
-	    if ((tp = strnchr(sp,sl,'=')) != nullptr) {
-	        kl = (tp - sp) ;
+	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
+	        kl = intconv(tp - sp) ;
 	        while (kl && CHAR_ISWHITE(*kp)) kl -= 1 ;
 	        vp = (tp + 1) ;
-	        vl = ((sp + sl) - vp) ;
-	    }
+	        vl = intconv((sp + sl) - vp) ;
+	    } /* end if */
 	    if (kl > 0) {
 	        while ((vl > 0) && CHAR_ISWHITE(*vp)) {
 	            vp += 1 ;
@@ -388,37 +385,42 @@ int subinfo::fixval(char *rbuf,int rlen,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	if (vl > 0) {
-	    cchar	*tp ;
 	    char	*rp = rbuf ;
 	    if (vl > rlen) vl = rlen ;
-	    while ((tp = strnbrk(vp,vl,"%+\t")) != nullptr) {
+	    for (cchar *tp ; (tp = strnbrk(vp,vl,"%+\t")) != nullptr ; ) {
 	        cint	sch = mkchar(*tp) ;
-	        if ((tp-vp) > 0) {
-	            rp = strwcpy(rp,vp,(tp-vp)) ;
+	        if (cint tl = intconv(tp - vp) ; tl > 0) {
+	            rp = strwcpy(rp,vp,tl) ;
 	        }
 	        switch (sch) {
 	        case '+':
-	            if (((rp-rbuf) == 0) || (rp[-1] != ' ')) *rp++ = ' ' ;
+	            if (((rp-rbuf) == 0) || (rp[-1] != ' ')) {
+			*rp++ = ' ' ;
+		    }
 	            break ;
 	        case '\t':
-	            if (((rp-rbuf) == 0) || (rp[-1] != ' ')) *rp++ = ' ' ;
+	            if (((rp-rbuf) == 0) || (rp[-1] != ' ')) {
+			*rp++ = ' ' ;
+		    }
 	            break ;
 	        case '%':
 	            {
-	                cint	tl = (vl-(tp-vp)) ;
+	                cint	tl = intconv(vl - (tp - vp)) ;
 	                rp = strwebhex(rp,tp,tl) ;
-	                tp += MIN(2,tl) ;
+	                tp += min(2,tl) ;
 	            }
 	            break ;
 	        } /* end switch */
-	        vl -= ((tp+1)-vp) ;
-	        vp = (tp+1) ;
-	    } /* end while */
+	        vl -= intconv((tp + 1) - vp) ;
+	        vp = (tp + 1) ;
+	    } /* end for */
 	    if ((rs >= 0) && (vl > 0)) {
-	        while ((vl > 0) && CHAR_ISWHITE(vp[vl-1])) vl -= 1 ;
+	        while ((vl > 0) && CHAR_ISWHITE(vp[vl - 1])) {
+		    vl -= 1 ;
+		}
 	        rp = strwcpy(rp,vp,vl) ;
-	    }
-	    i = (rp-rbuf) ;
+	    } /* end if */
+	    i = intconv(rp - rbuf) ;
 	} /* end if (positive) */
 	rbuf[i] = '\0' ;
 	return (rs >= 0) ? i : rs ;
@@ -428,8 +430,7 @@ int subinfo::fixval(char *rbuf,int rlen,cchar *vp,int vl) noex {
 int subinfo::store(cchar *kp,int kl,cchar *vp,int vl) noex {
 	strpack		*spp = op->spp ;
 	int		rs ;
-	cchar		*sp ;
-	if ((rs = strpack_store(spp,kp,kl,&sp)) >= 0) {
+	if (cchar *sp ; (rs = strpack_store(spp,kp,kl,&sp)) >= 0) {
 	    kp = sp ;
 	    kl = rs ;
 	    if (vl > 0) {
@@ -454,11 +455,11 @@ int subinfo::store(cchar *kp,int kl,cchar *vp,int vl) noex {
 /* end subroutine (subinfo::store) */
 
 int subinfo::load() noex {
-	cint		n = kvs.size() ;
-	cint		esize = 2 * szof(cchar *) ;
+	cint		n = intsat(kvs.size()) ;
+	cint		esz = 2 * szof(cchar *) ;
 	int		rs ;
 	int		sz ;
-	sz = ((n+1)*esize) ;
+	sz = ((n + 1) * esz) ;
 	if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
 	    op->kv = (cchar *(*)[2]) p ;
 	    op->n = n ;
@@ -479,7 +480,7 @@ static char *strwebhex(char *rp,cchar *tp,int tl) noex {
 	    cint	ch2 = mkchar(tp[2]) ;
 	    if (ishexlatin(ch1) && ishexlatin(ch2)) {
 	        if (int v ; cfhexi((tp+1),2,&v) >= 0) {
-	            *rp++ = v ;
+	            *rp++ = char(v) ;
 	        }
 	    }
 	}
