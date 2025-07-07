@@ -44,6 +44,7 @@
 
 #include	"biblecur.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -155,12 +156,11 @@ int biblecur_check(biblecur *op,cchar *sqp,int sql) noex {
 	            fieldterms(nterms,false,": \t") ;
 	            if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
 	                int	nval = 0 ;
-	                int	i = 0 ;
-	                int	fl ;
+	                int	i = 0 ; /* counter below */
 	                cchar	*fp ;
-	                while ((fl = fsb.word(nterms,&fp)) >= 0) {
+	                for (int fl ; (fl = fsb.word(nterms,&fp)) >= 0 ; ) {
 	                    if (fl > 0) {
-	                        si = ((fp + fl) - sqp) ;
+	                        si = intconv((fp + fl) - sqp) ;
 	                        if ((rs = cfdeci(fp,fl,&nval)) >= 0) {
 	                            switch (i) {
 	                            case 0:
@@ -178,24 +178,24 @@ int biblecur_check(biblecur *op,cchar *sqp,int sql) noex {
 	                    i += 1 ;
 	                    if (i == 3) break ;
 	                    if (rs < 0) break ;
-	                } /* end while (field_word) */
+	                } /* end for (field_word) */
 	                rs1 = fsb.finish ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (field) */
 	            if (rs >= 0) {
 	                if ((n_book >= 0) && (n_book != op->book)) {
-	                    op->f.newbook = true ;
-	                    op->f.newchapter = true ;
-	                    op->f.newverse = true ;
+	                    op->fl.newbook = true ;
+	                    op->fl.newchapter = true ;
+	                    op->fl.newverse = true ;
 	                    op->book = n_book ;
 	                }
 	                if ((n_chapter >= 0) && (n_chapter != op->chapter)) {
-	                    op->f.newchapter = true ;
-	                    op->f.newverse = true ;
+	                    op->fl.newchapter = true ;
+	                    op->fl.newverse = true ;
 	                    op->chapter = n_chapter ;
 	                }
 	                if ((n_verse >= 0) && (n_verse != op->verse)) {
-	                    op->f.newverse = true ;
+	                    op->fl.newverse = true ;
 	                    op->verse = n_verse ;
 	                }
 	                si += siskipwhite((sp + si),(sl - si)) ;
@@ -211,7 +211,7 @@ int biblecur_newbook(biblecur *op,biblebook *bbp) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = biblecur_magic(op,bbp)) >= 0) {
-	    if ((f = op->f.newbook) != 0) {
+	    if ((f = op->fl.newbook) != 0) {
 	        cint	blen = BIBLEBOOK_LEN ;
 	        if ((rs = biblebook_get(bbp,op->book,op->bookname,blen)) >= 0) {
 		    rs = SR_OK ;
@@ -219,7 +219,7 @@ int biblecur_newbook(biblecur *op,biblebook *bbp) noex {
 	            rs = bufprintf(op->bookname,blen,"Book %u",op->book) ;
 	        }
 	    }
-	    op->f.newbook = false ;
+	    op->fl.newbook = false ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -229,8 +229,8 @@ int biblecur_newchapter(biblecur *op) noex {
     	int		rs ;
 	int		f = false ;
 	if ((rs = biblecur_magic(op)) >= 0) {
-	     f = op->f.newchapter ;
-	     op->f.newchapter = false ;
+	     f = op->fl.newchapter ;
+	     op->fl.newchapter = false ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -240,9 +240,9 @@ int biblecur_newverse(biblecur *op,int sl) noex {
     	int		rs ;
 	int		f = false ;
 	if ((rs = biblecur_magic(op)) >= 0) {
-	    if (op->f.newverse && (sl > 0)) {
+	    if (op->fl.newverse && (sl > 0)) {
 	        f = true ;
-	        op->f.newverse = false ;
+	        op->fl.newverse = false ;
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
