@@ -513,7 +513,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	    paramopt_curbegin(&aparams,&cur) ;
 
-	    while (paramopt_enumvalues(&aparams,PO_OPTION,&cur,&cp) >= 0) {
+	    while (paramopt_curenumval(&aparams,PO_OPTION,&cur,&cp) >= 0) {
 
 		if (cp == NULL) continue ;
 

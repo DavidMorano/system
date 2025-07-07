@@ -574,7 +574,7 @@ char	*envv[] ;
 
 	    paramopt_curbegin(&aparams,&cur) ;
 
-	    while (paramopt_enumvalues(&aparams,PO_OPTION,&cur,&cp) >= 0) {
+	    while (paramopt_curenumval(&aparams,PO_OPTION,&cur,&cp) >= 0) {
 		if (cp == NULL) continue ;
 
 	        if ((kwi = matostr(progopts,1,cp,-1)) >= 0) {
