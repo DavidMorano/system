@@ -1,4 +1,4 @@
-/* codebal SUPPORT [*/
+/* codebal SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++98 */
 
@@ -32,7 +32,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
 #include	<new>
 #include	<vector>
 #include	<usystem.h>
@@ -43,13 +42,12 @@
 
 #include	"codebal.h"
 
+import libutil ;
 
 /* local defines */
 
 
-/* namespaces */
-
-using namespace		std ;		/* yes, we want punishment! */
+/* imported namespaces */
 
 
 /* external subroutines */
@@ -120,7 +118,7 @@ int codebal_start(codebal *op) noex {
 int codebal_finish(codebal *op) noex {
 	int		rs ;
 	int		rs1 ;
-	int		f_bal = false ;
+	int		f_bal = false ;/* return-value */
 	if ((rs = codebal_magic(op)) >= 0) {
 	    f_bal = (! op->f_fail) ;
 	    if (f_bal) {
@@ -141,12 +139,12 @@ int codebal_finish(codebal *op) noex {
 
 int codebal_load(codebal *op,cchar *sp,int sl) noex {
 	int		rs ;
-	bool		f_fail = false ;
 	if ((rs = codebal_magic(op,sp)) >= 0) {
+	    bool	f_fail = false ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    while (sl-- && *sp) {
 	        cint	ch = mkchar(*sp++) ;
-	        int	w ;
+	        int	w{} ;
 	        switch (ch) {
 	        case CH_LPAREN:
 	        case CH_LBRACE:
