@@ -1,6 +1,9 @@
-/* taginfo */
+/* taginfo HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* parse a tag (given in a string) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,14 +16,15 @@
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TAGINFO_INCLUDE
-#define	TAGINFO_INCLUDE		1
+#define	TAGINFO_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
-#include	<localmisc.h>
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	TAGINFO		struct taginfo
@@ -32,20 +36,12 @@ struct taginfo {
 	int		fnamelen ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(TAGINFO_MASTER)) || (TAGINFO_MASTER == 0)
+extern int	taginfo_parse(taginfo *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int	taginfo_parse(TAGINFO *,const char *,int) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* TAGINFO_MASTER */
 
 #endif /* TAGINFO_INCLUDE */
 
