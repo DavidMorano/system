@@ -2056,7 +2056,7 @@ static int procmaildname_begin(PROGINFO *pip,PARAMOPT *aop) noex {
 	        cchar		*vp ;
 	        if ((rs = paramopt_curbegin(aop,&cur)) >= 0) {
 	            cchar	*po = PO_MAILDIRS ;
-	            while ((vl = paramopt_enumvalues(aop,po,&cur,&vp)) >= 0) {
+	            while ((vl = paramopt_curenumval(aop,po,&cur,&vp)) >= 0) {
 	                rs = procmaildname_add(pip,vp,vl) ;
 	                c += rs ;
 	                if (rs < 0) break ;
