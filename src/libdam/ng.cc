@@ -5,7 +5,6 @@
 /* search (and other things) a newsgroup list for a newsgroup name */
 /* version %I% last-modified %G% */
 
-#define	CF_SAFE		1
 
 /* revision history:
 
@@ -40,6 +39,7 @@
 
 #include	"ng.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -105,13 +105,12 @@ int ng_finish(NG *ngp) noex {
 
 int ng_search(NG *ngp,cchar *name,ng_ent **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	if (rpp) *rpp = nullptr ;
 	if (ngp) {
 	    void *vp{} ;
 	    rs = SR_OK ;
-	    for (int i = 0 ; (rs1 = vecitem_get(ngp,i,&vp)) >= 0 ; i += 1) {
+	    for (i = 0 ; (rs = vecitem_get(ngp,i,&vp)) >= 0 ; i += 1) {
 	        ng_ent	*ep = (ng_ent *) vp ;
 	        if (vp) {
 	            if (strcasecmp(name,ep->name) == 0) {
@@ -195,7 +194,7 @@ int ng_get(NG *ngp,int i,ng_ent **rpp) noex {
 int ng_addparse(NG *ngp,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		n = 0 ;
+	int		n = 0 ; /* return-value */
 	if (ngp && sp) {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (ema aid ; (rs = ema_start(&aid)) >= 0) {
@@ -203,18 +202,18 @@ int ng_addparse(NG *ngp,cchar *sp,int sl) noex {
 		    ema_ent	*ep ;
 	            for (int i = 0 ; ema_get(&aid,i,&ep) >= 0 ; i += 1) {
 	                if ((ep != nullptr) && (! ep->f.error)) {
-	                    int	sl = 0 ;
-	                    cchar	*sp = nullptr ;
+			    cchar	*rp{} ;
+	                    int		rl = 0 ;
 	                    if ((ep->rp != nullptr) && (ep->rl > 0)) {
-	                        sp = ep->rp ;
-	                        sl = ep->rl ;
+	                        rp = ep->rp ;
+	                        rl = ep->rl ;
 	                    } else if ((ep->ap != nullptr) && (ep->al > 0)) {
-	                        sp = ep->ap ;
-	                        sl = ep->al ;
+	                        rp = ep->ap ;
+	                        rl = ep->al ;
 	                    }
-		            if (sp != nullptr) {
-			        cchar	*cp ;
-	                        if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
+		            if (rp) {
+				cchar	*cp ;
+	                        if (int cl ; (cl = sfshrink(rp,rl,&cp)) > 0) {
 	                            rs = ng_add(ngp,cp,cl,nullptr) ;
 			            if (rs < INT_MAX) n += 1 ;
 			        }

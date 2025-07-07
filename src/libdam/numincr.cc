@@ -28,19 +28,18 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<cfdec.h>
 #include	<cfa26.h>
 #include	<ctdec.h>
 #include	<ctdecp.h>
 #include	<cta26.h>
-#include	<toxc.h>		/* |touc(3uc)| */
-#include	<ischarx.h>
+#include	<ischarx.h>		/* |isupperlatin(3uc)| */
 #include	<localmisc.h>
 
 #include	"numincr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -100,7 +99,7 @@ int numincr_load(numincr *op,cchar *sp,int sl) noex {
 		}
 	    } else if (isalphalatin(ch)) {
 	        op->f.alpha = true ;
-	        op->f.uc = touc(ch) ;
+	        op->f.uc = isupperlatin(ch) ;
 	        if (int v ; (rs = cfa26(sp,sl,&v)) >= 0) {
 	            op->v = v ;
 	        }
