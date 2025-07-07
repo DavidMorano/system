@@ -60,10 +60,66 @@ struct paramopt_cursor {
 	PARAMOPT_VAL	*valp ;
 } ;
 
-typedef PARAMOPT	paramopt ;
 typedef PARAMOPT_NAME	paramopt_name ;
 typedef PARAMOPT_VAL	paramopt_val ;
 typedef PARAMOPT_CUR	paramopt_cur ;
+
+#ifdef	__cplusplus
+enum paramoptmems {
+	paramoptmem_start,
+	paramoptmem_count,
+	paramoptmem_incr,
+	paramoptmem_finish,
+	paramoptmem_overlast
+} ;
+struct paramopt ;
+struct paramopt_co {
+	paramopt	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (paramopt *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (paramopt_co) */
+struct paramopt : paramopt_head {
+	paramopt_co	start ;
+	paramopt_co	count ;
+	paramopt_co	incr ;
+	paramopt_co	finish ;
+	paramopt() noex {
+	    start(this,paramoptmem_start) ;
+	    count(this,paramoptmem_count) ;
+	    incr(this,paramoptmem_incr) ;
+	    finish(this,paramoptmem_finish) ;
+	} ;
+	paramopt(const paramopt &) = delete ;
+	paramopt &operator = (const paramopt &) = delete ;
+	int loadu(cchar *,int) noex ;
+	int loads(cchar *,cchar *,int) noex ;
+	int load(cchar *,cchar *,int) noex ;
+	int loaduniq(cchar *,cchar *,int) noex ;
+	int loadone(cchar *,int) noex ;
+	int havekey(cchar *) noex ;
+	int haveval(cchar *,cchar *,int) noex ;
+	int countvals(cchar *) noex ;
+	int curbegin(paramopt_cur *) noex ;
+	int curend(paramopt_cur *) noex ;
+	int curenumkey(paramopt_cur *,cchar **) noex ;
+	int curenumval(cchar *,paramopt_cur *,cc **) noex ;
+	int curfetch(cchar *,paramopt_cur *,cchar **) noex ;
+	void dtor() noex ;
+	operator int () noex ;
+	destruct paramopt() {
+	    if (head) dtor() ;
+	} ;
+} ; /* end struct (paramopt) */
+#else	/* __cplusplus */
+typedef PARAMOPT	paramopt ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
@@ -72,16 +128,17 @@ extern int paramopt_loadu(paramopt *,cchar *,int) noex ;
 extern int paramopt_loads(paramopt *,cchar *,cchar *,int) noex ;
 extern int paramopt_load(paramopt *,cchar *,cchar *,int) noex ;
 extern int paramopt_loaduniq(paramopt *,cchar *,cchar *,int) noex ;
+extern int paramopt_loadone(paramopt *,cchar *,int) noex ;
 extern int paramopt_havekey(paramopt *,cchar *) noex ;
 extern int paramopt_haveval(paramopt *,cchar *,cchar *,int) noex ;
+extern int paramopt_count(paramopt *) noex ;
 extern int paramopt_countvals(paramopt *,cchar *) noex ;
+extern int paramopt_incr(paramopt *) noex ;
 extern int paramopt_curbegin(paramopt *,paramopt_cur *) noex ;
 extern int paramopt_curend(paramopt *,paramopt_cur *) noex ;
-extern int paramopt_curenumkeys(paramopt *,paramopt_cur *,cchar **) noex ;
-extern int paramopt_fetch(paramopt *,cchar *,paramopt_cur *,cchar **) noex ;
-extern int paramopt_enumvalues(paramopt *,cchar *,paramopt_cur *,cc **) noex ;
-extern int paramopt_incr(paramopt *) noex ;
-extern int paramopt_loadone(paramopt *,cchar *,int) noex ;
+extern int paramopt_curenumkey(paramopt *,paramopt_cur *,cchar **) noex ;
+extern int paramopt_curenumval(paramopt *,cchar *,paramopt_cur *,cc **) noex ;
+extern int paramopt_curfetch(paramopt *,cchar *,paramopt_cur *,cchar **) noex ;
 extern int paramopt_finish(paramopt *) noex ;
 
 EXTERNC_end
