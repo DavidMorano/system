@@ -41,7 +41,7 @@
 #include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| + |strchr(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
@@ -104,7 +104,7 @@ static int schedvar_exper(SV *,char *,int,cc *,int) noex ;
 
 /* local variables */
 
-constexpr bool		f_search = CF_SEARCH ;
+cbool		f_search = CF_SEARCH ;
 
 
 /* exported variables */
