@@ -1543,7 +1543,7 @@ static int procsufs(PROGINFO *pip,PARAMOPT *pop,cchar *s)
 	            if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
 	                int	vl ;
 	                cchar	*vp ;
-	                while ((vl = paramopt_fetch(pop,s,&cur,&vp)) >= 0) {
+	                while ((vl = paramopt_curfetch(pop,s,&cur,&vp)) >= 0) {
 	                    if (vl != 0) {
 #if	CF_DEBUG
 	                        if (DEBUGLEVEL(3))

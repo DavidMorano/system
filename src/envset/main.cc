@@ -3446,7 +3446,7 @@ static int ourconf_ifnopreload(OURCONF *ocp)
 	    int		vl ;
 	    cchar	*po = PO_NOPRELOAD ;
 	    cchar	*vp ;
-	    while ((rs1 = paramopt_enumvalues(pop,po,&cur,&vp)) >= 0) {
+	    while ((rs1 = paramopt_curenumval(pop,po,&cur,&vp)) >= 0) {
 		vl = rs1 ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
