@@ -27,8 +27,8 @@
 #include	<sys/types.h>
 #include	<sys/utsname.h>
 #include	<sys/uio.h>
-#include	<sys/time.h>		/* for 'u_adjtime(3u)' */
-#include	<sys/timeb.h>		/* for 'uc_ftime(3uc)' */
+#include	<sys/time.h>		/* |u_adjtime(3u)| */
+#include	<sys/timeb.h>		/* |uc_ftime(3uc)| */
 #include	<sys/resource.h>
 #include	<sys/stat.h>
 #include	<sys/statvfs.h>
@@ -44,7 +44,7 @@
 #include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<utime.h>		/* for 'u_utime(2)' */
+#include	<utime.h>		/* |u_utime(2)| */
 #include	<pthread.h>
 #include	<termios.h>
 #include	<time.h>
@@ -62,7 +62,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usys.h>	/* <- auxilllary OS support */
+#include	<usys.h>		/* <- auxilllary OS support */
 
 #include	<ucsys.h>
 #include	<ucent.h>
