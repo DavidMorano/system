@@ -17,7 +17,7 @@
 
 /*******************************************************************************
 
-  	Name:
+  	Object:
 	linecenter
 
 	Description:
@@ -45,6 +45,7 @@
 
 #include	"linecenter.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -131,6 +132,8 @@ constexpr int		fnlen = LINECENTER_FNLEN ;
 
 constexpr double	defpercent = LINECENTER_DEFPERCENT ;
 
+cbool			f_comment = false ;
+
 
 /* exported variables */
 
@@ -141,10 +144,10 @@ int linecenter_start(LC *op,cc *fn) noex {
 	cint		ne = LINECENTER_DEFLINES ;
 	int		rs ;
 	if ((rs = linecenter_ctor(op,fn)) >= 0) {
-	    if ((rs = sncpy1(op->fn,fnlen,fn)) >= 0) {
+	    if ((rs = sncpy(op->fn,fnlen,fn)) >= 0) {
 	        if ((rs = fifostr_start(op->sqp)) >= 0) {
-	            int		sz = (ne + 1) * szof(cchar **) ;
-		    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	            cint	sz = (ne + 1) * szof(cchar **) ;
+		    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
 			op->lines = ccharpp(vp) ;
 	                op->le = ne ;
 	                op->magic = LINECENTER_MAGIC ;
@@ -215,21 +218,22 @@ int linecenter_addline(LC *op,cc *lbuf,int llen) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = linecenter_magic(op,lbuf)) >= 0) {
-	    int		sl, cl ;
-	    cchar	*sp, *cp ;
+	    int		sl ;
+	    cchar	*sp ;
+	    cchar	*cp ;
 	    if (llen < 0) llen = lenstr(lbuf) ;
 	    sp = lbuf ;
 	    sl = llen ;
-	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
+	    for (int cl ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
 	        c += 1 ;
 	        if ((rs = fifostr_add(op->sqp,cp,cl)) >= 0) {
 	            op->wc += 1 ;
 	            op->ccnt += cl ;
 	        }
-	        sl -= ((cp + cl) - sp) ;
+	        sl -= intconv((cp + cl) - sp) ;
 	        sp = (cp + cl) ;
 		if (rs < 0) break ;
-	    } /* end while */
+	    } /* end for */
 	} /* end if (linecenter_magic) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -251,13 +255,13 @@ int linecenter_addlines(LC *op,cc *lbuf,int llen) noex {
 	                op->wc += 1 ;
 	                op->ccnt += cl ;
 	            }
-	            sl -= ((cp + cl) - sp) ;
+	            sl -= intconv((cp + cl) - sp) ;
 	            sp = (cp + cl) ;
 		    if (rs < 0) break ;
 	        } /* end while */
 	        if (rs < 0) break ;
 	        if ((tp = strnchr(sp,sl,CH_NL)) == nullptr) break ;
-	        sl -= ((tp + 1) - sp) ;
+	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	    } /* end while (reading lines) */
 	} /* end if (linecenter_magic) */
@@ -277,7 +281,7 @@ int linecenter_mklinepart(LC *op,char *lbuf,int llen) noex {
 
 int linecenter_getline(LC *op,int i,cchar **lpp) noex {
 	int		rs ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if ((rs = linecenter_magic(op,lpp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (i >= 0) {
@@ -289,28 +293,28 @@ int linecenter_getline(LC *op,int i,cchar **lpp) noex {
 	        } else {
 	            rs = SR_NOTFOUND ;
 		}
-	    }
+	    } /* end if (OK) */
 	} /* end if (linecenter_magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (linecenter_getline) */
 
-int linecenter_mklines(LC *op,int llen,int linebrklen) noex {
+int linecenter_mklines(LC *op,int lwidth,int lbrk) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = linecenter_magic(op)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (llen >= 1) {
-	        if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	    if (lwidth >= 1) {
+	        if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
 	            cint	llen = rs ;
 	            int		linetmplen ;
-	            if (linebrklen <= 0) {
-	                linebrklen = lenpercent(llen,defpercent) ;
+	            if (lbrk <= 0) {
+	                lbrk = lenpercent(lwidth,defpercent) ;
 	            }
 	            while (rs >= 0) {
 		        auto	lcmf = linecenter_mklinefull ;
-	                linetmplen = linecenter_hasbrk(op,llen,linebrklen) ;
+	                linetmplen = linecenter_hasbrk(op,lwidth,lbrk) ;
 	                if (linetmplen <= 0) linetmplen = llen ;
 	                if ((rs = lcmf(op,lbuf,linetmplen)) > 0) {
 	                    rs = linecenter_storeline(op,lbuf,rs) ;
@@ -320,7 +324,7 @@ int linecenter_mklines(LC *op,int llen,int linebrklen) noex {
 	            } /* end while */
 	            while (rs >= 0) {
 		        auto	lcmp = linecenter_mklinepart ;
-	                linetmplen = linecenter_hasbrk(op,llen,linebrklen) ;
+	                linetmplen = linecenter_hasbrk(op,lwidth,lbrk) ;
 	                if (linetmplen <= 0) linetmplen = llen ;
 	                if ((rs = lcmp(op,lbuf,linetmplen)) > 0) {
 	                    rs = linecenter_storeline(op,lbuf,rs) ;
@@ -368,7 +372,7 @@ static int linecenter_storeline(LC *op,cc *lbuf,int llen) noex {
 static int linecenter_mkline(LC *op,int f_part,char *lbuf,int llen) noex {
 	int		rs ;
 	int		rs1 ;
-	int		tlen = 0 ;
+	int		tlen = 0 ; /* return-value */
 	if ((rs = linecenter_magic(op,lbuf)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (llen >= 1) {
@@ -378,11 +382,10 @@ static int linecenter_mkline(LC *op,int f_part,char *lbuf,int llen) noex {
 	        int		f_give = f_part ;
 		rs = SR_OK ;
 	        if (! f_part) {
-#ifdef	COMMENT
-	            {
-			auto		fsel = fifostr_entlen ;
+		    if_constexpr (f_comment) {
+			int	c = 0 ;
+			cauto	fsel = fifostr_entlen ;
 	                ql = 0 ;
-	                c = 0 ;
 	                for (int i = 0 ; (wl = fsel(sqp,i)) >= 0 ; i += 1) {
 	                    if (wl > 0) {
 	                        if (c++ > 0) {
@@ -395,16 +398,15 @@ static int linecenter_mkline(LC *op,int f_part,char *lbuf,int llen) noex {
 	                        }
 			    }
 	                } /* end for */
-	            } /* end block */
-#else /* COMMENT */
-	            ql = op->ccnt ;
-	            if (op->wc > 0) {
-		        ql += (op->wc - 1) ;
-	            }
-	            if (ql >= (llen - 1)) {
-	                f_give = true ;
-	            }
-#endif /* COMMENT */
+	            } else {
+	                ql = op->ccnt ;
+	                if (op->wc > 0) {
+		            ql += (op->wc - 1) ;
+	                }
+	                if (ql >= (llen - 1)) {
+	                    f_give = true ;
+	                }
+		    } /* end if_constexpr (f_comment) */
 	        } /* end if (not requested partial) */
 	        if ((rs >= 0) && f_give) {
 	            int		c = 0 ;
@@ -444,27 +446,25 @@ static int linecenter_mkline(LC *op,int f_part,char *lbuf,int llen) noex {
 }
 /* end subroutine (linecenter_mkline) */
 
-static int linecenter_hasbrk(LC *op,int llen,int brklen) noex {
+static int linecenter_hasbrk(LC *op,int lwidth,int brklen) noex {
 	int		rs = SR_OK ;
-	int		len ;
-	int		wl ;
 	int		curlen = op->ccnt ;
-	int		tmplen = 0 ;
+	int		tmplen = 0 ; /* return-value */
 	if (op->wc > 0) {
 	    curlen += (op->wc - 1) ;
 	}
 	if (curlen > brklen) {
 	    cint	wlen = WORDBUFLEN ;
+	    int		wl ;
 	    cchar	*wp ;
 	    char	wbuf[WORDBUFLEN + 1] ;
-	    auto	fser = fifostr_entread ;
+	    cauto	fser = fifostr_entread ;
 	    wp = wbuf ;
-	    len = 0 ;
 	    for (int i = 0 ; (wl = fser(op->sqp,wbuf,wlen,i)) >= 0 ; i += 1) {
+		int	len = wl ;
 	        if (wl == 0) continue ;
-	        len = wl ;
 	        if (i > 0) len += 1 ;
-	        if (len >= llen) break ;
+	        if (len >= lwidth) break ;
 	        if (len >= brklen) {
 	            if ((wp[wl-1] == ',') || (wp[wl-1] == '.')) {
 	                tmplen = len ;
@@ -480,7 +480,7 @@ static int linecenter_hasbrk(LC *op,int llen,int brklen) noex {
 static int lenpercent(int len,double percent) noex {
 	double		flen = len ;
 	flen *= percent ;
-	return flen ;
+	return int(flen) ;
 }
 /* end subroutine (lenpercent) */
 

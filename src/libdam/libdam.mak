@@ -119,7 +119,7 @@ OBJ21= strwcpy.o strwcpyxc.o strwcpyrev.o
 OBJ22= strwcpycompact.o strwcpyopaque.o strwcpyblanks.o strwcpywide.o
 OBJ23= strncpyfc.o strncpyuc.o strncpyfc.o strncpyblanks.o
 
-OBJ24= rexecl.o rcmdu.o qualdisplay.o 
+OBJ24= rexecl.o rcmdu.o
 OBJ25= rex.o rfile.o lockfile.o lockend.o
 OBJ26= timestr_date.o timestr_nist.o timestr_elapsed.o timevalstr_ulog.o 
 OBJ27= timestr_scandate.o 
@@ -242,7 +242,7 @@ OBJ127= pwcache.o grcache.o gncache.o namecache.o grmems.o
 OBJ128= buffer.o buffer_extras.o 
 OBJ129= buffer_stropaque.o buffer_strcompact.o buffer_strquote.o
 OBJ130= sbuf_termconseq.o sbuf_blanks.o
-OBJ131= paramopt.o paramopt_loadone.o
+OBJ131= paramopt.o
 OBJ132= serialbuf.o srvreg.o srvrege.o wordfill.o linefold.o storeitem.o dstr.o 
 OBJ133= bufstr.o stackaddr.o outstore.o outline.o
 OBJ134= mapstrint.o keyopt.o keyopt_lastvalue.o keyvals.o
@@ -603,9 +603,6 @@ dstr.o:			dstr.c dstr.h
 
 keyvals.o:		keyvals.cc keyvals.h
 
-paramopt.o:		paramopt.cc paramopt.h
-paramopt_loadone.o:	paramopt_loadone.cc paramopt.h
-
 loadave.o:		loadave.c loadave.h
 
 egs.o:			egs.cc egs.h
@@ -742,6 +739,7 @@ userid.o:		userid.cc userid.hh
 motd.o:			motd.cc		motd.h
 issue.o:		issue.cc	issue.h
 statmsg.o:		statmsg.cc	statmsg.h
+defvar.o:		defvar.cc	defvar.h
 
 # TEXT related
 textlook.o:		textlook.cc textlook.h
@@ -862,6 +860,11 @@ densityx.dir:
 # ARGMGR
 argmgr.o:		argmgr.dir
 argmgr.dir:
+	makesubdir $@
+
+# PARAMOPT
+paramopt.o:		paramopt.dir
+paramopt.dir:
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h
