@@ -55,7 +55,7 @@
 #include	<grp.h>
 #include	<dirent.h>
 
-#include	<usys.h>	/* <- auxilllary OS support */
+#include	<usys.h>		/* <- auxilllary OS support */
 
 #include	<clanguage.h>
 #include	<utypedefs.h>
