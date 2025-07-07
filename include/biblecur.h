@@ -37,7 +37,7 @@ struct biblecur_flags {
 } ;
 
 struct biblecur_head {
-	BIBLECUR_FL	f ;
+	BIBLECUR_FL	fl ;
 	uint		magic ;
 	int		book ;
 	int		chapter ;
