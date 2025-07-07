@@ -31,7 +31,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
@@ -40,7 +39,7 @@
 #include	<strings.h>		/* |strncasecmp(3c)| + |lenstr(3c)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<estrings.h>
+#include	<estrings.h>		/* |strnchr(3uc)| */
 #include	<mapstrint.h>
 #include	<bfile.h>
 #include	<bfliner.h>
@@ -55,11 +54,12 @@
 
 #include	"keysymer.h"
 
+import libutil ;
 
 /* local defines */
 
-#define	KEYSYMER_INCDNAME	"include"
-#define	KEYSYMER_KSFNAME	"keysym.h"
+#define	KS_INCDNAME	"include"
+#define	KS_KSFNAME	"keysym.h"
 
 #define	KS		keysymer
 
@@ -153,11 +153,11 @@ int keysymer_open(keysymer *op,cchar *pr) noex {
 	    if (pr[0]) {
 		cint	ne = 20 ;
 	        if ((rs = mapstrint_start(op->mlp,ne)) >= 0) {
-	            if (USTAT sb ; (rs = u_stat(pr,&sb)) >= 0) {
+	            if (ustat sb ; (rs = u_stat(pr,&sb)) >= 0) {
 		        if (S_ISDIR(sb.st_mode)) {
-	        	    if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
-		                cchar	*idn = KEYSYMER_INCDNAME ;
-		                cchar	*kfn = KEYSYMER_KSFNAME ;
+	        	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+		                cchar	*idn = KS_INCDNAME ;
+		                cchar	*kfn = KS_KSFNAME ;
 		                if ((rs = mkpath(tbuf,pr,idn,kfn)) >= 0) {
 			            if ((rs = keysymer_parse(op,tbuf)) >= 0) {
 			                op->magic = KEYSYMER_MAGIC ;
@@ -223,7 +223,7 @@ int keysymer_lookup(keysymer *op,cchar *kp,int kl) noex {
 	        char	knbuf[keylen + 1] ;
 	        if (kl < 0) kl = lenstr(kp) ;
 	        if (hasuc(kp,kl)) {
-	            kl = strwcpylc(knbuf,kp,min(kl,keylen)) - knbuf ;
+	            kl = intconv(strwcpylc(knbuf,kp,min(kl,keylen)) - knbuf) ;
 	            kp = knbuf ;
 	        }
 	        rs = mapstrint_fetch(op->mlp,kp,kl,nullptr,&v) ;
@@ -316,16 +316,16 @@ static int keysymer_parseln(keysymer *op,cchar *lp,int ll) noex {
 	    cchar	*cp{} ;
 	    if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
 		if (strncmp("define",cp,cl) == 0) {
-		    sl -= ((cp+cl) - sp) ;
+		    sl -= intconv((cp + cl) - sp) ;
 		    sp = (cp+cl) ;
 		    if ((cl = sfnext(sp,sl,&cp)) > 0) {
 			cnullptr	np{} ;
 		        if (cchar *tp ; (tp = strnchr(cp,cl,'_')) != np) {
 		            if (strncmp("KEYSYM",cp,(tp-cp)) == 0) {
-				cint	kl = ((cp+cl) - (tp+1)) ;
-				cchar	*kp = (tp+1) ;
+				cint	kl = intconv((cp + cl) - (tp + 1)) ;
+				cchar	*kp = (tp + 1) ;
 				if (strncasecmp("include",cp,cl) != 0) {
-				    sl -= ((cp + cl) - sp) ;
+				    sl -= intconv((cp + cl) - sp) ;
 				    sp = (cp + cl) ;
 				    rs = keysymer_ks(op,kp,kl,sp,sl) ;
 				    c = rs ;
@@ -370,7 +370,7 @@ static int keysymer_process(keysymer *op,cchar *kp,int kl,int kn) noex {
 	{
 	    char	knbuf[keylen + 1] ;
 	    if (hasuc(kp,kl)) {
-	        kl = strwcpylc(knbuf,kp,min(kl,keylen)) - knbuf ;
+	        kl = intconv(strwcpylc(knbuf,kp,min(kl,keylen)) - knbuf) ;
 	        kp = knbuf ;
 	    }
 	    c = 1 ;
@@ -394,12 +394,12 @@ static int keysymer_seen(keysymer *op,cchar *sp,int sl,int *rp) noex {
 	int		v = 0 ;
 	if (sl < 0) sl = lenstr(sp) ;
 	if (cchar *tp ; (tp = strnchr(sp,sl,'_')) != nullptr) {
-	    int		kl = ((sp + sl) - (tp + 1)) ;
+	    int		kl = intconv((sp + sl) - (tp + 1)) ;
 	    cchar	*kp = (tp + 1) ;
 	    char	knbuf[keylen + 1] ;
 	    if (hasuc(kp,kl)) {
 	        cint	ml = min(kl,keylen) ;
-	        kl = strwcpylc(knbuf,kp,ml) - knbuf ;
+	        kl = intconv(strwcpylc(knbuf,kp,ml) - knbuf) ;
 	        kp = knbuf ;
 	    }
 	    rs = mapstrint_fetch(op->mlp,kp,kl,nullptr,&v) ;
