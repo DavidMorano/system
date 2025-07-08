@@ -59,6 +59,7 @@
 
 #include	"mailaddrquote.h"
 
+import libutil ;
 
 /* local defines */
 
