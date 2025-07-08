@@ -5,8 +5,6 @@
 /* read in a file of parameters */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGSFIELD	1		/* extra debug print-outs */
 
 /* revision history:
 
@@ -31,59 +29,52 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t(3c++)| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<regexpr.h>
+#include	<cstring>		/* |strncmp(3c)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecobj.h>
 #include	<storebuf.h>
 #include	<fsdir.h>
-#include	<char.h>
 #include	<buffer.h>
 #include	<nulstr.h>
+#include	<pathclean.h>
+#include	<cfnum.h>
+#include	<sfx.h>
+#include	<absfn.h>
+#include	<strwcpy.h>
+#include	<char.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"devpermfile.h"
 
+import libutil ;
 
 /* local defines */
 
-#define	DEVPERMFILE_ICHECKTIME	2	/* file check interval (seconds) */
-#define	DEVPERMFILE_ICHANGETIME	2	/* wait change interval (seconds) */
+#define	DP_ICHECKINT	2	/* file check interval (seconds) */
+#define	DP_ICHANGEINT	2	/* wait change interval (seconds) */
 
-#define	DEVPERMFILE_KEY		struct devpermfile_k
-#define	DEVPERMFILE_IE		struct devpermfile_ie
+#define	DP_KA		szof(mode_t)
+#define	DP_BO(v)	((DP_KA - ((v) % DP_KA)) % DP_KA)
 
-#define	DEVPERMFILE_KA		szof(mode_t)
-#define	DEVPERMFILE_BO(v)		\
-	((DEVPERMFILE_KA - ((v) % DEVPERMFILE_KA)) % DEVPERMFILE_KA)
+#define	DP		devpermfile
+#define	DP_ENT		devpermfile_ent
+#define	DP_CUR		devpermfile_cur
+#define	DP_KEY		devpermfile_key
+#define	DP_IE		devpermfile_ie
 
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	getpwd(char *,int) ;
-extern int	pathclean(char *,cchar *,int) ;
-extern int	cfnumi(cchar *,int,int *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -91,72 +82,100 @@ extern char	*strwcpy(char *,cchar *,int) ;
 
 /* local structures */
 
-struct devpermfile_k {
-	cchar	*console ;
+struct devpermfile_key {
+	cchar		*console ;
 	int		conlen ;
 	int		count ;
 } ;
 
 struct devpermfile_ie {
-	cchar	*dev ;		/* device string */
-	mode_t		dmode ;
+	cchar		*dev ;		/* device string */
 	int		ci ;		/* console index */
 	int		devlen ;	/* device length */
+	mode_t		dmode ;
 } ;
 
+namespace {
+    struct vars {
+	int		maxpathlen ;
+	int		maxlinelen ;
+	operator int () noex ;
+    } ; /* end strcut (vars) */
+} /* end namespace */
 
 /* forward references */
 
-static int	devpermfile_finishkeys(DEVPERMFILE *) ;
-static int	devpermfile_finishentries(DEVPERMFILE *) ;
-static int	devpermfile_fileparse(DEVPERMFILE *,cchar *) ;
-static int	devpermfile_fileparseline(DEVPERMFILE *,cchar *,int) ;
-static int	devpermfile_keyadd(DEVPERMFILE *,cchar *,int) ;
-static int	devpermfile_keydel(DEVPERMFILE *,int) ;
-static int	devpermfile_keyincr(DEVPERMFILE *,int) ;
-static int	devpermfile_keydecr(DEVPERMFILE *,int) ;
-static int	devpermfile_entexpand(DEVPERMFILE *,int,mode_t,
-			cchar *,int) ;
-static int	devpermfile_ententer(DEVPERMFILE *,int,mode_t,
-			cchar *,int) ;
-static int	devpermfile_entdir(DEVPERMFILE *,int,mode_t,
-			cchar *,int) ;
-static int	devpermfile_entadd(DEVPERMFILE *,DEVPERMFILE_IE *) ;
-static int	devpermfile_keymat(DEVPERMFILE *,DEVPERMFILE_IE *,
-			cchar *) ;
-
-static int	key_start(DEVPERMFILE_KEY *,cchar *,int) ;
-static int	key_incr(DEVPERMFILE_KEY *) ;
-static int	key_decr(DEVPERMFILE_KEY *) ;
-static int	key_count(DEVPERMFILE_KEY *) ;
-static int	key_mat(DEVPERMFILE_KEY *,cchar *,int) ;
-static int	key_finish(DEVPERMFILE_KEY *) ;
-static int	key_fake(DEVPERMFILE_KEY *,cchar *,int) ;
-
-static int	ientry_start(DEVPERMFILE_IE *,int,mode_t,cchar *,int) ;
-static int	ientry_ci(DEVPERMFILE_IE *) ;
-static int	ientry_finish(DEVPERMFILE_IE *) ;
-
-static int	entry_load(DEVPERMFILE_ENT *,char *,int,DEVPERMFILE_IE *) ;
-
-static int	mkcatfile(char *,int,cchar *) ;
-static int	mkdirfile(char *,cchar *,int,cchar *,int) ;
-
-static int	vkeymat() ;
-
-#ifdef	COMMENT
-extern "C" {
-    static int	vcmpentry() noex ;
+template<typename ... Args>
+static int devpermfile_ctor(devpermfile *op,Args ... args) noex {
+    	DEVPERMFILE	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
 }
-#endif
+/* end subroutine (devpermfile_ctor) */
 
-static mode_t	modeparse(cchar *,int) ;
+static int devpermfile_dtor(devpermfile *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (devpermfile_dtor) */
+
+template<typename ... Args>
+static inline int devpermfile_magic(devpermfile *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == DEVPERMFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (devpermfile_magic) */
+
+static int	devpermfile_finkeys(DP *) noex ;
+static int	devpermfile_finents(DP *) noex ;
+static int	devpermfile_parse(DP *,cchar *) noex ;
+static int	devpermfile_parseln(DP *,cchar *,int) noex ;
+static int	devpermfile_keyadd(DP *,cchar *,int) noex ;
+static int	devpermfile_keydel(DP *,int) noex ;
+static int	devpermfile_keyincr(DP *,int) noex ;
+static int	devpermfile_keydecr(DP *,int) noex ;
+static int	devpermfile_entexpand(DP *,int,mode_t,cchar *,int) noex ;
+static int	devpermfile_entins(DP *,int,mode_t,cchar *,int) noex ;
+static int	devpermfile_entdir(DP *,int,mode_t,cchar *,int) noex ;
+static int	devpermfile_entadd(DP *,DP_IE *) noex ;
+static int	devpermfile_keymat(DP *,DP_IE *,cchar *) noex ;
+
+static int	key_start(DP_KEY *,cchar *,int) noex ;
+static int	key_incr(DP_KEY *) noex ;
+static int	key_decr(DP_KEY *) noex ;
+static int	key_count(DP_KEY *) noex ;
+static int	key_mat(DP_KEY *,cchar *,int) noex ;
+static int	key_finish(DP_KEY *) noex ;
+static int	key_fake(DP_KEY *,cchar *,int) noex ;
+
+static int	ientry_start(DP_IE *,int,mode_t,cchar *,int) noex ;
+static int	ientry_ci(DP_IE *) noex ;
+static int	ientry_finish(DP_IE *) noex ;
+
+static int	entry_load(DP_ENT *,char *,int,DP_IE *) noex ;
+
+static int	mkdirfile(char *,cchar *,int,cchar *,int) noex ;
+
+static int	vkeymat(cvoid **,cvoid **) noex ;
+
+static mode_t	modeparse(cchar *,int) noex ;
 
 
 /* local variables */
 
+static vars		var ;
+
 /* key field terminators (pound, equal, colon, and all white space) */
-static const unsigned char 	kterms[32] = {
+constexpr char		kterms[32] = {
 	0x00, 0x1B, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x20,
 	0x00, 0x00, 0x00, 0x00,
@@ -168,7 +187,7 @@ static const unsigned char 	kterms[32] = {
 } ;
 
 /* argument field terminators (pound and all white space) */
-static const unsigned char 	aterms[32] = {
+constexpr char		aterms[32] = {
 	0x00, 0x1B, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x04,
 	0x00, 0x00, 0x00, 0x00,
@@ -180,400 +199,217 @@ static const unsigned char 	aterms[32] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
+static int devpermfile_opener(DP *) noex ;
 
-int devpermfile_open(op,fname)
-DEVPERMFILE	*op ;
-cchar	fname[] ;
-{
-	int	rs = SR_OK ;
-	int	sz ;
-	int	opts ;
-
-	cchar	*cp ;
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (fname == NULL)
-	    return SR_FAULT ;
-
-	if (fname[0] == '\0')
-	    return SR_INVALID ;
-
-	memclear(op) ;
-	op->intcheck = DEVPERMFILE_ICHECKTIME ;
-	op->intchange = DEVPERMFILE_ICHANGETIME ;
-	op->ti_check = time(NULL) ;
-
-	{
-	    int		fl = -1 ;
-	    char	tmpfname[MAXPATHLEN + 1] ;
-	    if (fname[0] != '/') {
-		int	pwdlen ;
-		if ((rs = getpwd(tmpfname,MAXPATHLEN)) >= 0) {
-		    pwdlen = rs ;
-		    rs = mkcatfile(tmpfname,pwdlen,fname) ;
-		    fl = rs ;
-		    fname = tmpfname ;
-		}
+int devpermfile_open(DP *op,cc *fname) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = devpermfile_ctor(op,fname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+		if ((rs = var) >= 0) {
+	            op->intcheck = DP_ICHECKINT ;
+	            op->intchange = DP_ICHANGEINT ;
+	            op->ti_check = getustime ;
+	            cchar	*fn ;
+	            if (absfn catfn ; (rs = catfn.start(fname,-1,&fn)) >= 0) {
+	                if (cc *cp ; (rs = uc_mallocstrw(fn,rs,&cp)) >= 0) {
+	                    op->fname = cp ;
+		            rs = devpermfile_opener(op) ;
+			    if (rs < 0) {
+			        uc_free(op->fname) ;
+			        op->fname = nullptr ;
+			    } /* end if (error) */
+	                } /* end if (memory-allocation) */
+	                rs1 = catfn.finish ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (absfn) */
+		} /* end if (vars) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		devpermfile_dtor(op) ;
 	    }
-	    if (rs >= 0) {
-	        rs = uc_mallocstrw(fname,fl,&cp) ;
-	        op->fname = cp ;
-	    }
-	}
-	if (rs < 0)
-	    goto bad0 ;
-
-/* initialize */
-
-	opts = VECOBJ_OSTATIONARY ;
-	sz = szof(DEVPERMFILE_KEY) ;
-	rs = vecobj_start(&op->keys,sz,10,opts) ;
-	if (rs < 0)
-	    goto bad1 ;
-
-/* keep this not-sorted so that the original order is maintained */
-
-	opts = 0 ;
-	sz = szof(DEVPERMFILE_IE) ;
-	rs = vecobj_start(&op->entries,sz,10,opts) ;
-	if (rs < 0)
-	    goto bad2 ;
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile_open: about to parse, file=%s\n",fname) ;
-#endif
-
-	rs = devpermfile_fileparse(op,fname) ;
-	    if (rs < 0)
-	        goto bad4 ;
-
-	op->magic = DEVPERMFILE_MAGIC ;
-
-ret0:
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile_open: ret rs=%d\n",rs) ;
-#endif
-
+	} /* end if (devpermfile_ctor) */
 	return rs ;
-
-/* handle bad things */
-bad4:
-	devpermfile_finishentries(op) ;
-
-bad3:
-	vecobj_finish(&op->entries) ;
-
-bad2:
-	vecobj_finish(&op->keys) ;
-
-bad1:
-	if (op->fname != NULL) {
-	    uc_free(op->fname) ;
-	    op->fname = NULL ;
-	}
-
-bad0:
-	op->magic = 0 ;
-	goto ret0 ;
 }
 /* end subroutine (devpermfile_open) */
 
+static int devpermfile_opener(DP *op) noex {
+	int		vsz = szof(DP_KEY) ;
+	cint		vn = 10 ;
+	int		vo = vecobjm.stationary ;
+    	int		rs ;
+	if ((rs = vecobj_start(&op->keys,vsz,vn,vo)) >= 0) {
+	    /* keep this not-sorted so that the original order is maintained */
+	    vsz = szof(DP_IE) ;
+	    vo = 0 ;
+	    if ((rs = vecobj_start(&op->entries,vsz,vn,vo)) >= 0) {
+		if ((rs = devpermfile_parse(op,op->fname)) >= 0) {
+		    op->magic = DEVPERMFILE_MAGIC ;
+		}
+		if (rs < 0) {
+		    devpermfile_finents(op) ;
+		    vecobj_finish(&op->entries) ;
+		} /* end if (error) */
+	    }
+	    if (rs < 0) {
+		vecobj_finish(&op->keys) ;
+	    } /* end if (error) */
+	} /* end if (keys.start) */
+	return rs ;
+}
+/* end subroutine (devpermfile_opener) */
 
-/* free up the resources occupied by a DEVPERMFILE list object */
-int devpermfile_close(op)
-DEVPERMFILE	*op ;
-{
-	int	rs = SR_OK ;
-	int	rs1 ;
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != DEVPERMFILE_MAGIC)
-	    return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile_close: ent\n") ;
-#endif
-
-/* secondary items */
-
-	rs1 = devpermfile_finishentries(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = devpermfile_finishkeys(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = vecobj_finish(&op->entries) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = vecobj_finish(&op->keys) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->fname != NULL) {
-	    rs1 = uc_free(op->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->fname = NULL ;
-	}
-
-	op->magic = 0 ;
+/* free up the resources occupied by a DP list object */
+int devpermfile_close(DP *op) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = devpermfile_magic(op)) >= 0) {
+	    {
+	        rs1 = devpermfile_finents(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = devpermfile_finkeys(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = vecobj_finish(&op->entries) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = vecobj_finish(&op->keys) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->fname) {
+	        rs1 = uc_free(op->fname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->fname = nullptr ;
+	    }
+	    {
+		rs1 = devpermfile_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (devpermfile_close) */
 
-
-/* cursor manipulations */
-int devpermfile_curbegin(op,cp)
-DEVPERMFILE	*op ;
-DEVPERMFILE_CUR	*cp ;
-{
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != DEVPERMFILE_MAGIC)
-	    return SR_NOTOPEN ;
-
-	op->ccount += 1 ;
-	cp->i = -1 ;
-	return SR_OK ;
+int devpermfile_curbegin(DP *op,DP_CUR *cp) noex {
+    	int		rs ;
+	if ((rs = devpermfile_magic(op,cp)) >= 0) {
+	    op->ccount += 1 ;
+	    cp->i = -1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (devpermfile_curbegin) */
 
-
-int devpermfile_curend(op,cp)
-DEVPERMFILE	*op ;
-DEVPERMFILE_CUR	*cp ;
-{
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != DEVPERMFILE_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (op->ccount > 0) op->ccount -= 1 ;
-	cp->i = -1 ;
-	return SR_OK ;
+int devpermfile_curend(DP *op,DP_CUR *cp) noex {
+    	int		rs ;
+	if ((rs = devpermfile_magic(op,cp)) >= 0) {
+	   if (op->ccount > 0) op->ccount -= 1 ;
+	   cp->i = -1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (devpermfile_curend) */
 
-
 /* search the parameters for a match */
-int devpermfile_fetch(op,key,curp,ep,ebuf,elen)
-DEVPERMFILE	*op ;
-cchar	key[] ;
-DEVPERMFILE_CUR	*curp ;
-DEVPERMFILE_ENT	*ep ;
-char		ebuf[] ;
-int		elen ;
-{
-	DEVPERMFILE_IE		*iep ;
-
-	VECOBJ	*elp ;
-
-	int	rs ;
-	int	i, j ;
-	int	el = 0 ;
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != DEVPERMFILE_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (key == NULL)
-	    return SR_FAULT ;
-
-	if (key[0] == '\0')
-	    return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile_fetch: ent key=%s\n",key) ;
-#endif
-
-	if (curp == NULL)
-	    return SR_FAULT ;
-
-	if (ep == NULL)
-	    return SR_FAULT ;
-
-	if (ebuf == NULL)
-	    return SR_FAULT ;
-
-/* loop forward */
-
-	elp = &op->entries ;
-	    j = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	    for (i = j ; (rs = vecobj_get(elp,i,&iep)) >= 0 ; i += 1) {
-	        if (iep == NULL) continue ;
-
-#if	CF_DEBUGS
-	        debugprintf("devpermfile_fetch: loop i=%d\n",i) ;
-#endif
-
-	        if (devpermfile_keymat(op,iep,key))
-		    break ;
-
-	    } /* end for (looping through entries) */
-
-	if (rs >= 0) {
-	    rs = entry_load(ep,ebuf,elen,iep) ;
-	    if (rs >= 0)
-	        curp->i = i ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile_fetch: ret rs=%d vl=%u\n",rs,vl) ;
-#endif
-
+int devpermfile_curfetch(DP *op,cc *key,DP_CUR *curp,DP_ENT *ep,
+		char *ebuf,int elen) noex {
+	int		rs ;
+	int		el = 0 ; /* return-value */
+	if ((rs = devpermfile_magic(op,key,curp,ep,ebuf)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (key[0]) {
+		vecobj	*elp = &op->entries ;
+		DP_IE	*iep{} ;
+		cint	j = (curp->i >= 0) ? (curp->i + 1) : 0 ;
+		int	i ; /* used-afterwards */
+		void	*vp{} ;
+	        for (i = j ; (rs = elp->get(i,&vp)) >= 0 ; i += 1) {
+		    iep = (DP_IE *) vp ;
+	            if (vp) {
+	                if (devpermfile_keymat(op,iep,key)) break ;
+		    }
+	        } /* end for (looping through entries) */
+	        if ((rs >= 0) && iep) {
+	            if ((rs = entry_load(ep,ebuf,elen,iep)) >= 0) {
+			el = rs ;
+	                curp->i = i ;
+	            }
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? el : rs ;
 }
-/* end subroutine (devpermfile_fetch) */
+/* end subroutine (devpermfile_curfetch) */
 
-
-/* enumerate the entries */
-int devpermfile_enum(op,curp,ep,ebuf,elen)
-DEVPERMFILE	*op ;
-DEVPERMFILE_CUR	*curp ;
-DEVPERMFILE_ENT	*ep ;
-char		ebuf[] ;
-int		elen ;
-{
-	DEVPERMFILE_IE	*iep ;
-
-	VECOBJ	*elp ;
-
-	int	rs ;
-	int	i, j ;
-	int	el = 0 ;
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != DEVPERMFILE_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (curp == NULL)
-	    return SR_FAULT ;
-
-	if ((ep == NULL) || (ebuf == NULL))
-	    return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile_enum: ent curi=%d\n",curp->i) ;
-#endif
-
-	elp = &op->entries ;
-	i = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	for (j = i ; (rs = vecobj_get(elp,j,&iep)) >= 0 ; j += 1) {
-
-	    if (iep != NULL)
-	        break ;
-
-	} /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile_enum: vecobj_get() j=%d rs=%d\n",j,rs) ;
-#endif
-
-	if ((rs >= 0) && (iep != NULL)) {
-	    rs = entry_load(ep,ebuf,elen,iep) ;
-	    el = rs ;
-	    if (rs >= 0)
-	        curp->i = j ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile_enum: ret rs=%d el=%u\n",rs,el) ;
-#endif
-
+int devpermfile_curenum(DP *op,DP_CUR *curp,DP_ENT *ep,
+		char *ebuf,int elen) noex {
+	int		rs ;
+	int		el = 0 ; /* return-value */
+	if ((rs = devpermfile_magic(op,curp,ep,ebuf)) >= 0) {
+	    vecobj	*elp = &op->entries ;
+	    DP_IE	*iep{} ;
+	    cint	j = (curp->i >= 0) ? (curp->i + 1) : 0 ;
+	    int		i ; /* used-afterwards */
+	    void	*vp{} ;
+	    for (i = j ; (rs = elp->get(i,&vp)) >= 0 ; i += 1) {
+		iep = (DP_IE *) vp ;
+	        if (vp) break ;
+	    } /* end for */
+	    if ((rs >= 0) && iep) {
+	        if ((rs = entry_load(ep,ebuf,elen,iep)) >= 0) {
+	            el = rs ;
+	            curp->i = j ;
+	        }
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? el : rs ;
 }
-/* end subroutine (devpermfile_enum) */
+/* end subroutine (devpermfile_curenum) */
 
-
-int devpermfile_checkint(op,intcheck)
-DEVPERMFILE	*op ;
-int		intcheck ;
-{
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != DEVPERMFILE_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (intcheck < 1) intcheck = 1 ;
-	op->intcheck = intcheck ;
-	return SR_OK ;
+int devpermfile_checkint(DP *op,int intcheck) noex {
+    	int		rs ;
+	if ((rs = devpermfile_magic(op)) >= 0) {
+	    if (intcheck < 1) intcheck = 1 ;
+	    op->intcheck = intcheck ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (devpermfile_checkint) */
 
-
 /* check if the parameter file has changed */
-int devpermfile_check(op,daytime)
-DEVPERMFILE	*op ;
-time_t		daytime ;
-{
-	ustat	sb ;
-	int		rs = SR_OK ;
-	int		f_changed = FALSE ;
-	int		f = FALSE ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != DEVPERMFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (daytime == 0)
-	    daytime = time(NULL) ;
-
-/* should we even check? */
-
-	if ((daytime - op->ti_check) <= op->intcheck)
-	    goto ret0 ;
-
-	op->ti_check = daytime ;
-
-/* check the files */
-
-	rs = uc_stat(op->fname,&sb) ;
-	if (rs < 0)
-	    goto bad1 ;
-
-	f = f || (sb.st_mtime > op->ti_mod) ;
-	f = f || (sb.st_size != op->fsize) ;
-	if (f && ((daytime - sb.st_mtime) >= op->intchange)) {
-
-	    op->ti_mod = sb.st_mtime ;
-	    op->fsize = sb.st_size ;
-	    f_changed = TRUE ;
-	    devpermfile_finishentries(op) ;
-
-	    rs = devpermfile_fileparse(op,op->fname) ;
-
-	} /* end if */
-
-bad1:
-ret0:
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile_check: ret rs=%d changed=%u\n",
-	    rs,f_changed) ;
-#endif
-
+int devpermfile_check(DP *op,time_t dt) noex {
+	int		rs ;
+	int		f_changed = false ; /* return-value */
+	if ((rs = devpermfile_magic(op)) >= 0) {
+	    if (dt == 0) dt = getustime ;
+	    if ((dt - op->ti_check) >= op->intcheck) {
+	        op->ti_check = dt ;
+	        /* check the files */
+	        if (ustat sb ; (rs = uc_stat(op->fname,&sb)) >= 0) {
+	    	    bool	f = false ;
+	            f = f || (sb.st_mtime > op->ti_mod) ;
+	            f = f || (sb.st_size != op->fsize) ;
+	            if (f && ((dt - sb.st_mtime) >= op->intchange)) {
+	    	        op->ti_mod = sb.st_mtime ;
+	    	        op->fsize = sb.st_size ;
+	    	        f_changed = true ;
+	    	        devpermfile_finents(op) ;
+	    	        rs = devpermfile_parse(op,op->fname) ;
+		    } /* end if */
+		} /* end if (stat) */
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? f_changed : rs ;
 }
 /* end subroutine (devpermfile_check) */
@@ -581,905 +417,555 @@ ret0:
 
 /* private subroutines */
 
+static int devpermfile_parser(DP *op,cchar *fname) noex ;
 
-/* parse a parameter file */
-static int devpermfile_fileparse(op,fname)
-DEVPERMFILE	*op ;
-cchar	fname[] ;
-{
-	ustat	sb ;
-
-	bfile		loadfile, *lfp = &loadfile ;
-
-	const int	llen = LINEBUFLEN ;
-
-	int	rs ;
-	int	len ;
-	int	cl ;
-	int	c = 0 ;
-
-	cchar	*cp ;
-
-	char	lbuf[LINEBUFLEN + 1] ;
-
-
-	if (fname == NULL)
-	    return SR_FAULT ;
-
-	if (fname[0] == '\0')
-	    return SR_INVALID ;
-
-	rs = bopen(lfp,op->fname,"r",0664) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile_fileparse: bopen() rs=%d\n",rs) ;
-#endif
-
-	rs = bcontrol(lfp,BC_STAT,&sb) ;
-	if (rs < 0)
-	    goto ret1 ;
-
-	op->ti_mod = sb.st_mtime ;
-	op->fsize = sb.st_size ;
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile_fileparse: start processing\n") ;
-#endif
-
-	while ((rs = breadlns(lfp,lbuf,llen,-1,NULL)) > 0) {
-
-	    len = rs ;
-	    if (len == 1) continue ;	/* blank line */
-
-	    if (lbuf[len - 1] != '\n') {
-	        int	ch ;
-	        while ((ch = bgetc(lfp)) >= 0) {
-	            if (ch == '\n')
-	                break ;
-	        }
-	        continue ;
-	    }
-
-	    cp = lbuf ;
-	    cl = len ;
-	    lbuf[--cl] = '\0' ;
-	    while (CHAR_ISWHITE(*cp)) {
-	        cp += 1 ;
-	        cl -= 1 ;
-	    }
-
-	    if ((*cp == '\0') || (*cp == '#')) continue ;
-
-#if	CF_DEBUGS && CF_DEBUGSFIELD
-	    debugprintf("devpermfile_fileparse: line> %r\n",
-	        cp,cl) ;
-#endif
-
-	    rs = devpermfile_fileparseline(op,cp,cl) ;
-	    c += rs ;
-
-	    if (rs < 0) break ;
-	} /* end while (reading lines) */
-
-	if (rs < 0) devpermfile_finishentries(op) ;
-
-ret1:
-	bclose(lfp) ;
-
-ret0:
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile_fileparse: ret rs=%d added=%d\n",
-	    rs,c) ;
-#endif
-
+static int devpermfile_parse(DP *op,cchar *fname) noex {
+	int		rs = SR_FAULT ;
+	int		c = 0 ; /* return-value */
+	if (fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+		rs = devpermfile_parser(op,fname) ;
+		c = rs ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (devpermfile_fileparse) */
+/* end subroutine (devpermfile_parse) */
 
-
-static int devpermfile_fileparseline(op,lp,ll)
-DEVPERMFILE	*op ;
-cchar	*lp ;
-int		ll ;
-{
-	FIELD	fsb ;
-
-	mode_t	dmode ;
-
-	int	rs ;
-	int	fl ;
-	int	kl, ml ;
-	int	ci = -1 ;
-	int	c = 0 ;
-	int	f_key = FALSE ;
-	int	f_mode = FALSE ;
-
-	cchar	*fp ;
-	cchar	*kp, *mp ;
-
-
-	rs = field_start(&fsb,lp,ll) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-/* get the "console" field */
-
-	fl = field_get(&fsb,kterms,&fp) ;
-	if (fl <= 0)
-	    goto ret1 ;
-
-#if	CF_DEBUGS && CF_DEBUGSFIELD
-	debugprintf("devpermfile_fileparseline: key=>%r<\n",
-	    fp,fl) ;
-#endif
-
-	kp = fp ;
-	kl = fl ;
-
-/* get the "mode" field */
-
-	fl = field_get(&fsb,kterms,&fp) ;
-	if (fl <= 0)
-	    goto ret1 ;
-
-	mp = fp ;
-	ml = fl ;
-
-/* get "devices" */
-
-	    while ((rs >= 0) && 
-	        ((fl = field_get(&fsb,aterms,&fp)) >= 0)) {
-
-#if	CF_DEBUGS && CF_DEBUGSFIELD
-	        debugprintf("devpermfile_fileparseline: "
-	            "field value=>%r<\n",
-	            fp,fl) ;
-#endif
-
-	        if (fl > 0) {
-
-			if (! f_key) {
-			f_key = TRUE ;
-			rs = devpermfile_keyadd(op,kp,kl) ;
-			ci = rs ;
-			if (rs == SR_OVERFLOW) break ;
+static int devpermfile_parser(DP *op,cchar *fname) noex {
+    	cnullptr	np{} ;
+    	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+	    cint	llen = rs ;
+	    cmode	om = 0 ;
+	    if (bfile lf ; (rs = lf.open(fname,"r",om)) >= 0) {
+		if (ustat sb ; (rs = lf.control(BC_STAT,&sb)) >= 0) {
+		    op->ti_mod = sb.st_mtime ;
+		    op->fsize = sb.st_size ;
+		    while ((rs = lf.readlns(lbuf,llen,-1,np)) > 0) {
+			cchar	*cp ;
+			if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
+			    rs = devpermfile_parseln(op,cp,cl) ;
+			    c += rs ;
 			}
-
-		if ((rs >= 0) && (! f_mode)) {
-			f_mode = TRUE ;
-			dmode = modeparse(mp,ml) ; /* cannot fail */
-		}
-
-		if (rs >= 0) {
-			rs = devpermfile_entexpand(op,ci,dmode,fp,fl) ;
-			c += rs ;
-		} /* end if */
-
-	        } /* end if (non-empty device field) */
-
-	        if (fsb.term == '#') break ;
-		if (rs < 0) break ;
-	    } /* end while (fields) */
-
-	if (f_key && (c == 0) && (ci >= 0))
-	    devpermfile_keydel(op,ci) ;
-
-ret1:
-	field_finish(&fsb) ;
-
-ret0:
-
-#if	CF_DEBUGS && CF_DEBUGSFIELD
-	debugprintf("devpermfile_fileparseline: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	    		if (rs < 0) break ;
+		    } /* end while (reading lines) */
+		    if (rs < 0) {
+			devpermfile_finents(op) ;
+		    }
+		} /* end if (bcontrol) */
+		rs1 = lf.close ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (bfile) */
+	    rs = rsfree(rs,lbuf) ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (devpermfile_fileparseline) */
+/* end subroutine (devpermfile_parser) */
 
+static int devpermfile_parseln(DP *op,cchar *lp,int ll) noex {
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
+	    cchar	*kp ;
+	    /* get the "console" field */
+	    if (int kl ; (kl = fsb.get(kterms,&kp)) > 0) {
+		cchar	*mp ;
+		/* get the "mode" field */
+		if (int ml ; (ml = fsb.get(kterms,&mp)) > 0) {
+		    cchar	*dp ;
+		    int		ci = -1 ;
+		    bool	f_key = false ;
+		    bool	f_mode = false ;
+		    mode_t	dm{} ;
+		    /* get "devices" */
+	    	    for (int dl ; (dl = fsb.get(aterms,&dp)) >= 0 ; ) {
+	                if (dl > 0) {
+			    if (! f_key) {
+			        f_key = true ;
+			        rs = devpermfile_keyadd(op,kp,kl) ;
+			        ci = rs ;
+			    }
+		            if ((rs >= 0) && (! f_mode)) {
+			        f_mode = true ;
+			        dm = modeparse(mp,ml) ; /* cannot fail */
+		            }
+		            if (rs >= 0) {
+				rs = devpermfile_entexpand(op,ci,dm,dp,dl) ;
+			        c += rs ;
+			    } /* end if */
+	                } /* end if (non-empty device field) */
+	                if (fsb.term == '#') break ;
+		        if (rs < 0) break ;
+		    } /* end for (fields) */
+		    if (f_key && (c == 0) && (ci >= 0)) {
+			devpermfile_keydel(op,ci) ;
+		    }
+		} /* end if (got mode) */
+	    } /* end if (got key) */
+	    rs1 = fsb.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (field) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (devpermfile_parseln) */
 
 /* add an entry to something */
-static int devpermfile_entadd(op,iep)
-DEVPERMFILE	*op ;
-DEVPERMFILE_IE	*iep ;
-{
-	int	rs ;
-
-
-	rs = vecobj_add(&op->entries,iep) ;
-
-#if	CF_DEBUGS 
-	debugprintf("devpermfile_entadd: vecobj_add() rs=%d\n",rs) ;
-#endif
-
-	return rs ;
+static int devpermfile_entadd(DP *op,DP_IE *iep) noex {
+	vecobj		*elp = &op->entries ;
+	return elp->add(iep) ;
 }
 /* end subroutine (devpermfile_entadd) */
 
-
 /* free up ALL of the keys */
-static int devpermfile_finishkeys(op)
-DEVPERMFILE	*op ;
-{
-	DEVPERMFILE_KEY	*kep ;
-
-	VECOBJ	*klp = &op->keys ;
-
-	int	rs = SR_OK ;
-	int	i ;
-
-
-	for (i = 0 ; vecobj_get(klp,i,&kep) >= 0 ; i += 1) {
-	    if (kep == NULL) continue ;
-	    key_finish(kep) ;
-	    vecobj_del(klp,i--) ;
-	} /* end for */
-
-	return rs ;
-}
-/* end subroutine (devpermfile_finishkeys) */
-
-
-/* free up ALL of the entries in this DEVPERMFILE list */
-static int devpermfile_finishentries(op)
-DEVPERMFILE	*op ;
-{
-	DEVPERMFILE_IE	*iep ;
-
-	VECOBJ	*elp = &op->entries ;
-
-	int	rs = SR_OK ;
-	int	i ;
-
-
-	for (i = 0 ; vecobj_get(elp,i,&iep) >= 0 ; i += 1) {
-	    if (iep == NULL) continue ;
-	    devpermfile_keydecr(op,iep->ci) ;
-	    ientry_finish(iep) ;
-	    vecobj_del(elp,i--) ;
-	} /* end for */
-
-	return rs ;
-}
-/* end subroutine (devpermfile_finishentries) */
-
-
-static int devpermfile_keyadd(op,kp,kl)
-DEVPERMFILE	*op ;
-cchar	*kp ;
-int		kl ;
-{
-	DEVPERMFILE_KEY	k ;
-
-	VECOBJ	*klp = &op->keys ;
-
-	int	rs ;
-	int	rs1 ;
-	int	cl ;
-	int	ci = 0 ;
-
-	char	tmpfname[MAXPATHLEN + 1] ;
-
-
-	rs = pathclean(tmpfname,kp,kl) ;
-	cl = rs ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	key_fake(&k,tmpfname,cl) ;
-
-	rs1 = vecobj_search(klp,&k,vkeymat,NULL) ;
-	ci = rs1 ;
-	if (rs1 == SR_NOTFOUND) {
-	    rs = key_start(&k,tmpfname,cl) ;
-	    if (rs >= 0) {
-	        rs = vecobj_add(&op->keys,&k) ;
-	        ci = rs ;
-	        if (rs < 0) key_finish(&k) ;
+static int devpermfile_finkeys(DP *op) noex {
+	vecobj		*klp = &op->keys ;
+	int		rs = SR_OK ;
+	void		*vp{} ;
+	for (int i = 0 ; klp->get(i,&vp) >= 0 ; i += 1) {
+	    DP_KEY	*kep = (DP_KEY *) vp ;
+	    if (vp) {
+	        key_finish(kep) ;
+	        vecobj_del(klp,i--) ;
 	    }
-	}
+	} /* end for */
+	return rs ;
+}
+/* end subroutine (devpermfile_finkeys) */
 
-ret0:
+/* free up ALL of the entries in this DP list */
+static int devpermfile_finents(DP *op) noex {
+	vecobj		*elp = &op->entries ;
+	int		rs = SR_OK ;
+	void		*vp{} ;
+	for (int i = 0 ; elp->get(i,&vp) >= 0 ; i += 1) {
+	    DP_IE	*iep = (DP_IE *) vp ;
+	    if (vp) {
+	        devpermfile_keydecr(op,iep->ci) ;
+	        ientry_finish(iep) ;
+	        vecobj_del(elp,i--) ;
+	    }
+	} /* end for */
+	return rs ;
+}
+/* end subroutine (devpermfile_finents) */
+
+static int devpermfile_keyadd(DP *op,cchar *kp,int kl) noex {
+	vecobj		*klp = &op->keys ;
+	cnullptr	np{} ;
+	cint		rsn = SR_NOTFOUND ;
+	int		rs ;
+	int		ci = 0 ; /* return-value */
+	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	    if ((rs = pathclean(tbuf,kp,kl)) >= 0) {
+		cint	cl = rs ;
+	        if (DP_KEY k ; (rs = key_fake(&k,tbuf,cl)) >= 0) {
+	            if ((rs = klp->search(&k,vkeymat,np)) >= 0) {
+			ci = rs ;
+		    } else if (rs == rsn) {
+	                if ((rs = key_start(&k,tbuf,cl)) >= 0) {
+	                    rs = klp->add(&k) ;
+	        	    ci = rs ;
+	        	    if (rs < 0) {
+				key_finish(&k) ;
+			    } /* end if (error) */
+			} /* end if (key_start) */
+		    } /* end if (was not found) */
+		} /* end if (key_fake) */
+	    } /* end if (pathclean) */
+	    rs = rsfree(rs,tbuf) ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? ci : rs ;
 }
 /* end subroutine (devpermfile_keyadd) */
 
-
-static int devpermfile_keydel(op,ci)
-DEVPERMFILE	*op ;
-int		ci ;
-{
-	DEVPERMFILE_KEY	*kep ;
-
-	VECOBJ	*klp = &op->keys ;
-
-	int	rs1 ;
-
-
-	rs1 = vecobj_get(klp,ci,&kep) ;
-	if (rs1 >= 0) {
-	    int	c = key_count(kep) ;
-	    if (c == 0) {
+static int devpermfile_keydel(DP *op,int ci) noex {
+	vecobj		*klp = &op->keys ;
+	int		rs ;
+	void		*vp{} ;
+	if ((rs = klp->get(ci,&vp)) >= 0) {
+	    DP_KEY	*kep = (DP_KEY *) vp ;
+	    if ((rs = key_count(kep)) == 0) {
 	        key_finish(kep) ;
-	        vecobj_del(klp,ci) ;
+	        klp->del(ci) ;
 	    }
 	}
-
-	return SR_OK ;
+	return rs ;
 }
 /* end subroutine (devpermfile_keydel) */
 
-
-static int devpermfile_keyincr(op,ci)
-DEVPERMFILE	*op ;
-int		ci ;
-{
-	DEVPERMFILE_KEY	*kep ;
-
-	VECOBJ	*klp = &op->keys ;
-
-	int	rs ;
-
-
-	rs = vecobj_get(klp,ci,&kep) ;
-	if (rs >= 0)
-	    key_incr(kep) ;
-
+static int devpermfile_keyincr(DP *op,int ci) noex {
+	vecobj		*klp = &op->keys ;
+	int		rs ;
+	void		*vp{} ;
+	if ((rs = klp->get(ci,&vp)) >= 0) {
+	    DP_KEY	*kep = (DP_KEY *) vp ;
+	    if (vp) {
+	        key_incr(kep) ;
+	    }
+	}
 	return rs ;
 }
 /* end subroutine (devpermfile_keyincr) */
 
-
-static int devpermfile_keydecr(op,ci)
-DEVPERMFILE	*op ;
-int		ci ;
-{
-	DEVPERMFILE_KEY	*kep ;
-
-	VECOBJ	*klp = &op->keys ;
-
-	int	rs ;
-
-
-	rs = vecobj_get(klp,ci,&kep) ;
-	if (rs >= 0) {
-	    int	c = key_decr(kep) ;
-	    if (c == 0) {
-		key_finish(kep) ;
-		vecobj_del(klp,ci) ;
+static int devpermfile_keydecr(DP *op,int ci) noex {
+	vecobj		*klp = &op->keys ;
+	int		rs ;
+	void		*vp{} ;
+	if ((rs = klp->get(ci,&vp)) >= 0) {
+	    DP_KEY	*kep = (DP_KEY *) vp ;
+	    if (vp) {
+	        if ((rs = key_decr(kep)) == 0) { /* equal-zero */
+		    key_finish(kep) ;
+		    klp->del(ci) ;
+		}
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (devpermfile_keydecr) */
 
-
-static int devpermfile_entexpand(op,ci,dmode,dp,dl)
-DEVPERMFILE	*op ;
-int		ci ;
-mode_t		dmode ;
-cchar	*dp ;
-int		dl ;
-{
-	int	rs = SR_OK ;
-	int	bl ;
-	int	c = 0 ;
-
-	cchar	*bp ;
-
-
-	if (dl < 0) dl = lenstr(dp) ;
-
-	bl = sfbasename(dp,dl,&bp) ;
-
-	if (bl > 0) {
-	    if ((bl == 1) && (bp[0] == '*')) {
-	        rs = devpermfile_entdir(op,ci,dmode,dp,(bp-1-dp)) ;
-	        c += rs ;
-	    } else {
-	        rs = devpermfile_ententer(op,ci,dmode,dp,dl) ;
-	        c += rs ;
-	    }
-	}
-
+static int devpermfile_entexpand(DP *op,int ci,mode_t dm,cc *dp,int dl) noex {
+	int		rs = SR_FAULT ;
+	int		c = 0 ; /* return-value */
+	if (dp) {
+	    cchar	*bp ;
+	    if (dl < 0) dl = lenstr(dp) ;
+	    if (int bl ; (bl = sfbasename(dp,dl,&bp)) > 0) {
+	        if ((bl == 1) && (bp[0] == '*')) {
+		    cint tl = intconv(bp - 1 - dp) ;
+	            rs = devpermfile_entdir(op,ci,dm,dp,tl) ;
+	            c += rs ;
+	        } else {
+	            rs = devpermfile_entins(op,ci,dm,dp,dl) ;
+	            c += rs ;
+	        }
+	    } /* end if (sfbasename) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (devpermfile_entexpand) */
 
-
-static int devpermfile_ententer(op,ci,dmode,dp,dl)
-DEVPERMFILE	*op ;
-int		ci ;
-mode_t		dmode ;
-cchar	*dp ;
-int		dl ;
-{
-	DEVPERMFILE_IE	ie ;
-
-	int	rs ;
-	int	c = 0 ;
-
-
-	rs = ientry_start(&ie,ci,dmode,dp,dl) ;
-	if (rs >= 0) {
-	    rs = devpermfile_keyincr(op,ci) ;
-	    if (rs >= 0) {
+static int devpermfile_entins(DP *op,int ci,mode_t dmode,cc *dp,int dl) noex {
+	int		rs ;
+	int		c = 0 ; /* return-value */
+	if (DP_IE ie ; (rs = ientry_start(&ie,ci,dmode,dp,dl)) >= 0) {
+	    if ((rs = devpermfile_keyincr(op,ci)) >= 0) {
 		c += 1 ;
 		rs = devpermfile_entadd(op,&ie) ;
-		if (rs < 0)
+		if (rs < 0) {
 	 	    devpermfile_keydecr(op,ci) ;
-	    }
-	    if (rs < 0)
+		}
+	    } /* end if (devpermfile_keyincr) */
+	    if (rs < 0) {
 		ientry_finish(&ie) ;
-	}
-
+	    }
+	} /* end if (ientry_start) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (devpermfile_ententer) */
+/* end subroutine (devpermfile_entins) */
 
+static int devpermfile_entdirs(DP *,char *,int,mode_t,cchar *,int) noex ;
 
-static int devpermfile_entdir(op,ci,dmode,dp,dl)
-DEVPERMFILE	*op ;
-int		ci ;
-mode_t		dmode ;
-cchar	*dp ;
-int		dl ;
-{
-	NULSTR		ns ;
-
-	FSDIR		d ;
-
-	FSDIR_SLOT	ds ;
-
-	int	rs ;
-	int	rs1 ;
-	int	c = 0 ;
-
-	cchar	*dname ;
-
-	char	tmpfname[MAXPATHLEN + 1] ;
-
-
-	if ((rs = nulstr_start(&ns,dp,dl,&dname)) >= 0) {
-
-	    if (fsdir_open(&d,dname) >= 0) {
-	        int	dnl ;
-
-	        while ((dnl = fsdir_read(&d,&ds)) > 0) {
-		    cchar *dnp = ds.name ;
-
-		    if (dnp[0] == '.') continue ;
-		    rs1 = mkdirfile(tmpfname,dp,dl,dnp,dnl) ;
-		    if (rs1 >= 0) {
-	                rs = devpermfile_ententer(op,ci,dmode,tmpfname,rs1) ;
-	                c += rs ;
-	 	    }
-
-	        } /* end while (reading) */
-
-	        fsdir_close(&d) ;
-	    } /* end if (fsdir_open) */
-
-	    nulstr_finish(&ns) ;
-	} /* end if (nullstr) */
-
+static int devpermfile_entdir(DP *op,int ci,mode_t dm,cc *dp,int dl) noex {
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	(void) ci ;
+	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	    cchar	*dname ;
+	    if (nulstr ns ; (rs = ns.start(dp,dl,&dname)) >= 0) {
+		{
+	            rs = devpermfile_entdirs(op,tbuf,ci,dm,dname,dl) ;
+		    c = rs ;
+		}
+	        rs1 = ns.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (nullstr) */
+	    rs = rsfree(rs,tbuf) ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (devpermfile_entdir) */
 
+static int devpermfile_entdirs(DP *op,char *tbuf,int ci,mode_t dm,
+		cc *dp,int dl) noex {
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+	if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
+	    cint	nlen = rs ;
+	    if (fsdir d ; (rs = d.open(dp)) >= 0) {
+		for (fsdir_ent de ; (rs = d.read(&de,nbuf,nlen)) > 0 ; ) {
+		    cchar	*dnp = nbuf ;
+		    cint	dnl = rs ;
+		    if (hasnotdots(dnp,dnl)) {
+			if ((rs = mkdirfile(tbuf,dp,dl,dnp,dnl)) >= 0) {
+	                    rs = devpermfile_entins(op,ci,dm,tbuf,rs) ;
+	                    c += rs ;
+			}
+	 	    }
+		    if (rs < 0) break ;
+	        } /* end for (reading) */
+	        rs1 = d.close ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (fsdir_open) */
+	    rs = rsfree(rs,nbuf) ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (devpermfile_entdir) */
 
-static int devpermfile_keymat(op,iep,key)
-DEVPERMFILE	*op ;
-DEVPERMFILE_IE	*iep ;
-cchar	key[] ;
-{
-	DEVPERMFILE_KEY	*kep ;
-
-	int	rs1 ;
-	int	conlen = lenstr(key) ;
-	int	ci = iep->ci ;
-	int	f = FALSE ;
-
-
-	ci = ientry_ci(iep) ;
-
-	rs1 = vecobj_get(&op->keys,ci,&kep) ;
-	if (rs1 >= 0)
-	    f = key_mat(kep,key,conlen) ;
-
-	return f ;
+static int devpermfile_keymat(DP *op,DP_IE *iep,cchar *key) noex {
+    	vecobj		*klp = &op->keys ;
+	int		rs ;
+	int		f = false ; /* return-value */
+	if ((rs = ientry_ci(iep)) >= 0) {
+	    cint	ci = rs ;
+	    if (void *vp ; (rs = klp->get(ci,&vp)) >= 0) {
+	        DP_KEY	*kep = (DP_KEY *) vp ;
+	        if (vp) {
+		    cint	keylen = lenstr(key) ;
+	            f = key_mat(kep,key,keylen) ;
+	        }
+	    } /* end if (vecobj_get) */
+	} /* end if (ientry_ci) */
+	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (devpermfile_keymat) */
 
-
-static int key_start(kep,console,conlen)
-DEVPERMFILE_KEY	*kep ;
-cchar	*console ;
-int		conlen ;
-{
-	int	rs ;
-
-	cchar	*cp ;
-
-
-	if (kep == NULL)
-	    return SR_FAULT ;
-
-	if (console == NULL)
-	    return SR_FAULT ;
-
-	if (console[0] == '\0')
-	    return SR_INVALID ;
-
-	if (conlen < 0) conlen = lenstr(console) ;
-
-	memclear(kep) ;
-	rs = uc_mallocstrw(console,conlen,&cp) ;
-	if (rs >= 0) {
-	    kep->console = cp ;
-	    kep->conlen = conlen ;
-	}
-
-ret0:
+static int key_start(DP_KEY *kep,cchar *conbuf,int conlen) noex {
+	int		rs = SR_FAULT ;
+	if (kep && conbuf) {
+	    rs = SR_INVALID ;
+	    memclear(kep) ;
+	    if (conbuf[0]) {
+	        if (conlen < 0) conlen = lenstr(conbuf) ;
+	        if (cchar *cp ; (rs = uc_mallocstrw(conbuf,conlen,&cp)) >= 0) {
+	            kep->console = cp ;
+	            kep->conlen = conlen ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (key_start) */
 
-
-static int key_incr(kep)
-DEVPERMFILE_KEY	*kep ;
-{
-
-
-	if (kep == NULL)
-	    return SR_FAULT ;
-
-	kep->count += 1 ;
-	return kep->count ;
+static int key_incr(DP_KEY *kep) noex {
+    	int		rs = SR_FAULT ;
+	if (kep) {
+	    kep->count += 1 ;
+	    rs = kep->count ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (key_incr) */
 
-
-static int key_decr(kep)
-DEVPERMFILE_KEY	*kep ;
-{
-
-
-	if (kep == NULL)
-	    return SR_FAULT ;
-
-	if (kep->count > 0) kep->count -= 1 ;
-	return kep->count ;
+static int key_decr(DP_KEY *kep) noex {
+    	int		rs = SR_FAULT ;
+	if (kep) {
+	    if (kep->count > 0) kep->count -= 1 ;
+	    rs = kep->count ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (key_decr) */
 
-
-static int key_count(kep)
-DEVPERMFILE_KEY	*kep ;
-{
-
-
-	if (kep == NULL)
-	    return SR_FAULT ;
-
-	return kep->count ;
+static int key_count(DP_KEY *kep) noex {
+    	int		rs = SR_FAULT ;
+	if (kep) {
+	    rs = kep->count ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (key_count) */
 
-
-static int key_mat(kep,key,keylen)
-DEVPERMFILE_KEY	*kep ;
-cchar	key[] ;
-int		keylen ;
-{
-	int	cl = kep->conlen ;
-	int	f ;
-
-	cchar	*cp = kep->console ;
-
-
-	if (keylen < 0) keylen = lenstr(key) ;
-
-	f = (keylen == cl) ;
-	f = f && (strncmp(cp,key,cl) == 0) ;
-	return f ;
+static int key_mat(DP_KEY *kep,cchar *keyp,int keyl) noex {
+    	int		rs = SR_FAULT ;
+	int		f = false ; /* return-value */
+	if (kep && keyp) {
+	    cint	cl = kep->conlen ;
+	    cchar	*cp = kep->console ;
+	    rs = SR_OK ;
+	    if (keyl < 0) keyl = lenstr(keyp) ;
+	    f = (keyl == cl) ;
+	    f = f && (strncmp(cp,keyp,cl) == 0) ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (key_mat) */
 
-
-static int key_finish(kep)
-DEVPERMFILE_KEY	*kep ;
-{
-	int	rs = SR_OK ;
-
-
-	if (kep == NULL)
-	    return SR_FAULT ;
-
-	if (kep->console != NULL) {
-	    uc_free(kep->console) ;
-	    kep->console = NULL ;
-	}
-
+static int key_finish(DP_KEY *kep) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (kep) {
+	    rs = SR_OK ;
+	    if (kep->console) {
+	        rs1 = uc_free(kep->console) ;
+		if (rs >= 0) rs = rs1 ;
+	        kep->console = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (key_finish) */
 
-
-static int key_fake(kep,key,keylen)
-DEVPERMFILE_KEY	*kep ;
-cchar	key[] ;
-int		keylen ;
-{
-
-
-	if (keylen < 0) keylen = lenstr(key) ;
-
-	kep->console = key ;
-	kep->conlen = keylen ;
-	return keylen ;
+static int key_fake(DP_KEY *kep,cchar *keyp,int keyl) noex {
+    	int		rs = SR_FAULT ;
+	if (kep && keyp) {
+	    rs = SR_OK ;
+	    if (keyl < 0) keyl = lenstr(keyp) ;
+	    kep->console = keyp ;
+	    kep->conlen = keyl ;
+	    rs = keyl ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (key_fake) */
 
-
-static int ientry_start(iep,ci,m,dp,dl)
-DEVPERMFILE_IE	*iep ;
-int		ci ;
-mode_t		m ;
-cchar	dp[] ;
-int		dl ;
-{
-	int	rs ;
-
-	cchar	*cp ;
-
-
-	if (iep == NULL)
-	    return SR_FAULT ;
-
-	if (ci < 0)
-	    return SR_INVALID ;
-
-	if (dp == NULL)
-	    return SR_FAULT ;
-
-	memclear(iep) ;
-	iep->ci = ci ;
-	iep->dmode = m ;
-	if (dl < 0) dl = lenstr(dp) ;
-
-	rs = uc_mallocstrw(dp,dl,&cp) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	iep->dev = cp ;
-	iep->devlen = dl ;
-
-ret0:
-
-#if	CF_DEBUGS
-	debugprintf("devpermfile/ientry_start: ret rs=%d\n",rs) ;
-#endif
-
+static int ientry_start(DP_IE *iep,int ci,mode_t m,cc *dp,int dl) noex {
+	int		rs = SR_FAULT ;
+	if (iep && dp) {
+	    rs = SR_INVALID ;
+	    memclear(iep) ;
+	    if (ci >= 0) {
+	        iep->ci = ci ;
+	        iep->dmode = m ;
+	        if (dl < 0) dl = lenstr(dp) ;
+	        if (cchar *cp ; (rs = uc_mallocstrw(dp,dl,&cp)) >= 0) {
+	            iep->dev = cp ;
+	            iep->devlen = rs ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ientry_start) */
 
-
-static int ientry_finish(iep)
-DEVPERMFILE_IE	*iep ;
-{
-
-
-	if (iep == NULL)
-	    return SR_FAULT ;
-
-	if (iep->dev != NULL) {
-	    uc_free(iep->dev) ;
-	    iep->dev = NULL ;
-	}
-
-	iep->devlen = 0 ;
-	return SR_OK ;
+static int ientry_finish(DP_IE *iep) noex {
+    	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (iep) {
+	    rs = SR_OK ;
+	    if (iep->dev) {
+	        rs1 = uc_free(iep->dev) ;
+		if (rs >= 0) rs = rs1 ;
+	        iep->dev = nullptr ;
+	    }
+	    iep->devlen = 0 ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (ientry_finish) */
 
-
-static int ientry_ci(iep)
-DEVPERMFILE_IE	*iep ;
-{
-
-
-	if (iep == NULL)
-	    return SR_FAULT ;
-
-	return iep->ci ;
+static int ientry_ci(DP_IE *iep) noex {
+    	int		rs = SR_FAULT ;
+	if (iep) {
+	    rs = iep->ci ;
+	}
+	return rs ;
 }
 /* end subroutine (ientry_ci) */
 
-
-static int entry_load(ep,ebuf,elen,iep)
-DEVPERMFILE_ENT	*ep ;
-char			ebuf[] ;
-int			elen ;
-DEVPERMFILE_IE		*iep ;
-{
-	int	rs = SR_OK ;
-	int	bo ;
-	int	ilen ;
-	int	el = 0 ;
-
-	char	*bp ;
-
-
-	if (ep == NULL)
-	    return SR_FAULT ;
-
-	if (ebuf == NULL)
-	    return SR_FAULT ;
-
-	if (elen <= 0)
-	    return SR_OVERFLOW ;
-
-	if (iep == NULL)
-	    return SR_FAULT ;
-
-	memclear(ep) ;
-	ep->devmode = iep->dmode ;
-	ep->devlen = iep->devlen ;
-
-	bp = ebuf ;
-	bo = DEVPERMFILE_BO((ulong) ebuf) ;
-	bp += bo ;
-	elen -= bo ;
-
-#if	CF_DEBUGS
-	    debugprintf("entry_load: bo=%u\n",bo) ;
-#endif
-
-	if (rs >= 0) {
-	    ilen = (iep->devlen+1) ;
-	    if (ilen < elen) {
-		ep->dev = bp ;
-	        bp = strwcpy(bp,iep->dev,iep->devlen) + 1 ;
-		elen -= ilen ;
-	    } else
-	        rs = SR_OVERFLOW ;
-	}
-
-	el = (bp - ebuf) ;
-
-#if	CF_DEBUGS
-	debugprintf("entry_load: ret rs=%d el=%u\n",rs,el) ;
-#endif
-
+static int entry_load(DP_ENT *ep,char *ebuf,int elen,DP_IE *iep) noex {
+	int		rs = SR_FAULT ;
+	int		el = 0 ; /* return-value */
+	if (ep && ebuf && iep) {
+	    rs = SR_INVALID ;
+	    memclear(ep) ;
+	    if (elen > 0) {
+	        cint	bo = DP_BO((ulong) ebuf) ;
+	        cint	ilen = (iep->devlen + 1) ;
+	        char	*bp = ebuf ;
+		rs = SR_OK ;
+	        ep->devmode = iep->dmode ;
+	        ep->devlen = iep->devlen ;
+	        bp += bo ;
+	        elen -= bo ;
+	        if (ilen < elen) {
+		    ep->dev = bp ;
+	            bp = strwcpy(bp,iep->dev,iep->devlen) + 1 ;
+		    elen -= ilen ;
+	        } else {
+	            rs = SR_OVERFLOW ;
+		}
+		el = intconv(bp - ebuf) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? el : rs ;
 }
 /* end subroutine (entry_load) */
 
-
-static int mkcatfile(char *buf,int i,cchar *fname)
-{
-	const int	blen = MAXPATHLEN ;
-
-	int	rs = SR_OK ;
-
-
-	if ((rs >= 0) && (i > 0) && (buf[i-1] != '/')) {
-	    rs = storebuf_chr(buf,blen,i,'/') ;
-	    i += rs ;
-	}
-
+static int mkdirfile(char *bufp,cc *dp,int dl,cc *dnp,int dnl) noex {
+	cint		bufl = var.maxpathlen ;
+	int		rs = SR_OK ;
+	int		i = 0 ;
 	if (rs >= 0) {
-	    rs = storebuf_strw(buf,blen,i,fname,-1) ;
+	    rs = storebuf_strw(bufp,bufl,i,dp,dl) ;
 	    i += rs ;
 	}
-
-	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (mkfile) */
-
-
-static int mkdirfile(buf,dp,dl,dnp,dnl)
-char		buf[] ;
-cchar	*dp ;
-int		dl ;
-cchar	*dnp ;
-int		dnl ;
-{
-	const int	blen = MAXPATHLEN ;
-
-	int	rs = SR_OK ;
-	int	i = 0 ;
-
-
+	if ((rs >= 0) && (i > 0) && (bufp[i - 1] != '/')) {
+	    rs = storebuf_chr(bufp,bufl,i,'/') ;
+	    i += rs ;
+	}
 	if (rs >= 0) {
-	    rs = storebuf_strw(buf,blen,i,dp,dl) ;
+	    rs = storebuf_strw(bufp,bufl,i,dnp,dnl) ;
 	    i += rs ;
 	}
-
-	if ((rs >= 0) && (i > 0) && (buf[i-1] != '/')) {
-	    rs = storebuf_chr(buf,blen,i,'/') ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(buf,blen,i,dnp,dnl) ;
-	    i += rs ;
-	}
-
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (mkdirfile) */
 
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = maxpathlen) == 0) {
+	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	        maxpathlen = rs ;
+	        if ((rs = getbufsize(getbufsize_ml)) >= 0) {
+	            maxlinelen = rs ;
+	        }
+	    }
+	} /* end if (initialization needed) */
+	return rs ;
+} /* end method (vars::operator) */
 
-static int vkeymat(e1pp,e2pp)
-DEVPERMFILE_KEY	**e1pp, **e2pp ;
-{
-	DEVPERMFILE_KEY	*e1p = *e1pp ;
-	DEVPERMFILE_KEY	*e2p = *e2pp ;
-
-	int	rc ;
-
-
-	if ((*e1pp == NULL) && (*e2pp == NULL))
-	    return 0 ;
-
-	if (*e1pp == NULL)
-	    return 1 ;
-
-	if (*e2pp == NULL)
-	    return -1 ;
-
-	rc = (e1p->console[0] - e2p->console[0]) ;
-	if (rc == 0)
+static int keymat(DP_KEY *e1p,DP_KEY *e2p) noex {
+    	int		rc ;
+	if ((rc = (e1p->console[0] - e2p->console[0])) == 0) {
 	    rc = strcmp(e1p->console,e2p->console) ;
+	}
+	return rc ;
+}
 
+static int vkeymat(cvoid **v1pp,cvoid **v2pp) noex {
+	DP_KEY		*e1p = (DP_KEY *) *v1pp ;
+	DP_KEY		*e2p = (DP_KEY *) *v2pp ;
+	int		rc = 0 ;
+	if (e1p || e2p) {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+		if (e2p) {
+		    rc = keymat(e1p,e2p) ;
+		}
+	    }
+	}
 	return rc ;
 }
 /* end subroutine (vkeymat) */
-
-
-#ifdef	COMMENT
-
-static int vcmpentry(DEVPERMFILE_ENT **e1pp,DEVPERMFILE_ENT **e2pp) noex {
-	DEVPERMFILE_ENT	*e1p = *e1pp ;
-	DEVPERMFILE_ENT	*e2p = *e2pp ;
-	int	rc = 0 ;
-	if ((*e1pp == NULL) && (*e2pp == NULL))
-	    return 0 ;
-
-	if (*e1pp == NULL)
-	    return 1 ;
-
-	if (*e2pp == NULL)
-	    return -1 ;
-
-	rc = (e1p->console[0] - e2p->console[0]) ;
-	if (rc == 0)
-	    rc = strcmp(e1p->key,e2p->key) ;
-
-	return rc ;
-}
-/* end subroutine (vcmpentry) */
-
-#endif /* COMMENT */
 
 static mode_t modeparse(cchar *mp,int ml) noex {
 	mode_t	m = 0600 ;
 	if (ml < 0) ml = lenstr(mp) ;
 	if (ml > 0) {
-		int	rs1 ;
-		int	v ;
-		rs1 = cfnumi(mp,ml,&v) ;
-		if (rs1 >= 0) {
-			if (v > 0777) v = 0777 ;
-			m = v ;
-		}
+	    if (int v ; cfnumi(mp,ml,&v) >= 0) {
+		if (v > 0777) v = 0777 ;
+		m = mode_t(v) ;
+	    }
 	}
 	return m ;
 }
