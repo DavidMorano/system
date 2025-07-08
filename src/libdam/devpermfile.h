@@ -20,9 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
+#include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -37,8 +35,6 @@
 #define	DEVPERMFILE_ENT		struct devpermfile_entry
 #define	DEVPERMFILE_CUR		struct devpermfile_cursor
 
-#define	DEVPERMFILE_ELEN (sizeof(struct devpermfile_e)+(2*(MAXPATHLEN+1)))
-
 
 struct devpermfile_flags {
 	uint		dummy:1 ;
@@ -48,11 +44,11 @@ struct devpermfile_head {
 	cchar		*fname ;
 	vecobj		keys ;
 	vecobj		entries ;	/* parameter entries */
-	DEVPERMFILE_FL	f ;
+	DEVPERMFILE_FL	fl ;
+	off_t		fsize ;
 	time_t		ti_check ;	/* time last checked */
 	time_t		ti_mod ;
 	uint		magic ;
-	int		fsize ;
 	int		intcheck ;	/* check interval (seconds) */
 	int		intchange ;	/* file-change interval (seconds) */
 	int		ccount ;	/* cursor count */
@@ -79,9 +75,9 @@ EXTERNC_begin
 extern int devpermfile_open(devpermfile *,cchar *) noex ;
 extern int devpermfile_curbegin(devpermfile *,devpermfile_cur *) noex ;
 extern int devpermfile_curend(devpermfile *,devpermfile_cur *) noex ;
-extern int devpermfile_fetch(devpermfile *,cchar *,devpermfile_cur *,
+extern int devpermfile_curfetch(devpermfile *,cchar *,devpermfile_cur *,
 		devpermfile_ent *,char *,int) noex ;
-extern int devpermfile_enum(devpermfile *,devpermfile_cur *,
+extern int devpermfile_curenum(devpermfile *,devpermfile_cur *,
 		devpermfile_ent *,char *,int) noex ;
 extern int devpermfile_checkint(devpermfile *,int) noex ;
 extern int devpermfile_check(devpermfile *,time_t) noex ;
