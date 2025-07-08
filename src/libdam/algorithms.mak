@@ -35,6 +35,8 @@ DEFS +=
 
 INCS += algorithms.h
 
+MODS +=
+
 LIBS +=
 
 
@@ -44,7 +46,6 @@ LIBDIRS += -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -61,10 +62,10 @@ OBJ2= dijkstra1.o dijkstra2.o
 OBJ3= partidxi.o partitionai.o
 OBJ4= msort.o
 OBJ5= sort_insertion.o sort_merge.o
-OBJ6=
+OBJ6= editdistance.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o obj5.o
+OBJB= obj4.o obj5.o obj6.o
 
 OBJ= $(OBJA) $(OBJB)
 
@@ -102,13 +103,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	$(RM) $(ALL)
@@ -161,5 +157,8 @@ msort.o:		msort.cc	msort.h			$(INCS)
 
 sort_insertion.o:	sort_insertion.ccm			$(INCS)
 sort_merge.o:		sort_merge.ccm				$(INCS)
+
+editdistance.o:		editdistance.cc	editdistance.h		$(INCS)
+
 
 
