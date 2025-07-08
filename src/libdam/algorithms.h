@@ -35,6 +35,7 @@
 #include	<partidxi.h>
 #include	<partitionai.h>
 #include	<msort.h>
+#include	<editdistance.h>
 
 
 #endif /* ALGORITHMS_INCLUDE */
