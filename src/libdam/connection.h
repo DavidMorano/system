@@ -45,9 +45,9 @@ struct connection_head {
 	cchar		*pr ;		/* dynamically allocated */
 	sockaddress	*sap ;
 	INADDR		netipaddr ;
-	CONNECTION_FL	f ;
+	CONNECTION_FL	fl ;
 	int		sal ;
-	int		s ;
+	int		sock ;
 } ;
 
 #ifdef	__cplusplus
@@ -72,6 +72,7 @@ struct connection : connection_head {
 	connection_co	finish ;
 	connection() noex {
 	    finish(this,connectionmem_finish) ;
+	    sap = nullptr ;
 	} ;
 	connection(const connection &) = delete ;
 	connection &operator = (const connection &) = delete ;
@@ -81,8 +82,8 @@ struct connection : connection_head {
 	int peername(sockaddress *,int,char *,int) noex ;
 	int mknames(vecstr *) noex ;
 	void dtor() noex ;
-	~connection() {
-	    dtor() ;
+	destruct connection() {
+	    if (sap) dtor() ;
 	} ;
 } ; /* end struct (connection) */
 #else	/* __cplusplus */
