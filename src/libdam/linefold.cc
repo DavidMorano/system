@@ -45,7 +45,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |lenstr(3c)| */
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<cfdec.h>
@@ -58,6 +57,7 @@
 
 #include	"linefold.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -262,29 +262,26 @@ int linefold_count(linefold *op) noex {
 
 static int linefold_process(linefold *op,int cols,int ind,
 		cc *lbuf,int llen) noex {
-	params		p ;
-	liner		le ;
-	int		rs = SR_OK ;
-	int		sl ;
-	int		ll ;
-	int		nline = 0 ;
-	cchar		*sp ;
-	cchar		*lp ;
-	params_load(&p,cols,ind) ;
+	int		rs ;
+	int		nline = 0 ; /* return-value */
 	if (llen < 0) llen = lenstr(lbuf) ;
-	sp = lbuf ;
-	sl = llen ;
-	while ((ll = params_nextline(&p,sp,sl,&lp)) > 0) {
-	    le.lp = lp ;
-	    le.ll = ll ;
-	    rs = vecobj_add(op->llp,&le) ;
-	    sl -= ((lp + ll) - sp) ;
-	    sp = (lp + ll) ;
-	    if (rs < 0) break ;
-	} /* end while */
-	if (rs >= 0) {
-	    nline = params_nline(&p) ;
-	}
+	if (params p ; (rs = params_load(&p,cols,ind)) >= 0) {
+	    liner	le{} ;
+	    int		sl = llen ;
+	    cchar	*sp = lbuf ;
+	    cchar	*lp ;
+	    for (int ll ; (ll = params_nextline(&p,sp,sl,&lp)) > 0 ; ) {
+	        le.lp = lp ;
+	        le.ll = ll ;
+	        rs = vecobj_add(op->llp,&le) ;
+	        sl -= intconv((lp + ll) - sp) ;
+	        sp = (lp + ll) ;
+	        if (rs < 0) break ;
+	    } /* end for */
+	    if (rs >= 0) {
+	        nline = params_nline(&p) ;
+	    }
+	} /* end if (params_load) */
 	return (rs >= 0) ? nline : rs ;
 }
 /* end subroutine (linefold_process) */
@@ -376,7 +373,7 @@ static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	} /* end while */
 	/* done */
 	*ncp = ncs ;
-	pl = (cp - sp) ;
+	pl = intconv(cp - sp) ;
 	return pl ;
 }
 /* end subroutine (nextpiece) */
