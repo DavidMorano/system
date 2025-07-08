@@ -30,7 +30,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
@@ -63,6 +62,7 @@
 #include	"cyi.h"
 #include	"cyimk.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -210,7 +210,7 @@ int calmgr_start(calmgr *op,calyears *cyp,int cidx,cchar *dn,cchar *cn) noex {
 	                if ((rs = calmgr_idxdir(op)) >= 0) {
 	                    cint	vo = VECHAND_OSTATIONARY ;
 	                    if ((rs = vechand_start(op->idxp,1,vo)) >= 0) {
-	                        op->f.idxes = true ;
+	                        op->fl.idxes = true ;
 	                    }
 	                } /* end if (calmgr_idxdir) */
 	                if (rs < 0) {
@@ -234,13 +234,13 @@ int calmgr_finish(calmgr *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = calmgr_magic(op)) >= 0) {
-	    if (op->f.idxes) {
+	    if (op->fl.idxes) {
 	        {
 	            rs1 = calmgr_idxends(op) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        {
-	            op->f.idxes = false ;
+	            op->fl.idxes = false ;
 	            rs1 = vechand_finish(op->idxp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
@@ -295,7 +295,7 @@ int calmgr_getbase(calmgr *op,cchar **rpp) noex {
 	    rs = SR_INVALID ;
 	    if (op->mapdata) {
 	         md = op->mapdata ;
-	         rs = op->mapsize ;
+	         rs = intconv(op->mapsize) ;
 	    }
 	    *rpp = (rs >= 0) ? md : nullptr ;
 	} /* end if (magic) */
@@ -425,7 +425,7 @@ static int calmgr_dbmaper(calmgr *op,cc *dbuf,time_t dt) noex {
 	cmode		om = 0666 ;
         if ((rs = u_open(dbuf,of,om)) >= 0) {
             cint        fd = rs ;
-            if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+            if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
                 if (S_ISREG(sb.st_mode)) {
                     csize       szm = size_t(INT_MAX) ;
                     op->fsize = size_t(sb.st_size) ;
@@ -698,19 +698,17 @@ static int calmgr_mkcyi(calmgr *op,int y) noex {
 	    calcite	q ;
 	    uint	foff = 0 ;
 	    cint	cidx = op->cidx ;
-	    int		ml = op->mapsize ;
+	    int		ml = intconv(op->mapsize) ;
 	    int		len ;
 	    int		ll ;
 	    int		f_ent = false ;
 	    cchar	*md = op->mapdata ;
 	    cchar	*mp = op->mapdata ;
 	    cchar	*lp ;
-	    cchar	*tp ;
 	    bool	f = false ;
+	    for (cchar *tp ; (tp = strnchr(mp,ml,'\n')) != nullptr ; ) {
 
-	    while ((tp = strnchr(mp,ml,'\n')) != nullptr) {
-
-	        len = ((tp + 1) - mp) ;
+	        len = intconv((tp + 1) - mp) ;
 	        lp = mp ;
 	        ll = (len - 1) ;
 
@@ -817,7 +815,7 @@ static int calmgr_mkdirs(calmgr *op,cchar *dname,mode_t dm) noex {
 	int		rs ;
 	dm &= S_IAMB ;
 	if ((rs = mkdirs(dname,dm)) >= 0) {
-	    if (USTAT sb ; (rs = u_stat(dname,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
 	        if (((sb.st_mode & dm) != dm)) {
 	            rs = uc_minmod(dname,dm) ;
 	        }
@@ -891,7 +889,7 @@ static int mkbve_start(cyimk_ent *bvep,cchar *md,calent *ep) noex {
 	        if (nlines <= UCHAR_MAX) {
 	            cyimk_ln	*lines ;
 	            cint	lsz = (nlines + 1) * szof(cyimk_ln) ;
-	            bvep->nlines = nlines ;
+	            bvep->nlines = uchar(nlines) ;
 	            if ((rs = uc_malloc(lsz,&lines)) >= 0) {
 	                int	i ; /* used-afterwards */
 	                bvep->lines = lines ;
