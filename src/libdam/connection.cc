@@ -30,12 +30,12 @@
 	name and find the hostname of the remote end of the socket.
 
 	Synopses:
-	int connection_start(CON *cnp,cchar *inetdomain) noex
-	int connection_finish(CON *cnp) noex
-	int connection_socklocname(CON *cnp,char *dp,int dl,int s) noex
-	int connection_sockremname(CON *cnp,char *dp,int dl,int s) noex
-	int connection_peername(CON *cnp,SA *sap,int sal,char *dp,int dl) noex
-	int connection_mknames(CON *cnp,vecstr *nlp) noex
+	int connection_start(CON *op,cchar *inetdomain) noex
+	int connection_finish(CON *op) noex
+	int connection_socklocname(CON *op,char *dp,int dl,int s) noex
+	int connection_sockremname(CON *op,char *dp,int dl,int s) noex
+	int connection_peername(CON *op,SA *sap,int sal,char *dp,int dl) noex
+	int connection_mknames(CON *op,vecstr *nlp) noex
 
 	Returns:
 	>=0		OK
@@ -88,6 +88,7 @@
 
 #include	"connection.h"
 
+import libutil ;
 import uconstants ;
 
 /* local defines */
@@ -124,9 +125,9 @@ namespace {
 	int		maxhostlen ;
 	int		socknamelen ;
 	int		hostentlen ;
-	int mkvars() noex ;
+	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -155,66 +156,66 @@ constexpr cchar		*localhost = sysword.w_localhost ;
 
 /* exported subroutines */
 
-int connection_start(CON *cnp,cchar *inetdomain) noex {
-    	CONNECTION	*hop = cnp ;
+int connection_start(CON *op,cchar *inetdomain) noex {
+    	CONNECTION	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (cnp && inetdomain) {
-	    static cint		rsv = var.mkvars() ;
+	if (op && inetdomain) {
+	    static cint		rsv = var ;
 	    cint		ssz = szof(sockaddress) ;
 	    memclear(hop) ;
 	    if ((rs = rsv) >= 0) {
-	        cnp->inetdomain = inetdomain ;
-	        cnp->f.inet = false ;
-	        cnp->s = -1 ;
-	        if (void *vp{} ; (rs = uc_libmalloc(ssz,&vp)) >= 0) {
-		    cnp->sap = sockaddressp(vp) ;
+	        op->inetdomain = inetdomain ;
+	        op->fl.inet = false ;
+	        op->sock = -1 ;
+	        if (void *vp ; (rs = uc_libmalloc(ssz,&vp)) >= 0) {
+		    op->sap = sockaddressp(vp) ;
 	        }
-	    } /* end if (vars::mkvars) */
+	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (connection_start) */
 
-int connection_finish(CON *cnp) noex {
+int connection_finish(CON *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (cnp) {
+	if (op) {
 	    rs = SR_OK ;
-	    if (cnp->f.inetdomain && cnp->inetdomain) {
-	        cnp->f.inetdomain = false ;
-	        rs1 = uc_free(cnp->inetdomain) ;
+	    if (op->fl.inetdomain && op->inetdomain) {
+	        op->fl.inetdomain = false ;
+	        rs1 = uc_free(op->inetdomain) ;
 	        if (rs >= 0) rs = rs1 ;
-	        cnp->inetdomain = nullptr ;
+	        op->inetdomain = nullptr ;
 	    }
-	    if (cnp->name) {
-	        rs1 = uc_free(cnp->name) ;
+	    if (op->name) {
+	        rs1 = uc_free(op->name) ;
 	        if (rs >= 0) rs = rs1 ;
-	        cnp->name = nullptr ;
+	        op->name = nullptr ;
 	    }
-	    if (cnp->sap) {
-		rs1 = uc_libfree(cnp->sap) ;
+	    if (op->sap) {
+		rs1 = uc_libfree(op->sap) ;
 	        if (rs >= 0) rs = rs1 ;
-		cnp->sap = nullptr ;
+		op->sap = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (connection_finish) */
 
-int connection_socklocname(CON *cnp,char *dp,int dl,int s) noex {
+int connection_socklocname(CON *op,char *dp,int dl,int s) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (cnp && dp) {
+	if (op && dp) {
 	    rs = SR_BADF ;
 	    if (s >= 0) {
 		if (USTAT sb ; (rs = uc_fstat(s,&sb)) >= 0) {
 		    if (S_ISSOCK(sb.st_mode)) {
-	                sockaddress	*sap = cnp->sap ;
+	                sockaddress	*sap = op->sap ;
 	                int		sal = szof(sockaddress) ;
-	                cnp->s = s ;
+	                op->sock = s ;
 	                if ((rs = u_sockaddrloc(s,sap,&sal)) >= 0) {
-	                    cnp->f.sa = true ;
-	                    rs = connection_peername(cnp,sap,sal,dp,dl) ;
+	                    op->fl.sa = true ;
+	                    rs = connection_peername(op,sap,sal,dp,dl) ;
 	                    len = rs ;
 	                }
 	    	    } else if (S_ISFIFO(sb.st_mode)) {
@@ -228,20 +229,20 @@ int connection_socklocname(CON *cnp,char *dp,int dl,int s) noex {
 }
 /* end subroutine (connection_socklocname) */
 
-int connection_sockremname(CON *cnp,char *dp,int dl,int s) noex {
+int connection_sockremname(CON *op,char *dp,int dl,int s) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (cnp && dp) {
+	if (op && dp) {
 	    rs = SR_BADF ;
 	    if (s >= 0) {
 		if (USTAT sb ; (rs = uc_fstat(s,&sb)) >= 0) {
 		    if (S_ISSOCK(sb.st_mode)) {
-	                sockaddress	*sap = cnp->sap ;
+	                sockaddress	*sap = op->sap ;
 	                int		sal = szof(sockaddress) ;
-	                cnp->s = s ;
+	                op->sock = s ;
 	                if ((rs = u_sockaddrrem(s,sap,&sal)) >= 0) {
-	                    cnp->f.sa = true ;
-	                    rs = connection_peername(cnp,sap,sal,dp,dl) ;
+	                    op->fl.sa = true ;
+	                    rs = connection_peername(op,sap,sal,dp,dl) ;
 	                    len = rs ;
 	                }
 	    	    } else if (S_ISFIFO(sb.st_mode)) {
@@ -255,31 +256,31 @@ int connection_sockremname(CON *cnp,char *dp,int dl,int s) noex {
 }
 /* end subroutine (connection_sockremname) */
 
-int connection_peername(CON *cnp,SA *sap,int sal,char *dp,int dl) noex {
+int connection_peername(CON *op,SA *sap,int sal,char *dp,int dl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (cnp && sap && dp) {
+	if (op && sap && dp) {
 	    dp[0] = '\0' ;
 	    if ((rs = sockaddress_getaf(sap)) >= 0) {
 	        cint	af = rs ;
-	        cnp->f.addr = false ;
-	        cnp->f.sa = true ;
-	        memcpy(cnp->sap,sap) ;
-	        cnp->sal = sal ;
+	        op->fl.addr = false ;
+	        op->fl.sa = true ;
+	        memcpy(op->sap,sap) ;
+	        op->sal = sal ;
 	        switch (af) {
 	        case AF_UNIX:
 	            rs = sockaddress_getaddr(sap,dp,dl) ;
 	            len = rs ;
 	            break ;
 	        case AF_INET4:
-	            cnp->f.inet = true ;
-	            cnp->f.addr = true ;
-	            rs = connection_ip4lookup(cnp,dp,dl) ;
+	            op->fl.inet = true ;
+	            op->fl.addr = true ;
+	            rs = connection_ip4lookup(op,dp,dl) ;
 	            len = rs ;
 	            break ;
 	        case AF_INET6:
-	            cnp->f.inet = true ;
-	            rs = connection_ip6lookup(cnp,dp,dl) ;
+	            op->fl.inet = true ;
+	            rs = connection_ip6lookup(op,dp,dl) ;
 	            len = rs ;
 	            break ;
 	        } /* end switch (got an INET host entry) */
@@ -291,9 +292,9 @@ int connection_peername(CON *cnp,SA *sap,int sal,char *dp,int dl) noex {
 
 namespace {
     struct sub_mknames {
-	CON	*cnp ;
+	CON	*op ;
 	vecstr	*nlp ;
-	sub_mknames(CON *o,vecstr *n) noex : cnp(o), nlp(n) { } ;
+	sub_mknames(CON *o,vecstr *n) noex : op(o), nlp(n) { } ;
 	operator int () noex ;
 	int addstuff(int) noex ;
 	int addnames(hostinfo *) noex ;
@@ -301,11 +302,11 @@ namespace {
     } ; /* end struct (sub_mknames) */
 }
 
-int connection_mknames(CON *cnp,vecstr *nlp) noex {
+int connection_mknames(CON *op,vecstr *nlp) noex {
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	if (cnp && nlp) {
-	    sub_mknames		mko(cnp,nlp) ;
+	if (op && nlp) {
+	    sub_mknames		mko(op,nlp) ;
 	    rs = mko ;
 	    n = rs ;
 	} /* end if (non-null) */
@@ -316,12 +317,12 @@ int connection_mknames(CON *cnp,vecstr *nlp) noex {
 sub_mknames::operator int () noex {
 	int		rs = SR_DESTADDRREQ ;
 	int		n = 0 ;
-	if (cnp->f.sa) {
-	    if ((rs = sockaddress_getaf(cnp->sap)) >= 0) {
+	if (op->fl.sa) {
+	    if ((rs = sockaddress_getaf(op->sap)) >= 0) {
 	        cint	af = rs ;
 	        switch (af) {
 	        case AF_UNIX:
-	            rs = connection_addname(cnp,nlp,localhost) ;
+	            rs = connection_addname(op,nlp,localhost) ;
 		    n += rs ;
 		    break ;
 		case AF_INET4:
@@ -340,7 +341,7 @@ int sub_mknames::addstuff(int af) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (hostinfo hi ; (rs = hostinfo_start(&hi,af,cnp->name)) >= 0) {
+	if (hostinfo hi ; (rs = hostinfo_start(&hi,af,op->name)) >= 0) {
 	    if ((rs = addnames(&hi)) >= 0) {
 		n += rs ;
 		rs = addresses(&hi) ;
@@ -359,15 +360,15 @@ int sub_mknames::addnames(hostinfo *hip) noex {
 	int		n = 0 ;
 	cchar		*hp ;
 	if ((rs = hostinfo_geteffective(hip,&hp)) >= 0) {
-	    if ((rs = connection_addname(cnp,nlp,hp)) >= 0) {
+	    if ((rs = connection_addname(op,nlp,hp)) >= 0) {
 	        n += rs ;
 	        if ((rs = hostinfo_getcanonical(hip,&hp)) >= 0) {
 		    hostinfo_cur	hc ;
-	            rs = connection_addname(cnp,nlp,hp) ;
+	            rs = connection_addname(op,nlp,hp) ;
 	            n += rs ;
 	            if ((rs = hostinfo_curbegin(hip,&hc)) >= 0) {
 	                while ((rs = hostinfo_curenumname(hip,&hc,&hp)) > 0) {
-	                    rs = connection_addname(cnp,nlp,hp) ;
+	                    rs = connection_addname(op,nlp,hp) ;
 	              	    n += rs ;
 	              	    if (rs < 0) break ;
 	            	} /* end while (names) */
@@ -417,10 +418,10 @@ int sub_mknames::adddots(int af) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((af == AF_INET4) && cnp->f.inet && cnp->f.addr) {
+	if ((af == AF_INET4) && op->fl.inet && op->fl.addr) {
 	    if (char *nbuf{} ; (rs = malloc_hn(&nbuf)) >= 0) {
 	        cint		nlen = rs ;
-	        if (inetaddr ia ; (rs = ia.start(&cnp->netipaddr)) >= 0) {
+	        if (inetaddr ia ; (rs = ia.start(&op->netipaddr)) >= 0) {
 	            if ((rs = ia.getdotaddr(nbuf,nlen)) >= 0) {
 	                rs = nlp->adduniq(nbuf,rs) ;
 	                if (rs < INT_MAX) n += 1 ;
@@ -439,12 +440,12 @@ int sub_mknames::adddots(int af) noex {
 
 /* private subroutines */
 
-static int connection_addname(CON *cnp,vecstr *nlp,cc *name) noex {
+static int connection_addname(CON *op,vecstr *nlp,cc *name) noex {
 	int		sl = lenstr(name) ;
 	int		rs ;
 	int		n = 0 ;
 	if ((rs = nlp->adduniq(name,sl)) >= 0) {
-	    cchar	*dn = cnp->inetdomain ;
+	    cchar	*dn = op->inetdomain ;
 	    n += (rs < INT_MAX) ;
 	    if (dn && isindomain(name,dn)) {
 		sl = rmchr(name,sl,'.') ; /* <- first dot for 'nodename' */
@@ -457,27 +458,27 @@ static int connection_addname(CON *cnp,vecstr *nlp,cc *name) noex {
 /* end subroutine (connection_addname) */
 
 /* lookup this IP (INET4) address */
-static int connection_ip4lookup(CON *cnp,char *dp,int dl) noex {
-	sockaddress	*sap = cnp->sap ;
+static int connection_ip4lookup(CON *op,char *dp,int dl) noex {
+	sockaddress	*sap = op->sap ;
 	cint		alen = in4addrlen ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = sockaddress_getaddr(sap,&cnp->netipaddr,alen)) >= 0) {
+	if ((rs = sockaddress_getaddr(sap,&op->netipaddr,alen)) >= 0) {
 	    if (char *hebuf{} ; (rs = malloc_ho(&hebuf)) >= 0) {
 	        ucentho		he ;
 	        cint		helen = rs ;
 	        cint		af = AF_INET4 ;
 	        cint		al = in4addrlen ;
-	        cchar		*ap  = charp(&cnp->netipaddr) ;
+	        cchar		*ap  = charp(&op->netipaddr) ;
 	        if ((rs = getho_addr(&he,hebuf,helen,af,ap,al)) >= 0) {
 	            hostent_cur		hc ;
 	            cchar		*sp = nullptr ;
-	            if (cnp->inetdomain) {
+	            if (op->inetdomain) {
 	                if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
 			    auto	enumname = hostent_curenumname ;
 	                    while ((rs = enumname(&he,&hc,&sp)) > 0) {
-	                        if (isindomain(sp,cnp->inetdomain)) break ;
+	                        if (isindomain(sp,op->inetdomain)) break ;
 	                    } /* end while */
 	                    rs1 = hostent_curend(&he,&hc) ;
 			    if (rs >= 0) rs = rs1 ;
@@ -497,7 +498,7 @@ static int connection_ip4lookup(CON *cnp,char *dp,int dl) noex {
 	               } /* end if */
 		    } /* end if (ok) */
 	        } else if (isNotFound(rs)) {
-	            if (inetaddr ia ; (rs = ia.start(&cnp->netipaddr)) >= 0) {
+	            if (inetaddr ia ; (rs = ia.start(&op->netipaddr)) >= 0) {
 		        {
 	                    rs = ia.getdotaddr(dp,dl) ;
 			    len = rs ;
@@ -513,12 +514,12 @@ static int connection_ip4lookup(CON *cnp,char *dp,int dl) noex {
 }
 /* end subroutine (connection_ip4lookup) */
 
-static int connection_ip6lookup(CON *cnp,char *dp,int dl) noex {
+static int connection_ip6lookup(CON *op,char *dp,int dl) noex {
 	int		rs ;
 	int		len = 0 ;
 	if (char *hnbuf{} ; (rs = malloc_hn(&hnbuf)) >= 0) {
-	    CSOCKADDR	*ssap = sockaddrp(cnp->sap) ;
-	    cint	sal = cnp->sal ;
+	    CSOCKADDR	*ssap = sockaddrp(op->sap) ;
+	    cint	sal = op->sal ;
 	    cint	slen = NI_MAXSERV ;
 	    cint	hnlen = rs ;
 	    cint	fl = NI_NOFQDN ;
@@ -529,13 +530,13 @@ static int connection_ip6lookup(CON *cnp,char *dp,int dl) noex {
 	        rs = sncpy(dp,dl,hnbuf) ;
 	        len = rs ;
 	    } else if (isNotPresent(rs)) {
-		sockaddress	*sap = cnp->sap ;
+		sockaddress	*sap = op->sap ;
 		cint		al = in6addrlen ;
 	        if ((rs = sockaddress_getaddr(sap,in6addr,al)) >= 0) {
 	            if (isin4mapped(in6addr)) {
-	                cnp->f.addr = true ;
-	                memcpy(&cnp->netipaddr,(in6addr + 6)) ;
-	                rs = connection_ip4lookup(cnp,dp,dl) ;
+	                op->fl.addr = true ;
+	                memcpy(&op->netipaddr,(in6addr + 6)) ;
+	                rs = connection_ip4lookup(op,dp,dl) ;
 	                len = rs ;
 	            } else if (isin6loopback(in6addr)) {
 	                rs = sncpy(dp,dl,localhost) ;
@@ -561,8 +562,8 @@ int connection::sockremname(char *dp,int dl,int s) noex {
 	return connection_sockremname(this,dp,dl,s) ;
 }
 
-int connection::peername(sockaddress *sap,int sal,char *dp,int dl) noex {
-	return connection_peername(this,sap,sal,dp,dl) ;
+int connection::peername(sockaddress *asap,int asal,char *dp,int dl) noex {
+	return connection_peername(this,asap,asal,dp,dl) ;
 }
 
 int connection::mknames(vecstr *nlp) noex {
@@ -588,7 +589,7 @@ connection_co::operator int () noex {
 }
 /* end method (connection_co::operator) */
 
-int vars::mkvars() noex {
+vars::operator int () noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
@@ -601,7 +602,6 @@ int vars::mkvars() noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (vars::mkvars) */
+} /* end method (vars::operator) */
 
 
