@@ -39,7 +39,7 @@
 #define	NODESFILE		struct nodesfile_head
 #define	NODESFILE_CUR		struct nodesfile_cursor
 #define	NODESFILE_MAGIC 	0x17464148
-#define	NODESFILE_MAXSZ		(500 *1024)
+#define	NODESFILE_MAXSZ		(500 * 1024)
 
 
 struct nodesfile_cursor {
