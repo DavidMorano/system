@@ -93,6 +93,7 @@
 
 #include	"getprovider.h"
 
+import libutil ;
 import uconstants ;
 
 /* local defines */
@@ -126,7 +127,7 @@ namespace {
 	int tryinfo() noex ;
 	int trydef() noex ;
     } ; /* end struct (trier) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -137,9 +138,12 @@ namespace {
 constexpr provider	providers[] = {
 	{ 0, "unknown", 			"Unknown" }, 
 	{ 1, "Sun_Microsystems", 		"Sun Microsystems" },
-	{ 2, "Compaq Computer Corporation", 	nullptr },
+	{ 2, "Compaq Computer Corporation", 	"Compaq Computer" },
 	{ 3, "sgi", 				"Silicon Graphics" },
-	{ 4, nullptr, 				nullptr }
+    	{ 4, "Dell Computer",			nullptr },
+    	{ 5, "Hewlett Packard",			nullptr },
+    	{ 6, "Apple Computer",			nullptr },
+	{ 7, nullptr, 				nullptr }
 } ;
 
 constexpr trier_m	tries[] = {
@@ -194,7 +198,7 @@ int getvendor(char *rbuf,int rlen) noex {
 	    rbuf[0] = '\0' ;
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
-	        if (char *pbuf{} ; (rs = malloc_mn(&pbuf)) >= 0) {
+	        if (char *pbuf ; (rs = malloc_mn(&pbuf)) >= 0) {
 	            if ((rs = getprovider(pbuf,rs)) >= 0) {
 	                cint	pl = rs ;
 	                int	i ; /* used-afterwards */
@@ -234,8 +238,7 @@ trier::operator int () noex {
 	    if (rs != 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end method (trier::operator) */
+} /* end method (trier::operator) */
 
 int trier::tryenv() noex {
 	static cchar	*valp = getenv(varname.provider) ;
@@ -274,7 +277,7 @@ namespace libdam {
     provider::operator int () noex {
 	int		rs ;
 	int		id = 0 ;
-	if (char *pbuf{} ; (rs = malloc_mn(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = malloc_mn(&pbuf)) >= 0) {
 	    if ((rs = getprovider(pbuf,rs)) >= 0) {
 		rs = getproviderid(pbuf,rs) ;
 		id = rs ;
@@ -283,6 +286,6 @@ namespace libdam {
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? id : rs ;
     }
-}
+} /* end namespace (libdam) */
 
 
