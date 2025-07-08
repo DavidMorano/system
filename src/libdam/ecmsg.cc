@@ -30,12 +30,13 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"ecmsg.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -93,6 +94,7 @@ int ecmsg_finish(ecmsg *op) noex {
 int ecmsg_loadbuf(ecmsg *op,cchar *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
 	if (op && mbuf) {
+	    rs = SR_OK ;
 	    if (mlen < 0) mlen = lenstr(mbuf) ;
 	    if (mlen > ECMSG_MAXBUFLEN) mlen = ECMSG_MAXBUFLEN ;
 	    if (op->ebuf) {
@@ -101,13 +103,11 @@ int ecmsg_loadbuf(ecmsg *op,cchar *mbuf,int mlen) noex {
 	        op->elen = 0 ;
 	    }
 	    if (mlen >= 0) {
-	        char	*bp ;
-	        if ((rs = uc_malloc((mlen+1),&bp)) >= 0) {
+	        if (char *bp ; (rs = uc_malloc((mlen + 1),&bp)) >= 0) {
 		    op->ebuf = bp ;
-	            memcpy(bp,mbuf,mlen) ;
-	            op->ebuf[mlen] = '\0' ;
+	            strwcpy(bp,mbuf,mlen) ;
 	            op->elen = mlen ;
-	        }
+	        } /* end if (memory-allocation) */
 	    } /* end if (size) */
 	} /* end if (non-null) */
 	return rs ;
