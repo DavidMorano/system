@@ -73,6 +73,7 @@ struct keyvals : keyvals_head {
 	    count(this,keyvalsmem_count) ;
 	    delset(this,keyvalsmem_delset) ;
 	    finish(this,keyvalsmem_finish) ;
+	    magic = 0 ;
 	} ;
 	keyvals(const keyvals &) = delete ;
 	keyvals &operator = (const keyvals &) = delete ;
@@ -87,8 +88,8 @@ struct keyvals : keyvals_head {
 	int check(keyvals *,time_t) noex ;
 	void dtor() noex ;
 	operator int () noex ;
-	~keyvals() {
-	    dtor() ;
+	destruct keyvals() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (keyvals) */
 #else	/* __cplusplus */
