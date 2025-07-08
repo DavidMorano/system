@@ -41,7 +41,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* |INT_MAX| + |UCHAR_MAX| */
@@ -60,6 +59,7 @@
 
 #include	"egs.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -210,7 +210,7 @@ int egs_read(egs *op,char *rbuf,int rlen) noex {
 int egs_write(egs *op,cchar *wbuf,int wlen) noex {
 	int		rs ;
 	int		wl = 0 ;
-	if (wlen < 0) wlen = clenstr(wbuf) ;
+	if (wlen < 0) wlen = lenstr(wbuf) ;
 	if ((rs = egs_magic(op,wbuf)) >= 0) {
 	    cint	clen = min(UCHAR_MAX,CMDBUFLEN) ;
 	    int		bits ;
