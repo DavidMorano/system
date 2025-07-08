@@ -43,6 +43,7 @@
 
 #include	"keyvals.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -378,7 +379,7 @@ int keyvals_curenum(keyvals *op,CUR *curp,cchar **kpp,cchar **vpp) noex {
 	int		rs ;
 	int		kl = 0 ;
 	if ((rs = keyvals_magic(op,curp)) >= 0) {
-	    int		rs = SR_BUGCHECK ;
+	    rs = SR_BUGCHECK ;
 	    if (curp->ecp) {
 	        hdb_dat		key ;
 	        hdb_dat		val ;
@@ -410,7 +411,7 @@ int keyvals_fetch(keyvals *op,cchar *kp,CUR *curp,cchar **vpp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	if ((rs = keyvals_magic(op,kp,curp)) >= 0) {
-	    int		rs = SR_BUGCHECK ;
+	    rs = SR_BUGCHECK ;
 	    if (curp->ecp) {
 	        hdb_dat		key ;
 	        hdb_dat		val ;
