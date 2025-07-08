@@ -23,8 +23,9 @@ enum providerids {
     providerid_sgi,
     providerid_dell,
     providerid_hp,
+    providerid_apple,
     providerid_overlast
-} ;
+} ; /* end enum (providerids) */
 
 #define	PROVIDERID_UNKNOWN	providerid_unknown
 #define	PROVIDERID_SUN		providerid_sun
@@ -32,6 +33,7 @@ enum providerids {
 #define	PROVIDERID_SGI		providerid_sgi
 #define	PROVIDERID_DELL		providerid_dell
 #define	PROVIDERID_HP		providerid_hp
+#define	PROVIDERID_APPLE	providerid_apple
 #define	PROVIDERID_OVERLAST	providerid_overlast
 
 
