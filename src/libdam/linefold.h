@@ -36,7 +36,7 @@ struct linefold_flags {
 
 struct linefold_head {
 	vecobj		*llp ;
-	LINEFOLD_FL	f ;
+	LINEFOLD_FL	fl ;
 	uint		magic ;
 } ;
 
