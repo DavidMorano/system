@@ -48,6 +48,7 @@
 
 #include	"dirdb.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -127,9 +128,9 @@ static inline int dirdb_magic(dirdb *op,Args ... args) noex {
 
 static int	dirdb_alreadyentry(dirdb *,dirdb_ent *) noex ;
 static int	dirdb_alreadyname(dirdb *,cchar *,int) noex ;
-static int	dirdb_adding(dirdb *,USTAT *,cchar *,int) noex ;
+static int	dirdb_adding(dirdb *,ustat *,cchar *,int) noex ;
 
-static int	entry_start(dirdb_ent *,cchar *,int,USTAT *,int) noex ;
+static int	entry_start(dirdb_ent *,cchar *,int,ustat *,int) noex ;
 static int	entry_finish(dirdb_ent *) noex ;
 
 #if	CF_STATCMP
@@ -172,10 +173,11 @@ int dirdb_finish(dirdb *op) noex {
 	int		rs1 ;
 	if ((rs = dirdb_magic(op)) >= 0) {
 	    if (op->dbp) {
+		vechand	*dlp = op->dlp ;
 	        void	*vp{} ;
-	        for (int i = 0 ; vechand_get(op->dlp,i,&vp) >= 0 ; i += 1) {
+	        for (int i = 0 ; dlp->get(i,&vp) >= 0 ; i += 1) {
+		    dirdb_ent	*ep = entp(vp) ;
 	            if (vp) {
-		        dirdb_ent	*ep = entp(vp) ;
 		        {
 	                    rs1 = entry_finish(ep) ;
 	                    if (rs >= 0) rs = rs1 ;
@@ -214,9 +216,9 @@ int dirdb_add(dirdb *op,cchar *dp,int dl) noex {
 	    rs = SR_INVALID ;
 	    if (dp[0]) {
 	        if (dl < 0) dl = lenstr(dp) ;
-	        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	        if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	             if ((rs = mkpath1w(tbuf,dp,dl)) >= 0) {
-	                 if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
+	                 if (ustat sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 		             if (S_ISDIR(sb.st_mode)) {
 		                 bool	f_add = true ;
 		                 while ((dl > 0) && (dp[dl-1] == '/')) {
@@ -313,8 +315,9 @@ int dirdb_curenum(dirdb *op,dirdb_cur *curp,dirdb_ent **epp) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = dirdb_magic(op,curp,epp)) >= 0) {
+	    vechand	*dlp = op->dlp ;
 	    int		i = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	    if (void *vp{} ; (rs = vechand_get(op->dlp,i,&vp)) >= 0) {
+	    if (void *vp ; (rs = dlp->get(i,&vp)) >= 0) {
 		*epp = entp(vp) ;
 	        curp->i = i ;
 	        len = lenstr((*epp)->name) ;
@@ -327,7 +330,7 @@ int dirdb_curenum(dirdb *op,dirdb_cur *curp,dirdb_ent **epp) noex {
 
 /* private subroutines */
 
-static int dirdb_adding(dirdb *op,USTAT *sbp,cchar *sp,int sl) noex {
+static int dirdb_adding(dirdb *op,ustat *sbp,cchar *sp,int sl) noex {
 	cint		sz = szof(dirdb_ent) ;
 	int		rs ;
 	if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
@@ -363,11 +366,10 @@ static int dirdb_adding(dirdb *op,USTAT *sbp,cchar *sp,int sl) noex {
 static int dirdb_alreadyentry(dirdb *op,dirdb_ent *ep) noex {
 	int		rs = SR_OK ;
 	int		dnamel = lenstr(ep->name) ;
-	int		cl ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	cchar		*dnamep = ep->name ;
 	cchar		*cp ;
-	while ((cl = sfdirname(dnamep,dnamel,&cp)) > 0) {
+	for (int cl ; (cl = sfdirname(dnamep,dnamel,&cp)) > 0 ; ) {
 	    if ((rs = dirdb_alreadyname(op,cp,cl)) > 0) {
 		f = true ;
 	        break ;
@@ -375,7 +377,7 @@ static int dirdb_alreadyentry(dirdb *op,dirdb_ent *ep) noex {
 	    dnamep = cp ;
 	    dnamel = cl ;
 	    if (rs < 0) break ;
-	} /* end while */
+	} /* end for */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (dirdb_alreadyentry) */
@@ -384,10 +386,10 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    if (nlen < 0) nlen = lenstr(name) ;
 	    if ((rs = mkpath1w(tbuf,name,nlen)) >= 0) {
-	        if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
+	        if (ustat sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 	            dirdb_fid	fid{} ;
 	            hdb_dat	key ;
 	            hdb_dat	val{} ;
@@ -411,7 +413,7 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 }
 /* end subroutine (dirdb_alreadyname) */
 
-static int entry_start(dirdb_ent *ep,cc *sp,int sl,USTAT *sbp,int count) noex {
+static int entry_start(dirdb_ent *ep,cc *sp,int sl,ustat *sbp,int count) noex {
 	int		rs = SR_FAULT ;
 	if (ep) {
 	    if (sl < 0) sl = lenstr(sp) ;
@@ -419,7 +421,7 @@ static int entry_start(dirdb_ent *ep,cc *sp,int sl,USTAT *sbp,int count) noex {
 	    ep->fid.ino = sbp->st_ino ;
 	    ep->fid.dev = sbp->st_dev ;
 	    ep->count = count ;
-	    if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	        ep->name = cp ;
 	    }
 	} /* end if (non-null) */
@@ -444,7 +446,7 @@ static int entry_finish(dirdb_ent *ep) noex {
 
 #if	CF_STATCMP
 
-static int cmpstat(const USTAT *e1p,const USTAT *e2p) noex {
+static int cmpstat(const ustat *e1p,const ustat *e2p) noex {
 	int		rc = (e1p->st_ino - e2p->st_ino) ;
 	if (rc == 0) {
 	    rc = (e1p->st_dev - e2p->st_dev) ;
@@ -454,8 +456,8 @@ static int cmpstat(const USTAT *e1p,const USTAT *e2p) noex {
 /* end subroutine (cmpstat) */
 
 static int vcmpstat(cvoid **v1pp,cvoid **v2pp) noex {
-	const USTAT	*e1p = (USTAT *) *v1pp ;
-	const USTAT	*e2p = (USTAT *) *v2pp ;
+	const ustat	*e1p = (ustat *) *v1pp ;
+	const ustat	*e2p = (ustat *) *v2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;
