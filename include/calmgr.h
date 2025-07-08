@@ -65,7 +65,7 @@ struct calmgr_head {
 	time_t		ti_lastcheck ;		/* DB last check */
 	size_t		fsize ;			/* DB file size */
 	size_t		mapsize ;		/* DB map length */
-	CALMGR_FL	f ;
+	CALMGR_FL	fl ;
 	uint		magic ;
 	int		nentries ;		/* DB entries */
 	int		cidx ;			/* parent index (ordinal) */
