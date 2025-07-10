@@ -63,12 +63,12 @@ struct logzones_head {
 	char		*buf ;
 	time_t		opentime ;		/* file open time */
 	time_t		accesstime ;		/* file access time */
-	time_t		mtime ;			/* file modification time */
-	LOGZONES_FL	f ;
+	time_t		timod ;			/* file modification time */
+	off_t		fsize ;
+	LOGZONES_FL	fl ;
 	uint		magic ;
 	int		oflags ;
 	int		pagesize ;
-	int		filesize ;
 	int		bufsize ;
 	int		fd ;
 	mode_t		operms ;
