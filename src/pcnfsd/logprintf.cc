@@ -1,13 +1,19 @@
-/* logfile_printf */
+/* logfile_printf SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /***********************************************************************
 
+  	Name:
+	logprintf
+
+	Description:
 	Module to operate on the logfile.
 
 ************************************************************************/
 
-#include	<envstandards.h>	/* must be ordered fist to configure */
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<unistd.h>

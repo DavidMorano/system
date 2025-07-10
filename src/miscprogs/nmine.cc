@@ -26,7 +26,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be ordered fist to configure */
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/stat.h>
 #include	<fcntl.h>
 #include	<ctime>
