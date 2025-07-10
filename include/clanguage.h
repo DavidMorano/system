@@ -67,6 +67,14 @@
 #define	floatconv		float
 #endif
 
+#ifndef	ylikely
+#define	ylikely			[[likely]]
+#endif /* ylikely */
+
+#ifndef	nlikely
+#define	nlikely			[[unlikely]]
+#endif /* nlikely */
+
 #ifdef	__cplusplus
 #ifndef	restrict
 #define	restrict		__restrict__
