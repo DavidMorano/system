@@ -79,6 +79,7 @@ struct dirlist : dirlist_head {
 	    strsize(this,dirlistmem_strsize) ;
 	    join(this,dirlistmem_join) ;
 	    finish(this,dirlistmem_finish) ;
+	    magic = 0 ;
 	} ;
 	dirlist(const dirlist &) = delete ;
 	dirlist &operator = (const dirlist &) = delete ;
@@ -91,8 +92,8 @@ struct dirlist : dirlist_head {
 	int joinmk(char *,int) noex ;
 	operator int () noex ;
 	void dtor() noex ;
-	~dirlist() {
-	    dtor() ;
+	destruct dirlist() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (dirlist) */
 #else	/* __cplusplus */
