@@ -27,6 +27,13 @@
 #include	<usysrets.h>
 
 
+EXTERNC_begin
+
+extern int	expandline(cchar *,int,char *,int,int *) noex ;
+
+EXTERNC_end
+
+
 #endif /* EXPANDLINE_INCLUDE */
 
 
