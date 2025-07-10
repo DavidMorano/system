@@ -28,6 +28,7 @@
 
 #include	<mknpathx.h>
 #include	<mknpathxw.h>
+#include	<mknpathw.h>
 
 
 #endif /* MKNPATH_INCLUDE */
