@@ -109,6 +109,7 @@ struct dirseen : dirseen_head {
 	    start(this,dirseenmem_start) ;
 	    count(this,dirseenmem_count) ;
 	    finish(this,dirseenmem_finish) ;
+	    magic = 0 ;
 	} ;
 	dirseen(const dirseen &) = delete ;
 	dirseen &operator = (const dirseen &) = delete ;
@@ -118,8 +119,8 @@ struct dirseen : dirseen_head {
 	int notseen(USTAT *,cchar *,int) noex ;
 	int notadd(USTAT *,cchar *,int) noex ;
 	void dtor() noex ;
-	~dirseen() {
-	    dtor() ;
+	destruct dirseen() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (dirseen) */
 typedef DIRSEEN_CUR	dirseen_cur ;
