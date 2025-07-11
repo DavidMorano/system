@@ -1,0 +1,23 @@
+#!/usr/extra/bin/ksh
+# RS_SEC
+PN=${0##*/}
+DN=/dev/null
+SRC=${HOME}/github/system
+SUBS="src "
+TDIR=/card/github/system
+EXCL=.rsync-exclude
+if [[ -d "${SRC}" ]] ; then
+  if [[ -d ${TDIR} ]] ; then
+    if cd ${SRC} ; then
+      if [[ -r "${EXCL}" ]] ; then
+        rsync --force -rtlH --exclude-from=${EXCL} ${SUBS} ${TDIR}
+        sync &
+      else
+        print -u 2 -- "${PN}: missing exclusion file"
+      fi
+    fi
+  else
+    print -u 2 -- "${PN}: target directory inaccessible"
+  fi
+fi
+
