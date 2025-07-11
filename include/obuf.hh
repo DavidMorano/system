@@ -87,15 +87,16 @@ public:
 	obuf(cchar *sp = nullptr,int sl = -1) noex ;
 	int operator [] (int) const noex ;
 	int add(cchar *sp,int sl = -1) noex ;
+	int add(int) noex ;
 	int at(int i) const noex ;
 	int adv(int) noex ;
 	void dtor() noex ;
+	operator int () const noex {
+	    return ilen() ;
+	} ;
 	destruct obuf() {
 	    if (fl.open) dtor() ;
 	} ; /* end dtor */
-	operator int () noex {
-	    return len() ;
-	} ;
 } ; /* end class (obuf) */
 
 

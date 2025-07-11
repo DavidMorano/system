@@ -33,7 +33,7 @@ extern int		iaddsat(int,int) noex ;
 extern long		laddsat(long,long) noex ;
 extern longlong		lladdsat(longlong,longlong) noex ;
 
-extern uint		uaddsat(uint,uint) noex ;
+extern uint		uiaddsat(uint,uint) noex ;
 extern ulong		uladdsat(ulong,ulong) noex ;
 extern ulonglong	ulladdsat(ulonglong,ulonglong) noex ;
 
@@ -52,7 +52,7 @@ inline longlong		addsat(longlong v1,longlong v2) noex {
 }
 
 inline uint		addsat(uint v1,uint v2) noex {
-	return uaddsat(v1,v2) ;
+	return uiaddsat(v1,v2) ;
 }
 inline ulong		addsat(ulong v1,ulong v2) noex {
 	return uladdsat(v1,v2) ;
