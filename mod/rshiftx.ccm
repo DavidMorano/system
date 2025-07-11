@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* right-shift an integer and result the shifted result */
+/* right-shift an integer and return the shifted result */
 /* lang=C++20 (conformance reviewed) */
 
 module ;
@@ -20,8 +20,14 @@ export module rshiftx ;
 
 export {
     template<typename T> static T rshiftx(T v,int n) noex {
-	return (v >> n) ;
+	T res ;
+	if (n >= 0) {
+	    (v >> n) ;
+	} else {
+	    (v << (- n)) ;
+	}
+	return res ;
     } /* end subroutine (rshiftx) */
-}
+} /* end export */
 
 

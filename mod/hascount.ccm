@@ -25,7 +25,8 @@
 
 	Description:
 	This subroutine checks if the given array of elements (type
-	'T') has duplicate entries.
+	'T') has duplicate entries.  It actually counts any entries
+	that are repeats.
 
 	Synopsis:
 	template(typename T> int hascount(const int *sp,int sl,int n) noex
@@ -37,7 +38,7 @@
 	n		target count to reach before returning
 
 	Returns:
-	>=0		number of matches before target count reached
+	>=0		number of duplicates
 	<0		error (system-return)
 
 *******************************************************************************/

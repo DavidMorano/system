@@ -31,16 +31,11 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<new>			/* |nothrow(3c++| */
 #include	<utility>
 #include	<functional>
-#include	<set>
-#include	<string>
 #include	<stdexcept>
 #include	<usystem.h>
 #include	<timeout.h>
@@ -87,14 +82,14 @@ export {
 	timer(T *aobjp) {
 	    objp = aobjp ;
 	    timeout_load(&to,0L,nullptr,nullptr,0u,0) ;
-	} ;
-	~timer() {
+	} ; /* end ctor */
+	destruct timer() {
 	    if (f_running) {
 	        cint	cmd = timeoutcmd_cancel ;
 		f_running = false ;
 		uc_timeout(cmd,&to) ;
 	    }
-	} ;
+	} ; /* end dtor */
 	int setint(int valint,uint tag,int arg) {
 	    cnullptr	np{} ;
 	    int		rs = SR_OK ;

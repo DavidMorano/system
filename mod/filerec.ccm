@@ -26,8 +26,8 @@
 	filerec
 
 	Description:
-	This object implements a set with a key consisting of
-	device and inode numbers.
+	This object implements a set (an un-ordered set) with a key
+	consisting of device and inode numbers.
 
 	Symopsis:
 	int filerec_start(int n = 0) noex
@@ -59,6 +59,8 @@ module ;
 #include	<usysrets.h>
 
 export module filerec ;
+
+cint		filerec_deftablen = 100 ;
 
 export {
     struct filerec_devino {
@@ -95,8 +97,12 @@ enum filerecmems {
 	filerecmem_overlast
 } ; /* end enum (filerecmems) */
 
+typedef std::unordered_set<filerec_devino>	filerec_base ;
+
 export {
     struct filerec ;
+    struct filerec_cur ;
+    struct filerec_iter ;
     struct filerec_co {
 	filerec		*op = nullptr ;
 	int		w = -1 ;
@@ -111,11 +117,11 @@ export {
     } ; /* end struct (filerec_co) */
     struct filerec {
 	friend filerec_co ;
-	typedef std::unordered_set<filerec_devino>	stype ;
+	typedef filerec_base	stype ;
 	typedef filerec_devino	key_type ;
 	filerec(const filerec &) = delete ;
 	filerec &operator = (const filerec &) = delete ;
-	stype		*setp = nullptr ;
+	filerec_base	*setp = nullptr ;
 	filerec_co	start ;
 	filerec_co	finish ;
 	filerec_co	count ;
@@ -130,12 +136,34 @@ export {
 	    if (setp) dtor() ;
 	} ; /* end dtor */
 	int		checkin(custat *,cchar *) noex ;
+	int		curbegin(filerec_cur *) noex ;
+	int		curend(filerec_cur *) noex ;
+	int		curenum(filerec_cur *,filerec_devino *) noex ;
+	filerec_iter begin() noex ;
+	filerec_iter end() noex ;
     private:
 	int		istart(int) noex ;
 	int		ifinish() noex ;
 	int		icount() noex ;
 	int		finents() noex ;
     } ; /* end class (filerec) */
+    struct filerec_cur {
+	filerec_base::iterator	it ;
+    } ; /* end struct (filerec_cur) */
+    typedef filerec_devino	filerec_ent ;
+    struct filerec_iter {
+	filerec_base::iterator	baseit ;
+	filerec_iter() = default ;
+	filerec_iter(const filerec_iter &) = default ;
+	filerec_iter &operator = (const filerec_iter &) = default ;
+	bool operator != (const filerec_iter &) noex ;
+	bool operator == (const filerec_iter &) noex ;
+	filerec_ent operator * () noex ;
+	filerec_iter operator + (int) const noex ;
+	filerec_iter &operator += (int) noex ;
+	filerec_iter operator ++ () noex ; /* pre */
+	filerec_iter operator ++ (int) noex ; /* post */
+    } ; /* end struct filerec_iter) */
 } /* end export */
 
 
