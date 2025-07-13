@@ -86,7 +86,8 @@ extern "C" cchar	*getourenv(cchar **,cchar *) ;
 
 /* local structures */
 
-struct msort_data {
+namespace {
+    struct msort_data {
 	char		*base = nullptr ;
 	int		esz ;		/* element size */
 	int		(*cmpfun)(cvoid *,cvoid *) ;
@@ -97,7 +98,7 @@ struct msort_data {
 	    tmp = new(nothrow) char[esz + 1] ;
 	    pvp = new(nothrow) char[esz + 1] ;
 	} ;
-	~msort_data() {
+	destruct msort_data() {
 	    delete [] tmp ;
 	    delete [] pvp ;
 	}
@@ -121,7 +122,8 @@ struct msort_data {
 	    memcpy(pvp,ip,esize) ;
 	} ;
 	int getpivot(int,int) ;
-} ;
+    } ; /* end struct (msort_data) */
+} /* end namespace */
 
 
 /* forward references */
