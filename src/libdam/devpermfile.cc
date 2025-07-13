@@ -26,6 +26,10 @@
 	This object reads in the parameter file and makes the
 	parameter pairs available thought a key search.
 
+	Documentation:
+	See |logindevperm(5)| and the source files under either
+	Solaris® or Illumos® with file names that contain 'devperm'.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -36,6 +40,7 @@
 #include	<cstddef>		/* |nullptr_t(3c++)| */
 #include	<cstdlib>
 #include	<cstring>		/* |strncmp(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -74,6 +79,15 @@ import libutil ;
 #define	DP_IE		devpermfile_ie
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -108,9 +122,20 @@ namespace {
 template<typename ... Args>
 static int devpermfile_ctor(devpermfile *op,Args ... args) noex {
     	DEVPERMFILE	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = memclear(hop) ;
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->klp = new(nothrow) vecobj) != np) {
+	        if ((op->elp = new(nothrow) vecobj) != np) {
+		    rs = SR_OK ;
+	        } /* end if (new-vecobj) */
+		if (rs < 0) {
+		    delete op->klp ;
+		    op->klp = nullptr ;
+		}
+	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -120,6 +145,14 @@ static int devpermfile_dtor(devpermfile *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
+	    if (op->elp) {
+		delete op->elp ;
+		op->elp = nullptr ;
+	    }
+	    if (op->klp) {
+		delete op->klp ;
+		op->klp = nullptr ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -244,21 +277,21 @@ static int devpermfile_opener(DP *op) noex {
 	cint		vn = 10 ;
 	int		vo = vecobjm.stationary ;
     	int		rs ;
-	if ((rs = vecobj_start(&op->keys,vsz,vn,vo)) >= 0) {
+	if ((rs = vecobj_start(op->klp,vsz,vn,vo)) >= 0) {
 	    /* keep this not-sorted so that the original order is maintained */
 	    vsz = szof(DP_IE) ;
 	    vo = 0 ;
-	    if ((rs = vecobj_start(&op->entries,vsz,vn,vo)) >= 0) {
+	    if ((rs = vecobj_start(op->elp,vsz,vn,vo)) >= 0) {
 		if ((rs = devpermfile_parse(op,op->fname)) >= 0) {
 		    op->magic = DEVPERMFILE_MAGIC ;
 		}
 		if (rs < 0) {
 		    devpermfile_finents(op) ;
-		    vecobj_finish(&op->entries) ;
+		    vecobj_finish(op->elp) ;
 		} /* end if (error) */
 	    }
 	    if (rs < 0) {
-		vecobj_finish(&op->keys) ;
+		vecobj_finish(op->klp) ;
 	    } /* end if (error) */
 	} /* end if (keys.start) */
 	return rs ;
@@ -279,11 +312,11 @@ int devpermfile_close(DP *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = vecobj_finish(&op->entries) ;
+	        rs1 = vecobj_finish(op->elp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = vecobj_finish(&op->keys) ;
+	        rs1 = vecobj_finish(op->klp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->fname) {
@@ -329,7 +362,7 @@ int devpermfile_curfetch(DP *op,cc *key,DP_CUR *curp,DP_ENT *ep,
 	if ((rs = devpermfile_magic(op,key,curp,ep,ebuf)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (key[0]) {
-		vecobj	*elp = &op->entries ;
+		vecobj	*elp = op->elp ;
 		DP_IE	*iep{} ;
 		cint	j = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 		int	i ; /* used-afterwards */
@@ -357,7 +390,7 @@ int devpermfile_curenum(DP *op,DP_CUR *curp,DP_ENT *ep,
 	int		rs ;
 	int		el = 0 ; /* return-value */
 	if ((rs = devpermfile_magic(op,curp,ep,ebuf)) >= 0) {
-	    vecobj	*elp = &op->entries ;
+	    vecobj	*elp = op->elp ;
 	    DP_IE	*iep{} ;
 	    cint	j = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 	    int		i ; /* used-afterwards */
@@ -516,14 +549,14 @@ static int devpermfile_parseln(DP *op,cchar *lp,int ll) noex {
 
 /* add an entry to something */
 static int devpermfile_entadd(DP *op,DP_IE *iep) noex {
-	vecobj		*elp = &op->entries ;
+	vecobj		*elp = op->elp ;
 	return elp->add(iep) ;
 }
 /* end subroutine (devpermfile_entadd) */
 
 /* free up ALL of the keys */
 static int devpermfile_finkeys(DP *op) noex {
-	vecobj		*klp = &op->keys ;
+	vecobj		*klp = op->klp ;
 	int		rs = SR_OK ;
 	void		*vp{} ;
 	for (int i = 0 ; klp->get(i,&vp) >= 0 ; i += 1) {
@@ -539,7 +572,7 @@ static int devpermfile_finkeys(DP *op) noex {
 
 /* free up ALL of the entries in this DP list */
 static int devpermfile_finents(DP *op) noex {
-	vecobj		*elp = &op->entries ;
+	vecobj		*elp = op->elp ;
 	int		rs = SR_OK ;
 	void		*vp{} ;
 	for (int i = 0 ; elp->get(i,&vp) >= 0 ; i += 1) {
@@ -555,7 +588,7 @@ static int devpermfile_finents(DP *op) noex {
 /* end subroutine (devpermfile_finents) */
 
 static int devpermfile_keyadd(DP *op,cchar *kp,int kl) noex {
-	vecobj		*klp = &op->keys ;
+	vecobj		*klp = op->klp ;
 	cnullptr	np{} ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
@@ -584,7 +617,7 @@ static int devpermfile_keyadd(DP *op,cchar *kp,int kl) noex {
 /* end subroutine (devpermfile_keyadd) */
 
 static int devpermfile_keydel(DP *op,int ci) noex {
-	vecobj		*klp = &op->keys ;
+	vecobj		*klp = op->klp ;
 	int		rs ;
 	void		*vp{} ;
 	if ((rs = klp->get(ci,&vp)) >= 0) {
@@ -599,7 +632,7 @@ static int devpermfile_keydel(DP *op,int ci) noex {
 /* end subroutine (devpermfile_keydel) */
 
 static int devpermfile_keyincr(DP *op,int ci) noex {
-	vecobj		*klp = &op->keys ;
+	vecobj		*klp = op->klp ;
 	int		rs ;
 	void		*vp{} ;
 	if ((rs = klp->get(ci,&vp)) >= 0) {
@@ -613,7 +646,7 @@ static int devpermfile_keyincr(DP *op,int ci) noex {
 /* end subroutine (devpermfile_keyincr) */
 
 static int devpermfile_keydecr(DP *op,int ci) noex {
-	vecobj		*klp = &op->keys ;
+	vecobj		*klp = op->klp ;
 	int		rs ;
 	void		*vp{} ;
 	if ((rs = klp->get(ci,&vp)) >= 0) {
@@ -721,7 +754,7 @@ static int devpermfile_entdirs(DP *op,char *tbuf,int ci,mode_t dm,
 /* end subroutine (devpermfile_entdir) */
 
 static int devpermfile_keymat(DP *op,DP_IE *iep,cchar *key) noex {
-    	vecobj		*klp = &op->keys ;
+    	vecobj		*klp = op->klp ;
 	int		rs ;
 	int		f = false ; /* return-value */
 	if ((rs = ientry_ci(iep)) >= 0) {
