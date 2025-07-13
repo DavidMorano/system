@@ -36,6 +36,10 @@
 #include	<partitionai.h>
 #include	<msort.h>
 #include	<editdistance.h>
+#include	<fam.h>
+#include	<fhm.h>
+#include	<fsum.h>
+#include	<nthai.h>
 
 
 #endif /* ALGORITHMS_INCLUDE */
