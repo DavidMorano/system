@@ -261,7 +261,7 @@ OBJ144=
 OBJ145= cfhulian.o
 OBJ146= ctb26.o cthexstr.o ctroman.o ctwords.o
 OBJ147= quickselecti.o igcd.o minmax.o isort.o
-OBJ148= fam.o fhm.o fsum.o
+OBJ148= fam.o fhm.o
 OBJ149= permutations.o combinations.o
 OBJ150= wsnwcpynarrow.o
 OBJ151= wsfnext.o wsinul.o wsichr.o wsirchr.o
@@ -922,5 +922,11 @@ minmaxelem.o:		minmaxelem.ccm			$(INCS)
 # HASDUPLICATE
 hascount.o:		hascount.ccm			$(INCS)
 	makemodule hascount
+
+# BINCHAR
+binchar.o:		binchar.ccm
+	makemodule rshiftx
+	makemodule binchar
+
 
 
