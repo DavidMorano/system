@@ -32,20 +32,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<digval.h>
+#include	<obuf.hh>
 #include	<mkchar.h>
 #include	<ischarx.h>
-#include	<obuf.hh>
 #include	<localmisc.h>
 
 #include	"hexdecoder.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -199,7 +199,7 @@ int hexdecoder_read(hexdecoder *op,char *rbuf,int rlen) noex {
 	    int		ml ;
 	    rbuf[0] = '\0' ;
 	    if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
-	        cint	len = obp->len ;
+	        cint	len = obp->len ; /* <- read-coerce */
 	        ml = min(len,rlen) ;
 	        for (i = 0 ; i < ml ; i += 1) {
 		    cint	ch = obp->at(i) ;
