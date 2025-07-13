@@ -41,6 +41,7 @@
 #include	"babycalc.h"
 #include	"babycalcs.h"
 
+import libutil ;
 
 /* local defines */
 
