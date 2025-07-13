@@ -82,6 +82,7 @@
 #include	"babycalcs.h"
 #include	"babieshdr.h"
 
+import libutil ;
 
 /* local defines */
 
