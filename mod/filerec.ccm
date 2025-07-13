@@ -63,30 +63,37 @@ export module filerec ;
 cint		filerec_deftablen = 100 ;
 
 export {
-    struct filerec_devino {
+    struct filerec_ent {
 	cchar		*fname{} ;
+	time_t		timod ;
+	off_t		fsize ;
 	ino_t		ino ;
 	dev_t		dev ;
-	filerec_devino(dev_t d,ino_t i) noex : dev(d), ino(i) { } ;
+	mode_t		fm ;
+	filerec_ent(dev_t d,ino_t i,mode_t m) noex : dev(d), ino(i), fm(m) { } ;
 	size_t hashval() const noex {
 	    return size_t(dev + ino) ;
 	} ;
-	bool equal_to(const filerec_devino &o) noex {
+	bool equal_to(const filerec_ent &o) noex {
 	    return ((dev == o.dev) && (ino == o.ino)) ;
 	} ;
-    } ; /* end struct (filerec_devino) */
+	void load(time_t t,off_t s) noex {
+	    timod = t ;
+	    fsize = s ;
+	} ;
+    } ; /* end struct (filerec_ent) */
     namespace std {
-        template<> struct hash<filerec_devino> {
-	    size_t operator() (const filerec_devino &di) const noex {
+        template<> struct hash<filerec_ent> {
+	    size_t operator() (const filerec_ent &di) const noex {
 	        return di.hashval() ;
 	    } ;
-        } ; /* end struct-template (hash<filerec_devino>) */
-        template<> struct equal_to<filerec_devino> {
-	    typedef const filerec_devino	cdi ;
+        } ; /* end struct-template (hash<filerec_ent>) */
+        template<> struct equal_to<filerec_ent> {
+	    typedef const filerec_ent	cdi ;
 	    size_t operator() (cdi &lhs,cdi &rhs) const noex {
 	        return ((lhs.dev == rhs.dev) && (lhs.ino == rhs.ino)) ;
 	    } ;
-        } ; /* end struct-template (hash<filerec_devino>) */
+        } ; /* end struct-template (hash<filerec_ent>) */
     } /* end namespace) */
 } /* end export */
 
@@ -97,7 +104,7 @@ enum filerecmems {
 	filerecmem_overlast
 } ; /* end enum (filerecmems) */
 
-typedef std::unordered_set<filerec_devino>	filerec_base ;
+typedef std::unordered_set<filerec_ent>	filerec_base ;
 
 export {
     struct filerec ;
@@ -118,7 +125,7 @@ export {
     struct filerec {
 	friend filerec_co ;
 	typedef filerec_base	stype ;
-	typedef filerec_devino	key_type ;
+	typedef filerec_ent	key_type ;
 	filerec(const filerec &) = delete ;
 	filerec &operator = (const filerec &) = delete ;
 	filerec_base	*setp = nullptr ;
@@ -138,7 +145,7 @@ export {
 	int		checkin(custat *,cchar *) noex ;
 	int		curbegin(filerec_cur *) noex ;
 	int		curend(filerec_cur *) noex ;
-	int		curenum(filerec_cur *,filerec_devino *) noex ;
+	int		curenum(filerec_cur *,filerec_ent *) noex ;
 	filerec_iter begin() noex ;
 	filerec_iter end() noex ;
     private:
@@ -150,7 +157,6 @@ export {
     struct filerec_cur {
 	filerec_base::iterator	it ;
     } ; /* end struct (filerec_cur) */
-    typedef filerec_devino	filerec_ent ;
     struct filerec_iter {
 	filerec_base::iterator	baseit ;
 	filerec_iter() = default ;
