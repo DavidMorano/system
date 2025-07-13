@@ -400,8 +400,8 @@ int acctab_allowed(acctab *op,cchar *ng,cchar *ma,cchar *un,cchar *pw) noex {
 		        /* search the STD entries first */
 	                slp = op->stdalp ;
 	                if ((rs = slp->curbegin(&cur)) >= 0) {
-		            auto	vif = vecobj_curfetch ;
-			    auto	vcf = vcmpent ;
+		            cauto	vif = vecobj_curfetch ;
+			    cauto	vcf = vcmpent ;
 	                    while ((rs1 = vif(slp,&ae,&cur,vcf,&vp)) >= 0) {
 		                aep = entp(vp) ;
 	                        if (vp) {
@@ -447,7 +447,7 @@ int acctab_anyallowed(acctab *op,vecstr *nlp,vecstr *mlp,cc *un,cc *pw) noex {
 	if ((rs = acctab_magic(op,nlp,mlp,un,pw)) >= 0) {
 	    cchar	*ngp ; /* netgroup pointer */
 	    cchar	*mp ; /* machine pointer */
-	    auto	vsg = vecstr_get ;
+	    cauto	vsg = vecstr_get ;
 	    for (int i = 0 ; (rs1 = vsg(nlp,i,&ngp)) >= 0 ; i += 1) {
 	        if (ngp) {
 	            for (int j = 0 ; (rs2 = vsg(mlp,j,&mp)) >= 0 ; j += 1) {
@@ -524,8 +524,8 @@ int acctab_curenum(acctab *op,acctab_cur *curp,acctab_ent **sepp) noex {
 	if ((rs = acctab_magic(op,curp)) >= 0) {
 	    vecobj	*slp ;
 	    acctab_ent	*aep ;
-	    int		j ;
-	    auto	vig = vecobj_get ;
+	    int		j ; /* used-multiple */
+	    cauto	vig = vecobj_get ;
 	    void	*vp{} ;
 	    if (sepp == nullptr) sepp = &aep ;
 	    rs = SR_NOTFOUND ;
@@ -826,7 +826,7 @@ static int acctab_entfins(acctab *op) noex {
 	int		rs2 ;
 	if (op) {
 	    vecobj	*slp ;
-	    auto	vig = vecobj_get ;
+	    cauto	vig = vecobj_get ;
 	    rs = SR_OK ;
 	    for (int j = 0 ; j < 2 ; j += 1) {
 	        slp = (j == 0) ? op->stdalp : op->rgxalp ;
