@@ -61,6 +61,7 @@
 
 #include	"qpdecoder.h"
 
+import libutil ;
 
 /* local defines */
 
