@@ -59,6 +59,7 @@
 #define	CH_SQUOTE	0x27		/* quote single (') */
 #define	CH_BQUOTE	0x60		/* quote back (`) */
 #define	CH_DQUOTE	0x22		/* quote double (") */
+#define	CH_DOT		0x2E		/* dot */
 #define	CH_FSLASH	0x2F		/* slash forward */
 #define	CH_BSLASH	0x5C		/* slash backward */
 #define	CH_LPAREN	0x28		/* parenthesis left */
