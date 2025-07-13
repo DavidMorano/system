@@ -1,16 +1,17 @@
-/* chowns */
+/* chowns SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* change ownership on all components of a file path */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-08-10, David A­D­ Morano
-        This code was originally written. This subroutines is standard on
-        some UNIXes but not on others so it is now provided.
+	This code was originally written.  This subroutines is
+	standard on some UNIXes but not on others so it is now
+	provided.
 
 */
 
@@ -18,106 +19,103 @@
 
 /*******************************************************************************
 
-        This subroutine will try to change the wonership (UID and GID) on all of
-        the directories in the specified directory path.
+  	Name:
+	chowns
+
+	Description:
+	This subroutine will try to change the wonership (UID and
+	GID) on all of the directories in the specified directory
+	path.
 
 	Synopsis:
-
-	int chowns(dir,uid,gid)
-	const char	dir[] ;
-	uid_t		uid ;
-	gid_t		gid ;
+	int chowns(cchar *dir,uid_t uid,gid_t gid) noex
 
 	Arguments:
-
 	- dir		direcrtory path to a new directory to create
 	- uid
 	- gid
 
 	Returns:
-
 	>=0		operation completed successfully
-	<0		represents a system error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<sys/types.h>		/* system types */
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<cstring>
-
+#include	<cstring>		/* |strchr(3c)| */
 #include	<usystem.h>
+#include	<mallocxx.h>
+#include	<mkpathx.h>
 #include	<localmisc.h>
+
+#include	"chowns.h"
 
 
 /* local defines */
 
-#define	CHECKINFO	struct checkinfo
-
 
 /* external variables */
-
-extern int	mkpath1(char *,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* local structures */
 
-struct checkinfo {
+namespace {
+    struct checkinfo {
 	uid_t		uid ;
 	gid_t		gid ;
 	mode_t		mode ; /* not used here */
-} ;
+    } ;
+} /* end namespace */
 
 
 /* forward references */
 
-static int	checkdir(struct checkinfo *,const char *) ;
+static int	checkdir(checkinfo *,cchar *) noex ;
 
 
 /* local variables */
 
+constexpr uid_t		uidend = -1 ;
+constexpr gid_t		gidend = -1 ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int chowns(cchar *dname,uid_t uid,gid_t gid)
-{
-	CHECKINFO	ci ;
-	int		rs ;
-	char		dirbuf[MAXPATHLEN + 1] ;
-
-#if	CF_DEBUGS
-	debugprintf("chowns: ent dir=%s\n",dir) ;
-#endif
-
-	memclear(&ci) ;
-	ci.uid = uid ;
-	ci.gid = gid ;
-
-	if ((rs = mkpath1(dirbuf,dname)) >= 0) {
-	    cchar	*cp = dirbuf ;
-	    char	*bp ;
-	    while ((bp = strchr(cp,'/')) != NULL) {
-	        *bp = '\0' ;
-	        if (((bp - cp) > 0) && (strcmp(cp,".") != 0)) {
-	            rs = checkdir(&ci,dirbuf) ;
-	        } /* end if */
-	        *bp = '/' ;
-	        cp = bp + 1 ;
-	        if (rs < 0) break ;
-	    } /* end while */
-	    if ((rs >= 0) && (*cp != '\0')) {
-	        rs = checkdir(&ci,dirbuf) ;
-	    }
-	} /* end if (mkpath) */
-
+int chowns(cchar *dname,uid_t uid,gid_t gid) noex {
+    	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
+	if (dname) {
+	    rs = SR_INVALID ;
+	    if (dname[0]) {
+	        if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
+	            checkinfo	ci{} ;
+	            ci.uid = uid ;
+	            ci.gid = gid ;
+	            if ((rs = mkpath(dbuf,dname)) >= 0) {
+	                cchar	*cp = dbuf ;
+	                for (char *bp ; (bp = strchr(cp,'/')) != np ; ) {
+	                    *bp = '\0' ;
+	                    if (((bp - cp) > 0) && (strcmp(cp,".") != 0)) {
+	                        rs = checkdir(&ci,dbuf) ;
+	                    } /* end if */
+	                    *bp = '/' ;
+	                    cp = bp + 1 ;
+	                    if (rs < 0) break ;
+	                } /* end while */
+	                if ((rs >= 0) && (*cp != '\0')) {
+	                    rs = checkdir(&ci,dbuf) ;
+	                }
+	            } /* end if (mkpath) */
+		    rs = rsfree(rs,dbuf) ;
+	        } /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (chowns) */
@@ -125,21 +123,16 @@ int chowns(cchar *dname,uid_t uid,gid_t gid)
 
 /* local subroutines */
 
-
-static int checkdir(CHECKINFO *cip,cchar *dirbuf)
-{
-	ustat	sb ;
+static int checkdir(checkinfo *cip,cchar *dirbuf) noex {
 	int		rs ;
-
-	if ((rs = u_stat(dirbuf,&sb)) >= 0) {
-	    int	f = FALSE ;
-	    f = f || ((cip->uid >= 0) && (sb.st_uid != cip->uid)) ;
-	    f = f || ((cip->gid >= 0) && (sb.st_gid != cip->gid)) ;
+	if (ustat sb ; (rs = u_stat(dirbuf,&sb)) >= 0) {
+	    bool	f = false ;
+	    f = f || ((cip->uid != uidend) && (sb.st_uid != cip->uid)) ;
+	    f = f || ((cip->gid != gidend) && (sb.st_gid != cip->gid)) ;
 	    if (f) {
 		rs = u_chown(dirbuf,cip->uid,cip->gid) ;
 	    }
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (checkdir) */
