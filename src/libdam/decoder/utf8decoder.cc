@@ -44,6 +44,7 @@
 
 #include	"utf8decoder.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -255,7 +256,7 @@ int utf8decoder_read(utf8decoder *op,wchar_t *rbuf,int rlen) noex {
 	    if (rlen > 0) {
 		int	ml ;
 	        if (widebuf *wbp ; (wbp = widebufp(op->outbuf)) != np) {
-	            cint	len = wbp->len() ;
+	            cint	len = wbp->len() ; /* <- read-coerce */
 	            ml = min(len,rlen) ;
 	            for (i = 0 ; i < ml ; i += 1) {
 		        rbuf[i] = wbp->at(i) ;
