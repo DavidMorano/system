@@ -46,6 +46,7 @@
 
 #include	"b64decoder.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -227,7 +228,7 @@ int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
                 if (rlen > 0) {
 		    int		ml ;
                     if (obuf *obp ; (obp = obufp(op->outbuf)) != np) {
-                        cint	len = obp->len ; /* <- reading from magic */
+                        cint	len = obp->len ; /* <- read-coerce */
 			ml = min(len,rlen) ;
                         for (i = 0 ; i < ml ; i += 1) {
 			    cint	ch = obp->at(i) ;
