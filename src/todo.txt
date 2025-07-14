@@ -14,7 +14,6 @@ sysdialer
 cm
 mailmsghdrct	mess
 memfile		can we just trash this?
-quote
 srv{x}
 libpcs		a lot of junk in there
 convertx	part of the |ctx| group
@@ -23,11 +22,9 @@ msfile
 openqotd
 maintqotd
 utmpaccenum
-calmgr		pointer implementation
 spawnproc	block structure; actually this is a huge mess
 termnote	could use some break-down of large subs into smaller ones
 ipasswd
-nettime		add 'constexpr if'
 var
 vars
 varmk
@@ -50,4 +47,5 @@ icalmk		mess, junk, or not even finished
 motd		*done*
 statmsg		*done*
 issue		*done*
+quote		not finished junk (currently contains junk)
 
