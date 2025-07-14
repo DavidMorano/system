@@ -28,7 +28,7 @@
 
 EXTERNC_begin
 
-extern int sfext(cchar *,int) noex ;
+extern int	sfext(cchar *,int,cchar **) noex ;
 
 EXTERNC_end
 
