@@ -36,6 +36,7 @@
 
 #include	"densitydbe.h"
 
+import libutil ;
 
 /* local defines */
 
