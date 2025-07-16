@@ -94,14 +94,15 @@ struct pwentry : pwentry_head {
 	    start(this,pwentrymem_start) ;
 	    mkextras(this,pwentrymem_mkextras) ;
 	    finish(this,pwentrymem_finish) ;
+	    username = nullptr ;
 	} ;
 	pwentry(const pwentry &) = delete ;
 	pwentry &operator = (const pwentry &) = delete ;
 	int fieldpw(int,cchar *,int = -1) noex ;
 	int mkcopy(pwentry *,char *,int) noex ;
 	void dtor() noex ;
-	~pwentry() {
-	    dtor() ;
+	destruct pwentry() {
+	    if (username) dtor() ;
 	} ;
 } ; /* end struct (pwentry) */
 #else	/* __cplusplus */
