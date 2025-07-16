@@ -20,6 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<limits.h>		/* |CHAR_BIT| */
+#include	<stddef.h>		
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -31,8 +33,8 @@
 
 template<typename T>
 constexpr bool numsign(T v) noex {
-	cint	n = (8*sizeof(T)) ;
-	return bool((v >> (n-1)) & 1) ;
+	cint	n = (CHAR_BIT * szof(T)) ;
+	return bool((v >> (n - 1)) & 1) ;
 }
 
 #endif /* __cplusplus */
