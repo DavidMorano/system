@@ -24,11 +24,12 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
 
-extern int sfweirdo(cchar *,int,cchar *,cchar **) noex ;
+extern int	sfweirdo(cchar *,int,cchar *,cchar **) noex ;
 
 EXTERNC_end
 
