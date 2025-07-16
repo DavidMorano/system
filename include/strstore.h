@@ -51,7 +51,7 @@ struct strstore_chunk {
 } ;
 
 struct strstore_head {
-	STRSTORE_CH	*ccp ;		/* current chunk pointer */
+	STRSTORE_CH	*csp ;		/* current chunk pointer */
 	vechand		*clp ;		/* chunk-list-pointer */
 	vechand		*nlp ;		/* number-list-pointer */
 	lookaside	*lap ;		/* look-aside-pointer */
