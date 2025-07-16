@@ -58,13 +58,14 @@ struct nulstr : nulstr_head {
 	nulstr_co	finish ;
 	nulstr() noex {
 	    finish(this,nulstrmem_finish) ;
+	    as = nullptr ;
 	} ;
 	nulstr(const nulstr &) = delete ;
 	nulstr &operator = (const nulstr &) = delete ;
 	int start(cchar *,int,cchar **) noex ;
 	void dtor() noex ;
-	~nulstr() {
-	    dtor() ;
+	destruct nulstr() {
+	    if (as) dtor() ;
 	} ;
 } ; /* end struct (nulstr) */
 #else /* __cplusplus */
