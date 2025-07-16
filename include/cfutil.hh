@@ -28,11 +28,11 @@
 #include	<usysrets.h>
 
 namespace cfx {
-    extern int	rmleadzero(cchar *,int) noex ;
+    extern int	rmleadzero(cchar *,int) noex ;		/* used internally */
     extern int	sfdigs(cchar *,int,cchar **) noex ;
     extern int	sfchars(cchar *,int,cchar **) noex ;
     extern int	getsign(cchar *,int,bool *) noex ;
-}
+} /* end namespace */
 
 
 #endif /* __cplusplus (C++ only) */
