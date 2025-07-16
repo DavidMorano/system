@@ -77,7 +77,7 @@ struct groupids {
 	int get(gid_t **) noex ;
 	void dtor() noex ;
 	destruct groupids() {
-	    dtor() ;
+	    if (gids) dtor() ;
 	} ;
     private:
 	int istart(gid_t **) noex ;
