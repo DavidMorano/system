@@ -89,7 +89,7 @@ int fileobject(cchar *fname) noex {
 		cmode	om = 0 ;
 		if ((rs = uc_open(fname,of,om)) >= 0) {
 	            cint	fd = rs ;
-	            if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
+	            if (ustat sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
 	                if (S_ISREG(sb.st_mode)) {
 		            char	magbuf[maglen + 1] ;
 	                    if ((rs = uc_read(fd,magbuf,maglen)) >= maglen) {
