@@ -1,7 +1,6 @@
 algorithms
 argmgr
 configvars
-database
 decoder
 densityx
 fileread
