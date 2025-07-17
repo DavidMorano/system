@@ -231,6 +231,8 @@ constexpr int		diglen = DIGBUFLEN ;
 
 constexpr char		totaluser[] = TOTALNAME ;
 
+cbool			f_comment = false ;
+
 
 /* exported variables */
 
@@ -793,27 +795,27 @@ static int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
 	int		cl ;
 	cchar		*cp ;
 	memclear(recp) ;
-#ifdef	COMMENT
-	cl = sfnext(lp,ll,&cp) ;
-	recp->countstr.sp = cp ;
-	recp->countstr.sl = cl ;
-	ll = ((lp+ll)-(cp+cl)) ;
-	lp = (cp+cl) ;
-	cl = sfnext(lp,ll,&cp) ;
-	recp->datestr.sp = cp ;
-	recp->datestr.sl = cl ;
-	ll = ((lp+ll)-(cp+cl)) ;
-	lp = (cp+cl) ;
-#else
-	recp->countstr.sp = lp ;
-	recp->countstr.sl = UAFILE_LCOUNT ;
-	lp += (UAFILE_LCOUNT + 1) ;
-	ll -= (UAFILE_LCOUNT + 1) ;
-	recp->datestr.sp = lp ;
-	recp->datestr.sl = UAFILE_LDATE ;
-	lp += (UAFILE_LDATE + 1) ;
-	ll -= (UAFILE_LDATE + 1) ;
-#endif /* COMMENT */
+	if_constexpr (f_comment) {
+	    cl = sfnext(lp,ll,&cp) ;
+	    recp->countstr.sp = cp ;
+	    recp->countstr.sl = cl ;
+	    ll = ((lp+ll)-(cp+cl)) ;
+	    lp = (cp+cl) ;
+	    cl = sfnext(lp,ll,&cp) ;
+	    recp->datestr.sp = cp ;
+	    recp->datestr.sl = cl ;
+	    ll = ((lp+ll)-(cp+cl)) ;
+	    lp = (cp+cl) ;
+	} else {
+	    recp->countstr.sp = lp ;
+	    recp->countstr.sl = UAFILE_LCOUNT ;
+	    lp += (UAFILE_LCOUNT + 1) ;
+	    ll -= (UAFILE_LCOUNT + 1) ;
+	    recp->datestr.sp = lp ;
+	    recp->datestr.sl = UAFILE_LDATE ;
+	    lp += (UAFILE_LDATE + 1) ;
+	    ll -= (UAFILE_LDATE + 1) ;
+	} /* end if_constexpr (f_comment) */
 	cl = sfnext(lp,ll,&cp) ;
 	recp->userstr.sp = cp ;
 	recp->userstr.sl = min(cl,UAFILE_MAXUSERLEN) ;
@@ -858,8 +860,7 @@ static int entry_load(UAD_ENT *ep,char *ebuf,int elen,UAD_REC *recp) noex {
 static int mkts(char *tbuf,int tlen,time_t t) noex {
 	int		tl = 0 ;
 	timestr_logz(t,tbuf) ;
-	tl = lenstr(tbuf) ;
-	if (tl < tlen) {
+	if ((tl = lenstr(tbuf)) < tlen) {
 	    char	*bp = (tbuf + tl) ;
 	    cint	bl = (tlen - tl) ;
 	    strnblanks(bp,bl) ;
