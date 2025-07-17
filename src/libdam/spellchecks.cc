@@ -75,7 +75,7 @@
 #include	<matxstr.h>		/* |matpstr(3uc)| */
 #include	<char.h>
 #include	<isnot.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"spellchecks.h"
 
@@ -94,21 +94,21 @@ import libutil ;
 #define	SC_CD		struct spellchecks_cachedir
 #define	SC_CDF		struct spellchecks_cdflags
 
-#define	STRDESC			struct strdesc
+#define	STRDESC		struct strdesc
 
-#define	SUBINFO			struct subinfo
-#define	SUBINFO_FL		subinfo_flags
+#define	SUBINFO		subinfo
+#define	SUBINFO_FL	subinfo_flags
 
-#define	CONFIG			struct config
+#define	CONFIG		struct config
 
-#define	CACHEDIR		struct spellchecks_cachedir
+#define	CACHEDIR	struct spellchecks_cachedir
 #define	CACHEDIR_NFS	2
 
-#define	DB			struct spellchecks_list
+#define	DB		struct spellchecks_list
 #define	DB_NFS		3
 
 #undef	WORDER
-#define	WORDER			struct worder
+#define	WORDER		struct worder
 
 #define	IDXDNAME	".spellchecks"
 #define	IDXSUF		"cyi"
@@ -163,10 +163,6 @@ import libutil ;
 #define	TO_FILEMOD	(60 * 24 * 3600)
 #define	TO_MKWAIT	(5 * 50)
 #define	TO_CHECK	4
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
 
 
 /* external subroutines */
@@ -226,7 +222,7 @@ struct subinfo {
 	time_t		daytime ;
 	int		logsize ;
 	char		username[USERNAMELEN + 1] ;
-} ;
+} ; /* end struct (subinfo) */
 
 struct spellchecks_lflags {
 	uint		open:1 ;
@@ -259,7 +255,7 @@ struct spellchecks_cal {
 	cchar		*dirname ;
 	cchar 		*calname ;		/* DB file-name */
 	cchar		*mapdata ;		/* DB memory-map address */
-	struct spellchecks_calflags	f ;
+	spellchecks_calflags	fl ;
 	time_t		ti_db ;			/* DB file modification */
 	time_t		ti_map ;		/* DB map */
 	time_t		ti_lastcheck ;		/* DB last check */
@@ -280,8 +276,8 @@ struct spellchecks_eflags {
 } ;
 
 struct spellchecks_entry {
-	struct spellchecks_eline	*lines ;
-	struct spellchecks_eflags	f ;
+	spellchecks_eline	*lines ;
+	spellchecks_eflags	fl ;
 	uint		voff ;
 	uint		vlen ;
 	uint		hash ;
@@ -295,7 +291,7 @@ struct spellchecks_citer {
 } ;
 
 struct worder {
-	struct spellchecks_eline	*lines ;
+	spellchecks_eline	*lines ;
 	cchar		*mp ;
 	cchar		*sp ;
 	int		sl ;
@@ -1311,7 +1307,7 @@ SC_LE	*lep ;
 	int	rs = SR_OK ;
 	int	rs1 ;
 
-	if (lep->f.open) {
+	if (lep->fl.open) {
 	    rs1 = strlist_close(&lep->sl) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1743,7 +1739,7 @@ int		f_search ;
 	    } /* end if (cyi_open) */
 	} /* end if */
 
-	calp->f.vind = (rs >= 0) ;
+	calp->fl.vind = (rs >= 0) ;
 
 	return rs ;
 }
@@ -1877,7 +1873,7 @@ int		oflags ;
 
 	    if (rs >= 0) {
 	        rs = cyi_open(&op->vind,indname) ;
-	        op->f.vind = (rs >= 0) ;
+	        op->fl.vind = (rs >= 0) ;
 
 	    } /* end if */
 
@@ -1885,13 +1881,13 @@ int		oflags ;
 	        rs = spellchecks_indmk(op,sip,dname,sip->daytime) ;
 	        if (rs >= 0) {
 		    rs = cyi_open(&op->vind,indname) ;
-	            op->f.vind = (rs >= 0) ;
+	            op->fl.vind = (rs >= 0) ;
 	        }
 	    }
 
 	} else {
 	    rs = cyi_open(&op->vind,indname) ;
-	    op->f.vind = (rs >= 0) ;
+	    op->fl.vind = (rs >= 0) ;
 	} /* end if (open-only or open-create) */
 
 ret0:
@@ -2163,8 +2159,8 @@ SC_CAL	*calp ;
 	int	rs = SR_OK ;
 
 
-	if (calp->f.vind) {
-	    calp->f.vind = false ;
+	if (calp->fl.vind) {
+	    calp->fl.vind = false ;
 	    rs = cyi_close(&calp->vind) ;
 	}
 
@@ -2565,7 +2561,7 @@ SUBINFO	*sip ;
 	    goto ret0 ;
 
 	rs = vecstr_start(&sip->defdirs,0,0) ;
-	sip->f.defdirs = (rs >= 0) ;
+	sip->fl.defdirs = (rs >= 0) ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -2604,8 +2600,8 @@ SUBINFO	*sip ;
 
 ret1:
 	if (rs < 0) {
-	    if (sip->f.defdirs) {
-		sip->f.defdirs = false ;
+	    if (sip->fl.defdirs) {
+		sip->fl.defdirs = false ;
 		vecstr_finish(&sip->defdirs) ;
 	    }
 	}
@@ -2634,29 +2630,20 @@ char		tmpdname[] ;
 }
 /* end subroutine (subinfo_havedir) */
 
-
-static int subinfo_ids(sip)
-SUBINFO	*sip ;
-{
-	int	rs = SR_OK ;
-
-
-	if (! sip->f.id) {
-	    sip->f.id = true ;
+static int subinfo_ids(SI *sip) noex {
+	int		rs = SR_OK ;
+	if (! sip->fl.id) {
+	    sip->fl.id = true ;
 	    rs = ids_load(&sip->id) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (subinfo_ids) */
 
-
-static int subinfo_tmpuserdir(sip)
-SUBINFO	*sip ;
-{
-	cmode	dmode = 0775 ;
+static int subinfo_tmpuserdir(SI *sip) noex {
 	int		rs ;
 	int		dl ;
+	cmode		dmode = 0775 ;
 	char		tmpdname[MAXPATHLEN + 1] ;
 
 	rs = subinfo_username(sip) ;
@@ -2843,9 +2830,9 @@ int		cl ;
 
 /* open the DAYOFMONTH database (manager?) if it is not already open */
 
-	if (! sip->f.dom) {
+	if (! sip->fl.dom) {
 	    rs = dayofmonth_start(dmp,sip->year) ;
-	    sip->f.dom = (rs >= 0) ;
+	    sip->fl.dom = (rs >= 0) ;
 	}
 
 	if (rs >= 0) {
@@ -2910,7 +2897,7 @@ int		sl ;
 	    rs = subinfo_year(sip) ;
 	    if (rs >= 0) {
 	        rs = holidays_open(holp,op->pr,sip->year,nullptr) ;
-	        sip->f.hols = (rs >= 0) ;
+	        sip->fl.hols = (rs >= 0) ;
 
 	 	f = false ;
 		f = f || (rs == SR_BADFMT) ;
@@ -2920,7 +2907,7 @@ int		sl ;
 	    }
 	} /* end if (open database as necessary) */
 
-	if ((rs >= 0) && sip->f.hols) {
+	if ((rs >= 0) && sip->fl.hols) {
 	    HOLIDAYS_CITE	hc ;
 	    cint	hollen = HOLBUFLEN ;
 	    char	holbuf[HOLBUFLEN + 1] ;
@@ -3265,10 +3252,10 @@ SC_ENT	*oep ;
 
 /* the following checks (code) are not needed in the present implementation! */
 
-	if ((rs >= 0) && (! ep->f.hash))
+	if ((rs >= 0) && (! ep->fl.hash))
 	   rs = entry_mkhash(ep,op) ;
 
-	if ((rs >= 0) && (! oep->f.hash))
+	if ((rs >= 0) && (! oep->fl.hash))
 	   rs = entry_mkhash(oep,op) ;
 
 /* we continue with the real (needed) work here */
@@ -3304,9 +3291,8 @@ SPELLCHECKS	*op ;
 	    return SR_NOTOPEN ;
 
 	if ((rs = vechand_get(&op->cals,ep->cidx,&calp)) >= 0) {
-	    cchar	*mp ;
-	    if ((rs = cal_mapdata(calp,&mp)) >= 0) {
-		struct spellchecks_eline	*elp = ep->lines ;
+	    if (cchar *mp ; (rs = cal_mapdata(calp,&mp)) >= 0) {
+		spellchecks_eline	*elp = ep->lines ;
 	        uint	hash = 0 ;
 		int	i ;
 	        for (i = 0 ; i < ep->i ; i += 1) {
@@ -3314,12 +3300,12 @@ SPELLCHECKS	*op ;
 	            sl = elp[i].llen ;
 	            while ((cl = nextfield(sp,sl,&cp)) > 0) {
 		        hash += hash_elf(cp,cl) ;
-		        sl -= ((cp + cl) - sp) ;
+		        sl -= intconv((cp + cl) - sp) ;
 		        sp = (cp + cl) ;
 	            } /* end while */
 	        } /* end for */
 	        ep->hash = hash ;
-	        ep->f.hash = true ;
+	        ep->fl.hash = true ;
 	    } /* end if (cal_mapdata) */
 	} /* end if (vechand_get) */
 
@@ -3327,15 +3313,9 @@ SPELLCHECKS	*op ;
 }
 /* end subroutine (entry_mkhash) */
 
-
-static int entry_sethash(ep,hash)
-SC_ENT	*ep ;
-uint		hash ;
-{
-
-
+static int entry_sethash(SC_ENT *ep,uint hash) noex {
 	ep->hash = hash ;
-	ep->f.hash = true ;
+	ep->fl.hash = true ;
 	return SR_OK ;
 }
 /* end subroutine (entry_sethash) */
