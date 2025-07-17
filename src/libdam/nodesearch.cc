@@ -53,6 +53,7 @@
 
 #include	"nodesearch.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -216,7 +217,7 @@ int nodesearch_search(NS *op,cc *sp,int sl) noex {
 	int		f_found = false ;
 	if ((rs = nodesearch_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((rs = nodesfile_search(op->nfp,sp,sl)) >= 0) {
+	    if ((rs = nodesfile_have(op->nfp,sp,sl)) >= 0) {
 	        f_found = true ;
 	    }
 	} /* end if (magic) */
