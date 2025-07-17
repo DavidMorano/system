@@ -157,6 +157,7 @@
 #include	"ts.h"
 #include	"tse.hh"
 
+import libutil ;
 
 /* local defines */
 
@@ -319,7 +320,6 @@ constexpr int		maglen = TS_FILEMAGICSIZE ;
 constexpr char		magstr[] = TS_FILEMAGIC ;
 
 constexpr bool		f_comment = false ;
-
 constexpr bool		f_creat = CF_CREAT ;
 constexpr bool		f_lockf = CF_LOCKF ;
 constexpr bool		f_nienum = CF_NIENUM ;
@@ -647,7 +647,7 @@ int ts_check(ts *op,time_t dt) noex {
 static int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
     	int		rs ;
 	int		rs1 ;
-	int		ei = 0 ;
+	int		ei = 0 ; /* return-value */
 	bool		f_newentry = false ;
 	if (tse ew ; (rs = ew.start) >= 0) {
 	    if (char *bp ; (rs = ts_findname(op,nnp,nnl,&bp)) >= 0) {
@@ -707,7 +707,7 @@ static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
-	int		ei = 0 ;
+	int		ei = 0 ; /* return-value */
 	char		*bp = nullptr ;
 	if ((rs = mapstrint_fetch(op->nip,nnp,nnl,np,&ei)) >= 0) {
 	    if ((rs = entbuf_read(op->ebmp,ei,&bp)) > 0) {
@@ -739,14 +739,14 @@ static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	int		rs ;
 	int		rs1 ;
-	int		ne = 0 ;
-	int		ei = 0 ;
+	int		ne = 0 ; /* used-throughout */
+	int		ei = 0 ; /* return-value */
 	bool		f_found = false ;
 	char		*bp = nullptr ;
 	if (nnl < 0) nnl = lenstr(nnp) ;
 	if (tse ew ; (rs = ew.start) >= 0) {
 	    while ((rs >= 0) && (! f_found)) {
-	        int		i ; /* used-afterwards */
+	        int	i ; /* used-afterwards */
 	        rs = entbuf_read(op->ebmp,ei,&bp) ;
 	        ne = rs ;
 	        if (rs <= 0) break ;
@@ -1013,7 +1013,7 @@ static int ts_lockacq(ts *op,time_t dt,int f_read) noex {
 		} /* end if_constexpr (f_lockf) */
 		if (rs >= 0) {
 		    /* has the file changed at all? */
-	            if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+	            if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 			f_changed = f_changed || (sb.st_size != op->filesize) ;
 			f_changed = f_changed || (sb.st_mtime != op->timod) ;
 		        if (f_changed) {
@@ -1125,7 +1125,7 @@ static int ts_filesetinfo(ts *op,time_t dt) noex {
 	int		am = (op->oflags & O_ACCMODE) ;
 	(void) dt ;
 	op->fl.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
-	if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 	    op->timod = sb.st_mtime ;
 	    op->filesize = intsat(sb.st_size) ;
 	    if (char *fsbuf ; (rs = malloc_fs(&fsbuf)) >= 0) {
@@ -1175,7 +1175,7 @@ static int ts_ebuffinish(ts *op) noex {
 static int ts_readentry(ts *op,int ei,char **rpp) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*bp = nullptr ;
+	char		*bp = nullptr ; /* used-afterwards */
 	if ((rs = entbuf_read(op->ebmp,ei,&bp)) > 0) {
 	    if_constexpr (f_nienum) {
 		if (tse ew ; (rs = ew.start) >= 0) {
@@ -1270,6 +1270,7 @@ static int tsent_load(tsent *ep,cc *bp,char *rb,int rl) noex {
 static int tsent_trans(tsent *ep,tse *tep) noex {
     	int		rs = SR_FAULT ;
 	if (tep) {
+	    rs = SR_OK ;
 	    tep->count = ep->count ;
 	    tep->utime = ep->utime ;
 	    tep->ctime = ep->ctime ;
