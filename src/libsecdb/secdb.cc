@@ -32,29 +32,73 @@
 /* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
 /* Use is subject to license terms. */
 
+/*******************************************************************************
 
+	Group:
+	secdb
+
+	Description:
+	This contains security related stuff.
+
+	Notes:
+	1. Ths subroutine |_unescape()| used below (starting at
+	line number 336) has a second argument of type 'char *'.
+	That suggests (indicates) that the correspoing passed
+	c-string could be modified by the called subroutine.  But
+	analysis shows that it does not appear to be so; that is,
+	the called subroutine does not appear to actually modify
+	that c-string argument.  But I honor the subroutine function
+	signature anyway and arrange to pass down to it a modifiable
+	c-string.  I could not just pass down the constant c-string
+	of escape characters because the C++ language does not allow
+	constant c-strings to used in a non-constant context (good
+	for it -- than you C++ ISO committe).
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include <cstdio>
 #include <cstdlib>
 #include <strings.h>
 #include <secdb.h>
 #include <ctype.h>
 
+#include	"secdb.h"
+
+
 /* From libnsl */
-extern char *_strdup_null(char *);
-extern char *_strtok_escape(char *, char *, char **);
-extern char *_strpbrk_escape(char *, char *);
-extern char *_unescape(char *, char *);
+extern "C" {
+    extern char *_strdup_null(char *) noex ;
+    extern char *_strtok_escape(char *, char *, char **) noex ;
+    extern char *_strpbrk_escape(char *, char *) noex ;
+    extern char *_unescape(char *, char *) noex ;
+}
 
-char *_do_unescape(char *);
+extern "C" {
+    char *_do_unescape(char *) noex ;
+}
 
+
+/* forward references */
+
+static int lenstr(cchar *s) noex {
+    	return intconv(strlen(s)) ;
+}
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
 
 /*
  * kva_match(): Given a key-value array and a key, return a pointer to the
  * value that matches the key.
  */
-char *
-kva_match(kva_t *kva, char *key)
-{
+char * kva_match(kva_t *kva, char *key) noex {
 	int	i;
 	kv_t	*data;
 
@@ -69,14 +113,12 @@ kva_match(kva_t *kva, char *key)
 	}
 
 	return (NULL);
-}
+} /* end subroutine (kva_match) */
 
 /*
  * _kva_free(): Free up memory.
  */
-void
-_kva_free(kva_t *kva)
-{
+void _kva_free(kva_t *kva) noex {
 	int	i;
 	kv_t	*data;
 
@@ -96,15 +138,13 @@ _kva_free(kva_t *kva)
 	}
 	free(kva->data);
 	free(kva);
-}
+} /* end if (_kva_free) */
 
 /*
  * _kva_free_value(): Free up memory (value) for all the occurrences of
  * the given key.
  */
-void
-_kva_free_value(kva_t *kva, char *key)
-{
+void _kva_free_value(kva_t *kva, char *key) noex {
 	int	ctr;
 	kv_t	*data;
 
@@ -122,14 +162,10 @@ _kva_free_value(kva_t *kva, char *key)
 		}
 		data++;
 	}
-}
+} /* end subroutine (_kva_free_value) */
 
-/*
- * new_kva(): Allocate a key-value array.
- */
-kva_t  *
-_new_kva(int size)
-{
+/* * new_kva(): Allocate a key-value array.  */
+kva_t  * _new_kva(int size) noex {
 	kva_t	*new_kva;
 
 	if ((new_kva = (kva_t *)calloc(1, sizeof (kva_t))) == NULL) {
@@ -141,15 +177,13 @@ _new_kva(int size)
 	}
 
 	return (new_kva);
-}
+} /* end subroutine (_new_kva) */
 
 /*
  * _str2kva(): Given a string (s) of key-value pairs, separated by delimeter
  * (del), place the values into the key value array (nkva).
  */
-kva_t  *
-_str2kva(char *s, char *ass, char *del)
-{
+kva_t  * _str2kva(char *s, char *ass, char *del) noex {
 	int	n = 0;
 	int	m;
 	int	size = KV_ADD_KEYS;
@@ -167,7 +201,7 @@ _str2kva(char *s, char *ass, char *del)
 	    del == NULL ||
 	    *s == '\0' ||
 	    *s == '\n' ||
-	    (strlen(s) <= 1)) {
+	    (lenstr(s) <= 1)) {
 		return (NULL);
 	}
 	p = s;
@@ -201,7 +235,7 @@ _str2kva(char *s, char *ass, char *del)
 	} while ((pair = _strtok_escape(NULL, del, &last_pair)) != NULL);
 	free(buf);
 	return (nkva);
-}
+} /* end subroutine (_str2kva) */
 
 /*
  * _kva2str(): Given an array of key-value pairs, place them into a string
@@ -210,9 +244,7 @@ _str2kva(char *s, char *ass, char *del)
  *
  * Return Values: 0  Success 1  Buffer too small
  */
-int
-_kva2str(kva_t *kva, char *buf, int buflen, char *ass, char *del)
-{
+int _kva2str(kva_t *kva, char *buf, int buflen, char *ass, char *del) noex {
 	int	i;
 	int	len;
 	int	off = 0;
@@ -237,11 +269,9 @@ _kva2str(kva_t *kva, char *buf, int buflen, char *ass, char *del)
 	}
 
 	return (0);
-}
+} /* end subroutine (_kva2str) */
 
-int
-_insert2kva(kva_t *kva, char *key, char *value)
-{
+int _insert2kva(kva_t *kva, char *key, char *value) noex {
 	int	i;
 	kv_t	*data;
 
@@ -258,11 +288,9 @@ _insert2kva(kva_t *kva, char *key, char *value)
 		}
 	}
 	return (1);
-}
+} /* end subroutine (_insert2kva) */
 
-kva_t  *
-_kva_dup(kva_t *old_kva)
-{
+kva_t  * _kva_dup(kva_t *old_kva) noex {
 	int	i;
 	int	size;
 	kv_t	*old_data;
@@ -285,11 +313,9 @@ _kva_dup(kva_t *old_kva)
 	}
 
 	return (nkva);
-}
+} /* end subroutine (_kva_dup) */
 
-static void
-strip_spaces(char **valuep)
-{
+static void strip_spaces(char **valuep) noex {
 	char *p, *start;
 
 	/* Find first non-white space character and return pointer to it */
@@ -301,38 +327,44 @@ strip_spaces(char **valuep)
 	if (*p == '\0')
 		return;
 
-	p = p + strlen(p) - 1;
+	p = p + lenstr(p) - 1;
 
 	/* Remove trailing spaces */
 	while (p > start && isspace((unsigned char)*p))
 		p--;
 
 	p[1] = '\0';
-}
+} /* end subroutine (strip_spaces) */
 
-char *
-_do_unescape(char *src)
-{
+char * _do_unescape(char *src) noex {
 	char *tmp = NULL;
 	char *dst = NULL;
 
 	if (src == NULL) {
 		dst = _strdup_null(src);
 	} else {
-		strip_spaces(&src);
-		tmp = _unescape(src, "=;:,\\");
-		dst = (tmp == NULL) ? _strdup_null(src) : tmp;
-	}
+	    cnothrow	nt{} ;
+	    cnullptr	np{} ;
+	    cchar	escs[] = "=;:,\\" ;
+	    {
+		cint	elen = lenstr(escs) ;
+	        strip_spaces(&src) ;
+	        if (char *tbuf ; (tbuf = new(nt) char[elen + 1]) != np) {
+		    strcpy(tbuf,escs) ;
+		    {
+		        tmp = _unescape(src,tbuf) ;
+		        dst = (tmp == NULL) ? _strdup_null(src) : tmp ;
+		    }
+		    delete [] tbuf ;
+	        } /* end if (m-a-f) */
+	    } /* end block */
+	} /* end if */
 
 	return (dst);
-}
+} /* end subroutine (_do_unescape) */
 
-/*
- * Some utilities for handling comma-separated lists.
- */
-char *
-_argv_to_csl(char **strings)
-{
+/* * Some utilities for handling comma-separated lists.  */
+char * _argv_to_csl(char **strings) noex {
 	int len = 0;
 	int i = 0;
 	char *newstr = NULL;
@@ -340,7 +372,7 @@ _argv_to_csl(char **strings)
 	if (strings == NULL)
 		return (NULL);
 	for (i = 0; strings[i] != NULL; i++) {
-		len += strlen(strings[i]) + 1;
+		len += lenstr(strings[i]) + 1;
 	}
 	if ((len > 0) && ((newstr = (char *)malloc(len + 1)) != NULL)) {
 		(void) memset(newstr, 0, len);
@@ -352,11 +384,9 @@ _argv_to_csl(char **strings)
 		return (newstr);
 	} else
 		return (NULL);
-}
+} /* end subroutine (_argv_to_csl) */
 
-char **
-_csl_to_argv(char *csl)
-{
+char ** _csl_to_argv(char *csl) noex {
 	int len = 0;
 	int ncommas = 0;
 	int i = 0;
@@ -365,7 +395,7 @@ _csl_to_argv(char *csl)
 	char *pc;
 	char *lasts = NULL;
 
-	len = strlen(csl);
+	len = lenstr(csl);
 	for (i = 0; i < len; i++) {
 		if (csl[i] == ',')
 			ncommas++;
@@ -381,23 +411,19 @@ _csl_to_argv(char *csl)
 	spc[i] = NULL;
 	free(copy);
 	return (spc);
-}
+} /* end subroutine (_csl_to_argv) */
 
-void
-_free_argv(char **p_argv)
-{
+void _free_argv(char **p_argv) noex {
 	char **p_a;
 
 	for (p_a = p_argv; *p_a != NULL; p_a++)
 		free(*p_a);
 	free(p_argv);
-}
+} /* end subroutine (_free_argv) */
 
 
 #ifdef DEBUG
-void
-print_kva(kva_t *kva)
-{
+void print_kva(kva_t *kva) noex {
 	int	i;
 	kv_t	*data;
 
@@ -411,7 +437,7 @@ print_kva(kva_t *kva)
 		    data[i].key != NULL ? data[i].key : "NULL",
 		    data[i].value != NULL ? data[i].value : "NULL");
 	}
-}
+} /* end subroutine (print_kva) */
 #endif  /* DEBUG */
 
 
