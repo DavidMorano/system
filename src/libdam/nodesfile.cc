@@ -412,7 +412,7 @@ int nodesfile_have(NF *op,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		fal = false ;
 	if ((rs = nodesfile_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = clenstr(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (NF_ENT e ; (rs = e.start(sp,sl,0)) >= 0) {
 	        hdb		*elp = op->elp ;
 	        hdb_dat		key ;
