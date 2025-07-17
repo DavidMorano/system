@@ -30,9 +30,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
@@ -55,6 +52,7 @@
 
 #include	"dialtab.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -86,9 +84,9 @@ using std::nothrow ;			/* constant */
 struct dialtab_file {
 	cchar		*fname ;
 	time_t		mti ;
-	dev_t		dev ;
+	off_t		fsize ;
 	ino_t		ino ;
-	int		fsz ;
+	dev_t		dev ;
 } ;
 
 
@@ -198,7 +196,7 @@ int dialtab_open(DT *op,cchar *dialfname) noex {
 	if ((rs = dialtab_ctor(op)) >= 0) {
 	    int		vsz = szof(DT_FI) ;
 	    int		vn = 10 ;
-	    int		vo = VECOBJ_OREUSE ;
+	    int		vo = vecobjm.reuse ;
 	    if ((rs = vecobj_start(op->flp,vsz,vn,vo)) >= 0) {
 		vsz = szof(DT_ENT) ;
 		vn = 20 ;
@@ -355,7 +353,7 @@ int adder::reader(DT_FI *fep,cchar *fn,int fi) noex {
 		    fep->dev = sb.st_dev ;
 		    fep->ino = sb.st_ino ;
 		    fep->mti = sb.st_mtime ;
-		    fep->fsz = sb.st_size ;
+		    fep->fsize = sb.st_size ;
 	            while ((rs = breadlns(&b,lbuf,llen,to,np)) > 0) {
 		        cchar	*lp{} ;
 		        if (int ll ; (ll = sfcontent(lbuf,rs,&lp)) > 0) {
@@ -485,7 +483,7 @@ int dialtab_search(DT *op,cchar *name,DT_ENT **depp) noex {
 			    int		l2 = lenstr(sp) ;
 			    int		l ;
 	                    cp += 1 ;
-	                    l = (sp + l2 - cp) ;
+	                    l = intconv(sp + l2 - cp) ;
 	                    if (strncmp((name + l1 - l),cp,l) == 0) {
 	                        idx = i ;
 			        break ;
