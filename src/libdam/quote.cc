@@ -45,7 +45,7 @@
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<climits>		/* |UINT_MAX| */
+#include	<climits>		/* |UINT_MAX| + |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -144,7 +144,6 @@ struct subinfo_fl {
 struct subinfo {
 	ids		id ;
 	vecstr		defdirs ;
-	subinfo_fl	init, f ;
 	quote		*op ;
 	cchar		*tmpdname ;
 	char		*tudname ;
@@ -152,6 +151,8 @@ struct subinfo {
 	cchar		**dirnames ;
 	char		*username ;
 	time_t		daytime ;
+	subinfo_fl	init ;
+	subinfo_fl	fl ;
 	int		year ;
 	int		isdst ;
 	int		gmtoff ;
@@ -162,10 +163,10 @@ struct quote_dfl {
 } ;
 
 struct quote_dir {
-	quote_dfl	f ;
 	char		*dirname ;
-	TEXTLOOK	looker ;
+	textlook	looker ;
 	time_t		ti_mtime ;		/* latest for all entries */
+	quote_dfl	fl ;
 	int		nentries ;		/* DB entries */
 	int		cidx ;			/* ordinal */
 } ;
@@ -178,7 +179,7 @@ struct quote_qdir {
 	char		*dirname ;
 	char 		*calname ;		/* DB file-name */
 	char		*mapdata ;		/* DB memory-map address */
-	quote_qdfl	f ;
+	quote_qdfl	fl ;
 	TL		vind ;			/* verse-index */
 	time_t		ti_db ;			/* DB file modification */
 	time_t		ti_map ;		/* DB map */
@@ -188,9 +189,9 @@ struct quote_qdir {
 	uint		mapsize ;		/* DB map length */
 	int		nentries ;		/* DB entries */
 	int		cidx ;			/* ordinal */
-} ;
+} ; /* end struct (quote_qdir) */
 
-QU_EL {
+struct quote_eline {
 	uint		loff ;
 	uint		llen ;
 } ;
@@ -201,7 +202,7 @@ struct quote_eflags {
 
 struct quote_ent {
 	quote_eline	*lines ;
-	quote_eflags	f ;
+	quote_eflags	fl ;
 	uint		voff ;
 	uint		vlen ;
 	uint		hash ;
@@ -351,7 +352,7 @@ static int	worder_start(WR *,QU *,QU_ENT *) noex ;
 static int	worder_finish(WR *) noex ;
 static int	worder_get(WR *,cchar **) noex ;
 
-static int	isempty(cchar *,int) noex ;
+static bool	isempty(cchar *,int) noex ;
 
 static int	mkmonth(cchar *,int) noex ;
 static int	dayofmonth_mkday(DAYOFMONTH *,uint,cchar *,int) noex ;
@@ -374,7 +375,7 @@ constexpr cint		rsterm[] = {
 	SR_OVERFLOW,
 	SR_RANGE,
 	0
-} ;
+} ; /* end array (rsterm) */
 
 
 /* exported variables */
@@ -389,23 +390,18 @@ extern const quote_obj	quote_modinfo = {
 /* exported subroutines */
 
 int quote_open(quote *op,cc *pr,cc *dirnames,cc *quotenames) noex {
-	subinfo		si, *sip = &si ;
 	int		rs ;
-	int		wopts ;
+	int		rs1 ;
 	int		c = 0 ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-#endif
-	if (pr == nullptr) return SR_FAULT ;
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-
+	if ((rs = quote_ctor(op,pr)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+	int		wopts ;
 	op->pr = pr ;
 	op->tmpdname = getenv(VARTMPDNAME) ;
-	if (op->tmpdname == nullptr)
+	if (op->tmpdname == nullptr) {
 	    op->tmpdname = TMPDNAME ;
+	}
 
 	rs = quote_dirnamescreate(op,dirnames) ;
 	if (rs < 0)
@@ -420,14 +416,14 @@ int quote_open(quote *op,cc *pr,cc *dirnames,cc *quotenames) noex {
 	if (rs < 0)
 	    goto bad2 ;
 
-	rs = subinfo_start(sip,op,0L,dirnames) ;
-	if (rs >= 0) {
-
+	subinfo		si, *sip = &si ;
+	if ((rs = subinfo_start(sip,op,0z,dirnames)) >= 0) {
+	    {
 	    rs = quote_dirsopen(op,sip,sip->dirnames,quotenames) ;
 	    c = rs ;
-
-	    subinfo_finish(sip) ;
-
+	    }
+	    rs1 = subinfo_finish(sip) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 
 	if (rs < 0)
@@ -440,6 +436,11 @@ int quote_open(quote *op,cc *pr,cc *dirnames,cc *quotenames) noex {
 
 ret0:
 
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		quote_dtor(op) ;
+	    }
+	} /* end if (quote_ctor) */
 	return (rs >= 0) ? c : rs ;
 
 /* bad stuff */
@@ -1410,16 +1411,16 @@ cchar	dbdname[] ;
 	    dmode |= 0755 ;
 	    rs = u_mkdir(dbdname,dmode) ;
 	    if (rs >= 0) {
-		qdirp->f.writedbdir = true :
+		qdirp->fl.writedbdir = true :
 		rs = uc_minmod(dbdname,dmode) ;
 	    }
 	}
 
-	if ((rs >= 0) && (! qdirp->f.writedbdir)) {
+	if ((rs >= 0) && (! qdirp->fl.writedbdir)) {
 	    rs = subinfo_ids(sip) ;
 	    if (rs >= 0) {
 	        rs1 = permid(&sip->id,&sb,W_OK) ;
-		qdirp->f.writedbdir = (rs1 >= 0) ;
+		qdirp->fl.writedbdir = (rs1 >= 0) ;
 	    }
 	}
 
@@ -1887,7 +1888,7 @@ int		f_search ;
 	    } /* end if (cyi_open) */
 	} /* end if */
 
-	calp->f.vind = (rs >= 0) ;
+	calp->fl.vind = (rs >= 0) ;
 	return rs ;
 }
 /* end subroutine (quote_indopencheck) */
@@ -2157,8 +2158,8 @@ QU_CAL	*calp ;
 	int	rs = SR_OK ;
 
 
-	if (calp->f.vind) {
-	    calp->f.vind = false ;
+	if (calp->fl.vind) {
+	    calp->fl.vind = false ;
 	    rs = cyi_close(&calp->vind) ;
 	}
 
@@ -2302,7 +2303,7 @@ DI	*sip ;
 	    goto ret0 ;
 
 	rs = vecstr_start(&sip->defdirs,0,0) ;
-	sip->f.defdirs = (rs >= 0) ;
+	sip->fl.defdirs = (rs >= 0) ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -2349,8 +2350,8 @@ DI	*sip ;
 
 ret1:
 	if (rs < 0) {
-	    if (sip->f.defdirs) {
-		sip->f.defdirs = false ;
+	    if (sip->fl.defdirs) {
+		sip->fl.defdirs = false ;
 		vecstr_finish(&sip->defdirs) ;
 	    }
 	}
@@ -2388,8 +2389,8 @@ DI	*sip ;
 	int	rs = SR_OK ;
 
 
-	if (! sip->f.id) {
-	    sip->f.id = true ;
+	if (! sip->fl.id) {
+	    sip->fl.id = true ;
 	    rs = ids_load(&sip->id) ;
 	}
 
@@ -2404,20 +2405,20 @@ DI	*sip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (sip->f.hols) {
-	    sip->f.hols = false ;
+	if (sip->fl.hols) {
+	    sip->fl.hols = false ;
 	    rs1 = holidays_close(&sip->hols) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (sip->f.dom) {
-	    sip->f.dom = false ;
+	if (sip->fl.dom) {
+	    sip->fl.dom = false ;
 	    rs1 = dayofmonth_finish(&sip->dom) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (sip->f.defdirs) {
-	    sip->f.defdirs = false ;
+	if (sip->fl.defdirs) {
+	    sip->fl.defdirs = false ;
 	    rs1 = vecstr_finish(&sip->defdirs) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -2434,10 +2435,10 @@ DI	*sip ;
 	    sip->userhome = nullptr ;
 	}
 
-	if (sip->f.id) {
+	if (sip->fl.id) {
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->f.id = false ;
+	    sip->fl.id = false ;
 	}
 
 	return rs ;
@@ -2659,9 +2660,9 @@ int		cl ;
 
 /* open the DAYOFMONTH database (manager?) if it is not already open */
 
-	if (! sip->f.dom) {
+	if (! sip->fl.dom) {
 	    rs = dayofmonth_start(dmp,sip->year) ;
-	    sip->f.dom = (rs >= 0) ;
+	    sip->fl.dom = (rs >= 0) ;
 	}
 
 	if (rs >= 0)
@@ -2725,7 +2726,7 @@ int		sl ;
 	    rs = subinfo_year(sip) ;
 	    if (rs >= 0) {
 	        rs = holidays_open(holp,op->pr,sip->year,nullptr) ;
-	        sip->f.hols = (rs >= 0) ;
+	        sip->fl.hols = (rs >= 0) ;
 
 	 	f = false ;
 		f = f || (rs == SR_BADFMT) ;
@@ -2735,7 +2736,7 @@ int		sl ;
 	    }
 	} /* end if (open database as necessary) */
 
-	if ((rs >= 0) && sip->f.hols) {
+	if ((rs >= 0) && sip->fl.hols) {
 	    HOLIDAYS_CITE	hc ;
 	    char	holbuf[HOLBUFLEN + 1] ;
 
@@ -3004,10 +3005,10 @@ QU_ENT	*oep ;
 
 /* the following checks (code) is not needed in the present implementation! */
 
-	if ((rs >= 0) && (! ep->f.hash))
+	if ((rs >= 0) && (! ep->fl.hash))
 	   rs = entry_mkhash(ep,op) ;
 
-	if ((rs >= 0) && (! oep->f.hash))
+	if ((rs >= 0) && (! oep->fl.hash))
 	   rs = entry_mkhash(oep,op) ;
 
 /* we continue with the real (needed) work here */
@@ -3061,7 +3062,7 @@ QUOTE	*op ;
 	for (i = 0 ; i < ep->i ; i += 1) {
 	    sp = (mp + elp[i].loff) ;
 	    sl = elp[i].llen ;
-	    while ((cl = nextfield(sp,sl,&cp)) > 0) {
+	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
 		hash += hash_elf(cp,cl) ;
 		sl -= ((cp + cl) - sp) ;
 		sp = (cp + cl) ;
@@ -3069,7 +3070,7 @@ QUOTE	*op ;
 	} /* end for */
 
 	ep->hash = hash ;
-	ep->f.hash = true ;
+	ep->fl.hash = true ;
 
 ret0:
 	return rs ;
@@ -3084,7 +3085,7 @@ uint		hash ;
 
 
 	ep->hash = hash ;
-	ep->f.hash = true ;
+	ep->fl.hash = true ;
 	return SR_OK ;
 }
 /* end subroutine (entry_sethash) */
@@ -3312,12 +3313,11 @@ int worder_finish(WR *wp) noex {
 /* end subroutine (worder_finish) */
 
 int worder_get(WR *wp,cc **rpp) noex {
-	int	cl = 0 ;
-	char	*cp ;
+	int		cl = 0 ; /* return-value */
+	char		*cp ;
 	while (wp->i < wp->nlines) {
 
-	    cl = nextfield(wp->sp,wp->sl,&cp) ;
-	    if (cl > 0) {
+	    if ((cl = sfnext(wp->sp,wp->sl,&cp)) > 0) {
 		wp->sl -= ((cp + cl) - wp->sp) ;
 		wp->sp = (cp + cl) ;
 		break ;
@@ -3330,17 +3330,15 @@ int worder_get(WR *wp,cc **rpp) noex {
 	    }
 
 	} /* end while */
-
-	if (rpp != nullptr)
+	if (rpp) {
 	    *rpp = cp ;
-
-ret0:
+	}
 	return cl ;
 }
 /* end subroutine (worder_get) */
 
-static int isempty(cchar *lp,int ll) noex {
-	int	f = false ;
+static bool isempty(cchar *lp,int ll) noex {
+	bool		f = false ;
 	f = f || (ll == 0) ;
 	f = f || (lp[0] == '#') ;
 	if ((! f) && CHAR_ISWHITE(*lp)) {
