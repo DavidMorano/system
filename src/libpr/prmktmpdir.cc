@@ -62,12 +62,11 @@
 
 #include	"prmktmpdir.h"
 
+import libutil ;
 
 /* local defines */
 
-#define	SUBINFO		struct subinfo
-
-#define	SI		SUBINFO
+#define	SI		subinfo
 
 #ifndef	VARTMPDNAME
 #define	VARTMPDNAME	"TMPDIR"
@@ -103,7 +102,7 @@ static int	subinfo_start(SI *,cchar *) noex ;
 static int	subinfo_finish(SI *) noex ;
 static int	subinfo_mkprtmp(SI *,char *,cchar *) noex ;
 static int	subinfo_chown(SI *,cchar *) noex ;
-static int	subinfo_ckmode(SI *,cchar *,USTAT *,mode_t) noex ;
+static int	subinfo_ckmode(SI *,cchar *,ustat *,mode_t) noex ;
 
 static int	ensureattr(cchar *,mode_t,uid_t,gid_t) noex ;
 
@@ -120,12 +119,12 @@ constexpr gid_t		gidend = -1 ;
 /* exported subroutines */
 
 int prmktmpdir(cchar *pr,char *rbuf,cc *tmpdname,cc *dname,mode_t m) noex {
-	SUBINFO		si, *sip = &si ;
-	cmode		dm = TMPDMODE ;
+	subinfo		si, *sip = &si ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
 	int		f_prtmp = false ;
+	cmode		dm = TMPDMODE ;
 	char		prtmpdname[MAXPATHLEN + 1] ;
 
 	if (pr == nullptr) return SR_FAULT ;
@@ -150,7 +149,7 @@ int prmktmpdir(cchar *pr,char *rbuf,cc *tmpdname,cc *dname,mode_t m) noex {
 /* phase two */
 
 	        if ((dname != nullptr) && (dname[0] != '\0')) {
-	            USTAT	sb ;
+	            ustat	sb ;
 	            if ((rs = mkpath2(rbuf,prtmpdname,dname)) >= 0) {
 	                len = rs ;
 	                if ((rs = u_stat(rbuf,&sb)) >= 0) {
@@ -187,17 +186,17 @@ int prmktmpdir(cchar *pr,char *rbuf,cc *tmpdname,cc *dname,mode_t m) noex {
 
 static int subinfo_start(SI *sip,cchar *pr) noex {
 	int		rs = SR_FAULT ;
-	if (sip && pr) {
-	    USTAT	prsb ;
+	if (sip && pr) ylikely {
 	    memclear(sip) ;
 	    sip->pr = pr ;
 	    sip->euid = geteuid() ;
 	    sip->egid = getegid() ;
-	    rs = u_stat(pr,&prsb) ;
-	    sip->puid = prsb.st_uid ;
-	    sip->pgid = prsb.st_gid ;
-	    sip->tuid = -1 ;
-	    sip->tgid = -1 ;
+	    if (ustat prsb ; (rs = u_stat(pr,&prsb)) >= 0) ylikely {
+	        sip->puid = prsb.st_uid ;
+	        sip->pgid = prsb.st_gid ;
+	        sip->tuid = -1 ;
+	        sip->tgid = -1 ;
+	    } /* end if (u_stat) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -205,7 +204,7 @@ static int subinfo_start(SI *sip,cchar *pr) noex {
 
 static int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -214,14 +213,12 @@ static int subinfo_finish(SI *sip) noex {
 
 static int subinfo_mkprtmp(SI *sip,char *prtmpdname,cc *tmpdname) noex {
 	int		rs ;
-	int		rl ;
 	int		f_create = false ;
 	cchar		*rn{} ;
-	if ((rl = sfbasename(sip->pr,-1,&rn)) > 0) {
-	    if ((rs = mkpath2w(prtmpdname,tmpdname,rn,rl)) >= 0) {
+	if (int rl ; (rl = sfbasename(sip->pr,-1,&rn)) > 0) ylikely {
+	    if ((rs = mkpath2w(prtmpdname,tmpdname,rn,rl)) >= 0) ylikely {
 		cmode		dm = (TMPDMODE | S_ISVTX) ;
-		USTAT		sb ;
-	        if ((rs = u_stat(prtmpdname,&sb)) >= 0) {
+		if (ustat sb ; (rs = u_stat(prtmpdname,&sb)) >= 0) ylikely {
 	            sip->tuid = sb.st_uid ;
 	            sip->tgid = sb.st_gid ;
 	            if (S_ISDIR(sb.st_mode)) {
@@ -260,7 +257,7 @@ static int subinfo_chown(SI *sip,cchar *prtmpdname) noex {
 }
 /* end subroutine (subinfo_chown) */
 
-static int subinfo_ckmode(SI *sip,cc *dname,USTAT *sbp,mode_t dm) noex {
+static int subinfo_ckmode(SI *sip,cc *dname,ustat *sbp,mode_t dm) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if ((sbp->st_uid == sip->euid) && ((sbp->st_mode & dm) != dm)) {
@@ -276,13 +273,12 @@ static int ensureattr(cchar *tmpdname,mode_t nm,uid_t puid,gid_t pgid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		f = false ;
-	if (tmpdname) {
+	if (tmpdname) ylikely {
 	    rs = SR_INVALID ;
-	    if (tmpdname[0]) {
-	        if ((rs = u_open(tmpdname,O_RDONLY,0666)) >= 0) {
-	            USTAT	sb ;
+	    if (tmpdname[0]) ylikely {
+	        if ((rs = u_open(tmpdname,O_RDONLY,0666)) >= 0) ylikely {
 	            cint	fd = rs ;
-	            if ((rs = u_fstat(fd,&sb)) >= 0) {
+	            if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
 	                mode_t	cm = sb.st_mode & (~ S_IFMT) ;
 	                nm &= (~ S_IFMT) ;
 	                if ((cm & nm) != nm) {
@@ -290,7 +286,7 @@ static int ensureattr(cchar *tmpdname,mode_t nm,uid_t puid,gid_t pgid) noex {
 	                    nm |= cm ;
 	                    rs = u_fchmod(fd,nm) ;
 	                }
-	                if (rs >= 0) {
+	                if (rs >= 0) ylikely {
 			    if ((puid != uidend) || (pgid != gidend)) {
 	                        if ((puid != uidend) && (puid == sb.st_uid)) {
 				    puid = uidend ;
