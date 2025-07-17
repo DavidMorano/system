@@ -29,7 +29,6 @@
 #include	<envstandards.h>	/* must be before others */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<fifostr.h>
@@ -43,10 +42,6 @@ import libutil ;
 import sif ;
 
 /* local defines */
-
-#ifndef	WORDBUFLEN
-#define	WORDBUFLEN	100
-#endif
 
 
 /* imported namespaces */
@@ -182,15 +177,14 @@ int wordfill_addline(wordfill *op,cchar *lbuf,int llen) noex {
 	    if (llen < 0) llen = lenstr(lbuf) ;
 	    if (llen > 0) {
 		sif	so(lbuf,llen) ;
-		int	cl ;
 		cchar	*cp ;
-		while ((cl = so(&cp)) > 0) {
+		for (int cl ; (cl = so(&cp)) > 0 ; ) {
 	            c += 1 ;
 	            rs = fifostr_add(op->sqp,cp,cl) ;
 	            op->wc += 1 ;
 	            op->chrc += cl ;
 	            if (rs < 0) break ;
-	        } /* end while */
+	        } /* end for */
 	    } /* end if (non-zero positive) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
