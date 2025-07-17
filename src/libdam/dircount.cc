@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-03-01, David AÂ­DÂ­ Morano
+	= 1998-03-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services (RNS).
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -36,14 +36,9 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>
@@ -62,13 +57,12 @@
 /* external variables */
 
 
-/* external variables */
-
-
 /* local structures */
 
 
 /* forward references */
+
+static int dircounts(cchar *) noex ;
 
 
 /* local variables */
@@ -81,32 +75,41 @@
 
 int dircount(cchar *dname) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		c = 0 ;
 	if (dname) {
 	    rs = SR_FAULT ;
 	    if (dname[0]) {
-		char	*nbuf{} ;
-		if ((rs = malloc_mn(&nbuf)) >= 0) {
-	            fsdir	d ;
-	            fsdir_ent	de ;
-		    cint	nlen = rs ;
-	            if ((rs = fsdir_open(&d,dname)) >= 0) {
-	                while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
-	                   if (hasNotDots(de.name,rs) > 0) {
-		                c += 1 ;
-		            } /* end (not dots) */
-	                } /* end while */
-	                rs1 = fsdir_close(&d) ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (fsdir) */
-		    rs1 = uc_free(nbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (m-a-f) */
+		rs = dircounts(dname) ;
+		c = rs ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (dircount) */
+
+
+/* local subroutines */
+
+static int dircounts(cchar *dname) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+        if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
+            cint        nlen = rs ;
+            if (fsdir d ; (rs = d.open(dname)) >= 0) {
+		for (fsdir_ent de ; (rs = d.read(&de,nbuf,nlen)) > 0 ; ) {
+                    if (hasNotDots(nbuf,rs) > 0) {
+                        c += 1 ;
+                    } /* end (not dots) */
+                } /* end for */
+                rs1 = d.close ;
+                if (rs >= 0) rs = rs1 ;
+            } /* end if (fsdir) */
+            rs1 = uc_free(nbuf) ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (m-a-f) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (dircounts) */
 
 
