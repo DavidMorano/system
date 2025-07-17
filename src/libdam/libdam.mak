@@ -134,8 +134,8 @@ OBJ34=
 OBJ35= sfsub.o sfcasesub.o sfkey.o sfbreak.o sfskipwhite.o sfshrink.o sfword.o
 OBJ36= sfdirname.o sfbasename.o sfwhitedot.o sfprogroot.o sfdequote.o
 OBJ37= sfcookkey.o sfsubstance.o sfthing.o sfcenter.o sfrootname.o sfnamecomp.o
-OBJ38= sichr.o sicasechr.o sialpha.o sidigit.o sialnum.o sidquote.o sinext.o
-OBJ39= sisub.o sicasesub.o sibreak.o siskipwhite.o sibasename.o sispan.o 
+OBJ38=
+OBJ39=
 
 OBJ40= getenv3.o
 OBJ41= permsched.o
@@ -261,7 +261,7 @@ OBJ144=
 OBJ145= cfhulian.o
 OBJ146= ctb26.o cthexstr.o ctroman.o ctwords.o
 OBJ147= quickselecti.o igcd.o minmax.o isort.o
-OBJ148= fam.o fhm.o fsum.o
+OBJ148= fam.o fhm.o
 OBJ149= permutations.o combinations.o
 OBJ150= wsnwcpynarrow.o
 OBJ151= wsfnext.o wsinul.o wsichr.o wsirchr.o
@@ -922,5 +922,11 @@ minmaxelem.o:		minmaxelem.ccm			$(INCS)
 # HASDUPLICATE
 hascount.o:		hascount.ccm			$(INCS)
 	makemodule hascount
+
+# BINCHAR
+binchar.o:		binchar.ccm
+	makemodule rshiftx
+	makemodule binchar
+
 
 
