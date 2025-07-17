@@ -29,11 +29,6 @@
 	'scheduled' operation is provided by the 'permsched'
 	subroutine.  Check out that subroutine for more information.
 
-	Notes:
-	Note that the local subroutine |mkvarstr()| is identical
-	to |sncpy3w(3dam)| with the middle string being '='.  Just
-	saying ....
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -46,7 +41,7 @@
 #include	<vecstr.h>
 #include	<storebuf.h>
 #include	<sbuf.h>
-#include	<snx.h>
+#include	<snx.h>			/* |snkeyval(3uc)| */
 #include	<sncpyx.h>
 #include	<snwcpy.h>
 #include	<vstrkeycmpx.h>
@@ -92,7 +87,7 @@ typedef vecstr *	vecstrp ;
 template<typename ... Args>
 inline int schedvar_magic(schedvar *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SCHEDVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -114,14 +109,14 @@ cbool		f_search = CF_SEARCH ;
 
 int schedvar_start(SV *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    cint	osz = szof(vecstr) ;
 	    op->magic = 0 ;
-	    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
+	    if (void *vp ; (rs = uc_malloc(osz,&vp)) >= 0) ylikely {
 		vecstr	*slp = vecstrp(vp) ;
 	        cint	ve = SCHEDVAR_NE ;
-	        cint	vo = VECSTR_OSORTED ;
-	        if ((rs = slp->start(ve,vo)) >= 0) {
+	        cint	vo = vecstrm.sorted ;
+	        if ((rs = slp->start(ve,vo)) >= 0) ylikely {
 		    op->slp = slp ;
 		    op->magic = SCHEDVAR_MAGIC ;
 		}
@@ -137,8 +132,8 @@ int schedvar_start(SV *op) noex {
 int schedvar_finish(SV *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = schedvar_magic(op)) >= 0) {
-	    if (op->slp) {
+	if ((rs = schedvar_magic(op)) >= 0) ylikely {
+	    if (op->slp) ylikely {
 	        {
 	            rs1 = vecstr_finish(op->slp) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -157,7 +152,7 @@ int schedvar_finish(SV *op) noex {
 
 int schedvar_add(SV *op,cc *key,cc *vp,int vl) noex {
 	int		rs ;
-	if ((rs = schedvar_magic(op,key,vp)) >= 0) {
+	if ((rs = schedvar_magic(op,key,vp)) >= 0) ylikely {
 	    rs = vecstr_envset(op->slp,key,vp,vl) ;
 	}
 	return rs ;
@@ -166,7 +161,7 @@ int schedvar_add(SV *op,cc *key,cc *vp,int vl) noex {
 
 int schedvar_curbegin(SV *op,SV_C *curp) noex {
 	int		rs ;
-	if ((rs = schedvar_magic(op,curp)) >= 0) {
+	if ((rs = schedvar_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	}
 	return rs ;
@@ -175,7 +170,7 @@ int schedvar_curbegin(SV *op,SV_C *curp) noex {
 
 int schedvar_curend(SV *op,SV_C *curp) noex {
 	int		rs ;
-	if ((rs = schedvar_magic(op,curp)) >= 0) {
+	if ((rs = schedvar_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	}
 	return rs ;
@@ -186,7 +181,7 @@ int schedvar_curenum(SV *op,SV_C *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	int		vl = 0 ;
-	if ((rs = schedvar_magic(op,curp,kbuf)) >= 0) {
+	if ((rs = schedvar_magic(op,curp,kbuf)) >= 0) ylikely {
 	    vecstr	*slp = op->slp ;
 	    cnullptr	np{} ;
 	    int		i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
@@ -196,14 +191,14 @@ int schedvar_curenum(SV *op,SV_C *curp,char *kbuf,int klen,
 	    while (((rs = slp->get(i,&cp)) >= 0) && (cp == np)) {
 	        i += 1 ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        int	kl = -1 ;
 		cchar	*vap = nullptr ;
 		if (cchar *tp ; (tp = strchr(cp,'=')) != nullptr) {
 	            kl = intconv(tp - cp) ;
 		    vap = (tp + 1) ;
 	        }
-	        if ((rs = snwcpy(kbuf,klen,cp,kl)) >= 0) {
+	        if ((rs = snwcpy(kbuf,klen,cp,kl)) >= 0) ylikely {
 	    	    if (vbuf && vap) {
 	                rs = sncpy1(vbuf,vlen,vap) ;
 	                vl = rs ;
@@ -218,7 +213,7 @@ int schedvar_curenum(SV *op,SV_C *curp,char *kbuf,int klen,
 
 int schedvar_findkey(SV *op,cc *key,cc **rpp) noex {
 	int		rs ;
-	if ((rs = schedvar_magic(op,key)) >= 0) {
+	if ((rs = schedvar_magic(op,key)) >= 0) ylikely {
 	    vecstr	*slp = op->slp ;
 	    if_constexpr (f_search) {
 		rs = slp->search(key,vstrkeycmp,rpp) ;
@@ -232,7 +227,7 @@ int schedvar_findkey(SV *op,cc *key,cc **rpp) noex {
 
 int schedvar_del(SV *op,cc *key) noex {
 	int		rs ;
-	if ((rs = schedvar_magic(op,key)) >= 0) {
+	if ((rs = schedvar_magic(op,key)) >= 0) ylikely {
 	    vecstr	*slp = op->slp ;
 	    if ((rs = slp->finder(key,vstrkeycmp)) >= 0) {
 	        rs = slp->del(rs) ;
@@ -245,10 +240,10 @@ int schedvar_del(SV *op,cc *key) noex {
 int schedvar_expand(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = schedvar_magic(op,dbuf,sp)) >= 0) {
+	if ((rs = schedvar_magic(op,dbuf,sp)) >= 0) ylikely {
 	    rs = SR_TOOBIG ;
 	    dbuf[0] = '\0' ;
-	    if (dlen > 0) {
+	    if (dlen > 0) ylikely {
 	        if (sl < 0) sl = lenstr(sp) ;
 		rs = schedvar_exper(op,dbuf,dlen,sp,sl) ;
 		len = rs ;
@@ -264,7 +259,7 @@ int schedvar_expand(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
 static int schedvar_exper(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
 	int		rs ;
 	int		len = 0 ;
-	if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) {
+	if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) ylikely {
 	    vecstr	*slp = op->slp ;
 	    cnullptr	np{} ;
             cchar	*lfp = (sp + sl) ;
@@ -283,7 +278,7 @@ static int schedvar_exper(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
 			} else {
                             rs = slp->finder(KEYBUF(*fp),vcf,&cp) ;
 			}
-                        if (rs >= 0) {
+                        if (rs >= 0) ylikely {
                             if (cchar *tp ; (tp = strchr(cp,'=')) != np) {
                                 rs = b.str(tp+1) ;
                             } /* end if (it had a value) */
@@ -299,25 +294,5 @@ static int schedvar_exper(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (schedvar_exper) */
-
-#ifdef	COMMENT
-static int mkvarstr(char *dbuf,int dlen,cc *k,cc *sp,int sl) noex {
-    	storebuf	sb(dbuf,dlen) ;
-	int		rs = SR_OK ;
-	if (rs >= 0) rs = sb.str(key) ;
-	if (rs >= 0) rs = sb.chr('=') ;
-	if (rs >= 0) rs = sb.strw(sp,sl) ;
-	if (rs >= 0) rs = sb.idx ;
-	return rs ;
-}
-/* end subroutine (mkvarstr) */
-#endif /* COMMENT */
-
-#ifdef	COMMENT
-static int mkvarstr(char *dbuf,int dlen,cc *k,cc *sp,int sl) noex {
-    	return snkeval(dbuf,dlen,k,sp,sl) ;
-}
-/* end subroutine (mkvarstr) */
-#endif /* COMMENT */
 
 
