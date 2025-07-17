@@ -222,13 +222,13 @@ local int dw_starter(DW *op,cchar *dn) noex {
 	if ((rs = rsv) >= 0) {
 	    cint	sz = szof(DW_ENT) ;
 	    cint	vn = 10 ;
-	    cint	vo = (VECOBJ_OSTATIONARY | VECOBJ_OCONSERVE) ;
+	    cint	vo = (vecobjm.stationary | vecobjm.conserve) ;
 	    op->fd = -1 ;
 	    op->count_new = 0 ;
 	    op->count_checkable = 0 ;
             /* initialize */
 	    if ((rs = vecobj_start(op->elp,sz,vn,vo)) >= 0) {
-		auto		mall = uc_mallocstrw ;
+		cauto		mall = uc_mallocstrw ;
 	        custime		dt = getustime ;
 	        op->timod = 0 ;
 	        op->tiopen = 0 ;
