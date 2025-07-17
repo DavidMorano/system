@@ -90,27 +90,12 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy4(char *,int,cchar *,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	pathadd(char *,int,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	fileobject(const char *) ;
-extern int	hasNotDots(const char *,int) ;
-extern int	isNotPresent(int) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) noex ;
 #endif
 
 #if	CF_DEUGN
-extern int	nprintf(cchar *,cchar *,...) ;
+extern int	nprintf(cchar *,cchar *,...) noex ;
 #endif
 
 
@@ -119,7 +104,8 @@ extern int	nprintf(cchar *,cchar *,...) ;
 
 /* local structures */
 
-struct pollinfo {
+extern "C" {
+    struct pollinfo {
 	void		*sop ;
 	cvoid		*objname ;
 	int		(*start)(void *) ;
@@ -127,14 +113,16 @@ struct pollinfo {
 	int		(*info)(void *) ;
 	int		(*cmd)(void *) ;
 	int		(*finish)(void *) ;
-} ;
+    } ;
+}
 
 struct pollobj_flags {
 	uint		running:1 ;
 	uint		active:1 ;
 } ;
 
-struct pollobj {
+extern "C" {
+    struct pollobj {
 	cchar		*name ;
 	void		*sop ;
 	void		*obj ;
@@ -146,7 +134,8 @@ struct pollobj {
 	POLLOBJ_FL	f ;
 	uint		objsize ;
 	uint		infosize ;
-} ;
+    } ;
+}
 
 struct thread_args {
 	PCSPOLLS	*op ;
@@ -168,39 +157,40 @@ enum cmds {
 
 /* forward references */
 
-static int pcspolls_valsbegin(pcspolls *,PCSCONF *,cchar *) ;
-static int pcspolls_valsend(pcspolls *) ;
+static int pcspolls_valsbegin(pcspolls *,PCSCONF *,cchar *) noex ;
+static int pcspolls_valsend(pcspolls *) noex ;
 
-static int thread_start(THREAD *,pcspolls *) ;
-static int thread_finish(THREAD *) ;
-static int thread_cmdrecv(THREAD *,int) ;
-static int thread_exiting(THREAD *) ;
-static int thread_cmdexit(THREAD *) ;
-static int thread_waitexit(THREAD *) ;
-static int thread_worker(THREAD *) ;
+static int thread_start(THREAD *,pcspolls *) noex ;
+static int thread_finish(THREAD *) noex ;
+static int thread_cmdrecv(THREAD *,int) noex ;
+static int thread_exiting(THREAD *) noex ;
+static int thread_cmdexit(THREAD *) noex ;
+static int thread_waitexit(THREAD *) noex ;
+static int thread_worker(THREAD *) noex ;
 
 #ifdef	COMMENT
-static int thread_setdone(THREAD *) ;
+static int thread_setdone(THREAD *) noex ;
 #endif
 
-static int work_start(WORK *,THREAD *) ;
-static int work_term(WORK *) ;
-static int work_finish(WORK *) ;
-static int work_objloads(WORK *,THREAD *,char *,int) ;
-static int work_objloadcheck(WORK *,cchar *,cchar *,int) ;
-static int work_objload(WORK *,POLLINFO *) ;
-static int work_objstarts(WORK *,THREAD *) ;
-static int work_objchecks(WORK *) ;
-static int work_objfins(WORK *) ;
+static int work_start(WORK *,THREAD *) noex ;
+static int work_term(WORK *) noex ;
+static int work_finish(WORK *) noex ;
+static int work_objloads(WORK *,THREAD *,char *,int) noex ;
+static int work_objloadcheck(WORK *,cchar *,cchar *,int) noex ;
+static int work_objload(WORK *,POLLINFO *) noex ;
+static int work_objstarts(WORK *,THREAD *) noex ;
+static int work_objchecks(WORK *) noex ;
+static int work_objfins(WORK *) noex ;
 
-static int pollinfo_syms(POLLINFO *,void *,cchar *,int) ;
+static int pollinfo_syms(POLLINFO *,void *,cchar *,int) noex ;
 
-static int pollobj_callstart(POLLOBJ *,THREAD *) ;
-static int pollobj_check(POLLOBJ *) ;
-static int pollobj_finish(POLLOBJ *) ;
+static int pollobj_callstart(POLLOBJ *,THREAD *) noex ;
+static int pollobj_check(POLLOBJ *) noex ;
+static int pollobj_finish(POLLOBJ *) noex ;
 
-static int mksymname(char *,cchar *,int,cchar *) ;
-static int isrequired(int) ;
+static int mksymname(char *,cchar *,int,cchar *) noex ;
+
+static bool isrequired(int) noex ;
 
 
 /* local variables */
@@ -209,7 +199,7 @@ static cchar	*exts[] = {
 	"so",
 	"o",
 	"",
-	NULL
+	nullptr
 } ;
 
 static cchar	*subs[] = {
@@ -218,7 +208,7 @@ static cchar	*subs[] = {
 	"info",
 	"cmd",
 	"finish",
-	NULL
+	nullptr
 } ;
 
 enum subs {
@@ -247,9 +237,9 @@ int pcspolls_start(pcspolls *op,PCSCONF *pcp,cchar *sn)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pcp == NULL) return SR_FAULT ;
-	if (sn == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pcp == nullptr) return SR_FAULT ;
+	if (sn == nullptr) return SR_FAULT ;
 
 	if (sn[0] == '\0') return SR_INVALID ;
 
@@ -261,7 +251,7 @@ int pcspolls_start(pcspolls *op,PCSCONF *pcp,cchar *sn)
 
 	if ((rs = pcspolls_valsbegin(op,pcp,sn)) >= 0) {
 	    if ((rs = thread_start(&op->t,op)) >= 0) {
-		op->f.working = TRUE ;
+		op->f.working = true ;
 		op->magic = PCSPOLLS_MAGIC ;
 	    }
 	    if (rs < 0)
@@ -282,7 +272,7 @@ int pcspolls_finish(pcspolls *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != PCSPOLLS_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGN
@@ -290,7 +280,7 @@ int pcspolls_finish(pcspolls *op)
 #endif
 
 	if (op->f.working) {
-	    op->f.working = FALSE ;
+	    op->f.working = false ;
 	    rs1 = thread_finish(&op->t) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -312,11 +302,11 @@ int pcspolls_info(pcspolls *op,PCSPOLLS_INFO *ip)
 {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSPOLLS_MAGIC) return SR_NOTOPEN ;
 
-	if (ip != NULL) {
+	if (ip != nullptr) {
 	    memset(ip,0,sizeof(PCSPOLLS_INFO)) ;
 	    ip->dummy = 1 ;
 	}
@@ -330,7 +320,7 @@ int pcspolls_cmd(pcspolls *op,int cmd)
 {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSPOLLS_MAGIC) return SR_NOTOPEN ;
 
@@ -342,11 +332,11 @@ int pcspolls_cmd(pcspolls *op,int cmd)
 /* private subroutines */
 
 
-static int pcspolls_valsbegin(pcspolls *op,PCSCONF *pcp,const char *sn)
+static int pcspolls_valsbegin(pcspolls *op,PCSCONF *pcp,cchar *sn)
 {
 	int		rs ;
 	int		size = 0 ;
-	const char	*pr = pcp->pr ;
+	cchar	*pr = pcp->pr ;
 	char		*bp ;
 
 	op->pcp = pcp ;			/* supposedly stable throughout */
@@ -372,10 +362,10 @@ static int pcspolls_valsend(pcspolls *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->a != NULL) {
+	if (op->a != nullptr) {
 	    rs1 = uc_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->a = NULL ;
+	    op->a = nullptr ;
 	}
 
 	return rs ;
@@ -387,9 +377,9 @@ static int pcspolls_valsend(pcspolls *op)
 struct pcspolls_thread {
 	PCSPOLLS	*op ;
 	PCSCONF		*pcp ;
-	const char	*sn ;
-	const char 	*pr ;
-	const char	*envv ;
+	cchar	*sn ;
+	cchar 	*pr ;
+	cchar	*envv ;
 	PSEM		s ;
 	pthread_t	tid ;
 	volatile int	cmd ;
@@ -420,10 +410,10 @@ static int thread_start(THREAD *tip,pcspolls *op)
 		if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 	    	    pthread_t	tid ;
 	    	    uptsub_t	fn = (uptsub_t) thread_worker ;
-	    	    if ((rs = uptcreate(&tid,NULL,fn,tip)) >= 0) {
+	    	    if ((rs = uptcreate(&tid,nullptr,fn,tip)) >= 0) {
 	    	        tip->tid = tid ;
 		    }
-		    u_sigmask(SIG_SETMASK,&osm,NULL) ;
+		    u_sigmask(SIG_SETMASK,&osm,nullptr) ;
 		} /* end if (sigmask) */
 	    } /* end if (signal handling) */
 	} /* end if (thrcomm-start) */
@@ -486,7 +476,7 @@ static int thread_cmdrecv(THREAD *tip,int to)
 
 static int thread_exiting(THREAD *tip)
 {
-	tip->f_exiting = TRUE ;
+	tip->f_exiting = true ;
 	return thrcomm_exiting(&tip->tc) ;
 }
 /* end subroutine (thread_exiting) */
@@ -496,7 +486,7 @@ static int thread_cmdexit(THREAD *tip)
 {
 	int		rs = SR_OK ;
 	if (! tip->f_exiting) {
-	    const int	cmd = cmd_exit ;
+	    cint	cmd = cmd_exit ;
 	    rs = thrcomm_cmdsend(&tip->tc,cmd,-1) ;
 	}
 	return rs ;
@@ -519,7 +509,7 @@ static int thread_waitexit(THREAD *tip)
 #ifdef	COMMENT
 static int thread_setdone(THREAD *tip)
 {
-	const int	rrs = 1 ;
+	cint	rrs = 1 ;
 	return thrcomm_rspsend(&tip->tc,rrs,-1) ;
 }
 /* end subroutine (thread_setdone) */
@@ -529,7 +519,7 @@ static int thread_setdone(THREAD *tip)
 static int thread_worker(THREAD *tip)
 {
 	WORK		w ;
-	const int	to = 4 ;
+	cint	to = 4 ;
 	int		rs ;
 	int		rs1 ;
 	int		ctime = 0 ;
@@ -543,16 +533,16 @@ static int thread_worker(THREAD *tip)
 #endif
 
 	if ((rs = work_start(&w,tip)) >= 0) {
-	    int		f_exit = FALSE ;
+	    int		f_exit = false ;
 	    while ((rs = thread_cmdrecv(tip,to)) >= 0) {
-	        const int	cmd = rs ;
+	        cint	cmd = rs ;
 		if ((rs = work_objchecks(&w)) >= 0) {
 	            switch (cmd) {
 	            case cmd_noop:
 	                ctime += 1 ;
 	                break ;
 	            case cmd_exit:
-	                f_exit = TRUE ;
+	                f_exit = true ;
 	                rs = work_term(&w) ;
 	                break ;
 	            } /* end switch */
@@ -579,14 +569,12 @@ static int thread_worker(THREAD *tip)
 }
 /* end subroutine (thread_worker) */
 
-
-static int work_start(WORK *wp,THREAD *tip)
-{
+static int work_start(WORK *wp,THREAD *tip) noex {
 	int		rs ;
 	int		c = 0 ;
-	const char	*pr = tip->pr ;
+	cchar	*pr = tip->pr ;
 
-	if (wp == NULL) return SR_FAULT ;
+	if (wp == nullptr) return SR_FAULT ;
 
 	memset(wp,0,sizeof(WORK)) ;
 	wp->tip = tip ;
@@ -601,14 +589,13 @@ static int work_start(WORK *wp,THREAD *tip)
 	    char	pdname[MAXPATHLEN+1] ;
 
 	    if ((rs = mkpath3(pdname,pr,ld,pd)) >= 0) {
-		USTAT	sb ;
 	        int	dl = rs ;
 
 #if	CF_DEBUGS
 	        debugprintf("pcspolls/work_start: pdname=%s\n",pdname) ;
 #endif
 
-	        if ((rs = u_stat(pdname,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(pdname,&sb)) >= 0) {
 		    if (S_ISDIR(sb.st_mode)) {
 	                if ((rs = work_objloads(wp,tip,pdname,dl)) >= 0) {
 	                    if ((c = rs) > 0) {
@@ -642,7 +629,7 @@ static int work_finish(WORK *wp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (wp == NULL) return SR_FAULT ;
+	if (wp == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("pcspolls/work_finish: ent\n") ;
@@ -671,8 +658,8 @@ static int work_finish(WORK *wp)
 
 static int work_term(WORK *wp)
 {
-	if (wp == NULL) return SR_FAULT ;
-	wp->f_term = TRUE ;
+	if (wp == nullptr) return SR_FAULT ;
+	wp->f_term = true ;
 
 #if	CF_DEBUGS
 	debugprintf("pcspolls/work_term: ent\n") ;
@@ -681,26 +668,21 @@ static int work_term(WORK *wp)
 }
 /* end subroutine (work_term) */
 
-
-static int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen)
-{
-	FSDIR		d ;
-	FSDIR_ENT	e ;
+static int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (tip == NULL) return SR_FAULT ;
-	if ((rs = fsdir_open(&d,dbuf)) >= 0) {
+	if (tip == nullptr) return SR_FAULT ;
+	if (fsdir d ; (rs = fsdir_open(&d,dbuf)) >= 0) {
 	    int		nl ;
-	    cchar	*np ;
+	    fsdir_ent	e ;
 	    while ((rs = fsdir_read(&d,&e)) > 0) {
-	        np = e.name ;
+	        cchar	*sp = e.name ;
 	        nl = rs ;
-	        if (hasNotDots(np,nl)) {
-	            int	ol ;
-	            if ((ol = sifext(np,nl,exts)) > 0) {
-	                if ((rs = pathadd(dbuf,dlen,np)) >= 0) {
-	                    rs = work_objloadcheck(wp,dbuf,np,ol) ;
+	        if (hasNotDots(sp,nl)) {
+	            if (int cl ; (ol = sifext(sp,nl,exts)) > 0) {
+	                if ((rs = pathadd(dbuf,dlen,sp)) >= 0) {
+	                    rs = work_objloadcheck(wp,dbuf,sp,ol) ;
 	                    c += rs ;
 	                } /* end if (pathadd) */
 	            } /* end if (has proper suffix) */
@@ -715,10 +697,7 @@ static int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen)
 }
 /* end subroutine (work_objloads) */
 
-
-static int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl)
-{
-	ustat	sb ;
+static int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl) noex {
 	struct pollinfo	oi ;
 	int		rs ;
 	int		c = 0 ;
@@ -727,12 +706,12 @@ static int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl)
 	debugprintf("pcspolls/work_objloadcheck: ent\n") ;
 #endif
 
-	if ((rs = u_stat(fname,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode) && (sb.st_size > 0)) {
 	        if ((rs = fileobject(fname)) > 0) {
-	            const int	m = RTLD_LAZY ;
+	            cint	m = RTLD_LAZY ;
 	            void	*sop ;
-	            if ((sop = dlopen(fname,m)) != NULL) {
+	            if ((sop = dlopen(fname,m)) != nullptr) {
 	                memset(&oi,0,sizeof(struct pollinfo)) ;
 	                oi.sop = sop ;
 	                if ((rs = pollinfo_syms(&oi,sop,sp,sl)) > 0) {
@@ -767,12 +746,12 @@ static int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl)
 
 static int work_objload(WORK *wp,POLLINFO *oip)
 {
-	const int	psize = sizeof(POLLOBJ) ;
+	cint	psize = sizeof(POLLOBJ) ;
 	int		rs ;
 	void		*p ;
 
-	if (wp == NULL) return SR_FAULT ;
-	if (oip == NULL) return SR_FAULT ;
+	if (wp == nullptr) return SR_FAULT ;
+	if (oip == nullptr) return SR_FAULT ;
 
 	if ((rs = uc_malloc(psize,&p)) >= 0) {
 	    POLLOBJ	*pop = p ;
@@ -790,7 +769,7 @@ static int work_objload(WORK *wp,POLLINFO *oip)
 	        pop->infosize = pnp->infosize ;
 	    }
 	    {
-	        const int	osize = pop->objsize ;
+	        cint	osize = pop->objsize ;
 	        if ((rs = uc_malloc(osize,&p)) >= 0) {
 	            pop->obj = p ;
 	            rs = vechand_add(&wp->polls,pop) ;
@@ -800,7 +779,7 @@ static int work_objload(WORK *wp,POLLINFO *oip)
 #endif
 	            if (rs < 0) {
 	                uc_free(pop->obj) ;
-	                pop->obj = NULL ;
+	                pop->obj = nullptr ;
 	            }
 	        } /* end if (memory-allocation) */
 	    }
@@ -823,7 +802,7 @@ static int work_objstarts(WORK *wp,THREAD *tip)
 	debugprintf("pcspolls/work_objstarts: ent\n") ;
 #endif
 	for (i = 0 ; vechand_get(plp,i,&pop) >= 0 ; i += 1) {
-	    if (pop != NULL) {
+	    if (pop != nullptr) {
 	        rs = pollobj_callstart(pop,tip) ;
 	        if (rs < 0) break ;
 	    }
@@ -848,7 +827,7 @@ static int work_objchecks(WORK *wp)
 	nprintf(NDF,"pcspolls/work_objchecks: ent\n") ;
 #endif
 	for (i = 0 ; vechand_get(plp,i,&pop) >= 0 ; i += 1) {
-	    if (pop != NULL) {
+	    if (pop != nullptr) {
 	        rs1 = pollobj_check(pop) ;
 	        if (rs >= 0) rs = rs1 ;
 		c += ((rs1 > 0)?1:0) ;
@@ -874,7 +853,7 @@ static int work_objfins(WORK *wp)
 	nprintf(NDF,"pcspolls/work_objfins: ent\n") ;
 #endif
 	for (i = 0 ; vechand_get(plp,i,&pop) >= 0 ; i += 1) {
-	    if (pop != NULL) {
+	    if (pop != nullptr) {
 	        rs1 = pollobj_finish(pop) ;
 	        if (rs >= 0) rs = rs1 ;
 		c += ((rs1 > 0)?1:0) ;
@@ -897,12 +876,12 @@ static int pollinfo_syms(POLLINFO *oip,void *sop,cchar *sp,int sl)
 
 	if ((rs = snwcpy(symname,SYMNAMELEN,sp,sl)) >= 0) {
 	    void	*snp ;
-	    if ((snp = dlsym(sop,symname)) != NULL) {
+	    if ((snp = dlsym(sop,symname)) != nullptr) {
 	        int	i ;
 	        oip->objname = snp ;
-	        for (i = 0 ; subs[i] != NULL ; i += 1) {
+	        for (i = 0 ; subs[i] != nullptr ; i += 1) {
 	            if ((rs = mksymname(symname,sp,sl,subs[i])) >= 0) {
-	                if ((snp = dlsym(sop,symname)) != NULL) {
+	                if ((snp = dlsym(sop,symname)) != nullptr) {
 	                    switch (i) {
 	                    case sub_start:
 	                        oip->start = (int (*)(void *)) snp ;
@@ -921,7 +900,7 @@ static int pollinfo_syms(POLLINFO *oip,void *sop,cchar *sp,int sl)
 	                        break ;
 	                    } /* end switch */
 	                } /* end if (dlsym) */
-	                if ((snp == NULL) && isrequired(i)) {
+	                if ((snp == nullptr) && isrequired(i)) {
 	                    rs = 0 ; /* mark failure */
 	                }
 	            } /* end if (mksymname) */
@@ -939,9 +918,9 @@ static int pollobj_callstart(POLLOBJ *pop,THREAD *tip)
 {
 	int		rs = SR_OK ;
 
-	if (tip == NULL) return SR_FAULT ;
+	if (tip == nullptr) return SR_FAULT ;
 
-	if (pop->obj != NULL) {
+	if (pop->obj != nullptr) {
 	    void	*pr = (void *) tip->pr ;
 	    void	*sn = (void *) tip->sn ;
 	    void	*envv = (void *) tip->envv ;
@@ -950,8 +929,8 @@ static int pollobj_callstart(POLLOBJ *pop,THREAD *tip)
 	    int	(*start)(void *,void *,void *,void *,void *) ;
 	    start = (int (*)(void *,void *,void *,void *,void *)) saddr ;
 	    if ((rs = (*start)(pop->obj,pr,sn,envv,pcp)) >= 0) {
-	        pop->f.running = TRUE ;
-	        pop->f.active = TRUE ;
+	        pop->f.running = true ;
+	        pop->f.active = true ;
 	    }
 #if	CF_DEBUGS
 	    debugprintf("pcspolls/pollobj_callstart: "
@@ -969,13 +948,13 @@ static int pollobj_check(POLLOBJ *pop)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 
 #if	CF_DEBUGN
 	nprintf(NDF,"pcspolls/pollobj_check: ent n=%s\n",pop->name) ;
 #endif
 
-	if ((pop->check != NULL) && pop->f.running) {
+	if ((pop->check != nullptr) && pop->f.running) {
 	    int	(*check)(void *) = pop->check ;
 	    rs1 = (*check)(pop->obj) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -983,10 +962,10 @@ static int pollobj_check(POLLOBJ *pop)
 #if	CF_EARLY
 	    if (f) {
 	    	int	(*finish)(void *) = pop->finish ;
-		pop->f.running = FALSE ;
+		pop->f.running = false ;
 	    	rs1 = (*finish)(pop->obj) ;
 	    	if (rs >= 0) rs = rs1 ;
-		pop->f.active = FALSE ;
+		pop->f.active = false ;
 	    }
 #endif /* CF_EARLY */
 	} /* end if (checking) */
@@ -1004,7 +983,7 @@ static int pollobj_finish(POLLOBJ *pop)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 
 #if	CF_DEBUGS
 	debugprintf("pcspolls/pollobj_finish: ent n=%s\n",pop->name) ;
@@ -1014,27 +993,27 @@ static int pollobj_finish(POLLOBJ *pop)
 	nprintf(NDF,"pcspolls/pollobj_finish: ent n=%s\n",pop->name) ;
 #endif
 
-	if ((pop->finish != NULL) && pop->f.active) {
+	if ((pop->finish != nullptr) && pop->f.active) {
 	    int	(*finish)(void *) = pop->finish ;
 	    rs1 = (*finish)(pop->obj) ;
 #if	CF_DEBUGS
 	    debugprintf("pcspolls/pollobj_finish: obj->finish() rs=%d\n",rs1) ;
 #endif
 	    if (rs >= 0) rs = rs1 ;
-	    pop->f.running = FALSE ;
-	    pop->f.active = FALSE ;
-	    f = TRUE ;
+	    pop->f.running = false ;
+	    pop->f.active = false ;
+	    f = true ;
 	}
 
-	if (pop->obj != NULL) {
+	if (pop->obj != nullptr) {
 	    rs1 = uc_free(pop->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    pop->obj = NULL ;
+	    pop->obj = nullptr ;
 	}
 
-	if (pop->sop != NULL) {
+	if (pop->sop != nullptr) {
 	   dlclose(pop->sop) ;
-	   pop->sop = NULL ;
+	   pop->sop = nullptr ;
 	}
 
 #if	CF_DEBUGN
@@ -1045,40 +1024,32 @@ static int pollobj_finish(POLLOBJ *pop)
 }
 /* end subroutine (pollobj_finish) */
 
-
-static int mksymname(char *rbuf,const char *sp,int sl,const char *sub)
-{
-	const int	rlen = SYMNAMELEN ;
+static int mksymname(char *rbuf,cchar *sp,int sl,cchar *sub) noex {
+	cint		rlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
 	int		nl = 0 ;
-
 	if (rs >= 0) {
 	    rs = storebuf_strw(rbuf,rlen,nl,sp,sl) ;
 	    nl += rs ;
 	}
-
 	if (rs >= 0) {
 	    rs = storebuf_chr(rbuf,rlen,nl,'_') ;
 	    nl += rs ;
 	}
-
 	if (rs >= 0) {
 	    rs = storebuf_strw(rbuf,rlen,nl,sub,-1) ;
 	    nl += rs ;
 	}
-
 	return (rs >= 0) ? nl : rs ;
 }
 /* end subroutine (mksymname) */
 
-
-static int isrequired(int i)
-{
-	int		f = FALSE ;
+static bool isrequired(int i) noex {
+	int		f = false ;
 	switch (i) {
 	case sub_start:
 	case sub_finish:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
