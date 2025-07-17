@@ -39,8 +39,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
@@ -68,6 +66,7 @@
 
 #include	"nlspeername.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -80,17 +79,18 @@
 
 /* local structures */
 
-struct vars {
+namespace {
+    struct vars {
 	int		maxhostlen ;
-} ;
+	operator int () noex ;
+    } ;
+} /* end namespace */
 
 
 /* forward references */
 
 static int	nlspeername_unix(char *,cchar *,cchar *,int) noex ;
 static int	nlspeername_inet4(char *,cchar *,cchar *,int) noex ;
-
-static int	mkvars() noex ;
 
 
 /* local variables */
@@ -111,7 +111,7 @@ int nlspeername(cchar *addr,cchar *dn,char *pn) noex {
 	    rs = SR_INVALID ;
 	    pn[0] = '\0' ;
 	    if (al >= 16) {
-		static cint	rsv = mkvars() ;
+		static cint	rsv = var ;
 		if ((rs = rsv) >= 0) {
 	            if (int af ; (rs = cfhexi(addr,4,&af)) >= 0) {
 			switch (af) {
@@ -125,7 +125,7 @@ int nlspeername(cchar *addr,cchar *dn,char *pn) noex {
 			    break ;
 	                } /* end switch (recognized the address family) */
 	            } /* end if (cfhexi) */
-		} /* end if (mkvars) */
+		} /* end if (vars) */
 	    } /* end if (good) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -179,7 +179,7 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	                            while ((rs = henum(&he,&hc,&hp)) > 0) {
 	                                if (isindomain(hp,dn)) {
 	                                    cp = strwcpy(pn,he.h_name,nlen) ;
-	                                    len = (cp - pn) ;
+	                                    len = intconv(cp - pn) ;
 	                                    break ;
 	                                }
 	                            } /* end while */
@@ -190,7 +190,7 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	                    if (rs >= 0) {
 	                        if ((pn[0] == '\0') && he.h_name) {
 	                            cp = strwcpy(pn,he.h_name,nlen) ;
-	                            len = (cp - pn) ;
+	                            len = intconv(cp - pn) ;
 	                        }
 	                    } /* end if (ok) */
 	                } else {
@@ -206,13 +206,12 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 }
 /* end subroutine (nlspeername_inet4) */
 
-static int mkvars() noex {
+vars::operator int () noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
 	    var.maxhostlen = rs ;
 	}
 	return rs ;
-}
-/* end subroutine (mkvars) */
+} /* end method (vars::operator) */
 
 
