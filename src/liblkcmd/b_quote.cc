@@ -1,14 +1,14 @@
-/* b_quote */
+/* b_quote SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* query the bible database using words as the query keys */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_COOKIE	0		/* use cookie as separator */
-
 
 /* revision history:
 
@@ -22,16 +22,15 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  This little program looks
-	up a number in a database and returns the corresponding string.
+  	Description:
+	This is a built-in command to the KSH shell.  This little
+	program looks up a number in a database and returns the
+	corresponding string.
 
 	Synopsis:
-
 	$ quote <word(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -47,25 +46,28 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-
+#include	<new>			/* |nothrow(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
 #include	<userinfo.h>
 #include	<field.h>
-#include	<char.h>
 #include	<vecstr.h>
 #include	<paramfile.h>
 #include	<expcook.h>
 #include	<wordfill.h>
 #include	<prmkfname.h>
+#include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -102,44 +104,21 @@
 #define	LOCINFO		struct locinfo
 #define	LOCINFO_FL	struct locinfo_flags
 
+#define	PI		proginfo
+
+#define	CF		config
+
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfcasesub(cchar *,int,cchar *,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	hasnonwhite(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isStrEmpty(cchar *,int) ;
-
-extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) noex ;
+extern int	proginfo_setpiv(PROGINFO *,cchar *,const pivars *) noex ;
 
 #if	CF_DEBUG || CF_DEBUGS
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -166,16 +145,16 @@ struct locinfo_flags {
 
 struct locinfo {
 	void		*ofp ;
-	cchar	*homedname ;
-	cchar	*org ;
-	cchar	*name ;
-	cchar	*fullname ;
+	cchar		*homedname ;
+	cchar		*org ;
+	cchar		*name ;
+	cchar		*fullname ;
 	char		*ndbname ;
-	PROGINFO	*pip ;
-	LOCINFO_FL	have, f, changed, final ;
+	proginfo	*pip ;
+	LOCINFO_FL	have, fl, changed, fin ;
 	LOCINFO_FL	open ;
-	BIBLEBOOK	ndb ;		/* bible-book-name DB */
-	QUOTE		qdb ;
+	biblebook	ndb ;		/* bible-book-name DB */
+	quote		qdb ;
 	vecstr		quotedirs ;
 	vecstr		quotenames ;
 	int		linelen ;
@@ -191,10 +170,10 @@ struct config_flags {
 } ;
 
 struct config {
-	PROGINFO	*pip ;
-	PARAMFILE	params ;
-	EXPCOOK		cooks ;
-	struct config_flags	f ;
+	proginfo	*pip ;
+	paramfile	params ;
+	expcook		cooks ;
+	config_flags	fl ;
 } ;
 
 
@@ -202,24 +181,24 @@ struct config {
 
 static int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+static int	usage(PI *) ;
 
-static int	config_init(struct config *,PROGINFO *,cchar *) ;
-static int	config_check(struct config *) ;
-static int	config_read(struct config *) ;
-static int	config_free(struct config *) ;
-static int	config_files(struct config *,vecstr *) ;
-static int	config_loadcooks(struct config *) ;
+static int	config_start(CF *,PI *,cchar *) ;
+static int	config_check(CF *) ;
+static int	config_read(CF *) ;
+static int	config_finish(CF *) ;
+static int	config_files(CF *,vecstr *) ;
+static int	config_loadcooks(CF *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procspecs(PROGINFO *,cchar *,int) ;
-static int	procspec(PROGINFO *,vecstr *) ;
-static int	procnames(PROGINFO *,PARAMOPT *) ;
+static int	procopts(PI *,KEYOPT *) ;
+static int	procspecs(PI *,cchar *,int) ;
+static int	procspec(PI *,vecstr *) ;
+static int	procnames(PI *,PARAMOPT *) ;
 
-static int	procout(PROGINFO *,cchar *,int) ;
-static int	procoutline(PROGINFO *,int,cchar *,int) ;
+static int	procout(PI *,cchar *,int) ;
+static int	procoutline(PI *,int,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
+static int	locinfo_start(LOCINFO *,PI *) ;
 static int	locinfo_finish(LOCINFO *) ;
 static int	locinfo_deflinelen(LOCINFO *) ;
 static int	locinfo_nlookup(LOCINFO *,int,char *,int) ;
@@ -371,7 +350,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO	li, *lip = &li ;
-	struct config	co ;
+	CF	co ;
 	BITS		pargs ;
 	KEYOPT		akopts ;
 	PARAMOPT	aparams ;
@@ -672,7 +651,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -723,7 +702,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'p':
-	                        lip->f.prefix = TRUE ;
+	                        lip->fl.prefix = TRUE ;
 	                        break ;
 
 	                    case 'q':
@@ -959,7 +938,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 		pip->progname,configfname) ;
 
 	pip->config = &co ;
-	rs = config_init(pip->config,pip,configfname) ;
+	rs = config_start(pip->config,pip,configfname) ;
 	pip->open.config = (rs > 0) ;
 	if (rs < 0) {
 	    ex = EX_OSERR ;
@@ -1036,7 +1015,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto badquoteopen ;
 	}
 
-	if (lip->f.audit) {
+	if (lip->fl.audit) {
 	    rs = quote_audit(&lip->qdb) ;
 
 #if	CF_DEBUG
@@ -1154,7 +1133,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if ((rs < 0) && (ex == EX_OK)) {
 	    ex = mapex(mapexs,rs) ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        shio_printf(pip->efp,
 	            "%s: could not perform function (%d)\n",
 	            pip->progname,rs) ;
@@ -1173,7 +1152,7 @@ badaudit:
 badquoteopen:
 	if (pip->open.config) {
 	    pip->open.config = FALSE ;
-	    config_free(pip->config) ;
+	    config_finish(pip->config) ;
 	}
 
 badinitconfig:
@@ -1226,7 +1205,7 @@ badprogstart:
 /* end subroutine (mainsub) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+static int locinfo_start(LOCINFO *lip,PI *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1234,7 +1213,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	lip->pip = pip ;
 	lip->count = -1 ;
 	lip->max = -1 ;
-	lip->f.separate = TRUE ;
+	lip->fl.separate = TRUE ;
 
 	return rs ;
 }
@@ -1246,9 +1225,9 @@ static int locinfo_finish(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip->have.ndb && lip->f.ndb) {
+	if (lip->have.ndb && lip->fl.ndb) {
 	    lip->have.ndb = FALSE ;
-	    lip->f.ndb = FALSE ;
+	    lip->fl.ndb = FALSE ;
 	    rs1 = biblebook_close(&lip->ndb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1302,7 +1281,7 @@ static int locinfo_nlookup(LOCINFO *lip,int bi,char *buf,int buflen)
 	if (! lip->have.ndb) {
 	    lip->have.ndb = TRUE ;
 	    rs = biblebook_open(&lip->ndb,pip->pr,lip->ndbname) ;
-	    lip->f.ndb = (rs >= 0) ;
+	    lip->fl.ndb = (rs >= 0) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -1313,7 +1292,7 @@ static int locinfo_nlookup(LOCINFO *lip,int bi,char *buf,int buflen)
 	} /* end if */
 
 	if (rs >= 0) {
-	    if (lip->f.ndb) {
+	    if (lip->fl.ndb) {
 	        rs = biblebook_get(&lip->ndb,bi,buf,buflen) ;
 	        len = rs ;
 	    } else
@@ -1330,7 +1309,7 @@ static int locinfo_nlookup(LOCINFO *lip,int bi,char *buf,int buflen)
 /* end subroutine (locinfo_nlookup) */
 
 
-static int usage(PROGINFO *pip)
+static int usage(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1355,8 +1334,8 @@ static int usage(PROGINFO *pip)
 
 
 /* configuration maintenance */
-static int config_init(cfp,pip,configfname)
-struct config	*cfp ;
+static int config_start(cfp,pip,configfname)
+CF	*cfp ;
 PROGINFO	*pip ;
 cchar	*configfname ;
 {
@@ -1372,7 +1351,7 @@ cchar	*configfname ;
 	if (cfp == NULL)
 	    return SR_FAULT ;
 
-	memset(cfp,0,sizeof(struct config)) ;
+	memset(cfp,0,sizeof(CF)) ;
 
 	cfp->pip = pip ;
 	pp = &cfp->params ;
@@ -1381,7 +1360,7 @@ cchar	*configfname ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("config_init: paramfile_open() rs=%d \n",rs) ;
+	    debugprintf("config_start: paramfile_open() rs=%d \n",rs) ;
 #endif
 
 	if (rs < 0)
@@ -1389,7 +1368,7 @@ cchar	*configfname ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("config_init: configfname=%s\n",configfname) ;
+	    debugprintf("config_start: configfname=%s\n",configfname) ;
 #endif
 
 	if ((configfname != NULL) && (configfname[0] != '\0')) {
@@ -1401,7 +1380,7 @@ cchar	*configfname ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("config_init: 1 paramfile_fileadd() rs=%d \n",rs) ;
+	    debugprintf("config_start: 1 paramfile_fileadd() rs=%d \n",rs) ;
 #endif
 
 	    }
@@ -1420,7 +1399,7 @@ cchar	*configfname ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("config_init: 2 paramfile_fileadd() rs=%d \n",rs) ;
+	    debugprintf("config_start: 2 paramfile_fileadd() rs=%d \n",rs) ;
 #endif
 
 			if (rs < 0)
@@ -1437,7 +1416,7 @@ cchar	*configfname ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("config_init: mid rs=%d c=%u\n",rs,c) ;
+	    debugprintf("config_start: mid rs=%d c=%u\n",rs,c) ;
 #endif
 
 	if ((rs < 0) || (c == 0))
@@ -1451,7 +1430,7 @@ cchar	*configfname ;
 	if (rs < 0)
 	    goto bad2 ;
 
-	cfp->f.p = TRUE ;
+	cfp->fl.p = TRUE ;
 	rs = config_read(cfp) ;
 	if (rs < 0)
 	    goto bad2 ;
@@ -1461,7 +1440,7 @@ ret0:
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("config_init: ret rs=%d c=%u\n",rs,c) ;
+	    debugprintf("config_start: ret rs=%d c=%u\n",rs,c) ;
 #endif
 
 	return (rs >= 0) ? c : rs ;
@@ -1476,11 +1455,11 @@ bad1:
 bad0:
 	goto ret1 ;
 }
-/* end subroutine (config_init) */
+/* end subroutine (config_start) */
 
 
 static int config_files(cfp,flp)
-struct config	*cfp ;
+CF	*cfp ;
 vecstr		*flp ;
 {
 	PROGINFO	*pip = cfp->pip ;
@@ -1571,7 +1550,7 @@ ret0:
 
 
 static int config_loadcooks(cfp)
-struct config	*cfp ;
+CF	*cfp ;
 {
 	PROGINFO	*pip = cfp->pip ;
 	EXPCOOK		*ckp ;
@@ -1604,7 +1583,7 @@ struct config	*cfp ;
 
 
 static int config_check(cfp)
-struct config	*cfp ;
+CF	*cfp ;
 {
 	PROGINFO	*pip = cfp->pip ;
 	int		rs = SR_NOTOPEN ;
@@ -1612,7 +1591,7 @@ struct config	*cfp ;
 	if (cfp == NULL)
 	    return SR_FAULT ;
 
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 	    if ((rs = paramfile_check(&cfp->params,pip->daytime)) > 0)
 	        rs = config_read(cfp) ;
 	}
@@ -1622,8 +1601,8 @@ struct config	*cfp ;
 /* end subroutine (config_check) */
 
 
-static int config_free(cfp)
-struct config	*cfp ;
+static int config_finish(cfp)
+CF	*cfp ;
 {
 	PROGINFO	*pip = cfp->pip ;
 	int		rs = SR_NOTOPEN ;
@@ -1631,7 +1610,7 @@ struct config	*cfp ;
 	if (cfp == NULL)
 	    return SR_FAULT ;
 
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 
 	    expcook_finish(&cfp->cooks) ;
 
@@ -1641,19 +1620,16 @@ struct config	*cfp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("config_free: ret rs=%d\n",rs) ;
+	    debugprintf("config_finish: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
 }
-/* end subroutine (config_free) */
+/* end subroutine (config_finish) */
 
-
-static int config_read(cfp)
-struct config	*cfp ;
-{
-	PROGINFO	*pip = cfp->pip ;
-	LOCINFO	*lip ;
+static int config_read(CF *cfp) noex {
+	proginfo	*pip = cfp->pip ;
+	LOCINFO		*lip ;
 	PARAMFILE	*pfp ;
 	PARAMFILE_CUR	cur ;
 	PARAMFILE_ENT	pe ;
@@ -1680,10 +1656,10 @@ struct config	*cfp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("config_read: f_p=%u\n",cfp->f.p) ;
+	    debugprintf("config_read: f_p=%u\n",cfp->fl.p) ;
 #endif
 
-	if (! cfp->f.p) {
+	if (! cfp->fl.p) {
 	    rs = SR_NOTOPEN ;
 	    goto ret0 ;
 	}
@@ -1819,7 +1795,7 @@ ret0:
 
 
 /* process the program ako-names */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PI *pip,KEYOPT *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1848,10 +1824,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.audit) {
 	                lip->have.audit = TRUE ;
 	                lip->final.audit = TRUE ;
-	                lip->f.audit = TRUE ;
+	                lip->fl.audit = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    lip->f.audit = (rs > 0) ;
+	                    lip->fl.audit = (rs > 0) ;
 			}
 	            }
 	            break ;
@@ -1859,7 +1835,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.linelen) {
 	                lip->have.linelen = TRUE ;
 	                lip->final.linelen = TRUE ;
-	                lip->f.linelen = TRUE ;
+	                lip->fl.linelen = TRUE ;
 	                if (vl > 0) {
 			    rs = optvalue(vp,vl) ;
 	                    lip->linelen = rs ;
@@ -1870,7 +1846,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.indent) {
 	                lip->have.indent = TRUE ;
 	                lip->final.indent = TRUE ;
-	                lip->f.indent = TRUE ;
+	                lip->fl.indent = TRUE ;
 			lip->indent = 1 ;
 	                if (vl > 0) {
 			    rs = optvalue(vp,vl) ;
@@ -1882,10 +1858,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.interactive) {
 	                lip->have.interactive = TRUE ;
 	                lip->final.interactive = TRUE ;
-	                lip->f.interactive = TRUE ;
+	                lip->fl.interactive = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    lip->f.interactive = (rs > 0) ;
+	                    lip->fl.interactive = (rs > 0) ;
 		        }
 		    }
 		    break ;
@@ -1893,10 +1869,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.prefix) {
 	                lip->have.prefix = TRUE ;
 	                lip->final.prefix = TRUE ;
-	                lip->f.prefix = TRUE ;
+	                lip->fl.prefix = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    lip->f.prefix = (rs > 0) ;
+	                    lip->fl.prefix = (rs > 0) ;
 		        }
 		    }
 		    break ;
@@ -1904,10 +1880,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.separate) {
 	                lip->have.separate = TRUE ;
 	                lip->final.separate = TRUE ;
-	                lip->f.separate = TRUE ;
+	                lip->fl.separate = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    lip->f.separate = (rs > 0) ;
+	                    lip->fl.separate = (rs > 0) ;
 			}
 	            }
 	            break ;
@@ -1942,7 +1918,7 @@ int		sl ;
 	if (sp == NULL)
 	    return SR_FAULT ;
 
-	if (lip->f.interactive)
+	if (lip->fl.interactive)
 	    lip->cout = 0 ;
 
 	if ((rs = vecstr_start(&qstr,5,0)) >= 0) {
@@ -1994,7 +1970,7 @@ vecstr		*qsp ;
 	if (qsp == NULL)
 	    return SR_FAULT ;
 
-	if (lip->f.prefix)
+	if (lip->fl.prefix)
 	    qopts |= QUOTE_OPREFIX ;
 
 	rs = quote_curbegin(&lip->qdb,&cur) ;
@@ -2072,11 +2048,9 @@ int		buflen ;
 	fmt = "\n" ;
 #endif
 
-	if (lip->f.separate && (lip->cout++ > 0)) {
-
+	if (lip->fl.separate && (lip->cout++ > 0)) {
 	    rs = shio_printf(lip->ofp,fmt) ;
 	    wlen += rs ;
-
 	} /* end if (separator) */
 
 	if (rs < 0)
@@ -2135,7 +2109,7 @@ ret0:
 }
 /* end subroutine (procout) */
 
-static int procoutline(PROGINFO *pip,int line,cchar *lp,int ll) noex {
+static int procoutline(PI *pip,int line,cchar *lp,int ll) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		indent ;
