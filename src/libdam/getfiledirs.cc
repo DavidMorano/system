@@ -61,9 +61,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strchr(3c)| */
@@ -79,6 +76,7 @@
 #include	<pathadd.h>
 #include	<strwcpy.h>
 #include	<sfx.h>
+#include	<mkx.h>
 #include	<mkchar.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -269,8 +267,8 @@ int getter::checks(cc *dp,int dl) noex {
 
 int getter::checker(cc *dp,int dl) noex {
     	int		rs = SR_OK ;
-	int		c = 0 ;
-	bool		ty{} ;
+	int		c = 0 ; /* return-value */
+	bool		ty{} ; /* used-multiple */
 	if (dl > 0) {
 	    if ((rs = mknpathw(pbuf,plen,dp,dl)) >= 0) {
 		cint	dm = (R_OK|X_OK) ;
@@ -300,13 +298,13 @@ int getter::checker(cc *dp,int dl) noex {
 }
 /* end method (getter::checker) */
 
-int getter::checkname(bool fdir,int am) noex {
+int getter::checkname(bool fdir,int um) noex {
     	int		rs ;
 	int		c = 0 ;
-	if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
 	    cmode	pm = sb.st_mode ;
 	    if ((fdir && S_ISDIR(pm)) || ((!fdir) && S_ISREG(pm))) {
-	        if ((rs = permid(&id,&sb,am)) >= 0) {
+	        if ((rs = permid(&id,&sb,um)) >= 0) {
 	            c = 1 ;
 	        } else if (isNotAccess(rs)) {
 		    rs = SR_OK ;
