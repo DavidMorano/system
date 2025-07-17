@@ -42,12 +42,12 @@ struct devpermfile_flags {
 
 struct devpermfile_head {
 	cchar		*fname ;
-	vecobj		keys ;
-	vecobj		entries ;	/* parameter entries */
-	DEVPERMFILE_FL	fl ;
+	vecobj		*klp ;		/* key-list-pointer */
+	vecobj		*elp ;		/* entry-list-pointer */
 	off_t		fsize ;
 	time_t		ti_check ;	/* time last checked */
 	time_t		ti_mod ;
+	DEVPERMFILE_FL	fl ;
 	uint		magic ;
 	int		intcheck ;	/* check interval (seconds) */
 	int		intchange ;	/* file-change interval (seconds) */
@@ -57,8 +57,8 @@ struct devpermfile_head {
 struct devpermfile_entry {
 	cchar		*console ;
 	cchar		*dev ;
-	mode_t		devmode ;
 	int		devlen ;
+	mode_t		devmode ;
 } ;
 
 struct devpermfile_cursor {
