@@ -56,6 +56,7 @@
 
 #include	"sysnamedb.h"
 
+import libutil ;
 
 /* local defines */
 
