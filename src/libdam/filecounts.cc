@@ -44,9 +44,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
@@ -74,6 +71,7 @@
 
 #include	"filecounts.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -89,7 +87,7 @@
 #define	WORKER_CMDINC	1
 #define	WORKER_CMDSET	2
 
-#define	DEFNENTRIES	10
+#define	DEFENTS	10
 
 #define	TO_LOCK		4		/* seconds */
 
@@ -326,7 +324,7 @@ int filecounts_cursnap(FC *op,FC_CUR *curp) noex {
 	    if (op->ncursors > 0) {
 	        cint	iisz = szof(FC_II) ;
 	        cint	to = TO_LOCK ;
-	        int	vn = DEFNENTRIES ;
+	        int	vn = DEFENTS ;
 	        int	vo = 0 ;
 	        if (vecobj tlist ; (rs = tlist.start(iisz,vn,vo)) >= 0) {
 	            if ((rs = lockfile(op->fd,F_RLOCK,0z,0z,to)) >= 0) {
@@ -527,7 +525,7 @@ static int filecounts_updateone(FC *op,cchar *tbuf,WORKER_ENT *wep) noex {
 	switch (na) {
 	case WORKER_CMDINC:
 	    if (ni >= 0) {
-	        nv = uiaddsat(wep->ovalue,wep->avalue) ;
+	        nv = addsat(wep->ovalue,wep->avalue) ;
 	    } else {
 	        nv = (wep->ovalue + 1) ;
 	    }
@@ -572,7 +570,7 @@ static int filecounts_append(FC *op,cchar *tbuf,WORKER_ENT *wep) noex {
 	        wlen += rs ;
 	        if (off_t eoff{} ; (rs = u_seeko(op->fd,0z,w,&eoff)) >= 0) {
 	            rs = u_write(op->fd,ubuf,wlen) ;
-	            wep->eoff = eoff ;
+	            wep->eoff = intconv(eoff) ;
 	        }
 	    } /* end if (mkentry) */
 	    rs = rsfree(rs,ubuf) ;
@@ -651,7 +649,7 @@ static int filecounts_snaperline(FC *op,dater *dmp,vecobj *ilp,
 	        cl = FILECOUNTS_NUMDIGITS ;
 	        if (uint v{} ; (rs = cfdecui(cp,cl,&v)) >= 0) {
 	            {
-	                sl -= ((cp + cl + 1) - sp) ;
+	                sl -= intconv((cp + cl + 1) - sp) ;
 	                sp = (cp + cl + 1) ;
 	            }
 	            cp = sp ;
@@ -660,7 +658,7 @@ static int filecounts_snaperline(FC *op,dater *dmp,vecobj *ilp,
 	                time_t	utime ;
 	                if ((rs = dater_gettime(dmp,&utime)) >= 0) {
 		            {
-	                        sl -= ((cp + cl + 1) - sp) ;
+	                        sl -= intconv((cp + cl + 1) - sp) ;
 	                        sp = (cp + cl + 1) ;
 		            }
 		            {
@@ -702,9 +700,9 @@ static int filecounts_lockend(FC *op) noex {
 
 static int worker_start(WORKER *wp,FC_N *nlp) noex  {
 	cint		wesz = szof(WORKER_ENT) ;
-	cint		vn = DEFNENTRIES ;
+	cint		vn = DEFENTS ;
 	int		rs ;
-	int		vo = VECOBJ_OCOMPACT ;
+	int		vo = vecobjm.compact ;
 	memclear(wp) ;
 	wp->nlp = nlp ;
 	if ((rs = vecobj_start(&wp->wlist,wesz,vn,vo)) >= 0) {
