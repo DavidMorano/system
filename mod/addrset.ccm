@@ -135,7 +135,7 @@ export {
 	void	dtor() noex ;
     public:
 	destruct addrset() {
-	    dtor() ;
+	    if (magic) dtor() ;
 	} ; /* end if (dtor) */
    } ; /* end struct (addrset) */
 } /* end export (addrset) */
