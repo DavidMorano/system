@@ -17,6 +17,9 @@
 
 /*******************************************************************************
 
+  	Object:
+	linehist
+
 	Names:
 	linehist_start
 	linehist_proc
@@ -42,7 +45,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<vector>
-#include	<new>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<usystem.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
@@ -84,7 +87,7 @@ namespace {
 	    return ln ; 
 	} ;
     } ; /* end struct (item) */
-}
+} /* end namespace */
 
 typedef vector<item>	ivec ;
 typedef vector<item> *	ivecp ;
@@ -226,7 +229,7 @@ int linehist_proc(linehist *op,int ln,cchar *sp,int sl) noex {
 		    sp += 1 ;
 		    sl -= 1 ;
 	        } /* end while */
-	        c = lvp->size() ;
+	        c = intconv(lvp->size()) ;
 	    } else {
 	        rs = SR_BUGCHECK ;
 	    }
@@ -241,7 +244,7 @@ int linehist_count(linehist *op) noex {
 	int		c = 0 ;
 	if ((rs = linehist_magic(op)) >= 0) {
 	    if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) {
-	        c = lvp->size() ;
+	        c = intconv(lvp->size()) ;
 	    } else {
 	        rs = SR_BUGCHECK ;
 	    }
@@ -258,10 +261,10 @@ int linehist_get(linehist *op,int i,int *lnp) noex {
 	    rs = SR_INVALID ;
 	    if (i >= 0) {
 	        if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) {
-	            cint	len = lvp->size() ;
+	            cint	len = intconv(lvp->size()) ;
 	            if (i < len) {
 	                item	vi = lvp->at(i) ;
-		        type = (vi.type()+1) ;
+		        type = (vi.type() + 1) ;
 		        if (lnp != nullptr) {
 		            *lnp = vi.line() ;
 		        }
