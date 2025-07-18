@@ -41,9 +41,6 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>
@@ -56,8 +53,6 @@ module ;
 module filerec ;
 
 /* local defines */
-
-#define	FONCE_DEFTABLEN		100
 
 
 /* imported namespaces */
@@ -92,34 +87,20 @@ using std::nothrow ;			/* constant */
 
 /* local subroutines (methods) */
 
-int filerec::curbegin(filerec_cur *curp) noex {
-	int		rs = SR_NOTOPEN ;
-	if (setp && curp) {
-	    rs = SR_OK ;
-	    curp->it = setp->begin() ;
-	} /* end if (valid) */
-	return rs ;
-} /* end method (filerec::curbegin) */
+filerec_iter filerec::begin() noex {
+    	filerec_iter	it ;
+	if (setp) ylikely {
+	    it.baseit = setp->begin() ;
+	}
+    	return it ;
+} /* end method (filerec::begin) */
 
-int filerec::curend(filerec_cur *curp) noex {
-	int		rs = SR_NOTOPEN ;
-	if (setp && curp) {
-	    rs = SR_OK ;
-	    curp->it = setp->end() ;
-	} /* end if (valid) */
-	return rs ;
-} /* end method (filerec::curend) */
-
-int filerec::curenum(filerec_cur *curp,filerec_ent *ep) noex {
-	int		rs = SR_NOTOPEN ;
-	if (setp && curp && ep) {
-	    stype::iterator ite = setp->end() ;
-	    rs = SR_NOTFOUND ;
-	    if (curp->it != ite) {
-		*ep = *curp->it++ ;
-	    }
-	} /* end if (valid) */
-	return rs ;
-} /* end method (filerec::curenum) */
+filerec_iter filerec::end() noex {
+    	filerec_iter	it ;
+	if (setp) ylikely {
+	    it.baseit = setp->end() ;
+	}
+    	return it ;
+} /* end method (filerec::end) */
 
 
