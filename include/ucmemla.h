@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* object to provide large0allocation memory */
+/* object to provide large-allocation memory */
 /* version %I% last-modified %G% */
 
 
