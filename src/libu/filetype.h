@@ -45,7 +45,7 @@ enum filetypes {
 	filetype_wht,			/* 14 - "event port" on Solaris® */
 	filetype_unassigned15,		/* 15 */
 	filetype_overlast,
-	filetype_pipe = filetype_fifo
+	filetype_pipe = filetype_fifo	/* alias */
 } ; /* end enum (filestypes */
 
 
