@@ -36,9 +36,13 @@
 #ifndef	_SECDB_H
 #define	_SECDB_H
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	DEFAULT_POLICY		"solaris"
@@ -79,37 +83,36 @@ extern "C" {
 typedef struct kv_s {
 	char   *key;
 	char   *value;
-} kv_t;					/* A key-value pair */
+} kv_t ;				/* A key-value pair */
 
 typedef struct kva_s {
 	int	length;			/* array length */
 	kv_t    *data;			/* array of key value pairs */
-} kva_t;				/* Key-value array */
+} kva_t ;				/* Key-value array */
 
+EXTERNC_begin
 
-extern char *kva_match(kva_t *, char *);
-extern int _auth_match(const char *, const char *);
-extern char *_argv_to_csl(char **strings);
-extern char **_csl_to_argv(char *csl);
-extern char *_do_unescape(char *src);
-extern void _free_argv(char **p_argv);
-extern int _insert2kva(kva_t *, char *, char *);
-extern int _kva2str(kva_t *, char *, int, char *, char *);
-extern kva_t *_kva_dup(kva_t *);
-extern void _kva_free(kva_t *);
-extern void _kva_free_value(kva_t *, char *);
-extern kva_t *_new_kva(int size);
-extern kva_t *_str2kva(char *, char *, char *);
-extern int _enum_auths(const char *, int (*)(const char *, void *, void *),
-    void *ctxt, void *pres);
-extern int _enum_profs(const char *,
-    int (*)(const char *, kva_t *, void *, void *), void *ctxt, void *pres);
-extern int _enum_attrs(const char *,
-    int (*)(const char *, kva_t *, void *, void *), void *ctxt, void *pres);
+extern char *kva_match(kva_t *, char *) noex ;
+extern int _auth_match(cchar *, cchar *) noex ;
+extern char *_argv_to_csl(char **strings) noex ;
+extern char **_csl_to_argv(char *csl) noex ;
+extern char *_do_unescape(char *src) noex ;
+extern void _free_argv(char **p_argv) noex ;
+extern int _insert2kva(kva_t *, char *, char *) noex ;
+extern int _kva2str(kva_t *, char *, int, char *, char *) noex ;
+extern kva_t *_kva_dup(kva_t *) noex ;
+extern void _kva_free(kva_t *) noex ;
+extern void _kva_free_value(kva_t *, char *) noex ;
+extern kva_t *_new_kva(int size) noex ;
+extern kva_t *_str2kva(char *, char *, char *) noex ;
+extern int _enum_auths(cchar *, int (*)(cchar *, void *, void *),
+    void *ctxt, void *pres) noex ;
+extern int _enum_profs(cchar *,
+    int (*)(cchar *, kva_t *, void *, void *), void *ctxt, void *pres) noex ;
+extern int _enum_attrs(cchar *,
+    int (*)(cchar *, kva_t *, void *, void *), void *ctxt, void *pres) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif	/* _SECDB_H */
