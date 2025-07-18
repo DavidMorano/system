@@ -60,12 +60,13 @@ struct linebuffer : linebuffer_head {
 	linebuffer() noex {
 	    start(this,linebuffermem_start) ;
 	    finish(this,linebuffermem_finish) ;
+	    lbuf = nullptr ;
 	} ;
 	linebuffer(const linebuffer &) = delete ;
 	linebuffer &operator = (const linebuffer &) = delete ;
 	void dtor() noex ;
-	~linebuffer() {
-	    dtor() ;
+	destruct linebuffer() {
+	    if (lbuf) dtor() ;
 	} ;
 } ; /* end struct (linebuffer) */
 #else /* __cplusplus */
