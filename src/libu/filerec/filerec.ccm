@@ -26,8 +26,8 @@
 	filerec
 
 	Description:
-	This object implements a set with a key consisting of
-	device and inode numbers.
+	This object implements a set (an un-ordered set) with a key
+	consisting of device and inode numbers.
 
 	Symopsis:
 	int filerec_start(int n = 0) noex
@@ -45,8 +45,6 @@ module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>		/* |dev_t| + |ino_t| */
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<utility>
@@ -60,31 +58,40 @@ module ;
 
 export module filerec ;
 
+cint		filerec_deftablen = 100 ;
+
 export {
-    struct filerec_devino {
+    struct filerec_ent {
 	cchar		*fname{} ;
+	time_t		timod ;
+	off_t		fsize ;
 	ino_t		ino ;
 	dev_t		dev ;
-	filerec_devino(dev_t d,ino_t i) noex : dev(d), ino(i) { } ;
+	mode_t		fm ;
+	filerec_ent(dev_t d,ino_t i,mode_t m) noex : dev(d), ino(i), fm(m) { } ;
 	size_t hashval() const noex {
 	    return size_t(dev + ino) ;
 	} ;
-	bool equal_to(const filerec_devino &o) noex {
+	bool equal_to(const filerec_ent &o) noex {
 	    return ((dev == o.dev) && (ino == o.ino)) ;
 	} ;
-    } ; /* end struct (filerec_devino) */
+	void load(time_t t,off_t s) noex {
+	    timod = t ;
+	    fsize = s ;
+	} ;
+    } ; /* end struct (filerec_ent) */
     namespace std {
-        template<> struct hash<filerec_devino> {
-	    size_t operator() (const filerec_devino &di) const noex {
+        template<> struct hash<filerec_ent> {
+	    size_t operator() (const filerec_ent &di) const noex {
 	        return di.hashval() ;
 	    } ;
-        } ; /* end struct-template (hash<filerec_devino>) */
-        template<> struct equal_to<filerec_devino> {
-	    typedef const filerec_devino	cdi ;
+        } ; /* end struct-template (hash<filerec_ent>) */
+        template<> struct equal_to<filerec_ent> {
+	    typedef const filerec_ent	cdi ;
 	    size_t operator() (cdi &lhs,cdi &rhs) const noex {
 	        return ((lhs.dev == rhs.dev) && (lhs.ino == rhs.ino)) ;
 	    } ;
-        } ; /* end struct-template (hash<filerec_devino>) */
+        } ; /* end struct-template (hash<filerec_ent>) */
     } /* end namespace) */
 } /* end export */
 
@@ -95,8 +102,12 @@ enum filerecmems {
 	filerecmem_overlast
 } ; /* end enum (filerecmems) */
 
+typedef std::unordered_set<filerec_ent>	filerec_base ;
+
 export {
     struct filerec ;
+    struct filerec_cur ;
+    struct filerec_iter ;
     struct filerec_co {
 	filerec		*op = nullptr ;
 	int		w = -1 ;
@@ -110,12 +121,12 @@ export {
 	} ;
     } ; /* end struct (filerec_co) */
     struct filerec {
-	friend filerec_co ;
-	typedef std::unordered_set<filerec_devino>	stype ;
-	typedef filerec_devino	key_type ;
+	friend		filerec_co ;
+	typedef filerec_base	stype ;
+	typedef filerec_ent	key_type ;
 	filerec(const filerec &) = delete ;
 	filerec &operator = (const filerec &) = delete ;
-	stype		*setp = nullptr ;
+	filerec_base	*setp = nullptr ;
 	filerec_co	start ;
 	filerec_co	finish ;
 	filerec_co	count ;
@@ -130,12 +141,33 @@ export {
 	    if (setp) dtor() ;
 	} ; /* end dtor */
 	int		checkin(custat *,cchar *) noex ;
+	int		curbegin(filerec_cur *) noex ;
+	int		curend(filerec_cur *) noex ;
+	int		curenum(filerec_cur *,filerec_ent *) noex ;
+	filerec_iter begin() noex ;
+	filerec_iter end() noex ;
     private:
 	int		istart(int) noex ;
 	int		ifinish() noex ;
 	int		icount() noex ;
 	int		finents() noex ;
     } ; /* end class (filerec) */
+    struct filerec_cur {
+	filerec_base::iterator	it ;
+    } ; /* end struct (filerec_cur) */
+    struct filerec_iter {
+	filerec_base::iterator	baseit ;
+	filerec_iter() = default ;
+	filerec_iter(const filerec_iter &) = default ;
+	filerec_iter &operator = (const filerec_iter &) = default ;
+	bool operator != (const filerec_iter &) noex ;
+	bool operator == (const filerec_iter &) noex ;
+	filerec_ent operator * () noex ;
+	filerec_iter operator + (int) const noex ;
+	filerec_iter &operator += (int) noex ;
+	filerec_iter operator ++ () noex ; /* pre */
+	filerec_iter operator ++ (int) noex ; /* post */
+    } ; /* end struct filerec_iter) */
 } /* end export */
 
 
