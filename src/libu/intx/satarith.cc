@@ -129,7 +129,7 @@ longlong lladdsat(longlong v1,longlong v2) noex {
 }
 /* end subroutine (lladdsat) */
 
-uint uaddsat(uint v1,uint v2) noex {
+uint uiaddsat(uint v1,uint v2) noex {
 	return xuaddsat(v1,v2) ;
 }
 /* end subroutine (uaddsat) */
