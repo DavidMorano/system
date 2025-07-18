@@ -140,7 +140,7 @@
 #include	<grcache.h>
 #include	<grmems.h>
 #include	<hash.h>
-#include	<hasnonpath.h>
+#include	<nonpath.h>
 #include	<hasx.h>
 #include	<hdb.h>
 #include	<hdbstr.h>
