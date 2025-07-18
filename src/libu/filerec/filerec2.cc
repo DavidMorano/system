@@ -41,9 +41,6 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>
@@ -92,7 +89,7 @@ using std::nothrow ;			/* constant */
 
 int filerec::curbegin(filerec_cur *curp) noex {
 	int		rs = SR_NOTOPEN ;
-	if (setp && curp) {
+	if (setp && curp) ylikely {
 	    rs = SR_OK ;
 	    curp->it = setp->begin() ;
 	} /* end if (valid) */
@@ -101,7 +98,7 @@ int filerec::curbegin(filerec_cur *curp) noex {
 
 int filerec::curend(filerec_cur *curp) noex {
 	int		rs = SR_NOTOPEN ;
-	if (setp && curp) {
+	if (setp && curp) ylikely {
 	    rs = SR_OK ;
 	    curp->it = setp->end() ;
 	} /* end if (valid) */
@@ -110,7 +107,7 @@ int filerec::curend(filerec_cur *curp) noex {
 
 int filerec::curenum(filerec_cur *curp,filerec_ent *ep) noex {
 	int		rs = SR_NOTOPEN ;
-	if (setp && curp && ep) {
+	if (setp && curp && ep) ylikely {
 	    stype::iterator ite = setp->end() ;
 	    rs = SR_NOTFOUND ;
 	    if (curp->it != ite) {
