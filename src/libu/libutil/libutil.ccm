@@ -49,6 +49,16 @@ export {
     constexpr inline int xstrlen(cchar *sp) noex {
     	return intconv(strlen(sp)) ;
     }
+} /* end export */
+
+export {
+    constexpr inline int clenstr(cchar *sp,int sl = -1) noex {
+    	cchar		*cp = sp ;
+	while (sl && *cp++) {
+	    sl -= 1 ;
+	}
+	return intconv(cp - sp) ;
+    } /* end subroutine (clenstr) */
     constexpr inline int lenstr(cchar *sp,int sl = -1) noex {
     	int		len = 0 ;
 	if (sl >= 0) {
@@ -59,6 +69,9 @@ export {
 	}
     	return len ;
     } /* end subroutine (lenstr) */
+} /* end export */
+
+export {
     constexpr inline int xstrspn(cchar *sp,cchar *ss) noex {
     	return intconv(strspn(sp,ss)) ;
     }
