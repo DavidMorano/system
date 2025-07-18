@@ -77,15 +77,18 @@ struct gecos : gecos_head {
 	gecos_co	finish ;
 	gecos() noex {
 	    finish(this,gecosmem_finish) ;
-	} ;
+	    vals[gecosval_realname].vp = nullptr ;
+	    vals[gecosval_realname].vl = 0 ;
+	} ; /* end ctor */
 	gecos(const gecos &) = delete ;
 	gecos &operator = (const gecos &) = delete ;
 	int start(cchar *,int = -1) noex ;
 	int compose(char *,int) noex ;
 	int getval(int,cchar **) noex ;
 	void dtor() noex ;
-	~gecos() {
-	    dtor() ;
+	destruct gecos() {
+	    cchar *p = vals[gecosval_realname].vp ;
+	    if (p) dtor() ;
 	} ;
 } ; /* end struct (gecos) */
 #else	/* __cplusplus */
