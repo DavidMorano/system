@@ -69,17 +69,17 @@ SOFL= -shared
 OBJ00= mailvalues.o endian.o 
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
-OBJ03= umods.o  usysflag.o
+OBJ03= libutil.o umods.o usysflag.o
 
 OBJ04= utimeout.o utimeouts.o 
 OBJ05= ulogerror.o strtox.o 
 OBJ06= usupport.o umisc.o
-OBJ07= umemalloc.o uobjlock.o
+OBJ07= umemalloc.o
 
 OBJ08= usys.o usyscallbase.o usysutility.o 
 OBJ09= uregfork.o uatfork.o ufdlock.o 
 OBJ10= usig.o uexec.o uipc.o 
-OBJ11= ustr.o
+OBJ11= ustr.o uobjlock.o ureserve.o
 
 OBJ12= usysdata.o usysauxinfo.o 
 OBJ13= ufileop.o ufiledesc.o 
@@ -91,14 +91,14 @@ OBJ17= ptx.o uacceptpass.o
 OBJ18= timeval.o itimerval.o
 OBJ19= timespec.o itimerspec.o
 
-OBJ20= uinet.o ureserve.o
+OBJ20= uinet.o
 OBJ21= strnul.o intx.o chrset.o
 OBJ22= ugetloadavg.o uiconv.o
 OBJ23= syscontain.o stdfnames.o
 
 OBJ24= posixdirent.o
 OBJ25= fonce.o filerec.o
-OBJ26= libutil.o
+OBJ26=
 OBJ27=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -107,7 +107,7 @@ OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
-OBJG= obj24.o obj25.o obj26.o
+OBJG= obj24.o obj25.o
 
 OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 
