@@ -23,8 +23,8 @@
 	filerec
 
 	Description:
-	This object implements a map container of blocks (of a given
-	structure).
+	This object implements a set (an un-ordered set) with a key
+	consisting of device and inode numbers.
 
 	Symopsis:
 	int filerec_start(int n = 0) noex
@@ -41,9 +41,6 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>
@@ -56,8 +53,6 @@ module ;
 module filerec ;
 
 /* local defines */
-
-#define	FONCE_DEFTABLEN		100
 
 
 /* imported namespaces */
@@ -102,8 +97,8 @@ typedef filerec::stype::iterator	setiter ;
 int filerec::istart(int n) noex {
 	cnullptr	np{} ;
 	int		rs = SR_INVALID ;
-	if (n >= 0) {
-	    if (n == 0) n = FONCE_DEFTABLEN ;
+	if (n >= 0) ylikely {
+	    if (n == 0) n = filerec_deftablen ;
 	    try {
 	        rs = SR_NOMEM ;
 	        if ((setp = new(nothrow) stype(n)) != np) {
@@ -119,14 +114,16 @@ int filerec::istart(int n) noex {
 int filerec::ifinish() noex {
 	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
-	if (setp) {
+	if (setp) ylikely {
 	    rs = SR_OK ;
 	    {
 		rs1 = finents() ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    delete setp ;
-	    setp = nullptr ;
+	    {
+	        delete setp ;
+	        setp = nullptr ;
+	    }
 	} /* end if (open) */
 	return rs ;
 } /* end method (filerec::ifinish) */
@@ -134,11 +131,17 @@ int filerec::ifinish() noex {
 int filerec::checkin(custat *sbp,cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (sbp) {
+	if (sbp && fn) ylikely {
+	    const dev_t		dev = sbp->st_dev ;
+	    const ino_t		ino = sbp->st_ino ;
+	    custime		timod = sbp->st_mtime ;
+	    coff		fsize = sbp->st_size ;
+	    cmode		fmode = sbp->st_mode ;
 	    rs = SR_BUGCHECK ;
-	    if (setp) {
-	        filerec_devino	k(sbp->st_dev,sbp->st_ino) ;
-		if (! setp->contains(k)) {
+	    if (setp) ylikely {
+	        filerec_ent	k(dev,ino,fmode) ;
+		k.load(timod,fsize) ;
+		if (! setp->contains(k)) ylikely {
 		    if (cchar *cp ; (rs = umemallocstrw(fn,-1,&cp)) >= 0) {
 			k.fname = cp ;
 		        try {
@@ -152,7 +155,7 @@ int filerec::checkin(custat *sbp,cchar *fn) noex {
 			    char *bp = cast_const<charp>(cp) ;
 			    umemfree(bp) ;
 			    k.fname = nullptr ;
-			}
+			} /* end if (error) */
 		    } /* end if (memory-allocation) */
 		} /* end if (already) */
 	    } /* end if (initialize) */
@@ -162,7 +165,7 @@ int filerec::checkin(custat *sbp,cchar *fn) noex {
 
 int filerec::icount() noex {
 	int		rs = SR_BUGCHECK ;
-	if (setp) {
+	if (setp) ylikely {
 	    csize cnt = setp->size() ;
 	    rs = intconv(cnt) ;
 	} /* end if (non-null) */
@@ -186,7 +189,7 @@ int filerec::finents() noex {
 } /* end method (filerec::finents) */
 
 void filerec::dtor() noex {
-	if (cint rs = finish ; rs < 0) {
+	if (cint rs = finish ; rs < 0) nlikely {
 	    ulogerror("filerec",rs,"fini-finish") ;
 	}
 } /* end method (filerec::dtor) */
@@ -197,7 +200,7 @@ filerec::operator int () noex {
 
 int filerec_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case filerecmem_start:
 	        rs = op->istart(a) ;
