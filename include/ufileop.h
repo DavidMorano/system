@@ -90,6 +90,7 @@ extern int u_utime(cchar *,CUTIMBUF *) noex ;
 extern int u_utimes(cchar *,CTIMEVAL *) noex ;
 extern int u_xattrget(cc *,cc *,void *,size_t,uint32_t,int) noex ;
 extern int u_xattrset(cc *,cc *,cvoid *,size_t,uint32_t,int) noex ;
+extern int u_realpath(cchar *,char *,char **) noex ;
 
 EXTERNC_end
 
