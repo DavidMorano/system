@@ -280,7 +280,7 @@ OBJ161= nusers.o mesg.o initnow.o
 OBJ162= getfiledirs.o findfilepath.o findfile.o
 OBJ163= cvttemperature.o bufprintf.o xfile.o
 OBJ164= mapex.o strsigabbr.o strerrabbr.o strlocktype.o
-OBJ165= emainfo.o getdig.o
+OBJ165= emainfo.o
 OBJ166= listentcp.o listenudp.o listenuss.o listenusd.o 
 OBJ167= listenpass.o listenconn.o
 
