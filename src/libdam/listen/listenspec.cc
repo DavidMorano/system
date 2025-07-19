@@ -1,4 +1,5 @@
 /* listenspec SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* hold (or manage) a "listen" specification */
@@ -18,6 +19,10 @@
 
 /*******************************************************************************
 
+	Object:
+	listenspec
+
+	Description:
 	This object holds a "listen" specification.
 
 *******************************************************************************/
@@ -340,7 +345,7 @@ int listenspec_finish(LS *op) noex {
 
 int listenspec_issame(LS *op,LISTENSPEC *otherp) noex {
 	int		rs ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	if ((rs = listenspec_magic(op,otherp)) >= 0) {
 	    f = (op->ltype == otherp->ltype) ;
 	    if (f) {
@@ -1382,8 +1387,7 @@ static int listenspec_openporter(LS *op,cchar *pr,int af,cchar *hp,
 	    cint	type = SOCK_STREAM ;
 	    cint	proto = IPPROTO_TCP ;
 	    cint	flow = 0 ;
-	    int		alen = rs ;
-	    if ((rs = sockaddress_startaddr(&sa,af,addr,alen,port,flow)) >= 0) {
+	    if ((rs = sockaddress_start(&sa,af,addr,port,flow)) >= 0) {
 	    	cint	pf = ai.ai_family ;
 		if ((rs = openport(pf,type,proto,&sa)) >= 0) {
 	            fd = rs ;
