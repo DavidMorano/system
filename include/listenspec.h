@@ -1,4 +1,5 @@
 /* listenspec HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* this object holds a "listen" specification */
@@ -22,6 +23,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>		/* |MAXNAMELEN| + |MAXPATHLEN| */
 
