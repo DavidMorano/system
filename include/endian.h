@@ -30,6 +30,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<stdint.h>		/* |uint32_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -44,6 +45,10 @@
 #define	ENDIANSTR	endianstr
 #endif
 
+EXTERNC_begin
+extern uint32_t		 ntohi(uint32_t) noex ;
+extern uint32_t		 htoni(uint32_t) noex ;
+EXTERNC_end
 
 extern int	endianval ;
 
