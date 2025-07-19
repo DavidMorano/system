@@ -74,7 +74,7 @@
 #define	SYSHAS_AIO		1
 
 /* Solaris®: typedefs */
-#define	SYSHAS_TYPEUSHORT		0
+#define	SYSHAS_TYPEUSHORT	0
 #define	SYSHAS_TYPEUINT		0
 
 /* Solaris®: tasks */
@@ -249,6 +249,9 @@
 /* Solaris®: |sig_t| */
 #define	SYSHAS_TYPESIGT		0
 
+/* Solaris®: |in6_addr_t| */
+#define	SYSHAS_TYPEIN6ADDRT	1
+
 /* Solaris®: |getexecname| */
 #define	SYSHAS_GETEXECNAME	1
 
@@ -314,7 +317,7 @@
 #endif
 
 /* Darwin: typedefs */
-#define	SYSHAS_TYPEUSHORT		1
+#define	SYSHAS_TYPEUSHORT	1
 #define	SYSHAS_TYPEUINT		1
 
 /* Darwin: tasks */
@@ -492,6 +495,9 @@
 
 /* Darwin®: |sig_t| */
 #define	SYSHAS_TYPESIGT		1
+
+/* Darwin®: |in6_addr_t| */
+#define	SYSHAS_TYPEIN6ADDRT	1
 
 /* Darwin®: |getexecname| */
 #define	SYSHAS_GETEXECNAME	0
@@ -717,6 +723,9 @@
 /* Linux: |sig_t| */
 #define	SYSHAS_TYPESIGT		0
 
+/* Linux®: |in6_addr_t| */
+#define	SYSHAS_TYPEIN6ADDRT	0
+
 /* Linux®: |getexecname| */
 #define	SYSHAS_GETEXECNAME	0
 
@@ -816,8 +825,9 @@ struct syshas_mgr {
         uint    resolvepath:1 ;
         uint    waitid:1 ;
         uint    pipes:1 ;
-        uint    typedirent:1 ;
+        uint    typedirentt:1 ;
         uint    typesigt:1 ;
+        uint    typein6addrt:1 ;
         uint    getexecname:1 ;
         uint    libproc:1 ;
 	constexpr syshas_mgr() noexcept {
@@ -906,8 +916,9 @@ struct syshas_mgr {
                 resolvepath	= SYSHAS_RESOLVEPATH ;
                 waitid		= SYSHAS_WAITID ;
                 pipes		= SYSHAS_PIPES ;
-                typedirent	= SYSHAS_TYPEDIRENT ;
+                typedirentt	= SYSHAS_TYPEDIRENT ;
                 typesigt	= SYSHAS_TYPESIGT ;
+                typein6addrt	= SYSHAS_TYPEIN6ADDRT ;
                 getexecname	= SYSHAS_GETEXECNAME ;
                 libproc		= SYSHAS_LIBPROC ;
 	} ; /* end ctor */
