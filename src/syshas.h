@@ -74,8 +74,8 @@
 #define	SYSHAS_AIO		1
 
 /* Solaris®: typedefs */
-#define	SYSHAS_USHORT		0
-#define	SYSHAS_UINT		0
+#define	SYSHAS_TYPEUSHORT	0
+#define	SYSHAS_TYPEUINT		0
 
 /* Solaris®: tasks */
 #define	SYSHAS_TASK		1
@@ -185,6 +185,9 @@
 /* Solaris®: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		1
 
+/* Solaris®: strnstr(3c) */
+#define	SYSHAS_STRNSTR		1
+
 /* Solaris®: sigqueue(3c) */
 #define	SYSHAS_SIGQUEUE		1
 
@@ -245,6 +248,9 @@
 
 /* Solaris®: |sig_t| */
 #define	SYSHAS_TYPESIGT		0
+
+/* Solaris®: |in6_addr_t| */
+#define	SYSHAS_TYPEIN6ADDRT	1
 
 /* Solaris®: |getexecname| */
 #define	SYSHAS_GETEXECNAME	1
@@ -311,8 +317,8 @@
 #endif
 
 /* Darwin: typedefs */
-#define	SYSHAS_USHORT		1
-#define	SYSHAS_UINT		1
+#define	SYSHAS_TYPEUSHORT	1
+#define	SYSHAS_TYPEUINT		1
 
 /* Darwin: tasks */
 #define	SYSHAS_TASK		0
@@ -430,6 +436,9 @@
 /* Darwin: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		1
 
+/* Darwin®: strnstr(3c) */
+#define	SYSHAS_STRNSTR		1
+
 /* Darwin: sigqueue(3c) */
 #define	SYSHAS_SIGQUEUE		0
 
@@ -487,6 +496,9 @@
 /* Darwin®: |sig_t| */
 #define	SYSHAS_TYPESIGT		1
 
+/* Darwin®: |in6_addr_t| */
+#define	SYSHAS_TYPEIN6ADDRT	1
+
 /* Darwin®: |getexecname| */
 #define	SYSHAS_GETEXECNAME	0
 
@@ -540,8 +552,8 @@
 #define	SYSHAS_AIO		1
 
 /* Linux: typedefs */
-#define	SYSHAS_USHORT		0
-#define	SYSHAS_UINT		0
+#define	SYSHAS_TYPEUSHORT		0
+#define	SYSHAS_TYPEUINT		0
 
 /* Linux: tasks */
 #define	SYSHAS_TASK		1
@@ -651,6 +663,9 @@
 /* Linux: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		1	/* finally */
 
+/* Linux®: strnstr(3c) */
+#define	SYSHAS_STRNSTR		0
+
 /* Linux: sigqueue(3c) */
 #define	SYSHAS_SIGQUEUE		1
 
@@ -708,6 +723,9 @@
 /* Linux: |sig_t| */
 #define	SYSHAS_TYPESIGT		0
 
+/* Linux®: |in6_addr_t| */
+#define	SYSHAS_TYPEIN6ADDRT	0
+
 /* Linux®: |getexecname| */
 #define	SYSHAS_GETEXECNAME	0
 
@@ -716,6 +734,199 @@
 
 /******************************************************************************/
 #endif /* OSNAME */
+
+
+#ifdef	__cplusplus
+
+struct syshas_mgr {
+    	typedef unsigned int	uint ;
+        uint    shadow:1 ;
+        uint    project:1 ;
+        uint    statvfs:1 ;
+        uint    poll:1 ;
+        uint    streams:1 ;
+        uint    timer:1 ;
+        uint    acl:1 ;
+        uint    userattr:1 ;
+        uint    secdb:1 ;
+        uint    setenv:1 ;
+        uint    unsetenv:1 ;
+        uint    sysinfo:1 ;
+        uint    offset:1 ;
+        uint    getcwd:1 ;
+        uint    aio:1 ;
+        uint    typeushort:1 ;
+        uint    typeuint:1 ;
+        uint    task:1 ;
+        uint    utmpx:1 ;
+        uint    utmpname:1 ;
+        uint    utmpxname:1 ;
+        uint    loadavg:1 ;
+        uint    loadavgint:1 ;
+        uint    readdirr:1 ;
+        uint    getpwxxxr:1 ;
+        uint    getpwgnur:1 ;
+        uint    getpwentr:1 ;
+        uint    getpwnamr:1 ;
+        uint    getpwuidr:1 ;
+        uint    getspxxxr:1 ;
+        uint    getspgnur:1 ;
+        uint    getspentr:1 ;
+        uint    getspnamr:1 ;
+        uint    getgrxxxr:1 ;
+        uint    getgrgnur:1 ;
+        uint    getgrentr:1 ;
+        uint    getgrnamr:1 ;
+        uint    getgrgidr:1 ;
+        uint    getpjxxxr:1 ;
+        uint    getpjgnur:1 ;
+        uint    getpjentr:1 ;
+        uint    getpjnamr:1 ;
+        uint    getpjpidr:1 ;
+        uint    getprxxxr:1 ;
+        uint    getprgnur:1 ;
+        uint    getnwxxxr:1 ;
+        uint    getnwgnur:1 ;
+        uint    gethoxxxr:1 ;
+        uint    gethognur:1 ;
+        uint    getsvxxxr:1 ;
+        uint    getsvgnur:1 ;
+        uint    getloginr:1 ;
+        uint    localtimer:1 ;
+        uint    gmtimer:1 ;
+        uint    ttynamer:1 ;
+        uint    openpt:1 ;
+        uint    ptmx:1 ;
+        uint    pshm:1 ;
+        uint    psem:1 ;
+        uint    nsem:1 ;
+        uint    pmq:1 ;
+        uint    audit:1 ;
+        uint    getdents:1 ;
+        uint    xti:1 ;
+        uint    mutexrobust:1 ;
+        uint    strnlen:1 ;
+        uint    strlcpy:1 ;
+        uint    strnstr:1 ;
+        uint    sigqueue:1 ;
+        uint    sigsend:1 ;
+        uint    sigsendset:1 ;
+        uint    sigwait:1 ;
+        uint    pthreadsigsend:1 ;
+        uint    ucontext:1 ;
+        uint    getcontext:1 ;
+        uint    reltimedwait:1 ;
+        uint    memcntl:1 ;
+        uint    memplock:1 ;
+        uint    gethrtime:1 ;
+        uint    getrandom:1 ;
+        uint    mkdirp:1 ;
+        uint    stime:1 ;
+        uint    resolvepath:1 ;
+        uint    waitid:1 ;
+        uint    pipes:1 ;
+        uint    typedirentt:1 ;
+        uint    typesigt:1 ;
+        uint    typein6addrt:1 ;
+        uint    getexecname:1 ;
+        uint    libproc:1 ;
+	constexpr syshas_mgr() noexcept {
+                shadow		= SYSHAS_SHADOW ;
+                project		= SYSHAS_PROJECT ;
+                statvfs		= SYSHAS_STATVFS ;
+                poll		= SYSHAS_POLL ;
+                streams		= SYSHAS_STREAMS ;
+                timer		= SYSHAS_TIMER ;
+                acl		= SYSHAS_ACL ;
+                userattr	= SYSHAS_USERATTR ;
+                secdb		= SYSHAS_SECDB ;
+                setenv		= SYSHAS_SETENV ;
+                unsetenv	= SYSHAS_UNSETENV ;
+                sysinfo		= SYSHAS_SYSINFO ;
+                offset		= SYSHAS_OFFSET ;
+                getcwd		= SYSHAS_GETCWD ;
+                aio		= SYSHAS_AIO ;
+                typeushort	= SYSHAS_TYPEUSHORT ;
+                typeuint	= SYSHAS_TYPEUINT ;
+                task		= SYSHAS_TASK ;
+                utmpx		= SYSHAS_UTMPX ;
+                utmpname	= SYSHAS_UTMPNAME ;
+                utmpxname	= SYSHAS_UTMPXNAME ;
+                loadavg		= SYSHAS_LOADAVG ;
+                loadavgint	= SYSHAS_LOADAVGINT ;
+                readdirr	= SYSHAS_READDIRR ;
+                getpwxxxr	= SYSHAS_GETPWXXXR ;
+                getpwgnur	= SYSHAS_GETPWGNUR ;
+                getpwentr	= SYSHAS_GETPWENTR ;
+                getpwnamr	= SYSHAS_GETPWNAMR ;
+                getpwuidr	= SYSHAS_GETPWUIDR ;
+                getspxxxr	= SYSHAS_GETSPXXXR ;
+                getspgnur	= SYSHAS_GETSPGNUR ;
+                getspentr	= SYSHAS_GETSPENTR ;
+                getspnamr	= SYSHAS_GETSPNAMR ;
+                getgrxxxr	= SYSHAS_GETGRXXXR ;
+                getgrgnur	= SYSHAS_GETGRGNUR ;
+                getgrentr	= SYSHAS_GETGRENTR ;
+                getgrnamr	= SYSHAS_GETGRNAMR ;
+                getgrgidr	= SYSHAS_GETGRGIDR ;
+                getpjxxxr	= SYSHAS_GETPJXXXR ;
+                getpjgnur	= SYSHAS_GETPJGNUR ;
+                getpjentr	= SYSHAS_GETPJENTR ;
+                getpjnamr	= SYSHAS_GETPJNAMR ;
+                getpjpidr	= SYSHAS_GETPJPIDR ;
+                getprxxxr	= SYSHAS_GETPRXXXR ;
+                getprgnur	= SYSHAS_GETPRGNUR ;
+                getnwxxxr	= SYSHAS_GETNWXXXR ;
+                getnwgnur	= SYSHAS_GETNWGNUR ;
+                gethoxxxr	= SYSHAS_GETHOXXXR ;
+                gethognur	= SYSHAS_GETHOGNUR ;
+                getsvxxxr	= SYSHAS_GETSVXXXR ;
+                getsvgnur	= SYSHAS_GETSVGNUR ;
+                getloginr	= SYSHAS_GETLOGINR ;
+                localtimer	= SYSHAS_LOCALTIMER ;
+                gmtimer		= SYSHAS_GMTIMER ;
+                ttynamer	= SYSHAS_TTYNAMER ;
+                openpt		= SYSHAS_OPENPT ;
+                ptmx		= SYSHAS_PTMX ;
+                pshm		= SYSHAS_PSHM ;
+                psem		= SYSHAS_PSEM ;
+                nsem		= SYSHAS_NSEM ;
+                pmq		= SYSHAS_PMQ ;
+                audit		= SYSHAS_AUDIT ;
+                getdents	= SYSHAS_GETDENTS ;
+                xti		= SYSHAS_XTI ;
+                mutexrobust	= SYSHAS_MUTEXROBUST ;
+                strnlen		= SYSHAS_STRNLEN ;
+                strlcpy		= SYSHAS_STRLCPY ;
+                strnstr		= SYSHAS_STRNSTR ;
+                sigqueue	= SYSHAS_SIGQUEUE ;
+                sigsend		= SYSHAS_SIGSEND ;
+                sigsendset	= SYSHAS_SIGSENDSET ;
+                sigwait		= SYSHAS_SIGWAIT ;
+                pthreadsigsend	= SYSHAS_PTHREADSIGSEND ;
+                ucontext	= SYSHAS_UCONTEXT ;
+                getcontext	= SYSHAS_GETCONTEXT ;
+                reltimedwait	= SYSHAS_RELTIMEDWAIT ;
+                memcntl		= SYSHAS_MEMCNTL ;
+                memplock	= SYSHAS_MEMPLOCK ;
+                gethrtime	= SYSHAS_GETHRTIME ;
+                getrandom	= SYSHAS_GETRANDOM ;
+                mkdirp		= SYSHAS_MKDIRP ;
+                stime		= SYSHAS_STIME ;
+                resolvepath	= SYSHAS_RESOLVEPATH ;
+                waitid		= SYSHAS_WAITID ;
+                pipes		= SYSHAS_PIPES ;
+                typedirentt	= SYSHAS_TYPEDIRENT ;
+                typesigt	= SYSHAS_TYPESIGT ;
+                typein6addrt	= SYSHAS_TYPEIN6ADDRT ;
+                getexecname	= SYSHAS_GETEXECNAME ;
+                libproc		= SYSHAS_LIBPROC ;
+	} ; /* end ctor */
+} ; /* end struct (syshas) */
+
+constexpr syshas_mgr		syshas ;
+
+#endif /* __cplusplus */
 
 
 #endif /* SYSHAS_INCLUDE */
