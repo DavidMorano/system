@@ -19,7 +19,6 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<vechand.h>
-#include	<bits.h>
 
 
 #define	SPELLCHECKS_MAGIC	0x99447246
@@ -70,7 +69,8 @@ extern int spellchecks_count(spellchecks *) noex ;
 extern int spellchecks_look(spellchecks *,cchar *,int) noex ;
 extern int spellchecks_looks(spellchecks *,bits *,cchar *,int) noex ;
 extern int spellchecks_curbegin(spellchecks *,spellchecks_cur *) noex ;
-extern int spellchecks_enum(spellchecks *,spellchecks_cur *,char *,int) noex ;
+extern int spellchecks_curenum(spellchecks *,spellchecks_cur *,
+		char *,int) noex ;
 extern int spellchecks_curend(spellchecks *,spellchecks_cur *) noex ;
 extern int spellchecks_check(spellchecks *,time_t) noex ;
 extern int spellchecks_audit(spellchecks *) noex ;
