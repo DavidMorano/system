@@ -80,12 +80,15 @@
 /* exported subroutines */
 
 int wswcpynarrow(wchar_t *rarr,cchar *sp,int sl) noex {
-	int		c = 0 ;
-	while ((c < sl) && sp[c]) {
-	    cint	ch = mkchar(sp[c]) ;
-	    rarr[c++] = ch ;
-	} /* end while */
-	rarr[c] = '\0' ;
+	int		c = -1 ;
+	if (rarr && sp) {
+	    c = 0 ;
+	    while ((c < sl) && sp[c]) {
+	        cint	ch = mkchar(sp[c]) ;
+	        rarr[c++] = ch ;
+	    } /* end while */
+	    rarr[c] = '\0' ;
+	} /* end if (non-null) */
 	return c ;
 }
 /* end subroutine (wswcpynarrow) */
