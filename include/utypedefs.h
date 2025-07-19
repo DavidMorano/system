@@ -42,7 +42,6 @@
 #include	<time.h>		/* for |u_utime(2)| */
 #include	<utime.h>		/* for |u_utime(2)| */
 #include	<pthread.h>
-#include	<termios.h>
 #include	<errno.h>
 #include	<dirent.h>
 #include	<ucontext.h>
@@ -133,67 +132,66 @@
 typedef int			intoff_t ;
 #endif /* TYPEDEF_INTOFFT */
 
-#ifndef	TYPEDEF_NOTHROW
-#define	TYPEDEF_NOTHROW
+#ifndef	TYPEDEF_NOTHROWT
+#define	TYPEDEF_NOTHROWT
 #ifdef	__cplusplus
 #include			<new>		/* |nothrow(3c++)| */
 typedef decltype(std::nothrow)	nothrow_t ;
 #endif /* __cplusplus */
-#endif /* TYPEDEF_NOTHROW */
+#endif /* TYPEDEF_NOTHROWT */
 
 /* handle some really brain-damaged systems -- like MacOS-X Darwin®! */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 #if	defined(OSNUM) && (OSNUM <= 7)
-#ifndef	TYPEDEF_ID
-#define	TYPEDEF_ID
+#ifndef	TYPEDEF_IDT
+#define	TYPEDEF_IDT
 typedef int			id_t ;
-#endif /* TYPEDEF_ID */
+#endif /* TYPEDEF_IDT */
 #endif
 #endif
 
-#ifndef	TYPEDEF_IN4ADDRT
-#define	TYPEDEF_IN4ADDRT
-typedef in_addr_t		in4_addr_t ;
+#ifndef	TYPEDEF_IN4ADDRTT
+#define	TYPEDEF_IN4ADDRTT
+typedef in_addr_t		in4_addr_t ;		/* scalar type */
 #endif
 
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#if	defined(OSNUM) && (OSNUM <= 9)
-#ifndef	TYPEDEF_IN6ADDRT
-#define	TYPEDEF_IN6ADDRT
+/* some OSes (which remain nameless but has initials "Linux") do not have */
+#if	defined(SYSHAS_TYPEIN6ADDRT) && (SYSHAS_TYPEIN6ADDRT == 0)
+#ifndef	TYPEDEF_IN6ADDRTT
+#define	TYPEDEF_IN6ADDRTT
 typedef struct in6_addr		in6_addr_t ;
 #endif
-#endif
-#endif
+#endif /* defined(SYSHAS_TYPEIN6ADDRT) && (SYSHAS_TYPEIN6ADDRT == 0) */
 
-#ifndef	TYPEDEF_ERRNO
-#define	TYPEDEF_ERRNO
+#ifndef	TYPEDEF_ERRNOT
+#define	TYPEDEF_ERRNOT
 typedef int			errno_t ;
-#endif /* TYPEDEF_ERRNO */
+#endif /* TYPEDEF_ERRNOT */
 
-#ifndef	TYPEDEF_UNIXRET
-#define	TYPEDEF_UNIXRET
+#ifndef	TYPEDEF_UNIXRETT
+#define	TYPEDEF_UNIXRETT
 typedef int			unixret_t ;
-#endif /* TYPEDEF_UNIXRET */
+#endif /* TYPEDEF_UNIXRETT */
 
-#ifndef	TYPEDEF_SYSRET
-#define	TYPEDEF_SYSRET
+#ifndef	TYPEDEF_SYSRETT
+#define	TYPEDEF_SYSRETT
 typedef int			sysret_t ;
-#endif /* TYPEDEF_SYSRET */
+#endif /* TYPEDEF_SYSRETT */
 
-#ifndef	TYPEDEF_CERRNO
-#define	TYPEDEF_CERRNO
+#ifndef	TYPEDEF_CERRNOT
+#define	TYPEDEF_CERRNOT
 typedef const errno_t		cerrno_t ;
-#endif /* TYPEDEF_CERRNO */
+#endif /* TYPEDEF_CERRNOY */
 
-#ifndef	TYPEDEF_CUNIXRET
-#define	TYPEDEF_CUNIXRET
+#ifndef	TYPEDEF_CUNIXRETT
+#define	TYPEDEF_CUNIXRETT
 typedef const unixret_t		cunixret_t ;
-#endif /* TYPEDEF_CUNIXRET */
+#endif /* TYPEDEF_CUNIXRETT */
 
-#ifndef	TYPEDEF_CSYSRET
-#define	TYPEDEF_CSYSRET
+#ifndef	TYPEDEF_CSYSRETT
+#define	TYPEDEF_CSYSRETT
 typedef const sysret_t		csysret_t ;
-#endif /* TYPEDEF_CSYSRET */
+#endif /* TYPEDEF_CSYSRETT */
 
 /* this next type-def is related to the one afterwards */
 #ifndef	TYPEDEF_SIGF
