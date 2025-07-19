@@ -73,10 +73,10 @@
 
 int xfile(ids *idp,cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (idp && fname) {
+	if (idp && fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-	        if (USTAT sb ; (rs = uc_stat(fname,&sb)) >= 0) {
+	    if (fname[0]) ylikely {
+	        if (ustat sb ; (rs = uc_stat(fname,&sb)) >= 0) ylikely {
 	            if (S_ISREG(sb.st_mode)) {
 		        rs = permid(idp,&sb,X_OK) ;
 	            } else {
