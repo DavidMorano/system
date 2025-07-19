@@ -38,18 +38,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<getourenv.h>
 #include	<bfile.h>
@@ -60,6 +58,7 @@
 #include	<sbuf.h>
 #include	<kvsfile.h>
 #include	<strx.h>
+#include	<rmx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -97,7 +96,6 @@ extern int	mkpath1(char *,cchar *) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	rmext(cchar *,int) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecti(cchar *,int,int *) ;
