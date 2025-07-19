@@ -45,7 +45,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>		/* return-system codes */
+#include	<usysrets.h>		/* system-return codes */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
