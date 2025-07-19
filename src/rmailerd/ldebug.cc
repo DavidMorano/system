@@ -1,17 +1,15 @@
-/* ldebug */
+/* ldebug SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* local debugging stubs */
-
-
-#define	CF_DEBUGS	0
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	- 1997-11-21, David A­D­ Morano
-
 	This program was started by copying from the RSLOW program.
-
 
 */
 
@@ -19,29 +17,26 @@
 
 /**************************************************************************
 
-	This modeule provides debugging support for the REXEC program.
+  	Name:
+	ldebug
 
+	Description:
+	This modeule provides debugging support for the REXEC
+	program.
 
 **************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<poll.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
 
@@ -50,47 +45,41 @@
 /* local defines */
 
 
-
 /* external subroutines */
-
-
-/* forward subroutines */
 
 
 /* external variables */
 
 
+/* forward references */
+
+
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
 /* convert file mode bits to ASCII string */
-char *d_procmode(mode,buf,buflen)
-int	mode ;
-char	buf[] ;
-int	buflen ;
-{
-
-
+cchar *d_procmode(int mode,hcar *dbuf,int dlen) noex {
+    	char	*rp = nullptr ;
+	(void) dbuf ;
+	(void) dlen ;
 	switch (mode) {
-
 	case IM_FILE:
-	    return "FILE" ;
-
+	    rp = "FILE" ;
+	    break ;
 	case IM_PIPE:
-	    return "PIPE" ;
-
+	    rp = "PIPE" ;
+	    break ;
 	case IM_SEEK:
-	    return "SEEK" ;
-
+	    rp = "SEEK" ;
+	    break ;
 	} /* end switch */
-
-	return NULL ;
+	return rp ;
 }
 /* end subroutine (d_procmode) */
-
-
 
 
