@@ -1,0 +1,13 @@
+SOCKADDRESS
+
+This (object) is an attempt to make some sort of common interface
+for setting, getting, or otherwise manipulating or using UIX socket
+addresses.  Sadly, there is less that I can do to make this interface
+useful than I would like.  The problem is actually two fold.  First
+there is the issue of each address faimly hacing their own
+socket-address objet.  But secondarily, and actually even more
+painful, is that fact that individual socket address objects
+(structures) are different acorss mutliple different operating
+systems,
+
+
