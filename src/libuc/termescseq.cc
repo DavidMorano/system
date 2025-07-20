@@ -27,12 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
@@ -64,13 +66,13 @@
 
 int termescseq(char *dp,int dl,int fch,int a1,int a2,int a3,int a4) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	if (dl < 0) dl = INT_MAX ;
-	if (dp) {
+	if (dp) ylikely {
 	    rs = SR_ILSEQ ;
-	    if (fch > 0) {
+	    if (fch > 0) ylikely {
 	        rs = SR_OK ;
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            rs = storebuf_chr(dp,dl,i,'\033') ;
 	            i += rs ;
 	        }
@@ -90,17 +92,17 @@ int termescseq(char *dp,int dl,int fch,int a1,int a2,int a3,int a4) noex {
 	                a = a4 ; 
 	                break ;
 	            } /* end switch */
-	            if (a >= 0) {
-	                if ((a >= 0x20) && (a < 0x2f)) {
+	            if (a >= 0) ylikely {
+	                if ((a >= 0x20) && (a < 0x2f)) ylikely {
 		            rs = storebuf_chr(dp,dl,i,a) ;
 		            i += rs ;
 	                } else {
 		            rs = SR_ILSEQ ;
 			}
-	            }
+	            } /* end if */
 	        } /* end for */
-	        if (rs >= 0) {
-	            if ((fch >= 0x30) && (fch <= 0x7e)) {
+	        if (rs >= 0) ylikely {
+	            if ((fch >= 0x30) && (fch <= 0x7e)) ylikely {
 	                rs = storebuf_chr(dp,dl,i,fch) ;
 	                i += rs ;
 	            } else {
