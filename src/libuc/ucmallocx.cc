@@ -85,13 +85,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| + |strncpy(3c)| */
+#include	<cstring>		/* |strncpy(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<localmisc.h>
 
 #include	"ucmallocx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -124,7 +125,7 @@ static inline void ourstrwcpy(char *bp,cchar *sp,int sl) noex {
 		*bp++ = *sp++ ;
 	    }
 	    *bp = '\0' ;
-	}
+	} /* end if_constexpr (f) */
 }
 /* end subroutine (ourcpywstr) */
 
@@ -159,10 +160,10 @@ int uc_mallocbuf(cvoid *vp,int vl,cvoid **vrpp) noex {
 	if (vp && rpp) {
 	    if (vl < 0) {
 		cchar	*sp = charp(vp) ;
-		vl = strlen(sp) ;
+		vl = lenstr(sp) ;
 	    }
-	    if (char *bp{} ; (rs = uc_malloc((vl+1),&bp)) >= 0) {
-	        memcpy(bp,vp,vl) ;
+	    if (char *bp ; (rs = uc_malloc((vl + 1),&bp)) >= 0) {
+	        memcopy(bp,vp,vl) ;
 	        bp[vl] = '\0' ;
 	        *rpp = bp ;
 	    } else {
@@ -176,8 +177,8 @@ int uc_mallocbuf(cvoid *vp,int vl,cvoid **vrpp) noex {
 int uc_mallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rpp) {
-	    if (sl < 0) sl = strlen(sp) ;
-	    if (char *bp{} ; (rs = uc_malloc((sl+1),&bp)) >= 0) {
+	    sl = lenstr(sp,sl) ;
+	    if (char *bp ; (rs = uc_malloc((sl + 1),&bp)) >= 0) {
 	        *rpp = bp ;
 	        ourstrwcpy(bp,sp,sl) ;
 	    } else {
