@@ -60,10 +60,10 @@ extern "C" {
 
 int uc_rmdir(cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-	        if ((char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) {
+	    if (fname[0]) ylikely {
+	        if ((char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) ylikely {
 	            if ((rs = mkexpandpath(ebuf,fname,-1)) > 0) {
 		        rs = u_rmdir(ebuf) ;
 	            } else if (rs == 0) {
