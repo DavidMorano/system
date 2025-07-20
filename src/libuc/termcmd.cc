@@ -38,10 +38,11 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<ascii.h>
-#include	<cfdec.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"termcmd.h"
@@ -72,7 +73,7 @@
 
 int termcmd_clear(termcmd *ckp) noex {
 	int		rs = SR_FAULT ;
-	if (ckp) {
+	if (ckp) ylikely {
 	    ckp->type = 0 ;
 	    ckp->name = 0 ;
 	    ckp->istr[0] = '\0' ;
