@@ -40,19 +40,17 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<upt.h>
 #include	<localmisc.h>
 
 #include	"thrbase.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -122,18 +120,17 @@ extern "C" {
 /* exported subroutines */
 
 int thrbase_start(thrbase *op,thrbase_sub worker,void *ap) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if ((rs = thrbase_ctor(op,worker)) >= 0) {
 	    op->ap = ap ;
 	    if ((rs = thrcomm_start(op->tcp,0)) >= 0) {
-	        sigset_t	osm{} ;
-	        sigset_t	nsm{} ;
-	        if ((rs = uc_sigsetfill(&nsm)) >= 0) {
+	        if (sigset_t nsm{} ; (rs = uc_sigsetfill(&nsm)) >= 0) {
+	            sigset_t	osm{} ;
 		    if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 	                THRBASE_SI	*sip ;
-			cnullptr	np{} ;
-	                cint		sz = sizeof(THRBASE_SI) ;
+	                cint		sz = szof(THRBASE_SI) ;
 	                if ((rs = uc_malloc(sz,&sip)) >= 0) {
 	                    uptsub_f	thrsub = uptsub_f(startworker) ;
 	                    pthread_t	tid ;
