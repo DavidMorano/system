@@ -77,9 +77,8 @@
 int uc_utime(cchar *fname,CUTIMBUF *utp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (fname && utp) {
-	    char	*ebuf{} ;
-	    if ((rs = libmalloc_mp(&ebuf)) >= 0) {
+	if (fname && utp) ylikely {
+	    if (char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) ylikely {
 	        if ((rs = mkexpandpath(ebuf,fname,-1)) > 0) {
 		    rs = u_utime(ebuf,utp) ;
 	        } else if (rs == 0) {
@@ -96,9 +95,8 @@ int uc_utime(cchar *fname,CUTIMBUF *utp) noex {
 int uc_utimes(cchar *fname,CTIMEVAL *utp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (fname && utp) {
-	    char	*ebuf{} ;
-	    if ((rs = libmalloc_mp(&ebuf)) >= 0) {
+	if (fname && utp) ylikely {
+	    if (char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) ylikely {
 	        if ((rs = mkexpandpath(ebuf,fname,-1)) > 0) {
 		    rs = u_utimes(ebuf,utp) ;
 	        } else if (rs == 0) {
