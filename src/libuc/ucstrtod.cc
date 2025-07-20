@@ -61,7 +61,7 @@
 
 int uc_strtod(cchar *startp,char **endpp,double *rp) noex {
 	int	rs = SR_FAULT ;
-	if (startp && rp) {
+	if (startp && rp) ylikely {
 	    char	*ep{} ;
 	    errno = 0 ;
 	    *rp = strtod(startp,&ep) ;
