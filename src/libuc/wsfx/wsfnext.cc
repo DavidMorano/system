@@ -103,7 +103,7 @@ int wsfnext(cwchar *wsp,int wsl,cwchar **rpp) noex {
     	int		rl = -1 ;
 	cwchar		*rp = nullptr ;
 	if (wsp && rpp) {
-	    int		ch ;
+	    int		ch ; /* used-multiple */
 	    while (wsl && *wsp) {
 	        ch = int(*wsp) ;
 	        if (! iswwhite(ch)) break ;
