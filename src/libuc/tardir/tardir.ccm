@@ -18,8 +18,13 @@
 
 /*******************************************************************************
 
-	Names:
+	Object:
 	tardir
+
+	Description:
+	This is a container for directories.  Only a single name
+	for each directory is retained (additional path-names for
+	directories) are ignored (the first one is picked).
 
 *******************************************************************************/
 
