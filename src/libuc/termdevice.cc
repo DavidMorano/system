@@ -103,9 +103,6 @@ import libutil ;
 
 #define	TO_READ		20		/* timeout waiting for sub-process */
 
-#define	SUBINFO		subinfo
-#define	SUBINFO_FL	subinfo_flags
-
 
 /* external subroutines */
 
@@ -146,6 +143,8 @@ constexpr static subinfo_m	getnames[] = {
 	&subinfo::fork
 } ; /* end array (subinfo_m) */
 
+cbool		f_comment = false ;
+
 
 /* exported variables */
 
@@ -155,27 +154,26 @@ constexpr static subinfo_m	getnames[] = {
 int termdevice(char *dbuf,int dlen,int fd) noex {
 	int		rs = SR_NOENT ;
 	int		rs1 ;
-
-	if (fd < 0) return SR_BADF ;
-
-	if (dbuf == nullptr) return SR_FAULT ;
-
-	if (dlen < MINBUFLEN) return SR_OVERFLOW ;
-
-	if (isatty(fd)) {
-	    dbuf[0] = '\0' ;
-	    if (subinfo si ; (rs = si.start(dbuf,dlen,fd)) >= 0) {
-	        for (cauto &m : getnames) {
-	            rs = (si.*m)() ;
-	            if (rs != 0) break ;
-	        } /* end for */
-	        rs1 = si.finish() ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (subinfo) */
-	} else {
-	    rs = SR_NOTTY ;
-	}
-
+	if (dbuf) ylikely {
+	    rs = SR_OVERFLOW ;
+	    if (dlen >= MINBUFLEN) {
+		rs = SR_BADF ;
+		if (fd >= 0) {
+		    rs = SR_NOTTY ;
+	            if (isatty(fd)) {
+	                dbuf[0] = '\0' ;
+	                if (subinfo si ; (rs = si.start(dbuf,dlen,fd)) >= 0) {
+	                    for (cauto &m : getnames) {
+	                        rs = (si.*m)() ;
+	                        if (rs != 0) break ;
+	                    } /* end for */
+	                    rs1 = si.finish() ;
+		            if (rs >= 0) rs = rs1 ;
+	                } /* end if (subinfo) */
+	            } /* end if (isatty) */
+	        } /* end if (FD OK) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (termdevice) */
@@ -185,7 +183,7 @@ int termdevice(char *dbuf,int dlen,int fd) noex {
 
 int subinfo::start(char *db,int dl,int afd) noex {
 	int		rs = SR_FAULT ;
-	if (db) {
+	if (db) ylikely {
 	    rs = SR_OK ;
 	    fd = afd ;
 	    dbuf = db ;
@@ -201,23 +199,23 @@ int subinfo::finish() noex {
 /* end subroutine (subinfo_finish) */
 
 int subinfo::var() noex {
+	cchar		*vn = VARTERMDEV ;
 	int		rs ;
 	int		len = 0 ; /* return-value */
 	if (ustat st1 ; (rs = u_fstat(fd,&st1)) >= 0) {
-	    cc *vn = VARTERMDEV ;
-	    if (cchar *cp ; (cp = getenv(vn)) != nullptr) {
-		if (ustat st2 ; (rs = u_stat(cp,&st2)) >= 0) {
+	    static cpcchar	valp = getenv(vn) ;
+	    if (valp) {
+		if (ustat st2 ; (rs = u_stat(valp,&st2)) >= 0) {
 	            rs = SR_NOENT ;
 	            if (st1.st_rdev == st2.st_rdev) {
-	                rs = sncpy1(dbuf,dlen,cp) ;
+	                rs = sncpy1(dbuf,dlen,valp) ;
 	                len = rs ;
 	            }
 	        } else if (isNotPresent(rs)) {
 	            rs = SR_OK ;
 	        }
-	    } /* end if (environment variable worked out !) */
+	    } /* end if (environment variable worked out!) */
 	} /* end if (stat) */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getname_var) */
@@ -235,70 +233,58 @@ int subinfo::ttyname() noex {
 /* end subroutine (getname_ttyname) */
 
 int subinfo::fork() noex {
-	int		rs ;
+	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	int		pfds[2] ;
-	if ((rs = u_pipe(pfds)) >= 0) {
-	    cint	tlen = MAXPATHLEN ;
-	    int		cs ;
-	    char	tbuf[tlen + 2] = {} ;
-
-	    if ((rs = uc_fork()) == 0) {
-	        cchar	*av[3] ;
-
-	        u_close(pfds[0]) ; /* not used */
-
-	        for (int i = 0 ; i < 3 ; i += 1) {
-		    u_close(i) ;
-		}
-
-	        u_dup(fd) ;
-	        u_close(fd) ;		/* done using it */
-
-	        u_dup(pfds[1]) ;		/* standard output */
-	        u_close(pfds[1]) ;		/* done using it */
-
-	        u_open(NULLFNAME,O_WRONLY,0666) ;
-
-	        av[0] = "tty" ;
-	        av[1] = nullptr ;
-
-	        u_execv(PROG_TTY,av) ;
-
-	        uc_exit(EX_NOEXEC) ;
-
-	    } else if (rs > 0) {
-	        const pid_t	pid_child = rs ;
-	        cint	to = TO_READ ;
-	        cint	opts = FM_TIMED ;
-
-	        u_close(pfds[1]) ;	/* not used */
-	        pfds[1] = -1 ;
-
-	        if ((rs = uc_reade(pfds[0],tbuf,tlen,to,opts)) > 0) {
-	            len = rs ;
-		    int i ; /* used-afterwards */
-	            for (i = 0 ; i < len ; i += 1) {
-	                if (tbuf[i] == '\n') break ;
-	            }
-	            if (i == len) rs = SR_RANGE ;
-	            tbuf[i] = '\0' ;
-	            rs = snwcpy(dbuf,dlen,tbuf,i) ;
-	            len = rs ;
-		} /* end uc_ucreade) */
-	    	rs1 = u_waitpid(pid_child,&cs,0) ;
-		if (rs >= 0) rs = rs1 ;
-	    } else {
-	        rs = SR_BADE ;
-	    }
-
-	    u_close(pfds[0]) ;
-	    if (pfds[1] >= 0) {
-	        u_close(pfds[1]) ;
-	    }
-	} /* end if (pipe) */
-
+	if_constexpr (f_comment) {
+	    int		pfds[2] ;
+	    if ((rs = u_pipe(pfds)) >= 0) {
+	        cint	tlen = MAXPATHLEN ;
+	        int	cs ;
+	        char	tbuf[tlen + 2] = {} ;
+	        if ((rs = uc_fork()) == 0) {
+	            cchar	*av[3] ;
+	            u_close(pfds[0]) ; /* not used */
+	            for (int i = 0 ; i < 3 ; i += 1) {
+		        u_close(i) ;
+		    }
+	            u_dup(fd) ;
+	            u_close(fd) ;		/* done using it */
+	            u_dup(pfds[1]) ;		/* standard output */
+	            u_close(pfds[1]) ;		/* done using it */
+	            u_open(NULLFNAME,O_WRONLY,0666) ;
+	            av[0] = "tty" ;
+	            av[1] = nullptr ;
+	            u_execv(PROG_TTY,av) ;
+	            uc_exit(EX_NOEXEC) ;
+	        } else if (rs > 0) {
+	            const pid_t	pid_child = rs ;
+	            cint	to = TO_READ ;
+	            cint	opts = FM_TIMED ;
+	            u_close(pfds[1]) ;	/* not used */
+	            pfds[1] = -1 ;
+	            if ((rs = uc_reade(pfds[0],tbuf,tlen,to,opts)) > 0) {
+	                len = rs ;
+		        int i ; /* used-afterwards */
+	                for (i = 0 ; i < len ; i += 1) {
+	                    if (tbuf[i] == '\n') break ;
+	                }
+	                if (i == len) rs = SR_RANGE ;
+	                tbuf[i] = '\0' ;
+	                rs = snwcpy(dbuf,dlen,tbuf,i) ;
+	                len = rs ;
+		    } /* end uc_ucreade) */
+	    	    rs1 = u_waitpid(pid_child,&cs,0) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } else {
+	            rs = SR_BADE ;
+	        }
+	        u_close(pfds[0]) ;
+	        if (pfds[1] >= 0) {
+	            u_close(pfds[1]) ;
+	        }
+	    } /* end if (pipe) */
+	} /* end if_constexpr (f_comment) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getname_fork) */
