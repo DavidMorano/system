@@ -72,13 +72,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<ctime>
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
-#include	<ctime>
+#include	<cstring>		/* <- for |lenstr(3c)| */
 #include	<usystem.h>
 #include	<sigblocker.h>
 #include	<aflag.hh>
@@ -90,13 +88,14 @@
 
 #include	"ucclustername.h"
 
+import libutil ;
 
 /* local defines */
 
-#define	UCLUSTERNAME	struct clustername
-#define	UCLUSTERNAME_A	struct clustername_a
+#define	UCLUSTERNAME	clustername
+#define	UCLUSTERNAME_A	clustername_a
 
-#define	SUBINFO		struct subinfo
+#define	SI		subinfo
 
 #define	TO_TTL		(2*3600) /* two hours */
 
@@ -164,10 +163,10 @@ static int	ucclustername_end(UCLUSTERNAME *) noex ;
 static int	ucclustername_allocbegin(UCLUSTERNAME *,time_t,int) noex ;
 static int	ucclustername_allocend(UCLUSTERNAME *,UCLUSTERNAME_A *) noex ;
 
-static int	subinfo_start(SUBINFO *,char *,int,cchar *) noex ;
-static int	subinfo_finish(SUBINFO *) noex ;
-static int	subinfo_cacheget(SUBINFO *,UCLUSTERNAME *) noex ;
-static int	subinfo_cacheset(SUBINFO *,UCLUSTERNAME *,int) noex ;
+static int	subinfo_start(SI *,char *,int,cchar *) noex ;
+static int	subinfo_finish(SI *) noex ;
+static int	subinfo_cacheget(SI *,UCLUSTERNAME *) noex ;
+static int	subinfo_cacheset(SI *,UCLUSTERNAME *,int) noex ;
 
 
 /* local variables */
@@ -187,11 +186,12 @@ int ucclustername_init() noex {
 	if (! uip->f_void) {
 	    if (! uip->f_init) {
 	        uip->f_init = true ;
-	        if ((rs = ptm_create(&uip->mx,nullptr)) >= 0) {
+	        if ((rs = ptm_create(&uip->mx,nullptr)) >= 0) ylikely {
 	            void_f	b = ucclustername_atforkbefore ;
 	            void_f	a = ucclustername_atforkafter ;
-	            if ((rs = uc_atfork(b,a,a)) >= 0) {
-	                if ((rs = uc_atexit(ucclustername_exit)) >= 0) {
+	            if ((rs = uc_atfork(b,a,a)) >= 0) ylikely {
+			cauto esub = ucclustername_exit ;
+	                if ((rs = uc_atexit(esub)) >= 0) ylikely {
 	                    uip->f_initdone = true ;
 	                    f = true ;
 	                }
@@ -249,13 +249,13 @@ int ucclustername_get(char *rbuf,int rlen,cchar *nn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (rbuf && nn) {
+	if (rbuf && nn) ylikely {
 	    rs = SR_INVALID ;
-	    if (nn[0]) {
+	    if (nn[0]) ylikely {
 	        rbuf[0] = '\0' ;
-	        if (sigblocker b ; (rs = b.start) >= 0) {
-	            if ((rs = ucclustername_init()) >= 0) {
-	                SUBINFO		si ;
+	        if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	            if ((rs = ucclustername_init()) >= 0) ylikely {
+	                SI si ;
 	                if ((rs = subinfo_start(&si,rbuf,rlen,nn)) >= 0) {
 	                    UCLUSTERNAME	*uip = &ucclustername_data ;
 		            {
@@ -279,13 +279,13 @@ int ucclustername_set(cchar *cbuf,int clen,cchar *nn,int to) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (cbuf && nn) {
+	if (cbuf && nn) ylikely {
 	    rs = SR_INVALID ;
-	    if (cbuf[0] && nn[0]) {
-	        if (clen < 0) clen = strlen(cbuf) ;
-	        if (sigblocker b ; (rs = b.start) >= 0) {
-	            if ((rs = ucclustername_init()) >= 0) {
-	                SUBINFO		si ;
+	    if (cbuf[0] && nn[0]) ylikely {
+	        if (clen < 0) clen = lenstr(cbuf) ;
+	        if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	            if ((rs = ucclustername_init()) >= 0) ylikely {
+	                SI si ;
 		        char		*sbuf = charp(cbuf) ;
 	                if ((rs = subinfo_start(&si,sbuf,clen,nn)) >= 0) {
 	                    UCLUSTERNAME	*uip = &ucclustername_data ;
@@ -327,8 +327,8 @@ static int ucclustername_allocbegin(UCLUSTERNAME *uip,time_t dt,int ttl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if ((rs = uc_forklockbegin(-1)) >= 0) {
-	    if ((rs = ptm_lock(&uip->mx)) >= 0) {
+	if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+	    if ((rs = ptm_lock(&uip->mx)) >= 0) ylikely {
 	        if ((uip->a == nullptr) || ((dt-uip->et) >= ttl)) {
 	            if (! uip->f_allocget) {
 	                uip->f_allocget = true ;
@@ -348,9 +348,9 @@ static int ucclustername_allocbegin(UCLUSTERNAME *uip,time_t dt,int ttl) noex {
 static int ucclustername_allocend(UCLUSTERNAME *uip,UCLUSTERNAME_A *ap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ap && ap->a) {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) {
-	        if ((rs = ptm_lock(&uip->mx)) >= 0) {
+	if (ap && ap->a) ylikely {
+	    if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+	        if ((rs = ptm_lock(&uip->mx)) >= 0) ylikely {
 	            {
 	                uip->f_allocget = false ;
 	                uip->a = ap->a ;
@@ -388,9 +388,9 @@ static void ucclustername_exit() noex {
 	}
 }
 
-static int subinfo_start(SUBINFO *sip,char *rbuf,int rlen,cchar *nn) noex {
+static int subinfo_start(SI *sip,char *rbuf,int rlen,cchar *nn) noex {
     	int		rs = SR_FAULT ;
-	if (sip && rbuf && nn) {
+	if (sip && rbuf && nn) ylikely {
 	    rs = SR_OK ;
 	    sip->to = TO_TTL ;
 	    sip->dt = time(nullptr) ;
@@ -402,7 +402,7 @@ static int subinfo_start(SUBINFO *sip,char *rbuf,int rlen,cchar *nn) noex {
 }
 /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+static int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = SR_OK ;
@@ -411,12 +411,12 @@ static int subinfo_finish(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
-static int subinfo_cacheget(SUBINFO *sip,UCLUSTERNAME *uip) noex {
+static int subinfo_cacheget(SI *sip,UCLUSTERNAME *uip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = uc_forklockbegin(-1)) >= 0) {
-	    if ((rs = ptm_lock(&uip->mx)) >= 0) {
+	if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+	    if ((rs = ptm_lock(&uip->mx)) >= 0) ylikely {
 	        if (uip->a != nullptr) {
 	            if ((uip->et > 0) && ((sip->dt-uip->et) < uip->ttl)) {
 	                if (strcmp(sip->nn,uip->nn) == 0) {
@@ -435,19 +435,19 @@ static int subinfo_cacheget(SUBINFO *sip,UCLUSTERNAME *uip) noex {
 }
 /* end subroutine (subinfo_cacheget) */
 
-static int subinfo_cacheset(SUBINFO *sip,UCLUSTERNAME *uip,int ttl) noex {
+static int subinfo_cacheset(SI *sip,UCLUSTERNAME *uip,int ttl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
 	char		*aprev = nullptr ;
 	if (ttl < 0) ttl = sip->to ;
-	if ((rs = ucclustername_allocbegin(uip,sip->dt,ttl)) > 0) {
+	if ((rs = ucclustername_allocbegin(uip,sip->dt,ttl)) > 0) ylikely {
 	    UCLUSTERNAME_A	uca{} ;
 	    int			sz = 0 ;
 	    f = true ;
-	    sz += (strlen(sip->nn) + 1) ;
-	    sz += (strnlen(sip->rbuf,sip->rlen) + 1) ;
-	    if (char *bp{} ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	    sz += (lenstr(sip->nn) + 1) ;
+	    sz += (lenstr(sip->rbuf,sip->rlen) + 1) ;
+	    if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) ylikely {
 	        uca.a = bp ;
 	        aprev = uip->a ;
 	        uca.nn = bp ;
