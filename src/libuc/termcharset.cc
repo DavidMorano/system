@@ -90,14 +90,14 @@ static cint	inter[4][2] = {
 
 int termcharset(char *dp,int dl,int setnum,int f96,cchar *fontname) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	if (dl < 0) dl = INT_MAX ;
-	if (dp && fontname) {
+	if (dp && fontname) ylikely {
 	    rs = SR_INVALID ;
-	    if ((setnum >= 0) && (setnum < 4)) {
+	    if ((setnum >= 0) && (setnum < 4)) ylikely {
 	        if (f96 != 0) f96 = 1 ; /* make safe as an array index */
 		/* setting a 96-character set to G0 is invalid */
-	        if ((setnum != 0) || (! f96)) {
+	        if ((setnum != 0) || (! f96)) ylikely {
 		    rs = SR_OK ;
 		    /* construct escape sequence */
 	            if (rs >= 0) {
@@ -106,7 +106,7 @@ int termcharset(char *dp,int dl,int setnum,int f96,cchar *fontname) noex {
 	                i += rs ;
 	            }
 	            if (rs >= 0) {
-	                int		ich = inter[setnum][f96] ;
+	                cint	ich = inter[setnum][f96] ;
 	                rs = storebuf_chr(dp,dl,i,ich) ;
 	                i += rs ;
 	            }
