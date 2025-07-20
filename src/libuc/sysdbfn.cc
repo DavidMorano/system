@@ -61,7 +61,6 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
 #include	<usystem.h>
 #include	<syswords.hh>
 #include	<libmallocxx.h>
@@ -151,11 +150,11 @@ int sysdbmgr_fini() noex {
 
 int sysdbfn_get(enum sysdbfiles w,cchar *fname,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (rpp) {
+	if (rpp) ylikely {
 	    rs = SR_INVALID ;
-	    if ((w >= 0) && (w < sysdbfile_overlast)) {
-		if (fname) {
-		    if (fname[0]) {
+	    if ((w >= 0) && (w < sysdbfile_overlast)) ylikely {
+		if (fname) ylikely {
+		    if (fname[0]) ylikely {
 			rs = SR_OK ;
 			*rpp = fname ;
 		    } /* end if (valid) */
@@ -178,11 +177,11 @@ int sysdbmgr::init() noex {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
-	        if ((rs = mx.create) >= 0) {
+	        if ((rs = mx.create) >= 0) ylikely {
 	            void_f	b = sysdbmgr_atforkbefore ;
 	            void_f	a = sysdbmgr_atforkafter ;
-	            if ((rs = uc_atforkrecord(b,a,a)) >= 0) {
-	                if ((rs = uc_atexit(sysdbmgr_exit)) >= 0) {
+	            if ((rs = uc_atforkrecord(b,a,a)) >= 0) ylikely {
+	                if ((rs = uc_atexit(sysdbmgr_exit)) >= 0) ylikely {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
@@ -222,7 +221,8 @@ int sysdbmgr::fini() noex {
 	    {
 		for (int i = 0 ; i < sysdbfile_overlast ; i += 1) {
 		    if (cchar *str ; (str = strs[i]) != nullptr) {
-			rs1 = uc_libfree(str) ;
+			char *bp = cast_const<charp>(str) ;
+			rs1 = uc_libfree(bp) ;
 			if (rs >= 0) rs = rs1 ;
 			strs[i] = nullptr ;
 		    }
