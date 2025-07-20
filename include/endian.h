@@ -21,7 +21,15 @@
 	endian
 
 	Description:
-	This module provides machine endian managemnt.
+	This module provides machine endian management.
+
+	Notes:
+	Why is the interface of this code so strange?  Because the
+	interface predates this present code by a long time.  The
+	original code was based on the preprocessor defines: ENDIAN
+	and ENDIANSTR.  The 'ENDIAN' value returned an integer:
+	0==litle-endian, 1=big-endian.  The 'ENDIANSTR' value
+	returned a c-string: "0"=little-endian, "1"=big-endian.
 
 *******************************************************************************/
 
