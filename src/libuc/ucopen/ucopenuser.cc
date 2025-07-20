@@ -35,6 +35,7 @@
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getbufsize.h>
 #include	<getax.h>
+#include	<getpwx.h>
 #include	<getusername.h>
 #include	<opensysfs.h>
 #include	<opensysdbs.h>
