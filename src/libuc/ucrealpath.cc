@@ -39,15 +39,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>		/* standard says this is necessary */
-#include	<cerrno>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |realpath(3c)| */
 #include	<cstring>		/* |strcpy(3c)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
-#include	<errtimer.hh>
 #include	<mkpathx.h>
 #include	<localmisc.h>
 
@@ -71,8 +67,6 @@ import libutil ;
 
 /* forward references */
 
-sysret_t std_realpath(cchar *,char *,char **) noex ;
-
 
 /* local variables */
 
@@ -87,32 +81,32 @@ constexpr bool		f_mkpath = CF_MKPATH ;
 /* external subroutines */
 
 int uc_realpath(cchar *fname,char *rbuf) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
-	if (fname && rbuf) {
-	    cnullptr	np{} ;
+	if (fname && rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (fname[0]) {
-		char	*rp{} ;
+	    if (fname[0]) ylikely {
+		char	*rp{} ; /* used-multiple */
 		if_constexpr (f_mkpath) {
-	            if ((rs = std_realpath(fname,np,&rp)) >= 0) {
+	            if ((rs = u_realpath(fname,np,&rp)) >= 0) ylikely {
 			rs = mkpath(rbuf,rp) ;
 			rl = rs ;
 			free(rp) ;
-		    } /* end if (std_realpath) */
+		    } /* end if (u_realpath) */
 		} else {
-		    if ((rs = maxpathlen) >= 0) {
+		    if ((rs = maxpathlen) >= 0) ylikely {
 		        cint	rlen = rs ;
-	                if ((rs = std_realpath(fname,np,&rp)) >= 0) {
-		            if ((rl = lenstr(rp)) <= rlen) {
+	                if ((rs = u_realpath(fname,np,&rp)) >= 0) ylikely {
+		            if ((rl = lenstr(rp)) <= rlen) ylikely {
 		                strcpy(rbuf,rp) ;
 			        rs = SR_OK ;
 		            } else {
 			        rs = SR_OVERFLOW ;
 		            }
 			    free(rp) ;
-		        } /* end if (std_realpath) */
+		        } /* end if (u_realpath) */
 		    } /* end if (maxpathlen) */
 		} /* end if_constexpr (f_mkpath) */
 	    } /* end if (valid) */
@@ -120,52 +114,5 @@ int uc_realpath(cchar *fname,char *rbuf) noex {
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (uc_realpath) */
-
-
-/* local subroutines */
-
-sysret_t std_realpath(cchar *fname,char *rbuf,char **rpp) noex {
-	errtimer	to_mfile = utimeout[uto_mfile] ;
-	errtimer	to_nfile = utimeout[uto_nfile] ;
-	errtimer	to_nomem = utimeout[uto_nomem] ;
-	errtimer	to_nospc = utimeout[uto_nospc] ;
-	errtimer	to_again = utimeout[uto_again] ;
-        reterr          r ;
-	int		rs ;
-	char		*rp = nullptr ;
-	repeat {
-	    rs = SR_OK ;
-	    if ((rp = realpath(fname,rbuf)) == nullptr) {
-		rs = (- errno) ;
-	    }
-	    if (rs < 0) {
-                r(rs) ;                 /* <- default causes exit */
-	        switch (rs) {
-	        case SR_MFILE:
-                    r = to_mfile(rs) ;
-		    break ;
-	        case SR_NFILE:
-                    r = to_nfile(rs) ;
-		    break ;
-		case SR_NOMEM:
-                    r = to_nomem(rs) ;
-		    break ;
-	        case SR_NOSPC:
-                    r = to_nospc(rs) ;
-		    break ;
-	        case SR_AGAIN:
-                    r = to_again(rs) ;
-		    break ;
-	        case SR_INTR:
-		    r(false) ;
-	            break ;
-	        } /* end switch */
-		rs = r ;
-	    } /* end if (ok) */
-	} until ((rs >= 0) || r.fexit) ;
-	*rpp = (rs >= 0) ? rp : nullptr ;
-	return rs ;
-}
-/* end method (std_realpath) */
 
 
