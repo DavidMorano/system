@@ -37,7 +37,7 @@
 #include	<climits>
 #include	<cstring>
 #include	<usystem.h>
-#include	<typenonpath.h>
+#include	<nonpath.h>
 #include	<localmisc.h>
 
 
@@ -71,10 +71,10 @@ int uc_stat(cchar *fname,ustat *sbp)
 	int		rs = SR_OK ;
 	int		fl ;
 	int		flen = 0 ;
-	cchar		*fbuf = NULL ;
+	cchar		*fbuf = nullptr ;
 
-	if (fname == NULL) return SR_FAULT ;
-	if (sbp == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
+	if (sbp == nullptr) return SR_FAULT ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
@@ -91,17 +91,16 @@ int uc_stat(cchar *fname,ustat *sbp)
 
 	if (rs >= 0) {
 
-	    if (typenonpath(fname,fl)) {
+	    if ((rs = nonpath(fname,fl)) == 0) {
 	        memclear(sbp) ;
 	        sbp->st_mode = S_IFNAM ;
 	        sbp->st_uid = UID_NOBODY ;
 	        sbp->st_gid = GID_NOBODY ;
 	        strncpy(sbp->st_fstype,FSTYPE_FLOAT,FSTYPESZ) ;
-	    } else {
-	        const int	elen = MAXPATHLEN ;
-	        char		*ebuf ;
-	        if ((rs = uc_libmalloc((elen+1),&ebuf)) >= 0) {
-	            if ((rs = mkuserpath(ebuf,NULL,fname,fl)) > 0) {
+	    } else if (rs >= 0) {
+	        cint	elen = MAXPATHLEN ;
+	        if (char *ebuf ; (rs = uc_libmalloc((elen+1),&ebuf)) >= 0) {
+	            if ((rs = mkuserpath(ebuf,nullptr,fname,fl)) > 0) {
 	                fname = ebuf ;
 	            } else if (rs == 0) {
 	                if ((rs = mkcdpath(ebuf,fname,fl)) > 0) {
@@ -121,7 +120,7 @@ int uc_stat(cchar *fname,ustat *sbp)
 	        } /* end if (memory-allocation) */
 	    } /* end if (nonpath) */
 
-	    if (fbuf != NULL) {
+	    if (fbuf != nullptr) {
 		uc_libfree(fbuf) ;
 	    }
 
