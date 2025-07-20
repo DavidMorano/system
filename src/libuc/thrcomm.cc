@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	thrcomm
+
+	Description:
 	This object provides some minimal communication between a
 	controller thread and a separate parallel thread.
 
@@ -299,11 +303,10 @@ int thrcomm_exiting(thrcomm *op) noex {
 /* private subroutines */
 
 static int thrcomm_ptminit(thrcomm *op,int f_shared) noex {
-	ptma		a ;
 	int		rs ;
 	int		rs1 ;
-	int		f_ptm = false ;
-	if ((rs = ptma_create(&a)) >= 0) {
+	if (ptma a ; (rs = ptma_create(&a)) >= 0) {
+	    int		f_ptm = false ;
 	    if (f_shared) {
 		cint	v = PTHREAD_PROCESS_SHARED ;
 		rs = ptma_setpshared(&a,v) ;
@@ -321,11 +324,10 @@ static int thrcomm_ptminit(thrcomm *op,int f_shared) noex {
 /* end subroutine (thrcomm_ptminit) */
 
 static int thrcomm_ptcinit(thrcomm *op,int f_shared) noex {
-	ptca		a ;
 	int		rs ;
 	int		rs1 ;
-	int		f_ptc = false ;
-	if ((rs = ptca_create(&a)) >= 0) {
+	if (ptca a ; (rs = ptca_create(&a)) >= 0) {
+	    int		f_ptc = false ;
 	    if (f_shared) {
 		cint	v = PTHREAD_PROCESS_SHARED ;
 		rs = ptca_setpshared(&a,v) ;
