@@ -23,7 +23,7 @@
 #include	<unistd.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<typenonpath.h>
+#include	<nonpath.h>
 #include	<localmisc.h>
 
 
@@ -40,10 +40,12 @@
 
 /* external subroutines */
 
-extern int	mkuserpath(char *,const char *,const char *,int) ;
-extern int	mkcdpath(char *,const char *,int) ;
-extern int	mkvarpath(char *,const char *,int) ;
-extern int	hasvarpathprefix(const char *,int) ;
+extern "C" {
+    extern int	mkuserpath(char *,cchar *,cchar *,int) noex ;
+    extern int	mkcdpath(char *,cchar *,int) noex ;
+    extern int	mkvarpath(char *,cchar *,int) noex ;
+    extern int	hasvarpathprefix(cchar *,int) noex ;
+}
 
 
 /* forward references */
@@ -63,13 +65,10 @@ int uc_readlink(cchar *fname,char *rbuf,int rlen) noex {
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-	fl = strlen(fname) ;
+	fl = lenstr(fname) ;
 
-	if (typenonpath(fname,fl)) {
-	    rs = SR_INVALID ;
-	} else {
+	if ((rs = nonpath(fname,fl)) > 0) {
 	    char	efname[MAXPATHLEN + 1] ;
-
 	    if ((rs = mkuserpath(efname,NULL,fname,fl)) > 0) {
 	        fname = efname ;
 	    } else if (rs == 0) {
@@ -84,7 +83,8 @@ int uc_readlink(cchar *fname,char *rbuf,int rlen) noex {
 	    if (rs >= 0) {
 	        rs = u_readlink(fname,rbuf,rlen) ;
 	    }
-
+	} else if (rs >= 0) {
+	        rs = u_readlink(fname,rbuf,rlen) ;
 	} /* end if (nonpath or other) */
 
 	return rs ;
