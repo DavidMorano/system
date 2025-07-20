@@ -48,10 +48,11 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<strx.h>		/* |strbrk(3u)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
-#include	"strx.h"
+#include	"strxbrk.h"
 
 import libutil ;
 
@@ -85,7 +86,7 @@ import libutil ;
 /* exported subroutines */
 
 char *strobrk(cchar *s,cchar *ss) noex {
-    	return strpbrk(s,ss) ;
+    	return strbrk(s,ss) ;
 } /* end subroutine (strobrk) */
 
 char *strrbrk(cchar *s,cchar *ss) noex {
