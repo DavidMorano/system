@@ -47,9 +47,10 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<libmallocxx.h>
-#include	<hasnonpath.h>
+#include	<nonpath.h>
 #include	<localmisc.h>
 
+import libutil ;
 
 /* local defines */
 
@@ -66,7 +67,6 @@ extern "C" {
     extern int	mkuserpath(char *,cchar *,cchar *,int) noex ;
     extern int	mkcdpath(char *,cchar *,int) noex ;
     extern int	mkvarpath(char *,cchar *,int) noex ;
-    extern int	hasnonpath(cchar *,int) noex ;
 }
 
 
@@ -91,13 +91,12 @@ int uc_chmod(cchar *fname,mode_t fm) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fl ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-	        fl = strlen(fname) ;
-	        if (! hasnonpath(fname,fl)) {
-	    	    char	*efname{} ;
-		    if ((rs = libmalloc_mp(&efname)) >= 0) {
+	    if (fname[0]) ylikely {
+	        fl = lenstr(fname) ;
+	        if ((rs = nonpath(fname,fl)) >= 0) {
+	    	    if (char *efname ; (rs = libmalloc_mp(&efname)) >= 0) {
 	                if ((rs = mkuserpath(efname,nullptr,fname,fl)) > 0) {
 	                    fname = efname ;
 	                } else if (rs == 0) {
@@ -115,6 +114,8 @@ int uc_chmod(cchar *fname,mode_t fm) noex {
 			rs1 = uc_libfree(efname) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
+		} else if (rs >= 0) {
+	                    rs = u_chmod(fname,fm) ;
 	        } /* end if (nonpath) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -125,11 +126,11 @@ int uc_chmod(cchar *fname,mode_t fm) noex {
 int uc_minmod(cchar *fname,mode_t mm) noex {
 	int		rs = SR_FAULT ;
 	int		f_changed = false ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        mm &= (~ S_IFMT) ;
-		if (USTAT sb ; (rs = u_stat(fname,&sb)) >= 0) {
+		if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) ylikely {
 	            cmode	cm = (sb.st_mode & (~ S_IFMT)) ;
 	            if ((cm & mm) != mm) {
 	                f_changed = true ;
@@ -155,7 +156,7 @@ static int ensuremode(cchar *rbuf,mode_t nm) noex {
 		cint	of = O_RDONLY ;
 	        if ((rs = u_open(rbuf,of,om)) >= 0) {
 	            cint	fd = rs ;
-	            if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	            if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	                cmode	cm = sb.st_mode & (~ S_IFMT) ;
 	                nm &= (~ S_IFMT) ;
 	                if ((cm & nm) != nm) {
