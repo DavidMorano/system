@@ -56,15 +56,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/utsname.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<memory>		/* |destroy_a(3c++)| */
 #include	<usystem.h>
-#include	<ucsysauxinfo.h>
+#include	<ucsysauxinfo.h>	/* |SAI_{xx}| */
 #include	<getbufsize.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
@@ -74,6 +72,7 @@
 
 #include	"uinfo.h"
 
+import libutil ;
 
 /* local defines */
 
