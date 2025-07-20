@@ -23,7 +23,7 @@
 #include	<unistd.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<typenonpath.h>
+#include	<nonpath.h>
 #include	<localmisc.h>
 
 
@@ -65,13 +65,13 @@ int uc_lstat(cchar *fname,USTAT *sbp) noex {
 
 	fl = strlen(fname) ;
 
-	if (typenonpath(fname,fl)) {
+	if ((rs = nonpath(fname,fl)) == 0) {
 	    memclear(sbp) ;
 	    sbp->st_mode = S_IFNAM ;
 	    sbp->st_uid = UID_NOBODY ;
 	    sbp->st_gid = GID_NOBODY ;
 	    strncpy(sbp->st_fstype,FSTYPE_FLOAT,FSTYPESZ) ;
-	} else {
+	} else if (rs >= 0) {
 	    char	efname[MAXPATHLEN + 1] ;
 
 	    if ((rs = mkuserpath(efname,NULL,fname,fl)) > 0) {
