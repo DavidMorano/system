@@ -91,13 +91,13 @@ static int	ucmemla_map(ucmemla *,size_t,void **) noex ;
 int ucmemla_acquire(ucmemla *op,size_t us,void *rp) noex {
 	void		**rpp = (void **) rp ;
 	int		rs = SR_FAULT ;
-	if (op && rpp) {
+	if (op && rpp) ylikely {
 	    rs = SR_INVALID ;
 	    op->ma = nullptr ;
 	    op->ms = 0 ;
 	    op->f_large = false ;
-	    if (us > 0) {
-		void	*vp{} ;
+	    if (us > 0) ylikely {
+		void	*vp{} ; /* used-multiple */
 		if (us >= uslarge) {
 		    op->f_large = true ;
 		    rs = ucmemla_map(op,us,&vp) ;
@@ -106,7 +106,7 @@ int ucmemla_acquire(ucmemla *op,size_t us,void *rp) noex {
 		    if ((rs = uc_libmalloc(am,&vp)) >= 0) {
 		        op->ma = vp ;
 		        op->ms = us ;
-		    }
+		    } /* end if (memory-allocation) */
 		} /* end if (pagesize) */
 		*rpp = vp ;
 	    } /* end if (valid) */
@@ -117,7 +117,7 @@ int ucmemla_acquire(ucmemla *op,size_t us,void *rp) noex {
 
 int ucmemla_release(ucmemla *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if (op->f_large) {
 		rs = u_mmapend(op->ma,op->ms) ;
 	    } else {
