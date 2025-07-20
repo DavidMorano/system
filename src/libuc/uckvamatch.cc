@@ -9,12 +9,12 @@
 
 /* revision history:
 
-	= 1998-04-13, David AÂ­DÂ­ Morano
+	= 1998-04-13, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -42,32 +42,40 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<new>			/* |nothrow(3c++)| */
 #include	<secdb.h>		/* <- the money shot */
 #include	<usystem.h>
 #include	<localmisc.h>
 
+import libutil ;
 
 /* local defines */
-
-#if	defined(SYSHAS_USERATTR) && (SYSHAS_USERATTR > 0)
-#define	F_USERATTR	1
-#else /* defined(SYSHAS_USERATTR) && (SYSHAS_USERATTR > 0) */
-#define	F_USERATTR	0
-#endif /* defined(SYSHAS_USERATTR) && (SYSHAS_USERATTR > 0) */
 
 
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
 
-constexpr bool		f_userattr = F_USERATTR ;
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -79,11 +87,11 @@ int uc_kvamatch(kva_t *kva,cchar *keyname,cchar **rpp) noex {
 	    rs = SR_INVALID ;
 	    if (keyname[0]) {
 		rs = SR_OK ;
-	        if_constexpr (f_userattr) {
-		    const nullptr_t	np{} ;
-		    char	*kp = (char *) keyname ;
+	        if_constexpr (syshas.userattr) {
+		    cnullptr	np{} ;
+		    char	*kp = charp(keyname) ;
 	            if ((rp = kva_match(kva,kp)) != np) {
-	                rs = strlen(rp) ;
+	                rs = lenstr(rp) ;
 	            } else {
 	                rs = SR_NOTFOUND ;
 	            }
