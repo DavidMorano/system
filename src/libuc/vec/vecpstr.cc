@@ -1274,12 +1274,12 @@ vecpstr_iter vecpstr_iter::operator + (int n) const noex {
 
 vecpstr_iter &vecpstr_iter::operator += (int n) noex {
 	increment(n) ;
-	return (*this) ;
+	return *this ;
 }
 
 vecpstr_iter vecpstr_iter::operator ++ () noex { /* pre */
 	increment() ;
-	return (*this) ;
+	return *this ;
 }
 
 vecpstr_iter vecpstr_iter::operator ++ (int) noex { /* post */
