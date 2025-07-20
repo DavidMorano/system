@@ -24,7 +24,7 @@
 	This module serves as a cache (of sorts) for UNIX® information
 	that is related to the underlying machine and which does
 	not (easily) change during program exection.  Although this
-	object can service as a local cache (cotrolled by this
+	object can serve as a local cache (cotrolled by this
 	object itself), note that a process-wide cache of the
 	|uname(2)| information can be had and managed by the
 	|uinfo(3uc)| facility (enumated system call).
@@ -44,6 +44,7 @@
 
 #include	"unameo.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -63,7 +64,7 @@
 template<typename ... Args>
 static inline int unameo_ctor(unameo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
 	    op->a = nullptr ;
 	    op->sysname = nullptr ;
@@ -77,7 +78,7 @@ static inline int unameo_ctor(unameo *op,Args ... args) noex {
 
 static inline int unameo_dtor(unameo *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -98,22 +99,20 @@ static bufsizevar		nodenamelen(getbufsize_nn) ;
 int unameo_start(unameo *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = unameo_ctor(op)) >= 0) {
-	    if ((rs = nodenamelen) >= 0) {
+	if ((rs = unameo_ctor(op)) >= 0) ylikely {
+	    if ((rs = nodenamelen) >= 0) ylikely {
 	        cint	nlen = rs ;
-	        cint	usz = sizeof(UTSNAME) ;
-	        void	*vp{} ;
-	        if ((rs = uc_malloc(usz,&vp)) >= 0) {
+	        cint	usz = szof(UTSNAME) ;
+	        if (void *vp ; (rs = uc_malloc(usz,&vp)) >= 0) ylikely {
 	            UTSNAME	*unp = (UTSNAME *) vp ;
-	            if ((rs = u_uname(unp)) >= 0) {
+	            if ((rs = u_uname(unp)) >= 0) ylikely {
 	                int	sz = 0 ;
-	                char	*bp ;
-	                sz += (strnlen(unp->sysname,nlen) + 1) ;
-	                sz += (strnlen(unp->nodename,nlen) + 1) ;
-	                sz += (strnlen(unp->release,nlen) + 1) ;
-	                sz += (strnlen(unp->version,nlen) + 1) ;
-	                sz += (strnlen(unp->machine,nlen) + 1) ;
-	                if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	                sz += (lenstr(unp->sysname,nlen) + 1) ;
+	                sz += (lenstr(unp->nodename,nlen) + 1) ;
+	                sz += (lenstr(unp->release,nlen) + 1) ;
+	                sz += (lenstr(unp->version,nlen) + 1) ;
+	                sz += (lenstr(unp->machine,nlen) + 1) ;
+	                if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) ylikely {
 	                    op->a = bp ;
 	                    op->sysname = bp ;
 	                    bp = (strwcpy(bp,unp->sysname,nlen) + 1) ;
@@ -142,9 +141,9 @@ int unameo_start(unameo *op) noex {
 int unameo_finish(unameo *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->a) {
+	    if (op->a) ylikely {
 	        rs1 = uc_free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
