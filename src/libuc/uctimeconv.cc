@@ -52,6 +52,7 @@
 
 #include	"uctimeconv.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -95,8 +96,8 @@ constexpr bool		f_reentrant = F_REENTRANT ;
 int uc_localtime(const time_t *tp,TM *tsp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (tp && tsp) {
-	    TM		*rp ;
+	if (tp && tsp) ylikely {
+	    TM		*rp ; /* used-multiple */
 	    rs = SR_OK ;
 	    errno = 0 ;
 	    if_constexpr (f_reentrant) {
@@ -104,8 +105,8 @@ int uc_localtime(const time_t *tp,TM *tsp) noex {
 	            rs = (- errno) ;
 		}
 	    } else {
-	        if ((rs = uc_forklockbegin(-1)) >= 0) {
-	            if ((rs = uctimeconvmx.lockbegin) >= 0) {
+	        if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+	            if ((rs = uctimeconvmx.lockbegin) >= 0) ylikely {
 	                if ((rp = localtime(tp)) == nullptr) {
 	                    rs = (- errno) ;
 		        } else {
@@ -126,8 +127,8 @@ int uc_localtime(const time_t *tp,TM *tsp) noex {
 int uc_gmtime(const time_t *tp,TM *tsp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (tp && tsp) {
-	    TM		*rp ;
+	if (tp && tsp) ylikely {
+	    TM		*rp ; /* used-multiple */
 	    rs = SR_OK ;
 	    errno = 0 ;
 	    if_constexpr (f_reentrant) {
@@ -135,8 +136,8 @@ int uc_gmtime(const time_t *tp,TM *tsp) noex {
 	            rs = (- errno) ;
 		}
 	    } else {
-	        if ((rs = uc_forklockbegin(-1)) >= 0) {
-	            if ((rs = uctimeconvmx.lockbegin) >= 0) {
+	        if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+	            if ((rs = uctimeconvmx.lockbegin) >= 0) ylikely {
 	                if ((rp = gmtime(tp)) == nullptr) {
 	                    rs = (- errno) ;
 		        } else {
@@ -167,7 +168,7 @@ int uc_ztime(const time_t *tp,TM *tsp,int z) noex {
 
 int uc_mktime(TM *tmp,time_t *rp) noex {
 	int		rs = SR_FAULT ;
-	if (tmp && rp) {
+	if (tmp && rp) ylikely {
 	    time_t	res = 0 ;
 	    errno = 0 ;
 	    if ((res = mktime(tmp)) < 0) {
