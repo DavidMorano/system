@@ -29,13 +29,17 @@ module ;
 
 export module sview ;
 
+import libutil ;
+
 export {
     struct sview {
 	cchar		*sp ;
 	int		sl ;
 	constexpr sview() noex : sp(nullptr), sl(0) { } ;
 	constexpr sview(cchar *p,int l) noex : sp(p), sl(l) { 
-	   if (l < 0) sl = strlen(p) ;
+	   if (l < 0) {
+	       sl = intconv(strlen(p)) ;
+	   }
 	} ;
 	constexpr sview(const sview &o) noex {
 	    sp = o.sp ;
@@ -50,9 +54,9 @@ export {
 	    sl = o.sl ;
 	    return *this ;
 	} ;
-	constexpr const sview &operator = (cchar *op) noex {
-	    sp = op  ;
-	    sl = strlen(op) ;
+	constexpr const sview &operator = (cchar *osp) noex {
+	    sp = osp  ;
+	    sl = intconv(strlen(osp)) ;
 	    return *this ;
 	} ;
     } ; /* end struct (sview) */
