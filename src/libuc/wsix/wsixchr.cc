@@ -48,6 +48,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<localmisc.h>
 
 #include	"wsix.h"		/* |wsinul(3uc)| */
 
@@ -76,7 +77,7 @@
 /* exported subroutines */
 
 int wsiochr(const wchar_t *wsp,int wsl,int sch) noex {
-	int		i = -1 ; /* return-value */
+	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	if (wsp) {
 	    if (wsl < 0) wsl = wsinul(wsp) ;
@@ -90,7 +91,7 @@ int wsiochr(const wchar_t *wsp,int wsl,int sch) noex {
 /* end subroutine (wsiochr) */
 
 int wsirchr(const wchar_t *wsp,int wsl,int sch) noex {
-	int		i = -1 ; /* return-value */
+	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	if (wsp) {
 	    if (wsl < 0) wsl = wsinul(wsp) ;
