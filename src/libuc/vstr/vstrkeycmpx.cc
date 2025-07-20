@@ -72,6 +72,9 @@ typedef int (*verse_f)(cc *,cc *) noex ;
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 static int vstrkeycmpx(verse_f vx,cchar **s1pp,cchar **s2pp) noex {
