@@ -96,7 +96,7 @@
 #include	<getuserhome.h>		/* |getuserhome(3uc)| */
 #include	<libmallocxx.h>
 #include	<vecstr.h>
-#include	<typenonpath.h>
+#include	<nonpath.h>
 #include	<snwcpy.h>
 #include	<snx.h>
 #include	<mkx.h>
@@ -216,16 +216,6 @@ enum accmodes {
 	accmode_rdwr,
 	accmode_overlast
 } ;
-
-enum nonpaths {
-	nonpath_not,
-	nonpath_dialer,
-	nonpath_fsvc,
-	nonpath_usvc,
-	nonpath_overlast
-} ;
-
-static cchar	nonpaths[] = "/¥§~" ;
 
 #if	CF_ISMORE
 static cint	rsmore[] = {
@@ -351,10 +341,11 @@ static int open_eval(ucopeninfo *oip) noex {
 
 	while ((rs >= 0) && (fd < 0)) {
 
-	    if ((npi = typenonpath(oip->fname,-1)) > 0) {
+	    if ((rs = nonpath(oip->fname,-1)) > 0) {
+		npi = rs ;
 	        rs = open_floatpath(oip,npi) ;
 	        fd = rs ;
-	    } else {
+	    } else if (rs >= 0) {
 	        if (hasvarpathprefix(oip->fname,-1) && (efname == nullptr)) {
 	            cint	sz = (MAXPATHLEN + 1) ;
 	            if (void *p ; (rs = uc_libmalloc(sz,&p)) >= 0) {
@@ -462,13 +453,14 @@ static int open_otherlink(ucopeninfo *oip,int *fdp,char *ofname) noex {
 	    if (rbuf[0] == '/') {
 	        oip->fname = (cchar *) ofname ;
 	        rs = mkpath1(ofname,rbuf) ;
-	    } else if ((npi = typenonpath(rbuf,-1)) > 0) {
+	    } else if ((rs = nonpath(rbuf,-1)) > 0) {
+		npi = rs ;
 	        oip->fname = (cchar *) ofname ;
 	        if ((rs = mkpath1(ofname,rbuf)) >= 0) {
 	            rs = open_floatpath(oip,npi) ;
 	            fd = rs ;
 	        }
-	    } else {
+	    } else if (rs >= 0) {
 	        int		cl ;
 	        cchar		*cp ;
 	        char		dname[MAXPATHLEN + 1] ;
