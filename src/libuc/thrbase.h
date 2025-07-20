@@ -35,13 +35,19 @@ enum thrbasecmds {
 	thrbasecmd_overlast
 } ;
 
+EXTERNC_begin
+
+typedef int (*thrbase_f)(THRBASE *,void *) noex ;
+
+EXTERNC_end
+
 struct thrbase_info {
 	int		dummy ;
 } ;
 
 struct thrbase_startinfo {
 	THRBASE		*op ;
-	int		(*worker)(THRBASE *,void *) ;
+	thrbase_f	worker ;
 } ;
 
 struct thrbase_head {
