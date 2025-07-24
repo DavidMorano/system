@@ -11,6 +11,9 @@ libuc		fix to completely compile!
 ucopen
 ucopen		needs dynamic allocation
 fsdirtree	needs pointer implementation and a lot of cleanup
+opendialer	cleanup
+sdprog		mess
+srv		mess
 sysdialer
 cm
 mailmsghdrct	mess
