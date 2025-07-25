@@ -80,7 +80,7 @@
 #include	<bits.h>
 #include	<buffer.h>
 #include	<bufprintf.h>
-#include	<bufsizenames.h>
+#include	<bufsize.h>
 #include	<bufstr.h>
 #include	<bwops.h>
 #include	<cachetime.h>

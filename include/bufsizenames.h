@@ -39,10 +39,12 @@
 
 enum getbufsizes {
 	getbufsize_ps,		/* page-size */
+	getbufsize_mi,		/* max-pid */
 	getbufsize_ma,		/* max-args */
 	getbufsize_mn,		/* max-name */
 	getbufsize_mp,		/* max-path */
 	getbufsize_ml,		/* max-line */
+	getbufsize_mm,		/* max-message */
 	getbufsize_nn,		/* node-name */
 	getbufsize_hn,		/* host-name */
 	getbufsize_un,		/* user-name */

@@ -40,7 +40,7 @@ enum modloados {
     modloado_avail,
     modloado_self,
     modloado_overlast
-} ;
+} ; /* end enum (modloados) */
 
 #ifdef	__cplusplus
 
@@ -50,7 +50,7 @@ struct modloadms {
     	static cint	libsdirs ;
     	static cint	avail ;
     	static cint	self ;
-} ;
+} ; /* end structenum (modloadms) */
 
 #endif /* __cplusplus */
 
@@ -104,8 +104,8 @@ struct modload : modload_head {
 	int getmva(int *,int) noex ;
 	int getsym(cchar *,cvoid **) noex ;
 	void dtor() noex ;
-	~modload() {
-	    dtor() ;
+	destruct modload() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (modload) */
 #else	/* __cplusplus */
@@ -124,7 +124,9 @@ extern int modload_close(modload *) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
 extern const modloadms	modloadm ;
+#endif /* __cplusplus */
 
 
 #endif /* MODLOAD_INCLUDE */

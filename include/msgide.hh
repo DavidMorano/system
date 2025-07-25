@@ -83,8 +83,8 @@ struct msgide {
 	int wru(cchar *,int = -1) noex ;
 	int loadrec(cchar *,int = -1) noex ;
 	int loadmid(cchar *,int = -1) noex ;
-	~msgide() {
-	    finish() ;
+	destruct msgide() {
+	    if (a) finish() ;
 	} ;
     private:
 	int istart() noex ;
