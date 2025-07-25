@@ -100,9 +100,9 @@ struct sockaddress : sockaddress_head {
 	sockaddress_co	len ;
 	sockaddress_co	finish ;
 	sockaddress() noex {
-	    getaf(this,sockaddressmem_getaf) ;
-	    len(this,sockaddressmem_len) ;
-	    finish(this,sockaddressmem_finish) ;
+	    getaf	(this,sockaddressmem_getaf) ;
+	    len		(this,sockaddressmem_len) ;
+	    finish	(this,sockaddressmem_finish) ;
 	} ;
 	sockaddress(const sockaddress &) = delete ;
 	sockaddress &operator = (const sockaddress &) = delete ;

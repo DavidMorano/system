@@ -34,6 +34,7 @@
 struct strlistmks_object {
 	cchar		*name ;
 	uint		objsize ;
+	uint		dummy ;
 } ;
 
 struct strlistmks_flags {

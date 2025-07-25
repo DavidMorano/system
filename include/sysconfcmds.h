@@ -44,6 +44,7 @@
 
 enum sysconfcmds {
     sysconfcmd_synthetic = 1000,
+    sysconfcmd_maxpid,
     sysconfcmd_maxline,
     sysconfcmd_maxlogin,
     sysconfcmd_maxgroups,
@@ -57,6 +58,7 @@ enum sysconfcmds {
     sysconfcmd_maxprojectname,
     sysconfcmd_maxnodename,
     sysconfcmd_maxhostname,
+    sysconfcmd_maxmsg,
     sysconfcmd_maxmailaddr,
     sysconfcmd_pwent,
     sysconfcmd_uaent,
@@ -67,6 +69,9 @@ enum sysconfcmds {
 } ; /* end enum (sysconfcmds) */
 
 
+#ifndef	_SC_MAXPID
+#define	_SC_MAXPID		sysconfcmd_maxpid
+#endif
 #ifndef	_SC_LINE_MAX
 #define	_SC_LINE_MAX		sysconfcmd_maxline
 #endif
@@ -132,8 +137,16 @@ enum sysconfcmds {
 #ifndef	_SC_ZONEINFO_MAX
 #define	_SC_ZONEINFO_MAX	sysconfcmd_maxzoneinfo
 #endif
+#ifndef	_SC_MSG_MAX
+#define	_SC_MSG_MAX		sysconfcmd_maxmsg
+#endif
 #ifndef	_SC_MAILADDR_MAX
 #define	_SC_MAILADDR_MAX	sysconfcmd_maxmailaddr
+#endif
+
+/* an alias (since the real one did not follow the typical convention) */
+#ifndef	_SC_PID_MAX
+#define	_SC_PID_MAX		_SC_MAXPID
 #endif
 
 
