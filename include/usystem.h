@@ -62,9 +62,10 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<ubufdefs.h>
 #include	<usupport.h>
-#include	<stdintx.h>
 
+#include	<stdintx.h>
 #include	<uinet.h>
 #include	<usyscalls.h>
 #include	<uxti.h>

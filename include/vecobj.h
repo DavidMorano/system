@@ -199,7 +199,11 @@ extern int vecobj_addnew(vecobj *,void **) noex ;
 
 EXTERNC_end
 
-extern vecobjms		vecobjm ;
+#ifdef	__cplusplus
+
+extern const vecobjms	vecobjm ;
+
+#endif /* __cplusplus */
 
 
 #endif /* VECOBJ_INCLUDE */
