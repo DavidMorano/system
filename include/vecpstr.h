@@ -328,7 +328,11 @@ static inline int vecpstr_loaddirs(vecpstr *op,cchar *newsdname) noex {
 
 EXTERNC_end
 
-extern vecpstrms	vecpstrm ;
+#ifdef	__cplusplus
+
+extern const vecpstrms	vecpstrm ;
+
+#endif /* __cplusplus */
 
 
 #endif /* VECPSTR_INCLUDE */

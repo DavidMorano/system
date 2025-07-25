@@ -37,7 +37,7 @@
 	(|bufsizeitem|).  
 	
 	Notes:
-	1. (2014-06-17) Oh, I almost forgot.  I am using the new
+	1. 2014-06-17 - Oh, I almost forgot.  I am using the new
 	|constexpr| features of C++14.  I waited for these C++14
 	enhancements to |constexpr| for these many years.  I knew
 	that the imbecilic implemention of |constexpr| in C+11
@@ -50,13 +50,14 @@ module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>		/* |_SC_xx| */
-#include	<climits>
+#include	<climits>		/* some possibly applicabledefines */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<ubufdefs.h>		/* |{xx}BUFLEN| */
 #include	<bufsizenames.h>
 #include	<sysconfcmds.h>
 #include	<localmisc.h>
@@ -88,6 +89,10 @@ export {
 	        ip->name = _SC_PAGESIZE ;
 		ip->defval = (8 * 1024) ;	/* page-size Solaris® */
 	        break ;
+	    case getbufsize_mi:
+	        ip->name = _SC_PID_MAX ;
+		ip->defval = PID_MAX ;
+	        break ;
 	    case getbufsize_ma:
 	        ip->name = _SC_ARG_MAX ;
 		ip->defval = ARBUFLEN ;
@@ -103,6 +108,10 @@ export {
 	    case getbufsize_ml:		/* max-line */
 	        ip->name = _SC_LINE_MAX ;
 		ip->defval = MLBUFLEN ;
+	        break ;
+	    case getbufsize_mm:		/* max-message */
+	        ip->name = _SC_MSG_MAX ;
+		ip->defval = MMBUFLEN ;
 	        break ;
 	    case getbufsize_nn:		/* node-name */
 	        ip->name = _SC_NODENAME_MAX ; /* <- really is "nodename" */
