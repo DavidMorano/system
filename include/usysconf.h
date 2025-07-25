@@ -27,6 +27,14 @@
 #include	<usysrets.h>
 
 
+EXTERNC_begin
+
+extern int	u_sysconfval(int,long *) noex ;
+extern int	u_sysconfstr(int,char *,int) noex ;
+
+EXTERNC_end
+
+
 #endif /* USYSCONF_INCLUDE */
 
 

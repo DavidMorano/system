@@ -40,6 +40,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<usupport.h>
+#include	<usysconf.h>
 
 
 EXTERNC_begin

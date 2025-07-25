@@ -1,4 +1,4 @@
-/* ustd HEADER */
+/* ustd_confval HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -20,29 +20,35 @@
 
 /*******************************************************************************
 
-  	Group:
-	ustd
+  	System:
+	ustd_ttydefs
 
 	Description:
 	This file contains the UNIX® system types that the brain-damaged
-	MacOS operating system does NOT have.  We are trying in a very
-	small way to make up for some of the immense brain-damage within
-	the Apple Darwin operating system.
+	MacOS operating system does NOT have.  We are trying in a
+	very small way to make up for some of the immense brain-damage
+	within the Apple Darwin operating system.
 
 *******************************************************************************/
 
-#ifndef	USTD_INCLUDE
-#define	USTD_INCLUDE
+#ifndef	USTDCONFVAL_INCLUDE
+#define	USTDCONFVAL_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 
-#include	<ustd_typedefs.h>	/* should be ordered first */
 
-#include	<ustd_confstr.h>
-#include	<ustd_confval.h>
+namespace ustd {
+    extern int	ustd_confval(int,long *) noex ;
+} /* end namespace (ustd) */
 
 
-#endif /* USTD_INCLUDE */
+#endif /* __cplusplus */
+#endif /* USTDCONFVAL_INCLUDE */
 
 

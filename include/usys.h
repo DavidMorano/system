@@ -50,6 +50,7 @@
 #include	<usys_ugetnisdom.h>
 #include	<usys_usendfile.h>
 #include	<usys_ufstype.h>
+#include	<usys_umaxmsglen.h>
 #include	<usys_pathpid.h>
 
 /* missing operating system calls */
