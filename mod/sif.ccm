@@ -29,6 +29,8 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
+#pragma		GCC dependency	"mod/chrset.ccm"
+
 export module sif ;
 
 import chrset ;
