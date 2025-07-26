@@ -1,4 +1,5 @@
 /* hasx HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* has a counted c-string some characteristic? */
