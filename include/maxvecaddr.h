@@ -1,4 +1,5 @@
 /* maxvecaddr HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* Maximum-Vector-Address (see SUPPORT source file for more information) */
