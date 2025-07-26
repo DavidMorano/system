@@ -54,6 +54,7 @@
 #define	CH_US		0x1F		/* unit separator */
 
 #define	CH_SP		0x20		/* space */
+#define	CH_STAR		0x2A		/* star (asterisk)plus */
 #define	CH_PLUS		0x2B		/* plus */
 #define	CH_MINUS	0x2D		/* minus */
 #define	CH_SQUOTE	0x27		/* quote single (') */
