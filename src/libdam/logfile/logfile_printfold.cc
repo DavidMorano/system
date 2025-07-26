@@ -32,13 +32,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<linefold.h>
 #include	<localmisc.h>
 
 #include	"logfile.h"
 
+import libutil ;
 
 /* local defines */
 
