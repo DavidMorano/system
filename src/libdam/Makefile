@@ -134,8 +134,8 @@ OBJ34=
 OBJ35= sfsub.o sfcasesub.o sfkey.o sfbreak.o sfskipwhite.o sfshrink.o sfword.o
 OBJ36= sfdirname.o sfbasename.o sfwhitedot.o sfprogroot.o sfdequote.o
 OBJ37= sfcookkey.o sfsubstance.o sfthing.o sfcenter.o sfrootname.o sfnamecomp.o
-OBJ38= sichr.o sicasechr.o sialpha.o sidigit.o sialnum.o sidquote.o sinext.o
-OBJ39= sisub.o sicasesub.o sibreak.o siskipwhite.o sibasename.o sispan.o 
+OBJ38=
+OBJ39=
 
 OBJ40= getenv3.o
 OBJ41= permsched.o
@@ -261,7 +261,7 @@ OBJ144=
 OBJ145= cfhulian.o
 OBJ146= ctb26.o cthexstr.o ctroman.o ctwords.o
 OBJ147= quickselecti.o igcd.o minmax.o isort.o
-OBJ148= fam.o fhm.o fsum.o
+OBJ148= fam.o fhm.o
 OBJ149= permutations.o combinations.o
 OBJ150= wsnwcpynarrow.o
 OBJ151= wsfnext.o wsinul.o wsichr.o wsirchr.o
@@ -280,9 +280,9 @@ OBJ161= nusers.o mesg.o initnow.o
 OBJ162= getfiledirs.o findfilepath.o findfile.o
 OBJ163= cvttemperature.o bufprintf.o xfile.o
 OBJ164= mapex.o strsigabbr.o strerrabbr.o strlocktype.o
-OBJ165= emainfo.o getdig.o
-OBJ166= listentcp.o listenudp.o listenuss.o listenusd.o 
-OBJ167= listenpass.o listenconn.o
+OBJ165= emainfo.o
+OBJ166=
+OBJ167=
 
 OBJ168= getprogexec.o getnodedomain.o getrand.o getgid_def.o
 OBJ169= getehostname.o getchostname.o getcanonical.o getourhe.o
@@ -867,6 +867,11 @@ paramopt.o:		paramopt.dir
 paramopt.dir:
 	makesubdir $@
 
+# LISTEN
+listen.o:		listen.dir
+listen.dir:
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 
@@ -922,5 +927,11 @@ minmaxelem.o:		minmaxelem.ccm			$(INCS)
 # HASDUPLICATE
 hascount.o:		hascount.ccm			$(INCS)
 	makemodule hascount
+
+# BINCHAR
+binchar.o:		binchar.ccm
+	makemodule rshiftx
+	makemodule binchar
+
 
 
