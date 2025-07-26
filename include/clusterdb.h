@@ -1,4 +1,5 @@
 /* clusterdb HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* manage a database of cluster names */
