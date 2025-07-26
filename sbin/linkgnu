@@ -1,10 +1,12 @@
-#!/bin/ksh
+#!/usr/extra/bin/ksh
 # LINKGNU
 
-CMDS=" gar gcc gcov gcpp gld gnm gpp granlib"
+CMDS=" gar gcc gcov gcpp gld gnm gpp gxx granlib"
 CMDBIN=${REPOROOT}/bin
 
 PN=${0##*/}
+DN=/dev/null
+
 if [[ -d "${CMDBIN}" ]] ; then
   for TDIR in "${@}" ; do
     if [[ -d "${TDIR}" ]] ; then
@@ -25,5 +27,4 @@ if [[ -d "${CMDBIN}" ]] ; then
 else
   print -u2 "${PN}: no command directory found"
 fi
-
 
