@@ -2,58 +2,29 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* filter a string of text against some criteria */
+/* File-Once management */
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 1998-11-01, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	STRFILTER_INCLUDE
 #define	STRFILTER_INCLUDE
 
 
-#include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>
-#include	<usystem.h>
-#include	<vecstr.h>
-
-
-/* object defines */
-#define	STRFILTER		struct strfilter_head
-#define	STRFILTER_FL		struct strfilter_flags
-
-/* options */
-#define	STRFILTER_MCARRIAGE	0x0001
-
-/* constants */
-#ifdef	LINE_MAX
-#define	STRFILTER_BUFLEN	MAX(LINE_MAX,4096)
-#else
-#define	STRFILTER_BUFLEN	4096
-#endif
-
-
-struct strfilter_flags {
-	uint		sslist:1 ;	/* select */
-	uint		sxlist:1 ;	/* exclude */
-} ;
-
-struct strfilter_head {
-	vecstr		*sslp ;	/* select list pointer */
-	vecstr		*sxlp ;	/* exclude list pointer */
-	STRFILTER_FL	f ;
-} ;
-
-typedef	STRFILTER	strfilter ;
-typedef	STRFILTER_FL	strfilter_fl ;
-
-EXTERNC_begin
-
-extern int strfilter_start(strfilter *,cchar *,cchar *) noex ;
-extern int strfilter_check(strfilter *,cchar *,int) noex ;
-extern int strfilter_finish(strfilter *) noex ;
-
-EXTERNC_end
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #endif /* STRFILTER_INCLUDE */
