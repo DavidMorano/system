@@ -1,4 +1,5 @@
 /* thrcomm HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* Thread-Communication (THRCOMM) */
