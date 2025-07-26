@@ -49,7 +49,7 @@
 #include	<dlfcn.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<usystem.h>
 #include	<usysflag.h>
@@ -70,6 +70,7 @@
 
 #include	"modload.h"
 
+import libutil ;
 
 /* local defines */
 
