@@ -1,4 +1,6 @@
-/* envstandards */
+/* envstandards HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
 
 
 /* revision history:
