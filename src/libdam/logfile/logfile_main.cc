@@ -76,6 +76,7 @@
 
 #include	"logfile.h"
 
+import libutil ;
 
 /* local defines */
 
