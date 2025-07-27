@@ -30,7 +30,6 @@
 
 #define	LINEHIST_MAGIC		0x13f3c203
 #define	LINEHIST		struct linehist_head
-#define	LINEHIST_LINE		struct linehist_line
 
 
 struct linehist_head {
