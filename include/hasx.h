@@ -38,6 +38,7 @@ extern bool hasempty(cchar *,int) noex ;
 extern bool hasalpha(cchar *,int) noex ;
 extern bool hasalnum(cchar *,int) noex ;
 extern bool hasnum(cchar *,int) noex ;
+extern bool hasmodname(cchar *,int) noex ;
 
 extern bool hasprintlatin(cchar *,int) noex ;
 extern bool hasprintbad(cchar *,int) noex ;
