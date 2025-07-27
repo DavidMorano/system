@@ -69,8 +69,10 @@ struct strop : strop_head {
 	strop(const strop &) = delete ;
 	strop &operator = (const strop &) = delete ;
 	int start(cchar *,int = -1) noex ;
-	int breakfield(cchar *,cchar **) noex ;
 	int whitechr(int) noex ;		/* skip wht until */
+	int fieldwht(cchar **) noex ;
+	int fieldchr(int,cchar **) noex ;
+	int fieldbrk(cchar *,cchar **) noex ;
 	int findchr(int) noex ;
 	int findterm(cchar *) noex ;
 	int spanterm(cchar *) noex ;
@@ -87,18 +89,16 @@ typedef struct strop_head	strop ;
 EXTERNC_begin
 
 extern int	strop_start(strop *,cchar *,int) noex ;
-extern int	strop_breakfield(strop *,cchar *,cchar **) noex ;
 extern int	strop_white(strop *) noex ;
 extern int	strop_whitechr(strop *,int) noex ;
+extern int	strop_fieldwht(strop *,cchar **) noex ;
+extern int	strop_fieldchr(strop *,int,cchar **) noex ;
+extern int	strop_fieldbrk(strop *,cchar *,cchar **) noex ;
 extern int	strop_findchr(strop *,int) noex ;
 extern int	strop_findterm(strop *,cchar *) noex ;
 extern int	strop_spanterm(strop *,cchar *) noex ;
 extern int	strop_span(strop *,cchar *) noex ;
 extern int	strop_finish(strop *) noex ;
-
-EXTERNC_end
-
-#ifdef	__cplusplus
 
 inline int strop_whitedash(strop *op) noex {
 	return strop_whitechr(op,'-') ;
@@ -107,16 +107,7 @@ inline int strop_whitecolon(strop *op) noex {
 	return strop_whitechr(op,':') ;
 }
 
-#else /* __cplusplus */
-
-static inline int strop_whitedash(strop *op) noex {
-	return strop_whitechr(op,'-') ;
-}
-static inline int strop_whitecolon(strop *op) noex {
-	return strop_whitechr(op,':') ;
-}
-
-#endif /* __cplusplus */
+EXTERNC_end
 
 
 #endif /* STROP_UNCLUDE */
