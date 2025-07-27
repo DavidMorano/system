@@ -62,6 +62,8 @@
 #define	CH_DQUOTE	0x22		/* quote double (") */
 #define	CH_DOT		0x2E		/* dot */
 #define	CH_FSLASH	0x2F		/* slash forward */
+#define	CH_COLON	0x3A		/* colon */
+#define	CH_SEMI		0x3B		/* semi-colon */
 #define	CH_BSLASH	0x5C		/* slash backward */
 #define	CH_LPAREN	0x28		/* parenthesis left */
 #define	CH_RPAREN	0x29		/* parenthesis right */
@@ -72,6 +74,7 @@
 #define	CH_RBRACK	0x5D		/* bracket right */
 #define	CH_LBRACE	0x7B		/* brace left */
 #define	CH_RBRACE	0x7D		/* brace right */
+#define	CH_UNDER	0x5F		/* underscore */
 #define	CH_DEL		0x7F		/* delete */
 
 #define	CH_B0		0x80		/* ?? */
