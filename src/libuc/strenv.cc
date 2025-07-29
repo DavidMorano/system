@@ -132,7 +132,7 @@ namespace {
         }
 	void dtor() noex ;
 	destruct valstore() {
-	    dtor() ;
+	    if (finit || finitdone) dtor() ;
 	} ;
     private:
 	int iinit() noex ;
@@ -225,14 +225,14 @@ strenv::operator ccharp () noex {
 int valstore::iinit() noex {
 	int		rs = SR_NXIO ;
 	int		fr = false ;
-	if (!fvoid) {
+	if (! fvoid) {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
-	        if ((rs = mx.create) >= 0) {
+	        if ((rs = mx.create) >= 0) ylikely {
 	            void_f	b = valstore_atforkbefore ;
 	            void_f	a = valstore_atforkafter ;
-	            if ((rs = uc_atforkrecord(b,a,a)) >= 0) {
+	            if ((rs = uc_atforkrecord(b,a,a)) >= 0) ylikely {
 	                if ((rs = uc_atexit(valstore_exit)) >= 0) {
 	                    finitdone = true ;
 	                    fr = true ;
@@ -250,7 +250,7 @@ int valstore::iinit() noex {
 		}
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
-	        auto lamb = [this] () -> int {
+	        cauto lamb = [this] () -> int {
 	            int		rsl = SR_OK ;
 	            if (!finit) {
 		        rsl = SR_LOCKLOST ;
@@ -299,8 +299,8 @@ int valstore::ifini() noex {
 int valstore::valget(int aw,cchar **rpp) noex {
 	int		rs = SR_INVALID ;
 	int		rs1 ;
-	if ((aw >= 0) && (aw < strenv_overlast)) {
-	    if ((rs = monbegin) >= 0) {
+	if ((aw >= 0) && (aw < strenv_overlast)) ylikely {
+	    if ((rs = monbegin) >= 0) ylikely {
 	        if (! facc[aw]) {
 		    switch (aw) {
 		    case strenv_tmpdir:
@@ -329,7 +329,7 @@ int valstore::valget(int aw,cchar **rpp) noex {
 int valstore::valtmpdir(int aw) noex {
 	int		rs = SR_OK ;
 	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
-	    cchar	*rp ;
+	    cchar	*rp ; /* used-afterwards */
 	    if ((rp = getenv(vn)) == nullptr) {
 		rp = sysword.w_tmpdir ;
 	    } /* end if (env-variable access) */
@@ -360,7 +360,7 @@ int valstore::valpath(int aw) noex {
 	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
 	    cchar	*rp ; /* used-afterwards */
 	    if ((rp = getenv(vn)) == nullptr) {
-		if ((rs = maxpathlen) >= 0) {
+		if ((rs = maxpathlen) >= 0) ylikely {
 		    cint	tlen = (rs * PLMULT) ;
 		    if (char *tbuf ; (rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		        cchar	*usrlocal = sysword.w_usrlocaldir ;
@@ -371,7 +371,7 @@ int valstore::valpath(int aw) noex {
 			        cint	clen = (tlen - (tl + rs)) ;
 			        char	*cbuf = (tbuf + (tl + rs)) ;
 			        tl += rs ;
-		                if ((rs = uc_sysconfstr(cbuf,clen,cmd)) >= 0) {
+		                if ((rs = uc_sysconfstr(cmd,cbuf,clen)) >= 0) {
 			            tl += rs ;
 			            ma[aw] = mallocstrw(tbuf,tl) ;
 		                } /* end if (uc_sysconfstr) */
@@ -408,20 +408,22 @@ void valstore::dtor() noex {
 
 valstore_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	switch (w) {
-	case valstoremem_init:
-	    rs = op->iinit() ;
-	    break ;
-	case valstoremem_fini:
-	    rs = op->ifini() ;
-	    break ;
-	case valstoremem_monbegin:
-	    rs = op->imonbegin() ;
-	    break ;
-	case valstoremem_monend:
-	    rs = op->imonend() ;
-	    break ;
-	} /* end switch */
+	if (op) ylikely {
+	    switch (w) {
+	    case valstoremem_init:
+	        rs = op->iinit() ;
+	        break ;
+	    case valstoremem_fini:
+	        rs = op->ifini() ;
+	        break ;
+	    case valstoremem_monbegin:
+	        rs = op->imonbegin() ;
+	        break ;
+	    case valstoremem_monend:
+	        rs = op->imonend() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (valstore_co) */

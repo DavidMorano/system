@@ -79,16 +79,20 @@
 /* exported subroutines */
 
 char *strdcpyopaque(char *dp,int dl,cchar *sp,int sl) noex {
-	while (sl && *sp)  {
-	    cint	ch = mkchar(*sp) ;
-	    if (! CHAR_ISWHITE(ch)) {
-	        if (dl-- == 0) break ;
-	        *dp++ = char(ch) ;
-	    } /* end if */
-	    sp += 1 ;
-	    sl -= 1 ;
-	} /* end while */
-	*dp = '\0' ;
+    	if (dp && sp) {
+	    while (sl && *sp)  {
+	        cint	ch = mkchar(*sp) ;
+	        if (! CHAR_ISWHITE(ch)) {
+	            if (dl-- == 0) break ;
+	            *dp++ = char(ch) ;
+	        } /* end if */
+	        sp += 1 ;
+	        sl -= 1 ;
+	    } /* end while */
+	    *dp = '\0' ;
+	} else {
+	    dp = nullptr ;
+	} /* end if (non-null) */
 	return dp ;
 }
 /* end subroutine (strdcpyopaque) */

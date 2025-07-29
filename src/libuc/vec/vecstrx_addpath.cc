@@ -69,7 +69,7 @@
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<libmallocxx.h>		/* <- currently unused */
-#include	<strn.h>
+#include	<strn.h>		/* |strnbrk(3uc)| */
 #include	<pathclean.h>
 #include	<localmisc.h>
 
@@ -99,7 +99,7 @@ static int vecstrx_addone(vecstrx *op,char *pbuf,cchar *sp,int sl) noex {
 	if ((rs = pathclean(pbuf,sp,sl)) >= 0) {
 	    rs = op->adduniq(pbuf,rs) ;
 	    if (rs < INT_MAX) c += 1 ;
-	}
+	} /* end if (pathclean) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecstrx_addone) */
@@ -116,8 +116,9 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 /* exported subroutines */
 
 int vecstrx::addpathclean(cchar *lp,int ll) noex {
+    	cnullptr	np{} ;
     	auto		mall = uc_libmalloc ;
-    	auto		free = uc_libfree ;
+    	auto		mfre = uc_libfree ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -127,9 +128,8 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 	    if (ll > 0) {
 		if ((rs = maxpathlen) >= 0) {
 		    cint	plen = rs ;
-		    if (char *pbuf{} ; (rs = mall((plen+1),&pbuf)) >= 0) {
-	                cchar	*tp ;
-	                while ((tp = strnbrk(lp,ll,":;")) != nullptr) {
+		    if (char *pbuf ; (rs = mall((plen+1),&pbuf)) >= 0) {
+	                for (cc *tp ; (tp = strnbrk(lp,ll,":;")) != np ; ) {
 			    if (cint tl = intconv(tp - lp) ; tl >= 0) {
 				rs = vecstrx_addone(this,pbuf,lp,tl) ;
 				c += rs ;
@@ -142,7 +142,7 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 			    rs = vecstrx_addone(this,pbuf,lp,ll) ;
 			    c += rs ;
 	                }
-			rs1 = free(pbuf) ;
+			rs1 = mfre(pbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		} /* end if (maxpathlen) */
@@ -153,14 +153,14 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 /* end subroutine (vecstrx_addpathclean) */
 
 int vecstrx::addpath(cchar *lp,int ll) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (lp) {
 	    rs = SR_OK ;
 	    if (ll < 0) ll = lenstr(lp) ;
 	    if (ll > 0) {
-	        cchar	*tp ;
-	        while ((tp = strnbrk(lp,ll,":;")) != nullptr) {
+	        for (cc *tp ; (tp = strnbrk(lp,ll,":;")) != np ; ) {
 		    if (cint tl = intconv(tp - lp) ; tl >= 0) {
 		        rs = adduniq(lp,tl) ;
 		        if (rs < INT_MAX) c += 1 ;
@@ -181,7 +181,7 @@ int vecstrx::addpath(cchar *lp,int ll) noex {
 
 int vecstrx::addcspath() noex {
     	auto		mall = uc_libmalloc ;
-    	auto		free = uc_libfree ;
+    	auto		mfre = uc_libfree ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -189,11 +189,11 @@ int vecstrx::addcspath() noex {
             cint    clen = (NPATH * rs) ;
             if (char *cbuf ; (rs = mall((clen+1),&cbuf)) >= 0) {
                 cint        req = _CS_PATH ;
-                if ((rs = uc_sysconfstr(cbuf,clen,req)) >= 0) {
+                if ((rs = uc_sysconfstr(req,cbuf,clen)) >= 0) {
                     rs = addpath(cbuf,rs) ;
                     c += rs ;
                 } /* end if */
-                rs1 = free(cbuf) ;
+                rs1 = mfre(cbuf) ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (m-a-f) */
         } /* end if (maxpathlen) */

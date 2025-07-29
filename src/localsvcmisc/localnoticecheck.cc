@@ -6,7 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -59,25 +58,20 @@
 #include	<cstring>
 #include	<pwd.h>
 #include	<usystem.h>
+#include	<getax.h>
+#include	<getpwx.h>
 #include	<estrings.h>
 #include	<bfile.h>
 #include	<vecstr.h>
-#include	<getax.h>
-#include	<ugetpw.h>
 #include	<mailbox.h>
 #include	<mbcache.h>
 #include	<mailmsg.h>
 #include	<ema.h>
+#include	<compactstr.h>
 #include	<localmisc.h>
 
 
 /* local defines */
-
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
 
 #ifndef	LINEBUFLEN
 #define	LINEBUFLEN	2048

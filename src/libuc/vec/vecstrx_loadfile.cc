@@ -66,6 +66,7 @@
 #include	<cstring>		/* |strcmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<getfdfile.h>
 #include	<bufsizevar.hh>
 #include	<filer.h>
 #include	<field.h>
@@ -79,10 +80,6 @@
 
 #define	LINEBUFMULT	5		/* line-buffer size multiplier */
 #define	DEFBUFLEN	1024
-
-#ifndef	FD_STDIN
-#define	FD_STDIN	0
-#endif
 
 #define	TO_READ		-1		/* read timeout */
 
@@ -110,8 +107,8 @@ namespace {
     struct vars {
         int	linebuflen ;
 	operator int () noex ;
-    } ;
-}
+    } ; /* end struct (vars) */
+} /* end namespace */
 
 
 /* forward references */
@@ -186,7 +183,7 @@ static int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
 	    csize	fsz = size_t(sb.st_size) ;
 	    rs = SR_ISDIR ;
 	    if (! S_ISDIR(sb.st_mode)) {
@@ -202,7 +199,7 @@ static int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	            to = TO_READ ;
 	            if (S_ISSOCK(sb.st_mode)) fbo |= FILER_ONET ;
 	        }
-	        if (char *lbuf{} ; (rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
+	        if (char *lbuf ; (rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
 		    if (filer lf ; (rs = lf.start(fd,0z,fbsz,fbo)) >= 0) {
 	                while ((rs = lf.readln(lbuf,llen,to)) > 0) {
 			    rs = vecstrx_loadline(vsp,fu,lbuf,rs) ;

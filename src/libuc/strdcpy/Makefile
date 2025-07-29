@@ -31,28 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= strdcpy.h
+INCS += strdcpy.h
 
-LIBS=
+MODS +=
 
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ0_DTRDCPY= strdcpyx.o strdcpyxw.o
@@ -66,7 +51,23 @@ OBJB_STRDCPY= obj2_strd.o obj3_strd.o
 OBJ_STRDCPY= $(OBJA_STRDCPY) $(OBJB_STRDCPY)
 
 
-.SUFFIXES:		.hh .ii
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -80,6 +81,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -92,17 +96,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_STRDCPY)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_STRDCPY)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_STRDCPY)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -115,23 +117,23 @@ control:
 
 
 obj0_strd.o:	$(OBJ0_DTRDCPY)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DTRDCPY)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_DTRDCPY)
 
 obj1_strd.o:	$(OBJ1_STRDCPY)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_STRDCPY)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_STRDCPY)
 
 obj2_strd.o:	$(OBJ2_STRDCPY)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_STRDCPY)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_STRDCPY)
 
 obj3_strd.o:	$(OBJ3_STRDCPY)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_STRDCPY)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_STRDCPY)
 
 
-strdcpyx.o:		strdcpyx.cc strdcpyx.h $(INCS)
-strdcpyxw.o:		strdcpyxw.cc strdcpyxw.h $(INCS)
+strdcpyx.o:		strdcpyx.cc	strdcpyx.h		$(INCS)
+strdcpyxw.o:		strdcpyxw.cc	strdcpyxw.h		$(INCS)
 
-strdcpyclean.o:		strdcpyclean.cc $(INCS)
-strdcpycompact.o:	strdcpycompact.cc $(INCS)
-strdcpyopaque.o:	strdcpyopaque.cc $(INCS)
+strdcpyclean.o:		strdcpyclean.cc 			$(INCS)
+strdcpycompact.o:	strdcpycompact.cc 			$(INCS)
+strdcpyopaque.o:	strdcpyopaque.cc 			$(INCS)
 
 

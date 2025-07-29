@@ -78,19 +78,22 @@ static bool	isour(int) noex ;
 /* exported subroutines */
 
 char *strdcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
-	int		ch ;
-	int		dl = 0 ;
-	while (dlen-- && sl-- && *sp) {
-	    ch = mkchar(*sp) ;
-	    if (isour(ch)) {
-		dbuf[dl++] = char(ch) ;
-	    } else if (sch != 0) {
-		dbuf[dl++] = char(sch) ;
-	    }
-	    sp += 1 ;
-	} /* end while */
-	dbuf[dl] = '\0' ;
-	return (dbuf+dl) ;
+	char		*rp = nullptr ; /* return-value */
+	if (dbuf && sp) {
+	    int		dl = 0 ; /* used-afterwards */
+	    while (dlen-- && sl-- && *sp) {
+	        cint ch = mkchar(*sp) ;
+	        if (isour(ch)) {
+		    dbuf[dl++] = char(ch) ;
+	        } else if (sch != 0) {
+		    dbuf[dl++] = char(sch) ;
+	        }
+	        sp += 1 ;
+	    } /* end while */
+	    dbuf[dl] = '\0' ;
+	    rp = (dbuf + dl) ;
+	} /* end if (non-null) */
+	return rp ;
 }
 /* end subroutine (strdcpyclean) */
 

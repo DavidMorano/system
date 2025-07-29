@@ -55,6 +55,8 @@ module ;
 #include	<usysrets.h>
 #include	<localmisc.h>
 
+#pragma		GCC dependency	"mod/ureserve.ccm"
+
 export module strfilter ;
 
 import ureserve ;			/* |vecstr(3u)| */
@@ -97,7 +99,6 @@ constexpr cint		tlen = (UCHAR_MAX + 1) ;
 
 export {
     struct strfilter_fl {
-	uint		open:1 ;
 	uint		ready:1 ;
     } ;
     struct strfilter ;
@@ -109,6 +110,9 @@ export {
 	    w = m ;
 	} ;
 	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
 	int operator [] (int) noex ;
     } ; /* end struct (strfilter_co) */
     struct strfilter : vecstr {
@@ -138,7 +142,7 @@ export {
 	void dtor() noex ;
 	operator int () const noex ;
 	destruct strfilter() {
-	    if (fl.open || magic) dtor() ;
+	    if (magic) dtor() ;
 	} ;
     private:
 	int istart() noex ;

@@ -8,5 +8,6 @@ Synopsis (in a Makefile):
 	$(LD) ...
 
 Arguments:
+[-m]		optionally indicate that the module contain |main|
 <module_name>	is the name of the module being built
 

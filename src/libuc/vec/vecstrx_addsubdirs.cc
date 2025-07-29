@@ -67,7 +67,7 @@ int vecstrx::addsubdirs(cchar *newsdname) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (newsdname) {
-	    if (char *fbuf{} ; (rs = libmalloc_mp(&fbuf)) >= 0) {
+	    if (char *fbuf ; (rs = libmalloc_mp(&fbuf)) >= 0) {
 	        fsdirtree	dir ;
 		cint		flen = rs ;
 	        cint		fo = (FSDIRTREE_MFOLLOW | FSDIRTREE_MDIR) ;

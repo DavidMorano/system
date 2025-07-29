@@ -165,7 +165,7 @@ int vecstrms::conserve		= (1 << vecstro_conserve) ;
 int vecstrms::sorted		= (1 << vecstro_sorted) ;
 int vecstrms::ordered		= (1 << vecstro_ordered) ;
 
-vecstrms	vecstrm ;
+const vecstrms		vecstrm ;
 
 
 /* exported subroutines */

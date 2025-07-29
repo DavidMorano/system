@@ -39,6 +39,7 @@
 #include	"config.h"
 #include	"defs.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -74,14 +75,14 @@ int output(progifo *pip,cchar *ofname) noex {
 	int		len = 0 ;
 	int		wlen = 0 ;
 	cchar		*org = pip->org ;
-	cchar		*module = pip->module ;
+	cchar		*modstr = pip->modstr ;
 	char		obuf[ORGLEN + 1], *bp ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 
 /* we cannot allow any weirdo quotes from getting into our target string */
 
 	if ((org != NULL) && (org[0] != '\0')) {
-	    len = strnlen(org,olen) ;
+	    len = lenstr(org,olen) ;
 	    bp = obuf ;
 	    for (int i = 0 ; (i < len) && org[i] ; i += 1) {
 	        if (org[i] == '"') *bp++ = '\\' ;
@@ -103,8 +104,8 @@ int output(progifo *pip,cchar *ofname) noex {
 	if ((rs = bopen(ofp,ofname,"wct",0666)) >= 0) {
 	    off_t	offset ;
 
-	    if ((module != NULL) && (module[0] != '\0')) {
-	        rs = bprintf(ofp,"const char %s_makedate[] =\n\"",module) ;
+	    if ((modstr != NULL) && (modstr[0] != '\0')) {
+	        rs = bprintf(ofp,"const char %s_makedate[] =\n\"",modstr) ;
 	    } else
 	        rs = bprintf(ofp,"const char makedate[] =\n\"") ;
 
@@ -123,15 +124,15 @@ int output(progifo *pip,cchar *ofname) noex {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
-	        debugprintf("output: outputting m=%\n",module) ;
+	        debugprintf("output: outputting m=%\n",modstr) ;
 #endif
 
-	    if ((module != NULL) && (module[0] != '\0')) {
+	    if ((modstr != NULL) && (modstr[0] != '\0')) {
 	        if (pip->f.main) {
-	            rs = bprintf(ofp,"%-23s",module) ;
+	            rs = bprintf(ofp,"%-23s",modstr) ;
 	    	    wlen += rs ;
 	        } else {
-	            rs = bprintf(ofp,"/%-22s",module) ;
+	            rs = bprintf(ofp,"/%-22s",modstr) ;
 	    	    wlen += rs ;
 	   	}
 	    } else {

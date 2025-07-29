@@ -176,7 +176,7 @@ int vecpstrms::conserve		= (1 << vecpstro_conserve) ;
 int vecpstrms::sorted		= (1 << vecpstro_sorted) ;
 int vecpstrms::ordered		= (1 << vecpstro_ordered) ;
 
-vecpstrms	vecpstrm ;
+const vecpstrms		vecpstrm ;
 
 
 /* exported subroutines */

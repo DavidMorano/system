@@ -44,7 +44,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -66,7 +65,7 @@ OBJB_SRC= obj2_src.o obj3_src.o
 OBJ_SRC= $(OBJA_SRC) $(OBJB_SRC)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).a
@@ -80,6 +79,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -92,12 +94,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).a:			$(OBJ_SRC)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order:		$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order

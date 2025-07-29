@@ -82,7 +82,7 @@ namespace {
 	int remslash() noex ;
 	int finish() noex ;
     } ; /* end struct (pathbuf) */
-}
+} /* end namespace */
 
 
 /* local structures */
@@ -103,70 +103,17 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 /* exported subroutines */
 
+static int pathnclean(char *,int,cc *,int) noex ;
+
 int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		len = 0 ;
 	if (rbuf && spathbuf) {
 	    rbuf[0] = '\0' ;
 	    if ((rs = maxpathlen) >= 0) {
 		cint	rlen = rs ;
-	        int	nc = 0 ;
-	        bool	f_prev = false ;
-	        cchar	*pp = spathbuf ;
-	        if (int pl ; (pl = lenstr(spathbuf,spathlen)) > 0) {
-	            if (pathbuf pb ; (rs = pb.start(rbuf,rlen)) >= 0) {
-	                if (*pp == '/') {
-	                    pp += 1 ;
-	                    pl -= 1 ;
-	                    f_prev = true ;
-	                    if (*pp == '/') {
-	                        rs = pb.chr('/') ;
-		            }
-	                } /* end if */
-			if (rs >= 0) {
-	                    int		cl ;
-	                    cchar	*cp{} ;
-	                    while ((cl = nextname(pp,pl,&cp)) > 0) {
-	                        if (cp[0] == '.') {
-	                            if ((cp[1] == '.') && (cl == 2)) {
-	                                if (nc > 0) {
-	                                    rs = pb.remslash() ;
-	                                    nc -= 1 ;
-	                                } else {
-	                                    if (f_prev) {
-	                                        pb.chr('/') ;
-					    }
-	                                    rs = pb.strw(cp,2) ;
-	                                    f_prev = true ;
-	                                    nc = 0 ;
-	                                } /* end if */
-	                            } else if (cl > 1) {
-	                                if (f_prev) {
-	                                    pb.chr('/') ;
-				        }
-	                                rs = pb.strw(cp,cl) ;
-	                                f_prev = true ;
-	                                nc += 1 ;
-	                            } /* end if */
-	                        } else {
-	                            if (f_prev) {
-	                                pb.chr('/') ;
-			            }
-	                            rs = pb.strw(cp,cl) ;
-	                            f_prev = true ;
-	                            nc += 1 ;
-	                        } /* end if */
-	                        pl -= intconv((cp + cl) - pp) ;
-	                        pp = (cp + cl) ;
-				if (rs < 0) break ;
-	                    } /* end while */
-			} /* end if (ok) */
-	                rs1 = pb.finish() ;
-	                if (rs >= 0) rs = rs1 ;
-			len = rs1 ;
-	            } /* end if (pathbuf) */
-	        } /* end if (positive) */
+	        rs = pathnclean(rbuf,rlen,spathbuf,spathlen) ;
+		len = rs ;
 	    } /* end if (maxpathlen) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -175,6 +122,68 @@ int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 
 
 /* local subroutines */
+
+static int pathnclean(char *rbuf,int rlen,cc *sp,int sl) noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	int		len = 0 ;
+        int     nc = 0 ;
+        bool    f_prev = false ;
+        cchar   *pp = sp ;
+        if (int pl ; (pl = lenstr(sp,sl)) > 0) {
+            if (pathbuf pb ; (rs = pb.start(rbuf,rlen)) >= 0) {
+                if (*pp == '/') {
+                    pp += 1 ;
+                    pl -= 1 ;
+                    f_prev = true ;
+                    if (*pp == '/') {
+                        rs = pb.chr('/') ;
+                    }
+                } /* end if */
+                if (rs >= 0) {
+                    cchar       *cp{} ;
+                    for (int cl ; (cl = nextname(pp,pl,&cp)) > 0 ; ) {
+                        if (cp[0] == '.') {
+                            if ((cp[1] == '.') && (cl == 2)) {
+                                if (nc > 0) {
+                                    rs = pb.remslash() ;
+                                    nc -= 1 ;
+                                } else {
+                                    if (f_prev) {
+                                        pb.chr('/') ;
+                                    }
+                                    rs = pb.strw(cp,2) ;
+                                    f_prev = true ;
+                                    nc = 0 ;
+                                } /* end if */
+                            } else if (cl > 1) {
+                                if (f_prev) {
+                                    pb.chr('/') ;
+                                }
+                                rs = pb.strw(cp,cl) ;
+                                f_prev = true ;
+                                nc += 1 ;
+                            } /* end if */
+                        } else {
+                            if (f_prev) {
+                                pb.chr('/') ;
+                            }
+                            rs = pb.strw(cp,cl) ;
+                            f_prev = true ;
+                            nc += 1 ;
+                        } /* end if */
+                        pl -= intconv((cp + cl) - pp) ;
+                        pp = (cp + cl) ;
+                        if (rs < 0) break ;
+                    } /* end for */
+                } /* end if (ok) */
+                rs1 = pb.finish() ;
+                if (rs >= 0) rs = rs1 ;
+                len = rs1 ;
+            } /* end if (pathbuf) */
+        } /* end if (positive) */
+        return (rs >= 0) ? len : rs ;
+} /* end subroutine (pathnclean) */
 
 int pathbuf::start(char *sp,int sl) noex {
 	int		rs = SR_FAULT ;

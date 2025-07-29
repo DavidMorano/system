@@ -64,7 +64,7 @@ namespace {
 	int del(int = -1)                           noex override final ;
 	int sort(vecstrx_f = nullptr)               noex override final ;
     } ; /* end struct (vecpstrer) */
-}
+} /* end namespace */
 
 
 /* forward references */

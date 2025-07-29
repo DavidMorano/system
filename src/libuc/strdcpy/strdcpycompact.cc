@@ -58,7 +58,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -71,6 +72,8 @@
 #include	<localmisc.h>
 
 #include	"strdcpy.h"
+
+#pragma		GCC dependency	"mod/libutil.ccm"
 
 import libutil ;
 
@@ -104,43 +107,42 @@ using std::max ;			/* subroutine-template */
 /* exported subroutines */
 
 char *strdcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
-	char		*rp = nullptr ;
+	char		*rp = nullptr ; /* return-value */
 	if (dbuf && sp) {
 	    int		rs ;
 	    int		rs1 ;
 	    int		dl = 0 ;
 	    if (dlen < 0) dlen = INT_MAX ;
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (strmgr m ; (rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
-		int	cl ;
+	    if (strmgr m ; (rs = m.start(dbuf,dlen)) >= 0) {
 	        cchar	*cp{} ;
-	        while ((cl = sfnext(sp,sl,&cp)) > 0) {
+	        for (int cl ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
 		    if (dl > 0) {
-	                if ((rs = strmgr_chr(&m,CH_SP)) >= 0) {
+	                if ((rs = m.chr(CH_SP)) >= 0) {
 		            dl += 1 ;
 		        }
 		    }
 		    if (rs >= 0) {
-	                if ((rs = strmgr_str(&m,cp,cl)) >= 0) {
+	                if ((rs = m.str(cp,cl)) >= 0) {
 		            dl += cl ;
 		        } else if (rs == SR_OVERFLOW) {
-			    if ((rs = strmgr_rem(&m)) > 0) {
+			    if ((rs = m.rem) > 0) {
 			        cint	ml = min(rs,cl) ;
-	            	        if ((rs = strmgr_str(&m,cp,ml)) >= 0) {
+	            	        if ((rs = m.str(cp,ml)) >= 0) {
 				    dl += ml ;
 			        }
-			    }
-		        }
-	            }
+			    } /* end if (some remaining) */
+		        } /* end if */
+	            } /* end if (OK) */
 	            sl -= intconv((cp+cl) - sp) ;
 	            sp = (cp+cl) ;
 	            if (rs < 0) break ;
-	        } /* end while (looping through string pieces) */
-	        rs1 = strmgr_finish(&m) ;
+	        } /* end for */
+	        rs1 = m.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (strmgr) */
 	    dbuf[dl] = '\0' ;
-	    rp = (rs >= 0) ? (dbuf+dl) : nullptr ;
+	    rp = (rs >= 0) ? (dbuf + dl) : nullptr ;
 	} /* end if (non-null) */
 	return rp ;
 }
