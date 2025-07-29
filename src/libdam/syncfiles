@@ -1,5 +1,5 @@
 #!/usr/extra/bin/ksh
-# SYNCFILES
+# SYNCINCS
 files_d | while read D ; do
   find $D -type f -mtime -120 -name '*.h*' -print | while read N ; do
     BN=${N##*/}
@@ -13,7 +13,7 @@ files_d | while read D ; do
         ln -f $N include
       fi
     else 
-      p -- "linking to INCLUDE ${N}"
+      print -- "linking to INCLUDE ${N}"
       ln $N $IN
     fi
     if [[ -r $BN ]] ; then

@@ -42,7 +42,7 @@ I05= zdb.h zos.h tmz.h zoffparts.h
 I06= termstr.h
 I07= kinfo.h loadave.h
 I08= logfile.h lfm.h tmpx.h
-I09= storeitem.h 
+I09=
 I10= userinfo.h openport.h
 I11= char.h ansigr.h baops.h bwops.h
 I12= envs.h
@@ -150,7 +150,7 @@ OBJ48= wdt.o base64.o netorder.o stdorder.o getserial.o log2.o logbase.o
 OBJ49=
 OBJ50= readn.o writen.o writeto.o acceptpass.o passfd.o
 OBJ51=
-OBJ52= mailaddrquote.o compactstr.o
+OBJ52= mailaddrquote.o
 OBJ53= randmwc.o
 OBJ54= wchar_iswhite.o toxc.o baops.o 
 OBJ55= 
@@ -192,18 +192,18 @@ OBJ83= tmstrs.o shellunder.o udomain.o
 OBJ84= mktmpuserdir.o mkcaselower.o mkfmtphone.o
 OBJ85=
 OBJ86= mktmpfile.o mktmplock.o mkjobfile.o mkdatefile.o mkuuid.o mkchar.o
-OBJ87= nchr.o mnwcpy.o
+OBJ87= nchr.o
 
 OBJ88= tcgetlines.o tcsetlines.o tcpeek.o tcsetmesg.o tcsetbiff.o tcsetown.o
 OBJ89= tcgetws.o tcsetws.o
 OBJ90=
 OBJ91=
 OBJ92= unlinkd.o mapshmtmp.o
-OBJ93= mkfnamesuf.o mkfname.o mksofname.o mkfdfname.o
-OBJ94= mkgecosname.o mkmailname.o mkuiname.o mkuibang.o 
-OBJ95= mkaddrname.o mkbestaddr.o mkbestfrom.o mkdisphdr.o mkaltext.o
+OBJ93=
+OBJ94=
+OBJ95=
 
-OBJ96= memfile.o linehist.o langstate.o sigman.o sighand.o
+OBJ96= memfile.o langstate.o sigman.o sighand.o
 OBJ97= comparse.o mhcom.o zos.o tmz.o zdb.o zoffparts.o snflags.o
 OBJ98= openportmsg.o varsub.o userattr.o 
 OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
@@ -221,7 +221,7 @@ OBJ109=
 OBJ110= 
 OBJ111= 
 
-OBJ112= strmgr.o dayspec.o bcspec.o termtrans.o uiconv.o chartrans.o obuf.o
+OBJ112= dayspec.o bcspec.o termtrans.o uiconv.o chartrans.o
 OBJ113=
 OBJ114= 
 OBJ115=
@@ -230,7 +230,7 @@ OBJ117= msfile.o msfilee.o entbuf.o nodedb.o clusterdb.o
 OBJ118= cksum.o sha1.o gecos.o pwfile.o ipasswd.o
 OBJ119=
 
-OBJ120= kvsfile.o paramfile.o strtab.o strstore.o querystr.o
+OBJ120= kvsfile.o paramfile.o querystr.o
 OBJ121=
 OBJ122=
 OBJ123=
@@ -239,12 +239,12 @@ OBJ125=
 OBJ126= netfile.o termstr.o filecounts.o
 OBJ127= pwcache.o grcache.o gncache.o namecache.o grmems.o
 
-OBJ128= buffer.o buffer_extras.o 
-OBJ129= buffer_stropaque.o buffer_strcompact.o buffer_strquote.o
-OBJ130= sbuf_termconseq.o sbuf_blanks.o
+OBJ128=
+OBJ129=
+OBJ130=
 OBJ131= paramopt.o
-OBJ132= serialbuf.o srvreg.o srvrege.o wordfill.o linefold.o storeitem.o dstr.o 
-OBJ133= bufstr.o stackaddr.o outstore.o outline.o
+OBJ132= serialbuf.o srvreg.o srvrege.o wordfill.o
+OBJ133= stackaddr.o outstore.o outline.o
 OBJ134= mapstrint.o keyopt.o keyopt_lastvalue.o keyvals.o
 OBJ135= envs.o envs_procxe.o envs_subs.o
 
@@ -281,8 +281,8 @@ OBJ162= getfiledirs.o findfilepath.o findfile.o
 OBJ163= cvttemperature.o bufprintf.o xfile.o
 OBJ164= mapex.o strsigabbr.o strerrabbr.o strlocktype.o
 OBJ165= emainfo.o
-OBJ166= listentcp.o listenudp.o listenuss.o listenusd.o 
-OBJ167= listenpass.o listenconn.o
+OBJ166=
+OBJ167=
 
 OBJ168= getprogexec.o getnodedomain.o getrand.o getgid_def.o
 OBJ169= getehostname.o getchostname.o getcanonical.o getourhe.o
@@ -359,7 +359,7 @@ OBJFILE2= objq.o objr.o objs.o objt.o obju.o objv.o
 OBJFILE= $(OBJFILE0) $(OBJFILE1) $(OBJFILE2)
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -376,6 +376,9 @@ a:			$(T).a
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -612,24 +615,15 @@ sha1.o:			sha1.c sha1.h
 outline.o:		outline.cc	outline.h
 outstore.o:		outstore.cc	outstore.h
 
-strmgr.o:		strmgr.c strmgr.h
-
 lookaside.o:		lookaside.c lookaside.h
 
 serialbuf.o:		serialbuf.c serialbuf.h
 
 netorder.o:		netorder.c netorder.h
 
-storeitem.o:		storeitem.c storeitem.h
-
 matenv.o:		matenv.c matenv.h
 
 stackaddr.o:		stackaddr.c stsackaddr.h
-
-strcpyxc.o:		strcpyxc.cc strcpyxc.h
-strwcpyxc.o:		strwcpyxc.cc strwcpyxc.h
-matstr.o:		matstr.cc matstr.h
-matostr.o:		matostr.cc matostr.h
 
 comparse.o:		comparse.c comparse.h
 
@@ -704,17 +698,13 @@ keyopt.o:		keyopt.cc keyopt.h
 keyopt_lastvalue.o:	keyopt_lastval.cc keyopt.h
 codebal.o:		codebal.cc codebal.h
 strpack.o:		strpack.cc strpack.h
-strtab.o:		strtab.cc strtab.h
-strstore.o:		strstore.cc strstore.h
 userattr.o:		userattr.c userattr.h
 pwfile.o:		pwfile.c pwfile.h pwentry.h
 ts.o:			ts.cc ts.h
 envlist.o:		envlist.cc envlist.h
 querystr.o:		querystr.cc querystr.h
-linehist.o:		linehist.cc linehist.h
-linefold.o:		linefold.cc linefold.h
-langstate.o:		langstate.cc langstate.h
-mkdirlist.o:		mkdirlist.cc mkdirlist.h
+langstate.o:		langstate.cc	langstate.h
+mkdirlist.o:		mkdirlist.cc	mkdirlist.h
 sesmsg.o:		sesmsg.cc sesmsg.h
 msgdata.o:		msgdata.cc msgdata.h
 msgbuf.o:		msgbuf.cc msgbuf.h
@@ -847,6 +837,11 @@ lineindex.o:		lineindex.dir
 lineindex.dir:	
 	makesubdir $@
 
+# LINEX
+linex.o:		linex.dir
+linex.dir:	
+	makesubdir $@
+
 # CLUSTER
 cluster.o:		cluster.dir
 cluster.dir:	
@@ -865,6 +860,21 @@ argmgr.dir:
 # PARAMOPT
 paramopt.o:		paramopt.dir
 paramopt.dir:
+	makesubdir $@
+
+# LISTEN
+listen.o:		listen.dir
+listen.dir:
+	makesubdir $@
+
+# LOADMODNAMES
+loadmodnames.o:		loadmodnames.dir
+loadmodnames.dir:
+	makesubdir $@
+
+# INSTR
+instr.o:		instr.dir
+instr.dir:
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h

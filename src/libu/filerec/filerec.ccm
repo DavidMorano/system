@@ -140,6 +140,7 @@ export {
 	destruct filerec() {
 	    if (setp) dtor() ;
 	} ; /* end dtor */
+	int		add(cchar *,int = -1) noex ;
 	int		checkin(custat *,cchar *) noex ;
 	int		curbegin(filerec_cur *) noex ;
 	int		curend(filerec_cur *) noex ;

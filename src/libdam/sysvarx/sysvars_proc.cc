@@ -155,8 +155,9 @@ int sysvars_procget(hdbstr *vlp,cchar *fn) noex {
 	                for (int i = 0 ; lvars.get(i,&cp) >= 0 ; i += 1) {
 	                    if (cp == nullptr) continue ;
 	                    if ((tp = strchr(cp,'=')) == nullptr) continue ;
-	                    f = (matstr(wstrs,cp,(tp - cp)) >= 0) ;
-	                    f = f || (matpstr(pstrs,10,cp,(tp - cp)) >= 0) ;
+			    cint tl = intconv(tp - cp) ;
+	                    f = (matstr(wstrs,cp,tl) >= 0) ;
+	                    f = f || (matpstr(pstrs,10,cp,tl) >= 0) ;
 	                    if (f) {
 	                        rs = procaddvar(vlp,cp,-1) ;
 	                    } /* end if */
@@ -325,10 +326,10 @@ static int procaddvar(hdbstr *vlp,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	cchar		*kp = sp ;
 	cchar		*vp = nullptr ;
-	if (cchar *tp{} ; (tp = strnchr(sp,sl,'=')) != np) {
+	if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != np) {
 	    vp = (tp + 1) ;
 	    vl = -1 ;
-	    kl = (tp - sp) ;
+	    kl = intconv(tp - sp) ;
 	}
 	if ((rs = hdbstr_fetch(vlp,kp,kl,np,np)) == rsn) {
 	    c += 1 ;

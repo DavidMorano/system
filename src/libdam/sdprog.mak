@@ -35,25 +35,9 @@ DEFS +=
 
 INCS += sdprog.h
 
-#LIBS= -ldam -luc -lu
+MODS +=
+
 LIBS= -lu
-
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ00= sdprog_main.o
@@ -65,6 +49,21 @@ OBJA= obj00.o
 OBJB= 
 
 OBJ= obja.o 
+
+
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -105,13 +104,8 @@ $(T).o:			$(OBJ) Makefile
 $(T).so:		$(OBJ) Makefile
 	$(LD) $(SOFL) -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order order:	$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 install-pre:
 	filefind . -s h | makenewer -af - -d $(INCDIR)

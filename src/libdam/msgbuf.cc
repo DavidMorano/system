@@ -36,6 +36,7 @@
 
 #include	"msgbuf.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -72,14 +73,16 @@ int msgbuf_start(msgbuf *mbp,int fd,int bufsz,int to) noex {
 	    rs = SR_INVALID ;
 	    memclear(mbp) ;
 	    if (fd >= 0) {
-	        if (bufsz <= 0) bufsz = getpagesize() ;
-	        if (to < 1) to = TO_READ ;
-	        mbp->fd = fd ;
-	        mbp->mlen = bufsz ;
-	        mbp->to = to ;
-	        if (char *bp ; (rs = uc_malloc(bufsz,&bp)) >= 0) {
-	            mbp->mbuf = bp ;
-	        }
+		if ((rs = ucpagesize) >= 0) {
+	            if (bufsz <= 0) bufsz = rs ;
+	            if (to < 1) to = TO_READ ;
+	            mbp->fd = fd ;
+	            mbp->mlen = bufsz ;
+	            mbp->to = to ;
+	            if (char *bp ; (rs = uc_malloc(bufsz,&bp)) >= 0) {
+	                mbp->mbuf = bp ;
+	            }
+		} /* end if (ucpagesize) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;

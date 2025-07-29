@@ -31,28 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= varsub.h
+INCS += varsub.h
 
-LIBS=
+MODS +=
 
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ0_VARSUB= varsub_main.o
@@ -64,6 +49,22 @@ OBJA_VARSUB= obj0_varsub.o obj1_varsub.o
 OBJB_VARSUB= obj2_varsub.o
 
 OBJ_VARSUB= obja_varsub.o objb_varsub.o
+
+
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -96,13 +97,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_VARSUB)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_VARSUB)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)

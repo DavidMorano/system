@@ -35,6 +35,24 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
 
 
@@ -48,7 +66,9 @@ int u_utimes(cchar *fname,CTIMEVAL *tvp) noex {
 	if (fname && tvp) {
 	    rs = SR_OK ;
 	    repeat {
-	        if (utimes(fname,tvp) < 0) rs = (- errno) ;
+	        if (utimes(fname,tvp) < 0) {
+		    rs = (- errno) ;
+		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;

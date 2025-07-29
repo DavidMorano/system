@@ -1,6 +1,9 @@
-/* delenv */
+/* delenv SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* delete an environment variable */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,24 +17,35 @@
 
 /******************************************************************************
 
-        This subroutine is used to delete an environment variable permanently
-        from the process environment list. There is no convenient way to
-        un-delete this later.
+  	Name:
+	delenv
 
-	This is an incredibly stupid hack.  This subroutine should *never* be
-	used.  It was only written to satisfy some stupid open-source programs
+  	Description:
+	This subroutine is used to delete an environment variable
+	permanently from the process environment list. There is no
+	convenient way to un-delete this later.  This is an incredibly
+	stupid hack.  This subroutine should *never* be used.  It
+	was only written to satisfy some stupid open-source programs
 	that I occassionally stoop too low to want to use!
-
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstddef>
-#include	<cstring>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<localmisc.h>
+
+#include	"delenv.h"
+
+
+/* local defines */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -39,51 +53,52 @@
 extern char	**environ ;
 
 
+/* local structures */
+
+
 /* forward references */
 
-static int	namecmp(const char *,int,const char *) ;
+static bool	namecmp(cchar *,int,cchar *) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-const char *delenv(const char *name)
-{
-	int		len ;
-	const char	**env = (const char **) environ ;
-	const char	*np ;
-	const char	*cp ;
-	const char	**p2 ;
-	const char	**p1 ;
-
-
-	if ((name == NULL) || (environ == NULL))
-	    return NULL ;
-
-	for (np = name ; (*np != '\0') && (*np != '=') ; np += 1) ;
-
-	len = np - name ;
-	for (p1 = env ; *p1 != NULL ; p1 += 1) {
-	    if (namecmp(name,len,*p1) == 0) break ;
-	}
-
-	if (*p1 == NULL)
-	    return NULL ;
-
-	cp = *p1 ;
-
-/* find the last entry */
-
-	for (p2 = p1 ; *p2 != NULL ; p2 += 1) ;
-
-	p2 -= 1 ;
-
-/* swap the last entry with this one */
-
-	if (p1 != p2)
-	    *p1 = *p2 ;
-
-	*p2 = NULL ;
+cchar *delenv(cchar *name) noex {
+	cchar		*cp = nullptr ;
+	if (name || environ) {
+	    cchar	**env = (cchar **) environ ;
+	    cchar	**p2 ;
+	    cchar	**p1 ;
+	    {
+		cchar	*sp = name ; /* used-afterwards */
+	        while ((*sp != '\0') && (*sp != '=')) {
+	       	    sp += 1 ;
+	        }
+	        {
+	            cint len = intconv(sp - name) ;
+	            for (p1 = env ; *p1 != nullptr ; p1 += 1) {
+	                if (namecmp(name,len,*p1) == 0) break ;
+	            }
+	        } /* end block */
+	    } /* end block */
+	    if (*p1) {
+	        cp = *p1 ;
+	        /* find the last entry */
+	        for (p2 = p1 ; *p2 != nullptr ; p2 += 1) ;
+	        p2 -= 1 ;
+	        /* swap the last entry with this one */
+	        if (p1 != p2) *p1 = *p2 ;
+	        *p2 = nullptr ;
+	    } else {
+	        cp = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return cp ;
 }
 /* end subroutine (delenv) */
@@ -91,18 +106,15 @@ const char *delenv(const char *name)
 
 /* local subroutines */
 
-
-static int namecmp(const char *name,int namelen,const char *entry)
-{
-	const char	*nep = (name + namelen) ;
-	const char	*np = name ;
-	const char	*ep = entry ;
-
-	while ((np < nep) && *ep && (*ep != '=')) {
-	    if (*np++ != *ep++) return 1 ;
-	}
-
-	return 0 ;
+static bool namecmp(cchar *name,int namelen,cchar *entry) noex {
+	cchar	*nep = (name + namelen) ;
+	cchar	*ep = entry ;
+	bool	f = false ;
+	for (cc *sp = name ; (sp < nep) && *ep && (*ep != '=') ; ) {
+	    f = (*sp++ != *ep++) ;
+	    if (f) break ;
+	} /* end while */
+	return f ;
 }
 /* end subroutine (namecmp) */
 

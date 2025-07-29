@@ -51,9 +51,8 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
-	<0		error
+	<0		error (system-return)
 
 	= Notes
 
@@ -61,18 +60,15 @@
 	A. We only need to traverse the path list once, so the overhead
 	   of using |vecstr_addpathclean()| is probably not justified.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<ids.h>
 #include	<vecstr.h>
@@ -81,6 +77,7 @@
 #include	"opendialer_prog.h"
 #include	"defs.h"
 
+import libutil ;
 
 /* local defines */
 

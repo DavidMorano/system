@@ -33,18 +33,18 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<ulogerror.h>
 #include	<localmisc.h>
+
+#pragma		GCC dependency	"mod/debug.ccm"
 
 module argmgr ;
 
-import debug ;				/* |deb{xx}(3u)| */
+import debug ;
 
 /* local defines */
 
@@ -78,110 +78,22 @@ import debug ;				/* |deb{xx}(3u)| */
 
 /* local subroutines */
 
-bool argmgr_iter::operator != (const argmgr_iter &o) noex {
-	bool		f = false ;
-	if_constexpr (f_debug) {
-	    debprintf(__func__,"ent ai=%d\n",ai) ;
-	}
-	if (op && (ai < o.ai)) {
-    	    int		rs ;
-	    if (cchar *ap ; (rs = op->get(ai,&ap)) > 0) {
-	        ai = rs ;
-	        f = bool(ap) ;
-	    } else if (rs < 0) {
-	        ulogerror(__func__,rs,"operator-!=") ;
-	    } /* end if */
-	}
-	if_constexpr (f_debug) {
-	    debprintf(__func__,"ret ai=%d f=%u\n",ai,f) ;
-	}
-	return f ;
-} /* end method (argmgr_iter::operator) */
-
-bool argmgr_iter::operator < (const argmgr_iter &o) noex {
-	bool		f = false ;
-	if (op && (ai < o.ai)) {
-    	    int		rs ;
-	    if (cchar *ap ; (rs = op->get(ai,&ap)) > 0) {
-	        ai = rs ;
-	        f = bool(ap) ;
-	    } else if (rs < 0) {
-	        ulogerror(__func__,rs,"operator-<") ;
-	    } /* end if */
-	}
-	return f ;
-} /* end method (argmgr_iter::operator) */
-
-ccharp argmgr_iter::operator * () noex {
-	cchar		*rp = nullptr ;
-	if (op) {
+argmgr_iter argmgr::begin() noex {
+    	argmgr_iter	res(this,0) ;
+	cchar		*ap = nullptr ;
+	if (cint rs = get(1,&ap) ; rs > 0) {
 	    if_constexpr (f_debug) {
-	        debprintf(__func__,"ent ai=%d\n",ai) ;
+		cchar *fmt = "rs=%d ap=%s\n" ;
+	        debprintf(__func__,fmt,rs,((ap) ? "ok" : "null")) ;
 	    }
-	    if (int rs ; (rs = op->present(ai)) > 0) {
-	        if_constexpr (f_debug) {
-	            debprintf(__func__,"present=YES\n") ;
-		}
-	        if (cchar *ap ; (rs = op->get(ai,&ap)) > 0) {
-	            rp = ap ;
-	        } else if (rs < 0) {
-	            ulogerror(__func__,rs,"operator-deref") ;
-	        } /* end if */
-	    } else {
-	        ulogerror(__func__,rs,"operator-deref") ;
-	    } /* end if (present) */
-	}
-	if_constexpr (f_debug) {
-	    cchar *fmt = "ret rp=%s\n" ;
-	    debprintf(__func__,fmt,((rp) ? "ok" : "null")) ;
-	}
-	return rp ;
-} /* end method (argmgr_iter::operator) */
-
-argmgr_iter::operator ccharp () noex {
-    	return *(*this) ;
-} /* end method (argmgr_iter::operator) */
-
-argmgr_iter argmgr_iter::operator + (int inc) const noex {
-    	argmgr_iter res = *this ;
-	res.ai += inc ;
-	if (res.ai < 0) res.ai = 0 ;
+	    if (ap) res.ai = rs ;
+	} /* end if (get) */
 	return res ;
-}
+} /* end method (argmgr::begin) */
 
-argmgr_iter &argmgr_iter::operator += (int n) noex {
-    	if (cint rs = increment(n) ; rs < 0) {
-	    ulogerror("argmgr_iter",rs,"operator-assign-inc") ;
-	}
-	return *this ;
-}
-
-argmgr_iter argmgr_iter::operator ++ () noex { /* pre */
-    	increment() ;
-    	return *this ;
-}
-
-argmgr_iter argmgr_iter::operator ++ (int) noex { /* post */
-    	argmgr_iter	prev(*this) ;
-	increment() ;
-    	return prev ;
-}
-
-int argmgr_iter::increment(int n) noex {
-    	int		rs = SR_INVALID ;
-	if (op && (n >= 0)) {
-	    bool	f = false ;
-	    rs = SR_OK ;
-	    for (int i = 0 ; (rs >= 0) && (i < n) && (! f) ; i += 1) {
-	        if (cc *ap ; (rs = op->get((ai + 1),&ap)) > 0) {
-		    ai = rs ;
-		    f = !ap ;
-		} else if (rs == 0) {
-		    f = true ;
-	        }
-	    } /* end for */
-	} /* end if (valid) */
-	return rs ;
-} /* end method (argmgr_iter::increment) */
+argmgr_iter argmgr::end() noex {
+    	argmgr_iter	res(this,argc) ;
+	return res ;
+} /* end method (argmgr::end) */
 
 

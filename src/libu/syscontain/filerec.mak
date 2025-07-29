@@ -56,10 +56,11 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= filerec0.o filerec1.o
-OBJ1=
+OBJ0= filerec0.o filerec1.o 
+OBJ1= filerec2.o filerec3.o
+OBJ2= filerec4.o filerec5.o
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o obj2.o
 
 OBJ= obja.o
 
@@ -117,6 +118,12 @@ obj0.o:			$(OBJ0)
 obj1.o:			$(OBJ1)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
 
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
+
 
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
@@ -129,6 +136,22 @@ filerec0.o:		filerec.ccm			$(INCS)
 	makemodule filerec
 
 filerec1.o:		filerec1.cc filerec.ccm		$(INCS)
+	makemodule filerec
+	$(COMPILE.cc) $<
+
+filerec2.o:		filerec2.cc filerec.ccm		$(INCS)
+	makemodule filerec
+	$(COMPILE.cc) $<
+
+filerec3.o:		filerec3.cc filerec.ccm		$(INCS)
+	makemodule filerec
+	$(COMPILE.cc) $<
+
+filerec4.o:		filerec4.cc filerec.ccm		$(INCS)
+	makemodule filerec
+	$(COMPILE.cc) $<
+
+filerec5.o:		filerec5.cc filerec.ccm		$(INCS)
 	makemodule filerec
 	$(COMPILE.cc) $<
 

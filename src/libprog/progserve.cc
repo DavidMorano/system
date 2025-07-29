@@ -19,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	progserve
+
+	Description:
 	This subroutine processes a new connection that just came in.
 
 *******************************************************************************/
@@ -52,6 +56,7 @@
 #include	<storebuf.h>
 #include	<expcook.h>
 #include	<ids.h>
+#include	<mkx.h>			/* |mkbasename(3uc)| */
 #include	<strn.h>
 #include	<strwcpy.h>
 #include	<char.h>
@@ -126,30 +131,6 @@
 
 /* external subroutines */
 
-extern int	sninetaddr(char *,int,int,const void *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath2w(char *,cchar *,cchar *,int) ;
-extern int	mkpath3w(char *,cchar *,cchar *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkbasename(char *,cchar *,int) ;
-extern int	mkshlibname(char *,cchar *,int) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfbaselib(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	vstrkeycmp(cchar **,cchar **) ;
-extern int	nlspeername(cchar *,cchar *,char *) ;
-extern int	getprogpath(IDS *,vecstr *,char *,cchar *,int) ;
-extern int	netgroupcheck(cchar *,vecstr *,vecstr *) ;
-extern int	mkquoted(char *,int,cchar *,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	isasocket(int) ;
-extern int	uc_waitwritable(int,int) ;
-
 extern int	progsrvargs(PROGINFO *,vecstr *,cchar *) ;
 extern int	progshlib(PROGINFO *,cchar *,cchar *,vecstr *,cchar *,int) ;
 extern int	progexec(PROGINFO *,cchar *,cchar *,vecstr *) ;
@@ -159,15 +140,19 @@ extern int	proguseracctmat(PROGINFO *,struct passwd *,char *,int,cchar *) ;
 extern int	proguseracctexec(PROGINFO *,CLIENTINFO *,struct passwd *) ;
 #endif /* P_FINGERS */
 
-extern int	xfile(IDS *,cchar *) ;
-
-extern char	*strdcpy1(char *,int,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*strbasename(char *) ;
-
 
 /* external variables */
+
+
+/* local structures */
+
+namespace {
+    struct vars {
+	int	maxnamelen ;
+	int	maxpathlen ;
+	operator int () noex ;
+    } ;
+}
 
 
 /* forward references */
@@ -198,7 +183,7 @@ static int	loadaccgroups(PROGINFO *,vecstr *,cchar *,int) ;
 
 /* local variables */
 
-static const uchar	gterms[] = {
+constexpr char		gterms[] = {
 	0x00, 0x02, 0x00, 0x00,
 	0x01, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -209,20 +194,24 @@ static const uchar	gterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static cchar	*prbins[] = {
+constexpr cpcchar	prbins[] = {
 	"bin",
 	"sbin",
-	NULL
+	nullptr
 } ;
 
-static cchar	*prlibs[] = {
+constexpr cpcchar	prlibs[] = {
 	"lib",
-	NULL
+	nullptr
 } ;
+
+static vars		var ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int progserve(pip,sop,bop,cip,nelp,svcspec,sav)
 PROGINFO	*pip ;
@@ -247,7 +236,7 @@ cchar	*sav[] ;
 
 /* has a service been passed to us (overrides normal service) */
 
-	if ((pip->svcpass != NULL) && (pip->svcpass[0] != '\0'))
+	if ((pip->svcpass != nullptr) && (pip->svcpass[0] != '\0'))
 	    svcspecp = pip->svcpass ;
 
 	svcspeclen = strlen(svcspecp) ;
@@ -256,7 +245,7 @@ cchar	*sav[] ;
 
 	cip->service = svcspecp ;
 	cip->subservice = svcspecp + svcspeclen ; /* setup for none */
-	if ((tp = strnchr(svcspecp,svcspeclen,'+')) != NULL) {
+	if ((tp = strnchr(svcspecp,svcspeclen,'+')) != nullptr) {
 
 	    cip->subservice = (tp + 1) ;
 	    svcspeclen = (tp - svcspecp) ;
@@ -277,7 +266,7 @@ cchar	*sav[] ;
 	if (pip->debuglevel > 0) {
 	    bprintf(pip->efp,"%s: %s svc=%s\n",pip->progname,
 	        timestr_logz(pip->daytime,timebuf), cip->service) ;
-	    if (cip->subservice != NULL)
+	    if (cip->subservice != nullptr)
 	        bprintf(pip->efp,"%s: subsvc=%s\n", pip->progname,
 	            cip->subservice) ;
 	}
@@ -285,7 +274,7 @@ cchar	*sav[] ;
 	if (pip->open.logprog) {
 	    proglog_printf(pip,"%s svc=%s\n",
 	        timestr_logz(pip->daytime,timebuf), cip->service) ;
-	    if (cip->subservice != NULL)
+	    if (cip->subservice != nullptr)
 	        proglog_printf(pip,"subsvc=%s\n", cip->subservice) ;
 	}
 
@@ -304,7 +293,7 @@ cchar	*sav[] ;
 	    cchar	*varterm = VARTERM ;
 
 	    rs1 = vecstr_search(&pip->exports,varterm,vstrkeycmp,&cp) ;
-	    if ((rs1 == SR_NOTFOUND) && (nelp != NULL)) {
+	    if ((rs1 == SR_NOTFOUND) && (nelp != nullptr)) {
 	        rs1 = vecstr_search(nelp,varterm,vstrkeycmp,&cp) ;
 	        if (rs1 >= 0)
 	            rs = vecstr_add(&pip->exports,cp,-1) ;
@@ -322,7 +311,7 @@ cchar	*sav[] ;
 
 	if ((rs >= 0) && (! f_served) && pip->open.svcfname) {
 
-	    rs1 = svcfile_fetch(&pip->stab,cip->service,NULL,
+	    rs1 = svcfile_fetch(&pip->stab,cip->service,nullptr,
 	        &ste,stebuf,STEBUFLEN) ;
 
 	    if (rs1 >= 0) {
@@ -426,7 +415,6 @@ ret1:
 
 /* local subroutines */
 
-
 static int procserver(pip,cip,step,sav)
 PROGINFO	*pip ;
 CLIENTINFO	*cip ;
@@ -448,8 +436,8 @@ cchar	*sav[] ;
 	int		f_cont = TRUE ;
 	cchar	*argz ;
 
-	if (cip == NULL) return SR_FAULT ;
-	if (step == NULL) return SR_FAULT ;
+	if (cip == nullptr) return SR_FAULT ;
+	if (step == nullptr) return SR_FAULT ;
 
 	rs = loadcooks(pip,cip,sav) ;
 	if (rs < 0)
@@ -495,8 +483,8 @@ cchar	*sav[] ;
 	if (rs < 0)
 	    goto badargstart ;
 
-	argz = NULL ;
-	if (se.a.srvargs != NULL) {
+	argz = nullptr ;
+	if (se.a.srvargs != nullptr) {
 
 	    rs = progsrvargs(pip,&alist,se.a.srvargs) ;
 
@@ -510,10 +498,10 @@ cchar	*sav[] ;
 
 /* get fail-cont indicator */
 
-	if (se.a.failcont != NULL) {
+	if (se.a.failcont != nullptr) {
 	    cchar	*tp ;
 	    f_failcont = TRUE ;
-	    if ((tp = strchr(se.a.failcont,'=')) != NULL) {
+	    if ((tp = strchr(se.a.failcont,'=')) != nullptr) {
 	        rs1 = optbool((tp+1),-1) ;
 	        if (rs1 >= 0) f_failcont = (rs1 > 0) ;
 	    }
@@ -605,7 +593,7 @@ cchar	*argz ;
 	int		f_served = FALSE ;
 	cchar	*passfname = sep->a.passfile ;
 
-	if (passfname == NULL)
+	if (passfname == nullptr)
 	    goto ret0 ;
 
 	if (passfname[0] == '\0')
@@ -660,7 +648,7 @@ cchar	*argz ;
 	cchar	*program = sep->a.sharedobj ;
 	cchar	*pnp ;
 	cchar	*tp ;
-	cchar	*enp = NULL ;	/* shlib entry-point */
+	cchar	*enp = nullptr ;	/* shlib entry-point */
 	cchar	*cp ;
 	char		progfname[MAXPATHLEN + 1] ;
 	char		shlibname[MAXNAMELEN + 1] ;
@@ -668,18 +656,18 @@ cchar	*argz ;
 
 /* get a program if we do not have one already */
 
-	if ((program == NULL) || (program[0] == '\0'))
+	if ((program == nullptr) || (program[0] == '\0'))
 	    goto ret0 ;
 
 /* parse out the components of the 'shlib' specification */
 
 	pnl = sfshrink(program,-1,&pnp) ;
 
-	if ((tp = strnchr(pnp,pnl,':')) == NULL) {
+	if ((tp = strnchr(pnp,pnl,':')) == nullptr) {
 	    tp = strnbrk(pnp,pnl," \t") ;
 	}
 
-	if (tp != NULL) {
+	if (tp != nullptr) {
 	    enl = sfshrink((tp+1),((pnp+pnl)-(tp+1)),&enp) ;
 	    pnl = (tp-pnp) ;
 	    while ((pnl > 0) && CHAR_ISWHITE(pnp[pnl-1])) pnl -= 1 ;
@@ -690,14 +678,14 @@ cchar	*argz ;
 	    goto badnoprog ;
 	}
 
-	if ((enp == NULL) || (enl == 0)) {
-	    if ((argz != NULL) && (argz[0] != '\0')) {
+	if ((enp == nullptr) || (enl == 0)) {
+	    if ((argz != nullptr) && (argz[0] != '\0')) {
 	        enp = argz ;
 	        enl = strlen(argz) ;
 	    } else {
 	        enl = sfbaselib(pnp,pnl,&enp) ;
 	    }
-	    if ((enp == NULL) || (enl == 0)) {
+	    if ((enp == nullptr) || (enl == 0)) {
 	        enp = SHLIBENTRY ;
 	        enl = -1 ;
 	    }
@@ -712,7 +700,7 @@ cchar	*argz ;
 
 /* can we execute this service daemon? */
 
-	if (strnchr(pnp,pnl,'.') == NULL) {
+	if (strnchr(pnp,pnl,'.') == nullptr) {
 	    rs = mkshlibname(shlibname,pnp,pnl) ;
 	    pnl = rs ;
 	    pnp = shlibname ;
@@ -745,7 +733,7 @@ cchar	*argz ;
 
 /* get a basename for ARG0 */
 
-	if (argz != NULL) {
+	if (argz != nullptr) {
 	    if ((argz[0] == '+') && (argz[1] == '\0')) {
 	        argz = argzbuf ;
 		if (enl > nlen) enl = nlen ; /* prevent buffer overflow */
@@ -788,7 +776,7 @@ cchar	*argz ;
 
 /* do it! */
 
-	pip->daytime = time(NULL) ;
+	pip->daytime = time(nullptr) ;
 
 	if (pip->open.logprog) {
 	    proglog_end(pip) ;
@@ -852,7 +840,7 @@ cchar	*argz ;
 /* get a program if we do not have one already */
 
 	program = sep->a.program ;
-	if ((program == NULL) && (argz != NULL)) {
+	if ((program == nullptr) && (argz != nullptr)) {
 	    program = argz ;
 	    if ((argz[0] == '+') || (argz[0] == '-'))
 	        program += 1 ;
@@ -860,7 +848,7 @@ cchar	*argz ;
 
 /* check the program (a little bit) */
 
-	if ((program == NULL) || (program[0] == '\0'))
+	if ((program == nullptr) || (program[0] == '\0'))
 	    goto ret0 ;
 
 	if (rs >= 0) {
@@ -919,21 +907,23 @@ cchar	*argz ;
 
 /* get a basename for ARG0 */
 
-	if (argz != NULL) {
+	if (argz != nullptr) {
 	    if ((argz[0] == '+') && (argz[1] == '\0')) {
+		cint	maxname = var.maxnamelen ;
 	        argz = argzbuf ;
-	        cl = mkbasename(argzbuf,pnp,pnl) ;
+	        cl = mkbasename(argzbuf,maxname,pnp,pnl) ;
 	        if ((rs = vecstr_del(alp,0)) >= 0) {
 	            rs = vecstr_insert(alp,0,argz,cl) ;
 		}
 	    }
 	} else {
+	    cint	maxname = var.maxnamelen ;
 	    argz = argzbuf ;
-	    cl = mkbasename(argzbuf,pnp,pnl) ;
+	    cl = mkbasename(argzbuf,maxname,pnp,pnl) ;
 	    if (vecstr_count(alp) < 1) {
 	        rs = vecstr_add(alp,argz,cl) ;
 	    }
-	}
+	} /* end if */
 
 	if (pip->open.logprog) {
 	    proglog_printf(pip,"pf=%s",progfname) ;
@@ -960,7 +950,7 @@ cchar	*argz ;
 
 /* do it! */
 
-	pip->daytime = time(NULL) ;
+	pip->daytime = time(nullptr) ;
 
 	if (pip->open.logprog) {
 #ifdef	COMMENT
@@ -1032,7 +1022,7 @@ int		pnl ;
 
 	} else {
 
-	    for (i = 0 ; prdirs[i] != NULL ; i += 1) {
+	    for (i = 0 ; prdirs[i] != nullptr ; i += 1) {
 		cchar	*dir = prdirs[i] ;
 	        if ((rs = mkpath3w(progfname,pip->pr,dir,pnp,pnl)) >= 0) {
 	            rlen = rs ;
@@ -1063,7 +1053,7 @@ static int procaccperm(PROGINFO *pip,CLIENTINFO *cip,PROCSE *sep)
 	int		f = TRUE ;
 	cchar		*acc ;
 
-	if ((sep->a.access == NULL) && (pip->defacc == NULL))
+	if ((sep->a.access == nullptr) && (pip->defacc == nullptr))
 	    goto ret0 ;
 
 	if (cip->f_local)
@@ -1078,7 +1068,7 @@ static int procaccperm(PROGINFO *pip,CLIENTINFO *cip,PROCSE *sep)
 	if (rs < 0)
 	    goto ret2 ;
 
-	acc = (sep->a.access != NULL) ? sep->a.access : pip->defacc ;
+	acc = (sep->a.access != nullptr) ? sep->a.access : pip->defacc ;
 
 /* process the server access list */
 
@@ -1102,7 +1092,7 @@ static int procaccperm(PROGINFO *pip,CLIENTINFO *cip,PROCSE *sep)
 /* try our own netgroups */
 
 	if ((rs >= 0) && pip->open.accfname) {
-	    rs = acctab_anyallowed(&pip->atab,&netgroups,&names,NULL,NULL) ;
+	    rs = acctab_anyallowed(&pip->atab,&netgroups,&names,nullptr,nullptr) ;
 	    f = (rs > 0) ;
 	} /* end if */
 
@@ -1165,30 +1155,30 @@ static int loadcooks(PROGINFO *pip,CLIENTINFO *cip,cchar **sav)
 	    } /* end switch */
 	}
 
-	if ((rs >= 0) && (cip->peername != NULL))
+	if ((rs >= 0) && (cip->peername != nullptr))
 	    rs = expcook_add(&pip->cooks,"P",cip->peername,-1) ;
 
-	if ((rs >= 0) && (cip->peername != NULL))
+	if ((rs >= 0) && (cip->peername != nullptr))
 	    rs = expcook_add(&pip->cooks,"h",cip->peername,-1) ;
 
 	if (rs >= 0)
 	    rs = expcook_add(&pip->cooks,"s",cip->service,-1) ;
 
-	if ((rs >= 0) && (cip->subservice != NULL))
+	if ((rs >= 0) && (cip->subservice != nullptr))
 	    rs = expcook_add(&pip->cooks,"ss",cip->subservice,-1) ;
 
-	if ((rs >= 0) && (cip->netuser != NULL))
+	if ((rs >= 0) && (cip->netuser != nullptr))
 	    rs = expcook_add(&pip->cooks,"u",cip->netuser,-1) ;
 
-	if ((rs >= 0) && (cip->netpass != NULL))
+	if ((rs >= 0) && (cip->netpass != nullptr))
 	    rs = expcook_add(&pip->cooks,"p",cip->netpass,-1) ;
 
-	if ((rs >= 0) && (sav != NULL)) {
+	if ((rs >= 0) && (sav != nullptr)) {
 	    int		size = 1 ;
 	    int		i, cr ;
 	    char	*svcargs, *cp ;
 
-	    for (i = 0 ; sav[i] != NULL ; i += 1) {
+	    for (i = 0 ; sav[i] != nullptr ; i += 1) {
 	        size += ((2 * strlen(sav[i])) + 2 + 1) ;
 	    }
 
@@ -1196,7 +1186,7 @@ static int loadcooks(PROGINFO *pip,CLIENTINFO *cip,cchar **sav)
 	        svcargs[0] = '\0' ;
 	        cp = svcargs ;
 	        cr = (size - 1) ;
-	        for (i = 0 ; (rs >= 0) && (sav[i] != NULL) ; i += 1) {
+	        for (i = 0 ; (rs >= 0) && (sav[i] != nullptr) ; i += 1) {
 	            if (i > 0) *cp++ = ' ' ;
 	            if ((rs = mkquoted(cp,cr,sav[i],-1)) >= 0) {
 	                cp += rs ;
@@ -1239,8 +1229,8 @@ static int loadpeernames(PROGINFO *pip,CLIENTINFO *cip,vecstr *nlp)
 	cchar		*cp ;
 	char		peername[MAXHOSTNAMELEN + 1] ;
 
-	if (cip == NULL) return SR_FAULT ;
-	if (nlp == NULL) return SR_FAULT ;
+	if (cip == nullptr) return SR_FAULT ;
+	if (nlp == nullptr) return SR_FAULT ;
 
 	peername[0] = '\0' ;
 
@@ -1270,7 +1260,7 @@ static int loadpeernames(PROGINFO *pip,CLIENTINFO *cip,vecstr *nlp)
 /* use 'nlspeername(3dam)' */
 
 	if ((rs >= 0) && (rs1 < 0) && (! pip->f.daemon)) {
-	    if ((cp = getourenv(pip->envv,VARNLSADDR)) != NULL) {
+	    if ((cp = getourenv(pip->envv,VARNLSADDR)) != nullptr) {
 	        rs1 = nlspeername(cp,pip->domainname,peername) ;
 	        if (rs1 >= 0) {
 	            rs = vecstr_adduniq(nlp,peername,-1) ;
@@ -1290,14 +1280,13 @@ static int loadaccgroups(PROGINFO *pip,vecstr *glp,cchar *accbuf,int acclen)
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
-	if (glp == NULL) return SR_FAULT ;
-	if (accbuf == NULL) return SR_FAULT ;
+	if (glp == nullptr) return SR_FAULT ;
+	if (accbuf == nullptr) return SR_FAULT ;
 
 	if (acclen < 0) acclen = strlen(accbuf) ;
 
 	if ((acclen > 0) && (accbuf[0] != '\0')) {
-	    FIELD	af ;
-
+	    field	af ;
 	    if ((rs = field_start(&af,accbuf,acclen)) >= 0) {
 	        int	fl, cl ;
 	        cchar	*fp, *cp ;
@@ -1326,5 +1315,16 @@ static int loadaccgroups(PROGINFO *pip,vecstr *glp,cchar *accbuf,int acclen)
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (loadaccgroups) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	    maxnamelen = rs ;
+	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	        maxpathlen = rs ;
+	    }
+	}
+	return rs ;
+} /* end method (vars::operator) */
 
 

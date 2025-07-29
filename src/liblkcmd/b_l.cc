@@ -60,7 +60,7 @@
 #include	<vecstr.h>
 #include	<vstrcmpx.h>
 #include	<fsdir.h>
-#include	<typenonpath.h>
+#include	<nonpath.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -395,7 +395,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    if (ai == 0) continue ;
 
 	    argp = argv[ai] ;
-	    argl = strlen(argp) ;
+	    argl = lenstr(argp) ;
 
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
@@ -462,7 +462,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                pr = argp ;
 	                        } else
@@ -484,7 +484,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                sn = argp ;
 	                        } else
@@ -502,7 +502,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                afname = argp ;
 	                        } else
@@ -520,7 +520,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                efname = argp ;
 	                        } else
@@ -538,7 +538,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                ofname = argp ;
 	                        } else
@@ -555,7 +555,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                cp = argp ;
 	                        } else
@@ -599,7 +599,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                pr = argp ;
 	                        } else
@@ -620,7 +620,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                KEYOPT	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
@@ -1154,7 +1154,7 @@ static int procprint(PROGINFO *pip,void *ofp,VECSTR *dlp)
 	for (i = 0 ; vecstr_get(dlp,i,&fnp) >= 0 ; i += 1) {
 	    if (fnp == NULL) continue ;
 
-	    fnl = strlen(fnp) ;
+	    fnl = lenstr(fnp) ;
 
 	    if ((si = filesuf(fnp,fnl)) >= 0) {
 
@@ -1284,24 +1284,20 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 #endif /* CF_LOCSETENT */
 
-
-static int filesuf(cchar fname[],int fl)
-{
+static int filesuf(cchar *fname,int fl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
-
-	if (fl < 0) fl = strlen(fname) ;
+	if (fl < 0) fl = lenstr(fname) ;
 
 #if	CF_DEBUGS
 	debugprintf("b_l/filesuf: fname=>%s<\n",fname) ;
 #endif
 
-	if (typenonpath(fname,fl)) {
+	if (nonpath(fname,fl) > 0) {
 	    si = suffix_nonpath ;
 	} else {
 	    USTAT	sb ;
 	    char	tmpfname[MAXPATHLEN+1] ;
-
 	    if ((rs = mkvarpath(tmpfname,fname,fl)) > 0) {
 	        fname = tmpfname ;
 	    } else if (rs == 0) {

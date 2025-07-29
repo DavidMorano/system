@@ -40,6 +40,9 @@ MODS += argmgr.ccm
 LIBS=
 
 
+OBJ_ARGMGR += argmgr0.o argmgr1.o argmgr2.o argmgr3.o
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
@@ -56,10 +59,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ_ARGMGR += argmgr0.o argmgr1.o argmgr2.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -72,6 +72,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -87,7 +90,6 @@ all:			$(ALL)
 
 .ccm.o:
 	makemodule $(*)
-	echo default-rule
 
 
 $(T).o:			$(OBJ_ARGMGR)
@@ -112,6 +114,10 @@ argmgr1.o:		argmgr1.cc argmgr.ccm
 	$(COMPILE.cc) $<
 
 argmgr2.o:		argmgr2.cc argmgr.ccm
+	makemodule argmgr
+	$(COMPILE.cc) $<
+
+argmgr3.o:		argmgr3.cc argmgr.ccm
 	makemodule argmgr
 	$(COMPILE.cc) $<
 

@@ -47,13 +47,15 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<strn.h>
-#include	<char.h>
+#include	<strn.h>		/* |strnchr(3uc)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"nchr.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;
 
 /* local defines */
 
@@ -91,11 +93,11 @@ constexpr bool		f_strnchr = CF_STRNCHR ;
 /* exported subroutines */
 
 int nchr(cchar *sp,int sl,int sch) noex {
+    	cnullptr	np{} ;
 	int		n = 0 ;
 	if_constexpr (f_strnchr) {
-	    cchar	*tp ;
 	    if (sl < 0) sl = lenstr(sp) ;
-	    while ((tp = strnchr(sp,sl,sch)) != nullptr) {
+	    for (cc *tp ; (tp = strnchr(sp,sl,sch)) != np ; ) {
 	        n += 1 ;
 	        sl -= ((tp+1)-sp) ;
 	        sp = (tp+1) ;

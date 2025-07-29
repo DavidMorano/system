@@ -32,16 +32,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<new>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<localmisc.h>
 
 #include	"langstate.h"
+
+#pragma		GCC dependency	"mod/libutil.ccm"
 
 import libutil ;
 
@@ -72,7 +71,7 @@ namespace {
 	    return ln ; 
 	} ;
     } ; /* end struct (item) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -82,8 +81,7 @@ static int langstate_ctor(langstate *op,Args ... args) noex {
     	LANGSTATE	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
-	    memclear(hop) ; /* dangerous */
+	    rs = memclear(hop) ; /* dangerous */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -120,7 +118,7 @@ static int langstate_magic(langstate *op,Args ... args) noex {
 int langstate_start(langstate *op) noex {
 	int		rs ;
 	if ((rs = langstate_ctor(op)) >= 0) {
-	    op->f.clear = true ;
+	    op->fl.clear = true ;
 	    op->magic = LANGSTATE_MAGIC ;
 	    if (rs < 0) {
 		langstate_dtor(op) ;
@@ -146,61 +144,61 @@ int langstate_finish(langstate *op) noex {
 
 int langstate_proc(langstate *op,int ln,int ch) noex {
 	int		rs ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	if ((rs = langstate_magic(op)) >= 0) {
-	    f = op->f.clear ;
-	    if (op->f.comment) {
-	        if ((op->pch == '*') && (ch == '/')) {
-		    op->f.comment = false ;
-		    op->f.clear = true ;
+	    f = op->fl.clear ;
+	    if (op->fl.comment) {
+	        if ((op->pch == CH_STAR) && (ch == CH_SLASH)) {
+		    op->fl.comment = false ;
+		    op->fl.clear = true ;
 		    op->line = 0 ;
 	        }
-	    } else if (op->f.quote) {
-	        if (op->f.skip) {
-		    op->f.skip = false ;
+	    } else if (op->fl.quote) {
+	        if (op->fl.skip) {
+		    op->fl.skip = false ;
 	        } else {
 		    if (ch == CH_BSLASH) {
-		        op->f.skip = true ;
+		        op->fl.skip = true ;
 	            } else if (ch == CH_DQUOTE) {
-		        op->f.quote = false ;
-		        op->f.clear = true ;
+		        op->fl.quote = false ;
+		        op->fl.clear = true ;
 		        op->line = 0 ;
 		    }
 	        }
-	    } else if (op->f.literal) {
-	        if (op->f.skip) {
-		    op->f.skip = false ;
+	    } else if (op->fl.literal) {
+	        if (op->fl.skip) {
+		    op->fl.skip = false ;
 	        } else {
 		    if (ch == CH_BSLASH) {
-		        op->f.skip = true ;
+		        op->fl.skip = true ;
 	            } else if (ch == CH_SQUOTE) {
-		        op->f.literal = false ;
-		        op->f.clear = true ;
+		        op->fl.literal = false ;
+		        op->fl.clear = true ;
 		        op->line = 0 ;
 		    }
 	        }
 	    } else {
 	        switch (ch) {
-	        case '*':
-		    if (op->pch == '/') {
-		        op->f.comment = true ;
-		        op->f.clear = false ;
+	        case CH_STAR:
+		    if (op->pch == CH_SLASH) {
+		        op->fl.comment = true ;
+		        op->fl.clear = false ;
 		        op->line = ln ;
 		        f = false ;
 		    }
 		    break ;
 	        case CH_DQUOTE:
 		    if ((op->pch != CH_BSLASH) && (op->pch != CH_SQUOTE)) {
-		        op->f.quote = true ;
-		        op->f.clear = false ;
+		        op->fl.quote = true ;
+		        op->fl.clear = false ;
 		        op->line = ln ;
 		        f = false ;
 		    }
 		    break ;
 	        case CH_SQUOTE:
 		    if (op->pch != CH_BSLASH) {
-		        op->f.literal = true ;
-		        op->f.clear = false ;
+		        op->fl.literal = true ;
+		        op->fl.clear = false ;
 		        op->line = ln ;
 		        f = false ;
 		    }
@@ -219,11 +217,11 @@ int langstate_getstat(langstate *op,langstate_info *sbp) noex {
 	if ((rs = langstate_magic(op,sbp)) >= 0) {
 	    memclear(sbp) ; /* dangerous */
 	    sbp->line = op->line ;
-	    if (op->f.comment) {
+	    if (op->fl.comment) {
 	        type = langstatetype_comment ;
-	    } else if (op->f.quote) {
+	    } else if (op->fl.quote) {
 	        type = langstatetype_quote ;
-	    } else if (op->f.literal) {
+	    } else if (op->fl.literal) {
 	        type = langstatetype_literal ;
 	    }
 	    sbp->type = type ;

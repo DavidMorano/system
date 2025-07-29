@@ -39,6 +39,7 @@
 
 #include	"msgide.hh"
 
+import libutil ;
 
 /* local defines */
 

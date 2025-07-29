@@ -38,7 +38,6 @@ INCS += libu.h
 MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm 
 MODS += libutil.ccm chrset.ccm
 MODS += digtab.ccm xxtostr.ccm 
-MODS += usysconf.ccm ulibvals.ccm
 MODS += usigset.o usigblock.ccm umisc.ccm
 MODS += unixfnames.ccm constdiv.ccm builtin.ccm
 MODS += usysbasic.ccm ureserve.cmm vecbool.ccm
@@ -69,7 +68,7 @@ SOFL= -shared
 OBJ00= mailvalues.o endian.o 
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
-OBJ03= libutil.o umods.o usysflag.o
+OBJ03= libutil.o usysconf.o umods.o 
 
 OBJ04= utimeout.o utimeouts.o 
 OBJ05= ulogerror.o strtox.o 
@@ -81,7 +80,7 @@ OBJ09= uregfork.o uatfork.o ufdlock.o
 OBJ10= usig.o uexec.o uipc.o 
 OBJ11= ustr.o uobjlock.o ureserve.o
 
-OBJ12= usysdata.o usysauxinfo.o 
+OBJ12= usysflag.o usysdata.o usysauxinfo.o 
 OBJ13= ufileop.o ufiledesc.o 
 OBJ14= um.o uprocess.o
 OBJ15= usysop.o vecbool.o
@@ -98,7 +97,7 @@ OBJ23= syscontain.o stdfnames.o
 
 OBJ24= posixdirent.o
 OBJ25= fonce.o filerec.o
-OBJ26=
+OBJ26= ustd.o
 OBJ27=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -107,7 +106,7 @@ OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
-OBJG= obj24.o obj25.o
+OBJG= obj24.o obj25.o obj26.o
 
 OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 
@@ -315,6 +314,11 @@ usys.o:			usys.dir
 usys.dir:
 	makesubdir $@
 
+# USTD
+ustd.o:			ustd.dir
+ustd.dir:
+	makesubdir $@
+
 # UFDLOCK
 ufdlock.o:		ufdlock.dir
 ufdlock.dir:
@@ -378,6 +382,11 @@ ureserve.dir:
 # USUPPORT
 usupport.o:		usupport.dir
 usupport.dir:
+	makesubdir $@
+
+# USYSCONF
+usysconf.o:		usysconf.dir
+usysconf.dir:
 	makesubdir $@
 
 # VECBOOL

@@ -49,8 +49,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<sys/stat.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usyscalls.h>

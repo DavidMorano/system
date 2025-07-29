@@ -26,9 +26,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -49,8 +46,6 @@
 /* imported namespaces */
 
 using namespace	ufileop ;		/* namespace */
-
-using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -79,9 +74,9 @@ using std::nullptr_t ;			/* type */
 namespace ufileop {
     int ufileopbase::operator () (cchar *fname) noex {
 	int		rs = SR_BADF ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        errtimer	to_again	= utimeout[uto_again] ;
 	        errtimer	to_busy		= utimeout[uto_busy] ;
 	        errtimer	to_nomem	= utimeout[uto_nomem] ;
@@ -95,7 +90,7 @@ namespace ufileop {
 	        errtimer	to_io		= utimeout[uto_io] ;
 	        reterr		r ;
 	        repeat {
-	            if ((rs = callstd(fname)) < 0) {
+	            if ((rs = callstd(fname)) < 0) nlikely {
 		        r(rs) ;			/* <- default causes exit */
                         switch (rs) {
                         case SR_AGAIN:

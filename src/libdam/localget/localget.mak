@@ -31,11 +31,23 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= localget.h
+INCS += localget.h
 
-LIBS=
+MODS +=
+
+LIBS +=
+
+OBJ0_LCOALGET= localgetnetload.o
+OBJ1_LCOALGET= localgetorg.o localgetorgcode.o
+OBJ2_LCOALGET= localgetorgloc.o localgetsystat.o
+OBJ3_LCOALGET= 
+
+OBJA_LCOALGET= obj0_localget.o obj1_localget.o
+OBJB_LCOALGET= obj2_localget.o
+
+OBJ_LCOALGET= $(OBJA_LCOALGET) $(OBJB_LCOALGET)
 
 
 INCDIRS=
@@ -44,7 +56,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -53,18 +64,6 @@ CFLAGS		?= $(MAKECFLAGS)
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
-
-
-OBJ0_LCOALGET= localgetnetload.o
-OBJ1_LCOALGET= localgetorg.o localgetorgcode.o
-OBJ2_LCOALGET= localgetorgloc.o localgetsystat.o
-OBJ3_LCOALGET= 
-
-
-OBJA_LCOALGET= obj0_localget.o obj1_localget.o
-OBJB_LCOALGET= obj2_localget.o
-
-OBJ_LCOALGET= $(OBJA_LCOALGET) $(OBJB_LCOALGET)
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -100,13 +99,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_LCOALGET)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LCOALGET)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)

@@ -41,6 +41,7 @@
 struct txtindexmks_object {
 	cchar		*name ;
 	uint		objsize ;
+	uint		dummy ;
 } ;
 
 struct txtindexmks_patient {

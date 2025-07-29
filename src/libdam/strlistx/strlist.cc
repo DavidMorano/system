@@ -64,6 +64,7 @@
 #include	"strlist.h"
 #include	"strlisthdr.h"
 
+import libutil ;
 
 /* local defines */
 

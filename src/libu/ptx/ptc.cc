@@ -38,6 +38,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<usupport.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>
 
 #include	"ptca.h"
@@ -45,12 +46,6 @@
 
 
 /* local defines */
-
-#if	defined(SYSHAS_RELTIMEDWAIT) && ( (SYSHAS_RELTIMEDWAIT > 0))
-#define	F_RELTIMEDWAIT		1	/* relative timed wait */
-#else
-#define	F_RELTIMEDWAIT		0	/* relative timed wait */
-#endif
 
 
 /* external subroutines */
@@ -61,10 +56,16 @@
 
 /* forward references */
 
+static sysret_t std_ptcinit(ptc *op,ptca *ap) noex {
+    	int		rs ;
+	if ((rs = pthread_cond_init(op,ap)) > 0) {
+	    rs = (- rs) ;
+	}
+	return rs ;
+} /* end subroutine (std_ptcinit) */
+
 
 /* local variables */
-
-constexpr bool		f_reltimedwait = F_RELTIMEDWAIT ;
 
 
 /* exported variables */
@@ -73,37 +74,40 @@ constexpr bool		f_reltimedwait = F_RELTIMEDWAIT ;
 /* exported subroutines */
 
 int ptc_create(ptc *op,ptca *ap) noex {
-	int		to_nomem = utimeout[uto_nomem] ;
-	int		to_again = utimeout[uto_again] ;
 	int		rs = SR_FAULT ;
-	bool		f_exit = false ;
 	if (op) {
+	    errtimer	to_nomem	= utimeout[uto_nomem] ;
+	    errtimer	to_nobufs	= utimeout[uto_nobufs] ;
+	    errtimer	to_again	= utimeout[uto_again] ;
+	    errtimer	to_busy		= utimeout[uto_busy] ;
+	    errtimer	to_io		= utimeout[uto_io] ;
+	    reterr	r ;
 	    repeat {
-	        if ((rs = pthread_cond_init(op,ap)) > 0) {
-		    rs = (- rs) ;
-	        }
-	        if (rs < 0) {
-	            switch (rs) {
-	            case SR_NOMEM:
-	                if (to_nomem-- > 0) {
-		            msleep(1000) ;
-		        } else {
-	                    f_exit = true ;
-		        }
-	                break ;
-	            case SR_AGAIN:
-	                if (to_again-- > 0) {
-		            msleep(1000) ;
-		        } else {
-	                    f_exit = true ;
-		        }
-	                break ;
-		    default:
-		        f_exit = true ;
-		        break ;
-	            } /* end switch */
+		if ((rs = std_ptcinit(op,ap)) < 0) {
+                    r(rs) ;		/* <- default causes exit */
+                    switch (rs) {
+                    case SR_NOMEM:
+                        r = to_nomem(rs) ;
+                        break ;
+                    case SR_NOBUFS:
+                        r = to_nobufs(rs) ;
+                        break ;
+                    case SR_AGAIN:
+                        r = to_again(rs) ;
+                        break ;
+                    case SR_BUSY:
+                        r = to_busy(rs) ;
+                        break ;
+                    case SR_IO:
+                        r = to_io(rs) ;
+                        break ;
+                    case SR_INTR:
+                        r(false) ;
+                        break ;
+                    } /* end switch */
+                    rs = r ;
 	        } /* end if (error) */
-	    } until ((rs >= 0) || f_exit) ;
+	    } until ((rs >= 0) || r.fexit) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -145,9 +149,11 @@ int ptc_signal(ptc *op) noex {
 int ptc_wait(ptc *op,ptm *mp) noex {
 	int		rs = SR_FAULT ;
 	if (op && mp) {
-	    if ((rs = pthread_cond_wait(op,mp)) > 0) {
-	        rs = (- rs) ;
-	    }
+	    repeat {
+	        if ((rs = pthread_cond_wait(op,mp)) > 0) {
+	            rs = (- rs) ;
+	        }
+	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -174,9 +180,11 @@ int ptc_timedwait(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    if (tp) {
-	        if ((rs = pthread_cond_timedwait(op,mp,tp)) > 0) {
-	            rs = (- rs) ;
-	        }
+		repeat {
+	            if ((rs = pthread_cond_timedwait(op,mp,tp)) > 0) {
+	                rs = (- rs) ;
+	            }
+		} until (rs != SR_INTR) ;
 	    } else {
 	        rs = ptc_wait(op,mp) ;
 	    }
@@ -189,7 +197,7 @@ int ptc_reltimedwaitnp(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	int		rs = SR_NOSYS ;
 	if (op) {
 	    if (tp) {
-	        if_constexpr (f_reltimedwait) {
+	        if_constexpr (syshas.reltimedwait) {
 	            if ((rs = pthread_cond_reltimedwait_np(op,mp,tp)) > 0) {
 	                rs = (- rs) ;
 	            }

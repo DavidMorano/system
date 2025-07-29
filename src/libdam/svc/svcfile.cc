@@ -1,4 +1,5 @@
 /* svcfile SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* service-table file manager */
@@ -56,21 +57,21 @@
 
 #include	"svcfile.h"
 
+import libutil ;
 
 /* local defines */
 
 #define	SVCFILE_INTCHECK	2	/* file-change check interval */
 #define	SVCFILE_INTWAIT		2	/* file-change wait interval */
 
-#define	SVCFILE_FILE		struct xsvcfile_file
-#define	SVCFILE_KEYNAME		struct svcfile_keyname
-#define	SVCFILE_IENT		struct svcfile_ie
-#define	SVCFILE_SVCNAME		struct svcfile_svcname
+#define	SVCFILE_FILE		xsvcfile_file
+#define	SVCFILE_KEYNAME		svcfile_keyname
+#define	SVCFILE_SF_IE		svcfile_ie
+#define	SVCFILE_SVCNAME		svcfile_svcname
+#define	SF_IE			svcfile_ie
 
-#define	SVCENTRY		struct svcentry
-#define	SVCENTRY_KEY		struct svcentry_key
-
-#define	IENT			struct svcfile_ie
+#define	SVCENTRY		svcentry
+#define	SVCENTRY_KEY		svcentry_key
 
 #undef	DEFCHUNKSIZE
 #define	DEFCHUNKSIZE		512
@@ -109,7 +110,7 @@ struct svcfile_svcname {
 
 struct xsvcfile_file {
 	cchar		*fname ;
-	time_t		mtime ;
+	time_t		timod ;
 	ino_t		ino ;
 	dev_t		dev ;
 	int		fsize ;
@@ -248,13 +249,13 @@ static int	svcname_incr(SVCFILE_SVCNAME *) noex ;
 static int	svcname_decr(SVCFILE_SVCNAME *) noex ;
 static int	svcname_finish(SVCFILE_SVCNAME *) noex ;
 
-static int	ientry_loadstr(IENT *,char *,SVCENTRY *) noex ;
-static int	ientry_finish(IENT *) noex ;
+static int	ientry_loadstr(SF_IE *,char *,SVCENTRY *) noex ;
+static int	ientry_finish(SF_IE *) noex ;
 #if	CF_MOREKEYS
-static int	ientry_morekeys(IENT *,int,int) noex ;
+static int	ientry_morekeys(SF_IE *,int,int) noex ;
 #endif
 
-static int	entry_load(svcfile_ent *,char *,int,IENT *) noex ;
+static int	entry_load(svcfile_ent *,char *,int,SF_IE *) noex ;
 
 static int	mkvars() noex ;
 
@@ -502,7 +503,7 @@ int svcfile_curenum(svcfile *op,svcfile_cur *curp,svcfile_ent *ep,
 	            hdb_dat	val ;
 	            hdb_cur	*ecp = curp->ecp ;
 	            if ((rs = hdb_curenum(op->elp,ecp,&key,&val)) >= 0) {
-	                IENT	*iep = (IENT *) val.buf ;
+	                SF_IE	*iep = (SF_IE *) val.buf ;
 	                if ((ep != nullptr) && (ebuf != nullptr)) {
 	                    rs = entry_load(ep,ebuf,elen,iep) ;
 	                    svclen = rs ;
@@ -546,7 +547,7 @@ int svcfile_curfetch(svcfile *op,cc *svcname,svcfile_cur *curp,svcfile_ent *ep,
 	            key.buf = svcname ;
 	            key.len = lenstr(svcname) ;
 	            if ((rs = hdb_fetch(op->elp,key,ecp,&val)) >= 0) {
-	                IENT	*iep = (IENT *) val.buf ;
+	                SF_IE	*iep = (SF_IE *) val.buf ;
 	                if ((ep != nullptr) && (ebuf != nullptr)) {
 	                    rs = entry_load(ep,ebuf,elen,iep) ;
 	                    svclen = rs ;
@@ -613,7 +614,7 @@ static int svcfile_filefins(svcfile *op) noex {
 /* check if the access table files have changed */
 /* ARGSUSED */
 static int svcfile_checkfiles(svcfile *op,time_t dt) noex {
-	USTAT		sb ;
+	ustat		sb ;
 	cint		wt = SVCFILE_INTWAIT ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -625,7 +626,7 @@ static int svcfile_checkfiles(svcfile *op,time_t dt) noex {
 	    SVCFILE_FILE	*fep = (SVCFILE_FILE *) vp ;
 	    if (vp) {
 	        rs1 = uc_stat(fep->fname,&sb) ;
-	        if ((rs1 >= 0) && ((sb.st_mtime - fep->mtime) >= wt)) {
+	        if ((rs1 >= 0) && ((sb.st_mtime - fep->timod) >= wt)) {
 	            c_changed += 1 ;
 	            svcfile_filedump(op,i) ;
 	            rs = svcfile_fileparse(op,i) ;
@@ -640,18 +641,16 @@ static int svcfile_checkfiles(svcfile *op,time_t dt) noex {
 static int svcfile_fileparse(svcfile *op,int fi) noex {
 	int		rs ;
 	int		c = 0 ;
-	void		*vp{} ;
-	if ((rs = vecobj_get(op->flp,fi,&vp)) >= 0) {
+	if (void *vp ; (rs = vecobj_get(op->flp,fi,&vp)) >= 0) {
 	    SVCFILE_FILE	*fep = (SVCFILE_FILE *) vp ;
 	    if (vp) {
-	        USTAT	sb ;
 	        cchar	*fname = fep->fname ;
-	        if ((rs = uc_stat(fname,&sb)) >= 0) {
-	            if (sb.st_mtime > fep->mtime) {
+	        if (ustat sb ; (rs = uc_stat(fname,&sb)) >= 0) {
+	            if (sb.st_mtime > fep->timod) {
 	                fep->dev = sb.st_dev ;
 	                fep->ino = sb.st_ino ;
-	                fep->mtime = sb.st_mtime ;
-	                fep->fsize = sb.st_size ;
+	                fep->timod = sb.st_mtime ;
+	                fep->fsize = intsat(sb.st_size) ;
 	                rs = svcfile_fileparser(op,fi,fname) ;
 	                c = rs ;
 	            } /* end if (need new parsing) */
@@ -737,13 +736,13 @@ int fileparser::allocend() noex {
 	return rs ;
 }
 
-int fileparser::operator () (cchar *fname) noex {
+int fileparser::operator () (cchar *fn) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = allocbegin()) >= 0) {
 	    {
-	        rs = parsef(fname) ;
+	        rs = parsef(fn) ;
 		c = rs ;
 	    }
 	    rs1 = allocend() ;
@@ -752,14 +751,13 @@ int fileparser::operator () (cchar *fname) noex {
 	return (rs >= 0) ? c : rs ;
 }
 
-int fileparser::parsef(cchar *fname) noex {
-	svcentry	se{} ;
-	bfile		svcfile, *lfp = &svcfile ;
+int fileparser::parsef(cchar *fn) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = bopen(lfp,fname,"r",0)) >= 0) {
-	    while ((rs = breadln(lfp,lbuf,llen)) > 0) {
+	if (bfile sf ; (rs = sf.open(fn,"r",0)) >= 0) {
+	    svcentry	se{} ;
+	    while ((rs = sf.readln(lbuf,llen)) > 0) {
 	 	cchar	*cp{} ;
 		if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
 		    rs = parseln(&se,cp,cl) ;
@@ -776,7 +774,7 @@ int fileparser::parsef(cchar *fname) noex {
 	        rs1 = svcentry_finish(&se) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (extra entry) */
-	    rs1 = bclose(lfp) ;
+	    rs1 = sf.close ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bfile) */
 	if (rs < 0) {
@@ -859,7 +857,7 @@ static int svcfile_filealready(svcfile *op,dev_t dev,ino_t ino) noex {
 
 /* add an entry to the access entry list */
 static int svcfile_addentry(svcfile *op,int fi,SVCENTRY *nep) noex {
-	int		sz = szof(IENT) ;
+	int		sz = szof(SF_IE) ;
 	int		rs ;
 	int		f_added = false ;
 
@@ -870,7 +868,7 @@ static int svcfile_addentry(svcfile *op,int fi,SVCENTRY *nep) noex {
 	    f_added = true ;
 	    void	*vp{} ;
 	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
-		IENT	*iep = (IENT *) vp ;
+		SF_IE	*iep = (SF_IE *) vp ;
 	        cint	n = svcentry_nkeys(nep) ;
 	        iep->fi = fi ;
 	        sz = (n+1) * 2 * szof(char *) ;
@@ -887,7 +885,7 @@ static int svcfile_addentry(svcfile *op,int fi,SVCENTRY *nep) noex {
 	                    key.buf = iep->svc ;
 	                    key.len = sl ;
 	                    val.buf = iep ;
-	                    val.len = szof(IENT) ;
+	                    val.len = szof(SF_IE) ;
 	                    if ((rs = hdb_store(op->elp,key,val)) >= 0) {
 	                        rs = svcfile_svcadd(op,iep->svc) ;
 	                        if (rs < 0) {
@@ -943,9 +941,9 @@ static int svcfile_filedump(svcfile *op,int fi) noex {
 	int		rs2 ;
 	int		c = 0 ;
 	if ((rs = hdb_curbegin(op->elp,&cur)) >= 0) {
-	    IENT	*ep ;
+	    SF_IE	*ep ;
 	    while ((rs2 = hdb_curenum(op->elp,&cur,&key,&val)) >= 0) {
-	        ep = (IENT *) val.buf ;
+	        ep = (SF_IE *) val.buf ;
 	        if ((ep->fi == fi) || (fi < 0)) {
 	            c += 1 ;
 		    {
@@ -1240,7 +1238,7 @@ static int svcentry_size(SVCENTRY *sep) noex {
 }
 /* end subroutine (svcentry_size) */
 
-static int ientry_loadstr(IENT *iep,char *bp,SVCENTRY *nep) noex {
+static int ientry_loadstr(SF_IE *iep,char *bp,SVCENTRY *nep) noex {
 	int		rs = SR_FAULT ;
 	int		sl = 0 ;
 	if (iep && bp && nep) {
@@ -1272,7 +1270,7 @@ static int ientry_loadstr(IENT *iep,char *bp,SVCENTRY *nep) noex {
 }
 /* end subroutine (ientry_loadstr) */
 
-static int ientry_finish(IENT *iep) noex {
+static int ientry_finish(SF_IE *iep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (iep) {
@@ -1293,7 +1291,7 @@ static int ientry_finish(IENT *iep) noex {
 /* end subroutine (ientry_finish) */
 
 #if	CF_MOREKEYS
-static int ientry_morekeys(IENT *iep,int c,int i) noex {
+static int ientry_morekeys(SF_IE *iep,int c,int i) noex {
 	int		rs = SR_FAULT ;
 	int		f_more = true ;
 	if (iep) {
@@ -1308,7 +1306,7 @@ static int ientry_morekeys(IENT *iep,int c,int i) noex {
 #endif /* CF_MOREKEYS */
 
 /* load up the user-interface entry from the internal structure */
-static int entry_load(svcfile_ent *ep,char *ebuf,int elen,IENT *iep) noex {
+static int entry_load(svcfile_ent *ep,char *ebuf,int elen,SF_IE *iep) noex {
 	int		rs = SR_FAULT ;
 	int		rlen = 0 ;
 	if (iep && ebuf && iep) {
@@ -1326,7 +1324,7 @@ static int entry_load(svcfile_ent *ep,char *ebuf,int elen,IENT *iep) noex {
 #endif
 	    	    ep->svc = bp ;
 	    	    bp = strwcpy(bp,iep->svc,-1) + 1 ;
-	    	    rlen = (bp - ep->svc - 1) ;
+	    	    rlen = intconv(bp - ep->svc - 1) ;
 	    	    for (i = 0 ; i < iep->nkeys ; i += 1) {
 	        	cchar	*kp = iep->keyvals[i][0] ;
 	        	cchar	*vp = iep->keyvals[i][1] ;

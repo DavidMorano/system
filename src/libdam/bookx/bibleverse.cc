@@ -1,10 +1,11 @@
-/* bibleverse */
+/* bibleverse SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* BIBLEVERSE object-load management */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -17,15 +18,11 @@
 
 /*******************************************************************************
 
-	This module implements an interface (a trivial one) that allows access
-	to the BIBLEVERSE datbase.
-
+  	Description:
+	This module implements an interface (a trivial one) that
+	allows access to the BIBLEVERSE datbase.
 
 *******************************************************************************/
-
-
-#define	BIBLEVERSE_MASTER	1
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

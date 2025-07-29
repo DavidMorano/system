@@ -42,7 +42,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -137,7 +136,7 @@ static int bwritebuf(bfile *op,cchar *wbuf,int n) noex {
 	    cint	mlen = min(blen,nblanks) ;
 	    rs = bwrite(op,wbuf,mlen) ;
 	    wlen += rs ;
-	    blen -= mlen ;
+	    blen -= rs ;
 	} /* end while */
 	return (rs >= 0) ? wlen : rs ;
 }

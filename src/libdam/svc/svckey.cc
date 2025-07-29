@@ -1,4 +1,5 @@
 /* svckey SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* service key data-structure-conversion access */
@@ -16,23 +17,38 @@
 
 /******************************************************************************
 
+  	Name:
+	int svckey_load(svckey *skp,svcfile_ent *sep) noex {
+
+	Description:
 	This object really forms some glue to pass service entry
 	parameters (like from a file processed with SVCFILE) to
 	other objects that expect to be handed pointers to service-entry
 	related string values.
+
+	Synopsis:
+	int svckey_load(svckey *skp,svcfile_ent *sep) noex
+
+	Arguments:
+	skp
+	sep
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<matxstr.h>
 #include	<localmisc.h>
 
 #include	"svckey.h"
 
+import libutil ;
 
 /* external subroutines */
 
@@ -62,7 +78,7 @@ constexpr cpcchar	svckeys[] = {
 	"failcont",
 	"include",
 	nullptr
-} ;
+} ; /* end array (svckeys) */
 
 
 /* exported variables */

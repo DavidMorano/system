@@ -35,14 +35,32 @@
 #define	VARSUB			struct varsub_head
 #define	VARSUB_FL		struct varsub_flags
 #define	VARSUB_CUR		struct varsub_cursor
-#define	VARSUB_MAGIC		91827364
+#define	VARSUB_MAGIC		0x91827364
+
+enum varsubos {
+    	varsubo_noblank,
+    	varsubo_badnokey,
+    	varsubo_brace,
+    	varsubo_paren,
+    	varsubo_overlast,
+} ;
+
+#ifdef	__cplusplus
+struct varsubms {
+    	static cint	blank ;		/* default, substitute blank */
+    	static cint	noblank ;	/* substitute the key on failure */
+    	static cint	badnokey ;	/* fail out on failure */
+    	static cint	brace ;		/* substitute on braces */
+    	static cint	paren ;		/* substitute on parentheses */
+} ;
+#endif /* __cplusplus */
+
 /* initialization options */
 #define	VARSUB_OBLANK		0	/* default, substitute blank */
-#define	VARSUB_ONOBLANK		(1<<0)	/* substitute the key on failure */
-#define	VARSUB_OBADNOKEY	(1<<1)	/* fail out on failure */
-#define	VARSUB_OBRACE		(1<<2)	/* substitute on braces */
-#define	VARSUB_OPAREN		(1<<3)	/* substitute on parentheses */
-
+#define	VARSUB_ONOBLANK		(1 << varsubo_noblank)
+#define	VARSUB_OBADNOKEY	(1 << varsubo_badnokey)
+#define	VARSUB_OBRACE		(1 << varsubº_brace)
+#define	VARSUB_OPAREN		(1 << varsubo_paren)
 
 struct varsub_flags {
 	uint		badnokey:1 ;
@@ -58,7 +76,7 @@ struct varsub_cursor {
 
 struct varsub_head {
 	vechand		*slp ;
-	VARSUB_FL	f ;
+	VARSUB_FL	fl ;
 	uint		magic ;
 	int		n ;		/* current allocated length */
 	int		i ;		/* maximum length used */
@@ -90,6 +108,12 @@ extern int	varsub_addvec(varsub *,vecstr *) noex ;
 extern int	varsub_finish(varsub *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+extern const varsubms	varsubm ;
+
+#endif /* __cplusplus */
 
 
 #endif /* VARSUB_INCLUDE */

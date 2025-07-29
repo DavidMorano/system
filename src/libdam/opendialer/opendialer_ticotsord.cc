@@ -24,15 +24,12 @@
 	This is an open-dialer.
 
 	The file-name corresponding to this dialer looks like:
-
 		ticotsord¥<addr>[,to=<to>]
 
 	Example:
-
 		ticotsord¥/local
 
 	Synopsis:
-
 	int opendialer_ticotsord(pr,prn,svc,of,om,argv,envv,to)
 	cchar	*pr ;
 	cchar	*prn ;
@@ -44,7 +41,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	svc		service name
@@ -55,7 +51,6 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
 	<0		error (system-return)
 
@@ -69,7 +64,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<strn.h>
 #include	<strwcpy.h>
@@ -79,6 +73,7 @@
 #include	"opendialer_ticotsord.h"
 #include	"defs.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -87,21 +82,8 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	findxfile(IDS *,char *,cchar *) ;
-extern int	getaf(cchar *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	dialtcp(cchar *,cchar *,int,int,int) ;
-extern int	dialticotsord(cchar *,int,int,int) ;
-extern int	uc_openprog(cchar *,int,cchar **,cchar **) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
+/* external variables */
 
 
 /* local structures */
@@ -117,16 +99,16 @@ struct argparse {
 
 /* local variables */
 
-static cchar	*ops[] = {
-	"to",
-	"af",
-	NULL
-} ;
-
 enum ops {
 	op_to,
 	op_af,
 	op_overlast
+} ;
+
+constexpr cpcchar	ops[] = {
+	"to",
+	"af",
+	nullptr
 } ;
 
 
@@ -136,8 +118,10 @@ static int argparse_start(struct argparse *,cchar *) ;
 static int argparse_finish(struct argparse *) ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int opendialer_ticotsord(pr,prn,svc,of,om,argv,envv,to)
 cchar	*pr ;
@@ -154,14 +138,14 @@ int		to ;
 	int		argc = 0 ;
 	int		opts = 0 ;
 	int		fd = -1 ;
-	cchar	*argz = NULL ;
+	cchar	*argz = nullptr ;
 
 #if	CF_DEBUGS
 	{
 	    int	i ;
 	    debugprintf("opendialer_ticotsord: svc=%s\n",svc) ;
-	    if (argv != NULL) {
-	        for (i = 0 ; argv[i] != NULL ; i += 1) {
+	    if (argv != nullptr) {
+	        for (i = 0 ; argv[i] != nullptr ; i += 1) {
 	            debugprintf("opendialer_ticotsord: a[%u]=%s\n",i,argv[i]) ;
 	        }
 	    }
@@ -170,12 +154,12 @@ int		to ;
 
 	if (svc[0] == '\0') return SR_INVALID ;
 
-	if (argv != NULL) {
-	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
+	if (argv != nullptr) {
+	    for (argc = 0 ; argv[argc] != nullptr ; argc += 1) ;
 	    argz = argv[0] ;
 	}
 
-	if ((rs >= 0) && (argz == NULL)) rs = SR_NOENT ;
+	if ((rs >= 0) && (argz == nullptr)) rs = SR_NOENT ;
 	if ((rs >= 0) && (argz[0] == '\0')) rs = SR_NOENT ;
 	if (rs < 0) goto ret0 ;
 
@@ -197,7 +181,7 @@ int		to ;
 	    if (ai.to >= 0) to = ai.to ;
 	    if (ai.af >= 0) af = ai.af ;
 	    portspec = ai.portspec ;
-	    if (ai.hostname != NULL) {
+	    if (ai.hostname != nullptr) {
 	        rs = getaf(svc,-1) ;
 	        af = rs ;
 	        hostname = ai.hostname ;
@@ -241,9 +225,9 @@ static int argparse_start(struct argparse *app,cchar *argz)
 	int	opl = 0 ;
 
 	cchar	*tp, *sp ;
-	cchar	*hostp = NULL ;
-	cchar	*portp = NULL ;
-	cchar	*opp = NULL ;
+	cchar	*hostp = nullptr ;
+	cchar	*portp = nullptr ;
+	cchar	*opp = nullptr ;
 
 	memclear(app) ;
 	app->to = -1 ;
@@ -251,7 +235,7 @@ static int argparse_start(struct argparse *app,cchar *argz)
 
 	if (argz[0] == '\0') goto ret0 ;
 
-	if ((tp = strbrk(argz,",:")) != NULL) {
+	if ((tp = strbrk(argz,",:")) != nullptr) {
 	    int		oi ;
 	    int		v ;
 	    int		kl, vl ;
@@ -266,7 +250,7 @@ static int argparse_start(struct argparse *app,cchar *argz)
 #if	CF_DEBUGS
 	    debugprintf("opendialer_ticotsord/argparse_start: s=%s\n",sp) ;
 #endif
-	        if ((tp = strchr(sp,',')) != NULL) {
+	        if ((tp = strchr(sp,',')) != nullptr) {
 	            portl = (tp-sp) ;
 	            sp = (tp+1) ;
 #if	CF_DEBUGS
@@ -285,7 +269,7 @@ static int argparse_start(struct argparse *app,cchar *argz)
 	    while (sp[0]) {
 	        opp = sp ;
 	        opl = -1 ;
-	        if ((tp = strchr(sp,',')) != NULL) {
+	        if ((tp = strchr(sp,',')) != nullptr) {
 	            opl = (tp-sp) ;
 		    nsp = (tp+1) ;
 	        } else {
@@ -298,16 +282,16 @@ static int argparse_start(struct argparse *app,cchar *argz)
 #endif
 		kp = opp ;
 		kl = opl ;
-		vp = NULL ;
+		vp = nullptr ;
 		vl = 0 ;
-		if ((tp = strnchr(opp,opl,'=')) != NULL) {
+		if ((tp = strnchr(opp,opl,'=')) != nullptr) {
 		    kl = (tp-opp) ;
 		    vp = (tp+1) ;
 		    vl = (opp+opl) - (tp+1) ;
 		}
 #if	CF_DEBUGS
 	    debugprintf("opendialer_ticotsord/argparse_start: k=%r\n",kp,kl) ;
-		if (vp != NULL) 
+		if (vp != nullptr) 
 	    debugprintf("opendialer_ticotsord/argparse_start: v=%r\n",vp,vl) ;
 #endif
 	        oi = matstr(ops,kp,kl) ;
@@ -334,24 +318,24 @@ static int argparse_start(struct argparse *app,cchar *argz)
 #endif
 		if (rs < 0) break ;
 	    } /* end while */
-	    if ((rs >= 0) && ((hostp != NULL) || (portp != NULL))) {
+	    if ((rs >= 0) && ((hostp != nullptr) || (portp != nullptr))) {
 	        int	size = 0 ;
 	        char	*bp ;
-	        if (hostp != NULL) {
+	        if (hostp != nullptr) {
 	            if (hostl < 0) hostl = lenstr(hostp) ;
 	            size += (hostl + 1) ;
 	        }
-	        if (portp != NULL) {
+	        if (portp != nullptr) {
 	            if (portl < 0) portl = lenstr(portp) ;
 	            size += (portl + 1) ;
 	        }
 	        if ((rs = uc_malloc(size,&bp)) >= 0) {
 	            app->a = bp ;
-	            if (hostp != NULL) {
+	            if (hostp != nullptr) {
 	                app->hostname = bp ;
 	                bp = strwcpy(bp,hostp,hostl) + 1 ;
 	            }
-	            if (portp != NULL) {
+	            if (portp != nullptr) {
 	                app->portspec = bp ;
 	                bp = strwcpy(bp,portp,portl) + 1 ;
 	            }
@@ -372,14 +356,14 @@ static int argparse_finish(struct argparse *app)
 	int	rs1 ;
 
 
-	if (app->a != NULL) {
+	if (app->a != nullptr) {
 	    rs1 = uc_free(app->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    app->a = NULL ;
+	    app->a = nullptr ;
 	}
 
-	app->hostname = NULL ;
-	app->portspec = NULL ;
+	app->hostname = nullptr ;
+	app->portspec = nullptr ;
 	return rs ;
 }
 /* end subroutine (argparse_finish) */

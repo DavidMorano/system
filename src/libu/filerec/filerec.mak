@@ -58,7 +58,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 OBJ0= filerec0.o filerec1.o 
 OBJ1= filerec2.o filerec3.o
-OBJ2= filerec4.o
+OBJ2= filerec4.o filerec5.o
 
 OBJA= obj0.o obj1.o obj2.o
 
@@ -148,6 +148,10 @@ filerec3.o:		filerec3.cc filerec.ccm		$(INCS)
 	$(COMPILE.cc) $<
 
 filerec4.o:		filerec4.cc filerec.ccm		$(INCS)
+	makemodule filerec
+	$(COMPILE.cc) $<
+
+filerec5.o:		filerec5.cc filerec.ccm		$(INCS)
 	makemodule filerec
 	$(COMPILE.cc) $<
 

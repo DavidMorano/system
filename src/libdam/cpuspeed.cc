@@ -1,11 +1,11 @@
-/* cpuspeed */
+/* cpuspeed HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* subroutine to load a CPUSPEED module */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -18,14 +18,12 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine loads up a CPUSPEED module.
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>

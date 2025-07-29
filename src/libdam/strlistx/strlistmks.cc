@@ -81,6 +81,7 @@
 #include	"strlistmks.h"
 #include	"strlisthdr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -263,8 +264,8 @@ int strlistmks_open(SLM *op,cc *dbname,int of,mode_t om,int n) noex {
 	            op->om = om ;
 	            op->nfd = -1 ;
 	            op->gid = -1 ;
-	            op->f.ofcreat = (of & O_CREAT) ;
-	            op->f.ofexcl = (of & O_EXCL) ;
+	            op->f.ofcreat = !!(of & O_CREAT) ;
+	            op->f.ofexcl = !!(of & O_EXCL) ;
 	            op->f.none = (! op->f.ofcreat) && (! op->f.ofexcl) ;
 	            if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
 		        op->dbname = cp ;
@@ -675,7 +676,7 @@ int sub_wrsfile::mkfile(rectab_t rt,int rtl) noex {
 		if ((rs = filer_write(sfp,mbuf,rs)) >= 0) {
 	            /* prepare the file-header */
 	            hf.vetu[0] = STRLISTMKS_VERSION ;
-	            hf.vetu[1] = ENDIAN ;
+	            hf.vetu[1] = char(ENDIAN) ;
 	            hf.vetu[2] = 0 ;
 	            hf.vetu[3] = 0 ;
 	            hf.wtime = uint(dt) ;
@@ -694,7 +695,7 @@ int sub_wrsfile::mkfile(rectab_t rt,int rtl) noex {
 	                        foff += rs ;
 		                /* make and write out key-string table */
 			        if ((rs = strtab_strsize(ksp)) >= 0) {
-			            cint	sz = rs ;
+			            sz = rs ;
 			            hf.stoff = foff ;
 			            hf.stlen = sz ;
 			            rs = mkkstab(sfp,rtl,sz) ;

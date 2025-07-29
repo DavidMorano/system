@@ -56,7 +56,7 @@ struct strfilemks_head {
 	void		*recorder ;
 	void		*idx ;
 	STRFILEMKS_IMAP	imap ;
-	STRFILEMKS_FL	f ;
+	STRFILEMKS_FL	fl ;
 	gid_t		gid ;
 	uint		magic ;
 	int		pagesize ;

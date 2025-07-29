@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (comsat)
 
 T= comsat
 

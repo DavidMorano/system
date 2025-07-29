@@ -131,7 +131,7 @@ int strlisthdr_rd(strlisthdr *ep,char *hbuf,int hlen) noex {
 	                header[hi_nskip] = ep->nskip ;
 	                bp += hdrsz ;
 	                bl -= hdrsz ;
-		        len = (bp - hbuf) ;
+		        len = intconv(bp - hbuf) ;
 		    } else {
 			rs = SR_OVERFLOW ;
 	            } /* end if */
@@ -184,7 +184,7 @@ int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex {
 	                ep->nskip = header[hi_nskip] ;
 	                bp += hdrsz ;
 	                bl -= hdrsz ;
-		        len = (bp - hbuf) ;
+		        len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
 		    }

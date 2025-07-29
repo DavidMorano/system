@@ -66,7 +66,7 @@
 
 #include	"msgid.h"
 
-import msgide ;
+import libutil ;
 
 /* local defines */
 

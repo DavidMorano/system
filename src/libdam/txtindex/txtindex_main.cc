@@ -30,7 +30,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<vecstr.h>
@@ -40,6 +39,7 @@
 #include	"txtindex.h"
 #include	"txtindexes.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -80,7 +80,7 @@ extern "C" {
     typedef int	(*socurend_f)(void *,void *) noex ;
     typedef int	(*soaudit_f)(void *) noex ;
     typedef int	(*soclose_f)(void *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -443,9 +443,9 @@ static int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
 		if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*modbname = TXTINDEX_MODBNAME ;
 	            int		mo = 0 ;
-	            mo |= MODLOAD_OLIBVAR ;
-	            mo |= MODLOAD_OPRS ;
-	            mo |= MODLOAD_OSDIRS ;
+	            mo |= modloadm.libvar ;
+	            mo |= modloadm.libprs ;
+	            mo |= modloadm.libsdirs ;
 	            if ((rs = modload_open(lp,pr,modbname,objn,mo,sv)) >= 0) {
 		        op->fl.modload = true ;
 	                if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {

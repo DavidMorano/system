@@ -240,9 +240,7 @@ static int nettime_udp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 	int		rs = SR_OK ;
 	int		f_got = false ;
 	char		tsbuf[tslen + 1] ;
-
 	ntp->proto = IPPROTO_UDP ;
-
 	if_constexpr (f_useudp) {
 	    UA	ua{} ;
 	    ua.ntp = ntp ;
@@ -259,7 +257,6 @@ static int nettime_udp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 	} else {
 	    rs = SR_PROTONOSUPPORT ;
 	} /* end if_constexpr (f_useudp) */
-
 	if ((rs >= 0) && f_got) {
 	    uint64_t	uti_start = utime_timeval(&netstart) ;
 	    uint64_t	uti_end = utime_timeval(&netend) ;
@@ -277,7 +274,6 @@ static int nettime_udp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 	        tv_loadusec(&ntp->trip,uti_trip) ;
 	    }
 	} /* end if */
-
 	return (rs >= 0) ? f_got : rs ;
 }
 /* end subroutine (nettime_udp) */
@@ -293,13 +289,9 @@ static int nettime_tcp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 	int		len ;
 	int		f_got = false ;
 	char		tsbuf[tslen + 1] ;
-
 	ntp->proto = IPPROTO_TCP ;
-
 	/* retrieve network data */
-
 	gettimeofday(&netstart,nullptr) ;
-
 	if ((af == AF_UNSPEC) || (af == AF_INET4)) {
 	    raf = AF_INET4 ;
 	    pf = PF_UNSPEC ;
@@ -308,7 +300,6 @@ static int nettime_tcp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 	    rs = dialtcp(hostname,svc,raf,to,0) ;
 	    s = rs ;
 	}
-
 	if ((((s < 0) && (rs >= 0)) || connagain(rs)) &&
 	    ((af == AF_UNSPEC) || (af == AF_INET6))) {
 	    raf = AF_INET6 ;
@@ -318,9 +309,7 @@ static int nettime_tcp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 	    rs = dialtcp(hostname,svc,raf,to,0) ;
 	    s = rs ;
 	}
-
 	if (rs >= 0) {
-
 	    if ((rs = uc_reade(s,tsbuf,tslen,to,FM_EXACT)) >= 0) {
 	        len = rs ;
 	        if (len == NETTIMELEN) {
@@ -330,37 +319,27 @@ static int nettime_tcp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 	            rs = SR_BADMSG ;
 		}
 	    }
-
 	    rs1 = u_close(s) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
-
-/* process network data */
-
+	/* process network data */
 	if ((rs >= 0) && f_got) {
-	    uint64_t	uti_start, uti_end ;
-	    uint64_t	uti_inet, uti_local ;
+	    uint64_t	uti_start = utime_timeval(&netstart) ;
+	    uint64_t	uti_end = utime_timeval(&netend) ;
+	    uint64_t	uti_inet ;
+	    uint64_t	uti_local ;
 	    uint64_t	uti_trip ;
 	    int64_t	uti_off ;
-
-	    uti_start = utime_timeval(&netstart) ;
-
-	    uti_end = utime_timeval(&netend) ;
-
 	    uti_local = utime_tcpcalc(uti_end,uti_start) ;
-
 	    {
 	        uint64_t	t = gettime_inet(tsbuf) ;
 	        uti_inet = t * onemillion ;
 	        uti_off = uti_inet - uti_local ;
 	        tv_loadusec(&ntp->off,uti_off) ;
 	    }
-
 	    uti_trip = uti_end - uti_start ;
 	    tv_loadusec(&ntp->trip,uti_trip) ;
-
 	} /* end if */
-
 	return (rs >= 0) ? f_got : rs ;
 }
 /* end subroutine (nettime_tcp) */
@@ -374,22 +353,18 @@ static int nettime_udptrythem(UA *uap,char *tsbuf) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f_got = false ;
-
 	uap->proto = proto ;
 	hint.ai_protocol = proto ;
-
 	if (uap->af >= 0) {
 	    if (cint pf = getprotofamily(uap->af) ; pf >= 0) {
 	        uap->pf = pf ;
 	        hint.ai_family = pf ;
 	    }
 	}
-
 	if (vechand alist ; (rs = vechand_start(&alist,2,0)) >= 0) {
 	    cchar	*hn = uap->hostname ;
 	    if ((rs = hostaddr_start(&ha,hn,uap->svc,&hint)) >= 0) {
 		int pf ;
-
 	        if (((! f_got) && (rs >= 0)) || connagain(rs)) {
 	            pf = PF_INET4 ;
 	            if ((uap->pf <= 0) || (uap->pf == pf)) {
@@ -398,7 +373,6 @@ static int nettime_udptrythem(UA *uap,char *tsbuf) noex {
 	                if ((rs >= 0) || (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	            }
 	        }
-
 	        if (((! f_got) && (rs >= 0)) || connagain(rs)) {
 	            pf = PF_INET6 ;
 	            if ((uap->pf <= 0) || (uap->pf == pf)) {
@@ -407,7 +381,6 @@ static int nettime_udptrythem(UA *uap,char *tsbuf) noex {
 	                if ((rs >= 0) || (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	            }
 	        }
-
 	        if (((! f_got) && (rs >= 0)) || connagain(rs)) {
 	            pf = PF_UNSPEC ;
 	            if (uap->pf <= 0) {
@@ -416,14 +389,12 @@ static int nettime_udptrythem(UA *uap,char *tsbuf) noex {
 	                if ((rs >= 0) || (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	            }
 	        }
-
 	        hostaddr_finish(&ha) ;
 	        if ((rs >= 0) && (uap->c == 0)) rs = SR_PROTONOSUPPORT ;
 	    } /* end if (initialized host addresses) */
 	    rs1 = vechand_finish(&alist) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
-
 	return (rs >= 0) ? f_got : rs ;
 }
 /* end subroutine (nettime_udptrythem) */
@@ -434,7 +405,7 @@ static int nettime_udptrysome(UA *uap,char *tsbuf,vechand *alp,
 	int		rs1 ;
 	int		f_got = false ;
 	if (hostaddr_cur cur ; (rs = hostaddr_curbegin(hap,&cur)) >= 0) {
-	    bool	f ;
+	    bool	f{} ;
 	    for (AI *aip ; hostaddr_curenum(hap,&cur,&aip) >= 0 ; ) {
 	        cint	proto = aip->ai_protocol ;
 	        f = ((proto == uap->proto) || (proto <= 0)) ;
@@ -466,7 +437,6 @@ static int nettime_udptryone(UA *uap,char *tsbuf,AI *aip) noex {
 	int		st = aip->ai_socktype ;
 	int		proto = uap->proto ;
 	int		f = false ; /* return-value */
-
 	uap->ntp->pf = aip->ai_family ;
 	if ((rs = u_socket(pf,st,proto)) >= 0) {
 	    cint	fd = rs ;
@@ -485,7 +455,6 @@ static int nettime_udptryone(UA *uap,char *tsbuf,AI *aip) noex {
 	    rs1 = u_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (opened socket) */
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (nettime_udptryone) */
@@ -769,7 +738,7 @@ static int mkprintscope(char *printaddr,int printalen,SOCKADDR *ssap) noex {
 	    f_scope = true ;
 	}
 	if ((rs >= 0) && f_scope) {
-	    if (int extra{} ; (rs = sockaddress_getextra(sap,&extra)) >= 0) {
+	    if (int extra ; (rs = sockaddress_getextra(sap,&extra)) >= 0) {
 	        if (sbuf b ; (rs = b.start(printaddr,printalen)) >= 0) {
 		    {
 	                b.hexui(scope) ;
@@ -788,11 +757,11 @@ static int mkprintscope(char *printaddr,int printalen,SOCKADDR *ssap) noex {
 #endif /* COMMENT */
 
 vars::operator int () noex {
-	    int		rs ;
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-		maxpathlen = rs ;
-	    }
-	    return rs ;
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    maxpathlen = rs ;
+	}
+	return rs ;
 } /* end method (vars::operator) */
 
 

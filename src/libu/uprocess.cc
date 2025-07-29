@@ -626,7 +626,6 @@ int uprocer::isetgroups() noex {
 /* end method (uprocer::isetgroups) */
 
 int uprocessbase::operator () () noex {
-	int		rs ;
         errtimer        to_again        = utimeout[uto_again] ;
         errtimer        to_busy         = utimeout[uto_busy] ;
         errtimer        to_nomem        = utimeout[uto_nomem] ;
@@ -639,6 +638,7 @@ int uprocessbase::operator () () noex {
         errtimer        to_dquot        = utimeout[uto_dquot] ;
         errtimer        to_io           = utimeout[uto_io] ;
         reterr          r ;
+	int		rs ;
         repeat {
             if ((rs = callstd()) < 0) {
                 r(rs) ;                 /* <- default causes exit */

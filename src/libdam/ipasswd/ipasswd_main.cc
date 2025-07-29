@@ -96,6 +96,7 @@
 
 #include	"ipasswd.h"
 
+import libutil ;
 
 /* local defines */
 

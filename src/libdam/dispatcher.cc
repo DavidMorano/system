@@ -1,17 +1,18 @@
-/* dispatcher */
+/* dispatcher SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* object to dispatch jobs to threads */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable */
-
 
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	The object is a generalized version of what used to be pseudo-random
-	code in other programs (that did multi-thread dispatching).
+	The object is a generalized version of what used to be
+	pseudo-random code in other programs (that did multi-thread
+	dispatching).
 
 */
 
@@ -19,22 +20,20 @@
 
 /*******************************************************************************
 
-        This object is used as a helper to manage jobs that need to be
-        dispatched to parrallel theads.
-
+  	Description:
+	This object is used as a helper to manage jobs that need
+	to be dispatched to parrallel theads.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 

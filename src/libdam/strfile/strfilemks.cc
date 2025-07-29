@@ -68,16 +68,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
 #include	<usystem.h>
 #include	<nulstr.h>
 #include	<vecobj.h>
@@ -99,16 +98,15 @@
 
 /* local defines */
 
-#define	STRFILEMKS_SIZEMULT	4
-#define	STRFILEMKS_NSKIP	5
-#define	STRFILEMKS_INDPERMS	0664
+#define	SFM_SIZEMULT	4
+#define	SFM_NSKIP	5
+#define	SFM_INDPERMS	0664
+
 #define	STRLISTMKS_FSUF		STRLISTHDR_FSUF
 
-#define	RECMGR		struct recmgr
-#define	RECMGR_ENT	struct recmgr_e
-#define	MAPFILE		struct mapfile
-#define	IDX		struct idx 
-#define	IDX_FL		struct idx_flags
+#define	RECMGR		recmgr
+#define	RECMGR_ENT	recmgr_e
+#define	MAPFILE		mapfile
 
 #undef	RECTAB
 #define	RECTAB		struct strfilemks_rectab
@@ -158,7 +156,7 @@ struct recmgr_e {
 	int		sl ;
 } ;
 
-struct idx_flags {
+struct idx_fl {
 	uint		fb:1 ;
 }
 
@@ -167,8 +165,8 @@ struct idx {
 	cchar		*ibname ;	/* idx base-name */
 	cchar		*nfname ;	/* new idx file-name */
 	cchar		*ai ;
-	STRLISTHDR	hdr ;
-	IDX_FL		f ;
+	strlisthdr	hdr ;
+	idx_fl		fl ;
 	filer		fb ;
 	int		fd ;
 	uint		fo ;
@@ -242,7 +240,7 @@ static cchar	zerobuf[4] = {
 
 /* exported variables */
 
-const STRFILEMKS_OBJ	strfilemks_mod = {
+const SFM_OBJ	strfilemks_mod = {
 	"strfilemks",
 	szof(STRFILEMKS),
 	0
@@ -261,15 +259,15 @@ int		n ;
 	int	rs ;
 	cchar	*cp ;
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (dbname == NULL) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-	if (n < STRFILEMKS_NENTRIES)
-	    n = STRFILEMKS_NENTRIES ;
+	if (n < SFM_NENTRIES)
+	    n = SFM_NENTRIES ;
 
 	memclear(op) ;
 	op->om = om ;
@@ -277,23 +275,23 @@ int		n ;
 	op->gid = -1 ;
 	op->pagesize = getpagesize() ;
 
-	op->f.creat = (oflags & O_CREAT) ;
-	op->f.excl = (oflags & O_EXCL) ;
-	op->f.none = (! op->f.creat) && (! op->f.excl) ;
+	op->fl.creat = !!(oflags & O_CREAT) ;
+	op->fl.excl = !!(oflags & O_EXCL) ;
+	op->fl.none = ((! op->fl.creat) && (! op->fl.excl)) ;
 
 	if ((rs = strfilemks_recbegin(op)) >= 0) {
 	    if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
 		op->dbname = cp ;
 		if ((rs = strfilemks_filesbegin(op)) >= 0) {
 		    if ((rs = strfilemks_listbegin(op,n)) >= 0) {
-			op->magic = STRFILEMKS_MAGIC ;
+			op->magic = SFM_MAGIC ;
 		    }
 		    if (rs < 0)
-			strfilemks_filesend(op,FALSE) ;
+			strfilemks_filesend(op,false) ;
 		} /* end if */
 		if (rs < 0) {
 	    	    uc_free(op->dbname) ;
-	    	    op->dbname = NULL ;
+	    	    op->dbname = nullptr ;
 		}
 	    } /* end if (memory-allocation) */
 	    if (rs < 0)
@@ -310,18 +308,18 @@ STRFILEMKS	*op ;
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
-	int	f_remove = TRUE ;
+	int	f_remove = true ;
 	int	nvars = 0 ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != STRFILEMKS_MAGIC)
+	if (op->magic != SFM_MAGIC)
 	    return SR_NOTOPEN ;
 
 	nvars = op->nvars ;
-	if (! op->f.abort) {
+	if (! op->fl.abort) {
 	    rs1 = strfilemks_mkvarfile(op) ;
 	    f_remove = (rs1 < 0) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -337,7 +335,7 @@ STRFILEMKS	*op ;
 	if (! f_remove) f_remove = (rs1 < 0) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if ((rs >= 0) && (! op->f.abort)) {
+	if ((rs >= 0) && (! op->fl.abort)) {
 	    rs1 = strfilemks_renamefiles(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -345,10 +343,10 @@ STRFILEMKS	*op ;
 	rs1 = strfilemks_filesend(op,f_remove) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (op->dbname != NULL) {
+	if (op->dbname != nullptr) {
 	    rs1 = uc_free(op->dbname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->dbname = NULL ;
+	    op->dbname = nullptr ;
 	}
 
 	op->magic = 0 ;
@@ -366,10 +364,10 @@ int		sl ;
 	int	rs ;
 
 
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
-	if (op->magic != STRFILEMKS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != SFM_MAGIC) return SR_NOTOPEN ;
 
 	if ((rs = mapfile_start(&fm,ms,sp,sl)) >= 0) {
 
@@ -383,30 +381,28 @@ int		sl ;
 /* end subroutine (strfilemks_addfile) */
 
 
-static int strfilemks_addfiler(STRFILEMKS *op,MAPFILE *mfp)
-{
+static int strfilemks_addfiler(STRFILEMKS *op,MAPFILE *mfp) noex {
 	RECMGR		*rmp = op->recorder ;
 	int		rs ;
 	int		c = 0 ;
-
 	if ((rs = recmgr_grpbegin(rmp)) >= 0) {
-	    int		ml = mfp->msize ;
+	    int		ml = intsat(mfp->msize) ;
 	    int		ll ;
 	    cchar	*tp, *lp ;
 	    cchar	*mp = mfp->mdata ;
 
-	    while ((tp = strnbrk(mp,ml,"\n#")) != NULL) {
+	    while ((tp = strnbrk(mp,ml,"\n#")) != nullptr) {
 	        lp = mp ;
 	        ll = (tp - mp) ;
 	        len = ((tp + 1) - mp) ;
 
 	        if (*tp == '#') {
-	            if ((tp = strnchr((tp+1),(mp+ml-(tp+1)),'\n')) != NULL)
+	            if ((tp = strnchr((tp+1),(mp+ml-(tp+1)),'\n')) != nullptr)
 	                len = ((tp + 1) - mp) ;
 	        }
 
 		if (ll > 0) {
-		    int	mo = (mfp->msize - ml) ;
+		    int	mo = (intconv(mfp->msize) - ml) ;
 		    if ((rs = recmgr_grpadd(rmp,mo,ll)) >= 0) {
 			if ((rs = idx_bufstr(op->idx,lp,ll)) >= 0) {
 				c += 1 ;
@@ -455,7 +451,7 @@ static int recmgr_grpbegin(RECMGR *rmp)
 /* nothing to do */
 static int recmgr_grpend(RECMGR *rmp)
 {
-	if (rmp == NULL) return SR_FAULT ;
+	if (rmp == nullptr) return SR_FAULT ;
 	return SR_OK ;
 }
 /* end subroutine (strfilemks_grpend) */
@@ -477,13 +473,13 @@ STRFILEMKS	*op ;
 {
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != STRFILEMKS_MAGIC)
+	if (op->magic != SFM_MAGIC)
 	    return SR_NOTOPEN ;
 
-	op->f.abort = TRUE ;
+	op->fl.abort = true ;
 	return SR_OK ;
 }
 /* end subroutine (strfilemks_abort) */
@@ -495,10 +491,10 @@ gid_t		gid ;
 {
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != STRFILEMKS_MAGIC)
+	if (op->magic != SFM_MAGIC)
 	    return SR_NOTOPEN ;
 
 	op->gid = gid ;
@@ -509,84 +505,71 @@ gid_t		gid ;
 
 /* private subroutines */
 
-
-static int strfilemks_recbegin(STRFILEMKS *op)
-{
-	cint	rsize = szof(RECMGR) ;
+static int strfilemks_recbegin(STRFILEMKS *op) noex {
+	cint	rsz = szof(RECMGR) ;
 	int	rs ;
-	void	*p ;
-	if ((rs = uc_malloc(rsize,&p)) >= 0) {
+	if (void *p ; (rs = uc_malloc(rsz,&p)) >= 0) {
 	    RECMGR	*rmp = p ;
 	    op->recorder = p ;
 	    rs = recmgr_start(rmp) ;
 	    if (rs < 0) {
 		uc_free(op->recorder) ;
-		op->recorder = NULL ;
+		op->recorder = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
 }
 /* end subroutine (strfilemks_recbegin) */
 
-
-static int strfilemks_recend(STRFILEMKS *op)
-{
+static int strfilemks_recend(STRFILEMKS *op) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-
+	{
 	rs1 = recmg_finish(&op->recorder) ;
 	if (rs >= 0) rs = rs1 ;
-
-	if (op->recorder != NULL) {
+	}
+	if (op->recorder) {
 	    rs1 = uc_free(op->recorder) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->recorder = NULL ;
+	    op->recorder = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (strfilemks_recend) */
 
-
-static int strfilemks_idxbegin(STRFILEMKS *op,cchar *dbname)
-{
-	cint	isize = szof(IDX) ;
+static int strfilemks_idxbegin(STRFILEMKS *op,cchar *dbname) noex {
+	cint	isz = szof(idx) ;
 	int	rs ;
-	void	*p ;
-	if ((rs = uc_malloc(isize,&p)) >= 0) {
-	    IDX		*ixp = p ;
+	if (void *p ; (rs = uc_malloc(isz,&p)) >= 0) {
+	    idx		*ixp = p ;
 	    op->idx = p ;
 	    rs = idx_start(op->idx,dbname) ;
 	    if (rs < 0) {
 		uc_free(op->idx) ;
-		op->idx = NULL ;
+		op->idx = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
 }
 /* end subroutine (strfilemks_idxbegin) */
 
-
-static int strfilemks_idxend(STRFILEMKS *op)
-{
+static int strfilemks_idxend(STRFILEMKS *op) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
 
-	if (op->idx != NULL) {
+	if (op->idx) {
 	    rs1 = idx_finish(op->idx) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = uc_free(op->idx) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->idx = NULL ;
+	    op->idx = nullptr ;
 	}
 
 	return rs ;
 }
 /* end subroutine (strfilemks_idxend) */
 
-
-static int idx_start(IDX *ixp,cchar *dbname)
-{
+static int idx_start(idx *ixp,cchar *dbname) noex {
 	int	rs = SR_OK ;
 	int	dnl ;
 
@@ -598,11 +581,11 @@ static int idx_start(IDX *ixp,cchar *dbname)
 	    int		bnl ;
 	    cchar	*bnp ;
 	    if ((bnl = sfbasename(dbname,-1,&bnp)) > 0) {
-		int	size = 0 ;
+		int	sz = 0 ;
 		char	*bp ;
-		size += (dnl+1) ;
-		size += (bnl+1) ;
-		if ((rs = uc_malloc(size,&bp)) >= 0) {
+		sz += (dnl+1) ;
+		sz += (bnl+1) ;
+		if ((rs = uc_malloc(sz,&bp)) >= 0) {
 		    ixp->ai = bp ;
 		    op->idname = bp ;
 		    bp = (strwcpy(bp,dnp,dnl) + 1) ;
@@ -614,9 +597,9 @@ static int idx_start(IDX *ixp,cchar *dbname)
 		    }
 		    if (rs < 0) {
 			uc_free(idx->ai) ;
-			idx->ai = NULL ;
-			idx->idname = NULL ;
-			idx->ibname = NULL ;
+			idx->ai = nullptr ;
+			idx->idname = nullptr ;
+			idx->ibname = nullptr ;
 		    }
 		} /* end if (memory-allocation) */
 	    } else {
@@ -631,23 +614,23 @@ static int idx_start(IDX *ixp,cchar *dbname)
 /* end subroutine (idx_start) */
 
 
-static int idx_finish(IDX *ixp)
+static int idx_finish(idx *ixp)
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
 
-	if (ixp->nfname != NULL) {
+	if (ixp->nfname != nullptr) {
 	    rs1 = uc_free(ixp->nfname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ixp->nfname = NULL ;
+	    ixp->nfname = nullptr ;
 	}
 
-	if (ixp->ai != NULL) {
+	if (ixp->ai != nullptr) {
 	    rs1 = uc_free(ixp->ai) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ixp->ai = NULL ;
-	    idx->idname = NULL ;
-	    idx->ibname = NULL ;
+	    ixp->ai = nullptr ;
+	    idx->idname = nullptr ;
+	    idx->ibname = nullptr ;
 	}
 
 	return rs ;
@@ -655,7 +638,7 @@ static int idx_finish(IDX *ixp)
 /* end subroutine (idx_finish) */
 
 
-static int idx_dirwritable(IDX *ixp)
+static int idx_dirwritable(idx *ixp)
 {
 	cint	am = (X_OK|W_OK) ;
 	int	rs ;
@@ -663,16 +646,16 @@ static int idx_dirwritable(IDX *ixp)
 
 	if (dname[0] == '\0') dname = "." ;
 
-	rs = perm(dname,-1,-1,NULL,am) ;
+	rs = perm(dname,-1,-1,nullptr,am) ;
 
 	return rs ;
 }
 /* end subroutine (idx_dirwritable) */
 
 
-static int idx_create(IDX *ixp,cchar *fsuf)
+static int idx_create(idx *ixp,cchar *fsuf)
 {
-	time_t		dt = time(NULL) ;
+	time_t		dt = time(nullptr) ;
 	cint	clen = MAXNAMELEN ;
 	int		rs ;
 	cchar	*ibname = ixp->ibname ;
@@ -690,7 +673,7 @@ static int idx_create(IDX *ixp,cchar *fsuf)
 		if ((rs = idx_nfold(ixp,dt,nfname)) > 0) {
 	    	    rs = idx_nfopen(ixp,nfname) ;
 	 	} else (rs >= 0) {
-	    	    op->f.inprogress = TRUE ;
+	    	    op->fl.inprogress = true ;
 		    rs = idx_nfopentmp(ixp,fsuf) ;
 		}
 	    }
@@ -711,7 +694,7 @@ static int idx_create(IDX *ixp,cchar *fsuf)
 /* end subroutine (idx_create) */
 
 
-static int idx_creator(IDX *ixp)
+static int idx_creator(idx *ixp)
 {
 	int	rs ;
 
@@ -724,7 +707,7 @@ static int idx_creator(IDX *ixp)
 /* end subroutine (idx_creator) */
 
 
-static int idx_destroy(IDX *ixp)
+static int idx_destroy(idx *ixp)
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -735,11 +718,11 @@ static int idx_destroy(IDX *ixp)
 	    ixp->fd = -1 ;
 	}
 
-	if (ixp->nfname != NULL) {
+	if (ixp->nfname != nullptr) {
 	    if (ixp->nfname[0] != '\0') u_unlink(izp->nfname) ;
 	    rs1 = uc_free(ixp->nfname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ixp->nfname = NULL ;
+	    ixp->nfname = nullptr ;
 	}
 
 	return rs ;
@@ -747,7 +730,7 @@ static int idx_destroy(IDX *ixp)
 /* end subroutine (idx_destroy) */
 
 
-static int idx_nfopen(IDX *ixp,cchar *nfname)
+static int idx_nfopen(idx *ixp,cchar *nfname)
 {
 	cint	of = (O_CREAT | O_EXCL | O_WRONLY) ;
 	int	rs ;
@@ -761,7 +744,7 @@ static int idx_nfopen(IDX *ixp,cchar *nfname)
 /* end subroutine (idx_nfopen) */
 
 
-static int idx_nfclose(IDX *ixp)
+static int idx_nfclose(idx *ixp)
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -775,26 +758,24 @@ static int idx_nfclose(IDX *ixp)
 /* end subroutine (idx_nfclose) */
 
 
-static int idx_nfold(IDX *ixp,time_t dt,cchar *nfname)
+static int idx_nfold(idx *ixp,time_t dt,cchar *nfname)
 {
-	USTAT	sb ;
+	ustat	sb ;
 	int	rs ;
-	int	f = FALSE ;
+	int	f = false ;
 	if ((rs = u_stat(nfname,&sb)) >= 0) {
 	    if ((dt-sb.st_mtime) >= TO_OLD) {
-		if (u_unlink(nfname) >= 0) f = TRUE ;
+		if (u_unlink(nfname) >= 0) f = true ;
 	    }
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
-	    f = TRUE ;
+	    f = true ;
 	}
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (idx_nfold) */
 
-
-static int idx_nfopentmp(IDX *ixp,cchar *fsuf)
-{
+static int idx_nfopentmp(idx *ixp,cchar *fsuf) noex {
 	cint	of = (O_WRONLY | O_CREAT) ;
 	cint	clen = MAXNAMELEN ;
 	int		rs = SR_OK ;
@@ -826,39 +807,37 @@ static int idx_nfopentmp(IDX *ixp,cchar *fsuf)
 }
 /* end subroutine (idx_nfopentmp) */
 
-
-static int idx_nfstore(IDX *op,cchar *nf)
-{
-	int	rs ;
-
-	cchar	*cp ;
-
-	if (op->nfname != NULL) {
-	    uc_free(op->nfname) ;
-	    op->nfname = NULL ;
+static int idx_nfstore(idx *op,cchar *nf) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (op->nfname) {
+	    rs1 = uc_free(op->nfname) ;
+	    if (rs >= 0) rs = rs1 ;
+	    op->nfname = nullptr ;
 	}
-
-	rs = uc_mallocstrw(nf,-1,&cp) ;
-	if (rs >= 0) op->nfname = cp ;
-
+	if (rs >= 0) {
+	    if (cchar *cp ; (rs = uc_mallocstrw(nf,-1,&cp)) >= 0) {
+	        op->nfname = cp ;
+	    }
+	}
 	return rs ;
 }
 /* end subroutine (idx_nfstore) */
 
-static int idx_bufbegin(IDX *ixp) noex {
+static int idx_bufbegin(idx *ixp) noex {
 	int	rs ;
 	if ((rs = filer_start(&ixp->fb,ixp->fd,0z,0,0)) >= 0) {
-	    ixp->f.fb = TRUE ;
+	    ixp->fl.fb = true ;
 	}
 	return rs ;
 }
 /* end subroutine (idx_bufbegin) */
 
-static int idx_bufend(IDX *ixp) noex {
+static int idx_bufend(idx *ixp) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-	if (ixp->f.fb) {
-	    ixp->f.fb = FALSE ;
+	if (ixp->fl.fb) {
+	    ixp->fl.fb = false ;
 	    rs1 = filer_finish(&ixp->fb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -866,19 +845,16 @@ static int idx_bufend(IDX *ixp) noex {
 }
 /* end subroutine (idx_bufend) */
 
-static int idx_bufwrite(IDX *ixp,cvoid *wbuf,int wlen) noex {
+static int idx_bufwrite(idx *ixp,cvoid *wbuf,int wlen) noex {
 	int	rs = filer_write(&ixp->db,wbuf,wlen) ;
 	ixp->fo += rs ;
 	return rs ;
 }
 /* end subroutine (idx_bufwrite) */
 
-
-static int idx_bufhdr(IDX *ixp)
-{
+static int idx_bufhdr(idx *ixp) noex {
 	cint	hlen = szof(STRLISTHDR) ;
 	int	rs ;
-
 	rs = filer_write(&ixp->db,&ixp->hdr,hlen) ;
 	ixp->fo += rs ;
 	ixp->hdr.stoff = ixp->fo ;
@@ -886,16 +862,13 @@ static int idx_bufhdr(IDX *ixp)
 }
 /* end subroutine (idx_bufhdr) */
 
-
-static int idx_bufstr(IDX *ixp,cchar *lp,int ll)
-{
+static int idx_bufstr(idx *ixp,cchar *lp,int ll) noex {
 	filer	*fbp = &ixp->fb ;
 	int	rs ;
 	rs = filer_println(fbp,lp,ll) ;
 	return rs ;
 }
 /* end subroutine (idx_bufstr) */
-
 
 static int strfilemks_filesbegin(STRFILEMKS *op) noex {
 	int		rs = SR_INVALID ;
@@ -914,11 +887,11 @@ static int strfilemks_filesbegin(STRFILEMKS *op) noex {
 	            rs = mkpath1w(tmpdname,dnp,dnl) ;
 	        if (rs >= 0) {
 	            int	operm = (X_OK | W_OK) ;
-	            rs = perm(tmpdname,-1,-1,NULL,operm) ;
+	            rs = perm(tmpdname,-1,-1,nullptr,operm) ;
 	        }
 	        if (rs >= 0) {
 	            if ((rs = strfilemks_nfcreate(op,FSUF_IND)) >= 0) {
-	                if (op->f.creat && op->f.excl) {
+	                if (op->fl.creat && op->fl.excl) {
 	                    rs = strfilemks_fexists(op) ;
 	                }
 	                if (rs < 0)
@@ -926,9 +899,9 @@ static int strfilemks_filesbegin(STRFILEMKS *op) noex {
 	            } /* end if (nfcreate) */
 	        }
 	        if (rs < 0) {
-		    if (op->idname != NULL) {
+		    if (op->idname != nullptr) {
 	    	        uc_free(op->idname) ;
-	    	        op->idname = NULL ;
+	    	        op->idname = nullptr ;
 		    }
 	        }
 	    } /* end if (memory-allocation) */
@@ -946,19 +919,19 @@ STRFILEMKS	*op ;
 	int	rs1 ;
 
 
-	if (op->nfname != NULL) {
+	if (op->nfname != nullptr) {
 	    if (f && (op->nfname[0] != '\0')) {
 	        u_unlink(op->nfname) ;
 	    }
 	    rs1 = uc_free(op->nfname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->nfname = NULL ;
+	    op->nfname = nullptr ;
 	}
 
-	if (op->idname != NULL) {
+	if (op->idname != nullptr) {
 	    rs1 = uc_free(op->idname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->idname = NULL ;
+	    op->idname = nullptr ;
 	}
 
 	return rs ;
@@ -971,7 +944,7 @@ static int strfilemks_nfcreate(op,fsuf)
 STRFILEMKS	*op ;
 cchar	fsuf[] ;
 {
-	USTAT	sb ;
+	ustat	sb ;
 
 	cint	to_old = TO_OLDFILE ;
 
@@ -1007,25 +980,25 @@ again:
 #endif /* CF_LATE */
 
 	if (rs == SR_EXIST) {
-	    time_t	daytime = time(NULL) ;
+	    time_t	daytime = time(nullptr) ;
 	    int		f_inprogress ;
 	    rs1 = u_stat(op->nfname,&sb) ;
 	    if ((rs1 >= 0) && ((daytime - sb.st_mtime) > to_old)) {
 		u_unlink(op->nfname) ;
 		goto again ;
 	    }
-	    op->f.inprogress = TRUE ;
-	    f_inprogress = op->f.none ;
-	    f_inprogress = f_inprogress || (op->f.creat && op->f.excl) ;
+	    op->fl.inprogress = true ;
+	    f_inprogress = op->fl.none ;
+	    f_inprogress = f_inprogress || (op->fl.creat && op->fl.excl) ;
 	    rs = (f_inprogress) ? SR_INPROGRESS : SR_OK ;
 	} /* end if */
 
 	if (rs >= 0) {
-	    op->f.created = TRUE ;
+	    op->fl.created = true ;
 	} else {
-	    if (op->nfname != NULL) {
+	    if (op->nfname != nullptr) {
 	        uc_free(op->nfname) ;
-	        op->nfname = NULL ;
+	        op->nfname = nullptr ;
 	    }
 	}
 
@@ -1042,13 +1015,13 @@ cchar	fsuf[] ;
 {
 	int	rs = SR_OK ;
 
-	if ((op->nfd < 0) || op->f.inprogress) {
+	if ((op->nfd < 0) || op->fl.inprogress) {
 	    int	oflags = O_WRONLY | O_CREAT ;
 	    if (op->nfd >= 0) {
 		u_close(op->nfd) ;
 		op->nfd = -1 ;
 	    }
-	    if (op->f.inprogress) {
+	    if (op->fl.inprogress) {
 		char	cname[MAXNAMELEN + 1] ;
 		char	infname[MAXPATHLEN + 1] ;
 		char	outfname[MAXPATHLEN + 1] ;
@@ -1056,7 +1029,7 @@ cchar	fsuf[] ;
 		rs = sncpy6(cname,MAXNAMELEN,
 			fpre,"XXXXXXXX",".",fsuf,ENDIANSTR,"n") ;
 		if (rs >= 0) {
-		    if ((op->idname != NULL) && (op->idname[0] != '\0')) {
+		    if ((op->idname != nullptr) && (op->idname[0] != '\0')) {
 		        rs = mkpath2(infname,op->idname,cname) ;
 		    } else
 		        rs = mkpath1(infname,cname) ;
@@ -1064,7 +1037,7 @@ cchar	fsuf[] ;
 		if (rs >= 0) {
 		    rs = opentmpfile(infname,oflags,op->om,outfname) ;
 	            op->nfd = rs ;
-		    op->f.created = (rs >= 0) ;
+		    op->fl.created = (rs >= 0) ;
 		}
 		if (rs >= 0)
 		    rs = strfilemks_nfstore(op,outfname) ;
@@ -1075,19 +1048,19 @@ cchar	fsuf[] ;
 	    } else {
 	        rs = u_open(op->nfname,oflags,op->om) ;
 	        op->nfd = rs ;
-		op->f.created = (rs >= 0) ;
+		op->fl.created = (rs >= 0) ;
 	    }
 	    if (rs < 0) {
 		if (op->nfd >= 0) {
 		    u_close(op->nfd) ;
 		    op->nfd = -1 ;
 		}
-	        if (op->nfname != NULL) {
+	        if (op->nfname != nullptr) {
 		    if (op->nfname[0] != '\0') {
 			u_unlink(op->nfname) ;
 		    }
 	            uc_free(op->nfname) ;
-	            op->nfname = NULL ;
+	            op->nfname = nullptr ;
 		}
 	    }
 	} /* end if */
@@ -1110,14 +1083,14 @@ STRFILEMKS	*op ;
 	    op->nfd = -1 ;
 	}
 
-	if (op->nfname != NULL) {
+	if (op->nfname != nullptr) {
 	    if (op->nfname[0] != '\0') {
 		rs1 = u_unlink(op->nfname) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    rs1 = uc_free(op->nfname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->nfname = NULL ;
+	    op->nfname = nullptr ;
 	}
 
 	return rs ;
@@ -1134,9 +1107,9 @@ cchar	outfname[] ;
 	cchar	*cp ;
 
 
-	if (op->nfname != NULL) {
+	if (op->nfname != nullptr) {
 	    uc_free(op->nfname) ;
-	    op->nfname = NULL ;
+	    op->nfname = nullptr ;
 	}
 
 	rs = uc_mallocstrw(outfname,-1,&cp) ;
@@ -1152,12 +1125,12 @@ STRFILEMKS	*op ;
 {
 	int	rs = SR_OK ;
 
-	if (op->f.creat && op->f.excl && op->f.inprogress) {
+	if (op->fl.creat && op->fl.excl && op->fl.inprogress) {
 	    cchar	*suf = FSUF_IND ;
 	    cchar	*end = ENDIANSTR ;
 	    char	hfname[MAXPATHLEN + 1] ;
 	    if ((rs = mkfnamesuf2(hfname,op->dbname,suf,end)) >= 0) {
-		USTAT	sb ;
+		ustat	sb ;
 	        int	rs1 = u_stat(hfname,&sb) ;
 	        if (rs1 >= 0) rs = SR_EXIST ;
 	    }
@@ -1167,74 +1140,58 @@ STRFILEMKS	*op ;
 }
 /* end subroutine (strfilemks_fexists) */
 
-
-static int strfilemks_listbegin(op,n)
-STRFILEMKS	*op ;
-int		n ;
-{
-	int	rs ;
-	int	size ;
-
-
-	size = (n * STRFILEMKS_SIZEMULT) ;
+static int strfilemks_listbegin(STRFILEMKS *op,int n) noex {
+	cint		sz = (n * SFM_SIZEMULT) ;
+	int		rs ;
 	if ((rs = strtab_start(&op->strs,size)) >= 0) {
-	        rs = rectab_start(&op->rectab,n) ;
-	    if (rs < 0)
+	    rs = rectab_start(&op->rectab,n) ;
+	    if (rs < 0) {
 		strtab_finish(&op->strs) ;
+	    }
 	} /* end if (strtab-keys) */
-
 	return rs ;
 }
 /* end subroutine (strfilemks_listbegin) */
 
-
-static int strfilemks_listend(op)
-STRFILEMKS	*op ;
-{
-	int	rs = SR_OK ;
-	int	rs1 ;
-
-
+static int strfilemks_listend(STRFILEMKS *op) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	{
 	rs1 = rectab_finish(&op->rectab) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = strtab_finish(&op->strs) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	return rs ;
 }
 /* end subroutine (strfilemks_listend) */
 
-
-static int strfilemks_mkvarfile(op)
-STRFILEMKS	*op ;
-{
-	int	rs = SR_OK ;
-	int	rtl ;
-
-
-	rtl = rectab_done(&op->rectab) ;
-
-	if (rtl == (op->nvars + 1)) {
-	    rs = strfilemks_wrvarfile(op) ;
-	} else
-	    rs = SR_BUGCHECK ;
-
-	return (rs >= 0) ? op->nvars : rs ;
+static int strfilemks_mkvarfile(STRFILEMKS *op) noex {
+	int		rs ;
+	int		nv = 0 ; /* return-value */
+	if ((rs =rectab_done(&op->rectab)) >= 0) {
+	    cint	rtl = rs ;
+	    if (rtl == (op->nvars + 1)) {
+	        rs = strfilemks_wrvarfile(op) ;
+	        nv = op->nvars ;
+	    } else {
+	        rs = SR_BUGCHECK ;
+	    }
+	} /* end if (rectab_done) */
+	return (rs >= 0) ? nv: rs ;
 }
 /* end subroutine (strfilemks_mkvarfile) */
 
-
-static int strfilemks_wrvarfile(op)
-STRFILEMKS	*op ;
-{
+static int strfilemks_wrvarfile(STRFILEMKS *op) noex {
 	STRLISTGDR	hf ;
 
 	filer	varfile ;
 
-	STRTAB	*ksp = &op->strs ;
+	strtab	*ksp = &op->strs ;
 
-	time_t	daytime = time(NULL) ;
+	time_t	daytime = time(nullptr) ;
 
 	uint	fileoff = 0 ;
 
@@ -1260,7 +1217,7 @@ STRFILEMKS	*op ;
 	if (rs < 0)
 	    goto ret0 ;
 
-	op->f.viopen = TRUE ;
+	op->fl.viopen = true ;
 	size = (pagesize * 4) ;
 	rs = filer_start(&varfile,op->nfd,0z,size,0) ;
 	if (rs < 0)
@@ -1275,7 +1232,7 @@ STRFILEMKS	*op ;
 	hf.vetu[3] = 0 ;
 	hf.wtime = (uint) daytime ;
 	hf.nvars = op->nvars ;
-	hf.nskip = STRFILEMKS_NSKIP ;
+	hf.nskip = SFM_NSKIP ;
 
 /* create the file-header */
 
@@ -1306,7 +1263,7 @@ STRFILEMKS	*op ;
 /* make and write out key-string table */
 
 	if (rs >= 0) {
-	    char	*kstab = NULL ;
+	    char	*kstab = nullptr ;
 
 	    size = strtab_strsize(ksp) ;
 
@@ -1327,7 +1284,7 @@ STRFILEMKS	*op ;
 /* make and write out the record-index table */
 
 	        if (rs >= 0) {
-		    uint	(*indtab)[3] = NULL ;
+		    uint	(*indtab)[3] = nullptr ;
 
 	            itl = nextpowtwo(rtl) ;
 
@@ -1383,7 +1340,7 @@ ret2:
 
 /* we're out of here */
 ret1:
-	op->f.viopen = FALSE ;
+	op->fl.viopen = false ;
 	rs1 = u_close(op->nfd) ;
 	if (rs >= 0) rs = rs1 ;
 	op->nfd = -1 ;
@@ -1558,10 +1515,10 @@ RECTAB		*rtp ;
 	int	rs1 ;
 
 
-	if (rtp->rectab != NULL) {
+	if (rtp->rectab != nullptr) {
 	    rs1 = uc_free(rtp->rectab) ;
 	    if (rs >= 0) rs = rs1 ;
-	    rtp->rectab = NULL ;
+	    rtp->rectab = nullptr ;
 	}
 
 	return rs ;
@@ -1591,12 +1548,8 @@ uint		ki, vi ;
 }
 /* end subroutine (rectab_add) */
 
-
-static int rectab_extend(rtp)
-RECTAB		*rtp ;
-{
+static int rectab_extend(RECTAB *rtp) noex {
 	int	rs = SR_OK ;
-
 	if ((rtp->i + 1) > rtp->n) {
 	    uint	(*va)[2] ;
 	    int		nn ;
@@ -1608,50 +1561,36 @@ RECTAB		*rtp ;
 	        rtp->n = nn ;
 	    }
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (rectab_extend) */
 
 
-static int rectab_done(rtp)
-RECTAB		*rtp ;
-{
+static int rectab_done(RECTAB *rtp) noex {
 	int	i = rtp->i ;
-
-
 	rtp->rectab[i][0] = UINT_MAX ;
 	rtp->rectab[i][1] = 0 ;
 	return rtp->i ;
 }
 /* end subroutine (rectab_done) */
 
-
 #ifdef	COMMENT
-static int rectab_count(rtp)
-RECTAB		*rtp ;
-{
-
+static int rectab_count(RECTAB *rtp) noex {
 	return rtp->i ;
 }
 /* end subroutine (rectab_count) */
 #endif /* COMMENT */
 
-
-static int rectab_getvec(rtp,rpp)
-RECTAB		*rtp ;
-uint		(**rpp)[2] ;
-{
-
+static int rectab_getvec(RECTAB *rtp,uint (**rpp)[2]) noex {
+    	int		rs = SR_OK ;
 	*rpp = rtp->rectab ;
-	return rtp->i ;
+	rs = rtp->i ;
+	return rs ;
 }
 /* end subroutine (rectab_getvec) */
 
-
-static int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl)
-{
-	NULSTR	fn ;
+static int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl) noex {
+	nulstr	fn ;
 	int	rs ;
 	cchar	*fname ;
 
@@ -1659,9 +1598,8 @@ static int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl)
 	if ((rs = nulstr_start(&fn,sp,sl,&fname)) >= 0) {
 	    cint	of = O_RDONLY ;
 	if ((rs = uc_open(fname,of,0666)) >= 0) {
-	    USTAT	db ;
 	    int	fd = rs ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
+	    if (ustat	db ; (rs = u_fstat(fd,&sb)) >= 0) {
 		if (S_ISREG(sb.st_mode)) {
 		    csize	ps = op->pagesize ;
 		    if ((max > 0) && (sb.st_size <= max)) {
@@ -1669,7 +1607,7 @@ static int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl)
 	    	        int	mp = PROT_READ ;
 	    	        int	mf = MAP_SHARED ;
 	    	        void	*md ;
-		        if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
+		        if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
 			    cint		madv = MADV_SEQUENTIAL ;
 			    const caddr_t	ma = md ;
 	    		    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
@@ -1698,11 +1636,11 @@ static int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl)
 
 static int mapfile_end(MAPFILE *mfp) noex {
 	int		rs = SR_OK ;
-	if (mfp->mapdata != NULL) {
+	if (mfp->mapdata != nullptr) {
 	    csize	ms = fmp->mapsize ;
 	    cvoid	*md = fmp->mapdata ;
 	    rs = u_munmap(md,ms) ;
-	    mfp->mapdata = NULL ;
+	    mfp->mapdata = nullptr ;
 	    mfp->mapsize = 0 ;
 	}
 	return rs ;
@@ -1755,7 +1693,7 @@ struct strentry	*vep ;
 	chash = (nhash & INT_MAX) ;
 
 /* CONSTCOND */
-	while (TRUE) {
+	while (true) {
 	    if (it[hi][0] == 0) break ;
 
 	    ri = it[hi][0] ;
@@ -1764,7 +1702,7 @@ struct strentry	*vep ;
 		break ;
 
 	    it[hi][1] |= (~ INT_MAX) ;
-	    nhash = hashagain(nhash,c++,STRFILEMKS_NSKIP) ;
+	    nhash = hashagain(nhash,c++,SFM_NSKIP) ;
 
 	    hi = hashindex(nhash,il) ;
 

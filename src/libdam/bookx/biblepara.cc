@@ -1,11 +1,12 @@
-/* biblepara */
+/* biblepara SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* BIBLEPARA object-load management */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_LOOKSELF	0		/* try searching "SELF" for SO */
-
 
 /* revision history:
 

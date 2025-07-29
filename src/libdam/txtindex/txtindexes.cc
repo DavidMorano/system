@@ -100,6 +100,7 @@
 #include	"offindex.h"
 #include	"naturalwords.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -669,8 +670,9 @@ static int txtindexes_dbproc(txtindexes *op,time_t dt) noex {
 	TI_FI		*fip = &op->hf ;
 	txtindexhdr	*hip = &op->ifi ;
 	int		rs ;
-	int		c = 0 ;
-	if ((rs = txtindexhdr_rd(hip,fip->mapdata,fip->mapsize)) >= 0) {
+	int		c = 0 ; /* return-value */
+	cint	fsz = intsat(fip->mapsize) ;
+	if ((rs = txtindexhdr_rd(hip,fip->mapdata,fsz)) >= 0) {
 	    if ((rs = txtindexes_hdrverify(op,dt)) >= 0) {
 		TI_MI		*mip = &op->mi ;
 	        mip->sdn = (char *) (fip->mapdata + hip->sdnoff) ;
@@ -681,8 +683,8 @@ static int txtindexes_dbproc(txtindexes *op,time_t dt) noex {
 	        mip->eitab = (uint (*)[3]) (fip->mapdata + hip->eioff) ;
 	        mip->table = (uint *) (fip->mapdata + hip->taboff) ;
 	        c = hip->taglen ;
-	    }
-	}
+	    } /* end if (txtindexes_hdrverify) */
+	} /* endif (txtindexhdr_rd) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (txtindexes_dbproc) */
@@ -705,7 +707,7 @@ static int txtindexes_mkhashkeys(txtindexes *op,vecstr *clp,mainv klp) noex {
 	for (i = 0 ; (kp = klp[i]) != nullptr ; i += 1) {
 	    if (kp != nullptr) {
 
-	        kl = strnlen(kp,klen) ;	/* also prevents overflow */
+	        kl = lenstr(kp,klen) ;	/* also prevents overflow */
 	        if (kl >= minwlen) {
 
 	            if (hasuc(kp,kl)) {
@@ -1019,8 +1021,8 @@ static int txtindexes_audithash(txtindexes *op,offindex *oip) noex {
 	int		rs = SR_OK ;
 	hip = &op->ifi ;
 	/* loop over table entries */
-	hfsize = fip->mapsize ;
-	tfsize = op->tf.mapsize ;
+	hfsize = intsat(fip->mapsize) ;
+	tfsize = intsat(op->tf.mapsize) ;
 	cint	n = int(hip->tablen) ;
 	for (int i = 0 ; i < n ; i += 1) {
 	    uint	*uip ;
@@ -1104,7 +1106,7 @@ static int txtindexes_auditeigen(txtindexes *op) noex {
 	            break ;
 	        }
 	        cp = (estab + si) ;
-	        cl = strnlen(cp,(NATURALWORDLEN + 1)) ;
+	        cl = lenstr(cp,(NATURALWORDLEN + 1)) ;
 	        if (cl >= NATURALWORDLEN) {
 	            rs = SR_BADFMT ;
 	            break ;
@@ -1138,11 +1140,10 @@ static int txtindexes_auditeigen(txtindexes *op) noex {
 	} /* end if (ok) */
 /* while we are here, we may as well go all out! (inverted str-tab check) */
 	if (rs >= 0) {
-	    cchar	*ecp ;
+	    cchar	*ecp = (estab + essize) ;
 	    cp = (estab + 1) ;
-	    ecp = (estab + essize) ;
 	    while ((cp < ecp) && cp[0]) {
-	        uint	si = (cp - estab) ;
+	        uint	si = intconv(cp - estab) ;
 	        int	j{} ; /* used-afterwards */
 	        cl = lenstr(cp) ;
 	        for (j = 0 ; j < erlen ; j += 1) {
@@ -1172,7 +1173,7 @@ static int offindex_tags(offindex *oip,cchar *fp,int fl) noex {
 	int		n = 0 ;
 	cchar		*tp ;
 	while ((tp = strnchr(fp,fl,'\n')) != nullptr) {
-	    cint	len = ((tp + 1) - fp) ;
+	    cint	len = intconv((tp + 1) - fp) ;
 	    ll = (len - 1) ;
 	    if (ll > 0) {
 	        n += 1 ;
@@ -1189,12 +1190,12 @@ static int offindex_tags(offindex *oip,cchar *fp,int fl) noex {
 
 static int tag_parse(TI_TAG *tagp,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	int		len = 0 ;
-	cchar		*tp ;
+	int		len = 0 ; /* return-value */
+	cchar		*tp ; /* used-multiple */
 	rbuf[0] = '\0' ;
 	if (sl < 0) {
 	    if ((tp = strchr(sp,'\n')) != 0) {
-	        sl = (tp - sp) ;
+	        sl = intconv(tp - sp) ;
 	    } else {
 	        rs = SR_BADFMT ;
 	    }
@@ -1204,21 +1205,22 @@ static int tag_parse(TI_TAG *tagp,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	    tagp->reclen = 0 ;
 	    if ((tp = strnchr(sp,sl,':')) != nullptr) {
 		{
-	            rs = snwcpy(rbuf,rlen,sp,(tp - sp)) ;
+		    cint tl = intconv(tp - sp) ;
+	            rs = snwcpy(rbuf,rlen,sp,tl) ;
 	            len = rs ;
 		}
-	        sl -= ((tp + 1) - sp) ;
+	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	    } /* end if */
 	    if (rs >= 0) {
 	        if ((tp = strnchr(sp,sl,',')) != nullptr) {
-		    cint	vl = (tp - sp) ;
+		    cint	vl = intconv(tp - sp) ;
 		    if (uint uv ; (rs = cfdecui(sp,vl,&uv)) >= 0) {
 			tagp->recoff = uv ;
-	                sl -= ((tp + 1) - sp) ;
+	                sl -= intconv((tp + 1) - sp) ;
 	                sp = (tp + 1) ;
 	                if ((tp = strnbrk(sp,sl,"\t ")) != nullptr) {
-	                    sl = (tp - sp) ;
+	                    sl = intconv(tp - sp) ;
 	                }
 	                tagp->reclen = INT_MAX ;
 	                if (sl >= 0) {

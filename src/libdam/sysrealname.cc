@@ -31,7 +31,6 @@
 #include	<dlfcn.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<new>
 #include	<usystem.h>
@@ -217,10 +216,10 @@ constexpr char		extradir[] = "/usr/extra" ;
 int sysrealname_open(SRN *op,cchar *dbname) noex {
 	int		rs ;
 	if (dbname == nullptr) dbname = SYSREALNAME_DBNAME ;
-	if ((rs = sysrealname_ctor(op)) >= 0) {
+	if ((rs = sysrealname_ctor(op)) >= 0) ylikely {
 	    cchar	*objname = SRN_OBJNAME ;
 	    cchar	*pr = extradir ;
-	    if ((rs = sysrealname_objloadbegin(op,pr,objname)) >= 0) {
+	    if ((rs = sysrealname_objloadbegin(op,pr,objname)) >= 0) ylikely {
                 sysrealname_calls    *callp = callsp(op->callp) ;
 		rs = SR_NOSYS ;
 		if (op->callp) {
@@ -241,7 +240,7 @@ int sysrealname_open(SRN *op,cchar *dbname) noex {
 int sysrealname_close(SRN *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sysrealname_magic(op)) >= 0) {
+	if ((rs = sysrealname_magic(op)) >= 0) ylikely {
             sysrealname_calls    *callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->close) {
@@ -264,9 +263,9 @@ int sysrealname_close(SRN *op) noex {
 /* end subroutine (sysrealname_close) */
 
 int sysrealname_getinfo(SRN *op,SRN_INFO *ip) noex {
-	int		rs = SR_NOSYS ;
+	int		rs ;
 	int		n = 0 ;
-	if ((rs = sysrealname_magic(op)) >= 0) {
+	if ((rs = sysrealname_magic(op)) >= 0) ylikely {
             sysrealname_calls    *callp = callsp(op->callp) ;
 	    IPW_INFO		iinfo{} ;
 	    rs = SR_NOSYS ;
@@ -275,9 +274,9 @@ int sysrealname_getinfo(SRN *op,SRN_INFO *ip) noex {
 	        rs = co(op->obj,&iinfo) ;
 	        n = rs ;
 	    }
-	    if (ip) {
+	    if (ip) ylikely {
 	        memclear(ip) ;
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    ip->writetime = iinfo.writetime ;
 		    ip->writecount = iinfo.writecount ;
 		    ip->entries = iinfo.entries ;
@@ -294,13 +293,13 @@ int sysrealname_getinfo(SRN *op,SRN_INFO *ip) noex {
 
 int sysrealname_curbegin(SRN *op,SRN_CUR *curp) noex {
 	int		rs ;
-	if ((rs = sysrealname_magic(op,curp)) >= 0) {
+	if ((rs = sysrealname_magic(op,curp)) >= 0) ylikely {
             sysrealname_calls	*callp = callsp(op->callp) ;
 	    cint		csz = op->cursize ;
 	    rs = SR_NOSYS ;
 	    memclear(curp) ;
 	    if (callp->curbegin) {
-	        if (void *vp{} ; (rs = uc_malloc(csz,&vp)) >= 0) {
+	        if (void *vp ; (rs = uc_malloc(csz,&vp)) >= 0) {
 		    cauto co = callp->curbegin ;
 		    IPW_CUR	*icurp = (IPW_CUR *) curp->scp ;
 		    curp->scp = vp ;
@@ -321,7 +320,7 @@ int sysrealname_curbegin(SRN *op,SRN_CUR *curp) noex {
 int sysrealname_curend(SRN *op,SRN_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sysrealname_magic(op,curp)) >= 0) {
+	if ((rs = sysrealname_magic(op,curp)) >= 0) ylikely {
             sysrealname_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == SRN_CURMAGIC) {
@@ -358,7 +357,7 @@ int sysrealname_curlook(SRN *op,SRN_CUR *curp,int fo,
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = sysrealname_magic(op,curp,sbuf)) >= 0) {
+	if ((rs = sysrealname_magic(op,curp,sbuf)) >= 0) ylikely {
 	    if (realname rn ; (rs = rn.start(sbuf,slen)) >= 0) {
 	        cchar	*sa[6] ;
 	        if ((rs = rn.getpieces(sa)) > 0) {
@@ -376,7 +375,7 @@ int sysrealname_curlook(SRN *op,SRN_CUR *curp,int fo,
 int sysrealname_curlookparts(SRN *op,SRN_CUR *curp,int fo,
 		cchar **sa,int sn) noex {
 	int		rs ;
-	if ((rs = sysrealname_magic(op,curp,sa)) >= 0) {
+	if ((rs = sysrealname_magic(op,curp,sa)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == SRN_CURMAGIC) {
 	        rs = sysrealname_curload(op,curp,fo,sa,sn) ;
@@ -388,7 +387,7 @@ int sysrealname_curlookparts(SRN *op,SRN_CUR *curp,int fo,
 
 int sysrealname_curlookread(SRN *op,SRN_CUR *curp,char *rbuf) noex {
 	int		rs ;
-	if ((rs = sysrealname_magic(op,curp,rbuf)) >= 0) {
+	if ((rs = sysrealname_magic(op,curp,rbuf)) >= 0) ylikely {
             sysrealname_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == SRN_CURMAGIC) {
@@ -413,7 +412,7 @@ int sysrealname_curlookread(SRN *op,SRN_CUR *curp,char *rbuf) noex {
 int sysrealname_curenum(SRN *op,SRN_CUR *curp,char *ubuf,
 		cchar **sa,char *rbuf,int rlen) noex {
 	int		rs ;
-	if ((rs = sysrealname_magic(op,curp,ubuf,sa,rbuf)) >= 0) {
+	if ((rs = sysrealname_magic(op,curp,ubuf,sa,rbuf)) >= 0) ylikely {
             sysrealname_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == SRN_CURMAGIC) {
@@ -431,7 +430,7 @@ int sysrealname_curenum(SRN *op,SRN_CUR *curp,char *ubuf,
 
 int sysrealname_audit(SRN *op) noex {
 	int		rs ;
-	if ((rs = sysrealname_magic(op)) >= 0) {
+	if ((rs = sysrealname_magic(op)) >= 0) ylikely {
             sysrealname_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->audit) {
@@ -452,7 +451,7 @@ static int sysrealname_objloadbegin(SRN *op,cchar *pr,cchar *objn) noex {
 	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
 	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
 	        if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*mn = SRN_MODBNAME ;
@@ -468,7 +467,7 @@ static int sysrealname_objloadbegin(SRN *op,cchar *pr,cchar *objn) noex {
 			    cint	osz = op->objsize ;
 	                    op->objsize = mv[0] ;
 	                    op->cursize = mv[1] ;
-			    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
+			    if (void *vp ; (rs = uc_malloc(osz,&vp)) >= 0) {
 	                        op->obj = vp ;
 	                        rs = sysrealname_loadcalls(op,&syms) ;
 	                        if (rs < 0) {
@@ -498,7 +497,7 @@ static int sysrealname_objloadbegin(SRN *op,cchar *pr,cchar *objn) noex {
 static int sysrealname_objloadend(SRN *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->obj) {
+	if (op->obj) ylikely {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
@@ -562,7 +561,7 @@ static int sysrealname_loadcalls(SRN *op,vecstr *slp) noex {
 static int sysrealname_curload(SRN *op,SRN_CUR *curp,
 		int fo,cc **sa,int sn) noex {
 	int		rs = SR_FAULT ;
-	if (op && sa) {
+	if (op && sa) ylikely {
 	    int		sasize ;
 	    int		ssize = 0 ;
 	    if (sn < 0) {
@@ -573,7 +572,7 @@ static int sysrealname_curload(SRN *op,SRN_CUR *curp,
 	    for (int i = 0 ; i < sn ; i += 1) {
 	        ssize += (lenstr(sa[i]) + 1) ;
 	    }
-	    if (char *bp{} ; (rs = uc_malloc(ssize,&bp)) >= 0) {
+	    if (char *bp ; (rs = uc_malloc(ssize,&bp)) >= 0) {
 	        int	i{} ; /* used-afterwards */
 	        cchar	**sap = (cchar **) bp ;
 	        char	*sbp = (bp + sasize) ;

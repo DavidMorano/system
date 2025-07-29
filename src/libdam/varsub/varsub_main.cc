@@ -58,12 +58,15 @@
 
 #include	"varsub.h"
 
+import libutil ;
 
 /* local defines */
 
-#define	VARSUB_DEFENT	10
-#define	VARSUB_NLINES	10
-#define	VARSUB_SUB	struct varsub_sub
+#define	VS		varsub
+#define	VS_SUB		varsub_sub
+#define	VS_MAGIC	VARSUB_MAGIC
+#define	VS_DEFENT	10
+#define	VS_NLINES	10
 
 
 /* imported namespaces */
@@ -91,11 +94,11 @@ struct varsub_sub {
 
 /* forward references */
 
-typedef VARSUB_SUB	ent ;
+typedef VS_SUB	ent ;
 typedef ent		*entp ;
 
 template<typename ... Args>
-static int varsub_ctor(varsub *op,Args ... args) noex {
+static int varsub_ctor(VS *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -109,7 +112,7 @@ static int varsub_ctor(varsub *op,Args ... args) noex {
 }
 /* end subroutine (varsub_ctor) */
 
-static int varsub_dtor(varsub *op) noex {
+static int varsub_dtor(VS *op) noex {
 	int		rs = SR_OK ;
 	if (op->slp) {
 	    delete op->slp ;
@@ -120,25 +123,25 @@ static int varsub_dtor(varsub *op) noex {
 /* end subroutine (varsub_dtor) */
 
 template<typename ... Args>
-static inline int varsub_magic(varsub *op,Args ... args) noex {
+static inline int varsub_magic(VS *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == VARSUB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == VS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
 /* end subroutine (varsin_magic) */
 
-static int	varsub_setopts(varsub *,int) noex ;
-static int	varsub_iadd(varsub *,cchar *,int,cchar *,int) noex ;
-static int	varsub_iaddq(varsub *,cchar *,int,cchar *,int) noex ;
-static int	varsub_sort(varsub *) noex ;
-static int	varsub_procvalue(varsub *,buffer *,cchar *,int) noex ;
-static int	varsub_procsub(varsub *,buffer *,cchar *,int) noex ;
-static int	varsub_getval(varsub *,cchar *,int,cchar **) noex ;
-static int	varsub_expfiler(varsub *,bfile *,bfile *) noex ;
-static int	varsub_writebuf(varsub *,bfile *,buffer *) noex ;
-static int	varsub_entfins(varsub *) noex ;
+static int	varsub_setopts(VS *,int) noex ;
+static int	varsub_iadd(VS *,cchar *,int,cchar *,int) noex ;
+static int	varsub_iaddq(VS *,cchar *,int,cchar *,int) noex ;
+static int	varsub_sort(VS *) noex ;
+static int	varsub_procvalue(VS *,buffer *,cchar *,int) noex ;
+static int	varsub_procsub(VS *,buffer *,cchar *,int) noex ;
+static int	varsub_getval(VS *,cchar *,int,cchar **) noex ;
+static int	varsub_expfiler(VS *,bfile *,bfile *) noex ;
+static int	varsub_writebuf(VS *,bfile *,buffer *) noex ;
+static int	varsub_entfins(VS *) noex ;
 
 static int	entry_start(ent *,cchar *,int,cchar *,int) noex ;
 static int	entry_keycmp(ent *,ent *) noex ;
@@ -153,41 +156,34 @@ extern "C" {
 }
 
 
-/* local subroutines */
-
-consteval int mkoptmask() noex {
-	int	m = 0 ;
-	m = m | VARSUB_ONOBLANK ;
-	m = m | VARSUB_OBADNOKEY ;
-	m = m | VARSUB_OBRACE ;
-	m = m | VARSUB_OPAREN ;
-	return m ;
-}
-/* end subroutine (mkoptmask) */
-
-
 /* local variables */
-
-constexpr int		optmask = mkoptmask() ;
 
 static bufsizevar	maxlinelen(getbufsize_ml) ;
 
 
 /* exported variables */
 
+cint varsubms::blank	= 0 ;
+cint varsubms::noblank	= (1 << varsubo_noblank) ;
+cint varsubms::badnokey	= (1 << varsubo_badnokey) ;
+cint varsubms::brace	= (1 << varsubo_brace) ;
+cint varsubms::paren	= (1 << varsubo_paren) ;
+
+const varsubms		varsubm ;
+
 
 /* exported subroutines */
 
-int varsub_start(varsub *op,int aopts) noex {
+int varsub_start(VS *op,int aopts) noex {
 	int		rs ;
 	if ((rs = varsub_ctor(op)) >= 0) {
 	    op->i = 0 ;
-	    op->n = VARSUB_DEFENT ;
+	    op->n = VS_DEFENT ;
 	    if ((rs = varsub_setopts(op,aopts)) >= 0) {
 		vechand	*slp = op->slp ;
 	        cint	vo = VECHAND_OORDERED ;
 	        if ((rs = vechand_start(slp,op->n,vo)) >= 0) {
-	            op->magic = VARSUB_MAGIC ;
+	            op->magic = VS_MAGIC ;
 	        }
 	    }
 	    if (rs < 0) {
@@ -198,7 +194,7 @@ int varsub_start(varsub *op,int aopts) noex {
 }
 /* end subroutine (varsub_start) */
 
-int varsub_finish(varsub *op) noex {
+int varsub_finish(VS *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = varsub_magic(op)) >= 0) {
@@ -220,7 +216,7 @@ int varsub_finish(varsub *op) noex {
 }
 /* end subroutine (varsub_finish) */
 
-int varsub_add(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
+int varsub_add(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	int		rs ;
 	if ((rs = varsub_magic(op,k)) >= 0) {
 	    rs = SR_INVALID ;
@@ -232,7 +228,7 @@ int varsub_add(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 }
 /* end subroutine (varsub_add) */
 
-int varsub_addva(varsub *op,mainv envv) noex {
+int varsub_addva(VS *op,mainv envv) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = varsub_magic(op,envv)) >= 0) {
@@ -257,7 +253,7 @@ int varsub_addva(varsub *op,mainv envv) noex {
 }
 /* end subroutine (varsub_addva) */
 
-int varsub_addquick(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
+int varsub_addquick(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	int		rs ;
 	if ((rs = varsub_magic(op,k)) >= 0) {
 	    rs = SR_INVALID ;
@@ -269,7 +265,7 @@ int varsub_addquick(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 }
 /* end subroutine (varsub_addquick) */
 
-int varsub_addvaquick(varsub *op,cchar **envv) noex {
+int varsub_addvaquick(VS *op,cchar **envv) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = varsub_magic(op,envv)) >= 0) {
@@ -294,7 +290,7 @@ int varsub_addvaquick(varsub *op,cchar **envv) noex {
 }
 /* end subroutine (varsub_addvaquick) */
 
-int varsub_del(varsub *op,cchar *k,int klen) noex {
+int varsub_del(VS *op,cchar *k,int klen) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = varsub_magic(op,k)) >= 0) {
@@ -326,7 +322,7 @@ int varsub_del(varsub *op,cchar *k,int klen) noex {
 }
 /* end subroutine (varsub_del) */
 
-int varsub_find(varsub *op,cchar *k,int klen,cchar **vpp,int *vlenp) noex {
+int varsub_find(VS *op,cchar *k,int klen,cchar **vpp,int *vlenp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	if ((rs = varsub_magic(op,k)) >= 0) {
@@ -341,7 +337,7 @@ int varsub_find(varsub *op,cchar *k,int klen,cchar **vpp,int *vlenp) noex {
 }
 /* end subroutine (varsub_find) */
 
-int varsub_fetch(varsub *op,cchar *k,int klen,cchar **vpp) noex {
+int varsub_fetch(VS *op,cchar *k,int klen,cchar **vpp) noex {
 	int		rs ;
 	if ((rs = varsub_magic(op,k)) >= 0) {
 	    if (klen < 0) klen = lenstr(k) ;
@@ -353,7 +349,7 @@ int varsub_fetch(varsub *op,cchar *k,int klen,cchar **vpp) noex {
 }
 /* end subroutine (varsub_fetch) */
 
-int varsub_curbegin(varsub *op,varsub_cur *curp) noex {
+int varsub_curbegin(VS *op,varsub_cur *curp) noex {
 	int		rs ;
 	if ((rs = varsub_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
@@ -362,7 +358,7 @@ int varsub_curbegin(varsub *op,varsub_cur *curp) noex {
 }
 /* end subroutine (varsub_curbegin) */
 
-int varsub_curend(varsub *op,varsub_cur *curp) noex {
+int varsub_curend(VS *op,varsub_cur *curp) noex {
 	int		rs ;
 	if ((rs = varsub_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
@@ -371,7 +367,7 @@ int varsub_curend(varsub *op,varsub_cur *curp) noex {
 }
 /* end subroutine (varsub_curend) */
 
-int varsub_curenum(varsub *op,varsub_cur *curp,cchar **kpp,cchar **vpp) noex {
+int varsub_curenum(VS *op,varsub_cur *curp,cchar **kpp,cchar **vpp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	if ((rs = varsub_magic(op,curp)) >= 0) {
@@ -399,7 +395,7 @@ int varsub_curenum(varsub *op,varsub_cur *curp,cchar **kpp,cchar **vpp) noex {
 }
 /* end subroutine (varsub_curenum) */
 
-int varsub_expfile(varsub *op,bfile *ifp,bfile *ofp) noex {
+int varsub_expfile(VS *op,bfile *ifp,bfile *ofp) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = varsub_magic(op,ifp,ofp)) >= 0) {
@@ -412,7 +408,7 @@ int varsub_expfile(varsub *op,bfile *ifp,bfile *ofp) noex {
 }
 /* end subroutine (varsub_expfile) */
 
-int varsub_exp(varsub *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
+int varsub_exp(VS *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		bl = 0 ;
@@ -444,7 +440,7 @@ int varsub_exp(varsub *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 }
 /* end subroutine (varsub_exp) */
 
-int varsub_expbuf(varsub *op,buffer *bufp,cchar *sbuf,int slen) noex {
+int varsub_expbuf(VS *op,buffer *bufp,cchar *sbuf,int slen) noex {
 	int		rs ;
 	if ((rs = varsub_magic(op,bufp,sbuf)) >= 0) {
 	    if (slen < 0) slen = lenstr(sbuf) ;
@@ -459,20 +455,30 @@ int varsub_expbuf(varsub *op,buffer *bufp,cchar *sbuf,int slen) noex {
 
 /* private subroutines */
 
-static int varsub_setopts(varsub *op,int vo) noex {
+consteval int mkoptmask() noex {
+	int	m = 0 ;
+	m = m | varsubm.blank ;
+	m = m | varsubm.badnokey ;
+	m = m | varsubm.brace ;
+	m = m | varsubm.paren ;
+	return m ;
+} /* end subroutine (mkoptmask) */
+
+static int varsub_setopts(VS *op,int vo) noex {
+	constexpr cint	optmask = mkoptmask() ;
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_INVALID ;
-	    op->f = {} ;
+	    op->fl = {} ;
 	    if ((vo & optmask) == 0) {
 	        rs = SR_OK ;
-	        if (vo & VARSUB_ONOBLANK) op->f.noblank = true ;
-	        if (vo & VARSUB_OBADNOKEY) op->f.badnokey = true ;
-	        if (vo & (VARSUB_OPAREN | VARSUB_OBRACE)) {
-	            if (vo & VARSUB_OBRACE) op->f.brace = true ;
-	            if (vo & VARSUB_OPAREN) op->f.paren = true ;
+	        if (vo & varsubm.noblank) op->fl.noblank = true ;
+	        if (vo & varsubm.badnokey) op->fl.badnokey = true ;
+	        if (vo & (varsubm.paren | varsubm.brace)) {
+	            if (vo & varsubm.brace) op->fl.brace = true ;
+	            if (vo & varsubm.paren) op->fl.paren = true ;
 	        } else {
-	            op->f.brace = op->f.paren = true ;
+	            op->fl.brace = op->fl.paren = true ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -480,7 +486,7 @@ static int varsub_setopts(varsub *op,int vo) noex {
 }
 /* end subroutine (varsub_setopts) */
 
-static int varsub_procvalue(varsub *op,buffer *bufp,cchar *sp,int sl) noex {
+static int varsub_procvalue(VS *op,buffer *bufp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		sses[3][2] ;
 	int		kl ;
@@ -489,12 +495,12 @@ static int varsub_procvalue(varsub *op,buffer *bufp,cchar *sp,int sl) noex {
 	cchar		ssb[] = { CH_LBRACE, CH_RBRACE, 0 } ;
 	cchar		ssp[] = { CH_LPAREN, CH_RPAREN, 0 } ;
 	cchar		*kp ;
-	if (op->f.brace) {
+	if (op->fl.brace) {
 	    sses[i][0] = ssb[0] ;
 	    sses[i][1] = ssb[1] ;
 	    i += 1 ;
 	}
-	if (op->f.paren) {
+	if (op->fl.paren) {
 	    sses[i][0] = ssp[0] ;
 	    sses[i][1] = ssp[1] ;
 	    i += 1 ;
@@ -538,7 +544,7 @@ static int varsub_procvalue(varsub *op,buffer *bufp,cchar *sp,int sl) noex {
 }
 /* end subroutine (varsub_procvalue) */
 
-static int varsub_procsub(varsub *op,buffer *bufp,cchar *kp,int kl) noex {
+static int varsub_procsub(VS *op,buffer *bufp,cchar *kp,int kl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (kl > 0) {
@@ -557,7 +563,7 @@ static int varsub_procsub(varsub *op,buffer *bufp,cchar *kp,int kl) noex {
 	        if (al > 0) {
 	            rs = bufp->strw(ap,al) ;
 	            len += rs ;
-		} else if (op->f.noblank) {
+		} else if (op->fl.noblank) {
 		    if ((rs = bufp->chr('*')) >= 0) {
 	            	len += rs ;
 	                if ((rs = bufp->strw(kp,kl)) >= 0) {
@@ -566,7 +572,7 @@ static int varsub_procsub(varsub *op,buffer *bufp,cchar *kp,int kl) noex {
 	            	    len += rs ;
 			}
 		    }
-	        } else if (op->f.badnokey) {
+	        } else if (op->fl.badnokey) {
 	            rs = SR_NOTFOUND ;
 	        } else {
 		    rs = SR_OK ;
@@ -577,7 +583,7 @@ static int varsub_procsub(varsub *op,buffer *bufp,cchar *kp,int kl) noex {
 }
 /* end subroutine (varsub_procsub) */
 
-static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
+static int varsub_iadd(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	int		rs ;
 	if (klen < 0) klen = lenstr(k) ;
 	if (vlen < 0) vlen = (v) ? lenstr(v) : 0 ;
@@ -601,7 +607,7 @@ static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	        if ((rs = uc_malloc(msize,&vp)) >= 0) {
 	            ent		*ep = entp(vp) ;
 	            if ((rs = entry_start(ep,k,klen,v,vlen)) >= 0) {
-	                op->f.sorted = false ;
+	                op->fl.sorted = false ;
 	                rs = vechand_add(elp,ep) ;
 	                if (rs < 0) {
 	                    entry_finish(ep) ;
@@ -619,18 +625,17 @@ static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 }
 /* end subroutine (varsub_iadd) */
 
-static int varsub_iaddq(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
+static int varsub_iaddq(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	int		rs = SR_INVALID ;
 	if (klen < 0) klen = lenstr(k) ;
 	if (vlen < 0) vlen = (v != nullptr) ? lenstr(v) : 0 ;
 	if (klen > 0) {
 	    vechand	*elp = op->slp ;
 	    cint	msize = szof(ent) ;
-	    void	*vp{} ;
-	    if ((rs = uc_malloc(msize,&vp)) >= 0) {
+	    if (void *vp ; (rs = uc_malloc(msize,&vp)) >= 0) {
 	        ent	*ep = entp(vp) ;
 	        if ((rs = entry_start(ep,k,klen,v,vlen)) >= 0) {
-	            op->f.sorted = false ;
+	            op->fl.sorted = false ;
 	            rs = vechand_add(elp,ep) ;
 	            if (rs < 0) {
 	                entry_finish(ep) ;
@@ -645,19 +650,19 @@ static int varsub_iaddq(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 }
 /* end subroutine (varsub_iaddq) */
 
-static int varsub_sort(varsub *op) noex {
+static int varsub_sort(VS *op) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
-	if (! op->f.sorted) {
+	if (! op->fl.sorted) {
 	    f = true ;
-	    op->f.sorted = true ;
+	    op->fl.sorted = true ;
 	    rs = vechand_sort(op->slp,vcmpent) ;
 	}
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (varsub_sort) */
 
-static int varsub_getval(varsub *op,cchar *kp,int kl,cchar **vpp) noex {
+static int varsub_getval(VS *op,cchar *kp,int kl,cchar **vpp) noex {
 	ent		*ep{} ;
 	int		rs = SR_DOM ;
 	int		vl = 0 ;
@@ -680,24 +685,22 @@ static int varsub_getval(varsub *op,cchar *kp,int kl,cchar **vpp) noex {
 }
 /* end subroutine (varsub_getval) */
 
-static int varsub_expfiler(varsub *op,bfile *ifp,bfile *ofp) noex {
+static int varsub_expfiler(VS *op,bfile *ifp,bfile *ofp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	char		*lbuf{} ;
-	if ((rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    if ((rs = maxlinelen) >= 0) {
-	        buffer	b ;
-	        cint	stlen = (VARSUB_NLINES * rs) ;
+	        cint	stlen = (VS_NLINES * rs) ;
 	        op->badline = -1 ;
-	        if ((rs = b.start(stlen)) >= 0) {
+	        if (buffer b ; (rs = b.start(stlen)) >= 0) {
 		    int		nlines = 0 ;
 	            while ((rs = breadln(ifp,lbuf,llen)) > 0) {
 	                int	len = rs ;
 	                if (lbuf[len-1] == '\n') nlines += 1 ;
 	                if ((rs = varsub_expbuf(op,&b,lbuf,len)) >= 0) {
-	                    if (nlines >= VARSUB_NLINES) {
+	                    if (nlines >= VS_NLINES) {
 	                        nlines = 0 ;
 	                        rs = varsub_writebuf(op,ofp,&b) ;
 			        wlen += rs ;
@@ -720,7 +723,7 @@ static int varsub_expfiler(varsub *op,bfile *ifp,bfile *ofp) noex {
 }
 /* end subroutine (varsub_expfiler) */
 
-static int varsub_writebuf(varsub *op,bfile *ofp,buffer *bufp) noex {
+static int varsub_writebuf(VS *op,bfile *ofp,buffer *bufp) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (op) {
@@ -735,7 +738,7 @@ static int varsub_writebuf(varsub *op,bfile *ofp,buffer *bufp) noex {
 }
 /* end subroutine (varsub_writebuf) */
 
-static int varsub_entfins(varsub *op) noex {
+static int varsub_entfins(VS *op) noex {
 	vechand		*elp = op->slp ; /* loop invariant */
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -766,7 +769,7 @@ static int entry_start(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
 	/* allocate buffers for the key and its value respectively */
 	if (kl > 0) {
 	    cint	sz = (kl + 1) + (vl + 1) ;
-	    if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
+	    if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	        ep->kp = bp ;
 	        ep->kl = kl ;
 	        bp = (strwcpy(bp,kp,kl) + 1) ;

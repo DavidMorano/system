@@ -1,11 +1,12 @@
-/* bibleq */
+/* bibleq SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* BIBLEQ object-load management */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_LOOKOTHER	0		/* look elsewhere */
-
 
 /* revision history:
 
@@ -18,15 +19,11 @@
 
 /*******************************************************************************
 
-	This module implements an interface (a trivial one) that provides
-	access to the BIBLEQ object (which is dynamically loaded).
-
+	This module implements an interface (a trivial one) that
+	provides access to the BIBLEQ object (which is dynamically
+	loaded).
 
 *******************************************************************************/
-
-
-#define	BIBLEQ_MASTER		1
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

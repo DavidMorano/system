@@ -40,7 +40,7 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<getnodename.h>
+#include	<getnodedomain.h>
 #include	<mkpr.h>
 #include	<estrings.h>
 #include	<vecstr.h>
@@ -49,6 +49,7 @@
 #include	"txtindexmk.h"
 #include	"txtindexmks.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -81,7 +82,7 @@ extern "C" {
     typedef int	(*sonoop_f)(void *) noex ;
     typedef int	(*soabort_f)(void *) noex ;
     typedef int	(*soclose_f)(void *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -340,8 +341,8 @@ static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
 		if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*mn = TIM_MODBNAME ;
 		    int		mo = 0 ;
-	            mo |= MODLOAD_OLIBVAR ;
-	            mo |= MODLOAD_OSDIRS ;
+	            mo |= modloadm.libvar ;
+	            mo |= modloadm.libsdirs ;
 	            if ((rs = modload_open(lp,pr,mn,objn,mo,sv)) >= 0) {
 			op->fl.modload = true ;
 	    		if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {

@@ -77,7 +77,7 @@ int ass_addchr(ass *asp,int ch) noex {
 	    }
 	    if (rs >= 0) {
 	        asp->sbuf = p ;
-	        asp->sbuf[(asp->slen)++] = ch ;
+	        asp->sbuf[(asp->slen)++] = char(ch) ;
 	    }
 	    len = asp->slen ;
 	} /* end if (non-null) */
@@ -116,14 +116,14 @@ int ass::addchr(int ch) noex {
 }
 
 void ass::dtor() noex {
-	if (cint rs = int(finish) ; rs < 0) {
+	if (cint rs = finish ; rs < 0) {
 	    ulogerror("ass",rs,"fini-finish") ;
 	}
-}
+} /* end method (ass::dtor) */
 
 ass_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case assmem_start:
 	        rs = ass_start(op) ;

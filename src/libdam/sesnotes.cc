@@ -128,7 +128,7 @@ static inline int sesnotes_magic(SN *op,Args ... args) noex {
 
 static int sesnotes_ready(SN *) noex ;
 static int sesnotes_sends(SN *,char *,int,int,int,cchar *,int) noex ;
-static int sesnotes_sender(SN *,cchar *,int,int,time_t,cchar *,int) noex ;
+static int sesnotes_sender(SN *,cchar *,int,time_t,cchar *,int) noex ;
 
 static int haveproc(cchar *,int) noex ;
 
@@ -285,20 +285,21 @@ static int sesnotes_sends(SN *op,char *dbuf,int dlen,
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    if (fsdir d ; (rs = fsdir_open(&d,dbuf)) >= 0) {
 	        fsdir_ent	de ;
 	        while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
+		    cint	dnl = rs ;
+		    cchar	*dnp = de.name ;
 	            if (de.name[0] == 'p') {
-		        if ((rs = haveproc((de.name+1),(rs-1))) > 0) {
-	                    if ((rs = pathadd(dbuf,dlen,de.name)) >= 0) {
-			        cint	dl = rs ;
-	                        if (USTAT sb ; (rs = u_lstat(dbuf,&sb)) >= 0) {
+		        if ((rs = haveproc((dnp+1),(dnl-1))) > 0) {
+	                    if ((rs = pathadd(dbuf,dlen,dnp)) >= 0) {
+	                        if (ustat sb ; (rs = u_lstat(dbuf,&sb)) >= 0) {
 	                            if (S_ISSOCK(sb.st_mode)) {
 				        cchar	*dp = dbuf ;
 				        auto	ss = sesnotes_sender ;
-	                                rs = ss(op,dp,dl,mt,st,mp,ml) ;
+	                                rs = ss(op,dp,mt,st,mp,ml) ;
 	                                c += rs ;
 	                            } /* end if (is-socket) */
 	                        } /* end if (stat) */
@@ -323,8 +324,7 @@ static int sesnotes_sends(SN *op,char *dbuf,int dlen,
 }
 /* end subroutine (sesnotes_sends) */
 
-static int sesnotes_sender(SN *op,cc *ap,int al,int mt,time_t st,
-		cc *sp,int sl) noex {
+static int sesnotes_sender(SN *op,cc *ap,int mt,time_t st,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
@@ -332,7 +332,7 @@ static int sesnotes_sender(SN *op,cc *ap,int al,int mt,time_t st,
 	    sockaddress	sa ;
 	    uint	tag = op->pid ;
 	    cint	af = AF_UNIX ;
-	    if ((rs = sockaddress_startaddr(&sa,af,ap,al,0,0)) >= 0) {
+	    if ((rs = sockaddress_start(&sa,af,ap,0,0)) >= 0) {
 	        cint	sal = rs ;
 	        cint	mlen = MSGBUFLEN ;
 	        int	ml = -1 ;

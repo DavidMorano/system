@@ -35,6 +35,8 @@ DEFS +=
 
 INCS += ptx.h
 
+MODS +=
+
 LIBS +=
 
 
@@ -44,7 +46,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -66,7 +67,7 @@ OBJB_UFILEDESC= obj2.o obj3.o
 OBJ_UFILEDESC= obja.o objb.o
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -92,17 +93,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_UFILEDESC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UFILEDESC)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)

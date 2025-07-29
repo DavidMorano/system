@@ -30,13 +30,13 @@
 	Synopsis:
 
 	int opendialer_hello(pr,prn,svc,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
-	const char	*svc ;
+	char	*pr ;
+	char	*prn ;
+	char	*svc ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	char	**argv ;
+	char	**envv ;
 	int		to ;
 
 	Arguments:
@@ -53,22 +53,19 @@
 	Returns:
 
 	>=0		file-descriptor
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<ids.h>
 #include	<keyopt.h>
@@ -85,17 +82,16 @@
 #include	"opendialer_hello.h"
 #include	"defs.h"
 
+import libutil ;
 
 /* local defines */
 
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(char *,...) ;
+extern int	strlinelen(char *,int,int) ;
 #endif
 
 
@@ -103,20 +99,20 @@ extern int	strlinelen(const char *,int,int) ;
 
 
 int opendialer_hello(pr,prn,svc,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
-const char	*svc ;
+char	*pr ;
+char	*prn ;
+char	*svc ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+char	**argv ;
+char	**envv ;
 int		to ;
 {
 	int		rs = SR_OK ;
 	int		pipes[2] ;
 	int		fd = -1 ;
 	int		sl = -1 ;
-	const char	*sp = "hello world!\n" ;
+	char	*sp = "hello world!\n" ;
 
 	if ((rs = u_pipe(pipes)) >= 0) {
 	    const int	wfd = pipes[1] ;

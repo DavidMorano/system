@@ -110,6 +110,7 @@
 #include	"txtindexhdr.h"
 #include	"naturalwords.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -759,7 +760,7 @@ static int txtindexmks_addtag(TIM *op,TIM_TAG *tagp) noex {
 	                kl = maxkl ;
 		    }
 	        } else {
-	            kl = strnlen(kp,maxkl) ;
+	            kl = lenstr(kp,maxkl) ;
 		}
 	        if (kl < minwlen) continue ;
 
@@ -795,14 +796,15 @@ static int txtindexmks_addtag(TIM *op,TIM_TAG *tagp) noex {
 static int txtindexmks_mkhash(TIM *op) noex {
 	int		rs ;
 	int		rs1 ;
-	int		clists = 0 ;
+	int		clists = 0 ; /* return-value */
 	if ((rs = txtindexmks_nhashopen(op)) >= 0) {
+	    custime	dt = getustime ;
 	    HDR		hdr{} ;
 	    hdr.vetu[0] = TXTINDEXHDR_VERSION ;
-	    hdr.vetu[1] = ENDIAN ;
+	    hdr.vetu[1] = char(ENDIAN) ;
 	    hdr.vetu[2] = 0 ;
 	    hdr.vetu[3] = 0 ;
-	    hdr.wtime = (uint) time(nullptr) ;
+	    hdr.wtime = uint(dt) ;
 	    hdr.tfsize = op->tagsize ;
 	    hdr.taglen = op->ti.ntags ;
 	    hdr.minwlen = op->pi.minwlen ;
@@ -888,10 +890,11 @@ static int txtindexmks_mkhashwrhdr(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
 
 static int txtindexmks_mkhashwrtab(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
 	int		*table = nullptr ;
-	cint		tsize = op->pi.tablen * szof(uint) ;
+	int		tsz = op->pi.tablen * szof(uint) ;
 	int		rs ;
-	int		wlen = 0 ;
-	if ((rs = uc_malloc(tsize,&table)) >= 0) {
+	int		rs1 ;
+	int		wlen = 0 ; /* return-value */
+	if ((rs = uc_malloc(tsz,&table)) >= 0) {
 	    cint	tablen = int(op->pi.tablen) ;
 	    hdrp->listoff = off ;
 	    for (int i = 0 ; (rs >= 0) && (i < tablen) ; i += 1) {
@@ -902,12 +905,13 @@ static int txtindexmks_mkhashwrtab(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
 	    hdrp->maxtags = op->ti.maxtags ;
 	    hdrp->taboff = off ;
 	    if (rs >= 0) {
-	        cint	tsize = op->pi.tablen * szof(uint) ;
-	        rs = filer_write(hfp,table,tsize) ;
+	        tsz = op->pi.tablen * szof(uint) ;
+	        rs = filer_write(hfp,table,tsz) ;
 	        off += rs ;
 	        wlen += rs ;
 	    }
-	    uc_free(table) ;
+	    rs1 = uc_free(table) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -1187,13 +1191,12 @@ static int txtindexmks_printeigener(TIM *op,printeigen *ap) noex {
 		if ((rs = uc_malloc(eisize,&eitab)) >= 0) {
 		    int	ns = TXTINDEXMKS_NSKIP ;
 		    if ((rs = strtab_indmk(edp,eitab,eisize,ns)) >= 0) {
-			int	i ;
 			int	si ;
 			int	sl ;
 			cchar	*sp ;
 			cchar	*fmt ;
 			fmt = "txtindexmks_printeigen: i=%u si=%u s=%s\n" ;
-			for (i = 1 ; i < erlen ; i += 1) {
+			for (int i = 1 ; i < erlen ; i += 1) {
 	    		    si = ertab[i] ;
 	    		    if (si > 0) {
 	        		debugprintf(fmt,i,si,(estab + si)) ;
@@ -1204,11 +1207,12 @@ static int txtindexmks_printeigener(TIM *op,printeigen *ap) noex {
 	    		    fmt = "txtindexmks_printeigen: stabfind() rs=%d\n";
 	    		    debugprintf(fmt,rs1) ;
 			} /* end for */
-		    }
-		    uc_free(eitab) ;
+		    } /* end if (strtab_indmk) */
+		    rs1 = uc_free(eitab) ;
+		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a) */
-	    }
-	}
+	    } /* end if (strtab_indsize) */
+	} /* end if (strtab_recmk) */
 	return rs ;
 }
 /* end subroutine (txtindexmks_printeigener) */

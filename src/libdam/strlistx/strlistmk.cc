@@ -33,7 +33,6 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<modload.h>
@@ -43,6 +42,7 @@
 #include	"strlistmk.h"
 #include	"strlistmks.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -272,17 +272,17 @@ int strlistmk_chgrp(SLM *op,gid_t gid) noex {
 static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
 	modload		*lp = op->mlp ;
 	cint		vn = sub_overlast ;
-	cint		vo = VECSTR_OCOMPACT ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
 	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
-                if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
+                if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
                     cchar	*modbn = STRLISTMK_MODBNAME ;
                     int		mo = 0 ;
-                    mo |= MODLOAD_OLIBVAR ;
-                    mo |= MODLOAD_OPRS ;
-                    mo |= MODLOAD_OSDIRS ;
+                    mo |= modloadm.libvar ;
+                    mo |= modloadm.libprs ;
+                    mo |= modloadm.libsdirs ;
                     if ((rs = modload_open(lp,pr,modbn,objn,mo,sv)) >= 0) {
 			op->fl.modload = true ;
                         if (int mv[2] ; (rs = modload_getmva(lp,mv,1)) >= 0) {

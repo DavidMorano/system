@@ -33,6 +33,7 @@
 
 #include	"svckv.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -147,23 +148,22 @@ int svckv_isprog(cchar *(*kv)[2],int n,cchar **vpp) noex {
 
 /* return (as the integer return value) a bit-set of options from the SVCENT */
 int svckv_svcopts(cchar *(*kv)[2],int n) noex {
-	int		vl ;
-	int		ow = 0 ;
+	int		ow = 0 ; /* return-value */
 	cchar		*k = "opts" ;
 	cchar		*vp ;
-	if ((vl = svckv_val(kv,n,k,&vp)) > 0) {
+	if (int vl ; (vl = svckv_val(kv,n,k,&vp)) > 0) {
 	    int		cl ;
 	    cchar	*cp ;
-	    cchar	*tp ;
-	    while ((tp = strnbrk(vp,vl," ,")) != nullptr) {
-	        if ((cl = sfshrink(vp,(tp-vp),&cp)) > 0) {
+	    for (cc *tp ; (tp = strnbrk(vp,vl," ,")) != nullptr ; ) {
+		cint tl = intconv(tp - vp) ;
+	        if ((cl = sfshrink(vp,tl,&cp)) > 0) {
 	            if (int ii ; (ii = matstr(svcopts,cp,cl)) >= 0) {
 	                ow |= (1 << ii) ;
 	            }
 	        }
-	        vl -= ((tp+1)-vp) ;
-	        vp = (tp+1) ;
-	    } /* end while */
+	        vl -= intconv((tp + 1)-vp) ;
+	        vp = (tp + 1) ;
+	    } /* end for */
 	    if (vl > 0) {
 	        if ((cl = sfshrink(vp,vl,&cp)) > 0) {
 	            if (int ii ; (ii = matstr(svcopts,cp,cl)) >= 0) {

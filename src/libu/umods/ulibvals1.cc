@@ -37,7 +37,6 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>		/* |sysconf(3c)| stuff */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<bit>			/* |endian(3c++)| */
@@ -46,7 +45,7 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>		/* |MAXBASE| */
 #include	<ulogerror.h>
-#include	<sysconfcmds.h>
+#include	<sysconfcmds.h>		/* |_SC_{xx}| */
 #include	<localmisc.h>		/* |{xxx}BUFLEN| */
 
 module ulibvals ;
@@ -80,12 +79,14 @@ const int	ulibvals::endianval	= mkendian() ;
 const int	ulibvals::pagesz	= getval(_SC_PAGESIZE) ;
 const int	ulibvals::clktck	= getval(_SC_CLK_TCK) ;
 const int	ulibvals::maxbase	= MAXBASE ; /* the standard value */
+const int	ulibvals::maxpid	= getval(_SC_PID_MAX) ;
 const int	ulibvals::maxarg	= getval(_SC_ARG_MAX) ;
 const int	ulibvals::maxline	= getval(_SC_LINE_MAX) ;
 const int	ulibvals::maxlogin	= getval(_SC_LOGIN_NAME_MAX) ;
 const int	ulibvals::maxgroups	= getval(_SC_NGROUPS_MAX) ;
 const int	ulibvals::maxnamelen	= getval(_SC_NAME_MAX) ;
 const int	ulibvals::maxpathlen	= getval(_SC_PATH_MAX) ;
+const int	ulibvals::maxmsglen	= getval(_SC_MSG_MAX) ;
 const int	ulibvals::usernamelen	= getval(_SC_USERNAME_MAX) ;
 const int	ulibvals::groupnamelen	= getval(_SC_GROUPNAME_MAX) ;
 const int	ulibvals::projnamelen	= getval(_SC_PROJECTNAME_MAX) ;

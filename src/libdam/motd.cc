@@ -1209,7 +1209,7 @@ static int mapdir_expanders(MD *ep,cc *un,cc *pp) noex {
         if (char *hbuf ; (rs = malloc_mp(&hbuf)) >= 0) {
             if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
                 cint        pwlen = rs ;
-                if (ucentpw pw ; (rs = getpwx_name(&pw,pwbuf,pwlen,un)) >= 0) {
+                if (ucentpwx pw ; (rs = pw.nam(pwbuf,pwlen,un)) >= 0) {
                     cchar   *uh = pw.pw_dir ;
                     if (pp) {
                         rs = mkpath(hbuf,uh,pp) ;

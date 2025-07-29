@@ -1,4 +1,6 @@
-/* envstandards (Darwin) */
+/* envstandards SUPPORT (Darwin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* revision history:

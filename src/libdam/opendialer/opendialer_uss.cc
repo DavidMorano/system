@@ -25,11 +25,9 @@
 	This is an open-dialer.
 
 	The file-name corresponding to this dialer looks like:
-
 		uss¥<filepath>[:<svc>][,to=<to>][­<arg(s)>]
 
 	Example:
-
 		uss¥/tmp/local/tcpmuxd/srv
 		ussmus¥/tmp/local/tcpmuxd/srv:daytime
 
@@ -61,7 +59,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -69,7 +66,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<strn.h>
 #include	<strwcpy.h>
@@ -79,6 +75,7 @@
 #include	"opendialer_uss.h"
 #include	"defs.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -89,28 +86,8 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	getaf(cchar *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	dialtcp(cchar *,cchar *,int,int,int) ;
-extern int	dialtcpnls(cchar *,cchar *,int,int) ;
-extern int	dialtcpmux(cchar *,cchar *,cchar **,int,int) ;
-extern int	dialuss(cchar *,int,int) ;
-extern int	dialussnls(cchar *,cchar *,int,int) ;
-extern int	dialussmux(cchar *,cchar *,cchar **,int,int) ;
-extern int	uc_openprog(cchar *,int,cchar **,cchar **) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-#if	CF_DEBUGN
-extern int	nprintf(cchar *,cchar *,...) ;
-#endif
+/* external variables */
 
 
 /* local structures */
@@ -125,25 +102,27 @@ struct argparse {
 
 /* local variables */
 
-static cchar	*ops[] = {
-	"to",
-	NULL
-} ;
-
 enum ops {
 	op_to,
 	op_overlast
 } ;
 
+constexpr cpcchar	ops[] = {
+	"to",
+	nullptr
+} ;
+
 
 /* forward references */
 
-static int argparse_start(struct argparse *,cchar *) ;
-static int argparse_finish(struct argparse *) ;
+static int argparse_start(struct argparse *,cchar *) noex ;
+static int argparse_finish(struct argparse *) noex ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int opendialer_uss(pr,prn,fname,of,om,argv,envv,to)
 cchar	*pr ;
@@ -160,15 +139,15 @@ int		to ;
 	int		argc = 0 ;
 	int		opts = 0 ;
 	int		fd = -1 ;
-	cchar	*argz = NULL ;
+	cchar	*argz = nullptr ;
 
 #if	CF_DEBUGS
 	{
 	    int	i ;
 	    debugprintf("opendialer_uss: prn=%s\n",prn) ;
 	    debugprintf("opendialer_uss: fname=%s\n",fname) ;
-	    if (argv != NULL) {
-	        for (i = 0 ; argv[i] != NULL ; i += 1) {
+	    if (argv != nullptr) {
+	        for (i = 0 ; argv[i] != nullptr ; i += 1) {
 	            debugprintf("opendialer_uss: a[%u]=%s\n",i,argv[i]) ;
 	        }
 	    }
@@ -177,12 +156,12 @@ int		to ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-	if (argv != NULL) {
-	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
+	if (argv != nullptr) {
+	    for (argc = 0 ; argv[argc] != nullptr ; argc += 1) ;
 	    argz = argv[0] ;
 	}
 
-	if ((rs >= 0) && (argz == NULL)) rs = SR_NOENT ;
+	if ((rs >= 0) && (argz == nullptr)) rs = SR_NOENT ;
 	if ((rs >= 0) && (argz[0] == '\0')) rs = SR_NOENT ;
 
 /* parse out everything */
@@ -229,15 +208,15 @@ int		to ;
 	int		argc = 0 ;
 	int		opts = 0 ;
 	int		fd = -1 ;
-	cchar	*argz = NULL ;
+	cchar	*argz = nullptr ;
 
 #if	CF_DEBUGS
 	{
 	    int	i ;
 	    debugprintf("opendialer_ussnls: prn=%s\n",prn) ;
 	    debugprintf("opendialer_ussnls: fname=%s\n",fname) ;
-	    if (argv != NULL) {
-	        for (i = 0 ; argv[i] != NULL ; i += 1) {
+	    if (argv != nullptr) {
+	        for (i = 0 ; argv[i] != nullptr ; i += 1) {
 	            debugprintf("opendialer_ussnls: a[%u]=%s\n",i,argv[i]) ;
 	        }
 	    }
@@ -246,12 +225,12 @@ int		to ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-	if (argv != NULL) {
-	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
+	if (argv != nullptr) {
+	    for (argc = 0 ; argv[argc] != nullptr ; argc += 1) ;
 	    argz = argv[0] ;
 	}
 
-	if ((rs >= 0) && (argz == NULL)) rs = SR_NOENT ;
+	if ((rs >= 0) && (argz == nullptr)) rs = SR_NOENT ;
 	if ((rs >= 0) && (argz[0] == '\0')) rs = SR_NOENT ;
 
 /* parse out everything */
@@ -298,15 +277,15 @@ int		to ;
 	int		argc = 0 ;
 	int		opts = 0 ;
 	int		fd = -1 ;
-	cchar	*argz = NULL ;
+	cchar	*argz = nullptr ;
 
 #if	CF_DEBUGS
 	{
 	    int	i ;
 	    debugprintf("opendialer_ussmux: prn=%s\n",prn) ;
 	    debugprintf("opendialer_ussmux: fname=%s\n",fname) ;
-	    if (argv != NULL) {
-	        for (i = 0 ; argv[i] != NULL ; i += 1) {
+	    if (argv != nullptr) {
+	        for (i = 0 ; argv[i] != nullptr ; i += 1) {
 	            debugprintf("opendialer_ussmux: a[%u]=%s\n",i,argv[i]) ;
 	        }
 	    }
@@ -315,12 +294,12 @@ int		to ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-	if (argv != NULL) {
-	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
+	if (argv != nullptr) {
+	    for (argc = 0 ; argv[argc] != nullptr ; argc += 1) ;
 	    argz = argv[0] ;
 	}
 
-	if ((rs >= 0) && (argz == NULL)) rs = SR_NOENT ;
+	if ((rs >= 0) && (argz == nullptr)) rs = SR_NOENT ;
 	if ((rs >= 0) && (argz[0] == '\0')) rs = SR_NOENT ;
 
 /* parse out everything */
@@ -372,7 +351,7 @@ static int argparse_start(struct argparse *app,cchar *argz)
 	if (argz[0] == '\0') goto ret0 ;
 
 	app->svc = argz ;
-	if ((tp = strbrk(argz,",")) != NULL) {
+	if ((tp = strbrk(argz,",")) != nullptr) {
 	    cchar	*sp = argz ;
 	    cchar	*nsp ;
 	    cchar	*svcp = argz ;
@@ -384,7 +363,7 @@ static int argparse_start(struct argparse *app,cchar *argz)
 	    while (ch) {
 	        optp = sp ;
 	        optl = -1 ;
-	        if ((tp = strchr(sp,',')) != NULL) {
+	        if ((tp = strchr(sp,',')) != nullptr) {
 	            optl = (tp-sp) ;
 		    nsp = (tp+1) ;
 	        } else {
@@ -397,16 +376,16 @@ static int argparse_start(struct argparse *app,cchar *argz)
 #endif
 		kp = optp ;
 		kl = optl ;
-		vp = NULL ;
+		vp = nullptr ;
 		vl = 0 ;
-		if ((tp = strnchr(optp,optl,'=')) != NULL) {
+		if ((tp = strnchr(optp,optl,'=')) != nullptr) {
 		    kl = (tp-optp) ;
 		    vp = (tp+1) ;
 		    vl = ((optp+optl)-(tp+1)) ;
 		}
 #if	CF_DEBUGS
 	    debugprintf("opendialer_ticotsord/argparse_start: k=%r\n",kp,kl) ;
-		if (vp != NULL) 
+		if (vp != nullptr) 
 	    debugprintf("opendialer_ticotsord/argparse_start: v=%r\n",vp,vl) ;
 #endif
 	        if ((oi = matstr(ops,kp,kl)) >= 0) {
@@ -428,16 +407,16 @@ static int argparse_start(struct argparse *app,cchar *argz)
 	    	ch = MKCHAR(sp[0]) ;
 		if (rs < 0) break ;
 	    } /* end while */
-	    if ((rs >= 0) && (svcp != NULL)) {
+	    if ((rs >= 0) && (svcp != nullptr)) {
 	        int	size = 0 ;
 	        char	*bp ;
-	        if (svcp != NULL) {
+	        if (svcp != nullptr) {
 	            if (svcl < 0) svcl = lenstr(svcp) ;
 	            size += (svcl + 1) ;
 	        }
 	        if ((rs = uc_malloc(size,&bp)) >= 0) {
 	            app->a = bp ;
-	            if (svcp != NULL) {
+	            if (svcp != nullptr) {
 	                app->svc = bp ;
 	                bp = strwcpy(bp,svcp,svcl) + 1 ;
 	            }
@@ -456,10 +435,10 @@ static int argparse_finish(struct argparse *app)
 	int	rs = SR_OK ;
 	int	rs1 ;
 
-	if (app->a != NULL) {
+	if (app->a != nullptr) {
 	    rs1 = uc_free(app->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    app->a = NULL ;
+	    app->a = nullptr ;
 	}
 
 	return rs ;

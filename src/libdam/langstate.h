@@ -44,11 +44,6 @@ enum langstatetypes {
 	langstatetype_overlast
 } ;
 
-struct langstate_lineinfo {
-	int		line ;
-	int		type ;
-} ;
-
 struct langstate_flags {
 	uint		comment:1 ;
 	uint		quote:1 ;
@@ -57,8 +52,13 @@ struct langstate_flags {
 	uint		clear:1 ;
 } ;
 
+struct langstate_lineinfo {
+	int		line ;
+	int		type ;
+} ;
+
 struct langstate_head {
-	LANGSTATE_FL	f ;
+	LANGSTATE_FL	fl ;
 	uint		magic ;
 	int		line ;
 	int		pch ;		/* previous character */

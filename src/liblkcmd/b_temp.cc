@@ -1,4 +1,5 @@
 /* b_temp SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is a SHELL built-in version of 'temp(1)' */

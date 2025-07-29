@@ -52,20 +52,19 @@
 
 	Returns:
 	>=0		file-descriptor
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<ids.h>
@@ -84,6 +83,7 @@
 #include	"opendialer_finger.h"
 #include	"defs.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -104,24 +104,8 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	optvalue(cchar *,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	getaf(cchar *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	dialtcp(cchar *,cchar *,int,int,int) ;
-extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
-extern int	dialfinger(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
+/* external variables */
 
 
 /* local structures */
@@ -139,13 +123,6 @@ struct argparse {
 
 /* local variables */
 
-static cchar	*ops[] = {
-	"to",
-	"af",
-	"long",
-	NULL
-} ;
-
 enum ops {
 	op_to,
 	op_af,
@@ -153,15 +130,24 @@ enum ops {
 	op_overlast
 } ;
 
+constexpr cpcchar	ops[] = {
+	"to",
+	"af",
+	"long",
+	NULL
+} ;
+
 
 /* forward references */
 
-static int argparse_start(struct argparse *,cchar *) ;
-static int argparse_finish(struct argparse *) ;
+static int argparse_start(struct argparse *,cchar *) noex ;
+static int argparse_finish(struct argparse *) noex ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int opendialer_finger(pr,prn,svc,of,om,argv,envv,to)
 cchar	*pr ;

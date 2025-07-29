@@ -31,7 +31,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strchr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<vecstr.h>
@@ -46,6 +46,7 @@
 
 #include	"sysvar.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -247,7 +248,7 @@ constexpr cpcchar	pstrs[] = {
 int sysvar_open(SV *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	if ((rs = sysvar_ctor(op,pr)) >= 0) {
-	    int		rs = SR_INVALID ;
+	    rs = SR_INVALID ;
 	    if (pr[0]) {
 	        cchar	*objn = SYSVAR_OBJNAME ;
 	        if ((rs = sysvar_objloadbegin(op,pr,objn)) >= 0) {
@@ -434,10 +435,10 @@ static int sysvar_objloadbegin(SV *op,cchar *pr,cchar *objn) noex {
 	            cchar	*mn = SYSVAR_MODBNAME ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
-	            mo |= MODLOAD_OLIBVAR ;
-	            mo |= MODLOAD_OPRS ;
-	            mo |= MODLOAD_OSDIRS ;
-	            mo |= MODLOAD_OAVAIL ;
+	            mo |= modloadm.libvar ;
+	            mo |= modloadm.libprs ;
+	            mo |= modloadm.libsdirs ;
+	            mo |= modloadm.avail ;
 	            if ((rs = modload_open(lp,pr,mn,on,mo,sv)) >= 0) {
 		        op->fl.modload = true ;
 	                if (int mv[2] ; (rs = modload_getmva(lp,mv,1)) >= 0) {
@@ -616,13 +617,16 @@ static int sysvar_procsysdef(SV *op,cchar *fname) noex {
 		cchar	*cp{} ;
 	        for (int i = 0 ; (rs2 = lvars.get(i,&cp)) >= 0 ; i += 1) {
 	            if (cp) {
-	                if (cchar *tp{} ; (tp = strchr(cp,'=')) != np) {
-	                    bool	f = (matstr(wstrs,cp,(tp - cp)) >= 0) ;
-	                    f = f || (matpstr(pstrs,10,cp,(tp - cp)) >= 0) ;
-	                    if (f) {
-	                        rs = vecstr_adduniq(op->dlp,cp,-1) ;
-	                     } /* end if */
-		         }
+	                if (cchar *tp ; (tp = strchr(cp,'=')) != np) {
+			    cint tl = intconv(tp - cp) ;
+			    {
+	                        bool	f = (matstr(wstrs,cp,tl) >= 0) ;
+	                        f = f || (matpstr(pstrs,10,cp,tl) >= 0) ;
+	                        if (f) {
+	                            rs = vecstr_adduniq(op->dlp,cp,-1) ;
+	                        } /* end if */
+			    } /* end block */
+		         } /* end if (strchr) */
 		    } /* end if (non-null) */
 		    if (rs < 0) break ;
 	        } /* end for */
@@ -718,9 +722,9 @@ static int sysvar_defenum(SV *op,SV_DC *dcp,char *kbuf,int klen,
 	if (rs >= 0) {
 	    int		kl = -1 ;
 	    cchar	*valp = nullptr ;
-	    if (cchar *tp{} ; (tp = strchr(cp,'=')) != nullptr) {
+	    if (cchar *tp ; (tp = strchr(cp,'=')) != nullptr) {
 		valp = (tp + 1) ;
-		kl = (tp - cp) ;
+		kl = intconv(tp - cp) ;
 	    }
 	    if (kbuf) {
 		rs = snwcpy(kbuf,klen,cp,kl) ;

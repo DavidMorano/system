@@ -23,15 +23,11 @@
 	This is an open-dialer.
 
 	The file-name corresponding to this dialer looks like:
-
 		tcp¥<af>:<host>:<port>[,to=<to>][­<arg(s)>]
-
 	or
-
 		tcp¥<host>:<port>[,to=<to>][,af=<af>][­<arg(s)>]
 
 	Example:
-
 		tcp¥inet6:rca:daytime
 
 	Synopsis:
@@ -78,6 +74,7 @@
 #include	"opendialer_tcp.h"
 #include	"defs.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -86,15 +83,8 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	findxfile(IDS *,char *,cchar *) ;
-extern int	getaf(cchar *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	dialtcp(cchar *,cchar *,int,int,int) ;
-extern int	uc_openprog(cchar *,int,cchar **,cchar **) ;
+
+/* external variables */
 
 
 /* local structures */
@@ -110,16 +100,16 @@ struct argparse {
 
 /* local variables */
 
-static cchar	*ops[] = {
-	"to",
-	"af",
-	nullptr
-} ;
-
 enum ops {
 	op_to,
 	op_af,
 	op_overlast
+} ;
+
+constexpr cpcchar	ops[] = {
+	"to",
+	"af",
+	nullptr
 } ;
 
 
@@ -129,8 +119,10 @@ static int argparse_start(struct argparse *,cchar *) ;
 static int argparse_finish(struct argparse *) ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int opendialer_tcp(pr,prn,svc,of,om,argv,envv,to)
 cchar	*pr ;

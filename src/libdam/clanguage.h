@@ -212,6 +212,10 @@
 #endif /* __cplusplus */
 #endif /* EXTERNC_begin */
 
+#ifndef	CAST_R
+#define	CAST_R		cast_reinterpret
+#endif
+
 
 #endif /* CLANGUAGE_INCLUDE */
 

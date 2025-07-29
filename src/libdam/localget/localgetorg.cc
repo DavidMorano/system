@@ -6,7 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_USERORG	0		/* try to access "user" org also */
-#define	CF_UCPWCACHE	1		/* use |ucpwcache(3uc)| */
 
 /* revision history:
 
@@ -46,41 +45,35 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<usystem.h>
 #include	<ucpwcache.h>
-#include	<varnames.hh>
-#include	<syswords.hh>
-#include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<getusername.h>
 #include	<getuserhome.h>
 #include	<getax.h>
+#include	<getpwx.h>
 #include	<gecos.h>
+#include	<getbufsize.h>
+#include	<mallocxx.h>
+#include	<varnames.hh>
+#include	<syswords.hh>
 #include	<filereadln.h>
 #include	<sfx.h>
 #include	<sncpyx.h>
 #include	<sncpyxw.h>
 #include	<mkpathx.h>
-#include	<char.h>
 #include	<strlibval.hh>
+#include	<char.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"localget.h"
 
+import libutil ;
 
 /* local defines */
 
-#if	CF_UCPWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
-
-#define	SUBINFO		struct subinfo
-
-#define	SI		SUBINFO
+#define	SI		subinfo
 
 #ifndef	LOCALUSERNAME
 #define	LOCALUSERNAME	"local"
@@ -151,7 +144,7 @@ int localgetorg(cchar *pr,char *rbuf,int rlen,cchar *username) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (username[0]) {
-	        SUBINFO		si, *sip = &si ;
+	        SI		si, *sip = &si ;
 	        cchar		*ofn = ORGCNAME ;
 	        if ((rs = subinfo_start(&si,pr,ofn,username,rbuf,rlen)) >= 0) {
 	            for (int i = 0 ; i < 7 ; i += 1) {
@@ -358,10 +351,9 @@ static int subinfo_passwder(SI *sip,cchar *un) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	sip->rbuf[0] = '\0' ;
-	if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
-	    ucentpw	pw ;
+	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
 	    cint	pwlen = rs ;
-	    if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
+	    if (ucentpwx pw ; (rs = pw.nam(pwbuf,pwlen,un)) >= 0) {
 		if (gecos g ; (rs = gecos_start(&g,pw.pw_gecos,-1)) >= 0) {
 		    cint	gi = gecosval_organization ;
 		    cchar	*vp{} ;

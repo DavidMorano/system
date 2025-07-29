@@ -39,7 +39,7 @@
 
 
 struct vars_flags {
-    	uint		modload::1 ;
+    	uint		modload:1 ;
 } ; /* end struct (vars_flags) */
 
 struct vars_information {

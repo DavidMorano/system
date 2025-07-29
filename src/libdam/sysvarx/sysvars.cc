@@ -70,6 +70,7 @@
 #include	"sysvars.h"
 #include	"var.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -735,8 +736,9 @@ static int sysvars_indmkdata(SVS *op,cchar *indname,mode_t om) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (op) {
-	    if (hdbstr vt ; (rs = hdbstr_start(&vt,DEFNVARS)) >= 0) {
+	if (op) ylikely {
+	    cint	hn = DEFNVARS ;
+	    if (hdbstr vt ; (rs = hdbstr_start(&vt,hn)) >= 0) ylikely {
 	        bool	f  = false ;
 	        for (int i = 0 ; sysfnames[i] != nullptr ; i += 1) {
 	            rs = sysvars_procget(&vt,sysfnames[i]) ;
@@ -748,7 +750,7 @@ static int sysvars_indmkdata(SVS *op,cchar *indname,mode_t om) noex {
 	            if (rs < 0) break ;
 	        } /* end for */
 	        if (rs >= 0) {
-	            rs = sysvars_procset(&vtindname,om) ;
+	            rs = sysvars_procset(&vt,indname,om) ;
 	        }
 	        rs1 = hdbstr_finish(&vt) ;
 	        if (rs >= 0) rs = rs1 ;

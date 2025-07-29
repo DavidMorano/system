@@ -1,6 +1,6 @@
 /* kshlib SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C89 */
+/* lang=C++20 (conformance reviewed) */
 
 /* library initialization for KSH built-in command libraries */
 /* version %I% last-modified %G% */
@@ -199,7 +199,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* must be ordered first to configure */
 
 #if	(defined(KSHBUILTIN) && (KSHBUILTIN > 0))
 #include	<shell.h>
@@ -222,12 +222,14 @@
 #include	<sighand.h>
 #include	<sockaddress.h>
 #include	<raqhand.h>
-#include	<char.h>
 #include	<utmpacc.h>
 #include	<tmtime.hh>
 #include	<strx.h>
+#include	<dirempty.h>
+#include	<char.h>
+#include	<ischarx.h>
 #include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| |TIMEBUFLEN| */
 
 #include	"sesmsg.h"
 #include	"msgdata.h"
@@ -235,10 +237,6 @@
 
 
 /* local defines */
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
 
 #if	(defined(KSHBUILTIN) && (KSHBUILTIN > 0))
 #define	KSHLIB_MEMALLOC		1
@@ -260,16 +258,12 @@
 
 #define	TO_LOCKENV	10
 
-#define	KSHLIB		struct kshlib
-#define	KSHLIB_FL	struct kshlib_flags
+#define	KSHLIB		kshlib
+#define	KSHLIB_FL	kshlib_flags
 #define	KSHLIB_SCOPE	PTHREAD_SCOPE_PROCESS
 
-#define	STORENOTE	struct storenote
-#define	STORENOTE_FL	struct storenote_flags
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
+#define	STORENOTE	storenote
+#define	STORENOTE_FL	storenote_flags
 
 
 /* external subroutines */
@@ -291,12 +285,6 @@ extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	listenusd(cchar *,mode_t,int) ;
 extern int	rmsesfiles(cchar *) ;
-extern int	isdirempty(cchar *) ;
-extern int	msleep(int) ;
-extern int	rmeol(cchar *,int) ;
-extern int	iseol(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
 
 #if	CF_LOCKMEMALLOC
 extern int	lockmemalloc_set(int) ;
@@ -326,25 +314,26 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* external variables */
 
-extern char	**environ ;
+extern mainv	environ ;
 
 
 /* local structures */
 
-typedef int (*subcmd_t)(int,cchar **,cchar **,void *) ;
-
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
-typedef cchar	cchar ;
-#endif
+extern "C" {
+    typedef int (*subcmd_t)(int,cchar **,cchar **,void *) noex ;
+}
 
 #ifndef	TYPEDEF_TWORKER
-#define	TYPEDEF_TWORKER	1
-typedef	int (*tworker)(void *) ;
+#define	TYPEDEF_TWORKER
+extern "C" {
+    typedef	int (*tworker)(void *) noex ;
+}
 #endif
 
-typedef	int (*cmdsub_t)(int,cchar **,cchar **,void *) ;
-typedef	int (*func_caller)(int,cchar **,void *) ;
+extern "C" {
+    typedef	int (*cmdsub_t)(int,cchar **,cchar **,void *) noex ;
+    typedef	int (*func_caller)(int,cchar **,void *) noex ;
+}
 
 struct kshlib_flags {
 	uint		notes:1 ;
@@ -353,9 +342,9 @@ struct kshlib_flags {
 } ;
 
 struct kshlib {
-	PTM		m ;		/* mutex data */
-	PTM		menv ;		/* mutex environment */
-	PTC		c ;		/* condition variable */
+	ptm		mx ;		/* mutex data */
+	ptm		menv ;		/* mutex environment */
+	ptc		cxv ;		/* condition variable */
 	SIGHAND		sm ;
 	SOCKADDRESS	servaddr ;	/* server address */
 	RAQHAND		mq ;		/* message queue */
@@ -1258,8 +1247,8 @@ static int kshlib_init(void)
 #endif
 	if (! uip->f_init) {
 	    uip->f_init = TRUE ;
-	    if ((rs = ptm_create(&uip->m,NULL)) >= 0) {
-	        if ((rs = ptc_create(&uip->c,NULL)) >= 0) {
+	    if ((rs = ptm_create(&uip->mx,NULL)) >= 0) {
+	        if ((rs = ptc_create(&uip->cxv,NULL)) >= 0) {
 	            void	(*b)() = kshlib_atforkbefore ;
 	            void	(*ap)() = kshlib_atforkparent ;
 	            void	(*ac)() = kshlib_atforkchild ;
@@ -1277,7 +1266,7 @@ static int kshlib_init(void)
 	                    uc_atforkexpunge(b,ap,ac) ;
 	            } /* end if (uc_atfork) */
 	            if (rs < 0)
-	                ptc_destroy(&uip->c) ;
+	                ptc_destroy(&uip->cxv) ;
 	        } /* end if (ptc_create) */
 	    } /* end if (ptm_create) */
 	    if (rs < 0)
@@ -1315,8 +1304,8 @@ static void kshlib_fini(void)
 	        void	(*ac)() = kshlib_atforkchild ;
 	        uc_atforkexpunge(b,ap,ac) ;
 	    }
-	    ptc_destroy(&uip->c) ;
-	    ptm_destroy(&uip->m) ;
+	    ptc_destroy(&uip->cxv) ;
+	    ptm_destroy(&uip->mx) ;
 	    memset(uip,0,sizeof(struct kshlib)) ;
 	} /* end if (atexit registered) */
 #if	CF_DEBUGN
@@ -1828,9 +1817,9 @@ static int kshlib_workdef(KSHLIB *uip,MSGDATA *mip)
 {
 	int		rs ;
 	if (mip == NULL) return SR_FAULT ;
-	if ((rs = ptm_lock(&uip->m)) >= 0) {
+	if ((rs = ptm_lock(&uip->mx)) >= 0) {
 	    uip->cdefs += 1 ;
-	    ptm_unlock(&uip->m) ;
+	    ptm_unlock(&uip->mx) ;
 	} /* end if (mutex) */
 	return rs ;
 }
@@ -1886,15 +1875,13 @@ static int kshlib_sesdname(KSHLIB *uip)
 }
 /* end subroutine (kshlib_sesdname) */
 
-
-static int kshlib_reqfname(KSHLIB *uip)
-{
+static int kshlib_reqfname(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	int		pl = 0 ;
 	if (uip->reqfname == NULL) {
 	    if ((rs = kshlib_sesdname(uip)) >= 0) {
 	        const uint	uv = (uint) uip->pid ;
-	        const int	dlen = DIGBUFLEN ;
+	        cint		dlen = DIGBUFLEN ;
 	        char		dbuf[DIGBUFLEN+1] = { 'p' } ;
 	        if ((rs = ctdecui((dbuf+1),(dlen-1),uv)) >= 0) {
 		    cchar	*sesdname = uip->sesdname ;
@@ -1911,10 +1898,6 @@ static int kshlib_reqfname(KSHLIB *uip)
 	} else {
 	    pl = strlen(uip->sesdname) ;
 	}
-
-#if	CF_DEBUGN
-	nprintf(NDF,"kshlib_reqfname: ret rs=%d\n",rs) ;
-#endif
 	return (rs >= 0) ? pl : rs ;
 }
 /* end subroutine (kshlib_reqfname) */
@@ -2163,7 +2146,7 @@ static int kshlib_cmdsend(KSHLIB *uip,int cmd)
 static void kshlib_atforkbefore()
 {
 	KSHLIB		*uip = &kshlib_data ;
-	ptm_lock(&uip->m) ;
+	ptm_lock(&uip->mx) ;
 }
 /* end subroutine (kshlib_atforkbefore) */
 
@@ -2171,7 +2154,7 @@ static void kshlib_atforkbefore()
 static void kshlib_atforkparent()
 {
 	KSHLIB		*uip = &kshlib_data ;
-	ptm_unlock(&uip->m) ;
+	ptm_unlock(&uip->mx) ;
 }
 /* end subroutine (kshlib_atforkafter) */
 
@@ -2182,7 +2165,7 @@ static void kshlib_atforkchild()
 	uip->f_running = FALSE ;
 	uip->f_exiting = FALSE ;
 	uip->pid = getpid() ;
-	ptm_unlock(&uip->m) ;
+	ptm_unlock(&uip->mx) ;
 }
 /* end subroutine (kshlib_atforkchild) */
 
@@ -2222,16 +2205,16 @@ static int kshlib_capbegin(KSHLIB *uip,int to)
 #if	CF_DEBUGN && 0
 	nprintf(NDF,"kshlib_capbegin: ent to=%d\n",to) ;
 #endif
-	if ((rs = ptm_lockto(&uip->m,to)) >= 0) {
+	if ((rs = ptm_lockto(&uip->mx,to)) >= 0) {
 	    uip->waiters += 1 ;
 	    while ((rs >= 0) && uip->f_capture) { /* busy */
-	        rs = ptc_waiter(&uip->c,&uip->m,to) ;
+	        rs = ptc_waiter(&uip->cxv,&uip->mx,to) ;
 	    } /* end while */
 	    if (rs >= 0) {
 	        uip->f_capture = TRUE ;
 	    }
 	    uip->waiters -= 1 ;
-	    rs1 = ptm_unlock(&uip->m) ;
+	    rs1 = ptm_unlock(&uip->mx) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 #if	CF_DEBUGN && 0
@@ -2249,12 +2232,12 @@ static int kshlib_capend(KSHLIB *uip)
 #if	CF_DEBUGN && 0
 	nprintf(NDF,"kshlib_capend: ent\n") ;
 #endif
-	if ((rs = ptm_lock(&uip->m)) >= 0) {
+	if ((rs = ptm_lock(&uip->mx)) >= 0) {
 	    uip->f_capture = FALSE ;
 	    if (uip->waiters > 0) {
-	        rs = ptc_signal(&uip->c) ;
+	        rs = ptc_signal(&uip->cxv) ;
 	    }
-	    rs1 = ptm_unlock(&uip->m) ;
+	    rs1 = ptm_unlock(&uip->mx) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 #if	CF_DEBUGN && 0
@@ -2442,14 +2425,12 @@ static int kshlib_mq(KSHLIB *uip)
 /* end subroutine (kshlib_mq) */
 #endif /* CF_MQ */
 
-
-static int kshlib_sesend(KSHLIB *uip)
-{
+static int kshlib_sesend(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->sesdname != NULL) {
 	    if ((rs = kshlib_sid(uip)) >= 0) {
 		if (uip->sid == uip->pid) {
-		    if ((rs = isdirempty(uip->sesdname)) > 0) {
+		    if ((rs = dirempty(uip->sesdname)) > 0) {
 			rs = u_rmdir(uip->sesdname) ;
 		    }
 		}

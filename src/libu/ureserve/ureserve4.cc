@@ -33,7 +33,7 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
+#include	<climits>		/* |UCHAR_MAX| + |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<stdexcept>		/* |std::out_of_range(3c++)| */
@@ -92,10 +92,10 @@ typedef string_view		strview ;
 
 int vecstr::add(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
-	if (sp) {
+	if (sp) ylikely {
     	    rs = SR_NOTOPEN ;
-	    if (fl.open) {
-		cint	msl = xstrnlen(sp,sl) ;
+	    if (fl.open) ylikely {
+		cint	msl = lenstr(sp,sl) ;
 	        try {
 	            string	s(sp,msl) ;
 		    push_back(s) ;
@@ -125,9 +125,9 @@ int vecstr::adduniq(cchar *sp,int sl) noex {
 int vecstr::find(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
 	int		c = -1 ; /* return-value */
-	if (sp) {
+	if (sp) ylikely {
     	    rs = SR_NOTOPEN ;
-	    if (fl.open) {
+	    if (fl.open) ylikely {
 		if (sl < 0) sl = lenstr(sp) ;
 		rs = ifind(sp,sl) ;
 	    } /* end if (open) */
@@ -139,9 +139,9 @@ int vecstr::search(cchar *sp,int sl) noex {
     	cint		rsn = SR_NOTFOUND ;
     	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (sp) {
+	if (sp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (fl.open) {
+	    if (fl.open) ylikely {
 		if (sl < 0) sl = lenstr(sp) ;
 		if (fl.sorted) {
     		    strview	s(sp,sl) ;
@@ -160,12 +160,12 @@ int vecstr::search(cchar *sp,int sl) noex {
 
 int vecstr::get(int ai,ccharpp rpp) noex {
     	int		rs = SR_NOTOPEN ;
-	if (fl.open) {
+	if (fl.open) ylikely {
 	    csize cnt = size() ;
-	    if (ai >= 0) {
+	    if (ai >= 0) ylikely {
 		cint	n = intconv(cnt) ;
 		rs = SR_NOTFOUND ;
-		if (ai < n) {
+		if (ai < n) ylikely {
 		    try {
 		        string &s = at(ai) ;
 	    	        rs = SR_OK ;
@@ -183,13 +183,13 @@ int vecstr::get(int ai,ccharpp rpp) noex {
 
 int vecstr::del(int ai) noex {
     	int		rs = SR_NOTOPEN ;
-	if (fl.open) {
+	if (fl.open) ylikely {
 	    csize cnt = size() ;
 	    rs = SR_INVALID ;
-	    if (ai >= 0) {
+	    if (ai >= 0) ylikely {
 		cint	n = intconv(cnt) ;
 		rs = SR_NOTFOUND ;
-		if (ai < n) {
+		if (ai < n) ylikely {
 		    iterator it = begin() ;
 		    erase(it + ai) ;
 		    rs = SR_OK ;
@@ -201,9 +201,9 @@ int vecstr::del(int ai) noex {
 
 int vecstr::curbegin(vecstr_cur *curp) noex {
     	int		rs = SR_FAULT ;
-	if (curp) {
+	if (curp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (fl.open) {
+	    if (fl.open) ylikely {
 	        curp->it = begin() ;
 	        rs = SR_OK ;
 	    } /* end if (valid) */
@@ -213,9 +213,9 @@ int vecstr::curbegin(vecstr_cur *curp) noex {
 
 int vecstr::curend(vecstr_cur *curp) noex {
     	int		rs = SR_FAULT ;
-	if (curp) {
+	if (curp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (fl.open) {
+	    if (fl.open) ylikely {
 	        curp->it = end() ;
 	        rs = SR_OK ;
 	    } /* end if (valid) */
@@ -225,12 +225,12 @@ int vecstr::curend(vecstr_cur *curp) noex {
 
 int vecstr::curenum(vecstr_cur *curp,ccharpp rpp) noex {
     	int		rs = SR_FAULT ;
-	if (curp && rpp) {
+	if (curp && rpp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (fl.open) {
+	    if (fl.open) ylikely {
 	        iterator ite = end() ;
 	        rs = SR_NOTFOUND ;
-	        if (curp->it != ite) {
+	        if (curp->it != ite) ylikely {
 		    string	&s = *curp->it ;
 		    *rpp = s.c_str() ;
 		    curp->it++ ;
@@ -243,7 +243,7 @@ int vecstr::curenum(vecstr_cur *curp,ccharpp rpp) noex {
 
 int vecstr::istart(int ne) noex {
     	int		rs = SR_OK ;
-	if (ne > 0) {
+	if (ne > 0) ylikely {
 	    try {
 	        reserve(ne) ;
 		rs = SR_OK ;
@@ -257,7 +257,7 @@ int vecstr::istart(int ne) noex {
 
 int vecstr::ifinish() noex {
     	int		rs = SR_NOTOPEN ;
-	if (fl.open) {
+	if (fl.open) ylikely {
 	    rs = SR_OK ;
 	    fl.open = false ;
 	}
@@ -266,7 +266,7 @@ int vecstr::ifinish() noex {
 
 int vecstr::isort() noex {
     	int		rs = SR_NOTOPEN ;
-	if (fl.open) {
+	if (fl.open) ylikely {
 	    std::ranges::sort(*this) ;
 	    fl.sorted = true ;
 	    rs = SR_OK ;
@@ -294,7 +294,7 @@ int vecstr::ifind(cchar *sp,int sl) noex {
 
 int vecstr::idelall() noex {
     	int		rs = SR_NOTOPEN ;
-	if (fl.open) {
+	if (fl.open) ylikely {
 	    resize(0) ;
 	    rs = SR_OK ;
 	}
@@ -303,7 +303,7 @@ int vecstr::idelall() noex {
 
 int vecstr::icount() const noex {
     	int		rs = SR_NOTOPEN ;
-	if (fl.open) {
+	if (fl.open) ylikely {
 	    csize cnt = size() ;
 	    rs = intconv(cnt) ;
 	}
@@ -314,20 +314,20 @@ void vecstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecstr",rs,"fini-finish") ;
 	}
-}
+} /* end method (vecstr::dtor) */
 
 vecstr::operator int () noex {
     	int		rs = SR_NOTOPEN ;
-	if (fl.open) {
+	if (fl.open) ylikely {
 	    csize	c = size() ;
 	    rs = intconv(c) ;
 	}
 	return rs ;
-}
+} /* end method (vecstr::operator) */
 
 int vecstr_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case vecstrmem_start:
 	        rs = op->istart(a) ;
@@ -347,7 +347,6 @@ int vecstr_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (vecstr_co::operator) */
+} /* end method (vecstr_co::operator) */
 
 

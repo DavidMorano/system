@@ -72,6 +72,7 @@
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>
 
 #include	"um.h"
@@ -143,8 +144,10 @@ namespace {
 	int advise(void *,size_t) noex ;
 	int sync(void *,size_t) noex ;
 	int lockp(void *,size_t) noex ;
+    private:
+	int callstd(void *,size_t) noex ;
     } ; /* end struct (um) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -360,61 +363,70 @@ int u_munmap(void *ma,size_t ms) noex {
 
 /* local subroutines */
 
-int um::operator () (void *ma,size_t ms) noex {
-	int		to_nosr = utimeout[uto_nosr] ;
-	int		to_nospc = utimeout[uto_nospc] ;
-	int		to_nomem = utimeout[uto_nomem] ;
-	int		to_nolck = utimeout[uto_nolck] ;
-	int		to_again = utimeout[uto_again] ;
-	int		rs ;
-	bool		f_exit = false ;
-	repeat {
-	    errno = 0 ;
-	    if ((rs = (this->*m)(ma,ms)) < 0) {
-	        switch (rs) {
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-	            break ;
-	        case SR_NOSPC:
-	            if (to_nospc-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-	            break ;
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-	            break ;
-	        case SR_NOLCK:
-	            if (to_nolck-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-	            break ;
-	        case SR_AGAIN:
-	            if (to_again-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-	            break ;
-	        case SR_INTR:
-		    break ;
-	        } /* end switch */
-	    } /* end if (some kind of error) */
-	} until ((rs >= 0) || f_exit) ;
-	return rs ;
+int um::callstd(void *ma,size_t ms) noex {
+    	return (this->*m)(ma,ms) ;
 }
-/* end subroutine (um::operator) */
+
+int um::operator () (void *ma,size_t ms) noex {
+        errtimer        to_again        = utimeout[uto_again] ;
+        errtimer        to_busy         = utimeout[uto_busy] ;
+        errtimer        to_nomem        = utimeout[uto_nomem] ;
+        errtimer        to_nosr         = utimeout[uto_nosr] ;
+        errtimer        to_nobufs       = utimeout[uto_nobufs] ;
+        errtimer        to_mfile        = utimeout[uto_mfile] ;
+        errtimer        to_nfile        = utimeout[uto_nfile] ;
+        errtimer        to_nolck        = utimeout[uto_nolck] ;
+        errtimer        to_nospc        = utimeout[uto_nospc] ;
+        errtimer        to_dquot        = utimeout[uto_dquot] ;
+        errtimer        to_io           = utimeout[uto_io] ;
+        reterr          r ;
+	int		rs ;
+        repeat {
+            if ((rs = callstd(ma,ms)) < 0) {
+                r(rs) ;                 /* <- default causes exit */
+                switch (rs) {
+                case SR_AGAIN:
+                    r = to_again(rs) ;
+                    break ;
+                case SR_BUSY:
+                    r = to_busy(rs) ;
+                    break ;
+                case SR_NOMEM:
+                    r = to_nomem(rs) ;
+                    break ;
+                case SR_NOSR:
+                    r = to_nosr(rs) ;
+                    break ;
+                case SR_NOBUFS:
+                    r = to_nobufs(rs) ;
+                    break ;
+                case SR_MFILE:
+                    r = to_mfile(rs) ;
+                    break ;
+                case SR_NFILE:
+                    r = to_nfile(rs) ;
+                    break ;
+                case SR_NOLCK:
+                    r = to_nolck(rs) ;
+                    break ;
+                case SR_NOSPC:
+                    r = to_nospc(rs) ;
+                    break ;
+                case SR_DQUOT:
+                    r = to_dquot(rs) ;
+                    break ;
+                case SR_IO:
+                    r = to_io(rs) ;
+                    break ;
+                case SR_INTR:
+                    r(false) ;
+                    break ;
+                } /* end switch */
+                rs = r ;
+            } /* end if (error) */
+        } until ((rs >= 0) || r.fexit) ;
+	return rs ;
+} /* end method (um::operator) */
 
 int um::mapbegin(void *ma,size_t ms) noex {
 	void		**rpp = (void **) vp ;
@@ -429,7 +441,7 @@ int um::mapbegin(void *ma,size_t ms) noex {
 		}
 	    }
 	    *rpp = (rs >= 0) ? ra : nullptr ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (um::mapbegin) */
@@ -443,7 +455,7 @@ int um::mapend(void *ma,size_t ms) noex {
 		    rs = (- errno) ;
 	        }
 	    } /* end if (valid) */
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (um::mapend) */
@@ -457,7 +469,7 @@ int um::lockbegin(void *ma,size_t ms) noex {
 		    rs = (- errno) ;
 	        }
 	    } /* end if (valid) */
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (um::lockbegin) */
@@ -471,7 +483,7 @@ int um::lockend(void *ma,size_t ms) noex {
 		    rs = (- errno) ;
 	        }
 	    } /* end if (valid) */
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (um::lockend) */
@@ -503,7 +515,7 @@ int um::cntl(void *ma,size_t ms) noex {
 		    rs = (- errno) ;
 	        }
 	    } /* end if (valid) */
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (um::cntl) */
@@ -517,7 +529,7 @@ int um::incore(void *ma,size_t ms) noex {
 		    rs = (- errno) ;
 	        }
 	    } /* end if (valid) */
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (um::incore) */
@@ -531,7 +543,7 @@ int um::protect(void *ma,size_t ms) noex {
 		    rs = (- errno) ;
 	        }
 	    } /* end if (valid) */
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (um::protect) */
@@ -545,7 +557,7 @@ int um::advise(void *ma,size_t ms) noex {
 		    rs = (- errno) ;
 	        }
 	    } /* end if (valid) */
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (um::advise) */
@@ -559,7 +571,7 @@ int um::sync(void *ma,size_t ms) noex {
 		    rs = (- errno) ;
 	        }
 	    } /* end if (valid) */
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (um::sync) */

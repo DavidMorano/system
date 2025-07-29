@@ -1,3 +1,7 @@
+/* statvfs_darwin HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
 /*
  * Copyright (c) 2000 Apple Computer, Inc. All rights reserved.
  *

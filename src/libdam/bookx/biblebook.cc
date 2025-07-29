@@ -1,4 +1,5 @@
 /* biblebook SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* BIBLEBOOK object-load management */

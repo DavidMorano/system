@@ -243,7 +243,7 @@ int sysnamedb_getnodes(sysnamedb *op,vecstr *clp,vecstr *nlp) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = sysnamedb_magic(op,clp,nlp)) >= 0) {
-	    if (char *cbuf{} ; (rs = malloc_nn(&cbuf)) >= 0) {
+	    if (char *cbuf ; (rs = malloc_nn(&cbuf)) >= 0) {
 		clusterdb	*cop = op->clp ;
 		cint		clen = rs ;
 		int		cl ;
@@ -282,9 +282,9 @@ int sysnamedb_getnodes(sysnamedb *op,vecstr *clp,vecstr *nlp) noex {
 
 static int sysnamedb_nodebegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	int		rs ;
-	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath(tbuf,pr,NODEFNAME)) >= 0) {
-	        if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
+	        if (ustat sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 	            if ((rs = permid(idp,&sb,R_OK)) >= 0) {
 	                nodedb	*ndp = op->nlp ;
 	                if ((rs = nodedb_open(ndp,tbuf)) >= 0) {
@@ -318,9 +318,9 @@ static int sysnamedb_nodeend(sysnamedb *op) noex {
 
 static int sysnamedb_clusterbegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	int		rs ;
-	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath(tbuf,pr,CLUSTERFNAME)) >= 0) {
-	        if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
+	        if (ustat sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 	            if ((rs = permid(idp,&sb,R_OK)) >= 0) {
 	                clusterdb	*ndp = op->clp ;
 	                if ((rs = clusterdb_open(ndp,tbuf)) >= 0) {
@@ -359,7 +359,7 @@ static int sysnamedb_trynodes(sysnamedb *op,vecstr *slp,cc *nn) noex {
 	int		c = 0 ;
 	if (op->fl.node) {
 	    cint	elen = var.elen ;
-	    if (char *ebuf{} ; (rs = uc_malloc((elen + 1),&ebuf)) >= 0) {
+	    if (char *ebuf ; (rs = uc_malloc((elen + 1),&ebuf)) >= 0) {
 	        nodedb		*nop = op->nlp ;
 	        nodedb_cur	cur ;
 	        if ((rs = nodedb_curbegin(nop,&cur)) >= 0) {
@@ -393,7 +393,7 @@ static int sysnamedb_tryclusters(sysnamedb *op,vecstr *slp,cc *nn) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (op->fl.clu) {
-	    if (char *cbuf{} ; (rs = malloc_nn(&cbuf)) >= 0) {
+	    if (char *cbuf ; (rs = malloc_nn(&cbuf)) >= 0) {
 	        clusterdb	*cop = op->clp ;
 	    	cint		clen = rs ;
 	        clusterdb_cur	cur ; 

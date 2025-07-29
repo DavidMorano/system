@@ -48,6 +48,7 @@
 #include	<cmbuf.h>
 #include	<cmdmap.h>
 #include	<codebal.h>
+#include	<compactstr.h>
 #include	<conallof.h>
 #include	<configfile.h>
 #include	<connection.h>

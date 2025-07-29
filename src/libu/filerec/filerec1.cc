@@ -130,7 +130,7 @@ int filerec::ifinish() noex {
 
 int filerec::checkin(custat *sbp,cchar *fn) noex {
 	int		rs = SR_FAULT ;
-	int		f = false ;
+	int		f = false ; /* 0=not_added, 1=added */
 	if (sbp && fn) ylikely {
 	    const dev_t		dev = sbp->st_dev ;
 	    const ino_t		ino = sbp->st_ino ;
@@ -147,7 +147,7 @@ int filerec::checkin(custat *sbp,cchar *fn) noex {
 		        try {
 	                    pair<setiter,bool>	ret = setp->insert(k) ;
 		            rs = SR_OK ;
-		            f = ret.second ;
+		            f = ret.second ; /* 0=not_added, 1=added */
 		        } catch (...) {
 		            rs = SR_NOMEM ;
 		        }

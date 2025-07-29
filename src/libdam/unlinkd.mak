@@ -31,11 +31,21 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS= 
+DEFS += 
 
-INCS= unlinkd.h
+INCS += unlinkd.h
 
-LIBS= -ldam
+MODS +=
+
+LIBS += -ldam
+
+
+OBJ00= unlinkd_main.o rmermsg.o
+OBJ01=
+
+OBJA= $(OBJ00) $(OBJ01)
+
+OBJ= $(OBJA)
 
 
 INCDIRS=
@@ -44,7 +54,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -53,29 +62,6 @@ CFLAGS		?= $(MAKECFLAGS)
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
-
-
-OBJ00= unlinkd_main.o 
-OBJ01= rmermsg.o
-OBJ02=
-OBJ03=
-OBJ04=
-OBJ05=
-OBJ06=
-OBJ07=
-OBJ08=
-OBJ09=
-OBJ10=
-OBJ11=
-OBJ12=
-OBJ13=
-OBJ14=
-OBJ15=
-
-OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
-OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
-
-OBJ= $(OBJA) $(OBJB)
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -129,6 +115,26 @@ clean:			again
 control:
 	uname -n > Control
 	date >> Control
+
+
+obj0.o:			$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
+
+
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
 unlinkd_main.o:		unlinkd_main.cc rmermsg.h	$(INCS)

@@ -37,6 +37,13 @@ INCS= logfile.h
 
 LIBS=
 
+OBJ0_LOGFILE= logfile_main.o logfile_printfold.o logfile_userinfo.o
+
+OBJA_LOGFILE= obj0_logfile.o
+
+OBJ_LOGFILE= $(OBJA_LOGFILE)
+
+
 
 INCDIRS=
 
@@ -44,7 +51,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -53,13 +59,6 @@ CFLAGS		?= $(MAKECFLAGS)
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
-
-
-OBJ0_LOGFILE= logfile_main.o logfile_printfold.o logfile_userinfo.o
-
-OBJA_LOGFILE= obj0_logfile.o
-
-OBJ_LOGFILE= $(OBJA_LOGFILE)
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -95,13 +94,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_LOGFILE)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LOGFILE)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)

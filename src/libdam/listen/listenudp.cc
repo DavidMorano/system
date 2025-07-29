@@ -58,6 +58,7 @@
 #include	<hostent.h>
 #include	<hostinfo.h>
 #include	<hostaddr.h>
+#include	<mnw.h>			/* |mnwcpy(3uc)| */
 #include	<localmisc.h>
 
 #include	"listenudp.h"
@@ -120,7 +121,6 @@ typedef unsigned int	in_addr_t ;
 /* external subroutines */
 
 extern "C" {
-    extern int	mnwcpy(char *,int,cvoid *,int) noex ;
     extern int	getprotofamily(int) noex ;
     extern int	getproto_name(cchar *,int) noex ;
 }

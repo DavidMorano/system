@@ -35,7 +35,20 @@ DEFS=
 
 INCS= sysvar.h sysvars.h
 
+MODS +=
+
 LIBS=
+
+
+OBJ0= sysvar.o
+OBJ1= sysvars.o sysvars_proc.o
+OBJ2= 
+OBJ3= 
+
+OBJA= obj0.o obj1.o
+OBJB= obj2.o obj3.o
+
+OBJ= obja.o
 
 
 INCDIRS=
@@ -44,7 +57,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -53,17 +65,6 @@ CFLAGS		?= $(MAKECFLAGS)
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
-
-
-OBJ0_STRLIST= sysvar.o
-OBJ1_STRLIST= sysvars.o sysvars_proc.o
-OBJ2_STRLIST= 
-OBJ3_STRLIST= 
-
-OBJA_STRLIST= obj0.o obj1.o
-OBJB_STRLIST= obj2.o obj3.o
-
-OBJ_STRLIST= obja.o
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -96,16 +97,11 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ_STRLIST)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_STRLIST)
+$(T).o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -117,24 +113,24 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0.o:			$(OBJ0_STRLIST)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_STRLIST)
+obj0.o:			$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
 
-obj1.o:			$(OBJ1_STRLIST)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_STRLIST)
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
 
-obj2.o:			$(OBJ2_STRLIST)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_STRLIST)
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
 
-obj3.o:			$(OBJ3_STRLIST)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_STRLIST)
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
 
 
-obja.o:			$(OBJA_STRLIST)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_STRLIST)
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
 
-objb.o:			$(OBJB_STRLIST)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_STRLIST)
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
 sysvar.o:		sysvar.cc	sysvar.h	$(INCS)

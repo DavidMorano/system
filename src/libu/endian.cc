@@ -17,6 +17,11 @@
 
 /*******************************************************************************
 
+  	Names:
+ 	endianval
+	endianstr
+
+	Description:
 	This module provides machine endian managemnt.  Basically,
 	this code just sets two global variables with an indication
 	of what the machine endianess is.  The two varaibles are
@@ -46,10 +51,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<bit>			/* |endian(3c++)| */
+#include	<bit>			/* |endian(3c++)| + |byteswap(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"endian.h"
 
@@ -60,6 +66,7 @@
 /* imported namespaces */
 
 using std::endian ;			/* enumeration */
+using std::byteswap ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -96,6 +103,17 @@ cchar	*endianstr ;
 
 
 /* exported subroutines */
+
+uint32_t htoni(uint32_t uv) noex {
+	if_constexpr (endian::native == endian::little) {
+	    uv = byteswap(uv) ;
+	} 
+    	return uv ;
+} /* end subroutine (htoni) */
+
+uint32_t ntohi(uint32_t uv) noex {
+    	return htoni(uv) ;
+} /* end subroutine (ntohi) */
 
 
 /* local subroutines */

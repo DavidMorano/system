@@ -38,8 +38,8 @@ INCS += umods.h
 MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm 
 MODS += bitop.ccm
 MODS += xxtostr.ccm digtab.ccm
-MODS += usysconf.ccm ulibvals.ccm
-MODS += usigset.o usigblock.o
+MODS += ulibvals.ccm
+MODS += usigset.ccm usigblock.ccm
 MODS += unixfnames.ccm constdiv.ccm builtin.ccm
 MODS += usysbasic.ccm
 
@@ -69,7 +69,7 @@ SOFL= -shared
 OBJ00_UMODS = valuelims.o digbufsizes.o 
 OBJ01_UMODS = uconstants.o
 OBJ02_UMODS = xxtostr.o digtab.o bitop.o
-OBJ03_UMODS = usysconf.o ulibvals.o 
+OBJ03_UMODS = ulibvals.o 
 OBJ04_UMODS = usigset.o usigblock.o 
 OBJ05_UMODS = unixfnames.o constdiv.o 
 OBJ06_UMODS = usysbasic.o
@@ -218,7 +218,6 @@ objf_umods.o:		$(OBJF_UMODS)
 
 # VARIOUS (module)
 digtab.o:		digtab.ccm
-usysconf.o:		usysconf.ccm
 usigset.o:		usigset.ccm
 constdiv.o:		constdiv.ccm
 builtin.o:		builtin.ccm
@@ -245,7 +244,7 @@ uconstants1.o:		uconstants1.cc uconstants.ccm
 ulibvals.o:		ulibvals0.o ulibvals1.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
-ulibvals0.o:		ulibvals.ccm usysconf.o 
+ulibvals0.o:		ulibvals.ccm
 	makemodule ulibvals
 
 ulibvals1.o:		ulibvals1.cc ulibvals.ccm 

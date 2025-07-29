@@ -1,5 +1,9 @@
-/* main (bal) */
+/* mainbal SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
+
+/* something to do with balancing tokens */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -83,8 +87,7 @@ bool StrRecurse::mkstr(res_t &res,string &s,int c,int i,int w) noex {
 	    }
 	}
 	return f ;
-}
-/* end method (StrRecurse::mkstr) */
+} /* end method (StrRecurse::mkstr) */
 
 
 /* forward references */
@@ -114,8 +117,7 @@ bool IsBalanced1(const std::string &input) noex {
   } /* end for */
   if (f && (count > 0)) f = false ; 
   return f ;
-} 
-/* end subroutine (IsBalanced1) */
+} /* end subroutine (IsBalanced1) */
 
 bool IsBalanced2(const std::string &input) noex {
   bool		f = true ;
@@ -138,8 +140,7 @@ bool IsBalanced2(const std::string &input) noex {
     }
   } /* end for */
   return f ;
-} 
-/* end subroutine (IsBalanced2) */
+} /* end subroutine (IsBalanced2) */
 
 /* ARGSUSED */
 int main(int argc,cchar **argv,cchar **envv) {
@@ -165,8 +166,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	} /* end for */
 
 	return 0 ;
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
 /* local subroutines */
@@ -183,8 +183,7 @@ static res_t bal1(cint N) noex {
     mk.mkstr(res,s,0,0,1) ;
   }
   return res ;
-}
-/* end subroutine (bal1) */
+} /* end subroutine (bal1) */
 
 struct bal2_item {
 	int	c = 0 ; /* count */
@@ -230,7 +229,7 @@ struct bal2_item {
 	    return (*this) ;
 	} ;
 	/* do not need 'move' constructor or assignment (too simple) */
-} ;
+} ; /* end struct (bal2_item) */
 
 static void bal2_push(stack<bal2_item> &s,int c,int i,int w) noex {
    bal2_item	wi(c,i,w) ;
@@ -284,8 +283,7 @@ static res_t bal2(cint N) noex {
     } /* end while */
   } /* end if */
   return res ;
-}
-/* end subroutine (bal2) */
+} /* end subroutine (bal2) */
 
 struct bal3_item {
 	int	c = 0 ; /* count */
@@ -295,7 +293,7 @@ struct bal3_item {
 	bal3_item(int _c,int _i,int _w) : c(_c), i(_i), w(_w) { } ;
 	bal3_item &operator = (const bal3_item &wi) = default ;
 	/* do not need 'move' constructor or assignment (too simple) */
-} ;
+} ; /* end struct (bal3_item) */
 
 static void bal3_push(stack<bal3_item> &work,int c,int i) noex {
 	cint	n = 2 ;
@@ -303,8 +301,7 @@ static void bal3_push(stack<bal3_item> &work,int c,int i) noex {
 	    bal3_item	wi(c,i,w) ;
 	    work.push(wi) ;
 	}
-}
-/* end subroutine (bal3_push) */
+} /* end subroutine (bal3_push) */
 
 static res_t bal3(cint N) noex {
 	res_t		res ;
@@ -355,14 +352,12 @@ static res_t bal3(cint N) noex {
 	    } /* end while */
 	} /* end if */
 	return res ;
-}
-/* end subroutine (bal3) */
+} /* end subroutine (bal3) */
 
 static void printres(const res_t &res) noex {
 	for (auto &s : res) {
 	    cout << s << endl ;
 	}
-}
-/* end subroutine (printres) */
+} /* end subroutine (printres) */
 
 

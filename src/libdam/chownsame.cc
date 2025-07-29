@@ -1,11 +1,11 @@
-/* chownsame */
+/* chownsame SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* make all directories in a directory path */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -18,27 +18,24 @@
 
 /*******************************************************************************
 
-	This subroutine changes the owner of a file (or directory) to be the
-	same as another file (or directory) given as a reference.
+  	Description:
+	This subroutine changes the owner of a file (or directory)
+	to be the same as another file (or directory) given as a
+	reference.
 
 	Synopsis:
-
 	int chownsame(cchar *dname,cchar *ref)
 
 	Arguments:
-
 	dname		direcrtory path to a new directory to create
 	ref		reference file or directory
 
 	Returns:
-
 	>0		ownership changed
 	==0		ownership not changed
-	<0		represents a system error
-
+	<0		error (system-return)
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

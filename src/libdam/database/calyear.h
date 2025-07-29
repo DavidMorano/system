@@ -1,20 +1,22 @@
-/* calyear */
+/* calyear HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CALYEAR_INCLUDE
-#define	CALYEAR_INCLUDE	1
+#define	CALYEAR_INCLUDE
 
 
 #include	<envstandards.h>
-
-#include	<sys/types.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<modload.h>
+#include	<calyears.h>
 #include	<localmisc.h>
-
-#include	"calyears.h"
 
 
 #define	CALYEAR_MAGIC	0x99447246
