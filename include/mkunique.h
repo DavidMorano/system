@@ -1,8 +1,8 @@
-/* snwcpy HEADER */
+/* mkunique HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* copy a c-string to a sized destination buffer */
+/* create a c-string w/ all unique characters */
 /* version %I% last-modified %G% */
 
 
@@ -15,35 +15,25 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	SNWCPY_INCLUDE
-#define	SNWCPY_INCLUDE
+#ifndef	MKUNIQUE_INCLUDE
+#define	MKUNIQUE_INCLUDE
 
 
-#include	<envstandards.h>	/* ordered first to configure */
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<snwcpyx.h>
-
 
 EXTERNC_begin
 
-extern int	snwcpy(char *,int,cchar *,int) noex ;
+extern int	mkunique(char *,int,cchar *,int) noex ;
 
 EXTERNC_end
 
-#ifdef	__cplusplus
 
-inline int snwcpy(char *dbuf,int dlen,cchar *sp) noex {
-	return snwcpy(dbuf,dlen,sp,-1) ;
-}
-
-#endif /* __cplusplus */
-
-
-#endif /* SNWCPY_INCLUDE */
+#endif /* MKUNIQUE_INCLUDE */
 
 
