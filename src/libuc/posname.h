@@ -63,8 +63,8 @@ struct posname : posname_head {
 	posname &operator = (const posname &) = delete ;
 	int start(cchar *sp,int sl,cchar **) noex ;
 	void dtor() noex ;
-	~posname() {
-	    dtor() ;
+	destruct posname() {
+	    if (as) dtor() ;
 	} ;
 } ; /* end struct (posname) */
 #else /* __cplusplus */

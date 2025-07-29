@@ -92,15 +92,18 @@ int snwcpyhyphen(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		dl = 0 ; /* return-value */
 	if (dbuf && sp) {
-	    rs = SR_OK ;
-	    while (dlen-- && sl && *sp) {
-	        int ch = mkchar(*sp++) ;
-	        if (ch == '_') ch = '-' ;
-	        dbuf[dl++] = char(ch) ;
-	        sl -= 1 ;
-	    } /* end while */
-	    if (sl && *sp) rs = SR_OVERFLOW ;
-	    dbuf[dl] = '\0' ;
+	    rs = SR_INVALID ;
+	    if (dlen >= 0) {
+	        rs = SR_OK ;
+	        while (dlen-- && sl && *sp) {
+	            int ch = mkchar(*sp++) ;
+	            if (ch == '_') ch = '-' ;
+	            dbuf[dl++] = char(ch) ;
+	            sl -= 1 ;
+	        } /* end while */
+	        if (sl && *sp) rs = SR_OVERFLOW ;
+	        dbuf[dl] = '\0' ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
 }

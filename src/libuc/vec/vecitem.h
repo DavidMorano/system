@@ -57,7 +57,7 @@ struct vecitem_flags {
 
 struct vecitem_head {
 	void		**va ;
-	VECITEM_FL	f ;
+	VECITEM_FL	fl ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */

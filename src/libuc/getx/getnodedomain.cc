@@ -73,15 +73,15 @@
 #include	<fcntl.h>		/* for |O_RDONLY| */
 #include	<climits>		/* for |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* for |getenv(3c)| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<uinfo.h>
 #include	<varnames.hh>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
-#include	<strings.h>		/* from BSD |strncasecmp(3c)| */
-#include	<estrings.h>
+#include	<estrings.h>		/* most all string subroutines */
 #include	<filer.h>
 #include	<strn.h>
 #include	<sfx.h>
@@ -106,8 +106,8 @@ import libutil ;
 #define	TO_READ		30		/* time-out for read */
 
 #undef	TRY
-#define	TRY		struct tryer
-#define	TRY_FL		struct tryer_flags
+#define	TRY		tryer
+#define	TRY_FL		tryer_flags
 
 #ifndef	CF_GUESS
 #define	CF_GUESS	0
@@ -155,7 +155,7 @@ namespace {
 	cchar		*name ;
 	cchar		*domain ;
     } ; /* end struct (guess) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -217,7 +217,7 @@ constexpr guess		ga[] = {
 	{ "rcg", "rightcore.com" },
 	{ "jig", "rightcore.com" },
 	{ nullptr, nullptr }
-} ;
+} ; /* end array (ga) */
 
 static bufsizevar	maxnodelen(getbufsize_nn) ;
 static bufsizevar	maxhostlen(getbufsize_hn) ;
@@ -233,8 +233,8 @@ constexpr bool		f_guess = CF_GUESS ;
 int getnodedomain(char *nbuf,char *dbuf) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = maxhostlen) >= 0) {
-	    if (TRY ti ; (rs = try_start(&ti,nbuf,dbuf,rs)) >= 0) {
+	if ((rs = maxhostlen) >= 0) ylikely {
+	    if (TRY ti ; (rs = try_start(&ti,nbuf,dbuf,rs)) >= 0) ylikely {
 		/* do we need a nodename? */
 	        if (nbuf != nullptr) {
 	            nbuf[0] = '\0' ;
@@ -261,12 +261,13 @@ int getnodedomain(char *nbuf,char *dbuf) noex {
 /* end subroutine (getnodedomain) */
 
 int getsysdomain(char *dbuf,int dlen) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (dbuf) {
+	if (dbuf) ylikely {
 	    dbuf[0] = '\0' ;
-	    if (TRY ti ; (rs = try_start(&ti,nullptr,dbuf,dlen)) >= 0) {
+	    if (TRY ti ; (rs = try_start(&ti,np,dbuf,dlen)) >= 0) ylikely {
 		/* do we need a domainname? */
 		rs = SR_OK ;
 	        for (int i = 0 ; (rs == SR_OK) && systries[i] ; i += 1) {
@@ -289,11 +290,11 @@ int getuserdomain(char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (dbuf) {
-	    if (char *dn{} ; (rs = malloc_hn(&dn)) >= 0) {
+	if (dbuf) ylikely {
+	    if (char *dn ; (rs = malloc_hn(&dn)) >= 0) ylikely {
 	        if (dlen < 0) dlen = rs ;
-	        if ((rs = getnodedomain(nullptr,dn)) >= 0) {
-	            rs = sncpy1(dbuf,dlen,dn) ;
+	        if ((rs = getnodedomain(nullptr,dn)) >= 0) ylikely {
+	            rs = sncpy(dbuf,dlen,dn) ;
 		    len = rs ;
 	        }
 	        rs1 = uc_free(dn) ;
@@ -309,9 +310,9 @@ int getuserdomain(char *dbuf,int dlen) noex {
 
 static int try_start(TRY *tip,char *nb,char *db,int dl) noex {
 	int		rs = SR_FAULT ;
-	if (tip) {
+	if (tip) ylikely {
 	    memclear(tip) ;
-	    if ((rs = maxhostlen) >= 0) {
+	    if ((rs = maxhostlen) >= 0) ylikely {
 		cint	hl = rs ;
 	        tip->f = {} ;
 	        tip->domainname = db ;
@@ -320,7 +321,7 @@ static int try_start(TRY *tip,char *nb,char *db,int dl) noex {
 	        tip->nodename = nb ;
 		tip->dlen = (dl < 0) ? hl : dl ;
 	        if (nb == nullptr) {
-	            if (char *cp{} ; (rs = malloc_nn(&cp)) >= 0) {
+	            if (char *cp ; (rs = malloc_nn(&cp)) >= 0) ylikely {
 		       tip->nbuf = cp ;
 	    	       tip->nodename = cp ;
 		    }
@@ -333,31 +334,34 @@ static int try_start(TRY *tip,char *nb,char *db,int dl) noex {
 /* end subroutine (try_start) */
 
 static int try_finish(TRY *tip) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (tip->sysnodename) {
-	    rs1 = uc_free(tip->sysnodename) ;
-	    if (rs >= 0) rs = rs1 ;
-	    tip->sysnodename = nullptr ;
-	}
-	if (tip->nbuf) {
-	    rs1 = uc_free(tip->nbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	    tip->nbuf = nullptr ;
-	}
-	tip->varnode = nullptr ;
+	if (tip) ylikely {
+	    rs = SR_OK ;
+	    if (tip->sysnodename) {
+	        rs1 = uc_free(tip->sysnodename) ;
+	        if (rs >= 0) rs = rs1 ;
+	        tip->sysnodename = nullptr ;
+	    }
+	    if (tip->nbuf) {
+	        rs1 = uc_free(tip->nbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	        tip->nbuf = nullptr ;
+	    }
+	    tip->varnode = nullptr ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (try_finish) */
 
 static int try_initvarnode(TRY *tip) noex {
 	int		rs = SR_FAULT ;
-	if (tip) {
+	if (tip) ylikely {
 	    rs = SR_OK ;
 	    if (! tip->f.initvarnode) {
 	        static cchar	*val = getenv(varname.node) ;
 	        tip->f.initvarnode = true ;
-		if (val != nullptr) {
+		if (val) {
 	            tip->f.varnode = true ;
 	            tip->varnode = val ;
 	        }
@@ -368,63 +372,69 @@ static int try_initvarnode(TRY *tip) noex {
 /* end subroutine (try_initvarnode) */
 
 static int try_inituname(TRY *tip) noex {
-	int		rs = SR_OK ;
-	if (! tip->f.inituname) {
-	    tip->f.inituname = true ;
-	    if (uinfo_names uin ; (rs = uinfo_name(&uin)) >= 0) {
-	        cchar	*sp = uin.nodename ;
-	        int	sl = lenstr(uin.nodename) ;
-	        if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
-	            tip->f.uname = true ;
-	            tip->sysnodename = cp ;
-	            rs = 0 ;
-	        } /* end if (memory-allocation) */
-	    } /* end if (uname) */
-	} /* end if (needed initialization) */
+	int		rs = SR_FAULT ;
+	if (tip) ylikely {
+	    rs = SR_OK ;
+	    if (! tip->f.inituname) {
+	        tip->f.inituname = true ;
+	        if (uinfo_names uin ; (rs = uinfo_name(&uin)) >= 0) ylikely {
+	            cchar	*sp = uin.nodename ;
+	            int		sl = lenstr(uin.nodename) ;
+	            if (cc *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	                tip->f.uname = true ;
+	                tip->sysnodename = cp ;
+	                rs = 0 ;
+	            } /* end if (memory-allocation) */
+	        } /* end if (uname) */
+	    } /* end if (needed initialization) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (try_inituname) */
 
 static int try_initnode(TRY *tip) noex {
-	int		rs = SR_OK ;
-	if (! tip->f.initnode) {
-	    tip->f.initnode = true ;
-	    if ((rs = maxnodelen) >= 0) {
-	        int	sl = -1 ;
-	        cchar	*sp = nullptr ;
-	        cchar	*cp ;
-	        if ((rs >= 0) && (sp == nullptr)) {
-	            if (! tip->f.initvarnode) {
-		        rs = try_initvarnode(tip) ;
-		    }
-	            cp = tip->varnode ;
-	            if (tip->f.varnode && (cp) && (cp[0] != '\0')) {
-		        sp = cp ;
-		    }
-	        } /* end if (ok) */
-	        if ((rs >= 0) && (sp == nullptr)) {
-	            if (! tip->f.inituname) {
-			rs = try_inituname(tip) ;
-		    }
-	            if (rs >= 0) {
-	                cp = tip->sysnodename ;
-	                if (tip->f.inituname && cp && (cp[0] != '\0')) {
-			    sp = cp ;
+	int		rs = SR_FAULT ;
+	if (tip) ylikely {
+	    rs = SR_OK ;
+	    if (! tip->f.initnode) {
+	        tip->f.initnode = true ;
+	        if ((rs = maxnodelen) >= 0) ylikely {
+	            int		sl = -1 ;
+	            cchar	*sp = nullptr ;
+	            cchar	*cp ;
+	            if ((rs >= 0) && (sp == nullptr)) {
+	                if (! tip->f.initvarnode) {
+		            rs = try_initvarnode(tip) ;
 		        }
-	            }
-	        } /* end if (ok) */
-	        if (rs >= 0) {
-	            if (sp != nullptr) {
-	                if (int cl ; (cl = sfwhitedot(sp,sl,&cp)) > 0) {
-	                    tip->f.node = true ;
-	                    strdcpy1w(tip->nodename,maxnodelen,cp,cl) ;
+	                cp = tip->varnode ;
+	                if (tip->f.varnode && (cp) && (cp[0] != '\0')) {
+		            sp = cp ;
+		        }
+	            } /* end if (ok) */
+	            if ((rs >= 0) && (sp == nullptr)) {
+	                if (! tip->f.inituname) {
+			    rs = try_inituname(tip) ;
+		        }
+	                if (rs >= 0) {
+	                    cp = tip->sysnodename ;
+	                    if (tip->f.inituname && cp && (cp[0] != '\0')) {
+			        sp = cp ;
+		            }
 	                }
-		    } else {
-		        rs = SR_IDRM ;
-		    }
-	        } /* end if (ok) */
-	    } /* end if (maxnodelen) */
-	} /* end if (needed initialization) */
+	            } /* end if (ok) */
+	            if (rs >= 0) ylikely {
+	                if (sp != nullptr) {
+	                    if (int cl ; (cl = sfwhitedot(sp,sl,&cp)) > 0) {
+	                        tip->f.node = true ;
+	                        strdcpy1w(tip->nodename,maxnodelen,cp,cl) ;
+	                    }
+		        } else {
+		            rs = SR_IDRM ;
+		        }
+	            } /* end if (ok) */
+	        } /* end if (maxnodelen) */
+	    } /* end if (needed initialization) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? 0 : rs ;
 }
 /* end subroutine (try_initnode) */
@@ -433,7 +443,7 @@ static int try_vardomain(TRY *tip) noex {
 	static cchar	*val = getenv(varname.domain) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if (val != nullptr) {
+	if (val) {
 	    cchar	*cp{} ;
 	    if (int cl ; (cl = sfshrink(val,-1,&cp)) > 0) {
 		cint	dlen = tip->dlen ;
@@ -476,13 +486,13 @@ static int try_varnode(TRY *tip) noex {
 	if (! tip->f.initvarnode) {
 	    rs = try_initvarnode(tip) ;
 	}
-	if ((rs >= 0) && tip->f.varnode) {
+	if ((rs >= 0) && tip->f.varnode) ylikely {
 	    cchar	*sp = tip->varnode ;
 	    if (cchar *tp ; (tp = strchr(sp,'.')) != nullptr) {
 	        cchar	*cp = (tp + 1) ;
 	        if (cp[0] != '\0') {
 		    cint	dlen = tip->dlen ;
-	            rs = sncpy1(tip->domainname,dlen,cp) ;
+	            rs = sncpy(tip->domainname,dlen,cp) ;
 		    len = rs ;
 		}
 	    }
@@ -497,13 +507,13 @@ static int try_uname(TRY *tip) noex {
 	if (! tip->f.inituname) {
 	    rs = try_inituname(tip) ;
 	}
-	if ((rs >= 0) && tip->f.uname) {
+	if ((rs >= 0) && tip->f.uname) ylikely {
 	    cchar	*sp = tip->sysnodename ;
 	    if (cchar *tp ; (tp = strchr(sp,'.')) != nullptr) {
 	        cchar	*cp = (tp + 1) ;
 	        if (cp[0] != '\0') {
 		    cint	dlen = tip->dlen ;
-	            rs = sncpy1(tip->domainname,dlen,cp) ;
+	            rs = sncpy(tip->domainname,dlen,cp) ;
 		    len = rs ;
 		}
 	    }
@@ -519,13 +529,13 @@ static int try_gethost(TRY *tip) noex {
 	if (! tip->f.initnode) {
 	    rs = try_initnode(tip) ;
 	}
-	if ((rs >= 0) && tip->f.node) {
-	    if (char *hbuf{} ; (rs = malloc_ho(&hbuf)) >= 0) {
+	if ((rs >= 0) && tip->f.node) ylikely {
+	    if (char *hbuf ; (rs = malloc_ho(&hbuf)) >= 0) ylikely {
 		cnullptr	np{} ;
 	        ucentho		he, *hep = &he ;
 	        cint		hlen = rs ;
 	        cchar		*nn = tip->nodename ;
-	        if ((rs = uc_gethonam(&he,hbuf,hlen,nn)) >= 0) {
+	        if ((rs = uc_gethonam(&he,hbuf,hlen,nn)) >= 0) ylikely {
 		    cint	dlen = tip->dlen ;
 	            cchar	*tp{} ;
 		    char	*dbuf = tip->domainname ;
@@ -534,14 +544,14 @@ static int try_gethost(TRY *tip) noex {
 	            f = f && (hep->h_name != np) ;
 		    f = f && ((tp = strchr(hep->h_name,'.')) != np) ;
 		    if (f) {
-	                rs = sncpy1(dbuf,dlen,(tp + 1)) ;
+	                rs = sncpy(dbuf,dlen,(tp + 1)) ;
 			len = rs ;
 	            } /* end if (official name) */
-	            if ((rs == 0) && (hep->h_aliases != nullptr)) {
+	            if ((rs == 0) && (hep->h_aliases != nullptr)) ylikely {
 	                for (int i = 0 ; hep->h_aliases[i] ; i += 1) {
 			    cchar	*ap = hep->h_aliases[i] ;
 	                    if ((tp = strchr(ap,'.')) != nullptr) {
-	                        rs = sncpy1(dbuf,dlen,(tp+1)) ;
+	                        rs = sncpy(dbuf,dlen,(tp+1)) ;
 				len = rs ;
 	                    } /* end if */
 			    if (rs != 0) break ;
@@ -560,7 +570,7 @@ static int try_gethost(TRY *tip) noex {
 
 static int try_resolve(TRY *tip) noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; (rs == SR_OK) && resolvefnames[i] ; i += 1) {
+	for (int i = 0 ; (rs == SR_OK) && resolvefnames[i] ; i += 1) ylikely {
 	    cchar	*fn = resolvefnames[i] ;
 	    rs = try_resolvefile(tip,fn) ;
 	} /* end for */
@@ -572,9 +582,9 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) ylikely {
 	    cint	llen = rs ;
-	    if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
+	    if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) ylikely {
 		cint	fd = rs ;
 		{
 		    rs = try_resolvefd(tip,lbuf,llen,fd) ;
@@ -589,33 +599,43 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs;
-	return rs ;
 }
 /* end subroutine (try_resolvefile) */
 
+static int tryreader(int,char *,int,cchar **) noex ;
+
 static int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
 	int		rs ;
+	int		len = 0 ; /* return-value */
+	if (cchar *dp{} ; (rs = tryreader(fd,lbuf,llen,&dp)) > 0) ylikely {
+            if (dp) {
+	        cint	dlen = tip->dlen ;
+	        char	*dbuf = tip->domainname ;
+		len = rs ;
+                rs = snwcpy(dbuf,dlen,dp,rs) ;
+	    }
+        } /* end if (tryreader) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (try_resolvefd) */
+
+static int tryreader(int fd,char *lbuf,int llen,cchar **rpp) noex {
+    	cint		bsz = FILERLEN ; /* buffer size */
+	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
-	cchar		*dp = nullptr ;
-        if (filer b ; (rs = b.start(fd,0z,FILERLEN,0)) >= 0) {
+	int		len = 0 ; /* return-value */
+	cchar		key[] = "domain" ;
+        if (filer b ; (rs = b.start(fd,0z,bsz,0)) >= 0) ylikely {
 	    cint	to = TO_READ ;
-	    cchar	*key = "domain" ;
             while ((rs = b.readln(lbuf,llen,to)) > 0) {
-                if ((len = sfkeyval(lbuf,rs,key,&dp)) > 0) break ;
+                if ((len = sfkeyval(lbuf,rs,key,rpp)) > 0) break ;
             } /* end while (reading lines) */
             rs1 = b.finish ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (filer) */
-        if ((rs >= 0) && (len > 0) && dp) {
-	    cint	dlen = tip->dlen ;
-	    char	*dbuf = tip->domainname ;
-            rs = snwcpy(dbuf,dlen,dp,len) ;
-        }
 	if (len < 0) len = 0 ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (try_resolvefd) */
+} /* end subroutine (tryreader) */
 
 static int try_guess(TRY *tip) noex {
 	int		rs = SR_OK ;
@@ -641,7 +661,7 @@ static int try_guess(TRY *tip) noex {
 	        } /* end for */
 	        if (si >= 0) {
 		    cint	mhl = maxhostlen ;
-	            rs = sncpy1(tip->domainname,mhl,ga[si].domain) ;
+	            rs = sncpy(tip->domainname,mhl,ga[si].domain) ;
 		    len = rs ;
 	        }
 	    } /* end if (have node) */
@@ -652,7 +672,10 @@ static int try_guess(TRY *tip) noex {
 
 /* remove trailing whitespace and dots */
 static int rmwhitedot(char *bp,int bl) noex {
-	while ((bl > 0) && ((bp[bl-1] == '.') || CHAR_ISWHITE(bp[bl-1]))) {
+	auto isrm = [] (int ch) -> bool {
+	    return (ch == '.') || char_iswhite(ch) ;
+	} ;
+	while ((bl > 0) && isrm(bp[bl - 1])) {
 	    bp[--bl] = '\0' ;
 	}
 	return (bl > 0) ? bl : SR_NOTFOUND ;

@@ -47,14 +47,13 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<ascii.h>
-#include	<toxc.h>
 #include	<nleadstr.h>
+#include	<toxc.h>		/* |tobc(3u)| + |tolc(3u)| + ... */
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
-#include	"six.h"
+#include	"sicasechr.h"
 
 
 /* local defines */
@@ -63,19 +62,67 @@
 /* external subroutines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+extern "C" {
+    typedef int (*toxc_f)(int) noex ;
+}
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+template<toxc_f toxc>
+static int sixchr(cchar *sp,int sl,int sch) noex {
+	int		i = 0 ; /* used-afterwards */
+	bool		f = false ;
+	if (sp) ylikely {
+	    sch = toxc(sch) ;
+	    for (i = 0 ; sl-- && sp[i] ; i += 1) {
+	        cint	ch = toxc(sp[i]) ;
+	        f = (ch == sch) ;
+	        if (f) break ;
+	    } /* end for */
+	} /* end if (non-null) */
+	return (f) ? i : -1 ;
+} /* end subroutine-template (sixchr) */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
+int sibasechr(cchar *sp,int sl,int sch) noex {
+    	return sixchr<tobc>(sp,sl,sch) ;
+} /* end subroutine (sibasechr) */
+
 int sicasechr(cchar *sp,int sl,int sch) noex {
-	int		i ; /* used afterwards */
-	bool		f = false ;
-	sch = tolc(sch) ;
-	for (i = 0 ; sl-- && sp[i] ; i += 1) {
-	    cint	ch = tolc(sp[i]) ;
-	    f = (ch == sch) ;
-	    if (f) break ;
-	} /* end for */
-	return (f) ? i : -1 ;
-}
-/* end subroutine (sicasechr) */
+    	return sixchr<touc>(sp,sl,sch) ;
+} /* end subroutine (sicasechr) */
+
+int sifoldchr(cchar *sp,int sl,int sch) noex {
+    	return sixchr<tofc>(sp,sl,sch) ;
+} /* end subroutine (sifoldchr) */
 
 

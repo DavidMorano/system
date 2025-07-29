@@ -36,11 +36,11 @@
 #include	<usystem.h>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<getax.h>
+#include	<getpwx.h>
 #include	<gecos.h>
 #include	<getusername.h>
-#include	<getpwx.h>
+#include	<mallocxx.h>
 #include	<storeitem.h>
 #include	<strn.h>
 #include	<snwcpy.h>

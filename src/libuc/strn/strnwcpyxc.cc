@@ -101,7 +101,7 @@ extern "C" {
 /* forward references */
 
 static char *strnwcpyxc(toxc_f toxc,char *dp,int dl,cchar *sp,int sl) noex {
-	if (dp && sp) {
+	if (dp && sp) ylikely {
     	    while (dl && sl-- && *sp) {
 	        *dp++ = char(toxc(*sp++)) ;
 		dl -= 1 ;

@@ -57,7 +57,7 @@
 /* local defines */
 
 #ifndef	PID_MAX
-#define	PID_MAX		999999
+#define	PID_MAX		999999		/* six '9's */
 #endif
 
 

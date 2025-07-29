@@ -45,7 +45,11 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -78,11 +82,11 @@ import libutil ;
 
 int mkmagic(char *rbuf,int rsz,cchar *ms,int ml) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf && ms) {
+	if (rbuf && ms) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if ((rsz >= 2) && ms[0]) {
-	        if (cint mslen = lenstr(ms,ml) ; (mslen+1) <= rsz) {
+	    if ((rsz >= 2) && ms[0]) ylikely {
+	        if (cint mslen = lenstr(ms,ml) ; (mslen+1) <= rsz) ylikely {
 	            char	*bp = strwcpy(rbuf,ms,ml) ;
 	            rs = SR_OK ;
 	            *bp++ = '\n' ;

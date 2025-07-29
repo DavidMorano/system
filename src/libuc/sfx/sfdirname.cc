@@ -60,11 +60,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -101,25 +101,27 @@ import libutil ;
 /* exported subroutines */
 
 int sfdirname(cchar *sp,int sl,cchar **rpp) noex {
-	int		rs ;
-	int		i ; /* used-afterwards */
-	if (sl < 0) sl = lenstr(sp) ;
-	while ((sl > 0) && (sp[sl - 1] == '/'))  {
-	    sl -= 1 ;
-	}
-	for (i = sl ; i > 0 ; i -= 1) {
-	    if (sp[i - 1] == '/') break ;
-	}
-	if (rpp) {
-	    *rpp = sp ;
-	}
-	if (i == 1) {
-	    rs = 1 ;
-	} else if (i <= 0) {
-	    rs = 0 ;
-	} else {
-	    rs = (i - 1) ;
-	}
+	int		rs = SR_FAULT ;
+	if (sp) ylikely {
+	    int		i ; /* used-afterwards */
+	    if (sl < 0) sl = lenstr(sp) ;
+	    while ((sl > 0) && (sp[sl - 1] == '/'))  {
+	        sl -= 1 ;
+	    }
+	    for (i = sl ; i > 0 ; i -= 1) {
+	        if (sp[i - 1] == '/') break ;
+	    }
+	    if (rpp) {
+	        *rpp = sp ;
+	    }
+	    if (i == 1) {
+	        rs = 1 ;
+	    } else if (i <= 0) {
+	        rs = 0 ;
+	    } else {
+	        rs = (i - 1) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sfdirname) */

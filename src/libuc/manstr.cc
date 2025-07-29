@@ -27,9 +27,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<six.h>
-#include	<char.h>
+#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -73,7 +75,7 @@ namespace {
 
 int manstr_start(manstr *sop,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (sop && sp) {
+	if (sop && sp) ylikely {
 	    rs = SR_OK ;
 	    sop->sp = sp ;
 	    sop->sl = sl ;
@@ -84,7 +86,7 @@ int manstr_start(manstr *sop,cchar *sp,int sl) noex {
 
 int manstr_finish(manstr *sop) noex {
 	int		rs = SR_FAULT ;
-	if (sop) {
+	if (sop) ylikely {
 	    rs = sop->sl ;
 	    sop->sp = nullptr ;
 	    sop->sl = 0 ;
@@ -95,7 +97,7 @@ int manstr_finish(manstr *sop) noex {
 
 int manstr_breakfield(manstr *sop,cchar *ss,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		rl = -1 ;
+	int		rl = 0 ;
 	if (sop && ss && rpp) {
 	    int		si = -1 ;
 	    rs = SR_OK ;
@@ -124,21 +126,32 @@ int manstr_breakfield(manstr *sop,cchar *ss,cchar **rpp) noex {
 
 /* skip white-space until reach terminator character */
 int manstr_whitechr(manstr *sop,int sch) noex {
-	whitestop	pred(sop,sch) ;
-	while ((sop->sl > 0) && pred) {
-	    sop->sp += 1 ;
-	    sop->sl -= 1 ;
-	}
-	return sop->sl ;
+    	int		rs = SR_FAULT ;
+	int		sl = 0 ; /* return-value */
+	if (sop) {
+	    rs = SR_OK ;
+	    for (whitestop pred(sop,sch) ; (sop->sl > 0) && pred ; ) {
+	        sop->sp += 1 ;
+	        sop->sl -= 1 ;
+	    } /* end for */
+	    sl = sop->sl ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? sl : rs ;
 }
 /* end subroutine (manstr_whitecolon) */
 
 int manstr_span(manstr *sop,cchar *stuff) noex {
-	if (int si ; (si = sispan(sop->sp,sop->sl,stuff)) > 0) {
-	    sop->sp += si ;
-	    sop->sl -= si ;
-	}
-	return sop->sl ;
+    	int		rs = SR_FAULT ;
+	int		sl = 0 ;
+	if (sop && stuff) {
+	    rs = SR_OK ;
+	    if (int si ; (si = sispan(sop->sp,sop->sl,stuff)) > 0) {
+	        sop->sp += si ;
+	        sop->sl -= si ;
+	    }
+	    sl = sop->sl ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? sl : rs ;
 }
 /* end subroutine (manstr_span) */
 

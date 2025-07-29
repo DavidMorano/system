@@ -53,7 +53,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<ctime>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -91,11 +90,11 @@
 
 int mknoise(uint *a,int n) noex {
 	int		rs = SR_FAULT ;
-	if (a) {
+	if (a) ylikely {
 	    rs = SR_INVALID ;
-	    if (n > 0) {
+	    if (n > 0) ylikely {
 	        cint	sz = szof(uint) ;
-	        if ((rs = uc_rand(a,(n * sz))) >= 0) {
+	        if ((rs = uc_rand(a,(n * sz))) >= 0) ylikely {
 		    n = (rs / sz) ;
 		}
 	    }

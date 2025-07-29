@@ -59,7 +59,6 @@
 #include	<unistd.h>		/* for |getgroups(2)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -101,7 +100,7 @@ static constexpr gid_t	gidend = gid_t(-1) ;
 
 int groupids::get(gid_t **gpp) noex {
 	int		rs = SR_FAULT ;
-	if (gpp) {
+	if (gpp) ylikely {
 	    *gpp = gids ;
 	    rs = ng ;
 	} /* end if (non-null) */
@@ -113,7 +112,7 @@ void groupids::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("groupids",rs,"fini-finish") ;
 	}
-}
+} /* end method (groupids::dtor) */
 
 
 /* local subroutines */
@@ -121,12 +120,12 @@ void groupids::dtor() noex {
 int groupids::istart(gid_t **gpp) noex {
 	int		rs ;
 	cnullptr	np{} ;
-	if ((rs = u_getgroups(0,np)) >= 0) {
+	if ((rs = u_getgroups(0,np)) >= 0) ylikely {
 	    cint	sz = ((rs + 1) * szof(gid_t)) ;
 	    ng = rs ;
-	    if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) ylikely {
 		gids = (gid_t *) vp ;
-		if ((rs = u_getgroups(ng,gids)) >= 0) {
+		if ((rs = u_getgroups(ng,gids)) >= 0) ylikely {
 		    gids[ng] = gidend ;
 		    if (gpp) {
 			*gpp = gids ;
@@ -145,7 +144,7 @@ int groupids::istart(gid_t **gpp) noex {
 int groupids::ifinish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (gids) {
+	if (gids) ylikely {
 	    rs1 = uc_libfree(gids) ;
 	    if (rs >= 0) rs = rs1 ;
 	    gids = nullptr ;
@@ -167,14 +166,16 @@ int groupids_st::operator () (gid_t **gpp) noex {
 
 groupids_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	switch (w) {
-	case groupidsmem_ngroups:
-	    rs = op->ng ;
-	    break ;
-	case groupidsmem_finish:
-	    rs = op->ifinish() ;
-	    break ;
-	} /* end switch */
+	if (op) ylikely {
+	    switch (w) {
+	    case groupidsmem_ngroups:
+	        rs = op->ng ;
+	        break ;
+	    case groupidsmem_finish:
+	        rs = op->ifinish() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (groupids_co::operator) */

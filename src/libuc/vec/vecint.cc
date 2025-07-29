@@ -79,19 +79,6 @@ static int	vecint_extrange(vecint *,int) noex ;
 
 static int	deftypecmp(const VECINT_TYPE *,const VECINT_TYPE *) noex ;
 
-consteval int mkoptmask() noex {
-	int		m = 0 ;
-	m |= VECINT_OREUSE ;
-	m |= VECINT_OSWAP ;
-	m |= VECINT_OSTATIONARY ;
-	m |= VECINT_OCOMPACT ;
-	m |= VECINT_OSORTED ;
-	m |= VECINT_OORDERED ;
-	m |= VECINT_OCONSERVE ;
-	return m ;
-}
-/* end subroutine (mkoptmask) */
-
 
 /* local variables */
 
@@ -271,14 +258,14 @@ int vecint_del(vecint *op,int i) noex {
 		/* delete the entry */
 	        op->c -= 1 ;			/* decrement list count */
 		/* apply the appropriate deletion based on management policy */
-	        if (op->f.ostationary) {
+	        if (op->fl.ostationary) {
 	            (op->va)[i] = INT_MIN ;
 	            if (i == (op->i - 1)) {
 	                op->i -= 1 ;
 	            }
 	            f_fi = true ;
-	        } else if (op->f.issorted || op->f.oordered) {
-	            if (op->f.ocompact) {
+	        } else if (op->fl.issorted || op->fl.oordered) {
+	            if (op->fl.ocompact) {
 		        int	j ;
 	                op->i -= 1 ;
 	                for (j = i ; j < op->i ; j += 1) {
@@ -293,10 +280,10 @@ int vecint_del(vecint *op,int i) noex {
 	                f_fi = true ;
 	            } /* end if */
 	        } else {
-	            if ((op->f.oswap || op->f.ocompact) && (i < (op->i - 1))) {
+	            if ((op->fl.oswap || op->fl.ocompact) && (i < (op->i - 1))) {
 	                (op->va)[i] = (op->va)[op->i - 1] ;
 	                (op->va)[--op->i] = INT_MIN ;
-	                op->f.issorted = false ;
+	                op->fl.issorted = false ;
 	            } else {
 	                (op->va)[i] = INT_MIN ;
 	                if (i == (op->i - 1)) {
@@ -347,8 +334,8 @@ int vecint_extent(vecint *op) noex {
 int vecint_sort(vecint *op) noex {
 	int		rs ;
 	if ((rs = vecint_magic(op)) >= 0) {
-	    if (! op->f.issorted) {
-	        op->f.issorted = true ;
+	    if (! op->fl.issorted) {
+	        op->fl.issorted = true ;
 	        if (op->c > 1) {
 		    cint	esize = szof(VECINT_TYPE) ;
 		    qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
@@ -364,7 +351,7 @@ int vecint_sort(vecint *op) noex {
 int vecint_setsorted(vecint *op) noex {
 	int		rs ;
 	if ((rs = vecint_magic(op)) >= 0) {
-	    op->f.issorted = true ;
+	    op->fl.issorted = true ;
 	    rs = op->c ;
 	} /* end if (magic) */
 	return rs ;
@@ -375,7 +362,7 @@ int vecint_find(vecint *op,VECINT_TYPE v) noex {
 	int		rs ;
 	int		i = 0 ; /* ¥ GCC false complaint */
 	if ((rs = vecint_magic(op)) >= 0) {
-	    if (op->f.issorted) {
+	    if (op->fl.issorted) {
 	        cint		esz = szof(VECINT_TYPE) ;
 	        qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
 	        int		*rpp ;
@@ -487,19 +474,32 @@ int vecint_audit(vecint *op) noex {
 
 /* private subroutines */
 
+consteval int mkoptmask() noex {
+	int		m = 0 ;
+	m |= VECINT_OREUSE ;
+	m |= VECINT_OSWAP ;
+	m |= VECINT_OSTATIONARY ;
+	m |= VECINT_OCOMPACT ;
+	m |= VECINT_OSORTED ;
+	m |= VECINT_OORDERED ;
+	m |= VECINT_OCONSERVE ;
+	return m ;
+}
+/* end subroutine (mkoptmask) */
+
 static int vecint_setopts(vecint *op,int vo) noex {
 	constexpr int	m = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	if ((vo & (~ m)) == 0) {
 	    rs = SR_OK ;
-	    op->f = {} ;
-	    if (vo & VECINT_OREUSE) op->f.oreuse = 1 ;
-	    if (vo & VECINT_OSWAP) op->f.oswap = 1 ;
-	    if (vo & VECINT_OSTATIONARY) op->f.ostationary = 1 ;
-	    if (vo & VECINT_OCOMPACT) op->f.ocompact = 1 ;
-	    if (vo & VECINT_OSORTED) op->f.osorted = 1 ;
-	    if (vo & VECINT_OORDERED) op->f.oordered = 1 ;
-	    if (vo & VECINT_OCONSERVE) op->f.oconserve = 1 ;
+	    op->fl = {} ;
+	    if (vo & VECINT_OREUSE) op->fl.oreuse = 1 ;
+	    if (vo & VECINT_OSWAP) op->fl.oswap = 1 ;
+	    if (vo & VECINT_OSTATIONARY) op->fl.ostationary = 1 ;
+	    if (vo & VECINT_OCOMPACT) op->fl.ocompact = 1 ;
+	    if (vo & VECINT_OSORTED) op->fl.osorted = 1 ;
+	    if (vo & VECINT_OORDERED) op->fl.oordered = 1 ;
+	    if (vo & VECINT_OCONSERVE) op->fl.oconserve = 1 ;
 	} /* end if (valid) */
 	return rs ;
 }
@@ -511,7 +511,7 @@ static int vecint_addval(vecint *op,VECINT_TYPE v) noex {
 	bool		f_done = false ;
 	bool		f ;
 /* can we fit this new entry within the existing extent? */
-	f = (op->f.oreuse || op->f.oconserve) && (! op->f.oordered) ;
+	f = (op->fl.oreuse || op->fl.oconserve) && (! op->fl.oordered) ;
 	if (f && (op->c < op->i)) {
 	    i = op->fi ;
 	    while ((i < op->i) && (op->va[i] != INT_MIN)) {
@@ -540,7 +540,7 @@ static int vecint_addval(vecint *op,VECINT_TYPE v) noex {
 	} /* end if */
 	if (rs >= 0) {
 	    op->c += 1 ;		/* increment list count */
-	    op->f.issorted = false ;
+	    op->fl.issorted = false ;
 	}
 	return (rs >= 0) ? i : rs ;
 }
@@ -594,7 +594,7 @@ static int vecint_insertval(vecint *op,int ii,VECINT_TYPE val) noex {
 	} /* end if */
 	op->va[ii] = val ;
 	op->c += 1 ;
-	op->f.issorted = false ;
+	op->fl.issorted = false ;
 	return ii ;
 }
 /* end subroutine (vecint_insertval) */

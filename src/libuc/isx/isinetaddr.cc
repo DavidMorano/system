@@ -39,17 +39,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<uinet.h>		/* |INETX_ADDRSTRLEN| */
 #include	<inaddrbad.hh>
 #include	<localmisc.h>

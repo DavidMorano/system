@@ -43,12 +43,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>		/* possible fuure use */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -95,16 +93,20 @@ static inline bool isleader(cchar *sp) noex {
 /* exported subroutines */
 
 int sfnamecomp(cchar *sp,int sl,cchar **rpp) noex {
-	if (sl < 0) sl = lenstr(sp) ;
-	if (sl > 1) {
-	    while ((sl > 2) && isleader(sp)) {
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	    while ((sl > 1) && (sp[sl-1] == '/')) {
-	        sl -= 1 ;
-	    }
-	} /* end if */
+    	if (sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    if (sl > 1) {
+	        while ((sl > 2) && isleader(sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        } /* end while */
+	        while ((sl > 1) && (sp[sl-1] == '/')) {
+	            sl -= 1 ;
+	        }
+	    } /* end if (non-zero positive) */
+	} else {
+	    sl = -1 ;
+	} /* end if (non-null) */
 	if (rpp) *rpp = sp ;
 	return sl ;
 }

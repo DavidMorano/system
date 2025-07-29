@@ -54,10 +54,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnchr(3uc)| */
 #include	<snx.h>
 #include	<snwcpy.h>
 #include	<storeitem.h>
@@ -68,6 +67,7 @@
 
 #include	"pwentry.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -109,7 +109,7 @@ static vars	var ;
 int pwentry_start(pwentry *op) noex {
     	PWENTRY		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = memclear(hop) ;
 	    op->lstchg = -1 ;
 	} /* end if (non-null) */
@@ -119,11 +119,11 @@ int pwentry_start(pwentry *op) noex {
 
 int pwentry_fieldpw(pwentry *op,int fn,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (op && sp) {
+	if (op && sp) ylikely {
 	    int		v ;
 	    cchar	*mp = nullptr ;
 	    rs = SR_OK ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    switch (fn) {
 	    case 0:
 	        op->username = mp = mallocstrw(sp,sl) ;
@@ -134,12 +134,16 @@ int pwentry_fieldpw(pwentry *op,int fn,cchar *sp,int sl) noex {
 	    case 2:
 	        mp = sp ;
 	        op->uid = -1 ;
-	        if ((sl > 0) && (cfdeci(sp,sl,&v) >= 0)) op->uid = v ;
+	        if ((sl > 0) && (cfdeci(sp,sl,&v) >= 0)) {
+		    op->uid = v ;
+		}
 	        break ;
 	    case 3:
 	        mp = sp ;
 	        op->gid = -1 ;
-	        if ((sl > 0) && (cfdeci(sp,sl,&v) >= 0)) op->gid = v ;
+	        if ((sl > 0) && (cfdeci(sp,sl,&v) >= 0)) {
+		    op->gid = v ;
+		}
 	        break ;
 	    case 4:
 	        op->gecos = mp = mallocstrw(sp,sl) ;
@@ -201,13 +205,13 @@ int pwentry_fieldpw(pwentry *op,int fn,cchar *sp,int sl) noex {
 int pwentry_mkextras(pwentry *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->gecos != nullptr) {
-	        if (gecos g ; (rs = g.start(op->gecos)) >= 0) {
+	    if (op->gecos != nullptr) ylikely {
+	        if (gecos g ; (rs = g.start(op->gecos)) >= 0) ylikely {
 	            for (int i = 0 ; i < gecosval_overlast ; i += 1) {
 	                cchar	*vp{} ;
-	                if (int vl ; (vl = g.getval(i,&vp)) >= 0) {
+	                if (int vl ; (vl = g.getval(i,&vp)) >= 0) ylikely {
 	                    if (vp != nullptr) {
 	                        switch (i) {
 	                        case gecosval_organization:
@@ -251,9 +255,9 @@ int pwentry_mkextras(pwentry *op) noex {
 int pwentry_mkcopy(pwentry *op,pwentry *uop,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && uop && rbuf) {
+	if (op && uop && rbuf) ylikely {
 	    memclear(uop) ;
-	    if (storeitem ub ; (rs = ub.start(rbuf,rlen)) >= 0) {
+	    if (storeitem ub ; (rs = ub.start(rbuf,rlen)) >= 0) ylikely {
 	        if (op->username != nullptr) {
 	            ub.strw(op->username,-1,&uop->username) ;
 	        }
@@ -313,7 +317,7 @@ int pwentry_finish(pwentry *op) noex {
     	PWENTRY		*hop = op ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->username != nullptr) {
 	        rs1 = uc_free(op->username) ;
@@ -388,13 +392,13 @@ static int pwentry_loadname(PE *op,cc *vp,int vl) noex {
     	int		rs ;
 	int		rs1 ;
 	int		tl = 0 ;
-	if (char *tbuf{} ; (rs = uc_malloc((vl + 1),&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = uc_malloc((vl + 1),&tbuf)) >= 0) ylikely {
 	    cint	tlen = rs ;
 	    if (strnchr(vp,vl,'_') != nullptr) {
 		rs = snwcpyhyphen(tbuf,tlen,vp,vl) ;
 		vp = tbuf ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 		rs = loaditem(&op->realname,vp,vl) ;
 		tl = rs ;
 	    }
@@ -417,11 +421,11 @@ void pwentry::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("pwentry",rs,"fini-finish") ;
 	}
-}
+} /* end method (pwentry::dtor) */
 
 pwentry_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case pwentrymem_start:
 	        rs = pwentry_start(op) ;
@@ -440,7 +444,7 @@ pwentry_co::operator int () noex {
 
 static int loaditem(cchar **rpp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
-	if (vp) {
+	if (vp) ylikely {
 	    rs = uc_mallocstrw(vp,vl,rpp) ;
 	}
 	return rs ;
@@ -449,14 +453,13 @@ static int loaditem(cchar **rpp,cchar *vp,int vl) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
+	if ((rs = getbufsize(getbufsize_pw)) >= 0) ylikely {
 	    pwlen += rs ;
-	    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	    if ((rs = getbufsize(getbufsize_mn)) >= 0) ylikely {
 	        pwlen += rs ; /* additional size for some extra stuff */
 	    }
 	}
 	return (rs >= 0) ? pwlen : rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 

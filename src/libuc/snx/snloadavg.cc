@@ -58,7 +58,7 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
@@ -66,7 +66,11 @@
 #include	<sys/param.h>		/* |FSCALE| + |FSHIFT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<storebuf.h>
 #include	<ctdec.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
@@ -92,7 +96,7 @@ namespace {
 	int load(uint) noex ;
 	int round(int) noex ;
     } ; /* end struct (parts) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -109,7 +113,7 @@ namespace {
 int snloadavg(char *rbuf,int rlen,uint la,int w,int p,int fill) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    storebuf	buf(rbuf,rlen) ;
 	    parts	pa ;
 	    cint	diglen = DIGBUFLEN ;
@@ -136,17 +140,17 @@ int snloadavg(char *rbuf,int rlen,uint la,int w,int p,int fill) noex {
 	    /* put the resulting string together */
 	    zfprec = (fill == 0) ? prec : 0 ;
 	    dp = digbuf ;
-	    if ((rs = ctdecpui(digbuf,diglen,zfprec,pa.parti)) >= 0) {
+	    if ((rs = ctdecpui(digbuf,diglen,zfprec,pa.parti)) >= 0) ylikely {
 	        dl = rs ;
 	        if ((prec >= 0) && (prec < dl)) {
-	            dp += (dl-prec) ;
+	            dp += (dl - prec) ;
 	            dl = prec ;
 	        }
 	        rs = buf.strw(dp,dl) ;
 	    } /* end if (ctdec) */
-	    if ((rs >= 0) && (p >= 0)) {
-	        if ((rs = buf.chr('.')) >= 0) {
-	            if (p > 0) {
+	    if ((rs >= 0) && (p >= 0)) ylikely {
+	        if ((rs = buf.chr('.')) >= 0) ylikely {
+	            if (p > 0) ylikely {
 	                if ((rs = ctdecpui(digbuf,diglen,p,pa.partf)) >= 0) {
 	                    dl = rs ;
 	                    if (dl > p) dl = p ;
@@ -174,7 +178,7 @@ int parts::load(uint la) noex {
 /* end method (parts::load) */
 
 int parts::round(int prec) noex {
-	int		r ;
+	int		r{} ;
 	switch (prec) {
 	case 3: /* no change needed */
 	    break ;

@@ -34,15 +34,15 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<hdb.h>
 #include	<strpack.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnchr(3uc)| */
 #include	<localmisc.h>
 
 #include	"mapstrs.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -71,12 +71,12 @@ template<typename ... Args>
 static int mapstrs_ctor(mapstrs *op,Args ... args) noex {
     	MAPSTRS		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->dbp = new(nothrow) hdb) != np) {
-	        if ((op->spp = new(nothrow) strpack) != np) {
+	    if ((op->dbp = new(nothrow) hdb) != np) ylikely {
+	        if ((op->spp = new(nothrow) strpack) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new_hdb) */
 		if (rs < 0) {
@@ -91,13 +91,13 @@ static int mapstrs_ctor(mapstrs *op,Args ... args) noex {
 
 static int mapstrs_dtor(mapstrs *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->spp) {
+	    if (op->spp) ylikely {
 		delete op->spp ;
 		op->spp = nullptr ;
 	    }
-	    if (op->dbp) {
+	    if (op->dbp) ylikely {
 		delete op->dbp ;
 		op->dbp = nullptr ;
 	    }
@@ -109,7 +109,7 @@ static int mapstrs_dtor(mapstrs *op) noex {
 template<typename ... Args>
 static inline int mapstrs_magic(mapstrs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MAPSTRS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -126,13 +126,14 @@ static inline int mapstrs_magic(mapstrs *op,Args ... args) noex {
 /* exported subroutines */
 
 int mapstrs_start(mapstrs *op,int n) noex {
+    	cnullptr	np{} ;
 	int		rs ;
-	if ((rs = mapstrs_ctor(op)) >= 0) {
+	if ((rs = mapstrs_ctor(op)) >= 0) ylikely {
 	    cint		at = true ;
-	    if ((rs = hdb_start(op->dbp,n,at,nullptr,nullptr)) >= 0) {
+	    if ((rs = hdb_start(op->dbp,n,at,np,np)) >= 0) ylikely {
 	        strpack	*spp = op->spp ;
 	        cint	csz = MAPSTRS_CHUNKSIZE ;
-	        if ((rs = strpack_start(spp,csz)) >= 0) {
+	        if ((rs = strpack_start(spp,csz)) >= 0) ylikely {
 		    op->magic = MAPSTRS_MAGIC ;
 		}
 	        if (rs < 0) {
@@ -150,8 +151,8 @@ int mapstrs_start(mapstrs *op,int n) noex {
 int mapstrs_finish(mapstrs *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mapstrs_magic(op)) >= 0) {
-	    if (op->spp) {
+	if ((rs = mapstrs_magic(op)) >= 0) ylikely {
+	    if (op->spp) ylikely {
 	        strpack	*spp = op->spp ;
 	        rs1 = strpack_finish(spp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -168,11 +169,11 @@ int mapstrs_finish(mapstrs *op) noex {
 
 int mapstrs_add(mapstrs *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs ;
-	if ((rs = mapstrs_magic(op,kp)) >= 0) {
+	if ((rs = mapstrs_magic(op,kp)) >= 0) ylikely {
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
 	    hdb		*hlp = op->dbp ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = lenstr(kp) ;
 	    key.buf = kp ;
 	    key.len = kl ;
 	    if ((rs = hdb_fetch(hlp,key,nullptr,&val)) >= 0) {
@@ -200,10 +201,10 @@ int mapstrs_add(mapstrs *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 
 int mapstrs_del(mapstrs *op,cchar *kp,int kl) noex {
 	int		rs ;
-	if ((rs = mapstrs_magic(op,kp)) >= 0) {
+	if ((rs = mapstrs_magic(op,kp)) >= 0) ylikely {
 	    hdb		*hlp = op->dbp ;
 	    hdb_dat	key ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = lenstr(kp) ;
 	    key.buf = kp ;
 	    key.len = kl ;
 	    rs = hdb_delkey(hlp,key) ;
@@ -214,7 +215,7 @@ int mapstrs_del(mapstrs *op,cchar *kp,int kl) noex {
 
 int mapstrs_count(mapstrs *op) noex {
 	int		rs ;
-	if ((rs = mapstrs_magic(op)) >= 0) {
+	if ((rs = mapstrs_magic(op)) >= 0) ylikely {
 	    rs = hdb_count(op->dbp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -225,16 +226,16 @@ int mapstrs_present(mapstrs *op,cchar *kp,int kl,cchar **rpp) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		vl = 0 ;
-	if ((rs = mapstrs_magic(op,kp)) >= 0) {
+	if ((rs = mapstrs_magic(op,kp)) >= 0) ylikely {
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
-	    if (kl < 0) kl = strlen(kp) ;
+	    if (kl < 0) kl = lenstr(kp) ;
 	    if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != np) {
-	        kl = (tp-kp) ;
+	        kl = intconv(tp - kp) ;
 	    }
 	    key.buf = kp ;
 	    key.len = kl ;
-	    if ((rs = hdb_fetch(op->dbp,key,np,&val)) >= 0) {
+	    if ((rs = hdb_fetch(op->dbp,key,np,&val)) >= 0) ylikely {
 	        vl = val.len ;
 	        if (rpp) {
 		    *rpp = charp(val.buf) ;

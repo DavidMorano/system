@@ -95,7 +95,7 @@ int vecobjms::conserve		= (1 << vecobjo_conserve) ;
 int vecobjms::sorted		= (1 << vecobjo_sorted) ;
 int vecobjms::ordered		= (1 << vecobjo_ordered) ;
 
-vecobjms	vecobjm ;
+const vecobjms		vecobjm ;
 
 
 /* exported subroutines */

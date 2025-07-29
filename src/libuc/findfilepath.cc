@@ -52,7 +52,6 @@
 #include	<sys/stat.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<varnames.hh>
 #include	<bufsizevar.hh>
@@ -68,6 +67,7 @@
 
 #include	"findfilepath.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -109,14 +109,15 @@ static strlibval	pathval(strlibval_path) ;
 /* exported subroutines */
 
 int findfilepath(char *rbuf,cchar *path,cchar *fn,int am) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (rbuf && fn) {
+	if (rbuf && fn) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (fn[0]) {
-	        if (ids id ; (rs = id.load) >= 0) {
+	    if (fn[0]) ylikely {
+	        if (ids id ; (rs = id.load) >= 0) ylikely {
 	            if (fn[0] == '/') {
 	                if ((rs = fileperm(&id,fn,am)) > 0) {
 			    rs = mkpath1(rbuf,fn) ;
@@ -126,18 +127,17 @@ int findfilepath(char *rbuf,cchar *path,cchar *fn,int am) noex {
 	                if (path == nullptr) path = pathval ;
 	                if (path && (path[0] != '\0')) {
 	                    int		dnl = -1 ;
-	            	    cchar	*tp ;
 	                    cchar	*dnp = path ;
 			    rs = SR_OK ;
-	                    while ((tp = strchr(dnp,':')) != nullptr) {
+	                    for (cc *tp ; (tp = strchr(dnp,':')) != np ; ) {
 			        {
-	                            dnl = (tp - dnp) ;
+	                            dnl = intconv(tp - dnp) ;
 	                            rs = checkone(&id,rbuf,dnp,dnl,fn,am) ;
 	                            len = rs ;
 			        }
 	                        dnp = (tp + 1) ;
 	                        if (rs != SR_OK) break ;
-	                    } /* end while */
+	                    } /* end for */
 	                } /* end if (non-nullptr path) */
 	            } /* end if */
 	            rs1 = id.release ;
@@ -157,15 +157,15 @@ static int checkone(ids *idp,char *pbuf,cc *dnp,int dnl,cc *fn,int am) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 	if (dnl != 0) {
-	    if ((rs = mkourpath(pbuf,dnp,dnl,fn)) >= 0) {
+	    if ((rs = mkourpath(pbuf,dnp,dnl,fn)) >= 0) ylikely {
 		cint	tl = rs ;
 	        if ((rs = fileperm(idp,pbuf,am)) > 0) {
 		    rl = tl ;
 	        } /* end if (fileperm) */
 	    } /* end if (mkourpath) */
 	} else {
-	    if ((rs = fileperm(idp,fn,am)) > 0) {
-	        rl = strlen(fn) ;
+	    if ((rs = fileperm(idp,fn,am)) > 0) ylikely {
+	        rl = lenstr(fn) ;
 	    } /* end if (fileperm) */
 	} /* end if */
 	return (rs >= 0) ? rl : rs ;
@@ -176,7 +176,7 @@ static int checkone(ids *idp,char *pbuf,cc *dnp,int dnl,cc *fn,int am) noex {
 static int fileperm(ids *idp,cchar *fn,int am) noex {
 	int		rs ;
 	int		f = false ;
-	if (USTAT sb ; (rs = u_stat(fn,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(fn,&sb)) >= 0) ylikely {
 	    if (S_ISREG(sb.st_mode))  {
 	        if ((rs = permid(idp,&sb,am)) >= 0) {
 		    f = true ;
@@ -194,7 +194,7 @@ static int fileperm(ids *idp,cchar *fn,int am) noex {
 static int mkourpath(char *pbuf,cc *dnp,int dnl,cc *fn) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ;
-	if ((rs = maxpathlen) >= 0) {
+	if ((rs = maxpathlen) >= 0) ylikely {
 	    cint	plen = rs ;
 	    if (rs >= 0) {
 	        rs = storebuf_strw(pbuf,plen,i,dnp,dnl) ;
@@ -214,7 +214,7 @@ static int mkourpath(char *pbuf,cc *dnp,int dnl,cc *fn) noex {
 /* end subroutine (mkourpath) */
 
 static bool isendslash(cc *dp,int dl) noex {
-	if (dl < 0) dl = strlen(dp) ;
+	if (dl < 0) dl = lenstr(dp) ;
 	return ((dl > 0) && (dp[dl-1] == '/')) ;
 }
 /* end subroutine (isendslash) */

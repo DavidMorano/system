@@ -41,7 +41,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<mkpathx.h>
 #include	<localmisc.h>
 
@@ -67,9 +71,9 @@
 
 int mkufname(char *rbuf,cchar *hn,cchar *rc) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf && hn && rc) {
+	if (rbuf && hn && rc) ylikely {
 	    rs = SR_INVALID ;
-	    if (hn[0] && rc[0]) {
+	    if (hn[0] && rc[0]) ylikely {
 		bool	f = true ;
 		rs = SR_OK ;
 		f = f && (rc[0] != '/') ;

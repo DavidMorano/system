@@ -32,7 +32,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
@@ -69,7 +68,7 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 int outbuf_start(outbuf *op,char *obuf,int olen) noex {
 	int		rs = SR_FAULT ;
-	if (op && obuf) {
+	if (op && obuf) ylikely {
 	    op->obuf = nullptr ;
 	    op->olen = 0 ;
 	    op->f_alloc = false ;
@@ -93,7 +92,7 @@ int outbuf_start(outbuf *op,char *obuf,int olen) noex {
 int outbuf_finish(outbuf *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->f_alloc && op->obuf) {
 	        rs1 = uc_free(op->obuf) ;
@@ -108,7 +107,7 @@ int outbuf_finish(outbuf *op) noex {
 
 int outbuf_get(outbuf *op,cchar **onpp) noex {
 	int		rs = SR_FAULT ;
-	if (op && onpp) {
+	if (op && onpp) ylikely {
 	    rs = SR_OK ;
 	    if (op->f_alloc) {
 	        op->obuf[0] = '\0' ;
@@ -149,7 +148,7 @@ outbuf::operator int () noex {
 
 outbuf_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case outbufmem_finish:
 	        rs = outbuf_finish(op) ;

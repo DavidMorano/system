@@ -108,7 +108,7 @@ struct dirlist_ent {
 template<typename ... Args>
 static inline int dirlist_ctor(dirlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
@@ -123,7 +123,7 @@ static inline int dirlist_ctor(dirlist *op,Args ... args) noex {
 
 static int dirlist_dtor(dirlist *op) noex {
 	int		rs = SR_OK ;
-	if (op->dbp) {
+	if (op->dbp) ylikely {
 	    delete op->dbp ;
 	    op->dbp = nullptr ;
 	}
@@ -134,7 +134,7 @@ static int dirlist_dtor(dirlist *op) noex {
 template<typename ... Args>
 static int dirlist_magic(dirlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DIRLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -162,7 +162,7 @@ constexpr bool		f_nulpath = CF_NULPATH ;
 
 int dirlist_start(dirlist *op) noex {
 	int		rs ;
-	if ((rs = dirlist_ctor(op)) >= 0) {
+	if ((rs = dirlist_ctor(op)) >= 0) ylikely {
 	    cint	esz = szof(ent) ;
 	    cint	ne = DIRLIST_NDEF ;
 	    cint	vo = VECOBJ_OORDERED ;
@@ -180,7 +180,7 @@ int dirlist_start(dirlist *op) noex {
 int dirlist_finish(dirlist *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = dirlist_magic(op)) >= 0) {
+	if ((rs = dirlist_magic(op)) >= 0) ylikely {
 	    if (op->dbp) {
 		vecobj	*dbp = op->dbp ;
 	        {
@@ -210,7 +210,7 @@ int dirlist_finish(dirlist *op) noex {
 
 int dirlist_semi(dirlist *op) noex { /* add a semicolon as an entry */
 	int		rs ;
-	if ((rs = dirlist_magic(op)) >= 0) {
+	if ((rs = dirlist_magic(op)) >= 0) ylikely {
 	    if (ent e ; (rs = entry_start(&e,";",1,0L,0L)) >= 0) {
 	        op->tlen += (rs+1) ;
 	        rs = vecobj_add(op->dbp,&e) ;
@@ -227,7 +227,7 @@ int dirlist_adds(dirlist *op,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = dirlist_magic(op,sp)) >= 0) {
+	if ((rs = dirlist_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    for (cc *tp ; (tp = strnbrk(sp,sl,":; \t,")) != np ; ) {
 	        cchar	*cp = sp ;
@@ -256,7 +256,7 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f_added = false ;
-	if ((rs = dirlist_magic(op,sp)) >= 0) {
+	if ((rs = dirlist_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) {
 	        int	pl{} ;
@@ -321,7 +321,7 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 
 int dirlist_count(dirlist *op) noex {
 	int		rs ;
-	if ((rs = dirlist_magic(op)) >= 0) {
+	if ((rs = dirlist_magic(op)) >= 0) ylikely {
 	    rs = vecobj_count(op->dbp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -329,7 +329,7 @@ int dirlist_count(dirlist *op) noex {
 
 int dirlist_strsize(dirlist *op) noex {
 	int		rs ;
-	if ((rs = dirlist_magic(op)) >= 0) {
+	if ((rs = dirlist_magic(op)) >= 0) ylikely {
 	    rs = op->tlen ;
 	} /* end if (magic) */
 	return rs ;
@@ -338,7 +338,7 @@ int dirlist_strsize(dirlist *op) noex {
 
 int dirlist_curbegin(dirlist *op,dirlist_cur *curp) noex {
 	int		rs ;
-	if ((rs = dirlist_magic(op,curp)) >= 0) {
+	if ((rs = dirlist_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -347,7 +347,7 @@ int dirlist_curbegin(dirlist *op,dirlist_cur *curp) noex {
 
 int dirlist_curend(dirlist *op,dirlist_cur *curp) noex {
 	int		rs ;
-	if ((rs = dirlist_magic(op,curp)) >= 0) {
+	if ((rs = dirlist_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -356,7 +356,7 @@ int dirlist_curend(dirlist *op,dirlist_cur *curp) noex {
 
 int dirlist_curenum(dirlist *op,dirlist_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
-	if ((rs = dirlist_magic(op,curp,rbuf)) >= 0) {
+	if ((rs = dirlist_magic(op,curp,rbuf)) >= 0) ylikely {
 	    int		i = (curp->i >= 0) ? (curp->i+1) : 0 ;
 	    void	*vp{} ;
 	    while ((rs = vecobj_get(op->dbp,i,&vp)) >= 0) {
@@ -376,7 +376,7 @@ int dirlist_curenum(dirlist *op,dirlist_cur *curp,char *rbuf,int rlen) noex {
 
 int dirlist_curget(dirlist *op,dirlist_cur *curp,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = dirlist_magic(op,curp)) >= 0) {
+	if ((rs = dirlist_magic(op,curp)) >= 0) ylikely {
 	    int		i = (curp->i >= 0) ? (curp->i+1) : 0 ;
 	    void	*vp{} ;
 	    while ((rs = vecobj_get(op->dbp,i,&vp)) >= 0) {
@@ -399,7 +399,7 @@ int dirlist_curget(dirlist *op,dirlist_cur *curp,cchar **rpp) noex {
 
 int dirlist_joinsize(dirlist *op) noex {
 	int		rs ;
-	if ((rs = dirlist_magic(op)) >= 0) {
+	if ((rs = dirlist_magic(op)) >= 0) ylikely {
 	    rs = op->tlen ;
 	} /* end if (magic) */
 	return rs ;
@@ -409,7 +409,7 @@ int dirlist_joinsize(dirlist *op) noex {
 int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = dirlist_magic(op,jbuf)) >= 0) {
+	if ((rs = dirlist_magic(op,jbuf)) >= 0) ylikely {
 	    int		djlen = op->tlen ;
 	    if (jlen >= djlen) {
 		vecobj	*dbp = op->dbp ;
@@ -442,7 +442,7 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 	                    if (dl > 0) {
 	                        bp = strwcpy(bp,dp,dl) ;
 	                    }
-		        } /* end if_constexpr */
+		        } /* end if_constexpr (f_nulpath) */
 	            } else {
 	                f_semi = true ;
 		    }
@@ -526,14 +526,16 @@ dirlist_co::operator int () noex {
 /* end method (dirlist_co::operator) */
 
 static int entry_start(ent *ep,cc *sp,int sl,dev_t dev,ino_t ino) noex {
-	int		rs ;
-	memclear(ep) ;
-	ep->dev = dev ;
-	ep->ino = ino ;
-	if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
-	    ep->sl = rs ;
-	    ep->sp = cp ;
-	} /* end if */
+	int		rs = SR_FAULT ;
+	if (ep && sp) ylikely {
+	    memclear(ep) ;
+	    ep->dev = dev ;
+	    ep->ino = ino ;
+	    if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	        ep->sl = rs ;
+	        ep->sp = cp ;
+	    } /* end if */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (entry_start) */
@@ -541,7 +543,7 @@ static int entry_start(ent *ep,cc *sp,int sl,dev_t dev,ino_t ino) noex {
 static int entry_finish(ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ep->sp) {
+	if (ep->sp) ylikely {
 	    rs1 = uc_free(ep->sp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->sp = nullptr ;
@@ -551,28 +553,34 @@ static int entry_finish(ent *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
+static int cmpname(const entp e1p,const entp e2p) noex {
+	cint        ml = min(e1p->sl,e2p->sl) ;
+	int         rc ;
+	cchar       *s1 = e1p->sp ;
+	cchar       *s2 = e2p->sp ;
+	{
+            cint        ch1 = mkchar(*s1) ;
+            cint        ch2 = mkchar(*s2) ;
+            if ((rc = (ch1 - ch2)) == 0) {
+                rc = strncmp(s1,s2,ml) ;
+            }
+	} /* end block */
+	return rc ;
+} /* end subroutine (cmpname) */
+
 static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	ent		*e1p = entp(*v1pp) ;
 	ent		*e2p = entp(*v2pp) ;
 	int		rc = 0 ;
-	if (e1p || e2p) {
+	if (e1p || e2p) ylikely {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
-		    cint	ml = min(e1p->sl,e2p->sl) ;
-		    cchar	*s1 = e1p->sp ;
-		    cchar	*s2 = e2p->sp ;
-		    {
-                        cint        ch1 = mkchar(*s1) ;
-                        cint        ch2 = mkchar(*s2) ;
-                        if ((rc = (ch1 - ch2)) == 0) {
-	                    rc = strncmp(s1,s2,ml) ;
-		        }
-		    }
+		    rc = cmpname(e1p,e2p) ;
 		}
 	    }
-	}
+	} /* end if */
 	return rc ;
 }
 /* end subroutine (vcmpname) */
@@ -581,7 +589,7 @@ static int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
 	ent		*e1p = entp(*v1pp) ;
 	ent		*e2p = entp(*v2pp) ;
 	int		rc = 0 ;
-	if (e1p || e2p) {
+	if (e1p || e2p) ylikely {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
@@ -591,7 +599,7 @@ static int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
 		    }
 	        }
 	    }
-	}
+	} /* end if */
 	return rc ;
 }
 /* end subroutine (vcmpdevino) */

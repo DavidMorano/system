@@ -67,6 +67,14 @@
 #define	floatconv		float
 #endif
 
+#ifndef	ylikely
+#define	ylikely			[[likely]]
+#endif /* ylikely */
+
+#ifndef	nlikely
+#define	nlikely			[[unlikely]]
+#endif /* nlikely */
+
 #ifdef	__cplusplus
 #ifndef	restrict
 #define	restrict		__restrict__
@@ -203,6 +211,10 @@
 #define	EXTERNC_end	/* externc_end */
 #endif /* __cplusplus */
 #endif /* EXTERNC_begin */
+
+#ifndef	CAST_R
+#define	CAST_R		cast_reinterpret
+#endif
 
 
 #endif /* CLANGUAGE_INCLUDE */

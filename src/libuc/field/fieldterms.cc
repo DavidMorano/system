@@ -45,7 +45,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>
 #include	<usystem.h>

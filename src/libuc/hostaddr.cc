@@ -83,13 +83,11 @@ ADDRINFO {
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -97,6 +95,7 @@ ADDRINFO {
 
 #include	"hostaddr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -127,7 +126,7 @@ extern "C" {
 template<typename ... Args>
 static inline int hostaddr_ctor(hostaddr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
 	    op->magic = 0 ;
 	    op->aip = nullptr ;
@@ -140,7 +139,7 @@ static inline int hostaddr_ctor(hostaddr *op,Args ... args) noex {
 
 static inline int hostaddr_dtor(hostaddr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -150,7 +149,7 @@ static inline int hostaddr_dtor(hostaddr *op) noex {
 template<typename ... Args>
 static inline int hostaddr_magic(hostaddr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == HOSTADDR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -175,12 +174,12 @@ extern "C" {
 int hostaddr_start(hostaddr *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = hostaddr_ctor(op,hn,svc)) >= 0) {
+	if ((rs = hostaddr_ctor(op,hn,svc)) >= 0) ylikely {
 	    if (char *ehostname{} ; (rs = malloc_hn(&ehostname)) >= 0) {
 	        ADDRINFO	*aip{} ;
 	        if ((rs = geteaddrinfo(hn,svc,hintp,ehostname,&aip)) >= 0) {
 	            op->aip = aip ;
-	            if ((rs = hostaddr_resultbegin(op)) >= 0) {
+	            if ((rs = hostaddr_resultbegin(op)) >= 0) ylikely {
 	                cchar	*cp{} ;
 	                if ((rs = uc_mallocstrw(ehostname,-1,&cp)) >= 0) {
 		            op->ehostname = cp ;
@@ -209,7 +208,7 @@ int hostaddr_start(hostaddr *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 int hostaddr_finish(hostaddr *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = hostaddr_magic(op)) >= 0) {
+	if ((rs = hostaddr_magic(op)) >= 0) ylikely {
 	    if (op->ehostname) {
 	        rs1 = uc_free(op->ehostname) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -236,10 +235,10 @@ int hostaddr_finish(hostaddr *op) noex {
 
 int hostaddr_getcanonical(hostaddr *op,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = hostaddr_magic(op,rpp)) >= 0) {
+	if ((rs = hostaddr_magic(op,rpp)) >= 0) ylikely {
 	    ADDRINFO	*aip = op->aip ;
 	    *rpp = aip->ai_canonname ;
-	    rs = strlen(aip->ai_canonname) ;
+	    rs = lenstr(aip->ai_canonname) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -247,7 +246,7 @@ int hostaddr_getcanonical(hostaddr *op,cchar **rpp) noex {
 
 int hostaddr_curbegin(hostaddr *op,hostaddr_cur *curp) noex {
 	int		rs ;
-	if ((rs = hostaddr_magic(op,curp)) >= 0) {
+	if ((rs = hostaddr_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -256,7 +255,7 @@ int hostaddr_curbegin(hostaddr *op,hostaddr_cur *curp) noex {
 
 int hostaddr_curend(hostaddr *op,hostaddr_cur *curp) noex {
 	int		rs ;
-	if ((rs = hostaddr_magic(op,curp)) >= 0) {
+	if ((rs = hostaddr_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -266,9 +265,9 @@ int hostaddr_curend(hostaddr *op,hostaddr_cur *curp) noex {
 int hostaddr_curenum(hostaddr *op,hostaddr_cur *curp,ADDRINFO **rpp) noex {
 	int		rs ;
 	int		i = 0 ;
-	if ((rs = hostaddr_magic(op,curp)) >= 0) {
+	if ((rs = hostaddr_magic(op,curp)) >= 0) ylikely {
 	    i = (curp->i >= 0) ? (curp->i+1) : 0 ;
-	    if (i < op->n) {
+	    if (i < op->n) ylikely {
 	        if (rpp) *rpp = op->resarr[i] ;
 	        curp->i = i ;
 	    } else {
@@ -285,7 +284,7 @@ int hostaddr_curenum(hostaddr *op,hostaddr_cur *curp,ADDRINFO **rpp) noex {
 
 static int hostaddr_resultbegin(hostaddr *op) noex {
 	ADDRINFO	*aip = op->aip ;
-	cint		esize = szof(ADDRINFO) ;
+	cint		esz = szof(ADDRINFO) ;
 	int		rs ;
 	int		n = 0 ;
 	int		sz ;
@@ -294,8 +293,9 @@ static int hostaddr_resultbegin(hostaddr *op) noex {
 	    aip = aip->ai_next ;
 	    n += 1 ;
 	} /* end while */
-	sz = ((n + 1) * esize) ;
-	if (ADDRINFO **resarr{} ; (rs = uc_malloc(sz,&resarr)) >= 0) {
+	sz = ((n + 1) * esz) ;
+	if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) ylikely {
+	    ADDRINFO **resarr = (ADDRINFO **) vp ;
 	    int		i = 0 ; /* used-afterwards */
 	    op->resarr = resarr ;
 	    op->n = n ;
@@ -310,7 +310,7 @@ static int hostaddr_resultbegin(hostaddr *op) noex {
 		cint	ssize = szof(void *) ;
 	        qsort(resarr,n,ssize,vcmpaddr) ;
 	    }
-	} /* end if (m-a) */
+	} /* end if (memory-allocation) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (hostaddr_resultbegin) */
@@ -318,7 +318,7 @@ static int hostaddr_resultbegin(hostaddr *op) noex {
 static int hostaddr_resultend(hostaddr *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->resarr) {
+	if (op->resarr) ylikely {
 	    rs1 = uc_free(op->resarr) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->resarr = nullptr ;
@@ -336,11 +336,11 @@ static int vcmpaddr(cvoid *v1p,cvoid *v2p) noex {
 	{
 	    ADDRINFO	*a1p = (ADDRINFO *) *a1pp ;
 	    ADDRINFO	*a2p = (ADDRINFO *) *a2pp ;
-	    if (a1p || a2p) {
+	    if (a1p || a2p) ylikely {
 	        rc = +1 ;
-	        if (a1p) {
+	        if (a1p) ylikely {
 		    rc = -1 ;
-	            if (a2p) {
+	            if (a2p) ylikely {
 	                rc = (a1p->ai_family - a2p->ai_family) ;
 	            }
 	        }

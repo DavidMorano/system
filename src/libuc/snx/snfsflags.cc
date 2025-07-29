@@ -54,7 +54,7 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
@@ -62,7 +62,11 @@
 #include	<sys/statvfs.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"snflags.h"
@@ -103,8 +107,8 @@ constexpr flagstrs	fs_vstat[] = {
 #ifdef	ST_NOTRUNC
 	{ ST_NOTRUNC, "NOTRUNC" },
 #endif
-	{ 0, NULL }
-} ;
+	{ 0, nullptr }
+} ; /* end array (fs_vstat) */
 
 
 /* exported variables */
@@ -115,8 +119,8 @@ constexpr flagstrs	fs_vstat[] = {
 int snfsflags(char *dbuf,int dlen,ulong flags) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (dbuf) {
-	    if (snflags ss ; (rs = ss.start(dbuf,dlen)) >= 0) {
+	if (dbuf) ylikely {
+	    if (snflags ss ; (rs = ss.start(dbuf,dlen)) >= 0) ylikely {
 	        for (int i = 0 ; (rs >= 0) && fs_vstat[i].fl ; i += 1) {
 	            if (flags & fs_vstat[i].fl) {
 	                rs = ss.addstr(fs_vstat[i].s) ;

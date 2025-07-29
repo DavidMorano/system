@@ -56,14 +56,18 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
@@ -96,7 +100,7 @@ namespace {
 	int	mch = 0 ;
 	int operator () (char *,int) noex ;
     } ; /* end struct (snxxx) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -161,10 +165,10 @@ int snsd(char *dbuf,int dlen,cchar *s1,uint d2) noex {
 int snchrs(char *dp,int dl,int ch,int n) noex {
     	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (dp) {
+	if (dp) ylikely {
 	    rs = SR_INVALID ;
-	    if (n >= 0) {
-		if (storebuf sb(dp,dl) ; (rs = sb.chrs(ch,n)) >= 0) {
+	    if (n >= 0) ylikely {
+		if (storebuf sb(dp,dl) ; (rs = sb.chrs(ch,n)) >= 0) ylikely {
 		    rl = sb.idx ;
 		} /* end if (storebuf) */
 	    } /* end if (valid) */
@@ -179,20 +183,20 @@ int snchrs(char *dp,int dl,int ch,int n) noex {
 int snxxx::operator () (char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (dbuf) {
+	if (dbuf) ylikely {
 	    storebuf	sb(dbuf,dlen) ;
 	    rs = SR_OK ;
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        if (s1) {
 	            rs = sb.str(s1) ;
 	        } else {
 	            rs = sb.dec(d1) ;
 	        }
 	    }
-	    if ((rs >= 0) && mch) {
+	    if ((rs >= 0) && mch) ylikely {
 	        rs = sb.chr(mch) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        if (s2) {
 	            rs = sb.str(s2) ;
 	        } else {

@@ -55,19 +55,21 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= retstat.o sethand.o
-OBJ1= setstr.o setstr_loadfile.o
-OBJ2= setostr.o setostr_loadfile.o
-OBJ3= setint.o 
-OBJ4= setoint.o
+OBJ0= setint.o setoint.o
+OBJ1= setstr.o setstr_ext.o
+OBJ2= setostr.o setostr_ext.o
+OBJ3= sethand.o
+
+OBJ4= retstat.o 
+OBJ5= setstrx_loadfile.o
 
 OBJA= obj0.o obj1.o obj2.o 
-OBJB= obj3.o obj4.o
+OBJB= obj3.o obj4.o obj5.o
 
 OBJ= obja.o objb.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -80,6 +82,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -100,13 +105,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	$(RM) $(ALL)
@@ -145,23 +145,28 @@ objb.o:			$(OBJB)
 
 
 # RETSTAT
-retstat.o:		retstat.ccm			$(INCS)
+retstat.o:		retstat.ccm				$(INCS)
 	makemodule retstat
 
 # set-strings
-setstr.o:		setstr.cc setstr.h		$(INCS)
-setstr_loadfile.o:	setstr_loadfile.cc setstr.h	$(INCS)
+setstr.o:		setstr.cc setstr.h			$(INCS)
+setstr_ext.o:		setstr_ext.cc	setstrx.hh		$(INCS)
+setstr_loadfile.o:	setstr_loadfile.cc setstr.h		$(INCS)
 
 # set-ordered-strings
-setostr.o:		setostr.cc setostr.h		$(INCS)
-setostr_loadfile.o:	setostr_loadfile.cc setostr.h	$(INCS)
+setostr.o:		setostr.cc	setostr.h		$(INCS)
+setostr_ext.o:		setostr_ext.cc	setstrx.hh		$(INCS)
+setostr_loadfile.o:	setostr_loadfile.cc setostr.h		$(INCS)
 
-setint.o:		setint.cc setint.h		$(INCS)
+setint.o:		setint.cc setint.h			$(INCS)
 
-sethand.o:		sethand.ccm retstat.ccm		$(INCS)
+setoint.o:		setoint.cc setoint.h			$(INCS)
+
+sethand.o:		sethand.ccm retstat.ccm			$(INCS)
 	makemodule retstat
 	makemodule sethand
 
-setoint.o:		setoint.cc setoint.h		$(INCS)
+# SETSTRX
+setstrx_loadfile.o:	setstrx_loadfile.cc	setstrx.hh	$(INCS)
 
 

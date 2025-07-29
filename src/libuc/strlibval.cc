@@ -122,7 +122,7 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 /* exported subroutines */
 
 strlibval::operator ccharp () noex {
-	cchar		*rp ;
+	cchar		*rp ; /* return-value */
 	if ((rp = strp) == nullptr) {
 	    cint	to = utimeout[uto_busy] ;
 	    if (! fmx.testandset) {
@@ -173,17 +173,17 @@ strlibval::operator ccharp () noex {
 void strlibval::dtor() noex {
 	strp = nullptr ;
 	if (a) {
-	    cint	rs = uc_free(a) ;
-	    a = nullptr ;
-	    if (rs < 0) {
-		 ulogerror("strlibpath::dtor",rs,"dtor-uc_free") ;
+	    if (cint rs = uc_free(a) ; rs >= 0) {
+	        a = nullptr ;
+	    } else {
+		ulogerror("strlibpath::dtor",rs,"dtor-uc_free") ;
 	    }
 	}
 }
 /* end method (strlibval::dtor) */
 
 ccharp strlibval::cook() noex {
-	cchar	*rp = nullptr ;
+	cchar	*rp = nullptr ; /* return-value */
 	if (cchar *vn ; (vn = enver.name[w]) != nullptr) {
 	    rp = getenv(vn) ;
 	    strp = rp ;
@@ -193,7 +193,7 @@ ccharp strlibval::cook() noex {
 /* end method (strlibval::cook) */
 
 ccharp strlibval::strtmpdir() noex {
-	cchar	*rp = nullptr ;
+	cchar	*rp = nullptr ; /* return-value */
 	if (cchar *vn ; (vn = enver.name[w]) != nullptr) {
 	    if ((rp = getenv(vn)) == nullptr) {
 		rp = sysword.w_tmpdir ;
@@ -205,7 +205,7 @@ ccharp strlibval::strtmpdir() noex {
 /* end method (strlibval::strtmpdir) */
 
 ccharp strlibval::strmaildir() noex {
-	cchar	*rp = nullptr ;
+	cchar	*rp = nullptr ; /* return-value */
 	if (cchar *vn ; (vn = enver.name[w]) != nullptr) {
 	    if ((rp = getenv(vn)) == nullptr) {
 		rp = sysword.w_maildir ;
@@ -233,7 +233,7 @@ ccharp strlibval::strpath() noex {
 			        cint	clen = (tlen - (tl+rs)) ;
 			        char	*cbuf = (tbuf + (tl+rs)) ;
 			        tl += rs ;
-		                if ((rs = uc_sysconfstr(cbuf,clen,cmd)) >= 0) {
+		                if ((rs = uc_sysconfstr(cmd,cbuf,clen)) >= 0) {
 			            tl += rs ;
 			            a = mallocstrw(tbuf,tl) ;
 			            rp = a ;

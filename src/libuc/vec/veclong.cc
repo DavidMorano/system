@@ -86,18 +86,6 @@ static inline int veclong_magic(veclong *op,Args ... args) noex {
 }
 /* end subroutine (veclong_magic) */
 
-static consteval int mkoptmask() noex {
-	int		m = 0 ;
-	m |= VECLONG_OREUSE ;
-	m |= VECLONG_OSWAP ;
-	m |= VECLONG_OSTATIONARY ;
-	m |= VECLONG_OCOMPACT ;
-	m |= VECLONG_OSORTED ;
-	m |= VECLONG_OORDERED ;
-	m |= VECLONG_OCONSERVE ;
-	return m ;
-}
-
 static int	veclong_addval(veclong *op,VECLONG_TYPE) noex ;
 static int	veclong_extend(veclong *,int) noex ;
 static int	veclong_setopts(veclong *,int) noex ;
@@ -327,14 +315,14 @@ int veclong_del(veclong *op,int i) noex {
 		/* delete the entry */
 	        op->c -= 1 ;		/* decrement list count */
                 /* apply the appropriate deletion based on management policy */
-	        if (op->f.ostationary) {
+	        if (op->fl.ostationary) {
 	            op->va[i] = 0 ;
 	            if (i == (op->i - 1)) {
 	                op->i -= 1 ;
 	            }
 	            f_fi = true ;
-	        } else if (op->f.issorted || op->f.oordered) {
-	             if (op->f.ocompact) {
+	        } else if (op->fl.issorted || op->fl.oordered) {
+	             if (op->fl.ocompact) {
 		         int	j ;
 	                 op->i -= 1 ;
 	                 for (j = i ; j < op->i ; j += 1) {
@@ -349,10 +337,10 @@ int veclong_del(veclong *op,int i) noex {
 	                 f_fi = true ;
 	             } /* end if */
 	         } else {
-	             if ((op->f.oswap || op->f.ocompact) && (i < (op->i - 1))) {
+	             if ((op->fl.oswap || op->fl.ocompact) && (i < (op->i - 1))) {
 	                 op->va[i] = op->va[op->i - 1] ;
 	                 op->va[--op->i] = 0 ;
-	                 op->f.issorted = false ;
+	                 op->fl.issorted = false ;
 	             } else {
 	                 op->va[i] = 0 ;
 	                 if (i == (op->i - 1)) {
@@ -384,8 +372,8 @@ int veclong_sort(veclong *op) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = veclong_magic(op)) >= 0) {
-	    if (! op->f.issorted) {
-	        op->f.issorted = true ;
+	    if (! op->fl.issorted) {
+	        op->fl.issorted = true ;
 	        if (op->c > 1) {
 		    cint	esz = szof(VECLONG_TYPE) ;
 	            sort_vcmp	scmp = sort_vcmp(deflongcmp) ;
@@ -401,7 +389,7 @@ int veclong_sort(veclong *op) noex {
 int veclong_setsorted(veclong *op) noex {
 	int		rs ;
 	if ((rs = veclong_magic(op)) >= 0) {
-	    op->f.issorted = true ;
+	    op->fl.issorted = true ;
 	    rs = op->c ;
 	} /* end if (magic) */
 	return rs ;
@@ -412,7 +400,7 @@ int veclong_find(veclong *op,VECLONG_TYPE v) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = veclong_magic(op)) >= 0) {
-	    if (op->f.issorted) {
+	    if (op->fl.issorted) {
 	        long		*rpp2 ;
 	        cint		esz = szof(VECLONG_TYPE) ;
 	        sort_vcmp	scmp = sort_vcmp(deflongcmp) ;
@@ -472,19 +460,31 @@ int veclong_audit(veclong *op) noex {
 
 /* private subroutines */
 
+static consteval int mkoptmask() noex {
+	int		m = 0 ;
+	m |= VECLONG_OREUSE ;
+	m |= VECLONG_OSWAP ;
+	m |= VECLONG_OSTATIONARY ;
+	m |= VECLONG_OCOMPACT ;
+	m |= VECLONG_OSORTED ;
+	m |= VECLONG_OORDERED ;
+	m |= VECLONG_OCONSERVE ;
+	return m ;
+} /* end subroutine (mkoptmask) */
+
 static int veclong_setopts(veclong *op,int vo) noex {
 	constexpr int	m = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	if ((vo & (~ m)) == 0) {
 	    rs = SR_OK ;
-	    op->f = {} ;
-	    if (vo & VECLONG_OREUSE) op->f.oreuse = 1 ;
-	    if (vo & VECLONG_OSWAP) op->f.oswap = 1 ;
-	    if (vo & VECLONG_OSTATIONARY) op->f.ostationary = 1 ;
-	    if (vo & VECLONG_OCOMPACT) op->f.ocompact = 1 ;
-	    if (vo & VECLONG_OSORTED) op->f.osorted = 1 ;
-	    if (vo & VECLONG_OORDERED) op->f.oordered = 1 ;
-	    if (vo & VECLONG_OCONSERVE) op->f.oconserve = 1 ;
+	    op->fl = {} ;
+	    if (vo & VECLONG_OREUSE) op->fl.oreuse = 1 ;
+	    if (vo & VECLONG_OSWAP) op->fl.oswap = 1 ;
+	    if (vo & VECLONG_OSTATIONARY) op->fl.ostationary = 1 ;
+	    if (vo & VECLONG_OCOMPACT) op->fl.ocompact = 1 ;
+	    if (vo & VECLONG_OSORTED) op->fl.osorted = 1 ;
+	    if (vo & VECLONG_OORDERED) op->fl.oordered = 1 ;
+	    if (vo & VECLONG_OCONSERVE) op->fl.oconserve = 1 ;
 	} /* end if (valid) */
 	return rs ;
 }
@@ -496,7 +496,7 @@ int veclong_addval(veclong *op,VECLONG_TYPE v) noex {
 	bool		f_done = false ;
 	bool		f ;
 	/* can we fit this new entry within the existing extent? */
-	f = (op->f.oreuse || op->f.oconserve) && (! op->f.oordered) ;
+	f = (op->fl.oreuse || op->fl.oconserve) && (! op->fl.oordered) ;
 	if (f && (op->c < op->i)) {
 	    i = op->fi ;
 	    while ((i < op->i) && (op->va[i] != INT_MIN)) {
@@ -525,7 +525,7 @@ int veclong_addval(veclong *op,VECLONG_TYPE v) noex {
 	} /* end if */
 	if (rs >= 0) {
 	    op->c += 1 ;		/* increment list count */
-	    op->f.issorted = false ;
+	    op->fl.issorted = false ;
 	}
 	return (rs >= 0) ? i : rs ;
 }
@@ -578,7 +578,7 @@ static int veclong_insertval(veclong *op,int ii,VECLONG_TYPE val) noex {
 	} /* end if */
 	op->va[ii] = val ;
 	op->c += 1 ;
-	op->f.issorted = false ;
+	op->fl.issorted = false ;
 	return ii ;
 }
 /* end subroutine (veclong_insertval) */

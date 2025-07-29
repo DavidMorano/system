@@ -28,11 +28,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -75,24 +77,24 @@ static bufsizevar	maxnamelen(getbufsize_mn) ;
 int mkshlibname(char *shlibname,cchar *pnp,int pnl) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (shlibname && pnp) {
+	if (shlibname && pnp) ylikely {
 	    rs = SR_INVALID ;
-	    if (pnp[0]) {
+	    if (pnp[0]) ylikely {
 	        cchar	*lc = "lib" ;
 		if (pnl < 0) pnl = lenstr(pnp) ;
-		if ((rs = maxnamelen) >= 0) {
+		if ((rs = maxnamelen) >= 0) ylikely {
 		    storebuf	sb(shlibname,rs) ;
 	            bool	f = ((pnl >= 3) && (strncmp(pnp,lc,3) == 0)) ;
 	            if (! f) {
 			rs = sb.strw(lc,3) ;
 	            }
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                rs = sb.strw(pnp,pnl) ;
 	            }
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                rs = sb.chr('.') ;
 	            }
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                rs = sb.strw("so",2) ;
 	            }
 		    rl = sb ;

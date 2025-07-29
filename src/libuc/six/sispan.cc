@@ -51,7 +51,7 @@
 #include	<mkchar.h>
 #include	<localmisc.h>
 
-#include	"six.h"
+#include	"sispan.h"
 
 import libutil ;			/* |xstrspn(3u)| */
 

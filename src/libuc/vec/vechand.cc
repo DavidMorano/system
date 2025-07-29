@@ -100,7 +100,7 @@ int vechandms::conserve		= (1 << vechando_conserve) ;
 int vechandms::sorted		= (1 << vechando_sorted) ;
 int vechandms::ordered		= (1 << vechando_ordered) ;
 
-vechandms	vechandm ;
+const vechandms		vechandm ;
 
 
 /* exported subroutines */

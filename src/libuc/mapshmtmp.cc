@@ -50,7 +50,6 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<sysval.hh>
 #include	<mallocxx.h>
@@ -80,6 +79,9 @@ extern "C" {
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward reference */
 
 static int	shmalloc(int,int) noex ;
@@ -90,13 +92,17 @@ static int	shmalloc(int,int) noex ;
 static sysval		pagesize(sysval_ps) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mapshmtmp(char *rbuf,int rlen,mode_t operm,int shmlen,char **rpp) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (rpp) {
+	if (rpp) ylikely {
 	    rs = SR_INVALID ;
-	    if (shmlen > 0) {
+	    if (shmlen > 0) ylikely {
 		bool	f_bufalloc = false ;
 		rs = SR_OK ;
                 if (rbuf == nullptr) {
@@ -105,17 +111,16 @@ int mapshmtmp(char *rbuf,int rlen,mode_t operm,int shmlen,char **rpp) noex {
                         f_bufalloc = true ;
                     }
                 } /* end if (not user-supplied buffer) */
-                if (rs >= 0) {
-		    const nullptr_t	np{} ;
-                    if ((rs = openshmtmp(rbuf,rlen,operm)) >= 0) {
-                        cint        	fd = rs ;
+                if (rs >= 0) ylikely {
+                    if ((rs = openshmtmp(rbuf,rlen,operm)) >= 0) ylikely {
+                        cint	fd = rs ;
                         if (f_bufalloc) {
                             uc_unlinkshm(rbuf) ;
                         }
-                        if ((rs = shmalloc(fd,shmlen)) >= 0) {
-                            size_t  ms = shmlen ;
-                            int     mp = (PROT_READ | PROT_WRITE) ;
-                            int     mo = MAP_SHARED ;
+                        if ((rs = shmalloc(fd,shmlen)) >= 0) ylikely {
+                            csize	ms = shmlen ;
+                            cint	mp = (PROT_READ | PROT_WRITE) ;
+                            cint	mo = MAP_SHARED ;
                             rs = u_mmapbegin(np,ms,mp,mo,fd,0z,rpp) ;
                         } /* end if */
                         uc_close(fd) ;
@@ -135,11 +140,11 @@ int mapshmtmp(char *rbuf,int rlen,mode_t operm,int shmlen,char **rpp) noex {
 
 static int shmalloc(int fd,int shmlen) noex {
 	int		rs ;
-	if ((rs = pagesize) >= 0) {
+	if ((rs = pagesize) >= 0) ylikely {
 	    cint	ps = rs ;
 	    off_t	off = 0 ;
-	    cint	wlen = sizeof(int) ;
-	    char	wbuf[sizeof(int) + 1] = {} ;
+	    cint	wlen = szof(int) ;
+	    char	wbuf[szof(int) + 1] = {} ;
 	    while ((rs >= 0) && (off < shmlen)) {
 	        rs = u_pwrite(fd,wbuf,wlen,off) ;
 	        off += ps ;

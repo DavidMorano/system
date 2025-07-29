@@ -43,7 +43,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* <- for |getenv(3c)| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
 #include	<getourenv.h>
 #include	<cfdec.h>
@@ -51,7 +51,6 @@
 #include	<localmisc.h>
 
 #include	"getnprocessors.h"
-
 
 import uconstants ;
 
@@ -79,7 +78,7 @@ enum whiches {
 	w_ucsys,
 	w_def,
 	w_overlast
-} ;
+} ; /* end enum (whiches) */
 
 namespace {
     struct procer ;
@@ -106,7 +105,7 @@ constexpr procer_m	procers[] = {
 	&procer::gloenv,
 	&procer::ucsys,
 	&procer::def
-} ;
+} ; /* end array (procers) */
 
 
 /* exported variables */

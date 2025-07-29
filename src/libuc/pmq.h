@@ -30,8 +30,8 @@
 
 
 struct pmq_head {
-	mqd_t		pq ;
 	char		*name ;		/* allocated */
+	mqd_t		pq ;
 	uint		magic ;
 } ;
 

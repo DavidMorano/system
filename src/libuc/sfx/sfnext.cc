@@ -100,10 +100,11 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<baops.h>		/* |batst(2uc)| */
-#include	<char.h>
+#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
+#include	"sfnext.h"
 
 
 /* local defines */
@@ -159,9 +160,10 @@ namespace {
 int sfnext(cchar *sp,int sl,cchar **rpp) noex {
 	sfnextx		sf(sp,sl,rpp) ;
 	return sf ;
-}
+} /* end subroutine (sfnext) */
 
 int sfnextchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
+    	int		rl = -1 ;
 	struct esfx : sfnextx {
 	    int		sch ;
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
@@ -169,10 +171,13 @@ int sfnextchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 		return (ch == sch) ;
 	    } ;
 	} ; /* end struct */
-	esfx		sf(sp,sl,rpp) ;
-	sf.sch = sch ;
-	return sf ;
-}
+	if (sch) ylikely {
+	    esfx	sf(sp,sl,rpp) ;
+	    sf.sch = sch ;
+	    rl = sf ;
+	}
+	return rl ;
+} /* end subroutine (sfnextchr) */
 
 int sfnextbrk(cchar *sp,int sl,cchar *bstr,cchar **rpp) noex {
 	int		rl = -1 ;
@@ -183,13 +188,13 @@ int sfnextbrk(cchar *sp,int sl,cchar *bstr,cchar **rpp) noex {
 		return (strchr(bstr,ch) != nullptr) ;
 	    } ;
 	} ; /* end struct */
-	if (bstr) {
+	if (bstr) ylikely {
 	    esfx	sf(sp,sl,rpp) ;
 	    sf.bstr = bstr ;
 	    rl = sf ;
 	} /* end if (non-null) */
 	return rl ;
-}
+} /* end subroutine (sfnextbrk) */
 
 int sfnextterm(cchar *sp,int sl,cchar *terms,cchar **rpp) noex {
 	int		rl = -1 ;
@@ -200,7 +205,7 @@ int sfnextterm(cchar *sp,int sl,cchar *terms,cchar **rpp) noex {
 		return batst(terms,ch) ;
 	    } ;
 	} ; /* end struct */
-	if (terms) {
+	if (terms) ylikely {
 	    esfx	sf(sp,sl,rpp) ;
 	    sf.terms = terms ;
 	    rl = sf ;
@@ -215,7 +220,7 @@ int sfnextterm(cchar *sp,int sl,cchar *terms,cchar **rpp) noex {
 sfnextx::operator int () noex {
 	int		rl = -1 ;
 	cchar		*rp = nullptr ;
-	if (sp && rpp) {
+	if (sp && rpp) ylikely {
 	    while (sl && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;

@@ -42,6 +42,9 @@ module ;
 #include	<usysrets.h>
 #include	<localmisc.h>
 
+#pragma		GCC dependency	"mod/ureserve.ccm"
+#pragma		GCC dependency	"mod/fonce.ccm"
+
 export module tardir ;
 
 import ureserve ;			/* |vecstr(3u)| */

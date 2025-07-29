@@ -76,10 +76,10 @@ static inline int recarr_ctor(recarr *op,Args ... args) noex {
 	    op->i = 0 ;
 	    op->n = 0 ;
 	    op->fi = 0 ;
-	    op->f = {} ;
+	    op->fl = {} ;
 	}
 	return rs ;
-}
+} /* end subroutine (recarr_ctor) */
 
 static int recarr_dtor(recarr *op) noex {
 	int		rs = SR_FAULT ;
@@ -87,7 +87,7 @@ static int recarr_dtor(recarr *op) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
+} /* end subroutine (recarr_dtor) */
 
 static int	recarr_setopts(recarr *,int) noex ;
 static int	recarr_extend(recarr *,int = 0) noex ;
@@ -95,23 +95,8 @@ static int	recarr_extend(recarr *,int = 0) noex ;
 
 /* local subroutines */
 
-consteval int mkoptmask() noex {
-	int		m = 0 ;
-	m |= RECARR_OREUSE ;
-	m |= RECARR_OCOMPACT ;
-	m |= RECARR_OSWAP ;
-	m |= RECARR_OSTATIONARY ;
-	m |= RECARR_OCONSERVE ;
-	m |= RECARR_OSORTED ;
-	m |= RECARR_OORDERED ;
-	return m ;
-}
-/* end subroutine (mkoptmask) */
-
 
 /* local variables */
-
-constexpr int		optmask = mkoptmask() ;
 
 constexpr bool		f_qsort = CF_QSORT ;
 
@@ -127,13 +112,12 @@ int recarr_start(recarr *op,int n,int opts) noex {
 	    if (n <= 1) n = RECARR_DEFENTS ;
 	    if ((rs = recarr_setopts(op,opts)) >= 0) {
 	        cint	sz = (n + 1) * szof(void **) ;
-	        void	*vp{} ;
-	        if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
-		    op->va = (void **) vp ;
+	        if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+		    op->va = voidpp(vp) ;
 		    op->n = n ;
 	            op->va[0] = nullptr ;
 	        } /* end if (memory-allocation) */
-	    }
+	    } /* end if (recarr_setopts) */
 	    if (rs < 0) {
 		recarr_dtor(op) ;
 	    }
@@ -171,8 +155,8 @@ int recarr_add(recarr *op,cvoid *sp) noex {
 	    bool	f_done = false ;
 	    bool 	f = true ;
 	    rs = SR_OK ;
-	    f = f && (op->f.oreuse || op->f.oconserve) ;
-	    f = f && (! op->f.oordered) ;
+	    f = f && (op->fl.oreuse || op->fl.oconserve) ;
+	    f = f && (! op->fl.oordered) ;
 	    if (f && (op->c < op->i)) {
 	        i = op->fi ;
 	        while ((i < op->i) && (op->va[i] != nullptr)) {
@@ -197,7 +181,7 @@ int recarr_add(recarr *op,cvoid *sp) noex {
 	        }
 	    } /* end if (added elsewhere) */
 	    if (rs >= 0) op->c += 1 ;
-	    op->f.issorted = false ;
+	    op->fl.issorted = false ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
@@ -290,12 +274,12 @@ int recarr_del(recarr *op,int i) noex {
 	        if (op->va) {
 	            bool	f_fi = false ;
 	            op->c -= 1 ;
-	            if (op->f.ostationary) {
+	            if (op->fl.ostationary) {
 	                op->va[i] = nullptr ;
 	                if (i == (op->i - 1)) op->i -= 1 ;
 	                f_fi = true ;
-	            } else if (op->f.issorted || op->f.oordered) {
-	                if (op->f.ocompact) {
+	            } else if (op->fl.issorted || op->fl.oordered) {
+	                if (op->fl.ocompact) {
 	                    op->i -= 1 ;
 	                    for (int j = i ; j < op->i ; j += 1) {
 	                        op->va[j] = op->va[j + 1] ;
@@ -308,19 +292,19 @@ int recarr_del(recarr *op,int i) noex {
 	                } /* end if */
 	            } else {
 			bool	f = true ;
-	                f = f && (op->f.oswap || op->f.ocompact) ;
+	                f = f && (op->fl.oswap || op->fl.ocompact) ;
 			f = f && (i < (op->i-1)) ;
 			if (f) {
 	                    op->va[i] = op->va[op->i - 1] ;
 	                    op->va[--op->i] = nullptr ;
-	                    op->f.issorted = false ;
+	                    op->fl.issorted = false ;
 	                } else {
 	                    op->va[i] = nullptr ;
 	                    if (i == (op->i - 1)) op->i -= 1 ;
 	                    f_fi = true ;
 	                } /* end if */
 	            } /* end if */
-	            if (op->f.oconserve) {
+	            if (op->fl.oconserve) {
 	                while (op->i > i) {
 	                    if (op->va[op->i - 1] != nullptr) break ;
 	                    op->i -= 1 ;
@@ -378,8 +362,8 @@ int recarr_sort(recarr *op,recarr_cf vcmp) noex {
 	    rs = SR_OK ;
 	    if (op->va) {
 		c = op->c ;
-	        if (! op->f.issorted) {
-	            op->f.issorted = true ;
+	        if (! op->fl.issorted) {
+	            op->fl.issorted = true ;
 	            if (op->c > 1) {
 			qsort_f		qcmp = qsort_f(vcmp) ;
 			if_constexpr (f_qsort) {
@@ -400,7 +384,7 @@ int recarr_setsorted(recarr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = op->c ;
-	    op->f.issorted = true ;
+	    op->fl.issorted = true ;
 	}
 	return rs ;
 }
@@ -413,14 +397,14 @@ int recarr_search(recarr *op,cvoid *ep,recarr_cf vcmp,void *vrp) noex {
 	if (op && ep && vcmp) {
 	    cint	esize = szof(void *) ;
 	    void	**spp{} ;
-	    if (op->f.osorted && (! op->f.issorted)) {
-	        op->f.issorted = true ;
+	    if (op->fl.osorted && (! op->fl.issorted)) {
+	        op->fl.issorted = true ;
 	        if (op->c > 1) {
 		    qsort_f	qcmp = qsort_f(vcmp) ;
 		    qsort(op->va,op->i,esize,qcmp) ;
 	        }
 	    }
-	    if (op->f.issorted) {
+	    if (op->fl.issorted) {
 		qsort_f		qcmp = qsort_f(vcmp) ;
 	        spp = (void **) bsearch(&ep,op->va,op->i,esize,qcmp) ;
 	        rs = SR_NOTFOUND ;
@@ -470,18 +454,32 @@ int recarr_extent(recarr *op) noex {
 
 /* private subroutines */
 
+consteval int mkoptmask() noex {
+	int		m = 0 ;
+	m |= RECARR_OREUSE ;
+	m |= RECARR_OCOMPACT ;
+	m |= RECARR_OSWAP ;
+	m |= RECARR_OSTATIONARY ;
+	m |= RECARR_OCONSERVE ;
+	m |= RECARR_OSORTED ;
+	m |= RECARR_OORDERED ;
+	return m ;
+}
+/* end subroutine (mkoptmask) */
+
 static int recarr_setopts(recarr *op,int vo) noex {
+	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~optmask)) == 0) {
+	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
-	    op->f = {} ;
-	    if (vo & RECARR_OREUSE) op->f.oreuse = 1 ;
-	    if (vo & RECARR_OCOMPACT) op->f.ocompact = 1 ;
-	    if (vo & RECARR_OSWAP) op->f.oswap = 1 ;
-	    if (vo & RECARR_OSTATIONARY) op->f.ostationary = 1 ;
-	    if (vo & RECARR_OCONSERVE) op->f.oconserve = 1 ;
-	    if (vo & RECARR_OSORTED) op->f.osorted = 1 ;
-	    if (vo & RECARR_OORDERED) op->f.oordered = 1 ;
+	    op->fl = {} ;
+	    if (vo & RECARR_OREUSE) op->fl.oreuse = 1 ;
+	    if (vo & RECARR_OCOMPACT) op->fl.ocompact = 1 ;
+	    if (vo & RECARR_OSWAP) op->fl.oswap = 1 ;
+	    if (vo & RECARR_OSTATIONARY) op->fl.ostationary = 1 ;
+	    if (vo & RECARR_OCONSERVE) op->fl.oconserve = 1 ;
+	    if (vo & RECARR_OSORTED) op->fl.osorted = 1 ;
+	    if (vo & RECARR_OORDERED) op->fl.oordered = 1 ;
 	} /* end if (valid options) */
 	return rs ;
 }

@@ -45,18 +45,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<ctime>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<getnodename.h>
-#include	<base64.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -99,11 +95,10 @@ static int mkform(char *,cchar *,mode_t) noex ;
 int mkjobfile(char *rbuf,cchar *dname,mode_t fm) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (rbuf && dname) {
+	if (rbuf && dname) ylikely {
 	    rs = SR_INVALID ;
-	    if (dname[0]) {
-		USTAT	sb ;
-	        if ((rs = u_stat(dname,&sb)) >= 0) {
+	    if (dname[0]) ylikely {
+		if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) ylikely {
 	    	    rs = SR_NOTDIR ;
 	            if (S_ISDIR(sb.st_mode)) {
 			cmode	pm = (fm & S_IAMB) ;
@@ -121,21 +116,22 @@ int mkjobfile(char *rbuf,cchar *dname,mode_t fm) noex {
 /* local subroutines */
 
 static int mkform(char *rbuf,cchar *dname,mode_t fm) noex {
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-	char		*nbuf{} ;
-	if ((rs = malloc_nn(&nbuf)) >= 0) {
-	    int		nlen = rs ;
-	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
-		cint	pl = PREFIXLEN ;
-		if (rs > pl) nbuf[pl] = '\0' ;
-		rs = mkartfile(rbuf,dname,nbuf,0,fm) ;
-		rl = rs ;
-	    } /* end if (getnodename) */
-	    rs1 = uc_free(nbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (getnodename) */
+	if (rbuf && dname) ylikely {
+	    if (char *nbuf ; (rs = malloc_nn(&nbuf)) >= 0) ylikely {
+	        int	nlen = rs ;
+	        if ((rs = getnodename(nbuf,nlen)) >= 0) ylikely {
+		    cint	pl = PREFIXLEN ;
+		    if (rs > pl) nbuf[pl] = '\0' ;
+		    rs = mkartfile(rbuf,dname,nbuf,0,fm) ;
+		    rl = rs ;
+	        } /* end if (getnodename) */
+	        rs1 = uc_free(nbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mkform) */

@@ -96,12 +96,12 @@ int snwcpyshrink(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	if (dbuf && sp) {
 	    cchar	*cp ;
 	    rs = SR_OK ;
-	        if (cchar *tp ; (tp = strnchr(sp,sl,CH_NL)) != nullptr) {
-	            sl = intconv(tp - sp) ;
-	        }
-	        if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
-	            rs = snwcpy(dbuf,dlen,cp,cl) ;
-	        }
+	    if (cchar *tp ; (tp = strnchr(sp,sl,CH_NL)) != nullptr) {
+	        sl = intconv(tp - sp) ;
+	    }
+	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
+	        rs = snwcpy(dbuf,dlen,cp,cl) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }

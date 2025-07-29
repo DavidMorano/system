@@ -86,17 +86,20 @@ using std::max ;			/* subroutine-template */
 /* exported subroutines */
 
 int strnnlen(cchar *sp,int sl,int mlen) noex {
-	int		len = 0 ;
-	if (sp && (sl != 0) && (mlen != 0)) {
-	    if (sl > 0) {
-	        if (mlen > 0) {
-		    sl = min(sl,mlen) ;
-		}
-	    } else {
-	        sl = mlen ;
-	    }
-	    len = lenstr(sp,sl) ; /* (sl < 0) is allowed */
-	} /* end if */
+	int		len = -1 ;
+	if (sp) ylikely {
+	    len = 0 ;
+	    if (sp && (sl != 0) && (mlen != 0)) {
+	        if (sl > 0) {
+	            if (mlen > 0) {
+		        sl = min(sl,mlen) ;
+		    }
+	        } else {
+	            sl = mlen ;
+	        }
+	        len = lenstr(sp,sl) ; /* (sl < 0) is allowed */
+	    } /* end if */
+	} /* end if (non-null) */
 	return len ;
 }
 /* end subroutine (strnnlen) */

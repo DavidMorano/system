@@ -45,12 +45,12 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnchr(3uc)| */
 #include	<matkeystr.h>
 
 #include	"getenver.h"
@@ -78,7 +78,7 @@ extern mainv	environ ;
 
 cchar *getenver(cchar *kp,int kl) noex {
 	cchar		*vp = nullptr ;
-	if (kp) {
+	if (kp) ylikely {
 	    if (kl < 0) kl = lenstr(kp) ;
 	    if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
 		kl = intconv(tp - kp) ;

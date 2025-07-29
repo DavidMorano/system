@@ -35,7 +35,11 @@
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<usupport.h>
 #include	<localmisc.h>
 

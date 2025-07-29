@@ -79,6 +79,7 @@ struct field : field_head {
 	field() noex {
 	    rem(this,fieldmem_rem) ;
 	    finish(this,fieldmem_finish) ;
+	    lp = nullptr ;
 	} ;
 	field(const field &) = delete ;
 	field &operator = (const field &) = delete ;
@@ -91,8 +92,8 @@ struct field : field_head {
 	int srvarg(cchar *,char *,int) noex ;
 	int remaining(cchar ** = nullptr) noex ;
 	void dtor() noex ;
-	~field() {
-	    dtor() ;
+	destruct field() {
+	    if (lp) dtor() ;
 	} ;
 } ; /* end struct (field) */
 #else

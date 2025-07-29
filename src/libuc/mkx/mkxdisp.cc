@@ -47,7 +47,11 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -124,10 +128,10 @@ constexpr suber_m	tries[] = {
 int mkxsdisp(char *rbuf,int rlen,cc *disp,cc *node,cc *domain) noex {
     	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
-	if (rbuf && disp) {
+	if (rbuf && disp) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if ((rlen > 0) && disp[0]) {
+	    if ((rlen > 0) && disp[0]) ylikely {
 		if (suber so(rbuf,rlen,disp,node,domain) ; (rs = so) >= 0) {
 		    len = rs ;
 		}
@@ -181,7 +185,7 @@ int suber::trytwo() noex {
 
 int suber::trythree() noex {
     	int		rs = SR_OK ;
-	if (havevar(domain)) {
+	if (havevar(domain)) ylikely {
 	    cchar	*cp = strchr(disp,':') ;
 	    char	*bp = rbuf ;
 	    cint ol = intconv(cp - disp) ;

@@ -16,12 +16,19 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************* 
+  	Group:
+	numsign
+
+	Description:
 	Retrieve the numeric sign of a variable.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<clanguage.h>
 
 #include	"numsign.h"

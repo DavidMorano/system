@@ -62,12 +62,12 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<ascii.h>
-#include	<strn.h>
-#include	<char.h>
+#include	<ascii.h>		/* |CH_{xx}| */
+#include	<strn.h>		/* |strnrchr(3uc)| */
+#include	<char.h>		/* |char_iswhite(3uc)| + ... */
 #include	<localmisc.h>
 
-#include	"sfx.h"
+#include	"sfx.h"			/* |sfshrink(3uc)| */
 
 
 /* local defines */
@@ -104,7 +104,7 @@ constexpr cpcchar	allows[] = {
 	"S'",
 #endif /* CF_ALLOWSMODE */
 	nullptr
-} ;
+} ; /* end array (allows) */
 
 cbool		f_allows = CF_ALLOWSMODE ;
 
@@ -118,7 +118,7 @@ int sfword(cchar *sp,int sl,cchar **rpp) noex {
     	cnullptr	np{} ;
 	int		cl = -1 ; /* return-value */
 	cchar		*cp = nullptr ;
-	if (sp) {
+	if (sp) ylikely {
 	    if ((cl = sfshrinkmore(sp,sl,&cp)) > 0) {
 	        bool	f = false ;
 	        if (cp[0] == CH_SQUOTE) {

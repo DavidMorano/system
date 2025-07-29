@@ -142,14 +142,6 @@ enum signalmissings {
 #endif
 
 /* system configuration */
-enum extrasysconfs {
-    	extrasysconf_maxpid,
-	extrasysconf_overlast
-} ;
-
-#ifndef	_SC_MAXPID
-#define	_SC_MAXPID	extrasysconf_maxpid
-#endif
 
 /* PATHCONF preprocessor defines */
 #ifndef	_PC_CHOWN_RESTRICTED
@@ -227,138 +219,6 @@ enum extrasysconfs {
 #endif
 #endif /* MAXLINELEN */
 
-/* follows are the GETBUFSIZE defaults */
-
-/* arguments (and environment) */
-#ifndef	ARBUFLEN
-#ifdef	ARG_MAX
-#define	ARBUFLEN	ARG_MAX
-#else
-#define	ARBUFLEN	(2*1024*1024)	/* default for many systems */
-#endif
-#endif
-
-/* max-name */
-#ifndef	MNBUFLEN
-#ifdef	NAME_MAX
-#define	MNBUFLEN	NAME_MAX
-#else
-#define	MNBUFLEN	(1*1024)
-#endif
-#endif
-
-/* max-path */
-#ifndef	MPBUFLEN
-#ifdef	PATH_MAX
-#define	MPBUFLEN	PATH_MAX
-#else
-#define	MPBUFLEN	(4*1024)
-#endif
-#endif
-
-/* max-line */
-#ifndef	MLBUFLEN
-#ifdef	LINE_MAX
-#define	MLBUFLEN	LINE_MAX
-#else
-#define	MLBUFLEN	(2*2048)
-#endif
-#endif
-
-/* node-name */
-#ifndef	NNBUFLEN
-#ifdef	_POSIX_HOST_NAME_MAX
-#define	NNBUFLEN	(_POSIX_HOST_NAME_MAX-1)
-#else
-#ifdef	SYS_NMLN
-#define	NNBUFLEN	(SYS_NMLN-1)
-#else
-#define	NNBUFLEN	256
-#endif
-#endif
-#endif
-
-/* host-name */
-#ifndef	HNBUFLEN
-#ifdef	MAXHOSTNAMELEN
-#define	HNBUFLEN	MAXHOSTNAMELEN
-#else
-#define	HNBUFLEN	(1*1024)
-#endif
-#endif
-
-/* user-name */
-#ifndef	UNBUFLEN
-#ifdef	_POSIX_LOGIN_NAME_MAX
-#define	UNBUFLEN	_POSIX_LOGIN_NAME_MAX
-#else
-#define	UNBUFLEN	255		/* picked value from MacOS! */
-#endif
-#endif
-
-/* group-name */
-#ifndef	GNBUFLEN
-#define	GNBUFLEN	255		/* picked value from MacOS! */
-#endif
-
-/* project-name */
-#ifndef	PNBUFLEN
-#define	PNBUFLEN	255		/* picked value from MacOS! */
-#endif
-
-/* password entry */
-#ifndef	PWBUFLEN
-#ifdef	_SC_GETPW_R_SIZE_MAX
-#define	PWBUFLEN	_SC_GETPW_R_SIZE_MAX
-#else
-#define	PWBUFLEN	1024		/* Solaris® _SC_GETPW_R_SIZE_MAX */
-#endif
-#endif
-
-/* shadow-password entry */
-#ifndef	SPBUFLEN
-#define	SPBUFLEN	1024		/* same as PWBUFLEN for now */
-#endif
-
-/* user-attribute entry */
-#ifndef	UABUFLEN
-#define	UABUFLEN	(2*1024)	/* this is just a suggestion */
-#endif
-
-/* group entry */
-#ifndef	GRBUFLEN
-#ifdef	_SC_GETGR_R_SIZE_MAX
-#define	GRBUFLEN	_SC_GETGR_R_SIZE_MAX
-#else
-#define	GRBUFLEN	7296		/* Solaris® _SC_GETGR_R_SIZE_MAX */
-#endif
-#endif
-
-/* project entry */
-#ifndef	PJBUFLEN
-#define	PJBUFLEN	(4 * 1024)	/* Solaris® recommends (4*1024) */
-#endif
-
-/* protocol entry */
-#ifndef	PRBUFLEN
-#define	PRBUFLEN	256
-#endif
-
-/* network entry */
-#ifndef	NWBUFLEN
-#define	NWBUFLEN	(4 * 1024)
-#endif
-
-/* host entry */
-#ifndef	HOBUFLEN
-#define	HOBUFLEN	(8 * 1024)
-#endif
-
-/* service entry */
-#ifndef	SVBUFLEN
-#define	SVBUFLEN	256
-#endif
-
 #ifndef	NODENAMELEN
 #ifdef	SYS_NMLN
 #define	NODENAMELEN	(SYS_NMLN-1)	/* usually 256 for SVR4! */
@@ -400,48 +260,30 @@ enum extrasysconfs {
 #endif
 #endif
 
-/* filesystem-type buffer length */
-#ifndef	FSBUFLEN
-#ifdef	MFSNAMELEN
-#define	FSBUFLEN	MFSNAMELEN
-#else
-#ifdef	MFSTYPENAMELEN
-#define	FSBUFLEN	(MFSTYPENAMELEN-1) /* Apple-Darwin value */
-#else
-#ifdef	_ST_FSTYPSZ
-#define	FSBUFLEN	_ST_FSTYPSZ	/* Sun-Solaris value */
-#else
-#define	FSBUFLEN	15		/* Apple-Darwin value */
-#endif
-#endif
-#endif
-#endif
-
 /* symbol name (this is really 255 on most platforms) */
 #ifndef	SYMNAMELEN
 #define	SYMNAMELEN	100		/* symbol-name-length (really 255) */
 #endif
-#ifndef	SNBUFLEN
-#define	SNBUFLEN	SYMNAMELEN	/* symbol-name-length (really 255) */
+
+#ifndef	ARGBUFLEN
+#define	ARGBUFLEN	MAXARGLEN
 #endif
 
-/* time-zone-name (this is the abbreviated time-zone from time immemorial) */
-#ifndef	ZNBUFLEN
-#ifdef	TZNAME_MAX
-#define	ZNBUFLEN	TZNAME_MAX
-#else
-#ifdef	_POSIX_TZNAME_MAX
-#define	ZNBUFLEN	_POSIX_TZNAME_MAX	/* POSIX®-2012 value */
-#else
-#define	ZNBUFLEN	6			/* POSIX®-2 value */
-#endif /* _POSIX_TZNAME_MAX */
-#endif /* TZNAME_MAX */
-#endif /* ZNBUFLEN */
-
-/* zone-info-name (from Zone-Info; a newer concept) */
-#ifndef	ZIBUFLEN
-#define	ZIBUFLEN	MAXNAMELEN	/* what some others have suggested */
+#ifndef	LINEBUFLEN
+#define	LINEBUFLEN	MAXLINELEN
 #endif
+
+#ifndef	NAMEBUFLEN
+#define	NAMEBUFLEN	MAXNAMELEN
+#endif
+
+#ifndef	PATHBUFLEN
+#define	PATHBUFLEN	MAXPATHLEN
+#endif
+
+#ifndef	MSGBUFLEN
+#define	MSGBUFLEN	(16 * 1024)
+#endif /* MSGBUFLEN */
 
 #ifndef	PASSWORDLEN
 #define	PASSWORDLEN	8
@@ -459,7 +301,7 @@ enum extrasysconfs {
 
 /* maximum PID on the system (could be wrong) */
 #ifndef	PID_MAX
-#define	PID_MAX		99999		/* historic value (in decimal) */
+#define	PID_MAX		999999		/* historic value (in decimal) */
 #endif
 
 /* Network-Interface (NI) */

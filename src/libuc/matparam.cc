@@ -27,15 +27,28 @@
 	We search to see if our given value is in the given parameter
 	array.
 
+	Synopsis:
+	bool matparam(cshort *pp,int pl,int v) noex ;
+
+	Arguments:
+	pp		parameter array pointer
+	pl		parameter array length
+	v		value to match
+
+	Returns:
+	true		match yes
+	false		match no
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* <- for |SHORT_MIN| */
+#include	<climits>		/* |SHORT_MIN| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"matparam.h"
@@ -45,6 +58,12 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -60,12 +79,14 @@
 
 bool matparam(cshort *pp,int pl,int v) noex {
 	bool		f = false ;
-	for (int i = 0 ; (i < pl) && (pp[i] >= 0) ; i += 1) {
-	    cint	pv = int(pp[i]) ;
-	    if (pv == SHORT_MIN) break ;
-	    f = (pv == v) ;
-	    if (f) break ;
-	} /* end for */
+	if (pp) ylikely {
+	    for (int i = 0 ; (i < pl) && (pp[i] >= 0) ; i += 1) {
+	        cint	pv = int(pp[i]) ;
+	        if (pv == SHORT_MIN) break ;
+	        f = (pv == v) ;
+	        if (f) break ;
+	    } /* end for */
+	} /* end if (non-null) */
 	return f ;
 }
 /* end subroutine (matparam) */

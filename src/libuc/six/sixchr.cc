@@ -43,7 +43,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -53,7 +53,7 @@
 #include	<mkchar.h>
 #include	<localmisc.h>
 
-#include	"six.h"
+#include	"sixchr.h"
 
 import libutil ;
 
@@ -75,7 +75,7 @@ int siochr(cchar *sp,int sl,int sch) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	sch &= UCHAR_MAX ;
-	if (sp) {
+	if (sp) ylikely {
 	    for (i = 0 ; sl-- && sp[i] ; i += 1) {
 	        cint	ch = mkchar(sp[i]) ;
 	        f = (ch == sch) ;
@@ -90,12 +90,13 @@ int sirchr(cchar *sp,int sl,int sch) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	sch &= UCHAR_MAX ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    for (i = (sl - 1) ; i >= 0 ; i -= 1) {
 	        cint	ch = mkchar(sp[i]) ;
-		if ((f = (ch == sch))) break ;
-	    }
+	        f = (ch == sch) ;
+	        if (f) break ;
+	    } /* end for */
 	} /* end if (non-null) */
 	return (f) ? i : -1 ;
 }

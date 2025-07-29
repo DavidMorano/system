@@ -47,6 +47,7 @@
 #include	<sys/param.h>
 #include	<sys/mman.h>
 #include	<grp.h>
+#include	<ctime>			/* |time_t| */
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -72,6 +73,7 @@
 
 #include	"grmems.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -148,11 +150,11 @@ template<typename ... Args>
 static int grmems_ctor(grmems *op,Args ... args) noex {
 	grmems_head	*hop = cast_static<grmems_head *>(op) ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    cnullptr	np{} ;
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->lrup = new(nothrow) pq) != np) {
+	    if ((op->lrup = new(nothrow) pq) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-pq) */
 	} /* end if (non-null) */
@@ -164,7 +166,7 @@ static int grmems_dtor(grmems *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-	    if (op->lrup) {
+	    if (op->lrup) ylikely {
 		delete op->lrup ;
 		op->lrup = nullptr ;
 	    }
@@ -176,7 +178,7 @@ static int grmems_dtor(grmems *op) noex {
 template<typename ... Args>
 static int grmems_magic(grmems *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == GRMEMS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -244,10 +246,10 @@ int grmems_start(grmems *op,int nmax,int ttl) noex {
 	if (ttl < GRMEMS_DEFTTL) ttl = GRMEMS_DEFTTL ;
 	if ((rs = grmems_ctor(op)) >= 0) {
 	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) {
+	    if ((rs = rsv) >= 0) ylikely {
 	        op->fd = -1 ;
 	        op->pagesize = var.pagesize ;
-	        if ((rs = pq_start(op->lrup)) >= 0) {
+	        if ((rs = pq_start(op->lrup)) >= 0) ylikely {
 	            op->nmax = nmax ;
 	            op->ttl = ttl ;
 	            op->magic = GRMEMS_MAGIC ;
@@ -264,7 +266,7 @@ int grmems_start(grmems *op,int nmax,int ttl) noex {
 int grmems_finish(grmems *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = grmems_magic(op)) >= 0) {
+	if ((rs = grmems_magic(op)) >= 0) ylikely {
 	    if (op->usergids) {
 		{
 		    rs1 = grmems_mkugdeplete(op) ;
@@ -307,7 +309,7 @@ int grmems_finish(grmems *op) noex {
 
 int grmems_curbegin(grmems *op,grmems_cur *curp) noex {
 	int		rs ;
-	if ((rs = grmems_magic(op,curp)) >= 0) {
+	if ((rs = grmems_magic(op,curp)) >= 0) ylikely {
 	    rs = memclear(curp) ;	/* dangerous */
 	    curp->ri = -1 ;
 	    curp->i = -1 ;
@@ -320,9 +322,9 @@ int grmems_curbegin(grmems *op,grmems_cur *curp) noex {
 
 int grmems_curend(grmems *op,grmems_cur *curp) noex {
 	int		rs ;
-	if ((rs = grmems_magic(op,curp)) >= 0) {
+	if ((rs = grmems_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == GRMEMS_CURMAGIC) {
+	    if (curp->magic == GRMEMS_CURMAGIC) ylikely {
 		rs = SR_OK ;
 	        if (op->cursors > 0) op->cursors -= 1 ;
 	        curp->ri = -1 ;
@@ -337,21 +339,21 @@ int grmems_curend(grmems *op,grmems_cur *curp) noex {
 int grmems_lookup(grmems *op,grmems_cur *curp,cchar *gnp,int gnl) noex {
 	int		rs ;
 	int		ri = 0 ;
-	if ((rs = grmems_magic(op,curp,gnp)) >= 0) {
+	if ((rs = grmems_magic(op,curp,gnp)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == GRMEMS_CURMAGIC) {
+	    if (curp->magic == GRMEMS_CURMAGIC) ylikely {
 		rs = SR_INVALID ;
 	        if (gnp[0]) {
 		    rs = SR_OK ;
 	            if (op->recs == nullptr) {
 	                rs = grmems_starter(op) ;
 	            }
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                grmems_rec	*ep = nullptr ;
 	                time_t		dt = getustime ;
 	                int		ct{} ;
 	                op->s.total += 1 ;
-	                if ((rs = grmems_fetch(op,&ep,gnp,gnl)) >= 0) {
+	                if ((rs = grmems_fetch(op,&ep,gnp,gnl)) >= 0) ylikely {
 	                    ri = rs ;
 	                    ct = ct_hit ;
 	                    rs = grmems_recaccess(op,dt,ep) ;
@@ -361,7 +363,7 @@ int grmems_lookup(grmems *op,grmems_cur *curp,cchar *gnp,int gnl) noex {
 	                    ri = rs ;
 	                } /* end if (hit or miss) */
 	                grmems_upstats(op,ct,rs) ;
-	                if (rs >= 0) {
+	                if (rs >= 0) ylikely {
 	                    curp->ri = ri ;
 	                    curp->i = -1 ;
 	                }
@@ -375,14 +377,14 @@ int grmems_lookup(grmems *op,grmems_cur *curp,cchar *gnp,int gnl) noex {
 
 int grmems_lookread(grmems *op,grmems_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
-	if ((rs = grmems_magic(op,curp,rbuf)) >= 0) {
+	if ((rs = grmems_magic(op,curp,rbuf)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == GRMEMS_CURMAGIC) {
+	    if (curp->magic == GRMEMS_CURMAGIC) ylikely {
 		rs = SR_OK ;
 	        if (op->recs == nullptr) {
 	            rs = grmems_starter(op) ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            cint	ri = curp->ri ;
 	            if (ri >= 0) {
 	                recarr		*rlp = (recarr *) op->recs ;
@@ -412,14 +414,14 @@ int grmems_invalidate(grmems *op,cchar *gnp,int gnl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f_found = false ;
-	if ((rs = grmems_magic(op,gnp)) >= 0) {
+	if ((rs = grmems_magic(op,gnp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (gnp[0]) {
+	    if (gnp[0]) ylikely {
 		rs = SR_OK ;
 	        if (op->recs == nullptr) {
 	            rs = grmems_starter(op) ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            grmems_rec	*ep{} ;
 	            if ((rs = grmems_fetch(op,&ep,gnp,gnl)) >= 0) {
 	                cint	ri = rs ;
@@ -454,7 +456,7 @@ int grmems_invalidate(grmems *op,cchar *gnp,int gnl) noex {
 int grmems_check(grmems *op,time_t dt) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = grmems_magic(op)) >= 0) {
+	if ((rs = grmems_magic(op)) >= 0) ylikely {
 	    if (op->recs != nullptr) {
 	        recarr		*rlp = op->recs ;
 	        grmems_rec	*ep{} ;
@@ -480,7 +482,7 @@ int grmems_check(grmems *op,time_t dt) noex {
 
 int grmems_stats(grmems *op,grmems_st *sp) noex {
 	int		rs ;
-	if ((rs = grmems_magic(op,sp)) >= 0) {
+	if ((rs = grmems_magic(op,sp)) >= 0) ylikely {
 	    if (op->recs) {
 	        if ((rs = recarr_count(op->recs)) >= 0) {
 	            *sp = op->s ;
@@ -499,9 +501,9 @@ int grmems_stats(grmems *op,grmems_st *sp) noex {
 
 static int grmems_starter(grmems *op) noex {
 	int		rs = SR_OK ;
-	if (op->recs == nullptr) {
+	if (op->recs == nullptr) ylikely {
 	    cint	sz = sizeof(recarr) ;
-	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) ylikely {
 	        int	ro = 0 ;
 	        ro |= RECARR_OSTATIONARY ;
 	        ro |= RECARR_OREUSE ;
@@ -524,7 +526,7 @@ static int grmems_fetch(grmems *op,grmems_rec **epp,cchar *gnp,int gnl) noex {
 	recarr		*rlp = op->recs ;
 	grmems_rec	*ep{} ;
 	int		rs ;
-	int		i = 0 ; /* used afterwards */
+	int		i = 0 ; /* used-afterwards */
 	for (i = 0 ; (rs = recarr_get(rlp,i,&ep)) >= 0 ; i += 1) {
 	    if (ep) {
 	        if (gnp[0] == ep->gn[0]) {
@@ -545,7 +547,7 @@ static int grmems_mkrec(grmems *op,time_t dt,grmems_rec **epp,
 	int		rs1 ;
 	int		ri = 0 ;
 	*epp = nullptr ;
-	if ((rs = recarr_count(op->recs)) >= 0) {
+	if ((rs = recarr_count(op->recs)) >= 0) ylikely {
 	    pq_ent	*pep ;
 	    cint	n = rs ;
 	    if (n >= op->nmax) {
@@ -578,7 +580,7 @@ static int grmems_mkrec(grmems *op,time_t dt,grmems_rec **epp,
 static int grmems_newrec(grmems *op,time_t dt,grmems_rec **epp,
 		cchar *gnp,int gnl) noex {
 	int		rs = SR_BUGCHECK ;
-	if (epp) {
+	if (epp) ylikely {
 	    grmems_rec	*ep{} ;
 	    cint	rsize = sizeof(grmems_rec) ;
 	    if ((rs = uc_malloc(rsize,&ep)) >= 0) {
@@ -603,7 +605,7 @@ static int grmems_recstart(grmems *op,time_t dt,grmems_rec *ep,
 	    cint	wc = op->wcount++ ;
 	    char	gn[gnlen+1] ;
 	    strdcpy1w(gn,gnlen,gnp,gnl) ;
-	    if (char *grbuf ; (rs = malloc_gr(&grbuf)) >= 0) {
+	    if (char *grbuf ; (rs = malloc_gr(&grbuf)) >= 0) ylikely {
 	        ucentgr	gr{} ;
 	        cint	grlen = rs ;
 	        if ((rs = getgr_name(&gr,grbuf,grlen,gn)) >= 0) {
@@ -638,8 +640,8 @@ static int grmems_recrefresh(grmems *op,time_t dt,grmems_rec *ep) noex {
 	cint		wc = op->wcount++ ;
 	int		rs ;
 	int		rs1 ;
-	if (cchar *gnp ; (rs = record_getgnp(ep,&gnp)) >= 0) {
-	    if (char *grbuf ; (rs = malloc_gr(&grbuf)) >= 0) {
+	if (cchar *gnp ; (rs = record_getgnp(ep,&gnp)) >= 0) ylikely {
+	    if (char *grbuf ; (rs = malloc_gr(&grbuf)) >= 0) ylikely {
 	        ucentgr		gr ;
 		cint		grlen = rs ;
 	        if ((rs = getgr_name(&gr,grbuf,grlen,gnp)) >= 0) {
@@ -669,7 +671,7 @@ static int grmems_recrefresh(grmems *op,time_t dt,grmems_rec *ep) noex {
 static int grmems_recusers(grmems *op,time_t dt,vecobj *ulp,gid_t gid) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = grmems_mkug(op,dt)) >= 0) {
+	if ((rs = grmems_mkug(op,dt)) >= 0) ylikely {
 	    grmems_ug	k{} ;
 	    grmems_ug	*ugp ;
 	    grmems_ug	*ugs = (grmems_ug *) op->usergids ;
@@ -708,11 +710,11 @@ static int grmems_mkug(grmems *op,time_t dt) noex {
 	    cint	vn = 10 ;
 	    cint	vo = 0 ;
 	    cint	esz = szof(grmems_ug) ;
-	    if (vecobj ugl ; (rs = ugl.start(esz,vn,vo)) >= 0) {
-	        if ((rs = grmems_mkugload(op,dt,&ugl)) >= 0) {
+	    if (vecobj ugl ; (rs = ugl.start(esz,vn,vo)) >= 0) ylikely {
+	        if ((rs = grmems_mkugload(op,dt,&ugl)) >= 0) ylikely {
 		    vecobj_vcf	vcf = vecobj_vcf(vcmpug) ;
 	            c = rs ;
-	            if ((rs = ugl.sort(vcf)) >= 0) {
+	            if ((rs = ugl.sort(vcf)) >= 0) ylikely {
 	                rs = grmems_mkugstore(op,dt,&ugl) ;
 		    }
 	        } /* end if (grmems-mkugload) */
@@ -730,8 +732,8 @@ static int grmems_mkugload(grmems *op,time_t dt,vecobj *ulp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (cchar *fn{} ; (rs = sysdbfn_get(w,np,&fn)) >= 0) {
-	    if ((rs = grmems_pwmapbegin(op,dt,fn)) >= 0) {
+	if (cchar *fn{} ; (rs = sysdbfn_get(w,np,&fn)) >= 0) ylikely {
+	    if ((rs = grmems_pwmapbegin(op,dt,fn)) >= 0) ylikely {
 	        int	ml = op->fsize ;
 	        cchar	*mp = charp(op->mapdata) ;
 	        cchar	*tp ;
@@ -770,9 +772,9 @@ static int grmems_mkugstore(grmems *op,time_t dt,vecobj *ulp) noex {
 	cint		esz = sizeof(grmems_ug) ;
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = vecobj_count(ulp)) >= 0) {
+	if ((rs = vecobj_count(ulp)) >= 0) ylikely {
 	    cint	sz = ((rs + 1) * esz) ;
-	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) ylikely {
 	        grmems_ug	*ugs = (grmems_ug *) vp ;
 	        for (int i = 0 ; ulp->get(i,&vp) >= 0 ; i += 1) {
 	            if (vp) {
@@ -807,7 +809,7 @@ static int grmems_mkugdeplete(grmems *op) noex {
 
 static int grmems_recaccess(grmems *op,time_t dt,grmems_rec *ep) noex {
 	int		rs ;
-	if ((rs = grmems_recrear(op,ep)) >= 0) {
+	if ((rs = grmems_recrear(op,ep)) >= 0) ylikely {
 	    if ((rs = record_isold(ep,dt,op->ttl)) > 0) {
 	        rs = grmems_recrefresh(op,dt,ep) ;
 	    } else {
@@ -819,9 +821,8 @@ static int grmems_recaccess(grmems *op,time_t dt,grmems_rec *ep) noex {
 /* end subroutine (grmems_recaccess) */
 
 static int grmems_recrear(grmems *op,grmems_rec *ep) noex {
-	pq_ent		*pep ;
 	int		rs ;
-	if ((rs = pq_gettail(op->lrup,&pep)) >= 0) {
+	if (pq_ent *pep ; (rs = pq_gettail(op->lrup,&pep)) >= 0) {
 	    pq_ent	*pcp = (pq_ent *) ep ;
 	    if (pcp != pep) {
 	        pep = (pq_ent *) ep ;
@@ -951,9 +952,9 @@ static int record_start(grmems_rec *ep,time_t dt,int wc,
 		vecobj *ulp,ucentgr *grp) noex {
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	if (ep && ulp && grp) {
+	if (ep && ulp && grp) ylikely {
 	    memclear(ep) ;		/* dangerous */
-	    if (char *gnbuf ; (rs = malloc_gn(&gnbuf)) >= 0) {
+	    if (char *gnbuf ; (rs = malloc_gn(&gnbuf)) >= 0) ylikely {
 		cint	gnlen = rs ;
 		ep->gn = gnbuf ;
 		{
@@ -975,7 +976,7 @@ static int record_start(grmems_rec *ep,time_t dt,int wc,
 static int record_finish(grmems_rec *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_OK ;
 	    if (ep->mems) {
 	        rs1 = uc_free(ep->mems) ;
@@ -997,7 +998,7 @@ static int record_refresh(grmems_rec *ep,time_t dt,int wc,
 		vecobj *ulp,ucentgr *grp) noex {
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_OK ;
 	    if (ep->mems != nullptr) {
 	        rs = uc_free(ep->mems) ;
@@ -1017,8 +1018,8 @@ static int record_mems(grmems_rec *ep,time_t dt,int wc,
 		vecobj *ulp,ucentgr *grp) noex {
 	int		rs ;
 	int		n = 0 ; /* return-value */
-	if ((rs = record_loadgruns(ep,ulp,grp)) >= 0) {
-	    if ((rs = ulp->count) >= 0) {
+	if ((rs = record_loadgruns(ep,ulp,grp)) >= 0) ylikely {
+	    if ((rs = ulp->count) >= 0) ylikely {
 		cint	ulen = var.usernamelen ;
 	        int	sz = 0 ;
 	        int	masz ;
@@ -1038,7 +1039,7 @@ static int record_mems(grmems_rec *ep,time_t dt,int wc,
 	                sz += (ul+1) ;
 		    } /* end if (non-null) */
 	        } /* end for */
-	        if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
+	        if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) ylikely {
 	            cchar	**mems = ccharpp(bp) ;
 	            int		c = 0 ;
 	            bp += masz ;
@@ -1065,7 +1066,7 @@ static int record_mems(grmems_rec *ep,time_t dt,int wc,
 static int record_loadgruns(grmems_rec *op,vecobj *ulp,ucentgr *grp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (grp->gr_mem != nullptr) {
 	        cchar	**mems = ccharpp(grp->gr_mem) ;
@@ -1086,7 +1087,7 @@ static int record_loadgruns(grmems_rec *op,vecobj *ulp,ucentgr *grp) noex {
 static int record_access(grmems_rec *ep,time_t dt) noex {
 	int		rs = SR_FAULT ;
 	int		wc = 0 ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_OK ;
 	    ep->ti_access = dt ;
 	    wc = ep->wcount ;
@@ -1098,7 +1099,7 @@ static int record_access(grmems_rec *ep,time_t dt) noex {
 static int record_isold(grmems_rec *ep,time_t dt,int ttl) noex {
 	int		rs = SR_FAULT ;
 	int		f_old = false ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_OK ;
 	    f_old = ((dt - ep->ti_create) >= ttl) ;
 	} /* end if (non-null) */
@@ -1108,11 +1109,11 @@ static int record_isold(grmems_rec *ep,time_t dt,int ttl) noex {
 
 static int record_getgnp(grmems_rec *ep,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (ep && rpp) {
+	if (ep && rpp) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if (ep->gn) {
+	    if (ep->gn) ylikely {
 	        rs = SR_NOTOPEN ;
-	        if (ep->gn[0]) {
+	        if (ep->gn[0]) ylikely {
 		    rs = SR_OK ;
 	            *rpp = (rs >= 0) ? ep->gn : nullptr ;
 	        } /* end if (valid) */
@@ -1125,7 +1126,7 @@ static int record_getgnp(grmems_rec *ep,cchar **rpp) noex {
 static int usergid_start(grmems_ug *ugp,cchar *unp,int unl,gid_t gid) noex {
 	int		rs ;
 	int		ul = 0 ;
-	if (char *unbuf ; (rs = malloc_un(&unbuf)) >= 0) {
+	if (char *unbuf ; (rs = malloc_un(&unbuf)) >= 0) ylikely {
 	    cint	unlen = rs ;
 	    ugp->un = unbuf ;
 	    ul = intconv(strnwcpy(ugp->un,unlen,unp,unl) - ugp->un) ;
@@ -1138,7 +1139,7 @@ static int usergid_start(grmems_ug *ugp,cchar *unp,int unl,gid_t gid) noex {
 static int usergid_finish(grmems_ug *ugp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (ugp) {
+	if (ugp) ylikely {
 	    rs = SR_OK ;
 	    if (ugp->un) {
 		ugp->un[0] = '\0' ;
@@ -1238,13 +1239,13 @@ static int vcmpug(cvoid **v1pp,cvoid **v2pp) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = ucpagesize) >= 0) {
+	if ((rs = ucpagesize) >= 0) ylikely {
 	    pagesize = rs ;
-	    if ((rs = getbufsize(getbufsize_gr)) >= 0) {
+	    if ((rs = getbufsize(getbufsize_gr)) >= 0) ylikely {
 	        grlen = rs ;
-	        if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	        if ((rs = getbufsize(getbufsize_un)) >= 0) ylikely {
 	            usernamelen = rs ;
-	            if ((rs = getbufsize(getbufsize_gn)) >= 0) {
+	            if ((rs = getbufsize(getbufsize_gn)) >= 0) ylikely {
 	                groupnamelen = rs ;
 	            }
 	        }

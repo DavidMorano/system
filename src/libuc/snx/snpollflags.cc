@@ -53,17 +53,21 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"snflags.h"
@@ -117,7 +121,7 @@ const flagstrs		fs_poll[] = {
 	{ POLLREMOVE, "REMOVE" },
 #endif
 	{ 0, NULL }
-} ;
+} ; /* end array (fs_poll) */
 
 
 /* exported variables */
@@ -128,8 +132,8 @@ const flagstrs		fs_poll[] = {
 int snpollflags(char *dbuf,int dlen,int flags) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (dbuf) {
-	    if (snflags ss ; (rs = ss.start(dbuf,dlen)) >= 0) {
+	if (dbuf) ylikely {
+	    if (snflags ss ; (rs = ss.start(dbuf,dlen)) >= 0) ylikely{
 	        for (int i = 0 ; (rs >= 0) && fs_poll[i].f ; i += 1) {
 	            if (flags & fs_poll[i].f) {
 	                rs = ss.addstr(fs_poll[i].s) ;

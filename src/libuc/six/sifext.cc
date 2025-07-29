@@ -80,14 +80,16 @@ import libutil ;
 
 int sifext(cchar *fp,int fl,mainv exts) noex {
 	int		si = -1 ;
-	if (fl < 0) fl = lenstr(fp) ;
-	if (cchar *tp ; (tp = strnrchr(fp,fl,'.')) != nullptr) {
-	    cint	el = intconv((fp + fl) - (tp + 1)) ;
-	    cchar	*ep = (tp + 1) ;
-	    if ((el > 0) && (matstr(exts,ep,el) >= 0)) {
-	    	si = intconv(tp - fp) ;
-	    }
-	} /* end if(had extension) */
+	if (fp && exts) ylikely {
+	    if (fl < 0) fl = lenstr(fp) ;
+	    if (cchar *tp ; (tp = strnrchr(fp,fl,'.')) != nullptr) {
+	        cint	el = intconv((fp + fl) - (tp + 1)) ;
+	        cchar	*ep = (tp + 1) ;
+	        if ((el > 0) && (matstr(exts,ep,el) >= 0)) {
+	    	    si = intconv(tp - fp) ;
+	        }
+	    } /* end if (had extension) */
+	} /* end if (non-null) */
 	return si ;
 }
 /* end subroutine (sifext) */

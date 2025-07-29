@@ -94,9 +94,9 @@ import libutil ;
 int getportnum(cchar *pn,cchar *ps) noex {
 	int		rs = SR_FAULT ;
 	int		port = -1 ;
-	if (ps) {
+	if (ps) ylikely {
 	    rs = SR_INVALID ;
-	    if (ps[0]) {
+	    if (ps[0]) ylikely {
 		cint	pl = lenstr(ps) ;
 	        if (hasalldig(ps,pl)) {
 	            rs = cfdeci(ps,pl,&port) ;

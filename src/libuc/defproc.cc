@@ -70,8 +70,8 @@
 
 #define	ENVNAMELEN	REALNAMELEN	/* should be sufficient? */
 
-#define	SUBINFO		struct subinfo
-#define	SI		struct subinfo
+
+#define	SI		subinfo
 
 
 /* imported namespaces */
@@ -152,22 +152,21 @@ static cchar	ssp[] = {
 /* exported subroutines */
 
 int defproc(vecstr *dlp,mainv envv,expcook *clp,cchar *fname) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		c = 0 ;
-	if (dlp && clp && fname) {
+	int		c = 0 ; /* return-value */
+	if (dlp && clp && fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-		SUBINFO	li, *lip = &li ;
-		char	*lbuf{} ;
+	    if (fname[0]) ylikely {
+		SI	li, *lip = &li ;
 		lip->envv = envv ;
 		lip->clp = clp ;
 		lip->dlp = dlp ;
-		if ((rs = malloc_ml(&lbuf)) >= 0) {
+		if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) ylikely {
 		    cint	llen = rs ;
 		    bfile	loadfile, *lfp = &loadfile ;
-		    if ((rs = bopen(lfp,fname,"r",0666)) >= 0) {
-			const nullptr_t		np{} ;
+		    if ((rs = bopen(lfp,fname,"r",0666)) >= 0) ylikely {
 	    		while ((rs = breadlns(lfp,lbuf,llen,-1,np)) > 0) {
 			    cchar	*lp{} ;
 			    if (int ll ; (ll = sfcontent(lbuf,rs,&lp)) > 0) {
@@ -209,8 +208,9 @@ static int procline(SI *lip,cchar *lbuf,int llen) noex {
 /* extract any dependencies (if we have any) */
 	tp = strnbrk(sp,sl," \t?+=#") ;
 	if ((tp != nullptr) && (*tp == '?')) {
-	    if ((rs1 = checkdeps(lip,sp,(tp - sp))) > 0) {
-	        sl -= ((tp + 1) - sp) ;
+	    cint tl = intconv(tp - sp) ;
+	    if ((rs1 = checkdeps(lip,sp,tl)) > 0) {
+	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	        while (sl && CHAR_ISWHITE(*sp)) {
 	            sp += 1 ;
@@ -224,24 +224,25 @@ static int procline(SI *lip,cchar *lbuf,int llen) noex {
 	if (! f_done) {
 	    cl = 0 ;
 	    if ((tp != nullptr) && ((*tp == '=') || CHAR_ISWHITE(*tp))) {
-	        cl = sfshrink(sp,(tp - sp),&cp) ;
-	        sl -= ((tp + 1) - sp) ;
+		cint tl = intconv(tp - sp) ;
+	        cl = sfshrink(sp,tl,&cp) ;
+	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	    } /* end if (delimiter) */
 	    if (cl > 0) {
 	        cint	nrs = SR_NOTFOUND ;
 	        if ((rs = vecstr_findn(lip->dlp,cp,cl)) == nrs) {
-	            buffer	b ;
 	            char	envname[ENVNAMELEN + 1] ;
 	            enp = envname ;
 	            snwcpy(envname,ENVNAMELEN,cp,cl) ;
-	            if ((sl >= 0) && ((rs = buffer_start(&b,sl)) >= 0)) {
+	            buffer	b ;
+	            if ((sl >= 0) && ((rs = b.start(sl)) >= 0)) {
 	                if ((rs = procvalues(lip,&b,ssb,sp,sl)) >= 0) {
-	                    if ((cl = buffer_get(&b,&cp)) > 0) {
+	                    if ((cl = b.get(&cp)) > 0) {
 	                        rs = vecstr_envadd(lip->dlp,enp,cp,cl) ;
 	                    }
 	                }
-	                len = buffer_finish(&b) ;
+	                len = b.finish ;
 	                if (rs >= 0) rs = len ;
 	            } /* end if (buffer) */
 	        } /* end if (not-already-present) */
@@ -252,19 +253,17 @@ static int procline(SI *lip,cchar *lbuf,int llen) noex {
 /* end subroutine (procline) */
 
 static int checkdeps(SI *lip,cchar *sp,int sl) noex {
-	field		fsb ;
 	int		rs ;
 	int		rs1 = 0 ;
-	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-	    int		fl ;
+	if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) ylikely {
 	    cchar	*fp{} ;
-	    while ((fl = field_get(&fsb,dterms,&fp)) >= 0) {
+	    for (int fl ; (fl = fsb.get(dterms,&fp)) >= 0 ; ) {
 	        if (fl > 0) {
 	            rs1 = getev(lip->envv,fp,fl,nullptr) ;
 		}
 	        if (rs1 < 0) break ;
-	    } /* end while */
-	    rs1 = field_finish(&fsb) ;
+	    } /* end for */
+	    rs1 = fsb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? (rs1 >= 0) : rs ;
@@ -275,18 +274,15 @@ static int procvalues(SI *lip,buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*fbuf{} ;
-	if ((rs = malloc_mp(&fbuf)) >= 0) {
+	if (char *fbuf ; (rs = malloc_mp(&fbuf)) >= 0) ylikely {
 	    cint	flen = rs ;
-	    field	fsb ;
-	    if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-	        int	fl ;
+	    if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) ylikely {
 	        int	c = 0 ;
 	        cchar	*fp = fbuf ;
-	        while ((fl = field_sharg(&fsb,fterms,fbuf,flen)) >= 0) {
+	        for (int fl ; (fl = fsb.sharg(fterms,fbuf,flen)) >= 0; ) {
 	            if (fl > 0) {
 	                if (c++ > 0) {
-	                    rs = buffer_chr(bp,' ') ;
+	                    rs = bp->chr(' ') ;
 	                    len += rs ;
 	                }
 	                if (rs >= 0) {
@@ -297,7 +293,7 @@ static int procvalues(SI *lip,buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	            if (fsb.term == '#') break ;
 	            if (rs < 0) break ;
 	        } /* end while (looping over values) */
-	        rs1 = field_finish(&fsb) ;
+	        rs1 = fsb.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (fields) */
 	    rs1 = uc_free(fbuf) ;
@@ -309,26 +305,25 @@ static int procvalues(SI *lip,buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 
 static int procvalue(SI *lip,buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	int		kl, cl ;
 	int		len = 0 ;
-	cchar		*kp, *cp ;
-	while ((kl = sfthing(sp,sl,ss,&kp)) >= 0) {
-	    cp = sp ;
-	    cl = ((kp - 2) - sp) ;
+	cchar		*kp ;
+	for (int kl ; (kl = sfthing(sp,sl,ss,&kp)) >= 0 ; ) {
+	    cchar	*cp = sp ;
+	    cint	cl = intconv((kp - 2) - sp) ;
 	    if (cl > 0) {
-	        rs = buffer_strw(bp,cp,cl) ;
+	        rs = bp->strw(cp,cl) ;
 	        len += rs ;
 	    }
 	    if ((rs >= 0) && (kl > 0)) {
 	        rs = procsubenv(lip,bp,kp,kl) ;
 	        len += rs ;
 	    }
-	    sl -= ((kp + kl + 1) - sp) ;
+	    sl -= intconv((kp + kl + 1) - sp) ;
 	    sp = (kp + kl + 1) ;
 	    if (rs < 0) break ;
-	} /* end while */
+	} /* end for */
 	if ((rs >= 0) && (sl > 0)) {
-	    rs = buffer_strw(bp,sp,sl) ;
+	    rs = bp->strw(sp,sl) ;
 	    len += rs ;
 	}
 	return (rs >= 0) ? len : rs ;
@@ -338,20 +333,20 @@ static int procvalue(SI *lip,buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 static int procsubenv(SI *lip,buffer *bp,cchar *kp,int kl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if (kl >= 0) {
+	if (kl >= 0) ylikely {
 	    int		al = 0 ;
 	    cchar	*ap = nullptr ;
 	    cchar	*cp{} ;
 	    if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
 	        ap = (tp + 1) ;
-	        al = (kp + kl) - (tp + 1) ;
-	        kl = (tp - kp) ;
+	        al = intconv((kp + kl) - (tp + 1)) ;
+	        kl = intconv(tp - kp) ;
 	    }
 	    if (int cl ; (cl = getev(lip->envv,kp,kl,&cp)) > 0) {
-	        rs = buffer_strw(bp,cp,cl) ;
+	        rs = bp->strw(cp,cl) ;
 	        len += rs ;
 	    } else if (al > 0) {
-	        rs = buffer_strw(bp,ap,al) ;
+	        rs = bp->strw(ap,al) ;
 	        len += rs ;
 	    }
 	} /* end if (non-zero) */

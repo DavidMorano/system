@@ -42,7 +42,11 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<realname.h>
 #include	<localmisc.h>
 
@@ -82,14 +86,13 @@ int mkrealname(char *rbuf,int rlen,cchar *gnp,int gnl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (rbuf && gnp) {
-	    realname	rn ;
-	    if ((rs = realname_start(&rn,gnp,gnl)) >= 0) {
+	if (rbuf && gnp) ylikely {
+	    if (realname rn ; (rs = rn.start(gnp,gnl)) >= 0) ylikely {
 	        {
-	            rs = realname_name(&rn,rbuf,rlen) ;
+	            rs = rn.name(rbuf,rlen) ;
 	            len = rs ;
 	        }
-	        rs1 = realname_finish(&rn) ;
+	        rs1 = rn.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (realname) */
 	} /* end if (non-null) */

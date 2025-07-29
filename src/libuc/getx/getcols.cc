@@ -83,14 +83,17 @@ import libutil ;
 
 int getcols(int ntab,int ccol,int ncols,cchar *lbuf,int llen) noex {
 	cint		tcol = (ccol + ncols) ;
-	int		i = 0 ; /* return-value */
-	if (llen < 0) llen = lenstr(lbuf) ;
-	if (ccol < tcol) {
-	    for (i = 0 ; (ccol < tcol) && (i < llen) ; i += 1) {
-	        cint	cols = charcols(ntab,ccol,lbuf[i]) ;
-	        ccol += cols ;
-	    } /* end for */
-	} /* end if */
+	int		i = -1 ; /* return-value */
+	if (lbuf) ylikely {
+	    if (llen < 0) llen = lenstr(lbuf) ;
+	    i = 0 ;
+	    if (ccol < tcol) ylikely {
+	        for (i = 0 ; (ccol < tcol) && (i < llen) ; i += 1) {
+	            cint	cols = charcols(ntab,ccol,lbuf[i]) ;
+	            ccol += cols ;
+	        } /* end for */
+	    } /* end if */
+	} /* end if (non-null) */
 	return i ;
 }
 /* end subroutine (getcols) */

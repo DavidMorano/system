@@ -129,8 +129,7 @@ constexpr int		defents = STRFILTER_DEFENTS ;	/* defualt entries */
 int strfilter::istart() noex {
     	int		rs ;
 	nents = defents ;
-	if ((rs = vecstr::start) >= 0) {
-	    fl.open = true ;
+	if ((rs = vecstr::start) >= 0) ylikely {
 	    magic = STRFILTER_MAGIC ;
 	}
 	return rs ;
@@ -150,7 +149,6 @@ int strfilter::ifinish() noex {
 	        rs1 = vecstr::finish() ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    fl.open = false ;
 	    magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -159,12 +157,12 @@ int strfilter::ifinish() noex {
 int strfilter::add(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = SR_INVALID ;
-	    if (sl > 0) {
+	    if (sl > 0) ylikely {
     	        rs = SR_NOTOPEN ;
-	        if (magic == STRFILTER_MAGIC) {
+	        if (magic == STRFILTER_MAGIC) ylikely {
 		    rs = SR_OK ;
 		    if (strnbrk(sp,sl," \t,")) {
 		        sif sa(sp,sl,',') ;
@@ -186,10 +184,10 @@ int strfilter::add(cchar *sp,int sl) noex {
 
 int strfilter::have(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = SR_INVALID ;
-	    if (sl > 0) {
+	    if (sl > 0) ylikely {
 	        rs = ihave(sp,sl) ;
 	    }
 	}
@@ -198,7 +196,7 @@ int strfilter::have(cchar *sp,int sl) noex {
 
 int strfilter::ents() noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == STRFILTER_MAGIC) {
+	if (magic == STRFILTER_MAGIC) ylikely {
     	    rs = nents ;
 	} /* end if (non-null) */
     	return rs ;
@@ -206,7 +204,7 @@ int strfilter::ents() noex {
 
 int strfilter::icount() const noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == STRFILTER_MAGIC) {
+	if (magic == STRFILTER_MAGIC) ylikely {
 	    rs = vecstr::icount() ;
 	} /* end if (magic) */
 	return rs ;
@@ -214,7 +212,7 @@ int strfilter::icount() const noex {
 
 int strfilter::iready() noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == STRFILTER_MAGIC) {
+	if (magic == STRFILTER_MAGIC) ylikely {
 	    if ((rs = vecstr::sort) >= 0) {
 	        std::sort(filtarr,(filtarr+idx)) ;
 	    }
@@ -276,7 +274,7 @@ int strfilter::inschrs(cchar *sp,int sl) noex {
 
 int strfilter::extend(int n) noex {
 	int		rs = SR_OK ;
-	if ((idx + n) > ext) {
+	if ((idx + n) > ext) ylikely {
 	    int		ne ;
 	    int		sz ;
 	    voidp	na{} ;
@@ -301,11 +299,11 @@ void strfilter::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("strfilter",rs,"fini-finish") ;
 	}
-}
+} /* end method (strfilter::dtor) */
 
 strfilter::operator int () const noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == STRFILTER_MAGIC) {
+	if (magic == STRFILTER_MAGIC) ylikely {
 	    rs = icount() ;
 	} /* end if (magic) */
 	return rs ;
@@ -313,7 +311,7 @@ strfilter::operator int () const noex {
 
 strfilter_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case strfiltermem_start:
 	        rs = op->istart() ;

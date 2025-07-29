@@ -97,24 +97,23 @@ int mkaddrdisp(char *abuf,int alen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (abuf && sp) {
+	if (abuf && sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sbuf b ; (rs = b.start(abuf,alen)) >= 0) {
+	    if (sbuf b ; (rs = b.start(abuf,alen)) >= 0) ylikely {
 	        cint	flen = sl ;
 	        if (char *fbuf ; (rs = uc_malloc((flen+1),&fbuf)) >= 0) {
-	            if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
+	            if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) ylikely {
 			cnullptr	np{} ;
-	                int		fl ;
 	                int		c = 0 ;
-	                while ((fl = fsb.sharg(np,fbuf,flen)) >= 0) {
+	                for (int fl ; (fl = fsb.sharg(np,fbuf,flen)) >= 0 ; ) {
 	                    cchar	*fp = fbuf ;
-	                    if (fl > 0) {
+	                    if (fl > 0) ylikely {
 				if_constexpr (f_nonstandard) {
 	                            if (c++ > 0) {
 	                                rs = b.chr(' ') ;
 			            }
 			        } /* end if_constexpr (f_nonstandard) */
-	                        if (rs >= 0) {
+	                        if (rs >= 0) ylikely {
 	                            rs = b.strw(fp,fl) ;
 			        }
 			    } /* end if (non-zero positive) */

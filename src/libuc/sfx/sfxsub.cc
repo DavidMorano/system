@@ -51,7 +51,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<strnxcmp.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -91,14 +90,14 @@ import libutil ;
 int sfosub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		sslen = 0 ; /* return-value */
 	bool		f = false ;
-	if (sp && ss) {
+	if (sp && ss) ylikely {
 	    int		i = 0 ;
 	    f = true ;
 	    sslen = lenstr(ss) ;
-	    if (sslen > 0) {
+	    if (sslen > 0) ylikely {
 		f = false ;
 	        if (sl < 0) sl = lenstr(sp) ;
-	        if (sslen <= sl) {
+	        if (sslen <= sl) ylikely {
 	            for (i = 0 ; i <= (sl - sslen) ; i += 1) {
 		        f = ((sslen == 0) || (sp[i] == ss[0])) ;
 	                f = f && (strncmp((sp + i),ss,sslen) == 0) ;
@@ -106,7 +105,7 @@ int sfosub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	            } /* end for */
 	        } /* end if (possible) */
 	    } /* end if (non-empty) */
-	    if (rpp) {
+	    if (rpp) ylikely {
 	        *rpp = ((f) ? (sp + i) : nullptr) ;
 	    }
 	} /* end if (non-null) */
@@ -117,14 +116,14 @@ int sfosub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 int sfrsub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		sslen = 0 ; /* return-value */
 	bool		f = false ;
-	if (sp && ss) {
+	if (sp && ss) ylikely {
 	    int		i = 0 ;
 	    f = true ;
 	    sslen = lenstr(ss) ;
-	    if (sslen > 0) {
+	    if (sslen > 0) ylikely {
 		f = false ;
 	        if (sl < 0) sl = lenstr(sp) ;
-	        if (sslen <= sl) {
+	        if (sslen <= sl) ylikely {
 	            for (i = (sl - sslen) ; i >= 0 ; i -= 1) {
 		        f = ((sslen == 0) || (sp[i] == ss[0])) ;
 	                f = f && (strncmp((sp + i),ss,sslen) == 0) ;
@@ -132,7 +131,7 @@ int sfrsub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	            } /* end for */
 	        } /* end if (possible) */
 	    } /* end if (non-empty) */
-	    if (rpp) {
+	    if (rpp) ylikely {
 	        *rpp = ((f) ? (sp + i) : nullptr) ;
 	    }
 	} /* end if (non-null) */

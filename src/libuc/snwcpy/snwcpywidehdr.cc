@@ -67,6 +67,7 @@
 #include	<ascii.h>
 #include	<strmgr.h>
 #include	<straltwchar.h>
+#include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -95,6 +96,8 @@ extern "C" {
 
 /* local variables */
 
+cint		ch_sub = mkchar('¿') ;
+
 
 /* exported variables */
 
@@ -108,37 +111,34 @@ int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int wsl) noex {
 	if (dlen < 0) dlen = INT_MAX ;
 	if (wsl < 0) wsl = wsnlen(wsp,-1) ;
 	if (strmgr m ; (rs = m.start(dbuf,dlen)) >= 0) {
-	    int		wl ;
 	    cwchar	*wp ;
-	    while ((wl = wsfnext(wsp,wsl,&wp)) > 0) {
+	    for (int wl ; (wl = wsfnext(wsp,wsl,&wp)) > 0 ; ) {
 	        if (dl > 0) {
 	            rs = m.chr(' ') ;
 	            if (rs >= 0) dl += 1 ;
 	        }
 	        if (rs >= 0) {
-	            uint	wch ;
 		    int		i ; /* used-afterwards */
 	            for (i = 0 ; (rs >= 0) && (i < wl) && wp[i] ; i += 1) {
-	                if ((wch = (uint) wp[i]) > UCHAR_MAX) {
+	                if (uint wch ; (wch = (uint) wp[i]) > UCHAR_MAX) {
 			    if (cc *ss ; (ss = straltwchar(wch)) != nullptr) {
-	                        rs = m.str(ss,-1) ;
+	                        rs = m.str(ss) ;
 			    } else {
-			        wch = '¿' ;
-	                        rs = m.chr(wch) ;
+	                        rs = m.chr(ch_sub) ;
 			    }
 			} else {
 			    if (isprintbad(wch)) {
-				wch = '¿' ;
+				wch = ch_sub ;
 			    }
 	                    rs = m.chr(wch) ;
-			}
+			} /* end if */
 	            } /* end for */
 	            if (rs >= 0) dl += i ;
 	        } /* end if (ok) */
 	        wsl -= intconv((wp + wl) - wsp) ;
 	        wsp = (wp + wl) ;
 	        if (rs < 0) break ;
-	    } /* end while (looping through string pieces) */
+	    } /* end for */
 	    rs1 = m.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (strmgr) */

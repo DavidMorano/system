@@ -21,6 +21,8 @@
 	u_adjtime
 	u_stime
 	u_time
+	u_sysconfval
+	u_sysconfstr
 
 	Description:
 	System functions.
@@ -29,6 +31,8 @@
 	int u_adjtime(CTIMEVAL *tvp,TIMEVAL *ovp) noex ;
 	int u_stime(time_t *tp) noex ;
 	int u_time(time_t *rp) noex ;
+	int u_sysconfval(int cmd,long *rp) noex
+	int u_sysconfstr(int cmd,char *rbuf,int rlen) noex
 
 	Returns:
 	>=0		OK
@@ -36,13 +40,13 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/time.h>
 #include	<cerrno>
+#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<ctime>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -54,6 +58,7 @@
 
 #include	"usysop.h"
 
+import usysconf ;
 
 /* local defines */
 
@@ -85,10 +90,12 @@
 /* exported subroutines */
 
 int u_adjtime(CTIMEVAL *tvp,TIMEVAL *ovp) noex {
-	int		rs ;
-	if ((rs = adjtime(tvp,ovp)) < 0) {
-	    rs = (- errno) ;
-	}
+	int		rs = SR_INVALID ;
+	if (tvp || ovp) {
+	    if ((rs = adjtime(tvp,ovp)) < 0) {
+	        rs = (- errno) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (u_adjtime) */
@@ -99,7 +106,7 @@ int u_stime(time_t *tp) noex {
 	    if ((rs = stime(tp)) < 0) {
 		rs = (- errno) ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (u_stime) */
@@ -114,5 +121,13 @@ int u_time(time_t *rp) noex {
 	return rs ;
 }
 /* end subroutine (u_time) */
+
+int u_sysconfval(int cmd,long *rp) noex {
+    return usysconfval(cmd,rp) ;
+}
+
+int u_sysconfstr(int cmd,char *rbuf,int rlen) noex {
+    return usysconfstr(cmd,rbuf,rlen) ;
+}
 
 

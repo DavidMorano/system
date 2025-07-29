@@ -79,16 +79,20 @@ extern "C" {
 
 template<toxc_f toxc>
 char *strwcpyxc(char *dp,cchar *sp,int sl) noex {
-	if (sl >= 0) {
-	    while (sl-- && *sp) {
-	        *dp++ = char(toxc(*sp++)) ;
-	    }
+    	if (dp && sp) {
+	    if (sl >= 0) {
+	        while (sl-- && *sp) {
+	            *dp++ = char(toxc(*sp++)) ;
+	        }
+	    } else {
+	        while (*sp) {
+		    *dp++ = char(toxc(*sp++)) ;
+	        }
+	    } /* end if */
+	    *dp = '\0' ;
 	} else {
-	    while (*sp) {
-		*dp++ = char(toxc(*sp++)) ;
-	    }
-	} /* end if */
-	*dp = '\0' ;
+	    dp = nullptr ;
+	} /* end if (non-null) */
 	return dp ;
 }
 /* end subroutine-template (strwcpyxc) */

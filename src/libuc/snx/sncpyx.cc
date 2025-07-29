@@ -58,7 +58,7 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
@@ -66,8 +66,8 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<cstdarg>
+#include	<cstdarg>		/* |va_list(3c)| */
+#include	<cstring>		/* |strlcpy(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -140,7 +140,7 @@ int sncpyx(char *dp,int dl,int n,...) noex {
 	int		rl = 0 ; /* return-value */
 	char		*bp = dp ;
 	if (dl < 0) dl = (INT_MAX - 1) ;
-	if (dp) {
+	if (dp) ylikely {
 	    size_t	rlen = (dl+1) ;
 	    va_begin(ap,n) ;
 	    rs = SR_OK ;

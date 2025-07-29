@@ -73,13 +73,13 @@ int mkpathrooted(char *rbuf,cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (rbuf && fn) {
+	if (rbuf && fn) ylikely {
 	    rs = SR_INVALID ;
-	    if (fn[0]) {
+	    if (fn[0]) ylikely {
 	        if (fn[0] != '/') {
-	            if (char *pbuf{} ; (rs = libmalloc_mp(&pbuf)) >= 0) {
+	            if (char *pbuf ; (rs = libmalloc_mp(&pbuf)) >= 0) ylikely {
 	                cint	plen = rs ;
-	                if ((rs = getpwd(pbuf,plen)) >= 0) {
+	                if ((rs = getpwd(pbuf,plen)) >= 0) ylikely {
 	                    rs = mkpath(rbuf,pbuf,fn) ;
 		            rl = rs ;
 	                }

@@ -129,24 +129,22 @@ int permsched(mv sched,vecstr *nsp,char *rbuf,int rlen,cc *fn,pm am) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		sl = 0 ;
-	if (sched && nsp && rbuf && fn) {
+	if (sched && nsp && rbuf && fn) ylikely {
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
-	        ids	id ;
-	        if ((rs = ids_load(&id)) >= 0) {
+	        if (ids id ; (rs = id.load) >= 0) ylikely {
 	            rs = SR_NOEXIST ;
 	            for (int i = 0 ; sched[i] ; i += 1) {
 		        cchar	*sch = sched[i] ;
 	                if ((rs = schedexpand(sch,nsp,rbuf,rlen,fn)) >= 0) {
-	                    USTAT	sb ;
 	                    sl = rs ;
-	                    if ((rs = uc_stat(rbuf,&sb)) >= 0) {
+	                    if (ustat sb ; (rs = uc_stat(rbuf,&sb)) >= 0) {
 	                        rs = permid(&id,&sb,am) ;
 	                    }
 	                } /* end if (schedexpand) */
 	                if (rs >= 0) break ;
 	            } /* end for */
-	            rs1 = ids_release(&id) ;
+	            rs1 = id.release ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (ids) */
 	    } /* end if (valid) */
@@ -159,38 +157,37 @@ int permsched(mv sched,vecstr *nsp,char *rbuf,int rlen,cc *fn,pm am) noex {
 /* local subroutines */
 
 static int schedexpand(cc *fmt,vecstr *nsp,char *rbuf,int rlen,cc *fn) noex {
-	const nullptr_t	np{} ;
-	sbuf		b ;
+	cnullptr	np{} ;
 	int		rs ;
 	int		len = 0 ;
 	rbuf[0] = '\0' ;
-	if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
-	    auto	vf = vecstr_finder ;
-	    auto	vs = vstrkeycmp ;
+	if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
+	    cauto	vf = vecstr_finder ;
+	    cauto	vs = vstrkeycmp ;
 	    char	kb[2] = {} ;
 	    for (cchar *fp = fmt ; *fp && (rs >= 0) ; fp += 1) {
 	        if (*fp == '%') {
 	            fp += 1 ;
 	            if (! *fp) break ;
 	            if (*fp == '%') {
-	                rs = sbuf_chr(&b,'%') ;
+	                rs = b.chr('%') ;
 	            } else {
 			kb[0] = *fp ;
-	                if (cc *cp{} ; (rs = vf(nsp,kb,vs,&cp)) >= 0) {
+	                if (cc *cp ; (rs = vf(nsp,kb,vs,&cp)) >= 0) {
 	                    if (cc *tp ; (tp = strchr(cp,'=')) != np) {
-	                        rs = sbuf_strw(&b,(tp + 1),-1) ;
+	                        rs = b.strw((tp + 1)) ;
 	                    } /* end if (it had a value) */
 	                } else if (*fp == 'f') {
-	                    rs = sbuf_strw(&b,fn,-1) ;
+	                    rs = b.strw(fn) ;
 	                } else {
 	                    rs = SR_NOTFOUND ;
 			}
 	            } /* end if (tried to expand a key) */
 	        } else {
-	            rs = sbuf_chr(&b,*fp) ;
+	            rs = b.chr(*fp) ;
 	        } /* end if (escape or regular character) */
 	    } /* end for */
-	    len = sbuf_finish(&b) ;
+	    len = b.finish ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
 	return (rs >= 0) ? len : rs ;

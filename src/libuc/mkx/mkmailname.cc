@@ -43,7 +43,11 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<realname.h>
 #include	<localmisc.h>
 
@@ -83,8 +87,8 @@ int mkmailname(char *rbuf,int rlen,cchar *gp,int gl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (rbuf && gp) {
-	    if (realname rn ; (rs = rn.start(gp,gl)) >= 0) {
+	if (rbuf && gp) ylikely {
+	    if (realname rn ; (rs = rn.start(gp,gl)) >= 0) ylikely {
 	        {
 	            rs = rn.mailname(rbuf,rlen) ;
 		    rl = rs ;

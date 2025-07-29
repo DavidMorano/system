@@ -78,8 +78,8 @@ import libutil ;
 /* exported subroutines */
 
 namespace cfx {
-    int rmleadzero(cchar *sp,int sl) noex {
-	if ((sl > 1) && iszero(*sp)) {
+    int rmleadzero(cchar *sp,int sl) noex {		/* used internally */
+	if ((sl > 1) && iszero(*sp++)) {
 	    sl -= 1 ;
 	}
 	return sl ;
@@ -93,7 +93,7 @@ namespace cfx {
 		rl = rmleadzero(sp,sl) ;
 		sp += (sl - rl) ;
 	    }
-	}
+	} /* end if (sfshrink) */
 	*rpp = sp ;
 	return rl ;
     } /* end subroutine (cfdigs) */
@@ -101,7 +101,7 @@ namespace cfx {
 	int	rl = 0 ;
 	cchar	*sp = nsp ;
 	if (int sl ; (sl = sfshrink(nsp,nsl,&sp)) > 0) {
-	    auto islead = [] (char ch) noex {
+	    cauto islead = [] (char ch) noex {
 		return ((ch == ' ') || (ch == '+') || (ch == '0')) ;
 	    } ;
 	    while ((sl > 0) && islead(*sp)) {
@@ -118,7 +118,7 @@ namespace cfx {
 namespace cfx {
     int getsign(cchar *sp,int sl,bool *fnegp) noex {
 	int		rs = SR_FAULT ;
-	if (sp && fnegp) {
+	if (sp && fnegp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;

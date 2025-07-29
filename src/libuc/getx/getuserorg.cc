@@ -55,8 +55,8 @@
 #include	<usystem.h>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
-#include	<getpwx.h>
 #include	<getax.h>
+#include	<getpwx.h>
 #include	<getusername.h>
 #include	<getuserhome.h>
 #include	<mallocxx.h>

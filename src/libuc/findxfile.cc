@@ -39,14 +39,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
+#include	<cstring>		/* |strbrk(3c)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<getprogpath.h>
@@ -84,6 +79,8 @@ import uconstants ;
 
 /* forward references */
 
+static int	filexfile_path(ids *,char *,cc *,cc *) noex ;
+
 
 /* local variables */
 
@@ -94,53 +91,17 @@ import uconstants ;
 /* exported subroutines */
 
 int findxfile(ids *idp,char *rbuf,cchar *pn) noex {
-    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		len = 0 ;
-	if (idp && rbuf && pn) {
+	if (idp && rbuf && pn) ylikely {
 	    rbuf[0] = '\0' ;
 	    rs = SR_INVALID ;
-	    if (pn[0]) {
+	    if (pn[0]) ylikely {
 	        static cchar	*path = getenv(varname.path) ;
 	        rs = SR_NOENT ;
 	        if (path) {
-	            cint	vn = NENTS ;
-		    cint	vo = 0 ;
-	            bool	f_pwd = false ;
-	            if (vecstr plist ; (rs = plist.start(vn,vo)) >= 0) {
-		        cchar	*sp = path ;
-	                if (char *cbuf{} ; (rs = malloc_mp(&cbuf)) >= 0) {
-	                    for (cc *tp ; (tp = strbrk(sp,":;")) != np ; ) {
-				cint tl = intconv(tp - sp) ;
-	                        if ((tp - sp) == 0) {
-	                            f_pwd = true ;
-		                }
-	                        if ((rs = pathclean(cbuf,sp,tl)) >= 0) {
-	                            rs = plist.adduniq(cbuf,rs) ;
-	                        }
-	                        sp = (tp + 1) ;
-	                        if (rs < 0) break ;
-	                    } /* end while */
-		            rs = rsfree(rs,cbuf) ;
-		        } /* end if (m-a-f) */
-	                if ((rs >= 0) && (sp[0] != '\0')) {
-	                    rs = plist.adduniq(sp,-1) ;
-		        }
-	                if (rs >= 0) {
-			    auto	gp = getprogpath ;
-	                    if ((rs = gp(idp,&plist,rbuf,pn,-1)) >= 0) {
-		                len = rs ;
-			    } else if (rs == SR_NOENT) {
-	                         if ((! f_pwd) && ((rs = xfile(idp,pn)) >= 0)) {
-	                             rs = mkpath1(rbuf,pn) ;
-		                     len = rs ;
-		                 }
-			    } /* end if */
-	                } /* end if */
-	                rs1 = plist.finish ;
-		        if (rs >= 0) rs = rs1 ;
-	            } /* end if (path-list) */
+		    rs = filexfile_path(idp,rbuf,pn,path) ;
+		    len = rs ;
 	        } else {
 	            if ((rs = xfile(idp,pn)) >= 0) {
 		        rs = mkpath(rbuf,pn) ;
@@ -152,5 +113,52 @@ int findxfile(ids *idp,char *rbuf,cchar *pn) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (findxfile) */
+
+
+/* local subroutines */
+
+static int filexfile_path(ids *idp,char *rbuf,cc *pn,cc *path) noex {
+    	cnullptr	np{} ;
+        cint        vn = NENTS ;
+        cint        vo = 0 ;
+        int         rs ;
+	int		rs1 ;
+        int         len = 0 ; /* return-value */
+        bool        f_pwd = false ;
+        if (vecstr plist ; (rs = plist.start(vn,vo)) >= 0) ylikely {
+            cchar   *sp = path ;
+            if (char *cbuf ; (rs = malloc_mp(&cbuf)) >= 0) ylikely {
+                for (cc *tp ; (tp = strbrk(sp,":;")) != np ; ) {
+                    cint tl = intconv(tp - sp) ;
+                    if ((tp - sp) == 0) {
+                        f_pwd = true ;
+                    }
+                    if ((rs = pathclean(cbuf,sp,tl)) >= 0) {
+                        rs = plist.adduniq(cbuf,rs) ;
+                    }
+                    sp = (tp + 1) ;
+                    if (rs < 0) break ;
+                } /* end while */
+                rs = rsfree(rs,cbuf) ;
+            } /* end if (m-a-f) */
+            if ((rs >= 0) && (sp[0] != '\0')) {
+                rs = plist.adduniq(sp,-1) ;
+            }
+            if (rs >= 0) ylikely {
+                auto        gp = getprogpath ;
+                if ((rs = gp(idp,&plist,rbuf,pn,-1)) >= 0) {
+                    len = rs ;
+                } else if (rs == SR_NOENT) {
+                     if ((! f_pwd) && ((rs = xfile(idp,pn)) >= 0)) {
+                         rs = mkpath1(rbuf,pn) ;
+                         len = rs ;
+                     }
+                } /* end if */
+            } /* end if */
+            rs1 = plist.finish ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (path-list) */
+        return (rs >= 0) ? len : rs ;
+} /* end subroutine (filexfile_path) */
 
 

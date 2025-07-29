@@ -73,7 +73,7 @@ static int	absfn_loadnul(absfn *,cchar *,int,cchar **) noex ;
 
 int absfn_start(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (op && sp && rpp) {
+	if (op && sp && rpp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = SR_OK ;
 	    op->as = nullptr ;
@@ -95,7 +95,7 @@ int absfn_start(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 int absfn_finish(absfn *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->as) {
 		char *bp = cast_const<charp>(op->as) ;
@@ -115,14 +115,13 @@ int absfn_finish(absfn *op) noex {
 static int absfn_loadpwd(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) ylikely {
 	    cint	plen = rs ;
-	    if ((rs = getpwd(pbuf,plen)) >= 0) {
-	 	if ((rs = pathaddw(pbuf,rs,sp,sl)) >= 0) {
+	    if ((rs = getpwd(pbuf,plen)) >= 0) ylikely {
+	 	if ((rs = pathaddw(pbuf,rs,sp,sl)) >= 0) ylikely {
 		    sl = rs ;
 	            if (sl > ABSFN_SHORTLEN) {
-		        cchar	*cp{} ;
-	                if ((rs = uc_libmallocstrw(sp,sl,&cp)) >= 0) {
+	                if (cc *cp ; (rs = uc_libmallocstrw(sp,sl,&cp)) >= 0) {
 	                    *rpp = cp ;
 	                    op->as = cp ;
 	                } /* end if (memory-allocation) */
@@ -163,11 +162,11 @@ void absfn::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("absfn",rs,"fini-finish") ;
 	}
-}
+} /* end method (absfn::dtor) */
 
 absfn_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case absfnmem_finish:
 	        rs = absfn_finish(op) ;
@@ -175,7 +174,6 @@ absfn_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (absfn_co::operator) */
+} /* end method (absfn_co::operator) */
 
 

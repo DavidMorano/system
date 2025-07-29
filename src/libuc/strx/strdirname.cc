@@ -44,13 +44,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
+import libutil ;
 
 /* local defines */
 
@@ -67,7 +67,7 @@ static constexpr cchar		strdirname_dot[] = "." ;
 
 char *strdirname(char *s) noex {
 	int		si ;
-	int		sl = strlen(s) ;
+	int		sl = lenstr(s) ;
 	/* remove trailing slash characters */
 	while ((sl > 1) && (s[sl - 1] == '/')) {
 	    sl -= 1 ;

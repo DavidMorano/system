@@ -175,8 +175,8 @@ int malloc_zi(char **rpp) noex {
 int malloc_ps(char **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		sz = 0 ;
-	if (rpp) {
-	    if ((rs = pagesize) > 0) {
+	if (rpp) ylikely {
+	    if ((rs = pagesize) > 0) ylikely {
 	        rs = uc_valloc((rs + 1),rpp) ;
 	    } else if (rs <= 0) {
 		*rpp = nullptr ;
@@ -184,19 +184,19 @@ int malloc_ps(char **rpp) noex {
 	    } /* end if (pagesize) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
-}
+} /* end subroutine (malloc_ps) */
 
 int malloc_mailaddr(char **rpp) noex {
     	cint		hmult = mailvalue.hostnamemult ;
     	cint		nmult = mailvalue.nodenamemult ;
 	int		rs = SR_FAULT ;
 	int		mal = 0 ;		/* mail-address length */
-	if (rpp) {
+	if (rpp) ylikely {
 	    int		w = getbufsize_hn ;
-	    if ((rs = getbufsize(w)) >= 0) {
+	    if ((rs = getbufsize(w)) >= 0) ylikely {
 		cint	hnl = rs ;
 		w = getbufsize_nn ;
-		if ((rs = getbufsize(w)) >= 0) {
+		if ((rs = getbufsize(w)) >= 0) ylikely {
 		    cint	nnl = rs ;
 		    mal = ((hmult * hnl) + (nmult * nnl)) ;
 		    rs = uc_malloc((mal+1),rpp) ;
@@ -204,7 +204,6 @@ int malloc_mailaddr(char **rpp) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? mal : rs ;
-}
-/* end subroutine (mailoc_mailaddr) */
+} /* end subroutine (mailoc_mailaddr) */
 
 

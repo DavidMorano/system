@@ -33,7 +33,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
+#include	<unistd.h>		/* |_CS_{xx}| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -41,11 +41,12 @@
 #include	<usysrets.h>
 
 
-enum missingconfstrs {
-	missingconfstr_publicdir = 1000,
-	missingconfstr_tmpdir,
-	missingconfstr_cachedir,
-	missingconfstr_overlast
+enum sysconfstrss {
+	sysconfstr_synthetic = 1000,
+	sysconfstr_publicdir,
+	sysconfstr_tmpdir,
+	sysconfstr_cachedir,
+	sysconfstr_overlast
 } ;
 
 
@@ -53,7 +54,7 @@ enum missingconfstrs {
 #ifdef	_CS_DARWIN_USER_DIR	
 #define	_CS_PUBLICDIR	_CS_DARWIN_USER_DIR	
 #else
-#define	_CS_PUBLICDIR	missingconfstr_publicdir
+#define	_CS_PUBLICDIR	sysconfstr_publicdir
 #endif
 #endif
 
@@ -61,7 +62,7 @@ enum missingconfstrs {
 #ifdef	_CS_DARWIN_USER_TEMP_DIR
 #define	_CS_TMPDIR	_CS_DARWIN_USER_TEMP_DIR
 #else
-#define	_CS_TMPDIR	missingconfstr_tmpdir
+#define	_CS_TMPDIR	sysconfstr_tmpdir
 #endif
 #endif
 
@@ -69,7 +70,7 @@ enum missingconfstrs {
 #ifdef	_CS_DARWIN_USER_CACHE_DIR
 #define	_CS_CACHEDIR	_CS_DARWIN_USER_CACHE_DIR
 #else
-#define	_CS_CACHEDIR	missingconfstr_cachedir
+#define	_CS_CACHEDIR	sysconfstr_cachedir
 #endif
 #endif
 
@@ -77,7 +78,7 @@ enum missingconfstrs {
 EXTERNC_begin
 
 extern int	uc_sysconfval(int,long *) noex ;
-extern int	uc_sysconfstr(char *,int,int) noex ;
+extern int	uc_sysconfstr(int,char *,int) noex ;
 
 static inline int uc_sysconf(int req,long *rp) noex {
 	return uc_sysconfval(req,rp) ;

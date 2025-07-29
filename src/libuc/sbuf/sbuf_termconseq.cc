@@ -25,7 +25,7 @@
 	characters into the buffer.
 
 	Synopsis:
-	int sbuf_termconseq(sbuf *sbp,int name,int a1,int a2) noex
+	int sbuf_termconseq(sbuf *op,int name,int a1,int a2) noex
 
 	Arguments:
 	op		pointer to the buffer object
@@ -84,19 +84,19 @@
 
 /* exported subroutines */
 
-int sbuf_termconseq(sbuf *sbp,int name,cchar *is,int na,...) noex {
+int sbuf_termconseq(sbuf *op,int name,cchar *is,int na,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
-	int		tl = 0 ;
-	if (sbp) {
+	int		tl = 0 ; /* return-value */
+	if (op) ylikely {
 	    rs = SR_INVALID ;
-	    if (name > 0) {
-		va_list	ap ;
+	    if (name > 0) ylikely {
 	        cint	tlen = TERMCONSEQLEN ;
 	        char	tbuf[TERMCONSEQLEN + 1] ;
 		va_begin(ap,na) ;
 	        if ((rs = termconseqva(tbuf,tlen,name,is,na,ap)) >= 0) {
 	            tl = rs ;
-	            rs = sbuf_strw(sbp,tbuf,tl) ;
+	            rs = sbuf_strw(op,tbuf,tl) ;
 	        }
 		va_end(ap) ;
 	    } /* end if (valid) */

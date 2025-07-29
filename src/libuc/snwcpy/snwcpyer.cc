@@ -107,20 +107,22 @@
 /* exported subroutines */
 
 int snwcpy(char *dp,int dl,cchar *sp,int sl) noex {
-	int		rs ;
-	if (dl >= 0) {
-	    if (sl >= 0) {
-	        if (sl > dl) {
-	            rs = sncpy1(dp,dl,sp) ;
+	int		rs = SR_FAULT ;
+	if (dp && sp) {
+	    if (dl >= 0) {
+	        if (sl >= 0) {
+	            if (sl > dl) {
+	                rs = sncpy1(dp,dl,sp) ;
+	            } else {
+	                rs = intconv(strwcpy(dp,sp,sl) - dp) ;
+		    }
 	        } else {
-	            rs = intconv(strwcpy(dp,sp,sl) - dp) ;
-		}
+	            rs = sncpy1(dp,dl,sp) ;
+	        }
 	    } else {
-	        rs = sncpy1(dp,dl,sp) ;
+	        rs = intconv(strwcpy(dp,sp,sl) - dp) ;
 	    }
-	} else {
-	    rs = intconv(strwcpy(dp,sp,sl) - dp) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (snwcpy) */

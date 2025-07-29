@@ -114,17 +114,17 @@ int mkonefrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (fbuf && sp) {
+	if (fbuf && sp) ylikely {
 	    rs = SR_INVALID ;
 	    fbuf[0] = '\0' ;
-	    if (sp[0]) {
+	    if (sp[0]) ylikely {
 		rs = SR_OK ;
 	        if (sl < 0) sl = lenstr(sp) ;
-	        if (sl > 0)  {
-	            if (ema a ; (rs = a.start) >= 0) {
-	                if ((rs = a.parse(sp,sl)) >= 0) {
+	        if (sl > 0)  ylikely {
+	            if (ema a ; (rs = a.start) >= 0) ylikely {
+	                if ((rs = a.parse(sp,sl)) >= 0) ylikely {
 	            	    ema_ent	*ep ;
-		            if ((rs = a.get(0,&ep)) >= 0) {
+		            if ((rs = a.get(0,&ep)) >= 0) ylikely {
 		                rs = emaentry_bestfrom(ep,fbuf,flen) ;
 	                        len = rs ;
 		            } /* end if (ema_get) */
@@ -167,7 +167,7 @@ static int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
 	    }
 	}
 	if_constexpr (f_massage) {
-	    if ((rp != nullptr) && (nl > 0)) {
+	    if ((rp != nullptr) && (nl > 0)) ylikely {
 	        int	cl ;
 	        cchar	*cp ;
 	        switch (atype) {
@@ -188,7 +188,7 @@ static int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
 	        } /* end switch */
 	    } /* end if (positive) */
 	} else {
-	    if ((rp != nullptr) && (nl > 0)) {
+	    if ((rp != nullptr) && (nl > 0)) ylikely {
 	        switch (atype) {
 	        case atype_comment:
 	        case atype_address:

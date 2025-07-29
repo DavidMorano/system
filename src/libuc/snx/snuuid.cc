@@ -53,7 +53,7 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
@@ -61,8 +61,12 @@
 #include	<climits>		/* |UINT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdint>
-#include	<usystem.h>
+#include	<cstdint>		/* |uint64_t| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<sbuf.h>
 #include	<mkuuid.h>		/* |uuid_dat| below */
 #include	<localmisc.h>		/* |DIGBUFLEN| */
@@ -102,15 +106,15 @@
 int snuuid(char *dbuf,int dlen,uuid_dat *up) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (dbuf && up) {
-	    if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) {
+	if (dbuf && up) ylikely {
+	    if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) ylikely {
 	        uint64_t	v = (up->time & UINT_MAX) ;
 	        if (rs >= 0) rs = b.hexp(v,4) ;
 	        if (rs >= 0) rs = b.chr('-') ;
 	        v = ((up->time >> 32) & UINT_MAX) ;
 	        if (rs >= 0) rs = b.hexp(v,2) ;
 	        if (rs >= 0) rs = b.chr('-') ;
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    uint64_t	tv ;
 		    v = 0 ;
 		    tv = ((up->time >> 48) & UINT_MAX) ;

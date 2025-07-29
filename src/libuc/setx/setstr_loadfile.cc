@@ -1,4 +1,4 @@
-/* setstr_loadfile SUPPORT */
+/* setostr_loadfile SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	setstr_loadfile
+	setostr_loadfile
 
 	Description:
 	This subroutine will read (process) a file and put all of
@@ -26,7 +26,7 @@
 	of a SETSTR object.
 
 	Synopsis:
-	int setstr_loadfile(setstr *op,int fo,cchar *fname) noex
+	int setostr_loadfile(setostr *op,int fo,cchar *fname) noex
 
 	Arguments:
 	op		pointer to SETSTR object
@@ -47,7 +47,7 @@
 
 	Why are we using FIELD as opposed to |sfnext(3uc)| or
 	something similar?  Because our sematics are to process
-	quoted strings as a single setstr entry!
+	quoted strings as a single setostr entry!
 
 	Note_on_uniqueness:
 
@@ -65,11 +65,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<mallocxx.h>
-#include	<linebuffer.h>
+#include	<getfdfile.h>
+#include	<libmallocxx.h>
 #include	<intsat.h>
 #include	<filer.h>
 #include	<field.h>
@@ -77,24 +76,18 @@
 #include	<sfx.h>
 #include	<localmisc.h>		/* |BCEIL(3dam)| */
 
-#include	"setstr.h"
+#include	"setostr.h"
 
 
 /* local defines */
-
-#ifndef	FD_STDIN
-#define	FD_STDIN	0
-#endif
 
 #define	TO_READ		-1		/* read timeout */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -111,8 +104,9 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static int	setstr_loadfd(setstr *,int,int) noex ;
-static int	setstr_loadln(setstr *,int,cchar *,int) noex ;
+static int	setostr_loadfd(setostr *,int,int) noex ;
+static int	setostr_loadfds(setostr *,int,int,int,int,int) noex ;
+static int	setostr_loadln(setostr *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -125,7 +119,7 @@ static constexpr fieldterminit		ft("\n#") ;
 
 /* exported subroutines */
 
-int setstr_loadfile(setstr *op,int fu,cchar *fname) noex {
+int setostr_loadfile(setostr *op,int fu,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op && fname) {
@@ -143,7 +137,7 @@ int setstr_loadfile(setstr *op,int fu,cchar *fname) noex {
 	            }
 	        }
 	        if (rs >= 0) {
-	            rs = setstr_loadfd(op,fu,fd) ;
+	            rs = setostr_loadfd(op,fu,fd) ;
 	            c = rs ;
 	        }
 	        if (f_opened && (fd >= 0)) {
@@ -153,17 +147,16 @@ int setstr_loadfile(setstr *op,int fu,cchar *fname) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (setstr_loadfile) */
+/* end subroutine (setostr_loadfile) */
 
 
 /* local subroutines */
 
-static int setstr_loadfd(setstr *op,int fu,int fd) noex {
+static int setostr_loadfd(setostr *op,int fu,int fd) noex {
 	int		rs ;
-	int		rs1 ;
 	int		to = -1 ;
 	int		c = 0 ;
-	if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	    if (! S_ISDIR(sb.st_mode)) {
 		int	fbsz = 1024 ;
 		int	fbo = 0 ;
@@ -178,46 +171,55 @@ static int setstr_loadfd(setstr *op,int fu,int fd) noex {
 			fbo |= FILER_ONET ;
 		    }
 	        }
-		if (linebuffer lb ; (rs = lb.start) >= 0) {
-		    cint	llen = rs ;
-		    char	*lbuf = lb.lbuf ;
-		    if (filer fb ; (rs = fb.start(fd,0z,fbsz,fbo)) >= 0) {
-	                while ((rs = fb.readln(lbuf,llen,to)) > 0) {
-			    cchar	*cp{} ;
-			    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
-			        rs = setstr_loadln(op,fu,cp,cl) ;
-			        c += rs ;
-			    }
-	                    if (rs < 0) break ;
-	                } /* end while (reading lines) */
-	                rs1 = fb.finish ;
-		        if (rs >= 0) rs = rs1 ;
-	            } /* end if (filer) */
-		    rs1 = lb.finish ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (linebuffer) */
+		{
+		    rs = setostr_loadfds(op,fd,fu,fbsz,fbo,to) ;
+		    c = rs ;
+		}
 	    } else {
 	        rs = SR_ISDIR ;
 	    }
 	} /* end if (stat) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (setstr_loadfd) */
+/* end subroutine (setostr_loadfd) */
 
-static int setstr_loadln(setstr *op,int fu,cchar *lp,int ll) noex {
+static int setostr_loadfds(setostr *op,int fd,int fu,int fbsz,int fbo,
+		int to) noex {
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+	if (char *lbuf ; (rs = libmalloc_ml(&lbuf)) >= 0) {
+	    cint	llen = rs ;
+	    if (filer fb ; (rs = fb.start(fd,0z,fbsz,fbo)) >= 0) {
+	        while ((rs = fb.readln(lbuf,llen,to)) > 0) {
+		    cchar	*cp{} ;
+		    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
+			rs = setostr_loadln(op,fu,cp,cl) ;
+			c += rs ;
+		    } /* end if (sfcontent) */
+	            if (rs < 0) break ;
+	        } /* end while (reading lines) */
+	        rs1 = fb.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (filer) */
+	    rs = rslibfree(rs,lbuf) ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (setostr_loadfds) */
+
+static int setostr_loadln(setostr *op,int fu,cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
-	    int		fl ;
 	    cchar	*fp ;
-	    while ((fl = fsb.get(ft.terms,&fp)) >= 0) {
+	    for (int fl ; (fl = fsb.get(ft.terms,&fp)) >= 0 ; ) {
 		if (fl > 0) {
 		    if (fu) {
-			rs = setstr_del(op,fp,fl) ;
+			rs = setostr_del(op,fp,fl) ;
 		    }
 		    if (rs >= 0) {
-			rs = setstr_add(op,fp,fl) ;
+			rs = setostr_add(op,fp,fl) ;
 		    }
 		    if (rs != INT_MAX) c += 1 ;
 		} /* end if (got one) */
@@ -229,6 +231,6 @@ static int setstr_loadln(setstr *op,int fu,cchar *lp,int ll) noex {
 	} /* end if (fields) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (setstr_loadln) */
+/* end subroutine (setostr_loadln) */
 
 

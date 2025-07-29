@@ -1,4 +1,4 @@
-/* strnwht MODULE */
+/* strnwht1 MODULE (module-implementation-unit) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -102,24 +102,24 @@ static constexpr cauto		isw = iswhite ;
 extern "C" {
     char *strnwht(cchar *sp,int sl) noex {
 	char		*rsp = nullptr ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl >= 0) {	
+	    if (sl > 0) ylikely {	
 	        cchar	*lsp = (sp + sl) ;
-	        bool	f = false ;
+		bool	f = false ;
 	        while ((sp < lsp) && *sp && (*sp != '\n')) {
 		    cint	ch = mkchar(*sp) ;
 		    if ((f = isw(ch))) break ;
 		    sp += 1 ;
 		} /* end while */
 	        rsp = (f) ? charp(sp) : nullptr ;
-	    } /* end if */
+	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
 	return rsp ;
     } /* end subroutine (strnwht) */
     char *strnwhtbrk(cchar *sp,int sl,cchar *ss) noex {
     	char		*rsp = nullptr ;
-	if (sp && ss) {
+	if (sp && ss) ylikely {
     	    chrset	sset(ss) ;
 	    rsp = strnwhtbrk(sp,sl,sset) ;
 	}
@@ -127,14 +127,14 @@ extern "C" {
     } /* end subroutine (strnwhtbrk) */
     char *strnwhtchr(cchar *sp,int sl,int sch) noex {
     	char		*rsp = nullptr ;
-	if (sp) {
-	    if (sch) {
+	if (sp) ylikely {
+	    if (sch) ylikely {
     	        chrset sset ; sset.set(sch) ;
 	        rsp = strnwhtbrk(sp,sl,sset) ;
 	    } else {
 		rsp = strnwht(sp,sl) ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rsp ;
     } /* end subroutine (strnwhtchr) */
 } /* end extern */
@@ -142,9 +142,9 @@ extern "C" {
 extern "C++" {
     char *strnwhtbrk(cchar *sp,int sl,const chrset &sset) noex {
 	char		*rsp = nullptr ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl >= 0) {	
+	    if (sl > 0) ylikely {	
 	        cchar	*lsp = (sp + sl) ;
 	        bool	f = false ;
 	        while ((sp < lsp) && *sp) {
@@ -163,7 +163,7 @@ extern "C++" {
 		    } /* end while */
 		    if (f) rsp = charp(sp) ;
 		} /* end if (had white-space) */
-	    } /* end if */
+	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
 	return rsp ;
     } /* end subroutine (strnwhtbrk) */

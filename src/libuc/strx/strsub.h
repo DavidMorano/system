@@ -1,4 +1,5 @@
 /* strsub HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* find a substring within a larger string */

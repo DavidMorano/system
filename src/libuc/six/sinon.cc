@@ -49,7 +49,7 @@
 #include	<ischarx.h>
 #include	<localmisc.h>
 
-#include	"six.h"
+#include	"sinon.h"
 
 
 /* local defines */
@@ -76,15 +76,17 @@ extern "C" {
 
 /* forward references */
 
-static int sinon(cchar *sp,int sl,isnon_f isx) noex {
-	int		i{} ; /* used-afterwards */
+static int sinon(isnon_f isx,cchar *sp,int sl) noex {
+	int		i = 0 ; /* used-afterwards */
 	bool		f = false ;
-	for (i = 0 ; sl && sp[i] ; i += 1) {
-	    cint	ch = mkchar(sp[i]) ;
-	    f = (! isx(ch)) ;
-	    if (f) break ;
-	    sl -= 1 ;
-	} /* end for */
+	if (sp) ylikely {
+	    for (i = 0 ; sl && sp[i] ; i += 1) {
+	        cint	ch = mkchar(sp[i]) ;
+	        f = (! isx(ch)) ;
+	        if (f) break ;
+	        sl -= 1 ;
+	    } /* end for */
+	} /* end if (non-null) */
 	return (f) ? i : -1 ;
 }
 /* end subroutine (sinon) */
@@ -99,15 +101,15 @@ static int sinon(cchar *sp,int sl,isnon_f isx) noex {
 /* exported subroutines */
 
 int sinonoct(cchar *sp,int sl) noex {
-    	return sinon(sp,sl,isoctlatin) ;
+    	return sinon(isoctlatin,sp,sl) ;
 }
 
 int sinondec(cchar *sp,int sl) noex {
-    	return sinon(sp,sl,isdeclatin) ;
+    	return sinon(isdeclatin,sp,sl) ;
 }
 
 int sinonhex(cchar *sp,int sl) noex {
-    	return sinon(sp,sl,ishexlatin) ;
+    	return sinon(ishexlatin,sp,sl) ;
 }
 
 

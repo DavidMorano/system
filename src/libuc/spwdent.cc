@@ -41,6 +41,7 @@
 #include	"spwd.h"
 #include	"spwdent.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -81,8 +82,8 @@ int spwdent_parse(SPWD *spp,char *spbuf,int splen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (spp && spbuf && sp) {
 	    storeitem	ib, *ibp = &ib ;
-	    if (sl < 0) sl = strlen(sp) ;
-	    memset(spp,0,sizeof(SPWD)) ;
+	    if (sl < 0) sl = lenstr(sp) ;
+	    memclear(spp) ;
 	    if ((rs = storeitem_start(ibp,spbuf,splen)) >= 0) {
 	        int		fi = 0 ;
 	        int		si ;
@@ -112,8 +113,8 @@ int spwdent_load(SPWD *spp,char *spbuf,int splen,CSPWD *sspp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (spp && spbuf && sspp) {
+	    memcopy(spp,sspp) ;
 	    storeitem	ib ;
-	    memcpy(spp,sspp,sizeof(SPWD)) ;
 	    if ((rs = storeitem_start(&ib,spbuf,splen)) >= 0) {
 	        si_copystr(&ib,&spp->sp_namp,sspp->sp_namp) ;
 	        si_copystr(&ib,&spp->sp_pwdp,sspp->sp_pwdp) ;
@@ -191,10 +192,10 @@ int spwdent_format(CSPWD *spp,char *rbuf,int rlen) noex {
 int spwdent_size(CSPWD *pp) noex {
 	int		sz = 1 ;
 	if (pp->sp_namp) {
-	    sz += (strlen(pp->sp_namp) + 1) ;
+	    sz += (lenstr(pp->sp_namp) + 1) ;
 	}
 	if (pp->sp_pwdp) {
-	    sz += (strlen(pp->sp_pwdp) + 1) ;
+	    sz += (lenstr(pp->sp_pwdp) + 1) ;
 	}
 	return sz ;
 }
@@ -254,8 +255,8 @@ static int spwdent_parseone(SPWD *spp,SI *ibp,int fi,cchar *vp,int vl) noex {
 	    break ;
 	} /* end switch */
 	if ((rs >= 0) && (vpp != nullptr)) {
-	    int		cl ;
-	    if (cchar *cp{} ; (cl = sfshrink(vp,vl,&cp)) >= 0) {
+	    cchar	*cp ;
+	    if (int cl ; (cl = sfshrink(vp,vl,&cp)) >= 0) {
 	        rs = storeitem_strw(ibp,cp,cl,vpp) ;
 	    }
 	}
@@ -269,7 +270,7 @@ static int spwdent_parsedefs(SPWD *spp,SI *ibp,int sfi) noex {
 	    cchar	**vpp = (cchar **) &spp->sp_pwdp ;
 	    cchar	*sp = spp->sp_namp ;
 	    cchar	*valp ;
-	    valp = (sp + strlen(sp)) ;
+	    valp = (sp + lenstr(sp)) ;
 	    sfi += 1 ;
 	    rs = storeitem_strw(ibp,valp,0,vpp) ;
 	}

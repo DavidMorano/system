@@ -28,13 +28,15 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"dstr.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;			/* lenstr(3u)| */
 
 /* local defines */
 
@@ -70,8 +72,8 @@ int dstr_start(dstr *sop,cchar *sp,int sl) noex {
 	if (sop && sp) {
 	    sop->sbuf = nullptr ;
 	    sop->slen = 0 ;
-	    if (sl < 0) sl = strlen(sp) ;
-	    if (cchar *rp{} ; (rs = uc_mallocstrw(sp,sl,&rp)) >= 0) {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    if (cchar *rp ; (rs = uc_mallocstrw(sp,sl,&rp)) >= 0) ylikely {
 		sop->slen = rs ;
 		sop->sbuf = charp(rp) ;
 	    }
@@ -83,7 +85,7 @@ int dstr_start(dstr *sop,cchar *sp,int sl) noex {
 int dstr_finish(dstr *sop) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (sop) {
+	if (sop) ylikely {
 	    rs = SR_OK ;
 	    if (sop->sbuf) {
 	        rs1 = uc_free(sop->sbuf) ;
@@ -98,7 +100,7 @@ int dstr_finish(dstr *sop) noex {
 
 int dstr_assign(dstr *sop,dstr *sop2) noex {
 	int		rs = SR_FAULT ;
-	if (sop && sop2) {
+	if (sop && sop2) ylikely {
 	    if ((rs = dstr_finish(sop)) >= 0) {
 	        rs = dstr_start(sop,sop2->sbuf,sop2->slen) ;
 	    }

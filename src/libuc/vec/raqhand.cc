@@ -57,23 +57,8 @@ import libutil ;
 static int	raqhand_setopts(raqhand *,int) noex ;
 static int	raqhand_valid(raqhand *,int) noex ;
 
-consteval int mkoptmask() noex {
-	int		m = 0 ;
-	m |= RAQHAND_OREUSE ;
-	m |= RAQHAND_OCOMPACT ;
-	m |= RAQHAND_OSWAP ;
-	m |= RAQHAND_OSTATIONARY ;
-	m |= RAQHAND_OCONSERVE ;
-	m |= RAQHAND_OSORTED ;
-	m |= RAQHAND_OORDERED ;
-	return m ;
-}
-/* end subroutine (mkoptmask) */
-
 
 /* local variables */
-
-constexpr int		optmask = mkoptmask() ;
 
 
 /* exported variables */
@@ -294,18 +279,32 @@ int raqhand_count(raqhand *op) noex {
 
 /* private subroutines */
 
+consteval int mkoptmask() noex {
+	int		m = 0 ;
+	m |= RAQHAND_OREUSE ;
+	m |= RAQHAND_OCOMPACT ;
+	m |= RAQHAND_OSWAP ;
+	m |= RAQHAND_OSTATIONARY ;
+	m |= RAQHAND_OCONSERVE ;
+	m |= RAQHAND_OSORTED ;
+	m |= RAQHAND_OORDERED ;
+	return m ;
+}
+/* end subroutine (mkoptmask) */
+
 static int raqhand_setopts(raqhand *op,int vo) noex {
+	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	if ((vo & (~optmask)) == 0) {
 	    rs = SR_OK ;
-	    op->f = {} ;
-	    if (vo & RAQHAND_OREUSE) op->f.oreuse = 1 ;
-	    if (vo & RAQHAND_OCOMPACT) op->f.ocompact = 1 ;
-	    if (vo & RAQHAND_OSWAP) op->f.oswap = 1 ;
-	    if (vo & RAQHAND_OSTATIONARY) op->f.ostationary = 1 ;
-	    if (vo & RAQHAND_OCONSERVE) op->f.oconserve = 1 ;
-	    if (vo & RAQHAND_OSORTED) op->f.osorted = 1 ;
-	    if (vo & RAQHAND_OORDERED) op->f.oordered = 1 ;
+	    op->fl = {} ;
+	    if (vo & RAQHAND_OREUSE) op->fl.oreuse = 1 ;
+	    if (vo & RAQHAND_OCOMPACT) op->fl.ocompact = 1 ;
+	    if (vo & RAQHAND_OSWAP) op->fl.oswap = 1 ;
+	    if (vo & RAQHAND_OSTATIONARY) op->fl.ostationary = 1 ;
+	    if (vo & RAQHAND_OCONSERVE) op->fl.oconserve = 1 ;
+	    if (vo & RAQHAND_OSORTED) op->fl.osorted = 1 ;
+	    if (vo & RAQHAND_OORDERED) op->fl.oordered = 1 ;
 	} /* end if (valid options) */
 	return rs ;
 }

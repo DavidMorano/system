@@ -7,7 +7,6 @@
 
 #define	CF_PMQDIR	0		/* manage message-queue directory */
 #define	CF_GETPMQ	0		/* manage message-queue IDs */
-#define	CF_UGETPW	0		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -42,9 +41,11 @@
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<getbufsize.h>
-#include        <errtimer.hh>
 #include	<getax.h>
+#include	<getpwx.h>
 #include	<libmallocxx.h>
+#include	<mallocxx.h>
+#include        <errtimer.hh>
 #include	<mkpathx.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>
@@ -55,14 +56,6 @@
 import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
-
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
-#define	GETPW_UID	ugetpw_uid
-#else
-#define	GETPW_NAME	getpw_name
-#define	GETPW_UID	getpw_uid
-#endif /* CF_UGETPW */
 
 #define	PMQ_PATHPREFIX	"/tmp/pmq"
 
@@ -149,6 +142,8 @@ namespace {
 	int attrget(pmq *) noex ;
 	int notify(pmq *) noex ;
 	int unlink(pmq *) noex ;
+    private:
+	int callkern(pmq *) noex ;
     } ; /* end struct (posixhelp) */
 } /* end namespace */
 
@@ -160,7 +155,7 @@ int		uc_unlinkpmq(cchar *) noex ;
 template<typename ... Args>
 static inline int pmq_ctor(pmq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
 	    op->name = nullptr ;
 	    op->magic = 0 ;
@@ -170,7 +165,7 @@ static inline int pmq_ctor(pmq *op,Args ... args) noex {
 
 static inline int pmq_dtor(pmq *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -180,7 +175,7 @@ static inline int pmq_dtor(pmq *op) noex {
 template<typename ... Args>
 static inline int pmq_magic(pmq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == PMQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -219,13 +214,13 @@ static constexpr mqd_t		mqdbad = mkmqdbad() ;
 int pmq_open(pmq *op,cchar *name,int of,mode_t om,const pmq_attr *attr) noex {
 	int		rs ;
 	int		rc = 0 ;
-	if ((rs = pmq_ctor(op,name)) >= 0) {
+	if ((rs = pmq_ctor(op,name)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
-		if ((rs = pmq_nameload(op,name)) >= 0) {
+		if ((rs = pmq_nameload(op,name)) >= 0) ylikely {
 		    posixhelp	po(of,om,attr) ;
 		    po.m = &posixhelp::open ;
-		    if ((rs = po(op)) >= 0) {
+		    if ((rs = po(op)) >= 0) ylikely {
 			rc = rs ;
 			op->magic = PMQ_MAGIC ;
 		    }
@@ -245,7 +240,7 @@ int pmq_open(pmq *op,cchar *name,int of,mode_t om,const pmq_attr *attr) noex {
 int pmq_close(pmq *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pmq_magic(op)) >= 0) {
+	if ((rs = pmq_magic(op)) >= 0) ylikely {
 	    {
 		rs1 = pmq_nameclean(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -268,7 +263,7 @@ int pmq_close(pmq *op) noex {
 
 int pmq_send(pmq *op,cchar *sbuf,int slen,uint prio) noex {
 	int		rs ;
-	if ((rs = pmq_magic(op,sbuf)) >= 0) {
+	if ((rs = pmq_magic(op,sbuf)) >= 0) ylikely {
 	    posixhelp	po(sbuf,slen,prio) ;
 	    po.m = &posixhelp::send ;
 	    rs = po(op) ;
@@ -279,7 +274,7 @@ int pmq_send(pmq *op,cchar *sbuf,int slen,uint prio) noex {
 
 int pmq_recv(pmq *op,char *rbuf,int rlen,uint *priop) noex {
 	int		rs ;
-	if ((rs = pmq_magic(op,rbuf)) >= 0) {
+	if ((rs = pmq_magic(op,rbuf)) >= 0) ylikely {
 	    posixhelp	po(rbuf,rlen,priop) ;
 	    po.m = &posixhelp::recv ;
 	    rs = po(op) ;
@@ -290,7 +285,7 @@ int pmq_recv(pmq *op,char *rbuf,int rlen,uint *priop) noex {
 
 int pmq_attrset(pmq *op,const pmq_attr *nattr,pmq_attr *oattr) noex {
 	int		rs ;
-	if ((rs = pmq_magic(op,nattr)) >= 0) {
+	if ((rs = pmq_magic(op,nattr)) >= 0) ylikely {
 	    posixhelp	po(oattr,nattr) ;
 	    po.m = &posixhelp::attrset ;
 	    rs = po(op) ;
@@ -301,7 +296,7 @@ int pmq_attrset(pmq *op,const pmq_attr *nattr,pmq_attr *oattr) noex {
 
 int pmq_attrget(pmq *op,pmq_attr *oattr) noex {
 	int		rs ;
-	if ((rs = pmq_magic(op,oattr)) >= 0) {
+	if ((rs = pmq_magic(op,oattr)) >= 0) ylikely {
 	    posixhelp	po(oattr) ;
 	    po.m = &posixhelp::attrget ;
 	    rs = po(op) ;
@@ -312,7 +307,7 @@ int pmq_attrget(pmq *op,pmq_attr *oattr) noex {
 
 int pmq_notify(pmq *op,SIGEVENT *sep) noex {
 	int		rs ;
-	if ((rs = pmq_magic(op)) >= 0) {
+	if ((rs = pmq_magic(op)) >= 0) ylikely {
 	    posixhelp	po(sep) ;
 	    po.m = &posixhelp::notify ;
 	    rs = po(op) ;
@@ -323,7 +318,7 @@ int pmq_notify(pmq *op,SIGEVENT *sep) noex {
 
 int pmq_unlink(pmq *op) noex {
 	int		rs ;
-	if ((rs = pmq_magic(op)) >= 0) {
+	if ((rs = pmq_magic(op)) >= 0) ylikely {
 	    posixhelp	po ;
 	    po.m = &posixhelp::unlink ;
 	    rs = po(op) ;
@@ -336,9 +331,9 @@ int pmq_unlink(pmq *op) noex {
 int uc_unlinkpmq(cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 	        if (char *altname ; (rs = libmalloc_mn(&altname)) >= 0) {
 		    cint	maxnamelen = rs ;
 	            if (name[0] != '/') {
@@ -384,8 +379,8 @@ static int pmq_nameload(pmq *op,cchar *name) noex {
 	} else if (cl == 1) {
 	    rs = SR_INVALID ;
 	} /* end if (needed rooted name) */
-	if (rs >= 0) {
-	    if (char *cp ; (rs = uc_libmalloc((cl + 1),&cp)) >= 0) {
+	if (rs >= 0) ylikely {
+	    if (char *cp ; (rs = uc_libmalloc((cl + 1),&cp)) >= 0) ylikely {
 	        if ((rs = sncpy(cp,cl,prefix,name)) >= 0) {
 		    op->name = cp ;
 	        }
@@ -400,7 +395,7 @@ static int pmq_nameload(pmq *op,cchar *name) noex {
 
 static int pmq_nameclean(pmq *op) noex {
 	int		rs = SR_OK ;
-	if (op->name) {
+	if (op->name) ylikely {
 	    rs = uc_libfree(op->name) ;
 	    op->name = nullptr ;
 	}
@@ -408,15 +403,24 @@ static int pmq_nameclean(pmq *op) noex {
 }
 /* end subroutine (pmq_nameclean) */
 
+int posixhelp::callkern(pmq *op) noex {
+    	int		rs ;
+	if ((rs = (this->*m)(op)) < 0) nlikely {
+	    rs = (- errno) ;
+	}
+	return rs ;
+} /* end method (posixhelp::callkern) */
+
 int posixhelp::operator () (pmq *op) noex {
 	errtimer	to_mfile = utimeout[uto_mfile] ;
 	errtimer	to_nfile = utimeout[uto_nfile] ;
 	errtimer	to_nomem = utimeout[uto_nomem] ;
 	errtimer	to_nospc = utimeout[uto_nospc] ;
+	errtimer	to_again = utimeout[uto_again] ;
         reterr          r ;
 	int		rs ;
 	repeat {
-	    if ((rs = (this->*m)(op)) < 0) {
+	    if ((rs = callkern(op)) < 0) nlikely {
                 r(rs) ;                 /* <- default causes exit */
 	        switch (rs) {
 	        case SR_MFILE:
@@ -430,6 +434,9 @@ int posixhelp::operator () (pmq *op) noex {
 		    break ;
 	        case SR_NOSPC:
                     r = to_nospc(rs) ;
+		    break ;
+	        case SR_AGAIN:
+                    r = to_again(rs) ;
 		    break ;
 	        case SR_INTR:
 		    r(false) ;
@@ -453,7 +460,7 @@ int posixhelp::open(pmq *op) noex {
 
 int posixhelp::close(pmq *op) noex {
 	int		rs ;
-	if ((rs = mq_close(op->pq)) < 0) {
+	if ((rs = mq_close(op->pq)) < 0) nlikely {
 	    rs = (- errno) ;
 	}
 	return rs ;
@@ -462,7 +469,7 @@ int posixhelp::close(pmq *op) noex {
 
 int posixhelp::send(pmq *op) noex {
 	int		rs ;
-	if ((rs = mq_send(op->pq,sbuf,slen,prio)) < 0) {
+	if ((rs = mq_send(op->pq,sbuf,slen,prio)) < 0) nlikely {
 	    rs = (- errno) ;
 	}
 	return rs ;
@@ -471,7 +478,7 @@ int posixhelp::send(pmq *op) noex {
 
 int posixhelp::recv(pmq *op) noex {
 	int		rs ;
-	if ((rs = mq_receive(op->pq,rbuf,rlen,priop)) < 0) {
+	if ((rs = mq_receive(op->pq,rbuf,rlen,priop)) < 0) nlikely {
 	    rs = (- errno) ;
 	}
 	return rs ;
@@ -480,7 +487,7 @@ int posixhelp::recv(pmq *op) noex {
 
 int posixhelp::attrset(pmq *op) noex {
 	int		rs ;
-	if ((rs = mq_setattr(op->pq,nattr,oattr)) < 0) {
+	if ((rs = mq_setattr(op->pq,nattr,oattr)) < 0) nlikely {
 	    rs = (- errno) ;
 	}
 	return rs ;
@@ -489,7 +496,7 @@ int posixhelp::attrset(pmq *op) noex {
 
 int posixhelp::attrget(pmq *op) noex {
 	int		rs ;
-	if ((rs = mq_getattr(op->pq,oattr)) < 0) {
+	if ((rs = mq_getattr(op->pq,oattr)) < 0) nlikely {
 	    rs = (- errno) ;
 	}
 	return rs ;
@@ -498,7 +505,7 @@ int posixhelp::attrget(pmq *op) noex {
 
 int posixhelp::notify(pmq *op) noex {
 	int		rs ;
-	if ((rs = mq_notify(op->pq,sep)) < 0) {
+	if ((rs = mq_notify(op->pq,sep)) < 0) nlikely {
 	    rs = (- errno) ;
 	}
 	return rs ;
@@ -507,8 +514,8 @@ int posixhelp::notify(pmq *op) noex {
 
 int posixhelp::unlink(pmq *op) noex {
 	int		rs = SR_NOENT ;
-	if (op->name[0] != '\0') {
-	    if ((rs = mq_unlink(op->name)) < 0) {
+	if (op->name[0] != '\0') ylikely {
+	    if ((rs = mq_unlink(op->name)) < 0) nlikely {
 		rs = (- errno) ;
 	    } else {
 	        op->name[0] = '0' ;
@@ -544,8 +551,7 @@ static int pmqdirrm(cchar *name) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*pp = PMQ_PATHPREFIX ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath2(tbuf,pp,name)) >= 0) {
 	        rs = u_unlink(tbuf) ;
 	    }
@@ -557,9 +563,8 @@ static int pmqdirrm(cchar *name) noex {
 /* end subroutine (pmqdirrm) */
 
 static int pmqdircheck(cchar *pp) noex {
-	USTAT		sb ;
 	int		rs ;
-	if ((rs = u_stat(pp,&sb)) == SR_NOENT) {
+	if (ustat sb ; (rs = u_stat(pp,&sb)) == SR_NOENT) {
 	    const mode_t	dm = 0777 ;
 	    const uid_t		euid = geteuid() ;
 	    if ((rs = u_mkdir(pp,dm)) >= 0) {
@@ -588,30 +593,27 @@ static int pmqdircheck(cchar *pp) noex {
 #if	CF_GETPMQ
 
 static int getpmquid(void) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
 	int		uid = -1 ;
-	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	    ucentpw	pw ;
+	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
 	    cint	pwlen = rs ;
-	    if (char *pwbuf{} ; (rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
-	        cint	rsn = SR_NOTFOUND ;
-	        cchar	*un = PMQ_USERNAME1 ;
-	        if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
-	            uid = pw.pw_uid ;
-	        } else if (rs == rsn) {
-	    	    un = PMQ_USERNAME2 ;
-	            if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
-	    	        uid = pw.pw_uid ;
-		    } else if (rs == rsn) {
-		        rs = SR_OK ;
-		        uid = PMQ_UID ;
-		    }
-	        }
-	        rs1 = uc_free(pwbuf) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
-	} /* end if (getbufsize) */
+	    cchar	*un = PMQ_USERNAME1 ;
+	    if (ucentpwx pw ; (rs = pw.nam(pwbuf,pwlen,un)) >= 0) {
+	        uid = pw.pw_uid ;
+	    } else if (rs == rsn) {
+		    un = PMQ_USERNAME2 ;
+	        if ((rs = pw.name(pwbuf,pwlen,un)) >= 0) {
+		    uid = pw.pw_uid ;
+		} else if (rs == rsn) {
+		    rs = SR_OK ;
+		    uid = PMQ_UID ;
+		}
+	    } /* end if */
+	    rs1 = uc_free(pwbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? uid : rs ;
 }
 /* end subroutine (getpmquid) */

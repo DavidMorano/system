@@ -43,10 +43,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| + |strchr(3c)| + ... */
+#include	<cstring>		/* |strchr(3c)| + |strrchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -56,17 +56,16 @@
 
 #include	"strnxchr.h"
 
+import libutil ;
 
 /* local defines */
 
 #ifndef	CF_STRCHR
 #define	CF_STRCHR	0
 #endif
-
 #ifndef	CF_STRRCHR
 #define	CF_STRRCHR	0
 #endif
-
 #ifndef	CF_MEMCHR
 #define	CF_MEMCHR	0
 #endif
@@ -92,9 +91,9 @@
 
 /* local variables */
 
-constexpr bool		f_strchr = CF_STRCHR ;
-constexpr bool		f_strrchr = CF_STRRCHR ;
-constexpr bool		f_memchr = CF_MEMCHR ;
+cbool		f_strchr	= CF_STRCHR ;
+cbool		f_strrchr	= CF_STRRCHR ;
+cbool		f_memchr	= CF_MEMCHR ;
 
 
 /* exported variables */
@@ -103,36 +102,38 @@ constexpr bool		f_memchr = CF_MEMCHR ;
 /* exported subroutines */
 
 char *strnochr(cchar *sp,int sl,int sch) noex {
+        cnullptr	np{} ;
 	char		*rsp = nullptr ;
-	if (sp) {
+	if (sp) ylikely {
 	    bool	f = false ;
 	    sch &= UCHAR_MAX ;
-	    if (sl < 0) {
-	        if_constexpr (f_strchr) {
-	            rsp = strchr(sp,sch) ;
-	        } else {
-	            while (*sp) {
-	                f = (mkchar(*sp) == sch) ;
-		        if (f) break ;
-	                sp += 1 ;
-	            } /* end while */
-		    if (f) rsp = charp( sp) ;
-	        } /* end if_constexpr (f_strchr) */
-	    } else {
+	    if (sl >= 0) {
 		if_constexpr (f_memchr) {
-		    cchar	*tp = charp(memchr(sp,sch,sl)) ;
-		    if (tp) {
+		    csize msize = size_t(sl) ;
+		    if (cc *tp ; (tp = charp(memchr(sp,sch,msize))) != np) {
 			rsp = charp(tp) ;
 		    }
 		} else {
-	            cchar	*lsp = (sp + sl) ;
-	            while ((sp < lsp) && *sp) {
-	                f = (mkchar(*sp) == sch) ;
+	            for (cchar *lsp = (sp + sl) ; (sp < lsp) && *sp ; ) {
+			cint	ch = mkchar(*sp) ;
+	                f = (ch == sch) ;
 		        if (f) break ;
 	                sp += 1 ;
 	            } /* end while */
 		    if (f) rsp = charp(sp) ;
 		} /* end if_constexpr (f_memchr) */
+	    } else {
+	        if_constexpr (f_strchr) {
+	            rsp = strchr(sp,sch) ;
+	        } else {
+	            while (*sp) {
+			cint	ch = mkchar(*sp) ;
+	                f = (ch == sch) ;
+		        if (f) break ;
+	                sp += 1 ;
+	            } /* end while */
+		    if (f) rsp = charp(sp) ;
+	        } /* end if_constexpr (f_strchr) */
 	    } /* end if */
 	} /* end if (non-null) */
 	return rsp ;
@@ -141,26 +142,20 @@ char *strnochr(cchar *sp,int sl,int sch) noex {
 
 char *strnrchr(cchar *sp,int sl,int sch) noex {
 	char		*rsp = nullptr ;
-	if (sp) {
-	    bool	fdone = false ;
+	if (sp) ylikely {
 	    sch &= UCHAR_MAX ;
-	    if (sl < 0) {
+	    if (sl >= 0) {
+	        for (cchar *csp = (sp + sl) ; rsp && (--csp >= sp) ; ) {
+	            cint	ch = mkchar(*csp) ;
+	            if (ch == sch) rsp = charp(csp) ;
+	        } /* end while */
+	    } else {
 		if_constexpr (f_strrchr) {
-		    fdone = true ;
 	            rsp = strrchr(sp,sch) ;
 		} else {
-	            sl = strlen(sp) ;
+	            sl = lenstr(sp) ;
+		    rsp = strnrchr(sp,sl,sch) ;
 		} /* end if_constexpr (f_strrchr) */
-	    } /* end if (no length given) */
-	    if ((!fdone) && (sl >= 0)) {
-	        bool	f = false ;
-	        cchar	*csp = (sp + sl) ;
-	        while (--csp >= sp) {
-	            cint	ch = mkchar(*csp) ;
-	            f = (ch == sch) ;
-	            if (f) break ;
-	        } /* end while */
-		if (f) rsp = charp(csp) ;
 	    } /* end if */
 	} /* end if (non-null) */
 	return rsp ;

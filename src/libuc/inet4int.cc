@@ -38,9 +38,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>		/* |UC(3local)| */
 
 #include	"inet4int.h"
@@ -58,6 +59,15 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
 
 
@@ -68,12 +78,14 @@
 
 uint inet4int(cvoid *ap) noex {
 	uint		v = 0 ;
-	cchar		*cp = charp(ap) ;
-	for (int i = 0 ; i < 4 ; i += 1) {
-	    uint	uv = UC(cp[i]) ;
-	    v <<= 8 ;
-	    v |= uv ;
-	} /* end for */
+	if (ap) ylikely {
+	    cchar	*cp = charp(ap) ;
+	    for (int i = 0 ; i < 4 ; i += 1) {
+	        uint	uv = UC(cp[i]) ;
+	        v <<= 8 ;
+	        v |= uv ;
+	    } /* end for */
+	} /* end if (non-null) */
 	return v ;
 }
 /* end subroutine (inet4int) */

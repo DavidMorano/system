@@ -67,7 +67,8 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<char.h>
+#include	<char.h>		/* |char_tolc(3uc)| */
+#include	<localmisc.h>
 
 #include	"digval.h"
 

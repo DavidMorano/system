@@ -63,6 +63,9 @@ import libutil ;
 
 /* local variables */
 
+constexpr cauto		mall = uc_libmalloc ;
+constexpr cauto		mfre = uc_libfree ;
+
 
 /* exported variables */
 
@@ -73,16 +76,16 @@ int sbuf_addquoted(sbuf *sbp,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (sbp && sp) {
+	if (sbp && sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    {
 	        cint	qlen = ((sl * 2) + 3) ;
-	        if (char *qbuf{} ; (rs = uc_libmalloc((qlen+1),&qbuf)) >= 0) {
+	        if (char *qbuf ; (rs = mall((qlen+1),&qbuf)) >= 0) {
 	            if ((rs = mkquoted(qbuf,qlen,sp,sl)) >= 0) {
 	                len = rs ;
 	                rs = sbuf_strw(sbp,qbuf,len) ;
 	            }
-	            rs1 = uc_libfree(qbuf) ;
+	            rs1 = mfre(qbuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (allocation) */
 	    } /* end block */

@@ -43,10 +43,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bufsizevar.hh>
 #include	<ctdec.h>
 #include	<localmisc.h>
@@ -89,10 +92,10 @@ static bufsizevar	maxnamelen(getbufsize_mn) ;
 int mkfdfname(char *dbuf,int dlen,int fd) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (dbuf) {
+	if (dbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (fd >= 0) {
-		if ((rs = getdlen(dlen)) >= 0) {
+	    if (fd >= 0) ylikely {
+		if ((rs = getdlen(dlen)) >= 0) ylikely {
 	            dbuf[i++] = CHX_STAR ;
 	            rs = ctdeci((dbuf+i),(dlen-i),fd) ;
 	            i += rs ;

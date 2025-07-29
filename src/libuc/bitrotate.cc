@@ -86,7 +86,7 @@ template<typename UT> static UT bitrotatex(UT v,int n) noex {
 	            nr = n ;
 	            nl = (nb - n) ;
 	        } else {
-	            n = abs(n) ;
+	            n = (- n) ;
 	            nr = (nb - n) ;
 	            nl = n ;
 	        } /* end if */

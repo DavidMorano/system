@@ -131,9 +131,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strnchr(3c)| */
-#include	<usystem.h>
-#include	<strn.h>
-#include	<sncpyx.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<strn.h>		/* |strnchar(3uc)| */
 #include	<snwcpy.h>
 #include	<localmisc.h>
 
@@ -185,8 +188,8 @@ constexpr int	maxgecoslen = MAXGECOSLEN ;
 int mkgecosname(char *rbuf,int rlen,cchar *gf) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (rbuf && gf) {
-	    if (cchar *cp{} ; (rs = getgecosname(gf,-1,&cp)) >= 0) {
+	if (rbuf && gf) ylikely {
+	    if (cchar *cp{} ; (rs = getgecosname(gf,-1,&cp)) >= 0) ylikely {
 		cint	cl = rs ;
 	        rs = snwcpyhyphen(rbuf,rlen,cp,cl) ;
 		rl = rs ;
@@ -201,7 +204,7 @@ int getgecosname(cchar *gbuf,int glen,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		cl = 0 ;
 	cchar		*cp = nullptr ;
-	if (gbuf) {
+	if (gbuf) ylikely {
 	    cint	sch = CH_LPAREN ;
 	    cchar	*tp ;
 	    bool	f = true ;

@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* find the Next-Quoted-Sstring-Token */
+/* find the Next-Quoted-String-Token */
 /* version %I% last-modified %G% */
 
 
@@ -42,12 +42,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<ascii.h>
-#include	<char.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<ascii.h>		/* |CH_{xx}| */
+#include	<six.h>			/* |sidquote(3uc)| */
+#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
+#include	"sfnext.h"
 
 import libutil ;
 
@@ -61,10 +66,6 @@ import libutil ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	sidquote(cchar *,int) noex ;
-}
 
 
 /* external variables */
@@ -85,29 +86,31 @@ extern "C" {
 /* exported subroutines */
 
 int sfnextqtok(cchar *sp,int sl,cchar **rpp) noex {
-	int		len = 0 ;
-	if (sl < 0) sl = lenstr(sp) ;
-	/* skip over whitespace */
-	while (sl && CHAR_ISWHITE(sp[0])) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	} /* end while */
-	if (rpp) *rpp = sp ;
-	/* skip over the non-whitespace */
-	len = sl ;
-	while (sl && sp[0] && (! CHAR_ISWHITE(sp[0]))) {
-	    int		si ;
-	    if (sp[0] == CH_DQUOTE) {
+	int		len = -1 ;
+	if (sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    /* skip over whitespace */
+	    while (sl && CHAR_ISWHITE(sp[0])) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	        si = sidquote(sp,sl) ;
-	    } else {
-	        si = 1 ;
-	    } /* end if */
-	    sp += si ;
-	    sl -= si ;
-	} /* end while */
-	len -= sl ;
+	    } /* end while */
+	    if (rpp) *rpp = sp ;
+	    /* skip over the non-whitespace */
+	    len = sl ;
+	    while (sl && sp[0] && (! CHAR_ISWHITE(sp[0]))) {
+	        int		si ;
+	        if (sp[0] == CH_DQUOTE) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	            si = sidquote(sp,sl) ;
+	        } else {
+	            si = 1 ;
+	        } /* end if */
+	        sp += si ;
+	        sl -= si ;
+	    } /* end while */
+	    len -= sl ;
+	} /* end if (non-null) */
 	return len ;
 }
 /* end subroutine (sfnextqtok) */

@@ -41,7 +41,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -49,6 +48,8 @@
 #include	<localmisc.h>
 
 #include	"sfx.h"
+
+#pragma		GCC dependency	"mod/libutil.ccm"
 
 import libutil ;
 

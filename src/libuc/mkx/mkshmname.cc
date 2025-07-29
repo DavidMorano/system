@@ -46,7 +46,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bufsizevar.hh>		/* |maxnamelen(3uc)| */
 #include	<storebuf.h>
 #include	<strn.h>		/* |strnnlen(3uc)| */
@@ -97,10 +101,9 @@ static bufsizevar	maxnamelen(getbufsize_mn) ;
 int mkshmname(char *shmbuf,cchar *fp,int fl,cchar *dp,int dl) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = maxnamelen) >= 0) {
-	    storebuf	sb(shmbuf,rs) ;
-	    int		ml ;
-	    if ((rs = sb.chr('/')) >= 0) {
+	if ((rs = maxnamelen) >= 0) ylikely {
+	    if (storebuf sb(shmbuf,rs) ; (rs = sb.chr('/')) >= 0) ylikely {
+	        int	ml ;
 	        if (fp[0] == '/') {
 	            if (fl < 0) fl = lenstr(fp) ;
 	            fp += 1 ;
@@ -108,15 +111,15 @@ int mkshmname(char *shmbuf,cchar *fp,int fl,cchar *dp,int dl) noex {
 	        }
 	        ml = strnnlen(fp,fl,SHMPREFIXLEN) ;
 	        rs = sb.strw(fp,ml) ;
-	    }
-	    if (rs >= 0) {
-	        rs = sb.chr('$') ;
-	    }
-	    if (rs >= 0) {
-	        ml = strnnlen(dp,dl,SHMPOSTFIXLEN) ;
-	        rs = sb.strw(dp,ml) ;
+	        if (rs >= 0) ylikely {
+	            rs = sb.chr('$') ;
+	        }
+	        if (rs >= 0) ylikely {
+	            ml = strnnlen(dp,dl,SHMPOSTFIXLEN) ;
+	            rs = sb.strw(dp,ml) ;
+	        }
 	        len = sb.idx ;
-	    }
+	    } /* end if (storebuf) */
 	} /* end if (maxnamelen) */
 	return (rs >= 0) ? len : rs ;
 }

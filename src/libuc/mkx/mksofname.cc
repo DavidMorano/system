@@ -31,7 +31,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -73,28 +77,27 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 int mksofname(char *rbuf,cchar *dn,cchar *name,cchar *ext) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf && dn && name && ext) {
+	if (rbuf && dn && name && ext) ylikely {
 	    rs = SR_INVALID ;
-	    if (dn[0] && name[0]) {
-		if ((rs = maxpathlen) >= 0) {
-		    storebuf	sb(rbuf,rs) ;
-		    if ((rs = sb.strw(dn)) > 0) {
+	    if (dn[0] && name[0]) ylikely {
+		if ((rs = maxpathlen) >= 0) ylikely {
+		    if (storebuf sb(rbuf,rs) ; (rs = sb.strw(dn)) > 0) ylikely {
 	                if (dn[rs - 1] != '/') {
 	                    rs = sb.chr('/') ;
 			}
-	            }
-	            if (rs >= 0) {
-	                rs = sb.strw(name) ;
-	            }
-	            if (ext[0]) {
-	                if ((rs >= 0) && (ext[0] != '.')) {
-	                    rs = sb.chr('.') ;
+	                if (rs >= 0) ylikely {
+	                    rs = sb.strw(name) ;
 	                }
-	                if (rs >= 0) {
-	                    rs = sb.strw(ext) ;
-	                }
-	            } /* end if (had extension) */
-		    len = sb.idx ;
+	                if (ext[0]) {
+	                    if ((rs >= 0) && (ext[0] != '.')) {
+	                        rs = sb.chr('.') ;
+	                    }
+	                    if (rs >= 0) ylikely {
+	                        rs = sb.strw(ext) ;
+	                    }
+	                } /* end if (had extension) */
+		        len = sb.idx ;
+		    } /* end if (storebuf) */
 		} /* end if (maxpathlen) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */

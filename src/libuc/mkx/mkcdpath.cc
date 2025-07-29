@@ -65,7 +65,11 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strnchr(3c)| */
 #include	<new>			/* |nothrow(3c++) */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<sfx.h>
@@ -85,7 +89,7 @@ import uconstants ;
 
 #define	MKCDPATH_MP	(4*1024)
 
-#define	CH_OUREXPAND	MKCHAR('¬')
+#define	CHX_OUREXPAND	MKCHAR('¬')
 
 
 /* external subroutines */
@@ -168,7 +172,7 @@ static const mksub_m	mems[] = {
     &mksub::getbasename,
     &mksub::testpaths,
     &mksub::mkresult
-} ;
+} ; /* end array (mems) */
 
 
 /* exported variables */
@@ -181,11 +185,11 @@ int mkcdpath(char *ebuf,cchar *fp,int fl) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		el = 0 ;
-	if (ebuf && fp) {
-	    cint	ec = CH_OUREXPAND ;
+	if (ebuf && fp) ylikely {
+	    cint	ec = CHX_OUREXPAND ;
 	    ebuf[0] = '\0' ;
 	    if (fl < 0) fl = lenstr(fp) ;
-	    if ((fl > 0) && (mkchar(fp[0]) == ec)) {
+	    if ((fl > 0) && (mkchar(fp[0]) == ec)) ylikely {
 		cint	sl = (fl + 1) ;
 		cchar	*sp = (fp + 1) ;
 	        if (mksub *sip ; (sip = new(nt) mksub(ebuf,sp,sl)) != np) {
@@ -208,12 +212,12 @@ int mkcdpath(char *ebuf,cchar *fp,int fl) noex {
 int mksub::testpaths() noex {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
-	if (plist != nullptr) {
+	if (plist != nullptr) ylikely {
 	    int		pl = lenstr(plist) ;
 	    cchar	*pp = plist ;
 	    for (cchar *tp ; (tp = strnchr(pp,pl,':')) != np ; ) {
 		cint	ll = intconv(tp - pp) ;
-		if (ll > 0) {
+		if (ll > 0) ylikely {
 		    rs = testpath(pp,ll) ;
 		    el = rs ;
 	        }
@@ -232,9 +236,9 @@ int mksub::testpaths() noex {
 
 int mksub::testpath(cchar *cp,int cl) noex {
 	int		rs ;
-	if ((rs = mkjoin(cp,cl)) >= 0) {
+	if ((rs = mkjoin(cp,cl)) >= 0) ylikely {
 	    cint	jl = rs ;
-	    if (USTAT sb ; (rs = u_stat(ebuf,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_stat(ebuf,&sb)) >= 0) ylikely {
 		if (S_ISDIR(sb.st_mode)) {
 		    rs = jl ;
 		} else {
@@ -251,13 +255,12 @@ int mksub::testpath(cchar *cp,int cl) noex {
 int mksub::mkjoin(cchar *cp,int cl) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = maxpathlen) >= 0) {
-	    storebuf	sb(ebuf,rs) ;
-	    if ((rs = sb.strw(cp,cl)) >= 0) {
+	if ((rs = maxpathlen) >= 0) ylikely {
+	    if (storebuf sb(ebuf,rs) ; (rs = sb.strw(cp,cl)) >= 0) ylikely {
 	        if ((rs > 0) && (ebuf[rs - 1] != '/')) {
 	            rs = sb.chr('/') ;
 		}
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            rs = sb.strw(sp,sl) ;
 		    len = sb.idx ;
 		}

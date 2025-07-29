@@ -119,10 +119,10 @@ constexpr cchar		vn[] = VARNISDOMAIN ;
 
 int getnisdomain(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (rlen >= 0) {
+	    if (rlen >= 0) ylikely {
 	 	nisfind	 nis(rbuf,rlen) ;
 		rs = nis ;
 	    }

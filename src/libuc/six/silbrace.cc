@@ -42,9 +42,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<ascii.h>
-#include	<toxc.h>
 #include	<char.h>
-#include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -75,15 +73,18 @@
 /* exported subroutines */
 
 int silbrace(cchar *sp,int sl) noex {
-	int		si = 0 ;
-	while (sl && CHAR_ISWHITE(*sp)) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	    si += 1 ;
-	}
-	if ((sl == 0) || (sp[0] != CH_LBRACE)) {
-	    si = -1 ;
-	}
+	int		si = -1 ;
+	if (sp) ylikely {
+	    si = 0 ;
+	    while (sl && CHAR_ISWHITE(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	        si += 1 ;
+	    }
+	    if ((sl == 0) || (sp[0] != CH_LBRACE)) {
+	        si = -1 ;
+	    }
+	} /* end if (non-null) */
 	return si ;
 }
 /* end subroutine (silbrace) */

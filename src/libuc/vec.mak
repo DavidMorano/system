@@ -40,22 +40,6 @@ MODS +=
 LIBS=
 
 
-INCDIRS += 
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
-
-
 # vecstr
 OBJA_VECSTR= vecstr.o vecstr_ext.o
 OBJB_VECSTR= 
@@ -108,7 +92,23 @@ OBJD_VEC= recarr.o raqhand.o obj_vecobj.o
 OBJ_VEC= obja_vec.o objb_vec.o objc_vec.o objd_vec.o
 
 
-.SUFFIXES:		.hh .ii
+INCDIRS += 
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -122,6 +122,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -134,17 +137,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_VEC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_VEC)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ_VEC) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
 	rm -f $(ALL)
@@ -262,7 +263,7 @@ vechand.o:		vechand.cc vechand.h
 vecint.o:		vecint.cc vecint.h
 veclong.o:		veclong.cc veclong.h
 vecitem.o:		vecitem.cc vecitem.h
-vecsorthand.o:		vecsorthand.cc vecsorthand.h
+vecsorthand.o:		vecsorthand.cc		vecsorthand.h	$(INCS)
 vsetstr.o:		vsetstr.cc		vsetstr.h	$(INCS)
 
 raqhand.o:		raqhand.cc raqhand.h

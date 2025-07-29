@@ -59,8 +59,8 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 OBJ00_MKX= mkaddrname.o mkaddrdisp.o mkaddrbest.o mkaddrfrom.o
 OBJ01_MKX= mkaltext.o
-OBJ02_MKX= mkcaselower.o mkcdpath.o mkcexsync.o mkbasename.o
-OBJ03_MKX= mkcleanline.o
+OBJ02_MKX= mkcdpath.o mkcexsync.o 
+OBJ03_MKX= mkbasename.o
 OBJ04_MKX= mkdisplayable.o
 OBJ05_MKX= mkexpandpath.o mkfdfname.o mkfingerquery.o 
 OBJ06_MKX= mkfmtphone.o mkfname.o mkfnamesuf.o
@@ -70,8 +70,8 @@ OBJ09_MKX= mkmaildirtest.o mkmailname.o mkmid.o
 OBJ10_MKX= mknoise.o mknpathx.o mknpathxw.o
 OBJ11_MKX= mkonefrom.o mkpathrooted.o mkpathx.o mkpathxw.o
 OBJ12_MKX= mkquoted.o
-OBJ13_MKX= mkrealname.o mkrevstr.o
-OBJ14_MKX= mkshlibname.o mkshmname.o mksofname.o mkstrunique.o
+OBJ13_MKX= mkrealname.o
+OBJ14_MKX= mkshlibname.o mkshmname.o mksofname.o mkunique.o
 OBJ15_MKX= mktagfname.o
 OBJ16_MKX= mkufname.o
 OBJ17_MKX= mkuserpath.o mkutmpid.o
@@ -247,10 +247,10 @@ mkvarpath.o:		mkvarpath.cc		$(INCS)
 
 mkaltext.o:		mkaltext.cc				$(INCS)
 mkmaildirtest.o:	mkmaildirtest.cc			$(INCS)
-mkstrunique.o:		mkstrunique.cc				$(INCS)
-mkcleanline.o:		mkcleanline.cc				$(INCS)
+mkunique.o:		mkunique.cc				$(INCS)
 mkfmtphone.o:		mkfmtphone.cc				$(INCS)
 mkfingerquery.o:	mkfingerquery.cc			$(INCS)
+mklinelcean.o:		mklineclean.cc	mklineclean.h		$(INCS)
 
 mkpr.o:			mkpr.cc mkpr.h				$(INCS)
 mkxdisp.o:		mkxdisp.cc	mkxdisp.h		$(INCS)

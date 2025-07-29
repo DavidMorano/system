@@ -56,20 +56,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<sbuf.h>
-#include	<baops.h>
 #include	<snwcpy.h>
 #include	<ascii.h>
-#include	<hasx.h>
-#include	<six.h>
+#include	<six.h>			/* |siterm(3uc)| */
 #include	<field.h>
 #include	<fieldterms.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"mkquoted.h"
@@ -111,7 +108,7 @@ namespace {
 	operator int () noex ;
 	int mkq() noex ;
     } ; /* end struct (quoter) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -133,9 +130,9 @@ static char		qterms[termsize] ;
 
 int mkquoted(char *qbuf,int qlen,cchar *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
-	if (qbuf && abuf) {
+	if (qbuf && abuf) ylikely {
 	    static cint		srs = fieldterms(qterms,false,qchars) ;
-	    if ((rs = srs) >= 0) {
+	    if ((rs = srs) >= 0) ylikely {
 	        quoter	q(qbuf,qlen,abuf,alen) ;
 	        rs = q ;
 	    } /* end if (fieldterms) */
@@ -163,7 +160,7 @@ int quoter::mkq() noex {
 	int		len = 0 ;
 	int		al = alen ;
 	cchar		*ap = abuf ;
-	if (sbuf b ; (rs = b.start(qbuf,qlen)) >= 0) {
+	if (sbuf b ; (rs = b.start(qbuf,qlen)) >= 0) ylikely {
 	    if (f_white) {
 	        b.chr(CH_DQUOTE) ;
 	    }

@@ -1,5 +1,6 @@
 /* nleadkeystr HEADER */
-/* lang=C20 */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* match on the leading part of a string */
 /* version %I% last-modified %G% */

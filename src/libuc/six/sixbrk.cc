@@ -5,7 +5,7 @@
 /* subroutine to find a character in a given string */
 /* version %I% last-modified %G% */
 
-#define	CF_STRCHR	1		/* use |strchr(3c)| */
+#define	CF_STRCHR	0		/* use |strchr(3c)| */
 
 /* revision history:
 
@@ -64,7 +64,8 @@
 
 #include	"sixbrk.h"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| + |xstrcspn(3u)| */
+import chrset ;
 
 /* local defines */
 
@@ -100,10 +101,24 @@ constexpr bool		f_strchr = CF_STRCHR ;
 
 /* exported subroutines */
 
+int siobrk(cchar *sp,int sl,const chrset &sset) noex {
+	int		i = 0 ; /* return-value */
+	bool		f = false ;
+	if (sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    for (i = 0 ; sl && sp[i] ; i += 1) {
+		cint	ch = mkchar(sp[i]) ;
+		if ((f = sset.tst(ch))) break ;
+	        sl -= 1 ;
+	    } /* end for */
+	} /* end if (non-null) */
+	return (f) ? i : -1 ;
+} /* end subroutine (siobrk) */
+
 int siobrk(cchar *sp,int sl,cchar *ss) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
-	if (sp && ss) {
+	if (sp && ss) ylikely {
 	    if (sl >= 0) {
 	        if_constexpr (f_strchr) {
 	            cnullptr	np{} ;
@@ -114,12 +129,10 @@ int siobrk(cchar *sp,int sl,cchar *ss) noex {
 	                sl -= 1 ;
 	            } /* end for */
 	        } else {
+		    chrset	sset(ss) ;
 	            for (i = 0 ; sl && sp[i] ; i += 1) {
-	                for (int j = 0 ; ss[j] ; j += 1) {
-	                    f = (sp[i] == ss[j]) ;
-		            if (f) break ;
-	                } /* end for */
-	                if (f) break ;
+		        cint	ch = mkchar(sp[i]) ;
+		    	if ((f = sset.tst(ch))) break ;
 	                sl -= 1 ;
 	            } /* end for */
 	        } /* end if_constexpr (f_strchr) */
@@ -128,57 +141,33 @@ int siobrk(cchar *sp,int sl,cchar *ss) noex {
 	    }
 	} /* end if (non-null) */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (siobrk) */
-
-int siobrk(cchar *sp,int sl,const chrset &sset) noex {
-	int		i = 0 ; /* return-value */
-	bool		f = false ;
-	if (sp) {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl >= 0) {
-	        for (i = 0 ; sl && sp[i] ; i += 1) {
-		    cint	ch = mkchar(sp[i]) ;
-		    if ((f = sset.tst(ch))) break ;
-	            sl -= 1 ;
-	        } /* end for */
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return (f) ? i : -1 ;
-}
-/* end subroutine (siobrk) */
-
-int sirbrk(cchar *sp,int sl,cchar *ss) noex {
-	int		i = 0 ; /* return-value */
-	bool		f = false ;
-	if (sp && ss) {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl > 0) {
-	        cnullptr	np{} ;
-	        for (i = (sl - 1) ; i >= 0 ; i -= 1) {
-		    cint	ch = mkchar(sp[i]) ;
-		    if ((f = (strchr(ss,ch) != np))) break ;
-	        } /* end for */
-	    } /* end if */
-	} /* end if (non-null) */
-	return (f) ? i : -1 ;
-}
-/* end subroutine (sirbrk) */
+} /* end subroutine (siobrk) */
 
 int sirbrk(cchar *sp,int sl,const chrset &sset) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl > 0) {
-	        for (i = (sl - 1) ; i >= 0 ; i -= 1) {
-		    cint	ch = mkchar(sp[i]) ;
-		    if ((f = sset.tst(ch))) break ;
-	        } /* end for */
-	    } /* end if */
+	    for (i = (sl - 1) ; i >= 0 ; i -= 1) {
+		cint	ch = mkchar(sp[i]) ;
+		if ((f = sset.tst(ch))) break ;
+	    } /* end for */
 	} /* end if (non-null) */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (sirbrk) */
+} /* end subroutine (sirbrk) */
+
+int sirbrk(cchar *sp,int sl,cchar *ss) noex {
+	int		i = 0 ; /* return-value */
+	bool		f = false ;
+	if (sp && ss) ylikely {
+	    chrset	sset(ss) ;
+	    if (sl < 0) sl = lenstr(sp) ;
+	    for (i = (sl - 1) ; i >= 0 ; i -= 1) {
+		cint	ch = mkchar(sp[i]) ;
+		if ((f = sset.tst(ch))) break ;
+	    } /* end for */
+	} /* end if (non-null) */
+	return (f) ? i : -1 ;
+} /* end subroutine (sirbrk) */
 
 

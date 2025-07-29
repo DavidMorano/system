@@ -5,8 +5,6 @@
 /* find a substring within a larger string */
 /* version %I% last-modified %G% */
 
-#define	CF_STRNSTR	1		/* used standard |strnstr(3c)| */
-#define	CF_STRCASESTR	1		/* used standard |strcasestr(3c)| */
 
 /* revision history:
 
@@ -22,8 +20,7 @@
 	Standard-Library subroutine |strnstr(3c)| when calling our
 	own |strnsub(3uc)|.  Oops!  Note that the function signature
 	on the standard |strnstr(3c)| is NOT the same as our own
-	old |strnsub(3uc)|, so I adapt it to match.  Everything
-	diddo w/ the (now) standard |strcasestr(3c)|.
+	old |strnsub(3uc)|, so I adapt it to match.
 
 */
 
@@ -53,18 +50,27 @@
 	-	pointer to found substring
 	NULL	substring was not found
 
+	Notes:
+	1. An empty (zero-length) sub-string returns TRUE; that is,
+	a pointer to the first character of the c-string to be
+	searched is returned (as if a match occurred right there).
+	This (current) behavior mimics the function of both
+	|strstr(3c)|, |strnstr(3c)|, and |strcasestr(3c)|.
+	2. Note that the standard |strcasestr(3c)| subroutine cannot
+	be used since it fails to properly handle Latin(-1) characters.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |strstr(3c)| + |strnstr(3c)| */
+#include	<cstring>		/* |strstr(3c)| + |strnstr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<toxc.h>
 #include	<nleadstr.h>
+#include	<toxc.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -73,14 +79,6 @@
 import libutil ;
 
 /* local defines */
-
-#ifndef	CF_STRNSTR
-#define	CF_STRNSTR	0
-#endif
-
-#ifndef	CF_STRCASESTR
-#define	CF_STRCASESTR	0
-#endif
 
 
 /* imported namespaces */
@@ -109,16 +107,13 @@ namespace {
 	strner(toxc_f t,nleadxstr_f n) noex : toxc(t), nleadxstr(n) { } ;
 	char *strnxsub(cchar *,int,cchar *,int) noex ;
     } ; /* end struct (strner) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 
 /* local variables */
-
-constexpr bool	f_strnstr = CF_STRNSTR ;
-constexpr bool	f_strcasestr = CF_STRCASESTR ;
 
 
 /* exported variables */
@@ -130,12 +125,16 @@ char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
 	if (sp && ss) {
 	    if (sl >= 0) {
-		if_constexpr (f_strnstr) {
-		    rp = strnstr(sp,ss,sl) ;
+		if_constexpr (syshas.strnstr) {
+		    csize	slsize = size_t(sl) ;
+		    rp = strnstr(sp,ss,slsize) ;
 		} else {
-		    strner	so(tobc,nleadbasestr) ;
-		    cint	sslen = strlen(ss) ;
-	            rp = so.strnxsub(sp,sl,ss,sslen) ;
+		    if (cint sslen = lenstr(ss) ; sslen > 0) {
+		        strner	so(tobc,nleadbasestr) ;
+	                rp = so.strnxsub(sp,sl,ss,sslen) ;
+		    } else {
+	    	        rp = charp(sp) ;
+	            } /* end if (positive) */
 		} /* end if_constexpr (f_strnstr) */
 	    } else {
 	        rp = strstr(sp,ss) ;
@@ -148,20 +147,11 @@ char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 char *strncasesub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
 	if (sp && ss) {
-	    cint	sslen = lenstr(ss) ;
-	    rp = charp(sp) ;
-	    if (sslen > 0) {
-		if (sl >= 0) {
-		    strner	so(tolc,nleadcasestr) ;
-		    rp = so.strnxsub(sp,sl,ss,sslen) ;
-		} else {
-		    if_constexpr (f_strcasestr) {
-		        rp = strcasestr(sp,ss) ;
-		    } else {
-		        strner	so(tolc,nleadcasestr) ;
-		        rp = so.strnxsub(sp,sl,ss,sslen) ;
-		    } /* end if_constexpr (f_strcasestr) */
-		} /* end if */
+	    if (cint sslen = lenstr(ss) ; sslen > 0) {
+		strner	so(tolc,nleadcasestr) ;
+		rp = so.strnxsub(sp,sl,ss,sslen) ;
+	    } else {
+		rp = charp(sp) ;
 	    } /* end if (positive) */
 	} /* end if (non-null) */
 	return rp ;
@@ -169,9 +159,16 @@ char *strncasesub(cchar *sp,int sl,cchar *ss) noex {
 /* end subroutine (strncasesub) */
 
 char *strnfoldsub(cchar *sp,int sl,cchar *ss) noex {
-	strner		so(tofc,nleadfoldstr) ;
-	cint		sslen = lenstr(ss) ;
-    	return so.strnxsub(sp,sl,ss,sslen) ;
+	char		*rp = nullptr ;
+	if (sp && ss) {
+	    if (cint sslen = lenstr(ss) ; sslen > 0) {
+	        strner	so(tofc,nleadfoldstr) ;
+	        rp = so.strnxsub(sp,sl,ss,sslen) ;
+	    } else {
+		rp = charp(sp) ;
+	    } /* end if (positive) */
+	} /* end if (non-null) */
+    	return rp ;
 }
 /* end subroutine (strnfoldsub) */
 
@@ -192,7 +189,7 @@ char *strner::strnxsub(cchar *sp,int sl,cchar *ss,int sslen) noex {
                     if (f) break ;
                 } /* end if */
             } /* end for */
-            rp = charp((f) ? (sp + i) : nullptr) ;
+	    if (f) rp = charp(sp + i) ;
         } /* end if (valid) */
 	return rp ;
 }

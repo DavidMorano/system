@@ -37,11 +37,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdarg>
+#include	<cstdarg>		/* |va_list(3c)| */
 #include	<cstring>		/* |strlcpy(3c)| */
 #include	<usystem.h>
-#include	<snwcpy.h>
 #include	<bufsizevar.hh>
+#include	<snwcpy.h>
 #include	<localmisc.h>
 
 #include	"mknpathxw.h"
@@ -117,8 +117,8 @@ int mknpathxw(char *pbuf,int plen,int n,...) noex {
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
 	char		*bp = pbuf ;
-	if (pbuf) {
-	    if ((rs = getrlen(plen)) >= 0) {
+	if (pbuf) ylikely {
+	    if ((rs = getrlen(plen)) >= 0) ylikely {
 	        int	bl = rs ;
 	        int	sl = -1 ;
 	        va_begin(ap,n) ;
@@ -136,8 +136,8 @@ int mknpathxw(char *pbuf,int plen,int n,...) noex {
 	                    rs = SR_NAMETOOLONG ;
 		        }
 	            } /* end if (needed a pathname separator) */
-	            if (rs >= 0) {
-	                if ((rs = snwcpy(bp,bl,sp,sl)) > 0) {
+	            if (rs >= 0) ylikely {
+	                if ((rs = snwcpy(bp,bl,sp,sl)) > 0) ylikely {
 	                    bp += rs ;
 	                    bl -= rs ;
 	                } else if (rs == SR_OVERFLOW) {
@@ -159,7 +159,7 @@ int mknpathxw(char *pbuf,int plen,int n,...) noex {
 
 int maxpather::operator () (int plen) noex {
     	int		rs ;
-	if ((rs = plen) < 0) {
+	if ((rs = plen) < 0) ylikely {
 	    rs = maxpathlen ;
 	}
 	return rs ;

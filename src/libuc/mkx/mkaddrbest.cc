@@ -44,7 +44,11 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<snwcpy.h>
 #include	<sfx.h>
 #include	<ema.h>
@@ -68,6 +72,9 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 
@@ -83,10 +90,10 @@ int mkaddrbest(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (rbuf && abuf) {
+	if (rbuf && abuf) ylikely {
 	    rbuf[0] = '\0' ;
-	    if (ema a ; (rs = a.start) >= 0) {
-	        if ((rs = a.parse(abuf,alen)) >= 0) {
+	    if (ema a ; (rs = a.start) >= 0) ylikely {
+	        if ((rs = a.parse(abuf,alen)) >= 0) ylikely {
 	            ema_ent	*ep ;
 	            for (int i = 0 ; a.get(i,&ep) >= 0 ; i += 1) {
 	                if (ep) {
@@ -105,9 +112,8 @@ int mkaddrbest(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	                        }
 			    }
 	                    if (sl > 0) {
-			        int	al ;
 			        cchar	*ap ;
-			        if ((al = sfshrink(sp,sl,&ap)) > 0) {
+			        if (int al ; (al = sfshrink(sp,sl,&ap)) > 0) {
 	                            rs = snwcpy(rbuf,rlen,ap,al) ;
 	                            len = rs ;
 			        }

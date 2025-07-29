@@ -242,7 +242,7 @@ static int base64_dg(cchar *inbuf,char *outbuf) noex {
 	    }
 	    if (rs < 0) break ;
 	} /* end for */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    if_constexpr (f_comment) {
 	        for (int i = 0 ; i < 3 ; i += 1) {
 	            outbuf[i] = char(hold >> ((2 - i) * 6)) ;

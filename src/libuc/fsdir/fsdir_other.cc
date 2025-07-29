@@ -21,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	fsdir
+
+	Description:
 	This code module provides a platform independent implementation
 	of UNIX® file system directory access.  This module uses
 	the system call |getdents(2)| to read the directories and

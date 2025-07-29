@@ -40,11 +40,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<userinfo.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
@@ -73,29 +75,31 @@
 
 /* exported subroutines */
 
-int uiname(USERINFO *uip,char *rbuf,int rlen) noex {
+int uiname(userinfo *uip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
-	if (rbuf && uip) {
+	int		len = 0 ;
+	if (rbuf && uip) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (rlen >= 0) {
-		cchar	*np = nullptr ;
+	    if (rlen >= 0) ylikely {
+		cchar	*sp = nullptr ;
 		rs = SR_NOTFOUND ;
 	        if (uip->fullname && (uip->fullname[0] != '\0')) {
-	            np = uip->fullname ;
+	            sp = uip->fullname ;
 	        } else if (uip->name && (uip->name[0] != '\0')) {
-	            np = uip->name ;
+	            sp = uip->name ;
 	        } else if (uip->mailname && (uip->mailname[0] != '\0')) {
-	            np = uip->mailname ;
+	            sp = uip->mailname ;
 	        } else if (uip->username && (uip->username[0] != '\0')) {
-	            np = uip->username ;
+	            sp = uip->username ;
 	        }
-	        if (np) {
-	            rs = sncpy1(rbuf,rlen,np) ;
+	        if (sp) {
+	            rs = sncpy(rbuf,rlen,sp) ;
+		    len = rs ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (uiname) */
 

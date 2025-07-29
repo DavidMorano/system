@@ -19,7 +19,7 @@
 #include	<usysdefs.h>
 
 
-#ifndef	__cplusplus
+#ifdef	__cplusplus
 
 namespace libu {
     extern bool hasnotdots(cchar *,int) noex ;

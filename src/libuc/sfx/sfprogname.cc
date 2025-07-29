@@ -46,11 +46,10 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<sfx.h>			/* |sfbasename(3cu)| */
 #include	<six.h>			/* |sirchr(3uc)| */
 #include	<localmisc.h>
 
-#include	"sfx.h"
+#include	"sfx.h"			/* |sfbasename(3cu)| */
 
 
 /* local defines */
@@ -85,7 +84,7 @@
 int sfprogname(cchar *sp,int sl,cchar **rpp) noex {
 	int		cl = -1 ; /* return-value */
 	cchar		*cp = nullptr ;
-	if (sp) {
+	if (sp) ylikely {
 	    if ((cl = sfbasename(sp,sl,&cp)) > 0) {
 	        if (int si ; (si = sirchr(cp,cl,'.')) >= 0) {
 		    cl -= si ;

@@ -64,7 +64,7 @@ struct veclong_flags {
 
 struct veclong_head {
 	VECLONG_TYPE	*va ;
-	VECLONG_FL	f ;
+	VECLONG_FL	fl ;
 	uint		magic ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */

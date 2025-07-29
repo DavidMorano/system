@@ -57,15 +57,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strncmp(3c)| */
+#include	<cstring>		/* |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<strnxcmp.h>
 #include	<localmisc.h>
 
-#include	"sfx.h"
+#include	"sfx.h"			/* |sf{x}name(3uc)| */
 
 
 /* local defines */
@@ -92,21 +91,23 @@
 /* exported subroutines */
 
 int sfprogroot(cchar *pp,int pl,cchar **rpp) noex {
-	int		sl = -1 ;
+	int		sl = -1 ; /* return-value */
 	cchar		*sp = nullptr ;
-	cchar		*dp{} ;
-	if (int dl ; (dl = sfdirname(pp,pl,&dp)) > 0) {
-	    bool	f ;
-	    cchar	*bp{} ;
-	    int		bl = sfbasename(dp,dl,&bp) ;
-	    f = ((bl == 3) && (strncmp(bp,"bin",bl) == 0)) ;
-	    if (! f) {
-	        f = ((bl == 4) && (strncmp(bp,"sbin",bl) == 0)) ;
-	    }
-	    if (f) {
-	        sl = sfdirname(dp,dl,&sp) ;
-	    }
-	} /* end if */
+	if (sp) ylikely {
+	    cchar	*dp{} ;
+	    if (int dl ; (dl = sfdirname(pp,pl,&dp)) > 0) {
+	        bool	f ;
+	        cchar	*bp{} ;
+	        int	bl = sfbasename(dp,dl,&bp) ;
+	        f = ((bl == 3) && (strncmp(bp,"bin",bl) == 0)) ;
+	        if (! f) {
+	            f = ((bl == 4) && (strncmp(bp,"sbin",bl) == 0)) ;
+	        }
+	        if (f) {
+	            sl = sfdirname(dp,dl,&sp) ;
+	        }
+	    } /* end if */
+	} /* end if (non-null) */
 	if (rpp) {
 	    *rpp = (sl >= 0) ? sp : nullptr ;
 	}

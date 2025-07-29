@@ -42,15 +42,15 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
+#include	<ctime>			/* |time_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<mallocxx.h>
 #include	<getpwd.h>
+#include	<mallocxx.h>
 #include	<bfile.h>
 #include	<vecobj.h>
 #include	<hdb.h>
@@ -69,6 +69,7 @@
 
 #include	"kvsfile.h"
 
+import libutil ;
 
 /* local defines */
 

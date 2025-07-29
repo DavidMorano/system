@@ -118,9 +118,9 @@ namespace {
 
 int removes(cchar *tardname) noex {
 	int		rs = SR_FAULT ;
-	if (tardname) {
+	if (tardname) ylikely {
 	    rs = SR_INVALID ;
-	    if (tardname[0]) {
+	    if (tardname[0]) ylikely {
 		mgr ro(tardname) ;
 		rs = ro ;
 	    } /* end if (valid) */
@@ -136,9 +136,9 @@ mgr::operator int () noex {
     	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = malloc_mp(&pbuf)) >= 0) {
+	if ((rs = malloc_mp(&pbuf)) >= 0) ylikely {
 	    plen = rs ;
-	    if ((rs = malloc_mn(&nbuf)) >= 0) {
+	    if ((rs = malloc_mn(&nbuf)) >= 0) ylikely {
 		nlen = rs ;
 	        if ((rs = mkexpandpath(pbuf,tardname,-1)) > 0) {
 		    rs = remover(rs) ;
@@ -161,7 +161,7 @@ mgr::operator int () noex {
 int mgr::remover(int pl) noex {
 	int		rs ;
 	int		c = 0 ;
-	if (ustat sb ; (rs = u_lstat(pbuf,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_lstat(pbuf,&sb)) >= 0) ylikely {
 	    if (S_ISDIR(sb.st_mode)) {
 		if ((rs = removedents(pl)) >= 0) {
 	            c = (rs + 1) ;
@@ -179,8 +179,8 @@ int mgr::removedents(int pl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (dirents names ; (rs = names.start) >= 0) {
-	    if ((rs = names.load(nbuf,nlen,pbuf)) > 0) {
+	if (dirents names ; (rs = names.start) >= 0) ylikely {
+	    if ((rs = names.load(nbuf,nlen,pbuf)) > 0) ylikely {
 	        cchar	*sp ;
 	        for (int i = 0 ; names.get(i,&sp) >= 0 ; i += 1) {
 	            if (sp) {
@@ -203,9 +203,9 @@ int dirents::load(char *nbuf,int nlen,cchar *dname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (fsdir d ; (rs = d.open(dname)) >= 0) {
+	if (fsdir d ; (rs = d.open(dname)) >= 0) ylikely {
 	    for (fsdir_ent ds ; (rs = d.read(&ds,nbuf,nlen)) > 0 ; ) {
-	        if ((nbuf[0] != '.') || hasNotDots(nbuf,rs)) {
+	        if ((nbuf[0] != '.') || hasNotDots(nbuf,rs)) ylikely {
 	            c += 1 ;
 	            rs = add(nbuf,rs) ;
 	        }

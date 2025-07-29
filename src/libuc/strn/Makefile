@@ -57,9 +57,9 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0_STRN= strncpyxc.o strnwcpyxc.o 
-OBJ1_STRN= strnnlen.o
-OBJ2_STRN= strnxchr.o strnxbrk.o strnxsub.o strnwht.o
-OBJ3_STRN= strnset.o 
+OBJ1_STRN= strnnlen.o strnset.o
+OBJ2_STRN= strnxchr.o strnxbrk.o strnxsub.o 
+OBJ3_STRN= strnxterm.o strnwht.o strnchar.o
 
 OBJA_STRN= obj0_strn.o obj1_strn.o
 OBJB_STRN= obj2_strn.o obj3_strn.o
@@ -126,9 +126,11 @@ obj3_strn.o:	$(OBJ3_STRN)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_STRN)
 
 
-strnxsub.o:		strnxsub.cc	strnxsub.h	$(INCS)
 strnxchr.o:		strnxchr.cc	strnxchr.h	$(INCS)
 strnxbrk.o:		strnxbrk.cc	strnxbrk.h	$(INCS)
+strnxsub.o:		strnxsub.cc	strnxsub.h	$(INCS)
+strnxterm.o:		strnxterm.cc	strnxterm.h	$(INCS)
+strnchar.o:		strnchar.cc	strnchar.h	$(INCS)
 
 strnnlen.o:		strnnlen.cc			$(INCS)
 strnset.o:		strnset.cc			$(INCS)

@@ -62,13 +62,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<uinfo.h>
@@ -79,7 +77,8 @@
 #include	<getpwd.h>
 #include	<gethz.h>
 #include	<getourenv.h>
-#include	<getxname.h>		/* |getnisdomain(3uc)| */
+#include	<getxname.h>
+#include	<getnisdomain.h>	/* |getnisdomain(3uc)| */
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<vecstr.h>
@@ -97,6 +96,7 @@
 
 #include	"mkprogenv.h"
 
+import libutil ;
 import uconstants ;
 
 /* local defines */
@@ -138,12 +138,12 @@ template<typename ... Args>
 static int mkprogenv_ctor(mkprogenv *op,Args ... args) noex {
     	MKPROGENV	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    cnullptr	np{} ;
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->envp = new(nothrow) vechand) != np) {
-	        if ((op->storep = new(nothrow) strpack) != np) {
+	    if ((op->envp = new(nothrow) vechand) != np) ylikely {
+	        if ((op->storep = new(nothrow) strpack) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new_strpack) */
 		if (rs < 0) {
@@ -158,7 +158,7 @@ static int mkprogenv_ctor(mkprogenv *op,Args ... args) noex {
 
 static int mkprogenv_dtor(mkprogenv *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->storep) {
 		delete op->storep ;
@@ -176,7 +176,7 @@ static int mkprogenv_dtor(mkprogenv *op) noex {
 template<typename ... Args>
 static inline int mkprogenv_magic(mkprogenv *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MKPROGENV_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -206,7 +206,7 @@ constexpr cpcchar	envbad[] = {
 	varname.termdev,
 	varname.pwd,
 	nullptr
-} ;
+} ; /* end array (envbad) */
 
 constexpr cpcchar	envsys[] = {
 	varname.sysname,
@@ -218,7 +218,7 @@ constexpr cpcchar	envsys[] = {
 	varname.tz,
 	varname.nisdomain,
 	nullptr
-} ;
+} ; /* end array (envsys) */
 
 constexpr cpcchar	envdef[] = {
 	"LD_LIBRARY_PATH",
@@ -244,19 +244,19 @@ constexpr cpcchar	envdef[] = {
 	"LC_NUMERIC",
 	"LC_TIME",
 	nullptr
-} ;
+} ; /* end array (envdef) */
 
 enum envextra {
 	extraenv_username,
 	extraenv_home,
 	extraenv_overlast
-} ;
+} ; /* end enum (envextra) */
 
 constexpr cpcchar	envextra[] = {
 	varname.username,
 	varname.home,
 	nullptr
-} ;
+} ; /* end array (envextra) */
 
 constexpr cpcchar	defpaths[] = {
 	"/usr/preroot/bin",
@@ -269,7 +269,7 @@ constexpr cpcchar	defpaths[] = {
 	"/sbin"
 	"/usr/extra/bin",
 	nullptr
-} ;
+} ; /* end array (defpaths) */
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 static bufsizevar	maxhostlen(getbufsize_hn) ;
@@ -283,18 +283,18 @@ static bufsizevar	maxhostlen(getbufsize_hn) ;
 int mkprogenv_start(mkprogenv *op,mainv envv) noex {
 	mainv		progenviron = mainv(environ) ;
 	int		rs ;
-	if ((rs = mkprogenv_ctor(op)) >= 0) {
+	if ((rs = mkprogenv_ctor(op)) >= 0) ylikely {
 	    cint	vn = NENVS ;
 	    cint	vo = VECHAND_OCOMPACT ;
 	    op->envv = (envv) ? envv : progenviron ;
-	    if ((rs = vechand_start(op->envp,vn,vo)) >= 0) {
+	    if ((rs = vechand_start(op->envp,vn,vo)) >= 0) ylikely {
 	        cint	ssz = 256 ;
-	        if ((rs = strpack_start(op->storep,ssz)) >= 0) {
+	        if ((rs = strpack_start(op->storep,ssz)) >= 0) ylikely {
 	            rs = mkprogenv_mkenv(op,envv) ;
 	            if (rs < 0) {
 	                strpack_finish(op->storep) ;
 		    }
-	        }
+	        } /* end if (strpack_start) */
 	        if (rs < 0) {
 	            vechand_finish(op->envp) ;
 	        }
@@ -310,7 +310,7 @@ int mkprogenv_start(mkprogenv *op,mainv envv) noex {
 int mkprogenv_finish(mkprogenv *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mkprogenv_magic(op)) >= 0) {
+	if ((rs = mkprogenv_magic(op)) >= 0) ylikely {
 	    rs = SR_OK ;
 	    if (op->uh) {
 	        rs1 = uc_free(op->uh) ;
@@ -344,23 +344,23 @@ int mkprogenv_envset(mkprogenv *op,cchar *kp,cchar *valp,int vall) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mkprogenv_magic(op,kp)) >= 0) {
+	if ((rs = mkprogenv_magic(op,kp)) >= 0) ylikely {
 	    strpack	*spp = op->storep ;
 	    int		sz = 1 ; /* terminating NUL */
-	    sz += strlen(kp) ;
+	    sz += lenstr(kp) ;
 	    sz += 1 ;			/* for the equals sign character */
 	    if (valp) {
 	        sz += int(strnlen(valp,vall)) ;
 	    }
-	    if (char *ebuf{} ; (rs = uc_malloc(sz,&ebuf)) >= 0) {
+	    if (char *ebuf ; (rs = uc_malloc(sz,&ebuf)) >= 0) ylikely {
 	        char	*bp = ebuf ;
 	        bp = strwcpy(bp,kp,-1) ;
 	        *bp++ = '=' ;
 	        if (valp) {
 	       	    bp = strwcpy(bp,valp,vall) ;
 	        }
-		cint	el = (bp - ebuf) ;
-	        if (cchar *ep{} ; (rs = spp->store(ebuf,el,&ep)) >= 0) {
+		cint	el = intconv(bp - ebuf) ;
+	        if (cchar *ep{} ; (rs = spp->store(ebuf,el,&ep)) >= 0) ylikely {
 	    	    vechand	*elp = op->envp ;
 		    {
 		        auto	vcf = vechand_f(vstrkeycmp) ;
@@ -384,7 +384,7 @@ int mkprogenv_envset(mkprogenv *op,cchar *kp,cchar *valp,int vall) noex {
 
 int mkprogenv_getvec(mkprogenv *op,mainv *evp) noex {
 	int		rs ;
-	if ((rs = mkprogenv_magic(op)) >= 0) {
+	if ((rs = mkprogenv_magic(op)) >= 0) ylikely {
 	    vechand	*elp = op->envp ;
 	    if (evp) {
 	        rs = elp->getvec(evp) ;
@@ -405,8 +405,8 @@ static int mkprogenv_mkenvpwd(mkprogenv *op,EL *etp) noex {
 	int		c = 0 ;
 	cchar		*varpwd = varname.pwd ;
 	if ((rs = etp->present(varpwd)) == rsn) {
-	    if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
-		if ((rs = getpwd(pbuf,rs)) > 0) {
+	    if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) ylikely {
+		if ((rs = getpwd(pbuf,rs)) > 0) ylikely {
 	            c = 1 ;
 	            rs = mkprogenv_envadd(op,etp,varpwd,pbuf,rs) ;
 		} else if (isNotPresent(rs)) {
@@ -423,7 +423,7 @@ static int mkprogenv_mkenv(mkprogenv *op,mainv envv) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (envlist et ; (rs = et.start(NENVS)) >= 0) {
+	if (envlist et ; (rs = et.start(NENVS)) >= 0) ylikely {
 	    vechand	*elp = op->envp ;
 	    bool	f_path = false ;
 	    cchar	*varpath = varname.path ;
@@ -451,8 +451,8 @@ static int mkprogenv_mkenv(mkprogenv *op,mainv envv) noex {
 	        n += rs ;
 	    }
 	    /* system environment variables */
-	    if (rs >= 0) {
-	        if ((rs = mkprogenv_mkenvdef(op,&et,envsys)) >= 0) {
+	    if (rs >= 0) ylikely {
+	        if ((rs = mkprogenv_mkenvdef(op,&et,envsys)) >= 0) ylikely {
 		    cint	ne = int(nelem(envsys) - 1) ;
 	            n += rs ;
 	            if (rs < ne) {
@@ -462,12 +462,12 @@ static int mkprogenv_mkenv(mkprogenv *op,mainv envv) noex {
 	        }
 	    } /* end if (system environment variables) */
 	    /* USERNAME and HOME */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = mkprogenv_mkenvextras(op,&et,envextra) ;
 	        n += rs ;
 	    } /* end if (extra environment variables) */
 	    /* PWD */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 		rs = mkprogenv_mkenvpwd(op,&et) ;
 		n += rs ;
 	    } /* end if */
@@ -501,7 +501,7 @@ static int mktz(char *vbuf,int vlen,cchar *un) noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (userattrdb ua ; (rs = ua.open(un)) >= 0) {
+	if (userattrdb ua ; (rs = ua.open(un)) >= 0) ylikely {
 	    if ((rs = ua.lookup(vbuf,vlen,"tz")) >= 0) {
 		len = rs ;
 	    } else if (isNotPresent(rs)) {
@@ -519,10 +519,10 @@ static int mkprogenv_mkenvsys(mkprogenv *op,EL *etp,mainv envs) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = maxhostlen) >= 0) {
+	if ((rs = maxhostlen) >= 0) ylikely {
 	    cint	vlen = (VBUFMULT * rs) ;
-	    if (char *vbuf{} ; (rs = uc_malloc((vlen+1),&vbuf)) >= 0) {
-	        if (uinfo_names uid ; (rs = uinfo_name(&uid)) >= 0) {
+	    if (char *vbuf ; (rs = uc_malloc((vlen+1),&vbuf)) >= 0) ylikely {
+	        if (uinfo_names uid ; (rs = uinfo_name(&uid)) >= 0) ylikely {
 	            for (int i = 0 ; (rs >= 0) && envs[i] ; i += 1) {
 	                cchar	*kp = envs[i] ;
 	                if ((rs = etp->present(kp)) == rsn) {
@@ -552,7 +552,7 @@ static int mkprogenv_mkenvsys(mkprogenv *op,EL *etp,mainv envs) noex {
                                 } else {
                                     vp = uid.nodename ;
                                     if ((tp = strchr(vp,'.')) != np) {
-                                        vl = (tp - vp) ;
+                                        vl = intconv(tp - vp) ;
                                     }
                                 } /* end if */
                                 break ;
@@ -639,14 +639,14 @@ static int mkprogenv_mkenvextras(mkprogenv *op,EL *etp,mainv envs) noex {
 
 static int mkprogenv_envadd(mkprogenv *op,EL *etp,cc *kp,cc *vp,int vl) noex {
 	vechand		*elp = op->envp ;
+	cint		kl = lenstr(kp) ;
 	int		rs ;
-	int		kl = strlen(kp) ;
 	int		bl = 0 ;
-	bl += (kl+1) ;
+	bl += (kl + 1) ;
 	if (vp) {
-	    bl += ((vl >= 0) ? vl : int(strlen(vp))) ;
+	    bl += ((vl >= 0) ? vl : int(lenstr(vp))) ;
 	}
-	if (char *bp{} ; (rs = uc_malloc((bl+1),&bp)) >= 0) {
+	if (char *bp ; (rs = uc_malloc((bl+1),&bp)) >= 0) {
 	    strpack	*spp = op->storep ;
 	    strdcpy3w(bp,bl,kp,"=",vp,vl) ;
 	    if (cchar *ep{} ; (rs = spp->store(bp,bl,&ep)) >= 0) {
@@ -666,9 +666,9 @@ static int mkprogenv_cspath(mkprogenv *op,EL *etp) noex {
 	int		n = 0 ;
 	if ((rs = maxpathlen) >= 0) {
 	    cint	plen = (PATHMULT * rs) ;
-	    if (char *pbuf{} ; (rs = uc_malloc((plen + 1),&pbuf)) >= 0) {
+	    if (char *pbuf ; (rs = uc_malloc((plen + 1),&pbuf)) >= 0) {
 	        cint	req = _CS_PATH ;
-	        if ((rs = uc_sysconfstr(pbuf,plen,req)) >= 0) {
+	        if ((rs = uc_sysconfstr(req,pbuf,plen)) >= 0) {
 		    cchar	*varpath = varname.path ;
 	            rs = mkprogenv_envadd(op,etp,varpath,pbuf,rs) ;
 	            n += rs ;
@@ -685,13 +685,13 @@ static int mkprogenv_userinfo(mkprogenv *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->un == nullptr) {
-	    if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	    if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
 	        ucentpw		pw ;
 	        cint		pwlen = rs ;
 	        if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
 		    cchar	*un = pw.pw_name ;
 		    cchar	*uh = pw.pw_dir ;
-		    if (cchar *cp{} ; (rs = uc_mallocstrw(un,-1,&cp)) >= 0) {
+		    if (cchar *cp ; (rs = uc_mallocstrw(un,-1,&cp)) >= 0) {
 			op->un = cp ;
 			if ((rs = uc_mallocstrw(uh,-1,&cp)) >= 0) {
 	                    op->uh = cp ;

@@ -40,8 +40,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<ascii.h>
+#include	<localmisc.h>
 
 #include	"mkcexsync.h"
 
@@ -77,12 +82,12 @@ constexpr int		finlen = MKCEXSYNC_FINLEN ;
 
 int mkcexsync(char *rbuf,int rlen) noex {
     	int		rs = SR_FAULT ;
-	int		i = 0 ;
-	if (rbuf) {
+	int		i = 0 ; /* return-value */
+	if (rbuf) ylikely {
 	    cint	leaderlen = (rlen - finlen) ;
 	    rs = SR_OVERFLOW ;
-	    if (rlen >= reqlen) {
-	        int	j{} ;
+	    if (rlen >= reqlen) ylikely {
+	        int	j ; /* used-multiple */
 	        for (j = (leaderlen-1) ; j >= 0 ; j -= 1) {
 	            rbuf[i] = (i & 1) ;
 	            i += 1 ;

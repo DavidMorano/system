@@ -54,7 +54,7 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
@@ -62,7 +62,11 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
@@ -101,7 +105,7 @@
 int sncpyarray(char *dbuf,int dlen,cchar **a,int n) noex {
 	int		rs = SR_FAULT ;
 	int		si = 0 ;
-	if (dbuf && a) {
+	if (dbuf && a) ylikely {
 	    rs = SR_OK ;
 	    if (n < 0) n = INT_MAX ;
 	    for (int i = 0 ; (rs >= 0) && (i < n) && a[i] ; i += 1) {

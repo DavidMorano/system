@@ -53,6 +53,7 @@
 #include	"lineindex.h"
 #include	"lineindexhdr.h"
 
+import libutil ;
 
 /* local defines */
 

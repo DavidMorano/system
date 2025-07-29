@@ -242,13 +242,13 @@ int getrootdname(char *rbuf,int rlen,cchar *prname,cchar *domain) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (rbuf && prname) {
+	if (rbuf && prname) ylikely {
 	    rbuf[0] = '\0' ;
-	    if ((rs = maxpathlen) >= 0) {
+	    if ((rs = maxpathlen) >= 0) ylikely {
 	        SI	si ;
 	        if (rlen < 0) rlen = rs ;
 	        if (prname[0] == '\0') prname = PRNAME ;
-	        if ((rs = subinfo_start(&si,prname,domain)) >= 0) {
+	        if ((rs = subinfo_start(&si,prname,domain)) >= 0) ylikely {
 	            rs = SR_NOTDIR ;
 	            for (int i = 0 ; gettries[i] ; i += 1) {
 	                rs = (*gettries[i])(&si,rbuf,rlen) ;
@@ -269,12 +269,11 @@ int mkpr(char *pbuf,int plen,cchar *prname,cchar *domain) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (pbuf && prname) {
+	if (pbuf && prname) ylikely {
 	    rs = SR_INVALID ;
 	    pbuf[0] = '\0' ;
-	    if (prname[0]) {
-	        SI	ti ;
-	        if ((rs = subinfo_start(&ti,prname,domain)) >= 0) {
+	    if (prname[0]) ylikely {
+	        if (SI ti ; (rs = subinfo_start(&ti,prname,domain)) >= 0) {
 	            rs = SR_NOTFOUND ;
 	            for (int i = 0 ; mktries[i] ; i += 1) {
 	                rs = (*mktries[i])(&ti,pbuf,plen) ;
@@ -302,12 +301,11 @@ static int subinfo_start(SI *sip,cchar *prname,cchar *domain) noex {
 	sip->domain = domain ;
 	sip->dname = prname ;
         if (hasuc(prname,-1)) { /* while keeping stack mostly shallow */
-	    char	*dbuf{} ;
-	    if ((rs = malloc_mp(&dbuf)) >= 0) {
+	    if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) ylikely {
                 cint	dlen = rs ;
-                if ((rs = sncpylc(dbuf,dlen,prname)) >= 0) {
+                if ((rs = sncpylc(dbuf,dlen,prname)) >= 0) ylikely {
 		    cchar	*cp{} ; 
-                    if ((rs = uc_mallocstrw(dbuf,rs,&cp)) >= 0) {
+                    if ((rs = uc_mallocstrw(dbuf,rs,&cp)) >= 0) ylikely {
                         sip->open.dname = true ;
                         sip->dname = cp ;
                     } /* end if (m-a) */
@@ -351,10 +349,9 @@ static int subinfo_checkid(SI *sip) noex {
 /* end subroutine (subinfo_checkid) */
 
 static int subinfo_dirok(SI *sip,cchar *dname,mode_t dm) noex {
-	USTAT		sb ;
 	int		rs ;
-	if ((rs = uc_stat(dname,&sb)) >= 0) {
-	    if ((rs = subinfo_checkid(sip)) >= 0) {
+	if (ustat sb ; (rs = uc_stat(dname,&sb)) >= 0) ylikely {
+	    if ((rs = subinfo_checkid(sip)) >= 0) ylikely {
 	        rs = SR_NOTDIR ;
 	        if (S_ISDIR(sb.st_mode) && sip->open.ids) {
 	            rs = permid(&sip->id,&sb,dm) ;
@@ -368,13 +365,12 @@ static int subinfo_dirok(SI *sip,cchar *dname,mode_t dm) noex {
 static int subinfo_env(SI *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	cchar		*envp = sip->prname ;
 	if (haslc(envp,-1)) {
-	    char	*ebuf{} ;
-	    if ((rs = malloc_mp(&ebuf)) >= 0) {
+	    if (char *ebuf ; (rs = malloc_mp(&ebuf)) >= 0) ylikely {
 		cint	elen = rs ;
-	        if ((rs = sncpyuc(ebuf,elen,envp)) >= 0) {
+	        if ((rs = sncpyuc(ebuf,elen,envp)) >= 0) ylikely {
 	    	    rs = subinfo_enver(sip,rbuf,rlen,ebuf) ;
 		    len = rs ;
 		}
@@ -392,9 +388,9 @@ static int subinfo_env(SI *sip,char *rbuf,int rlen) noex {
 static int subinfo_enver(SI *sip,char *rbuf,int rlen,cc *envp) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if (envp[0] != '\0') {
+	if (envp[0] != '\0') ylikely {
 	    if (cchar *cp ; (cp = getenv(envp)) != nullptr) {
-		if ((rs = sncpy1(rbuf,rlen,cp)) >= 0) {
+		if ((rs = sncpy(rbuf,rlen,cp)) >= 0) ylikely {
 		    len = rs ;
 		    rs = subinfo_dirok(sip,rbuf,DMODE) ;
 		}
@@ -412,11 +408,13 @@ static int subinfo_domain(SI *sip,char *rbuf,int rlen) noex {
 	    cchar	*vn = varname.domain ;
 	    sip->domain = getenv(vn) ;
 	}
-	if (sip->domain && sip->domain[0]) {
+	if (sip->domain && sip->domain[0]) ylikely {
 	    int		dnl = lenstr(sip->domain) ;
 	    cchar	*dnp = sip->domain ;
-	    while ((dnl > 0) && (dnp[dnl-1] == '.')) dnl -= 1 ;
-	    if (dnl > 0) {
+	    while ((dnl > 0) && (dnp[dnl-1] == '.')) {
+		dnl -= 1 ;
+	    }
+	    if (dnl > 0) ylikely {
 	        if (hasuc(dnp,dnl)) {
 		    if (dnl <= STACKBUFLEN) {
 			cint	dlen = dnl ;
@@ -425,8 +423,7 @@ static int subinfo_domain(SI *sip,char *rbuf,int rlen) noex {
 		            rs = subinfo_domainer(sip,rbuf,rlen,dbuf,rs) ;
 	                }
 		    } else {
-		        char	*dbuf{} ;
-		        if ((rs = malloc_hn(&dbuf)) >= 0) {
+		        if (char *dbuf ; (rs = malloc_hn(&dbuf)) >= 0) {
 		            cint	dlen = rs ;
 	                    if ((rs = snwcpylc(dbuf,dlen,dnp,dnl)) > 0) {
 		                rs = subinfo_domainer(sip,rbuf,rlen,dbuf,rs) ;
@@ -446,8 +443,8 @@ static int subinfo_domain(SI *sip,char *rbuf,int rlen) noex {
 
 static int subinfo_domainer(SI *sip,char *rbuf,int rlen,cc *dnp,int dnl) noex {
 	int		rs = SR_OK ;
-	int		len = 0 ;
-	int		i ;
+	int		len = 0 ; /* return-value */
+	int		i ; /* used-afterwards */
 	cchar		*bnp ;
 	for (i = 0 ; domains[i].domain ; i += 1) {
 	    cchar	*dn = domains[i].domain ;
@@ -459,8 +456,8 @@ static int subinfo_domainer(SI *sip,char *rbuf,int rlen,cc *dnp,int dnl) noex {
 	    }
 	} /* end for */
 	bnp = domains[i].basedname ;
-	if (domains[i].domain && bnp) {
-	    if ((rs = mknpath2(rbuf,rlen,bnp,sip->dname)) >= 0) {
+	if (domains[i].domain && bnp) ylikely {
+	    if ((rs = mknpath2(rbuf,rlen,bnp,sip->dname)) >= 0) ylikely {
 	        len = rs ;
 	        rs = subinfo_dirok(sip,rbuf,DMODE) ;
 	    }
@@ -473,14 +470,14 @@ static int subinfo_user(SI *sip,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
-	    ucentpw	pw ;
+	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) ylikely {
 	    cint	pwlen = rs ;
-	    if ((rs = getpwx_name(&pw,pwbuf,pwlen,sip->dname)) >= 0) {
-	        if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	    cchar	*dn = sip->dname ;
+	    if (ucentpwx pw ; (rs = pw.nam(pwbuf,pwlen,dn)) >= 0) ylikely {
+	        if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) ylikely {
 		    cchar	*d = pw.pw_dir ;
-		    cchar	*swd = SWDFNAME ;
-	            if ((rs = mkpath2(tbuf,d,swd)) >= 0) {
+		    cchar	swd[] = SWDFNAME ;
+	            if ((rs = mkpath(tbuf,d,swd)) >= 0) ylikely {
 			rs = subinfo_users(sip,rbuf,rlen,tbuf,d) ;
 			len = rs ;
 		    }
@@ -499,9 +496,9 @@ static int subinfo_users(SI *sip,char *rbuf,int rlen,cc *sym,cc *d) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (ustat sb ; (rs = u_lstat(sym,&sb)) >= 0) {
-            if (S_ISLNK(sb.st_mode)) {
-                if ((rs = u_readlink(sym,rbuf,rlen)) >= 0) {
+	if (ustat sb ; (rs = u_lstat(sym,&sb)) >= 0) ylikely {
+            if (S_ISLNK(sb.st_mode)) ylikely {
+                if ((rs = u_readlink(sym,rbuf,rlen)) >= 0) ylikely {
                     cint     bl = rs ;
                     len = rs ;
                     rbuf[bl] = '\0' ;
@@ -519,7 +516,7 @@ static int subinfo_users(SI *sip,char *rbuf,int rlen,cc *sym,cc *d) noex {
 			    if (rs >= 0) rs = rs1 ;
 			} /* end if (m-a-f) */
                     } /* end if */
-                    if ((rs >= 0) && (len > 0)) {
+                    if ((rs >= 0) && (len > 0)) ylikely {
                         rs = subinfo_dirok(sip,rbuf,DMODE) ;
                     }
                 } /* end if (read link) */
@@ -533,7 +530,7 @@ static int subinfo_users(SI *sip,char *rbuf,int rlen,cc *sym,cc *d) noex {
 
 static int subinfo_prmap(SI *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
-	int		i = 0 ; /* used afterwards */
+	int		i = 0 ; /* used-afterwards */
 	int		len = 0 ; /* return-value */
 	for (i = 0 ; prmaps[i].prname ; i += 1) {
 	    cchar	*pn = prmaps[i].prname ;
@@ -543,7 +540,7 @@ static int subinfo_prmap(SI *sip,char *rbuf,int rlen) noex {
 		}
 	    }
 	} /* end for */
-	if (prmaps[i].prname) {
+	if (prmaps[i].prname) ylikely {
 	    if ((rs = sncpy1(rbuf,rlen,prmaps[i].dname)) >= 0) {
 	        len = rs ;
 	        rs = subinfo_dirok(sip,rbuf,DMODE) ;
@@ -554,16 +551,17 @@ static int subinfo_prmap(SI *sip,char *rbuf,int rlen) noex {
 /* end subroutine (subinfo_prmap) */
 
 static int subinfo_home(SI *sip,char *rbuf,int rlen) noex {
+    	static cchar	*hn = getenv(VARHOME) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (cc *hn ; (hn = getenv(VARHOME)) != nullptr) {
+	if (hn) ylikely {
 	    rs = subinfo_homer(sip,rbuf,rlen,hn) ;
 	    len = rs ;
 	} else {
-	    if (char *hbuf ; (rs = malloc_mp(&hbuf)) >= 0) {
+	    if (char *hbuf ; (rs = malloc_mp(&hbuf)) >= 0) ylikely {
 		cint	hlen = rs ;
-	        if ((rs = getuserhome(hbuf,hlen,"-")) >= 0) {
+	        if ((rs = getuserhome(hbuf,hlen,"-")) >= 0) ylikely {
 	    	    rs = subinfo_homer(sip,rbuf,rlen,hbuf) ;
 	    	    len = rs ;
 	        }
@@ -578,10 +576,10 @@ static int subinfo_home(SI *sip,char *rbuf,int rlen) noex {
 static int subinfo_homer(SI *sip,char *rbuf,int rlen,cchar *hn) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if (hn && hn[0]) {
+	if (hn && hn[0]) ylikely {
 	    cchar	*dn = sip->dname ;
 	    cchar	*hdname = HOMEBASEDNAME ;
-	    if ((rs = mknpath3(rbuf,rlen,hn,hdname,dn)) >= 0) {
+	    if ((rs = mknpath3(rbuf,rlen,hn,hdname,dn)) >= 0) ylikely {
 	        len = rs ;
 	        rs = subinfo_dirok(sip,rbuf,DMODE) ;
 	    }
@@ -594,12 +592,11 @@ static int subinfo_bases(SI *sip,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*tmpfname{} ;
-	if ((rs = malloc_mp(&tmpfname)) >= 0) {
+	if (char *tmpfname ; (rs = malloc_mp(&tmpfname)) >= 0) ylikely {
 	    for (int i = 0 ; basednames[i] ; i += 1) {
 	        cchar	*bn = basednames[i] ;
-	        if ((rs = dirsearch(bn,sip->dname)) > 0) {
-	            if ((rs = mkpath2(tmpfname,bn,sip->dname)) >= 0) {
+	        if ((rs = dirsearch(bn,sip->dname)) > 0) ylikely {
+	            if ((rs = mkpath2(tmpfname,bn,sip->dname)) >= 0) ylikely {
 		        cint	dm = DMODE ;
 		        if ((rs = subinfo_dirok(sip,tmpfname,dm)) >= 0) {
 	                    rs = sncpy1(rbuf,rlen,tmpfname) ;
@@ -622,12 +619,10 @@ static int dirsearch(cchar *basedname,cchar *username) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f_found = false ;
-	char		*nbuf{} ;
-	if ((rs = malloc_mn(&nbuf)) >= 0) {
-	    fsdir	dir ;
-	    fsdir_ent	ds ;
+	if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) ylikely {
 	    cint	nlen = rs ;
-	    if ((rs = fsdir_open(&dir,basedname)) >= 0) {
+	    if (fsdir dir ; (rs = fsdir_open(&dir,basedname)) >= 0) ylikely {
+	        fsdir_ent	ds ;
 	        while ((rs = fsdir_read(&dir,&ds,nbuf,nlen)) > 0) {
 		    cchar	*fnp = ds.name ;
 		    if (fnp[0] != '.') {

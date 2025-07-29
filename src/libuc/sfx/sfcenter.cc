@@ -79,21 +79,23 @@ import libutil ;
 /* exported subroutines */
 
 int sfcenter(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
-	int		cl = -1 ;
+	int		cl = -1 ; /* return-value */
 	cchar		*cp = nullptr ;
-	if (sl < 0) sl = lenstr(sp) ;
-	if (sl >= 2) {
-	    int		sch = mkchar(ss[0]) ;
-	    if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
-	        sch = mkchar(ss[1]) ;
-		cp = (tp + 1) ;
-	        sl -= intconv((tp + 1)-sp) ;
-	        sp = (tp + 1) ;
-	        if ((tp = strnchr(sp,sl,sch)) != nullptr) {
-	            cl = intconv(tp - sp) ;
+	if (sp && ss) {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    if (sl >= 2) {
+	        int	sch = mkchar(ss[0]) ;
+	        if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
+	            sch = mkchar(ss[1]) ;
+		    cp = (tp + 1) ;
+	            sl -= intconv((tp + 1)-sp) ;
+	            sp = (tp + 1) ;
+	            if ((tp = strnchr(sp,sl,sch)) != nullptr) {
+	                cl = intconv(tp - sp) ;
+	            }
 	        }
-	    }
-	} /* end if */
+	    } /* end if */
+	} /* end if (non-null) */
 	if (rpp) {
 	    *rpp = (cl >= 0) ? cp : nullptr ;
 	}

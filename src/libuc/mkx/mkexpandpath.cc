@@ -43,6 +43,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
+#include	<localmisc.h>
 
 #include	"mkx.h"
 
@@ -86,11 +87,11 @@ extern "C" {
 int mkexpandpath(char *rbuf,cchar *pp,int pl) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (rbuf && pp) {
+	if (rbuf && pp) ylikely {
 	    if (pl < 0) pl = lenstr(pp) ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = mkuserpath(rbuf,nullptr,pp,pl)) == 0) {
-	        if ((rs = mkvarpath(rbuf,pp,pl)) == 0) {
+	    if ((rs = mkuserpath(rbuf,nullptr,pp,pl)) == 0) ylikely {
+	        if ((rs = mkvarpath(rbuf,pp,pl)) == 0) ylikely {
 	            rs = mkcdpath(rbuf,pp,pl) ;
 		    rl = rs ;
 	        }

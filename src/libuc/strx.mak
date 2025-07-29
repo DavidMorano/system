@@ -61,10 +61,12 @@ OBJ1= strsigabbr.o strerrabbr.o
 OBJ2= strsub.o strwhite.o 
 OBJ3= strbasename.o strdirname.o
 
-OBJA= obj0.o obj1.o obj2.o
-#OBJB= obj3.o obj4.o obj5.o
+OBJ4= strcpyxc.o strlinelen.o strlocktype.o
 
-OBJ= $(OBJA)
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o
+
+OBJ= $(OBJA) $(OBJB)
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -139,10 +141,13 @@ obj5.o:			$(OBJ5)
 
 strxbrk.o:		strxbrk.cc				$(INCS)
 strwhite.o:		strwhite.cc				$(INCS)
-strsub.o:		strsub.cc strsub.h			$(INCS)
-strerrabbr.o:		strerrabbr.cc strerrabbr.h		$(INCS)
-strsigabbr.o:		strsigabbr.cc strsigabbr.h		$(INCS)
-straltwchar.o:		straltwchar.cc straltwchar.h		$(INCS)
+strsub.o:		strsub.cc	strsub.h		$(INCS)
+strerrabbr.o:		strerrabbr.cc	strerrabbr.h		$(INCS)
+strsigabbr.o:		strsigabbr.cc	strsigabbr.h		$(INCS)
+straltwchar.o:		straltwchar.cc	straltwchar.h		$(INCS)
+strcpyxc.o:		strcpyxc.cc	strcpyxc.h		$(INCS)
+strlinelen.o:		strlinelen.cc	strlinelen.h		$(INCS)
+strlocktype.o:		strlocktype.cc	strlocktype.h		$(INCS)
 
 strbasename.o:		strbasename.cc				$(INCS)
 strdirname.o:		strdirname.cc				$(INCS)

@@ -54,7 +54,7 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
@@ -62,7 +62,11 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
@@ -101,7 +105,7 @@
 int snrealname(char *dbuf,int dlen,mainv a,int n) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (dbuf && a) {
+	if (dbuf && a) ylikely {
 	    storebuf	sb(dbuf,dlen) ;
 	    int		c = 0 ;
 	    rs = SR_OK ;

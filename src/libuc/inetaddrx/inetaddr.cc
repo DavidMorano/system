@@ -126,7 +126,7 @@ constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 
 int inetaddr_start(inetaddr *ip,cvoid *addr) noex {
 	int		rs = SR_FAULT ;
-	if (ip && addr) {
+	if (ip && addr) ylikely {
 	    char *ep = charp(memcopy(ip->straddr,addr,inet4addrlen)) ;
 	    rs = intconv(ep - ip->straddr) ;
 	}
@@ -137,7 +137,7 @@ int inetaddr_start(inetaddr *ip,cvoid *addr) noex {
 #if	defined(CF_STARTSTR) && (CF_STARTSTR > 0)
 int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 	int		rs = SR_FAULT ;
-	if (ip && addrp) {
+	if (ip && addrp) ylikely {
 	    cchar	*ap = addrp ;
 	    char	abuf[alen + 1] ;
 	    rs = SR_OK ;
@@ -176,7 +176,7 @@ int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 #if	defined(CF_STARTDOT) && (CF_STARTDOT > 0)
 int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex {
 	int		rs = SR_FAULT ;
-	if (ip && addrp) {
+	if (ip && addrp) ylikely {
 	    cchar	*ap = addrp ;
 	    char	abuf[(inet4addrlen* 4) + 1] ;
 	    rs = SR_OK ;
@@ -208,7 +208,7 @@ int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex {
 
 int inetaddr_finish(inetaddr *ip) noex {
 	int		rs = SR_FAULT ;
-	if (ip) {
+	if (ip) ylikely {
 	    rs = SR_OK ;
 	    ip->a = {} ;
 	}
@@ -219,7 +219,7 @@ int inetaddr_finish(inetaddr *ip) noex {
 int inetaddr_gethexaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		j = 0 ;
-	if (ip && rbuf) {
+	if (ip && rbuf) ylikely {
 	    constexpr int	rlenmin = ((inet4addrlen* 2) + 0) ;
 	    rs = SR_OK ;
 	    rbuf[0] = '\0' ;
@@ -241,7 +241,7 @@ int inetaddr_gethexaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 int inetaddr_getdotaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (ip && rbuf) {
+	if (ip && rbuf) ylikely {
 	    constexpr int	rlenmin = ((inet4addrlen * 3) + 3) ;
 	    char	*bp = rbuf ;
 	    rbuf[0] = '\0' ;
@@ -267,7 +267,7 @@ int inetaddr_getdotaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 
 inetaddr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case inetaddrmem_finish:
 	        rs = inetaddr_finish(op) ;

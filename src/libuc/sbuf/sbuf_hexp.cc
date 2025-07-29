@@ -27,7 +27,7 @@
 	int sbuf_hexp(sbuf *,uint64_t,int) noex
 
 	Arguments:
-	sbp		pointer to the buffer object
+	sop		pointer to the buffer object
 	ap		string to add
 	al		length of string to add
 
@@ -71,32 +71,34 @@
 
 /* exported subroutines */
 
-int sbuf_hexp(sbuf *bp,uint64_t v,int n) noex {
-	uint		vi ;
-	cint		dlen = DIGBUFLEN ;
-	int		rs ;
-	char		dbuf[DIGBUFLEN+1] ;
-	switch (n) {
-	case 2:
-	    vi = uint(v) ;
-	    rs = cthexus(dbuf,dlen,vi) ;
-	    break ;
-	case 4:
-	    vi = uint(v) ;
-	    rs = cthexui(dbuf,dlen,vi) ;
-	    break ;
-	case 6:
-	    rs = cthexull(dbuf,dlen,v) ;
-	    break ;
-	default:
-	    rs = SR_INVALID ;
-	    break ;
-	} /* end switch */
-	if (rs >= 0) {
-	    cchar	*dp = dbuf ;
-	    if (n == 6) dp += ((8-n)*2) ;
-	    rs = bp->strw(dp,(n*2)) ;
-	} /* end if */
+int sbuf_hexp(sbuf *op,uint64_t v,int n) noex {
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
+	    uint	vi ;
+	    cint	dlen = DIGBUFLEN ;
+	    char	dbuf[DIGBUFLEN+1] ;
+	    switch (n) {
+	    case 2:
+	        vi = uint(v) ;
+	        rs = cthexus(dbuf,dlen,vi) ;
+	        break ;
+	    case 4:
+	        vi = uint(v) ;
+	        rs = cthexui(dbuf,dlen,vi) ;
+	        break ;
+	    case 6:
+	        rs = cthexull(dbuf,dlen,v) ;
+	        break ;
+	    default:
+	        rs = SR_INVALID ;
+	        break ;
+	    } /* end switch */
+	    if (rs >= 0) {
+	        cchar	*dp = dbuf ;
+	        if (n == 6) dp += ((8-n)*2) ;
+	        rs = op->strw(dp,(n*2)) ;
+	    } /* end if */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sbuf_hexp) */

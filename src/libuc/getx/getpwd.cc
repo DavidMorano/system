@@ -51,15 +51,15 @@
 	getpwds
 
 	Description:
-	If you also want to get the internal 'USTAT' block from the
+	If you also want to get the internal 'ustat' block from the
 	file-system (sort of as a free-bee of using this subroutine),
 	use the form of this call as:
 
 	Synopsis:
-	int getpwds(USTAT *sbp,char *pwbuf,int pwlen) noex
+	int getpwds(ustat *sbp,char *pwbuf,int pwlen) noex
 
 	Arguments:
-	sbp		USTAT block pointer to receive result
+	sbp		ustat block pointer to receive result
 	pwbuf		present-working buffer pointer
 	pwlen		prsent-working buffer length
 
@@ -78,6 +78,7 @@
 #include	<bufsizevar.hh>
 #include	<sncpyx.h>
 #include	<isnot.h>
+#include	<localmisc.h>
 
 #include	"getpwd.h"
 
@@ -116,7 +117,7 @@ int getpwd(char *pwbuf,int pwlen) noex {
 }
 /* end subroutine (getpwd) */
 
-int getpwds(USTAT *sbp,char *pwbuf,int pwlen) noex {
+int getpwds(ustat *sbp,char *pwbuf,int pwlen) noex {
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
 	if (pwbuf) {
@@ -125,7 +126,7 @@ int getpwds(USTAT *sbp,char *pwbuf,int pwlen) noex {
 		static cchar	*pwd = getenv(varname.pwd) ;
 	        if (pwlen < 0) pwlen = rs ;
 	        if (pwd != nullptr) {
-	            USTAT	*ssbp, sb1, sb2 ;
+	            ustat	*ssbp, sb1, sb2 ;
 	            if ((rs = u_stat(pwd,&sb1)) >= 0) {
 		        ssbp = (sbp) ? sbp : &sb2 ;
 	                if ((rs = u_stat(".",ssbp)) >= 0) {

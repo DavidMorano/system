@@ -35,6 +35,23 @@ extern char	* strnwcpyfc (char *,int,cchar *,int) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+inline char	* strnwcpybc (char *dp,int dl,cchar *sp) noex {
+    	return strnwcpybc(dp,dl,sp,-1) ;
+}
+inline char	* strnwcpylc (char *dp,int dl,cchar *sp) noex {
+    	return strnwcpylc(dp,dl,sp,-1) ;
+}
+inline char	* strnwcpyuc (char *dp,int dl,cchar *sp) noex {
+    	return strnwcpyuc(dp,dl,sp,-1) ;
+}
+inline char	* strnwcpyfc (char *dp,int dl,cchar *sp) noex {
+    	return strnwcpyfc(dp,dl,sp,-1) ;
+}
+
+#endif /* __cplusplus */
+
 
 #endif /* STRNWCPYXC_INCLUDE */
 

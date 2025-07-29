@@ -42,6 +42,11 @@
 
 #include	"ema.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency	"ema_entry.ccm"
+#pragma		GCC dependency	"ema_asstr.ccm"
+#pragma		GCC dependency	"ema_parts.ccm"
+
 import libutil ;
 import ema_entry ;
 import ema_asstr ;

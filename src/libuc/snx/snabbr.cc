@@ -53,7 +53,7 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
@@ -61,7 +61,11 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<sfx.h>			/* |sfnext(3uc)| */
 #include	<toxc.h>		/* |chtouc(3uc)| (for GCC b*llsh*t) */
 #include	<localmisc.h>
@@ -102,13 +106,12 @@ import libutil ;
 int snabbr(char *dp,int dl,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ; /* return-value */
-	if (dp && sp) {
-	    int		cl ;
+	if (dp && sp) ylikely {
 	    cchar	*cp{} ;
 	    rs = SR_OK ;
 	    if (dl < 0) dl = INT_MAX ;
 	    if (sl < 0) sl = lenstr(sp) ;
-	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
+	    for (int cl ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
 	        if (i < dl) {
 	            dp[i++] = chtouc(cp[0]) ; /* <- GCC conversion complaint */
 	        } else {
@@ -117,7 +120,7 @@ int snabbr(char *dp,int dl,cchar *sp,int sl) noex {
 	        sl -= intconv((cp + cl) - sp) ;
 	        sp = (cp + cl) ;
 	        if (rs < 0) break ;
-	    } /* end while */
+	    } /* end for */
 	    dp[i] = '\0' ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;

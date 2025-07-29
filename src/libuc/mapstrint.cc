@@ -28,11 +28,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<hdb.h>
 #include	<strwcpy.h>
@@ -40,6 +38,7 @@
 
 #include	"mapstrint.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -79,7 +78,7 @@ typedef	mapstrint_cur	cur ;
 
 int mapstrint_start(MSI *dbp,int nitems) noex {
 	int		rs = SR_FAULT ;
-	if (dbp) {
+	if (dbp) ylikely {
 	    rs = hdb_start(dbp,nitems,0,nullptr,nullptr) ;
 	}
 	return rs ;
@@ -88,7 +87,7 @@ int mapstrint_start(MSI *dbp,int nitems) noex {
 
 int mapstrint_count(MSI *dbp) noex {
 	int		rs = SR_FAULT ;
-	if (dbp) {
+	if (dbp) ylikely {
 	    rs = hdb_count(dbp) ;
 	}
 	return rs ;
@@ -99,7 +98,7 @@ int mapstrint_finish(MSI *dbp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (dbp) {
+	if (dbp) ylikely {
 	    rs = SR_OK ;
 	    {
 	        mapstrint_cur	kcur ;
@@ -117,7 +116,7 @@ int mapstrint_finish(MSI *dbp) noex {
 	            hdb_curend(dbp,&kcur) ;
 	        } /* end if */
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end block */
 	    {
 	        rs1 = hdb_finish(dbp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -129,12 +128,12 @@ int mapstrint_finish(MSI *dbp) noex {
 
 int mapstrint_add(MSI *dbp,cchar *kstr,int klen,int ival) noex {
 	int		rs = SR_FAULT ;
-	if (dbp && kstr) {
+	if (dbp && kstr) ylikely {
 	    rs = SR_INVALID ;
 	    if (klen < 0) klen = lenstr(kstr) ;
-	    if (klen > 0) {
+	    if (klen > 0) ylikely {
 	        cint	sz = szof(int) + klen + 1 ;
-	        if (int *ip{} ; (rs = uc_malloc(sz,&ip)) >= 0) {
+	        if (int *ip ; (rs = uc_malloc(sz,&ip)) >= 0) ylikely {
 	            hdb_dat	key ;
 	            hdb_dat	val ;
 	            char	*bp ;
@@ -159,7 +158,7 @@ int mapstrint_add(MSI *dbp,cchar *kstr,int klen,int ival) noex {
 int mapstrint_already(MSI *op,cchar *kstr,int klen) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && kstr) {
+	if (op && kstr) ylikely {
 	    if (int v ; (rs = mapstrint_fetch(op,kstr,klen,np,&v)) >= 0) {
 	        rs = v ;
 	    }
@@ -171,7 +170,7 @@ int mapstrint_already(MSI *op,cchar *kstr,int klen) noex {
 int mapstrint_curenum(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	int		rs = SR_FAULT ;
 	int		klen = 0 ;
-	if (dbp && curp) {
+	if (dbp && curp) ylikely {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    if (kpp) *kpp = nullptr ;
@@ -193,7 +192,7 @@ int mapstrint_curenum(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 int mapstrint_fetch(MSI *dbp,cchar *kstr,int klen,cur *curp,int *vp) noex {
 	int		rs = SR_FAULT ;
 	int		rv = 0 ;
-	if (dbp && kstr) {
+	if (dbp && kstr) ylikely {
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
 	    if (klen < 0) klen = lenstr(kstr) ;
@@ -214,7 +213,7 @@ int mapstrint_fetch(MSI *dbp,cchar *kstr,int klen,cur *curp,int *vp) noex {
 int mapstrint_fetchrec(MSI *dbp,cc *kstr,int klen,cur *curp,
 		cc **kpp,int *vp) noex {
 	int		rs = SR_FAULT ;
-	if (dbp && kstr && curp) {
+	if (dbp && kstr && curp) ylikely {
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
 	    hdb_dat	rkey{} ;
@@ -239,7 +238,7 @@ int mapstrint_fetchrec(MSI *dbp,cc *kstr,int klen,cur *curp,
 int mapstrint_curget(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	int		rs = SR_FAULT ;
 	int		klen = 0 ;
-	if (dbp && curp) {
+	if (dbp && curp) ylikely {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    if (kpp) *kpp = nullptr ;
@@ -260,7 +259,7 @@ int mapstrint_curget(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 
 int mapstrint_curnext(MSI *dbp,mapstrint_cur *curp) noex {
 	int		rs = SR_FAULT ;
-	if (dbp && curp) {
+	if (dbp && curp) ylikely {
 	    rs = hdb_curnext(dbp,curp) ;
 	}
 	return rs ;
@@ -270,7 +269,7 @@ int mapstrint_curnext(MSI *dbp,mapstrint_cur *curp) noex {
 /* advance the cursor to the next entry with the given key */
 int mapstrint_nextkey(MSI *dbp,cchar *kstr,int klen,mapstrint_cur *curp) noex {
 	int		rs = SR_FAULT ;
-	if (dbp && kstr && curp) {
+	if (dbp && kstr && curp) ylikely {
 	    hdb_dat	key ;
 	    if (klen < 0) klen = lenstr(kstr) ;
 	    key.buf = kstr ;
@@ -287,10 +286,10 @@ int mapstrint_delkey(MSI *dbp,cchar *kstr,int klen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rs2 ;
-	if (dbp && kstr) {
+	if (dbp && kstr) ylikely {
 	    if (klen < 0) klen = lenstr(kstr) ;
 	    /* delete all of the data associated with this key */
-	    if (hdb_cur kcur ; (rs = hdb_curbegin(dbp,&kcur)) >= 0) {
+	    if (hdb_cur kcur ; (rs = hdb_curbegin(dbp,&kcur)) >= 0) ylikely {
 	        hdb_dat		skey ;
 	        hdb_dat		key{} ;
 	        hdb_dat		val{} ;
@@ -331,7 +330,7 @@ int mapstrint_delkey(MSI *dbp,cchar *kstr,int klen) noex {
 
 int mapstrint_curdel(MSI *dbp,mapstrint_cur *curp,int f_adv) noex {
 	int		rs = SR_FAULT ;
-	if (dbp && curp) {
+	if (dbp && curp) ylikely {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    if ((rs = hdb_curget(dbp,curp,&key,&val)) >= 0) {
@@ -359,7 +358,7 @@ int mapstrint_curend(MSI *dbp,mapstrint_cur *curp) noex {
 int mapstrint_cursetval(MSI *dbp,mapstrint_cur *curp,int ival) noex {
 	int		rs = SR_FAULT ;
 	int		kl = 0 ;
-	if (dbp && curp) {
+	if (dbp && curp) ylikely {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    if ((rs = hdb_curget(dbp,curp,&key,&val)) >= 0) {

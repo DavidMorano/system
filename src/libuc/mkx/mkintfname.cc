@@ -47,7 +47,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -83,16 +87,16 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 int mkintfname(char *rbuf,cchar *dn,cchar *prn,cchar *inter) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (rbuf && prn && inter) {
+	if (rbuf && prn && inter) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (prn[0] && inter[0]) {
-	        if ((rs = maxpathlen) >= 0) {
+	    if (prn[0] && inter[0]) ylikely {
+	        if ((rs = maxpathlen) >= 0) ylikely {
 		    storebuf	sb(rbuf,rs) ;
-	            if (dn && dn[0]) {
+	            if (dn && dn[0]) ylikely {
 	                rs = sb.str(dn) ;
 		    }
-		    if (rs >= 0) {
+		    if (rs >= 0) ylikely {
 	                if (int i = sb.idx ; (i > 0) && (rbuf[i - 1] != '/')) {
 	                    rs = sb.chr('/') ;
 	                }

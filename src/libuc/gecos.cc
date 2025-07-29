@@ -77,16 +77,16 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<ascii.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnbrk(3uc)| */
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"gecos.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -122,7 +122,7 @@ namespace {
 	bool		fparen = false ;
 	gecoshelp(gecos *aop,cchar *asp,int asl) noex {
 	    op = aop ;
-	    if (asl < 0) asl = strlen(asp) ;
+	    if (asl < 0) asl = lenstr(asp) ;
 	    sp = asp ;
 	    sl = asl ;
 	    bp = asp ;
@@ -140,7 +140,7 @@ namespace {
 	void printer() noex ;
 	void proc() noex ;
     } ; /* end struct (gecoshelp) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -167,9 +167,8 @@ constexpr gecoshelp_m	gmems[] = {
 	&gecoshelp::office,
 	&gecoshelp::wphone,
 	&gecoshelp::hphone,
-	&gecoshelp::printer,
-	nullptr
-} ;
+	&gecoshelp::printer
+} ; /* end array (gmems) */
 
 
 /* exported variables */
@@ -181,9 +180,9 @@ int gecos_start(gecos *op,cchar *sp,int sl) noex {
     	GECOS		*hop = op ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	if (op && sp) {
+	if (op && sp) ylikely {
 	    memclear(hop) ;
-	    if (gecoshelp ho(op,sp,sl) ; (rs = ho.start()) >= 0) {
+	    if (gecoshelp ho(op,sp,sl) ; (rs = ho.start()) >= 0) ylikely {
 		{
 		    ho.proc() ;
 		}
@@ -197,12 +196,8 @@ int gecos_start(gecos *op,cchar *sp,int sl) noex {
 
 int gecos_finish(gecos *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_OK ;
-	    for (int i = 0 ; i < gecosval_overlast ; i += 1) {
-	        op->vals[i].vp = nullptr ;
-	        op->vals[i].vl = 0 ;
-	    }
+	if (op) ylikely {
+	    rs = memclear(op->vals) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -210,9 +205,9 @@ int gecos_finish(gecos *op) noex {
 
 int gecos_getval(gecos *op,int i,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_INVALID ;
-	    if (i < gecosval_overlast) {
+	    if (i < gecosval_overlast) ylikely {
 	        rs = op->vals[i].vl ;
 	        if (rpp) {
 	            *rpp = op->vals[i].vp ;
@@ -223,11 +218,13 @@ int gecos_getval(gecos *op,int i,cchar **rpp) noex {
 }
 /* end subroutine (gecos_getval) */
 
+/* create a c-string from the stored object data */
 int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op && rbuf) {
-            if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	if (op && rbuf) ylikely {
+            if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
                 bool        fparen = false ;
                 if (op->vals[gecosval_organization].vp != nullptr) {
                     gecos_storeit(op,&b,gecosval_organization) ;
@@ -243,12 +240,16 @@ int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
                         gecos_storeit(op,&b,gecosval_realname) ;
                     }
                 } /* end if (realname) */
-    		/* do we have account and printer-bin information? */
-                if ((op->vals[gecosval_account].vp != nullptr) || 
-                    (op->vals[gecosval_bin].vp != nullptr)) {
-                    fparen = true ;
-                    b.chr(CH_LPAREN) ;
-                }
+    		/* do we have account OR printer-bin information? */
+		{
+		    bool f = false ;
+                    f = f || (op->vals[gecosval_account].vp != np) ;
+                    f = f || (op->vals[gecosval_bin].vp != np) ;
+		    if (f) {
+                        fparen = true ;
+                        b.chr(CH_LPAREN) ;
+                    }
+		} /* end block */
                 if (op->vals[gecosval_account].vp != nullptr) {
                     gecos_storeit(op,&b,gecosval_account) ;
                 }
@@ -297,12 +298,15 @@ static int gecos_storename(gecos *op,sbuf *bp,cchar *tp) noex {
 	int		vi = gecosval_realname ;
 	int		sl ;
 	cchar		*sp ;
-	sp = op->vals[vi].vp ;
-	sl = op->vals[vi].vl ;
+	{
+	    sp = op->vals[vi].vp ;
+	    sl = op->vals[vi].vl ;
+	}
 	/* store the initial segment of the name */
 	if ((tp - sp) > 0) {
-	    bp->strw(sp,(tp - sp)) ;
-	    sl -= (tp - sp) ;
+	    cint tl = intconv(tp - sp) ;
+	    bp->strw(sp,tl) ;
+	    sl -= intconv(tp - sp) ;
 	    sp = tp ;
 	}
 	/* make the substitution */
@@ -313,8 +317,9 @@ static int gecos_storename(gecos *op,sbuf *bp,cchar *tp) noex {
 	}
 	/* loop searching for other segments */
 	while ((tp = strnchr(sp,sl,'-')) != nullptr) {
-	    bp->strw(sp,(tp - sp)) ;
-	    sl -= (tp - sp) ;
+	    cint tl = intconv(tp - sp) ;
+	    bp->strw(sp,tl) ;
+	    sl -= intconv(tp - sp) ;
 	    sp = tp ;
 	} /* end while */
 	if (sl > 0) {
@@ -335,14 +340,20 @@ int gecoshelp::finish() noex {
 void gecoshelp::organization() noex {
 	if (cchar *tp ; (tp = strnchr(bp,bl,'-')) != np) {
 	    bool	f = false ;
-	    f = f || (strnbrk(tp,(bl - (tp - bp)),brkleft) != nullptr) ;
-	    f = f || (strnbrk(bp,(tp - bp),brkleft) == nullptr) ;
+	    if (! f) {
+		cint tl = intconv(bl - (tp - bp)) ;
+	        f = (strnbrk(tp,tl,brkleft) != np) ;
+	    }
+	    if (! f) {
+		cint tl = intconv(tp - bp) ;
+	        f = (strnbrk(bp,tl,brkleft) == np) ;
+	    }
 	    if (f) {
 	        n += 1 ;
 	        op->vals[gecosval_organization].vp = bp ;
-	        op->vals[gecosval_organization].vl = (tp - bp) ;
+	        op->vals[gecosval_organization].vl = intconv(tp - bp) ;
 	        bp = (tp + 1) ;
-	        bl = ((sp + sl) - (tp + 1)) ;
+	        bl = intconv((sp + sl) - (tp + 1)) ;
 	    } /* end if */
 	} /* end if (organization) */
 }
@@ -353,9 +364,9 @@ void gecoshelp::realname() noex {
 	    if (tp[0] == CH_LPAREN) fparen = true ;
 	    n += 1 ;
 	    op->vals[gecosval_realname].vp = bp ;
-	    op->vals[gecosval_realname].vl = (tp - bp) ;
+	    op->vals[gecosval_realname].vl = intconv(tp - bp) ;
 	    bp = (tp + 1) ;
-	    bl = (sp + sl) - (tp + 1) ;
+	    bl = intconv((sp + sl) - (tp + 1)) ;
 	} else {
 	    n += 1 ;
 	    op->vals[gecosval_realname].vp = bp ;
@@ -371,10 +382,10 @@ void gecoshelp::account() noex {
 	    if (tp - bp) {
 	        n += 1 ;
 	        op->vals[gecosval_account].vp = bp ;
-	        op->vals[gecosval_account].vl = (tp - bp) ;
+	        op->vals[gecosval_account].vl = intconv(tp - bp) ;
 	    }
 	    bp = (tp + 1) ;
-	    bl = (sp + sl) - (tp + 1) ;
+	    bl = intconv((sp + sl) - (tp + 1)) ;
 	} else {
 	    n += 1 ;
 	    op->vals[gecosval_bin].vp = bp ;
@@ -391,10 +402,10 @@ void gecoshelp::bin() noex {
 	        if ((tp - bp) && (op->vals[gecosval_bin].vp == nullptr)) {
 	            n += 1 ;
 	            op->vals[gecosval_bin].vp = bp ;
-	            op->vals[gecosval_bin].vl = (tp - bp) ;
+	            op->vals[gecosval_bin].vl = intconv(tp - bp) ;
 	        }
 	        bp = (tp + 1) ;
-	        bl = (sp + sl) - (tp + 1) ;
+	        bl = intconv((sp + sl) - (tp + 1)) ;
 	    } else if (op->vals[gecosval_bin].vp == nullptr) {
 	        n += 1 ;
 	        op->vals[gecosval_bin].vp = bp ;
@@ -410,10 +421,10 @@ void gecoshelp::office() noex {
 	    if (tp - bp) {
 	        n += 1 ;
 	        op->vals[gecosval_office].vp = bp ;
-	        op->vals[gecosval_office].vl = (tp - bp) ;
+	        op->vals[gecosval_office].vl = intconv(tp - bp) ;
 	    }
 	    bp = (tp + 1) ;
-	    bl = (sp + sl) - (tp + 1) ;
+	    bl = intconv((sp + sl) - (tp + 1)) ;
 	} else {
 	    n += 1 ;
 	    op->vals[gecosval_office].vp = bp ;
@@ -428,10 +439,10 @@ void gecoshelp::wphone() noex {
 	    if (tp - bp) {
 	        n += 1 ;
 	        op->vals[gecosval_wphone].vp = bp ;
-	        op->vals[gecosval_wphone].vl = (tp - bp) ;
+	        op->vals[gecosval_wphone].vl = intconv(tp - bp) ;
 	    }
 	    bp = (tp + 1) ;
-	    bl = (sp + sl) - (tp + 1) ;
+	    bl = intconv((sp + sl) - (tp + 1)) ;
 	} else if (op->vals[gecosval_office].vp == nullptr) {
 	    n += 1 ;
 	    op->vals[gecosval_office].vp = bp ;
@@ -446,10 +457,10 @@ void gecoshelp::hphone() noex {
 	    if (tp - bp) {
 	        n += 1 ;
 	        op->vals[gecosval_hphone].vp = bp ;
-	        op->vals[gecosval_hphone].vl = (tp - bp) ;
+	        op->vals[gecosval_hphone].vl = intconv(tp - bp) ;
 	    }
 	    bp = (tp + 1) ;
-	    bl = (sp + sl) - (tp + 1) ;
+	    bl = intconv((sp + sl) - (tp + 1)) ;
 	} else {
 	    n += 1 ;
 	    op->vals[gecosval_hphone].vp = bp ;
@@ -464,10 +475,10 @@ void gecoshelp::printer() noex {
 	    if (tp - bp) {
 	        n += 1 ;
 	        op->vals[gecosval_printer].vp = bp ;
-	        op->vals[gecosval_printer].vl = (tp - bp) ;
+	        op->vals[gecosval_printer].vl = intconv(tp - bp) ;
 	    }
 	    bp = (tp + 1) ;
-	    bl = (sp + sl) - (tp + 1) ;
+	    bl = intconv((sp + sl) - (tp + 1)) ;
 	} else {
 	    n += 1 ;
 	    op->vals[gecosval_printer].vp = bp ;
@@ -478,9 +489,9 @@ void gecoshelp::printer() noex {
 /* end method (gecoshelp::printer) */
 
 void gecoshelp::proc() noex {
-	for (int i = 0 ; gmems[i] && (bl > 0) ; i += 1) {
-	    gecoshelp_m		m = gmems[i] ;
+	for (cauto &m : gmems) {
 	    (this->*m)() ;
+	    if (bl == 0) break ;
 	} /* end for */
 }
 /* end method (gecoshelp::proc) */
@@ -501,11 +512,11 @@ void gecos::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("gecos",rs,"fini-finish") ;
 	}
-}
+} /* end method (gecos::dtor) */
 
 gecos_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case gecosmem_finish:
 	        rs = gecos_finish(op) ;
@@ -513,7 +524,6 @@ gecos_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (gecos_co::operator) */
+} /* end method (gecos_co::operator) */
 
 

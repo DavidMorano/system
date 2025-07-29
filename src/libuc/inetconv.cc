@@ -69,15 +69,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<strn.h>
-#include	<sfx.h>
+#include	<strn.h>		/* |strnchr(3uc)| */
+#include	<sfx.h>			/* |sfshrink(3uc)| */
 #include	<strwcpy.h>
 #include	<uinet.h>
 #include	<inaddrbad.hh>
@@ -126,9 +126,9 @@ constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 
 int inetnetpton(void *dbuf,int dlen,int af,cchar *srcbuf,int srclen) noex {
 	int		rs = SR_FAULT ;
-	if (dbuf && srcbuf) {
+	if (dbuf && srcbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if ((af >= 0) && (dlen > 0)) {
+	    if ((af >= 0) && (dlen > 0)) ylikely {
 	        cchar	*sp{} ;
 		rs = SR_DOM ;
 	        if (int sl ; (sl = sfshrink(srcbuf,srclen,&sp)) > 0) {
@@ -147,9 +147,9 @@ int inetnetpton(void *dbuf,int dlen,int af,cchar *srcbuf,int srclen) noex {
 
 int inetpton(void *addrbuf,int addrlen,int af,cchar *srcbuf,int srclen) noex {
 	int		rs = SR_FAULT ;
-	if (addrbuf && srcbuf) {
+	if (addrbuf && srcbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if ((af >= 0) && (addrlen > 0)) {
+	    if ((af >= 0) && (addrlen > 0)) ylikely {
 	        cchar	*sp{} ;
 		rs = SR_DOM ;
 	        if (int sl ; (sl = sfshrink(srcbuf,srclen,&sp)) > 0) {
@@ -189,9 +189,9 @@ int inetpton(void *addrbuf,int addrlen,int af,cchar *srcbuf,int srclen) noex {
 
 int inetntop(char *rbuf,int rlen,int af,cvoid *binaddr) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf && binaddr) {
+	if (rbuf && binaddr) ylikely {
 	    rs = SR_INVALID ;
-	    if ((af >= 0) && (rlen > 0)) {
+	    if ((af >= 0) && (rlen > 0)) ylikely {
 		rs = uc_inetntop(rbuf,rlen,af,binaddr) ;
 		if (rs == SR_NOSPC) rs = SR_OVERFLOW ; 
 	    } /* end if (valid) */

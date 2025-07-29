@@ -69,7 +69,7 @@ struct recarr_head {
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
 	int		fi ;		/* free entry index */
-	RECARR_FL	f ;
+	RECARR_FL	fl ;
 } ;
 
 typedef	RECARR		recarr ;

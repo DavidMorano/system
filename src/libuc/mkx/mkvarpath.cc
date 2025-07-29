@@ -69,8 +69,8 @@ import libutil ;
 
 #define	MKVARPATH_MP	(4*1024)
 
-#undef	CH_EXPAND
-#define	CH_EXPAND	'%'
+#undef	CHX_EXPAND
+#define	CHX_EXPAND	'%'
 
 
 /* imported namespaces */
@@ -110,10 +110,10 @@ static bufsizevar	maxpathlen(getbufsize_mp,MKVARPATH_MP) ;
 /* exported subroutines */
 
 int mkvarpath(char *rbuf,cchar *fp,int fl) noex {
-	cint		ec = CH_EXPAND ;
+	cint		ec = CHX_EXPAND ;
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
-	if (rbuf && fp) {
+	if (rbuf && fp) ylikely {
             rbuf[0] = '\0' ;
             if (fl < 0) fl = lenstr(fp) ;
             if ((fp[0] == ec) || ((fp[0] == '/') && fl && (fp[1] == ec))) {
@@ -129,7 +129,7 @@ int mkvarpath(char *rbuf,cchar *fp,int fl) noex {
                     vl = intconv(tp - vp) ;
                     rp = tp ;
                 }
-                if (vl > 0) {
+                if (vl > 0) ylikely {
                     char    *vbuf = nullptr ; /* writable (will be) */
                     if ((cp = getenver(vp,vl)) == nullptr) {
                         if (haslc(vp,vl)) {
@@ -139,8 +139,8 @@ int mkvarpath(char *rbuf,cchar *fp,int fl) noex {
                                 cp = getenver(vbuf,vl) ;
                             }
                         }
-                    }
-                    if (rs >= 0) {
+                    } /* end if (getenver) */
+                    if (rs >= 0) ylikely {
                         if (cp != nullptr) {
                             if (strchr(cp,':') != nullptr) {
                                 rs = mkvarpath_list(rbuf,cp,rp) ;
@@ -173,7 +173,7 @@ static int mkvarpath_list(char *rbuf,cchar *pathlist,cchar *rp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
-	if (vecstr paths ; (rs = vecstr_start(&paths,2,0)) >= 0) {
+	if (vecstr paths ; (rs = vecstr_start(&paths,2,0)) >= 0) ylikely {
 	    int		sl ;
 	    int		f_zero = false ;
 	    cchar	*sp = pathlist ;
@@ -204,16 +204,16 @@ static int mkvarpath_one(char *rbuf,vecstr *plp,cc *sp,int sl,cc *rp) noex {
 	int		rs1 ;
 	int		pl = 0 ;
 	if (sl < 0) sl = lenstr(sp) ;
-	if ((rs = vecstr_findn(plp,sp,sl)) == rsn) {
-	    if ((rs = vecstr_add(plp,sp,sl)) >= 0) {
+	if ((rs = vecstr_findn(plp,sp,sl)) == rsn) ylikely {
+	    if ((rs = vecstr_add(plp,sp,sl)) >= 0) ylikely {
 	        rs1 = mkvarpath_join(rbuf,sp,sl,rp) ;
 	        pl = rs1 ;
 	        if ((rs1 == SR_OVERFLOW) || (rs1 == SR_NAMETOOLONG)) {
 	            rs1 = SR_OK ;
 	            pl = 0 ;
 	        }
-	        if ((rs1 >= 0) && (pl > 0) && (rbuf[0] != '\0')) {
-	            if (USTAT sb ; (rs = u_lstat(rbuf,&sb)) >= 0) {
+	        if ((rs1 >= 0) && (pl > 0) && (rbuf[0] != '\0')) ylikely {
+	            if (ustat sb ; (rs = u_lstat(rbuf,&sb)) >= 0) {
 			rs = 0 ; /* <- dummy action */
 		    } else if (isNotPresent(rs)) {
 			rs = SR_OK ;
@@ -229,14 +229,13 @@ static int mkvarpath_one(char *rbuf,vecstr *plp,cc *sp,int sl,cc *rp) noex {
 static int mkvarpath_join(char *rbuf,cchar *sp,int sl,cchar *rp) noex {
 	int		rs ;
 	int		pl = 0 ;
-	if ((rs = maxpathlen) >= 0) {
-	    storebuf	sb(rbuf,rs) ;
-	    if ((rs = sb.strw(sp,sl)) >= 0) {
+	if ((rs = maxpathlen) >= 0) ylikely {
+	    if (storebuf sb(rbuf,rs) ; (rs = sb.strw(sp,sl)) >= 0) ylikely {
 	        if (rp) {
 	            rs = sb.strw(rp) ;
 		}
 		pl = sb.idx ;
-	    }
+	    } /* end if (storebuf) */
 	    if (rs == SR_OVERFLOW) rs = SR_NAMETOOLONG ;
 	} /* end if (maxpathlen) */
 	return (rs >= 0) ? pl : rs ;

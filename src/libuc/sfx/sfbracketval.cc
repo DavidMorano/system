@@ -64,26 +64,26 @@
 /* exported subroutines */
 
 int sfbracketval(cchar *sp,int sl,cchar **rpp) noex {
-	cchar		*cp2 ;
-	cchar		*cp3 ;
-	if ((cp2 = strnchr(sp,sl,'<')) != nullptr) {
-	    cp2 += 1 ;
-	    sl = intconv((sp + sl) - cp2) ;
-	    if ((cp3 = strnchr(cp2,sl,'>')) != nullptr) {
-	        sl = intconv(cp3 - cp2) ;
+    	if (sp) ylikely {
+	    if (cc *cp2 ; (cp2 = strnchr(sp,sl,'<')) != nullptr) {
+	        cp2 += 1 ;
+	        sl = intconv((sp + sl) - cp2) ;
+	        if (cc *cp3 ; (cp3 = strnchr(cp2,sl,'>')) != nullptr) {
+	            sl = intconv(cp3 - cp2) ;
+	        }
+	        sp = cp2 ;
+	    } /* end if */
+	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	    } /* end while */
+	    while ((sl > 0) && CHAR_ISWHITE(sp[sl - 1])) {
+	        sl -= 1 ;
 	    }
-	    sp = cp2 ;
-	} /* end if */
-	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	} /* end while */
-	while ((sl > 0) && CHAR_ISWHITE(sp[sl - 1])) {
-	    sl -= 1 ;
-	}
-	if (rpp) {
-	    *rpp = sp ;
-	}
+	} else {
+	    sl = -1 ;
+	} /* end if (non-null) */
+	if (rpp) *rpp = sp ;
 	return sl ;
 }
 /* end subroutine (sfbracketval) */

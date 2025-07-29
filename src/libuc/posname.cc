@@ -30,7 +30,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<sncpyxw.h>		/* |sncpy2w(3uc)| */
@@ -39,6 +38,7 @@
 
 #include	"posname.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -63,6 +63,10 @@ static int	posname_loadnul(posname *,cchar *,int,cchar **) noex ;
 
 /* local variables */
 
+constexpr cauto		mall = uc_libmalloc ;
+constexpr cauto		mals = uc_libmallocstrw ;
+constexpr cauto		mfre = uc_libfree ;
+
 
 /* exported variables */
 
@@ -71,12 +75,12 @@ static int	posname_loadnul(posname *,cchar *,int,cchar **) noex ;
 
 int posname_start(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (op && sp && rpp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	if (op && sp && rpp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = SR_OK ;
 	    op->as = nullptr ;
 	    *rpp = sp ;
-	    if (sl > 0) {
+	    if (sl > 0) ylikely {
 	        if (sp[0] != '/') {
 		    rs = posname_loadslash(op,sp,sl,rpp) ;
 		    sl = rs ;
@@ -93,10 +97,11 @@ int posname_start(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 int posname_finish(posname *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->as) {
-	        rs1 = uc_libfree(op->as) ;
+	    if (op->as) ylikely {
+		char *bp = cast_const<charp>(op->as) ;
+	        rs1 = mfre(bp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->as = nullptr ;
 	    }
@@ -112,15 +117,14 @@ int posname_finish(posname *op) noex {
 static int posname_loadslash(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) ylikely {
 	    cint	nlen = rs ;
-	    if ((rs = sncpy2w(nbuf,nlen,"/",sp,sl)) >= 0) {
+	    if ((rs = sncpy2w(nbuf,nlen,"/",sp,sl)) >= 0) ylikely {
 		sl = rs ;
 	        if (sl > POSNAME_SHORTLEN) {
-		    cchar	*cp{} ;
-	            if ((rs = uc_libmallocstrw(sp,sl,&cp)) >= 0) {
-	                *rpp = cp ;
+		    if (cc *cp ; (rs = mals(sp,sl,&cp)) >= 0) ylikely {
 	                op->as = cp ;
+	                *rpp = cp ;
 	            } /* end if (memory-allocation) */
 	        } else {
 	            *rpp = op->buf ;
@@ -137,10 +141,10 @@ static int posname_loadslash(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 static int posname_loadnul(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	if (sl > POSNAME_SHORTLEN) {
-	    if (cchar *cp ; (rs = uc_libmallocstrw(sp,sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = mals(sp,sl,&cp)) >= 0) ylikely {
+		op->as = cp ;
 		sl = rs ;
 		*rpp = cp ;
-		op->as = cp ;
 	    } /* end if (memory-allocation) */
 	} else {
 	    *rpp = op->buf ;
@@ -158,11 +162,11 @@ void posname::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("posname",rs,"fini-finish") ;
 	}
-}
+} /* end method (posname::dtor) */
 
 posname_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case posnamemem_finish:
 	        rs = posname_finish(op) ;

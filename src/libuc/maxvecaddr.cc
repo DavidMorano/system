@@ -27,7 +27,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -35,6 +36,7 @@
 
 #include	"maxvecaddr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -80,7 +82,7 @@ cchar *maxvecaddr(mainv va) noex {
 	        } /* end for */
 		if (sp != nullptr) {
 		    lp = sp ;
-		    lp += (strlen(sp) + 1) ;
+		    lp += (lenstr(sp) + 1) ;
 		    if (lp > maxp) maxp = lp ;
 		}
 	    } /* end block */

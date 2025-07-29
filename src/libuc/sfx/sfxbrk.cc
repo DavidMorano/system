@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* return a sub-string starting at a break character, if one is found */
+/* return a sub-string delimited by a break character, if one is found */
 /* version %I% last-modified %G% */
 
 
@@ -22,8 +22,10 @@
 	sfrbrk
 
 	Description:
-	This subroutine returns a sub-string starting at a break
-	character, if one is found within a counted source c-string.
+	This subroutine returns a sub-string delimited between
+	the start of a given string and a break character found
+	within that same given string (of one id found).  If no
+	break character is present, no-found result is returned.
 
 	Synopsis:
 	int sfobrk(cchar *sp,int sl,cchar *ss,cchar **rpp) noex
@@ -36,27 +38,20 @@
 	rpp	result pointer of beginning of found break-string
 
 	Returns:
-	>=0	length of the found break-string (from break to end of string)
+	>=0	length of the found break-string
 	<0	(will be '-1') no characters from string 'sb' present in 'sp'
-
-	Notes:
-	The resulting 'break-string', if one is found at all, starts
-	at the break character itself (not just after the
-	break-character).   The resulting (returned) length is from
-	the break character to the end of the original string.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| + |strbrk(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<strn.h>
-#include	<mkchar.h>
+#include	<strn.h>		/* |strnxbrk(3uc)| */
+#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -118,19 +113,26 @@ int sfrbrk(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
 /* local subroutines */
 
 int sfxbrk::operator () (cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
-	bool		f = false ;
+	int		rl = -1 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((rp = xbrk(sp,sl,sb)) != nullptr) {
-		f = true ;
-		sl -= intconv(rp - sp) ;
-	    }
+	    if (sl > 0) ylikely {
+	        while (sl && CHAR_ISWHITE(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        }
+	        if ((rp = xbrk(sp,sl,sb)) != nullptr) {
+		    rl = intconv(rp - sp) ;
+		    rp = sp ;
+	            while (rl && CHAR_ISWHITE(rp[rl - 1])) {
+	                rl -= 1 ;
+	            }
+	        } /* end if (hit) */
+	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
-	if (rpp) {
-	    *rpp = (f) ? rp : nullptr ;
-	}
-	return (f) ? sl : -1 ;
+	if (rpp) *rpp = rp ;
+	return rl ;
 } /* end method (sfxbrk:operator) */
 
 

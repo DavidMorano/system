@@ -41,12 +41,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<varnames.hh>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<userinfo.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
@@ -86,45 +87,45 @@ constexpr bool	f_mailname  = CF_MAILNAME ;
 
 /* exported subroutines */
 
-int uibang(USERINFO *uip,char *rbuf,int rlen) noex {
+int uibang(userinfo *uip,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf && uip) {
+	if (rbuf && uip) ylikely {
 	    rbuf[0] = '\0' ;
 	    rs = SR_INVALID ;
-	    if (rlen >= 0) {
-	        cchar	*np = nullptr ;
+	    if (rlen >= 0) ylikely {
+	        cchar	*sp = nullptr ;
 	        if_constexpr (f_fullname) {
-	            if (np == NULL) {
+	            if (sp == nullptr) {
 	                if (uip->fullname && (uip->fullname[0] != '\0')) {
-	                    np = uip->fullname ;
+	                    sp = uip->fullname ;
 	                }
 	            }
 	        } /* end if_constexpr (f_fullname) */
-	        if (np == NULL) {
+	        if (sp == nullptr) {
 	            if (uip->name && (uip->name[0] != '\0')) {
-	                np = uip->name ;
+	                sp = uip->name ;
 	            }
 	        }
 	        if_constexpr (f_mailname) {
-	            if (np == NULL) {
+	            if (sp == nullptr) {
 	                if (uip->mailname && (uip->mailname[0] != '\0')) {
-	                    np = uip->mailname ;
+	                    sp = uip->mailname ;
 	                }
 	            }
 	        } /* end if_constexpr (f_mailname) */
-	        if (np == NULL) {
+	        if (sp == nullptr) {
 	            if (uip->fullname && (uip->fullname[0] != '\0')) {
-	                np = uip->fullname ;
+	                sp = uip->fullname ;
 	            }
 	        }
 	        {
 	            cchar	*nn = uip->nodename ;
 	            cchar	*un = uip->username ;
 	            rs = SR_NOTFOUND ;
-	            if (np != NULL) {
-	               rs = sncpy6(rbuf,rlen,nn,"!",un," (",np,")") ;
+	            if (sp != nullptr) {
+	               rs = sncpy6(rbuf,rlen,nn,"!",un," (",sp,")") ;
 	            }
-	            if ((rs == SR_OVERFLOW) || np) {
+	            if ((rs == SR_OVERFLOW) || snp) {
 	               rs = sncpy3(rbuf,rlen,nn,"!",un) ;
 	            }
 	        } /* end block */

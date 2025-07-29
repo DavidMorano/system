@@ -77,12 +77,14 @@
 /* exported subroutines */
 
 int nleadkeystr(cchar *bs,cchar *sp,int sl) noex {
-	int		i{} ; /* used-afterwards */
-	if (sl < 0) sl = INT_MAX ;
-	for (i = 0 ; (i < sl) && bs[i] && sp[i] ; i += 1) {
-	    if (bs[i] != sp[i]) break ;
-	    if ((bs[i] == '=') || (sp[i] == '=')) break ;
-	} /* end for */
+	int		i = -1 ; /* return-value */
+	if (bs) ylikely {
+	    if (sl < 0) sl = INT_MAX ;
+	    for (i = 0 ; (i < sl) && bs[i] && sp[i] ; i += 1) {
+	        if (bs[i] != sp[i]) break ;
+	        if ((bs[i] == '=') || (sp[i] == '=')) break ;
+	    } /* end for */
+	} /* end if (non-null) */
 	return i ;
 }
 /* end subroutine (nleadkeystr) */

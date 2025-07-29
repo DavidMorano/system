@@ -48,12 +48,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| + |strbrk(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnobrk(3uc)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 

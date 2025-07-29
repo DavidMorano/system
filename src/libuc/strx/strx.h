@@ -13,6 +13,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>
+#include	<stdlib.h>
 #include	<string.h>		/* |strchr(3c)| + |strpbrk(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -25,6 +27,9 @@
 #include	<strerrabbr.h>
 #include	<strsigabbr.h>
 #include	<straltwchar.h>
+#include	<strcpyxc.h>
+#include	<strlinelen.h>
+#include	<strlocktype.h>
 
 
 EXTERNC_begin

@@ -1,4 +1,5 @@
 /* maxvecaddr HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* Maximum-Vector-Address (see SUPPORT source file for more information) */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<usysdefs.h>
 
 

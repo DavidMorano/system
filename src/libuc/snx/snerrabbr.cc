@@ -53,15 +53,18 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<sncpyx.h>
 #include	<ctdec.h>
 #include	<localmisc.h>
@@ -98,11 +101,11 @@ extern "C" {
 
 int snerrabbr(char *dbuf,int dlen,int n) noex {
 	int		rs = SR_FAULT ;
-	if (dbuf) {
+	if (dbuf) ylikely {
 	    if (cchar *s ; (s = strerrabbr(n)) != nullptr) {
-	        rs = sncpy1(dbuf,dlen,s) ;
+	        rs = sncpy(dbuf,dlen,s) ;
 	    } else {
-	        rs = ctdeci(dbuf,dlen,n) ;
+	        rs = ctdec(dbuf,dlen,n) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;

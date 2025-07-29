@@ -191,7 +191,11 @@ extern int vechand_finish(vechand *) noex ;
 
 EXTERNC_end
 
-extern vechandms	vechandm ;
+#ifdef	__cplusplus
+
+extern const vechandms	vechandm ;
+
+#endif /* __cplusplus */
 
 
 #endif /* VECHAND_INCLUDE */

@@ -42,10 +42,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<ctime>
+#include	<sys/types.h>		/* |pid_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<usystem.h>		/* |getustime(3u)| */
 #include	<sbuf.h>
 #include	<localmisc.h>
 
@@ -78,10 +78,10 @@
 int mkmid(char *rbuf,int rlen,cchar *dn,cchar *nn,pid_t pid,int serial) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (rbuf && dn && nn) {
+	if (rbuf && dn && nn) ylikely {
 	    rs = SR_INVALID ;
-	    if (dn[0] && nn[0] && (pid >= 0)) {
-	        if (sbuf mb ; (rs = mb.start(rbuf,rlen)) >= 0) {
+	    if (dn[0] && nn[0] && (pid >= 0)) ylikely {
+	        if (sbuf mb ; (rs = mb.start(rbuf,rlen)) >= 0) ylikely {
 		    {
 	                custime		dt = getustime ;
 	                uint		uv = uint(pid) ;

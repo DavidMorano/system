@@ -55,12 +55,13 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdarg>
 #include	<cstdio>
 #include	<algorithm>		/* |min(3c++)| + |mac(3c++)| */
@@ -111,11 +112,11 @@ using std::nothrow ;			/* constant */
 int snwvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf && fmt && ap) {
+	if (rbuf && fmt && ap) ylikely {
 	    rs = SR_INVALID ;
-	    if ((rlen >= 0) && fmt[0]) {
+	    if ((rlen >= 0) && fmt[0]) ylikely {
 		csize	rsize = size_t(rlen) ;
-		if ((rs = vsnprintf(rbuf,(rsize+1),fmt,ap)) >= 0) {
+		if ((rs = vsnprintf(rbuf,(rsize+1),fmt,ap)) >= 0) ylikely {
 		    len = min(rs,rlen) ;
 		} else {
 		    rs = SR_BADFMT ;
@@ -129,15 +130,17 @@ int snwvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 int snwprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
-	if (rbuf && fmt) {
+	int		len = 0 ;
+	if (rbuf && fmt) ylikely {
 	    rs = SR_INVALID ;
-	    if ((rlen >= 0) && fmt[0]) {
+	    if ((rlen >= 0) && fmt[0]) ylikely {
 		va_begin(ap,fmt) ;
 		rs = snwvprintf(rbuf,rlen,fmt,ap) ;
+		len = rs ;
 		va_end(ap) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (snwprintf) */
 

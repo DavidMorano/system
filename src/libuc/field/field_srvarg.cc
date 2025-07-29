@@ -66,10 +66,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<ascii.h>
 #include	<baops.h>
 #include	<fieldterms.h>
@@ -148,170 +151,170 @@ int field_srvarg(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	int		rs = SR_OK ;
 	int		fl = 0 ;
-	    int		ch ;
-	    int		nch ;
-	    int		qe ;
-	    int		chterm = '\0' ;
-	    int		ll = fsbp->ll ;
-	    cchar	*lp = fsbp->lp ;
-	    char	*bp = abuf ;
-	    while ((ll > 0) && char_iswhite(*lp)) {
-	        lp += 1 ;
-	        ll -= 1 ;
-	    }
-	    while (ll > 0) {
-	        ch = mkchar(*lp) ;
-	        if (batst(terms,ch)) break ;
-	        if (ch == '\"') {
-	            if (alen > 0) {
-	                *bp++ = charconv(ch) ;
-	                alen -= 1 ;
-	            }
-	            qe = ch ;
-		    lp += 1 ;
-	            ll -= 1 ;
-	            while (ll > 0) {
-	                ch = mkchar(*lp) ;
-		        if (ll > 1) nch = mkchar(lp[1]) ;
-	                if ((ch == '\\') && (ll > 1) && batst(doubles,nch)) {
-	                    if (alen > 0) {
-	                        *bp++ = charconv(ch) ;
-	                        alen -= 1 ;
-	                    }
-	                    lp += 1 ;
-	                    ll -= 1 ;
-	                    ch = mkchar(*lp) ;
-	                    if (alen > 0) {
-	                        *bp++ = charconv(ch) ;
-	                        alen -= 1 ;
-	                    }
-	                    lp += 1 ;
-	                    ll -= 1 ;
-	                } else if (ch == qe) {
-	                    if (alen > 0) {
-	                        *bp++ = charconv(ch) ;
-	                        alen -= 1 ;
-	                    }
-	                    lp += 1 ;
-	                    ll -= 1 ;
-	                    break ;
-	                } else {
-	                    if (alen > 0) {
-	                        *bp++ = charconv(ch) ;
-	                        alen -= 1 ;
-	                    }
-	                    lp += 1 ;
-	                    ll -= 1 ;
-	                } /* end if */
-	            } /* end while (processing the quoted portion) */
-	        } else if (ch == '\'') {
-	            if (alen > 0) {
-	                *bp++ = charconv(ch) ;
-	                alen -= 1 ;
-	            }
-	            qe = ch ;
-		    lp += 1 ;
-	            ll -= 1 ;
-	            while (ll > 0) {
-	                ch = mkchar(*lp) ;
-	                if (ch == qe) {
-	                    if (alen > 0) {
-	                        *bp++ = charconv(ch) ;
-	                        alen -= 1 ;
-	                    }
-	                    lp += 1 ;
-	                    ll -= 1 ;
-	                    break ;
-	                } else {
-	                    if (alen > 0) {
-	                        *bp++ = charconv(ch) ;
-	                        alen -= 1 ;
-	                    }
-	                    lp += 1 ;
-	                    ll -= 1 ;
-	                } /* end if */
-	            } /* end while (processing the quoted portion) */
-	        } else if (ch == '<') {
-	            qe = '>' ;
-	            lp += 1 ;
-	            ll -= 1 ;
-	            while (ll > 0) {
-	                ch = mkchar(*lp) ;
-		        if (ll > 1) nch = mkchar(lp[1]) ;
-	                if ((ch == '\\') && (ll > 1) && batst(doubles,nch)) {
-	                    if (alen > 0) {
-	                        *bp++ = charconv(ch) ;
-	                        alen -= 1 ;
-	                    }
-	                    lp += 1 ;
-	                    ll -= 1 ;
-	                    ch = mkchar(*lp) ;
-	                    if (alen > 0) {
-	                        *bp++ = charconv(ch) ;
-	                        alen -= 1 ;
-	                    }
-	                    lp += 1 ;
-	                    ll -= 1 ;
-	                } else if (ch == qe) {
-	                    lp += 1 ;
-	                    ll -= 1 ;
-	                    break ;
-	                } else {
-	                    if (alen > 0) {
-	                        *bp++ = charconv(ch) ;
-	                        alen -= 1 ;
-	                    }
-	                    lp += 1 ;
-	                    ll -= 1 ;
-	                } /* end if */
-	            } /* end while (processing the quoted portion) */
-	        } else if ((ch == '\\') && (ll > 1)) {
-	            if (alen > 0) {
-	                *bp++ = charconv(ch) ;
-	                alen -= 1 ;
-	            }
-	            lp += 1 ;
-	            ll -= 1 ;
-	            ch = mkchar(*lp) ;
-	            if (alen > 0) {
-	                *bp++ = charconv(ch) ;
-	                alen -= 1 ;
-	            }
-	            lp += 1 ;
-	            ll -= 1 ;
-	        } else {
-	            if (alen > 0) {
-	                *bp++ = charconv(ch) ;
-	                alen -= 1 ;
-	            }
-	            lp += 1 ;
-	            ll -= 1 ;
-	        } /* end if */
-	    } /* end while */
-	    if (ll > 0) {
-	        chterm = ' ' ;
-	        ch = mkchar(*lp) ;
-	        if (batst(terms,ch)) {
-	            chterm = ch ;
-	            lp += 1 ;
-	            ll -= 1 ;
-	        } /* end if (it was a terminator) */
-	    } /* end if (some remaining length) */
-	    while ((ll > 0) && char_iswhite(*lp)) {
-	        lp += 1 ;
-	        ll -= 1 ;
-	    } /* end while */
-	    fl = intconv(bp - abuf) ;
-	    if_constexpr (f_trailwhite) {
-	        while ((fl > 0) && char_iswhite(abuf[fl - 1])) {
-		    fl -= 1 ;
-	        }
-	    } /* end if_constexpr (f_trailwhite) */
-	    fsbp->lp = lp ;
-	    fsbp->ll = ll ;
-	    fsbp->fp = (fl >= 0) ? abuf : nullptr ;
-	    fsbp->fl = fl ;
-	    fsbp->term = chterm ;
+        int         ch ; /* used-multiple-blocks */
+        int         nch ;
+        int         qe ;
+        int         chterm = '\0' ;
+        int         ll = fsbp->ll ;
+        cchar       *lp = fsbp->lp ;
+        char        *bp = abuf ;
+        while ((ll > 0) && char_iswhite(*lp)) {
+            lp += 1 ;
+            ll -= 1 ;
+        }
+        while (ll > 0) {
+            ch = mkchar(*lp) ;
+            if (batst(terms,ch)) break ;
+            if (ch == '\"') {
+                if (alen > 0) {
+                    *bp++ = charconv(ch) ;
+                    alen -= 1 ;
+                }
+                qe = ch ;
+                lp += 1 ;
+                ll -= 1 ;
+                while (ll > 0) {
+                    ch = mkchar(*lp) ;
+                    if (ll > 1) nch = mkchar(lp[1]) ;
+                    if ((ch == '\\') && (ll > 1) && batst(doubles,nch)) {
+                        if (alen > 0) {
+                            *bp++ = charconv(ch) ;
+                            alen -= 1 ;
+                        }
+                        lp += 1 ;
+                        ll -= 1 ;
+                        ch = mkchar(*lp) ;
+                        if (alen > 0) {
+                            *bp++ = charconv(ch) ;
+                            alen -= 1 ;
+                        }
+                        lp += 1 ;
+                        ll -= 1 ;
+                    } else if (ch == qe) {
+                        if (alen > 0) {
+                            *bp++ = charconv(ch) ;
+                            alen -= 1 ;
+                        }
+                        lp += 1 ;
+                        ll -= 1 ;
+                        break ;
+                    } else {
+                        if (alen > 0) {
+                            *bp++ = charconv(ch) ;
+                            alen -= 1 ;
+                        }
+                        lp += 1 ;
+                        ll -= 1 ;
+                    } /* end if */
+                } /* end while (processing the quoted portion) */
+            } else if (ch == '\'') {
+                if (alen > 0) {
+                    *bp++ = charconv(ch) ;
+                    alen -= 1 ;
+                }
+                qe = ch ;
+                lp += 1 ;
+                ll -= 1 ;
+                while (ll > 0) {
+                    ch = mkchar(*lp) ;
+                    if (ch == qe) {
+                        if (alen > 0) {
+                            *bp++ = charconv(ch) ;
+                            alen -= 1 ;
+                        }
+                        lp += 1 ;
+                        ll -= 1 ;
+                        break ;
+                    } else {
+                        if (alen > 0) {
+                            *bp++ = charconv(ch) ;
+                            alen -= 1 ;
+                        }
+                        lp += 1 ;
+                        ll -= 1 ;
+                    } /* end if */
+                } /* end while (processing the quoted portion) */
+            } else if (ch == '<') {
+                qe = '>' ;
+                lp += 1 ;
+                ll -= 1 ;
+                while (ll > 0) {
+                    ch = mkchar(*lp) ;
+                    if (ll > 1) nch = mkchar(lp[1]) ;
+                    if ((ch == '\\') && (ll > 1) && batst(doubles,nch)) {
+                        if (alen > 0) {
+                            *bp++ = charconv(ch) ;
+                            alen -= 1 ;
+                        }
+                        lp += 1 ;
+                        ll -= 1 ;
+                        ch = mkchar(*lp) ;
+                        if (alen > 0) {
+                            *bp++ = charconv(ch) ;
+                            alen -= 1 ;
+                        }
+                        lp += 1 ;
+                        ll -= 1 ;
+                    } else if (ch == qe) {
+                        lp += 1 ;
+                        ll -= 1 ;
+                        break ;
+                    } else {
+                        if (alen > 0) {
+                            *bp++ = charconv(ch) ;
+                            alen -= 1 ;
+                        }
+                        lp += 1 ;
+                        ll -= 1 ;
+                    } /* end if */
+                } /* end while (processing the quoted portion) */
+            } else if ((ch == '\\') && (ll > 1)) {
+                if (alen > 0) {
+                    *bp++ = charconv(ch) ;
+                    alen -= 1 ;
+                }
+                lp += 1 ;
+                ll -= 1 ;
+                ch = mkchar(*lp) ;
+                if (alen > 0) {
+                    *bp++ = charconv(ch) ;
+                    alen -= 1 ;
+                }
+                lp += 1 ;
+                ll -= 1 ;
+            } else {
+                if (alen > 0) {
+                    *bp++ = charconv(ch) ;
+                    alen -= 1 ;
+                }
+                lp += 1 ;
+                ll -= 1 ;
+            } /* end if */
+        } /* end while */
+        if (ll > 0) {
+            chterm = ' ' ;
+            ch = mkchar(*lp) ;
+            if (batst(terms,ch)) {
+                chterm = ch ;
+                lp += 1 ;
+                ll -= 1 ;
+            } /* end if (it was a terminator) */
+        } /* end if (some remaining length) */
+        while ((ll > 0) && char_iswhite(*lp)) {
+            lp += 1 ;
+            ll -= 1 ;
+        } /* end while */
+        fl = intconv(bp - abuf) ;
+        if_constexpr (f_trailwhite) {
+            while ((fl > 0) && char_iswhite(abuf[fl - 1])) {
+                fl -= 1 ;
+            }
+        } /* end if_constexpr (f_trailwhite) */
+        fsbp->lp = lp ;
+        fsbp->ll = ll ;
+        fsbp->fp = (fl >= 0) ? abuf : nullptr ;
+        fsbp->fl = fl ;
+        fsbp->term = chterm ;
 	return (rs >= 0) ? fl : rs ;
 }
 /* end subroutine (field_srvarger) */

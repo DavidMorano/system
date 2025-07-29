@@ -100,7 +100,7 @@ static vars	var ;
 int findfile(ids *idp,vecstr *plp,int am,char *pbuf,cc *fbuf,int flen) noex {
 	int		rs = SR_FAULT ;
 	int		pl = 0 ; /* return-value */
-	if (idp && plp && pbuf && fbuf) {
+	if (idp && plp && pbuf && fbuf) ylikely {
     	    static cint		rsv = var ;
 	    pbuf[0] = '\0' ;
 	    if ((rs = rsv) >= 0) {
@@ -111,7 +111,7 @@ int findfile(ids *idp,vecstr *plp,int am,char *pbuf,cc *fbuf,int flen) noex {
 	        if (flen != 0) {
 	            bool f_done = false ;
 	            if (strnchr(fbuf,flen,'/') != nullptr) {
-	                if ((rs = mkpath1w(pbuf,fbuf,flen)) >= 0) {
+	                if ((rs = mkpath1w(pbuf,fbuf,flen)) >= 0) ylikely {
 	                    pl = rs ;
 		            if ((rs = fileperm(idp,pbuf,am)) >= 0) {
 		                f_done = true ;
@@ -152,7 +152,7 @@ static int mkfpathw(char *pbuf,cc *pp,cc *fbuf,int flen) noex {
 	int		rs = SR_OK ;
 	int		pl = 0 ;
 	if (pp[0] != '\0') {
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = storebuf_strw(pbuf,plen,pl,pp,-1) ;
 	        pl += rs ;
 	    }
@@ -184,7 +184,7 @@ static int fileperm(ids *idp,cchar *fname,int am) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
 	}
 	return rs ;

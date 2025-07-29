@@ -55,7 +55,7 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
@@ -63,8 +63,8 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<cstdarg>
+#include	<cstdarg>		/* |va_list(3c)| */
+#include	<cstring>		/* |strlcpy(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -131,24 +131,24 @@ int sncpy6w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,
 int sncpyxw(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;
-	char		*bp = dp ;
+	int		rl = 0 ; /* return-value */
 	if (dl < 0) dl = (INT_MAX - 1) ;
-	if (dp) {
+	if (dp) ylikely {
 	    size_t	rmlen = (dl + 1) ;
+	    char	*bp = dp ;
 	    va_begin(ap,n) ;
 	    rs = SR_OK ;
 	    dp[0] = '\0' ;
 	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 		size_t	ml ;
-	        cc	*sp = (const char *) va_arg(ap,char *) ;
+	        cc	*sp = (cchar *) va_arg(ap,char *) ;
 	        if (i < (n-1)) {
 	            ml = strlcpy(bp,sp,rmlen) ;
 	            if (ml < rmlen) bp += ml ;
 	        } else { /* emulate |strlcpy(3c)| but w/ given length */
 	            int		sl = (int) va_arg(ap,int) ;
 		    ml = 0 ;
-		    while ((ml < (rmlen-1)) && sl-- && *sp) {
+		    while ((ml < (rmlen - 1)) && sl-- && *sp) {
 		        *bp++ = *sp++ ;
 		        ml += 1 ;
 		    }

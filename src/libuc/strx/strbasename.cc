@@ -34,13 +34,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
+import libutil ;
 
 /* local defines */
 
@@ -52,7 +52,7 @@
 
 char *strbasename(char *s) noex {
 	int		si = 0 ;
-	int		sl = strlen(s) ;
+	int		sl = lenstr(s) ;
 	/* remove trailing slash characters */
 	while ((sl > 1) && (s[sl - 1] == '/')) {
 	    sl -= 1 ;

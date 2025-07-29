@@ -247,6 +247,13 @@ static inline unixret_t piper(int *fds,int fl) noex {
 EXTERNC_end
 #endif /* SUBROUTINE_PIPER */
 
+#ifndef	DECLARATION_STRBRK
+#define	DECLARATION_STRBRK
+EXTERNC_begin
+extern char *strbrk(cchar *,cchar *) noex ;
+EXTERNC_end
+#endif /* DECLARATION_STRBRK */
+
 
 #endif /* USYSXXX_INCLUDE */
 

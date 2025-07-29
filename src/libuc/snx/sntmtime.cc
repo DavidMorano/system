@@ -106,23 +106,25 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
 #include	<cstddef>
 #include	<cstdlib>		/* for |abs(3c)| */
-#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<calstrs.h>
 #include	<sbuf.h>
 #include	<zoffparts.h>
-#include	<mkchar.h>
 #include	<ctdec.h>
 #include	<ctdecp.h>
+#include	<mkchar.h>
 #include	<localmisc.h>		/* |NYEARS_CENTURY| */
 
 #include	"sntmtime.h"
@@ -168,8 +170,8 @@ constexpr int		nyears = NYEARS_CENTURY ;
 int sntmtime(char *dbuf,int dlen,tmtime *tmp,cchar *fmt) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (dbuf && tmp && fmt) {
-	    if (sbuf ss ; (rs = ss.start(dbuf,dlen)) >= 0) {
+	if (dbuf && tmp && fmt) ylikely {
+	    if (sbuf ss ; (rs = ss.start(dbuf,dlen)) >= 0) ylikely {
 	        {
 	            rs = sbuf_fmtstrs(&ss,tmp,fmt) ;
 	        }
@@ -186,7 +188,7 @@ int sntmtime(char *dbuf,int dlen,tmtime *tmp,cchar *fmt) noex {
 
 static int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	int		rs = SR_FAULT ;
-	if (ssp && tmp) {
+	if (ssp && tmp) ylikely {
 	    mainv	monp = calstrs_months ;
 	    mainv	dayp = calstrs_days ;
 	    rs = SR_OK ;
@@ -374,7 +376,7 @@ static int sbuf_digs(sbuf *ssp,int v,int n,int f_space) noex {
 	    } /* end if (space) */
 	    break ;
 	} /* end switch */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rs = sbuf_strw(ssp,dbuf,n) ;
 	}
 	return rs ;
@@ -385,7 +387,7 @@ static int sbuf_year(sbuf *ssp,tmtime *tmp) noex {
 	cint		y = ((tmp->year + TM_YEAR_BASE)%10000) ;
 	int		rs ;
 	char		dbuf[4+1] ;
-	if ((rs = ctdecpi(dbuf,4,4,y)) >= 0) { /* leading zeros to 4 digits */
+	if ((rs = ctdecpi(dbuf,4,4,y)) >= 0) ylikely {
 	    rs = sbuf_strw(ssp,dbuf,4) ;
 	}
 	return rs ;
@@ -394,11 +396,11 @@ static int sbuf_year(sbuf *ssp,tmtime *tmp) noex {
 
 static int sbuf_coder(sbuf *ssp,tmtime *tmp,int f_sec) noex {
 	int		rs ;
-	if ((rs = sbuf_twodig(ssp,tmp->hour)) >= 0) {
-	    if ((rs = sbuf_chr(ssp,':')) >= 0) {
-	        if ((rs = sbuf_twodig(ssp,tmp->min)) >= 0) {
+	if ((rs = sbuf_twodig(ssp,tmp->hour)) >= 0) ylikely {
+	    if ((rs = sbuf_chr(ssp,':')) >= 0) ylikely {
+	        if ((rs = sbuf_twodig(ssp,tmp->min)) >= 0) ylikely {
 		    if (f_sec) {
-			if ((rs = sbuf_chr(ssp,':')) >= 0) {
+			if ((rs = sbuf_chr(ssp,':')) >= 0) ylikely {
 	        	    rs = sbuf_twodig(ssp,tmp->sec) ;
 			}
 		    }
@@ -414,10 +416,10 @@ static int sbuf_zoff(sbuf *ssp,tmtime *tmp) noex {
 	int		rs ;
 	{
 	    cint	ch = ((zo >= 0) ? '-' : '+') ;
-	    if ((rs = sbuf_chr(ssp,ch)) >= 0) {
+	    if ((rs = sbuf_chr(ssp,ch)) >= 0) ylikely {
 	        cint	zh = abs(zo / 60) % 100 ;
 	        cint	zm = abs(zo % 60) ;
-	        if ((rs = sbuf_twodig(ssp,zh)) >= 0) {
+	        if ((rs = sbuf_twodig(ssp,zh)) >= 0) ylikely {
 	    	    rs = sbuf_twodig(ssp,zm) ;
 		}
 	    }
@@ -428,10 +430,10 @@ static int sbuf_zoff(sbuf *ssp,tmtime *tmp) noex {
 
 static int sbuf_dated(sbuf *ssp,tmtime *tmp) noex {
 	int		rs ;
-	if ((rs = sbuf_twodig(ssp,(tmp->mon+1))) >= 0) {
-	    if ((rs = sbuf_chr(ssp,'/')) >= 0) {
-	        if ((rs = sbuf_twodig(ssp,tmp->mday)) >= 0) {
-	    	    if ((rs = sbuf_chr(ssp,'/')) >= 0) {
+	if ((rs = sbuf_twodig(ssp,(tmp->mon+1))) >= 0) ylikely {
+	    if ((rs = sbuf_chr(ssp,'/')) >= 0) ylikely {
+	        if ((rs = sbuf_twodig(ssp,tmp->mday)) >= 0) ylikely {
+	    	    if ((rs = sbuf_chr(ssp,'/')) >= 0) ylikely {
 	        	int	y ;
 	        	y = ((tmp->year+TM_YEAR_BASE)%nyears) ;
 	        	rs = sbuf_twodig(ssp,y) ;
@@ -445,10 +447,10 @@ static int sbuf_dated(sbuf *ssp,tmtime *tmp) noex {
 
 static int sbuf_dater(sbuf *ssp,tmtime *tmp) noex {
 	int		rs ;
-	if ((rs = sbuf_year(ssp,tmp)) >= 0) {
-	    if ((rs = sbuf_chr(ssp,'-')) >= 0) {
-	        if ((rs = sbuf_twodig(ssp,(tmp->mon+1))) >= 0) {
-	    	    if ((rs = sbuf_chr(ssp,'-')) >= 0) {
+	if ((rs = sbuf_year(ssp,tmp)) >= 0) ylikely {
+	    if ((rs = sbuf_chr(ssp,'-')) >= 0) ylikely {
+	        if ((rs = sbuf_twodig(ssp,(tmp->mon+1))) >= 0) ylikely {
+	    	    if ((rs = sbuf_chr(ssp,'-')) >= 0) ylikely {
 			rs = sbuf_twodig(ssp,tmp->mday) ;
 		    }
 		}
@@ -460,11 +462,11 @@ static int sbuf_dater(sbuf *ssp,tmtime *tmp) noex {
 
 static int sbuf_datex(sbuf *ssp,tmtime *tmp) noex {
 	int		rs ;
-	if ((rs = sbuf_twodig(ssp,tmp->mday)) >= 0) {
-	    if ((rs = sbuf_chr(ssp,' ')) >= 0) {
+	if ((rs = sbuf_twodig(ssp,tmp->mday)) >= 0) ylikely {
+	    if ((rs = sbuf_chr(ssp,' ')) >= 0) ylikely {
 		cchar	*const *m = calstrs_months ;
-	        if ((rs = sbuf_strw(ssp,m[tmp->mon],3)) >= 0) {
-	    	    if ((rs = sbuf_chr(ssp,' ')) >= 0) {
+	        if ((rs = sbuf_strw(ssp,m[tmp->mon],3)) >= 0) ylikely {
+	    	    if ((rs = sbuf_chr(ssp,' ')) >= 0) ylikely {
 	        	rs = sbuf_year(ssp,tmp) ;
 		    }
 		}

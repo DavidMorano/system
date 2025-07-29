@@ -54,7 +54,7 @@
 /* local defines */
 
 
-/* imported spaces */
+/* imported namespaces */
 
 
 /* local typedefs */
@@ -86,7 +86,7 @@ int obuf::istart() noex {
 } /* end method (obuf::istart) */
 
 int obuf::ifinish() noex {
-    	cint	rs = ilen() ;
+    	cint		rs = ilen() ;
     	fl.open = false ;
     	return rs ;
 } /* end method (obuf::ifinish) */
@@ -104,7 +104,7 @@ int obuf::push(int ch) noex {
 	    rs = SR_NOMEM ;
 	}
 	return rs ;
-}
+} /* end method (obuf::push) */
 
 int obuf::adv(int al) noex {
     	csize		bsize = b.size() ;
@@ -133,14 +133,13 @@ int obuf::adv(int al) noex {
 	    }
 	} /* end if */
 	return rl ;
-}
-/* end subroutine (obuf::adv) */
+} /* end method (obuf::adv) */
 
 void obuf::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("obuf",rs,"fini-finish") ;
 	}
-}
+} /* end method (obuf::dtor) */
 
 obuf_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -161,7 +160,6 @@ obuf_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (obuf_co::operator) */
+} /* end method (obuf_co::operator) */
 
 

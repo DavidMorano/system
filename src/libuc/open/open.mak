@@ -40,23 +40,6 @@ MODS +=
 LIBS +=
 
 
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
-
-
 OBJ0_OPEN= openaddrinfo.o opensockaddr.o openshm.o
 OBJ1_OPEN= openport.o openportmsg.o
 OBJ2_OPEN= opendefstds.o opensysfs.o opentmp.o
@@ -69,6 +52,22 @@ OBJA= obj0_open.o obj1_open.o obj2_open.o
 OBJB= obj3_open.o obj4_open.o obj5_open.o obj6_open.o
 
 OBJ_OPEN= obja.o objb.o
+
+
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -104,13 +103,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_OPEN)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_OPEN)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)

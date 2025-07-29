@@ -50,6 +50,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<ubufdefs.h>
 
 #include	<aflag.hh>
 #include	<endian.h>
@@ -61,6 +62,8 @@
 #include	<usysutility.hh>
 #include	<usysauxinfo.h>
 #include	<usysdata.h>
+
+#include	<ustd.h>	/* <- converted system calls */
 
 #include	<ugetloadavg.h>	/* load-average retrieval |u_getloadavg| */
 #include	<um.h>		/* UNIX® memory-management */

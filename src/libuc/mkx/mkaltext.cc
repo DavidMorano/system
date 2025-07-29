@@ -40,12 +40,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strrchr(3c)| */
-#include	<usystem.h>
+#include	<cstring>		/* |strrchr(3c)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<bufsizevar.hh>
 #include	<sbuf.h>
 #include	<localmisc.h>
@@ -81,12 +84,12 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 int mkaltext(char *dbuf,cchar *name,cchar *ext) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (dbuf && name && ext) {
+	if (dbuf && name && ext) ylikely {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
-	        if (cchar *tp ; (tp = strrchr(name,'.')) != nullptr) {
-	            if (tp[1] != '\0') {
-			if ((rs = maxpathlen) >= 0) {
+	        if (cchar *tp ; (tp = strrchr(name,'.')) != nullptr) ylikely {
+	            if (tp[1] != '\0') ylikely {
+			if ((rs = maxpathlen) >= 0) ylikely {
 	                    cint	dlen = rs ;
 	                    if (sbuf alt ; (rs = alt.start(dbuf,dlen)) >= 0) {
 		                {

@@ -56,8 +56,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<estrings.h>
 #include	<ema.h>
 #include	<isoneof.h>
@@ -65,6 +68,7 @@
 
 #include	"mkx.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -111,7 +115,7 @@ static constexpr int	rsbadaddr[] = {
 	0
 } ;
 
-constexpr bool		f_massage = CF_MASSAGE ;
+cbool		f_massage = CF_MASSAGE ;
 
 
 /* exported variables */
@@ -122,12 +126,12 @@ constexpr bool		f_massage = CF_MASSAGE ;
 int mkaddrfrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (fbuf && sp) {
+	if (fbuf && sp) ylikely {
 	    rs = SR_INVALID ;
 	    fbuf[0] = '\0' ;
-	    if (sp[0]) {
-	        if (sl < 0) sl = strlen(sp) ;
-	        if (sl > 0)  {
+	    if (sp[0]) ylikely {
+	        if (sl < 0) sl = lenstr(sp) ;
+	        if (sl > 0) ylikely {
 	            rs = mkaddrx(fbuf,flen,sp,sl) ;
 		    len = rs ;
 	        } /* end if (non-zero source) */
@@ -141,13 +145,12 @@ int mkaddrfrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 /* local subroutines */
 
 static int mkaddrx(char *rbuf,int rlen,cchar *sp,int sl) noex {
-	ema		a ;
-	ema_ent		*ep ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-        if ((rs = ema_start(&a)) >= 0) {
-            if ((rs = ema_parse(&a,sp,sl)) >= 0) {
+	if (ema a ; (rs = ema_start(&a)) >= 0) ylikely {
+            if ((rs = ema_parse(&a,sp,sl)) >= 0) ylikely {
+		ema_ent		*ep ;
                 auto        eg = ema_get ;
                 cint        rsn = SR_NOTFOUND ;
                 for (int i = 0 ; (rs1 = eg(&a,i,&ep)) >= 0 ; i += 1) {
@@ -212,7 +215,7 @@ static int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
 	        } /* end switch */
 	    } /* end if (positive) */
 	} else {
-	    if ((rp != nullptr) && (nl > 0)) {
+	    if ((rp != nullptr) && (nl > 0)) ylikely {
 	        switch (atype) {
 	        case atype_comment:
 	        case atype_address:

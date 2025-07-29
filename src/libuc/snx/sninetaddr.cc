@@ -55,16 +55,20 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<netinet/in.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)|+ |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<uinet.h>		/* |AF_INET4| */
 #include	<inetaddr.h>
 #include	<sncpyx.h>
 #include	<strdcpyx.h>
@@ -142,7 +146,7 @@ constexpr bool		f_cthexuc = CF_CTHEXUC ;
 
 int sninetaddr(char *dbuf,int dlen,int af,cchar *addr) noex {
 	int		rs = SR_FAULT ;
-	if (dbuf && addr) {
+	if (dbuf && addr) ylikely {
 	    switch (af) {
 	    case AF_UNIX:
 	        rs = snunix(dbuf,dlen,addr) ;
@@ -179,8 +183,8 @@ static int snunix(char *dbuf,int dlen,cchar *addr) noex {
 static int sninet4(char *dbuf,int dlen,cchar *addr) noex {
 	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
-	if (inetaddr ia ; (rs = ia.start(addr)) >= 0) {
+	int		len = 0 ; /* return-value */
+	if (inetaddr ia ; (rs = ia.start(addr)) >= 0) ylikely {
 	    {
 	        rs = ia.getdotaddr(dbuf,dlen) ;
 		len = rs ;
@@ -195,13 +199,12 @@ static int sninet4(char *dbuf,int dlen,cchar *addr) noex {
 static int sninet6(char *dbuf,int dlen,cchar *addr) noex {
 	cint		astrlen = INETX_ADDRSTRLEN ;
 	int		rs = SR_OK ;
-	int		pl = 0 ;
-	if ((dlen < 0) || (dlen >= astrlen)) {
-	    uint	uch ;
+	int		pl = 0 ; /* return-value */
+	if ((dlen < 0) || (dlen >= astrlen)) ylikely {
 	    cint	n = INET6ADDRLEN ;
 	    char	digbuf[diglen + 1] ;
 	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-		uch = mkchar(addr[i]) ;
+		uint	uch = mkchar(addr[i]) ;
 		if_constexpr (f_cthexuc) {
 	            rs = cthexuc(digbuf,diglen,uch) ; /* cannot fail! */
 	            if ((i > 0) && ((i & 1) == 0)) dbuf[pl++] = ':' ;

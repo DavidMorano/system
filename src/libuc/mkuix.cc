@@ -111,10 +111,10 @@ constexpr bool	f_mailname  = CF_MAILNAME ;
 
 int mkuiname(char *rbuf,int rlen,userinfo *uip) noex {
 	int		rs = SR_OK ;
-	if (rbuf && uip) {
+	if (rbuf && uip) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (rlen >= 0) {
+	    if (rlen >= 0) ylikely {
 		cchar	*ns = nullptr ;
 		rs = SR_NOTFOUND ;
 	        if (uip->fullname && (uip->fullname[0] != '\0')) {
@@ -126,7 +126,7 @@ int mkuiname(char *rbuf,int rlen,userinfo *uip) noex {
 	        } else if (uip->username && (uip->username[0] != '\0')) {
 	            ns = uip->username ;
 	        }
-	        if (ns) {
+	        if (ns) ylikely {
 	            rs = sncpy(rbuf,rlen,ns) ;
 	        }
 	    } /* end if (valid) */
@@ -137,10 +137,10 @@ int mkuiname(char *rbuf,int rlen,userinfo *uip) noex {
 
 int mkuibang(char *rbuf,int rlen,userinfo *uip) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf && uip) {
+	if (rbuf && uip) ylikely {
 	    rbuf[0] = '\0' ;
 	    rs = SR_INVALID ;
-	    if (rlen >= 0) {
+	    if (rlen >= 0) ylikely {
 	        cchar	*ns = nullptr ;
 	        if_constexpr (f_fullname) {
 	            if (ns == nullptr) {
@@ -170,7 +170,7 @@ int mkuibang(char *rbuf,int rlen,userinfo *uip) noex {
 	            cchar	*nn = uip->nodename ;
 	            cchar	*un = uip->username ;
 	            rs = SR_NOTFOUND ;
-	            if (ns) {
+	            if (ns) ylikely {
 	                rs = sncpy(rbuf,rlen,nn,"!",un," (",ns,")") ;
 	                if (rs == SR_OVERFLOW) {
 	                   rs = sncpy(rbuf,rlen,nn,"!",un) ;

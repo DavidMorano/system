@@ -97,13 +97,13 @@ static constexpr gid_t	gidend = gid_t(-1) ;
 int ids_load(ids *op) noex {
 	int		rs ;
 	int		ng = 0 ; /* return-value */
-	if ((rs = ids_ctor(op)) >= 0) {
-	    if ((rs = var) >= 0) {
+	if ((rs = ids_ctor(op)) >= 0) ylikely {
+	    if ((rs = var) >= 0) ylikely {
 		cint	nmax = rs ;
 	        cint	sz = ((rs + 1) * szof(gid_t)) ;
-	        if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+	        if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) ylikely {
 		    op->gids = (gid_t *) vp ;
-		    if ((rs = u_getgroups(nmax,op->gids)) >= 0) {
+		    if ((rs = u_getgroups(nmax,op->gids)) >= 0) ylikely {
 			ng = rs ;
 		        op->gids[ng] = gidend ;
 		    }
@@ -124,7 +124,7 @@ int ids_load(ids *op) noex {
 int ids_release(ids *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->gids) {
 	        rs1 = uc_libfree(op->gids) ;
@@ -143,9 +143,9 @@ int ids_release(ids *op) noex {
 int ids_ngroups(ids *op) noex {
 	int		rs = SR_FAULT ;
 	int		ng = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->gids) {
+	    if (op->gids) ylikely {
 	        for (ng = 0 ; op->gids[ng] != gidend ; ng += 1) ;
 	    }
 	} /* end if (non-null) */
@@ -156,7 +156,7 @@ int ids_ngroups(ids *op) noex {
 int ids_refresh(ids *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->gids) {
 	        rs1 = uc_libfree(op->gids) ;
@@ -173,16 +173,16 @@ int ids_refresh(ids *op) noex {
 
 int ids_copy(ids *op,const ids *otherp) noex {
 	int		rs = SR_FAULT ;
-	if (op && otherp) {
+	if (op && otherp) ylikely {
 	    op->uid = otherp->uid ;
 	    op->euid = otherp->euid ;
 	    op->gid = otherp->gid ;
 	    op->egid = otherp->egid ;
-	    if ((rs = ids_ngids(otherp)) >= 0) {
+	    if ((rs = ids_ngids(otherp)) >= 0) ylikely {
 	        cint	n = rs ;
 	        int	sz = 0 ;
 	        sz += intconv((n + 1) * szof(gid_t)) ;
-	        if (void *p ; (rs = uc_libmalloc(sz,&p)) >= 0) {
+	        if (void *p ; (rs = uc_libmalloc(sz,&p)) >= 0) ylikely {
 	            int		i = 0 ; /* <- used-afterwards */
 		    op->gids = (gid_t *) p ;
 		    for (i = 0 ; otherp->gids[i] ; i += 1) {
@@ -201,7 +201,7 @@ int ids_copy(ids *op,const ids *otherp) noex {
 
 static int ids_ctor(ids *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->gids = nullptr ;
 	    op->uid = getuid() ;
@@ -215,7 +215,7 @@ static int ids_ctor(ids *op) noex {
 
 static int ids_dtor(ids *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->gids = nullptr ;
 	}
@@ -225,7 +225,7 @@ static int ids_dtor(ids *op) noex {
 
 static int ids_ngids(const ids *op) noex {
 	int		n = 0 ;
-	if (op->gids) {
+	if (op->gids) ylikely {
 	    for (n = 0 ; op->gids[n] != gidend ; n += 1) ;
 	}
 	return n ;
@@ -234,7 +234,7 @@ static int ids_ngids(const ids *op) noex {
 
 ids_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case idsmem_load:
 	        rs = ids_load(op) ;
@@ -266,7 +266,7 @@ void ids::dtor() noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = maxgroups) == 0) {
+	if ((rs = maxgroups) == 0) ylikely {
 	    cint	cmd = _SC_NGROUPS_MAX ;
 	    if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
 	        maxgroups = rs ;

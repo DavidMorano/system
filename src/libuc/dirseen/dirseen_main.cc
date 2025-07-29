@@ -29,7 +29,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>		/* |USTAT| */
+#include	<sys/stat.h>		/* |ustat| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
@@ -68,18 +68,18 @@ using std::nothrow ;			/* constant */
 
 namespace {
     struct dirseen_ent {
-	cchar		*name ;
+	cchar		*namep ;
 	ino_t		ino ;
 	dev_t		dev ;
-	int		namelen ;
-	dirseen_ent() noex : name(nullptr), namelen(0), dev(0L), ino(0L) { } ;
-	dirseen_ent(cchar *sp,int sl = -1) noex : name(sp) {
+	int		namel ;
+	dirseen_ent() noex : namep(nullptr), namel(0), dev(0L), ino(0L) { } ;
+	dirseen_ent(cchar *sp,int sl = -1) noex : namep(sp) {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    namelen = sl ;
+	    namel = sl ;
 	} ;
 	dirseen_ent(dev_t d,ino_t i) noex : dev(d), ino(i) { } ;
     } ; /* end struct (dirseen_ent) */
-}
+} /* end namespace */
 
 typedef dirseen_ent	ent ;
 typedef dirseen_ent	*entp ;
@@ -107,14 +107,14 @@ extern "C" {
 
 int dirseen_start(dirseen *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->strsize = 0 ;
 	    if ((op->dlistp = new(nothrow) vecobj) != nullptr) {
+	        cint	esz = szof(dirseen_ent) ;
 		cint	vn = DIRSEEN_NDEF ;
 	        cint	vo = 0 ;
-	        cint	esz = szof(dirseen_ent) ;
 	        if ((rs = vecobj_start(op->dlistp,esz,vn,vo)) >= 0) {
 	            op->magic = DIRSEEN_MAGIC ;
 	        } /* end if  */
@@ -131,7 +131,7 @@ int dirseen_start(dirseen *op) noex {
 int dirseen_finish(dirseen *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = dirseen_magic(op)) >= 0) {
+	if ((rs = dirseen_magic(op)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (op->dlistp) {
 		vecobj	*dlp = op->dlistp ;
@@ -158,9 +158,9 @@ int dirseen_finish(dirseen *op) noex {
 }
 /* end subroutine (dirseen_finish) */
 
-int dirseen_add(dirseen *op,cchar *sp,int sl,USTAT *sbp) noex {
+int dirseen_add(dirseen *op,cchar *sp,int sl,ustat *sbp) noex {
 	int		rs ;
-	if ((rs = dirseen_magic(op,sp,sbp)) >= 0) {
+	if ((rs = dirseen_magic(op,sp,sbp)) >= 0) ylikely {
 	    dirseen_ent		e(sbp->st_dev,sbp->st_ino) ;
 	    cnullptr		np{} ;
 	    cint		rsn = SR_NOTFOUND ;
@@ -191,7 +191,7 @@ int dirseen_add(dirseen *op,cchar *sp,int sl,USTAT *sbp) noex {
 
 int dirseen_havename(dirseen *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = dirseen_magic(op,sp)) >= 0) {
+	if ((rs = dirseen_magic(op,sp)) >= 0) ylikely {
 	    dirseen_ent		e(sp,sl) ;
 	    rs = vecobj_search(op->dlistp,&e,vcmpname,nullptr) ;
 	} /* end if (magic) */
@@ -199,9 +199,9 @@ int dirseen_havename(dirseen *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (dirseen_havename) */
 
-int dirseen_havedevino(dirseen *op,USTAT *sbp) noex {
+int dirseen_havedevino(dirseen *op,ustat *sbp) noex {
 	int		rs ;
-	if ((rs = dirseen_magic(op,sbp)) >= 0) {
+	if ((rs = dirseen_magic(op,sbp)) >= 0) ylikely {
 	    dirseen_ent		e(sbp->st_dev,sbp->st_ino) ;
 	    rs = vecobj_search(op->dlistp,&e,vcmpdevino,nullptr) ;
 	} /* end if (magic) */
@@ -211,7 +211,7 @@ int dirseen_havedevino(dirseen *op,USTAT *sbp) noex {
 
 int dirseen_count(dirseen *op) noex {
 	int		rs ;
-	if ((rs = dirseen_magic(op)) >= 0) {
+	if ((rs = dirseen_magic(op)) >= 0) ylikely {
 	    rs = vecobj_count(op->dlistp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -220,7 +220,7 @@ int dirseen_count(dirseen *op) noex {
 
 int dirseen_curbegin(dirseen *op,dirseen_cur *curp) noex {
 	int		rs ;
-	if ((rs = dirseen_magic(op,curp)) >= 0) {
+	if ((rs = dirseen_magic(op,curp)) >= 0) ylikely {
 	    memclear(curp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -229,7 +229,7 @@ int dirseen_curbegin(dirseen *op,dirseen_cur *curp) noex {
 
 int dirseen_curend(dirseen *op,dirseen_cur *curp) noex {
 	int		rs ;
-	if ((rs = dirseen_magic(op,curp)) >= 0) {
+	if ((rs = dirseen_magic(op,curp)) >= 0) ylikely {
 	    memclear(curp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -238,7 +238,7 @@ int dirseen_curend(dirseen *op,dirseen_cur *curp) noex {
 
 int dirseen_curenum(dirseen *op,dirseen_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
-	if ((rs = dirseen_magic(op,curp,rbuf)) >= 0) {
+	if ((rs = dirseen_magic(op,curp,rbuf)) >= 0) ylikely {
 	    cint	i = (curp->i >= 0) ? curp->i : 0 ;
 	    void	*vp{} ;
 	    while ((rs = vecobj_get(op->dlistp,i,&vp)) >= 0) {
@@ -246,7 +246,7 @@ int dirseen_curenum(dirseen *op,dirseen_cur *curp,char *rbuf,int rlen) noex {
 	    } /* end while */
 	    if ((rs >= 0) && vp) {
 	        dirseen_ent	*ep = entp(vp) ;
-	        if ((rs = sncpy1(rbuf,rlen,ep->name)) >= 0) {
+	        if ((rs = sncpy1(rbuf,rlen,ep->namep)) >= 0) {
 	            curp->i = (i + 1) ;
 	        }
 	    } /* end if (got one) */
@@ -258,7 +258,7 @@ int dirseen_curenum(dirseen *op,dirseen_cur *curp,char *rbuf,int rlen) noex {
 
 /* private subroutines */
 
-int dirseen::add(cchar *sp,int sl,USTAT *sbp) noex {
+int dirseen::add(cchar *sp,int sl,ustat *sbp) noex {
 	return dirseen_add(this,sp,sl,sbp) ;
 }
 
@@ -266,7 +266,7 @@ int dirseen::havename(cchar *sp,int sl) noex {
 	return dirseen_havename(this,sp,sl) ;
 }
 
-int dirseen::havedevino(USTAT *sbp) noex {
+int dirseen::havedevino(ustat *sbp) noex {
 	return dirseen_havedevino(this,sbp) ;
 }
 
@@ -297,9 +297,9 @@ int entry_start(dirseen_ent *ep,cchar *sp,int sl,dev_t dev,ino_t ino) noex {
 	int		rs ;
 	ep->dev = dev ;
 	ep->ino = ino ;
-	if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
-	    ep->name = cp ;
-	    ep->namelen = rs ;
+	if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) ylikely {
+	    ep->namep = cp ;
+	    ep->namel = rs ;
 	}
 	return rs ;
 }
@@ -310,15 +310,27 @@ int entry_finish(dirseen_ent *ep) noex {
 	int		rs1 ;
 	if (ep) {
 	    rs = SR_OK ;
-	    if (ep->name) {
-	        rs1 = uc_free(ep->name) ;
+	    if (ep->namep) ylikely {
+	        rs1 = uc_free(ep->namep) ;
 	        if (rs >= 0) rs = rs1 ;
-	        ep->name = nullptr ;
+	        ep->namep = nullptr ;
+		ep->namel = 0 ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (entry_finish) */
+
+static int cmpname(const entp e1p,const entp e2p) noex {
+        cint    ml = min(e1p->namel,e2p->namel) ;
+        cint    ch1 = mkchar(e1p->namep[0]) ;
+        cint    ch2 = mkchar(e2p->namep[0]) ;
+        int     rc ;
+        if ((rc = (ch1 - ch2)) == 0) {
+            rc = strncmp(e1p->namep,e2p->namep,ml) ;
+        }
+        return rc ;
+} /* end subroutine (cmpname) */
 
 static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	dirseen_ent	**e1pp = entpp(v1pp) ;
@@ -327,17 +339,12 @@ static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	{
 	    dirseen_ent	*e1p = *e1pp ;
 	    dirseen_ent	*e2p = *e2pp ;
-	    if (e1p || e2p) {
+	    if (e1p || e2p) ylikely {
 	        rc = +1 ;
 	        if (e1p) {
 		    rc = -1 ;
 	            if (e2p) {
-		        cint	ml = min(e1p->namelen,e2p->namelen) ;
-			cint	ch1 = mkchar(e1p->name[0]) ;
-			cint	ch2 = mkchar(e2p->name[0]) ;
-			if ((rc = (ch1 - ch2)) == 0) {
-	                    rc = strncmp(e1p->name,e2p->name,ml) ;
-			}
+			rc = cmpname(e1p,e2p) ;
 		    }
 	        }
 	    } /* end if */
@@ -346,6 +353,20 @@ static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 }
 /* end subroutine (vcmpname) */
 
+static int cmpdevino(const entp e1p,const entp e2p) noex {
+        const dev_t	dev = (e1p->dev - e2p->dev) ;
+        int		rc = 0 ;
+        if (dev == 0) {
+            const ino_t       ino = (e1p->ino - e2p->ino) ;
+            if (ino) {
+                rc = (ino > 0) ? +1 : -1 ;
+            }
+        } else {
+            rc = (dev > 0) ? +1 : -1 ;
+        }
+	return rc ;
+} /* end subroutine (cmpdevino) */
+
 static int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
 	dirseen_ent	**e1pp = entpp(v1pp) ;
 	dirseen_ent	**e2pp = entpp(v2pp) ;
@@ -353,27 +374,17 @@ static int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
 	{
 	    dirseen_ent	*e1p = *e1pp ;
 	    dirseen_ent	*e2p = *e2pp ;
-	    if (e1p || e2p) {
+	    if (e1p || e2p) ylikely {
 	        rc = +1 ;
-	        if (e1p) {
+	        if (e1p) ylikely {
 		    rc = -1 ;
-	            if (e2p) {
-			dev_t	dev = (e1p->dev - e2p->dev) ;
-			rc = 0 ;
-			if (dev == 0) {
-			    ino_t	ino = (e1p->ino - e2p->ino) ;
-			    if (ino) {
-			        rc = (ino > 0) ? +1 : -1 ;
-			    }
-			} else {
-			    rc = (dev > 0) ? +1 : -1 ;
-			}
+	            if (e2p) ylikely {
+			rc = cmpdevino(e1p,e2p) ;
 		    }
 	        }
 	    } /* end if */
 	} /* end block */
 	return rc ;
-}
-/* end subroutine (vcmpdevino) */
+} /* end subroutine (vcmpdevino) */
 
 

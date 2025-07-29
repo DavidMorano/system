@@ -9,13 +9,14 @@
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-	This code module was originally written in C language modeled
-	(roughly) from a prior VAX assembly language version (written
-	circa 1980 perhaps).  This is why this looks so "ugly"!
-	This code comes from stuff dated back to almost the pre-dawn
-	era of modern computer languages!  I wrote the original VAX
-	assembly stuff also.  This code below was then written into
-	C-language perhaps around 1983 (at AT&T Bell Laboratories).
+	This code module was written in C language transcribed from
+	a prior VAX assembly language version (written circa 1980
+	perhaps).  This is why this looks so "ugly"!  This code
+	comes from stuff dated back to almost the pre-dawn era of
+	modern computer languages!  I wrote the original VAX assembly
+	version also.  This code below was then written (transcribed)
+	into C-language perhaps around 1993 or 1983 (at AT&T Bell
+	Laboratories).
 
 	= 2023-11-04, David A­D­ Morano
 	I (finally) changed the code to initialize the default
@@ -82,11 +83,11 @@
 
 	Notes:
 	This is a classic, ported forward from the old VAX-11/780
-	days. This was translated from VAX assembly language.
+	days.  This was translated from VAX assembly language.
 
 	Note:
 	This code was messy when it was assembly language.  And it
-	is still messy to this very day (here in C-lnaguage). I had
+	is still messy to this very day (here in C-lnaguage).  I had
 	to get this statement out as a sort of disclaimer.
 
 *******************************************************************************/
@@ -96,7 +97,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<ascii.h>
 #include	<baops.h>
 #include	<strop.h>
@@ -184,6 +189,7 @@ int field_finish(field *fsbp) noex {
 	    rs = SR_NOTOPEN ;
 	    if (fsbp->lp) {
 		rs = SR_OK ;
+		fsbp->lp = nullptr ;
 		fsbp->ll = 0 ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -194,17 +200,16 @@ int field_finish(field *fsbp) noex {
 int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		fl = 0 ;
+	int		fl = 0 ; /* return-value */
 	cchar		*fp = nullptr ;
 	if (fsbp && fpp) {
 	    if (terms == nullptr) terms = dterms.terms ;
 	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
-		int	ch ;
 		int	chterm = '\0' ;
 		so.white() ;
 		fp = so.sp ;	/* <- first field? */
 	        if (so.sl > 0) {
-	            ch = mkchar(*so.sp) ;
+	            int		ch = mkchar(*so.sp) ;
 	            if (batst(quotes.terms,ch)) {
 	                cint	qe = ch ;	/* set default quote end */
 			so.inc() ;
@@ -252,17 +257,16 @@ int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 int field_getterm(field *fsbp,cchar *terms,cchar **fpp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		fl = 0 ;
+	int		fl = 0 ; /* return-value */
 	cchar		*fp = nullptr ;
 	if (fsbp && fpp) {
 	    if (terms == nullptr) terms = dterms.terms ;
 	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
-		int	ch ;
 		int	chterm = '\0' ;
 		so.white() ;
 		fp = so.sp ;	/* <- first field? */
 	        if (so.sl > 0) {
-	            ch = mkchar(*so.sp) ;
+	            int		ch = mkchar(*so.sp) ;
 	            if (! batst(terms,ch)) {
 	        	fp = so.sp ; 		/* save field address */
 			so.inc() ;
@@ -294,7 +298,7 @@ int field_getterm(field *fsbp,cchar *terms,cchar **fpp) noex {
 int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		fl = 0 ;
+	int		fl = 0 ; /* return-value */
 	if (fsbp && fbuf) {
 	    if (terms == nullptr) terms = dterms.terms ;
 	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
@@ -395,7 +399,7 @@ int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 
 int field_remaining(field *fsbp,cchar **lpp) noex {
 	int		rs = SR_FAULT ;
-	int		ll = 0 ;
+	int		ll = 0 ; /* return-value */
 	if (fsbp) {
 	    rs = SR_NOTOPEN ;
 	    if (fsbp->lp) {

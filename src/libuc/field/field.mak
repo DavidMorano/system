@@ -31,11 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= field.h fieldterms.h fieldterminit.hh
+INCS += field.h fieldterms.h fieldterminit.hh
 
-LIBS=
+MODS += 
+
+LIBS +=
 
 
 INCDIRS=
@@ -44,7 +46,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -66,7 +67,7 @@ OBJB_FIELD= obj2_field.o obj3_field.o
 OBJ_FIELD= $(OBJA_FIELD) $(OBJB_FIELD)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .ccm
 
 
 default:		$(T).o
@@ -92,17 +93,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_FIELD)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_FIELD)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_FIELD)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -115,16 +114,16 @@ control:
 
 
 obj0_field.o:	$(OBJ0_FIELD)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_FIELD)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_FIELD)
 
 obj1_field.o:	$(OBJ1_FIELD)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_FIELD)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_FIELD)
 
 obj2_field.o:	$(OBJ2_FIELD)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_FIELD)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_FIELD)
 
 obj3_field.o:	$(OBJ3_FIELD)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_FIELD)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_FIELD)
 
 
 field_main.o:		field_main.cc		$(INCS)

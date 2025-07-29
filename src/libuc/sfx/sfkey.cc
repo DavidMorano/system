@@ -46,13 +46,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<strn.h>
-#include	<char.h>
+#include	<strn.h>		/* |strnchr(3uc)| */
+#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -83,7 +82,7 @@ import libutil ;
 /* exported subroutines */
 
 int sfkey(cchar *sp,int sl,cchar **rpp) noex {
-	int		kl = -1 ;
+	int		kl = -1 ; /* return-value */
 	if (sp) {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {

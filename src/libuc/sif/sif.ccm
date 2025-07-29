@@ -29,6 +29,8 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
+#pragma		GCC dependency	"mod/chrset.ccm"
+
 export module sif ;
 
 import chrset ;
@@ -75,7 +77,6 @@ export {
 	    }
 	} ; /* end ctor */
 	sif(cchar *p,int l = -1,int c = 0) noex : sif(p,l,nullptr,c) { } ;
-	sif(cchar *p,int l,cchar *ss) noex : sif(p,l,ss,0) { } ;
 	int next(cchar **) noex ;
 	int nextchr(cchar **) noex ;
 	int nextbrk(cchar **) noex ;

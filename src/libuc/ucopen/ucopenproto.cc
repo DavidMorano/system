@@ -97,6 +97,7 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<getaf.h>
+#include	<libmallocxx.h>
 #include	<openshm.h>
 #include	<ascii.h>
 #include	<vecstr.h>
@@ -326,6 +327,9 @@ static constexpr cpcchar	protonames[] = {
 	"http",
 	nullptr
 } ;
+
+constexpr cauto		mall = uc_libmalloc ;
+constexpr cauto		mfre = uc_libfree ;
 
 
 /* exported variables */
@@ -792,7 +796,7 @@ static int inetargs_finish(inetargs *iap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (iap->a) {
-	    rs1 = uc_libfree(iap->a) ;
+	    rs1 = mfre(iap->a) ;
 	    iap->a = nullptr ;
 	    if (rs < 0) rs = rs1 ;
 	}
@@ -826,7 +830,7 @@ static int inetargs_alloc(inetargs *iap) noex {
 	if (iap->svcp != nullptr) {
 	    sz += (lenstr(iap->svcp,iap->svcl) + 1) ;
 	}
-	if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	if (char *bp ; (rs = mall(sz,&bp)) >= 0) {
 	    cchar	*cp ;
 	    iap->a = bp ;
 #ifdef	COMMENT
@@ -1046,27 +1050,20 @@ static int fingerworker(FINGERARGS *fap) noex {
 
 static int fingerworker_loop(FINGERARGS *fap,filer *ofp,filer *ifp,
 		int cols,int ind,int to) noex {
-	cint		llen = LINEBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	char		*lbuf ;
-	if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = libmalloc_ml(&lbuf)) >= 0) {
+	    cint	llen = rs ;
 	    int		clen = 0 ;
-	    int		ll, sl ;
-	    cchar	*lp, *sp ;
+	    int		sl ;
+	    cchar	*sp ;
 	    cchar	*cp ;
-
 	    while ((rs = filer_readln(ifp,lbuf,llen,to)) > 0) {
-	        int	len = rs ;
-	        clen = mkcleanline(lbuf,len,0) ;
-	        if (clen > 0) {
-	            LINEFOLD	lf ;
-	            lp = lbuf ;
-	            ll = clen ;
-	            if ((rs = linefold_start(&lf,cols,ind,lp,ll)) >= 0) {
-	                int	i = 0 ;
-	                while ((sl = linefold_get(&lf,i,&sp)) >= 0) {
+		cchar	*lp ;
+		if (int ll ; (ll = sfcontent(lbuf,rs,&lp)) > 0) {
+	            if (linefold lf ; (rs = lf.start(cols,ind,lp,ll)) >= 0) {
+	                if (int i = 0 ; (sl = lf.get(i,&sp)) >= 0 ; i += 1) {
 #ifdef	COMMENT
 	                    if ((sl == 0) || (sp[sl-1] != '\n')) {
 	                        char *cp = colbuf ;
@@ -1084,7 +1081,8 @@ static int fingerworker_loop(FINGERARGS *fap,filer *ofp,filer *ifp,
 	                    i += 1 ;
 	                    if (rs < 0) break ;
 	                } /* end while */
-	                linefold_finish(&lf) ;
+	                rs1 = lf.finish ;
+			if (rs >= 0) rs = rs1 ;
 	            } /* end if */
 	        } else {
 	            rs = filer_println(ofp,lbuf,0) ;
@@ -1092,7 +1090,7 @@ static int fingerworker_loop(FINGERARGS *fap,filer *ofp,filer *ifp,
 	        } /* end if (clen) */
 	        if (rs < 0) break ;
 	    } /* end while (reading lines) */
-	    rs1 = uc_free(lbuf) ;
+	    rs1 = uc_libfree(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
@@ -1102,12 +1100,12 @@ static int fingerworker_loop(FINGERARGS *fap,filer *ofp,filer *ifp,
 static int fingerworker_liner(FINGERARGS *fap,filer *ofp,int cols,
 		int ind,int ln,cc *sp,int sl) noex {
 	int		rs ;
+	int		rs1 ;
 	int		clen ;
 	int		sz ;
 	int		gcols ;
 	int		icols ;
 	int		wlen = 0 ;
-	char		*cbuf ;
 
 	if (fap == nullptr) return SR_FAULT ;
 
@@ -1118,7 +1116,7 @@ static int fingerworker_liner(FINGERARGS *fap,filer *ofp,int cols,
 
 	clen = (2*cols) ;
 	sz = (clen+1) ;
-	if ((rs = uc_libmalloc(sz,&cbuf)) >= 0) {
+	if (char *cbuf ; (rs = mall(sz,&cbuf)) >= 0) {
 	    int		i = 0 ;
 	    int		ll, cl ;
 	    int		ncols = gcols ;
@@ -1163,10 +1161,9 @@ static int fingerworker_liner(FINGERARGS *fap,filer *ofp,int cols,
 	        ncols = (gcols-ind) ;
 	        if (rs < 0) break ;
 	    } /* end while */
-
-	    uc_libfree(cbuf) ;
+	    rs1 = mfre(cbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (fingerworker_liner) */
@@ -1184,14 +1181,11 @@ static int fingerclean(cint fd) noex {
 	        cint		llen = LINEBUFLEN ;
 	        cint		clen = LINEBUFLEN ;
 	        int		sz = 0 ;
-	        char		*bp ;
-	        char		*lbuf ;
-	        char		*cbuf ;
 	        sz += (llen+1) ;
 	        sz += (clen+1) ;
-	        if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
-	            lbuf = bp ;
-	            cbuf = (bp+(llen+1)) ;
+	        if (char *bp ; (rs = mall(sz,&bp)) >= 0) {
+	            char	*lbuf = bp ;
+	            int		cbuf = (bp+(llen+1)) ;
 	            while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
 	                int	len = rs ;
 	                if (hasmseol(lbuf,len)) {
@@ -1211,7 +1205,8 @@ static int fingerclean(cint fd) noex {
 	                }
 	                if (rs < 0) break ;
 	            } /* end while */
-	            uc_libfree(bp) ;
+	            rs1 = mfre(bp) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a) */
 	        rs1 = filer_finish(&b) ;
 	        if (rs >= 0) rs = rs1 ;

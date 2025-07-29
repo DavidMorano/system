@@ -106,9 +106,11 @@
 /* exported subroutines */
 
 char *strnset(char *bp,int ch,int n) noex {
-	while (n-- > 0) {
-	    *bp++ = char(ch) ;
-	}
+    	if (bp) {
+	    while (n-- > 0) {
+	        *bp++ = char(ch) ;
+	    }
+	} /* end if (non-null) */
 	return bp ;
 }
 /* end subroutine (strnset) */

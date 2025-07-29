@@ -68,6 +68,15 @@ import libutil ;
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
 
 
@@ -80,9 +89,9 @@ int getev(mainv envv,cchar *kp,int kl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		vl = 0 ;
 	cchar		*vp = nullptr ;
-	if (envv && kp) {
+	if (envv && kp) ylikely {
 	    rs = SR_INVALID ;
-	    if (kp[0]) {
+	    if (kp[0]) ylikely {
 		rs = SR_OK ;
 	        if (int ei ; (ei = matkeystr(envv,kp,kl)) >= 0) {
 	            if ((vp = strchr(envv[ei],'=')) != nullptr) {

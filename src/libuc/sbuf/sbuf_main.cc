@@ -115,8 +115,8 @@ static inline int sbuf_xxxx(sbuf *op,int (*ctxxx)(char *,int,T),T v) noex {
 	cint		dlen = DIGBUFLEN ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op) {
-	    if ((rs = SBUF_INDEX) >= 0) {
+	if (op) ylikely {
+	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 	        cint		bl = (SBUF_RLEN-SBUF_INDEX) ;
 	        if (bl >= dlen) {
 	            char	*bp = (SBUF_RBUF+SBUF_INDEX) ;
@@ -174,25 +174,25 @@ static blanker			bo ;	/* so-called "blank" object */
 
 int sbuf_start(sbuf *op,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
-	if (op && dbuf) {
+	if (op && dbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (dlen > 0) {
+	    if (dlen > 0) ylikely {
 	        rs = SR_OK ;
 	        dbuf[0] = '\0' ;
 	        SBUF_RBUF = dbuf ;
 	        SBUF_RLEN = dlen ;
 	        SBUF_INDEX = 0 ;
-	    }
-	}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sbuf_start) */
 
 int sbuf_finish(sbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->rbuf) {
+	    if (op->rbuf) ylikely {
 	        if ((rs = SBUF_INDEX) >= 0) {
 	            SBUF_RBUF = nullptr ;
 	            SBUF_RLEN = 0 ;
@@ -206,7 +206,7 @@ int sbuf_finish(sbuf *op) noex {
 
 int sbuf_reset(sbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    char	*bp = SBUF_RBUF ;
 	    rs = SR_OK ;
 	    SBUF_INDEX = 0 ;
@@ -219,8 +219,8 @@ int sbuf_reset(sbuf *op) noex {
 int sbuf_buf(sbuf *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && sp) {
-	    if ((rs = SBUF_INDEX) >= 0) {
+	if (op && sp) ylikely {
+	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 	        char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
 	        if (SBUF_RLEN < 0) {
 	            if (sl < 0) {
@@ -257,8 +257,8 @@ int sbuf_buf(sbuf *op,cchar *sp,int sl) noex {
 
 int sbuf_strw(sbuf *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (op && sp) {
-	    if ((rs = SBUF_INDEX) >= 0) {
+	if (op && sp) ylikely {
+	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 		rs = sbuf_addstrw(op,sp,sl) ;
 	    }
 	}
@@ -268,7 +268,7 @@ int sbuf_strw(sbuf *op,cchar *sp,int sl) noex {
 
 int sbuf_strs(sbuf *bp,int sch,mainv sv) noex {
 	int		rs = SR_FAULT ;
-	if (bp && sv) {
+	if (bp && sv) ylikely {
 	    rs = SR_OK ;
 	    for (int i = 0 ; sv[i] ; i += 1) {
 	        cchar	*sp = sv[i] ;
@@ -401,13 +401,13 @@ int sbuf_hexuc(sbuf *op,uchar v) noex {
 	cint		hlen = (2 * szof(uchar)) ; /* unsigned character */
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op) {
-	    if ((rs = SBUF_INDEX) >= 0) {
+	if (op) ylikely {
+	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 		cint	bl = (SBUF_RLEN-SBUF_INDEX) ;
 		rs = SR_OVERFLOW ;
-	        if (bl >= hlen) {
+	        if (bl >= hlen) ylikely {
 	            char	*bp = (SBUF_RBUF+SBUF_INDEX) ;
-	            if ((rs = cthexuc(bp,bl,v)) >= 0) {
+	            if ((rs = cthexuc(bp,bl,v)) >= 0) ylikely {
 		        SBUF_INDEX += rs ;
 		        len = rs ;
 	            }
@@ -436,12 +436,12 @@ int sbuf_hexull(sbuf *op,ulonglong v) noex {
 int sbuf_chr(sbuf *op,int ch) noex {
 	cint		len = 1 ;
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = SBUF_INDEX) >= 0) {
+	if (op) ylikely {
+	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 	        cint	bl = (SBUF_RLEN - SBUF_INDEX) ;
 	        char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
 		rs = SR_OVERFLOW ;
-	        if (bl >= len) {
+	        if (bl >= len) ylikely {
 	            *bp++ = charconv(ch) ;
 	            *bp = '\0' ;
 	            SBUF_INDEX += len ;
@@ -458,10 +458,10 @@ int sbuf_chr(sbuf *op,int ch) noex {
 /* store a character (n-times) */
 int sbuf_chrs(sbuf *op,int ch,int len) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = SBUF_INDEX) >= 0) {
+	if (op) ylikely {
+	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 		rs = SR_INVALID ;
-		if (len >= 0) {
+		if (len >= 0) ylikely {
 		    cint	bl = (SBUF_RLEN - SBUF_INDEX) ;
 		    char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
 		    rs = SR_OVERFLOW ;
@@ -485,9 +485,9 @@ int sbuf_chrs(sbuf *op,int ch,int len) noex {
 int sbuf_blanks(sbuf *op,int n) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op) {
-	    if ((rs = SBUF_INDEX) >= 0) {
-		if (n >= 0) {
+	if (op) ylikely {
+	    if ((rs = SBUF_INDEX) >= 0) ylikely {
+		if (n >= 0) ylikely {
 	            while ((rs >= 0) && (len < n)) {
 	                cint	ml = min((n - len),bo.l) ;
 	                rs = sbuf_addstrw(op,bo.p,ml) ;
@@ -503,10 +503,10 @@ int sbuf_blanks(sbuf *op,int n) noex {
 int sbuf_vprintf(sbuf *op,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && fmt && ap) {
+	if (op && fmt && ap) ylikely {
 	    rs = SR_INVALID ;
-	    if (fmt[0]) {
-	        if ((rs = SBUF_INDEX) >= 0) {
+	    if (fmt[0]) ylikely {
+	        if ((rs = SBUF_INDEX) >= 0) ylikely {
 	            cint	fm = 0x01 ; /* *will* error out on overflow! */
 	            cint	dl = (SBUF_RLEN - SBUF_INDEX) ;
 	            char	*dp = (SBUF_RBUF + SBUF_INDEX) ;
@@ -538,9 +538,9 @@ int sbuf_printf(sbuf *op,cchar *fmt,...) noex {
 
 int sbuf_adv(sbuf *op,int adv,char **dpp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if (dpp) *dpp = nullptr ;
-	    if ((rs = SBUF_INDEX) >= 0) {
+	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 	        if ((SBUF_RLEN - SBUF_INDEX) >= adv) {
 		    if (dpp != nullptr) *dpp = (SBUF_RBUF + SBUF_INDEX) ;
 		    SBUF_INDEX += adv ;
@@ -556,8 +556,8 @@ int sbuf_adv(sbuf *op,int adv,char **dpp) noex {
 /* get the remaining length in the buffer */
 int sbuf_rem(sbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = SBUF_INDEX) >= 0) {
+	if (op) ylikely {
+	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 	        rs = (SBUF_RLEN-SBUF_INDEX) ;
 	    }
 	} /* end if (non-null) */
@@ -568,7 +568,7 @@ int sbuf_rem(sbuf *op) noex {
 /* get the length filled so far */
 int sbuf_getlen(sbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SBUF_INDEX ;
 	}
 	return rs ;
@@ -578,7 +578,7 @@ int sbuf_getlen(sbuf *op) noex {
 /* get the length filled so far */
 int sbuf_getbuf(sbuf *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if (rpp) *rpp = op->rbuf ;
 	    rs = SBUF_INDEX ;
 	}
@@ -589,7 +589,7 @@ int sbuf_getbuf(sbuf *op,cchar **rpp) noex {
 /* get the pointer in the buffer to the next character */
 int sbuf_getpoint(sbuf *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SBUF_INDEX ;
 	    if (rpp) {
 	        *rpp = (SBUF_RBUF + SBUF_INDEX) ;
@@ -602,8 +602,8 @@ int sbuf_getpoint(sbuf *op,cchar **rpp) noex {
 /* get (retrieve) the previous character (if there is one) */
 int sbuf_getprev(sbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = SBUF_INDEX) >= 0) {
+	if (op) ylikely {
+	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 	        rs = mkchar(SBUF_RBUF[SBUF_INDEX - 1]) ;
 	    }
 	} /* end if */
@@ -633,7 +633,7 @@ int sbuf::vprintf(cchar *fmt,va_list ap) noex {
 int sbuf::printf(cchar *fmt,...) noex {
     	va_list		ap ;
 	int		rs = SR_FAULT ;
-	if (fmt) {
+	if (fmt) ylikely {
 	    va_begin(ap,fmt) ;
 	    rs = sbuf_vprintf(this,fmt,ap) ;
 	    va_end(ap) ;
@@ -705,7 +705,7 @@ static int sbuf_addstrw(sbuf *op,cchar *sp,int sl) noex {
 
 int sbuf_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case sbufmem_deci:
 		rs = sbuf_deci(op,a) ;

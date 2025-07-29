@@ -30,7 +30,7 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<usystem.h>		/* |uid_t| */
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getax.h>
 
@@ -78,19 +78,19 @@ static constexpr getpwxuid_f	subuids[] = {
 	getpw_uid
 } ;
 
-constexpr uid_t			uidend(-1) ;
+constexpr uid_t		uidend(-1) ;
+
+static int		getpwx_state = 1 ;
 
 
 /* exported variables */
-
-int		getpwx_state = 1 ;
 
 
 /* exported subroutines */
 
 int getpwx_control(int ns) noex {
     	int		rs = SR_INVALID ;
-	if ((ns >= 0) && (ns < 2)) {
+	if ((ns >= 0) && (ns < 2)) ylikely {
 	    getpwx_state = ns ;
 	    rs = SR_OK ;
 	}
@@ -99,9 +99,9 @@ int getpwx_control(int ns) noex {
 
 int getpwx_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *name) noex {
 	int		rs = SR_FAULT ;
-	if (pwp && pwbuf && name) {
+	if (pwp && pwbuf && name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 		cint	w = getpwx_state ;
 		rs = subnames[w](pwp,pwbuf,pwlen,name) ;
 	    } /* end if (valid) */
@@ -112,9 +112,9 @@ int getpwx_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *name) noex {
 
 int getpwx_uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
-	if (pwp && pwbuf) {
+	if (pwp && pwbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (uid != uidend) {
+	    if (uid != uidend) ylikely {
 		cint	w = getpwx_state ;
 		rs = subuids[w](pwp,pwbuf,pwlen,uid) ;
 	    } /* end if (valid) */
@@ -122,5 +122,17 @@ int getpwx_uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	return rs ;
 }
 /* end subroutine (getpwx_uid) */
+
+int ucentpwx::nam(char *pwbuf,int pwlen,cchar *un) noex {
+    	return getnam(pwbuf,pwlen,un) ;
+}
+
+int ucentpwx::uid(char *pwbuf, int pwlen,uid_t uid) noex {
+    	return getuid(pwbuf,pwlen,uid) ;
+}
+
+int ucentpwx::control(int ns) noex {
+    	return getpwx_control(ns) ;
+}
 
 

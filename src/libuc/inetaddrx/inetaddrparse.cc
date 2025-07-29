@@ -79,7 +79,7 @@ import libutil ;
 int inetaddrparse_load(inetaddrparse *ap,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	if (ap && sp) {
+	if (ap && sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = memclear(ap) ;
 	    n += 1 ;

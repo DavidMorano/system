@@ -32,7 +32,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>		/* |off_t| */
-#include	<usystem.h>		/* for |USTAT| */
+#include	<usystem.h>		/* for |ustat| */
 
 
 #define	FILEMAP		struct filemap_head
@@ -41,7 +41,7 @@
 struct filemap_head {
 	cchar		*bp ;
 	void		*mapdata ;
-	USTAT		*sbp ;		/* requires 'usystem.h' */
+	ustat		*stbp ;		/* requires 'usystem.h' */
 	size_t		mapsize ;
 	size_t		maxsize ;
 } ;
@@ -85,17 +85,18 @@ struct filemap : filemap_head {
 	    rewind(this,filemapmem_rewind) ;
 	    close(this,filemapmem_close) ;
 	    tell(this,0) ;
+	    mapdata = nullptr ;
 	} ;
 	filemap(const filemap &) = delete ;
 	filemap &operator = (const filemap &) = delete ;
 	int open(cchar *,size_t = 0uz) noex ;
-	int stat(USTAT *) noex ;
+	int stat(ustat *) noex ;
 	int read(int,void *) noex ;
 	int getln(cchar **) noex ;
 	int seek(off_t,int = 0) noex ;
 	void dtor() noex ;
-	~filemap() {
-	    dtor() ;
+	destruct filemap() {
+	    if (mapdata) dtor() ;
 	} ;
 } ; /* end struct (filemap) */
 #else	/* __cplusplus */
@@ -105,7 +106,7 @@ typedef FILEMAP		filemap ;
 EXTERNC_begin
 
 extern int	filemap_open(filemap *,cchar *,size_t) noex ;
-extern int	filemap_stat(filemap *,USTAT *) noex ;
+extern int	filemap_stat(filemap *,ustat *) noex ;
 extern int	filemap_read(filemap *,int,void *) noex ;
 extern int	filemap_getln(filemap *,cchar **) noex ;
 extern int	filemap_seek(filemap *,off_t,int) noex ;

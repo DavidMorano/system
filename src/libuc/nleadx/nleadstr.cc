@@ -25,8 +25,10 @@
 	(simplified) name.
 
 
-	Name:
+	Names:
 	nleadbasestr
+	nleadcasestr
+	nleadfoldstr
 
 	Description:
 	Calculate the number of characters that two string have in
@@ -62,14 +64,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |INT_MAX| */
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<char.h>
 #include	<toxc.h>
 #include	<localmisc.h>
 
@@ -107,12 +108,14 @@ extern "C" {
 /* subroutine-templates */
 
 template <toxc_f toxc>
-int nleadxxxxstr(cchar *bs,cchar *sp,int sl) noex {
-	int		i{} ; /* used-afterwards */
-	if (sl < 0) sl = INT_MAX ;
-	for (i = 0 ; (i < sl) && bs[i] && sp[i] ; i += 1) {
-	    if (toxc(bs[i]) != toxc(sp[i])) break ;
-	} /* end for */
+static int nleadxxxxstr(cchar *bs,cchar *sp,int sl) noex {
+	int		i = -1 ; /* return-value */
+	if (bs) ylikely {
+	    if (sl < 0) sl = INT_MAX ;
+	    for (i = 0 ; (i < sl) && bs[i] && sp[i] ; i += 1) {
+	        if (toxc(bs[i]) != toxc(sp[i])) break ;
+	    } /* end for */
+	} /* end if (non-null) */
 	return i ;
 }
 /* end subroutine-template (nleadxxxxstr)*/

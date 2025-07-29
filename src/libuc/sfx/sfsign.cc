@@ -47,14 +47,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>		/* possible future use */
-#include	<char.h>
-#include	<ischarx.h>
+#include	<char.h>		/* |char_iswhite(3uc)| */
+#include	<ischarx.h>		/* |isplusminus(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -86,21 +84,25 @@ import libutil ;
 
 int sfsign(cchar *sp,int sl,cchar **rpp,bool *bp) noex {
 	bool		fneg = false ;
-	if (sl < 0) sl = lenstr(sp) ;
-	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	}
-	if ((sl > 0) && isplusminus(*sp)) {
-	    fneg = (*sp == '-') ;
-	    sp += 1 ;
-	    sl -= 1 ;
-	}
-	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	}
-	*rpp = sp ;
+    	if (sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	    }
+	    if ((sl > 0) && isplusminus(*sp)) {
+	        fneg = (*sp == '-') ;
+	        sp += 1 ;
+	        sl -= 1 ;
+	    }
+	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	    }
+	} else {
+	    sl = -1 ;
+	} /* end if (non-null) */
+	if (rpp) *rpp = sp ;
 	if (bp) *bp = fneg ;
 	return sl ;
 }

@@ -70,9 +70,9 @@ typedef longlong *	longlongp ;
 
 static int serialbuf_wok(serialbuf *op,cvoid *wp,int wl) noex {
 	int		rs = SR_FAULT ;
-	if (op && wp) {
-	    if (op->sbuf) {
-		if ((rs = op->i) >= 0) {
+	if (op && wp) ylikely {
+	    if (op->sbuf) ylikely {
+		if ((rs = op->i) >= 0) ylikely {
 		    cint	al = (op->slen - op->i) ;
 		    rs = SR_TOOBIG ;
 	            if (al >= wl) {
@@ -92,8 +92,8 @@ static int serialbuf_rok(serialbuf *op,void *rp,int rl) noex {
 
 static int serialbuf_szok(serialbuf *op,int sz) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if (op->sbuf) {
+	if (op) ylikely {
+	    if (op->sbuf) ylikely {
 		if ((rs = op->i) >= 0) {
 		    cint	al = (op->slen - op->i) ;
 		    rs = SR_TOOBIG ;
@@ -111,7 +111,7 @@ template<typename T>
 static int serialbuf_rx(serialbuf *op,T *rp) noex {
 	cint		sz = szof(T) ;
 	int		rs ;
-	if ((rs = serialbuf_rok(op,rp,sz)) >= 0) {
+	if ((rs = serialbuf_rok(op,rp,sz)) >= 0) ylikely {
 	    cchar	*sp = (op->sbuf + op->i) ;
 	    stdorder_r(sp,rp) ;
 	    op->i += sz ;
@@ -140,7 +140,7 @@ template<typename T>
 static int serialbuf_wx(serialbuf *op,T v) noex {
 	cint		sz = szof(T) ;
 	int		rs ;
-	if ((rs = serialbuf_szok(op,sz)) >= 0) {
+	if ((rs = serialbuf_szok(op,sz)) >= 0) ylikely {
 	    char	*bp = (op->sbuf + op->i) ;
 	    stdorder_w(bp,v) ;
 	    op->i += sz ;
@@ -176,8 +176,8 @@ static int serialbuf_wxa(serialbuf *op,T *wa,int n) noex {
 
 int serialbuf_start(serialbuf *op,char *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if (sbuf) {
+	if (op) ylikely {
+	    if (sbuf) ylikely {
 		rs = SR_INVALID ;
 		if (slen > 0) {
 	            rs = SR_OK ;
@@ -198,7 +198,7 @@ int serialbuf_start(serialbuf *op,char *sbuf,int slen) noex {
 
 int serialbuf_finish(serialbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->sbuf && op->slen) {
 	        op->sbuf = nullptr ;
@@ -214,7 +214,7 @@ int serialbuf_finish(serialbuf *op) noex {
 /* "advance" the buffer-index as if we wrote something in there */
 int serialbuf_adv(serialbuf *op,int sz) noex {
 	int		rs ;
-	if ((rs = serialbuf_szok(op,sz)) >= 0) {
+	if ((rs = serialbuf_szok(op,sz)) >= 0) ylikely {
 	    op->i += sz ;
 	}
 	return rs ;
@@ -223,9 +223,9 @@ int serialbuf_adv(serialbuf *op,int sz) noex {
 
 int serialbuf_getlen(serialbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->sbuf && op->slen) {
+	    if (op->sbuf && op->slen) ylikely {
 	        rs = op->i ;
 	    }
 	} /* end if (non-null) */
@@ -235,9 +235,9 @@ int serialbuf_getlen(serialbuf *op) noex {
 
 int serialbuf_reset(serialbuf *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->sbuf && op->slen) {
+	    if (op->sbuf && op->slen) ylikely {
 	        op->i = 0 ;
 	        rs = SR_OK ;
 	    }
@@ -249,7 +249,7 @@ int serialbuf_reset(serialbuf *op) noex {
 int serialbuf_robj(serialbuf *op,void *rp,int rl) noex {
 	char		*rb = charp(rp) ;
 	int		rs ;
-	if ((rs = serialbuf_rok(op,rb,rl)) >= 0) {
+	if ((rs = serialbuf_rok(op,rb,rl)) >= 0) ylikely {
 	    cchar	*sp = (op->sbuf + op->i) ;
 	    memcpy(rp,sp,rl) ;
 	    op->i += rl ;
@@ -261,7 +261,7 @@ int serialbuf_robj(serialbuf *op,void *rp,int rl) noex {
 int serialbuf_rc(serialbuf *op,char *rp) noex {
 	cint		sz = szof(char) ;
 	int		rs ;
-	if ((rs = serialbuf_rok(op,rp,sz)) >= 0) {
+	if ((rs = serialbuf_rok(op,rp,sz)) >= 0) ylikely {
 	    cchar	*sp = (op->sbuf + op->i) ;
 	    *rp = *sp ;
 	    op->i += sz ;
@@ -309,7 +309,7 @@ int serialbuf_rlla(serialbuf *op,longlong *rp,int n) noex {
 int serialbuf_rstrn(serialbuf *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rl = 0 ;
-	if ((rs = serialbuf_rok(op,rbuf,rlen)) >= 0) {
+	if ((rs = serialbuf_rok(op,rbuf,rlen)) >= 0) ylikely {
 	    cchar	*sp = (op->sbuf + op->i) ;
 	    rl = intconv(strwcpy(rbuf,sp,rlen) - rbuf) ;
 	    op->i += rl ;
@@ -322,9 +322,9 @@ int serialbuf_rstrn(serialbuf *op,char *rbuf,int rlen) noex {
 int serialbuf_rstrw(serialbuf *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rl = 0 ;
-	if ((rs = serialbuf_rok(op,rbuf,rlen)) >= 0) {
+	if ((rs = serialbuf_rok(op,rbuf,rlen)) >= 0) ylikely {
 	    cchar	*sp = (op->sbuf + op->i) ;
-	    if ((rs = sncpy(rbuf,rlen,sp)) >= 0) {
+	    if ((rs = sncpy(rbuf,rlen,sp)) >= 0) ylikely {
 		rl = rs ;
 	        op->i += rl ;
 	    }
@@ -336,7 +336,7 @@ int serialbuf_rstrw(serialbuf *op,char *rbuf,int rlen) noex {
 int serialbuf_rbuf(serialbuf *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rl = 0 ;
-	if ((rs = serialbuf_rok(op,rbuf,rlen)) >= 0) {
+	if ((rs = serialbuf_rok(op,rbuf,rlen)) >= 0) ylikely {
 	    cchar	*sp = (op->sbuf + op->i) ;
 	    memcpy(rbuf,sp,rlen) ;
 	    rl = rlen ;
@@ -415,7 +415,7 @@ int serialbuf_rubuf(serialbuf *op,uchar *rbuf,int rlen) noex {
 int serialbuf_wobj(serialbuf *op,cvoid *wp,int wl) noex {
 	char		*wb = charp(wp) ;
 	int		rs ;
-	if ((rs = serialbuf_wok(op,wb,wl)) >= 0) {
+	if ((rs = serialbuf_wok(op,wb,wl)) >= 0) ylikely {
 	    char	*bp = (op->sbuf + op->i) ;
 	    memcpy(bp,wp,wl) ;
 	    op->i += wl ;
@@ -427,7 +427,7 @@ int serialbuf_wobj(serialbuf *op,cvoid *wp,int wl) noex {
 int serialbuf_wc(serialbuf *op,char ch) noex {
 	cint		sz = szof(char) ;
 	int		rs ;
-	if ((rs = serialbuf_szok(op,sz)) >= 0) {
+	if ((rs = serialbuf_szok(op,sz)) >= 0) ylikely {
 	    char	*bp = (op->sbuf + op->slen) ;
 	    *bp = char(ch) ;
 	    op->i += sz ;
@@ -475,7 +475,7 @@ int serialbuf_wlla(serialbuf *op,const longlong *llwa,int n) noex {
 int serialbuf_wstrn(serialbuf *op,cchar *wbuf,int wlen) noex {
 	int		rs ;
 	int		wl = 0 ;
-	if ((rs = serialbuf_wok(op,wbuf,wlen)) >= 0) {
+	if ((rs = serialbuf_wok(op,wbuf,wlen)) >= 0) ylikely {
 	    char	*bp = (op->sbuf + op->i) ;
 	    strncpy(bp,wbuf,wlen) ;
 	    wl = wlen ;
@@ -489,7 +489,7 @@ int serialbuf_wstrn(serialbuf *op,cchar *wbuf,int wlen) noex {
 int serialbuf_wstrw(serialbuf *op,cchar *wbuf,int wlen) noex {
 	int		rs ;
 	int		wl = 0 ;
-	if ((rs = serialbuf_wok(op,wbuf,(wlen+1))) >= 0) {
+	if ((rs = serialbuf_wok(op,wbuf,(wlen+1))) >= 0) ylikely {
 	    char	*bp = (op->sbuf + op->i) ;
 	    wl = intconv(strwcpy(bp,wbuf,wlen) - bp) ;
 	    op->i += wl ;
@@ -501,7 +501,7 @@ int serialbuf_wstrw(serialbuf *op,cchar *wbuf,int wlen) noex {
 int serialbuf_wbuf(serialbuf *op,cchar *wbuf,int wlen) noex {
 	int		rs ;
 	int		wl = 0 ;
-	if ((rs = serialbuf_wok(op,wbuf,(wlen+1))) >= 0) {
+	if ((rs = serialbuf_wok(op,wbuf,(wlen+1))) >= 0) ylikely {
 	    char	*bp = (op->sbuf + op->i) ;
 	    memcpy(bp,wbuf,wlen) ;
 	    wl = wlen ;
@@ -732,11 +732,11 @@ void serialbuf::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("serialbuf",rs,"fini-finish") ;
 	}
-}
+} /* end method (serialbuf::dtor) */
 
 serialbuf_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case serialbufmem_getlen:
 	        rs = serialbuf_getlen(op) ;

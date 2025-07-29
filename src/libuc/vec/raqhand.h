@@ -56,7 +56,7 @@ struct raqhand_flags {
 
 struct raqhand_head {
 	cvoid		**va ;
-	RAQHAND_FL	f ;
+	RAQHAND_FL	fl ;
 	int		c ;		/* count of items in list */
 	int		n ;		/* extent of array */
 	int		hi ;		/* head */

@@ -46,6 +46,7 @@
 
 #include	"bufstr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -79,8 +80,8 @@ static inline int bufstr_xxxx(bufstr *op,int (*ctxxx)(char *,int,T),T v) noex {
 	cint		dlen = DIGBUFLEN ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op) {
-	    if ((rs = bufstr_extend(op,dlen)) >= 0) {
+	if (op) ylikely {
+	    if ((rs = bufstr_extend(op,dlen)) >= 0) ylikely {
 	        char	*bp = (op->dbuf + op->len) ;
 	        rs = ctxxx(bp,dlen,v) ;
 	        op->len += rs ;
@@ -126,7 +127,7 @@ static inline int bufstr_hexx(bufstr *sbp,T v) noex {
 
 int bufstr_start(bufstr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->len = 0 ;
 	    op->dlen = 0 ;
@@ -141,7 +142,7 @@ int bufstr_finish(bufstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->dbuf) {
 	        rs1 = uc_free(op->dbuf) ;
@@ -159,9 +160,9 @@ int bufstr_finish(bufstr *op) noex {
 int bufstr_strw(bufstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (char *bp ; (rs = bufstr_extend(op,sl,&bp)) >= 0) {
+	    if (char *bp ; (rs = bufstr_extend(op,sl,&bp)) >= 0) ylikely {
 	        strwcpy(bp,sp,sl) ;
 	        op->len += sl ;
 	        len = op->len ;
@@ -173,7 +174,7 @@ int bufstr_strw(bufstr *op,cchar *sp,int sl) noex {
 
 int bufstr_chr(bufstr *op,int ch) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    char	buf[2] = { char(ch) } ;
 	    rs = bufstr_strw(op,buf,1) ;
 	}
@@ -184,7 +185,7 @@ int bufstr_chr(bufstr *op,int ch) noex {
 int bufstr_get(bufstr *op,cchar **spp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (spp) {
 	        *spp = (op->dbuf) ? op->dbuf : op->sbuf ;

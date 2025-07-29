@@ -86,7 +86,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |lenstr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -97,6 +97,7 @@
 
 #include	"ncol.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -128,7 +129,7 @@
 /* exported subroutines */
 
 int ncolstr(int ntab,int ccol,cchar *sp,int sl) noex {
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	int		cols = 0 ;
 	while (sl-- && sp[0]) {
 	    cint	ch = mkchar(sp[0]) ;
@@ -164,7 +165,7 @@ int ncolchar(int ntab,int ccol,int ch) noex {
 int getcols(int ntab,int ccol,int ncols,cchar *sp,int sl) noex {
 	cint		tcol = (ccol + ncols) ;
 	int		i = 0 ; /* used afterwards */
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if (ccol < tcol) {
 	    int		cols ;
 	    for (i = 0 ; (ccol < tcol) && (i < sl) ; i += 1) {

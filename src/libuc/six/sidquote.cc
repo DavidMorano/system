@@ -62,28 +62,48 @@
 /* local typedefs */
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int sidquote(cchar *sp,int sl) noex {
-	int		i ; /* used-afterwards (return value) */
-	bool		f_skip = false ;
-	bool		f_done = false ;
-	for (i = 0 ; sl && sp[i] && (! f_done) ; i += 1) {
-	    cint	ch = mkchar(sp[i]) ;
-	    switch (ch) {
-	    case '\\':
-		f_skip = (! f_skip) ;
-		break ;
-	    case CH_DQUOTE:
-		if (! f_skip) f_done = TRUE ;
-		fallthrough ;
-	        /* FALLTHROUGH */
-	    default:
-		f_skip = false ;
-		break ;
-	    } /* end switch */
-	    sl -= 1 ;
-	} /* end for */
+	int		i = -1 ; /* used-afterwards (return value) */
+	if (sp) ylikely {
+	    bool	f_skip = false ;
+	    bool	f_done = false ;
+	    for (i = 0 ; sl && sp[i] && (! f_done) ; i += 1) {
+	        cint	ch = mkchar(sp[i]) ;
+	        switch (ch) {
+	        case '\\':
+		    f_skip = (! f_skip) ;
+		    break ;
+	        case CH_DQUOTE:
+		    if (! f_skip) f_done = TRUE ;
+		    fallthrough ;
+	            /* FALLTHROUGH */
+	        default:
+		    f_skip = false ;
+		    break ;
+	        } /* end switch */
+	        sl -= 1 ;
+	    } /* end for */
+	} /* end if (non-null) */
 	return i ;
 }
 /* end subroutine (sidquote) */

@@ -111,9 +111,9 @@ constexpr bool		f_debug = CF_DEBUG ;
 
 int sif::operator () (cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;		/* indicate zero result */
+	int		rl = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if (sp && rpp) {
+	if (sp && rpp) ylikely {
 	    rs = SR_OK ;
 	    if (sstr) {
 		rl = nextbrk(rpp) ;
@@ -134,9 +134,9 @@ int sif::operator () (cchar **rpp) noex {
 
 int sif::next(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;
+	int		rl = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if (sp && rpp) {
+	if (sp && rpp) ylikely {
 	    rs = SR_OK ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rl = sfnext(sp,sl,&rp)) > 0) {
@@ -152,10 +152,10 @@ int sif::next(cchar **rpp) noex {
 int sif::nextbrk(cchar **rpp) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;		/* <- indicate zero result */
+	int		rl = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
 	if_constexpr (f_debug) debprintf(__func__,"ent sl=%d\n",sl) ;
-	if (sp && (sstr || sch) && rpp) {
+	if (sp && (sstr || sch) && rpp) ylikely {
 	    rs = SR_OK ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && (rl <= 0)) {
@@ -183,9 +183,9 @@ int sif::nextbrk(cchar **rpp) noex {
 
 int sif::spchr(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;		/* <- indicate zero result */
+	int		rl = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if (sp && sch && rpp) {
+	if (sp && sch && rpp) ylikely {
 	    rs = SR_OK ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && (rl <= 0)) {
@@ -208,9 +208,9 @@ int sif::spchr(cchar **rpp) noex {
 
 int sif::spbrk(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;		/* <- indicate zero result */
+	int		rl = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if (sp && sstr && rpp) {
+	if (sp && sstr && rpp) ylikely {
 	    rs = SR_OK ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && (rl <= 0)) {
@@ -235,7 +235,7 @@ int sif::chr(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = SR_NOTFOUND ;	/* <- indicate not-found */
 	cchar		*rp = nullptr ;
-	if (sp && sch && rpp) {
+	if (sp && sch && rpp) ylikely {
 	    rs = SR_OK ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
@@ -259,7 +259,7 @@ int sif::brk(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = SR_NOTFOUND ;	/* <- indicate not-found */
 	cchar		*rp = nullptr ;
-	if (sp && sstr && rpp) {
+	if (sp && sstr && rpp) ylikely {
 	    rs = SR_OK ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (cchar *tp ; (tp = strnbrk(sp,sl,sstr)) != nullptr) {
@@ -284,7 +284,7 @@ int sif::brk(cchar **rpp) noex {
 
 sif_co::operator bool () noex {
 	bool		f = false ;
-	if (op) {
+	if (op) ylikely {
 	    cnullptr	np{} ;
 	    cint	ch = mkchar(op->sp[0]) ;
 	    switch (w) {

@@ -89,10 +89,10 @@ int mkdirs(cchar *dname,mode_t dm) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	dm &= (~ S_IFMT) ;
-	if (dname) {
+	if (dname) ylikely {
 	    rs = SR_INVALID ;
-	    if (dname[0]) {
-	        if (ids id ; (rs = id.load) >= 0) {
+	    if (dname[0]) ylikely {
+	        if (ids id ; (rs = id.load) >= 0) ylikely {
 	            if ((rs = procdir(&id,dname,dm)) >= 0) {
 	                c += rs ;
 	            } else if (rs == SR_NOENT) {
@@ -113,7 +113,7 @@ int mkdirs(cchar *dname,mode_t dm) noex {
 
 static int procdir(ids *idp,cchar *dirbuf,mode_t dm) noex {
 	int		rs ;
-	if (USTAT sb ; (rs = uc_stat(dirbuf,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_stat(dirbuf,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        rs = permid(idp,&sb,X_OK) ;
 	        if (rs > 0) rs = 0 ;
@@ -133,8 +133,8 @@ static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *dirbuf ; (rs = libmalloc_mp(&dirbuf)) >= 0) {
-            if ((rs = mkpath(dirbuf,dname)) >= 0) {
+	if (char *dirbuf ; (rs = libmalloc_mp(&dirbuf)) >= 0) ylikely {
+            if ((rs = mkpath(dirbuf,dname)) >= 0) ylikely {
                 cchar       *dp = dirbuf ;
                 for (char *bp ; (bp = strchr(dp,'/')) != np ; ) {
                     bool    f = true ;

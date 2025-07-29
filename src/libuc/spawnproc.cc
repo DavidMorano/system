@@ -468,14 +468,14 @@ static void spawnproc_child(scon *psap,cchar *fname,
 	}
 
 	if (rs >= 0) {
+	    cint	isz = szof(int) ;
 	    if_constexpr (f_isaexec) {
 	        rs = uc_isaexecve(fname,av,ev) ;
 	    } else {
 	        rs = uc_execve(fname,av,ev) ;
 	    } /* end if_constexpr (f_isaexec) */
-	    u_write(cfd,&rs,sizeof(int)) ;
+	    u_write(cfd,&rs,isz) ;
 	} /* end if (exec) */
-
 	uc_exit(EX_NOEXEC) ;
 }
 /* end subroutine (spawnproc_child) */
@@ -567,7 +567,7 @@ int envloader::envpath() noex {
 	    cint	plen = (PATHMULT * var.maxpathlen) ;
 	    if (char *pbuf{} ; (rs = uc_malloc((plen + 1),&pbuf)) >= 0) {
 		cint	cmd = _CS_PATH ;
-	        if ((rs = uc_sysconfstr(pbuf,plen,cmd)) >= 0) {
+	        if ((rs = uc_sysconfstr(cmd,pbuf,plen)) >= 0) {
 	            rs = envhelp_envset(ehp,vn,pbuf,rs) ;
 	        } /* end if */
 	        rs = rsfree(rs,pbuf) ;
@@ -587,7 +587,7 @@ static int findprog(char *pwd,char *pbuf,cchar *fname) noex {
 	            rs = getpwd(pwd,var.maxpathlen) ;
 	        }
 	        if (rs >= 0) {
-	            if ((rs = mkpath2(pbuf,pwd,fname)) >= 0) {
+	            if ((rs = mkpath(pbuf,pwd,fname)) >= 0) {
 	                pl = rs ;
 	                if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
 	                    cint	am = X_OK ;

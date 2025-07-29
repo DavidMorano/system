@@ -68,6 +68,8 @@
 
 #include	"snwcpyx.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
 import libutil ;
 
 /* local defines */
@@ -237,8 +239,7 @@ int expmgr::handle() noex {
 int expmgr::handle_octal() noex {
     	int		rs ;
 	if ((rs = siourx(sinonoct,sp,sl)) >= 0) {
-	    cint n = (rs + 1) ;
-	    if ((rs = storeval(cfoct,(sp-1),n)) >= 0) {
+	    if (cint n = (rs + 1) ; (rs = storeval(cfoct,(sp - 1),n)) >= 0) {
 	        sp += (n - 1) ;
 	        sl -= (n - 1) ;
 	    }
@@ -287,8 +288,7 @@ int expmgr::handle_x() noex {
 		}
 	    } else {
 		if ((rs = siourx(sinonhex,sp,sl)) > 0) {
-		    cint	si = rs ;
-		    if ((rs = storeval(cfhex,sp,si)) >= 0) {
+		    if (cint si = rs ; (rs = storeval(cfhex,sp,si)) >= 0) {
 			sl -= si ;
 			sp += si ;
 		    }

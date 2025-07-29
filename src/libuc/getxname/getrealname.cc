@@ -11,9 +11,9 @@
 	= 2003-10-01, David A­D­ Morano
 	This was written to consolidate this type of code that was
 	previously done separately in different places.  This code
-	only makes sense if access to the user ucentpw record is
+	only makes sense if access to the user UCENTPW record is
 	*only* needed to get the GECOS "name" field.  If more general
-	access of the user ucentpw record is needed, something other
+	access of the user UCENTPW record is needed, something other
 	than this should be used.
 
 */
@@ -27,7 +27,7 @@
 
 	Description:
 	This subroutine will try to find a real-name given a username.  If just
-	queries the ucentpw-GECOS information.
+	queries the UCENTPW-GECOS information.
 
 	Synopsis:
 	int getrealname(char *rbuf,int rlen,cchar *un) noex
@@ -83,7 +83,7 @@
 
 /* forward references */
 
-static int getpwname(ucentpw *,char *,int,cchar *) noex ;
+static int getpwname(ucentpwx *,char *,int,cchar *) noex ;
 
 
 /* local variables */
@@ -101,8 +101,8 @@ int getrealname(char *rbuf,int rlen,cchar *un) noex {
 	if (rlen < 0) rlen = REALNAMELEN ;
 	if (rbuf) {
 	    if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
-	        ucentpw	pw ;
-	        cint	pwlen = rs ;
+	        ucentpwx	pw ;
+	        cint		pwlen = rs ;
 	        if ((rs = getpwname(&pw,pwbuf,pwlen,un)) >= 0) {
 	            cchar *gp ;
 	            if ((rs = getgecosname(pw.pw_gecos,-1,&gp)) > 0) {
@@ -121,10 +121,10 @@ int getrealname(char *rbuf,int rlen,cchar *un) noex {
 
 /* local subroutines */
 
-static int getpwname(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
+static int getpwname(ucentpwx *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	int		rs ;
 	if (un && (un[0] != '\0') && (un[0] != '-')) {
-	    rs = getpwx_name(pwp,pwbuf,pwlen,un) ;
+	    rs = pwp->nam(wbuf,pwlen,un) ;
 	} else {
 	    rs = getpwusername(pwp,pwbuf,pwlen,-1) ;
 	}

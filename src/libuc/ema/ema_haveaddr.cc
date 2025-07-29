@@ -35,6 +35,8 @@
 
 #include	"ema.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
 import libutil ;
 
 /* local defines */

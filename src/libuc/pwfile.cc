@@ -51,6 +51,7 @@
 
 #include	"pwfile.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -94,12 +95,13 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static int pwfile_ctor(PF *op,Args ... args) noex {
 	PWFILE		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->alp = new(nothrow) vecitem) != nullptr) {
-	        if ((op->ulp = new(nothrow) hdb) != nullptr) {
+	    if ((op->alp = new(nothrow) vecitem) != np) ylikely {
+	        if ((op->ulp = new(nothrow) hdb) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-hdb) */
 		if (rs < 0) {
@@ -114,7 +116,7 @@ static int pwfile_ctor(PF *op,Args ... args) noex {
 
 static int pwfile_dtor(PF *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->ulp) {
 		delete op->ulp ;
@@ -132,7 +134,7 @@ static int pwfile_dtor(PF *op) noex {
 template<typename ... Args>
 static int pwfile_magic(PF *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == PWFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -158,13 +160,13 @@ static int	pwfile_checkopen(PF *) noex ;
 
 int pwfile_open(PF *op,cchar *pwfname) noex {
 	int		rs ;
-	if ((rs = pwfile_ctor(op,pwfname)) >= 0) {
+	if ((rs = pwfile_ctor(op,pwfname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (pwfname[0]) {
-	        if (cchar *cp{} ; (rs = uc_mallocstrw(pwfname,-1,&cp)) >= 0) {
+	    if (pwfname[0]) ylikely {
+	        if (cchar *cp ; (rs = uc_mallocstrw(pwfname,-1,&cp)) >= 0) {
 	            op->fname = cp ;
 	            op->lfd = -1 ;
-	            if ((rs = pwfile_loadbegin(op)) >= 0) {
+	            if ((rs = pwfile_loadbegin(op)) >= 0) ylikely {
 	                op->f = {} ;
 	                op->magic = PWFILE_MAGIC ;
 	            }
@@ -185,17 +187,17 @@ int pwfile_open(PF *op,cchar *pwfname) noex {
 int pwfile_close(PF *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pwfile_magic(op)) >= 0) {
+	if ((rs = pwfile_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = pwfile_loadend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->lfd >= 0) {
+	    if (op->lfd >= 0) ylikely {
 	        rs1 = u_close(op->lfd) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->lfd = -1 ;
 	    }
-	    if (op->fname) {
+	    if (op->fname) ylikely {
 	        rs1 = uc_free(op->fname) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
@@ -212,7 +214,7 @@ int pwfile_close(PF *op) noex {
 
 int pwfile_curenum(PF *op,PF_CUR *curp,PWE *uep,char *rbuf,int rlen) noex {
 	int		rs ;
-	if ((rs = pwfile_magic(op,curp,uep,rbuf)) >= 0) {
+	if ((rs = pwfile_magic(op,curp,uep,rbuf)) >= 0) ylikely {
 	    pwentry	*ep = nullptr ; /* used-afterwards */
 	    void	*vp{} ;
 	    while ((rs = vecitem_get(op->alp,curp->i,&vp)) >= 0) {
@@ -234,16 +236,16 @@ int pwfile_curenum(PF *op,PF_CUR *curp,PWE *uep,char *rbuf,int rlen) noex {
 /* fetch the next entry that matches the specified username */
 int pwfile_fetchuser(PF *op,cc *un,PF_CUR *curp,PWE *uep,char *rb,int rl) noex {
 	int		rs ;
-	if ((rs = pwfile_magic(op,un,curp,uep,rb)) >= 0) {
+	if ((rs = pwfile_magic(op,un,curp,uep,rb)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (un[0]) {
-	        USTAT	sb ;
+	    if (un[0]) ylikely {
+	        ustat	sb ;
 	        if (op->lfd < 0) {
 	            rs = uc_stat(op->fname,&sb) ;
 	        } else {
 	            rs = uc_fstat(op->lfd,&sb) ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            hdb_dat	key ;
 	            hdb_dat	val{} ;
 	            hdb_cur	*hcurp = ((curp) ? curp->hcp : nullptr) ;
@@ -253,7 +255,7 @@ int pwfile_fetchuser(PF *op,cc *un,PF_CUR *curp,PWE *uep,char *rb,int rl) noex {
 	            } /* end if */
 		    /* continue with the query */
 	            key.buf = un ;
-	            key.len = strlen(un) ;
+	            key.len = lenstr(un) ;
 	            if ((rs = hdb_fetch(op->ulp,key,hcurp,&val)) >= 0) {
 	                if (uep) {
 	                    pwentry	*ep = (PWE *) val.buf ;
@@ -269,8 +271,8 @@ int pwfile_fetchuser(PF *op,cc *un,PF_CUR *curp,PWE *uep,char *rb,int rl) noex {
 
 int pwfile_curbegin(PF *op,PF_CUR *curp) noex {
 	int		rs ;
-	if ((rs = pwfile_magic(op,curp)) >= 0) {
-	    if ((rs = pwfile_checkopen(op)) >= 0) {
+	if ((rs = pwfile_magic(op,curp)) >= 0) ylikely {
+	    if ((rs = pwfile_checkopen(op)) >= 0) ylikely {
 		int	cmd ; /* used in two blocks below */
 	        bool	f_locked = false ;
 	        if (! op->f.locked) {
@@ -285,7 +287,7 @@ int pwfile_curbegin(PF *op,PF_CUR *curp) noex {
 	            f_locked = true ;
 	        } /* end if (not locked) */
 	        curp->i = 0 ;
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    rs = hdb_curbegin(op->ulp,curp->hcp) ;
 		}
 	        if ((rs < 0) && f_locked) {
@@ -307,7 +309,7 @@ int pwfile_curbegin(PF *op,PF_CUR *curp) noex {
 int pwfile_curend(PF *op,PF_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pwfile_magic(op,curp)) >= 0) {
+	if ((rs = pwfile_magic(op,curp)) >= 0) ylikely {
 	    if (op->f.locked_cur && (! op->f.locked_explicit)) {
 		cint	to = TO_LOCK ;
 	        op->f.locked = false ;
@@ -326,8 +328,8 @@ int pwfile_curend(PF *op,PF_CUR *curp) noex {
 int pwfile_lock(PF *op,int type,int to_lock) noex {
 	int		rs ;
 	int		f_opened = false ;
-	if ((rs = pwfile_magic(op)) >= 0) {
-	    if ((rs = pwfile_checkopen(op)) >= 0) {
+	if ((rs = pwfile_magic(op)) >= 0) ylikely {
+	    if ((rs = pwfile_checkopen(op)) >= 0) ylikely {
 	        f_opened = (rs > 0) ;
 	        switch (type) {
 	        case F_ULOCK:
@@ -382,10 +384,10 @@ int pwfile_lock(PF *op,int type,int to_lock) noex {
 static int pwfile_loadbegin(PF *op) noex {
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = pwfile_filefront(op)) >= 0) {
+	if ((rs = pwfile_filefront(op)) >= 0) ylikely {
 	    cnullptr	np{} ;
 	    n = rs ;
-	    if ((rs = hdb_start(op->ulp,n,0,np,np)) >= 0) {
+	    if ((rs = hdb_start(op->ulp,n,0,np,np)) >= 0) ylikely {
 	        vecitem		*alp = op->alp ;
 	        void		*vp{} ;
 	        for (int i = 0 ; vecitem_get(alp,i,&vp) >= 0 ; i += 1) {
@@ -394,7 +396,7 @@ static int pwfile_loadbegin(PF *op) noex {
 	        	hdb_dat		key ;
 	        	hdb_dat		val ;
 	                key.buf = ep->username ;
-	                key.len = strlen(ep->username) ;
+	                key.len = lenstr(ep->username) ;
 	                val.buf = ep ;
 	                val.len = szof(pwentry) ;
 	                rs = hdb_store(op->ulp,key,val) ;
@@ -416,7 +418,7 @@ static int pwfile_loadbegin(PF *op) noex {
 static int pwfile_loadend(PF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->ulp) {
+	if (op->ulp) ylikely {
 	    rs1 = hdb_finish(op->ulp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -430,13 +432,13 @@ static int pwfile_loadend(PF *op) noex {
 
 static int pwfile_filefront(PF *op) noex {
 	int		rs = SR_NOENTRY ;
-	if (op->fname[0]) {
-	    if (USTAT sb ; (rs = uc_stat(op->fname,&sb)) >= 0) {
+	if (op->fname[0]) ylikely {
+	    if (ustat sb ; (rs = uc_stat(op->fname,&sb)) >= 0) ylikely {
 	        vecitem		*alp = op->alp ;
 	        cint		vo = VECITEM_OCOMPACT ;
-	        int		vn = ((sb.st_size / 60) + 5) ;
+	        int		vn = intconv((sb.st_size / 60) + 5) ;
 	        if (vn < DEFENTS) vn = DEFENTS ;
-	        if ((rs = alp->start(vn,vo)) >= 0) {
+	        if ((rs = alp->start(vn,vo)) >= 0) ylikely {
 	            op->readtime = sb.st_mtime ;
 	            rs = pwfile_filefronter(op) ;
 	            if (rs < 0) {
@@ -453,16 +455,16 @@ static int pwfile_filefronter(PF *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) ylikely {
 	    bfile	pf, *fp = &pf ;
 	    cint	llen = rs ;
 	    cmode	om = 0644 ;
-	    if ((rs = bopen(fp,op->fname,"rc",om)) >= 0) {
+	    if ((rs = bopen(fp,op->fname,"rc",om)) >= 0) ylikely {
 	        if (! op->f.locked) {
 	            rs = bcontrol(fp,BC_LOCKREAD,TO_LOCK) ;
 	        }
-	        if (rs >= 0) {
-	            while ((rs = breadln(fp,lbuf,llen)) > 0) {
+	        if (rs >= 0) ylikely {
+	            while ((rs = breadln(fp,lbuf,llen)) > 0) ylikely {
 			cint	ll = rmeol(lbuf,rs) ;
 			rs = pwfile_fileln(op,lbuf,ll) ;
 			n += rs ;
@@ -486,13 +488,14 @@ static int pwfile_fileln(PF *op,cchar *lbuf,int ll) noex {
     	cnullptr	np{} ;
     	int		rs ;
     	int		n = 0 ;
-        if (pwentry ent ; (rs = ent.start) >= 0) {
+        if (pwentry ent ; (rs = ent.start) >= 0) ylikely {
             int         fn = 0 ;
             int         cl = ll ;
 	    cchar	*cp = lbuf ; /* used-afterwards */
-            for (cc *tp{} ; (tp = strnchr(cp,cl,':')) != np ; ) {
-                rs = ent.fieldpw(fn,cp,(tp - cp)) ;
-                cl -= ((tp + 1) - cp) ;
+            for (cc *tp ; (tp = strnchr(cp,cl,':')) != np ; ) {
+		cint tl = intconv(tp - cp) ;
+                rs = ent.fieldpw(fn,cp,tl) ;
+                cl -= intconv((tp + 1) - cp) ;
                 cp = (tp + 1) ;
                 fn += 1 ;
                 if (rs < 0) break ;

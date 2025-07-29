@@ -44,15 +44,13 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strnchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<ascii.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnchr(3uc)| |strnsub(3uc)| */
 #include	<mkchar.h>
-#include	<ischarx.h>
+#include	<ischarx.h>		/* |isalnumlatin(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -95,7 +93,7 @@ int sfthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
     	cnullptr	np{} ;
 	int		cl = -1 ; /* return-value */
 	cchar		*cp = nullptr ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sl >= 4) {
 	        for (cchar *tp ; (tp = strnchr(sp,sl,chx)) != np ; ) {

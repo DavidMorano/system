@@ -102,7 +102,7 @@ int sixsub(cchar *sp,int sl,cchar *ss) noex {
 	int		i{} ; /* used-afterwards */
 	bool		f = false ;
 	if (sl < 0) sl = lenstr(sp) ;
-	if (sslen <= sl) {
+	if (sslen <= sl) ylikely {
 	    cint	sslead = toxc(ss[0]) ;
 	    int		m ;
 	    for (i = 0 ; i <= (sl - sslen) ; i += 1) {
@@ -128,42 +128,42 @@ int sixsub(cchar *sp,int sl,cchar *ss) noex {
 /* exported subroutines */
 
 int sibasesub(cchar *sp,int sl,cchar *ss) noex {
-    	int		rs = -1 ;
-	if (sp && ss) {
+    	int		si = -1 ;
+	if (sp && ss) ylikely {
 	    if (sl >= 0) {
 	        if_constexpr (syshas.strnstr) {
 	            csize	slsize = size_t(sl) ;
 	            if (cc *tp ; (tp = strnstr(sp,ss,slsize)) != nullptr) {
-		        rs = intconv(tp - sp) ;
+		        si = intconv(tp - sp) ;
 	            }
 	        } else {
-	            rs = sixsub<tobc,nleadbasestr>(sp,sl,ss) ;
+	            si = sixsub<tobc,nleadbasestr>(sp,sl,ss) ;
 	        } /* end if_constexpr (f_strnstr) */
 	    } else {
 	        if (cc *tp ; (tp = strstr(sp,ss)) != nullptr) {
-		    rs = intconv(tp - sp) ;
+		    si = intconv(tp - sp) ;
 	        }
 	    }
 	} /* end if (non-null) */
-	return rs ;
+	return si ;
 }
 /* end subroutine (sibasesub) */
 
 int sicasesub(cchar *sp,int sl,cchar *ss) noex {
-    	int		rs = -1 ;
-	if (sp && ss) {
-	    rs = sixsub<touc,nleadcasestr>(sp,sl,ss) ;
+    	int		si = -1 ;
+	if (sp && ss) ylikely {
+	    si = sixsub<touc,nleadcasestr>(sp,sl,ss) ;
 	} /* end if (non-null) */
-	return rs ;
+	return si ;
 }
 /* end subroutine (sicasesub) */
 
 int sifoldsub(cchar *sp,int sl,cchar *ss) noex {
-    	int		rs = -1 ;
-	if (sp && ss) {
-	    rs = sixsub<tofc,nleadfoldstr>(sp,sl,ss) ;
+    	int		si = -1 ;
+	if (sp && ss) ylikely {
+	    si = sixsub<tofc,nleadfoldstr>(sp,sl,ss) ;
 	} /* end if (non-null) */
-	return rs ;
+	return si ;
 }
 /* end subroutine (sifoldsub) */
 

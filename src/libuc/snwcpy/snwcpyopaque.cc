@@ -49,13 +49,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<char.h>
 #include	<mkchar.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"snwcpyx.h"
@@ -94,17 +96,20 @@ int snwcpyopaque(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		dl = 0 ; /* return-value */
 	if (dbuf && sp) {
-	    rs = SR_OK ;
-	    while (dlen-- && sl && *sp) {
-	        if (cint ch = mkchar(*sp) ; (! CHAR_ISWHITE(ch))) {
-		    if (dlen-- == 0) break ;
-		    dbuf[dl++] = char(ch) ;
-	        } /* end if */
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	    if (sl && *sp) rs = SR_OVERFLOW ;
-	    dbuf[dl] = '\0' ;
+	    rs = SR_INVALID ;
+	    if (dlen >= 0) {
+	        rs = SR_OK ;
+	        while (dlen && sl && *sp) {
+	            if (cint ch = mkchar(*sp) ; (! CHAR_ISWHITE(ch))) {
+		        if (dlen-- == 0) break ;
+		        dbuf[dl++] = char(ch) ;
+	            } /* end if */
+	            sp += 1 ;
+	            sl -= 1 ;
+	        } /* end while */
+	        if (sl && *sp) rs = SR_OVERFLOW ;
+	        dbuf[dl] = '\0' ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
 }

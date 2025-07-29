@@ -49,14 +49,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system-types */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
 #include	<usystem.h>		/* |lenstr(3u)| */
 #include	<cfdec.h>
-#include	<char.h>
+#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<localmisc.h>
 
 #include	"shellunder.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -84,11 +86,11 @@
 int shellunder_load(shellunder_dat *op,cchar *under) noex {
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
-	if (op && under) {
+	if (op && under) ylikely {
 	    rs = SR_OK ;
 	    op->pid = -1 ;
 	    op->progename = nullptr ;
-	    if (under[0] != '\0') {
+	    if (under[0] != '\0') ylikely {
 	        if (under[0] == '*') {
 	            int		dl = -1 ;
 	            cchar	*dp = (under+1) ;

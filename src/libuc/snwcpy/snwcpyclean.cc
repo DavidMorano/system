@@ -101,7 +101,7 @@ namespace {
 		if (((ch & 0x7F) >= 0x20) && (ch != CH_DEL)) {
 		    s.set(ch,true) ;
 		}
-	    }
+	    } /* end for */
 	} ;
 	constexpr void mkextra(bitset<chtabsz> &s) noex {
 	    s.set(CH_BEL,true) ;

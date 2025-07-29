@@ -31,30 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= snwcpy.h snwcpyx.h snwcpyxc.h
+INCS += snwcpy.h snwcpyx.h snwcpyxc.h
 
 MODS +=
 
-LIBS=
-
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ0_SNWCPYX= snwcpyxc.o snwcpyopaque.o
@@ -71,7 +54,23 @@ OBJC_SNWCPYX= obj4.o obj5.o
 OBJ_SNWCPYX= obja.o objb.o objc.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -84,6 +83,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -102,7 +104,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_SNWCPYX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_SNWCPYX)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -118,32 +120,32 @@ control:
 
 
 obj0.o:			$(OBJ0_SNWCPYX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_SNWCPYX)
 
 obj1.o:			$(OBJ1_SNWCPYX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_SNWCPYX)
 
 obj2.o:			$(OBJ2_SNWCPYX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_SNWCPYX)
 
 obj3.o:			$(OBJ3_SNWCPYX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_SNWCPYX)
 
 obj4.o:			$(OBJ4_SNWCPYX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_SNWCPYX)
 
 obj5.o:			$(OBJ5_SNWCPYX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_SNWCPYX)
 
 
 obja.o:			$(OBJA_SNWCPYX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_SNWCPYX)
 
 objb.o:			$(OBJB_SNWCPYX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_SNWCPYX)
 
 objc.o:			$(OBJC_SNWCPYX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_SNWCPYX)
 
 
 snwcpyclean.o:		snwcpyclean.cc		$(INCS)

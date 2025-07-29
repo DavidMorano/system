@@ -45,14 +45,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>		/* possible future use */
-#include	<ascii.h>
-#include	<char.h>
+#include	<ascii.h>		/* |CH_{xx}| */
+#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -85,23 +83,25 @@ static bool	isnotours(int) noex ;
 
 /* exported subroutines */
 
-int sfsubstance(cchar *sp,int sl,cchar **cpp) noex {
-	int		ch ;
-	if (sl < 0) sl = lenstr(sp) ;
-	while (sl > 0) {
-	    ch = mkchar(sp[0]) ;
-	    if (isnotours(ch)) break ;
-	    sp += 1 ;
-	    sl -= 1 ;
-	}
-	while (sl > 0) {
-	    ch = mkchar(sp[sl-1]) ;
-	    if (isnotours(ch)) break ;
-	    sl -= 1 ;
-	}
-	if (cpp) {
-	    *cpp = sp ;
-	}
+int sfsubstance(cchar *sp,int sl,cchar **rpp) noex {
+    	if (sp) ylikely {
+	    int		ch ; /* used-mulitple */
+	    if (sl < 0) sl = lenstr(sp) ;
+	    while (sl > 0) {
+	        ch = mkchar(sp[0]) ;
+	        if (isnotours(ch)) break ;
+	        sp += 1 ;
+	        sl -= 1 ;
+	    }
+	    while (sl > 0) {
+	        ch = mkchar(sp[sl-1]) ;
+	        if (isnotours(ch)) break ;
+	        sl -= 1 ;
+	    }
+	} else {
+	    sl = -1 ;
+	} /* end if (non-null) */
+	if (rpp) *rpp = sp ;
 	return sl ;
 }
 /* end subroutine (sfsubstance) */

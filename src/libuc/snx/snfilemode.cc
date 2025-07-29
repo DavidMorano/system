@@ -53,7 +53,7 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
@@ -63,8 +63,11 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<ctoct.h>
 #include	<localmisc.h>		/* |OCTBUFLEN| */
 
@@ -116,8 +119,8 @@ constexpr flagstrs	fileperms[] = {
 int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (dbuf) {
-	    if (snflags ss ; (rs = ss.start(dbuf,dlen)) >= 0) {
+	if (dbuf) ylikely {
+	    if (snflags ss ; (rs = ss.start(dbuf,dlen)) >= 0) ylikely {
 	        cint	ft = (fm & S_IFMT) ;
 	        cchar	*ms = nullptr ;
 	        switch (ft) {
@@ -152,7 +155,7 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 		    ms = "UNKNOWN" ;
 		    break ;
 	        } /* end switch */
-	        if (ms) {
+	        if (ms) ylikely {
 		    rs = ss.addstr(ms) ;
 	        }
 	        for (int i = 0 ; (rs >= 0) && fileperms[i].f ; i += 1) {
@@ -160,14 +163,15 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 	                rs = ss.addstr(fileperms[i].s) ;
 		    }
 	        } /* end for */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    cint	n = 4 ; /* last characters */
+		    cint	v = int(fm & S_IAMB) ;
 		    cint	plen = OCTBUFLEN ;
 		    char	pbuf[OCTBUFLEN+1] ;
-		    if ((rs = ctocti(pbuf,plen,(fm & S_IAMB))) >= 0) {
+		    if ((rs = ctoct(pbuf,plen,v)) >= 0) ylikely {
 		        cchar	*cp = ((rs > n) ? (pbuf+(rs-n)) : pbuf) ;
 	                rs = ss.addstr(cp) ;
-		    }
+		    } /* end if (ctoct) */
 	        } /* end if (ok) */
 	        rs1 = ss.finish ;
 	        if (rs >= 0) rs = rs1 ;

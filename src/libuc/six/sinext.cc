@@ -40,14 +40,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<ascii.h>
-#include	<toxc.h>
-#include	<mkchar.h>
+#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -57,26 +54,47 @@ import libutil ;
 
 /* local defines */
 
-#define	ISWHITE(ch)	CHAR_ISWHITE(ch)
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
 
-/* external subroutines */
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+constexpr cauto		iswht = char_iswhite ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
 int sinext(cchar *sp,int sl) noex {
-	int		i = 0 ;
-	if (sl < 0) sl = lenstr(sp) ;
-	while ((i < sl) && ISWHITE(sp[i])) {
-	    i += 1 ;
-	}
-	while ((i < sl) && sp[i] && (! ISWHITE(sp[i]))) {
-	    i += 1 ;
-	}
+	int		i = -1 ; /* return-value */
+	if (sp) ylikely {
+	    i = 0 ; 
+	    if (sl < 0) sl = lenstr(sp) ;
+	    while ((i < sl) && iswht(sp[i])) {
+	        i += 1 ;
+	    }
+	    while ((i < sl) && sp[i] && (! iswht(sp[i]))) {
+	        i += 1 ;
+	    }
+	} /* end if (non-null) */
 	return i ;
 }
 /* end subroutine (sinext) */

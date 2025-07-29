@@ -17,8 +17,12 @@
 
 /*******************************************************************************
 
+  	Group:
+	bufprintf
+
+	Description:
 	This subroutine is used by 'printf' type routines to format
-	an output "buffer" from a format specification. This routine
+	an output "buffer" from a format specification.  This routine
 	has no support for floating point conversion since floating
 	point formats are not general enough for the most portable
 	applications.
@@ -26,6 +30,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdarg>
 #include	<usystem.h>
 #include	<fmtstr.h>
@@ -46,6 +52,11 @@
 /* forward references */
 
 
+/* local variables */
+
+cint		mo = 0 ;		/* mode-options */
+
+
 /* exported variables */
 
 
@@ -55,9 +66,8 @@ int bufprintf(char *dbuf,int dlen,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (dbuf && fmt) {
-	    cint	m = 0 ;
 	    va_begin(ap,fmt) ;
-	    rs = fmtstr(dbuf,dlen,m,fmt,ap) ;
+	    rs = fmtstr(dbuf,dlen,mo,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -67,8 +77,7 @@ int bufprintf(char *dbuf,int dlen,cchar *fmt,...) noex {
 int bufvprintf(char *dbuf,int dlen,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf && fmt && ap) {
-	    cint	m = 0 ;
-	    rs = fmtstr(dbuf,dlen,m,fmt,ap) ;
+	    rs = fmtstr(dbuf,dlen,mo,fmt,ap) ;
 	} /* end if (non-null) */
 	return rs ;
 }

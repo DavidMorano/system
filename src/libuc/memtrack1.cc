@@ -91,7 +91,7 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static inline int memtrack_magic(memtrack *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == memtrack_magicval) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -108,7 +108,7 @@ static inline int memtrack_magic(memtrack *op,Args ... args) noex {
 
 int memtrack::ins(cvoid *addr,int asize) noex {
 	int		rs ;
-	if ((rs = memtrack_magic(this)) >= 0) {
+	if ((rs = memtrack_magic(this)) >= 0) ylikely {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr && (asize > 0)) {
@@ -122,7 +122,7 @@ int memtrack::ins(cvoid *addr,int asize) noex {
 
 int memtrack::rem(cvoid *addr) noex {
 	int		rs ;
-	if ((rs = memtrack_magic(this)) >= 0) {
+	if ((rs = memtrack_magic(this)) >= 0) ylikely {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr) {
@@ -135,7 +135,7 @@ int memtrack::rem(cvoid *addr) noex {
 
 int memtrack::present(cvoid *addr) noex {
 	int		rs ;
-	if ((rs = memtrack_magic(this)) >= 0) {
+	if ((rs = memtrack_magic(this)) >= 0) ylikely {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr) {
@@ -150,7 +150,7 @@ int memtrack::present(cvoid *addr) noex {
 
 int memtrack::get(cvoid *addr,memtrack_ent *ep) noex {
 	int		rs ;
-	if ((rs = memtrack_magic(this)) >= 0) {
+	if ((rs = memtrack_magic(this)) >= 0) ylikely {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr) {
@@ -169,7 +169,7 @@ int memtrack::get(cvoid *addr,memtrack_ent *ep) noex {
 
 int memtrack::istart(int n) noex {
 	int		rs = SR_INVALID ;
-	if (n >= 0) {
+	if (n >= 0) ylikely {
 	    if ((tp = new(nothrow) track_t) != nullptr) {
 	        if ((rs = tp->start(n)) >= 0) {
 		    magic = memtrack_magicval ;
@@ -187,7 +187,7 @@ int memtrack::istart(int n) noex {
 int memtrack::ifinish() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = memtrack_magic(this)) >= 0) {
+	if ((rs = memtrack_magic(this)) >= 0) ylikely {
 	    rs = SR_OK ;
 	    {
 	        rs1 = tp->finish() ;
@@ -205,7 +205,7 @@ int memtrack::ifinish() noex {
 
 int memtrack::icount() noex {
 	int		rs ;
-	if ((rs = memtrack_magic(this)) >= 0) {
+	if ((rs = memtrack_magic(this)) >= 0) ylikely {
 	    rs = tp->count() ;
 	} /* end if (was open) */
 	return rs ;
@@ -219,12 +219,11 @@ void memtrack::dtor() noex {
 		ulogerror("memtrack",rs,"dtor-finish") ;
 	    }
 	}
-}
-/* end method (memtrack::dtor) */
+} /* end method (memtrack::dtor) */
 
 int memtrack_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op && (w >= 0)) {
+	if (op && (w >= 0)) ylikely {
 	    switch (w) {
 	    case memtrackmem_start:
 		rs = op->istart(a) ;

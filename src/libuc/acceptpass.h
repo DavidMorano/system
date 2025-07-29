@@ -1,4 +1,5 @@
 /* acceptpass HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* accept a passed file-descriptor (FD) from a UNIX® pipe */

@@ -24,11 +24,12 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
 
-extern int sfext(cchar *,int) noex ;
+extern int	sfext(cchar *,int,cchar **) noex ;
 
 EXTERNC_end
 

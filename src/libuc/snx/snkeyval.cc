@@ -58,14 +58,18 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
@@ -101,11 +105,11 @@ cint		mch = CHX_MIDDLE ;
 
 int snkeyval(char *dbuf,int dlen,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
-	if (dbuf && kp) {
+	if (dbuf && kp) ylikely {
 	    rs = SR_INVALID ;
-	    if (kp[0]) {
+	    if (kp[0]) ylikely {
     	        if (storebuf sb(dbuf,dlen) ; (rs = sb.strw(kp,kl)) >= 0) {
-	            if ((rs = sb.chr(mch)) >= 0) {
+	            if ((rs = sb.chr(mch)) >= 0) ylikely {
 	                if (vp) rs = sb.strw(vp,vl) ;
 	                if (rs >= 0) rs = sb.idx ;
 		    }

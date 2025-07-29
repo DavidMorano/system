@@ -18,6 +18,7 @@
 /*******************************************************************************
 
 	Name:
+	strncpybc
 	strncpylc
 	strncpyuc
 	strncpyfc
@@ -65,7 +66,7 @@
 /* local typedefs */
 
 extern "C" {
-    typedef int (*toxc_f)(int) noex ;
+    typedef char (*chtoxc_f)(int) noex ;
     typedef char *(*scxc_f)(char *,cchar *) noex ;
 }
 
@@ -81,13 +82,13 @@ extern "C" {
 
 /* forward references */
 
-template<toxc_f toxc>
+template<chtoxc_f chtoxc>
 char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
-	if (dst && src) {
+	if (dst && src) ylikely {
 	    dst[0] = '\0' ;
 	    if (n >= 0) {
 	        while (n && *src) {
-	            *dst++ = char(toxc(*src++)) ;
+	            *dst++ = chtoxc(*src++) ;
 		    n -= 1 ;
 	        } /* end while */
 	        if (n > 0) {
@@ -111,19 +112,19 @@ char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
 /* exported subroutines */
 
 char *strncpybc(char *dst,cchar *src,int n) noex {
-	return strncpyxc<tobc>(strcpybc,dst,src,n) ;
+	return strncpyxc<chtobc>(strcpybc,dst,src,n) ;
 }
 
 char *strncpylc(char *dst,cchar *src,int n) noex {
-	return strncpyxc<tolc>(strcpylc,dst,src,n) ;
+	return strncpyxc<chtolc>(strcpylc,dst,src,n) ;
 }
 
 char *strncpyuc(char *dst,cchar *src,int n) noex {
-	return strncpyxc<touc>(strcpyuc,dst,src,n) ;
+	return strncpyxc<chtouc>(strcpyuc,dst,src,n) ;
 }
 
 char *strncpyfc(char *dst,cchar *src,int n) noex {
-	return strncpyxc<tofc>(strcpyfc,dst,src,n) ;
+	return strncpyxc<chtofc>(strcpyfc,dst,src,n) ;
 }
 
 

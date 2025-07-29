@@ -52,7 +52,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -62,6 +61,7 @@
 
 #include	"cthexstr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -90,7 +90,7 @@ int cthexstr(char *dbuf,int dlen,int f,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (dbuf && sp) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) {
 	        const uchar	*up = (const uchar *) sp ;
 	        for (int i = 0 ; (rs >= 0) && (i < sl) ; i += 1) {

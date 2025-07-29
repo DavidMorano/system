@@ -147,12 +147,12 @@ int getuid_name(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		uid = 0 ;
-	if (sp) {
+	if (sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (sp[0]) {
+	    if (sp[0]) ylikely {
 	        cchar	*nn{} ;
-	        if (nulstr ns ; (rs = ns.start(sp,sl,&nn)) >= 0) {
-	            if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	        if (nulstr ns ; (rs = ns.start(sp,sl,&nn)) >= 0) ylikely {
+	            if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) ylikely {
 	                ucentpw	pw{} ; 
 	                cint	pwlen = rs ;
 			cauto	getpw = getpwx_name ;
@@ -173,9 +173,9 @@ int getuid_name(cchar *sp,int sl) noex {
 
 int getuid_user(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (sp) {
+	if (sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (sp[0]) {
+	    if (sp[0]) ylikely {
 	        if (hasalldig(sp,sl)) {
 	            if (int v{} ; (rs = cfdeci(sp,sl,&v)) >= 0) {
 		        rs = v ;
@@ -193,12 +193,12 @@ int getgid_name(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		gid = 0 ;
-	if (sp) {
+	if (sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (sp[0]) {
+	    if (sp[0]) ylikely {
 	        cchar	*name{} ;
-	        if (nulstr ns ; (rs = ns.start(sp,sl,&name)) >= 0) {
-	            if (char *grbuf ; (rs = malloc_gr(&grbuf)) >= 0) {
+	        if (nulstr ns ; (rs = ns.start(sp,sl,&name)) >= 0) ylikely {
+	            if (char *grbuf ; (rs = malloc_gr(&grbuf)) >= 0) ylikely {
 	                cint	grlen = rs ;
 	                ucentgr	gr{} ;
 			if ((rs = getgr_name(&gr,grbuf,grlen,name)) >= 0) {
@@ -218,9 +218,9 @@ int getgid_name(cchar *sp,int sl) noex {
 
 int getgid_group(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (sp) {
+	if (sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (sp[0]) {
+	    if (sp[0]) ylikely {
 	        if (hasalldig(sp,sl)) {
 	            if (int v{} ; (rs = cfdeci(sp,sl,&v)) >= 0) {
 		        rs = v ;
@@ -237,8 +237,8 @@ int getgid_group(cchar *sp,int sl) noex {
 int getgid_def(cchar *gname,gid_t gid) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
-	if (gname) {
-	    if ((rs = getgid_group(gname,-1)) == rsn) {
+	if (gname) ylikely {
+	    if ((rs = getgid_group(gname,-1)) == rsn) ylikely {
 	        if (gid == gidend) {
 	            rs = getgid() ;
 	        } else {
@@ -254,12 +254,12 @@ int getpjid_name(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		pjid = 0 ;
-	if (sp) {
+	if (sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (sp[0]) {
+	    if (sp[0]) ylikely {
 	        cchar	*name{} ;
-	        if (nulstr ns ; (rs = ns.start(sp,sl,&name)) >= 0) {
-	            if (char *pjbuf ; (rs = malloc_pj(&pjbuf)) >= 0) {
+	        if (nulstr ns ; (rs = ns.start(sp,sl,&name)) >= 0) ylikely {
+	            if (char *pjbuf ; (rs = malloc_pj(&pjbuf)) >= 0) ylikely {
 	                cint	pjlen = rs ;
 		        ucentpj pj ;
 		        if ((rs = getpj_name(&pj,pjbuf,pjlen,name)) >= 0) {
@@ -279,9 +279,9 @@ int getpjid_name(cchar *sp,int sl) noex {
 
 int getpjid_proj(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (sp) {
+	if (sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (sp[0]) {
+	    if (sp[0]) ylikely {
 	        if (hasalldig(sp,sl)) {
 	            if (int v{} ; (rs = cfdeci(sp,sl,&v)) >= 0) {
 		        rs = v ;
@@ -298,7 +298,7 @@ int getpjid_proj(cchar *sp,int sl) noex {
 int getpjid_def(cchar *name,projid_t pjid) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
-	if (name) {
+	if (name) ylikely {
 	    if ((rs = getpjid_proj(name,-1)) == rsn) {
 	        if (pjid == pjidend) {
 	            rs = getprojid() ;

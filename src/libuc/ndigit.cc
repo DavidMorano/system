@@ -61,7 +61,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |abs(3c)| */
 #include	<cmath>			/* |log2(3c++)| + |ceil(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>

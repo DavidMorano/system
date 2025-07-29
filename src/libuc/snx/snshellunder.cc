@@ -58,7 +58,7 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
@@ -66,7 +66,11 @@
 #include	<sys/types.h>		/* |pid_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
@@ -90,7 +94,7 @@
 
 /* local variables */
 
-constexpr int		dch = '*' ;
+cint		dch = '*' ;
 
 
 /* exported variables */
@@ -101,21 +105,21 @@ constexpr int		dch = '*' ;
 int snshellunder(char *dbuf,int dlen,pid_t pid,cchar *execfname) noex {
 	int		rs = SR_FAULT ;
 	int		idx = 0 ;
-	if (dbuf && execfname) {
+	if (dbuf && execfname) ylikely {
 	    storebuf	b(dbuf,dlen) ; 
 	    rs = SR_OK ;
-	    if (pid >= 0) {
-		if (rs >= 0) {
+	    if (pid >= 0) ylikely {
+		if (rs >= 0) ylikely {
 		    rs = b.chr(dch) ;
 		}
-	        if (uint uv = uint(pid) ; rs >= 0) {
+	        if (uint uv = uint(pid) ; rs >= 0) ylikely {
 	            rs = b.dec(uv) ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            rs = b.chr(dch) ;
 	        }
 	    } /* end if (PID included) */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = b.str(execfname) ;
 	        idx = b.idx ;
 	    }

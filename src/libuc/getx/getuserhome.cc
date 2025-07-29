@@ -67,16 +67,16 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<pwd.h>
 #include	<usystem.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getbufsize.h>
+#include	<getax.h>
+#include	<getpwx.h>
+#include	<getusername.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>
-#include	<getax.h>
-#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getusername.h>
-#include	<getpwx.h>
 #include	<sfx.h>
 #include	<mkpathx.h>
 #include	<hasx.h>
@@ -201,7 +201,7 @@ static int subinfo_start(subinfo *sip,cchar *un) noex {
 	sip->uid = -1 ;
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
 	    cint	pwlen = rs ;
-	    if (char *pwbuf{} ; (rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
+	    if (char *pwbuf ; (rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        sip->pwbuf = pwbuf ;
 	        sip->pwlen = pwlen ;
 	    }
@@ -325,7 +325,7 @@ static int dirsearch(cchar *basedname,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f_found = false ;
-	if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    if (fsdir dir ; (rs = fsdir_open(&dir,basedname)) >= 0) {
 	        fsdir_ent	ds ;

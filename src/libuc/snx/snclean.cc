@@ -53,7 +53,7 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
@@ -66,7 +66,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<mkchar.h>
-#include	<ischarx.h>
+#include	<ischarx.h>		/* |isprintlatin(3uc)| */
 #include	<localmisc.h>
 
 #include	"snclean.h"
@@ -101,9 +101,9 @@ int snclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
     	cint		chs = mkchar('¿') ;
 	int		rs = SR_FAULT ;
 	int		dl = 0 ; /* return-value */
-	if (dbuf && sp) {
+	if (dbuf && sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (dlen >= 0) {
+	    if (dlen >= 0) ylikely {
 	        rs = SR_OK ;
 		while (dlen-- && sl && *sp) {
 	            if (cint ch = mkchar(*sp) ; ischarok(ch)) {

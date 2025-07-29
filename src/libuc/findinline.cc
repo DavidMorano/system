@@ -9,8 +9,8 @@
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-	The subroutine was adapted from others programs that did
-	similar types of functions.
+	The subroutine was adapted from another subroutine that did
+	a similar type of function.
 
 */
 
@@ -39,19 +39,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
-#include	<estrings.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<ascii.h>
-#include	<strn.h>
+#include	<sfx.h>			/* |sfshrink(3uc)| */
+#include	<strn.h>		/* |strnchr(3uc)| */
 #include	<strwcpy.h>
 #include	<mkchar.h>
-#include	<ischarx.h>
+#include	<ischarx.h>		/* |isalphalatin(3uc)| */
 #include	<localmisc.h>
 
 #include	"findinline.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -80,19 +85,17 @@ static int	getpair(findinline *,cchar *,int) noex ;
 /* exported subroutines */
 
 int findinline_esc(findinline *fip,cchar *lp,int ll) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		skiplen = 0 ;
-	if (fip && lp) {
+	if (fip && lp) ylikely {
 	    rs = SR_OK ;
-	    if (ll < 0) ll = strlen(lp) ;
-	    if (ll >= 3) {
-	        cchar	*tp, *cp ;
-	        int	cl ;
-	        while ((tp = strnchr(lp,ll,CH_BSLASH)) != nullptr) {
+	    if (ll < 0) ll = lenstr(lp) ;
+	    if (ll >= 3) ylikely {
+	        for (cc *tp ; (tp = strnchr(lp,ll,CH_BSLASH)) != np ; ) {
+		    cchar	*cp = (tp + 1) ;
 		    fip->sp = tp ;
-		    cp = (tp+1) ;
-		    cl = ((lp+ll)-(tp+1)) ;
-		    if (cl > 0) {
+		    if (int cl = intconv((lp + ll) - (tp + 1)) ; cl > 0) {
 		        int	ch = mkchar(cp[0]) ;
 		        if (ch == '_') {
 	        	    skiplen = getdash(fip,cp,cl) ;
@@ -115,26 +118,25 @@ int findinline_esc(findinline *fip,cchar *lp,int ll) noex {
 
 static int getdash(findinline *fip,cchar *sp,int sl) noex {
 	int		skiplen = 0 ;
-	cchar		*start = (sp-1) ;
+	cchar		*start = (sp - 1) ;
 	fip->kp = sp ;
 	fip->kl = 1 ;
 	sp += 1 ;
 	sl -= 1 ;
-	if (sl > 0) {
+	if (sl > 0) ylikely {
 	    int		vl = 0 ;
-	    int		f ;
 	    fip->vp = sp ;
-	    while (sl) {
+	    for (bool f ; sl ; ) {
 		cint	ch = mkchar(sp[0]) ;
 		f = isalphalatin(ch) ;
 		if (!f) break ;
 		sp += 1 ;
 		sl -= 1 ;
 		vl += 1 ;
-	    } /* end while */
+	    } /* end for */
 	    if (vl > 0) {
 		fip->vl = vl ;
-		skiplen = (sp-start) ;
+		skiplen = intconv(sp - start) ;
 	    }
 	} /* end if */
 	return skiplen ;
@@ -142,21 +144,21 @@ static int getdash(findinline *fip,cchar *sp,int sl) noex {
 /* end subroutine (getdash) */
 
 static int getpair(findinline *fip,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		skiplen = 0 ;
-	cchar		*start = (sp-1) ;
-	cchar		*tp ;
+	cchar		*start = (sp - 1) ;
 	fip->kp = sp ;
-	if ((tp = strnchr(sp,sl,CH_LBRACE)) != nullptr) {
-	    int		kl ;
-	    if ((kl = sfshrink(sp,(tp-sp),nullptr)) > 0) {
+	if (cchar *tp ; (tp = strnchr(sp,sl,CH_LBRACE)) != np) {
+	    cint tl = intconv(tp - sp) ;
+	    if (int kl ; (kl = sfshrink(sp,tl,nullptr)) > 0) {
 		fip->kl = kl ;
-		sl -= ((tp+1)-sp) ;
-		sp = (tp+1) ;
+		sl -= intconv((tp + 1) - sp) ;
+		sp = (tp + 1) ;
 		fip->vp = sp ;
 	        if ((tp = strnchr(sp,sl,CH_RBRACE)) != nullptr) {
 		    if ((tp-sp) > 0) {
-			fip->vl = (tp-sp) ;
-			skiplen = ((tp+1)-start) ;
+			fip->vl = intconv(tp - sp) ;
+			skiplen = intconv((tp + 1) - start) ;
 		    }
 		}
 	    }

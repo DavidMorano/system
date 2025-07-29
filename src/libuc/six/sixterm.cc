@@ -80,7 +80,7 @@ import libutil ;
 int sioterm(cchar *sp,int sl,cchar *terms) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
-	if (sp && terms) {
+	if (sp && terms) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
 	        cint	ch = mkchar(sp[i]) ;
@@ -95,7 +95,7 @@ int sioterm(cchar *sp,int sl,cchar *terms) noex {
 int sirterm(cchar *sp,int sl,cchar *terms) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
-	if (sp && terms) {
+	if (sp && terms) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    for (i = (sl - 1) ; (i >= 0) ; i += 1) {
 	        cint	ch = mkchar(sp[i]) ;

@@ -41,7 +41,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strncmp(3c)| */
+#include	<cstring>		/* |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -77,21 +77,23 @@ import libutil ;
 /* exported subroutines */
 
 int sfbaselib(cchar *pnp,int pnl,cchar **rpp) noex {
-	int		cl ;
-	cchar		*cp ;
-	cchar		*tp ;
-	if ((cl = sfbasename(pnp,pnl,&cp)) > 0) {
-	    pnp = cp ;
-	    pnl = cl ;
-	}
-	if ((tp = strnrchr(pnp,pnl,'.')) != nullptr) {
-	    pnl = intconv(tp - pnp) ;
-	}
-	if ((pnl > 3) && (strncmp(pnp,"lib",3) == 0)) {
-	    pnp += 3 ;
-	    pnl -= 3 ;
-	}
-	if (rpp) *rpp = (char *) pnp ;
+    	if (pnp) ylikely {
+	    cchar	*cp ;
+	    if (int cl ; (cl = sfbasename(pnp,pnl,&cp)) > 0) {
+	        pnp = cp ;
+	        pnl = cl ;
+	    }
+	    if (cc *tp ; (tp = strnrchr(pnp,pnl,'.')) != nullptr) {
+	        pnl = intconv(tp - pnp) ;
+	    }
+	    if ((pnl > 3) && (strncmp(pnp,"lib",3) == 0)) {
+	        pnp += 3 ;
+	        pnl -= 3 ;
+	    }
+	} else {
+	    pnl = -1 ;
+	} /* end if (non-null) */
+	if (rpp) *rpp = charp(pnp) ;
 	return pnl ;
 }
 /* end subroutine (sfbaselib) */

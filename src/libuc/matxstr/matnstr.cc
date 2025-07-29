@@ -52,7 +52,7 @@
 #include	<mkchar.h>
 #include	<localmisc.h>
 
-#include	"matxstr.h"
+#include	"matnstr.h"
 
 import libutil ;
 

@@ -86,7 +86,7 @@ extern "C" {
 static int sichar(ischr_f ischr,cchar *sp,int sl) noex {
 	int		i = 0 ; /* used-afterwards */
 	bool		f = false ;
-	if (sp) {
+	if (sp) ylikely {
 	    for (i = 0 ; sl && sp[i] ; i += 1) {
 	        cint	ch = mkchar(sp[i]) ;
 	        f = ischr(ch) ;

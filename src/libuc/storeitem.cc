@@ -46,8 +46,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdint>
-#include	<bit>
+#include	<bit>			/* |has_single_bit(3c++)| */
 #include	<usystem.h>
 #include	<ctdec.h>
 #include	<intceil.h>
@@ -56,6 +57,7 @@
 
 #include	"storeitem.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -90,9 +92,9 @@ using std::has_single_bit ;		/* subroutine-template */
 
 int storeitem_start(storeitem *op,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
-	if (op && dbuf) {
+	if (op && dbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (dlen > 0) {
+	    if (dlen > 0) ylikely {
 		rs = SR_OK ;
 	        op->dbuf = dbuf ;
 	        op->dlen = dlen ;
@@ -106,9 +108,9 @@ int storeitem_start(storeitem *op,char *dbuf,int dlen) noex {
 
 int storeitem_finish(storeitem *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->dbuf) {
+	    if (op->dbuf) ylikely {
 		rs = SR_OVERFLOW ;
 		if (!op->f_overflow) {
 	    	    rs = (op->index + 1) ;
@@ -125,11 +127,11 @@ int storeitem_strw(storeitem *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (rpp) *rpp = nullptr ;
-	if (op && sp) {
+	if (op && sp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->dbuf) {
+	    if (op->dbuf) ylikely {
 		rs = op->index ;
-		if (op->index >= 0) {
+		if (op->index >= 0) ylikely {
 	            int		dlen = (op->dlen - op->index) ;
 	            char	*dbuf = (op->dbuf + op->index) ;
 		    {
@@ -139,7 +141,7 @@ int storeitem_strw(storeitem *op,cchar *sp,int sl,cchar **rpp) noex {
 			}
 			*dp = '\0' ;
 			if (dlen >= 0) {
-	    		    wlen = (dp - dbuf) ;
+	    		    wlen = intconv(dp - dbuf) ;
 	    		    op->index += (wlen + 1) ;
 	            	    if (rpp) *rpp = dbuf ;
 			} else {
@@ -159,11 +161,11 @@ int storeitem_buf(storeitem *op,cvoid *vbp,int vbl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (rpp) *rpp = nullptr ;
-	if (op && vbp) {
+	if (op && vbp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->dbuf) {
+	    if (op->dbuf) ylikely {
 		rs = op->index ;
-	        if (op->index >= 0) {
+	        if (op->index >= 0) ylikely {
 		    int		dlen = (op->dlen - op->index) ;
 		    char	*dbuf = (op->dbuf + op->index) ;
 		    {
@@ -175,7 +177,7 @@ int storeitem_buf(storeitem *op,cvoid *vbp,int vbl,cchar **rpp) noex {
 			}
 			*dp = '\0' ;
 			if (dlen >= 0) {
-	    		    wlen = (dp - dbuf) ;
+	    		    wlen = intconv(dp - dbuf) ;
 	    		    op->index += (wlen + 1) ;
 	    		    if (rpp) *rpp = dbuf ;
 			} else {
@@ -195,11 +197,11 @@ int storeitem_dec(storeitem *op,int v,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	if (rpp) *rpp = nullptr ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->dbuf) {
+	    if (op->dbuf) ylikely {
 		rs = op->index ;
-	        if (op->index >= 0) {
+	        if (op->index >= 0) ylikely {
 	    	    cint	tlen = DIGBUFLEN ;
 		    int		dlen = (op->dlen - op->index) ;
 		    char	*dbuf = (op->dbuf + op->index) ;
@@ -218,7 +220,7 @@ int storeitem_dec(storeitem *op,int v,cchar **rpp) noex {
 		            }
 		        } /* end if */
 		    } /* end if (alternatives) */
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                op->index += (wlen + 1) ;
 	                if (rpp) *rpp = dbuf ;
 	            } else {
@@ -235,16 +237,16 @@ int storeitem_chr(storeitem *op,int ch,cchar **rpp) noex {
 	cint		wlen = 1 ;
 	int		rs = SR_FAULT ;
 	if (rpp) *rpp = nullptr ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->dbuf) {
+	    if (op->dbuf) ylikely {
 		rs = op->index ;
-	        if (op->index >= 0) {
+	        if (op->index >= 0) ylikely {
 		    int		dlen = (op->dlen - op->index) ;
 		    char	*dbuf = (op->dbuf + op->index) ;
-		    if ((dlen >= 0) && ((wlen+1) <= dlen)) {
+		    if ((dlen >= 0) && ((wlen+1) <= dlen)) ylikely {
 	    	        char	*bp = dbuf ;
-	    	        *bp++ = ch ;
+	    	        *bp++ = char(ch) ;
 	    	        *bp = '\0' ;
 	    	        op->index += (wlen + 1) ;
 	    	        if (rpp) *rpp = dbuf ;
@@ -268,11 +270,11 @@ int storeitem_nul(storeitem *op,cchar **rpp) noex {
 int storeitem_block(storeitem *op,int bsize,int align,void **vpp) noex {
 	int		rs = SR_FAULT ;
 	int		inc = 0 ;
-	if (op && vpp) {
+	if (op && vpp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->dbuf) {
+	    if (op->dbuf) ylikely {
 		rs = op->index ;
-		if (op->index >= 0) {
+		if (op->index >= 0) ylikely {
 		    uint	ua = uint(align) ;
 		    rs = SR_INVALID ;
 		    if ((bsize > 0) && (align > 0) && has_single_bit(ua)) {
@@ -283,13 +285,13 @@ int storeitem_block(storeitem *op,int bsize,int align,void **vpp) noex {
 			    uintptr_t	v = uintptr_t(rbuf) ;
 			    nv = uipceil(v,align) ;
 			    nv += uintptr_t(iceil(bsize,align)) ;
-			    inc = (nv - v) ;
+			    inc = intsat(nv - v) ;
 			    if (rlen >= inc) {
 	    		        char	*bp = rbuf ;
 				rs = SR_OK ;
 	                        memclear(bp,inc) ;
 	    		        op->index += inc ;
-	    		        *vpp = (void *) nv ;
+	    		        *vpp = voidp(nv) ;
 			    } else {
 	    	        	op->f_overflow = true ;
 	    			rs = SR_OVERFLOW ;
@@ -305,14 +307,14 @@ int storeitem_block(storeitem *op,int bsize,int align,void **vpp) noex {
 /* end subroutine (storeitem_block) */
 
 int storeitem_ptab(storeitem *op,int n,void ***vppp) noex {
-	cint		align = sizeof(void *) ;
-	void		**vpp = (void **) vppp ;
+	cint		align = szof(void *) ;
+	void		**vpp = voidpp(vppp) ;
 	int		rs = SR_FAULT ;
-	if (op && vpp) {
+	if (op && vpp) ylikely {
 	    rs = SR_INVALID ;
-	    if (n > 0) {
-	        cint	bs = ((n+1) * align) ;
-	        if ((rs = storeitem_block(op,bs,align,vpp)) >= 0) {
+	    if (n > 0) ylikely {
+	        cint	bs = ((n + 1) * align) ;
+	        if ((rs = storeitem_block(op,bs,align,vpp)) >= 0) ylikely {
 		    (*vppp)[n] = nullptr ;
 	        }
 	    } /* end if (valid) */
@@ -324,11 +326,11 @@ int storeitem_ptab(storeitem *op,int n,void ***vppp) noex {
 int storeitem_getlen(storeitem *op) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->dbuf) {
+	    if (op->dbuf) ylikely {
 		rs = op->index ;
-		if (op->index >= 0) {
+		if (op->index >= 0) ylikely {
 		    if (op->f_overflow) rs = SR_OVERFLOW ;
 		    len = op->index ;
 		} /* end if (no-errors) */
@@ -374,11 +376,11 @@ void storeitem::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("storeitem",rs,"fini-finish") ;
 	}
-}
+} /* end method (storeitem::dtor) */
 
 storeitem_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case storeitemmem_getlen:
 	        rs = storeitem_getlen(op) ;

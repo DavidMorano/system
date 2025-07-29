@@ -46,8 +46,11 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
 
@@ -86,10 +89,10 @@
 int mkfingerquery(char *qbuf,int qlen,int f_long,cchar *up,mainv av) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (qbuf && up) {
+	if (qbuf && up) ylikely {
 	    rs = SR_INVALID ;
-	    if (qlen > 0) {
-	        if (sbuf b ; (rs = b.start(qbuf,qlen)) >= 0) {
+	    if (qlen > 0) ylikely {
+	        if (sbuf b ; (rs = b.start(qbuf,qlen)) >= 0) ylikely {
 	            rs = b.strw(up,-1) ;
 	            if ((rs >= 0) && f_long) {
 		        b.strw(" /W",3) ;
@@ -101,7 +104,7 @@ int mkfingerquery(char *qbuf,int qlen,int f_long,cchar *up,mainv av) noex {
 		            }
 	                } /* end for */
 	            } /* end if (argument-vector) */
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                b.strw("\n\r",2) ;
 	            }
 	            len = b.finish ;

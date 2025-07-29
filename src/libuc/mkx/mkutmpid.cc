@@ -106,15 +106,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<strnxchr.h>
 #include	<localmisc.h>
@@ -128,7 +125,8 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::min ;
+using std::min ;			/* type */
+using std::max ;			/* type */
 
 
 /* local typedefs */
@@ -219,14 +217,14 @@ int mkutmpid(char *idbuf,int idlen,cchar *devbuf,int devlen) noex {
 
 tmper::operator int () noex {
 	int		rs = SR_FAULT ;
-	if (rbuf && sbuf) {
+	if (rbuf && sbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (rlen >= 1) {
+	    if (rlen >= 1) ylikely {
 		rs = SR_DOM ;
 	        memclear(rbuf,rlen) ;
 	        if (slen < 0) slen = lenstr(sbuf) ;
-		if (slen > 0) {
-		    if (cchar *lp ; (rs = extdev(&lp)) >= 0) {
+		if (slen > 0) ylikely {
+		    if (cchar *lp ; (rs = extdev(&lp)) >= 0) ylikely {
 		        cint	ll = rs ;
 		        rs = 0 ;
 		        for (int i = 0 ; (rs == 0) && tmpcalls[i] ; i += 1) {
@@ -260,8 +258,8 @@ int tmper::extdev(cchar **rpp) noex {
 
 int tmper::subdirs(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
-	if ((ll > 0) && (rbuf[0] == '\0')) {
-	    if (cchar *tp ; (tp = strnchr(lp,ll,'/')) != nullptr) {
+	if ((ll > 0) && (rbuf[0] == '\0')) ylikely {
+	    if (cchar *tp ; (tp = strnchr(lp,ll,'/')) != nullptr) ylikely {
 	        cint	sl = intconv(tp - lp) ;
 	        cint	cl = (ll - intconv((tp + 1) - lp)) ;
 	        int	pl = 0 ;
@@ -274,7 +272,7 @@ int tmper::subdirs(cchar *lp,int ll) noex {
 	            pl = lenstr(pp) ;
 	            if ((pl == sl) && (strncmp(pp,sp,pl) == 0)) break ;
 	        } /* end for */
-	        if (prefixes[i].name && pp && pl) {
+	        if (prefixes[i].name && pp && pl) ylikely {
 	            rs = idcpy(rbuf,rlen,pp,pl,cp,cl) ;
 	        } /* end if */
 	    } /* end if (tried for a directory match) */
@@ -285,7 +283,7 @@ int tmper::subdirs(cchar *lp,int ll) noex {
 
 int tmper::basename(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
-	if ((ll > 0) && (rbuf[0] == '\0')) {
+	if ((ll > 0) && (rbuf[0] == '\0')) ylikely {
 	    int		i ; /* used-afterwards */
 	    int		cl = ll ;
 	    int		pl = 0 ;
@@ -296,7 +294,7 @@ int tmper::basename(cchar *lp,int ll) noex {
 	        pl = lenstr(pp) ;
 	        if ((pl <= cl) && (strncmp(pp,lp,pl) == 0)) break ;
 	    } /* end for */
-	    if (prefixes[i].name && pp && pl) {
+	    if (prefixes[i].name && pp && pl) ylikely {
 	        rs = idcpy(rbuf,rlen,pp,pl,cp,cl) ;
 	    } /* end if */
 	} /* end if (needed) */
@@ -306,7 +304,7 @@ int tmper::basename(cchar *lp,int ll) noex {
 
 int tmper::special(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
-	if ((ll > 0) && (rbuf[0] == '\0')) {
+	if ((ll > 0) && (rbuf[0] == '\0')) ylikely {
 	    int		i = 0 ;
 	    int		pl = 0 ;
 	    cchar	*pp{} ;
@@ -315,7 +313,7 @@ int tmper::special(cchar *lp,int ll) noex {
 		pl = lenstr(pp) ;
 	        if (strcmp(pp,lp) == 0) break ;
 	    } /* end for */
-	    if (prefixes[i].name && pp && pl) {
+	    if (prefixes[i].name && pp && pl) ylikely {
 	        rs = idcpy(rbuf,rlen,pp,pl,nullptr,0) ;
 	    } /* end if */
 	} /* end if (needed) */
@@ -325,7 +323,7 @@ int tmper::special(cchar *lp,int ll) noex {
 
 int tmper::something(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
-	if ((ll > 0) && (rbuf[0] == '\0')) {
+	if ((ll > 0) && (rbuf[0] == '\0')) ylikely {
 	    int		cl = 0 ;
 	    cchar	*cp ;
 	    if ((cp = strnchr(lp,ll,'/')) != nullptr) {

@@ -26,12 +26,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<ctime>
+#include	<sys/types.h>		/* system types */
+#include	<ctime>			/* |time_t| */
 #include	<cstddef>		/* |nullptr_t(3c++)| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strken(3c)| */
 #include	<usystem.h>
 #include	<getgroupname.h>
 #include	<bufsizevar.hh>
@@ -44,6 +42,7 @@
 
 #include	"filegrp.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -371,7 +370,7 @@ static int filegrp_searchgid(FG *op,FG_REC **rpp,gid_t gid) noex {
 	} /* end for */
 	if ((rs >= 0) && rp) {
 	   *rpp = rp ;
-	    gl = strlen(rp->gn) ;
+	    gl = lenstr(rp->gn) ;
 	}
 	return (rs >= 0) ? gl : rs ;
 }
@@ -478,7 +477,7 @@ static int record_start(FG_REC *rp,time_t dt,gid_t gid,cc *gn) noex {
 	            rp->gid = gid ;
 	            rp->ti_create = dt ;
 	            rp->ti_access = dt ;
-	            gl = strwcpy(rp->gn,gn,gnl) - rp->gn ;
+	            gl = intconv(strwcpy(rp->gn,gn,gnl) - rp->gn) ;
 		} /* end if (m-a) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -540,7 +539,7 @@ static int record_update(FG_REC *rp,time_t dt,cc *gn) noex {
 /* end subroutine (record_update) */
 
 static int record_access(FG_REC *rp,time_t dt) noex {
-	cint		gl = strlen(rp->gn) ;
+	cint		gl = lenstr(rp->gn) ;
 	rp->ti_access = dt ;
 	return gl ;
 }

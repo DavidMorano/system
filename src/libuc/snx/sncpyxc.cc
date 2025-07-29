@@ -59,7 +59,7 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
@@ -71,8 +71,9 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysrets.h>		/* system-returns */
 #include	<toxc.h>
+#include	<localmisc.h>
 
 #include	"sncpyxc.h"
 
@@ -93,18 +94,24 @@
 
 template<int (*toxc)(int)>
 int sncpyxc(char *dbuf,int dlen,cchar *sp) noex {
-    	int		rl = SR_OVERFLOW ;
-	int		i = 0 ;
-	char		*dp = dbuf ;
-	if (dlen < 0) dlen = INT_MAX ;
-	while ((i < dlen) && sp[i]) {
-	    *dp++ = charconv(toxc(sp[i++])) ;
-	}
-	*dp = '\0' ;
-	if (sp[i] == '\0') {
-	    rl = intconv(dp - dbuf) ;
-	}
-	return rl ;
+    	int		rs = SR_FAULT ;
+	int		rl = 0 ; /* return-value */
+	if (dbuf && sp) ylikely {
+	    int		i = 0 ; /* used-afterwards */
+	    char	*dp = dbuf ;
+	    rs = SR_OK ;
+	    if (dlen < 0) dlen = INT_MAX ;
+	    while ((i < dlen) && sp[i]) {
+	        *dp++ = charconv(toxc(sp[i++])) ;
+	    }
+	    *dp = '\0' ;
+	    if (sp[i] == '\0') {
+	        rl = intconv(dp - dbuf) ;
+	    } else {
+		rs = SR_OVERFLOW ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine-template (sncpyxc) */
 

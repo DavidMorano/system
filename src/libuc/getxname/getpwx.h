@@ -31,6 +31,16 @@ extern int getpwx_control(int) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+struct ucentpwx : ucentpw {
+    	int nam(char *, int,cchar *) noex ;
+    	int uid(char *, int,uid_t) noex ;
+	int control(int) noex ;
+} ; /* end struct (ucentpwx) */
+
+#endif /* __cplusplus */
+
 
 #endif /* GETPWX_INCLUDE */
 

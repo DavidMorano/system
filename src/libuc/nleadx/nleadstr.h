@@ -1,4 +1,5 @@
 /* nleadstr HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* match on the leading part of a string */

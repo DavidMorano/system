@@ -60,6 +60,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -69,15 +72,18 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int getproto_name(cchar *pnp,int pnl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		proto = 0 ;
-	if (pnp) {
+	if (pnp) ylikely {
 	    rs = SR_INVALID ;
-	    if (pnp[0]) {
+	    if (pnp[0]) ylikely {
 	        cchar	*pname{} ;
 	        if (nulstr n ; (rs = n.start(pnp,pnl,&pname)) >= 0) {
 	    	    if (char *prbuf{} ; (rs = malloc_pr(&prbuf)) >= 0) {

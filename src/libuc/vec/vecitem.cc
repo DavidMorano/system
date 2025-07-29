@@ -91,19 +91,6 @@ static int	vecitem_iget(vecitem *,int,void **) noex ;
 static int	vecitem_fetchbeg(vecitem *,fetchargs *) noex ;
 static int	vecitem_fetchcont(vecitem *,fetchargs *) noex ;
 
-consteval int mkoptmask() noex {
-	int		m = 0 ;
-	m |= VECITEM_OREUSE ;
-	m |= VECITEM_OCOMPACT ;
-	m |= VECITEM_OSWAP ;
-	m |= VECITEM_OSTATIONARY ;
-	m |= VECITEM_OCONSERVE ;
-	m |= VECITEM_OSORTED ;
-	m |= VECITEM_OORDERED ;
-	return m ;
-}
-/* end subroutine (mkoptmask) */
-
 consteval cur mkcurdef() noex {
 	cur	c{} ;
 	c.c = 0 ;
@@ -177,7 +164,7 @@ int vecitem_add(vecitem *op,cvoid *ep,int el) noex {
 	    if (char *bp ; (rs = uc_malloc((el+1),&bp)) >= 0) {
 	        memcpy(bp,ep,el) ;
 	        bp[el] = '\0' ;
-	        f = (op->f.oreuse || op->f.oconserve) && (! op->f.oordered) ;
+	        f = (op->fl.oreuse || op->fl.oconserve) && (! op->fl.oordered) ;
 	        if (f && (op->c < op->i)) {
 	            i = op->fi ;
 	            while ((i < op->i) && (op->va[i] != nullptr)) {
@@ -208,7 +195,7 @@ int vecitem_add(vecitem *op,cvoid *ep,int el) noex {
 	                uc_free(bp) ;
 	            }
 	        }
-	        op->f.issorted = false ;
+	        op->fl.issorted = false ;
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
@@ -242,14 +229,14 @@ int vecitem_del(vecitem *op,int i) noex {
 	            op->c -= 1 ;		/* decrement list count */
 	            uc_free(op->va[i]) ;
 	        } /* end if */
-	        if (op->f.ostationary) {
+	        if (op->fl.ostationary) {
 	            op->va[i] = nullptr ;
 	            if (i == (op->i - 1)) {
 	                op->i -= 1 ;
 	            }
 	            f_fi = true ;
-	        } else if (op->f.issorted || op->f.oordered) {
-	            if (op->f.ocompact) {
+	        } else if (op->fl.issorted || op->fl.oordered) {
+	            if (op->fl.ocompact) {
 	                op->i -= 1 ;
 	                for (int j = i ; j < op->i ; j += 1) {
 	                    op->va[j] = op->va[j + 1] ;
@@ -263,10 +250,10 @@ int vecitem_del(vecitem *op,int i) noex {
 	                f_fi = true ;
 	            } /* end if */
 	        } else {
-	            if ((op->f.oswap || op->f.ocompact) && (i < (op->i - 1))) {
+	            if ((op->fl.oswap || op->fl.ocompact) && (i < (op->i - 1))) {
 	                op->va[i] = op->va[op->i - 1] ;
 	                op->va[--op->i] = nullptr ;
-	                op->f.issorted = false ;
+	                op->fl.issorted = false ;
 	            } else {
 	                op->va[i] = nullptr ;
 	                if (i == (op->i - 1)) {
@@ -275,7 +262,7 @@ int vecitem_del(vecitem *op,int i) noex {
 	                f_fi = true ;
 	            } /* end if */
 	        } /* end if */
-	        if (op->f.oconserve) {
+	        if (op->fl.oconserve) {
 	            while (op->i > i) {
 	                if (op->va[op->i - 1] != nullptr) break ;
 	                op->i -= 1 ;
@@ -304,8 +291,8 @@ int vecitem_sort(vecitem *op,cmpf cf) noex {
 	int		rs = SR_FAULT ;
 	if (op && cf) {
 	    rs = op->c ;
-	    if (! op->f.issorted) {
-	        op->f.issorted = true ;
+	    if (! op->fl.issorted) {
+	        op->fl.issorted = true ;
 	        if (op->c > 1) {
 		    qsort_f	scf = qsort_f(cf) ;
 		    cint	ssz = szof(void *) ;
@@ -375,15 +362,15 @@ int vecitem_search(vecitem *op,cvoid *cep,cmpf cf,void *vrp) noex {
 	if (op && cep && cf) {
 	    cnullptr	np{} ;
 	    rs = SR_OK ;
-	    if (op->f.osorted && (! op->f.issorted)) {
-	        op->f.issorted = true ;
+	    if (op->fl.osorted && (! op->fl.issorted)) {
+	        op->fl.issorted = true ;
 	        if (op->c > 1) {
 		    qsort_f	scf = qsort_f(cf) ;
 		    cint	ssz = szof(void *) ;
 	            qsort(op->va,op->i,ssz,scf) ;
 	        }
 	    } /* end if (sorting) */
-	    if (op->f.issorted) {
+	    if (op->fl.issorted) {
 	        qsort_f		scf = qsort_f(cf) ;
 	        cint		ssz = szof(void *) ;
 	        void		**spp ;
@@ -461,19 +448,32 @@ int vecitem_audit(vecitem *op) noex {
 
 /* private subroutines */
 
+consteval int mkoptmask() noex {
+	int		m = 0 ;
+	m |= VECITEM_OREUSE ;
+	m |= VECITEM_OCOMPACT ;
+	m |= VECITEM_OSWAP ;
+	m |= VECITEM_OSTATIONARY ;
+	m |= VECITEM_OCONSERVE ;
+	m |= VECITEM_OSORTED ;
+	m |= VECITEM_OORDERED ;
+	return m ;
+}
+/* end subroutine (mkoptmask) */
+
 static int vecitem_setopts(vecitem *op,int vo) noex {
 	constexpr int	m = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	op->f = {} ;
+	op->fl = {} ;
 	if ((vo & (~ m)) == 0) {
 	    rs = SR_OK ;
-	    if (vo & VECITEM_OREUSE) op->f.oreuse = 1 ;
-	    if (vo & VECITEM_OSWAP) op->f.oswap = 1 ;
-	    if (vo & VECITEM_OSTATIONARY) op->f.ostationary = 1 ;
-	    if (vo & VECITEM_OCOMPACT) op->f.ocompact = 1 ;
-	    if (vo & VECITEM_OSORTED) op->f.osorted = 1 ;
-	    if (vo & VECITEM_OORDERED) op->f.oordered = 1 ;
-	    if (vo & VECITEM_OCONSERVE) op->f.oconserve = 1 ;
+	    if (vo & VECITEM_OREUSE) op->fl.oreuse = 1 ;
+	    if (vo & VECITEM_OSWAP) op->fl.oswap = 1 ;
+	    if (vo & VECITEM_OSTATIONARY) op->fl.ostationary = 1 ;
+	    if (vo & VECITEM_OCOMPACT) op->fl.ocompact = 1 ;
+	    if (vo & VECITEM_OSORTED) op->fl.osorted = 1 ;
+	    if (vo & VECITEM_OORDERED) op->fl.oordered = 1 ;
+	    if (vo & VECITEM_OCONSERVE) op->fl.oconserve = 1 ;
 	} /* end if (valid options) */
 	return rs ;
 }
@@ -531,7 +531,7 @@ static int vecitem_fetchbeg(vecitem *op,fetchargs *ap) noex {
 	    auto	vig = vecitem_iget ;
 	    int		j{} ;
 	    i = rs ;
-            if (op->f.osorted) {
+            if (op->fl.osorted) {
                 void    *last = *rpp ;
                 cint    js = (rs - 1) ;
                 auto    lamb = [&]() noex {
@@ -565,9 +565,9 @@ static int vecitem_fetchcont(vecitem *op,fetchargs *ap) noex {
 	void		**rpp = ap->rpp ;
 	void		*tep{} ;
 	int		i = 0 ;
-        if (op->f.osorted) {
-            if (! op->f.issorted) {
-                op->f.issorted = true ;
+        if (op->fl.osorted) {
+            if (! op->fl.issorted) {
+                op->fl.issorted = true ;
                 if (op->c > 1) {
                     qsort_f     scf = qsort_f(cf) ;
                     cint        ssz = szof(void *) ;

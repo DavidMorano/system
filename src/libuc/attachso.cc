@@ -64,19 +64,13 @@
 
 #include	"attachso.h"
 
+import libutil ;
 
 /* local defines */
 
-#define	SUBINFO		struct subinfo
-#define	SUBINFO_FL	struct subinfo_flags
-
-#ifndef	SYMNAMELEN
-#define	SYMNAMELEN	60
-#endif
-
 #define	DNAME_SELF	"*SELF*"
 
-#define	SI		SUBINFO
+#define	SI		subinfo
 
 
 /* imported namespaces */
@@ -99,7 +93,7 @@ extern "C" {
 
 /* local structures */
 
-struct subinfo_flags {
+struct subinfo_fl {
 	uint		id:1 ;
 } ;
 
@@ -111,21 +105,21 @@ struct subinfo {
 	mainv		exts ;
 	mainv		syms ;
 	ids		id ;
-	SUBINFO_FL	f ;
+	subinfo_fl	f ;
 	int		dlmode ;
 } ;
 
 
 /* forward references */
 
-static int	subinfo_start(subinfo *,mv,cchar *,mv,mv,int,void **) noex ;
-static int	subinfo_soload(subinfo *) noex ;
-static int	subinfo_finish(subinfo *,int) noex ;
+static int	subinfo_start(SI *,mv,cchar *,mv,mv,int,void **) noex ;
+static int	subinfo_soload(SI *) noex ;
+static int	subinfo_finish(SI *,int) noex ;
 
-static int	subinfo_sofind(subinfo *) noex ;
-static int	subinfo_socheck(subinfo *,ids *,cchar *) noex ;
-static int	subinfo_checksyms(subinfo *) noex ;
-static int	subinfo_modclose(subinfo *) noex ;
+static int	subinfo_sofind(SI *) noex ;
+static int	subinfo_socheck(SI *,ids *,cchar *) noex ;
+static int	subinfo_checksyms(SI *) noex ;
+static int	subinfo_modclose(SI *) noex ;
 
 
 /* local variables */
@@ -137,7 +131,7 @@ constexpr cpcchar	defexts[] = {
 	nullptr
 } ;
 
-constexpr int		termrs[] = {
+constexpr int		rsterm[] = {
 	SR_FAULT,
 	SR_INVALID,
 	SR_NOMEM,
@@ -150,7 +144,7 @@ constexpr int		termrs[] = {
 	SR_OVERFLOW,
 	SR_RANGE,
 	0
-} ;
+} ; /* end array (rsterm) */
 
 
 /* exported variables */
@@ -161,12 +155,12 @@ constexpr int		termrs[] = {
 int attachso(mv dnames,cc *oname,mv exts,mv syms,int m,void **ropp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (dnames && oname) {
+	if (dnames && oname) ylikely {
 	    rs = SR_INVALID ;
 	    if (oname[0]) {
 	        subinfo		si ;
 		auto		ss = subinfo_start ;
-	        if ((rs = ss(&si,dnames,oname,exts,syms,m,ropp)) >= 0) {
+	        if ((rs = ss(&si,dnames,oname,exts,syms,m,ropp)) >= 0) ylikely {
 	            int		f_abort ;
 	            {
 	                rs = subinfo_soload(&si) ;
@@ -188,7 +182,7 @@ static int subinfo_start(SI *sip,mv dnames,cc *oname,mv exts,mv syms,
 			int m,void **ropp) noex {
     	int		rs = SR_FAULT ;
 	if (exts == nullptr) exts = defexts ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = memclear(sip) ;
 	    sip->dnames = dnames ;
 	    sip->oname = oname ;
@@ -203,7 +197,7 @@ static int subinfo_start(SI *sip,mv dnames,cc *oname,mv exts,mv syms,
 
 static int subinfo_finish(SI *sip,int f_abort) noex {
     	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
     	    rs = SR_OK ;
 	    if (f_abort && sip->ropp) {
 	        void	*sop = voidp(*(sip->ropp)) ;
@@ -219,7 +213,7 @@ static int subinfo_finish(SI *sip,int f_abort) noex {
 
 static int subinfo_soload(SI *sip) noex {
 	int		rs ;
-	if ((rs = subinfo_sofind(sip)) >= 0) {
+	if ((rs = subinfo_sofind(sip)) >= 0) ylikely {
 	    if (sip->ropp) {
 		*(sip->ropp) = sip->sop ;
 	    }
@@ -231,7 +225,7 @@ static int subinfo_soload(SI *sip) noex {
 static int subinfo_sofind(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
-	if (ids id ; (rs = id.load) >= 0) {
+	if (ids id ; (rs = id.load) >= 0) ylikely {
 	    cint	soperm = (X_OK | R_OK) ;
 	    mainv	dnames = sip->dnames ;
 	    bool	f_open = false ;
@@ -269,8 +263,8 @@ static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 	int		rs ;
 	int		rs1 = SR_NOTFOUND ;
 	int		f = false ;
-	if (char *sofname{} ; (rs = malloc_mp(&sofname)) >= 0) {
-	    USTAT	sb ;
+	if (char *sofname ; (rs = malloc_mp(&sofname)) >= 0) ylikely {
+	    ustat	sb ;
 	    cint	soperm = (R_OK | X_OK) ;
 	    mainv	exts = sip->exts ;
 	    sip->sop = nullptr ;
@@ -297,7 +291,7 @@ static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 				    }
 	                            sip->sop = nullptr ;
 	                        }
-	                        if (isOneOf(termrs,rs1)) rs = rs1 ;
+	                        if (isOneOf(rsterm,rs1)) rs = rs1 ;
 			    }
 	                } /* end if (ok) */
 	            } /* end if (file and perms) */
@@ -321,10 +315,10 @@ static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 
 static int subinfo_checksyms(SI *sip) noex {
 	int		rs = SR_FAULT ;
-	if (sip->sop) {
+	if (sip->sop) ylikely {
 	    mainv	syms = sip->syms ;
 	    rs = SR_OK ;
-	    if (syms) {
+	    if (syms) ylikely {
 	        cvoid	*symp ;
 	        for (int i = 0 ; (rs >= 0) && syms[i] ; i += 1) {
 	            symp = dlsym(sip->sop,syms[i]) ;
@@ -338,7 +332,7 @@ static int subinfo_checksyms(SI *sip) noex {
 
 static int subinfo_modclose(SI *sip) noex {
     	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = SR_OK ;
 	    if (sip->sop) {
 	        if (! isSpecialObject(sip->sop)) {

@@ -64,7 +64,7 @@ struct vecint_flags {
 
 struct vecint_head {
 	VECINT_TYPE	*va ;
-	VECINT_FL	f ;
+	VECINT_FL	fl ;
 	uint		magic ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */

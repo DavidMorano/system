@@ -52,17 +52,21 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<pthread.h>
+#include	<pthread.h>		/* |pthread_t| */
 #include	<climits>		/* UINT_MAX */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>		/* <- for |uintptr_t| */
-#include	<usystem.h>
+#include	<cstdint>		/* |uintptr_t| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<ctdec.h>
 #include	<localmisc.h>
 
@@ -95,7 +99,7 @@
 int sntid(char *dp,int dl,pthread_t tid) noex {
 	uintptr_t	up = uintptr_t(tid) ;
 	int		rs = SR_FAULT ;
-	if (dp) {
+	if (dp) ylikely {
 	    uint	uv = cast_static<uint>(up & UINT_MAX) ;
 	    rs = ctdecui(dp,dl,uv) ;
 	}

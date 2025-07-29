@@ -35,6 +35,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* <- for |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<bit>			/* <- |countr_zero(3c++)| */
 #include	<usystem.h>
@@ -45,6 +46,7 @@
 
 #include	"bits.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -106,9 +108,9 @@ constexpr int		dsz = int(szof(digit)) ;
 
 int bits_start(bits *op,int n) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_INVALID ;
-	    if (n >= 0) {
+	    if (n >= 0) ylikely {
 		rs = SR_OK ;
 	        op->a = nullptr ;
 	        op->nwords = nawords ;
@@ -127,7 +129,7 @@ int bits_start(bits *op,int n) noex {
 int bits_finish(bits *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->a) {
 	        rs1 = uc_libfree(op->a) ;
@@ -144,14 +146,14 @@ int bits_finish(bits *op) noex {
 
 int bits_set(bits *op,int i) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_INVALID ;
-	    if (i >= 0) {
+	    if (i >= 0) ylikely {
 		rs = SR_OK ;
 	        if (i >= op->nbits) {
 	            rs = bits_alloc(op,i+1) ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            if ((i+1) > op->n) op->n = (i+1) ;
 		    if (i >= nabits) {
 			cint	ii = (i - nabits) ;
@@ -170,14 +172,14 @@ int bits_set(bits *op,int i) noex {
 
 int bits_clear(bits *op,int i) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (i >= 0) { /* <- clear one bit */
+	    if (i >= 0) ylikely { /* <- clear one bit */
 	        if (i >= op->nbits) {
 	            rs = bits_alloc(op,i+1) ;
 	        }
-	        if (rs >= 0) {
-	            if ((i+1) > op->n) op->n = (i+1) ;
+	        if (rs >= 0) ylikely {
+	            if ((i + 1) > op->n) op->n = (i + 1) ;
 		    if (i >= nabits) {
 			cint	ii = (i - nabits) ;
 	                rs = batst(op->a,ii) ;
@@ -201,9 +203,9 @@ int bits_clear(bits *op,int i) noex {
 
 int bits_test(bits *op,int i) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_INVALID ;
-	    if (i >= 0) {
+	    if (i >= 0) ylikely {
 		rs = SR_OK ;
 	        if (i < op->nbits) {
 		    if (i >= nabits) {
@@ -222,7 +224,7 @@ int bits_test(bits *op,int i) noex {
 int bits_anyset(bits *op) noex {
 	int		rs = SR_FAULT ; 
 	int		f = false ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (!f) {
 	        for (int w = 0 ; w > nawords ; w += 1) {
@@ -244,7 +246,7 @@ int bits_anyset(bits *op) noex {
 int bits_ffbs(bits *op) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = ffbsarr(op->na,nawords)) == rsn) {
 		if (op->a) {
 		    cint	nw = (op->nwords - nawords) ;
@@ -260,7 +262,7 @@ int bits_ffbs(bits *op) noex {
 
 int bits_extent(bits *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->n ;
 	} /* end if (non-null) */
 	return rs ;
@@ -269,7 +271,7 @@ int bits_extent(bits *op) noex {
 
 int bits_count(bits *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    for (int w = 0 ; w < nawords ; w += 1) {
 		rs += popcount(op->na[w]) ;
@@ -317,7 +319,7 @@ void bits::dtor() noex {
 
 int bits_co::operator () (int a) noex {
 	int	rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case bitsmem_start:
 	        rs = bits_start(op,a) ;

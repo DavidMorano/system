@@ -57,15 +57,15 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_CTX= ctchars.o ctxxx.o
+OBJ0_CTX= cvtdig.o cvtfloat.o
 OBJ1_CTX= ctbin.o 
 OBJ2_CTX= ctoct.o
 OBJ3_CTX= ctdec.o ctdecp.o ctdecf.o
 
 OBJ4_CTX= cthex.o
 OBJ5_CTX= cta26.o
-OBJ6_CTX= ctroman.o ctwords.o
-OBJ7_CTX= cvtdig.o
+OBJ6_CTX= ctchars.o ctxxx.o 
+OBJ7_CTX= ctroman.o ctwords.o
 
 OBJA_CTX= obj0ctx.o obj1ctx.o obj2ctx.o obj3ctx.o
 OBJB_CTX= obj4ctx.o obj5ctx.o obj6ctx.o obj7ctx.o

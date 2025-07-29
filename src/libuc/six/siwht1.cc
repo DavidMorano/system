@@ -90,35 +90,44 @@ extern "C" {
     int siwht(cchar *sp,int sl) noex {
     	cnullptr	np{} ;
     	int		si = -1 ;
-	if (cchar *tp ; (tp = strnwht(sp,sl)) != np) {
-	    si = intconv(tp - sp) ;
-	}
+	if (sp) ylikely {
+	    if (cchar *tp ; (tp = strnwht(sp,sl)) != np) {
+	        si = intconv(tp - sp) ;
+	    }
+	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwht) */
     int siwhtbrk(cchar *sp,int sl,cchar *ss) noex {
     	cnullptr	np{} ;
     	int		si = -1 ;
-	if (cchar *tp ; (tp = strnwhtbrk(sp,sl,ss)) != np) {
-	    si = intconv(tp - sp) ;
-	}
+	if (sp) ylikely {
+	    if (cchar *tp ; (tp = strnwhtbrk(sp,sl,ss)) != np) {
+	        si = intconv(tp - sp) ;
+	    }
+	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwhtbrk) */
     int siwhtchr(cchar *sp,int sl,int sch) noex {
     	cnullptr	np{} ;
     	int		si = -1 ;
-	if (cchar *tp ; (tp = strnwhtchr(sp,sl,sch)) != np) {
-	    si = intconv(tp - sp) ;
-	}
+	if (sp) ylikely {
+	    if (cchar *tp ; (tp = strnwhtchr(sp,sl,sch)) != np) {
+	        si = intconv(tp - sp) ;
+	    }
+	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwhtchr) */
 } /* end extern */
 
 extern "C++" {
     int siwhtbrk(cchar *sp,int sl,const chrset &sset) noex {
+    	cnullptr	np{} ;
     	int		si = -1 ;
-	if (cchar *tp ; (tp = strnwhtbrk(sp,sl,sset)) != nullptr) {
-	    si = intconv(tp - sp) ;
-	}
+	if (sp) ylikely {
+	    if (cchar *tp ; (tp = strnwhtbrk(sp,sl,sset)) != np) {
+	        si = intconv(tp - sp) ;
+	    }
+	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwhtbrk) */
 } /* end extern */

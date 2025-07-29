@@ -27,12 +27,12 @@
 	buffer are made.
 
 	Synopsis:
-	int sfshrink(cchar *sp,int sl,cchar **rpp) noex ;
+	int sfshrink(cchar *sp,int sl,cchar **rpp) noex
 
 	Arguments:
-	sp	buffer
-	sl	buffer length
-	rpp	pointer to prointer to resulting string
+	sp	source c-string pointer
+	sl	source c-string length
+	rpp	pointer to pointer to resulting string
 
 	Returns:
 	+ non-white-space string length (if OK), otherwise 0
@@ -42,13 +42,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>		/* possible future use */
-#include	<char.h>
+#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -85,20 +83,24 @@ import libutil ;
 /* exported subroutines */
 
 int sfshrink(cchar *sp,int sl,cchar **rpp) noex {
-	if (sl < 0) {
-	    while (CHAR_ISWHITE(*sp)) {
-	        sp += 1 ;
-	    }
-	    sl = lenstr(sp) ;
-	} else {
-	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	        sp += 1 ;
+    	if (sp) ylikely {
+	    if (sl >= 0) {
+	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        } /* end while */
+	        if (sp[0] == '\0') sl = 0 ;
+	    } else {
+	        while (CHAR_ISWHITE(*sp)) {
+	            sp += 1 ;
+	        }
+	        sl = lenstr(sp) ;
+	    } /* end if */
+	    while ((sl > 0) && CHAR_ISWHITE(sp[sl - 1])) {
 	        sl -= 1 ;
-	    } /* end while */
-	    if (sp[0] == '\0') sl = 0 ;
-	} /* end if */
-	while ((sl > 0) && CHAR_ISWHITE(sp[sl - 1])) {
-	    sl -= 1 ;
+	    }
+	} else {
+	    sl = -1 ;
 	}
 	if (rpp) *rpp = sp ;
 	return sl ;

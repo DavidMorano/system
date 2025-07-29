@@ -56,9 +56,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
 #include	<unistd.h>
-#include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
@@ -73,7 +72,7 @@
 #include	<ascii.h>
 #include	<buffer.h>
 #include	<snwcpy.h>
-#include	<sfx.h>
+#include	<sfx.h>			/* |sfweirdo(3uc)| */
 #include	<strn.h>
 #include	<vstrkeycmpx.h>
 #include	<char.h>
@@ -279,21 +278,22 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	int		rs = 1 ; /* something positive (see code below) */
 	int		el ;
 	int		enl = 0 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	cchar		*scl = "?+:;¶µ­=#\t " ;
-	cchar		*tp, *ep ;
+	cchar		*tp ;
+	cchar		*ep ;
 	cchar		*enp = nullptr ;
 	char		envnamebuf[envnamelen+ 1] ;
 	while (sl && char_iswhite(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
 	}
-/* extract any dependencies (if we have any) */
+	/* extract any dependencies (if we have any) */
 	if (((tp = strnbrk(sp,sl,scl)) != np) && (*tp == '?')) {
 	    cint	tl = intconv(tp - sp) ;
 	    if ((rs = deps(sp,tl)) > 0) {
 	        sl -= intconv((tp + 1) - sp) ;
-	        sp = (tp+1) ;
+	        sp = (tp + 1) ;
 	        while (sl && char_iswhite(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
@@ -301,12 +301,12 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	    } /* end if (subinfo::deps) */
 	} /* end if (getting dependencies) */
 	if (rs > 0) { /* greater-than */
-	    if ((el = sfbrk(sp,sl,strassign,&ep)) > 0) {
+	    if ((el = sfweirdo(sp,sl,strassign,&ep)) > 0) {
 	        int	sch = 0 ;
 	        bool	f_exit = false ;
 	        bool	f_go = true ;
 	        sl -= intconv((ep + el) - sp) ;
-	        sp = (ep+el) ;
+	        sp = (ep + el) ;
 	        while (sl && char_iswhite(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
@@ -448,11 +448,10 @@ int subinfo::deps(cchar *sp,int sl) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 = 0 ;
-	int		f = true ;
+	int		f = true ; /* return-value */
 	if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
-	    int		fl ;
 	    cchar	*fp{} ;
-	    while ((fl = fsb.get(dterms,&fp)) >= 0) {
+	    for (int fl ; (fl = fsb.get(dterms,&fp)) >= 0 ; ) {
 	        if (fl > 0) {
 		    auto	vs = vstrkeycmp ;
 	            if ((rs = vecstr_searchl(dlp,fp,fl,vs,np)) >= 0) {
@@ -462,7 +461,7 @@ int subinfo::deps(cchar *sp,int sl) noex {
 		    }
 		} /* end if (non-zero positive) */
 		if (rs < 0) break ;
-	    } /* end while */
+	    } /* end for */
 	    rs1 = fsb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
@@ -478,9 +477,8 @@ int subinfo::vals(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	int		len = 0 ;
 	if (char *fbuf{} ; (rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	    if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
-	        int	fl ;
 	        int	c = 0 ;
-	        while ((fl = fsb.sharg(vterms,fbuf,flen)) >= 0) {
+	        for (int fl ; (fl = fsb.sharg(vterms,fbuf,flen)) >= 0 ; ) {
 	            if (fl > 0) {
 	                if (c++ > 0) {
 	                    rs = bp->chr(' ') ;
@@ -493,7 +491,7 @@ int subinfo::vals(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	            } /* end if (non-zero) */
 	            if (fsb.term == '#') break ;
 	            if (rs < 0) break ;
-	        } /* end while (looping over values) */
+	        } /* end for (looping over values) */
 	        rs1 = fsb.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (field) */
@@ -506,10 +504,9 @@ int subinfo::vals(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 
 int subinfo::val(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	int		kl ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	cchar		*kp{} ;
-	while ((kl = sfthing(sp,sl,ss,&kp)) >= 0) {
+	for (int kl ; (kl = sfthing(sp,sl,ss,&kp)) >= 0 ; ) {
 	    cchar	*cp = sp ;
 	    int		cl = intconv((kp - 2) - sp) ;
 	    if (cl > 0) {
@@ -523,7 +520,7 @@ int subinfo::val(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	    sl -= intconv((kp + kl + 1) - sp) ;
 	    sp = (kp + kl + 1) ;
 	    if (rs < 0) break ;
-	} /* end while */
+	} /* end for */
 	if ((rs >= 0) && (sl > 0)) {
 	    rs = bp->strw(sp,sl) ;
 	    len += rs ;

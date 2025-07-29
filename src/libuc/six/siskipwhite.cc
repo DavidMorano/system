@@ -50,7 +50,30 @@
 #include	"six.h"
 
 
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+constexpr cauto		iswht = char_iswhite ;
 
 
 /* exported variables */
@@ -59,10 +82,12 @@
 /* exported subroutines */
 
 int siskipwhite(cchar *sp,int sl) noex {
-	int		i ; /* used afterwards */
-	for (i = 0 ; sl-- && sp[i] ; i += 1) {
-	    if (! CHAR_ISWHITE(sp[i])) break ;
-	} /* end while */
+	int		i = -1 ; /* used afterwards */
+	if (sp) ylikely {
+	    for (i = 0 ; sl-- && sp[i] ; i += 1) {
+	        if (! iswht(sp[i])) break ;
+	    } /* end while */
+	} /* end if (non-null) */
 	return i ;
 }
 /* end subroutine (siskipwhite) */

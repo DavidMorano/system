@@ -29,7 +29,9 @@
 #include	<strnxchr.h>		/* find */
 #include	<strnxbrk.h>		/* find */
 #include	<strnxsub.h>		/* find */
+#include	<strnxterm.h>		/* find */
 #include	<strnwht.h>		/* find */
+#include	<strnchar.h>		/* find */
 #include	<strncpyxc.h>		/* copy */
 #include	<strnwcpyxc.h>		/* copy (case changing) */
 
@@ -52,6 +54,14 @@ static inline char *strnncpy(char *dp,cchar *sp,int sl,int sz) noex {
 }
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+inline char *strnwcpy(char *dp,int dl,cchar *sp) noex {
+    	return strnwcpybc(dp,dl,sp,-1) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* STRN_INCLUDE */

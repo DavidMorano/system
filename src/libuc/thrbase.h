@@ -1,4 +1,5 @@
 /* thrbase HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* access manager interface to PCS user-mode polling */

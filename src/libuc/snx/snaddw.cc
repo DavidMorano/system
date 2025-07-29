@@ -60,14 +60,18 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"snaddw.h"
@@ -99,9 +103,9 @@
 int snaddw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf && sp) {
+	if (rbuf && sp) ylikely {
 	    rs = SR_INVALID ;
- 	    if (i >= 0) {	
+ 	    if (i >= 0) ylikely {	
 	        char	*bp = (rbuf + i) ;
 	        rs = SR_OK ;
 	        if (rlen < 0) {

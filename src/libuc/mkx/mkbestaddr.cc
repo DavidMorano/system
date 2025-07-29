@@ -44,8 +44,11 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<snwcpy.h>
 #include	<sfx.h>
 #include	<ema.h>
@@ -87,10 +90,10 @@ int mkaddrbest(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (rbuf && abuf) {
+	if (rbuf && abuf) ylikely {
 	    rbuf[0] = '\0' ;
-	    if (ema a ; (rs = ema_start(&a)) >= 0) {
-	        if ((rs = ema_parse(&a,abuf,alen)) >= 0) {
+	    if (ema a ; (rs = ema_start(&a)) >= 0) ylikely {
+	        if ((rs = ema_parse(&a,abuf,alen)) >= 0) ylikely {
 	            ema_ent	*ep ;
 	            for (int i = 0 ; ema_get(&a,i,&ep) >= 0 ; i += 1) {
 	                if (ep) {
@@ -108,7 +111,7 @@ int mkaddrbest(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 				    sl = ep->al ;
 	                        }
 			    }
-	                    if (sl > 0) {
+	                    if (sl > 0) ylikely {
 			        cchar	*ap ;
 			        if (int al ; (al = sfshrink(sp,sl,&ap)) > 0) {
 	                            rs = snwcpy(rbuf,rlen,ap,al) ;

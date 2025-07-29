@@ -21,8 +21,11 @@
 	siext
 
 	Description:
-        Given a file-name (a counted c-string) we determine if it has a
-        file-extension of a given set.
+	Given a file-name (a counted c-string) I determine if it
+	has a file-extension.  If it has a file-extension, I return
+	the length (character count) of the origial string up to
+	the dot character before the file-extension.  For no
+	file-extension, I return -1.
 
 	Synopsis:
 	int siext(cchar *fp,int fl,mainv exts) noex
@@ -33,10 +36,8 @@
 	exts		arrays of strings (allowable extensions)
 
 	Returns:
-	<0		does not have an approved extension
-	==0		has an approved extension, but has no base part
-	>0              has an approved extension (and this is
-			base-str length)
+	>=0		leading length up to found file-extension
+	<0              no file extension found
 
 ******************************************************************************/
 
@@ -73,7 +74,7 @@ namespace {
 	constexpr brkinit() noex {
 	    brks.set(CH_SLASH) ;
 	    brks.set(CH_DOT) ;
-	} ;
+	} ; /* end ctor */
     } ; /* end struct (brkinit) */
 } /* end namespace */
 
@@ -93,7 +94,7 @@ constexpr brkinit	bi ;
 
 int siext(cchar *fp,int fl) noex {
 	int		si = -1 ;
-	if (fp) {
+	if (fp) ylikely {
 	    if (fl < 0) fl = lenstr(fp) ;
 	    while ((fl > 0) && (fp[fl - 1] == CH_SLASH)) {
 	        fl -= 1 ;

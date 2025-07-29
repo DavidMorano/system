@@ -33,12 +33,12 @@
 	the user would expect.  Happily for us, the cheaper and
 	more likely methods come first, and the heavier and more
 	expensive methods come later (pretty much).  Although, in
-	all cases a lookup into the system ucentpw database is
+	all cases a lookup into the system UCENTPW database is
 	required (itself not always a cheap or fast operation).  In
-	fact, a lookup to the system ucentpw database can be much
+	fact, a lookup to the system UCENTPW database can be much
 	more expensive than a lookup into the system UTMPX database
-	(otherwise thought to be more expensive than a ucentpw
-	lookup).  We guard against making multiple ucentpw database
+	(otherwise thought to be more expensive than a UCENTPW 
+	lookup).  We guard against making multiple UCENTPW database
 	requests for the same name (to save time).
 
 	The following are available:
@@ -76,7 +76,7 @@
 	int getpwusername(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex
 
 	Arguments:
-	pwp		pointer to ucentpw structure (to receive results)
+	pwp		pointer to UCENTPW structure (to receive results)
 	pwbuf		supplied buffer to hold information
 	pwlen		length of supplied buffer
 	uid		user-id
@@ -108,7 +108,7 @@
 	Forst we try to look up the name is the local program cache.
 	Failing the cache lookup, we go through various ways of
 	guessing what our username is. Each time we guess a name,
-	we have to verify it by looking it up in the system ucentpw
+	we have to verify it by looking it up in the system UCENTPW 
 	database. We do that by calling the subroutines
 	|getxusername_lookup()| below. As soon as a guess of a name
 	is verified, we return the guess as the answer. Finally,
@@ -127,15 +127,17 @@
 #include	<cstdlib>
 #include	<pwd.h>
 #include	<usystem.h>
-#include	<varnames.hh>
-#include	<getbufsize.h>
 #include	<ucgetpid.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<vecstr.h>
-#include	<getax.h>
 #include	<ucproguser.h>
-#include	<utmpacc.h>
 #include	<getutmpent.h>		/* <- for |getutmpname(3uc)| */
+#include	<getax.h>
+#include	<getpwx.h>
+#include	<getbufsize.h>
+#include	<mallocxx.h>
+#include	<utmpacc.h>
+#include	<varnames.hh>
+#include	<vecstr.h>
 #include	<strlibval.hh>
 #include	<sfx.h>
 #include	<snx.h>
@@ -336,31 +338,29 @@ int getxusername(getxuser *xup) noex {
 static int getusernamer(char *ubuf,int ulen,uid_t uid) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
+	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
 	    ucentpw	pw ;
 	    cint	pwlen = rs ;
-	    if (char *pwbuf{} ; (rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
-	        getxuser	xu{} ;
-	        xu.pwp = &pw ;
-	        xu.pwbuf = pwbuf ;
-	        xu.pwlen = pwlen ;
-	        xu.ubuf = ubuf ;
-	        xu.ulen = ulen ;
-	        xu.uid = uid ;
-	        xu.f_tried = true ;
-	        if ((rs = getxusername(&xu)) >= 0) {
-	            rs = xu.unl ;
-	            if (xu.unl <= 0) {
-	                rs = sncpy1(ubuf,ulen,pw.pw_name) ;
-	            }
-	        } else if (rs == SR_NOTFOUND) {
-	            uint	v = xu.uid ;
-	            rs = snsd(ubuf,ulen,"U",v) ;
+	    getxuser	xu{} ;
+	    xu.pwp = &pw ;
+	    xu.pwbuf = pwbuf ;
+	    xu.pwlen = pwlen ;
+	    xu.ubuf = ubuf ;
+	    xu.ulen = ulen ;
+	    xu.uid = uid ;
+	    xu.f_tried = true ;
+	    if ((rs = getxusername(&xu)) >= 0) {
+	        rs = xu.unl ;
+	        if (xu.unl <= 0) {
+	            rs = sncpy1(ubuf,ulen,pw.pw_name) ;
 	        }
-	        rs1 = uc_free(pwbuf) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
-	} /* end if (getbufsize) */
+	    } else if (rs == SR_NOTFOUND) {
+	        uint	v = xu.uid ;
+	        rs = snsd(ubuf,ulen,"U",v) ;
+	    }
+	    rs1 = uc_free(pwbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (getusernamer) */

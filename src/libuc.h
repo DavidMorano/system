@@ -80,7 +80,7 @@
 #include	<bits.h>
 #include	<buffer.h>
 #include	<bufprintf.h>
-#include	<bufsizenames.h>
+#include	<bufsize.h>
 #include	<bufstr.h>
 #include	<bwops.h>
 #include	<cachetime.h>
@@ -94,7 +94,6 @@
 #include	<chrono.h>
 #include	<clanguage.h>
 #include	<clusterdb.h>
-#include	<compactstr.h>
 #include	<conmsghdr.h>
 #include	<csem.h>
 #include	<ctx.h>
@@ -140,7 +139,7 @@
 #include	<grcache.h>
 #include	<grmems.h>
 #include	<hash.h>
-#include	<hasnonpath.h>
+#include	<nonpath.h>
 #include	<hasx.h>
 #include	<hdb.h>
 #include	<hdbstr.h>
@@ -163,7 +162,6 @@
 #include	<kvsfile.h>
 #include	<libmallocxx.h>
 #include	<libuc.h>
-#include	<linebuffer.h>
 #include	<liner.h>
 #include	<localmisc.h>
 #include	<lockfile.h>
@@ -217,8 +215,6 @@
 #include	<randlc.h>
 #include	<randomvar.h>
 #include	<rmdirs.h>
-#include	<rmeol.h>
-#include	<rmleadzero.h>
 #include	<rmx.h>
 #include	<rpsem.h>
 #include	<rsfree.h>

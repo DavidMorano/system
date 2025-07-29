@@ -46,19 +46,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<strn.h>
-#include	<six.h>
-#include	<ischarx.h>
+#include	<six.h>			/* |sichr(3uc)| */
 #include	<strwcmp.h>
 #include	<char.h>
+#include	<ischarx.h>		/* |iseol(3uc)| */
 #include	<localmisc.h>
 
-#include	"sfx.h"
+#include	"sfx.h"			/* |sfshrink(3uc)| + |sfnext(3uc)| */
 
 import libutil ;
 
@@ -86,35 +84,38 @@ import libutil ;
 /* exported subroutines */
 
 int sfcontent(cchar *sp,int sl,cchar **rpp) noex {
-	int		rl = 0 ;
+	int		rl = -1 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if (sl < 0) sl = lenstr(sp) ;
-	if (sl > 0) {
-	    if (int si ; (si = sichr(sp,sl,'#')) > 0) {
-		rl = sfshrink(sp,si,&rp) ;
-	    } else {
-		while (sl && iseol(sp[sl-1])) {
-		    sl -= 1 ;
+	if (sp) ylikely {
+	    rl = 0 ;
+	    if (sl < 0) sl = lenstr(sp) ;
+	    if (sl > 0) ylikely {
+	        if (int si ; (si = sichr(sp,sl,'#')) >= 0) {
+		    sl = si ;
+	        } else {
+		    while (sl && iseol(sp[sl - 1])) sl -= 1 ;
+	        } /* end if (comment or EOL) */
+		{
+		    rl = sfshrink(sp,sl,&rp) ;
 		}
-		rl = sfshrink(sp,sl,&rp) ;
-	    }
-	} /* end if (non-zero positive) */
+	    } /* end if (non-zero positive) */
+	} /* end if (non-null) */
 	if (rpp) *rpp = rp ;
 	return rl ;
 }
 /* end subroutine (sfcontent) */
 
 int sfkeyval(cchar *sp,int sl,cchar *key,cchar **rpp) noex {
-	int		vl = -1 ;
+	int		vl = -1 ; /* return-value */
 	cchar		*vp = nullptr ;
-	if (sp) {
+	if (sp) ylikely {
 	    cchar	*cp{} ;
 	    if (int cl ; (cl = sfcontent(sp,sl,&cp)) > 0) {
 		cchar	*kp{} ;
 		if (int kl ; (kl = sfnext(cp,cl,&kp)) > 0) {
 		    if (strwcmp(key,kp,kl) == 0) {
-			cint	xl = intconv((cp+cl) - (kp+kl)) ;
-			cchar	*xp = (kp+kl) ;
+			cint	xl = intconv((cp + cl) - (kp + kl)) ;
+			cchar	*xp = (kp + kl) ;
 			vl = sfnext(xp,xl,&vp) ;
 		    } /* end if (strwcmp) */
 		} /* end if (sfnext) */

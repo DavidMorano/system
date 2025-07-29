@@ -1,4 +1,5 @@
 /* hasx HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* has a counted c-string some characteristic? */
@@ -26,6 +27,7 @@
 #include	<matstr.h>
 #include	<stdfnames.h>
 
+#include	<hasuniq.h>
 
 EXTERNC_begin
 
@@ -37,6 +39,7 @@ extern bool hasempty(cchar *,int) noex ;
 extern bool hasalpha(cchar *,int) noex ;
 extern bool hasalnum(cchar *,int) noex ;
 extern bool hasnum(cchar *,int) noex ;
+extern bool hasmodname(cchar *,int) noex ;
 
 extern bool hasprintlatin(cchar *,int) noex ;
 extern bool hasprintbad(cchar *,int) noex ;

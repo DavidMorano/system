@@ -26,12 +26,12 @@
 	directories easier.
 
 	Synopsis:
-	int dirseen_notseen(dirseen *op,USTAT *sbp,cchar *dbuf,int dlen) noex
-	int dirseen_notadd(dirseen *op,USTAT *sbp,cchar *dbuf,int dlen) noex
+	int dirseen_notseen(dirseen *op,ustat *sbp,cchar *dbuf,int dlen) noex
+	int dirseen_notadd(dirseen *op,ustat *sbp,cchar *dbuf,int dlen) noex
 
 	Arguments:
 	op		pointer to object
-	sbp		pointer to USTAT structure
+	sbp		pointer to ustat structure
 	dbuf		directory buffer
 	dlen		length of string in directory buffer
 
@@ -52,6 +52,7 @@
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<pathclean.h>
+#include	<strnul.hh>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -81,15 +82,15 @@
 
 /* exported subroutines */
 
-int dirseen_notseen(dirseen *op,USTAT *sbp,cchar *dbuf,int dlen) noex {
+int dirseen_notseen(dirseen *op,ustat *sbp,cchar *dbuf,int dlen) noex {
 	cint		rsn = SR_NOENT ;
 	int		rs ;
 	int		f = false ;
-	if ((rs = dirseen_magic(op,sbp,dbuf)) >= 0) {
+	if ((rs = dirseen_magic(op,sbp,dbuf)) >= 0) ylikely {
 	    sbp->st_ino = 0 ;
 	    sbp->st_dev = 0 ;
 	    if ((rs = dirseen_havename(op,dbuf,dlen)) == rsn) {
-	        if ((rs = u_stat(dbuf,sbp)) >= 0) {
+		if (strnul ns(dbuf,dlen) ; (rs = u_stat(ns,sbp)) >= 0) {
 	            if (S_ISDIR(sbp->st_mode)) {
 	    	        if ((rs = dirseen_havedevino(op,sbp)) == rsn) {
 			    rs = SR_OK ;
@@ -105,10 +106,10 @@ int dirseen_notseen(dirseen *op,USTAT *sbp,cchar *dbuf,int dlen) noex {
 }
 /* end subroutine (dirseen_notseen) */
 
-int dirseen_notadd(dirseen *op,USTAT *sbp,cchar *dbuf,int dlen) noex {
+int dirseen_notadd(dirseen *op,ustat *sbp,cchar *dbuf,int dlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = dirseen_magic(op,sbp,dbuf)) >= 0) {
+	if ((rs = dirseen_magic(op,sbp,dbuf)) >= 0) ylikely {
 	    if (char *cbuf ; (rs = malloc_mp(&cbuf)) >= 0) {
 	        if ((rs = pathclean(cbuf,dbuf,dlen)) > 0) {
 	            rs = dirseen_add(op,cbuf,rs,sbp) ;
@@ -124,11 +125,11 @@ int dirseen_notadd(dirseen *op,USTAT *sbp,cchar *dbuf,int dlen) noex {
 
 /* local subroutines */
 
-int dirseen::notseen(USTAT *sbp,cchar *dbuf,int dlen) noex {
+int dirseen::notseen(ustat *sbp,cchar *dbuf,int dlen) noex {
 	return dirseen_notseen(this,sbp,dbuf,dlen) ;
 }
 
-int dirseen::notadd(USTAT *sbp,cchar *dbuf,int dlen) noex {
+int dirseen::notadd(ustat *sbp,cchar *dbuf,int dlen) noex {
 	return dirseen_notadd(this,sbp,dbuf,dlen) ;
 }
 

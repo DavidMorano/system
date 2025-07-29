@@ -41,12 +41,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<char.h>
+#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -77,15 +76,19 @@ import libutil ;
 /* exported subroutines */
 
 int sfskipwhite(cchar *sp,int sl,cchar **rpp) noex {
-	if (sl < 0) {
-	    while (CHAR_ISWHITE(*sp)) sp += 1 ;
-	    sl = lenstr(sp) ;
+    	if (sp) ylikely {
+	    if (sl < 0) {
+	        while (CHAR_ISWHITE(*sp)) sp += 1 ;
+	        sl = lenstr(sp) ;
+	    } else {
+	        while (sl && CHAR_ISWHITE(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        }
+	    } /* end if */
 	} else {
-	    while (sl && CHAR_ISWHITE(*sp)) {
-	        sp += 1 ;
-	        sl -= 1 ;
-	    }
-	} /* end if */
+	    sl = -1 ;
+	} /* end if (non-null) */
 	if (rpp) *rpp = sp ;
 	return sl ;
 }

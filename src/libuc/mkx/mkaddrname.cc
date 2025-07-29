@@ -56,7 +56,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<estrings.h>
 #include	<ema.h>
 #include	<isoneof.h>
@@ -127,15 +131,15 @@ int mkaddrname(char *fbuf,int flen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (fbuf && sp) {
+	if (fbuf && sp) ylikely {
 	    rs = SR_OK ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    fbuf[0] = '\0' ;
-	    if (sl > 0)  {
-	        if (ema a ; (rs = a.start) >= 0) {
-	            if ((rs = a.parse(sp,sl)) >= 0) {
+	    if (sl > 0)  ylikely {
+	        if (ema a ; (rs = a.start) >= 0) ylikely {
+	            if ((rs = a.parse(sp,sl)) >= 0) ylikely {
 	        	ema_ent		*ep{} ;
-			auto		eg = ema_get ;
+			cauto		eg = ema_get ;
 		        for (int i = 0 ; (rs1 = eg(&a,i,&ep)) >= 0 ; i += 1) {
 		            rs = emaentry_addrname(ep,fbuf,flen) ;
 	                    len = rs ;
@@ -161,7 +165,7 @@ static int emaentry_addrname(ema_ent *ep,char *fbuf,int flen) noex {
 	int		rs = SR_OK ;
 	int		nl = 0 ;
 	int		atype = -1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	cchar		*sp = nullptr ;
 	if ((sp == nullptr) || (nl == 0)) {
 	    if (ep->cp != nullptr) {

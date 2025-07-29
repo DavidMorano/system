@@ -72,7 +72,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strstr(3c)| */
 #include	<usystem.h>
 #include	<timewatch.hh>
 #include	<vecstr.h>
@@ -126,7 +126,7 @@ namespace {
 	int		bs[getbufsize_overlast] ; /* Buffer-Size */
 	int operator [] (int) noex ;
     } ; /* end class (ubufsize) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -204,11 +204,11 @@ int ubufsize::load() noex {
 	int		rs1 ;
 	if (! floaded) {
 	    floaded = true ;
-	    if (vecstr cv ; (rs = vecstr_start(&cv,1,0)) >= 0) {
+	    if (vecstr cfv ; (rs = cfv.start(1,0)) >= 0) {
 	        cchar	*fn = GETBUFSIZE_CONF ;
-	        if ((rs = vecstr_envfile(&cv,fn)) >= 0) {
+	        if ((rs = cfv.envfile(fn)) >= 0) {
 	            cchar	*kp ;
-	            for (int i = 0 ; vecstr_get(&cv,i,&kp) >= 0 ; i += 1) {
+	            for (int i = 0 ; cfv.get(i,&kp) >= 0 ; i += 1) {
 	                if (kp) {
 			    rs = loadent(kp) ;
 	                } /* end if (non-null) */
@@ -217,7 +217,7 @@ int ubufsize::load() noex {
 	        } else if (isNotPresent(rs)) {
 	            rs = SR_OK ;
 	        }
-	        rs1 = vecstr_finish(&cv) ;
+	        rs1 = cfv.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (vecstr) */
 	} /* end if (need load) */

@@ -41,13 +41,12 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<ascii.h>
-#include	<char.h>
+#include	<ascii.h>		/* |CH_{xx}| */
+#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -80,16 +79,20 @@ static int	isours(int) noex ;
 /* exported subroutines */
 
 int sfdequote(cchar *sp,int sl,cchar **rpp) noex {
-	if (sl < 0) sl = lenstr(sp) ;
-	while (sl && isours(sp[0])) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	}
-	if (sp[0] == '\0') sl = 0 ;
-	if (rpp) *rpp = sp ;
-	while (sl && isours(sp[sl-1])) {
-	    sl -= 1 ;
-	}
+    	if (sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    while (sl && isours(sp[0])) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	    }
+	    if (sp[0] == '\0') sl = 0 ;
+	    if (rpp) *rpp = sp ;
+	    while (sl && isours(sp[sl-1])) {
+	        sl -= 1 ;
+	    }
+	} else {
+	    sl = -1 ;
+	} /* end if (non-null) */
 	return sl ;
 }
 /* end subroutine (sfdequote) */

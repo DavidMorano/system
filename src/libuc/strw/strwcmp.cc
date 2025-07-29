@@ -115,7 +115,7 @@ namespace {
 	    return nleadfoldstr(s1,s2,s2len) ;
 	} ;
    } ;
-}
+} /* end namespace */
 
 
 /* forward references */

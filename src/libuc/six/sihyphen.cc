@@ -41,13 +41,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| + |strnchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
-#include	<toxc.h>
 #include	<localmisc.h>
 
 #include	"six.h"
@@ -93,13 +91,14 @@ cbool		f_strnchr = CF_STRNCHR ;
 /* exported subroutines */
 
 int sihyphen(cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		si = 0 ; /* return-value */
 	bool		f = false ;
 	if (sp) {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if_constexpr (f_strnchr) {
 	        cchar	*tp ;
-	        while ((sl >= 2) && ((tp = strnchr(sp,sl,'-')) != nullptr)) {
+	        while ((sl >= 2) && ((tp = strnchr(sp,sl,'-')) != np)) {
 	            si += intconv(tp - sp) ;
 	            f = (intconv((tp - sp) + 1) < sl) && (tp[1] == '-') ;
 	            if (f) break ;

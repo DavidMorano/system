@@ -35,24 +35,9 @@ DEFS +=
 
 INCS += getx.h
 
+MODS +=
+
 LIBS +=
-
-
-INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ00= getaddr.o getaf.o getarchitecture.o getbufsize.o
@@ -76,6 +61,21 @@ OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o
 
 OBJ= obja.o objb.o objc.o objd.o
+
+
+INCDIRS +=
+
+LIBDIRS += -L$(LIBDIR)
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -111,13 +111,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	$(RM) $(ALL)
@@ -186,8 +181,6 @@ objd.o:			$(OBJD)
 
 
 getbufsize.o:		getbufsize.cc		getbufsize.h		$(INCS)
-	makemodule bufsizedata
-	$(COMPILE.cc) getbufsize.cc
 
 getaddr.o:		getaddr.cc		getaddr.h		$(INCS)
 getaf.o:		getaf.cc		getaf.h			$(INCS)

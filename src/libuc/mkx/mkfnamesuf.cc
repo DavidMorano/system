@@ -45,8 +45,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdarg>
-#include	<usystem.h>
+#include	<cstdarg>		/* |va_list(3c)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -106,27 +110,28 @@ int mkfnamesuf5(char *ofname,cc *p1,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5) noex {
 
 int mkfnamesufx(char *rbuf,int n,cc *p1,...) noex {
 	va_list		ap ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if ((rs = maxpathlen) >= 0) {
-	    storebuf	sb(rbuf,rs) ;
-	    if ((rs = sb.str(p1)) >= 0) {
-	        if (n > 0) {
-	            rs = sb.chr('.') ;
-		}
-	        if (rs >= 0) {
-	            va_begin(ap,p1) ;
-	            for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-	                cc	*sp = (cc *) va_arg(ap,cc *) ;
-		        if (sp) {
-	                    rs = sb.str(sp) ;
-		        }
-	            } /* end for */
-	            va_end(ap) ;
-	        } /* end if (ok) */
-	        rl = sb.idx ;
-	    }
-	} /* end if (maxpathlen) */
+	if (rbuf) ylikely {
+	    if ((rs = maxpathlen) >= 0) ylikely {
+	        if (storebuf sb(rbuf,rs) ; (rs = sb.str(p1)) >= 0) ylikely {
+	            if (n > 0) {
+	                rs = sb.chr('.') ;
+		    }
+	            if (rs >= 0) ylikely {
+	                va_begin(ap,p1) ;
+	                for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
+	                    cc	*sp = (cc *) va_arg(ap,cc *) ;
+		            if (sp) {
+	                        rs = sb.str(sp) ;
+		            }
+	                } /* end for */
+	                va_end(ap) ;
+	            } /* end if (ok) */
+	            rl = sb.idx ;
+	        } /* end if (storebuf) */
+	    } /* end if (maxpathlen) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mkfnamesufx) */

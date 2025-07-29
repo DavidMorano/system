@@ -54,14 +54,18 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"snaddslash.h"
@@ -93,9 +97,9 @@
 int snaddslash(char *rbuf,int rlen,int rl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if ((rlen >= 0) && (rl >= 0)) {
+	    if ((rlen >= 0) && (rl >= 0)) ylikely {
 	        rs = SR_OK ;
 		if ((rl == 0) || (rbuf[rl - 1] != '/')) {
 		    rbuf[rl] = '/' ;

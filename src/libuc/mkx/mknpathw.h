@@ -1,4 +1,4 @@
-/* mknpathxw HEADER */
+/* mknpathw HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -15,26 +15,13 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	MKNPATHXW_INCLUDE
-#define	MKNPATHXW_INCLUDE
+#ifndef	MKNPATHW_INCLUDE
+#define	MKNPATHW_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<usystem.h>
-
-
-EXTERNC_begin
-
-extern int mknpathxw(char *,int,int,...) noex ;
-
-extern int mknpath1w(char *,int,cc *,int) noex ;
-extern int mknpath2w(char *,int,cc *,cc *,int) noex ;
-extern int mknpath3w(char *,int,cc *,cc *,cc *,int) noex ;
-extern int mknpath4w(char *,int,cc *,cc *,cc *,cc *,int) noex ;
-extern int mknpath5w(char *,int,cc *,cc *,cc *,cc *,cc *,int) noex ;
-extern int mknpath6w(char *,int,cc *,cc *,cc *,cc *,cc *,cc *,int) noex ;
-
-EXTERNC_end
+#include	<mknpathxw.h>
 
 #ifdef	__cplusplus
 
@@ -62,6 +49,6 @@ inline int mknpathw(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,
 #endif /* __cplusplus */
 
 
-#endif /* MKNPATHXW_INCLUDE */
+#endif /* MKNPATHW_INCLUDE */
 
 

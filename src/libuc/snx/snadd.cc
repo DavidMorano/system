@@ -60,18 +60,22 @@
 	snkeyval(3uc)
 	snwvprintf(3uc)
 	snwprintf(3uc)
-	snkeval(3uc)
+	snkeyval(3uc)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdarg>
-#include	<usystem.h>
+#include	<cstdarg>		/* |va_list(3c)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
-#include	"snadd.h"
+#include	"snadd.h"		/* |snadd(3uc)| */
 
 
 /* local defines */
@@ -101,7 +105,7 @@ int snaddx(char *rbuf,int rlen,int rl,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    va_begin(ap,n) ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {

@@ -53,7 +53,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/time.h>
+#include	<sys/time.h>		/* |TIMEVAL| */
 #include	<stdint.h>
 #include	<climits>		/* |UINT_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
@@ -95,7 +95,7 @@ namespace {
 	int mkuunode() noex ;
     } ; /* end struct (mkuu) */
     typedef int (mkuu::*mkuu_m)() noex ;
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -119,7 +119,7 @@ constexpr mkuu_m	mems[] = {
 
 int mkuuid(uuid_dat *up,int ver) noex {
 	int		rs = SR_FAULT ;
-	if (up) {
+	if (up) ylikely {
     	    mkuu	uu(up) ;
 	    rs = uu(ver) ;
 	}
@@ -135,7 +135,7 @@ int mkuu::operator () (int ver) noex {
 	int		rs ;
 	if (ver <= 0) ver = UUID_VERSION ;
 	memclear(up) ;
-	if ((rs = getrand(rwords,rsz)) >= 0) {
+	if ((rs = getrand(rwords,rsz)) >= 0) ylikely {
 	    up->version = uchar(ver & 0x0F) ; /* <- four (4) bits */
 	    for (cauto &m : mems) {
 		rs = (this->*m)() ;
@@ -148,7 +148,7 @@ int mkuu::operator () (int ver) noex {
 
 int mkuu::mkuutime() noex {
     	int		rs ;
-    	if (timeval tv ; (rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
+    	if (timeval tv ; (rs = uc_gettimeofday(&tv,nullptr)) >= 0) ylikely {
 	    uint64_t	rt = 0 ;	/* resulting-time */
 	    uint64_t	v ;
 	    {
@@ -181,8 +181,8 @@ int mkuu::mkuuclk() noex {
 /* contributes six bytes */
 int mkuu::mkuunode() noex {
     	int		rs ;
-	if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
-	    if ((rs = getnodename(nbuf,rs)) >= 0) {
+	if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) ylikely {
+	    if ((rs = getnodename(nbuf,rs)) >= 0) ylikely {
 	        uint64_t	nv = loadbytes(nbuf,rs) ;
 	        uint64_t	v ;
 	        {

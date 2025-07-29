@@ -46,7 +46,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>		/* possible future use */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -83,10 +82,14 @@ import libutil ;
 /* exported subroutines */
 
 int sflast(cchar *sp,int sl,int n,cchar **rpp) noex {
-	if (sl < 0) sl = lenstr(sp) ;
-	if ((n >= 0) && (sl > n)) {
-	    sl = n ;
-	    sp += (sl-n) ;
+    	if (sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    if ((n >= 0) && (sl > n)) {
+	        sl = n ;
+	        sp += (sl - n) ;
+	    }
+	} else {
+	    sl = -1 ;
 	}
 	if (rpp) *rpp = sp ;
 	return sl ;

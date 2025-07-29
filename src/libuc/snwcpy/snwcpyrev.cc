@@ -40,8 +40,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -50,6 +50,8 @@
 #include	<localmisc.h>
 
 #include	"snwcpyx.h"
+
+#pragma		GCC dependency	"mod/libutil.ccm"
 
 import libutil ;
 
@@ -79,16 +81,19 @@ import libutil ;
 int snwcpyrev(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf && sp) {
-	    rs = SR_OVERFLOW ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((dlen < 0) || (dlen >= sl)) {
-	        int	i ; /* used-afterwards */
-	        for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
-	            dbuf[i] = sp[sl-i-1] ;
-	        } /* end for */
-	        dbuf[i] = '\0' ;
-		rs = i ;
-	    } /* end if */
+	    rs = SR_INVALID ;
+	    if (dlen >= 0) {
+	        rs = SR_OVERFLOW ;
+	        if (sl < 0) sl = lenstr(sp) ;
+	        if ((dlen < 0) || (dlen >= sl)) {
+	            int	i ; /* used-afterwards */
+	            for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
+	                dbuf[i] = sp[sl-i-1] ;
+	            } /* end for */
+	            dbuf[i] = '\0' ;
+		    rs = i ;
+	        } /* end if */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? sl : rs ;
 }

@@ -50,11 +50,14 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdarg>
-#include	<usystem.h>
+#include	<cstdarg>		/* |va_list(3c)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
-#include	<sncpyx.h>
 #include	<localmisc.h>
 
 #include	"mkfname.h"
@@ -120,20 +123,22 @@ int mkfname6(char *rbuf,cc *p1,cc *p2,cc *p3,cc *p4,cc *p5,cc *p6) noex {
 
 int mkfnamex(char *rbuf,int na,...) noex {
 	va_list		ap ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if ((rs = maxpathlen) >= 0) {
-	    storebuf	sb(rbuf,rs) ;
-	    va_begin(ap,na) ;
-	    for (int i = 0 ; (rs >= 0) && (i < na) ; i += 1) {
-	        cc	*sp = (cc *) va_arg(ap,cc *) ;
-		if (sp) {
-	            rs = sb.str(sp) ;
-		}
-	    } /* end for */
-	    rl = sb.idx ;
-	    va_end(ap) ;
-	} /* end if (maxpathlen) */
+	if (rbuf) ylikely {
+	    if ((rs = maxpathlen) >= 0) ylikely {
+	        storebuf	sb(rbuf,rs) ;
+	        va_begin(ap,na) ;
+	        for (int i = 0 ; (rs >= 0) && (i < na) ; i += 1) {
+	            cc	*sp = (cc *) va_arg(ap,cc *) ;
+		    if (sp) {
+	                rs = sb.str(sp) ;
+		    }
+	        } /* end for */
+	        rl = sb.idx ;
+	        va_end(ap) ;
+	    } /* end if (maxpathlen) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mkfnamex) */

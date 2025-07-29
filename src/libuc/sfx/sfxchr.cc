@@ -62,8 +62,8 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<strn.h>
-#include	<char.h>
+#include	<strn.h>		/* |strnxchr(3uc)| */
+#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -96,7 +96,7 @@ namespace {
 	sub_sfxchr(strxchr_f f) noex : fun(f) { } ;
 	int operator () (cchar *,int,int,cchar **) noex ;
     } ; /* end struct (sub_sfxchr) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -131,9 +131,9 @@ int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex {
 int sub_sfxchr::operator () (cchar *sp,int sl,int sch,cchar **rpp) noex {
 	int		rl = -1 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl > 0) {
+	    if (sl > 0) ylikely {
 	        while (sl && CHAR_ISWHITE(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
@@ -144,7 +144,7 @@ int sub_sfxchr::operator () (cchar *sp,int sl,int sch,cchar **rpp) noex {
 	            while (rl && CHAR_ISWHITE(rp[rl - 1])) {
 	                rl -= 1 ;
 	            }
-		}/* end if (hit) */
+		} /* end if (hit) */
 	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
 	if (rpp) *rpp = rp ;

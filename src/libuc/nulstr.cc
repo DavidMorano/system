@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	nulstr
+
+	Descrition:
 	This object module (nulstr) provides support for creating
 	NUL-terminated strings when only a counted string is
 	available.
@@ -24,13 +28,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"nulstr.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -52,11 +58,11 @@
 int nulstr_start(nulstr *ssp,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		cl = 0 ;
-	if (ssp && sp && rpp) {
+	if (ssp && sp && rpp) ylikely {
 	    rs = SR_OK ;
 	    ssp->as = nullptr ;
 	    *rpp = sp ;
-	    if (sl >= 0) {
+	    if (sl >= 0) ylikely {
 	        if (sp[sl] != '\0') {
 	            if (sl > NULSTR_SHORTLEN) {
 		        cchar	*cp ;
@@ -67,13 +73,13 @@ int nulstr_start(nulstr *ssp,cchar *sp,int sl,cchar **rpp) noex {
 	                }
 	            } else {
 	                *rpp = ssp->buf ;
-	                cl = strwcpy(ssp->buf,sp,sl) - ssp->buf ;
+	                cl = intconv(strwcpy(ssp->buf,sp,sl) - ssp->buf) ;
 	            } /* end if */
 	        } else {
 	            cl = sl ;
 	        }
 	    } else {
-	        cl = strlen(sp) ;
+	        cl = lenstr(sp) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? cl : rs ;
@@ -83,10 +89,11 @@ int nulstr_start(nulstr *ssp,cchar *sp,int sl,cchar **rpp) noex {
 int nulstr_finish(nulstr *ssp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (ssp) {
+	if (ssp) ylikely {
 	    rs = SR_OK ;
-	    if (ssp->as) {
-	        rs1 = uc_libfree(ssp->as) ;
+	    if (ssp->as) ylikely {
+		char *bp = cast_const<charp>(ssp->as) ;
+	        rs1 = uc_libfree(bp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ssp->as = nullptr ;
 	    }
@@ -105,19 +112,21 @@ int nulstr::start(cchar *sp,int sl,cchar **rpp) noex {
 
 nulstr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	switch (w) {
-	case nulstrmem_finish:
-	    rs = nulstr_finish(op) ;
-	    break ;
-	} /* end switch */
+	if (op) ylikely {
+	    switch (w) {
+	    case nulstrmem_finish:
+	        rs = nulstr_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (nulstr_co::operator) */
 
-void dtor::dtor() noex {
+void nulstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("dtor",rs,"fini-finish") ;
 	}
-}
+} /* end method (nulstr::dtor) */
 
 

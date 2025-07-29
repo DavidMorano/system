@@ -47,11 +47,15 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<sbuf.h>
-#include	<ascii.h>
+#include	<ascii.h>		/* |CH_{xx}| */
 #include	<mkchar.h>
-#include	<ischarx.h>
+#include	<ischarx.h>		/* |isprintlatin(3uc)| */
 #include	<localmisc.h>
 
 #include	"mkdisplayable.h"
@@ -84,8 +88,8 @@ import libutil ;
 int mkdisplayable(char *rbuf,int rlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (rbuf && sp) {
-	    if (sbuf s ; (rs = s.start(rbuf,rlen)) >= 0) {
+	if (rbuf && sp) ylikely {
+	    if (sbuf s ; (rs = s.start(rbuf,rlen)) >= 0) ylikely {
 	        int	pch = 0 ;
 	        bool	f_shift = false ;
 		if (sl < 0) sl = lenstr(sp) ;

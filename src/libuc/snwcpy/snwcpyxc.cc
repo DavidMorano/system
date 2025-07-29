@@ -60,19 +60,21 @@
 
 template<char (*chtoxc)(int)>
 int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
-    	int		dl = SR_OVERFLOW ; /* return-value */
-	int		i = 0 ;
-	char		*dp = dbuf ;
-	if (dlen < 0) dlen = INT_MAX ;
-	while ((i < dlen) && sl && sp[i]) {
-	    *dp++ = chtoxc(sp[i++]) ;
-	    sl -= 1 ;
-	}
-	*dp = '\0' ;
-	if ((sl == 0) || (sp[i] == '\0')) {
-	    dl = intconv(dp - dbuf) ;
-	}
-	return dl ;
+    	int		rs = SR_OVERFLOW ; /* return-value */
+	if (dbuf && sp) {
+	    int		i = 0 ; /* used-afterwards */
+	    char	*dp = dbuf ;
+	    if (dlen < 0) dlen = INT_MAX ;
+	    while ((i < dlen) && sl && sp[i]) {
+	        *dp++ = chtoxc(sp[i++]) ;
+	        sl -= 1 ;
+	    }
+	    *dp = '\0' ;
+	    if ((sl == 0) || (sp[i] == '\0')) {
+	        rs = intconv(dp - dbuf) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine-template (snwcpyxc) */
 
