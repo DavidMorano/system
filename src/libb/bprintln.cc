@@ -41,7 +41,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<localmisc.h>
@@ -79,7 +80,7 @@ int bprintln(bfile *op,cchar *lbuf,int llen) noex {
 	if ((rs = bfile_magic(op,lbuf)) > 0) {
 	    if ((rs = bfile_ckwr(op)) >= 0) {
 	        bool	feol = false ;
-	        if (llen < 0) llen = cstrlen(lbuf) ;
+	        if (llen < 0) llen = lenstr(lbuf) ;
 	        feol = feol || (llen == 0) ;
 	        feol = feol || (lbuf[llen-1] != CH_NL) ;
 	        if (feol) {

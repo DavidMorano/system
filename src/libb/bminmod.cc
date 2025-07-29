@@ -22,10 +22,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 

@@ -55,8 +55,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strchr(3c)| */
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<vecstr.h>

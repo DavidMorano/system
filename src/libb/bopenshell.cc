@@ -40,14 +40,17 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strncmp(3c)| */
 #include	<usystem.h>
 #include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
+
+#pragma		GCC dependency	"mod/libutil.ccm"
 
 import libutil ;
 
@@ -146,7 +149,7 @@ int bopenshell(bfile **fpa,cchar *cmd) noex {
 
 /* clean up the command a little */
 
-	cmdlen = strlen(cmd) ;
+	cmdlen = lenstr(cmd) ;
 
 	while (CHAR_ISWHITE(*cmd)) {
 	    cmd += 1 ;
@@ -383,7 +386,7 @@ int bopenshell(bfile **fpa,cchar *cmd) noex {
 
 /* write the user's program string to the child SHELL */
 
-	if ((rs = u_write(wfd,cmd,strlen(cmd))) < cmdlen) {
+	if ((rs = u_write(wfd,cmd,lenstr(cmd))) < cmdlen) {
 
 	    if (rs >= 0)
 	        rs = SR_NOBUFS ;

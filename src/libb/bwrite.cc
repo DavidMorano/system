@@ -46,7 +46,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstdlib>
 #include	<algorithm>
 #include	<usystem.h>
 #include	<strn.h>
@@ -119,7 +119,7 @@ int bwrite(bfile *op,cvoid *abuf,int alen) noex {
 int bfile_write(bfile *op,cvoid *abuf,int alen) noex {
 	int		rs ;
 	cchar		*abp = charp(abuf) ;
-	if (alen < 0) alen = cstrlen(abp) ;
+	if (alen < 0) alen = lenstr(abp) ;
 	if (op->bm == bfilebm_none) {
 	    rs = bfile_wbig(op,abuf,alen) ;
 	} else {

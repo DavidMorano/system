@@ -41,14 +41,16 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<linefold.h>
 #include	<localmisc.h>		/* |COLUMNS| + |NTABCOLS| */
 
 #include	"bfile.h"
+
+#pragma		GCC dependency	"mod/libutil.ccm"
 
 import libutil ;
 

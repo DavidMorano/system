@@ -48,7 +48,6 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
@@ -71,10 +70,6 @@
 
 
 /* imported namespaces */
-
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */

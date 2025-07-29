@@ -29,7 +29,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -62,7 +61,7 @@
 int bdup(bfile *op,bfile *fnewp) noex {
 	int		rs ;
 	if ((rs = bfile_magic(op,fnewp)) > 0) {
-	    BFILE	*bnewp = fnewp ;
+	    bfile	*bnewp = fnewp ;
 	    memcpy(bnewp,op) ; /* shallow-copy */
 	    if ((rs = bfile_flush(op)) >= 0) {
 	        if ((rs = u_dup(op->fd)) >= 0) {

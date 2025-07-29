@@ -17,6 +17,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	Open a "program" and pass the standard output to a BFILE
 	object as if it was opened by BFILE itself.
 
@@ -30,7 +31,7 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strchr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>

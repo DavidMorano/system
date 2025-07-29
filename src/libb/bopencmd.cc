@@ -37,8 +37,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<char.h>
 #include	<strwcpy.h>
@@ -47,6 +47,8 @@
 
 #include	"bfile.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
 import libutil ;
 
 /* local defines */
@@ -54,8 +56,8 @@ import libutil ;
 #define	CMDBUFLEN	MAXPATHLEN
 #define	RESERVEDFDS	3
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
+#ifndef	nullptrFNAME
+#define	nullptrFNAME	"/dev/null"
 #endif
 
 #ifndef	VARSHELL
@@ -76,7 +78,6 @@ extern char	*environ[] ;
 
 /* exported subroutines */
 
-
 int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 	pid_t		pid_child ;
 	int		rs = SR_OK ;
@@ -93,7 +94,7 @@ int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 	debugprintf("bopencmd: entered\n") ;
 #endif
 
-	if (fpa == NULL) return SR_FAULT ;
+	if (fpa == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	{
@@ -105,17 +106,17 @@ int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 
 	for (i = 0 ; i < 3 ; i += 1) {
 
-	    if ((fpa[i] != NULL) && (fpa[i]->magic == BFILE_MAGIC))
+	    if ((fpa[i] != nullptr) && (fpa[i]->magic == BFILE_MAGIC))
 	        return SR_OPEN ;
 
 	} /* end for */
 
-	if ((cmd == NULL) || (cmd[0] == '\0'))
+	if ((cmd == nullptr) || (cmd[0] == '\0'))
 	    return SR_INVALID ;
 
 /* clean up the command a little */
 
-	cmdlen = strlen(cmd) ;
+	cmdlen = lenstr(cmd) ;
 
 	while (CHAR_ISWHITE(*cmd)) {
 	    cmd += 1 ;
@@ -134,7 +135,7 @@ int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 
 #if	CF_BFD
 	for (i = 0 ; i < 3 ; i += 1) {
-	    const char	*nullfname = NULLFNAME ;
+	    const char	*nullfname = nullptrFNAME ;
 
 	    bfd[i] = -1 ;
 	    if (u_fstat(i,&sb) >= 0)
@@ -154,7 +155,7 @@ int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 
 /* open up the necessary pipes */
 
-	for (i = 0 ; i < 3 ; i += 1) if (fpa[i] != NULL) {
+	for (i = 0 ; i < 3 ; i += 1) if (fpa[i] != nullptr) {
 
 	    rs = u_pipe(pipes[i]) ;
 	    if (rs < 0)
@@ -199,7 +200,7 @@ int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 
 	    for (i = 0 ; i < 3 ; i += 1) {
 
-	        if (fpa[i] != NULL) {
+	        if (fpa[i] != nullptr) {
 
 	            u_close(pipes[i][(i == 0) ? 1 : 0]) ;
 
@@ -216,12 +217,12 @@ int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 
 /* get the user's SHELL command */
 
-	    if ((sp = getenv(VARSHELL)) != NULL) {
+	    if ((sp = getenv(VARSHELL)) != nullptr) {
 	        if (u_access(sp,X_OK) < 0)
-	           sp  = NULL ;
+	           sp  = nullptr ;
 	    }
 
-	    if (sp == NULL) {
+	    if (sp == nullptr) {
 	        sp = "/usr/bin/ksh" ;
 	        if (u_access(sp,X_OK) < 0)
 	            sp = "/usr/bin/sh" ;
@@ -254,7 +255,7 @@ int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 		    av[i++] = "shcmd" ;
 		    av[i++] = "-c" ;
 		    av[i++] = cmdp ;
-		    av[i] = NULL ;
+		    av[i] = nullptr ;
 	    	    uc_execve(sp,av,ev) ;
 		} else {
 	            uc_exit(EX_UNAVAILABLE) ;
@@ -275,10 +276,10 @@ int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 	    debugprintf("bopencmd: checking to open BIO file %d\n",i) ;
 #endif
 
-	    if (fpa[i] != NULL) {
+	    if (fpa[i] != nullptr) {
 
 #if	CF_DEBUGS
-	        debugprintf("bopencmd: found a non-NULL one FPA[%d]=%08X\n",
+	        debugprintf("bopencmd: found a non-nullptr one FPA[%d]=%08X\n",
 	            i,fpa[i]) ;
 #endif
 
@@ -346,15 +347,16 @@ badbopen:
 /* close all BIO files below the one that bombed */
 
 	for (j = 0 ; j < i ; j += 1) {
-	    if (fpa[j] != NULL)
+	    if (fpa[j] != nullptr)
 	        bclose(fpa[j]) ;
 	}
 
 /* close all pipes from the one that bombed and above */
 
 	for (j = i ; j < 3 ; j += 1) {
-	    if (fpa[j] != NULL)
-	        u_close(pipes[j][(j == 0) ? 1 : 0]) ;
+	    if (fpa[j] != nullptr) {
+	        u_close(pipes[j][(j == 0) ? 1 : 0]) ; 
+	    }
 	}
 
 	goto err3 ;

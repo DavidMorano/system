@@ -78,6 +78,7 @@
 #include	"config.h"
 #include	"proginfo.h"
 
+import libutil ;
 
 /* local defines */
 
@@ -708,7 +709,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    if (ai == 0) continue ;
 
 	    argp = argv[ai] ;
-	    argl = strlen(argp) ;
+	    argl = lenstr(argp) ;
 
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
@@ -757,7 +758,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                pr = argp ;
 				    }
@@ -772,7 +773,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl) {
 	                            keyopt	*kop = &akopts ;
 	                            rs = keyopt_loads(kop,argp,argl) ;
@@ -813,7 +814,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                pip->tmpdname = argp ;
 				    }
@@ -832,7 +833,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl) {
 	                            paramopt	*app = &pip->aparams ;
 	                            rs = paramopt_loadu(app,argp,argl) ;
@@ -853,7 +854,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                pmspec = argp ;
 				    }
@@ -874,7 +875,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                sn = argp ;
 				    }
@@ -895,7 +896,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                afname = argp ;
 				    }
@@ -915,7 +916,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                efname = argp ;
 				    }
@@ -936,7 +937,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                ofname = argp ;
 				    }
@@ -951,7 +952,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl) {
 	                            pfname = argp ;
 				}
@@ -965,7 +966,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl) {
 	                            yfname = argp ;
 				}
@@ -1042,7 +1043,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                cp = argp ;
 	                                cl = argl ;
@@ -1090,7 +1091,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl) {
 	                            pip->final.older = true ;
 	                            pip->have.older = true ;
@@ -1107,7 +1108,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl) {
 	                            pip->final.accessed = true ;
 	                            pip->have.accessed = true ;
@@ -1124,7 +1125,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl) {
 	                            pip->final.sufacc = true ;
 	                            rs = procsuf_load(pip,suf_acc,argp,argl) ;
@@ -1139,7 +1140,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl) {
 	                            pip->final.sufrej = true ;
 	                            rs = procsuf_load(pip,suf_rej,argp,argl) ;
@@ -1154,7 +1155,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl) {
 	                            pip->have.younger = true ;
 	                            pip->final.younger = true ;
@@ -1171,7 +1172,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl) {
 	                            paramopt	*app = &pip->aparams ;
 	                            cchar	*po = po_prune ;
@@ -1242,7 +1243,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                pr = argp ;
 	                        } else {
@@ -1276,7 +1277,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                paramopt	*pop = &pip->aparams ;
 	                                cchar		*po = PO_TARDIRS ;
@@ -1314,7 +1315,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            if (argr > 0) {
 	                                argp = argv[++ai] ;
 	                                argr -= 1 ;
-	                                argl = strlen(argp) ;
+	                                argl = lenstr(argp) ;
 	                                if (argl) {
 	                                    cp = argp ;
 	                                    cl = argl ;
@@ -1339,7 +1340,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
@@ -1390,7 +1391,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            if (argr > 0) {
 	                                argp = argv[++ai] ;
 	                                argr -= 1 ;
-	                                argl = strlen(argp) ;
+	                                argl = lenstr(argp) ;
 	                                if (argl) {
 	                                    cp = argp ;
 	                                    cl = argl ;
@@ -1410,7 +1411,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                paramopt	*app = &pip->aparams ;
 	                                cchar		*po = po_fts ;
@@ -1451,7 +1452,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                pip->final.younger = true ;
 	                                pip->have.younger = true ;
@@ -2703,7 +2704,7 @@ int procname(PI *pip,cchar *name) noex {
 
 static int procdir(PI *pip,cchar *np,USTAT *sbp) noex {
 	int		rs = SR_OK ;
-	int		nl = strlen(np) ;
+	int		nl = lenstr(np) ;
 	int		c = 0 ;
 	int		f_cont = true ;
 
@@ -2967,7 +2968,7 @@ static int procother(PI *pip,cchar *name,USTAT *sbp) noex {
 
 #if	CF_DIRS
 	if ((rs >= 0) && f_process && (pip->f.follow || pip->f.f_uniq)) {
-	    cint	nl = strlen(name) ;
+	    cint	nl = lenstr(name) ;
 	    int		f = true ;
 	    if ((rs = procdir_haveprefix(pip,name,nl)) >= 0) {
 	        f = (rs > 0) ;
@@ -3701,7 +3702,7 @@ static int procsuf_have(PI *pip,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
 	    int		vl ;
 	    int		m ;
@@ -3914,9 +3915,8 @@ static int procsuf_load(PI *pip,int si,cchar *ap,int al) noex {
 
 static int procrm_begin(PI *pip) noex {
 	int		rs ;
-	{
-	rs = vecpstr_start(&pip->rmdirs,0,0,0) ;
-	pip->f.rmdirs = (rs >= 0) ;
+	if ((rs = vecpstr_start(&pip->rmdirs,0,0,0)) >= 0) {
+	    pip->f.rmdirs = true ;
 	}
 	return rs ;
 }
@@ -3924,7 +3924,7 @@ static int procrm_begin(PI *pip) noex {
 
 static int procrm_add(PI *pip,cchar *dp,int dl) noex {
 	int		rs ;
-	if (dl < 0) dl = strlen(dp) ;
+	if (dl < 0) dl = lenstr(dp) ;
 	if ((dl > 0) && (dp[dl-1] == '/')) {
 	    dl -=1 ;
 	}

@@ -286,6 +286,14 @@ typedef const char		cc ;
 #endif
 #endif
 
+#ifndef	MAXLINELEN
+#ifdef	LINE_MAX
+#define	MAXLINELEN	LINE_MAX
+#else
+#define	MAXLINELEN	(2*1024)
+#endif
+#endif
+
 #ifndef	MAXNAMELEN
 #ifdef	NAME_MAX
 #define	MAXNAMELEN	NAME_MAX
@@ -299,14 +307,6 @@ typedef const char		cc ;
 #define	MAXPATHLEN	PATH_MAX
 #else
 #define	MAXPATHLEN	1024
-#endif
-#endif
-
-#ifndef	MAXLINELEN
-#ifdef	LINE_MAX
-#define	MAXLINELEN	LINE_MAX
-#else
-#define	MAXLINELEN	(2*1024)
 #endif
 #endif
 
@@ -327,10 +327,6 @@ typedef const char		cc ;
 #define	HOSTNAMELEN	1024
 #endif
 
-#ifndef	MSGBUFLEN
-#define	MSGBUFLEN	2048
-#endif
-
 /* timezone abbreviation */
 #ifndef	TZABBRLEN
 #define	TZABBRLEN	8
@@ -346,22 +342,7 @@ typedef const char		cc ;
 #define	MAILALIASLEN	64
 #endif
 
-#ifndef	ARGBUFLEN
-#define	ARGBUFLEN	MAXARGLEN
-#endif
-
-#ifndef	NAMEBUFLEN
-#define	NAMEBUFLEN	MAXNAMELEN
-#endif
-
-#ifndef	PATHBUFLEN
-#define	PATHBUFLEN	MAXPATHLEN
-#endif
-
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	MAXLINELEN
-#endif
-
+/* this is (long) depracated from UNIX® */
 #ifndef	NOFILE
 #define	NOFILE		20		/* UNIX® number of files */
 #endif

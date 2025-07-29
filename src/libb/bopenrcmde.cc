@@ -30,10 +30,12 @@
 #include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<cstrings>		/* for |strcasecmp(3c)| */
 #include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strchr(3c)| */
+#include	<cstrings>		/* for |strcasecmp(3c)| */
 #include	<usystem.h>
 #include	<getnodename.h>
 #include	<strx.h>

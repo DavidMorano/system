@@ -26,12 +26,14 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
+
+#pragma		GCC dependency	"mod/libutil.ccm"
 
 import libutil ;
 
@@ -81,7 +83,7 @@ int bopenrcmd(bfile **fpa,cchar *remotehost,cchar *cmd) noex {
 	if ((cmd == NULL) || (cmd[0] == '\0'))
 	    return SR_INVALID ;
 
-	if ((strlen(cmd) + 6) > LINEBUFLEN)
+	if ((lenstr(cmd) + 6) > LINEBUFLEN)
 	    return SR_INVALID ;
 
 /* where is the RSH program */

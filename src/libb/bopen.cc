@@ -50,7 +50,6 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
@@ -387,9 +386,8 @@ int sub_bopen::openreg() noex {
 
 static int bfile_bufbegin(bfile *op,int bsize) noex {
 	int		rs ;
-	char		*p ;
 	if (bsize == 0) bsize = op->pagesize ;
-	if ((rs = uc_malloc(bsize,&p)) >= 0) {
+	if (char *p ; (rs = uc_malloc(bsize,&p)) >= 0) {
 	    op->bdata = p ;
 	    op->bsize = bsize ;
 	    op->bbp = p ;
@@ -433,8 +431,7 @@ static int bfile_mapbegin(bfile *op) noex {
 	int		rs = SR_OK ;
 	if (op->f.mappable) {
 	    cint	sz = (nm * sizeof(bfile_map)) ;
-	    void	*vp{} ;
-	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
 	        op->maps = maper(vp) ;
 	        for (int i = 0 ; i < nm ; i += 1) {
 	            op->maps[i].f.valid = false ;

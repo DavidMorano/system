@@ -29,13 +29,15 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strchr(3c)| */
 #include	<usystem.h>
 #include	<mkfile.h>
 #include	<strx.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
+
+#pragma		GCC dependency	"mod/libutil.ccm"
 
 import libutil ;
 

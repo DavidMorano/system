@@ -24,6 +24,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This code piece provides for the basic "open" and "close"
 	functions for the BFILE I-O library.
 
@@ -39,11 +40,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* strchr(3c)| */
 #include	<usystem.h>
 #include	<sysval.h>
 #include	<stdfnames.h>
