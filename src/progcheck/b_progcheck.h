@@ -1,4 +1,9 @@
-/* config */
+/* þ_progcheck HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* check C-language programs for some simple problems */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

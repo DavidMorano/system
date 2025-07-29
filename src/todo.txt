@@ -4,14 +4,14 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
-sockaddress
+filewatch
 ufcntl		?? weirdo problem
 uctim
 libuc		fix to completely compile!
 ucopen
 ucopen		needs dynamic allocation
 fsdirtree	needs pointer implementation and a lot of cleanup
-opendialer	cleanup
+opendialer	cleanup -- actually an incredible mess
 sdprog		mess
 srv		mess
 sysdialer
@@ -52,4 +52,9 @@ motd		*done*
 statmsg		*done*
 issue		*done*
 quote		not finished junk (currently contains junk)
+strfilemks	incredible mess
+strfilemk	incredible mess
+
+special			description
+--------------------------------------------------------------------------------
 

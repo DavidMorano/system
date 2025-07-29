@@ -20,25 +20,22 @@
 
 /*******************************************************************************
 
-	This is the front-end to make the various SHELL (KSH) built-in commands
-	into stand-alone programs.
-
+	This is the front-end to make the various SHELL (KSH)
+	built-in commands into stand-alone programs.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
-#include	<csignal>
 #include	<ucontext.h>
 #include	<dlfcn.h>
+#include	<csignal>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<intceil.h>
 #include	<sighand.h>
@@ -165,11 +162,12 @@ static const SIGCODE	sigcode_bus[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(int argc,cchar *argv[],cchar *envv[])
-{
+int main(int argc,mainv argv,mainv envv) {
 	const int	f_lockmemalloc = CF_LOCKMEMALLOC ;
 	const int	f_util = CF_UTIL ;
 	int		rs = SR_OK ;

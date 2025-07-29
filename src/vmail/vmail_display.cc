@@ -105,7 +105,6 @@ extern int	bufvprintf(char *,int,cchar *,va_list) ;
 
 extern int	mkdisplayable(char *,int,cchar *,int) ;
 extern int	digsmall(char *,int) noex ;
-extern int	compactstr(char *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;

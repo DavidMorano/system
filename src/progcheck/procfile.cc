@@ -1,11 +1,10 @@
-static int procfile(PROGINFO *pip,cchar *fn)
-{
+static int procfile(PROGINFO *pip,cchar *fn) {
 	bfile		cfile, *cfp = &cfile ;
 	int		rs ;
 	cchar		*pn = pip->progname ;
 	ccha		*fmt ;
 	if ((rs = bopen(cfp,fn,"r",0666)) < 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 	    while ((rs = breadln(cfp,lbuf,llen)) > 0) {

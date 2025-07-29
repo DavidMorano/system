@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (progcheck)
 
 T= progcheck
 

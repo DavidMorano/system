@@ -1,8 +1,8 @@
 PATHCLEAN
 
-This command cleans up the specified paths and prints the cleaned up result(s)
-to standard-output.  All paths can also optionally be joined together, for
-making a single cleaned up path.
+This command cleans up the specified paths and prints the cleaned
+up result(s) to standard-output.  All paths can also optionally be
+joined together, for making a single cleaned up path.
 
 Synopsis:
 $ pathclean <path(s)> [-j] [-o <opts>] [-V]
