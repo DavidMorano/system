@@ -75,6 +75,7 @@
 #include	<initnow.h>
 #include	<ascii.h>
 #include	<strn.h>		/* |strnrbrk(3uc)| */
+#include	<mnw.h>			/* |mnwcpy(3uc)| */
 #include	<timestr.h>
 #include	<hasx.h>
 #include	<ischarx.h>
@@ -141,7 +142,6 @@ extern int	sncpy2(cchar *,int,cchar *,cchar *) ;
 extern int	sncpy1w(char *,int,cchar *,int) ;
 extern int	mkpath1(char *,cchar *) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mnwcpy(void *,int,const void *,int) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
@@ -1960,8 +1960,9 @@ static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af) noex {
 	        if (f) {
 	            rs = mnwcpy(abuf,alen,ap,al) ;
 	            break ;
-	        } else
+	        } else {
 	            al = 0 ;
+		}
 
 	        if (rs < 0) break ;
 	    } /* end while */
