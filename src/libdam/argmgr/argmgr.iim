@@ -1,0 +1,12 @@
+# 0 "argmgr.ccm"
+# 0 "<built-in>"
+# 0 "<command-line>"
+# 1 "argmgr.ccm"
+# 32 "argmgr.ccm"
+module ;
+
+# 1 "/Users/dam/github/system/inc/envstandards.h" 1
+# 100 "/Users/dam/github/system/inc/envstandards.h"
+# 1 "/Users/dam/github/system/inc/syshas.h" 1
+# 101 "/Users/dam/github/system/inc/envstandards.h" 2
+# 35 "argmgr.ccm" 2

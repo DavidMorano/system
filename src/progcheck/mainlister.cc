@@ -1,14 +1,14 @@
-/* mainlister */
+/* mainlister SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++11 */
 
 /* test of SLIST object */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory allocations */
 #define	CF_DEBUGADD	1		/* debug adding */
 #define	CF_DEBUGONE	0		/* debug one */
-
 
 /* revision history:
 
@@ -21,13 +21,15 @@
 
 /*******************************************************************************
 
-	We really are just (mostly) testing the SLIST object.
+  	Name:
+	mainlister
 
+	Description:
+	We really are just (mostly) testing the SLIST object.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
 #include	<cstdlib>
 #include	<cinttypes>
@@ -45,6 +47,9 @@
 #include	<iomanip>
 #include	<usystem.h>
 #include	<ucmallreg.h>
+#include	<getourenv.h>
+#include	<ctdec.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"slist.hh"
@@ -66,10 +71,6 @@ using namespace std ;
 
 /* external subroutines */
 
-extern "C" int	sisub(cchar *,int,cchar *) ;
-extern "C" int	mkrevstr(char *,int) ;
-extern "C" int	ctdeci(char *,int,int) ;
-
 #if	CF_DEBUGS
 extern "C" int	debugopen(cchar *) ;
 extern "C" int	debugprintf(cchar *,...) ;
@@ -77,10 +78,6 @@ extern "C" int	debugprinthexblock(cchar *,int,const void *,int) ;
 extern "C" int	debugclose() ;
 extern "C" int	strlinelen(cchar *,cchar *,int) ;
 #endif
-
-extern "C" cchar	*getourenv(cchar **,cchar *) ;
-
-extern "C" char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -175,7 +172,7 @@ public:
 #endif
 	    return c ;
 	} ;
-} ;
+} ; /* end struct (listadder) */
 
 
 /* forward references */
@@ -186,12 +183,12 @@ static int	printlist(slist<int> &,cchar *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,const char **argv,const char **envv)
-{
+int main(int argc,mainv argv,mainv) {
 
 #if	CF_DEBUGS && CF_DEBUGMALL
 	uint		mo_start ;
@@ -265,7 +262,7 @@ int main(int argc,const char **argv,const char **envv)
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
+	        cint	size = (10*sizeof(uint)) ;
 	        const char	*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -298,7 +295,6 @@ int main(int argc,const char **argv,const char **envv)
 }
 /* end subroutine (main) */
 
-
 /* for memory allocation tracking */
 void *operator new(size_t sz) {
     	void *p ;
@@ -326,9 +322,7 @@ void operator delete(void *p,const std::nothrow_t &nt) noexcept {
 
 /* local subroutines */
 
-
-static int printlist(slist<int> &l,cchar *s)
-{
+static int printlist(slist<int> &l,cchar *s) {
 	int		c = 0 ;
 	cout << s ;
 	for (auto v : l) {
@@ -340,16 +334,13 @@ static int printlist(slist<int> &l,cchar *s)
 }
 /* end subroutine (printlist) */
 
-
 #if	CF_DEBUGS
-static int debugprintlist(slist<int> &l,cchar *s)
-{
-	const int	plen = LINEBUFLEN ;
+static int debugprintlist(slist<int> &l,cchar *s) {
+	cint	plen = LINEBUFLEN ;
 	int		rs = SR_OK ;
-	char		*pbuf ;
-	if ((pbuf = new(nothrow) char [plen+1]) >= 0) {
-	    const int	dlen = DIGBUFLEN ;
-	    const int	n = 28 ;
+	if (char *pbuf ; (pbuf = new(nothrow) char [plen+1]) >= 0) {
+	    cint	dlen = DIGBUFLEN ;
+	    cint	n = 28 ;
 	    int		i = 0 ;
 	    char	dbuf[DIGBUFLEN+1] ;
 	    char	*bp = pbuf ;

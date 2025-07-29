@@ -1,0 +1,188 @@
+/* ucsysconf MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* interface component for UNIX® library-3c */
+/* get system configuration information */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-04-13, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	uc_sysconfval
+
+	Description:
+	This subroutine returns system-related values (as opposed
+	to strings as |uc_sysconfstr(3uc)| does).
+
+	Synopsis:
+	int uc_sysconfval(int req,long *rp) noex
+
+	Arguments:
+	req		requested value to return
+	rp		pointer to value-type |long| for received value
+
+	Returns:
+	>=0		OK and this is the requested value
+	<0		error (system-return)
+
+	Name:
+	uc_sysconfstr
+
+	Description:
+	This subroutine is NOT the same as the UNIX®-System version.
+	This subroutine returns "OVERFLOW" when the user supplied
+	buffer is not big enough to hold the associated value.
+
+	Synopsis:
+	int uc_sysconfstr(char *rbuf,int rlen,int req) noex
+
+	Arguments:
+	rbuf		user supplied buffer to hold result
+	rlen		length of user supplied value
+	req		configuration value to request
+
+	Returns:
+	>0		valid and the value is returned with this length
+	0		valid but there was no value associated
+	<0		error (system-return)
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<atomic>
+#include	<usystem.h>
+#include	<errtimer.hh>
+#include	<sysconfcmds.h>
+#include	<localmisc.h>
+
+#include	"ucsysconf.h"
+
+export module ucsysconf ;
+
+/* local defines */
+
+
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::atomic_int ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+enum dataitems {
+	dataitem_maxpid,
+	dataitem_maxarg,
+	dataitem_maxline,
+	dataitem_maxlogin,
+	dataitem_ngroups,
+	dataitem_maxnode,
+	dataitem_maxhost,
+	dataitem_maxmsg,
+	dataitem_maxtzname,
+	dataitem_clk,
+	dataitem_overlast
+} ; /* end enum (dataitems) */
+
+    struct ucdatamgr {
+	atomic_int	d[dataitem_overlast] ;
+    } ; /* end struct (ucdatamgr) */
+
+    struct ucsysconf ;
+
+    typedef int (ucsysconf::*usysconf_m)(int) noex ;
+
+    struct ucsysconf {
+	usysconf_m	m ;
+	char		*rbuf ;
+	long		*lp ;
+	int		rlen ;
+	ucsysconf(char *rp,int rl) noex : rbuf(rp), rlen(rl) { } ;
+	ucsysconf(long *p) noex : lp(p) { } ;
+	int sysconfval(int) noex ;
+	int sysconfstr(int) noex ;
+	int mconfval(int) noex ;
+	int mconfstr(int) noex ;
+	int operator () (int) noex ;
+	int getval(int) noex ;
+	int getvalcache(int) noex ;
+	int getvalsyn(int) noex ;
+	int getstr(int) noex ;
+	int getstrsyn(int) noex ;
+	int getstd(int) noex ;
+    } ; /* end struct (ucsysconf) */
+
+
+/* forward references */
+
+
+/* local variables */
+
+ucdatamgr		ucdata ;
+
+constexpr size_t	minusone = -1uz ;
+
+
+/* exported variables */
+
+export extern "C++" {
+    libuc::ucmaxliner	ucmaxline ;
+}
+
+
+/* exported subroutines */
+
+export extern "C" {
+    int uc_sysconfval(int req,long *rp) noex {
+	ucsysconf	sco(rp) ;
+	int		rs = SR_OK ;
+	sco.m = &ucsysconf::mconfval ;
+	return sco.sysconfval(req) ;
+    } /* end subroutine (uc_sysconfval) */
+} /* end export */
+
+export extern "C" {
+    int uc_sysconfstr(int req,char *rbuf,int rlen) noex {
+	ucsysconf	sco(rbuf,rlen) ;
+	sco.m = &ucsysconf::mconfstr ;
+	return sco.sysconfstr(req) ;
+    } /* end subroutine (uc_sysconfstr) */
+} /* end export */
+
+
+/* local subroutines */
+
+namespace libuc {
+    ucmaxliner::operator int () noex {
+	cint		cmd = _SC_LINE_MAX ;
+	return uc_sysconfval(cmd,nullptr) ;
+    }
+} /* end namespace */
+
+
