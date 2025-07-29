@@ -33,9 +33,46 @@ struct linefilter_head {
 	vecstr		*sslp ;	/* select list pointer */
 	vecstr		*sxlp ;	/* exclude list pointer */
 	LINEFILTER_FL	fl ;
+	uint		magic ;
 } ;
 
+#ifdef	__cplusplus
+enum linefiltermems {
+	linefiltermem_finish,
+	linefiltermem_overlast
+} ;
+struct linefilter ;
+struct linefilter_co {
+	linefilter	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (linefilter *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (linefilter_co) */
+struct linefilter : linefilter_head {
+	linefilter_co	finish ;
+	linefilter() noex {
+	    finish(this,linefiltermem_finish) ;
+	    magic = 0 ;
+	} ;
+	linefilter(const linefilter &) = delete ;
+	linefilter &operator = (const linefilter &) = delete ;
+	int start(cchar *,cchar *) noex ;
+	int check(cchar *,int) noex ;
+	void dtor() noex ;
+	destruct linefilter() {
+	    if (magic) dtor() ;
+	} ;
+} ; /* end struct (linefilter) */
+#else	/* __cplusplus */
 typedef	LINEFILTER	linefilter ;
+#endif /* __cplusplus */
+
 typedef	LINEFILTER_FL	linefilter_fl ;
 
 EXTERNC_begin

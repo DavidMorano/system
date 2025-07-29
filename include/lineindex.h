@@ -89,7 +89,7 @@ struct lineindex_head {
 	int		of ;
 	int		ropts ;
 	mode_t		om ;
-} ;
+} ; /* end struct (lineindex_head) */
 
 typedef	LINEINDEX		lineindex ;
 typedef	LINEINDEX_FL		lineindex_fl ;

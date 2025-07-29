@@ -95,6 +95,7 @@ struct linefold : linefold_head {
 	linefold() noex {
 	    count(this,linefoldmem_count) ;
 	    finish(this,linefoldmem_finish) ;
+	    magic = 0 ;
 	} ;
 	linefold(const linefold &) = delete ;
 	linefold &operator = (const linefold &) = delete ;
@@ -113,8 +114,8 @@ struct linefold : linefold_head {
 	    return it ;
 	} ;
 	void dtor() noex ;
-	~linefold() {
-	    dtor() ;
+	destruct linefold() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (linefold) */
 #else	/* __cplusplus */

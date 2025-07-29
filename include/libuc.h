@@ -94,7 +94,6 @@
 #include	<chrono.h>
 #include	<clanguage.h>
 #include	<clusterdb.h>
-#include	<compactstr.h>
 #include	<conmsghdr.h>
 #include	<csem.h>
 #include	<ctx.h>
@@ -163,7 +162,6 @@
 #include	<kvsfile.h>
 #include	<libmallocxx.h>
 #include	<libuc.h>
-#include	<linebuffer.h>
 #include	<liner.h>
 #include	<localmisc.h>
 #include	<lockfile.h>

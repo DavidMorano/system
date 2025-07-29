@@ -27,6 +27,7 @@
 #include	<matstr.h>
 #include	<stdfnames.h>
 
+#include	<hasuniq.h>
 
 EXTERNC_begin
 

@@ -27,7 +27,7 @@ struct ass_head {
 	char		*sbuf ;
 	int		slen ;
 	int		ext ;
-} ;
+} ; /* end struct (ass_head) */
 
 #ifdef	__cplusplus
 enum assmems {
@@ -50,20 +50,21 @@ struct ass_co {
 	} ;
 } ; /* end struct (ass_co) */
 struct ass : ass_head {
-	ass_co	start ;
-	ass_co	len ;
-	ass_co	finish ;
+	ass_co		start ;
+	ass_co		len ;
+	ass_co		finish ;
 	ass() noex {
-	    start(this,assmem_start) ;
-	    len(this,assmem_len) ;
-	    finish(this,assmem_finish) ;
+	    start	(this,assmem_start) ;
+	    len		(this,assmem_len) ;
+	    finish	(this,assmem_finish) ;
+	    sbuf= nullptr ;
 	} ;
 	ass(const ass &) = delete ;
 	ass &operator = (const ass &) = delete ;
 	int addchr(int) noex ;
 	void dtor() noex ;
-	~ass() {
-	    dtor() ;
+	destruct ass() {
+	    if (sbuf) dtor() ;
 	} ;
 } ; /* end struct (ass) */
 #else	/* __cplusplus */
