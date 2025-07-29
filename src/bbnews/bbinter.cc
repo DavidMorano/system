@@ -46,11 +46,12 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<time.h>
-#include	<cstring>
 #include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<bfile.h>
@@ -59,15 +60,16 @@
 #include	<sbuf.h>
 #include	<spawnproc.h>
 #include	<keysym.h>
-#include	<toxc.h>
 #include	<mktmp.h>
+#include	<mailmsg.h>
+#include	<keysymer.h>
+#include	<toxc.h>
 #include	<hasx.h>
 #include	<ischarx.h>
+#include	<compactstr.h>
 #include	<localmisc.h>
 #include	<debug.h>
 
-#include	"mailmsg.h"
-#include	"keysymer.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"display.h"
@@ -120,44 +122,39 @@
 
 /* external subroutines */
 
-extern int	snsdd(char *,int,const char *,uint) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfnext(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	nleadcasestr(const char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	snsdd(char *,int,cchar *,uint) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath2w(char *,cchar *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfskipwhite(cchar *,int,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfnext(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	nleadcasestr(cchar *,cchar *,int) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	permid(IDS *,ustat *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	pcsmailcheck(const char *,char *,int,const char *) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	bufvprintf(char *,int,const char *,va_list) ;
-extern int	spawncmdproc(SPAWNPROC *,const char *,const char *) ;
+extern int	pathclean(char *,cchar *,int) ;
+extern int	pcsmailcheck(cchar *,char *,int,cchar *) ;
+extern int	mkdirs(cchar *,mode_t) ;
+extern int	bufvprintf(char *,int,cchar *,va_list) ;
+extern int	spawncmdproc(SPAWNPROC *,cchar *,cchar *) ;
 extern int	uterm_readcmd(UTERM *,TERMCMD *,int,int) ;
 extern int	iscmdstart(int) ;
 
-extern int	mailboxappend(const char *,int,int) ;
-extern int	mkdisplayable(char *,int,const char *,int) ;
-extern int	compactstr(char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
+extern int	mailboxappend(cchar *,int,int) ;
+extern int	mkdisplayable(char *,int,cchar *,int) ;
 
 
 /* external variables */
@@ -165,14 +162,14 @@ extern char	*strnrchr(const char *,int,int) ;
 
 /* local structures */
 
-static const char	*syscmdmap[] = {
+constexpr cpcchar	syscmdmap[] = {
 	"%p/etc/%s/%s.%f",
 	"%p/etc/%s/%f",
 	"%p/etc/%s.%f",
 	NULL
 } ;
 
-static const char	*usrcmdmap[] = {
+constexpr cpcchar	usrcmdmap[] = {
 	"%h/etc/%s/%s.%f",
 	"%h/etc/%s/%f",
 	"%h/etc/%s.%f",
@@ -180,7 +177,7 @@ static const char	*usrcmdmap[] = {
 } ;
 
 struct bbinter_fieldstr {
-	const char	*fp ;
+	cchar	*fp ;
 	int		fl ;
 } ;
 
@@ -202,15 +199,15 @@ static int	bbinter_utermbegin(BBINTER *) ;
 static int	bbinter_utermend(BBINTER *) ;
 static int	bbinter_loadcmdmap(BBINTER *) ;
 static int	bbinter_loadcmdmapsc(BBINTER *,vecstr *) ;
-static int	bbinter_loadcmdmapfile(BBINTER *,const char *) ;
-static int	bbinter_loadcmdkey(BBINTER *,const char *,int) ;
+static int	bbinter_loadcmdmapfile(BBINTER *,cchar *) ;
+static int	bbinter_loadcmdkey(BBINTER *,cchar *,int) ;
 static int	bbinter_loadcmdkeyone(BBINTER *,struct bbinter_fieldstr *) ;
 static int	bbinter_refresh(BBINTER *) ;
 static int	bbinter_cmdin(BBINTER *) ;
 static int	bbinter_cmdinesc(BBINTER *,int) ;
 static int	bbinter_cmddig(BBINTER *,int) ;
 static int	bbinter_cmdhandle(BBINTER *,int) ;
-static int	bbinter_charin(BBINTER *,const char *,...) ;
+static int	bbinter_charin(BBINTER *,cchar *,...) ;
 static int	bbinter_done(BBINTER *) ;
 static int	bbinter_welcome(BBINTER *) ;
 static int	bbinter_version(BBINTER *) ;
@@ -218,25 +215,25 @@ static int	bbinter_user(BBINTER *) ;
 static int	bbinter_poll(BBINTER *) ;
 static int	bbinter_checkclock(BBINTER *) ;
 static int	bbinter_checkmail(BBINTER *) ;
-static int	bbinter_checkmailinfo(BBINTER *,const char *) ;
-static int	bbinter_info(BBINTER *,int,const char *,...) ;
+static int	bbinter_checkmailinfo(BBINTER *,cchar *) ;
+static int	bbinter_info(BBINTER *,int,cchar *,...) ;
 
-static int	bbinter_mailstart(BBINTER *,const char *,int) ;
+static int	bbinter_mailstart(BBINTER *,cchar *,int) ;
 static int	bbinter_mailscan(BBINTER *) ;
 static int	bbinter_mailend(BBINTER *,int) ;
 
-static int	bbinter_mbopen(BBINTER *,const char *,int) ;
+static int	bbinter_mbopen(BBINTER *,cchar *,int) ;
 static int	bbinter_mbclose(BBINTER *) ;
 
 static int	bbinter_msgnum(BBINTER *) ;
 static int	bbinter_msgpoint(BBINTER *,int) ;
 static int	bbinter_scancheck(BBINTER *,int,int) ;
 static int	bbinter_change(BBINTER *) ;
-static int	bbinter_input(BBINTER *,char *,int,const char *,...) ;
-static int	bbinter_response(BBINTER *,char *,int,const char *,...) ;
-static int	bbinter_havemb(BBINTER *,const char *,int) ;
+static int	bbinter_input(BBINTER *,char *,int,cchar *,...) ;
+static int	bbinter_response(BBINTER *,char *,int,cchar *,...) ;
+static int	bbinter_havemb(BBINTER *,cchar *,int) ;
 static int	bbinter_mailempty(BBINTER *) ;
-static int	bbinter_pathprefix(BBINTER *,const char *) ;
+static int	bbinter_pathprefix(BBINTER *,cchar *) ;
 static int	bbinter_viewtop(BBINTER *,int) ;
 static int	bbinter_viewnext(BBINTER *,int) ;
 
@@ -251,10 +248,10 @@ static int	bbinter_cmddelnum(BBINTER *,int,int) ;
 static int	bbinter_cmdsubject(BBINTER *,int) ;
 static int	bbinter_cmdshell(BBINTER *) ;
 
-static int	bbinter_msgoutfile(BBINTER *,const char *,int,off_t,int) ;
-static int	bbinter_msgoutpipe(BBINTER *,const char *,off_t,int) ;
-static int	bbinter_msgoutview(BBINTER *,const char *,const char *) ;
-static int	bbinter_msgmove(BBINTER *,const char *,off_t,int) ;
+static int	bbinter_msgoutfile(BBINTER *,cchar *,int,off_t,int) ;
+static int	bbinter_msgoutpipe(BBINTER *,cchar *,off_t,int) ;
+static int	bbinter_msgoutview(BBINTER *,cchar *,cchar *) ;
+static int	bbinter_msgmove(BBINTER *,cchar *,off_t,int) ;
 static int	bbinter_msgdel(BBINTER *,int,int) ;
 static int	bbinter_msgdelnum(BBINTER *,int,int,int) ;
 
@@ -270,7 +267,7 @@ static int	bbinter_msgviewsetlines(BBINTER *,int) ;
 static int	bbinter_mbviewopen(BBINTER *) ;
 static int	bbinter_mbviewclose(BBINTER *) ;
 
-static int	bbinter_filecopy(BBINTER *,const char *,const char *) ;
+static int	bbinter_filecopy(BBINTER *,cchar *,cchar *) ;
 
 #if	CF_INITTEST
 static int	bbinter_test(BBINTER *) ;
@@ -310,7 +307,7 @@ static const int	sigints[] = {
 	0
 } ;
 
-static const char	*cmds[] = {
+static cchar	*cmds[] = {
 	"quitquick",
 	"refresh",
 	"msginfo",
@@ -469,9 +466,9 @@ PROGINFO	*pip ;
 	int	rows, cols ;
 	int	f ;
 
-	const char	*pn = pip->progname ;
-	const char	*un = pip->username ;
-	const char	*ccp ;
+	cchar	*pn = pip->progname ;
+	cchar	*un = pip->username ;
+	cchar	*ccp ;
 
 	char	tmpdname[MAXPATHLEN + 1] = { 0 } ;
 	char	tmpfname[MAXPATHLEN + 1] = { 0 } ;
@@ -859,7 +856,7 @@ BBINTER		*iap ;
 	int	rc = 1 ;
 	int	f ;
 
-	const char	*pp = BBINTER_IPROMPT ;
+	cchar	*pp = BBINTER_IPROMPT ;
 
 
 	if (iap == NULL)
@@ -948,7 +945,7 @@ BBINTER		*iap ;
 	if ((rs >= 0) && if_term) {
 	    rs = SR_INTR ;
 	    if (! pip->f.quiet) {
-		const char	*pn = pip->progname ;
+		cchar	*pn = pip->progname ;
 		bprintf(pip->efp,"%s: exiting on termination\n",pn) ;
 	    }
 	}
@@ -1207,12 +1204,12 @@ static int bbinter_loadcmdmap(BBINTER *iap)
 	int	rs = SR_OK ;
 	int	rs1 ;
 
-	const char	*cmfname = CMDMAPFNAME ;
+	cchar	*cmfname = CMDMAPFNAME ;
 
 
 	if ((rs = vecstr_start(&sc,3,0)) >= 0) {
 	    const int	flen = MAXPATHLEN ;
-	    const char	**sa ;
+	    cchar	**sa ;
 	    char	fbuf[MAXPATHLEN + 1] ;
 
 	    if ((rs = bbinter_loadcmdmapsc(iap,&sc)) >= 0) {
@@ -1271,8 +1268,8 @@ static int bbinter_loadcmdmapsc(BBINTER *iap,vecstr *scp)
 	int	rs = SR_OK ;
 	int	i ;
 
-	const char	*keys = "hps" ;
-	const char	*vp ;
+	cchar	*keys = "hps" ;
+	cchar	*vp ;
 	char	kbuf[2] = { 0, 0 } ;
 
 	for (i = 0 ; keys[i] != '\0' ; i += 1) {
@@ -1299,7 +1296,7 @@ static int bbinter_loadcmdmapsc(BBINTER *iap,vecstr *scp)
 /* end subroutine (bbinter_loadcmdmapsc) */
 
 
-static int bbinter_loadcmdmapfile(BBINTER *iap,const char *fname)
+static int bbinter_loadcmdmapfile(BBINTER *iap,cchar *fname)
 {
 	PROGINFO	*pip = iap->pip ;
 
@@ -1324,7 +1321,7 @@ static int bbinter_loadcmdmapfile(BBINTER *iap,const char *fname)
 	    const int	llen = LINEBUFLEN ;
 	    int		len ;
 	    int		sl ;
-	    const char	*sp, *tp ;
+	    cchar	*sp, *tp ;
 	    char	lbuf[LINEBUFLEN+1] ;
 
 	    while ((rs = breadln(cfp,lbuf,llen)) > 0) {
@@ -1368,7 +1365,7 @@ ret0:
 
 static int bbinter_loadcmdkey(iap,sp,sl)
 BBINTER		*iap ;
-const char	sp[] ;
+cchar	sp[] ;
 int		sl ;
 {
 	PROGINFO	*pip = iap->pip ;
@@ -1380,7 +1377,7 @@ int		sl ;
 	int	fl ;
 	int	f_loaded = FALSE ;
 
-	const char	*fp ;
+	cchar	*fp ;
 
 
 #ifdef	COMMENT
@@ -1445,7 +1442,7 @@ struct bbinter_fieldstr	*fs ;
 	int	cl ;
 	int	f ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	cp = fs[1].fp ;
@@ -2037,7 +2034,7 @@ int		key ;
 /* end subroutine (bbinter_cmdhandle) */
 
 
-static int bbinter_info(BBINTER *iap,int f_err,const char *fmt,...)
+static int bbinter_info(BBINTER *iap,int f_err,cchar *fmt,...)
 {
 	PROGINFO	*pip = iap->pip ;
 
@@ -2125,7 +2122,7 @@ BBINTER		*iap ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	const char	*org = pip->org ;
+	cchar	*org = pip->org ;
 	char		buf[BUFLEN + 1] ;
 
 	if ((rs = sbuf_start(&b,buf,BUFLEN)) >= 0) {
@@ -2290,7 +2287,7 @@ BBINTER		*iap ;
 
 static int bbinter_checkmailinfo(iap,buf)
 BBINTER		*iap ;
-const char	buf[] ;
+cchar	buf[] ;
 {
 	PROGINFO	*pip = iap->pip ;
 
@@ -2331,7 +2328,7 @@ ret0:
 
 static int bbinter_mailstart(iap,mbname,mblen)
 BBINTER		*iap ;
-const char	mbname[] ;
+cchar	mbname[] ;
 int		mblen ;
 {
 	PROGINFO	*pip = iap->pip ;
@@ -2540,8 +2537,8 @@ int		f_quick ;
 	int	i ;
 	int	f_yes = TRUE ;
 
-	const char	*ccp ;
-	const char	*cp ;
+	cchar	*ccp ;
+	cchar	*cp ;
 
 	char	response[LINEBUFLEN + 1] ;
 
@@ -2634,7 +2631,7 @@ ret0:
 /* end subroutine (bbinter_mailend) */
 
 
-int bbinter_charin(BBINTER *iap,const char *fmt,...)
+int bbinter_charin(BBINTER *iap,cchar *fmt,...)
 {
 	PROGINFO	*pip = iap->pip ;
 
@@ -2680,7 +2677,7 @@ int bbinter_charin(BBINTER *iap,const char *fmt,...)
 
 static int bbinter_mbopen(iap,mbfname,f_ro)
 BBINTER		*iap ;
-const char	mbfname[] ;
+cchar	mbfname[] ;
 int		f_ro ;
 {
 	MBCACHE_INFO	mcinfo ;
@@ -2985,8 +2982,8 @@ int		argnum ;
 	int	mi ;
 	int	outlen ;
 
-	const char	*ccp ;
-	const char	*cp ;
+	cchar	*ccp ;
+	cchar	*cp ;
 
 	char	response[LINEBUFLEN + 1] ;
 
@@ -3054,8 +3051,8 @@ int		argnum ;
 	int	mi ;
 	int	outlen ;
 
-	const char	*ccp ;
-	const char	*cp ;
+	cchar	*ccp ;
+	cchar	*cp ;
 
 	char	response[LINEBUFLEN + 1] ;
 
@@ -3122,9 +3119,9 @@ int		argnum ;
 	int	nlines ;
 	int	vlines = -1 ;
 
-	const char	*cmd ;
-	const char	*midp ;
-	const char	*mfp ;
+	cchar	*cmd ;
+	cchar	*midp ;
+	cchar	*mfp ;
 
 	char	msgid[MAILADDRLEN + 1] ;
 
@@ -3232,10 +3229,10 @@ int		argnum ;
 	int	mt ;
 	int	nlines, vlines ;
 
-	const char	*ccp ;
-	const char	*midp ;
-	const char	*mfp ;
-	const char	*cp ;
+	cchar	*ccp ;
+	cchar	*midp ;
+	cchar	*mfp ;
+	cchar	*cp ;
 
 	char	response[LINEBUFLEN + 1] ;
 	char	msgid[MAILADDRLEN + 1] ;
@@ -3356,8 +3353,8 @@ int		argnum ;
 	int	mblen ;
 	int	f_same = FALSE ;
 
-	const char	*ccp ;
-	const char	*cp ;
+	cchar	*ccp ;
+	cchar	*cp ;
 
 	char	response[LINEBUFLEN + 1] ;
 	char	mbname[MAXNAMELEN + 1] ;
@@ -3480,7 +3477,7 @@ int		argnum ;
 	int	mi ;
 	int	f_delprev = FALSE ;
 
-	const char	*ccp ;
+	cchar	*ccp ;
 
 
 #if	CF_DEBUG
@@ -3526,7 +3523,7 @@ int		argnum ;
 	int	mi ;
 	int	c ;
 
-	const char	*ccp ;
+	cchar	*ccp ;
 
 
 #if	CF_DEBUG
@@ -3572,7 +3569,7 @@ int		argnum ;
 	int	rs = SR_OK ;
 	int	mi ;
 
-	const char	*ccp ;
+	cchar	*ccp ;
 
 	char	disbuf[DISBUFLEN + 1] = { 0 } ;
 
@@ -3613,7 +3610,7 @@ ret0:
 
 static int bbinter_msgoutfile(iap,cp,cl,moff,mlen)
 BBINTER		*iap ;
-const char	cp[] ;
+cchar	cp[] ;
 int		cl ;
 off_t	moff ;
 int		mlen ;
@@ -3627,7 +3624,7 @@ int		mlen ;
 	int	rs = SR_OK ;
 	int	rs1 ;
 
-	const char	*ccp ;
+	cchar	*ccp ;
 
 	char	ofname[MAXPATHLEN + 1] ;
 
@@ -3683,7 +3680,7 @@ ret0:
 
 static int bbinter_msgoutpipe(iap,cmd,outoff,outlen)
 BBINTER		*iap ;
-const char	cmd[] ;
+cchar	cmd[] ;
 off_t		outoff ;
 int		outlen ;
 {
@@ -3785,7 +3782,7 @@ int		outlen ;
 	} /* end block */
 
 	if (rs >= 0) {
-	    const char	*ccp ;
+	    cchar	*ccp ;
 
 	    ccp = "resume> \v" ;
 	    rs = bbinter_response(iap,response,LINEBUFLEN,ccp) ;
@@ -3821,15 +3818,15 @@ ret0:
 
 static int bbinter_msgoutview(iap,cmd,vfname)
 BBINTER		*iap ;
-const char	cmd[] ;
-const char	vfname[] ;
+cchar	cmd[] ;
+cchar	vfname[] ;
 {
 	PROGINFO	*pip = iap->pip ;
 
 	int	rs = SR_OK ;
 	int	rs1, rs2 ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	if (cmd == NULL)
@@ -3852,7 +3849,7 @@ const char	vfname[] ;
 	    SPAWNPROC	ps ;
 	    pid_t	pid ;
 	    int		cs ;
-	    const char	*av[5] ;
+	    cchar	*av[5] ;
 
 	    sfbasename(cmd,-1,&cp) ;
 
@@ -3891,8 +3888,8 @@ ret0:
 
 static int bbinter_filecopy(iap,srcfname,dstfname)
 BBINTER		*iap ;
-const char	srcfname[] ;
-const char	dstfname[] ;
+cchar	srcfname[] ;
+cchar	dstfname[] ;
 {
 	const mode_t	operms = 0666 ;
 
@@ -3928,7 +3925,7 @@ const char	dstfname[] ;
 
 static int bbinter_msgmove(iap,mbname,moff,mlen)
 BBINTER		*iap ;
-const char	mbname[] ;
+cchar	mbname[] ;
 off_t	moff ;
 int		mlen ;
 {
@@ -4142,7 +4139,7 @@ int		n ;
 
 		    if (lines < 0) {
 			MAILMSGFILE_MSGINFO	*mip ;
-			const char *mid = msp->vs[mbcachemf_mid] ;
+			cchar *mid = msp->vs[mbcachemf_mid] ;
 			rs1 = mailmsgfile_msginfo(&iap->msgfiles,mid,&mip) ;
 			if (rs1 >= 0) {
 				lines = mip->vlines ;
@@ -4169,7 +4166,7 @@ int		n ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3)) {
-			const char	*cp ;
+			cchar	*cp ;
 	                debugprintf("bbinter_scancheck: vs[from]=>%s<\n",
 	                    msp->vs[mbcachemf_from]) ;
 	                    cp = msp->vs[mbcachemf_subject] ;
@@ -4208,7 +4205,7 @@ ret0:
 
 
 /* get input */
-int bbinter_input(BBINTER *iap,char *linebuf,int linelen,const char *fmt,...)
+int bbinter_input(BBINTER *iap,char *linebuf,int linelen,cchar *fmt,...)
 {
 	PROGINFO	*pip = iap->pip ;
 
@@ -4264,7 +4261,7 @@ int bbinter_input(BBINTER *iap,char *linebuf,int linelen,const char *fmt,...)
 
 
 /* get input */
-int bbinter_response(BBINTER *iap,char *linebuf,int linelen,const char *fmt,...)
+int bbinter_response(BBINTER *iap,char *linebuf,int linelen,cchar *fmt,...)
 {
 	PROGINFO	*pip = iap->pip ;
 
@@ -4276,7 +4273,7 @@ int bbinter_response(BBINTER *iap,char *linebuf,int linelen,const char *fmt,...)
 	int	cl ;
 	int	rl = 0 ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	if (linebuf == NULL)
@@ -4338,8 +4335,8 @@ BBINTER		*iap ;
 	int	f_same = FALSE ;
 	int	f_changed = FALSE ;
 
-	const char	*ccp  ;
-	const char	*cp ;
+	cchar	*ccp  ;
+	cchar	*cp ;
 
 	char	response[LINEBUFLEN + 1] ;
 
@@ -4433,7 +4430,7 @@ ret0:
 /* do we have the specified mailbox? */
 static int bbinter_havemb(iap,mbname,mblen)
 BBINTER		*iap ;
-const char	mbname[] ;
+cchar	mbname[] ;
 int		mblen ;
 {
 	PROGINFO	*pip = iap->pip ;
@@ -4525,8 +4522,8 @@ BBINTER		*iap ;
 	int	cl = 0 ;
 	int	f_ok = TRUE ;
 
-	const char	*ps ;
-	const char	*cp ;
+	cchar	*ps ;
+	cchar	*cp ;
 
 	char	rbuf[LINEBUFLEN + 1] ;
 	char	prefix[MAXNAMELEN + 1] ;
@@ -4548,7 +4545,7 @@ BBINTER		*iap ;
 #endif
 
 	if ((rs >= 0) && (rl > 0)) {
-	    const char	*px = iap->pathprefix ;
+	    cchar	*px = iap->pathprefix ;
 	    if ((cl = sfshrink(rbuf,rl,&cp)) > 0) {
 		if ((rs = mkpath1w(prefix,cp,cl)) >= 0) {
 	    	    if ((rs = bbinter_pathprefix(iap,prefix)) >= 0) {
@@ -4561,7 +4558,7 @@ BBINTER		*iap ;
 			    if (px != NULL)
 		    		rs = bbinter_info(iap,FALSE,"dir=%s\v",px) ;
 	    		} else {
-				const char	*fmt = "inaccessible dir=%r\v" ;
+				cchar	*fmt = "inaccessible dir=%r\v" ;
 				rs = bbinter_info(iap,TRUE,fmt,cp,cl) ;
 			} /* end if */
 	} /* end if */
@@ -4581,8 +4578,8 @@ BBINTER		*iap ;
 	int	rs2, rs3 ;
 	int	cl ;
 
-	const char	*ccp ;
-	const char	*cp ;
+	cchar	*ccp ;
+	cchar	*cp ;
 
 	char	response[LINEBUFLEN + 1] ;
 
@@ -4626,7 +4623,7 @@ BBINTER		*iap ;
 	} /* end block */
 
 	if (rs >= 0) {
-	    const char	*ccp ;
+	    cchar	*ccp ;
 
 	    ccp = "resume> \v" ;
 	    rs = bbinter_response(iap,response,LINEBUFLEN,ccp) ;
@@ -4647,7 +4644,7 @@ ret0:
 
 static int bbinter_pathprefix(iap,pathprefix)
 BBINTER		*iap ;
-const char	pathprefix[] ;
+cchar	pathprefix[] ;
 {
 	PROGINFO	*pip = iap->pip ;
 
@@ -4657,7 +4654,7 @@ const char	pathprefix[] ;
 	int	rs1 = SR_OK ;
 	int	f_ok = FALSE ;
 
-	const char	*ndp ;
+	cchar	*ndp ;
 
 	char	tmpdname[MAXPATHLEN + 1] ;
 	char	newdname[MAXPATHLEN + 1] = { 0 } ;
@@ -4696,7 +4693,7 @@ const char	pathprefix[] ;
 #endif
 
 	if ((rs >= 0) && (rs1 >= 0)) {
-	    const char	*px = iap->pathprefix ;
+	    cchar	*px = iap->pathprefix ;
 	    if ((px == NULL) || (strcmp(px,ndp) != 0)) {
 
 	        rs1 = u_stat(ndp,&sb) ;
@@ -4877,8 +4874,8 @@ BBINTER		*iap ;
 	int		vlines = -1 ;
 	int		mt ;
 	int		mi = iap->miscanpoint ;
-	const char	*midp ;
-	const char	*mfp = NULL ;
+	cchar	*midp ;
+	cchar	*mfp = NULL ;
 	char		msgid[MAILADDRLEN + 1] ;
 
 #if	CF_DEBUG
@@ -5399,7 +5396,7 @@ int		ln ;
 	int		ll = -1 ;
 	int		i ;
 	int		c = 0 ;
-	const char	*lp = NULL ;
+	cchar	*lp = NULL ;
 	char		dum[2] ;
 
 #if	CF_DEBUG

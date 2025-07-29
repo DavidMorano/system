@@ -120,6 +120,8 @@ module ;
 #include	<syswords.hh>		/* |sysword(3u)| */
 #include	<localmisc.h>		/* ?? not-needed ?? */
 
+#pragma		GCC dependency	"mod/digtab.ccm"
+
 export module xxtostr ;
 
 import digtab ;				/* |getdig(3u)| */
