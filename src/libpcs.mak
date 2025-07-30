@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gxx
@@ -32,28 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= libpcs.h
+INCS += libpcs.h
 
-LIBS=
+MODS +=
 
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(EUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ0_LIBPCS= 
@@ -67,18 +51,38 @@ OBJB_LIBPCS= obj2_libpcs.o obj3_libpcs.o
 OBJ_LIBPCS= $(OBJA_LIBPCS) $(OBJB_LIBPCS)
 
 
-.SUFFIXES:		.hh .ii
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(EUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).a
 
 all:			$(ALL)
 
+
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -92,6 +96,9 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_LIBPCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LIBPCS)
@@ -99,8 +106,8 @@ $(T).o:			$(OBJ_LIBPCS)
 $(T).a:			$(OBJ_LIBPCS)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order:		$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order

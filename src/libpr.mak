@@ -35,9 +35,17 @@ DEFS +=
 
 INCS += libpr.h
 
-MODS=
+MODS +=
 
-LIBS=
+LIBS +=
+
+
+OBJ0_LIBPR= prgetprogpath.o prgetclustername.o
+OBJ1_LIBPR= prmktmpdir.o prmkfname.o
+
+OBJA_LIBPR= obj0_libpr.o obj1_libpr.o
+
+OBJ_LIBPR= $(OBJA_LIBPR)
 
 
 INCDIRS=
@@ -46,7 +54,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,16 +64,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_LIBPR= prgetprogpath.o prgetclustername.o
-OBJ1_LIBPR= prmktmpdir.o prmkfname.o
-
-
-OBJA_LIBPR= obj0_libpr.o obj1_libpr.o
-
-OBJ_LIBPR= $(OBJA_LIBPR)
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).a
@@ -79,6 +77,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -102,8 +103,8 @@ $(T).o:			$(OBJ_LIBPR)
 $(T).a:			$(OBJ_LIBPR)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order:		$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order
@@ -138,7 +139,5 @@ prgetclustername.o:	prgetclustername.cc prgetclustername.h	#(INCS)
 prmktmpdir.o:		prmktmpdir.cc prmktmpdir.h		$(INCS)
 prmkfname.o:		prmkfname.cc prmkfname.h		$(INCS)
 propenqotd.o:		propenqotd.cc propenqotd.h		$(INCS)
-
-
 
 

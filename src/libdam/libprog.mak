@@ -2,7 +2,6 @@
 
 T= libprog
 
-#ALL= $(T).so $(T).a
 ALL= $(T).o
 
 
@@ -36,25 +35,10 @@ DEFS +=
 
 INCS += libprog.h proginfo.h
 
+MODS +=
+
 #LIBS= -ldam -luc -lu
 LIBS= -lu
-
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ00= proginfo.o proglog.o proguserlist.o
@@ -140,7 +124,23 @@ OBJE=
 OBJ= obja.o 
 
 
-.SUFFIXES:		.hh .ii
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		all
@@ -156,6 +156,9 @@ so:			$(T).so
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -167,6 +170,9 @@ so:			$(T).so
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 obja.o:			$(OBJA)
@@ -200,8 +206,8 @@ $(T).o:			$(OBJ) Makefile localmisc.h
 $(T).so:		$(OBJ) Makefile localmisc.h
 	$(LD) -o $@ $(SOFL) $(LDFLAGS) $(OBJ) $(LIBINFO)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order order:	$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order

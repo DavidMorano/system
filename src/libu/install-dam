@@ -2,6 +2,7 @@
 # INSTALL-DAM
 
 
+: ${HOME:=$( userhome )}
 : ${EXTRA:=/usr/extra}
 : ${USRLCOAL:=/usr/local}
 
@@ -30,7 +31,7 @@ for LIB in ${LIBS} ; do
 	if [[ ${LIB} == *.so ]] ; then
 	  M=0775
         fi
-        ln -f ${LIB} ${TD}
+        lnx ${LIB} ${TD}
       fi
     done
   fi
