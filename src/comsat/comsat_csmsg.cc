@@ -97,7 +97,7 @@
 #include	<mkx.h>
 #include	<wsix.h>
 #include	<timestr.h>
-#include	<compactstr.h>
+#include	<instr.h>
 #include	<localmisc.h>
 #include	<comsatmsg.h>
 
@@ -533,10 +533,10 @@ static int procmsginfo(PI *pip,MAILMSG *mmp,cchar *un)
 	    cint	tlen = max(fl,sl) ;
 	    if (char *tbuf ; (tbuf = new(nt) char[tlen + 1]) != np) {
 		cint	m = (linecleanoptm.nonsub) ;
-	        fl = compactstr(frombuf,fl) ;
+	        fl = instrcompact(frombuf,fl) ;
 	        fl = mklineclean(tbuf,tlen,m,frombuf,fl) ;
 		strcpy(frombuf,tbuf) ;
-	        sl = compactstr(subjbuf,sl) ;
+	        sl = instrcompact(subjbuf,sl) ;
 	        sl = mklineclean(tbuf,tlen,m,subjbuf,fl) ;
 		strcpy(subjbuf,tbuf) ;
 	        delete [] tbuf ;

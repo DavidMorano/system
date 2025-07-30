@@ -66,7 +66,7 @@
 #include	<toxc.h>
 #include	<hasx.h>
 #include	<ischarx.h>
-#include	<compactstr.h>
+#include	<instr.h>
 #include	<localmisc.h>
 #include	<debug.h>
 
@@ -3593,7 +3593,7 @@ int		argnum ;
 	ccp = msp->vs[mbcachemf_subject] ;
 	if (ccp != NULL) {
 	    rs = mkdisplayable(disbuf,dislen,ccp,-1) ;
-	    if (rs >= 0) compactstr(disbuf,rs) ;
+	    if (rs >= 0) instrcompact(disbuf,rs) ;
 	}
 
 	if (rs >= 0) {
@@ -3606,7 +3606,6 @@ ret0:
 	return rs ;
 }
 /* end subroutine (bbinter_cmdsubject) */
-
 
 static int bbinter_msgoutfile(iap,cp,cl,moff,mlen)
 BBINTER		*iap ;

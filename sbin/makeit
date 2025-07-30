@@ -6,8 +6,7 @@ BUILDTYPE=develop
 #BUILDTYPE=deliver
 
 
-#export REPOROOT=$( reporoot )
-export REPOROOT=${HOME}/github/system
+export REPOROOT=$( reporoot )
 
 PN=${0##/*}
 ex=0
@@ -30,18 +29,19 @@ export OSNAME OSTYPE OSRELEASE OSNUM
 
 
 integer i=0
-typeset -a DIRS
-DIRS[i++]=${GH}/other/include
-DIRS[i++]=${GH}/system/include
-DIRS[i++]=${GH}/test/include
-DIRS[i++]=${GH}/research/include
+typeset -a dirs
+dirs[i++]=${GH}/${REPOROOT}/include
+dirs[i++]=${GH}/other/include
+dirs[i++]=${GH}/system/include
+dirs[i++]=${GH}/test/include
+dirs[i++]=${GH}/research/include
 
 VPATH=
-for (( i = 0 ; i < ${#DIRS[@]} ; i += 1 )) ; do
+for (( i = 0 ; i < ${#dirs[@]} ; i += 1 )) ; do
   if [[ $i > 0 ]] ; then
     VPATH+=":"
   fi
-  VPATH+="${DIRS[i]}"
+  VPATH+="${dirs[i]}"
 done
 export VPATH
 

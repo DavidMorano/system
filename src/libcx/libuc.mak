@@ -404,8 +404,6 @@ sockaddress.o:		sockaddress.cc sockaddress.h
 storeitem.o:		storeitem.cc storeitem.h
 storebuf.o:		storebuf.cc storebuf.h
 
-dstr.o:			dstr.cc dstr.h
-
 varray.o:		varray.cc varray.h
 
 lookaside.o:		lookaside.cc lookaside.h
