@@ -27,10 +27,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<ctime>			/* |time_t| */
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
@@ -49,6 +45,7 @@
 #include	<linecleanopt.h>	/* line-cleaning options */
 #include	<ascii.h>
 #include	<ischarx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"filewatch.h"
@@ -127,6 +124,7 @@ static inline int filewatch_magic(filewatch *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (filewatch_magic) */
 
+static int	filewatch_fileready(FW *,time_t,cchar *,int) noex ;
 static int	filewatch_fileopen(FW *,time_t,cchar *,int) noex ;
 static int	filewatch_fileclose(FW *) noex ;
 static int	filewatch_stat(FW *,ustat *) noex ;
@@ -151,13 +149,13 @@ const filewatchms	filewatchm ;
 
 static int filewatch_starts(FW *op,FW_ARGS *ap) noex ;
 
-int filewatch_start(FW *op,FW_ARGS *ap,LF *sfp,cc *fn) noex {
+int filewatch_start(FW *op,FW_ARGS *ap,LF *lfp,cc *fn) noex {
 	int		rs ;
-	if ((rs = filewatch_ctor(op,ap,sfp,fn)) >= 0) {
+	if ((rs = filewatch_ctor(op,ap,lfp,fn)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
 		custime		dt = getustime ;
-		op->sfp = sfp ;
+		op->lfp = lfp ;
 		if (char *bp ; (rs = malloc_ps(&bp)) >= 0) {
 		    op->bufp = bp ;
 		    op->bufl = rs ;
@@ -165,9 +163,9 @@ int filewatch_start(FW *op,FW_ARGS *ap,LF *sfp,cc *fn) noex {
 		    if ((rs = filewatch_fileopen(op,dt,fn,-1)) >= 0) {
 		        if (cc *cp ; (rs = uc_mallocstrw(fn,-1,&cp)) >= 0) {
 			    op->fname = cp ;
-			    if ((rs = filewatch_starts(op,ap)) >= 0) {
-				op->magic = FILEWATCH_MAGIC ;
-			    }
+			        if ((rs = filewatch_starts(op,ap)) >= 0) {
+				    op->magic = FILEWATCH_MAGIC ;
+			        }
 			    if (rs < 0) {
 				uc_free(op->fname) ;
 				op->fname = nullptr ;
@@ -233,6 +231,9 @@ int filewatch_finish(FW *op) noex {
 }
 /* end subroutine (filewatch_finish) */
 
+static int filewatch_checks(FW *,off_t,bfile *) noex ;
+static int filewatch_checkrest(FW *,time_t) noex ;
+
 /* check if our file has changed */
 int filewatch_check(FW *op,time_t dt,BF *ofp) noex {
 	int		rs = SR_FAULT ;
@@ -242,271 +243,201 @@ int filewatch_check(FW *op,time_t dt,BF *ofp) noex {
 	    if ((dt - op->lastcheck) >= op->interval) {
 		op->lastcheck = dt ;
 		if (ustat sb ; (rs = filewatch_stat(op,&sb)) >= 0) {
-
-
+		    coff	fsize = sb.st_size ;
+		    custime	mtime = sb.st_mtime ;
+		    bool	fchanged = false ;
+		    fchanged = fchanged || (mtime > op->lastchange) ;
+		    fchanged = fchanged || (fsize != op->offset) ;
+		    if (fchanged) {
+			cchar	*fn = op->fname ;
+			int	off = intsat(op->offset) ;
+			if ((rs = filewatch_fileready(op,dt,fn,off)) >= 0) {
+			    if ((rs = filewatch_checks(op,fsize,ofp)) >= 0) {
+			        wlen += rs ;
+				rs = filewatch_checkrest(op,dt) ;
+			    }
+			} /* end if (fileready) */
+		    } /* end if (condition activated) */
 		} /* end if (filewatch_stat) */
 	    } /* end if (timeout) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filewatch_check) */
+} /* end subroutine (filewatch_check) */
 
-#ifdef	COMMENT
-	off_t	boff ;
-	int		len ;
-	int		f ;
-	if ((sb.st_mtime > op->lastchange) || (sb.st_size != op->offset)) {
+static int filewatch_checkgt(FW *op,off_t,bfile *) noex ;
+static int filewatch_checklt(FW *op,off_t) noex ;
 
-	    if (! op->fl.open) {
-
-	        rs = filewatch_fileopen(op,dt,op->fname,op->offset) ;
-	        if (rs < 0)
-	            goto bad2 ;
-
-	    } /* end if (file open?) */
-
-/* try to process some lines in the file */
-
-	    if (sb.st_size > op->offset) {
-
-/* CONSTCOND */
-
-	        while (true) {
-	            int		blen ;
-	            char	*bp ;
-
-	            bp = op->bufp + op->bi ;
-	            blen = FW_BUFLEN - op->bi ;
-	            rs = breadln(op->wfp,bp,blen) ;
-	            len = rs ;
-	            if (rs <= 0)
-	                break ;
-
-	            op->bi += len ;
-	            if ((len >= FW_BUFLEN) ||
-	                (op->bufp[op->bi - 1] == '\n')) {
-
-	                f = true ;
-	                if (op->sfp != nullptr) {
-	                    rs1 = linefilter_check(op->sfp,op->bufp,op->bi) ;
-	                    f = (rs1 > 0) ;
-	                } /* end if */
-
-	                if (f) {
-	                    rs = filewatch_putout(op,ofp,op->bufp,op->bi) ;
-	                    wlen += rs ;
-	                    if (rs < 0)
-	                        break ;
-	                } /* end if */
-
-	                op->bi = 0 ;
-
-	            } /* end if (any output needed) */
-
-	            op->offset += len ;
-
-	        } /* end while (processing lines) */
-
-	    } /* end if (change) */
-
-	    if (sb.st_size < op->offset) {
-		boff = sb.st_size ;
-	        bseek(op->wfp,boff,SEEK_SET) ;
-	        op->offset = sb.st_size ;
-	    }
-
-	    op->lastchange = dt ;
-
-	} /* end if (change of some kind) */
-
-/* is the file still present in the file system? */
-
-	if ((rs >= 0) && op->fl.open && ((dt - op->opentime) > TO_OPEN)) {
-
-	    int	f ;
-
-
-	    f = (strcmp(op->fname,"-") == 0) || 
-	        (strcmp(op->fname,STDFNIN) == 0) ;
-
-	    if (! f) {
-
-	        rs = u_stat(op->fname,&sb) ;
-
-	        if ((rs == SR_NOENT) || ((rs >= 0) &&
-	            ((sb.st_ino != op->ino) || (sb.st_dev != op->dev)))) {
-
-	            rs = filewatch_fileclose(op) ;
-
-	            if (rs >= 0)
-	                rs = SR_NOENT ;
-
-	        }
-
-	    } /* end if */
-
-	} /* end if (file-open check) */
-
-ret0:
-	return (rs >= 0) ? wlen : rs ;
-
-/* bad things */
-bad2:
-bad1:
-	if (op->fl.open) {
-	    op->fl.open = false ;
-	    bclose(op->wfp) ;
-	}
-
-bad0:
-	goto ret0 ;
-}
-/* end subroutine (filewatch_check) */
-#endif /* COMMENT */
-
-#ifdef	COMMENT
-int filewatch_readln(FW *op,time_t dt,char *lbuf,int llen) noex {
-	ustat	sb ;
-	off_t	boff ;
-	int		rs = SR_OK ;
-	int		len, ml ;
+static int filewatch_checks(FW *op,off_t fsize,bfile *ofp) noex {
+    	int		rs = SR_OK ;
 	int		wlen = 0 ;
+	if (fsize > op->offset) {
+	    rs = filewatch_checkgt(op,fsize,ofp) ;
+	} else if (fsize < op->offset) {
+	    rs = filewatch_checklt(op,fsize) ;
+	}
+	return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (filewatch_checks) */
 
-	if (op == nullptr) return SR_FAULT ;
-	if (linebuf == nullptr) return SR_FAULT ;
+static int filewatch_checkgt(FW *op,off_t fsize,bfile *ofp) noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	int		len ;
+	int		wlen = 0 ; /* return-value */
+	bool		f ;
+	(void) fsize ;
+        forever {
+            int         bl = (op->bufl - op->bi) ;
+            char        *bp = (op->bufp + op->bi) ;
+            rs = breadln(op->wfp,bp,bl) ;
+            len = rs ;
+            if (rs <= 0) break ;
+            op->bi += len ;
+            if ((len >= op->bufl) || (op->bufp[op->bi - 1] == '\n')) {
+                f = true ;
+                if (op->lfp != nullptr) {
+                    rs1 = linefilter_check(op->lfp,op->bufp,op->bi) ;
+                    f = (rs1 > 0) ;
+                } /* end if */
+                if (f) {
+                    rs = filewatch_putout(op,ofp,op->bufp,op->bi) ;
+                    wlen += rs ;
+                    if (rs < 0) break ;
+                } /* end if */
+                op->bi = 0 ;
+            } /* end if (any output needed) */
+            op->offset += len ;
+        } /* forever (processing lines) */
+	return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (filewatch_checkgt) */
 
-	if (linelen < 0) return SR_INVALID ;
+static int filewatch_checklt(FW *op,off_t fsize) noex {
+    	bfile		*wfp = op->wfp ;
+    	int		rs ;
+	if ((rs = wfp->seek(fsize,SEEK_SET)) >= 0) {
+	    op->offset = fsize ;
+	}
+	return rs ;
+} /* end subroutine (filewatch_checklt) */
 
-	if (linelen == 0)
-	    goto ret0 ;
+static int filewatch_checkrest(FW *op,time_t dt) noex {
+    	cint		to = TO_OPEN ;
+    	int		rs ;
+	if (op->fl.open && ((dt - op->opentime) > to)) {
+	    bool	f = false ;
+	    f = f || (strcmp(op->fname,"-") == 0) ;
+	    f = f || (strcmp(op->fname,STDFNIN) == 0) ;
+	    if (! f) {
+	        if (ustat sb ; (rs = u_stat(op->fname,&sb)) >= 0) {
+	            f = f || (sb.st_ino != op->ino) ;
+		    f = f || (sb.st_dev != op->dev) ;
+		    if (f) {
+	                rs = filewatch_fileclose(op) ;
+		    }
+		} else if (isNotPresent(rs)) {
+	            rs = filewatch_fileclose(op) ;
+		}
+	    } /* end if (not STDIN) */
+	} /* end if (timed-out) */
+	return rs ;
+} /* end subroutine (filewatch_checkrest) */
 
+static int filewatch_readhave(FW *,char *,int) noex ;
+static int filewatch_readget(FW *,char *,int,time_t) noex ;
+
+int filewatch_readln(FW *op,time_t dt,char *lbuf,int llen) noex {
+	int		rs = SR_FAULT ;
+	int		wlen = 0 ; /* return-value */
+	if (op && lbuf) {
+	    rs = SR_INVALID ;
+	    if (llen >= 0) {
+		if (op->ll > 0) {
+		    rs = filewatch_readhave(op,lbuf,llen) ;
+		    wlen = rs ;
+		} else {
+		    rs = filewatch_readget(op,lbuf,llen,dt) ;
+		    wlen = rs ;
+		}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (filewatch_readln) */
+
+static int filewatch_readhave(FW *op,char *lbuf,int llen) noex {
+    	int		rs = SR_OK ;
+	int		wlen = 0 ;
 	if (op->ll > 0) {
-
-	    ml = MIN(linelen,op->ll) ;
-	    memcpy(linebuf,op->lp,ml) ;
-
+	    cint ml = min(llen,op->ll) ;
+	    memcopy(lbuf,op->lp,ml) ;
 	    op->ll -= ml ;
 	    wlen = ml ;
-	    goto ret0 ;
 	}
+	return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (filewatch_readhave) */
 
-/* continue to ret to read a line */
+static int filewatch_readproc(FW *,off_t,char *,int) noex ;
 
-	if ((dt - op->lastcheck) < op->interval)
-	    goto ret0 ;
+static int filewatch_readget(FW *op,char *lbuf,int llen,time_t dt) noex {
+    	int		rs = SR_OK ;
+	int		wlen = 0 ;
+	if ((dt - op->lastcheck) >= op->interval) {
+	    op->lastcheck = dt ;
+	    if (ustat sb ; (rs = filewatch_stat(op,&sb)) >= 0) {
+		bool f = false ;
+		f = f || (sb.st_mtime > op->lastchange) ;
+		f = f || (sb.st_size != op->offset) ;
+		if (f) {
+		    coff	fsize = sb.st_size ;
+	    	    cchar	*fn = op->fname ;
+		    if ((rs = filewatch_fileready(op,dt,fn,-1z)) >= 0) {
+			rs = filewatch_readproc(op,fsize,lbuf,llen) ;
+			wlen = rs ;
+			op->lastchange = dt ;
+		    } /* end if (filewatch_fileready) */
+		} /* end if (change) */
+	    } /* end if (stat) */
+	} /* end if (interfacel timeout) */
+	return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (filewatch_readget) */
 
-	op->lastcheck = dt ;
-
-/* check if the modification time or the size of the file has changed */
-
-	if (op->fl.open) {
-	    rs = bcontrol(op->wfp,BC_STAT,&sb) ;
-	} else {
-	    rs = u_stat(op->fname,&sb) ;
-	}
-
-	if (rs < 0)
-	    goto bad1 ;
-
-	if ((sb.st_mtime > op->lastchange) || (sb.st_size != op->offset)) {
-
-	    if (! op->fl.open) {
-
-	        rs = filewatch_fileopen(op,dt,
-	            op->fname,op->offset) ;
-
-	        if (rs < 0)
-	            goto bad2 ;
-
-	    } /* end if (file open?) */
-
-/* try to process some lines in the file */
-
-	    if (sb.st_size > op->offset) {
-	        int		blen ;
-	        char	*bp ;
-
-	        bp = op->bufp + op->bi ;
-	        blen = FW_BUFLEN - op->bi ;
-	        rs = breadln(op->wfp,bp,blen) ;
-	        len = rs ;
-	        if ((rs >= 0) && (len > 0)) {
-
+static int filewatch_readproc(FW *op,off_t fsize,char *lbuf,int llen) noex {
+    	int		rs = SR_OK ;
+	int		wlen = 0 ;
+	    if (fsize > op->offset) {
+	        int	bl = (op->bufl - op->bi) ;
+	        char	*bp = (op->bufp + op->bi) ;
+	        if ((rs = breadln(op->wfp,bp,bl)) > 0) {
+	            cint	len = rs ;
 	            op->offset += len ;
 	            op->bi += len ;
-	            if ((len >= FW_BUFLEN) ||
+	            if ((len >= op->bufl) ||
 	                (op->bufp[op->bi - 1] == '\n')) {
-	                int	ml ;
-
-	                ml = MIN(linelen,op->bi) ;
-	                memcpy(linebuf,op->bufp,ml) ;
-
+	                cint ml = min(llen,op->bi) ;
+	                memcopy(lbuf,op->bufp,ml) ;
 	                wlen += ml ;
 	                op->lp = op->bufp + ml ;
 	                op->ll = op->bi - ml ;
 	                op->bi = 0 ;
-
 	            } /* end if (got a line) */
-
 	        } /* end if (got some data) */
-
-	    } else if (sb.st_size < op->offset) {
-
-		boff = sb.st_size ;
-	        bseek(op->wfp,boff,SEEK_SET) ;
-
-	        op->offset = sb.st_size ;
-	    }
-
-	    op->lastchange = dt ;
-
-	} /* end if (change of some kind) */
-
-/* is the file still present in the file system? */
-
-	if ((rs >= 0) && op->fl.open && ((dt - op->opentime) > TO_OPEN)) {
-	    int	f ;
-
-	    f = (strcmp(op->fname,"-") == 0) || 
-	        (strcmp(op->fname,STDFNIN) == 0) ;
-
-	    if (! f) {
-
-	        rs = u_stat(op->fname,&sb) ;
-
-	        if ((rs == SR_NOENT) || ((rs >= 0) &&
-	            ((sb.st_ino != op->ino) || (sb.st_dev != op->dev)))) {
-
-	            rs = filewatch_fileclose(op) ;
-
-	            if (rs >= 0)
-	                rs = SR_NOENT ;
-
-	        }
-
+	    } else if (fsize < op->offset) {
+	        if ((rs = bseek(op->wfp,fsize,SEEK_SET)) >= 0) {
+	            op->offset = fsize ;
+		}
 	    } /* end if */
-
-	} /* end if (file-open check) */
-
-ret0:
-	return (rs >= 0) ? wlen : rs ;
-
-/* bad things */
-bad2:
-bad1:
-	if (op->fl.open) {
-	    op->fl.open = false ;
-	    bclose(op->wfp) ;
-	}
-
-bad0:
-	goto ret0 ;
-}
-/* end subroutine (filewatch_readln) */
-#endif /* COMMENT */
+	    return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (filewatch_readproc) */
 
 
 /* private subroutines */
+
+static int filewatch_fileready(FW *op,time_t dt,cc *fn,int off) noex {
+
+	int		rs = SR_OK ;
+	if (! op->fl.open) {
+	    rs = filewatch_fileopen(op,dt,fn,off) ;
+	}
+	return rs ;
+} /* end subroutine (filewatch_fileready) */
 
 static int filewatch_fileopen(FW *op,time_t dt,cc *fn,int off) noex {
 	int		rs = SR_OK ;
@@ -516,22 +447,21 @@ static int filewatch_fileopen(FW *op,time_t dt,cc *fn,int off) noex {
 		op->fl.open = true ;
 		if ((rs = wfp->control(BC_LINEBUF,0)) >= 0) {
 		    off_t	offset ;
-		    off_t	boff ;
+		    off_t	boffset ;
 		    op->offset = off ;
 		    if (off >= 0) {
-	    	        boff = off_t(off) ;
-	    	        rs = wfp->seek(boff,SEEK_SET) ;
+	    	        boffset = off_t(off) ;
+	    	        rs = wfp->seek(boffset,SEEK_SET) ;
 		    } else {
-	    	        if ((rs = wfp->seek(0L,SEEK_END)) >= 0) {
-	        	    rs = wfp->tell(&boff) ;
-	        	    offset = boff ;
+	    	        if ((rs = wfp->seek(0z,SEEK_END)) >= 0) {
+	        	    rs = wfp->tell(&boffset) ;
+	        	    offset = boffset ;
 	        	    op->offset = offset ;
 	    	        }
 	            } /* end if */
 		    if (rs >= 0) {
 			cint cmd = BC_STAT ;
 			if (ustat sb ; (rs = wfp->control(cmd,&sb)) >= 0) {
-
 			    op->lastchange = sb.st_mtime ;
 			    op->ino = sb.st_ino ;
 			    op->dev = sb.st_dev ;
@@ -542,8 +472,7 @@ static int filewatch_fileopen(FW *op,time_t dt,cc *fn,int off) noex {
 	    } /* end if (bopenx) */
 	} /* end if (needed opening) */
 	return rs ;
-}
-/* end subroutine (filewatch_fileopen) */
+} /* end subroutine (filewatch_fileopen) */
 
 static int filewatch_fileclose(FW *op) noex {
 	int		rs = SR_OK ;
