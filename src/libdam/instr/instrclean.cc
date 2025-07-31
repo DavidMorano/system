@@ -2,19 +2,20 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* create a clean (cleaned up) line of text */
+/* create a clean (cleaned up) line of text in-place */
 /* version %I% last-modified %G% */
 
-#define	CF_CLEAN1	0		/* use CLEAN-1 */
+#define	CF_CLEAN1	1		/* use CLEAN-1 */
 
 /* revision history:
 
-	= 1998-02-01, David A­D­ Morano
-	This code was originally written.
+	= 1992-05-14, David A­D­ Morano
+	This was originally written for a UNIX-based hardware 
+	support tool.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1992 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -41,7 +42,8 @@
 	m		mode parameter (see above on use of mode)
 
 	Returns:
-	-		length of resulting line (not NL terminated)
+	>=0		length of resulting string (not NL terminated)
+	<0		error (system-return)
 
 	Important note:
 	Resulting lines are nver NL (EOL) terminated - even if the
@@ -71,7 +73,7 @@ import libutil ;
 /* local defines */
 
 #ifndef	CF_CLEAN1
-#define	CF_CLEAN1	0		/* use CLEAN-1 */
+#define	CF_CLEAN1	1		/* use CLEAN-1 */
 #endif
 
 
@@ -114,6 +116,7 @@ int instrclean(char *lp,int ll,int m) noex {
 	int		len = 0 ;
 	if (lp) ylikely {
 	    mflags	mf{} ;
+	    rs = SR_OK ;
 	    if (ll < 0) ll = lenstr(lp) ;
 	    while ((ll > 0) && isend(lp[ll - 1])) {
 	        ll -= 1 ;
