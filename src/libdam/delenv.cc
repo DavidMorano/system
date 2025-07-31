@@ -22,7 +22,7 @@
 
   	Description:
 	This subroutine is used to delete an environment variable
-	permanently from the process environment list. There is no
+	permanently from the process environment list.  There is no
 	convenient way to un-delete this later.  This is an incredibly
 	stupid hack.  This subroutine should *never* be used.  It
 	was only written to satisfy some stupid open-source programs
