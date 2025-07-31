@@ -60,7 +60,7 @@ struct filewatch_head {
 	cchar		*fname ;
 	char		*lp ;
 	char		*bufp ;
-	linefilter	*sfp ;
+	linefilter	*lfp ;
 	bfile		*wfp ;
 	time_t		lastcheck ;
 	time_t		lastchange ;
