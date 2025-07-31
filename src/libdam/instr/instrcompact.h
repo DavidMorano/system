@@ -2,18 +2,19 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* in-string operations */
+/* remove the whitespace out of a c-string in-place */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-04-10, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services.
+	= 1992-05-14, David A­D­ Morano
+	This was originally written for a UNIX-based hardware 
+	support tool.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1992 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	INSTRCOMPACT_INCLUDE
 #define	INSTRCOMPACT_INCLUDE
@@ -24,6 +25,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
