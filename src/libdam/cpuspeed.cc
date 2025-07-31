@@ -2,10 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* subroutine to load a CPUSPEED module */
+/* load a CPUSPEED module and call it */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -18,6 +17,9 @@
 
 /*******************************************************************************
 
+  	Name:
+	cpuspeed
+
   	Description:
 	This subroutine loads up a CPUSPEED module.
 
@@ -28,17 +30,25 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<dlfcn.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
+#include	<mkpr.h>
+#include	<mkpathx.h>
+#include	<mkfnamesuf.h>
+#include	<sncpyx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+
+#include	"cpuspeed.h"
 
 
 /* local defines */
 
-#define	DEBUGFNAME	"/tmp/cpuspeed.deb"
+#ifdef	PRDOMAIN
+#define	PRDOMAIN	"LOCAL"
+#endif
 
 #ifndef	PROGRAMEOOT
 #define	PROGRAMROOT	"/usr/add-on/local"
@@ -54,87 +64,80 @@
 #define	NRUNS		10000000
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+extern "C" {
+    typedef int (*sub_f)(int) noex ;
+}
+
+
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkpath5(char *,cchar *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
+
+/* external variables */
 
 
 /* local structures */
 
-struct loadfile {
+namespace {
+    struct loadmgr {
 	void		*dhp ;
 	int		dlmode ;
-	char		fname[MAXPATHLEN + 1] ;
-} ;
+	char		*fname ;
+	int operator () (cchar *,cchar *,cchar **) noex ;
+    } ; /* end struct (loadmgr) */
+} /* end namespace */
 
 
 /* forward references */
 
-static int	loadfile(struct loadfile *,cchar *,cchar *,cchar **) ;
+static int	lfile(loadmgr *,cchar *,cchar *) noex ;
 
 
 /* local variables */
 
-#if	defined(_LP64)
-
-static const char	*subdirs[] = {
+constexpr cpcchar	subdirs[] = {
 	"sparcv9",
-	"sparc",
-	"",
-	NULL
-} ;
-
-#else /* defined(_LP64) */
-
-static const char	*subdirs[] = {
 	"sparcv8",
 	"sparcv7",
 	"sparc",
 	"",
-	NULL
-} ;
+	nullptr
+} ; /* end array (subdirs) */
 
-#endif /* defined(_LP64) */
-
-static const char	*names[] = {
+constexpr cpcchar	names[] = {
 	"dhry",
-	NULL
-} ;
+	nullptr
+} ; /* end array (names) */
 
-static const char	*exts[] = {
+constexpr cpcchar	exts[] = {
 	"",
 	"so",
 	"o",
-	NULL
-} ;
+	nullptr
+} ; /* end array (exts) */
+
+
+/* exported variables */
 
 
 /* exported suroutines */
 
-
-int cpuspeed(cchar *pr,cchar *name,int nruns)
-{
-	struct loadfile	lf{} ;
+int cpuspeed(cchar *pr,cchar *name,int nruns) noex {
+    	cnullptr	np{} ;
+	loadmgr		lf{} ;
 	int		rs ;
 	int		i ;
 	int		speed ;
-	int		(*fp)(int) ;
 	void		*dhp ;
 
 /* program root */
 
-	if (pr == NULL)
+	if (pr == nullptr)
 	    pr = PROGRAMROOT ;
-
-#if	CF_DEBUGS
-	debugprintf("loader: pr=%s\n",pr) ;
-#endif
 
 	if (nruns <= 0)
 	    nruns = NRUNS ;
@@ -146,34 +149,29 @@ int cpuspeed(cchar *pr,cchar *name,int nruns)
 #endif
 
 	rs = SR_NOTFOUND ;
-	if ((name == NULL) || (name[0] == '\0')) {
-	    for (i = 0 ; names[i] != NULL ; i += 1) {
-	        rs = loadfile(&lf,pr,names[i],exts) ;
+	if ((name == nullptr) || (name[0] == '\0')) {
+	    for (i = 0 ; names[i] != nullptr ; i += 1) {
+	        rs = lfile(&lf,pr,names[i]) ;
 	        if (rs > 0) break ;
 	    } /* end for */
 	} else {
-	    rs = loadfile(&lf,pr,name,exts) ;
+	    rs = lfile(&lf,pr,name) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("loader: search rs=%d\n",rs) ;
-#endif
 
 	if (rs >= 0) {
-	dhp = lf.dhp ;
-	if (dhp != NULL) {
-#if	CF_DEBUGS
-	    cp = dlerror() ;
-#endif
-	    if ((fp = (int (*)()) dlsym(dhp,ENTRYNAME)) != NULL) {
-	        speed = (*fp)(nruns) ;
+	    dhp = lf.dhp ;
+	    if (dhp != nullptr) {
+	        cchar	*en = ENTRYNAME ;
+	        sub_f fp ;
+	        if ((fp = (sub_f)  dlsym(dhp,en)) != np) {
+	            speed = (*fp)(nruns) ;
+	        } else {
+	            rs = SR_LIBBAD ;
+	        }
+	        dlclose(dhp) ;
 	    } else {
-	        rs = SR_LIBBAD ;
+	        rs = SR_LIBACC ;
 	    }
-	    dlclose(dhp) ;
-	} else {
-	    rs = SR_LIBACC ;
-	}
 	} /* end if (ok) */
 
 	return (rs >= 0) ? speed : rs ;
@@ -183,34 +181,24 @@ int cpuspeed(cchar *pr,cchar *name,int nruns)
 
 /* local subroutines */
 
-
-static int loadfile(lfp,pr,name,exts)
-struct loadfile	*lfp ;
-const char	pr[] ;
-const char	name[] ;
-const char	*exts[] ;
-{
+static int lfile(loadmgr *lfp,cc *pr,cc *name) noex {
 	ustat	sb ;
 	int		i, j, k ;
 	int		fl = 0 ;
-	const char	*lp = NULL ;
+	cchar	*lp = nullptr ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
-	if (lfp == NULL)
+	if (lfp == nullptr)
 	    return SR_FAULT ;
 
 	for (i = 0 ; i < 2 ; i += 1) {
 
 	    lp = (i == 0) ? OFD : "" ;
-	    for (j = 0 ; subdirs[j] != NULL ; j += 1) {
+	    for (j = 0 ; subdirs[j] != nullptr ; j += 1) {
 
 	        mkpath5(tmpfname,pr,LIBDNAME,lp,subdirs[j],name) ;
 
-	        for (k = 0 ; exts[k] != NULL ; k += 1) {
-
-#if	CF_DEBUGS
-	            debugprintf("loader/havefile: ext=%s\n",exts[k]) ;
-#endif
+	        for (k = 0 ; exts[k] != nullptr ; k += 1) {
 
 	            if (exts[k][0] != '\0') {
 	                fl = mkfnamesuf1(lfp->fname,tmpfname,exts[k]) ;
@@ -218,25 +206,21 @@ const char	*exts[] ;
 	                fl = sncpy1(lfp->fname,MAXPATHLEN,tmpfname) ;
 		    }
 
-#if	CF_DEBUGS
-	            debugprintf("loader/havefile: fname=%s\n",lfp->fname) ;
-#endif
-
-	            lfp->dhp = NULL ;
+	            lfp->dhp = nullptr ;
 	            if ((u_stat(lfp->fname,&sb) >= 0) && (S_ISREG(sb.st_mode)))
 	                lfp->dhp = dlopen(lfp->fname,lfp->dlmode) ;
 
-	            if (lfp->dhp != NULL) break ;
+	            if (lfp->dhp != nullptr) break ;
 	        } /* end for (extensions) */
 
-	        if (lfp->dhp != NULL) break ;
+	        if (lfp->dhp != nullptr) break ;
 	    } /* end for (subdirs) */
 
-	    if (lfp->dhp != NULL) break ;
+	    if (lfp->dhp != nullptr) break ;
 	} /* end for (major machine designator) */
 
-	return (lfp->dhp != NULL) ? fl : SR_NOENT ;
+	return (lfp->dhp != nullptr) ? fl : SR_NOENT ;
 }
-/* end subroutine (loadfile) */
+/* end subroutine (lfile) */
 
 
