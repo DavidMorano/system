@@ -2,18 +2,19 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* compact the whitespace out of a string */
+/* remove any extra whitespace out of a c-string in-place */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-08-10, David A-D- Morano
-	This was written from scratch.
+	= 1992-05-14, David A­D­ Morano
+	This was originally written for a UNIX-based hardware 
+	support tool.
 
 */
 
-/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
+/* Copyright © 1992 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -21,7 +22,7 @@
 	instrcompact
 
 	Descrption:
-	This subroutine compacts a string -- in place -- by removing
+	This subroutine compacts a string -- in-place -- by removing
 	redundant whitespace.  Also non-blank whitespaces are
 	replaced only by blanks.  Also any leading whitespace is
 	removed.
@@ -42,9 +43,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<estrings.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<sfx.h>			/* |sfnext(3uc)| */
 #include	<strwcpy.h>
-#include	<hasx.h>
+#include	<hasx.h>		/* |hasdoublewhite(3uc)| */
 #include	<localmisc.h>
 
 #include	"instrcompact.h"
