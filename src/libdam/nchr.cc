@@ -99,13 +99,13 @@ int nchr(cchar *sp,int sl,int sch) noex {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    for (cc *tp ; (tp = strnchr(sp,sl,sch)) != np ; ) {
 	        n += 1 ;
-	        sl -= ((tp+1)-sp) ;
-	        sp = (tp+1) ;
+	        sl -= intconv((tp + 1) - sp) ;
+	        sp = (tp + 1) ;
 	    } /* end while */
 	} else {
 	    while (sl-- && sp[0]) {
 	       cint	ch = mkchar(sp[0]) ;
-	       if (ch == sch) n += 1 ;
+	       n += (ch == sch) ;
 	       sp += 1 ;
 	    } /* end while */
 	} /* end if_constexpr (f_strnchr) */
