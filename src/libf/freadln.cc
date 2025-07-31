@@ -46,6 +46,8 @@
 
 #include	<envstandards.h>	/* must be ordered first to configure */
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdio>
 #include	<cstring>		/* for |lenstr(3c)| */
 #include	<usystem.h>
@@ -53,6 +55,9 @@
 
 #include	"stdsio.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;
 
 /* local defines */
 
