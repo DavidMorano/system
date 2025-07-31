@@ -67,7 +67,7 @@
 #include	<mbcache.h>
 #include	<mailmsg.h>
 #include	<ema.h>
-#include	<compactstr.h>
+#include	<instr.h>
 #include	<localmisc.h>
 
 
@@ -401,11 +401,7 @@ static int procmailmsg(MBC *mbp,tm_t nt,char *rbuf,int rlen,int mi,int c) noex {
 		    if (fp != NULL) {
 			int	rl ;
 		        rl = (strdcpy1w(rbuf,rlen,fp,fl) - rbuf) ;
-			compactstr(rbuf,rl) ;
-#if	CF_DEBUGS
-	    	debugprintf("localnoticecheck/procmailmsg: mbf f=>%r<\n",
-			rbuf,strlinelen(rbuf,rs,40)) ;
-#endif
+			instrcompact(rbuf,rl) ;
 		    }
 		}
 	} /* end if (mbcache_msgscan) */
