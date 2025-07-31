@@ -2,31 +2,35 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* in-string operations */
+/* in-place c-string manipulations */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-04-10, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services.
+	= 1992-05-14, David A­D­ Morano
+	This was originally written for a UNIX-based hardware 
+	support tool.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1992 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	INSTR_INCLUDE
 #define	INSTR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>		/* |UCHAR_MAX| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<char.h>
+#include	<usysrets.h>
 
+#include	<instrcase.h>
+#include	<instrclean.h>
+#include	<instrcompact.h>
+#include	<instrrev.h>
 
 
 #endif /* INSTR_INCLUDE */
