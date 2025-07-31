@@ -43,9 +43,9 @@ LIBS +=
 OBJ0= instrclean.o
 OBJ1= instrcompact.o
 OBJ2= instrrev.o
-OBJ3=
+OBJ3= instrcase.o
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
 
 OBJ= obja.o
 
@@ -135,8 +135,9 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
-instrclean.o:		instrclean.cc	instrclean.h		$(INCS)
-instrcompact.o:		instrcompact.cc	instrcompact.h		$(INCS)
-instrrev.o:		instrrev.cc	instrrev.h		$(INCS)
+instrcase.o:		instrcase.cc		instrcase.h	$(INCS)
+instrclean.o:		instrclean.cc		instrclean.h	$(INCS)
+instrcompact.o:		instrcompact.cc		instrcompact.h	$(INCS)
+instrrev.o:		instrrev.cc		instrrev.h	$(INCS)
 
 
