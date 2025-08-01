@@ -1,0 +1,7 @@
+DELENV
+
+This subroutine deletes an environment variables from the process
+environment variable list (passed down to the |main| subroutine viæ
+its thrid argument).  This subroutine is severely depracted and
+should never be used (at all).
+
