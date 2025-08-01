@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (showfieldterms)
 
 T= showfieldterms
 
@@ -226,7 +226,7 @@ control:
 	date >> Control
 
 
-main.o:			main.c $(INCS)
+showfieldterms_main.o:	showfieldterms_main.c $(INCS)
 
 whatinfo.o:		whatinfo.c config.h
 
