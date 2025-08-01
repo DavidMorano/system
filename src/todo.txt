@@ -4,7 +4,7 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
-filewatch
+cpuspeed
 ufcntl		?? weirdo problem
 uctim
 libuc		fix to completely compile!
@@ -35,6 +35,7 @@ varmk
 varmks
 spellchecks	incredible mess!
 mcmsg		mail-related messages (needs total modern rework)
+cpuspeed	test code -> |xcpuspeed|
 
 = Future
 
