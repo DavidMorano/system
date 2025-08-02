@@ -868,8 +868,8 @@ listen.dir:
 	makesubdir $@
 
 # LOADMODNAMES
-loadmodnames.o:		loadmodnames.dir
-loadmodnames.dir:
+modloadnames.o:		modloadnames.dir
+modloadnames.dir:
 	makesubdir $@
 
 # INSTR
@@ -894,6 +894,7 @@ deprecated.o:		deprecated.cc
 getclusters.o:		getclusters.cc getclusters.h
 percache.o:		percache.cc percache.h
 cvttemperature.o:	cvttemperature.cc cvttemperature.h
+mallcompactstr.o:	mallcompactstr.cc	mallcompactstr.h	$(INCS)
 
 # DFSA
 dfsa.o:			dfsa0.o dfsa1.o			$(INCS)
