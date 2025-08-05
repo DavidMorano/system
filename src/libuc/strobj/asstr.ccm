@@ -1,0 +1,142 @@
+/* asstr MODULE (primary module interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* AS-String (asstr) -- used within EMA */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-01, David A­D­ Morano
+	This object module was originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Object:
+	asstr
+
+	Description:
+	This is an email address handling module object.  It can
+	parse out and store hierarchically organized EMAs.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<localmisc.h>
+
+export module asstr ;
+
+constexpr int	addresslen = 60 ;	/* starting address length */
+
+enum asstrmems {
+        asstrmem_get,
+        asstrmem_getprev,
+        asstrmem_adv,
+        asstrmem_skipwhite,
+	asstrmem_backwhite,
+	asstrmem_finish,
+	asstrmem_overlast
+} ; /* end enum (asstrmems) */
+
+export {
+    enum sis {
+	si_address,
+	si_route,
+	si_comment,
+	si_overlast
+    } ;
+    struct asstr ;
+    struct asstr_co {
+	asstr		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (asstr *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () (int = 0) noex {
+	    return operator int () ;
+	} ;
+    } ; /* end struct (asstr_co) */
+    struct asstr {
+	friend		asstr_co ;
+	asstr_co	get ;
+	asstr_co	getprev ;
+	asstr_co	adv ;
+	asstr_co	skipwhite ;
+	asstr_co	backwhite ;
+	asstr_co	finish ;
+	cchar		*sp ;
+	uint		magic ;
+	int		sl ;
+	asstr() noex : sp(nullptr), magic(0) {
+	    get		(this,asstrmem_get) ;
+	    getprev	(this,asstrmem_getprev) ;
+	    adv		(this,asstrmem_adv) ;
+	    skipwhite	(this,asstrmem_skipwhite) ;
+	    backwhite	(this,asstrmem_backwhite) ;
+	    finish	(this,asstrmem_finish) ;
+	    magic = 0 ;
+	    sp = nullptr ;
+	} ; /* end ctor */
+        int	start(cchar *,int) noex ;
+	void dtor() noex ;
+	operator int () noex ;
+	destruct asstr() {
+	    if (sp) dtor() ;
+	} ;
+    } ; /* end struct (asstr_head) */
+} /* end export */
+
+export {
+        int	asstr_start(asstr *,cchar *,int) noex ;
+    	int	asstr_get(asstr *op) noex ;
+    	int	asstr_getprev(asstr *op) noex ;
+    	int	asstr_adv(asstr *op) noex ;
+    	int	asstr_skipwhite(asstr *op) noex ;
+    	int	asstr_backwhite(asstr *op) noex ;
+        int	asstr_finish(asstr *) noex ;
+} /* end export */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+
