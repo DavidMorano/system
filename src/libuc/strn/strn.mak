@@ -31,13 +31,24 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= strn.h
+INCS += strn.h
 
 MODS +=
 
-LIBS=
+LIBS +=
+
+
+OBJ0_STRN= strncpyxc.o strnwcpyxc.o 
+OBJ1_STRN= strnnlen.o strnset.o
+OBJ2_STRN= strnxchr.o strnxbrk.o strnxsub.o 
+OBJ3_STRN= strnxterm.o strnwht.o strnchar.o
+
+OBJA= obj0_strn.o obj1_strn.o
+OBJB= obj2_strn.o obj3_strn.o
+
+OBJ_STRN= obja.o objb.o
 
 
 INCDIRS=
@@ -56,18 +67,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_STRN= strncpyxc.o strnwcpyxc.o 
-OBJ1_STRN= strnnlen.o strnset.o
-OBJ2_STRN= strnxchr.o strnxbrk.o strnxsub.o 
-OBJ3_STRN= strnxterm.o strnwht.o strnchar.o
-
-OBJA_STRN= obj0_strn.o obj1_strn.o
-OBJB_STRN= obj2_strn.o obj3_strn.o
-
-OBJ_STRN= $(OBJA_STRN) $(OBJB_STRN)
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -80,6 +80,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -124,6 +127,13 @@ obj2_strn.o:	$(OBJ2_STRN)
 
 obj3_strn.o:	$(OBJ3_STRN)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_STRN)
+
+
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
 strnxchr.o:		strnxchr.cc	strnxchr.h	$(INCS)

@@ -1,6 +1,6 @@
-# MAKEFILES (strobj)
+# MAKEFILES (ucstream)
 
-T= strobj
+T= ucstream
 
 ALL= $(T).o
 
@@ -33,24 +33,22 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += strobj.h
+INCS += ucstream.h
 
 MODS +=
 
 LIBS +=
 
 
-OBJ0= strmgr.o 
-OBJ1= strstore.o
-OBJ2= strop.o asstr.o
-OBJ3= strtab.o strtabfind.o
+OBJ0= ucstream0.o ucstream1.o
+OBJ1=
+OBJ2=
+OBJ3=
 
-OBJ4= ass.o dstr.o
+OBJA= obj0.o
+OBJB=
 
-OBJA= obj0.o obj1.o obj2.o obj3.o 
-OBJB= obj4.o
-
-OBJ= obja.o objb.o
+OBJ= obja.o
 
 
 INCDIRS +=
@@ -69,7 +67,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -82,6 +80,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -116,55 +117,32 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
-
-obj4.o:			$(OBJ4)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
-
-obj5.o:			$(OBJ5)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
-
-obj6.o:			$(OBJ6)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6)
-
-obj7.o:			$(OBJ7)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
-
-objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
-
-
-strmgr.o:		strmgr.cc	strmgr.h		$(INCS)
-strop.o:		strop.cc	strop.h			$(INCS)
-strstore.o:		strstore.cc	strstore.h		$(INCS)
-strtab.o:		strtab.cc	strtab.h		$(INCS)
-strtabfind.o:		strtabfind.cc	strtabfind.h		$(INCS)
-
-dstr.o:			dstr.cc		dstr.h			$(INCS)
-ass.o:			ass.cc		ass.h			$(INCS)
-
-# ASSTR
-asstr.o:		asstr0.o asstr1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-asstr0.o:		asstr.ccm				$(INCS)
-	makemodule asstr
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-asstr1.o:		asstr1.cc				$(INCS)
-	makemodule asstr
+
+ucstream_primary.o:	ucstream_primary.cc		$(INCS)
+
+ucstream0.o:		ucstream.ccm			$(INCS)
+	makemodule ucstream
+
+ucstream1.o:		ucstream1.cc ucstream.ccm	$(INCS)
+	makemodule ucstream
 	$(COMPILE.cc) $<
 
 
