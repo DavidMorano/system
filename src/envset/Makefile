@@ -170,7 +170,7 @@ INCS= config.h defs.h
 
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o proginfo_rootname.o
 OBJ01= progreport.o progfindprog.o progexec.o
-OBJ02= defproc.o
+OBJ02=
 OBJ03=
 OBJ04=
 OBJ05=
@@ -337,70 +337,6 @@ progreport.o:		progreport.c progreport.h defs.h config.h
 progfindprog.o:		progfindprog.c $(INCS)
 
 progexec.o:		progexec.c $(INCS)
-
-
-envs.o:			envs.c envs.h
-
-envs_procxe.o:		envs_procxe.c envs.h
-
-envs_subs.o:		envs_subs.c envs.h
-
-
-getutmpent.o:		getutmpent.c getutmpent.h
-
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-buffer.o:		buffer.c buffer.h
-
-vecobj.o:		vecobj.c vecobj.h
-
-lookaside.o:		lookaside.c lookaside.h
-
-pq.o:			pq.c pq.h
-
-schedvar.o:		schedvar.c schedvar.h
-
-sysvar.o:		sysvar.c sysvar.h sysvars.h dirseen.h
-
-varsub.o:		varsub.c varsub.h
-
-paramfile.o:		paramfile.c paramfile.h
-
-userattr.o:		userattr.c userattr.h
-
-buffer.o:		buffer.c buffer.h
-
-sysvars.o:		sysvars.c sysvars.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-var.o:			var.c var.h vars.h dirseen.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-varmk.o:		varmk.c varmk.h varmks.h dirseen.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-vars.o:			vars.c vars.h varhdr.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-varhdr.o:		varhdr.c varhdr.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-dirseen.o:		dirseen.c dirseen.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-msfile.o:		msfile.c msfile.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
 
 
 sysvarproc.o:		sysvarproc.c varmk.h

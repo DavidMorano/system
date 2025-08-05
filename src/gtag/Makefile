@@ -318,16 +318,6 @@ lastlogfile.o:		lastlogfile.c lastlogfile.h
 
 tmpx.o:			tmpx.c tmpx.h
 
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-fifostr.o:		fifostr.c fifostr.h
-
-bits.o:			bits.c bits.h
-
 
 X01= testfindinline
 

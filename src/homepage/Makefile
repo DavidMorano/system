@@ -349,10 +349,6 @@ userinfo.o:		userinfo.c userinfo.h
 
 spawnproc.o:		spawnproc.c spawnproc.h
 
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
 realname.o:		realname.c realname.h
 
 ipasswd.o:		ipasswd.c ipasswd.h
@@ -361,29 +357,17 @@ lastlogfile.o:		lastlogfile.c lastlogfile.h
 
 tmpx.o:			tmpx.c tmpx.h
 
-nodedb.o:		nodedb.c nodedb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
 paramopt.o:		paramopt.c paramopt.h
 
 svcfile.o:		svcfile.c svcfile.h
-
-field.o:		field.c field.h
-
-field_srvarg.o:		field_srvarg.c field.h
 
 msgdata.o:		msgdata.c msgdata.h
 
 termout.o:		termout.cc termout.h
 
-pta.o:			pta.c pta.h
-
 storeitem.o:		storeitem.c storeitem.h
 
 spawner.o:		spawner.c spawner.h
-
-useraccdb.o:		useraccdb.c useraccdb.h
 
 querystr.o:		querystr.cc querystr.h
 

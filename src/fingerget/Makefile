@@ -229,23 +229,9 @@ systems.o:		systems.c systems.h
 
 cm.o:			cm.c cm.h dialer.h systems.h"
 
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
 streamsync.o:		streamsync.c streamsync.h
 
 envlist.o:		envlist.c envlist.h
-
-hdb.o:			hdb.c hdb.h
-
-lookaside.o:		lookaside.c lookaside.h
-
-pq.o:			pq.c pq.h
-
-hdbstr.o:		hdbstr.c hdbstr.h
-
-hdbstr_loadfile.o:	hdbstr_loadfile.c
 
 msfile.o:		msfile.c msfile.h msfilee.h msflag.h
 
@@ -255,17 +241,11 @@ mapstrint.o:		mapstrint.c mapstrint.h
 
 mkcexsync.o:		mkcexsync.c mkcexsync.h
 
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h kvsfile.h
-
 svctab.o:		svctab.c svctab.h
 
 strstore.o:		strstore.c strstore.h
 
 serialbuf.o:		serialbuf.c serialbuf.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
 
 buffer.o:		buffer.c buffer.h
 

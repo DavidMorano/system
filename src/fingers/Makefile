@@ -168,10 +168,10 @@ OBJ08= varsub_extras.o
 OBJ09= field_svcargs.o field_srvarg.o
 OBJ10= 
 OBJ11= standing.o builtin.o sysmisc.o muximsg.o procse.o
-OBJ12= defproc.o clientinfo.o
+OBJ12= clientinfo.o
 OBJ13= 
-OBJ14= envs.o envs_procxe.o envs_subs.o
-OBJ15= lfm.o svcfile.o acctab.o logfile.o
+OBJ14=
+OBJ15=
 
 OBJ16= jobdb.o svckey.o connection.o hostinfo.o
 OBJ17= sysvar.o dirseen.o poller.o
@@ -416,52 +416,6 @@ muximsg.o:		muximsg.c muximsg.h
 procse.o:		procse.c procse.h
 
 svckey.o:		svckey.c svckey.h
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-vecstr.o:		vecstr.c vecstr.h
-
-pcspoll.o:		pcspoll.c pcsconf.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-
-spawnproc.o:		spawnproc.c spawnproc.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-modload.o:		modload.c modload.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-dirseen.o:		dirseen.c dirseen.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-sysvars.o:		sysvars.c sysvars.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-var.o:			var.c var.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-varmk.o:		varmk.c varmk.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-vars.o:			vars.c vars.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-varmks.o:		varmks.c varmks.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-varhdr.o:		varhdr.c varhdr.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-sysvarproc.o:		sysvarproc.c
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
 
 
 # testing

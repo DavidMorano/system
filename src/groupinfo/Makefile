@@ -303,7 +303,7 @@ getlogname.o:		getlogname.c
 
 getloghost.o:		getloghost.c
 
-getpwentry.o:		getpwentry.c pwentry.h
+getpwentry.o:		getpwentry.c
 
 getpwlogname.o:		getpwlogname.c
 
@@ -339,12 +339,6 @@ tmpx.o:			tmpx.c tmpx.h
 objfile.o:		objfile.c objfile.h
 
 storeitem.o:		storeitem.c storeitem.h
-
-gecos.o:		gecos.c gecos.h
-
-fsdir.o:		fsdir.c fsdir.h
-
-pwfile.o:		pwfile.c pwfile.h pwentry.h
 
 pwi.o:			pwi.c pwi.h
 

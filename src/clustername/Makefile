@@ -307,12 +307,4 @@ lastlogfile.o:		lastlogfile.c lastlogfile.h
 
 tmpx.o:			tmpx.c tmpx.h
 
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h kvsfile.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-hdb.o:			hdb.c hdb.h
-
 

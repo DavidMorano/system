@@ -231,20 +231,3 @@ proginfo.o:		proginfo.c defs.h
 proginfo_setpiv.o:	proginfo_setpiv.c defs.h
 
 
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-userinfo.o:		userinfo.c userinfo.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-
