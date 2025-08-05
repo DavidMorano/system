@@ -142,65 +142,65 @@ control:
 
 
 obj00.o:		$(OBJ00)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ00)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj01.o:		$(OBJ01)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ01)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj02.o:		$(OBJ02)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ02)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj03.o:		$(OBJ03)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ03)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj04.o:		$(OBJ04)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ04)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj05.o:		$(OBJ05)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ05)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj06.o:		$(OBJ06)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ06)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj07.o:		$(OBJ07)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ07)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj08.o:		$(OBJ08)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ08)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj09.o:		$(OBJ09)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ09)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj10.o:		$(OBJ10)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ10)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj11.o:		$(OBJ11)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ11)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj12.o:		$(OBJ12)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ12)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj13.o:		$(OBJ13)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ13)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj14.o:		$(OBJ14)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ14)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj15.o:		$(OBJ15)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ15)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objc.o:			$(OBJC)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objd.o:			$(OBJD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 bcontrol.o:		bcontrol.cc		$(INCS)

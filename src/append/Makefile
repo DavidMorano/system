@@ -301,10 +301,6 @@ lastlogfile.o:		lastlogfile.c lastlogfile.h
 
 tmpx.o:			tmpx.c tmpx.h
 
-nodedb.o:		nodedb.c nodedb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
 paramopt.o:		paramopt.c paramopt.h
 
 

@@ -134,7 +134,7 @@ OBJ11=
 OBJ12= 
 OBJ13= isValidMagic.o
 OBJ14= streamsync.o msfile.o msfilee.o ids.o
-OBJ15= nodedb.o clusterdb.o kvsfile.o serialbuf.o stdorder.o
+OBJ15=
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
 OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
@@ -238,7 +238,7 @@ transfer.o:		transfer.c transfer.h $(INCS)
 
 mkcexsync.o:		mkcexsync.c mkcexsync.h
 
-dbi.o:			dbi.c dbi.h $(INCS) nodedb.h clusterdb.h
+dbi.o:			dbi.c dbi.h $(INCS)
 
 
 dialcprogmsg.o:		dialcprogmsg.c dialcprogmsg.h
@@ -272,20 +272,6 @@ msfilee.o:		msfilee.c msfilee.h
 
 mapstrint.o:		mapstrint.c mapstrint.h
 
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h kvsfile.h
-
 svcfile.o:		svcfile.c svcfile.h
-
-strstore.o:		strstore.c strstore.h
-
-serialbuf.o:		serialbuf.c serialbuf.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-stdorder.o:		stdorder.c stdorder.h
-
-ids.o:			ids.c ids.h
 
 
