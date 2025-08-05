@@ -1,0 +1,94 @@
+/* ucstream MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* file stream operations for LIBUC */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2011-04-12, David A­D­ Morano
+	This code was originally written.  Only the introduction
+	of C++11 has allowed this (finally), due to the addition
+	(in C++11) of |unordered_set(3c++)|.
+
+*/
+
+/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Object:
+	ucstream
+
+	Description:
+	This object implements a file stream.
+
+	Symopsis:
+	int ucstream_start(int n = 0) noex
+
+	Arguments:
+	n		suggested starting possible number of elements
+
+	Returns:
+	>=0		ok
+	<0		error (system-return)
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/stat.h>		/* |dev_t| + |ino_t| */
+#include	<unistd.h>
+#include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<filer.h>		/* <- the money shot */
+
+export module ucstream ;
+
+enum ucstreammems {
+	ucstreammem_close,
+	ucstreammem_overlast
+} ; /* end enum (ucstreammems) */
+
+export {
+    struct ucstream ;
+    struct ucstream_co {
+	ucstream	*op = nullptr ;
+	int		w = -1 ;
+	constexpr void operator () (ucstream *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+    } ; /* end struct (ucstream_co) */
+    struct ucstream : filer {
+	friend		ucstream_co ;
+	ucstream_co	close ;
+	int		fd ;
+	ucstream() noex {
+	    close	(this,ucstreammem_close) ;
+	    fd = -1 ;
+	} ; /* end ctor) */
+	int open(cchar *,cchar * = nullptr,mode_t = 0) noex ;
+	void dtor() noex ;
+	destruct ucstream() {
+	    if (fd >= 0) dtor() ;
+	} ; /* end dtor */
+    private:
+	int	iclose() noex ;
+    } ; /* end class (ucstream) */
+} /* end export */
+
+
