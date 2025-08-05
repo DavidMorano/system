@@ -247,32 +247,3 @@ whatinfo.o:		whatinfo.c config.h
 proginfo.o:		proginfo.c $(INCS)
 
 
-udomain.o:		udomain.c
-
-getutmpent.o:		getutmpent.c getutmpent.h
-
-getnodedomain.o:	getnodedomain.c
-
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-
-
