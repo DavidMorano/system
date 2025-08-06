@@ -25,7 +25,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<char.h>
+#include	<char.h>		/* |CHAR_{xx}(3uc)| */
 
 
 EXTERNC_begin
