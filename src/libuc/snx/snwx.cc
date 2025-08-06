@@ -19,7 +19,7 @@
 
 	Name:
 	snwprinf
-	vsnwprintf
+	snwvprintf
 
 	Description:
 	Create a c-string according to some formatting rules.

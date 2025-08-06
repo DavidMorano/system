@@ -63,6 +63,7 @@
 #define	SOCKADDRESS_LEN		szof(union sockaddress_head)
 #define	SOCKADDRESS_NAMELEN	szof(union sockaddress_head)
 #define	SOCKADDRESS_MAXPATH	MAXPATHLEN
+#define	SOCKADDRESS_STRSIZE	(2 * SOCKADDRESS_MAXPATH + 1)
 
 
 struct sockaddress_head {
@@ -71,7 +72,7 @@ struct sockaddress_head {
 	    SOCKADDR_UN		a_unix ;
 	    SOCKADDR_IN4	a_in4 ;
 	    SOCKADDR_IN6	a_in6 ;
-	    unsigned char	str[2 + SOCKADDRESS_MAXPATH + 1] ;
+	    unsigned char	str[SOCKADDRESS_STRSIZE] ;
 	} ;
 } ; /* end struct (sockaddress_head) */
 
@@ -104,8 +105,8 @@ struct sockaddress : sockaddress_head {
 	    len		(this,sockaddressmem_len) ;
 	    finish	(this,sockaddressmem_finish) ;
 	} ;
-	sockaddress(const sockaddress &) = delete ;
-	sockaddress &operator = (const sockaddress &) = delete ;
+	sockaddress(const sockaddress &) noex ;
+	sockaddress &operator = (const sockaddress &) noex ;
 	int start(int,cvoid * = nullptr,int = 0,uint = 0) noex ;
 	operator int () noex ;
 } ; /* end struct (sockaddress) */
@@ -115,20 +116,20 @@ typedef SOCKADDRESS	sockaddress ;
 
 EXTERNC_begin
 
-extern int sockaddress_start(sockaddress *,int,cvoid *,int,uint) noex ;
-extern int sockaddress_getlen(sockaddress *) noex ;
+extern int sockaddress_start	(sockaddress *,int,cvoid *,int,uint) noex ;
+extern int sockaddress_getlen	(sockaddress *) noex ;
 extern int sockaddress_getaddrlen(sockaddress *) noex ;
-extern int sockaddress_gethex(sockaddress *,char *,int) noex ;
-extern int sockaddress_getaf(sockaddress *) noex ;
-extern int sockaddress_getport(sockaddress *) noex ;
-extern int sockaddress_getflow(sockaddress *,uint *) noex ;
-extern int sockaddress_getaddr(sockaddress *,void *,int) noex ;
-extern int sockaddress_getscope(sockaddress *,uint *) noex ;
-extern int sockaddress_getextra(sockaddress *,uint *) noex ;
-extern int sockaddress_putaf(sockaddress *,int) noex ;
-extern int sockaddress_putport(sockaddress *,int) noex ;
-extern int sockaddress_putaddr(sockaddress *,cvoid *) noex ;
-extern int sockaddress_finish(sockaddress *) noex ;
+extern int sockaddress_gethex	(sockaddress *,char *,int) noex ;
+extern int sockaddress_getaf	(sockaddress *) noex ;
+extern int sockaddress_getport	(sockaddress *) noex ;
+extern int sockaddress_getflow	(sockaddress *,uint *) noex ;
+extern int sockaddress_getaddr	(sockaddress *,void *,int) noex ;
+extern int sockaddress_getscope	(sockaddress *,uint *) noex ;
+extern int sockaddress_getextra	(sockaddress *,uint *) noex ;
+extern int sockaddress_putaf	(sockaddress *,int) noex ;
+extern int sockaddress_putport	(sockaddress *,int) noex ;
+extern int sockaddress_putaddr	(sockaddress *,cvoid *) noex ;
+extern int sockaddress_finish	(sockaddress *) noex ;
 
 EXTERNC_end
 

@@ -650,6 +650,25 @@ sockaddress::operator int () noex {
     	return sockaddress_getlen(this) ;
 }
 
+static void sockaddress_init(sockaddress *op,const sockaddress *other) noex {
+    	cint	msz = SOCKADDRESS_STRSIZE ;
+    	memcopy(op->str,other->str,msz) ;
+	{
+	    op->getaf	(op,sockaddressmem_getaf) ;
+	    op->len	(op,sockaddressmem_len) ;
+	    op->finish	(op,sockaddressmem_finish) ;
+	}
+} /* end subroutine (sockaddress_init) */
+
+sockaddress::sockaddress(const sockaddress &o) noex {
+    	sockaddress_init(this,&o) ;
+} /* end method (sockaddress::ctor) */
+
+sockaddress &sockaddress::operator = (const sockaddress &o) noex {
+    	sockaddress_init(this,&o) ;
+	return *this ;
+} /* end method (sockaddress::assignment) */
+
 sockaddress_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
@@ -666,7 +685,6 @@ sockaddress_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (sockaddress_co::operator) */
+} /* end method (sockaddress_co::operator) */
 
 

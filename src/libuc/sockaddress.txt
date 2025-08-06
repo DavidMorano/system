@@ -8,6 +8,5 @@ there is the issue of each address faimly hacing their own
 socket-address objet.  But secondarily, and actually even more
 painful, is that fact that individual socket address objects
 (structures) are different acorss mutliple different operating
-systems,
-
+systems.
 
