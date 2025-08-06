@@ -90,7 +90,7 @@ static char     sccsid[] = "@(#)pcnfsd.c	1.4";
  * is to build up a set of implementations for different architectures
  * (Unix System V, VMS, etc.). Users are encouraged to submit their own
  * variations for redistribution. If you need a particular variation which
- * you don't see here, either code it yourself (and, hopefully, send it to
+ * you do not see here, either code it yourself (and, hopefully, send it to
  * us at Sun) or contact your Customer Support representative. 
  */
 
@@ -616,7 +616,7 @@ pr_start(ps_arg)
 	}
 	if (statbuf.st_size == 0) {
 		/*
-		 * Null file - don't print it, just kill it. 
+		 * Null file - do not print it, just kill it. 
 		 */
 		unlink(pathname);
 
@@ -697,7 +697,7 @@ pr_start(ps_arg)
 			sprintf (clientname_opt, "-C%s", ps_arg->psa_client);
 		} else {
 			/*
-			 *  We don't know the user's identity, so the printout
+			 *  We do not know the user's identity, so the printout
 			 *  will end up being enqueued by root.  We do want
 			 *  the user's name to appear on the banner page,
 			 *  so we slip it in via the -J option.

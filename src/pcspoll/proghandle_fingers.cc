@@ -196,7 +196,7 @@ struct clientinfo	*cip ;
 	    debugprintf("proghandle: svcbuf=>%r<\n",svcbuf,len) ;
 #endif
 
-/* we have our input data => make sure we don't get any more! :-) */
+/* we have our input data => make sure we do not get any more! :-) */
 
 #if	defined(P_FINGERS)
 	if (f_socket)
