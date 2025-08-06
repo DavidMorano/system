@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* string-copy variant */
+/* copy a counted c-string to a sized destination buffer w/ case conversion */
 /* version %I% last-modified %G% */
 
 
