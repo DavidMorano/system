@@ -32,7 +32,7 @@ struct progconfig_flags {
 	uint		lockfile:1 ;	/* have a lock file */
 	uint		mspoll:1 ;	/* do MS polling */
 	uint		zerospeed:1 ;	/* zero out 'speed' element */
-	uint		nopass:1 ;	/* don't listen on PASS */
+	uint		nopass:1 ;	/* do not listen on PASS */
 	uint		msfile:1 ;
 	uint		logfile:1 ;
 	uint		loglen:1 ;

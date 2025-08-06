@@ -49,7 +49,7 @@
 	= Load-averages
 
         Although load-averages are available when retrieving SYSMISC
-        (miscellaneous system) information from the kernel, we don't bother with
+        (miscellaneous system) information from the kernel, we do not bother with
         it at all since the general introduction of the 'getloadavg(3c)'
         subroutine in the world. If that subroutine was not available,
         load-averages would have to be treated as being as difficult to retrieve

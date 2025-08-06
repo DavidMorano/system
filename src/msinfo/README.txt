@@ -12,7 +12,7 @@ Arguments:
 -s <sortkey>	an optional field to sort output on; one of:
 				utime stime dtime la1m la5min la15min speed
 -r		reverse the sense of the sort
--nh		don't print the header
+-nh		do not print the header
 -<n>		limit output to the first <n> nodes
 -db <file>	machine status database file
 -V		print command version to standard-error and then exit
