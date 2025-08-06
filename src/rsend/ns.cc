@@ -13,7 +13,7 @@
 	This subroutine was adopted for use from the DWD program.
 
 	- 2003-11-04, David A­D­ Morano
-        I don't know where all this has been (apparently "around") but I grabbed
+        I do not know where all this has been (apparently "around") but I grabbed
         it from the CM object!
 
 */

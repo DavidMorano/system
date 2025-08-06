@@ -155,7 +155,7 @@ OBJ23= inetaddrparse.o hasleadcolon.o getaf.o
 #OBJ24= uss.o ussmux.o ussinfo.o
 #OBJ25= tcp.o tcpmux.o tcpnls.o 
 #OBJ26= uux.o udp.o prog.o
-#OBJ27= defproc.o 
+#OBJ27=
 #OBJ28= sysvar.o
 OBJ29= uuname.o 
 #OBJ30= envs.o envs_procxe.o envs_subs.o
@@ -287,9 +287,6 @@ cmbuf.o:		cmbuf.c cmbuf.h
 
 
 inetaddrparse.o:	inetaddrparse.c inetaddrparse.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-defproc.o:		defproc.c
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
 
 hasleadcolon.o:		hasleadcolon.c

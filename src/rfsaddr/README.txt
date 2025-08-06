@@ -1,6 +1,6 @@
 RFSADDR
 
-I lost the original one so this is a look-alike version.  I don't even remember
+I lost the original one so this is a look-alike version.  I do not even remember
 what the arguments were or how the first one worked !  This version looks more
 like the later 'hostrfs' program that was distributed with the AT&T REXEC
 package.  This one is a bit more flexible since it can create TLI addresses for
