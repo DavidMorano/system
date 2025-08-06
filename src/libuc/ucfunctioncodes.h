@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	ucfunctioncodes
+
+	Description:
 	Function codes for extended Input-Output operations.
 
 *******************************************************************************/
@@ -115,7 +119,7 @@
 #define	FM_NOTECHO	(1<<(1+4))	/* no terminator echo */
 #define	FM_NOFILTER	(1<<(2+4))	/* no filter on input */
 #define	FM_RAWIN	(1<<(3+4))	/* raw input (no control) */
-#define	FM_NONBLOCK	(1<<(4+4))	/* don't start if no data */
+#define	FM_NONBLOCK	(1<<(4+4))	/* do not start if no data */
 #define	FM_TIMED	(1<<(5+4))	/* timed read */
 #define	FM_EXACT	(1<<(6+4))	/* exact transfer length */
 #define	FM_AGAIN	(1<<(7+4))	/* return AGAIN if no data */
