@@ -460,7 +460,7 @@ top:
 	                wsp->c[JOBSTATE_WATCH]) ;
 
 	        else
-	            debugprintf("watch: DIR don't know\n") ;
+	            debugprintf("watch: DIR do not know\n") ;
 
 	    }
 #endif /* CF_DEBUG */

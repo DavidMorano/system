@@ -195,7 +195,7 @@ Subject: Your domains are set to cancel soon
           <td style="padding-top:20px; padding-bottom:40px; padding-left:20px; padding-right:20px" align="left"><font face="Arial, sans-serif" color="#333333" style="font-size:14px; -webkit-text-size-adjust:none; line-height:20px">
           The following domains expire on the dates listed below. ICANN, the organization that regulates domain sales online, requires us to inform the account holder and registrant contact (that's you, in this case) of expirations and renewals.<br />
 <br />
-What should you do? If the account holder handles renewals, relax. If they don't, you should log in and switch the domains to auto-renew and avoid loss or a lapse in service.</font>
+What should you do? If the account holder handles renewals, relax. If they do not, you should log in and switch the domains to auto-renew and avoid loss or a lapse in service.</font>
  
             </td>
         </tr>

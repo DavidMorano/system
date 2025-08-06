@@ -504,7 +504,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	                            break ;
 
-/* don't read input */
+/* do not read input */
 	                        case 'n':
 	                            opt_n = "-n" ;
 	                            f_n = TRUE ;
