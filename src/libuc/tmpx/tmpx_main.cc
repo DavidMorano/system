@@ -151,7 +151,7 @@ int tmpx_open(tmpx *op,cchar *dbfn,int oflags) noex {
 	    op->ti_check = 0 ;
 	    op->mapsize = 0 ;
 	    op->fsize = 0 ;
-	    op->f = {} ;
+	    op->fl = {} ;
 	    op->mapoff = 0 ;
 	    op->magic = 0 ;
 	    op->oflags = oflags ;
@@ -444,14 +444,14 @@ static int tmpx_writable(tmpx *op,int oflags) noex {
 	        rs = SR_INVALID ;
 	        break ;
 	} /* end switch */
-	op->f.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
+	op->fl.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
 	return rs ;
 }
 /* end subroutine (tmpx_writable) */
 
 static int tmpx_openbegin(tmpx *op,cchar *dbfn) noex {
 	int		rs ;
-	if (cchar *cp{} ; (rs = uc_mallocstrw(dbfn,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = uc_mallocstrw(dbfn,-1,&cp)) >= 0) {
 	    custime	dt = getustime ;
 	    op->fname = cp ;
 	    if ((rs = tmpx_fileopen(op,dt)) >= 0) {

@@ -106,7 +106,7 @@ struct tmpx_head {
 	time_t		ti_check ;	/* last check time */
 	size_t		mapsize ;
 	size_t		fsize ;		/* file total size */
-	TMPX_FL		f ;
+	TMPX_FL		fl ;
 	uint		mapoff ;	/* file mapping starting offset */
 	uint		magic ;
 	int		pagesize ;
@@ -165,6 +165,7 @@ struct tmpx : tmpx_head {
 	    getrunlevel(this,tmpxmem_getrunlevel) ;
 	    nusers(this,tmpxmem_nusers) ;
 	    close(this,tmpxmem_close) ;
+	    magic = 0 ;
 	} ;
 	tmpx(const tmpx &) = delete ;
 	tmpx &operator = (const tmpx &) = delete ;
@@ -180,8 +181,8 @@ struct tmpx : tmpx_head {
 	int getuserlines(vecstr *,cchar *) noex ;
 	int getuserterms(vecstr *,cchar *) noex ;
 	void dtor() noex ;
-	~tmpx() {
-	    dtor() ;
+	destruct tmpx() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (tmpx) */
 #else	/* __cplusplus */

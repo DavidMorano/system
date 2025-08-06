@@ -43,7 +43,7 @@ enum termcmdtypes {
 	termcmdtype_dcs,		/* device-control-string */
 	termcmdtype_pf,			/* special function key (P,Q,R,S) */
 	termcmdtype_overlast
-} ;
+} ; /* end enum (termcmdtypes) */
 
 struct termcmd_flags {
 	uint		fpriv:1 ;	/* private CSI */
@@ -58,7 +58,7 @@ struct termcmd_head {
 	short		p[TERMCMD_NP] ;	/* parameters */
 	char		istr[TERMCMD_ISIZE+1] ;
 	char		dstr[TERMCMD_DSIZE+1] ;
-} ;
+} ; /* end struct (termcmd_head) */
 
 typedef	TERMCMD		termcmd ;
 typedef	TERMCMD_FL	termcmd_fl ;
