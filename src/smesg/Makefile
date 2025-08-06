@@ -292,48 +292,9 @@ maininfo.o:		maininfo.c maininfo.h kshlib.h
 
 kshlib.o:		kshlib.c kshlib.h sesmsg.h msgdata.h
 
-sesmsg.o:		sesmsg.c sesmsg.h
-
 msgdata.o:		msgdata.c msgdata.h
 
 
-getnodedomain.o:	getnodedomain.c
-
-getutmpent.o:		getutmpent.c getutmpent.h
-
-getutmpterm.o:		getutmpterm.c getutmpent.h
-
-
 shio.o:			shio.c shio.h
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-osetstr.o:		osetstr.c osetstr.h
-	$(GPP) -c $(CFLAGS) $(CPPFLAGS) osetstr.cc
-
-termout.o:		termout.cc termout.h ansigr.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) termout.cc
-
-sysrealname.o:		sysrealname.c sysrealname.h
-
-vecint.o:		vecint.c vecint.h
 
 

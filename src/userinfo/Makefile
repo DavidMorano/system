@@ -297,16 +297,10 @@ maininfo.o:		maininfo.c maininfo.h kshlib.h
 
 kshlib.o:		kshlib.c kshlib.h sesmsg.h msgdata.h
 
-sesmsg.o:		sesmsg.c sesmsg.h
-
 msgdata.o:		msgdata.c msgdata.h
 
 
 pwilookup.o:		pwilookup.c pwi.h
-
-getnodedomain.o:	getnodedomain.c
-
-getxusername.o:		getxusername.c getxusername.h
 
 getlogname.o:		getlogname.c
 
@@ -318,74 +312,9 @@ getpwlogname.o:		getpwlogname.c
 
 lastlogin.o:		lastlogin.c lastlogfile.h
 
-getax.o:		getax.c getax.h
-
 getpwentry.o:		getpwentry.c pwentry.h
-
-pwentry.o:		pwentry.c pwentry.h
 
 
 shio.o:			shio.c shio.h
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr.o:		vecstr.c vecstr.h
-
-vecstr_env.o:		vecstr_env.c vecstr.h
-
-vecstr_envfile.o:	vecstr_envfile.c vecstr.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c vecstr.h
-
-field.o:		field.c field.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-tmpx_getuserlines.o:	tmpx_getuserlines.c tmpx.h
-
-tmpx_getuserterms.o:	tmpx_getuserterms.c tmpx.h
-
-objfile.o:		objfile.c objfile.h
-
-storeitem.o:		storeitem.c storeitem.h
-
-gecos.o:		gecos.c gecos.h
-
-fsdir.o:		fsdir.c fsdir.h
-
-pwfile.o:		pwfile.c pwfile.h pwentry.h
-
-ids.o:			ids.c ids.h
-
-pwi.o:			pwi.c pwi.h ipasswd.h
-
-strtab.o:		strtab.c strtab.h
-
-sysgroup.o:		sysgroup.c sysgroup.h
-
-userattr.o:		userattr.c userattr.h
-
-sysusers.o:		sysusers.c sysusers.h
-
-sysgroups.o:		sysgroups.c sysgroups.h
-
-sysprojects.o:		sysprojects.c sysprojects.h
-
-sysproject.o:		sysproject.c sysproject.h
-
-groupent.o:		groupent.c groupent.h
-
-projectent.o:		projectent.c projectent.h
-
-
-ugetpw.o:		ugetpw.c ugetpw.h
-
-utmpacc.o:		utmpacc.c utmpacc.h
 
 

@@ -129,8 +129,8 @@ OBJ14= hostent.o timestr_nist.o
 OBJ15= procfileenv.o procfilepaths.o strfieldcmp.o
 OBJ16= bopensched.o bopenroot.o connection.o
 OBJ17= permsched.o
-OBJ18= pwfile.o srvtab.o acctab.o 
-OBJ19= field_srvarg.o
+OBJ18=
+OBJ19=
 OBJ20= starmat.o
 OBJ21= sockaddress.o
 OBJ22= getfname.o serialbuf.o chmods.o
@@ -229,10 +229,5 @@ badback.o:		badback.c $(INCS)
 timestr_nist.o:		timestr_nist.c nistinfo.h
 
 
-sockaddress.o:		sockaddress.c sockaddress.h
-
-muximsg.o:		muximsg.c muximsg.h
-
-pwfile.o:		pwfile.c pwfile.h
 
 

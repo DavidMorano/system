@@ -276,29 +276,6 @@ maininfo.o:		maininfo.c maininfo.h kshlib.h
 
 kshlib.o:		kshlib.c kshlib.h sesmsg.h msgdata.h
 
-sesmsg.o:		sesmsg.c sesmsg.h
-
 msgdata.o:		msgdata.c msgdata.h
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-cksum.o:		cksum.c cksum.h
 
 

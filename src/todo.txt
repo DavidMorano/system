@@ -4,7 +4,7 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
-cpuspeed
+xcpuspeed
 ufcntl		?? weirdo problem
 uctim
 libuc		fix to completely compile!

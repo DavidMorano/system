@@ -129,22 +129,22 @@ OBJ08=
 OBJ09= field_svcargs.o field_srvarg.o
 OBJ10= varsub_extras.o
 OBJ11= standing.o builtin.o sysmisc.o muximsg.o procse.o
-OBJ12= defproc.o clientinfo.o
+OBJ12= clientinfo.o
 OBJ13= 
-OBJ14= envs.o envs_procxe.o envs_subs.o
-OBJ15= lfm.o svcfile.o acctab.o
-OBJ16= jobdb.o svckey.o connection.o
-OBJ17= sysvar.o dirseen.o poller.o
+OBJ14=
+OBJ15=
+OBJ16= jobdb.o
+OBJ17=
 OBJ18=
-OBJ19= netgroupcheck.o getprogpath.o
-OBJ20= sfthing.o getfname.o securefile.o nlspeername.o 
-OBJ21= strdomain.o mkutmpid.o
-OBJ22= strnnlen.o strlinelen.o 
-OBJ23= listenuss.o listentcp.o listenpass.o
+OBJ19=
+OBJ20=
+OBJ21=
+OBJ22=
+OBJ23=
 OBJ24=
 OBJ25=
 OBJ26=
-OBJ27= mkbasename.o mkshlibname.o sfbaselib.o
+OBJ27=
 OBJ28=
 OBJ29=
 OBJ30=
@@ -327,16 +327,5 @@ standing.o:		standing.c standing.h $(INCS)
 builtin.o:		builtin.c builtin.h $(INCS)
 
 clientinfo.o:		clientinfo.c $(INCS)
-
-
-jobdb.o:		jobdb.c jobdb.h
-
-sysmisc.o:		sysmisc.c sysmisc.h
-
-muximsg.o:		muximsg.c muximsg.h
-
-procse.o:		procse.c procse.h
-
-svckey.o:		svckey.c svckey.h
 
 

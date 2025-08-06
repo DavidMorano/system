@@ -264,24 +264,3 @@ proginfo.o:		proginfo.c $(INCS)
 procfile.o:		procfile.c $(INCS)
 
 
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_addenv.o:	vecstr_addenv.c
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h
-
-kvstab.o:		kvstab.c kvstab.h
-
-

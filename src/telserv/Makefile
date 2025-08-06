@@ -129,26 +129,26 @@ OBJ05= progcmd.o progpass.o progprocess.o
 OBJ06= progconfig.o progpid.o progsvc.o progacc.o progipc.o
 OBJ07= printhelp.o
 OBJ08=
-OBJ09= field_svcargs.o
-OBJ10= varsub_extras.o
-OBJ11= defproc.o clientinfo.o 
+OBJ09=
+OBJ10=
+OBJ11= clientinfo.o 
 OBJ12= standing.o builtin.o sysmisc.o muximsg.o procse.o
 OBJ13= 
-OBJ14= envs.o envs_procxe.o envs_subs.o
-OBJ15= lfm.o svcfile.o acctab.o
-OBJ16= jobdb.o svckey.o connection.o
-OBJ17= sysvar.o dirseen.o poller.o
+OBJ14=
+OBJ15=
+OBJ16=
+OBJ17=
 OBJ18=
-OBJ19= netgroupcheck.o mkplogid.o mksublogid.o
-OBJ20= sfthing.o getfname.o securefile.o nlspeername.o getaflen.o
-OBJ21= strdomain.o mkutmpid.o pcsuserfile.o
-OBJ22= strnnlen.o strlinelen.o getaf.o
-OBJ23= getsystypenum.o
+OBJ19=
+OBJ20=
+OBJ21=
+OBJ22=
+OBJ23=
 
 OBJ24=
 OBJ25=
 OBJ26=
-OBJ27= mkbasename.o mkshlibname.o sfbaselib.o
+OBJ27=
 OBJ28= 
 OBJ29=
 OBJ30= 
@@ -156,14 +156,14 @@ OBJ31=
 
 #OBJ32= 
 #OBJ33=
-#OBJ34= sysvars.o var.o
-#OBJ35= sysvarproc.o
-#OBJ36= varmk.o 
+#OBJ34=
+#OBJ35=
+#OBJ36=
 #OBJ37=
 #OBJ38=
 #OBJ39=
 
-#OBJ40= vars.o varhdr.o
+#OBJ40=
 #OBJ41=
 #OBJ42=
 #OBJ43=
@@ -172,9 +172,9 @@ OBJ31=
 #OBJ46= 
 #OBJ47=
 
-OBJ48= getproviderid.o
+OBJ48=
 OBJ49=
-OBJ50= isBadSend.o isBadRecv.o isBadMsg.o
+OBJ50=
 OBJ50= 
 OBJ51= 
 OBJ52=
@@ -325,21 +325,5 @@ standing.o:		standing.c standing.h $(INCS)
 builtin.o:		builtin.c builtin.h $(INCS)
 
 clientinfo.o:		clientinfo.c $(INCS)
-
-
-jobdb.o:		jobdb.c jobdb.h
-
-sysmisc.o:		sysmisc.c sysmisc.h
-
-muximsg.o:		muximsg.c muximsg.h
-
-procse.o:		procse.c procse.h
-
-svckey.o:		svckey.c svckey.h
-
-
-getutmpent.o:		getutmpent.c getutmpent.h
-
-pcsuserfile.o:		pcsuserfile.c
 
 
