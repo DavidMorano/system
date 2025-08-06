@@ -36,7 +36,7 @@ struct strtab_chunk {
 	int		csz ;		/* allocated extent */
 	int		cl ;		/* amount used */
 	int		count ;		/* number of items */
-} ;
+} ; /* end struct (strtab_chunk) */
 
 struct strtab_head {
 	STRTAB_CH	*chp ;
@@ -47,7 +47,7 @@ struct strtab_head {
 	int		chsize ;
 	int		stsize ;	/* "string table" size */
 	int		count ;		/* total item count */
-} ; /* end struct (strtab) */
+} ; /* end struct (strtab_head) */
 
 typedef STRTAB		strtab ;
 typedef STRTAB_CH	strtab_ch ;

@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* string-operations */
+/* string-read-operations */
 /* version %I% last-modified %G% */
 
 
@@ -22,7 +22,8 @@
 
 	Description:
 	This object allows for some specialized manipulations on a
-	counted-string object.
+	counted-string object.  The given string is supplied by the
+	caller and is read-only.
 
 *******************************************************************************/
 

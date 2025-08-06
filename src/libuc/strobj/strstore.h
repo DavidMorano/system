@@ -41,14 +41,14 @@
 
 struct strstore_cursor {
 	int		i ;
-} ;
+} ; /* end struct (strstore_cursor) */
 
 struct strstore_chunk {
 	char		*cdata ;
 	int		csz ;		/* allocated buffer length */
 	int		i ;		/* index length */
 	int		c ;		/* item count within chunk */
-} ;
+} ; /* end struct (strstore_chunk) */
 
 struct strstore_head {
 	STRSTORE_CH	*csp ;		/* current chunk pointer */
@@ -60,7 +60,7 @@ struct strstore_head {
 	int		chsize ;
 	int		totalsize ;
 	int		c ;		/* total count */
-} ;
+} ; /* end struct (strstore_head) */
 
 typedef STRSTORE	strstore ;
 typedef STRSTORE_CH	strstore_ch ;

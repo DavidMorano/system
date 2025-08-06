@@ -25,7 +25,7 @@
 	the standard-input for a BFILE file-open operation.
 
 	Synopsis:
-	cchar *bfilestfname(cchar *atf) noex
+	cchar *strstdfname(cchar *atf) noex
 
 	Arguments:
 	atf	file-name to check to see if a BFILE standard-input wanted
@@ -65,8 +65,8 @@
 
 /* exported subroutines */
 
-cchar *bfilestfname(int w,cchar *atf) noex {
-	if ((w >= 0) && (w < stdfile_overlast)) {
+cchar *strstdfname(int w,cchar *atf) noex {
+	if ((w >= 0) && (w < stdfile_overlast)) ylikely {
             if ((atf == nullptr) || (atf[0] == '\0') || (atf[0] == '-')) {
                 atf = stdfnames[w] ;
 	    }
