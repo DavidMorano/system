@@ -41,7 +41,7 @@
 #include	<termios.h>
 #include	<unistd.h>
 #include	<poll.h>
-#include	<ctime>
+#include	<ctime>			/* |time_t| */
 #include	<climits>		/* |CHAR_UMAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -134,8 +134,7 @@ static inline int uterm_magic(uterm *op,Args ... args) noex {
 	    rs = (op->magic == UTERM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (uterm_magic) */
+} /* end subroutine (uterm_magic) */
 
 static int	uterm_loadterms(uterm *,cchar *) noex ;
 static int	uterm_attrbegin(uterm *) noex ;
@@ -187,20 +186,20 @@ constexpr bool		f_subunix = CF_SUBUNIX ;
 
 int uterm_start(uterm *op,int fd) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_INVALID ;
 	    if (fd >= 0) {
 	        op->ti_start = getustime ;
 	        op->fd = fd ;
 	        op->uid = -1 ;
 	        if ((rs = uc_tcgetpgrp(fd)) == SR_NOTTY) {
-	            op->f.noctty = true ;
+	            op->fl.noctty = true ;
 	            rs = SR_OK ;
 	        }
-	        if (rs >= 0) {
-		    if ((rs = uterm_loadterms(op,uterms)) >= 0) {
-	                if ((rs = uterm_attrbegin(op)) >= 0) {
-		            if ((rs = uterm_qbegin(op)) >= 0) {
+	        if (rs >= 0) ylikely {
+		    if ((rs = uterm_loadterms(op,uterms)) >= 0) ylikely {
+	                if ((rs = uterm_attrbegin(op)) >= 0) ylikely {
+		            if ((rs = uterm_qbegin(op)) >= 0) ylikely {
 		                op->magic = UTERM_MAGIC ;
 		            }
 	 	            if (rs < 0) {
@@ -218,7 +217,7 @@ int uterm_start(uterm *op,int fd) noex {
 int uterm_finish(uterm *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = uterm_magic(op)) >= 0) {
+	if ((rs = uterm_magic(op)) >= 0) ylikely {
 	    {
 		rs1 = uterm_qend(op) ;
 		if (rs >= 0) rs = rs1 ;
@@ -245,9 +244,9 @@ int uterm_resume(uterm *op) noex {
 
 int uterm_restore(uterm *op) noex {
 	int		rs ;
-	if ((rs = uterm_magic(op)) >= 0) {
+	if ((rs = uterm_magic(op)) >= 0) ylikely {
 	    TERMIOS	*attrp = &op->ts_old ;
-	    if ((rs = uc_tcattrset(op->fd,TCSADRAIN,attrp)) >= 0) {
+	    if ((rs = uc_tcattrset(op->fd,TCSADRAIN,attrp)) >= 0) ylikely {
 	        rs = op->fd ;
 	    }
 	} /* end if (magic) */
@@ -257,7 +256,7 @@ int uterm_restore(uterm *op) noex {
 
 int uterm_ensure(uterm *op) noex {
 	int		rs ;
-	if ((rs = uterm_magic(op)) >= 0) {
+	if ((rs = uterm_magic(op)) >= 0) ylikely {
 	    TERMIOS	*attrp = &op->ts_new ;
 	    cint	cmd = TCSADRAIN ;
 	    rs = uc_tcattrset(op->fd,cmd,attrp) ;
@@ -269,7 +268,7 @@ int uterm_ensure(uterm *op) noex {
 int uterm_control(uterm *op,int cmd,...) noex {
 	va_list		ap ;
 	int		rs ;
-	if ((rs = uterm_magic(op)) >= 0) {
+	if ((rs = uterm_magic(op)) >= 0) ylikely {
 	    cint	fc = (cmd & FM_CMDMASK) ;
 	    int		iw, *iwp ;
 	    va_begin(ap,cmd) ;
@@ -334,7 +333,7 @@ int uterm_control(uterm *op,int cmd,...) noex {
 	    case utermcmd_setpgrp:
 		{
 		    SIGIGN	si ;
-		    if ((rs = sigign_start(&si,sigouts)) >= 0) {
+		    if ((rs = sigign_start(&si,sigouts)) >= 0) ylikely {
 		        const pid_t	pgrp = (pid_t) va_arg(ap,pid_t) ;
 	                rs = uc_tcsetpgrp(op->fd,pgrp) ;
 		        sigign_finish(&si) ;
@@ -361,9 +360,9 @@ int uterm_control(uterm *op,int cmd,...) noex {
 /* end subroutine (uterm_control) */
 
 int uterm_status(uterm *op,int cmd,...) noex {
+	va_list		ap ;
 	int		rs ;
-	if ((rs = uterm_magic(op)) >= 0) {
-	    va_list	ap ;
+	if ((rs = uterm_magic(op)) >= 0) ylikely {
 	    va_begin(ap,cmd) ;
 	    switch (cmd) {
 	    case utermcmd_noop:
@@ -409,7 +408,7 @@ int uterm_reade(uterm *op,char *rbuf,int rlen,int timeout,int fc,
 		uterm_pr *lpp,uterm_ld *llp) noex {
 	int		rs ;
 	int		count = 0 ;
-	if ((rs = uterm_magic(op,rbuf)) >= 0) {
+	if ((rs = uterm_magic(op,rbuf)) >= 0) ylikely {
 	int		ch = -1 ;
 	cchar		*terms = op->rterms ;
 	char		qbuf[2] ;
@@ -417,9 +416,9 @@ int uterm_reade(uterm *op,char *rbuf,int rlen,int timeout,int fc,
 	if (fc & fm_rawin) fc |= fm_nofilter ;
 	if (fc & fm_noecho) fc |= fm_notecho ;
 
-	op->f.cntl_c = false ;
-	op->f.cntl_o = false ;		/* cancel ^O effect */
-	op->f.read = true ;		/* read is in progress */
+	op->fl.cntl_c = false ;
+	op->fl.cntl_o = false ;		/* cancel ^O effect */
+	op->fl.read = true ;		/* read is in progress */
 
 /* top of further access */
 /* top */
@@ -450,7 +449,7 @@ int uterm_reade(uterm *op,char *rbuf,int rlen,int timeout,int fc,
 
 	    if ((timeout >= 0) && (op->timeout <= 0)) break ;
 
-	    if (op->f.cntl_c) break ;
+	    if (op->fl.cntl_c) break ;
 
 	    ch = mkchar(qbuf[0]) ;
 	    rbuf[count] = charconv(ch) ;
@@ -542,7 +541,7 @@ int uterm_reade(uterm *op,char *rbuf,int rlen,int timeout,int fc,
 	    count += 1 ;
 	} /* end if (terminator processing) */
 
-	op->f.read = false ;
+	op->fl.read = false ;
 	} /* end if (magic) */
 	return (rs >= 0) ? count : rs ;
 }
@@ -557,7 +556,7 @@ int uterm_write(uterm *op,cchar *wbuf,int wlen) noex {
 	int		rs ;
 	int		tlen = 0 ;
 	if ((rs = uterm_magic(op)) >= 0) {
-	    if (! op->f.cntl_o) {
+	    if (! op->fl.cntl_o) ylikely {
 	        if (wlen < 0) wlen = lenstr(wbuf) ;
 	        if (op->mode & fm_rawout) {
 	            rs = u_write(op->fd,wbuf,wlen) ;
@@ -575,7 +574,7 @@ int uterm_write(uterm *op,cchar *wbuf,int wlen) noex {
 int uterm_cancel(uterm *op,int fc,int cparam) noex {
 	int		rs ;
 	(void) fc ;
-	if ((rs = uterm_magic(op)) >= 0) {
+	if ((rs = uterm_magic(op)) >= 0) ylikely {
 	    rs = cparam ;
 	} /* end if (magic) */
 	return rs ;
@@ -584,9 +583,9 @@ int uterm_cancel(uterm *op,int fc,int cparam) noex {
 
 int uterm_poll(uterm *op) noex {
 	int		rs ;
-	if ((rs = uterm_magic(op)) >= 0) {
-	    if ((rs = tty_wait(op,0)) >= 0) {
-	        if (op->f.cntl_c) rs = SR_CANCELED ;
+	if ((rs = uterm_magic(op)) >= 0) ylikely {
+	    if ((rs = tty_wait(op,0)) >= 0) ylikely {
+	        if (op->fl.cntl_c) rs = SR_CANCELED ;
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -595,9 +594,8 @@ int uterm_poll(uterm *op) noex {
 
 int uterm_getmesg(uterm *op) noex {
 	int		rs ;
-	if ((rs = uterm_magic(op)) >= 0) {
-	    USTAT	sb ;
-	    if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	if ((rs = uterm_magic(op)) >= 0) ylikely {
+	    if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 	        rs = bool(sb.st_mode & S_IWGRP) ;
 	    }
 	} /* end if (magic) */
@@ -607,9 +605,8 @@ int uterm_getmesg(uterm *op) noex {
 
 int uterm_getbiff(uterm *op) noex {
 	int		rs ;
-	if ((rs = uterm_magic(op)) >= 0) {
-	    USTAT	sb ;
-	    if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	if ((rs = uterm_magic(op)) >= 0) ylikely {
+	    if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 	        rs = bool(sb.st_mode & S_IXUSR) ;
 	    }
 	} /* end if (magic) */
@@ -619,14 +616,13 @@ int uterm_getbiff(uterm *op) noex {
 
 int uterm_getpop(uterm *op) noex {
 	int		rs ;
-	if ((rs = uterm_magic(op)) >= 0) {
-	    USTAT	sb ;
-	    if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-	        int		v = 0 ;
+	if ((rs = uterm_magic(op)) >= 0) ylikely {
+	    if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) ylikely {
+	        int	v = 0 ;
 	        if (sb.st_mode & S_IXUSR) v |= 0x01 ;
 	        if (sb.st_mode & S_IWGRP) v |= 0x02 ;
 	        rs = v ;
-	    }
+	    } /* end if (u_fstat) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -635,9 +631,8 @@ int uterm_getpop(uterm *op) noex {
 int uterm_setpop(uterm *op,int v) noex {
 	int		rs ;
 	int		rv = 0 ;
-	if ((rs = uterm_magic(op)) >= 0) {
-	    USTAT	sb ;
-	    if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	if ((rs = uterm_magic(op)) >= 0) ylikely {
+	    if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) ylikely {
 	        mode_t	fm = sb.st_mode ;
 	        if (sb.st_mode & S_IXUSR) rv |= 0x01 ;
 	        if (sb.st_mode & S_IWGRP) rv |= 0x02 ;
@@ -659,7 +654,7 @@ int uterm_setpop(uterm *op,int v) noex {
 
 static int uterm_loadterms(uterm *op,cchar *ut) noex {
 	int		rs = SR_FAULT ;
-	if (ut) {
+	if (ut) ylikely {
 	    rs = SR_OK ;
 	    memcpy(op->rterms,ut,fieldterm_tabsize) ;
 	}
@@ -755,7 +750,7 @@ static int uterm_qend(uterm *op) noex {
 static int uterm_controlmode(uterm *op) noex {
 	cint		m = op->mode ;
 	int		rs = SR_OK ;
-	op->f.nosig = ((m & fm_nosig) != 0) ;
+	op->fl.nosig = ((m & fm_nosig) != 0) ;
 	return rs ;
 }
 /* end subroutine (uterm_controlmode) */
@@ -815,8 +810,8 @@ static int tty_wps(uterm *op,cchar *ubuf,int ulen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ulen < 0) ulen = lenstr(ubuf) ;
-	if (ulen > 0) {
-	    if (int ci ; (ci = sinotprint(ubuf,ulen)) >= 0) {
+	if (ulen > 0) ylikely {
+	    if (int ci ; (ci = sinotprint(ubuf,ulen)) >= 0) ylikely {
 	        if (buffer pb ; (rs = buffer_start(&pb,ulen)) >= 0) {
 	            int		bl = ulen ;
 	            cchar	*bp = ubuf ;
@@ -982,63 +977,63 @@ static int tty_risr(uterm *op,cchar *sp,int sl) noex {
 	int		f_dle = false ;
 	for (int i = 0 ; i < sl ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
-	    if (op->f.nosig) {
+	    if (op->fl.nosig) {
 	        rs = charq_ins(&op->taq,ch) ;
-	        op->f.rw = true ;
+	        op->fl.rw = true ;
 	    } else {
 	        switch (ch) {
 	        case CH_XOFF:
-	            op->f.suspend = true ;
+	            op->fl.suspend = true ;
 	            break ;
 	        case CH_XON:
-	            op->f.suspend = false ;
+	            op->fl.suspend = false ;
 	            break ;
 	        case CH_SO:
-	            if (op->f.cntl_o) {
-	                op->f.cntl_o = false ;
+	            if (op->fl.cntl_o) {
+	                op->fl.cntl_o = false ;
 	            } else {
-	                op->f.cntl_o = true ;
-		    	if (! op->f.nosigecho) {
+	                op->fl.cntl_o = true ;
+		    	if (! op->fl.nosigecho) {
 	                    rs = tty_echo(op," ^O\r\n",5) ;
 			}
 	            }
 	            break ;
 	        case CH_ETX:
-		    if (! op->f.nosigecho) {
+		    if (! op->fl.nosigecho) {
 	                rs = tty_echo(op," ^C\r\n",5) ;
 		    }
-	            op->f.cntl_c = true ;
-	            op->f.rw = true ;
+	            op->fl.cntl_c = true ;
+	            op->fl.rw = true ;
 	            break ;
 	        case CH_EM:
-		    if (! op->f.nosigecho) {
+		    if (! op->fl.nosigecho) {
 	                rs = tty_echo(op," ^Y\r\n",5) ;
 		    }
-	            op->f.cntl_c = true ;
-	            op->f.rw = true ;
+	            op->fl.cntl_c = true ;
+	            op->fl.rw = true ;
 	            break ;
 	        case CH_DLE:
 	            f_dle = true ;
 	            break ;
 /* Control-Z (substitute) */
 	        case CH_SUB:
-		    if (op->f.noctty) {
-		        op->f.cntl_z = true ;
+		    if (op->fl.noctty) {
+		        op->fl.cntl_z = true ;
 		    } else {
 			if_constexpr (f_subunix) {
 		            rs = uc_raise(SIGTSTP) ;
 			} else {
-		            op->f.cntl_z = true ;
+		            op->fl.cntl_z = true ;
 			} /* end if_constexpr (f_subunix) */
 		    } /* end if */
 	            break ;
 	        default:
-	            if ((! op->f.read) && (ch == CH_CAN))  {
+	            if ((! op->fl.read) && (ch == CH_CAN))  {
 	                char	dch ;
 	                while (charq_rem(&op->taq,&dch) >= 0) ;
 	            } else {
 	                rs = charq_ins(&op->taq,ch) ;
-	                op->f.rw = true ;
+	                op->fl.rw = true ;
 	            }
 	            break ;
 	        } /* end switch */

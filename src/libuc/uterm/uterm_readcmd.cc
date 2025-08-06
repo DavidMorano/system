@@ -43,17 +43,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<ascii.h>
-#include	<cfdec.h>
-#include	<sbuf.h>
+#include	<ascii.h>		/* |CH_{xx}| */
 #include	<ndigit.h>
+#include	<cfdec.h>
 #include	<ischarx.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<localmisc.h>		/* |DIGBUFLEN| + |UC()| */
 
 #include	"uterm.h"
 #include	"termcmd.h"
@@ -61,10 +58,6 @@
 import libutil ;
 
 /* local defines */
-
-#ifndef	UC
-#define	UC(ch)		((uchar)(ch))
-#endif
 
 #define	TR_OPTS		(FM_NOFILTER | FM_NOECHO | FM_RAWIN | FM_TIMED)
 
@@ -94,27 +87,27 @@ struct sub {
 	int		rlen ;		/* read-length */
 	int		maxdig ;	/* maximum digits in TERMCMD_MAXPVAL */
 	uint		f_error:1 ;
-} ;
+} ; /* end struct (sub) */
 
 
 /* forward subroutines */
 
-static int sub_start(sub *,uterm *,termcmd *,int,int) noex ;
-static int sub_readch(sub *) noex ;
-static int sub_procesc(sub *) noex ;
-static int sub_procCSI(sub *) noex ;
-static int sub_proc_dcs(sub *) noex ;
-static int sub_proc_pf(sub *) noex ;
-static int sub_proc_reg(sub *,int) noex ;
-static int sub_procescmore(sub *,int) noex ;
-static int sub_loadparam(sub *,cchar *,int) noex ;
-static int sub_finish(sub *) noex ;
+local int sub_start(sub *,uterm *,termcmd *,int,int) noex ;
+local int sub_readch(sub *) noex ;
+local int sub_procesc(sub *) noex ;
+local int sub_procCSI(sub *) noex ;
+local int sub_proc_dcs(sub *) noex ;
+local int sub_proc_pf(sub *) noex ;
+local int sub_proc_reg(sub *,int) noex ;
+local int sub_procescmore(sub *,int) noex ;
+local int sub_loadparam(sub *,cchar *,int) noex ;
+local int sub_finish(sub *) noex ;
 
-static bool isinter(int) noex ;
-static bool isfinalesc(int) noex ;
-static bool isfinalcsi(int) noex ;
-static bool isparam(int) noex ;
-static bool iscancel(int) noex ;
+local bool isinter(int) noex ;
+local bool isfinalesc(int) noex ;
+local bool isfinalcsi(int) noex ;
+local bool isparam(int) noex ;
+local bool iscancel(int) noex ;
 
 
 /* local variables */
@@ -129,6 +122,8 @@ termcmdtype_overlast
 #endif /* COMMENT */
 
 constexpr const uchar	cans[] = "\030\032\033" ;
+
+static cint		maxdig = ndigit(TERMCMD_MAXPVAL,10) ;
 
 constexpr bool		f_comment = false ;
 
@@ -159,8 +154,7 @@ int uterm_readcmd(uterm *utp,termcmd *ckp,int to,int ich) noex {
 	            rs = 0 ;
 	            while (rs == 0) {
 	                if ((rs = sub_readch(&si)) >= 0) {
-	                    cint	ch = rs ;
-	                    switch (ch) {
+	                    switch (cint ch = rs ; ch) {
 	                    case CH_ESC:
 	                        rs = sub_procesc(&si) ;
 	                        break ;
@@ -192,11 +186,11 @@ int uterm_readcmd(uterm *utp,termcmd *ckp,int to,int ich) noex {
 
 /* local subroutines */
 
-static int sub_start(sub *sip,uterm *utp,termcmd *ckp,int to,int ich) noex {
+local int sub_start(sub *sip,uterm *utp,termcmd *ckp,int to,int ich) noex {
 	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = memclear(sip) ;
-	    sip->maxdig = ndigit(TERMCMD_MAXPVAL,10) ;
+	    sip->maxdig = maxdig ;
 	    sip->ckp = ckp ;
 	    sip->utp = utp ;
 	    sip->to = to ;
@@ -206,16 +200,16 @@ static int sub_start(sub *sip,uterm *utp,termcmd *ckp,int to,int ich) noex {
 }
 /* end subroutine (sub_start) */
 
-static int sub_finish(sub *sip) noex {
+local int sub_finish(sub *sip) noex {
 	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
 }
 /* end subroutine (sub_finish) */
 
-static int sub_readch(sub *sip) noex {
+local int sub_readch(sub *sip) noex {
 	int		rs = SR_OK ;
 	int		rch = 0 ;
 	if (sip->ich != 0) {
@@ -234,15 +228,14 @@ static int sub_readch(sub *sip) noex {
 }
 /* end subroutine (sub_readch) */
 
-static int sub_procesc(sub *sip) noex {
+local int sub_procesc(sub *sip) noex {
 	termcmd		*ckp = sip->ckp ;
 	int		rs ;
 	{
 	    ckp->name = termcmdtype_esc ;
 	}
-	if ((rs = sub_readch(sip)) >= 0) {
-	    cint	ch = rs ;
-	    switch (ch) {
+	if ((rs = sub_readch(sip)) >= 0) ylikely {
+	    switch (cint ch = rs ; ch) {
 	    case '[':
 	        rs = sub_procCSI(sip) ;
 	        break ;
@@ -267,7 +260,7 @@ static int sub_procesc(sub *sip) noex {
 }
 /* end subroutine (sub_procesc) */
 
-static int sub_procescmore(sub *sip,int ch) noex {
+local int sub_procescmore(sub *sip,int ch) noex {
 	termcmd		*ckp = sip->ckp ;
 	cint		ilen = TERMCMD_ISIZE ;
 	int		rs = SR_OK ;
@@ -280,14 +273,14 @@ static int sub_procescmore(sub *sip,int ch) noex {
 	    if (sip->ii < ilen) {
 	        ckp->istr[sip->ii++] = charconv(ch) ;
 	    } else {
-	        ckp->f.iover = true ;
+	        ckp->fl.iover = true ;
 	    }
 	    rs = sub_readch(sip) ;
 	    if (rs < 0) break ;
 	    ch = rs ;
 	} /* end while */
 	ckp->istr[sip->ii] = 0 ;
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    if (isfinalesc(ch)) {
 	        ckp->name = charconv(ch) ;
 	        rs = 1 ;		/* signal DONE */
@@ -309,7 +302,7 @@ static int sub_procescmore(sub *sip,int ch) noex {
 }
 /* end subroutine (sub_procescmore) */
 
-static int sub_procCSI(sub *sip) noex {
+local int sub_procCSI(sub *sip) noex {
 	termcmd		*ckp = sip->ckp ;
 	int		rs ;
 	{
@@ -317,7 +310,7 @@ static int sub_procCSI(sub *sip) noex {
 	    ckp->istr[0] = '\0' ;
 	    ckp->dstr[0] = '\0' ;
 	}
-	if ((rs = sub_readch(sip)) >= 0) {
+	if ((rs = sub_readch(sip)) >= 0) ylikely {
 	    cint	ilen = TERMCMD_ISIZE ;
 	    cint	dlen = DIGBUFLEN ;
 	    int		dl = 0 ;
@@ -327,7 +320,7 @@ static int sub_procCSI(sub *sip) noex {
 	    bool	f_leadingzero = true ;
 	    char	dbuf[DIGBUFLEN+1] = { 0 } ;
 	    if (ch == '?') {
-	        ckp->f.fpriv = true ;
+	        ckp->fl.fpriv = true ;
 	        rs = sub_readch(sip) ;
 	        ch = rs ;
 	    }
@@ -364,13 +357,13 @@ static int sub_procCSI(sub *sip) noex {
 	        if (sip->ii < ilen) {
 	            ckp->istr[sip->ii++] = charconv(ch) ;
 	        } else {
-	            ckp->f.iover = true ;
+	            ckp->fl.iover = true ;
 	        }
 	        rs = sub_readch(sip) ;
 	        if (rs < 0) break ;
 	        ch = rs ;
 	    } /* end while */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        if (isfinalcsi(ch)) {
 	            ckp->name = charconv(ch) ;
 	            rs = 1 ;		/* signal DONE */
@@ -400,13 +393,13 @@ static int sub_procCSI(sub *sip) noex {
 }
 /* end subroutine (sub_procCSI) */
 
-static int sub_proc_dcs(sub *sip) noex {
+local int sub_proc_dcs(sub *sip) noex {
 	termcmd		*ckp = sip->ckp ;
 	int		rs ;
 	ckp->type = termcmdtype_dcs ;
 	ckp->istr[0] = '\0' ;
 	ckp->dstr[0] = '\0' ;
-	if ((rs = sub_readch(sip)) >= 0) {
+	if ((rs = sub_readch(sip)) >= 0) ylikely {
 	    cint	ilen = TERMCMD_ISIZE ;
 	    cint	dlen = DIGBUFLEN ;
 	    int		dl = 0 ;
@@ -416,7 +409,7 @@ static int sub_proc_dcs(sub *sip) noex {
 	    bool	f_leadingzero = true ;
 	    char	dbuf[DIGBUFLEN+1] = { 0 } ;
 	    if (ch == '?') {
-	        ckp->f.fpriv = true ;
+	        ckp->fl.fpriv = true ;
 	        rs = sub_readch(sip) ;
 	        ch = rs ;
 	    }
@@ -453,13 +446,13 @@ static int sub_proc_dcs(sub *sip) noex {
 	        if (sip->ii < ilen) {
 	            ckp->istr[sip->ii++] = charconv(ch) ;
 	        } else {
-	            ckp->f.iover = true ;
+	            ckp->fl.iover = true ;
 	        }
 	        rs = sub_readch(sip) ;
 	        if (rs < 0) break ;
 	        ch = rs ;
 	    } /* end while */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        if (isfinalcsi(ch)) {
 	            ckp->name = charconv(ch) ;	/* no error */
 	            rs = 1 ;		/* signal OK */
@@ -500,7 +493,7 @@ static int sub_proc_dcs(sub *sip) noex {
 	                if (sip->di < dsz) {
 	                    ckp->dstr[sip->di++] = charconv(ch) ;
 	                } else {
-	                    ckp->f.dover = true ;
+	                    ckp->fl.dover = true ;
 	                }
 	            } else {
 	                f_seenesc = true ;
@@ -519,7 +512,7 @@ static int sub_proc_dcs(sub *sip) noex {
 }
 /* end subroutine (sub_proc_dcs) */
 
-static int sub_proc_pf(sub *sip) noex {
+local int sub_proc_pf(sub *sip) noex {
 	termcmd		*ckp = sip->ckp ;
 	int		rs ;
 	{
@@ -527,7 +520,7 @@ static int sub_proc_pf(sub *sip) noex {
 	    ckp->istr[0] = '\0' ;
 	    ckp->dstr[0] = '\0' ;
 	}
-	if ((rs = sub_readch(sip)) >= 0) {
+	if ((rs = sub_readch(sip)) >= 0) ylikely {
 	    cint	ch = rs ;
 	    if (isfinalcsi(ch)) {
 	        ckp->name = charconv(ch) ;
@@ -550,7 +543,7 @@ static int sub_proc_pf(sub *sip) noex {
 }
 /* end subroutine (sub_proc_pf) */
 
-static int sub_proc_reg(sub *sip,int ich) noex {
+local int sub_proc_reg(sub *sip,int ich) noex {
 	termcmd		*ckp = sip->ckp ;
 	int		rs = 1 ;		/* signal DONE */
 	{
@@ -561,7 +554,7 @@ static int sub_proc_reg(sub *sip,int ich) noex {
 }
 /* end subroutine (sub_proc_reg) */
 
-static int sub_loadparam(sub *sip,cchar *dbuf,int dl) noex {
+local int sub_loadparam(sub *sip,cchar *dbuf,int dl) noex {
 	termcmd		*ckp = sip->ckp ;
 	cint		nparams = TERMCMD_NP ;
 	int		rs = SR_OK ;
@@ -590,27 +583,27 @@ static int sub_loadparam(sub *sip,cchar *dbuf,int dl) noex {
 }
 /* end subroutine (sub_loadparam) */
 
-static bool isinter(int ch) noex {
+local bool isinter(int ch) noex {
 	return ((ch >= 0x20) && (ch <= 0x2F)) ;
 }
 /* end subroutines (isinter) */
 
-static bool isfinalesc(int ch) noex {
+local bool isfinalesc(int ch) noex {
 	return ((ch >= 0x30) && (ch <= 0x7E)) ;
 }
 /* end subroutines (isfinalesc) */
 
-static bool isfinalcsi(int ch) noex {
+local bool isfinalcsi(int ch) noex {
 	return ((ch >= 0x40) && (ch <= 0x7E)) ;
 }
 /* end subroutines (isfinalcsi) */
 
-static bool isparam(int ch) noex {
+local bool isparam(int ch) noex {
 	return ((ch >= 0x30) && (ch <= 0x3F)) ;
 }
 /* end subroutines (isparam) */
 
-static bool iscancel(int ch) noex {
+local bool iscancel(int ch) noex {
 	bool		f = false ;
 	for (int i = 0 ; cans[i] ; i += 1) {
 	    f = (ch == cans[i]) ;

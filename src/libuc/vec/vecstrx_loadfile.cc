@@ -60,7 +60,7 @@
 #include	<sys/stat.h>		/* |uc_fstat(3uc)| */
 #include	<unistd.h>
 #include	<fcntl.h>		/* |uc_open(3uc)| */
-#include	<climits>		/* <- |INT_MAX| */
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
@@ -223,9 +223,8 @@ static int vecstrx_loadline(vecstrx *vsp,int fu,cchar *lbuf,int len) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (field fsb ; (rs = fsb.start(lbuf,len)) >= 0) {
-	    int		fl ;
 	    cchar	*fp ;
-	    while ((fl = fsb.get(fterms,&fp)) >= 0) {
+	    for (int fl ; (fl = fsb.get(fterms,&fp)) >= 0 ; ) {
 		if (fl > 0) {
 		    if (fu) {
 			rs = vsp->adduniq(fp,fl) ;
@@ -237,7 +236,7 @@ static int vecstrx_loadline(vecstrx *vsp,int fu,cchar *lbuf,int len) noex {
 		} /* end if (got one) */
 		if (fsb.term == '#') break ;
 		if (rs < 0) break ;
-	    } /* end while (fields) */
+	    } /* end for (fields) */
 	    rs1 = fsb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (fields) */

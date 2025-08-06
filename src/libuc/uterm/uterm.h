@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types |uid_t| */
+#include	<time.h>		/* |time_t| */
 #include	<termios.h>
 #include	<limits.h>
 #include	<clanguage.h>
@@ -92,7 +93,7 @@ struct uterm_head {
 	charq		ecq ;
 	time_t		ti_start ;
 	uid_t		uid ;
-	UTERM_FL	f ;
+	UTERM_FL	fl ;
 	uint		magic ;
 	int		fd ;
 	int		loopcount ;
@@ -101,7 +102,7 @@ struct uterm_head {
 	int		ch_read, ch_write ;
 	int		status ;
 	char		rterms[32] ;
-} ;
+} ; /* end struct (uterm_head) */
 
 typedef UTERM		uterm ;
 typedef	UTERM_LD	uterm_ld ;
