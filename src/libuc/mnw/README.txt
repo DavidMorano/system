@@ -1,4 +1,4 @@
 MNW
 
-These are (very special) string or buffer copy functions.
+These are (very special) memory-oriented string or buffer copy functions.
 
