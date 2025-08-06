@@ -58,7 +58,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
+#include	<sys/stat.h>		/* |S_IF{xx}| */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */

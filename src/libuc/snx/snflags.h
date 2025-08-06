@@ -75,6 +75,7 @@ struct snflags : snflags_head {
 	    count(this,snflagsmem_count) ;
 	    len(this,snflagsmem_len) ;
 	    finish(this,snflagsmem_finish) ;
+	    bp = nullptr ;
 	} ;
 	snflags(const snflags &) = delete ;
 	snflags &operator = (const snflags &) = delete ;
@@ -82,8 +83,8 @@ struct snflags : snflags_head {
 	int addstr(cchar *) noex ;
 	int addstrw(cchar *,int = -1) noex ;
 	void dtor() noex ;
-	~snflags() {
-	    dtor() ;
+	destruct snflags() {
+	    if (bp) dtor() ;
 	} ;
 } ; /* end struct (snflags) */
 #else	/* __cplusplus */

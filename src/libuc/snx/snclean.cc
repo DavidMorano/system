@@ -91,6 +91,8 @@ static inline bool	ischarok(int) noex ;
 
 /* local variables */
 
+cint		ch_sub = mkchar('¿') ;
+
 
 /* exported variables */
 
@@ -98,7 +100,6 @@ static inline bool	ischarok(int) noex ;
 /* exported subroutines */
 
 int snclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
-    	cint		chs = mkchar('¿') ;
 	int		rs = SR_FAULT ;
 	int		dl = 0 ; /* return-value */
 	if (dbuf && sp) ylikely {
@@ -109,7 +110,7 @@ int snclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	            if (cint ch = mkchar(*sp) ; ischarok(ch)) {
 		        dbuf[dl++] = char(ch) ;
 		    } else {
-		        dbuf[dl++] = char(chs) ;
+		        dbuf[dl++] = char(ch_sub) ;
 		    }
 		    sp += 1 ;
 		    sl -= 1 ;

@@ -131,7 +131,7 @@ int sibasesub(cchar *sp,int sl,cchar *ss) noex {
     	int		si = -1 ;
 	if (sp && ss) ylikely {
 	    if (sl >= 0) {
-	        if_constexpr (syshas.strnstr) {
+	        if (syshas.strnstr) {
 	            csize	slsize = size_t(sl) ;
 	            if (cc *tp ; (tp = strnstr(sp,ss,slsize)) != nullptr) {
 		        si = intconv(tp - sp) ;
