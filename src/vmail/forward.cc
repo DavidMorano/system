@@ -84,7 +84,7 @@ int	mn, f_edit ;
 	if ((fout = fopen(filename,"w")) == NULL)
 		return BAD ;
 
-/*jm*/	chmod(filename, 0660) ;		/* don't let the rest of */
+/*jm*/	chmod(filename, 0660) ;		/* do not let the rest of */
 /* the world read the forwarded mail!!   */
 
 /*jm*/	chown(filename,getuid(), pip->gid_mail) ;

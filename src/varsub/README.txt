@@ -16,7 +16,7 @@ Argumuments:
 			<n> is type
 -o <options>		options include:
 				badnokey[=<v>]	exit on a bad key
-				blanks[=<v>]	don't allow blank substututions
+				blanks[=<v>]	do not allow blank substututions
 -z			substitute nothing for non-existent keys
 -db <map>		map DB file 
 -s <var>=<value>	substitute the variable for its value (repeatable)

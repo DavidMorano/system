@@ -1144,7 +1144,7 @@ gotpty:
 	 * 	-h : pass on name of host.
 	 *		WARNING:  -h is accepted by login if and only if
 	 *			getuid() == 0.
-	 * 	-p : don't clobber the environment (so terminal type stays set).
+	 * 	-p : do not clobber the environment (so terminal type stays set).
 	 */
 
 /* System V login expects a UTMP entry to already be there */
@@ -2088,7 +2088,7 @@ dooption(option)
 
 	case TELOPT_LOGOUT:
 		/*
-		 * Options don't get much easier.  Acknowledge the option,
+		 * Options do not get much easier.  Acknowledge the option,
 		 * and then clean up and exit.
 		 */
 		nfrontp += sprintf(nfrontp, (char *)will, option);
@@ -2691,7 +2691,7 @@ rmut()
 	char	*cp ;
 
 
-	/* while cleaning up don't allow disruption */
+	/* while cleaning up do not allow disruption */
 	signal(SIGCHLD, SIG_IGN);
 
 	setutxent();
@@ -2894,7 +2894,7 @@ drainstream(size)
 }
 
 /*
- * TPI style replacement for socket send() primitive, so we don't require
+ * TPI style replacement for socket send() primitive, so we do not require
  * sockmod to be on the stream.
  */
 static int send_oob(int fd, char *ptr, int count)

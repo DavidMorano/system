@@ -2141,7 +2141,7 @@ static int inter_poll(INTER *iap)
 	    }
 	} /* end if (subprocs) */
 
-/* what is this (next part) supposed to do? (don't know!) */
+/* what is this (next part) supposed to do? (do not know!) */
 
 	if ((rs >= 0) && iap->f.setmbname && (iap->mbname == NULL)) {
 	    char	zbuf[2] = { 0 } ;
