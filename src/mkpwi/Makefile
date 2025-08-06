@@ -163,9 +163,9 @@ OBJ08=
 OBJ09=
 OBJ10=
 OBJ11= syspasswd.o
-OBJ12= pwfile.o gecos.o strtab.o ipasswd.o
+OBJ12=
 OBJ13=
-OBJ14= mkmagic.o
+OBJ14=
 OBJ15= strfieldcmp.o
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 
@@ -293,33 +293,7 @@ expander.o:		expander.c $(INCS)
 recorder.o:		recorder.c recorder.h
 
 
-getax.o:		getax.c getax.h
-
-
-varsub_extras.o:	varsub_extras.c
-
-varsub_dumpfd.o:	varsub_dumpfd.c
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
 syspasswd.o:		syspasswd.c syspasswd.h
-
-pwfile.o:		pwfile.c pwfile.h
-
-gecos.o:		gecos.c gecos.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-vecint.o:		vecint.c vecint.h
-
-strtab.o:		strtab.c strtab.h
-
-mapstrint.o:		mapstrint.c mapstrint.h
-
-osetstr.o:		osetstr.c osetstr.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) osetstr.cc
 
 
 # testing

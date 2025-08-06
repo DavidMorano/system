@@ -392,7 +392,7 @@ int argc; char *argv[];
 			rcfirst = nextmsg;
 		}
 		if (rcfirst > firstmsg)
-			firstmsg = rcfirst;	/* don't set below first msg */
+			firstmsg = rcfirst;	/* do not set below first msg */
 	}
 	if (newrc) {
 		nextmsg = firstmsg;

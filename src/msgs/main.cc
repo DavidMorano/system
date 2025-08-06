@@ -559,7 +559,7 @@ const char	*envv[] ;
 	            lastcmd = YES ;
 	            break ;
 
-/* don't pipe thru 'more' during long messages */
+/* do not pipe thru 'more' during long messages */
 	        case 'p':
 	            f_pause = NO ;
 	            break ;
@@ -1366,7 +1366,7 @@ const char	*envv[] ;
 	    }
 
 	    if (rcfirst > firstmsg)
-	        firstmsg = rcfirst;	/* don't set below first msg */
+	        firstmsg = rcfirst;	/* do not set below first msg */
 
 	} /* end if */
 
