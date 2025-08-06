@@ -153,7 +153,7 @@ OBJ05=
 OBJ06= 
 OBJ07= printhelp.o
 OBJ08=
-OBJ09= pwfile.o pwentry.o
+OBJ09=
 OBJ10=
 OBJ11=
 OBJ12= havenis.o
@@ -281,36 +281,5 @@ checkpass.o:		checkpass.c $(INCS)
 passwdok.o:		passwdok.c $(INCS)
 
 getpassword.o:		getpassword.c $(INCS)
-
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-gecos.o:		gecos.c
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-paramopt.o:		paramopt.c paramopt.h
-
-pwfile.o:		pwfile.c pwfile.h pwentry.h
-
-pwentry.o:		pwentry.c pwentry.h
-
-storeitem.o:		storeitem.c storeitem.h
 
 

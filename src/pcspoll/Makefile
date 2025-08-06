@@ -152,26 +152,26 @@ OBJ05= muximsg.o svckey.o svcentry.o
 OBJ06= progconfig.o progpcsconfig.o progpid.o progstampcheck.o 
 OBJ07= printhelp.o
 OBJ08=
-OBJ09= varsub.o varsub_extras.o
+OBJ09=
 OBJ10=
 OBJ11=
-OBJ12= field_svcargs.o
-OBJ13= sysvar.o dirseen.o poller.o
-OBJ14= envs.o envs_procxe.o envs_subs.o
-OBJ15= svcfile.o acctab.o cq.o lfm.o var.o spawner.o
+OBJ12=
+OBJ13=
+OBJ14=
+OBJ15=
 
 OBJ16= pcsuserfile.o
-OBJ17= mkplogid.o mksublogid.o
+OBJ17=
 OBJ18= prmktmpdir.o mktmpuserdir.o
 OBJ19= getfname.o getarchitecture.o
-OBJ20= defproc.o securefile.o
-OBJ21= strnnlen.o strlinelen.o 
-OBJ22= strfieldcmp.o snsdd.o sfthing.o
+OBJ20= securefile.o
+OBJ21=
+OBJ22=
 OBJ23= nextfieldterm.o
 
 OBJ24= getsystypenum.o getproviderid.o getaf.o getaflen.o
 OBJ25= 
-OBJ26= isBadSend.o isBadRecv.o isBadMsg.o
+OBJ26=
 OBJ27=
 OBJ28=
 OBJ29=
@@ -339,55 +339,8 @@ progentry.o:		progentry.c progentry.h svckey.h
 
 svcentry.o:		svcentry.c svcentry.h svckey.h
 
-svckey.o:		svckey.c svckey.h
-
 muximsg.o:		muximsg.c muximsg.h
 
 pcsuserfile.o:		pcsuserfile.c pcsconf.h
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-vecstr.o:		vecstr.c vecstr.h
-
-pcspoll.o:		pcspoll.c pcsconf.h
-
-expcook.o:		expcook.c expcook.h
-
-lfm.o:			lfm.c lfm.h
-
-envs.o:			envs.c envs.h
-
-envs_procxe.o:		envs_procxe.c envs.h
-
-envs_subs.o:		envs_subs.c envs.h
-
-svcfile.o:		svcfile.c svcfile.h
-
-acctab.o:		acctab.c acctab.h
-
-msg.o:			msg.c msg.h
-
-matenv.o:		matenv.c matenv.h
-
-sysvar.o:		sysvar.c sysvar.h dirseen.h
-
-dirseen.o:		dirseen.c dirseen.h
-
-var.o:			var.c var.h varhdr.h
-
-varhdr.o:		varhdr.c varhdr.h
-
-logfile.o:		logfile.c logfile.h
-
-poller.o:		poller.c poller.h
-
-spawner.o:		spawner.c spawner.h
-
-varsub.o:		varsub.c varsub.h
-
-varsub_extras.o:	varsub_extras.c varsub.h
 
 

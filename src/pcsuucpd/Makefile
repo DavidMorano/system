@@ -131,7 +131,7 @@ OBJ10= getcodedtimed.o kinfo.o
 OBJ11= getfname.o findfilepath.o
 OBJ12= serialbuf.o listentcp.o
 OBJ13= jobdb.o builtin.o standing.o procse.o muximsg.o sysmisc.o
-OBJ14= pwfile.o hostent.o
+OBJ14=
 OBJ15= procfileenv.o procfilepaths.o strfieldcmp.o
 OBJ16= bopensched.o bopenroot.o connection.o
 OBJ17= permsched.o schedvar.o
@@ -221,7 +221,7 @@ control:
 	(uname -n ; date) > Control
 
 
-main.o:			main.c $(INCS) srvtab.h acctab.h pwfile.h
+main.o:			main.c $(INCS) srvtab.h acctab.h
 
 whatinfo.o:		whatinfo.c config.h
 
@@ -236,7 +236,7 @@ standing.o:		msfile.h msfilee.h kinfo.h
 
 watch.o:		watch.c $(INCS) muximsg.h
 
-handle.o:		handle.c $(INCS) srvtab.h pwfile.h
+handle.o:		handle.c $(INCS) srvtab.h
 
 handle_srventry.o:	handle_srventry.c $(INCS) srvtab.h acctab.h
 
@@ -252,28 +252,5 @@ jobdb.o:		jobdb.c jobdb.h
 muximsg.o:		muximsg.c muximsg.h
 
 sysmisc.o:		sysmisc.c sysmisc.h
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-srvtab.o:		srvtab.c srvtab.h
-
-acctab.o:		acctab.c acctab.h
-
-sockaddress.o:		sockaddress.c sockaddress.h
-
-pwfile.o:		pwfile.c pwfile.h
-
-kinfo.o:		kinfo.c kinfo.h
-
-msfile.o:		msfile.c msfile.h msfilee.h msflag.h
-
-msfilee.o:		msfilee.c msfilee.h
-
-hostent.o:		hostent.c hostent.h
-
-openportmsg.o:		openportmsg.c openportmsg.h
 
 

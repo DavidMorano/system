@@ -88,7 +88,7 @@ OBJ01= main.o whatinfo.o
 OBJ02= process.o checkpass.o passwdok.o
 OBJ03=
 OBJ04= getpassword.o
-OBJ05= gecos.o pwfile.o
+OBJ05=
 OBJ06=
 OBJ07=
 

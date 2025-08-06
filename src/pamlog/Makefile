@@ -327,90 +327,9 @@ obji.o:			$(OBJI)
 
 proginfo.o:		proginfo.c defs.h
 
-
 sfreadline.o:		sfreadline.c
 
 
 shio.o:			shio.c shio.h
-
-userinfo.o:		userinfo.c userinfo.h
-
-char.o:			char.c char.h
-
-field.o:		field.c field.h
-
-field_srvarg.o:		field_srvarg.c field.h
-
-fifostr.o:		fifostr.c fifostr.h
-
-fifoelem.o:		fifoelem.c fifoelem.h
-
-vecstr.o:		vecstr.c vecstr.h
-
-vecelem.o:		vecelem.c vecelem.h
-
-veclist.o:		vechand.c vechand.h
-
-hdb.o:			hdb.c hdb.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-loadave.o:		loadave.c loadave.h
-
-entropy.o:		entropy.c entropy.h
-
-sha1.o:			sha1.c sha1.h
-
-buffer.o:		buffer.c buffer.h
-
-bufstr.o:		bufstr.c bufstr.h
-
-sbuf.o:			sbuf.c sbuf.h
-
-lookaside.o:		lookaside.c lookaside.h
-
-q.o:			q.c q.h
-
-plainq.o:		plainq.c plainq.h
-
-pq.o:			pq.c pq.h
-
-charq.o:		charq.c charq.h
-
-serialbuf.o:		serialbuf.c serialbuf.h
-
-netorder.o:		netorder.c netorder.h
-
-storeitem.o:		storeitem.c storeitem.h
-
-outbuf.o:		outbuf.c outbuf.h
-
-matenv.o:		matenv.c matenv.h
-
-msg.o:			msg.c msg.h matenv.h
-
-dater.o:		dater.c dater.h
-
-realname.o:		realname.c realname.h
-
-inetaddr.o:		inetaddr.c inetaddr.h
-
-gecos.o:		gecos.c gecos.h
-
-kinfo.o:		kinfo.c kinfo.h
-
-msfile.o:		msfile.c msfile.h msfilee.h
-
-msfilee.o:		msfilee.c msfilee.h
-
-msfile_best.o:		msfile_best.c msfile.h msfilee.h
-
-lookaside.o:		lookaside.c lookaside.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
 
 
