@@ -67,7 +67,7 @@
 	to be locked is taken as relative to the current file
 	position.
 
-	Some Solaris bugs to be aware of:
+	Some Solaris® bugs to be aware of:
 	If a file is locked to the exact size of the file and then
 	a memory map of the whole file is attempted (at the size
 	of the file), then memory mapping fails with an ERRNO of
@@ -81,14 +81,12 @@
 	file-locking does not "prevent" reading memory (from a
 	process that has the same file memory-mapped), but neither
 	does file-locking prevent another process from reading the
-	same file using |read(2)|!  Do you get it Solaris® boys?
+	same file using |read(2)| (unless mandatory locking is
+	employed)!   Do you get it Solaris® boys?
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
@@ -125,7 +123,7 @@
 
 /* forward references */
 
-static int	trylock(int,FLOCK *,int) noex ;
+static int	lockto(int,FLOCK *,int) noex ;
 
 
 /* local variables */
@@ -197,7 +195,7 @@ int uc_lockfile(int fd,int cmd,off_t start,off_t sz,int to) noex {
 		break ;
 	    } /* end switch */
 	    if (rs >= 0) {
-		rs = trylock(fd,&fl,to) ;
+		rs = lockto(fd,&fl,to) ;
 	    }
 	    break ;
 	case F_ULOCK:
@@ -220,7 +218,7 @@ int uc_lockfile(int fd,int cmd,off_t start,off_t sz,int to) noex {
 
 /* local subroutines */
 
-static int trylock(int fd,FLOCK *flp,int to) noex {
+static int lockto(int fd,FLOCK *flp,int to) noex {
     	int		rs = SR_OK ;
 	for (int i = 0 ; rs >= 0 ; i += 1) {
 	    rs = u_fcntl(fd,F_SETLK,flp) ;
@@ -230,6 +228,6 @@ static int trylock(int fd,FLOCK *flp,int to) noex {
 	} /* end for */
 	return rs ;
 }
-/* end subroutine (trylock) */
+/* end subroutine (lockto) */
 
 

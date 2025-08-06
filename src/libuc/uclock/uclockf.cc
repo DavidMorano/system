@@ -36,7 +36,7 @@
 			F_RLOCK
 			F_TRLOCK
 			F_RTEST
-	size		size of region to lock in the file (0="whole file")
+	lsize		size of region to lock in the file (0="whole file")
 
 	Returns:
 	>=0		OK
@@ -79,7 +79,7 @@
 
 /* exported subroutines */
 
-int uc_lockf(int fd,int cmd,off_t size) noex {
+int uc_lockf(int fd,int cmd,off_t lsize) noex {
 	int		rs = SR_NOTOPEN ;
 	if (fd >= 0) {
 	    rs = SR_INVALID ;
@@ -88,7 +88,7 @@ int uc_lockf(int fd,int cmd,off_t size) noex {
 	        bool	f_exit = false ;
 	        repeat {
 	            errno = 0 ;
-	            if ((rs = lockf(fd,cmd,size)) < 0) {
+	            if ((rs = lockf(fd,cmd,lsize)) < 0) {
 			rs = (- errno) ;
 		    }
 	            if (rs < 0) {
@@ -97,13 +97,13 @@ int uc_lockf(int fd,int cmd,off_t size) noex {
 	                    if (to-- > 0) {
 	                        msleep(1) ;
 		            } else {
-			        f_exit = TRUE ;
+			        f_exit = true ;
 		            }
 		            break ;
 	                case SR_INTR:
 	                    break ;
 		        default:
-		            f_exit = TRUE ;
+		            f_exit = true ;
 		            break ;
 	                } /* end switch */
 	            } /* end if (error) */
