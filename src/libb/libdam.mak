@@ -209,7 +209,7 @@ OBJ98= openportmsg.o varsub.o userattr.o
 OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
 OBJ100= rijndael.o expcook.o schedvar.o
 OBJ101= termnote.o egs.o librandom.o bits.o 
-OBJ102= loadave.o modload.o userinfo.o pwentry.o 
+OBJ102= loadave.o modload.o userinfo.o
 OBJ103= dw.o fmq.o useraccdb.o csem.o
 
 OBJ104= sesmsg.o msgdata.o msgbuf.o
@@ -226,11 +226,11 @@ OBJ113=
 OBJ114= 
 OBJ115=
 OBJ116=
-OBJ117= msfile.o msfilee.o entbuf.o nodedb.o clusterdb.o
-OBJ118= cksum.o sha1.o gecos.o pwfile.o ipasswd.o
+OBJ117= msfile.o msfilee.o entbuf.o
+OBJ118= cksum.o sha1.o ipasswd.o
 OBJ119=
 
-OBJ120= kvsfile.o paramfile.o querystr.o
+OBJ120= paramfile.o querystr.o
 OBJ121=
 OBJ122=
 OBJ123=
@@ -669,8 +669,6 @@ sigman.o:		sigman.c sigman.h
 sighand.o:		sighand.c sighand.h
 
 paramfile.o:		paramfile.cc paramfile.h
-
-kvsfile.o:		kvsfile.cc kvsfile.h
 srvtab.o:		srvtab.cc srvtab.h
 acctab.o:		acctab.cc acctab.h
 schedvar.o:		schedvar.cc schedvar.h
@@ -687,7 +685,6 @@ mesg.o:			mesg.cc mesg.h
 
 bits.o:			bits.cc bits.h baops.h
 dialtab.o:		dialtab.cc dialtab.h
-clusterdb.o:		clusterdb.c clusterdb.h
 hostinfo.o:		hostinfo.cc hostinfo.h
 hostaddr.o:		hostaddr.cc hostaddr.h
 hostent.o:		hostent.cc hostent.h
@@ -699,7 +696,6 @@ keyopt_lastvalue.o:	keyopt_lastval.cc keyopt.h
 codebal.o:		codebal.cc codebal.h
 strpack.o:		strpack.cc strpack.h
 userattr.o:		userattr.c userattr.h
-pwfile.o:		pwfile.c pwfile.h pwentry.h
 ts.o:			ts.cc ts.h
 envlist.o:		envlist.cc envlist.h
 querystr.o:		querystr.cc querystr.h
@@ -880,6 +876,7 @@ instr.dir:
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 
+# SINGLES
 printhelp.o:		printhelp.cc printhelp.hh
 removename.o:		removename.cc removename.h
 wdt.o:			wdt.cc wdt.h
@@ -895,6 +892,7 @@ getclusters.o:		getclusters.cc getclusters.h
 percache.o:		percache.cc percache.h
 cvttemperature.o:	cvttemperature.cc cvttemperature.h
 mallcompactstr.o:	mallcompactstr.cc	mallcompactstr.h	$(INCS)
+defproc.o:		defproc.cc		defproc.h		$(INCS)
 
 # DFSA
 dfsa.o:			dfsa0.o dfsa1.o			$(INCS)
