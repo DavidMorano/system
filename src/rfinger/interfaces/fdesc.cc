@@ -12,7 +12,7 @@
 	This subroutine was adopted for use from the DWD program.
 
 	- 03/11/04, Dave Morano
-	I don't know where all this has been (apparently "around") but
+	I do not know where all this has been (apparently "around") but
 	I grabbed it from the FDESC object !
 
 */

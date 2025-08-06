@@ -790,7 +790,7 @@ static int procfind_withmapper(PROGINFO *pip,varsub *sdp,char *pbuf)
 /* end sugroutine (procfind_withmapper) */
 
 
-/* if we don't have a program file yet, search the execution PATH */
+/* if we do not have a program file yet, search the execution PATH */
 static int procfind_withpath(PROGINFO *pip,char *pbuf)
 {
 	const int	plen = MAXPATHLEN ;

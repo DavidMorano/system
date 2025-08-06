@@ -339,7 +339,7 @@ char	*envv[] ;
 	                            f_version = TRUE ;
 	                            break ;
 
-/* no operation (don't post) */
+/* no operation (do not post) */
 	                        case 'n':
 	                            pip->f.no = TRUE ;
 	                            break ;
