@@ -69,6 +69,10 @@ export {
 	}
     	return len ;
     } /* end subroutine (lenstr) */
+    constexpr inline int getlenstr(cchar *sp,int sl = -1) noex {
+	if (sl < 0) sl = lenstr(sp) ;
+	return sl ;
+    }
 } /* end export */
 
 export {
@@ -97,9 +101,9 @@ export {
     constexpr inline char *strcpy(char *dp,cchar *ss,int n) noex {
 	char	*rp ;
 	if (n >= 0) {
-	    rp = stpncpy(dp,ss,n) ;
+	    rp = strncpy(dp,ss,n) ;
 	} else {
-	    rp = stpcpy(dp,ss) ;
+	    rp = strcpy(dp,ss) ;
 	}
     	return rp ;
     } /* end subroutine (strcpy) */
@@ -124,6 +128,9 @@ export {
 	cint	osz = szof(T) ;
 	return memclear(op,osz) ;
     }
+} /* end export */
+
+export {
     template<typename T> constexpr inline void *memcpy(T *dp,cvoid *sp) noex {
 	csize	dsize = sizeof(T) ;
 	return memcpy(dp,sp,dsize) ;

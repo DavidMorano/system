@@ -40,6 +40,21 @@ MODS += libutil.ccm
 LIBS +=
 
 
+DEPMODS += 
+
+OBJ00= libutil0.o libutil1.o
+OBJ01=
+OBJ02= 
+OBJ03= 
+
+OBJA= obj00.o
+OBJB= 
+OBJC= 
+OBJD= 
+
+OBJ= obja.o 
+
+
 INCDIRS=
 
 LIBDIRS=
@@ -56,21 +71,6 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-DEPMODS += 
-
-OBJ00= libutil0.o libutil1.o
-OBJ01=
-OBJ02= 
-OBJ03= 
-
-OBJA= obj00.o
-OBJB= 
-OBJC= 
-OBJD= 
-
-OBJ= obja.o 
-
-
 .SUFFIXES:		.hh .ii .ccm
 
 
@@ -84,6 +84,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
