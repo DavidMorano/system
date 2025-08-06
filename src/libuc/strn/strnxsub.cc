@@ -125,9 +125,9 @@ char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
 	if (sp && ss) {
 	    if (sl >= 0) {
-		if_constexpr (syshas.strnstr) {
-		    csize	slsize = size_t(sl) ;
-		    rp = strnstr(sp,ss,slsize) ;
+		if (syshas.strnstr) {
+		    csize n = size_t(sl) ;
+		    rp = strnstr(sp,ss,n) ;
 		} else {
 		    if (cint sslen = lenstr(ss) ; sslen > 0) {
 		        strner	so(tobc,nleadbasestr) ;
@@ -135,7 +135,7 @@ char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 		    } else {
 	    	        rp = charp(sp) ;
 	            } /* end if (positive) */
-		} /* end if_constexpr (f_strnstr) */
+		} /* end if (syshas.strnstr) */
 	    } else {
 	        rp = strstr(sp,ss) ;
 	    }

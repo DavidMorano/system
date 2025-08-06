@@ -12,7 +12,7 @@
 	This code was originally written for some reason.
 
 	= 2020-03-22, David A­D­ Morano
-	I modularized this.
+	I modularized this (made into a C++20 module).
 
 */
 
@@ -44,7 +44,7 @@
 	sch		search character to search for
 
 	Returns:
-	-		pointer to found character or nullptr if not found
+	-		pointer to found character or NULL if not found
 
 *******************************************************************************/
 
@@ -167,7 +167,7 @@ extern "C++" {
 	} /* end if (non-null) */
 	return rsp ;
     } /* end subroutine (strnwhtbrk) */
-    char *strnwhtchr(cchar *sp,int sl,chrset &sset) noex {
+    char *strnwhtchr(cchar *sp,int sl,const chrset &sset) noex {
 	return strnwhtbrk(sp,sl,sset) ;
     }
 } /* end extern */
