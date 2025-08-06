@@ -112,10 +112,10 @@ INCS= config.h defs.h
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o
 OBJ01= 
 OBJ02= lastlogin.o
-OBJ03= getlogname.o
+OBJ03=
 OBJ04= getpwentry.o getpwlogname.o
 OBJ05= udomain.o
-OBJ06= realname.o lastlogfile.o
+OBJ06= lastlogfile.o
 OBJ07= printhelp.o
 
 OBJ08=

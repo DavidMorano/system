@@ -112,7 +112,7 @@ testfile.txt:15047,56	wrappe man himsel small packag makes
 testfile.txt:15105,527	hand-h reply progra master regard comput game nature coughe contin embodi positi dos said shifte video asked came softwa today calcul held novice lesson explai hand slight insign person tao
 testfile.txt:15634,66	mathem coffee machin theore conver
 testfile.txt:15702,764	perhap mexica water planes around bored edge devise game gently marvel statio island consid direct slow beach watchi colony local airpla sea force along search match opposi fly overfl newspa falkla gather backs societ noting slowly fall turn ten motion onto thousa specta air paper heads birds pilots tennis report water' pengui magazi royal slow-m unison fascin audobo
-testfile.txt:16468,360	played nice she death elegy macdow pianis asked replie writte hoffma ambiti musici better compos think talent josef it's don't edward died quite opinio
+testfile.txt:16468,360	played nice she death elegy macdow pianis asked replie writte hoffma ambiti musici better compos think talent josef it's do not edward died quite opinio
 testfile.txt:16830,259	asked came replie inside donkey loudly stable bray neighb loan hear believ asking borrow nasrud teache whom moment brayed
 testfile.txt:17091,149	three- three spies word devise letter dramat shortl voice learn has absurd heard unprin he's
 testfile.txt:17242,149	take ice cream away koan give
@@ -182,10 +182,10 @@ testfile.txt:29655,93	accide mind body better absenc condit presen
 testfile.txt:29750,429	moby dick walk budd invent accide 2026 saving billy hardin almana electr never caught light met mike nobody unbuck oil taken happen histor tyler car lamps wat anarch peasan armcha bulb motor thus used meant revolt whale cause 1426 until sigism
 testfile.txt:30181,292	fifty nearer come room comple sectio permit shall pollin openin polls feet digest accord pope certif return pretex 4761 door count whatev pope's arkans until person window law
 testfile.txt:30475,85	accord bath take once every least kentuc person year law
-testfile.txt:30562,88	accord best rememb eyes jimmy blue alo recoll don't vincen
+testfile.txt:30562,88	accord best rememb eyes jimmy blue alo recoll do not vincen
 testfile.txt:30652,87	accord latest offici worthl totall figure statis
 testfile.txt:30741,77	accord mean obitua dies never notice person unimpo
-testfile.txt:30820,287	city pittsb york really beat anytim best accord david care came fifth letter places rated twenty almana americ don't mcnall rand live place
+testfile.txt:30820,287	city pittsb york really beat anytim best accord david care came fifth letter places rated twenty almana americ do not mcnall rand live place
 testfile.txt:31109,39	accord bagpip pleats
 testfile.txt:31150,39	accura vice
 testfile.txt:31191,302	rubber sights nicht easy der hands und machin fur mit spitze relaxe corken blowen mitten keepen dummko vatch das blinke schnap gewerk ist pocket achtun spring gefing
@@ -205,7 +205,7 @@ testfile.txt:32758,43	old better adult enough
 testfile.txt:32803,154	econom sellin partic lewis cheape sincla valuab worthl factor goods advert
 testfile.txt:32959,89	ascept advice young men least asceti can't
 testfile.txt:33050,891	bob longer james pieces kicked herd led killed except fact pionee whose leg medici barry exampl frog's came take dave attach anyway today veteri frankl termin myron enormo surgeo hop differ electr field louise discov though watch mary normal implan 1780 amp after amphib conduc etc advanc has its import seriou injure stone transf frog benjam kinds names sinks volt watt dead pond become skille muscle truth luigi experi metal galvan develo
-testfile.txt:33943,248	years few barry diddly after advanc replac rock disco family social dave life form dum lichen guidan meanin today kids boring offers died roll don't
+testfile.txt:33943,248	years few barry diddly after advanc replac rock disco family social dave life form dum lichen guidan meanin today kids boring offers died roll do not
 testfile.txt:34193,55	decima nobody damn places gives after number
 testfile.txt:34250,120	lot quotat known string well-k old after togeth mencke shakes
 testfile.txt:34372,223	surely party sole simply o'rour having enjoy yourse after women hosts purpos sent champa taxi hosts' they'd place
@@ -300,11 +300,11 @@ testfile.txt:49007,527	novoca arthur says bit old having teeth beauti him zayda 
 testfile.txt:49536,52	pound worth preven ounce purge
 testfile.txt:49590,91	best form govern better it's anarch
 testfile.txt:49683,220	let land sun void edge book stand fill night dead darkne drawn others tibeta chant ship 4000 gratef
-testfile.txt:49905,52	furthe trouse don't
+testfile.txt:49905,52	furthe trouse do not
 testfile.txt:49959,138	credit take comic outsid exclai jeff sight christ merry stroll cards heard
 testfile.txt:50099,87	malt god's god justif man does ways housma milton
 testfile.txt:50188,52	mode exited append day sevent
-testfile.txt:50242,150	rememb nisker kfog radio scoop report own news prepos don't words
+testfile.txt:50242,150	rememb nisker kfog radio scoop report own news prepos do not words
 testfile.txt:50394,652	taylor surgic old outsid comple youthf young wherei barry whom keep side care inside dave saving beauty pretty fill men organ own gradua approa effect course though orson cells necess explod want proced painfu underg human skin lookin top unplea career elizab stars welles dead turned limite face hollyw fascin
 testfile.txt:51048,85	fully merely detail courte armed nuclea warhea course
 testfile.txt:51135,308	vertic table michae tin horizo mainta advanc essenc find call world plane design column frayn surfac ma'am labora suppor legs rectil men four tables consis anywhe
@@ -314,11 +314,11 @@ testfile.txt:51879,144	land life needs bertol andrea has heroes unhapp brecht ga
 testfile.txt:52025,72	buy tom lehrer tell heard high angels
 testfile.txt:52099,23	ankh love isis
 testfile.txt:52124,136	grease anoint functi devil' dictio alread devil slippe bierce king suffic great ambros
-testfile.txt:52262,380	glitch lisp hey hacker leave indire typing functi need floyd call pure-l flow sung lists pink data tune pure contro declar chorus it's don't recent alone song
+testfile.txt:52262,380	glitch lisp hey hacker leave indire typing functi need floyd call pure-l flow sung lists pink data tune pure contro declar chorus it's do not recent alone song
 testfile.txt:52644,54	night sleep eucaly tree
-testfile.txt:52700,325	toothp breath compar pales peace teeth televi barry diddly has world need messag dave dum guidan teenag today possib always kids wisdom truth whiter offers don't freshe source
-testfile.txt:53027,508	finer ark pick outlet else table 1029 mother cares moses cents alfred page papyru bathro questi soluti submit didn't maybe pigeon princi supply answer podunk book books bookst front proble fortun don't intere none montan duncan
-testfile.txt:53537,62	larger hammer don't force anthon law
+testfile.txt:52700,325	toothp breath compar pales peace teeth televi barry diddly has world need messag dave dum guidan teenag today possib always kids wisdom truth whiter offers do not freshe source
+testfile.txt:53027,508	finer ark pick outlet else table 1029 mother cares moses cents alfred page papyru bathro questi soluti submit didn't maybe pigeon princi supply answer podunk book books bookst front proble fortun do not intere none montan duncan
+testfile.txt:53537,62	larger hammer do not force anthon law
 testfile.txt:53601,201	worksh toes droppe access least strike corner tool roll coroll anthon law
 testfile.txt:53804,66	opposi word antony think you're trying
 testfile.txt:53872,82	having clod art charle mccabe facts opinio
@@ -354,7 +354,7 @@ testfile.txt:56960,168	isn't price comple means label anythi labele improv went 
 testfile.txt:57130,55	useful chocol anythi made
 testfile.txt:57187,40	worth anythi overdo doing
 testfile.txt:57229,47	proble it's apathy soluti
-testfile.txt:57278,148	james afteri thom clever think statem aphori don't until late alexan concis
+testfile.txt:57278,148	james afteri thom clever think statem aphori do not until late alexan concis
 testfile.txt:57428,157	past genera coding carrie proble apl create throug langua future mistak perfec bums
 testfile.txt:57587,106	progra roy keir write- write apl read can't langua
 testfile.txt:57695,127	turn toes abilit aquade faucet rich hall bathtu snigle adj posses
@@ -425,7 +425,7 @@ testfile.txt:67919,41	favor bank collec error 200
 testfile.txt:67962,82	barach rule own drinks physic alcoho person
 testfile.txt:68046,103	feet dark upward bare floor sharp especi magnet metal object
 testfile.txt:68151,140	indica barome having ingeni devil' dictio kind devil weathe bierce instru ambros
-testfile.txt:68293,115	barth' barth distin divide types don't
+testfile.txt:68293,115	barth' barth distin divide types do not
 testfile.txt:68410,82	nail observ baruch looks hammer everyt
 testfile.txt:68494,91	baseba rogers game skille it's americ high taxes
 testfile.txt:68587,61	langui anguis apl high level basic
@@ -442,7 +442,7 @@ testfile.txt:69493,85	won't things better used enjoy free open breezy
 testfile.txt:69580,55	securi stake consci nation defens
 testfile.txt:69637,119	wary lazaru tax drink collec shoot love enough strong miss
 testfile.txt:69758,130	busy souls contro times sons birth bees
-testfile.txt:69890,670	master hermit she became young munchi studen chines grass replie life absolu benare worthw thing tasty anyway tell comman upon chao dumb ideogr don't great sacred oppone follow zarath no-thi nobody grazin hearin camden confro purpos demand beast someth deligh enligh conten pleasa pastur primar fools unders priest front voice making day took zen
+testfile.txt:69890,670	master hermit she became young munchi studen chines grass replie life absolu benare worthw thing tasty anyway tell comman upon chao dumb ideogr do not great sacred oppone follow zarath no-thi nobody grazin hearin camden confro purpos demand beast someth deligh enligh conten pleasa pastur primar fools unders priest front voice making day took zen
 testfile.txt:70562,72	five extens anybod carbon ego xerox maximu
 testfile.txt:70636,116	won't watch begath multi- multi used televi day event raise money commer public
 testfile.txt:70754,78	warran away behold bold print giveth fine taketh
@@ -477,8 +477,8 @@ testfile.txt:74710,19	ignora bliss
 testfile.txt:74731,43	leg blood down flows
 testfile.txt:74776,47	water tastie blood thicke
 testfile.txt:74825,85	betwee theori take given funnie choice blore' blore razor
-testfile.txt:74912,298	patric drunk fact leave chicag throwi car has arrest left booze board again plain drivin legend sight drove irelan day insura snakes it's don't kept window
-testfile.txt:75212,79	feelin postul you'll worry you're boling don't
+testfile.txt:74912,298	patric drunk fact leave chicag throwi car has arrest left booze board again plain drivin legend sight drove irelan day insura snakes it's do not kept window
+testfile.txt:75212,79	feelin postul you'll worry you're boling do not
 testfile.txt:75293,140	bolub projec teams fourth comput detest vividl progre report manife bolub' lack weekly law
 testfile.txt:75435,81	plants rule whose office doctor medici bombec never died
 testfile.txt:75518,46	again bleah change coke boo
@@ -518,8 +518,8 @@ testfile.txt:80074,46	bureau tenure has politi
 testfile.txt:80122,40	red tape bureau cut length
 testfile.txt:80164,295	burn's robert carefu sawhor guess rocks across burn weighi balanc plank perfec burns put pile again hog weight until symmet method
 testfile.txt:80461,659	justic confes execut record includ death devil ambros once decisi eviden upon women dictio sorcer ever based proved law scourg nothin logic admiss court charge thorou existe alike bierce powerf existi easily certai human suffer judges witchc courts convic sound destit witche unimpe flaw devil' magici testim mankin reason malevo
-testfile.txt:81122,76	global paws corpor worry cause its feedin don't
-testfile.txt:81200,28	spam don't
+testfile.txt:81122,76	global paws corpor worry cause its feedin do not
+testfile.txt:81200,28	spam do not
 testfile.txt:81230,634	years issues gould eighte whethe wide capaci exampl far failur makes angels lies minds invest five once laugh derisi energy intell tell theolo never number sense altere realiz pinhea discus has world debate house narrow infini seem nonsen ancien human pin percep standa thousa distor unders intens foolis hats fit finite
 testfile.txt:81866,250	major enthus regist compil overha weakne expose alloca bruce analyz its replac levere optimi resist radica system
 testfile.txt:82118,99	neares speed office coast gain gas statio enough trying
@@ -551,20 +551,20 @@ testfile.txt:87628,177	minist 1983 financ post stamp canada cabine gerald really
 testfile.txt:87807,195	module domain torus invers stanis cancel remain mantis null verse modes shall root lem cyberi node abscis
 testfile.txt:88004,260	sympat recipi things you'll people puttin welfar unders think always that's june proble yourse cancer anythi never july sucker
 testfile.txt:88266,560	annoya bob expres usual word jargon sjober eventu we've stallm began using someth story canoni thinki lab adj conver mit finall got standa possib manner sink used aha object loud made steele presen talkin fashio
-testfile.txt:88828,269	afraid take taking trees become conser capric risks has import root anythi lazy standi never dec don't avoid jan
+testfile.txt:88828,269	afraid take taking trees become conser capric risks has import root anythi lazy standi never dec do not avoid jan
 testfile.txt:89099,136	captai penny' penny mom fool can't law
 testfile.txt:89237,236	take three longer projec expect carele comple carefu mostly times takes planne four planni reduce
-testfile.txt:89475,95	forbid match york coats wear carmel trouse men has don't ordina
+testfile.txt:89475,95	forbid match york coats wear carmel trouse men has do not ordina
 testfile.txt:89572,259	carper pet chance puttin runnin shun times least act hall dozen pur kar examin string reachi down rich give vacuum snigle pickin
 testfile.txt:89833,42	lapwar built built- cat buzzer
 testfile.txt:89877,77	educat twain nothin cabbag mark colleg caulif
 testfile.txt:89956,52	breath health hazard cautio
 testfile.txt:90010,51	dduupp cchhee yyoouu sswwii
-testfile.txt:90063,693	unques adams quantu chicag cecil final i'm hangs won't simult betwee knowle thing unusua eigens can't don't psyche rescue future none show has ain't cat said perple you're hope straig enligh randy findin readin compen human queer cats unders schrod dead dope alive decay animal zoo
+testfile.txt:90063,693	unques adams quantu chicag cecil final i'm hangs won't simult betwee knowle thing unusua eigens can't do not psyche rescue future none show has ain't cat said perple you're hope straig enligh randy findin readin compen human queer cats unders schrod dead dope alive decay animal zoo
 testfile.txt:90758,62	take celebr lunch day elepha hannib year
 testfile.txt:90822,205	celest useful model naviga iii center wrong throop univer premis works earth kelvin based tool incorr
 testfile.txt:91029,80	measle census housew taker ever
-testfile.txt:91111,277	aprico i'd navel ugh cerebu brandy look tell has love someth don't secret jaka lick
+testfile.txt:91111,277	aprico i'd navel ugh cerebu brandy look tell has love someth do not secret jaka lick
 testfile.txt:91390,489	years killed old rise empty walk devil ambros mortif thing taking men dictio prefer habits tried robust ripe pride doing bath flesh health dawn others has find bierce otherw certai stomac cold spite cause devil' truth hearty practi sturdy person reason
 testfile.txt:91881,141	life buy things funny ogden ever it's can't nash certai money buying
 testfile.txt:92024,159	lot bad beginn regard angry chapte widely move univer has create story made far
@@ -614,7 +614,7 @@ testfile.txt:96917,194	let dyads stanis come indice higher markov tread fairy ch
 testfile.txt:97113,140	human accept comput manner statem comman contro feel presen
 testfile.txt:97255,165	life marie thing extemp medley glorio wrong parker cycle love commen never doroth rouman song
 testfile.txt:97422,129	commit illust ham chicke eggs involv breakf pig
-testfile.txt:97553,418	irrita commit wise stampe preven half adjour others doubt popula sugges stamps vague meetin beginn appoin waitin possib arrive subcom move everyo anythi never rules it's until don't
+testfile.txt:97553,418	irrita commit wise stampe preven half adjour others doubt popula sugges stamps vague meetin beginn appoin waitin possib arrive subcom move everyo anythi never rules it's until do not
 testfile.txt:97973,128	decide commit nothin men group fred indivi allen done
 testfile.txt:98103,101	appoin commit become nowada subcom import
 testfile.txt:98206,148	clive thing james dancin humor moving common differ sense speeds
@@ -625,7 +625,7 @@ testfile.txt:98685,41	progra byte comput
 testfile.txt:98728,77	post-t comput post merely turing formal system theory declin scienc
 testfile.txt:98807,58	comput think intell
 testfile.txt:98867,75	picass comput answer useles pablo give
-testfile.txt:98944,103	things comput except kinds proble world add don't figure
+testfile.txt:98944,103	things comput except kinds proble world add do not figure
 testfile.txt:99049,106	comput job estima until cost perfec
 testfile.txt:99157,65	wit concei larouc conver causes
 testfile.txt:99224,88	consul billed outsid 000 concep idea
@@ -634,7 +634,7 @@ testfile.txt:99453,26	soup conden books
 testfile.txt:99481,110	confes vries coat tweed dandru peter soul sense
 testfile.txt:99593,72	feelin unders confid situat
 testfile.txt:99667,836	forwar god's years shoved god except record carefu sake bonehe barry ship undoub videoc didn't fast once fiddle dave maneuv fiddli unpack break manual purcha factor child give instru sausag owner' polish troubl destro congra owner knobs alread read set fine free you're ask extrem consum thousa via typica servic plugge please device starti
-testfile.txt:100505,379	match progra buy produc extens old come else whose promin probab togeth manufa conspi appear expens came stuff either fit device making kl-10 purvey anythi thereb connec don't none tenden interf
+testfile.txt:100505,379	match progra buy produc extens old come else whose promin probab togeth manufa conspi appear expens came stuff either fit device making kl-10 purvey anythi thereb connec do not none tenden interf
 testfile.txt:100886,74	visit whose consci mother ends never mencke law
 testfile.txt:100962,84	lookin consci voice inner warns somebo mencke
 testfile.txt:101048,61	else feels consci hurts everyt
@@ -669,7 +669,7 @@ testfile.txt:104193,141	hard handle dealin wrong solved easy proble succes impro
 testfile.txt:104336,108	dear again hear lord want never armed hand manage one-ar
 testfile.txt:104446,487	reader dear correc says vital table home believ elbow one's purpos read import teache miss class educat betwee econom examin catchi princi learni manner answer elbows gentle howeve never course place greate
 testfile.txt:104935,186	dear reader list saliva manner man ways please face gentle acquir decent removi man's tactfu miss
-testfile.txt:105123,764	dear says charms expres tips food froot old adjace table comple really barry claim mornin shavin langua year commer shows put compre dave watchi couldn announ writer comes don't bat show actual they'l cream instea mister childr next curiou breakf lucky mean sittin cartoo 5-year answer eggs always loops yes essent dead compou person
+testfile.txt:105123,764	dear says charms expres tips food froot old adjace table comple really barry claim mornin shavin langua year commer shows put compre dave watchi couldn announ writer comes do not bat show actual they'l cream instea mister childr next curiou breakf lucky mean sittin cartoo 5-year answer eggs always loops yes essent dead compou person
 testfile.txt:105889,568	dear reader signs dog's tips around mind word except coming barry small decora langua words quotat put busine dave mainly concep writer item's hot hand alert check' dog hand-l gramma bear mister apostr purpos import creati random item answer letter marks used check small- respon person
 testfile.txt:106459,61	guy god's god wise death tellin
 testfile.txt:106522,67	life death fired life's you've tellin geis
@@ -680,18 +680,18 @@ testfile.txt:106739,98	mind leave else think death doesn' anythi
 testfile.txt:106839,23	death fanati
 testfile.txt:106864,110	unable form decisi office task music force stoppe maker person
 testfile.txt:106976,397	emu-ri member struck judgin riding really throwi unless final obscen langua majori conver mudgee decisi addres contes judges creek assoc panel used crowd shoute abusiv down overwh boomer emu presen
-testfile.txt:107375,324	wash lilla archai hullab harold boston walla nora's barrel swalle trolle love louisv nora charli molly dollar pensac walt lou alleyg boy freezi kalama boola kelly lullab deck don't caulif
+testfile.txt:107375,324	wash lilla archai hullab harold boston walla nora's barrel swalle trolle love louisv nora charli molly dollar pensac walt lou alleyg boy freezi kalama boola kelly lullab deck do not caulif
 testfile.txt:107701,301	got truly things thing deep word implie semant able sorts marvel i've claim blesse it's davis theory quite randy
 testfile.txt:108004,244	wid come kelly- bootle nothin lear devil king attemp inacti errors black fault defaul again kelly possib speak englis vain mon devil' dictio dis avoid system stan
 testfile.txt:108250,247	bitcou 255 code bx_ 0x7777 weird word 0x3333 count define 0x1111 really number 0x0f0f bits
-testfile.txt:108499,244	nuts expung mail fortun wouldn drive hate gets don't delete system sure
+testfile.txt:108499,244	nuts expung mail fortun wouldn drive hate gets do not delete system sure
 testfile.txt:108745,143	bread determ side examin butter one's devil' dictio act devil delibe bierce ambros
 testfile.txt:108890,49	code today think tomorr delive yester
 testfile.txt:108941,79	establ govern home its demand rightf disney
 testfile.txt:109022,110	govern better device shall george democr deserv bernar shaw insure
 testfile.txt:109134,153	form govern countr aloud wonder soaper permit democr senato first- manage class
 testfile.txt:109289,147	form substi govern appoin electi few corrup george democr bernar shaw incomp
-testfile.txt:109438,84	govern think democr don't
+testfile.txt:109438,84	govern think democr do not
 testfile.txt:109524,101	form jackal jackas worshi democr mencke
 testfile.txt:109627,88	nehru worse jawaha democr system
 testfile.txt:109717,127	suspic white half democr recurr
@@ -701,7 +701,7 @@ testfile.txt:110539,149	puttin dentis one's devil' dictio mouth devil presti bie
 testfile.txt:110690,176	klan maxson despis ride white man joined night lynch machin robots luddit sheeti
 testfile.txt:110868,180	meal rememb thing table desser guests cookbo probab import anarch stage pass
 testfile.txt:111050,779	rememb despit comput advice rotate fluke whethe laughi nation put three wherev passiv owning speak fortun sleep never heed placid amid avoid greate noise future though turkey glowin thereo univer unless tires aridit quiet need waste piece mainte deteri lampoo possib comfor hear wrongs kiss always hold behind face yourse big changi disill person
-testfile.txt:111831,99	hit paper devrie want hits don't dilemm typewr keys
+testfile.txt:111831,99	hit paper devrie want hits do not dilemm typewr keys
 testfile.txt:111932,22	lied
 testfile.txt:111956,55	things reads no-one ever
 testfile.txt:112013,91	mirror devil' dictio devil bierce never clones ambros
@@ -736,37 +736,37 @@ testfile.txt:114945,169	though think wrong we're said i've anythi never it's cou
 testfile.txt:115116,132	bad better nothin dick brando sex docume
 testfile.txt:115250,120	progra castor oil hate docume manage
 testfile.txt:115372,34	bell does ring pavlov
-testfile.txt:115408,64	tom abando mix ring arrive tomorr hope don't decode
-testfile.txt:115474,59	golda you're meir don't great humble
-testfile.txt:115535,55	believ hear anythi don't everyt
-testfile.txt:115592,69	cointm change excuse joe don't reason
-testfile.txt:115663,766	help tites repent come applie bertil raoul him mitgon crosso harleq tortur finks dogs intimi techni stick tick harlan cardio seizur sincer incent don't wasn't caught search tock cunnin tormen man finger briber danger teeper probes physic said treach quietl extrem crimin elliso better fallar prints cops tick-t used guile plate until hell system raoul-
-testfile.txt:116431,42	starve cook tonigh today rat don't
-testfile.txt:116475,29	feed tonigh bats don't
-testfile.txt:116506,27	don't odd
-testfile.txt:116535,109	code dave mislea storer commen don't sucker terrib debug
-testfile.txt:116646,119	twain around nothin mark saying owes world don't living
-testfile.txt:116767,46	south dakota don't surfin
-testfile.txt:116815,55	noon yourse sleep till hate mornin don't
-testfile.txt:116872,57	hit kick man down him it's don't easier he's
-testfile.txt:116931,42	today kiss elepha lips don't
-testfile.txt:116975,60	fillmo presid don't kept vietna knock
-testfile.txt:117037,73	let walkin drive crazy it's don't distan
-testfile.txt:117112,67	let mind wander little it's don't alone
-testfile.txt:117181,50	lemmin look gainin don't
-testfile.txt:117233,110	put again today enjoy tomorr don't
-testfile.txt:117345,62	darryl yes zanuck don't until finish talkin
-testfile.txt:117409,93	thou'l busine thus compet succes steal cheat bierce never don't ambros
-testfile.txt:117504,58	turn brazil friend don't suspec
-testfile.txt:117564,75	walt take life kelly son ain't seriou nohow don't perman
-testfile.txt:117641,67	take life you'll alive seriou never don't
-testfile.txt:117710,69	today ones tell big small don't effect lies
-testfile.txt:117781,87	candle tell ends i'm burnin don't wax
-testfile.txt:117870,114	avoidi tempta farmer starts old grow worry almana older don't
-testfile.txt:117986,142	howard ideas you'll ram people throat worry down aiken don't steali
-testfile.txt:118130,110	austra schult today coming worry tomorr world alread charle it's don't
-testfile.txt:118242,125	busy worry worryi they'r don't thinki
-testfile.txt:118369,67	came feel don't
+testfile.txt:115408,64	tom abando mix ring arrive tomorr hope do not decode
+testfile.txt:115474,59	golda you're meir do not great humble
+testfile.txt:115535,55	believ hear anythi do not everyt
+testfile.txt:115592,69	cointm change excuse joe do not reason
+testfile.txt:115663,766	help tites repent come applie bertil raoul him mitgon crosso harleq tortur finks dogs intimi techni stick tick harlan cardio seizur sincer incent do not wasn't caught search tock cunnin tormen man finger briber danger teeper probes physic said treach quietl extrem crimin elliso better fallar prints cops tick-t used guile plate until hell system raoul-
+testfile.txt:116431,42	starve cook tonigh today rat do not
+testfile.txt:116475,29	feed tonigh bats do not
+testfile.txt:116506,27	do not odd
+testfile.txt:116535,109	code dave mislea storer commen do not sucker terrib debug
+testfile.txt:116646,119	twain around nothin mark saying owes world do not living
+testfile.txt:116767,46	south dakota do not surfin
+testfile.txt:116815,55	noon yourse sleep till hate mornin do not
+testfile.txt:116872,57	hit kick man down him it's do not easier he's
+testfile.txt:116931,42	today kiss elepha lips do not
+testfile.txt:116975,60	fillmo presid do not kept vietna knock
+testfile.txt:117037,73	let walkin drive crazy it's do not distan
+testfile.txt:117112,67	let mind wander little it's do not alone
+testfile.txt:117181,50	lemmin look gainin do not
+testfile.txt:117233,110	put again today enjoy tomorr do not
+testfile.txt:117345,62	darryl yes zanuck do not until finish talkin
+testfile.txt:117409,93	thou'l busine thus compet succes steal cheat bierce never do not ambros
+testfile.txt:117504,58	turn brazil friend do not suspec
+testfile.txt:117564,75	walt take life kelly son ain't seriou nohow do not perman
+testfile.txt:117641,67	take life you'll alive seriou never do not
+testfile.txt:117710,69	today ones tell big small do not effect lies
+testfile.txt:117781,87	candle tell ends i'm burnin do not wax
+testfile.txt:117870,114	avoidi tempta farmer starts old grow worry almana older do not
+testfile.txt:117986,142	howard ideas you'll ram people throat worry down aiken do not steali
+testfile.txt:118130,110	austra schult today coming worry tomorr world alread charle it's do not
+testfile.txt:118242,125	busy worry worryi they'r do not thinki
+testfile.txt:118369,67	came feel do not
 testfile.txt:118438,439	relati miles bill safe she lose don teeth fields head gold road advent bad didn't hard cousin penelo pretty bolivi imposs looked wrinkl tarrad face furthe seven larson whipsn sleep her it's died almost
 testfile.txt:118879,506	ascii happy guy rubber glyphs bit or'd i'd word double wide half few left vo-vo- you're whole i'm fun sung togeth bucky outta bits nine side augmen keyboa thousa plus sight duckie tune contro 1978 meta additi lots heard steele
 testfile.txt:119387,188	resear foolin double chief believ assist tooth fairy often belief subjec accomp experi blind lab
@@ -802,7 +802,7 @@ testfile.txt:122611,79	someon around else sulliv talent has fred allen
 testfile.txt:122692,85	educat real castin edman swine proces pearls false irsin
 testfile.txt:122779,81	bullwi speak jelly spirit eeny meeny beanie moose
 testfile.txt:122862,79	lose nothin steven yolks egghea unite adlai
-testfile.txt:122943,319	syllab you'll word wine rum egg wonder drink need season invent whiske meanin holida englis eggs tradit eggnog comes don't gin nog
+testfile.txt:122943,319	syllab you'll word wine rum egg wonder drink need season invent whiske meanin holida englis eggs tradit eggnog comes do not gin nog
 testfile.txt:123264,115	kindly bellam given reliev nature anesth egotis brooks damned fool pain
 testfile.txt:123381,120	low taste egotis devil' dictio himsel devil bierce intere person ambros
 testfile.txt:123503,111	things worse better ehrman said commen
@@ -841,7 +841,7 @@ testfile.txt:129239,68	picofa every don little own has its nanohe vonada
 testfile.txt:129309,43	price every mine man has
 testfile.txt:129354,76	god every worse man miguel often him cervan made
 testfile.txt:129432,145	riches list robert every look forbes i'm mornin orben throug americ
-testfile.txt:129579,127	produc every orthon think finite space inner has dimens basis don't sense nonzer makes
+testfile.txt:129579,127	produc every orthon think finite space inner has dimens basis do not sense nonzer makes
 testfile.txt:129708,201	progra shorte bug every has doesn' least induct deduce instru reduce
 testfile.txt:129911,96	progra writte every has purpos wasn't
 testfile.txt:130009,64	progra fits every rarely
@@ -853,14 +853,14 @@ testfile.txt:130356,50	else somebo weirdo everyb dykstr else's
 testfile.txt:130408,58	nobody die heaven wants everyb
 testfile.txt:130468,131	progra taught everyo sculpt michel great
 testfile.txt:130601,80	stupid realiz everyo genius it's
-testfile.txt:130683,664	chimer cerebr stanis analyt mind fact hypoth simpli neanti lem mythic three banali attack school dragon everyo differ suffic don't scient entire discov wholly distin discus demons has unconc need indeed exist nillit existe amply nonexi layman higher kinds knows does proble furthe satisf brilli purely cyberi formul
+testfile.txt:130683,664	chimer cerebr stanis analyt mind fact hypoth simpli neanti lem mythic three banali attack school dragon everyo differ suffic do not scient entire discov wholly distin discus demons has unconc need indeed exist nillit existe amply nonexi layman higher kinds knows does proble furthe satisf brilli purely cyberi formul
 testfile.txt:131349,72	talks does everyo anythi apathy
 testfile.txt:131423,96	unfort contro belong small evil group everyt
 testfile.txt:131521,124	belch worth satisf precis differ everyt bergma ingmar
 testfile.txt:131647,60	built top except down top-do everyt
 testfile.txt:131709,30	wrong everyt
 testfile.txt:131741,324	solid obviou contin study univer fuller exampl straig there' lines surfac sugges solids less absolu learne begin buckmi school become everyt you've
-testfile.txt:132067,437	search graspi seller you'll hide half shoppi barry walk etc mall excell steal dozen keep 80s best dave findin cleani books rack bookst hold night gets best-s half-d spayed trend don't garfie tellin person
+testfile.txt:132067,437	search graspi seller you'll hide half shoppi barry walk etc mall excell steal dozen keep 80s best dave findin cleani books rack bookst hold night gets best-s half-d spayed trend do not garfie tellin person
 testfile.txt:132506,64	drinki water spike office heavil excell day cooler
 testfile.txt:132572,52	slinki puttin excell day escala
 testfile.txt:132626,36	excell day rotten
@@ -870,7 +870,7 @@ testfile.txt:132844,64	login senili excess messag logout sure sign
 testfile.txt:132910,101	execut abilit quickl decidi else gettin john pollar somebo
 testfile.txt:133013,45	worst expect least it's
 testfile.txt:133060,46	food corpor accoun expens stamps
-testfile.txt:133108,81	after need experi olivie someth don't until
+testfile.txt:133108,81	after need experi olivie someth do not until
 testfile.txt:133191,112	again thing jones enable marvel experi recogn mistak
 testfile.txt:133305,96	worst always gives test experi teache instru afterw
 testfile.txt:133403,77	old ones instea experi person causes mistak
@@ -890,8 +890,8 @@ testfile.txt:135326,179	though religi devoti seem vanish whose data inspir psych
 testfile.txt:135507,28	famili attemp breeds
 testfile.txt:135537,247	famili cabine having p'o tung-p baby want hope whole throug minist stupid prove life wrecke ignora intell tung becomi child tranqu crown born
 testfile.txt:135786,19	famous words
-testfile.txt:135807,161	army handle think worry wouldn famous cop don't smart words
-testfile.txt:135970,367	happen unplug worry famous need loaded him tog enough year wires shortc let's words won't let stupid take always touch fix sunny never it's can't moment don't they'd manage reserv
+testfile.txt:135807,161	army handle think worry wouldn famous cop do not smart words
+testfile.txt:135970,367	happen unplug worry famous need loaded him tog enough year wires shortc let's words won't let stupid take always touch fix sunny never it's can't moment do not they'd manage reserv
 testfile.txt:136339,87	misera famous devil' dictio devil bierce conspi adj ambros
 testfile.txt:136428,439	digita dougla miles adams neat planet eight ape whose blue-g orbiti utterl small roughl green backwa unrega far lies watche life ape-de guide yellow pretty think amazin millio idea primit unfash galaxy arm descen forms sun unchar wester blue little hitchh ninety spiral insign distan
 testfile.txt:136869,105	six form intole every alter oscar ugline wilde months fashio
@@ -904,11 +904,11 @@ testfile.txt:138429,129	feelin fifth nothin avoids has import never boredo procr
 testfile.txt:138560,108	feet fifty flippa flippe fleet walked slime frogs made unnatu
 testfile.txt:138670,341	bitten scan man young easy nor parker devil behold sad heart brave i'm love touche tongue raw doroth words verses care side fighti wear coddle often woo neithe pride
 testfile.txt:139013,82	north betwee barber cats caroli statut prohib fights dogs
-testfile.txt:139097,62	finagl creed misled don't scienc facts
+testfile.txt:139097,62	finagl creed misled do not scienc facts
 testfile.txt:139161,72	finagl gone wrong works has experi someth law
 testfile.txt:139235,98	finagl once fourth fouled worse job anythi improv done law makes
 testfile.txt:139335,196	finagl misint accord someon pet eager believ happen always own second result antici fake theory matter law
-testfile.txt:139533,300	help nobody correc third whose obviou advice really immedi collec need want whom stops ask mistak finagl checki data hear coroll beyond don't figure person law
+testfile.txt:139533,300	help nobody correc third whose obviou advice really immedi collec need want whom stops ask mistak finagl checki data hear coroll beyond do not figure person law
 testfile.txt:139835,116	1981 findin acupun york rock times perfor goes jan
 testfile.txt:139953,57	party fine day him far throw
 testfile.txt:140012,60	heavy energy excess steal fine day someth
@@ -954,7 +954,7 @@ testfile.txt:146716,48	functi oblite often forms follow
 testfile.txt:146766,258	1980 early austra 1984 paul man eating man-ea hours discus large min harbri 1980's films harris best hog arguab razorb gregor movie fortun ever obscur great made violen
 testfile.txt:147026,175	month i'll hey they'l contri mine rights midnig stay plate fortun debate animal roger
 testfile.txt:147203,97	won't title countr week fictit away fortun song miss
-testfile.txt:147302,129	month maybe undern week write type walls fortun want graffi don't
+testfile.txt:147302,129	month maybe undern week write type walls fortun want graffi do not
 testfile.txt:147433,355	club week office she nor unless statut shall exceed female 200 weighi airpor appear less apply suit bathin fortun provis kentuc pounds horses armed escort law
 testfile.txt:147790,877	natura resear protec impass clams fact record nature simple male youthf having artifi all-ti dingel clam hero nomina oyster matter morals expand amount betwee teenag fortun rep sharp goes propos habits propag follow during living champi buy bill john exchan transc world cast seed wait want read house debate female large minute congre michig throug inform mean hoffma places repres eared clare fertil sharp- presen
 testfile.txt:148669,84	punste week office door fortun sign incorr
@@ -996,11 +996,11 @@ testfile.txt:157123,163	band countr woman coming garter devil' dictio intend dev
 testfile.txt:157288,164	perhap fall except nothin heads tomorr advent sky asteri fear never gauls comes
 testfile.txt:157454,1046	arthur signs commit word obviou peace grow wretch entail clearl superm darlin backwa goy's isn't best won't busine writte side price guide thing harsh funny pay every goy speak look think listen sleep stacca minor never softer differ adjust everyt course live shlafe made gay childr has yiddis friend left road world high associ teachi speaki soothi we'll drivin readin letter that's englis sound street little doesn' indivi naiman
 testfile.txt:158502,176	ten except gee activi theate extrac count everyo has doesn' mudhea high louise firesi scienc
-testfile.txt:158680,53	anymor gee think kansas don't toto
+testfile.txt:158680,53	anymor gee think kansas do not toto
 testfile.txt:158735,243	bisexu inclin known expect commit means intell cheap june howeve little quick gemini thinke incest
 testfile.txt:158980,281	bad short loves around room possib respec stars june highli enjoy praise men forget trip gemini news everyb sucker men's
 testfile.txt:159263,168	unable determ restau predic restro rich hall gender her design turtle snigle person
-testfile.txt:159433,83	geneti look explai father don't
+testfile.txt:159433,83	geneti look explai father do not
 testfile.txt:159518,92	stupid limita thus elbert genius its handic hubbar
 testfile.txt:159612,84	bright chemis laundr genius additi discov rhymes
 testfile.txt:159698,70	1982-1 reader 1982 1984 chicag george orwell northw
@@ -1066,7 +1066,7 @@ testfile.txt:169699,46	got mole proble avogar call
 testfile.txt:169747,135	simard progra compla allow exists unstru goto struct tool ray
 testfile.txt:169884,92	govern encour john illusi couple updike
 testfile.txt:169978,81	govern newspa lie democr differ lies
-testfile.txt:170061,175	econom govern thing rogers god does knows doesn' spendi it's don't
+testfile.txt:170061,175	econom govern thing rogers god does knows doesn' spendi it's do not
 testfile.txt:170238,70	values large grabel equal law
 testfile.txt:170310,57	life job indent gradua it's
 testfile.txt:170369,56	life job indent gradua it's
@@ -1109,7 +1109,7 @@ testfile.txt:175724,624	bob protec food eat atlant going barry poop grandp year 
 testfile.txt:176350,121	got water float hartle horse him lead someth you've law
 testfile.txt:176473,70	hartle anyone yourse sleep crazie never second law
 testfile.txt:176545,175	rigoro humidi organi damn pressu volume please contro harvar variab condit temper law
-testfile.txt:176722,171	okay d'azev comput mail anyone 372 yes proble has don't send accoun tutors scienc
+testfile.txt:176722,171	okay d'azev comput mail anyone 372 yes proble has do not send accoun tutors scienc
 testfile.txt:176895,335	facili things word qwerty harder hands has left design writin among typewr appear layout typed lot keyboa databa letter everyo hand notice unnatu theref follow
 testfile.txt:177232,407	buy indica powder dark stains heaven freshn expedi biscui they'r has wheat ready- whole family pictur brown bag box shy tasty needs front blue big ready tried done give made person streng
 testfile.txt:177641,127	sentim occasi approp anothe superi devil' dictio hatred devil bierce ambros
@@ -1117,7 +1117,7 @@ testfile.txt:177770,22	adequa day
 testfile.txt:177794,22	adequa day
 testfile.txt:177818,415	perhap cynica non-cy progra realiz aggres projec signs blunt whethe nice non cheerf purpos releas questi serves channe inadve inform defuse tensio begs cookie pressu revolu fortun warnin day ever live
 testfile.txt:178235,150	always tell find play ever never there' notice trying
-testfile.txt:178387,522	water member produc filled beside few barry whom calm makes drugs naked spouse dave screw redwoo ever don't hot sit shirle give none opposi week damn califo murder after wonder mass hours necess tubs taming sex mean earthq answer tub able anythi contai lavern
+testfile.txt:178387,522	water member produc filled beside few barry whom calm makes drugs naked spouse dave screw redwoo ever do not hot sit shirle give none opposi week damn califo murder after wonder mass hours necess tubs taming sex mean earthq answer tub able anythi contai lavern
 testfile.txt:178911,60	life twice lived
 testfile.txt:178973,96	health grow vigoro crack need notice sidewa grass
 testfile.txt:179071,134	sharpl around people doctor waving intell capabi minute guns notice declin
@@ -1180,7 +1180,7 @@ testfile.txt:187910,260	chad taking view nothin happen hipcri histor learn hegel
 testfile.txt:188172,111	diffic hlade find lazy task give person easier hlade' law
 testfile.txt:188285,101	inside strugg every proble hoare' small large hoare law
 testfile.txt:188388,110	take longer expect hofsta always takes accoun law
-testfile.txt:188500,82	rex happin hollyw don't send reed
+testfile.txt:188500,82	rex happin hollyw do not send reed
 testfile.txt:188584,1063	hardwa major lumber member who's except expect around home jungle artifi barry design conven peer let's board let price reorde toaste take life inside shipme dave screw every applyi pay look calcul willin shop never electr object everyt primit notice oppose entire store busy locati week broken amazon mercha washer prices has replac toilet next sticke piece middle taming employ someti ask nail obtain seen drawba center higher trees always breaks christ little yourse able remove tribe we're tank do-it-
 testfile.txt:189649,93	watchd propul home labora chris weapon doberm shaw ultima
 testfile.txt:189744,63	best policy better honest insani defens
@@ -1220,7 +1220,7 @@ testfile.txt:194717,48	rememb hummin never words songs
 testfile.txt:194767,72	humor abuse gilber it's willia drug fashio
 testfile.txt:194841,129	direct hurewi memory princi chance forget propor someth
 testfile.txt:194972,320	social protec distas believ nixon agains school minori commun viewpo academ studen profes marxis indoct advoca majori matter richar freedo
-testfile.txt:195294,323	powder mom's produc includ carpet preven its releas smells cat manufa encaps distri odor better zeb piss uswest mom com techno removi don't urine reign convin during timw
+testfile.txt:195294,323	powder mom's produc includ carpet preven its releas smells cat manufa encaps distri odor better zeb piss uswest mom com techno removi do not urine reign convin during timw
 testfile.txt:195619,67	bored possib ever
 testfile.txt:195688,66	econom paul man mccrac honest
 testfile.txt:195756,90	kissin henry girlfr gloria steine never
@@ -1232,7 +1232,7 @@ testfile.txt:196348,94	buy beef pot roast option prices leased optimi i've
 testfile.txt:196444,71	things wear sweate mother
 testfile.txt:196517,373	help sneeri partic adamit pre-ad fact descen sulliv pooh conseq primor protop someth family inconc globul bah pooh-b atomic unders tell ancest gilber exclus haught can't pride trace pre person born mikado
 testfile.txt:196892,299	knoxvi tennes draft fact beside tavern sendin univer loiter dwight world haste highwa asleep van philos profes apprec vate done senten
-testfile.txt:197193,252	argume dave steer topic partie invite remain agains respec barry often friend win clear great don't argue oppone sign ask
+testfile.txt:197193,252	argume dave steer topic partie invite remain agains respec barry often friend win clear great do not argue oppone sign ask
 testfile.txt:197447,81	cheste water believ gettin clean keeps hot
 testfile.txt:197530,69	rogers organi party belong democr
 testfile.txt:197601,56	bet kludge human brain minsky marvin
@@ -1260,22 +1260,22 @@ testfile.txt:201564,460	aberra centur mrs mind permut mine subtle call fail ordi
 testfile.txt:202026,71	isaac comput asimov lack fear
 testfile.txt:202099,164	oblige god believ forego intell has feel intend endowe sense galile reason
 testfile.txt:202265,86	forbid goethe god wolfga myself von johann
-testfile.txt:202353,124	james believ quirk i'm aquari don't astrol
-testfile.txt:202479,149	salesm believ think really big hoax sell plasti number gas it's don't shorta sign
-testfile.txt:202630,144	lowell care reader sugar smacks chicag idea jumpin breakf frog don't 1992-1 commer 1992
-testfile.txt:202776,91	care electi does tweed don't nomina boss
-testfile.txt:202869,88	admire ashlei proble brilli don't soluti certai
-testfile.txt:202959,129	got take hundre waitin ghostb bill abuse i've don't murray
-testfile.txt:203090,85	presle elvis line anythi music don't
-testfile.txt:203177,87	presle elvis line anythi music don't
-testfile.txt:203266,616	master lewis things glass word whethe alice nice scornf humpty till words less choose argume dumpty carrol tell knock- down differ object don't neithe course nor said tone throug there' questi glory knock contem mean lookin rather that's means smiled meant doesn'
-testfile.txt:203884,121	spinac i'd eat glad i'm hate claren darrow don't liked
-testfile.txt:204007,86	ronald mind path going mabbit nowher it's don't intere
-testfile.txt:204095,118	mind fright does street congre horses hugo don't victor
-testfile.txt:204215,67	marria minute don't object sex
-testfile.txt:204284,68	vanish descar think ren said don't
-testfile.txt:204354,134	put let think hospit alread him don't mental hand they'd
-testfile.txt:204490,473	progra severa davy days chance alarm blaste alien destro coming death merely barry aliens next excell anybod want cut congre large thinki nuclea poor broadc mistak cannon federa beings signal cannot earth scient don't elimin
+testfile.txt:202353,124	james believ quirk i'm aquari do not astrol
+testfile.txt:202479,149	salesm believ think really big hoax sell plasti number gas it's do not shorta sign
+testfile.txt:202630,144	lowell care reader sugar smacks chicag idea jumpin breakf frog do not 1992-1 commer 1992
+testfile.txt:202776,91	care electi does tweed do not nomina boss
+testfile.txt:202869,88	admire ashlei proble brilli do not soluti certai
+testfile.txt:202959,129	got take hundre waitin ghostb bill abuse i've do not murray
+testfile.txt:203090,85	presle elvis line anythi music do not
+testfile.txt:203177,87	presle elvis line anythi music do not
+testfile.txt:203266,616	master lewis things glass word whethe alice nice scornf humpty till words less choose argume dumpty carrol tell knock- down differ object do not neithe course nor said tone throug there' questi glory knock contem mean lookin rather that's means smiled meant doesn'
+testfile.txt:203884,121	spinac i'd eat glad i'm hate claren darrow do not liked
+testfile.txt:204007,86	ronald mind path going mabbit nowher it's do not intere
+testfile.txt:204095,118	mind fright does street congre horses hugo do not victor
+testfile.txt:204215,67	marria minute do not object sex
+testfile.txt:204284,68	vanish descar think ren said do not
+testfile.txt:204354,134	put let think hospit alread him do not mental hand they'd
+testfile.txt:204490,473	progra severa davy days chance alarm blaste alien destro coming death merely barry aliens next excell anybod want cut congre large thinki nuclea poor broadc mistak cannon federa beings signal cannot earth scient do not elimin
 testfile.txt:204965,31	doubt theref
 testfile.txt:204998,280	spider goal killed male contin has one's succes dread george female shaw finish busine courts behind front earth becomi bernar moment succee
 testfile.txt:205280,68	drink george jean nathan intere
@@ -1320,7 +1320,7 @@ testfile.txt:210479,52	watch hours sit
 testfile.txt:210533,52	game change rules
 testfile.txt:210587,180	humour calvin cartoo anvils saturd bill idiots explos hobbes entert classi fallin love mornin watter
 testfile.txt:210769,115	feet eat bite nibble heads ugly bluish love smurfi
-testfile.txt:210886,179	let age sittin old speed bucket fool i'm approa prof tapioc cosmo don't light fishha appear
+testfile.txt:210886,179	let age sittin old speed bucket fool i'm approa prof tapioc cosmo do not light fishha appear
 testfile.txt:211067,87	ashlei excell brilli totall perfec parts
 testfile.txt:211156,141	innoce twain week mind mark takes abroad quanti prodig someti
 testfile.txt:211299,44	disk hurts slippe pack
@@ -1358,12 +1358,12 @@ testfile.txt:218488,68	life lately built used i've high resist
 testfile.txt:218558,61	indeci think used i'm sure
 testfile.txt:218621,134	realiz body think used wonder organ emo brain philli tellin
 testfile.txt:218757,105	near hydran steven used couldn factor park wright fire anywhe place
-testfile.txt:218864,329	food except old winter summer societ irreve kindne makes happie human brenda roads respec beings total cheape men women behan anythi beer safer warmer connec don't animal strong law
+testfile.txt:218864,329	food except old winter summer societ irreve kindne makes happie human brenda roads respec beings total cheape men women behan anythi beer safer warmer connec do not animal strong law
 testfile.txt:219195,186	watch won't breath buy hee berke week every scream husban elsewh county down want forget it's haw sit blanch bloom
 testfile.txt:219383,231	habit didn't days rogers else knows does grows anythi prodig child born
 testfile.txt:219616,324	though block drunk around home steven few drivew key freewa car across times house crawle middle lawn put accide door night yell drove starte everyo lock park hell wright figure
 testfile.txt:219942,99	didn't gratif twain prompt answer mark able said
-testfile.txt:220043,225	race buy things detest henry gauvre lives aptly descri emile impres want need spendi strang dislik don't money doing
+testfile.txt:220043,225	race buy things detest henry gauvre lives aptly descri emile impres want need spendi strang dislik do not money doing
 testfile.txt:220270,120	got full tarot steven night poker house four cards died wright playin
 testfile.txt:220392,95	genera steven wouldn sell anythi specif went wright store
 testfile.txt:220489,750	progra star partic comput intuit devise expose weakne superf feel pulsar temper less greens holes showed got found absolu fate low every curren down frozen error crust went hot chased case relati high-m run ran low-ma its mass absent exceed george improv high black finall strain zero answer stars wanted beneat cold test fixed assumi born develo
@@ -1428,7 +1428,7 @@ testfile.txt:228171,82	seen better heads clagho i've beer senato mug
 testfile.txt:228255,215	full fall bright greatn man highes meridi evenin touch' shall i've haste glory exhala settin shakes
 testfile.txt:228472,102	syntax worse joss total its went ibm langua everyw loss
 testfile.txt:228576,114	fifty box man idaho pounds sweeth illega give candy weighi law makes less
-testfile.txt:228692,87	confin ideas stay don't solita minds
+testfile.txt:228692,87	confin ideas stay do not solita minds
 testfile.txt:228781,167	themse tells box stamp idiot rich hall can't place quite figure snigle person envelo
 testfile.txt:228950,174	member human affair whose always tribe has contro devil' dictio idiot devil large influe bierce powerf domina ambros
 testfile.txt:229126,142	tape progra miles 6600 core memory grishm paper used instea assemb second langua
@@ -1449,8 +1449,8 @@ testfile.txt:231304,80	trap paul door beatty world' world want operat stage
 testfile.txt:231386,106	laid reach baumol econom conclu wouldn world' world willia
 testfile.txt:231494,321	hed side adams spell commit spelle nothin pray siouxe follen left charle there' lament orthog
 testfile.txt:231817,35	wrong anythi
-testfile.txt:231854,66	damn fool don't succee give
-testfile.txt:231922,49	succes redefi don't succee
+testfile.txt:231854,66	damn fool do not succee give
+testfile.txt:231922,49	succes redefi do not succee
 testfile.txt:231973,78	banker eight come count four teller window
 testfile.txt:232053,65	dolphi flippe televi smart
 testfile.txt:232120,51	increa entrop coming
@@ -1472,8 +1472,8 @@ testfile.txt:233429,85	god yiddis saying lived earth knock window
 testfile.txt:233516,74	god legs wanted brave kitman give marvin
 testfile.txt:233592,124	electe tastef ann around white concre barrie foam replac house margar replic
 testfile.txt:233718,83	happie i'd man dead alive drop samuel goldwy
-testfile.txt:233803,274	bed around damn stay probab parker shall i'm drive fun doroth amount i'll again ten pretty looks mark night abstai park don't sure give
-testfile.txt:234079,63	i'll pastur don't future
+testfile.txt:233803,274	bed around damn stay probab parker shall i'm drive fun doroth amount i'll again ten pretty looks mark night abstai park do not sure give
+testfile.txt:234079,63	i'll pastur do not future
 testfile.txt:234144,115	i'd planta home gallag sell eugene hell georgi
 testfile.txt:234261,58	turner ted humili perfec
 testfile.txt:234321,75	known albert locksm einste
@@ -1513,12 +1513,12 @@ testfile.txt:239828,52	timesh share give
 testfile.txt:239882,68	belly come wounds heals button stays
 testfile.txt:239952,81	life today day rest hell yester
 testfile.txt:240035,115	agree johnso men lyndon baines everyt sure thinki doing
-testfile.txt:240152,68	three lauren wrongs peter don't
+testfile.txt:240152,68	three lauren wrongs peter do not
 testfile.txt:240222,60	absolu corrup
 testfile.txt:240284,64	fly losing meant wouldn luggag keep
 testfile.txt:240350,225	glutte margue qualif partic market school necess gradua field' emmons field shorta employ person
 testfile.txt:240577,71	ann fatali duff edward
-testfile.txt:240650,84	paul count billio don't money getty dollar
+testfile.txt:240650,84	paul count billio do not money getty dollar
 testfile.txt:240736,69	isn't water horse drink lead force
 testfile.txt:240807,40	close read you're
 testfile.txt:240849,61	surviv death probab anythi
@@ -1526,10 +1526,10 @@ testfile.txt:240912,76	carefu call can't give
 testfile.txt:240990,65	enjoy badly learn can't doing
 testfile.txt:241057,64	harry cannot convin truman confus
 testfile.txt:241123,48	didn't really caught
-testfile.txt:241173,54	lost care ain't don't
-testfile.txt:241229,82	won't funera yours men day claren don't men's
-testfile.txt:241313,82	didn't dyson nasty obitua freema probab don't matter
-testfile.txt:241397,115	bad breath little jay want toilet lavori pour leno don't dog
+testfile.txt:241173,54	lost care ain't do not
+testfile.txt:241229,82	won't funera yours men day claren do not men's
+testfile.txt:241313,82	didn't dyson nasty obitua freema probab do not matter
+testfile.txt:241397,115	bad breath little jay want toilet lavori pour leno do not dog
 testfile.txt:241514,107	eat worse nothin happen either day mornin frog rest live
 testfile.txt:241623,113	boy going want you're eye ever toehol anywhe politi public
 testfile.txt:241738,72	nobody clearl explai somebo misund
@@ -1548,7 +1548,7 @@ testfile.txt:242816,147	fifth prompt possib ways wrong proced circum four percei
 testfile.txt:242965,152	betwee twain pick starvi prospe bite princi man mark him differ dog
 testfile.txt:243119,155	won't soft you'll ice push cup drink extra vendin machin button
 testfile.txt:243276,178	put passed critic comput nothin garbag having enoble someho machin comes throug none dare expens
-testfile.txt:243456,84	game down poker you're sit don't sucker
+testfile.txt:243456,84	game down poker you're sit do not sucker
 testfile.txt:243542,65	footpr stand hair head
 testfile.txt:243609,201	stock slicke stick locker upon trick fail joker lock liquor slick
 testfile.txt:243812,89	educat derek ignora think bok presid harvar expens
@@ -1557,14 +1557,14 @@ testfile.txt:243984,98	earl nobody think alive car paymen cares you're couple mi
 testfile.txt:244084,89	bad arthur think solved proble wait we've until kasspe
 testfile.txt:244175,122	larges united built center nixon think stood shoppi has world states richar
 testfile.txt:244299,119	larges united built center nixon think stood shoppi has world states richar
-testfile.txt:244420,934	severa lob days expect partie anxiou nice having immedi call year tear indict worst isn't police thing party today own recurr gas avoid host don't case sure throw living window you'll room preven lawyer job they'r unless succes advanc want kind next guest find arrest anybod set they'v throug planni knock someon door year's guests dead wake anythi
+testfile.txt:244420,934	severa lob days expect partie anxiou nice having immedi call year tear indict worst isn't police thing party today own recurr gas avoid host do not case sure throw living window you'll room preven lawyer job they'r unless succes advanc want kind next guest find arrest anybod set they'v throug planni knock someon door year's guests dead wake anythi
 testfile.txt:245356,146	laid lot ten asleep comfor big felt graffi studen took they'd class
 testfile.txt:245504,80	learni unders you're anythi doing
 testfile.txt:245586,50	die justic divine seldon nick want
 testfile.txt:245638,104	dorthy god thinks look gave parker want money
-testfile.txt:245744,331	consti word precio instea flavor titles read want george listin nation statec select direct readin begin govern beginn today convey organi unders little washin teleph contai don't portio today'
+testfile.txt:245744,331	consti word precio instea flavor titles read want george listin nation statec select direct readin begin govern beginn today convey organi unders little washin teleph contai do not portio today'
 testfile.txt:246077,102	strict spouse talk word pay every listen want sleep attent
-testfile.txt:246181,215	got walt electe memora kelly party wants think kids means pogo school you'se memori presid homily pester so's don't
+testfile.txt:246181,215	got walt electe memora kelly party wants think kids means pogo school you'se memori presid homily pester so's do not
 testfile.txt:246398,66	includ wish wisely ignore saying live
 testfile.txt:246466,115	henny youngm tonigh you'll sorry going tomorr sleep you're mornin someth late
 testfile.txt:246583,36	happy succes you're
@@ -1718,7 +1718,7 @@ testfile.txt:271121,155	benchl years robert talent couldn famous writin took fif
 testfile.txt:271278,63	better book kill dead liked
 testfile.txt:271343,76	foot forest man virgin set never hand place
 testfile.txt:271421,160	sun days james blowin broken birds summer dent shinin lawn mower breeze singin perfec
-testfile.txt:271583,533	perhap master yours aldric old novelt unread man knew away its read forgot charm thrown there' deciph lifeti found pleasa letter think grows thomas singul date able anythi day never loses perpet signat beyond don't kept guesse foreve reason
+testfile.txt:271583,533	perhap master yours aldric old novelt unread man knew away its read forgot charm thrown there' deciph lifeti found pleasa letter think grows thomas singul date able anythi day never loses perpet signat beyond do not kept guesse foreve reason
 testfile.txt:272118,540	icepac ahead east led bored war-me else goodgu soldie death quick him death- prayin mornin meltin merino else's swords fate rode bleati burden sharp sidesa arrowr harvar lances forged rest hangov heavy nursin laden dealin war armies gimlet next painle someon lampoo thousa hour possib twodor rings sat whoppe marche limply
 testfile.txt:272660,118	rose glass she teeth her wasn't exactl
 testfile.txt:272780,137	rouses man wing advant dragon himsel sky great stream cross
@@ -1726,19 +1726,19 @@ testfile.txt:272919,171	found worst genera human dicken despis nature pleasa sne
 testfile.txt:273092,186	admini issuin things food eat robert nice safe names gave warnin toxic substa fuoss stoppe drug
 testfile.txt:273280,90	mind spell word damn think andrew it's jackso poor
 testfile.txt:273372,74	milkbo eat wearin underw world i'm it's dog-ea dog
-testfile.txt:273448,62	govern thing pay it's don't
+testfile.txt:273448,62	govern thing pay it's do not
 testfile.txt:273512,82	paint steven wouldn small world want it's wright
 testfile.txt:273596,96	troubl bullwi summon means it's what's rocky
 testfile.txt:273694,79	week dead church it's took lucky femme
 testfile.txt:273775,53	always it's gets pitch darkes black
 testfile.txt:273830,59	bad luck andrew mathis it's supers
 testfile.txt:273891,83	better wanted murder winch it's marty
-testfile.txt:273976,254	you'll believ really provin proves said it's don't done easier
+testfile.txt:273976,254	you'll believ really provin proves said it's do not done easier
 testfile.txt:274232,67	fight princi one's it's live easier
 testfile.txt:274301,81	wrong it's easier forgiv
 testfile.txt:274384,89	macy seen fabulo half hour anythi it's macy's haven'
 testfile.txt:274475,59	ride horse wilbur ugly washin it's illega
-testfile.txt:274536,246	isn't mean her's yours edpres likewi either ours press oxford univer its our's ain't her it's theirs news don't hers
+testfile.txt:274536,246	isn't mean her's yours edpres likewi either ours press oxford univer its our's ain't her it's theirs news do not hers
 testfile.txt:274784,243	pelvic tight insa-a really hips hands thrust left ane insa rocky horror pictur let's knees let pull put again step jump warp gets it's show
 testfile.txt:275029,58	walt imposs kind fun it's disney
 testfile.txt:275089,89	drunk samura teddy it's bears
@@ -1752,7 +1752,7 @@ testfile.txt:275703,80	talent korda hungar it's enough alexan
 testfile.txt:275785,61	comput cal ass keegan it's
 testfile.txt:275848,98	things taking that's import you're it's realit percei
 testfile.txt:275948,102	hard ground once luten yourse bootst you're it's lift daniel
-testfile.txt:276052,98	afraid die happen want i'm allen it's don't woody
+testfile.txt:276052,98	afraid die happen want i'm allen it's do not woody
 testfile.txt:276152,72	life dips dread valley it's garfie
 testfile.txt:276226,223	unsett capita major fact englis little upon sydney it's reflec odd langua case lower harris
 testfile.txt:276451,55	post raisin bran it's
@@ -1760,7 +1760,7 @@ testfile.txt:276508,64	life simple angele death really choice it's quite los
 testfile.txt:276574,117	stupid given civili believ modern devil it's explan
 testfile.txt:276693,171	grown paying jones moon raises frankl we're crops fear it's somebo opinio
 testfile.txt:276866,39	though counts it's
-testfile.txt:276907,1086	jack's market list bare table she going away artifi langua chart parent passed take retrie angry often ago apples met don't made along window busy relati named lived said house high jack jovial waitin join better whithe finite starte needn' algori day magic prompt hamilt became hardly isaak i'm him commen poor far basics told byte path mark intell chips charac matric linked hash thrash thy high-l travel compil salesm ram exchan walkin swap items dost beanst set trade thou busy-w flow togeth backtr popped queue sparse deal kernel level
+testfile.txt:276907,1086	jack's market list bare table she going away artifi langua chart parent passed take retrie angry often ago apples met do not made along window busy relati named lived said house high jack jovial waitin join better whithe finite starte needn' algori day magic prompt hamilt became hardly isaak i'm him commen poor far basics told byte path mark intell chips charac matric linked hash thrash thy high-l travel compil salesm ram exchan walkin swap items dost beanst set trade thou busy-w flow togeth backtr popped queue sparse deal kernel level
 testfile.txt:277995,130	legisl life govern postul safe man sessio libert democr proper man's jacqui
 testfile.txt:278127,141	tom james wished man essent total univer privat joyce stoppa indiff notice recogn public
 testfile.txt:278270,33	won't jenkin law
@@ -1787,18 +1787,18 @@ testfile.txt:280973,81	though race faster rat winnin comes along
 testfile.txt:281056,77	three justic michae always seven times wagner prevai
 testfile.txt:281135,61	justic incide order edgar hoover law
 testfile.txt:281198,40	favor justic decisi
-testfile.txt:281240,170	hard kobold bad confin cobalt roguel wordy topple cobol' cobol feel strike shinin it's metal don't abc
+testfile.txt:281240,170	hard kobold bad confin cobalt roguel wordy topple cobol' cobol feel strike shinin it's metal do not abc
 testfile.txt:281412,90	pedest wear night crossi kansas lights requir tail highwa law
 testfile.txt:281504,99	katz man possib act nation ration law exhaus
 testfile.txt:281605,49	swallo beauti cans beer americ keep
-testfile.txt:281656,53	freeze cool keep don't hellma mayonn
+testfile.txt:281656,53	freeze cool keep do not hellma mayonn
 testfile.txt:281711,59	active cater emotio neuros keep favori
 testfile.txt:281772,48	bingo street grandm keep legali
 testfile.txt:281822,305	reach watch suck mind frisbe car predic preced world powerf commen keep disc laws land maneuv strain techni always consta never termed force
 testfile.txt:282129,172	should feet ground grinds wheel head eye keep ball someth nose done
 testfile.txt:282303,358	driver says numero wrong nor lights has idiot usuall plague unlike design speedo dashbo makes mistak rather center thomps gage modern automo experi gas what's helped giant neithe ken
 testfile.txt:282663,138	three alumni facult footba kerr parkin succes plenty studen kerr's rules colleg sex
-testfile.txt:282803,471	around travel taken stomp instea barry diddly dad berrie family parent dave dum huntin sulkin sittin observ guidan teenag today grubs kids primat you'd slam branch day never leaves don't tree yellin origin
+testfile.txt:282803,471	around travel taken stomp instea barry diddly dad berrie family parent dave dum huntin sulkin sittin observ guidan teenag today grubs kids primat you'd slam branch day never leaves do not tree yellin origin
 testfile.txt:283276,37	kin afflic blood
 testfile.txt:283315,127	always solved easy proble exceed kinkle author second respon law
 testfile.txt:283444,62	six kirk enterp beam six-pa down yeoman pack rand
@@ -1818,7 +1818,7 @@ testfile.txt:284457,194	put walt ladybu sing jump above kelly stern look rhyme c
 testfile.txt:284653,22	laetri pits
 testfile.txt:284677,95	depend langsa nothin always everyt someti laws
 testfile.txt:284774,48	basica larkin false law laws
-testfile.txt:284824,733	rememb things applic she'd spent she whimpe wrong grow barry crop got lassie dave every think rushin never her they'd alert don't filed made manage follow week happen gettin precio farmho whatso instea probab etc crops lived minute waste someth family girl tracto federa suppor wants idiots always ones looked pinned sleeve saying tug brilli farm
+testfile.txt:284824,733	rememb things applic she'd spent she whimpe wrong grow barry crop got lassie dave every think rushin never her they'd alert do not filed made manage follow week happen gettin precio farmho whatso instea probab etc crops lived minute waste someth family girl tracto federa suppor wants idiots always ones looked pinned sleeve saying tug brilli farm
 testfile.txt:285559,199	told came realiz home apartm stolen steven night exact replac duplic friend said everyt wright
 testfile.txt:285760,153	asked police week record cops album car humor cop said devo stoppe sense
 testfile.txt:285915,50	yeer kudn't engine won spel
@@ -1873,8 +1873,8 @@ testfile.txt:293259,197	maybe brown today better wrong always think that's worry
 testfile.txt:293458,78	bergen saturd having night date candic living
 testfile.txt:293538,86	sun includ annual around earth trip free living expens
 testfile.txt:293626,77	life diffic has never task attemp living
-testfile.txt:293705,127	vax plunge things deep envy want lizzie axe borden took don't
-testfile.txt:293834,100	depart isn't rates loan print need fine loan-d don't manage intere
+testfile.txt:293705,127	vax plunge things deep envy want lizzie axe borden took do not
+testfile.txt:293834,100	depart isn't rates loan print need fine loan-d do not manage intere
 testfile.txt:293936,1006	perhap pop eyesta applia water reefs loves cooks claws justic fact cooked guilt pot served sole apolog utensi neural call squirm grasp pictur incorr easies predat delect 21st crude take guilty memory look frankl shortl helpin everyo sea crusta proper theirs method reduce notice swipe puttin placin appara they'r prepar its has head unmist friend art crime you're excuse among using feroci flouri trial establ boilin scallo floor refres behind night shout lobste alive squeam elimin cookin
 testfile.txt:294944,132	once chance gettin main street eaten millio aren't lion lockwo shot enough
 testfile.txt:295078,74	sittin awful little logic smells bird tree
@@ -1913,7 +1913,7 @@ testfile.txt:298132,1047	bona featur simple comple bootle functi usuall offsho s
 testfile.txt:299181,360	inexpr white eminen conden forego immedi advanc subjec works devil bierce acting someth illumi ambros knowle human thousa acted upon devil' dictio defini light great scient magnet
 testfile.txt:299543,127	shoppi automo carts left rich hall friend unatte snigle adj magnoc attrac
 testfile.txt:299672,149	someon dispos talk whose taught theivi devil' dictio bird devil bierce magpie sugges ambros
-testfile.txt:299823,306	consid confor observ obtain dispos maier better discar succes experi bigger maier' don't coroll theory measur law facts corres
+testfile.txt:299823,306	consid confor observ obtain dispos maier better discar succes experi bigger maier' do not coroll theory measur law facts corres
 testfile.txt:300131,82	opposi progra govern every main main's equal action law
 testfile.txt:300215,57	broke motto mainta fix ain't can't
 testfile.txt:300274,250	major dig quickl man conclu men premis times devil' dictio devil piece bierce minor second sixty postho ambros
@@ -1930,7 +1930,7 @@ testfile.txt:301632,131	eat man remain friend intend samuel butler terms animal 
 testfile.txt:301765,143	eat man remain 1835 friend intend samuel 1835-1 butler 1902 terms animal until victim eats
 testfile.txt:301910,108	albert else man attrib clever avoids unless usuall einste somebo enemy
 testfile.txt:302020,359	pecies infest man raptur devil whole bierce habita ambros apidit lost exterm contem hief overlo occupa indubi canada thinks howeve own devil' dictio multip earth insist ought animal
-testfile.txt:302381,147	catch mandre doctor think that's size brain don't questi
+testfile.txt:302381,147	catch mandre doctor think that's size brain do not questi
 testfile.txt:302530,464	club years sports picked record engage mine man slopin barry histor inner probab rock guess round athlet forehe umpire beers crude whompe dave air better tossed drove ago millio dating yearni older four primit force mankin haven' drag
 testfile.txt:302996,195	simard three item inform given someon always manual unit shelf has others need docume ray
 testfile.txt:303193,272	tuesda years comple friday wednes sad lived next mornin common king thinki walt kelly period aftern ago unhapp monday gloomy mournf
@@ -1976,7 +1976,7 @@ testfile.txt:310591,84	marx justic milita grouch music
 testfile.txt:310677,68	amount launch millih beauty requir ship adj
 testfile.txt:310747,120	themse immort sunday aftern millio susan rainy ertz
 testfile.txt:310869,670	tricia baker years around home having going enjoyi evil suprem showed hubert consid minded conced vote flumme lesson millio four sensib lesser almost julie rummag high-m nixon humphr next presid court find thread gold ford among 1968 high politi black tweedl russel appoin begin rather silver lives always taught sat choice stew abstai presen
-testfile.txt:311541,442	distur countr partic regard mind unhall emphat myself door-n hands shall permit trade piece simile coffin ironmo deades nail knowle inclin mean marley door ancest dead wisdom own don't repeat done theref
+testfile.txt:311541,442	distur countr partic regard mind unhall emphat myself door-n hands shall permit trade piece simile coffin ironmo deades nail knowle inclin mean marley door ancest dead wisdom own do not repeat done theref
 testfile.txt:311985,37	learne slow minnie maze mouse
 testfile.txt:312024,113	city buy shotgu cap allowe howeve kansas pistol purcha missou freely minors
 testfile.txt:312139,56	loves misery does recipr compan
@@ -1999,8 +1999,8 @@ testfile.txt:314655,125	celest dave hacker whose moon phase import object
 testfile.txt:314782,65	abused mophob fear verbal missis
 testfile.txt:314849,617	star sports silenc saturd chicag freudi offici anal 0-0 player best fight think ka-ka reflec hills result match broken interp offens said tied free someth paraph associ full beverl stalem hear anal-r retent night period waited called we're starte saying rogeri took person
 testfile.txt:315468,222	let choose correc path despai total pray wisdom histor leads extinc utter allen hopele woody mankin crossr faces
-testfile.txt:315692,121	softwa engine you'd worry job doesn' mosher don't everyt law
-testfile.txt:315815,740	genera swims dumps headac crabs eyes around she male timele away really stingi barry swim virtua terrib eats dave surviv every down amoeba her differ gets tired don't live place anywhe single instin has hours sand want reprod female large noble fish sex buggy finall lookin starin eggs lie little underw doesn' truth quanti until somepl driven teen
+testfile.txt:315692,121	softwa engine you'd worry job doesn' mosher do not everyt law
+testfile.txt:315815,740	genera swims dumps headac crabs eyes around she male timele away really stingi barry swim virtua terrib eats dave surviv every down amoeba her differ gets tired do not live place anywhe single instin has hours sand want reprod female large noble fish sex buggy finall lookin starin eggs lie little underw doesn' truth quanti until somepl driven teen
 testfile.txt:316557,103	turgen unders noses others blow differ can't
 testfile.txt:316662,90	came bit zappa ass wouldn music frank
 testfile.txt:316754,89	arnold she clever unders does mother anythi bennet far
@@ -2012,7 +2012,7 @@ testfile.txt:317646,232	nine countr talk troubl happen later trust men women pre
 testfile.txt:317880,75	rain washin car doesn' recurs murphy law
 testfile.txt:317957,77	resear suppor tend enough murphy theory law
 testfile.txt:318036,116	restat godel' thomas pyncho brash godel gravit prolet rainbo murphy theore law
-testfile.txt:318154,1109	arthur spies says weeks she death call wall troops three sorry every libera consta her shot secret can't don't chile firing snappi troubl passpo lasts daught squad next court hauled left charge hotel knowin prison top milita esther that's we're day sergea spits shouts lined top-se chicag photog mornin espion camera pictur tortur he's asks cries goy's got hustle prove guide goy aged armed jewish they'l room they'r reques yiddis couple middle surrou they'v murray finall possib turns wants contac front night face moveme please crazy instal senten tourin instan naiman
+testfile.txt:318154,1109	arthur spies says weeks she death call wall troops three sorry every libera consta her shot secret can't do not chile firing snappi troubl passpo lasts daught squad next court hauled left charge hotel knowin prison top milita esther that's we're day sergea spits shouts lined top-se chicag photog mornin espion camera pictur tortur he's asks cries goy's got hustle prove guide goy aged armed jewish they'l room they'r reques yiddis couple middle surrou they'v murray finall possib turns wants contac front night face moveme please crazy instal senten tourin instan naiman
 testfile.txt:319265,152	item sittin projec food become mustgo has rich hall friend snigle refrig scienc
 testfile.txt:319419,104	advice gardne john grende friend gold sit violen seek
 testfile.txt:319525,855	forwar picked snake away really barry small symbol bedroo bathro sidewa measur year cooper perfec band dormit checke life dave break cleanl down clean apprec rushed effort late sure amplif doing threw window though launch john gather backed ended act find haste frame throug using onto door career senior lives belt fit crowd wanted sound able move sounde truth shouti
@@ -2077,7 +2077,7 @@ testfile.txt:328252,101	champi east today became pole-v german news flash vault 
 testfile.txt:328355,91	newsfl steamr detail russia jersey eleven tanks throug
 testfile.txt:328448,75	opposi newton fourth every satisf has equal action law
 testfile.txt:328525,83	newton known little overhe bird safer sevent hand law
-testfile.txt:328610,100	fact friday next day don't lucky matter year
+testfile.txt:328610,100	fact friday next day do not lucky matter year
 testfile.txt:328712,117	missed raymon refund income nothin tax really satisf next shot quite
 testfile.txt:328831,75	sack nice boy leghor mice foghor sharp wet
 testfile.txt:328908,39	commen onesel nihili
@@ -2148,25 +2148,25 @@ testfile.txt:340211,74	someon murder weapon frame it's course fake
 testfile.txt:340287,178	amount item given commit possib air martin thomas occur agenda libera hot reacti greate
 testfile.txt:340467,67	boy unmana animal plato
 testfile.txt:340536,168	bad fletch knebel doom kills who's man witch' witch enshri whom there' none words
-testfile.txt:340706,122	power mix knows tools everyo aren't solubl nigel crazy alcoho don't course
+testfile.txt:340706,122	power mix knows tools everyo aren't solubl nigel crazy alcoho do not course
 testfile.txt:340830,58	policy there' it's course reason
 testfile.txt:340890,145	believ books newspa anchor blazer wears news
 testfile.txt:341037,128	coffee talk comput office anyone effici want removi improv automa
 testfile.txt:341167,79	fall catch sooner behind ogden ogden' law
 testfile.txt:341248,25	we're dad devo
-testfile.txt:341275,152	isn't seem life extrem days grumbl nothin lank wrong flat whatev goes don't none
+testfile.txt:341275,152	isn't seem life extrem days grumbl nothin lank wrong flat whatev goes do not none
 testfile.txt:341429,151	progra okay indice muck shout works hoo struct i'm day hoo-ra ray
-testfile.txt:341582,117	600 dispos i'd blame congre lichty wagner billio don't irresp
+testfile.txt:341582,117	600 dispos i'd blame congre lichty wagner billio do not irresp
 testfile.txt:341701,689	sunwar silenc things skies untres wind mind god climbe eagle mirth easy lark burnin bonds wind-s laught silent put hundre magee surly never clouds gilles chased sunlit split trod hand dreame done along swung liftin john danced topped slippe i've touche throug flung flew high sancti sun sun-sp eager silver air halls wings craft soared joined swept height flight footle wheele blue grace space face earth shouti hoveri tumbli deliri
 testfile.txt:342392,67	going guess lifeti
 testfile.txt:342461,254	again miles around they'l nothin remain myself grew behave fancy clean wonder love brave housma passes quite
 testfile.txt:342717,28	moon look wow
 testfile.txt:342747,72	let blackb look joy four dimens let's
-testfile.txt:342821,49	touch you're anythi phd don't
+testfile.txt:342821,49	touch you're anythi phd do not
 testfile.txt:342872,82	age unexpe things old happen man trotsk
 testfile.txt:342956,63	progra die old addres branch never
 testfile.txt:343021,40	die old soldie young ones never
-testfile.txt:343063,84	oliver after need experi someth don't until law
+testfile.txt:343063,84	oliver after need experi someth do not until law
 testfile.txt:343149,102	type drink omnibi anythi i'm indiff adj
 testfile.txt:343253,232	gallon where' think jell ingred omnive flavor washin big need wrench drop four machin yeh awaren jell-o
 testfile.txt:343487,112	submit isn't wolfga paper wrong collea pauli physic
@@ -2191,7 +2191,7 @@ testfile.txt:349599,108	jones advant frankl yourse listen least somebo talkin
 testfile.txt:349709,206	underl usenet ten years rospac having going chuq disagr von flame notion cooper basic
 testfile.txt:349917,67	inform means procee can't formal
 testfile.txt:349986,166	issawi eggs break cannot amazin making decent charle profes omelet breaki
-testfile.txt:350154,609	city captai enter herald altern believ going death subjec said him hangin king questi put asked hanged told decide answer gates front tell nasrud whoeve line lie announ gallow truth day guard don't exactl erecte force hang
+testfile.txt:350154,609	city captai enter herald altern believ going death subjec said him hangin king questi put asked hanged told decide answer gates front tell nasrud whoeve line lie announ gallow truth day guard do not exactl erecte force hang
 testfile.txt:350765,87	oiled betwee man quiet differ machin
 testfile.txt:350854,113	comput stop answer phone never reason
 testfile.txt:350969,96	1768 sees 1848 superi merely chatea world 1768-1 odious
@@ -2199,7 +2199,7 @@ testfile.txt:351067,61	itch bramah ernest learns scratc
 testfile.txt:351130,305	again begin meetin chevin produc ideas ratio man half plus repres change quarte brain four man's alone creati anthon
 testfile.txt:351437,49	belly laugh man theolo man's
 testfile.txt:351488,156	i'll floppe gotten monk tell has said net fish live
-testfile.txt:351646,67	thing talk nice egotis don't
+testfile.txt:351646,67	thing talk nice egotis do not
 testfile.txt:351715,364	nobody 1983 god bible gardne latin john young least read nyt him throug straig discip parts chores less he's extrem percen readin uneven review simply learni pleasa book amazin touch writer course jan
 testfile.txt:352081,125	thing durant nothin clever always lesson histor often
 testfile.txt:352208,175	fall indica progra zero robert main roman lackin termin succes firth empire causes
@@ -2214,7 +2214,7 @@ testfile.txt:354695,1136	aircra member bags paris diseas market fact mandat arou
 testfile.txt:355833,142	venera admini former held blamed proble washin george never ludcke reason
 testfile.txt:355977,43	commit sees seldom monume
 testfile.txt:356022,74	invent paint seem thing bugs can't fresh
-testfile.txt:356098,176	thing tell sheer terror physic experi advers don't condit someti hartma doing
+testfile.txt:356098,176	thing tell sheer terror physic experi advers do not condit someti hartma doing
 testfile.txt:356276,80	price old model run better look car
 testfile.txt:356358,50	bet stop horse runawa him
 testfile.txt:356410,140	burned stake god martyr always thomas counte has votes reed majori
@@ -2277,8 +2277,8 @@ testfile.txt:362795,83	past cause often find result future easier
 testfile.txt:362880,71	emotio kesey think love sense ken
 testfile.txt:362953,70	mailed coming unless usuall what's it's
 testfile.txt:363025,161	howard return post funny better calls press washin phone simons smart
-testfile.txt:363188,109	let things room mosqui little slept claim bother never don't single
-testfile.txt:363299,131	fond ogden want don't nash tellin haven'
+testfile.txt:363188,109	let things room mosqui little slept claim bother never do not single
+testfile.txt:363299,131	fond ogden want do not nash tellin haven'
 testfile.txt:363432,103	readil benjam ideas accept tell frankl said
 testfile.txt:363537,51	buy that's anythi custom
 testfile.txt:363590,85	today tomorr yester
@@ -2333,7 +2333,7 @@ testfile.txt:371996,62	side cleani preudh it's law window
 testfile.txt:372060,112	minist prime loves joseph workin man winsto church chambe him
 testfile.txt:372174,42	progre pro con congre
 testfile.txt:372218,171	relati lay unable freder postul she possib eggs positi probab hen lays doesn' winsor black she's
-testfile.txt:372391,276	mind barry probab celled slime sex questi asked dave every answer pools yes warm orgasm often consta amoeba don't almost animal one-ce single teen living
+testfile.txt:372391,276	mind barry probab celled slime sex questi asked dave every answer pools yes warm orgasm often consta amoeba do not almost animal one-ce single teen living
 testfile.txt:372669,137	came govern come data standa ebcdic encryp prof studen americ went ibm
 testfile.txt:372808,263	week shutou droppe 130 midter has newell chem quarte studen gorden averag five once again week's tossed earned profes exam single phenom receiv eng threw
 testfile.txt:373073,653	natura equiva qed above latin equati want induct import large popula less transl take every milita techni trivia used assume proof arbitr number suffic it's equal sample case
@@ -2370,7 +2370,7 @@ testfile.txt:379984,74	light- third regula calori one-th what's light year less
 testfile.txt:380060,78	side tachyo road cross
 testfile.txt:380140,134	feet ducks stamp forest flamin fires flat elepha
 testfile.txt:380276,105	themse mounta climbe home preven ones going rope sensib togeth
-testfile.txt:380383,666	star polans correc post spot brad else lose postne believ away really emily somebo posted direct once coppol it's wars send can't don't made temple netiqu mail you'll roman probab has net wait whole you're messag enough franci certai questi inform soon answer knows day check
+testfile.txt:380383,666	star polans correc post spot brad else lose postne believ away really emily somebo posted direct once coppol it's wars send can't do not made temple netiqu mail you'll roman probab has net wait whole you're messag enough franci certai questi inform soon answer knows day check
 testfile.txt:381051,154	100 units produc 000 every proces coming line contro works least qualit sure testin
 testfile.txt:381207,70	invent god man trust alcoho questi grass
 testfile.txt:381279,41	nothin happen quick has act
@@ -2386,24 +2386,24 @@ testfile.txt:382851,89	rule mark ray's precis cut axe chalk ray microm measur
 testfile.txt:382942,169	razors nooses rivers damp awful cause parker acids smells aren't pain guns gas cramp lawful doroth give live stain drugs
 testfile.txt:383113,158	worth graphi adequa sets descri hardly pictur 10k words
 testfile.txt:383273,117	reader member twain myself suppos mark idiot congre repeat
-testfile.txt:383392,270	real admire progra diffic comput actual else arguin ada aesthe implem its overwh find add large scient don't notice
+testfile.txt:383392,270	real admire progra diffic comput actual else arguin ada aesthe implem its overwh find add large scient do not notice
 testfile.txt:383664,167	real hardwa shame despis comput actual limita softwa has doesn' idea machin it's turing scient poor
-testfile.txt:383833,114	real code comput disk space commen scient don't can't afford identi
-testfile.txt:383949,123	real pencil progra comput write assemb anythi number scient don't portab less
-testfile.txt:384074,210	real code occasi progra applic comput write rarely count hardly precis accura scient don't high level system tinker
+testfile.txt:383833,114	real code comput disk space commen scient do not can't afford identi
+testfile.txt:383949,123	real pencil progra comput write assemb anythi number scient do not portab less
+testfile.txt:384074,210	real code occasi progra applic comput write rarely count hardly precis accura scient do not high level system tinker
 testfile.txt:384286,197	real hardwa nobody trusts comput planet write run specs fit able sapien anythi ever homo scient langua future single
 testfile.txt:384485,215	real pencil progra desks neurot premat carefu wear line struct toilet traine neckti clear otherw compul disdai
-testfile.txt:384702,145	real progra brown bag eat lunche quiche doesn' sell vendin machin bring don't brown-
-testfile.txt:384849,99	real hard progra code write unders commen don't
-testfile.txt:384950,166	real progra form caveme look flowch after illite draw don't docume drew
-testfile.txt:385118,253	real progra mounta room wear tennis sport change clothe climbi boots play middle requir machin don't case sudden spring
-testfile.txt:385373,104	real progra actual write reachi pubert after don't basic
-testfile.txt:385479,158	real wimp progra write pipe engine white wear socks fortra stress freaks don't crysta weenie
-testfile.txt:385639,118	real progra decide write whethe fortra cobol don't can't
+testfile.txt:384702,145	real progra brown bag eat lunche quiche doesn' sell vendin machin bring do not brown-
+testfile.txt:384849,99	real hard progra code write unders commen do not
+testfile.txt:384950,166	real progra form caveme look flowch after illite draw do not docume drew
+testfile.txt:385118,253	real progra mounta room wear tennis sport change clothe climbi boots play middle requir machin do not case sudden spring
+testfile.txt:385373,104	real progra actual write reachi pubert after do not basic
+testfile.txt:385479,158	real wimp progra write pipe engine white wear socks fortra stress freaks do not crysta weenie
+testfile.txt:385639,118	real progra decide write whethe fortra cobol do not can't
 testfile.txt:385759,63	real progra rogue better think advent playin
-testfile.txt:385824,132	real progra callin text functi space after otherw scratc don't shared finish
-testfile.txt:385958,204	real perhap progra verify correc execut comput except softwa engine verifi proces involv doesn' necess aid anythi packag don't debug
-testfile.txt:386164,457	severa hardwa greasy correc comput mid except engine workin run going wish away dfa megaby levels aisles one's need aid packag someth virtua transi real stop softwa verifi kill trip idea mid-tr great moment inexpl don't system distru person
+testfile.txt:385824,132	real progra callin text functi space after otherw scratc do not shared finish
+testfile.txt:385958,204	real perhap progra verify correc execut comput except softwa engine verifi proces involv doesn' necess aid anythi packag do not debug
+testfile.txt:386164,457	severa hardwa greasy correc comput mid except engine workin run going wish away dfa megaby levels aisles one's need aid packag someth virtua transi real stop softwa verifi kill trip idea mid-tr great moment inexpl do not system distru person
 testfile.txt:386623,179	real extern softwa engine workin spec descri undocu job feel proced using formal late
 testfile.txt:386804,91	real occurs oppose fake adj
 testfile.txt:386897,96	real afraid they'l users break face they'r machin never
@@ -2425,7 +2425,7 @@ testfile.txt:388468,161	dolph broke ache better having stomac tax flat millio fe
 testfile.txt:388631,289	econom chase resour depres diffic houses lose data neighb sophis modeli job predic succes downtu recess loses
 testfile.txt:388922,203	shalt take nonce reader protec bit paired used reclai spare dot i'm thou cons tree single made
 testfile.txt:389127,85	ice-br ice ogden dandy reflec nash breaki candy quicke liquor
-testfile.txt:389214,739	severa star implic produc zorac james obviou comple artifi starfi positi design ship displa short advise intell announ hogan approa unusua interc don't apart everyt reinte pause place show follow unknow famili spheri after constr univer purpos giants delibe large surrou middle transf illumi seem form again floor means we're change space
+testfile.txt:389214,739	severa star implic produc zorac james obviou comple artifi starfi positi design ship displa short advise intell announ hogan approa unusua interc do not apart everyt reinte pause place show follow unknow famili spheri after constr univer purpos giants delibe large surrou middle transf illumi seem form again floor means we're change space
 testfile.txt:389955,92	reisne inerti you'll rule think big concep never enough
 testfile.txt:390049,79	religi anatol servic sin has making love france great done
 testfile.txt:390130,88	dave used barry rembra beaure never
@@ -2438,7 +2438,7 @@ testfile.txt:390620,72	maxim man highes does classi rennin animal
 testfile.txt:390694,126	civili wester think report gandhi idea mahatm
 testfile.txt:390822,144	report devil' dictio truth devil bierce writer dispel guesse tempes words ambros
 testfile.txt:390968,824	help water bob countr protec miles remind old pledge away empty barry missil i'm nation senato put maybe dave carry school down idea prayer jobs goes great can't six drinki realiz folk run riskin outspo promis need pollut kind set sensit honest presid issue there' pig straig politi career ours chemic agains that's report belong saying system talkin person enviro
-testfile.txt:391794,84	resear braun wernhe i'm von don't doing
+testfile.txt:391794,84	resear braun wernhe i'm von do not doing
 testfile.txt:391880,91	tempta you'll chance later think probab resist easier
 testfile.txt:391973,822	larger starts picks pieces tut's planet speed tut bone twice double kph him roger beers spaces stacks nerd galact nine slow review body every rowdy patrol insura four beer bones wrecks second light notice week johnso car drinks etc cans next cut exceed king questi fall soon hour does breaks nutley pyrami
 testfile.txt:392797,646	procla tenet above rhode indire implie expedi circui circum conven direct absolu maybe princi gain estima immuta scient result adhere none guesse induce rhode' law empiri happen proven probab univer purpos otherw materi politi infini combin comfor inferr always unilat advant deduct assume derive become truth unequi undeni until person
@@ -2454,10 +2454,10 @@ testfile.txt:394439,159	conten adorab asleep rule fallen looks has cat lap utter
 testfile.txt:394600,128	though admire greatl deep rule lunch probab great thinki appear
 testfile.txt:394730,102	deans fandal hide lie find academ father rules damian
 testfile.txt:394834,234	six york inters next legal horn throug red turn honkin drivin four-w means anythi four cars park rules light flashe anywhe done
-testfile.txt:395070,769	severa compar dieter countr snacks eat food leave table taste wine eating bronx empty hungry enjoy really exampl feel season richar creed smit betwee take subtly accomp textur never rules it's don't everyt avoid travel childp cap unless import diet finish browni meal turnip better later cheeks agains feels stomac always plate blue especi compan portio
+testfile.txt:395070,769	severa compar dieter countr snacks eat food leave table taste wine eating bronx empty hungry enjoy really exampl feel season richar creed smit betwee take subtly accomp textur never rules it's do not everyt avoid travel childp cap unless import diet finish browni meal turnip better later cheeks agains feels stomac always plate blue especi compan portio
 testfile.txt:395841,86	refer rule always wrong rules boss
 testfile.txt:395929,471	relati waiter longer ants bugs worms things tips post around partie gettin cocain tip affect existe missin post-n mornin someth nuclea safety hard exotic birds flock dead tell little become ignore overly bother person dog
-testfile.txt:396402,1045	neat shredd post sneeze gasoli illega nuclea flamma parts bills foods short age beef supply commun scaven never hand elevat don't fire flying intern psycho salad due throug safety manneq sanita air ones nutrit spare limite proble mouth buildi d-day day roll rememb tips food stagge carefu scarce circul design post-n attemp availa dollar areas put ground hit hundre learn organs mashed avoid lead heavy after piles etc has wheat accumu fallou drive you're existe materi fall potato bomb stairs tossed dead equal recogn
+testfile.txt:396402,1045	neat shredd post sneeze gasoli illega nuclea flamma parts bills foods short age beef supply commun scaven never hand elevat do not fire flying intern psycho salad due throug safety manneq sanita air ones nutrit spare limite proble mouth buildi d-day day roll rememb tips food stagge carefu scarce circul design post-n attemp availa dollar areas put ground hit hundre learn organs mashed avoid lead heavy after piles etc has wheat accumu fallou drive you're existe materi fall potato bomb stairs tossed dead equal recogn
 testfile.txt:397449,241	enthus drunks fiends laugh reckle talent rely dope luck lack sagitt optimi nov dec great deal majori tenden
 testfile.txt:397692,73	isn't san herb caen used never franci
 testfile.txt:397767,65	proust san editin marcel issue franci pentho
@@ -2543,7 +2543,7 @@ testfile.txt:411691,1013	genera irrita resear divers makers pieces god around in
 testfile.txt:412706,84	guy rememb anyway bible gideon ever what's can't
 testfile.txt:412792,96	worst sooner later possib occur set circum sodd's sodd second bound law
 testfile.txt:412890,67	analys comput softwa attire evenin female formal
-testfile.txt:412959,72	pursui happin prefer don't
+testfile.txt:412959,72	pursui happin prefer do not
 testfile.txt:413033,85	simply howe agains kill alive men law
 testfile.txt:413120,829	collap progra jets stunt old around cabine going tax overni barry shoppi mall nation billio handma popula subver year everyb dollar depart decide dave guide surviv string maimin drop old-fa electr games gift pulled humble force giving gift-g along buy exchan walton gifts kind forget you're barbie large interv family money form econom sum govern sittin holida thousa celebr air dolls means spend christ cranbe level killin fashio
 testfile.txt:413951,145	catch joseph catch- heller upon thrust achiev medioc born
@@ -2551,7 +2551,7 @@ testfile.txt:414098,114	let life jerk seems live
 testfile.txt:414214,87	depart hit subtle wouldn head recogn
 testfile.txt:414303,69	fast life lane traffi oncomi you're live
 testfile.txt:414374,152	finall avery turn worse horrib televi perfor appear person
-testfile.txt:414528,376	scorpi rememb rhinoc crocod kicked teeth poison hippop anarch certai points dogs pat put armcha fangs front clothe down hardin big sharp sleep elepha almana don't animal mike
+testfile.txt:414528,376	scorpi rememb rhinoc crocod kicked teeth poison hippop anarch certai points dogs pat put armcha fangs front clothe down hardin big sharp sleep elepha almana do not animal mike
 testfile.txt:414906,156	primal tasted found cousin fell knocke today parlor floor ogden throug termit wood nash
 testfile.txt:415064,130	withst progra 1982 sept progre acm sigpla change langua manage epigra absorb
 testfile.txt:415196,111	pens coat instea multip hanger somebo ought ball disapp cross
@@ -2585,7 +2585,7 @@ testfile.txt:420230,37	today stay away saucer flying
 testfile.txt:420269,39	hurric stay away
 testfile.txt:420310,57	rhinoc lightl attemp steali
 testfile.txt:420369,123	i'll believ drink somebo philos someth steele plagia everyb
-testfile.txt:420494,112	progra guidel handle test steinb never error condit don't system
+testfile.txt:420494,112	progra guidel handle test steinb never error condit do not system
 testfile.txt:420608,49	search stop happin next
 testfile.txt:420659,86	search bath take stop happin next they'd
 testfile.txt:420747,100	fight mostly report behind proble stult' stult soluti
@@ -2612,7 +2612,7 @@ testfile.txt:422571,102	progra 1982 syntac sept acm sigpla sugar cancer semico e
 testfile.txt:422675,168	progra monito runs its loses it's totall system made favori rpg monopo
 testfile.txt:422845,178	sub-sy progra 1982 sept acm sigpla always we're sub starti system infini epigra
 testfile.txt:423025,1014	loathi bastar compli least drive heinou vegas cure life top every ether chemic thomps pint volume hollyw fear music las gets load weasel closin
-testfile.txt:424041,169	stogie roguie eat roguel wine called big rock drink troll smoke love don't roll monste abc
+testfile.txt:424041,169	stogie roguie eat roguel wine called big rock drink troll smoke love do not roll monste abc
 testfile.txt:424212,86	abilit mind man tact tell hole has head open
 testfile.txt:424300,52	unsaid tact you're thinki
 testfile.txt:424354,65	take stride anyone gets everyt trampl
@@ -2625,7 +2625,7 @@ testfile.txt:425487,62	talk calls foolis euripi fool sense
 testfile.txt:425551,64	henry doers willia talker shakes
 testfile.txt:425617,102	wilhel friedr means onesel concea talkin nietzs
 testfile.txt:425721,190	determ persis think dogged headed commun taurus practi stubbo hell bull apr
-testfile.txt:425913,99	russel reform means tax behind don't tree fellow
+testfile.txt:425913,99	russel reform means tax behind do not tree fellow
 testfile.txt:426014,88	fast price govern itself market likely going taxes
 testfile.txt:426104,88	life extens life's certai taxes
 testfile.txt:426194,132	onto home edge grows able freewa childr car teach polite courte never
@@ -2642,7 +2642,7 @@ testfile.txt:428533,69	forbid anyone pliers pair texas law posses
 testfile.txt:428604,145	ground possib justif proces text cannot has finneg usc idea made right-
 testfile.txt:428751,92	walt goodne thing kelly pogo modern conven remote future thank
 testfile.txt:428845,73	pound boy liver leghor foghor sharp wet boy's
-testfile.txt:428920,57	unders wonder don't
+testfile.txt:428920,57	unders wonder do not
 testfile.txt:428979,41	isn't guardi secret you've
 testfile.txt:429022,89	eight woman speaks parker can't doroth langua
 testfile.txt:429113,62	chemot 80's tell can't hairst
@@ -2658,7 +2658,7 @@ testfile.txt:430404,72	foot army bill leader needs big toe murray
 testfile.txt:430478,213	separa britai assert men placed create practi declar equal effect great lincol future abraha
 testfile.txt:430693,58	teenag income modern averag
 testfile.txt:430753,114	beauty woman rather man better think averag brains
-testfile.txt:430869,204	bad laid gotten jim unders joyce' bookst undese owner has unix anythi joyce totall don't tried reputa
+testfile.txt:430869,204	bad laid gotten jim unders joyce' bookst undese owner has unix anythi joyce totall do not tried reputa
 testfile.txt:431075,889	wherea diffic barry shoppi mall detail conven backwa basic lot direct fast got fault once accide dave guide surviv parkin pickup idea differ forear lots rules hand great neithe truck struck man tattoo car danger cities said want kind drive you're charli muscul legall drivin malls squat behind street valid christ allowe crowde big anythi contai explai park driven reason violen
 testfile.txt:431966,872	100 slip lover fact food heated sold bottle restau egg lunch immedi barry whiz ba-ko- pourin writin statin mornin tomato matter bits basic cooled didn't nugget compre dave bun down aroma electr number consis medioc emit made menu pattie cheez rank seafoo specia dinner mister wads kind seriou breakf patty item onion percen paper lettuc inspec unit called ketchu sauce device little lover' starti animal servin guaran
 testfile.txt:432840,136	best progra layman alice book that's wonder anythi it's
@@ -2690,7 +2690,7 @@ testfile.txt:436688,71	cliche alan comput always need perlis field
 testfile.txt:436761,110	1981 staff member york januar times length memos measur confus
 testfile.txt:436873,223	1969-1 genera countr john breedi conser bird intend 1969 roundi subver ground watche atty every 1972 means mitche moveme clean commun
 testfile.txt:437098,196	consul curse once normal needs instea medici upon has him requir enough custom give beaten asks strong
-testfile.txt:437296,339	starts correc word talked pleasu lazaru after excess love enough busine punctu supply throat period moron moment don't bound force place none course cuttin senten
+testfile.txt:437296,339	starts correc word talked pleasu lazaru after excess love enough busine punctu supply throat period moron moment do not bound force place none course cuttin senten
 testfile.txt:437637,51	its affect cost hasn't popula living
 testfile.txt:437690,72	chance going down cost living
 testfile.txt:437764,94	eat mcnult nothin john fit machin cow makes grass
@@ -2722,8 +2722,8 @@ testfile.txt:441651,77	hoffma duty revolu away abbie
 testfile.txt:441730,1350	perhap soup compla stewar notes pot old drowne climbe rule few death backwa suspec tragic simult themse three conque attack foul willin drop father heir harvar odd rest met second great kitche unknow relati fell chloro eligib vats accurs salad left untime breakf succum lampoo dishra gestur myster either wear twodor rings roast threat slave play tray troney day suspic food accept bored parraf reclai assail thrown poison began dozen revamp appear king's forks found lot accide throne boy fled sort enemie city lineal postal son descen after minas least plot noble appare sculle carote rightf strang king employ finall return grabs dead looked grief bravel until system beaten crown fashio
 testfile.txt:443082,128	myth robert heller exists skill succes equals second manage
 testfile.txt:443212,682	joys brow wall whistl final green leo protes hangs hard put paint isn't painte outrag every ever father it's echoed heard almost child wet sputte propou hang jewish though famili summon yiddis said riddle perple rosten smiled knit gave doesn' herrin
-testfile.txt:443896,146	club magic lucid rule simple waving hands rock waste hoping mccloc don't
-testfile.txt:444044,155	progra expert rule michae yet optimi jackso don't second
+testfile.txt:443896,146	club magic lucid rule simple waving hands rock waste hoping mccloc do not
+testfile.txt:444044,155	progra expert rule michae yet optimi jackso do not second
 testfile.txt:444201,126	establ kludge techni interm later trick it's second well-e mike broido
 testfile.txt:444329,633	mscp uda50 progra hyper blocks around cube above edge 4-27 functi wrappi basic moves stated reache view disk manual viewpo group logica four perfor vector dimens doc potent host follow track approp area access set struct quote page form referr sector axis cylind kit howeve line analog parall hyper-
 testfile.txt:444964,133	grant progra user major contri endowm suppor inanit fortun nation
@@ -2760,12 +2760,12 @@ testfile.txt:449990,69	die ashley possib young montag idea late
 testfile.txt:450061,668	years cigars fact old restau going away televi barry whack repair wires inside dave poking men idea factor electr consis vcr's medioc trying buy broken destro cheap lester mister named destru traine sledge free bring so-cal consum rather vcr center servic ones lives sets thus called lookit fritte device person perman
 testfile.txt:450731,79	itself franco differ spisan equal identi
 testfile.txt:450812,129	octobe longer kissin york bit henry uncons 1973 immedi takes times illega
-testfile.txt:450943,210	form rogers income martyr crook tax has golf americ it's throug level don't made liars
+testfile.txt:450943,210	form rogers income martyr crook tax has golf americ it's throug level do not made liars
 testfile.txt:451155,218	consum increa burger thing smith choice import presid indivi day king donald garnis
 testfile.txt:451375,112	partic intell dimini discus adam number square walins
 testfile.txt:451489,108	lowest member divide group number
 testfile.txt:451599,509	nader spends god whose tax barry taxes irs lines accord busine dave organi look toll idea never pays hot ralph tip they'r want cheat print free staffe questi money employ dynami ask nickel real consum inform guidan repres useles knows toll-f big neatly sweati
-testfile.txt:452110,50	kenned consta don't mad
+testfile.txt:452110,50	kenned consta do not mad
 testfile.txt:452162,31	ducks coming killer
 testfile.txt:452195,354	compla powder word home candle stay nor parker ladies erotic till read i've impure keep doroth sancti far awake admire three poetry rather gives night men never shrink paints they'd light wicked heard single shudde overtu recogn
 testfile.txt:452551,165	blount replie roy thing word write better proces used said find somebo drugs
@@ -2808,11 +2808,11 @@ testfile.txt:460975,147	watch someon diffic thing theodo else white wrong world 
 testfile.txt:461124,155	found exciti isaac herald funny hear that's asimov phrase eureka discov scienc
 testfile.txt:461281,57	writte blinks having cursor moving writes
 testfile.txt:461340,60	soap dish myster cordur
-testfile.txt:461402,764	lewis tune's correc eyes glass a-sitt comple alice coming eyes' really feel invent knight vexed thing hersel carrol own bewild ought don't aged gate quite intere song trying oughtn man haddoc said throug sittin lookin means ways that's unders called tune little means'
+testfile.txt:461402,764	lewis tune's correc eyes glass a-sitt comple alice coming eyes' really feel invent knight vexed thing hersel carrol own bewild ought do not aged gate quite intere song trying oughtn man haddoc said throug sittin lookin means ways that's unders called tune little means'
 testfile.txt:462168,160	ebert sold theate 1986 letter report movie nation conces associ candy roger
 testfile.txt:462330,85	short says shirt short- bare suppor sleeve nation arms associ
 testfile.txt:462417,224	james spread hide wide escape wrong sweep sinner its net fine wondro fish web take jeffre every myster roche big meshes child alone thee strong law
-testfile.txt:462643,105	turn govern again around run going they'r congre hope don't
+testfile.txt:462643,105	turn govern again around run going they'r congre hope do not
 testfile.txt:462750,250	let cometh form coding comput binary whatso testam affirm yea modern commun evil nay matthe number offers basis theory system
 testfile.txt:463002,259	woodhe countr york post robert run runnin think elvis alive washin enquir times read nation
 testfile.txt:463263,106	choose tanenb thing nice standa andrew
@@ -2825,7 +2825,7 @@ testfile.txt:464403,69	boy man school farthe walk older gets
 testfile.txt:464474,101	famili age doctri grow wisdom older brings distru mencke
 testfile.txt:464577,124	let catch breath reader comma elizab grow zwart become own import older clarks less
 testfile.txt:464703,82	thing repeat cringe mistak
-testfile.txt:464787,133	social resear possib ruther interp whatev ernest don't scienc
+testfile.txt:464787,133	social resear possib ruther interp whatev ernest do not scienc
 testfile.txt:464922,89	take stop man proble leisur never rest
 testfile.txt:465013,140	real soon things look schulz learn younge charle i've born
 testfile.txt:465155,69	pat thing behind really decent person
@@ -2855,7 +2855,7 @@ testfile.txt:469348,222	theme avoidi overal primar repres enforc offici commun s
 testfile.txt:469572,190	edged charit human double distin manife privil call laffer animal certai inhuma
 testfile.txt:469764,89	stupid someon watchi probab propor action
 testfile.txt:469855,551	countr barry far cows lot depart dave energy enormo raccoo dinosa easter scient tried piled none manage postpe bill oil run workin bulldo anger cancer etc haddoc sand althou middle guzzle they'v using form top labora thousa rats tons turned proble rental animal person develo
-testfile.txt:470408,103	proble erase unwrit don't glaser law
+testfile.txt:470408,103	proble erase unwrit do not glaser law
 testfile.txt:470513,283	mathem progra engine verifi proble order tend cheat toy result
 testfile.txt:470798,157	genera virtue taylor vices pretty elizab going proble annoyi they'r sure
 testfile.txt:470957,62	lifegu gene proble pool
@@ -2865,7 +2865,7 @@ testfile.txt:471609,76	liver paged con liz quote brain qotc liz's
 testfile.txt:471687,270	dave worth reveal coated standa eager indust televi barry job presid slime- slime piece waste nation questi politi ethica makes
 testfile.txt:471959,136	fella just's chiefl rain steals rainet umbrel unjust
 testfile.txt:472097,72	reader failin unders messag cursed encoun
-testfile.txt:472171,68	comput eat small chips don't reason
+testfile.txt:472171,68	comput eat small chips do not reason
 testfile.txt:472241,295	nuts tips food gerbil market dextro barry someti cross dave betwee catchi sugar called contai writer tastes terms it's gravel grape reason
 testfile.txt:472538,201	depend progre man adapts persis himsel world adapt george bernar shaw reason theref unreas trying
 testfile.txt:472741,38	revolu televi
@@ -2953,8 +2953,8 @@ testfile.txt:487199,35	games system
 testfile.txt:487236,323	hottes cool implie engine obviou run comfor imposs compet heat immedi physic existe differ daviss hell temper margin richar parts
 testfile.txt:487561,91	exagge lying tell addict truth can't
 testfile.txt:487654,150	penis actual vagina occupa really everyo gloria steine requir open jobs
-testfile.txt:487806,865	centur tender butter arthur jones eat soft come simple chance exampl ponder crab jenks goy's forbid isn't reid dipped melted fat learne guide thing goyish every goy think morsel larsen never it's ricks don't wright discov jewish katz you'll steven johnso sincla miller jews yiddis find meet named seriou hope fresh questi someon answer unders rabbis knows names failed cold yet lobste jew person guaran mayonn naiman
-testfile.txt:488673,225	turn again micro plants organi expose lights micro- exhibi charac underg animal light don't photos
+testfile.txt:487806,865	centur tender butter arthur jones eat soft come simple chance exampl ponder crab jenks goy's forbid isn't reid dipped melted fat learne guide thing goyish every goy think morsel larsen never it's ricks do not wright discov jewish katz you'll steven johnso sincla miller jews yiddis find meet named seriou hope fresh questi someon answer unders rabbis knows names failed cold yet lobste jew person guaran mayonn naiman
+testfile.txt:488673,225	turn again micro plants organi expose lights micro- exhibi charac underg animal light do not photos
 testfile.txt:488900,401	increa magic believ finger wonder collec swells claim leavin disapp teachi ebenez spots surfac stick pools intell volume concen blow earth vii fades almost nose parche tide
 testfile.txt:489303,89	three benjam damn kinds disrae lies statis
 testfile.txt:489394,189	three transm sun meteor someon star trek pionee possib proces panel turned away solar has loaded large blocki there' video
@@ -3028,7 +3028,7 @@ testfile.txt:500429,64	peace tacitu desert call
 testfile.txt:500495,124	twain spell pronou better always mark foreig vinci vinchy
 testfile.txt:500621,144	benjam obtain essent frankl little 1759 nor libert deserv give safety neithe tempor
 testfile.txt:500767,55	told believ gullib
-testfile.txt:500824,596	word we'd began pass less mailed told betwee code thing tell curl ever they'd rest kept secret don't result done discov month quickl prl proven run instea after hair sent throug again rather unders failed valid turned yourse proof ignori soul notion
+testfile.txt:500824,596	word we'd began pass less mailed told betwee code thing tell curl ever they'd rest kept secret do not result done discov month quickl prl proven run instea after hair sent throug again rather unders failed valid turned yourse proof ignori soul notion
 testfile.txt:501422,46	look they'r parano trying
 testfile.txt:501470,90	diffic avon unfrie really they'r fortun they'd
 testfile.txt:501562,56	things used
@@ -3037,7 +3037,7 @@ testfile.txt:501692,37	think big pollut missis
 testfile.txt:501731,33	telepa think honk you're
 testfile.txt:501766,61	100 vlsi think eniacs pack
 testfile.txt:501829,77	tonigh comput home crashe think after crawl family
-testfile.txt:501908,70	click twice think don't speaki
+testfile.txt:501908,70	click twice think do not speaki
 testfile.txt:501980,132	red thirty butter days except peanut june wonder suspen wears father hath april rest septob
 testfile.txt:502114,43	fortue examin inspec 2-14
 testfile.txt:502159,335	genera progra come order has need someth enough undoub desper take random given randch howeve please cookie fortun ever charac profou
@@ -3052,7 +3052,7 @@ testfile.txt:504003,49	announ unauth cybern
 testfile.txt:504054,132	troubl treate ill-tr unborn they'r read housma unbego ill fellow
 testfile.txt:504188,108	seager lemma chapte 351 number prof
 testfile.txt:504298,41	creame week non non-da nation dairy
-testfile.txt:504341,1000	increa progra user longer hunter type pledge ride midnig obscen subscr less miss let betwee guide coffee acknow contri monthl down fortun clean 300 differ don't can't receiv mug week mail happen contin gettin unless cutbac target forget shut free favori money mean federa suppor users means cannot saying pithy
+testfile.txt:504341,1000	increa progra user longer hunter type pledge ride midnig obscen subscr less miss let betwee guide coffee acknow contri monthl down fortun clean 300 differ do not can't receiv mug week mail happen contin gettin unless cutbac target forget shut free favori money mean federa suppor users means cannot saying pithy
 testfile.txt:505343,75	take travel bradbu ray sugges
 testfile.txt:505420,426	numeri enter power glass comput eat minimu chicke egg descri functi calori demons foods milk skim conten compon thing maximi data heads lettuc nutrit fixed proble day ever lots level result melott instru rev adrian
 testfile.txt:505848,262	hard take bee whose she cannot tell pill little has times sons never bees sex story
@@ -3068,7 +3068,7 @@ testfile.txt:507345,349	progra tuesda maryla comput built taken newspa univer ha
 testfile.txt:507696,76	itself actual hofsta doesn' contra senten
 testfile.txt:507774,808	beeper weeks table restau people gourme cricke going below immedi eighti barry lack excell dental availa liza 80s best themse three price dave minnel wouldn enormo soda goes made reserv search buy stalk rank advanc floss orient import anybod couple baking someth inform determ waitin lives crowd extend night strivi ready person
 testfile.txt:508584,75	month hard memora forget matter
-testfile.txt:508661,1080	hunter diseas around led kurt believ steadi campai legal feel devil mornin rainbo illega appear poor drugs heroic public inward consid asked told let facade cure vonneg review gray beauty think eaten excerp fear americ comes goes sort effort moment don't sample entire doing strong health rosy relati loathi tinhor honor bitter has seems said sane politi exteri easily fatal trail dorian known better suffer wants thomps does alive ugline truth joy
+testfile.txt:508661,1080	hunter diseas around led kurt believ steadi campai legal feel devil mornin rainbo illega appear poor drugs heroic public inward consid asked told let facade cure vonneg review gray beauty think eaten excerp fear americ comes goes sort effort moment do not sample entire doing strong health rosy relati loathi tinhor honor bitter has seems said sane politi exteri easily fatal trail dorian known better suffer wants thomps does alive ugline truth joy
 testfile.txt:509743,84	think annoyi everyt
 testfile.txt:509829,38	write manual can't
 testfile.txt:509869,47	simula can't
@@ -3120,7 +3120,7 @@ testfile.txt:516546,36	clever ogden dumb nash
 testfile.txt:516584,53	thing wonder west mae
 testfile.txt:516639,53	bob wier everyt enough
 testfile.txt:516694,110	expand jerry govern brown paper fill volume often find availa briefc
-testfile.txt:516806,628	help centur sports simple skydiv flippi walk keep sugges exhaus closet tape agree take pile strugg carry supply pancak helium shower baths magnet light scient avoid don't give discov follow hang man altern horizo instea conser need rate skiing paperw consum balloo step top stop possib gravit glue please cheape clothe earth' big earth 24th presen curlin
+testfile.txt:516806,628	help centur sports simple skydiv flippi walk keep sugges exhaus closet tape agree take pile strugg carry supply pancak helium shower baths magnet light scient avoid do not give discov follow hang man altern horizo instea conser need rate skiing paperw consum balloo step top stop possib gravit glue please cheape clothe earth' big earth 24th presen curlin
 testfile.txt:517436,62	revenu travel today intern arrive men tomorr import
 testfile.txt:517500,93	wealth troubl trees beauti virgin day eucaly live
 testfile.txt:517595,95	truly tikkan madnes intell signif henrik achiev great
@@ -3145,7 +3145,7 @@ testfile.txt:520862,68	howard half kandel cheapl live
 testfile.txt:520932,567	ear pieces spent bit bite pronou whose bruise bitten man bruisi has himsel demand said chambe forehe withdr dismis magist came three compen return examin pay hour courtr silver nasrud men own fallin second succee case trying
 testfile.txt:521501,39	percen zero nothin almost
 testfile.txt:521542,93	bad male memory ways tell has forget second sure sexy
-testfile.txt:521637,51	three wrongs lefts don't
+testfile.txt:521637,51	three wrongs lefts do not
 testfile.txt:521690,157	roguel unicor run look losing its hulks you're rub horn umber there' points confus abc
 testfile.txt:521849,134	police beckma judex speed ubi 1971 non roman trans limit accusa ibi petr law
 testfile.txt:521985,49	real air doesn' exist ufo force ufo's
@@ -3217,20 +3217,20 @@ testfile.txt:529802,63	gravit proble involv defeat paperw
 testfile.txt:529867,46	except predic everyt future
 testfile.txt:529915,169	put genera deceas james stamp postma cannot dead face unless said drop day person theref sugges
 testfile.txt:530086,77	rigidl define vroomf demand doubt uncert areas
-testfile.txt:530165,62	care we're phone don't compan
-testfile.txt:530229,72	water we're don't wasn't fish certai discov
-testfile.txt:530303,126	hardwa softwa unders lights blinki don't someti
+testfile.txt:530165,62	care we're phone do not compan
+testfile.txt:530229,72	water we're do not wasn't fish certai discov
+testfile.txt:530303,126	hardwa softwa unders lights blinki do not someti
 testfile.txt:530431,108	commis mermai energy bomb atomic gave rabi want
 testfile.txt:530541,261	eat bed home half hours dad grave poison python lump tough monty mill came dry hour o'cloc kill night halele down went dance singin
 testfile.txt:530804,55	walt kelly met enemy
 testfile.txt:530861,112	things normal worry alread never
 testfile.txt:530975,111	uprigh believ man hands walked free tomlin lily reason mastur
-testfile.txt:531088,852	toothp partic bond molecu teeth death wish offici barry lack i'm bathro sidewa past blanke police dave sink dribbl foam down martia electr rest hurt don't flu streng midway main harden hours has said head find kind rivule couple cease eventu throug someth high crusty strain floor proces does front you'd lie yourse little stalag mouth brushi homici settin perman talkin sympto
+testfile.txt:531088,852	toothp partic bond molecu teeth death wish offici barry lack i'm bathro sidewa past blanke police dave sink dribbl foam down martia electr rest hurt do not flu streng midway main harden hours has said head find kind rivule couple cease eventu throug someth high crusty strain floor proces does front you'd lie yourse little stalag mouth brushi homici settin perman talkin sympto
 testfile.txt:531942,416	buy mainta fields eventu hope machin turing money abstra chess provid best alan activi think ones unders speak englis intell compet men teach purely organs sense playin
 testfile.txt:532360,98	judgem return always respec affect
 testfile.txt:532460,123	amendm rememb protec shrill self jackas self-s seekin within matter
 testfile.txt:532585,492	genera diffic projec years cave home bare gettin really ugly barry tools exampl wall wound drive taming put isn't bad consid extrem dave begin screw wanted fist blood little ago millio paneli nails primit ought spatte person gratef
-testfile.txt:533079,98	best kill really friend it's don't enemie trying
+testfile.txt:533079,98	best kill really friend it's do not enemie trying
 testfile.txt:533179,1202	eyes sadnes she restau dazzle white ride knew young heming rib-ey terrib appleb poured fight bad whiske spoke memory speak look granol men happin mechan everyo margar never winner her peter doing song streng lay boyfri arm intern tollwa its bulls next raised said eye belle' finish tough ask tequil stop senor whom's imitat compet starte bmw day bull rib faced peace whom him mornin within haggar told life belle youth tell thee though french woman lean car forget quiet merle smile punche betray milk girl onto jordac fought lie
 testfile.txt:534383,128	soon energy techni run meter proble solar utilit solve sunbea throug compan
 testfile.txt:534513,275	eyes tears things planet cry summer wild till friend love bring songs winds afraid invent laugh lullab acts gentil used creatu wisdom
@@ -3263,8 +3263,8 @@ testfile.txt:539339,44	food garlic art insani
 testfile.txt:539385,45	garlic salad art insani
 testfile.txt:539432,189	fat govern countr britis nice anyway kya runnin washin wouldn insens george ksfo throw
 testfile.txt:539623,72	life ticket find can't entran
-testfile.txt:539697,88	someon water having walk don't footst follow
-testfile.txt:539787,1052	perhap severa star earnes robert mind come barry whom mornin bathro messia quiver greet hopped robot naked baseme dave thing sing saving learn chosen hop shower charac wars lenses landed blind result don't moment playfu alone sense dog sixth boundi stall son threep bear childr has likes kind want drift toilet whole powerf flush pull emotio barefo top thousa either nips wants legs contac night essent cannot little face teach buildi plasti injury exactl uncann
+testfile.txt:539697,88	someon water having walk do not footst follow
+testfile.txt:539787,1052	perhap severa star earnes robert mind come barry whom mornin bathro messia quiver greet hopped robot naked baseme dave thing sing saving learn chosen hop shower charac wars lenses landed blind result do not moment playfu alone sense dog sixth boundi stall son threep bear childr has likes kind want drift toilet whole powerf flush pull emotio barefo top thousa either nips wants legs contac night essent cannot little face teach buildi plasti injury exactl uncann
 testfile.txt:540841,37	three tell times
 testfile.txt:540880,318	basica word come partie really nasty barry kind tend him conven witty questi asked stupid came dave terrif always think women enormo winsto church soundi insult f-word
 testfile.txt:541200,64	power want none respon
@@ -3293,7 +3293,7 @@ testfile.txt:543745,61	five countr needs weapon plasma dollar
 testfile.txt:543808,59	five needs weapon world plasma five-d dollar
 testfile.txt:543869,88	save magic unicor beagle peter can't
 testfile.txt:543959,506	launch nobody whereb countr actual bed remain really instea barry hours stretc need mornin three style dave saving every weekda anyway via civili belchi unders proces hold called space wake emerge concep gradua ready scratc daylig during
-testfile.txt:544467,58	won't don't hurt
+testfile.txt:544467,58	won't do not hurt
 testfile.txt:544527,56	word thesau steven what's wright
 testfile.txt:544585,224	macnel comput jeff probab call sensit grasp repair shoe layman thing two-by techni highly does four it's what's exactl can't instru
 testfile.txt:544811,74	quotat change what's can't
@@ -3332,7 +3332,7 @@ testfile.txt:549306,196	asked replie years mind kent she woman going sympho calc
 testfile.txt:549504,209	admini luten produc week every twice nothin dimini away you're proper there' daniel vacati done boss
 testfile.txt:549715,114	progra someon says wish want need lollip him langua done give
 testfile.txt:549831,70	empiri jon going carrol gets tough
-testfile.txt:549903,104	match remedy govern remedi bureau proble modify don't
+testfile.txt:549903,104	match remedy govern remedi bureau proble modify do not
 testfile.txt:550009,251	moon africa cures usuall love ceremo anarch bang ngdang armcha trees heads bleed hold tribe hardin men almana until sacred west mike nose
 testfile.txt:550262,99	metaph voltai speaks unders speake whom
 testfile.txt:550363,347	larger stanis lined pushed grade univer whack set left smalle lem easily bluer lower bottom yellow top today ones places stars count cyberi proper corner types bodies apart
@@ -3342,11 +3342,11 @@ testfile.txt:551107,106	virtue rememb heredi paine thomas poster ought planni
 testfile.txt:551215,167	knowle progra 1982 except singed sept acm sigpla unders finger based system epigra
 testfile.txt:551384,245	invest direct katz topic goal amrom answer forthr swayed gave firmly deflec piece procee object scient hand
 testfile.txt:551631,60	ears mouth shut keep
-testfile.txt:551693,54	neatly don't doing
+testfile.txt:551693,54	neatly do not doing
 testfile.txt:551749,82	govern harry dictat effici truman
 testfile.txt:551833,262	given killed worse decisi man answer better acted proble move clarif toward next him defini laffer shot attitu measur
 testfile.txt:552097,116	man nothin kill war costs winsto polite curchi declar formal
-testfile.txt:552215,189	select absolu topic carefu nothin answer either asking foreca probab edgar others 300 don't sample fiedle
+testfile.txt:552215,189	select absolu topic carefu nothin answer either asking foreca probab edgar others 300 do not sample fiedle
 testfile.txt:552406,100	watch eraser journa mark street guys world wall
 testfile.txt:552508,90	chance impres
 testfile.txt:552600,184	dear near bored restle wretch deject away lonely hoffen feel samuel you're i'm rub darlin here's
@@ -3364,11 +3364,11 @@ testfile.txt:553983,61	worse ignora knows cares apathy
 testfile.txt:554046,98	themse someon anyone else wrong test admiss admit
 testfile.txt:554146,342	lisp novemb produc quacks things robert man woman mentio childr eye fuss burns let fall merit fate europe plan 1792 rights addres mighty kings amid fix'd attent empire
 testfile.txt:554490,66	invent severa having sin i'm never trying perfec
-testfile.txt:554558,146	watche stove pot steven boils awful eye never mess don't keep edward
+testfile.txt:554558,146	watche stove pot steven boils awful eye never mess do not keep edward
 testfile.txt:554706,87	buy choose form misery happin own lets can't money certai
 testfile.txt:554795,74	buy bargai positi doesn' love puts great money
 testfile.txt:554871,85	correc people convic does change never opinio
-testfile.txt:554958,106	greatl outsid reassu need world it's don't
+testfile.txt:554958,106	greatl outsid reassu need world it's do not
 testfile.txt:555066,154	watch holds safe hands devil' dictio friend affect devil bierce ambros
 testfile.txt:555222,84	always whistl charge never law
 testfile.txt:555308,116	triple proces cares doesn' iso krypto anythi bifurc mos made gate
@@ -3388,7 +3388,7 @@ testfile.txt:556344,77	collap office roman latin empire automa
 testfile.txt:556423,52	watch eyes 3-d movies
 testfile.txt:556477,134	feathe kills food man does kill bevera freque allen woody
 testfile.txt:556613,112	dumps does califo choice lawyer toxic jersey waste
-testfile.txt:556727,79	eat wrappe elepha pengui don't can't
+testfile.txt:556727,79	eat wrappe elepha pengui do not can't
 testfile.txt:556808,625	help produc maps i'd pet rise going really goldfi beauti i'm dedica fair dates words hard got life look down wouldn buns it's can't fold dog watch cuticl freshn downto specia rutaba gloves floss promis cat need friend road love i've blende dairy lowly appoin meetin spend night ferret bakery lingui check
 testfile.txt:557435,126	funera twain mark involv rejoic birth grieve person
 testfile.txt:557563,64	alphab order song
@@ -3398,7 +3398,7 @@ testfile.txt:557836,684	drives comput around old treat joke simple barf figgy ba
 testfile.txt:558522,60	contem oscar wilde born
 testfile.txt:558584,266	troubl office john run fan there' shelto far matter direct fast return possib propel stand hits almost can't source none flee
 testfile.txt:558852,66	expand revenu govern wiker wiker' absorb law
-testfile.txt:558920,1156	rememb partic nouns correc word carefu pronou mixing repeti writin willia terrib adverb words put agree take cliche passiv view metaph flaky singul exclam statem linkin everyo writer never proofr prepos rules don't great split hand avoid place avoide viable follow locuti pick idiom altern improp overus verbs subjec shift find reread least plague infini negati trendy seek form editin possib verb marks always used sound safire voice close antece especi dangli deal bull conjun senten
+testfile.txt:558920,1156	rememb partic nouns correc word carefu pronou mixing repeti writin willia terrib adverb words put agree take cliche passiv view metaph flaky singul exclam statem linkin everyo writer never proofr prepos rules do not great split hand avoid place avoide viable follow locuti pick idiom altern improp overus verbs subjec shift find reread least plague infini negati trendy seek form editin possib verb marks always used sound safire voice close antece especi dangli deal bull conjun senten
 testfile.txt:560078,105	data proven collec anythi enough method willia hollan law statis
 testfile.txt:560185,129	compla heat warm winter summer house season keep
 testfile.txt:560316,141	wit humori spoils devil' dictio devil bierce leavin americ salt cooker ambros
@@ -3413,7 +3413,7 @@ testfile.txt:562428,335	though consid longer hired rule leave having wish remove
 testfile.txt:562765,72	lose worker nothin world arise chairs
 testfile.txt:562839,79	strict three code enforc war world dress averte adhere
 testfile.txt:562920,109	worst month august though 1981 shorte steve downhi skiing rubens lines
-testfile.txt:563031,228	worst month full three steve days paying apartm possib means februa has rubens rent don't avoid year whenev
+testfile.txt:563031,228	worst month full three steve days paying apartm possib means februa has rubens rent do not avoid year whenev
 testfile.txt:563261,194	worst guide reader crisis pulses 1985 involv war bombs explod column electr videot nuclea damage respon
 testfile.txt:563457,121	worst sprout vegeta steve brusse next rubens year
 testfile.txt:563580,153	lewis depend tell carrol please want said cat ought deal
@@ -3439,12 +3439,12 @@ testfile.txt:566250,69	that's redund kind person
 testfile.txt:566321,115	you're
 testfile.txt:566438,353	days unread old i'd son man young wonder papers said pointl willia reputa facts found wrote replie shame youth better look think fill galore won never father great made
 testfile.txt:566793,364	lewis old white son man young hair has head said injure i'm brain willia perfec feared replie age again youth think stand yet carrol become father incess sure none
-testfile.txt:567159,391	breath per talk peers kick old death lectur airs said i'm conven enough questi year told i'll save hundre three stuff youth answer think yet bore yourse listen day father don't downst give
+testfile.txt:567159,391	breath per talk peers kick old death lectur airs said i'm conven enough questi year told i'll save hundre three stuff youth answer think yet bore yourse listen day father do not downst give
 testfile.txt:567552,381	beak lewis suet old jaw pray has argued said lasted finish weak muscul goose life youth jaws yet carrol gave anythi father took bones rest case manage toughe wife law streng
-testfile.txt:567935,373	though help progra realiz old equall write run said read they'v keep langua sugges useful isn't bad replie taking paying youth every looks books yet father never don't hike none
+testfile.txt:567935,373	though help progra realiz old equall write run said read they'v keep langua sugges useful isn't bad replie taking paying youth every looks books yet father never do not hike none
 testfile.txt:568310,378	shook lewis old uncomm supple mentio grey pray back-s said sell couple fat sage grown allow youth box shilli door turned yet carrol limbs locks somers kept ointme reason
 testfile.txt:568690,377	compla yours days critic old few mentio really bear statur said i've willia fair far mistak errors got youth stop think englis everyo declar father lots it's great hurt scared quite late
-testfile.txt:569069,391	kick lewis old hardly airs said eye enough questi balanc eel i'll three stuff youth steady answer clever suppos think stairs yet carrol yourse listen down day father ever awfull don't made nose give
+testfile.txt:569069,391	kick lewis old hardly airs said eye enough questi balanc eel i'll three stuff youth steady answer clever suppos think stairs yet carrol yourse listen down day father ever awfull do not made nose give
 testfile.txt:569462,65	once young stay immatu indefi
 testfile.txt:569529,50	ever messag person
 testfile.txt:569581,92	readin wise spend wonder sort trash witty
@@ -3469,19 +3469,19 @@ testfile.txt:571937,53	book hair wears its can't judge
 testfile.txt:571992,48	progra broken egos can't
 testfile.txt:572042,135	lauren spasti happen going worryi bacall what's can't enough
 testfile.txt:572179,137	surviv mitten things schulz learn juice charle i've can't wet suckin
-testfile.txt:572318,96	bumste either dagwoo teach lazy can't don't
+testfile.txt:572318,96	bumste either dagwoo teach lazy can't do not
 testfile.txt:572416,65	imposs cannot achiev attemp absurd
 testfile.txt:572483,48	cannot kill injuri eterni
 testfile.txt:572533,68	forwar pattin cannot propel yourse
 testfile.txt:572603,98	didn't month life advanc need lease
 testfile.txt:572703,118	prove staff white verdic hinckl couldn doubt house sane beyond meese reason
 testfile.txt:572823,22	mail
-testfile.txt:572847,80	hard talk saling think teache don't
-testfile.txt:572929,117	needle eat food eating knitti piggy sew don't reason fork miss chines
+testfile.txt:572847,80	hard talk saling think teache do not
+testfile.txt:572929,117	needle eat food eating knitti piggy sew do not reason fork miss chines
 testfile.txt:573048,953	help sounds expert silt comple whethe going tax one-fi offici simpli barry design keep here's irs brains taxes direct amount short take decide revenu betwee file dave tax-pr goes pays gets send fiftee show hey intern distin prepar unless need want money form govern addres names servic calls means sears wants text spend pond we're please househ sweati check took
 testfile.txt:574003,64	comput superi feel tenden
 testfile.txt:574069,153	scroll dave mizk manual acquir irk decot glekno entitl ibm perman confus
-testfile.txt:574224,110	fasten close down walk unusua magnet don't metal object person
+testfile.txt:574224,110	fasten close down walk unusua magnet do not metal object person
 testfile.txt:574336,20	mail junk
 testfile.txt:574358,79	return old body wrinkl please gets year
 testfile.txt:574439,73	lot you'll today capaci learn mistak
@@ -3491,7 +3491,7 @@ testfile.txt:574834,86	apartm christ rice rickly small krispi echo
 testfile.txt:574922,107	fat 1982-0 reader 1982 marks chicag little car stretc cyrus you're
 testfile.txt:575031,136	comput friend misdat fix spendi check adding you've sugges
 testfile.txt:575169,65	full power gear takes taxi landed you've gear-u
-testfile.txt:575236,344	dougla galaxy adams i'd she man young betelg wish really mother times i'm airloc told didn't die guide deep asphyx tell space listen hitchh it's don't trappe vogon
+testfile.txt:575236,344	dougla galaxy adams i'd she man young betelg wish really mother times i'm airloc told didn't die guide deep asphyx tell space listen hitchh it's do not trappe vogon
 testfile.txt:575582,58	look wrinkl millio green dollar
 testfile.txt:575642,35	soon hide recogn
 testfile.txt:575679,152	man begins prepar call himsel ashame sydney realis someth secret sure doing harris
@@ -3506,7 +3506,7 @@ testfile.txt:576824,78	beach friend house never until rent
 testfile.txt:576904,242	yield life ahrima take sacrif yours stock week rather wellin spare own wells next hesita fair compan
 testfile.txt:577148,62	mind actual merely twiste sprain posses
 testfile.txt:577212,117	think worry seldom probab wouldn miller olin
-testfile.txt:577331,89	carry emulat dead especi heros don't far
+testfile.txt:577331,89	carry emulat dead especi heros do not far
 testfile.txt:577422,113	bet ruther agains odds ernest anythi never scienc
 testfile.txt:577537,111	best fight wear trouse henrik libert never ibsen freedo
 testfile.txt:577650,512	sultry nearby drinki houses visit cool fact actual you'll believ cheerf roarin really barry summer firepl find house guzzle hearth popula contra august dave sittin that's remark heat heavil remove day scient fire postpe opinio
@@ -3534,7 +3534,7 @@ testfile.txt:581111,68	type you're specie matter
 testfile.txt:581181,59	life dog's furnit leadin stay you've dog
 testfile.txt:581242,69	got band sucks gary gidden gimmic you've
 testfile.txt:581313,115	got think yet tomorr prepar you've yester haven'
-testfile.txt:581430,89	mixed analys thing tells patien believ has don't
+testfile.txt:581430,89	mixed analys thing tells patien believ has do not
 testfile.txt:581521,90	consci enjoyi anythi never stops doing
 testfile.txt:581613,24	fault dumped core
 testfile.txt:581639,1090	inadeq basica licens signs carpet outlet spot home chance whethe table amityv coming bunch circui barry call common horror posses wires causes best take dave screw book kill film often gun down enormo electr fuses sparks bursts avoid based case flicke damage sure docume demoni you'll actual broken demons lights has etc need breake you're house fine traine bring taming someti form regula means stairs cats called blood dinett change proble caulki until system
@@ -3559,5 +3559,5 @@ testfile.txt:585325,100	nothin forces needed men evil edmund win burke
 testfile.txt:585427,533	peace subtle engage maynar side book hidden curren diagno millio keynes basis 235-23 secret unobse overtu law wealth john man contin conseq import societ destru citize 1919 existi econom govern manner surer does forces proces confis means debauc inflat chapte able 235 236
 testfile.txt:585962,98	train fictio mark wonder has truth it's strang sense
 testfile.txt:586062,81	past once god she rome woman mated has ever petron
-testfile.txt:586145,75	skydiv don't succee unknow
+testfile.txt:586145,75	skydiv do not succee unknow
 testfile.txt:586222,197	ahem dear reader list manner man ways please face gentle acquir decent removi man's tactfu miss

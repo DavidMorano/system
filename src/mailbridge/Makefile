@@ -231,70 +231,8 @@ proginfo_rootname.o:	proginfo_rootname.c defs.h
 procflow.o:		procflow.c $(INCS) dialer.h systems.h cm.h
 
 
-systems.o:		systems.c systems.h
-
-ns.o:			ns.c ns.h
-
-dialer.o:		dialer.c dialer.h dirseen.h
-
-cm.o:			cm.c cm.h dialer.h systems.h
-
-
 pcsconf.o:		pcsconf.c pcsconf.h
 
 pcstrustuser.o:		pcstrustuser.c pcsconf.h
-
-dialuux.o:		dialuux.c dialuux.h uuname.h
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-vecstr.o:		vecstr.c vecstr.h
-
-streamsync.o:		streamsync.c streamsync.h
-
-envlist.o:		envlist.c envlist.h
-
-hdb.o:			hdb.c hdb.h
-
-lookaside.o:		lookaside.c lookaside.h
-
-pq.o:			pq.c pq.h
-
-hdbstr.o:		hdbstr.c hdbstr.h
-
-hdbstr_loadfile.o:	hdbstr_loadfile.c
-
-msfile.o:		msfile.c msfile.h msfilee.h msflag.h
-
-msfilee.o:		msfilee.c msfilee.h
-
-mapstrint.o:		mapstrint.c mapstrint.h
-
-mkcexsync.o:		mkcexsync.c mkcexsync.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h kvsfile.h
-
-svctab.o:		svctab.c svctab.h
-
-strstore.o:		strstore.c strstore.h
-
-serialbuf.o:		serialbuf.c serialbuf.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-buffer.o:		buffer.c buffer.h
-
-dirseen.o:		dirseen.c dirseen.h
-
-uux.o:			uux.c uux.h dialer.h
-
-uuname.o:		uuname.c uuname.h uunames.h dirseen.h
-
-uunames.o:		uunames.c uunames.h
 
 

@@ -128,10 +128,10 @@ OBJ14= hostent.o headkey.o
 OBJ15= procfileenv.o procfilepaths.o strfieldcmp.o
 OBJ16= bopensched.o bopenroot.o connection.o
 OBJ17= permsched.o
-OBJ18= pwfile.o srvtab.o acctab.o
-OBJ19= field_srvarg.o
+OBJ18= srvtab.o acctab.o
+OBJ19=
 OBJ20= starmat.o logfile.o
-OBJ21= sockaddress.o mapstrint.o uc_readlinetimed.o
+OBJ21=
 OBJ22= getfname.o serialbuf.o chmods.o
 OBJ23= mktmpdir.o checkdirs.o badback.o 
 
@@ -245,10 +245,6 @@ sockaddress.o:		sockaddress.c sockaddress.h
 timestr_nist.o:		timestr_nist.c nistinfo.h
 
 muximsg.o:		muximsg.c muximsg.h
-
-pwfile.o:		pwfile.c pwfile.h
-
-kinfo.o:		kinfo.c kinfo.h
 
 logfile.o:		logfile.c logfile.h
 

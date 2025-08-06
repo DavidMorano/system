@@ -470,7 +470,7 @@ fall over gently onto their backs.
 	A musician of more ambition than talent composed an elegy at
 the death of composer Edward MacDowell.  She played the elegy for the
 pianist Josef Hoffman, then asked his opinion.  "Well, it's quite
-nice," he replied, but don't you think it would be better if ..."
+nice," he replied, but do not you think it would be better if ..."
 	"If what?"  asked the composer.
 	"If ... if you had died and MacDowell had written the elegy?"
 %
@@ -827,7 +827,7 @@ the returns."
 According to Kentucky state law, every person must take a bath at least
 once a year.
 %
-According to my best recollection, I don't remember.
+According to my best recollection, I do not remember.
 		-- Vincent "Jimmy Blue Eyes" Alo
 %
 According to the latest official figures, 43% of all statistics are
@@ -838,7 +838,7 @@ dies.
 %
 "According to the Rand McNally Places-Rated Almanac, the best place to
 live in America is the city of Pittsburgh.  The city of New York came
-in twenty-fifth.  Here in New York we really don't care too much.
+in twenty-fifth.  Here in New York we really do not care too much.
 Because we know that we could beat up their city anytime."
 		-- David Letterman
 %
@@ -1352,7 +1352,7 @@ government at all.
 	The grateful dead.
 		-- Tibetan ("Book of the Dead," ca­ 4000 BC)
 %
-... and furthermore ... I don't like your trousers.
+... and furthermore ... I do not like your trousers.
 %
 And I heard Jeff exclaim,
 As they strolled out of sight,
@@ -1366,7 +1366,7 @@ To justify God's ways to man
 %
 And on the seventh day, He exited from append mode.
 %
-"... And remember: if you don't like the news, go out and make some of
+"... And remember: if you do not like the news, go out and make some of
 your own."
         	-- "Scoop" Nisker (KFOG radio reporter Preposterous Words)
 %
@@ -1422,8 +1422,8 @@ Anoint, v.:
 		------- ------ -- --- ----
 	(Sung to the tune of a recent Pink Floyd song.)
 
-We don't need no indirection
-We don't need no flow control
+We do not need no indirection
+We do not need no flow control
 No data typing or declarations
 Did you leave the lists alone?
 
@@ -1446,7 +1446,7 @@ offers whiter teeth *___and* fresher breath.
 
 (1) None.  (Moses didn't have an ark).
 (2) Your mother, by the pigeonhole principle.
-(3) I don't know.
+(3) I do not know.
 (4) Who cares?
 (5) 6 (or maybe 4, or else 3).  Mr­ Alfred J­ Duncan of Podunk,
     Montana, submitted an interesting solution to Problem 5.
@@ -1577,7 +1577,7 @@ Anything worth doing is worth overdoing
 Aphorism, n.:
 	A concise, clever statement.
 Afterism, n.:
-	A concise, clever statement you don't think of until too late.
+	A concise, clever statement you do not think of until too late.
 		-- James Alexander Thom
 %
 APL is a mistake, carried through to perfection.  It is the language of
@@ -1888,7 +1888,7 @@ Barometer, n.:
 %
 Barth's Distinction:
 	There are two types of people: those who divide people into two
-	types, and those who don't.
+	types, and those who do not.
 %
 Baruch's Observation:
 	If all you have is a hammer, everything looks like a nail.
@@ -1948,7 +1948,7 @@ followers.
 	One day Zarathud took his students to a pleasant pasture and
 there he confronted The Sacred Chao while She was contentedly grazing.
 	"Tell me, you dumb beast," demanded the Priest in his
-commanding voice, "why don't you do something worthwhile?  What is your
+commanding voice, "why do not you do something worthwhile?  What is your
 Purpose in Life, anyway?"
 	Munching the tasty grass, The Sacred Chao replied "MU".  (The
 Chinese ideogram for NO-THING.)
@@ -2104,14 +2104,14 @@ Blore's Razor:
 	Given a choice between two theories, take the one which is
 	funnier.
 %
-Board the windows, up your car insurance, and don't leave any booze in
+Board the windows, up your car insurance, and do not leave any booze in
 plain sight.  It's St­ Patrick's day in Chicago again.  The legend has
 it that St­ Patrick drove the snakes out of Ireland.  In fact, he was
 arrested for drunk driving.  The snakes left because people kept
 throwing up on them.
 %
 Boling's postulate:
-	If you're feeling good, don't worry.  You'll get over it.
+	If you're feeling good, do not worry.  You'll get over it.
 %
 Bolub's Fourth Law of Computerdom:
 	Project teams detest weekly progress reporting because it so
@@ -2280,10 +2280,10 @@ sorcery for which so many suffered death.  If there were no witches,
 human testimony and human reason are alike destitute of value.
 		-- Ambrose Bierce ("The Devil's Dictionary")
 %
-"But don't you worry, its for a cause -- feeding global corporations
+"But do not you worry, its for a cause -- feeding global corporations
 paws."
 %
-"But I don't like Spam!!!!"
+"But I do not like Spam!!!!"
 %
 ... But if we laugh with derision, we will never understand.  Human
 intellectual capacity has not altered for thousands of years so far as
@@ -2476,7 +2476,7 @@ Canonical, adj.:
 	Steele: "He just used `canonical' in the canonical way."
 %
 CAPRICORN (23 Dec 23 -- 19 Jan)
-	You are conservative and afraid of taking risks.  You don't do
+	You are conservative and afraid of taking risks.  You do not do
 much of anything and are lazy.  There has never been a Capricorn of any
 importance.  Capricorns should avoid standing still for too long as
 they take root and become trees.
@@ -2491,7 +2491,7 @@ complete than expected, mostly because the planners expect their
 planning to reduce the time it takes.
 %
 Carmel, New York, has an ordinance forbidding men to wear coats and
-trousers that don't match.
+trousers that do not match.
 %
 Carperpetuation (kar' pur pet u a shun), n.:
 	The act, when vacuuming, of running over a string at least a
@@ -2515,7 +2515,7 @@ For I have been reading of Schrodinger's cat
 But none of my cats are at all like that.
 This unusual animal (so it is said)
 Is simultaneously alive and dead!
-What I don't understand is just why he
+What I do not understand is just why he
 Can't be one or the other, unquestionably.
 My future now hangs in between eigenstates.
 In one I'm enlightened, in the other I ain't.
@@ -2541,7 +2541,7 @@ Jaka:		Look, Cerebus-- Jaka has to tell you ... something
 Cerebus:	If Cerebus had a navel, would you lick apricot brandy
 		out of it?
 Jaka:		Ugh!
-Cerebus:	You don't like apricot brandy?
+Cerebus:	You do not like apricot brandy?
 		-- Cerebus #6 ("The Secret")
 %
 Certain old men prefer to rise at dawn, taking a cold bath and a long
@@ -2793,7 +2793,7 @@ Computers are useless.  They can only give you answers.
 		-- Pablo Picasso
 %
 Computers can figure out all kinds of problems, except the things in
-the world that just don't add up.
+the world that just do not add up.
 %
 Computers will not be perfected until they can compute how much more
 than the estimate the job will cost.
@@ -2836,7 +2836,7 @@ Connector Conspiracy, n:
 	[probably came into prominence with the appearance of the
 	KL-10, none of whose connectors match anything else] The
 	tendency of manufacturers (or, by extension, programmers or
-	purveyors of anything) to come up with new products which don't
+	purveyors of anything) to come up with new products which do not
 	fit together with the old stuff, thereby making you buy either
 	all new stuff or expensive interface devices.
 %
@@ -3041,7 +3041,7 @@ Swaller dollar cauliflower, alleygaroo!
 
 Don't we know archaic barrel,
 Lullaby Lilla Boy, Louisville Lou.
-Trolley Molly don't love Harold,
+Trolley Molly do not love Harold,
 Boola boola Pensacoola hullabaloo!
 		-- Walt Kelly
 %
@@ -3095,7 +3095,7 @@ incompetent many for appointment by the corrupt few."
 		-- George Bernard Shaw
 %
 Democracy is a government where you can say what you think even if you
-don't think.
+do not think.
 %
 "Democracy is also a form of worship.  It is the worship of Jackals by
 Jackasses."
@@ -3163,7 +3163,7 @@ There is always a big future in computer maintenance.
 		-- National Lampoon
 %
 DeVries's Dilemma:
-	If you hit two keys on the typewriter, the one you don't want
+	If you hit two keys on the typewriter, the one you do not want
 	hits the paper.
 %
 Did I say 2?  I lied.
@@ -3517,7 +3517,7 @@ Eggheads unite!  You have nothing to lose but your yolks.
 %
 Eggnog is a traditional holiday drink invented by the English.  Many
 people wonder where the word "eggnog" comes from.  The first syllable
-comes from the English word "egg", meaning "egg".  I don't know where
+comes from the English word "egg", meaning "egg".  I do not know where
 the "nog" comes from.
 
 To make eggnog, you'll need rum, whiskey, wine gin and, if they are in
@@ -3695,7 +3695,7 @@ richest people in America.  If I'm not there, I go to work"
 %
 Every nonzero finite dimensional inner product space has an orthonormal basis.
 
-It makes sense, when you don't think about it.
+It makes sense, when you do not think about it.
 %
 Every program has at least one bug and can be shortened by at least one
 instruction -- from which, by induction, one can deduce that every
@@ -3727,7 +3727,7 @@ taught how ___not to.  So it is with the great programmers.
 Everyone is a genius.  It's just that some people are too stupid to
 realize it.
 %
-Everyone knows that dragons don't exist.  But while this simplistic
+Everyone knows that dragons do not exist.  But while this simplistic
 formulation may satisfy the layman, it does not suffice for the
 scientific mind.  The School of Higher Neantical Nillity is in fact
 wholly unconcerned with what ____does exist.  Indeed, the banality of
@@ -3790,7 +3790,7 @@ Expect the worst, it's the least you can do.
 Expense Accounts, n.:
 	Corporate food stamps.
 %
-Experience is something you don't get until just after you need it.
+Experience is something you do not get until just after you need it.
 		-- Olivier
 %
 Experience is that marvelous thing that enables you recognize a mistake
@@ -3986,7 +3986,7 @@ Finagle's Third Law:
 Corollaries:
 	(1) Nobody whom you ask for help will see it.
 	(2) The first person who stops by, whose advice you really
-	    don't want to hear, will see it immediately.
+	    do not want to hear, will see it immediately.
 %
 Finding out what goes on in the C.I.A­ is like performing acupuncture
 on a rock.
@@ -4497,7 +4497,7 @@ think not, my friend, I think not.
 	"Only to ten, Mudhead."
 			-- Firesign Theater
 %
-"Gee, Toto, I don't think we are in Kansas anymore."
+"Gee, Toto, I do not think we are in Kansas anymore."
 %
 GEMINI (21 May -- 20 June)
 	You are a quick and intelligent thinker.  People like you
@@ -4517,7 +4517,7 @@ Genderplex, n.:
 
 		-- Rich Hall ("Sniglets")
 %
-Genetics explains why you look like your father, and if you don't, why
+Genetics explains why you look like your father, and if you do not, why
 you should.
 %
 Genius may have its limitations, but stupidity is not thus
@@ -4825,7 +4825,7 @@ Government [is] an illusion the governed should not encourage.
 Government lies, and newspapers lie, but in a democracy they are
 different lies.
 %
-Government spending?  I don't know what it's all about.  I don't know
+Government spending?  I do not know what it's all about.  I do not know
 any more about this thing than an economist does, and, God knows, he
 doesn't know much.
 		-- Will Rogers
@@ -5024,7 +5024,7 @@ Harvard Law:
 	organism will do as it damn well pleases.
 %
 "Has anyone had problems with the computer accounts?"
-"Yes, I don't have one."
+"Yes, I do not have one."
 "Okay, you can send mail to one of the tutors ..."
 		-- E­ D'Azevedo (Computer Science 372)
 %
@@ -5077,8 +5077,8 @@ Have you ever wondered what makes Californians so calm?  Besides drugs,
 I mean.  The answer is hot tubs.  A hot tub is a redwood container
 filled with water that you sit in naked with members of the opposite
 sex, none of whom is necessarily your spouse.  After a few hours in
-their hot tubs, Californians don't give a damn about earthquakes or
-mass murderers.  They don't give a damn about anything , which is why
+their hot tubs, Californians do not give a damn about earthquakes or
+mass murderers.  They do not give a damn about anything , which is why
 they are able to produce "Laverne and Shirley" week after week.
 		-- Dave Barry ("The Taming of the Screw")
 %
@@ -5371,7 +5371,7 @@ Hofstadter's Law:
 	It always takes longer than you expect, even when you take
 	Hofstadter's Law into account.
 %
-Hollywood is where if you don't have happiness you send out for it.
+Hollywood is where if you do not have happiness you send out for it.
 		-- Rex Reed
 %
 	Home centers are designed for the do-it-yourselfer who's
@@ -5572,7 +5572,7 @@ What are our schools for if not indoctrination against Communism?
 "I am convinced that the manufacturers of carpet odor removing powder
 have included encapsulated time released cat urine in their products.
 This technology must be what prevented its distribution during my mom's
-reign.  My carpet smells like piss, and I don't have a cat.  Better go
+reign.  My carpet smells like piss, and I do not have a cat.  Better go
 by some more."
 		-- timw@zeb.USWest.COM
 %
@@ -5619,7 +5619,7 @@ you are loitering in taverns or asleep beside the highway."
 "I argue very well.  Ask any of my remaining friends.  I can win an
 argument on any topic, against any opponent.  People know this, and
 steer clear of me at parties.  Often, as a sign of their great respect,
-they don't even invite me."
+they do not even invite me."
 		-- Dave Barry
 %
 'I believe in getting into hot water; it keeps you clean."
@@ -5755,37 +5755,37 @@ with sense, reason, and intellect has intended us to forego their use."
 "I do not know myself, and God forbid that I should."
 		-- Johann Wolfgang von Goethe
 %
-"I don't believe in astrology.  But then I'm an Aquarius, and Aquarians
-don't believe in astrology."
+"I do not believe in astrology.  But then I'm an Aquarius, and Aquarians
+do not believe in astrology."
 		-- James R­ F­ Quirk
 %
-I don't believe there really IS a GAS SHORTAGE.­ I think it's all just
+I do not believe there really IS a GAS SHORTAGE.­ I think it's all just
 a BIG HOAX on the part of the plastic sign salesmen -- to sell more
 numbers!!
 %
-I don't care for the Sugar Smacks commercial.  I don't like the idea of
+I do not care for the Sugar Smacks commercial.  I do not like the idea of
 a frog jumping on my Breakfast.
 		-- Lowell (Chicago Reader 1992-10-15)
 %
-"I don't care who does the electing as long as I get to do the
+"I do not care who does the electing as long as I get to do the
 nominating"
 		-- Boss Tweed
 %
-"I don't have any solution but I certainly admire the problem."
+"I do not have any solution but I certainly admire the problem."
 		-- Ashleigh Brilliant
 %
-"I don't have to take this abuse from you -- I've got hundreds of
+"I do not have to take this abuse from you -- I've got hundreds of
 people waiting to abuse me."
 		-- Bill Murray ("Ghostbusters")
 %
-I don't know anything about music.  In my line you don't have to.
+I do not know anything about music.  In my line you do not have to.
 		-- Elvis Presley
 %
-"I don't know anything about music.  In my line you don't have to."
+"I do not know anything about music.  In my line you do not have to."
 		-- Elvis Presley
 %
-	"I don't know what you mean by `glory,'" Alice said
-	Humpty Dumpty smiled contemptuously.  "Of course you don't --
+	"I do not know what you mean by `glory,'" Alice said
+	Humpty Dumpty smiled contemptuously.  "Of course you do not --
 till I tell you.  I meant `there's a nice knock-down argument for
 you!'"
 	"But glory doesn't mean `a nice knock-down argument,'" Alice
@@ -5799,25 +5799,25 @@ so many different things."
 that's all."
 		-- Lewis Carroll ("Through the Looking Glass")
 %
-"I don't like spinach, and I'm glad I don't, because if I liked it I'd
+"I do not like spinach, and I'm glad I do not, because if I liked it I'd
 eat it, and I just hate it."
 		-- Clarence Darrow
 %
-"I don't mind going nowhere as long as it's an interesting path."
+"I do not mind going nowhere as long as it's an interesting path."
 		-- Ronald Mabbitt
 %
-I don't mind what Congress does, as long as they don't do it in the
+I do not mind what Congress does, as long as they do not do it in the
 streets and frighten the horses.
 		-- Victor Hugo
 %
-"I don't object to sex before marriage, but two minutes before?!?"
+"I do not object to sex before marriage, but two minutes before?!?"
 %
-"I don't think so," said Ren'e Descartes.  Just then, he vanished.
+"I do not think so," said Ren'e Descartes.  Just then, he vanished.
 %
-"I don't think they could put him in a mental hospital.  On the other
-hand, if he were already in, I don't think they'd let him out."
+"I do not think they could put him in a mental hospital.  On the other
+hand, if he were already in, I do not think they'd let him out."
 %
-I don't want to alarm anybody, but there is an excellent chance that
+I do not want to alarm anybody, but there is an excellent chance that
 the Earth will be destroyed in the next several days.  Congress is
 thinking about eliminating a federal program under which scientists
 broadcast signals to alien beings.  This would be a large mistake.
@@ -6004,7 +6004,7 @@ entertainment is all about ... Idiots, explosives and falling anvils."
  Nibble on they bluish feet."
 %
 "I may appear to be just sitting here like a bucket of tapioca, but
-don't let appearances fool you.  I'm approaching old age ... at the
+do not let appearances fool you.  I'm approaching old age ... at the
 speed of light."
 		-- Prof­ Cosmo Fishhawk
 %
@@ -6211,7 +6211,7 @@ near the place.
 		-- Steven Wright
 %
 I value kindness to human beings first of all, and kindness to
-animals.  I don't respect the law; I have a total irreverence for
+animals.  I do not respect the law; I have a total irreverence for
 anything connected with society except that which makes the roads
 safer, the beer stronger, the food cheaper, and old men and women
 warmer in the winter, and happier in the summer.
@@ -6240,8 +6240,8 @@ didn't know."
 		-- Mark Twain
 %
 I was part of that strange race of people aptly described as spending
-their lives doing things they detest to make money they don't want to
-buy things they don't need to impress people they dislike.
+their lives doing things they detest to make money they do not want to
+buy things they do not need to impress people they dislike.
 		-- Emile Henry Gauvreay
 %
 "I was playing poker the other night ... with Tarot cards­ I got a full
@@ -6496,7 +6496,7 @@ And everywhere this language went,
 Idaho state law makes it illegal for a man to give his sweetheart a box
 of candy weighing less than fifty pounds.
 %
-Ideas don't stay in some minds very long because they don't like
+Ideas do not stay in some minds very long because they do not like
 solitary confinement.
 %
 Idiot Box, n.:
@@ -6587,9 +6587,9 @@ But to go commit siouxeyesighed.
 %
 If anything can go wrong, it will.
 %
-If at first you don't succeed, give up, no use being a damn fool.
+If at first you do not succeed, give up, no use being a damn fool.
 %
-If at first you don't succeed, redefine success.
+If at first you do not succeed, redefine success.
 %
 If bankers can count, how come they have eight windows and only four
 tellers?
@@ -6649,7 +6649,7 @@ replaced by tasteful foam replicas of ANN MARGARET!"
 If I could drop dead right now, I'd be the happiest man alive!
 		-- Samuel Goldwyn
 %
-If I don't drive around the park,
+If I do not drive around the park,
 I'm pretty sure to make my mark.
 If I'm in bed each night by ten,
 I may get back my looks again.
@@ -6659,7 +6659,7 @@ But I shall stay the way I am,
 Because I do not give a damn.
 		-- Dorothy Parker
 %
-If I don't see you in the future, I'll see you in the pasture.
+If I do not see you in the future, I'll see you in the pasture.
 %
 If I had a plantation in Georgia and a home in Hell, I'd sell the
 plantation and go home.
@@ -6829,7 +6829,7 @@ If two men agree on everything, you may be sure that one of them is
 doing the thinking.
 		-- Lyndon Baines Johnson
 %
-If two wrongs don't make a right, try three.
+If two wrongs do not make a right, try three.
 		-- Laurence J­ Peter
 %
 "If value corrupts then absolute value corrupts absolutely"
@@ -6844,7 +6844,7 @@ qualifications, that field's employment market is glutted.
 If you are a fatalist, what can you do about it?
 		-- Ann Edwards-Duff
 %
-"If you can count your money, you don't have a billion dollars."
+"If you can count your money, you do not have a billion dollars."
 		-- J­ Paul Getty
 %
 If you can lead it to water and force it to drink, it isn't a horse.
@@ -6863,15 +6863,15 @@ If you can't learn to do it well, learn to enjoy doing it badly.
 %
 If you didn't get caught, did you really do it?
 %
-If you don't care where you are, then you ain't lost.
+If you do not care where you are, then you ain't lost.
 %
-If you don't go to other men's funerals they won't go to yours.
+If you do not go to other men's funerals they won't go to yours.
 		-- Clarence Day
 %
-If you don't have a nasty obituary you probably didn't matter.
+If you do not have a nasty obituary you probably didn't matter.
 		-- Freeman Dyson
 %
-"If you don't want your dog to have bad breath, do what I do:  Pour a little
+"If you do not want your dog to have bad breath, do what I do:  Pour a little
 Lavoris in the toilet."
 		-- Jay Leno
 %
@@ -6934,7 +6934,7 @@ If you put garbage in a computer nothing comes out but garbage.  But
 this garbage, having passed through a very expensive machine, is
 somehow enobled and none dare criticize it.
 %
-If you sit down at a poker game and don't see a sucker, get up.  You're
+If you sit down at a poker game and do not see a sucker, get up.  You're
 the sucker.
 %
 If you stand on your head, you will get footprints in your hair.
@@ -6981,7 +6981,7 @@ having another one ...
 If your party is successful, the police will knock on your door, unless
 your party is very successful in which case they will lob tear gas
 through your living room window.  As host, your job is to make sure
-that they don't arrest anybody.  Or if they're dead set on arresting
+that they do not arrest anybody.  Or if they're dead set on arresting
 someone, your job is to make sure it isn't you ...
 %
 If you took all the students that felt asleep in class and laid them
@@ -6998,7 +6998,7 @@ If you want to know what god thinks of money, just look at the people
 he gave it to.
 		-- Dorthy Parker
 %
-If you want to understand your government, don't begin by reading the
+If you want to understand your government, do not begin by reading the
 Constitution.  It conveys precious little of the flavor of today's
 statecraft.  Instead, read selected portions of the Washington
 telephone directory containing listings for all the organizations with
@@ -7010,7 +7010,7 @@ word you say, talk in your sleep.
 %
 "If you wants to get elected president, you'se got to think up some
 memoraboble homily so's school kids can be pestered into memorizin' it,
-even if they don't know what it means."
+even if they do not know what it means."
 		-- Walt Kelly ("The Pogo Party")
 %
 If you wish to live wisely, ignore sayings -- including this one.
@@ -7680,7 +7680,7 @@ broken ...
 %
 "It was pleasant to me to get a letter from you the other day.  Perhaps
 I should have found it pleasanter if I had been able to decipher it.  I
-don't think that I mastered anything beyond the date (which I knew) and
+do not think that I mastered anything beyond the date (which I knew) and
 the signature (which I guessed at).  There's a singular and a perpetual
 charm in a letter of yours; it never grows old, it never loses its
 novelty .... Other letters are read and thrown away and forgotten, but
@@ -7720,7 +7720,7 @@ It's a damn poor mind that can only think of one way to spell a word.
 "It's a dog-eat-dog world out there, and I'm wearing Milkbone
 underwear."
 %
-It's a good thing we don't get all the government we pay for.
+It's a good thing we do not get all the government we pay for.
 %
 "It's a small world, but I wouldn't want to have to paint it."
 		-- Steven Wright
@@ -7743,7 +7743,7 @@ It's better to be wanted for murder that not to be wanted at all.
 %
 "It's easier said than done."
 
-... and if you don't believe it, try proving that it's easier done than
+... and if you do not believe it, try proving that it's easier done than
 said, and you'll see that "it's easier said that `it's easier done than
 said' than it is done", which really proves that "it's easier said than
 done".
@@ -7760,7 +7760,7 @@ hour!"
 It's illegal in Wilbur, Washington, to ride an ugly horse.
 %
 It's is not, it isn't ain't, and it's it's, not its, if you mean it
-is.  If you don't, it's its.  Then too, it's hers.  It isn't her's.  It
+is.  If you do not, it's its.  Then too, it's hers.  It isn't her's.  It
 isn't our's either.  It's ours, and likewise yours and theirs.
 		-- Oxford University Press, Edpress News
 %
@@ -7816,7 +7816,7 @@ It's not so hard to lift yourself by your bootstraps once you're off
 the ground.
 		-- Daniel B­ Luten
 %
-It's not that I'm afraid to die.  I just don't want to be there when it
+It's not that I'm afraid to die.  I just do not want to be there when it
 happens.
 		-- Woody Allen
 %
@@ -8101,7 +8101,7 @@ sleeves, and they'd always waste precious minutes saying things: "Do
 you think something's wrong?  Do you think she wants us to follow her?
 What is it, girl?", etc., as if this had never happened before, instead
 of every week.  What with all the time these people spent pinned under
-the tractor, I don't see how they managed to grow any crops
+the tractor, I do not see how they managed to grow any crops
 whatsoever.  They probably got by on federal crop supports, which
 Lassie filed the applications for.
 		-- Dave Barry
@@ -8352,7 +8352,7 @@ Don't you envy people who
 Do all the things ___YOU want to do?
 %
 Loan-department manager:  "There isn't any fine print.  At these
-interest rates, we don't need it."
+interest rates, we do not need it."
 %
 Lobster:
 	Everyone loves these delectable crustaceans, but many cooks are
@@ -8529,7 +8529,7 @@ Magpie, n.:
 		-- Ambrose Bierce ("The Devil's Dictionary")
 %
 Maier's Law:
-	If the facts don't conform to the theory, they must be disposed
+	If the facts do not conform to the theory, they must be disposed
 	of.
 
 Corollaries:
@@ -8611,7 +8611,7 @@ Man, n.:
 %
 Mandrell: "You know what I think?"
 Doctor:   "Ah, ah that's a catch question­ With a brain your size you
-	  don't think, right?"
+	  do not think, right?"
 		-- "Doctor Who"
 %
 Mankind's yearning to engage in sports is older than recorded history,
@@ -8825,7 +8825,7 @@ Tricia and Julie begin to find silver threads among the gold and the
 black.
 		-- Russel Baker ("Ford without Flummery")
 %
-Mind!  I don't mean to say that I know, of my own knowledge, what there
+Mind!  I do not mean to say that I know, of my own knowledge, what there
 is particularly dead about a door-nail.  I might have been inclined,
 myself, to regard a coffin-nail as the deadest piece of ironmongery in
 the trade.  But the wisdom of our ancestors is in the simile; and my
@@ -8942,7 +8942,7 @@ and around for hours, looking for someplace to go, until finally the
 female gets really tired and has a terrible headache, and she just
 dumps her eggs right on the sand and swims away.  Then the male, driven
 by some timeless, noble instinct for survival, eats the eggs.  So the
-truth is that fish don't reproduce at all, but there are so many of
+truth is that fish do not reproduce at all, but there are so many of
 them that it doesn't make any difference.
 		-- Dave Barry ("Sex and the Single Amoeba: What Every
 		   Teen Should Know")
@@ -9275,7 +9275,7 @@ Newton's Fourth Law:  Every action has an equal and opposite satisfaction.
 Newton's Little-Known Seventh Law:
 	A bird in the hand is safer than one overhead.
 %
-Next Friday will not be your lucky day.  As a matter of fact, you don't
+Next Friday will not be your lucky day.  As a matter of fact, you do not
 have a lucky day this year.
 %
 "Next to being shot at and missed, nothing is really quite as satisfying
@@ -9610,7 +9610,7 @@ The man who kills both which and whom
 Will be enshrined in our Who's Whom.
 		-- Fletcher Knebel
 %
-"Of course power tools and alcohol don't mix.  Everyone knows power
+"Of course power tools and alcohol do not mix.  Everyone knows power
 tools aren't soluble in alcohol ..."
 		-- Crazy Nigel
 %
@@ -9629,7 +9629,7 @@ Ogden's Law:
 %
 Oh Dad!  We're ALL Devo!
 %
-Oh don't the days seem lank and long
+Oh do not the days seem lank and long
 	When all goes right and none goes wrong,
 And isn't your life extremely flat
 	With nothing whatever to grumble at!
@@ -9639,7 +9639,7 @@ Oh, I am a C programmer and I'm okay
 And when it works, I shout hoo-ray
 	Oh, I am a C programmer and I'm okay
 %
-"Oh, I don't blame Congress.  If I had $600 billion at my disposal, I'd
+"Oh, I do not blame Congress.  If I had $600 billion at my disposal, I'd
 be irresponsible, too."
 		-- Lichty & Wagner
 %
@@ -9679,7 +9679,7 @@ Oh, wow!  Look at the moon!
 "OK, now let's look at four dimensions on the blackboard."
 		-- Dr­ Joy
 %
-OK, so you're a PhD.  Just don't touch anything.
+OK, so you're a PhD.  Just do not touch anything.
 %
 "Old age is the most unexpected of things that can happen to a man."
 		-- Trotsky
@@ -9689,7 +9689,7 @@ Old programmers never die.  They just branch to a new address.
 Old soldiers never die.  Young ones do.
 %
 Oliver's Law:
-	Experience is something you don't get until just after you need
+	Experience is something you do not get until just after you need
 	it.
 %
 Omnibiblious, adj.:
@@ -9866,7 +9866,7 @@ announced, "Whoever would enter the city must first answer the truth to
 a question which will be put to him."  Nasrudin was first in line.  The
 captain of the guard asked him, "Where are you going?  Tell the truth
 -- the alternative is death by hanging."  "I am going," said Nasrudin,
-"to be hanged on that gallows."  "I don't believe you."  "Very well, if
+"to be hanged on that gallows."  "I do not believe you."  "Very well, if
 I have told a lie, then hang me!" "But that would make it the truth!"
 "Exactly," said Nasrudin, "your truth."
 %
@@ -9895,7 +9895,7 @@ One monk said to the other, "The fish has flopped out of the net! How
 will it live?"  The other said, "When you have gotten out of the net,
 I'll tell you."
 %
-One nice thing about egotists: they don't talk about other people.
+One nice thing about egotists: they do not talk about other people.
 %
 One of my less pleasant chores when I was young was to read the Bible
 from one end to the other.  Reading the Bible straight through is at
@@ -9991,7 +9991,7 @@ One seldom sees a monument to a committee.
 One thing the inventors can't seem to get the bugs out of is fresh
 paint.
 %
-"One thing they don't tell you about doing experimental physics is that
+"One thing they do not tell you about doing experimental physics is that
 sometimes you must work under adverse conditions ... like a state of
 sheer terror."
 		-- W­ K­ Hartmann
@@ -10230,11 +10230,11 @@ People who are funny and smart and return phone calls get much better
 press than people who are just funny and smart.
 		-- Howard Simons ("The Washington Post")
 %
-People who claim they don't let little things bother them have never
+People who claim they do not let little things bother them have never
 slept in a room with a single mosquito.
 %
 People who have what they want are very fond of telling people who
-haven't what they want that they don't want it.
+haven't what they want that they do not want it.
 		-- Ogden Nash
 %
 People will accept your ideas much more readily if you tell them that
@@ -10491,7 +10491,7 @@ Because she's unable to postulate how.
 %
 Probably the question asked most often is: Do one-celled animals have
 orgasms?  The answer is yes, they have orgasms almost constantly, which
-is why they don't mind living in pools of warm slime.
+is why they do not mind living in pools of warm slime.
 		-- Dave Barry ("Sex and the Single Amoeba: What Every
 		   Teen Should Know")
 %
@@ -10715,7 +10715,7 @@ Q: Somebody just posted that Roman Polanski directed Star Wars.  What
 A: Post the correct answer at once!  We can't have people go on
    believing that!  Very good of you to spot this.  You'll probably be
    the only one to make the correction, so post as soon as you can.  No
-   time to lose, so certainly don't wait a day, or check to see if
+   time to lose, so certainly do not wait a day, or check to see if
    somebody else has made the correction.
 
    And it's not good enough to send the message by mail.  Since you're
@@ -10801,20 +10801,20 @@ Congress.  But I repeat myself.
 %
 Real computer scientists admire ADA for its overwhelming aesthetic
 value but they find it difficult to actually program in it, as it is
-much too large to implement.  Most computer scientists don't notice
+much too large to implement.  Most computer scientists do not notice
 this because they are still arguing over what else to add to ADA.
 %
 Real computer scientists despise the idea of actual hardware.  Hardware
 has limitations, software doesn't.  It's a real shame that Turing
 machines are so poor at I/O.
 %
-Real computer scientists don't comment their code.  The identifiers are
+Real computer scientists do not comment their code.  The identifiers are
 so long they can't afford the disk space.
 %
-Real computer scientists don't program in assembler.  They don't write
+Real computer scientists do not program in assembler.  They do not write
 in anything less portable than a number two pencil.
 %
-Real computer scientists don't write code.  They occasionally tinker
+Real computer scientists do not write code.  They occasionally tinker
 with `programming systems', but those are so high level that they
 hardly count (and rarely count accurately; precision is for
 applications.)
@@ -10828,42 +10828,42 @@ programming is for compulsive neurotics who were prematurely toilet-
 trained.  They wear neckties and carefully line up pencils on otherwise
 clear desks.
 %
-Real programmers don't bring brown-bag lunches.  If the vending machine
-doesn't sell it, they don't eat it.  Vending machines don't sell
+Real programmers do not bring brown-bag lunches.  If the vending machine
+doesn't sell it, they do not eat it.  Vending machines do not sell
 quiche.
 %
-Real programmers don't comment their code.  It was hard to write, it
+Real programmers do not comment their code.  It was hard to write, it
 should be hard to understand.
 %
-Real programmers don't draw flowcharts.  Flowcharts are, after all, the
+Real programmers do not draw flowcharts.  Flowcharts are, after all, the
 illiterate's form of documentation.  Cavemen drew flowcharts; look how
 much good it did them.
 %
-Real Programmers don't play tennis, or any other sport that requires
+Real Programmers do not play tennis, or any other sport that requires
 you to change clothes.  Mountain climbing is OK, and real programmers
 wear their climbing boots to work in case a mountain should suddenly
 spring up in the middle of the machine room.
 %
-Real programmers don't write in BASIC.  Actually, no programmers write
+Real programmers do not write in BASIC.  Actually, no programmers write
 in BASIC after reaching puberty.
 %
-Real programmers don't write in FORTRAN.  FORTRAN is for pipe stress
+Real programmers do not write in FORTRAN.  FORTRAN is for pipe stress
 freaks and crystallography weenies.  FORTRAN is for wimp engineers who
 wear white socks.
 %
-Real Programmers don't write in PL/I.  PL/I is for programmers who
+Real Programmers do not write in PL/I.  PL/I is for programmers who
 can't decide whether to write in COBOL or FORTRAN.
 %
 Real Programmers think better when playing Adventure or Rogue.
 %
-Real Programs don't use shared text.  Otherwise, how can they use
+Real Programs do not use shared text.  Otherwise, how can they use
 functions for scratch space after they are finished calling them?
 %
-Real software engineers don't debug programs, they verify correctness.
+Real software engineers do not debug programs, they verify correctness.
 This process doesn't necessarily involve execution of anything on a
 computer, except perhaps a Correctness Verification Aid package.
 %
-Real software engineers don't like the idea of some inexplicable and
+Real software engineers do not like the idea of some inexplicable and
 greasy hardware several aisles away that may stop working at any
 moment.  They have a great distrust of hardware people, and wish that
 systems could be virtual at *___all* levels.  They would like personal
@@ -10953,7 +10953,7 @@ Is quicker.
 		-- Ogden Nash
 %
 "Reintegration complete," ZORAC advised.  "We're back in the universe
-again ..."  An unusually long pause followed, "... but I don't know
+again ..."  An unusually long pause followed, "... but I do not know
 which part.  We seem to have changed our position in space."  A
 spherical display in the middle of the floor illuminated to show the
 starfield surrounding the ship.
@@ -11017,7 +11017,7 @@ that's just the kind of straight-talking honest person I am, and I
 can't help it.
 		-- Dave Barry, "On Presidential Politics"
 %
-Research is what I'm doing when I don't know what I'm doing.
+Research is what I'm doing when I do not know what I'm doing.
 		-- Wernher von Braun
 %
 Resisting temptation is easier when you think you'll probably get
@@ -11586,7 +11586,7 @@ bound to occur.
 Software, n.:
 	Formal evening attire for female computer analysts.
 %
-Some don't prefer the pursuit of happiness to the happiness of pursuit.
+Some do not prefer the pursuit of happiness to the happiness of pursuit.
 %
 "Some men are alive simply because it is against the law to kill them."
 		-- Ed Howe
@@ -11796,7 +11796,7 @@ Steele's Plagiarism of Somebody's Philosophy:
 another drink.
 %
 Steinbach's Guideline for Systems Programming:
-	Never test for an error condition you don't know how to
+	Never test for an error condition you do not know how to
 handle.
 %
 Stop searching.  Happiness is right next to you.
@@ -11909,7 +11909,7 @@ music at top volume and at least a pint of ether.
 		-- H.S­ Thompson, "Fear and Loathing in Las Vegas"
 %
 T:	One big monster, he called TROLL.
-	He don't rock, and he don't roll;
+	He do not rock, and he do not roll;
 	Drink no wine, and smoke no stogies.
 	He just Love To Eat Them Roguies.
 		-- The Roguelet's ABC
@@ -11961,7 +11961,7 @@ TAURUS (Apr 20 - May 20)
 	determination and work like hell.  Most people think you are
 	stubborn and bull headed.  You are a Communist.
 %
-Tax reform means "Don't tax you, don't tax me, tax that fellow behind
+Tax reform means "Don't tax you, do not tax me, tax that fellow behind
 the tree."
 		-- Russell Long
 %
@@ -12049,7 +12049,7 @@ Thank goodness modern convenience is a thing of the remote future.
 "That boy's about as sharp as a pound of wet liver"
 		-- Foghorn Leghorn
 %
-"That must be wonderful!  I don't understand it at all."
+"That must be wonderful!  I do not understand it at all."
 %
 That secret you've been guarding, isn't.
 %
@@ -12108,7 +12108,7 @@ The average woman would rather have beauty than brains, because the
 average man can see better than he can think.
 %
 "The bad reputation UNIX® has gotten is totally undeserved, laid on by
-people who don't understand, who have not gotten in there and tried
+people who do not understand, who have not gotten in there and tried
 anything."
 		-- Jim Joyce (owner of Jim Joyce's UNIX® Bookstore)
 %
@@ -12603,7 +12603,7 @@ devices with cheap cigars and going, 'Lookit all them WIRES in there!'"
 		-- Henry Kissinger (New York Times, 28 October 1973)
 %
 "The income tax has made more liars out of the American people than golf
-has.  Even when you make a tax form out on the level, you don't know
+has.  Even when you make a tax form out on the level, you do not know
 when it's through if you are a crook or a martyr."
 		-- Will Rogers
 %
@@ -12869,7 +12869,7 @@ The moving cursor writes, and having written, blinks on.
 	"... The name of the song is called 'Haddocks' Eyes'!"
 	"Oh, that's the name of the song, is it?" Alice said, trying to
 feel interested.
-	"No, you don't understand," the Knight said, looking a little
+	"No, you do not understand," the Knight said, looking a little
 vexed.  "That's what the name is called.  The name really is, 'The Aged
 Aged Man.'"
 	"Then I ought to have said "That's what the song is called'?"
@@ -12898,7 +12898,7 @@ Big fish alone escape from thee!
 		-- James Jeffrey Roche
 %
 The new Congressmen say they're going to turn the government around.  I
-hope I don't get run over again.
+hope I do not get run over again.
 %
 The New Testament offers the basis for modern computer coding theory,
 in the form of an affirmation of the binary number system.
@@ -12956,7 +12956,7 @@ The one good thing about repeating your mistakes is that you know when
 to cringe.
 %
 "The only possible interpretation of any research whatever in the
-`social sciences' is: some do, some don't."
+`social sciences' is: some do, some do not."
 		-- Ernest Rutherford
 %
 The only problem with being a man of leisure is that you can never stop
@@ -13105,7 +13105,7 @@ of the animals turned into oil, although most of the laboratory rats
 developed cancer.
 		-- Dave Barry ("Postpetroleum Guzzler")
 %
-The problem with any unwritten law is that you don't know where to go
+The problem with any unwritten law is that you do not know where to go
 to erase it.
 		-- Glaser and Way
 %
@@ -13154,7 +13154,7 @@ But chiefly on the just, because
 The reader this message encounters not failing to understand is
 cursed.
 %
-The reason computer chips are so small is computers don't eat much.
+The reason computer chips are so small is computers do not eat much.
 %
 "The reason it's called "Grape Nuts" is that it contains "dextrose",
 which is also sometimes called "grape sugar", and also because "Grape
@@ -13594,9 +13594,9 @@ every other person you meet with that name will be Jewish.  Why is
 this?
 	Who knows?  Learned rabbis have pondered this question for
 centuries and have failed to come up with an answer, and you think ___you
-can find one?  Get serious.  You don't even understand why it's
+can find one?  Get serious.  You do not even understand why it's
 forbidden to eat crab -- fresh cold crab with mayonnaise -- or lobster
--- soft tender morsels of lobster dipped in melted butter.  You don't
+-- soft tender morsels of lobster dipped in melted butter.  You do not
 even understand a simple thing like that, and yet you hope to discover
 why there are more Jews named Miller than Katz?  Fat Chance.
 		-- Arthur Naiman ("Every Goy's Guide to Yiddish")
@@ -13604,7 +13604,7 @@ why there are more Jews named Miller than Katz?  Fat Chance.
 "There are some micro-organisms that exhibit characteristics of both
 plants and animals.  When exposed to light they undergo photosynthesis;
 and when the lights go out, they turn into animals.  But then again,
-don't we all?"
+do not we all?"
 %
 "There are those who claim that magic is like the tide; that it swells
 and fades over the surface of the earth, collecting in concentrated
@@ -13973,7 +13973,7 @@ Think of it!  With VLSI we can pack 100 ENIACs in 1 sq­ cm­!
 Think of your family tonight.  Try to crawl home after the computer
 crashes.
 %
-Think twice before speaking, but don't say "think think click click".
+Think twice before speaking, but do not say "think think click click".
 %
 "Thirty days hath Septober,
 April, June, and no wonder.
@@ -14159,8 +14159,8 @@ do for the poor devil, it seems to me, is to name his disease in his
 honor.  From this moment on, let all those who feel that Americans can
 be as easily led to beauty as to ugliness, to truth as to public
 relations, to joy as to bitterness, be said to be suffering from Hunter
-Thompson's disease.  I don't have it this morning.  It comes and goes.
-This morning I don't have Hunter Thompson's disease.
+Thompson's disease.  I do not have it this morning.  It comes and goes.
+This morning I do not have Hunter Thompson's disease.
 		-- Kurt Vonnegut Jr­ (on Dr­ Hunter S­ Thompson: Excerpt
 		   from "A Political Disease", Vonnegut's review of "Fear
 		   and Loathing: On the Campaign Trail '72")
@@ -14501,7 +14501,7 @@ Two percent of zero is almost nothing.
 "Two sure ways to tell a sexy male; the first is, he has a bad memory.
 I forget the second."
 %
-Two wrongs don't make a right, but three lefts do.
+Two wrongs do not make a right, but three lefts do.
 %
 U:	There's a U -- a Unicorn!
 	Run right up and rub its horn.
@@ -14774,12 +14774,12 @@ deceased.  My suggestion, therefore, is that you drop dead."
 "We demand rigidly defined areas of doubt and uncertainty!"
 		-- Vroomfondel
 %
-"We don't care.  We don't have to.  We're the Phone Company."
+"We do not care.  We do not have to.  We're the Phone Company."
 %
-We don't know who discovered water, but we're certain it wasn't a
+We do not know who discovered water, but we're certain it wasn't a
 fish.
 %
-We don't understand the software, and sometimes we don't understand the
+We do not understand the software, and sometimes we do not understand the
 hardware, but we can *___see* the blinking lights!
 %
 "We gave you an atomic bomb, what do you want, mermaids?"
@@ -14801,7 +14801,7 @@ back to normal, and that they already have.
 hands for masturbation."
 		-- Lily Tomlin
 %
-We have the flu.  I don't know if this particular strain has an
+We have the flu.  I do not know if this particular strain has an
 official name, but if it does, it must be something like "Martian Death
 Flu".  You may have had it yourself.  The main symptom is that you wish
 you had another setting on your electric blanket, up past "HIGH", that
@@ -14842,7 +14842,7 @@ primitive blood, which isn't really all that bad when you consider how
 ugly paneling is to begin with.
 		-- Dave Barry ("The Taming of the Screw")
 %
-We really don't have any enemies.  It's just that some of our best
+We really do not have any enemies.  It's just that some of our best
 friends are trying to kill us.
 %
 	We were young and our happiness dazzled us with its strength.
@@ -15013,7 +15013,7 @@ country­ Nice try anyway, George."
 What good is a ticket to the good life, if you can't find the
 entrance?
 %
-What good is having someone who can walk on water if you don't follow
+What good is having someone who can walk on water if you do not follow
 in his footsteps?
 %
 What I do, first thing [in the morning], is I hop into the shower
@@ -15029,7 +15029,7 @@ lenses, essentially blind -- could result in the kind of injury where
 you have to learn a whole new part if you want to sing the "Messiah",
 if you get my drift.  Then I hop right back out, because Robert, with
 that uncanny sixth sense some children have -- you cannot teach it;
-they either have it or they don't -- has chosen exactly that moment to
+they either have it or they do not -- has chosen exactly that moment to
 flush one of the toilets.  Perhaps several of them.
 		-- Dave Barry ("Saving Face")
 %
@@ -15134,7 +15134,7 @@ process of stretching and belching and scratching, and it would still
 be only 7 a.m­ when we were ready to actually emerge from bed.
 		-- Dave Barry ("$#$%#^%!^%&@%@!")
 %
-What you don't know can hurt you, only you won't know it.
+What you do not know can hurt you, only you won't know it.
 %
 "What's another word for Thesaurus?"
 		-- Steven Wright
@@ -15293,7 +15293,7 @@ say what I wish done," give him a lollipop.
 "When the going gets tough, the tough get empirical"
 		-- Jon Carroll
 %
-When the government bureau's remedies don't match your problem, you
+When the government bureau's remedies do not match your problem, you
 modify the problem, not the remedy.
 %
 When the Ngdanga tribe of West Africa hold their moon love ceremonies,
@@ -15338,7 +15338,7 @@ swayed, directly to the goal.
 %
 "When you are in it up to your ears, keep your mouth shut."
 %
-When you don't know what you are doing, do it neatly.
+When you do not know what you are doing, do it neatly.
 %
 When you have an efficient government, you have a dictatorship.
 		-- Harry Truman
@@ -15353,7 +15353,7 @@ to a definite problem.  For better or worse you have acted decisively.
 		-- Winston Curchill (on formal declarations of war)
 %
 When you know absolutely nothing about the topic, make your forecast by
-asking a carefully selected probability sample of 300 others who don't
+asking a carefully selected probability sample of 300 others who do not
 know the answer either.
 		-- Edgar R­ Fiedler
 %
@@ -15423,7 +15423,7 @@ The Rights of Woman merit some attention.
 %
 While having never invented a sin, I'm trying to perfect several.
 %
-While it may be true that a watched pot never boils, the one you don't keep an
+While it may be true that a watched pot never boils, the one you do not keep an
 eye on can make an awful mess of your stove.
 		-- Edward Stevenson
 %
@@ -15435,7 +15435,7 @@ While money doesn't buy love, it puts you in a great bargaining position.
 While most peoples' opinions change, the conviction of their correctness never
 does.
 %
-While you don't greatly need the outside world, it's still very reassuring to
+While you do not greatly need the outside world, it's still very reassuring to
 know that it's still there.
 %
 While your friend holds you affectionately by both your hands you are safe, for
@@ -15494,7 +15494,7 @@ lawyers?
 
 New Jersey had first choice.
 %
-Why don't elephants eat penguins?
+Why do not elephants eat penguins?
 
 Because they can't get the wrappers off ...
 %
@@ -15565,7 +15565,7 @@ Remember to never split an infinitive. The passive voice should never be used.
 Do not put statements in the negative form. Verbs have to agree with their
 subjects. Proofread carefully to see if you words out. If you reread your work,
 you can find on rereading a great deal of repetition can be avoided by rereading
-and editing. A writer must not shift your point of view. And don't start a
+and editing. A writer must not shift your point of view. And do not start a
 sentence with a conjunction. (Remember, too, a preposition is a terrible word to
 end a sentence with.) Don't overuse exclamation marks!! Place pronouns as close
 as possible, especially in long sentences, as of 10 or more words, to their
@@ -15649,7 +15649,7 @@ Worst Month of 1981 for Downhill Skiing:
 %
 Worst Month of the Year:
         February. February has only 28 days in it, which means that if you rent
-        an apartment, you are paying for three full days you don't get. Try to
+        an apartment, you are paying for three full days you do not get. Try to
         avoid Februarys whenever possible.
 		-- Steve Rubenstein
 %
@@ -15794,7 +15794,7 @@ And the muscular strength which it gave to my jaw,
 	Has lasted the rest of my life."
 		-- Lewis Carroll
 %
-"You are old," said the youth, "and your programs don't run,
+"You are old," said the youth, "and your programs do not run,
 	And there isn't one language you like;
 Yet of useful suggestions for help you have none --
 	Have you thought about taking a hike?"
@@ -15802,7 +15802,7 @@ Yet of useful suggestions for help you have none --
 "Since I never write programs," his father replied,
 	"Every language looks equally bad;
 Yet the people keep paying to read all my books
-	And don't realize that they've been had."
+	And do not realize that they've been had."
 %
 "You are old," said the youth, "as I mentioned before,
 	And have grown most uncommonly fat;
@@ -15917,7 +15917,7 @@ enough worrying about what's happening now.
 		-- Charles Schulz ("Things I've Had to Learn Over and
 		   Over and Over")
 %
-"You can't teach people to be lazy - either they have it, or they don't."
+"You can't teach people to be lazy - either they have it, or they do not."
 		-- Dagwood Bumstead
 %
 You cannot achieve the impossible without attempting the absurd.
@@ -15935,10 +15935,10 @@ doubt.
 %
 You do not have mail.
 %
-You don't have to think too hard when you talk to teachers.
+You do not have to think too hard when you talk to teachers.
 		-- J­ D­ Salinger
 %
-You don't sew with a fork, so I see no reason to eat with knitting
+You do not sew with a fork, so I see no reason to eat with knitting
 needles.
 		-- Miss Piggy (on eating Chinese Food)
 %
@@ -16002,7 +16002,7 @@ airlock with a man from Betelgeuse and about to die of asphyxiation in
 deep space that I really wish I'd listened to what my mother told me
 when I was young!"
 	"Why, what did she tell you?"
-	"I don't know, I didn't listen!"
+	"I do not know, I didn't listen!"
 		-- Douglas Adams ("Hitchhiker's Guide to the Galaxy")
 %
 You look like a million dollars.  All green and wrinkled.
@@ -16054,7 +16054,7 @@ You possess a mind not merely twisted, but actually sprained.
 know how seldom they do."
 		-- Olin Miller.
 %
-You should emulate your heros, but don't carry it too far.  Especially
+You should emulate your heros, but do not carry it too far.  Especially
 if they are dead.
 %
 "You should never bet against anything in science at odds of more than
@@ -16289,7 +16289,7 @@ make sense."
 "No woman ever has a past once she has mated with a god."
 		-- Petronius of Rome
 %
-"If at first you don't succeed ... skydiving is not for you."
+"If at first you do not succeed ... skydiving is not for you."
 		-- unknown
 %
 Dear Miss Manners:

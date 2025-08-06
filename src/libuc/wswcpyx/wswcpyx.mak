@@ -40,6 +40,16 @@ MODS +=
 LIBS +=
 
 
+OBJ0= wswcpynarrow.o
+OBJ1= 
+OBJ2= 
+OBJ3= 
+
+OBJA= obj0.o 
+
+OBJ= obja.o
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
@@ -56,21 +66,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= wswcpynarrow.o
-OBJ1= 
-OBJ2= 
-OBJ3= 
-OBJ4= 
-OBJ5= 
-
-OBJA= obj0.o 
-OBJB= obj2.o obj3.o
-OBJC= obj4.o obj5.o
-
-OBJ= obja.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -83,6 +79,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
