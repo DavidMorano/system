@@ -565,7 +565,7 @@ int		to ;
 		    rs,olbuf,strlinelen(olbuf,oll,40)) ;
 	    }
 #endif
-	    if (isNotAccess(rs)) { /* we don't care too much for these errors */
+	    if (isNotAccess(rs)) { /* we do not care too much for these errors */
 		olbuf[0] = '\0' ;
 		if (isNotPresent(rs)) rs = SR_OK ;
 		else if (rs == SR_OVERFLOW) rs = SR_OK ;

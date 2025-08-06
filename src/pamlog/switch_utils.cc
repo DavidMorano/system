@@ -543,7 +543,7 @@ pr_config(pamh)
  * return value: new repositories
  *	1. In the case of PAM_REP_DEFAULT, new repositories are from nsswitch
  *	   file (as long as it represents a valid and supported configuration).
- *	2. In the case of specified repository, we don't check the nsswitch
+ *	2. In the case of specified repository, we do not check the nsswitch
  *	   file; just return the specified repository.
  */
 int

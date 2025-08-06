@@ -98,7 +98,7 @@ is intended to remedy the lack of certain critical generic network
  * is to build up a set of implementations for different architectures
  * (Unix System V, VMS, etc.). Users are encouraged to submit their own
  * variations for redistribution. If you need a particular variation which
- * you don't see here, either code it yourself (and, hopefully, send it to
+ * you do not see here, either code it yourself (and, hopefully, send it to
  * us at Sun) or contact your Customer Support representative. 
  */
 
@@ -1012,7 +1012,7 @@ struct pr_start_args *ps_arg ;
 
 	if (statbuf.st_size == 0) {
 
-/* it is an empty file - don't print it, just kill it */
+/* it is an empty file - do not print it, just kill it */
 
 	    unlink(pathname) ;
 

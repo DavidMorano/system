@@ -683,7 +683,7 @@ ck_perm(pamh, repository, domain, pwd, shpwd, privileged, passwd_res, uid,
 #ifdef PAM_LDAP
 	if (repository == PAM_REP_LDAP) {
 		/*
-		 * Special case root: don't bother to get root from ldap.
+		 * Special case root: do not bother to get root from ldap.
 		 */
 		if (strcmp(usrname, "root") == 0) {
 			*pwd = NULL;	*shpwd = NULL;
@@ -721,7 +721,7 @@ ck_perm(pamh, repository, domain, pwd, shpwd, privileged, passwd_res, uid,
 #ifdef PAM_NIS
 	if (repository == PAM_REP_NIS) {
 		/*
-		 * Special case root: don't bother to get root from nis(yp).
+		 * Special case root: do not bother to get root from nis(yp).
 		 */
 		if (strcmp(usrname, "root") == 0) {
 			*pwd = NULL;	*shpwd = NULL;
@@ -760,7 +760,7 @@ ck_perm(pamh, repository, domain, pwd, shpwd, privileged, passwd_res, uid,
 #ifdef PAM_NISPLUS
 	if (repository == PAM_REP_NISPLUS) {
 		/*
-		 * Special case root: don't bother to get root from nis+.
+		 * Special case root: do not bother to get root from nis+.
 		 */
 		if (strcmp(usrname, "root") == 0) {
 			*pwd = NULL;	*shpwd = NULL;
@@ -772,7 +772,7 @@ ck_perm(pamh, repository, domain, pwd, shpwd, privileged, passwd_res, uid,
 
 		/*
 		 * We need to use user id to
-		 * make any nis+ request. But don't give up the super
+		 * make any nis+ request. But do not give up the super
 		 * user power yet. It may be needed elsewhere.
 		 */
 		(void) setuid(0);	/* keep real user id as root */
@@ -1328,7 +1328,7 @@ repository_to_string(int repository)
  * A message is also printed if the input string is too long.
  * The password sources use :'s as seperators, and are not allowed in the "gcos"
  * field.  Newlines serve as delimiters between users in the password source,
- * and so, those too, are checked for.  (I don't think that it is possible to
+ * and so, those too, are checked for.  (I do not think that it is possible to
  * type them in, but better safe than sorry)
  *
  * Returns '1' if a colon or newline is found or the input line is too long.

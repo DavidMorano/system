@@ -368,7 +368,7 @@ update_spent(pamh, field, data, unix_pwd, unix_sp,
 					 * It was set to 0 before. That
 					 * will force passwd change at the
 					 * next login. There are several
-					 * ways to force passwd change. I don't
+					 * ways to force passwd change. I do not
 					 * think turning on aging should imply
 					 * that.
 					 */
