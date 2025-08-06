@@ -93,7 +93,7 @@ OBJ06= mapex.o
 OBJ07=
 
 OBJ08= strkeyx.o
-OBJ09=
+OBJ09= strobj.o
 OBJ10= cfx.o memtrack.o mapblock.o
 OBJ11= field.o
 
@@ -924,23 +924,24 @@ hostaddr.o:		hostaddr.cc	hostaddr.h
 hostinfo.o:		hostinfo.cc	hostinfo.h
 lookaside.o:		lookaside.cc	lookaside.h
 expcook.o:		expcook.cc	expcook.h
-paramfile.o:		paramfile.cc	paramfile.h
-memfile.o:		memfile.cc	memfile.h
-dirlist.o:		dirlist.cc	dirlist.h
-varray.o:		varray.cc	varray.h
-csem.o:			csem.cc		csem.h
-pwcache.o:		pwcache.cc	pwcache.h
-lockrw.o:		lockrw.cc	lockrw.h
-nodedb.o:		nodedb.cc	nodedb.h
-ccfile.o:		ccfile.cc	ccfile.hh
-thrcomm.o:		thrcomm.cc	thrcomm.h
-thrbase.o:		thrbase.cc	thrbase.h thrcomm.h
-pwentry.o:		pwentry.cc	pwentry.h
-pwfile.o:		pwfile.cc	pwfile.h
-bufstr.o:		bufstr.cc	bufstr.h
-syspasswd.o:		syspasswd.cc	syspasswd.h
-absfn.o:		absfn.cc	absfn.h
-outbuf.o:		outbuf.cc	outbuf.h
+memfile.o:		memfile.cc	memfile.h		$(INCS)
+dirlist.o:		dirlist.cc	dirlist.h		$(INCS)
+varray.o:		varray.cc	varray.h		$(INCS)
+csem.o:			csem.cc		csem.h			$(INCS)
+pwcache.o:		pwcache.cc	pwcache.h		$(INCS)
+lockrw.o:		lockrw.cc	lockrw.h		$(INCS)
+nodedb.o:		nodedb.cc	nodedb.h		$(INCS)
+ccfile.o:		ccfile.cc	ccfile.hh		$(INCS)
+thrcomm.o:		thrcomm.cc	thrcomm.h		$(INCS)
+thrbase.o:		thrbase.cc	thrbase.h thrcomm.h	$(INCS)
+pwentry.o:		pwentry.cc	pwentry.h		$(INCS)
+pwfile.o:		pwfile.cc	pwfile.h		$(INCS)
+bufstr.o:		bufstr.cc	bufstr.h		$(INCS)
+syspasswd.o:		syspasswd.cc	syspasswd.h		$(INCS)
+absfn.o:		absfn.cc	absfn.h			$(INCS)
+outbuf.o:		outbuf.cc	outbuf.h		$(INCS)
+kvsfile.o:		kvsfile.cc	kvsfile.h		$(ICNS)
+clusterdb.o:		clusterdb.cc	clusterdb.h		$(ICNS)
 
 # sring-comparisons
 vstr.o:			vstr.dir
@@ -975,6 +976,11 @@ hasx.dir:
 # MNW
 mnw.o:			mnw.dir
 mnw.dir:
+	makesubdir $@
+
+# UCSTREAM
+ucstream.o:		ucstream.dir
+ucstream.dir:
 	makesubdir $@
 
 # DEBUG

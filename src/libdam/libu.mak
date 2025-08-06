@@ -65,7 +65,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 SOFL= -shared
 
 
-OBJ00= mailvalues.o endian.o 
+OBJ00= syshas.o mailvalues.o endian.o 
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
 OBJ03= libutil.o usysconf.o umods.o 
@@ -287,6 +287,7 @@ objg.o:			$(OBJG)
 
 
 # SUPPORT
+syshas.o:		syshas.cc	syshas.h		$(INCS)
 timewatch.o:		timewatch.cc timewatch.hh		$(INCS)
 aflag.o:		aflag.cc aflag.hh			$(INCS)
 errtimer.o:		errtimer.cc errtimer.hh			$(INCS)
