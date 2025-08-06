@@ -40,7 +40,7 @@ a) whether there is a UTMPX entry or not for current session
 b) "message" status of current terminal
 c) "biff" status of current terminal
 
-If there is no controlling terminal for the session, don't send the
+If there is no controlling terminal for the session, do not send the
 update message.
 
 If there is no UTMPX entry, check if there is a controlling terminal

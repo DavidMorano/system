@@ -23,7 +23,7 @@ main()
      struct msgrec rec;
      int i;
 
-     switch (fork())		/* TLH - now don't have to add an & */
+     switch (fork())		/* TLH - now do not have to add an & */
          {
 	 case -1:	fprintf (stderr, "rem_pgm: Cannot fork!\n");
 	 		exit (2);

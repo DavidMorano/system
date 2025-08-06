@@ -1825,7 +1825,7 @@ PROGENTRY_ARGS	*pap ;
 
 	if ((rs < 0) || (! f_process)) {
 
-/* we don't need to run this one */
+/* we do not need to run this one */
 
 	    progentry_free(pep) ;
 

@@ -6,7 +6,7 @@
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
-#define	CF_DEBUGNOCONF	0		/* don't allow config file */
+#define	CF_DEBUGNOCONF	0		/* do not allow config file */
 #define	CF_RUNMODE	0		/* put RUNMODE in environment */
 #define	CF_ACCTAB	1
 #define	CF_SETENTRY	1		/* use 'proginfo_setentry()' */
