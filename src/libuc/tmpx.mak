@@ -31,11 +31,27 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= tmpx.h
+INCS += tmpx.h
 
-LIBS=
+MODS +=
+
+LIBS +=
+
+
+OBJ0= tmpx_main.o tmpx_obj.o
+OBJ1= tmpx_getboottime.o
+OBJ2= tmpx_getrunlevel.o
+OBJ3= tmpx_getuserlines.o tmpx_getuserterms.o
+
+OBJ4= tmpx_getsessions.o
+OBJ5=
+
+OBJA= obj0.o obj1.o
+OBJB= obj2.o obj3.o obj4.o
+
+OBJ= obja.o objb.o
 
 
 INCDIRS=
@@ -44,7 +60,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,19 +70,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_TMPX= tmpx_main.o tmpx_obj.o
-OBJ1_TMPX= tmpx_getboottime.o
-OBJ2_TMPX= tmpx_getrunlevel.o
-OBJ3_TMPX= tmpx_getuserlines.o tmpx_getuserterms.o
-OBJ4_TMPX= tmpx_getsessions.o
-
-OBJA_TMPX= obj0_tmpx.o obj1_tmpx.o
-OBJB_TMPX= obj2_tmpx.o obj3_tmpx.o obj4_tmpx.o
-
-OBJ_TMPX= $(OBJA_TMPX) $(OBJB_TMPX)
-
-
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -81,6 +84,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -93,17 +99,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
 
-$(T).o:			$(OBJ_TMPX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_TMPX)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -115,20 +119,27 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_tmpx.o:	$(OBJ0_TMPX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_TMPX)
+obj0.o:			$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
 
-obj1_tmpx.o:	$(OBJ1_TMPX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_TMPX)
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
 
-obj2_tmpx.o:	$(OBJ2_TMPX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_TMPX)
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
 
-obj3_tmpx.o:	$(OBJ3_TMPX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_TMPX)
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
 
-obj4_tmpx.o:	$(OBJ4_TMPX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_TMPX)
+obj4.o:			$(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
+
+
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
 tmpx_main.o:		tmpx_main.cc		$(INCS)

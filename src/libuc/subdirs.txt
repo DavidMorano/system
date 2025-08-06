@@ -34,7 +34,6 @@ mktmp
 mkx
 nleadx
 obuf
-open
 path
 permx
 pow
@@ -81,3 +80,5 @@ wsfx
 wsix
 wsnx
 wswcpyx
+strobj
+open

@@ -42,7 +42,7 @@ LIBS +=
 
 OBJ0= strmgr.o 
 OBJ1= strstore.o
-OBJ2= strop.o
+OBJ2= strop.o asstr.o
 OBJ3= strtab.o strtabfind.o
 
 OBJ4= ass.o dstr.o
@@ -155,5 +155,16 @@ strtabfind.o:		strtabfind.cc	strtabfind.h		$(INCS)
 
 dstr.o:			dstr.cc		dstr.h			$(INCS)
 ass.o:			ass.cc		ass.h			$(INCS)
+
+# ASSTR
+asstr.o:		asstr0.o asstr1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+asstr0.o:		asstr.ccm				$(INCS)
+	makemodule asstr
+
+asstr1.o:		asstr1.cc				$(INCS)
+	makemodule asstr
+	$(COMPILE.cc) $<
 
 
