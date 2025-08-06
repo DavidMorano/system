@@ -390,7 +390,7 @@ LINEDESC	*ldp ;
 
 	    f_eol = (cp[cl - 1] == '\n') ;
 
-/* get out early if we don't have an EOL */
+/* get out early if we do not have an EOL */
 
 	    f_copydown = ((! ldp->f_eol) && (! ldp->f_eof) && 
 		((cp + cl) == (lp + ll))) ;

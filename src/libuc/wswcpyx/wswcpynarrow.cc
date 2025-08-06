@@ -9,9 +9,7 @@
 /* revision history:
 
 	= 2000-05-14, David A­D­ Morano
-
 	Originally written for Rightcore Network Services.
-
 
 */
 
@@ -46,6 +44,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -80,16 +79,17 @@
 /* exported subroutines */
 
 int wswcpynarrow(wchar_t *rarr,cchar *sp,int sl) noex {
-	int		c = -1 ;
+	int		rs = SR_FAULT ;
+	int		c = 0 ; /* return-value */
 	if (rarr && sp) {
-	    c = 0 ;
+	    rs = SR_OK ;
 	    while ((c < sl) && sp[c]) {
 	        cint	ch = mkchar(sp[c]) ;
 	        rarr[c++] = ch ;
 	    } /* end while */
 	    rarr[c] = '\0' ;
 	} /* end if (non-null) */
-	return c ;
+	return (c >= 0) ? c : rs ;
 }
 /* end subroutine (wswcpynarrow) */
 

@@ -746,7 +746,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	}
 #endif
 
-/* find a file if we don't have one already */
+/* find a file if we do not have one already */
 
 	if (file == NULL) {
 
