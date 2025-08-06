@@ -1,4 +1,4 @@
-/* main (openport) */
+/* openport_main SUPPORT (openport) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 

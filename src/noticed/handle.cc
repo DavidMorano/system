@@ -261,7 +261,7 @@ struct clientinfo	*cip ;
 	    debugprintf("handle: svcspec=%s\n",svcspec) ;
 #endif
 
-/* we have our input data => make sure we don't get any more! :-) */
+/* we have our input data => make sure we do not get any more! :-) */
 
 	if (f_socket)
 	    u_shutdown(ifd,SHUT_RD) ;
