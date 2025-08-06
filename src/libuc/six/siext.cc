@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* determine if file-name (just a c-string) has an approved file-extension */
+/* find string-index up to the beginning of a file-name extension */
 /* version %I% last-modified %G% */
 
 
@@ -24,8 +24,8 @@
 	Given a file-name (a counted c-string) I determine if it
 	has a file-extension.  If it has a file-extension, I return
 	the length (character count) of the origial string up to
-	the dot character before the file-extension.  For no
-	file-extension, I return -1.
+	the startof the file-extension (after the dot character).
+	For no file-extension, I return -1.
 
 	Synopsis:
 	int siext(cchar *fp,int fl,mainv exts) noex
@@ -53,6 +53,9 @@
 
 #include	"six.h"			/* |sirbrk(3uc)| */
 #include	"siext.h"
+
+#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency	"mod/chrset.ccm"
 
 import libutil ;
 import chrset ;

@@ -12,7 +12,7 @@
 	This code was originally written.
 
 	= 2020-03-22, David A­D­ Morano
-	I modularized this.
+	I modularized this (made into a C++20 module).
 
 */
 

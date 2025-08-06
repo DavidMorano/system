@@ -95,8 +95,10 @@ int sfcontent(cchar *sp,int sl,cchar **rpp) noex {
 	        } else {
 		    while (sl && iseol(sp[sl - 1])) sl -= 1 ;
 	        } /* end if (comment or EOL) */
-		{
+		if (sl) {
 		    rl = sfshrink(sp,sl,&rp) ;
+		} else {
+		    rp = sp ;
 		}
 	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
