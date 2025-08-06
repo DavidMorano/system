@@ -990,7 +990,7 @@ int	nsi, nso ;
 	    pip->logid = jep->jobid ;
 	    pip->pid = getpid() ;
 
-/* close stuff we don't need */
+/* close stuff we do not need */
 
 	    if (pip->f.daemon)
 	        u_close(sip->fd_listentcp) ;

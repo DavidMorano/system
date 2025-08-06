@@ -830,7 +830,7 @@ const char	*envv[] ;
 
 	} /* end for (progopts) */
 
-/* if we don't have a request for something yet, use our progmode */
+/* if we do not have a request for something yet, use our progmode */
 
 	f = lip->f.sum || lip->f.amean || lip->f.hmean ;
 	if (! f) {
