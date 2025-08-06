@@ -40,6 +40,17 @@ MODS +=
 LIBS +=
 
 
+OBJ0_ENVS= envs_main.o
+OBJ1_ENVS= envs_procxe.o
+OBJ2_ENVS= envs_subs.o
+OBJ3_ENVS= 
+
+OBJA_ENVS= obj0_envs.o obj1_envs.o
+OBJB_ENVS= obj2_envs.o
+
+OBJ_ENVS= $(OBJA_ENVS) $(OBJB_ENVS)
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
@@ -56,16 +67,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_ENVS= envs_main.o
-OBJ1_ENVS= envs_procxe.o
-OBJ2_ENVS= envs_subs.o
-OBJ3_ENVS= 
-
-
-OBJA_ENVS= obj0_envs.o obj1_envs.o
-OBJB_ENVS= obj2_envs.o
-
-OBJ_ENVS= $(OBJA_ENVS) $(OBJB_ENVS)
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -73,14 +75,14 @@ default:		$(T).o
 all:			$(ALL)
 
 
-.SUFFIXES:		.hh .ii .ccm
-
-
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -101,9 +103,6 @@ all:			$(ALL)
 $(T).o:			$(OBJ_ENVS)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_ENVS)
 
-$(T).a:			$(OBJ_ENVS)
-	$(AR) $(ARFLAGS) -rc $@ $?
-
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
@@ -118,13 +117,16 @@ control:
 
 
 obj0_envs.o:	$(OBJ0_ENVS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_ENVS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_envs.o:	$(OBJ1_ENVS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_ENVS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_envs.o:	$(OBJ2_ENVS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_ENVS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3_envs.o:	$(OBJ3_ENVS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 envs_main.o:		envs_main.cc	$(INCS)

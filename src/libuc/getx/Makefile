@@ -54,11 +54,12 @@ OBJ10= getsocktype.o getsyslogx.o getsystypenum.o
 OBJ11= getuserhome.o getuserorg.o getuserterms.o
 OBJ12= getxid.o getopendial.o getmaxpid.o
 OBJ13= getnisdomain.o getpwx.o
+OBJ14= getoflags.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o 
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
-OBJD= obj12.o obj13.o
+OBJD= obj12.o obj13.o obj14.o
 
 OBJ= obja.o objb.o objc.o objd.o
 
@@ -78,7 +79,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -91,6 +92,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -125,59 +129,62 @@ control:
 
 
 obj00.o:		$(OBJ00)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ00)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj01.o:		$(OBJ01)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ01)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj02.o:		$(OBJ02)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ02)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj03.o:		$(OBJ03)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ03)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj04.o:		$(OBJ04)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ04)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj05.o:		$(OBJ05)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ05)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj06.o:		$(OBJ06)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ06)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj07.o:		$(OBJ07)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ07)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj08.o:		$(OBJ08)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ08)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj09.o:		$(OBJ09)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ09)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj10.o:		$(OBJ10)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ10)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj11.o:		$(OBJ11)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ11)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj12.o:		$(OBJ12)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ12)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj13.o:		$(OBJ13)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ13)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj14.o:		$(OBJ14)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objc.o:			$(OBJC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objd.o:			$(OBJD)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 getbufsize.o:		getbufsize.cc		getbufsize.h		$(INCS)
@@ -223,5 +230,6 @@ getopendial.o:		getopendial.c		getopendial.h		$(INCS)
 getmaxpid.o:		getmaxpid.cc		getmaxpid.h		$(INCS)
 getnisdomain.o:		getnisdomain.cc		getnisdomain.h		$(INCS)
 getpwx.o:		getpwx.cc		getpwx.h		$(INCS)
+getoflags.o:		getoflags.cc		getoflags.h		$(INCS)
 
 

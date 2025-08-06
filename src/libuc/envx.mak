@@ -40,23 +40,6 @@ MODS +=
 LIBS +=
 
 
-INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
-
-
 OBJ0= envhelp.o envlist.o envmgr.o
 OBJ1=
 OBJ2=
@@ -67,7 +50,23 @@ OBJA= obj0.o
 OBJ= obja.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS +=
+
+LIBDIRS += -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -80,6 +79,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -100,13 +102,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	$(RM) $(ALL)
@@ -119,23 +116,23 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 envmgr.o:		envmgr.cc envmgr.h	$(INCS)
