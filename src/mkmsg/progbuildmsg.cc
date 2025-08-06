@@ -30,7 +30,7 @@
 		subject
 		to
 
-	I don't know if we are caring a rat's butt about this below!
+	I do not know if we are caring a rat's butt about this below!
 
 	As an aside, personally I always preferred the order:
 
