@@ -26,12 +26,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-
-EXTERNC_begin
-
-extern int	mnwcpy(char *,int,cchar *,int) noex ;
-
-EXTERNC_end
+#include	<mnwcpy.h>
 
 
 #endif /* MNW_INCLUDE */
