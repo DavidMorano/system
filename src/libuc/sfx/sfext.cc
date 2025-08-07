@@ -5,7 +5,7 @@
 /* string-find a file-name extension */
 /* version %I% last-modified %G% */
 
-#define	CF_SIEXT	1		/* used |siext(3uc)| */
+#define	CF_SIRCHR	1		/* used |sirchr(3uc)| */
 
 /* revision history:
 
@@ -56,13 +56,16 @@
 #include	"sfx.h"
 #include	"sfext.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency	"mod/chrset.ccm"
+
 import libutil ;
 import chrset ;
 
 /* local defines */
 
-#ifndef	CF_SIEXT
-#define	CF_SIEXT	1		/* used |siext(3uc)| */
+#ifndef	CF_SIRCHR
+#define	CF_SIRCHR	1		/* used |sirchr(3uc)| */
 #endif
 
 
@@ -92,7 +95,7 @@ namespace {
 
 constexpr brkinit       bi ;
 
-cbool			f_siext = CF_SIEXT ;
+cbool			f_sirchr = CF_SIRCHR ;
 
 
 /* exported variables */
@@ -101,22 +104,18 @@ cbool			f_siext = CF_SIEXT ;
 /* exported subroutines */
 
 int sfext(cchar *sp,int sl,cchar **rpp) noex {
-    	int		rs = SR_FAULT ;
-	int		el = 0 ; /* return-value */
+	int		el = -1 ; /* return-value */
 	if (sp && rpp) ylikely {
 	    cchar	*ep = nullptr ;
-	    bool	f = false ;
-	    rs = SR_OK ;
-	    if_constexpr (f_siext) {
+	    if_constexpr (f_sirchr) {
 		if (sl < 0) sl = lenstr(sp) ;
 		while ((sl > 0) && (sp[sl - 1] == CH_SLASH)) {
 		    sl -= 1 ;
 		}
 		if (int si ; (si = sirbrk(sp,sl,bi.brks)) >= 0) {
                     if (sp[si] == CH_DOT) {
-			f = true ;
                         si += 1 ;
-		        el = (sl - si) ;
+		        el = (sl - si) ; /* <- signal FOUND */
 		        ep = (sp + si) ;
                     } /* end if (got) */
                 } /* end if (hit something) */
@@ -124,16 +123,15 @@ int sfext(cchar *sp,int sl,cchar **rpp) noex {
 	        cchar	*bp ;
 	        if (int bl ; (bl = sfbasename(sp,sl,&bp)) > 0) {
 		    if (int si ; (si = sirchr(bp,bl,CH_DOT)) > 0) {
-		        f = true ;
 			si += 1 ;
-		        el = (bl - si) ;
+		        el = (bl - si) ; /* <- signal FOUND */
 		        ep = (bp + si) ;
 		    }
 	        } /* end if (sibasename) */
-	    } /* end if_constexpr (f_siext) */
-	    *rpp = (f) ? ep : nullptr ;
+	    } /* end if_constexpr (f_sirchr) */
+	    *rpp = ep ;
 	} /* end if (non-null) */
-	return (rs >= 0) ? el : rs ;
+	return el ;
 }
 /* end subroutine (sfext) */
 
