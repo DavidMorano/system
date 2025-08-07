@@ -9,10 +9,10 @@
 /* revision history:
 
 	= 1998-10-20, David A­D­ Morano
-	This code was originally written so that dangerous
-	daemon programs do not have to be run as 'root' in order
-	to bind to a priveledge port (for those transport providers
-	that have priveledged ports).  A good example of a dangerous
+	This code was originally written so that dangerous daemon
+	programs do not have to be run as 'root' in order to bind
+	to a priveledge port (for those transport providers that
+	have priveledged ports).  A good example of a dangerous
 	daemon program that this capability is especially useful
 	for is the infamous SENDMAIL daemon!
 
@@ -48,13 +48,14 @@
 #include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
+#include	<getusername.h>
+#include	<mallocxx.h>		/* |malloc_mm(3uc)| */
 #include	<nulstr.h>
 #include	<sockaddress.h>
 #include	<sfx.h>
@@ -62,22 +63,23 @@
 #include	<strwcpy.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>
-#include	<getusername.h>
 #include	<permx.h>
 #include	<matxstr.h>
 #include	<isnot.h>
-#include	<localmisc.h>		/* |MSGBUFLEN| */
+#include	<localmisc.h>
 
 #include	"openport.h"
 #include	"openportmsg.h"
 
-import libutil ;
+#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency	"mod/uconstants.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 import uconstants ;
 
 /* local defines */
 
-#define	MBUFLEN		MSGBUFLEN
-
+#define	NARGS		5
 #define	NENVS		10
 
 #define	SA		sockaddress
@@ -125,7 +127,7 @@ namespace {
 	int opener() noex ;
 	int progproc(cchar *,int) noex ;
     } ; /* end struct (openporter) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -142,13 +144,13 @@ static int	progfind(char *) noex ;
 
 /* local variables */
 
-static constexpr cpcchar	prs[] = {
+constexpr cpcchar	prs[] = {
 	"/usr/extra",
 	"/usr/preroot",
 	nullptr
 } ;
 
-constexpr int			unlen = OPENPORTMSG_UNLEN ;
+constexpr int		unlen = OPENPORTMSG_UNLEN ;
 
 
 /* exported variables */
@@ -204,9 +206,15 @@ int openporter::start() noex {
 		    rs = getusername(ubuf,ulen,-1) ;
 		    if (rs < 0) {
 			uc_free(a) ;
-		    }
+			ubuf = nullptr ;
+			pbuf = nullptr ;
+		    } /* end if (error) */
 		} /* end if (memory-allocation) */
 	    } /* end if (getbufsize) */
+	    if (rs < 0) {
+		plen = 0 ;
+		ulen = 0 ;
+	    } /* end if (error) */
 	} /* end if (getbufsize) */
 	return rs ;
 }
@@ -231,10 +239,9 @@ int openporter::opener() noex {
 	int		fd = -1 ;
 	if ((rs = progfind(pbuf)) >= 0) {
 	    cint	pl = rs ;
-	    int		bl ;
 	    cchar	*bn ;
 	    rs = SR_INVALID ;
-	    if ((bl = sfbasename(pbuf,pl,&bn)) > 0) {
+	    if (int bl ; (bl = sfbasename(pbuf,pl,&bn)) > 0) {
 	        rs = progproc(bn,bl) ;
 	        fd = rs ;
 	    }
@@ -247,27 +254,28 @@ int openporter::progproc(cchar *bn,int bl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (vecstr envs ; (rs = vecstr_start(&envs,5,0)) >= 0) {
+	if (vecstr envs ; (rs = envs.start(5,0)) >= 0) {
 	    if ((rs = loadenvs(&envs,ubuf,pbuf,bn,bl)) >= 0) {
 		cchar	*name ;
 		if (nulstr n ; (rs = n.start(bn,bl,&name)) >= 0) {
 		    cchar	*vnhome = varname.home ;
-	            int 	i = 0 ;
-	            int		j ;
-	            cchar	*sargv[5] ;
-	            cchar	*senvv[NENVS +2+ 1] ;
+	            cchar	*sargv[NARGS + 1] ;
+	            cchar	*senvv[NENVS + 2 + 1] ;
 	            cchar	*ep ;
-	            sargv[i++] = name ;
-	            sargv[i++] = "-b" ;
-	            sargv[i] = nullptr ;
-	            i = 0 ;
-	            if ((j = matkeystr(environ,vnhome,-1)) >= 0) {
+		    {
+	                int 	ai = 0 ;
+	                sargv[ai++] = name ;
+	                sargv[ai++] = "-b" ;
+	                sargv[ai] = nullptr ;
+		    }
+	            int i = 0 ; /* used-multiple for env-var array */
+	            if (int j ; (j = matkeystr(environ,vnhome,-1)) >= 0) {
 	                senvv[i++] = environ[j] ;
 	            }
-	            for (j = 0 ; vecstr_get(&envs,j,&ep) >= 0 ; j += 1) {
+	            for (int j = 0 ; envs.get(j,&ep) >= 0 ; j += 1) {
 	                if (ep) {
 	                    if (i >= NENVS) {
-	                        rs = SR_NOANODE ;
+	                        rs = SR_BUGCHECK ;
 	                        break ;
 	                    }
 	                    senvv[i++] = ep ;
@@ -284,7 +292,7 @@ int openporter::progproc(cchar *bn,int bl) noex {
 	            if (rs >= 0) rs = rs1 ;
 		} /* end if (nulstr) */
 	    } /* end if (loadenvs) */
-	    rs1 = vecstr_finish(&envs) ;
+	    rs1 = envs.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
 	} /* end if (vecstr) */
@@ -318,12 +326,13 @@ static int procspawn(cc *un,cc *prog,mainv sargv,mainv senvv,
 static int procspawn_begin(SP_CON *psp,cc *prog,mainv sargv,mainv senvv) noex {
 	int		rs = SR_FAULT ;
 	if (psp && prog && sargv && senvv) {
+	    int i = 0 ;
 	    memclear(psp) ;
 	    psp->opts |= SPAWNPROC_OIGNINTR ;
 	    psp->opts |= SPAWNPROC_OSETPGRP ;
-	    psp->disp[0] = SPAWNPROC_DOPEN ;
-	    psp->disp[1] = SPAWNPROC_DCLOSE ;
-	    psp->disp[2] = SPAWNPROC_DCLOSE ;
+	    psp->disp[i++] = SPAWNPROC_DOPEN ;
+	    psp->disp[i++] = SPAWNPROC_DCLOSE ;
+	    psp->disp[i++] = SPAWNPROC_DCLOSE ;
 	    rs = spawnproc(psp,prog,sargv,senvv) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -336,11 +345,11 @@ static int procspawn_end(pid_t pid,int *csp) noex {
 /* end subroutine (procspawn_end) */
 
 static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
-	cint		mlen = MBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (char *mbuf ; (rs = uc_malloc((mlen+1),&mbuf)) >= 0) {
+	if (char *mbuf ; (rs = malloc_mm(&mbuf)) >= 0) {
+	    cint	mlen = rs ;
 	    openportmsg_req	m0{} ;
 	    openportmsg_res	m1{} ;
 	    int		ml ;
@@ -348,7 +357,7 @@ static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
 	    m0.pf = pf ;
 	    m0.ptype = pt ;
 	    m0.proto = proto ;
-	    m0.sa = *sap ;
+	    m0.sa = *sap ; /* <- copy object */
 	    strwcpy(m0.username,un,unlen) ;
     
 	    if ((rs = openportmsg_msgrequest(&m0,1,mbuf,mlen)) >= 0) {
@@ -360,7 +369,7 @@ static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
 	            ml = rs1 ;
 	            if (rs1 >= 0) {
 	                rs1 = openportmsg_msgresponse(&m1,0,mbuf,ml) ;
-	        }
+	            }
     
 	            if ((rs1 > 0) && (m1.msgtype == mt)) {
 	                if (m1.rs >= 0) {
@@ -385,23 +394,21 @@ static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
 /* end subroutine (procexchange) */
 
 static int loadenvs(vecstr *elp,cchar *un,cchar *prog,cchar *bn,int bl) noex {
+	constexpr cpcchar penvnames[] = { "_", "_EF" } ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	if (rs >= 0) {
-	    rs = vecstr_envadd(elp,"_",prog,-1) ;
+	for (cauto &s : penvnames) {
+	    rs = elp->envadd(s,prog,-1) ;
 	    if (rs < INT_MAX) c += 1 ;
-	}
+	    if (rs < 0) break ;
+	} /* end for */
 	if (rs >= 0) {
-	    rs = vecstr_envadd(elp,"_EF",prog,-1) ;
-	    if (rs < INT_MAX) c += 1 ;
-	}
-	if (rs >= 0) {
-	    rs = vecstr_envadd(elp,"_A0",bn,bl) ;
+	    rs = elp->envadd("_A0",bn,bl) ;
 	    if (rs < INT_MAX) c += 1 ;
 	}
 	if (rs >= 0) {
 	    cchar	*key = varname.username ;
-	    rs = vecstr_envadd(elp,key,un,-1) ;
+	    rs = elp->envadd(key,un,-1) ;
 	    if (rs < INT_MAX) c += 1 ;
 	}
 	return (rs >= 0) ? c : rs ;
@@ -410,16 +417,14 @@ static int loadenvs(vecstr *elp,cchar *un,cchar *prog,cchar *bn,int bl) noex {
 
 static int progfind(char *progfname) noex {
 	cnullptr	np{} ;
-	USTAT		sb ;
 	int		rs = SR_LIBACC ;
-	int		rl = 0 ;
-	int		len = 0 ;
-	cchar		*bin = "sbin" ;
-	cchar		*pn = OPERPORT_PROGNAME ;
+	int		len = 0 ; /* return-value */
+	cchar		sbin[] = "sbin" ;
+	cchar		pn[] = OPERPORT_PROGNAME ;
 	for (int i = 0 ; prs[i] != nullptr ; i += 1) {
-	    if ((rs = mkpath3(progfname,prs[i],bin,pn)) >= 0) {
-	        rl = rs ;
-	        if ((rs = u_stat(progfname,&sb)) >= 0) {
+	    if ((rs = mkpath(progfname,prs[i],sbin,pn)) >= 0) {
+	        cint	rl = rs ;
+		if (ustat sb ; (rs = u_stat(progfname,&sb)) >= 0) {
 	            if (S_ISREG(sb.st_mode)) {
 			cint	am = (R_OK|X_OK) ;
 	                if ((rs = perm(progfname,-1,-1,np,am)) >= 0) {
