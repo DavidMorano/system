@@ -46,7 +46,7 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- |CHAR_BIT| */
+#include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<bit>			/* |countl_zero(3c++)| */
