@@ -89,6 +89,7 @@
 #include	<ucsig.h>
 #include	<uclock.h>
 #include	<ucgetx.h>
+#include	<uckvamatch.h>
 
 #include	<getxname.h>
 #include	<getexecname.h>
@@ -258,7 +259,6 @@ extern int uc_addrinfoget(cchar *,cchar *,const ADDRINFO *,ADDRINFO **) noex ;
 extern int uc_addrinfofree(ADDRINFO *) noex ;
 
 /* miscellaneous */
-extern int	uc_kvamatch(kva_t *,cchar *,cchar **) noex ;
 extern int	uc_strtod(cchar *,char **,double *) noex ;
 
 EXTERNC_end
