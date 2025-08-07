@@ -77,7 +77,7 @@
 
 /* forward references */
 
-static int	ipow10(int) noex ;
+local int	ipow10(int) noex ;
 
 
 /* local variables */
@@ -150,7 +150,7 @@ longlong llpow(longlong b,int n) noex {
 
 /* local subroutines */
 
-static int ipow10(int n) noex {
+local int ipow10(int n) noex {
 	int		r = 0 ;
 	if (n < 9) {
 	    r = b10tab[n] ;
