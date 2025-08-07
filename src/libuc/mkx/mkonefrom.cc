@@ -64,6 +64,8 @@
 
 #include	"mkx.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
 import libutil ;
 
 /* local defines */
@@ -113,7 +115,7 @@ constexpr bool	f_massage = CF_MASSAGE ;
 int mkonefrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (fbuf && sp) ylikely {
 	    rs = SR_INVALID ;
 	    fbuf[0] = '\0' ;
@@ -123,8 +125,8 @@ int mkonefrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 	        if (sl > 0)  ylikely {
 	            if (ema a ; (rs = a.start) >= 0) ylikely {
 	                if ((rs = a.parse(sp,sl)) >= 0) ylikely {
-	            	    ema_ent	*ep ;
-		            if ((rs = a.get(0,&ep)) >= 0) ylikely {
+	            	    ema_ent *ep ; 
+			    if ((rs = a.get(0,&ep)) >= 0) ylikely {
 		                rs = emaentry_bestfrom(ep,fbuf,flen) ;
 	                        len = rs ;
 		            } /* end if (ema_get) */
@@ -146,7 +148,7 @@ static int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
 	int		rs = SR_OK ;
 	int		nl = 0 ;
 	int		atype = -1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
 	if ((rp == nullptr) || (nl == 0)) {
 	    if (ep->cp != nullptr) {
