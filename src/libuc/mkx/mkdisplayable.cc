@@ -17,9 +17,12 @@
 
 /*******************************************************************************
 
+  	Name:
+	mkdisplayble
+
 	Description:
 	This subroutine will scan the source data looking for
-	displayable (like on a terminal) characters. Displayable
+	displayable (like on a terminal) characters.  Displayable
 	characters are transferred to the result buffer as space
 	permits.
 
@@ -35,11 +38,6 @@
 	Returns:
 	>=0	length of transfered characters
 	<0	error code (system-return)
-
-	Notes:
-	Implementation note: Remeber that all signed 'char's get
-	promoted to stupid signed values on subroutine calls (whether
-	the subroutine argument is signed or unsigned)!
 
 *******************************************************************************/
 
@@ -91,7 +89,7 @@ int mkdisplayable(char *rbuf,int rlen,cchar *sp,int sl) noex {
 	if (rbuf && sp) ylikely {
 	    if (sbuf s ; (rs = s.start(rbuf,rlen)) >= 0) ylikely {
 	        int	pch = 0 ;
-	        bool	f_shift = false ;
+	        bool	fshift = false ;
 		if (sl < 0) sl = lenstr(sp) ;
 	        for (int i = 0 ; (i < sl) && sp[i] ; i += 1) {
 	            cint	ch = mkchar(sp[i]) ;
@@ -100,13 +98,13 @@ int mkdisplayable(char *rbuf,int rlen,cchar *sp,int sl) noex {
 	            case CH_SO:
 	            case CH_SS2:
 	            case CH_SS3:
-		        f_shift = true ;
+		        fshift = true ;
 	                pch = ch ;
 		        break ;
 	            default:
 	                if (isprintlatin(ch)) {
-		            if (f_shift) {
-			        f_shift = false ;
+		            if (fshift) {
+			        fshift = false ;
 	    		        rs = s.chr(pch) ;
 		            }
 			    if (rs >= 0) {
