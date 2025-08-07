@@ -19,10 +19,12 @@
 
 	Names:
 	rmeol
+	rmwht
+	rmclass
+	rmtrailchr
 	rmochr
 	rmrchr
 	rmext
-	rmtrailchr
 	rmcomment
 
 	Description:
@@ -32,15 +34,18 @@
 
 	Synopsis:
 	int rmeol(cchar *sp,int sl) noex
+	int rmwht(cchar *sp,int sl) noex
+	int rmclass(cchar *sp,int sl,cchar *ss) noex
+	int rmtrailchr(cchar *sp,int sl,int sch) noex
 	int rmochr(cchar *sp,int sl,int sch) noex
 	int rmrchr(cchar *sp,int sl,int sch) noex
 	int rmext(cchar *sp,int sl) noex
-	int rmtrailchr(cchar *sp,int sl,int sch) noex
 	int rmcomment(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		pinter to constant string to consider
 	sl		length of supplied string
+	ss		c-string of characters representing a class
 	sch		character to search for
 
 	Returns:
@@ -49,8 +54,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -62,7 +69,9 @@
 
 #include	"rmx.h"
 
-import libutil ;
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -106,6 +115,50 @@ int rmeol(cchar *sp,int sl) noex {
 }
 /* end subroutine (rmeol) */
 
+int rmwht(cchar *sp,int sl) noex {
+    	if (sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    while (sl && iswhite(sp[sl - 1])) {
+	        sl -= 1 ;
+	    }
+	} else {
+	    sl = -1 ;
+	}
+	return sl ;
+}
+/* end subroutine (rmwht) */
+
+static bool isclass(cchar *ss,int ch) noex {
+    	ch &= UCHAR_MAX ;
+    	return (strchr(ss,ch) != nullptr) ;
+}
+
+int rmclass(cchar *sp,int sl,cchar *ss) noex {
+    	if (sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    while (sl && isclass(ss,sp[sl - 1])) {
+	        sl -= 1 ;
+	    }
+	} else {
+	    sl = -1 ;
+	}
+	return sl ;
+}
+/* end subroutine (rmclass) */
+
+int rmtrailchr(cchar *sp,int sl,int sch) noex {
+    	if (sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    while ((sl > 1) && (sp[sl - 1] == char(sch))) {
+	       sl -= 1 ;
+	    }
+	} else {
+	    sl = -1 ;
+	}
+	return sl ;
+}
+/* end subroutine (rmtrailchr) */
+
 int rmochr(cchar *sp,int sl,int ch) noex {
     	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
@@ -144,19 +197,6 @@ int rmext(cchar *sp,int sl) noex {
     	return sl ;
 }
 /* end subroutine (rmext) */
-
-int rmtrailchr(cchar *sp,int sl,int sch) noex {
-    	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    while ((sl > 1) && (sp[sl - 1] == char(sch))) {
-	       sl -= 1 ;
-	    }
-	} else {
-	    sl = -1 ;
-	}
-	return sl ;
-}
-/* end subroutine (rmtrailchr) */
 
 int rmcomment(cchar *lp,int ll) noex {
 	int		rl = -1 ;
