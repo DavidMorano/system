@@ -87,7 +87,7 @@ int sfdequote(cchar *sp,int sl,cchar **rpp) noex {
 	    }
 	    if (sp[0] == '\0') sl = 0 ;
 	    if (rpp) *rpp = sp ;
-	    while (sl && isours(sp[sl-1])) {
+	    while (sl && isours(sp[sl - 1])) {
 	        sl -= 1 ;
 	    }
 	} else {
