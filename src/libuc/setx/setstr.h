@@ -57,6 +57,7 @@ struct setstr : setstr_head {
 	setstr_co	delall ;
 	setstr_co	count ;
 	setstr_co	finish ;
+	bool		fopen{} ;
 	setstr() noex {
 	    start(this,setstrmem_start) ;
 	    delall(this,setstrmem_delall) ;
@@ -72,8 +73,8 @@ struct setstr : setstr_head {
 	int curenum(setstr_cur *,cchar **) noex ;
 	int curend(setstr_cur *) noex ;
 	void dtor() noex ;
-	~setstr() {
-	    dtor() ;
+	destruct setstr() {
+	    if (fopen) dtor() ;
 	} ;
 } ; /* end struct (setstr) */
 #else	/* __cplusplus */
