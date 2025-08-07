@@ -33,11 +33,9 @@
 #include	<fcntl.h>		/* open-flags */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<pwd.h>
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<bfile.h>
 #include	<hdb.h>
 #include	<storeitem.h>
 #include	<mallocstuff.h>
@@ -51,11 +49,13 @@
 
 #include	"pwfile.h"
 
-import libutil ;
+#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency	"mod/ucstream.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import ucstream ;			/* |lenstr(3u)| */
 
 /* local defines */
-
-#define	DEFENTS	10
 
 #define	PF		pwfile
 #define	PF_CUR		pwfile_cur
@@ -64,17 +64,11 @@ import libutil ;
 
 #define	TO_LOCK		60
 
-#ifndef	F_LOCK
-#define	F_ULOCK	0
-#define	F_LOCK	1
-#define	F_TLOCK	2
-#define	F_TEST	3
-#endif
+#define	DEFENTS		10
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -456,27 +450,25 @@ static int pwfile_filefronter(PF *op) noex {
 	int		rs1 ;
 	int		n = 0 ;
 	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) ylikely {
-	    bfile	pf, *fp = &pf ;
 	    cint	llen = rs ;
-	    cmode	om = 0644 ;
-	    if ((rs = bopen(fp,op->fname,"rc",om)) >= 0) ylikely {
+	    if (ucstream pf ; (rs = pf.open(op->fname,"rc")) >= 0) ylikely {
 	        if (! op->f.locked) {
-	            rs = bcontrol(fp,BC_LOCKREAD,TO_LOCK) ;
+	            rs = pf.lockbegin(0,TO_LOCK) ;
 	        }
 	        if (rs >= 0) ylikely {
-	            while ((rs = breadln(fp,lbuf,llen)) > 0) ylikely {
+	            while ((rs = pf.readln(lbuf,llen)) > 0) ylikely {
 			cint	ll = rmeol(lbuf,rs) ;
 			rs = pwfile_fileln(op,lbuf,ll) ;
 			n += rs ;
 	                if (rs < 0) break ;
 	            } /* end while (reading file entries) */
 	            if ((rs >= 0) && (! op->f.locked)) {
-	                rs = bcontrol(fp,BC_UNLOCK,0) ;
+	                rs = pf.lockend ;
 	            }
 	        } /* end if (ok) */
-	        rs1 = bclose(fp) ;
+	        rs1 = pf.close ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (bfile) */
+	    } /* end if (ucstream) */
 	    rs1 = uc_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
