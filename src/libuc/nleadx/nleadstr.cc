@@ -17,13 +17,12 @@
 
 /*******************************************************************************
 
-	Name:
+  	Name:
 	nleadstr
 
 	Description:
-	This is the same as |nleadbasestr| but with a different
-	(simplified) name.
-
+	This subroutine is the same as |nleadbasestr(3uc)|, noted
+	below, but with a different name.
 
 	Names:
 	nleadbasestr
@@ -32,9 +31,9 @@
 
 	Description:
 	Calculate the number of characters that two string have in
-	common from their leading edges. If we get a match at all
+	common from their leading edges.  If we get a match at all
 	we return the number of characters matched. If we do not
-	get a match, we return a negative number. The second given
+	get a match, we return a negative number.  The second given
 	string is allowed to have an optional length supplied.
 
 	Synopsis:
@@ -46,8 +45,8 @@
 	sl		length of test-string
 
 	Returns:
-	>=0		match found and it matched up to this length
-	<0		no match (system-return)
+	>=0		length of matched string (0=no-match)
+	<0		error (-1 only due to NULL argument)
 
 	Notes:
 	1. Rationale for using templates rather than passing a 
@@ -71,6 +70,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<syshas.h>
 #include	<toxc.h>
 #include	<localmisc.h>
 
@@ -101,12 +101,6 @@ extern "C" {
 
 /* forward references */
 
-
-/* local variables */
-
-
-/* subroutine-templates */
-
 template <toxc_f toxc>
 static int nleadxxxxstr(cchar *bs,cchar *sp,int sl) noex {
 	int		i = -1 ; /* return-value */
@@ -118,7 +112,13 @@ static int nleadxxxxstr(cchar *bs,cchar *sp,int sl) noex {
 	} /* end if (non-null) */
 	return i ;
 }
-/* end subroutine-template (nleadxxxxstr)*/
+/* end subroutine-template (nleadxxxxstr) */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
