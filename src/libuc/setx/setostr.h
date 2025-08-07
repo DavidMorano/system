@@ -74,6 +74,7 @@ struct setostr : setostr_head {
 	    delall(this,setostrmem_delall) ;
 	    count(this,setostrmem_count) ;
 	    finish(this,setostrmem_finish) ;
+	    magic = 0 ;
 	} ;
 	setostr(const setostr &) = delete ;
 	setostr &operator = (const setostr &) = delete ;
@@ -84,8 +85,8 @@ struct setostr : setostr_head {
 	int curenum(setostr_cur *,cchar **) noex ;
 	int curend(setostr_cur *) noex ;
 	void dtor() noex ;
-	~setostr() {
-	    dtor() ;
+	destruct setostr() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (setostr) */
 #else	/* __cplusplus */
