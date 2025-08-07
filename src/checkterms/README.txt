@@ -1,4 +1,4 @@
 CHECKTERMS
 
-I don't know what this is! :-)
+I do not know what this is! :-)
 
