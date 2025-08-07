@@ -27,33 +27,7 @@
 #include	<stdintx.h>
 
 #include	<powtwo.h>
-
-
-EXTERNC_begin
-
-extern int	ipow(int,int) noex ;
-extern long	lpow(long,int) noex ;
-extern longlong	llpow(longlong,int) noex ;
-
-static inline int ipowell(int b,int e) noex {
-	return ipow(b,e) ;
-}
-
-EXTERNC_end
-
-#ifdef	__cplusplus
-
-static inline int	pow(int b,int e) noex {
-	return ipow(b,e) ;
-}
-static inline long	pow(long b,int e) noex {
-	return lpow(b,e) ;
-}
-static inline longlong	pow(longlong b,int e) noex {
-	return llpow(b,e) ;
-}
-
-#endif /* __cplusplus */
+#include	<xpow.h>
 
 
 #endif /* POW_INCLUDE */
