@@ -86,19 +86,21 @@ int sfbasename(cchar *sp,int sl,cchar **rpp) noex {
 	int		rl = -1 ; /* return-value */
 	cchar		*rp = nullptr ;
 	if (sp) {
-	    int		si ; /* used-afterwards */
 	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((sl > 1) && (sp[sl - 1] == '/')) {
 	        sl -= 1 ;
 	    }
-	    for (si = sl ; si > 0 ; si -= 1) {
-	        if (sp[si - 1] == '/') break ;
-	    }
-	    if ((sl == 1) && (si == 1) && (sp[0] == '/')) {
-	        si -= 1 ;
-	    }
-	    rp = (sp + si) ;
-	    rl = (sl - si) ;
+	    {
+	        int	si ; /* used-afterwards */
+	        for (si = sl ; si > 0 ; si -= 1) {
+	            if (sp[si - 1] == '/') break ;
+	        }
+	        if ((sl == 1) && (si == 1) && (sp[0] == '/')) {
+	            si -= 1 ;
+	        }
+	        rp = (sp + si) ;
+	        rl = (sl - si) ;
+	    } /* end block */
 	} /* end if (non-null) */
 	if (rpp) *rpp = rp ;
 	return rl ;
