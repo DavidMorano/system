@@ -238,14 +238,16 @@ void setstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("setstr",rs,"fini-finish") ;
 	}
-}
+} /* end method (strstr::dtor) */
 
 int setstr_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
 	    case setstrmem_start:
-	        rs = setstr_start(op,a) ;
+	        if ((rs = setstr_start(op,a)) >= 0) {
+		    op->fopen = true ;
+		}
 	        break ;
 	    case setstrmem_delall:
 	        rs = setstr_delall(op) ;
@@ -255,6 +257,7 @@ int setstr_co::operator () (int a) noex {
 	        break ;
 	    case setstrmem_finish:
 	        rs = setstr_finish(op) ;
+		op->fopen = false ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
