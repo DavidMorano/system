@@ -98,6 +98,10 @@ int malloc_ml(char **rpp) noex {
 	cint	w = getbufsize_ml ;
 	return uc_mallocsys(w,rpp) ;
 }
+int malloc_mm(char **rpp) noex {
+	cint	w = getbufsize_mm ;
+	return uc_mallocsys(w,rpp) ;
+}
 int malloc_nn(char **rpp) noex {
 	cint	w = getbufsize_nn ;
 	return uc_mallocsys(w,rpp) ;
