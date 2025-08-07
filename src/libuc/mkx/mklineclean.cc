@@ -115,7 +115,7 @@ static bool	ischarok(int) noex ;
 
 /* local variables */
 
-cint		ch_sub	= int(UC('¿')) ;
+constexpr int	ch_sub	= mkchar('¿') ;
 
 cbool		f_clean1 = CF_CLEAN1 ;	/* use CLEAN-1 */
 
