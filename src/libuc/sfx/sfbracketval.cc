@@ -65,13 +65,13 @@
 
 int sfbracketval(cchar *sp,int sl,cchar **rpp) noex {
     	if (sp) ylikely {
-	    if (cc *cp2 ; (cp2 = strnchr(sp,sl,'<')) != nullptr) {
-	        cp2 += 1 ;
-	        sl = intconv((sp + sl) - cp2) ;
-	        if (cc *cp3 ; (cp3 = strnchr(cp2,sl,'>')) != nullptr) {
-	            sl = intconv(cp3 - cp2) ;
+	    if (cc *tp ; (tp = strnchr(sp,sl,'<')) != nullptr) {
+	        tp += 1 ;
+	        sl = intconv((sp + sl) - tp) ;
+	        if (cc *t2p ; (t2p = strnchr(tp,sl,'>')) != nullptr) {
+	            sl = intconv(t2p - tp) ;
 	        }
-	        sp = cp2 ;
+	        sp = tp ;
 	    } /* end if */
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
