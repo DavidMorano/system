@@ -42,6 +42,7 @@ extern int malloc_ma(char **) noex ;		/* MA max-args */
 extern int malloc_mn(char **) noex ;		/* MN max-name */
 extern int malloc_mp(char **) noex ;		/* MP max-path */
 extern int malloc_ml(char **) noex ;		/* ML max-line */
+extern int malloc_mm(char **) noex ;		/* MM max-message */
 extern int malloc_nn(char **) noex ;		/* NN node-name */
 extern int malloc_hn(char **) noex ;		/* HN host-name */
 extern int malloc_un(char **) noex ;		/* UN user-name */
