@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	openportmsg
+
+	Description:
         This module contains the code to make and parse the internal
         messages to support |openport(3dam)| IPC.
 
@@ -27,6 +31,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
+#include	<sockaddress.h>
 #include	<stdorder.h>
 #include	<serialbuf.h>
 #include	<localmisc.h>
@@ -36,8 +41,8 @@
 
 /* local defines */
 
-#define	OPM_REQ		struct openportmsg_request
-#define	OPM_RES		struct openportmsg_response
+#define	OPM_REQ		openportmsg_request
+#define	OPM_RES		openportmsg_response
 
 
 /* imported namespaces */
@@ -82,7 +87,7 @@ int openportmsg_msgrequest(OPM_REQ *sp,int f,char *mbuf,int mlen) noex {
 	        sb.wi(sp->pf) ;
 	        sb.wi(sp->ptype) ;
 	        sb.wi(sp->proto) ;
-	        sz = szof(SOCKADDRESS_IN6) ;
+	        sz = szof(sockaddress) ;
 	        sb.wubuf(ubp,sz) ;
 	        sb.wstrw(sp->username,unlen) ;
 	        if ((sp->msglen = sb.getlen) > 0) {
@@ -96,10 +101,9 @@ int openportmsg_msgrequest(OPM_REQ *sp,int f,char *mbuf,int mlen) noex {
 	        sb.ri(&sp->pf) ;
 	        sb.ri(&sp->ptype) ;
 	        sb.ri(&sp->proto) ;
-	        sz = szof(SOCKADDRESS_IN6) ;
+	        sz = szof(sockaddress) ;
 	        sb.rubuf(ubp,sz) ;
 	        sb.rstrw(sp->username,unlen) ;
-
 	    } /* end if */
 	    rs1 = sb.finish ;
 	    if (rs >= 0) rs = rs1 ;
