@@ -40,16 +40,15 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>		/* |u_stat(3u)| */
+#include	<ctime>
 #include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| + |lenstr(3c)| */
-#include	<ctime>
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
-#include	<bfile.h>
 #include	<field.h>
 #include	<fieldterms.h>
 #include	<vecobj.h>
@@ -57,7 +56,7 @@
 #include	<mkchar.h>
 #include	<strwcpy.h>
 #include	<mkpathx.h>
-#include	<sfx.h>
+#include	<sfx.h>			/* |sfcontent(3uc)| */
 #include	<mkpathrooted.h>
 #include	<char.h>
 #include	<isnot.h>
@@ -65,17 +64,23 @@
 
 #include	"nodedb.h"
 
-import libutil ;
+#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency	"mod/ucstream.ccm"
+
+import libutil ;			/* lenstr(3u)| */
+import ucstream ;
 
 /* local defines */
 
-#define	ND_INTCHECK	60	/* file check interval (seconds) */
+#define	ND_INTCHECK	60		/* file check interval (seconds) */
 #define	ND		nodedb
 #define	ND_C		nodedb_cur
 #define	ND_E		nodedb_ent
 #define	ND_F		nodedb_file
 #define	ND_K		nodedb_keyname
 #define	ND_IE		nodedb_ie
+
+#define	UCS		ucstream
 
 #define	SE		svcentry
 #define	SE_KEY		svcentry_key
@@ -219,14 +224,15 @@ static inline int nodedb_magic(nodedb *op,Args ... args) noex {
 }
 /* end subroutine (nodedb_magic) */
 
-static int	ND_Fileadder(nodedb *op,cchar *fname) noex ;
-static int	ND_Filefins(nodedb *) noex ;
+static int	nodedb_fileadder(nodedb *op,cchar *fname) noex ;
+static int	nodedb_filefins(nodedb *) noex ;
 static int	nodedb_entfins(nodedb *) noex ;
-static int	ND_Fileparse(nodedb *,int) noex ;
-static int	ND_Fileparser(nodedb *,ND_F *,int) noex ;
-static int	ND_Fileparseln(nodedb *,int,cchar *,int) noex ;
-static int	ND_Filedump(nodedb *,int) noex ;
-static int	ND_Filedel(nodedb *,int) noex ;
+static int	nodedb_fileparse(nodedb *,int) noex ;
+static int	nodedb_fileparser(nodedb *,ND_F *,int) noex ;
+static int	nodedb_fileparserd(ND *,UCS *,char *,int,int) noex ;
+static int	nodedb_fileparseln(nodedb *,int,cchar *,int) noex ;
+static int	nodedb_filedump(nodedb *,int) noex ;
+static int	nodedb_filedel(nodedb *,int) noex ;
 static int	nodedb_addentry(nodedb *,int,SE *) noex ;
 static int	nodedb_checkfiles(nodedb *,time_t) noex ;
 
@@ -265,7 +271,7 @@ static vars		var ;
 
 /* exported subroutines */
 
-int nodedb_open(nodedb *op,cchar *fname) noex {
+int nodedb_open(ND *op,cchar *fname) noex {
 	int		rs ;
 	if ((rs = nodedb_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
@@ -308,7 +314,7 @@ int nodedb_open(nodedb *op,cchar *fname) noex {
 }
 /* end subroutine (nodedb_open) */
 
-int nodedb_close(nodedb *op) noex {
+int nodedb_close(ND *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = nodedb_magic(op)) >= 0) ylikely {
@@ -317,7 +323,7 @@ int nodedb_close(nodedb *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ND_Filefins(op) ;
+	        rs1 = nodedb_filefins(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->entsp) {
@@ -338,31 +344,31 @@ int nodedb_close(nodedb *op) noex {
 }
 /* end subroutine (nodedb_close) */
 
-int ND_Fileadd(nodedb *op,cchar *fname) noex {
+int nodedb_fileadd(ND *op,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
 	if ((rs = nodedb_magic(op,fname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (fname[0]) ylikely {
-		if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) ylikely {
+		if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) ylikely {
 		    if ((rs = mkpathrooted(tbuf,fname)) >= 0) ylikely {
-		        rs = ND_Fileadder(op,tbuf) ;
+		        rs = nodedb_fileadder(op,tbuf) ;
 		        rc = rs ;
 	            } /* end if (mkpathrooted) */
 		    rs1 = uc_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } else {
-		rs = ND_Fileadder(op,fname) ;
+		rs = nodedb_fileadder(op,fname) ;
 		rc = rs ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
 }
-/* end subroutine (ND_Fileadd) */
+/* end subroutine (nodedb_fileadd) */
 
-int nodedb_curbegin(nodedb *op,nodedb_cur *curp) noex {
+int nodedb_curbegin(ND *op,nodedb_cur *curp) noex {
 	int		rs ;
 	if ((rs = nodedb_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOMEM ;
@@ -381,7 +387,7 @@ int nodedb_curbegin(nodedb *op,nodedb_cur *curp) noex {
 }
 /* end subroutine (nodedb_curbegin) */
 
-int nodedb_curend(nodedb *op,nodedb_cur *curp) noex {
+int nodedb_curend(ND *op,nodedb_cur *curp) noex {
 	int		rs ;
 	if ((rs = nodedb_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
@@ -440,7 +446,7 @@ int ND_Fetch(ND *op,cc *svcbuf,ND_C *curp,
 }
 /* end subroutine (ND_Fetch) */
 
-int nodedb_check(nodedb *op) noex {
+int nodedb_check(ND *op) noex {
 	int		rs ;
 	if ((rs = nodedb_magic(op)) >= 0) ylikely {
 	    if (op->cursors == 0) {
@@ -457,7 +463,7 @@ int nodedb_check(nodedb *op) noex {
 
 /* private subroutines */
 
-static int ND_Fileadder(NODEDB *op,cchar *fname) noex {
+static int nodedb_fileadder(NODEDB *op,cchar *fname) noex {
 	int		rs ;
 	if (ND_F fe{} ; (rs = file_start(&fe,fname)) >= 0) ylikely {
 	    vecobj	*flp = op->filep ;
@@ -466,9 +472,9 @@ static int ND_Fileadder(NODEDB *op,cchar *fname) noex {
 	    if ((rs = flp->search(&fe,vcf,nullptr)) == rsn) {
 	        if ((rs = flp->add(&fe)) >= 0) {
 	            cint	fi = rs ;
-	            rs = ND_Fileparse(op,fi) ;
+	            rs = nodedb_fileparse(op,fi) ;
 	            if (rs < 0) {
-	                ND_Filedel(op,fi) ;
+	                nodedb_filedel(op,fi) ;
 	            }
 	        } /* end if (vecobj_add) */
 	    } /* end if (vecobj_search) */
@@ -478,9 +484,9 @@ static int ND_Fileadder(NODEDB *op,cchar *fname) noex {
 	} /* end if (file-start) */
 	return rs ;
 }
-/* end subroutine (ND_Fileadder) */
+/* end subroutine (nodedb_fileadder) */
 
-static int ND_Filefins(nodedb *op) noex {
+static int nodedb_filefins(ND *op) noex {
 	vecobj		*flp = op->filep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -494,9 +500,9 @@ static int ND_Filefins(nodedb *op) noex {
 	} /* end for */
 	return rs ;
 }
-/* end subroutine (ND_Filefins) */
+/* end subroutine (nodedb_filefins) */
 
-static int nodedb_checkfiles(nodedb *op,time_t daytime) noex {
+static int nodedb_checkfiles(ND *op,time_t daytime) noex {
 	vecobj		*flp = op->filep ;
 	int		rs = SR_OK ;
 	int		c_changed = 0 ;
@@ -504,11 +510,11 @@ static int nodedb_checkfiles(nodedb *op,time_t daytime) noex {
 	for (int i = 0 ; flp->get(i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
 		ND_F	*fep = (ND_F *) vp ;
-		if (USTAT sb ; (rs = u_stat(fep->fname,&sb)) >= 0) {
+		if (ustat sb ; (rs = u_stat(fep->fname,&sb)) >= 0) {
 	            if (sb.st_mtime > fep->timod) {
 	                c_changed += 1 ;
-	                ND_Filedump(op,i) ;
-	                rs = ND_Fileparse(op,i) ;
+	                nodedb_filedump(op,i) ;
+	                rs = nodedb_fileparse(op,i) ;
 		    }
 		} else if (isNotPresent(rs)) {
 		    rs = SR_OK ;
@@ -521,7 +527,7 @@ static int nodedb_checkfiles(nodedb *op,time_t daytime) noex {
 }
 /* end subroutine (nodedb_checkfiles) */
 
-static int ND_Fileparse(nodedb *op,int fi) noex {
+static int nodedb_fileparse(ND *op,int fi) noex {
 	vecobj		*flp = op->filep ;
 	int		rs ;
 	int		c = 0 ;
@@ -529,73 +535,69 @@ static int ND_Fileparse(nodedb *op,int fi) noex {
 	    rs = SR_NOTFOUND ;
 	    if (vp) {
 		ND_F	*fep = (ND_F *) vp ;
-	        rs = ND_Fileparser(op,fep,fi) ;
+	        rs = nodedb_fileparser(op,fep,fi) ;
 		c = rs ;
 	        if (rs < 0) {
-	            ND_Filedump(op,fi) ;
+	            nodedb_filedump(op,fi) ;
 	        }
 	    } /* end if (non-null) */
 	} /* end if (vector_get) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (ND_Fileparse) */
+/* end subroutine (nodedb_fileparse) */
 
-static int ND_Fileparser(nodedb *op,ND_F *fep,int fi) noex {
+static int nodedb_fileparser(ND *op,ND_F *fep,int fi) noex {
     	cint		lsz = var.lineslen ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *lbuf{} ; (rs = uc_malloc(lsz,&lbuf)) >= 0) {
-	    bfile	loadfile, *lfp = &loadfile ;
+	if (char *lbuf ; (rs = uc_malloc(lsz,&lbuf)) >= 0) {
 	    cint	llen = rs ;
-	    if ((rs = bopen(lfp,fep->fname,"r",0664)) >= 0) {
-	        bool	f_bol = true ;
-	        bool	f_eol ;
-	        if (USTAT sb ; (rs = bcontrol(lfp,BC_STAT,&sb)) >= 0) {
+	    if (ucstream nf ; (rs = nf.open(fep->fname,"r")) >= 0) {
+	        if (ustat sb ; (rs = nf.stat(&sb)) >= 0) {
+		    rs = SR_ISDIR ;
 	            if (S_ISREG(sb.st_mode)) {
 	                if (fep->timod < sb.st_mtime) {
-			    cnullptr	np{} ;
 	                    fep->dev = sb.st_dev ;
 	                    fep->ino = sb.st_ino ;
 	                    fep->timod = sb.st_mtime ;
 	                    fep->fsize = size_t(sb.st_size) ;
-	                    while ((rs = breadlns(lfp,lbuf,llen,-1,np)) > 0) {
-	                        int	len = rs ;
-	                        int	cl ;
-	                        cchar	*cp ;
-	                        f_eol = (lbuf[len - 1] == '\n') ;
-	                        if (f_eol) len -= 1 ;
-	                        lbuf[len] = '\0' ;
-	                        if ((cl = sfskipwhite(lbuf,len,&cp)) > 0) {
-	                            if (f_bol && (*cp != '#')) {
-	                                rs = ND_Fileparseln(op,fi,cp,cl) ;
-	                                if (rs > 0) c += 1 ;
-	                            }
-	                        }
-	                        f_bol = f_eol ;
-	                        if (rs < 0) break ;
-	                    } /* end while (reading extended lines) */
-	                } /* end if (needed) */
-	            } else {
-	                rs = SR_ISDIR ;
-	            }
-	        } /* end if (bcontrol) */
-	        rs1 = bclose(lfp) ;
+			    rs = nodedb_fileparserd(op,&nf,lbuf,llen,fi) ;
+			    c += rs ;
+			} /* end if */
+	            } /* end if (regular file) */
+	        } /* end if (ucstream_stat) */
+	        rs1 = nf.close ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (bfile) */
+	    } /* end if (ucstream) */
 	    rs1 = uc_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (ND_Fileparser) */
+/* end subroutine (nodedb_fileparser) */
 
-static int ND_Fileparseln(nodedb *op,int fi,cchar *lp,int ll) noex {
+static int nodedb_fileparserd(ND *op,UCS *nfp,char *lp,int ll,int fi) noex {
+	cnullptr	np{} ;
+    	int		rs ;
+	int		c = 0 ;
+	while ((rs = nfp->readlns(lp,ll,-1,np)) > 0) {
+	    cchar	*cp ;
+	    if (int cl ; (cl = sfcontent(lp,rs,&cp)) > 0) {
+		rs = nodedb_fileparseln(op,fi,cp,cl) ;
+		c += rs ;
+	    }
+	    if (rs < 0) break ;
+	} /* end while */
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (nodedb_fileparserd) */
+
+static int nodedb_fileparseln(ND *op,int fi,cchar *lp,int ll) noex {
     	cint		alen = (var.maxhostlen * ARGSMULT) ;
 	int		rs ;
 	int		rs1 ;
 	int		f_ent = false ;
-	if (char *abuf{} ; (rs = uc_malloc((alen + 1),&abuf)) >= 0) {
+	if (char *abuf ; (rs = uc_malloc((alen + 1),&abuf)) >= 0) {
 	    SE		se ; /* used multiple blocks below */
 	    lineinfo	li{} ;
 	    int		c_field = 0 ;
@@ -646,9 +648,9 @@ static int ND_Fileparseln(nodedb *op,int fi,cchar *lp,int ll) noex {
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? f_ent : rs ;
 }
-/* end subroutine (ND_Fileparseln) */
+/* end subroutine (nodedb_fileparseln) */
 
-static int nodedb_addentry(nodedb *op,int fi,SE *sep) noex {
+static int nodedb_addentry(ND *op,int fi,SE *sep) noex {
 	int		rs = SR_FAULT ;
 	if (sep) {
 	    cint	sz = szof(ND_IE) ;
@@ -675,7 +677,7 @@ static int nodedb_addentry(nodedb *op,int fi,SE *sep) noex {
 }
 /* end subroutine (nodedb_addentry) */
 
-static int ND_Filedump(nodedb *op,int fi) noex {
+static int nodedb_filedump(ND *op,int fi) noex {
 	hdb		*elp = op->entsp ;
 	int		rs ;
 	int		rs1 ;
@@ -706,9 +708,9 @@ static int ND_Filedump(nodedb *op,int fi) noex {
 	} /* end if (cursor) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (ND_Filedump) */
+/* end subroutine (nodedb_filedump) */
 
-static int ND_Filedel(nodedb *op,int fi) noex {
+static int nodedb_filedel(ND *op,int fi) noex {
 	vecobj		*flp = op->filep ;
 	int		rs ;
 	int		rs1 ;
@@ -727,10 +729,10 @@ static int ND_Filedel(nodedb *op,int fi) noex {
 	} /* end if (vecob_get) */
 	return rs ;
 }
-/* end subroutine (ND_Filedel) */
+/* end subroutine (nodedb_filedel) */
 
-static int nodedb_entfins(nodedb *op) noex {
-	return ND_Filedump(op,-1) ;
+static int nodedb_entfins(ND *op) noex {
+	return nodedb_filedump(op,-1) ;
 }
 /* end subroutine (nodedb_entfins) */
 
@@ -740,7 +742,7 @@ static int file_start(ND_F *fep,cchar *fname) noex {
 	    rs = SR_INVALID ;
 	    memclear(fep) ;
 	    if (fname[0]) {
-	        if (cchar *cp{} ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
 	            fep->fname = cp ;
 	        }
 	    } /* end if (valid) */
@@ -778,7 +780,7 @@ static int ientry_start(ND_IE *iep,int fi,SE *sep) noex {
 	        if ((rs = klp->count) >= 0) {
 	            SE_KEY	*kep ;
 	            int		sz = 0 ;
-	            void	*vp{} ;
+	            void	*vp{} ; /* used-mulitple */
 	            iep->nkeys = rs ;
 	            c = rs ; /* <- return value */
 		    /* find the size to allocate (everything) */
@@ -939,7 +941,7 @@ static int svcentry_addkey(SE *sep,cc *kp,int kl,cc *ap,int al) noex {
 	        } else {
 	            sz += 1 ;
 	        }
-		if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
+		if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	            SE_KEY	key{} ;
 		    /* copy over (load) the key-name */
 	            key.kname = bp ;
