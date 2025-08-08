@@ -491,7 +491,7 @@ int		maxjobs, filetime ;
 	                debugprintf("watch: DIR nwatch=%d\n",nwatch) ;
 
 	            else
-	                debugprintf("watch: DIR don't know\n") ;
+	                debugprintf("watch: DIR do not know\n") ;
 
 	        }
 #endif /* CF_DEBUG */
