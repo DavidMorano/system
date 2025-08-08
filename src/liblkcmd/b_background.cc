@@ -1046,7 +1046,7 @@ const char	*envv[] ;
 	pip->username = username ;
 	getusername(username,USERNAMELEN,-1) ;
 
-/* create a mail address if we don't already have one */
+/* create a mail address if we do not already have one */
 
 	if (mailaddr[0] == '\0')
 		sncpy3(mailaddr,MAILADDRLEN,username,"@",domainname) ;
@@ -1069,7 +1069,7 @@ const char	*envv[] ;
 	    pip->open.configfile = TRUE ;
 	}
 
-/* find anything that we don't already have */
+/* find anything that we do not already have */
 
 	if (pip->msfname[0] == '\0') {
 
