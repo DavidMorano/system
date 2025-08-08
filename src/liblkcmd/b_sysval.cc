@@ -58,7 +58,7 @@
 	worth doing has to be a good bit faster than that.  Hence,
 	pretty much only TSR behavior can beat a single file access.
 
-	Parallelism?  There is not any, so we don't have to worry
+	Parallelism?  There is not any, so we do not have to worry
 	about using mutexes or semaphores.  Maybe someday we will
 	have to think about parallelism, but probably not any time
 	soon!
