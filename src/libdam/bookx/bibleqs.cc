@@ -11,7 +11,7 @@
 #define	CF_DEBUGPW	0		/* debug |ktag_procword()| */
 #define	CF_DEBUGPL	0		/* debug |ktac_procline()| */
 #define	CF_EMPTYTERM	1		/* empty line terminates entry */
-#define	CF_EXTRASTRONG	0		/* don't use Strong's eigen-words */
+#define	CF_EXTRASTRONG	0		/* do not use Strong's eigen-words */
 #define	CF_EXTRAEIGEN	0		/* perform extra EIGEN-DB check */
 #define	CF_SINGLEWORD	1		/* treat extra words as single */
 #define	CF_MKBIBLEQSI	0		/* |bibleqs_mkbibleqsi()| */
@@ -2527,7 +2527,7 @@ static int mkfieldterms(uchar *wterms) noex {
 /* end subroutine (mkfieldterms) */
 
 
-/* find if two entries match (we don't need a "comparison") */
+/* find if two entries match (we do not need a "comparison") */
 static int vesrch(cvoid *v1p,cvoid *v2p) noex {
 	KTAG_KEY	**e1pp = (KTAG_KEY **) v1p ;
 	KTAG_KEY	**e2pp = (KTAG_KEY **) v2p ;
