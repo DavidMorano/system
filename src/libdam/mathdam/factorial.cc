@@ -132,7 +132,7 @@ constexpr long		facts[] = {
 	0x0000130777758000, 0x0001437eeecd8000, 
 	0x0016beecca730000, 0x01b02b9306890000,
 	0x21c3677c82b40000
-} ;
+} ; /* end array (facts) */
 
 template<typename T> static T factorialx(int n) noex {
 	T	v = -1.0 ;
