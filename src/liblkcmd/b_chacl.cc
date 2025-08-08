@@ -2651,7 +2651,7 @@ static int aclents_maskmat(aclent_t *aclbuf,int nacls) noex {
 /****
 	Returns:
 	>=0	had mask and this is its index
-	-1	did not have mask and don't need one
+	-1	did not have mask and do not need one
 	-2	did not have mask and need one
 ****/
 
@@ -2674,7 +2674,7 @@ static int aclents_maskneed(aclent_t aclbuf[],int nacls) noex {
 /****
 	Returns:
 	>=0	had mask and this is its index
-	-1	did not have mask and don't need one
+	-1	did not have mask and do not need one
 	-2	did not have mask and need one
 ****/
 
