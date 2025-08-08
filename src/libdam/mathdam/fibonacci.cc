@@ -122,7 +122,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cmath>			/* |floor(3m++)| | |sqrt(3c++)| */
-#include	<numbers>		/* C++20 math consants */
+#include	<numbers>		/* C++20 math constants */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -170,7 +170,7 @@ constexpr uint		fibotab[] = {
 	0x00e3d1b0, 0x01709e79, 0x02547029, 0x03c50ea2,
 	0x06197ecb, 0x09de8d6d, 0x0ff80c38, 0x19d699a5,
 	0x29cea5dd, 0x43a53f82, 0x6d73e55f, 0xb11924e1
-} ;
+} ; /* end array (fibotab) */
 
 template<typename T> constexpr T five = T{5.0} ;
 
