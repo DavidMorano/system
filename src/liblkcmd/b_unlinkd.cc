@@ -967,7 +967,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	co.f.lockinfo = lip->f.lockinfo ;
 
-/* find anything that we don't already have */
+/* find anything that we do not already have */
 
 	if ((rs >= 0) && pip->f.daemon && (pip->pidfname[0] == '\0')) {
 	    char	cname[MAXNAMELEN+1] ;
