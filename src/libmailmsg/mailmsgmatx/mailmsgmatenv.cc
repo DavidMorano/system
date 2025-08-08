@@ -155,7 +155,7 @@ int mailmsgmatenv(mmenvdat *mep,cchar *sp,int sl) noex {
 	                    sl -= si ;
 			    if ((si = mmenvdat_remote(mep,sp,sl)) >= 0) {
 			        len = mep->a.el ;
-			        mep->f.start = f_start ;
+			        mep->fl.start = f_start ;
 			    }
 		        }
 		    }
