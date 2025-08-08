@@ -715,7 +715,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (pip->tmpdname == NULL) pip->tmpdname = getourenv(envv,VARTMPDNAME) ;
 	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
 
-/* get the file to append to if we don't have it already */
+/* get the file to append to if we do not have it already */
 
 	if (ofname == NULL) {
 	    for (ai = ai_continue ; ai < argc ; ai += 1) {
