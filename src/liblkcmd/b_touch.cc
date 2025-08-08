@@ -747,7 +747,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	memset(&spi,0,sizeof(TOUCH_INFO)) ;
 
-/* use the first positional argument as the date-spec if we don't have it */
+/* use the first positional argument as the date-spec if we do not have it */
 
 	ai_continue = 1 ;
 	if (reffname == NULL) {
