@@ -355,7 +355,7 @@ int		ifd, ofd ;
 	        first[i] = clear[i] ;
 	    }
 
-/* don't bother writing anything for the first block yet, just skip */
+/* do not bother writing anything for the first block yet, just skip */
 
 	    u_seek(sfd,(off_t) BLOCKLEN,SEEK_SET) ;
 
