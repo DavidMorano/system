@@ -78,7 +78,7 @@ constexpr cpcchar	hits[] = {
 	"-",
 	"+",
 	nullptr
-} ;
+} ; /* end array (hits) */
 
 
 /* exported variables */
