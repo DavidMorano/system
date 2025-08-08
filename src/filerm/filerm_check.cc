@@ -114,7 +114,7 @@ int checkname(proginfo *,cchar *name,USTAT *sbp) noex {
 	f_link = S_ISLNK(sbp->st_mode) ? TRUE : FALSE ;
 	f_follow = pip->f.follow ;
 
-/* don't follow the directory (if there is one) under these conditions */
+/* do not follow the directory (if there is one) under these conditions */
 
 	rc = f_link && (! f_follow) ;
 
