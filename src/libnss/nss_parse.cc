@@ -85,7 +85,7 @@ char *_strpbrk_escape(char *, char *) noex ;
 
 /*
  * _strtok_escape()
- *   Like strtok_r, except we don't break on a token if it is escaped
+ *   Like strtok_r, except we do not break on a token if it is escaped
  *   with the escape character (\).
  */
 char * _strtok_escape(char *string, char *sepset, char **lasts) noex {
