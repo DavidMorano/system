@@ -27,7 +27,7 @@
 	a "received" header field for mail messages.  Note that
 	some (stupid) mailers put characters like quote characters
 	and other weirdo characters into some of the value fields
-	of the RECEIVED header.  I don't know how many of these
+	of the RECEIVED header.  I do not know how many of these
 	weirdo characters are legal in an RFC-822 value (if any)
 	but we are currently using 'field_word(3dam)' with only the
 	semi-colon character as a terminator to try to handle these
