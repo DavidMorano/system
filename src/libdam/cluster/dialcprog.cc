@@ -60,7 +60,7 @@
 	pfn		program file-name
 	av		argument vector
 	ev		environment vector 
-	to		timeout ('>0' means use one, '-1' means don't)
+	to		timeout ('>0' means use one, '-1' means do not)
 	options		any dial options
 	fd2p		pointer to integer for standard-error file-descriptor
 
@@ -2192,7 +2192,7 @@ cchar	node[] ;
 	        while ((rs = hostinfo_curenumname(&hi,&hc,&np)) > 0) {
 		    int		nl = rs ;
 
-/* don't remove domain part since the node could be in another domain */
+/* do not remove domain part since the node could be in another domain */
 
 #ifdef	COMMENT
 	            {
@@ -2202,7 +2202,7 @@ cchar	node[] ;
 	            }
 #endif
 
-/* don't remove domain part since the node could be in another domain */
+/* do not remove domain part since the node could be in another domain */
 
 	            if ((nl > 0) && (vecstr_findn(nsp,np,nl) < 0)) {
 	                rs = vecstr_add(nsp,np,nl) ;
