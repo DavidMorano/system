@@ -889,7 +889,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    pip->open.config = TRUE ;
 	}
 
-/* find anything that we don't already have */
+/* find anything that we do not already have */
 
 	if (pip->intrun < 1)
 	    pip->intrun = RUNINT ;
