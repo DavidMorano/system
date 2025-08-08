@@ -27,7 +27,6 @@
 #include	<usysrets.h>
 
 
-/* object defines */
 #define	MMENVDAT		struct mmenvdat_head
 #define	MMENVDAT_FL		struct mmenvdat_flags
 #define	MMENVDAT_ELEM		struct mmenvdat_elemement
@@ -46,7 +45,7 @@ struct mmenvdat_head {
 	MMENVDAT_ELEM	a ;	/* address (EMA) */
 	MMENVDAT_ELEM	d ;	/* date */
 	MMENVDAT_ELEM	r ;	/* remove-from (EMA) */
-	MMENVDAT_FL	f ;	/* flags */
+	MMENVDAT_FL	fl ;	/* flags */
 	int		rt ;	/* remote type */
 } ;
 
