@@ -871,7 +871,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	    rs = procopts(pip,&akopts) ;
 	}
 
-/* if we don't have a request for something yet, use our progmode */
+/* if we do not have a request for something yet, use our progmode */
 
 	f = FALSE ;
 	f = f || lip->f.sum ;
