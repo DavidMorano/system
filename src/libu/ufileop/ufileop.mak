@@ -40,6 +40,13 @@ MODS += libutil.ccm
 LIBS +=
 
 
+OBJA_UFILEOP= ufileopbase.o ufiler.o
+OBJB_UFILEOP= uutime.o uutimes.o
+OBJC_UFILEOP= urmdirs.o urealpath.o
+
+OBJ_UFILEOP= obja_ufileop.o objb_ufileop.o objc_ufileop.o
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
@@ -56,14 +63,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJA_UFILEOP= ufileopbase.o ufiler.o
-OBJB_UFILEOP= uutime.o uutimes.o
-OBJC_UFILEOP= urmdirs.o urealpath.o
-
-OBJ_UFILEOP= obja_ufileop.o objb_ufileop.o objc_ufileop.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -76,6 +76,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -94,7 +97,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_UFILEOP)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UFILEOP)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_UFILEOP)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -110,13 +113,13 @@ control:
 
 
 obja_ufileop.o:		$(OBJA_UFILEOP)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_UFILEOP)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb_ufileop.o:		$(OBJB_UFILEOP)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_UFILEOP)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objc_ufileop.o:		$(OBJC_UFILEOP)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_UFILEOP)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 ufileopbase.o:		ufileopbase.cc			$(INCS)
