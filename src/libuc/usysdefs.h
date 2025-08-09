@@ -51,20 +51,20 @@
 
 /* extra "open" flags */
 enum extraopenflags {
-	extraopenflag_start = 28,
 	extraopenflag_minmode = 28,
 	extraopenflag_minfd,
 	extraopenflag_network,
-	extraopenflag_overlast
+	extraopenflag_overlast,
+	extraopenflag_start = extraopenflag_minmode
 } ;
 
 /* missing UNIX® signals */
 enum signalmissings {
-	signalmissing_start = 1000,
 	signalmissing_pwr = 1000,
 	signalmissing_cancel,
 	signalmissing_lost,
-	signalmissing_overlast
+	signalmissing_overlast,
+	signalmissing_start = signalmissing_pwr
 } ;
 
 #ifndef	SIGCLD
