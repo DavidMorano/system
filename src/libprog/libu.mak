@@ -70,7 +70,7 @@ OBJ01= aflag.o errtimer.o
 OBJ02= timewatch.o timecount.o
 OBJ03= libutil.o usysconf.o umods.o 
 
-OBJ04= utimeout.o utimeouts.o 
+OBJ04= ulibvals.o utimeout.o utimeouts.o 
 OBJ05= ulogerror.o strtox.o 
 OBJ06= usupport.o umisc.o
 OBJ07= umemalloc.o
@@ -98,7 +98,7 @@ OBJ23= syscontain.o stdfnames.o
 OBJ24= posixdirent.o
 OBJ25= fonce.o filerec.o
 OBJ26= ustd.o
-OBJ27=
+OBJ27= ucomposite.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -106,7 +106,7 @@ OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
-OBJG= obj24.o obj25.o obj26.o
+OBJG= obj24.o obj25.o obj26.o obj27.o
 
 OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 
@@ -176,86 +176,86 @@ control:
 
 
 obj00.o:		$(OBJ00)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ00)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj01.o:		$(OBJ01)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ01)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj02.o:		$(OBJ02)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ02)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj03.o:		$(OBJ03)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ03)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
 obj04.o:		$(OBJ04)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ04)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj05.o:		$(OBJ05)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ05)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj06.o:		$(OBJ06)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ06)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj07.o:		$(OBJ07)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ07)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
 obj08.o:		$(OBJ08)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ08)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj09.o:		$(OBJ09)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ09)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj10.o:		$(OBJ10)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ10)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj11.o:		$(OBJ11)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ11)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
 obj12.o:		$(OBJ12)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ12)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj13.o:		$(OBJ13)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ13)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj14.o:		$(OBJ14)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ14)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj15.o:		$(OBJ15)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ15)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
 obj16.o:		$(OBJ16)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ16)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj17.o:		$(OBJ17)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ17)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj18.o:		$(OBJ18)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ18)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj19.o:		$(OBJ19)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ19)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj20.o:		$(OBJ20)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ20)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj21.o:		$(OBJ21)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ21)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj22.o:		$(OBJ22)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ22)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj23.o:		$(OBJ23)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ23)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj24.o:		$(OBJ24)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ24)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj25.o:		$(OBJ25)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ25)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj26.o:		$(OBJ26)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ26)
@@ -265,25 +265,25 @@ obj27.o:		$(OBJ27)
 
 
 obja.o:			$(OBJA)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 objb.o:			$(OBJB)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 objc.o:			$(OBJC)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJC)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 objd.o:			$(OBJD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJD)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obje.o:			$(OBJE)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJE)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 objf.o:			$(OBJF)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJF)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 objg.o:			$(OBJG)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJG)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
 # SUPPORT
@@ -408,6 +408,16 @@ filerec.dir:
 # LIBUTIL
 libutil.o:		libutil.dir
 libutil.dir:
+	makesubdir $@
+
+# ULIBVALS
+ulibvals.o:		ulibvals.dir
+ulibvals.dir:
+	makesubdir $@
+
+# UCOMPOSITE
+ucomposite.o:		ucomposite.dir
+ucomposite.dir:
 	makesubdir $@
 
 chrset.o:		chrset.ccm
