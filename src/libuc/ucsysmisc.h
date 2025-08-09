@@ -46,14 +46,14 @@ namespace libuc {
 	    return operator int () ;
 	} ;
     } ; /* end struct (ucpagesizer) */
-}
+} /* end namespace (libuc) */
 
 namespace libuc {
     struct ucnprocesser {
     	operator int () noex ;
 	int operator () (int = 0) noex ;
     } ; /* end struct (ucnprocesser) */
-}
+} /* end namespace (libuc) */
 
 extern libuc::ucpagesizer	ucpagesize ;
 extern libuc::ucnprocesser	ucnprocessors ;
