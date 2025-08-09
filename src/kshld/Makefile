@@ -163,19 +163,19 @@ INCS= config.h defs.h
 
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o proginfo_rootname.o
 OBJ01= progfindprog.o progexec.o
-OBJ02= defproc.o
-OBJ03= getev.o
+OBJ02=
+OBJ03=
 OBJ04= 
 OBJ05=
-OBJ06= envs.o envs_procxe.o envs_subs.o
+OBJ06=
 OBJ07= printhelp.o
 OBJ08=
 OBJ09= userattr.o
-OBJ10= sysvar.o dirseen.o paramfile.o varsub.o buffer.o
+OBJ10=
 OBJ11= 
 OBJ12= localgetorg.o
-OBJ13= sfthing.o matkeystr.o strkeycmp.o strnkeycmp.o 
-OBJ14= strnnlen.o
+OBJ13=
+OBJ14=
 #OBJ15= 
 #OBJ16=
 #OBJ17=
@@ -327,69 +327,6 @@ progfindprog.o:		progfindprog.c $(INCS)
 progexec.o:		progexec.c $(INCS)
 
 
-envs.o:			envs.c envs.h
-
-envs_procxe.o:		envs_procxe.c envs.h
-
-envs_subs.o:		envs_subs.c envs.h
-
-
-getutmpent.o:		getutmpent.c getutmpent.h
-
-userinfo.o:		userinfo.c userinfo.h
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-buffer.o:		buffer.c buffer.h
-
-vecobj.o:		vecobj.c vecobj.h
-
-lookaside.o:		lookaside.c lookaside.h
-
-pq.o:			pq.c pq.h
-
-schedvar.o:		schedvar.c schedvar.h
-
-sysvar.o:		sysvar.c sysvar.h sysvars.h dirseen.h
-
-varsub.o:		varsub.c varsub.h
-
-paramfile.o:		paramfile.c paramfile.h
-
-userattr.o:		userattr.c userattr.h
-
-
-sysvars.o:		sysvars.c sysvars.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-var.o:			var.c var.h vars.h dirseen.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-varmk.o:		varmk.c varmk.h varmks.h dirseen.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-vars.o:			vars.c vars.h varhdr.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-varhdr.o:		varhdr.c varhdr.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-dirseen.o:		dirseen.c dirseen.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-msfile.o:		msfile.c msfile.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
-
-
 sysvarproc.o:		sysvarproc.c varmk.h
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
 
@@ -397,10 +334,6 @@ ncpus.o:		ncpus.c
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $(*).c
 
 getsysmisc.o:		getsysmisc.c getsysmisc.h
-
-getsystypenum.o:	getsystypenum.c
-
-bprintcleanline.o:	bprintcleanline.c
 
 
 # testing
