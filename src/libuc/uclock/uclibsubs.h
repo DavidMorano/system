@@ -90,6 +90,7 @@
 #include	<uclock.h>
 #include	<ucgetx.h>
 #include	<uckvamatch.h>
+#include	<ucwritedesc.h>
 
 #include	<getxname.h>
 #include	<getexecname.h>
@@ -187,7 +188,6 @@ extern int	uc_readlinetimed(int,char *,int,int) noex ;
 extern int	uc_writeto(int,cvoid *,int,int) noex ;
 extern int	uc_write(int,cvoid *,int) noex ;
 extern int	uc_writen(int,cvoid *,int) noex ;
-extern int	uc_writedesc(int,int,int) noex ;
 extern int	uc_writefile(int,cchar *) noex ;
 
 extern int	uc_reade(int,void *,int,int,int) noex ;
