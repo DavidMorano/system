@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gxx
@@ -32,28 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= filer.h
+INCS += filer.h
 
-LIBS=
+MODS +=
 
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ0_FILER=
@@ -66,18 +50,38 @@ OBJA_FILER= filer_main.o filer_writers.o filer_obj.o
 OBJ_FILER= $(OBJA_FILER)
 
 
-.SUFFIXES:		.hh .ii
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
 
 all:			$(ALL)
 
+
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -91,20 +95,18 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_FILER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_FILER)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_FILER)
 
 $(T).a:			$(OBJ_FILER)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -117,16 +119,16 @@ control:
 
 
 obj0_filer.o:	$(OBJ0_FILER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_FILER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_filer.o:	$(OBJ1_FILER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_FILER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_filer.o:	$(OBJ2_FILER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_FILER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_filer.o:	$(OBJ3_FILER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_FILER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 filer_main.o:		filer_main.cc		$(INCS)
