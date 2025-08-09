@@ -1,13 +1,12 @@
-# MAKEFILE
+# MAKEFILE (pathadd)
 
 T= pathadd
 
 ALL= $(T)
 
-SRCROOT= $(LOCAL)
 
 
-BINDIR= $(SRCROOT)/bin
+BINDIR= $(REPOROOT)/bin
 
 
 all:		$(ALL)
