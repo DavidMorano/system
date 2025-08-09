@@ -115,7 +115,7 @@ int uc_chmod(cchar *fname,mode_t fm) noex {
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		} else if (rs >= 0) {
-	                    rs = u_chmod(fname,fm) ;
+		    rs = u_chmod(fname,fm) ;
 	        } /* end if (nonpath) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
