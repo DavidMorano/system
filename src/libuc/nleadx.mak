@@ -40,6 +40,16 @@ MODS +=
 LIBS +=
 
 
+OBJ0= nleadkeystr.o nleadstr.o
+OBJ1= 
+OBJ2= 
+OBJ3= 
+
+OBJA= obj0.o 
+
+OBJ= obja.o 
+
+
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
@@ -56,19 +66,6 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= nleadkeystr.o nleadstr.o
-OBJ1= 
-OBJ2= 
-OBJ3= 
-OBJ4= 
-OBJ5= 
-
-OBJA= obj0.o 
-OBJB= 
-
-OBJ= obja.o 
-
-
 .SUFFIXES:		.hh .ii .ccm
 
 
@@ -82,6 +79,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -102,8 +102,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	$(RM) $(ALL)
@@ -126,18 +126,6 @@ obj2.o:			$(OBJ2)
 
 obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
-
-obj4.o:			$(OBJ4)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
-
-obj5.o:			$(OBJ5)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
-
-obj6.o:			$(OBJ6)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6)
-
-obj7.o:			$(OBJ7)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7)
 
 
 obja.o:			$(OBJA)
