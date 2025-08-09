@@ -1,4 +1,4 @@
-# PATHADD
+# PATHADD (KornShell function)
 
 
 # FUNCTION begin (pathadd)
@@ -11,14 +11,14 @@ function pathadd {
   OPT=${3}
   if [[ -n "${VARNAME}" ]] && [[ -d "${DIR}" ]] ; then
     eval AA=\${${VARNAME}}
-    print -- ${AA} | ${P_FGREP} "${DIR}" > ${DN}
+    print -- ${AA} | ${P_FGREP} -q "${DIR}"
     if [[ $? -ne 0 ]] ; then
       if [[ -z "${AA}" ]] ; then
           AA=${DIR}
       else
         if [[ -n "${OPT}" ]] ; then
           case "${OPT}" in
-          '-f' | 'f' )
+          '-f' | '-h' | 'f' )
             AA=${DIR}:${AA}
             ;;
           '*' )
