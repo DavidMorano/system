@@ -16,7 +16,7 @@
 	= 1993-02-21, David A­D­ Morano
 	The interrupt code below was changed so that stupid UNIX®
 	would not ____ up when the file descriptor got a HANUP on
-	the other end. This problem surfaced in connection with
+	the other end.  This problem surfaced in connection with
 	networking stuff.
 
 */
@@ -57,9 +57,14 @@
 #include	<poll.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* local defines */
 
@@ -135,7 +140,7 @@ int uc_writeto(int fd,cvoid *ubuf,int ulen,int to) noex {
 		        if (fexit) break ;
 		        if (to >= 0) {
 		            ti_now = time(nullptr) ;
-		            if ((ti_now-ti_start) >= to) {
+		            if ((ti_now - ti_start) >= to) {
 		                rs = SR_TIMEDOUT ;
 		                break ;
 		            }
@@ -153,29 +158,28 @@ int uc_write(int fd,cvoid *wbuf,int wlen) noex {
 }
 /* end subroutine (uc_write) */
 
-int uc_writen(int fd,cvoid *abuf,int alen) noex {
+int uc_writen(int fd,cvoid *abuf,int µalen) noex {
 	int		rs = SR_FAULT ;
+	int		tlen = 0 ; /* return-value */
 	if (abuf) {
             rs = SR_BADF ;
 	    if (fd >= 0) {
-	        int	alenr = alen ;
 	        cchar	*abp = charp(abuf) ;
-	        if (alen < 0) {
-	            alen = strlen(abp) ;
-	        }
-	        if (alenr > 0) {
-	            while ((rs >= 0) && (alenr > 0)) {
+		if (int alen ; (alen = getlenstr(abp,µalen)) > 0) {
+	            for (int alenr = alen ; (rs >= 0) && (alenr > 0) ; ) {
 	                if ((rs = u_write(fd,abp,alenr)) >= 0) {
 		            abp += rs ;
 		            alenr -= rs ;
-		        }
-	            } /* end while */
+			    tlen += rs ;
+		        } /* end if (u_write) */
+	            } /* end for */
 	        } else {
 	            rs = u_write(fd,abp,0) ;
+		    tlen = rs ;
 	        } /* end if */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? alen : rs ;
+	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (uc_writen) */
 
