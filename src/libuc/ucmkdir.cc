@@ -39,18 +39,36 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<libmallocxx.h>
+#include	<mkx.h>
+#include	<localmisc.h>
 
 
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern "C" {
-    extern int	mkexpandpath(char *,cchar *,int) noex ;
-}
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -65,9 +83,8 @@ int uc_mkdir(cchar *fname,mode_t dm) noex {
 	if (fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        char	*ebuf{} ;
-	        if ((rs = libmalloc_mp(&ebuf)) >= 0) {
-	            if ((rs = mkexpandpath(ebuf,fname,-1)) > 0) {
+	        if (char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) {
+	            if ((rs = mkpathexp(ebuf,fname,-1)) > 0) {
 		        rs = u_mkdir(ebuf,dm) ;
 		        rc = rs ;
 	            } else if (rs == 0) {
