@@ -62,7 +62,6 @@
 #include	<filetype.h>		/* |filetype(3u)| */
 #include	<localmisc.h>
 
-#include	"ucwritedesc.h"
 
 /* local defines */
 
