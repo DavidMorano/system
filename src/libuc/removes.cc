@@ -58,6 +58,7 @@
 #include	<fsdir.h>
 #include	<vecpstr.h>
 #include	<mkpathx.h>
+#include	<mkx.h>
 #include	<pathadd.h>
 #include	<hasx.h>
 #include	<localmisc.h>
@@ -76,10 +77,6 @@ import libutil ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	mkexpandpath(char *,cchar *,int) noex ;
-}
 
 
 /* external variables */
@@ -140,7 +137,7 @@ mgr::operator int () noex {
 	    plen = rs ;
 	    if ((rs = malloc_mn(&nbuf)) >= 0) ylikely {
 		nlen = rs ;
-	        if ((rs = mkexpandpath(pbuf,tardname,-1)) > 0) {
+	        if ((rs = mkpathexp(pbuf,tardname,-1)) > 0) {
 		    rs = remover(rs) ;
 		    c = rs ;
 	        } else if (rs == 0) {
@@ -148,7 +145,7 @@ mgr::operator int () noex {
 		        rs = remover(rs) ;
 		        c = rs ;
 		    }
-	        } /* end if (mkexpandpath) */
+	        } /* end if (mkpathexp) */
 	        rs1 = uc_free(nbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
