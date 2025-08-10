@@ -34,14 +34,6 @@ extern int	sirbrk(cchar *,int,cchar *) noex ;
 
 EXTERNC_end
 
-#ifdef	__cplusplus
-
-import chrset ;
-extern int	siobrk(cchar *,int,const chrset &) noex ;
-extern int	sirbrk(cchar *,int,const chrset &) noex ;
-
-#endif /* __cplusplus */
-
 
 #endif /* SIXBRK_INCLUDE */
 
