@@ -18,7 +18,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
-#include	<mallocxx.h>
+#include	<libmallocxx.h>
+#include	<mkx.h>
 #include	<localmisc.h>
 
 
@@ -31,14 +32,7 @@
 /* local typedefs */
 
 
-/* local typedefs */
-
-
 /* external subroutines */
-
-extern "C" {
-    extern int	mkexpandpath(char *,cchar *,int) noex ;
-}
 
 
 /* external variables */
@@ -63,8 +57,8 @@ int uc_rmdir(cchar *fname) noex {
 	if (fname) ylikely {
 	    rs = SR_INVALID ;
 	    if (fname[0]) ylikely {
-	        if ((char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) ylikely {
-	            if ((rs = mkexpandpath(ebuf,fname,-1)) > 0) {
+	        if (char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) ylikely {
+	            if ((rs = mkpathexp(ebuf,fname,-1)) > 0) {
 		        rs = u_rmdir(ebuf) ;
 	            } else if (rs == 0) {
 		        rs = u_rmdir(fname) ;
