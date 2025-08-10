@@ -9,16 +9,24 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-03-21, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services
 	(RNS).
 
+	= 2017-08-01, David A­D­ Morano
+	Updated for lack of interfaces in Apple-Darwin.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Names:
+	uc_seeko
+	uc_fcntl
+
+  	Description:
 	No, we are not the same as UNIX® all of the time!  We return
 	PFNOSUPPORT is a protocol-family (PF) is not supported!
 
@@ -58,27 +66,27 @@
 /* exported subroutines */
 
 int uc_fcntl(int fd,int cmd,...) noex {
-	int		rs ;
 	va_list		ap ;
-	va_begin(ap,cmd) ;
-	{
+	int		rs = SR_INVALID ;
+	if (cmd >= 0) {
+	    va_begin(ap,cmd) ;
 	    caddr_t	any = va_arg(ap,caddr_t) ;
 	    rs = u_fcntl(fd,cmd,any) ;
-	}
-	va_end(ap) ;
+	    va_end(ap) ;
+	} /* end if */
 	return rs ;
 }
 /* end subroutine (uc_fcntl) */
 
 int uc_ioctl(int fd,int cmd,...) noex {
-	int		rs ;
 	va_list		ap ;
-	va_begin(ap,cmd) ;
-	{
+	int		rs = SR_INVALID ;
+	if (cmd >= 0) {
+	    va_begin(ap,cmd) ;
 	    caddr_t	any = va_arg(ap,caddr_t) ;
 	    rs = u_ioctl(fd,cmd,any) ;
-	}
-	va_end(ap) ;
+	    va_end(ap) ;
+	} /* end if */
 	return rs ;
 }
 /* end subroutine (uc_ioctl) */
