@@ -250,7 +250,7 @@ static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	    rs = SR_INVALID ;
 	    if (inname[0] && (of >= 0) && (opt >= 0)) {
 	        if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) {
-	            if ((rs = mkexpandpath(pbuf,inname,-1)) > 0) {
+	            if ((rs = mkpathexp(pbuf,inname,-1)) > 0) {
 		        rs = opentmpxer(pbuf,of,om,opt,obuf) ;
 		        fd = rs ;
 	            } else if (rs == 0) {
