@@ -30,6 +30,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
+#include	<mkx.h>
 #include	<libmallocxx.h>
 
 
@@ -38,9 +39,11 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int	mkexpandpath(char *,cchar *,int) noex ;
-}
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -61,7 +64,7 @@ int uc_execve(cchar *fname,mainv av,mainv ev) noex {
 	if (fname && av && ev) {
 	    char	*ebuf{} ;
 	    if ((rs = libmalloc_mp(&ebuf)) >= 0) {
-	        if ((rs = mkexpandpath(ebuf,fname,-1)) > 0) {
+	        if ((rs = mkpathexp(ebuf,fname,-1)) > 0) {
 		    rs = u_execve(ebuf,av,ev) ;
 		    rv = rs ;
 	        } else if (rs == 0) {
