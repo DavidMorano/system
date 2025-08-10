@@ -12,7 +12,7 @@
 	This module was originally written.
 
 	= 2017-08-01, David A­D­ Morano
-	Updated for lack of interfaces in Apple-Darwin
+	Updated for lack of interfaces in Apple-Darwin.
 
 */
 
@@ -20,6 +20,11 @@
 
 /*******************************************************************************
 
+  	Names:
+	uc_seeko
+	uc_fcntl
+
+  	Description:
 	Additional (or supplemental) support for UNIX® limits.
 
 *******************************************************************************/
@@ -29,14 +34,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<unistd.h>		/* types? */
+#include	<fcntl.h>		/* types? */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<uopen.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
