@@ -45,14 +45,18 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<six.h>			/* |sichr(3uc)| */
-#include	<strn.h>		/* |strnbrk(3uc)| */
+#include	<six.h>			/* |siochr(3uc)| */
+#include	<ascii.h>		/* |CH_{xx}| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"nonpath.h"
 
-import libutil ;
+#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency	"mod/chrset.ccm"
+
+import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
+import chrset ;				/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* local defines */
 
@@ -65,11 +69,28 @@ import libutil ;
 
 /* external subroutines */
 
+extern "C++" {
+    int		siobrk(cchar *,int,const chrset &) noex ;
+    int		sirbrk(cchar *,int,const chrset &) noex ;
+}
+
 
 /* external variables */
 
 
 /* local structures */
+
+namespace {
+    struct nons {
+	cchar		*nonpaths = "¥§~" ;
+	chrset		ss ;
+	constexpr nons() noex {
+	    for (int ch, i = 0 ; ((ch = nonpaths[i])) ; i += 1) {
+		ss.set(ch) ;
+	    } /* end for */
+	} ; /* end ctor (nons) */
+    } ; /* end struct (nons) */
+} /* end namespace */
 
 
 /* forward references */
@@ -77,7 +98,11 @@ import libutil ;
 
 /* local variables */
 
-static constexpr cchar		nonpaths[] = "/¥§~" ;
+constexpr nons		bs ;
+
+cint			chx_user1 = mkchar('~') ;
+cint			chx_user2 = mkchar('µ') ;
+cint			chx_cd = mkchar('¬') ;
 
 
 /* exported variables */
@@ -85,22 +110,27 @@ static constexpr cchar		nonpaths[] = "/¥§~" ;
 
 /* exported subroutines */
 
-int nonpath(cchar *fp,int fl) noex {
-    	cnullptr	np{} ;
+int nonpath(cchar *fp,int µfl) noex {
 	int		rs = SR_FAULT ;
 	int		t = 0 ; /* return-value (type-of-nonpath) */
 	if (fp) ylikely {
-	    if (fl < 0) fl = lenstr(fp) ;
-	    rs = SR_OK ;
-	    t = -1 ;
-	    if ((fl > 0) && (fp[0] != '/')) {
-	        if (cchar *tp ; (tp = strnbrk(fp,fl,nonpaths)) != np) {
-	            if (((tp - fp) > 0) && (tp[1] != '\0')) {
-			cint ch = mkchar(*tp) ;
-	                t = sichr(nonpaths,-1,ch) ;
-	            }
-	        }
-	    } /* end if */
+	    rs = SR_INVALID ;
+	    if (int fl ; (fl = getlenstr(fp,µfl)) > 0) {
+		cint ch = mkchar(fp[0]) ;
+		rs = SR_OK ;
+	        if (ch != CH_SLASH) {
+		    t = nonpath_user ;
+		    if ((ch != chx_user1) && (ch != chx_user2)) {
+			t = nonpath_cd ;
+			if (ch != chx_cd) {
+			    t = nonpath_reg ;
+	                    if (int si ; (si = siobrk(fp,fl,bs.ss)) >= 0) {
+			        t = (si + nonpath_dialer) ;
+			    }
+			}
+	            } /* end if (nonpath_user) */
+	        } /* end if (absolute path) */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? t : rs ;
 }
