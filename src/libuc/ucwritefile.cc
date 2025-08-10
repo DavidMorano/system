@@ -94,12 +94,34 @@ int uc_writefile(int ofd,cchar *fname) noex {
  	    	        }
 	    	        rs1 = u_close(ifd) ;
 		        if (rs >= 0) rs = rs1 ;
-		    } /* end if (open-file) */
+		    } /* end if (file) */
 	        } /* end if (valid) */
 	    } /* end if (valid-FD) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (uc_writefile) */
+} /* end subroutine (uc_writefile) */
+
+int uc_filecopy(cchar *sfname,cchar *dfname) noex {
+    	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
+	if (dfname) ylikely {
+	    rs = SR_INVALID ;
+	    if (dfname[0]) ylikely {
+		cint	of = (O_WRONLY | O_CREAT) ;
+		cmode	om = 0777 ;
+		if ((rs = uc_open(dfname,of,om)) >= 0) {
+		    cint	dfd = rs ;
+		    {
+			rs = uc_writefile(dfd,sfname) ;
+			len = rs ;
+		    }
+		    rs1 = uc_close(dfd) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (destination file) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+} /* end subroutine (uc_filecopy) */
 
 
