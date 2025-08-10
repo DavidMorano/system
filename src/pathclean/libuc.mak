@@ -912,6 +912,7 @@ td.o:			td.cc		td.h termstr.h
 recip.o:		recip.cc	recip.h
 querystr.o:		querystr.cc	querystr.h
 absfn.o:		absfn.cc	absfn.h
+nonpathfn.o:		nonpathfn.cc	nonpathfn.h
 posname.o:		posname.cc	posname.h
 ids.o:			ids.cc		ids.h
 groupids.o:		groupids.cc	groupids.hh
