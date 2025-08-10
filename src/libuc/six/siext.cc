@@ -65,6 +65,11 @@ import chrset ;
 
 /* external subroutines */
 
+extern "C++" {
+    int		siobrk(cchar *,int,const chrset &) noex ;
+    int		sirbrk(cchar *,int,const chrset &) noex ;
+}
+
 
 /* external variables */
 
