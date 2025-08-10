@@ -42,10 +42,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mkpath.h>
-#include	<libmallocxx.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<getpwd.h>
+#include	<libmallocxx.h>
+#include	<mkpath.h>
 #include	<localmisc.h>
 
 #include	"mkx.h"
@@ -55,7 +59,19 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
