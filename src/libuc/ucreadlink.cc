@@ -16,15 +16,17 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<cstring>
 #include	<usystem.h>
+#include	<libmallocxx.h>
 #include	<nonpath.h>
 #include	<localmisc.h>
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -56,37 +58,38 @@ extern "C" {
 /* exported subroutines */
 
 int uc_readlink(cchar *fname,char *rbuf,int rlen) noex {
-	int		rs = SR_OK ;
-	int		fl ;
-
-	if (fname == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-
-	if (fname[0] == '\0') return SR_INVALID ;
-
-	fl = lenstr(fname) ;
-
-	if ((rs = nonpath(fname,fl)) > 0) {
-	    char	efname[MAXPATHLEN + 1] ;
-	    if ((rs = mkuserpath(efname,NULL,fname,fl)) > 0) {
-	        fname = efname ;
-	    } else if (rs == 0) {
-	        if ((rs = mkcdpath(efname,fname,fl)) > 0) {
-	            fname = efname ;
-	        } else if (rs == 0) {
-	            rs = mkvarpath(efname,fname,fl) ;
-	            if (rs > 0) fname = efname ;
-		}
-	    }
-
-	    if (rs >= 0) {
-	        rs = u_readlink(fname,rbuf,rlen) ;
-	    }
-	} else if (rs >= 0) {
-	        rs = u_readlink(fname,rbuf,rlen) ;
-	} /* end if (nonpath or other) */
-
-	return rs ;
+    	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
+	int		len = 0 ; /* return-value */
+	if (fname && rbuf) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (int fl ; (fl = gelenstr(fname)) > 0) {
+	        if ((rs = nonpath(fname,fl)) > 0) {
+		    if (char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) {
+	                if ((rs = mkuserpath(ebuf,np,fname,fl)) > 0) {
+	                    fname = ebuf ;
+	                } else if (rs == 0) {
+	                    if ((rs = mkcdpath(ebuf,fname,fl)) > 0) {
+	                        fname = ebuf ;
+	                    } else if (rs == 0) {
+	                        rs = mkvarpath(ebuf,fname,fl) ;
+	                        if (rs > 0) fname = ebuf ;
+		            }
+	                } /* end if */
+	                if (rs >= 0) {
+	                    rs = u_readlink(fname,rbuf,rlen) ;
+			    len = rs ;
+	                }
+			rs = rslibfree(rs,ebuf) ;
+		    } /* end if (m-a-f) */
+	        } else if (rs >= 0) {
+		    rs = u_readlink(fname,rbuf,rlen) ;
+		    len = rs ;
+	        } /* end if (nonpath or other) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (uc_readlink) */
 
