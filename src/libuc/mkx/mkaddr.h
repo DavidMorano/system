@@ -20,7 +20,7 @@
 
 */
 
-/* Copyright (c) 1998,2018,23023 David A-D- Morano.  All rights reserved. */
+/* Copyright (c) 1998,2018,2023 David A-D- Morano.  All rights reserved. */
 
 #ifndef	MKADDR_INCLUDE
 #define	MKADDR_INCLUDE
