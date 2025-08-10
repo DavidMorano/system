@@ -25,7 +25,9 @@
 
 
 enum nonpaths {
-	nonpath_abs,
+    	nonpath_reg,			/* regular: absolute or relative */
+    	nonpath_user,
+    	nonpath_cd,
 	nonpath_dialer,
 	nonpath_fsvc,
 	nonpath_usvc,
