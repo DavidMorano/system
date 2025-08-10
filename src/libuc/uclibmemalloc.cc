@@ -24,7 +24,7 @@
 /*******************************************************************************
 
   	Group:
-	uclbmemalloc
+	uc_lbmemalloc
 
 	Description:
 	This is the low-level component of the MEMALLOC facility.
@@ -75,7 +75,7 @@ namespace {
 	int stdvalloc(int,void *) noex ;
 	int stdrealloc(int,void *) noex ;
     } ; /* end struct (uclibmemalloc) */
-}
+} /* end namespace */
 
 
 /* forward references */
