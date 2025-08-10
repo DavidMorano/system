@@ -1,12 +1,13 @@
-/* progquery */
+/* progquery SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* make a query */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG 	0		/* run-time debug print-outs */
 #define	CF_READSTDIN	0		/* read STDIN failing arguments */
-
 
 /* revision history:
 
@@ -19,10 +20,13 @@
 
 /*******************************************************************************
 
+  	Name:
+	progquery
+
+	Description:
 	This subroutine processes a single file.
 
 	Synopsis:
-
 	int progquery(pip,aip,terms,dbname,ofname)
 	PROGINFO	*pip ;
 	ARGINFO		*aip ;
@@ -42,8 +46,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -52,6 +57,7 @@
 #include	<vecstr.h>
 #include	<field.h>
 #include	<textlook.h>
+#include	<mkx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -66,35 +72,12 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfcasesub(const char *,int,const char *,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	mkexpandpath(char *,const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	isdigitlatin(int) ;
-
 #if	CF_DEBUG || CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
 
 extern int	progexit(PROGINFO *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
 
 
 /* external variables */
@@ -206,7 +189,7 @@ static int procdb(PROGINFO *pip,ARGINFO *aip,bfile *ofp,cchar *dbname)
 	cchar		*fmt ;
 	char		tmpfname[MAXPATHLEN+1] ;
 
-	if ((rs = mkexpandpath(tmpfname,dbname,-1)) >= 0) {
+	if ((rs = mkpathexp(tmpfname,dbname,-1)) >= 0) {
 	    cchar	*bdn = pip->basedname ;
 	    if (rs > 0) dbname = tmpfname ;
 	    if ((rs = textlook_open(tlp,pip->pr,dbname,bdn)) >= 0) {
