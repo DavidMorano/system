@@ -57,7 +57,7 @@ int uc_create(cchar *fname,mode_t om) noex {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 		if (char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) {
-	            if ((rs = mkexpandpath(ebuf,fname,-1)) > 0) {
+	            if ((rs = mkpathexp(ebuf,fname,-1)) > 0) {
 		        rs = u_creat(ebuf,om) ;
 			fd = rs ;
 	            } else if (rs == 0) {
