@@ -1,4 +1,5 @@
 /* progquery SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a query */
@@ -48,6 +49,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -55,6 +57,7 @@
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<field.h>
+#include	<mkx.h>
 #include	<localmisc.h>
 
 #include	"textlook.h"
@@ -70,35 +73,12 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	sfcasesub(cchar *,int,cchar *,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	optbool(cchar *,int) ;
-extern int	mkexpandpath(char *,cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	isdigitlatin(int) ;
-
 #if	CF_DEBUG || CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern int	progexit(PROGINFO *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -210,11 +190,11 @@ cchar	dbname[] ;
 	cchar	*cp ;
 	char		tmpfname[MAXPATHLEN+1] ;
 
-	rs = mkexpandpath(tmpfname,dbname,-1) ;
+	rs = mkpathexp(tmpfname,dbname,-1) ;
 	if (rs > 0) dbname = tmpfname ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf( "progquery/procdb: mkexpandpath() rs=%d\n",rs) ;
+	    debugprintf( "progquery/procdb: mkpathexp() rs=%d\n",rs) ;
 #endif
 	if (rs < 0) goto ret0 ;
 
