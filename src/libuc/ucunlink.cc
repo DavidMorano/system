@@ -25,6 +25,7 @@
 #include	<usystem.h>
 #include	<libmallocxx.h>
 #include	<posname.h>		/* create POSIX® entity names */
+#include	<mkx.h>
 #include	<localmisc.h>
 
 
@@ -50,10 +51,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	mkexpandpath(char *,cchar *,int) noex ;
-}
 
 
 /* external subroutines */
@@ -83,7 +80,7 @@ int uc_unlink(cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	if (char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) {
-	    if ((rs = mkexpandpath(ebuf,fname,-1)) > 0) {
+	    if ((rs = mkpathexp(ebuf,fname,-1)) > 0) {
 		rs = u_unlink(ebuf) ;
 	    } else if (rs == 0) {
 		rs = u_unlink(fname) ;
