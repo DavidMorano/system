@@ -68,43 +68,6 @@ using std::max ;			/* subroutine-template */
 
 /* exported subroutines */
 
-int filer_co::operator () (int a) noex {
-	int		rs = SR_BUGCHECK ;
-	if (op) {
-	    switch (w) {
-	    case filermem_reserve:
-	        rs = filer_reserve(op,a) ;
-	        break ;
-	    case filermem_invalidate:
-	        rs = filer_invalidate(op) ;
-	        break ;
-	    case filermem_flush:
-	        rs = filer_flush(op) ;
-	        break ;
-	    case filermem_adv:
-	        rs = filer_adv(op,a) ;
-	        break ;
-	    case filermem_poll:
-	        rs = filer_poll(op,a) ;
-	        break ;
-	    case filermem_writeblanks:
-	        rs = filer_writeblanks(op,a) ;
-	        break ;
-	    case filermem_writealign:
-	        rs = filer_writealign(op,a) ;
-	        break ;
-	    case filermem_writezero:
-	        rs = filer_writezero(op,a) ;
-	        break ;
-	    case filermem_finish:
-	        rs = filer_finish(op) ;
-	        break ;
-	    } /* end switch */
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end method (filer_co::operator) */
-
 int filer::start(int afd,off_t soff,int bsz,int to) noex {
 	return filer_start(this,afd,soff,bsz,to) ;
 }
@@ -146,7 +109,7 @@ int filer::printf(cchar *fmt,...) noex {
 	    va_end(ap) ;
 	}
 	return rs ;
-}
+} /* end method (filer::printf) */
 
 int filer::vprintf(cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
@@ -168,11 +131,54 @@ int filer::writefd(char *bufp,int bufl,int mfd,int alen) noex {
 	return filer_writefd(this,bufp,bufl,mfd,alen) ;
 }
 
+int filer::stat(ustat *sbp) noex {
+	return filer_stat(this,sbp) ;
+}
+
 void filer::dtor() noex {
 	cint		rs = filer_finish(this) ;
 	if (rs < 0) {
 	    ulogerror("filer",rs,"fini-finish") ;
 	}
-}
+} /* end method (filer::dtor) */
+
+int filer_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case filermem_reserve:
+	        rs = filer_reserve(op,a) ;
+	        break ;
+	    case filermem_invalidate:
+	        rs = filer_invalidate(op) ;
+	        break ;
+	    case filermem_flush:
+	        rs = filer_flush(op) ;
+	        break ;
+	    case filermem_adv:
+	        rs = filer_adv(op,a) ;
+	        break ;
+	    case filermem_poll:
+	        rs = filer_poll(op,a) ;
+	        break ;
+	    case filermem_lockend:
+	        rs = filer_lockend(op) ;
+	        break ;
+	    case filermem_writeblanks:
+	        rs = filer_writeblanks(op,a) ;
+	        break ;
+	    case filermem_writealign:
+	        rs = filer_writealign(op,a) ;
+	        break ;
+	    case filermem_writezero:
+	        rs = filer_writezero(op,a) ;
+	        break ;
+	    case filermem_finish:
+	        rs = filer_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (filer_co::operator) */
 
 
