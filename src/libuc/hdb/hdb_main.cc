@@ -81,7 +81,7 @@
 	Implementation note:
 
 	Whew! There may be more hairy code that what is in this
-	object, but I don't know where it is! What am I trying to
+	object, but I do not know where it is! What am I trying to
 	say? There may be bugs in this mess! It has held up solidly
 	against testing and use already but there could still be
 	some corners that are not quite right.  Both the core of
