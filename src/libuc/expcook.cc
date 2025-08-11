@@ -17,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	expcook
 
 	Description:
@@ -30,17 +30,19 @@
 	character is HEX '\x7d'.  Deal with it!
 
 	Cookies take the form:
-	%{<key>}
+	%<keychr>
+	%{<keychr>}
+	%{<keystr>}
 
 	Where:
-	<key>		is the key to look-up
+	<keychr>	is the key to look-up
+	<keystr>	is the key to look-up
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<new>
 #include	<usystem.h>
 #include	<hdbstr.h>
@@ -53,6 +55,9 @@
 
 #include	"expcook.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;		/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -61,7 +66,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -77,9 +81,9 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 static inline int expcook_ctor(EX *op) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if ((op->hlp = new(nothrow) hdbstr) != np) {
@@ -166,7 +170,7 @@ int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 	int		rs ;
 	if ((rs = expcook_magic(op,kbuf)) >= 0) {
 	    hdbstr	*slp = op->hlp ;
-	    int		kl = strlen(kbuf) ;
+	    cint	kl = lenstr(kbuf) ;
 	    if ((rs = slp->fetch(kbuf,kl,np,np)) >= 0) {
 	        rs = slp->delkey(kbuf,kl) ;
 	    } else if (rs == SR_NOTFOUND) {
@@ -181,9 +185,9 @@ int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 /* end subroutine (expcook_add) */
 
 int expcook_curbegin(EX *op,expcook_cur *curp) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = expcook_magic(op,curp)) >= 0) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    if ((curp->clp = new(nothrow) hdbstr_cur) != np) {
 	        hdbstr	*slp = op->hlp ;
@@ -259,7 +263,7 @@ int expcook_exp(EX *op,int wch,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		bl = 0 ;
 	if ((rs = expcook_magic(op,rbuf,sp)) >= 0) {
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    rbuf[0] = '\0' ;
 	    if (rlen > 0) {
 	        if (buffer bo ; (rs = bo.start(rlen)) >= 0) {
@@ -288,14 +292,14 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	if ((rs = expcook_magic(op,bufp,sp)) >= 0) {
 	    cint	sch = '%' ;
 	    cchar	*ss = "{}" ;
-	    cchar	*tp ;
-	    if (sl < 0) sl = strlen(sp) ;
-	    while ((tp = strnchr(sp,sl,sch)) != nullptr) {
-	        if ((rs = bufp->strw(sp,(tp-sp))) >= 0) {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    for (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr ; ) {
+		cint tl = intconv(tp - sp) ;
+	        if ((rs = bufp->strw(sp,tl)) >= 0) {
 	            int		kl = -1 ;
 	            cchar	*kp = nullptr ;
 		    len += rs ;
-	            sl -= ((tp+1)-sp) ;
+	            sl -= intconv((tp + 1) - sp) ;
 	            sp = (tp+1) ;
 	            if (sl > 0) {
 	                if (sp[0] == sch) {
@@ -308,14 +312,14 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	                    sp += 1 ;
 	                    if ((tp = strnchr(sp,sl,ss[1])) != nullptr) {
 	                        kp = sp ;
-	                        kl = (tp-sp) ;
-	                        sl -= ((tp+1)-sp) ;
-	                        sp = (tp+1) ;
+	                        kl = intconv(tp - sp) ;
+	                        sl -= intconv((tp + 1) - sp) ;
+	                        sp = (tp + 1) ;
 	                    } else {
 	                        kp = sp ;
 	                        kl = 0 ;
-	                        sl -= ((tp+1)-sp) ;
-	                        sp = (tp+1) ;
+	                        sl -= intconv((tp + 1) - sp) ;
+	                        sp = (tp + 1) ;
 	                    } /* end if */
 	                } else {
 	                    kp = sp ;
@@ -333,7 +337,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 		    }
 	        } /* end if (buf-add leading part) */
 	        if (rs < 0) break ;
-	    } /* end while (expanding) */
+	    } /* end for (expanding) */
 	    /* copy over any remainder (trailing part) */
 	    if ((rs >= 0) && (sl > 0)) {
 	        rs = bufp->strw(sp,sl) ;
@@ -350,7 +354,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 static int expcook_prockey(EX *op,int wch,buffer *bufp,cchar *kp,int kl) noex {
 	int		rs = SR_NOTFOUND ;
 	int		len = 0 ;
-	if (kl < 0) kl = strlen(kp) ;
+	if (kl < 0) kl = lenstr(kp) ;
 	if (kl > 0) {
 	    hdbstr	*slp = op->hlp ;
 	    if (cchar *vp{} ; (rs = slp->fetch(kp,kl,nullptr,&vp)) >= 0) {
