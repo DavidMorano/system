@@ -61,6 +61,7 @@ struct envlist : envlist_head {
 	    start(this,envlistmem_start) ;
 	    count(this,envlistmem_count) ;
 	    finish(this,envlistmem_finish) ;
+	    elp = nullptr ;
 	} ;
 	envlist(const envlist &) = delete ;
 	envlist &operator = (const envlist &) = delete ;
@@ -68,8 +69,8 @@ struct envlist : envlist_head {
 	int add(cchar *,int = -1) noex ;
 	int present(cchar *,int = -1,cchar ** = nullptr) noex ;
 	void dtor() noex ;
-	~envlist() {
-	    dtor() ;
+	destruct envlist() {
+	    if (elp) dtor() ;
 	} ;
 } ; /* end struct (envlist) */
 #else	/* __cplusplus */
