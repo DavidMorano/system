@@ -128,21 +128,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>
 #include	<cstdlib>
-#include	<cstring>		/* |strnchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<strn.h>		/* |strnchar(3uc)| */
+#include	<strn.h>		/* |strnchr(3uc)| */
 #include	<snwcpy.h>
+#include	<ascii.h>
 #include	<localmisc.h>
 
 #include	"mkgecosname.h"
 
-import libutil ;
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* local defines */
 
@@ -156,8 +158,6 @@ import libutil ;
 
 
 /* imported namespaces */
-
-using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -199,37 +199,36 @@ int mkgecosname(char *rbuf,int rlen,cchar *gf) noex {
 }
 /* end subroutine (mkgecosname) */
 
-int getgecosname(cchar *gbuf,int glen,cchar **rpp) noex {
+int getgecosname(cchar *gbuf,int µglen,cchar **rpp) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	int		cl = 0 ;
+	int		cl = 0 ; /* return-value */
 	cchar		*cp = nullptr ;
 	if (gbuf) ylikely {
-	    cint	sch = CH_LPAREN ;
-	    cchar	*tp ;
-	    bool	f = true ;
 	    rs = SR_OK ;
-	    if (glen < 0) {
-		glen = lenstr(gbuf,maxgecoslen) ;
-	    }
-	    f = f && ((cp = strnchr(gbuf,glen,'-')) != np) ;
-	    {
-		cint	tl = intconv(glen - (cp - gbuf)) ;
-	        f = f && ((tp = strnchr(cp,tl,sch)) != np) ;
-	    }
-	    if (f) {
-	        cp += 1 ;
-	        cl = intconv(tp - cp) ;
-	    } else if ((tp = strnchr(gbuf,glen,sch)) != nullptr) {
-	        cp = gbuf ;
-	        cl = intconv(tp - gbuf) ;
-	    } else if ((tp = strnchr(gbuf,glen,'-')) != nullptr) {
-	        cp = (tp + 1) ;
-	        cl = glen - intconv((tp + 1) - gbuf) ;
-	    } else {
-	        cp = gbuf ;
-	        cl = glen ;
-	    } /* end if */
+	    if (int glen ; (glen = getlenstr(gbuf,µglen)) > 0) ylikely {
+	        cint	sch = CH_LPAREN ;
+	        cchar	*tp ;
+	        bool	f = true ;
+	        f = f && ((cp = strnchr(gbuf,glen,'-')) != np) ;
+	        {
+		    cint	tl = intconv(glen - (cp - gbuf)) ;
+	            f = f && ((tp = strnchr(cp,tl,sch)) != np) ;
+	        }
+	        if (f) {
+	            cp += 1 ;
+	            cl = intconv(tp - cp) ;
+	        } else if ((tp = strnchr(gbuf,glen,sch)) != np) {
+	            cp = gbuf ;
+	            cl = intconv(tp - gbuf) ;
+	        } else if ((tp = strnchr(gbuf,glen,'-')) != np) {
+	            cp = (tp + 1) ;
+	            cl = glen - intconv((tp + 1) - gbuf) ;
+	        } else {
+	            cp = gbuf ;
+	            cl = glen ;
+	        } /* end if */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	if (rpp) *rpp = cp ;
 	return (rs >= 0) ? cl : rs ;
