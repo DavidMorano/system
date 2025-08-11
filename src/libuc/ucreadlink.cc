@@ -44,8 +44,6 @@ import libutil ;			/* |getlenstr(3u)| */
 extern "C" {
     extern int	mkuserpath(char *,cchar *,cchar *,int) noex ;
     extern int	mkcdpath(char *,cchar *,int) noex ;
-    extern int	mkvarpath(char *,cchar *,int) noex ;
-    extern int	hasvarpathprefix(cchar *,int) noex ;
 }
 
 
