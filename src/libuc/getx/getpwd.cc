@@ -77,10 +77,12 @@
 #include	<varnames.hh>		/* |varname(3u)| */
 #include	<bufsizevar.hh>
 #include	<sncpyx.h>
-#include	<isnot.h>
+#include	<isnot.h>		/* isNotPresent(3uc)| */
 #include	<localmisc.h>
 
 #include	"getpwd.h"
+
+#pragma		GCC dependency	"mod/uconstants.ccm"
 
 import uconstants ;			/* |varname(3u)| */
 
@@ -97,6 +99,9 @@ import uconstants ;			/* |varname(3u)| */
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
