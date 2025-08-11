@@ -121,11 +121,6 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
-extern "C" {
-    extern int	mkvarpath(char *,cchar *,int) noex ;
-    extern bool	hasvarpathprefix(cchar *,int) noex ;
-}
-
 
 /* external variables */
 
