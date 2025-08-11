@@ -46,7 +46,7 @@
  *	EX_UNAVAILABLE (69) -- A service is unavailable.  This can occur
  *		if a support program or file does not exist.  This
  *		can also be used as a catchall message when something
- *		you wanted to do doesn't work, but you don't know
+ *		you wanted to do doesn't work, but you do not know
  *		why.
  *	EX_SOFTWARE (70) -- An internal software error has been detected.
  *		This should be limited to non-operating system related
