@@ -22,7 +22,11 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
+#include	<mkx.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -30,16 +34,14 @@
 
 /* external subroutines */
 
-extern int	mkexpandpath(char *,cchar *,int) ;
-extern int	mkuserpath(char *,cchar *,cchar *,int) ;
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int uc_symlink(cchar *ofname,cchar *nfname)
-{
-	const int	plen = MAXPATHLEN ;
+int uc_symlink(cchar *ofname,cchar *nfname) noex {
+	cint		plen = MAXPATHLEN ;
 	int		rs ;
 	int		size = 0 ;
 	char		*bp ;
@@ -48,7 +50,7 @@ int uc_symlink(cchar *ofname,cchar *nfname)
 	if ((rs = uc_libmalloc(size,&bp)) >= 0) {
 	    char	*obuf = bp + ((plen+1)*0) ;
 	    char	*nbuf = bp + ((plen+1)*1) ;
-	    if ((rs = mkexpandpath(obuf,ofname,-1)) > 0) {
+	    if ((rs = mkpathexp(obuf,ofname,-1)) > 0) {
 		ofname = obuf ;
 	    }
 	    if (rs >= 0) {
