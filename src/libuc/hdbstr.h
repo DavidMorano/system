@@ -58,8 +58,8 @@ struct hdbstr_iter {
 	hdbstr_iter &operator += (int) noex ;
 	hdbstr_iter &operator ++ () noex ; /* pre */
 	hdbstr_iter operator ++ (int) noex ; /* post */
-	~hdbstr_iter() {
-	    dtor() ;
+	destruct hdbstr_iter() {
+	    if (op) dtor() ;
 	} ;
     private:
 	int increment(int = 1) noex ;
@@ -82,6 +82,7 @@ struct hdbstr : hdb {
 	hdbstr_co	delall ;
 	hdbstr_co	count ;
 	hdbstr_co	finish ;
+	bool		fopen{} ;
 	hdbstr() noex {
 	    start(this,hdbstrmem_start) ;
 	    delall(this,hdbstrmem_delall) ;
@@ -105,8 +106,8 @@ struct hdbstr : hdb {
 	hdbstr_iter begin() noex ;
 	hdbstr_iter end() noex ;
 	void dtor() noex ;
-	~hdbstr() {
-	    dtor() ;
+	destruct hdbstr() {
+	    if (fopen) dtor() ;
 	} ;
 } ; /* end struct (hdbstr) */
 #else	/* __cplusplus */
