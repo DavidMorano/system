@@ -124,7 +124,7 @@ int getrealname(char *rbuf,int rlen,cchar *un) noex {
 static int getpwname(ucentpwx *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	int		rs ;
 	if (un && (un[0] != '\0') && (un[0] != '-')) {
-	    rs = pwp->nam(wbuf,pwlen,un) ;
+	    rs = pwp->nam(pwbuf,pwlen,un) ;
 	} else {
 	    rs = getpwusername(pwp,pwbuf,pwlen,-1) ;
 	}
