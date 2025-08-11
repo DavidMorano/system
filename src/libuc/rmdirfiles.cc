@@ -64,6 +64,9 @@
 
 #include	"rmdirs.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -85,7 +88,7 @@
 
 /* forward references */
 
-static int	vecstr_dirfilesload(vecstr *,cchar *,cchar *,int) noex ;
+static int	vecstr_load(vecstr *,cchar *,cchar *,int) noex ;
 static int	vecstr_dirfilesdelete(vecstr *) noex ;
 static int	premat(cchar *,int,cchar *,int) noex ;
 
@@ -105,13 +108,12 @@ int rmdirfiles(cchar *dn,cchar *pre,int to) noex {
 	if (dn) {
 	    rs = SR_INVALID ;
 	    if (dn[0]) {
-	        vecstr	fs ;
-	        if ((rs = vecstr_start(&fs,0,0)) >= 0) {
-	            if ((rs = vecstr_dirfilesload(&fs,dn,pre,to)) > 0) {
+	        if (vecstr fs ; (rs = fs.start(0,0)) >= 0) {
+	            if ((rs = vecstr_load(&fs,dn,pre,to)) > 0) {
 	                rs = vecstr_dirfilesdelete(&fs) ;
 	                c += rs ;
 	            }
-	            rs1 = vecstr_finish(&fs) ;
+	            rs1 = fs.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (files) */
 	    } /* end if (valid) */
@@ -123,23 +125,20 @@ int rmdirfiles(cchar *dn,cchar *pre,int to) noex {
 
 /* local subroutines */
 
-static int vecstr_dirfilesload(vecstr *flp,cchar *dn,cchar *pre,int to) noex {
-	const time_t	dt = time(nullptr) ;
+static int vecstr_load(vecstr *flp,cchar *dn,cchar *pre,int to) noex {
+	custime		dt = time(nullptr) ;
 	int		rs ;
 	int		rs1 ;
 	int		prelen = 0 ;
 	int		c = 0 ;
-	char		*rbuf{} ;
-	if (pre) prelen = strlen(pre) ;
-	if ((rs = malloc_mp(&rbuf)) >= 0) {
+	if (pre) prelen = lenstr(pre) ;
+	if (char *rbuf ; (rs = malloc_mp(&rbuf)) >= 0) {
 	    if ((rs = mkpath1(rbuf,dn)) >= 0) {
-		char	*nbuf{} ;
 	        cint	rl = rs ;
-	        if ((rs = malloc_mn(&nbuf)) >= 0) {
-		    fsdir	dir ;
-		    fsdir_ent	de ;
+		if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
 		    cint	nlen = rs ;
-		    if ((rs = fsdir_open(&dir,dn)) >= 0) {
+		    if (fsdir dir ; (rs = fsdir_open(&dir,dn)) >= 0) {
+		        fsdir_ent	de ;
 	                while ((rs = fsdir_read(&dir,&de,nbuf,nlen)) > 0) {
 	                    cchar	*sp = de.name ;
 	                    cint	sl = rs ;
@@ -177,15 +176,19 @@ static int vecstr_dirfilesload(vecstr *flp,cchar *dn,cchar *pre,int to) noex {
 /* end subroutine (vecstr_loaddirfiles) */
 
 static int vecstr_dirfilesdelete(vecstr *flp) noex {
+    	int		rsn = SR_NOTFOUND ;
+    	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
 	cchar		*fp{} ;
-	for (int i = 0 ; vecstr_get(flp,i,&fp) >= 0 ; i += 1) {
+	for (int i = 0 ; (rs1 = flp->get(i,&fp)) >= 0 ; i += 1) {
 	    if ((fp != nullptr) && (fp[0] != '\0')) {
 	        c += 1 ;
 	        u_unlink(fp) ;
 	    }
 	} /* end for */
-	return c ;
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecstr_dirfilesdelete) */
 
