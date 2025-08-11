@@ -35,16 +35,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<sys/statvfs.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
+#include	<fcntl.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
+#include	<libmallocxx.h>
 #include	<nonpath.h>
+#include	<mkx.h>
 #include	<localmisc.h>
 
 #pragma		GCC dependency	"mod/libutil.ccm"
@@ -67,8 +68,6 @@ define	FSTYPESZ	_ST_FSTYPSZ
 extern "C" {
     extern int	mkuserpath(char *,cchar *,cchar *,int) noex ;
     extern int	mkcdpath(char *,cchar *,int) noex ;
-    extern int	mkvarpath(char *,cchar *,int) noex ;
-    extern int	hasvarpathprefix(cchar *,int) noex ;
 }
 
 
@@ -94,7 +93,7 @@ int uc_stat(cchar *fname,ustat *sbp) noex {
 	int		rs1 ;
 	int		fl ;
 	int		flen = 0 ;
-	cchar		*fbuf = nullptr ;
+	char		*fbuf = nullptr ;
 	(void) rs1 ;
 	if (fname == nullptr) return SR_FAULT ;
 	if (sbp == nullptr) return SR_FAULT ;
