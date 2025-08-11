@@ -10,7 +10,7 @@
 
 	= 1998-08-17, David A­D­ Morano
 	This subroutine was written as a generalization of the
-	locking found in many previous programs. Why don't the OS
+	locking found in many previous programs. Why did not the OS
 	suppliers write this subroutine in addition to |lockf(3c)|?
 
 */
@@ -30,7 +30,7 @@
 	timeout none-the-less.  Read locks can also be manipulated
 	with this routine unlike with |lockf(3c)|.  Like with
 	|lockf(3c)| all lock regions are relative to the current
-	file position if the starting off is given as negative
+	file position if the given offset is given as negative
 	(anything).  If the 'start' argument is negative, then the
 	function behaves essentially the same as |lockf(3c)| and
 	all locks are relative with respect to the current file off
@@ -66,7 +66,7 @@
 	to be locked is taken as relative to the current file
 	position.
 
-	Some Solaris bugs to be aware of:
+	Some Solaris® bugs to be aware of:
 	If a file is locked to the exact size of the file and then
 	a memory map of the whole file is attempted (at the size
 	of the file), then memory mapping fails with an ERRNO of
@@ -80,7 +80,8 @@
 	file-locking does not "prevent" reading memory (from a
 	process that has the same file memory-mapped), but neither
 	does file-locking prevent another process from reading the
-	same file using |read(2)|!   Do you get it solaris boys?
+	same file using |read(2)| (unless mandatory locking is
+	employed)!   Do you get it Solaris® boys?
 
 *******************************************************************************/
 
