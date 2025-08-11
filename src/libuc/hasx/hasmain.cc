@@ -1,4 +1,4 @@
-/* hasx SUPPORT */
+/* hasmain SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -19,7 +19,7 @@
 /*******************************************************************************
 
   	Group:
-	hasx
+	has{x}
 
 	Description:
 	These subroutines check if a specified c-string has any of
@@ -30,14 +30,14 @@
 	hsempty
 
 	Description:
-        This subroutine determines if a given string is empty or not.
+        This subroutine determines if a given c-string is empty or not.
 
 	Synopsis:
 	bool hasempty(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		string pointer
-	sl		string length
+	sp		c-string pointer
+	sl		c-string length
 
 	Returns:
 	1		true (empty)
@@ -48,7 +48,7 @@
 	haseoh
 
 	Description:
-	Determine if the given string consists of an End-Of-Header
+	Determine if the given c-string consists of an End-Of-Header
 	(EOH) sequence.  An EOH is a leadering blank line of two
 	sorts:
 	<NL>
@@ -58,7 +58,7 @@
 	bool haseoh(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		string to test
+	sp		c-string to test
 	sl		length of strin to test
 
 	Returns:
@@ -76,27 +76,27 @@
 	bool hasnonwhite(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		string pointer
-	sl		string length
+	sp		c-string pointer
+	sl		c-string length
 
 	Returns:
-	false		string is empty
-	true		string has some non-white content
+	false		c-string is empty
+	true		c-string has some non-white content
 
 
 	Name:
 	hasleadcolon
 
 	Description:
-	Does the given string have a colon character (':') occur
+	Does the given c-string have a colon character (':') occur
 	before a slash character ('/')?
 
 	Synopsis:
 	int hasleadcolon(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		pointer to string
-	sl		length of string
+	sp		pointer to c-string
+	sl		length of c-string
 
 	Returns:
 	false		answer NO
@@ -113,30 +113,30 @@
 	bool hasprintlatin(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		string to test
+	sp		c-string to test
 	sl		length of strin to test
 
 	Returns:
-	false		string does not have bad stuff in it
-	true		string has some bad stuff in it
+	false		c-string does not have bad stuff in it
+	true		c-string has some bad stuff in it
 
 
 	Name:
 	hasprintbad
 
 	Description:
-	Does the given string have characters that are bad to print?
+	Does the given c-string have characters that are bad to print?
 
 	Synopsis:
-	bool hasprintbad(ccha *sp,int sl) noex
+	bool hasprintbad(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		string to test
+	sp		c-string to test
 	sl		length of strin to test
 
 	Returns:
-	false		string does not have bad stuff in it
-	true		string has some bad stuff in it
+	false		c-string does not have bad stuff in it
+	true		c-string has some bad stuff in it
 
 
 	Name:
@@ -149,12 +149,12 @@
 	bool hasallalpha(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		string to test
-	sl		length of string to test
+	sp		c-string to test
+	sl		length of c-string to test
 
 	Returns:
-	false		string does not have all digits
-	true		string has all digits in it
+	false		c-string does not have all digits
+	true		c-string has all digits in it
 
 
 	Name:
@@ -167,30 +167,30 @@
 	bool hasallalnum(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		string to test
-	sl		length of string to test
+	sp		c-string to test
+	sl		length of c-string to test
 
 	Returns:
-	false		string does not have all digits
-	true		string has all digits in it
+	false		c-string does not have all digits
+	true		c-string has all digits in it
 
 
 	Name:
 	hasalldig
 
 	Description:
-	Are all of the characters in the given string digits?
+	Are all of the characters in the given c-string digits?
 
 	Synopsis:
 	bool hasalldig(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		string to test
+	sp		c-string to test
 	sl		length of strin to test
 
 	Returns:
-	false		string does not have all digits
-	true		string has all digits in it
+	false		c-string does not have all digits
+	true		c-string has all digits in it
 
 
 	Name:
@@ -204,44 +204,29 @@
 	bool hasallbase(cchar *sp,int sl,int base) noex
 
 	Arguments:
-	sp		string to test
-	sl		length of strin to test
+	sp		c-string to test
+	sl		length of c-string to test
 	base		base to check against
 
 	Returns:
-	false		string does not have all digits
-	true		string has all digits in it
-
-
-	Name:
-	hasvarprefix
-
-	Description:
-	This subroutine tests whether the file-name has the var-path
-	prefix on it.  A so-called "var-path" prefix looks like
-	either one of the following:
-
-	%<string>/<comething>/<...>
-	/%<string>/<something>/...
-
-	Synopsis:
-	bool hasvarpathprefix(cchar *,int) noex
+	false		c-string does not have all digits
+	true		c-string has all digits in it
 
 
 	Name:
 	hasValidMagic
 
 	Description:
-	This subroutine verifies that the given unknown string
-	contains the given valid magic string.
+	This subroutine verifies that the given unknown c-string
+	contains the given valid magic c-string.
 
 	Synopsis:
 	bool hasValidMagic(cchar *sp,int sl,cchar *ms) noex
 
 	Arguments:
-	cchar	*sp		string buffer to test
-	int	sl		length of string buffer
-	int	ms		givem valid magic string
+	cchar	*sp		c-string buffer to test
+	int	sl		length of c-string buffer
+	int	ms		givem valid magic c-string
 
 	Returns:
 	false		does not match
@@ -252,7 +237,7 @@
 	hasnotdots
 
 	Description:
-	This subroutine determines if the given string has neither of the
+	This subroutine determines if the given c-string has neither of the
 	following:
 	+ one dot character
 	+ two dot characters
@@ -261,26 +246,26 @@
 	bool hasNotDots(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		pointer to given string
-	sl		length of given string
+	sp		pointer to given c-string
+	sl		length of given c-string
 
 	Returns:
-	false		string has the standard dot-dirs
-	true		string does not have the standard dot-dirs
+	false		c-string has the standard dot-dirs
+	true		c-string does not have the standard dot-dirs
 
 
 	Name:
 	hasmealone
 
 	Description:
-	We test whether the given string consists only of those
+	We test whether the given c-string consists only of those
 	characters that symbolically represent the "current" user.
 
 	Synopsis:
 	int hasmealone(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		string to test
+	sp		c-string to test
 	sl		length of strin to test
 
 	Returns:
@@ -292,14 +277,14 @@
 	hasINET4AddrStr
 
 	Description:
-	We test whether the given string consists of an INET4 address
-	string.
+	We test whether the given c-string consists of an INET4 address
+	c-string.
 
 	Synopsis:
 	int hasINET4AddrStr(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		string to test
+	sp		c-string to test
 	sl		length of strin to test
 
 	Returns:
@@ -310,7 +295,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>		/* |strcmp(3c)| | |strncmp(3c)| */
+#include	<cstring>		/* |strcmp(3c)| + |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -770,28 +755,13 @@ bool hasonlyplusminus(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasonlyplusminus) */
 
-bool hasvarpathprefix(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (sp) ylikely {
-	    cint	ec = '%' ;
-	    f = f || (sl && (sp[0] == ec)) ;
-	    if (! f) {
-		f = true ;
-	        f = f && ((sl < 0) || (sl > 1)) ;
-		f = f && (sp[0] == '/') && (sp[1] == ec) ;
-	    }
-	} /* end if (non-null) */
-	return f ;
-}
-/* end subroutine (hasvarpathprefix) */
-
 bool hascdpath(cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) ylikely {
 	    if (sl && sp[0]) {
-	        cint	ec = mkchar('¬') ;
+	        cint	chx_ec = mkchar('¬') ;
 	        int	ch = mkchar(sp[0]) ;
-	        f = (ch == ec) ;
+	        f = (ch == chx_ec) ;
 	    }
 	} /* end if (non-null) */
 	return f ;
