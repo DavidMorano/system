@@ -71,7 +71,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| | |strncmp(3c)| */
+#include	<cstring>		/* |strlen(3c)| + |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -83,7 +83,7 @@
 
 #include	"strnxcmp.h"
 
-import libutil ;
+import libutil ;			/* lenstr(3u)| */
 
 /* local defines */
 
