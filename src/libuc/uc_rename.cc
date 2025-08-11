@@ -21,14 +21,16 @@
 
 	This is the middleware version of |u_rename(3u)|.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
+#include	<mkx.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -36,15 +38,14 @@
 
 /* external subroutines */
 
-extern int	mkexpandpath(char *,cchar *,int) ;
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int uc_rename(cchar *ofname,cchar *nfname)
-{
-	const int	elen = MAXPATHLEN ;
+int uc_rename(cchar *ofname,cchar *nfname) noex {
+	cint		elen = MAXPATHLEN ;
 	int		rs ;
 	int		size = 0 ;
 	int		rv = 0 ;
@@ -55,12 +56,12 @@ int uc_rename(cchar *ofname,cchar *nfname)
 	    int		ol = -1 ;
 	    char	*obuf = bp + ((elen+1)*0) ;
 	    char	*nbuf = bp + ((elen+1)*1) ;
-	    if ((rs = mkexpandpath(obuf,ofname,-1)) >= 0) {
+	    if ((rs = mkpathexp(obuf,ofname,-1)) >= 0) {
 		if (rs > 0) {
 		    ol = rs ;
 		    ofname = obuf ;
 		}
-	        if ((rs = mkexpandpath(nbuf,nfname,ol)) >= 0) {
+	        if ((rs = mkpathexp(nbuf,nfname,ol)) >= 0) {
 		    if (rs > 0) nfname = nbuf ;
 		    rs = u_rename(ofname,nfname) ;
 		    rv = rs ;
