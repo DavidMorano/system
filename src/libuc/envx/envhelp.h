@@ -61,6 +61,7 @@ struct envhelp : envhelp_head {
 	    sort(this,envhelpmem_sort) ;
 	    count(this,envhelpmem_count) ;
 	    finish(this,envhelpmem_finish) ;
+	    elp = nullptr ;
 	} ;
 	envhelp(const envhelp &) = delete ;
 	envhelp &operator = (const envhelp &) = delete ;
@@ -69,8 +70,8 @@ struct envhelp : envhelp_head {
 	int envset(cchar *,cchar *,int) noex ;
 	int getvec(mainv *) noex ;
 	void dtor() noex ;
-	~envhelp() {
-	    dtor() ;
+	destruct envhelp() {
+	    if (elp) dtor() ;
 	} ;
 } ; /* end struct (envhelp) */
 #else	/* __cplusplus */
