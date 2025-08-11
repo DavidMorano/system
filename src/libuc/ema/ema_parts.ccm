@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* AS-String (parts) -- used within EMA */
+/* buffer parts -- used within EMA */
 /* version %I% last-modified %G% */
 
 
@@ -31,63 +31,215 @@ module ;
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usystem.h>
+#include	<buffer.h>		/* dynamically allocated buffer */
+#include	<localmisc.h>
+
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+#define	PARTS_MAGIC	0x92374562
 
 export module ema_parts ;
 
-import ema_asstr ;
+import libutil ;			/* |memclean(3u)| */
 
-using namespace::emaobj ;		/* namespace */
+cint		parts_magic = PARTS_MAGIC ;
+
+enum partsmems {
+	partsmem_len,
+	partsmem_getprev,
+	partsmem_finish,
+	partsmem_overlast
+} ; /* end enum (partsmems) */
 
 export {
-    namespace emaobj {
-        int	partsbegin(asstr *) noex ;
-        int	partslen(asstr *) noex ;
-        int	partsend(asstr *) noex ;
-    }
+    struct parts ;
+    struct parts_co {
+	parts		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (parts *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = -1) noex ;
+	operator int () noex {
+	    return operator () (-1) ;
+	} ;
+    } ; /* end struct (parts_co) */
+    struct parts {
+	friend		parts_co ;
+	parts_co	len ;
+	parts_co	getprev ;
+	parts_co	finish ;
+	buffer		*as ;
+	uint		magic ;
+	int		nbufs ;
+	parts() noex : as(nullptr), magic(0), nbufs(0) { 
+	    len		(this,partsmem_len) ;
+	    getprev	(this,partsmem_getprev) ;
+	    finish	(this,partsmem_finish) ;
+	} ;
+        int		start(int) noex ;
+	int		addchr(int,int) noex ;
+	int		get(int,ccharpp) noex ;
+	void dtor() noex ;
+	destruct parts() {
+	    if (magic) dtor() ;
+	} ;
+    private:
+	int bufalloc() noex ;
+	int bufstart() noex ;
+	int finbufs() noex ;
+	int ilen(int) noex ;
+	int igetprev(int) noex ;
+	int ifinish() noex ;
+    } ; /* end struct (parts) */
 } /* end export */
 
-namespace emaobj {
-    int partsbegin(asstr *asp) noex {
-	int		rs = SR_FAULT ;
-	if (asp) {
-	    rs = SR_OK ;
-	    for (int i = 0 ; (rs >= 0) && (i < si_overlast) ; i += 1) {
-	        rs = asstr_start(asp + i) ;
-	    }
-	} /* end if (non-null) */
+int parts::start(int n) noex {
+	int		rs = SR_INVALID ;
+	if (n > 0) {
+	    nbufs = n ;
+	    if ((rs = bufalloc()) >= 0) {
+		if ((rs = bufstart()) >= 0) {
+		    magic = PARTS_MAGIC ;
+		}
+	    } /* end if (bufalloc) */
+	} /* end if (valid) */
 	return rs ;
-    } /* end subroutine (partsbegin) */
-    int partslen(asstr *asp) noex {
-	int		rs = SR_FAULT ;
-	int		rs1 ;
+} /* end subroutine (parts_start) */
+
+int parts::addchr(int idx,int ch) noex {
+    	int		rs = SR_BUGCHECK ;
+	if (as) {
+	    rs = SR_INVALID ;
+	    if ((idx >= 0) && (idx < nbufs)) {
+	        rs = buffer_chr((as + idx),ch) ;
+	    }
+	}
+	return rs ;
+} /* end method (parts::addchr) */
+
+int parts::ilen(int idx) noex {
+	int		rs = SR_BUGCHECK ;
 	int		len = 0 ; /* return-value */
-	if (asp) {
-	    rs = SR_OK ;
-	    for (int i = 0 ; i < si_overlast ; i += 1) {
-	        asstr_backwhite(asp+i) ;
-	        rs1 = asstr_len(asp+i) ;
-	        if (rs1 >= 0) len += rs1 ;
-	    } /* end for */
-	} /* end if (non-null) */
+	if (as) {
+	    if (idx >= 0) {
+		rs = buffer_len(as + idx) ;
+		len = rs ;
+	    } else {
+		rs = SR_OK ;
+	        for (int i = 0 ; (rs >= SR_OK) && (i < nbufs) ; i += 1) {
+	            rs = buffer_len(as + i) ;
+		    len += rs ;
+	        } /* end for */
+	    } /* end if */
+	} /* end if */
 	return (rs >= 0) ? len : rs ;
-    } /* end subroutine (partslen) */
-    int partsend(asstr *asp) noex {
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	if (asp) {
-	    rs = SR_OK ;
-	    for (int i = 0 ; i < si_overlast ; i += 1) {
-	        rs1 = asstr_finish(asp + i) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
+} /* end method (parts::ilen) */
+
+int parts::igetprev(int idx) noex {
+	int		rs = SR_INVALID ;
+	if ((idx >= 0) && (idx < nbufs)) {
+	    rs = buffer_getprev(as + idx) ;
+	} /* end if (valid) */
+	return rs ;
+} /* end method (parts::igetprev) */
+
+int parts::get(int idx,ccharpp rpp) noex {
+    	int		rs = SR_FAULT ;
+	if (rpp) {
+    	    int		rs = SR_INVALID ;
+	    if ((idx >= 0) && (idx < nbufs)) {
+	        rs = buffer_get((as + idx),rpp) ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (partsend) */
-} /* end namespace (emaobj) */
+} /* end method (parts::get) */
+
+int parts::ifinish() noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	    if (as) {
+		{
+		    rs1 = finbufs() ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+		{
+		    rs1 = uc_free(as) ;
+		    if (rs >= 0) rs = rs1 ;
+		    as = nullptr ;
+		    nbufs = 0 ;
+		}
+	    } /* end if (as) */
+	    magic = 0 ;
+	return rs ;
+} /* end method (parts::ifinish) */
+
+int parts::bufalloc() noex {
+    	int		rs ;
+	int		sz = (nbufs * szof(buffer)) ;
+	if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	    as = (buffer *) vp ;
+	    memclear(as,sz) ;
+	} /* end if (memory */
+	return rs ;
+} /* end subroutine (parts_bufalloc) */
+
+int parts::bufstart() noex {
+    	int		rs = SR_BUGCHECK ;
+	if (as) {
+	    int		j{} ;
+	    rs = SR_OK ;
+	    for (int i = 0 ; (rs >= 0) && (i < nbufs) ; i += 1) {
+	        if ((rs = buffer_start((as + i),0)) >= 0) {
+		    j = i ;
+	        }
+	    } /* end for */
+	    if (rs < 0) {
+	        while (j >= 0) {
+		    buffer_finish(as + j--) ;
+	        }
+	    } /* end if (error) */
+	} /* end if */
+	return rs ;
+} /* end subroutine (parts::bufstart) */
+
+int parts::finbufs() noex {
+    	int		rs = SR_BUGCHECK ;
+	int		rs1 ;
+	    if (as) {
+		rs = SR_OK ;
+	        for (int i = 0 ; i < nbufs ; i += 1) {
+	            rs1 = buffer_finish(as + i) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end for */
+	    } /* end if (as) */
+	return rs ;
+} /* end subroutine (parts::finbufs) */
+
+void parts::dtor() noex {
+    	if (as) {
+	    (void) finish() ;
+	}
+} /* end method (parts::dtor) */
+
+int parts_co::operator () (int idx) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case partsmem_len:
+	        rs = op->ilen(idx) ;
+	        break ;
+	    case partsmem_getprev:
+	        rs = op->igetprev(idx) ;
+	        break ;
+	    case partsmem_finish:
+	        rs = op->ifinish() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (parts_co::operator) */
 
 
