@@ -93,7 +93,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
@@ -105,14 +105,14 @@
 #include	<ascii.h>
 #include	<baops.h>
 #include	<strop.h>
-#include	<char.h>
 #include	<mkchar.h>
+#include	<char.h>
 #include	<fieldterminit.hh>
 #include	<localmisc.h>
 
 #include	"field.h"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
