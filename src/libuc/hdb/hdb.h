@@ -104,6 +104,7 @@ struct hdb : hdb_head {
 	    delall(this,hdbmem_delall) ;
 	    audit(this,hdbmem_audit) ;
 	    finish(this,hdbmem_finish) ;
+	    htaddr = nullptr ;
 	} ;
 	hdb(const hdb &) = delete ;
 	hdb &operator = (const hdb &) = delete ;
@@ -123,8 +124,8 @@ struct hdb : hdb_head {
 	int curdone(hdb_cur *) noex ;
 	int delkey(hdb_dat) noex ;
 	void dtor() noex ;
-	~hdb() {
-	    dtor() ;
+	destruct hdb() {
+	    if (htaddr) dtor() ;
 	} ;
 } ; /* end struct (hdb) */
 #else	/* __cplusplus */
