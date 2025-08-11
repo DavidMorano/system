@@ -25,7 +25,7 @@
 	characters found.
 
 	Synopsis:
-	int hasuniq(char *bp,int bl) noex
+	int hasuniq(cchar *bp,int bl) noex
 
 	Arguments:
 	bp		string to test
@@ -38,12 +38,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>
 #include	<cstdlib>
 #include	<bitset>		/* |bitset(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -58,7 +59,6 @@
 
 /* local typedefs */
 
-using std::nullptr_t ;			/* type */
 using std::bitset ;			/* type */
 
 
@@ -76,7 +76,7 @@ using std::bitset ;			/* type */
 
 /* local variables */
 
-constexpr int		nchars = (UCHAR_MAX + 1) ;
+cint		nchars = (UCHAR_MAX + 1) ;
 
 
 /* exported variables */
@@ -84,16 +84,15 @@ constexpr int		nchars = (UCHAR_MAX + 1) ;
 
 /* exported subroutines */
 
-bool hasuniq(char *bp,int bl) noex {
+bool hasuniq(cchar *bp,int bl) noex {
     	bool		f = false ;
 	if (bp) {
 	    if (bl > 1) ylikely {
-	        bitset<nchars>	seen ;
-	        while (bl-- && *bp) {
+	        for (bitset<nchars> seen ; bl-- && *bp ; ) {
 	            cint	ch = mkchar(*bp++) ;
 		    if ((f = seen[ch])) break ;
 		    seen[ch] = true ;
-	        } /* end while */
+	        } /* end for */
 	    } /* end if */
 	} /* end if (non-null) */
 	return f ;
