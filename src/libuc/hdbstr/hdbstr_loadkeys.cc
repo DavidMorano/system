@@ -130,17 +130,14 @@ int hdbstr_loadkeys(hdbstr *op,cchar *fname) noex {
 
 static int hdbstr_load(hdbstr *op,char *lbuf,int llen,cchar *fn) noex {
 	cnullptr	np{} ;
-	ccfile		kf ; /* Key-File */
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = kf.open(fn)) >= 0) {
+	if (ccfile kf ; (rs = kf.open(fn)) >= 0) {
 	    while ((rs = kf.readln(lbuf,llen)) > 0) {
-	        field	fsb ;
-	        if ((rs = fsb.start(lbuf,rs)) >= 0) {
+	        if (field fsb ; (rs = fsb.start(lbuf,rs)) >= 0) {
 		    cchar	*fp{} ;
-		    int		fl ;
-	            while ((fl = fsb.get(fterms,&fp)) >= 0) {
+	            for (int fl ; (fl = fsb.get(fterms,&fp)) >= 0 ; ) {
 	                if (fl > 0) {
 	                    if ((rs = hdbstr_add(op,fp,fl,np,0)) >= 0) {
 			        c += 1 ;
@@ -148,14 +145,14 @@ static int hdbstr_load(hdbstr *op,char *lbuf,int llen,cchar *fn) noex {
 	                } /* end if (got one) */
 	                if (fsb.term == '#') break ;
 		        if (rs < 0) break ;
-	            } /* end while */
+	            } /* end for */
 	            rs1 = fsb.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (field) */
 	    } /* end while (reading lines) */
 	    rs1 = kf.close ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (bfile) */
+	} /* end if (ccfile) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (hdbstr_load) */
