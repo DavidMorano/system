@@ -129,7 +129,9 @@ int hdbstr_co::operator () (int a) noex {
 	if (op) {
 	    switch (w) {
 	    case hdbstrmem_start:
-	        rs = hdbstr_start(op,a) ;
+	        if ((rs = hdbstr_start(op,a)) >= 0) {
+		    op->fopen = true ;
+		}
 	        break ;
 	    case hdbstrmem_delall:
 	        rs = hdbstr_delall(op) ;
@@ -139,6 +141,7 @@ int hdbstr_co::operator () (int a) noex {
 	        break ;
 	    case hdbstrmem_finish:
 	        rs = hdbstr_finish(op) ;
+		op->fopen = false ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
