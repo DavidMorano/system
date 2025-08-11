@@ -52,20 +52,20 @@
 struct filer_flags {
 	uint		net:1 ;		/* network FD */
 	uint		write:1 ;	/* we are writing (otherwise reading) */
-} ;
+} ; /* end struct (filer_flags) */
 
 struct filer_head {
 	char		*dbuf ;		/* data-bufer pointer (constant) */
 	char		*bp ;		/* goes up with use */
 	off_t		off ;		/* virtual file pointer */
-	FILER_FL	f ;
+	FILER_FL	fl ;
 	uint		magic ;
 	int		fd ;		/* file-descriptor */
 	int		of ;		/* open-flags */
 	int		dt ;		/* file-type ("DT_XXX" values)*/
 	int		dlen ;		/* data-buffer length (constant) */
 	int		len ;		/* length of valid-data in buffer */
-} ;
+} ; /* end struct (filer_head) */
 
 #ifdef	__cplusplus
 enum filermems {
@@ -74,12 +74,13 @@ enum filermems {
 	filermem_flush,
 	filermem_adv,
 	filermem_poll,
+	filermem_lockend,
 	filermem_finish,
 	filermem_writeblanks,
 	filermem_writealign,
 	filermem_writezero,
 	filermem_overlast
-} ;
+} ; /* end enum (filermems) */
 struct filer ;
 struct filer_co {
 	filer		*op = nullptr ;
@@ -99,6 +100,7 @@ struct filer : filer_head {
 	filer_co	flush ;
 	filer_co	adv ;
 	filer_co	poll ;
+	filer_co	lockend ;
 	filer_co	finish ;
 	filer_co	writeblanks ;
 	filer_co	writealign ;
@@ -109,10 +111,12 @@ struct filer : filer_head {
 	    flush(this,filermem_flush) ;
 	    adv(this,filermem_adv) ;
 	    poll(this,filermem_poll) ;
+	    lockend(this,filermem_lockend) ;
 	    finish(this,filermem_finish) ;
 	    writeblanks(this,filermem_writeblanks) ;
 	    writealign(this,filermem_writealign) ;
 	    writezero(this,filermem_writezero) ;
+	    magic = 0 ;
 	} ;
 	filer(const filer &) = delete ;
 	filer &operator = (const filer &) = delete ;
@@ -130,9 +134,11 @@ struct filer : filer_head {
 	int tell(off_t *) noex ;
 	int writefill(cchar *,int) noex ;
 	int writefd(char *,int,int,int) noex ;
+	int stat(ustat *) noex ;
+	int lockbegin(int,int) noex ;
 	void dtor() noex ;
-	~filer() {
-	    dtor() ;
+	destruct filer() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (filer) */
 #else	/* __cplusplus */
@@ -161,6 +167,9 @@ extern int	filer_adv(filer *,int) noex ;
 extern int	filer_seek(filer *,off_t,int) noex ;
 extern int	filer_tell(filer *,off_t *) noex ;
 extern int	filer_poll(filer *,int) noex ;
+extern int	filer_stat(filer *,ustat *) noex ;
+extern int	filer_lockbegin(filer *,int,off_t,int) noex ;
+extern int	filer_lockend(filer *) noex ;
 extern int	filer_finish(filer *) noex ;
 
 extern int	filer_writeblanks(filer *,int) noex ;
