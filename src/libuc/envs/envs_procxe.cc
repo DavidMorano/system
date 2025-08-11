@@ -66,7 +66,6 @@
 #include	<expcook.h>
 #include	<vecstr.h>
 #include	<nulstr.h>
-#include	<bfile.h>
 #include	<field.h>
 #include	<fieldterms.h>
 #include	<ascii.h>
@@ -82,7 +81,11 @@
 
 #include	"envs.h"
 
-import libutil ;
+#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency	"mod/ucstream.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import ucstream ;
 
 /* local defines */
 
@@ -216,11 +219,10 @@ int subinfo::procer(cchar *fn) noex {
 	int		c = 0 ;
 	if ((rs = maxlinelen) >= 0) {
 	    cint	sz = ((rs + 1) * NLINES) ;
-	    if (char *lbuf{} ; (rs = uc_malloc((sz + 1),&lbuf)) > 0) {
+	    if (char *lbuf ; (rs = uc_malloc((sz + 1),&lbuf)) > 0) {
 		cint	llen = sz ;
-	        bfile	xefile, *xfp = &xefile ;
-	        if ((rs = bopen(xfp,fn,"r",0666)) >= 0) {
-	            while ((rs = breadlns(xfp,lbuf,llen,-1,np)) > 0) {
+	        if (ucstream ef ; (rs = ef.open(fn,"r")) >= 0) {
+	            while ((rs = ef.readlns(lbuf,llen,-1,np)) > 0) {
 	                cchar	*cp{} ;
 			if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
 			    c += 1 ;
@@ -228,7 +230,7 @@ int subinfo::procer(cchar *fn) noex {
 			}
 	        	if (rs < 0) break ;
 	    	    } /* end while (reading lines) */
-	    	    rs1 = bclose(xfp) ;
+	    	    rs1 = ef.close ;
 	    	    if (rs >= 0) rs = rs1 ;
 		} /* end if (file-open) */
 		rs1 = uc_free(lbuf) ;
@@ -475,7 +477,7 @@ int subinfo::vals(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *fbuf{} ; (rs = uc_malloc((flen+1),&fbuf)) >= 0) {
+	if (char *fbuf ; (rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	    if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
 	        int	c = 0 ;
 	        for (int fl ; (fl = fsb.sharg(vterms,fbuf,flen)) >= 0 ; ) {
