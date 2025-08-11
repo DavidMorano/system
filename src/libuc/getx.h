@@ -46,6 +46,7 @@
 #include	<getnodedomain.h>
 #include	<getnodeinfo.h>
 #include	<getnprocessors.h>
+#include	<getoflags.h>
 #include	<getourenv.h>
 #include	<getpassword.h>
 #include	<getportnum.h>
