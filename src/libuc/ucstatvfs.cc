@@ -17,15 +17,13 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/statvfs.h>
 #include	<sys/stat.h>
-#include	<sys/uio.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<poll.h>
 #include	<usystem.h>
 #include	<libmallocxx.h>
+#include	<mkx.h>			/* |mkpathexp(3uc)| */
 #include	<localmisc.h>
 
 
@@ -33,11 +31,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	mkvarpath(char *,cchar *,int) noex ;
-    extern int	hasvarpathprefix(cchar *,int) noex ;
-}
 
 
 /* external variables */
@@ -57,17 +50,17 @@ extern "C" {
 
 /* exported subroutines */
 
-int uc_statvfs(cchar *fname,USTATVFS *sbp) noex {
+int uc_statvfs(cchar *fname,ustatvfs *sbp) noex {
 	int		rs = SR_FAULT ;
 	if (fname && sbp) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-		if (char *efname ; (rs = libmalloc_mp(&efname)) >= 0) {
-	            if ((rs = mkvarpath(efname,fname,-1)) >= 0) {
-	                if (rs > 0) fname = efname ;
+		if (char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) {
+	            if ((rs = mkpathexp(ebuf,fname,-1)) >= 0) {
+	                if (rs > 0) fname = ebuf ;
 	                rs = u_statvfs(fname,sbp) ;
-	            } /* end if (mkvarpath) */
-		    rs = rslibfree(rs,efname) ;
+	            } /* end if (mkpathexp) */
+		    rs = rslibfree(rs,ebuf) ;
 		} /* end if (m-a-f) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
