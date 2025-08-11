@@ -21,8 +21,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<unistd.h>
+#include	<mkx.h>
 #include	<usystem.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -30,20 +34,16 @@
 
 /* external subroutines */
 
-extern int	mkexpandpath(char *,cchar *,int) ;
-extern int	mkuserpath(char *,cchar *,cchar *,int) ;
-
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnrchr(cchar *,int,int) ;
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int uc_link(cchar *ofname,cchar *nfname)
 {
@@ -58,7 +58,7 @@ int uc_link(cchar *ofname,cchar *nfname)
 	    int		ol = -1 ;
 	    char	*obuf = bp + ((plen+1)*0) ;
 	    char	*nbuf = bp + ((plen+1)*1) ;
-	    if ((rs = mkexpandpath(obuf,ofname,-1)) >= 0) {
+	    if ((rs = mkpathexp(obuf,ofname,-1)) >= 0) {
 		if (rs > 0) {
 		    ol = rs ;
 		    ofname = obuf ;
