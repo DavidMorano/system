@@ -29,7 +29,7 @@
 
 	Arguments:
 	dst		path to UNIX® domain socket to dial to
-	to		to ('>=0' mean use one, '-1' means don't)
+	to		to ('>=0' mean use one, '-1' means do not)
 	dot		any dial options
 
 	Returns:
