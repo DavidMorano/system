@@ -1,4 +1,4 @@
-/* uc_access */
+/* uc_access SUPPORT */
 /* charset=ISO8859-1 */
 
 /* interface component for UNIX® library-3c */
@@ -22,7 +22,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
+#include	<mkx.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -30,20 +34,19 @@
 
 /* external subroutines */
 
-extern int	mkexpandpath(char *,cchar *,int) ;
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int uc_access(cchar *fname,int am)
-{
-	const int	elen = MAXPATHLEN ;
+int uc_access(cchar *fname,int am) noex {
+	cint		elen = MAXPATHLEN ;
 	int		rs ;
 	char		*ebuf ;
 
 	if ((rs = uc_libmalloc((elen+1),&ebuf)) >= 0) {
-	    if ((rs = mkexpandpath(ebuf,fname,-1)) > 0) {
+	    if ((rs = mkpathexp(ebuf,fname,-1)) > 0) {
 		rs = u_access(ebuf,am) ;
 	    } else if (rs == 0) {
 		rs = u_access(fname,am) ;
