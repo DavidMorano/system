@@ -31,7 +31,7 @@
 	abuf		XTI address
 	alen		address of XTI address
 	svcbuf		service specification
-	to		to ('>=0' mean use one, '-1' means don't)
+	to		to ('>=0' mean use one, '-1' means do not)
 	dot
 
 	Returns:
