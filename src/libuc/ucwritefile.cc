@@ -38,8 +38,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>		/* |O_{xx}| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
