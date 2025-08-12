@@ -40,9 +40,7 @@
 
 /* imported namespaces */
 
-using namespace::ema_ns ;		/* namespace */
-using std::nullptr_t ;			/* type */
-using std::nothrow ;			/* constant */
+using namespace		ema_ns ;	/* |ema_starter()| */
 
 
 /* local typedefs */
