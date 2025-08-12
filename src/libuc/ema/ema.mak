@@ -31,13 +31,27 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= ema.h
+INCS += ema.h
 
 MODS += ema_asstr.ccm ema_entry.ccm ema_parts.ccm
 
-LIBS=
+LIBS +=
+
+
+DEPS_MAIN += ema_asstr.o ema_entry.o ema_parts.o
+
+OBJ0= ema_main.o ema_obj.o
+OBJ1= ema_parse.o ema_load.o
+OBJ2= ema_haveaddr.o ema_first.o
+
+OBJ3= $(DEPS_MAIN)
+
+OBJA= obj0.o obj1.o
+OBJB= obj2.o obj3.o
+
+OBJ_EMA= obja.o objb.o
 
 
 INCDIRS=
@@ -56,16 +70,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-DEPS_MAIN += ema_asstr.o ema_entry.o ema_parts.o
-
-OBJ0= ema_main.o ema_obj.o
-OBJ1= ema_haveaddr.o ema_first.o
-OBJ2= $(DEPS_MAIN)
-
-OBJ_EMA= obj0.o obj1.o obj2.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -78,6 +83,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -124,16 +132,35 @@ obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
 
 
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+
+
 ema_main.o:		ema_main.cc $(DEPS_MAIN)		$(INCS)
+ema_parse.o:		ema_parse.cc $(DEPS_MAIN)		$(INCS)
+ema_load.o:		ema_load.cc $(DEPS_MAIN)		$(INCS)
 ema_obj.o:		ema_obj.cc				$(INCS)
 ema_haveaddr.o:		ema_haveaddr.cc				$(INCS)
 ema_first.o:		ema_first.cc				$(INCS)
 
-ema_parts.o:		ema_parts.ccm ema_asstr.o		$(INCS)
-	makemodule ema_asstr
-	makemodule ema_parts
+# EMA_PARTS
+ema_parts.o:		ema_parts.ccm				$(INCS)
 
-ema_asstr.o:		ema_asstr.ccm				$(INCS)
+# EMA_ENTRY
 ema_entry.o:		ema_entry.ccm				$(INCS)
+
+# EMA_ASSTR
+ema_asstr.o:		ema_asstr0.o ema_asstr1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+ema_asstr0.o:		ema_asstr.ccm				$(INCS)
+	makemodule ema_asstr
+
+ema_asstr1.o:		ema_asstr1.cc				$(INCS)
+	makemodule ema_asstr
+	$(COMPILE.cc) $<
 
 
