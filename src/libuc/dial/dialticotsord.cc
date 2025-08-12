@@ -41,7 +41,7 @@
 	Arguments:
 	addr		XTI address
 	alen		address of XTI address
-	to		to ('>=0' mean use one, '-1' means don't)
+	to		to ('>=0' mean use one, '-1' means do not)
 	opts		any dial options
 
 	Returns:
