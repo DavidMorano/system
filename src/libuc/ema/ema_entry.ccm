@@ -48,11 +48,9 @@ export module ema_entry ;
 import libutil ;			/* |memclear(3u)| */
 
 export {
-    namespace emaobj {
         int	entry_start(ema_ent *) noex ;
         int	entry_finish(ema_ent *) noex ;
         int	entry_startload(ema_ent *,ema_ent *) noex ;
-    }
 } /* end export */
 
 
@@ -87,8 +85,6 @@ typedef ema_ent	*	entp ;
 
 
 /* exported subroutines */
-
-namespace emaobj {
 
    int entry_start(ema_ent *ep) noex {
 	int		rs = SR_FAULT ;
@@ -176,8 +172,6 @@ namespace emaobj {
 	} /* end if (non-nullptr) */
 	return rs ;
     } /* end subroutine (entry_startload) */
-
-} /* end namespace (emaobj) */
 
 #if	COMMENT
 static int entry_debugprint(ema_ent *ep,cchar *s) noex {
