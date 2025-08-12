@@ -40,13 +40,48 @@ MODS +=
 LIBS=
 
 
+OBJ00_MKX= mkaddrname.o mkaddrdisp.o mkaddrbest.o mkaddrfrom.o
+OBJ01_MKX= mkaltext.o
+OBJ02_MKX= mkcexsync.o 
+OBJ03_MKX= mkbasename.o
+OBJ04_MKX= mkdisplayable.o
+OBJ05_MKX= mkfdfname.o mkfingerquery.o 
+OBJ06_MKX= mkfmtphone.o mkfname.o mkfnamesuf.o
+OBJ07_MKX= mkgecosname.o
+OBJ08_MKX= mkintfname.o mkmagic.o
+OBJ09_MKX= mkmaildirtest.o mkmailname.o mkmid.o
+OBJ10_MKX= mknoise.o mknpathx.o mknpathxw.o
+OBJ11_MKX= mkonefrom.o mkpathx.o mkpathxw.o
+OBJ12_MKX= mkquoted.o
+OBJ13_MKX= mkrealname.o
+OBJ14_MKX= mkshlibname.o mkshmname.o mksofname.o mkunique.o
+OBJ15_MKX= mktagfname.o
+OBJ16_MKX= mkufname.o
+OBJ17_MKX= mkutmpid.o
+OBJ18_MKX= mkuuid.o 
+OBJ19_MKX= mkpr.o mkxdisp.o
+
+OBJ20_MKX= mkpathrooted.o 
+OBJ21_MKX= mkpathuser.o mkpathcd.o
+OBJ22_MKX= mkpathexp.o
+OBJ23_MKX= mkpathmulti.o
+
+OBJA_MKX= obj00.o obj01.o obj02.o obj03.o
+OBJB_MKX= obj04.o obj05.o obj06.o obj07.o
+OBJC_MKX= obj08.o obj09.o obj10.o obj11.o
+OBJD_MKX= obj12.o obj13.o obj14.o obj15.o
+OBJE_MKX= obj16.o obj17.o obj18.o obj19.o
+OBJF_MKX= obj20.o obj21.o obj22.o obj23.o
+
+OBJ_MKX= obja.o objb.o objc.o objd.o obje.o objf.o
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,48 +92,22 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ00_MKX= mkaddrname.o mkaddrdisp.o mkaddrbest.o mkaddrfrom.o
-OBJ01_MKX= mkaltext.o
-OBJ02_MKX= mkcdpath.o mkcexsync.o 
-OBJ03_MKX= mkbasename.o
-OBJ04_MKX= mkdisplayable.o
-OBJ05_MKX= mkexpandpath.o mkfdfname.o mkfingerquery.o 
-OBJ06_MKX= mkfmtphone.o mkfname.o mkfnamesuf.o
-OBJ07_MKX= mkgecosname.o
-OBJ08_MKX= mkintfname.o mkmagic.o
-OBJ09_MKX= mkmaildirtest.o mkmailname.o mkmid.o
-OBJ10_MKX= mknoise.o mknpathx.o mknpathxw.o
-OBJ11_MKX= mkonefrom.o mkpathrooted.o mkpathx.o mkpathxw.o
-OBJ12_MKX= mkquoted.o
-OBJ13_MKX= mkrealname.o
-OBJ14_MKX= mkshlibname.o mkshmname.o mksofname.o mkunique.o
-OBJ15_MKX= mktagfname.o
-OBJ16_MKX= mkufname.o
-OBJ17_MKX= mkuserpath.o mkutmpid.o
-OBJ18_MKX= mkuuid.o mkvarpath.o
-OBJ19_MKX= mkpr.o mkxdisp.o
-
-OBJA_MKX= obj00_mkx.o obj01_mkx.o obj02_mkx.o obj03_mkx.o
-OBJB_MKX= obj04_mkx.o obj05_mkx.o obj06_mkx.o obj07_mkx.o
-OBJC_MKX= obj08_mkx.o obj09_mkx.o obj10_mkx.o obj11_mkx.o
-OBJD_MKX= obj12_mkx.o obj13_mkx.o obj14_mkx.o obj15_mkx.o
-OBJE_MKX= obj16_mkx.o obj17_mkx.o obj18_mkx.o obj19_mkx.o
-
-OBJ_MKX= obja_mkx.o objb_mkx.o objc_mkx.o objd_mkx.o obje_mkx.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
 
 all:			$(ALL)
 
+
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -140,86 +149,107 @@ control:
 	(uname -n ; date) > Control
 
 
-obj00_mkx.o:	$(OBJ00_MKX)
+obj00.o:	$(OBJ00_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ00_MKX)
 
-obj01_mkx.o:	$(OBJ01_MKX)
+obj01.o:	$(OBJ01_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ01_MKX)
 
-obj02_mkx.o:	$(OBJ02_MKX)
+obj02.o:	$(OBJ02_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ02_MKX)
 
-obj03_mkx.o:	$(OBJ03_MKX)
+obj03.o:	$(OBJ03_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ03_MKX)
 
-obj04_mkx.o:	$(OBJ04_MKX)
+obj04.o:	$(OBJ04_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ04_MKX)
 
-obj05_mkx.o:	$(OBJ05_MKX)
+obj05.o:	$(OBJ05_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ05_MKX)
 
-obj06_mkx.o:	$(OBJ06_MKX)
+obj06.o:	$(OBJ06_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ06_MKX)
 
-obj07_mkx.o:	$(OBJ07_MKX)
+obj07.o:	$(OBJ07_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ07_MKX)
 
-obj08_mkx.o:	$(OBJ08_MKX)
+obj08.o:	$(OBJ08_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ08_MKX)
 
-obj09_mkx.o:	$(OBJ09_MKX)
+obj09.o:	$(OBJ09_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ09_MKX)
 
-obj10_mkx.o:	$(OBJ10_MKX)
+obj10.o:	$(OBJ10_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ10_MKX)
 
-obj11_mkx.o:	$(OBJ11_MKX)
+obj11.o:	$(OBJ11_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ11_MKX)
 
-obj12_mkx.o:	$(OBJ12_MKX)
+obj12.o:	$(OBJ12_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ12_MKX)
 
-obj13_mkx.o:	$(OBJ13_MKX)
+obj13.o:	$(OBJ13_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ13_MKX)
 
-obj14_mkx.o:	$(OBJ14_MKX)
+obj14.o:	$(OBJ14_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ14_MKX)
 
-obj15_mkx.o:	$(OBJ15_MKX)
+obj15.o:	$(OBJ15_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ15_MKX)
 
-obj16_mkx.o:	$(OBJ16_MKX)
+obj16.o:	$(OBJ16_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ16_MKX)
 
-obj17_mkx.o:	$(OBJ17_MKX)
+obj17.o:	$(OBJ17_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ17_MKX)
 
-obj18_mkx.o:	$(OBJ18_MKX)
+obj18.o:	$(OBJ18_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ18_MKX)
 
-obj19_mkx.o:	$(OBJ19_MKX)
+obj19.o:	$(OBJ19_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ19_MKX)
 
 
-obja_mkx.o:	$(OBJA_MKX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MKX)
+obj20.o:		$(OBJ20_MKX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objb_mkx.o:	$(OBJB_MKX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_MKX)
+obj21.o:		$(OBJ21_MKX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objc_mkx.o:	$(OBJC_MKX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_MKX)
+obj22.o:		$(OBJ22_MKX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objd_mkx.o:	$(OBJD_MKX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJD_MKX)
-
-obje_mkx.o:	$(OBJE_MKX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJE_MKX)
+obj23.o:		$(OBJ23_MKX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-mkpathrooted.o:		mkpathrooted.cc	mkpath.h	$(INCS)
+obja.o:			$(OBJA_MKX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB_MKX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objc.o:			$(OBJC_MKX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd.o:			$(OBJD_MKX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obje.o:			$(OBJE_MKX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objf.o:			$(OBJF_MKX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 mkpathx.o:		mkpathx.cc	mkpath.h	$(INCS)
 mkpathxw.o:		mkpathxw.cc	mkpath.h	$(INCS)
+
+mkpathrooted.o:		mkpathrooted.cc	mkpath.h	$(INCS)
+mkpathuser.o:		mkpathuser.cc			$(INCS)
+mkpathcd.o:		mkpathcd.cc			$(INCS)
+mkpathexp.o:		mkpathexp.cc			$(INCS)
+mkpathmulti.o:		mkpathmulti.cc			$(INCS)
 
 mknpathx.o:		mknpathx.cc	mknpath.h	$(INCS)
 mknpathxw.o:		mknpathxw.cc	mknpath.h	$(INCS)
@@ -241,9 +271,6 @@ mkintfname.o:		mkintfname.cc		$(INCS)
 mkufname.o:		mkufname.cc		$(INCS)
 
 mkonefrom.o:		mkonefrom.cc		$(INCS)
-mkcdpath.o:		mkcdpath.cc		$(INCS)
-mkuserpath.o:		mkuserpath.cc		$(INCS)
-mkvarpath.o:		mkvarpath.cc		$(INCS)
 
 mkaltext.o:		mkaltext.cc				$(INCS)
 mkmaildirtest.o:	mkmaildirtest.cc			$(INCS)
@@ -252,7 +279,11 @@ mkfmtphone.o:		mkfmtphone.cc				$(INCS)
 mkfingerquery.o:	mkfingerquery.cc			$(INCS)
 mklinelcean.o:		mklineclean.cc	mklineclean.h		$(INCS)
 
-mkpr.o:			mkpr.cc mkpr.h				$(INCS)
+mkpr.o:			mkpr.cc		mkpr.h			$(INCS)
 mkxdisp.o:		mkxdisp.cc	mkxdisp.h		$(INCS)
 
+# depracated
+mkcdpath.o:		mkcdpath.cc		$(INCS)
+mkuserpath.o:		mkuserpath.cc		$(INCS)
+mkexpandpath.o:		mkexpandpath.cc		$(INCS)
 
