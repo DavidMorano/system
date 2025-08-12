@@ -979,6 +979,11 @@ mnw.o:			mnw.dir
 mnw.dir:
 	makesubdir $@
 
+# UCFILEOP
+ucfileop.o:		ucfileop.dir
+ucfileop.dir:
+	makesubdir $@
+
 # UCSTREAM
 ucstream.o:		ucstream.dir
 ucstream.dir:
