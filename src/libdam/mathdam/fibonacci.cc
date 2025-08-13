@@ -121,7 +121,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cmath>			/* |floor(3m++)| | |sqrt(3c++)| */
+#include	<cmath>			/* |floor(3m++)| + |sqrt(3c++)| */
 #include	<numbers>		/* C++20 math constants */
 #include	<clanguage.h>
 #include	<utypedefs.h>
