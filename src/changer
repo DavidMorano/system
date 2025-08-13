@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} don aren "
+NAMES="${NAMES} mkexpandpath "
 
 DN=/dev/null
 
@@ -11,8 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/don't/s//do not/g
-g/aren't/s//are not/g
+g/mkexpandpath/s//mkpathexp/g
 	w
 	q
 EOF
