@@ -41,7 +41,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
@@ -78,10 +77,6 @@ using std::max ;			/* subroutine-template */
 
 
 /* external subroutines */
-
-extern "C" {
-    int mkpathuser(char *,cchar *,cchar *,int) noex ;
-}
 
 
 /* external variables */
@@ -196,7 +191,8 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
 	    cchar	*un = up ;
 	    char	ubuf[ulen+1] ;		/* <- VLA */
 	    if (ul >= 0) {
-	        rs = intconv(strwcpy(ubuf,up,min(ul,ulen)) - ubuf) ;
+		cint mul = min(ul,ulen) ;
+	        rs = intconv(strwcpy(ubuf,up,mul) - ubuf) ;
 	        un = ubuf ;
 	    }
 	    if (rs >= 0) ylikely {
