@@ -29,7 +29,7 @@
 
 	Arguments:
 	fname		path to UNIX® domain socket to dial to
-	timeout		timeout ('>=0' mean use one, '-1' means don't)
+	timeout		timeout ('>=0' mean use one, '-1' means do not)
 	opts		any dial opts
 
 	Returns:
