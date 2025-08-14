@@ -28,12 +28,10 @@
 
 
 #define	PREFIXFN		struct prefixfn_head
-#define	PREFIXFN_SHORTLEN	128	/* "string length optimization" */
 
 
 struct prefixfn_head {
 	cchar		*as ;	/* allocated string */
-	char		buf[PREFIXFN_SHORTLEN+1] ;
 } ;
 
 #ifdef	__cplusplus
@@ -58,6 +56,7 @@ struct prefixfn : prefixfn_head {
 	prefixfn_co	finish ;
 	prefixfn() noex {
 	    finish(this,prefixfnmem_finish) ;
+	    as = nullptr ;
 	} ;
 	prefixfn(const prefixfn &) = delete ;
 	prefixfn &operator = (const prefixfn &) = delete ;
