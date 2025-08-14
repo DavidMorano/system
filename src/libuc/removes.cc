@@ -60,6 +60,7 @@
 #include	<mkpathx.h>
 #include	<mkx.h>
 #include	<pathadd.h>
+#include	<prefixfn.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 
@@ -115,14 +116,20 @@ namespace {
 
 int removes(cchar *tardname) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		rv = 0 ; /* return-value */
 	if (tardname) ylikely {
-	    rs = SR_INVALID ;
-	    if (tardname[0]) ylikely {
-		mgr ro(tardname) ;
-		rs = ro ;
-	    } /* end if (valid) */
+	    cchar *fn ;
+	    if (prefixfn pf ; (rs = pf.start(tardname,-1,&fn)) > 0) {
+		{
+		    mgr ro(fn) ;
+		    rs = ro ;
+		}
+		rs1 = pf.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (prefixfn) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (removes) */
 
