@@ -29,16 +29,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<ctime>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<netdb.h>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<vecobj.h>
@@ -53,28 +50,27 @@
 
 /* local defines */
 
-#define	CLUSTERDB_MAGIC		0x31835926
-#define	CLUSTERDB_MINCHECKTIME	5	/* file check interval (seconds) */
-#define	CLUSTERDB_CHECKTIME	60	/* file check interval (seconds) */
-#define	CLUSTERDB_CHANGETIME	3	/* wait change interval (seconds) */
-#define	CLUSTERDB_DEFNETGROUP	"DEFAULT"
+#define	CD_MAGIC	0x31835926
+#define	CD_INTCKMIN	5		/* file check interval (seconds) */
+#define	CD_INTCK	60		/* file check interval (seconds) */
+#define	CD_INTCHG	3		/* wait change interval (seconds) */
+#define	CD_DEFNETGRP	"DEFAULT"
 
-#define	CLUSTERDB_FILE		struct clusterdb_file
-#define	CLUSTERDB_KEYNAME	struct clusterdb_keyname
+#define	CD		clusterdb
+#define	CD_CUR		clusterdb_cur
+#define	CD_FILE		clusterdb_file
+#define	CD_KEYNAME	clusterdb_keyname
 
-#define	CLUSTERDB_KA		sizeof(char *(*)[2])
-#define	CLUSTERDB_BO(v)		\
-	((CLUSTERDB_KA - ((v) % CLUSTERDB_KA)) % CLUSTERDB_KA)
+#define	CD_KA		szof(char *(*)[2])
+#define	CD_BO(v)		\
+	((CD_KA - ((v) % CLUSTERDB_KA)) % CLUSTERDB_KA)
 
-#define	KEYALIGNMENT		sizeof(char *(*)[2])
+#define	KEYALIGNMENT	szof(char *(*)[2])
 
-#define	CD			clusterdb
-#define	CD_CUR			clusterdb_cur
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -104,7 +100,9 @@ struct clusterdb_keyname {
 
 struct clusterdb_ie {
 	cchar		*(*keys)[2] ;
-	cchar		*svc, *clu, *sys ;
+	cchar		*svc ;
+	cchar		*clu ;
+	cchar		*sys ;
 	int		nkeys ;			/* number of keys */
 	int		fsize ;			/* total size */
 	int		fi ;			/* file index */
@@ -128,10 +126,10 @@ struct svcentry_key {
 /* forward references */
 
 template<typename ... Args>
-static int clusterdb_ctor(clusterdb *op,Args ... args) noex {
+local int clusterdb_ctor(clusterdb *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if ((op->ctp = new(nothrow) kvsfile) != np) {
@@ -142,7 +140,7 @@ static int clusterdb_ctor(clusterdb *op,Args ... args) noex {
 }
 /* end subroutine (clusterdb_ctor) */
 
-static int clusterdb_dtor(clusterdb *op) noex {
+local int clusterdb_dtor(clusterdb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -156,10 +154,10 @@ static int clusterdb_dtor(clusterdb *op) noex {
 /* end subroutine (clusterdb_dtor) */
 
 template<typename ... Args>
-static int clusterdb_magic(clusterdb *op,Args ... args) noex {
+local int clusterdb_magic(clusterdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == CLUSTERDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == CD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -179,14 +177,14 @@ int clusterdb_open(clusterdb *op,cchar *fname) noex {
 	if ((rs = clusterdb_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        if (USTAT sb ; (rs = u_stat(fname,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
 		    csize	fsz = size_t(sb.st_size) ;
 		    int		ne ;
 		    {
 		        cint	isz = intsat(fsz / 4) ;
 	                ne = max(isz,10) ;
 	                if ((rs = kvsfile_open(op->ctp,ne,fname)) >= 0) {
-	                    op->magic = CLUSTERDB_MAGIC ;
+	                    op->magic = CD_MAGIC ;
 	                }
 		    } /* end block */
 	        } /* end if (stat) */
@@ -233,7 +231,7 @@ int clusterdb_curbegin(CD *op,CD_CUR *curp) noex {
 	int		rs ;
 	int		rsc = 0 ;
 	if ((rs = clusterdb_magic(op,curp)) >= 0) {
-	    cint	kcurlen = sizeof(kvsfile_cur) ;
+	    cint	kcurlen = szof(kvsfile_cur) ;
 	    void	*vp{} ;
 	    if ((rs = uc_malloc(kcurlen,&vp)) >= 0) {
 		curp->kcurp = (kvsfile_cur *) vp ;
@@ -283,7 +281,7 @@ int clusterdb_curenum(CD *op,CD_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	if ((rs = clusterdb_magic(op,curp,kbuf,vbuf)) >= 0) {
-	    kvsfile_cur		*kcp = (curp) ? curp->kcurp : nullptr ;
+	    kvsfile_cur	*kcp = (curp) ? curp->kcurp : nullptr ;
 	    rs = kvsfile_curenum(op->ctp,kcp,kbuf,klen,vbuf,vlen) ;
 	} /* end if (magic) */
 	return rs ;
@@ -337,7 +335,7 @@ namespace {
 	} ;
 	operator int () noex ;
     } ; /* end struct (fetcher) */
-}
+} /* end namespace */
 
 int clusterdb_curfetchrev(CD *op,cc *nn,CD_CUR *curp,char *kbuf,int klen) noex {
 	int		rs ;
@@ -346,8 +344,7 @@ int clusterdb_curfetchrev(CD *op,cc *nn,CD_CUR *curp,char *kbuf,int klen) noex {
 	if ((rs = clusterdb_magic(op,nn,kbuf)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (nn[0]) {
-		fetcher		fo(op,curp,nn,kbuf,klen) ;
-		if ((rs = fo.start()) >= 0) {
+		if (fetcher fo(op,curp,nn,kbuf,klen) ; (rs = fo.start()) >= 0) {
 		    {
 		        rs = fo ;
 			kl = rs ;
@@ -367,9 +364,9 @@ fetcher::operator int () noex {
 	cint		nrs = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f_match = false ;
 	if (curp != nullptr) {
 	    kvsfile_cur		*kcp = curp->kcurp ;
+	    bool		f_match = false ;
 	    while ((rs = kvsfile_curenumkey(kop,kcp,kbuf,klen)) >= 0) {
 	        if ((rs = kvsfile_curbegin(kop,&vcur)) >= 0) {
 	            while (rs >= 0) {
