@@ -33,7 +33,7 @@
 	hn		host to dial to
 	ps		port specification to use
 	af		address family
-	to		to ('>0' means use one, '-1' means don't)
+	to		to ('>0' means use one, '-1' means do not)
 	opts		any dial options
 
 	Returns:
