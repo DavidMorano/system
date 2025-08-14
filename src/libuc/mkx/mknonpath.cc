@@ -87,7 +87,7 @@ int mknonpath(char *rbuf,int rlen,cchar *sp,int sl) noex {
 	if (rbuf && sp) ylikely {
 	    rs = SR_INVALID ;
 	    if (sp[0]) ylikely {
-
+		rs = 0 ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
