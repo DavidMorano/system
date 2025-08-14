@@ -36,7 +36,7 @@
 	af		address family
 	svc		service specification
 	sargs		pointer to array of pointers to arguments
-	to		to ('>0' means use one, '-1' means don't)
+	to		to ('>0' means use one, '-1' means do not)
 	opts		any dial options
 
 	Returns:
