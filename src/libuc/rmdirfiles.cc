@@ -57,6 +57,7 @@
 #include	<vecstr.h>
 #include	<mkpathx.h>
 #include	<pathadd.h>
+#include	<prefixfn.h>
 #include	<nleadstr.h>
 #include	<hasx.h>
 #include	<isnot.h>
@@ -101,13 +102,13 @@ static int	premat(cchar *,int,cchar *,int) noex ;
 
 /* exported subroutines */
 
-int rmdirfiles(cchar *dn,cchar *pre,int to) noex {
+int rmdirfiles(cchar *dname,cchar *pre,int to) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (dn) {
-	    rs = SR_INVALID ;
-	    if (dn[0]) {
+	if (dname) {
+	    cchar *dn ;
+	    if (prefixfn pf ; (rs = pf.start(dname,-1,&dn)) > 0) {
 	        if (vecstr fs ; (rs = fs.start(0,0)) >= 0) {
 	            if ((rs = vecstr_load(&fs,dn,pre,to)) > 0) {
 	                rs = vecstr_dirfilesdelete(&fs) ;
@@ -116,7 +117,9 @@ int rmdirfiles(cchar *dn,cchar *pre,int to) noex {
 	            rs1 = fs.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (files) */
-	    } /* end if (valid) */
+		rs1 = pf.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (prefixfn) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -145,7 +148,7 @@ static int vecstr_load(vecstr *flp,cchar *dn,cchar *pre,int to) noex {
 	                    if (hasNotDots(sp,sl)) {
 	                        if (premat(pre,prelen,sp,sl)) {
 	                            if ((rs = pathadd(rbuf,rl,sp)) >= 0) {
-	            		        USTAT	usb ;
+	            		        ustat	usb ;
 	                                cint	ql = rs ;
 	                                if ((rs = u_stat(rbuf,&usb)) >= 0) {
 	                                    const time_t ft = usb.st_mtime ;
