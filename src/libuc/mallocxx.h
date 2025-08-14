@@ -63,6 +63,13 @@ extern int malloc_zn(char **) noex ;		/* ZN time-zone-name abbr */
 extern int malloc_zi(char **) noex ;		/* ZI zone-info name */
 extern int malloc_mailaddr(char **) noex ;	/* MA mail address */
 
+local inline int malloc_strw(cchar *sp,int sl,cchar **rpp) noex {
+    	return uc_mallocstrw(sp,sl,rpp) ;
+}
+local inline int malloc_free(void *p) noex {
+    	return uc_libfree(p) ;
+}
+
 EXTERNC_end
 
 
