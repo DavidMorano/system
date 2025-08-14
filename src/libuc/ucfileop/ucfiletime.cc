@@ -28,7 +28,6 @@
 	Synopsis:
 	int uc_utime(cchar *fname,CUTIMBUF *utp) noex
 	int uc_utimes(cchar *fname,CTIMEVAL *utp) noex
-	This is the middleware version of |u_utime(3u)|.
 
 	Arguments:
 	fname		file-name
