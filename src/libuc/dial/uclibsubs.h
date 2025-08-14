@@ -89,6 +89,9 @@
 #include	<ucsig.h>
 #include	<uclock.h>
 #include	<ucgetx.h>
+#include	<uckvamatch.h>
+#include	<ucwrite.h>
+#include	<ucfileop.h>
 
 #include	<getxname.h>
 #include	<getexecname.h>
@@ -142,7 +145,6 @@ extern int	uc_readlink(cchar *,char *,int) noex ;
 extern int	uc_chmod(cchar *,mode_t) noex ;
 extern int	uc_chown(cchar *,uid_t,gid_t) noex ;
 extern int	uc_rename(cchar *,cchar *) noex ;
-extern int	uc_utime(cchar *,const UTIMBUF *) noex ;
 extern int	uc_realpath(cchar *,char *) noex ;
 extern int	uc_resolvepath(cchar *,char *,int) noex ;
 extern int	uc_truncate(cchar *,off_t) noex ;
@@ -182,12 +184,6 @@ extern int	uc_read(int,void *,int) noex ;
 extern int	uc_readn(int,void *,int) noex ;
 extern int	uc_readline(int,char *,int) noex ;
 extern int	uc_readlinetimed(int,char *,int,int) noex ;
-
-extern int	uc_writeto(int,cvoid *,int,int) noex ;
-extern int	uc_write(int,cvoid *,int) noex ;
-extern int	uc_writen(int,cvoid *,int) noex ;
-extern int	uc_writedesc(int,int,int) noex ;
-extern int	uc_writefile(int,cchar *) noex ;
 
 extern int	uc_reade(int,void *,int,int,int) noex ;
 extern int	uc_recve(int,void *,int,int,int,int) noex ;
@@ -258,7 +254,6 @@ extern int uc_addrinfoget(cchar *,cchar *,const ADDRINFO *,ADDRINFO **) noex ;
 extern int uc_addrinfofree(ADDRINFO *) noex ;
 
 /* miscellaneous */
-extern int	uc_kvamatch(kva_t *,cchar *,cchar **) noex ;
 extern int	uc_strtod(cchar *,char **,double *) noex ;
 
 EXTERNC_end
