@@ -1,4 +1,4 @@
-/* getoflagsSUPPORT */
+/* getoflags SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -100,9 +100,10 @@ int getoflags(cchar *os) noex {
 		    of |= O_APPEND ;
 	            break ;
 	        case 'a':
+	            am.wr = true ;
 	            of |= O_APPEND ;
 	            break ;
-	        case 'b': /* POSIX "binary" mode -- nothing on real UNIXes® */
+	        case 'b': /* POSIX® "binary" mode -- nothing on real UNIXes® */
 	            break ;
 	        case 'c':
 	            of |= O_CREAT ;
@@ -120,7 +121,7 @@ int getoflags(cchar *os) noex {
 	            of |= O_EXCL ;
 		    break ;
 	        case 'F':
-		    of |= O_MINFD ;		/* minimum-file-descriptor */
+		    of |= O_MINFD ;	/* minimum-file-descriptor */
 		    break ;
 	        case 'N':
 	            of |= O_NETWORK ;	/* "network" file */
