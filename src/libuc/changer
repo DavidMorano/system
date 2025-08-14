@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} snkeval "
+NAMES="${NAMES} mkexpandpath "
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/snkeval/s//snkeyval/g
+g/mkexpandpath/s//mkpathexp/g
 	w
 	q
 EOF
