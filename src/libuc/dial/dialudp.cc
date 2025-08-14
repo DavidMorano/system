@@ -32,7 +32,7 @@
 	hostname	host to dial to
 	portspec	port specification to use
 	af		address family
-	to		to ('>=0' mean use one, '-1' means don't)
+	to		to ('>=0' mean use one, '-1' means do not)
 	opts		any dial options
 
 	Returns:
