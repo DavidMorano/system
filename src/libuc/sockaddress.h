@@ -80,6 +80,7 @@ struct sockaddress_head {
 enum sockaddressmems {
 	sockaddressmem_getaf,
 	sockaddressmem_len,
+	sockaddressmem_addrlen,
 	sockaddressmem_finish,
 	sockaddressmem_overlast
 } ;
@@ -99,10 +100,12 @@ struct sockaddress_co {
 struct sockaddress : sockaddress_head {
 	sockaddress_co	getaf ;
 	sockaddress_co	len ;
+	sockaddress_co	addrlen ;
 	sockaddress_co	finish ;
 	sockaddress() noex {
 	    getaf	(this,sockaddressmem_getaf) ;
 	    len		(this,sockaddressmem_len) ;
+	    addrlen	(this,sockaddressmem_addrlen) ;
 	    finish	(this,sockaddressmem_finish) ;
 	} ;
 	sockaddress(const sockaddress &) noex ;
