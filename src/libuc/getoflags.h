@@ -20,12 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>		/* |UCHAR_MAX| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<char.h>		/* |CHAR_{xx}(3uc)| */
+#include	<usysrets.h>
 
 
 EXTERNC_begin
