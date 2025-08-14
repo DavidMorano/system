@@ -62,7 +62,7 @@ OBJ18_MKX= mkuuid.o
 OBJ19_MKX= mkpr.o mkxdisp.o
 
 OBJ20_MKX= mkpathrooted.o 
-OBJ21_MKX= mkpathuser.o mkpathcd.o
+OBJ21_MKX= mkpathuser.o mkpathvar.o
 OBJ22_MKX= mkpathexp.o
 OBJ23_MKX= mkpathmulti.o
 
@@ -247,7 +247,7 @@ mkpathxw.o:		mkpathxw.cc	mkpath.h	$(INCS)
 
 mkpathrooted.o:		mkpathrooted.cc	mkpath.h	$(INCS)
 mkpathuser.o:		mkpathuser.cc			$(INCS)
-mkpathcd.o:		mkpathcd.cc			$(INCS)
+mkpathvar.o:		mkpathvar.cc			$(INCS)
 mkpathexp.o:		mkpathexp.cc			$(INCS)
 mkpathmulti.o:		mkpathmulti.cc			$(INCS)
 
