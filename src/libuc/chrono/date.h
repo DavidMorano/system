@@ -25,7 +25,7 @@ struct date_head {
 	time_t		time ;			/* UNIX® time */
 	short		zoff ;			/* minutes west of GMT */
 	short		isdst ;			/* is-daylight-savings time */
-} ;
+} ; /* end struct (date_head) */
 
 #ifdef	__cplusplus
 enum datemems {
@@ -49,6 +49,7 @@ struct date : date_head {
 	date_co	finish ;
 	date() noex {
 	    finish(this,datemem_finish) ;
+	    zname = nullptr ;
 	} ;
 	date(const date &) = delete ;
 	date &operator = (const date &) = delete ;
@@ -60,8 +61,8 @@ struct date : date_head {
 	int getisdst(int *) noex ;
 	int getzname(char *,int) noex ;
 	void dtor() noex ;
-	~date() {
-	    dtor() ;
+	destruct date() {
+	    if (zname) dtor() ;
 	} ;
 } ; /* end struct (date) */
 #else	/* __cplusplus */
