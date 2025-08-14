@@ -33,7 +33,7 @@
 	ps		port specification to use
 	af		address family
 	svc		service specification
-	to		to ('>0' means use one, '-1' means don't)
+	to		to ('>0' means use one, '-1' means do not)
 	dot		any dial options
 
 	Returns:
