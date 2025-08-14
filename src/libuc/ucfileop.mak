@@ -42,15 +42,15 @@ LIBS +=
 
 OBJ0= prefixfn.o
 OBJ1= ucchown.o ucfiletime.o
-OBJ2= uclstat.o ucpathconf.o
+OBJ2= uclink.o uclstat.o ucpathconf.o
 OBJ3= ucreadlink.o ucstat.o
-OBJ4= ucstatvfs.o
-OBJ5=
-OBJ6=
-OBJ7=
+OBJ4= ucstatvfs.o ucaccess.o
+OBJ5= ucresolvepath.o ucrealpath.o
+OBJ6= ucunlink.o ucremove.o
+OBJ7= ucmkdir.o ucrmdir.o ucfilemode.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o 
-OBJB= obj4.o 
+OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= obja.o objb.o
 
@@ -154,12 +154,20 @@ objb.o:			$(OBJB)
 
 prefixfn.o:		prefixfn.cc prefixfn.h			$(INCS)
 
+ucaccess.o:		ucaccess.cc				$(INCS)
 ucchown.o:		ucchown.cc				$(INCS)
+ucfilemode.o:		ucfilemode.cc				$(INCS)
 ucfiletime.o:		ucfiletime.cc				$(INCS)
+uclink.o:		uclink.cc				$(INCS)
 uclstat.o:		uclstat.cc				$(INCS)
 ucpathconf.o:		ucpathconf.cc				$(INCS)
 ucreadlink.o:		ucreadlink.cc				$(INCS)
+ucremove.o:		ucremove.cc				$(INCS)
+ucresolvepath.o:	ucresolvepath.cc			$(INCS)
+ucrealpath.o:		ucrealpath.cc				$(INCS)
 ucstat.o:		ucstat.cc				$(INCS)
 ucstatvfs.o:		ucstatvfs.cc				$(INCS)
+ucsymlink.o:		ucsymlink.cc				$(INCS)
+ucunlink.o:		ucunlink.cc				$(INCS)
 
 
