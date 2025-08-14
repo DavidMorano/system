@@ -91,7 +91,7 @@
 #include	<ucgetx.h>
 #include	<uckvamatch.h>
 #include	<ucwrite.h>
-#include	<ucfiletime.h>
+#include	<ucfileop.h>
 
 #include	<getxname.h>
 #include	<getexecname.h>
