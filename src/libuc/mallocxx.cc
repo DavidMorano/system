@@ -203,7 +203,7 @@ int malloc_mailaddr(char **rpp) noex {
 		if ((rs = getbufsize(w)) >= 0) ylikely {
 		    cint	nnl = rs ;
 		    mal = ((hmult * hnl) + (nmult * nnl)) ;
-		    rs = uc_malloc((mal+1),rpp) ;
+		    rs = uc_malloc((mal + 1),rpp) ;
 		} /* end if */
 	    } /* end if */
 	} /* end if (non-null) */
