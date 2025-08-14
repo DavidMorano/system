@@ -34,7 +34,7 @@
 	af		address family
 	svc		service specification
 	sargv		pointer to array of pointers to arguments
-	to		timeout ('>0' means use one, '-1' means don't)
+	to		timeout ('>0' means use one, '-1' means do not)
 	dot		any dial options
 
 	Returns:
