@@ -95,7 +95,7 @@ import uconstants ;
 
 #define	MKCDPATH_MP	(4*1024)
 
-#define	CHX_OUREXPAND	MKCHAR('¬')
+#define	CHX_EXP	MKCHAR('¬')
 
 
 /* imported namespaces */
@@ -198,7 +198,7 @@ int mkpathcd(char *ebuf,cchar *fp,int fl) noex {
 	int		rs = SR_FAULT ;
 	int		el = 0 ;
 	if (ebuf && fp) ylikely {
-	    cint	chx_ec = CHX_OUREXPAND ;
+	    cint	chx_ec = CHX_EXP ;
 	    ebuf[0] = '\0' ;
 	    if (fl < 0) fl = lenstr(fp) ;
 	    if ((fl > 0) && (mkchar(fp[0]) == chx_ec)) ylikely {
