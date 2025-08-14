@@ -26,7 +26,7 @@
 
 struct cvtdater_head {
 	time_t		daytime ;
-} ;
+} ; /* end struct (cvtdater_head) */
 
 #ifdef	__cplusplus
 enum cvtdatermems {
@@ -50,14 +50,15 @@ struct cvtdater : cvtdater_head {
 	cvtdater_co	finish ;
 	cvtdater() noex {
 	    finish(this,cvtdatermem_finish) ;
+	    daytime = 0 ;
 	} ;
 	cvtdater(const cvtdater &) = delete ;
 	cvtdater &operator = (const cvtdater &) = delete ;
 	int start(time_t = 0L) noex ;
 	int load(time_t *,cchar *,int = -1) noex ;
 	void dtor() noex ;
-	~cvtdater() {
-	    dtor() ;
+	destruct cvtdater() {
+	    if (daytime) dtor() ;
 	} ;
 } ; /* end struct (cvtdater) */
 #else	/* __cplusplus */
