@@ -66,6 +66,13 @@ extern int libmalloc_sn(char **) noex ;	/* SN symbol-name */
 extern int libmalloc_zn(char **) noex ;	/* ZN time-zone-name abbreviation */
 extern int libmalloc_zi(char **) noex ;	/* ZI zone-info-name (Zone-Info) */
 
+local inline int libmalloc_strw(cchar *sp,int sl,cchar **rpp) noex {
+    	return uc_libmallocstrw(sp,sl,rpp) ;
+}
+local inline int libmalloc_free(void *p) noex {
+    	return uc_libfree(p) ;
+}
+
 
 EXTERNC_end
 
