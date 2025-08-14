@@ -47,10 +47,29 @@
 
 /* exported subroutines */
 
+int uc_statfs(cchar *fname,ustatfs *sbp) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		rv = 0 ; /* return-value */
+	if (fname && sbp) {
+	    cchar *fn ;
+	    if (prefixfn pf ; (rs = pf.start(fname,-1,&fn)) > 0) {
+		{
+		    rs = u_statfs(fn,sbp) ;
+		    rv = rs ;
+		}
+		rs1 = pf.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (prefixfn) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rv : rs ;
+}
+/* end subroutine (uc_statfs) */
+
 int uc_statvfs(cchar *fname,ustatvfs *sbp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		rv = 0 ;
+	int		rv = 0 ; /* return-value */
 	if (fname && sbp) {
 	    cchar *fn ;
 	    if (prefixfn pf ; (rs = pf.start(fname,-1,&fn)) > 0) {
@@ -65,5 +84,4 @@ int uc_statvfs(cchar *fname,ustatvfs *sbp) noex {
 	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (uc_statvfs) */
-
 
