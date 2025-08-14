@@ -111,7 +111,7 @@ namespace {
 	    mktouc() ;
 	    mktofc() ;
 	    mktoval() ;
-	} ;
+	} ; /* end ctor */
     } ; /* end struct (charinfo) */
 } /* end namespace */
 
@@ -144,30 +144,32 @@ constexpr void charinfo::mkisuc() noex {
 	    isuc.set(ch,true) ;
 	}
 	isuc.set(UC('×'),false) ;
-	isuc.set(UC('ß'),false) ; 	/* <- this is 'ss' in German */
 }
 /* end method (charinfo::mkisuc) */
 
 constexpr void charinfo::mktolc() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
-	    tolc[ch] = uchar(ch) ;
-	}
-	for (int ch = 'A' ; ch <= 'Z' ; ch += 1) {
-	    tolc[ch] = uchar(ch + 0x20) ;
-	}
-	for (int ch = UC('À') ; ch <= UC('Ö') ; ch += 1) {
-	    tolc[ch] = uchar(ch + 0x20) ;
-	}
-	for (int ch = UC('Ø') ; ch <= UC('Þ') ; ch += 1) {
-	    tolc[ch] = uchar(ch + 0x20) ;
-	}
+	    int nch = ch ;
+	    bool f = false ;
+	    f = f || ((ch >= 'A') && (ch <= 'Z')) ;
+	    f = f || ((ch >= UC('À')) && (ch <= UC('Ö'))) ;
+	    f = f || ((ch >= UC('Ø')) && (ch <= UC('Þ'))) ;
+	    if (f) nch += 0x20 ;
+	    tolc[ch] = uchar(nch) ;
+	} /* end for */
 }
 /* end method (charinfo::mktolc) */
 
 constexpr void charinfo::mktouc() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
-	    touc[ch] = uchar(ch) ;
-	}
+	    int nch = ch ;
+	    bool f = false ;
+    	    f = f || ((ch >= 'a') && (ch <= 'z')) ;
+	    f = f || ((ch >= UC('à')) && (ch <= UC('ö'))) ;
+	    f = f || ((ch >= UC('ø')) && (ch <= UC('þ'))) ;
+	    if (f) nch -= 0x20 ;
+	    touc[ch] = uchar(nch) ;
+	} /* end for */
 }
 /* end method (charinfo::mktouc) */
 
