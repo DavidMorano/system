@@ -39,7 +39,7 @@
 EXTERNC_begin
 
 extern int	mkpathuser(char *,cchar *,cchar *,int) noex ;
-extern int	mkpathcd(char *,cchar *,int) noex ;
+extern int	mkpathvar(char *,cchar *,int) noex ;
 extern int	mkpathexp(char *,cchar *,int) noex ;
 extern int	mkpathmuli(char *,cchar *,int) noex ;
 
