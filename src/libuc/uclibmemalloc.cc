@@ -44,7 +44,7 @@
 
 #include	"uclibmemalloc.h"
 
-import libutil ;			/* |lenstr(3u)| */
+import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* local defines */
 
@@ -89,21 +89,22 @@ namespace {
 
 /* exported subroutines */
 
-int uc_libmallocstrw(cchar *sp,int sl,cchar **rpp) noex {
+int uc_libmallocstrw(cchar *sp,int µsl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (sp && rpp) {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (char *bp ; (rs = uc_libmalloc((sl+1),&bp)) >= 0) {
-	        *rpp = bp ;
-		{
-	            char *ep = stpncpy(bp,sp,sl) ;
-		    *ep = '\0' ;
-		    rl = intconv(ep - bp) ;
-		}
-	    } else {
-		*rpp = nullptr ;
-	    } /* end if (uc_libmalloc) */
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	        if (char *bp ; (rs = uc_libmalloc((sl + 1),&bp)) >= 0) {
+	            *rpp = bp ;
+		    {
+	                char *ep = stpncpy(bp,sp,sl) ;
+		        *ep = '\0' ;
+		        rl = intconv(ep - bp) ;
+		    }
+	        } else {
+		    *rpp = nullptr ;
+	        } /* end if (uc_libmalloc) */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
@@ -132,8 +133,8 @@ int uc_libmalloc(int sz,void *vp) noex {
 }
 /* end subroutine (uc_libmalloc) */
 
-int uc_libcalloc(int ne,int esize,void *vp) noex {
-	cint		sz = (ne * esize) ;
+int uc_libcalloc(int ne,int esz,void *vp) noex {
+	cint		sz = (ne * esz) ;
 	int		rs ;
 	if ((rs = uc_libmalloc(sz,vp)) >= 0) {
 	    memset(vp,0,sz) ;
