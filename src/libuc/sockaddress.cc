@@ -679,6 +679,9 @@ sockaddress_co::operator int () noex {
 	    case sockaddressmem_len:
 	        rs = sockaddress_getlen(op) ;
 	        break ;
+	    case sockaddressmem_addrlen:
+	        rs = sockaddress_getaddrlen(op) ;
+	        break ;
 	    case sockaddressmem_finish:
 	        rs = sockaddress_finish(op) ;
 	        break ;
