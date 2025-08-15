@@ -58,6 +58,7 @@ struct absfn : absfn_head {
 	absfn_co	finish ;
 	absfn() noex {
 	    finish(this,absfnmem_finish) ;
+	    as = nullptr ;
 	} ;
 	absfn(const absfn &) = delete ;
 	absfn &operator = (const absfn &) = delete ;
