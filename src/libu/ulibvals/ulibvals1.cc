@@ -48,11 +48,15 @@ module ;
 #include	<sysconfcmds.h>		/* |_SC_{xx}| */
 #include	<localmisc.h>		/* |{xxx}BUFLEN| */
 
+#pragma		GCC dependency	"mod/usysconf.ccm"
+
 module ulibvals ;
 
 import usysconf ;			/* |usysconfval(3u)| */
 
 using std::endian ;
+
+static int	rscum ;
 
 static constexpr int mkendian() noex {
     	using enum	endian ;	/* get the values */
@@ -67,10 +71,13 @@ static constexpr int mkendian() noex {
 	return n ;
 } /* end subroutine (mkendian) */
 
-static int getval(int cmd) noex {
+int getval(int cmd) noex {
     	int		rs ;
-	if ((rs = usysconfval(cmd)) < 0) {
-	    ulogerror("ulibvals",rs,"getval") ;
+	if ((rs = rscum) >= 0) {
+	    if ((rs = usysconfval(cmd)) < 0) {
+	        rscum = rs ;
+	        ulogerror("ulibvals",rs,"getval") ;
+	    }
 	}
 	return rs ;
 } /* end subroutine (getval) */
@@ -89,7 +96,8 @@ const int	ulibvals::maxpathlen	= getval(_SC_PATH_MAX) ;
 const int	ulibvals::maxmsglen	= getval(_SC_MSG_MAX) ;
 const int	ulibvals::usernamelen	= getval(_SC_USERNAME_MAX) ;
 const int	ulibvals::groupnamelen	= getval(_SC_GROUPNAME_MAX) ;
-const int	ulibvals::projnamelen	= getval(_SC_PROJECTNAME_MAX) ;
+const int	ulibvals::projnamelen	= 
+				getval(_SC_PROJECTNAME_MAX) ;
 const int	ulibvals::nodenamelen	= getval(_SC_NODENAME_MAX) ;
 const int	ulibvals::hostnamelen	= getval(_SC_HOSTNAME_MAX) ;
 const int	ulibvals::binbuflen	= BINBUFLEN ;	/* for |int256_t| */
@@ -97,6 +105,10 @@ const int	ulibvals::octbuflen	= OCTBUFLEN ;	/* for |int256_t| */
 const int	ulibvals::decbuflen	= DECBUFLEN ;	/* for |int256_t| */
 const int	ulibvals::hexbuflen	= HEXBUFLEN ;	/* for |int256_t| */
 const int	ulibvals::digbuflen	= DIGBUFLEN ;	/* for |int256_t| */
+
+ulibvals::operator int () noex {
+	return rscum ;
+}
 
 const ulibvals	ulibval ;
 
