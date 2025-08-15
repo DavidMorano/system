@@ -70,8 +70,8 @@ struct usys_mtime {
 	} ;
 } ; /* end struct (getustime) */
 
-extern usys_mtime	mtime ;
-extern usys_mtime	getmtime ;
+extern usys_mtime	getusmtime ;
+
 
 #endif /* __cplusplus */
 #endif /* OBJECT_GETMTIME */
