@@ -116,6 +116,7 @@ using std::nothrow ;			/* constant */
 /* local structures */
 
 enum dataitems {
+	dataitem_pagesz,
 	dataitem_maxpid,
 	dataitem_maxarg,
 	dataitem_maxline,
@@ -223,6 +224,7 @@ int usysconf::getstr(int req) noex {
 int usysconf::getval(int req) noex {
     	int		rs = SR_OK ;
 	switch (req) {
+	case _SC_PAGESIZE :
 	case _SC_PID_MAX:
 	case _SC_ARG_MAX:
 	case _SC_LINE_MAX:
@@ -367,6 +369,7 @@ int usysconf::getvalcache(int req) noex {
 	int		rs = SR_OK ;
 	int		ii = -1 ;
 	switch (req) {
+	case _SC_PAGESIZE :		ii = dataitem_pagesz ; 		break ;
 	case _SC_PID_MAX:		ii = dataitem_maxpid ; 		break ;
 	case _SC_ARG_MAX:		ii = dataitem_maxarg ; 		break ;
 	case _SC_LINE_MAX:		ii = dataitem_maxline ; 	break ;
