@@ -151,6 +151,10 @@ int buffer::printf(cchar *fmt,...) noex {
 	    va_end(ap) ;
 	}
 	return rs ;
-}
+} /* end method (buffer::printf) */
+
+buffer::operator int () noex {
+	return len ;
+} /* end method (buffer::operator) */
 
 
