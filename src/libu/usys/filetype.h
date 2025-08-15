@@ -14,7 +14,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/stat.h>		/* |S_IFMT| */
+#include	<sys/stat.h>		/* |S_IFMT| + |mode_t| */
 #include	<dirent.h>		/* possielbe preprocesor 'DT_{x}' */
 #include	<clanguage.h>
 #include	<utypedefs.h>
