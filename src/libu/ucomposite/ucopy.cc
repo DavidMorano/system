@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* copy a file (to another file) */
+/* copy a file (to another file or a file-descriptor) */
 /* version %I% last-modified %G% */
 
 
@@ -17,20 +17,28 @@
 
 /*******************************************************************************
 
-	Name:
+	Names:
+	u_writefd
+	u_writefile
 	u_copy
 
 	Description:
+	These provide various copy-file operations.
 
 	Synopsis:
+	int u_writefd(int fd,int sfd) noex
+	int u_writefile(int fd,cchar *fn) noex
 	int u_copy(cchar *srcfname,cchar *dstfname) noex
 
 	Arguments:
+	fd		file-descriptor to write to
+	sfd		file-descriptor of source file (to copy from)
+	fn		file to copy-out and write to given FD
 	srcfname	source file
 	dstfname	destination file
 
 	Returns:
-	>=0		number of items removed
+	>=0		number of bytes copied (up to INT_MAX)
 	<0		error (system-return)
 
 *******************************************************************************/
@@ -47,7 +55,6 @@
 #include	"ucopy.h"
 
 import usysconf ;			/* |usysconval(3u)| */
-
 
 /* local defines */
 
@@ -69,8 +76,8 @@ import usysconf ;			/* |usysconval(3u)| */
 
 /* forward references */
 
-static int	copyover(int,int) noex ;
-static int	copyovers(char *,int,int,int) noex ;
+local int	copyover(int,int) noex ;
+local int	copyovers(char *,int,int,int) noex ;
 
 
 /* local variables */
@@ -83,7 +90,7 @@ static int	copyovers(char *,int,int,int) noex ;
 
 int u_writefd(int fd,int sfd) noex {
     	int		rs = SR_BADF ;
-	if ((fd >= 0) && (sfd >= 0)) {
+	if ((fd >= 0) && (sfd >= 0)) ylikely {
 	    rs = copyover(sfd,fd) ;
 	}
 	return rs ;
@@ -93,13 +100,13 @@ int u_writefile(int fd,cchar *fn) noex {
     	int		rs = SR_BADF ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (fd >= 0) {
+	if (fd >= 0) ylikely {
 	    rs = SR_FAULT ;
-	    if (fn) {
+	    if (fn) ylikely {
 		rs = SR_INVALID ;
-		if (fn[0]) {
+		if (fn[0]) ylikely {
 		    cint	of = O_RDONLY ;
-		    if ((rs = u_open(fn,of,0)) >= 0) {
+		    if ((rs = u_open(fn,of,0)) >= 0) ylikely {
 			cint	sfd = rs ;
 			{
 	    	            rs = copyover(sfd,fd) ;
@@ -112,7 +119,7 @@ int u_writefile(int fd,cchar *fn) noex {
 	    } /* end if (non-null) */
 	} /* end if (valid FD) */
 	return (rs >= 0) ? len : rs ;
-} /* end subroutine (u_writefd) */
+} /* end subroutine (u_writefile) */
 
 int u_copy(cchar *srcfname,cchar *dstfname) noex {
 	int		rs = SR_FAULT ;
@@ -121,13 +128,13 @@ int u_copy(cchar *srcfname,cchar *dstfname) noex {
 	if (srcfname && dstfname) ylikely {
 	    rs = SR_INVALID ;
 	    if (srcfname[0] && dstfname[0]) ylikely {
-		mode_t	om = O_RDONLY ;
-		if ((rs = u_open(srcfname,om,0)) >= 0) {
+		int	of = O_RDONLY ;
+		if ((rs = u_open(srcfname,of,0)) >= 0) ylikely {
 		    cint fd = rs ;
-		    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
-			cmode dm = (sb.st_mode & 0777) ;
-			om = (O_WRONLY | O_CREAT) ;
-			if ((rs = u_open(dstfname,om,dm)) >= 0) {
+		    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
+			cmode dm = (sb.st_mode & S_IAMB) ;
+			of = (O_WRONLY | O_CREAT) ;
+			if ((rs = u_open(dstfname,of,dm)) >= 0) ylikely {
 			    cint	dfd = rs ;
 			    {
 				rs = copyover(fd,dfd) ;
@@ -148,18 +155,18 @@ int u_copy(cchar *srcfname,cchar *dstfname) noex {
 
 /* local subroutines */
 
-static int copyover(int fd,int dfd) noex {
+local int copyover(int fd,int dfd) noex {
     	cnothrow	nt{} ;
     	cnullptr	np{} ;
     	int		rs ;
 	int		csz = 0 ;
-    	if (cint cmd = _SC_PAGESIZE ; (rs = usysconfval(cmd)) >= 0) {
+    	if (cint cmd = _SC_PAGESIZE ; (rs = usysconfval(cmd)) >= 0) ylikely {
 	    cint	clen = rs ;
 	    rs = SR_NOMEM ;
-	    if (char *cbuf ; (cbuf = new(nt) char[clen + 1]) != np) {
+	    if (char *cbuf ; (cbuf = new(nt) char[clen + 1]) != np) ylikely {
 		{
 		    rs = copyovers(cbuf,clen,fd,dfd) ;
-		    csz = 1 ;
+		    csz = rs ;
 		}
 		delete [] cbuf ;
 	    } /* end if (new-char) */
@@ -167,17 +174,17 @@ static int copyover(int fd,int dfd) noex {
 	return (rs >= 0) ? csz : rs ;
 } /* end subroutine (copyover) */
 
-static int copyovers(char *cbuf,int clen,int fd,int dfd) noex {
+local int copyovers(char *cbuf,int clen,int fd,int dfd) noex {
     	int		rs ;
 	int		csz = 0 ;
 	size_t		fsize = 0 ;
 	while ((rs = u_read(fd,cbuf,clen)) > 0) {
 	    rs = u_writen(dfd,cbuf,rs) ;
 	    fsize += rs ;
+	    if (rs < 0) break ;
 	} /* end while */
 	if (rs >= 0) csz = intsat(fsize) ;
 	return (rs >= 0) ? csz : rs ;
-
 } /* end subroutine (copyovers) */
 
 
