@@ -74,6 +74,7 @@ export {
     bool char_iswhite(int) noex ;
     bool char_islc(int) noex ;
     bool char_isuc(int) noex ;
+    bool char_isfc(int) noex ;
     inline bool char_isspacetab(int ch) noex {
 	return (ch == ' ') || (ch == '\t') ;
     }
