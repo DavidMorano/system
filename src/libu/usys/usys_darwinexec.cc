@@ -111,8 +111,8 @@
 #define	VARPATH		"PATH"
 #define	MAXPATH		(4 * 1024)
 
-import libutil ;
-import umisc ;				/* |strbasename(3u)| | |mknpath(3u)| */
+import libutil ;			/* |lenstr(3u)| */
+import umisc ;				/* |strbasename(3u)| + |mknpath(3u)| */
 import usysbasic ;
 
 using libu::sncpy ;			/* subroutine (usupport) */
