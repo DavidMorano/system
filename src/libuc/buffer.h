@@ -37,7 +37,7 @@ struct buffer_head {
 	char		*dbuf ;		/* the "buffer" */
 	int		dlen ;		/* current buffer extent */
 	int		startlen ;	/* saved for expansion purposes */
-	int		len ;		/* occupied length */
+	int		clen ;		/* current (occupied) length */
 } ;
 
 #ifdef	__cplusplus
@@ -45,6 +45,8 @@ enum buffermems {
 	buffermem_start,
 	buffermem_strsize,
 	buffermem_reset,
+	buffermem_getprev,
+	buffermem_len,
 	buffermem_finish,
 	buffermem_overlast
 } ;
@@ -65,12 +67,17 @@ struct buffer : buffer_head {
 	buffer_co	start ;
 	buffer_co	strsize ;
 	buffer_co	reset ;
+	buffer_co	getprev ;
+	buffer_co	len ;
 	buffer_co	finish ;
 	buffer() noex {
-	    strsize(this,buffermem_start) ;
-	    strsize(this,buffermem_strsize) ;
-	    reset(this,buffermem_reset) ;
-	    finish(this,buffermem_finish) ;
+	    strsize	(this,buffermem_start) ;
+	    strsize	(this,buffermem_strsize) ;
+	    reset	(this,buffermem_reset) ;
+	    getprev	(this,buffermem_getprev) ;
+	    len		(this,buffermem_len) ;
+	    finish	(this,buffermem_finish) ;
+	    dbuf = nullptr ;
 	} ;
 	buffer(const buffer &) = delete ;
 	buffer &operator = (const buffer &) = delete ;
@@ -90,6 +97,7 @@ struct buffer : buffer_head {
 	template<typename Octal> int oct(Octal) noex ;
 	template<typename Decimal> int dec(Decimal) noex ;
 	template<typename Hexadecimal> int hex(Hexadecimal) noex ;
+	operator int () noex ;
 	void dtor() noex ;
 	destruct buffer() {
 	    if (dbuf) dtor() ;
@@ -123,8 +131,9 @@ extern int	buffer_hexul(buffer *,ulong) noex ;
 extern int	buffer_hexull(buffer *,ulonglong) noex ;
 extern int	buffer_printf(buffer *,cchar *,...) noex ;
 extern int	buffer_vprintf(buffer *,cchar *,va_list) noex ;
-extern int	buffer_getprev(buffer *) noex ;
 extern int	buffer_get(buffer *,cchar **) noex ;
+extern int	buffer_getprev(buffer *) noex ;
+extern int	buffer_len(buffer *) noex ;
 extern int	buffer_finish(buffer *) noex ;
 
 extern int	buffer_strcompact(buffer *,cchar *,int) noex ;
