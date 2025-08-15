@@ -15,13 +15,15 @@
 
 	Description:
 	This module can be used to construct strings or messages
-	in buffers WITHOUT using the |snsprint(3c)| subroutine.  This
-	module is useful when the user does NOT supply a buffer to
-	be used as the working store.  Rather, an internally,
+	in buffers WITHOUT using the |snsprint(3c)| subroutine.
+	This module is useful when the user does NOT supply a buffer
+	to be used as the working store.  Rather, an internally,
 	dynamically grown and managed buffer is maintained.  This
 	module uses an object, that must be initialized and eventually
 	freed, to track the state of the dynamically used internal
-	buffer.
+	buffer.  Short buffer usage is optimized somewhat with the
+	use of an internal buffer.  Once the internal buffer is
+	exhausted, a dynamically allocated buffer is used instead.
 
 *******************************************************************************/
 
@@ -47,7 +49,7 @@ struct bufstr_head {
 	int		dlen ;		/* extent */
 	int		len ;		/* index (active length) */
 	char		sbuf[BUFSTR_LEN + 1] ; /* static-buffer */
-} ;
+} ; /* end struct (bufstr) */
 
 #ifdef	__cplusplus
 enum bufstrmems {
@@ -55,7 +57,7 @@ enum bufstrmems {
 	bufstrmem_strsize,
 	bufstrmem_finish,
 	bufstrmem_overlast
-} ;
+} ; /* end enum (bufstrmems) */
 struct bufstr ;
 struct bufstr_co {
 	bufstr		*op = nullptr ;
