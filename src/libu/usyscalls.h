@@ -81,6 +81,7 @@
 #include	<utimeouts.h>
 #include	<ulogerror.h>
 #include	<umemalloc.hh>
+#include	<ucomposite.h>
 
 #include	<varnames.hh>
 #include	<syswords.hh>
