@@ -17,30 +17,44 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	absfn
 	
 	Description:
-	This object module (absfn) creates an absolute file-name
+	This object module (ABSFN) creates an absolute file-name
 	when needed.  It does this by prepending the present 
 	working directory (PWD) to those file names that a relative.
+
+	Synopsis:
+	int absfn_start(absfn *op,cchar *sp,int 탎l,cchar **rpp) noex
+
+	Arguments:
+	op		object pointer
+	sp		file-name c-string pointer
+	탎l		file-name c-string length
+	rpp		pointer to resulting file-name (c-string)
+
+	Returns:
+	>=0		length of resulting c-string
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |lenstr(3c)| */
 #include	<usystem.h>
-#include	<mallocxx.h>
 #include	<getpwd.h>
+#include	<libmallocxx.h>
 #include	<strwcpy.h>
 #include	<pathadd.h>
 #include	<localmisc.h>
 
 #include	"absfn.h"
 
-import libutil ;
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -57,13 +71,20 @@ import libutil ;
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
-static int	absfn_loadpwd(absfn *,cchar *,int,cchar **) noex ;
-static int	absfn_loadnul(absfn *,cchar *,int,cchar **) noex ;
+local int	absfn_loadpwd(absfn *,cchar *,int,cchar **) noex ;
+local int	absfn_loadnul(absfn *,cchar *,int,cchar **) noex ;
 
 
 /* local variables */
+
+constexpr cauto		mem_almp = libmalloc_mp ;
+constexpr cauto		mem_alst = uc_libmallocstrw ;
+constexpr cauto		mem_free = uc_libfree ;
 
 
 /* exported variables */
@@ -71,14 +92,15 @@ static int	absfn_loadnul(absfn *,cchar *,int,cchar **) noex ;
 
 /* exported subroutines */
 
-int absfn_start(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
+int absfn_start(absfn *op,cchar *sp,int 탎l,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
+	int		sl = 0 ; /* return-value */
 	if (op && sp && rpp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    rs = SR_OK ;
+	    rs = SR_INVALID ;
 	    op->as = nullptr ;
-	    *rpp = sp ;
-	    if (sl > 0) {
+	    if ((sl = getlenstr(sp,탎l)) > 0) ylikely {
+	        rs = SR_OK ;
+	        *rpp = sp ;
 	        if (sp[0] != '/') {
 		    rs = absfn_loadpwd(op,sp,sl,rpp) ;
 		    sl = rs ;
@@ -86,7 +108,8 @@ int absfn_start(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 		    rs = absfn_loadnul(op,sp,sl,rpp) ;
 		    sl = rs ;
 		}
-	    } /* end if (PWD needed) */
+	    } /* end if (getlenstr) */
+	    if (rs < 0) *rpp = nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? sl : rs ;
 }
@@ -99,7 +122,7 @@ int absfn_finish(absfn *op) noex {
 	    rs = SR_OK ;
 	    if (op->as) {
 		char *bp = cast_const<charp>(op->as) ;
-	        rs1 = uc_libfree(bp) ;
+	        rs1 = mem_free(bp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->as = nullptr ;
 	    }
@@ -112,16 +135,16 @@ int absfn_finish(absfn *op) noex {
 
 /* local subroutines */
 
-static int absfn_loadpwd(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
+local int absfn_loadpwd(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) ylikely {
+	if (char *pbuf ; (rs = mem_almp(&pbuf)) >= 0) ylikely {
 	    cint	plen = rs ;
 	    if ((rs = getpwd(pbuf,plen)) >= 0) ylikely {
 	 	if ((rs = pathaddw(pbuf,rs,sp,sl)) >= 0) ylikely {
 		    sl = rs ;
 	            if (sl > ABSFN_SHORTLEN) {
-	                if (cc *cp ; (rs = uc_libmallocstrw(sp,sl,&cp)) >= 0) {
+	                if (cc *cp ; (rs = mem_alst(sp,sl,&cp)) >= 0) {
 	                    *rpp = cp ;
 	                    op->as = cp ;
 	                } /* end if (memory-allocation) */
@@ -131,17 +154,17 @@ static int absfn_loadpwd(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	            } /* end if */
 	        } /* end if (pathadd) */
 	    } /* end if (getpwd) */
-	    rs1 = uc_free(pbuf) ;
+	    rs1 = mem_free(pbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? sl : rs ;
 }
 /* end subroutine (absfn_loadpwd) */
 
-static int absfn_loadnul(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
+local int absfn_loadnul(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	if (sl > ABSFN_SHORTLEN) {
-	    if (cchar *cp ; (rs = uc_libmallocstrw(sp,sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = mem_alst(sp,sl,&cp)) >= 0) {
 		sl = rs ;
 		*rpp = cp ;
 		op->as = cp ;
