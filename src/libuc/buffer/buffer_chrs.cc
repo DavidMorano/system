@@ -79,7 +79,7 @@ namespace {
 	cint	l = lenstr(sysword.w_blanks) ;
 	cchar	*p = sysword.w_blanks ;
     } ; /* end struct (blanker) */
-}
+} /* end namespace */
 
 
 /* forward references */
