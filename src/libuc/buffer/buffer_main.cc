@@ -112,11 +112,11 @@ static inline int buffer_ctor(buffer *op,Args ... args) noex {
 	    rs = SR_OK ;
 	    op->dbuf = nullptr ;
 	    op->startlen = 0 ;
-	    op->len = 0 ;
+	    op->clen = 0 ;
 	    op->dlen = 0 ;
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
+} /* end method (buffer_ctor) */
 
 static int	buffer_ext(buffer *,int) noex ;
 
@@ -127,9 +127,9 @@ int buffer_xxxx(buffer *op,int (*ctxxx)(char *,int,T),T v) noex {
 	int		len = 0 ;
 	if (op) {
 	    if ((rs = buffer_ext(op,dlen)) >= 0) {
-	        char	*bp = (op->dbuf + op->len) ;
+	        char	*bp = (op->dbuf + op->clen) ;
 	        rs = ctxxx(bp,dlen,v) ;
-	        op->len += rs ;
+	        op->clen += rs ;
 		len = rs ;
 	    }
 	} /* end if (non-null) */
@@ -186,10 +186,10 @@ int buffer_finish(buffer *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbuf = nullptr ;
 	    }
-	    len = op->len ;
+	    len = op->clen ;
 	    op->dlen = 0 ;
 	    op->startlen = 0 ;
-	    op->len = 0 ;
+	    op->clen = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
@@ -198,8 +198,8 @@ int buffer_finish(buffer *op) noex {
 int buffer_reset(buffer *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    if ((rs = op->len) >= 0) {
-	        op->len = 0 ;
+	    if ((rs = op->clen) >= 0) {
+	        op->clen = 0 ;
 	    }
 	}
 	return rs ;
@@ -209,11 +209,11 @@ int buffer_reset(buffer *op) noex {
 int buffer_adv(buffer *op,int advlen) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    if ((rs = op->len) >= 0) {
+	    if ((rs = op->clen) >= 0) {
 		rs = SR_INVALID ;
 	        if (advlen >= 0) {
 	            if ((rs = buffer_ext(op,advlen)) >= 0) {
-	                op->len += advlen ;
+	                op->clen += advlen ;
 	            }
 	        } /* end if (valid) */
 	    } /* end if (valid) */
@@ -226,12 +226,12 @@ int buffer_strw(buffer *op,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op && sbuf) {
-	    if ((rs = op->len) >= 0) {
+	    if ((rs = op->clen) >= 0) {
 	        if (slen < 0) slen = lenstr(sbuf) ;
 	        if ((rs = buffer_ext(op,slen)) >= 0) {
-	            char	*bp = (op->dbuf + op->len) ;
+	            char	*bp = (op->dbuf + op->clen) ;
 	            len = intconv(strwcpy(bp,sbuf,slen) - bp) ;
-	            op->len += len ;
+	            op->clen += len ;
 	        }
 	    }
 	} /* end if (non-null) */
@@ -242,10 +242,10 @@ int buffer_strw(buffer *op,cchar *sbuf,int slen) noex {
 int buffer_chr(buffer *op,int ch) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    if ((rs = op->len) >= 0) {
+	    if ((rs = op->clen) >= 0) {
 	        if ((rs = buffer_ext(op,1)) >= 0) {
-	            op->dbuf[(op->len)++] = char(ch) ;
-	            op->dbuf[op->len] = '\0' ;
+	            op->dbuf[(op->clen)++] = char(ch) ;
+	            op->dbuf[op->clen] = '\0' ;
 	        }
 	    }
 	} /* end if (non-null) */
@@ -256,12 +256,12 @@ int buffer_chr(buffer *op,int ch) noex {
 int buffer_buf(buffer *op,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	if (op && sbuf) {
-	    if ((rs = op->len) >= 0) {
+	    if ((rs = op->clen) >= 0) {
 	        if (slen < 0) slen = lenstr(sbuf) ;
 	        if ((rs = buffer_ext(op,slen)) >= 0) {
-	            char	*bp = (op->dbuf + op->len) ;
+	            char	*bp = (op->dbuf + op->clen) ;
 	            memcpy(bp,sbuf,slen) ;
-	            op->len += slen ;
+	            op->clen += slen ;
 	        }
 	    }
 	} /* end if (non-null) */
@@ -304,7 +304,7 @@ int buffer_get(buffer *op,cchar **spp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op && spp) {
-	    len = op->len ;
+	    len = op->clen ;
 	    if (spp) {
 	        if ((rs = buffer_ext(op,1)) >= 0) {
 	            *spp = (rs >= 0) ? op->dbuf : nullptr ;
@@ -318,10 +318,10 @@ int buffer_get(buffer *op,cchar **spp) noex {
 int buffer_getprev(buffer *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    if ((rs = op->len) > 0) {
-	        if ((rs = buffer_ext(op,1)) >= 0) {
-	            rs = mkchar(op->dbuf[op->len-1]) ;
-	        }
+	    if ((rs = op->clen) > 0) {
+		cint bl = op->clen ;
+		char *bp = op->dbuf ;
+		rs = mkchar(bp[bl - 1]) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -402,28 +402,36 @@ int buffer_hexull(buffer *op,ulonglong uv) noex {
 }
 /* end subroutine (buffer_hexull) */
 
+int buffer_len(buffer *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = op->clen ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (buffer_len) */
+
 
 /* private subroutines */
 
 static int buffer_ext(buffer *op,int req) noex {
 	int		rs = SR_OK ;
-	int		need ;
+	int		need ; /* used-below */
 	if (req < 0) req = op->startlen ;
-	need = ((op->len + (req + 1)) - op->dlen) ;
+	need = ((op->clen + (req + 1)) - op->dlen) ;
 	if (need > 0) {
-	    int		nlen ;
-	    char	*nbuf{} ;
+	    int		nlen ; /* used-multiple */
+	    char	*nbuf{} ; /* used-multiple */
 	    if (op->dbuf) {
 	        nlen = max(op->startlen,need) ;
 	        if ((rs = uc_libmalloc((nlen + 1),&nbuf)) >= 0) {
 	            op->dbuf = nbuf ;
 		    op->dlen = nlen ;
 	        } else {
-	            op->len = rs ;
+	            op->clen = rs ;
 	        }
 	    } else {
 		nlen = op->dlen ;
-	        while ((op->len + (req + 1)) > nlen) {
+	        while ((op->clen + (req + 1)) > nlen) {
 		    if_constexpr (f_fastgrow) {
 	                nlen = ((nlen + 1) * 2) ;
 		    } else {
@@ -434,7 +442,7 @@ static int buffer_ext(buffer *op,int req) noex {
 	            op->dbuf = nbuf ;
 		    op->dlen = nlen ;
 	        } else {
-	            op->len = rs ;
+	            op->clen = rs ;
 		}
 	    } /* end if */
 	} /* end if (extension needed) */
@@ -466,11 +474,11 @@ void buffer::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("buffer",rs,"fini-finish") ;
 	}
-}
+} /* end method (buffer::dtor) */
 
 int buffer_co::operator () (int v) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case buffermem_start:
 	        rs = buffer_start(op,v) ;
@@ -481,13 +489,18 @@ int buffer_co::operator () (int v) noex {
 	    case buffermem_reset:
 	        rs = buffer_reset(op) ;
 	        break ;
+	    case buffermem_len:
+	        rs = buffer_len(op) ;
+	        break ;
+	    case buffermem_getprev:
+	        rs = buffer_getprev(op) ;
+	        break ;
 	    case buffermem_finish:
 	        rs = buffer_finish(op) ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (buffer_co::operator) */
+} /* end method (buffer_co::operator) */
 
 
