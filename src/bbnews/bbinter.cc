@@ -2182,7 +2182,7 @@ BBINTER		*iap ;
 	    c += rs ;
 	}
 
-/* what is this (next part) supposed to do? (don't know!) */
+/* what is this (next part) supposed to do? (do not know!) */
 
 	if ((rs >= 0) && iap->f.setmbname && (iap->mbname == NULL)) {
 	    iap->f.setmbname = FALSE ;
