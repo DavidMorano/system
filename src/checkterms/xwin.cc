@@ -123,7 +123,7 @@ int numttys;
 	else {
 		/* time per process to guarentee we get done */
 		average = (END_TIME - wakeuptime)/ (numttys*MINUTE);
-		/* don't divde by zero */
+		/* do not divde by zero */
 		/* should probably print a message here but it would mean 3600 ttys */
 		if( average <= 0 ){
 			average = 2*MINUTE;
