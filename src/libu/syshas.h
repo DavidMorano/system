@@ -17,7 +17,7 @@
 	= 2023-10-06, David A­D­ Morano
 	I updated this to include an additional item that many of
 	these operating systems (Darwin and Linux) do not have have;
-	namely |strlcpy(3c)| and |strlen(3c)|.
+	namely |strlcpy(3c)| and |strnlen(3c)|.
 
 */
 
@@ -76,6 +76,15 @@
 /* Solaris®: typedefs */
 #define	SYSHAS_TYPEUSHORT	0
 #define	SYSHAS_TYPEUINT		0
+
+/* Solaris®: |dirent_t| */
+#define	SYSHAS_TYPEDIRENT	1
+
+/* Solaris®: |sig_t| */
+#define	SYSHAS_TYPESIGT		0
+
+/* Solaris®: |in6_addr_t| */
+#define	SYSHAS_TYPEIN6ADDRT	1
 
 /* Solaris®: tasks */
 #define	SYSHAS_TASK		1
@@ -243,15 +252,6 @@
 #define	SYSHAS_PIPES		0
 #endif
 
-/* Solaris®: |dirent_t| */
-#define	SYSHAS_TYPEDIRENT	1
-
-/* Solaris®: |sig_t| */
-#define	SYSHAS_TYPESIGT		0
-
-/* Solaris®: |in6_addr_t| */
-#define	SYSHAS_TYPEIN6ADDRT	1
-
 /* Solaris®: |getexecname| */
 #define	SYSHAS_GETEXECNAME	1
 
@@ -319,6 +319,15 @@
 /* Darwin: typedefs */
 #define	SYSHAS_TYPEUSHORT	1
 #define	SYSHAS_TYPEUINT		1
+
+/* Darwin: |dirent_t| */
+#define	SYSHAS_TYPEDIRENT	0
+
+/* Darwin®: |sig_t| */
+#define	SYSHAS_TYPESIGT		1
+
+/* Darwin®: |in6_addr_t| */
+#define	SYSHAS_TYPEIN6ADDRT	1
 
 /* Darwin: tasks */
 #define	SYSHAS_TASK		0
@@ -490,15 +499,6 @@
 /* Darwin: |pipe2(2)| */
 #define	SYSHAS_PIPES		0
 
-/* Darwin: |dirent_t| */
-#define	SYSHAS_TYPEDIRENT	0
-
-/* Darwin®: |sig_t| */
-#define	SYSHAS_TYPESIGT		1
-
-/* Darwin®: |in6_addr_t| */
-#define	SYSHAS_TYPEIN6ADDRT	1
-
 /* Darwin®: |getexecname| */
 #define	SYSHAS_GETEXECNAME	0
 
@@ -552,8 +552,17 @@
 #define	SYSHAS_AIO		1
 
 /* Linux: typedefs */
-#define	SYSHAS_TYPEUSHORT		0
+#define	SYSHAS_TYPEUSHORT	0
 #define	SYSHAS_TYPEUINT		0
+
+/* Linux: |dirent_t| */
+#define	SYSHAS_TYPEDIRENT	0
+
+/* Linux: |sig_t| */
+#define	SYSHAS_TYPESIGT		0
+
+/* Linux®: |in6_addr_t| */
+#define	SYSHAS_TYPEIN6ADDRT	0
 
 /* Linux: tasks */
 #define	SYSHAS_TASK		1
@@ -717,15 +726,6 @@
 /* Linux: |pipe2(2)| */
 #define	SYSHAS_PIPES		1
 
-/* Linux: |dirent_t| */
-#define	SYSHAS_TYPEDIRENT	0
-
-/* Linux: |sig_t| */
-#define	SYSHAS_TYPESIGT		0
-
-/* Linux®: |in6_addr_t| */
-#define	SYSHAS_TYPEIN6ADDRT	0
-
 /* Linux®: |getexecname| */
 #define	SYSHAS_GETEXECNAME	0
 
@@ -757,6 +757,9 @@ struct syshas_mgr {
         uint    aio:1 ;
         uint    typeushort:1 ;
         uint    typeuint:1 ;
+        uint    typedirentt:1 ;
+        uint    typesigt:1 ;
+        uint    typein6addrt:1 ;
         uint    task:1 ;
         uint    utmpx:1 ;
         uint    utmpname:1 ;
@@ -825,9 +828,6 @@ struct syshas_mgr {
         uint    resolvepath:1 ;
         uint    waitid:1 ;
         uint    pipes:1 ;
-        uint    typedirentt:1 ;
-        uint    typesigt:1 ;
-        uint    typein6addrt:1 ;
         uint    getexecname:1 ;
         uint    libproc:1 ;
 	constexpr syshas_mgr() noexcept {
@@ -848,6 +848,9 @@ struct syshas_mgr {
                 aio		= SYSHAS_AIO ;
                 typeushort	= SYSHAS_TYPEUSHORT ;
                 typeuint	= SYSHAS_TYPEUINT ;
+                typedirentt	= SYSHAS_TYPEDIRENT ;
+                typesigt	= SYSHAS_TYPESIGT ;
+                typein6addrt	= SYSHAS_TYPEIN6ADDRT ;
                 task		= SYSHAS_TASK ;
                 utmpx		= SYSHAS_UTMPX ;
                 utmpname	= SYSHAS_UTMPNAME ;
@@ -916,15 +919,12 @@ struct syshas_mgr {
                 resolvepath	= SYSHAS_RESOLVEPATH ;
                 waitid		= SYSHAS_WAITID ;
                 pipes		= SYSHAS_PIPES ;
-                typedirentt	= SYSHAS_TYPEDIRENT ;
-                typesigt	= SYSHAS_TYPESIGT ;
-                typein6addrt	= SYSHAS_TYPEIN6ADDRT ;
                 getexecname	= SYSHAS_GETEXECNAME ;
                 libproc		= SYSHAS_LIBPROC ;
 	} ; /* end ctor */
-} ; /* end struct (syshas) */
+} ; /* end struct (syshas_mgr) */
 
-constexpr syshas_mgr		syshas ;
+extern const syshas_mgr		syshas ;
 
 #endif /* __cplusplus */
 
