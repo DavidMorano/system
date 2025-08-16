@@ -1,4 +1,4 @@
-/* main SUPORT (CEXECER) */
+/* main SUPPORT (CEXECER) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
