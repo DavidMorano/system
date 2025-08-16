@@ -30,7 +30,6 @@
 #include	<sys/types.h>		/* system types */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<ucgetpid.h>
 #include	<getbufsize.h>
@@ -52,6 +51,9 @@
 #include	"sesnotes.h"
 #include	"sesmsg.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -72,16 +74,16 @@ namespace {
 	int		usernamelen ;
 	int		maxpathlen ;
 	int operator () (int = 0) noex ;
-    } ;
-}
+    } ; /* end struct (vars) */
+} /* end namespace */
 
 
 /* forward references */
 
-static int	mkvars(int) noex ;
+local int	mkvars(int) noex ;
 
 template<typename ... Args>
-static int sesnotes_ctor(SN *op,Args ... args) noex {
+local int sesnotes_ctor(SN *op,Args ... args) noex {
 	SESNOTES	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
@@ -101,7 +103,7 @@ static int sesnotes_ctor(SN *op,Args ... args) noex {
 }
 /* end subroutine (sesnotes_ctor) */
 
-static int sesnotes_dtor(SN *op) noex {
+local int sesnotes_dtor(SN *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) {
@@ -126,11 +128,11 @@ static inline int sesnotes_magic(SN *op,Args ... args) noex {
 }
 /* end subroutine (sesnotes_magic) */
 
-static int sesnotes_ready(SN *) noex ;
-static int sesnotes_sends(SN *,char *,int,int,int,cchar *,int) noex ;
-static int sesnotes_sender(SN *,cchar *,int,time_t,cchar *,int) noex ;
+local int sesnotes_ready(SN *) noex ;
+local int sesnotes_sends(SN *,char *,int,int,time_t,cchar *,int) noex ;
+local int sesnotes_sender(SN *,cchar *,int,time_t,cchar *,int) noex ;
 
-static int haveproc(cchar *,int) noex ;
+local int haveproc(cchar *,int) noex ;
 
 
 /* local variables */
@@ -240,7 +242,7 @@ int sesnotes_send(SN *op,int mt,cchar *mp,int ml,pid_t sid) noex {
 
 /* private subroutines */
 
-static int sesnotes_ready(SN *op) noex {
+local int sesnotes_ready(SN *op) noex {
 	constexpr char	dname[] = SN_PROGDNAME ;
 	constexpr char	tpat[] = "sesnotesXXXXXX" ;
 	int		rs = SR_OK ;
@@ -280,8 +282,8 @@ static int sesnotes_ready(SN *op) noex {
 }
 /* end subroutine (sesnotes_ready) */
 
-static int sesnotes_sends(SN *op,char *dbuf,int dlen,
-		int mt,int st,cchar *mp,int ml) noex {
+local int sesnotes_sends(SN *op,char *dbuf,int dlen,
+		int mt,time_t st,cchar *mp,int ml) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -324,7 +326,24 @@ static int sesnotes_sends(SN *op,char *dbuf,int dlen,
 }
 /* end subroutine (sesnotes_sends) */
 
-static int sesnotes_sender(SN *op,cc *ap,int mt,time_t st,cc *sp,int sl) noex {
+local int addrun(sockaddress *sap,cchar *ap) noex {
+    	int		rs ;
+	int		rs1 ;
+	if ((rs = sockaddress_getaddrlen(sap)) >= 0) {
+	    cchar	*name ;
+	    cint	al = rs ;
+	    if (nulstr n ; (rs = n.start(ap,al,&name)) >= 0) {
+		{
+		    u_unlink(name) ;
+		}
+		rs1 = n.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (nulstr) */
+	} /* end if (sockaddress_getaddrlen) */
+	return rs ;
+} /* end subroutine (addrun) */
+
+local int sesnotes_sender(SN *op,cc *ap,int mt,time_t st,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
@@ -373,15 +392,7 @@ static int sesnotes_sender(SN *op,cc *ap,int mt,time_t st,cc *sp,int sl) noex {
 	                f = true ;
 	            } else {
 			if (rs == SR_DESTADDRREQ) {
-			    nulstr	n ;
-			    cchar	*name ;
-			    if ((rs = n.start(ap,al,&name)) >= 0) {
-				{
-			            u_unlink(name) ;
-				}
-				rs1 = n.finish ;
-				if (rs >= 0) rs = rs1 ;
-			    } /* end if (nulstr) */
+			    rs = addrun(&sa,ap) ;
 			} else {
 	                    rs = SR_OK ; /* just ignore any other failures */
 			}
@@ -395,7 +406,7 @@ static int sesnotes_sender(SN *op,cc *ap,int mt,time_t st,cc *sp,int sl) noex {
 }
 /* end subroutine (sesnotes_sender) */
 
-static int haveproc(cchar *pp,int pl) noex {
+local int haveproc(cchar *pp,int pl) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (pl > 0) {
@@ -421,8 +432,8 @@ int vars::operator () (int unl) noex {
 }
 /* end method (vars::operator) */
 
-static int mkvars(int unl) noex {
+local int mkvars(int unl) noex {
     	return var(unl) ;
-}
+} /* end subroutine (mkvars) */
 
 
