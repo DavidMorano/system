@@ -271,7 +271,7 @@ char	*envv[] ;
 
 	                        break ;
 
-/* don't do anything */
+/* do not do anything */
 	                    case 'n':
 	                        pip->f.no = TRUE ;
 	                        break ;
