@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* make a character (8-bit) out of an integer */
+/* make a character-type value (8-bit) returning an integer */
 /* version %I% last-modified %G% */
 
 
@@ -20,7 +20,28 @@
 
 */
 
-/* Copyright © 1998,2018,23023 David A-D- Morano.  All rights reserved. */
+/* Copyright © 1998,2018,2023 David A-D- Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	mkchar
+
+	Description:
+	We make a character-type value (an 8-bit entity) out of an
+	integer and result the resuling integer.  We do this quite
+	simply.
+
+	Synopsis:
+	int mkchar(int ch) noex
+
+	Arguments:
+	ch		a character
+
+	Returns:
+	-		a real character w/o any junk
+
+*******************************************************************************/
 
 #ifndef	MKCHAR_INCLUDE
 #define	MKCHAR_INCLUDE
