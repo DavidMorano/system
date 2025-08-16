@@ -259,7 +259,7 @@ int	maxjobs ;
 	            eprintf("watch: DIR nwatch=%d\n",nwatch) ;
 
 	        else
-	            eprintf("watch: DIR don't know\n") ;
+	            eprintf("watch: DIR do not know\n") ;
 
 	    }
 #endif /* F_DEBUG */
