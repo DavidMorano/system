@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* make a character (8-bit) out of an integer */
+/* make a character-type value (8-bit) returning an integer */
 /* version %I% last-modified %G% */
 
 
@@ -21,8 +21,9 @@
 	mkchar
 
 	Description:
-	We make a character (an 8-bit entity) out of an integer.
-	We do this quite simply.
+	We make a character-type value (an 8-bit entity) out of an
+	integer and result the resuling integer.  We do this quite
+	simply.
 
 	Synopsis:
 	int mkchar(int ch) noex
