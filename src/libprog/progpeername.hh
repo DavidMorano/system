@@ -1,8 +1,8 @@
-/* proglog HEADER */
+/* progpeername HEADER */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* program-logging */
+/* retrive perr-name */
 /* version %I% last-modified %G% */
 
 
@@ -17,20 +17,25 @@
 
 /*******************************************************************************
 
-	Manage program logging operations.
+  	Name:
+	progpeername
+
+	Description:
+	Retrive the perr-name (of something).
 
 *******************************************************************************/
 
-#ifndef	PROGLOG_INCLUDE
-#define	PROGLOG_INCLUDE
+#ifndef	PROGPEERNAME_INCLUDE
+#define	PROGPEERNAME_INCLUDE
 #ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* must be before others */
-#include	<stdarg.h>
+#include	<cstdarg>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<clientinfo.h>
 
@@ -45,6 +50,6 @@ EXTERNC_end
 
 
 #endif /* __cplusplus */
-#endif /* PROGLOG_INCLUDE */
+#endif /* PROGPEERNAME_INCLUDE */
 
 
