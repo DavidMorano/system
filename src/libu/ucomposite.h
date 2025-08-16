@@ -1,4 +1,4 @@
-/* ucomposte HEADER (UNIX® file operations) */
+/* ucomposite HEADER (UNIX® file operations) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -18,12 +18,9 @@
 
 /*******************************************************************************
 
-	Names:
-	u_copy
-
 	Description:
-	All of the UNIX® system calls that use (operate on) a
-	file-descroptor.
+	These subroutine provide some additional LIBU function over
+	just plain UNIX® system calls.
 
 *******************************************************************************/
 
