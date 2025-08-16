@@ -1029,7 +1029,7 @@ int main(int argc,mainv argv,mainv envv) {
 	pip->username = username ;
 	getusername(username,USERNAMELEN,-1) ;
 
-/* create a mail address if we don't already have one */
+/* create a mail address if we do not already have one */
 
 	pip->mailaddr = mailaddr ;
 	if (mailaddr[0] == '\0')
@@ -1046,7 +1046,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    pip->open.configfile = TRUE ;
 	}
 
-/* find anything that we don't already have */
+/* find anything that we do not already have */
 
 	if (pip->slfname[0] == '\0') {
 
