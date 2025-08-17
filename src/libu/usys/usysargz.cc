@@ -52,7 +52,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getpid(2)| */
-#include	<cstring>		/* |strncpy(3c)| */
 #include	<new>			/* |nothrow(3c)| */
 #include	<atomic>		/* |atomic_flag(3c++)| */
 #include	<mutex>			/* |call_once(3c++)| */
@@ -90,15 +89,16 @@ namespace usys {
 	return rss ;
     } /* end method (usysargz::operator) */
     void usysargz::initonce() noex {
-	cnullptr    np{} ;
+	cnothrow	nt{} ;
+	cnullptr	np{} ;
 	if ((rss >= 0) && (name == nullptr)) {
 	    rss = SR_NOMEM ;
-	    if (char *tbuf ; (tbuf = new(nothrow) char[tlen + 1]) != np) {
+	    if (char *tbuf ; (tbuf = new(nt) char[tlen + 1]) != np) {
 		const pid_t	    pid = getpid() ;
 		if ((rss = usys_namepid(tbuf,tlen,pid)) >= 0) {
 		    nlen = rss ;
 		    rss = SR_NOMEM ;
-		    if ((name = new(nothrow) char[nlen + 1]) != np) {
+		    if ((name = new(nt) char[nlen + 1]) != np) {
 			rss = sncpy(name,nlen,tbuf) ;
 		    } /* end if (new-name) */
 		} /* end if (usys_namepid) */
