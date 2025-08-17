@@ -23,7 +23,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<atomic>
+#include	<atomic>		/* |once_flag(3c++)| */
 #include	<mutex>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -35,8 +35,8 @@ using std::once_flag ;
 
 namespace usys {
     struct usysargz {
-	once_flag	ox ;
     	char		*name{} ;
+	once_flag	ox ;
 	int		nlen ;
 	int		rss = SR_OK ;
 	usysargz() = default ;
