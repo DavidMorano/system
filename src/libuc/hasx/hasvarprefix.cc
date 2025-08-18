@@ -17,14 +17,6 @@
 
 /*******************************************************************************
 
-  	Group:
-	hasx
-
-	Description:
-	These subroutines check if a specified c-string has any of
-	some characteristic we are looking for.
-
-
 	Name:
 	hasvarprefix
 
@@ -32,33 +24,34 @@
 	This subroutine tests whether the file-name has the var-path
 	prefix on it.  A so-called "var-path" prefix looks like
 	either one of the following:
-
-	%<string>/<comething>/<...>
-	/%<string>/<something>/...
+		%<string>/<comething>/<...>
+		/%<string>/<something>/...
 
 	Synopsis:
-	bool hasvarprefix(cchar *,int) noex
+	bool hasvarprefix(cchar *sp,int sl) noex
+
+	Arguments:
+	sp		test c-string pointer
+	sl		test c-string length
+
+	Returns:
+	false		assertion fails
+	true		assertion succeeds
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>		/* |strcmp(3c)| + |strncmp(3c)| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<ascii.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
 #include	<mkchar.h>
-#include	<char.h>
-#include	<ischarx.h>
 #include	<localmisc.h>		/* |UC(3dam)| */
 
 #include	"hasx.h"
-
-import libutil ;			/* |lenstr(3u)| */
-import ulibvals ;			/* |ulibval(3u)| */
 
 /* local defines */
 
