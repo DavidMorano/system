@@ -42,10 +42,10 @@ LIBS +=
 
 OBJ0= hasmain.o hasuniq.o
 OBJ1= hasvarprefix.o
-OBJ2=
+OBJ2= hasmodname.o
 OBJ3=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
 
 OBJ= obja.o 
 
@@ -66,7 +66,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -135,5 +135,6 @@ obja.o:			$(OBJA)
 hasxmain.o:		hasmain.cc			$(INCS)
 hasuniq.o:		hasuniq.cc			$(INCS)
 hasvarprefix.o:		hasvarprefix.cc			$(INCS)
+hasmodname.o:		hasmodname.cc			$(INCS)
 
 
