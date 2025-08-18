@@ -28,8 +28,8 @@
 	int hasuniq(cchar *bp,int bl) noex
 
 	Arguments:
-	bp		string to test
-	bl		length of string to test
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	>=0		length of given string
@@ -38,7 +38,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<bitset>		/* |bitset(3c++)| */
 #include	<clanguage.h>
