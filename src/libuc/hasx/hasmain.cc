@@ -36,8 +36,8 @@
 	bool hasempty(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		c-string pointer
-	sl		c-string length
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	1		true (empty)
@@ -58,8 +58,8 @@
 	bool haseoh(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		c-string to test
-	sl		length of strin to test
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	false		assertion fails
@@ -76,8 +76,8 @@
 	bool hasnonwhite(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		c-string pointer
-	sl		c-string length
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	false		c-string is empty
@@ -95,8 +95,8 @@
 	int hasleadcolon(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		pointer to c-string
-	sl		length of c-string
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	false		answer NO
@@ -113,8 +113,8 @@
 	bool hasprintlatin(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		c-string to test
-	sl		length of strin to test
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	false		c-string does not have bad stuff in it
@@ -131,8 +131,8 @@
 	bool hasprintbad(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		c-string to test
-	sl		length of strin to test
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	false		c-string does not have bad stuff in it
@@ -149,8 +149,8 @@
 	bool hasallalpha(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		c-string to test
-	sl		length of c-string to test
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	false		c-string does not have all digits
@@ -167,8 +167,8 @@
 	bool hasallalnum(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		c-string to test
-	sl		length of c-string to test
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	false		c-string does not have all digits
@@ -185,8 +185,8 @@
 	bool hasalldig(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		c-string to test
-	sl		length of strin to test
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	false		c-string does not have all digits
@@ -204,8 +204,8 @@
 	bool hasallbase(cchar *sp,int sl,int base) noex
 
 	Arguments:
-	sp		c-string to test
-	sl		length of c-string to test
+	sp		test c-string pointer
+	sl		test c-string length
 	base		base to check against
 
 	Returns:
@@ -224,9 +224,9 @@
 	bool hasValidMagic(cchar *sp,int sl,cchar *ms) noex
 
 	Arguments:
-	cchar	*sp		c-string buffer to test
-	int	sl		length of c-string buffer
-	int	ms		givem valid magic c-string
+	sp		test c-string pointer
+	sl		test c-string length
+	ms		givem valid magic c-string
 
 	Returns:
 	false		does not match
@@ -246,8 +246,8 @@
 	bool hasNotDots(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		pointer to given c-string
-	sl		length of given c-string
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	false		c-string has the standard dot-dirs
@@ -265,8 +265,8 @@
 	int hasmealone(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		c-string to test
-	sl		length of strin to test
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	false		assertion fails
@@ -284,8 +284,8 @@
 	int hasINET4AddrStr(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		c-string to test
-	sl		length of strin to test
+	sp		test c-string pointer
+	sl		test c-string length
 
 	Returns:
 	false		assertion fails
@@ -295,6 +295,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| + |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -495,23 +496,6 @@ bool hasnum(cchar *sp,int sl) noex {
 	return f ;
 }
 /* end subroutine (hasnum) */
-
-/* has C-lang or C++ "identifier" */
-bool hasmodname(cchar *mp,int ml) noex {
-        bool            f = false ;
-	if (mp) ylikely {
-            if (int ch ; (ml > 0) && (ch = mkchar(*mp) , isalphalatin(ch))) {
-                cint	ch_d = CH_DOT ;
-                cint	ch_u = CH_UNDER ;
-                while (ml-- && *mp) {
-                    ch = mkchar(*mp++) ;
-                    f = isalnumlatin(ch) || (ch == ch_d) || (ch == ch_u) ;
-                    if (! f) break ;
-                } /* end while */
-            } /* end if (correct leading character) */
-	} /* end if (non-null) */
-        return f ;
-} /* end subroutine (hasmodname) */
 
 bool hasdoublewhite(cchar *sp,int sl) noex {
 	bool		f = false ;
