@@ -45,26 +45,6 @@ MODS += usysbasic.ccm ureserve.cmm vecbool.ccm
 LIBS += -liconv -lproc
 
 
-INCDIRS=
-
-LIBDIRS=
-
-
-RUNINFO= -rpath $(RUNDIR)
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
-
-#SOFL= -shared -Xlinker -flat_namespace -Xlinker -undefined -Xlinker suppress
-#SOFL= -shared -Xlinker -undefined -Xlinker dynamic_lookup
-SOFL= -shared
-
-
 OBJ00= syshas.o mailvalues.o endian.o 
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
@@ -111,7 +91,27 @@ OBJG= obj24.o obj25.o obj26.o obj27.o
 OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS=
+
+LIBDIRS=
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+#SOFL= -shared -Xlinker -flat_namespace -Xlinker -undefined -Xlinker suppress
+#SOFL= -shared -Xlinker -undefined -Xlinker dynamic_lookup
+SOFL= -shared
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -126,6 +126,9 @@ so:			$(T).so
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
