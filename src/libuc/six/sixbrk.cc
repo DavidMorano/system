@@ -76,8 +76,6 @@ import chrset ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-
 
 /* local typedefs */
 
