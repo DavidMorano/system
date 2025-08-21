@@ -26,19 +26,21 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
+#pragma		GCC dependency	"mod/chrset.ccm"
+
 export module strnwht ;
 
 import chrset ;
 
 export extern "C" {
     char *strnwht(cchar *,int) noex ;
-    char *strnwhtbrk(cchar *,int,cchar *) noex ;
     char *strnwhtchr(cchar *,int,int) noex ;
+    char *strnwhtbrk(cchar *,int,cchar *) noex ;
 }
 
 export extern "C++" {
-    char *strnwhtbrk(cchar *sp,int sl,const chrset &) noex ;
     char *strnwhtchr(cchar *sp,int sl,const chrset &) noex ;
+    char *strnwhtbrk(cchar *sp,int sl,const chrset &) noex ;
 }
 
 
