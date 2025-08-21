@@ -59,7 +59,7 @@
 #pragma		GCC dependency	"mod/libutil.ccm"
 #pragma		GCC dependency	"mod/chrset.ccm"
 
-import libutil ;
+import libutil ;			/* |getlenstr(3u)| */
 import chrset ;
 
 /* local defines */
@@ -70,6 +70,11 @@ import chrset ;
 
 
 /* external subroutines */
+
+extern "C++" {
+    int siobrk(cchar *,int,const chrset &) noex ;
+    int sirbrk(cchar *,int,const chrset &) noex ;
+}
 
 
 /* external variables */
@@ -103,25 +108,26 @@ cbool			f_sirchr = CF_SIRCHR ;
 
 /* exported subroutines */
 
-int sfext(cchar *sp,int sl,cchar **rpp) noex {
+int sfext(cchar *sp,int µsl,cchar **rpp) noex {
 	int		el = -1 ; /* return-value */
 	if (sp && rpp) ylikely {
 	    cchar	*ep = nullptr ;
 	    if_constexpr (f_sirchr) {
-		if (sl < 0) sl = lenstr(sp) ;
-		while ((sl > 0) && (sp[sl - 1] == CH_SLASH)) {
-		    sl -= 1 ;
-		}
-		if (int si ; (si = sirbrk(sp,sl,bi.brks)) >= 0) {
-                    if (sp[si] == CH_DOT) {
-                        si += 1 ;
-		        el = (sl - si) ; /* <- signal FOUND */
-		        ep = (sp + si) ;
-                    } /* end if (got) */
-                } /* end if (hit something) */
+		if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+		    while ((sl > 0) && (sp[sl - 1] == CH_SLASH)) {
+		        sl -= 1 ;
+		    }
+		    if (int si ; (si = sirbrk(sp,sl,bi.brks)) >= 0) {
+                        if (sp[si] == CH_DOT) {
+                            si += 1 ;
+		            el = (sl - si) ; /* <- signal FOUND */
+		            ep = (sp + si) ;
+                        } /* end if (got) */
+                    } /* end if (hit something) */
+		} /* end if (gelenstr) */
 	    } else {
 	        cchar	*bp ;
-	        if (int bl ; (bl = sfbasename(sp,sl,&bp)) > 0) {
+	        if (int bl ; (bl = sfbasename(sp,µsl,&bp)) > 0) {
 		    if (int si ; (si = sirchr(bp,bl,CH_DOT)) > 0) {
 			si += 1 ;
 		        el = (bl - si) ; /* <- signal FOUND */
