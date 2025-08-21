@@ -203,7 +203,7 @@ OBJ93=
 OBJ94=
 OBJ95=
 
-OBJ96= memfile.o langstate.o sigman.o sighand.o
+OBJ96= memfile.o langx.o sigman.o sighand.o
 OBJ97= comparse.o mhcom.o zos.o tmz.o zdb.o zoffparts.o snflags.o
 OBJ98= openportmsg.o varsub.o userattr.o 
 OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
@@ -699,7 +699,6 @@ userattr.o:		userattr.c userattr.h
 ts.o:			ts.cc ts.h
 envlist.o:		envlist.cc envlist.h
 querystr.o:		querystr.cc querystr.h
-langstate.o:		langstate.cc	langstate.h
 mkdirlist.o:		mkdirlist.cc	mkdirlist.h
 sesmsg.o:		sesmsg.cc sesmsg.h
 msgdata.o:		msgdata.cc msgdata.h
@@ -861,6 +860,11 @@ paramopt.dir:
 # LISTEN
 listen.o:		listen.dir
 listen.dir:
+	makesubdir $@
+
+# LANGX
+langx.o:		langx.dir
+langx.dir:
 	makesubdir $@
 
 # LOADMODNAMES

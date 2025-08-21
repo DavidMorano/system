@@ -29,14 +29,16 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
+#pragma		GCC dependency	"mod/chrset.ccm"
+
 export module siwht ;
 
 import chrset ;
 
 export extern "C" {
     int	siwht(cchar *,int) noex ;
-    int	siwhtbrk(cchar *,int,cchar *) noex ;
     int	siwhtchr(cchar *,int,int) noex ;
+    int	siwhtbrk(cchar *,int,cchar *) noex ;
 }
 
 export extern "C++" {
