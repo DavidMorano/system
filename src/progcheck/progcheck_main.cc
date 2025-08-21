@@ -1,6 +1,6 @@
 /* b_progcheck SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C99 */
+/* lang=C++20 */
 
 /* check C-language programs for some simple problems */
 /* version %I% last-modified %G% */
@@ -37,13 +37,13 @@
 	$ progcheck [<file(s)> ...] [<opt(s)>]
 
 	Notes:
-	This program is quite inefficient.  It calls langstate four
+	This program is quite inefficient.  It calls LANGSTATE four
 	times for each character of input.  A proper implementation
 	would call it just once for each character of input!  How
 	did this happen?  It happened because we built the program
 	in incremental stages and what should have happened was
 	that a rewrite, refactor, whatever should have reorganized
-	the program to call langstate only once for each input
+	the program to call LANGSTATE only once for each input
 	character.  Whatever, the program works right now.
 
 *******************************************************************************/
@@ -70,6 +70,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<getoutenv.h>
+#include	<mallocxx.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -77,6 +78,7 @@
 #include	<langstate.h>
 #include	<optval.h>
 #include	<sncpyx.h>
+#include	<rmx.h>
 #include	<sfx.h>
 #include	<matstr.h>
 #include	<linehist.h>
@@ -97,11 +99,13 @@
 
 #define	PI		proginfo
 
-#define	LI		locinfo
 #define	LI_FL		locinfo_fl
 
 #define	KO		keyopt
 #define	KO_CUR		keyopt_cur
+
+#define	LS		langstate
+#define	LS_STAT		langstate_stat
 
 #define	AI		ARGINFO
 
@@ -109,15 +113,7 @@
 
 #define	FUNTAB		fun_tab
 
-#define	FUNCOUNT	fun_count
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(2048,LINE_MAX)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif /* LINEBUFLEN */
+#define	FC		fun_count
 
 #define	PROGCHECK_NCH	3
 
@@ -175,32 +171,32 @@ struct fun_count {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) noex ;
+local int	mainsub(int,cchar **,cchar **,void *) noex ;
 
-static int	usage(PI *) noex ;
+local int	usage(PI *) noex ;
 
-static int	procopts(PI *,KO *) noex ;
-static int	procargs(PI *,AI *,BITS *,cchar *,cchar *) noex ;
-static int	procfile(PI *,void *,cchar *) noex ;
-static int	procline(PI *,langstate *,FUNCOUNT *,int,cchar *,int) noex ;
-static int	procout(PI *,void *,cchar *,FUNCOUNT *) noex ;
-static int	procouthist(PI *,void *,HIST *) noex ;
-static int	procoutlang(PI *,void *,langstate *) noex ;
+local int	procopts(PI *,KO *) noex ;
+local int	procargs(PI *,AI *,BITS *,cchar *,cchar *) noex ;
+local int	procfile(PI *,void *,cchar *) noex ;
+local int	procln(PI *,LS *,FC *,int,cchar *,int) noex ;
+local int	procout(PI *,void *,cchar *,FC *) noex ;
+local int	procouthist(PI *,void *,HIST *) noex ;
+local int	procoutlang(PI *,void *,LS *) noex ;
 
-static int	locinfo_start(LI *,PI *) noex ;
-static int	locinfo_finish(LI *) noex ;
+local int	locinfo_start(LI *,PI *) noex ;
+local int	locinfo_finish(LI *) noex ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LI *,cchar **,cchar *,int) noex ;
+local int	locinfo_setentry(LI *,cchar **,cchar *,int) noex ;
 #endif
 
-static int	hist_start(HIST *) noex ;
-static int	hist_proc(HIST *,int,cchar *,int) noex ;
-static int	hist_count(HIST *,int) noex ;
-static int	hist_get(HIST *,int,int,int *) noex ;
-static int	hist_finish(HIST *) noex ;
+local int	hist_start(HIST *) noex ;
+local int	hist_proc(HIST *,int,cchar *,int) noex ;
+local int	hist_count(HIST *,int) noex ;
+local int	hist_get(HIST *,int,int,int *) noex ;
+local int	hist_finish(HIST *) noex ;
 
-static int	funcount_clear(FUNCOUNT *) noex ;
+local int	funcount_clear(FC *) noex ;
 
 static cchar	*chartype(int) noex ;
 
@@ -348,7 +344,7 @@ int p_progcheck(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* local subroutines */
 
 /* ARGSUSED */
-static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
+local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PI		pi, *pip = &pi ;
 	LI		li, *lip = &li ;
 	AI		ainfo ;
@@ -1003,7 +999,7 @@ badarg:
 }
 /* end subroutine (mainsub) */
 
-static int usage(PI *pip) noex {
+local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar	*pn = pip->progname ;
@@ -1022,7 +1018,7 @@ static int usage(PI *pip) noex {
 /* end subroutine (usage) */
 
 /* process the program ako-options */
-static int procopts(PI *pip,KO *kop) noex {
+local int procopts(PI *pip,KO *kop) noex {
 	LI		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1119,7 +1115,7 @@ static int procopts(PI *pip,KO *kop) noex {
 }
 /* end subroutine (procopts) */
 
-static int procargs(PI *pip,AI *aip,BITS *bop,cchar *ofn,cchar *afn) noex {
+local int procargs(PI *pip,AI *aip,BITS *bop,cchar *ofn,cchar *afn) noex {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
 	int		rs1 ;
@@ -1156,35 +1152,28 @@ static int procargs(PI *pip,AI *aip,BITS *bop,cchar *ofn,cchar *afn) noex {
 	    } /* end if (ok) */
 
 	    if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
-	        SHIO	afile, *afp = &afile ;
-
-	        if (strcmp(afn,"-") == 0) afn = STDFNIN ;
-
-	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            cint	llen = LINEBUFLEN ;
-	            char	lbuf[LINEBUFLEN + 1] ;
-
-	            while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
-	                int	len = rs ;
-
-	                if (lbuf[len - 1] == '\n') len -= 1 ;
-	                lbuf[len] = '\0' ;
-
-	                if ((cl = sfshrink(lbuf,len,&cp)) > 0) {
-	                    if (cp[0] != '#') {
-	                        lbuf[(cp+cl)-lbuf] = '\0' ;
-	                        pan += 1 ;
-	                        rs = procfile(pip,ofp,lbuf) ;
+		if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+	            SHIO	afile, *afp = &afile ;
+		    cint	llen = rs ;
+	            if (strcmp(afn,"-") == 0) afn = STDFNIN ;
+	            if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
+	                while ((rs = shio_readln(afp,lbuf,llen)) > 0) {
+	                    int	len = rs ;
+	                    if (lbuf[len - 1] == '\n') len -= 1 ;
+	                    lbuf[len] = '\0' ;
+	                    if ((cl = sfshrink(lbuf,len,&cp)) > 0) {
+	                        if (cp[0] != '#') {
+	                            lbuf[(cp+cl)-lbuf] = '\0' ;
+	                            pan += 1 ;
+	                            rs = procfile(pip,ofp,lbuf) ;
+	                        }
 	                    }
-	                }
-
-	                if (rs >= 0) rs = lib_sigterm() ;
-	                if (rs >= 0) rs = lib_sigintr() ;
-	                if (rs < 0) break ;
-	            } /* end while (reading lines) */
-
-	            rs1 = shio_close(afp) ;
-	            if (rs >= 0) rs = rs1 ;
+	                    if (rs >= 0) rs = lib_sigterm() ;
+	                    if (rs >= 0) rs = lib_sigintr() ;
+	                    if (rs < 0) break ;
+	                } /* end while (reading lines) */
+	                rs1 = shio_close(afp) ;
+	                if (rs >= 0) rs = rs1 ;
 	        } else {
 	            if (! pip->f.quiet) {
 	                fmt = "%s: inaccessible argument-list (%d)\n" ;
@@ -1192,7 +1181,9 @@ static int procargs(PI *pip,AI *aip,BITS *bop,cchar *ofn,cchar *afn) noex {
 	                shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
 	            }
 	        } /* end if */
-
+		    rs1 = uc_free(lbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
 	    } /* end if (procesing file argument file list) */
 
 	    rs1 = shio_close(ofp) ;
@@ -1207,63 +1198,57 @@ static int procargs(PI *pip,AI *aip,BITS *bop,cchar *ofn,cchar *afn) noex {
 }
 /* end subroutine (procargs) */
 
-static int procfile(PI *pip,void *ofp,cchar *fn) noex {
+local int procfile(PI *pip,void *ofp,cchar *fn) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*pn = pip->progname ;
-	cchar		*fmt ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("progcheck/procfile: ent fn=%s\n",fn) ;
 #endif
-	if (HIST h ; (rs = hist_start(&h)) >= 0) {
-	    if (langstate ls ; (rs = langstate_start(&ls)) >= 0) {
-	        cint	ncca = nelem(cca) ;
-	        SHIO	cfile, *cfp = &cfile ;
-	        if ((rs = shio_open(cfp,fn,"r",0666)) >= 0) {
-	            FUNCOUNT	counts[ncca+1] ;
-	            cint	llen = LINEBUFLEN ;
-	            int		len ;
-	            int		ln = 1 ;	/* line-number (starts @ 1) */
-	            char	lbuf[LINEBUFLEN + 1] ;
-	            funcount_clear(counts) ;
-	            while ((rs = shio_readline(cfp,lbuf,llen)) > 0) {
-	                len = rs ;
-
-	                if (lbuf[len-1] == '\n') len -= 1 ;
-
-	                if (len > 0) {
-	                    FUNCOUNT	*c = counts ;
-	                    if ((rs = procline(pip,&ls,c,ln,lbuf,len)) >= 0) {
-	                        rs = hist_proc(&h,ln,lbuf,len) ;
+	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+	    if (HIST h ; (rs = hist_start(&h)) >= 0) {
+	        if (LS ls ; (rs = langstate_start(&ls)) >= 0) {
+	            cint	ncca = nelem(cca) ;
+	            SHIO	cfile, *cfp = &cfile ;
+	            if ((rs = shio_open(cfp,fn,"r",0666)) >= 0) {
+	                FC	counts[ncca + 1] ;
+	                int	ln = 1 ;	/* line-number */
+	                funcount_clear(counts) ;
+	                while ((rs = shio_readln(cfp,lbuf,llen)) > 0) {
+			    cchar *lp = lbuf ;
+			    if (cint l = rmeol(lbuf,rs) ; ll > 0) {
+	                        FC *c = counts ;
+	                        if ((rs = procln(pip,&ls,c,ln,lp,ll)) >= 0) {
+	                            rs = hist_proc(&h,ln,lp,ll) ;
+	                        }
+	                    } /* end if (rmeol) */
+	                    ln += 1 ;
+	                    if (rs < 0) break ;
+	                } /* end while (reading lines) */
+	                if (rs >= 0) {
+	                    if ((rs = procout(pip,ofp,fn,counts)) >= 0) {
+	                        if ((rs = procouthist(pip,ofp,&h)) >= 0) {
+	                            rs = procoutlang(pip,ofp,&ls) ;
+	                        }
 	                    }
-	                }
-
-	                ln += 1 ;
-	                if (rs < 0) break ;
-	            } /* end while (reading lines) */
-
-	            if (rs >= 0) {
-	                if ((rs = procout(pip,ofp,fn,counts)) >= 0) {
-	                    if ((rs = procouthist(pip,ofp,&h)) >= 0) {
-	                        rs = procoutlang(pip,ofp,&ls) ;
-	                    }
-	                }
-	            } /* end if (ok) */
-
-	            rs1 = shio_close(cfp) ;
+	                } /* end if (ok) */
+	                rs1 = shio_close(cfp) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } else {
+	                cchar *fmt = "%s: inaccessible file (%d)\n" ;
+	                shio_printf(pip->efp,fmt,pn,rs) ;
+	                shio_printf(pip->efp,"%s: file=%s\n",pn,fn) ;
+	            } /* end if */
+	            rs1 = langstate_finish(&ls) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } else {
-	            fmt = "%s: inaccessible file (%d)\n" ;
-	            shio_printf(pip->efp,fmt,pn,rs) ;
-	            shio_printf(pip->efp,"%s: file=%s\n",pn,fn) ;
-	        } /* end if */
-	        rs1 = langstate_finish(&ls) ;
+	        } /* end if (langstate) */
+	        rs1 = hist_finish(&h) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (langstate) */
-	    rs1 = hist_finish(&h) ;
+	    } /* end if (hist) */
+	    rs1 = uc_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (hist) */
+	} /* end if (m-a-f) */
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("progcheck/procfile: ret rs=%d\n",rs) ;
@@ -1272,33 +1257,33 @@ static int procfile(PI *pip,void *ofp,cchar *fn) noex {
 }
 /* end subroutine (procfile) */
 
-static int procline(PI *pip,langstate *lsp,FUNCOUNT *counts,
-		int ln,cchar *lbuf,int llen) noex {
-	cint		ncca = nelem(cca) ;
-	int		rs = SR_OK ;
-	if (pip == nullptr) return SR_FAULT ;
-	for (int j = 0 ; j < llen ; j += 1) {
-	    cint	ch = MKCHAR(lbuf[j]) ;
+local int procln(PI *pip,LS *lsp,FC *cntp,int ln,cc *lp,int ll) noex {
+	int		rs = SR_FAULT ;
+	if (pip && lp) {
+	    rs = SR_OK ;
+	    for (int j = 0 ; j < ll ; j += 1) {
+	        cint	ch = MKCHAR(lp[j]) ;
 #if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("progcheck/procline: ln=%u\n",ln) ;
+	        if (DEBUGLEVEL(4))
+	            debugprintf("progcheck/procln: ln=%u\n",ln) ;
 #endif
-	    if ((rs = langstate_proc(lsp,ln,ch)) > 0) {
-	        for (int k = 0 ; k < ncca ; k += 1) {
-	            if (ch == cca[k].c_open) {
-	                counts[k].c_open += 1 ;
-	            } else if (ch == cca[k].c_close) {
-	                counts[k].c_close += 1 ;
-	            }
-	        } /* end for */
-	    } /* end if (langstate_proc) */
-	} /* end for */
-
+	        if ((rs = langstate_proc(lsp,ln,ch)) > 0) {
+		    cint	ncca = nelem(cca) ;
+	            for (int k = 0 ; k < ncca ; k += 1) {
+	                if (ch == cca[k].c_open) {
+	                    cntp[k].c_open += 1 ;
+	                } else if (ch == cca[k].c_close) {
+	                    cntp[k].c_close += 1 ;
+	                }
+	            } /* end for */
+	        } /* end if (langstate_proc) */
+	    } /* end for */
+	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (procline) */
+/* end subroutine (procln) */
 
-static int procout(PI *pip,void *ofp,cchar *fn,FUNCOUNT *counts) noex {
+local int procout(PI *pip,void *ofp,cchar *fn,FC *counts) noex {
 	LI		*lip = pip->lip ;
 	cint		ncca = nelem(cca) ;
 	int		rs = SR_OK ;
@@ -1333,7 +1318,7 @@ static int procout(PI *pip,void *ofp,cchar *fn,FUNCOUNT *counts) noex {
 }
 /* end subroutine (procout) */
 
-static int procouthist(PI *pip,void *ofp,HIST *hlp) noex {
+local int procouthist(PI *pip,void *ofp,HIST *hlp) noex {
 	cint		ncca = nelem(cca) ;
 	int		rs = SR_OK ;
 	for (int w = 0 ; w < ncca ; w += 1) {
@@ -1369,15 +1354,14 @@ static int procouthist(PI *pip,void *ofp,HIST *hlp) noex {
 }
 /* end subroutine (procouthist) */
 
-static int procoutlang(PI *pip,void *ofp,langstate *lsp) noex {
-	langstate_stat	stat ;
+local int procoutlang(PI *pip,void *ofp,LS *lsp) noex {
 	int		rs ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("progcheck/procoutlang: ent\n") ;
 #endif
-	if ((rs = langstate_stat(lsp,&stat)) > 0) {
-	    LI	*lip = pip->lip ;
+	if (LS_STAT stat ; (rs = langstate_getstat(lsp,&stat)) > 0) {
+	    LI		*lip = pip->lip ;
 	    cchar	*cp = langstatetypes[stat.type] ;
 	    cchar	*fmt = "unbalanced »%s« at line=%u\n" ;
 #if	CF_DEBUG
@@ -1386,12 +1370,12 @@ static int procoutlang(PI *pip,void *ofp,langstate *lsp) noex {
 #endif
 	    lip->f.dirty = true ;
 	    rs = shio_printf(ofp,fmt,cp,stat.line) ;
-	}
+	} /* end if (langstate_getstat) */
 	return rs ;
 }
 /* end subroutine (procoutlang) */
 
-static int locinfo_start(LI *lip,PI *pip) noex {
+local int locinfo_start(LI *lip,PI *pip) noex {
 	int		rs = SR_OK ;
 
 	if (lip == nullptr) return SR_FAULT ;
@@ -1404,7 +1388,7 @@ static int locinfo_start(LI *lip,PI *pip) noex {
 }
 /* end subroutine (locinfo_start) */
 
-static int locinfo_finish(LI *lip) noex {
+local int locinfo_finish(LI *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1421,53 +1405,48 @@ static int locinfo_finish(LI *lip) noex {
 /* end subroutine (locinfo_finish) */
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl) noex {
-	vecstr		*slp ;
-	int		rs = SR_OK ;
+local int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl) noex {
+	int		rs = SR_FAULT ;
 	int		len = 0 ;
-
-	if (lip == nullptr) return SR_FAULT ;
-	if (epp == nullptr) return SR_FAULT ;
-
-	slp = &lip->stores ;
-	if (! lip->open.stores) {
-	    rs = vecstr_start(slp,4,0) ;
-	    lip->open.stores = (rs >= 0) ;
-	}
-
-	if (rs >= 0) {
-	    int	oi = -1 ;
-	    if (*epp != nullptr) {
-	        oi = vecstr_findaddr(slp,*epp) ;
+	if (lip && epp) {
+	    vecstr	*slp = &lip->stores ;
+	    if (! lip->open.stores) {
+	        rs = vecstr_start(slp,4,0) ;
+	        lip->open.stores = (rs >= 0) ;
 	    }
-	    if (vp != nullptr) {
-	        len = strnlen(vp,vl) ;
-	        rs = vecstr_store(slp,vp,len,epp) ;
-	    } else {
-	        *epp = nullptr ;
-	    }
-	    if ((rs >= 0) && (oi >= 0)) {
-	        vecstr_del(slp,oi) ;
-	    }
-	} /* end if (ok) */
-
+	    if (rs >= 0) {
+	        int	oi = -1 ;
+	        if (*epp != nullptr) {
+	            oi = vecstr_findaddr(slp,*epp) ;
+	        }
+	        if (vp != nullptr) {
+	            len = strnlen(vp,vl) ;
+	            rs = vecstr_store(slp,vp,len,epp) ;
+	        } else {
+	            *epp = nullptr ;
+	        }
+	        if ((rs >= 0) && (oi >= 0)) {
+	            vecstr_del(slp,oi) ;
+	        }
+	    } /* end if (ok) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (locinfo_setentry) */
 #endif /* CF_LOCSETENT */
 
-static int hist_start(HIST *hlp) noex {
+local int hist_start(HIST *hlp) noex {
 	cint		n = PROGCHECK_NCH ;
 	int		rs = SR_OK ;
 	int		i ; /* used-afterwards */
 	for (i = 0 ; (i < n) ; i += 1) {
-	    linehist	*lhp = (hlp->types+i) ;
+	    linehist	*lhp = (hlp->types + i) ;
 	    rs = linehist_start(lhp,balstrs[i]) ;
 	    if (rs < 0) break ;
 	} /* end for */
 	if (rs < 0) {
 	    for (int j = 0 ; j < i ; j += 1) {
-	        linehist	*lhp = (hlp->types+j) ;
+	        linehist	*lhp = (hlp->types + j) ;
 	        linehist_finish(lhp) ;
 	    } /* end for */
 	} /* end if (error) */
@@ -1475,12 +1454,12 @@ static int hist_start(HIST *hlp) noex {
 }
 /* end subroutine (hist_start) */
 
-static int hist_finish(HIST *hlp) noex {
+local int hist_finish(HIST *hlp) noex {
 	cint		n = PROGCHECK_NCH ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	for (int j = 0 ; j < n ; j += 1) {
-	    linehist	*lhp = (hlp->types+j) ;
+	    linehist	*lhp = (hlp->types + j) ;
 	    rs1 = linehist_finish(lhp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end for */
@@ -1488,38 +1467,38 @@ static int hist_finish(HIST *hlp) noex {
 }
 /* end subroutine (hist_finish) */
 
-static int hist_proc(HIST *hlp,int ln,cchar *sp,int sl) noex {
+local int hist_proc(HIST *hlp,int ln,cchar *sp,int sl) noex {
 	cint		n = PROGCHECK_NCH ;
 	int		rs = SR_OK ;
 	for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-	    linehist	*lhp = (hlp->types+i) ;
+	    linehist	*lhp = (hlp->types + i) ;
 	    rs = linehist_proc(lhp,ln,sp,sl) ;
 	} /* end for */
 	return rs ;
 }
 /* end subroutine (hist_proc) */
 
-static int hist_count(HIST *hlp,int w) noex {
+local int hist_count(HIST *hlp,int w) noex {
 	int		rs = SR_INVALID ;
 	if (w < PROGCHECK_NCH) {
-	    linehist	*lhp = (hlp->types+w) ;
+	    linehist	*lhp = (hlp->types + w) ;
 	    rs = linehist_count(lhp) ;
 	}
 	return rs ;
 }
 /* end if (hist_count) */
 
-static int hist_get(HIST *hlp,int w,int i,int *lnp) noex {
+local int hist_get(HIST *hlp,int w,int i,int *lnp) noex {
 	int		rs = SR_INVALID ;
 	if (w < PROGCHECK_NCH) {
-	    linehist	*lhp = (hlp->types+w) ;
+	    linehist	*lhp = (hlp->types + w) ;
 	    rs = linehist_get(lhp,i,lnp) ;
 	}
 	return rs ;
 }
 /* end if (hist_get) */
 
-static int funcount_clear(FUNCOUNT *counts) noex {
+local int funcount_clear(FC *counts) noex {
 	cint	ncca = nelem(cca) ;
 	for (int i = 0 ; i < ncca ; i += 1) {
 	    counts[i].c_open = 0 ;
