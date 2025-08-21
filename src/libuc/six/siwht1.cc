@@ -21,19 +21,26 @@
 /*******************************************************************************
 
 	Name:
-	siwht{xxx}
+	siwht
+	siwhtchr
+	siwhtbrk
 
 	Description:
-	This subroutine searchs for an a character that is not part
-	of a certain character class.
+	This subroutine searchs for an a character that is either
+	the specified character (if provided), or for a character
+	in a specified chracter-class (if provided), or failing
+	that a white-space character.
 
 	Synopsis:
-	int siwht{xxx}(cchar *sp,int sl) noex
+	int siwht(cchar *sp,int sl) noex
+	int siwhtchr(cchar *sp,int sl,int sch) noex
+	int siwhtbrk(cchar *sp,int sl,cchar *ss) noex
 
 	Arguments:
-	xxx	one of: oct, dec, hex
 	sp	string to be examined
 	sl	length of string of break character to break on
+	sch	search character
+	ss	search character-class (a c-string)
 
 	Returns:
 	>=0	index of found character
@@ -52,6 +59,9 @@ module ;
 #include	<usysdefs.h>
 #include	<strn.h>
 #include	<localmisc.h>
+
+#pragma		GCC dependency	"mod/siwht.ccm"
+#pragma		GCC dependency	"mod/strnwht.ccm"
 
 module siwht ;
 
@@ -97,16 +107,6 @@ extern "C" {
 	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwht) */
-    int siwhtbrk(cchar *sp,int sl,cchar *ss) noex {
-    	cnullptr	np{} ;
-    	int		si = -1 ;
-	if (sp) ylikely {
-	    if (cchar *tp ; (tp = strnwhtbrk(sp,sl,ss)) != np) {
-	        si = intconv(tp - sp) ;
-	    }
-	} /* end if (non-null) */
-    	return si ;
-    } /* end subroutine (siwhtbrk) */
     int siwhtchr(cchar *sp,int sl,int sch) noex {
     	cnullptr	np{} ;
     	int		si = -1 ;
@@ -117,6 +117,16 @@ extern "C" {
 	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwhtchr) */
+    int siwhtbrk(cchar *sp,int sl,cchar *ss) noex {
+    	cnullptr	np{} ;
+    	int		si = -1 ;
+	if (sp) ylikely {
+	    if (cchar *tp ; (tp = strnwhtbrk(sp,sl,ss)) != np) {
+	        si = intconv(tp - sp) ;
+	    }
+	} /* end if (non-null) */
+    	return si ;
+    } /* end subroutine (siwhtbrk) */
 } /* end extern */
 
 extern "C++" {
