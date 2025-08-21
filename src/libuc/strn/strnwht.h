@@ -29,8 +29,8 @@
 EXTERNC_begin
 
 extern char *strnwht(cchar *,int) noex ;
-extern char *strnwhtbrk(cchar *,int,cchar *) noex ;
 extern char *strnwhtchr(cchar *,int,int) noex ;
+extern char *strnwhtbrk(cchar *,int,cchar *) noex ;
 
 EXTERNC_end
 
