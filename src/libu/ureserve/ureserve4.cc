@@ -5,6 +5,7 @@
 /* reserved interfaces */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -41,20 +42,26 @@ module ;
 #include	<string>
 #include	<string_view>
 #include	<algorithm>		/* |ranges::sort(3c++)| */
+#include	<iostream>		/* |cerr(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<ulogerror.h>
-#include	<ascii.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |eol| */
+
+#pragma		GCC dependency	"mod/libutil.ccm"
 
 module ureserve ;
 
 import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -63,6 +70,7 @@ using std::string ;			/* type */
 using std::string_view ;		/* type */
 using std::ranges::sort ;		/* niebloid */
 using std::ranges::binary_search ;	/* niebloid */
+using std::cerr ;			/* variable */
 
 
 /* local typedefs */
@@ -83,6 +91,8 @@ typedef string_view		strview ;
 
 
 /* local variables */
+
+cbool		f_debug = CF_DEBUG ;
 
 
 /* exported variables */
@@ -160,6 +170,9 @@ int vecstr::search(cchar *sp,int sl) noex {
 
 int vecstr::get(int ai,ccharpp rpp) noex {
     	int		rs = SR_NOTOPEN ;
+	if_constexpr (f_debug) {
+	    cerr << __func__ << ": ent ai=" << ai << eol ;
+	}
 	if (fl.open) ylikely {
 	    csize cnt = size() ;
 	    if (ai >= 0) ylikely {
@@ -176,7 +189,10 @@ int vecstr::get(int ai,ccharpp rpp) noex {
 		        rs = SR_BUGCHECK ;
 		    }
 		} /* end if (request in-range) */
-	    }
+	    } /* end if (valid) */
+	} /* end if (open) */
+	if_constexpr (f_debug) {
+	    cerr << __func__ << ": ent rs=" << rs << eol ;
 	}
 	return rs ;
 } /* end method (vecstr::get) */
@@ -250,10 +266,10 @@ int vecstr::istart(int ne) noex {
 	    } catch (...) {
 		rs = SR_NOMEM ;
 	    }
-	}
+	} /* end if (non-zero positive) */
 	fl.open = true ;
 	return rs ;
-}
+} /* end method (vecstr::istart) */
 
 int vecstr::ifinish() noex {
     	int		rs = SR_NOTOPEN ;
@@ -262,7 +278,7 @@ int vecstr::ifinish() noex {
 	    fl.open = false ;
 	}
 	return rs ;
-}
+} /* end method (vecstr::ifinish) */
 
 int vecstr::isort() noex {
     	int		rs = SR_NOTOPEN ;
