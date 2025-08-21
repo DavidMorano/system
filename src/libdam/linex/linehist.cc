@@ -56,7 +56,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::vector ;			/* type */
 using std::nothrow ;			/* constant */
 
@@ -94,7 +93,7 @@ typedef vector<item> *	ivecp ;
 /* forward references */
 
 template<typename ... Args>
-static int linehist_ctor(linehist *op,Args ... args) noex {
+local int linehist_ctor(linehist *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
@@ -109,7 +108,7 @@ static int linehist_ctor(linehist *op,Args ... args) noex {
 }
 /* end subroutine (linehist_ctor) */
 
-static int linehist_dtor(linehist *op) noex {
+local int linehist_dtor(linehist *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -123,7 +122,7 @@ static int linehist_dtor(linehist *op) noex {
 /* end subroutine (linehist_dtor) */
 
 template<typename ... Args>
-static inline int linehist_magic(linehist *op,Args ... args) noex {
+local inline int linehist_magic(linehist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == LINEHIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -157,7 +156,7 @@ int linehist_start(linehist *op,cchar *ss) noex {
 	            if (rs < 0) {
 		        delete lvp ;
 		        op->lvp = nullptr ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (new-ivec) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
@@ -194,7 +193,7 @@ int linehist_finish(linehist *op) noex {
 int linehist_proc(linehist *op,int ln,cchar *sp,int sl) noex {
 	cnullptr	np{} ;
 	int		rs ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if ((rs = linehist_magic(op,sp)) >= 0) {
 	    if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) {
 	        cint	sch0 = mkchar(op->ss[0]) ;
@@ -239,7 +238,7 @@ int linehist_proc(linehist *op,int ln,cchar *sp,int sl) noex {
 int linehist_count(linehist *op) noex {
 	cnullptr	np{} ;
 	int		rs ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if ((rs = linehist_magic(op)) >= 0) {
 	    if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) {
 	        c = intconv(lvp->size()) ;
