@@ -51,7 +51,9 @@
 
 #include	"umemalloc.hh"
 
-import libutil ;
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -97,19 +99,22 @@ namespace {
 /* exported subroutines */
 
 namespace libu {
-    int umemallocstrw(cchar *sp,int sl,cchar **rpp) noex {
+    int umemallocstrw(cchar *sp,int µsl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
+	int		bl = 0 ; /* return-value */
 	if (sp && rpp) {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (char *bp ; (rs = umemalloc((sl + 1),&bp)) >= 0) {
-	        *rpp = bp ;
-	        strncpy(bp,sp,sl) ;
-	        bp[sl] = '\0' ;
-	    } else {
-		*rpp = nullptr ;
-	    } /* end if (umemalloc) */
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	        if (char *bp ; (rs = umemalloc((sl + 1),&bp)) >= 0) {
+		    bl = sl ;
+	            *rpp = bp ;
+	            strncpy(bp,sp,sl) ;
+	            bp[bl] = '\0' ;
+	        } else {
+		    *rpp = nullptr ;
+	        } /* end if (umemalloc) */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? sl : rs ;
+	return (rs >= 0) ? bl : rs ;
     } /* end subroutine (umemallocstrw) */
     int umemalloc(int sz,void *vp) noex {
 	umember	lmo ;
