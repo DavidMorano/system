@@ -95,7 +95,8 @@ struct langstate : langstate_head {
 	} ;
 	langstate(const langstate &) = delete ;
 	langstate &operator = (const langstate &) = delete ;
-	int proc(int,int) noex ;
+	int proc(int,int = -1) noex ;
+	int procln(int,cchar *,int = -1) noex ;
 	int getstat(langstate_info *) noex ;
 	operator int () noex ;
 	void dtor() noex ;
@@ -111,6 +112,7 @@ EXTERNC_begin
 
 extern int langstate_start(langstate *) noex ;
 extern int langstate_proc(langstate *,int,int) noex ;
+extern int langstate_procln(langstate *,int,cchar *,int) noex ;
 extern int langstate_getstat(langstate *,langstate_info *) noex ;
 extern int langstate_finish(langstate *) noex ;
 
