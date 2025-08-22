@@ -55,8 +55,6 @@
 #include	<grp.h>
 #include	<dirent.h>
 
-#include	<usys.h>		/* <- auxilllary OS support */
-
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -71,11 +69,9 @@
 #include	<uxti.h>
 #include	<upthread.h>
 
-#include	<ucent.h>
 #include	<ucfunctioncodes.h>
 #include	<ucopen.h>
 #include	<uclibsubs.h>
-
 
 
 #endif /* USYSTEM_INCLUDE */
