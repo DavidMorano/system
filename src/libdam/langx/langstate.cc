@@ -9,7 +9,11 @@
 /* revision history:
 
 	= 2008-06-29, David A­D­ Morano
-	This was really made from scratch.
+	This was really made from scratch, but was inspired by
+	previous code of a similar nature, dating back a long time
+	(likely to the 1980s).  Various programs that I have made
+	over the earlier decades (of my career) have used code like
+	this object (but that previous code was not objectified).
 
 	= 2016-06-29, David A­D­ Morano
 	I updated this to add the C++11 'noexcept' where appropriate.
@@ -27,7 +31,15 @@
 	langstate
 
 	Description:
-	We track the parse state of C-language type input.
+	This object is used to track the parse state of C-language
+	type source text.
+
+	Notes:
+	1. The subroutine (member function) |langstate_procln()|
+	is really quite useless.  The reason is because a partcially
+	"clear" line, a line that has both comments (or literals)
+	and no special state, is not really usefull for practivally
+	anything.
 
 *******************************************************************************/
 
@@ -36,13 +48,14 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<ascii.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"langstate.h"
 
 #pragma		GCC dependency	"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -211,6 +224,21 @@ int langstate_proc(langstate *op,int ln,int ch) noex {
 }
 /* end subroutine (langstate_proc) */
 
+int langstate_procln(langstate *op,int ln,cchar *lp,int ll) noex {
+	int		rs ;
+	int		f = false ; /* return-value */
+	if ((rs = langstate_magic(op,lp)) >= 0) {
+	    while (ll && *lp) {
+		cint ch = mkchar(*lp) ;
+		if ((rs = langstate_proc(op,ln,ch)) > 0) {
+		    if (!f) f = true ;
+		}
+		if (rs < 0) break ;
+	    } /* end while */
+	} /* end if (magic) */
+	return (rs >= 0) ? f : rs ;
+} /* end subroutine (langstate_procln) */
+
 int langstate_getstat(langstate *op,langstate_info *sbp) noex {
 	int		rs ;
 	int		type = langstatetype_clear ;
@@ -232,6 +260,18 @@ int langstate_getstat(langstate *op,langstate_info *sbp) noex {
 
 
 /* local subroutines */
+
+int langstate::proc(int ln,int ch) noex {
+	return langstate_proc(this,ln,ch) ;
+}
+
+int langstate::procln(int ln,cchar *lp,int ll) noex {
+	return langstate_procln(this,ln,lp,ll) ;
+}
+
+int langstate::getstat(langstate_info *sbp) noex {
+	return langstate_getstat(this,sbp) ;
+}
 
 void langstate::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
