@@ -190,7 +190,7 @@ export {
 export {
     template<typename T>
     constexpr inline T *resumelife(void *vp) noex {
-    	T *rp = cast_reinterpret<T *>(vp) ;
+    	T *rp = cast_static<T *>(vp) ;
     	return rp ;
     }
 } /* end export */
