@@ -135,6 +135,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-langstate.o:		langstate.cc langstate.h	$(INCS)
+langstate.o:		langstate.cc	langstate.h	$(INCS)
+langproc.o:		langproc.cc	langproc.h	$(INCS)
 
 
