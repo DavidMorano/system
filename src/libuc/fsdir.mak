@@ -40,6 +40,13 @@ MODS +=
 LIBS +=
 
 
+OBJ0= fsdir_xx.o
+OBJ1= fsdir_other.o
+OBJ2= fsdir_darwin.o
+
+OBJ= obj0.o obj1.o obj2.o
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
@@ -56,13 +63,6 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= fsdir_xx.o
-OBJ1= fsdir_other.o
-OBJ2= fsdir_darwin.o
-
-OBJ= obj0.o obj1.o obj2.o
-
-
 .SUFFIXES:		.hh .ii .ccm
 
 
@@ -76,6 +76,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -110,16 +113,16 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 fsdir_other.o:		fsdir_other.cc			$(INCS)
