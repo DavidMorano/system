@@ -63,6 +63,8 @@
 
 #include	"fsdir.h"
 
+#pragma		GCC dependency	"mod/libutil.ccm"
+
 import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
@@ -72,12 +74,10 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::destroy_at ;			/* subroutine-template */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libu::cfdec ;			/* subroutine */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
