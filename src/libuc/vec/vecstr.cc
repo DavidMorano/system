@@ -92,6 +92,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |sort(3c++)| */
+#include	<string>
 #include	<usystem.h>
 #include	<nulstr.h>
 #include	<nleadstr.h>
@@ -102,7 +103,7 @@
 
 #include	"vecstr.h"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* local defines */
 
@@ -113,7 +114,7 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using std::string ;			/* type */
 using std::sort ;			/* subroutine-template */
 
 
@@ -126,6 +127,10 @@ extern "C" {
 
 
 /* external subroutines */
+
+extern "C++" {
+    int		vecstr_add(vecstr *,string *) noex ;
+}
 
 
 /* external variables */
@@ -819,6 +824,16 @@ int vecstr_avmkstr(vecstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecstr_avmkstr) */
+
+int vecstr_add(vecstr *op,string *strp) noex {
+	int		rs = SR_FAULT ;
+	if (op && strp) {
+	    cchar	*sp = strp->c_str() ;
+	    cint	sl = intconv(strp->size()) ;
+	    rs = vecstr_add(op,sp,sl) ;
+	}
+	return rs ;
+} /* end subroutine (vecstr_add) */
 
 
 /* private subroutines */
