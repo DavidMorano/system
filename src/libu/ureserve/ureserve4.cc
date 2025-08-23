@@ -122,6 +122,16 @@ int vecstr::add(cchar *sp,int sl) noex {
 	return rs ;
 } /* end method (vecstr::add) */
 
+int vecstr::add(string *strp) noex {
+    	int		rs = SR_FAULT ;
+	if (strp) ylikely {
+	    cchar	*sp = strp->c_str() ;
+	    cint	sl = intconv(strp->size()) ;
+	    rs = add(sp,sl) ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (vecstr::add) */
+
 int vecstr::adduniq(cchar *sp,int sl) noex {
     	int		rs ;
 	if ((rs = find(sp,sl)) >= 0) {
@@ -325,6 +335,11 @@ int vecstr::icount() const noex {
 	}
 	return rs ;
 } /* end method (vecstr::icount) */
+
+/* special */
+int vecstr_add(vecstr *op,string *strp) noex {
+    	return op->add(strp) ;
+}
 
 void vecstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
