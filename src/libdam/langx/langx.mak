@@ -41,11 +41,11 @@ LIBS +=
 
 
 OBJ0= langstate.o
-OBJ1=
+OBJ1= langproc.o
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o 
+OBJA= obj0.o obj1.o
 
 OBJ= obja.o 
 
