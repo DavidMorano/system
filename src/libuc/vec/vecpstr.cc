@@ -70,8 +70,9 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<new>
-#include	<algorithm>
+#include	<new>			/* |nothrow(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<string>
 #include	<usystem.h>
 #include	<vechand.h>
 #include	<vstrcmpx.h>
@@ -83,18 +84,18 @@
 
 #include	"vecpstr.h"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* local defines */
 
-#define	VPS_CHSIZE	512	/* starting table size */
+#define	VPS_CHSIZE	512		/* starting table size */
 #define	VPS_CH		vecpstr_ch 
 #define	MODP2(v,n)	((v) & ((n) - 1))
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using std::string ;			/* type */
 using std::sort ;			/* subroutine-template */
 using std::min ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -110,6 +111,13 @@ extern "C" {
 
 
 /* external subroutines */
+
+extern "C++" {
+    int		vecpstr_add(vecpstr *,string *) noex ;
+}
+
+
+/* external variables */
 
 
 /* local structures */
@@ -809,6 +817,16 @@ int vecpstr_getvec(vecpstr *op,mainv *rppp) noex {
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (vecpstr_getvec) */
+
+int vecpstr_add(vecpstr *op,string *strp) noex {
+	int		rs = SR_FAULT ;
+	if (op && strp) {
+	    cchar	*sp = strp->c_str() ;
+	    cint	sl = intconv(strp->size()) ;
+	    rs = vecpstr_add(op,sp,sl) ;
+	}
+	return rs ;
+} /* end subroutine (vecpstr_add) */
 
 
 /* private subroutines */
