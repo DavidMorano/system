@@ -27,6 +27,7 @@
 #include	<usysrets.h>
 
 #include	<langstate.h>
+#include	<langproc.h>
 
 
 #endif /* LANGX_INCLUDE */
