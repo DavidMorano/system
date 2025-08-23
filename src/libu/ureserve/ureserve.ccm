@@ -197,6 +197,7 @@ export {
 	} ; /* end ctor */
 	int add(cchar *,int = -1) noex ;
 	int adduniq(cchar *,int = -1) noex ;
+	int add(string *) noex ;
 	int find(cchar *,int = -1) noex ;
 	int search(cchar *,int = -1) noex ;
 	int get(int,ccharpp) noex ;
@@ -220,6 +221,7 @@ export {
     struct vecstr_cur {
 	vecstr::iterator	it ;
     } ; /* end struct (vestr_cur) */
+    int vecstr_add(vecstr *,string *) noex ;
 } /* end export */
 
 export {
