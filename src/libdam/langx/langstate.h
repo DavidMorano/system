@@ -92,6 +92,7 @@ struct langstate : langstate_head {
 	langstate() noex {
 	    start	(this,langstatemem_start) ;
 	    finish	(this,langstatemem_finish) ;
+	    magic = 0 ;
 	} ;
 	langstate(const langstate &) = delete ;
 	langstate &operator = (const langstate &) = delete ;
@@ -101,7 +102,7 @@ struct langstate : langstate_head {
 	operator int () noex ;
 	void dtor() noex ;
 	destruct langstate() {
-	    dtor() ;
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (langstate) */
 #else	/* __cplusplus */
