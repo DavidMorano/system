@@ -5,6 +5,7 @@
 /* computer-language text processor */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	1		/* debugging */
 
 /* revision history:
 
@@ -64,12 +65,15 @@
 #pragma		GCC dependency		"mod/ureserve.ccm"
 #pragma		GCC dependency		"mod/debug.ccm"
 
-
 import libutil ;			/* |resumelife(3u)| */
 import ureserve ;			/* |vecstr(3u)| */
 import debug ;
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -148,6 +152,8 @@ local inline int langproc_magic(langproc *op,Args ... args) noex {
 
 /* local variables */
 
+cbool		f_debug = CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -201,31 +207,36 @@ int langproc_proc(langproc *op,int ln,cchar *sp,int sl) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ; /* return-value */
-	{
+	if_constexpr (f_debug) {
 	    strnul s(sp,sl) ;
 	    debprintf(__func__,"ent ln=%d s=>%s<\n",ln,ccp(s)) ;
 	}
 	if ((rs = langproc_magic(op,sp)) >= 0) {
 	    rs = SR_BUGCHECK ;
 	    if (vecstr *lvp ; (lvp = resumelife<vecstr>(op->lvp)) != np) {
+		langstate *lsp = op->lsp ;
 		string	tmp ;
 		bool	frm = false ;
 		rs = SR_OK ;
 	        while ((rs >= 0) && sl && *sp) {
 		    cint	ch = mkchar(*sp) ;
-		    if ((rs = langstate_proc(op->lsp,ln,ch)) > 0) {
-			try {
-			    if (frm) {
-			        tmp += CH_SP ;
+		    if ((rs = lsp->proc(ln,ch)) >= 0) {
+			if ((rs = lsp->code) > 0) {
+			    try {
+			        if (frm) {
+			            tmp += char(CH_SP) ;
+			            c += 1 ;
+				    frm = false ;
+			        } /* end if (previous non-clear) */
+			        tmp += char(ch) ;
 			        c += 1 ;
-				frm = false ;
-			    } /* end if (previous non-clear) */
-			    tmp += char(ch) ;
-			    c += 1 ;
-			} catch (...) {
-			    rs = SR_NOMEM ;
-			}
-		    } else {
+			    } catch (...) {
+			        rs = SR_NOMEM ;
+			    }
+			} else if (rs == 0) {
+			    frm = true ;
+			} /* end if */
+		    } else if (rs == 0) {
 			frm = true ;
 		    } /* end if (langstate_proc) */
 		    sp += 1 ;
@@ -236,7 +247,9 @@ int langproc_proc(langproc *op,int ln,cchar *sp,int sl) noex {
 		}
 	    } /* end if (vecstr) */
 	} /* end if (magic) */
+	if_constexpr (f_debug) {
 	    debprintf(__func__,"ret rs=%d c=%d\n",rs,c) ;
+	}
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (langproc_proc) */
@@ -278,13 +291,27 @@ int langproc_curenum(langproc *op,langproc_cur *curp,cchar **rpp) noex {
 	int		len = 0 ; /* return-value */
 	if ((rs = langproc_magic(op,curp,rpp)) >= 0) {
 	    rs = SR_BUGCHECK ;
+	    if_constexpr (f_debug) {
+	        debprintf(__func__,"check\n") ;
+	    }
 	    if (vecstr *lvp ; (lvp = resumelife<vecstr>(op->lvp)) != np) {
-		if (cchar *cp ; (rs = lvp->get(curp->i++,&cp)) >= 0) {
+		cint	idx = (curp->i >= 0) ? (curp->i + 1) : 0 ;
+	        if_constexpr (f_debug) {
+	            debprintf(__func__,"-> get()\n") ;
+		}
+		if (cchar *cp ; (rs = lvp->get(idx,&cp)) >= 0) {
 		    *rpp = cp ;
 		    len = lenstr(cp) ;
+		    curp->i = idx ;
 		}
 	    } /* end if (non-null) */
+	    if_constexpr (f_debug) {
+	        debprintf(__func__,"check rs=%d\n",rs) ;
+	    }
 	} /* end if (magic) */
+	if_constexpr (f_debug) {
+	    debprintf(__func__,"ret rs=%d len=%d\n",rs,len) ;
+	}
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (langproc_curenum) */
