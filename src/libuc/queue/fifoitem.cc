@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* FIFO string operations */
+/* FIFO-item operations */
 /* version %I% last-modified %G% */
 
 
@@ -118,7 +118,7 @@ int fifoitem_ins(fifoitem *op,cvoid *sp,int sl) noex {
 	int		rs ;
 	if ((rs = fifoitem_magic(op,sp)) >= 0) {
 	    cint	esz = szof(fifoitem_ent) ;
-	    if (void *vp{} ; (rs = uc_malloc(esz,&vp)) >= 0) {
+	    if (void *vp ; (rs = uc_malloc(esz,&vp)) >= 0) {
 	        fifoitem_ent	*ep = entp(vp) ;
 	        if ((rs = entry_start(ep,sp,sl)) >= 0) {
 		    if (op->head && op->tail) {
@@ -319,7 +319,7 @@ int fifoitem_present(fifoitem *op,cv *sp,int sl,fifoitem_cmp scmp) noex {
 		f = f && (sl == ep->dl) ;
 		f = f && scmp(sp,ep->dp) ;
 		return f ;
-	    } ;
+	    } ; /* end lambda */
 	    if (FI_CUR cur ; (rs = fifoitem_curbegin(op,&cur)) >= 0) {
 	        FI_ENT	*ep ;
 	        while ((rs = fifoitem_curfetch(op,&cur,&ep)) >= 0) {
@@ -366,14 +366,5 @@ static int entry_finish(fifoitem_ent *ep) noex {
 	return rs ;
 }
 /* end subroutine (entry_finish) */
-
-#ifdef	COMMENT
-static int cmpent(FI_ENT *e1p,FI_ENT *e2p) noex {
-    	cint		sxl = e1p->dl ;
-    	cchar		*s1p = charp(e1p->dp) ;
-    	cchar		*s2p = charp(e2p->dp) ;
-	return strwcmp(s1p,s2p,sxl) ;
-}
-#endif /* COMMENT */
 
 
