@@ -42,7 +42,7 @@ enum langstatetypes {
 	langstatetype_quote,
 	langstatetype_literal,
 	langstatetype_overlast
-} ;
+} ; /* end enum (langstatetypes) */
 
 struct langstate_flags {
 	uint		comment:1 ;
@@ -50,19 +50,19 @@ struct langstate_flags {
 	uint		literal:1 ;
 	uint		skip:1 ;
 	uint		clear:1 ;
-} ;
+} ; /* end struct (langstate_flags) */
 
 struct langstate_lineinfo {
 	int		line ;
 	int		type ;
-} ;
+} ; /* end struct (langstate_lineinfo) */
 
 struct langstate_head {
 	LANGSTATE_FL	fl ;
 	uint		magic ;
 	int		line ;
 	int		pch ;		/* previous character */
-} ;
+} ; /* end struct (linestage_head) */
 
 typedef LANGSTATE_FL	langstate_fl ;
 typedef LANGSTATE_INFO	langstate_info ;
@@ -71,6 +71,7 @@ typedef LANGSTATE_INFO	langstate_info ;
 enum langstatemems {
     	langstatemem_start,
 	langstatemem_finish,
+	langstatemem_code,
 	langstatemem_overlast
 } ;
 struct langstate ;
@@ -89,11 +90,13 @@ struct langstate_co {
 struct langstate : langstate_head {
 	langstate_co	start ;
 	langstate_co	finish ;
+	langstate_co	code ;
 	langstate() noex {
 	    start	(this,langstatemem_start) ;
 	    finish	(this,langstatemem_finish) ;
+	    code	(this,langstatemem_code) ;
 	    magic = 0 ;
-	} ;
+	} ; /* end ctor */
 	langstate(const langstate &) = delete ;
 	langstate &operator = (const langstate &) = delete ;
 	int proc(int,int = -1) noex ;
@@ -115,6 +118,7 @@ extern int langstate_start(langstate *) noex ;
 extern int langstate_proc(langstate *,int,int) noex ;
 extern int langstate_procln(langstate *,int,cchar *,int) noex ;
 extern int langstate_getstat(langstate *,langstate_info *) noex ;
+extern int langstate_code(langstate *) noex ;
 extern int langstate_finish(langstate *) noex ;
 
 EXTERNC_end
