@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	charq
+
+	Description:
 	This module implements a character queue object.
 
 *******************************************************************************/
@@ -30,6 +34,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -39,6 +46,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int charq_start(charq *op,int sz) noex {
@@ -46,14 +56,13 @@ int charq_start(charq *op,int sz) noex {
 	if (op) {
 	    rs = SR_INVALID ;
 	    if (sz > 1) {
-		void	*vp{} ;
-	        if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
+		if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
 		    op->buf = charp(vp) ;
 	            op->sz = sz ;
 	            op->count = 0 ;
 	            op->ri = 0 ;
 	            op->wi = 0 ;
-	        }
+	        } /* end if (memory-allocation) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
