@@ -106,18 +106,18 @@ struct filer : filer_head {
 	filer_co	writealign ;
 	filer_co	writezero ;
 	filer() noex {
-	    reserve(this,filermem_reserve) ;
-	    invalidate(this,filermem_invalidate) ;
-	    flush(this,filermem_flush) ;
-	    adv(this,filermem_adv) ;
-	    poll(this,filermem_poll) ;
-	    lockend(this,filermem_lockend) ;
-	    finish(this,filermem_finish) ;
-	    writeblanks(this,filermem_writeblanks) ;
-	    writealign(this,filermem_writealign) ;
-	    writezero(this,filermem_writezero) ;
+	    reserve	(this,filermem_reserve) ;
+	    invalidate	(this,filermem_invalidate) ;
+	    flush	(this,filermem_flush) ;
+	    adv		(this,filermem_adv) ;
+	    poll	(this,filermem_poll) ;
+	    lockend	(this,filermem_lockend) ;
+	    finish	(this,filermem_finish) ;
+	    writeblanks	(this,filermem_writeblanks) ;
+	    writealign	(this,filermem_writealign) ;
+	    writezero	(this,filermem_writezero) ;
 	    magic = 0 ;
-	} ;
+	} ; /* end ctor */
 	filer(const filer &) = delete ;
 	filer &operator = (const filer &) = delete ;
 	int start(int = 0,off_t = 0z,int = 0,int = 0) noex ;
