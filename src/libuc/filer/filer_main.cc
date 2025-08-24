@@ -196,13 +196,13 @@ int filer_read(filer *op,void *rbuf,int rlen,int to) noex {
 	        int	mlen ;
 	        while ((op->len == 0) && (rc-- > 0)) {
 		    cint	fd = op->fd ;
-		    cint	bufsize = op->dlen ;
+		    cint	bsz = op->dlen ;
 		    char	*buf = op->dbuf ;
 	            op->bp = op->dbuf ;
 		    if (to >= 0) {
-	                rs = uc_reade(fd,buf,bufsize,to,fmo) ;
+	                rs = uc_reade(fd,buf,bsz,to,fmo) ;
 		    } else {
-	                rs = u_read(fd,buf,bufsize) ;
+	                rs = u_read(fd,buf,bsz) ;
 		    }
 	            if ((rs == SR_TIMEDOUT) && (tlen > 0)) {
 	                f_timedout = true ;
@@ -256,13 +256,13 @@ int filer_readln(filer *op,char *rbuf,int rlen,int to) noex {
 	        int	mlen ;
 	        while ((op->len == 0) && (rc-- > 0)) {
 		    cint	fd = op->fd ;
-		    cint	bufsize = op->dlen ;
+		    cint	bsz = op->dlen ;
 		    char	*buf = op->dbuf ;
 	            op->bp = op->dbuf ;
 		    if (to >= 0) {
-	                rs = uc_reade(fd,buf,bufsize,to,fmo) ;
+	                rs = uc_reade(fd,buf,bsz,to,fmo) ;
 		    } else {
-	                rs = u_read(fd,buf,bufsize) ;
+	                rs = u_read(fd,buf,bsz) ;
 		    }
 	            if ((rs == SR_TIMEDOUT) && (tlen > 0)) {
 	                f_timedout = true ;
