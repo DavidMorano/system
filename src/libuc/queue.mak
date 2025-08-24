@@ -31,11 +31,28 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= queue.h
+INCS += queue.h
 
-LIBS=
+MODS +=
+
+LIBS +=
+
+
+OBJ0_QUEUE= plainq.o q.o aiq.o
+OBJ1_QUEUE= pq.o ciq.o piq.o intiq.o
+OBJ2_QUEUE= cq.o fifoitem.o fifoelem.o
+OBJ3_QUEUE= charq.o chariq.o
+OBJ4_QUEUE= slq.o fifostr.o
+OBJ5_QUEUE= slist.o
+OBJ6_QUEUE=
+OBJ7_QUEUE=
+
+OBJA_QUEUE= obj0_queue.o obj1_queue.o obj2_queue.o 
+OBJB_QUEUE= obj3_queue.o obj4_queue.o obj5_queue.o
+
+OBJ_QUEUE= obja_queue.o objb_queue.o
 
 
 INCDIRS=
@@ -44,7 +61,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,20 +71,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_QUEUE= plainq.o q.o aiq.o
-OBJ1_QUEUE= pq.o ciq.o piq.o intiq.o
-OBJ2_QUEUE= cq.o fifoitem.o fifoelem.o
-OBJ3_QUEUE= charq.o chariq.o
-OBJ4_QUEUE= slq.o fifostr.o
-OBJ5_QUEUE= slist.o
-
-OBJA_QUEUE= obj0_queue.o obj1_queue.o obj2_queue.o 
-OBJB_QUEUE= obj3_queue.o obj4_queue.o obj5_queue.o
-
-OBJ_QUEUE= obja_queue.o objb_queue.o
-
-
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -82,6 +85,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -94,12 +100,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_QUEUE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_QUEUE)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -112,29 +121,35 @@ control:
 
 
 obj0_queue.o:		$(OBJ0_QUEUE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_queue.o:		$(OBJ1_QUEUE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_queue.o:		$(OBJ2_QUEUE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_queue.o:		$(OBJ3_QUEUE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4_queue.o:		$(OBJ4_QUEUE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5_queue.o:		$(OBJ5_QUEUE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6_queue.o:		$(OBJ6_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7_queue.o:		$(OBJ7_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja_queue.o:		$(OBJA_QUEUE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb_queue.o:		$(OBJB_QUEUE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 # single-list-pointer-queue (singly linked pointer queue) */
