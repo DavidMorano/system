@@ -184,22 +184,26 @@ int vecstr::get(int ai,ccharpp rpp) noex {
 	    cerr << __func__ << ": ent ai=" << ai << eol ;
 	}
 	if (fl.open) ylikely {
-	    csize cnt = size() ;
-	    if (ai >= 0) ylikely {
-		cint	n = intconv(cnt) ;
-		rs = SR_NOTFOUND ;
-		if (ai < n) ylikely {
-		    try {
-		        string &s = at(ai) ;
-	    	        rs = SR_OK ;
-		        if (rpp) {
-			    *rpp = s.c_str() ;
-			}
-		    } catch (const std::out_of_range &) {
-		        rs = SR_BUGCHECK ;
-		    }
-		} /* end if (request in-range) */
-	    } /* end if (valid) */
+	    rs = SR_FAULT ;
+	    if (rpp) {
+	        csize cnt = size() ;
+	        rs = SR_INVALID ;
+	        if (ai >= 0) ylikely {
+		    cint	n = intconv(cnt) ;
+		    rs = SR_NOTFOUND ;
+		    if (ai < n) ylikely {
+		        try {
+		            string &s = at(ai) ;
+	    	            rs = SR_OK ;
+		            if (rpp) {
+			        *rpp = s.c_str() ;
+			    }
+		        } catch (const std::out_of_range &) {
+		            rs = SR_BUGCHECK ;
+		        }
+		    } /* end if (request in-range) */
+	        } /* end if (valid) */
+	    } /* end if (non-null) */
 	} /* end if (open) */
 	if_constexpr (f_debug) {
 	    cerr << __func__ << ": ent rs=" << rs << eol ;
