@@ -258,6 +258,15 @@ int langstate_getstat(langstate *op,langstate_info *sbp) noex {
 }
 /* end subroutine (langstate_getstat) */
 
+int langstate_code(langstate *op) noex {
+	int		rs ;
+	int		f = false ;
+	if ((rs = langstate_magic(op)) >= 0) {
+	    f = op->fl.clear || op->fl.quote || op->fl.literal ;
+	} /* end if (magic) */
+	return (rs >= 0) ? f : rs ;
+} /* end subroutine (langstate_code) */
+
 
 /* local subroutines */
 
@@ -296,6 +305,9 @@ langstate_co::operator int () noex {
 	        break ;
 	    case langstatemem_finish:
 	        rs = langstate_finish(op) ;
+	        break ;
+	    case langstatemem_code:
+	        rs = langstate_code(op) ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
