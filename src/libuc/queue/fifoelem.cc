@@ -9,7 +9,8 @@
 /* revision history :
 
 	= 1998-12-01, David A­D­ Morano
-	Module was originally written.
+	Module was originally written.  This object may actually date 
+	from the 1980s.
 
 */
 
@@ -35,7 +36,9 @@
 
 #include	"fifoelem.h"
 
-import libutil ;
+#pragma		GCC dependency	"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| + |memcopy(3u)| */
 
 /* local defines */
 
@@ -79,227 +82,253 @@ static int	entry_finish(FE_ENT *) noex ;
 
 /* exported subroutines */
 
-int fifoelem_start(fifoelem *op) noex {
+int fifoelem_start(FE *op) noex {
     	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	    op->head = op->tail = nullptr ;
 	    op->n = 0 ;
 	    op->magic = FIFOELEM_MAGIC ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (fifoelem_start) */
 
-int fifoelem_finish(fifoelem *op) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
-
-	while ((rs = fifoelem_curdel(op,nullptr)) >= 0) ;
-	if (rs == SR_NOTFOUND) rs = SR_OK ;
-
-	op->magic = 0 ;
+int fifoelem_finish(FE *op) noex {
+	int		rs ;
+	if ((rs = fifoelem_magic(op)) >= 0) {
+	    while ((rs = fifoelem_del(op)) >= 0) ;
+	    if (rs == SR_NOTFOUND) rs = SR_OK ;
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (fifoelem_finish) */
 
-int fifoelem_add(fifoelem *op,void *usp,int usl) noex {
-	cint		esize = szof(FE_ENT) ;
+int fifoelem_add(FE *op,void *usp,int usl) noex {
+    	cnullptr	np{} ;
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (usp == nullptr) return SR_FAULT ;
-
-	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
-
-	if (void *vp ; (rs = uc_malloc(esize,&vp)) >= 0) {
-	    FE_ENT	*ep = (FIFOELEM_ENT *) vp ;
-	    if ((rs = entry_start(ep,usp,usl)) >= 0) {
-	        if (op->head == nullptr) {
-	            op->head = ep ;
-	            op->tail = ep ;
-	            ep->prev = ep->next = nullptr ;
-	        } else {
-	            ep->prev = op->tail ;
-	            (op->tail)->next = ep ;
-	            op->tail = ep ;
-	        }
-	        op->n += 1 ;
+	int		n = 0 ; /* return-value */
+	if ((rs = fifoelem_magic(op,usp)) >= 0) {
+	    cint	rsz = szof(FE_ENT) ;
+	    if (void *vp ; (rs = uc_malloc(rsz,&vp)) >= 0) {
+	        FE_ENT	*ep = (FE_ENT *) vp ;
+	        if ((rs = entry_start(ep,usp,usl)) >= 0) {
+	            if (op->head && op->tail) {
+	                ep->prev = op->tail ;
+	                (op->tail)->next = ep ;
+	                op->tail = ep ;
+		    } else if ((op->head == np) && (op->tail == np)) {
+	                op->head = ep ;
+	                op->tail = ep ;
+	                ep->prev = ep->next = nullptr ;
+	            } else {
+			rs = SR_BADFMT ;
+	            }
+	            op->n += 1 ;
+		    if (rs < 0) {
+			entry_finish(ep) ;
+		    } /* end if (error) */
+	        } /* end if (entry_start) */
+		n = op->n ;
 	        if (rs < 0) {
 		    uc_free(vp) ;
-		}
-	    } /* end if (entry_start) */
-	} /* end if (m-a) */
-
-	return (rs >= 0) ? op->n : rs ;
+		} /* end if (error) */
+	    } /* end if (m-a) */
+	} /* end if (magic) */
+	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (fifoelem_add) */
 
-int fifoelem_remove(fifoelem *op,void *ebuf,int elen) noex {
-	FE_ENT		*ep ;
-	int		rs = SR_OK ;
+int fifoelem_rem(FE *op,void *ebuf,int elen) noex {
+	int		rs ;
 	int		rs1 ;
-	int		slen ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (ebuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
-
-/* can we give the call an entry? */
-
-	if (op->head == nullptr)
-	    return SR_NOTFOUND ;
-
-	ep = op->head ;
-	if ((elen >= 0) && (ep->dl > elen))
-	    return SR_TOOBIG ;
-
-	memcpy(ebuf,ep->dp,ep->dl) ;
-
-	slen = ep->dl ;
-	op->head = ep->next ;
-	if (op->head == nullptr) {
-	    op->tail = nullptr ;
-	} else {
-	    (op->head)->prev = nullptr ;
-	}
-	{
-	rs1 = entry_finish(ep) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	{
-	rs1 = uc_free(ep) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	op->n -= 1 ;
+	int		slen ; /* return-value */
+	if ((rs = fifoelem_magic(op,ebuf)) >= 0) {
+	    rs = SR_NOTFOUND ;
+	    if (op->head) {
+		FE_ENT	*ep = op->head ;
+		rs = SR_TOOBIG ;
+	        if ((elen < 0) || (ep->dl <= elen)) {
+	            memcopy(ebuf,ep->dp,ep->dl) ;
+		    slen = ep->dl ;
+		    op->head = ep->next ;
+		    if (op->head == nullptr) {
+	    	       op->tail = nullptr ;
+		    } else {
+	    	        (op->head)->prev = nullptr ;
+		    }
+		    {
+		       rs1 = entry_finish(ep) ;
+		       if (rs >= 0) rs = rs1 ;
+		    }
+		    {
+		       rs1 = uc_free(ep) ;
+		       if (rs >= 0) rs = rs1 ;
+		    }
+		    op->n -= 1 ;
+	        } /* end if (valid) */
+	    } /* end if (empty) */
+	} /* end if (magic) */
 	return (rs >= 0) ? slen : rs ;
 }
-/* end subroutine (fifoelem_remove) */
+/* end subroutine (fifoelem_rem) */
 
-int fifoelem_curfetch(fifoelem *op,FE_CUR *cp,FE_ENT **epp) noex {
-	FE_ENT		*ep ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (epp == nullptr) return SR_FAULT ;
-
-	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
-
-/* OK, do the deed */
-
-	if ((cp == nullptr) || (cp->current == nullptr)) {
-	    ep = op->head ;
-	} else {
-	    ep = (cp->current)->next ;
-	}
-
-	if (cp) {
-	    cp->current = ep ;
-	}
-
-	if (epp) {
-	    *epp = ep ;
-	}
-
-	return ((ep != nullptr) ? ep->dl : SR_NOTFOUND) ;
+int fifoelem_get(FE *op,FE_ENT **epp) noex {
+    	cnullptr	np{} ;
+    	int		rs ;
+	int		dl = 0 ; /* return-value */
+	if ((rs = fifoelem_magic(op)) >= 0) {
+	    FE_ENT	*ep = nullptr ;
+	    if (op->head && op->tail) {
+		ep = op->head ;
+		dl = ep->dl ;
+	    } else if ((op->head == np) && (op->tail == np)) {
+		rs = SR_NOTFOUND ;
+	    } else {
+		rs = SR_BADFMT ;
+	    }
+	    if (epp) *epp = ep ;
+	} /* end if (magic) */
+	return (rs >= 0) ? dl : rs ;
 }
-/* end subroutine (fifoelem_curfetch) */
+/* end subroutine (fifoelem_get) */
 
-int fifoelem_curdel(fifoelem *op,FE_CUR *cp) noex {
-	FE_ENT	*ep ;
-	int		rs = SR_OK ;
+int fifoelem_del(FE *op) noex {
+    	cnullptr	np{} ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
-
-	/* OK, do the deed */
-	if ((cp == nullptr) || (cp->current == nullptr)) {
-	    ep = op->head ;
-	} else {
-	    ep = cp->current ;
-	}
-
-	if (ep == nullptr)
-	    return SR_NOTFOUND ;
-
-	if (cp != nullptr) {
-
-	    if (ep->prev == nullptr) {
+	int		n = 0 ; /* return-value */
+	if ((rs = fifoelem_magic(op)) >= 0) {
+	    if (op->head && op->tail) {
+	        FE_ENT	*ep = op->head ;
 	        op->head = ep->next ;
+	        if (op->head == nullptr) {
+	            op->tail = nullptr ;
+	        } else {
+	            (op->head)->prev = nullptr ;
+	        }
+	        {
+	            rs1 = entry_finish(ep) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+	            rs1 = uc_free(ep) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        op->n -= 1 ;
+	        n = op->n ;
+	    } else if ((op->head == np) && (op->tail == np)) {
+		rs = SR_NOTFOUND ;
 	    } else {
-	        (ep->prev)->next = ep->next ;
+		rs = SR_BADFMT ;
 	    }
-
-	    if (ep->next == nullptr) {
-	        op->tail = ep->prev ;
-	    } else {
-	        (ep->next)->prev = ep->prev ;
-	    }
-
-	    cp->current = ep->prev ;
-
-	} else {
-
-	    op->head = ep->next ;
-	    if (op->head == nullptr) {
-	        op->tail = nullptr ;
-	    } else {
-	        (op->head)->prev = nullptr ;
-	    }
-
-	} /* end if */
-	{
-	rs1 = entry_finish(ep) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	{
-	rs1 = uc_free(ep) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-
-	op->n -= 1 ;
-	return (rs >= 0) ? op->n : rs ;
+	} /* end if (magic) */
+	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (fifoelem_curdel) */
+/* end subroutine (fifoelem_del) */
 
-int fifoelem_count(fifoelem *op) noex {
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
-
-	return op->n ;
+int fifoelem_count(FE *op) noex {
+    	int		rs ;
+	int		n = 0 ; /* return-value */
+	if ((rs = fifoelem_magic(op)) >= 0) {
+	    n = op->n ;
+	}
+	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (fifoelem_count) */
 
-int fifoelem_curbegin(FE *op,FE_CUR *cp) noex {
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
-
-	cp->current = nullptr ;
-	return SR_OK ;
+int fifoelem_curbegin(FE *op,FE_CUR *curp) noex {
+    	int		rs ;
+	if ((rs = fifoelem_magic(op,curp)) >= 0) {
+	    curp->current = nullptr ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (fifoelem_curbegin) */
 
-int fifoelem_curend(FE *op,FE_CUR *cp) noex {
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != FIFOELEM_MAGIC) return SR_NOTOPEN ;
-
-	cp->current = nullptr ;
-	return SR_OK ;
+int fifoelem_curend(FE *op,FE_CUR *curp) noex {
+    	int		rs ;
+	if ((rs = fifoelem_magic(op,curp)) >= 0) {
+	    curp->current = nullptr ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (fifoelem_curend) */
 
-int fifoelem_present(fifoelem *op,cv *vsp,int vsl,fifoelem_cmp scmp) noex {
+int fifoelem_curfetch(FE *op,FE_CUR *curp,FE_ENT **epp) noex {
+    	cnullptr	np{} ;
+    	int		rs ;
+	int		dl = 0 ; /* return-value */
+	if ((rs = fifoelem_magic(op,curp)) >= 0) {
+	    FE_ENT	*ep = nullptr ;
+	    if (op->head && op->tail) {
+	        if (curp->current == np) {
+	            ep = op->head ;
+	        } else {
+	            ep = (curp->current)->next ;
+	        }
+	        curp->current = ep ;
+		dl = ep->dl ;
+	    } else if ((op->head == np) && (op->tail == np)) {
+		rs = SR_NOTFOUND ;
+	    } else {
+		rs = SR_BADFMT ;
+	    }
+	    if (epp) *epp = ep ;
+	} /* end if (magic) */
+	return (rs >= 0) ? dl : rs ;
+}
+/* end subroutine (fifoelem_curfetch) */
+
+int fifoelem_curdel(FE *op,FE_CUR *curp) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
-	int		dl = 0 ;
+	int		n = 0 ; /* return-value */
+	if ((rs = fifoelem_magic(op,curp)) >= 0) {
+	    FE_ENT	*ep = nullptr ;
+	    if (op->head && op->tail) {
+	        if (curp->current == nullptr) {
+	            ep = op->head ;
+	        } else {
+	            ep = curp->current ;
+	        }
+	        if (ep->prev == nullptr) {
+	            op->head = ep->next ;
+	        } else {
+	            (ep->prev)->next = ep->next ;
+	        }
+	        if (ep->next == nullptr) {
+	            op->tail = ep->prev ;
+	        } else {
+	            (ep->next)->prev = ep->prev ;
+	        }
+	        curp->current = ep->prev ;
+	    } else if ((op->head == np) && (op->tail == np)) {
+		rs = SR_NOTFOUND ;
+	    } else {
+		rs = SR_BADFMT ;
+	    }
+	    {
+	        rs1 = entry_finish(ep) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = uc_free(ep) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->n -= 1 ;
+	    n = op->n ;
+	} /* end if (magic) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end subroutine (fifoelem_curdel) */
+
+int fifoelem_present(FE *op,cv *vsp,int vsl,fifoelem_cmp scmp) noex {
+	int		rs ;
+	int		rs1 ;
+	int		dl = 0 ; /* return-value */
 	if ((rs = fifoelem_magic(op,vsp)) >= 0) {
 	    int		sl = vsl ;
 	    cchar	*sp = charp(vsp) ;
@@ -312,7 +341,7 @@ int fifoelem_present(fifoelem *op,cv *vsp,int vsl,fifoelem_cmp scmp) noex {
 		f = f && (sl == ep->dl) ;
 		f = f && scmp(sp,ep->dp) ;
 		return f ;
-	    } ;
+	    } ; /* end lambda */
 	    if (FE_CUR cur ; (rs = fifoelem_curbegin(op,&cur)) >= 0) {
 	        FE_ENT	*ep ;
 	        while ((rs = fifoelem_curfetch(op,&cur,&ep)) >= 0) {
@@ -356,7 +385,6 @@ static int entry_finish(FE_ENT *ep) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    ep->dp = nullptr ;
 	}
-
 	ep->dl = 0 ;
 	return rs ;
 }
