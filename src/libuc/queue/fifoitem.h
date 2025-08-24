@@ -56,13 +56,13 @@ extern int fifoitem_start(fifoitem *) noex ;
 extern int fifoitem_finish(fifoitem *) noex ;
 extern int fifoitem_ins(fifoitem *,cvoid *,int) noex ;
 extern int fifoitem_rem(fifoitem *,void *,int) noex ;
+extern int fifoitem_del(fifoitem *) noex ;
 extern int fifoitem_count(fifoitem *) noex ;
 extern int fifoitem_curbegin(fifoitem *,fifoitem_cur *) noex ;
 extern int fifoitem_curend(fifoitem *,fifoitem_cur *) noex ;
 extern int fifoitem_curdel(fifoitem *,fifoitem_cur *) noex ;
 extern int fifoitem_curfetch(fifoitem *,fifoitem_cur *,fifoitem_ent **) noex ;
 extern int fifoitem_curenum(fifoitem *,fifoitem_cur *,cvoid **) noex ;
-extern int fifoitem_del(fifoitem *) noex ;
 extern int fifoitem_present(fifoitem *,cvoid *,int,fifoitem_cmp) noex ;
 
 EXTERNC_end
