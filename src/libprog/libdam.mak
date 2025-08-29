@@ -867,9 +867,9 @@ langx.o:		langx.dir
 langx.dir:
 	makesubdir $@
 
-# LOADMODNAMES
-modloadnames.o:		modloadnames.dir
-modloadnames.dir:
+# STRFILE
+strfile.o:		strfile.dir
+strfile.dir:
 	makesubdir $@
 
 # INSTR
