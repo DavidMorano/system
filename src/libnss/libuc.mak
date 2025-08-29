@@ -118,7 +118,7 @@ OBJ26=
 OBJ27=
 
 OBJ28= ucttyname.o uctc.o ucsysconf.o
-OBJ29=
+OBJ29= uclibmem.o
 OBJ30= ucsys.o
 OBJ31= tcx.o
 
@@ -378,6 +378,7 @@ uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
 ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
 ucobjmode.o:		ucobjmode.cc
 ucunlink.o:		ucunlink.cc
+uclibmem.o:		uclibmem.cc	uclibmem.h		$(INCS)
 
 # UNIX C-language system library string-to-integer interface
 # string-to-x
@@ -987,11 +988,6 @@ ucfileop.dir:
 # UCSTREAM
 ucstream.o:		ucstream.dir
 ucstream.dir:
-	makesubdir $@
-
-# DEBUG
-debug.o:		debug.dir
-debug.dir:
 	makesubdir $@
 
 # string-constants
