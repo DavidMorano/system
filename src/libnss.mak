@@ -2,7 +2,7 @@
 
 T= libnss
 
-ALL= $(T).o $(T).a
+ALL= $(T).o $(T).so $(T).a
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -31,11 +31,16 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= 
+INCS += 
 
-LIBS=
+MODS +=
+
+LIBS +=
+
+
+OBJ_LIBNSS= nss_parse.o
 
 
 INCDIRS=
@@ -44,7 +49,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,10 +59,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ_LIBNSS= nss_parse.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).a
@@ -71,6 +72,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -88,14 +92,17 @@ all:			$(ALL)
 	makemodule $(*)
 
 
+$(T).so:		$(OBJ_LIBNSS)
+	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ_LIBNSS)
+
 $(T).o:			$(OBJ_LIBNSS)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LIBNSS)
 
 $(T).a:			$(OBJ_LIBNSS)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order:		$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order
@@ -112,6 +119,6 @@ control:
 	(uname -n ; date) > Control
 
 
-nss_parse.o:		nss_parse.c nss_parse.h
+nss_parse.o:		nss_parse.cc nss_parse.h
 
 
