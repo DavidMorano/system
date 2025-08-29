@@ -53,7 +53,7 @@ OBJ03= libutil.o usysconf.o umods.o
 OBJ04= ulibvals.o utimeout.o utimeouts.o 
 OBJ05= ulogerror.o strtox.o 
 OBJ06= usupport.o umisc.o
-OBJ07= umemalloc.o
+OBJ07= umem.o
 
 OBJ08= usys.o usyscallbase.o usysutility.o 
 OBJ09= uregfork.o uatfork.o ufdlock.o 
@@ -427,6 +427,7 @@ chrset.o:		chrset.ccm
 
 # OTHER
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
+umem.o:			umem.cc		umem.hh		$(INCS)
 um.o:			um.cc um.h			$(INCS)
 usig.o:			usig.cc usig.h			$(INCS)
 usysop.o:		usysop.cc usysop.h		$(INCS)
