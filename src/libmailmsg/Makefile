@@ -40,23 +40,6 @@ MODS=
 LIBS= -luc -lu
 
 
-LDRPATH= $(EXTRA)/lib
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
-
-
 OBJ00= mailmsgx.o mailmsg.o msgentry.o mailbox.o
 OBJ01= mailmsgmatx.o mailmsghdrx.o
 OBJ02= recip.o retpath.o envmat.o lkmail.o
@@ -79,7 +62,23 @@ OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJ= obja.o objb.o objc.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+LDRPATH= $(EXTRA)/lib
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -94,6 +93,9 @@ so:			$(T).so
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -136,56 +138,56 @@ control:
 
 
 obj00.o:		$(OBJ00)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ00)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj01.o:		$(OBJ01)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ01)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj02.o:		$(OBJ02)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ02)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj03.o:		$(OBJ03)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ03)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj04.o:		$(OBJ04)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ04)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj05.o:		$(OBJ05)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ05)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj06.o:		$(OBJ06)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ06)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj07.o:		$(OBJ07)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ07)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj08.o:		$(OBJ08)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ08)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj09.o:		$(OBJ09)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ09)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj10.o:		$(OBJ10)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ10)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj11.o:		$(OBJ11)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ11)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objc.o:			$(OBJC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objd.o:			$(OBJD)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obje.o:			$(OBJE)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 # MAILBOX
