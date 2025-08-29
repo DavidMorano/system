@@ -2,7 +2,7 @@
 
 T= libsecdb
 
-ALL= $(T).o $(T).a
+ALL= $(T).o $(T).a $(T).so
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -30,6 +30,7 @@ RM		?= rm -f
 TOUCH		?= touch
 LINT		?= lint
 
+
 DEFS +=
 
 INCS +=
@@ -37,6 +38,9 @@ INCS +=
 MODS +=
 
 LIBS +=
+
+
+OBJ_LIBSECDB= secdb.o
 
 
 INCDIRS=
@@ -55,13 +59,12 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ_LIBSECDB= secdb.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).a
+
+so:			$(T).so
 
 all:			$(ALL)
 
@@ -71,6 +74,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -87,6 +93,9 @@ all:			$(ALL)
 .ccm.o:
 	makemodule $(*)
 
+
+$(T).so:		$(OBJ_LIBSECDB)
+	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ_LIBSECDB)
 
 $(T).o:			$(OBJ_LIBSECDB)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LIBSECDB)
