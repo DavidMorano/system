@@ -122,13 +122,13 @@ int bbnewsrc_open(BBNEWSRC *ungp,cchar ufname[],int f_readtime)
 	if (ufname[0] == '\0') return SR_INVALID ;
 
 	memset(ungp,0,sizeof(BBNEWSRC)) ;
-	ungp->f.readtime = f_readtime ;
-	ungp->f.wroteheader = FALSE ;
+	ungp->fl.readtime = f_readtime ;
+	ungp->fl.wroteheader = FALSE ;
 
 	if ((rs = uc_mallocstrw(ufname,-1,&cp)) >= 0) {
 	    ungp->ufname = cp ;
 	    if ((rs = bopen(&ungp->nf,ufname,"rw",0664)) >= 0) {
-	        ungp->f.fileopen = TRUE ;
+	        ungp->fl.fileopen = TRUE ;
 		f_opened = TRUE ;
 #if	CF_DEBUGS
 		debugprintf("bbnewsrc_open: opened\n") ;
@@ -142,8 +142,8 @@ int bbnewsrc_open(BBNEWSRC *ungp,cchar ufname[],int f_readtime)
 	            ungp->magic = BBNEWSRC_MAGIC ;
 	        }
 	        if (rs < 0) {
-	            if (ungp->f.fileopen) {
-	                ungp->f.fileopen = FALSE ;
+	            if (ungp->fl.fileopen) {
+	                ungp->fl.fileopen = FALSE ;
 		        bclose(&ungp->nf) ;
 	            }
 	        }
@@ -173,11 +173,11 @@ int bbnewsrc_close(BBNEWSRC *ungp)
 
 	if (ungp->magic != BBNEWSRC_MAGIC) return SR_NOTOPEN ;
 
-	if (ungp->f.fileopen) {
+	if (ungp->fl.fileopen) {
 
 /* if we were writing, write the trailer stuff */
 
-	if (ungp->f.wroteheader) {
+	if (ungp->fl.wroteheader) {
 	    off_t	off ;
 	    bprintf(&ungp->nf,"\n\n") ;
 	    btell(&ungp->nf,&off) ;
@@ -226,7 +226,7 @@ int bbnewsrc_read(BBNEWSRC *ungp,BBNEWSRC_ENT *ep)
 
 /* return OK (EOF) if we didn't have a file to open originally */
 
-	if (! ungp->f.fileopen)
+	if (! ungp->fl.fileopen)
 		return SR_OK ;
 
 /* read the line since the file was opened */
@@ -277,20 +277,20 @@ int bbnewsrc_write(BBNEWSRC *ungp,char ng[],int sf,time_t mtime)
 
 /* open the file if we couldn't originally */
 
-	if (! ungp->f.fileopen) {
+	if (! ungp->fl.fileopen) {
 
 		rs = bopen(&ungp->nf,ungp->ufname,"rwc",0664) ;
 
 		if (rs < 0)
 			return rs ;
 
-		ungp->f.fileopen = TRUE ;
+		ungp->fl.fileopen = TRUE ;
 
 	} /* end if (opening the file for writing) */
 
 /* write the file header if we didn't already */
 
-	if (! ungp->f.wroteheader) {
+	if (! ungp->fl.wroteheader) {
 
 #if	CF_DEBUGS
 	    debugprintf("bbnewsrc_write: writing header\n") ;
@@ -310,7 +310,7 @@ int bbnewsrc_write(BBNEWSRC *ungp,char ng[],int sf,time_t mtime)
 
 	    bprintf(&ungp->nf,"#\n\n") ;
 
-	    ungp->f.wroteheader = TRUE ;
+	    ungp->fl.wroteheader = TRUE ;
 
 	} /* end if (writing header stuff) */
 
@@ -323,7 +323,7 @@ int bbnewsrc_write(BBNEWSRC *ungp,char ng[],int sf,time_t mtime)
 	        timestr_log(mtime,timebuf)) ;
 #endif
 
-	    if (ungp->f.readtime) {
+	    if (ungp->fl.readtime) {
 
 		if ((rs = dater_start(&d,NULL,NULL,0)) >= 0) {
 
