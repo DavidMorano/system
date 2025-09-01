@@ -187,7 +187,7 @@ const char	configfname[] ;
 
 /* look for configuration file */
 
-	f_secreq = (! pip->f.proglocal) ;
+	f_secreq = (! pip->fl.proglocal) ;
 	schedp = (sched != NULL) ? sched : schedpconf ;
 
 #if	CF_DEBUG
@@ -266,17 +266,17 @@ const char	configfname[] ;
 	} /* end if */
 
 	if (rs >= 0) {
-	    pip->f.secure_conf = pip->f.secure_root ;
-	    if (f_secreq || (! pip->f.secure_conf)) {
+	    pip->fl.secure_conf = pip->fl.secure_root ;
+	    if (f_secreq || (! pip->fl.secure_conf)) {
 
 	        rs1 = securefile(pip->configfname,pip->euid,pip->egid) ;
-	        pip->f.secure_conf = (rs1 > 0) ;
+	        pip->fl.secure_conf = (rs1 > 0) ;
 
 	    }
 	}
 
 	if (rs >= 0)
-	    pip->f.pc = TRUE ;
+	    pip->fl.pc = TRUE ;
 
 	if ((rs >= 0) && pip->open.params)
 	    rs = progconfigread(pip) ;
@@ -288,7 +288,7 @@ ret0:
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("progconfiginit: ret rs=%d f_pc=%u\n",rs,pip->f.pc) ;
+	    debugprintf("progconfiginit: ret rs=%d f_pc=%u\n",rs,pip->fl.pc) ;
 #endif
 
 	return rs ;
@@ -303,7 +303,7 @@ bad2:
 	}
 
 bad1:
-	pip->f.pc = FALSE ;
+	pip->fl.pc = FALSE ;
 	pip->open.params = FALSE ;
 
 bad0:
@@ -319,7 +319,7 @@ struct proginfo	*pip ;
 	int	f = FALSE ;
 
 
-	if (pip->f.pc && pip->open.params) {
+	if (pip->fl.pc && pip->open.params) {
 
 	    rs = paramfile_check(&pip->params,pip->daytime) ;
 	    if (rs > 0) {
@@ -340,7 +340,7 @@ struct proginfo	*pip ;
 	int	rs = SR_NOTOPEN ;
 
 
-	if (! pip->f.pc)
+	if (! pip->fl.pc)
 	    goto ret0 ;
 
 	rs = SR_OK ;
@@ -387,10 +387,10 @@ struct proginfo	*pip ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("progconfigread: f_pc=%u open_params=%u\n",
-	        pip->f.pc,pip->open.params) ;
+	        pip->fl.pc,pip->open.params) ;
 #endif
 
-	if (! pip->f.pc)
+	if (! pip->fl.pc)
 	    goto ret0 ;
 
 	if (! pip->open.params)
@@ -697,7 +697,7 @@ struct proginfo	*pip ;
 	        pip->have.useracct = TRUE ;
 		if (vl > 0) {
 		    rs = optbool(ep,el) ;
-		    pip->f.useracct = (rs > 0) ;
+		    pip->fl.useracct = (rs > 0) ;
 		}
 		break ;
 
