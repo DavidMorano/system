@@ -206,7 +206,7 @@ char	*envv[] ;
 	if (bopen(&errfile,BFILE_STDERR,"dwca",0666) >= 0) {
 
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 
 	}
@@ -218,7 +218,7 @@ char	*envv[] ;
 	pip->audiorate = -1 ;
 	pip->audiochans = -1 ;
 
-	pip->f.quiet = FALSE ;
+	pip->fl.quiet = FALSE ;
 
 /* start parsing the arguments */
 
@@ -460,7 +460,7 @@ char	*envv[] ;
 
 /* monitor */
 	                        case 'm':
-	                            pip->f.monitor = 1 ;
+	                            pip->fl.monitor = 1 ;
 	                            if (f_optequal) {
 
 	                                f_optequal = FALSE ;
@@ -493,7 +493,7 @@ char	*envv[] ;
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* sample rate */
@@ -741,7 +741,7 @@ char	*envv[] ;
 #endif
 
 #ifdef	COMMENT
-	if (pip->f.monitor && (pip->monitorvol < 0))
+	if (pip->fl.monitor && (pip->monitorvol < 0))
 		pip->monitorvol = 100 ;
 #endif
 
@@ -757,7 +757,7 @@ char	*envv[] ;
 		bprintf(pip->efp, "%s: port=%u\n",
 			pip->progname, pip->audioport) ;
 
-		if (pip->f.monitor)
+		if (pip->fl.monitor)
 		bprintf(pip->efp, "%s: monitorvol=%d\n",
 			pip->progname, pip->monitorvol) ;
 
@@ -910,7 +910,7 @@ baduser2:
 	ex = EX_NOUSER ;
 
 #ifdef	COMMENT
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 	    bprintf(pip->efp,
 	        "%s: user=%s not found (%d)\n",
 	        pip->progname,un,rs) ;
