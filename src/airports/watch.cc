@@ -224,7 +224,7 @@ LFM		*lfp ;
 	pip->fd_req = -1 ;
 
 #ifdef	COMMENT
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    for (i = 0 ; i < 3 ; i += 1) {
 
@@ -259,7 +259,7 @@ LFM		*lfp ;
 /* let's go ! */
 
 	nfds = 0 ;
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	fds[nfds].fd = pip->fd_req ;
 	fds[nfds].events = POLLIN | POLLPRI ;
@@ -338,7 +338,7 @@ LFM		*lfp ;
 	pip->daytime = time(NULL) ;
 
 #ifdef	COMMENT
-	if (pip->f.daemon && (rs > 0)) {
+	if (pip->fl.daemon && (rs > 0)) {
 
 	    for (nfd = 0 ; nfd < nfds ; nfd += 1) {
 
@@ -637,7 +637,7 @@ LFM		*lfp ;
 	} /* end if (something from 'poll') */
 #endif /* COMMENT */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 /* maintenance the LOCK mutex file */
 
@@ -733,7 +733,7 @@ LFM		*lfp ;
 #endif
 
 #ifdef	COMMENT
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	closeipc(pip,reqfname) ;
 
@@ -778,7 +778,7 @@ char		fname[] ;
 	debugprintf("watch/openipc: reqfname=%s\n",pip->reqfname) ;
 #endif
 
-	if (pip->f.daemon && 
+	if (pip->fl.daemon && 
 		(pip->reqfname[0] != '-') && (pip->reqfname[0] != '+')) {
 
 #if	CF_DEBUG
@@ -948,7 +948,7 @@ char		fname[] ;
 
 	u_close(pip->fd_req) ;
 
-	if (! pip->f.daemon)
+	if (! pip->fl.daemon)
 	    u_unlink(fname) ;
 
 #if	CF_DEBUG
