@@ -530,11 +530,11 @@ PROGINFO	*pip ;
 	if (rs < 0) goto baduterm ;
 
 	rs = cmdmap_start(&iap->cm,defcmds) ;
-	iap->f.cminit = (rs >= 0) ;
+	iap->fl.cminit = (rs >= 0) ;
 	if (rs < 0) goto badcmdmap ;
 
 	rs1 = keysymer_open(&iap->ks,pip->pr) ;
-	iap->f.ksinit = (rs1 >= 0) ;
+	iap->fl.ksinit = (rs1 >= 0) ;
 	if (rs < 0) goto badkeysymer ;
 
 #if	CF_DEBUG
@@ -543,7 +543,7 @@ PROGINFO	*pip ;
 #endif
 
 	ccp = pip->kbdtype ;
-	if ((ccp != NULL) && (ccp[0] != '\0') && iap->f.ksinit) {
+	if ((ccp != NULL) && (ccp[0] != '\0') && iap->fl.ksinit) {
 	    rs1 = SR_OK ;
 
 #if	CF_DEBUG
@@ -573,7 +573,7 @@ PROGINFO	*pip ;
 #if	CF_KBDINFO
 	    if ((rs >= 0) && (rs1 >= 0)) {
 	        rs = kbdinfo_open(&iap->ki,&iap->ks,tmpfname) ;
-	        iap->f.kiinit = (rs >= 0) ;
+	        iap->fl.kiinit = (rs >= 0) ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	debugprintf("bbinter_start: kbdinfo_open() rs=%d\n",rs) ;
@@ -585,7 +585,7 @@ PROGINFO	*pip ;
 	if (rs < 0)
 	    goto badkbdinfo ;
 
-	if (iap->f.kiinit) {
+	if (iap->fl.kiinit) {
 	    rs = bbinter_loadcmdmap(iap) ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -604,7 +604,7 @@ PROGINFO	*pip ;
 
 	if (rs >= 0) {
 	    rs = mailmsgfile_start(&iap->msgfiles,tmpdname,pip->linelen,-1) ;
-	    iap->f.mfinit = (rs >= 0) ;
+	    iap->fl.mfinit = (rs >= 0) ;
 	}
 
 #if	CF_DEBUG
@@ -686,8 +686,8 @@ PROGINFO	*pip ;
 	    rs1 = display_infots(&iap->di,&ts) ;
 	    f = (rs1 >= 0) ;
 	    f = f && ((ts == 0) || (pip->daytime > (ts + 5))) ;
-	    if (f && (! iap->f.welcome)) {
-	        iap->f.welcome = TRUE ;
+	    if (f && (! iap->fl.welcome)) {
+	        iap->fl.welcome = TRUE ;
 	        rs = bbinter_welcome(iap) ;
 	    }
 	}
@@ -717,32 +717,32 @@ bad5:
 
 bad4:
 bad3:
-	if (iap->f.mfinit) {
-	    iap->f.mfinit = FALSE ;
+	if (iap->fl.mfinit) {
+	    iap->fl.mfinit = FALSE ;
 	    mailmsgfile_finish(&iap->msgfiles) ;
 	}
 
 badmailmsgfile:
 badloadcmdmap:
-	if (iap->f.kiinit) {
-	    iap->f.kiinit = FALSE ;
+	if (iap->fl.kiinit) {
+	    iap->fl.kiinit = FALSE ;
 	    kbdinfo_close(&iap->ki) ;
 	}
 
 badkbdinfo:
-	if (iap->f.ksinit) {
-	    iap->f.ksinit = FALSE ;
+	if (iap->fl.ksinit) {
+	    iap->fl.ksinit = FALSE ;
 	    keysymer_close(&iap->ks) ;
 	}
 
 badkeysymer:
-	if (iap->f.uterminit) {
+	if (iap->fl.uterminit) {
 	    bbinter_utermend(iap) ;
 	}
 
 baduterm:
-	if (iap->f.cminit) {
-	    iap->f.cminit = FALSE ;
+	if (iap->fl.cminit) {
+	    iap->fl.cminit = FALSE ;
 	    cmdmap_finish(&iap->cm) ;
 	}
 
@@ -776,8 +776,8 @@ BBINTER		*iap ;
 	rs1 = bbinter_mbviewclose(iap) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (iap->f.mvinit) {
-	    iap->f.mvinit = FALSE ;
+	if (iap->fl.mvinit) {
+	    iap->fl.mvinit = FALSE ;
 	    rs1 = mailmsgviewer_close(&iap->mv) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -788,7 +788,7 @@ BBINTER		*iap ;
 	    iap->mbname = NULL ;
 	}
 
-	if (iap->f.mcinit || iap->f.mbopen) {
+	if (iap->fl.mcinit || iap->fl.mbopen) {
 	    rs1 = bbinter_mbclose(iap) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -798,26 +798,26 @@ BBINTER		*iap ;
 	if (rs >= 0) rs = rs1 ;
 #endif /* CF_DISPLAY */
 
-	if (iap->f.mfinit) {
-	    iap->f.mfinit = FALSE ;
+	if (iap->fl.mfinit) {
+	    iap->fl.mfinit = FALSE ;
 	    rs1 = mailmsgfile_finish(&iap->msgfiles) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (iap->f.kiinit) {
-	    iap->f.kiinit = FALSE ;
+	if (iap->fl.kiinit) {
+	    iap->fl.kiinit = FALSE ;
 	    rs1 = kbdinfo_close(&iap->ki) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (iap->f.ksinit) {
-	    iap->f.ksinit = FALSE ;
+	if (iap->fl.ksinit) {
+	    iap->fl.ksinit = FALSE ;
 	    rs1 = keysymer_close(&iap->ks) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (iap->f.cminit) {
-	    iap->f.cminit = FALSE ;
+	if (iap->fl.cminit) {
+	    iap->fl.cminit = FALSE ;
 	    rs1 = cmdmap_finish(&iap->cm) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -877,9 +877,9 @@ BBINTER		*iap ;
 	    f = (rs1 >= 0) ;
 	    f = f && (pip->daytime > (ts + 7)) ;
 	    f = f && (pip->daytime > (iap->ti_start + 3)) ;
-	    if (f && (! iap->f.welcome)) {
-	        iap->f.cmdprompt = FALSE ;
-	        iap->f.welcome = TRUE ;
+	    if (f && (! iap->fl.welcome)) {
+	        iap->fl.cmdprompt = FALSE ;
+	        iap->fl.welcome = TRUE ;
 	        rs = bbinter_welcome(iap) ;
 	    }
 	}
@@ -893,17 +893,17 @@ BBINTER		*iap ;
 	        debugprintf("bbinter_cmd: bbinterrupt\n") ;
 #endif
 
-	    iap->f.cmdprompt = FALSE ;
+	    iap->fl.cmdprompt = FALSE ;
 	    rs = bbinter_refresh(iap) ;
 	}
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("bbinter_cmd: f_cmdprompt=%u\n",iap->f.cmdprompt) ;
+	    debugprintf("bbinter_cmd: f_cmdprompt=%u\n",iap->fl.cmdprompt) ;
 #endif
 
-	if ((rs >= 0) && (! iap->f.cmdprompt)) {
-	    iap->f.cmdprompt = TRUE ;
+	if ((rs >= 0) && (! iap->fl.cmdprompt)) {
+	    iap->fl.cmdprompt = TRUE ;
 	    rs = display_input(&iap->di,"%s %r\v",
 	        pp,iap->numbuf,iap->numlen) ;
 	}
@@ -915,14 +915,14 @@ BBINTER		*iap ;
 	        if (isdigitlatin(cmd) || (cmd == CH_DEL) || (cmd == CH_BS)) {
 	            rs = bbinter_cmddig(iap,cmd) ;
 	        } else {
-	            iap->f.cmdprompt = FALSE ;
+	            iap->fl.cmdprompt = FALSE ;
 	            rs = bbinter_cmdhandle(iap,cmd) ;
 	        }
 	    }
 	}
 
 	if (if_term) {
-	    iap->f.exit = TRUE ;
+	    iap->fl.exit = TRUE ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
 	    debugprintf("bbinter_cmd: SIGTERM rs=%d\n",rs) ;
@@ -930,21 +930,21 @@ BBINTER		*iap ;
 	}
 
 #if	CF_BBINTERPOLL
-	if ((rs >= 0) && (! iap->f.exit)) {
+	if ((rs >= 0) && (! iap->fl.exit)) {
 	    rs = bbinter_poll(iap) ;
 	    if (rs > 0)
-	        iap->f.cmdprompt = FALSE ;
+	        iap->fl.cmdprompt = FALSE ;
 	}
 #endif
 
-	if ((rs >= 0) && iap->f.exit)
+	if ((rs >= 0) && iap->fl.exit)
 	    rs = bbinter_done(iap) ;
 
-	rc = (iap->f.exit) ? 0 : 1 ;
+	rc = (iap->fl.exit) ? 0 : 1 ;
 
 	if ((rs >= 0) && if_term) {
 	    rs = SR_INTR ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 		cchar	*pn = pip->progname ;
 		bprintf(pip->efp,"%s: exiting on termination\n",pn) ;
 	    }
@@ -995,7 +995,7 @@ BBINTER		*iap ;
 	if (pip->svlines == 0) {
 	    f_percent = TRUE ;
 	    percent = SCANPERCENT ;
-	} else if (pip->f.svpercent) {
+	} else if (pip->fl.svpercent) {
 	    f_percent = TRUE ;
 	    percent = pip->svlines ;
 	}
@@ -1018,7 +1018,7 @@ BBINTER		*iap ;
 	iap->jumplines = pip->sjlines ;
 	if (pip->sjlines == 0) {
 	    iap->jumplines = (iap->scanlines - 1) ;
-	} else if (pip->f.sjpercent) {
+	} else if (pip->fl.sjpercent) {
 	    f_percent = TRUE ;
 	    percent = pip->sjlines ;
 	}
@@ -1167,7 +1167,7 @@ static int bbinter_utermbegin(BBINTER *iap)
 
 	if ((rs = uterm_start(&iap->ut,iap->tfd)) >= 0) {
 	    if ((rs = uterm_control(&iap->ut,fc_setmode,fm_notecho)) >= 0) {
-		iap->f.uterminit = TRUE ;
+		iap->fl.uterminit = TRUE ;
 	    }
 	    if (rs < 0)
 		uterm_finish(&iap->ut) ;
@@ -1184,8 +1184,8 @@ static int bbinter_utermend(BBINTER *iap)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (iap->f.uterminit) {
-	    iap->f.uterminit = FALSE ;
+	if (iap->fl.uterminit) {
+	    iap->fl.uterminit = FALSE ;
 	    rs1 = uterm_finish(&iap->ut) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1313,7 +1313,7 @@ static int bbinter_loadcmdmapfile(BBINTER *iap,cchar *fname)
 	if (fname == NULL) return SR_FAULT ;
 	if (fname[0] == '\0') return SR_INVALID ;
 
-	if (! iap->f.kiinit) goto ret0 ;
+	if (! iap->fl.kiinit) goto ret0 ;
 
 	if (pip->kbdtype == NULL) goto ret0 ;
 
@@ -1476,7 +1476,7 @@ struct bbinter_fieldstr	*fs ;
 #endif
 
 	    rs1 = SR_NOTFOUND ;
-	    if (iap->f.ksinit) {
+	    if (iap->fl.ksinit) {
 	        rs1 = keysymer_lookup(&iap->ks,fs[2].fp,fs[2].fl) ;
 	        key = rs1 ;
 	    }
@@ -1557,7 +1557,7 @@ BBINTER		*iap ;
 	rs = display_refresh(&iap->di) ;
 
 	if (rs >= 0) {
-	    if (iap->f.mvinit) {
+	    if (iap->fl.mvinit) {
 	        rs = bbinter_msgviewrefresh(iap) ;
 	    } else
 		rs = display_viewclear(&iap->di) ;
@@ -1640,7 +1640,7 @@ int		ch ;
 
 	if (ck.type < 0) goto ret0 ;
 
-	if (! iap->f.kiinit) goto ret0 ;
+	if (! iap->fl.kiinit) goto ret0 ;
 
 	rs = kbdinfo_lookup(&iap->ki,NULL,0,&ck) ;
 	keynum = rs ;
@@ -1716,7 +1716,7 @@ int		key ;
 	int	mult = 1 ;
 	int	nmsg = 0 ;
 	int	f_nomailbox = FALSE ;
-	int	f_errinfo = iap->f.info_err ;
+	int	f_errinfo = iap->fl.info_err ;
 	int	f = FALSE ;
 
 
@@ -1728,7 +1728,7 @@ int		key ;
 	}
 #endif
 
-	iap->f.info_err = FALSE ;
+	iap->fl.info_err = FALSE ;
 	if (iap->numlen > 0) {
 	    rs1 = cfdeci(iap->numbuf,iap->numlen,&argnum) ;
 	    if (rs1 < 0)
@@ -1753,7 +1753,7 @@ int		key ;
 	    break ;
 
 	case cmd_msginfo:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    rs = bbinter_msgnum(iap) ;
 	    break ;
@@ -1772,8 +1772,8 @@ int		key ;
 
 	case cmd_quitquick:
 	case cmd_quit:
-	    iap->f.exit = TRUE ;
-	    if (iap->f.mcinit) {
+	    iap->fl.exit = TRUE ;
+	    if (iap->fl.mcinit) {
 		int f = (cmd == cmd_quitquick) ;
 	        rs = bbinter_mailend(iap,f) ;
 	    }
@@ -1791,7 +1791,7 @@ int		key ;
 	    break ;
 
 	case cmd_scanfirst:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    nmsg = 0 ;
 	    if (nmsg != iap->miscanpoint)
@@ -1799,7 +1799,7 @@ int		key ;
 	    break ;
 
 	case cmd_scanlast:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    nmsg = (iap->miscanpoint + 10000) ;
 	    if (nmsg >= iap->nmsgs)
@@ -1809,7 +1809,7 @@ int		key ;
 	    break ;
 
 	case cmd_scannext:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    nmsg = (iap->miscanpoint >= 0) ? iap->miscanpoint : 0 ;
 	    nmsg += (argnum > 0) ? argnum : 1 ;
@@ -1820,7 +1820,7 @@ int		key ;
 	    break ;
 
 	case cmd_scanprev:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    nmsg = (iap->miscanpoint >= 0) ? iap->miscanpoint : 0 ;
 	    nmsg -= (argnum > 0) ? argnum : 1 ;
@@ -1831,7 +1831,7 @@ int		key ;
 	    break ;
 
 	case cmd_scannextmult:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    mult = iap->jumplines ;
 	    nmsg = (iap->miscanpoint >= 0) ? iap->miscanpoint : 0 ;
@@ -1843,7 +1843,7 @@ int		key ;
 	    break ;
 
 	case cmd_scanprevmult:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    mult = iap->jumplines ;
 	    nmsg = (iap->miscanpoint >= 0) ? iap->miscanpoint : 0 ;
@@ -1855,7 +1855,7 @@ int		key ;
 	    break ;
 
 	case cmd_goto:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox)
 		break ;
 
@@ -1866,7 +1866,7 @@ int		key ;
 	        if (nmsg >= iap->nmsgs)
 	            nmsg = (iap->nmsgs - 1) ;
 	        if (nmsg != iap->miscanpoint) {
-		    iap->f.viewchange = TRUE ;
+		    iap->fl.viewchange = TRUE ;
 	            rs = bbinter_msgpoint(iap,nmsg) ;
 	        }
 	    }
@@ -1882,7 +1882,7 @@ int		key ;
 	    break ;
 
 	case cmd_viewtop:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    if ((rs >= 0) && (iap->miscanpoint >= 0))
 		rs = bbinter_viewtop(iap,argnum) ;
@@ -1893,9 +1893,9 @@ int		key ;
 
 /* FALLTHROUGH */
 	case cmd_viewnext:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
-	    if (iap->f.mvinit) {
+	    if (iap->fl.mvinit) {
 	        if (argnum < 1) argnum = 1 ;
 		if (f)
 		    argnum = argnum * (iap->viewlines - 1) ;
@@ -1910,9 +1910,9 @@ int		key ;
 
 /* FALLTHROUGH */
 	case cmd_viewprev:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
-	    if (iap->f.mvinit) {
+	    if (iap->fl.mvinit) {
 	        if (argnum < 1) argnum = 1 ;
 		if (f)
 		    argnum = argnum * (iap->viewlines - 1) ;
@@ -1938,14 +1938,14 @@ int		key ;
 
 	case cmd_msgwrite:
 	case cmd_bodywrite:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    if (iap->miscanpoint >= 0)
 	        rs = bbinter_cmdwrite(iap,(cmd == cmd_msgwrite),argnum) ;
 	    break ;
 
 	case cmd_pagewrite:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    if (iap->miscanpoint >= 0)
 	        rs = bbinter_cmdbody(iap,argnum) ;
@@ -1953,14 +1953,14 @@ int		key ;
 
 	case cmd_msgpipe:
 	case cmd_bodypipe:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    if (iap->miscanpoint >= 0)
 	        rs = bbinter_cmdpipe(iap,(cmd == cmd_msgpipe),argnum) ;
 	    break ;
 
 	case cmd_pagebody:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    if (iap->miscanpoint >= 0)
 	        rs = bbinter_cmdpage(iap,argnum) ;
@@ -1971,7 +1971,7 @@ int		key ;
 	    break ;
 
 	case cmd_msgmove:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    if (iap->miscanpoint >= 0)
 	        rs = bbinter_cmdmove(iap,argnum) ;
@@ -1979,7 +1979,7 @@ int		key ;
 
 	case cmd_msgundelete:
 	case cmd_msgdelete:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    f = (cmd == cmd_msgdelete) ;
 	    if (iap->miscanpoint >= 0)
@@ -1988,7 +1988,7 @@ int		key ;
 
 	case cmd_msgundeletenum:
 	case cmd_msgdeletenum:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    f = (cmd == cmd_msgdeletenum) ;
 	    if (iap->miscanpoint >= 0)
@@ -1996,7 +1996,7 @@ int		key ;
 	    break ;
 
 	case cmd_msgsubject:
-	    f_nomailbox = (! iap->f.mcinit) ;
+	    f_nomailbox = (! iap->fl.mcinit) ;
 	    if (f_nomailbox) break ;
 	    if ((rs >= 0) && (iap->miscanpoint >= 0))
 	        rs = bbinter_cmdsubject(iap,argnum) ;
@@ -2020,10 +2020,10 @@ int		key ;
 	if (f_nomailbox)
 	    bbinter_info(iap,TRUE,"no current mailbox\v") ;
 
-	if (f_errinfo && (! iap->f.info_msg))
+	if (f_errinfo && (! iap->fl.info_msg))
 	    display_info(&iap->di,"\v") ;
 
-	iap->f.info_msg = FALSE ;
+	iap->fl.info_msg = FALSE ;
 
 /* done */
 
@@ -2043,8 +2043,8 @@ static int bbinter_info(BBINTER *iap,int f_err,cchar *fmt,...)
 	int	rs = SR_OK ;
 
 
-	iap->f.info_msg = TRUE ;
-	iap->f.info_err = f_err ;
+	iap->fl.info_msg = TRUE ;
+	iap->fl.info_err = f_err ;
 
 	{
 		va_begin(ap,fmt) ;
@@ -2177,20 +2177,20 @@ BBINTER		*iap ;
 	    c += rs ;
 	}
 
-	if ((rs >= 0) && pip->f.clock) {
+	if ((rs >= 0) && pip->fl.clock) {
 	    rs = bbinter_checkclock(iap) ;
 	    c += rs ;
 	}
 
 /* what is this (next part) supposed to do? (do not know!) */
 
-	if ((rs >= 0) && iap->f.setmbname && (iap->mbname == NULL)) {
-	    iap->f.setmbname = FALSE ;
+	if ((rs >= 0) && iap->fl.setmbname && (iap->mbname == NULL)) {
+	    iap->fl.setmbname = FALSE ;
 	    rs = display_setmbname(&iap->di,"",-1) ;
 	    c += 1 ;
 	}
 
-	if ((rs >= 0) && (! iap->f.mcinit) && (! iap->f.exit)) {
+	if ((rs >= 0) && (! iap->fl.mcinit) && (! iap->fl.exit)) {
 	     rs = bbinter_mailempty(iap) ;
 	}
 
@@ -2260,15 +2260,15 @@ BBINTER		*iap ;
 	    if (rs1 > 0) {
 
 	        f = TRUE ;
-	        iap->f.mailnew = TRUE ;
+	        iap->fl.mailnew = TRUE ;
 	        rs = bbinter_checkmailinfo(iap,buf) ;
 
 	        if (rs >= 0)
 	            rs = display_setnewmail(&iap->di,rs1) ;
 
 	    } else {
-	        if (iap->f.mailnew) {
-	            iap->f.mailnew = FALSE ;
+	        if (iap->fl.mailnew) {
+	            iap->fl.mailnew = FALSE ;
 	            buf[0] = '\0' ;
 	            rs = bbinter_checkmailinfo(iap,buf) ;
 
@@ -2304,15 +2304,15 @@ cchar	buf[] ;
 	    if (pip->daytime >= (iap->ti_mailinfo + TO_MAILCHECK)) {
 
 	        iap->ti_mailinfo = pip->daytime ;
-	        iap->f.mailinfo = TRUE ;
+	        iap->fl.mailinfo = TRUE ;
 	        iap->tag_info = infotag_mailfrom ;
 	        rs = bbinter_info(iap,FALSE,"mailfrom> %s\v",buf) ;
 
 	    } /* end if */
 
-	} else if (iap->f.mailinfo) {
+	} else if (iap->fl.mailinfo) {
 
-	    iap->f.mailinfo = FALSE ;
+	    iap->fl.mailinfo = FALSE ;
 	    if (iap->tag_info == infotag_mailfrom) {
 	        iap->tag_info = 0 ;
 	        rs = bbinter_info(iap,FALSE,"\v") ;
@@ -2353,7 +2353,7 @@ int		mblen ;
 
 	if (mbname == NULL) return SR_FAULT ;
 
-	iap->f.viewchange = TRUE ;
+	iap->fl.viewchange = TRUE ;
 
 /* form mailbox filename */
 
@@ -2377,7 +2377,7 @@ int		mblen ;
 	if (! f_access)
 	    goto ret1 ;
 
-	if (iap->f.mcinit) {
+	if (iap->fl.mcinit) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
@@ -2396,7 +2396,7 @@ int		mblen ;
 #endif
 
 	        if (rs >= 0) {
-	            iap->f.setmbname = TRUE ;
+	            iap->fl.setmbname = TRUE ;
 	            rs = display_setmbname(&iap->di,mbname,mblen) ;
 
 #if	CF_DEBUG
@@ -2491,7 +2491,7 @@ BBINTER		*iap ;
 	int	n ;
 
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 	si = iap->miscantop ;
@@ -2543,7 +2543,7 @@ int		f_quick ;
 	char	response[LINEBUFLEN + 1] ;
 
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 #if	CF_DEBUG
@@ -2689,16 +2689,16 @@ int		f_ro ;
 	int	mflags ;
 
 
-	if (iap->f.mbopen)
+	if (iap->fl.mbopen)
 	    return SR_NOANODE ;
 
 	mflags = 0 ;
 	mflags |= (f_ro) ? MAILBOX_ORDONLY : MAILBOX_ORDWR ;
-	mflags |= (! pip->f.useclen) ? MAILBOX_ONOCLEN : 0 ;
-	mflags |= (pip->f.useclines) ? MAILBOX_OUSECLINES : 0 ;
+	mflags |= (! pip->fl.useclen) ? MAILBOX_ONOCLEN : 0 ;
+	mflags |= (pip->fl.useclines) ? MAILBOX_OUSECLINES : 0 ;
 	rs1 = mailbox_open(&iap->mb,mbfname,mflags) ;
-	iap->f.mbopen = (rs1 >= 0) ;
-	iap->f.mbreadonly = f_ro ;
+	iap->fl.mbopen = (rs1 >= 0) ;
+	iap->fl.mbreadonly = f_ro ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -2709,7 +2709,7 @@ int		f_ro ;
 	    goto ret0 ;
 
 	rs = mbcache_start(&iap->mc,mbfname,mflags,&iap->mb) ;
-	iap->f.mcinit = (rs >= 0) ;
+	iap->fl.mcinit = (rs >= 0) ;
 	if (rs < 0)
 	   goto bad1 ;
 
@@ -2732,18 +2732,18 @@ int		f_ro ;
 #endif
 
 ret0:
-	return (rs >= 0) ? iap->f.mbopen : rs ;
+	return (rs >= 0) ? iap->fl.mbopen : rs ;
 
 /* bad stuff */
 bad2:
-	if (iap->f.mvinit) {
-	    iap->f.mcinit = FALSE ;
+	if (iap->fl.mvinit) {
+	    iap->fl.mcinit = FALSE ;
 	    mbcache_finish(&iap->mc) ;
 	}
 
 bad1:
-	if (iap->f.mbopen) {
-	    iap->f.mbopen = FALSE ;
+	if (iap->fl.mbopen) {
+	    iap->fl.mbopen = FALSE ;
 	    mailbox_close(&iap->mb) ;
 	}
 
@@ -2763,14 +2763,14 @@ BBINTER		*iap ;
 	iap->nmsgs = -1 ;
 	iap->nmsgdels = 0 ;
 
-	if (iap->f.mcinit) {
-	    iap->f.mcinit = FALSE ;
+	if (iap->fl.mcinit) {
+	    iap->fl.mcinit = FALSE ;
 	    rs1 = mbcache_finish(&iap->mc) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (iap->f.mbopen) {
-	    iap->f.mbopen = FALSE ;
+	if (iap->fl.mbopen) {
+	    iap->fl.mbopen = FALSE ;
 	    rs1 = mailbox_close(&iap->mb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -2788,7 +2788,7 @@ BBINTER		*iap ;
 	int	rs ;
 
 
-	if (iap->f.mcinit) {
+	if (iap->fl.mcinit) {
 
 	    rs = bbinter_info(iap,FALSE,"mb=%s msg=%u:%u\v",
 	        iap->mbname,
@@ -2830,7 +2830,7 @@ int		sipointnext ;
 	    debugprintf("bbinter_msgpoint: sipointnext=%d\n",sipointnext) ;
 #endif
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 	if ((sipointnext < 0) || (sipointnext >= nmsgs))
@@ -2988,7 +2988,7 @@ int		argnum ;
 	char	response[LINEBUFLEN + 1] ;
 
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 	mi = iap->miscanpoint ;
@@ -3057,7 +3057,7 @@ int		argnum ;
 	char	response[LINEBUFLEN + 1] ;
 
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 	mi = iap->miscanpoint ;
@@ -3126,7 +3126,7 @@ int		argnum ;
 	char	msgid[MAILADDRLEN + 1] ;
 
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 	mi = iap->miscanpoint ;
@@ -3238,7 +3238,7 @@ int		argnum ;
 	char	msgid[MAILADDRLEN + 1] ;
 
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 	mi = iap->miscanpoint ;
@@ -3360,7 +3360,7 @@ int		argnum ;
 	char	mbname[MAXNAMELEN + 1] ;
 
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 	mi = iap->miscanpoint ;
@@ -3454,7 +3454,7 @@ int		argnum ;
 
 	rs = bbinter_msgmove(iap,mbname,moff,mlen) ;
 
-	if ((rs >= 0) && pip->f.nextmov)
+	if ((rs >= 0) && pip->fl.nextmov)
 	    rs = bbinter_msgdel(iap,mi,TRUE) ;
 
 	if (rs >= 0)
@@ -3486,7 +3486,7 @@ int		argnum ;
 		f_del,argnum) ;
 #endif
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 	mi = iap->miscanpoint ;
@@ -3535,7 +3535,7 @@ int		argnum ;
 	if (argnum <= 0)
 	     argnum = 1 ;
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 	mi = iap->miscanpoint ;
@@ -3574,7 +3574,7 @@ int		argnum ;
 	char	disbuf[DISBUFLEN + 1] = { 0 } ;
 
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 	mi = iap->miscanpoint ;
@@ -3994,7 +3994,7 @@ int		delcmd ;
 	        rs = display_scanmark(&iap->di,mi,mark) ;
 	    }
 
-	    if ((rs >= 0) && delcmd && pip->f.nextdel && ((mi+1) < iap->nmsgs))
+	    if ((rs >= 0) && delcmd && pip->fl.nextdel && ((mi+1) < iap->nmsgs))
 	        rs = bbinter_msgpoint(iap,(mi+1)) ;
 
 	} /* end if (delcmd >= 0) */
@@ -4057,7 +4057,7 @@ int		delcmd ;
 
 	} /* end for */
 
-	if ((rs >= 0) && (delcmd > 0) && pip->f.nextdel) {
+	if ((rs >= 0) && (delcmd > 0) && pip->fl.nextdel) {
 
 	    if (mi >= iap->nmsgs)
 		mi = (iap->nmsgs - 1) ;
@@ -4161,7 +4161,7 @@ int		n ;
 	            dsd.date = msp->vs[mbcachemf_date] ;
 	            dsd.lines = lines ;
 	            dsd.msgi = si ;
-		    dsd.mark = (msp->f.del) ? iap->delmark : ' ' ;
+		    dsd.mark = (msp->fl.del) ? iap->delmark : ' ' ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3)) {
@@ -4368,7 +4368,7 @@ BBINTER		*iap ;
 
 /* are we changing to the same mailbox? */
 
-	if (iap->f.mcinit && (iap->mbname != NULL)) {
+	if (iap->fl.mcinit && (iap->mbname != NULL)) {
 	    m = nleadstr(iap->mbname,cp,cl) ;
 	    f_same = (iap->mbname[m] == '\0') && (m == cl) ;
 	}
@@ -4488,12 +4488,12 @@ BBINTER		*iap ;
 	char	mbname[3] ;
 
 
-	if (iap->f.mcinit || iap->f.exit)
+	if (iap->fl.mcinit || iap->fl.exit)
 	    goto ret0 ;
 
-	if ((rs >= 0) && iap->f.setmbname) {
+	if ((rs >= 0) && iap->fl.setmbname) {
 		mbname[0] = '\0' ;
-	        iap->f.setmbname = FALSE ;
+	        iap->fl.setmbname = FALSE ;
 	        rs = display_setmbname(&iap->di,mbname,0) ;
 	} /* end if */
 
@@ -4741,23 +4741,23 @@ int		vln ;
 
 /* get out if no Mail-Cache (MC) */
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 /* free up Message-View (MV) if called for */
 
-	if ((rs >= 0) && iap->f.mvinit) {
-	    f = iap->f.viewchange ;
+	if ((rs >= 0) && iap->fl.mvinit) {
+	    f = iap->fl.viewchange ;
 	    f = f || (iap->miscanpoint != iap->miviewpoint) ;
 	    if (f) {
-	        iap->f.viewchange = FALSE ;
+	        iap->fl.viewchange = FALSE ;
 	        rs = bbinter_msgviewclose(iap) ;
 	    }
 	}
 
 /* open a MSGVIEW if not already open */
 
-	if ((rs >= 0) && (! iap->f.mvinit)) {
+	if ((rs >= 0) && (! iap->fl.mvinit)) {
 	    rs = bbinter_msgviewopen(iap) ;
 	} /* end if */
 
@@ -4784,37 +4784,37 @@ int		inc ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	debugprintf("bbinter_viewnext: f_mcinit=%u inc=%d\n",iap->f.mcinit,inc) ;
+	debugprintf("bbinter_viewnext: f_mcinit=%u inc=%d\n",iap->fl.mcinit,inc) ;
 #endif
 
 /* get out if no Mail-Cache (MC) */
 
-	if (! iap->f.mcinit)
+	if (! iap->fl.mcinit)
 	    goto ret0 ;
 
 /* free up Message-View (MV) if called for */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	debugprintf("bbinter_viewnext: f_mvinit=%u\n",iap->f.mvinit) ;
-	debugprintf("bbinter_viewnext: f_viewchange=%u\n",iap->f.viewchange) ;
+	debugprintf("bbinter_viewnext: f_mvinit=%u\n",iap->fl.mvinit) ;
+	debugprintf("bbinter_viewnext: f_viewchange=%u\n",iap->fl.viewchange) ;
 	debugprintf("bbinter_viewnext: miscanpoint=%d miviewpoint=%d\n",
 		iap->miscanpoint,iap->miviewpoint) ;
 	}
 #endif
 
-	if ((rs >= 0) && iap->f.mvinit) {
-	    f = iap->f.viewchange ;
+	if ((rs >= 0) && iap->fl.mvinit) {
+	    f = iap->fl.viewchange ;
 	    f = f || (iap->miscanpoint != iap->miviewpoint) ;
 	    if (f) {
-	        iap->f.viewchange = FALSE ;
+	        iap->fl.viewchange = FALSE ;
 	        rs = bbinter_msgviewclose(iap) ;
 	    }
 	}
 
 /* open a MSGVIEW if not already open */
 
-	if ((rs >= 0) && (! iap->f.mvinit)) {
+	if ((rs >= 0) && (! iap->fl.mvinit)) {
 	    inc = 0 ;
 
 #if	CF_DEBUG
@@ -4827,7 +4827,7 @@ int		inc ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
 	debugprintf("bbinter_viewnext: _msgviewopen() rs=%d\n",rs) ;
-	debugprintf("bbinter_viewnext: f_mvinit=%u\n",iap->f.mvinit) ;
+	debugprintf("bbinter_viewnext: f_mvinit=%u\n",iap->fl.mvinit) ;
 	}
 #endif
 
@@ -4879,11 +4879,11 @@ BBINTER		*iap ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("bbinter_msgviewopen: f_mvinit=%u\n",iap->f.mvinit) ;
+	    debugprintf("bbinter_msgviewopen: f_mvinit=%u\n",iap->fl.mvinit) ;
 #endif
 
-	iap->f.viewchange = FALSE ;
-	if (iap->f.mvinit || (iap->miscanpoint < 0)) {
+	iap->fl.viewchange = FALSE ;
+	if (iap->fl.mvinit || (iap->miscanpoint < 0)) {
 	    rs = SR_NOANODE ;
 	    goto ret0 ;
 	}
@@ -5044,7 +5044,7 @@ BBINTER		*iap ;
 #endif
 
 	    rs = mailmsgviewer_open(&iap->mv,mfp) ;
-	    iap->f.mvinit = (rs >= 0) ;
+	    iap->fl.mvinit = (rs >= 0) ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -5084,8 +5084,8 @@ ret0:
 
 /* bad stuff */
 bad1:
-	if (iap->f.mvinit) {
-	    iap->f.mvinit = FALSE ;
+	if (iap->fl.mvinit) {
+	    iap->fl.mvinit = FALSE ;
 	    mailmsgviewer_close(&iap->mv) ;
 	}
 
@@ -5109,15 +5109,15 @@ BBINTER		*iap ;
 	debugprintf("bbinter_msgviewclose: ent\n") ;
 #endif
 
-	if (! iap->f.mvinit) {
+	if (! iap->fl.mvinit) {
 	    rs = SR_NOANODE ;
 	    goto ret0 ;
 	}
 
 	iap->lnviewtop = -1 ;
 	iap->miviewpoint = -1 ;
-	if (iap->f.mvinit) {
-	    iap->f.mvinit = FALSE ;
+	if (iap->fl.mvinit) {
+	    iap->fl.mvinit = FALSE ;
 	    rs = mailmsgviewer_close(&iap->mv) ;
 	}
 
@@ -5138,7 +5138,7 @@ int		nlines ;
 	int		f = FALSE ;
 
 #ifdef	COMMENT
-	if (! iap->f.mvinit) {
+	if (! iap->fl.mvinit) {
 		rs = SR_NOANODE ;
 		goto ret0 ;
 	}
@@ -5194,7 +5194,7 @@ int		lntop ;
 	if (lntop < 0)
 	    return SR_INVALID ;
 
-	if (! iap->f.mvinit) {
+	if (! iap->fl.mvinit) {
 		rs = SR_NOANODE ;
 		goto ret0 ;
 	}
@@ -5255,7 +5255,7 @@ int		lntop ;
 	if (iap->lnviewtop < 0)
 	    return SR_NOANODE ;
 
-	if (! iap->f.mvinit) {
+	if (! iap->fl.mvinit) {
 		rs = SR_NOANODE ;
 		goto ret0 ;
 	}
@@ -5406,7 +5406,7 @@ int		ln ;
 	if ((vi < 0) || (ln < 0))
 	    return SR_INVALID ;
 
-	if (! iap->f.mvinit) {
+	if (! iap->fl.mvinit) {
 	    rs = SR_NOANODE ;
 	    goto ret0 ;
 	}
