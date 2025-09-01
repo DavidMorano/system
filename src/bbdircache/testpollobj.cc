@@ -189,7 +189,7 @@ PCSCONF		*pcp ;
 	if ((rs = uc_malloc(wsize,&wap)) >= 0) {
 	    workargs_load(wap,op,pr,sn,envv,pcp) ;
 	    if ((rs = thrbase_start(&op->t,worker,wap)) >= 0) {
-		op->f.working = TRUE ;
+		op->fl.working = TRUE ;
 		op->wap = wap ;
 		op->magic = TESTPOLLOBJ_MAGIC ;
 	    }
@@ -219,11 +219,11 @@ TESTPOLLOBJ	*op ;
 	if (op->magic != TESTPOLLOBJ_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
-	debugprintf("testpollobj_finish: f_working=%d\n",op->f.working) ;
+	debugprintf("testpollobj_finish: f_working=%d\n",op->fl.working) ;
 #endif
 
-	if (op->f.working) {
-	    op->f.working = FALSE ;
+	if (op->fl.working) {
+	    op->fl.working = FALSE ;
 	    rs1 = thrbase_finish(&op->t) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
