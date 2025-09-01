@@ -242,9 +242,9 @@ cchar	af[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("emit_test: interactive=%u\n",
-		pip->f.interactive) ;
+		pip->fl.interactive) ;
 	    debugprintf("emit_test: popscreen=%u\n",
-		pip->f.popscreen) ;
+		pip->fl.popscreen) ;
 	}
 #endif /* CF_DEBUG */
 
@@ -266,14 +266,14 @@ cchar	af[] ;
 	        showlines = pip->showlines ;
 	}
 
-	if (pip->f.interactive)
+	if (pip->fl.interactive)
 	    indent = 0 ;
 
 	hv_subject[0] = '\0' ;
 	hv_subject[LINEBUFLEN] = '\0' ;
 	mkpath3(afname, pip->newsdname,ngdir,af) ;
 
-	if (pip->f.mailbox) {
+	if (pip->fl.mailbox) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -287,7 +287,7 @@ cchar	af[] ;
 	    rs = EMIT_OK ;
 	    goto ret0 ;
 
-	} else if (pip->f.catchup) {
+	} else if (pip->fl.catchup) {
 	    rs = EMIT_OK ;
 	    goto ret0 ;
 	}
@@ -308,7 +308,7 @@ start:
 
 /* if we are an ANSI terminal, pop the screen! */
 
-	if (pip->f.popscreen)
+	if (pip->fl.popscreen)
 	    bprintf(pip->ofp,"%H") ;
 
 /* what about the old "indent" junk? */
@@ -405,7 +405,7 @@ start:
 
 	        f_continue = TRUE ;
 	            cp = lbuf ;
-	        if (f_a && pip->f.interactive) {
+	        if (f_a && pip->fl.interactive) {
 
 	            while (*cp && (*cp != ':')) 
 			cp += 1 ;
@@ -417,7 +417,7 @@ start:
 			cp += 1 ;
 
 	            lines += 1 ;
-	            if (pip->f.popscreen) {
+	            if (pip->fl.popscreen) {
 	                fmt = (hastabs(cp)) ? "%s%s: %K%s\n" : "%s%s: %s%K\n" ;
 	            } else {
 	                fmt = "%s%s: %s\n" ;
@@ -430,7 +430,7 @@ start:
 	            f_newsgroups = TRUE ;
 	            f_shown = TRUE ;
 
-	        } else if (f_b && (! pip->f.interactive)) {
+	        } else if (f_b && (! pip->fl.interactive)) {
 
 /* this is for backward compatibility with old software */
 
@@ -449,7 +449,7 @@ start:
 			cp += 1 ;
 
 	            lines += 1 ;
-	            if (pip->f.popscreen)
+	            if (pip->fl.popscreen)
 	                fmt = (hastabs(cp)) ? "%s%s%K%s\n" : "%s%s%s%K\n" ;
 
 	            else
@@ -473,7 +473,7 @@ start:
 #endif
 
 	            lines += 1 ;
-	            if (pip->f.popscreen)
+	            if (pip->fl.popscreen)
 	                fmt = (hastabs(cp)) ? "%s%K%s\n" : "%s%s%K\n" ;
 
 	            else
@@ -582,7 +582,7 @@ start:
 
 	    hv_newsgroups[i] = '\0' ;
 	    lines += 1 ;
-	    if (pip->f.popscreen) {
+	    if (pip->fl.popscreen) {
 	        fmt = (hastabs(cp)) ? "%s%s: %K%s\n" : "%s%s: %s%K\n" ;
 	    } else
 	        fmt = "%s%s: %s\n" ;
@@ -624,7 +624,7 @@ start:
 #endif
 
 	            lines += 1 ;
-	            if (pip->f.popscreen) {
+	            if (pip->fl.popscreen) {
 	                fmt = "%s%s:       %s!%s%K\n" ;
 	            } else
 	                fmt = "%s%s:       %s!%s\n" ;
@@ -671,7 +671,7 @@ start:
 #endif
 
 	        lines += 1 ;
-	        if (pip->f.popscreen) {
+	        if (pip->fl.popscreen) {
 	            fmt = "%s%s:       %s%K\n" ;
 	        } else {
 	            fmt = "%s%s:       %s\n" ;
@@ -710,7 +710,7 @@ start:
 #endif
 
 	    lines += 1 ;
-	    if (pip->f.popscreen) {
+	    if (pip->fl.popscreen) {
 	        fmt = "%s%s: <%s>%K\n" ;
 	    } else
 	        fmt = "%s%s: <%s>\n" ;
@@ -728,7 +728,7 @@ start:
 #endif
 
 	lines += 1 ;
-	if (pip->f.popscreen) {
+	if (pip->fl.popscreen) {
 	    bprintf(pip->ofp,"%K\n") ;
 	} else
 	    bprintf(pip->ofp,"\n") ;
@@ -740,7 +740,7 @@ start:
 	    debugprintf("emit_test: METAMAIL or not?\n") ;
 #endif
 
-	if (pip->f.interactive && (! f_text) && 
+	if (pip->fl.interactive && (! f_text) && 
 	    (getenv("NOMETAMAIL") == NULL)) {
 
 	    struct termios	ttystatein, ttystateout ;
@@ -811,7 +811,7 @@ start:
 
 	        case '\r':
 	        case '\n':
-	            if (pip->f.popscreen) {
+	            if (pip->fl.popscreen) {
 
 	                bufprintf(buf,20,"%K") ;	/* expand code */
 
@@ -822,20 +822,20 @@ start:
 	            *obp++ = c ;
 	            op = 0 ;
 	            ip = indent ;
-	            if (! pip->f.interactive)
+	            if (! pip->fl.interactive)
 			break ;
 
-	            if (! pip->f.nopage) {
+	            if (! pip->fl.nopage) {
 
 	                lines += 1 ;
 	                if (lines > showlines) {
 
-	                    if (pip->f.popscreen) {
+	                    if (pip->fl.popscreen) {
 	                        bprintf(pip->ofp,"%K\n") ;
 	                    } else
 	                        bprintf(pip->ofp,"\n") ;
 
-	                    if (pip->f.popscreen) {
+	                    if (pip->fl.popscreen) {
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1)
@@ -857,7 +857,7 @@ start:
 	                        bprintf(pip->ofp, 
 	                            "hit CR to continue, \"q\" for prompt> ") ;
 
-	                    if (pip->f.interactive)
+	                    if (pip->fl.interactive)
 	                        bflush(pip->ofp) ;
 
 #if	CF_DEBUG
@@ -904,7 +904,7 @@ start:
 	                    if (response[0] == '\n') {
 
 	                        lines = 0 ;
-	                        if (pip->f.popscreen) {
+	                        if (pip->fl.popscreen) {
 	                            showlines -= 1 ;
 	                            bprintf(pip->ofp,"%A%K%A") ;
 	                        } else
@@ -988,9 +988,9 @@ finish:
 	if (rs < 0)
 	    goto ret0 ;
 
-	if (pip->f.interactive) {
+	if (pip->fl.interactive) {
 
-	    if (pip->f.popscreen) {
+	    if (pip->fl.popscreen) {
 	        bprintf(pip->ofp,"%K\n") ;
 	    } else
 	        bputc(pip->ofp,'\n') ;
@@ -1002,7 +1002,7 @@ finish:
 	if (signal(SIGINT, SIG_IGN) != SIG_IGN)
 	    signal(SIGINT, SIG_DFL) ;
 
-	if (! pip->f.interactive)
+	if (! pip->fl.interactive)
 	    return EMIT_OK ;
 
 #if	CF_DEBUG
@@ -1021,7 +1021,7 @@ prompt:
 	bprintf(pip->ofp,
 	    "next, previous, review, follow, reply,") ;
 
-	if (pip->f.popscreen) {
+	if (pip->fl.popscreen) {
 	    bprintf(pip->ofp,
 	        " save, print, quit? [next] %J") ;
 	} else {
@@ -1029,7 +1029,7 @@ prompt:
 	        " save, print, quit? [next] ") ;
 	}
 
-	if (pip->f.interactive)
+	if (pip->fl.interactive)
 	    bflush(pip->ofp) ;
 
 #if	CF_DEBUG
@@ -1197,7 +1197,7 @@ prompt:
 
 /* "unsubscribe" */
 	case 'u':
-	    dsp->f.subscribe = FALSE ;
+	    dsp->fl.subscribe = FALSE ;
 	    goto prompt ;
 
 /* "save" or "subscribe" */
@@ -1206,7 +1206,7 @@ prompt:
 
 /* handle making a subscription here */
 
-	        dsp->f.subscribe = TRUE ;
+	        dsp->fl.subscribe = TRUE ;
 	        goto prompt ;
 
 	    } /* end if (handling "subscribe") */
