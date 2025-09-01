@@ -176,7 +176,7 @@ int progng(PROGINFO *pip,DIRSHOWN *sdp,MKDIRLIST_ENT *dsp,emit_t emit)
 	            debugprintf("progng: sorting\n") ;
 #endif /* CF_DEBUG */
 
-	        artlist_sort(&al,pip->sortmode,pip->f.reverse) ;
+	        artlist_sort(&al,pip->sortmode,pip->fl.reverse) ;
 
 /* look at articles as appropriate given the currency mode */
 
@@ -320,8 +320,8 @@ static int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
 #endif /* CF_DEBUG */
 
 	cmode = CM_NEW ;
-	if (pip->f.old) cmode = CM_OLD ;
-	if (pip->f.all) cmode = CM_ALL ;
+	if (pip->fl.old) cmode = CM_OLD ;
+	if (pip->fl.all) cmode = CM_ALL ;
 
 	for (ai = 0 ; artlist_get(alp,ai,&ngd,&fname,&amt) >= 0 ; ai += 1) {
 	    if (fname != NULL) {
@@ -354,7 +354,7 @@ static int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
 	            debugprintf("progng/procartlook: interactive?\n") ;
 #endif
 
-	        if (pip->f.interactive)
+	        if (pip->fl.interactive)
 	            bflush(pip->ofp) ;
 
 #if	CF_DEBUG
