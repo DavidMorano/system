@@ -146,8 +146,8 @@ char	*envv[] ;
 	pip->debuglevel = 0 ;
 	pip->tmpdname = NULL ;
 
-	pip->f.print = FALSE ;
-	pip->f.no = FALSE ;
+	pip->fl.print = FALSE ;
+	pip->fl.no = FALSE ;
 
 
 /* process program arguments */
@@ -273,12 +273,12 @@ char	*envv[] ;
 
 /* do not do anything */
 	                    case 'n':
-	                        pip->f.no = TRUE ;
+	                        pip->fl.no = TRUE ;
 	                        break ;
 
 /* print out the bad links */
 	                    case 'p':
-	                        pip->f.print = TRUE ;
+	                        pip->fl.print = TRUE ;
 	                        break ;
 
 /* verbose output */
@@ -383,7 +383,7 @@ char	*envv[] ;
 	pan = 0 ;
 	if (npa > 0) {
 
-	    if (pip->f.print || (pip->verboselevel > 0))
+	    if (pip->fl.print || (pip->verboselevel > 0))
 	        rs = bopen(ofp,BFILE_STDOUT,"dwct",0644) ;
 
 	if (rs >= 0) {
@@ -413,7 +413,7 @@ char	*envv[] ;
 
 	    } /* end for (looping through requested circuits) */
 
-	    if (pip->f.print || (pip->verboselevel > 0))
+	    if (pip->fl.print || (pip->verboselevel > 0))
 	    	bclose(ofp) ;
 
 	}
