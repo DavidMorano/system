@@ -1,18 +1,17 @@
-/* bbnewsrc */
+/* bbnewsrc HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 #ifndef	BBNEWSRC_INCLUDE
-#define	BBNEWSRC_INCLUDE		1
+#define	BBNEWSRC_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-
 #include	<bfile.h>
 #include	<dater.h>
-#include	<localmisc.h>
 
 
 #define	BBNEWSRC	struct bbnewsrc_head
@@ -27,11 +26,11 @@ struct bbnewsrc_flags {
 } ;
 
 struct bbnewsrc_head {
-	uint		magic ;
-	BBNEWSRC_FL	f ;
+	cchar		*ufname ;
 	bfile		nf ;
-	DATER		tmpdate ;
-	const char	*ufname ;
+	dater		tmpdate ;
+	BBNEWSRC_FL	fl ;
+	uint		magic ;
 	int		line ;
 } ;
 
@@ -42,24 +41,16 @@ struct bbnewsrc_ent {
 	char		ngname[MAXPATHLEN+1] ;
 } ;
 
+EXTERNC_end
 
-#if	(! defined(BBNEWSRC_MASTER)) || (BBNEWSRC_MASTER == 0)
+extern int	bbnewsrc_open(BBNEWSRC *,cchar *,int) noex ;
+extern int	bbnewsrc_close(BBNEWSRC *) noex ;
+extern int	bbnewsrc_rewind(BBNEWSRC *) noex ;
+extern int	bbnewsrc_read(BBNEWSRC *,BBNEWSRC_ENT *) noex ;
+extern int	bbnewsrc_write(BBNEWSRC *,cchar *,int,time_t) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int	bbnewsrc_open(BBNEWSRC *,const char *,int) ;
-extern int	bbnewsrc_close(BBNEWSRC *) ;
-extern int	bbnewsrc_rewind(BBNEWSRC *) ;
-extern int	bbnewsrc_read(BBNEWSRC *,BBNEWSRC_ENT *) ;
-extern int	bbnewsrc_write(BBNEWSRC *,const char *,int,time_t) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BBNEWSRC_MASTER */
 
 #endif /* BBNEWSRC_INCLUDE */
 
