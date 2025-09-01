@@ -112,7 +112,7 @@ bfile		*ofp ;
 #endif
 
 	olen = 0 ;
-	if (pip->f.text) {
+	if (pip->fl.text) {
 	    struct outbuf	ob ;
 	    bfile	infile, *ifp = &infile ;
 	    int		ch ;
@@ -252,7 +252,7 @@ int		buflen ;
 	    }
 #endif
 
-	    if (pip->f.test) {
+	    if (pip->fl.test) {
 
 	        rs = 0 ;
 	        if (len > 0) {
