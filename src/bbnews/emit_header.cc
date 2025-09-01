@@ -164,9 +164,9 @@ cchar	af[] ;
 
 /* this is a hack to only print out the newsgroup name when we have articles */
 
-	if (pip->f.header) {
+	if (pip->fl.header) {
 	    bbcpy(hbuf,ngdir) ;
-	    pip->f.header = false ;
+	    pip->fl.header = false ;
 	    bprintf(pip->ofp,"newsgroup> %s\n",hbuf) ;
 	}
 
