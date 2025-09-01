@@ -517,7 +517,7 @@ struct userstat	**ubpp ;
 	        debugprintf("get_bds: no user specified newsgroups, EVERY\n") ;
 #endif
 
-	    pip->f.every = TRUE ;
+	    pip->fl.every = TRUE ;
 
 #if	CF_DEBUG
 	} else {
@@ -652,7 +652,7 @@ MKDIRLIST	*dsp ;
 
 
 	if (strcmp(fnp,".options") == 0)
-	    dsp->f.options = TRUE ;
+	    dsp->fl.options = TRUE ;
 
 	if (strchr(fnp,' ') != NULL) 
 		return BAD ;
