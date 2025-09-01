@@ -49,7 +49,6 @@
 #include	<cstring>
 
 #include	<usystem.h>
-#include	<ucmallreg.h>
 #include	<bufsizevar.hh>
 #include	<sighand.h>
 #include	<bits.h>
@@ -464,7 +463,7 @@ int main(int argc,mainv argv,mainv envv) noex {
 /* initialize some stuff before command line argument processing */
 
 	if (pip->progname[0] == 'n')
-	    pip->f.newprogram = TRUE ;
+	    pip->fl.newprogram = TRUE ;
 
 	pip->verboselevel = 1 ;
 	pip->progmode = -1 ;
@@ -489,11 +488,11 @@ int main(int argc,mainv argv,mainv envv) noex {
 
 	{
 	    const int	f = OPT_FASTSCAN ;
-	    pip->f.extrascan = (! f) ;
-	    pip->f.readtime = TRUE ;
-	    pip->f.interactive = TRUE ;
-	    pip->f.popscreen = TRUE ;
-	    pip->f.logprog = TRUE ;
+	    pip->fl.extrascan = (! f) ;
+	    pip->fl.readtime = TRUE ;
+	    pip->fl.interactive = TRUE ;
+	    pip->fl.popscreen = TRUE ;
+	    pip->fl.logprog = TRUE ;
 	}
 
 /* process program arguments */
@@ -760,10 +759,10 @@ int main(int argc,mainv argv,mainv envv) noex {
 	                    if (f_optplus) {
 	                        if (pip->progmode < 0) {
 	                            pip->progmode = PM_HEADER ;
-	                            pip->f.all = TRUE ;
+	                            pip->fl.all = TRUE ;
 	                        }
 	                    } else
-	                        pip->f.old = TRUE ;
+	                        pip->fl.old = TRUE ;
 	                    break ;
 
 /* article-id */
@@ -779,13 +778,13 @@ int main(int argc,mainv argv,mainv envv) noex {
 	                    if (pip->progmode < 0) {
 	                        pip->progmode = PM_COUNT ;
 	                    } else if ((pip->progmode == PM_NAMES) &&
-	                        pip->f.description)
+	                        pip->fl.description)
 	                        pip->progmode = PM_COUNT ;
 	                    break ;
 
 /* "query" */
 	                case argopt_query:
-	                    pip->f.query = TRUE ;
+	                    pip->fl.query = TRUE ;
 	                    if (pip->progmode < 0)
 	                        pip->progmode = PM_COUNT ;
 	                    if (f_optequal) {
@@ -797,22 +796,22 @@ int main(int argc,mainv argv,mainv envv) noex {
 
 /* "every_board" */
 	                case argopt_new:
-	                    pip->f.new = TRUE ;
+	                    pip->fl.new = TRUE ;
 	                    break ;
 
 /* "old_board" */
 	                case argopt_old:
-	                    pip->f.old = TRUE ;
+	                    pip->fl.old = TRUE ;
 	                    break ;
 
 /* "all_bulletins" */
 	                case argopt_all:
-	                    pip->f.all = TRUE ;
+	                    pip->fl.all = TRUE ;
 	                    break ;
 
 /* "every_board" */
 	                case argopt_every:
-	                    pip->f.every = TRUE ;
+	                    pip->fl.every = TRUE ;
 	                    break ;
 
 /* "names" */
@@ -826,27 +825,27 @@ int main(int argc,mainv argv,mainv envv) noex {
 
 /* "reverse" */
 	                case argopt_reverse:
-	                    pip->f.reverse = TRUE ;
+	                    pip->fl.reverse = TRUE ;
 	                    break ;
 
 /* "interactive" */
 	                case argopt_interactive:
-	                    pip->f.interactive = FALSE ;
+	                    pip->fl.interactive = FALSE ;
 	                    if (f_optplus)
-	                        pip->f.interactive = TRUE ;
+	                        pip->fl.interactive = TRUE ;
 	                    break ;
 
 /* "nopage" */
 	                case argopt_nopage:
-	                    pip->f.nopage = FALSE ;
+	                    pip->fl.nopage = FALSE ;
 	                    if (f_optplus)
-	                        pip->f.nopage = TRUE ;
+	                        pip->fl.nopage = TRUE ;
 	                    break ;
 
 /* mailbox option for BBR (and smart users) */
 	                case argopt_mailbox:
 	                    pip->progmode = PM_MAILBOX ;
-	                    pip->f.mailbox = TRUE ;
+	                    pip->fl.mailbox = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl)
@@ -857,26 +856,26 @@ int main(int argc,mainv argv,mainv envv) noex {
 /* catchup option (really quite similar to the "mailbox" option) */
 	                case argopt_catchup:
 	                    pip->progmode = PM_READ ;
-	                    pip->f.catchup = TRUE ;
+	                    pip->fl.catchup = TRUE ;
 	                    break ;
 
 /* subscription changes */
 	                case argopt_subscribe:
 	                    pip->progmode = PM_SUBSCRIPTION ;
-	                    pip->f.subscribe = TRUE ;
+	                    pip->fl.subscribe = TRUE ;
 	                    break ;
 
 /* subscription changes */
 	                case argopt_unsubscribe:
 	                    pip->progmode = PM_SUBSCRIPTION ;
-	                    pip->f.subscribe = FALSE ;
+	                    pip->fl.subscribe = FALSE ;
 	                    break ;
 
 /* print out newsgroup descriptions */
 	                case argopt_description:
 	                    if (pip->progmode < 0)
 	                        pip->progmode = PM_NAMES ;
-	                    pip->f.description = TRUE ;
+	                    pip->fl.description = TRUE ;
 	                    break ;
 
 /* editor program */
@@ -1112,17 +1111,17 @@ int main(int argc,mainv argv,mainv envv) noex {
 
 /* all articles (old and new) */
 	                    case 'a':
-	                        pip->f.all = TRUE ;
+	                        pip->fl.all = TRUE ;
 	                        break ;
 
 /* count */
 	                    case 'c':
-	                        pip->f.every = TRUE ;
+	                        pip->fl.every = TRUE ;
 	                        break ;
 
 /* every newsgroup */
 	                    case 'e':
-	                        pip->f.every = TRUE ;
+	                        pip->fl.every = TRUE ;
 	                        break ;
 
 /* options */
@@ -1139,12 +1138,12 @@ int main(int argc,mainv argv,mainv envv) noex {
 
 /* reverse */
 	                    case 'r':
-	                        pip->f.reverse = TRUE ;
+	                        pip->fl.reverse = TRUE ;
 	                        break ;
 
 /* subject */
 	                    case 's':
-	                        pip->f.every = TRUE ;
+	                        pip->fl.every = TRUE ;
 	                        break ;
 
 /* user's newsgroup list file */
@@ -1226,7 +1225,7 @@ int main(int argc,mainv argv,mainv envv) noex {
 	if (f_version) {
 	    bprintf(pip->efp,"%s: version %s/%s\n",
 	        pip->progname,
-	        VERSION,(pip->f.sysv_ct ? "SYSV" : "BSD")) ;
+	        VERSION,(pip->fl.sysv_ct ? "SYSV" : "BSD")) ;
 	}
 
 /* get the program root */
@@ -1298,7 +1297,7 @@ int main(int argc,mainv argv,mainv envv) noex {
 	            if (( rs = procopts(pip,&akopts)) >= 0) {
 #if	CF_CHECKONC
 		        rs = checkonc(pip->pr,NULL,NULL,NULL) ;
-		        pip->f.onckey = (rs >= 0) ;
+		        pip->fl.onckey = (rs >= 0) ;
 #else
 		        rs = 1 ;
 #endif /* CF_CHECKONC */
@@ -1307,7 +1306,7 @@ int main(int argc,mainv argv,mainv envv) noex {
 	    } /* end if (zalen) */
 	} /* end if (ok) */
 
-	if ((pip->progmode < 0) && pip->f.test)
+	if ((pip->progmode < 0) && pip->fl.test)
 	    pip->progmode = PM_TEST ;
 
 	if (pip->progmode < 0)
@@ -1420,7 +1419,7 @@ int main(int argc,mainv argv,mainv envv) noex {
 	    case SR_PIPE:
 		break ;
 	    default:
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: could not process (%d)\n",pn,rs) ;
 	        }
 		break ;
@@ -1612,10 +1611,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.query) {
 	                        pip->have.query = TRUE ;
 	                        pip->final.query = TRUE ;
-	                        pip->f.query = TRUE ;
+	                        pip->fl.query = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.query = (rs > 0) ;
+	                            pip->fl.query = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1623,10 +1622,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.test) {
 	                        pip->have.test = TRUE ;
 	                        pip->final.test = TRUE ;
-	                        pip->f.test = TRUE ;
+	                        pip->fl.test = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.test = (rs > 0) ;
+	                            pip->fl.test = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1634,10 +1633,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.term) {
 	                        pip->have.term = TRUE ;
 	                        pip->final.term = TRUE ;
-	                        pip->f.term = TRUE ;
+	                        pip->fl.term = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.term = (rs > 0) ;
+	                            pip->fl.term = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1645,10 +1644,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.useclen) {
 	                        pip->have.useclen = TRUE ;
 	                        pip->final.useclen = TRUE ;
-	                        pip->f.useclen = TRUE ;
+	                        pip->fl.useclen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.useclen = (rs > 0) ;
+	                            pip->fl.useclen = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1656,10 +1655,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.useclines) {
 	                        pip->have.useclines = TRUE ;
 	                        pip->final.useclines = TRUE ;
-	                        pip->f.useclines = TRUE ;
+	                        pip->fl.useclines = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.useclines = (rs > 0) ;
+	                            pip->fl.useclines = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1885,7 +1884,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *ofn)
 	            rs1 = bclose(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			cchar	*pn = pip->progname ;
 			cchar	*fmt ;
 			fmt = "%s: inaccessible argument-list (%d)\n" ;
