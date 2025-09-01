@@ -67,10 +67,10 @@ static int msupdate(progifo *pip,LFM *lp) noex {
 
 /* get some updated information */
 
-	if (! pip->f.zerospeed) {
+	if (! pip->fl.zerospeed) {
 
 #if	F_CPUSPEED
-	    f = (e.boottime == 0) || (e.speed == 0) || pip->f.speed ;
+	    f = (e.boottime == 0) || (e.speed == 0) || pip->fl.speed ;
 
 	    if (! f)
 	        f = (e.stime == 0) || 
@@ -91,7 +91,7 @@ static int msupdate(progifo *pip,LFM *lp) noex {
 
 	        if (rs1 < 0) {
 
-	            if ((! pip->f.quiet) && (pip->efp != NULL)) {
+	            if ((! pip->fl.quiet) && (pip->efp != NULL)) {
 
 	                shio_printf(pip->efp,
 	                    "%s: speed name=%s\n",
@@ -120,7 +120,7 @@ static int msupdate(progifo *pip,LFM *lp) noex {
 
 /* were we requested to do a disable ? */
 
-	if (pip->f.disable) {
+	if (pip->fl.disable) {
 
 	    e.flags |= MSFLAG_MDISABLED ;
 	    if (pip->disint > 0)
@@ -144,7 +144,7 @@ static int msupdate(progifo *pip,LFM *lp) noex {
 	        if (lw <= 0)
 	            break ;
 
-	        if (pip->f.daemon) {
+	        if (pip->fl.daemon) {
 
 	            if (pip->have.pidfile && (lp != NULL)) {
 
@@ -235,7 +235,7 @@ static int msupdate(progifo *pip,LFM *lp) noex {
 
 	        c += 1 ;
 
-	        if (! pip->f.daemon)
+	        if (! pip->fl.daemon)
 	            break ;
 
 /* sleep for daemon mode */
