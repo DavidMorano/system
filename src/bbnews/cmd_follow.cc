@@ -174,7 +174,7 @@ const char	hv_subject[] ;
 #endif
 
 #if	CF_DEBUG
-	if (pip->f.debug)
+	if (pip->fl.debug)
 	    debugprintf("follow: CMD> %s\n",cmdbuf) ;
 #endif
 
