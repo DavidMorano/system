@@ -23,12 +23,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ base64 [-ed] [<file>] [-t]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -45,7 +42,6 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<bfile.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -209,7 +205,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	pip->verboselevel = 1 ;
 
-	pip->f.encode = TRUE ;
+	pip->fl.encode = TRUE ;
 
 /* start parsing the arguments */
 
@@ -388,23 +384,23 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 			    case argopt_test:
-				pip->f.test = TRUE ;
+				pip->fl.test = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-					pip->f.test = (rs > 0) ;
+					pip->fl.test = (rs > 0) ;
 	                            }
 	                        }
 				break ;
 
 			    case argopt_text:
-				pip->f.text = TRUE ;
+				pip->fl.text = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-					pip->f.text = (rs > 0) ;
+					pip->fl.text = (rs > 0) ;
 	                            }
 	                        }
 				break ;
@@ -442,22 +438,22 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* decode */
 	                        case 'd':
-	                            pip->f.encode = FALSE ;
+	                            pip->fl.encode = FALSE ;
 	                            break ;
 
 /* encode */
 	                        case 'e':
-	                            pip->f.encode = TRUE ;
+	                            pip->fl.encode = TRUE ;
 	                            break ;
 
 /* text mode */
 	                        case 't':
-	                            pip->f.text = TRUE ;
+	                            pip->fl.text = TRUE ;
 	                            break ;
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* verbose mode */
@@ -586,7 +582,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 		if (cp[0] != '\0') {
 	    	    pan += 1 ;
 		    fc += 1 ;
-		    if (pip->f.encode) {
+		    if (pip->fl.encode) {
 	                rs = progencode(pip,ofp,cp) ;
 		    } else {
 	                rs = progdecode(pip,ofp,cp) ;
@@ -601,7 +597,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 		fc += 1 ;
 		cp = "-" ;
-		if (pip->f.encode) {
+		if (pip->fl.encode) {
 	        rs = progencode(pip,ofp,cp) ;
 		} else {
 	        rs = progdecode(pip,ofp,cp) ;
