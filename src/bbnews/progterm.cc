@@ -243,7 +243,7 @@ static int procmesg_begin(PROGINFO *pip,UTERM *utp)
 	    if (pip->euid == rs) {
 		const int	ucmd = utermcmd_setmesg ;
 		if ((rs = uterm_control(utp,ucmd,FALSE)) >= 0) {
-	    	    pip->f.mesgs = (rs > 0) ;
+	    	    pip->fl.mesgs = (rs > 0) ;
 		    if (rs > 0) pip->changed.mesgs = TRUE ;
 		}
 	    }
@@ -258,7 +258,7 @@ static int procmesg_end(PROGINFO *pip,UTERM *utp)
 	int		rs = SR_OK ;
 	if (pip->changed.mesgs) {
 	    const int	ucmd = utermcmd_setmesg ;
-	    rs = uterm_control(utp,ucmd,pip->f.mesgs) ;
+	    rs = uterm_control(utp,ucmd,pip->fl.mesgs) ;
 	}
 	return rs ;
 }
