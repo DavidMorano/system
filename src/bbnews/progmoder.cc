@@ -121,13 +121,13 @@ int progmoder(PROGINFO *pip,MKDIRLIST *ngp,cchar *ofn)
 	    debugprintf("progmoder: entered w/ progmode=%s(%d)\n",
 	        progmodes[pm],pm) ;
 	    debugprintf("progmoder: popscreen=%u\n",
-	        pip->f.popscreen) ;
+	        pip->fl.popscreen) ;
 	}
 #endif /* CF_DEBUG */
 
 	cmode = CM_NEW ;
-	if (pip->f.old) cmode = CM_OLD ;
-	if (pip->f.all) cmode = CM_ALL ;
+	if (pip->fl.old) cmode = CM_OLD ;
+	if (pip->fl.all) cmode = CM_ALL ;
 
 	if ((ofn == NULL) || (ofn[0] == '=') || (ofn[0] == '\0'))
 	    ofn = BFILE_STDOUT ;
@@ -142,7 +142,7 @@ int progmoder(PROGINFO *pip,MKDIRLIST *ngp,cchar *ofn)
 	                debugprintf("progmoder: dirlist rs=%d i=%d\n",rs,i) ;
 #endif
 #if	CF_SHOW
-	            if (dsp->f.show || pip->f.every) {
+	            if (dsp->fl.show || pip->fl.every) {
 	                pip->count = 0 ;
 	                switch (pm) {
 
@@ -158,7 +158,7 @@ int progmoder(PROGINFO *pip,MKDIRLIST *ngp,cchar *ofn)
 
 	                case PM_HEADER:
 	                    pip->ofp = ofp ;
-	                    pip->f.header = TRUE ;
+	                    pip->fl.header = TRUE ;
 	                    rs = progng(pip,&ds,dsp,emit_header,cmode) ;
 	                    break ;
 
@@ -170,15 +170,15 @@ int progmoder(PROGINFO *pip,MKDIRLIST *ngp,cchar *ofn)
 	                    if (DEBUGLEVEL(3))
 	                        debugprintf("progmoder: progng() rs=%d\n",rs) ;
 #endif
-	                    if (pip->f.query) {
+	                    if (pip->fl.query) {
 	                        if (pip->count > 0)
-	                            pip->f.newmessages = TRUE ;
-	                    } else if (pip->f.all || pip->f.old || 
-	                        pip->f.description || (pip->count > 0)) {
+	                            pip->fl.newmessages = TRUE ;
+	                    } else if (pip->fl.all || pip->fl.old || 
+	                        pip->fl.description || (pip->count > 0)) {
 	                        bbcpy(namebuf,dsp->name) ;
 	                        bprintf(ofp,"newsgroup> %s %d\n",
 	                            namebuf,pip->count) ;
-	                        if (pip->f.description)
+	                        if (pip->fl.description)
 	                            rs = description(pip,ofp,dsp) ;
 	                    } /* end if */
 	                    break ;
@@ -186,7 +186,7 @@ int progmoder(PROGINFO *pip,MKDIRLIST *ngp,cchar *ofn)
 /* report subscribed newsgroup names that have unread articles */
 	                case PM_NAMES:
 	                    bbcpy(namebuf,dsp->name) ;
-	                    if (pip->f.description) {
+	                    if (pip->fl.description) {
 	                        bprintf(ofp,"newsgroup> %s\n",namebuf) ;
 	                        rs = description(pip,ofp,dsp) ;
 	                    } else
@@ -195,7 +195,7 @@ int progmoder(PROGINFO *pip,MKDIRLIST *ngp,cchar *ofn)
 
 /* handle newsgroup subscription here */
 	                case PM_SUBSCRIPTION:
-	                    dsp->f.subscribe = pip->f.subscribe ;
+	                    dsp->fl.subscribe = pip->fl.subscribe ;
 	                    break ;
 
 	                case PM_MAILBOX:
@@ -223,8 +223,8 @@ int progmoder(PROGINFO *pip,MKDIRLIST *ngp,cchar *ofn)
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (dirshown) */
 	    if (rs >= 0) {
-	        if ((pip->progmode == PM_COUNT) && pip->f.query) {
-	            if (pip->f.newmessages)
+	        if ((pip->progmode == PM_COUNT) && pip->fl.query) {
+	            if (pip->fl.newmessages)
 	                rs = procqueryout(pip,ofp,c) ;
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
