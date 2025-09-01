@@ -281,10 +281,10 @@ int cmd_save(PI *pip,AENT *ap,cc *ngdir,cc *afname,int mode,cc *mailbox) noex {
 
 /* check for the envelope header line */
 
-	        if ((line == 0) && pip->f.addenv) {
+	        if ((line == 0) && pip->fl.addenv) {
 	            cchar	*envfromstr ;
 	            t = pip->now.time ;
-	            if (pip->f.envdate) {
+	            if (pip->fl.envdate) {
 	                switch (pip->whichenvdate) {
 	                case SORTMODE_MTIME:
 	                    t = stat_a.st_mtime ;
@@ -319,7 +319,7 @@ int cmd_save(PI *pip,AENT *ap,cc *ngdir,cc *afname,int mode,cc *mailbox) noex {
 	                    break ;
 	                } /* end switch */
 	            } /* end if (whichenvdate) */
-	            if (! pip->f.envfrom) {
+	            if (! pip->fl.envfrom) {
 	                sncpy3(env_from,LINEBUFLEN,
 	                    pip->mailhost,"!",from_username) ;
 	            } else {
