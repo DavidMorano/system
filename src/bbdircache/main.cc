@@ -40,9 +40,7 @@
 	increasingly draconian security restrictions imposed on the computers
 	in the DEFINITY development organization.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -74,7 +72,6 @@
 #include	<pcsconf.h>
 #include	<pcspoll.h>
 #include	<getax.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -349,7 +346,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->verboselevel = 1 ;
 	pip->intrun = -1 ;	/* program check interval */
 
-	pip->f.logprog = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 	pip->lip = lip ;
 	rs = locinfo_start(lip,pip) ;
@@ -621,7 +618,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -657,7 +654,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* daemon mode */
 	                    case 'd':
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        pip->intrun = -1 ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -706,7 +703,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* quiet mode */
 	                    case 'q':
 	                        pip->quietlevel = 1 ;
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -923,7 +920,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        cchar	*pn = pip->progname ;
 	        bprintf(pip->efp,"%s: could not process (%d)\n",pn,rs) ;
 	    }
@@ -1097,10 +1094,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.squery) {
 	                        lip->have.squery = TRUE ;
 	                        lip->final.squery = TRUE ;
-	                        lip->f.squery = TRUE ;
+	                        lip->fl.squery = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.squery = (rs > 0) ;
+	                            lip->fl.squery = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1291,7 +1288,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *app,cchar *afn,cchar *ofn)
 	            rs1 = bclose(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                bprintf(pip->efp,fmt,pn,rs) ;
 	                bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
