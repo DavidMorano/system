@@ -97,7 +97,7 @@ ustat	*sbp ;
 		return 1 ;
 
 
-	if (! pip->f.no) {
+	if (! pip->fl.no) {
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 0)
@@ -109,7 +109,7 @@ ustat	*sbp ;
 
 	} /* end if (removing) */
 
-	if (pip->f.print || (pip->verboselevel > 0))
+	if (pip->fl.print || (pip->verboselevel > 0))
 	    bprintf(pip->ofp,"%s\n", name) ;
 
 	return 1 ;
