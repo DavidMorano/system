@@ -112,7 +112,7 @@ int		fn ;
 
 	    } /* end if */
 
-	    if ((! gp->f.noblanks) || (len > 1))
+	    if ((! gp->fl.noblanks) || (len > 1))
 	        bwrite(gp->ofp,linebuf,len) ;
 
 	    line += 1 ;
