@@ -100,7 +100,7 @@ int		nuboards ;
 	        debugprintf("update: opening user NG file=%s\n",ufname) ;
 #endif
 
-	if (bbnewsrc_open(&ung,ufname,gp->f.readtime) >= 0) {
+	if (bbnewsrc_open(&ung,ufname,gp->fl.readtime) >= 0) {
 
 #if	CF_DEBUG
 	    if (gp->debuglevel > 1)
@@ -113,7 +113,7 @@ int		nuboards ;
 
 	        dsp = user_bds[i].dsp ;
 #if	CF_SUBSCRIBE
-	        f_subscribe = dsp->f.subscribe ;
+	        f_subscribe = dsp->fl.subscribe ;
 #else
 	        f_subscribe = FALSE ;
 #endif
@@ -121,7 +121,7 @@ int		nuboards ;
 #if	CF_DEBUG
 	        if (gp->debuglevel > 1)
 	            debugprintf("update: loop ng=%s f_subscribe=%d\n",
-	                dsp->name,dsp->f.subscribe) ;
+	                dsp->name,dsp->fl.subscribe) ;
 #endif
 
 /* make the board name (with the dots - not slashes) */
