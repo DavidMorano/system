@@ -432,7 +432,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	if (rs1 >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    shio_control(&errfile,SHIO_CLINEBUF,0) ;
 
 	}
@@ -454,8 +454,8 @@ int main(int argc,mainv argv,mainv envv) {
 	pip->runint = -1 ;
 	pip->disint = -1 ;
 
-	pip->f.quiet = FALSE ;
-	pip->f.daemon = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.daemon = FALSE ;
 
 
 /* start parsing the arguments */
@@ -749,17 +749,17 @@ int main(int argc,mainv argv,mainv envv) {
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* background */
 	                    case 'b':
-	                        pip->f.background = TRUE ;
+	                        pip->fl.background = TRUE ;
 	                        break ;
 
 /* daemon mode */
 	                    case 'd':
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        if (f_optequal) {
 
 	                            f_optequal = FALSE ;
@@ -1054,7 +1054,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	}
 
-	if (pip->f.daemon && (pip->pidfname[0] == '\0')) {
+	if (pip->fl.daemon && (pip->pidfname[0] == '\0')) {
 
 	    mkfnamesuf1(tmpfname,pip->nodename,PIDFNAME) ;
 
@@ -1080,7 +1080,7 @@ int main(int argc,mainv argv,mainv envv) {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("main: daemon=%u logging=%u\n",
-	        pip->f.daemon,pip->have.logfile) ;
+	        pip->fl.daemon,pip->have.logfile) ;
 #endif
 
 /* logging is normally only for daemon mode */
@@ -1142,7 +1142,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    if (pip->open.logfile)
 	        logfile_printf(&pip->lh,"sl=%s", pip->slfname) ;
 
-	    if (pip->f.daemon) {
+	    if (pip->fl.daemon) {
 
 	        LFM	pidlock ;
 
@@ -1150,7 +1150,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        int	cs ;
 
 
-		if (pip->f.background) {
+		if (pip->fl.background) {
 
 	        if (pip->open.logfile)
 	            logfile_flush(&pip->lh) ;
@@ -1323,10 +1323,10 @@ int main(int argc,mainv argv,mainv envv) {
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
 	        debugprintf("main: daemon=%u child=%u\n",
-	            pip->f.daemon,f_child) ;
+	            pip->fl.daemon,f_child) ;
 #endif
 
-	    if ((! pip->f.daemon) || f_child) {
+	    if ((! pip->fl.daemon) || f_child) {
 
 	        shio_printf(pip->efp, "%s: entries=%u\n",
 	            pip->progname,rs) ;
@@ -1351,7 +1351,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    case SR_ALREADY:
 	    case SR_AGAIN:
-	        if ((! pip->f.quiet) && (pip->efp != NULL))
+	        if ((! pip->fl.quiet) && (pip->efp != NULL))
 	            shio_printf(pip->efp,
 	                "%s: existing lock (%d)\n",
 	                pip->progname,rs) ;
@@ -1363,7 +1363,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        break ;
 
 	    default:
-	        if ((! pip->f.quiet) && (pip->efp != NULL))
+	        if ((! pip->fl.quiet) && (pip->efp != NULL))
 	            shio_printf(pip->efp,
 	                "%s: could not perform update (%d)\n",
 	                pip->progname,rs) ;
@@ -1379,7 +1379,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	if (pip->open.logfile) {
 
-	    if ((! pip->f.daemon) || f_child)
+	    if ((! pip->fl.daemon) || f_child)
 	        logfile_printf(&pip->lh,"exiting (%d) ex=%u",
 	            rs,ex) ;
 
@@ -1390,7 +1390,7 @@ done:
 ret4:
 	if ((pip->debuglevel > 0) && (pip->efp != NULL)) {
 
-	    if (pip->f.daemon) {
+	    if (pip->fl.daemon) {
 
 	        shio_printf(pip->efp,"%s: program (%s) exiting ex=%d\n",
 	            pip->progname,((f_child) ? "child" : "parent"),ex) ;
