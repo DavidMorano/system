@@ -184,41 +184,41 @@ vecstr		*setsp ;
 
 	        case bbopt_fastscan:
 	            if (cfdeci(cp2,-1,&val) >= 0)
-	                pip->f.extrascan = (val == 0) ;
+	                pip->fl.extrascan = (val == 0) ;
 #if	CF_DEBUG
 	            if (pip->debuglevel > 1)
 	                debugprintf("getbbopts: set extrascan=%d\n",
-	                    pip->f.extrascan) ;
+	                    pip->fl.extrascan) ;
 #endif
 	            break ;
 
 	        case bbopt_extrascan:
 	            if (cfdeci(cp2,-1,&val) >= 0)
-	                pip->f.extrascan = (val != 0) ;
+	                pip->fl.extrascan = (val != 0) ;
 #if	CF_DEBUG
 	            if (pip->debuglevel > 1)
 	                debugprintf("getbbopts: set extrascan=%d\n",
-	                    pip->f.extrascan) ;
+	                    pip->fl.extrascan) ;
 #endif
 	            break ;
 
 	        case bbopt_popscreen:
 	            if (cfdeci(cp2,-1,&val) >= 0)
-	                pip->f.popscreen = (val != 0) ;
+	                pip->fl.popscreen = (val != 0) ;
 #if	CF_DEBUG
 	            if (pip->debuglevel > 1)
 	                debugprintf("getbbopts: set popscreen=%d\n",
-	                    pip->f.popscreen) ;
+	                    pip->fl.popscreen) ;
 #endif
 	            break ;
 
 	        case bbopt_readtime:
 	            if (cfdeci(cp2,-1,&val) >= 0)
-	                pip->f.readtime = (val != 0) ;
+	                pip->fl.readtime = (val != 0) ;
 #if	CF_DEBUG
 	            if (pip->debuglevel > 1)
 	                debugprintf("getbbopts: set readtime=%d\n",
-	                    pip->f.readtime) ;
+	                    pip->fl.readtime) ;
 #endif
 	            break ;
 
@@ -273,19 +273,19 @@ vecstr		*setsp ;
 	                switch (oi) {
 
 	                case bbopt_fastscan:
-	                    pip->f.extrascan = (! f_opton) ;
+	                    pip->fl.extrascan = (! f_opton) ;
 	                    break ;
 
 	                case bbopt_extrascan:
-	                    pip->f.extrascan = f_opton ;
+	                    pip->fl.extrascan = f_opton ;
 	                    break ;
 
 	                case bbopt_popscreen:
-	                    pip->f.popscreen = f_opton ;
+	                    pip->fl.popscreen = f_opton ;
 	                    break ;
 
 	                case bbopt_readtime:
-	                    pip->f.readtime = f_opton ;
+	                    pip->fl.readtime = f_opton ;
 	                    break ;
 
 	                } /* end switch */
@@ -303,8 +303,8 @@ vecstr		*setsp ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1) {
-	    debugprintf("getbbopts: extrascan=%d\n",pip->f.extrascan) ;
-	    debugprintf("getbbopts: readtime=%d\n",pip->f.readtime) ;
+	    debugprintf("getbbopts: extrascan=%d\n",pip->fl.extrascan) ;
+	    debugprintf("getbbopts: readtime=%d\n",pip->fl.readtime) ;
 	}
 #endif /* CF_DEBUG */
 
@@ -313,9 +313,9 @@ vecstr		*setsp ;
 #ifdef	COMMENT
 	if (pip->debuglevel > 0)
 	    bprintf(pip->efp,"%s: FASTSCAN=%d\n",
-	        pip->progname,(! pip->f.extrascan)) ;
+	        pip->progname,(! pip->fl.extrascan)) ;
 
-	if (! pip->f.extrascan)
+	if (! pip->fl.extrascan)
 	    logfile_printf(&pip->lh,"FASTSCAN\n") ;
 #endif /* COMMENT */
 
