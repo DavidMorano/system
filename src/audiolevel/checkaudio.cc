@@ -171,7 +171,7 @@ const char	devfname[] ;
 	    aset.record.gain = AUDIO_MAX_GAIN ;
 #endif
 
-	    if (pip->f.monitor)
+	    if (pip->fl.monitor)
 	        aset.monitor_gain = pip->monitorvol ;
 
 	    bufsamples = bufsize / ((precision / 8) * channels) ;
