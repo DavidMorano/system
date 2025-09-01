@@ -172,10 +172,10 @@ char	*envv[] ;
 
 	(void) memset(&pip->f,0,sizeof(struct proginfo_flags)) ;
 
-	pip->f.nochange = FALSE ;
-	pip->f.quiet = FALSE ;
-	pip->f.follow = FALSE ;
-	pip->f.suffix = FALSE ;
+	pip->fl.nochange = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.follow = FALSE ;
+	pip->fl.suffix = FALSE ;
 
 /* process program arguments */
 
@@ -326,7 +326,7 @@ char	*envv[] ;
 
 /* follow symbolic links */
 	                case argopt_follow:
-				pip->f.follow = TRUE ;
+				pip->fl.follow = TRUE ;
 				break ;
 
 /* default action and user specified help */
@@ -359,7 +359,7 @@ char	*envv[] ;
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* take input file arguments from STDIN */
@@ -405,7 +405,7 @@ char	*envv[] ;
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* require a suffix for file names */
@@ -597,7 +597,7 @@ char	*envv[] ;
 /* get ready */
 
 	if ((rs = paramopt_havekey(&aparams,PO_SUFFIX)) > 0) {
-	    pip->f.suffix = TRUE ;
+	    pip->fl.suffix = TRUE ;
 	} /* end if */
 
 	if ((rs = paramopt_havekey(&aparams,PO_OPTION)) > 0) {
@@ -614,11 +614,11 @@ char	*envv[] ;
 	            switch (kwi) {
 
 	            case progopt_follow:
-	                pip->f.follow = TRUE ;
+	                pip->fl.follow = TRUE ;
 	                break ;
 
 	            case progopt_nofollow:
-	                pip->f.follow = FALSE ;
+	                pip->fl.follow = FALSE ;
 	                break ;
 
 	            } /* end switch */
@@ -693,7 +693,7 @@ char	*envv[] ;
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file\n",
