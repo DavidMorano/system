@@ -112,7 +112,7 @@ char		basedir[] ;
 	}
 
 
-	if (pip->f.verbose)
+	if (pip->fl.verbose)
 	    bprintf(pip->ofp,"directory=%s\n",basedir) ;
 
 
@@ -346,7 +346,7 @@ exit:
 
 	bclose(nnfp) ;
 
-	if (pip->f.verbose && (ndel > 0)) {
+	if (pip->fl.verbose && (ndel > 0)) {
 
 	    bprintf(pip->ofp,"subdirectories scanned: %d\n",
 	        ndir) ;
