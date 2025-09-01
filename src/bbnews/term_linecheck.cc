@@ -107,7 +107,7 @@ int proglinecheck(RPOGINFO *pip)
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 
-	if (pip->f.terminal) {
+	if (pip->fl.terminal) {
 	struct winsize	ws ;
 
 	f = if_winchange ;
