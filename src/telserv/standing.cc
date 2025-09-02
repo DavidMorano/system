@@ -203,7 +203,7 @@ PROGINFO	*pip ;
 /* other stuff */
 
 #if	CF_MSFILE
-	if (pip->f.mspoll) {
+	if (pip->fl.mspoll) {
 	        sop->m.pagesize = getpagesize() ;
 
 	        memset(&sop->m.e,0,sizeof(MSFILE_ENT)) ;
@@ -217,7 +217,7 @@ PROGINFO	*pip ;
 #endif
 
 	        rs1 = msfile_open(&sop->ms,pip->msfname,O_MSOPEN,0666) ;
-	        sop->f.msopen = (rs1 >= 0) ;
+	        sop->fl.msopen = (rs1 >= 0) ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
@@ -227,7 +227,7 @@ PROGINFO	*pip ;
 	        if (rs1 == 0)
 	            u_chmod(pip->msfname,0666) ;
 
-	        if (sop->f.msopen) {
+	        if (sop->fl.msopen) {
 
 	            rs1 = msfile_match(&sop->ms,pip->daytime,
 	                pip->nodename,-1, &sop->m.e) ;
@@ -270,7 +270,7 @@ STANDING	*sop ;
 
 /* close extra stuff */
 
-	if (sop->f.msopen) {
+	if (sop->fl.msopen) {
 	    rs1 = msfile_close(&sop->ms) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -395,14 +395,14 @@ time_t		daytime ;
 
 /* update the interval if necessary (this is a flagged maintenance thing) */
 
-	if (sop->f.interval) {
-	    sop->f.interval = FALSE ;
+	if (sop->fl.interval) {
+	    sop->fl.interval = FALSE ;
 	    mininterval = sop->mininterval ;
 	}
 
 /* handle MS stuff if necessary */
 
-	if (sop->f.msopen) {
+	if (sop->fl.msopen) {
 
 	    if ((mininterval == 0) || (mininterval > pip->intpoll))
 	        mininterval = pip->intpoll ;
@@ -771,7 +771,7 @@ char		buf[] ;
 	sop->nactive += 1 ;
 	if (co.interval < sop->mininterval) {
 	    sop->mininterval = co.interval ;
-	    sop->f.interval = TRUE ;
+	    sop->fl.interval = TRUE ;
 	}
 
 /* OK, gratuitously get updated LA values */
