@@ -447,7 +447,7 @@ int main(int argc,mainv argv,mainv envv) noex {
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* verbose mode */
