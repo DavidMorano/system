@@ -188,10 +188,10 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.pcspoll) {
 	                        pip->final.pcspoll = TRUE ;
 	                        pip->have.pcspoll = TRUE ;
-	                        pip->f.pcspoll = TRUE ;
+	                        pip->fl.pcspoll = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.pcspoll = (rs > 0) ;
+	                            pip->fl.pcspoll = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -201,10 +201,10 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.useclen) {
 	                        pip->final.useclen = TRUE ;
 	                        pip->have.useclen = TRUE ;
-	                        pip->f.useclen = TRUE ;
+	                        pip->fl.useclen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.useclen = (rs > 0) ;
+	                            pip->fl.useclen = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -214,10 +214,10 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.useclines) {
 	                        pip->final.useclines = TRUE ;
 	                        pip->have.useclines = TRUE ;
-	                        pip->f.useclines = TRUE ;
+	                        pip->fl.useclines = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.useclines = (rs > 0) ;
+	                            pip->fl.useclines = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -227,10 +227,10 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.mailget) {
 	                        pip->final.mailget = TRUE ;
 	                        pip->have.mailget = TRUE ;
-	                        pip->f.mailget = TRUE ;
+	                        pip->fl.mailget = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.mailget = (rs > 0) ;
+	                            pip->fl.mailget = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -239,10 +239,10 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.clock) {
 	                        pip->final.clock = TRUE ;
 	                        pip->have.clock = TRUE ;
-	                        pip->f.clock = TRUE ;
+	                        pip->fl.clock = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.clock = (rs > 0) ;
+	                            pip->fl.clock = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -251,10 +251,10 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.nextdel) {
 	                        pip->final.nextdel = TRUE ;
 	                        pip->have.nextdel = TRUE ;
-	                        pip->f.nextdel = TRUE ;
+	                        pip->fl.nextdel = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.nextdel = (rs > 0) ;
+	                            pip->fl.nextdel = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -263,10 +263,10 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.nextmov) {
 	                        pip->final.nextmov = TRUE ;
 	                        pip->have.nextmov = TRUE ;
-	                        pip->f.nextmov = TRUE ;
+	                        pip->fl.nextmov = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.nextmov = (rs > 0) ;
+	                            pip->fl.nextmov = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -275,10 +275,10 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.winadj) {
 	                        pip->final.winadj = TRUE ;
 	                        pip->have.winadj = TRUE ;
-	                        pip->f.winadj = TRUE ;
+	                        pip->fl.winadj = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.winadj = (rs > 0) ;
+	                            pip->fl.winadj = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -287,10 +287,10 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.deldup) {
 	                        pip->final.deldup = TRUE ;
 	                        pip->have.deldup = TRUE ;
-	                        pip->f.deldup = TRUE ;
+	                        pip->fl.deldup = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.deldup = (rs > 0) ;
+	                            pip->fl.deldup = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -299,10 +299,10 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.nosysconf) {
 	                        pip->final.nosysconf = TRUE ;
 	                        pip->have.nosysconf = TRUE ;
-	                        pip->f.nosysconf = TRUE ;
+	                        pip->fl.nosysconf = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.nosysconf = (rs > 0) ;
+	                            pip->fl.nosysconf = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
