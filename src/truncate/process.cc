@@ -106,9 +106,9 @@ ULONG		trunclen ;
 #endif
 
 	flen = trunclen ;
-	f_flen = pip->f.trunclen ;
+	f_flen = pip->fl.trunclen ;
 
-	if (! pip->f.literal) {
+	if (! pip->fl.literal) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
