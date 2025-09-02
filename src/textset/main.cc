@@ -24,17 +24,15 @@
 
 /*******************************************************************************
 
+  	Description:
         This program will read the input file and format it into TROFF constant
         width font style source input language.
 
 	Synopsis:
-
 	$ textset [<ifile>] [-DV] [-o <offset>] [-l <lines>] 
 		[-f <font>] [-p <point_size>] [-v <vertical_space>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -49,7 +47,6 @@
 #include	<estrings.h>
 #include	<bits.h>
 #include	<bfile.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -456,7 +453,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -490,7 +487,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* output page headers */
 	                    case 'h':
-	                        pip->f.headers = TRUE ;
+	                        pip->fl.headers = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl)
@@ -984,7 +981,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,bfile *ofp,cchar *afn)
 	        rs1 = bclose(&afile) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            cchar	*pn = pip->progname ;
 	            cchar	*fmt = "%s: inaccessible argument-list (%d)\n" ;
 	            bprintf(pip->efp,fmt,pn,rs) ;
