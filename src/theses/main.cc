@@ -235,7 +235,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->headerstring = NULL ;
 	pip->verboselevel = 1 ;
 
-	pip->f.headers = FALSE ;
+	pip->fl.headers = FALSE ;
 
 	f_help = FALSE ;
 
@@ -472,7 +472,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* output page headers */
 	                        case 'h':
-	                            pip->f.headers = TRUE ;
+	                            pip->fl.headers = TRUE ;
 	                            if (f_optequal) {
 	                                f_optequal = FALSE ;
 	                                if (avl)
