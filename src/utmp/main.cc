@@ -383,7 +383,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -403,11 +403,11 @@ int main(int argc,mainv argv,mainv envv) {
 	                        break ;
 
 	                    case 'y':
-	                        lip->f.yes = TRUE ;
+	                        lip->fl.yes = TRUE ;
 	                        break ;
 
 	                    case 'n':
-	                        lip->f.no = TRUE ;
+	                        lip->fl.no = TRUE ;
 	                        break ;
 
 	                    case 'p':
@@ -440,7 +440,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        break ;
 
 	                    case 'z':
-	                        lip->f.zap = TRUE ;
+	                        lip->fl.zap = TRUE ;
 	                        break ;
 
 	                    case '?':
@@ -674,7 +674,7 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid) noex {
 
 	si = 0 ;
 	while ((up = getutxent()) != NULL) {
-	    if (lip->f.zap && (lip->searchline != NULL)) {
+	    if (lip->fl.zap && (lip->searchline != NULL)) {
 		cchar	*searchline = lip->searchline ;
 
 	        if (strncmp(up->ut_line,searchline,TMPX_LLINE) == 0)
@@ -693,7 +693,7 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid) noex {
 	    strwcpy(lognamebuf,up->ut_user,TMPX_LUSER) ;
 	}
 
-	if (lip->f.zap && (lip->searchline != NULL)) {
+	if (lip->fl.zap && (lip->searchline != NULL)) {
 
 	    uc = *up ;		/* copy the record found */
 
@@ -708,7 +708,7 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid) noex {
 	        bprintf(pip->efp,fmt,pn,rs) ;
 	    }
 
-	} else if ((! lip->f.yes) && (! lip->f.no)) {
+	} else if ((! lip->fl.yes) && (! lip->fl.no)) {
 	    fmt = "id=%-4t line=%-12t user=%-12t sid=%-5u ses=%u host=%r\n" ;
 
 	    if (up != NULL) {
@@ -725,7 +725,7 @@ static int process(PROGINFO *pip,bfile *ofp,pid_t pid) noex {
 	        bprintf(ofp,"not logged in\n") ;
 	    }
 
-	} else if (lip->f.yes) {
+	} else if (lip->fl.yes) {
 
 	    if (up == NULL) {
 		cint	termlen = TERMBUFLEN ;
