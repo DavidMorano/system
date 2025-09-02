@@ -111,9 +111,9 @@ const char	fname[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
 	    debugprintf("process: entered, fname=%s\n",fname) ;
-	    if (pip->f.inplace)
+	    if (pip->fl.inplace)
 	        debugprintf("process: got the inplace\n") ;
-	    if (pip->f.leading)
+	    if (pip->fl.leading)
 	        debugprintf("process: strip leading white space\n") ;
 	}
 #endif /* CF_DEBUG */
@@ -128,17 +128,17 @@ const char	fname[] ;
 	        debugprintf("process: opening STDIN\n") ;
 #endif
 
-	    oflags = (pip->f.inplace) ? "drw" : "dr" ;
+	    oflags = (pip->fl.inplace) ? "drw" : "dr" ;
 	    rs = bopen(ifp,BFILE_STDIN,oflags,0666) ;
 
 	} else {
 
-	    oflags = (pip->f.inplace) ? "rw" : "r" ;
+	    oflags = (pip->fl.inplace) ? "rw" : "r" ;
 	    rs = bopen(ifp,fname,oflags,0666) ;
 
 	}
 
-	if ((rs >= 0) && pip->f.inplace) {
+	if ((rs >= 0) && pip->fl.inplace) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -187,7 +187,7 @@ const char	fname[] ;
 
 /* is this work "in-place"? */
 
-	if (pip->f.inplace) {
+	if (pip->fl.inplace) {
 	    int	f_ok = (rs >= 0) ;
 
 #if	CF_DEBUG
@@ -291,7 +291,7 @@ int		llen ;
 	sl = llen ;
 	if (rs >= 0) {
 	    if ((si = siskipwhite(sp,sl)) > 0) {
-	        if (! pip->f.rmleading) {
+	        if (! pip->fl.rmleading) {
 	            rs = bwrite(wfp,sp,si) ;
 	        }
 	            sp += si ;
@@ -299,13 +299,13 @@ int		llen ;
 	    }
 	}
 
-	if ((rs >= 0) && pip->f.rmtrailing) {
+	if ((rs >= 0) && pip->fl.rmtrailing) {
 	    while ((sl > 0) && CHAR_ISWHITE(sp[sl-1]))
 	        sl -= 1 ;
 	}
 
 	if (rs >= 0) {
-	    if (pip->f.rmmiddle) {
+	    if (pip->fl.rmmiddle) {
 
 	        c = 0 ;
 	        while ((cl = nextfield(sp,sl,&cp)) > 0) {
