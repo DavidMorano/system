@@ -143,7 +143,7 @@ RM= rm -f
 INCS= config.h defs.h termcharsets.h
 
 
-OBJ00= main.o
+OBJ00= termchar_main.o
 OBJ01= 
 OBJ02=
 OBJ03=
@@ -183,26 +183,30 @@ default:		$(T).x
 
 all:			$(ALL)
 
-.c.o:
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $<
-
-.cc.o:
-	$(GPP) -c $(CFLAGS) $(CPPFLAGS) $<
-
-.c.ln:
-	$(LINT) -c -u $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
-.c.cx:
-	$(CXREF) -C $(CXREFFLAGS) $(CPPFLAGS) $<
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
-.c.cs:
-	$(CXREF) $(CXREFFLAGS) $(CPPFLAGS) -o $(*).cs $<
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
+.c.o:
+	$(COMPILE.c) $<
+
+.cc.o:
+	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T):			$(T).ee
@@ -263,7 +267,7 @@ control:
 	date >> Control
 
 
-main.o:			main.c $(INCS)
+termchar_main.o:	termchar_main.cc $(INCS)
 
 whatinfo.o:		whatinfo.c config.h
 
