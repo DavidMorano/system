@@ -169,7 +169,7 @@ char		name[] ;
 	if (rs < 0)
 	    goto ret0 ;
 
-	if (pip->f.fakeit)
+	if (pip->fl.fakeit)
 	    goto ret0 ;
 
 /* open the device */
@@ -250,7 +250,7 @@ char		name[] ;
 
 	    u_close(tfd) ;
 
-	} else if (! pip->f.quiet)
+	} else if (! pip->fl.quiet)
 	    bprintf(pip->efp,"%s: could not open \"%s\" (%d)\n",
 	        pip->progname,bdp,rs) ;
 
