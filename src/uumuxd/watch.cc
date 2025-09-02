@@ -578,7 +578,7 @@ BUILTIN		*bip ;
 
 	        u_dup(ns) ;
 #else
-		if (! gp->f.fd_stdout) {
+		if (! gp->fl.fd_stdout) {
 
 			u_close(FD_STDOUT) ;
 
