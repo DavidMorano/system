@@ -74,7 +74,6 @@
 #include	<cstring>
 #include	<grp.h>
 #include	<usystem.h>
-#include	<ucmallreg.h>
 #include	<getourenv.h>
 #include	<getportnum.h>
 #include	<getax.h>
@@ -122,8 +121,6 @@
 #ifndef	VARMAIL
 #define	VARMAIL		"MAIL"
 #endif
-
-#define	NUCMEMALLOC	"ucmemalloc.deb"
 
 
 /* external subroutines */
@@ -551,17 +548,17 @@ int main(int argc,mainv argv,mainv envv) {
 	pip->to_spool = -1 ;
 	pip->to_msgread = -1 ;
 
-	pip->f.optlogmsg = OPT_LOGMSG ;
-	pip->f.optlogzone = OPT_LOGZONE ;
-	pip->f.optlogenv = OPT_LOGENV ;
-	pip->f.optlogmsgid = OPT_LOGMSGID ;
-	pip->f.optlogsys = OPT_LOGSYS ;
-	pip->f.optdivert = OPT_DIVERT ;
-	pip->f.optforward = OPT_FORWARD ;
-	pip->f.optnorepeat = OPT_NOREPEAT ;
-	pip->f.optnospam = OPT_NOSPAM ;
-	pip->f.optmailhist = OPT_MAILHIST ;
-	pip->f.optdeliver = OPT_DELIBER ;
+	pip->fl.optlogmsg = OPT_LOGMSG ;
+	pip->fl.optlogzone = OPT_LOGZONE ;
+	pip->fl.optlogenv = OPT_LOGENV ;
+	pip->fl.optlogmsgid = OPT_LOGMSGID ;
+	pip->fl.optlogsys = OPT_LOGSYS ;
+	pip->fl.optdivert = OPT_DIVERT ;
+	pip->fl.optforward = OPT_FORWARD ;
+	pip->fl.optnorepeat = OPT_NOREPEAT ;
+	pip->fl.optnospam = OPT_NOSPAM ;
+	pip->fl.optmailhist = OPT_MAILHIST ;
+	pip->fl.optdeliver = OPT_DELIBER ;
 
 /* local information */
 
@@ -836,16 +833,16 @@ int main(int argc,mainv argv,mainv envv) {
 	                    break ;
 
 	                case argopt_mr:
-	                    pip->f.multirecip = TRUE ;
+	                    pip->fl.multirecip = TRUE ;
 	                    break ;
 
 	                case argopt_nm:
-	                    pip->f.nopollmsg = TRUE ;
+	                    pip->fl.nopollmsg = TRUE ;
 	                    break ;
 
 /* ignore dots on input (default anyway!) */
 	                case argopt_oi:
-	                    pip->f.optin = TRUE ;
+	                    pip->fl.optin = TRUE ;
 	                    break ;
 
 /* COMAST port */
@@ -896,7 +893,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'R':
@@ -929,7 +926,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* ignore dots on input (default anyway!) */
 	                    case 'i':
-	                        pip->f.optin = TRUE ;
+	                        pip->fl.optin = TRUE ;
 	                        break ;
 
 /* boxname for DMAILBOX */
@@ -970,7 +967,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* quiet */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* subject */
@@ -1174,11 +1171,11 @@ int main(int argc,mainv argv,mainv envv) {
 
 	pip->uid = u.uid ;
 	pip->euid = u.euid ;
-	pip->f.setuid = (pip->uid != pip->euid) ;
+	pip->fl.setuid = (pip->uid != pip->euid) ;
 
 	pip->gid = u.gid ;
 	pip->egid = u.egid ;
-	pip->f.setgid = (pip->gid != pip->egid) ;
+	pip->fl.setgid = (pip->gid != pip->egid) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1213,7 +1210,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 #if	CF_PCSTRUSTUSER
 	rs = pcstrustuser(pip->pr,pip->username) ;
-	pip->f.trusted = (rs > 0) ;
+	pip->fl.trusted = (rs > 0) ;
 	if (rs < 0) goto badinit1 ;
 #endif
 
@@ -1287,7 +1284,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	if ((protospec != NULL) &&
 	    (strcasecmp(pip->protospec,PROTOSPEC_POSTFIX) == 0))
-	    pip->f.trusted = TRUE ;
+	    pip->fl.trusted = TRUE ;
 
 /* log ID */
 
@@ -1313,7 +1310,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* log file */
 
-	if ((rs >= 0) && ((pip->f.optlogmsg || pip->f.optlogconf))) {
+	if ((rs >= 0) && ((pip->fl.optlogmsg || pip->fl.optlogconf))) {
 
 	    rs = proglogfname(pip,tmpfname,logcname,lfname) ;
 	    if (rs > 0) lfname = tmpfname ;
@@ -1327,7 +1324,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        bprintf(pip->efp,"%s: lf=%s\n",pip->progname,lfname) ;
 
 	    if ((rs >= 0) && (lfname != NULL)) {
-	        pip->f.logprog = TRUE ;
+	        pip->fl.logprog = TRUE ;
 
 	        rs1 = SR_NOENT ;
 	        f = (lfname[0] != '\0') && (lfname[0] != '-') ;
@@ -1343,13 +1340,13 @@ int main(int argc,mainv argv,mainv envv) {
 
 	        if ((rs >= 0) && (rs1 >= 0)) {
 	            pip->open.logprog = TRUE ;
-	            pip->f.logconf = pip->f.optlogconf ;
-	            pip->f.logmsg = pip->f.optlogmsg ;
+	            pip->fl.logconf = pip->fl.optlogconf ;
+	            pip->fl.logmsg = pip->fl.optlogmsg ;
 	            if (pip->logsize > 0)
 	                logfile_checksize(&pip->lh,pip->logsize) ;
 	            rs1 = logfile_userinfo(&pip->lh,&u,pip->daytime,
 	                pip->progname,pip->version) ;
-	            if (pip->f.optlogconf)
+	            if (pip->fl.optlogconf)
 	                logfile_printf(&pip->lh,"pr=%s\n", pip->pr) ;
 	            if (protospec != NULL)
 	                logfile_printf(&pip->lh,"proto=%s\n",protospec) ;
@@ -1384,7 +1381,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        if (rs1 >= 0)
 	            rs1 = pcsuserfile(pip->pr,tmpfname,nn,un,buf) ;
 
-	        if (pip->f.logmsg) {
+	        if (pip->fl.logmsg) {
 	            if (rs1 == 1) {
 	                logfile_printf(&pip->lh,
 	                    "created user-list file") ;
@@ -1401,7 +1398,7 @@ int main(int argc,mainv argv,mainv envv) {
 	nprintf(NUCMEMALLOC,"main: env-sum log file\n") ;
 #endif
 
-	if ((rs >= 0) && pip->f.optlogenv) {
+	if ((rs >= 0) && pip->fl.optlogenv) {
 	    cchar	*env = LOGENVFNAME ;
 	    char	cname[MAXNAMELEN+1] ;
 	    char	envfname[MAXPATHLEN+1] ;
@@ -1434,7 +1431,7 @@ int main(int argc,mainv argv,mainv envv) {
 	nprintf(NUCMEMALLOC,"main: log-zone file\n") ;
 #endif
 
-	if ((rs >= 0) && pip->f.optlogzone) {
+	if ((rs >= 0) && pip->fl.optlogzone) {
 	    cchar	*zone = LOGZONEFNAME ;
 	    char	cname[MAXNAMELEN+1] ;
 	    char	zfname[MAXPATHLEN+1] ;
@@ -1488,7 +1485,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    if ((rs >= 0) && (envfromaddr == NULL)) {
 
-	        if (pip->f.trusted && (uu_user != NULL)) {
+	        if (pip->fl.trusted && (uu_user != NULL)) {
 	            envfromaddr = uu_user ;
 
 	        } else if (bl > 0) {
@@ -1699,7 +1696,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	} /* end if */
 
-	pip->f.comsat = 
+	pip->fl.comsat = 
 	    (pip->comsatfname != NULL) && (pip->comsatfname[0] != '-') ;
 
 	} /* end if (progmode-dmail) */
@@ -1740,7 +1737,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	} /* end if (default spam file) */
 
-	pip->f.spam = 
+	pip->fl.spam = 
 	    (pip->spamfname != NULL) && (pip->spamfname[0] != '-') ;
 
 	if (pip->progmode == progmode_dmailbox) {
@@ -1795,7 +1792,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	if ((rs >= 0) || (perm(mbfname,-1,-1,NULL,R_OK) >= 0)) {
 
-	    pip->f.mbtab = TRUE ;
+	    pip->fl.mbtab = TRUE ;
 	    proginfo_setentry(pip,&pip->mbfname,mbfname,-1) ;
 
 #if	CF_DEBUG
@@ -1809,11 +1806,11 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* do we have a system whitelist? */
 
-	if ((rs >= 0) && pip->f.optnospam) {
+	if ((rs >= 0) && pip->fl.optnospam) {
 	    sl = permsched(sched2,&svars,tmpfname,MAXPATHLEN,WLFNAME,R_OK) ;
 	    if (sl > 0) {
 	        rs1 = whitelist_open(&lip->wl1,tmpfname) ;
-	        lip->f.wl_system = (rs1 >= 0) ;
+	        lip->fl.wl_system = (rs1 >= 0) ;
 	        if (rs1 > 0)
 	            pip->nwl_system += rs1 ;
 	    }
@@ -1827,7 +1824,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	if (sl > 0) {
 	    rs1 = whitelist_open(&lip->bl1,tmpfname) ;
-	    lip->f.bl_system = (rs1 >= 0) ;
+	    lip->fl.bl_system = (rs1 >= 0) ;
 	    if (rs1 > 0)
 	        pip->nbl_system += rs1 ;
 	}
@@ -1975,7 +1972,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* deliver the message to the recipients */
 
-	if (pip->f.optlogmsgid) {
+	if (pip->fl.optlogmsgid) {
 
 	    mkpath2(tmpfname,pip->pr,MSGIDDBNAME) ;
 
@@ -1984,7 +1981,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    if (rs1 < 0)
 	        rs1 = msgid_open(&lip->mids,tmpfname,O_RDONLY,0660,MAXMSGID) ;
 
-	    lip->f.mids = (rs1 >= 0) ;
+	    lip->fl.mids = (rs1 >= 0) ;
 
 	} /* end if */
 
@@ -2000,8 +1997,8 @@ int main(int argc,mainv argv,mainv envv) {
 	    }
 	}
 
-	if (lip->f.mids) {
-	    lip->f.mids = FALSE ;
+	if (lip->fl.mids) {
+	    lip->fl.mids = FALSE ;
 	    msgid_close(&lip->mids) ;
 	}
 
@@ -2057,10 +2054,10 @@ int main(int argc,mainv argv,mainv envv) {
 	        debugprintf("main: progcomsat() rs=%d\n",rs1) ;
 #endif
 
-	    if (pip->f.logmsg || (pip->debuglevel > 0)) {
+	    if (pip->fl.logmsg || (pip->debuglevel > 0)) {
 
 	        cl = (rs1 >= 0) ? rs1 : 0 ;
-	        if (pip->f.logmsg)
+	        if (pip->fl.logmsg)
 	            logfile_printf(&pip->lh,
 	                "COMSAT messages sent=%d\n",cl) ;
 
@@ -2099,10 +2096,10 @@ int main(int argc,mainv argv,mainv envv) {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("main: prognotify() mbtab=%s f_mbtab=%u\n",
-	        pip->mbfname,pip->f.mbtab) ;
+	        pip->mbfname,pip->fl.mbtab) ;
 #endif
 
-	if ((! pip->f.nopollmsg) && pip->f.mbtab && 
+	if ((! pip->fl.nopollmsg) && pip->fl.mbtab && 
 	    (pip->mbfname != NULL) && (pip->c_delivered > 0) &&
 	    (uc_fork() == 0)) {
 
@@ -2120,7 +2117,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    if (rs1 > 0) {
 
-	        if (pip->f.logmsg)
+	        if (pip->fl.logmsg)
 	            logfile_printf(&pip->lh,
 	                "MAILPOLL messages sent=%d\n",rs1) ;
 
@@ -2151,7 +2148,7 @@ int main(int argc,mainv argv,mainv envv) {
 /* do any optional reporting for multi-recipient mode */
 
 #ifdef	COMMENT
-	if (pip->f.multirecip) {
+	if (pip->fl.multirecip) {
 	    bfile	outfile, *ofp = &outfile ;
 
 	    rs1 = SR_NOENT ;
@@ -2176,16 +2173,16 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* print a regular error message to STDERR if we are NOT in multi-recip mode */
 done:
-	if ((! pip->f.multirecip) && (rs < 0)) {
+	if ((! pip->fl.multirecip) && (rs < 0)) {
 	    switch (rs) {
 	    case SR_NOENT:
 	        ex = EX_NOUSER ;
-	        if (pip->f.logmsg) {
+	        if (pip->fl.logmsg) {
 	            logfile_printf(&pip->lh,
 	                "ex=%u recipient not found (%d)\n",
 	                ex,rs) ;
 	        }
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: recipient not found\n",
 	                pip->progname) ;
@@ -2196,12 +2193,12 @@ done:
 	    case SR_NOLCK:
 	    case SR_TXTBSY:
 	        ex = EX_TEMPFAIL ;
-	        if (pip->f.logmsg) {
+	        if (pip->fl.logmsg) {
 	            logfile_printf(&pip->lh,
 	                "ex=%u could not capture mail lock (%d)\n",
 	                ex,rs) ;
 	        }
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: could not capture the mail lock\n",
 	                pip->progname) ;
@@ -2209,12 +2206,12 @@ done:
 	        break ;
 	    case SR_ACCES:
 	        ex = EX_ACCESS ;
-	        if (pip->f.logmsg) {
+	        if (pip->fl.logmsg) {
 	            logfile_printf(&pip->lh,
 	                "ex=%u could not access mail spool-file (%d)\n",
 	                ex,rs) ;
 	        }
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: could not access the mail spool-file (%d)\n",
 	                pip->progname,rs) ;
@@ -2222,24 +2219,24 @@ done:
 	        break ;
 	    case SR_REMOTE:
 	        ex = EX_FORWARDED ;
-	        if (pip->f.logmsg) {
+	        if (pip->fl.logmsg) {
 	            logfile_printf(&pip->lh,
 	                "ex=%u mail is being forwarded (%d)\n",
 	                ex,rs) ;
 	        }
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: mail is being forwarded\n",
 	                pip->progname) ;
 	        }
 	        break ;
 	    case SR_NOSPC:
 	        ex = EX_NOSPACE ;
-	        if (pip->f.logmsg) {
+	        if (pip->fl.logmsg) {
 	            logfile_printf(&pip->lh,
 	                "ex=%u file-system is out of space (%d)\n",
 	                ex,rs) ;
 	        }
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: local file-system is out of space\n",
 	                pip->progname) ;
@@ -2247,12 +2244,12 @@ done:
 	        break ;
 	    default:
 	        ex = EX_UNKNOWN ;
-	        if (pip->f.logmsg) {
+	        if (pip->fl.logmsg) {
 	            logfile_printf(&pip->lh,
 	                "ex=%u unknown error (%d)\n",
 	                ex,rs) ;
 	        }
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: unknown bad thing (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -2261,7 +2258,7 @@ done:
 	} else
 	    ex = EX_OK ;
 
-	if (pip->f.logmsg)
+	if (pip->fl.logmsg)
 	    logfile_printf(&pip->lh,
 	        "recipients processed=%u delivered=%u\n",
 	        pip->c_processed,pip->c_delivered) ;
@@ -2299,13 +2296,13 @@ retgood:
 ret6:
 badinopen:
 ret5:
-	if (lip->f.bl_system) {
-	    lip->f.bl_system = FALSE ;
+	if (lip->fl.bl_system) {
+	    lip->fl.bl_system = FALSE ;
 	    whitelist_close(&lip->bl1) ;
 	}
 
-	if (lip->f.wl_system) {
-	    lip->f.wl_system = FALSE ;
+	if (lip->fl.wl_system) {
+	    lip->fl.wl_system = FALSE ;
 	    whitelist_close(&lip->wl1) ;
 	}
 
@@ -2684,80 +2681,80 @@ KEYOPT		*kop ;
 	                case locopt_logconf:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optlogconf = (rs > 0) ;
+	                        pip->fl.optlogconf = (rs > 0) ;
 	                    }
 	                    break ;
 	                case locopt_logmsg:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optlogmsg = (rs > 0) ;
+	                        pip->fl.optlogmsg = (rs > 0) ;
 	                    }
 	                    break ;
 	                case locopt_logzone:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optlogzone = (rs > 0) ;
+	                        pip->fl.optlogzone = (rs > 0) ;
 	                    }
 	                    break ;
 	                case locopt_logenv:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optlogenv = (rs > 0) ;
+	                        pip->fl.optlogenv = (rs > 0) ;
 	                    }
 	                    break ;
 	                case locopt_logmsgid:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optlogmsgid = (rs > 0) ;
+	                        pip->fl.optlogmsgid = (rs > 0) ;
 	                    }
 	                    break ;
 	                case locopt_divert:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optdivert = (rs > 0) ;
+	                        pip->fl.optdivert = (rs > 0) ;
 	                    }
 	                    break ;
 	                case locopt_forward:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optforward = (rs > 0) ;
+	                        pip->fl.optforward = (rs > 0) ;
 	                    }
 	                    break ;
 	                case locopt_nospam:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optnospam = (rs > 0) ;
+	                        pip->fl.optnospam = (rs > 0) ;
 	                    }
 	                    break ;
 
 	                case locopt_norepeat:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optnorepeat = (rs > 0) ;
+	                        pip->fl.optnorepeat = (rs > 0) ;
 	                    }
 	                    break ;
 	                case locopt_nopollmsg:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.nopollmsg = (rs > 0) ;
+	                        pip->fl.nopollmsg = (rs > 0) ;
 	                    }
 	                    break ;
 	                case locopt_mailhist:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optmailhist = (rs > 0) ;
+	                        pip->fl.optmailhist = (rs > 0) ;
 	                    }
 	                    break ;
 	                case locopt_deliver:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optdeliver = (rs > 0) ;
+	                        pip->fl.optdeliver = (rs > 0) ;
 	                    }
 	                    break ;
 	                case locopt_finish:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optfinish = (rs > 0) ;
+	                        pip->fl.optfinish = (rs > 0) ;
 	                    }
 	                    break ;
 	                } /* end switch */
@@ -2793,13 +2790,13 @@ KEYOPT		*kop ;
 	                case pcsopt_pcspoll:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.pcspoll = (rs > 0) ;
+	                        pip->fl.pcspoll = (rs > 0) ;
 	                    }
 	                    break ;
 	                case pcsopt_logsys:
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.optlogsys = (rs > 0) ;
+	                        pip->fl.optlogsys = (rs > 0) ;
 	                    }
 	                    break ;
 	                } /* end switch */
@@ -2882,7 +2879,7 @@ cchar	*ofname ;
 	            rs1 = bclose(afp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                bprintf(pip->efp,
 	                    "%s: inaccessible argument list file (%d)\n",
 	                    pip->progname,rs) ;
@@ -2926,7 +2923,7 @@ struct passwd	*pwp ;
 {
 	int		rs = SR_OK ;
 
-	if (pip->f.logmsg) {
+	if (pip->fl.logmsg) {
 	    char	namebuf[REALNAMELEN + 1] = { 0 } ;
 	    cchar	*fmt = "recip=%s" ;
 
@@ -3126,7 +3123,7 @@ vecobj		*ilp ;
 	for (i = 0 ; vecobj_get(ilp,i,&mop) >= 0 ; i += 1) {
 	    if (mop == NULL) continue ;
 
-	    mop->f.spamdeliver = mop->f.spam ;
+	    mop->fl.spamdeliver = mop->fl.spam ;
 	    f = TRUE ;
 	    break ;
 
@@ -3194,7 +3191,7 @@ int		tfd ;
 	    for (i = 0 ; vecobj_get(ilp,i,&mop) >= 0 ; i += 1) {
 	        if (mop == NULL) continue ;
 
-	        if (! mop->f.spamdeliver) continue ;
+	        if (! mop->fl.spamdeliver) continue ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
@@ -3203,7 +3200,7 @@ int		tfd ;
 #endif
 
 	        mid.count = 0 ;
-	        if (lip->f.mids && mop->f.messageid && 
+	        if (lip->fl.mids && mop->fl.messageid && 
 	            (mop->h_messageid != NULL) && 
 	            (mop->h_messageid[0] != '\0')) {
 
@@ -3225,7 +3222,7 @@ int		tfd ;
 
 /* repeat message-id? */
 
-	        if (f_deliver && pip->f.optnorepeat && f_repeat)
+	        if (f_deliver && pip->fl.optnorepeat && f_repeat)
 	            f_deliver = FALSE ;
 
 	        if (f_deliver) {
@@ -3244,13 +3241,13 @@ int		tfd ;
 	    if ((rs >= 0) && (rp->n > 0)) {
 
 		if (pip->progmode == progmode_dmail) {
-	            if (pip->f.optdeliver) {
+	            if (pip->fl.optdeliver) {
 	                rs = deliver(pip,tfd,rp) ;
 		    }
 		}
 
 	        if (rs < 0) {
-	            if (pip->f.logmsg) {
+	            if (pip->fl.logmsg) {
 	                logfile_printf(&pip->lh, 
 	                    "delivery failure u=%s (%d)\n",
 	                    rp->recipient,rs) ;
@@ -3318,7 +3315,7 @@ int		tfd ;
 #endif
 
 #ifdef	COMMENT
-	    if (pip->f.logmsg)
+	    if (pip->fl.logmsg)
 	        logfile_printf(&pip->lh,"recip=%s\n",rp->recipient) ;
 #endif
 
@@ -3326,7 +3323,7 @@ int		tfd ;
 
 	    rs1 = uc_getpwnam(rp->recipient,&pw,pwbuf,PWBUFLEN) ;
 
-	    if (pip->f.logmsg)
+	    if (pip->fl.logmsg)
 	        logrecip(pip,rp->recipient,rs1,&pw) ;
 
 	    if (rs1 >= 0) {
@@ -3340,8 +3337,8 @@ int		tfd ;
 
 /* user-specific whitelist? */
 
-	        lip->f.wl_system = FALSE ;
-	        if (pip->f.optnospam) {
+	        lip->fl.wl_system = FALSE ;
+	        if (pip->fl.optnospam) {
 
 	            sl = permsched(sched3,svp,
 	                tmpfname,MAXPATHLEN,WLFNAME,R_OK) ;
@@ -3364,7 +3361,7 @@ int		tfd ;
 #endif
 
 	                if (rs1 >= 0) {
-	                    lip->f.wl_local = TRUE ;
+	                    lip->fl.wl_local = TRUE ;
 	                    if (rs1 > 0)
 	                        pip->nwl_local += rs1 ;
 	                }
@@ -3395,7 +3392,7 @@ int		tfd ;
 #endif
 
 	            if (rs1 >= 0) {
-	                lip->f.bl_local = TRUE ;
+	                lip->fl.bl_local = TRUE ;
 	                if (rs1 > 0)
 	                    pip->nbl_local += rs1 ;
 	            }
@@ -3422,7 +3419,7 @@ int		tfd ;
 #endif
 
 	        mid.count = 0 ;
-	        if (lip->f.mids && mop->f.messageid && 
+	        if (lip->fl.mids && mop->fl.messageid && 
 	            (mop->h_messageid != NULL) && 
 	            (mop->h_messageid[0] != '\0')) {
 
@@ -3465,7 +3462,7 @@ int		tfd ;
 
 /* repeat message-id? */
 
-	        if (f_deliver && pip->f.optnorepeat && f_repeat)
+	        if (f_deliver && pip->fl.optnorepeat && f_repeat)
 	            f_deliver = FALSE ;
 
 #if	CF_DEBUG
@@ -3473,19 +3470,19 @@ int		tfd ;
 	            debugprintf("main/procrecips: repeat deliver=%u\n",
 	                f_deliver) ;
 	            debugprintf("main/procrecips: f_optnospam=%u\n",
-			pip->f.optnospam) ;
+			pip->fl.optnospam) ;
 	            debugprintf("main/procrecips: f_spam=%u\n",
-			mop->f.spam) ;
+			mop->fl.spam) ;
 		}
 #endif
 
 /* is this address in any whitelist? */
 
-	        if (f_deliver && pip->f.optnospam && mop->f.spam) {
+	        if (f_deliver && pip->fl.optnospam && mop->fl.spam) {
 
 	            f_deliver = FALSE ;
 	            rs1 = SR_NOTFOUND ;
-	            if (lip->f.wl_local && (pip->nwl_local > 0)) {
+	            if (lip->fl.wl_local && (pip->nwl_local > 0)) {
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
@@ -3516,7 +3513,7 @@ int		tfd ;
 	            } /* end if (local whitelist check) */
 
 	                if (isNotPrematch(rs1) && 
-	                lip->f.wl_system && (pip->nwl_system > 0)) {
+	                lip->fl.wl_system && (pip->nwl_system > 0)) {
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
@@ -3568,7 +3565,7 @@ int		tfd ;
 	        if (f_deliver) {
 
 	            rs1 = SR_NOTFOUND ;
-	            if (lip->f.bl_local && (pip->nbl_local > 0)) {
+	            if (lip->fl.bl_local && (pip->nbl_local > 0)) {
 
 	                rs1 = whitelist_prematch(&lip->bl2,mop->h_from) ;
 
@@ -3613,7 +3610,7 @@ int		tfd ;
 	            } /* end if (local blacklist check) */
 
 	                if (isNotPrematch(rs1) && 
-	                lip->f.bl_system && (pip->nbl_system > 0)) {
+	                lip->fl.bl_system && (pip->nbl_system > 0)) {
 
 	                rs1 = whitelist_prematch(&lip->bl1,mop->h_from) ;
 
@@ -3657,14 +3654,14 @@ int		tfd ;
 /* deliver or not based on what we know */
 
 	        if (f_deliver) {
-	            mop->f.spamdeliver = FALSE ;
+	            mop->fl.spamdeliver = FALSE ;
 	            c += 1 ;
 	            rs = recip_mo(rp,mop->moff,mop->mlen) ;
 	        }
 
 /* formulate log entry as a result */
 
-	        if ((rs >= 0) && pip->f.logmsg) {
+	        if ((rs >= 0) && pip->fl.logmsg) {
 
 	            if (f_repeat) {
 	                fmt = "  %3u %c%c%c%c=%u" ;
@@ -3675,7 +3672,7 @@ int		tfd ;
 	                mn,
 	                ((f_deliver) ? 'D' : ' '),
 	                ((f_blacklist) ? 'B' : ' '),
-	                ((mop->f.spam) ? 'S' : ' '),
+	                ((mop->fl.spam) ? 'S' : ' '),
 	                ((f_repeat) ? 'R' : ' '),
 	                mid.count) ;
 
@@ -3700,13 +3697,13 @@ int		tfd ;
 
 		if (pip->progmode == progmode_dmail) {
 
-	        if (pip->f.optdeliver)
+	        if (pip->fl.optdeliver)
 	            rs = deliver(pip,tfd,rp) ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
 	            debugprintf("main/procrecips: deliver=%u deliver() rs=%d\n",
-	                pip->f.optdeliver,rs) ;
+	                pip->fl.optdeliver,rs) ;
 #endif
 
 #if	CF_DEBUG
@@ -3741,7 +3738,7 @@ int		tfd ;
 
 	        if (rs < 0) {
 
-	            if (pip->f.logmsg)
+	            if (pip->fl.logmsg)
 	                logfile_printf(&pip->lh, 
 	                    "delivery failure u=%s (%d)\n",
 	                    rp->recipient,rs) ;
@@ -3758,7 +3755,7 @@ int		tfd ;
 	    if ((rs >= 0) && (rp->n > 0))
 	        pip->c_delivered += 1 ;
 
-	    if (pip->f.logmsg) {
+	    if (pip->fl.logmsg) {
 
 	        if (rp->n > 0) {
 	            if (rs >= 0) {
@@ -3776,7 +3773,7 @@ int		tfd ;
 		}
 	    } /* end if (logging) */
 
-	    if ((pip->debuglevel > 0) && (! pip->f.quiet)) {
+	    if ((pip->debuglevel > 0) && (! pip->fl.quiet)) {
 
 	        fmt = "%s: recip=%-32s %s (%d)\n" ;
 	        if ((rs >= 0) || (rp->n == 0))
@@ -3788,17 +3785,17 @@ int		tfd ;
 
 	    } /* end if */
 
-	    if (lip->f.bl_local) {
-	        lip->f.bl_local = FALSE ;
+	    if (lip->fl.bl_local) {
+	        lip->fl.bl_local = FALSE ;
 	        whitelist_close(&lip->bl2) ;
 	    }
 
-	    if (lip->f.wl_local) {
-	        lip->f.wl_local = FALSE ;
+	    if (lip->fl.wl_local) {
+	        lip->fl.wl_local = FALSE ;
 	        whitelist_close(&lip->wl2) ;
 	    }
 
-	    if ((rs < 0) && (! pip->f.multirecip))
+	    if ((rs < 0) && (! pip->fl.multirecip))
 	        break ;
 
 	} /* end for (looping through recipients) */
@@ -3834,7 +3831,7 @@ int		rstat ;
 	        "maildir=%s unavailable",
 	        pip->maildname) ;
 
-	if (pip->f.trusted && pip->f.optlogsys) {
+	if (pip->fl.trusted && pip->fl.optlogsys) {
 	    LOGSYS	ls, *lsp = &ls ;
 	    const int	fac = LOG_MAIL ;
 	    int		opts = 0 ;
@@ -3858,7 +3855,7 @@ int		rstat ;
 
 	} /* end if (logging to the system) */
 
-	f = pip->f.optdivert && (pip->deadmaildname != NULL) ;
+	f = pip->fl.optdivert && (pip->deadmaildname != NULL) ;
 	if (f)
 	    rs1 = perm(pip->deadmaildname,-1,-1,NULL,W_OK) ;
 
@@ -3867,7 +3864,7 @@ int		rstat ;
 	    const int	pwlen = PWBUFLEN ;
 	    char	pwbuf[PWBUFLEN + 1] ;
 
-	    pip->f.diverting = TRUE ;
+	    pip->fl.diverting = TRUE ;
 	    pip->maildname = pip->deadmaildname ;
 
 	    if (pip->open.logprog) {
@@ -3963,8 +3960,8 @@ struct locinfo	*lip ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (lip->f.mboxes) {
-	    lip->f.mboxes = FALSE ;
+	if (lip->fl.mboxes) {
+	    lip->fl.mboxes = FALSE ;
 	    rs1 = vecstr_finish(&lip->mboxes) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -4200,9 +4197,9 @@ int		ml ;
 	if (lip == NULL) return SR_FAULT ;
 	if (mp == NULL) return SR_FAULT ;
 
-	if (! lip->f.mboxes) {
+	if (! lip->fl.mboxes) {
 	    rs = vecstr_start(&lip->mboxes,0,0) ;
-	    lip->f.mboxes = (rs >= 0) ;
+	    lip->fl.mboxes = (rs >= 0) ;
 	}
 
 	if (rs >= 0) {
@@ -4221,7 +4218,7 @@ struct locinfo	*lip ;
 
 	if (lip == NULL) return SR_FAULT ;
 
-	if (lip->f.mboxes) {
+	if (lip->fl.mboxes) {
 	    rs = vecstr_count(&lip->mboxes) ;
 	}
 
@@ -4241,7 +4238,7 @@ cchar	**rpp ;
 
 	if (lip == NULL) return SR_FAULT ;
 
-	if (lip->f.mboxes) {
+	if (lip->fl.mboxes) {
 	    if ((rs = vecstr_get(&lip->mboxes,i,&rp)) >= 0)
 	        rl = strlen(rp) ;
 	} else
