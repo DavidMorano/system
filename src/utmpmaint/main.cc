@@ -544,7 +544,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -555,24 +555,24 @@ int main(int argc,cchar **argv,cchar **envv)
 	                    case 'h':
 	                        lip->final.hdr = TRUE ;
 	                        lip->have.hdr = TRUE ;
-	                        lip->f.hdr = TRUE ;
+	                        lip->fl.hdr = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.hdr = (rs > 0) ;
+	                                lip->fl.hdr = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 /* maintenance */
 	                    case 'm':
-	                        lip->f.maint = TRUE ;
+	                        lip->fl.maint = TRUE ;
 	                        break ;
 
 /* list */
 	                    case 'l':
-	                        lip->f.list = TRUE ;
+	                        lip->fl.list = TRUE ;
 	                        break ;
 
 /* options */
@@ -593,12 +593,12 @@ int main(int argc,cchar **argv,cchar **envv)
 	                    case 'p':
 	                        pip->final.print = TRUE ;
 	                        pip->have.print = TRUE ;
-	                        pip->f.print = TRUE ;
+	                        pip->fl.print = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.print = (rs > 0) ;
+	                                pip->fl.print = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -757,8 +757,8 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
-	    bprintf(pip->efp,"%s: f_maint=%u\n",pn,lip->f.maint) ;
-	    bprintf(pip->efp,"%s: f_list=%u\n",pn,lip->f.list) ;
+	    bprintf(pip->efp,"%s: f_maint=%u\n",pn,lip->fl.maint) ;
+	    bprintf(pip->efp,"%s: f_list=%u\n",pn,lip->fl.list) ;
 	}
 
 /* remaining initialization */
@@ -786,11 +786,11 @@ int main(int argc,cchar **argv,cchar **envv)
 	    MAPSTRINT	names ;
 	    if ((rs = mapstrint_start(&names,10)) >= 0) {
 
-	        if (lip->f.maint) {
+	        if (lip->fl.maint) {
 	            rs = procmaint(pip,dbfname) ;
 	        }
 
-	        if ((rs >= 0) && (pip->f.print || lip->f.list)) {
+	        if ((rs >= 0) && (pip->fl.print || lip->fl.list)) {
 	            ARGINFO	*aip = &ainfo ;
 	            BITS	*bop = &pargs ;
 	            cchar	*dfn = dbfname ;
@@ -825,7 +825,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	        fmt = "%s: processing error (%d)\n" ;
 	        break ;
 	    } /* end switch */
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        if (fmt != NULL)
 	            bprintf(pip->efp,fmt,pip->progname,rs) ;
 	    }
@@ -953,7 +953,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
 	lip->to = -1 ;
-	lip->f.hdr = OPT_HDR ;
+	lip->fl.hdr = OPT_HDR ;
 
 	return rs ;
 }
@@ -1044,10 +1044,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.print) {
 	                        pip->have.print = TRUE ;
 	                        pip->final.print = TRUE ;
-	                        pip->f.print = TRUE ;
+	                        pip->fl.print = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.print = (rs > 0) ;
+	                            pip->fl.print = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1055,10 +1055,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.hdr) {
 	                        lip->have.hdr = TRUE ;
 	                        lip->final.hdr = TRUE ;
-	                        lip->f.hdr = TRUE ;
+	                        lip->fl.hdr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.hdr = (rs > 0) ;
+	                            lip->fl.hdr = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1159,7 +1159,7 @@ cchar	*afn ;
 	            rs1 = bclose(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible argument list (%d)\n" ;
 	                bprintf(pip->efp,fmt,pn,rs) ;
 	                bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1170,7 +1170,7 @@ cchar	*afn ;
 
 /* process regular requests */
 
-	    if ((rs >= 0) && lip->f.list) {
+	    if ((rs >= 0) && lip->fl.list) {
 	        rs = proclist(pip,ofp,nlp,dbfn) ;
 	        c += rs ;
 	    }
