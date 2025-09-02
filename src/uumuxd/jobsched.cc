@@ -721,7 +721,7 @@ char	s[], articleid[] ;
 
 	        if (ep == NULL) continue ;
 
-	        if (ep->f.error) continue ;
+	        if (ep->fl.error) continue ;
 
 	        if (ep->rlen > 0) {
 
