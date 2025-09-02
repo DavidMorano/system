@@ -1,20 +1,23 @@
-/* kshvar (INCLUDE) */
+/* kshvar SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* KSH variable framework */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	KSHVAR_INCLUDE
-#define	KSHVAR_INCLUDE	1
+#define	KSHVAR_INCLUDE
 
 
 #include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 
 
@@ -22,8 +25,8 @@
 
 
 struct kshvar_head {
-	ulong		magic ;
-	VECOBJ		vars ;
+	vecobj		vars ;
+	uint		magic ;
 } ;
 
 struct kshvar_c {
@@ -31,33 +34,22 @@ struct kshvar_c {
 } ;
 
 struct kshvar_var {
-	const char	*varname ;
-	const char	*soname ;
+	cchar		*varname ;
+	cchar		*soname ;
 	int		refcount ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(KSHVAR_MASTER)) || (KSHVAR_MASTER == 0)
+extern int	kshvar_start(KSHVAR *) noex ;
+extern int	kshvar_store(KSHVAR *,KSHVAR_VAR *) noex ;
+extern int	kshvar_fetch(KSHVAR *,KSHVAR_VAR *) noex ;
+extern int	kshvar_enum(KSHVAR *,KSHVAR_CUR *,KSHVAR_VAR *) noex ;
+extern int	kshvar_finish(KSHVAR *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int	kshvar_start(KSHVAR *) ;
-extern int	kshvar_store(KSHVAR *,KSHVAR_VAR *) ;
-extern int	kshvar_fetch(KSHVAR *,KSHVAR_VAR *) ;
-extern int	kshvar_enum(KSHVAR *,KSHVAR_CUR *,KSHVAR_VAR *) ;
-extern int	kshvar_finish(KSHVAR *) ;
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-#endif /* KSHVAR_MASTER */
+EXTERNC_end
 
 
 #endif /* KSHVAR_INCLUDE */
-
-
 
 
