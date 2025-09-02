@@ -288,7 +288,7 @@ int display_start(DISPLAY *op,PROGINFO *pip,DISPLAY_ARGS *dap) noex {
 	                op->rl_scan = 2 ;
 	                if ((rs = display_linescalc(op)) >= 0) {
 	                    if ((rs = display_subwinbegin(op)) >= 0) {
-	                        op->f.scanfull = TRUE ;
+	                        op->fl.scanfull = TRUE ;
 	                        op->magic = DISPLAY_MAGIC ;
 	                    }
 	                    if (rs < 0)
@@ -822,14 +822,14 @@ int display_setnewmail(DISPLAY *op,int nmsgs)
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	f_newmail = (nmsgs > 0) ;
-	f_change = (! LEQUIV(op->f.newmail,f_newmail)) ;
+	f_change = (! LEQUIV(op->fl.newmail,f_newmail)) ;
 	if (f_newmail) {
 	    sp = "new mail arrived" ;
-	    if (! op->f.newmail) rs = display_beep(op) ;
-	    op->f.newmail = TRUE ;
+	    if (! op->fl.newmail) rs = display_beep(op) ;
+	    op->fl.newmail = TRUE ;
 	} else {
 	    sp = "----------------" ;
-	    op->f.newmail = FALSE ;
+	    op->fl.newmail = FALSE ;
 	} /* end if */
 
 	if ((rs >= 0) && f_change) {
@@ -1331,7 +1331,7 @@ int display_scanblank(DISPLAY *op,int si)
 #endif
 
 	if (si < 0) {
-	    op->f.scanfull = TRUE ;
+	    op->fl.scanfull = TRUE ;
 	    rs = display_scanblanks(op,-1) ;
 	} else {
 	    SCANLINE	*slp ;
@@ -1373,7 +1373,7 @@ int display_scanblanks(DISPLAY *op,int n)
 #endif
 
 	if (n < 0) {
-	    op->f.scanfull = TRUE ;
+	    op->fl.scanfull = TRUE ;
 	    n = INT_MAX ;
 	}
 
@@ -1412,7 +1412,7 @@ int display_scanfull(DISPLAY *op)
 	    debugprintf("display_scanfull: ent\n") ;
 #endif
 
-	op->f.scanfull = TRUE ;
+	op->fl.scanfull = TRUE ;
 	return rs ;
 }
 /* end subroutine (display_scanfull) */
@@ -1621,7 +1621,7 @@ int display_scandisplay(DISPLAY *op,int sitopnext)
 
 /* OK, now handle the confusing cases! */
 
-	f = (op->si_top < 0) || op->f.scanfull ;
+	f = (op->si_top < 0) || op->fl.scanfull ;
 	if (! f) {
 	    ndiff = (sitopnext - op->si_top) ;
 	    ni = abs(ndiff) ;
@@ -1630,7 +1630,7 @@ int display_scandisplay(DISPLAY *op,int sitopnext)
 
 	if (f) { /* no overlap */
 
-	    op->f.scanfull = FALSE ;
+	    op->fl.scanfull = FALSE ;
 	    rs = display_rscan(op,sitopnext) ;
 	    n = rs ;
 
@@ -2127,7 +2127,7 @@ int display_rmid(DISPLAY *op)
 	    strncpy((lbuf + i),cp,cl) ; /* insert */
 	}
 
-	if (op->f.moremsgs) {
+	if (op->fl.moremsgs) {
 	    i = COL_MOREMSGS ;
 	    cp = "more messages" ;
 	    cl = DISPLAY_LMOREMSGS ;
