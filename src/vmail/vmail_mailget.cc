@@ -199,7 +199,7 @@ int progmailget(PROGINFO *pip,PARAMOPT *app)
 	        pip->progname,pip->prog_getmail) ;
 	}
 
-	if (pip->f.mailget && (pip->prog_getmail != NULL)) {
+	if (pip->fl.mailget && (pip->prog_getmail != NULL)) {
 	    const char	*folder = pip->folderdname ;
 	    const char	*mb = pip->mbname_in ;
 
