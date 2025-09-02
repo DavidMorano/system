@@ -144,7 +144,7 @@ int update()
 
 	    dsp = user_bds[i].dsp ;
 #if	COMMENT
-		f_sublist = dsp->f.subscribe ;
+		f_sublist = dsp->fl.subscribe ;
 #else
 		f_sublist = FALSE ;
 #endif
@@ -152,7 +152,7 @@ int update()
 #if	CF_DEBUG
 	    if (g.f.debug)
 	        debugprintf("update: loop b=%s %d\n",
-	            dsp->name,dsp->f.subscribe) ;
+	            dsp->name,dsp->fl.subscribe) ;
 #endif
 
 /* make the board name (with the dots - not slashes) */
