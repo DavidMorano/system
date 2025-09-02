@@ -266,7 +266,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	proginfo_setbanner(pip,cp) ;
 
 	pip->verboselevel = 1 ;
-	pip->f.logprog = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 	pip->lip = &li ;
 	rs = locinfo_start(lip,pip) ;
@@ -468,7 +468,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'R':
@@ -498,7 +498,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* verbose (level) */
@@ -674,7 +674,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            logfile_printf(&pip->lh,
 	                "ex=%u unknown error (%d)\n",ex,rs) ;
 	        }
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: unknown bad thing (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -788,10 +788,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.logprog) {
 	                        pip->have.logprog = TRUE ;
 	                        pip->final.logprog = TRUE ;
-	                        pip->f.logprog = TRUE ;
+	                        pip->fl.logprog = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.logprog = (rs > 0) ;
+	                            pip->fl.logprog = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -870,7 +870,7 @@ static int procdir(PROGINFO *pip,cchar *dname)
 		    rs = procdirer(pip,xdname,dm) ;
 		}
 	    }
-	    if ((rs < 0) && (! pip->f.quiet)) {
+	    if ((rs < 0) && (! pip->fl.quiet)) {
 		cchar	*pn = pip->progname ;
 		cchar	*fmt = "%s: could not establish dir=%s (%d)\n" ;
 	        bprintf(pip->efp,fmt,pn,dname,rs) ;
