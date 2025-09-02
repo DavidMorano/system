@@ -550,7 +550,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -1089,10 +1089,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.badnokey) {
 	                        pip->have.badnokey = TRUE ;
 	                        pip->final.badnokey = TRUE ;
-	                        pip->f.badnokey = TRUE ;
+	                        pip->fl.badnokey = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.badnokey = (rs > 0) ;
+	                            pip->fl.badnokey = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1100,10 +1100,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.blanks) {
 	                        pip->have.blanks = TRUE ;
 	                        pip->final.blanks = TRUE ;
-	                        pip->f.blanks = TRUE ;
+	                        pip->fl.blanks = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.blanks = (rs > 0) ;
+	                            pip->fl.blanks = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1199,7 +1199,7 @@ const char	*ifn ;
 	            rs1 = bclose(afp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                bprintf(pip->efp,fmt,pn,rs) ;
 	                bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
