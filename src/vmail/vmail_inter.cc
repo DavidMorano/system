@@ -600,9 +600,9 @@ int inter_cmd(INTER *iap)
 	    f = (rs1 >= 0) ;
 	    f = f && (pip->daytime > (ts + 7)) ;
 	    f = f && (pip->daytime > (iap->ti_start + 3)) ;
-	    if (f && (! iap->f.welcome)) {
-	        iap->f.cmdprompt = FALSE ;
-	        iap->f.welcome = TRUE ;
+	    if (f && (! iap->fl.welcome)) {
+	        iap->fl.cmdprompt = FALSE ;
+	        iap->fl.welcome = TRUE ;
 	        rs = inter_welcome(iap) ;
 	    }
 	}
@@ -610,22 +610,22 @@ int inter_cmd(INTER *iap)
 
 	if (rs >= 0) {
 	    if ((rs = lib_issig(SIGINT)) > 0) {
-	        iap->f.cmdprompt = FALSE ;
+	        iap->fl.cmdprompt = FALSE ;
 	        rs = inter_refresh(iap) ;
 	    }
 	}
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("inter_cmd: f_cmdprompt=%u\n",iap->f.cmdprompt) ;
+	    debugprintf("inter_cmd: f_cmdprompt=%u\n",iap->fl.cmdprompt) ;
 #endif
 
-	if ((rs >= 0) && (! iap->f.cmdprompt)) {
+	if ((rs >= 0) && (! iap->fl.cmdprompt)) {
 	    cint	nl = iap->numlen ;
 	    cchar	*fmt ;
 	    cchar	*pp = INTER_IPROMPT ;
 	    char	*np = iap->numbuf ;
-	    iap->f.cmdprompt = TRUE ;
+	    iap->fl.cmdprompt = TRUE ;
 	    fmt = "%s %r\v" ;
 	    rs = display_input(&iap->di,fmt,pp,np,nl) ;
 	}
@@ -636,7 +636,7 @@ int inter_cmd(INTER *iap)
 	        if (isdigitlatin(cmd) || (cmd == CH_DEL) || (cmd == CH_BS)) {
 	            rs = inter_cmddig(iap,cmd) ;
 	        } else {
-	            iap->f.cmdprompt = FALSE ;
+	            iap->fl.cmdprompt = FALSE ;
 	            rs = inter_cmdhandle(iap,cmd) ;
 	        }
 	    }
@@ -648,27 +648,27 @@ int inter_cmd(INTER *iap)
 	if (DEBUGLEVEL(3))
 	    debugprintf("inter_cmd: SIGTERM\n") ;
 #endif
-	        iap->f.exit = TRUE ;
+	        iap->fl.exit = TRUE ;
 	    }
 	}
 
 #if	CF_INTERPOLL
-	if ((rs >= 0) && (! iap->f.exit)) {
+	if ((rs >= 0) && (! iap->fl.exit)) {
 	    rs = inter_poll(iap) ;
 	    if (rs > 0)
-	        iap->f.cmdprompt = FALSE ;
+	        iap->fl.cmdprompt = FALSE ;
 	}
 #endif
 
-	if ((rs >= 0) && iap->f.exit) {
+	if ((rs >= 0) && iap->fl.exit) {
 	    rs = inter_done(iap) ;
 	}
 
-	rc = (iap->f.exit) ? 0 : 1 ;
+	rc = (iap->fl.exit) ? 0 : 1 ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
-	    debugprintf("inter_cmd: f_exit=%u\n",iap->f.exit) ;
+	    debugprintf("inter_cmd: f_exit=%u\n",iap->fl.exit) ;
 	    debugprintf("inter_cmd: ret rs=%d rc=%d\n",rs,rc) ;
 	}
 #endif
@@ -738,7 +738,7 @@ static int inter_linescalc(INTER *iap)
 	if (pip->svlines == 0) {
 	    f_percent = TRUE ;
 	    percent = SCANPERCENT ;
-	} else if (pip->f.svpercent) {
+	} else if (pip->fl.svpercent) {
 	    f_percent = TRUE ;
 	    percent = pip->svlines ;
 	}
@@ -761,7 +761,7 @@ static int inter_linescalc(INTER *iap)
 	iap->jumplines = pip->sjlines ;
 	if (pip->sjlines == 0) {
 	    iap->jumplines = (iap->scanlines - 1) ;
-	} else if (pip->f.sjpercent) {
+	} else if (pip->fl.sjpercent) {
 	    f_percent = TRUE ;
 	    percent = pip->sjlines ;
 	}
@@ -795,12 +795,12 @@ static int inter_sigbegin(INTER	 *iap)
 	cint	ucmd = utermcmd_getpgrp ;
 	int		rs ;
 	if ((rs = uterm_control(utp,ucmd,0)) >= 0) {
-	    iap->f.ctty = TRUE ;
+	    iap->fl.ctty = TRUE ;
 	    iap->pgrp = rs ;
 	} else if (rs == SR_NOTTY) {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt = "%s: not on a controlling terminal (%d)\n" ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        bprintf(pip->efp,fmt,pn,rs) ;
 	    }
 	    rs = SR_OK ;
@@ -815,8 +815,8 @@ static int inter_sigend(INTER *iap)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (iap->f.subprocs) {
-	    iap->f.subprocs = FALSE ;
+	if (iap->fl.subprocs) {
+	    iap->fl.subprocs = FALSE ;
 	    rs1 = subprocs_finish(&iap->sp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1428,12 +1428,12 @@ static int inter_startclear(INTER *iap)
 static int inter_startwelcome(INTER *iap)
 {
 	int		rs = SR_OK ;
-	if (! iap->f.welcome) {
+	if (! iap->fl.welcome) {
 	    const time_t	dt = iap->ti_start ;
 	    time_t		ts ;
 	    if ((rs = display_infots(&iap->di,&ts)) >= 0) {
 	        if ((ts == 0) || (dt > (ts + 5))) {
-	            iap->f.welcome = TRUE ;
+	            iap->fl.welcome = TRUE ;
 	            rs = inter_welcome(iap) ;
 		}
 	    }
@@ -1569,7 +1569,7 @@ static int inter_cmdhandle(INTER *iap,int key)
 	int		mult = 1 ;
 	int		nmsg = 0 ;
 	int		f_nomailbox = FALSE ;
-	int		f_errinfo = iap->f.info_err ;
+	int		f_errinfo = iap->fl.info_err ;
 	int		f = FALSE ;
 
 #if	CF_DEBUG
@@ -1580,7 +1580,7 @@ static int inter_cmdhandle(INTER *iap,int key)
 	}
 #endif
 
-	iap->f.info_err = FALSE ;
+	iap->fl.info_err = FALSE ;
 	if (iap->numlen > 0) {
 	    rs1 = cfdeci(iap->numbuf,iap->numlen,&argnum) ;
 	    if (rs1 < 0)
@@ -1633,7 +1633,7 @@ static int inter_cmdhandle(INTER *iap,int key)
 
 	case cmd_quitquick:
 	case cmd_quit:
-	    iap->f.exit = TRUE ;
+	    iap->fl.exit = TRUE ;
 	    if (iap->open.mbcache) {
 	        int f = (cmd == cmd_quitquick) ;
 	        rs = inter_mailender(iap,f) ;
@@ -1737,7 +1737,7 @@ static int inter_cmdhandle(INTER *iap,int key)
 	            nmsg = (iap->nmsgs - 1) ;
 		}
 	        if (nmsg != iap->miscanpoint) {
-	            iap->f.viewchange = TRUE ;
+	            iap->fl.viewchange = TRUE ;
 	            rs = inter_msgpoint(iap,nmsg) ;
 	        }
 	    }
@@ -1926,11 +1926,11 @@ static int inter_cmdhandle(INTER *iap,int key)
 	    inter_info(iap,TRUE,"no current mailbox\v") ;
 	}
 
-	if (f_errinfo && (! iap->f.info_msg)) {
+	if (f_errinfo && (! iap->fl.info_msg)) {
 	    display_info(&iap->di,"\v") ;
 	}
 
-	iap->f.info_msg = FALSE ;
+	iap->fl.info_msg = FALSE ;
 
 /* done */
 
@@ -1945,8 +1945,8 @@ static int inter_info(INTER *iap,int f_err,cchar *fmt,...)
 {
 	int		rs ;
 
-	iap->f.info_msg = TRUE ;
-	iap->f.info_err = f_err ;
+	iap->fl.info_msg = TRUE ;
+	iap->fl.info_err = f_err ;
 
 	{
 	    va_list	ap ;
@@ -1965,8 +1965,8 @@ static int inter_winfo(INTER *iap,int f_err,cchar *sp,int sl)
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
 
-	iap->f.info_msg = TRUE ;
-	iap->f.info_err = f_err ;
+	iap->fl.info_msg = TRUE ;
+	iap->fl.info_err = f_err ;
 	rs = display_winfo(&iap->di,sp,sl) ;
 
 #if	CF_DEBUG
@@ -2100,7 +2100,7 @@ static int inter_poll(INTER *iap)
 	    c += rs ;
 	}
 
-	if ((rs >= 0) && pip->f.winadj) {
+	if ((rs >= 0) && pip->fl.winadj) {
 	    if ((rs = lib_issig(SIGWINCH)) > 0) {
 	        rs = inter_checkwinsize(iap) ;
 	        c += rs ;
@@ -2122,7 +2122,7 @@ static int inter_poll(INTER *iap)
 #endif
 	}
 
-	if ((rs >= 0) && pip->f.clock) {
+	if ((rs >= 0) && pip->fl.clock) {
 	    rs = inter_checkclock(iap) ;
 	    c += rs ;
 	}
@@ -2132,7 +2132,7 @@ static int inter_poll(INTER *iap)
 	    c += rs ;
 	}
 
-	if ((rs >= 0) && iap->f.subprocs) {
+	if ((rs >= 0) && iap->fl.subprocs) {
 	    if ((pip->daytime % 4) == 0) {
 	        if ((rs = lib_issig(SIGCHLD)) > 0) {
 	            rs = inter_checkchild(iap,TRUE) ;
@@ -2143,14 +2143,14 @@ static int inter_poll(INTER *iap)
 
 /* what is this (next part) supposed to do? (do not know!) */
 
-	if ((rs >= 0) && iap->f.setmbname && (iap->mbname == NULL)) {
+	if ((rs >= 0) && iap->fl.setmbname && (iap->mbname == NULL)) {
 	    char	zbuf[2] = { 0 } ;
-	    iap->f.setmbname = FALSE ;
+	    iap->fl.setmbname = FALSE ;
 	    rs = display_setmbname(&iap->di,zbuf,-1) ;
 	    c += 1 ;
 	}
 
-	if ((rs >= 0) && (! iap->open.mbcache) && (! iap->f.exit)) {
+	if ((rs >= 0) && (! iap->open.mbcache) && (! iap->fl.exit)) {
 	    rs = inter_mailempty(iap) ;
 	    c += rs ;
 	}
@@ -2352,13 +2352,13 @@ static int inter_checkmail(INTER *iap)
 	        rs1 = pcsmailcheck(pip->pr,buf,BUFLEN,un) ;
 	        if (rs1 > 0) {
 	            f = TRUE ;
-	            iap->f.mailnew = TRUE ;
+	            iap->fl.mailnew = TRUE ;
 	            if ((rs = inter_checkmailinfo(iap,buf)) >= 0) {
 	                rs = display_setnewmail(&iap->di,rs1) ;
 		    }
 	        } else {
-	            if (iap->f.mailnew) {
-	                iap->f.mailnew = FALSE ;
+	            if (iap->fl.mailnew) {
+	                iap->fl.mailnew = FALSE ;
 	                buf[0] = '\0' ;
 	                if ((rs = inter_checkmailinfo(iap,buf)) >= 0) {
 	                    rs = display_setnewmail(&iap->di,0) ;
@@ -2393,14 +2393,14 @@ static int inter_checkmailinfo(INTER *iap,cchar *buf)
 	    ct = iap->ti_mailinfo ;
 	    if ((dt-ct) >= to) {
 	        iap->ti_mailinfo = pip->daytime ;
-	        iap->f.mailinfo = TRUE ;
+	        iap->fl.mailinfo = TRUE ;
 	        iap->taginfo = infotag_mailfrom ;
 	        rs = inter_info(iap,FALSE,"mailfrom> %s\v",buf) ;
 	    } /* end if (time-out) */
 
-	} else if (iap->f.mailinfo) {
+	} else if (iap->fl.mailinfo) {
 
-	    iap->f.mailinfo = FALSE ;
+	    iap->fl.mailinfo = FALSE ;
 	    if (iap->taginfo == infotag_mailfrom) {
 	        iap->taginfo = 0 ;
 	        rs = inter_info(iap,FALSE,"\v") ;
@@ -2421,9 +2421,9 @@ static int inter_checkchild(INTER *iap,int f_check)
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 
-	if (! iap->f.subprocs) {
+	if (! iap->fl.subprocs) {
 	    rs = subprocs_start(&iap->sp) ;
-	    iap->f.subprocs = (rs >= 0) ;
+	    iap->fl.subprocs = (rs >= 0) ;
 	}
 
 	if (rs >= 0) {
@@ -2463,7 +2463,7 @@ static int inter_mailbeginer(INTER *iap,cchar *mbname,int mblen)
 
 	if (mbname == NULL) return SR_FAULT ;
 
-	iap->f.viewchange = TRUE ;
+	iap->fl.viewchange = TRUE ;
 
 /* form mailbox filename */
 
@@ -2500,7 +2500,7 @@ static int inter_mailbeginer(INTER *iap,cchar *mbname,int mblen)
 	if (rs >= 0) {
 	    DISPLAY	*dip = &iap->di ;
 	    if ((rs = display_input(dip,"mb=%r\v",mbname,mblen)) >= 0) {
-	        iap->f.setmbname = TRUE ;
+	        iap->fl.setmbname = TRUE ;
 	        rs = display_setmbname(dip,mbname,mblen) ;
 	    }
 	    if (rs >= 0)
@@ -2803,11 +2803,11 @@ static int inter_mbopen(INTER *iap,cchar *mbfname,int f_ro)
 	    return SR_NOANODE ;
 
 	mf |= (f_ro) ? MAILBOX_ORDONLY : MAILBOX_ORDWR ;
-	mf |= (! pip->f.useclen) ? MAILBOX_ONOCLEN : 0 ;
-	mf |= (pip->f.useclines) ? MAILBOX_OUSECLINES : 0 ;
+	mf |= (! pip->fl.useclen) ? MAILBOX_ONOCLEN : 0 ;
+	mf |= (pip->fl.useclines) ? MAILBOX_OUSECLINES : 0 ;
 	if ((rs1 = mailbox_open(&iap->mb,mbfname,mf)) >= 0) {
 	    iap->open.mailbox = TRUE ;
-	    iap->f.mbreadonly = f_ro ;
+	    iap->fl.mbreadonly = f_ro ;
 	    if ((rs = mbcache_start(&iap->mc,mbfname,mf,&iap->mb)) >= 0) {
 		MBCACHE_INFO	mcinfo ;
 	        iap->open.mbcache = TRUE ;
@@ -2845,10 +2845,10 @@ static int inter_mbclose(INTER *iap)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("inter_mbclose: ent f_deldup=%u\n",pip->f.deldup) ;
+	    debugprintf("inter_mbclose: ent f_deldup=%u\n",pip->fl.deldup) ;
 #endif
 
-	if (iap->open.mbcache && pip->f.deldup) {
+	if (iap->open.mbcache && pip->fl.deldup) {
 	    rs1 = mbcache_msgdeldup(&iap->mc) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -3530,7 +3530,7 @@ static int inter_cmdmove(INTER *iap,int argnum)
 
 	if (rs >= 0) {
 	    if ((rs = inter_msgappend(iap,mi,mbname)) >= 0) {
-	        if (pip->f.nextmov) rs = inter_msgdel(iap,mi,TRUE) ;
+	        if (pip->fl.nextmov) rs = inter_msgdel(iap,mi,TRUE) ;
 	        if (rs >= 0) {
 	            cchar	*fmt = "msg#%u -> %s\v" ;
 	            rs = inter_info(iap,FALSE,fmt,(mi+1),mbname) ;
@@ -3573,7 +3573,7 @@ static int inter_cmdmsgtrash(INTER *iap,int argnum)
 	            } /* end if (msg-append) */
 	        } else if (rs > 0) {
 	            ccp = "already trashed" ;
-	            if (pip->f.nextdel && ((mi+1) < iap->nmsgs)) {
+	            if (pip->fl.nextdel && ((mi+1) < iap->nmsgs)) {
 	                rs = inter_msgpoint(iap,(mi+1)) ;
 		    }
 	        } /* end if (msg-trash) */
@@ -3824,7 +3824,7 @@ static int inter_msgoutpipe(INTER *iap,cchar *cmd,off_t outoff,int outlen)
 	        ps.disp[0] = SPAWNPROC_DCREATE ;
 	        ps.disp[1] = SPAWNPROC_DINHERIT ;
 	        ps.disp[2] = SPAWNPROC_DINHERIT ;
-	        if (iap->f.ctty) {
+	        if (iap->fl.ctty) {
 	            ps.opts |= SPAWNPROC_OSETCTTY ;
 	            ps.fd_ctty = pip->tfd ;
 	            ps.pgrp = iap->pgrp ; /* activates setting PGRP */
@@ -3865,7 +3865,7 @@ static int inter_msgoutpipe(INTER *iap,cchar *cmd,off_t outoff,int outlen)
 	            }
 #endif /* CF_DEBUG */
 
-	            if (iap->f.ctty) {
+	            if (iap->fl.ctty) {
 			int	ucmd = utermcmd_setpgrp ;
 	                uterm_control(iap->utp,ucmd,iap->pgrp) ;
 	            }
@@ -4022,9 +4022,9 @@ static int inter_subproc(INTER *iap,pid_t pid)
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 
-	if (! iap->f.subprocs) {
+	if (! iap->fl.subprocs) {
 	    rs = subprocs_start(&iap->sp) ;
-	    iap->f.subprocs = (rs >= 0) ;
+	    iap->fl.subprocs = (rs >= 0) ;
 	}
 	if (rs >= 0) {
 	    rs = subprocs_add(&iap->sp,pid) ;
@@ -4081,7 +4081,7 @@ static int inter_msgoutview(INTER *iap,cchar *cmd,cchar *vfname)
 	            ps.disp[0] = SPAWNPROC_DINHERIT ;
 	            ps.disp[1] = SPAWNPROC_DINHERIT ;
 	            ps.disp[2] = SPAWNPROC_DINHERIT ;
-	            if (iap->f.ctty) {
+	            if (iap->fl.ctty) {
 	                ps.opts |= SPAWNPROC_OSETCTTY ;
 	                ps.fd_ctty = pip->tfd ;
 	                ps.pgrp = iap->pgrp ;
@@ -4095,7 +4095,7 @@ static int inter_msgoutview(INTER *iap,cchar *cmd,cchar *vfname)
 			    rs2 = cs ;
 		 	}
 
-	                if (iap->f.ctty) {
+	                if (iap->fl.ctty) {
 	    		    int	ucmd = utermcmd_setpgrp ;
 	                    uterm_control(iap->utp,ucmd,iap->pgrp) ;
 	                }
@@ -4217,7 +4217,7 @@ static int inter_msgdel(INTER *iap,int mi,int delcmd)
 	            }
 
 	            if (rs >= 0) {
-		        if (delcmd && pip->f.nextdel && ((mi+1) < iap->nmsgs)) {
+		        if (delcmd && pip->fl.nextdel && ((mi+1) < iap->nmsgs)) {
 	                    rs = inter_msgpoint(iap,(mi+1)) ;
 	                }
 	            }
@@ -4272,7 +4272,7 @@ static int inter_msgdelnum(INTER *iap,int mi,int num,int delcmd)
 	    mi += 1 ;
 	} /* end for */
 
-	if ((rs >= 0) && (delcmd > 0) && pip->f.nextdel) {
+	if ((rs >= 0) && (delcmd > 0) && pip->fl.nextdel) {
 	    if (mi >= iap->nmsgs) mi = (iap->nmsgs - 1) ;
 	    rs = inter_msgpoint(iap,mi) ;
 	} /* end if */
@@ -4356,7 +4356,7 @@ static int inter_scancheck(INTER *iap,int si,int n)
 	                dsd.date = msp->vs[mbcachemf_scandate] ;
 	                dsd.lines = lines ;
 	                dsd.msgi = si ;
-	                dsd.mark = (msp->f.del) ? iap->delmark : ' ' ;
+	                dsd.mark = (msp->fl.del) ? iap->delmark : ' ' ;
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(3)) {
@@ -4628,14 +4628,14 @@ static int inter_havemb(INTER *iap,cchar *mbname,int mblen)
 static int inter_mailempty(INTER *iap)
 {
 	int		rs = SR_OK ;
-	int		f = ((! iap->open.mbcache) && (! iap->f.exit)) ;
+	int		f = ((! iap->open.mbcache) && (! iap->fl.exit)) ;
 
 	if (f) {
 
-	    if ((rs >= 0) && iap->f.setmbname) {
+	    if ((rs >= 0) && iap->fl.setmbname) {
 	        char	mbname[3] ;
 	        mbname[0] = '\0' ;
-	        iap->f.setmbname = FALSE ;
+	        iap->fl.setmbname = FALSE ;
 	        rs = display_setmbname(&iap->di,mbname,0) ;
 	    } /* end if */
 
@@ -4727,7 +4727,7 @@ static int inter_cmdshell(INTER *iap)
 	            ps.disp[0] = SPAWNPROC_DINHERIT ;
 	            ps.disp[1] = SPAWNPROC_DINHERIT ;
 	            ps.disp[2] = SPAWNPROC_DINHERIT ;
-	            if (iap->f.ctty) {
+	            if (iap->fl.ctty) {
 	                ps.opts |= SPAWNPROC_OSETCTTY ;
 	                ps.fd_ctty = pip->tfd ;
 	                ps.pgrp = iap->pgrp ;
@@ -4739,7 +4739,7 @@ static int inter_cmdshell(INTER *iap)
 
 	                rs3 = u_waitpid(pid,&cs,0) ;
 
-	                if (iap->f.ctty) {
+	                if (iap->fl.ctty) {
 	    		    int	ucmd = utermcmd_setpgrp ;
 	                    uterm_control(iap->utp,ucmd,iap->pgrp) ;
 	                }
@@ -4784,10 +4784,10 @@ static int inter_viewtop(INTER *iap,int vln)
 /* free up Message-View (MV) if called for */
 
 	if (iap->open.mv) {
-	    int	f = iap->f.viewchange ;
+	    int	f = iap->fl.viewchange ;
 	    f = f || (iap->miscanpoint != iap->miviewpoint) ;
 	    if (f) {
-	        iap->f.viewchange = FALSE ;
+	        iap->fl.viewchange = FALSE ;
 	        rs = inter_msgviewclose(iap) ;
 	    }
 	}
@@ -4832,17 +4832,17 @@ static int inter_viewnext(INTER *iap,int inc)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
 	    debugprintf("inter_viewnext: f_mvinit=%u\n",iap->open.mv) ;
-	    debugprintf("inter_viewnext: f_viewchange=%u\n",iap->f.viewchange) ;
+	    debugprintf("inter_viewnext: f_viewchange=%u\n",iap->fl.viewchange) ;
 	    debugprintf("inter_viewnext: miscanpoint=%d miviewpoint=%d\n",
 	        iap->miscanpoint,iap->miviewpoint) ;
 	}
 #endif
 
 	if ((rs >= 0) && iap->open.mv) {
-	    f = iap->f.viewchange ;
+	    f = iap->fl.viewchange ;
 	    f = f || (iap->miscanpoint != iap->miviewpoint) ;
 	    if (f) {
-	        iap->f.viewchange = FALSE ;
+	        iap->fl.viewchange = FALSE ;
 	        rs = inter_msgviewclose(iap) ;
 	    }
 	}
@@ -4916,7 +4916,7 @@ static int inter_msgviewopen(INTER *iap)
 	}
 #endif
 
-	iap->f.viewchange = FALSE ;
+	iap->fl.viewchange = FALSE ;
 	if ((! iap->open.mv) && (iap->miscanpoint >= 0)) {
 	    if (iap->mbname != NULL) {
 	        iap->miviewpoint = mi ;
