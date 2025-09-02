@@ -425,7 +425,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -434,7 +434,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	                        break ;
 
 	                    case 'a':
-	                        pip->f.all = TRUE ;
+	                        pip->fl.all = TRUE ;
 	                        break ;
 
 /* options */
