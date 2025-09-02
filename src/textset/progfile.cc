@@ -114,7 +114,7 @@ int progfile(PROGINFO *pip,cchar *ifn)
 		wlen += rs ;
 	    }
 
-	    if ((rs >= 0) && pip->f.headers) {
+	    if ((rs >= 0) && pip->fl.headers) {
 	        USTAT	sb ;
 
 	        pip->pagelines = (pip->pagelines - 2) ;
@@ -167,7 +167,7 @@ int progfile(PROGINFO *pip,cchar *ifn)
 
 	        if ((rs >= 0) && f_startbreak) {
 	            f_startbreak = FALSE ;
-	            if (pip->f.eject) {
+	            if (pip->fl.eject) {
 	                rs = bprintf(pip->ofp,".bp\n") ;
 	    		wlen += rs ;
 	            }
@@ -227,7 +227,7 @@ int progfile(PROGINFO *pip,cchar *ifn)
 
 /* are we at a page header? */
 
-	        if ((rs >= 0) && (line == 0) && pip->f.headers) {
+	        if ((rs >= 0) && (line == 0) && pip->fl.headers) {
 	    	    const int	hlen = LINEBUFLEN ;
 	    	    char	hbuf[LINEBUFLEN + 1] ;
 		    if ((rs = mkheader(pip,hbuf,hlen,ifn,f_si,ft,page)) >= 0) {
