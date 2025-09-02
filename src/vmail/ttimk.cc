@@ -211,9 +211,9 @@ int		operms ;
 	op->operms = operms ;
 	op->nfd = -1 ;
 
-	op->f.creat = (oflags & O_CREAT) ;
-	op->f.excl = (oflags & O_EXCL) ;
-	op->f.none = (! op->f.creat) && (! op->f.excl) ;
+	op->fl.creat = (oflags & O_CREAT) ;
+	op->fl.excl = (oflags & O_EXCL) ;
+	op->fl.none = (! op->fl.creat) && (! op->fl.excl) ;
 
 	rs = uc_mallocstrw(dbname,-1,&op->dbname) ;
 	if (rs < 0)
@@ -271,7 +271,7 @@ TTIMK		*op ;
 	debugprintf("ttimk_close: nverses=%u\n",op->nverses) ;
 #endif
 
-	if (op->f.notsorted)
+	if (op->fl.notsorted)
 	    vecobj_sort(&op->verses,vvecmp) ;
 
 	nverses = op->nverses ;
@@ -364,7 +364,7 @@ TTIMK_VERSE	*bvp ;
 
 	citcmpval = (bve.citation & 0x00FFFFFF) ;
 	if (citcmpval < op->pcitation)
-	    op->f.notsorted = TRUE ;
+	    op->fl.notsorted = TRUE ;
 
 	op->pcitation = citcmpval ;
 
@@ -470,7 +470,7 @@ TTIMK		*op ;
 	if (rs < 0)
 	    goto bad2 ;
 
-	if (op->f.creat && op->f.excl)
+	if (op->fl.creat && op->fl.excl)
 	    rs = ttimk_fexists(op) ;
 
 	if (rs < 0)
@@ -506,7 +506,7 @@ TTIMK		*op ;
 	int		rs = SR_OK ;
 
 	if (op->nfname != NULL) {
-	    if (op->f.created && (op->nfname[0] != '\0')) {
+	    if (op->fl.created && (op->nfname[0] != '\0')) {
 	        u_unlink(op->nfname) ;
 	    }
 	    uc_free(op->nfname) ;
@@ -793,16 +793,16 @@ again:
 		u_unlink(op->nfname) ;
 		goto again ;
 	    }
-	    op->f.inprogress = TRUE ;
-	    f_inprogress = op->f.none ;
-	    f_inprogress = f_inprogress || (op->f.creat && op->f.excl) ;
+	    op->fl.inprogress = TRUE ;
+	    f_inprogress = op->fl.none ;
+	    f_inprogress = f_inprogress || (op->fl.creat && op->fl.excl) ;
 	    rs = (f_inprogress) ? SR_INPROGRESS : SR_OK ;
 	} /* end if */
 
 	if (rs < 0)
 	    goto bad1 ;
 
-	op->f.created = TRUE ;
+	op->fl.created = TRUE ;
 
 ret0:
 	return rs ;
@@ -828,13 +828,13 @@ const char	fsuf[] ;
 	int		rs = SR_OK ;
 	int		oflags ;
 
-	if ((op->nfd < 0) || op->f.inprogress) {
+	if ((op->nfd < 0) || op->fl.inprogress) {
 	    if (op->nfd >= 0) {
 		u_close(op->nfd) ;
 		op->nfd = -1 ;
 	    }
 	    oflags = O_WRONLY | O_CREAT ;
-	    if (op->f.inprogress) {
+	    if (op->fl.inprogress) {
 		char	cname[MAXNAMELEN + 1] ;
 		char	infname[MAXPATHLEN + 1] ;
 		char	outfname[MAXPATHLEN + 1] ;
@@ -850,7 +850,7 @@ const char	fsuf[] ;
 		if (rs >= 0) {
 		    rs = opentmpfile(infname,oflags,op->operms,outfname) ;
 	            op->nfd = rs ;
-		    op->f.created = (rs >= 0) ;
+		    op->fl.created = (rs >= 0) ;
 	 	}
 		if (rs >= 0)
 		    rs = ttimk_nfstore(op,outfname) ;
@@ -865,7 +865,7 @@ const char	fsuf[] ;
 	    } else {
 	        rs = u_open(op->nfname,oflags,op->operms) ;
 	        op->nfd = rs ;
-		op->f.created = (rs >= 0) ;
+		op->fl.created = (rs >= 0) ;
 	    }
 	}
 
@@ -929,8 +929,8 @@ TTIMK		*op ;
 	int		f ;
 	char		bvifname[MAXPATHLEN + 1] ;
 
-	f = (op->f.creat && op->f.excl) ;
-	if ((! f) || (! op->f.inprogress))
+	f = (op->fl.creat && op->fl.excl) ;
+	if ((! f) || (! op->fl.inprogress))
 	    goto ret0 ;
 
 	rs = mkfnamesuf2(bvifname,op->dbname,FSUF_IND,ENDIANSTR) ;
