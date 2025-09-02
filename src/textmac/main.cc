@@ -387,12 +387,12 @@ char	*envv[] ;
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* quiet */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* options */
@@ -764,7 +764,7 @@ char	*envv[] ;
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file (%d)\n",
