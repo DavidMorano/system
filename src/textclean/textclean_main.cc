@@ -509,7 +509,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -535,7 +535,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = true ;
+	                        pip->fl.nochange = true ;
 	                        break ;
 
 /* quiet */
@@ -666,15 +666,15 @@ int main(int argc,cchar **argv,cchar **envv) {
 	    struct options	*opp = pip->config ;
 	    cchar		*pn = pip->progname ;
 	    bfile		*efp = pip->efp ;
-	    bprintf(efp,"%s: inplace=%u\n",pn,opp->f.inplace) ;
-	    bprintf(efp,"%s: lower=%u\n",pn,opp->f.lower) ;
-	    bprintf(efp,"%s: double=%u\n",pn,opp->f.doublespace) ;
-	    bprintf(efp,"%s: half=%u\n",pn,opp->f.half) ;
-	    bprintf(efp,"%s: oneblank=%u\n",pn,opp->f.oneblank) ;
-	    bprintf(efp,"%s: noblank=%u\n",pn,opp->f.noblanks) ;
-	    bprintf(efp,"%s: leading=%u\n",pn,opp->f.rmleading) ;
-	    bprintf(efp,"%s: trailing=%u\n",pn,opp->f.rmtrailing) ;
-	    bprintf(efp,"%s: mscrap=%u\n",pn,opp->f.mscrap) ;
+	    bprintf(efp,"%s: inplace=%u\n",pn,opp->fl.inplace) ;
+	    bprintf(efp,"%s: lower=%u\n",pn,opp->fl.lower) ;
+	    bprintf(efp,"%s: double=%u\n",pn,opp->fl.doublespace) ;
+	    bprintf(efp,"%s: half=%u\n",pn,opp->fl.half) ;
+	    bprintf(efp,"%s: oneblank=%u\n",pn,opp->fl.oneblank) ;
+	    bprintf(efp,"%s: noblank=%u\n",pn,opp->fl.noblanks) ;
+	    bprintf(efp,"%s: leading=%u\n",pn,opp->fl.rmleading) ;
+	    bprintf(efp,"%s: trailing=%u\n",pn,opp->fl.rmtrailing) ;
+	    bprintf(efp,"%s: mscrap=%u\n",pn,opp->fl.mscrap) ;
 	} /* end if (run options) */
 
 	ainfo.argc = argc ;
@@ -724,7 +724,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	        ex = mapex(mapexs,rs) ;
 	        break ;
 	    } /* end switch */
-	    if ((! pip->f.quiet) && (fmt != nullptr)) {
+	    if ((! pip->fl.quiet) && (fmt != nullptr)) {
 	        bprintf(pip->efp,fmt,pip->progname,rs) ;
 	    }
 	} /* end if (error) */
@@ -883,34 +883,34 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 	                switch (oi) {
 	                case akoname_inplace:
-	                    opp->f.inplace = true ;
+	                    opp->fl.inplace = true ;
 	                    break ;
 	                case akoname_lower:
-	                    opp->f.lower = true ;
+	                    opp->fl.lower = true ;
 	                    break ;
 	                case akoname_double:
-	                    opp->f.doublespace = true ;
+	                    opp->fl.doublespace = true ;
 	                    break ;
 	                case akoname_half:
-	                    opp->f.half = true ;
+	                    opp->fl.half = true ;
 	                    break ;
 	                case akoname_oneblank:
-	                    opp->f.oneblank = true ;
+	                    opp->fl.oneblank = true ;
 	                    break ;
 	                case akoname_noblanks:
-	                    opp->f.noblanks = true ;
+	                    opp->fl.noblanks = true ;
 	                    break ;
 	                case akoname_leading:
-	                    opp->f.rmleading = true ;
+	                    opp->fl.rmleading = true ;
 	                    break ;
 	                case akoname_trailing:
-	                    opp->f.rmtrailing = true ;
+	                    opp->fl.rmtrailing = true ;
 	                    break ;
 	                case akoname_mscrap:
-	                    opp->f.mscrap = true ;
+	                    opp->fl.mscrap = true ;
 	                    break ;
 	                case akoname_pad:
-	                    opp->f.pad = true ;
+	                    opp->fl.pad = true ;
 	                    if (vl > 0) {
 	                        rs = optvalue(vp,vl) ;
 	                        opp->pad = rs ;
@@ -918,13 +918,13 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                    break ;
 	                case akoname_snug:
 	                case akoname_compact:
-	                    opp->f.snug = true ;
+	                    opp->fl.snug = true ;
 	                    break ;
 	                case akoname_subnbsp:
-	                    opp->f.subnbsp = true ;
+	                    opp->fl.subnbsp = true ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        opp->f.subnbsp = (rs > 0) ;
+	                        opp->fl.subnbsp = (rs > 0) ;
 	                    }
 	                    break ;
 	                } /* end switch */
@@ -968,7 +968,7 @@ static int procmsmap(proginfo *pip,OPTIONS *opp,cchar *mfn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if ((opp != nullptr) && opp->f.mscrap) {
+	if ((opp != nullptr) && opp->fl.mscrap) {
 	    if (mfn != nullptr) {
 	        rs = procmsmaper(pip,opp,mfn) ;
 	    } else {
@@ -1108,7 +1108,7 @@ static int procout_begin(proginfo *pip,OPTIONS *optp,void *ofp,cchar *ofn)
 {
 	int		rs = SR_OK ;
 	if (pip == nullptr) return SR_FAULT ;
-	if (optp->f.inplace) {
+	if (optp->fl.inplace) {
 	    rs = bopentmp(ofp,nullptr,"rwct",0666) ;
 	} else {
 	    if ((ofn == nullptr) || (ofn[0] == '\0') || (ofn[0] == '-')) {
@@ -1137,7 +1137,7 @@ static int procout_post(proginfo *pip,OPTIONS *optp,bfile *ofp,bfile *ifp)
 {
 	int		rs = SR_OK ;
 	int		clen = 0 ;
-	if (optp->f.inplace) {
+	if (optp->fl.inplace) {
 	    if ((rs = brewind(ofp)) >= 0) {
 		if ((rs = brewind(ifp)) >= 0) {
 		    if ((rs = bwriteblock(ifp,ofp,-1)) >= 0) {
@@ -1215,7 +1215,7 @@ static int process(proginfo *pip,arginfo *aip,bits *bop,options *optp,
 	        rs1 = bclose(afp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*fmt ;
 		    fmt = "%s: inaccessible argument-list (%d)\n" ;
@@ -1252,7 +1252,7 @@ static int procfile(proginfo *pip,OPTIONS *opp,bfile *ofp,cc *fp,int fl) noex {
 
 	if (nulstr n ; (rs = nulstr_start(&n,fp,fl,&fname)) >= 0) {
 	    bfile	ifile, *ifp = &ifile ;
-	    cchar	*ostr = (opp->f.inplace) ? "rw" : "r" ;
+	    cchar	*ostr = (opp->fl.inplace) ? "rw" : "r" ;
 	    if ((rs = bopen(ifp,fname,ostr,0666)) >= 0) {
 	        if ((rs = procfiler(pip,ifp,ofp)) >= 0) {
 	            wlen += rs ;
@@ -1313,7 +1313,7 @@ static int procline(proginfo *pip,bfile *ofp,STATE *fsp,cc *lbuf,int ll) noex {
 
 	if (fsp == nullptr) return SR_FAULT ;
 	obuf[0] = '\0' ;
-	if (opp->f.rmleading) {
+	if (opp->fl.rmleading) {
 	    while (ll && CHAR_ISWHITE(lbuf[0])) {
 		lbuf += 1 ;
 		ll -= 1 ;
@@ -1324,7 +1324,7 @@ static int procline(proginfo *pip,bfile *ofp,STATE *fsp,cc *lbuf,int ll) noex {
 	    f_print = false ;
 	}
 
-	if (opp->f.mscrap && (pip->msmap != nullptr)) {
+	if (opp->fl.mscrap && (pip->msmap != nullptr)) {
 	    int		kch ;
 	    int		rch ;
 	    for (i = 0 ; (i < ll) && (ol < olen) ; i += 1) {
@@ -1338,7 +1338,7 @@ static int procline(proginfo *pip,bfile *ofp,STATE *fsp,cc *lbuf,int ll) noex {
 	    }
 	}
 
-	if (opp->f.snug && ol) {
+	if (opp->fl.snug && ol) {
 	    int		c = 0 ;
 	    int		sl = ol ;
 	    int		cl ;
@@ -1354,11 +1354,11 @@ static int procline(proginfo *pip,bfile *ofp,STATE *fsp,cc *lbuf,int ll) noex {
 	    } /* end while */
 	} /* end if (snug) */
 
-	if (opp->f.rmtrailing && ol) {
+	if (opp->fl.rmtrailing && ol) {
 	    while (ol && CHAR_ISWHITE(obuf[ol-1])) ol -= 1 ;
 	}
 
-	if (opp->f.subnbsp && ol) {
+	if (opp->fl.subnbsp && ol) {
 	    int		i ;
 	    for (i = 0 ; i < ol ; i += 1) {
 	        if (obuf[i] == CH_SP) obuf[i] = CH_NBSP ;
@@ -1371,12 +1371,12 @@ static int procline(proginfo *pip,bfile *ofp,STATE *fsp,cc *lbuf,int ll) noex {
 
 	if (f_print) {
 	        if ((ol == 0) || hasallwhite(obuf,ol)) {
-	            if (opp->f.half && (! fsp->f.blank)) {
+	            if (opp->fl.half && (! fsp->fl.blank)) {
 	                f_print = false ;
 	            }
-	            fsp->f.blank = true ;
+	            fsp->fl.blank = true ;
 	        } else {
-	            fsp->f.blank = false ;
+	            fsp->fl.blank = false ;
 	        }
 	}
 
@@ -1385,7 +1385,7 @@ static int procline(proginfo *pip,bfile *ofp,STATE *fsp,cc *lbuf,int ll) noex {
 	    wlen += rs ;
 	}
 
-	if ((rs >= 0) && opp->f.doublespace) {
+	if ((rs >= 0) && opp->fl.doublespace) {
 	    rs = bprintln(ofp,obuf,0) ;
 	    wlen += rs ;
 	}
