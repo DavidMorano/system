@@ -465,7 +465,7 @@ const char	*envv[] ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 					LONG	vv ;
-	                                pip->f.trunclen = TRUE ;
+	                                pip->fl.trunclen = TRUE ;
 	                                rs = cfdecmfll(argp,argl,&vv) ;
 					trunclen = vv ;
 	                            }
@@ -473,7 +473,7 @@ const char	*envv[] ;
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* verbose mode */
@@ -581,7 +581,7 @@ const char	*envv[] ;
 /* other initialization */
 
 	if ((rs >= 0) && (argval != NULL) && (trunclen < 0)) {
-	    pip->f.trunclen = TRUE ;
+	    pip->fl.trunclen = TRUE ;
 	    rs = cfdecmfll(argval,-1,&trunclen) ;
 	}
 	lip->trunclen = trunclen ;
@@ -852,7 +852,7 @@ int		nl ;
 
 	flen = lip->trunclen ;
 
-	if (! pip->f.literal) {
+	if (! pip->fl.literal) {
 	    const char	*tp ;
 
 #if	CF_DEBUG
