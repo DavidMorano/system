@@ -47,7 +47,6 @@
 #include	<tzfile.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<ucmallreg.h>
 #include	<getourenv.h>
 #include	<gethz.h>
 #include	<userinfo.h>
@@ -419,16 +418,16 @@ int mainsub(int argc,cchar **argv,cchar **envv)
 	pip->to_read = TO_READ ;
 	pip->to_info = TO_INFO ;
 
-	pip->f.pcspoll = TRUE ;
-	pip->f.mailget = TRUE ;
-	pip->f.mailcheck = TRUE ;
-	pip->f.clock = TRUE ;
-	pip->f.nextdel = TRUE ;
-	pip->f.nextmov = TRUE ;
-	pip->f.useclen = DEFOPT_USECLEN ;
-	pip->f.useclines = DEFOPT_USECLINES ;
-	pip->f.winadj = DEFOPT_WINADJ ;
-	pip->f.bb = FALSE ;
+	pip->fl.pcspoll = TRUE ;
+	pip->fl.mailget = TRUE ;
+	pip->fl.mailcheck = TRUE ;
+	pip->fl.clock = TRUE ;
+	pip->fl.nextdel = TRUE ;
+	pip->fl.nextmov = TRUE ;
+	pip->fl.useclen = DEFOPT_USECLEN ;
+	pip->fl.useclines = DEFOPT_USECLINES ;
+	pip->fl.winadj = DEFOPT_WINADJ ;
+	pip->fl.bb = FALSE ;
 
 /* key options */
 
@@ -978,7 +977,7 @@ int mainsub(int argc,cchar **argv,cchar **envv)
 
 /* flag to automatically get new bulletins on 'bbtemp' mailbox */
 	                    case 'b':
-	                        pip->f.bb = TRUE ;
+	                        pip->fl.bb = TRUE ;
 	                        break ;
 
 /* number of terminal lines */
@@ -1319,7 +1318,7 @@ int mainsub(int argc,cchar **argv,cchar **envv)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1495,10 +1494,10 @@ static int procterm(PROGINFO *pip,PARAMOPT *pop)
 
 	    if (pip->debuglevel > 0) {
 	        bprintf(pip->efp,"%s: mailget=%u\n",
-	            pip->progname,pip->f.mailget) ;
+	            pip->progname,pip->fl.mailget) ;
 	    }
 
-	    if (pip->f.mailget) {
+	    if (pip->fl.mailget) {
 	        rs = progmailget(pip,pop) ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))
@@ -1828,7 +1827,7 @@ static int procscanspec(PROGINFO *pip)
 
 	    if ((tp = strchr(cp,'%')) != nullptr) {
 	        cl = (tp - cp) ;
-	        pip->f.svpercent = TRUE ;
+	        pip->fl.svpercent = TRUE ;
 	    }
 
 #if	CF_DEBUG
@@ -1848,7 +1847,7 @@ static int procscanspec(PROGINFO *pip)
 
 	    if ((tp = strchr(cp,'%')) != nullptr) {
 	        cl = (tp - cp) ;
-	        pip->f.sjpercent = TRUE ;
+	        pip->fl.sjpercent = TRUE ;
 	    }
 
 	    rs = cfdeci(cp,cl,&pip->sjlines) ;
