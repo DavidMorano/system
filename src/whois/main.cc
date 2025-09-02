@@ -469,7 +469,7 @@ const char	*envv[] ;
 /* queit mode */
 	                    case 'Q':
 	                        pip->have.quiet = TRUE ;
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        pip->final.quiet = TRUE ;
 	                        break ;
 
