@@ -433,7 +433,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -603,22 +603,22 @@ int main(int argc,cchar **argv,cchar **envv)
 	}
 
 	f = TRUE ;
-	f = f && (! pip->f.rmleading) ;
-	f = f && (! pip->f.rmmiddle) ;
-	f = f && (! pip->f.rmtrailing) ;
+	f = f && (! pip->fl.rmleading) ;
+	f = f && (! pip->fl.rmmiddle) ;
+	f = f && (! pip->fl.rmtrailing) ;
 	if (f) {
-	    pip->f.rmleading = TRUE ;
-	    pip->f.rmmiddle = TRUE ;
-	    pip->f.rmtrailing = TRUE ;
+	    pip->fl.rmleading = TRUE ;
+	    pip->fl.rmmiddle = TRUE ;
+	    pip->fl.rmtrailing = TRUE ;
 	}
 
 	if (pip->debuglevel > 0) {
 		bprintf(pip->efp,"%s: f_rmleading=%u\n",
-			pip->progname,pip->f.rmleading) ;
+			pip->progname,pip->fl.rmleading) ;
 		bprintf(pip->efp,"%s: f_rmmiddle=%u\n",
-			pip->progname,pip->f.rmmiddle) ;
+			pip->progname,pip->fl.rmmiddle) ;
 		bprintf(pip->efp,"%s: f_rmtrailing=%u\n",
-			pip->progname,pip->f.rmtrailing) ;
+			pip->progname,pip->fl.rmtrailing) ;
 	}
 
 /* remaining initialization */
@@ -630,7 +630,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* open the output file (if we are not processing in place that it) */
 
-	if (! pip->f.inplace) {
+	if (! pip->fl.inplace) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -705,7 +705,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	        bclose(afp) ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: inaccessible argument list file (%d)\n",
 	                pip->progname,rs) ;
@@ -726,7 +726,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	} /* end if (program invocation arguments) */
 
-	if ((! pip->f.inplace) && (ofp != NULL))
+	if ((! pip->fl.inplace) && (ofp != NULL))
 	    bclose(ofp) ;
 
 badoutopen:
@@ -746,7 +746,7 @@ done:
 
 	    } /* end switch */
 
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        bprintf(pip->efp,fmt, pip->progname,rs) ;
 	        if (tmpfname[0] != '\0')
 	            bprintf(pip->efp,"%s: file=%s\n",
@@ -888,9 +888,9 @@ KEYOPT		*kop ;
 	            if (! pip->final.inplace) {
 	                pip->have.inplace = TRUE ;
 	                pip->final.inplace = TRUE ;
-	                pip->f.inplace = TRUE ;
+	                pip->fl.inplace = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                    pip->f.inplace = (uv > 0) ? 1 : 0 ;
+	                    pip->fl.inplace = (uv > 0) ? 1 : 0 ;
 	            }
 	            break ;
 
@@ -898,9 +898,9 @@ KEYOPT		*kop ;
 	            if (! pip->final.rmleading) {
 	                pip->have.rmleading = TRUE ;
 	                pip->final.rmleading = TRUE ;
-	                pip->f.rmleading = TRUE ;
+	                pip->fl.rmleading = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                    pip->f.rmleading = (uv > 0) ? 1 : 0 ;
+	                    pip->fl.rmleading = (uv > 0) ? 1 : 0 ;
 	            }
 	            break ;
 
@@ -908,9 +908,9 @@ KEYOPT		*kop ;
 	            if (! pip->final.rmtrailing) {
 	                pip->have.rmtrailing = TRUE ;
 	                pip->final.rmtrailing = TRUE ;
-	                pip->f.rmtrailing = TRUE ;
+	                pip->fl.rmtrailing = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                    pip->f.rmtrailing = (uv > 0) ? 1 : 0 ;
+	                    pip->fl.rmtrailing = (uv > 0) ? 1 : 0 ;
 	            }
 	            break ;
 
@@ -918,9 +918,9 @@ KEYOPT		*kop ;
 	            if (! pip->final.rmmiddle) {
 	                pip->have.rmmiddle = TRUE ;
 	                pip->final.rmmiddle = TRUE ;
-	                pip->f.rmmiddle = TRUE ;
+	                pip->fl.rmmiddle = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                    pip->f.rmmiddle = (uv > 0) ? 1 : 0 ;
+	                    pip->fl.rmmiddle = (uv > 0) ? 1 : 0 ;
 	            }
 	            break ;
 
