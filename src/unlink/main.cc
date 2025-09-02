@@ -771,12 +771,12 @@ const char	*envv[] ;
 	                case argopt_follow:
 	                    pip->final.follow = TRUE ;
 	                    pip->have.follow = TRUE ;
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.follow = (rs > 0) ;
+	                            pip->fl.follow = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -785,12 +785,12 @@ const char	*envv[] ;
 	                case argopt_iacc:
 	                    pip->final.iacc = TRUE ;
 	                    pip->have.iacc = TRUE ;
-	                    pip->f.iacc = TRUE ;
+	                    pip->fl.iacc = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.iacc = (rs > 0) ;
+	                            pip->fl.iacc = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -801,7 +801,7 @@ const char	*envv[] ;
 	                    cl = -1 ;
 	                    pip->final.nice = TRUE ;
 	                    pip->have.nice = TRUE ;
-	                    pip->f.nice = TRUE ;
+	                    pip->fl.nice = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
@@ -833,7 +833,7 @@ const char	*envv[] ;
 	                    cl = -1 ;
 	                    pip->final.nice = TRUE ;
 	                    pip->have.nice = TRUE ;
-	                    pip->f.nice = TRUE ;
+	                    pip->fl.nice = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
@@ -948,7 +948,7 @@ const char	*envv[] ;
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -974,12 +974,12 @@ const char	*envv[] ;
 	                    case 'c':
 	                        pip->final.nostop = TRUE ;
 	                        pip->have.nostop = TRUE ;
-	                        pip->f.nostop = TRUE ;
+	                        pip->fl.nostop = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.nostop = (rs > 0) ;
+	                                pip->fl.nostop = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1004,12 +1004,12 @@ const char	*envv[] ;
 	                    case 'f':
 	                        pip->final.follow = TRUE ;
 	                        pip->have.follow = TRUE ;
-	                        pip->f.follow = TRUE ;
+	                        pip->fl.follow = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.follow = (rs > 0) ;
+	                                pip->fl.follow = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1045,7 +1045,7 @@ const char	*envv[] ;
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* options */
@@ -1065,12 +1065,12 @@ const char	*envv[] ;
 	                    case 'q':
 	                        pip->final.quiet = TRUE ;
 	                        pip->have.quiet = TRUE ;
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.quiet = (rs > 0) ;
+	                                pip->fl.quiet = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1152,12 +1152,12 @@ const char	*envv[] ;
 	                    case 'z':
 	                        pip->final.zargs = TRUE ;
 	                        pip->final.zargs = TRUE ;
-	                        pip->f.zargs = TRUE ;
+	                        pip->fl.zargs = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.zargs = (rs > 0) ;
+	                                pip->fl.zargs = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1321,7 +1321,7 @@ const char	*envv[] ;
 	if (rs >= 0)
 	    rs = procfts(pip) ;
 
-	if ((rs >= 0) && pip->f.cores)
+	if ((rs >= 0) && pip->fl.cores)
 	    pip->fts |= (1 << ft_r) ;
 
 	if ((rs >= 0) && (pip->debuglevel > 0))
@@ -1332,39 +1332,39 @@ const char	*envv[] ;
 	    goto retearly ;
 	}
 
-	if (pip->f.f_noextra) {
-	    pip->f.f_nodev = TRUE ;
-	    pip->f.f_nopipe = TRUE ;
-	    pip->f.f_nosock = TRUE ;
-	    pip->f.f_noname = TRUE ;
-	    pip->f.f_nodoor = TRUE ;
+	if (pip->fl.f_noextra) {
+	    pip->fl.f_nodev = TRUE ;
+	    pip->fl.f_nopipe = TRUE ;
+	    pip->fl.f_nosock = TRUE ;
+	    pip->fl.f_noname = TRUE ;
+	    pip->fl.f_nodoor = TRUE ;
 	}
 
 /* create the 'fnos' value */
 
-	if (pip->f.f_nodev) {
+	if (pip->fl.f_nodev) {
 	    bwset(pip->fnos,ft_c) ;
 	    bwset(pip->fnos,ft_b) ;
 	}
-	if (pip->f.f_noname) bwset(pip->fnos,ft_n) ;
-	if (pip->f.f_nopipe) bwset(pip->fnos,ft_p) ;
-	if (pip->f.f_nolink) bwset(pip->fnos,ft_l) ;
-	if (pip->f.f_nosock) bwset(pip->fnos,ft_s) ;
-	if (pip->f.f_nodoor) bwset(pip->fnos,ft_d) ;
+	if (pip->fl.f_noname) bwset(pip->fnos,ft_n) ;
+	if (pip->fl.f_nopipe) bwset(pip->fnos,ft_p) ;
+	if (pip->fl.f_nolink) bwset(pip->fnos,ft_l) ;
+	if (pip->fl.f_nosock) bwset(pip->fnos,ft_s) ;
+	if (pip->fl.f_nodoor) bwset(pip->fnos,ft_d) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    debugprintf("main: f_follow=%u\n",pip->f.follow) ;
-	    debugprintf("main: f_continue=%u\n",pip->f.nostop) ;
-	    debugprintf("main: f_iacc=%u\n",pip->f.iacc) ;
+	    debugprintf("main: f_follow=%u\n",pip->fl.follow) ;
+	    debugprintf("main: f_continue=%u\n",pip->fl.nostop) ;
+	    debugprintf("main: f_iacc=%u\n",pip->fl.iacc) ;
 	}
 #endif /* CF_DEBUG */
 
 	if (pip->debuglevel > 0) {
 	    const char	*pn = pip->progname ;
-	    bprintf(pip->efp,"%s: follow=%u\n",pn,pip->f.follow) ;
-	    bprintf(pip->efp,"%s: continue=%u\n",pn,pip->f.nostop) ;
-	    bprintf(pip->efp,"%s: iacc=%u\n",pn,pip->f.iacc) ;
+	    bprintf(pip->efp,"%s: follow=%u\n",pn,pip->fl.follow) ;
+	    bprintf(pip->efp,"%s: continue=%u\n",pn,pip->fl.nostop) ;
+	    bprintf(pip->efp,"%s: iacc=%u\n",pn,pip->fl.iacc) ;
 	}
 
 /* check a few more things */
@@ -1418,7 +1418,7 @@ const char	*envv[] ;
 
 #ifdef	COMMENT
 	if (pip->debuglevel > 0)
-	    bprintf(pip->efp,"%s: follow=%u\n",pip->progname,pip->f.follow) ;
+	    bprintf(pip->efp,"%s: follow=%u\n",pip->progname,pip->fl.follow) ;
 #endif
 
 	if ((rs >= 0) && (pip->nice > 0)) {
@@ -1522,7 +1522,7 @@ const char	*envv[] ;
 
 	        bclose(afp) ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file (%d)\n",
 	                pip->progname,rs) ;
@@ -1570,7 +1570,7 @@ badoutopen:
 	    bprintf(pip->efp,"%s: files=%u processed=%u\n",
 	        pip->progname,pip->c_files,pip->c_processed) ;
 
-	if ((rs >= 0) && (pan == 0) && (! pip->f.zargs) && (! pip->f.quiet)) {
+	if ((rs >= 0) && (pan == 0) && (! pip->fl.zargs) && (! pip->fl.quiet)) {
 	    ex = EX_USAGE ;
 	    bprintf(pip->efp,"%s: no files or directories were specified\n",
 	        pip->progname) ;
@@ -1581,7 +1581,7 @@ done:
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            bprintf(pip->efp,"%s: invalid usage (%d)\n",
 	                pip->progname,rs) ;
 	        break ;
@@ -1715,10 +1715,10 @@ struct proginfo	*pip ;
 	            case progopt_uniq:
 	                if (! pip->final.f_uniq) {
 	                    pip->final.f_uniq = TRUE ;
-	                    pip->f.f_uniq = TRUE ;
+	                    pip->fl.f_uniq = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.f_uniq = (rs > 0) ;
+	                        pip->fl.f_uniq = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1727,10 +1727,10 @@ struct proginfo	*pip ;
 	            case progopt_name:
 	                if (! pip->final.f_name) {
 	                    pip->final.f_name = TRUE ;
-	                    pip->f.f_name = TRUE ;
+	                    pip->fl.f_name = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.f_name = (rs > 0) ;
+	                        pip->fl.f_name = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1738,10 +1738,10 @@ struct proginfo	*pip ;
 	            case progopt_noprog:
 	                if (! pip->final.f_noprog) {
 	                    pip->final.f_noprog = TRUE ;
-	                    pip->f.f_noprog = TRUE ;
+	                    pip->fl.f_noprog = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.f_noprog = (rs > 0) ;
+	                        pip->fl.f_noprog = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1749,10 +1749,10 @@ struct proginfo	*pip ;
 	            case progopt_nosock:
 	                if (! pip->final.f_nosock) {
 	                    pip->final.f_nosock = TRUE ;
-	                    pip->f.f_nosock = TRUE ;
+	                    pip->fl.f_nosock = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.f_nosock = (rs > 0) ;
+	                        pip->fl.f_nosock = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1761,10 +1761,10 @@ struct proginfo	*pip ;
 	            case progopt_nofifo:
 	                if (! pip->final.f_nopipe) {
 	                    pip->final.f_nopipe = TRUE ;
-	                    pip->f.f_nopipe = TRUE ;
+	                    pip->fl.f_nopipe = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.f_nopipe = (rs > 0) ;
+	                        pip->fl.f_nopipe = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1772,10 +1772,10 @@ struct proginfo	*pip ;
 	            case progopt_nodev:
 	                if (! pip->final.f_nodev) {
 	                    pip->final.f_nodev = TRUE ;
-	                    pip->f.f_nodev = TRUE ;
+	                    pip->fl.f_nodev = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.f_nodev = (rs > 0) ;
+	                        pip->fl.f_nodev = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1783,10 +1783,10 @@ struct proginfo	*pip ;
 	            case progopt_noname:
 	                if (! pip->final.f_noname) {
 	                    pip->final.f_noname = TRUE ;
-	                    pip->f.f_noname = TRUE ;
+	                    pip->fl.f_noname = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.f_noname = (rs > 0) ;
+	                        pip->fl.f_noname = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1794,10 +1794,10 @@ struct proginfo	*pip ;
 	            case progopt_nolink:
 	                if (! pip->final.f_nolink) {
 	                    pip->final.f_nolink = TRUE ;
-	                    pip->f.f_nolink= TRUE ;
+	                    pip->fl.f_nolink= TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.f_nolink = (rs > 0) ;
+	                        pip->fl.f_nolink = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1805,10 +1805,10 @@ struct proginfo	*pip ;
 	            case progopt_noextra:
 	                if (! pip->final.f_noextra) {
 	                    pip->final.f_noextra = TRUE ;
-	                    pip->f.f_noextra = TRUE ;
+	                    pip->fl.f_noextra = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.f_noextra = (rs > 0) ;
+	                        pip->fl.f_noextra = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1816,10 +1816,10 @@ struct proginfo	*pip ;
 	            case progopt_cores:
 	                if (! pip->final.cores) {
 	                    pip->final.cores = TRUE ;
-	                    pip->f.cores = TRUE ;
+	                    pip->fl.cores = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.cores = (rs > 0) ;
+	                        pip->fl.cores = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1844,10 +1844,10 @@ struct proginfo	*pip ;
 	                if (! pip->final.follow) {
 	                    pip->final.follow = TRUE ;
 	                    pip->have.follow = TRUE ;
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.follow = (rs > 0) ;
+	                        pip->fl.follow = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1866,10 +1866,10 @@ struct proginfo	*pip ;
 	                if (! pip->final.iacc) {
 	                    pip->final.iacc = TRUE ;
 	                    pip->have.iacc = TRUE ;
-	                    pip->f.iacc = TRUE ;
+	                    pip->fl.iacc = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.iacc = (rs > 0) ;
+	                        pip->fl.iacc = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1878,10 +1878,10 @@ struct proginfo	*pip ;
 	                if (! pip->final.quiet) {
 	                    pip->final.quiet = TRUE ;
 	                    pip->have.quiet = TRUE ;
-	                    pip->f.iacc = TRUE ;
+	                    pip->fl.iacc = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.quiet = (rs > 0) ;
+	                        pip->fl.quiet = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -2067,7 +2067,7 @@ const char	name[] ;
 	}
 #endif
 
-	if (f_islink && pip->f.follow) {
+	if (f_islink && pip->fl.follow) {
 
 	    rs1 = fsdirtreestat(name,0,&ssb) ; /* STAT */
 	    if (rs1 >= 0) {
@@ -2135,7 +2135,7 @@ FSDIRTREE_STAT	*sbp ;
 	    *bp++ = '/' ;
 
 	    opts = 0 ;
-	    if (pip->f.follow) opts |= FSDIRTREE_MFOLLOW ;
+	    if (pip->fl.follow) opts |= FSDIRTREE_MFOLLOW ;
 
 	    if ((rs = fsdirtree_open(&d,name,opts)) >= 0) {
 		const int	mpl = MAXPATHLEN ;
@@ -2166,12 +2166,12 @@ FSDIRTREE_STAT	*sbp ;
 	    } /* end if (reading directory entries) */
 
 	    if (rs < 0) {
-	        if ((rs == SR_ACCESS) && pip->f.iacc) rs = SR_OK ;
-	        if ((! pip->f.quiet) && (rs < 0)) {
+	        if ((rs == SR_ACCESS) && pip->fl.iacc) rs = SR_OK ;
+	        if ((! pip->fl.quiet) && (rs < 0)) {
 	            bprintf(pip->efp,"%s: dname=%s (%d)\n",
 	                pip->progname,name,rs) ;
 		}
-	        if ((! istermrs(rs)) && pip->f.nostop) rs = SR_OK ;
+	        if ((! istermrs(rs)) && pip->fl.nostop) rs = SR_OK ;
 	    }
 
 	    if (p != NULL) uc_free(p) ;
@@ -2296,7 +2296,7 @@ FSDIRTREE_STAT	*sbp ;
 
 	if (S_ISLNK(sbp->st_mode)) {
 
-	    if (pip->f.f_nolink)
+	    if (pip->fl.f_nolink)
 	        goto done ;
 
 #if	CF_DEBUG
@@ -2305,7 +2305,7 @@ FSDIRTREE_STAT	*sbp ;
 #endif
 
 #if	CF_FOLLOWFILES
-	    if (pip->f.follow) {
+	    if (pip->fl.follow) {
 
 	        sbp = &ssb ;
 	        rs = fsdirtreestat(name,0,&ssb) ; /* STAT */
@@ -2320,7 +2320,7 @@ FSDIRTREE_STAT	*sbp ;
 	            if (DEBUGLEVEL(4))
 	                debugprintf("main/procother: symlink DANGLING\n") ;
 #endif
-	            if (! pip->f.nostop) goto done ;
+	            if (! pip->fl.nostop) goto done ;
 	            rs = SR_OK ;
 	        }
 
@@ -2339,14 +2339,14 @@ FSDIRTREE_STAT	*sbp ;
 
 /* prepare for suffix checks */
 
-	f_suf = (pip->have.sufreq || pip->f.sufacc || pip->f.sufrej) ;
+	f_suf = (pip->have.sufreq || pip->fl.sufacc || pip->fl.sufrej) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("main/procother: f_suf=%u\n",f_suf) ;
 #endif
 
-	if (f_suf || pip->f.cores)
+	if (f_suf || pip->fl.cores)
 	    bnl = sfbasename(name,-1,&bnp) ;
 
 	if (f_suf) {
@@ -2402,7 +2402,7 @@ FSDIRTREE_STAT	*sbp ;
 
 /* check against the suffix-acceptance list */
 
-	        if (f_process && pip->f.sufacc && (! f_accept)) {
+	        if (f_process && pip->fl.sufacc && (! f_accept)) {
 	            slp = (pip->sufs + suf_acc) ;
 	            rs1 = vecpstr_findn(slp,sp,sl) ;
 	            f_accept = (rs1 >= 0) ;
@@ -2410,7 +2410,7 @@ FSDIRTREE_STAT	*sbp ;
 
 /* check against the suffix-rejectance list */
 
-	        if (f_process && pip->f.sufrej && (! f_accept)) {
+	        if (f_process && pip->fl.sufrej && (! f_accept)) {
 	            slp = (pip->sufs + suf_rej) ;
 	            rs1 = vecpstr_findn(slp,sp,sl) ;
 	            if (rs1 >= 0) f_process = FALSE ;
@@ -2436,7 +2436,7 @@ FSDIRTREE_STAT	*sbp ;
 
 /* check if it is a program (and disallowed) */
 
-	if ((rs >= 0) && f_process && pip->f.f_noprog && (! f_accept)) {
+	if ((rs >= 0) && f_process && pip->fl.f_noprog && (! f_accept)) {
 	    if (S_ISREG(sbp->st_mode)) {
 	        rs = fileobject(name) ;
 	        f_process = (rs == 0) ;
@@ -2445,7 +2445,7 @@ FSDIRTREE_STAT	*sbp ;
 
 /* check if it is a program (and required) */
 
-	if ((rs >= 0) && f_process && pip->f.cores && (! f_accept)) {
+	if ((rs >= 0) && f_process && pip->fl.cores && (! f_accept)) {
 	    f_process = FALSE ;
 	    if (S_ISREG(sbp->st_mode) && (strwcmp("core",bnp,bnl) == 0)) {
 	        rs = fileobject(name) ;
@@ -2470,7 +2470,7 @@ FSDIRTREE_STAT	*sbp ;
 	            if (DEBUGLEVEL(4))
 	                debugprintf("main/procother: name=>%s<\n",name) ;
 #endif
-	            if (! pip->f.quiet)
+	            if (! pip->fl.quiet)
 	                rs = bprintf(pip->ofp,"%s\n", name) ;
 	        }
 	        break ;
@@ -2496,16 +2496,16 @@ FSDIRTREE_STAT	*sbp ;
 	} /* end if (processed) */
 
 done:
-	if ((pip->debuglevel > 0) | ((rs < 0) && (! pip->f.quiet))) {
-	    if ((rs != SR_ACCESS) || (! pip->f.iacc))
+	if ((pip->debuglevel > 0) | ((rs < 0) && (! pip->fl.quiet))) {
+	    if ((rs != SR_ACCESS) || (! pip->fl.iacc))
 	        bprintf(pip->efp,"%s: fname=%s (%d:%u)\n",
 	            pip->progname,name,rs,f_process) ;
 	}
 
 ret1:
 	if (rs < 0) {
-	    if ((rs == SR_ACCESS) && pip->f.iacc) rs = SR_OK ;
-	    if ((! istermrs(rs)) && pip->f.nostop) rs = SR_OK ;
+	    if ((rs == SR_ACCESS) && pip->fl.iacc) rs = SR_OK ;
+	    if ((! istermrs(rs)) && pip->fl.nostop) rs = SR_OK ;
 	}
 
 ret0:
@@ -2660,13 +2660,13 @@ struct proginfo	*pip ;
 	                if (c > 0) {
 	                    switch (si) {
 	                    case suf_req:
-	                        pip->f.sufreq = TRUE ;
+	                        pip->fl.sufreq = TRUE ;
 	                        break ;
 	                    case suf_acc:
-	                        pip->f.sufacc = TRUE ;
+	                        pip->fl.sufacc = TRUE ;
 	                        break ;
 	                    case suf_rej:
-	                        pip->f.sufrej = TRUE ;
+	                        pip->fl.sufrej = TRUE ;
 	                        break ;
 	                    } /* end switch */
 	                } /* end if */
@@ -3052,7 +3052,7 @@ struct fileinfo	*ckp ;
 
 	if (sbp->st_dev != pip->tarstat.st_dev) {
 	    pip->c_linkerr += 1 ;
-	    if (! pip->f.nostop) rs = SR_XDEV ;
+	    if (! pip->fl.nostop) rs = SR_XDEV ;
 	    goto ret0 ;
 	}
 
@@ -3123,7 +3123,7 @@ struct fileinfo	*ckp ;
 	    }
 	} /* end if */
 
-	if ((rs == SR_EXIST) && (! pip->f.quiet))
+	if ((rs == SR_EXIST) && (! pip->fl.quiet))
 	    bprintf(pip->efp,"%s: exists=%u\n",pip->progname,w) ;
 
 ret0:
@@ -3294,7 +3294,7 @@ LINKINFO	*lip ;
 	    }
 	} /* end if */
 
-	if ((rs == SR_EXIST) && (! pip->f.quiet))
+	if ((rs == SR_EXIST) && (! pip->fl.quiet))
 	    bprintf(pip->efp,"%s: exists=%u\n",pip->progname,w) ;
 
 ret0:
