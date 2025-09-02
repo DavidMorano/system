@@ -178,9 +178,9 @@ int main(int argc,cchar **argv,cchar **envv) {
 	pip->efp = efp ;
 	pip->ofp = ofp ;
 	pip->verboselevel = 1 ;
-	pip->f.no = FALSE ;
-	pip->f.quiet = FALSE ;
-	pip->f.outopen = FALSE ;
+	pip->fl.no = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.outopen = FALSE ;
 
 /* get the current time-of-day */
 
@@ -345,12 +345,12 @@ int main(int argc,cchar **argv,cchar **envv) {
 	                            break ;
 
 	                        case 'n':
-	                            pip->f.no = TRUE ;
+	                            pip->fl.no = TRUE ;
 	                            break ;
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* verbose mode */
@@ -663,7 +663,7 @@ retregular:
 /* bad ERRORs */
 badnofile:
 	ex = EX_NOINPUT ;
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 	    bprintf(efp,"%s: no filename was specified\n",
 	        pip->progname) ;
 
@@ -684,14 +684,14 @@ PROGINFO	*pip ;
 	int	rs = SR_OK ;
 
 
-	if (! pip->f.outopen) {
+	if (! pip->fl.outopen) {
 
 	    rs = bopen(pip->ofp,BFILE_STDOUT,"drwc",0666) ;
 
 	    if (rs < 0)
 	        return rs ;
 
-	    pip->f.outopen = TRUE ;
+	    pip->fl.outopen = TRUE ;
 
 	}
 
@@ -706,11 +706,11 @@ PROGINFO	*pip ;
 	int	rs = SR_OK ;
 
 
-	if (pip->f.outopen) {
+	if (pip->fl.outopen) {
 
 	    (void) bclose(pip->ofp) ;
 
-	    pip->f.outopen = FALSE ;
+	    pip->fl.outopen = FALSE ;
 
 	}
 
