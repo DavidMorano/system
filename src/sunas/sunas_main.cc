@@ -204,7 +204,7 @@ int main(int argc,mainv argv,mainv envv) {
 	if ((cp = getenv(VARERRORFNAME)) == nullptr) cp = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,cp,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = true ;
+	    pip->fl.errfile = true ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	} else if (! isNotPresent(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
@@ -276,7 +276,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* return */
 	if (pip->efp != nullptr) {
-	    pip->f.errfile = false ;
+	    pip->fl.errfile = false ;
 	    bclose(pip->efp) ;
 	    pip->efp = nullptr ;
 	}
