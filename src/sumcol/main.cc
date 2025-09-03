@@ -382,7 +382,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* follow symbolic links */
 	                case argopt_follow:
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    break ;
 
 /* default action and user specified help */
@@ -416,22 +416,22 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* optional division */
 	                    case 'd':
-	                        pip->f.divide = TRUE ;
+	                        pip->fl.divide = TRUE ;
 	                        break ;
 
 /* ignore mode */
 	                    case 'i':
-	                        pip->f.ignore = TRUE ;
+	                        pip->fl.ignore = TRUE ;
 	                        break ;
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* options */
@@ -618,7 +618,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            cchar	*fmt = "%s: invalid usage (%d)\n" ;
 	            bprintf(pip->efp,fmt,pip->progname,rs) ;
 	        }
@@ -842,7 +842,7 @@ static int procout(PROGINFO *pip,cchar *ofn)
 
 	    for (i = 0 ; i < pip->n ; i += 1) {
 
-	        if (pip->f.fdec) {
+	        if (pip->fl.fdec) {
 
 	            bprintf(ofp,"%12.4f %12.4f\n",
 	                pip->pairs[i].x,pip->pairs[i].sum) ;
@@ -907,7 +907,7 @@ static int procreduce(PROGINFO *pip)
 static int procdivide(PROGINFO *pip,int nfiles)
 {
 	int		rs = SR_OK ;
-	if (pip->f.divide && (nfiles > 0)) {
+	if (pip->fl.divide && (nfiles > 0)) {
 	    const double	dnom = (double) nfiles ;
 	    int			i ;
 
