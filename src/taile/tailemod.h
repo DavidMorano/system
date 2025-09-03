@@ -7,23 +7,23 @@
 #define	TAILEMOD_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<vecobj.h>
+#include	<vecstr.h>
+
+
 #define	TAILEMOD_MAGIC	31815927
 #define	TAILEMOD	struct tailemod_head
 #define	TAILEMOD_CALLS	struct tailemod_calls
 #define	TAILEMOD_ENT	struct tailemod_ent
 #define	TAILEMOD_MODULE	struct tailemod_module
 #define	TAILEMOD_INFO	struct tailemod_i
-
-
-#include	<sys/types.h>
-
-#include	<vecobj.h>
-#include	<vecstr.h>
-#include	<localmisc.h>
-
-
 /* module flags */
-
 #define	TAILEMOD_MFULL		0x0001
 #define	TAILEMOD_MHALFOUT	0x0002
 #define	TAILEMOD_MHALFIN	0x0004
@@ -39,13 +39,13 @@ struct tailemod_flags {
 } ;
 
 struct tailemod_head {
-	unsigned long	magic ;
+	mainv		dirs ;
 	char		*pr ;
-	cchar	**dirs ;
-	struct tailemod_flags	f ;
 	vecobj		modules ;		/* shared objects */
 	vecobj		entries ;		/* name entries */
 	vecstr		dirlist ;
+	TAILEMOD_FL	f ;
+	uint		magic ;
 } ;
 
 struct tailemod_calls {
@@ -66,7 +66,7 @@ struct tailemod_module {
 } ;
 
 struct tailemod_ent {
-	cchar	*name ;
+	cchar		*name ;
 	struct tailemod_module	*mp ;
 	struct tailemod_calls	c ;
 	int		size ;		/* object size */
@@ -95,6 +95,5 @@ EXTERNC_end
 
 
 #endif /* TAILEMOD_INCLUDE */
-
 
 
