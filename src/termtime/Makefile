@@ -39,7 +39,19 @@ MODS+=
 MODS+=
 MODS+= 
 
-LIBS+= -luo -lu
+LIBS+= -lf -luo -lu
+
+
+DEPS_MAIN += 
+
+OBJ0= termtime_main.o 
+OBJ1=
+OBJ2=
+OBJ3= 
+
+OBJA= obj0.o 
+
+OBJ_MAIN= obja.o
 
 
 INCDIRS=
@@ -56,18 +68,6 @@ CFLAGS		?= $(MAKECFLAGS)
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
-
-
-DEPS_MAIN += 
-
-OBJ0= termtime_main.o 
-OBJ1=
-OBJ2=
-OBJ3= 
-
-OBJA= obj0.o 
-
-OBJ_MAIN= obja.o
 
 
 .SUFFIXES:		.hh .ii .iim .ccm
