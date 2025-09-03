@@ -162,7 +162,7 @@ PROGINFO	*pip ;
 #endif
 
 	rs1 = SR_NOENT ;
-	f_secreq = (! pip->f.proglocal) ;
+	f_secreq = (! pip->fl.proglocal) ;
 
 	cp = pip->svcfname ;
 	cl = -1 ;
@@ -260,15 +260,15 @@ PROGINFO	*pip ;
 
 	if ((rs = perm(pip->svcfname,-1,-1,NULL,R_OK)) >= 0) {
 	    if (pip->fromconf.svcfname) {
-	        pip->f.secure_svcfile = 
-	            pip->f.secure_root && pip->f.secure_conf ;
+	        pip->fl.secure_svcfile = 
+	            pip->fl.secure_root && pip->fl.secure_conf ;
 	        } else
-	            pip->f.secure_svcfile = pip->f.secure_root ;
+	            pip->fl.secure_svcfile = pip->fl.secure_root ;
 
-	    if (f_secreq || (! pip->f.secure_svcfile)) {
+	    if (f_secreq || (! pip->fl.secure_svcfile)) {
 
 	        rs = securefile(pip->svcfname,pip->euid,pip->egid) ;
-	        pip->f.secure_svcfile = (rs > 0) ;
+	        pip->fl.secure_svcfile = (rs > 0) ;
 
 	    } /* end if */
 	}
