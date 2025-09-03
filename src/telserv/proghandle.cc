@@ -1083,7 +1083,7 @@ gotpty:
 
 	/* * Show banner that getty never gave.  */
 
-	if (pip->f.showsysbanner)
+	if (pip->fl.showsysbanner)
 		showbanner() ;
 
 	if ((pid = fork()) < 0)
