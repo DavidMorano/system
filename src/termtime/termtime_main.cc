@@ -4,12 +4,6 @@
 /* part of TERMCHAR program */
 /* version %I% last-modified %G% */
 
-#define	CF_CHARSETS	0		/* set character sets */
-#define	CF_ANSILEVEL	0		/* set ANSI conformance level */
-#define	CF_DECHEBREW	0		/* use DEC Hebrew */
-#define	CF_DECSUP	0		/* use DEC Supplemental */
-#define	CF_HEBREW	0		/* use DEC Hebrew */
-#define	CF_ANSIREC	1		/* use ANSI recommendation */
 
 /* revision history:
 
@@ -36,6 +30,7 @@
 *****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<ctime>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -46,11 +41,15 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
-#include	<strop.h>
+#include	<uclibmem.h>
+#include	<uctimeconvx.h>		/* |uc_localtime(3uc)| */
+#include	<ucstrftime.h>		/* |uc_strftime(3uc)| */
+#include	<strmgr.h>
 #include	<ascii.h>
 #include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
 
+import ulibvals ;			
 
 /* local defines */
 
@@ -62,37 +61,79 @@
 /* external subroutines */
 
 
-/* external variable */
+/* external variables */
+
+
+/* external variables */
 
 
 /* forward references */
 
+local int	mktermstr(strmgr *) noex ;
+local int	mktimestr(char *,int) noex ;
+
 
 /* local variables */
 
-static cchar	ss2[] = "\033N" ;
-static cchar	ss3[] = "\033O" ;
+local cint	pagesz = ulibval.pagesz ;
 
-static cchar	ls0[] = "\017" ;		/* also SI */
-static cchar	ls1[] = "\016" ;		/* also SO */
-static cchar	ls2[] = "\033n" ;
-static cchar	ls3[] = "\033o" ;
 
-static cchar	ls1r[] = "\033~" ;
-static cchar	ls2r[] = "\033}" ;
-static cchar	ls3r[] = "\033|" ;
+/* exported variables */
 
 
 /* exported subroutines */
 
-int main(int argc,mainv,mainv) {
+int main(int,mainv,mainv) {
+    	cnothrow	nt{} ;
+	cnullptr	np{} ;
 	FILE		*fp = stdout ;
-	int		rs = SR_OK ;
+	int		rs ;
+	int		rs1 ;
 	int		ex = EX_SUCCESS ;
-
-
+	if ((rs = pagesz) >= 0) {
+	    cint tlen = rs ;
+	    if (char *tbuf ; (tbuf = new(nt) char[tlen + 1]) != np) {
+		if (strmgr sm ; (rs = sm.start(tbuf,tlen)) >= 0) {
+		    if ((rs = mktermstr(&sm)) >= 0) {
+			if (cc *cp ; (rs = sm.get(&cp)) >= 0) {
+			    rs = fwrite(fp,cp,rs) ;
+			} /* end if (sm.get) */
+		    } /* end if (mktermstr) */
+		    rs1 = sm.finish ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (strmgr) */
+		delete [] tbuf ;
+	    } /* end if (m-a-f) */
+	} /* end if (pagesz) */
 	if ((ex == EX_SUCCESS) && (rs < 0)) ex = EX_DATAERR ;
 	return ex ;
 } /* end subroutine (main) */
+
+
+/* local subroutines */
+
+local int mktermstr(strmgr *smp) noex {
+	cint		slen = TIMEBUFLEN ;
+    	int		rs ;
+	if (char sbuf[slen + 1] ; (rs = mktimestr(sbuf,slen)) >= 0) {
+	    rs = SR_OK ;
+	    (void) smp ;
+
+
+	} /* end if (mktimestr) */
+	return rs ;
+} /* end subroutine (mktermstr) */
+
+local int mktimestr(char *tbuf,int tlen) noex {
+    	custime		dt = time(nullptr) ;
+    	int		rs ;
+	int		tl = 0 ; /* return-value */
+	if (TM ts ; (rs = uc_localtime(&dt,&ts)) >= 0) {
+	    cchar *fmt = "%a %e %H:%M" ;
+	    rs = uc_strftime(tbuf,tlen,fmt,&ts) ;
+	    tl = rs ;
+	} /* end if (uc_localtime) */
+	return (rs >= 0) ? tl : rs ;
+} /* end subroutine (mktimestr) */
 
 
