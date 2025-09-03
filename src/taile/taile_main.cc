@@ -268,11 +268,11 @@ int main(int argc,mainv argv,mainv envv) {
 
 	pip->verboselevel = 1 ;
 
-	pip->f.quiet = FALSE ;
-	pip->f.carriage = FALSE ;
-	pip->f.background = FALSE ;
-	pip->f.usestdin = TRUE ;	/* TRUE */
-	pip->f.clean = TRUE ;		/* TRUE */
+	pip->fl.quiet = FALSE ;
+	pip->fl.carriage = FALSE ;
+	pip->fl.background = FALSE ;
+	pip->fl.usestdin = TRUE ;	/* TRUE */
+	pip->fl.clean = TRUE ;		/* TRUE */
 
 /* other early initialization */
 
@@ -544,12 +544,12 @@ int main(int argc,mainv argv,mainv envv) {
 	                case argopt_wait:
 	                    pip->final.wait= TRUE ;
 	                    pip->have.wait = TRUE ;
-	                    pip->f.wait = TRUE ;
+	                    pip->fl.wait = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.wait = (rs > 0) ;
+	                            pip->fl.wait = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -557,7 +557,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                case argopt_fold:
 	                    pip->final.fold = TRUE ;
 	                    pip->have.fold = TRUE ;
-	                    pip->f.fold = TRUE ;
+	                    pip->fl.fold = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
@@ -566,7 +566,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            if (pip->linelen > 0) {
 	                                pip->have.linelen = TRUE ;
 	                            } else {
-	                                pip->f.fold = FALSE ;
+	                                pip->fl.fold = FALSE ;
 	                            }
 	                        }
 	                    }
@@ -598,7 +598,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -618,7 +618,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        break ;
 
 	                    case 'b':
-	                        pip->f.background = TRUE ;
+	                        pip->fl.background = TRUE ;
 	                        break ;
 
 	                    case 'c':
@@ -648,7 +648,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        break ;
 
 	                    case 'r':
-	                        pip->f.carriage = TRUE ;
+	                        pip->fl.carriage = TRUE ;
 	                        break ;
 
 /* poll interval */
@@ -918,7 +918,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    rs = vecstr_add(&files,cp,-1) ;
 	} /* end if */
 
-	if ((rs >= 0) && (! f_used) && pip->f.usestdin && (narg == 0)) {
+	if ((rs >= 0) && (! f_used) && pip->fl.usestdin && (narg == 0)) {
 	    narg += 1 ;
 	    rs = vecstr_add(&files,STDFNIN,-1) ;
 	} /* end if */
@@ -957,7 +957,7 @@ int main(int argc,mainv argv,mainv envv) {
 	if (rs >= 0) {
 
 	    opts = 0 ;
-	    if (pip->f.carriage)
+	    if (pip->fl.carriage)
 	        opts |= FILEWATCH_MCARRIAGE ;
 
 	    rs = SR_OK ;
@@ -1007,7 +1007,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    if (rs < 0) {
 
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            bprintf(pip->efp,"%s: could not open file=%s\n",
 	                pip->progname,cp) ;
 
@@ -1035,7 +1035,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        pip->pid_session = rs1 ;
 
 	    rs = 0 ;
-	    if (pip->f.background) {
+	    if (pip->fl.background) {
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4)) {
@@ -1132,7 +1132,7 @@ int main(int argc,mainv argv,mainv envv) {
 	            if ((rs < 0) && (rs != SR_NOENT))
 	                break ;
 
-	            if ((rs == SR_NOENT) && (! pip->f.wait)) {
+	            if ((rs == SR_NOENT) && (! pip->fl.wait)) {
 	                filewatch_finish(wp) ;
 	                vechand_del(&watchers,i) ;
 	                uc_free(wp) ;
@@ -1144,7 +1144,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	        } /* end for */
 
-	        if ((! pip->f.wait) && (nfiles <= 0)) {
+	        if ((! pip->fl.wait) && (nfiles <= 0)) {
 	            if_exit = TRUE ;
 	            break ;
 	        }
@@ -1190,7 +1190,7 @@ done:
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1266,7 +1266,7 @@ badarg:
 
 badnofiles:
 	ex = EX_USAGE ;
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 	    bprintf(pip->efp,"%s: no files were specified\n",
 	        pip->progname) ;
 	goto retearly ;
@@ -1343,10 +1343,10 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                if (! pip->final.wait) {
 	                    n += 1 ;
 	                    pip->have.wait = TRUE ;
-	                    pip->f.wait = TRUE ;
+	                    pip->fl.wait = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.wait = (rs > 0) ;
+	                        pip->fl.wait = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1354,10 +1354,10 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                if (! pip->final.usestdin) {
 	                    n += 1 ;
 	                    pip->have.usestdin = TRUE ;
-	                    pip->f.usestdin = TRUE ;
+	                    pip->fl.usestdin = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.usestdin = (rs > 0) ;
+	                        pip->fl.usestdin = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1365,10 +1365,10 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                if (! pip->final.useown) {
 	                    n += 1 ;
 	                    pip->have.useown = TRUE ;
-	                    pip->f.useown = TRUE ;
+	                    pip->fl.useown = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.useown = (rs > 0) ;
+	                        pip->fl.useown = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1376,10 +1376,10 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                if (! pip->final.fold) {
 	                    n += 1 ;
 	                    pip->have.fold = TRUE ;
-	                    pip->f.fold = TRUE ;
+	                    pip->fl.fold = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.fold = (rs > 0) ;
+	                        pip->fl.fold = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1387,10 +1387,10 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                if (! pip->final.clean) {
 	                    n += 1 ;
 	                    pip->have.clean = TRUE ;
-	                    pip->f.clean = TRUE ;
+	                    pip->fl.clean = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.clean = (rs > 0) ;
+	                        pip->fl.clean = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1419,7 +1419,7 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                    n += 1 ;
 	                    pip->have.linelen = TRUE ;
 	                    pip->final.linelen = TRUE ;
-	                    pip->f.linelen = TRUE ;
+	                    pip->fl.linelen = TRUE ;
 	                    if (vl > 0) {
 	                        rs = cfdecui(vp,vl,&uv) ;
 	                        pip->linelen = uv ;
@@ -1431,7 +1431,7 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                    n += 1 ;
 	                    pip->have.indent = TRUE ;
 	                    pip->final.indent = TRUE ;
-	                    pip->f.indent = TRUE ;
+	                    pip->fl.indent = TRUE ;
 	                    pip->indent = 8 ;
 	                    if (vl > 0) {
 	                        rs = cfdecui(vp,vl,&uv) ;
