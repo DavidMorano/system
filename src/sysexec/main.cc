@@ -203,7 +203,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if ((cp = getenv(VARERRORFNAME)) == NULL) cp = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,cp,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	} else if (! isNotPresent(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
@@ -284,7 +284,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* early return thing */
 
 	if (pip->efp != NULL) {
-	    pip->f.errfile = FALSE ;
+	    pip->fl.errfile = FALSE ;
 	    bclose(pip->efp) ;
 	    pip->efp = NULL ;
 	}
