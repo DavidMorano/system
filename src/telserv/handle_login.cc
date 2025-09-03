@@ -173,12 +173,12 @@ struct passwd	*pep ;
 	    debugprintf("handle_login: ese.access=>%s< defacc=>%s<\n",
 	        ese.access,pip->defacc) ;
 	    debugprintf("handle_login: f_acctab=%d f_inet=%d\n",
-	        pip->f.acctab,cnp->f.inet) ;
+	        pip->fl.acctab,cnp->fl.inet) ;
 	}
 #endif
 
 	rs = SR_OK ;
-	if (cnp->f.inet && ((ese.access != NULL) || (pip->defacc != NULL))) {
+	if (cnp->fl.inet && ((ese.access != NULL) || (pip->defacc != NULL))) {
 	    FIELD	af ;
 	    vecstr	netgroups, names ;
 	    int	fl ;
@@ -246,7 +246,7 @@ struct passwd	*pep ;
 
 /* try our own netgroups */
 
-	    if ((rs >= 0) && pip->f.acctab)
+	    if ((rs >= 0) && pip->fl.acctab)
 	        rs = acctab_anyallowed(&pip->atab,&netgroups,&names,NULL,NULL) ;
 
 #if	CF_DEBUG
@@ -256,7 +256,7 @@ struct passwd	*pep ;
 
 /* try the system netgroups (UNIX does not have one simple call as above !) */
 
-	    if ((! pip->f.acctab) || (rs < 0)) {
+	    if ((! pip->fl.acctab) || (rs < 0)) {
 
 	        char	*ngp, *mnp ;
 
@@ -334,7 +334,7 @@ struct passwd	*pep ;
 	    u_close(fd) ;
 
 	    count += 1 ;
-	    if ((rs >= 0) && pip->f.log)
+	    if ((rs >= 0) && pip->fl.log)
 	        logfile_printf(&pip->lh,"project=%u",rs) ;
 
 	} /* end if (project file) */
@@ -356,7 +356,7 @@ struct passwd	*pep ;
 	        u_close(fd) ;
 
 	        count += 1 ;
-	        if ((rs >= 0) && pip->f.log)
+	        if ((rs >= 0) && pip->fl.log)
 	            logfile_printf(&pip->lh,"plan=%u",rs) ;
 
 	    } /* end if (project file) */
