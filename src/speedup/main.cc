@@ -606,7 +606,7 @@ const char	*envv[] ;
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'o':
@@ -801,26 +801,26 @@ const char	*envv[] ;
 	                wi = matostr(whiches,2,cp,cl) ;
 	                switch (wi) {
 	                case which_sum:
-	                    lip->f.sum = TRUE ;
+	                    lip->fl.sum = TRUE ;
 	                    break ;
 	                case which_amean:
-	                    lip->f.amean = TRUE ;
+	                    lip->fl.amean = TRUE ;
 	                    break ;
 	                case which_hmean:
-	                    lip->f.hmean = TRUE ;
+	                    lip->fl.hmean = TRUE ;
 	                    break ;
 	                } /* end switch */
 	            } /* end if (non-zero value) */
 	            break ;
 	        case progopt_sum:
 	        case progopt_asum:
-	            lip->f.sum = TRUE ;
+	            lip->fl.sum = TRUE ;
 	            break ;
 	        case progopt_amean:
-	            lip->f.amean = TRUE ;
+	            lip->fl.amean = TRUE ;
 	            break ;
 	        case progopt_hmean:
-	            lip->f.hmean = TRUE ;
+	            lip->fl.hmean = TRUE ;
 	            break ;
 	        } /* end switch */
 
@@ -832,18 +832,18 @@ const char	*envv[] ;
 
 /* if we do not have a request for something yet, use our progmode */
 
-	f = lip->f.sum || lip->f.amean || lip->f.hmean ;
+	f = lip->fl.sum || lip->fl.amean || lip->fl.hmean ;
 	if (! f) {
 	    switch (pip->progmode) {
 	    case progmode_amean:
-	        lip->f.amean = TRUE ;
+	        lip->fl.amean = TRUE ;
 	        break ;
 	    case progmode_hmean:
-	        lip->f.hmean = TRUE ;
+	        lip->fl.hmean = TRUE ;
 	        break ;
 	    case progmode_asum:
 	    default:
-	        lip->f.sum = TRUE ;
+	        lip->fl.sum = TRUE ;
 	        break ;
 	    } /* end switch */
 	} /* end if (didn't get anuthing yet) */
@@ -851,20 +851,20 @@ const char	*envv[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
 	    debugprintf("main: requests sum=%u amean=%u, hmean=%u\n",
-	        lip->f.sum,lip->f.amean,lip->f.hmean) ;
+	        lip->fl.sum,lip->fl.amean,lip->fl.hmean) ;
 #endif
 
 	if (pip->debuglevel > 0) {
 
-	    if (lip->f.sum)
+	    if (lip->fl.sum)
 	        bprintf(pip->efp,"%s: request> %s\n",
 	            pip->progname,whiches[which_sum]) ;
 
-	    if (lip->f.amean)
+	    if (lip->fl.amean)
 	        bprintf(pip->efp,"%s: request> %s\n",
 	            pip->progname,whiches[which_amean]) ;
 
-	    if (lip->f.hmean)
+	    if (lip->fl.hmean)
 	        bprintf(pip->efp,"%s: request> %s\n",
 	            pip->progname,whiches[which_hmean]) ;
 
@@ -950,7 +950,7 @@ const char	*envv[] ;
 
 	            bclose(&argfile) ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                bprintf(pip->efp,
 	                    "%s: could not open the argument list file (%d)\n",
 	                    pip->progname,rs) ;
@@ -1001,7 +1001,7 @@ const char	*envv[] ;
 
 	            bclose(&infile) ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                bprintf(pip->efp,
 	                    "%s: could not open the input file (%d)\n",
 	                    pip->progname,rs) ;
@@ -1018,21 +1018,21 @@ const char	*envv[] ;
 	        double	fnum ;
 	        int	wi ;
 
-	        if (lip->f.sum) {
+	        if (lip->fl.sum) {
 	            wi = which_sum ;
 	            if ((rs = processor_result(&nproc,wi,&fnum)) >= 0) {
 	                bprintf(ofp,"%14.4f\n",fnum) ;
 		    }
 	        }
 
-	        if (lip->f.amean) {
+	        if (lip->fl.amean) {
 	            wi = which_amean ;
 	            if ((rs = processor_result(&nproc,wi,&fnum)) >= 0) {
 	                bprintf(ofp,"%14.4f\n",fnum) ;
 		    }
 	        }
 
-	        if (lip->f.hmean) {
+	        if (lip->fl.hmean) {
 	            wi = which_hmean ;
 	            if ((rs = processor_result(&nproc,wi,&fnum)) >= 0) {
 	                bprintf(ofp,"%14.4f\n",fnum) ;
