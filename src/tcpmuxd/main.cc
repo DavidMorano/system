@@ -68,7 +68,6 @@
 #include	<varsub.h>
 #include	<storebuf.h>
 #include	<char.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -614,18 +613,18 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->daytime = time(NULL) ;
 	pip->hostid = (uint) gethostid() ;
 
-	pip->f.defsvc = TRUE ;
-	pip->f.logprog = TRUE ;		/* default logging */
+	pip->fl.defsvc = TRUE ;
+	pip->fl.logprog = TRUE ;		/* default logging */
 
 #if	defined(P_PCSPOLL) && (P_PCSPOLL > 0)
-	pip->f.defpidlock = TRUE ;
-	pip->f.stampfname = TRUE ;
-	pip->f.rundname = FALSE ;
+	pip->fl.defpidlock = TRUE ;
+	pip->fl.stampfname = TRUE ;
+	pip->fl.rundname = FALSE ;
 #endif
 
 #if	defined(P_FINGERS) && (P_FINGERS > 0)
-	pip->f.loginsvc = TRUE ;
-	pip->f.useracct = TRUE ;	/* match on user-accounts */
+	pip->fl.loginsvc = TRUE ;
+	pip->fl.useracct = TRUE ;	/* match on user-accounts */
 #endif
 
 /* start parsing the arguments */
@@ -802,7 +801,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    if ((rs >= 0) && (cp != NULL)) {
 	                        pip->have.lfname = TRUE ;
 	                        pip->final.lfname = TRUE ;
-	                        pip->f.lfname = TRUE ;
+	                        pip->fl.lfname = TRUE ;
 	                        pip->lfname = cp ;
 	                    }
 	                    break ;
@@ -898,7 +897,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* pass-FD */
 	                case argopt_passfd:
-	                    pip->f.passfd = TRUE ;
+	                    pip->fl.passfd = TRUE ;
 	                    pip->fd_pass = FD_STDIN ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
@@ -913,12 +912,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                case argopt_ra:
 	                    pip->have.reuseaddr = TRUE ;
 	                    pip->final.reuseaddr = TRUE ;
-	                    pip->f.reuseaddr = TRUE ;
+	                    pip->fl.reuseaddr = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.reuseaddr = (rs > 0) ;
+	                            pip->fl.reuseaddr = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -927,12 +926,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                case argopt_log:
 	                    pip->have.logprog = TRUE ;
 	                    pip->final.logprog = TRUE ;
-	                    pip->f.logprog = TRUE ;
+	                    pip->fl.logprog = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.logprog = (rs > 0) ;
+	                            pip->fl.logprog = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -945,7 +944,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        argl = strlen(argp) ;
 	                        if (argl) {
 	                            KEYOPT	*kop = &pip->cmds ;
-	                            pip->f.cmd = TRUE ;
+	                            pip->fl.cmd = TRUE ;
 	                            rs = keyopt_loads(kop,argp,argl) ;
 	                        }
 	                    } else
@@ -954,7 +953,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* close-all-files */
 	                case argopt_caf:
-	                    pip->f.caf = TRUE ;
+	                    pip->fl.caf = TRUE ;
 	                    break ;
 
 /* handle all keyword defaults */
@@ -1023,7 +1022,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -1033,12 +1032,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* background mode */
 	                    case 'b':
-	                        pip->f.background = TRUE ;
+	                        pip->fl.background = TRUE ;
 	                        break ;
 
 /* daemon mode */
 	                    case 'd':
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -1055,7 +1054,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* force a run */
 	                    case 'f':
-	                        pip->f.force = TRUE ;
+	                        pip->fl.force = TRUE ;
 	                        pip->final.intmin = TRUE ;
 	                        pip->have.intmin = TRUE ;
 	                        pip->intmin = 0 ;
@@ -1115,14 +1114,14 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* uniq mode (check our PID mutex w/o error message) */
 	                    case 'u':
-	                        pip->f.uniq = TRUE ;
+	                        pip->fl.uniq = TRUE ;
 	                        pip->have.uniq = TRUE ;
 	                        pip->final.uniq = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.uniq = (rs > 0) ;
+	                                pip->fl.uniq = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1261,7 +1260,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 #if	CF_CHECKONC
 	if (rs >= 0) {
 	    if ((rs = checkonc(pip->pr,NULL,NULL,NULL)) >= 0) {
-		pip->f.onckey = TRUE ;
+		pip->fl.onckey = TRUE ;
 	    }
 	}
 #endif /* CF_CHECKONC */
@@ -1410,13 +1409,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* reset our effect UID if we are: a) SUID and b) sn=poll */
 
 #if	defined(P_PCSPOLL) && (P_PCSPOLL > 0)
-	pip->f.proglocal = (pip->searchname != NULL) && 
+	pip->fl.proglocal = (pip->searchname != NULL) && 
 	    (strcmp(pip->searchname,"poll") == 0) ;
 
-	if (pip->f.proglocal && (pip->uid != pip->euid))
+	if (pip->fl.proglocal && (pip->uid != pip->euid))
 	    u_seteuid(pip->uid) ;
 
-	if (pip->f.proglocal && (pip->gid != pip->egid))
+	if (pip->fl.proglocal && (pip->gid != pip->egid))
 	    u_setegid(pip->gid) ;
 #endif /* P_PCSPOLL */
 
@@ -1438,11 +1437,11 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if (rs >= 0) {
 
 	    rs1 = securefile(pip->pr,pip->euid,pip->egid) ;
-	    pip->f.secure_root = (rs1 > 0) ;
+	    pip->fl.secure_root = (rs1 > 0) ;
 
 	    if (pip->debuglevel > 0) {
 	        bprintf(pip->efp,"%s: secure_root=%u\n",
-	            pip->progname,pip->f.secure_root) ;
+	            pip->progname,pip->fl.secure_root) ;
 	    }
 
 /* make the hostname */
@@ -1619,7 +1618,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* run directory */
 
-	if ((rs >= 0) && pip->f.rundname) {
+	if ((rs >= 0) && pip->fl.rundname) {
 
 	    cp = pip->rundname ;
 	    cl = -1 ;
@@ -1721,15 +1720,15 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	        cp = argv[ai] ;
 	        if ((cp != NULL) && (cp[0] != '\0')) {
 	            pip->svcpass = cp ;
-	            pip->f.named = TRUE ;
+	            pip->fl.named = TRUE ;
 	            break ;
 		}
 	    }
 
 	} /* end for */
 
-	if (pip->f.daemon)
-	    pip->f.named = FALSE ;
+	if (pip->fl.daemon)
+	    pip->fl.named = FALSE ;
 
 /* do we have a stamp-file for ourselves? */
 
@@ -1767,7 +1766,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* now check if we need any servicing (only for unnamed services) */
 
 #if	CF_STAMPFNAME
-	if ((rs >= 0) && pip->f.stampfname) {
+	if ((rs >= 0) && pip->fl.stampfname) {
 
 #ifdef	COMMENT
 	    if (pip->open.log)
@@ -1777,7 +1776,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 #endif /* COMMENT */
 
 	    f = FALSE ;
-	    if (! pip->f.named) {
+	    if (! pip->fl.named) {
 	        rs = progstampcheck(pip) ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))
@@ -1789,7 +1788,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    if (rs < 0)
 	        goto badcheck ;	/* error */
 
-	    if ((! pip->f.named) && (! pip->f.daemon) && (! f)) {
+	    if ((! pip->fl.named) && (! pip->fl.daemon) && (! f)) {
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))
 	            debugprintf("main: no processing needed\n") ;
@@ -1812,7 +1811,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    debugprintf("main: pid-lock check\n") ;
 #endif
 
-	if ((pip->f.defpidlock && (! pip->f.named)) || pip->f.daemon) {
+	if ((pip->fl.defpidlock && (! pip->fl.named)) || pip->fl.daemon) {
 	    if ((rs = progpidbegin(pip,0)) >= 0) {
 
 	        if ((pip->debuglevel > 0) && (pip->pidfname != NULL)) {
@@ -1824,7 +1823,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    } /* end if */
 	} /* end if (PID mutex) */
 	if (rs < 0) {
-	    if ((! pip->f.quiet) || (pip->debuglevel > 0)) {
+	    if ((! pip->fl.quiet) || (pip->debuglevel > 0)) {
 	        bprintf(pip->efp,"%s: (1) PID mutex busy (%d)\n",
 	            pip->progname,rs) ;
 	    }
@@ -1862,7 +1861,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	vecstr_sort(&pip->defs,vstrkeycmp) ;
 
-	pip->f.secure_path = pip->f.secure_root ;
+	pip->fl.secure_path = pip->fl.secure_root ;
 	rs = envs_start(&pip->xenvs,DEFNXENVS) ;
 	if (rs < 0) {
 	    ex = EX_OSERR ;
@@ -1983,9 +1982,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	ainfo.ai_pos = ai_pos ;
 	if (rs >= 0) {
 	    if ((rs = proguserlist_begin(pip)) >= 0) {
-	        if (pip->f.cmd) {
+	        if (pip->fl.cmd) {
 	            rs = progcmd(pip,&ainfo) ;
-	        } else if (pip->f.passfd) {
+	        } else if (pip->fl.passfd) {
 	            rs = progpass(pip,&ainfo) ;
 	        } else {
 	            rs = progprocess(pip,&ainfo,&u) ;
@@ -2049,7 +2048,7 @@ badopts:
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: invalid argument (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -2248,10 +2247,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_log:
 	                    if (! pip->final.logprog) {
 	                        pip->have.logprog = TRUE ;
-	                        pip->f.logprog = TRUE ;
+	                        pip->fl.logprog = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.logprog = (rs > 0) ;
+	                            pip->fl.logprog = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2270,40 +2269,40 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_reuseaddr:
 	                    if (! pip->final.reuseaddr) {
 	                        pip->have.reuseaddr = TRUE ;
-	                        pip->f.reuseaddr = TRUE ;
+	                        pip->fl.reuseaddr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.reuseaddr = (rs > 0) ;
+	                            pip->fl.reuseaddr = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case akoname_showsysbanner:
 	                    if (! pip->final.showsysbanner) {
 	                        pip->have.showsysbanner = TRUE ;
-	                        pip->f.showsysbanner = TRUE ;
+	                        pip->fl.showsysbanner = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.showsysbanner = (rs > 0) ;
+	                            pip->fl.showsysbanner = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case akoname_uniq:
 	                    if (! pip->final.uniq) {
 	                        pip->have.uniq = TRUE ;
-	                        pip->f.uniq = TRUE ;
+	                        pip->fl.uniq = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.uniq = (rs > 0) ;
+	                            pip->fl.uniq = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case akoname_quiet:
 	                    if (! pip->final.quiet) {
 	                        pip->have.quiet = TRUE ;
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.quiet = (rs > 0) ;
+	                            pip->fl.quiet = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -3116,7 +3115,7 @@ static int loadxfile(PROGINFO *pip,cchar *xfname)
 	    if (S_ISREG(sb.st_mode)) {
 	        if ((rs = permid(&pip->id,&sb,R_OK)) >= 0) {
 		    if ((rs = securefile(xfname,pip->euid,pip->egid)) >= 0) {
-	    		pip->f.secure_path = TRUE ;
+	    		pip->fl.secure_path = TRUE ;
 		    } else if (isNotPresent(rs)) {
 			rs = SR_OK ;
 		    }
