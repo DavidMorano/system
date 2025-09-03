@@ -188,7 +188,7 @@ const char	cfname[] ;
 
 /* look for configuration file */
 
-	f_secreq = (! pip->f.proglocal) ;
+	f_secreq = (! pip->fl.proglocal) ;
 	schedp = (sched != NULL) ? sched : schedpconf ;
 
 #if	CF_DEBUG
@@ -266,15 +266,15 @@ const char	cfname[] ;
 	} /* end if */
 
 	if (rs >= 0) {
-	    pip->f.secure_conf = pip->f.secure_root ;
-	    if (f_secreq || (! pip->f.secure_conf)) {
+	    pip->fl.secure_conf = pip->fl.secure_root ;
+	    if (f_secreq || (! pip->fl.secure_conf)) {
 	        rs1 = securefile(pip->cfname,pip->euid,pip->egid) ;
-	        pip->f.secure_conf = (rs1 > 0) ;
+	        pip->fl.secure_conf = (rs1 > 0) ;
 	    }
 	}
 
 	if (rs >= 0)
-	    pip->f.pc = TRUE ;
+	    pip->fl.pc = TRUE ;
 
 	if ((rs >= 0) && pip->open.params)
 	    rs = progconfigread(pip) ;
@@ -286,7 +286,7 @@ ret0:
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("progconfigstart: ret rs=%d f_pc=%u\n",rs,pip->f.pc) ;
+	    debugprintf("progconfigstart: ret rs=%d f_pc=%u\n",rs,pip->fl.pc) ;
 #endif
 
 	return rs ;
@@ -299,7 +299,7 @@ bad4:
 	}
 
 bad1:
-	pip->f.pc = FALSE ;
+	pip->fl.pc = FALSE ;
 	pip->open.params = FALSE ;
 
 	goto ret0 ;
@@ -314,10 +314,10 @@ int progconfigfinish(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("progconfigfinish: ent f_pc=%u\n",pip->f.pc) ;
+	    debugprintf("progconfigfinish: ent f_pc=%u\n",pip->fl.pc) ;
 #endif
 
-	if (pip->f.pc) {
+	if (pip->fl.pc) {
 	    LISTENSPEC	*lsp ;
 	    vecobj	*llp = &pip->listens ;
 	    int		i ;
@@ -349,7 +349,7 @@ int progconfigcheck(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 
-	if (pip->f.pc && pip->open.params) {
+	if (pip->fl.pc && pip->open.params) {
 	    time_t	dt = pip->daytime ;
 	    if ((rs = paramfile_check(&pip->params,dt)) > 0) {
 	        f = TRUE ;
@@ -367,7 +367,7 @@ int progconfigread(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pip->f.pc && pip->open.params) {
+	if (pip->fl.pc && pip->open.params) {
 	    vecobj	tmplistens ;
 	    int		size = sizeof(LISTENSPEC) ;
 	    pip->changed.pc = TRUE ;
@@ -416,7 +416,7 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("progconfigread: f_pc=%u open_params=%u\n",
-	        pip->f.pc,pip->open.params) ;
+	        pip->fl.pc,pip->open.params) ;
 #endif
 
 	ckp = &pip->cooks ;
@@ -684,7 +684,7 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 	                pip->have.useracct = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(ep,el) ;
-	                    pip->f.useracct = (rs > 0) ;
+	                    pip->fl.useracct = (rs > 0) ;
 	                }
 	                break ;
 	            } /* end switch */
