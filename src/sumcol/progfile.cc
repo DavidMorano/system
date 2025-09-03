@@ -142,7 +142,7 @@ int progfile(PROGINFO *pip,cchar *fname)
 	                if (fl > 0)
 	                    rs = getval(pip,fp,fl,&x) ;
 
-	                if ((rs < 0) && pip->f.ignore)
+	                if ((rs < 0) && pip->fl.ignore)
 	                    rs = SR_OK ;
 
 	                if (rs < 0) break ;
@@ -261,7 +261,7 @@ static int getval(PROGINFO *pip,cchar *sp,int sl,double *vp)
 
 	if (strnchr(sp,sl,'.') != NULL) {
 
-	    pip->f.fdec = TRUE ;
+	    pip->fl.fdec = TRUE ;
 	    rs = cfdecf(sp,sl,vp) ;
 
 	} else {
