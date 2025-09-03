@@ -210,14 +210,14 @@ char	*envv[] ;
 	pip->euid = geteuid() ;
 
 	if (pip->uid != pip->euid)
-	    pip->f.setuid = TRUE ;
+	    pip->fl.setuid = TRUE ;
 
 	pip->gid = getgid() ;
 
 	pip->egid = getegid() ;
 
 	if (pip->gid != pip->egid)
-	    pip->f.setgid = TRUE ;
+	    pip->fl.setgid = TRUE ;
 
 #if	CF_DEBUGS
 	debugprintf("main: initial EUID=%d EGID=%d\n",
@@ -397,7 +397,7 @@ char	*envv[] ;
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* alternate effective group */
@@ -575,7 +575,7 @@ char	*envv[] ;
 	    switch (i) {
 
 	    case procopt_seven:
-	        pip->f.sevenbit = TRUE ;
+	        pip->fl.sevenbit = TRUE ;
 	        break ;
 
 	    } /* end switch */
@@ -586,7 +586,7 @@ char	*envv[] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("main: sevenbit=%d\n",pip->f.sevenbit) ;
+	    debugprintf("main: sevenbit=%d\n",pip->fl.sevenbit) ;
 #endif
 
 	} /* end block */
