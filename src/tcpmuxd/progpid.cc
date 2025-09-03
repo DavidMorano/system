@@ -84,7 +84,7 @@ int progpidbegin(PROGINFO *pip,int to)
 	int		rs = SR_OK ;
 	int		f ;
 
-	f = (pip->f.named || pip->f.passfd) ;
+	f = (pip->fl.named || pip->fl.passfd) ;
 	if (! f) {
 	    int		cl = -1 ;
 	    cchar	*cp = pip->pidfname ;
