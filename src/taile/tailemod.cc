@@ -178,7 +178,7 @@ const char	*dirs[] ;
 	    if (rs < 0)
 	        goto bad2 ;
 
-	    op->f.vsdirs = (rs >= 0)  ;
+	    op->fl.vsdirs = (rs >= 0)  ;
 	    for (i = 0 ; (rs >= 0) && (dirs[i] != NULL) ; i += 1) {
 
 	        rs = vecstr_add(&op->dirlist,(char *) dirs[i],-1) ;
@@ -223,7 +223,7 @@ bad5:
 
 bad4:
 bad3:
-	if (op->f.vsdirs)
+	if (op->fl.vsdirs)
 		vecstr_finish(&op->dirlist) ;
 
 bad2:
@@ -431,7 +431,7 @@ TAILEMOD	*op ;
 
 /* free up everything else */
 
-	if (op->f.vsdirs)
+	if (op->fl.vsdirs)
 	    vecstr_finish(&op->dirlist) ;
 
 	if (op->pr != NULL)
