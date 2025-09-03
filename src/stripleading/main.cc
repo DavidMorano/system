@@ -234,9 +234,9 @@ char	*envv[] ;
 	pip->progmode = -1 ;
 	pip->shave = -1 ;
 
-	pip->f.nochange = FALSE ;
-	pip->f.quiet = FALSE ;
-	pip->f.follow = FALSE ;
+	pip->fl.nochange = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.follow = FALSE ;
 
 /* process program arguments */
 
@@ -464,7 +464,7 @@ char	*envv[] ;
 
 /* follow symbolic links */
 	                case argopt_follow:
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    break ;
 
 /* default action and user specified help */
@@ -498,12 +498,12 @@ char	*envv[] ;
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* take input file arguments from STDIN */
 	                    case 'f':
-	                        pip->f.follow = TRUE ;
+	                        pip->fl.follow = TRUE ;
 	                        break ;
 
 /* file name length restriction */
@@ -535,7 +535,7 @@ char	*envv[] ;
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* options */
@@ -768,7 +768,7 @@ char	*envv[] ;
 	        bclose(afp) ;
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: inaccessible argument-list file (%d)\n",
 	                pip->progname,rs) ;
@@ -796,7 +796,7 @@ done:
 
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            bprintf(pip->efp,"%s: invalid usage (%d)\n",
 	                pip->progname,rs) ;
 	        break ;
