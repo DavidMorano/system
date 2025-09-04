@@ -37,7 +37,7 @@ INCS +=
 
 MODS +=
 
-LIBS +=
+LIBS += -lnss
 
 
 OBJ_LIBSECDB= secdb.o
@@ -95,7 +95,7 @@ all:			$(ALL)
 
 
 $(T).so:		$(OBJ_LIBSECDB)
-	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ_LIBSECDB)
+	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ_LIBSECDB) $(RUNINFO) $(LIBINFO)
 
 $(T).o:			$(OBJ_LIBSECDB)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LIBSECDB)
