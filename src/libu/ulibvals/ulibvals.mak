@@ -40,6 +40,17 @@ MODS +=
 LIBS +=
 
 
+OBJ0= ulibvals0.o ulibvals1.o
+OBJ1=
+OBJ2=
+OBJ3=
+
+OBJA= obj0.o 
+OBJB= obj2.o obj3.o
+
+OBJ= obja.o
+
+
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
@@ -55,16 +66,6 @@ CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
-
-OBJ0= ulibvals0.o ulibvals1.o
-OBJ1=
-OBJ2=
-OBJ3=
-
-OBJA= obj0.o 
-OBJB= obj2.o obj3.o
-
-OBJ= obja.o
 
 
 .SUFFIXES:		.hh .ii .iim .ccm
