@@ -40,22 +40,6 @@ MODS +=
 LIBS +=
 
 
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
-
-
 OBJ00_USYS= usys_xxx.o
 OBJ01_USYS= usys_sunos.o 
 OBJ02_USYS= usys_darwin.o usys_darwinexec.o usys_darwinargz.o
@@ -79,7 +63,23 @@ OBJD= obj09_usys.o obj10_usys.o obj11_usys.o
 OBJ_USYS= obja.o objb.o objc.o objd.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -92,6 +92,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -126,53 +129,53 @@ control:
 
 
 obj00_usys.o:	$(OBJ00_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ00_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj01_usys.o:	$(OBJ01_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ01_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj02_usys.o:	$(OBJ02_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ02_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj03_usys.o:	$(OBJ03_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ03_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj04_usys.o:	$(OBJ04_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ04_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj05_usys.o:	$(OBJ05_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ05_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj06_usys.o:	$(OBJ06_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ06_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj07_usys.o:	$(OBJ07_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ07_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj08_usys.o:	$(OBJ08_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ08_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj09_usys.o:	$(OBJ09_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ09_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj10_usys.o:	$(OBJ10_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ10_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj11_usys.o:	$(OBJ11_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ11_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:		$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:		$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objc.o:		$(OBJC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objd.o:		$(OBJD)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 # operating-system specific
