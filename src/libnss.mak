@@ -93,7 +93,7 @@ all:			$(ALL)
 
 
 $(T).so:		$(OBJ_LIBNSS)
-	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ_LIBNSS)
+	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ_LIBNSS) $(RUNINFO) $(LIBINFO)
 
 $(T).o:			$(OBJ_LIBNSS)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LIBNSS)
