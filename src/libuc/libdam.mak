@@ -208,7 +208,7 @@ OBJ97= comparse.o mhcom.o zos.o tmz.o zdb.o zoffparts.o snflags.o
 OBJ98= openportmsg.o varsub.o userattr.o 
 OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
 OBJ100= rijndael.o expcook.o schedvar.o
-OBJ101= termnote.o egs.o librandom.o bits.o 
+OBJ101= termnote.o egs.o librandom.o
 OBJ102= loadave.o modload.o userinfo.o
 OBJ103= dw.o fmq.o useraccdb.o csem.o
 
@@ -683,7 +683,7 @@ librandom.o:		librandom.cc librandom.h
 optval.o:		optval.cc optval.h
 mesg.o:			mesg.cc mesg.h
 
-bits.o:			bits.cc bits.h baops.h
+td.o:			td.cc		td.h			$(INCS)
 dialtab.o:		dialtab.cc dialtab.h
 hostinfo.o:		hostinfo.cc hostinfo.h
 hostaddr.o:		hostaddr.cc hostaddr.h
@@ -867,9 +867,9 @@ langx.o:		langx.dir
 langx.dir:
 	makesubdir $@
 
-# LOADMODNAMES
-modloadnames.o:		modloadnames.dir
-modloadnames.dir:
+# STRFILE
+strfile.o:		strfile.dir
+strfile.dir:
 	makesubdir $@
 
 # INSTR
