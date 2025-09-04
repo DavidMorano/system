@@ -1,0 +1,82 @@
+/* ucsigsets MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* interface component for UNIX® library-3c */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2000-05-14, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
+*/
+
+/* Copyright © 2000,2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<pthread.h>		/* |pthread_setmask(3c)| */
+#include	<csignal>
+#include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
+
+export module usigsets ;
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+export {
+    struct usigsets {
+        int empty	(sigset_t *) noex ;
+        int fill	(sigset_t *) noex ;
+        int add		(sigset_t *,int) noex ;
+        int del		(sigset_t *,int) noex ;
+        int ismem	(const sigset_t *,int) noex ;
+    } ; /* end struct (usigsets) */
+} /* end export (usigset) */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+export {
+    extern usigsets	usigset ;
+}
+
+
+/* exported subroutines */
+
+
