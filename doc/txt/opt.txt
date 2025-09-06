@@ -1,2 +1,0 @@
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
