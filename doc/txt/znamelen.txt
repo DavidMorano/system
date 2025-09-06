@@ -1,4 +1,0 @@
-#ifndef	ZNAMELEN
-#define	ZNAMELEN	8
-#endif
-
