@@ -1,4 +1,0 @@
-#undef	LOCAL_SOLARIS
-#define	LOCAL_SOLARIS	\
-	(defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)))
-
