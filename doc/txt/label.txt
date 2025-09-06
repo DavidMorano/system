@@ -1,1 +1,0 @@
-/* interface component for UNIX® library-3c */
