@@ -1,1 +1,0 @@
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
