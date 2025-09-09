@@ -38,7 +38,7 @@ INCS += libu.h
 MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm 
 MODS += libutil.ccm chrset.ccm
 MODS += digtab.ccm xxtostr.ccm 
-MODS += usigset.o usigblock.ccm umisc.ccm
+MODS += usigsets.o usigblock.ccm umisc.ccm
 MODS += unixfnames.ccm constdiv.ccm builtin.ccm
 MODS += usysbasic.ccm ureserve.cmm vecbool.ccm
 
@@ -52,8 +52,8 @@ OBJ03= libutil.o usysconf.o umods.o
 
 OBJ04= ulibvals.o utimeout.o utimeouts.o 
 OBJ05= ulogerror.o strtox.o 
-OBJ06= usupport.o umisc.o
-OBJ07= umemalloc.o
+OBJ06= uconstants.o usupport.o
+OBJ07= umem.o usigsets.o usigblock.o umisc.o
 
 OBJ08= usys.o usyscallbase.o usysutility.o 
 OBJ09= uregfork.o uatfork.o ufdlock.o 
@@ -308,10 +308,15 @@ usysdata.o:		usysdata.cc usysdata.h			$(INCS)
 uacceptpass.o:		uacceptpass.cc ufdlock.h		$(INCS)
 
 # requires USYSBASIC
-uatfork.o:		umods.o uatfork.cc uatfork.h		$(INCS)
+uatfork.o:		uatfork.cc uatfork.h umods.o		$(INCS)
 uobjlock.o:		umods.o uobjlock.cc uobjlock.cc		$(INCS)
 uregfork.o:		umods.o uregfork.cc uregfork.hh		$(INCS)
 uprocess.o:		umods.o uprocess.cc uprocess.h		$(INCS)
+
+# UCONSTANTS
+uconstants.o:		uconstants.dir
+uconstants.dir:
+	makesubdir $@
 
 # USYS
 usys.o:			usys.dir
@@ -423,10 +428,18 @@ ucomposite.o:		ucomposite.dir
 ucomposite.dir:
 	makesubdir $@
 
+# USIGSET
+usigsets.o:		usigsets.dir
+usigsets.dir:
+	makesubdir $@
+
+usigblock.o:		usigblock.ccm			$(INCS)
+
 chrset.o:		chrset.ccm
 
 # OTHER
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
+umem.o:			umem.cc		umem.hh		$(INCS)
 um.o:			um.cc um.h			$(INCS)
 usig.o:			usig.cc usig.h			$(INCS)
 usysop.o:		usysop.cc usysop.h		$(INCS)
@@ -443,7 +456,6 @@ endian.o:		endian.cc endian.h		$(INCS)
 timecount.o:		timecount.cc timecount.hh	$(INCS)
 
 strtox.o:		strtox.cc strtox.h		$(INCS)
-xxtostr.o:		xxtostr.ccm xxtostr.h		$(INCS)
 
 strnul.o:		strnul.cc strnul.hh		$(INCS)
 mailvalues.o:		mailvalues.cc mailvalues.hh	$(INCS)
