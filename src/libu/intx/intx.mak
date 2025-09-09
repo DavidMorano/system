@@ -40,6 +40,18 @@ MODS +=
 LIBS +=
 
 
+DEPS= uconstants.o
+
+OBJ0= intminmax.o
+OBJ1= intsat.o intrem.o intceil.o intfloor.o
+OBJ2= willaddover.o satarith.o 
+OBJ3=
+
+OBJA= obj0.o obj1.o obj2.o
+
+OBJ= $(OBJA)
+
+
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
@@ -57,17 +69,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= willaddover.o satarith.o 
-OBJ1= intsat.o intrem.o intceil.o intfloor.o
-OBJ2= intminmax.o
-OBJ3=
-
-OBJA= obj0.o obj1.o obj2.o
-
-OBJ= $(OBJA)
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -80,6 +82,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -100,13 +105,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	$(RM) $(ALL)
@@ -119,51 +119,31 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
-
-obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
-
-obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
-
-obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
-
-
-willaddover.o:		mods.o willaddover.cc willaddover.h	$(INCS)
-satarith.o:		mods.o satarith.cc satarith.h	$(INCS)
-intrem.o:		mods.o intrem.cc intrem.h	$(INCS)
-intsat.o:		mods.o intsat.cc intsat.h	$(INCS)
-intfloor.o:		mods.o intfloor.cc intfloor.h	$(INCS)
-intceil.o:		mods.o intceil.cc intceil.h	$(INCS)
-
-MOBJ= valuelims.o digbufsizes.o uconstants.o intminmax.o
-
-mods.o:			$(MOBJ)
-	makemodule valuelims digbufsizes
-	makemodule intminmax
-	makemodule uconstants
-	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
-
-valuelims.o:		valuelims.ccm
-
-digbufsizes.o:		digbufsizes.ccm
-
-uconstants.o:		uconstants0.o uconstants1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-uconstants0.o:		uconstants.ccm
-	makemodule valuelims digbufsizes
-	makemodule uconstants
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-uconstants1.o:		uconstants1.cc uconstants.ccm
-	makemodule valuelims digbufsizes
-	makemodule uconstants
-	$(COMPILE.cc) $<
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-intminmax.o:		intminmax.ccm
-	makemodule valuelims
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+willaddover.o:		willaddover.cc	willaddover.h	$(DEPS) $(INCS)
+satarith.o:		satarith.cc	satarith.h	$(DEPS) $(INCS)
+intrem.o:		intrem.cc	intrem.h	$(DEPS) $(INCS)
+intsat.o:		intsat.cc	intsat.h	$(DPES) $(INCS)
+intfloor.o:		intfloor.cc	intfloor.h	$(DEPS) $(INCS)
+intceil.o:		intceil.cc	intceil.h	$(DEPS) $(INCS)
+
+# UCONSTANTS
+uconstants.o:		uconstants.dir
+uconstants.dir:	
+
+# INTMINMAX
+intminmax.o:		intminmax.ccm			$(DEPS) $(INCS)
 	makemodule intminmax
 
 
