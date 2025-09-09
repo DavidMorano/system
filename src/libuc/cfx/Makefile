@@ -41,23 +41,6 @@ MODS += cfpowx.ccm cfsysx.ccm
 LIBS=
 
 
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
-
-
 OBJ0_CFX= mods.o
 OBJ1_CFX= cfbin.o 
 OBJ2_CFX= cfoct.o
@@ -76,7 +59,23 @@ OBJC_CFX= obj8cfx.o
 OBJ_CFX= obja_cfx.o objb_cfx.o objc_cfx.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -109,8 +108,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_CFX)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_CFX)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -123,44 +122,47 @@ control:
 
 
 obj0cfx.o:		$(OBJ0_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1cfx.o:		$(OBJ1_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2cfx.o:		$(OBJ2_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3cfx.o:		$(OBJ3_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4cfx.o:		$(OBJ4_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5cfx.o:		$(OBJ5_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj6cfx.o:		$(OBJ6_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj7cfx.o:		$(OBJ7_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj8cfx.o:		$(OBJ8_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ8_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj9cfx.o:		$(OBJ9_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ9_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja_cfx.o:		$(OBJA_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb_cfx.o:		$(OBJB_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objc_cfx.o:		$(OBJC_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd_cfx.o:		$(OBJD_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 cfutil.o:		cfutil.cc cfutil.hh			$(INCS)
