@@ -35,14 +35,14 @@ DEFS +=
 
 INCS += umods.h
 
-MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm 
+MODS += valuelims.ccm digbufsizes.ccm
 MODS += bitop.ccm
-MODS += xxtostr.ccm digtab.ccm
-MODS += usigset.ccm usigblock.ccm
+MODS += digtab.ccm xxtostr.ccm 
+MODS +=
 MODS += unixfnames.ccm constdiv.ccm builtin.ccm
 MODS += usysbasic.ccm
 
-LIBS += -liconv -lproc
+LIBS +=
 
 
 INCDIRS=
@@ -66,23 +66,23 @@ SOFL= -shared
 
 
 OBJ00_UMODS = valuelims.o digbufsizes.o 
-OBJ01_UMODS = uconstants.o
-OBJ02_UMODS = xxtostr.o
-OBJ03_UMODS = digtab.o bitop.o
-OBJ04_UMODS = usigset.o usigblock.o 
-OBJ05_UMODS = unixfnames.o constdiv.o 
+OBJ01_UMODS = builtin.o
+OBJ02_UMODS = digtab.o xxtostr.o
+OBJ03_UMODS = bitop.o
+OBJ04_UMODS = unixfnames.o 
+OBJ05_UMODS = constdiv.o 
 OBJ06_UMODS = usysbasic.o
-OBJ07_UMODS = builtin.o
+OBJ07_UMODS = 
 
 OBJA_UMODS= obj00_umods.o obj01_umods.o 
 OBJB_UMODS= obj02_umods.o obj03_umods.o
 OBJC_UMODS= obj04_umods.o obj05_umods.o 
-OBJD_UMODS= obj06_umods.o obj07_umods.o
+OBJD_UMODS= obj06_umods.o
 
 OBJ_UMODS= obja_umods.o objb_umods.o objc_umods.o objd_umods.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -97,6 +97,9 @@ so:			$(T).so
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -119,16 +122,6 @@ $(T).o:			$(OBJ_UMODS) Makefile
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
-
-install-pre:
-	filefind . -s h | makenewer -af - -d $(INCDIR)
-
-install:		$(ALL) Makefile
-	ranlib $(T).a
-	install -S -p -m 0775 $(T).so $(LIBDIR)
-
-install-incs:		$(INSTALLINCS)
-	makenewer $(INSTALLINCS) $(INCDIR)
 
 safe:
 	makesafe -v=3 -I $(INCDIR) $(OBJ)
@@ -217,7 +210,7 @@ objf_umods.o:		$(OBJF_UMODS)
 
 # VARIOUS (module)
 digtab.o:		digtab.ccm
-usigset.o:		usigset.ccm
+xxtostr.o:		xxtostr.ccm
 constdiv.o:		constdiv.ccm
 builtin.o:		builtin.ccm
 bitop.o:		bitop.ccm
@@ -227,17 +220,6 @@ valuelims.o:		valuelims.ccm			$(INCS)
 
 # DIGBUFSIZES (module)
 digbufsizes.o:		digbufsizes.ccm
-
-# UCONSTANTS
-uconstants.o:		uconstants0.o uconstants1.o
-	$(LD) -r -o $@ $(LDFLAGS) $^
-
-uconstants0.o:		uconstants.ccm valuelims.o digbufsizes.o 
-	makemodule uconstants
-
-uconstants1.o:		uconstants1.cc uconstants.ccm 
-	makemodule uconstants
-	$(COMPILE.cc) $<
 
 # UNIXFNAMES
 unixfnames.o:		unixfnames0.o unixfnames1.o
@@ -250,18 +232,11 @@ unixfnames1.o:		unixfnames1.cc unixfnames.ccm
 	makemodule unixfnames
 	$(COMPILE.cc) $<
 
-# USIGBLOCK
-usigblock.o:		usigblock.ccm usigset.o 
-	makemodule usigset
-	makemodule usigblock
-
 # USYSBASIC
 usysbasic.o:		usysbasic0.o usysbasic1.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
-usysbasic0.o:		usysbasic.ccm usigset.o usigblock.o 
-	makemodule usigset
-	makemodule usigblock
+usysbasic0.o:		usysbasic.ccm
 	makemodule usysbasic
 
 usysbasic1.o:		usysbasic1.cc usysbasic.ccm
