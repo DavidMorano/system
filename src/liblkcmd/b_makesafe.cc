@@ -821,7 +821,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 	                    case 'R':
@@ -855,16 +855,16 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* no-change */
 	                    case 'n':
-	                        lip->f.nochange = true ;
+	                        lip->fl.nochange = true ;
 	                        break ;
 
 /* print something !! */
 	                    case 'p':
-	                        lip->f.print = true ;
+	                        lip->fl.print = true ;
 	                        break ;
 
 	                    case 'r':
-	                        lip->f.remote = true ;
+	                        lip->fl.remote = true ;
 	                        break ;
 
 /* touch file */
@@ -893,12 +893,12 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* zero files (are OK) */
 	                    case 'z':
-	                        lip->f.zero = true ;
+	                        lip->fl.zero = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.zero = (rs > 0) ;
+	                                lip->fl.zero = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1064,7 +1064,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
 	    fmt = "%s: cache mode=%u\n" ;
-	    shio_printf(pip->efp,fmt,pn,lip->f.cache) ;
+	    shio_printf(pip->efp,fmt,pn,lip->fl.cache) ;
 	    fmt = "%s: allowed parallelism=%u\n" ;
 	    shio_printf(pip->efp,fmt,pn,lip->npar) ;
 	} /* end if */
@@ -1126,10 +1126,10 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	if (DEBUGLEVEL(2))
 	debugprintf("b_makenewer: waiting-out\n") ;
 #endif
-	                } else if ((pan == 0) && (! lip->f.zero)) {
+	                } else if ((pan == 0) && (! lip->fl.zero)) {
 	                    rs = SR_INVALID ;
 	                    ex = EX_USAGE ;
-	                    if (! pip->f.quiet) {
+	                    if (! pip->fl.quiet) {
 				cchar	*pn = pip->progname ;
 	                        cchar	*fmt ;
 	                        fmt = "%s: no files were specified\n" ;
@@ -1204,7 +1204,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1223,9 +1223,9 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* we are out of here */
 retearly:
-	if ((pip->debuglevel > 0) || lip->f.optdebug) {
+	if ((pip->debuglevel > 0) || lip->fl.optdebug) {
 	    cchar	*pn = pip->progname ;
-	    if (lip->f.optdebug) {
+	    if (lip->fl.optdebug) {
 	        proginfo_pwd(pip) ;
 	        shio_printf(pip->efp,"%s: dir=%s\n",pn,pip->pwd) ;
 	    }
@@ -1365,10 +1365,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akname_cache:
 	                    if (! lip->final.cache) {
 	                        lip->have.cache = true ;
-	                        lip->f.cache = true ;
+	                        lip->fl.cache = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.cache = (rs > 0) ;
+	                            lip->fl.cache = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1391,21 +1391,21 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akname_debug:
 	                    if (! lip->final.optdebug) {
 	                        lip->have.optdebug = true ;
-	                        lip->f.optdebug = true ;
+	                        lip->fl.optdebug = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.optdebug = (rs > 0) ;
+	                            lip->fl.optdebug = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case akname_maint:
 	                    if (! lip->final.maint) {
 	                        lip->have.maint = true ;
-	                        lip->f.maint = true ;
-	                        lip->f.zero = true ;
+	                        lip->fl.maint = true ;
+	                        lip->fl.zero = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.maint = (rs > 0) ;
+	                            lip->fl.maint = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1623,7 +1623,7 @@ static int procargfile(PROGINFO *pip,DISP *dop,cchar *afn)
 
 	        rs1 = shio_close(afp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } else if (! pip->f.quiet) {
+	    } else if (! pip->fl.quiet) {
 	        cchar	*pn = pip->progname ;
 	        cchar	*fmt ;
 	        fmt = "%s: unaccessible (%d) afile=%s\n" ;
@@ -1736,7 +1736,7 @@ static int procfilerdeps(PROGINFO *pip,cchar *name,time_t mo)
 	            const time_t 	mc = sb.st_mtime ;
 	            if (mc > mo) {
 	                f_done = true ;
-	                if (! lip->f.nochange) rs = u_unlink(name) ;
+	                if (! lip->fl.nochange) rs = u_unlink(name) ;
 	                if (rs >= 0) {
 	                    rs = procfiletell(pip,dbuf,name) ;
 	                }
@@ -1806,7 +1806,7 @@ static int procfilefind(PROGINFO *pip,cchar *name,time_t mo,cchar *dbuf)
 	if ((rs = procdeps_check(pip,obuf,mo,dbuf)) > 0) {
 	    cchar	*dname = dbuf ;
 	    f_remove = true ;
-	    if (! lip->f.nochange) rs = u_unlink(name) ;
+	    if (! lip->fl.nochange) rs = u_unlink(name) ;
 	    if (rs >= 0) {
 	        if (obuf[0] != '\0') {
 	            dname = obuf ;
@@ -1970,7 +1970,7 @@ static int procdeps_checker(PROGINFO *pip,char *rbuf,time_t mo,
 	            if (rs < 0) break ;
 	        } /* end for */
 /* print out any errors that there may be */
-	        if ((rs >= 0) && (! pip->f.quiet)) {
+	        if ((rs >= 0) && (! pip->fl.quiet)) {
 	            CPPERR	*ep ;
 	            fmt = "%s: dep=%s:%u missing inc=%s\n" ;
 	            for (i = 0 ; vecobj_get(&errs,i,&ep) >= 0 ; i += 1) {
@@ -2416,7 +2416,7 @@ static int procout_begin(PROGINFO *pip,void *ofp,cchar *ofn)
 	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-'))
 	    ofn = STDFNOUT ;
 
-	if (lip->f.print || (pip->verboselevel > 0)) {
+	if (lip->fl.print || (pip->verboselevel > 0)) {
 	    if ((rs = shio_open(ofp,ofn,"wct",0644)) >= 0) {
 	        if ((rs = ptm_create(&lip->ofm,NULL)) >= 0) {
 	            lip->ofp = ofp ;
@@ -2438,7 +2438,7 @@ static int procout_end(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip->f.print || (pip->verboselevel > 0)) {
+	if (lip->fl.print || (pip->verboselevel > 0)) {
 	    rs1 = ptm_destroy(&lip->ofm) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = shio_close(lip->ofp) ;
@@ -2962,7 +2962,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	memclear(lip) ;
 	lip->pip = pip ;
 	lip->to_tmpfiles = TO_TMPFILES ;
-	lip->f.cache = OPT_CACHE ;
+	lip->fl.cache = OPT_CACHE ;
 
 	if ((rs = ids_load(&lip->id)) >= 0) {
 	    if ((rs = ptm_create(&lip->efm,NULL)) >= 0) {
@@ -3081,13 +3081,13 @@ static int locinfo_tmpcheck(LOCINFO *lip) noex {
 	if (lip->jobdname != NULL) {
 	    TMTIME	t ;
 	    if ((rs = tmtime_localtime(&t,pip->daytime)) >= 0) {
-	        if ((t.hour >= HOUR_MAINT) && lip->f.maint) {
+	        if ((t.hour >= HOUR_MAINT) && lip->fl.maint) {
 	            uptsub_t	thr = (uptsub_t) locinfo_tmpmaint ;
 	            pthread_t	tid ;
 	            if ((rs = uptcreate(&tid,NULL,thr,lip)) >= 0) {
 	                rs = 1 ;
 	                lip->tid = tid ;
-	                lip->f.tmpmaint = true ;
+	                lip->fl.tmpmaint = true ;
 	            } /* end if (uptcreate) */
 	        } /* end if (after hours) */
 	    } /* end if (tmtime_localtime) */
@@ -3103,7 +3103,7 @@ static int locinfo_tmpmaint(LOCINFO *lip) noex {
 	cint	to = lip->to_tmpfiles ;
 	int		rs ;
 	int		c = 0 ;
-	int		f_need = lip->f.maint ;
+	int		f_need = lip->fl.maint ;
 	cchar		*dname = lip->jobdname ;
 	char		tsfname[MAXPATHLEN+1] ;
 
@@ -3145,7 +3145,7 @@ static int locinfo_tmpmaint(LOCINFO *lip) noex {
 static int locinfo_tmpdone(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (lip->f.tmpmaint) {
+	if (lip->fl.tmpmaint) {
 	    int	trs ;
 	    rs1 = uptjoin(lip->tid,&trs) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -3196,7 +3196,7 @@ static int locinfo_loadprids(LOCINFO *lip) noex {
 
 static int locinfo_alreadybegin(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
-	if (lip->f.cache) {
+	if (lip->fl.cache) {
 	    if ((rs = cachetime_start(&lip->mtdb)) >= 0) {
 	        lip->open.cache = true ;
 	    }

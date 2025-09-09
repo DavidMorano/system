@@ -581,7 +581,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_im:
 	                    if (! lip->final.im) {
 	                        lip->final.im = TRUE ;
-	                        lip->f.im = TRUE ;
+	                        lip->fl.im = TRUE ;
 	                    }
 	                    break ;
 
@@ -616,19 +616,19 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* continue on error */
 	                    case 'c':
 	                        lip->final.nostop = TRUE ;
 	                        lip->have.nostop = TRUE ;
-	                        lip->f.nostop = TRUE ;
+	                        lip->fl.nostop = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.nostop = (rs > 0) ;
+	                                lip->fl.nostop = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -649,19 +649,19 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'f':
 	                        lip->have.follow = TRUE ;
 	                        lip->final.follow = TRUE ;
-	                        lip->f.follow = TRUE ;
+	                        lip->fl.follow = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.follow = (rs > 0) ;
+	                                lip->fl.follow = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 /* no-change */
 	                    case 'n':
-	                        lip->f.nochange = TRUE ;
+	                        lip->fl.nochange = TRUE ;
 	                        break ;
 
 /* options */
@@ -680,7 +680,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* print something! */
 	                    case 'p':
-	                        lip->f.print = TRUE ;
+	                        lip->fl.print = TRUE ;
 	                        break ;
 
 	                    case 'q':
@@ -691,12 +691,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'r':
 	                        lip->final.rmfile = TRUE ;
 	                        lip->have.rmfile = TRUE ;
-	                        lip->f.rmfile = TRUE ;
+	                        lip->fl.rmfile = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.rmfile = (rs > 0) ;
+	                                lip->fl.rmfile = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -768,7 +768,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* zero files (are OK) */
 	                    case 'z':
-	                        lip->f.zero = TRUE ;
+	                        lip->fl.zero = TRUE ;
 	                        break ;
 
 	                    case '?':
@@ -909,16 +909,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
 	    debugprintf("main: tardname=%s\n",tardname) ;
-	    debugprintf("main: rmfile=%u\n",lip->f.rmfile) ;
-	    debugprintf("main: rmsuf=%u\n",lip->f.rmsuf) ;
+	    debugprintf("main: rmfile=%u\n",lip->fl.rmfile) ;
+	    debugprintf("main: rmsuf=%u\n",lip->fl.rmsuf) ;
 	}
 #endif /* CF_DEBUG */
 
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
 	    shio_printf(pip->efp,"%s: tardname=%s\n",pn,tardname) ;
-	    shio_printf(pip->efp,"%s: rmfile=%u\n",pn,lip->f.rmfile) ;
-	    shio_printf(pip->efp,"%s: rmsuf=%u\n",pn,lip->f.rmsuf) ;
+	    shio_printf(pip->efp,"%s: rmfile=%u\n",pn,lip->fl.rmfile) ;
+	    shio_printf(pip->efp,"%s: rmsuf=%u\n",pn,lip->fl.rmsuf) ;
 	}
 
 /* does the target directory exist? */
@@ -991,7 +991,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 		cchar	*pn = pip->progname ;
 		cchar	*fmt ;
 
-	        if (lip->f.print || (pip->verboselevel > 1)) {
+	        if (lip->fl.print || (pip->verboselevel > 1)) {
 		    fmt = "files processed=%u updated=%u\n" ;
 	            shio_printf(ofp,fmt,lip->c_processed,lip->c_updated) ;
 		}
@@ -1006,7 +1006,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2)) {
 	            debugprintf("main: debuglevel=%u quiet=%u\n",
-	                pip->debuglevel,pip->f.quiet) ;
+	                pip->debuglevel,pip->fl.quiet) ;
 	            debugprintf("main: past main loop rs=%d ex=%u\n",rs,ex) ;
 	            debugprintf("main: processed=%d updated=%d\n",
 	                lip->c_processed,lip->c_updated) ;
@@ -1035,7 +1035,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	} /* end if (ok) */
 
 /* done */
-	if ((rs < 0) && (! pip->f.quiet)) {
+	if ((rs < 0) && (! pip->fl.quiet)) {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt = "%s: could not perform function (%d)\n" ;
 	    shio_printf(pip->efp,fmt,pn,rs) ;
@@ -1377,10 +1377,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.rmsuf) {
 	                        lip->have.rmsuf = TRUE ;
 	                        lip->final.rmsuf = TRUE ;
-	                        lip->f.rmsuf = TRUE ;
+	                        lip->fl.rmsuf = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.rmsuf = (rs > 0) ;
+	                            lip->fl.rmsuf = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1389,10 +1389,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.rmfile) {
 	                        lip->have.rmfile = TRUE ;
 	                        lip->final.rmfile = TRUE ;
-	                        lip->f.rmfile = TRUE ;
+	                        lip->fl.rmfile = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.rmfile = (rs > 0) ;
+	                            lip->fl.rmfile = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1401,10 +1401,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.follow) {
 	                        lip->have.follow = TRUE ;
 	                        lip->final.follow = TRUE ;
-	                        lip->f.follow = TRUE ;
+	                        lip->fl.follow = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.follow = (rs > 0) ;
+	                            lip->fl.follow = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1413,10 +1413,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.nostop) {
 	                        lip->have.nostop = TRUE ;
 	                        lip->final.nostop = TRUE ;
-	                        lip->f.nostop = TRUE ;
+	                        lip->fl.nostop = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.nostop = (rs > 0) ;
+	                            lip->fl.nostop = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1425,7 +1425,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.younger) {
 	                        lip->have.younger = TRUE ;
 	                        lip->final.younger = TRUE ;
-	                        lip->f.younger = TRUE ;
+	                        lip->fl.younger = TRUE ;
 	                        if (vl > 0) {
 	                            int	v ;
 	                            rs = cfdecti(vp,vl,&v) ;
@@ -1437,10 +1437,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_im:
 	                    if (! lip->final.im) {
 	                        lip->final.im = TRUE ;
-	                        lip->f.im = TRUE ;
+	                        lip->fl.im = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.im = (rs > 0) ;
+	                            lip->fl.im = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1554,9 +1554,9 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 	    } /* end if (argument file) */
 
-	    if ((rs >= 0) && (pan == 0) && (! lip->f.zero)) {
+	    if ((rs >= 0) && (pan == 0) && (! lip->fl.zero)) {
 	        rs = SR_INVALID ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    fmt = "%s: no files were specified\n" ;
 	            shio_printf(pip->efp,fmt,pn) ;
 		}
@@ -1576,7 +1576,7 @@ static int procout_begin(PROGINFO *pip,void *ofp,cchar *ofn)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 
-	if (lip->f.print || (pip->verboselevel > 1)) {
+	if (lip->fl.print || (pip->verboselevel > 1)) {
 	    if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-')) {
 	        ofn = STDFNOUT ;
 	    }
@@ -1594,7 +1594,7 @@ static int procout_end(PROGINFO *pip,void *ofp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip->f.print || (pip->verboselevel > 1)) {
+	if (lip->fl.print || (pip->verboselevel > 1)) {
 	    cchar	*pn = pip->progname ;
 	    rs1 = shio_close(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1697,7 +1697,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *name)
 	        }
 #endif
 
-	        if (f_islink && lip->f.follow) {
+	        if (f_islink && lip->fl.follow) {
 
 	            rs1 = fsdirtreestat(name,0,&ssb) ; /* this is STAT */
 	            if (rs1 >= 0) {
@@ -1729,7 +1729,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *name)
 #endif
 
 	        if ((rs == SR_NOENT) || (rs == SR_ACCESS)) {
-	            if (lip->f.im) rs = SR_OK ;
+	            if (lip->fl.im) rs = SR_OK ;
 	        }
 	    } /* end if (fsdirtreestat) */
 
@@ -1782,7 +1782,7 @@ static int procdir(PROGINFO *pip,void *ofp,cchar *name,FSDIRTREE_STAT *sbp)
 	    *bp++ = '/' ;
 
 	    opts = 0 ;
-	    if (lip->f.follow) opts |= FSDIRTREE_MFOLLOW ;
+	    if (lip->fl.follow) opts |= FSDIRTREE_MFOLLOW ;
 
 	    if ((rs = fsdirtree_open(&d,name,opts)) >= 0) {
 	        vecstr		*slp = &lip->sufmaps ;
@@ -1864,7 +1864,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname,FSDIRTREESTAT *sbp)
 	    shio_printf(pip->efp,"%s: fname=%s\n",pip->progname,fname) ;
 	}
 
-	if (lip->f.follow && S_ISLNK(sbp->st_mode)) {
+	if (lip->fl.follow && S_ISLNK(sbp->st_mode)) {
 	    rs = fsdirtreestat(fname,0,sbp) ; /* STAT */
 	}
 
@@ -1934,7 +1934,7 @@ static int procfiler(PROGINFO *pip,void *ofp,ustat *ssbp,cchar *fname)
 /* form the filename of the one in the directory */
 
 	if ((bfl = sfbasename(fname,-1,&bfp)) > 0) {
-	    if (lip->f.rmsuf) {
+	    if (lip->fl.rmsuf) {
 	        cchar	*tp = strnrchr(bfp,bfl,'.') ;
 	        rs = mknewfname(dstfname,tardname,fname,tp,NULL) ;
 	    } else {
@@ -1963,7 +1963,7 @@ static int procfiler(PROGINFO *pip,void *ofp,ustat *ssbp,cchar *fname)
 
 	    if (S_ISREG(dsb.st_mode)) {
 	        fsize = (size_t) dsb.st_size ;
-	        if (lip->f.rmfile) {
+	        if (lip->fl.rmfile) {
 	            f_create = TRUE ;
 	        } else {
 	            int	f = FALSE ;
@@ -2063,11 +2063,11 @@ static int procfiler(PROGINFO *pip,void *ofp,ustat *ssbp,cchar *fname)
 	    debugprintf("main/procfiler: dstfname=%s\n",dstfname) ;
 #endif
 
-	        if (lip->f.print || (pip->verboselevel > 1)) {
+	        if (lip->fl.print || (pip->verboselevel > 1)) {
 	            shio_printf(ofp,"%s\n",dstfname) ;
 		}
 
-	if ((rs >= 0) && lip->f.rmfile) {
+	if ((rs >= 0) && lip->fl.rmfile) {
 	    if ((rs = mkpath1(altfname,dstfname)) >= 0) {
 		cchar	*aname = "mnXXXXXXXXXXXX" ;
 		char	tbuf[MAXPATHLEN+1] ;
@@ -2118,7 +2118,7 @@ static int procfiler(PROGINFO *pip,void *ofp,ustat *ssbp,cchar *fname)
 
 		lip->c_updated += 1 ;
 
-	        if (! lip->f.nochange) {
+	        if (! lip->fl.nochange) {
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
 	            debugprintf("main/procfiler: open fn=%s\n",fname) ;
@@ -2160,7 +2160,7 @@ static int procfiler(PROGINFO *pip,void *ofp,ustat *ssbp,cchar *fname)
 	    debugprintf("main/procfiler: dfn=%s\n",dstfname) ;
 	}
 #endif
-			if ((rs >= 0) && lip->f.rmfile) {
+			if ((rs >= 0) && lip->fl.rmfile) {
 			    rs = uc_rename(dstfname,altfname) ;
 			}
 #if	CF_DEBUG
@@ -2168,7 +2168,7 @@ static int procfiler(PROGINFO *pip,void *ofp,ustat *ssbp,cchar *fname)
 	    debugprintf("main/procfiler: mid5 rs=%d\n",rs) ;
 #endif
 	            } /* end if (ok) */
-		    if ((rs < 0) && lip->f.rmfile) {
+		    if ((rs < 0) && lip->fl.rmfile) {
 			uc_unlink(dstfname) ;
 		    }
 	        } /* end if (allowable actual update) */
@@ -2200,17 +2200,17 @@ static int procdisposition(PROGINFO *pip,cchar *name,int rs)
 
 
 	if (rs < 0) {
-	    if ((! pip->f.quiet) && (rs < 0)) {
+	    if ((! pip->fl.quiet) && (rs < 0)) {
 	        shio_printf(pip->efp,"%s: name=%s (%d)\n",
 	            pip->progname,name,rs) ;
 	    }
 
 	    if (rs == SR_ACCESS) {
-	        if (lip->f.iacc) rs = SR_OK ;
+	        if (lip->fl.iacc) rs = SR_OK ;
 	    } else if (rs == SR_NOENT) {
-	        if (lip->f.zero) rs = SR_OK ;
+	        if (lip->fl.zero) rs = SR_OK ;
 	    } else if (isNotPresent(rs)) {
-	        if (lip->f.nostop) rs = SR_OK ;
+	        if (lip->fl.nostop) rs = SR_OK ;
 	    }
 
 	} /* end if */
