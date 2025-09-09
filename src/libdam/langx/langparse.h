@@ -51,10 +51,10 @@ typedef	LANGPARSE_FL	langparse_fl ;
 
 EXTERNC_begin
 
-extern int langparse_start(langparse *,int) noex ;
-extern int langparse_load(langparse *,cchar *,int) noex ;
-extern int langparse_read(langparse *,char *,int) noex ;
-extern int langparse_finish(langparse *) noex ;
+extern int langparse_start	(langparse *,int) noex ;
+extern int langparse_load	(langparse *,cchar *,int) noex ;
+extern int langparse_read	(langparse *,char *,int) noex ;
+extern int langparse_finish	(langparse *) noex ;
 
 EXTERNC_end
 
