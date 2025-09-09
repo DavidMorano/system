@@ -137,5 +137,6 @@ objb.o:			$(OBJB)
 
 langstate.o:		langstate.cc	langstate.h	$(INCS)
 langproc.o:		langproc.cc	langproc.h	$(INCS)
+langparse.o:		langparse.cc	langparse.h	$(INCS)
 
 
