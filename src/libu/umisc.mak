@@ -40,6 +40,19 @@ MODS += umisc.ccm
 LIBS +=
 
 
+OBJ00= umisc0.o umisc1.o umisc2.o umisc3.o
+OBJ01= umisc4.o umisc5.o umisc6.o umisc7.o
+OBJ02= 
+OBJ03= 
+
+OBJA= obj00.o obj01.o
+OBJB= 
+OBJC= 
+OBJD= 
+
+OBJ= obja.o 
+
+
 INCDIRS=
 
 LIBDIRS=
@@ -56,22 +69,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-DEPMODS += usigset.ccm usigblock.ccm
-
-OBJ00= umisc0.o umisc1.o umisc2.o umisc3.o
-OBJ01= umisc4.o umisc5.o umisc6.o umisc7.o
-OBJ02= 
-OBJ03= 
-
-OBJA= obj00.o obj01.o
-OBJB= 
-OBJC= 
-OBJD= 
-
-OBJ= obja.o 
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -141,16 +139,7 @@ objb.o:			$(OBJB)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
 
 
-usigset.ccm:		
-	ln mod/usigset.ccm .
-
-usigblock.ccm:
-	ln mod/usigblock.ccm .
-
-
-umisc0.o:		umisc.ccm $(DEPMODS) 
-	makemodule usigset
-	makemodule usigblock
+umisc0.o:		umisc.ccm
 	makemodule umisc
 
 umisc1.o:		umisc1.cc umisc.ccm
