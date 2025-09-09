@@ -460,7 +460,7 @@ int	f_err ;
 /* attempt to connect to the host */
 
 #if	CF_LOG2
-	if (gp->f.log)
+	if (gp->fl.log)
 	    logfile_printf(&gp->lh,"about to attempt a connect\n") ;
 #endif
 
@@ -473,7 +473,7 @@ int	f_err ;
 #endif
 
 #if	CF_LOG
-	    if (gp->f.log)
+	    if (gp->fl.log)
 	        logfile_printf(&gp->lh,"failed connection rs=%d\n",srs) ;
 #endif
 
@@ -485,7 +485,7 @@ int	f_err ;
 #endif
 
 #if	CF_LOG2
-	if (gp->f.log)
+	if (gp->fl.log)
 	    logfile_printf(&gp->lh,"connected initial socket\n") ;
 #endif
 
@@ -500,7 +500,7 @@ int	f_err ;
 #endif
 
 #if	CF_LOG2
-	    if (gp->f.log)
+	    if (gp->fl.log)
 	        logfile_printf(&gp->lh,"about to bind an error socket\n") ;
 #endif
 
@@ -550,7 +550,7 @@ int	f_err ;
 #endif
 
 #if	CF_LOG
-	    if (gp->f.log)
+	    if (gp->fl.log)
 	        logfile_printf(&gp->lh,"we bound to port=%d\n",localport) ;
 #endif
 
