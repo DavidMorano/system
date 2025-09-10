@@ -1,4 +1,6 @@
-/* bvsmk */
+/* bvsmk HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* revision history:
@@ -11,15 +13,12 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BVSMK_INCLUDE
-#define	BVSMK_INCLUDE	1
+#define	BVSMK_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
-
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 
 #define	BVSMK_MAGIC	0x88773423
@@ -30,9 +29,8 @@
 #define	BVSMK_INTSTALE	(5*60)
 
 
-/* this is the shared-object description */
 struct bvsmk_obj {
-	const char	*name ;
+	cchar		*name ;
 	uint		objsize ;
 } ;
 
@@ -46,38 +44,30 @@ struct bvsmk_flags {
 } ;
 
 struct bvsmk_head {
-	uint		magic ;
 	cchar		*a ;		/* memory-allocation (pr, db) */
 	cchar		*pr ;
 	cchar 		*db ;
 	cchar		*idname ;
 	char		*nidxfname ;
-	BVSMK_FL	f ;
 	VECOBJ		books ;
-	mode_t		om ;
+	BVSMK_FL	fl ;
+	uint		magic ;
 	int		nverses ;
 	int		nzverses ;
 	int		maxbook ;
 	int		nfd ;
-} ;
+	mode_t		om ;
+} ; /* end struct (bvsmk_head) */
 
+EXTERNC_begin
 
-#if	(! defined(BVSMK_MASTER)) || (BVSMK_MASTER == 0)
+extern int	bvsmk_open(BVSMK *,cchar *,cchar *,int,mode_t) noex ;
+extern int	bvsmk_add(BVSMK *,int,uchar *,int) noex ;
+extern int	bvsmk_abort(BVSMK *,int) noex ;
+extern int	bvsmk_close(BVSMK *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int	bvsmk_open(BVSMK *,const char *,const char *,int,mode_t) ;
-extern int	bvsmk_add(BVSMK *,int,uchar *,int) ;
-extern int	bvsmk_abort(BVSMK *,int) ;
-extern int	bvsmk_close(BVSMK *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BVSMK_MASTER */
 
 #endif /* BVSMK_INCLUDE */
 
