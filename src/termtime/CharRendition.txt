@@ -1,0 +1,101 @@
+Character Rendition on ANSI terminals
+--------------------------------------------------------------------------------
+
+Here is a list of the ANSI standard text attribute escape sequences
+for ANSI compliant terminals. These sequences, also known as **Select
+Graphic Rendition (SGR)** parameters, are a fundamental part of the
+**ANSI escape code standard** (ISO/IEC 6429). They control the
+formatting of text on a terminal, such as color and style. The
+general format for an SGR escape sequence is `\x1b[...m`, where
+`\x1b` is the ASCII escape character, `[` is the control sequence
+introducer (CSI), `...` represents one or more SGR parameters, and
+`m` is the SGR command.
+
+\<br\>
+
+-----
+
+## Text Attributes
+
+These escape sequences apply a specific text style. Multiple
+attributes can be combined by separating the parameters with a
+semicolon, e.g., `\x1b[1;31m` for bold red text. The **reset**
+sequence `\x1b[0m` should be used to clear all attributes at the
+end of a formatted string.
+
+  * **`\x1b[0m`**: Reset/Normal (resets all attributes)
+  * **`\x1b[1m`**: Bold/Bright
+  * **`\x1b[2m`**: Faint/Dim (often not supported or shown as a lighter color)
+  * **`\x1b[3m`**: Italic (often not supported)
+  * **`\x1b[4m`**: Underline
+  * **`\x1b[5m`**: Blink (slow blink)
+  * **`\x1b[6m`**: Blink (rapid blink, often not supported and shows as 
+	  		a slow blink)
+  * **`\x1b[7m`**: Invert/Reverse (swaps foreground and background colors)
+  * **`\x1b[8m`**: Conceal/Hidden (makes text invisible)
+  * **`\x1b[9m`**: Strikethrough (often not supported)
+
+\<br\>
+
+-----
+
+## Foreground Colors (3/4-bit)
+
+These sequences set the color of the text itself.
+
+  * **`\x1b[30m`**: Black
+  * **`\x1b[31m`**: Red
+  * **`\x1b[32m`**: Green
+  * **`\x1b[33m`**: Yellow
+  * **`\x1b[34m`**: Blue
+  * **`\x1b[35m`**: Magenta
+  * **`\x1b[36m`**: Cyan
+  * **`\x1b[37m`**: White/Light Gray
+  * **`\x1b[39m`**: Default foreground color
+
+You can achieve **bright** versions of these colors by adding a `9`
+to the parameter (e.g., `\x1b[91m` for bright red) or by using the
+**bold** attribute (`\x1b[1;31m`).
+
+  * **`\x1b[90m`**: Bright Black (Gray)
+  * **`\x1b[91m`**: Bright Red
+  * **`\x1b[92m`**: Bright Green
+  * **`\x1b[93m`**: Bright Yellow
+  * **`\x1b[94m`**: Bright Blue
+  * **`\x1b[95m`**: Bright Magenta
+  * **`\x1b[96m`**: Bright Cyan
+  * **`\x1b[97m`**: Bright White
+
+\<br\>
+
+-----
+
+## Background Colors (3/4-bit)
+
+These sequences set the color of the background behind the text.
+
+  * **`\x1b[40m`**: Black
+  * **`\x1b[41m`**: Red
+  * **`\x1b[42m`**: Green
+  * **`\x1b[43m`**: Yellow
+  * **`\x1b[44m`**: Blue
+  * **`\x1b[45m`**: Magenta
+  * **`\x1b[46m`**: Cyan
+  * **`\x1b[47m`**: White/Light Gray
+  * **`\x1b[49m`**: Default background color
+
+Similar to foreground colors, you can achieve **bright** versions
+of these background colors by adding a `10` to the parameter (e.g.,
+`\x1b[101m` for bright red).
+
+  * **`\x1b[100m`**: Bright Black (Gray)
+  * **`\x1b[101m`**: Bright Red
+  * **`\x1b[102m`**: Bright Green
+  * **`\x1b[103m`**: Bright Yellow
+  * **`\x1b[104m`**: Bright Blue
+  * **`\x1b[105m`**: Bright Magenta
+  * **`\x1b[106m`**: Bright Cyan
+  * **`\x1b[107m`**: Bright White
+
+
+
