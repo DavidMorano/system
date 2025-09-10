@@ -39,7 +39,7 @@ MODS+=
 MODS+=
 MODS+= 
 
-LIBS+= -lf -luo -lu
+LIBS += -lf -luo -lu
 
 
 DEPS_MAIN += 
