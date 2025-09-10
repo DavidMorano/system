@@ -202,8 +202,8 @@ double		loadaverage ;
 	debugprintf("machineadd: exiting i=%d hostname=%s f_rstat=%d f_rsh=%d\n",
 	    i,
 	    ((struct machine **) mhp->va)[i]->hostname,
-	    ((struct machine **) mhp->va)[i]->f.rstat,
-	    ((struct machine **) mhp->va)[i]->f.rsh) ;
+	    ((struct machine **) mhp->va)[i]->fl.rstat,
+	    ((struct machine **) mhp->va)[i]->fl.rsh) ;
 #endif
 
 /* end of getting remote machine status */
@@ -282,7 +282,7 @@ long		*loadaveragep ;
 
 /* calculate the spare load */
 
-	    if (mp->f.rstat) {
+	    if (mp->fl.rstat) {
 
 #if	CF_DEBUGS
 	        if (g.debuglevel > 2)
@@ -323,7 +323,7 @@ long		*loadaveragep ;
 
 /* calculate the total free pages on the machine */
 
-	    if (mp->f.freepages && mp->f.freeswap) {
+	    if (mp->fl.freepages && mp->fl.freeswap) {
 
 #if	CF_DEBUGS
 	        if (g.debuglevel > 2)
@@ -361,10 +361,10 @@ long		*loadaveragep ;
 /* weigh it by the number of free pages left */
 
 #ifdef	BSD
-	    if (mp->f.freepages && (mp->freepages < 300))
+	    if (mp->fl.freepages && (mp->freepages < 300))
 	        loadspare -= (i_multiply(64 * mp->freepages) / 300) ;
 #else
-	    if (mp->f.freepages && (mp->freepages < 300))
+	    if (mp->fl.freepages && (mp->freepages < 300))
 	        loadspare -= (+(64 * mp->freepages) / 300) ;
 #endif
 
@@ -462,12 +462,12 @@ struct machine	*mp ;
 
 /* can we execute remotely on it at this time? */
 
-	if (! mp->f.sarfailed) {
+	if (! mp->fl.sarfailed) {
 
 /* continue to get SAR information */
 
-	    mp->f.freepages = FALSE ;
-	    mp->f.freeswap = FALSE ;
+	    mp->fl.freepages = FALSE ;
+	    mp->fl.freeswap = FALSE ;
 	    fpa[0] = &infile ;
 	    fpa[1] = &outfile ;
 	    fpa[2] = NULL ;
@@ -478,7 +478,7 @@ struct machine	*mp ;
 #endif
 
 	    if ((pid = bopenrcmd(fpa,mp->hostname,cmd)) < 0) {
-	        mp->f.sarfailed = TRUE ;
+	        mp->fl.sarfailed = TRUE ;
 
 	    } else
 	        bclose(fpa[0]) ;
@@ -491,35 +491,35 @@ struct machine	*mp ;
 
 /* can we get remote status at this time? */
 
-	mp->f.rstat = FALSE ;
+	mp->fl.rstat = FALSE ;
 	if ((rs = rstat(mp->hostname,mp->sp)) == RPC_SUCCESS)
-	    mp->f.rstat = TRUE ;
+	    mp->fl.rstat = TRUE ;
 
 #if	CF_DEBUGS
-	debugprintf("machineupdateone: rstat=%d\n",mp->f.rstat) ;
+	debugprintf("machineupdateone: rstat=%d\n",mp->fl.rstat) ;
 #endif
 
 /* does the remote system have any local disk? */
 
-	if (! mp->f.checkeddisk) {
+	if (! mp->fl.checkeddisk) {
 
-	    mp->f.havedisk = FALSE ;
+	    mp->fl.havedisk = FALSE ;
 	    if ((rs = havedisk(mp->hostname)) != -1) {
 
-	        mp->f.checkeddisk = TRUE ;
+	        mp->fl.checkeddisk = TRUE ;
 	        if (rs == 1)
-			mp->f.havedisk = TRUE ;
+			mp->fl.havedisk = TRUE ;
 
 	    }
 	}
 
 #if	CF_DEBUGS
-	debugprintf("machineupdateone: havedisk=%d\n",mp->f.havedisk) ;
+	debugprintf("machineupdateone: havedisk=%d\n",mp->fl.havedisk) ;
 #endif
 
 /* only execute if we are not in SAR fail mode */
 
-	if (! mp->f.sarfailed) {
+	if (! mp->fl.sarfailed) {
 
 #if	CF_DEBUGS
 	    debugprintf("machineupdateone: continuing with 'sar'\n") ;
@@ -527,7 +527,7 @@ struct machine	*mp ;
 
 /* assume a failure */
 
-	    mp->f.sarfailed = TRUE ;
+	    mp->fl.sarfailed = TRUE ;
 
 /* read all of the lines, saving the last (non-blank) line reliably */
 
@@ -603,9 +603,9 @@ struct machine	*mp ;
 	                mp->freepages) ;
 #endif
 
-	            mp->f.sarfailed = FALSE ;
-	            mp->f.rsh = TRUE ;
-	            mp->f.freepages = TRUE ;
+	            mp->fl.sarfailed = FALSE ;
+	            mp->fl.rsh = TRUE ;
+	            mp->fl.freepages = TRUE ;
 
 	        }
 
@@ -622,7 +622,7 @@ struct machine	*mp ;
 	                mp->freeswap) ;
 #endif
 
-	            mp->f.freeswap = TRUE ;
+	            mp->fl.freeswap = TRUE ;
 
 	        }
 
@@ -630,7 +630,7 @@ struct machine	*mp ;
 
 #if	CF_DEBUGS
 	        debugprintf("machineupdateone: cfdec rs=%d f_rsh=%d\n",
-	            rs,mp->f.rsh) ;
+	            rs,mp->fl.rsh) ;
 #endif
 
 	    } /* end if (got some output) */
@@ -647,12 +647,12 @@ struct machine	*mp ;
 
 #if	CF_DEBUGS
 	debugprintf("machineupdateone: about to exit rstat=%d rsh=%d\n",
-	    mp->f.rstat,mp->f.rsh) ;
+	    mp->fl.rstat,mp->fl.rsh) ;
 #endif
 
 /* end of getting remote machine status */
 
-	return (mp->f.rstat) ? OK : BAD ;
+	return (mp->fl.rstat) ? OK : BAD ;
 }
 /* end subroutine (machineupdateone) */
 
