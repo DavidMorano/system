@@ -1,0 +1,128 @@
+# MAKEFILE (fmtflag)
+
+T= fmtflag
+
+ALL= $(T).o
+
+
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
+
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
+
+
+DEFS +=
+
+INCS += fmtflag.h
+
+MODS +=
+
+LIBS +=
+
+
+OBJ= fmtflag0.o fmtflag1.o
+
+
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
+
+
+default:		$(T).o
+
+all:			$(ALL)
+
+
+.c.i:
+	$(CPP) $(CPPFLAGS) $< > $(*).i
+
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
+.c.o:
+	$(COMPILE.c) $<
+
+.cc.o:
+	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
+
+
+$(T).o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
+
+again:
+	rm -f $(ALL)
+
+clean:
+	makeclean $(ALL)
+
+control:
+	(uname -n ; date) > Control
+
+
+obj00.o:		$(OBJ00)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+obj01.o:		$(OBJ01)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+obj02.o:		$(OBJ02)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+obj03.o:		$(OBJ03)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+
+fmtflag0.o:		fmtflag.ccm			$(INCS)
+	makemodule fmtflag
+
+fmtflag1.o:		fmtflag1.cc fmtflag.ccm		$(INCS)
+	makemodule fmtflag
+	$(COMPILE.cc) $<
+
+
