@@ -205,7 +205,7 @@ char	*envv[] ;
 
 	if (bopen(&errfile,BFILE_STDERR,"dwca",0666) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	}
 
@@ -445,7 +445,7 @@ char	*envv[] ;
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* verbose mode */
@@ -767,7 +767,7 @@ char	*envv[] ;
 	    } else {
 
 		ex = EX_NOINPUT ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file\n",
