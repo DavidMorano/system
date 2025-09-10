@@ -90,10 +90,10 @@ int progoutmtheader(PROGINFO *pip,bfile *ofp)
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if (! pip->f.maintextheader) {
+	if (! pip->fl.maintextheader) {
 	    cchar	*pagetitle = pop->hf_pagetitle ;
 	    cchar	*pageloc = pop->hf_pagelocation ;
-	    pip->f.maintextheader = TRUE ;
+	    pip->fl.maintextheader = TRUE ;
 
 	    if (rs >= 0) {
 	        rs = progoffhf(pip,ofp,"PH",NULL,NULL,NULL) ;
@@ -123,8 +123,8 @@ int progoutmtfooter(PROGINFO *pip,bfile *ofp)
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if (! pip->f.maintextfooter) {
-	    pip->f.maintextfooter = TRUE ;
+	if (! pip->fl.maintextfooter) {
+	    pip->fl.maintextfooter = TRUE ;
 
 	    if (rs >= 0) {
 	        rs = progoffhf(pip,ofp,"EF",
@@ -189,7 +189,7 @@ int progoutbegin(PROGINFO *pip,bfile *ofp)
 
 /* we optionally have a page-footer w/ the page-number */
 
-	if ((rs >= 0) && pip->f.pagenums) {
+	if ((rs >= 0) && pip->fl.pagenums) {
 	    rs = progoffhf(pip,ofp,"PF","",pip->pout.hf_pagenum,"") ;
 	    wlen += rs ;
 	}
@@ -207,10 +207,10 @@ int progoutbegin(PROGINFO *pip,bfile *ofp)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("main/printfront: f_fm=%u frontfname=%s\n",
-	        pip->f.frontmatter,pip->frontfname) ;
+	        pip->fl.frontmatter,pip->frontfname) ;
 #endif
 
-	if ((rs >= 0) && pip->f.frontmatter) {
+	if ((rs >= 0) && pip->fl.frontmatter) {
 	    rs = progfront(pip,ofp) ;
 	    wlen += rs ;
 	}
@@ -224,12 +224,12 @@ int progoutbegin(PROGINFO *pip,bfile *ofp)
 	}
 
 	if ((rs >= 0) && pip->have.hyphenate) {
-	    rs = progoffsrn(pip,ofp,"hyphenation","Hy",pip->f.hyphenate) ;
+	    rs = progoffsrn(pip,ofp,"hyphenation","Hy",pip->fl.hyphenate) ;
 	    wlen += rs ;
 	}
 
 	if ((rs >= 0) && pip->have.ha) {
-	    rs = progoffsrn(pip,ofp,"ha","ha",pip->f.ha) ;
+	    rs = progoffsrn(pip,ofp,"ha","ha",pip->fl.ha) ;
 	    wlen += rs ;
 	}
 
@@ -323,7 +323,7 @@ int progoutend(PROGINFO *pip,bfile *ofp)
 
 /* any table-of-contents */
 
-	if ((rs >= 0) && pip->f.tc) {
+	if ((rs >= 0) && pip->fl.tc) {
 	    ncols = (pip->c.book <= 33) ? 1 : 2 ;
 	    rs = progouttc(pip,ofp,ncols) ;
 	    wlen += rs ;
