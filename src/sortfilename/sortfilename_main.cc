@@ -188,7 +188,7 @@ const char	*envv[] ;
 	    rs = bopen(&errfile,BFILE_STDERR,"dwca",0666) ;
 	if (rs >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	}
 
@@ -398,7 +398,7 @@ const char	*envv[] ;
 
 /* quiet mode */
 	                        case 'Q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* version */
