@@ -34,19 +34,27 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"vecitem.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| + |memcopy(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -96,7 +104,7 @@ consteval cur mkcurdef() noex {
 	c.c = 0 ;
 	c.i = -1 ;
 	return c ;
-} ;
+} /* end subroutine (mkcurdef) */
 
 
 /* local variables */
@@ -117,7 +125,7 @@ int vecitem_start(vecitem *op,int n,int opts) noex {
 	    memclear(hop) ;	/* <- potentially dangerous if type changes */
 	    if ((rs = vecitem_setopts(op,opts)) >= 0) {
 	        cint	sz = (n + 1) * szof(char **) ;
-		if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+		if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 		    op->va = (void **) vp ;
 	            op->va[0] = nullptr ;
 	            op->n = n ;
@@ -136,13 +144,13 @@ int vecitem_finish(vecitem *op) noex {
 	    for (int i = 0 ; i < op->i ; i += 1) {
 		void	*ep = op->va[i] ;
 	        if (ep) {
-	            rs1 = uc_free(ep) ;
+	            rs1 = libmem.free(ep) ;
 	            if (rs >= 0) rs = rs1 ;
 		    op->va[i] = nullptr ;
 	        }
 	    } /* end for */
 	    {
-	        rs1 = uc_free(op->va) ;
+	        rs1 = libmem.free(op->va) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
 	    }
@@ -161,8 +169,8 @@ int vecitem_add(vecitem *op,cvoid *ep,int el) noex {
 	    bool	f_done = false ;
 	    bool	f ;
 	    if (el < 0) el = lenstr(charp(ep)) ;
-	    if (char *bp ; (rs = uc_malloc((el+1),&bp)) >= 0) {
-	        memcpy(bp,ep,el) ;
+	    if (char *bp ; (rs = libmem.mall((el+1),&bp)) >= 0) {
+	        memcopy(bp,ep,el) ;
 	        bp[el] = '\0' ;
 	        f = (op->fl.oreuse || op->fl.oconserve) && (! op->fl.oordered) ;
 	        if (f && (op->c < op->i)) {
@@ -192,7 +200,7 @@ int vecitem_add(vecitem *op,cvoid *ep,int el) noex {
 	            op->c += 1 ; /* increment list count */
 	        } else {
 	            if (bp != nullptr) {
-	                uc_free(bp) ;
+	                libmem.free(bp) ;
 	            }
 	        }
 	        op->fl.issorted = false ;
@@ -227,7 +235,7 @@ int vecitem_del(vecitem *op,int i) noex {
 		rs = SR_OK ;
 	        if (op->va[i] != nullptr) {
 	            op->c -= 1 ;		/* decrement list count */
-	            uc_free(op->va[i]) ;
+	            libmem.free(op->va[i]) ;
 	        } /* end if */
 	        if (op->fl.ostationary) {
 	            op->va[i] = nullptr ;
@@ -489,11 +497,11 @@ static int vecitem_extend(vecitem *op) noex {
 	    if (op->va == nullptr) {
 	        nn = VECITEM_DEFENTS ;
 	        sz = (nn + 1) * esize ;
-	        rs = uc_malloc(sz,&na) ;
+	        rs = libmem.mall(sz,&na) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
 	        sz = (nn + 1) * esize ;
-	        rs = uc_realloc(op->va,sz,&na) ;
+	        rs = libmem.rall(op->va,sz,&na) ;
 	        op->va = nullptr ;
 	    }
 	    if (rs >= 0) {
