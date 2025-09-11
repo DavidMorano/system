@@ -244,17 +244,17 @@ int subinfo::starts() noex {
     	int		rs ;
 	if (char *bbuf ; (rs = libmalloc_mn(&bbuf)) >= 0) { /* max-name */
 	    if ((rs = sncpy(bbuf,rs,prefix,"s")) >= 0) {
-		auto malls = uc_libmallocstrw ;
+		auto malls = lm_strw ;
 	        if (cchar *cp ; (rs = malls(bbuf,rs,&cp)) >= 0) {
 		    basename = cast_const<charp>(cp) ;
 		    rs = startdir() ;
 		    if (rs < 0) {
-			uc_libfree(basename) ;
+			lm_free(basename) ;
 			basename = nullptr ;
 		    } /* end if (error) */
 		} /* end if (memory-allocation) */
 	    } /* end if (sncpy) */
-	    rs = rslibfree(rs,bbuf) ;
+	    rs = lm_rsfree(rs,bbuf) ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
@@ -268,12 +268,12 @@ int subinfo::startdir() noex {
 		cchar	*pp = dbuf ;
 	        if (USTAT sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
 		    if (S_ISDIR(sb.st_mode)) {
-			auto malls = uc_libmallocstrw ;
+			auto malls = lm_strw ;
 		        if (cc *cp ; (rs = malls(pp,pl,&cp)) >= 0) {
 			    svcdname = cast_const<charp>(cp) ;
 			    rs = startsym() ;
 			    if (rs < 0) {
-				uc_libfree(svcdname) ;
+				lm_free(svcdname) ;
 				svcdname = nullptr ;
 			    } /* end if (error) */
 		        } /* end if (memory-allocation) */
@@ -282,7 +282,7 @@ int subinfo::startdir() noex {
 		    }
 	        } /* end if (stat) */
 	    } /* end if (mkpath) */
-	    rs = rslibfree(rs,dbuf) ;
+	    rs = lm_rsfree(rs,dbuf) ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
@@ -292,12 +292,12 @@ int subinfo::startsym() noex {
     	int		rs ;
 	if (char *sbuf ; (rs = libmalloc_sn(&sbuf)) >= 0) {
 	    if ((rs = sncpy(sbuf,rs,prefix,"_",svc)) >= 0) {
-		auto malls = uc_libmallocstrw ;
+		auto malls = lm_strw ;
 		if (cc *cp ; (rs = malls(sbuf,rs,&cp)) >= 0) {
 		    dialsym = cast_const<charp>(cp) ;
 		} /* end if (memory-allocation) */
 	    } /* end if (sncpy) */
-	    rs = rslibfree(rs,sbuf) ;
+	    rs = lm_rsfree(rs,sbuf) ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
@@ -307,17 +307,17 @@ int subinfo::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (dialsym) {
-	    rs1 = uc_libfree(dialsym) ;
+	    rs1 = lm_free(dialsym) ;
 	    if (rs >= 0) rs = rs1 ;
 	    dialsym = nullptr ;
 	}
 	if (svcdname) {
-	    rs1 = uc_libfree(svcdname) ;
+	    rs1 = lm_free(svcdname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    svcdname = nullptr ;
 	}
 	if (basename) {
-	    rs1 = uc_libfree(basename) ;
+	    rs1 = lm_free(basename) ;
 	    if (rs >= 0) rs = rs1 ;
 	    basename = nullptr ;
 	}
@@ -335,7 +335,7 @@ int subinfo::search() noex {
 		    rs = exts(fbuf) ;
 		    f = rs ;
 		} /* end block */
-		rs = rslibfree(rs,fbuf) ;
+		rs = lm_rsfree(rs,fbuf) ;
 	    } /* end if (m-a-f) */
 	    rs1 = id.release ;
 	    if (rs >= 0) rs = rs1 ;
