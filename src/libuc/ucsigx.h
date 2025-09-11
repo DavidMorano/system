@@ -39,6 +39,9 @@ extern int uc_sigtimedwait(const sigset_t *,siginfo_t *,CTIMESPEC *) noex ;
 extern int uc_sigwaitinfoto(const sigset_t *,siginfo_t *,CTIMESPEC *) noex ;
 extern int uc_sigwaitinfo(const sigset_t *,siginfo_t *) noex ;
 
+extern int uc_raise(int) noex ;
+extern int uc_pause() noex ;
+
 EXTERNC_end
 
 
