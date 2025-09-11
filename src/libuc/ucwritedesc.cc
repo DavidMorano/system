@@ -70,6 +70,7 @@
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -217,7 +218,7 @@ int writer::copybuf(int ft) noex {
 	if ((rs = bufsize(ft)) >= 0) {
 	    size_t	ll = (ulen > 0) ? size_t(ulen) : SIZE_MAX ;
 	    char	*bbuf ;
-	    if (cint blen = rs ; (rs = uc_libvalloc(blen,&bbuf)) >= 0) {
+	    if (cint blen = rs ; (rs = libmem.vall(blen,&bbuf)) >= 0) {
 		csize	bsize = size_t(blen) ;
 		size_t	lsize = 0 ;
 		cauto read = [&,this] () noex {
@@ -235,7 +236,7 @@ int writer::copybuf(int ft) noex {
 		    if (rs < 0) break ;
 		} /* end for */
 		tlen = intsat(lsize) ;
-		rs1 = uc_libfree(bbuf) ;
+		rs1 = libmem.free(bbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (bufsize) */
