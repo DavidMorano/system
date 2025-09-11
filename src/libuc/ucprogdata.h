@@ -23,9 +23,14 @@
 #include	<usystem.h>
 
 
-#define	UCPROGDATA_DNETLOAD	0	/* netload */
-#define	UCPROGDATA_DSYSTAT	1	/* sys-stat */
+enum ucprogdatas {
+	ucprogdata_netload,		/* net-load */
+	ucprogdata_systat,		/* sys-stat */
+	ucprogdata_overlast
+} ; /* end enum (ucprogdatas) */
 
+#define	UCPROGDATA_DNETLOAD	ucprogdatas_netload
+#define	UCPROGDATA_DSYSTAT	ucprogdatas_systat
 
 EXTERNC_begin
 
