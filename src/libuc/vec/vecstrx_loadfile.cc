@@ -57,17 +57,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>		/* |uc_fstat(3uc)| */
+#include	<sys/stat.h>		/* |u_fstat(3u)| */
 #include	<unistd.h>
-#include	<fcntl.h>		/* |uc_open(3uc)| */
+#include	<fcntl.h>		/* |O_{xx}| */
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getfdfile.h>
-#include	<bufsizevar.hh>
 #include	<filer.h>
 #include	<field.h>
 #include	<fieldterms.h>
@@ -75,6 +80,9 @@
 
 #include	"vecstrx.hh"
 
+#pragma		GCC dependency		"mod/ulibvals.ccm"
+
+import ulibvals ;
 
 /* local defines */
 
@@ -86,9 +94,9 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -122,6 +130,8 @@ static int	mkterms() noex ;
 /* local variables */
 
 static char		fterms[fieldterms_termsize] ;
+
+static int		maxline = ulibval.maxline ;
 
 static vars		var ;
 
@@ -161,13 +171,13 @@ static int vecstrx_loadfiler(vecstrx *op,int fu,cchar *fname) noex {
         if (strcmp(fname,"-") != 0) {
             cint    of = O_RDONLY ;
             cmode   om = 0666 ;
-            if ((rs = uc_open(fname,of,om)) >= 0) {
+            if ((rs = u_open(fname,of,om)) >= 0) {
 		cint	fd = rs ;
 		{
                     rs = vecstrx_loadfd(op,fu,fd) ;
 		    c = rs ;
 		}
-                rs1 = uc_close(fd) ;
+                rs1 = u_close(fd) ;
 		if (rs >= 0) rs = rs1 ;
             } /* end if (read-file) */
         } else {
@@ -183,7 +193,7 @@ static int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (ustat sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	    csize	fsz = size_t(sb.st_size) ;
 	    rs = SR_ISDIR ;
 	    if (! S_ISDIR(sb.st_mode)) {
@@ -199,7 +209,7 @@ static int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	            to = TO_READ ;
 	            if (S_ISSOCK(sb.st_mode)) fbo |= FILER_ONET ;
 	        }
-	        if (char *lbuf ; (rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
+	        if (char *lbuf ; (rs = libmem.mall((llen+1),&lbuf)) >= 0) {
 		    if (filer lf ; (rs = lf.start(fd,0z,fbsz,fbo)) >= 0) {
 	                while ((rs = lf.readln(lbuf,llen,to)) > 0) {
 			    rs = vecstrx_loadline(vsp,fu,lbuf,rs) ;
@@ -209,7 +219,7 @@ static int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	                rs1 = lf.finish ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (filer) */
-		    rs1 = uc_libfree(lbuf) ;
+		    rs1 = libmem.free(lbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (not a directory) */
@@ -251,7 +261,7 @@ static int mkterms() noex {
 
 vars::operator int () noex {
         int             rs ;
-        if ((rs = ucmaxline) >= 0) {
+        if ((rs = maxline) >= 0) {
             var.linebuflen = (rs * LINEBUFMULT) ;
         }
         return rs ;
