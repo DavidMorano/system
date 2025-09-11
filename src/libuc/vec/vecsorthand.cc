@@ -32,7 +32,13 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"vecsorthand.h"
@@ -46,6 +52,7 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -98,7 +105,7 @@ int vecsorthand_start(vecsorthand *op,cmp_f cmpfunc,int vn) noex {
 	if (vn <= 1) vn = defents ;
 	if ((rs = vecsorthand_ctor(op,cmpfunc)) >= 0) {
 	    cint	sz = (szof(void **) * (vn + 1)) ;
-	    if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 	        op->va = voidpp(vp) ;
 	        op->e = vn ;
 	        {
@@ -117,7 +124,7 @@ int vecsorthand_finish(vecsorthand *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->va) {
-	        rs1 = uc_libfree(op->va) ;
+	        rs1 = libmem.free(op->va) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
 	    }
@@ -301,11 +308,11 @@ static int vecsorthand_extend(vecsorthand *op) noex {
 	    if (op->e == 0) {
 	        ne = ndef ;
 	        sz = (ne * szof(void **)) ;
-	        rs = uc_libmalloc(sz,&nva) ;
+	        rs = libmem.mall(sz,&nva) ;
 	    } else {
 	        ne = (op->e * 2) ;
 	        sz = (ne * szof(void **)) ;
-	        rs = uc_librealloc(op->va,sz,&nva) ;
+	        rs = libmem.rall(op->va,sz,&nva) ;
 	    }
 	    if (rs >= 0) {
 	        op->va = nva ;
