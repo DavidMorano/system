@@ -79,8 +79,8 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::destroy_at ;			/* subroutine */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -114,7 +114,7 @@ namespace {
 	char		*strp = nullptr ;
 	destruct setname() {
 	    if (strp) {
-	        uc_libfree(strp) ;
+	        libmem.free(strp) ;
 	        strp = nullptr ;
 	    }
 	}
@@ -124,7 +124,7 @@ namespace {
 	char		*strp = nullptr ;
 	destruct setaux() {
 	    if (strp) {
-	        uc_libfree(strp) ;
+	        libmem.free(strp) ;
 	        strp = nullptr ;
 	    }
 	}
@@ -263,12 +263,12 @@ int uinfo::fini() noex {
 	    {
 	        uinfo_alloc	*uap = &ao ;
 	        if (uap->name) {
-	            rs1 = uc_libfree(uap->name) ;
+	            rs1 = libmem.free(uap->name) ;
 		    if (rs >= 0) rs = rs1 ;
 	            uap->name = nullptr ;
 	        }
 	        if (uap->aux) {
-	            rs1 = uc_libfree(uap->aux) ;
+	            rs1 = libmem.free(uap->aux) ;
 		    if (rs >= 0) rs = rs1 ;
 	            uap->aux = nullptr ;
 	        }
@@ -325,7 +325,7 @@ int uinfo::getname_load(setname *setp) noex {
 	cint		usz = szof(utsname) ;
 	int		rs ;
 	int		rs1 ;
-	if (void *vp ; (rs = uc_libmalloc(usz,&vp)) >= 0) {
+	if (void *vp ; (rs = libmem.mall(usz,&vp)) >= 0) {
 	    if (utsname *utsp ; (utsp = new(vp) utsname) != np) {
                 if ((rs = u_uname(utsp)) >= 0) {
                     cint    nlen = (szof(utsp->sysname) - 1) ;
@@ -335,7 +335,7 @@ int uinfo::getname_load(setname *setp) noex {
                     sz += (lenstr(utsp->release,nlen) + 1) ;
                     sz += (lenstr(utsp->version,nlen) + 1) ;
                     sz += (lenstr(utsp->machine,nlen) + 1) ;
-                    if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+                    if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
                         setp->strp = bp ;
                         setp->tmpname.sysname = bp ;
                         bp = (strwcpy(bp,utsp->sysname,nlen) + 1) ;
@@ -351,7 +351,7 @@ int uinfo::getname_load(setname *setp) noex {
                 } /* end if (u_uname) */
 	        destroy_at(utsp) ;
 	    } /* end if (utsname) */
-	    rs1 = uc_libfree(vp) ;
+	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -368,7 +368,7 @@ int uinfo::getname_install(setname *setp) noex {
                     name = setp->tmpname ;
                     setp->strp = nullptr ;
 		} else {
-		    uc_libfree(setp->strp) ;
+		    libmem.free(setp->strp) ;
 		    setp->strp = nullptr ;
                 }
                 rs1 = mx.lockend ;
@@ -416,7 +416,7 @@ int uinfo::getaux_load(setaux *setp) noex {
 	cint		usz = szof(auxinfo) ;
 	int		rs ;
 	int		rs1 ;
-	if (void *vp ; (rs = uc_libmalloc(usz,&vp)) >= 0) {
+	if (void *vp ; (rs = libmem.mall(usz,&vp)) >= 0) {
 	    if (auxinfo *tap ; (tap = new(vp) auxinfo) != np) {
 	        if ((rs = tap->start()) >= 0) {
                     if ((rs = tap->load()) >= 0) {
@@ -427,7 +427,7 @@ int uinfo::getaux_load(setaux *setp) noex {
                         sz += (lenstr(tap->hwprovider,nlen) + 1) ;
                         sz += (lenstr(tap->hwserial,nlen) + 1) ;
                         sz += (lenstr(tap->nisdomain,nlen) + 1) ;
-                        if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+                        if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
                             cchar   *sp ;
                             setp->strp = bp ;
 		            {
@@ -462,7 +462,7 @@ int uinfo::getaux_load(setaux *setp) noex {
 	        } /* end if (start-finish) */
 	        destroy_at(tap) ;
 	    } /* end if (auxinfo) */
-	    rs1 = uc_libfree(vp) ;
+	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -479,7 +479,7 @@ int uinfo::getaux_install(setaux *setp) noex {
                     aux = setp->tmpaux ;
                     setp->strp = nullptr ;
 		} else {
-		    uc_libfree(setp->strp) ;
+		    libmem.free(setp->strp) ;
 		    setp->strp = nullptr ;
                 }
                 rs1 = mx.lockend ;
@@ -499,7 +499,7 @@ int auxinfo::start() noex {
 	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
 	    cint	sz = (nfields * (rs + 1)) ;
 	    flen = rs ;
-	    if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 		int	ai = 0 ;
 		a = charp(vp) ;
 		{
@@ -519,7 +519,7 @@ int auxinfo::finish() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	if (a) {
-	    rs1 = uc_libfree(a) ;
+	    rs1 = libmem.free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    a = nullptr ;
 	}
