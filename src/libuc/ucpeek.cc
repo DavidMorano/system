@@ -131,7 +131,7 @@ static int peek_stream(int fd,void *dbuf,int dlen) noex {
 	        rs = u_ioctl(fd,req,&pd) ;
 	        len = pd.databuf.len ;
 	    }
-	    rs1 = uc_libfree(cbuf) ;
+	    rs1 = lm_free(cbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs > 0) ? len : rs ;
