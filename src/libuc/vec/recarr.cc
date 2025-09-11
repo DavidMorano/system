@@ -30,7 +30,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |sort(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"recarr.h"
@@ -46,6 +52,8 @@
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -112,7 +120,7 @@ int recarr_start(recarr *op,int n,int opts) noex {
 	    if (n <= 1) n = RECARR_DEFENTS ;
 	    if ((rs = recarr_setopts(op,opts)) >= 0) {
 	        cint	sz = (n + 1) * szof(void **) ;
-	        if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+	        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 		    op->va = voidpp(vp) ;
 		    op->n = n ;
 	            op->va[0] = nullptr ;
@@ -132,7 +140,7 @@ int recarr_finish(recarr *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->va) {
-	        rs1 = uc_libfree(op->va) ;
+	        rs1 = libmem.free(op->va) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
 	        op->c = 0 ;
@@ -494,11 +502,11 @@ static int recarr_extend(recarr *op,int n) noex {
 	    if (op->va == nullptr) {
 	        nn = (n) ? n : RECARR_DEFENTS ;
 	        sz = (nn + 1) * szof(void **) ;
-	        rs = uc_libmalloc(sz,&nva) ;
+	        rs = libmem.mall(sz,&nva) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
 	        sz = (nn + 1) * szof(void **) ;
-	        rs = uc_librealloc(op->va,sz,&nva) ;
+	        rs = libmem.rall(op->va,sz,&nva) ;
 	        op->va = nullptr ;
 	    }
 	    if (rs >= 0) {
