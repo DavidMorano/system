@@ -231,7 +231,7 @@ static int subinfo_start(SI *sip,cc *prn,cc *svc,int of,mode_t om,
 	           cchar	*prefix = SVCSYMPREFIX ;
 	           char	dialsym[maxname +1] ;
 	           if ((rs = sncpy2(dialsym,maxname,prefix,sip->prn)) >= 0) {
-		       auto	mall = uc_libmallocstrw ;
+		       auto	mall = lm_strw ;
 		       cchar	*sp = dialsym ;
 	               if (cchar *cp ; (rs = mall(sp,rs,&cp)) >= 0) {
 	                   sip->dialsym = const_cast<char *>(cp) ;
@@ -249,7 +249,7 @@ static int subinfo_finish(SI *sip) noex {
 	int		rs1 ;
 
 	if (sip->dialsym != nullptr) {
-	    rs1 = uc_libfree(sip->dialsym) ;
+	    rs1 = lm_free(sip->dialsym) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->dialsym = nullptr ;
 	}
@@ -267,7 +267,7 @@ static int subinfo_search(SI *sip) noex {
 	if ((rs = subinfo_idbegin(sip)) >= 0) {
 	    cint	size = ((plen+1)*3) ;
 	    char	*abuf ;
-	    if ((rs = uc_libmalloc(size,&abuf)) >= 0) {
+	    if ((rs = lm_mall(size,&abuf)) >= 0) {
 	        char	dn[MAXHOSTNAMELEN+1] ;
 	        char	*pdn = (abuf+(0*(plen+1))) ;
 	        char	*sdn = (abuf+(1*(plen+1))) ;
@@ -292,7 +292,7 @@ static int subinfo_search(SI *sip) noex {
 	            } /* end for (prns) */
 
 	        } /* end if */
-	        rs1 = uc_libfree(abuf) ;
+	        rs1 = lm_free(abuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ma-a) */
 	    rs1 = subinfo_idend(sip) ;
