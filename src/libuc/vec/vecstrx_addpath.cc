@@ -66,20 +66,38 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<bufsizevar.hh>
-#include	<libmallocxx.h>		/* <- currently unused */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<usupport.h>
+#include	<usysconf.h>
+#include	<uclibmem.h>
 #include	<strn.h>		/* |strnbrk(3uc)| */
 #include	<pathclean.h>
 #include	<localmisc.h>
 
 #include	"vecstrx.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ulibvals.ccm"
+
+import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
+import ulibvals ;
 
 /* local defines */
 
 #define	NPATH	4			/* buffer multiply-factor */
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -107,7 +125,7 @@ static int vecstrx_addone(vecstrx *op,char *pbuf,cchar *sp,int sl) noex {
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static int		maxpathlen = ulibval.maxpathlen ;
 
 
 /* exported variables */
@@ -117,8 +135,6 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 int vecstrx::addpathclean(cchar *lp,int ll) noex {
     	cnullptr	np{} ;
-    	auto		mall = uc_libmalloc ;
-    	auto		mfre = uc_libfree ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -128,7 +144,7 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 	    if (ll > 0) {
 		if ((rs = maxpathlen) >= 0) {
 		    cint	plen = rs ;
-		    if (char *pbuf ; (rs = mall((plen+1),&pbuf)) >= 0) {
+		    if (char *pbuf ; (rs = libmem.mall((plen+1),&pbuf)) >= 0) {
 	                for (cc *tp ; (tp = strnbrk(lp,ll,":;")) != np ; ) {
 			    if (cint tl = intconv(tp - lp) ; tl >= 0) {
 				rs = vecstrx_addone(this,pbuf,lp,tl) ;
@@ -142,7 +158,7 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 			    rs = vecstrx_addone(this,pbuf,lp,ll) ;
 			    c += rs ;
 	                }
-			rs1 = mfre(pbuf) ;
+			rs1 = libmem.free(pbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		} /* end if (maxpathlen) */
@@ -180,20 +196,18 @@ int vecstrx::addpath(cchar *lp,int ll) noex {
 /* end subroutine (vecstrx_addpath) */
 
 int vecstrx::addcspath() noex {
-    	auto		mall = uc_libmalloc ;
-    	auto		mfre = uc_libfree ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
         if ((rs = maxpathlen) >= 0) {
             cint    clen = (NPATH * rs) ;
-            if (char *cbuf ; (rs = mall((clen+1),&cbuf)) >= 0) {
+            if (char *cbuf ; (rs = libmem.mall((clen+1),&cbuf)) >= 0) {
                 cint        req = _CS_PATH ;
-                if ((rs = uc_sysconfstr(req,cbuf,clen)) >= 0) {
+                if ((rs = u_sysconfstr(req,cbuf,clen)) >= 0) {
                     rs = addpath(cbuf,rs) ;
                     c += rs ;
                 } /* end if */
-                rs1 = mfre(cbuf) ;
+                rs1 = libmem.free(cbuf) ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (m-a-f) */
         } /* end if (maxpathlen) */
