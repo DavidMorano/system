@@ -62,15 +62,17 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usys.h>		/* <- auxilllary OS support */
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 
 #include	<ucsys.h>
 #include	<ucent.h>
 #include	<ucget.h>
 #include	<ucenum.h>
 #include	<ucuserattr.h>
-#include	<uclibmemalloc.h>
-#include	<ucmemalloc.h>
+#include	<uclibmem.h>
+#include	<ucmem.h>
 #include	<ucmallocx.h>
 #include	<ucstrtox.h>
 #include	<ucopen.h>
@@ -212,26 +214,6 @@ extern int	uc_rmdir(cchar *) noex ;
 extern int	uc_access(cchar *,int) noex ;
 extern int	uc_pathconf(cchar *,int,long *) noex ;
 
-/* process-signal group */
-extern int	uc_raise(int) noex ;
-extern int	uc_sigdefault(int) noex ;
-extern int	uc_sigignore(int) noex ;
-extern int	uc_sighold(int) noex ;
-extern int	uc_sigrelease(int) noex ;
-extern int	uc_sigpause(int) noex ;
-extern int	uc_sigsetempty(sigset_t *) noex ;
-extern int	uc_sigsetfill(sigset_t *) noex ;
-extern int	uc_sigsetadd(sigset_t *,int) noex ;
-extern int	uc_sigsetdel(sigset_t *,int) noex ;
-extern int	uc_sigsetismem(sigset_t *,int) noex ;
-
-/* special */
-extern int	uc_sigqueue(pid_t,int,const SIGVAL) noex ;
-extern int	uc_sigwaitinfo(const sigset_t *,siginfo_t *) noex ;
-extern int	uc_sigtimedwait(const sigset_t *,siginfo_t *,
-			CTIMESPEC *) noex ;
-extern int	uc_sigwaitinfoto(const sigset_t *,siginfo_t *,
-			CTIMESPEC *) noex ;
 /* special */
 extern int	uc_safesleep(int) noex ;
 extern int	uc_ttyname(int,char *,int) noex ;
