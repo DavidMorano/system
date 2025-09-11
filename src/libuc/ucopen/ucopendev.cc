@@ -196,12 +196,12 @@ static int opendev_default(cchar *fname,int of,mode_t om) noex {
 	sz += 1 ;
 	sz += intconv(lenstr(fname) + 1) ;
 	sz += 1 ;
-	if ((rs = uc_libmalloc(sz,&fnbuf)) >= 0) {
+	if ((rs = lm_mall(sz,&fnbuf)) >= 0) {
 	    if ((rs = mkpath2(fnbuf,devdname,fname)) >= 0) {
 	        rs = u_open(fnbuf,of,om) ;
 		fd = rs ;
 	    }
-	    rs1 = uc_libfree(fnbuf) ;
+	    rs1 = lm_free(fnbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */
 	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
@@ -297,7 +297,7 @@ static int inetargs_start(INETARGS *iap,cchar *sp,int sl) noex {
 	    for (int i = 0 ; i < da_overlast ; i += 1) {
 		sz += (iap->ia[i].p != nullptr) ? (iap->ia[i].l+1) : 1 ;
 	    }
-	    if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	    if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
 		cchar	*asp ;
 		iap->a = bp ;
 	        for (int i = 0 ; i < da_overlast ; i += 1) {
@@ -320,7 +320,7 @@ static int inetargs_finish(INETARGS *iap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (iap->a != nullptr) {
-	    rs1 = uc_libfree(iap->a) ;
+	    rs1 = lm_free(iap->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    iap->a = nullptr ;
 	}
