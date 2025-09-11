@@ -39,19 +39,18 @@
 
 #include	"varray.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
-
-#define	OURMALLOC(sz,pointer)		uc_libmalloc((sz),(pointer))
-#define	OURREALLOC(p1,sz,p2)		uc_librealloc((p1),(sz),(p2))
-#define	OURFREE(pointer)		uc_libfree((pointer))
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -119,13 +118,13 @@ int varray_start(varray *op,int esz,int n) noex {
 	    if (esz > 0) {
 	        cint	sz = (n + 1) * szof(void **) ;
 	        op->esz = esz ;
-	        if (void *vp{} ; (rs = OURMALLOC(sz,&vp)) >= 0) {
+	        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 	            memclear(vp,sz) ;
 	            op->va = (void **) vp ;
 	            op->n = n ;
 	            rs = lookaside_start(op->lap,esz,n) ;
 	            if (rs < 0) {
-	                OURFREE(vp) ;
+	                libmem.free(vp) ;
 		    }
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
@@ -149,7 +148,7 @@ int varray_finish(varray *op) noex {
 		    if (rs >= 0) rs = rs1 ;
 		}
 		if (op->va) {
-	            rs1 = OURFREE(op->va) ;
+	            rs1 = libmem.free(op->va) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->va = nullptr ;
 		}
@@ -381,11 +380,11 @@ static int varray_extend(VARRAY *op,int ni) noex {
 	    nn = (op->n + MAX(ndif,ninc)) ;
 	    sz = nn * szof(void **) ;
 	    if (op->va == nullptr) {
-	        if ((rs = OURMALLOC(sz,&vp)) >= 0) {
+	        if ((rs = libmem.mall(sz,&vp)) >= 0) {
 	            memclear(vp,sz) ;
 	        }
 	    } else {
-	        if ((rs = OURREALLOC(op->va,sz,&vp)) >= 0) {
+	        if ((rs = libmem.rall(op->va,sz,&vp)) >= 0) {
 	            void	**nva = (void **) vp ;
 	            cint	nndif = (nn-op->n) ;
 	            int		dsize ;
