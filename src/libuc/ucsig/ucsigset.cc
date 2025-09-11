@@ -16,8 +16,8 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<csignal>
 #include	<cerrno>
+#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -25,7 +25,13 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<localmisc.h>
 
+#include	"ucsigset.h"
+
+#pragma		GCC dependency		"mod/usigsets.ccm"
+
+import usigsets ;			/* |usigset(3u)| */
 
 /* local defines */
 
@@ -57,60 +63,27 @@
 /* exported subroutines */
 
 int uc_sigsetempty(sigset_t *sp) noex {
-	int		rs = SR_FAULT ;
-	if (sp) {
-	    if ((rs = sigemptyset(sp)) < 0) {
-	        rs = (- errno) ;
-	    }
-	} /* end if (non-null) */
-	return rs ;
+    	return usigset.empty(sp) ;
 }
 /* end subroutine (uc_sigsetempty) */
 
 int uc_sigsetfill(sigset_t *sp) noex {
-	int		rs = SR_FAULT ;
-	if (sp) {
-	    if ((rs = sigfillset(sp)) < 0) {
-	        rs = (- errno) ;
-	    }
-	} /* end if (non-null) */
-	return rs ;
+    	return usigset.fill(sp) ;
 }
 /* end subroutine (uc_sigsetfill) */
 
 int uc_sigsetadd(sigset_t *sp,int sn) noex {
-	int		rs = SR_FAULT ;
-	if (sp) {
-	    if ((rs = sigaddset(sp,sn)) < 0) {
-	        rs = (- errno) ;
-	    }
-	} /* end if (non-null) */
-	return rs ;
+    	return usigset.add(sp,sn) ;
 }
 /* end subroutine (uc_sigsetadd) */
 
 int uc_sigsetdel(sigset_t *sp,int sn) noex {
-	int		rs = SR_FAULT ;
-	if (sp) {
-	    if ((rs = sigdelset(sp,sn)) < 0) {
-	        rs = (- errno) ;
-	    }
-	} /* end if (non-null) */
-	return rs ;
+    	return usigset.del(sp,sn) ;
 }
 /* end subroutine (uc_sigsetdel) */
 
-int uc_sigsetismem(sigset_t *sp,int sn) noex {
-	int		rs = SR_FAULT ;
-	if (sp) {
-	    rs = SR_INVALID ;
-	    if (sn >= 0) {
-	        if ((rs = sigismember(sp,sn)) < 0) {
-		    rs = (- errno) ;
-	        }
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
+int uc_sigsetismem(const sigset_t *sp,int sn) noex {
+    	return usigset.ismem(sp,sn) ;
 }
 /* end subroutine (uc_sigsetismem) */
 
