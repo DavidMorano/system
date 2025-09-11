@@ -34,7 +34,6 @@
 #define	VECLONG_FL		struct veclong_flags
 #define	VECLONG_CUR		struct veclong_cursor
 #define	VECLONG_TYPE		long
-
 /* options */
 #define	VECLONG_ODEFAULT	0
 #define	VECLONG_OREUSE		(1 << 0)	/* reuse empty slots */
