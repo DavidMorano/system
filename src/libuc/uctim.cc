@@ -408,7 +408,7 @@ int uctim::cmd_create(int id,uctimarg *argp) noex {
 	int		rs1 ;
 	if (valp->metf) {
 	    cint	esz = szof(itcontrol) ;
-	    if (itcontrol *ep ; (rs = uc_libmalloc(esz,&ep)) >= 0) {
+	    if (itcontrol *ep ; (rs = lm_mall(esz,&ep)) >= 0) {
 		*ep = *argp->itcp ;
 	        if ((rs = ents.add(ep)) >= 0) {
 	            cint	ei = rs ;
@@ -422,7 +422,7 @@ int uctim::cmd_create(int id,uctimarg *argp) noex {
 		    }
 	        } /* end if (vechand_add) */
 	        if (rs < 0) {
-	            uc_libfree(ep) ;
+	            lm_free(ep) ;
 		}
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
@@ -435,7 +435,7 @@ int uctim::cmd_set(int id,uctimarg *argp) noex {
 	int		rs1 ;
 	if (valp->metf) {
 	    cint	esz = szof(itcontrol) ;
-	    if (itcontrol *ep ; (rs = uc_libmalloc(esz,&ep)) >= 0) {
+	    if (itcontrol *ep ; (rs = lm_mall(esz,&ep)) >= 0) {
 	        if ((rs = mx.lockbegin) >= 0) {
 	            if ((rs = ents.add(ep)) >= 0) {
 	                cint	ei = rs ;
@@ -452,7 +452,7 @@ int uctim::cmd_set(int id,uctimarg *argp) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (ptm) */
 	        if (rs < 0) {
-	            uc_libfree(ep) ;
+	            lm_free(ep) ;
 		}
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
@@ -482,7 +482,7 @@ int uctim::cmd_destroy(int id,uctimarg *argp) noex {
 	                }
 		    }
 		    if ((rs >= 0) && f_free) {
-	            	rs = uc_libfree(ep) ;
+	            	rs = lm_free(ep) ;
 		    }
 	        } /* end if (vechand_del) */
 	    } /* end if (vechand_get) */
@@ -671,7 +671,7 @@ int uctim::workfins() noex {
 	void		*otp{} ;
 	for (int i = 0 ; ents.get(i,&otp) >= 0 ; i += 1) {
 	    if (otp) {
-	        rs1 = uc_libfree(otp) ;
+	        rs1 = lm_free(otp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end for */
@@ -703,11 +703,11 @@ int uctim::workdump() noex {
 int uctim::priqbegin() noex {
 	cint		osz = szof(vecsorthand) ;
 	int		rs ;
-	if (void *p ; (rs = uc_libmalloc(osz,&p)) >= 0) {
+	if (void *p ; (rs = lm_mall(osz,&p)) >= 0) {
 	    prique	*pqp = (prique *) p ;
 	    rs = pqp->start(ourcmp,1) ;
 	    if (rs < 0) {
-	        uc_libfree(pqp) ;
+	        lm_free(pqp) ;
 	        pqp = nullptr ;
 	    }
 	} /* end if (m-a) */
@@ -724,7 +724,7 @@ int uctim::priqend() noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = uc_libfree(pqp) ;
+	        rs1 = lm_free(pqp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    pqp = nullptr ;
@@ -1072,7 +1072,7 @@ int uctim::disphandle() noex {
 	    if ((rs = dispjobdel(tep)) > 0) {
 	        timeout_f	met = (timeout_f) tep->metf ;
 	        rs = (*met)(tep->objp,tep->tag,tep->arg) ;
-	        uc_libfree(tep) ;
+	        lm_free(tep) ;
 	    } /* end if (still had job) */
 	    if (rs < 0) break ;
 	} /* end while */
