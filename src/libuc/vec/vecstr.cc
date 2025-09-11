@@ -93,7 +93,13 @@
 #include	<cstdlib>
 #include	<algorithm>		/* |sort(3c++)| */
 #include	<string>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<nulstr.h>
 #include	<nleadstr.h>
 #include	<strwcpy.h>
@@ -116,6 +122,7 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 using std::string ;			/* type */
 using std::sort ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -182,7 +189,7 @@ int vecstr_start(vecstr *op,int vn,int vo) noex {
 	    op->n = vn ;
 	    if ((rs = vecstr_setopts(op,vo)) >= 0) {
 	        cint	sz = (vn + 1) * szof(cchar **) ;
-	        if (void *va ; (rs = uc_libmalloc(sz,&va)) >= 0) {
+	        if (void *va ; (rs = libmem.mall(sz,&va)) >= 0) {
 	            op->va = ccharpp(va) ;
 	            op->va[0] = nullptr ;
 	            op->stsize = 1 ;
@@ -207,12 +214,12 @@ int vecstr_finish(vecstr *op) noex {
 		    cchar	*ep = op->va[i] ;
 	            if (ep) {
 			char *bp = cast_const<charp>(ep) ;
-	                rs1 = uc_libfree(bp) ;
+	                rs1 = libmem.free(bp) ;
 		        if (rs >= 0) rs = rs1 ;
 	            }
 	        } /* end for */
 		{
-	            rs1 = uc_libfree(op->va) ;
+	            rs1 = libmem.free(op->va) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->va = nullptr ;
 		}
@@ -283,7 +290,7 @@ int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	    }
 	    if (rs >= 0) {
 	        cint	sz = (kl + 1 + vl + 1) ;
-	        if (char *ap{} ; (rs = uc_libmalloc(sz,&ap)) >= 0) {
+	        if (char *ap ; (rs = libmem.mall(sz,&ap)) >= 0) {
 		    char	*bp = ap ;
 	            bp = strwcpy(bp,kp,kl) ;
 	            *bp++ = '=' ;
@@ -309,7 +316,7 @@ int vecstr_insert(vecstr *op,int ii,cchar *sp,int sl) noex {
 	        }
 	        if (rs >= 0) {
 	            cint	sz = (sl + 1) ;
-	            if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	            if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
 	                strwcpy(bp,sp,sl) ;
 	                op->stsize += sz ;
 	                i = vecstr_insertsp(op,ii,bp) ;
@@ -332,7 +339,7 @@ int vecstr_store(vecstr *op,cchar *sp,int sl,cchar **rpp) noex {
 	    }
 	    if (rs >= 0) {
 	        cint	sz = (sl + 1) ;
-	        if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	        if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
 	            char *ep = strwcpy(bp,sp,sl) ;
 	            op->stsize += intconv(ep - bp) ;
 	            i = vecstr_addsp(op,bp) ;
@@ -398,7 +405,7 @@ int vecstr_del(vecstr *op,int i) noex {
 	                    op->stsize -= (lenstr(op->va[i]) + 1) ;
 	                }
 			char *bp = cast_const<charp>(op->va[i]) ;
-	    		uc_libfree(bp) ;
+	    		libmem.free(bp) ;
 		    } /* end if (freeing the actual string data) */
 		    if (op->fl.ostationary) {
 	    	        op->va[i] = nullptr ;
@@ -457,7 +464,7 @@ int vecstr_delall(vecstr *op) noex {
 	        for (int i = 0 ; i < op->i ; i += 1) {
 	            if (op->va[i] != nullptr) {
 			char *bp = cast_const<charp>(op->va[i]) ;
-		        rs1 = uc_libfree(bp) ;
+		        rs1 = libmem.free(bp) ;
 		        if (rs >= 0) rs = rs1 ;
 	            }
 	        } /* end for */
@@ -902,11 +909,11 @@ static int vecstr_extvec(vecstr *op,int n) noex {
 	    if (op->va == nullptr) {
 	        nn = (n > 0) ? n : defents ;
 	        sz = (nn + 1) * szof(char **) ;
-	        rs = uc_libmalloc(sz,&na) ;
+	        rs = libmem.mall(sz,&na) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
 	        sz = (nn + 1) * szof(char **) ;
-	        rs = uc_librealloc(op->va,sz,&na) ;
+	        rs = libmem.rall(op->va,sz,&na) ;
 	    }
 	    if (rs >= 0) {
 	        op->va = (cchar **) na ;
