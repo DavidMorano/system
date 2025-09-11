@@ -46,8 +46,9 @@
 #include	<sys/types.h>
 #include	<pthread.h>
 #include	<unistd.h>
-#include	<climits>
 #include	<csignal>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>
 #include	<usystem.h>
@@ -64,6 +65,8 @@
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -107,7 +110,7 @@ int uptspawn(pthread_t *rp,pthread_attr_t *ptap,objsub_t start,
 	int		rv = 0 ;
 	if (rp && start) {
 	    cint	osz = szof(OURARGS) ;
-	    if (OURARGS *oap ; (rs = uc_libmalloc(osz,&oap)) >= 0) {
+	    if (OURARGS *oap ; (rs = libmem.mall(osz,&oap)) >= 0) {
 	        sigset_t	nsm ;
 	        sigset_t	osm ;
 	        uc_sigsetfill(&nsm) ;
@@ -171,7 +174,7 @@ static void *uptruner(void *vp) noex {
 	    int		(*start)(void *,void *) = oap->start ;
 	    void	*op = oap->op ;
 	    void	*ap = oap->ap ;
-	    uc_libfree(oap) ;
+	    libmem.free(oap) ;
 	    rs = (*start)(op,ap) ;
 	} /* end if (non-null) */
 	vrp = (void *) uintptr_t(rs) ;
