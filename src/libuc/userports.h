@@ -53,8 +53,8 @@ struct userports_head {
 	vecpstr		*plp ;		/* protocol-list-pointer */
 	vecpstr		*olp ;		/* port-list-pinter */
 	cchar		*fname ;
-	USERPORTS_FL	f ;
 	USERPORTS_FI	fi ;
+	USERPORTS_FL	fl ;
 	uint		magic ;
 } ;
 
