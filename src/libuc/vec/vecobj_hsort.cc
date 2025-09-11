@@ -73,8 +73,8 @@ int vecobj_hsort(vecobj *op,vecobj_vcf cmpfunc) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
 		rs = SR_OK ;
-	        if (! op->f.issorted) {
-	            op->f.issorted = true ;
+	        if (! op->fl.issorted) {
+	            op->fl.issorted = true ;
 	            if (op->c > 1) {
 			heapsort_cf	hcf = heapsort_cf(cmpfunc) ;
 			cint		esz = op->esize ;
