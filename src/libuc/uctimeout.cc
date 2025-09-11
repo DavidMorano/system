@@ -32,7 +32,7 @@
 	time-out call-backs.  Of course this is thread-safe.
 
 	Synopsis:
-	int uc_timeout(int cmd,TIMEOUT *val) noex
+	int uc_timeout(int cmd,timeout *val) noex
 
 	Arguments:
 	cmd		command:
@@ -72,6 +72,9 @@
 
 #include	"timeout.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |resumelife(3c++)| */
 
 /* local defines */
 
@@ -79,9 +82,11 @@
 #define	CF_CHILDTHRS	0
 #endif
 
-#define	UCTIMEOUT	struct uctimeout
-#define	UCTIMEOUT_FL	struct uctimeout_flags
+#define	UCTIMEOUT	uctimeout
+#define	UCTIMEOUT_FL	uctimeout_flags
 #define	UCTIMEOUT_SCOPE	PTHREAD_SCOPE_SYSTEM
+
+#define	CUCTIMEOUT	const uctimeout
 
 #define	TO_CAPTURE	60		/* capture wait for threads */
 #define	TO_SIGWAIT	2		/* signal-process wait */
@@ -89,6 +94,8 @@
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -98,6 +105,7 @@ extern "C" {
 }
 
 typedef vecsorthand	prique ;
+typedef const TIMEOUT *	ctimeoutp ;
 
 
 /* external subroutines */
@@ -118,7 +126,7 @@ namespace {
 	uint		wasblocked:1 ;
 	uint		running_siger:1 ;
 	uint		running_disper:1 ;
-    } ;
+    } ; /* end struct (uctimeout_flags) */
     struct uctimeout {
 	ptm		mx ;		/* data mutex */
 	ptc		cv ;		/* condition variable */
@@ -182,14 +190,14 @@ namespace {
 	    }
 	} ; /* end dtor (uctimeout) */
     } ; /* end struct (uctimeout) */
-}
+} /* end namespace */
 
 enum dispcmds {
 	dispcmd_exit,
 	dispcmd_timeout,
 	dispcmd_handle,
 	dispcmd_overlast
-} ;
+} ; /* end enum (dispcmds) */
 
 
 /* forward references */
@@ -201,27 +209,27 @@ extern "C" {
     static void	uctimeout_atforkparent() noex ;
     static void	uctimeout_atforkchild() noex ;
     static void	uctimeout_exit() noex ;
-    static int	ourcmp(const TIMEOUT *,const TIMEOUT *) noex ;
+    static int	ventcmp(cvoid *,cvoid *) noex ;
 }
 
-consteval int mkopts() noex {
+static int mkopts() noex {
 	int	vo = 0 ;
-	vo |= VECHA-D-OSTATIONARY ;
-	vo |= VECHA-D-OREUSE ;
-	vo |= VECHA-D-OCOMPACT ;
-	vo |= VECHA-D-OSWAP ;
-	vo |= VECHA-D-OCONSERVE ;
+	vo |= vechandm.stationary ;
+	vo |= vechandm.reuse ;
+	vo |= vechandm.compact ;
+	vo |= vechandm.swap ;
+	vo |= vechandm.conserve ;
 	return vo ;
-}
+} /* end subroutine (mkopts) */
 
 
 /* local variables */
 
 static uctimeout	uctimeout_data ;
 
-constexpr int		vopts = mkopts() ;
+cint			vopts = mkopts() ;
 
-constexpr bool		f_childthrs = CF_CHILDTHRS ;
+cbool			f_childthrs = CF_CHILDTHRS ;
 
 
 /* exported variables */
@@ -306,13 +314,13 @@ int uctimeout::init() noex {
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
-	            int		rs = SR_OK ;
+	            int		lrs = SR_OK ;
 	            if (!finit) {
-		        rs = SR_LOCKLOST ;
+		        lrs = SR_LOCKLOST ;
 	            } else if (finitdone) {
-		        rs = 1 ;
+		        lrs = 1 ;
 	            }
-	            return rs ;
+	            return lrs ;
 	        } ; /* end lambda */
 	        rs = tw(lamb) ;			/* <- time-watching */
 	    } /* end if (initialization) */
@@ -356,7 +364,7 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 	int		rs1 ;
 	if (valp->metf) {
 	    cint	esize = szof(TIMEOUT) ;
-	    if (TIMEOUT *ep{} ; (rs = uc_libmalloc(esize,&ep)) >= 0) {
+	    if (TIMEOUT *ep ; (rs = libmem.mall(esize,&ep)) >= 0) {
 	        if ((rs = mx.lockbegin) >= 0) {
 	            if ((rs = ents.add(ep)) >= 0) {
 	                cint	ei = rs ;
@@ -373,7 +381,7 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (ptm) */
 	        if (rs < 0) {
-	            uc_libfree(ep) ;
+	            libmem.free(ep) ;
 		}
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
@@ -404,7 +412,7 @@ int uctimeout::cmdcancel(TIMEOUT *valp) noex {
 	                }
 		    }
 		    if ((rs >= 0) && f_free) {
-	            	rs = uc_libfree(ep) ;
+	            	rs = libmem.free(ep) ;
 		    }
 	        } /* end if (vechand_del) */
 	    } /* end if (vechand_get) */
@@ -589,7 +597,7 @@ int uctimeout::workfins() noex {
 	void		*top ;
 	for (int i = 0 ; vechand_get(elp,i,&top) >= 0 ; i += 1) {
 	    if (top) {
-	        rs1 = uc_libfree(top) ;
+	        rs1 = libmem.free(top) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end for */
@@ -621,11 +629,11 @@ int uctimeout::workdump() noex {
 int uctimeout::priqbegin() noex {
 	cint		osize = szof(vecsorthand) ;
 	int		rs ;
-	if (void *p ; (rs = uc_libmalloc(osize,&p)) >= 0) {
-	    prique	*pqp = (prique *) p ;
-	    rs = vecsorthand_start(pqp,ourcmp,1) ;
+	if (void *vp ; (rs = libmem.mall(osize,&vp)) >= 0) {
+	    pqp = resumelife<prique>(vp) ;
+	    rs = vecsorthand_start(pqp,ventcmp,1) ;
 	    if (rs < 0) {
-	        uc_libfree(pqp) ;
+	        libmem.free(pqp) ;
 	        pqp = nullptr ;
 	    }
 	} /* end if (m-a) */
@@ -641,7 +649,7 @@ int uctimeout::priqend() noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (pqp) {
-	    rs1 = uc_libfree(pqp) ;
+	    rs1 = libmem.free(pqp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    pqp = nullptr ;
 	}
@@ -990,7 +998,7 @@ int uctimeout::disphandle() noex {
 	    if ((rs = dispjobdel(tep)) > 0) {
 	        timeout_f	met = (timeout_f) tep->metf ;
 	        rs = (*met)(tep->objp,tep->tag,tep->arg) ;
-	        uc_libfree(tep) ;
+	        libmem.free(tep) ;
 	    } /* end if (still had job) */
 	    if (rs < 0) break ;
 	} /* end while */
@@ -1059,19 +1067,21 @@ static void uctimeout_exit() noex {
 }
 /* end subroutine (uctimeout_atforkparent) */
 
-static int ourcmp(const TIMEOUT *e1p,const TIMEOUT *e2p) noex {
+static int ventcmp(cvoid *v1p,cvoid *v2p) noex {
+	const TIMEOUT	*e1p = ctimeoutp(v1p) ;
+	const TIMEOUT	*e2p = ctimeoutp(v2p) ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
-	            rc = (e1p->val - e2p->val) ;
+	            rc = intsat(e1p->val - e2p->val) ;
 	        }
 	    }
 	}
 	return rc ;
 }
-/* end subroutine (ourcmp) */
+/* end subroutine (ventcmp) */
 
 
