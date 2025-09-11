@@ -256,7 +256,7 @@ int uc_openinfo(ucopeninfo *oip) noex {
 	    if (hascdpath(oip->fname,-1)) {
 	        cint	tlen = MAXPATHLEN ;
 	        char	*tbuf ;
-	        if ((rs = uc_libmalloc((tlen+1),&tbuf)) >= 0) {
+	        if ((rs = lm_mall((tlen+1),&tbuf)) >= 0) {
 	            if ((rs = mkcdpath(tbuf,oip->fname,-1)) > 0) {
 			oip->fname = tbuf ;
 	                rs = open_eval(oip) ;
@@ -264,7 +264,7 @@ int uc_openinfo(ucopeninfo *oip) noex {
 	            } else if (rs == 0) {
 	                rs = SR_NOENT ;
 	            }
-	            uc_libfree(tbuf) ;
+	            lm_free(tbuf) ;
 	        } /* end if (memory-allocation) */
 	    } else {
 	        rs = open_eval(oip) ;
@@ -348,14 +348,14 @@ static int open_eval(ucopeninfo *oip) noex {
 	    } else if (rs >= 0) {
 	        if (hasvarpathprefix(oip->fname,-1) && (efname == nullptr)) {
 	            cint	sz = (MAXPATHLEN + 1) ;
-	            if (void *p ; (rs = uc_libmalloc(sz,&p)) >= 0) {
+	            if (void *p ; (rs = lm_mall(sz,&p)) >= 0) {
 	                efname = charp(p) ;
 	                efname[0] = '\0' ;
 	                if ((rs = mkvarpath(efname,oip->fname,-1)) > 0) {
 	                    oip->fname = efname ;
 	                } else if (rs <= 0) {
 	                    if (rs == 0) rs = SR_BADFMT ;
-	                    uc_libfree(efname) ;
+	                    lm_free(efname) ;
 	                    efname = nullptr ;
 	                }
 	            }
@@ -382,7 +382,7 @@ static int open_eval(ucopeninfo *oip) noex {
 	} /* end while */
 
 	if (efname) {
-	    uc_libfree(efname) ;
+	    lm_free(efname) ;
 	}
 
 	return (rs >= 0) ? fd : rs ;
