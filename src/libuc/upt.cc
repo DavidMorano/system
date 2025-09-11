@@ -54,6 +54,8 @@
 
 /* imported namespaces */
 
+using libuc::libmem ;			/* variable */
+
 
 /* local typedefs */
 
@@ -92,8 +94,8 @@ int uptcreate(pthread_t *rp,pta *ptap,uptsub_f start,void *arg) noex {
 	int		rs1 ;
 	int		tid = -1 ;
 	if (rp && start) {
-	    cint	osz = szof(struct ourarg) ;
-	    if (void *vp ; (rs = uc_libmalloc(osz,&vp)) >= 0) {
+	    cint	osz = szof(ourarg) ;
+	    if (void *vp ; (rs = libmem.mall(osz,&vp)) >= 0) {
 	        ourarg	*oap = (ourarg *) vp ;
 	        sigset_t	osm ;
 	        sigset_t	nsm ;
@@ -109,7 +111,7 @@ int uptcreate(pthread_t *rp,pta *ptap,uptsub_f start,void *arg) noex {
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
 	        if ((rs < 0) && (tid < 0)) {
-		    uc_libfree(oap) ;
+		    libmem.free(oap) ;
 	        }
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
@@ -335,7 +337,7 @@ static void *uptruner(void *vp) noex {
 	if (oap) {
 	    int		(*start)(void *) = oap->start ;
 	    void	*arg = oap->ap ;
-	    if ((rs = uc_libfree(oap)) >= 0) {
+	    if ((rs = libmem.free(oap)) >= 0) {
 	        rs = (*start)(arg) ;
 	    }
 	    {
