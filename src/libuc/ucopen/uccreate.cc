@@ -64,7 +64,7 @@ int uc_create(cchar *fname,mode_t om) noex {
 		        rs = u_creat(fname,om) ;
 			fd = rs ;
 	            }
-	            rs1 = uc_libfree(ebuf) ;
+	            rs1 = lm_free(ebuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 		if ((rs < 0) && (fd >= 0)) u_close(fd) ;
