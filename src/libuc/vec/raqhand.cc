@@ -33,7 +33,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"raqhand.h"
@@ -41,6 +47,14 @@
 import libutil ;
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -73,8 +87,7 @@ int raqhand_start(raqhand *op,int n,int opts) noex {
 	    memclear(op) ;
 	    if ((rs = raqhand_setopts(op,opts)) >= 0) {
 	        cint	sz = ((n+1) * szof(void *)) ;
-	        void	*vp{} ;
-	        if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
+	        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 		    memclear(vp,sz) ;
 		    op->va = (cvoid **) vp ;
 	            op->n = n ;
@@ -93,7 +106,7 @@ int raqhand_finish(raqhand *op) noex {
 	    if (op->va) {
 		rs = SR_OK ;
 		{
-		    rs1 = uc_libfree(op->va) ;
+		    rs1 = libmem.free(op->va) ;
 		    if (rs >= 0) rs = rs1 ;
 		    op->va = nullptr ;
 		}
@@ -334,11 +347,11 @@ static int raqhand_extend(raqhand *op) noex {
 	    if (op->va == nullptr) {
 	        nn = RAQHAND_DEFENTS ;
 	        sz = (nn + 1) * szof(void **) ;
-	        rs = uc_libmalloc(sz,&na) ;
+	        rs = libmem.mall(sz,&na) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
 	        sz = (nn + 1) * szof(void **) ;
-	        rs = uc_librealloc(op->va,sz,&na) ;
+	        rs = libmem.rall(op->va,sz,&na) ;
 	        op->va = nullptr ;
 	    }
 	    if (rs >= 0) {
