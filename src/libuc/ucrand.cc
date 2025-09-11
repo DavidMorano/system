@@ -70,6 +70,8 @@
 
 /* imported namespaces */
 
+using libuc::libmem ;			/* variable */
+
 
 /* local typedefs */
 
@@ -126,14 +128,14 @@ namespace {
 	rander_co	addnoise ;
 	int		waiters ;
 	rander() noex {
-	    init(this,randermem_init) ;
-	    fini(this,randermem_fini) ;
-	    randcheck(this,randermem_randcheck) ;
-	    randbegin(this,randermem_randbegin) ;
-	    randend(this,randermem_randend) ;
-	    capend(this,randermem_capend) ;
-	    addnoise(this,randermem_addnoise) ;
-	} ;
+	    init	(this,randermem_init) ;
+	    fini	(this,randermem_fini) ;
+	    randcheck	(this,randermem_randcheck) ;
+	    randbegin	(this,randermem_randbegin) ;
+	    randend	(this,randermem_randend) ;
+	    capend	(this,randermem_capend) ;
+	    addnoise	(this,randermem_addnoise) ;
+	} ; /* end ctor */
 	int capbegin(int = -1) noex ;
 	int get(char *,int) noex ;
 	int geter(char *,int) noex ;
@@ -152,7 +154,7 @@ namespace {
 	int icapend() noex ;
 	int iaddnoise() noex ;
     } ; /* end struct (rander) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -220,13 +222,13 @@ int rander::iinit() noex {
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
-	            int		rs = SR_OK ;
+	            int		lrs = SR_OK ;
 	            if (!finit) {
-		        rs = SR_LOCKLOST ;		/* <- failure */
+		        lrs = SR_LOCKLOST ;		/* <- failure */
 	            } else if (finitdone) {
-		        rs = 1 ;			/* <- OK ready */
+		        lrs = 1 ;			/* <- OK ready */
 	            }
-	            return rs ;
+	            return lrs ;
 	        } ; /* end lambda (lamb) */
 	        rs = tw(lamb) ;		/* <- time-watching occurs in there */
 	    } /* end if (initialization) */
@@ -361,13 +363,13 @@ int rander::irandbegin() noex {
 	int		rs = SR_OK ;
 	if (rvarp == nullptr) {
 	    cint	osz = szof(randomvar) ;
-	    if (void *vp{} ; (rs = uc_libmalloc(osz,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = libmem.mall(osz,&vp)) >= 0) {
 	        randomvar	*rvp = cast_static<randomvar *>(vp) ;
 	        if ((rs = randomvar_start(rvp,0,0)) >= 0) {
 	            rvarp = vp ;	/* <- store object pointer */
 		}
 	        if (rs < 0) {
-	            uc_libfree(vp) ;
+	            libmem.free(vp) ;
 		}
 	    } /* end if (memory-allocation) */
 	} /* end if (needed initialization) */
@@ -385,7 +387,7 @@ int rander::irandend() noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = uc_libfree(rvarp) ;
+	        rs1 = libmem.free(rvarp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        rvarp = nullptr ;
 	    }
