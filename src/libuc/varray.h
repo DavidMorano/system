@@ -47,16 +47,16 @@ EXTERNC_begin
 
 typedef int (*varray_vcmp)(cvoid **,cvoid **) noex ;
 
-extern int varray_start(varray *,int,int) noex ;
-extern int varray_enum(varray *,int,void *) noex ;
-extern int varray_acc(varray *,int,void *) noex ;
-extern int varray_mk(varray *,int,void *) noex ;
-extern int varray_del(varray *,int) noex ;
+extern int varray_start	(varray *,int,int) noex ;
+extern int varray_enum	(varray *,int,void *) noex ;
+extern int varray_acc	(varray *,int,void *) noex ;
+extern int varray_mk	(varray *,int,void *) noex ;
+extern int varray_del	(varray *,int) noex ;
 extern int varray_delall(varray *) noex ;
-extern int varray_count(varray *) noex ;
-extern int varray_find(varray *,void *) noex ;
+extern int varray_count	(varray *) noex ;
+extern int varray_find	(varray *,void *) noex ;
 extern int varray_search(varray *,void *,varray_vcmp,void *) noex ;
-extern int varray_audit(varray *) noex ;
+extern int varray_audit	(varray *) noex ;
 extern int varray_finish(varray *) noex ;
 
 EXTERNC_end
