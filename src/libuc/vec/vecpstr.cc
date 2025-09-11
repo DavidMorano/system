@@ -73,7 +73,13 @@
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<string>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vechand.h>
 #include	<vstrcmpx.h>
 #include	<nleadstr.h>
@@ -98,6 +104,7 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 using std::string ;			/* type */
 using std::sort ;			/* subroutine-template */
 using std::min ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -215,7 +222,7 @@ int vecpstr_finish(vecpstr *op) noex {
 	int		rs1 ;
 	if ((rs = vecpstr_magic(op)) >= 0) {
 	    if (op->va) {
-	        rs1 = uc_libfree(op->va) ;
+	        rs1 = libmem.free(op->va) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
 	    }
@@ -316,7 +323,7 @@ int vecpstr_insert(vecpstr *op,int ii,cchar *sp,int sl) noex {
 	    }
 	    if (rs >= 0) {
 	        cint	sz = (sl+1) ;
-	        if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	        if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
 	            strwcpy(bp,sp,sl) ;
 	            op->stsize += sz ;
 	            i = vecpstr_insertsp(op,ii,bp) ;
@@ -459,7 +466,7 @@ int vecpstr_delall(vecpstr *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->va) {
-	        rs1 = uc_libfree(op->va) ;
+	        rs1 = libmem.free(op->va) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
 	    }
@@ -934,7 +941,7 @@ static int vecpstr_finchunks(vecpstr *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_libfree(chkp) ;
+	            rs1 = libmem.free(chkp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	    }
@@ -960,7 +967,7 @@ static int vecpstr_newchunk(vecpstr *op,int amount) noex {
 	cint		sz = szof(VPS_CH) ;
 	int		rs ;
 	op->chp = nullptr ;
-	if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+	if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 	    op->chp = (VPS_CH *) vp ;
 	    if (amount < op->chsize) amount = op->chsize ;
 	    if ((rs = chunk_start(op->chp,amount)) >= 0) {
@@ -970,7 +977,7 @@ static int vecpstr_newchunk(vecpstr *op,int amount) noex {
 		}
 	    } /* end if (chunk) */
 	    if (rs < 0) {
-	        uc_libfree(op->chp) ;
+	        libmem.free(op->chp) ;
 	        op->chp = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
@@ -989,11 +996,11 @@ static int vecpstr_extvec(vecpstr *op,int n) noex {
 	        nn = op->addnum ;
 	        if (nn < dn) nn = dn ;
 	        vasz = (nn + 1) * szof(char **) ;
-	        rs = uc_libmalloc(vasz,&na) ;
+	        rs = libmem.mall(vasz,&na) ;
 	    } else {
 	        nn = (op->ext + 1) * 2 ;
 	        vasz = (nn + 1) * szof(char **) ;
-	        rs = uc_librealloc(op->va,vasz,&na) ;
+	        rs = libmem.rall(op->va,vasz,&na) ;
 	        op->va = nullptr ;
 	    } /* end if */
 	    if (rs >= 0) {
@@ -1059,7 +1066,7 @@ static int chunk_start(VPS_CH *chkp,int chsize) noex {
 	int		rs ;
 	chsize = iceil(chsize,8) ;
 	memclear(chkp) ; /* <- potentially dangerous if type changes */
-	if (void *vp ; (rs = uc_libmalloc(chsize,&vp)) >= 0) {
+	if (void *vp ; (rs = libmem.mall(chsize,&vp)) >= 0) {
 	    chkp->tab = charp(vp) ;
 	    chkp->tabsize = chsize ;
 	    chkp->tab[0] = '\0' ;
@@ -1073,7 +1080,7 @@ static int chunk_finish(VPS_CH *chkp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (chkp->tab) {
-	    rs1 = uc_libfree(chkp->tab) ;
+	    rs1 = libmem.free(chkp->tab) ;
 	    if (rs >= 0) rs = rs1 ;
 	    chkp->tab = nullptr ;
 	}
