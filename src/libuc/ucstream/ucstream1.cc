@@ -1,8 +1,8 @@
-/* ucstream1 SUPPORT */
+/* ucstream1 SUPPORT (module-implementation-unit) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* implement a map container of blocks (of a given structure) */
+/* file stream operations for LIBUC */
 /* version %I% last-modified %G% */
 
 
