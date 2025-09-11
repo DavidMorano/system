@@ -36,10 +36,18 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"veclong.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
@@ -48,9 +56,9 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -122,7 +130,7 @@ int veclong_finish(veclong *op) noex {
 	int		rs1 ;
 	if ((rs = veclong_magic(op)) >= 0) {
 	    if (op->va) {
-	        rs1 = uc_free(op->va) ;
+	        rs1 = libmem.free(op->va) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
 	    }
@@ -541,11 +549,11 @@ static int veclong_extend(veclong *op,int amount) noex {
 	    if (op->va == nullptr) {
 	        nn = max(amount,VECLONG_DEFENTS) ;
 	        sz = ((nn + 1) * esize) ;
-	        rs = uc_malloc(sz,&nva) ;
+	        rs = libmem.mall(sz,&nva) ;
 	    } else {
 	        nn = max((op->n + amount),(op->n * 2)) ;
 	        sz = ((nn + 1) * esize) ;
-	        rs = uc_realloc(op->va,sz,&nva) ;
+	        rs = libmem.rall(op->va,sz,&nva) ;
 	    } /* end if */
 	    if (rs >= 0) {
 	        op->va = nva ;
