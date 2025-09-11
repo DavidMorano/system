@@ -57,14 +57,14 @@ struct vecelem_flags {
 } ;
 
 struct vecelem_head {
-	caddr_t		va ;
-	VECELEM_FL	f ;
+	voidpp		va ;
+	VECELEM_FL	fl ;
 	uint		magic ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
 	int		fi ;		/* free index */
-	int		esize ;		/* element size */
+	int		esz ;		/* element size */
 } ;
 
 typedef VECELEM		vecelem ;
