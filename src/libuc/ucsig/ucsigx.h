@@ -19,8 +19,12 @@
 #define	UCSIGX_INCLUDE
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<signal.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 
 
 EXTERNC_begin
@@ -34,6 +38,9 @@ extern int uc_sigqueue(pid_t,int,CSIGVAL) noex ;
 extern int uc_sigtimedwait(const sigset_t *,siginfo_t *,CTIMESPEC *) noex ;
 extern int uc_sigwaitinfoto(const sigset_t *,siginfo_t *,CTIMESPEC *) noex ;
 extern int uc_sigwaitinfo(const sigset_t *,siginfo_t *) noex ;
+
+extern int uc_raise(int) noex ;
+extern int uc_pause() noex ;
 
 EXTERNC_end
 
