@@ -63,7 +63,6 @@
 #include	<csignal>		/* |sig_atomic_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<atomic>
 #include	<usystem.h>
 #include	<getbufsize.h>
@@ -83,6 +82,8 @@
 #include	<localmisc.h>
 
 #include	"utmpacc.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
@@ -113,6 +114,7 @@ import libutil ;
 /* imported namespaces */
 
 using std::atomic_int ;			/* type */
+using libuc::libmem ;
 
 
 /* local typedefs */
@@ -325,11 +327,11 @@ int utmpacc_curbegin(utmpacc_cur *curp) noex {
 	    cnullptr	np{} ;
 	    cint	csz = szof(utmpacc_icur) ;
 	    curp->icursor = nullptr ;
-	    if (void *vp ; (rs = uc_libmalloc(csz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(csz,&vp)) >= 0) {
 		cint		usz = szof(UTMPX) ;
 	        utmpacc_icur	*icurp = (utmpacc_icur *) vp ;
 		memclear(icurp) ;
-		if ((rs = uc_libmalloc(usz,&vp)) >= 0) {
+		if ((rs = libmem.mall(usz,&vp)) >= 0) {
 		    UTMPX	*ufp = (UTMPX *) vp ;
 		    cint	of = (O_CLOEXEC | O_MINFD) ;
 		    cmode	om = 0664 ;
@@ -351,12 +353,12 @@ int utmpacc_curbegin(utmpacc_cur *curp) noex {
 		        }
 		    } /* end if (opentmp) */
 		    if (rs < 0) {
-			uc_libfree(ufp) ;
+			libmem.free(ufp) ;
 			icurp->utmpfentp = nullptr ;
 		    }
 		} /* end if (memory-allocation) */
 		if (rs < 0) {
-		    uc_libfree(icurp) ;
+		    libmem.free(icurp) ;
 		    curp->icursor = nullptr ;
 		}
 	    } /* end if (mempory-allocation) */
@@ -407,7 +409,7 @@ int utmpacc_curend(utmpacc_cur *curp) noex {
 		        icurp->fd = -1 ;
 		    }
 		    if (icurp->utmpfentp) {
-			rs1 = uc_libfree(icurp->utmpfentp) ;
+			rs1 = libmem.free(icurp->utmpfentp) ;
 			if (rs >= 0) rs = rs1 ;
 			icurp->utmpfentp = nullptr ;
 		    }
@@ -416,7 +418,7 @@ int utmpacc_curend(utmpacc_cur *curp) noex {
 		    rs = SR_BADFMT ;
 		} /* end if (good cursor-magic) */
 		{
-		    rs1 = uc_libfree(curp->icursor) ;
+		    rs1 = libmem.free(curp->icursor) ;
 		    if (rs >= 0) rs = rs1 ;
 		    curp->icursor = nullptr ;
 		}
