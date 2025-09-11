@@ -63,11 +63,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<usystem.h>
-#include	<getbufsize.h>
-#include	<libmallocxx.h>
 #include	<fsdir.h>
 #include	<mkpathx.h>
 #include	<pathadd.h>
@@ -79,6 +75,9 @@
 
 #include	"ucproctypes.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import ulibvals ;			/* |maxnamelen| + |maxpathlen| */
 
 /* local defines */
 
@@ -89,6 +88,14 @@
 #ifndef	UIDSYS
 #define	UIDSYS		100		/* common but unofficial value */
 #endif
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -115,7 +122,12 @@ namespace {
 	int setid() noex ;
 	operator int () noex ;
     } ; /* end struct (procer) */
-}
+    struct vars {
+	int	maxnamelen ;
+	int	maxpathlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
 
 
 /* forward references */
@@ -123,7 +135,9 @@ namespace {
 
 /* local variables */
 
-constexpr cchar		dn[] = PROCDNAME ;
+static vars	var ;
+
+cchar		dn[] = PROCDNAME ;
 
 
 /* exported variables */
@@ -145,16 +159,18 @@ procer::operator int () noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = setid()) >= 0) {
-	    if ((rs = libmalloc_mn(&nbuf)) >= 0) {
-	        nlen = rs ;
-		{
-	            rs = fsdent() ;
-		    c = rs ;
-		}
-		rs1 = uc_libfree(nbuf) ;
-		if (rs >= 0) rs = rs1 ;
-		nbuf = nullptr ;
-	    } /* end if (lib-allocation-free) */
+	    if ((rs = var) >= 0) {
+		nlen = var.maxnamelen ;
+	        if ((rs = libmem.mall((nlen + 1),&nbuf)) >= 0) {
+		    {
+	                rs = fsdent() ;
+		        c = rs ;
+		    }
+		    rs1 = libmem.free(nbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		    nbuf = nullptr ;
+	        } /* end if (memory-allocation-free) */
+	    } /* end if (vars) */
 	} /* end if (valid) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -215,10 +231,11 @@ int procer::fsdent() noex {
 /* end subroutine (procer::fsdent) */
 
 int procer::selection() noex {
+    	cint		plen = var.maxpathlen ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (char *pbuf ; (rs = libmalloc_mp(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = libmem.mall((plen + 1),&pbuf)) >= 0) {
 	    if ((rs = mkpath1(pbuf,dn)) >= 0) {
 		cint    pl = rs ;
 		while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
@@ -226,7 +243,7 @@ int procer::selection() noex {
 		    if (isdigitlatin(ch)) {
 		        cchar   *dp = nbuf ;
                         if ((rs = pathadd(pbuf,pl,dp)) >= 0) {
-                            if (USTAT sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
+                            if (ustat sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
 				switch (w) {
 				case ucproctype_all:
 				    n += 1 ;
@@ -263,11 +280,24 @@ int procer::selection() noex {
 		    if (rs < 0) break ;
 		} /* end while */
 	    } /* end if (mkpath) */
-	    rs1 = uc_libfree(pbuf) ;
+	    rs1 = libmem.free(pbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end method (procer::selection) */
+
+vars::operator int () noex {
+    	int		rs = SR_OK ;
+	if (maxnamelen == 0) {
+	    if ((rs = ulibval.maxnamelen) >= 0) {
+		maxnamelen = rs ;
+		if ((rs = ulibval.maxpathlen) >= 0) {
+		    maxpathlen = rs ;
+		}
+	    }
+	} /* end if (needed) */
+	return rs ;
+} /* end method (vars::operator) */
 
 
