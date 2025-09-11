@@ -38,7 +38,14 @@
 #include	<cstring>		/* <- |memcmp(3c)| */
 #include	<new>
 #include	<algorithm>
-#include	<usystem.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<lookaside.h>
 #include	<localmisc.h>
 
@@ -53,6 +60,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -113,13 +121,13 @@ int vecobj_start(vecobj *op,int osize,int n,int opts) noex {
 	            op->i = 0 ;
 	            op->c = 0 ;
 	            op->fi = 0 ;
-	            if (void *vp ; (rs = uc_libmalloc(size,&vp)) >= 0) {
+	            if (void *vp ; (rs = libmem.mall(size,&vp)) >= 0) {
 	                op->va = voidpp(vp) ;
 	                op->va[0] = nullptr ;
 	                op->n = n ;
 	                rs = lookaside_start(op->lap,osize,n) ;
 	                if (rs < 0) {
-	                    uc_libfree(vp) ;
+	                    libmem.free(vp) ;
 			    op->va = nullptr ;
 			}
 	            } /* end if */
@@ -145,7 +153,7 @@ int vecobj_finish(vecobj *op) noex {
 		    if (rs >= 0) rs = rs1 ;
 		}
 		{
-		    rs1 = uc_libfree(op->va) ;
+		    rs1 = libmem.free(op->va) ;
 		    if (rs >= 0) rs = rs1 ;
 		    op->va = nullptr ;
 		}
@@ -718,11 +726,11 @@ static int vecobj_extend(vecobj *op) noex {
 	    if (op->va == nullptr) {
 	        nn = defents ;
 	        sz = (nn + 1) * szof(void **) ;
-	        rs = uc_libmalloc(sz,&nva) ;
+	        rs = libmem.mall(sz,&nva) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
 	        sz = (nn + 1) * szof(void **) ;
-	        rs = uc_librealloc(op->va,sz,&nva) ;
+	        rs = libmem.rall(op->va,sz,&nva) ;
 	        op->va = nullptr ;
 	    }
 	    if (rs >= 0) {
