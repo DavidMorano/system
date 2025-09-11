@@ -30,16 +30,31 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<libmallocxx.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<fsdirtree.h>
 #include	<localmisc.h>
 
 #include	"vecstrx.hh"
 
+#pragma		GCC dependency		"mod/ulibvals.ccm"
+
+import ulibvals ;
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -56,6 +71,8 @@
 
 /* local variables */
 
+static int		maxpathlen = ulibval.maxpathlen ;
+
 
 /* exported variables */
 
@@ -67,28 +84,30 @@ int vecstrx::addsubdirs(cchar *newsdname) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (newsdname) {
-	    if (char *fbuf ; (rs = libmalloc_mp(&fbuf)) >= 0) {
-	        fsdirtree	dir ;
-		cint		flen = rs ;
-	        cint		fo = (FSDIRTREE_MFOLLOW | FSDIRTREE_MDIR) ;
-	        if ((rs = fsdirtree_open(&dir,newsdname,fo)) >= 0) {
-	            USTAT	sb ;
-	            while ((rs = fsdirtree_read(&dir,&sb,fbuf,flen)) > 0) {
-	                if (fbuf[0] != '.') {
-	                    c += 1 ;
-	                    rs = add(fbuf,rs) ;
-	                }
-	                if (rs < 0) break ;
-	            } /* end while */
-	            rs1 = fsdirtree_close(&dir) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (fsdirtree) */
-	        if (rs >= 0) {
-	            sort(nullptr) ;
-	        }
-		rs1 = uc_libfree(fbuf) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
+	    if ((rs = maxpathlen) >= 0) {
+		cint	flen = rs ;
+	        if (char *fbuf ; (rs = libmem.mall((flen +1),&fbuf)) >= 0) {
+	            fsdirtree	dir ;
+	            cint	fo = (FSDIRTREE_MFOLLOW | FSDIRTREE_MDIR) ;
+	            if ((rs = fsdirtree_open(&dir,newsdname,fo)) >= 0) {
+	                ustat sb ;
+	                while ((rs = fsdirtree_read(&dir,&sb,fbuf,flen)) > 0) {
+	                    if (fbuf[0] != '.') {
+	                        c += 1 ;
+	                        rs = add(fbuf,rs) ;
+	                    }
+	                    if (rs < 0) break ;
+	                } /* end while */
+	                rs1 = fsdirtree_close(&dir) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (fsdirtree) */
+	            if (rs >= 0) {
+	                sort(nullptr) ;
+	            }
+		    rs1 = libmem.free(fbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (maxpathlen) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
