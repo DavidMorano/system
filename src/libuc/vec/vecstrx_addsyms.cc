@@ -58,15 +58,32 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<getbufsize.h>
-#include	<estrings.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<usupport.h>		/* |libu::sncpy(3u)| */
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"vecstrx.hh"
 
+#pragma		GCC dependency		"mod/ulibvals.ccm"
+
+import ulibvals ;
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libu::sncpy ;			/* subroutine */
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -83,9 +100,12 @@ namespace {
 	int		symlen ;
 	vars() noex = default ;
 	operator int () noex ;
-	~vars() ;
-    } ;
-}
+	void dtor() noex ;
+	destruct vars() {
+	    if (symbuf) dtor() ;
+	} ;
+    } ; /* end struct (vars) */
+} /* end namespace */
 
 
 /* forward references */
@@ -94,6 +114,8 @@ namespace {
 /* local variables */
 
 static vars		var ;
+
+static int		symnamelen = ulibval.maxsymbol ;
 
 
 /* exported variables */
@@ -124,23 +146,21 @@ int vecstrx::addsyms(cc *objn,mainv syms) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_sn)) >= 0) {
+	if ((rs = symnamelen) >= 0) {
 	    symlen = rs ;
-	    if (char *p ; (rs = uc_libmalloc((symlen + 1),&p)) >= 0) {
+	    if (char *p ; (rs = libmem.mall((symlen + 1),&p)) >= 0) {
 		symbuf = p ;
 	    }
 	}
 	return rs ;
-}
-/* end method (vars:operator) */
+} /* end method (vars:operator) */
 
-vars::~vars() {
+void vars::dtor() noex {
     	if (symbuf) {
-    	    uc_libfree(symbuf) ;
+    	    libmem.free(symbuf) ;
 	    symbuf = nullptr ;
 	    symlen = 0 ;
 	}
-}
-/* end method (vars:dtor) */
+} /* end method (vars:dtor) */
 
 
