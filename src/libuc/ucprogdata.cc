@@ -76,13 +76,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<csignal>
 #include	<ctime>
+#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- |strlen(3c)| */
 #include	<usystem.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
@@ -95,6 +92,9 @@
 
 #include	"ucprogdata.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -105,6 +105,8 @@
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/*  variable */
 
 
 /* local typedefs */
@@ -171,10 +173,13 @@ static int entry_finish(UCPD_ENT *) noex ;
 static UCPD	ucprogdata_data ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ucprogdata_init() noex {
-	UCPD	*uip = &ucprogdata_data ;
+	UCPD		*uip = &ucprogdata_data ;
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (! uip->f_void) {
@@ -217,7 +222,7 @@ int ucprogdata_init() noex {
 /* end subroutine (ucprogdata_init) */
 
 int ucprogdata_fini() noex {
-	UCPD	*uip = &ucprogdata_data ;
+	UCPD		*uip = &ucprogdata_data ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->f_initdone && (! uip->f_void)) {
@@ -320,17 +325,17 @@ static int ucprogdata_struct(UCPD *uip) noex {
 static int ucprogdata_begin(UCPD *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->ents == nullptr) {
-	    cint	osize = szof(varray) ;
-	    void	*p ;
-	    if ((rs = uc_libmalloc(osize,&p)) >= 0) {
-	        cint		esize = szof(UCPD_ENT) ;
+	    cint	osz = szof(varray) ;
+	    if (void *vp ; (rs = libmem.mall(osz,&vp)) >= 0) {
+	        cint		esz = szof(UCPD_ENT) ;
 	        cint		n = 4 ;
-	        varray		*ents = (varray *) p ;
-	        if ((rs = varray_start(ents,esize,n)) >= 0) {
+	        varray		*ents = (varray *) vp ;
+	        if ((rs = varray_start(ents,esz,n)) >= 0) {
 	            uip->ents = ents ;
 		}
-	        if (rs < 0)
-	            uc_libfree(p) ;
+	        if (rs < 0) {
+	            libmem.free(vp) ;
+		}
 	    } /* end if (memory-allocation) */
 	} /* end if (needed initialization) */
 	return rs ;
@@ -351,7 +356,7 @@ static int ucprogdata_end(UCPD *uip) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = uc_libfree(uip->ents) ;
+	        rs1 = libmem.free(uip->ents) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    uip->ents = nullptr ;
@@ -458,18 +463,18 @@ static void ucprogdata_exit() noex {
 }
 /* end subroutine (ucprogdata_exit) */
 
-
-static int entry_start(UCPD_ENT *ep,cchar *vp,int vl,int ttl) noex {
+static int entry_start(UCPD_ENT *ep,cchar *vp,int µvl,int ttl) noex {
 	custime		dt = getustime ;
-	int		rs ;
-	if (vl < 0) vl = strlen(vp) ;
-	if (char *bp{} ; (rs = uc_libmalloc((vl+1),&bp)) >= 0) {
-	    ep->vp = bp ;
-	    ep->vl = vl ;
-	    strwcpy(bp,vp,vl) ;
-	    ep->ttl = ttl ;
-	    ep->et = dt ;
-	} /* end if (m-a) */
+	int		rs = SR_FAULT ;
+	if (int vl ; (vl = getlenstr(vp,µvl)) >= 0) {
+	    if (char *bp ; (rs = libmem.mall((vl + 1),&bp)) >= 0) {
+	        ep->vp = bp ;
+	        ep->vl = vl ;
+	        strwcpy(bp,vp,vl) ;
+	        ep->ttl = ttl ;
+	        ep->et = dt ;
+	    } /* end if (m-a) */
+	} /* end if (getlenstr) */
 	return rs ;
 }
 /* end subroutine (entry_start) */
@@ -478,7 +483,8 @@ static int entry_finish(UCPD_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->vp) {
-	    rs1 = uc_libfree(ep->vp) ;
+	    void *p = voidp(ep->vp) ;
+	    rs1 = libmem.free(p) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->vp = nullptr ;
 	}
@@ -488,8 +494,9 @@ static int entry_finish(UCPD_ENT *ep) noex {
 
 static int entry_reload(UCPD_ENT *ep,cc *vp,int vl,int ttl) noex {
 	int		rs = SR_OK ;
-	if (ep->vp != nullptr) {
-	    rs = uc_libfree(ep->vp) ;
+	if (ep->vp) {
+	    void *p = voidp(ep->vp) ;
+	    rs = libmem.free(p) ;
 	    ep->vp = nullptr ;
 	}
 	if (rs >= 0) {
