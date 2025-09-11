@@ -41,7 +41,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"vechand.h"
@@ -51,6 +57,8 @@
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -87,7 +95,7 @@ static int	vechand_validx(vechand *,int) noex ;
 
 /* local variables */
 
-cint		defents = VECHAND_DEFENTS ;
+cint			defents = VECHAND_DEFENTS ;
 
 
 /* exported variables */
@@ -111,7 +119,7 @@ int vechand_start(vechand *op,int vn,int vo) noex {
 	    if (vn <= 1) vn = defents ;
 	    if ((rs = vechand_setopts(op,vo)) >= 0) {
 	        cint	sz = (vn + 1) * szof(cvoid **) ;
-	        if (void **va ; (rs = uc_libmalloc(sz,&va)) >= 0) {
+	        if (void **va ; (rs = libmem.mall(sz,&va)) >= 0) {
 		    op->va = va ;
 	            op->va[0] = nullptr ;
 	            op->n = vn ;
@@ -129,7 +137,7 @@ int vechand_finish(vechand *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->va) {
-	        rs1 = uc_libfree(op->va) ;
+	        rs1 = libmem.free(op->va) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
 	        op->c = 0 ;
@@ -515,15 +523,15 @@ static int vechand_extend(vechand *op) noex {
 	    if (op->va == nullptr) {
 	        nn = defents ;
 	        sz = (nn + 1) * szof(void **) ;
-	        rs = uc_libmalloc(sz,&nva) ;
+	        rs = libmem.mall(sz,&nva) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
 	        sz = (nn + 1) * szof(void **) ;
-	        rs = uc_librealloc(op->va,sz,&nva) ;
+	        rs = libmem.rall(op->va,sz,&nva) ;
 	        op->va = nullptr ;
 	    }
 	    if (rs >= 0) {
-	        op->va = (void **) nva ;
+	        op->va = voidpp(nva) ;
 	        op->n = nn ;
 		op->va[op->i] = nullptr ;
 	    }
