@@ -328,8 +328,8 @@ static constexpr cpcchar	protonames[] = {
 	nullptr
 } ;
 
-constexpr cauto		mall = uc_libmalloc ;
-constexpr cauto		mfre = uc_libfree ;
+constexpr cauto		mall = lm_mall ;
+constexpr cauto		mfre = lm_free ;
 
 
 /* exported variables */
@@ -1090,7 +1090,7 @@ static int fingerworker_loop(FINGERARGS *fap,filer *ofp,filer *ifp,
 	        } /* end if (clen) */
 	        if (rs < 0) break ;
 	    } /* end while (reading lines) */
-	    rs1 = uc_libfree(lbuf) ;
+	    rs1 = lm_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
