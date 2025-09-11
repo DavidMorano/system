@@ -95,7 +95,7 @@ int uc_opensysdb(sysdbfiles id,int oflags,mode_t operms) noex {
 		    rs = uc_open(nbuf,oflags,operms) ;
 		    fd = rs ;
 		}
-		rs1 = uc_libfree(nbuf) ;
+		rs1 = lm_free(nbuf) ;
 		if (rs >= 0) rs = rs1 ;
 		{
 		    if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
