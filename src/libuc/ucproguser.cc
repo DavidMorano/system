@@ -25,12 +25,14 @@
 	Set (as if for a cache) and get a username given a UID.
 
 	Synopsis:
+	int ucproguser_nameset(cchar *cbuf,int clen,uid_t uid,int ttl) noex
 	int ucproguser_nameget(char *rbuf,int rlen,uid_t uid) noex
 
 	Arguments:
 	rbuf		buffer to receive the requested username
 	rlen		length of supplied buffer
 	uid		UID of user to get name for
+	ttl		time-to-live
 
 	Returns:
 	==0		could not get a name
@@ -74,12 +76,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<cstring>
 #include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
@@ -98,6 +98,8 @@
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -132,22 +134,21 @@ namespace {
 	vaflag		f_void ;
 	vaflag		f_init ;
 	vaflag		f_initdone ;
+	void dtor() noex ;
 	destruct ucproguser() {
-	    if (cint rs = ucproguser_fini() ; rs < 0) {
-		ulogerror("ucproguser",rs,"dtor-fini") ;
-	    }
+	    dtor() ;
 	} ;
     } ; /* end struct (ucproguser) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 
 extern "C" {
-    static void	ucproguser_atforkbefore() noex ;
-    static void	ucproguser_atforkafter() noex ;
-    static void	ucproguser_exit() noex ;
+    local void	ucproguser_atforkbefore() noex ;
+    local void	ucproguser_atforkafter() noex ;
+    local void	ucproguser_exit() noex ;
 }
 
 static int	ucproguser_namer(UCPU *,cchar *,int) noex ;
@@ -232,6 +233,44 @@ int ucproguser_fini() noex {
 }
 /* end subroutine (ucproguser_fini) */
 
+int ucproguser_nameset(cchar *cbuf,int clen,uid_t uid,int ttl) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		ul = 0 ;
+	if (cbuf) {
+	    rs = SR_INVALID ;
+	    if (cbuf[0]) {
+	        if (uid == 0) uid = getuid() ;
+	        if (ttl < 0) ttl = TO_TTL ;
+		if (sigblocker b ; (rs = b.start) >= 0) {
+	            if ((rs = ucproguser_init()) >= 0) {
+			typedef int (*un_f)(UCPU *,cchar *,int) noex ;
+	                UCPU	*uip = &ucproguser_data ;
+	                if ((rs = uc_forklockbegin(-1)) >= 0) {
+	                    if ((rs = ptm_lock(&uip->mx)) >= 0) {
+				un_f	unr = ucproguser_namer ;
+				if ((rs = unr(uip,cbuf,clen)) >= 0) {
+				    ul = rs ;
+				    uip->et = time(nullptr) ;
+				    uip->uid = uid ;
+				    uip->ttl = ttl ;
+				}
+	                        rs1 = ptm_unlock(&uip->mx) ;
+	                        if (rs >= 0) rs = rs1 ;
+	                    } /* end if (mutex) */
+	                    rs1 = uc_forklockend() ;
+	                    if (rs >= 0) rs = rs1 ;
+	                } /* end if (forklock) */
+	            } /* end if (ucproguser_init) */
+	            rs1 = b.finish ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (sigblock) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? ul : rs ;
+}
+/* end subroutine (ucproguser_set) */
+
 int ucproguser_nameget(char *rbuf,int rlen,uid_t uid) noex {
 	UCPU		*uip = &ucproguser_data ;
 	int		rs = SR_FAULT ;
@@ -273,44 +312,6 @@ int ucproguser_nameget(char *rbuf,int rlen,uid_t uid) noex {
 }
 /* end subroutine (ucproguser_nameget) */
 
-int ucproguser_nameset(cchar *cbuf,int clen,uid_t uid,int ttl) noex {
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	int		ul = 0 ;
-	if (cbuf) {
-	    rs = SR_INVALID ;
-	    if (cbuf[0]) {
-	        if (uid == 0) uid = getuid() ;
-	        if (ttl < 0) ttl = TO_TTL ;
-		if (sigblocker b ; (rs = b.start) >= 0) {
-	            if ((rs = ucproguser_init()) >= 0) {
-			typedef int (*un_f)(UCPU *,cchar *,int) noex ;
-	                UCPU	*uip = &ucproguser_data ;
-	                if ((rs = uc_forklockbegin(-1)) >= 0) {
-	                    if ((rs = ptm_lock(&uip->mx)) >= 0) {
-				un_f	unr = ucproguser_namer ;
-				if ((rs = unr(uip,cbuf,clen)) >= 0) {
-				    ul = rs ;
-				    uip->et = time(nullptr) ;
-				    uip->uid = uid ;
-				    uip->ttl = ttl ;
-				}
-	                        rs1 = ptm_unlock(&uip->mx) ;
-	                        if (rs >= 0) rs = rs1 ;
-	                    } /* end if (mutex) */
-	                    rs1 = uc_forklockend() ;
-	                    if (rs >= 0) rs = rs1 ;
-	                } /* end if (forklock) */
-	            } /* end if (ucproguser_init) */
-	            rs1 = b.finish ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (sigblock) */
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (ucproguser_set) */
-
 
 /* local subroutines */
 
@@ -326,7 +327,7 @@ static int ucproguser_namer(UCPU *uip,cchar *cbuf,int clen) noex {
 static int ucproguser_namealloc(UCPU *uip,cchar *cbuf,int clen) noex {
 	int		rs = SR_BUGCHECK ;
 	if (uip->username == nullptr) {
-	    if (cchar *up ; (rs =  uc_libmallocstrw(cbuf,clen,&up)) >= 0) {
+	    if (cchar *up ; (rs =  libmem.strw(cbuf,clen,&up)) >= 0) {
 		uip->username = up ;
 	    } /* end if (m-a) */	
 	} /* end if (non-null) */
@@ -339,7 +340,7 @@ static int ucproguser_namefree(UCPU *uip) noex {
 	int		rs1 ;
 	if (uip->username) {
 	    char *bp = cast_const<charp>(uip->username) ;
-	    rs1 = uc_libfree(bp) ;
+	    rs1 = libmem.free(bp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    uip->username = nullptr ;
 	}
@@ -352,13 +353,13 @@ static int ucproguser_nameend(UCPU *uip) noex {
 	int		rs1 ;
 	if (uip->userhome) {
 	    char *bp = cast_const<charp>(uip->userhome) ;
-	    rs1 = uc_libfree(bp) ;
+	    rs1 = libmem.free(bp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    uip->userhome = nullptr ;
 	}
 	if (uip->username) {
 	    char *bp = cast_const<charp>(uip->username) ;
-	    rs1 = uc_libfree(bp) ;
+	    rs1 = libmem.free(bp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    uip->username = nullptr ;
 	}
@@ -366,23 +367,29 @@ static int ucproguser_nameend(UCPU *uip) noex {
 }
 /* end subroutine (ucproguser_nameend) */
 
-static void ucproguser_atforkbefore() noex {
+local void ucproguser_atforkbefore() noex {
 	UCPU	*uip = &ucproguser_data ;
 	ptm_lock(&uip->mx) ;
 }
 /* end subroutine (ucproguser_atforkbefore) */
 
-static void ucproguser_atforkafter() noex {
+local void ucproguser_atforkafter() noex {
 	UCPU	*uip = &ucproguser_data ;
 	ptm_unlock(&uip->mx) ;
 }
 /* end subroutine (ucproguser_atforkafter) */
 
-static void ucproguser_exit() noex {
+local void ucproguser_exit() noex {
 	if (cint rs = ucproguser_fini() ; rs < 0) {
 	    ulogerror("ucproguser",rs,"exit-fini") ;
 	}
 }
 /* end subroutine (ucproguser_exit) */
+
+void ucproguser::dtor() noex {
+	if (cint rs = ucproguser_fini() ; rs < 0) {
+	    ulogerror("ucproguser",rs,"dtor-fini") ;
+	}
+} /* end method (ucproguser::dtor) */
 
 
