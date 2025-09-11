@@ -50,7 +50,7 @@ enum vechandos {
     vechando_sorted,
     vechando_ordered,
     vechando_overlast
-} ;
+} ; /* end enum (vechandos) */
 
 #ifdef	__cplusplus	/* C++ only! */
 
@@ -62,7 +62,7 @@ struct vechandms {
     static int	conserve ;
     static int	sorted ;
     static int	ordered ;
-} ;
+} ; /* end struct (vechandms) */
 
 #endif /* __cplusplus */
 
