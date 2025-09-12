@@ -418,8 +418,8 @@ struct srventry	*sep ;
 
 	}
 
-	sep->f.notpresent = FALSE ;
-	sep->f.notexec = FALSE ;
+	sep->fl.notpresent = FALSE ;
+	sep->fl.notexec = FALSE ;
 
 #endif /* CF_ACCESSCHECK */
 
@@ -542,9 +542,9 @@ badret:
 	return rs ;
 
 badnopresent:
-	if (! sep->f.notpresent) {
+	if (! sep->fl.notpresent) {
 
-	    sep->f.notpresent = TRUE ;
+	    sep->fl.notpresent = TRUE ;
 	    logfile_printf(&g.lh,"service daemon program is not present\n") ;
 
 	}
@@ -552,9 +552,9 @@ badnopresent:
 	goto badret7 ;
 
 badnotexec:
-	if (! sep->f.notexec) {
+	if (! sep->fl.notexec) {
 
-	    sep->f.notexec = TRUE ;
+	    sep->fl.notexec = TRUE ;
 	    logfile_printf(&g.lh,"service daemon program is not executable\n") ;
 
 	}
