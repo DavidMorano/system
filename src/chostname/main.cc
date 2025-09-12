@@ -420,11 +420,11 @@ const char	*envv[] ;
 	                            break ;
 
 	                        case 'Q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 	                        case 'a':
-	                            pip->f.auth = TRUE ;
+	                            pip->fl.auth = TRUE ;
 	                            break ;
 
 /* verbose */
@@ -675,7 +675,7 @@ const char	name[] ;
 
 	if (pip->verboselevel >= 2) {
 
-	    rs = printinfo(pip,pip->f.auth,ofp,
+	    rs = printinfo(pip,pip->fl.auth,ofp,
 		name,as,chostname) ;
 
 	} else {
@@ -686,7 +686,7 @@ const char	name[] ;
 	}
 
 	if (rs < 0) {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 		bprintf(pip->efp,"%s: not found query=%s (%d)\n",
 			pip->progname,name,rs1) ;
 	    }
