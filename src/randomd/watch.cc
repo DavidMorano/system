@@ -472,7 +472,7 @@ top:
 
 /* check if the access table has changed, if we have one */
 
-	if (gp->f.acctab) {
+	if (gp->fl.acctab) {
 
 	if ((rs = acctab_check(atp,NULL)) > 0)
 		logfile_printf(&gp->lh,"%s access table file changed\n",
@@ -596,7 +596,7 @@ BUILTIN		*bip ;
 
 	        u_dup(ns) ;
 #else
-		if (! gp->f.fd_stdout) {
+		if (! gp->fl.fd_stdout) {
 
 			u_close(FD_STDOUT) ;
 
