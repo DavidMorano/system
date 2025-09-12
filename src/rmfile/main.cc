@@ -387,7 +387,7 @@ const char	*envv[] ;
 	                        break ;
 
 	                        case 'Q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* program-root */
@@ -428,11 +428,11 @@ const char	*envv[] ;
 	                            break ;
 
 	                    case 'n':
-	                        pip->f.nodelete = TRUE ;
+	                        pip->fl.nodelete = TRUE ;
 	                        break ;
 
 	                    case 'r':
-	                        pip->f.recursive = TRUE ;
+	                        pip->fl.recursive = TRUE ;
 	                        break ;
 
 /* verbose output */
@@ -613,7 +613,7 @@ const char	*envv[] ;
 	        bclose(afp) ;
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file (%d)\n",
 	                pip->progname,rs) ;
