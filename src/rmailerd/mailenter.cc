@@ -228,7 +228,7 @@ int		ifd, ofd, efd ;
 
 /* set the envelope sender address if we are directed to */
 
-	if (gp->f.sender) {
+	if (gp->fl.sender) {
 
 	    if ((pp->envelope_from != NULL) && 
 	        (pp->envelope_from[0] != '\0')) {
