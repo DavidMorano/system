@@ -838,7 +838,7 @@ int		len ;
 	while (((len = breadln(ifp,buf,BUFLEN)) > 0) &&
 	    (buf[len - 1] != '\n')) ;
 
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 	    bprintf(pip->efp,"%s: address too long \"%W\"\n",
 	        pip->progname,buf,MIN(len,40)) ;
 
