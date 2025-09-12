@@ -270,7 +270,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	pip->verboselevel = 1 ;
 
-	pip->f.logprog = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 /* start parsing the arguments */
 
@@ -486,7 +486,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -508,7 +508,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* "nogo" flag for testing */
 	                    case 'n':
-	                        pip->f.nogo = TRUE ;
+	                        pip->fl.nogo = TRUE ;
 	                        break ;
 
 /* options */
@@ -912,7 +912,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            rs1 = bclose(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                bprintf(pip->efp,fmt,pn,rs) ;
 	                bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
