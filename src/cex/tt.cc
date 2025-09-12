@@ -163,7 +163,7 @@ int		mxu ;
 /* standard input */
 
 	fds[0].fd = -1 ;
-	if (! pip->f.ni) {
+	if (! pip->fl.ni) {
 	    fds[0].fd = ifd ;
 	    fds[0].events = (POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI) ;
 	} else {
@@ -204,7 +204,7 @@ int		mxu ;
 	fds[3].fd = rfd ;
 	fds[3].events = (POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI) ;
 
-	if (pip->f.ni) {
+	if (pip->fl.ni) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -233,7 +233,7 @@ int		mxu ;
 
 /* what about sanity checking */
 
-	if (pip->f.sanity) {
+	if (pip->fl.sanity) {
 	    ti_pollsanity = 0 ;
 	    ti_sanity = 1 ;
 	    sanityfailures = 0 ;
@@ -743,7 +743,7 @@ int		mxu ;
 
 /* miscellaneous functions */
 
-	    if (pip->f.sanity) {
+	    if (pip->fl.sanity) {
 
 		if (! f_daytime) {
 		f_daytime = TRUE ;
