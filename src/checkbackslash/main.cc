@@ -162,9 +162,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->debuglevel = 0 ;
 	pip->verboselevel = 1 ;
 
-	pip->f.nochange = FALSE ;
-	pip->f.quiet = FALSE ;
-	pip->f.follow = FALSE ;
+	pip->fl.nochange = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.follow = FALSE ;
 
 /* process program arguments */
 
@@ -293,7 +293,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* follow symbolic links */
 	                case argopt_follow:
-				pip->f.follow = TRUE ;
+				pip->fl.follow = TRUE ;
 				break ;
 
 /* default action and user specified help */
@@ -363,12 +363,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* quiet */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* require a suffix for file names */
@@ -505,7 +505,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 #ifdef	COMMENT
 
 	if ((rs = paramopt_havekey(&aparams,PO_SUFFIX)) > 0) {
-	    pip->f.suffix = TRUE ;
+	    pip->fl.suffix = TRUE ;
 	} /* end if */
 
 	if ((rs = paramopt_havekey(&aparams,PO_OPTION)) > 0) {
@@ -522,11 +522,11 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            switch (kwi) {
 
 	            case opt_follow:
-	                pip->f.follow = TRUE ;
+	                pip->fl.follow = TRUE ;
 	                break ;
 
 	            case opt_nofollow:
-	                pip->f.follow = FALSE ;
+	                pip->fl.follow = FALSE ;
 	                break ;
 
 	            } /* end switch */
@@ -599,7 +599,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	        bclose(afp) ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(efp,
 	                "%s: could not open the argument list file\n",
 	                pip->progname) ;
