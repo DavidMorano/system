@@ -225,7 +225,7 @@ char	*envv[] ;
 
 /* verbose */
 	                case ARGOPT_VERBOSE:
-	                    pip->f.verbose = TRUE ;
+	                    pip->fl.verbose = TRUE ;
 	                    if (f_optequal) 
 				rs = SR_INVALID ;
 
@@ -292,7 +292,7 @@ char	*envv[] ;
 
 /* follow symbolic links */
 	                case ARGOPT_FOLLOW:
-				pip->f.follow = TRUE ;
+				pip->fl.follow = TRUE ;
 				break ;
 
 /* default action and user specified help */
@@ -324,7 +324,7 @@ char	*envv[] ;
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* file name length restriction */
@@ -354,7 +354,7 @@ char	*envv[] ;
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* require a suffix for file names */
@@ -387,7 +387,7 @@ char	*envv[] ;
 
 /* verbose output */
 	                    case 'v':
-	                        pip->f.verbose = TRUE ;
+	                        pip->fl.verbose = TRUE ;
 	                        break ;
 
 	                    case '?':
@@ -473,7 +473,7 @@ char	*envv[] ;
 /* get ready */
 
 	if ((rs = paramopt_havekey(&param,PO_SUFFIX)) > 0) {
-	    pip->f.suffix = TRUE ;
+	    pip->fl.suffix = TRUE ;
 	} /* end if */
 
 	if ((rs = paramopt_havekey(&param,PO_OPTION)) > 0) {
@@ -490,11 +490,11 @@ char	*envv[] ;
 	            switch (kwi) {
 
 	            case OPTION_FOLLOW:
-	                pip->f.follow = TRUE ;
+	                pip->fl.follow = TRUE ;
 	                break ;
 
 	            case OPTION_NOFOLLOW:
-	                pip->f.follow = FALSE ;
+	                pip->fl.follow = FALSE ;
 	                break ;
 
 	            } /* end switch */
@@ -568,7 +568,7 @@ char	*envv[] ;
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file\n",
