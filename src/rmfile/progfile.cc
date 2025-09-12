@@ -119,11 +119,11 @@ const char	fname[] ;
 	        debugprintf("progfile: directory\n") ;
 #endif
 
-	    if (! pip->f.nodelete) {
+	    if (! pip->fl.nodelete) {
 	        if (delay > 0) {
 	            rs = unlinkd(fname,delay) ;
 	        } else {
-		    if (pip->f.recursive) {
+		    if (pip->fl.recursive) {
 	                rs = removes(fname) ;
 		    } else
 	                rs = u_rmdir(fname) ;
