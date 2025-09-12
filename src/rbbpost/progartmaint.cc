@@ -212,7 +212,7 @@ int progartmaint(PROGINFO *pip,TDINFO *tip)
 
 	if (pip->open.logprog) {
 	    cchar	*fmt = "mode expire=%u maint=%u" ;
-	    proglog_printf(pip,fmt,pip->f.artexpires,pip->f.artmaint) ;
+	    proglog_printf(pip,fmt,pip->fl.artexpires,pip->fl.artmaint) ;
 	}
 
 	if ((rs = procartfiles(pip)) >= 0) {
@@ -257,7 +257,7 @@ static int procartfiles(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if ((pip->newsdname != NULL) && pip->f.artcores) {
+	if ((pip->newsdname != NULL) && pip->fl.artcores) {
 	    const int	flen = MAXPATHLEN ;
 	    char	*fbuf ;
 	    if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
@@ -370,12 +370,12 @@ static int procmsger(PROGINFO *pip,PROCDATA *pdp,cchar *ep,int el)
 	if ((rs = artinfo_start(aip,pdp->tdname,ep,el)) >= 0) {
 	    int	f = TRUE ;
 
-	    if ((rs >= 0) && pip->f.artexpires && f) {
+	    if ((rs >= 0) && pip->fl.artexpires && f) {
 	        rs = procmsgexpires(pip,pdp,aip) ;
 	        f = rs ;
 	    }
 
-	    if ((rs >= 0) && pip->f.artmaint && f) {
+	    if ((rs >= 0) && pip->fl.artmaint && f) {
 	        rs = procmsgmaint(pip,pdp,aip) ;
 	        f = rs ;
 	    }
@@ -639,11 +639,11 @@ static int artinfo_ngs(ARTINFO *aip,MAILMSG *msgp,EMA **rpp)
 {
 	int		rs = SR_OK ;
 
-	if (! aip->f.ngema) {
+	if (! aip->fl.ngema) {
 	    int		vl ;
 	    cchar	*hdr = HN_NEWSGROUPS ;
 	    cchar	*vp ;
-	    aip->f.ngema = TRUE ;
+	    aip->fl.ngema = TRUE ;
 	    if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
 	        EMA	*ngp = &aip->ngema ;
 	        vl = rs ;
