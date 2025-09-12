@@ -293,7 +293,7 @@ static int progcs_reader(PROGINFO *pip,DISPATCHER *dop)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
-	    debugprintf("progcs/_reader: ent f_daemon=%u\n",pip->f.daemon) ;
+	    debugprintf("progcs/_reader: ent f_daemon=%u\n",pip->fl.daemon) ;
 	    debugprintf("progcs/_reader: intnote=%d\n",pip->intnote) ;
 	    debugprintf("progcs/_reader: intidle=%d\n",pip->intidle) ;
 	    debugprintf("progcs/_reader: intrun=%d\n",pip->intrun) ;
@@ -301,7 +301,7 @@ static int progcs_reader(PROGINFO *pip,DISPATCHER *dop)
 #endif
 
 	intnote = pip->intnote ;
-	intrun = ((pip->f.daemon) ? pip->intrun : pip->intidle) ;
+	intrun = ((pip->fl.daemon) ? pip->intrun : pip->intidle) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
@@ -353,10 +353,10 @@ static int progcs_reader(PROGINFO *pip,DISPATCHER *dop)
 		    int	ml ;
 
 	            msgbuf[0] = '\0' ;
-	            if (pip->f.issocket) {
+	            if (pip->fl.issocket) {
 	                rs = uc_recve(fd,msgbuf,msglen,0,to,opts) ;
 	                ml = rs ;
-			f_eof = (pip->f.isstream && (rs == 0)) ;
+			f_eof = (pip->fl.isstream && (rs == 0)) ;
 	            } else {
 	                rs = uc_reade(fd,msgbuf,msglen,to,opts) ;
 	                ml = rs ;
