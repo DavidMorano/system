@@ -1,32 +1,24 @@
-/* sms */
+/* sms HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
-/* sms operations */
+/* SMS operations */
+/* version %I% last-modified %G% */
 
 
 #ifndef	SMS_INCLUDE
-#define	SMS_INCLUDE	1
+#define	SMS_INCLUDE
 
 
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<time.h>
-
 #include	<usystem.h>
+#include	<plainq.h>
 
-#include	"localmisc.h"
-#include	"plainq.h"
-
-
-
-/* object defines */
 
 #define	SMS		struct sms_head
-
 /* other defines */
-
 #define	SMS_SVCCODE	1		/* used when over UDPMUX */
-
-
 
 
 struct sms_bufdesc {
@@ -35,31 +27,23 @@ struct sms_bufdesc {
 } ;
 
 struct sms_head {
-	unsigned long	magic ;
-	PLAINQ	tq ;
-	time_t	timeout ;
-	uint	svc ;		/* numeric service */
-	int	fd ;		/* socket file descriptor */
-	int	pid ;		/* daemon PID */
+	plainq		tq ;
+	time_t		timeout ;
+	uint		magic ;
+	uint		svc ;		/* numeric service */
+	int		fd ;		/* socket file descriptor */
+	int		pid ;		/* daemon PID */
 } ;
 
+EXTERNC_begin
 
+extern int sms_open(SMS *,char *,char *,char *,char *,int) noex ;
+extern int sms_write(SMS *,char *,int) noex ;
+extern int sms_close(SMS *) noex ;
 
-
-#if	(! defined(SMS_MASTER)) || (SMS_MASTER == 0)
-
-extern int sms_open(SMS *,char *,char *,char *,char *,int) ;
-extern int sms_write(SMS *,char *,int) ;
-extern int sms_close(SMS *) ;
-
-extern SMS	obj_sms(char *) ;
-extern SMS	*new_sms(char *) ;
-extern void	free_sms(SMS *) ;
-
-#endif /* SMS_MASTER */
+EXTERNC_end
 
 
 #endif /* SMS_INCLUDE */
-
 
 
