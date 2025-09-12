@@ -191,7 +191,7 @@ int main(argc,mainv argv,mainv envv) {
 
 	pip->debuglevel = 0 ;
 
-	pip->f.verbose = false ;
+	pip->fl.verbose = false ;
 
 
 /* process program arguments */
@@ -247,7 +247,7 @@ int main(argc,mainv argv,mainv envv) {
 
 /* verbose */
 	                case argopt_verbose:
-	                    pip->f.verbose = true ;
+	                    pip->fl.verbose = true ;
 	                    if (f_optequal) {
 				rs = SR_INVALID ;
 				break ;
@@ -313,7 +313,7 @@ int main(argc,mainv argv,mainv envv) {
 
 /* verbose output */
 	                    case 'v':
-	                        pip->f.verbose = true ;
+	                        pip->fl.verbose = true ;
 	                        break ;
 
 	                    case '?':
