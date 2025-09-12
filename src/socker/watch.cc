@@ -311,7 +311,7 @@ BUILTIN		*bip ;
 	if (rs < 0)
 	    goto bad1 ;
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    pip->daytime = time(NULL) ;
 
@@ -351,7 +351,7 @@ BUILTIN		*bip ;
 
 /* we want to receive the new socket (from 'accept') above these guys */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    for (i = 0 ; i < 3 ; i += 1) {
 
@@ -402,7 +402,7 @@ BUILTIN		*bip ;
 
 	nfds = 0 ;
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    if (pip->fd_listentcp >= 0) {
 
@@ -446,7 +446,7 @@ BUILTIN		*bip ;
 
 /* if we are not in daemon mode, then we have a job waiting on FD_STDIN */
 
-	if (! pip->f.daemon) {
+	if (! pip->fl.daemon) {
 
 #if	CF_DEBUG && CF_WHOOPEN
 	    if (pip->debuglevel >= 4)
@@ -914,7 +914,7 @@ top:
 	        logfile_setid(&pip->lh,pip->logid) ;
 
 
-	        if (! pip->f.daemon)
+	        if (! pip->fl.daemon)
 	            f_exit = TRUE ;
 
 	    } else
@@ -925,11 +925,11 @@ top:
 
 /* maintenance the lock file */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 /* maintenance the LOCK mutex file */
 
-	    if (pip->f.lockfile &&
+	    if (pip->fl.lockfile &&
 	        ((pip->daytime - ti_lockcheck) >= (TI_MAINT - 1))) {
 
 	        LFM_CHECK	ci ;
@@ -975,7 +975,7 @@ top:
 
 /* maintenance the log file */
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 		logfile_check(&pip->lh,pip->daytime) ;
 
 
@@ -1019,7 +1019,7 @@ top:
 
 /* check if the server table file (srvtab) has changed */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    rs = srvtab_check(&pip->stab,pip->daytime,NULL) ;
 
@@ -1052,7 +1052,7 @@ top:
 
 /* check if the access table has changed, if we have one */
 
-	if (pip->f.daemon && pip->f.acctab) {
+	if (pip->fl.daemon && pip->fl.acctab) {
 
 	    rs = acctab_check(&pip->atab,NULL) ;
 
@@ -1115,7 +1115,7 @@ top:
 	printsubs(pip,"0") ;
 #endif
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    logfile_printf(&pip->lh,"%s daemon exiting\n",
 	        timestr_logz(pip->daytime,timebuf)) ;
@@ -1363,7 +1363,7 @@ int	nsi, nso ;
 	    debugprintf("watch_newjob: about to fork, passing ns=%d\n",nsi) ;
 #endif
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_flush(&pip->lh) ;
 
 	bflush(pip->efp) ;
@@ -1396,7 +1396,7 @@ int	nsi, nso ;
 
 /* close stuff we do not need */
 
-	    if (pip->f.daemon) {
+	    if (pip->fl.daemon) {
 
 		if (pip->fd_listenpass >= 0)
 	        	u_close(pip->fd_listenpass) ;
@@ -1582,7 +1582,7 @@ char		fname[] ;
 	debugprintf("watch/openipc: reqfname=%s\n",pip->reqfname) ;
 #endif
 
-	if (pip->f.daemon && 
+	if (pip->fl.daemon && 
 		(pip->reqfname[0] != '-') && (pip->reqfname[0] != '+')) {
 
 	    rs = u_socket(PF_UNIX,SOCK_DGRAM,0) ;
@@ -1743,7 +1743,7 @@ char		fname[] ;
 
 	u_close(pip->fd_req) ;
 
-	if (! pip->f.daemon)
+	if (! pip->fl.daemon)
 	    u_unlink(fname) ;
 
 #if	CF_DEBUG
