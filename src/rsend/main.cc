@@ -481,7 +481,7 @@ char	*envv[] ;
 	                            break ;
 
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* service name */
@@ -1312,7 +1312,7 @@ badarg:
 	goto retearly ;
 
 baduser:
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 	    bprintf(pip->efp,
 	        "%s: could not get user information (%d)\n",
 	        pip->progname,rs) ;
