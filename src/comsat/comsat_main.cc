@@ -438,7 +438,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->notesmax = NOTESMAX ;
 	pip->fd_msg = FD_STDIN ;
 
-	pip->f.logprog = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 /* start parsing the arguments */
 
@@ -657,12 +657,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                case argopt_ra:
 	                    pip->final.reuseaddr = TRUE ;
 	                    pip->have.reuseaddr = TRUE ;
-	                    pip->f.reuseaddr = TRUE ;
+	                    pip->fl.reuseaddr = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.reuseaddr = (rs > 0) ;
+	                            pip->fl.reuseaddr = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -671,7 +671,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                case argopt_daemon:
 	                    pip->final.daemon = TRUE ;
 	                    pip->have.daemon = TRUE ;
-	                    pip->f.daemon = TRUE ;
+	                    pip->fl.daemon = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
@@ -709,7 +709,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -744,7 +744,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* daemon mode */
 	                    case 'd':
 	                        pip->final.background = TRUE ;
-	                        pip->f.background = TRUE ;
+	                        pip->fl.background = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
@@ -941,8 +941,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    debugprintf("main: background=%u\n",pip->f.background) ;
-	    debugprintf("main: daemon=%u\n",pip->f.daemon) ;
+	    debugprintf("main: background=%u\n",pip->fl.background) ;
+	    debugprintf("main: daemon=%u\n",pip->fl.daemon) ;
 	    debugprintf("main: hostspec=%s\n",pip->hostspec) ;
 	    debugprintf("main: portspec=%s\n",pip->portspec) ;
 	}
@@ -1017,7 +1017,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	if ((rs >= 0) && (pip->debuglevel > 0)) {
 	    cchar	*pn = pip->progname ;
-	    bprintf(pip->efp,"%s: daemon mode=%u\n",pn,pip->f.daemon) ;
+	    bprintf(pip->efp,"%s: daemon mode=%u\n",pn,pip->fl.daemon) ;
 	}
 
 	memset(&ainfo,0,sizeof(ARGINFO)) ;
@@ -1218,10 +1218,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.reuseaddr) {
 	                        pip->have.reuseaddr = TRUE ;
 	                        pip->final.reuseaddr = TRUE ;
-	                        pip->f.reuseaddr = TRUE ;
+	                        pip->fl.reuseaddr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.reuseaddr = (rs > 0) ;
+	                            pip->fl.reuseaddr = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1245,10 +1245,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.daemon) {
 	                        pip->have.daemon= TRUE ;
 	                        pip->final.daemon = TRUE ;
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.daemon = (rs > 0) ;
+	                            pip->fl.daemon = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1404,9 +1404,9 @@ static int process(proginfo *pip) noex {
 		if ((rs = pip->znameset(znbuf,rs)) >= 0) {
 	            pip->daytime = now.time ;
 	            if ((rs = dater_start(&pip->d,&now,znbuf,-1)) >= 0) {
-	                if (pip->f.background) {
+	                if (pip->fl.background) {
 	                    rs = procback(pip) ;
-	                } else if (pip->f.daemon) {
+	                } else if (pip->fl.daemon) {
 	                    rs = procdaemon(pip) ;
 	                } else {
 	                    rs = procreg(pip) ;
@@ -1569,7 +1569,7 @@ static int procbackenv(PROGINFO *pip,SPAWNER *srp)
 	            if (v > 0) np = "intidle" ;
 	            break ;
 	        case 2:
-	            v = (pip->f.reuseaddr&1) ;
+	            v = (pip->fl.reuseaddr&1) ;
 	            if (v > 0) np = "resueaddr" ;
 	            break ;
 	        } /* end switch */
@@ -1731,7 +1731,7 @@ static int procdaemonbegin(PROGINFO *pip)
 	            int		opts = 0 ;
 
 	            if ((rs = ctdeci(digbuf,DIGBUFLEN,port)) >= 0) {
-	                if (pip->f.reuseaddr) opts |= 1 ;
+	                if (pip->fl.reuseaddr) opts |= 1 ;
 	                rs = listenudp(af,hostname,digbuf,opts) ;
 	                pip->fd_msg = rs ;
 	                pip->open.listen = (rs >= 0) ;
@@ -1862,9 +1862,9 @@ static int procreg(PROGINFO *pip)
 	int		c = 0 ;
 
 	if (isasocket(pip->fd_msg)) {
-	    pip->f.issocket = TRUE ;
+	    pip->fl.issocket = TRUE ;
 	    if ((rs = uc_getsocktype(pip->fd_msg)) >= 0) {
-		pip->f.isstream = (rs == SOCK_STREAM) ;
+		pip->fl.isstream = (rs == SOCK_STREAM) ;
 	    }
 	}
 
@@ -1873,7 +1873,7 @@ static int procreg(PROGINFO *pip)
 	    debugprintf("main/procreg: ent fd_msg=%d\n",
 	        pip->fd_msg) ;
 	    debugprintf("main/procreg: f_issocket=%u f_isstream=%d\n",
-	        pip->f.issocket,pip->f.isstream) ;
+	        pip->fl.issocket,pip->fl.isstream) ;
 	}
 #endif /* CF_DEBUG */
 
