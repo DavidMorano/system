@@ -614,7 +614,7 @@ char	*envv[] ;
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -638,7 +638,7 @@ char	*envv[] ;
 	                        break ;
 
 	                    case 'i':
-	                        pip->f.optin = TRUE ;
+	                        pip->fl.optin = TRUE ;
 	                        break ;
 
 /* options */
@@ -967,7 +967,7 @@ char	*envv[] ;
 	    }
 
 #if	CF_PCSPOLL
-	    if ((rs >= 0) && pip->f.pcspoll) {
+	    if ((rs >= 0) && pip->fl.pcspoll) {
 	        pip->pp = &p ;
 	            (void) pcspoll(pip->pr,&p,&sets) ;
 	    }
@@ -977,14 +977,14 @@ char	*envv[] ;
 
 #ifdef	COMMENT
 	    i = matstr(trustedusers,u.username,-1) ;
-	        pip->f.trusted = (i >= 0) ;
+	        pip->fl.trusted = (i >= 0) ;
 #else
 
 #endif /* COMMENT */
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	        debugprintf("main: f_trusted=%d\n",pip->f.trusted) ;
+	        debugprintf("main: f_trusted=%d\n",pip->fl.trusted) ;
 #endif
 
 	        vecstr_finish(&sets) ;
@@ -994,7 +994,7 @@ char	*envv[] ;
 #endif /* CF_PCS */
 
 	        rs = pcstrustuser(pip->pr,u.username) ;
-	        pip->f.trusted = (rs > 0) ;
+	        pip->fl.trusted = (rs > 0) ;
 
 /* other initialization */
 
@@ -1030,7 +1030,7 @@ char	*envv[] ;
 
 	    if (rs1 >= 0) {
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 	        logfile_userinfo(&pip->lh,&u,
 	        pip->daytime,pip->progname,pip->version) ;
 
@@ -1194,13 +1194,13 @@ char	*envv[] ;
 
 /* log recipients? */
 
-	if ((rs >= 0) && (pip->f.log || (pip->debuglevel > 0))) {
+	if ((rs >= 0) && (pip->fl.log || (pip->debuglevel > 0))) {
 
 	    for (i = 0 ; vecstr_get(&addrs,i,&cp) >= 0 ; i += 1) {
 
 	        if (cp == NULL) continue ;
 
-	            if (pip->f.log)
+	            if (pip->fl.log)
 	            logfile_printf(&pip->lh,"  to=%s\n",cp) ;
 
 	            if (pip->debuglevel > 0)
@@ -1323,7 +1323,7 @@ baduser:
 	    bprintf(pip->efp,"%s: recips=%u msglen=%u sent (%d)\n",
 	    pip->progname,c_recips,tlen,rs) ;
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	    logfile_printf(&pip->lh,"recips=%u msglen=%u sent (%d)\n",
 	    c_recips,tlen,rs) ;
 
@@ -1334,7 +1334,7 @@ done:
 
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	            if (! pip->f.quiet)
+	            if (! pip->fl.quiet)
 	            bprintf(pip->efp,"%s: invalid query (%d)\n",
 	            pip->progname,rs) ;
 
@@ -1359,7 +1359,7 @@ done:
 
 /* close off and get out! */
 ret2:
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_close(&pip->lh) ;
 
 retearly:
@@ -1394,7 +1394,7 @@ badarg:
 
 badinit1:
 	    ex = EX_OSERR ;
-	    if (! pip->f.quiet)
+	    if (! pip->fl.quiet)
 	    bprintf(pip->efp,
 	    "%s: initialization problem (%d)\n",
 	    pip->progname,rs) ;
@@ -1597,7 +1597,7 @@ vecstr		*setsp ;
 
 	            case progopt_pcspoll:
 	            if ((vlen > 0) && (cfdeci(vp,vlen,&val) >= 0))
-	                pip->f.pcspoll = (val > 0) ;
+	                pip->fl.pcspoll = (val > 0) ;
 
 	                break ;
 
