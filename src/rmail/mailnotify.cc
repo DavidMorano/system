@@ -166,7 +166,7 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp)
 
 /* do we have a MBTAB database? */
 
-	if ((pip->mbfname == NULL) || (! pip->f.mbtab))
+	if ((pip->mbfname == NULL) || (! pip->fl.mbtab))
 	    return SR_OK ;
 
 	if (pip->debuglevel > 0) {
@@ -409,8 +409,8 @@ int		port ;
 
 	                rip->m1.mlen = iep->mlen ;
 	                rip->m1.flags = 0 ;
-	                rip->m1.flags |= (iep->f.spam) ? 1 : 0 ;
-	                rip->m1.flags |= (iep->f.messageid) ? 2 : 0 ;
+	                rip->m1.flags |= (iep->fl.spam) ? 1 : 0 ;
+	                rip->m1.flags |= (iep->fl.messageid) ? 2 : 0 ;
 	                strwcpy(rip->m1.msgid,iep->h_messageid,
 	                    MCMSG_LMSGID) ;
 
