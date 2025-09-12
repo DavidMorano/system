@@ -383,7 +383,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* follow symbolic links */
 	                case argopt_follow:
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    break ;
 
 /* default action and user specified help */
@@ -417,22 +417,22 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* optional division */
 	                    case 'd':
-	                        pip->f.divide = TRUE ;
+	                        pip->fl.divide = TRUE ;
 	                        break ;
 
 /* ignore mode */
 	                    case 'i':
-	                        pip->f.ignore = TRUE ;
+	                        pip->fl.ignore = TRUE ;
 	                        break ;
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* options */
@@ -614,7 +614,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            cchar	*fmt = "%s: invalid usage (%d)\n" ;
 	            bprintf(pip->efp,fmt,pip->progname,rs) ;
 	        }
@@ -823,7 +823,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	                        break ;
 
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* file to receive the cksum answer in */
@@ -969,7 +969,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	if (reclen > MAXRECLEN) {
 
 	    reclen = MAXRECLEN ;
-		if (! pip->f.quiet)
+		if (! pip->fl.quiet)
 	    bprintf(pip->efp,
 		"%s: record length is too large - reduced to %d\n",
 	        pip->progname,reclen) ;
