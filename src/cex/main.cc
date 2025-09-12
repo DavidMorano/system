@@ -708,21 +708,21 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* no input mode (command only) */
 	                    case 'n':
-	                        pip->f.ni = TRUE ;
+	                        pip->fl.ni = TRUE ;
 	                        f_noinput = TRUE ;
 	                        break ;
 
 	                    case 'k':
-	                        pip->f.keepalive = TRUE ;
+	                        pip->fl.keepalive = TRUE ;
 	                        break ;
 
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* keepalive interval */
 	                    case 's':
-	                        pip->f.sanity = TRUE ;
+	                        pip->fl.sanity = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -941,12 +941,12 @@ int main(int argc,cchar **argv,cchar **envv)
 	lip->argc = argc ;
 	lip->ai_pass = ai_pass ;
 
-	lip->f.x = f_x ;
-	lip->f.d = f_d ;
-	lip->f.noinput = f_noinput ;
-	lip->f.wait = f_wait ;
-	lip->f.waittimed = f_waittimed ;
-	lip->f.empty = f_empty ;
+	lip->fl.x = f_x ;
+	lip->fl.d = f_d ;
+	lip->fl.noinput = f_noinput ;
+	lip->fl.wait = f_wait ;
+	lip->fl.waittimed = f_waittimed ;
+	lip->fl.empty = f_empty ;
 
 	lip->ifname = ifname ;
 	lip->ofname = ofname ;
@@ -1326,7 +1326,7 @@ static int procdial(PROGINFO *pip,cchar *rhostname,cchar *rcmdname) noex {
 	    debugprintf("main: about to open input file\n") ;
 #endif
 
-	if (! lip->f.noinput) {
+	if (! lip->fl.noinput) {
 	    ustat	isb ;
 	    const char		*ifname = lip->ifname ;
 
@@ -1364,9 +1364,9 @@ static int procdial(PROGINFO *pip,cchar *rhostname,cchar *rcmdname) noex {
 #endif
 
 	    opts |= DIALOPT_PWD ;
-	    if (lip->f.wait) opts |= DIALOPT_WAIT ;
-	    if (lip->f.waittimed) opts |= DIALOPT_WTIMED ;
-	    if (lip->f.empty) opts |= DIALOPT_EMPTY ;
+	    if (lip->fl.wait) opts |= DIALOPT_WAIT ;
+	    if (lip->fl.waittimed) opts |= DIALOPT_WTIMED ;
+	    if (lip->fl.empty) opts |= DIALOPT_EMPTY ;
 
 	    an = 1 ;
 	    if (ai_pass > 0) {
@@ -1509,7 +1509,7 @@ baddial:
 	    logfile_printf(&pip->lh,"rcmdname=%s",rcmdname) ;
 	}
 
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 
 	    bprintf(pip->efp,"%s: %s (%d)\n",
 	        pip->progname,cp,rs) ;
