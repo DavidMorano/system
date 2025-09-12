@@ -63,7 +63,6 @@
 #include	<buffer.h>
 #include	<nulstr.h>
 #include	<hdbstr.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -407,10 +406,10 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* initialize some stuff before command line argument processing */
 
 	pip->verboselevel = 1 ;
-	pip->f.logprog = TRUE ;
-	pip->f.logenv = TRUE ;
-	pip->f.logmsg = TRUE ;
-	pip->f.logzone = TRUE ;
+	pip->fl.logprog = TRUE ;
+	pip->fl.logenv = TRUE ;
+	pip->fl.logmsg = TRUE ;
+	pip->fl.logzone = TRUE ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -692,39 +691,39 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* article-expire mode */
 	                case argopt_expire:
-	                    pip->f.artexpires = TRUE ;
+	                    pip->fl.artexpires = TRUE ;
 	                    pip->final.artexpires = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.artexpires = (rs > 0) ;
+	                            pip->fl.artexpires = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 /* article-maintenance mode */
 	                case argopt_maint:
-	                    pip->f.artmaint = TRUE ;
+	                    pip->fl.artmaint = TRUE ;
 	                    pip->final.artmaint = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.artmaint = (rs > 0) ;
+	                            pip->fl.artmaint = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 /* core removal in article spool area */
 	                case argopt_cores:
-	                    pip->f.artcores = TRUE ;
+	                    pip->fl.artcores = TRUE ;
 	                    pip->final.artcores = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.artcores = (rs > 0) ;
+	                            pip->fl.artcores = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -791,7 +790,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'E':
@@ -837,7 +836,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                                lip->have.hdrfroms = TRUE ;
 	                                lip->final.hdrfroms = TRUE ;
 	                                if (argp[0] == '+') {
-	                                    lip->f.def_from = TRUE ;
+	                                    lip->fl.def_from = TRUE ;
 	                                } else if (argp[0] != '-') {
 					    const int	al = argl ;
 					    cchar	*ap = argp ;
@@ -1096,7 +1095,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        bprintf(pip->efp,"%s: could not process (%d)\n",
 	            pip->progname,rs) ;
 	    }
@@ -1246,10 +1245,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.squery) {
 	                        lip->have.squery = TRUE ;
 	                        lip->final.squery = TRUE ;
-	                        lip->f.squery = TRUE ;
+	                        lip->fl.squery = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.squery = (rs > 0) ;
+	                            lip->fl.squery = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1257,10 +1256,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.artexpires) {
 	                        pip->have.artexpires = TRUE ;
 	                        pip->final.artexpires = TRUE ;
-	                        pip->f.artexpires = TRUE ;
+	                        pip->fl.artexpires = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.artexpires = (rs > 0) ;
+	                            pip->fl.artexpires = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1268,10 +1267,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.artmaint) {
 	                        pip->have.artmaint = TRUE ;
 	                        pip->final.artmaint = TRUE ;
-	                        pip->f.artmaint = TRUE ;
+	                        pip->fl.artmaint = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.artmaint = (rs > 0) ;
+	                            pip->fl.artmaint = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1279,10 +1278,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.artcores) {
 	                        pip->have.artcores = TRUE ;
 	                        pip->final.artcores = TRUE ;
-	                        pip->f.artcores = TRUE ;
+	                        pip->fl.artcores = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.artcores = (rs > 0) ;
+	                            pip->fl.artcores = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1442,7 +1441,7 @@ static int procbase(PROGINFO *pip,ARGINFO *aip,BITS *app,cchar *afn,cchar *ofn,
 	        DATER		*tdp = &pip->td ;
 	        if ((rs = dater_start(tdp,nowp,zn,-1)) >= 0) {
 
-	            if (pip->f.artexpires || pip->f.artmaint) {
+	            if (pip->fl.artexpires || pip->fl.artmaint) {
 	                rs = progartmaint(pip,&ti) ;
 	            } else {
 	                rs = procargs(pip,&ti,aip,app,afn,ofn,ifn) ;
@@ -1537,7 +1536,7 @@ cchar		*ifn ;
 	            rs1 = bclose(afp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			cchar	*pn = pip->progname ;
 			cchar	*fmt ;
 			fmt = "%s: inaccessible argument-list (%d)\n" ;
@@ -2117,7 +2116,7 @@ static int locinfo_hdrfrom(LOCINFO *lip,cchar *sp,int sl)
 {
 	EMA		*emap = &lip->hdrfroms ;
 	int		rs ;
-	lip->f.hdrfroms = TRUE ;
+	lip->fl.hdrfroms = TRUE ;
 	rs = ema_parse(emap,sp,sl) ;
 	return rs ;
 }
@@ -2130,8 +2129,8 @@ static int locinfo_mkhdrfrom(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
-	if ((! lip->have.hdrfroms) || lip->f.def_from) {
-	if (! lip->f.hdrfroms) {
+	if ((! lip->have.hdrfroms) || lip->fl.def_from) {
+	if (! lip->fl.hdrfroms) {
 
 	if (lip->hdrfromaddr == NULL)
 	    lip->hdrfromaddr = getourenv(pip->envv,VARPROGMAILFROM) ;
@@ -2155,7 +2154,7 @@ static int locinfo_mkhdrfrom(LOCINFO *lip)
 			strlinelen(lip->hdrfromaddr,len,40)) ;
 #endif
 
-	    lip->f.hdrfroms = TRUE ;
+	    lip->fl.hdrfroms = TRUE ;
 	    rs = ema_parse(&lip->hdrfroms,lip->hdrfromaddr,len) ;
 
 #if	CF_DEBUG
@@ -2335,7 +2334,7 @@ static int locinfo_ngdname(LOCINFO *lip,char *ngdname,cchar *np,int nl)
 	if (nl < 0) nl = strlen(np) ;
 
 	if (! lip->open.ngmap) {
-	    const int	f = (pip->f.artmaint || pip->f.artexpires) ;
+	    const int	f = (pip->fl.artmaint || pip->fl.artexpires) ;
 	    const int	n = ((f) ? 1024 : 1) ;
 	    rs = hdbstr_start(mlp,n) ;
 	    lip->open.ngmap = (rs >= 0) ;
