@@ -366,18 +366,18 @@ char	*envv[] ;
 
 	proginfo_setbanner(pip,cp) ;
 
-	pip->f.efile = false ;
+	pip->fl.efile = false ;
 	if (bopen(&errfile,BFILE_STDERR,"dwca",0666) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.efile = TRUE ;
+	    pip->fl.efile = TRUE ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	} else
 	    u_open("/dev/null",O_WRONLY,0666) ;
 
-	pip->f.ofile = TRUE ;
+	pip->fl.ofile = TRUE ;
 	if (u_fstat(FD_STDOUT,&sb) < 0) {
 
-	    pip->f.ofile = false ;
+	    pip->fl.ofile = false ;
 	    u_open("/dev/null",O_WRONLY,0666) ;
 
 	}
@@ -684,7 +684,7 @@ char	*envv[] ;
 	                            break ;
 
 	                        case 'Q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* version */
@@ -694,7 +694,7 @@ char	*envv[] ;
 
 /* daemon mode */
 	                        case 'd':
-	                            pip->f.daemon = TRUE ;
+	                            pip->fl.daemon = TRUE ;
 	                            if (f_optequal) {
 
 	                                f_optequal = false ;
@@ -742,7 +742,7 @@ char	*envv[] ;
 /* reuse the bind addresses */
 	                        case 'r':
 				    pip->final.reuse = TRUE ;
-	                            pip->f.reuse = TRUE ;
+	                            pip->fl.reuse = TRUE ;
 	                            break ;
 
 /* verbose mode */
@@ -1052,7 +1052,7 @@ char	*envv[] ;
 	if (pip->markint <= 0)
 	    pip->markint = TI_MARKTIME ;
 
-	if (pip->f.mspoll) {
+	if (pip->fl.mspoll) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
@@ -1103,7 +1103,7 @@ char	*envv[] ;
 
 	if (rs >= 0) {
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 	    pip->open.log = TRUE ;
 	    if (pip->debuglevel > 0)
 	        bprintf(pip->efp,"%s: logfile=%s\n",
@@ -1155,7 +1155,7 @@ char	*envv[] ;
 
 /* request filename */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    if (reqfname[0] != '-') {
 
@@ -1207,7 +1207,7 @@ char	*envv[] ;
 
 /* what about a pass-FD file name? */
 
-	if (! pip->f.nopass) {
+	if (! pip->fl.nopass) {
 
 	if (passfname[0] != '-') {
 
@@ -1331,7 +1331,7 @@ char	*envv[] ;
 	            pip->progname,rs) ;
 
 	    } else
-	        pip->f.passwd = TRUE ;
+	        pip->fl.passwd = TRUE ;
 
 	} /* end if (accessing a 'passwd' file) */
 
@@ -1355,7 +1355,7 @@ char	*envv[] ;
 
 /* MS file */
 
-	if (pip->f.mspoll) {
+	if (pip->fl.mspoll) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
@@ -1424,7 +1424,7 @@ char	*envv[] ;
 	    debugprintf("main: about to check if we are a daemon\n") ;
 #endif
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    in_addr_t	addr ;
 
@@ -1469,7 +1469,7 @@ char	*envv[] ;
 
 	    pip->fd_listenpass = -1 ;
 	    if ((passfname[0] != '\0') && (passfname[0] != '-') &&
-		(! pip->f.nopass)) {
+		(! pip->fl.nopass)) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -1544,7 +1544,7 @@ char	*envv[] ;
 			bprintf(pip->efp,"%s: portspec=%s\n",
 				pip->progname,portspec) ;
 
-	        rs = listentcp(NULL,portspec,pip->f.reuse) ;
+	        rs = listentcp(NULL,portspec,pip->fl.reuse) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -1580,7 +1580,7 @@ char	*envv[] ;
 	        debugprintf( "main: become a daemon?\n") ;
 #endif
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_flush(&pip->lh) ;
 
 	    bflush(pip->efp) ;
@@ -1629,7 +1629,7 @@ char	*envv[] ;
 
 /* if we are a daemon, check out PID mutex again proper */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -1714,7 +1714,7 @@ char	*envv[] ;
 			pip->lockfname,LFM_TCREATE,TO_LOCK, NULL,
 			pip->nodename,pip->username,pip->banner) ;
 
-	        pip->f.lockfile = (rs >= 0) ;
+	        pip->fl.lockfile = (rs >= 0) ;
 
 	    } /* end if (lock file) */
 
@@ -1780,7 +1780,7 @@ char	*envv[] ;
 	            pip->progname,rs) ;
 
 	    } else
-	        pip->f.srvtab = TRUE ;
+	        pip->fl.srvtab = TRUE ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
@@ -1847,7 +1847,7 @@ char	*envv[] ;
 	    debugprintf("main: 1 rs=%d accfname=%s\n",rs,accfname) ;
 #endif
 
-	pip->f.acctab = false ;
+	pip->fl.acctab = false ;
 	if ((rs >= 0) || (perm(accfname,-1,-1,NULL,R_OK) >= 0)) {
 
 	    if (pip->debuglevel > 0)
@@ -1866,7 +1866,7 @@ char	*envv[] ;
 	            pip->progname,rs) ;
 
 	    } else
-	        pip->f.acctab = TRUE ;
+	        pip->fl.acctab = TRUE ;
 
 	} /* end if (accessing a 'acctab' file) */
 
@@ -1925,7 +1925,7 @@ char	*envv[] ;
 
 /* we are done initializing */
 
-	if (pip->f.daemon && pip->open.log) {
+	if (pip->fl.daemon && pip->open.log) {
 
 	    pip->daytime = time(NULL) ;
 
@@ -1970,13 +1970,13 @@ daemonret2:
 
 	builtin_free(&bis) ;
 
-	if (pip->f.acctab)
+	if (pip->fl.acctab)
 	    acctab_close(&pip->atab) ;
 
-	if (pip->f.srvtab)
+	if (pip->fl.srvtab)
 	    srvtab_close(&pip->stab) ;
 
-	if (pip->f.lockfile)
+	if (pip->fl.lockfile)
 	    lfm_finish(&pip->lfile) ;
 
 /* close some more (earlier) daemon stuff */
@@ -1993,11 +1993,11 @@ daemonret1:
 #endif
 
 ret5:
-	if (pip->f.passwd)
+	if (pip->fl.passwd)
 	    pwfile_close(&pip->passwd) ;
 
 ret4:
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_close(&pip->lh) ;
 
 ret3:
@@ -2073,7 +2073,7 @@ badpidopen:
 
 badpidlock:
 	ex = EX_MUTEX ;
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 
 	    bprintf(pip->efp,
 	        "%s: could not lock the PID file (%d)\n",
@@ -2255,7 +2255,7 @@ KEYOPT		*kop ;
 	                break ;
 
 	            case configopt_mspoll:
-	                pip->f.mspoll = TRUE ;
+	                pip->fl.mspoll = TRUE ;
 	                if ((pip->pollint <= 0) && (vp != NULL) &&
 	                    (cfdecti(vp,vlen,&iw) >= 0)) {
 
@@ -2266,11 +2266,11 @@ KEYOPT		*kop ;
 	                break ;
 
 	            case configopt_nopass:
-			pip->f.nopass = TRUE ;
+			pip->fl.nopass = TRUE ;
 	                if ((vp != NULL) &&
 	                    (cfdeci(vp,vlen,&iw) >= 0)) {
 
-				pip->f.nopass = (iw > 0) ;
+				pip->fl.nopass = (iw > 0) ;
 
 			}
 
