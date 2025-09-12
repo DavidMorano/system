@@ -482,9 +482,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto badlocstart ;
 	}
 
-	lip->f.min = DEFMINMAX ;
-	lip->f.max = DEFMINMAX ;
-	lip->f.maskcalc = DEFMASKCALC ;
+	lip->fl.min = DEFMINMAX ;
+	lip->fl.max = DEFMINMAX ;
+	lip->fl.maskcalc = DEFMASKCALC ;
 
 /* argumuments */
 
@@ -651,47 +651,47 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_min:
-	                    lip->f.min = true ;
+	                    lip->fl.min = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.min = (rs > 0) ;
+	                            lip->fl.min = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 	                case argopt_max:
-	                    lip->f.max = true ;
+	                    lip->fl.max = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.max = (rs > 0) ;
+	                            lip->fl.max = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 	                case argopt_mm:
-	                    lip->f.min = true ;
-	                    lip->f.max = true ;
+	                    lip->fl.min = true ;
+	                    lip->fl.max = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.min = (rs > 0) ;
-	                            lip->f.max = (rs > 0) ;
+	                            lip->fl.min = (rs > 0) ;
+	                            lip->fl.max = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 	                case argopt_mc:
-	                    lip->f.maskcalc = true ;
+	                    lip->fl.maskcalc = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.maskcalc = (rs > 0) ;
+	                            lip->fl.maskcalc = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -699,12 +699,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_suid:
 	                    lip->have.suid = true ;
 	                    lip->final.suid = true ;
-	                    lip->f.suid = true ;
+	                    lip->fl.suid = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.suid = (rs > 0) ;
+	                            lip->fl.suid = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -712,12 +712,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_sgid:
 	                    lip->have.sgid = true ;
 	                    lip->final.sgid = true ;
-	                    lip->f.sgid = true ;
+	                    lip->fl.sgid = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.sgid = (rs > 0) ;
+	                            lip->fl.sgid = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -778,7 +778,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -800,12 +800,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* delete empty ACLs */
 	                    case 'd':
-	                        lip->f.delempty = true ;
+	                        lip->fl.delempty = true ;
 	                        break ;
 
 /* follow symbolic links */
 	                    case 'f':
-	                        lip->f.follow = true ;
+	                        lip->fl.follow = true ;
 	                        break ;
 
 	                    case 'g':
@@ -824,12 +824,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* no stopping on error */
 	                    case 'n':
 	                    case 'c':
-	                        lip->f.nostop = true ;
+	                        lip->fl.nostop = true ;
 	                        break ;
 
 /* recurse */
 	                    case 'r':
-	                        lip->f.recurse = true ;
+	                        lip->fl.recurse = true ;
 	                        break ;
 
 /* program options */
@@ -850,7 +850,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 's':
 	                        cp = NULL ;
 	                        cl = -1 ;
-	                        lip->f.fsuffixes = true ;
+	                        lip->fl.fsuffixes = true ;
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
@@ -1089,7 +1089,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    usage(pip) ;
 	}
 
-	if (((rs < 0) && (! pip->f.quiet)) || (pip->debuglevel > 0)) {
+	if (((rs < 0) && (! pip->fl.quiet)) || (pip->debuglevel > 0)) {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
 	    fmt = "%s: entries=%u\n" ;
@@ -1103,7 +1103,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
 	    ex = mapex(mapexs,rs) ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        cchar	*pn = pip->progname ;
 	        cchar	*fmt ;
 		fmt = "%s: processing error (%d)\n" ;
@@ -1411,7 +1411,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	                        if (rs >= 0) c += 1 ;
 	                    }
 	                }
-	                if ((rs < 0) && lip->f.nostop) rs = SR_OK ;
+	                if ((rs < 0) && lip->fl.nostop) rs = SR_OK ;
 	                if (rs >= 0) rs = lib_sigterm() ;
 	                if (rs >= 0) rs = lib_sigintr() ;
 	                if (rs < 0) break ;
@@ -1443,7 +1443,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	                        }
 	                    }
 
-	                    if ((rs < 0) && lip->f.nostop) rs = SR_OK ;
+	                    if ((rs < 0) && lip->fl.nostop) rs = SR_OK ;
 	                    if (rs >= 0) rs = lib_sigterm() ;
 	                    if (rs >= 0) rs = lib_sigintr() ;
 	                    if (rs < 0) break ;
@@ -1497,7 +1497,7 @@ static int procname(PROGINFO *pip,cchar *fname)
 	        f_dir = S_ISDIR(sb.st_mode) ;
 	        if (S_ISLNK(sb.st_mode)) {
 	            f_islnk = true ;
-	            if (lip->f.follow) {
+	            if (lip->fl.follow) {
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
@@ -1517,13 +1517,13 @@ static int procname(PROGINFO *pip,cchar *fname)
 	        } /* end if (is-link) */
 	    } /* end if (following symbolic link) */
 
-	    if ((rs >= 0) && S_ISLNK(sb.st_mode) && (! lip->f.follow)) {
+	    if ((rs >= 0) && S_ISLNK(sb.st_mode) && (! lip->fl.follow)) {
 	        f_done = true ;
 	    }
 
 	    if ((! f_done) && (rs < 0)) {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*fmt ;
 		    fmt = "%s: file=%s\n" ;
@@ -1532,14 +1532,14 @@ static int procname(PROGINFO *pip,cchar *fname)
 	            shio_printf(pip->efp,fmt,pn,rs) ;
 	        } /* end if */
 
-	        if (lip->f.nostop) {
+	        if (lip->fl.nostop) {
 	            f_done = true ;
 	            rs = SR_OK ;
 	        }
 
 	    } /* end if */
 
-	    if ((rs >= 0) && (! f_done) && f_dir && lip->f.recurse) {
+	    if ((rs >= 0) && (! f_done) && f_dir && lip->fl.recurse) {
 	        rs = procnamer(pip,fname) ;
 	        c += rs ;
 	    } /* end if (opened direcory for recursion) */
@@ -1559,7 +1559,7 @@ static int procname(PROGINFO *pip,cchar *fname)
 	            debugprintf("process: checkname() rs=%d\n",rs) ;
 #endif
 
-	        if ((rs < 0) && lip->f.nostop)
+	        if ((rs < 0) && lip->fl.nostop)
 	            rs = SR_OK ;
 
 	    } /* end if (check on principal name) */
@@ -1590,7 +1590,7 @@ static int procnamer(PROGINFO *pip,cchar *fname)
 	    debugprintf("process: ent\n") ;
 #endif
 
-	dtopts |= ((lip->f.follow) ? FSDIRTREE_MFOLLOW : 0) ;
+	dtopts |= ((lip->fl.follow) ? FSDIRTREE_MFOLLOW : 0) ;
 	if ((rs = fsdirtree_open(&dt,fname,dtopts)) >= 0) {
 	    ustat	esb ;
 	    const int		mpl = MAXPATHLEN ;
@@ -1604,7 +1604,7 @@ static int procnamer(PROGINFO *pip,cchar *fname)
 	            debugprintf("process: dir name=%s\n",dename) ;
 #endif
 
-	        if (lip->f.nhf && (dename[0] == '.'))
+	        if (lip->fl.nhf && (dename[0] == '.'))
 	            continue ;
 
 	        if (! S_ISLNK(esb.st_mode)) {
@@ -1614,7 +1614,7 @@ static int procnamer(PROGINFO *pip,cchar *fname)
 	            }
 	        }
 
-	        if ((rs < 0) && lip->f.nostop)
+	        if ((rs < 0) && lip->fl.nostop)
 	            rs = SR_OK ;
 
 	        if (rs >= 0) rs = lib_sigterm() ;
@@ -1625,7 +1625,7 @@ static int procnamer(PROGINFO *pip,cchar *fname)
 	    rs1 = fsdirtree_close(&dt) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        cchar	*pn = pip->progname ;
 	        cchar	*fmt ;
 	        fmt = "%s: could not open directory (%d)\n" ;
@@ -1633,7 +1633,7 @@ static int procnamer(PROGINFO *pip,cchar *fname)
 	        fmt = "%s: directory=%s\n" ;
 	        shio_printf(pip->efp,fmt,pn,fname) ;
 	    }
-	    if (lip->f.nostop) rs = SR_OK ;
+	    if (lip->fl.nostop) rs = SR_OK ;
 	} /* end if (could not open directory) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -1663,10 +1663,10 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 
 	if (rs >= 0) {
 	    rs = 1 ;
-	    if ((rs > 0) && lip->f.fsuffixes) {
+	    if ((rs > 0) && lip->fl.fsuffixes) {
 	        rs = locinfo_isfsuffix(lip,fname) ;
 	    } /* end if (file-suffixes) */
-	    if ((rs > 0) && lip->f.ftypes) {
+	    if ((rs > 0) && lip->fl.ftypes) {
 	        rs = locinfo_isftype(lip,fname,sbp) ;
 	    } /* end if (file-type check) */
 	    if ((rs > 0) && (lip->uid_owner >= 0)) {
@@ -1704,13 +1704,13 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	if (rs >= 0) {
 	    mode_t	fm = sbp->st_mode ;
 	    int		f_set = false ;
-	    if (lip->f.suid && S_ISREG(fm)) {
+	    if (lip->fl.suid && S_ISREG(fm)) {
 		if (! (fm & S_ISUID)) {
 		    f_set = true ;
 		    fm |= S_ISUID ;
 		}
 	    }
-	    if (lip->f.sgid && (S_ISREG(fm) || S_ISDIR(fm))) {
+	    if (lip->fl.sgid && (S_ISREG(fm) || S_ISDIR(fm))) {
 		if (! (fm & S_ISGID)) {
 		    f_set = true ;
 		    fm |= S_ISGID ;
@@ -1755,7 +1755,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 
 /* find the minimum and the maximum perms */
 
-	    if (lip->f.min || lip->f.max) {
+	    if (lip->fl.min || lip->fl.max) {
 	        aclents_minmax(aclbuf,nacls,&perm_min,&perm_max) ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4)) {
@@ -1797,14 +1797,14 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	                perm_new = aclbuf[j].a_perm & (~ ap->perm) ;
 	            }
 
-	            if ((lip->f.min || lip->f.max) &&
+	            if ((lip->fl.min || lip->fl.max) &&
 	                (aclent_idtype(aclbuf + j) > 0)) {
 
-	                if (lip->f.min && (perm_min >= 0)) {
+	                if (lip->fl.min && (perm_min >= 0)) {
 	                    perm_new |= perm_min ;
 			}
 
-	                if (lip->f.max && (perm_max >= 0)) {
+	                if (lip->fl.max && (perm_max >= 0)) {
 	                    perm_new &= perm_max ;
 			}
 
@@ -1866,11 +1866,11 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	                }
 #endif /* CF_DEBUG */
 
-	                if ((lip->f.min || lip->f.max) && f_idtype) {
-	                    if (lip->f.min && (perm_min >= 0)) {
+	                if ((lip->fl.min || lip->fl.max) && f_idtype) {
+	                    if (lip->fl.min && (perm_min >= 0)) {
 	                        perm_new |= perm_min ;
 			    }
-	                    if (lip->f.max && (perm_max >= 0)) {
+	                    if (lip->fl.max && (perm_max >= 0)) {
 	                        perm_new &= perm_max ;
 			    }
 	                }
@@ -1882,7 +1882,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	                        debugprintf("checkname: perm_new greater\n") ;
 #endif
 
-	                    if (lip->f.min && f_idtype) {
+	                    if (lip->fl.min && f_idtype) {
 
 #if	CF_DEBUG
 	                        if (DEBUGLEVEL(4))
@@ -1922,7 +1922,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	    }
 #endif
 
-	    if (lip->f.min && f_minus) {
+	    if (lip->fl.min && f_minus) {
 	        int	f_gotone = false ;
 
 #if	CF_DEBUG
@@ -1958,7 +1958,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	        debugprintf("checkname: f_changed=%u\n",f_changed) ;
 #endif
 
-	    if (lip->f.delempty) {
+	    if (lip->fl.delempty) {
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
@@ -2061,7 +2061,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	        } else if (j >= 0)
 	            perm_mask = aclbuf[j].a_perm ;
 
-	        if (lip->f.maskcalc) {
+	        if (lip->fl.maskcalc) {
 
 	            if ((j < 0) && (nacls < (MAXACLS - 1))) {
 
@@ -2189,7 +2189,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	    if ((rs < 0) && isNotPresent(rs)) {
 	        lip->errored += 1 ;
 	        f_changed = false ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*fmt ;
 		    fmt = "%s: file=%s\n" ;
@@ -2202,7 +2202,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	                shio_printf(pip->efp,pn,rs) ;
 		    }
 	        } /* end if */
-	        if (lip->f.nostop) rs = SR_OK ;
+	        if (lip->fl.nostop) rs = SR_OK ;
 	    } /* end if (error) */
 	} /* end if (not permission error) */
 
@@ -2227,7 +2227,7 @@ static int checkowner(PROGINFO *pip,FSDIRTREE_STAT *sbp,cchar fname[])
 	int		rs = SR_OK ;
 	if ((pip->id.uid != 0) && (sbp->st_uid != pip->id.uid)) {
 	    rs = SR_PERM ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 		cchar	*pn = pip->progname ;
 		cchar	*fmt ;
 		fmt = "%s: not owner (%d)\n" ;
@@ -2297,7 +2297,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	        cint	esize = sizeof(aclinfo) ;
 	        pip->open.aparams = true ;
 	        if ((rs = vecobj_start(&lip->acls,esize,10,0)) >= 0) {
-	            lip->f.acls = true ;
+	            lip->fl.acls = true ;
 	        }
 	        if (rs < 0) {
 	            pip->open.aparams = false ;
@@ -2321,8 +2321,8 @@ static int locinfo_finish(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip->f.acls) {
-	    lip->f.acls = false ;
+	if (lip->fl.acls) {
+	    lip->fl.acls = false ;
 	    rs1 = vecobj_finish(&lip->acls) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -2375,10 +2375,10 @@ static int locinfo_procopts(LOCINFO *lip)
 			    if (! lip->final.nhf) {
 	                        lip->final.nhf = true ;
 	                        lip->have.nhf = true ;
-	                        lip->f.nhf = true ;
+	                        lip->fl.nhf = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.nhf = (rs > 0) ;
+	                            lip->fl.nhf = (rs > 0) ;
 	                        }
 			    }
 	                    break ;
@@ -2386,10 +2386,10 @@ static int locinfo_procopts(LOCINFO *lip)
 			    if (! lip->final.suid) {
 	                        lip->final.suid = true ;
 	                        lip->have.suid = true ;
-	                        lip->f.suid = true ;
+	                        lip->fl.suid = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.suid = (rs > 0) ;
+	                            lip->fl.suid = (rs > 0) ;
 	                        }
 			    }
 	                    break ;
@@ -2397,10 +2397,10 @@ static int locinfo_procopts(LOCINFO *lip)
 			    if (! lip->final.sgid) {
 	                        lip->final.sgid = true ;
 	                        lip->have.sgid = true ;
-	                        lip->f.sgid = true ;
+	                        lip->fl.sgid = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.sgid = (rs > 0) ;
+	                            lip->fl.sgid = (rs > 0) ;
 	                        }
 			    }
 	                    break ;
@@ -2485,7 +2485,7 @@ static int locinfo_ftypes(LOCINFO *lip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
 	if (c > 0) {
-	    lip->f.ftypes = true ;
+	    lip->fl.ftypes = true ;
 	}
 	return (rs >= 0) ? c : rs ;
 }
