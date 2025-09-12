@@ -467,7 +467,7 @@ uint		start, len ;
 	            bprintf(pip->ofp,"%08x",ia_lastbranch) ;
 
 	            rs1 = SR_NOTSUP ;
-	            if (pip->f.instrdis) {
+	            if (pip->fl.instrdis) {
 
 	                rs1 = mipsdis_getlevo(dp,
 	                    ia_lastbranch,instr_lastbranch,
