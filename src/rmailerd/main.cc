@@ -581,7 +581,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* ignore dots on input (default anyway!) */
 			    case argopt_oi:
-				pip->f.optin = TRUE ;
+				pip->fl.optin = TRUE ;
 				break ;
 
 /* handle all keyword defaults */
@@ -651,7 +651,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet mode */
 	                        case 'Q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* version */
@@ -661,12 +661,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* daemon mode */
 	                        case 'd':
-	                            pip->f.daemon = TRUE ;
+	                            pip->fl.daemon = TRUE ;
 	                            break ;
 
 /* ignore dots on input (default anyway!) */
 	                        case 'i':
-				    pip->f.optin = TRUE ;
+				    pip->fl.optin = TRUE ;
 	                            break ;
 
 /* options */
@@ -905,7 +905,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* create the values for the file schedule searching */
 
-	pip->f.svars = TRUE ;
+	pip->fl.svars = TRUE ;
 	vecstr_start(&schedvars,6,0) ;
 
 	vecstr_envset(&schedvars,"p",pip->pr,-1) ;
@@ -1164,7 +1164,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	    }
 
-	    if (pip->f.daemon && (cf.pidfname != NULL) && 
+	    if (pip->fl.daemon && (cf.pidfname != NULL) && 
 	        (pidfname[0] == '\0')) {
 
 #if	CF_DEBUG
@@ -1375,7 +1375,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 #if	CF_DEBUG
 	        if (pip->debuglevel > 1)
-	            debugprintf("main: options> sender=%d\n",pip->f.sender) ;
+	            debugprintf("main: options> sender=%d\n",pip->fl.sender) ;
 #endif
 
 	        }
@@ -1429,8 +1429,8 @@ int main(int argc,cchar **argv,cchar **envv)
 	    bprintf(pip->efp,"%s: pr=%s\n",
 	        pip->progname,pip->pr) ;
 
-	if (pip->f.svars) {
-	    pip->f.svars = FALSE ;
+	if (pip->fl.svars) {
+	    pip->fl.svars = FALSE ;
 	    vecstr_finish(&schedvars) ;
 	}
 
@@ -1441,7 +1441,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    debugprintf("main: 0 pidfname=%s\n",pidfname) ;
 #endif
 
-	if (pip->f.daemon && (pidfname[0] != '\0')) {
+	if (pip->fl.daemon && (pidfname[0] != '\0')) {
 
 	    if (pidfname[0] == '-')
 	        strcpy(pidfname,PIDFNAME) ;
@@ -1606,7 +1606,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    debugprintf("main: about to check if we are a daemon\n") ;
 #endif
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 	    struct protoent	*pep ;
 	    long		addr ;
 
@@ -1765,7 +1765,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* before we go too far, are we the only one on this PID mutex? */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -1844,7 +1844,7 @@ int main(int argc,cchar **argv,cchar **envv)
 #endif
 	    pip->daytime = time(NULL) ;
 
-	    if (pip->f.daemon)
+	    if (pip->fl.daemon)
 	        logfile_printf(&pip->lh,"%s finished initializing\n",
 	            timestr_logz(pip->daytime,timebuf)) ;
 
@@ -1855,7 +1855,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	} /* end if (making log entries) */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    rs = watch(pip,s,&exports) ;
 
@@ -2036,7 +2036,7 @@ badpidopen:
 	goto badret ;
 
 badpidlock:
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 
 	    bprintf(pip->efp,
 	        "%s: could not lock the PID file (%d)\n",
@@ -2064,7 +2064,7 @@ badpidlock:
 	goto badret ;
 
 badsocket:
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 	    bprintf(pip->efp,
 	        "%s: could not create a socket to listen on (%d)\n",
 	        pip->progname,rs) ;
@@ -2072,7 +2072,7 @@ badsocket:
 	goto badret ;
 
 badbind:
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 	    bprintf(pip->efp,
 	        "%s: could not bind to our port number (%d)\n",
 	        pip->progname,rs) ;
@@ -2080,7 +2080,7 @@ badbind:
 	goto ret2 ;
 
 badlisten:
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 	    bprintf(pip->efp,
 	        "%s: could not listen to our server socket (%d)\n",
 	        pip->progname,rs) ;
@@ -2186,10 +2186,10 @@ static int procopts(PROGINFO *pip,char *buf,int buflen)
 		c += 1 ;
 	        switch (i) {
 	        case progopt_sender:
-	            pip->f.sender = TRUE ;
+	            pip->fl.sender = TRUE ;
 	            if (vlen > 0) {
 	                if (cfdeci(val,vlen,&v) >= 0)
-	                    pip->f.sender = (v != 0) ? 1 : 0 ;
+	                    pip->fl.sender = (v != 0) ? 1 : 0 ;
 	            }
 		    break ;
 		default:
