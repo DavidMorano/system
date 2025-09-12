@@ -216,9 +216,9 @@ char	*envv[] ;
 
 /* initialize */
 
-	pip->f.quiet = FALSE ;
-	pip->f.verbose = FALSE ;
-	pip->f.interrupt = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.verbose = FALSE ;
+	pip->fl.interrupt = FALSE ;
 
 	pip->debuglevel = 0 ;
 
@@ -348,7 +348,7 @@ char	*envv[] ;
 
 /* verbose mode */
 	                    case ARGOPT_VERBOSE:
-	                        pip->f.verbose = TRUE ;
+	                        pip->fl.verbose = TRUE ;
 	                        break ;
 
 /* program root */
@@ -488,12 +488,12 @@ char	*envv[] ;
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* verbose mode */
 	                        case 'v':
-	                            pip->f.verbose = TRUE ;
+	                            pip->fl.verbose = TRUE ;
 	                            break ;
 
 	                        default:
@@ -839,7 +839,7 @@ char	*envv[] ;
 			pip->interrupt) ;
 #endif
 
-	        pip->f.interrupt = TRUE ;
+	        pip->fl.interrupt = TRUE ;
 
 	    }
 
@@ -860,10 +860,10 @@ char	*envv[] ;
 /* open the system report log file */
 
 #ifdef	COMMENT
-	pip->f.log = FALSE ;
+	pip->fl.log = FALSE ;
 	if ((rs = bopen(pip->lfp,logfname,"wca",0664)) >= 0) {
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -1067,7 +1067,7 @@ char	*envv[] ;
 	    "main: service table file=%s\n",pip->srvtab) ;
 #endif
 
-	pip->f.srvtab = FALSE ;
+	pip->fl.srvtab = FALSE ;
 	if (access(pip->srvtab,R_OK) >= 0) {
 
 #if	CF_DEBUG
@@ -1075,7 +1075,7 @@ char	*envv[] ;
 	        "main: we have a service table file\n") ;
 #endif
 
-	    pip->f.srvtab = TRUE ;
+	    pip->fl.srvtab = TRUE ;
 	    if ((rs = srvinit(&sf,pip->srvtab)) < 0) goto badsrv ;
 
 #if	CF_DEBUG
@@ -1124,7 +1124,7 @@ char	*envv[] ;
 	    "main: done w/ srvtab file ?\n") ;
 #endif
 
-	if (! pip->f.srvtab) goto badnosrv ;
+	if (! pip->fl.srvtab) goto badnosrv ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1) debugprintf(
@@ -1258,7 +1258,7 @@ char	*envv[] ;
 
 	    logfile_printf(&pip->lh,"dir=%s\n",pip->directory) ;
 
-	    if (pip->f.interrupt)
+	    if (pip->fl.interrupt)
 	        logfile_printf(&pip->lh,"intfile=%s\n",
 	            pip->interrupt) ;
 
@@ -1385,7 +1385,7 @@ badpidopen:
 	goto badret ;
 
 badpidlock:
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 
 	    bprintf(efp,
 	        "%s: could not lock the PID file \"%s\" rs=%d\n",
