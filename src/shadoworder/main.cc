@@ -540,7 +540,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* follow symbolic links */
 	                case argopt_follow:
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    break ;
 
 /* default action and user specified help */
@@ -570,7 +570,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -593,7 +593,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* take input file arguments from STDIN */
 	                    case 'f':
-	                        pip->f.follow = TRUE ;
+	                        pip->fl.follow = TRUE ;
 	                        break ;
 
 /* file name length restriction */
@@ -625,7 +625,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* options */
@@ -644,12 +644,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'p':
-	                        pip->f.print = TRUE ;
+	                        pip->fl.print = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.print = (rs > 0) ;
+	                                pip->fl.print = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -799,7 +799,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* get ready */
 
 	if ((rs = paramopt_havekey(&aparams,PO_SUFFIX)) > 0) {
-	    pip->f.suffix = TRUE ;
+	    pip->fl.suffix = TRUE ;
 	} /* end if */
 
 	if ((rs = paramopt_havekey(&aparams,PO_OPTION)) > 0) {
@@ -811,10 +811,10 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	        if ((kwi = matostr(progopts,2,cp,-1)) >= 0) {
 	            switch (kwi) {
 	            case progopt_follow:
-	                pip->f.follow = TRUE ;
+	                pip->fl.follow = TRUE ;
 	                break ;
 	            case progopt_nofollow:
-	                pip->f.follow = FALSE ;
+	                pip->fl.follow = FALSE ;
 	                break ;
 	            } /* end switch */
 	        } /* end if (progopts) */
@@ -1385,7 +1385,7 @@ VECOBJ		*sfp ;
 	    rs = vecobj_search(sfp,wpp,userwordcmp,&wsp) ;
 	    f = (rs >= 0) ;
 
-	    if ((rs >= 0) && pip->f.print) {
+	    if ((rs >= 0) && pip->fl.print) {
 	        rs = bprintln(ofp,wsp->up,-1) ;
 	        wlen += rs ;
 	    }
