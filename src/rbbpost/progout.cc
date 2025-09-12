@@ -391,7 +391,7 @@ MAILMSGATTENT	*ep ;
 
 /* content disposition */
 
-	    if ((rs >= 0) && f_multipart && pip->f.dis_inline) {
+	    if ((rs >= 0) && f_multipart && pip->fl.dis_inline) {
 	        cchar	*val = "inline" ;
 	        kn = "content-disposition" ;
 	        rs = bprintf(ofp, "%s: %s\n",kn,val) ;
@@ -620,7 +620,7 @@ static int outct(PROGINFO *pip,bfile *ofp,MAILMSGATTENT *ep)
 	int		wlen = 0 ;
 	int		cte = ep->cte ;
 	const int	f_pt = ep->f_plaintext ;
-	int		f_mime = pip->f.mime ;
+	int		f_mime = pip->fl.mime ;
 
 	if (pip == NULL) return SR_FAULT ;
 
@@ -700,7 +700,7 @@ static int outpartbody(PROGINFO *pip,bfile *ofp,bfile *ifp,MAILMSGATTENT *ep)
 	int		rs = SR_OK ;
 	int		len ;
 	int		wlen = 0 ;
-	int		f_textcrnl = (ep->f_plaintext && pip->f.crnl) ;
+	int		f_textcrnl = (ep->f_plaintext && pip->fl.crnl) ;
 	char		rbuf[BUFLEN + 2] ; /* added 2 rather than 1 for later */
 
 #if	CF_DEBUG
@@ -776,7 +776,7 @@ static int outpartbodybits(PROGINFO *pip,bfile *ofp,bfile *ifp,
 	if ((rs = uc_malloc((bllen+1),&p)) >= 0) {
 	    LINEFOLD	lf ;
 	    const int	cols = MAILTEXTCOLS ;
-	    const int	f_textcrnl = (pip->f.crnl && f_pt) ;
+	    const int	f_textcrnl = (pip->fl.crnl && f_pt) ;
 	    int		len ;
 	    int		ll ;
 	    int		f_bol = TRUE ;
