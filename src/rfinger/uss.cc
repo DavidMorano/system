@@ -333,7 +333,7 @@ const char	*av[] ;
 	    debugprintf("uss_open: f_log=%u\n",op->open.log) ;
 #endif
 
-	    if ((rs >= 0) && sip->f.log)
+	    if ((rs >= 0) && sip->fl.log)
 	        rs = uss_logstuff(op,sip) ;
 
 /* parse the port-specification if we have one */
@@ -964,7 +964,7 @@ static int subinfo_procargs(SUBINFO *sip)
 
 /* logfile */
 	                case argopt_lf:
-	                    sip->f.log = TRUE ;
+	                    sip->fl.log = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl)
@@ -1073,7 +1073,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                        break ;
 
 	                    case 'i':
-	                        sip->f.ignore = TRUE ;
+	                        sip->fl.ignore = TRUE ;
 	                        break ;
 
 /* options */
@@ -1239,9 +1239,9 @@ static int subinfo_procopts(SUBINFO *sip,KEYOPT *kop)
 
 	            switch (oi) {
 	            case procopt_log:
-	                sip->f.log = TRUE ;
+	                sip->fl.log = TRUE ;
 	                if ((vl > 0) && ((rs = optbool(vp,vl)) >= 0))
-	                    sip->f.log = (rs > 0) ;
+	                    sip->fl.log = (rs > 0) ;
 	                break ;
 	            } /* end switch */
 	            c += 1 ;
@@ -1427,7 +1427,7 @@ static int subinfo_logfile(SUBINFO *sip)
 	int		rs = SR_OK ;
 	int		f = sip->init.log ;
 
-	if (sip->f.log && (! sip->init.log)) {
+	if (sip->fl.log && (! sip->init.log)) {
 	    cchar	*lfname = sip->lfname ;
 	    sip->init.log = TRUE ;
 	    f = TRUE ;
