@@ -439,7 +439,7 @@ static int subinfo_start(MAINTQOTD *sip,time_t dt,cchar *pr,
 	sip->dt = dt ;
 	sip->euid = geteuid() ;
 
-	sip->f.logsub = TRUE ;
+	sip->fl.logsub = TRUE ;
 
 	if ((rs = u_stat(pr,&sb)) >= 0) {
 	    sip->uid_pr = sb.st_uid ;
@@ -692,7 +692,7 @@ static int subinfo_defaults(MAINTQOTD *sip)
 
 	{
 	    cchar	*lf = sip->lfname ;
-	    if (((lf == NULL) || (lf[0] == '+')) && sip->f.logsub) {
+	    if (((lf == NULL) || (lf[0] == '+')) && sip->fl.logsub) {
 	        cchar	*vp = sip->sn ;
 	        const int	vl = -1 ;
 	        rs = subinfo_logfile(sip,vp,vl) ;
