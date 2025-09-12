@@ -506,7 +506,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -856,7 +856,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    port = usw ;
 	    if ((rs >= 0) && (port > 0)) {
 
-	        tip->f.errchan = TRUE ;
+	        tip->fl.errchan = TRUE ;
 	        ctdeci(portbuf,18,port) ;
 
 #if	CF_DEBUG
@@ -895,7 +895,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	        u_close(fd_error) ;
 
-	        if (tip->f.errchan) {
+	        if (tip->fl.errchan) {
 	            u_dup(fd_a2) ;
 	        } else
 	            u_dup(fd_a1) ;
@@ -1334,7 +1334,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
-	lip->f.poll = TRUE ;
+	lip->fl.poll = TRUE ;
 
 	vo = VECSTR_PORDERED ;
 	if ((rs = vecstr_start(&lip->args,10,vo)) >= 0) {
