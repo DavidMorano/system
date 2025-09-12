@@ -237,7 +237,7 @@ int		to ;
 	debugprintf("filer_oread: rlen=%d to=%d\n",rlen,to) ;
 #endif
 
-	rc = (op->f.net) ? FILER_RCNET : 1 ;
+	rc = (op->fl.net) ? FILER_RCNET : 1 ;
 	while (tlen < rlen) {
 
 #if	CF_DEBUGS
