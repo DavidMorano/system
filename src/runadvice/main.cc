@@ -1303,7 +1303,7 @@ const char	*envv[] ;
 #if	CF_DEBUG && 0
 	                    if (g.debuglevel > 1)
 	                        debugprintf("main: a.f_rsh=%d\n",
-	                            ((struct machine *) (mh.va[0]))->f.rsh) ;
+	                            ((struct machine *) (mh.va[0]))->fl.rsh) ;
 #endif
 
 /* where is the TMP directory */
@@ -1334,7 +1334,7 @@ const char	*envv[] ;
 #if	CF_DEBUG && 0
 	                    if (g.debuglevel > 1)
 	                        debugprintf("main: a.f_rsh=%d\n",
-	                            ((struct machine *) (mh.va[0]))->f.rsh) ;
+	                            ((struct machine *) (mh.va[0]))->fl.rsh) ;
 #endif
 
 /* what is the "run" file that we will be using ? */
@@ -1376,7 +1376,7 @@ const char	*envv[] ;
 #if	CF_DEBUG && 0
 	                    if (g.debuglevel > 1)
 	                        debugprintf("main: a.f_rsh=%d\n",
-	                            ((struct machine *) (mh.va[0]))->f.rsh) ;
+	                            ((struct machine *) (mh.va[0]))->fl.rsh) ;
 #endif
 
 /* perform a final check on the ADVICE data output file name */
@@ -1400,7 +1400,7 @@ const char	*envv[] ;
 #if	CF_DEBUG && 0
 	                    if (g.debuglevel > 1)
 	                        debugprintf("main: a.f_rsh=%d\n",
-	                            ((struct machine *) (mh.va[0]))->f.rsh) ;
+	                            ((struct machine *) (mh.va[0]))->fl.rsh) ;
 #endif
 
 /* add default parameters where they were not specified by the user */
@@ -1423,7 +1423,7 @@ const char	*envv[] ;
 #if	CF_DEBUG && 0
 	                    if (g.debuglevel > 1)
 	                        debugprintf("main: a.f_rsh=%d\n",
-	                            ((struct machine *) (mh.va[0]))->f.rsh) ;
+	                            ((struct machine *) (mh.va[0]))->fl.rsh) ;
 #endif
 
 /* print out the accumulated run parameter information */
@@ -1476,7 +1476,7 @@ const char	*envv[] ;
 #if	CF_DEBUG && 0
 	                    if (g.debuglevel > 1)
 	                        debugprintf("main: a.f_rsh=%d\n",
-	                            ((struct machine *) (mh.va[0]))->f.rsh) ;
+	                            ((struct machine *) (mh.va[0]))->fl.rsh) ;
 #endif
 
 /* print out the machine status information */
@@ -1509,7 +1509,7 @@ const char	*envv[] ;
 	                debugprintf("main: machine %s\n",mp->hostname) ;
 #endif
 
-	            if (! mp->f.rstat)
+	            if (! mp->fl.rstat)
 	                bprintf(g.efp,"%s: machine \"%s\" may be down\n",
 	                    g.progname,mp->hostname) ;
 
@@ -1521,7 +1521,7 @@ const char	*envv[] ;
 
 	            }
 
-	            if (! mp->f.freepages) bprintf(g.efp,
+	            if (! mp->fl.freepages) bprintf(g.efp,
 	                "%s: machine \"%s\" has possible permissions problem\n",
 	                g.progname,mp->hostname) ;
 
