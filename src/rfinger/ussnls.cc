@@ -176,10 +176,10 @@ const char	*av[] ;
 
 #if	CF_DEBUGS
 	debugprintf("ussnls_open: ussinfo_logstuff()\n") ;
-	debugprintf("ussnls_open: f_log=%u\n",sip->f.log) ;
+	debugprintf("ussnls_open: f_log=%u\n",sip->fl.log) ;
 #endif
 
-	if ((rs >= 0) && sip->f.log)
+	if ((rs >= 0) && sip->fl.log)
 	    rs = ussnls_logstuff(op,sip) ;
 
 /* parse the port-specification if we have one */
