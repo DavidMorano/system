@@ -545,7 +545,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -600,7 +600,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* line-buffered */
 	                    case 'u':
 	                        pip->have.bufnone = TRUE ;
-	                        pip->f.bufnone = TRUE ;
+	                        pip->fl.bufnone = TRUE ;
 	                        pip->final.bufnone = TRUE ;
 	                        break ;
 
@@ -762,7 +762,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if ((rs < 0) && (ex == EX_OK)) {
 	    switch (rs) {
 	    default:
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	    	    bfile	*efp = (bfile *) pip->efp ;
 	            cchar	*pn = pip->progname ;
 	            cchar	*fmt = "%s: could not process (%d)\n" ;
@@ -900,7 +900,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.cvtcase) {
 	                        lip->have.cvtcase = TRUE ;
 	                        lip->final.cvtcase = TRUE ;
-	                        lip->f.cvtcase = TRUE ;
+	                        lip->fl.cvtcase = TRUE ;
 	                        if (vl > 0) {
 	                            rs = procsetcase(pip,vp,vl) ;
 				}
@@ -911,10 +911,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.bufwhole) {
 	                        pip->have.bufwhole = TRUE ;
 	                        pip->final.bufwhole = TRUE ;
-	                        pip->f.bufwhole = TRUE ;
+	                        pip->fl.bufwhole = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.bufwhole = (rs > 0) ;
+	                            pip->fl.bufwhole = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -923,10 +923,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.bufline) {
 	                        pip->have.bufline = TRUE ;
 	                        pip->final.bufline = TRUE ;
-	                        pip->f.bufline = TRUE ;
+	                        pip->fl.bufline = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.bufline = (rs > 0) ;
+	                            pip->fl.bufline = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -936,10 +936,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.bufnone) {
 	                        pip->have.bufnone = TRUE ;
 	                        pip->final.bufnone = TRUE ;
-	                        pip->f.bufnone = TRUE ;
+	                        pip->fl.bufnone = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.bufnone = (rs > 0) ;
+	                            pip->fl.bufnone = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -976,13 +976,13 @@ static int procsetcase(PROGINFO *pip,cchar *vp,int vl)
 	    const int	ch = CHAR_TOLC(vp[0]) ;
 	    switch (ch) {
 	    case 'l':
-	        lip->f.cvtlc = TRUE ;
+	        lip->fl.cvtlc = TRUE ;
 	        break ;
 	    case 'u':
-	        lip->f.cvtuc = TRUE ;
+	        lip->fl.cvtuc = TRUE ;
 	        break ;
 	    case 'f':
-	        lip->f.cvtfc = TRUE ;
+	        lip->fl.cvtfc = TRUE ;
 	        break ;
 	    } /* end switch */
 	    if (pip->debuglevel > 0) {
@@ -1064,7 +1064,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 	                rs1 = bclose(afp) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } else {
-	                if (! pip->f.quiet) {
+	                if (! pip->fl.quiet) {
 	    		    bfile	*efp = (bfile *) pip->efp ;
 			    fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                    bprintf(efp,fmt,pn,rs) ;
