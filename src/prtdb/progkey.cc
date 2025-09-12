@@ -124,7 +124,7 @@ int		kl ;
 
 /* access the front database (local and system) */
 
-	if ((vl == 0) && pip->f.pdbopen) {
+	if ((vl == 0) && pip->fl.pdbopen) {
 
 	    pp = (strcmp(printer,DEFPRINTER) == 0) ? "default" : printer ;
 
