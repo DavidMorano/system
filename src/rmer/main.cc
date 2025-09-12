@@ -431,12 +431,12 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 /* set message-discard mode */
 	                case argopt_md:
-			    pip->f.msgdiscard = TRUE ;
+			    pip->fl.msgdiscard = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-				    pip->f.msgdiscard = (rs > 0) ;
+				    pip->fl.msgdiscard = (rs > 0) ;
 				}
 	                    } 
 			    break ;
@@ -493,7 +493,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -689,7 +689,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 	if (rs >= 0) {
 
-	    if (pip->f.msgdiscard) {
+	    if (pip->fl.msgdiscard) {
 		uc_msgdiscard(fd_in) ;
 	     }
 
@@ -711,7 +711,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 		}
