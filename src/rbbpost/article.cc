@@ -1,17 +1,18 @@
-/* article */
+/* article SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* manage an ARTICLE object */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_SAFE		1		/* safety */
 
-
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 */
 
@@ -19,23 +20,22 @@
 
 /*******************************************************************************
 
-	This little object manages some particulars about an bulletin-board
-	article.
+  	Object:
+	article
 
+	Description:
+	This little object manages some particulars about an
+	bulletin-board article.
 
 *******************************************************************************/
 
-
-#define	ARTICLE_MASTER	1
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -47,11 +47,11 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,const char **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -83,19 +83,19 @@ int article_start(ARTICLE *op)
 	op->clines = -1 ;
 
 	if ((rs = ng_start(&op->ngs)) >= 0) {
-	    op->f.ngs = TRUE ;
+	    op->fl.ngs = TRUE ;
 	    if ((rs = retpath_start(&op->path)) >= 0) {
-	        op->f.path = TRUE ;
+	        op->fl.path = TRUE ;
 		if ((rs = vechand_start(&op->envdates,1,0)) >= 0) {
-	            op->f.envdates = TRUE ;
+	            op->fl.envdates = TRUE ;
 		}
 		if (rs < 0) {
-	            op->f.path = TRUE ;
+	            op->fl.path = TRUE ;
 	    	    retpath_finish(&op->path) ;
 		}
 	    }
 	    if (rs < 0) {
-	        op->f.ngs = FALSE ;
+	        op->fl.ngs = FALSE ;
 		ng_finish(&op->ngs) ;
 	    }
 	} /* end if (ngs) */
@@ -120,23 +120,23 @@ int article_finish(ARTICLE *op)
 #endif
 
 #if	CF_DEBUGS
-	debugprintf("article_finish: f_msgdate=%u\n",op->f.msgdate) ;
+	debugprintf("article_finish: f_msgdate=%u\n",op->fl.msgdate) ;
 #endif
 
-	if (op->f.msgdate) {
-	    op->f.msgdate = FALSE ;
+	if (op->fl.msgdate) {
+	    op->fl.msgdate = FALSE ;
 	    rs1 = dater_finish(&op->msgdate) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 #if	CF_DEBUGS
-	debugprintf("article_finish: f_envdates=%u\n",op->f.envdates) ;
+	debugprintf("article_finish: f_envdates=%u\n",op->fl.envdates) ;
 #endif
 
-	if (op->f.envdates) {
+	if (op->fl.envdates) {
 	    DATER	*dp ;
 	    int		i ;
-	    op->f.envdates = FALSE ;
+	    op->fl.envdates = FALSE ;
 	    for (i = 0 ; vechand_get(&op->envdates,i,&dp) >= 0 ; i += 1) {
 		rs1 = dater_finish(dp) ;
 		if (rs >= 0) rs = rs1 ;
@@ -148,20 +148,20 @@ int article_finish(ARTICLE *op)
 	} /* end if (envdates) */
 
 #if	CF_DEBUGS
-	debugprintf("article_finish: f_path=%u\n",op->f.path) ;
+	debugprintf("article_finish: f_path=%u\n",op->fl.path) ;
 #endif
-	if (op->f.path) {
-	    op->f.path = FALSE ;
+	if (op->fl.path) {
+	    op->fl.path = FALSE ;
 	    rs1 = retpath_finish(&op->path) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 #if	CF_DEBUGS
-	debugprintf("article_finish: f_ngs=%u\n",op->f.ngs) ;
+	debugprintf("article_finish: f_ngs=%u\n",op->fl.ngs) ;
 #endif
 
-	if (op->f.ngs) {
-	    op->f.ngs = FALSE ;
+	if (op->fl.ngs) {
+	    op->fl.ngs = FALSE ;
 	    rs1 = ng_finish(&op->ngs) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -199,14 +199,14 @@ int article_finish(ARTICLE *op)
 /* end subroutine (article_finish) */
 
 
-int article_addpath(ARTICLE *op,const char *sp,int sl)
+int article_addpath(ARTICLE *op,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (! op->f.path) {
-	    op->f.path = TRUE ;
+	if (! op->fl.path) {
+	    op->fl.path = TRUE ;
 	    rs = retpath_start(&op->path) ;
 	}
 
@@ -219,14 +219,14 @@ int article_addpath(ARTICLE *op,const char *sp,int sl)
 /* end subroutine (article_addpath) */
 
 
-int article_addng(ARTICLE *op,const char *sp,int sl)
+int article_addng(ARTICLE *op,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (! op->f.ngs) {
-	    op->f.ngs = TRUE ;
+	if (! op->fl.ngs) {
+	    op->fl.ngs = TRUE ;
 	    rs = ng_start(&op->ngs) ;
 	}
 
@@ -270,8 +270,8 @@ int article_addmsgdate(ARTICLE *op,DATER *dp)
 	if (op == NULL) return SR_FAULT ;
 	if (dp == NULL) return SR_FAULT ;
 
-	if (! op->f.msgdate) {
-	    op->f.msgdate = TRUE ;
+	if (! op->fl.msgdate) {
+	    op->fl.msgdate = TRUE ;
 	    rs = dater_start(&op->msgdate,NULL,NULL,0) ;
 	}
 
@@ -284,7 +284,7 @@ int article_addmsgdate(ARTICLE *op,DATER *dp)
 /* end subroutine (article_addmsgdate) */
 
 
-int article_addaddr(ARTICLE *op,int type,const char *sp,int sl)
+int article_addaddr(ARTICLE *op,int type,cchar *sp,int sl)
 {
 	const int	n = articleaddr_overlast ;
 	int		rs = SR_OK ;
@@ -307,7 +307,7 @@ int article_addaddr(ARTICLE *op,int type,const char *sp,int sl)
 /* end subroutine (article_addaddr) */
 
 
-int article_addstr(ARTICLE *op,int type,const char *sp,int sl)
+int article_addstr(ARTICLE *op,int type,cchar *sp,int sl)
 {
 	const int	n = articlestr_overlast ;
 	int		rs = SR_OK ;
@@ -322,7 +322,7 @@ int article_addstr(ARTICLE *op,int type,const char *sp,int sl)
 	}
 
 	if (rs >= 0) {
-	    const char	*cp ;
+	    cchar	*cp ;
 	    if ((rs = uc_mallocstrw(sp,sl,&cp)) > 0) {
 		op->strs[type] = cp ;
 		rs = (rs-1) ;
@@ -371,7 +371,7 @@ int article_addparse(ARTICLE *op,cchar *sp,int sl)
 	            debugprintf("article_addparse: ema entry\n") ;
 #endif
 
-	            if ((ep->f.error) || (ep->al <= 0)) continue ;
+	            if ((ep->fl.error) || (ep->al <= 0)) continue ;
 
 	            if ((cl = sfshrink(ep->ap,ep->al,&cp)) > 0) {
 			n += 1 ;
@@ -438,7 +438,7 @@ int article_getstr(ARTICLE *op,int type,cchar **rpp)
 {
 	const int	n = articlestr_overlast ;
 	int		rs = SR_OK ;
-	const char	*sp ;
+	cchar	*sp ;
 
 	if (op == NULL) return SR_FAULT ;
 
