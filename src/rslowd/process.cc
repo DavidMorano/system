@@ -1099,7 +1099,7 @@ char	s[], articleid[] ;
 
 	        if (ep == NULL) continue ;
 
-	        if ((! ep->f.error) && (ep->rlen > 0)) {
+	        if ((! ep->fl.error) && (ep->rlen > 0)) {
 
 	            strcpy(articleid,ep->route) ;
 
