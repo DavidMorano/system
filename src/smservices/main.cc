@@ -192,7 +192,7 @@ char	*envv[] ;
 	pip->progname = strbasename(argv[0]) ;
 
 	if ((rs = bopen(efp,BFILE_STDERR,"dwca",0666)) >= 0) {
-		pip->f.errfile = TRUE ;
+		pip->fl.errfile = TRUE ;
 	    pip->efp = &errfile ;
 	    bcontrol(efp,BC_LINEBUF,0) ;
 	}
