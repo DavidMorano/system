@@ -202,7 +202,7 @@ int		reclen ;
 
 	        if (hdb_curenum(dbp,&keycursor,&key,&value) >= 0) {
 
-	            if (! pip->f.removelabel) {
+	            if (! pip->fl.removelabel) {
 	                bprintf(ofp,"%s:%u,%u\t",fname,tagoff,taglen) ;
 		    }
 
