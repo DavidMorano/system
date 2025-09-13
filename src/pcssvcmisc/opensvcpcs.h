@@ -1,17 +1,18 @@
-/* opensvcpcs */
+/* opensvcpcs HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* PCS utility subroutines */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-	This code was started by taking the corresponding code from the
-	TCP-family module.  In retrospect, that was a mistake.  Rather I should
-	have started this code by using the corresponding UUX dialer module.
+	This code was started by taking the corresponding code from
+	the TCP-family module.  In retrospect, that was a mistake.
+	Rather I should have started this code by using the
+	corresponding UUX dialer module.
 
 */
 
@@ -19,29 +20,32 @@
 
 /*******************************************************************************
 
-	This code module contains some PCS-related utility subroutines.
+  	Name:
+	opensvcpcs
 
+	Description:
+	This code module contains some PCS-related utility subroutines.
 
 *******************************************************************************/
 
-
 #ifndef	OPENSVCPCS_INCLUDE
-#define	OPENSVCPCS_INCLUDE	1
+#define	OPENSVCPCS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bits.h>
 #include	<filer.h>
 #include	<pcsns.h>
-#include	<localmisc.h>
 
 #include	"defs.h"
 
 
-/* local defines */
-
-#define	SUBPCS		struct subpcs
+#define	SUBPCS		struct subpcs_head
 #define	SUBPCS_FL	struct subpcs_flags
 
 
@@ -51,35 +55,30 @@ struct subpcs_flags {
 	uint		full:1 ;
 } ;
 
-struct subpcs {
+struct subpcs_head {
+	mainv		envv ;
 	cchar		*pr ;
-	cchar		**envv ;
-	SUBPCS_FL	f ;
-	PCSNS		ns ;
+	pcsns		ns ;
+	SUBPCS_FL	fl ;
 	int		w ;
 } ;
 
+typedef	SUBPCS		subpcs ;
+typedef	SUBPCS_FL	subpcs_fl ;
 
-#if	(! defined(OPENSVCPCS_MASTER)) || (OPENSVCPCS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int subpcs_start(subpcs *,cchar *,cchar **,int) noex ;
+extern int subpcs_finish(subpcs *) noex ;
+extern int subpcs_af(subpcs *,filer *,cchar *) noex ;
+extern int subpcs_def(subpcs *,filer *) noex ;
+extern int subpcs_all(subpcs *,filer *) noex ;
+extern int subpcs_args(subpcs *,filer *,ARGINFO *,bits *,cchar *) noex ;
+extern int subpcs_users(subpcs *,filer *,cchar *,int) noex ;
+extern int subpcs_user(subpcs *,filer *,cchar *,int) noex ;
 
-extern int subpcs_start(SUBPCS *,cchar *,cchar **,int) ;
-extern int subpcs_finish(SUBPCS *) ;
-extern int subpcs_af(SUBPCS *,filer *,cchar *) ;
-extern int subpcs_def(SUBPCS *,filer *) ;
-extern int subpcs_all(SUBPCS *,filer *) ;
-extern int subpcs_args(SUBPCS *,filer *,ARGINFO *,BITS *,cchar *) ;
-extern int subpcs_users(SUBPCS *,filer *,cchar *,int) ;
-extern int subpcs_user(SUBPCS *,filer *,cchar *,int) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* OPENSVCPCS_MASTER */
 
 #endif /* OPENSVCPCS_INCLUDE */
 
