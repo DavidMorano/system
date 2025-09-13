@@ -17,7 +17,6 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<cstdarg>
@@ -25,7 +24,6 @@
 #include	<usystem.h>
 #include	<fsdir.h>
 #include	<filer.h>
-#include	<ucmallreg.h>
 #include	<localmisc.h>
 
 #ifndef FILER_RCNET
