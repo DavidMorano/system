@@ -147,7 +147,7 @@ char	*envv[] ;
 	gdp->debuglevel = 0 ;
 	gdp->tmpdir = NULL ;
 
-	gdp->f.verbose = FALSE ;
+	gdp->fl.verbose = FALSE ;
 
 
 /* process program arguments */
