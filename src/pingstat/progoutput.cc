@@ -156,7 +156,7 @@ int progoutput(PROGINFO *pip,ARGINFO *aip,BITS *bop)
 	    if ((rs = vechand_start(&phosts,20,0)) >= 0) {
 
 	        if ((rs = procargs(pip,aip,bop,&phosts)) >= 0) {
-	            if ((rs == 0) && pip->f.update) {
+	            if ((rs == 0) && pip->fl.update) {
 	                    rs = procdefpingtab(pip) ;
 	                    pan += rs ;
 	            }
@@ -278,7 +278,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,vechand *php)
 static int procout_begin(PROGINFO *pip,bfile *ofp,cchar *ofname)
 {
 	int		rs = SR_OK ;
-	if (! pip->f.nooutput) {
+	if (! pip->fl.nooutput) {
 	    if (pip->ofp == NULL) {
 	        if ((rs = bopen(ofp,ofname,"wct",0666)) >= 0) {
 	            pip->ofp = ofp ;
@@ -359,7 +359,7 @@ static int prochosts(PROGINFO *pip,VECHAND *phlp)
 
 	        if (rs1 == SR_HOSTDOWN) {
 	            f = FALSE ;
-	            pip->f.hostdown = TRUE ;
+	            pip->fl.hostdown = TRUE ;
 	        }
 
 	        if ((rs1 < 0) && (rs1 != SR_HOSTDOWN))
