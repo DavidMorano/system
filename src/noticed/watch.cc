@@ -213,7 +213,7 @@ BUILTIN		*bip ;
 
 /* make the FIFO for IPC requests */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    u_time(&daytime) ;
 
@@ -311,7 +311,7 @@ BUILTIN		*bip ;
 	    goto bad2 ;
 
 	sip->mqid_ipc = rs ;
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    rs = write_mqid(pip,sip->mqid_ipc) ;
 
@@ -337,7 +337,7 @@ BUILTIN		*bip ;
 
 /* we want to receive the new socket (from 'accept') above these guys */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    for (i = 0 ; i < 3 ; i += 1) {
 
@@ -378,7 +378,7 @@ BUILTIN		*bip ;
 
 	nfds = 0 ;
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    fds[nfds].fd = sip->fd_listentcp ;
 	    fds[nfds].events = POLLIN | POLLPRI ;
@@ -402,7 +402,7 @@ BUILTIN		*bip ;
 
 /* if we are not in daemon mode, then we have a job waiting on FD_STDIN */
 
-	if (! pip->f.daemon) {
+	if (! pip->fl.daemon) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -683,7 +683,7 @@ top:
 	        } /* end while */
 
 
-	        if (! pip->f.daemon)
+	        if (! pip->fl.daemon)
 	            f_exit = TRUE ;
 
 	    } else
@@ -694,7 +694,7 @@ top:
 
 /* maintenance the lock file */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    if ((pip->lockfp != NULL) && 
 	        ((daytime - t_lockcheck) >= (TI_MAINT - 1))) {
@@ -721,7 +721,7 @@ top:
 
 /* maintenance the PID mutex lock file */
 
-	if (pip->f.daemon && (pip->pidfp != NULL) && 
+	if (pip->fl.daemon && (pip->pidfp != NULL) && 
 	    ((daytime - t_pidcheck) >= (TI_MAINT - 1))) {
 
 	    rs = checklockfile(pip,pip->pidfp,pip->pidfname,
@@ -749,7 +749,7 @@ top:
 
 /* check if the server table file (srvtab) has changed */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    if ((rs = srvtab_check(sfp,daytime,NULL)) > 0)
 	        logfile_printf(&pip->lh,"%s server table file changed\n",
@@ -773,7 +773,7 @@ top:
 
 /* check if the access table has changed, if we have one */
 
-	if (pip->f.daemon && pip->f.acctab) {
+	if (pip->fl.daemon && pip->fl.acctab) {
 
 	    if ((rs = acctab_check(atp,NULL)) > 0)
 	        logfile_printf(&pip->lh,"%s access table file changed\n",
@@ -805,7 +805,7 @@ top:
 	if (f_tmpfifo)
 		u_unlink(reqfname) ;
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    u_time(&daytime) ;
 
@@ -1007,7 +1007,7 @@ int	nsi, nso ;
 
 /* close stuff we do not need */
 
-	    if (pip->f.daemon)
+	    if (pip->fl.daemon)
 	        u_close(sip->fd_listentcp) ;
 
 
