@@ -262,15 +262,15 @@ int		to ;
 	                switch (kwi) {
 
 	                case argopt_all:
-	                    sip->f.all = TRUE ;
+	                    sip->fl.all = TRUE ;
 	                    break ;
 
 	                case argopt_biff:
-	                    sip->f.biff = TRUE ;
+	                    sip->fl.biff = TRUE ;
 	                    break ;
 
 	                case argopt_bell:
-	                    sip->f.bell = TRUE ;
+	                    sip->fl.bell = TRUE ;
 	                    break ;
 
 /* argument-list file */
@@ -307,15 +307,15 @@ int		to ;
 	                    switch (kc) {
 
 	                    case 'a':
-	                        sip->f.all = TRUE ;
+	                        sip->fl.all = TRUE ;
 	                        break ;
 
 	                    case 'b':
-	                        sip->f.biff = TRUE ;
+	                        sip->fl.biff = TRUE ;
 	                        break ;
 
 	                    case 'r':
-	                        sip->f.bell = TRUE ;
+	                        sip->fl.bell = TRUE ;
 	                        break ;
 
 /* maximum terminals per user */
@@ -466,9 +466,9 @@ int		to ;
 	    if (n > 0) {
 
 	        opts = 0 ;
-	        if (sip->f.all) opts |= TERMNOTE_OALL ;
-	        if (sip->f.biff) opts |= TERMNOTE_OBIFF ;
-	        if (sip->f.bell) opts |= TERMNOTE_OBELL ;
+	        if (sip->fl.all) opts |= TERMNOTE_OALL ;
+	        if (sip->fl.biff) opts |= TERMNOTE_OBIFF ;
+	        if (sip->fl.bell) opts |= TERMNOTE_OBELL ;
 
 	        rs = opentermnote(pr,recips,sip->max,opts) ;
 	        fd = rs ;
@@ -513,7 +513,7 @@ static int subinfo_start(SUBINFO *sip,const char **envv)
 	sip->envv = envv ;
 	sip->max = -1 ;
 	rs = keyopt_start(&sip->akopts) ;
-	sip->f.akopts = (rs >= 0) ;
+	sip->fl.akopts = (rs >= 0) ;
 
 	return rs ;
 }
@@ -525,8 +525,8 @@ static int subinfo_finish(SUBINFO *sip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (sip->f.akopts) {
-	    sip->f.akopts = FALSE ;
+	if (sip->fl.akopts) {
+	    sip->fl.akopts = FALSE ;
 	    rs1 = keyopt_finish(&sip->akopts) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -565,10 +565,10 @@ static int subinfo_opts(SUBINFO *sip)
 	                if (! sip->final.all) {
 	                    sip->have.all = TRUE ;
 	                    sip->final.all = TRUE ;
-	                    sip->f.all = TRUE ;
+	                    sip->fl.all = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        sip->f.all = (rs > 0) ;
+	                        sip->fl.all = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -577,10 +577,10 @@ static int subinfo_opts(SUBINFO *sip)
 	                if (! sip->final.biff) {
 	                    sip->have.biff = TRUE ;
 	                    sip->final.biff = TRUE ;
-	                    sip->f.biff = TRUE ;
+	                    sip->fl.biff = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        sip->f.biff = (rs > 0) ;
+	                        sip->fl.biff = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -589,10 +589,10 @@ static int subinfo_opts(SUBINFO *sip)
 	                if (! sip->final.bell) {
 	                    sip->have.bell = TRUE ;
 	                    sip->final.bell = TRUE ;
-	                    sip->f.bell = TRUE ;
+	                    sip->fl.bell = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        sip->f.bell = (rs > 0) ;
+	                        sip->fl.bell = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -601,10 +601,10 @@ static int subinfo_opts(SUBINFO *sip)
 	                if (! sip->final.bell) {
 	                    sip->have.bell = TRUE ;
 	                    sip->final.bell = TRUE ;
-	                    sip->f.bell = TRUE ;
+	                    sip->fl.bell = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        sip->f.bell = (rs > 0) ;
+	                        sip->fl.bell = (rs > 0) ;
 	                    }
 	                }
 	                break ;
