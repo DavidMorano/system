@@ -98,18 +98,18 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsdd(char *,int,const char *,uint) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	snsdd(char *,int,cchar *,uint) ;
 extern int	snddd(char *,int,uint,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	cfdeci(char *,int,int *) ;
 extern int	permid(IDS *,ustat *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
-extern int	pcsgetprog(const char *,char *,const char *) ;
-extern int	pcsgetprogpath(const char *,char *,const char *) ;
+extern int	pcsgetprog(cchar *,char *,cchar *) ;
+extern int	pcsgetprogpath(cchar *,char *,cchar *) ;
 extern int	getpwd(char *,int) ;
 
 extern char	*strbasename(char *) ;
@@ -158,9 +158,10 @@ static int	process_jobactive(struct proginfo *,struct procinfo *,
 			char *,PROGENTRY **) ;
 static int	process_checkaccess(struct proginfo *,struct procinfo *,
 			char *) ;
-static int	writeout(struct proginfo *,int,const char *) ;
-static int	findprog(struct proginfo *,const char *,char *,int *) ;
-static int	xfile(struct proginfo *,const char *) ;
+static int	writeout(struct proginfo *,int,cchar *) ;
+static int	findprog(struct proginfo *,cchar *,char *,int *) ;
+
+static int xfile(proginfo *pip,cchar *fname) noex {
 
 static void	int_all(int) ;
 
@@ -230,7 +231,7 @@ int watch(proginfo *pip,vecstr *snp) noex {
 	opts = VECHAND_OSWAP | VECHAND_OCONSERVE ;
 	vechand_init(&pi.trun,pip->maxjobs,opts) ;	/* run table */
 
-	pi.daytime = time(NULL) ;
+	pi.daytime = time(nullptr) ;
 
 	t_start = pi.daytime ;
 	t_check = pi.daytime ;
@@ -248,21 +249,21 @@ int watch(proginfo *pip,vecstr *snp) noex {
 	sigs.sa_handler = int_all ;
 	sigs.sa_mask = signalmask ;
 	sigs.sa_flags = 0 ;
-	u_sigaction(SIGTERM,&sigs,NULL) ;
+	u_sigaction(SIGTERM,&sigs,nullptr) ;
 
 	(void) uc_sigemptyset(&signalmask) ;
 
 	sigs.sa_handler = int_all ;
 	sigs.sa_mask = signalmask ;
 	sigs.sa_flags = 0 ;
-	u_sigaction(SIGHUP,&sigs,NULL) ;
+	u_sigaction(SIGHUP,&sigs,nullptr) ;
 
 	(void) uc_sigemptyset(&signalmask) ;
 
 	sigs.sa_handler = int_all ;
 	sigs.sa_mask = signalmask ;
 	sigs.sa_flags = 0 ;
-	u_sigaction(SIGINT,&sigs,NULL) ;
+	u_sigaction(SIGINT,&sigs,nullptr) ;
 
 
 /* make up the structure of the PROGENTRY_ARGS */
@@ -276,9 +277,9 @@ int watch(proginfo *pip,vecstr *snp) noex {
 	pi.args.username = pip->username ;
 	pi.args.groupname = pip->groupname ;
 	pi.args.tmpdir = pip->tmpdname ;
-	pi.args.hostname = NULL ;
-	pi.args.service = NULL ;
-	pi.args.interval = NULL ;
+	pi.args.hostname = nullptr ;
+	pi.args.service = nullptr ;
+	pi.args.interval = nullptr ;
 	pi.args.daytime = pi.daytime ;
 
 
@@ -293,11 +294,11 @@ int watch(proginfo *pip,vecstr *snp) noex {
 
 /* load up all of the jobs that we may have been given */
 
-	if (pip->f.named) {
+	if (pip->fl.named) {
 
 	    for (i = 0 ; vecstr_get(snp,i,&cp) >= 0 ; i += 1) {
 
-	        if (cp == NULL) continue ;
+	        if (cp == nullptr) continue ;
 
 	        rs = process_name(pip,&pi,&pi.args,cp) ;
 
@@ -312,7 +313,7 @@ int watch(proginfo *pip,vecstr *snp) noex {
 
 	    for (i = 0 ; srvtab_get(sfp,i,&sep) >= 0 ; i += 1) {
 
-	        if (sep == NULL) continue ;
+	        if (sep == nullptr) continue ;
 
 #if	CF_DEBUG
 	        if (pip->debuglevel > 1)
@@ -321,7 +322,7 @@ int watch(proginfo *pip,vecstr *snp) noex {
 	                sep->interval) ;
 #endif
 
-	        if (pip->f.daemon && (sep->interval == NULL))
+	        if (pip->fl.daemon && (sep->interval == nullptr))
 	            continue ;
 
 #if	CF_DEBUG
@@ -393,21 +394,21 @@ int watch(proginfo *pip,vecstr *snp) noex {
 	            t_free = pi.daytime ;
 
 #if	CF_SRVTABFREE 
-	            if (pip->f.srvtab) {
+	            if (pip->fl.srvtab) {
 
 	                srvtab_close(pi.sfp) ;
 
-	                srvtab_open(pi.sfp,pip->srvtab,NULL) ;
+	                srvtab_open(pi.sfp,pip->srvtab,nullptr) ;
 
 	            }
 #endif /* CF_SRVTABFREE */
 
 #if	CF_ACCTABFREE
-	            if (pip->f.acctab) {
+	            if (pip->fl.acctab) {
 
 	                acctab_close(pi.atp) ;
 
-	                acctab_open(pi.atp,pip->acctab,NULL) ;
+	                acctab_open(pi.atp,pip->acctab,nullptr) ;
 
 	            }
 #endif /* CF_ACCTABFREE */
@@ -423,10 +424,10 @@ int watch(proginfo *pip,vecstr *snp) noex {
 
 	        if (dmalloc_count++ > 10) {
 
-	            if (pip->f.srvtab)
+	            if (pip->fl.srvtab)
 	                srvtab_close(pi.sfp) ;
 
-	            if (pip->f.acctab)
+	            if (pip->fl.acctab)
 	                acctab_close(pi.atp) ;
 
 	            {
@@ -447,11 +448,11 @@ int watch(proginfo *pip,vecstr *snp) noex {
 
 	            } /* end block */
 
-	            if (pip->f.srvtab)
-	                srvtab_open(pi.sfp,pip->srvtab,NULL) ;
+	            if (pip->fl.srvtab)
+	                srvtab_open(pi.sfp,pip->srvtab,nullptr) ;
 
-	            if (pip->f.acctab)
-	                acctab_open(pi.atp,pip->acctab,NULL) ;
+	            if (pip->fl.acctab)
+	                acctab_open(pi.atp,pip->acctab,nullptr) ;
 
 	        } /* end if (count reached) */
 
@@ -472,7 +473,7 @@ int watch(proginfo *pip,vecstr *snp) noex {
 
 	    if (rs == 0) {
 
-	        if (pip->f.named)
+	        if (pip->fl.named)
 	            break ;
 
 	        if (pip->runint >= 0) {
@@ -504,7 +505,7 @@ int watch(proginfo *pip,vecstr *snp) noex {
 	    sleep(to_poll) ;
 #endif
 
-	    pi.daytime = time(NULL) ;
+	    pi.daytime = time(nullptr) ;
 
 
 #if	CF_DEBUG
@@ -527,7 +528,7 @@ int watch(proginfo *pip,vecstr *snp) noex {
 	        debugprintf("watch: to_check=%d\n",to_check) ;
 #endif
 
-	    if (pip->f.daemon && (pi.daytime > (t_check + to_check))) {
+	    if (pip->fl.daemon && (pi.daytime > (t_check + to_check))) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -558,7 +559,7 @@ int watch(proginfo *pip,vecstr *snp) noex {
 /* check up on the log file */
 
 #if	CF_LOGFILECHECK
-	    if (pip->f.log)
+	    if (pip->fl.log)
 		logfile_check(&pip->lh,pi.daytime) ;
 #endif
 
@@ -592,28 +593,28 @@ int watch(proginfo *pip,vecstr *snp) noex {
 
 
 #if	CF_LOGONLY
-	f = pip->f.daemon ;
+	f = pip->fl.daemon ;
 #else
-	f = TRUE ;
+	f = true ;
 #endif
 
 	if (f) {
 
-	    pi.daytime = time(NULL) ;
+	    pi.daytime = time(nullptr) ;
 
-	    if (pip->f.daemon && f_exit)
+	    if (pip->fl.daemon && f_exit)
 	        cp = "%s server exiting (interrupt)\n" ;
 
 	    else if (pi.f_error)
 	        cp = "%s exiting (error detected)\n" ;
 
-	    else if (pip->f.daemon)
+	    else if (pip->fl.daemon)
 	        cp = "%s server exiting (period expired)\n" ;
 
 	    else
 	        cp = "%s exiting (work completed)\n" ;
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_printf(&pip->lh,cp,
 	            timestr_logz(pi.daytime,timebuf)) ;
 
@@ -649,7 +650,7 @@ bad0:
 
 	while (cq_rem(&pi.qfree,(void **) &pep) >= 0) {
 
-	    if (pep != NULL) {
+	    if (pep != nullptr) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -673,7 +674,7 @@ bad0:
 
 	while (cq_rem(&pi.qcom,(void **) &pep) >= 0) {
 
-	    if (pep != NULL) {
+	    if (pep != nullptr) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -704,7 +705,7 @@ bad0:
 	        debugprintf("watch: cleanup 2a i=%d\n",i) ;
 #endif
 
-	    if (pep != NULL) {
+	    if (pep != nullptr) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -760,7 +761,7 @@ char		name[] ;
 	int		rs ;
 
 
-	if ((name == NULL) || (name[0] == '\0'))
+	if ((name == nullptr) || (name[0] == '\0'))
 	    return SR_INVALID ;
 
 	rs = srvtab_find(pcp->sfp,name,&sep) ;
@@ -835,7 +836,7 @@ PROGENTRY	*pep ;
 	int	rs = SR_EMPTY ;
 
 
-	if (pep == NULL)
+	if (pep == nullptr)
 	    return SR_FAULT ;
 
 #if	CF_DEBUG
@@ -940,7 +941,7 @@ struct procinfo	*pcp ;
 	                    rs1,pep->name,pep->program) ;
 	                debugprintf("process_cycle: dumping exports\n") ;
 	                for (i = 0 ; vecstr_get(pcp->elp,i,&cp) >= 0 ; i += 1) {
-	                    if (cp == NULL) continue ;
+	                    if (cp == nullptr) continue ;
 	                    debugprintf("process_cycle: CP=%p\n",cp) ;
 	                    debugprintf("process_cycle: export> %w\n",
 					cp,strnlen(cp,50)) ;
@@ -953,15 +954,15 @@ struct procinfo	*pcp ;
 
 	            if (rs1 < 0) {
 
-	                if (pip->f.log)
+	                if (pip->fl.log)
 	                    logfile_setid(&pip->lh,pep->jobid) ;
 
-	                if (pip->f.log)
+	                if (pip->fl.log)
 	                    logfile_printf(&pip->lh,
 	                        "could not start job=%s (%d)\n",
 	                        pep->name,rs1) ;
 
-	                if (pip->f.log)
+	                if (pip->fl.log)
 	                    logfile_setid(&pip->lh,pip->logid) ;
 
 	                progentry_free(pep) ;
@@ -1001,10 +1002,10 @@ struct procinfo	*pcp ;
 	                ji,pep->pid) ;
 #endif
 
-	        if (pip->f.log)
+	        if (pip->fl.log)
 	            logfile_setid(&pip->lh,pep->jobid) ;
 
-	        if (pip->f.log)
+	        if (pip->fl.log)
 	            logfile_printf(&pip->lh, "%s server exit ex=%u\n",
 	                timestr_logz(pcp->daytime,timebuf),
 	                (child_stat & 255)) ;
@@ -1029,7 +1030,7 @@ struct procinfo	*pcp ;
 
 	            writeout(pip,efd,"standard error>") ;
 
-	            if (pip->f.log)
+	            if (pip->fl.log)
 	                logfile_printf(&pip->lh,"elapsed time %s\n",
 	                    timestr_elapsed((pcp->daytime - pep->atime),
 	                    timebuf)) ;
@@ -1043,14 +1044,14 @@ struct procinfo	*pcp ;
 	                debugprintf("process_cycle: child did not 'exec'\n") ;
 #endif
 
-	            if (pip->f.log)
+	            if (pip->fl.log)
 	                logfile_printf(&pip->lh,"server did not 'exec'\n") ;
 
 	        }
 
 	        (void) process_deljob(pip,pcp,ji,pep) ;
 
-	        if (pip->f.log)
+	        if (pip->fl.log)
 	            logfile_setid(&pip->lh,pip->logid) ;
 
 	    } else {
@@ -1060,7 +1061,7 @@ struct procinfo	*pcp ;
 	            debugprintf("process_cycle: unknown pid=%d\n",rs1) ;
 #endif
 
-	        if (pip->f.log)
+	        if (pip->fl.log)
 	            logfile_printf(&pip->lh,"unknown PID=%d\n",rs1) ;
 
 	    }
@@ -1079,14 +1080,14 @@ struct procinfo	*pcp ;
 
 	    if (rs < 0) {
 
-	            if (pip->f.log)
+	            if (pip->fl.log)
 	                logfile_printf(&pip->lh,
 	                    "%s lost PIDLOCK other PID=%d\n",
 	                    timestr_logz(pcp->daytime,timebuf),
 	                    lc.pid) ;
 
 	        rs = SR_ALREADY ;
-		pcp->f_error = TRUE ;
+		pcp->f_error = true ;
 	        goto ret0 ;
 	    }
 
@@ -1098,11 +1099,11 @@ struct procinfo	*pcp ;
 /* check if the server table file (srvtab) has changed */
 
 #if	CF_SRVTABCHECK
-	if (! pip->f.named) {
+	if (! pip->fl.named) {
 
-	    if ((rs = srvtab_check(pcp->sfp,pcp->daytime,NULL)) > 0) {
+	    if ((rs = srvtab_check(pcp->sfp,pcp->daytime,nullptr)) > 0) {
 
-	        if (pip->f.log)
+	        if (pip->fl.log)
 	            logfile_printf(&pip->lh,
 			"%s server table file changed\n",
 	                timestr_logz(pcp->daytime,timebuf)) ;
@@ -1119,11 +1120,11 @@ struct procinfo	*pcp ;
 
 
 #if	CF_ACCTABCHECK
-	if (! pip->f.named) {
+	if (! pip->fl.named) {
 
-	    if ((rs = acctab_check(pcp->atp,NULL)) > 0) {
+	    if ((rs = acctab_check(pcp->atp,nullptr)) > 0) {
 
-	        if (pip->f.log)
+	        if (pip->fl.log)
 	            logfile_printf(&pip->lh,"%s access table file changed\n",
 	                timestr_logz(pcp->daytime,timebuf)) ;
 
@@ -1174,7 +1175,7 @@ PROGENTRY	*pep ;
 	}
 #endif /* DEBFILE */
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_setid(&pip->lh,pep->jobid) ;
 
 
@@ -1217,7 +1218,7 @@ PROGENTRY	*pep ;
 	        nprintf(DEBFILE,"%-15s program=%s\n",
 	            pip->logid,program) ;
 
-	        if (p != NULL) {
+	        if (p != nullptr) {
 
 	            nprintf(DEBFILE,"%-15s PATH=%p\n",
 	                pip->logid,p) ;
@@ -1232,7 +1233,7 @@ PROGENTRY	*pep ;
 
 	            if ((*p == '/') || (*p == ':')) {
 
-	                while ((cp = strchr(p,':')) != NULL) {
+	                while ((cp = strchr(p,':')) != nullptr) {
 
 	                    nprintf(DEBFILE,"%-15s pathdir> %w\n",
 	                        pip->logid,p,(cp - p)) ;
@@ -1261,7 +1262,7 @@ PROGENTRY	*pep ;
 	        debugprintf("process_startjob: could not execute\n") ;
 #endif
 
-	    if (pip->f.log) {
+	    if (pip->fl.log) {
 
 	        logfile_printf(&pip->lh,"cannot execute server program\n") ;
 
@@ -1309,7 +1310,7 @@ PROGENTRY	*pep ;
 
 	if (rs < 0) {
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_printf(&pip->lh,
 	            "we couldn't do a fork (%d)\n",
 	            rs) ;
@@ -1371,7 +1372,7 @@ PROGENTRY	*pep ;
 	    char	*arg0 = strbasename(program) ;
 
 
-	    if (pip->f.log) {
+	    if (pip->fl.log) {
 
 	        logfile_printf(&pip->lh,"%s server=%s\n",
 	            timestr_logz(pcp->daytime,timebuf),
@@ -1396,7 +1397,7 @@ PROGENTRY	*pep ;
 	    debugprintf("process_startjob: forked pid=%d\n",pep->pid) ;
 #endif
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_setid(&pip->lh,pip->logid) ;
 
 	return rs ;
@@ -1406,7 +1407,7 @@ bad1:
 	(void) vechand_del(&pcp->trun,ji) ;
 
 bad0:
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_setid(&pip->lh,pip->logid) ;
 
 #if	CF_DEBUG
@@ -1431,12 +1432,12 @@ PROGENTRY	**pepp ;
 	int	rs, i ;
 
 
-	if (pepp == NULL)
+	if (pepp == nullptr)
 	    pepp = &pep ;
 
 	for (i = 0 ; (rs = vechand_get(&pcp->trun,i,pepp)) >= 0 ; i += 1) {
 
-	    if (*pepp == NULL) continue ;
+	    if (*pepp == nullptr) continue ;
 
 	    if (pid == (*pepp)->pid)
 	        break ;
@@ -1496,7 +1497,7 @@ struct procinfo	*pcp ;
 	sfp = pcp->sfp ;
 	for (i = 0 ; srvtab_get(sfp,i,&sep) >= 0 ; i += 1) {
 
-	    if (sep == NULL) continue ;
+	    if (sep == nullptr) continue ;
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -1505,7 +1506,7 @@ struct procinfo	*pcp ;
 	            sep->interval) ;
 #endif
 
-	    if (sep->interval == NULL)
+	    if (sep->interval == nullptr)
 	        continue ;
 
 /* is this service already active? (if not, check it) */
@@ -1568,7 +1569,7 @@ PROGENTRY_ARGS	*pap ;
 	char	*access ;
 
 
-	if ((pcp == NULL) || (sep == NULL))
+	if ((pcp == nullptr) || (sep == nullptr))
 	    return SR_FAULT ;
 
 #if	CF_DEBUG
@@ -1645,13 +1646,13 @@ PROGENTRY_ARGS	*pap ;
 	    goto bad2 ;
 	}
 
-	if ((interval < 0) && (! pip->f.named)) {
+	if ((interval < 0) && (! pip->fl.named)) {
 
 	    rs = 0 ;
 	    goto ret1 ;
 	}
 
-	if (pip->f.named && (interval < 0))
+	if (pip->fl.named && (interval < 0))
 	    interval = 0 ;
 
 	if ((pcp->to_minjob < 0) || (pcp->to_minjob > interval))
@@ -1711,7 +1712,7 @@ PROGENTRY_ARGS	*pap ;
 #endif /* CF_DEBUG */
 
 	            if ((pcp->daytime - sb.st_mtime) > interval)
-	                f_process = TRUE ;
+	                f_process = true ;
 
 	        }
 
@@ -1722,14 +1723,14 @@ PROGENTRY_ARGS	*pap ;
 
 	    bcontrol(&tsfile,BC_CHMOD,0666) ;
 
-	    f_process = TRUE ;
+	    f_process = true ;
 
 	}
 
 	if (rs < 0)
 	    goto bad3 ;
 
-/* at this point, if 'f_process' is TRUE, that means to run that job! */
+/* at this point, if 'f_process' is true, that means to run that job! */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -1745,7 +1746,7 @@ PROGENTRY_ARGS	*pap ;
 	    snsdd(logid,PROGENTRY_IDLEN,pip->logid, pcp->serial) ;
 
 	    pcp->serial += 1 ;
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_setid(&pip->lh,logid) ;
 
 #if	CF_DEBUG
@@ -1755,7 +1756,7 @@ PROGENTRY_ARGS	*pap ;
 	            pep->name) ;
 #endif
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_printf(&pip->lh,"%s service=%s\n",
 	            timestr_logz(pcp->daytime,timebuf),
 	            pep->name) ;
@@ -1805,7 +1806,7 @@ PROGENTRY_ARGS	*pap ;
 
 	    } else {
 
-	        if (pip->f.log)
+	        if (pip->fl.log)
 	            logfile_printf(&pip->lh,
 	                "could not expand service entry (%d)\n",
 	                rs) ;
@@ -1814,7 +1815,7 @@ PROGENTRY_ARGS	*pap ;
 
 	    }
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_setid(&pip->lh,pip->logid) ;
 
 	} /* end if (processing this service) */
@@ -1859,22 +1860,22 @@ bad0:
 
 
 /* is a named job active in the system already? */
-static int process_jobactive(pip,pcp,name,pepp)
+static int process_jobactive(proginfo *pip,proginfo *pcp,name,pepp)
 struct proginfo	*pip ;
 struct procinfo	*pcp ;
 char		name[] ;
 PROGENTRY	**pepp ;
 {
 	CQ_CURSOR	cur ;
-
 	PROGENTRY	*pep ;
-
-	int	rs, i ;
+	int	rs ;
+	int	rs1 ;
+	int	i ;
 
 
 	for (i = 0 ; (rs = vechand_get(&pcp->trun,i,&pep)) >= 0 ; i += 1) {
 
-	    if (pep == NULL) continue ;
+	    if (pep == nullptr) continue ;
 
 	    if (strcmp(pep->name,name) == 0)
 	        break ;
@@ -1882,22 +1883,20 @@ PROGENTRY	**pepp ;
 	} /* end for */
 
 	if (rs < 0) {
+	    if ((rs = cq_curbegin(&pcp->qcom,&cur)) >= 0) {
+		void *vp ;
+	        while ((rs = cq_curenum(&pcp->qcom,&cur,&vp)) >= 0) {
+		    pep = voidpp(vp) ;
+	            if (strcmp(pep->name,name) == 0) break ;
+	        } /* end while */
+	        rs1 = cq_curend(&pcp->qcom,&cur) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if */
+	} /* end if (error) */
 
-	    cq_curbegin(&pcp->qcom,&cur) ;
-
-	    while ((rs = cq_enum(&pcp->qcom,&cur,(void **) &pep)) >= 0) {
-
-	        if (strcmp(pep->name,name) == 0)
-	            break ;
-
-	    } /* end while */
-
-	    cq_curend(&pcp->qcom,&cur) ;
-
-	} /* end if */
-
-	if (pepp != NULL)
-	    *pepp = (rs >= 0) ? pep : NULL ;
+	if (pepp) {
+	    *pepp = (rs >= 0) ? pep : nullptr ;
+	}
 
 	return rs ;
 }
@@ -1933,14 +1932,11 @@ char		access[] ;
 #endif
 
 	rs = SR_OK ;
-	if ((access != NULL) || (pip->defacc != NULL)) {
-
-	    FIELD	af ;
-
-	    vecstr	netgroups, names ;
-
+	if ((access != nullptr) || (pip->defacc != nullptr)) {
+	    field	af ;
+	    vecstr	netgroups ;
+	    vecstr	names ;
 	    int		fl ;
-
 	    char	hostname[MAXHOSTNAMELEN + 2] ;
 	    char	*fp ;
 
@@ -1949,7 +1945,7 @@ char		access[] ;
 
 	    vecstr_start(&names,4,0) ;
 
-	    cp = (access != NULL) ? access : pip->defacc ;
+	    cp = (access != nullptr) ? access : pip->defacc ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -1960,7 +1956,7 @@ char		access[] ;
 
 	    if ((rs = field_init(&af,cp,-1)) >= 0) {
 
-	    while ((fl = field_get(&af,NULL,&fp)) >= 0) {
+	    while ((fl = field_get(&af,nullptr,&fp)) >= 0) {
 
 	        if (fl > 0) {
 
@@ -2006,7 +2002,7 @@ char		access[] ;
 
 	    rs = vecstr_add(&names,pip->nodename,-1) ;
 
-	    if (pip->domainname != NULL) {
+	    if (pip->domainname != nullptr) {
 
 		rs = snsds(hostname,MAXHOSTNAMELEN,
 	            pip->nodename,pip->domainname) ;
@@ -2032,7 +2028,7 @@ char		access[] ;
 	        debugprintf("process_checkaccess: checking access\n") ;
 #endif
 
-	    if (pip->f.acctab) {
+	    if (pip->fl.acctab) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -2040,7 +2036,7 @@ char		access[] ;
 #endif
 
 	        rs = acctab_anyallowed(pcp->atp,&netgroups,&names,
-	            pip->username,NULL) ;
+	            pip->username,nullptr) ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -2053,7 +2049,7 @@ char		access[] ;
 
 /* try the system netgroups (UNIX does not have one simple call as above!) */
 
-	    if ((! pip->f.acctab) || (rs < 0)) {
+	    if ((! pip->fl.acctab) || (rs < 0)) {
 
 	        char	*ngp, *mnp ;
 
@@ -2066,12 +2062,12 @@ char		access[] ;
 	        for (i = 0 ; (rs = vecstr_get(&netgroups,i,&ngp)) >= 0 ; 
 	            i += 1) {
 
-	            if (ngp == NULL) continue ;
+	            if (ngp == nullptr) continue ;
 
 	            for (j = 0 ; (rs = vecstr_get(&names,j,&mnp)) >= 0 ; 
 	                j += 1) {
 
-	                if (mnp == NULL) continue ;
+	                if (mnp == nullptr) continue ;
 
 	                if (isdigit(mnp[0]))
 	                    continue ;
@@ -2083,7 +2079,7 @@ char		access[] ;
 	                        ngp,mnp) ;
 #endif
 
-	                if (innetgr(ngp,mnp,NULL,pip->domainname))
+	                if (innetgr(ngp,mnp,nullptr,pip->domainname))
 	                    break ;
 
 	            } /* end for (machine names) */
@@ -2126,7 +2122,7 @@ char		access[] ;
 static int writeout(pip,fd,s)
 struct proginfo	*pip ;
 int		fd ;
-const char	s[] ;
+cchar	s[] ;
 {
 	ustat	sb ;
 
@@ -2142,7 +2138,7 @@ const char	s[] ;
 
 	    u_rewind(fd) ;
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_printf(&pip->lh,s) ;
 
 	    if (bopen(fp,(char *) fd,"dr",0666) >= 0) {
@@ -2158,7 +2154,7 @@ const char	s[] ;
 	                debugprintf("writeout: wo> %w\n",linebuf,len) ;
 #endif
 
-	            if (pip->f.log)
+	            if (pip->fl.log)
 	                logfile_printf(&pip->lh,"| %w\n",
 	                    linebuf,len) ;
 
@@ -2178,7 +2174,7 @@ const char	s[] ;
 /* find a program server and evaluate its security */
 static int findprog(pip,program,progpath,sp)
 struct proginfo	*pip ;
-const char	program[] ;
+cchar	program[] ;
 char		progpath[] ;
 int		*sp ;			/* secure path? */
 {
@@ -2191,7 +2187,7 @@ int		*sp ;			/* secure path? */
 	if (program[0] == '/') {
 
 	    sl = 0 ;
-	    *sp = pip->f.secure_srvtab ;
+	    *sp = pip->fl.secure_srvtab ;
 	    rs = xfile(pip,program) ;
 
 	} else {
@@ -2209,7 +2205,7 @@ int		*sp ;			/* secure path? */
 	    if (rs >= 0)
 	        vecstr_add(&already,progpath,sl) ;
 
-	    *sp = pip->f.secure_root && pip->f.secure_srvtab ;
+	    *sp = pip->fl.secure_root && pip->fl.secure_srvtab ;
 	    if (rs >= 0)
 	    	rs = xfile(pip,progpath) ;
 
@@ -2223,7 +2219,7 @@ int		*sp ;			/* secure path? */
 	        if (rs >= 0)
 	            vecstr_add(&already,progpath,sl) ;
 
-	    	*sp = pip->f.secure_root && pip->f.secure_srvtab ;
+	    	*sp = pip->fl.secure_root && pip->fl.secure_srvtab ;
 	    	if (rs >= 0)
 	    	    rs = xfile(pip,progpath) ;
 
@@ -2233,13 +2229,13 @@ int		*sp ;			/* secure path? */
 
 	    if (rs < 0) {
 
-	        *sp = pip->f.secure_path ;
+	        *sp = pip->fl.secure_path ;
 	        for (i = 0 ; vecstr_get(&pip->path,i,&cp) >= 0 ; i += 1) {
 
 	            char	*pp ;
 
 
-		    if (cp == NULL) continue ;
+		    if (cp == nullptr) continue ;
 
 	            rs = sl = 0 ;
 	            pp = (char *) program ;
@@ -2272,7 +2268,7 @@ int		*sp ;			/* secure path? */
 	        rs = mkpath2(progpath,cp,program) ;
 
 		sl = rs ;
-	        *sp = pip->f.secure_srvtab ;
+	        *sp = pip->fl.secure_srvtab ;
 		if (rs >= 0)
 	            rs = xfile(pip,progpath) ;
 
@@ -2284,7 +2280,7 @@ int		*sp ;			/* secure path? */
 	        rs = mkpath2(progpath,cp,program) ;
 
 		sl = rs ;
-	        *sp = pip->f.secure_srvtab ;
+	        *sp = pip->fl.secure_srvtab ;
 		if (rs >= 0)
 	            rs = xfile(pip,progpath) ;
 
@@ -2298,45 +2294,25 @@ int		*sp ;			/* secure path? */
 }
 /* end subroutine (findprog) */
 
-
-static int xfile(pip,fname)
-struct proginfo	*pip ;
-const char	fname[] ;
-{
-	ustat	sb ;
-
+static int xfile(proginfo *pip,cchar *fname) noex {
 	int	rs ;
-
-
-	rs = u_stat(fname,&sb) ;
-
-	if (rs >= 0) {
-
+	if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode)) {
-
 #if	CF_SPERM
 		rs = permid(&pip->ids,&sb,X_OK) ;
 #else
-	        rs = perm(fname,-1,-1,NULL,X_OK) ;
+	        rs = perm(fname,-1,-1,nullptr,X_OK) ;
 #endif
-
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (xfile) */
 
-
-static void int_all(sn)
-int	sn ;
-{
-
-
-	f_exit = TRUE ;
+static void int_all(int sn) noex {
+	f_exit = true ;
 }
 /* end subroutine (int_all) */
-
 
 
