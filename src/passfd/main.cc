@@ -415,7 +415,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
