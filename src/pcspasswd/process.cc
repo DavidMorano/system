@@ -130,7 +130,7 @@ PARAMOPT	*pp ;
 	strcpy(password,p) ;
 #endif
 
-	if (gp->f.sevenbit) {
+	if (gp->fl.sevenbit) {
 
 	    for (p = password ; *p != '\0' ; p += 1)
 	        *p = *p & 0x7F ;
