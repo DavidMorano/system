@@ -1,23 +1,26 @@
-/* owconfig */
+/* owconfig HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 #ifndef	OWCONFIG_INCLUDE
-#define	OWCONFIG_INCLUDE	1
+#define	OWCONFIG_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<paramfile.h>
 #include	<expcook.h>
-#include	<localmisc.h>
 
 #include	"ow.h"
 
 
-#define	OWCONFIG	struct owconfig
-#define	OWCONFIG_FLAGS	struct owconfig_flags
+#define	OWCONFIG	struct owconfig_head
+#define	OWCONFIG_FL	struct owconfig_flags
 
 
 struct owconfig_flags {
@@ -25,30 +28,27 @@ struct owconfig_flags {
 	uint		lockinfo:1 ;
 } ;
 
-struct owconfig {
-	OWCONFIG_FLAGS	f ;
-	PARAMFILE	p ;
-	EXPCOOK		cooks ;
+struct owconfig_head {
 	OW		*lip ;
-	const char	*cfname ;
-} ;
+	cchar		*cfname ;
+	paramfile	p ;
+	expcool		cooks ;
+	OWCONFIG_FL	fl ;
+} ; /* end struct (owconfig_head) */
 
+typedef	OWCONFIG	owconfig ;
+typedef	OWCONFIG_FL	owconfig_fl ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int owconfig_start(OWCONFIG *,OW *,const char *) ;
-extern int owconfig_check(OWCONFIG *) ;
-extern int owconfig_read(OWCONFIG *) ;
-extern int owconfig_finish(OWCONFIG *) ;
+extern int owconfig_start(OWCONFIG *,OW *,cchar *) noex ;
+extern int owconfig_check(OWCONFIG *) noex ;
+extern int owconfig_read(OWCONFIG *) noex ;
+extern int owconfig_finish(OWCONFIG *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* OWCONFIG */
-
 
 
