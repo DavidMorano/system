@@ -247,7 +247,7 @@ int main(int argc,mainv argv,mainv envv) {
 	if (rs < 0) goto badpargs ;
 
 	rs = paramopt_start(&aparams) ;
-	pip->f.aparams = (rs >= 0) ;
+	pip->fl.aparams = (rs >= 0) ;
 
 	ai_max = 0 ;
 	ai_pos = 0 ;
@@ -492,7 +492,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -521,7 +521,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* update */
 	                    case 'u':
-	                        pip->f.update = true ;
+	                        pip->fl.update = true ;
 	                        break ;
 
 /* verbose output */
@@ -778,7 +778,7 @@ static int procgather(PROGINFO *pip,PARAMOPT *pop) noex {
 	                if (int i ; (i = matostr(aknopts,2,cp,-1)) >= 0) {
 	                    switch (i) {
 	                    case aknopt_seven:
-	                        pip->f.sevenbit = true ;
+	                        pip->fl.sevenbit = true ;
 	                        break ;
 	                    } /* end switch */
 		        }
@@ -849,7 +849,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn) noex {
 	        rs1 = bclose(afp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    fmt = "%s: argument list-file unavailable (%d)\n" ;
 	            bprintf(pip->efp,fmt,pn,rs) ;
 	            bprintf(pip->efp,"%s: afile=%s\n",pn,afname) ;
@@ -873,7 +873,7 @@ static int procone(PROGINFO *pip,cchar *un)
 	int		rs ;
 	if ((rs = process(pip,un)) >= 0) {
 	    int	f_passed = (rs > 0) ;
-	    if ((rs >= 0) && (! pip->f.nooutput)) {
+	    if ((rs >= 0) && (! pip->fl.nooutput)) {
 	    rs = bprintf(ofp,"%svalid\n",(! f_passed) ? "in" : "") ;
 	    }
 	}
@@ -884,7 +884,7 @@ static int procone(PROGINFO *pip,cchar *un)
 static int procout_begin(PROGINFO *pip,cchar *ofn) noex {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
-	if (! pip->f.nooutput) {
+	if (! pip->fl.nooutput) {
 	    cint	oflen = szof(bfile) ;
 	    bfile	*ofbuf ;
 	    if ((rs = uc_malloc(oflen+1),&ofbuf)) >= 0) {
@@ -908,7 +908,7 @@ static int procout_end(PROGINFO *pip) noex {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if ((! pip->f.nooutput) && (lip->ofp != NULL)) {
+	if ((! pip->fl.nooutput) && (lip->ofp != NULL)) {
 	    rs1 = bclose(lip->ofp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = uc_free(lip->ofp) ;
@@ -938,7 +938,7 @@ static int locinfo_finish(LOCINFO *lip) noex {
 	if (lip == NULL) return SR_FAULT ;
 
 	if_constexpr (f_percache) {	/* need registration? */
-	    if (lip->f.percache) {
+	    if (lip->fl.percache) {
 	        if ((rs1 = percache_finireg(&pc)) > 0) { 
 	            rs1 = uc_atexit(ourfini) ;
 	        }
@@ -946,11 +946,11 @@ static int locinfo_finish(LOCINFO *lip) noex {
 	    }
 	} /* end if_constexpr (f_percache) */
 
-	if ((lip->fname != NULL) && lip->f.allocfname) {
+	if ((lip->fname != NULL) && lip->fl.allocfname) {
 	    rs1 = uc_free(lip->fname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    lip->fname = NULL ;
-	    lip->f.allocfname = FALSE ;
+	    lip->fl.allocfname = FALSE ;
 	}
 
 	if (lip->open.stores) {
