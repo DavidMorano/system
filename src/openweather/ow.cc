@@ -122,22 +122,22 @@ int		to ;
 
 /* flags to start with */
 
-	sip->f.lf = TRUE ;		/* LOGFILE enabled */
+	sip->fl.lf = TRUE ;		/* LOGFILE enabled */
 
 /* the rest of it */
 
 	if ((rs = vecstr_start(&sip->stores,4,0)) >= 0) {
-	    sip->f.stores = TRUE ;
+	    sip->fl.stores = TRUE ;
 	    if ((rs = vecstr_start(&sip->svars,4,0)) >= 0) {
-	        sip->f.svars = TRUE ;
+	        sip->fl.svars = TRUE ;
 	        rs = ow_setextras(sip) ;
 	        if (rs < 0) {
-	            sip->f.svars = FALSE ;
+	            sip->fl.svars = FALSE ;
 		    vecstr_finish(&sip->svars) ;
 		}
 	    }
 	    if (rs < 0) {
-	        sip->f.stores = FALSE ;
+	        sip->fl.stores = FALSE ;
 	        vecstr_finish(&sip->stores) ;
 	    }
 	}
@@ -178,14 +178,14 @@ int		f_abort ;
 	    sip->wfd = -1 ;
 	}
 
-	if (sip->f.svars) {
-	    sip->f.svars = FALSE ;
+	if (sip->fl.svars) {
+	    sip->fl.svars = FALSE ;
 	    rs1 = vecstr_finish(&sip->svars) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (sip->f.stores) {
-	    sip->f.stores = FALSE ;
+	if (sip->fl.stores) {
+	    sip->fl.stores = FALSE ;
 	    rs1 = vecstr_finish(&sip->stores) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -355,10 +355,10 @@ int ow_logprintf(OW *sip,const char *fmt,...)
 	if (fmt == NULL)
 	    return SR_FAULT ;
 
-	if ((rs >= 0) && sip->f.lf && (! sip->open.lf))
+	if ((rs >= 0) && sip->fl.lf && (! sip->open.lf))
 	    rs = ow_lfopen(sip) ;
 
-	if ((rs >= 0) && sip->f.ls && (! sip->open.ls))
+	if ((rs >= 0) && sip->fl.ls && (! sip->open.ls))
 	    rs = ow_lsopen(sip) ;
 
 	if (rs >= 0) {
@@ -368,11 +368,11 @@ int ow_logprintf(OW *sip,const char *fmt,...)
 	    va_end(ap) ;
 	}
 
-	if ((rs >= 0) && sip->f.lf && sip->open.lf && (dl > 0)) {
+	if ((rs >= 0) && sip->fl.lf && sip->open.lf && (dl > 0)) {
 	    logfile_write(&sip->lf,dbuf,dl) ;
 	}
 
-	if ((rs >= 0) && sip->f.ls && sip->open.ls && (dl > 0)) {
+	if ((rs >= 0) && sip->fl.ls && sip->open.ls && (dl > 0)) {
 	    const int	logpri = LOG_NOTICE ;
 	    logsys_write(&sip->ls,logpri,dbuf,dl) ;
 	}
@@ -612,7 +612,7 @@ int		f ;
 
 	if (f) { /* activate */
 
-	    sip->f.pidfname = FALSE ;
+	    sip->fl.pidfname = FALSE ;
 	    if ((rs = u_open(pf,oflags,0664)) >= 0) {
 	        int 	fd = rs ;
 	        int	wl ;
@@ -622,7 +622,7 @@ int		f ;
 	        if (rs >= 0) {
 	            pidbuf[wl++] = '\n' ;
 	            rs = u_write(fd,pidbuf,wl) ;
-	            sip->f.pidfname = (rs >= 0) ;
+	            sip->fl.pidfname = (rs >= 0) ;
 	        }
 	        u_close(fd) ;
 	    }
@@ -633,8 +633,8 @@ int		f ;
 
 	} else { /* de-activate */
 
-	    if ((pf != NULL) && sip->f.pidfname) {
-	        sip->f.pidfname = FALSE ;
+	    if ((pf != NULL) && sip->fl.pidfname) {
+	        sip->fl.pidfname = FALSE ;
 	        if (pf[0] != '\0') u_unlink(pf) ;
 	    }
 
@@ -796,7 +796,7 @@ static int ow_lfopen(OW *sip)
 	const char	*ln = sip->logfname ;
 
 
-	if (sip->f.lf) {
+	if (sip->fl.lf) {
 	    int	f = FALSE ;
 	    f = f || (ln == NULL) ;
 	    f = f || (ln[0] == '\0') ;
@@ -805,11 +805,11 @@ static int ow_lfopen(OW *sip)
 	        ln = sip->sn ;
 	    } else if (ln[0] == '-') {
 	        ln = NULL ;
-	        sip->f.lf = FALSE ;
+	        sip->fl.lf = FALSE ;
 	    }
 	}
 
-	if (sip->f.lf) {
+	if (sip->fl.lf) {
 	    char	lfname[MAXPATHLEN+1] ;
 	    if ((rs >= 0) && (ln != NULL))
 	        rs = mkpath3(lfname,sip->pr,sip->ld,ln) ;
@@ -852,7 +852,7 @@ static int ow_lsopen(OW *sip)
 
 	if (sip == NULL) return SR_FAULT ;
 
-	if (sip->f.ls) {
+	if (sip->fl.ls) {
 	    int	logfac = LOG_DAEMON ;
 	    rs = ow_mklogid(sip) ;
 	    if (rs >= 0) {
