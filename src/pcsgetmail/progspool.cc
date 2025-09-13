@@ -206,7 +206,7 @@ const char	mailuser[] ;
 /* can we access the mail spool directory? */
 
 #ifdef	COMMENT
-	if (pip->f.setgid)
+	if (pip->fl.setgid)
 	    rs = perm(maildname,-1,pip->egid,NULL,W_OK) ;
 
 	if (rs < 0)
@@ -538,7 +538,7 @@ ustat	*maildir_sbp ;
 /* go ahead and try to create the lock file */
 
 	rs = SR_ACCES ;
-	if (pip->f.setgid) {
+	if (pip->fl.setgid) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
@@ -621,7 +621,7 @@ ustat	*maildir_sbp ;
 {
 	int		rs = SR_ACCES ;
 
-	if (pip->f.setgid) {
+	if (pip->fl.setgid) {
 	    u_setegid(pip->egid) ;
 	    rs = u_unlink(mlfname) ;
 	    u_setegid(pip->gid) ;
@@ -665,7 +665,7 @@ int		mfd ;
 	int		f_bol, f_eol ;
 	int		f_leading = TRUE ;
 	int		f_forwarded ;
-	int		f_trunc = (! pip->f.nodel) ;
+	int		f_trunc = (! pip->fl.nodel) ;
 
 	if ((rs = bopen(&mfile,mailfname,"rw",0666)) >= 0) {
 	    if ((rs = bcontrol(&mfile,BC_LOCK,to)) >= 0) {
@@ -770,7 +770,7 @@ static int mklockinfo(PROGINFO *pip,char *rbuf,int rlen,time_t dt)
 
 	if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
 	    pid_t	pid = (pip->pid >= 0) ? pip->pid : 0 ;
-	    const char	*ct = ((pip->f.sysv_ct) ? "SYSV" : "BSD") ;
+	    const char	*ct = ((pip->fl.sysv_ct) ? "SYSV" : "BSD") ;
 	    char	tbuf[TIMEBUFLEN + 1] ;
 
 	    sbuf_printf(&b,"%u\n",(uint) pid) ;
