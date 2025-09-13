@@ -348,12 +348,12 @@ int		to ;
 
 /* specify blocks as output rather than GigiBytes */
 	                    case 'b':
-	                        sip->f.blocks = TRUE ;
+	                        sip->fl.blocks = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                sip->f.blocks = (rs > 0) ;
+	                                sip->fl.blocks = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -576,7 +576,7 @@ static int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un)
 {
 	PASSWDENT	pw ;
 	const int	pwlen = getbufsize(getbufsize_pw) ;
-	int		f_blocks = sip->f.blocks ;
+	int		f_blocks = sip->fl.blocks ;
 	int		rs ;
 	int		ll = 0 ;
 	char		*pwbuf ;
