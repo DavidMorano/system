@@ -296,7 +296,7 @@ vecstr		*snp ;
 
 /* before we go too far, are we the only one on this PID mutex? */
 
-	if (! pip->f.named) {
+	if (! pip->fl.named) {
 	    cchar	*pidmsg ;
 
 	    rs = progpidbegin(pip,TO_PIDLOCK) ;
@@ -314,7 +314,7 @@ vecstr		*snp ;
 	if (rs < 0)
 	    goto ret0 ;
 
-	if (pip->f.daemon && pip->open.logprog) {
+	if (pip->fl.daemon && pip->open.logprog) {
 	    logfile_printf(&pip->lh,"%s finished initializing\n",
 	        timestr_logz(pip->daytime,timebuf)) ;
 	    logfile_flush(&pip->lh) ;
@@ -536,7 +536,7 @@ vecstr		*snp ;
 
 	    if ((rs >= 0) && (njobs == 0)) {
 
-	        if (! pip->f.daemon)
+	        if (! pip->fl.daemon)
 	            break ;
 
 	        if (pip->intrun > 0) {
@@ -604,7 +604,7 @@ vecstr		*snp ;
 	        debugprintf("progwatch: to_checksvc=%d\n",to_checksvc) ;
 #endif
 
-	    if (pip->f.daemon && 
+	    if (pip->fl.daemon && 
 		((pip->daytime - ti_checksvc) >= to_checksvc)) {
 
 	        ti_checksvc = pip->daytime ;
@@ -644,7 +644,7 @@ vecstr		*snp ;
 #endif
 
 #if	CF_LOGONLY
-	f = pip->f.daemon ;
+	f = pip->fl.daemon ;
 #else
 	f = TRUE ;
 #endif
@@ -652,17 +652,17 @@ vecstr		*snp ;
 	if (f) {
 
 	    cchar	*fmt ;
-	    cchar	*s = (pip->f.daemon) ? "server" : "single" ;
+	    cchar	*s = (pip->fl.daemon) ? "server" : "single" ;
 
 	    pip->daytime = time(NULL) ;
 
-	    if (pip->f.daemon && if_term) {
+	    if (pip->fl.daemon && if_term) {
 	        fmt = "%s %s exiting -terminated (%d)\n" ;
 
 	    } else if (sip->f_error) {
 	        fmt = "%s %s exiting -error (%d)\n" ;
 
-	    } else if (pip->f.daemon) {
+	    } else if (pip->fl.daemon) {
 	        fmt = "%s %s exiting -expired (%d)\n" ;
 
 	    } else
@@ -790,7 +790,7 @@ vecstr		*snp ;
 	int		rs = SR_OK ;
 
 	sfp = pcp->sfp ;
-	if (pip->f.named) {
+	if (pip->fl.named) {
 	    int		i ;
 	    cchar	*cp ;
 
@@ -822,7 +822,7 @@ vecstr		*snp ;
 	        if (sk.interval == NULL)
 	            continue ;
 
-	        if (pip->f.daemon && (sk.interval == NULL))
+	        if (pip->fl.daemon && (sk.interval == NULL))
 	            continue ;
 
 	        rs = procservice(pip,&ste,&pcp->args) ;
@@ -1093,7 +1093,7 @@ struct proginfo	*pip ;
 /* check if the service file (svcfile) has changed */
 
 #if	CF_SVCFILECHECK
-	if ((rs >= 0) && (! pip->f.named)) {
+	if ((rs >= 0) && (! pip->fl.named)) {
 
 	    rs1 = progsvccheck(pip) ;
 
@@ -1110,7 +1110,7 @@ struct proginfo	*pip ;
 /* check if the access file (acctab) has changed */
 
 #if	CF_ACCTABCHECK
-	if ((rs >= 0) && (! pip->f.named) && pip->open.accfname) {
+	if ((rs >= 0) && (! pip->fl.named) && pip->open.accfname) {
 
 	    rs1 = progacccheck(pip) ;
 
@@ -1123,7 +1123,7 @@ struct proginfo	*pip ;
 
 /* maintenance the stamp-file (our own) */
 
-	if ((rs >= 0) && pip->f.stampfname) {
+	if ((rs >= 0) && pip->fl.stampfname) {
 	    cint	to = TO_STAMP ;
 
 	    if (pcp->ti_stampcheck == 0)
@@ -1554,12 +1554,12 @@ SVCENTRY_ARGS	*pap ;
 	    goto bad2 ;
 	}
 
-	if ((interval < 0) && (! pip->f.named)) {
+	if ((interval < 0) && (! pip->fl.named)) {
 	    rs = 0 ;
 	    goto ret1 ;
 	}
 
-	if (pip->f.named && (interval < 0))
+	if (pip->fl.named && (interval < 0))
 	    interval = 0 ;
 
 	if ((pcp->to_minjob < 0) || (pcp->to_minjob > interval))
@@ -1784,18 +1784,18 @@ static int procjobactive(proginfo *pip,cchar *name,svcentry **pepp) noex {
 
 	if (! f) {
 	    if ((rs = cq_curbegin(&pcp->qcom,&cur)) >= 0) {
-
-	        while (cq_enum(&pcp->qcom,&cur,&pep) >= 0) {
+	        while (cq_curenum(&pcp->qcom,&cur,&pep) >= 0) {
 	            f = (strcmp(pep->name,name) == 0) ;
 		    if (f) break ;
 	        } /* end while */
-
-	        cq_curend(&pcp->qcom,&cur) ;
+	        rs1 = cq_curend(&pcp->qcom,&cur) ;
+		if (rs >= 0) rs1 ;
 	    } /* end if (cursor) */
 	} /* end if */
 
-	if (pepp != NULL)
+	if (pepp) {
 	    *pepp = (f) ? pep : NULL ;
+	}
 
 	return (rs >= 0) ? f : rs ;
 }
@@ -2034,7 +2034,7 @@ int		*sp ;			/* secure path? */
 	if (program[0] == '/') {
 
 	    sl = 0 ;
-	    *sp = pip->f.secure_svcfile ;
+	    *sp = pip->fl.secure_svcfile ;
 	    rs = procxfile(pip,program) ;
 
 	} else if ((rs = vecstr_start(&already,3,0)) >= 0) {
@@ -2045,7 +2045,7 @@ int		*sp ;			/* secure path? */
 	        sl = rs ;
 	        rs = vecstr_add(&already,progpath,sl) ;
 
-	    *sp = pip->f.secure_root ;
+	    *sp = pip->fl.secure_root ;
 	    if (rs >= 0)
 	        rs = procxfile(pip,progpath) ;
 
@@ -2058,7 +2058,7 @@ int		*sp ;			/* secure path? */
 	        if (rs >= 0)
 	            vecstr_add(&already,progpath,sl) ;
 
-	        *sp = pip->f.secure_root ;
+	        *sp = pip->fl.secure_root ;
 	        if (rs >= 0)
 	            rs = procxfile(pip,progpath) ;
 
@@ -2068,7 +2068,7 @@ int		*sp ;			/* secure path? */
 
 	    if (isNotPresent(rs)) {
 
-	        *sp = pip->f.secure_path ;
+	        *sp = pip->fl.secure_path ;
 	        for (i = 0 ; vecstr_get(&pip->pathexec,i,&cp) >= 0 ; i += 1) {
 	            cchar	*pp ;
 
@@ -2218,17 +2218,14 @@ static int proclogjobs(progifo *pip) noex {
 
 	if (rs >= 0) {
 	    if ((rs = cq_curbegin(&sip->qcom,&cur)) >= 0) {
-
-	        while (cq_enum(&sip->qcom,&cur,&pep) >= 0) {
+	        while (cq_curenum(&sip->qcom,&cur,&pep) >= 0) {
 		    if (pep == NULL) continue ;
-
 	            njobs += 1 ;
 	            rs = proclogjob(pip,pep) ;
-
 	            if (rs < 0) break ;
 	        } /* end while */
-
-	        cq_curend(&sip->qcom,&cur) ;
+	        rs1 = cq_curend(&sip->qcom,&cur) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
 	} /* end if */
 
