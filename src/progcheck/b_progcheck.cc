@@ -630,14 +630,14 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* specify counts */
 	                case argopt_c:
-	                    lip->f.counts = true ;
+	                    lip->fl.counts = true ;
 	                    lip->final.counts = true ;
 	                    lip->have.counts = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.counts = (rs > 0) ;
+	                            lip->fl.counts = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -670,7 +670,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -725,7 +725,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* line-buffered */
 	                    case 'u':
 	                        pip->have.bufnone = true ;
-	                        pip->f.bufnone = true ;
+	                        pip->fl.bufnone = true ;
 	                        pip->final.bufnone = true ;
 	                        break ;
 
@@ -884,8 +884,8 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    debugprintf("b_progcheck: to_read=%d\n",pip->to_read) ;
 	    debugprintf("b_progcheck: have.bufline=%u\n",pip->have.bufline) ;
 	    debugprintf("b_progcheck: have.bufnone=%u\n",pip->have.bufnone) ;
-	    debugprintf("b_progcheck: f_bufline=%u\n",pip->f.bufline) ;
-	    debugprintf("b_progcheck: f_bufnone=%u\n",pip->f.bufnone) ;
+	    debugprintf("b_progcheck: f_bufline=%u\n",pip->fl.bufline) ;
+	    debugprintf("b_progcheck: f_bufnone=%u\n",pip->fl.bufnone) ;
 	}
 #endif /* CF_DEBUG */
 
@@ -920,7 +920,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	if ((rs < 0) && (ex == EX_OK)) {
 	    switch (rs) {
 	    default:
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            cchar	*pn = pip->progname ;
 	            cchar	*fmt = "%s: could not process (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
@@ -935,7 +935,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	        ex = EX_TERM ;
 	    } else if ((rs = lib_sigintr()) < 0) {
 	        ex = EX_INTR ;
-	    } else if (lip->f.dirty) {
+	    } else if (lip->fl.dirty) {
 	        ex = EX_DATAERR ;
 	    }
 	} /* end if */
@@ -1049,10 +1049,10 @@ local int procopts(PI *pip,KO *kop) noex {
 	                    if (! pip->final.bufwhole) {
 	                        pip->have.bufwhole = true ;
 	                        pip->final.bufwhole = true ;
-	                        pip->f.bufwhole = true ;
+	                        pip->fl.bufwhole = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.bufwhole = (rs > 0) ;
+	                            pip->fl.bufwhole = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1061,10 +1061,10 @@ local int procopts(PI *pip,KO *kop) noex {
 	                    if (! pip->final.bufline) {
 	                        pip->have.bufline = true ;
 	                        pip->final.bufline = true ;
-	                        pip->f.bufline = true ;
+	                        pip->fl.bufline = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.bufline = (rs > 0) ;
+	                            pip->fl.bufline = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1074,10 +1074,10 @@ local int procopts(PI *pip,KO *kop) noex {
 	                    if (! pip->final.bufnone) {
 	                        pip->have.bufnone = true ;
 	                        pip->final.bufnone = true ;
-	                        pip->f.bufnone = true ;
+	                        pip->fl.bufnone = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.bufnone = (rs > 0) ;
+	                            pip->fl.bufnone = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1085,10 +1085,10 @@ local int procopts(PI *pip,KO *kop) noex {
 	                    if (! lip->final.counts) {
 	                        lip->have.counts = true ;
 	                        lip->final.counts = true ;
-	                        lip->f.counts = true ;
+	                        lip->fl.counts = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.counts = (rs > 0) ;
+	                            lip->fl.counts = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1175,7 +1175,7 @@ local int procargs(PI *pip,AI *aip,BITS *bop,cchar *ofn,cchar *afn) noex {
 	                rs1 = shio_close(afp) ;
 	                if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	                shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1287,14 +1287,14 @@ local int procout(PI *pip,void *ofp,cchar *fn,FC *counts) noex {
 	LI		*lip = pip->lip ;
 	cint		ncca = nelem(cca) ;
 	int		rs = SR_OK ;
-	if (lip->f.counts) {
+	if (lip->fl.counts) {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
 	    for (int k = 0 ; k < ncca ; k += 1) {
 	        if (counts[k].c_open != counts[k].c_close) {
 	            fmt = "file \"%s\" %s> open=%-3d close=%-3d\n" ;
 
-	            lip->f.dirty = true ;
+	            lip->fl.dirty = true ;
 	            shio_printf(ofp,fmt,
 	                fn,cca[k].funcname,
 	                counts[k].c_open,counts[k].c_close) ;
@@ -1327,7 +1327,7 @@ local int procouthist(PI *pip,void *ofp,HIST *hlp) noex {
 	        int	ln ;
 	        int	t ;
 	        cchar	*fmt = nullptr ;
-	        lip->f.dirty = true ;
+	        lip->fl.dirty = true ;
 	        switch (w) {
 	        case 0:
 	            fmt = "parentheses¬\n" ;
@@ -1368,7 +1368,7 @@ local int procoutlang(PI *pip,void *ofp,LS *lsp) noex {
 	    if (DEBUGLEVEL(4))
 	        debugprintf("progcheck/procoutlang: type=%u\n",stat.type) ;
 #endif
-	    lip->f.dirty = true ;
+	    lip->fl.dirty = true ;
 	    rs = shio_printf(ofp,fmt,cp,stat.line) ;
 	} /* end if (langstate_getstat) */
 	return rs ;
