@@ -442,7 +442,7 @@ struct clientinfo	*cip ;
 
 	if (srvtab_match(&pip->stab,service,&sep) >= 0) {
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_flush(&pip->lh) ;
 
 	    rs = handle_srventry(pip,cip,&conn,
@@ -463,7 +463,7 @@ struct clientinfo	*cip ;
 	        debugprintf("handle: builtin_exec si=%d\n",si) ;
 #endif
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_flush(&pip->lh) ;
 
 	    rs = builtin_execute(bip,ourp,cip,si,&conn,&svcargs) ;
@@ -556,7 +556,7 @@ retnotfound1:
 	    debugprintf("handle: ret rs=%d\n",rs) ;
 #endif
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_flush(&pip->lh) ;
 
 	return rs ;
