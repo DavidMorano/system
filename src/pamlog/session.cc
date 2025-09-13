@@ -373,7 +373,7 @@ const char	**argv ;
 
 /* quiet mode */
 	                        case 'q':
-	                            mip->f.quiet = TRUE ;
+	                            mip->fl.quiet = TRUE ;
 	                            break ;
 
 /* verbose mode */
@@ -456,19 +456,19 @@ const char	**argv ;
 			switch (qi) {
 
 			case qopt_debug:
-				mip->f.debug = TRUE ;
+				mip->fl.debug = TRUE ;
 				break ;
 
 			case qopt_nowarn:
-				mip->f.nowarn = TRUE ;
+				mip->fl.nowarn = TRUE ;
 				break ;
 
 			case qopt_tryfirstpass:
-				mip->f.tryfirstpass = TRUE ;
+				mip->fl.tryfirstpass = TRUE ;
 				break ;
 
 			case qopt_usefirstpass:
-				mip->f.usefirstpass = TRUE ;
+				mip->fl.usefirstpass = TRUE ;
 				break ;
 
 			default:
