@@ -1,10 +1,9 @@
-/* progbal */
+/* progbal SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++98 */
 
 /* program character balance */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,25 +17,23 @@
 
 /*******************************************************************************
 
-	We determine if the character balance in the input (given a piece at
-	a time) is correct or not.
+  	Object:
+	progbal
+
+	Description:
+	We determine if the character balance in the input (given
+	a piece at a time) is correct or not.
 
 		progbal_start
 		progbal_load
 		progbal_finish
 
-
 *******************************************************************************/
 
-
-#define	PROGBAL_MASTER	0	/* necessary for proper symbol names */
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<vector>
 #include	<new>
@@ -83,11 +80,12 @@ static cchar	chopen[] = { CH_LPAREN, CH_LBRACE, CH_LBRACK, '\0' } ;
 static cchar	chclose[] = { CH_RPAREN, CH_RBRACE, CH_RBRACK, '\0' } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progbal_start(PROGBAL *op)
-{
+int progbal_start(PROGBAL *op) {
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -98,10 +96,8 @@ int progbal_start(PROGBAL *op)
 }
 /* end subroutine (progbal_start) */
 
-
 /* returns if all of the input was balanced */
-int progbal_finish(PROGBAL *op)
-{
+int progbal_finish(PROGBAL *op) {
 	int		rs = SR_OK ;
 	int		f_bal ;
 
@@ -123,9 +119,7 @@ int progbal_finish(PROGBAL *op)
 }
 /* end subroutine (progbal_finish) */
 
-
-int progbal_load(PROGBAL *op,cchar *sp,int sl)
-{
+int progbal_load(PROGBAL *op,cchar *sp,int sl) {
 	int		rs = SR_OK ;
 	int		f_fail = FALSE ;
 
