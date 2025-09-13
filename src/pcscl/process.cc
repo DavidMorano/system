@@ -176,7 +176,7 @@ char		filename[] ;
 	        f_writeback,f_seekable) ;
 #endif
 
-	if (! pip->f.seekable) {
+	if (! pip->fl.seekable) {
 
 	    if (f_writeback) {
 
@@ -296,7 +296,7 @@ char		filename[] ;
 
 	            } else {
 
-	                if (pip->f.wantenvelope) {
+	                if (pip->fl.wantenvelope) {
 
 #if	CF_DEBUG
 	                    if (pip->debuglevel > 1)
@@ -323,7 +323,7 @@ char		filename[] ;
 
 /* add an optional "received" postmark */
 
-	            if (pip->f.postmark) {
+	            if (pip->fl.postmark) {
 
 	                bprintf(ofp,"received:\n") ;
 
@@ -481,7 +481,7 @@ char		filename[] ;
 
 	            f_mailer = TRUE ;
 
-	        } else if (f_leading && (! pip->f.wantenvelope) &&
+	        } else if (f_leading && (! pip->fl.wantenvelope) &&
 	            ((strncmp(buf,"From ",5) == 0) ||
 	            (strncmp(buf,">From ",6) == 0))) {
 
