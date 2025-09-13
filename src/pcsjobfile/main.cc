@@ -452,7 +452,7 @@ char	*envv[] ;
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -498,7 +498,7 @@ char	*envv[] ;
 
 /* remove the file (eventually) */
 	                    case 'r':
-	                        pip->f.remove = TRUE ;
+	                        pip->fl.remove = TRUE ;
 	                        if (f_optequal) {
 
 	                            f_optequal = FALSE ;
@@ -756,7 +756,7 @@ char	*envv[] ;
 
 	if (rs < 0) {
 	    ex = EX_TEMPFAIL ;
-	    if (! pip->f.quiet)
+	    if (! pip->fl.quiet)
 	    bprintf(pip->efp,"%s: unavailable jobfile (%d)\n",
 	        pip->progname,rs) ;
 	    goto badjobfile ;
@@ -781,7 +781,7 @@ char	*envv[] ;
 
 	if (rs < 0) {
 	    ex = EX_CANTCREAT ;
-	    if (! pip->f.quiet)
+	    if (! pip->fl.quiet)
 	    bprintf(pip->efp,"%s: unavailable output (%d)\n",
 	        pip->progname,rs) ;
 
@@ -796,7 +796,7 @@ char	*envv[] ;
 
 	bflush(pip->efp) ;
 
-	if (pip->f.remove && (jobtime >= 0)) {
+	if (pip->fl.remove && (jobtime >= 0)) {
 
 	    if (jobtime > 0) {
 
