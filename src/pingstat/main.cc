@@ -51,7 +51,6 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<ucmallreg.h>
 #include	<getbufsize.h>
 #include	<getportnum.h>
 #include	<gethe.h>
@@ -366,7 +365,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->intmininput = -1 ;
 	pip->toping = -1 ;
 
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 	rs = pip->nowinit ;
 	if (rs < 0) goto badinitnow ;
@@ -619,12 +618,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	                case argopt_dgram:
 	                    pip->final.dgram = TRUE ;
-	                    pip->f.dgram = TRUE ;
+	                    pip->fl.dgram = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.dgram = (rs > 0) ;
+	                            pip->fl.dgram = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -656,12 +655,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    break ;
 
 	                case argopt_logextra:
-	                    pip->f.logextra = TRUE ;
+	                    pip->fl.logextra = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.logextra = (rs > 0) ;
+	                            pip->fl.logextra = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -747,7 +746,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -758,11 +757,11 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* binary dump output file */
 	                    case 'b':
-	                        pip->f.binary = TRUE ;
+	                        pip->fl.binary = TRUE ;
 	                        break ;
 
 	                    case 'd':
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -786,7 +785,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* input mode */
 	                    case 'i':
-	                        pip->f.input = TRUE ;
+	                        pip->fl.input = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -812,7 +811,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* no output */
 	                    case 'n':
-	                        pip->f.nooutput = TRUE ;
+	                        pip->fl.nooutput = TRUE ;
 	                        break ;
 
 /* options */
@@ -848,7 +847,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* receive mode */
 	                    case 'r':
-	                        pip->f.receive = TRUE ;
+	                        pip->fl.receive = TRUE ;
 	                        break ;
 
 /* 'pingstat' file name */
@@ -883,7 +882,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* update mode */
 	                    case 'u':
-	                        pip->f.update = TRUE ;
+	                        pip->fl.update = TRUE ;
 	                        break ;
 
 /* verbose mode */
@@ -1090,7 +1089,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1106,7 +1105,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	        break ;
 	    } /* end switch */
 	} else if ((rs >= 0) && (ex == EX_OK)) {
-	    if (pip->f.hostdown) ex = EX_TEMPFAIL ;
+	    if (pip->fl.hostdown) ex = EX_TEMPFAIL ;
 	} /* end if */
 
 retearly:
@@ -1302,10 +1301,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.marktime) {
 	                        pip->have.marktime = TRUE ;
 	                        pip->final.marktime = TRUE ;
-	                        pip->f.marktime = TRUE ;
+	                        pip->fl.marktime = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.marktime = (rs > 0) ;
+	                            pip->fl.marktime = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1319,7 +1318,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                                if (! pip->final.defintminping) {
 	                                    pip->have.defintminping = TRUE ;
 	                                    pip->final.defintminping = TRUE ;
-	                                    pip->f.defintminping = TRUE ;
+	                                    pip->fl.defintminping = TRUE ;
 	                                    pip->defintminping = v ;
 	                                }
 	                                break ;
@@ -1327,7 +1326,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                                if (! pip->final.intminping) {
 	                                    pip->have.intminping = TRUE ;
 	                                    pip->final.intminping = TRUE ;
-	                                    pip->f.intminping = TRUE ;
+	                                    pip->fl.intminping = TRUE ;
 	                                    pip->intminping = v ;
 	                                }
 	                                break ;
@@ -1335,7 +1334,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                                if (! pip->final.intminupdate) {
 	                                    pip->have.intminupdate = TRUE ;
 	                                    pip->final.intminupdate = TRUE ;
-	                                    pip->f.intminupdate = TRUE ;
+	                                    pip->fl.intminupdate = TRUE ;
 	                                    pip->intminupdate = v ;
 	                                }
 	                                break ;
@@ -1452,11 +1451,11 @@ static int processing(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 
 /* OK, now do whatever needed for the particular program mode we're in */
 
-	if (pip->f.input) {
+	if (pip->fl.input) {
 	    int		fd = FD_STDIN ;
-	    if ((! pip->f.daemon) && (! pip->f.dgram) && isasocket(fd)) {
+	    if ((! pip->fl.daemon) && (! pip->fl.dgram) && isasocket(fd)) {
 		if ((rs = uc_getsocktype(fd)) >= 0) {
-	            pip->f.dgram = (rs == SOCK_DGRAM) ;
+	            pip->fl.dgram = (rs == SOCK_DGRAM) ;
 		}
 	    } /* end if (data-gram determination) */
 
@@ -1464,11 +1463,11 @@ static int processing(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 	        bprintf(pip->efp,"%s: mode=input\n", pip->progname) ;
 
 	    if (pip->open.logprog) {
-	        fmt = (pip->f.dgram) ? "mode=input (dgram)" : "mode=input" ;
+	        fmt = (pip->fl.dgram) ? "mode=input (dgram)" : "mode=input" ;
 	        proglog_printf(pip,fmt) ;
 	    }
 
-	    if ((rs >= 0) && pip->f.daemon) {
+	    if ((rs >= 0) && pip->fl.daemon) {
 	        const char	*dps = PORTSPEC_PINGSTAT ;
 	        const char	*protoname = "udp" ;
 	        const int	af = AF_INET ;
@@ -1480,7 +1479,7 @@ static int processing(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 	        if (pip->open.logprog)
 	            logfile_printf(&pip->lh,"server") ;
 
-	        pip->f.dgram = TRUE ;
+	        pip->fl.dgram = TRUE ;
 	        if (pip->debuglevel == 0) {
 
 	            bflush(pip->efp) ;
