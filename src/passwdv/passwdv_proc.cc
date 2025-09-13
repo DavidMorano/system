@@ -157,7 +157,7 @@ int process(PROGINFO *pip,PWFILE *pfp,bfile *ofp,cchar *name)
 
 #endif /* CF_GETPASSWORD */
 
-	if ((rs >= 0) && pip->f.sevenbit) {
+	if ((rs >= 0) && pip->fl.sevenbit) {
 	    for (p = password ; *p != '\0' ; p += 1) {
 	        *p = *p & 0x7F ;
 	    }
