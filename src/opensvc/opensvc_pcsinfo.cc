@@ -404,24 +404,24 @@ int		to ;
 
 /* call users */
 	                    case 'a':
-	                        sip->f.all = TRUE ;
+	                        sip->fl.all = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                sip->f.all = (rs > 0) ;
+	                                sip->fl.all = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 /* type of name (regular or full) */
 	                    case 'f':
-	                        sip->f.full = TRUE ;
+	                        sip->fl.full = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                sip->f.full = (rs > 0) ;
+	                                sip->fl.full = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -496,7 +496,7 @@ int		to ;
 	        fd = rs ;
 		switch (sip->pm) {
 		case submode_name:
-		    w = (sip->f.full) ? pcsnsreq_fullname : pcsnsreq_pcsname ;
+		    w = (sip->fl.full) ? pcsnsreq_fullname : pcsnsreq_pcsname ;
 		    break ;
 		case submode_projinfo:
 		    w = pcsnsreq_projinfo ;
@@ -507,7 +507,7 @@ int		to ;
 		} /* end switch */
 	        if ((rs = subpcs_start(&si,pr,envv,w)) >= 0) {
 		    if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
-		        if (sip->f.all) {
+		        if (sip->fl.all) {
 			    rs = subpcs_all(&si,&b) ;
 		        } else {
 			    cchar	*afn = afname ;
