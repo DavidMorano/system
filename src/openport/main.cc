@@ -335,7 +335,7 @@ int main(int argc,cchar **argv,cchar **envv)
 /* initialize */
 
 	pip->verboselevel = 1 ;
-	pip->f.logprog = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 /* start parsing the arguments */
 
@@ -561,12 +561,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* query mode */
 	                case argopt_query:
-	                    pip->f.query = TRUE ;
+	                    pip->fl.query = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.query = (rs > 0) ;
+	                            pip->fl.query = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -599,7 +599,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -609,24 +609,24 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* all mode */
 	                    case 'a':
-	                        pip->f.all = TRUE ;
+	                        pip->fl.all = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.all = (rs > 0) ;
+	                                pip->fl.all = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 /* binder mode */
 	                    case 'b':
-	                        pip->f.binder = TRUE ;
+	                        pip->fl.binder = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.binder = (rs > 0) ;
+	                                pip->fl.binder = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -770,7 +770,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	rs = procopts(pip,&akopts) ;
 
-	if (pip->f.binder) {
+	if (pip->fl.binder) {
 	    dbfname = NULL ;
 	} else {
 	    if (dbfname == NULL) dbfname = getenv(VARDBFNAME) ;
@@ -782,7 +782,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    cchar	*fmt ;
 	    cchar	*ms ;
 	    fmt = "%s: mode=%s\n" ;
-	    ms = (pip->f.binder) ? modes[1] : modes[0] ;
+	    ms = (pip->fl.binder) ? modes[1] : modes[0] ;
 	    bprintf(pip->efp,fmt,pn,ms) ;
 	    fmt = "%s: db=%s\n" ;
 	    bprintf(pip->efp,fmt,pn,dbfname) ;
@@ -859,7 +859,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -986,10 +986,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case progopt_binder:
-	                    pip->f.binder = TRUE ;
+	                    pip->fl.binder = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.binder = (rs > 0) ;
+	                        pip->fl.binder = (rs > 0) ;
 	                    }
 	                    break ;
 	                } /* end switch */
@@ -1127,7 +1127,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,int cfd,
 	            rs1 = bclose(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                bprintf(pip->efp,fmt,pn,rs) ;
 	                bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1140,9 +1140,9 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,int cfd,
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2)) {
-	        debugprintf("main: f_bind=%u\n",pip->f.binder) ;
-	        debugprintf("main: f_all=%u\n",pip->f.all) ;
-	        debugprintf("main: f_query=%u\n",pip->f.query) ;
+	        debugprintf("main: f_bind=%u\n",pip->fl.binder) ;
+	        debugprintf("main: f_all=%u\n",pip->fl.all) ;
+	        debugprintf("main: f_query=%u\n",pip->fl.query) ;
 	    }
 #endif
 
@@ -1173,13 +1173,13 @@ static int process(PROGINFO *pip,cchar *dbfn,cchar *ofn,VECPSTR *alp,int cfd)
 	int		rs1 ;
 
 	{
-	    cchar	*ms = (pip->f.binder) ? modes[1] : modes[0] ;
+	    cchar	*ms = (pip->fl.binder) ? modes[1] : modes[0] ;
 	    proglog_printf(pip,"mode=%s",ms) ;
 	    proglog_printf(pip,"db=%s",dbfn) ;
 	}
 
 	if ((rs = userports_open(&db,dbfn)) >= 0) {
-	    if (pip->f.binder) {
+	    if (pip->fl.binder) {
 	        rs = procbind(pip,&db,cfd) ;
 	    } else {
 	        rs = proclist(pip,&db,ofn,alp) ;
@@ -1204,9 +1204,9 @@ static int proclist(PROGINFO *pip,USERPORTS *dbp,cchar *ofn,VECPSTR *alp)
 
 	if ((rs = bopen(ofp,ofn,"wct",0666)) >= 0) {
 
-	    if (pip->f.all) {
+	    if (pip->fl.all) {
 	        rs = proclistall(pip,dbp,ofp) ;
-	    } else if (pip->f.query) {
+	    } else if (pip->fl.query) {
 	        rs = proclistquery(pip,dbp,ofp,alp) ;
 	    } else {
 	        rs = proclistusers(pip,dbp,ofp,alp) ;
