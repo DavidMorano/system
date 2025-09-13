@@ -229,12 +229,12 @@ char	*envv[] ;
 	pip->eigenwords = -2 ;
 	pip->keys = -2 ;
 
-	pip->f.stderror = TRUE ;
+	pip->fl.stderror = TRUE ;
 	if (bopen(&errfile,BFILE_STDERR,"dwca",0666) >= 0) {
 	    pip->efp = &errfile ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	} else
-	    pip->f.stderror = FALSE ;
+	    pip->fl.stderror = FALSE ;
 
 #ifdef	COMMENT
 	bprintf(efp,"%s: started\n",pip->progname) ;
@@ -668,17 +668,17 @@ char	*envv[] ;
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* remove labels */
 	                        case 's':
-	                            pip->f.removelabel = TRUE ;
+	                            pip->fl.removelabel = TRUE ;
 	                            break ;
 
 /* index whole files */
 	                        case 'w':
-	                            pip->f.wholefile = TRUE ;
+	                            pip->fl.wholefile = TRUE ;
 	                            break ;
 
 /* verbose mode */
@@ -869,7 +869,7 @@ char	*envv[] ;
 
 	if ((rs = userinfo(&u,userbuf,USERINFO_LEN,NULL)) < 0) {
 
-	    if ((pip->debuglevel > 0) && (! pip->f.quiet))
+	    if ((pip->debuglevel > 0) && (! pip->fl.quiet))
 	        bprintf(efp,"%s: could not get user information\n",
 	            pip->progname) ;
 
@@ -1197,7 +1197,7 @@ char	*envv[] ;
 	    struct utsname	un ;
 
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -1558,7 +1558,7 @@ char	*envv[] ;
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            bprintf(efp,
 	                "%s: could not open the argument list file\n",
