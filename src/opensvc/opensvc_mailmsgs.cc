@@ -342,12 +342,12 @@ int		to ;
 
 /* summary mode */
 	                    case 's':
-	                        sip->f.summary = TRUE ;
+	                        sip->fl.summary = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-					sip->f.summary = (rs > 0) ;
+					sip->fl.summary = (rs > 0) ;
 				    }
 	                        }
 	                        break ;
@@ -476,7 +476,7 @@ int		to ;
 /* assemble the line to print */
 
 	if (rs >= 0) {
-	    if (sip->f.summary) {
+	    if (sip->fl.summary) {
 		rs = ctdeci(lbuf,llen,nmsgs) ;
 		ll = rs ;
 	    } else {
