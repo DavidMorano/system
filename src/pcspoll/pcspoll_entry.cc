@@ -274,7 +274,7 @@ PROGENTRY	*pep ;
 	if (pep->efname[0] != '\0')
 	    u_unlink(pep->efname) ;
 
-	if (pep->f.srvargs)
+	if (pep->fl.srvargs)
 	    vecstr_finish(&pep->srvargs) ;
 
 	if (pep->program != NULL) {
@@ -401,7 +401,7 @@ PROGENTRY_ARGS	*esap ;
 	    if (rs < 0)
 	        goto bad3 ;
 
-	    pep->f.srvargs = TRUE ;
+	    pep->fl.srvargs = TRUE ;
 	    if ((rs = vecstr_processargs(&pep->srvargs,outbuf)) > 0) {
 
 	        rs1 = vecstr_get(&pep->srvargs,0,&argz) ;
@@ -472,22 +472,22 @@ PROGENTRY_ARGS	*esap ;
 /* set at least one program argument if we have none so far */
 
 	rs = SR_OK ;
-	if (pep->f.srvargs)
+	if (pep->fl.srvargs)
 	    rs = vecstr_count(&pep->srvargs) ;
 
 	if ((rs == 0) && (pep->program != NULL)) {
 
 	    if ((cp = strbasename(pep->program)) != NULL) {
 
-	        if (! pep->f.srvargs) {
+	        if (! pep->fl.srvargs) {
 
 	            rs = vecstr_start(&pep->srvargs,2,0) ;
 		    if (rs >= 0)
-	    		pep->f.srvargs = TRUE ;
+	    		pep->fl.srvargs = TRUE ;
 
 		}
 
-		if (pep->f.srvargs)
+		if (pep->fl.srvargs)
 	            rs = vecstr_add(&pep->srvargs,cp,-1) ;
 
 	    }
@@ -510,10 +510,10 @@ bad5:
 	freeit(&pep->username) ;
 
 bad4:
-	if (pep->f.srvargs)
+	if (pep->fl.srvargs)
 	    vecstr_finish(&pep->srvargs) ;
 
-	pep->f.srvargs = FALSE ;
+	pep->fl.srvargs = FALSE ;
 
 bad3:
 	if (pep->program != NULL)
