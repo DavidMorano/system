@@ -153,7 +153,7 @@ const char	fname[] ;
 
 	    if (strcmp(ep->p.t_local.nodename,u.nodename) == 0) {
 
-	        rs = entry_openlocal(ep,(int) pfp->f.listen) ;
+	        rs = entry_openlocal(ep,(int) pfp->fl.listen) ;
 
 #if	CF_DEBUGS
 	        debugprintf("fspipe_open: entry_openlocal rs=%d\n",rs) ;
@@ -172,7 +172,7 @@ const char	fname[] ;
 	    debugprintf("fspipe_open: trying INET\n") ;
 #endif
 
-	    rs = entry_openinet(ep,(int) pfp->f.listen) ;
+	    rs = entry_openinet(ep,(int) pfp->fl.listen) ;
 
 	} /* end if (inet) */
 
@@ -217,7 +217,7 @@ FSPIPE		*pfp ;
 	    return SR_FAULT ;
 
 	pfp->magic = 0 ;
-	if (pfp->f.listen) {
+	if (pfp->fl.listen) {
 
 	    for (i = 0 ; (rs = vecitem_get(&pfp->e,i,&ep)) >= 0 ; i += 1) {
 
@@ -376,7 +376,7 @@ const char	fname[] ;
 	char		linebuf[LINELEN + 1] ;
 	char		*cp, *cp2, *cp3 ;
 
-	if (pfp->f.listen) {
+	if (pfp->fl.listen) {
 	    rs = bopen(pp,fname,"rw",0666) ;
 	} else
 	    rs = bopen(pp,fname,"r",0666) ;
