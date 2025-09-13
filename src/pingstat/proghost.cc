@@ -120,7 +120,7 @@ int		to ;
 
 /* OK, continue */
 
-	f_update = pip->f.update ;
+	f_update = pip->fl.update ;
 	pip->daytime = time(NULL) ;
 
 #if	CF_DEBUG
@@ -318,12 +318,12 @@ int		to ;
 
 /* do we want to print a report on this one? */
 
-	if ((! pip->f.update) || (pip->verboselevel > 1)) {
+	if ((! pip->fl.update) || (pip->verboselevel > 1)) {
 
 	    if ((rs1 >= 0) && (rs_match < 0))
 	        rs_match = pingstatdb_match(psp,name,&pe) ;
 
-	    if ((! pip->f.nooutput) && (pip->verboselevel > 0)) {
+	    if ((! pip->fl.nooutput) && (pip->verboselevel > 0)) {
 
 	        if (rs_match >= 0) {
 
