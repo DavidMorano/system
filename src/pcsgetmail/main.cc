@@ -318,7 +318,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->to_mailbox = TO_MAILBOX ;
 	pip->to_mailspool = TO_MAILSPOOL ;
 
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 	pip->lip = &li ;
 	rs = locinfo_start(lip,pip) ;
@@ -699,12 +699,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* no-delete mode */
 	                case argopt_nodel:
-	                    pip->f.nodel = TRUE ;
+	                    pip->fl.nodel = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.nodel = (rs > 0) ;
+	                            pip->fl.nodel = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -735,7 +735,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -762,7 +762,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'l':
-	                        lip->f.lock = TRUE ;
+	                        lip->fl.lock = TRUE ;
 	                        break ;
 
 /* mailbox file? */
@@ -822,7 +822,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'n':
-	                        lip->f.lock = FALSE ;
+	                        lip->fl.lock = FALSE ;
 	                        break ;
 
 /* options */
@@ -956,7 +956,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if (f_version) {
 	    cchar	*pn = pip->progname ;
 	    bprintf(pip->efp,"%s: version %s/%s\n",pn,
-	        VERSION,(pip->f.sysv_ct) ? "SYSV" : "BSD") ;
+	        VERSION,(pip->fl.sysv_ct) ? "SYSV" : "BSD") ;
 	    if (f_makedate) {
 	        cl = makedate_get(makedate,&cp) ;
 	        bprintf(pip->efp,"%s: makedate %r\n",pn,cp,cl) ;
@@ -1147,21 +1147,21 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    switch (rs) {
 	    case SR_TXTBSY:
 	        ex = EX_TEMPFAIL ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    fmt = "%s: could not capture the mail lock\n" ;
 	            bprintf(pip->efp,fmt,pn) ;
 	        }
 	        break ;
 	    case SR_ACCES:
 	        ex = EX_ACCESS ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    fmt = "%s: could not access the mail spool-file\n" ;
 	            bprintf(pip->efp,fmt,pn) ;
 	        }
 	        break ;
 	    case SR_REMOTE:
 	        ex = EX_FORWARDED ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 #ifdef	COMMENT
 	            if (forwarded(pip,buf,BUFLEN)) {
 			fmt = "%s: mail is being forwarded to \"%s\"\n" ;
@@ -1179,14 +1179,14 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	        ex = EX_NOSPACE ;
 		fmt = "file-system is out of space\n" ;
 	        proglog_printf(pip,fmt) ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    fmt = "%s: local file-system is out of space\n" ;
 	            bprintf(pip->efp,fmt,pn) ;
 	        }
 	        break ;
 	    default:
 	        ex = EX_UNKNOWN ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    fmt = "%s: unknown bad thing (%d)\n" ;
 	            bprintf(pip->efp,fmt,pn,rs) ;
 	        }
@@ -1412,10 +1412,10 @@ static int procopts(proginfo *pip,KEYOPT *kop)
 	                    if (! pip->final.nodel) {
 	                        pip->have.nodel = TRUE ;
 	                        pip->final.nodel = TRUE ;
-	                        pip->f.nodel = TRUE ;
+	                        pip->fl.nodel = TRUE ;
 	                        if ((vp != NULL) && (vl > 0)) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.nodel = (rs > 0) ;
+	                            pip->fl.nodel = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1474,8 +1474,8 @@ static int procuserinfo_begin(proginfo *pip,USERINFO *uip)
 	    }
 	}
 
-	if (pip->euid != pip->uid) pip->f.setuid = TRUE ;
-	if (pip->egid != pip->gid) pip->f.setgid = TRUE ;
+	if (pip->euid != pip->uid) pip->fl.setuid = TRUE ;
+	if (pip->egid != pip->gid) pip->fl.setgid = TRUE ;
 
 #ifdef	COMMENT
 	if (rs >= 0) {
@@ -1683,7 +1683,7 @@ static int procargs(proginfo *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 	        rs1 = bclose(afp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    fmt = "%s: inaccessible argument-list (%d)\n" ;
 	            bprintf(pip->efp,fmt,pn,rs) ;
 	            bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1803,7 +1803,7 @@ static int procfoldercheck(proginfo *pip,cchar *folder)
 	        proginfo_realend(pip) ;
 	    } /* end if (proginfo_real) */
 	}
-	if ((rs < 0) && (! pip->f.quiet)) {
+	if ((rs < 0) && (! pip->fl.quiet)) {
 	    cchar	*pn = pip->progname ;
 	    bprintf(pip->efp,
 	        "%s: inaccessible folder directory (%d)\n",pn,rs) ;
@@ -1854,13 +1854,13 @@ static int procthem(proginfo *pip)
 	    } /* end if */
 
 	} else
-	    lip->f.lock = FALSE ;
+	    lip->fl.lock = FALSE ;
 
 /* do the deed */
 
 	if (rs >= 0) {
 	    cint	mfd = lip->mfd ;
-	    cint	f_lock = lip->f.lock ;
+	    cint	f_lock = lip->fl.lock ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
