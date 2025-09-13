@@ -426,12 +426,12 @@ int opensvc_qotd(cchar *pr,cchar *prn,int of,mode_t om,
 /* use GMT */
 	                    case 'z':
 	                        sip->final.gmt = TRUE ;
-	                        sip->f.gmt = TRUE ;
+	                        sip->fl.gmt = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                sip->f.gmt = (rs > 0) ;
+	                                sip->fl.gmt = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -631,11 +631,11 @@ static int subinfo_mjd(SUBINFO *sip,cchar *dayspec)
 
 	if (ch == '+') {
 	    if ((rs = subinfo_tmtime(sip)) >= 0) {
-	        sip->f.mjd = TRUE ;
+	        sip->fl.mjd = TRUE ;
 		rs = getmjd(sip->year,sip->mon,sip->mday) ;
 	    }
 	} else if ((rs = ourmjd(dp,dl)) > 0) {
-	    sip->f.mjd = TRUE ;
+	    sip->fl.mjd = TRUE ;
 	} else {
 	    DAYSPEC	ds ;
 	    if ((rs = dayspec_load(&ds,dayspec,dl)) >= 0) {
@@ -646,7 +646,7 @@ static int subinfo_mjd(SUBINFO *sip,cchar *dayspec)
 		    if (ds.d < 0) ds.d = sip->mday ;
 		}
 		if (rs >= 0) {
-	     	    sip->f.mjd = TRUE ;
+	     	    sip->fl.mjd = TRUE ;
 		    rs = getmjd(ds.y,ds.m,ds.d) ;
 		}
 	    } /* end if (dayspec_load) */
