@@ -294,7 +294,7 @@ ustate	*sp ;
 	    debugprintf("procfile/procclose: about to post\n") ;
 #endif
 
-	if (! gp->f.no) {
+	if (! gp->fl.no) {
 
 #if	CF_DEBUG
 	if (gp->debuglevel > 1)
