@@ -1,6 +1,9 @@
-/* progbal */
+/* progbal HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
-/* HEX decoder */
+/* language totken balance checker support */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,12 +16,16 @@
 /* Copyright © 2016 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PROGBAL_INCLUDE
-#define	PROGBAL_INCLUDE	1
+#define	PROGBAL_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 
 
 #define	PROGBAL_MAGIC	0x13f3c203
@@ -32,23 +39,15 @@ struct progbal_head {
 	int		f_fail ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(PROGBAL_MASTER)) || (PROGBAL_MASTER == 0)
+extern int progbal_start(PROGBAL *) noex ;
+extern int progbal_load(PROGBAL *,cchar *,int) noex ;
+extern int progbal_read(PROGBAL *,char *,int) noex ;
+extern int progbal_finish(PROGBAL *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int progbal_start(PROGBAL *) ;
-extern int progbal_load(PROGBAL *,cchar *,int) ;
-extern int progbal_read(PROGBAL *,char *,int) ;
-extern int progbal_finish(PROGBAL *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PROGBAL_MASTER */
 
 #endif /* PROGBAL_INCLUDE */
 
