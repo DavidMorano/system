@@ -211,7 +211,7 @@ char	*envv[] ;
 	    rs = bopen(&errfile,BFILE_STDERR,"dwca",0666) ;
 	if (rs >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.stderror = TRUE ;
+	    pip->fl.stderror = TRUE ;
 	    bcontrol(pip->efp,BC_LINEBUF,0) ;
 	}
 
@@ -220,10 +220,10 @@ char	*envv[] ;
 	pip->debuglevel = 0 ;
 	pip->verboselevel = 1 ;
 
-	pip->f.quiet = FALSE ;
-	pip->f.log = FALSE ;
-	pip->f.seekable = FALSE ;
-	pip->f.wantenvelope = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.log = FALSE ;
+	pip->fl.seekable = FALSE ;
+	pip->fl.wantenvelope = FALSE ;
 
 
 /* early initialization processing */
@@ -533,7 +533,7 @@ char	*envv[] ;
 
 /* force an envelope on the output */
 	                        case 'e':
-	                            pip->f.wantenvelope = TRUE ;
+	                            pip->fl.wantenvelope = TRUE ;
 	                            break ;
 
 /* the "from" address for the envelope, if specified, or whatever */
@@ -580,7 +580,7 @@ char	*envv[] ;
 
 /* supply a "received" post-mark */
 	                        case 'p':
-	                            pip->f.postmark = TRUE ;
+	                            pip->fl.postmark = TRUE ;
 	                        if (f_optequal) {
 
 	                            f_optequal = FALSE ;
@@ -724,7 +724,7 @@ char	*envv[] ;
 
 	if ((rs = userinfo(&u,userbuf,USERINFO_LEN,NULL)) < 0) {
 
-	    if ((pip->debuglevel > 0) && (! pip->f.quiet))
+	    if ((pip->debuglevel > 0) && (! pip->fl.quiet))
 	        bprintf(pip->efp,"%s: could not get user information\n",
 	            pip->progname) ;
 
@@ -1016,7 +1016,7 @@ char	*envv[] ;
 		struct utsname	un ;
 
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -1215,7 +1215,7 @@ char	*envv[] ;
 		goto badoutopen ;
 
 	if (bseek(ofp,0L,SEEK_CUR) >= 0)
-	    pip->f.seekable = TRUE ;
+	    pip->fl.seekable = TRUE ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1) {
@@ -1265,7 +1265,7 @@ char	*envv[] ;
 
 /* if output file is seekable, check for a new-line as the last character */
 
-	if (f_append && pip->f.seekable) {
+	if (f_append && pip->fl.seekable) {
 
 		ustat	sb ;
 
@@ -1291,7 +1291,7 @@ char	*envv[] ;
 	pan = 0 ;
 
 	if ((npa > 1) || (afname != NULL))
-	    pip->f.wantenvelope = TRUE ;
+	    pip->fl.wantenvelope = TRUE ;
 
 
 /* process the positional arguments */
@@ -1439,7 +1439,7 @@ ret4:
 	    configfile_finish(&cf) ;
 
 ret3:
-	if (pip->f.log)
+	if (pip->fl.log)
 	logfile_close(&pip->lh) ;
 
 retearly:
