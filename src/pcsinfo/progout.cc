@@ -586,7 +586,7 @@ MAILMSGATTENT	*ep ;
 	    debugprintf("out/outpartbody: cte=%u\n",cte) ;
 #endif
 
-	f_textcrnl = f_pt && pip->f.crnl ;
+	f_textcrnl = f_pt && pip->fl.crnl ;
 	if ((cte == CE_BASE64) && f_textcrnl) {
 
 	    int	f_bol, f_eol ;
@@ -669,7 +669,7 @@ MAILMSGATTENT	*ep ;
 	    goto ret0 ;
 
 	bbuf = p ;
-	f_textcrnl = pip->f.crnl && f_pt ;
+	f_textcrnl = pip->fl.crnl && f_pt ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
