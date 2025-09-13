@@ -134,7 +134,7 @@ int pcsadj_begin(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
 	lip->rfd = -1 ;
-	if (lip->f.adj) {
+	if (lip->fl.adj) {
 
 	    if (lip->reqfname == NULL) {
 	        rs = locinfo_reqfname(lip) ;
@@ -152,7 +152,7 @@ int pcsadj_begin(PROGINFO *pip) noex {
 	    if (rs >= 0) {
 	        cmode	om = 0666 ;
 	        int	opts = 0 ;
-	        if (lip->f.reuseaddr) opts |= 1 ; /* reuse-address */
+	        if (lip->fl.reuseaddr) opts |= 1 ; /* reuse-address */
 	        if ((rs = listenusd(lip->reqfname,om,opts)) >= 0) {
 	            cint	fd = rs ;
 	            if ((rs = uc_closeonexec(fd,TRUE)) >= 0) {
