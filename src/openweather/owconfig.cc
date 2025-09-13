@@ -232,7 +232,7 @@ const char	*cfname ;
 	if (rs < 0) goto bad3 ;
 
 	f_open = TRUE ;
-	cfp->f.p = TRUE ;
+	cfp->fl.p = TRUE ;
 	rs = owconfig_read(cfp) ;
 	if (rs < 0) goto bad3 ;
 
@@ -273,7 +273,7 @@ OWCONFIG	*cfp ;
 	if (cfp == NULL)
 	    return SR_FAULT ;
 
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 
 	    rs = SR_OK ;
 	    rs1 = expcook_finish(&cfp->cooks) ;
@@ -306,7 +306,7 @@ OWCONFIG	*cfp ;
 	if (cfp == NULL)
 	    return SR_FAULT ;
 
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 
 #if	CF_DEBUGS
 	debugprintf("msumain/owconfig_check: paramfile_check()\n") ;
@@ -362,13 +362,13 @@ OWCONFIG	*cfp ;
 
 
 #if	CF_DEBUGS
-	    debugprintf("owconfig_read: f_p=%u\n",cfp->f.p) ;
+	    debugprintf("owconfig_read: f_p=%u\n",cfp->fl.p) ;
 #endif
 
 	if (cfp == NULL)
 	    return SR_FAULT ;
 
-	if (! cfp->f.p)
+	if (! cfp->fl.p)
 	    goto ret0 ;
 
 	ep = ebuf ;
