@@ -360,12 +360,12 @@ int		to ;
 
 /* summary mode */
 	                    case 's':
-	                        sip->f.summary = TRUE ;
+	                        sip->fl.summary = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-					sip->f.summary = (rs > 0) ;
+					sip->fl.summary = (rs > 0) ;
 				    }
 	                        }
 	                        break ;
@@ -496,7 +496,7 @@ int		to ;
 		const int	ul = strlen(un) ;
 		const int	ph = (period / 3600) ;
 	        const char	*fmt ;
-	        if ((nmsgs > 0) && (! sip->f.summary)) {
+	        if ((nmsgs > 0) && (! sip->fl.summary)) {
 	            fmt = "notifications u=%s p=%uh n=%u note=>%s<" ;
 	        } else {
 	            fmt = "notifications u=%s p=%uh n=%u" ;
