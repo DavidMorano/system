@@ -277,7 +277,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	if ((rs1 = bopen(&errfile,cp,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	} else if (! isNotPresent(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
@@ -301,7 +301,7 @@ int main(int argc,cchar **argv,cchar **envv)
 /* initialize */
 
 	pip->verboselevel = 1 ;
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 /* get the program root */
 
@@ -420,7 +420,7 @@ int main(int argc,cchar **argv,cchar **envv)
 /* early return thing */
 
 	if (pip->efp != NULL) {
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    bclose(pip->efp) ;
 	    pip->efp = NULL ;
 	}
