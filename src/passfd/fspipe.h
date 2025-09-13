@@ -1,27 +1,26 @@
-/* fspipe */
+/* fspipe HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 #ifndef	FSPIPE_INCLUDE
-#define	FSPIPE_INCLUDE		1
+#define	FSPIPE_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecelem.h>
 
-#include	"localmisc.h"
-
-
-/* object defines */
 
 #define	FSPIPE_MAGIC		0x98712365
 #define	FSPIPE			struct fspipe_head
-#define	FSPIPE_ENT		struct fspipe_e
 #define	FSPIPE_FL		struct fspipe_flags
-#define	FSPIPE_PARAM		union fspipe_param
+#define	FSPIPE_PA		union fspipe_param
+#define	FSPIPE_ENT		struct fspipe_entry
 
 #define	FSPIPE_VERSION		0
 #define	FSPIPE_TRANSLEN		32
@@ -56,7 +55,7 @@ union fspipe_param {
 	struct fspipe_tinet	t_inet ;
 } ;
 
-struct fspipe_e {
+struct fspipe_entry {
 	FSPIPE_PARAM	p ;
 	int		type ;
 	int		fd ;
@@ -65,19 +64,17 @@ struct fspipe_e {
 } ;
 
 struct fspipe_head {
-	ulong		magic ;
-	FSPIPE_FL	f ;
 	vecelem		e ;
+	FSPIPE_FL	fl ;
+	uint		magic ;
 	int		version ;
 	int		fd ;
 } ;
 
-
-#ifndef	FSPIPE_MASTER
-
-
-#endif /* FSPIPE_MASTER */
-
+typedef	FSPIPE		fspipe ;
+typedef	FSPIPE_FL	fspipe_fl ;
+typedef	FSPIPE_PA	fspipe_pa ;
+typedef	FSPIPE_ENT	fspipe_ent ;
 
 #endif /* FSPIPE_INCLUDE */
 
