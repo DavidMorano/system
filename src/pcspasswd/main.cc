@@ -165,10 +165,10 @@ int main(int argc,mainv argv,mainv envv) {
 	pip->verboselevel = 1 ;
 	pip->tmpdname = NULL ;
 
-	pip->f.nooutput = FALSE ;
-	pip->f.quiet = FALSE ;
-	pip->f.sevenbit = FALSE ;
-	pip->f.update = FALSE ;
+	pip->fl.nooutput = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.sevenbit = FALSE ;
+	pip->fl.update = FALSE ;
 
 /* process program arguments */
 
@@ -341,17 +341,17 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* seven bit stripping option */
 	                    case '7':
-	                        pip->f.sevenbit = TRUE ;
+	                        pip->fl.sevenbit = TRUE ;
 	                        break ;
 
 /* "no output" option (exit code only?) */
 	                    case 'n':
-	                        pip->f.nooutput = TRUE ;
+	                        pip->fl.nooutput = TRUE ;
 	                        break ;
 
 /* alternate PASSWD file */
@@ -372,7 +372,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* update */
 	                    case 'u':
-	                        pip->f.update = TRUE ;
+	                        pip->fl.update = TRUE ;
 	                        break ;
 
 /* verbose output */
@@ -556,7 +556,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    switch (i) {
 
 	    case procopt_seven:
-	        pip->f.sevenbit = TRUE ;
+	        pip->fl.sevenbit = TRUE ;
 	        break ;
 
 	    } /* end switch */
@@ -569,7 +569,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1)
-	    debugprintf("main: sevenbit=%d\n",pip->f.sevenbit) ;
+	    debugprintf("main: sevenbit=%d\n",pip->fl.sevenbit) ;
 #endif
 
 
@@ -618,7 +618,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* get ready */
 
-	if ((! pip->f.nooutput) &&
+	if ((! pip->fl.nooutput) &&
 	    ((rs = bopen(ofp,BFILE_STDOUT,"dwct",0644)) < 0))
 	    goto badoutopen  ;
 
@@ -644,7 +644,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 		f_passed = (rs1 > 0) ;
 
-	        if (! pip->f.nooutput)
+	        if (! pip->fl.nooutput)
 	            bprintf(ofp,"%svalid\n",(! f_passed) ? "in" : "") ;
 
 #if	CF_DEBUG
@@ -692,7 +692,7 @@ int main(int argc,mainv argv,mainv envv) {
 	            rs1 = process(pip,&aparams,pfp,ofp,cp) ;
 
 		    f_passed = (rs1 > 0) ;
-	            if (! pip->f.nooutput)
+	            if (! pip->fl.nooutput)
 	                bprintf(ofp,"%svalid\n",(! f_passed) ? "in" : "") ;
 
 	        } /* end while (reading lines) */
@@ -701,7 +701,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file (%d)\n",
@@ -725,7 +725,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    rs1 = process(pip,&aparams,pfp,ofp,userbuf) ;
 
 		f_passed = (rs1 > 0) ;
-	    if (! pip->f.nooutput)
+	    if (! pip->fl.nooutput)
 	        bprintf(ofp,"%svalid\n",(! f_passed) ? "in" : "") ;
 
 #if	CF_DEBUG
@@ -736,7 +736,7 @@ int main(int argc,mainv argv,mainv envv) {
 	} /* end if */
 
 
-	if (! pip->f.nooutput)
+	if (! pip->fl.nooutput)
 	    bclose(ofp) ;
 
 
