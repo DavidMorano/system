@@ -483,7 +483,7 @@ static int subinfo_start(SUBINFO *sip,cchar *pr,cchar **ev,int f)
 	sip->pr = pr ;
 	sip->envv = ev ;
 	sip->w = (f) ? pcsnsreq_fullname : pcsnsreq_pcsname ;
-	sip->f.full = f ;
+	sip->fl.full = f ;
 	rs = pcsns_open(&sip->ns,pr) ;
 	return rs ;
 }
