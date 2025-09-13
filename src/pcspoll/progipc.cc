@@ -129,7 +129,7 @@ int progipcbegin(PROGINFO *pip)
 	ipp->fd_req = -1 ;
 
 	f = (pip->reqfname != NULL) && (pip->reqfname[0] == '-') ;
-	if (pip->f.daemon && (! f)) {
+	if (pip->fl.daemon && (! f)) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -172,7 +172,7 @@ int progipcbegin(PROGINFO *pip)
 	        uc_closeonexec(ipp->fd_req,TRUE) ;
 		if (pip->debuglevel > 0)
 	            bprintf(pip->efp,"%s: req=%s\n",pip->progname,ipp->fname) ;
-	        if (pip->f.daemon && pip->open.logprog)
+	        if (pip->fl.daemon && pip->open.logprog)
 		    proglog_printf(pip,"req=%s",ipp->fname) ;
 	    }
 	    if (rs < 0) {
@@ -357,7 +357,7 @@ static int progipcbeginprivate(PROGINFO *pip,mode_t om,char *fname)
 	ipp = &pip->ipc ;
 
 	if ((rs = progjobdir(pip,ourdname)) >= 0) {
-	    pip->f.reqfnametmp = TRUE ;		/* mark as temporary */
+	    pip->fl.reqfnametmp = TRUE ;		/* mark as temporary */
 	    rs = mkpath2(template,ourdname,"reqXXXXXXXXXXX") ;
 	}
 	if (rs < 0) goto ret0 ;
