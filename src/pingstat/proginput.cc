@@ -107,7 +107,7 @@ int proginput(PROGINFO *pip,int fd) noex {
 	}
 #endif /* CF_DEBUG */
 
-	if (pip->f.dgram) {
+	if (pip->fl.dgram) {
 	    rs = procdatagram(pip,fd) ;
 	} else {
 	    rs = procstream(pip,fd) ;
@@ -142,7 +142,7 @@ int procstream(PROGINFO *pip,int fd) noex {
 
 	if (pip->intmininput > 0) to = pip->intmininput ;
 
-	if (pip->open.logprog && pip->f.logextra)
+	if (pip->open.logprog && pip->fl.logextra)
 	    logfile_printf(&pip->lh,"read to=%u",to) ;
 
 /* find maximum message size (or machine pagesize) */
@@ -165,7 +165,7 @@ int procstream(PROGINFO *pip,int fd) noex {
 	        rs = msgbuf_read(&mb,&mp) ;
 	        ml = rs ;
 
-	        if (pip->open.logprog && pip->f.logextra) {
+	        if (pip->open.logprog && pip->fl.logextra) {
 	            logfile_printf(&pip->lh,"read %d",rs) ;
 		}
 
@@ -225,7 +225,7 @@ int procstream(PROGINFO *pip,int fd) noex {
 
 	        if (rs >= 0) {
 	            rs = msgbuf_adv(&mb,mlen) ;
-	            if (pip->open.logprog && pip->f.logextra) {
+	            if (pip->open.logprog && pip->fl.logextra) {
 	                logfile_printf(&pip->lh,"adv %d\n",rs) ;
 		    }
 	        }
@@ -243,7 +243,7 @@ int procstream(PROGINFO *pip,int fd) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (msgbuf) */
 
-	if (pip->open.logprog && pip->f.logextra) {
+	if (pip->open.logprog && pip->fl.logextra) {
 	    logfile_printf(&pip->lh,"while-out %d",rs) ;
 	}
 
@@ -291,7 +291,7 @@ int procdatagram(PROGINFO *pip,int fd) noex {
 	    to = pip->intmininput ;
 #endif
 
-	if (pip->open.logprog && pip->f.logextra)
+	if (pip->open.logprog && pip->fl.logextra)
 	    logfile_printf(&pip->lh,"read to=%u",to) ;
 
 /* find maximum message size (or machine pagesize) */
@@ -318,7 +318,7 @@ int procdatagram(PROGINFO *pip,int fd) noex {
 
 	        pip->daytime = time(NULL) ;
 
-	        if (pip->open.logprog && pip->f.logextra) {
+	        if (pip->open.logprog && pip->fl.logextra) {
 	            logfile_printf(&pip->lh,"recve %d",rs) ;
 		}
 
@@ -388,7 +388,7 @@ int procdatagram(PROGINFO *pip,int fd) noex {
 
 	        if ((rs >= 0) && (pip->intrun >= 0)) {
 	            if ((pip->daytime - ti_start) >= pip->intrun) {
-	                if (pip->open.logprog && pip->f.logextra) {
+	                if (pip->open.logprog && pip->fl.logextra) {
 	                    logfile_printf(&pip->lh,"runint to") ;
 			}
 	                break ;
@@ -426,7 +426,7 @@ int procdatagram(PROGINFO *pip,int fd) noex {
 	    debugprintf("proginput/procdatagram: while-after\n") ;
 #endif
 
-	if (pip->open.logprog && pip->f.logextra) {
+	if (pip->open.logprog && pip->fl.logextra) {
 	    logfile_printf(&pip->lh,"while-out %d",rs) ;
 	}
 
