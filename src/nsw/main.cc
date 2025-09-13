@@ -329,7 +329,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->verboselevel = 1 ;
 	pip->daytime = time(NULL) ;
 
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 /* start parsing the arguments */
 
@@ -526,7 +526,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* run interval */
 	                    case 'd':
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -564,7 +564,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet mode */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* poll interval */
@@ -702,7 +702,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if (pip->intpoll <= 0)
 	    pip->intpoll = DEFINTPOLL ;
 
-	if (pip->f.daemon && (pip->intrun <= 0))
+	if (pip->fl.daemon && (pip->intrun <= 0))
 	    pip->intrun = DEFINTRUN ;
 
 #if	CF_DEBUG
@@ -784,7 +784,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            cchar	*fmt = "%s: invalid query (%d)\n" ;
 	            bprintf(pip->efp,fmt,pip->progname,rs) ;
 	        }
@@ -1020,7 +1020,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	            rs1 = bclose(afp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                bprintf(pip->efp,fmt,pn,rs) ;
 	                bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1144,7 +1144,7 @@ static int process(PROGINFO *pip,VECSTR *nlp)
 	        }
 	    }
 
-	    if (pip->f.daemon) {
+	    if (pip->fl.daemon) {
 	        sleep(pip->intpoll) ;
 	        pip->daytime = time(NULL) ;
 	    } else
