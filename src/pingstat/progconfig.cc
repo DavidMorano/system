@@ -187,7 +187,7 @@ int progconf_begin(PROGINFO *pip)
 #endif
 
 	    if ((rs = paramfile_open(&pip->params,pip->envv,cfn)) >= 0) {
-	        pip->f.pc = TRUE ;
+	        pip->fl.pc = TRUE ;
 	        pip->open.params = TRUE ;
 	        rs = progconf_read(pip) ;
 		if (rs < 0) {
@@ -199,7 +199,7 @@ int progconf_begin(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("progconfbegin: ret rs=%d f_pc=%u\n",rs,pip->f.pc) ;
+	    debugprintf("progconfbegin: ret rs=%d f_pc=%u\n",rs,pip->fl.pc) ;
 #endif
 
 	return rs ;
@@ -213,11 +213,11 @@ int progconf_end(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("progconf_end: ent f_pc=%u\n",pip->f.pc) ;
+	    debugprintf("progconf_end: ent f_pc=%u\n",pip->fl.pc) ;
 #endif
 
-	if (pip->f.pc) {
-	    pip->f.pc = FALSE ;
+	if (pip->fl.pc) {
+	    pip->fl.pc = FALSE ;
 	    rs = SR_OK ;
 	    if (pip->open.params) {
 	        pip->open.params = FALSE ;
@@ -240,7 +240,7 @@ int progconf_check(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 
-	if (pip->f.pc && pip->open.params) {
+	if (pip->fl.pc && pip->open.params) {
 	    PARAMFILE	*pfp = &pip->params ;
 	    if ((rs = paramfile_check(pfp,pip->daytime)) > 0) {
 	        f = TRUE ;
@@ -261,7 +261,7 @@ int progconf_read(PROGINFO *pip)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("progconf_read: f_pc=%u open_params=%u\n",
-	        pip->f.pc,pip->open.params) ;
+	        pip->fl.pc,pip->open.params) ;
 #endif
 
 	if (pip->open.params) {
