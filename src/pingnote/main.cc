@@ -279,7 +279,7 @@ char	*envv[] ;
 	} else
 	    rs = bopen(&errfile,BFILE_STDERR,"dwca",0666) ;
 	if (rs >= 0) {
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    pip->efp = &errfile ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	}
@@ -499,7 +499,7 @@ char	*envv[] ;
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* count */
@@ -761,13 +761,13 @@ char	*envv[] ;
 #endif
 
 	    if (rs >= 0) {
-	        pip->f.cdate = TRUE ;
+	        pip->fl.cdate = TRUE ;
 	        rs = dater_startcopy(&pip->cdate,&pip->tmpdate) ;
 	    }
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
-	        debugprintf("main: f_cdate=%d\n",pip->f.cdate) ;
+	        debugprintf("main: f_cdate=%d\n",pip->fl.cdate) ;
 #endif
 
 	} /* end if (user specified date) */
@@ -781,7 +781,7 @@ char	*envv[] ;
 	    if ((pinghost == NULL) || (pinghost[0] == '\0')) {
 
 	        rs = getnodedomain(localhost,domainname) ;
-	        if ((rs >= 0) && pip->f.domain)
+	        if ((rs >= 0) && pip->fl.domain)
 	            rs = sncat2(localhost,MAXHOSTNAMELEN,".",domainname) ;
 
 	        pinghost = localhost ;
@@ -929,7 +929,7 @@ char	*envv[] ;
 badmsg:
 badpinghost:
 badsetdate:
-	if (pip->f.cdate)
+	if (pip->fl.cdate)
 	    dater_finish(&pip->cdate) ;
 
 	dater_finish(&pip->tmpdate) ;
@@ -946,7 +946,7 @@ done:
 	        break ;
 
 	    default:
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            bprintf(pip->efp,
 	                "%s: could not perform function (%d)\n",
 	                pip->progname,rs) ;
@@ -1073,10 +1073,10 @@ KEYOPT		*kop ;
 	            if (! pip->final.domain) {
 	                pip->have.domain = TRUE ;
 	                pip->final.domain = TRUE ;
-	                pip->f.domain = TRUE ;
+	                pip->fl.domain = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    pip->f.domain = (rs > 0) ;
+	                    pip->fl.domain = (rs > 0) ;
 			}
 	            }
 	            break ;
@@ -1122,7 +1122,7 @@ int		count ;
 
 /* fill in the message fields */
 
-	if (pip->f.cdate || (count > 0)) {
+	if (pip->fl.cdate || (count > 0)) {
 
 	    struct pingstatmsg_uptime	m1 ;
 
@@ -1145,7 +1145,7 @@ int		count ;
 #endif
 
 	    timechange = 0 ;
-	    if (pip->f.cdate)
+	    if (pip->fl.cdate)
 	        dater_gettime(&pip->cdate,&timechange) ;
 
 	    m1.timechange = timechange ;
