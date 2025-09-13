@@ -377,12 +377,12 @@ int		to ;
 
 /* specify blocks as output rather than GigiBytes */
 	                    case 'b':
-	                        sip->f.blocks = TRUE ;
+	                        sip->fl.blocks = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-					sip->f.blocks = (rs > 0) ;
+					sip->fl.blocks = (rs > 0) ;
 				    }
 	                        }
 	                        break ;
