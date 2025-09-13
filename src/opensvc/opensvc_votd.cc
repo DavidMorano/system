@@ -670,12 +670,12 @@ int		to ;
 	                case argopt_bookname:
 	                    sip->have.bookname = true ;
 	                    sip->final.bookname = true ;
-	                    sip->f.bookname = true ;
+	                    sip->fl.bookname = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            sip->f.bookname = (rs > 0) ;
+	                            sip->fl.bookname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -721,7 +721,7 @@ int		to ;
 	                        break ;
 
 	                    case 'a':
-	                        sip->f.all = true ;
+	                        sip->fl.all = true ;
 	                        break ;
 
 /* type of argument-input */
@@ -800,12 +800,12 @@ int		to ;
 /* use GMT */
 	                    case 'z':
 	                        sip->final.gmt = true ;
-	                        sip->f.gmt = true ;
+	                        sip->fl.gmt = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                sip->f.gmt = (rs > 0) ;
+	                                sip->fl.gmt = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -997,10 +997,10 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    if (! sip->final.audit) {
 	                        sip->have.audit = true ;
 	                        sip->final.audit = true ;
-	                        sip->f.audit = true ;
+	                        sip->fl.audit = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            sip->f.audit = (rs > 0) ;
+	                            sip->fl.audit = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1008,7 +1008,7 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    if (! sip->final.linelen) {
 	                        sip->have.linelen = true ;
 	                        sip->final.linelen = true ;
-	                        sip->f.linelen = true ;
+	                        sip->fl.linelen = true ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            sip->linelen = rs ;
@@ -1019,7 +1019,7 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    if (! sip->final.indent) {
 	                        sip->have.indent = true ;
 	                        sip->final.indent = true ;
-	                        sip->f.indent = true ;
+	                        sip->fl.indent = true ;
 	                        sip->indent = 1 ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1031,10 +1031,10 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    if (! sip->final.bookname) {
 	                        sip->have.bookname = true ;
 	                        sip->final.bookname = true ;
-	                        sip->f.bookname = true ;
+	                        sip->fl.bookname = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            sip->f.bookname = (rs > 0) ;
+	                            sip->fl.bookname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1042,10 +1042,10 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    if (! sip->final.interactive) {
 	                        sip->have.interactive = true ;
 	                        sip->final.interactive = true ;
-	                        sip->f.interactive = true ;
+	                        sip->fl.interactive = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            sip->f.interactive = (rs > 0) ;
+	                            sip->fl.interactive = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1053,10 +1053,10 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    if (! sip->final.separate) {
 	                        sip->have.separate = true ;
 	                        sip->final.separate = true ;
-	                        sip->f.separate = true ;
+	                        sip->fl.separate = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            sip->f.separate = (rs > 0) ;
+	                            sip->fl.separate = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1065,10 +1065,10 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    if (! sip->final.defnull) {
 	                        sip->have.defnull = true ;
 	                        sip->final.defnull = true ;
-	                        sip->f.defnull = true ;
+	                        sip->fl.defnull = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            sip->f.defnull = (rs > 0) ;
+	                            sip->fl.defnull = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1076,10 +1076,10 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    if (! sip->final.para) {
 	                        sip->have.para = true ;
 	                        sip->final.para = true ;
-	                        sip->f.para = true ;
+	                        sip->fl.para = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            sip->f.para = (rs > 0) ;
+	                            sip->fl.para = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1087,10 +1087,10 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    if (! sip->final.gmt) {
 	                        sip->have.gmt = true ;
 	                        sip->final.gmt = true ;
-	                        sip->f.gmt = true ;
+	                        sip->fl.gmt = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            sip->f.gmt = (rs > 0) ;
+	                            sip->fl.gmt = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1098,10 +1098,10 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    if (! sip->final.allcache) {
 	                        sip->have.allcache = true ;
 	                        sip->final.allcache = true ;
-	                        sip->f.allcache = true ;
+	                        sip->fl.allcache = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            sip->f.allcache = (rs > 0) ;
+	                            sip->fl.allcache = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1137,10 +1137,10 @@ static int process(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
 	if (filer b ; (rs = filer_start(&b,fd,0z,512,0)) >= 0) {
 	    sip->ofp = &b ;
 
-	    if (sip->f.allcache) {
+	    if (sip->fl.allcache) {
 	        rs = procallcache(sip) ;
 	        wlen += rs ;
-	    } else if (sip->f.all) {
+	    } else if (sip->fl.all) {
 	        rs = procall(sip) ;
 	        wlen += rs ;
 	    } else {
@@ -1229,7 +1229,7 @@ static int procsome(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
 
 	} /* end if */
 
-	if ((rs >= 0) && (pan == 0) && sip->f.defnull) {
+	if ((rs >= 0) && (pan == 0) && sip->fl.defnull) {
 	    int		ndays = 1 ;
 
 	    if (sip->nitems > 1) ndays = sip->nitems ;
@@ -1249,7 +1249,7 @@ static int procspecs(SUBINFO *sip,cchar *sp,int sl) noex {
 
 	if (sp == nullptr) return SR_FAULT ;
 
-	if (sip->f.interactive) sip->cout = 0 ;
+	if (sip->fl.interactive) sip->cout = 0 ;
 
 	if (sl < 0) sl = strlen(sp) ;
 
@@ -1405,7 +1405,7 @@ static int procallcacheoutcite(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*fmt ;
-	if (sip->f.separate && (sip->cout++ > 0)) {
+	if (sip->fl.separate && (sip->cout++ > 0)) {
 	    fmt = OUTCOOKIE ;
 	    rs = filer_printf(sip->ofp,fmt) ;
 	    wlen += rs ;
@@ -1415,7 +1415,7 @@ static int procallcacheoutcite(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep) noex {
 	    cint	c = citep->c ;
 	    cint	v = citep->v ;
 	    cint	l = citep->l ;
-	    if (sip->f.bookname) {
+	    if (sip->fl.bookname) {
 	        cint	rsn = SR_NOTFOUND ;
 	        cint	nlen = BNBUFLEN ;
 	        char		nbuf[BNBUFLEN+1] ;
@@ -1570,7 +1570,7 @@ static int proctoday(SUBINFO *sip,int f_cite,int ndays) noex {
 	int		wlen = 0 ;
 
 	if ((rs = subinfo_today(sip)) >= 0) {
-	    cint	f_c = sip->f.trycache ;
+	    cint	f_c = sip->fl.trycache ;
 	    int		mjd = rs ;
 	    int		f_got = false ;
 	    if (f_c) {
@@ -1657,7 +1657,7 @@ static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
 	int		wlen = 0 ;
 	cchar		*fmt = nullptr ;
 
-	if (sip->f.separate && (sip->cout++ > 0)) {
+	if (sip->fl.separate && (sip->cout++ > 0)) {
 	    fmt = OUTCOOKIE ;
 	    rs = filer_printf(sip->ofp,fmt) ;
 	    wlen += rs ;
@@ -1673,7 +1673,7 @@ static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
 	    cchar	*fmt ;
 	    char	cbuf[COLBUFLEN + 1] ;
 
-	    if (sip->f.bookname && (vip->nbuf != nullptr)) {
+	    if (sip->fl.bookname && (vip->nbuf != nullptr)) {
 	        if (vip->nbuf[0] != '\0') {
 	            cint	nlen = vip->nlen ;
 	            cchar	*nbuf = vip->nbuf ;
@@ -1728,7 +1728,7 @@ static int procoutcite(SUBINFO *sip,bibleverse_q *qp,int ndays) noex {
 
 /* print out any necessary separator */
 
-	if (sip->f.separate && (sip->cout++ > 0)) {
+	if (sip->fl.separate && (sip->cout++ > 0)) {
 	    fmt = OUTCOOKIE ;
 	    rs = filer_printf(sip->ofp,fmt) ;
 	    wlen += rs ;
@@ -1742,7 +1742,7 @@ static int procoutcite(SUBINFO *sip,bibleverse_q *qp,int ndays) noex {
 	    int		v = qp->v ;
 	    int		f_havebook = false ;
 
-	    if (sip->f.bookname) {
+	    if (sip->fl.bookname) {
 	        cint	blen = BNBUFLEN ;
 	        int		bbl ;
 	        char		bbuf[BNBUFLEN + 1] ;
@@ -1796,7 +1796,7 @@ static int procoutverse(SUBINFO *sip,bibleverse_q *qp,cchar vp[],int vl) noex {
 
 	cbl = MIN((sip->linelen - sip->indent),clen) ;
 
-	if ((rs >= 0) && sip->f.para) {
+	if ((rs >= 0) && sip->fl.para) {
 	    rs = subinfo_ispara(sip,qp) ;
 	    f_p = (rs > 0) ;
 	}
@@ -1875,10 +1875,10 @@ static int subinfo_start(SUBINFO *sip,cchar **envv) noex {
 	sip->count = -1 ;
 	sip->max = -1 ;
 
-	sip->f.defnull = OPT_DEFnullptr ;
-	sip->f.separate = OPT_SEPARATE ;
-	sip->f.bookname = OPT_BOOKNAME ;
-	sip->f.trycache = OPT_TRYCACHE ;
+	sip->fl.defnull = OPT_DEFnullptr ;
+	sip->fl.separate = OPT_SEPARATE ;
+	sip->fl.bookname = OPT_BOOKNAME ;
+	sip->fl.trycache = OPT_TRYCACHE ;
 
 	return rs ;
 }
@@ -1933,7 +1933,7 @@ static int subinfo_setroot(SUBINFO *sip,cchar *pr,cchar *sn) noex {
 
 static int subinfo_outbegin(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-	if (sip->f.all || sip->f.allcache) {
+	if (sip->fl.all || sip->fl.allcache) {
 	    if ((rs = opentmp(nullptr,0,0)) >= 0) {
 	        sip->fd = rs ;
 	        sip->wfd = rs ;
@@ -1952,7 +1952,7 @@ static int subinfo_outbegin(SUBINFO *sip) noex {
 static int subinfo_outend(SUBINFO *sip,int ars) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (sip->f.all || sip->f.allcache) {
+	if (sip->fl.all || sip->fl.allcache) {
 	    rs = u_rewind(sip->fd) ;
 	} else {
 	    rs = u_close(sip->wfd) ;
@@ -2022,14 +2022,14 @@ static int subinfo_today(SUBINFO *sip) noex {
 	int		mjd = sip->mjd ;
 
 	if ((rs = subinfo_tmtime(sip)) >= 0) {
-	    if ((! sip->f.mjd) || ((sip->dt - sip->ti_mjd) >= to)) {
+	    if ((! sip->fl.mjd) || ((sip->dt - sip->ti_mjd) >= to)) {
 	        TMTIME	*tmp = &sip->tm ;
 	        int	yr ;
 	        sip->ti_mjd = sip->dt ;
 	        yr = (tmp->year + TM_YEAR_BASE) ;
 	        rs = getmjd(yr,tmp->mon,tmp->mday) ;
 	        mjd = rs ;
-	        sip->f.mjd = true ;
+	        sip->fl.mjd = true ;
 	        sip->mjd = mjd ;
 	    }
 	} /* end if (subinfo-tmtime) */
@@ -2069,15 +2069,15 @@ static int subinfo_tmtime(SUBINFO *sip) noex {
 	cint	to = TO_TMTIME ;
 	int		rs = SR_OK ;
 
-	if ((! sip->f.tmtime) || (sip->timecount++ >= tc)) {
+	if ((! sip->fl.tmtime) || (sip->timecount++ >= tc)) {
 	    if ((sip->dt == 0) || (sip->timecount == tc)) {
 	        sip->dt = time(nullptr) ;
 	    }
 	    sip->timecount = 0 ;
-	    if ((! sip->f.tmtime) || ((sip->dt - sip->ti_tmtime) >= to)) {
+	    if ((! sip->fl.tmtime) || ((sip->dt - sip->ti_tmtime) >= to)) {
 	        sip->ti_tmtime = sip->dt ;
-	        sip->f.tmtime = true ;
-	        if (sip->f.gmt) {
+	        sip->fl.tmtime = true ;
+	        if (sip->fl.gmt) {
 	            rs = tmtime_gmtime(&sip->tm,sip->dt) ;
 	        } else {
 	            rs = tmtime_localtime(&sip->tm,sip->dt) ;
@@ -2124,7 +2124,7 @@ static int subinfo_bvs(SUBINFO *sip) noex {
 	            sip->open.sdb = (rs >= 0) ;
 	        }
 	    }
-	    if ((rs >= 0) && sip->f.audit) {
+	    if ((rs >= 0) && sip->fl.audit) {
 	        rs = bvs_audit(bsp) ;
 	    } /* end if (audit) */
 	} /* end if (not open) */
@@ -2264,7 +2264,7 @@ static int subinfo_ispara(SUBINFO *sip,bibleverse_q *qp) noex {
 
 static int subinfo_vc(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-	if (sip->f.trycache && (! sip->open.vcache)) {
+	if (sip->fl.trycache && (! sip->open.vcache)) {
 	    rs = subinfo_vcbegin(sip) ;
 	}
 	return rs ;
@@ -2273,7 +2273,7 @@ static int subinfo_vc(SUBINFO *sip) noex {
 
 static int subinfo_vcbegin(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-	if (sip->f.trycache && (! sip->open.vcache)) {
+	if (sip->fl.trycache && (! sip->open.vcache)) {
 	    cint	of = O_CREAT ;
 	    cchar	*pr = sip->pr ;
 	    if ((rs = votdc_open(&sip->vcache,pr,nullptr,of)) >= 0) {
