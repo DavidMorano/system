@@ -266,7 +266,7 @@ char	*envv[] ;
 	                        break ;
 
 	                    case ARGOPT_VERBOSE:
-	                        pip->f.verbose = TRUE ;
+	                        pip->fl.verbose = TRUE ;
 	                        break ;
 
 /* help file */
@@ -331,7 +331,7 @@ char	*envv[] ;
 
 /* quiet mode */
 	                        case 'Q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* version */
@@ -341,7 +341,7 @@ char	*envv[] ;
 
 /* no operation (do not post) */
 	                        case 'n':
-	                            pip->f.no = TRUE ;
+	                            pip->fl.no = TRUE ;
 	                            break ;
 
 /* output file */
@@ -362,7 +362,7 @@ char	*envv[] ;
 
 /* verbose mode */
 	                        case 'v':
-	                            pip->f.verbose = TRUE ;
+	                            pip->fl.verbose = TRUE ;
 	                            break ;
 
 	                        case '?':
@@ -516,10 +516,10 @@ char	*envv[] ;
 
 	bufprintf(buf,BUFLEN,"%s/%s",pip->pr,LOGFNAME) ;
 
-	pip->f.log = FALSE ;
+	pip->fl.log = FALSE ;
 	if ((rs = logfile_open(&lh,buf,0,0666,u.logid)) >= 0) {
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -709,7 +709,7 @@ char	*envv[] ;
 
 	            if (rs < 0) {
 
-	                if (! pip->f.quiet)
+	                if (! pip->fl.quiet)
 	                    bprintf(pip->efp,
 				"%s: error processing file \"%s\"\n",
 	                        pip->progname,argv[i]) ;
@@ -735,7 +735,7 @@ char	*envv[] ;
 
 	    if (rs < 0) {
 
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            bprintf(pip->efp,"%s: error processing file \"%s\"\n",
 	                pip->progname,argv[i]) ;
 
@@ -751,7 +751,7 @@ char	*envv[] ;
 
 	bclose(ofp) ;
 
-	if ((pip->debuglevel > 0) || (! pip->f.quiet)) {
+	if ((pip->debuglevel > 0) || (! pip->fl.quiet)) {
 
 	    bprintf(efp,"%s: files processed %d, facts posted %d\n",
 	        pip->progname,pan,facts) ;
