@@ -418,7 +418,7 @@ cchar		mailfname[] ;
 
 	if (rs == SR_ACCESS) {
 
-	    if (pip->f.setuid) {
+	    if (pip->fl.setuid) {
 	        euid = geteuid() ;
 	        if (euid != pip->euid) {
 	            rs1 = u_seteuid(pip->euid) ;
@@ -432,7 +432,7 @@ cchar		mailfname[] ;
 	        }
 	    } /* end if (we have SUID) */
 
-	    if (pip->f.setgid) {
+	    if (pip->fl.setgid) {
 	        egid = getegid() ;
 	        if (egid != pip->egid) {
 	            rs1 = u_setegid(pip->egid) ;
@@ -514,7 +514,7 @@ int		uid_recip ;
 
 	if (rs == SR_ACCESS) {
 
-	    if (pip->f.setuid) {
+	    if (pip->fl.setuid) {
 	        euid = geteuid() ;
 	        if (euid != pip->euid) {
 	            rs1 = u_seteuid(pip->euid) ;
@@ -522,7 +522,7 @@ int		uid_recip ;
 	        }
 	    } /* end if (we have SUID) */
 
-	    if (pip->f.setgid) {
+	    if (pip->fl.setgid) {
 	        egid = getegid() ;
 	        if (egid != pip->egid) {
 	            rs1 = u_setegid(pip->egid) ;
@@ -576,7 +576,7 @@ static int mkboxdir(PROGINFO *pip,cchar boxdname[])
 	int		f_suid = FALSE ;
 	int		f_sgid = FALSE ;
 
-	if (pip->f.setuid) {
+	if (pip->fl.setuid) {
 	    euid = geteuid() ;
 	    if (euid != pip->uid) {
 	        rs1 = u_seteuid(pip->uid) ;
@@ -584,7 +584,7 @@ static int mkboxdir(PROGINFO *pip,cchar boxdname[])
 	    }
 	} /* end if (we have SUID) */
 
-	if (pip->f.setgid) {
+	if (pip->fl.setgid) {
 	    egid = getegid() ;
 	    if (egid != pip->gid) {
 	        rs1 = u_setegid(pip->gid) ;
