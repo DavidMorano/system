@@ -29,9 +29,7 @@
 	subtract the value "86400 * ((365 * 70) + 17)" to get the time in
 	seconds since Jan 1, 1970 (which is the UNIX epoch).
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -61,7 +59,6 @@
 #include	<vecobj.h>
 #include	<logsys.h>
 #include	<logfile.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -355,8 +352,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->to_open = -1 ;
 	pip->to_read = -1 ;
 
-	pip->f.logsys = TRUE ;
-	pip->f.logprog = TRUE ;
+	pip->fl.logsys = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 /* start parsing the arguments */
 
@@ -564,7 +561,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            rs = SR_INVALID ;
 	                    }
 	                    if ((rs >= 0) && (cp != NULL)) {
-	                        pip->f.lfname = TRUE ;
+	                        pip->fl.lfname = TRUE ;
 	                        lfname = cp ;
 	                    }
 	                    break ;
@@ -628,23 +625,23 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.quiet = (rs > 0) ;
+	                                pip->fl.quiet = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 	                    case 'a':
-	                        pip->f.all = TRUE ;
+	                        pip->fl.all = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.all = (rs > 0) ;
+	                                pip->fl.all = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -671,7 +668,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                lfname = argp ;
-	                                pip->f.lfname = TRUE ;
+	                                pip->fl.lfname = TRUE ;
 	                            }
 	                        } else
 	                            rs = SR_INVALID ;
@@ -692,7 +689,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'p':
-	                        pip->f.print = TRUE ;
+	                        pip->fl.print = TRUE ;
 	                        break ;
 
 /* actually set the time! */
@@ -896,7 +893,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                                    rs = process(pip,&r) ;
 	                                }
 	                            } else if ((c == 0) && (! f_settime)) {
-	                                if (! pip->f.quiet) {
+	                                if (! pip->fl.quiet) {
 	                                    fmt = "%s: no servers available\n" ;
 	                                    bprintf(pip->efp,fmt,pn) ;
 	                                }
@@ -1124,22 +1121,22 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_test:
 	                    if (! pip->final.test) {
 	                        pip->have.test = TRUE ;
-	                        pip->f.test = TRUE ;
+	                        pip->fl.test = TRUE ;
 	                        pip->final.test = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.test = (rs > 0) ;
+	                            pip->fl.test = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case akoname_logsys:
 	                    if (! pip->final.logsys) {
 	                        pip->have.logsys = TRUE ;
-	                        pip->f.logsys = TRUE ;
+	                        pip->fl.logsys = TRUE ;
 	                        pip->final.logsys = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.logsys = (rs > 0) ;
+	                            pip->fl.logsys = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1147,11 +1144,11 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.lfname) {
 	                        pip->have.lfname = TRUE ;
 	                        pip->final.lfname = TRUE ;
-	                        pip->f.lfname = TRUE ;
+	                        pip->fl.lfname = TRUE ;
 	                        if (vl > 0) {
 	                            rs1 = optbool(vp,vl) ;
 	                            if (rs1 >= 0) {
-	                                pip->f.lfname = (rs1 > 0) ;
+	                                pip->fl.lfname = (rs1 > 0) ;
 	                            } else if (rs1 == SR_INVALID) {
 	                                cchar	**vpp = &pip->lfname ;
 	                                rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -1202,13 +1199,13 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,vecobj *rp,cchar *afn)
 	            }
 	        }
 
-	        if ((! pip->f.all) && (c > 0)) break ;
+	        if ((! pip->fl.all) && (c > 0)) break ;
 	        if (rs < 0) break ;
 	    } /* end for */
 	} /* end if (ok) */
 
 	if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
-	    if (pip->f.all || (c == 0)) {
+	    if (pip->fl.all || (c == 0)) {
 	        bfile	afile, *afp = &afile ;
 
 	        if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
@@ -1232,14 +1229,14 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,vecobj *rp,cchar *afn)
 	                    }
 	                }
 
-	                if ((! pip->f.all) && (c > 0)) break ;
+	                if ((! pip->fl.all) && (c > 0)) break ;
 	                if (rs < 0) break ;
 	            } /* end while (reading lines) */
 
 	            rs1 = bclose(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                cchar	*pn = pip->progname ;
 	                cchar	*fmt ;
 	                fmt = "%s: inaccessible argument-list (%d)\n" ;
@@ -1316,7 +1313,7 @@ static int procuserinfo_end(PROGINFO *pip)
 static int proclogsys_begin(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
-	if (pip->f.logsys) {
+	if (pip->fl.logsys) {
 	    const int	fac = LOG_DAEMON ;
 	    int		lo = 0 ;
 	    cchar	*logid = pip->logid ;
@@ -1400,7 +1397,7 @@ static int procserver(PROGINFO *pip,vecobj *rlp,cchar *np,int nl)
 	            pip->progname,rs1) ;
 	    }
 
-	    if ((rs >= 0) && pip->f.print) {
+	    if ((rs >= 0) && pip->fl.print) {
 
 	        moff = 0 ;
 	        timebuf[0] = '-' ;
