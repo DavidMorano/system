@@ -123,7 +123,7 @@ cchar	fname[] ;
 	if (DEBUGLEVEL(2)) {
 	    debugprintf("progfile: fname=%s\n",fname) ;
 	    debugprintf("progfile: progmode=%u\n",pip->progmode) ;
-	    debugprintf("progfile: suffix=%u\n",pip->f.suffix) ;
+	    debugprintf("progfile: suffix=%u\n",pip->fl.suffix) ;
 	}
 #endif /* CF_DEBUG */
 
@@ -132,7 +132,7 @@ cchar	fname[] ;
 /* check if this file has the correct file-suffix */
 
 	f_skipfile = FALSE ;
-	if (pip->f.suffix) {
+	if (pip->fl.suffix) {
 
 	    bnl = sfbasename(fname,-1,&bnp) ;
 
@@ -242,11 +242,11 @@ cchar	fname[] ;
 
 
 	memset(&ec,0,sizeof(struct echars)) ;
-	ec.latin = pip->f.latin ;
-	ec.ff = pip->f.formfeed ;
-	ec.cr = pip->f.carriage ;
-	ec.bell = pip->f.bell ;
-	ec.bs = pip->f.backspace ;
+	ec.latin = pip->fl.latin ;
+	ec.ff = pip->fl.formfeed ;
+	ec.cr = pip->fl.carriage ;
+	ec.bell = pip->fl.bell ;
+	ec.bs = pip->fl.backspace ;
 
 	if ((fname[0] != '\0') && (fname[0] != '-'))
 	    rs = bopen(cfp,fname,"r",0666) ;
