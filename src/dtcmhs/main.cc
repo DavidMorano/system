@@ -480,7 +480,7 @@ char	*envv[] ;
 	                        break ;
 
 	                    case 'd':
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        pip->runint = -1 ;
 	                        if (f_optequal) {
 
@@ -555,7 +555,7 @@ char	*envv[] ;
 
 /* quiet mode */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* verbose mode */
@@ -731,7 +731,7 @@ char	*envv[] ;
 
 	if (rs >= 0) {
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 
 /* we opened it, maintenance this log file if we have to */
 
@@ -765,7 +765,7 @@ char	*envv[] ;
 	if ((portspec == NULL) || (portspec[0] == '\0'))
 	    portspec = SVCSPEC_DTCMHAVE ;
 
-	if (pip->f.log) {
+	if (pip->fl.log) {
 	    logfile_printf(&pip->lh,"port=%s\n",portspec) ;
 	    if ((pip->maxidle >= 0) && (pip->maxidle != INT_MAX)) {
 	        logfile_printf(&pip->lh,"maxidle=%u\n",pip->maxidle) ;
@@ -783,7 +783,7 @@ char	*envv[] ;
 /* should we go into daemon mode? */
 
 	fd_msg = FD_STDIN ;
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 	    uint	port ;
 	    char	*hostname, *portname ;
 
@@ -892,7 +892,7 @@ char	*envv[] ;
 	    const int	msglen = MSGBUFLEN ;
 	    char	msgbuf[MSGBUFLEN + 1] ;
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_flush(&pip->lh) ;
 
 	    mflags = 0 ;
@@ -974,7 +974,7 @@ char	*envv[] ;
 /* we are done */
 done:
 ret2:
-	if (pip->f.log) {
+	if (pip->fl.log) {
 	    if (rs == SR_TIMEDOUT) {
 	        logfile_printf(&pip->lh,"%s exiting on work timeout",
 	            timestr_logz(pip->daytime,timebuf)) ;
