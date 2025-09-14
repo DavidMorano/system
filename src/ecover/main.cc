@@ -294,7 +294,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	pip->verboselevel = 1 ;
 	pip->daytime = time(nullptr) ;
-	pip->f.logprog = true ;
+	pip->fl.logprog = true ;
 
 	pip->lip = &li ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -559,13 +559,13 @@ int main(int argc,cchar **argv,cchar **envv)
 /* unscramble */
 	                    case 'u':
 	                    case 'd':
-	                        pip->f.unscramble = true ;
+	                        pip->fl.unscramble = true ;
 	                        break ;
 
 /* scramble */
 	                    case 's':
 	                    case 'e':
-	                        pip->f.unscramble = false ;
+	                        pip->fl.unscramble = false ;
 	                        break ;
 
 /* job-ID */
@@ -730,7 +730,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	if (pip->debuglevel > 0) {
 	    bprintf(pip->efp,"%s: mode=%s\n", pip->progname,
-	        ((pip->f.unscramble) ? "decode" : "encode")) ;
+	        ((pip->fl.unscramble) ? "decode" : "encode")) ;
 	}
 
 	for (ai = 1 ; ai < argc ; ai += 1) {
@@ -929,10 +929,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.audit) {
 	                        lip->have.audit = true ;
 	                        lip->final.audit = true ;
-	                        lip->f.audit = true ;
+	                        lip->fl.audit = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.audit = (rs > 0) ;
+	                            lip->fl.audit = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -981,7 +981,7 @@ static int process(PROGINFO *pip,cchar *ofn,cchar *ifn)
 	            ECMSG	*emp = &lip->extra ;
 	            FILEINFO	fi ; /* result data */
 	            cint	ifd = rs ;
-	            if (pip->f.unscramble) {
+	            if (pip->fl.unscramble) {
 	                rs = decode(pip,&rv,&fi,emp,ifd,ofd) ;
 	            } else {
 	                if (pip->msgfname != nullptr) {
@@ -997,7 +997,7 @@ static int process(PROGINFO *pip,cchar *ofn,cchar *ifn)
 	            } else {
 	                fmt = "mode=%c cksum=\\x%08x (%u)" ;
 	                logfile_printf(&pip->lh,fmt,
-	                    ((pip->f.unscramble) ? 'u' : 's'),
+	                    ((pip->fl.unscramble) ? 'u' : 's'),
 	                    fi.cksum,fi.cksum) ;
 	            }
 	            rs1 = procinput_end(pip,ifd) ;
@@ -1104,8 +1104,8 @@ static int procout_begin(PROGINFO *pip,cchar *ofn)
 static int procout_end(PROGINFO *pip,int ofd)
 {
 	int		rs = SR_OK ;
-	if (pip->f.outfile && (ofd >= 0)) {
-	    pip->f.outfile = false ;
+	if (pip->fl.outfile && (ofd >= 0)) {
+	    pip->fl.outfile = false ;
 	    rs = u_close(ofd) ;
 	}
 	return rs ;
@@ -1120,7 +1120,7 @@ static int procinput_begin(PROGINFO *pip,cchar *ifn)
 	if ((ifn != nullptr) && (ifn[0] != '\0') && (ifn[0] != '-')) {
 	    cint	of = O_RDONLY ;
 	    if ((rs = uc_open(ifn,of,0666)) >= 0) {
-	        pip->f.infile = true ;
+	        pip->fl.infile = true ;
 	        ifd = rs ;
 	    }
 	}
@@ -1132,8 +1132,8 @@ static int procinput_begin(PROGINFO *pip,cchar *ifn)
 static int procinput_end(PROGINFO *pip,int ifd)
 {
 	int		rs = SR_OK ;
-	if (pip->f.infile && (ifd >= 0)) {
-	    pip->f.infile = false ;
+	if (pip->fl.infile && (ifd >= 0)) {
+	    pip->fl.infile = false ;
 	    rs = u_close(ifd) ;
 	}
 	return rs ;
@@ -1148,14 +1148,14 @@ static int procereport(PROGINFO *pip,FILEINFO *fip,int prs)
 	cchar		*fmt ;
 
 	proglog_printf(pip,"mode=%c",
-	    ((pip->f.unscramble) ? 'd' : 'e')) ;
+	    ((pip->fl.unscramble) ? 'd' : 'e')) ;
 
 	fmt = "sent cksum=\\x%08x (%u)" ;
 	proglog_printf(pip,fmt,fip->cksum,fip->cksum) ;
 
 	proglog_printf(pip,"failed (%d)",prs) ;
 
-	if ((pip->debuglevel > 0) || (! pip->f.quiet)) {
+	if ((pip->debuglevel > 0) || (! pip->fl.quiet)) {
 	    fmt = "%s: failed (%d)\n" ;
 	    bprintf(pip->efp,fmt,pn,prs) ;
 	}
