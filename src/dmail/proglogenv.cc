@@ -95,7 +95,7 @@ extern int	strlinelen(const char *,int,int) ;
 int proglogenv_begin(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
-	if (pip->f.optlogenv) {
+	if (pip->fl.optlogenv) {
 	    const int	nlen = MAXNAMELEN ;
 	    const char	*efn = LOGENVFNAME ;
 	    char	nbuf[MAXNAMELEN+1] ;
