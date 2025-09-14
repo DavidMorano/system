@@ -1,16 +1,17 @@
-/* tcpmux */
+/* tcpmux SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SYSDIALER "tcpmux" dialer module */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-        This was created as one of the first dialer modules for the SYSDIALER
-        object.
+	This was created as one of the first dialer modules for the
+	SYSDIALER object.
 
 */
 
@@ -18,35 +19,29 @@
 
 /*******************************************************************************
 
+  	Name:
+	tcpmux
+
+	Description:
 	This is a SYSDIALER module.
 
 	Synopsis:
-
 	tcpmux [[<host>:]<port>] [-f <af>]
 
 	Arguments:
-
 	+ host		override hostname
 	+ port		service port
 	+ af		address family
 
-
 *******************************************************************************/
 
-
-#define	TCPMUX_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<localmisc.h>
