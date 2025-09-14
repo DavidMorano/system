@@ -292,7 +292,7 @@ MAILFILES	*mfp ;
 	        f_displaying = FALSE ;
 	        f_blank = TRUE ;
 	        f_changed = TRUE ;
-		if (pip->f.log) {
+		if (pip->fl.log) {
 
 	        logfile_printf(&pip->lh,"%s idle from %s",
 	            timestr_logz(daytime,timebuf),
@@ -312,7 +312,7 @@ MAILFILES	*mfp ;
 
 	        f_changed = TRUE ;
 	        f_displaying = TRUE ;
-		if (pip->f.log) {
+		if (pip->fl.log) {
 
 	        logfile_printf(&pip->lh,"%s active",
 	            timestr_logz(daytime,timebuf)) ;
@@ -326,7 +326,7 @@ MAILFILES	*mfp ;
 
 	    }
 
-	    if (f_changed && pip->f.log)
+	    if (f_changed && pip->fl.log)
 	        logfile_flush(&pip->lh) ;
 
 	    if (state == S_MAILDONE)
@@ -358,7 +358,7 @@ MAILFILES	*mfp ;
 
 /* lock file checks */
 
-	    if (pip->f.lockfile || pip->f.pidfile) {
+	    if (pip->fl.lockfile || pip->fl.pidfile) {
 
 	        if (daytime > (ti_checklocks + (pip->to_lock / 2))) {
 
@@ -367,7 +367,7 @@ MAILFILES	*mfp ;
 
 	            ti_checklocks = daytime ;
 
-	            if (pip->f.lockfile) {
+	            if (pip->fl.lockfile) {
 
 	                rs = lfm_check(&pip->lk,&ci,daytime) ;
 
@@ -377,7 +377,7 @@ MAILFILES	*mfp ;
 	                        "%s: detected a lock conflict PID=%u\n",
 	                        pip->progname,(int) ci.pid) ;
 
-			    if (pip->f.log)
+			    if (pip->fl.log)
 	                    logfile_printf(&pip->lh,
 	                        "detected a lock conflict PID=%u\n",
 	                        (int) ci.pid) ;
@@ -387,7 +387,7 @@ MAILFILES	*mfp ;
 
 	            } /* end if (lockfile) */
 
-	            if (pip->f.pidfile) {
+	            if (pip->fl.pidfile) {
 
 	                rs = lfm_check(&pip->pidlock,&ci,daytime) ;
 
@@ -397,7 +397,7 @@ MAILFILES	*mfp ;
 	                        "%s: detected a PID lock conflict PID=%u\n",
 	                        pip->progname,(int) ci.pid) ;
 
-			    if (pip->f.log)
+			    if (pip->fl.log)
 	                    logfile_printf(&pip->lh,
 	                        "detected a PID lock conflict PID=%u\n",
 	                        (int) ci.pid) ;
@@ -468,7 +468,7 @@ MAILFILES	*mfp ;
 
 /* logfile check */
 
-	    if (pip->f.log) {
+	    if (pip->fl.log) {
 
 	    if ((tic % 10) == 0)
 	        logfile_check(&pip->lh,daytime) ;
@@ -534,7 +534,7 @@ badstat:
 	    i += bufprintf((buf + i),BUFLEN," rs=%d\n",rs) ;
 #endif
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_printf(&pip->lh,buf) ;
 
 	    if (f_orphaned)
@@ -544,7 +544,7 @@ badstat:
 
 	} else {
 
-	    if (pip->f.log) {
+	    if (pip->fl.log) {
 
 		if (rs == SR_IO) {
 	            logfile_printf(&pip->lh,
