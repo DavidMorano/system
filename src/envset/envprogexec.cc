@@ -107,7 +107,7 @@ struct intprog {
 int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 	BUFFER		b ;
 	vecstr		*elp = &pip->exports ;
-	cint	f_shell = pip->f.shell ;
+	cint	f_shell = pip->fl.shell ;
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	int		ai = 0 ;
@@ -132,8 +132,8 @@ int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("progexec: progfname=%s\n",progfname) ;
-	    debugprintf("progexec: f_shell=%u\n",pip->f.shell) ;
-	    debugprintf("progexec: f_progdash=%u\n",pip->f.progdash) ;
+	    debugprintf("progexec: f_shell=%u\n",pip->fl.shell) ;
+	    debugprintf("progexec: f_progdash=%u\n",pip->fl.progdash) ;
 	    debugprintf("progexec: argr=%d\n",argr) ;
 	    for (i = 0 ; argv[i] != NULL ; i += 1)
 	        debugprintf("progexec: arg[%u]=>%s<\n",i,argv[i]) ;
@@ -159,7 +159,7 @@ int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 /* should we prefix the minus thing? */
 
 	        f_m = FALSE ;
-	        f_m = f_m || pip->f.progdash ;
+	        f_m = f_m || pip->fl.progdash ;
 
 /* setup the zeroth argument */
 
