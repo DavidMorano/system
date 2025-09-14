@@ -296,7 +296,7 @@ char	*envv[] ;
 	pip->progmode = -1 ;
 	pip->ageint = -1 ;
 
-	pip->f.latin = TRUE ;
+	pip->fl.latin = TRUE ;
 
 /* process program arguments */
 
@@ -550,7 +550,7 @@ char	*envv[] ;
 
 /* follow symbolic links */
 	                case argopt_follow:
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    break ;
 
 /* default action and user specified help */
@@ -579,7 +579,7 @@ char	*envv[] ;
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -588,7 +588,7 @@ char	*envv[] ;
 
 /* follow symbolic links */
 	                    case 'f':
-	                        pip->f.follow = TRUE ;
+	                        pip->fl.follow = TRUE ;
 	                        break ;
 
 /* file name length restriction */
@@ -616,7 +616,7 @@ char	*envv[] ;
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* options */
@@ -638,12 +638,12 @@ char	*envv[] ;
 
 /* recurse down directories */
 	                    case 'r':
-	                        pip->f.recurse = TRUE ;
+	                        pip->fl.recurse = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 				    if (avl) {
 	                                rs = optbool(avp,avl) ;
-				        pip->f.recurse = (rs > 0) ;
+				        pip->fl.recurse = (rs > 0) ;
 				    }
 	                        }
 	                        break ;
@@ -830,15 +830,15 @@ char	*envv[] ;
 
 	if (pip->debuglevel > 0) {
 	    bprintf(pip->efp,"%s: allow latin=%u\n",
-		pip->progname,pip->f.latin) ;
+		pip->progname,pip->fl.latin) ;
 	    bprintf(pip->efp,"%s: allow ff=%u\n",
-		pip->progname,pip->f.formfeed) ;
+		pip->progname,pip->fl.formfeed) ;
 	    bprintf(pip->efp,"%s: allow cr=%u\n",
-		pip->progname,pip->f.carriage) ;
+		pip->progname,pip->fl.carriage) ;
 	    bprintf(pip->efp,"%s: allow bell=%u\n",
-		pip->progname,pip->f.bell) ;
+		pip->progname,pip->fl.bell) ;
 	    bprintf(pip->efp,"%s: allow bs=%u\n",
-		pip->progname,pip->f.backspace) ;
+		pip->progname,pip->fl.backspace) ;
 	} /* end if */
 
 /* check a few more things */
@@ -889,7 +889,7 @@ char	*envv[] ;
 
 		if (vp == NULL) continue ;
 
-	        pip->f.suffix = TRUE ;
+	        pip->fl.suffix = TRUE ;
 		rs = vecstr_add(&pip->suffixes,vp,vl) ;
 
 #if	CF_DEBUG
@@ -931,15 +931,15 @@ char	*envv[] ;
 	            switch (kwi) {
 
 	            case progopt_follow:
-	                pip->f.follow = TRUE ;
+	                pip->fl.follow = TRUE ;
 	                break ;
 
 	            case progopt_nofollow:
-	                pip->f.follow = FALSE ;
+	                pip->fl.follow = FALSE ;
 	                break ;
 
 	            case progopt_nostop:
-	                pip->f.nostop = TRUE ;
+	                pip->fl.nostop = TRUE ;
 	                break ;
 
 	            } /* end switch */
@@ -1041,7 +1041,7 @@ char	*envv[] ;
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file (%d)\n",
 	                pip->progname,rs) ;
@@ -1227,9 +1227,9 @@ KEYOPT		*kop ;
 		    if (! lip->have.header) {
 
 	            lip->have.header = TRUE ;
-	            lip->f.header = TRUE ;
+	            lip->fl.header = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                lip->f.header = (uv > 0) ? 1 : 0 ;
+	                lip->fl.header = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1239,9 +1239,9 @@ KEYOPT		*kop ;
 		    if (! lip->have.fmtlong) {
 
 	            lip->have.fmtlong = TRUE ;
-	            lip->f.fmtlong = TRUE ;
+	            lip->fl.fmtlong = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                lip->f.fmtlong = (uv > 0) ? 1 : 0 ;
+	                lip->fl.fmtlong = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1251,9 +1251,9 @@ KEYOPT		*kop ;
 		    if (! lip->have.fmtshort) {
 
 	            lip->have.fmtshort = TRUE ;
-	            lip->f.fmtshort = TRUE ;
+	            lip->fl.fmtshort = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                lip->f.fmtshort = (uv > 0) ? 1 : 0 ;
+	                lip->fl.fmtshort = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1263,9 +1263,9 @@ KEYOPT		*kop ;
 		    if (! lip->have.uniq) {
 
 	            lip->have.uniq = TRUE ;
-	            lip->f.uniq = TRUE ;
+	            lip->fl.uniq = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                lip->f.uniq = (uv > 0) ? 1 : 0 ;
+	                lip->fl.uniq = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1275,9 +1275,9 @@ KEYOPT		*kop ;
 		    if (! lip->have.users) {
 
 	            lip->have.users = TRUE ;
-	            lip->f.users = TRUE ;
+	            lip->fl.users = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                lip->f.users = (uv > 0) ? 1 : 0 ;
+	                lip->fl.users = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1287,9 +1287,9 @@ KEYOPT		*kop ;
 		    if (! pip->have.latin) {
 
 	            pip->have.latin = TRUE ;
-	            pip->f.latin = TRUE ;
+	            pip->fl.latin = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                pip->f.latin = (uv > 0) ? 1 : 0 ;
+	                pip->fl.latin = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1300,9 +1300,9 @@ KEYOPT		*kop ;
 		    if (! pip->have.formfeed) {
 
 	            pip->have.formfeed = TRUE ;
-	            pip->f.formfeed = TRUE ;
+	            pip->fl.formfeed = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                pip->f.formfeed = (uv > 0) ? 1 : 0 ;
+	                pip->fl.formfeed = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1313,9 +1313,9 @@ KEYOPT		*kop ;
 		    if (! pip->have.carriage) {
 
 	            pip->have.carriage = TRUE ;
-	            pip->f.carriage = TRUE ;
+	            pip->fl.carriage = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                pip->f.carriage = (uv > 0) ? 1 : 0 ;
+	                pip->fl.carriage = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1325,9 +1325,9 @@ KEYOPT		*kop ;
 		    if (! pip->have.bell) {
 
 	            pip->have.bell = TRUE ;
-	            pip->f.bell = TRUE ;
+	            pip->fl.bell = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                pip->f.bell = (uv > 0) ? 1 : 0 ;
+	                pip->fl.bell = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1338,9 +1338,9 @@ KEYOPT		*kop ;
 		    if (! pip->have.backspace) {
 
 	            pip->have.backspace = TRUE ;
-	            pip->f.backspace = TRUE ;
+	            pip->fl.backspace = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                pip->f.backspace = (uv > 0) ? 1 : 0 ;
+	                pip->fl.backspace = (uv > 0) ? 1 : 0 ;
 
 		    }
 
