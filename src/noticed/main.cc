@@ -322,18 +322,18 @@ char	*argv[], *envv[] ;
 
 	(void) memset(pip,0,sizeof(struct proginfo)) ;
 
-	pip->f.fd_stdout = TRUE ;
+	pip->fl.fd_stdout = TRUE ;
 	if (u_fstat(FD_STDOUT,&sb) < 0) {
 
-	    pip->f.fd_stdout = FALSE ;
+	    pip->fl.fd_stdout = FALSE ;
 	    (void) u_open("/dev/null",O_WRONLY,0666) ;
 
 	}
 
-	pip->f.fd_stderr = TRUE ;
+	pip->fl.fd_stderr = TRUE ;
 	if (bopen(efp,BFILE_STDERR,"dwca",0666) < 0) {
 
-	    pip->f.fd_stderr = FALSE ;
+	    pip->fl.fd_stderr = FALSE ;
 	    (void) u_open("/dev/null",O_WRONLY,0666) ;
 
 	} else
@@ -353,12 +353,12 @@ char	*argv[], *envv[] ;
 
 /* initialize */
 
-	pip->f.quiet = FALSE ;
-	pip->f.verbose = FALSE ;
-	pip->f.log = FALSE ;
-	pip->f.slog = FALSE ;
-	pip->f.daemon = FALSE ;
-	pip->f.acctab = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.verbose = FALSE ;
+	pip->fl.log = FALSE ;
+	pip->fl.slog = FALSE ;
+	pip->fl.daemon = FALSE ;
+	pip->fl.acctab = FALSE ;
 
 	pip->debuglevel = 0 ;
 	pip->marktime = -1 ;
@@ -481,7 +481,7 @@ char	*argv[], *envv[] ;
 
 /* verbose mode */
 	                    case ARGOPT_VERBOSE:
-	                        pip->f.verbose = TRUE ;
+	                        pip->fl.verbose = TRUE ;
 	                        break ;
 
 /* program root */
@@ -644,7 +644,7 @@ char	*argv[], *envv[] ;
 
 /* daemon mode */
 	                        case 'd':
-	                            pip->f.daemon = TRUE ;
+	                            pip->fl.daemon = TRUE ;
 	                            break ;
 
 /* TCP port to listen on */
@@ -663,7 +663,7 @@ char	*argv[], *envv[] ;
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* reuse the bind addresses */
@@ -673,7 +673,7 @@ char	*argv[], *envv[] ;
 
 /* verbose mode */
 	                        case 'v':
-	                            pip->f.verbose = TRUE ;
+	                            pip->fl.verbose = TRUE ;
 	                            break ;
 
 	                        case '?':
@@ -1154,7 +1154,7 @@ char	*argv[], *envv[] ;
 	    } /* end if (config file working directory) */
 
 
-	    if (pip->f.daemon && (cf.pidfname != NULL) && 
+	    if (pip->fl.daemon && (cf.pidfname != NULL) && 
 	        (pidfname[0] == '\0')) {
 
 #if	CF_DEBUG
@@ -1703,7 +1703,7 @@ char	*argv[], *envv[] ;
 	    debugprintf("main: 0 pidfname=%s\n",pidfname) ;
 #endif
 
-	if (pip->f.daemon && (pidfname[0] != '\0')) {
+	if (pip->fl.daemon && (pidfname[0] != '\0')) {
 
 	    if (pidfname[0] == '-')
 	        strcpy(pidfname,PIDFNAME) ;
@@ -1816,10 +1816,10 @@ char	*argv[], *envv[] ;
 /* open the system report log file */
 
 #ifdef	COMMENT
-	pip->f.slog = FALSE ;
+	pip->fl.slog = FALSE ;
 	if ((rs = bopen(pip->lfp,logfname,"wca",0664)) >= 0) {
 
-	    pip->f.slog = TRUE ;
+	    pip->fl.slog = TRUE ;
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -1906,14 +1906,14 @@ char	*argv[], *envv[] ;
 	    struct utsname	un ;
 
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
 	        debugprintf("main: we opened a logfile\n") ;
 #endif
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 	    if (pip->debuglevel > 0)
 	        bprintf(efp,"%s: logfile=%s\n",pip->progname,logfname) ;
 
@@ -1936,7 +1936,7 @@ char	*argv[], *envv[] ;
 	        debugprintf("main: making log entry\n") ;
 #endif
 
-	    if (pip->f.daemon) {
+	    if (pip->fl.daemon) {
 
 	        logfile_printf(&pip->lh,"%s %s %s\n",
 	            timestr_log(daytime,timebuf),
@@ -2158,7 +2158,7 @@ char	*argv[], *envv[] ;
 	    debugprintf("main: about to check if we are a daemon\n") ;
 #endif
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    in_addr_t	addr ;
 
@@ -2297,7 +2297,7 @@ char	*argv[], *envv[] ;
 
 /* before we go too far, are we the only one on this PID mutex ? */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -2503,7 +2503,7 @@ char	*argv[], *envv[] ;
 	    debugprintf("main: 1 rs=%d accfname=%s\n",rs,accfname) ;
 #endif
 
-	pip->f.acctab = FALSE ;
+	pip->fl.acctab = FALSE ;
 	if ((rs >= 0) || (perm(accfname,-1,-1,NULL,R_OK) >= 0)) {
 
 	    if (pip->debuglevel > 0)
@@ -2522,12 +2522,12 @@ char	*argv[], *envv[] ;
 	            pip->progname,rs) ;
 
 	    } else
-	        pip->f.acctab = TRUE ;
+	        pip->fl.acctab = TRUE ;
 
 	} /* end if (accessing a 'acctab' file) */
 
 #if	CF_DEBUG
-	if ((pip->debuglevel > 1) && pip->f.acctab) {
+	if ((pip->debuglevel > 1) && pip->fl.acctab) {
 		ACCTAB_CUR	ac ;
 		ACCTAB_ENT	*ep ;
 		debugprintf("main: netgroup machine user password\n") ;
@@ -2596,7 +2596,7 @@ char	*argv[], *envv[] ;
 
 /* we are done initializing */
 
-	if (pip->f.daemon && (userbuf[0] != '\0')) {
+	if (pip->fl.daemon && (userbuf[0] != '\0')) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -2656,7 +2656,7 @@ daemonret2:
 	    debugprintf("main: freeing acctab \n") ;
 #endif
 
-	if (pip->f.acctab)
+	if (pip->fl.acctab)
 	    (void) acctab_close(&atab) ;
 
 #if	CF_DEBUG
@@ -2704,11 +2704,11 @@ ret4:
 	    debugprintf("main: freeing logfile \n") ;
 #endif
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_close(&pip->lh) ;
 
 ret3:
-	if (pip->f.slog)
+	if (pip->fl.slog)
 	    bclose(pip->lfp) ;
 
 ret2:
@@ -2810,7 +2810,7 @@ badpidopen:
 
 badpidlock:
 	ex = EX_MUTEX ;
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 
 	    bprintf(efp,
 	        "%s: could not lock the PID file (rs=%d)\n",
