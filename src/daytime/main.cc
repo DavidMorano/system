@@ -64,7 +64,6 @@
 #include	<logfile.h>
 #include	<opendial.h>
 #include	<dialopts.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -511,7 +510,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* log file */
 	                case argopt_log:
-	                    pip->f.logprog = TRUE ;
+	                    pip->fl.logprog = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
@@ -526,7 +525,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    break ;
 
 	                case argopt_dgram:
-	                    lip->f.dgram = TRUE ;
+	                    lip->fl.dgram = TRUE ;
 	                    break ;
 
 	                case argopt_dialer:
@@ -718,7 +717,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* service name */
@@ -761,12 +760,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	                    case 'x':
 	                        lip->final.anyformat = TRUE ;
-	                        lip->f.anyformat = TRUE ;
+	                        lip->fl.anyformat = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.anyformat = (rs > 0) ;
+	                                lip->fl.anyformat = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1137,10 +1136,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.geekout) {
 	                        lip->have.geekout = TRUE ;
 	                        lip->final.geekout = TRUE ;
-	                        lip->f.geekout = TRUE ;
+	                        lip->fl.geekout = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.geekout = (rs > 0) ;
+	                            lip->fl.geekout = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1261,7 +1260,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,VECSTR *nlp,cchar *afn)
 	        rs1 = bclose(afp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            cchar	*pn = pip->progname ;
 	            cchar	*fmt ;
 	            fmt = "%s: inaccessible argument-list (%d)\n" ;
@@ -1394,7 +1393,7 @@ const char	svc[] ;
 
 	    if (rs >= 0) {
 
-	        if (! lip->f.anyformat) {
+	        if (! lip->fl.anyformat) {
 	            const int	ropts = FM_TIMED ;
 	            int		llen ;
 	            char	*bp ;
@@ -1448,7 +1447,7 @@ const char	svc[] ;
 	                    "rs=%4d                  %s\n",
 	                    rs,name) ;
 
-	            if ((rs < 0) && lip->f.geekout) rs = SR_OK ;
+	            if ((rs < 0) && lip->fl.geekout) rs = SR_OK ;
 
 	        } else
 	            rs = anyformat(ofp,s,to) ;
@@ -1499,7 +1498,7 @@ static int server(PROGINFO *pip)
 	            const int 		size = NIOVECS * sizeof(struct iovec) ;
 
 	            if (optl == sizeof(int)) {
-	                if (optv == SOCK_DGRAM) lip->f.dgram = TRUE ;
+	                if (optv == SOCK_DGRAM) lip->fl.dgram = TRUE ;
 	            } /* end if (get socket option) */
 
 	            memset(&vecs,0,size) ;
@@ -1512,7 +1511,7 @@ static int server(PROGINFO *pip)
 	            msg.msg_iov = vecs ;
 	            msg.msg_iovlen = NIOVECS ;
 
-	            if (lip->f.dgram) {
+	            if (lip->fl.dgram) {
 	                fd_portal = FD_STDIN ;
 	                msg.msg_namelen = sizeof(SOCKADDRESS) ;
 	                vecs[0].iov_len = (NISTINFO_BUFLEN+1) ;
@@ -1527,7 +1526,7 @@ static int server(PROGINFO *pip)
 	                cp = timestr_nist(pip->daytime,&nist,ntbuf) ;
 	                cl = strlen(ntbuf) ;
 	                ntbuf[cl++] = '\n' ;
-	                if (lip->f.dgram) {
+	                if (lip->fl.dgram) {
 	                    vecs[0].iov_len = cl ;
 	                    rs = u_sendmsg(fd_portal,&msg,0) ;
 	                } else {
