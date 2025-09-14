@@ -125,7 +125,7 @@ cchar	fname[] ;
 
 	f_link = S_ISLNK(sb.st_mode) ;
 	f_dir = S_ISDIR(sb.st_mode) ;
-	if ((rs >= 0) && f_link && pip->f.follow) {
+	if ((rs >= 0) && f_link && pip->fl.follow) {
 
 	    rs1 = u_stat(fname,&sb) ;
 	    if (rs1 >= 0)
@@ -136,7 +136,7 @@ cchar	fname[] ;
 	rs = u_stat(fname,&sb) ;
 
 	f_dir = S_ISDIR(sb.st_mode) ;
-	if ((rs >= 0) && f_dir && (! pip->f.follow)) {
+	if ((rs >= 0) && f_dir && (! pip->fl.follow)) {
 
 	    rs = u_lstat(fname,&sb) ;
 
@@ -185,7 +185,7 @@ cchar	fname[] ;
 	int	rs ;
 
 
-	if (pip->f.recurse)
+	if (pip->fl.recurse)
 	    rs = procrecurse(pip,pop,fname) ;
 
 	else
@@ -219,7 +219,7 @@ cchar	fname[] ;
 	    debugprintf("procrecurse: recursing\n") ;
 #endif
 
-	dtopts |= ((pip->f.follow) ? FSDIRTREE_MFOLLOW : 0) ;
+	dtopts |= ((pip->fl.follow) ? FSDIRTREE_MFOLLOW : 0) ;
 	rs = fsdirtree_open(&dt,fname,dtopts) ;
 	if (rs < 0)
 	    goto bad0 ;
@@ -277,7 +277,7 @@ cchar	fname[] ;
 
 	    }
 
-	    if ((rs < 0) && (! pip->f.nostop))
+	    if ((rs < 0) && (! pip->fl.nostop))
 	        break ;
 
 	} /* end while (looping through entries) */
@@ -289,7 +289,7 @@ ret0:
 
 /* bad stuff */
 bad0:
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 	    printf(pip->efp,
 	        "%s: could not open directory (%d)\n",
 	        pip->progname,rs) ;
@@ -298,7 +298,7 @@ bad0:
 	        pip->progname,fname) ;
 	}
 
-	if (pip->f.nostop)
+	if (pip->fl.nostop)
 	    rs = SR_OK ;
 
 	goto ret0 ;
@@ -376,7 +376,7 @@ cchar	fname[] ;
 
 	    }
 
-	    if ((rs < 0) && (! pip->f.nostop))
+	    if ((rs < 0) && (! pip->fl.nostop))
 	        break ;
 
 	} /* end while (looping through entries) */
@@ -388,7 +388,7 @@ ret0:
 
 /* bad stuff */
 bad0:
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 	    printf(pip->efp,
 	        "%s: could not open directory (%d)\n",
 	        pip->progname,rs) ;
@@ -397,7 +397,7 @@ bad0:
 	        pip->progname,fname) ;
 	}
 
-	if (! pip->f.nostop)
+	if (! pip->fl.nostop)
 	    goto bad0 ;
 
 	goto ret0 ;
