@@ -1,8 +1,6 @@
-/* tcp */
-
-
-#ifndef	TCP_INCLUDE
-#define	TCP_INCLUDE	1
+/* tcp HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* revision history:
@@ -14,12 +12,17 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+#ifndef	TCP_INCLUDE
+#define	TCP_INCLUDE
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<localmisc.h>
-
-#include	"sysdialer.h"
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<sysdialer.h>
 
 
 #define	TCP_MAGIC	31415926
@@ -27,34 +30,28 @@
 
 
 struct tcp_head {
-	unsigned long	magic ;
+	uint		magic ;
 	int		fd ;
 } ;
 
+typedef	TCP		tcp ;
 
-#if	(! defined(TCP_MASTER)) || (TCP_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int tcp_open(TCP *,SYSDIALER_ARGS *,cchar *,cchar *,cchar **) noex ;
+extern int tcp_reade(TCP *,char *,int,int,int) noex ;
+extern int tcp_recve(TCP *,char *,int,int,int,int) noex ;
+extern int tcp_recvfrome(TCP *,char *,int,int,void *,int *,int,int) noex ;
+extern int tcp_recvmsge(TCP *,MSGHDR *,int,int,int) noex ;
+extern int tcp_write(TCP *,cchar *,int) noex ;
+extern int tcp_send(TCP *,cchar *,int,int) noex ;
+extern int tcp_sendto(TCP *,cchar *,int,int,void *,int) noex ;
+extern int tcp_sendmsg(TCP *,MSGHDR *,int) noex ;
+extern int tcp_shutdown(TCP *,int) noex ;
+extern int tcp_close(TCP *) noex ;
 
-extern int tcp_open(TCP *,SYSDIALER_ARGS *,cchar *,cchar *,cchar **) ;
-extern int tcp_reade(TCP *,char *,int,int,int) ;
-extern int tcp_recve(TCP *,char *,int,int,int,int) ;
-extern int tcp_recvfrome(TCP *,char *,int,int,void *,int *,int,int) ;
-extern int tcp_recvmsge(TCP *,struct msghdr *,int,int,int) ;
-extern int tcp_write(TCP *,const char *,int) ;
-extern int tcp_send(TCP *,const char *,int,int) ;
-extern int tcp_sendto(TCP *,const char *,int,int,void *,int) ;
-extern int tcp_sendmsg(TCP *,struct msghdr *,int) ;
-extern int tcp_shutdown(TCP *,int) ;
-extern int tcp_close(TCP *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* TCP_MASTER */
 
 #endif /* TCP_INCLUDE */
 
