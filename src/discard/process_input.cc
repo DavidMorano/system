@@ -150,7 +150,7 @@ int		minpingint ;
 	    } /* end if (we used up some data -- update buffer) */
 
 	    rs = 0 ;
-	    if ((! pip->f.dgram) && ((mlen <= 0) || (blen == 0))) {
+	    if ((! pip->fl.dgram) && ((mlen <= 0) || (blen == 0))) {
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
