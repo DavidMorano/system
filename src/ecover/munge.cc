@@ -94,7 +94,7 @@ ULONG		out[] ;
 
 	extra = cheaprand(sum) ;
 
-	if (! gp->f.unscramble) {
+	if (! gp->fl.unscramble) {
 
 	    for (i = 0 ; i < n ; i += 1) {
 
