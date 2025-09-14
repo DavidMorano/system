@@ -245,7 +245,7 @@ struct clientinfo	*cip ;
 #endif
 
 	    rs = SR_NOTFOUND ;
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_printf(&pip->lh,"no service\n") ;
 
 	    goto ret3 ;
@@ -400,7 +400,7 @@ struct clientinfo	*cip ;
 		cchar	*svc = cip->serivice ;
 	        if (srvtab_match(&pip->stab,svc,&sep) >= 0) {
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_flush(&pip->lh) ;
 
 	    rs = handle_srventry(pip,cip,&conn,
@@ -408,7 +408,7 @@ struct clientinfo	*cip ;
 
 		} else if (login_match(pip,&pw,pwbuf,pwlen,svc) >= 0) {
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_flush(&pip->lh) ;
 
 	    rs = handle_login(pip,cip,&conn,
@@ -427,7 +427,7 @@ struct clientinfo	*cip ;
 	        debugprintf("handle: builtin_exec si=%d\n",si) ;
 #endif
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_flush(&pip->lh) ;
 
 	    rs = builtin_execute(bip,ourp,cip,si,&conn,&svcargs) ;
@@ -439,7 +439,7 @@ struct clientinfo	*cip ;
 
 	} else {
 	    rs = SR_NOTFOUND ;
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	    logfile_printf(&pip->lh,"service not found\n") ;
 	}
 		uc_free(pwbuf) ;
@@ -451,7 +451,7 @@ struct clientinfo	*cip ;
 done:
 ret4:
 	if (rs < 0) {
-	    if (pip->f.log) {
+	    if (pip->fl.log) {
 	    switch (rs) {
 	    case SR_NOTFOUND:
 	        cp = "service not found" ;
@@ -480,10 +480,10 @@ ret4:
 	    cp = "no user\n" ;
 	    rs = uc_writen(ofd,cp,strlen(cp)) ;
 
-	    if ((rs < 0) && pip->f.log)
+	    if ((rs < 0) && pip->fl.log)
 		logfile_printf(&pip->lh,"final write (%d)",rs) ;
 
-	} else if (pip->f.log)
+	} else if (pip->fl.log)
 		logfile_printf(&pip->lh,"sentback=%u",rs) ;
 
 /* we are out of here */
@@ -501,7 +501,7 @@ ret2:
 #endif
 
 ret1:
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_flush(&pip->lh) ;
 
 ret0:
