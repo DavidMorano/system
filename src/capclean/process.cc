@@ -117,7 +117,7 @@ const char	basedir[] ;
 	}
 
 
-	if (pip->f.verbose)
+	if (pip->fl.verbose)
 	    bprintf(pip->ofp,"directory: %s\n",basedir) ;
 
 
@@ -341,7 +341,7 @@ const char	basedir[] ;
 
 /* remove the current entry (if we can) */
 
-	                if (pip->f.verbose)
+	                if (pip->fl.verbose)
 	                    bprintf(pip->ofp,"file fragment \"%s\"\n",
 	                        dirbuf) ;
 
@@ -352,12 +352,12 @@ const char	basedir[] ;
 #endif
 
 #if	CF_REMOVE
-		if (((! pip->f.verbose) || pip->f.remove) && 
+		if (((! pip->fl.verbose) || pip->fl.remove) && 
 			(pip->debuglevel == 0))
 	                unlink(dirbuf) ;
 #endif
 		
-	                if (pip->f.verbose)
+	                if (pip->fl.verbose)
 	                    bprintf(pip->ofp,"removing file \"%s\"\n",
 	                        dirbuf) ;
 
@@ -452,7 +452,7 @@ exit:
 
 	bclose(nnfp) ;
 
-	if (pip->f.verbose && (ndel > 0)) {
+	if (pip->fl.verbose && (ndel > 0)) {
 
 	    bprintf(pip->ofp,"subdirectories scanned: %d\n",
 	        ndir) ;
