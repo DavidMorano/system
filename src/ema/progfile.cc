@@ -147,8 +147,8 @@ int progfile(PROGINFO *pip,PARAMOPT *pp,bfile *ofp,cchar *fname)
 
 	        for (i = 0 ; ema_get(&adds,i,&ep) >= 0 ; i += 1) {
 	            if (ep != NULL) {
-	                if (! lsp->f.count) {
-	                    if (lsp->f.info) {
+	                if (! lsp->fl.count) {
+	                    if (lsp->fl.info) {
 	                        rs = progfile_info(pip,ofp,ep,0) ;
 	                    } else {
 	                        rs = progfile_addr(pip,ofp,ep,0) ;
@@ -337,7 +337,7 @@ int		level ;
 	    debugprintf("progfile_addr: level=%u\n",level) ;
 #endif
 
-	if ((! lsp->f.expand) ||
+	if ((! lsp->fl.expand) ||
 	    (ep->type != ematype_group) || (ep->listp == NULL)) {
 
 #if	CF_DEBUG
@@ -350,7 +350,7 @@ int		level ;
 
 	} /* end if */
 
-	if ((rs >= 0) && lsp->f.expand &&
+	if ((rs >= 0) && lsp->fl.expand &&
 	    (ep->type == ematype_group) && (ep->listp != NULL)) {
 	    int	j ;
 
