@@ -115,7 +115,7 @@ const char	fname[] ;
 	rs = u_stat(fname,&sb) ;
 
 	f_dir = S_ISDIR(sb.st_mode) ;
-	if ((rs >= 0) && f_dir && (! pip->f.follow)) {
+	if ((rs >= 0) && f_dir && (! pip->fl.follow)) {
 
 	    rs = u_lstat(fname,&sb) ;
 
@@ -132,7 +132,7 @@ const char	fname[] ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
 
 
-	    if (pip->f.recurse) {
+	    if (pip->fl.recurse) {
 
 	        FSDIRTREE	dt ;
 
@@ -146,7 +146,7 @@ const char	fname[] ;
 	            debugprintf("process: recursing\n") ;
 #endif
 
-	        dtopts |= ((pip->f.follow) ? FSDIRTREE_MFOLLOW : 0) ;
+	        dtopts |= ((pip->fl.follow) ? FSDIRTREE_MFOLLOW : 0) ;
 	        rs = fsdirtree_open(&dt,fname,dtopts) ;
 
 #if	CF_DEBUG
@@ -156,7 +156,7 @@ const char	fname[] ;
 
 	        if (rs < 0) {
 
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 
 	                printf(pip->efp,
 	                    "%s: could not open directory (%d)\n",
@@ -168,7 +168,7 @@ const char	fname[] ;
 
 	            }
 
-	            if (! pip->f.nostop)
+	            if (! pip->fl.nostop)
 	                goto bad0 ;
 
 	        } /* end if (could not open directory) */
@@ -223,7 +223,7 @@ const char	fname[] ;
 
 	                }
 
-	                if ((rs < 0) && (! pip->f.nostop))
+	                if ((rs < 0) && (! pip->fl.nostop))
 	                    break ;
 
 	            } /* end while (looping through entries) */
@@ -253,7 +253,7 @@ const char	fname[] ;
 
 	        if (rs < 0) {
 
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 
 	                printf(pip->efp,
 	                    "%s: could not open directory (%d)\n",
@@ -265,7 +265,7 @@ const char	fname[] ;
 
 	            }
 
-	            if (! pip->f.nostop)
+	            if (! pip->fl.nostop)
 	                goto bad0 ;
 
 	        } /* end if (could not open directory) */
@@ -312,7 +312,7 @@ const char	fname[] ;
 
 	                }
 
-	                if ((rs < 0) && (! pip->f.nostop))
+	                if ((rs < 0) && (! pip->fl.nostop))
 	                    break ;
 
 	            } /* end while (looping through entries) */
