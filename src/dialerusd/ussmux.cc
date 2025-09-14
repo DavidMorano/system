@@ -188,10 +188,10 @@ const char	*av[] ;
 
 #if	CF_DEBUGS
 	debugprintf("ussmux_open: ussinfo_logstuff()\n") ;
-	debugprintf("ussmux_open: f_log=%u\n",sip->f.log) ;
+	debugprintf("ussmux_open: f_log=%u\n",sip->fl.log) ;
 #endif
 
-	if ((rs >= 0) && sip->f.log)
+	if ((rs >= 0) && sip->fl.log)
 	    rs = ussmux_logstuff(op,sip) ;
 
 /* parse the port-specification if we have one */
