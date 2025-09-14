@@ -536,7 +536,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'R':
@@ -575,7 +575,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case 'i':
-	                        pip->f.optin = TRUE ;
+	                        pip->fl.optin = TRUE ;
 	                        break ;
 
 /* options */
