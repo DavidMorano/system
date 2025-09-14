@@ -412,7 +412,7 @@ const void	*contextp ;
 	rs1 = shio_open(&errfile,cp,"wca",0666) ;
 	if (rs1 >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	}
 
 /* initialize */
@@ -526,13 +526,13 @@ const void	*contextp ;
 	                case argopt_hh:
 	                case argopt_h:
 	                    lip->have.header = TRUE ;
-	                    lip->f.header = TRUE ;
+	                    lip->fl.header = TRUE ;
 	                    if (f_optequal) {
 
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = cfdeci(avp,avl,&v) ;
-	                            lip->f.header = (v > 0) ;
+	                            lip->fl.header = (v > 0) ;
 	                        }
 	                    }
 
@@ -540,13 +540,13 @@ const void	*contextp ;
 
 	                case argopt_nh:
 	                    lip->have.header = TRUE ;
-	                    lip->f.header = FALSE ;
+	                    lip->fl.header = FALSE ;
 	                    if (f_optequal) {
 
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = cfdeci(avp,avl,&v) ;
-	                            lip->f.header = (v > 0) ;
+	                            lip->fl.header = (v > 0) ;
 	                        }
 	                    }
 
@@ -639,7 +639,7 @@ const void	*contextp ;
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -666,13 +666,13 @@ const void	*contextp ;
 /* print header */
 	                    case 'h':
 	                        lip->have.header = TRUE ;
-	                        lip->f.header = TRUE ;
+	                        lip->fl.header = TRUE ;
 	                        if (f_optequal) {
 
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = cfdeci(avp,avl,&v) ;
-	                                lip->f.header = (v > 0) ;
+	                                lip->fl.header = (v > 0) ;
 	                            }
 	                        }
 
@@ -681,13 +681,13 @@ const void	*contextp ;
 /* long mode */
 	                    case 'l':
 	                        lip->have.fmtlong = TRUE ;
-	                        lip->f.fmtlong = TRUE ;
+	                        lip->fl.fmtlong = TRUE ;
 	                        if (f_optequal) {
 
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = cfdeci(avp,avl,&v) ;
-	                                lip->f.fmtlong = (v > 0) ;
+	                                lip->fl.fmtlong = (v > 0) ;
 	                            }
 	                        }
 
@@ -711,14 +711,14 @@ const void	*contextp ;
 
 /* short mode */
 	                    case 's':
-	                        lip->f.fmtshort = TRUE ;
+	                        lip->fl.fmtshort = TRUE ;
 	                        lip->have.fmtshort = TRUE ;
 	                        if (f_optequal) {
 
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = cfdeci(avp,avl,&v) ;
-	                                lip->f.fmtshort = (v > 0) ;
+	                                lip->fl.fmtshort = (v > 0) ;
 	                            }
 	                        }
 
@@ -834,12 +834,12 @@ const void	*contextp ;
 
 /* argument defaults */
 
-	if (lip->f.fmtshort && lip->f.uniq)
-	    lip->f.users = TRUE ;
+	if (lip->fl.fmtshort && lip->fl.uniq)
+	    lip->fl.users = TRUE ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("main: f_quick=%u\n",lip->f.fmtshort) ;
+	    debugprintf("main: f_quick=%u\n",lip->fl.fmtshort) ;
 #endif
 
 /* other initilization */
@@ -904,7 +904,7 @@ const void	*contextp ;
 	        shio_close(afp) ;
 
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,
 	                "%s: could not open the argument list file\n",
 	                pip->progname) ;
@@ -1011,7 +1011,7 @@ done:
 	vecstr_finish(&names) ;
 
 ret4:
-	if ((rs < 0) && (! pip->f.quiet))
+	if ((rs < 0) && (! pip->fl.quiet))
 	    shio_printf(pip->efp,
 	        "%s: could not perform function (%d)\n",
 	        pip->progname,rs) ;
@@ -1200,9 +1200,9 @@ KEYOPT		*kop ;
 	            if (! lip->final.header) {
 	                lip->have.header = TRUE ;
 	                lip->final.header = TRUE ;
-	                lip->f.header = TRUE ;
+	                lip->fl.header = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                    lip->f.header = (uv > 0) ? 1 : 0 ;
+	                    lip->fl.header = (uv > 0) ? 1 : 0 ;
 	            }
 
 	            break ;
@@ -1211,9 +1211,9 @@ KEYOPT		*kop ;
 	            if (! lip->final.fmtlong) {
 	                lip->have.fmtlong = TRUE ;
 	                lip->final.fmtlong = TRUE ;
-	                lip->f.fmtlong = TRUE ;
+	                lip->fl.fmtlong = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                    lip->f.fmtlong = (uv > 0) ? 1 : 0 ;
+	                    lip->fl.fmtlong = (uv > 0) ? 1 : 0 ;
 	            }
 	            break ;
 
@@ -1222,9 +1222,9 @@ KEYOPT		*kop ;
 
 	                lip->have.fmtshort = TRUE ;
 	                lip->final.fmtshort = TRUE ;
-	                lip->f.fmtshort = TRUE ;
+	                lip->fl.fmtshort = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                    lip->f.fmtshort = (uv > 0) ? 1 : 0 ;
+	                    lip->fl.fmtshort = (uv > 0) ? 1 : 0 ;
 
 	            }
 
@@ -1235,9 +1235,9 @@ KEYOPT		*kop ;
 
 	                lip->have.uniq = TRUE ;
 	                lip->final.uniq = TRUE ;
-	                lip->f.uniq = TRUE ;
+	                lip->fl.uniq = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                    lip->f.uniq = (uv > 0) ? 1 : 0 ;
+	                    lip->fl.uniq = (uv > 0) ? 1 : 0 ;
 
 	            }
 
@@ -1248,9 +1248,9 @@ KEYOPT		*kop ;
 
 	                lip->have.users = TRUE ;
 	                lip->final.users = TRUE ;
-	                lip->f.users = TRUE ;
+	                lip->fl.users = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                    lip->f.users = (uv > 0) ? 1 : 0 ;
+	                    lip->fl.users = (uv > 0) ? 1 : 0 ;
 
 	            }
 	            break ;
@@ -1348,7 +1348,7 @@ vecstr		*nlp ;
 	for (i = 0 ; vecstr_get(nlp,i,&cp) >= 0 ; i += 1) {
 	    if (cp == NULL) continue ;
 
-	    lip->f.restricted = TRUE ;
+	    lip->fl.restricted = TRUE ;
 	    if (cp[0] == '-') {
 	        cp = lip->username ;
 	        cl = -1 ;
@@ -1402,7 +1402,7 @@ VECOBJ		*elp ;
 	        (up->ut_user[0] != '.')) ;
 #endif /* CF_FOTUSER */
 
-	    if (f && lip->f.restricted) {
+	    if (f && lip->fl.restricted) {
 
 	        cp = up->ut_user ;
 	        cl = strnlen(up->ut_user,MIN(UTMPX_LUSER,LOGNAMELEN)) ;
@@ -1454,10 +1454,10 @@ VECOBJ		*elp ;
 	char	timebuf[TIMEBUFLEN + 1] ;
 
 
-	if (lip->f.header && (! lip->f.fmtshort)) {
+	if (lip->fl.header && (! lip->fl.fmtshort)) {
 	    const char	*fmt ;
 
-	    if (lip->f.fmtlong) {
+	    if (lip->fl.fmtlong) {
 	        fmt = "USER       LINE         TIME           "
 	            "  ID    SID HOST\n" ;
 	    } else
@@ -1478,7 +1478,7 @@ VECOBJ		*elp ;
 
 	    if (up == NULL) continue ;
 
-	    if (lip->f.fmtshort) {
+	    if (lip->fl.fmtshort) {
 
 	        cp = up->ut_user ;
 	        cl = strnlen(cp,MIN(COLS_USERNAME,UTMPX_LUSER)) ;
@@ -1516,7 +1516,7 @@ VECOBJ		*elp ;
 
 /* print whichever output format */
 
-	        if (lip->f.fmtlong) {
+	        if (lip->fl.fmtlong) {
 
 	            char	ut_idbuf[UTMPX_LID + 1] ;
 	            char	ut_hostbuf[UTMPX_LHOST + 1] ;
