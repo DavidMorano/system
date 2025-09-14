@@ -21,12 +21,11 @@
 
 /*******************************************************************************
 
-	This subroutine forms the front-end of a program that sends a notice to
-	a user's terminal.  It is similar to 'write(1)' but more general.
-
+	This subroutine forms the front-end of a program that sends
+	a notice to a user's terminal.  It is similar to 'write(1)'
+	but more general.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -54,7 +53,6 @@
 #include	<sbuf.h>
 #include	<tmpx.h>
 #include	<sesnotes.h>
-#include	<ucmallreg.h>
 #include	<ischarx.h>
 #include	<isnot.h>
 #include	<exitcodes.h>
@@ -342,7 +340,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* early initialization */
 
 	pip->verboselevel = 1 ;
-	pip->f.logprog = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 	pip->lip = lip ;
 	rs = locinfo_start(lip,pip) ;
@@ -572,7 +570,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -592,16 +590,16 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'a':
-	                        pip->f.all = TRUE ;
+	                        pip->fl.all = TRUE ;
 	                        break ;
 
 	                    case 'b':
-	                        pip->f.biffonly = TRUE ;
+	                        pip->fl.biffonly = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.biffonly = (rs > 0) ;
+	                                pip->fl.biffonly = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -650,12 +648,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'r':
-	                        pip->f.ringbell = TRUE ;
+	                        pip->fl.ringbell = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.ringbell = (rs > 0) ;
+	                                pip->fl.ringbell = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -797,7 +795,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	}
 
 	if (rs >= 0) {
-	    if (pip->f.all) {
+	    if (pip->fl.all) {
 	        lip->nterms = NALLTERMS ;
 	    } else {
 	        if (lip->nterms < 0) lip->nterms = NDEFTERMS ;
@@ -1230,7 +1228,7 @@ int		mlen ;
 
 	            bclose(afp) ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			fmt = "%s: inaccesssible argument list (%d)\n" ;
 	                bprintf(pip->efp,fmt,pn,rs) ;
 	                bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1248,7 +1246,7 @@ int		mlen ;
 
 	    } /* end if */
 
-	    if ((rs >= 0) && (pip->verboselevel >= 2) && lip->f.outfile) {
+	    if ((rs >= 0) && (pip->verboselevel >= 2) && lip->fl.outfile) {
 	        bprintf(lip->ofp,"users=%d notified=%d\n",pan,lip->count) ;
 	    } /* end if */
 
@@ -1567,7 +1565,7 @@ static int noteone(PROGINFO *pip,cchar termfname[],cchar mbuf[],int mlen)
 	            debugprintf("notify: mode=\\o%08o\n",sb.st_mode) ;
 #endif
 		if (sb.st_mode & S_IWGRP) {
-	            if ((! pip->f.biffonly) || (sb.st_mode & S_IXUSR)) {
+	            if ((! pip->fl.biffonly) || (sb.st_mode & S_IXUSR)) {
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
@@ -1578,7 +1576,7 @@ static int noteone(PROGINFO *pip,cchar termfname[],cchar mbuf[],int mlen)
 	                    n += 1 ;
 	                    if ((rs >= 0) && (pip->verboselevel >= 2)) {
 			        LOCINFO	*lip = pip->lip ;
-			        if (pip->f.outfile) {
+			        if (pip->fl.outfile) {
 			            bfile	*ofp = lip->ofp ;
 			            if (ofp != NULL) {
 				        const char	*tf = termfname ;
@@ -1631,7 +1629,7 @@ int		tlen ;
 
 /* form the notice to write out */
 
-	    if (pip->f.ringbell)
+	    if (pip->fl.ringbell)
 	        sbuf_chr(&out,CH_BELL) ;
 
 	    sbuf_chr(&out,'\r') ;
