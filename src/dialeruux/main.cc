@@ -516,7 +516,7 @@ const char	*envv[] ;
 	                            break ;
 
 	                        case 'Q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 	                        case 'R':
@@ -555,7 +555,7 @@ const char	*envv[] ;
 	                            break ;
 
 	                        case 'i':
-	                            pip->f.optin = TRUE ;
+	                            pip->fl.optin = TRUE ;
 	                            break ;
 
 /* options */
