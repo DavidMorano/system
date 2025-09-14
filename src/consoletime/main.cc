@@ -391,17 +391,17 @@ int main(int argc,cchar **argv,cchar **envv)
 	pip->verboselevel = 1 ;
 	pip->to_open = -1 ;
 
-	pip->f.term = TRUE ;
-	pip->f.mesg = FALSE ;
+	pip->fl.term = TRUE ;
+	pip->fl.mesg = FALSE ;
 
-	pip->f.o_string = FALSE ;
-	pip->f.o_time = TRUE ;
-	pip->f.o_nodetitle = FALSE ;
-	pip->f.o_node = TRUE ;
-	pip->f.o_users = TRUE ;
-	pip->f.o_procs = TRUE ;
-	pip->f.o_mem = TRUE ;
-	pip->f.o_load = TRUE ;
+	pip->fl.o_string = FALSE ;
+	pip->fl.o_time = TRUE ;
+	pip->fl.o_nodetitle = FALSE ;
+	pip->fl.o_node = TRUE ;
+	pip->fl.o_users = TRUE ;
+	pip->fl.o_procs = TRUE ;
+	pip->fl.o_mem = TRUE ;
+	pip->fl.o_load = TRUE ;
 
 /* start parsing the arguments */
 
@@ -714,12 +714,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* daemon mode */
 	                    case 'd':
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -733,12 +733,12 @@ int main(int argc,cchar **argv,cchar **envv)
 							    ce */
 	                    case 'm':
 	                        pip->final.mesg = TRUE ;
-	                        pip->f.mesg = TRUE ;
+	                        pip->fl.mesg = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.mesg = (rs > 0) ;
+	                                pip->fl.mesg = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -769,7 +769,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        argl = strlen(argp) ;
 	                        if (argl) {
 	                            pip->final.o_string = TRUE ;
-	                            pip->f.o_string = TRUE ;
+	                            pip->fl.o_string = TRUE ;
 	                            pip->string = argp ;
 	                        }
 	                        break ;
@@ -778,12 +778,12 @@ int main(int argc,cchar **argv,cchar **envv)
 	                    case 't':
 	                        pip->final.term = TRUE ;
 	                        pip->have.term = TRUE ;
-	                        pip->f.term = TRUE ;
+	                        pip->fl.term = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.term = (rs > 0) ;
+	                                pip->fl.term = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -923,12 +923,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	switch (pip->progmode) {
 	case progmode_loginblurb:
-	    pip->f.o_time = FALSE ;
+	    pip->fl.o_time = FALSE ;
 	    if (ofname == NULL) ofname = "-" ;
 	    break ;
 	case progmode_consoletime:
-	    if ((! pip->final.o_time) && pip->f.daemon)
-	        pip->f.o_time = FALSE ;
+	    if ((! pip->final.o_time) && pip->fl.daemon)
+	        pip->fl.o_time = FALSE ;
 	    break ;
 	} /* end switch */
 
@@ -948,21 +948,21 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	if (termtype != NULL) {
 	    n = matpcasestr(ansiterms,2,termtype,-1) ;
-	    pip->f.ansiterm = (n >= 0) ;
+	    pip->fl.ansiterm = (n >= 0) ;
 	} /* end if */
 
-	if (pip->f.daemon && (! pip->final.term)) {
-	    pip->f.term = FALSE ;
+	if (pip->fl.daemon && (! pip->final.term)) {
+	    pip->fl.term = FALSE ;
 	}
 
 	if (pip->string == NULL) {
-	    pip->f.o_string = TRUE ;
+	    pip->fl.o_string = TRUE ;
 	    pip->string = getenv(VARSTRING) ;
 	}
 
 	pip->daytime = time(NULL) ;
 
-	if ((ofname == NULL) && (! pip->f.daemon)) {
+	if ((ofname == NULL) && (! pip->fl.daemon)) {
 	    const char	*ccp ;
 	    const char	*backup = NULL ;
 	    if ((rs = ids_load(&id)) >= 0) {
@@ -987,7 +987,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    ((ofname[0] == '\0') || (ofname[0] == '-'))) {
 	    ofname = OUTPUTDEV ;
 	    if (! pip->final.mesg)
-	        pip->f.mesg = FALSE ;
+	        pip->fl.mesg = FALSE ;
 	}
 
 	if (mntfname == NULL)
@@ -996,7 +996,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	if (pip->to_open < 0)
 	    pip->to_open = TO_OPEN ;
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    if ((mntfname == NULL) || (mntfname[0] == '\0')) {
 	        rs = SR_NOENT ;
@@ -1171,7 +1171,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            switch (ki) {
 	            case progopt_str:
 	                if (! pip->final.o_string) {
-	                    pip->f.o_string = TRUE ;
+	                    pip->fl.o_string = TRUE ;
 	                    if (vl > 0) {
 	                        strdcpy1w(pip->strbuf,STRBUFLEN,vp,vl) ;
 	                        pip->string = pip->strbuf ;
@@ -1180,74 +1180,74 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                break ;
 	            case progopt_date:
 	            case progopt_time:
-	                pip->f.o_time = TRUE ;
+	                pip->fl.o_time = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    pip->f.o_time = (rs > 0) ;
+	                    pip->fl.o_time = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_nodetitle:
-	                pip->f.o_nodetitle = TRUE ;
+	                pip->fl.o_nodetitle = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    pip->f.o_nodetitle = (rs > 0) ;
+	                    pip->fl.o_nodetitle = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_name:
 	            case progopt_node:
-	                pip->f.o_node = TRUE ;
+	                pip->fl.o_node = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    pip->f.o_node = (rs > 0) ;
+	                    pip->fl.o_node = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_users:
-	                pip->f.o_users = TRUE ;
+	                pip->fl.o_users = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    pip->f.o_users = (rs > 0) ;
+	                    pip->fl.o_users = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_procs:
-	                pip->f.o_procs = TRUE ;
+	                pip->fl.o_procs = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    pip->f.o_procs = (rs > 0) ;
+	                    pip->fl.o_procs = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_mem:
-	                pip->f.o_mem = TRUE ;
+	                pip->fl.o_mem = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    pip->f.o_mem = (rs > 0) ;
+	                    pip->fl.o_mem = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_load:
 	            case progopt_la:
-	                pip->f.o_load = TRUE ;
+	                pip->fl.o_load = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    pip->f.o_load = (rs > 0) ;
+	                    pip->fl.o_load = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_term:
 	                if (! pip->final.term) {
 	                    pip->final.term = TRUE ;
 	                    pip->have.term = TRUE ;
-	                    pip->f.term = TRUE ;
+	                    pip->fl.term = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.term = (rs > 0) ;
+	                        pip->fl.term = (rs > 0) ;
 	                    }
 	                }
 	                break ;
 	            case progopt_mesg:
 	                if (! pip->final.mesg) {
 	                    pip->final.mesg = TRUE ;
-	                    pip->f.mesg = TRUE ;
+	                    pip->fl.mesg = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.mesg = (rs > 0) ;
+	                        pip->fl.mesg = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1352,7 +1352,7 @@ static int procserve(PROGINFO *pip,cchar *mntfname)
 #endif
 
 	if (rs < 0) {
-	    if ((! pip->f.quiet) && (pip->efp != NULL))
+	    if ((! pip->fl.quiet) && (pip->efp != NULL))
 	        bprintf(pip->efp,"%s: could not perform mount (%d)\n",
 	            pip->progname,rs) ;
 	    goto ret3 ;
@@ -1556,11 +1556,11 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 	int		f ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
-	f = ((! pip->have.term) || pip->f.term) ;
-	if (f && (! pip->f.daemon)) {
+	f = ((! pip->have.term) || pip->fl.term) ;
+	if (f && (! pip->fl.daemon)) {
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 	        f_terminal = (S_ISCHR(sb.st_mode)) ? TRUE : FALSE ;
-	        if (f_terminal && pip->f.mesg) {
+	        if (f_terminal && pip->fl.mesg) {
 	            f_ok = (sb.st_mode & S_IWGRP) ? 1 : 0 ;
 	        }
 	    } /* end if (stat) */
@@ -1574,12 +1574,12 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 
 /* time */
 
-	    if (pip->f.o_string && (pip->string != NULL)) {
+	    if (pip->fl.o_string && (pip->string != NULL)) {
 	        c += 1 ;
 	        sbuf_strw(&b,pip->string,-1) ;
 	    } /* end if (option-string) */
 
-	    if (pip->f.o_time) {
+	    if (pip->fl.o_time) {
 	        char	timebuf[TIMEBUFLEN + 1] ;
 	        timestr_logz(pip->daytime,timebuf) ;
 	        if (c++ > 0) sbuf_chr(&b,' ') ;
@@ -1588,10 +1588,10 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 
 /* node-name */
 
-	    if ((rs >= 0) && pip->f.o_node) {
+	    if ((rs >= 0) && pip->fl.o_node) {
 	        if ((rs = proginfo_nodename(pip)) >= 0) {
 	            if (c++ > 0) sbuf_chr(&b,' ') ;
-	            if (pip->f.o_nodetitle)
+	            if (pip->fl.o_nodetitle)
 	                sbuf_strw(&b,"node=",-1) ;
 	            sbuf_strw(&b,pip->nodename,-1) ;
 	        }
@@ -1599,7 +1599,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 
 /* users (number of logged-in users) */
 
-	    if ((rs >= 0) && pip->f.o_users) {
+	    if ((rs >= 0) && pip->fl.o_users) {
 	        if ((rs = procinfo_nusers(pip)) >= 0) {
 	            if (c++ > 0) sbuf_chr(&b,' ') ;
 	            sbuf_strw(&b,"users=",-1) ;
@@ -1609,7 +1609,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 
 /* number of processes */
 
-	    if ((rs >= 0) && pip->f.o_procs) {
+	    if ((rs >= 0) && pip->fl.o_procs) {
 	        if ((rs = procinfo_nprocs(pip)) >= 0) {
 	            if (c++ > 0) sbuf_chr(&b,' ') ;
 	            sbuf_strw(&b,"procs=",-1) ;
@@ -1621,7 +1621,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 
 #if	defined(_SC_PHYS_PAGES) && defined(_SC_AVPHYS_PAGES)
 
-	    if ((rs >= 0) && pip->f.o_mem) {
+	    if ((rs >= 0) && pip->fl.o_mem) {
 	        ulong	n100, mu ;
 	        long	mt, ma ;
 	        uint	percent ;
@@ -1654,7 +1654,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 
 /* load averages */
 
-	    if ((rs >= 0) && pip->f.o_load) {
+	    if ((rs >= 0) && pip->fl.o_load) {
 	        double		dla[3] ;
 	        const char	*fmt ;
 	        if ((rs1 = uc_getloadavg(dla,3)) >= 0) {
@@ -1670,7 +1670,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 
 /* done */
 
-	    if (f_terminal && pip->f.ansiterm) {
+	    if (f_terminal && pip->fl.ansiterm) {
 	        const int	clen = CODEBUFLEN ;
 	        int		cl ;
 	        char	cbuf[CODEBUFLEN+1] ;
