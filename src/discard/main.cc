@@ -325,11 +325,11 @@ char	*envv[] ;
 
 /* initialize */
 
-	pip->f.quiet = FALSE ;
-	pip->f.log = FALSE ;
-	pip->f.slog = FALSE ;
-	pip->f.update = FALSE ;
-	pip->f.dgram = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.log = FALSE ;
+	pip->fl.slog = FALSE ;
+	pip->fl.update = FALSE ;
+	pip->fl.dgram = FALSE ;
 
 	pip->debuglevel = 0 ;
 	pip->verboselevel = 1 ;
@@ -584,7 +584,7 @@ char	*envv[] ;
 	                        break ;
 
 	                    case argopt_dgram:
-	                        pip->f.dgram = TRUE ;
+	                        pip->fl.dgram = TRUE ;
 	                        break ;
 
 	                    case argopt_help:
@@ -669,7 +669,7 @@ char	*envv[] ;
 
 /* binary dump output file */
 	                        case 'b':
-	                            pip->f.binary = TRUE ;
+	                            pip->fl.binary = TRUE ;
 	                            break ;
 
 /* take input file arguments from STDIN */
@@ -733,12 +733,12 @@ char	*envv[] ;
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* receive mode */
 	                        case 'r':
-	                            pip->f.receive = TRUE ;
+	                            pip->fl.receive = TRUE ;
 	                            break ;
 
 /* default timeout */
@@ -764,7 +764,7 @@ char	*envv[] ;
 
 /* update mode */
 	                        case 'u':
-	                            pip->f.update = TRUE ;
+	                            pip->fl.update = TRUE ;
 	                            break ;
 
 /* verbose mode */
@@ -1683,7 +1683,7 @@ char	*envv[] ;
 	        debugprintf("main: we opened a logfile\n") ;
 #endif
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 	    if (pip->debuglevel > 0)
 	        bprintf(efp,"%s: logfile=%s\n",pip->progname,logfname) ;
 
@@ -1898,7 +1898,7 @@ char	*envv[] ;
 	    if (rs >= 0)
 	        pip->sumfp = &sumfile ;
 
-	    if ((rs < 0) && (! pip->f.quiet)) {
+	    if ((rs < 0) && (! pip->fl.quiet)) {
 
 	        bprintf(efp,
 	            "%s: could not open the summary file (rs=%d)\n",
@@ -1915,7 +1915,7 @@ char	*envv[] ;
 
 /* OK, do out thing */
 
-		cp = (pip->f.dgram) ? "mode=input (dgram)" : "mode=input" ;
+		cp = (pip->fl.dgram) ? "mode=input (dgram)" : "mode=input" ;
 		logfile_printf(&pip->lh,cp) ;
 
 		rs = process_input(pip,pip->minupdate) ;
@@ -1949,10 +1949,10 @@ ret3:
 
 /* close some more earlier stuff */
 ret2:
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_close(&pip->lh) ;
 
-	if (pip->f.slog)
+	if (pip->fl.slog)
 	    bclose(pip->lfp) ;
 
 rethelp:
