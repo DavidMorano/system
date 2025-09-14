@@ -291,8 +291,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->keeptime = DEFKEEPTIME ;
 	pip->verboselevel = 1 ;
 
-	pip->f.ni = FALSE ;
-	pip->f.no = FALSE ;
+	pip->fl.ni = FALSE ;
+	pip->fl.no = FALSE ;
 
 	fd_in = FD_STDIN ;
 	fd_out = FD_STDOUT ;
@@ -372,15 +372,15 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    break ;
 
 	                case argopt_ni:
-	                    pip->f.ni = TRUE ;
+	                    pip->fl.ni = TRUE ;
 	                    break ;
 
 	                case argopt_no:
-	                    pip->f.no = TRUE ;
+	                    pip->fl.no = TRUE ;
 	                    break ;
 
 	                case argopt_sanity:
-	                    pip->f.sanity = TRUE ;
+	                    pip->fl.sanity = TRUE ;
 	                    break ;
 
 	                default:
@@ -408,7 +408,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -463,7 +463,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'n':
-	                        pip->f.ni = TRUE ;
+	                        pip->fl.ni = TRUE ;
 	                        break ;
 
 	                    case 'p':
@@ -947,7 +947,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	if (rs < 0) {
 	    ex = EX_UNAVAILABLE ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        fmt = "%s: could not connect to host (%d)\n" ;
 	        bprintf(pip->efp,fmt,pip->progname,rs) ;
 	    }
