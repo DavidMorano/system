@@ -1,18 +1,19 @@
-/* main */
+/* ema_main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* general program front end */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-	The program was written from scratch to do what the previous program by
-	the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 */
 
@@ -20,22 +21,20 @@
 
 /*******************************************************************************
 
-	This subroutine is the front-end of the EMA program.
+  	Name:
+	ema_main
 
+  	Description:
+	This subroutine is the front-end of the EMA program.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<csignal>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -55,29 +54,17 @@
 
 /* external subroutines */
 
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isFailOpen(int) ;
-
-extern int	printhelp(bfile *,const char *,const char *,const char *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	progfile(PROGINFO *,PARAMOPT *,bfile *,const char *) ;
+extern int	printhelp(bfile *,cchar *,cchar *,cchar *) noex ;
+extern int	proginfo_setpiv(PROGINFO *,cchar *,const pivars *) noex ;
+extern int	progfile(PROGINFO *,PARAMOPT *,bfile *,cchar *) noex ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugopen(cchar *) noex ;
+extern int	debugprintf(cchar *,...) noex ;
+extern int	debugprinthex(cchar *,int,cchar *,int) noex ;
+extern int	debugclose() noex ;
+extern int	strlinelen(cchar *,int,int) noex ;
 #endif
-
-extern const char	*getourenv(const char **,const char *) ;
 
 
 /* external variables */
@@ -98,12 +85,12 @@ static int	procsubpart(PROGINFO *,PARAMOPT *,CMD_LOCAL *) ;
 static int	procargs(PROGINFO *,ARGINFO *,BITS *,PARAMOPT *,
 			cchar *,cchar *,cchar *) ;
 
-static int	procmsgfile(PROGINFO *,PARAMOPT *,void *,const char *,int) ;
+static int	procmsgfile(PROGINFO *,PARAMOPT *,void *,cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*aknames[] = {
+static cchar	*aknames[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -116,7 +103,7 @@ static const char	*aknames[] = {
 	"ef",
 	"of",
 	"if",
-	NULL
+	nullptr
 } ;
 
 enum aknames {
@@ -157,13 +144,13 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"expand",
 	"noexpand",
 	"flat",
 	"list",
 	"info",
-	NULL
+	nullptr
 } ;
 
 enum akonames {
@@ -175,14 +162,14 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	*subparts[] = {
+static cchar	*subparts[] = {
 	"address",
 	"route",
 	"comment",
 	"original",
 	"best",
 	"any",
-	NULL
+	nullptr
 } ;
 
 enum subparts {
@@ -219,24 +206,24 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	int		cl ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_usage = FALSE ;
-	int		f_version = FALSE ;
-	int		f_help = FALSE ;
-	int		f_recipients = FALSE ;
+	int		f_usage = false ;
+	int		f_version = false ;
+	int		f_help = false ;
+	int		f_recipients = false ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = nullptr ;
+	cchar	*pr = nullptr ;
+	cchar	*sn = nullptr ;
+	cchar	*afname = nullptr ;
+	cchar	*efname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*ifname = nullptr ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
@@ -254,7 +241,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    goto badprogstart ;
 	}
 
-	if ((cp = getenv(VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getenv(VARBANNER)) == nullptr) cp = BANNER ;
 	proginfo_setbanner(pip,cp) ;
 
 	pip->lsp = lsp ;
@@ -264,7 +251,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	pip->verboselevel = 1 ;
 
-	lsp->f.expand = TRUE ;		/* default is to expand mail-groups */
+	lsp->fl.expand = trueg ;		/* default is to expand mail-groups */
 
 /* process program arguments */
 
@@ -284,7 +271,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -311,15 +298,15 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	            f_optequal = false ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
+	                f_optequal = trueg ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -330,14 +317,14 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* version */
 	                case akname_version:
-	                    f_version = TRUE ;
+	                    f_version = trueg ;
 	                    break ;
 
 /* verbose */
 	                case akname_verbose:
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optvalue(avp,avl) ;
 	                            pip->verboselevel = rs ;
@@ -348,7 +335,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* temporary directory */
 	                case akname_tmpdir:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pip->tmpdname = avp ;
 	                    } else {
@@ -366,7 +353,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* get a program root */
 	                case akname_root:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pr = avp ;
 	                    } else {
@@ -383,13 +370,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* want help ! file */
 	                case akname_help:
-	                    f_help = TRUE ;
+	                    f_help = trueg ;
 	                    break ;
 
 /* program search-name */
 	                case akname_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -407,7 +394,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* argument file-file */
 	                case akname_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -425,7 +412,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* error file */
 	                case akname_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -443,7 +430,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* output file */
 	                case akname_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -461,7 +448,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* input file */
 	                case akname_if:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ifname = avp ;
 	                    } else {
@@ -478,10 +465,10 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* the user specified some options */
 	                case akname_option:
-	                    cp = NULL ;
+	                    cp = nullptr ;
 	                    cl = -1 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            cp = avp ;
 	                            cl = avl ;
@@ -498,14 +485,14 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        } else
 	                            rs = SR_INVALID ;
 	                    }
-	                    if ((rs >= 0) && (cp != NULL) && (cl > 0)) {
+	                    if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
 				PARAMOPT	*pop = &aparams ;
 	                        rs = paramopt_loadu(pop,cp,cl) ;
 	                    }
 	                    break ;
 
 	                case akname_info:
-	                    lsp->f.info = TRUE ;
+	                    lsp->fl.info = trueg ;
 	                    break ;
 
 /* default action and user specified help */
@@ -525,7 +512,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* get a program root */
 	                    case 'R':
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl)
 	                                pr = avp ;
 	                        } else {
@@ -543,7 +530,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -552,18 +539,18 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = trueg ;
 	                        break ;
 
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = trueg ;
 	                        break ;
 
 	                    case 'h':
-	                        cp = NULL ;
+	                        cp = nullptr ;
 	                        cl = -1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                cp = avp ;
 	                                cl = avl ;
@@ -580,7 +567,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            } else
 	                                rs = SR_INVALID ;
 	                        }
-	                        if ((rs >= 0) && (cp != NULL) && (cl > 0)) {
+	                        if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
 				    PARAMOPT	*pop = &aparams ;
 	                            cchar	*po = PO_HEADER ;
 	                            rs = paramopt_loads(pop,po,cp,cl) ;
@@ -600,14 +587,14 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'n':
-	                        lsp->f.count = TRUE ;
+	                        lsp->fl.count = trueg ;
 	                        break ;
 
 /* specify all recipient headers */
 	                    case 'r':
-	                        f_recipients = TRUE ;
+	                        f_recipients = trueg ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
 	                                f_recipients = (rs > 0) ;
@@ -623,7 +610,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                PARAMOPT	*pop = &aparams ;
-	                                const char	*po = PO_SUBPART ;
+	                                cchar	*po = PO_SUBPART ;
 	                                rs = paramopt_loads(pop,po,argp,argl) ;
 	                            }
 	                        } else
@@ -634,7 +621,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -656,7 +643,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = trueg ;
 	                        break ;
 
 	                    default:
@@ -688,11 +675,11 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	debugprintf("main: after args rs=%d\n",rs) ;
 #endif
 
-	if (efname == NULL) efname = getenv(VARERRORFNAME) ;
-	if (efname == NULL) efname = BFILE_STDERR ;
+	if (efname == nullptr) efname = getenv(VARERRORFNAME) ;
+	if (efname == nullptr) efname = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,efname,"dwca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
+	    pip->open.errfile = trueg ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
@@ -735,7 +722,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* user specified help only */
 
 	if (f_help)
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 	if (f_version || f_help || f_usage)
 	    goto retearly ;
@@ -745,18 +732,18 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* other initialization */
 
-	if ((rs >= 0) && (pip->n == 0) && (argval != NULL)) {
+	if ((rs >= 0) && (pip->n == 0) && (argval != nullptr)) {
 	    rs = optvalue(argval,-1) ;
 	    pip->n = rs ;
 	}
 
-	if (pip->tmpdname == NULL) pip->tmpdname = getenv(VARTMPDNAME) ;
-	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = getenv(VARTMPDNAME) ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = TMPDNAME ;
 
 	if ((rs >= 0) && f_recipients) {
 	    int		i ;
 	    cchar	*po = PO_HEADER ;
-	    cchar	*types[4] = { "to", "cc", "bcc", NULL } ;
+	    cchar	*types[4] = { "to", "cc", "bcc", nullptr } ;
 	    for (i = 0 ; i < 3 ; i += 1) {
 	        rs = paramopt_loaduniq(&aparams,po,types[i],-1) ;
 		if (rs < 0) break ;
@@ -775,10 +762,10 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	}
 
 	if ((rs >= 0) && (pip->linelen == 0)) {
-	    if ((cp = getourenv(envv,VARLINELEN)) == NULL) {
+	    if ((cp = getourenv(envv,VARLINELEN)) == nullptr) {
 	        cp = getourenv(envv,VARCOLUMNS) ;
 	    }
-	    if (cp != NULL) {
+	    if (cp != nullptr) {
 	        if ((rs = optvalue(cp,-1)) >= 0) {
 	            pip->linelen = rs ;
 	        }
@@ -793,7 +780,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2) && (rs >= 0))
-	    debugprintf("main: AKO expand=%u\n",lsp->f.expand) ;
+	    debugprintf("main: AKO expand=%u\n",lsp->fl.expand) ;
 #endif /* CF_DEBUG */
 
 /* check arguments */
@@ -801,7 +788,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
 	    PARAMOPT_CUR	c ;
-	    const char	*ccp ;
+	    cchar	*ccp ;
 	    debugprintf("main: parameter keys are:\n") ;
 	    paramopt_curbegin(&aparams,&c) ;
 	    while (paramopt_curenumkey(&aparams,&c,&ccp) >= 0) {
@@ -846,9 +833,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	ainfo.ai_pos = ai_pos ;
 
 	if (rs >= 0) {
-	    const char	*ofn = ofname ;
-	    const char	*ifn = ifname ;
-	    const char	*afn = afname ;
+	    cchar	*ofn = ofname ;
+	    cchar	*ifn = ifname ;
+	    cchar	*afn = afname ;
 	    rs = procargs(pip,&ainfo,&pargs,&aparams,ofn,ifn,afn) ;
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;
@@ -862,7 +849,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: invalid usage (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -890,19 +877,19 @@ retearly:
 	    debugprintf("main: exiting rs=%d ex=%u\n",rs,ex) ;
 #endif
 
-	if (pip->efp != NULL) {
-	    pip->open.errfile = FALSE ;
+	if (pip->efp != nullptr) {
+	    pip->open.errfile = false ;
 	    bclose(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.aparams) {
-	    pip->open.aparams = NULL ;
+	    pip->open.aparams = nullptr ;
 	    paramopt_finish(&aparams) ;
 	}
 
 	if (pip->open.akopts) {
-	    pip->open.akopts = NULL ;
+	    pip->open.akopts = nullptr ;
 	    keyopt_finish(&akopts) ;
 	}
 
@@ -947,8 +934,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<msgfile(s)>] [-af <afile>] [-h <header(s)>]\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -973,9 +960,9 @@ static int procopts(PROGINFO *pip,KEYOPT *akp)
 	CMD_LOCAL	*lsp = pip->lsp ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
-	if ((cp = getenv(VAROPTS)) != NULL) {
+	if ((cp = getenv(VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(akp,cp,-1) ;
 	}
 
@@ -990,30 +977,30 @@ static int procopts(PROGINFO *pip,KEYOPT *akp)
 
 	            if ((oi = matostr(akonames,1,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(akp,kp,NULL,&vp) ;
+	                vl = keyopt_fetch(akp,kp,nullptr,&vp) ;
 
 	                switch (oi) {
 	                case akoname_noexpand:
 	                case akoname_list:
-	                    lsp->f.expand = FALSE ;
+	                    lsp->fl.expand = false ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lsp->f.expand = (rs > 0) ;
+	                        lsp->fl.expand = (rs > 0) ;
 	                    }
 	                    break ;
 	                case akoname_expand:
 	                case akoname_flat:
-	                    lsp->f.expand = TRUE ;
+	                    lsp->fl.expand = trueg ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lsp->f.expand = (rs > 0) ;
+	                        lsp->fl.expand = (rs > 0) ;
 	                    }
 	                    break ;
 	                case akoname_info:
-	                    lsp->f.info = TRUE ;
+	                    lsp->fl.info = trueg ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lsp->f.info = (rs > 0) ;
+	                        lsp->fl.info = (rs > 0) ;
 	                    }
 	                    break ;
 	                } /* end switch */
@@ -1059,27 +1046,27 @@ static int procsubpart(PROGINFO *pip,PARAMOPT *pop,CMD_LOCAL *lsp)
 	            if ((i = matostr(subparts,1,vp,vl)) >= 0) {
 	                switch (i) {
 	                case subpart_address:
-	                    lsp->af.address = TRUE ;
+	                    lsp->afl.address = trueg ;
 	                    spc += 1 ;
 	                    break ;
 	                case subpart_route:
-	                    lsp->af.route = TRUE ;
+	                    lsp->afl.route = trueg ;
 	                    spc += 1 ;
 	                    break ;
 	                case subpart_comment:
-	                    lsp->af.comment = TRUE ;
+	                    lsp->afl.comment = trueg ;
 	                    spc += 1 ;
 	                    break ;
 	                case subpart_original:
-	                    lsp->af.original = TRUE ;
+	                    lsp->afl.original = trueg ;
 	                    spc += 1 ;
 	                    break ;
 	                case subpart_best:
-	                    lsp->af.best = TRUE ;
+	                    lsp->afl.best = trueg ;
 	                    spc += 1 ;
 	                    break ;
 	                case subpart_any:
-	                    lsp->af.any = TRUE ;
+	                    lsp->afl.anyone = trueg ;
 	                    spc += 1 ;
 	                    break ;
 	                } /* end switch */
@@ -1094,7 +1081,7 @@ static int procsubpart(PROGINFO *pip,PARAMOPT *pop,CMD_LOCAL *lsp)
 	} /* end if (paramopt_curbegin) */
 	lsp->spc = spc ;
 	if (spc <= 0) {
-	    lsp->af.best = TRUE ;
+	    lsp->afl.best = trueg ;
 	}
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1116,14 +1103,14 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
-	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-'))
+	if ((ofn == nullptr) || (ofn[0] == '\0') || (ofn[0] == '-'))
 	    ofn = BFILE_STDOUT ;
 
 	if ((rs = bopen(ofp,ofn,"wct",0666)) >= 0) {
 	    int		pan = 0 ;
-	    int		f_input = TRUE ;
+	    int		f_input = trueg ;
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    pip->ofp = ofp ;
 
 	    if (rs >= 0) {
@@ -1132,9 +1119,9 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 	        for (ai = 1 ; ai < aip->argc ; ai += 1) {
 
 	            f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
-	            f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
+	            f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
 	            if (f) {
-	                f_input = FALSE ;
+	                f_input = false ;
 	                cp = aip->argv[ai] ;
 	                if (cp[0] != '\0') {
 	                    pan += 1 ;
@@ -1147,10 +1134,10 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 	        } /* end for (looping through mail message files) */
 	    } /* end if (ok) */
 
-	    if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
+	    if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
 	        bfile	afile, *afp = &afile ;
 
-	        f_input = FALSE ;
+	        f_input = false ;
 	        if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	        if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
@@ -1178,7 +1165,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 	            rs1 = bclose(afp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			fmt = "%s: inaccessible arglist (%d)\n" ;
 	                bprintf(pip->efp,fmt,pn,rs) ;
 	                bprintf(pip->efp,"%s: afile=%s\n",afn) ;
@@ -1189,7 +1176,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 
 	    if ((rs >= 0) && f_input) {
 
-	        if ((ifn == NULL) || (ifn[0] == '\0')) ifn = "-" ;
+	        if ((ifn == nullptr) || (ifn[0] == '\0')) ifn = "-" ;
 
 	        cp = ifn ;
 	        pan += 1 ;
@@ -1198,7 +1185,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 
 	        if (rs < 0) {
 	            if (strcmp(cp,"-") == 0) cp = "*STDIN*" ;
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                bprintf(pip->efp,
 	                    "%s: problem (%d) file=%s\n",
 	                    pip->progname,rs,cp) ;
@@ -1207,10 +1194,10 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 
 	    } /* end if */
 
-	    if ((rs >= 0) && lsp->f.count)
+	    if ((rs >= 0) && lsp->fl.count)
 	        bprintf(ofp,"%u\n",count) ;
 
-	    pip->ofp = NULL ;
+	    pip->ofp = nullptr ;
 	    rs1 = bclose(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
