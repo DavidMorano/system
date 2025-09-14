@@ -254,7 +254,7 @@ int		intcheck ;
 	if (rs < 0)
 	    goto bad2 ;
 
-	cfp->f.p = TRUE ;
+	cfp->fl.p = TRUE ;
 	rs = config_read(cfp) ;
 	if (rs < 0)
 	    goto bad2 ;
@@ -294,7 +294,7 @@ struct config	*cfp ;
 	    return SR_FAULT ;
 
 	pip = cfp->pip ;
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 	    const time_t	dt = pip->daytime ;
 	    const int		intcheck = cfp->intcheck ;
 	    int			f_check = TRUE ;
@@ -352,7 +352,7 @@ struct config	*cfp ;
 	if (pip == NULL)
 	    return SR_FAULT ;
 
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 
 	    rs1 = expcook_finish(&cfp->cooks) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -398,7 +398,7 @@ struct config	*cfp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("config_read: f_p=%u\n",cfp->f.p) ;
+	    debugprintf("config_read: f_p=%u\n",cfp->fl.p) ;
 #endif
 
 	if (cfp == NULL)
@@ -406,7 +406,7 @@ struct config	*cfp ;
 
 	pip = cfp->pip ;
 	lip = pip->lip ;
-	if (! cfp->f.p)
+	if (! cfp->fl.p)
 	    goto ret0 ;
 
 	if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
