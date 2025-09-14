@@ -149,7 +149,7 @@ char	*envv[] ;
 
 	pip->debuglevel = 0 ;
 
-	pip->f.verbose = FALSE ;
+	pip->fl.verbose = FALSE ;
 
 /* gather the arguments */
 
