@@ -122,12 +122,12 @@ int progadjust(PROGINFO *pip,struct timeval *tvp)
 	if (labs(tvp->tv_sec) > 0) {
 	    if (pip->open.logsys) {
 		const int	logpri = LOG_NOTICE ;
-		logsys_printf(&pip->ls,logpri,"adjusting=%u",(! pip->f.test)) ;
+		logsys_printf(&pip->ls,logpri,"adjusting=%u",(! pip->fl.test)) ;
 	    }
 	    if (pip->debuglevel > 0) {
-	        bprintf(pip->efp,"%s: adjusting=%u",(! pip->f.test)) ;
+	        bprintf(pip->efp,"%s: adjusting=%u",(! pip->fl.test)) ;
 	    }
-	    if (! pip->f.test) {
+	    if (! pip->fl.test) {
 	        rs = u_adjtime(tvp,NULL) ;
 	    }
 	} /* end if */
