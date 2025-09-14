@@ -141,7 +141,7 @@ int progdeliver(proginfo *pip,int tfd,RECIP *rp) noex {
 	if ((rs = progdeliverer(pip,tfd,rp,md,TRUE)) >= 0) {
 	    md = pip->copymaildname ;
 	    tlen = rs ;
-	    if (pip->f.optcopy && (md != NULL)) {
+	    if (pip->fl.optcopy && (md != NULL)) {
 		    cchar *fmt ;
 	            if ((rs = progdeliverer(pip,tfd,rp,md,FALSE)) >= 0) {
 			fmt = "  msg-copy (%d)" ;
