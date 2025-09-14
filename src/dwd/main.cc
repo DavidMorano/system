@@ -237,7 +237,7 @@ const char	*envv[] ;
 	} else
 	    rs = bopen(&errfile,BFILE_STDERR,"dwca",0666) ;
 	if (rs >= 0) {
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    pip->efp = &errfile ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	} /* end if (we have some STDERR) */
@@ -500,7 +500,7 @@ const char	*envv[] ;
 
 	                        case 'Q':
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* version */
@@ -526,7 +526,7 @@ const char	*envv[] ;
 
 /* poll only */
 	                        case 'p':
-	                            pip->f.poll = TRUE ;
+	                            pip->fl.poll = TRUE ;
 	                            if (f_optequal) {
 
 	                                f_optequal = FALSE ;
@@ -1100,7 +1100,7 @@ const char	*envv[] ;
 			pip->interrupt) ;
 #endif
 
-	        pip->f.interrupt = TRUE ;
+	        pip->fl.interrupt = TRUE ;
 
 	    }
 
@@ -1192,7 +1192,7 @@ const char	*envv[] ;
 
 	if (rs >= 0) {
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 	        daytime = time(NULL) ;
 
 	    logfile_printf(&pip->lh,"") ;
@@ -1233,14 +1233,14 @@ const char	*envv[] ;
 	        pip->srvtab) ;
 #endif
 
-	pip->f.srvtab = FALSE ;
+	pip->fl.srvtab = FALSE ;
 	if (u_access(pip->srvtab,R_OK) >= 0)
-	    pip->f.srvtab = TRUE ;
+	    pip->fl.srvtab = TRUE ;
 
 	else
 	    pip->srvtab = SRVFNAME2 ;
 
-	if (pip->f.srvtab || (u_access(pip->srvtab,R_OK) >= 0)) {
+	if (pip->fl.srvtab || (u_access(pip->srvtab,R_OK) >= 0)) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -1254,7 +1254,7 @@ const char	*envv[] ;
 
 	    rs = srvtab_open(&sf,pip->srvtab,NULL) ;
 
-	    pip->f.srvtab = (rs >= 0) ;
+	    pip->fl.srvtab = (rs >= 0) ;
 	    if (rs < 0)
 	        goto badsrv ;
 
@@ -1304,7 +1304,7 @@ const char	*envv[] ;
 	    debugprintf("main: done w/ srvtab file?\n") ;
 #endif
 
-	if ((pip->command == NULL) && (! pip->f.srvtab))
+	if ((pip->command == NULL) && (! pip->fl.srvtab))
 	    goto badnosrv ;
 
 
@@ -1336,7 +1336,7 @@ const char	*envv[] ;
 	        u_close(i) ;
 #endif /* COMMENT */
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_flush(&pip->lh) ;
 
 	    rs = uc_fork() ;
@@ -1475,7 +1475,7 @@ const char	*envv[] ;
 	    if (rs < 0)
 	        goto badpidfile2 ;
 
-	    pip->f.pidfile = TRUE ;
+	    pip->fl.pidfile = TRUE ;
 	    lfm_printf(&pip->pider,"%-14s %s/%s\n",
 	        pip->progname,
 	        VERSION,(u.f.sysv_ct) ? "SYSV" : "BSD") ;
@@ -1519,7 +1519,7 @@ const char	*envv[] ;
 
 /* make some last log entries before we get into bad boogying! */
 
-	if (pip->f.log && (userbuf[0] != '\0')) {
+	if (pip->fl.log && (userbuf[0] != '\0')) {
 
 	        daytime = time(NULL) ;
 
@@ -1543,7 +1543,7 @@ const char	*envv[] ;
 
 	    logfile_printf(&pip->lh,"dir=%s",pip->directory) ;
 
-	    if (pip->f.interrupt)
+	    if (pip->fl.interrupt)
 	        logfile_printf(&pip->lh,"intfile=%s",
 	            pip->interrupt) ;
 
@@ -1568,7 +1568,7 @@ const char	*envv[] ;
 	if ((pip->pidfname != NULL) && (pip->pidfname[0] != '\0'))
 	    lfm_finish(&pip->pider) ;
 
-	if (pip->f.srvtab)
+	if (pip->fl.srvtab)
 		srvtab_close(&sf) ;
 
 	job_free(&jobs) ;
@@ -1584,7 +1584,7 @@ ret4:
 	    bprintf(pip->efp,"%s: exiting ex=%u (%d)\n",
 	        pip->progname,ex,rs) ;
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_close(&pip->lh) ;
 
 ret3:
@@ -1689,7 +1689,7 @@ badconfig:
 	goto badret ;
 
 badlock:
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 
 	    bprintf(pip->efp,
 	        "%s: there was a lock file \"%s\" already\n",
@@ -1732,7 +1732,7 @@ badpidlock:
 	    debugprintf("main: PID lock failed, rs=%d\n",rs) ;
 #endif
 
-	if ((pip->debuglevel > 0) || (! pip->f.quiet)) {
+	if ((pip->debuglevel > 0) || (! pip->fl.quiet)) {
 
 	    bprintf(pip->efp,
 	        "%s: could not open the PID lock file (%d)\n",
@@ -1770,7 +1770,7 @@ badlock2:
 	goto daemonret ;
 
 badpidfile2:
-	if ((pip->debuglevel > 0) || (! pip->f.quiet))
+	if ((pip->debuglevel > 0) || (! pip->fl.quiet))
 	    logfile_printf(&pip->lh,
 	        "could not capture the PID lock file (%d)\n",rs) ;
 
