@@ -289,11 +289,11 @@ const char	*envv[] ;
 	pip->to_blank = -1 ;
 	pip->offint = -1 ;
 
-	pip->f.quiet = FALSE ;
-	pip->f.lockfile = TRUE ;
-	pip->f.pidfile = TRUE ;
-	pip->f.lockopen = FALSE ;
-	pip->f.pidopen = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.lockfile = TRUE ;
+	pip->fl.pidfile = TRUE ;
+	pip->fl.lockopen = FALSE ;
+	pip->fl.pidopen = FALSE ;
 
 	f_statdisplay = FALSE ;
 	f_help = FALSE ;
@@ -529,7 +529,7 @@ const char	*envv[] ;
 
 /* set the lock file directory */
 	                        case 'l':
-	                            pip->f.lockfile = TRUE ;
+	                            pip->fl.lockfile = TRUE ;
 	                            if (f_optequal) {
 	                                f_optequal = FALSE ;
 	                                if (avl)
@@ -566,7 +566,7 @@ const char	*envv[] ;
 
 /* observe PID file */
 	                        case 'p':
-	                            pip->f.pidfile = TRUE ;
+	                            pip->fl.pidfile = TRUE ;
 	                            if (f_optequal) {
 	                                f_optequal = FALSE ;
 	                                if (avl)
@@ -575,7 +575,7 @@ const char	*envv[] ;
 	                            break ;
 
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 	                        case 's':
@@ -854,7 +854,7 @@ const char	*envv[] ;
 
 	if (rs >= 0) {
 
-		pip->f.log = TRUE ;
+		pip->fl.log = TRUE ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
@@ -900,7 +900,7 @@ const char	*envv[] ;
 /* before we go too far, are we supposed to observe a lock file? */
 
 	lockfname[0] = '\0' ;
-	if (pip->f.lockfile) {
+	if (pip->fl.lockfile) {
 	    mode_t	umask_old ;
 
 #if	CF_DEBUG
@@ -969,7 +969,7 @@ const char	*envv[] ;
 	        goto badlock1 ;
 	    }
 
-	    pip->f.lockopen = TRUE ;
+	    pip->fl.lockopen = TRUE ;
 	    lfm_printf(&pip->lk,"%-14s %s\n",
 	        pip->progname,
 	        VERSION) ;
@@ -985,7 +985,7 @@ const char	*envv[] ;
 /* before we go too far, are we the only one on this PID mutex? */
 
 	pidfname[0] = '\0' ;
-	if (pip->f.pidfile) {
+	if (pip->fl.pidfile) {
 
 	    mode_t	umask_old ;
 
@@ -1055,7 +1055,7 @@ const char	*envv[] ;
 	    if (rs < 0)
 	        goto badpidopen ;
 
-	    pip->f.pidopen = TRUE ;
+	    pip->fl.pidopen = TRUE ;
 	    lfm_printf(&pip->pidlock,"%-14s %s\n",
 	        pip->progname,
 	        VERSION) ;
@@ -1074,7 +1074,7 @@ const char	*envv[] ;
 	    if (DEBUGLEVEL(2)) {
 
 	    debugprintf("main: calling 'daytimer' f_lock=%d f_pid=%d\n",
-	        pip->f.lockfile,pip->f.pidfile) ;
+	        pip->fl.lockfile,pip->fl.pidfile) ;
 
 	    debugprintf("main: refresh=%d to_blank=%d\n",
 	        refresh,pip->to_blank) ;
@@ -1092,7 +1092,7 @@ const char	*envv[] ;
 
 	}
 
-	if (pip->f.log) {
+	if (pip->fl.log) {
 
 		logfile_printf(&pip->lh,"PID=%u SID=%u",
 			(uint) pip->pid,(uint) pip->sid) ;
@@ -1185,16 +1185,16 @@ const char	*envv[] ;
 /* close off and get out ! */
 done:
 ret5:
-	if (pip->f.pidopen)
+	if (pip->fl.pidopen)
 	    lfm_finish(&pip->pidlock) ;
 
-	if (pip->f.lockopen)
+	if (pip->fl.lockopen)
 	    lfm_finish(&pip->lk) ;
 
 	if (lockfname[0] != '\0')
 		u_unlink(lockfname) ;
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_close(&pip->lh) ;
 
 ret4:
@@ -1253,7 +1253,7 @@ badnotterm:
 
 baduser:
 	ex = EX_NOUSER ;
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 	    bprintf(pip->efp,
 	        "%s: could not get user information (%d)\n",
 	        pip->progname,rs) ;
@@ -1279,7 +1279,7 @@ badlock1:
 	goto badret ;
 
 badpiddir:
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 	    bprintf(pip->efp,
 	        "%s: could not create the PID directory (%d)\n",
 	        pip->progname,rs) ;
@@ -1396,9 +1396,9 @@ KEYOPT		*kop ;
 	                break ;
 
 	            case progopt_logextra:
-			pip->f.logextra = TRUE ;
+			pip->fl.logextra = TRUE ;
 	                if ((vl > 0) && (cfdeci(vp,vl,&val) >= 0))
-	                    pip->f.logextra = (val > 0) ;
+	                    pip->fl.logextra = (val > 0) ;
 	                break ;
 
 	            } /* end switch */
