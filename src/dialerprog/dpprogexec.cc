@@ -173,9 +173,9 @@ int		argr ;
 	cl = -1 ;
 	f_sa = (argv[0] == NULL) ;
 	f_sa = f_sa || ((argv[0] != NULL) && hasonlyplusminus(argv[0],-1)) ;
-	f_sa = f_sa || pip->f.shell ;
+	f_sa = f_sa || pip->fl.shell ;
 	if (f_sa) {
-	    si = pip->f.shell ? 0 : 1 ;
+	    si = pip->fl.shell ? 0 : 1 ;
 	    cl = sfbasename(progfname,-1,&cp) ;
 	    start = (cl+2) ;
 	}
@@ -186,8 +186,8 @@ int		argr ;
 #endif
 
 	f_m = FALSE ;
-	f_m = f_m || ((argv[0] == NULL) && pip->f.progminus) ;
-	f_m = f_m || ((argv[0] == NULL) && pip->f.progdash) ;
+	f_m = f_m || ((argv[0] == NULL) && pip->fl.progminus) ;
+	f_m = f_m || ((argv[0] == NULL) && pip->fl.progdash) ;
 	f_m = f_m || ((argv[0] != NULL) && hasonlyminus(argv[0],-1)) ;
 
 	rs = buffer_start(&b,start) ;
@@ -196,7 +196,7 @@ int		argr ;
 
 	if (f_sa || f_m) {
 
-	    if ((argr > 0) && pip->f.shell) {
+	    if ((argr > 0) && pip->fl.shell) {
 	        si = 1 ;
 	        argr -= 1 ;
 	    }
