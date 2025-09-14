@@ -1,20 +1,19 @@
-/* defs */
+/* defs HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* Copyright © 1998,2004 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	DEFS_INCLUDE
-#define	DEFS_INCLUDE	1
+#define	DEFS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/timeb.h>
 #include	<netdb.h>
-
 #include	<userinfo.h>
 #include	<pcsconf.h>
 #include	<logfile.h>
@@ -24,7 +23,6 @@
 #include	<ids.h>
 #include	<grmems.h>
 #include	<sysrealname.h>
-#include	<localmisc.h>
 
 #include	"logzones.h"
 #include	"msgid.h"
@@ -169,52 +167,49 @@ struct proginfo_flags {
 } ;
 
 struct proginfo {
-	vecstr		stores ;
-	const char	**envv ;
-	const char	*pwd ;
-	const char	*progename ;
-	const char	*progdname ;
-	const char	*progname ;
-	const char	*pr ;
-	const char	*searchname ;
-	const char	*version ;
-	const char	*banner ;
-	const char	*nodename ;	/* USERINFO */
-	const char	*domainname ;	/* USERINFO */
-	const char	*username ;	/* USERINFO */
-	const char	*homedname ;	/* USERINFO */
-	const char	*groupname ;	/* USERINFO */
-	const char	*name ;		/* USERINFO */
-	const char	*fullname ;	/* USERINFO */
-	const char	*mailname ;	/* USERINFO */
-	const char	*logid ;	/* USERINFO */
-	const char	*cluster ;	/* USERINFO */
-	const char	*username_pcs ;
-	const char	*tmpdname ;
-	const char	*maildname ;
-	const char	*boxdname ;
-	const char	*deadmaildname ;
-	const char	*lfname ;
-	const char	*zfname ;
-	const char	*comsatfname ;
-	const char	*mbfname ;
-	const char	*spamfname ;
-	const char	*spambox ;
-	const char	*boxname ;
-	const char	*lockaddr ;
-	const char	*envfromaddr ;
-	const char	*msgsubject ;
-	const char	*protospec ;
+	cchar		**envv ;
+	cchar		*pwd ;
+	cchar		*progename ;
+	cchar		*progdname ;
+	cchar		*progname ;
+	cchar		*pr ;
+	cchar		*searchname ;
+	cchar		*version ;
+	cchar		*banner ;
+	cchar		*nodename ;	/* USERINFO */
+	cchar		*domainname ;	/* USERINFO */
+	cchar		*username ;	/* USERINFO */
+	cchar		*homedname ;	/* USERINFO */
+	cchar		*groupname ;	/* USERINFO */
+	cchar		*name ;		/* USERINFO */
+	cchar		*fullname ;	/* USERINFO */
+	cchar		*mailname ;	/* USERINFO */
+	cchar		*logid ;	/* USERINFO */
+	cchar		*cluster ;	/* USERINFO */
+	cchar		*username_pcs ;
+	cchar		*tmpdname ;
+	cchar		*maildname ;
+	cchar		*boxdname ;
+	cchar		*deadmaildname ;
+	cchar		*lfname ;
+	cchar		*zfname ;
+	cchar		*comsatfname ;
+	cchar		*mbfname ;
+	cchar		*spamfname ;
+	cchar		*spambox ;
+	cchar		*boxname ;
+	cchar		*lockaddr ;
+	cchar		*envfromaddr ;
+	cchar		*msgsubject ;
+	cchar		*protospec ;
 	cchar		*zname ;
 	USERINFO	*uip ;
 	PCSCONF		*pp ;
 	void		*lip ;
 	void		*efp ;
 	void		*namecache ;
-	PROGINFO_FL	have, f, changed, final ;
-	PROGINFO_FL	arg ;
-	PROGINFO_FL	open ;
-	struct timeb	now ;
+	vecstr		stores ;
+	TIMEB		now ;
 	DATER		tmpdate ;
 	LOGFILE		lh ;
 	LOGFILE		envsum ;
@@ -225,6 +220,11 @@ struct proginfo {
 	gid_t		gid, egid, gid_maildir ;
 	gid_t		gid_mail ;
 	pid_t		pid ;
+	PROGINFO_FL	have, changed, final ;
+	PROGINFO_FL	fl ;
+	PROGINFO_FL	arg ;
+	PROGINFO_FL	open ;
+	uint		magic ;
 	int		pwdlen ;
 	int		progmode ;
 	int		debuglevel ;
@@ -242,15 +242,15 @@ struct proginfo {
 } ;
 
 struct pivars {
-	const char	*vpr1 ;
-	const char	*vpr2 ;
-	const char	*vpr3 ;
-	const char	*pr ;
-	const char	*vprname ;
+	cchar		*vpr1 ;
+	cchar		*vpr2 ;
+	cchar		*vpr3 ;
+	cchar		*pr ;
+	cchar		*vprname ;
 } ;
 
 struct arginfo {
-	const char	**argv ;
+	cchar		**argv ;
 	int		argc ;
 	int		ai, ai_max, ai_pos ;
 	int		ai_continue ;
@@ -277,14 +277,14 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	struct proginfo	*pip ;
+	proginfo	*pip ;
 	vecstr		stores ;
 	vecstr		mboxes ;
 	MSGID		mids ;
 	WHITELIST	wl1, wl2, bl1, bl2 ;
 	GRMEMS		gm ;
 	SYSREALNAME	rn ;
-	LOCINFO_FL	f ;
+	LOCINFO_FL	fl ;
 	LOCINFO_FL	open ;
 	int		to ;
 } ;
@@ -304,7 +304,7 @@ struct msginfo {
 	int		mi ;		/* message index */
 	int		clen ;		/* content-length */
 	int		clines ;	/* content-lines */
-	struct msginfo_flags	f ;
+	MSGINFO_FL	fl ;
 	char		e_from[MAILADDRLEN + 1] ;
 	char		h_messageid[MAILADDRLEN + 1] ;
 	char		h_returnpath[MAILADDRLEN + 1] ;
@@ -319,29 +319,24 @@ struct msginfo {
 	char		h_articleid[MAXNAMELEN+ 1] ;
 } ;
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int proginfo_start(proginfo *,cchar **,cchar *,cchar *) noex ;
+extern int proginfo_setprogroot(proginfo *,cchar *,int) noex ;
+extern int proginfo_setentry(proginfo *,cchar **,cchar *,int) noex ;
+extern int proginfo_setversion(proginfo *,cchar *) noex ;
+extern int proginfo_setbanner(proginfo *,cchar *) noex ;
+extern int proginfo_setsearchname(proginfo *,cchar *,cchar *) noex ;
+extern int proginfo_setprogname(proginfo *,cchar *) noex ;
+extern int proginfo_setexecname(proginfo *,cchar *) noex ;
+extern int proginfo_pwd(proginfo *) noex ;
+extern int proginfo_progdname(proginfo *) noex ;
+extern int proginfo_progename(proginfo *) noex ;
+extern int proginfo_getpwd(proginfo *,char *,int) noex ;
+extern int proginfo_finish(proginfo *) noex ;
 
-extern int proginfo_start(struct proginfo *,const char **,const char *,
-		const char *) ;
-extern int proginfo_setprogroot(struct proginfo *,const char *,int) ;
-extern int proginfo_setentry(struct proginfo *,const char **,const char *,int) ;
-extern int proginfo_setversion(struct proginfo *,const char *) ;
-extern int proginfo_setbanner(struct proginfo *,const char *) ;
-extern int proginfo_setsearchname(struct proginfo *,const char *,const char *) ;
-extern int proginfo_setprogname(struct proginfo *,const char *) ;
-extern int proginfo_setexecname(struct proginfo *,const char *) ;
-extern int proginfo_pwd(struct proginfo *) ;
-extern int proginfo_progdname(struct proginfo *) ;
-extern int proginfo_progename(struct proginfo *) ;
-extern int proginfo_getpwd(struct proginfo *,char *,int) ;
-extern int proginfo_finish(struct proginfo *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* DEFS_INCLUDE */
 
