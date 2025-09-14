@@ -331,10 +331,10 @@ const char	*av[] ;
 
 #if	CF_DEBUGS
 	debugprintf("usd_open: subinfo_logfile()\n") ;
-	debugprintf("usd_open: f_log=%u\n",op->f.log) ;
+	debugprintf("usd_open: f_log=%u\n",op->fl.log) ;
 #endif
 
-	if ((rs >= 0) && sip->f.log)
+	if ((rs >= 0) && sip->fl.log)
 	    rs = subinfo_logfile(sip) ;
 
 /* parse the port-specification if we have one */
@@ -641,11 +641,11 @@ USD		*op ;
 
 	rs = u_close(op->fd) ;
 
-	if (op->f.log) {
+	if (op->fl.log) {
 
 	    logfile_printf(&op->lh,"bytes=%u",op->tlen) ;
 
-	    op->f.log = FALSE ;
+	    op->fl.log = FALSE ;
 	    logfile_close(&op->lh) ;
 
 	} /* end if */
@@ -705,8 +705,8 @@ struct subinfo	*sip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (sip->f.ids) {
-	    sip->f.ids = FALSE ;
+	if (sip->fl.ids) {
+	    sip->fl.ids = FALSE ;
 	    rs1 = ids_load(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -929,7 +929,7 @@ struct subinfo	*sip ;
 
 /* logfile */
 	                case argopt_lf:
-			    sip->f.log = TRUE ;
+			    sip->fl.log = TRUE ;
 	                    if (f_optequal) {
 
 	                        f_optequal = FALSE ;
@@ -1086,7 +1086,7 @@ struct subinfo	*sip ;
 	                        break ;
 
 	                    case 'i':
-	                        sip->f.ignore = TRUE ;
+	                        sip->fl.ignore = TRUE ;
 	                        break ;
 
 /* options */
@@ -1264,9 +1264,9 @@ KEYOPT		*kop ;
 	        switch (oi) {
 
 	        case procopt_log:
-	                sip->f.log = TRUE ;
+	                sip->fl.log = TRUE ;
 	                if ((vl > 0) && ((rs = optbool(vp,vl)) >= 0))
-	                    sip->f.log = (rs > 0) ;
+	                    sip->fl.log = (rs > 0) ;
 	            break ;
 
 	        } /* end switch */
@@ -1442,10 +1442,10 @@ struct subinfo	*sip ;
 	USERINFO	*uip = &sip->u ;
 	int		rs = SR_OK ;
 
-	if (sip->f.userinfo)
+	if (sip->fl.userinfo)
 	    goto ret0 ;
 
-	sip->f.userinfo = TRUE ;
+	sip->fl.userinfo = TRUE ;
 	rs = userinfo(uip,sip->userinfobuf,USERINFO_LEN,NULL) ;
 	if (rs < 0)
 	    goto bad0 ;
@@ -1485,10 +1485,10 @@ struct subinfo	*sip ;
 	const char	*lidp = NULL ;
 	char		logfname[MAXPATHLEN + 1] ;
 
-	if (! sip->f.log)
+	if (! sip->fl.log)
 	    goto ret0 ;
 
-	sip->f.log = TRUE ;
+	sip->fl.log = TRUE ;
 	lnp = sip->logfname ;
 	if (lnp[0] != '/') {
 	    rs = mkpath3(logfname,sip->pr,USD_LOGDNAME,lnp) ;
@@ -1503,7 +1503,7 @@ struct subinfo	*sip ;
 	    goto ret0 ;
 
 	    rs1 = logfile_open(&op->lh,lnp,0,0666,lidp) ;
-	    op->f.log = (rs1 >= 0) ;
+	    op->fl.log = (rs1 >= 0) ;
 
 #if	CF_DEBUGS
 	debugprintf("usd/subinfo_logfile: logfile_open() rs=%d\n",rs1) ;
@@ -1512,10 +1512,10 @@ struct subinfo	*sip ;
 	    if (rs1 >= 0) {
 		USERINFO	*uip = &sip->u ;
 
-		if (! sip->f.userinfo)
+		if (! sip->fl.userinfo)
 		     subinfo_userinfo(sip) ;
 
-		if (sip->f.userinfo) {
+		if (sip->fl.userinfo) {
 
 	            logfile_userinfo(&op->lh,uip,0L,
 	                USD_MNAME,USD_VERSION) ;
@@ -1553,8 +1553,8 @@ int		dlen ;
 	int		f = FALSE ;
 	const char	*dnp ;
 
-	if (! sip->f.ids) {
-	    sip->f.ids = TRUE ;
+	if (! sip->fl.ids) {
+	    sip->fl.ids = TRUE ;
 	    rs = ids_load(&sip->id) ;
 	}
 
