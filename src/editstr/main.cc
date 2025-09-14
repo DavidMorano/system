@@ -573,7 +573,7 @@ char	*envv[] ;
 
 /* follow symbolic links */
 	                case argopt_follow:
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    break ;
 
 /* default action and user specified help */
@@ -602,7 +602,7 @@ char	*envv[] ;
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -611,7 +611,7 @@ char	*envv[] ;
 
 /* follow symbolic links */
 	                    case 'f':
-	                        pip->f.follow = TRUE ;
+	                        pip->fl.follow = TRUE ;
 	                        break ;
 
 /* file name length restriction */
@@ -642,7 +642,7 @@ char	*envv[] ;
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* options */
@@ -663,13 +663,13 @@ char	*envv[] ;
 
 /* recurse down directories */
 	                    case 'r':
-	                        pip->f.recurse = TRUE ;
+	                        pip->fl.recurse = TRUE ;
 	                        if (f_optequal) {
 
 	                            f_optequal = FALSE ;
 				    if (avl) {
 	                                rs = cfdeci(avp,avl, &v) ;
-				        pip->f.recurse = (v > 0) ? 1 : 0 ;
+				        pip->fl.recurse = (v > 0) ? 1 : 0 ;
 				    }
 	                        }
 
@@ -908,7 +908,7 @@ char	*envv[] ;
 
 		if (cp == NULL) continue ;
 
-	        pip->f.suffix = TRUE ;
+	        pip->fl.suffix = TRUE ;
 		rs = vecstr_add(&pip->suffixes,cp,-1) ;
 		if (rs < 0)
 			break ;
@@ -943,15 +943,15 @@ char	*envv[] ;
 	            switch (kwi) {
 
 	            case progopt_follow:
-	                pip->f.follow = TRUE ;
+	                pip->fl.follow = TRUE ;
 	                break ;
 
 	            case progopt_nofollow:
-	                pip->f.follow = FALSE ;
+	                pip->fl.follow = FALSE ;
 	                break ;
 
 	            case progopt_nostop:
-	                pip->f.nostop = TRUE ;
+	                pip->fl.nostop = TRUE ;
 	                break ;
 
 	            } /* end switch */
@@ -1059,7 +1059,7 @@ char	*envv[] ;
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file (%d)\n",
@@ -1263,9 +1263,9 @@ KEYOPT		*kop ;
 		    if (! lip->have.header) {
 
 	            lip->have.header = TRUE ;
-	            lip->f.header = TRUE ;
+	            lip->fl.header = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                lip->f.header = (uv > 0) ? 1 : 0 ;
+	                lip->fl.header = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1275,9 +1275,9 @@ KEYOPT		*kop ;
 		    if (! lip->have.fmtlong) {
 
 	            lip->have.fmtlong = TRUE ;
-	            lip->f.fmtlong = TRUE ;
+	            lip->fl.fmtlong = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                lip->f.fmtlong = (uv > 0) ? 1 : 0 ;
+	                lip->fl.fmtlong = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1287,9 +1287,9 @@ KEYOPT		*kop ;
 		    if (! lip->have.fmtshort) {
 
 	            lip->have.fmtshort = TRUE ;
-	            lip->f.fmtshort = TRUE ;
+	            lip->fl.fmtshort = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                lip->f.fmtshort = (uv > 0) ? 1 : 0 ;
+	                lip->fl.fmtshort = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1299,9 +1299,9 @@ KEYOPT		*kop ;
 		    if (! lip->have.uniq) {
 
 	            lip->have.uniq = TRUE ;
-	            lip->f.uniq = TRUE ;
+	            lip->fl.uniq = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                lip->f.uniq = (uv > 0) ? 1 : 0 ;
+	                lip->fl.uniq = (uv > 0) ? 1 : 0 ;
 
 		    }
 
@@ -1311,9 +1311,9 @@ KEYOPT		*kop ;
 		    if (! lip->have.users) {
 
 	            lip->have.users = TRUE ;
-	            lip->f.users = TRUE ;
+	            lip->fl.users = TRUE ;
 	            if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                lip->f.users = (uv > 0) ? 1 : 0 ;
+	                lip->fl.users = (uv > 0) ? 1 : 0 ;
 
 		    }
 
