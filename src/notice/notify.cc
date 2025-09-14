@@ -307,7 +307,7 @@ int		mlen ;
 	                (sb.st_mode & S_IXUSR)) ;
 #endif
 
-	        if ((! pip->f.biffonly) || (sb.st_mode & S_IXUSR)) {
+	        if ((! pip->fl.biffonly) || (sb.st_mode & S_IXUSR)) {
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
@@ -317,7 +317,7 @@ int		mlen ;
 	            if ((rs = writenotice(pip,fd,mbuf,mlen)) >= 0) {
 
 	                n += 1 ;
-	                if ((pip->verboselevel >= 2) && pip->f.outfile) {
+	                if ((pip->verboselevel >= 2) && pip->fl.outfile) {
 	                    bprintf(pip->ofp,"%s\n",termfname) ;
 	                }
 
@@ -368,7 +368,7 @@ int		tlen ;
 
 /* form the notice to write out */
 
-	    if (pip->f.ringbell)
+	    if (pip->fl.ringbell)
 	        sbuf_chr(&out,CH_BELL) ;
 
 	    sbuf_chr(&out,'\r') ;
