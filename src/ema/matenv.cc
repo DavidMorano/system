@@ -162,7 +162,7 @@ int matenv(MATENV *mep,cchar *ebuf,int elen)
 
 	sp += 4 ;
 	sl -= 4 ;
-	mep->f.start = (! f) ;
+	mep->fl.start = (! f) ;
 
 /* slip whitespace */
 
