@@ -183,8 +183,8 @@ int		maxjobs, filetime ;
 	int	jobid = 0 ;
 	int	dfd, ifd, sfd ;
 	int	f_directory ;
-	int	f_interrupt = pip->f.interrupt ;
-	int	f_srvtab = pip->f.srvtab ;
+	int	f_interrupt = pip->fl.interrupt ;
+	int	f_srvtab = pip->fl.srvtab ;
 
 	char	tmpfname[MAXPATHLEN + 1] ;
 	char	timebuf[TIMEBUFLEN + 1], timebuf2[TIMEBUFLEN + 1] ;
@@ -213,7 +213,7 @@ int		maxjobs, filetime ;
 
 /* what about an interrupt file ? */
 
-	if (pip->f.interrupt &&
+	if (pip->fl.interrupt &&
 	    ((ifd = u_open(pip->interrupt,O_RDWR,0664)) >= 0)) {
 
 	    uc_closeonexec(ifd,TRUE) ;
@@ -222,15 +222,15 @@ int		maxjobs, filetime ;
 	    fds[0].events = POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI ;
 
 	} else
-	    pip->f.interrupt = FALSE ;
+	    pip->fl.interrupt = FALSE ;
 
-	f_interrupt = pip->f.interrupt ;
+	f_interrupt = pip->fl.interrupt ;
 
 
 /* what about the service table */
 
 	sfd = -1 ;
-	if (pip->f.srvtab) {
+	if (pip->fl.srvtab) {
 
 	    if (u_access(pip->srvtab,R_OK) >= 0)
 	        sfd = u_open(pip->srvtab,O_RDONLY,0666) ;
@@ -297,7 +297,7 @@ int		maxjobs, filetime ;
 	            if ((u_fstat(sfd,&ssb) >= 0) && 
 				(ssb.st_mtime > tim_srvtab)) {
 
-	                if (pip->f.srvtab)
+	                if (pip->fl.srvtab)
 	                    logfile_printf(&pip->lh,
 	                        "%s the service file changed\n",
 	                        timestr_logz(ssb.st_mtime,timebuf)) ;
@@ -319,7 +319,7 @@ int		maxjobs, filetime ;
 
 	                } /* end while */
 
-	                pip->f.srvtab = FALSE ;
+	                pip->fl.srvtab = FALSE ;
 	                if (u_access(pip->srvtab,R_OK) >= 0) {
 
 	                    (void) srvtab_close(slp) ;
@@ -328,7 +328,7 @@ int		maxjobs, filetime ;
 
 				if (rs >= 0) {
 
-	                        pip->f.srvtab = TRUE ;
+	                        pip->fl.srvtab = TRUE ;
 	                        if (tim_dir > 1) 
 					tim_dir -= 1 ;
 
@@ -339,7 +339,7 @@ int		maxjobs, filetime ;
 	                    logfile_printf(&pip->lh,
 	                        "%s the new service file is %s\n",
 	                        timestr_logz(daytime,timebuf),
-	                        (pip->f.srvtab) ? "OK" : "BAD") ;
+	                        (pip->fl.srvtab) ? "OK" : "BAD") ;
 
 	                } else {
 
@@ -357,9 +357,9 @@ int		maxjobs, filetime ;
 
 	        } else {
 
-	            if (pip->f.srvtab) {
+	            if (pip->fl.srvtab) {
 
-	                pip->f.srvtab = FALSE ;
+	                pip->fl.srvtab = FALSE ;
 	                logfile_printf(&pip->lh,
 	                    "%s service file went away\n",
 	                    timestr_logz(ssb.st_mtime,timebuf)) ;
@@ -676,7 +676,7 @@ int		maxjobs, filetime ;
 
 /* can we get rid of any old stale jobs ? */
 
-	                        if ((pip->f.srvtab && 
+	                        if ((pip->fl.srvtab && 
 	                            ((rs = srvtab_match(slp,dnp,&sep)) >= 0)) ||
 	                            (pip->command != NULL)) {
 
@@ -756,7 +756,7 @@ int		maxjobs, filetime ;
 	                        "job=%s\n",je.filename) ;
 
 	                    rs = BAD ;
-	                    if ((pip->f.srvtab && 
+	                    if ((pip->fl.srvtab && 
 	                        ((rs = srvtab_match(slp,dnp,&sep)) >= 0)) ||
 	                        (pip->command != NULL)) {
 
@@ -959,7 +959,7 @@ int		maxjobs, filetime ;
 /* scan to see if the stale jobs can be started */
 
 #ifdef	CF_STALE
-	    if ((nstale > 0) && pip->f.srvtab && f_srvtab) {
+	    if ((nstale > 0) && pip->fl.srvtab && f_srvtab) {
 
 #if	CF_DEBUG
 	if (pip->debuglevel >= 4)
@@ -1173,7 +1173,7 @@ int		maxjobs, filetime ;
 		daytime = time(NULL) ;
 
 		tim_run = daytime - tim_start ;
-		if (pip->f.poll && (nwaiting == 0) && (nstarted == 0) &&
+		if (pip->fl.poll && (nwaiting == 0) && (nstarted == 0) &&
 			(tim_run > pip->pollmodetime))
 			f_exit = TRUE ;
 
@@ -1185,7 +1185,7 @@ int		maxjobs, filetime ;
 	    timestr_logz(daytime,timebuf)) ;
 
 ret3:
-	if (pip->f.interrupt) 
+	if (pip->fl.interrupt) 
 		u_close(ifd) ;
 
 ret2:
@@ -1203,7 +1203,7 @@ ret0:
 killed:
 badlockfile:
 badpidfile:
-	if (pip->f.interrupt) 
+	if (pip->fl.interrupt) 
 		u_close(ifd) ;
 
 	if (dfd >= 0) 
