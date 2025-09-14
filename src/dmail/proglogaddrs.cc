@@ -162,7 +162,7 @@ MAILMSG		*msgp ;
 {
 	int		rs = SR_OK ;
 
-	if (pip->f.logmsg) {
+	if (pip->fl.logmsg) {
 	    int		i ;
 	    for (i = 0 ; hikeys[i] >= 0 ; i += 1) {
 	        rs = proglogaddr(pip,msgp,i) ;
@@ -211,7 +211,7 @@ int		hi ;
 
 	                if (cp != NULL) {
 
-	                    if (pip->f.logmsg) {
+	                    if (pip->fl.logmsg) {
 
 	                        logfile_printf(&pip->lh,"  from=%r",
 	                            cp,strnlen(cp,(LOGLINELEN - 7))) ;
@@ -249,7 +249,7 @@ int		hi ;
 	                    } /* end if (logging enabled) */
 
 	                    c += 1 ;
-	                    if ((! pip->f.logmsg) && (c > 0))
+	                    if ((! pip->fl.logmsg) && (c > 0))
 	                        break ;
 
 	                } /* end if (got an address) */
