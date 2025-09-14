@@ -221,7 +221,7 @@ char	*envv[] ;
 
 /* verbose */
 	                case ARGOPT_VERBOSE:
-	                    pip->f.verbose = TRUE ;
+	                    pip->fl.verbose = TRUE ;
 	                    if (f_optequal) 
 				goto badargextra ;
 
@@ -282,7 +282,7 @@ char	*envv[] ;
 
 /* follow symbolic links */
 	                case ARGOPT_FOLLOW:
-				pip->f.follow = TRUE ;
+				pip->fl.follow = TRUE ;
 				break ;
 
 /* default action and user specified help */
@@ -340,12 +340,12 @@ char	*envv[] ;
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* quiet */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* require a suffix for file names */
@@ -376,7 +376,7 @@ char	*envv[] ;
 
 /* verbose output */
 	                    case 'v':
-	                        pip->f.verbose = TRUE ;
+	                        pip->fl.verbose = TRUE ;
 	                        break ;
 
 	                    default:
@@ -477,7 +477,7 @@ char	*envv[] ;
 /* get ready */
 
 	if ((rs = paramopt_havekey(&aparams,PO_SUFFIX)) > 0) {
-	    pip->f.suffix = TRUE ;
+	    pip->fl.suffix = TRUE ;
 	} /* end if */
 
 	if ((rs = paramopt_havekey(&aparams,PO_OPTION)) > 0) {
@@ -494,11 +494,11 @@ char	*envv[] ;
 	            switch (kwi) {
 
 	            case OPTION_FOLLOW:
-	                pip->f.follow = TRUE ;
+	                pip->fl.follow = TRUE ;
 	                break ;
 
 	            case OPTION_NOFOLLOW:
-	                pip->f.follow = FALSE ;
+	                pip->fl.follow = FALSE ;
 	                break ;
 
 	            } /* end switch */
