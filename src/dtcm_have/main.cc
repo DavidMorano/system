@@ -620,7 +620,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'R':
@@ -675,7 +675,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'i':
-	                        pip->f.optin = TRUE ;
+	                        pip->fl.optin = TRUE ;
 	                        break ;
 
 /* options */
@@ -948,7 +948,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	if (rs >= 0) {
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 
 	    buf[0] = '\0' ;
 	    if ((u.name != NULL) && (u.name[0] != '\0'))
@@ -1087,9 +1087,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 		if (rs >= 0) {
 
-			pip->f.systems += 1 ;
-			if (pip->f.systems == 0)
-				pip->f.systems = 1 ;
+			pip->fl.systems += 1 ;
+			if (pip->fl.systems == 0)
+				pip->fl.systems = 1 ;
 
 		}
 
@@ -1111,7 +1111,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    SYSTEMS_CUR	cur ;
 	    SYSTEMS_ENT	*sep ;
 
-	    debugprintf("main: systems=%u sysnames: \n",pip->f.systems) ;
+	    debugprintf("main: systems=%u sysnames: \n",pip->fl.systems) ;
 
 	    systems_curbegin(&sysdb,&cur) ;
 
@@ -1200,13 +1200,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* log recipients? */
 
-	if ((rs >= 0) && (pip->f.log || (pip->debuglevel > 0))) {
+	if ((rs >= 0) && (pip->fl.log || (pip->debuglevel > 0))) {
 
 	    for (i = 0 ; vecstr_get(&addrs,i,&cp) >= 0 ; i += 1) {
 
 	        if (cp == NULL) continue ;
 
-	        if (pip->f.log)
+	        if (pip->fl.log)
 	            logfile_printf(&pip->lh,"  to=%s\n",cp) ;
 
 	        if (pip->debuglevel > 0)
@@ -1301,7 +1301,7 @@ done:
 
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            bprintf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 
@@ -1338,7 +1338,7 @@ done:
 	if (f_addrs)
 	    vecstr_finish(&addrs) ;
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_close(&pip->lh) ;
 
 badaddrinit:
@@ -1560,7 +1560,7 @@ vecstr		*setsp ;
 
 	        case progopt_pcspoll:
 	            if ((vlen > 0) && (cfdeci(vp,vlen,&val) >= 0))
-	                pip->f.pcspoll = (val > 0) ;
+	                pip->fl.pcspoll = (val > 0) ;
 
 	            break ;
 
@@ -1721,7 +1721,7 @@ const char	svcspec[] ;
 
 	    recipient_vcurend(recipp,&lcur) ;
 
-	} else if (pip->f.systems && (rs >= 0)) {
+	} else if (pip->fl.systems && (rs >= 0)) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
