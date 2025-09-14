@@ -187,17 +187,17 @@ int progcsreader(PROGINFO *pip)
 	int		rs ;
 	int		rs1 ;
 
-	if (isasocket(pip->fd_msg)) pip->f.issocket = TRUE ;
+	if (isasocket(pip->fd_msg)) pip->fl.issocket = TRUE ;
 
 #if	CF_DEBUGN
 	nprintf(NDF,"progcsreader: f_issocket=%u fd_msg=%d\n",
-	        pip->f.issocket,pip->fd_msg) ;
+	        pip->fl.issocket,pip->fd_msg) ;
 #endif
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("progcsreader: ent f_issocket=%u fd_msg=%d\n",
-	        pip->f.issocket,pip->fd_msg) ;
+	        pip->fl.issocket,pip->fd_msg) ;
 	    debugprintf("progcsreader: pn=%s\n",pip->progname) ;
 	}
 #endif /* CF_DEBUG */
@@ -384,7 +384,7 @@ static int subinfo_reader(SUBINFO *sip,DISP *dop)
 #endif
 
 	intnote = pip->intnote ;
-	intrun = ((pip->f.daemon) ? pip->intrun : pip->intidle) ;
+	intrun = ((pip->fl.daemon) ? pip->intrun : pip->intidle) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
@@ -454,7 +454,7 @@ static int subinfo_reader(SUBINFO *sip,DISP *dop)
 	        if ((re & POLLIN) || (re & POLLPRI)) {
 
 	            msgbuf[0] = '\0' ;
-	            if (pip->f.issocket) {
+	            if (pip->fl.issocket) {
 	                rs = uc_recve(fd,msgbuf,msglen,0,to,opts) ;
 	                ml = rs ;
 	            } else {
@@ -792,7 +792,7 @@ static int ereport(PROGINFO *pip,cchar fname[],int frs)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 	    const char	*pn = pip->progname ;
 	    const char	*fmt = "%s: file-processing error (%d)\n" ;
 	    rs1 = progeprintf(pip,fmt,pn,frs) ;
