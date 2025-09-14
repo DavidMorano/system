@@ -419,7 +419,7 @@ USSINFO		*sip ;
 
 /* logfile */
 	                case argopt_lf:
-			    sip->f.log = TRUE ;
+			    sip->fl.log = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl)
@@ -533,7 +533,7 @@ USSINFO		*sip ;
 	                        break ;
 
 	                    case 'i':
-	                        sip->f.ignore = TRUE ;
+	                        sip->fl.ignore = TRUE ;
 	                        break ;
 
 /* options */
@@ -696,9 +696,9 @@ KEYOPT		*kop ;
 	        switch (oi) {
 
 	        case procopt_log:
-	                sip->f.log = TRUE ;
+	                sip->fl.log = TRUE ;
 	                if ((vl > 0) && ((rs = optbool(vp,vl)) >= 0))
-	                    sip->f.log = (rs > 0) ;
+	                    sip->fl.log = (rs > 0) ;
 	            break ;
 
 	        } /* end switch */
@@ -849,7 +849,7 @@ USSINFO		*sip ;
 	int	rs = SR_OK ;
 	int	f = sip->init.log ;
 
-	if (sip->f.log && (! sip->init.log)) {
+	if (sip->fl.log && (! sip->init.log)) {
 	    const char	*lfname = sip->lfname ;
 	    sip->init.log = TRUE ;
 	    f = TRUE ;
