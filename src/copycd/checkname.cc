@@ -146,7 +146,7 @@ struct checkparams	*ckp ;
 	rs = OK ;
 	if (S_ISLNK(sbp->st_mode)) {
 
-		if (! pip->f.follow)
+		if (! pip->fl.follow)
 			return 0 ;
 
 	    sbp = &sb2 ;
@@ -171,7 +171,7 @@ struct checkparams	*ckp ;
 
 /* check if it has a suffix already */
 
-	if (pip->f.suffix) {
+	if (pip->fl.suffix) {
 
 		char	*cp ;
 
