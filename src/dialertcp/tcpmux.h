@@ -1,16 +1,24 @@
-/* tcpmux */
+/* tcpmux HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
+/* SYSDIALER "tcpmux" dialer module */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TCPMUX_INCLUDE
-#define	TCPMUX_INCLUDE	1
+#define	TCPMUX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<localmisc.h>
-
-#include	"sysdialer.h"
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<sysdialer.h>
 
 
 #define	TCPMUX_MAGIC	31415926
@@ -18,35 +26,29 @@
 
 
 struct tcpmux_head {
-	unsigned long	magic ;
+	uint		magic ;
 	int		fd ;
 } ;
 
+typedef	TCPMUX		tcpmux ;
 
-#if	(! defined(TCPMUX_MASTER)) || (TCPMUX_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int tcpmux_open(TCPMUX *,SYSDIALER_ARGS *,
-		const char *,const char *,const char **) ;
-extern int tcpmux_reade(TCPMUX *,char *,int,int,int) ;
-extern int tcpmux_recve(TCPMUX *,char *,int,int,int,int) ;
-extern int tcpmux_recvfrome(TCPMUX *,char *,int,int,void *,int *,int,int) ;
-extern int tcpmux_recvmsge(TCPMUX *,struct msghdr *,int,int,int) ;
-extern int tcpmux_write(TCPMUX *,const char *,int) ;
-extern int tcpmux_send(TCPMUX *,const char *,int,int) ;
-extern int tcpmux_sendto(TCPMUX *,const char *,int,int,void *,int) ;
-extern int tcpmux_sendmsg(TCPMUX *,struct msghdr *,int) ;
-extern int tcpmux_shutdown(TCPMUX *,int) ;
-extern int tcpmux_close(TCPMUX *) ;
+		cchar *,cchar *,cchar **) noex ;
+extern int tcpmux_reade(TCPMUX *,char *,int,int,int) noex ;
+extern int tcpmux_recve(TCPMUX *,char *,int,int,int,int) noex ;
+extern int tcpmux_recvfrome(TCPMUX *,char *,int,int,void *,int *,int,int) noex ;
+extern int tcpmux_recvmsge(TCPMUX *,MSGHDR *,int,int,int) noex ;
+extern int tcpmux_write(TCPMUX *,cchar *,int) noex ;
+extern int tcpmux_send(TCPMUX *,cchar *,int,int) noex ;
+extern int tcpmux_sendto(TCPMUX *,cchar *,int,int,void *,int) noex ;
+extern int tcpmux_sendmsg(TCPMUX *,MSGHDR *,int) noex ;
+extern int tcpmux_shutdown(TCPMUX *,int) noex ;
+extern int tcpmux_close(TCPMUX *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* TCPMUX_MASTER */
 
 #endif /* TCPMUX_INCLUDE */
 
