@@ -22,9 +22,7 @@
         This subroutine forms the front-end of a program that sends a notice to
         a user's terminal. It is similar to 'write(1)' but more general.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -45,7 +43,6 @@
 #include	<logfile.h>
 #include	<ascii.h>
 #include	<uterm.h>
-#include	<ucmallreg.h>
 #include	<ischarx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -448,7 +445,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -497,12 +494,12 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case 's':
-	                        lip->f.set = TRUE ;
+	                        lip->fl.set = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.set = (rs > 0) ;
+	                                lip->fl.set = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
