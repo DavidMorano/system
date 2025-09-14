@@ -306,7 +306,7 @@ SRVTAB		*sfp ;
 
 /* search for a match in the service table */
 
-	if (pip->f.srvtab && 
+	if (pip->fl.srvtab && 
 		((i = srvtab_match(sfp,jep->filename,&sep)) >= 0)) {
 
 #if	CF_DEBUG
@@ -598,7 +598,7 @@ SRVTAB		*sfp ;
 
 /* fork it ! */
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_flush(&pip->lh) ;
 
 	for (i = 0 ; (i < NFORKS) && ((rs = uc_fork()) < 0) ; i += 1) {
