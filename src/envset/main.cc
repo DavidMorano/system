@@ -682,8 +682,8 @@ int main(int argc,cchar **argv,cchar **envv)
 	if (rs1 >= 0) pip->progmode = rs1 ;
 
 	pip->verboselevel = 1 ;
-	pip->f.xeall = TRUE ;
-	pip->f.xextra = TRUE ;
+	pip->fl.xeall = TRUE ;
+	pip->fl.xextra = TRUE ;
 
 #if	CF_DEBUGS
 	rs1 = pip->progmode ;
@@ -693,11 +693,11 @@ int main(int argc,cchar **argv,cchar **envv)
 	switch (pip->progmode) {
 	case progmode_lsh:
 	case progmode_ksh:
-	    pip->f.shell = TRUE ;
+	    pip->fl.shell = TRUE ;
 	    break ;
 	} /* end switch */
 
-	f_envset = (! pip->f.shell) ;
+	f_envset = (! pip->fl.shell) ;
 
 /* gather the arguments */
 
@@ -978,7 +978,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            if ((rs = optbool(avp,avl)) >= 0) {
-					pip->f.nopreload = (rs > 0) ;
+					pip->fl.nopreload = (rs > 0) ;
 				    } else if (isNotValid(rs)) {
 					rs = SR_OK ;
 	                                cl = avl ;
@@ -1047,7 +1047,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -1067,7 +1067,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case 'b':
-	                        pip->f.background = TRUE ;
+	                        pip->fl.background = TRUE ;
 	                        break ;
 
 /* options */
@@ -1580,18 +1580,18 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    c += 1 ;
 	                    break ;
 	                case akoname_xeall:
-	                    pip->f.xeall = TRUE ;
+	                    pip->fl.xeall = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optvalue(vp,vl) ;
-	                        pip->f.xeall = (rs > 0) ;
+	                        pip->fl.xeall = (rs > 0) ;
 	                    }
 	                    c += 1 ;
 	                    break ;
 	                case akoname_xextra:
-	                    pip->f.xextra = TRUE ;
+	                    pip->fl.xextra = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optvalue(vp,vl) ;
-	                        pip->f.xextra = (rs > 0) ;
+	                        pip->fl.xextra = (rs > 0) ;
 	                    }
 	                    c += 1 ;
 	                    break ;
@@ -2256,7 +2256,7 @@ static int procenvs_begin(PROGINFO *pip)
 	        rs = loadxfile(pip,pip->xfname) ;
 	    }
 	    if (rs >= 0) {
-		if (pip->f.xeall) {
+		if (pip->fl.xeall) {
 	    	    if ((rs = loadxsched(pip,schedpfile)) >= 0) {
 	        	rs = loadxsched(pip,schedhfile) ;
 		    }
@@ -2349,7 +2349,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,PARAMOPT *pop,
 	int		rs ;
 	if ((rs = envs_subs(enp,&pip->cooks,&pip->pvars,exp)) >= 0) {
 	    if ((rs = procenvuser(pip)) >= 0) {
-		if (pip->f.xextra) {
+		if (pip->fl.xextra) {
 	    	    rs = procenvextra(pip) ;
 		}
 		if (rs >= 0) {
@@ -2385,8 +2385,8 @@ static int processor(PROGINFO *pip,ARGINFO *aip,cchar *prog)
 	int		rs ;
 	char		pbuf[MAXPATHLEN+1] ;
 	if ((prog != NULL) && hasonlyplusminus(prog,-1)) {
-	    if ((! pip->f.progdash) && (hasonlyminus(prog,-1))) {
-	        pip->f.progdash = TRUE ;
+	    if ((! pip->fl.progdash) && (hasonlyminus(prog,-1))) {
+	        pip->fl.progdash = TRUE ;
 	    }
 	    prog = NULL ;
 	}
@@ -2432,13 +2432,13 @@ static int procnopreload(PROGINFO *pip)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
 	    debugprintf("main/procnopreload: ent\n") ;
-	    debugprintf("main/procnopreload: nopreload=%u\n",pip->f.nopreload) ;
+	    debugprintf("main/procnopreload: nopreload=%u\n",pip->fl.nopreload) ;
 	    debugprintf("main/procnopreload: init-cf=%u\n",
 		(pip->config != NULL)) ;
 	}
 #endif
 	if (pip->have.nopreload) {
-	    int	f_elide = pip->f.nopreload ;
+	    int	f_elide = pip->fl.nopreload ;
 	    if (! f_elide) {
 		if (pip->config != NULL) {
 	            OURCONF	*ocp = pip->config ;
