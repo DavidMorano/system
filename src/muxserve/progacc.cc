@@ -154,7 +154,7 @@ int progaccopen(PROGINFO *pip)
 	cchar		*cp ;
 
 	rs1 = SR_NOENT ;
-	f_secreq = (! pip->f.proglocal) ;
+	f_secreq = (! pip->fl.proglocal) ;
 
 	cp = pip->accfname ;
 	cl = -1 ;
@@ -230,15 +230,15 @@ int progaccopen(PROGINFO *pip)
 
 	if (rs1 >= 0) {
 	    if (pip->fromconf.accfname)
-	        pip->f.secure_accfile = 
-			pip->f.secure_root && pip->f.secure_conf ;
+	        pip->fl.secure_accfile = 
+			pip->fl.secure_root && pip->fl.secure_conf ;
 	    else
-	        pip->f.secure_accfile = pip->f.secure_root ;
+	        pip->fl.secure_accfile = pip->fl.secure_root ;
 
-	    if (f_secreq || (! pip->f.secure_accfile)) {
+	    if (f_secreq || (! pip->fl.secure_accfile)) {
 
 	            rs1 = securefile(pip->accfname,pip->euid,pip->egid) ;
-	            pip->f.secure_accfile = (rs1 > 0) ;
+	            pip->fl.secure_accfile = (rs1 > 0) ;
 
 	    }
 	}
@@ -246,7 +246,7 @@ int progaccopen(PROGINFO *pip)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	debugprintf("progaccopen: securefile() rs=%d\n",rs1) ;
-	debugprintf("progaccopen: secure_accfile=%u\n",pip->f.secure_accfile) ;
+	debugprintf("progaccopen: secure_accfile=%u\n",pip->fl.secure_accfile) ;
 	}
 #endif
 
