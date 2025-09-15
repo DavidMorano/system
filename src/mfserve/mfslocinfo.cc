@@ -315,7 +315,7 @@ int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	    debugprintf("locinfo_start: ret rs=%d\n",rs) ;
 #endif
 
-	lip->f.adj = TRUE ;
+	lip->fl.adj = TRUE ;
 	return rs ;
 }
 /* end subroutine (locinfo_start) */
@@ -555,7 +555,7 @@ int locinfo_tmpourdir(LOCINFO *lip)
 	    pl = rs ;
 	    if ((rs = locinfo_runas(lip)) >= 0) {
 	        USTAT		usb ;
-	        const mode_t	dm = (lip->f.runasprn) ? 0775 : 0777 ;
+	        const mode_t	dm = (lip->fl.runasprn) ? 0775 : 0777 ;
 	        cchar		*ourtmp = lip->tmpourdname ;
 	        if ((rs = u_stat(ourtmp,&usb)) >= 0) {
 	            if (S_ISDIR(usb.st_mode)) {
@@ -858,7 +858,7 @@ int locinfo_maintourtmp(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		f ;
 	f = ((to > 0) && ((pip->daytime - lip->ti_tmpmaint) >= to)) ;
-	if (f || lip->f.maint) {
+	if (f || lip->fl.maint) {
 	    lip->ti_tmpmaint = pip->daytime ;
 	    if (lip->tmpourdname != NULL) {
 	        const int	to_client = lip->intclient ;
@@ -886,7 +886,7 @@ int locinfo_cmdsload(LOCINFO *lip,cchar *sp,int sl)
 	int		rs = SR_OK ;
 	if (sl < 0) sl = strlen(sp) ;
 	if (sl > 0) {
-	    lip->f.cmds = TRUE ;
+	    lip->fl.cmds = TRUE ;
 	    if ((rs = locinfo_cmdsbegin(lip)) >= 0) {
 	        KEYOPT	*kop = &lip->cmds ;
 	        rs = keyopt_loads(kop,sp,sl) ;
@@ -917,7 +917,7 @@ int locinfo_reqexit(LOCINFO *lip,cchar *reason)
 	cchar		*fmt = "reqexit · reason=%s" ;
 	if (reason == NULL) reason = "" ;
 	rs = logprintf(pip,fmt,reason) ;
-	lip->f.reqexit = TRUE ;
+	lip->fl.reqexit = TRUE ;
 	return rs ;
 }
 /* end subroutine (locinfo_reqexit) */
@@ -926,7 +926,7 @@ int locinfo_reqexit(LOCINFO *lip,cchar *reason)
 /* Is-Requested-Exit */
 int locinfo_isreqexit(LOCINFO *lip)
 {
-	int		rs = MKBOOL(lip->f.reqexit) ;
+	int		rs = MKBOOL(lip->fl.reqexit) ;
 	return rs ;
 }
 /* end subroutine (locinfo_isreqexit) */
@@ -1782,7 +1782,7 @@ static int locinfo_tmpourdname(LOCINFO *lip)
 static int locinfo_runas(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
-	int		f = lip->f.runasprn ;
+	int		f = lip->fl.runasprn ;
 	if (! lip->have.runasprn) {
 	    PROGINFO	*pip = lip->pip ;
 	    lip->have.runasprn = TRUE ;
@@ -1790,7 +1790,7 @@ static int locinfo_runas(LOCINFO *lip)
 	        cchar	*rn = pip->rootname ;
 	        cchar	*un = pip->username ;
 	        f = (strcmp(un,rn) == 0) ;
-	        lip->f.runasprn = f ;
+	        lip->fl.runasprn = f ;
 	    } /* end if (procinfo_rootname) */
 	} /* end if (needed) */
 	return (rs >= 0) ? f : rs ;
