@@ -1,4 +1,9 @@
-/* msu-config */
+/* msu-config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* handle MSU configuration functions */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,13 +16,11 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MSUCONFIG_INCLUDE
-#define	MSUCONFIG_INCLUDE	1
+#define	MSUCONFIG_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
-
 #include	<msfile.h>
 #include	<paramfile.h>
 #include	<expcook.h>
@@ -36,27 +39,23 @@ struct config_flags {
 } ;
 
 struct config {
-	PROGINFO	*pip ;
-	CONFIG_FL	f ;
-	PARAMFILE	p ;
-	EXPCOOK		cooks ;
+	proginfo	*pip ;
+	paramfile	p ;
+	expcool		cooks ;
 	time_t		ti_lastcheck ;
+	CONFIG_FL	fl ;
 	int		intcheck ;
 } ;
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	config_start(CONFIG *,proginfo *,cchar *,int) noex ;
+extern int	config_check(CONFIG *) noex ;
+extern int	config_read(CONFIG *) noex ;
+extern int	config_finish(CONFIG *) noex ;
 
-extern int	config_start(CONFIG *,PROGINFO *,cchar *,int) ;
-extern int	config_check(CONFIG *) ;
-extern int	config_read(CONFIG *) ;
-extern int	config_finish(CONFIG *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* MSUCONFIG_INCLUDE */
 
