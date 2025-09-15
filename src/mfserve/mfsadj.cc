@@ -174,13 +174,13 @@ int mfsadj_begin(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
-	    debugprintf("mfsadj_begin: ent f_reuseaddr=%u\n",lip->f.reuseaddr) ;
-	    debugprintf("mfsadj_begin: f_listen=%u\n",lip->f.adj) ;
+	    debugprintf("mfsadj_begin: ent f_reuseaddr=%u\n",lip->fl.reuseaddr) ;
+	    debugprintf("mfsadj_begin: f_listen=%u\n",lip->fl.adj) ;
 	}
 #endif
 
 	lip->rfd = -1 ;
-	if (lip->f.adj) {
+	if (lip->fl.adj) {
 
 	    if (lip->reqfname == NULL) {
 	        rs = locinfo_reqfname(lip) ;
@@ -203,7 +203,7 @@ int mfsadj_begin(PROGINFO *pip)
 	    if (rs >= 0) {
 	        const mode_t	om = 0666 ;
 	        int		opts = 0 ;
-	        if (lip->f.reuseaddr) opts |= 1 ; /* reuse-address */
+	        if (lip->fl.reuseaddr) opts |= 1 ; /* reuse-address */
 	        if ((rs = listenusd(lip->reqfname,om,opts)) >= 0) {
 	            const int	fd = rs ;
 	            if ((rs = uc_closeonexec(fd,TRUE)) >= 0) {
