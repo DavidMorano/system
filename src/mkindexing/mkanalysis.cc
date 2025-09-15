@@ -317,7 +317,7 @@ int mkanalysis(PROGINFO *pip,ARGINFO *aip,cchar *dbname) noex {
 	            debugprintf("main: done processing the argument file list\n") ;
 #endif
 
-	    } else if (! pip->f.quiet) {
+	    } else if (! pip->fl.quiet) {
 
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file\n",
