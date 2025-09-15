@@ -197,7 +197,7 @@ const char	ofname[] ;
 	        ofname = BFILE_STDOUT ;
 
 	    strcpy(openstr,"wc") ;
-	    if (pip->f.append) {
+	    if (pip->fl.append) {
 	        strcat(openstr,"a") ;
 	    } else
 	        strcat(openstr,"t") ;
@@ -305,7 +305,7 @@ static int subinfo_sendparams(SUBINFO *sip,bfile *ofp)
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if (pip->f.optsendparams) {
+	if (pip->fl.optsendparams) {
 	    int		i ;
 	    int		v ;
 	    cchar	*cp ;
@@ -536,7 +536,7 @@ DISP		*dop ;
 	    } /* end while (reading lines) */
 
 	    bclose(&argfile) ;
-	} else if (! pip->f.quiet) {
+	} else if (! pip->fl.quiet) {
 	    bprintf(pip->efp,"%s: unaccessible (%d) argfile=%s\n",
 	        pip->progname,rs,aip->afname) ;
 	} /* end if */
@@ -864,7 +864,7 @@ int		frs ;
 {
 	int		rs = SR_OK ;
 
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 	    bprintf(pip->efp,"%s: file-processing error (%d)\n",
 	        pip->progname,frs) ;
 	    bprintf(pip->efp,"%s: file=%s\n",
