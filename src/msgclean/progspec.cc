@@ -94,7 +94,7 @@ int progspec(PROGINFO *pip,PARAMOPT *pop,cchar *fname) noex {
 	rs = u_stat(fname,&sb) ;
 
 	f_dir = S_ISDIR(sb.st_mode) ;
-	if ((rs >= 0) && f_dir && (! pip->f.follow)) {
+	if ((rs >= 0) && f_dir && (! pip->fl.follow)) {
 	    rs = u_lstat(fname,&sb) ;
 	    f_dir = S_ISDIR(sb.st_mode) ;
 	}
@@ -105,13 +105,13 @@ int progspec(PROGINFO *pip,PARAMOPT *pop,cchar *fname) noex {
 	        int	del ;
 	        char	tmpfname[MAXPATHLEN + 1] ;
 
-	        if (pip->f.recurse) {
+	        if (pip->fl.recurse) {
 	            FSDIRTREE		dt ;
 	            FSDIRTREE_STAT	fsb ;
 	            int		dtopts = 0 ;
 	            char	dename[MAXPATHLEN + 1] ;
 
-	            dtopts |= ((pip->f.follow) ? FSDIRTREE_MFOLLOW : 0) ;
+	            dtopts |= ((pip->fl.follow) ? FSDIRTREE_MFOLLOW : 0) ;
 	            if ((rs = fsdirtree_open(&dt,fname,dtopts)) >= 0) {
 	                const int	mpl = MAXPATHLEN ;
 
@@ -134,7 +134,7 @@ int progspec(PROGINFO *pip,PARAMOPT *pop,cchar *fname) noex {
 	                    } /* end if */
 
 	                    if (progabort(pip) > 0) break ;
-	                    if ((rs < 0) && (! pip->f.nostop)) break ;
+	                    if ((rs < 0) && (! pip->fl.nostop)) break ;
 	                } /* end while (looping through entries) */
 
 	                fsdirtree_close(&dt) ;
@@ -158,7 +158,7 @@ int progspec(PROGINFO *pip,PARAMOPT *pop,cchar *fname) noex {
 	                    } /* end if */
 
 	                    if (progabort(pip) > 0) break ;
-	                    if ((rs < 0) && (! pip->f.nostop)) break ;
+	                    if ((rs < 0) && (! pip->fl.nostop)) break ;
 	                } /* end while (looping through entries) */
 
 	                fsdir_close(&d) ;
@@ -176,7 +176,7 @@ int progspec(PROGINFO *pip,PARAMOPT *pop,cchar *fname) noex {
 	    } /* end if */
 
 	    if (rs == SR_ACCESS) {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            printf(pip->efp,
 	                "%s: could not open directory (%d)\n",
 	                pip->progname,rs) ;
