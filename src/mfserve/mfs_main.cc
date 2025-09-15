@@ -90,7 +90,6 @@
 #include	<ugetpid.h>
 #include	<ugetpw.h>
 #include	<uinfo.h>
-#include	<ucmallreg.h>
 #include	<userinfo.h>
 #include	<getax.h>
 #include	<getusername.h>
@@ -554,7 +553,7 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	pip->verboselevel = 1 ;
 	pip->daytime = time(NULL) ;
 
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 	pip->lip = lip ;
 	rs = locinfo_start(lip,pip) ;
@@ -896,7 +895,7 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_speed:
-	                    lip->f.speedname = TRUE ;
+	                    lip->fl.speedname = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl)
@@ -960,12 +959,12 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_zerospeed:
-	                    lip->f.zerospeed = TRUE ;
+	                    lip->fl.zerospeed = TRUE ;
 	                    break ;
 
 /* disable interval */
 	                case argopt_disable:
-	                    pip->f.disable = TRUE ;
+	                    pip->fl.disable = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
@@ -980,12 +979,12 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_ra:
 	                    lip->have.reuseaddr = TRUE ;
 	                    lip->final.reuseaddr = TRUE ;
-	                    lip->f.reuseaddr = TRUE ;
+	                    lip->fl.reuseaddr = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.reuseaddr = (rs > 0) ;
+	                            lip->fl.reuseaddr = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -994,12 +993,12 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_fg:
 	                    lip->have.fg = TRUE ;
 	                    lip->final.fg = TRUE ;
-	                    lip->f.fg = TRUE ;
+	                    lip->fl.fg = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.fg = (rs > 0) ;
+	                            lip->fl.fg = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1008,7 +1007,7 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_daemon:
 	                    pip->have.daemon = TRUE ;
 	                    pip->final.daemon = TRUE ;
-	                    pip->f.daemon = TRUE ;
+	                    pip->fl.daemon = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
@@ -1103,14 +1102,14 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        pip->have.quiet = TRUE ;
 	                        pip->final.quiet = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.quiet = (rs > 0) ;
+	                                pip->fl.quiet = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1132,7 +1131,7 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* daemon mode */
 	                    case 'd':
 	                        pip->final.background = TRUE ;
-	                        pip->f.background = TRUE ;
+	                        pip->fl.background = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -1152,7 +1151,7 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                    case 'm':
 	                        lip->final.maint = TRUE ;
-	                        lip->f.maint = TRUE ;
+	                        lip->fl.maint = TRUE ;
 	                        break ;
 
 /* MS-node */
@@ -1196,12 +1195,12 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'r':
 	                        lip->have.reuseaddr = TRUE ;
 	                        lip->final.reuseaddr = TRUE ;
-	                        lip->f.reuseaddr = TRUE ;
+	                        lip->fl.reuseaddr = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.reuseaddr = (rs > 0) ;
+	                                lip->fl.reuseaddr = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1351,7 +1350,7 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (rs >= 0) {
 	    rs1 = securefile(pip->pr,pip->euid,pip->egid) ;
-	    lip->f.sec_root = (rs1 > 0) ;
+	    lip->fl.sec_root = (rs1 > 0) ;
 	}
 
 	if ((rs >= 0) && (pip->intpoll == 0) && (argval != NULL)) {
@@ -1426,7 +1425,7 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        } /* end if (userinfo) */
 	    } /* end if (procdefargs) */
 	    if ((rs >= 0) && (pip->debuglevel > 0)) {
-	        if (pip->f.daemon) {
+	        if (pip->fl.daemon) {
 	            cchar	*pn = pip->progname ;
 	            cchar	*fmt = "%s: requests=%d\n" ;
 	            shio_printf(pip->efp,fmt,pn,c) ;
@@ -1454,14 +1453,14 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    case SR_ALREADY:
 	    case SR_AGAIN:
 	        ex = EX_MUTEX ;
-	        if ((! pip->f.quiet) && (pip->efp != NULL)) {
+	        if ((! pip->fl.quiet) && (pip->efp != NULL)) {
 	            fmt = "%s: existing lock (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
 	        }
 	        break ;
 	    default:
 	        ex = mapex(mapexs,rs) ;
-	        if ((! pip->f.quiet) && (pip->efp != NULL)) {
+	        if ((! pip->fl.quiet) && (pip->efp != NULL)) {
 	            fmt = "%s: abnormal exit (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
 	        }
@@ -1478,8 +1477,8 @@ retearly:
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
-	    if (pip->f.background || pip->f.daemon) {
-	        cchar	*w = ((pip->f.daemon) ? "daemon" : "background") ;
+	    if (pip->fl.background || pip->fl.daemon) {
+	        cchar	*w = ((pip->fl.daemon) ? "daemon" : "background") ;
 	        fmt = "%s: (%s) exiting ex=%u (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,w,ex,rs) ;
 	    } else {
@@ -1628,10 +1627,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        c += 1 ;
 	                        pip->final.quiet = TRUE ;
 	                        pip->have.quiet = TRUE ;
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.quiet = (rs > 0) ;
+	                            pip->fl.quiet = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1733,10 +1732,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        c += 1 ;
 	                        lip->final.lockinfo = TRUE ;
 	                        lip->have.lockinfo = TRUE ;
-	                        lip->f.lockinfo = TRUE ;
+	                        lip->fl.lockinfo = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.lockinfo = (rs > 0) ;
+	                            lip->fl.lockinfo = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1745,10 +1744,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        c += 1 ;
 	                        lip->final.quick = TRUE ;
 	                        lip->have.quick = TRUE ;
-	                        lip->f.quick = TRUE ;
+	                        lip->fl.quick = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.quick = (rs > 0) ;
+	                            lip->fl.quick = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1757,10 +1756,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        c += 1 ;
 	                        lip->final.adj = TRUE ;
 	                        lip->have.adj = TRUE ;
-	                        lip->f.adj = TRUE ;
+	                        lip->fl.adj = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.adj = (rs > 0) ;
+	                            lip->fl.adj = (rs > 0) ;
 	                        }
 	                    } /* end if */
 	                    break ;
@@ -1770,10 +1769,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        c += 1 ;
 	                        lip->final.reuseaddr = TRUE ;
 	                        lip->have.reuseaddr = TRUE ;
-	                        lip->f.reuseaddr = TRUE ;
+	                        lip->fl.reuseaddr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.reuseaddr = (rs > 0) ;
+	                            lip->fl.reuseaddr = (rs > 0) ;
 	                        }
 	                    } /* end if */
 	                    break ;
@@ -1782,12 +1781,12 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        c += 1 ;
 	                        pip->final.daemon = TRUE ;
 	                        pip->have.daemon = TRUE ;
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        if (vl > 0) {
 	                            rs = cfdecti(vp,vl,&v) ;
 	                            pip->intrun = v ;
 	                            if (v == 0) {
-	                                pip->f.daemon = FALSE ;
+	                                pip->fl.daemon = FALSE ;
 	                            }
 	                        }
 	                    } /* end if */
@@ -1863,17 +1862,17 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case progopt_users:
 	                    if (! lip->final.users) {
 	                        lip->final.users = TRUE ;
-	                        lip->f.users = TRUE ;
+	                        lip->fl.users = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.users = (rs > 0) ;
+	                            lip->fl.users = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case progopt_maint:
 	                    if (! lip->final.maint) {
 	                        lip->final.maint = TRUE ;
-	                        lip->f.maint = TRUE ;
+	                        lip->fl.maint = TRUE ;
 	                        if ((vl > 0) && (lip->intclient == 0)) {
 	                            rs = cfdecti(vp,vl,&v) ;
 	                            lip->intclient = v ;
@@ -1918,7 +1917,7 @@ static int procdefargs(PROGINFO *pip)
 	        rs = optbool(cp,-1) ;
 	        pip->final.quiet = TRUE ;
 	        pip->have.quiet = TRUE ;
-	        pip->f.quiet = (rs > 0) ;
+	        pip->fl.quiet = (rs > 0) ;
 	    }
 	}
 
@@ -2184,7 +2183,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 static int proclisten_begin(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 	    rs = mfslisten_begin(pip) ;
 	}
 	return rs ;
@@ -2196,7 +2195,7 @@ static int proclisten_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 	    rs1 = mfslisten_end(pip) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -2360,7 +2359,7 @@ static int procourdefs(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
-	    debugprintf("mfsmain/procourdefs: f_users=%u\n",lip->f.users) ;
+	    debugprintf("mfsmain/procourdefs: f_users=%u\n",lip->fl.users) ;
 	    debugprintf("mfsmain/procourdefs: ret rs=%d\n",rs) ;
 	}
 #endif
@@ -2423,7 +2422,7 @@ static int procdaemondefs(PROGINFO *pip)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
 	    debugprintf("mfsmain: daemon=%u logging=%u\n",
-	        pip->f.daemon,pip->have.logprog) ;
+	        pip->fl.daemon,pip->have.logprog) ;
 #endif
 
 	if (pip->debuglevel > 0) {
@@ -2487,7 +2486,7 @@ static int procpidfname(PROGINFO *pip)
 	if ((rs >= 0) && (pfp != NULL) && (pfp[0] == '-')) {
 	    pfp = NULL ;
 	    pip->have.pidfname = FALSE ;
-	    pip->f.pidfname = FALSE ;
+	    pip->fl.pidfname = FALSE ;
 	    f_changed = FALSE ;
 	}
 
@@ -2520,14 +2519,14 @@ static int process(PROGINFO *pip,cchar *ofn)
 
 	if ((rs = proguserlist_begin(pip)) >= 0) {
 	    if ((rs = locinfo_msfile(lip)) >= 0) {
-	        if (pip->f.background || pip->f.daemon) {
+	        if (pip->fl.background || pip->fl.daemon) {
 	            if ((rs = procbackdefs(pip)) >= 0) {
 	                if ((rs = procpidfname(pip)) >= 0) {
 	                    if ((rs = procbackinfo(pip)) >= 0) {
 	                        if ((rs = ids_load(&pip->id)) >= 0) {
-	                            if (pip->f.background) {
+	                            if (pip->fl.background) {
 	                                rs = procback(pip) ;
-	                            } else if (pip->f.daemon) {
+	                            } else if (pip->fl.daemon) {
 	                                rs = procdaemon(pip) ;
 	                                c = rs ;
 	                            }
@@ -2537,7 +2536,7 @@ static int process(PROGINFO *pip,cchar *ofn)
 	                    } /* end if (procbackinfo) */
 	                } /* end if (procpidfname) */
 	            } /* end if (procbackdefs) */
-	        } else if (lip->f.cmds) {
+	        } else if (lip->fl.cmds) {
 	            rs = procourcmds(pip,ofn) ;
 	        } else {
 	            rs = procregular(pip) ;
@@ -2643,7 +2642,7 @@ static int procbackcheck(PROGINFO *pip)
 	    rs1 = locinfo_lockend(lip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        fmt = "%s: could not acquire PID lock (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,rs) ;
 	    }
@@ -2673,7 +2672,7 @@ static int procmntcheck(PROGINFO *pip)
 	        } else
 	            rs = SR_BUSY ;
 	        if (rs < 0) {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible mount point (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	            }
@@ -2861,7 +2860,7 @@ static int procbackenv(PROGINFO *pip,SPAWNER *srp)
 	            if (v > 0) np = "intspeed" ;
 	            break ;
 	        case 9:
-	            v = MKBOOL(pip->f.reuseaddr) ;
+	            v = MKBOOL(pip->fl.reuseaddr) ;
 	            if (v > 0) np = "resueaddr" ;
 	            break ;
 	        } /* end switch */
