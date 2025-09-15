@@ -231,7 +231,7 @@ const char	outfname[] ;
 /* open the output key file */
 
 	strcpy(openstr,"wc") ;
-	if (pip->f.append) {
+	if (pip->fl.append) {
 	    strcat(openstr,"a") ;
 	} else {
 	    strcat(openstr,"t") ;
@@ -355,7 +355,7 @@ bfile		*ofp ;
 	int		v ;
 	int		wlen = 0 ;
 
-	if (pip->f.optsendparams) {
+	if (pip->fl.optsendparams) {
 	    for (i = 0 ; i < mkcmd_overlast ; i += 1) {
 		const char	*cp = mkcmds[i] ;
 
@@ -619,7 +619,7 @@ DISP		*dop ;
 
 	    bclose(&argfile) ;
 
-	} else if (! pip->f.quiet) {
+	} else if (! pip->fl.quiet) {
 
 	    bprintf(pip->efp,"%s: unaccessible (%d) argfile=%s\n",
 	        pip->progname,rs,aip->afname) ;
@@ -989,7 +989,7 @@ char		fname[] ;
 	}
 #endif /* CF_DEBUG */
 
-	if (pip->f.optbible) {
+	if (pip->fl.optbible) {
 
 	    memcpy(bterms,terms,32) ;
 
@@ -1021,7 +1021,7 @@ char		fname[] ;
 
 /* figure a default hash DB size based on the input file length */
 
-	if (pip->f.wholefile) {
+	if (pip->fl.wholefile) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -1039,7 +1039,7 @@ char		fname[] ;
 
 /* go to it, read the file line by line */
 
-	f_start = pip->f.wholefile ;
+	f_start = pip->fl.wholefile ;
 	f_ent = FALSE ;
 	f_finish = FALSE ;
 
@@ -1090,7 +1090,7 @@ char		fname[] ;
 
 /* figure out where we start and/or end an entry */
 
-	    if (! pip->f.wholefile) {
+	    if (! pip->fl.wholefile) {
 
 	        if (delimiter[0] == '\0') {
 
@@ -1223,7 +1223,7 @@ char		fname[] ;
 	            int		f_first = FALSE ;
 	            cchar	*fp ;
 
-	            if (pip->f.optbible) {
+	            if (pip->fl.optbible) {
 
 	                fl = field_get(&fsb,bterms,&fp) ;
 
