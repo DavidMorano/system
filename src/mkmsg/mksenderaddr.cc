@@ -99,8 +99,8 @@ static int	piloadsender(PROGINFO *) noex ;
 int pimksenderaddr(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
-	if (! pip->f.init_sender) {
-	    pip->f.init_sender = TRUE ;
+	if (! pip->fl.init_sender) {
+	    pip->fl.init_sender = TRUE ;
 	    if (pip->hdr_sender == NULL) {
 	        cchar	*cp = NULL ;
 	        if ((cp = getenv(VARMAILSENDER)) != NULL) {
