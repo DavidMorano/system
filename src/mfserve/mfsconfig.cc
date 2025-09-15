@@ -217,14 +217,14 @@ int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck)
 	        if (DEBUGLEVEL(4))
 	            debugprintf("config_start: paramfile_open rs=%d\n",rs) ;
 #endif
-	        cfp->f.p = TRUE ;
+	        cfp->fl.p = TRUE ;
 	        rs = config_read(cfp) ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
 	            debugprintf("config_start: config_read rs=%d\n",rs) ;
 #endif
 		if (rs < 0) {
-		    cfp->f.p = FALSE ;
+		    cfp->fl.p = FALSE ;
 		    paramfile_close(pfp) ;
 		}
 	    }
@@ -260,10 +260,10 @@ int config_finish(CONFIG *cfp)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("config_finish: ent %c\n",
-		((cfp->f.p) ? '¥' : '_')) ;
+		((cfp->fl.p) ? '¥' : '_')) ;
 #endif
 
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 	    PARAMFILE	*pfp = &cfp->p ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -295,10 +295,10 @@ int config_check(CONFIG *cfp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("mfsmain/config_check: ent f_p=%u\n",cfp->f.p) ;
+	    debugprintf("mfsmain/config_check: ent f_p=%u\n",cfp->fl.p) ;
 #endif
 
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 	    const time_t	dt = pip->daytime ;
 	    const int		intcheck = cfp->intcheck ;
 	    int			f_check = TRUE ;
@@ -346,7 +346,7 @@ int config_read(CONFIG *cfp)
 	PROGINFO	*pip = cfp->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 	    MFSLISTEN_ACQ	acq ;
 	    if ((rs = mfslisten_acqbegin(pip,&acq)) >= 0) {
 	        int	size = 0 ;
@@ -397,7 +397,7 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("config_reader: ent f_p=%u\n",cfp->f.p) ;
+	    debugprintf("config_reader: ent f_p=%u\n",cfp->fl.p) ;
 #endif
 
 	lip = pip->lip ;
@@ -571,12 +571,12 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	            } /* end if */
 	            break ;
 	       case param_listen:
-	            if (pip->f.daemon && (el > 0)) {
+	            if (pip->fl.daemon && (el > 0)) {
 	                rs = mfslisten_acqadd(pip,acp,ebuf,el) ;
 		    }
 		    break ;
 	       case param_svctype:
-	            if (pip->f.daemon && (el > 0)) {
+	            if (pip->fl.daemon && (el > 0)) {
 			if (! lip->final.svctype) {
 	                    rs = locinfo_svctype(lip,ebuf,el) ;
 			}
@@ -585,10 +585,10 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	       case param_users:
 	            if (! lip->final.users) {
 			lip->final.users = TRUE ;
-			lip->f.users = TRUE ;
+			lip->fl.users = TRUE ;
 			if (el > 0) {
 	                    rs = optbool(ebuf,el) ;
-			    lip->f.users = (rs > 0) ;
+			    lip->fl.users = (rs > 0) ;
 			}
 		    }
 		    break ;
