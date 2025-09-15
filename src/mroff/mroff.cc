@@ -116,7 +116,7 @@ bfile		*ofp ;
 
 	if (rs < 0) {
 
-	    if ((! pip->f.quiet) && (pip->debuglevel == 0))
+	    if ((! pip->fl.quiet) && (pip->debuglevel == 0))
 	        bprintf(pip->efp,
 	            "%s: could not open input file (rs %d)\n",
 	            pip->progname,
@@ -135,7 +135,7 @@ bfile		*ofp ;
 #if	CF_DEBUG
 	if (pip->debuglevel > 1)
 	    debugprintf("mroff: we do %swant headers\n",
-	        ((rop->f.headers) ? "" : "not ")) ;
+	        ((rop->fl.headers) ? "" : "not ")) ;
 #endif
 
 
@@ -151,7 +151,7 @@ bfile		*ofp ;
 	*cp = '\0' ;
 
 
-	if (rop->f.headers) {
+	if (rop->fl.headers) {
 
 	    if ((rs = bcontrol(ifp,BC_STAT,&sb)) < 0) {
 
@@ -223,7 +223,7 @@ next_page:
 
 /* are we at a page header ? */
 
-	        if (rop->f.headers) {
+	        if (rop->fl.headers) {
 
 	            len2 = sprintf(headline,headerstring,
 	                timestr_edate(sb.st_mtime,timebuf),page) ;
@@ -245,7 +245,7 @@ next_page:
 
 /* and a reference page if any */
 
-	        if (rop->f.reference) {
+	        if (rop->fl.reference) {
 
 /* output reference page */
 
@@ -273,7 +273,7 @@ next_page:
 
 /* are we at a page header ? */
 
-	            if (rop->f.headers) {
+	            if (rop->fl.headers) {
 
 	                len2 = sprintf(headline,"%s Reference %3d",
 	                    timestr_edate(sb.st_mtime,timebuf),page) ;
@@ -339,7 +339,7 @@ next_page:
 
 /* are we at a page header ? */
 
-	        if (rop->f.headers) {
+	        if (rop->fl.headers) {
 
 	            len2 = sprintf(headline,headerstring,
 	                timestr_edate(sb.st_mtime,timebuf),page) ;
@@ -359,7 +359,7 @@ next_page:
 	            bwrite(ofp,lbuf[i],llen[i]) ;
 
 
-	        if (rop->f.concatenate && rop->f.reference) {
+	        if (rop->fl.concatenate && rop->fl.reference) {
 
 	            bprintf(ofp,".bp\n") ;
 
