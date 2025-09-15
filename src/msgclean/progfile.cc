@@ -130,7 +130,7 @@ cchar	fname[] ;
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("progfile: fname=%s\n",fname) ;
 	    debugprintf("progfile: progmode=%u\n",pip->progmode) ;
-	    debugprintf("progfile: suffix=%u\n",pip->f.suffix) ;
+	    debugprintf("progfile: suffix=%u\n",pip->fl.suffix) ;
 	}
 #endif /* CF_DEBUG */
 
@@ -140,7 +140,7 @@ cchar	fname[] ;
 /* check if this file has the correct file-suffix */
 
 	f_skipfile = FALSE ;
-	if (pip->f.suffix) {
+	if (pip->fl.suffix) {
 
 	    bnl = sfbasename(fname,-1,&bnp) ;
 
@@ -228,7 +228,7 @@ cchar	fname[] ;
 	        if ((rs > 0) && (! f_skipfile)) {
 
 	            rs = 1 ;
-	            if (! pip->f.nochange) {
+	            if (! pip->fl.nochange) {
 
 	                bseek(ifp,0L,SEEK_SET) ;
 
