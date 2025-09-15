@@ -431,7 +431,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -473,7 +473,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* remove the file (eventually) */
 	                    case 'r':
-	                        pip->f.remove = TRUE ;
+	                        pip->fl.remove = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -643,7 +643,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	rs = proctmpuser(pip) ;
 	if (rs < 0) {
-	    if (! pip->f.quiet)
+	    if (! pip->fl.quiet)
 		bprintf(pip->efp,"%s: TMPDIR inaccessible (%d)\n",rs) ;
 	    goto badtmpuser ;
 	}
@@ -698,7 +698,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	        bclose(afp) ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: inaccessible argument-list file (%d)\n",
 	                pip->progname,rs) ;
@@ -712,12 +712,12 @@ int main(int argc,mainv argv,mainv envv) {
 	bclose(ofp) ;
 	} else {
 	    ex = EX_CANTCREAT ;
-	    if (! pip->f.quiet)
+	    if (! pip->fl.quiet)
 	    bprintf(pip->efp,"%s: unavailable output (%d)\n",
 	        pip->progname,rs) ;
 	}
 
-	if ((! pip->f.quiet) && (rs < 0))
+	if ((! pip->fl.quiet) && (rs < 0))
 	    bprintf(pip->efp,"%s: could not complete function (%d)\n",rs) ;
 
 /* we are done! */
@@ -727,7 +727,7 @@ badtmpuser:
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    const char	*pn = pip->progname ;
 	            bprintf(pip->efp,"%s: invalid query (%d)\n",pn,rs) ;
 		}
