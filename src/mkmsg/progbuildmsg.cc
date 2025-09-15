@@ -154,7 +154,7 @@ MAILMSGATT	*alp ;
 	int		code = 0 ;
 	int		wlen = 0 ;
 	int		f_multipart = FALSE ;
-	int		f_mime = pip->f.mime ;
+	int		f_mime = pip->fl.mime ;
 	const char	*ccp ;
 	char		msgbound[MSGBOUNDLEN + 1] ;
 
@@ -165,7 +165,7 @@ MAILMSGATT	*alp ;
 
 /* do we need "multipart/mixed"? */
 
-	if (! pip->f.noinput) n = 1 ;
+	if (! pip->fl.noinput) n = 1 ;
 	rs = mailmsgatt_count(alp) ;
 	n += rs ;
 
@@ -178,7 +178,7 @@ MAILMSGATT	*alp ;
 
 /* type the input part */
 
-	if ((rs >= 0) && (! pip->f.noinput)) {
+	if ((rs >= 0) && (! pip->fl.noinput)) {
 	    int	f_def = FALSE ;
 
 #if	CF_DEBUG
@@ -228,7 +228,7 @@ MAILMSGATT	*alp ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("progbuildmsg: types¬\n") ;
-	    if (! pip->f.noinput) {
+	    if (! pip->fl.noinput) {
 	        debugprintf("progbuildmsg: type=%s subtype=%s\n",
 	            iep->type,iep->subtype) ;
 	    }
@@ -245,7 +245,7 @@ MAILMSGATT	*alp ;
 	    debugprintf("progbuildmsg: input?\n") ;
 #endif
 
-	if ((rs >= 0) && (! pip->f.noinput)) {
+	if ((rs >= 0) && (! pip->fl.noinput)) {
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
 	        debugprintf("progbuildmsg: coding input!\n") ;
@@ -345,7 +345,7 @@ MAILMSGATT	*alp ;
 
 /* do the main input text */
 
-	if ((rs >= 0) && (! pip->f.noinput)) {
+	if ((rs >= 0) && (! pip->fl.noinput)) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3)) {
@@ -384,7 +384,7 @@ MAILMSGATT	*alp ;
 	        rs = bprintf(pip->ofp,"--%s--\n",msgbound) ;
 	        wlen += rs ;
 	    } else {
-	        if (pip->f.noinput || (n <= 0)) {
+	        if (pip->fl.noinput || (n <= 0)) {
 	            rs = bputc(pip->ofp,'\n') ;
 	            wlen += rs ;
 	        }
@@ -441,7 +441,7 @@ static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,PARAMOPT *hlp,int f_mime)
 
 /* header-FACE */
 
-	if ((rs >= 0) && pip->f.add_face) {
+	if ((rs >= 0) && pip->fl.add_face) {
 	    const int	flen = FACEBUFLEN ;
 	    char	fbuf[FACEBUFLEN + 1] ;
 	    fbuf[0] = '\0' ;
@@ -457,7 +457,7 @@ static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,PARAMOPT *hlp,int f_mime)
 /* header-ORGANIZATION */
 
 	if ((rs >= 0) && (pip->org != NULL)) {
-	    if (pip->have.h_org && pip->f.h_org) {
+	    if (pip->have.h_org && pip->fl.h_org) {
 	        int	ol = strlen(pip->org) ;
 	        cchar	*op = pip->org ;
 	        kn = "organization" ;
@@ -471,7 +471,7 @@ static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,PARAMOPT *hlp,int f_mime)
 
 /* header-SENDER */
 
-	if ((rs >= 0) && pip->have.h_sender && pip->f.h_sender) {
+	if ((rs >= 0) && pip->have.h_sender && pip->fl.h_sender) {
 	    kn = "sender" ;
 	    rs = progoutheadema(pip,pip->ofp,kn,(adds+ha_sender)) ;
 	    wlen += rs ;
@@ -479,7 +479,7 @@ static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,PARAMOPT *hlp,int f_mime)
 
 /* header-REPLYTO */
 
-	if ((rs >= 0) && pip->have.h_replyto && pip->f.h_replyto) {
+	if ((rs >= 0) && pip->have.h_replyto && pip->fl.h_replyto) {
 	    kn = "reply-to" ;
 	    rs = progoutheadema(pip,pip->ofp,kn,(adds+ha_replyto)) ;
 	    wlen += rs ;
@@ -487,7 +487,7 @@ static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,PARAMOPT *hlp,int f_mime)
 
 /* header-DATE (RFC822 & STD11) */
 
-	if ((rs >= 0) && pip->f.mdate) {
+	if ((rs >= 0) && pip->fl.mdate) {
 	    kn = "date" ;
 	    f_date = TRUE ;
 	    dater_mkmsg(&pip->mdate,timebuf,-1) ;
