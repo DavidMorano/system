@@ -255,7 +255,7 @@ const char	ofname[] ;
 	        } /* end while (reading lines) */
 
 	        bclose(&argfile) ;
-	    } else if (! pip->f.quiet) {
+	    } else if (! pip->fl.quiet) {
 	        bprintf(pip->efp,
 	            "%s: could not open the argument list file (%d)\n",
 	            pip->progname,rs) ;
