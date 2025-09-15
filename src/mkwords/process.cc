@@ -106,7 +106,7 @@ char		name[] ;
 
 	if (S_ISLNK(sb.st_mode)) {
 
-	    if (pip->f.follow &&
+	    if (pip->fl.follow &&
 		(u_stat(name,&sb2) >= 0) && S_ISDIR(sb2.st_mode)) {
 
 #if	CF_DEBUG
@@ -114,7 +114,7 @@ char		name[] ;
 	        debugprintf("process: calling wdt\n") ;
 #endif
 
-	        wopts = (pip->f.follow) ? WDT_MFOLLOW : 0 ;
+	        wopts = (pip->fl.follow) ? WDT_MFOLLOW : 0 ;
 	        rs = wdt(name,wopts,checkname,pip) ;
 
 	    } else
@@ -122,7 +122,7 @@ char		name[] ;
 
 	} else if (S_ISDIR(sb.st_mode)) {
 
-	        wopts = (pip->f.follow) ? WDT_MFOLLOW : 0 ;
+	        wopts = (pip->fl.follow) ? WDT_MFOLLOW : 0 ;
 	        rs = wdt(name,wopts,checkname,pip) ;
 
 	} else
