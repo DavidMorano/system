@@ -1,39 +1,42 @@
-/* md5hash */
+/* md5hash HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MD5HASH_INCLUDE
-#define	MD5HASH_INCLUDE		1
+#define	MD5HASH_INCLUDE	
 
 
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<md5.h>
-
-#include	"localmisc.h"
 
 
 #define	MD5HASH		struct md5hash_head
 
 
 struct md5hash_head {
-	ulong		magic ;
 	MD5_CTS		ctx ;
+	uint		magic ;
 } ;
 
+typedef	MD5HASH		md5hash ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	md5hash_init(MD5HASH *) ;
-extern int	md5hash_add(MD5HASH *,void *,int) ;
-extern int	md5hash_get(MD5HASH *,ULONG *) ;
-extern int	md5hash_free(MD5HASH *) ;
+extern int	md5hash_init(MD5HASH *) noex ;
+extern int	md5hash_add(MD5HASH *,void *,int) noex ;
+extern int	md5hash_get(MD5HASH *,ulong *) noex ;
+extern int	md5hash_free(MD5HASH *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
+
 
 #endif /* MD5HASH_INCLUDE */
 
