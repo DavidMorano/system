@@ -281,7 +281,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->verboselevel = 1 ;
 	pip->daytime = time(NULL) ;
 
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 /* start parsing the arguments */
 
@@ -575,7 +575,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -1032,7 +1032,7 @@ static int proclogresult(PROGINFO *pip,int res)
 {
 	int		rs = SR_OK ;
 	cchar		*pn = pip->progname ;
-	if ((res < 0) && (! pip->f.quiet)) {
+	if ((res < 0) && (! pip->fl.quiet)) {
 	    bprintf(pip->efp,"%s: indexing failed (%d)\n",pn,res) ;
 	}
 	if ((pip->debuglevel > 0) && (rs >= 0)) {
@@ -1170,7 +1170,7 @@ static int procout_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if ((pip->outfile != NULL) && pip->f.outfile) {
+	if ((pip->outfile != NULL) && pip->fl.outfile) {
 	    bfile	*ofp = pip->outfile ;
 	    rs1 = bclose(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
