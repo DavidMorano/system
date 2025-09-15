@@ -148,7 +148,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	pip->verboselevel = 1 ;
 	pip->tmpdir = nullptr ;
 
-	pip->f.quiet = FALSE ;
+	pip->fl.quiet = FALSE ;
 
 
 /* process program arguments */
@@ -302,7 +302,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	                        break ;
 
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* terminal device */
