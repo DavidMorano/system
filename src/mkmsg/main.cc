@@ -422,9 +422,9 @@ static int mainsub(int argc,cchar **argv,cchar **envv)
 /* early things to initialize */
 
 	pip->verboselevel = 1 ;
-	pip->f.logprog = OPT_LOGPROG ;
-	pip->f.crnl = OPT_CRNL ;	/* default is "stupid" mode */
-	pip->f.mime = OPT_MIME ;
+	pip->fl.logprog = OPT_LOGPROG ;
+	pip->fl.crnl = OPT_CRNL ;	/* default is "stupid" mode */
+	pip->fl.mime = OPT_MIME ;
 
 	pip->lip = lip ;
 	rs = locinfo_start(lip,pip) ;
@@ -528,7 +528,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv)
 
 /* verbose */
 	                case argopt_verbose:
-	                    pip->f.verbose = TRUE ;
+	                    pip->fl.verbose = TRUE ;
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
@@ -849,7 +849,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv)
 	                                pip->have.h_org = TRUE ;
 	                                pip->final.h_org = TRUE ;
 	                                if (argp[0] != '-') {
-	                                    pip->f.h_org = TRUE ;
+	                                    pip->fl.h_org = TRUE ;
 	                                    pip->org = argp ;
 	                                }
 	                            }
@@ -858,7 +858,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -946,10 +946,10 @@ static int mainsub(int argc,cchar **argv,cchar **envv)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                if (argp[0] == '+') {
-	                                    pip->f.def_from = TRUE ;
+	                                    pip->fl.def_from = TRUE ;
 	                                } else if (argp[0] != '-') {
 	                                    EMA	*emap = (adds+ha_from) ;
-	                                    pip->f.h_from = TRUE ;
+	                                    pip->fl.h_from = TRUE ;
 	                                    rs = ema_parse(emap,argp,argl) ;
 	                                }
 	                            }
@@ -983,7 +983,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv)
 	                                f_input = TRUE ;
 				        rs = procatt(pip,&ie,cp,cl) ;
 	                            } else
-	                                pip->f.noinput = TRUE ;
+	                                pip->fl.noinput = TRUE ;
 	                        } else
 	                            rs = SR_INVALID ;
 	                        break ;
@@ -1015,7 +1015,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv)
 
 /* explicitly specify no input */
 	                    case 'n':
-	                        pip->f.noinput = TRUE ;
+	                        pip->fl.noinput = TRUE ;
 	                        break ;
 
 	                    case 'q':
@@ -1049,7 +1049,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv)
 
 /* verbose output */
 	                    case 'v':
-	                        pip->f.verbose = TRUE ;
+	                        pip->fl.verbose = TRUE ;
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -1163,7 +1163,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv)
 
 /* what about the input?  IS IT ALWAYS ONLY TEXT? */
 
-	if ((rs >= 0) && (! pip->f.noinput)) {
+	if ((rs >= 0) && (! pip->fl.noinput)) {
 
 	    if (f_input) {
 	        if ((ie.attfname != NULL) && 
@@ -1469,7 +1469,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                            const char	**vpp = &pip->org ;
 	                            pip->final.h_org = TRUE ;
 	                            pip->have.h_org = TRUE ;
-	                            pip->f.h_org = TRUE ;
+	                            pip->fl.h_org = TRUE ;
 	                            rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                        }
 	                    }
@@ -1478,10 +1478,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.crnl) {
 	                        pip->have.crnl = TRUE ;
 	                        pip->final.crnl = TRUE ;
-	                        pip->f.crnl = TRUE ;
+	                        pip->fl.crnl = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.crnl = (rs > 0) ;
+	                            pip->fl.crnl = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1489,10 +1489,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.add_from) {
 	                        pip->have.add_from = TRUE ;
 	                        pip->final.add_from = TRUE ;
-	                        pip->f.add_from = TRUE ;
+	                        pip->fl.add_from = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.add_from = (rs > 0) ;
+	                            pip->fl.add_from = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1500,10 +1500,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.add_org) {
 	                        pip->have.add_org = TRUE ;
 	                        pip->final.add_org = TRUE ;
-	                        pip->f.add_org = TRUE ;
+	                        pip->fl.add_org = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.add_org = (rs > 0) ;
+	                            pip->fl.add_org = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1511,10 +1511,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.add_face) {
 	                        pip->have.add_face = TRUE ;
 	                        pip->final.add_face = TRUE ;
-	                        pip->f.add_face = TRUE ;
+	                        pip->fl.add_face = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.add_face = (rs > 0) ;
+	                            pip->fl.add_face = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1522,10 +1522,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.add_replyto) {
 	                        pip->have.add_replyto = TRUE ;
 	                        pip->final.add_replyto = TRUE ;
-	                        pip->f.add_replyto = TRUE ;
+	                        pip->fl.add_replyto = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.add_replyto = (rs > 0) ;
+	                            pip->fl.add_replyto = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1533,10 +1533,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.add_sender) {
 	                        pip->have.add_sender = TRUE ;
 	                        pip->final.add_sender = TRUE ;
-	                        pip->f.add_sender = TRUE ;
+	                        pip->fl.add_sender = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.add_sender = (rs > 0) ;
+	                            pip->fl.add_sender = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1544,10 +1544,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.dis_inline) {
 	                        pip->have.dis_inline = TRUE ;
 	                        pip->final.dis_inline = TRUE ;
-	                        pip->f.dis_inline = TRUE ;
+	                        pip->fl.dis_inline = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.dis_inline = (rs > 0) ;
+	                            pip->fl.dis_inline = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1555,10 +1555,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.mime) {
 	                        pip->have.mime = TRUE ;
 	                        pip->final.mime = TRUE ;
-	                        pip->f.mime = TRUE ;
+	                        pip->fl.mime = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.mime = (rs > 0) ;
+	                            pip->fl.mime = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1826,21 +1826,21 @@ static int procextras_begin(PROGINFO *pip,PROCMORE *mp)
 	    debugprintf("main: user org=»%s«\n",pip->org) ;
 #endif
 
-	if ((! pip->final.add_org) && pip->have.h_org && pip->f.h_org) {
-	    pip->f.add_org = TRUE ;
+	if ((! pip->final.add_org) && pip->have.h_org && pip->fl.h_org) {
+	    pip->fl.add_org = TRUE ;
 	}
 
-	if ((rs >= 0) && pip->have.h_org && pip->f.h_org) {
+	if ((rs >= 0) && pip->have.h_org && pip->fl.h_org) {
 	    const char	*cp = pip->org ;
 	    if ((cp != NULL) && (cp[0] == '+')) {
 	        pip->org = NULL ;
-	        pip->f.h_org = FALSE ;
+	        pip->fl.h_org = FALSE ;
 	        pip->have.add_org = TRUE ;
-	        pip->f.add_org = TRUE ;
+	        pip->fl.add_org = TRUE ;
 	    }
 	} /* end if (hdr-org) */
 
-	if ((rs >= 0) && (! pip->final.h_org) && pip->f.add_org) {
+	if ((rs >= 0) && (! pip->final.h_org) && pip->fl.add_org) {
 	    const char	*un = pip->username ;
 	    const char	*org = pip->org ;
 	    if ((org == NULL) || (org[0] == '\0')) org = getenv(VARORG) ;
@@ -1852,13 +1852,13 @@ static int procextras_begin(PROGINFO *pip,PROCMORE *mp)
 	            const char	**vpp = &pip->org ;
 	            rs = proginfo_setentry(pip,vpp,obuf,rs) ;
 	            pip->have.h_org = TRUE ;
-	            pip->f.h_org = TRUE ;
+	            pip->fl.h_org = TRUE ;
 	            org = NULL ;
 	        }
 	    }
 	    if ((org != NULL) && (org[0] != '\0')) {
 	        pip->have.h_org = TRUE ;
-	        pip->f.h_org = TRUE ;
+	        pip->fl.h_org = TRUE ;
 	        pip->org = org ;
 	    }
 	} /* end if (hdr-org) */
@@ -1894,21 +1894,21 @@ static int procextras_begin(PROGINFO *pip,PROCMORE *mp)
 /* header-FROM */
 
 	f = FALSE ;
-	f = f || ((! pip->have.h_from) && pip->f.add_from) ;
-	f = f || (pip->have.h_from && pip->f.def_from) ;
+	f = f || ((! pip->have.h_from) && pip->fl.add_from) ;
+	f = f || (pip->have.h_from && pip->fl.def_from) ;
 	if ((rs >= 0) && f) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
 	        debugprintf("main: add_from=%u have_from=%u def_from=%u\n",
-	            pip->f.add_from, pip->have.h_from, pip->f.def_from) ;
+	            pip->fl.add_from, pip->have.h_from, pip->fl.def_from) ;
 #endif
 
 	    if ((rs = mkfromaddr(pip)) >= 0) {
 	        if (pip->hdr_from != NULL) {
 	            pip->have.h_from = TRUE ;
 	            pip->final.h_from = TRUE ;
-	            pip->f.h_from = TRUE ;
+	            pip->fl.h_from = TRUE ;
 	            rs = ema_parse((adds+ha_from),pip->hdr_from,-1) ;
 	        }
 	    } /* end if (mkfromaddr) */
@@ -1917,11 +1917,11 @@ static int procextras_begin(PROGINFO *pip,PROCMORE *mp)
 
 /* header-REPLYTO */
 
-	if ((rs >= 0) && pip->f.add_replyto) {
+	if ((rs >= 0) && pip->fl.add_replyto) {
 	    if ((rs = mkreplyaddr(pip)) >= 0) {
 	        if (pip->hdr_replyto != NULL) {
 	            pip->have.h_replyto = TRUE ;
-	            pip->f.h_replyto = TRUE ;
+	            pip->fl.h_replyto = TRUE ;
 	            rs = ema_parse((adds+ha_replyto),pip->hdr_replyto,-1) ;
 	        }
 	    }
@@ -1929,11 +1929,11 @@ static int procextras_begin(PROGINFO *pip,PROCMORE *mp)
 
 /* header-SENDER */
 
-	if ((rs >= 0) && pip->f.add_sender) {
+	if ((rs >= 0) && pip->fl.add_sender) {
 	    if ((rs = mksenderaddr(pip)) >= 0) {
 	        if (pip->hdr_sender != NULL) {
 	            pip->have.h_sender = TRUE ;
-	            pip->f.h_sender = TRUE ;
+	            pip->fl.h_sender = TRUE ;
 	            rs = ema_parse((adds+ha_sender),pip->hdr_sender,-1) ;
 	        }
 	    }
@@ -2214,13 +2214,13 @@ static int procdatestr_begin(PROGINFO *pip,cchar *datestr)
 #endif
 
 	    if ((rs = dater_setkey(&pip->tmpdate,datestr,-1,np,zn)) >= 0) {
-	        pip->f.mdate = TRUE ;
+	        pip->fl.mdate = TRUE ;
 	        rs = dater_startcopy(&pip->mdate,&pip->tmpdate) ;
 	    }
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
-	        debugprintf("main: f_mdate=%d\n",pip->f.mdate) ;
+	        debugprintf("main: f_mdate=%d\n",pip->fl.mdate) ;
 #endif
 
 	} /* end if (user specified date) */
@@ -2235,8 +2235,8 @@ static int procdatestr_end(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pip->f.mdate) {
-	    pip->f.mdate = FALSE ;
+	if (pip->fl.mdate) {
+	    pip->fl.mdate = FALSE ;
 	    rs1 = dater_finish(&pip->mdate) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -2401,7 +2401,7 @@ static int logmsginfo(PROGINFO *pip,EMA *adds,PARAMOPT *hlp)
 	if (pip->open.logprog) {
 	    int	i ;
 
-	    if ((rs >= 0) && pip->f.h_org) {
+	    if ((rs >= 0) && pip->fl.h_org) {
 	        const char	*org = pip->org ;
 	        if (org != NULL) rs = logmsghead(pip,hname_org,org) ;
 	    }
