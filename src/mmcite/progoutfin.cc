@@ -272,7 +272,7 @@ int progoutfin(PROGINFO *pip,BDB *bdbp,CITEDB *cdbp,cchar *ofname)
 	                            rs = bprintf(ofp,fmt) ;
 	                            wlen += rs ;
 
-	                        } else if ((rs1 == SR_NOTUNIQ) && pip->f.uniq) {
+	                        } else if ((rs1 == SR_NOTUNIQ) && pip->fl.uniq) {
 
 	                            fmt = "%s: not unique citation=%s\n" ;
 	                            rs = SR_NOTUNIQ ;
