@@ -599,17 +599,17 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet mode */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* remove labels */
 	                    case 's':
-	                        pip->f.removelabel = TRUE ;
+	                        pip->fl.removelabel = TRUE ;
 	                        break ;
 
 /* index whole files */
 	                    case 'w':
-	                        pip->f.wholefile = TRUE ;
+	                        pip->fl.wholefile = TRUE ;
 	                        break ;
 
 /* verbose mode */
@@ -718,8 +718,8 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* continue */
 
-	pip->f.noinput = f_noinput ;
-	pip->f.append = f_append ;
+	pip->fl.noinput = f_noinput ;
+	pip->fl.append = f_append ;
 
 	memclear(&ainfo) ;
 	ainfo.argc = argc ;
@@ -734,7 +734,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	if (rs < 0) {
 	    ex = EX_NOUSER ;
-	    if ((pip->debuglevel > 0) && (! pip->f.quiet))
+	    if ((pip->debuglevel > 0) && (! pip->fl.quiet))
 	        bprintf(pip->efp,"%s: could not get user information\n",
 	            pip->progname) ;
 	    goto retearly ;
@@ -942,8 +942,8 @@ cchar	*ofname ;
 	int	rs = SR_OK ;
 	int	hashn = hip->hashn ;
 	int	pan = 0 ;
-	int	f_append = pip->f.append ;
-	int	f_noinput = pip->f.noinput ;
+	int	f_append = pip->fl.append ;
+	int	f_noinput = pip->fl.noinput ;
 
 	cchar	*cp ;
 
@@ -1023,7 +1023,7 @@ cchar	*ofname ;
 
 	            bclose(afp) ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                bprintf(pip->efp,
 	                    "%s: inaccessible argument list file (%d)\n",
 	                    pip->progname,rs) ;
