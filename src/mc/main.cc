@@ -320,16 +320,16 @@ char	*argv[], *envv[] ;
 	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
-	pip->f.fd_stdout = TRUE ;
+	pip->fl.fd_stdout = TRUE ;
 
 	if (u_fstat(FD_STDOUT,&sb) < 0) {
-	    pip->f.fd_stdout = FALSE ;
+	    pip->fl.fd_stdout = FALSE ;
 	    (void) u_dup(FD_STDIN) ;
 	}
 
-	pip->f.fd_stderr = FALSE ;
+	pip->fl.fd_stderr = FALSE ;
 	if (bopen(&errfile,BFILE_STDERR,"dwca",0666) >= 0) {
-	    pip->f.fd_stderr = TRUE ;
+	    pip->fl.fd_stderr = TRUE ;
 	    pip->efp = &errfile ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	} else {
@@ -648,7 +648,7 @@ char	*argv[], *envv[] ;
 
 /* daemon mode */
 	                        case 'd':
-	                            pip->f.daemon = TRUE ;
+	                            pip->fl.daemon = TRUE ;
 	                            pip->runtime = -1 ;
 	                            if (f_optequal) {
 
@@ -698,7 +698,7 @@ char	*argv[], *envv[] ;
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* verbose mode */
@@ -751,7 +751,7 @@ char	*argv[], *envv[] ;
 	                maxai = i ;
 	                npa += 1 ;	/* increment position count */
 
-	                pip->f.named = TRUE ;
+	                pip->fl.named = TRUE ;
 
 	            }
 
@@ -765,7 +765,7 @@ char	*argv[], *envv[] ;
 	            maxai = i ;
 	            npa += 1 ;
 
-	            pip->f.named = TRUE ;
+	            pip->fl.named = TRUE ;
 
 	        } else {
 
@@ -887,7 +887,7 @@ char	*argv[], *envv[] ;
 
 #if	CF_CHECKONC
 	rs = checkonc(pip->pr,NULL,NULL,NULL) ;
-	pip->f.onckey = (rs >= 0) ;
+	pip->fl.onckey = (rs >= 0) ;
 #endif
 
 /* get some host/user information (offensive to ONC secure operations !) */
@@ -968,7 +968,7 @@ char	*argv[], *envv[] ;
 
 	rs = checksecure(pip->pr,pip->euid) ;
 
-	pip->f.secure_root = (rs > 0) ;
+	pip->fl.secure_root = (rs > 0) ;
 
 
 /* make the hostname */
@@ -1025,14 +1025,14 @@ char	*argv[], *envv[] ;
 
 	    configfname = CONFFNAME ;
 
-	    pip->f.secure_conf = pip->f.secure_root ;
+	    pip->fl.secure_conf = pip->fl.secure_root ;
 	    sl = permsched(sched1,&svars,
 	        tmpfname,MAXPATHLEN, configfname,R_OK) ;
 
 #ifdef	COMMENT
 	    if (sl < 0) {
 
-		pip->f.secure_conf = FALSE ;
+		pip->fl.secure_conf = FALSE ;
 		f_checksecure = TRUE ;
 	        sl = permsched(sched3,&svars,
 	        tmpfname,MAXPATHLEN, configfname,R_OK) ;
@@ -1047,7 +1047,7 @@ char	*argv[], *envv[] ;
 
 	} else {
 
-	    pip->f.secure_conf = FALSE ;
+	    pip->fl.secure_conf = FALSE ;
 	    f_checksecure = TRUE ;
 	    sl = getfname(pip->pr,configfname,1,tmpfname) ;
 
@@ -1110,7 +1110,7 @@ char	*argv[], *envv[] ;
 
 			rs = checksecure(configfname,pip->euid) ;
 
-			pip->f.secure_conf = (rs > 0) ;
+			pip->fl.secure_conf = (rs > 0) ;
 
 		}
 
@@ -1484,7 +1484,7 @@ char	*argv[], *envv[] ;
 	            if (strchr(srvfname,'/') != NULL)
 	                srvtab_type = GETFNAME_TYPEROOT ;
 
-			pip->f.secure_srvtab = pip->f.secure_conf ;
+			pip->fl.secure_srvtab = pip->fl.secure_conf ;
 
 	        }
 
@@ -1503,7 +1503,7 @@ char	*argv[], *envv[] ;
 	            if (strchr(accfname,'/') != NULL)
 	                acctab_type = GETFNAME_TYPEROOT ;
 
-			pip->f.secure_acctab = pip->f.secure_conf ;
+			pip->fl.secure_acctab = pip->fl.secure_conf ;
 
 	        }
 
@@ -1680,7 +1680,7 @@ char	*argv[], *envv[] ;
 #endif /* CF_DEBUG */
 
 	} else
-		pip->f.secure_conf = TRUE ;
+		pip->fl.secure_conf = TRUE ;
 
 /* end of accessing the configuration file */
 
@@ -1703,7 +1703,7 @@ char	*argv[], *envv[] ;
 	    debugprintf("main: 1 pidfname=%s\n",pidfname) ;
 #endif
 
-	if ((! pip->f.named) && (pidfname[0] != '\0')) {
+	if ((! pip->fl.named) && (pidfname[0] != '\0')) {
 
 	    if (pidfname[0] == '-')
 	        strcpy(pidfname,PIDFNAME) ;
@@ -1818,7 +1818,7 @@ char	*argv[], *envv[] ;
 
 /* can we get out right now ? */
 
-	if ((pip->debuglevel > 0) && (! pip->f.daemon)) {
+	if ((pip->debuglevel > 0) && (! pip->fl.daemon)) {
 
 		if (mincheck < -1)
 			cp = "default" ;
@@ -1924,7 +1924,7 @@ char	*argv[], *envv[] ;
 	    debugprintf("main: 2 mincheck=%d\n",mincheck) ;
 #endif
 
-	if ((! pip->f.daemon) && (! pip->f.named) && (mincheck > 0)) {
+	if ((! pip->fl.daemon) && (! pip->fl.named) && (mincheck > 0)) {
 
 	    if (checkstamp(pip,stampfname,mincheck) <= 0)
 	        goto mininterval ;
@@ -1939,8 +1939,8 @@ char	*argv[], *envv[] ;
 	    debugprintf("main: checking program parameters\n") ;
 #endif
 
-	if (pip->f.named)
-	    pip->f.daemon = FALSE ;
+	if (pip->fl.named)
+	    pip->fl.daemon = FALSE ;
 
 
 /* temporary directory */
@@ -2111,7 +2111,7 @@ char	*argv[], *envv[] ;
 	        debugprintf("main: we opened a logfile\n") ;
 #endif
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 	    if (pip->debuglevel > 0)
 	        bprintf(pip->efp,"%s: logfile=%s\n",pip->progname,logfname) ;
 
@@ -2132,7 +2132,7 @@ char	*argv[], *envv[] ;
 	        debugprintf("main: making log entry\n") ;
 #endif
 
-	    if (pip->f.daemon || pip->f.named) {
+	    if (pip->fl.daemon || pip->fl.named) {
 
 	        logfile_printf(&pip->lh,"%s %s %s\n",
 	            timestr_logz(daytime,timebuf),
@@ -2180,7 +2180,7 @@ char	*argv[], *envv[] ;
 	} /* end if (we have a log file or not) */
 
 
-	if (pip->f.daemon || pip->f.named)
+	if (pip->fl.daemon || pip->fl.named)
 	    logfile_printf(&pip->lh,"conf=%s\n",configfname) ;
 
 
@@ -2241,7 +2241,7 @@ char	*argv[], *envv[] ;
 	    debugprintf("main: are we in daemon mode ?\n") ;
 #endif
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 #if	CF_DEBUG && 0
 	    if (pip->debuglevel > 1) {
@@ -2266,7 +2266,7 @@ char	*argv[], *envv[] ;
 	            debugprintf( "main: becoming a daemon ?\n") ;
 #endif
 
-		if (pip->f.log)
+		if (pip->fl.log)
 		    logfile_flush(&pip->lh) ;
 
 #ifdef	COMMENT
@@ -2330,7 +2330,7 @@ char	*argv[], *envv[] ;
 
 /* before we go too far, are we the only one on this PID mutex ? */
 
-	if (! pip->f.named) {
+	if (! pip->fl.named) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -2461,7 +2461,7 @@ char	*argv[], *envv[] ;
 	    if (pip->debuglevel > 0)
 	        bprintf(pip->efp,"%s: mbtab=%s\n",pip->progname,mbfname) ;
 
-	    if (pip->f.daemon || pip->f.named)
+	    if (pip->fl.daemon || pip->fl.named)
 	        logfile_printf(&pip->lh,"mbtab=%s\n",mbfname) ;
 
 	    rs = paramfile_open(&pip->mbtab,envv,mbfname) ;
@@ -2478,17 +2478,17 @@ char	*argv[], *envv[] ;
 
 	    } else {
 
-		pip->f.mbtab = TRUE ;
+		pip->fl.mbtab = TRUE ;
 #ifdef	COMMENT
 		pip->mbtab = mallocstr(mbfname) ;
 #endif
 
-		pip->f.secure_mbtab = pc.f.secure_root && pip->f.secure_conf ;
-		if ((mbfname[0] != '/') || (! pip->f.secure_mbtab)) {
+		pip->fl.secure_mbtab = pc.f.secure_root && pip->fl.secure_conf ;
+		if ((mbfname[0] != '/') || (! pip->fl.secure_mbtab)) {
 
 			rs = checksecure(mbfname,pip->euid) ;
 
-			pip->f.secure_mbtab = (rs > 0) ;
+			pip->fl.secure_mbtab = (rs > 0) ;
 
 		}
 
@@ -2545,7 +2545,7 @@ char	*argv[], *envv[] ;
 	    if (pip->debuglevel > 0)
 	        bprintf(pip->efp,"%s: srvtab=%s\n",pip->progname,srvfname) ;
 
-	    if (pip->f.daemon || pip->f.named)
+	    if (pip->fl.daemon || pip->fl.named)
 	        logfile_printf(&pip->lh,"srvtab=%s\n",srvfname) ;
 
 	    rs = srvtab_open(&pip->stab,srvfname,NULL) ;
@@ -2562,15 +2562,15 @@ char	*argv[], *envv[] ;
 
 	    } else {
 
-		pip->f.srvtab = TRUE ;
+		pip->fl.srvtab = TRUE ;
 		pip->srvtab = mallocstr(srvfname) ;
 
-		pip->f.secure_srvtab = pc.f.secure_root && pip->f.secure_conf ;
-		if ((srvfname[0] != '/') || (! pip->f.secure_srvtab)) {
+		pip->fl.secure_srvtab = pc.f.secure_root && pip->fl.secure_conf ;
+		if ((srvfname[0] != '/') || (! pip->fl.secure_srvtab)) {
 
 			rs = checksecure(srvfname,pip->euid) ;
 
-			pip->f.secure_srvtab = (rs > 0) ;
+			pip->fl.secure_srvtab = (rs > 0) ;
 
 		}
 
@@ -2640,7 +2640,7 @@ char	*argv[], *envv[] ;
 	    debugprintf("main: 1 accfname=%s\n",accfname) ;
 #endif
 
-	pip->f.acctab = FALSE ;
+	pip->fl.acctab = FALSE ;
 	if ((rs >= 0) || (perm(accfname,-1,-1,NULL,R_OK) >= 0)) {
 
 	    if (pip->debuglevel > 0)
@@ -2662,15 +2662,15 @@ char	*argv[], *envv[] ;
 
 	    } else {
 
-	        pip->f.acctab = TRUE ;
+	        pip->fl.acctab = TRUE ;
 		pip->acctab = mallocstr(accfname) ;
 
-		pip->f.secure_acctab = pc.f.secure_root && pip->f.secure_conf ;
-		if ((accfname[0] != '/') || (! pip->f.secure_acctab)) {
+		pip->fl.secure_acctab = pc.f.secure_root && pip->fl.secure_conf ;
+		if ((accfname[0] != '/') || (! pip->fl.secure_acctab)) {
 
 			rs = checksecure(accfname,pip->euid) ;
 
-			pip->f.secure_acctab = (rs > 0) ;
+			pip->fl.secure_acctab = (rs > 0) ;
 
 		}
 
@@ -2679,7 +2679,7 @@ char	*argv[], *envv[] ;
 	} /* end if (accessing a 'acctab' file) */
 
 #if	CF_DEBUG
-	if ((pip->debuglevel > 1) && pip->f.acctab) {
+	if ((pip->debuglevel > 1) && pip->fl.acctab) {
 		ACCTAB_CUR	ac ;
 		ACCTAB_ENT	*ep ;
 		debugprintf("main: netgroup machine user password\n") ;
@@ -2728,7 +2728,7 @@ char	*argv[], *envv[] ;
 	    if (pip->debuglevel > 0)
 	        bprintf(pip->efp,"%s: path=%s\n",pip->progname,pathfname) ;
 
-	    if (pip->f.daemon || pip->f.named)
+	    if (pip->fl.daemon || pip->fl.named)
 	        logfile_printf(&pip->lh,"path=%s\n",pathfname) ;
 
 	    rs = procfilepath(pip->pr,pathfname,&pip->path) ;
@@ -2745,15 +2745,15 @@ char	*argv[], *envv[] ;
 
 	    } else {
 
-		pip->f.path = TRUE ;
+		pip->fl.path = TRUE ;
 		pip->pathfname = mallocstr(pathfname) ;
 
-		pip->f.secure_path = pc.f.secure_root && pip->f.secure_conf ;
-		if ((pathfname[0] != '/') || (! pip->f.secure_path)) {
+		pip->fl.secure_path = pc.f.secure_root && pip->fl.secure_conf ;
+		if ((pathfname[0] != '/') || (! pip->fl.secure_path)) {
 
 			rs = checksecure(pathfname,pip->euid) ;
 
-			pip->f.secure_path = (rs > 0) ;
+			pip->fl.secure_path = (rs > 0) ;
 
 		}
 
@@ -2785,11 +2785,11 @@ char	*argv[], *envv[] ;
 
 /* security summary */
 
-	pip->f.secure = pip->f.secure_root && pip->f.secure_conf &&
-		pip->f.secure_srvtab && pip->f.secure_path ;
+	pip->fl.secure = pip->fl.secure_root && pip->fl.secure_conf &&
+		pip->fl.secure_srvtab && pip->fl.secure_path ;
 
 #if	CF_SETRUID
-	if (pip->f.secure && (pip->uid != pip->euid))
+	if (pip->fl.secure && (pip->uid != pip->euid))
 		u_setreuid(pip->euid,-1) ;
 #endif
 
@@ -2841,7 +2841,7 @@ char	*argv[], *envv[] ;
 
 	ex = EX_DATAERR ;
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_printf("stampdname=%s\n",pip->stampdname) ;
 
 
@@ -2860,7 +2860,7 @@ char	*argv[], *envv[] ;
 
 /* we are done initializing */
 
-	if (pip->f.daemon && pip->f.log) {
+	if (pip->fl.daemon && pip->fl.log) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -2922,19 +2922,19 @@ char	*argv[], *envv[] ;
 
 	        } /* end if */
 
-	        pip->f.named = TRUE ;
+	        pip->fl.named = TRUE ;
 
 	    } /* end for */
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
 	        debugprintf("main: go ? rs=%d f_named=%d count=%d\n",
-	            rs,pip->f.named,count) ;
+	            rs,pip->fl.named,count) ;
 #endif
 
 	    if (rs >= 0) {
 
-	        if ((! pip->f.named) || (count > 0)) {
+	        if ((! pip->fl.named) || (count > 0)) {
 
 #if	DMALLOC
 		dmalloc_track((dmalloc_track_t) pcspoll_checker) ;
@@ -2996,7 +2996,7 @@ daemonret2:
 	debugprintf("main: daemonret2\n") ;
 #endif
 
-	if (pip->f.acctab)
+	if (pip->fl.acctab)
 	    (void) acctab_close(&pip->atab) ;
 
 #if	CF_DEBUG
@@ -3044,7 +3044,7 @@ bad4:
 	debugprintf("main: bad4\n") ;
 #endif
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_close(&pip->lh) ;
 
 bad3:
@@ -3065,7 +3065,7 @@ bad1:
 	debugprintf("main: bad1\n") ;
 #endif
 
-	if (pip->f.slog)
+	if (pip->fl.slog)
 	    bclose(pip->lfp) ;
 
 retearly:
@@ -3198,7 +3198,7 @@ badpidopen:
 badpidlock:
 	(void) vecstr_finish(&svars) ;
 
-	if ((pip->debuglevel > 0) || pip->f.daemon) {
+	if ((pip->debuglevel > 0) || pip->fl.daemon) {
 
 	    bprintf(pip->efp,
 	        "%s: could not lock the PID file (%d)\n",
@@ -3260,7 +3260,7 @@ badpidfile2:
 
 /* error types of returns */
 badret:
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_close(&pip->lh) ;
 
 	ex = EX_USAGE ;
