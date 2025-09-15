@@ -1,30 +1,35 @@
-/* progconfig */
+/* progconfig HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program configuration code */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	PROGCONFIG_INCLUDE
-#define	PROGCONFIG_INCLUDE	1
+#define	PROGCONFIG_INCLUDE
 
-
-#include	<sys/types.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<expcook.h>
 #include	<paramfile.h>
 #include	<vecstr.h>
-#include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
 
 
 #define	PROGCONFIG	struct progconfig_head
+#define	PROGCONFIG_FL	struct progconfig_flags
 
 
-struct progconfig_flags {
+struct proginfo_flags {
 	uint		srvtab:1 ;	/* do we have an SRVTAB ? */
 	uint		acctab:1 ;	/* do we have an ACCess TABle ? */
 	uint		passwd:1 ;	/* PWFILE? */
@@ -48,52 +53,43 @@ struct progconfig_flags {
 } ;
 
 struct progconfig_head {
-	unsigned long	magic ;
-	const char	*configfname ;
-	const char	*pidfname ;
-	const char	*lockfname ;		/* lock file */
-	const char	*svcfname ;		/* SVCTAB file */
-	const char	*accfname ;		/* ACCTAB file */
-	const char	*passfname ;		/* pass (FD) file */
-	const char	*reqfname ;		/* request file */
-	const char	*shmfname ;		/* SHM file */
-	const char	*msfname ;		/* MS file */
-	const char	*logfname ;
-	const char	*prog_rmail ;
-	const char	*prog_sendmail ;
-	const char	*orgcode ;		/* organization code */
-	const char	*speedname ;		/* CPUSPEED module name */
-	const char	*portspec ;
-	struct proginfo	*pip ;
-	struct progconfig_flags	f ;
-	struct progconfig_flags	have ;
-	struct progconfig_flags	change ;
-	struct progconfig_flags	open ;
-	struct progconfig_flags	final ;
-	PARAMFILE	p ;
-	EXPCOOK	cooks ;
+	cchar	*configfname ;
+	cchar	*pidfname ;
+	cchar	*lockfname ;		/* lock file */
+	cchar	*svcfname ;		/* SVCTAB file */
+	cchar	*accfname ;		/* ACCTAB file */
+	cchar	*passfname ;		/* pass (FD) file */
+	cchar	*reqfname ;		/* request file */
+	cchar	*shmfname ;		/* SHM file */
+	cchar	*msfname ;		/* MS file */
+	cchar	*logfname ;
+	cchar	*prog_rmail ;
+	cchar	*prog_sendmail ;
+	cchar	*orgcode ;		/* organization code */
+	cchar	*speedname ;		/* CPUSPEED module name */
+	cchar	*portspec ;
+	proginfo	*pip ;
+	paramfile	p ;
+	expcool		cooks ;
 	vecstr		stores ;
+	PROFCONFIG_FL	fl ;
+	PROFCONFIG_FL	have ;
+	PROFCONFIG_FL	change ;
+	PROFCONFIG_FL	open ;
+	PROFCONFIG_FL	final ;
+	uint		magic ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(PROGCONFIG_MASTER)) || (PROGCONFIG_MASTER == 0)
+extern int progconfigstart(PROGCONFIG *,proginfo *,cchar *) noex ;
+extern int progconfigcheck(PROGCONFIG *) noex ;
+extern int progconfigread(PROGCONFIG *) noex ;
+extern int progconfigfinish(PROGCONFIG *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int progconfigstart(PROGCONFIG *,struct proginfo *,const char *) ;
-extern int progconfigcheck(PROGCONFIG *) ;
-extern int progconfigread(PROGCONFIG *) ;
-extern int progconfigfinish(PROGCONFIG *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PROGCONFIG_MASTER */
 
 #endif /* PROGCONFIG */
-
 
 
