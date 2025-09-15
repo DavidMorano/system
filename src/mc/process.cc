@@ -327,7 +327,7 @@ vecstr			*snp ;		/* initial service names */
 
 /* check up on the log file */
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 		logfile_check(&pip->lh,sip->daytime) ;
 
 	    loopcount += 1 ;
@@ -342,7 +342,7 @@ vecstr			*snp ;		/* initial service names */
 
 
 #if	CF_LOGONLY
-	f = pip->f.daemon ;
+	f = pip->fl.daemon ;
 #else
 	f = TRUE ;
 #endif
@@ -351,16 +351,16 @@ vecstr			*snp ;		/* initial service names */
 
 	    sip->daytime = time(NULL) ;
 
-	    if (pip->f.daemon && f_exit)
+	    if (pip->fl.daemon && f_exit)
 	        cp = "%s server exiting (interrupt)\n" ;
 
-	    else if (pip->f.daemon)
+	    else if (pip->fl.daemon)
 	        cp = "%s server exiting (period expired)\n" ;
 
 	    else
 	        cp = "%s exiting (work completed)\n" ;
 
-	    if (pip->f.log)
+	    if (pip->fl.log)
 	        logfile_printf(&pip->lh,cp,
 	            timestr_logz(sip->daytime,timebuf)) ;
 
@@ -446,12 +446,12 @@ struct procinfo	*sip ;
 
 /* do other stuff for this cycle */
 
-	        if (pip->f.log)
+	        if (pip->fl.log)
 	            logfile_setid(&pip->lh,pip->logid) ;
 
 /* maintenance the lock file */
 
-	if (! pip->f.named) {
+	if (! pip->fl.named) {
 
 	    if ((pip->lockfp != NULL) && 
 	        ((sip->daytime - sip->t_lockcheck) > TI_MAINT)) {
@@ -473,7 +473,7 @@ struct procinfo	*sip ;
 
 	            if (rs > 0) {
 
-	                if (pip->f.log)
+	                if (pip->fl.log)
 	                    logfile_printf(&pip->lh,
 	                        "%s another program has my lock file, "
 	                        "other PID=%d\n",
@@ -482,7 +482,7 @@ struct procinfo	*sip ;
 
 	            } else {
 
-	                if (pip->f.log)
+	                if (pip->fl.log)
 	                    logfile_printf(&pip->lh,
 	                        "%s tampered lock file, rs=%d\n",
 	                        timestr_logz(sip->daytime,timebuf),
@@ -503,7 +503,7 @@ struct procinfo	*sip ;
 
 /* maintenance the PID mutex lock file */
 
-	if (pip->f.daemon && (pip->pidfp != NULL) && 
+	if (pip->fl.daemon && (pip->pidfp != NULL) && 
 	    ((sip->daytime - sip->t_pidcheck) > TI_MAINT)) {
 
 #if	CF_DEBUG
@@ -524,7 +524,7 @@ struct procinfo	*sip ;
 
 	        if (rs > 0) {
 
-	            if (pip->f.log)
+	            if (pip->fl.log)
 	                logfile_printf(&pip->lh,
 	                    "%s another program has PID file, other PID=%d\n",
 	                    timestr_logz(sip->daytime,timebuf),
@@ -532,7 +532,7 @@ struct procinfo	*sip ;
 
 	        } else {
 
-	            if (pip->f.log)
+	            if (pip->fl.log)
 	                logfile_printf(&pip->lh,
 	                    "%s something happened to PID file, rs=%d\n",
 	                    timestr_logz(sip->daytime,timebuf),
