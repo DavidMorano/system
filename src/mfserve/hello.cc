@@ -206,7 +206,7 @@ int hello_finish(HELLO *op)
 	if (op->magic != HELLO_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
-	debugprintf("hello_finish: f_working=%d\n",op->f.working) ;
+	debugprintf("hello_finish: f_working=%d\n",op->fl.working) ;
 #endif
 
 	rs1 = hello_argsend(op) ;
@@ -274,12 +274,12 @@ static int hello_argsbegin(HELLO *op,cchar **argv)
 	int		rs ;
 	if ((rs = vecpstr_start(alp,5,0,ss)) >= 0) {
 	    int		i ;
-	    op->f.args = TRUE ;
+	    op->fl.args = TRUE ;
 	    for (i = 0 ; (rs >= 0) && (argv[i] != NULL) ; i += 1) {
 	        rs = vecpstr_add(alp,argv[i],-1) ;
 	    }
 	    if (rs < 0) {
-	        op->f.args = FALSE ;
+	        op->fl.args = FALSE ;
 	        vecpstr_finish(alp) ;
 	    }
 	} /* end if (m-a) */
@@ -292,7 +292,7 @@ static int hello_argsend(HELLO *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.args) {
+	if (op->fl.args) {
 	    VECPSTR	*alp = &op->args ;
 	    rs1 = vecpstr_finish(alp) ;
 	    if (rs >= 0) rs = rs1 ;
