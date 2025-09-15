@@ -307,7 +307,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->lip = lip ;
 	memset(lip,0,sizeof(LOCINFO)) ;
 
-	lip->f.header = TRUE ;
+	lip->fl.header = TRUE ;
 
 /* start parsing the arguments */
 
@@ -507,7 +507,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    break ;
 
 	                case argopt_nh:
-	                    lip->f.header = FALSE ;
+	                    lip->fl.header = FALSE ;
 	                    break ;
 
 /* handle all keyword defaults */
@@ -538,7 +538,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -547,26 +547,26 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'a':
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        break ;
 
 	                    case 'f':
-	                        lip->f.mid = FALSE ;
+	                        lip->fl.mid = FALSE ;
 	                        break ;
 
 	                    case 'h':
-	                        lip->f.header = TRUE ;
+	                        lip->fl.header = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.header = (rs > 0) ;
+	                                lip->fl.header = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 	                    case 'm':
-	                        lip->f.mid = TRUE ;
+	                        lip->fl.mid = TRUE ;
 	                        break ;
 
 /* options */
@@ -723,7 +723,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	lip->nentries = DEFENTS ;
 	if (rs >= 0) {
-	    if (! lip->f.all) {
+	    if (! lip->fl.all) {
 	        if (argval != NULL) {
 	            rs = cfdeci(argval,-1,&v) ;
 	            if (v > 0) lip->nentries = v ;
@@ -830,7 +830,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -986,7 +986,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 	        rs1 = bclose(afp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    fmt = "%s: inaccessible argument-list (%d)\n" ;
 	            bprintf(pip->efp,fmt,pn,rs) ;
 	            bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1046,9 +1046,9 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 
 
 	nentries = lip->nentries ;
-	ninsert = (lip->f.all) ? -1 : lip->nentries ;
+	ninsert = (lip->fl.all) ? -1 : lip->nentries ;
 	f_recip = FALSE ;
-	if (! lip->f.all) {
+	if (! lip->fl.all) {
 
 	    rs1 = vecstr_count(rlp) ;
 	    f_recip = (rs1 > 0) ? 1 : 0 ;
@@ -1119,7 +1119,7 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 	                    rs1 = vecobj_inorder(&entries,&e,
 	                        lip->cmpfunc,ninsert) ;
 
-	                    if ((rs1 >= 0) && (! lip->f.all)) {
+	                    if ((rs1 >= 0) && (! lip->fl.all)) {
 	                        vecobj_del(&entries,nentries) ;
 			    }
 
@@ -1151,7 +1151,7 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 
 /* print out the extracted entries */
 
-	if ((rs >= 0) && lip->f.header) {
+	if ((rs >= 0) && lip->fl.header) {
 
 	    strwcpyuc(tmpfname,sortkeys[lip->tdi],SORTKEYLEN) ;
 
@@ -1163,7 +1163,7 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 	    bprintf(ofp,
 	        "RECIP    %-14s COUNT %s\n",
 	        tmpfname,
-	        ((lip->f.mid) ? "MESSAGE-ID" : "FROM")) ;
+	        ((lip->fl.mid) ? "MESSAGE-ID" : "FROM")) ;
 #endif /* CF_MID */
 
 	} /* end if */
@@ -1231,7 +1231,7 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 
 	    } /* end block */
 
-	    if ((rs >= 0) && lip->f.mid) {
+	    if ((rs >= 0) && lip->fl.mid) {
 
 	        n = NCOLSMSGID ;
 	        chend = ' ' ;
