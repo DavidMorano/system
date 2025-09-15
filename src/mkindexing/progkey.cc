@@ -202,7 +202,7 @@ const char	ofname[] ;
 	        ofname = BFILE_STDOUT ;
 
 	    strcpy(openstr,"wc") ;
-	    if (pip->f.append) {
+	    if (pip->fl.append) {
 	        strcat(openstr,"a") ;
 	    } else {
 	        strcat(openstr,"t") ;
@@ -310,7 +310,7 @@ static int subinfo_sendparams(SUBINFO *sip,bfile *ofp)
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if (pip->f.optsendparams) {
+	if (pip->fl.optsendparams) {
 	    int		i ;
 	    int		v ;
 	    cchar	*cp ;
@@ -532,7 +532,7 @@ static int subinfo_argfile(SUBINFO *sip,DISP *dop)
 
 	        rs1 = bclose(&afile) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } else if (! pip->f.quiet) {
+	    } else if (! pip->fl.quiet) {
 	        cchar	*pn = pip->progname ;
 	        cchar	*fmt = "%s: inaccessible (%d) afile=%s\n" ;
 	        bprintf(pip->efp,fmt,pn,rs,aip->afname) ;
@@ -578,7 +578,7 @@ static int subinfo_procfile(SUBINFO *sip,DISP *dop,cchar *fname)
 	        if ((rs = permid(&sip->id,&sb,R_OK)) >= 0) {
 	            rs = disp_addwork(dop,fname,-1) ;
 	        } else if (isNotAccess(rs)) {
-		    if (pip->f.iacc) {
+		    if (pip->fl.iacc) {
 			if (pip->debuglevel > 0) {
 	                    ereport(pip,fname,rs) ;
 			}
@@ -792,7 +792,7 @@ static int disp_worker(DISP *dop)
 static int ereport(PROGINFO *pip,cchar *fname,int frs)
 {
 	int		rs = SR_OK ;
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 	    cchar	*pn = pip->progname ;
 	    bprintf(pip->efp,"%s: file-processing error (%d)\n",pn,frs) ;
 	    bprintf(pip->efp,"%s: file=%s\n",pn,fname) ;
