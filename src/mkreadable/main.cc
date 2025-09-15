@@ -198,7 +198,7 @@ int main(int argc,cchar **argv,cchar **envv)
 #if	CF_DEBUGS
 	                    debugprintf("main: version key-word\n") ;
 #endif
-	                    pip->f.verbose = TRUE ;
+	                    pip->fl.verbose = TRUE ;
 	                    if (f_optequal) goto badargextra ;
 
 	                    break ;
@@ -315,12 +315,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* quiet */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* require a suffix for file names */
@@ -350,7 +350,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* verbose output */
 	                    case 'v':
-	                        pip->f.verbose = TRUE ;
+	                        pip->fl.verbose = TRUE ;
 	                        break ;
 
 	                    case '?':
@@ -451,7 +451,7 @@ int main(int argc,cchar **argv,cchar **envv)
 /* get ready */
 
 	if ((rs = paramopt_havekey(&aparams,PO_SUFFIX)) > 0) {
-	    pip->f.suffix = TRUE ;
+	    pip->fl.suffix = TRUE ;
 	} /* end if */
 
 /* OK, we do it */
@@ -523,7 +523,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            bprintf(efp,
 	                "%s: could not open the argument list file\n",
