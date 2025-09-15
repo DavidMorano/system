@@ -1,4 +1,6 @@
-/* msuclient */
+/* msuclient HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* revision history:
@@ -11,29 +13,30 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MSUCLIENT_INCLUDE
-#define	MSUCLIENT_INCLUDE	1
+#define	MSUCLIENT_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
-#include	<localmisc.h>
+#include	<envstandards.h>	/* must be ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	MSUCLIENT_MAGIC		0x58261227
 #define	MSUCLIENT		struct msuclient_head
-#define	MSUCLIENT_OBJ		struct msuclient_obj
-#define	MSUCLIENT_DATA		struct msuclient_d
 #define	MSUCLIENT_FL		struct msuclient_flags
+#define	MSUCLIENT_OBJ		struct msuclient_object
+#define	MSUCLIENT_DA		struct msuclient_data
 
 
-struct msuclient_obj {
+struct msuclient_objext {
 	char		*name ;
 	uint		objsize ;
 } ;
 
-struct msuclient_d {
+struct msuclient_data {
 	uint		intstale ;
 	uint		utime ;
 	uint		btime ;
@@ -47,38 +50,35 @@ struct msuclient_flags {
 } ;
 
 struct msuclient_head {
-	ulong		magic ;
 	cchar		*pr ;
 	cchar		*shmname ;
 	char		*mapdata ;
 	uint		*shmtable ;
-	MSUCLIENT_FL	f ;
 	time_t		dt ;
 	time_t		ti_shm ;		/* DB file modification */
 	time_t		ti_map ;		/* DB map */
 	time_t		ti_lastcheck ;		/* last check of file */
+	MSUCLIENT_FL	fl ;
+	uint		magic ;
 	int		nodenamelen ;
 	int		pagesize ;
 	int		mapsize ;
 	int		shmsize ;
-} ;
+} ; /* end struct (msuclient_head) */
 
+typedef	MSUCLIENT	msuclient ;
+typedef	MSUCLIENT_FL	msuclient_fl ;
+typedef	MSUCLIENT_OBJ	msuclient_obj ;
+typedef	MSUCLIENT_DA	msuclient_da ;
 
-#if	(! defined(MSUCLIENT_MASTER)) || (MSUCLIENT_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	msuclient_open(msuclient *,cchar *) noex ;
+extern int	msuclient_get(msuclient *,time_t,int,msgclient_da *) noex ;
+extern int	msuclient_close(msuclient *) noex ;
 
-extern int	msuclient_open(MSUCLIENT *,const char *) ;
-extern int	msuclient_get(MSUCLIENT *,time_t,int,MSUCLIENT_DATA *) ;
-extern int	msuclient_close(MSUCLIENT *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* MSUCLIENT_MASTER */
 
 #endif /* MSUCLIENT_INCLUDE */
 
