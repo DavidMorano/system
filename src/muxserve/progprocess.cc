@@ -228,7 +228,7 @@ int progprocess(PROGINFO *pip,ARGINFO *aip,USERINFO *uip)
 
 static int proglog_extra(PROGINFO *pip)
 {
-	const int	f = (pip->f.named || pip->f.passfd) ;
+	const int	f = (pip->fl.named || pip->fl.passfd) ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
 	    if ((pip->cfname != NULL) && (rs1 >= 0)) {
@@ -247,14 +247,14 @@ static int procsecurity(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		f = TRUE ;
 
-	f = f && pip->f.secure_root ;
-	f = f && pip->f.secure_conf ;
-	f = f && pip->f.secure_svcfile ;
-	f = f && pip->f.secure_path ;
-	pip->f.secure = f ;
+	f = f && pip->fl.secure_root ;
+	f = f && pip->fl.secure_conf ;
+	f = f && pip->fl.secure_svcfile ;
+	f = f && pip->fl.secure_path ;
+	pip->fl.secure = f ;
 
 #if	CF_SETRUID
-	if (pip->f.secure) {
+	if (pip->fl.secure) {
 	    if (pip->uid != pip->euid) {
 	        u_setreuid(pip->euid,-1) ;
 		if (pip->debuglevel > 0)
@@ -267,7 +267,7 @@ static int procsecurity(PROGINFO *pip)
 #endif /* CF_SETRUID */
 
 #if	CF_SETEUID
-	if (! pip->f.secure) {
+	if (! pip->fl.secure) {
 	    if (pip->uid != pip->euid)
 	        u_seteuid(pip->uid) ;
 	    if (pip->gid != pip->egid)
@@ -324,7 +324,7 @@ static int procaa(PROGINFO *pip,ARGINFO *aip)
 
 /* load up all of the service names that we have so far */
 
-	if (pip->f.named) {
+	if (pip->fl.named) {
 
 	    for (ai = 1 ; ai < aip->argc ; ai += 1) {
 
@@ -352,7 +352,7 @@ static int procaa(PROGINFO *pip,ARGINFO *aip)
 	            rs = vecstr_adduniq(&snames,cp,-1) ;
 	            if (rs != INT_MAX) count += 1 ;
 
-	        } else if (! pip->f.quiet) {
+	        } else if (! pip->fl.quiet) {
 
 	            rs = SR_NOTFOUND ;
 	            bprintf(pip->efp,
@@ -379,7 +379,7 @@ static int procaa(PROGINFO *pip,ARGINFO *aip)
 
 /* do some things if we are running in daemon mode */
 
-	if ((rs >= 0) && (pip->f.daemon || pip->f.background)) {
+	if ((rs >= 0) && (pip->fl.daemon || pip->fl.background)) {
 
 	    proglog_flush(pip) ;
 
@@ -390,7 +390,7 @@ static int procaa(PROGINFO *pip,ARGINFO *aip)
 	        rs = uc_fork() ;
 	 	if (rs == 0) {
 
-		    if (pip->f.caf) {
+		    if (pip->fl.caf) {
 		        int	i ;
 			bclose(pip->efp) ;
 			pip->efp = NULL ;
@@ -413,7 +413,7 @@ static int procaa(PROGINFO *pip,ARGINFO *aip)
 
 	} /* end if (daemon mode) */
 
-	if ((rs >= 0) && ((! pip->f.named) || (count > 0))) {
+	if ((rs >= 0) && ((! pip->fl.named) || (count > 0))) {
 
 	    rs = progwatch(pip,&snames) ;
 
