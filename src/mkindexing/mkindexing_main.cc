@@ -22,13 +22,12 @@
 
 /*******************************************************************************
 
-	This is the 'main' module for the MKKEY program.  This module processes
-	the program invocation arguments and performs some preprocessing steps
-	before any actual input files are scanned.
-
+	This is the 'main' module for the MKKEY program.  This
+	module processes the program invocation arguments and
+	performs some preprocessing steps before any actual input
+	files are scanned.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be before others */
 
@@ -57,7 +56,6 @@
 #include	<ascii.h>
 #include	<eigendb.h>
 #include	<upt.h>
-#include	<ucmallreg.h>
 #include	<ischarx.h>
 #include	<iserror.h>
 #include	<isnot.h>
@@ -371,8 +369,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->maxwordlen = -2 ;
 	pip->eigenwords = -2 ;
 	pip->maxkeys = -2 ;
-	pip->f.optsendparams = OPT_SENDPARAMS ;
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.optsendparams = OPT_SENDPARAMS ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 /* arguments */
 
@@ -730,7 +728,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 				    rs = optbool(avp,avl) ;
-	                            pip->f.iacc = rs ;
+	                            pip->fl.iacc = rs ;
 				}
 	                    }
 	                    break ;
@@ -775,7 +773,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        pip->quietlevel = 1 ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -794,7 +792,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* append to the key file */
 	                    case 'a':
-	                        pip->f.append = TRUE ;
+	                        pip->fl.append = TRUE ;
 	                        break ;
 
 	                    case 'b':
@@ -926,7 +924,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* prefix match */
 	                    case 'p':
-	                        pip->f.prefix = TRUE ;
+	                        pip->fl.prefix = TRUE ;
 	                        break ;
 
 	                    case 'q':
@@ -935,17 +933,17 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* remove labels */
 	                    case 's':
-	                        pip->f.removelabel = TRUE ;
+	                        pip->fl.removelabel = TRUE ;
 	                        break ;
 
 /* index whole files */
 	                    case 'w':
-	                        pip->f.wholefile = TRUE ;
+	                        pip->fl.wholefile = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.wholefile = (rs > 0) ;
+	                                pip->fl.wholefile = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1000,7 +998,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if (efname == NULL) efname = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,efname,"dwca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
@@ -1116,13 +1114,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	}
 
 #if	CF_DEBUG || CF_DEBUGS
-	if (pip->f.nodebug) debugclose() ;
-	debugprintf("main: pn=%s nodebug=%u\n",pip->progname,pip->f.nodebug) ;
+	if (pip->fl.nodebug) debugclose() ;
+	debugprintf("main: pn=%s nodebug=%u\n",pip->progname,pip->fl.nodebug) ;
 #endif
 
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
-	    const int	f_sp = pip->f.optsendparams ;
+	    const int	f_sp = pip->fl.optsendparams ;
 	    bprintf(pip->efp,"%s: cfname=%s\n",pn,cfname) ;
 	    bprintf(pip->efp,"%s: sendparams=%u\n",pn,f_sp);
 	}
@@ -1287,7 +1285,7 @@ retearly:
 #endif
 
 	if (pip->efp != NULL) {
-	    pip->f.errfile = FALSE ;
+	    pip->fl.errfile = FALSE ;
 	    bclose(pip->efp) ;
 	    pip->efp = NULL ;
 	}
@@ -1442,10 +1440,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.optbible) {
 	                        pip->final.optbible = TRUE ;
 	                        pip->have.optbible = TRUE ;
-	                        pip->f.optbible = TRUE ;
+	                        pip->fl.optbible = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.optbible = (rs > 0) ;
+	                            pip->fl.optbible = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1453,10 +1451,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.optnofile) {
 	                        pip->final.optnofile = TRUE ;
 	                        pip->have.optnofile = TRUE ;
-	                        pip->f.optnofile = TRUE ;
+	                        pip->fl.optnofile = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.optnofile = (rs > 0) ;
+	                            pip->fl.optnofile = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1464,10 +1462,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.keyfold) {
 	                        pip->final.keyfold = TRUE ;
 	                        pip->have.keyfold = TRUE ;
-	                        pip->f.keyfold = TRUE ;
+	                        pip->fl.keyfold = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.keyfold = (rs > 0) ;
+	                            pip->fl.keyfold = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1516,10 +1514,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.optuniq) {
 	                        pip->final.optuniq = TRUE ;
 	                        pip->have.optuniq = TRUE ;
-	                        pip->f.optuniq = TRUE ;
+	                        pip->fl.optuniq = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.optuniq = (rs > 0) ;
+	                            pip->fl.optuniq = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1527,10 +1525,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.optaudit) {
 	                        pip->final.optaudit = TRUE ;
 	                        pip->have.optaudit = TRUE ;
-	                        pip->f.optaudit = TRUE ;
+	                        pip->fl.optaudit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.optaudit = (rs > 0) ;
+	                            pip->fl.optaudit = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1538,10 +1536,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.optsendparams) {
 	                        pip->final.optsendparams = TRUE ;
 	                        pip->have.optsendparams = TRUE ;
-	                        pip->f.optsendparams = TRUE ;
+	                        pip->fl.optsendparams = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.optsendparams = (rs > 0) ;
+	                            pip->fl.optsendparams = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1549,10 +1547,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.nodebug) {
 	                        pip->final.nodebug = TRUE ;
 	                        pip->have.nodebug = TRUE ;
-	                        pip->f.nodebug = TRUE ;
+	                        pip->fl.nodebug = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.nodebug = (rs > 0) ;
+	                            pip->fl.nodebug = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1560,10 +1558,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.iacc) {
 	                        pip->final.iacc = TRUE ;
 	                        pip->have.iacc = TRUE ;
-	                        pip->f.iacc = TRUE ;
+	                        pip->fl.iacc = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.iacc = (rs > 0) ;
+	                            pip->fl.iacc = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1755,41 +1753,41 @@ static int procmode_begin(PROGINFO *pip,ARGINFO *aip,cchar *afn)
 	int		rs = SR_OK ;
 	switch (pip->progmode) {
 	case progmode_mkkey:
-	    pip->f.args = FALSE ;
-	    pip->f.eigendb = TRUE ;
+	    pip->fl.args = FALSE ;
+	    pip->fl.eigendb = TRUE ;
 	    break ;
 	case progmode_mkinv:
-	    pip->f.args = TRUE ;
-	    pip->f.eigendb = FALSE ;
+	    pip->fl.args = TRUE ;
+	    pip->fl.eigendb = FALSE ;
 	    break ;
 	case progmode_mkquery:
-	    pip->f.args = FALSE ;
-	    pip->f.eigendb = FALSE ;
+	    pip->fl.args = FALSE ;
+	    pip->fl.eigendb = FALSE ;
 	    break ;
 	case progmode_mktagprint:
-	    pip->f.args = FALSE ;
-	    pip->f.eigendb = FALSE ;
+	    pip->fl.args = FALSE ;
+	    pip->fl.eigendb = FALSE ;
 	    break ;
 	} /* end switch */
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	debugprintf("main/procmode: mid0 rs=%d\n",rs) ;
 #endif
-	if ((rs >= 0) && pip->f.args) {
+	if ((rs >= 0) && pip->fl.args) {
 	    rs = procargs(pip,aip,afn) ;
 	}
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	debugprintf("main/procmode: mid1 rs=%d\n",rs) ;
 #endif
-	if ((rs >= 0) && (pip->f.eigendb || pip->f.ids)) {
+	if ((rs >= 0) && (pip->fl.eigendb || pip->fl.ids)) {
 	    rs = progids_begin(pip) ;
 	}
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	debugprintf("main/procmode: mid2 rs=%d\n",rs) ;
 #endif
-	if ((rs >= 0) && pip->f.eigendb) {
+	if ((rs >= 0) && pip->fl.eigendb) {
 	    rs = progeigen_begin(pip) ;
 	}
 #if	CF_DEBUG
