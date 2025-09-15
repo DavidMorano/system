@@ -141,7 +141,7 @@ struct checkparams	*ckp ;
 
 /* check if it has a suffix already */
 
-	if (gp->f.suffix) {
+	if (gp->fl.suffix) {
 
 		char	*cp ;
 
