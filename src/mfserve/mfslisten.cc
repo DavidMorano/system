@@ -150,7 +150,7 @@ int mfslisten_end(PROGINFO *pip)
 int mfslisten_acqbegin(PROGINFO *pip,MFSLISTEN_ACQ *acp)
 {
 	int		rs = SR_OK ;
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 	    VECOBJ	*tlp = &acp->tmps ;
 	    const int	esize = sizeof(LISTENSPEC) ;
 	    const int	n = 4 ;
@@ -170,7 +170,7 @@ int mfslisten_acqend(PROGINFO *pip,MFSLISTEN_ACQ *acp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 	    VECOBJ	*tlp = &acp->tmps ;
 	    rs1 = mfslisten_acqmerge(pip,acp) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -199,7 +199,7 @@ int mfslisten_acqadd(PROGINFO *pip,MFSLISTEN_ACQ *acp,cchar *ebuf,int elen)
 	    debugprintf("mfslisten_acqadd: ent ebuf=>%r<\n",ebuf,elen) ;
 #endif
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 	    VECSTR	al, *alp = &al ;
 	    if ((rs = vecstr_start(alp,5,0)) >= 0) {
 	        cchar	*sp = ebuf ;
@@ -303,7 +303,7 @@ int mfslisten_maint(PROGINFO *pip,POLLER *pmp)
 	                if ((! f_active) && (! f_broken)) {
 			    const int	f = TRUE ;
 		            int		lo = 0 ;
-		            if (pip->f.reuseaddr) {
+		            if (pip->fl.reuseaddr) {
 				lo |= LISTENSPEC_MREUSE ;
 			    }
 	                    if ((rs = listenspec_active(lsp,lo,f)) >= 0) {
