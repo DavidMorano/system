@@ -180,7 +180,7 @@ const char	tag[] ;
 
 /* some verbosity */
 
-	if ((rs >= 0) && (pip->nprocessed > 0) && pip->f.optoutcookie) {
+	if ((rs >= 0) && (pip->nprocessed > 0) && pip->fl.optoutcookie) {
 	    rs = bprintf(ofp,"%%\n") ;
 	    wlen += rs ;
 	}
