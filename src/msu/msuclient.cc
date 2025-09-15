@@ -572,7 +572,7 @@ static int msuclient_shmcreater(MSUCLIENT *op,LOADINFO *lip,int shmi,
 
 ret2:
 	if (rs >= 0) {
-	    op->f.shm = TRUE ;
+	    op->fl.shm = TRUE ;
 	} else {
 	    msuclient_shmmapend(op) ;
 	    op->shmtable = NULL ;
@@ -744,8 +744,8 @@ static int msuclient_shmmapend(MSUCLIENT *op)
 	    op->mapdata = NULL ;
 	    op->mapsize = 0 ;
 	    op->ti_map = 0 ;
-	    if (op->f.shm && (op->shmtable != NULL)) {
-	        op->f.shm = FALSE ;
+	    if (op->fl.shm && (op->shmtable != NULL)) {
+	        op->fl.shm = FALSE ;
 	        op->shmtable = NULL ;
 	    }
 	}
