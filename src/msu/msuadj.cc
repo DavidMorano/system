@@ -187,11 +187,11 @@ int procipcbegin(PROGINFO *pip)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
 	    debugprintf("msuadj/procipcbegin: f_reuseaddr=%u\n",
-	        lip->f.reuseaddr) ;
+	        lip->fl.reuseaddr) ;
 #endif
 
 	lip->rfd = -1 ;
-	if (lip->f.listen)  {
+	if (lip->fl.listen)  {
 
 	    if (lip->reqfname == NULL) {
 	        rs = locinfo_reqfname(lip) ;
@@ -216,7 +216,7 @@ int procipcbegin(PROGINFO *pip)
 	    if (rs >= 0) {
 	        const mode_t	om = 0666 ;
 	        int	opts = 0 ;
-	        if (lip->f.reuseaddr) opts |= 1 ;
+	        if (lip->fl.reuseaddr) opts |= 1 ;
 	        if ((rs = listenusd(lip->reqfname,om,opts)) >= 0) {
 	            int	fd = rs ;
 	            if ((rs = uc_closeonexec(fd,TRUE)) >= 0) {
