@@ -382,7 +382,7 @@ static int procfile(PROGINFO *pip,cchar *fname) noex {
 
 	ka.minwlen = pip->minwordlen ;
 	ka.f_eigen = pip->open.eigendb ;
-	ka.f_nofile = pip->f.optnofile ;
+	ka.f_nofile = pip->fl.optnofile ;
 
 /* open the file that we are supposed to process */
 
@@ -641,10 +641,10 @@ static int subinfo_start(SUBINFO *sip,PROGINFO *pip,cchar *dbname) noex {
 	    if ((rs = vecpstr_start(&sip->eigenwords,50,0,0)) >= 0) {
 	        if (pip->sdn != NULL) {
 	            rs = loadsubstr(pip,&sip->sdn,pip->sdn,-1) ;
-	            sip->f.sdn = (rs >= 0) ;
+	            sip->fl.sdn = (rs >= 0) ;
 	            if (rs < 0) {
-	                if (sip->f.sdn && (sip->sdn != NULL)) {
-	                    sip->f.sdn = FALSE ;
+	                if (sip->fl.sdn && (sip->sdn != NULL)) {
+	                    sip->fl.sdn = FALSE ;
 	                    uc_free(sip->sdn) ;
 	                    sip->sdn = NULL ;
 	                }
@@ -670,15 +670,15 @@ static int subinfo_finish(SUBINFO *sip) noex {
 	rs1 = subinfo_txtclose(sip) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (sip->f.sfn && (sip->sfn != NULL)) {
-	    sip->f.sfn = FALSE ;
+	if (sip->fl.sfn && (sip->sfn != NULL)) {
+	    sip->fl.sfn = FALSE ;
 	    rs1 = uc_free(sip->sfn) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->sfn = NULL ;
 	}
 
-	if (sip->f.sdn && (sip->sdn != NULL)) {
-	    sip->f.sdn = FALSE ;
+	if (sip->fl.sdn && (sip->sdn != NULL)) {
+	    sip->fl.sdn = FALSE ;
 	    rs1 = uc_free(sip->sdn) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->sdn = NULL ;
@@ -743,13 +743,13 @@ static int subinfo_txtopen(SUBINFO *sip) noex {
 	ta.sdn = sip->sdn ;
 	ta.sfn = sip->sfn ;
 
-	if (! sip->f.txtopen) {
+	if (! sip->fl.txtopen) {
 	    if (sip->dbname != NULL) {
 		const mode_t	om = MKINV_INDPERM ;
 		cint		of = O_CREAT ;
 		cchar		*db = sip->dbname ;
 	        if ((rs = txtindexmk_open(&sip->tm,&ta,db,of,om)) >= 0) {
-	            sip->f.txtopen = TRUE ;
+	            sip->fl.txtopen = TRUE ;
 		} else if (isNotPresent(rs)) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*fmt = "%s: failed-open db=%s (%d)\n" ;
@@ -771,8 +771,8 @@ static int subinfo_txtclose(SUBINFO *sip) noex {
 
 	if (pip == NULL) return SR_FAULT ;
 
-	if (sip->f.txtopen) {
-	    sip->f.txtopen = FALSE ;
+	if (sip->fl.txtopen) {
+	    sip->fl.txtopen = FALSE ;
 	    rs1 = txtindexmk_close(&sip->tm) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -787,7 +787,7 @@ static int subinfo_addtags(SUBINFO *sip,TXTINDEXMK_TAG *tagp,int tagn) noex {
 
 	if (pip == NULL) return SR_FAULT ;
 
-	if (! sip->f.txtopen) {
+	if (! sip->fl.txtopen) {
 	    rs = subinfo_txtopen(sip) ;
 	}
 
