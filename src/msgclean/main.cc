@@ -554,7 +554,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* follow symbolic links */
 	                case argopt_follow:
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    break ;
 
 /* default action and user specified help */
@@ -584,7 +584,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -593,7 +593,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* follow symbolic links */
 	                    case 'f':
-	                        pip->f.follow = TRUE ;
+	                        pip->fl.follow = TRUE ;
 	                        break ;
 
 /* file name length restriction */
@@ -625,7 +625,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* options */
@@ -648,12 +648,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* recurse down directories */
 	                    case 'r':
-	                        pip->f.recurse = TRUE ;
+	                        pip->fl.recurse = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.recurse = (rs > 0) ;
+	                                pip->fl.recurse = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -897,7 +897,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            while (paramopt_curenumval(pop,po,&cur,&vp) >= 0) {
 	                if (vp == NULL) continue ;
 
-	                pip->f.suffix = TRUE ;
+	                pip->fl.suffix = TRUE ;
 	                rs = vecstr_add(&pip->suffixes,vp,-1) ;
 
 #if	CF_DEBUG
@@ -926,13 +926,13 @@ int main(int argc,cchar **argv,cchar **envv)
 	                    if ((kwi = matostr(progopts,1,vp,-1)) >= 0) {
 	                        switch (kwi) {
 	                        case progopt_follow:
-	                            pip->f.follow = TRUE ;
+	                            pip->fl.follow = TRUE ;
 	                            break ;
 	                        case progopt_nofollow:
-	                            pip->f.follow = FALSE ;
+	                            pip->fl.follow = FALSE ;
 	                            break ;
 	                        case progopt_nostop:
-	                            pip->f.nostop = TRUE ;
+	                            pip->fl.nostop = TRUE ;
 	                            break ;
 	                        } /* end switch */
 	                    } /* end if (progopts) */
@@ -1101,7 +1101,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_ageint:
 	                    if (! pip->have.intage) {
 	                        pip->have.intage = TRUE ;
-	                        pip->f.intage = TRUE ;
+	                        pip->fl.intage = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            pip->intage = rs ;
@@ -1112,7 +1112,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_nice:
 	                    if (! pip->have.niceval) {
 	                        pip->have.niceval = TRUE ;
-	                        pip->f.niceval = TRUE ;
+	                        pip->fl.niceval = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            pip->niceval = rs ;
@@ -1123,10 +1123,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_header:
 	                    if (! lip->have.header) {
 	                        lip->have.header = TRUE ;
-	                        lip->f.header = TRUE ;
+	                        lip->fl.header = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.header = (rs > 0) ;
+	                            lip->fl.header = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1134,10 +1134,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_long:
 	                    if (! lip->have.fmtlong) {
 	                        lip->have.fmtlong = TRUE ;
-	                        lip->f.fmtlong = TRUE ;
+	                        lip->fl.fmtlong = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.fmtlong = (rs > 0) ;
+	                            lip->fl.fmtlong = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1145,10 +1145,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_short:
 	                    if (! lip->have.fmtshort) {
 	                        lip->have.fmtshort = TRUE ;
-	                        lip->f.fmtshort = TRUE ;
+	                        lip->fl.fmtshort = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.fmtshort = (rs > 0) ;
+	                            lip->fl.fmtshort = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1156,10 +1156,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_uniq:
 	                    if (! lip->have.uniq) {
 	                        lip->have.uniq = TRUE ;
-	                        lip->f.uniq = TRUE ;
+	                        lip->fl.uniq = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.uniq = (rs > 0) ;
+	                            lip->fl.uniq = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1167,10 +1167,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_users:
 	                    if (! lip->have.users) {
 	                        lip->have.users = TRUE ;
-	                        lip->f.users = TRUE ;
+	                        lip->fl.users = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.users = (rs > 0) ;
+	                            lip->fl.users = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1273,7 +1273,7 @@ cchar *ofn, cchar *afn)
 
 	            bclose(afp) ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                bprintf(pip->efp,
 	                    "%s: inaccessible argument-list (%d)\n",
 	                    pip->progname,rs) ;
