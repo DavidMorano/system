@@ -200,7 +200,7 @@ static int procdb(PROGINFO *pip,ARGINFO *aip,bfile *ofp,cchar *dbname)
 		cchar	*afn = aip->afname ;
 		cchar	*cp ;
 
-	        if (pip->f.optaudit) {
+	        if (pip->fl.optaudit) {
 	            rs = textlook_audit(tlp) ;
 	            if ((rs < 0) || (pip->debuglevel > 0)) {
 	                bprintf(pip->efp, "%s: DB audit (%d)\n",
@@ -409,7 +409,7 @@ vecstr		*qsp ;
 
 	if (qsp == NULL) return SR_FAULT ;
 
-	if (pip->f.prefix) qopts |= TEXTLOOK_OPREFIX ;
+	if (pip->fl.prefix) qopts |= TEXTLOOK_OPREFIX ;
 
 	if ((rs = vecstr_getvec(qsp,&qkeya)) >= 0) {
 
