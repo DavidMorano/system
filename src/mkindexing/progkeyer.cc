@@ -154,7 +154,7 @@ cchar		*fname ;
 	}
 #endif /* CF_DEBUG */
 
-	if (pip->f.optbible) {
+	if (pip->fl.optbible) {
 	    memcpy(bterms,terms,32) ;
 	    BACLR(bterms,':') ;
 	} /* end if (special bible processing) */
@@ -178,7 +178,7 @@ cchar		*fname ;
 	    int		lo = 0 ;
 	    int		hashsize = 20 ;
 	    int		f_ent = FALSE ;
-	    int		f_start = pip->f.wholefile ;
+	    int		f_start = pip->fl.wholefile ;
 	    int		f_finish = FALSE ;
 	    char	lbuf[LINEBUFLEN + 1], *lp ;
 
@@ -189,7 +189,7 @@ cchar		*fname ;
 
 /* figure a default hash DB size based on the input file length */
 
-	    if (pip->f.wholefile) {
+	    if (pip->fl.wholefile) {
 	        hashsize = 1000 ;
 	        if ((rs = bsize(ifp)) > 0) {
 	            hashsize = (rs / 6) ;
@@ -241,7 +241,7 @@ cchar		*fname ;
 
 /* figure out where we start and/or end an entry */
 
-	        if (! pip->f.wholefile) {
+	        if (! pip->fl.wholefile) {
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4)) {
 	                debugprintf("progkeyer: NWF f_ent=%u\n",f_ent) ;
@@ -381,7 +381,7 @@ cchar		*fname ;
 	                int	f_first = FALSE ;
 	                cchar	*fp ;
 
-	                if (pip->f.optbible) {
+	                if (pip->fl.optbible) {
 
 	                    fl = field_get(&fsb,bterms,&fp) ;
 
