@@ -227,7 +227,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    rs = bopen(&errfile,BFILE_STDERR,"dwca",0666) ;
 	if (rs >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	}
 
@@ -428,7 +428,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet mode */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* reverse sort mode */
