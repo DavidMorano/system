@@ -1,6 +1,9 @@
-/* hello */
+/* hello HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* HELLO loadable service for MFSERVE */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,7 +16,7 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	HELLO_INCLUDE
-#define	HELLO_INCLUDE	1
+#define	HELLO_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -22,12 +25,9 @@
 #include	<ptm.h>
 #include	<ptc.h>
 #include	<vecpstr.h>
-#include	<localmisc.h>
 
 #include	"sreq.h"
 
-
-/* object defines */
 
 #define	HELLO			struct hello_head
 #define	HELLO_FL		struct hello_flags
@@ -40,38 +40,31 @@ struct hello_flags {
 } ;
 
 struct hello_head {
-	uint		magic ;
-	PTM		m ;		/* mutex */
-	PTC		c ;		/* condition variable */
-	HELLO_FL	f ;
+	mainv		envv ;
+	cchar		*pr ;
 	SREQ		*jep ;
-	VECPSTR		args ;
-	volatile int	f_abort ;	/* command from parent thread */
-	volatile int	f_exiting ;	/* thread is exiting */
+	ptm		m ;		/* mutex */
+	ptc		c ;		/* condition variable */
+	vecpstr		args ;
 	pid_t		pid ;
 	pthread_t	tid ;
-	int		ifd, ofd ;
-	cchar		*pr ;
-	cchar		**envv ;
-} ;
+	volatile int	f_abort ;	/* command from parent thread */
+	volatile int	f_exiting ;	/* thread is exiting */
+	HELLO_FL	fl ;
+	uint		magic ;
+	int		ifd ;
+	int		ofd ;
+} ; /* end struct (hello_head) */
 
+EXTERNC_begin
 
-#if	(! defined(HELLO_MASTER)) || (HELLO_MASTER == 0)
+extern int hello_start(HELLO *,cchar *,SREQ *,cchar **,cchar **) noex ;
+extern int hello_check(HELLO *) noex ;
+extern int hello_abort(HELLO *) noex ;
+extern int hello_finish(HELLO *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int hello_start(HELLO *,cchar *,SREQ *,cchar **,cchar **) ;
-extern int hello_check(HELLO *) ;
-extern int hello_abort(HELLO *) ;
-extern int hello_finish(HELLO *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* HELLO_MASTER */
 
 #endif /* HELLO_INCLUDE */
 
