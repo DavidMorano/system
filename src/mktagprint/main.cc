@@ -280,7 +280,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	pip->eigenwords = -2 ;
 	pip->maxkeys = -2 ;
 
-	pip->f.optoutcookie = TRUE ;	/* default */
+	pip->fl.optoutcookie = TRUE ;	/* default */
 
 /* start parsing the arguments */
 
@@ -618,12 +618,12 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case argopt_cookie:
-				pip->f.optoutcookie = TRUE ;
+				pip->fl.optoutcookie = TRUE ;
 	 			if (f_optequal) {
 	         		    f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-					pip->f.optoutcookie = (rs > 0) ;
+					pip->fl.optoutcookie = (rs > 0) ;
 				    }
 				}
 	                        break ;
@@ -670,7 +670,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet mode */
 	                        case 'Q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* program-root */
@@ -694,7 +694,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* append to the key file */
 	                        case 'a':
-	                            pip->f.append = TRUE ;
+	                            pip->fl.append = TRUE ;
 	                            break ;
 
 				case 'b':
@@ -810,7 +810,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* prefix match */
 	                        case 'p':
-	                            pip->f.prefix = TRUE ;
+	                            pip->fl.prefix = TRUE ;
 	                            break ;
 
 	                        case 'q':
@@ -819,12 +819,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* remove labels */
 	                        case 's':
-	                            pip->f.removelabel = TRUE ;
+	                            pip->fl.removelabel = TRUE ;
 	                            break ;
 
 /* index whole files */
 	                        case 'w':
-	                            pip->f.wholefile = TRUE ;
+	                            pip->fl.wholefile = TRUE ;
 	                            break ;
 
 /* verbose mode */
