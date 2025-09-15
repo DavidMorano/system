@@ -320,7 +320,7 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 
 /* before we go too far, are we the only one on this PID mutex? */
 
-	if ((pip->f.defpidlock && (! pip->f.named)) || pip->f.daemon) {
+	if ((pip->fl.defpidlock && (! pip->fl.named)) || pip->fl.daemon) {
 	    const char	*pidmsg ;
 
 	    rs = progpidbegin(pip,TO_LOCK) ;
@@ -353,7 +353,7 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 
 /* we want to receive the new socket (from 'accept') above these guys */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 	    for (i = 0 ; i < 3 ; i += 1) {
 	        oflags = (i == 2) ? O_WRONLY : O_RDONLY ;
 	        if (u_fstat(i,&sb) < 0)
@@ -436,7 +436,7 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 
 #endif /* CF_SIGCHILD */
 
-	if (pip->f.daemon && pip->open.logprog) {
+	if (pip->fl.daemon && pip->open.logprog) {
 	    const char	*ts = timestr_logz(pip->daytime,timebuf) ;
 	    pip->daytime = time(NULL) ;
 	    proglog_printf(pip,"%s ready",ts) ;
@@ -457,7 +457,7 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 	    debugprintf("progwatch: procwatcher() rs=%d\n",rs) ;
 #endif
 
-	if (pip->f.daemon && pip->open.logprog) {
+	if (pip->fl.daemon && pip->open.logprog) {
 	    proglog_printf(pip,"%s server exiting (%d)\n",
 	        timestr_logz(pip->daytime,timebuf),rs) ;
 	}
@@ -516,7 +516,7 @@ static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("procwatcher: ent f_daemon=%u\n",pip->f.daemon) ;
+	    debugprintf("procwatcher: ent f_daemon=%u\n",pip->fl.daemon) ;
 #endif
 
 	wip->ti_lastmark = pip->daytime ;
@@ -528,7 +528,7 @@ static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 
 /* let's go! */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 
 	    if (pip->fd_listentcp >= 0) {
 	        ps.fd = pip->fd_listentcp ;
@@ -555,7 +555,7 @@ static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 
 /* if we are not in daemon mode, then we have a job waiting on FD_STDIN */
 
-	if (! pip->f.daemon) {
+	if (! pip->fl.daemon) {
 	    CLIENTINFO	ci, *cip = &ci ;
 
 	    if ((rs = clientinfo_start(cip)) >= 0) {
@@ -582,7 +582,7 @@ static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 	    debugprintf("procwatcher: loop-top rs=%d\n",rs) ;
 #endif
 
-	if ((rs >= 0) && pip->changed.pc && pip->f.daemon) {
+	if ((rs >= 0) && pip->changed.pc && pip->fl.daemon) {
 	    rs = procwatchmaint(pip,wip) ;
 	}
 
@@ -608,7 +608,7 @@ static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 
 /* external interrupt */
 
-	    if ((rs >= 0) && pip->f.daemon && if_int) {
+	    if ((rs >= 0) && pip->fl.daemon && if_int) {
 		if_int = FALSE ;
 		to_maint = 0 ;
 		rs = procwatchint(pip,wip) ;
@@ -617,7 +617,7 @@ static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 
 /* broken */
 
-	    if ((rs >= 0) && pip->f.daemon && (to_broken-- == 0)) {
+	    if ((rs >= 0) && pip->fl.daemon && (to_broken-- == 0)) {
 	        to_broken = TO_BROKEN ;
 		to_maint = 0 ;
 		if ((rs = procwatchsubcmd_clear(pip)) > 0) {
@@ -633,10 +633,10 @@ static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 
 /* maintenance */
 
-	    if ((rs >= 0) && pip->f.daemon && (to_maint-- == 0)) {
+	    if ((rs >= 0) && pip->fl.daemon && (to_maint-- == 0)) {
 	        to_maint = TO_MAINT ;
 
-		if ((rs >= 0) && pip->f.pc) {
+		if ((rs >= 0) && pip->fl.pc) {
 		    rs = progconfigcheck(pip) ;
 
 #if	CF_DEBUG
@@ -724,7 +724,7 @@ static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 #endif
 
 	        if (wip->njobs == 0) {
-	            if (pip->f.daemon) {
+	            if (pip->fl.daemon) {
 	                if ((pip->intrun > 0) &&
 	                    ((pip->daytime - ti_start) > pip->intrun))
 	                    wip->f_exit = TRUE ;
@@ -1632,7 +1632,7 @@ static int procwatchjobs(PROGINFO *pip,SUBINFO *wip)
 	            debugprintf("progwatchjobs: signalled sig=%s\n",ss) ;
 #endif
 
-		if (! pip->f.quiet) {
+		if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 		        "%s: server(%u) was signalled sig=%s\n",
 		        pip->progname,pid,ss) ;
@@ -1646,7 +1646,7 @@ static int procwatchjobs(PROGINFO *pip,SUBINFO *wip)
 
 	    } else {
 
-		if (! pip->f.quiet) {
+		if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 		        "%s: server(%u) exited abnormally cs=%u\n",
 		        pip->progname,pid,cs) ;
@@ -1811,7 +1811,7 @@ static int procwatchnew(PROGINFO *pip,SUBINFO *wip,CLIENTINFO *cip)
 
 /* close stuff we do not need */
 
-	    if (pip->f.daemon) {
+	    if (pip->fl.daemon) {
 	        if (pip->fd_listenpass >= 0) {
 	            u_close(pip->fd_listenpass) ;
 	            pip->fd_listenpass = -1 ;
@@ -2122,7 +2122,7 @@ static int procwatchmaint(PROGINFO *pip,SUBINFO	 *wip)
 #endif
 
 		opts = 0 ;
-		if (pip->f.reuseaddr) opts |= LISTENSPEC_MREUSE ;
+		if (pip->fl.reuseaddr) opts |= LISTENSPEC_MREUSE ;
 
 	        rs1 = listenspec_active(lsp,opts,TRUE) ;
 		ac = rs1 ;
