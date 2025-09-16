@@ -351,7 +351,7 @@ struct clientinfo	*cip ;
 
 	vecstr_finish(&svcargs) ;
 
-        if (pip->f.log)
+        if (pip->fl.log)
 	    logfile_flush(&pip->lh) ;
 
 /* we are out of here */
