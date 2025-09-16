@@ -34,7 +34,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"vecint.h"
@@ -46,9 +52,9 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -68,8 +74,7 @@ static inline int vecint_magic(vecint *op,Args ... args) noex {
 	    rs = (op->magic == VECINT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (vecint_magic) */
+} /* end subroutine (vecint_magic) */
 
 static int	vecint_addval(vecint *op,VECINT_TYPE) noex ;
 static int	vecint_extend(vecint *,int) noex ;
@@ -98,7 +103,7 @@ int vecint_start(vecint *op,int vn,int vo) noex {
 	        op->n = vn ;
 	        if (vn > 0) {
 	            cint	sz = (vn + 1) * szof(VECINT_TYPE) ;
-		    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+		    if (void *vp{} ; (rs = libmem.mall(sz,&vp)) >= 0) {
 		        op->va = (VECINT_TYPE *) vp ;
 	    	        op->va[0] = INT_MIN ;
 		    }
@@ -117,7 +122,7 @@ int vecint_finish(vecint *op) noex {
 	int		rs1 ;
 	if ((rs = vecint_magic(op)) >= 0) {
 	    if (op->va) {
-	        rs1 = uc_free(op->va) ;
+	        rs1 = libmem.free(op->va) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
 	    }
@@ -153,7 +158,7 @@ extern int vecint_addlist(vecint *op,const VECINT_TYPE *lp,int ll) noex {
 int vecint_adduniq(vecint *op,VECINT_TYPE v) noex {
 	int		rs ;
 	if ((rs = vecint_magic(op)) >= 0) {
-	    int		i = 0 ;
+	    int		i = 0 ; /* used-afterwards */
 	    rs = INT_MAX ;
 	    for (i = 0 ; i < op->i ; i += 1) {
 	        if (op->va[i] == v) break ;
@@ -556,11 +561,11 @@ static int vecint_extend(vecint *op,int amount) noex {
 	    if (op->va == nullptr) {
 	        nn = max(amount,VECINT_DEFENTS) ;
 	        sz = ((nn + 1) * esize) ;
-	        rs = uc_malloc(sz,&nva) ;
+	        rs = libmem.mall(sz,&nva) ;
 	    } else {
 	        nn = max((op->n + amount),(op->n * 2)) ;
 	        sz = ((nn + 1) * esize) ;
-	        rs = uc_realloc(op->va,sz,&nva) ;
+	        rs = libmem.rall(op->va,sz,&nva) ;
 	    } /* end if */
 	    if (rs >= 0) {
 	        op->va = nva ;
