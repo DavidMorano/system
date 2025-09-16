@@ -37,9 +37,14 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<ucenumua.h>
-#include	<libmallocxx.h>
 #include	<strwcmp.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -49,8 +54,14 @@
 
 /* local defines */
 
+#ifndef	USERATTRLEN
+#define	USERATTRLEN		(4 * 1024)
+#endif
+
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -84,7 +95,8 @@ int vecstrx::loadpjusers(cchar *pjn) noex {
 	if (pjn) {
 	    rs = SR_INVALID ;
 	    if (pjn[0]) {
-		if (char *uab{} ; (rs = libmalloc_ua(&uab)) >= 0) {
+		cint ualen = USERATTRLEN ;
+		if (char *uab ; (rs = libmem.mall(ualen,&uab)) >= 0) {
 	            cint	ual = rs ;
 	            if (ucenumua eua ; (rs = eua.open) >= 0) {
 	                ucentua		ua{} ;
@@ -96,7 +108,7 @@ int vecstrx::loadpjusers(cchar *pjn) noex {
 	                rs1 = eua.close ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (sysuserattr) */
-	            rs1 = uc_libfree(uab) ;
+	            rs1 = libmem.free(uab) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
