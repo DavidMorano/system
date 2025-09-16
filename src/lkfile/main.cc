@@ -586,7 +586,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* remove timeout */
@@ -1589,7 +1589,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file\n",
@@ -1688,7 +1688,7 @@ daemonret1:
 	if (f_freeconfigfname && (configfname != NULL))
 	    free(configfname) ;
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_close(&pip->lh) ;
 
 	if (pip->lfp != NULL)
@@ -1755,7 +1755,7 @@ badpidopen:
 	goto badret ;
 
 badpidlock:
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 
 	    bprintf(pip->efp,
 	        "%s: could not lock the PID file (rs=%d)\n",
