@@ -246,7 +246,7 @@ int progfile(PROGINFO *pip,cchar *name)
 		}
 	    } /* end if */
 
-	    if (! pip->f.nochange)
+	    if (! pip->fl.nochange)
 	        u_unlink(name) ;
 
 	} /* end if (removing file) */
@@ -359,7 +359,7 @@ char		outfname[] ;
 
 /* print out any errors that there may be */
 
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 	    CPPERR	*ep ;
 	    for (i = 0 ; vecobj_get(&errs,i,&ep) >= 0 ; i += 1) {
 	        if (ep != NULL) {
