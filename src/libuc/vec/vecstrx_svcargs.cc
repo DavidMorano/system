@@ -31,7 +31,13 @@
 #include	<climits>		/* for |CHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<field.h>
 #include	<fieldterms.h>
 #include	<strn.h>
@@ -42,9 +48,17 @@
 
 #include	"vecstrx.hh"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -99,7 +113,7 @@ static int vecstrx_arger(vecstrx *vsp,int *fp,cchar *abuf) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *fbuf{} ; (rs = uc_malloc((alen+1),&fbuf)) >= 0) {
+	if (char *fbuf{} ; (rs = libmem.mall((alen+1),&fbuf)) >= 0) {
 	    cint	flen = alen ;
 	    if (field fsb ; (rs = fsb.start(abuf,alen)) >= 0) {
 	        int	fl ;
@@ -129,7 +143,7 @@ static int vecstrx_arger(vecstrx *vsp,int *fp,cchar *abuf) noex {
 	        rs1 = fsb.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (field) */
-	    rs1 = uc_free(fbuf) ;
+	    rs1 = libmem.free(fbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? c : rs ;
@@ -141,15 +155,16 @@ static int mkterms() noex {
 }
 /* end subroutine (mkterms) */
 
-static int hasLong(cchar *sp,int sl) noex {
+static int hasLong(cchar *sp,int µsl) noex {
 	int		f = false ;
-	if (sp[0] == '/') {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl >= 2) {
-		cint	sch = mkchar(sp[1]) ;
-		f = (tolc(sch) == 'w') ;
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	    if (sp[0] == '/') {
+	        if (sl >= 2) {
+		    cint	sch = mkchar(sp[1]) ;
+		    f = (tolc(sch) == 'w') ;
+	        }
 	    }
-	}
+	} /* end if (getlenstr) */
 	return f ;
 }
 /* end subroutine (hasLong) */
