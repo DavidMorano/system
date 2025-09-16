@@ -506,7 +506,7 @@ char	*envv[] ;
 	                    break ;
 
 	                case argopt_oi:
-	                    pip->f.optin = TRUE ;
+	                    pip->fl.optin = TRUE ;
 	                    break ;
 
 /* display the time this program was last "made" */
@@ -577,7 +577,7 @@ char	*envv[] ;
 	                        break ;
 
 	                    case 'i':
-	                        pip->f.optin = TRUE ;
+	                        pip->fl.optin = TRUE ;
 	                        break ;
 
 /* options */
@@ -597,7 +597,7 @@ char	*envv[] ;
 	                        break ;
 
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* timeout */
@@ -734,7 +734,7 @@ char	*envv[] ;
 
 	if (rs < 0) {
 	    ex = EX_NOUSER ;
-	    if (! pip->f.quiet)
+	    if (! pip->fl.quiet)
 	        bprintf(pip->efp,
 	            "%s: could not get user information (%d)\n",
 	            pip->progname,rs) ;
@@ -758,7 +758,7 @@ char	*envv[] ;
 	rs = vecstr_start(&sets,10,0) ;
 	if (rs < 0) {
 	    ex = EX_OSERR ;
-	    if (! pip->f.quiet)
+	    if (! pip->fl.quiet)
 	        bprintf(pip->efp,
 	            "%s: initialization 1 problem (%d)\n",
 	            pip->progname,rs) ;
@@ -837,7 +837,7 @@ char	*envv[] ;
 		pip->progname,pip->mailhost) ;
 
 #if	CF_PCSPOLL
-	if ((rs >= 0) && pip->f.pcspoll) {
+	if ((rs >= 0) && pip->fl.pcspoll) {
 
 	    pip->pp = &p ;
 	    pcspoll(pip->pr,NULL,&p,&sets) ;
@@ -849,13 +849,13 @@ char	*envv[] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("main: f_trusted=%d\n",pip->f.trusted) ;
+	    debugprintf("main: f_trusted=%d\n",pip->fl.trusted) ;
 #endif
 
 	vecstr_finish(&sets) ;
 
 	rs1 = pcstrustuser(pip->pr,pip->username) ;
-	pip->f.trusted = (rs1 > 0) ;
+	pip->fl.trusted = (rs1 > 0) ;
 
 /* other initialization */
 
@@ -918,7 +918,7 @@ char	*envv[] ;
 	rs = vecstr_start(&addrs,20,0) ;
 	if (rs < 0) {
 	    ex = EX_OSERR ;
-	    if (! pip->f.quiet)
+	    if (! pip->fl.quiet)
 	        bprintf(pip->efp,
 	            "%s: initialization 2 problem (%d)\n",
 	            pip->progname,rs) ;
@@ -1005,7 +1005,7 @@ char	*envv[] ;
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file (%d)\n",
@@ -1538,7 +1538,7 @@ vecstr		*setsp ;
 	        case progopt_pcspoll:
 	            if (vl > 0) {
 			rs = optbool(vp,vl) :
-	                pip->f.pcspoll = (rs > 0) ;
+	                pip->fl.pcspoll = (rs > 0) ;
 		    }
 	            break ;
 
