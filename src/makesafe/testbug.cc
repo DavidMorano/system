@@ -703,7 +703,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'R':
@@ -736,16 +736,16 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* no-change */
 	                    case 'n':
-	                        lip->f.nochange = TRUE ;
+	                        lip->fl.nochange = TRUE ;
 	                        break ;
 
 /* print something !! */
 	                    case 'p':
-	                        lip->f.print = TRUE ;
+	                        lip->fl.print = TRUE ;
 	                        break ;
 
 	                    case 'r':
-	                        lip->f.remote = TRUE ;
+	                        lip->fl.remote = TRUE ;
 	                        break ;
 
 /* touch file */
@@ -774,12 +774,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* zero files (are OK) */
 	                    case 'z':
-	                        lip->f.zero = TRUE ;
+	                        lip->fl.zero = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.zero = (rs > 0) ;
+	                                lip->fl.zero = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -925,7 +925,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
 	    fmt = "%s: cache mode=%u\n" ;
-	    shio_printf(pip->efp,fmt,pn,lip->f.cache) ;
+	    shio_printf(pip->efp,fmt,pn,lip->fl.cache) ;
 	    fmt = "%s: allowed parallelism=%u\n" ;
 	    shio_printf(pip->efp,fmt,pn,lip->npar) ;
 	} /* end if */
@@ -1007,7 +1007,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1026,9 +1026,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* we are out of here */
 retearly:
-	if ((pip->debuglevel > 0) || lip->f.optdebug) {
+	if ((pip->debuglevel > 0) || lip->fl.optdebug) {
 	    cchar	*pn = pip->progname ;
-	    if (lip->f.optdebug) {
+	    if (lip->fl.optdebug) {
 	        proginfo_pwd(pip) ;
 	        shio_printf(pip->efp,"%s: dir=%s\n",pn,pip->pwd) ;
 	    }
@@ -1167,10 +1167,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akname_cache:
 	                    if (! lip->final.cache) {
 	                        lip->have.cache = TRUE ;
-	                        lip->f.cache = TRUE ;
+	                        lip->fl.cache = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.cache = (rs > 0) ;
+	                            lip->fl.cache = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1192,21 +1192,21 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akname_debug:
 	                    if (! lip->final.optdebug) {
 	                        lip->have.optdebug = TRUE ;
-	                        lip->f.optdebug = TRUE ;
+	                        lip->fl.optdebug = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.optdebug = (rs > 0) ;
+	                            lip->fl.optdebug = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case akname_maint:
 	                    if (! lip->final.maint) {
 	                        lip->have.maint = TRUE ;
-	                        lip->f.maint = TRUE ;
-				lip->f.zero = TRUE ;
+	                        lip->fl.maint = TRUE ;
+				lip->fl.zero = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.maint = (rs > 0) ;
+	                            lip->fl.maint = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1869,7 +1869,7 @@ static int procout_begin(PROGINFO *pip,void *ofp,const char *ofn)
 	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-'))
 	    ofn = STDFNOUT ;
 
-	if (lip->f.print || (pip->verboselevel > 0)) {
+	if (lip->fl.print || (pip->verboselevel > 0)) {
 	    if ((rs = shio_open(ofp,ofn,"wct",0644)) >= 0) {
 	        if ((rs = ptm_create(&lip->ofm,NULL)) >= 0) {
 	            lip->ofp = ofp ;
@@ -1891,7 +1891,7 @@ static int procout_end(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip->f.print || (pip->verboselevel > 0)) {
+	if (lip->fl.print || (pip->verboselevel > 0)) {
 	    rs1 = ptm_destroy(&lip->ofm) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = shio_close(lip->ofp) ;
@@ -1996,7 +1996,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
 	lip->to_tmpfiles = TO_TMPFILES ;
-	lip->f.cache = OPT_CACHE ;
+	lip->fl.cache = OPT_CACHE ;
 
 	if ((rs = ids_load(&lip->id)) >= 0) {
 	    if ((rs = ptm_create(&lip->efm,NULL)) >= 0) {
@@ -2123,13 +2123,13 @@ static int locinfo_tmpcheck(LOCINFO *lip)
 	if (lip->jobdname != NULL) {
 	    TMTIME	t ;
 	    if ((rs = tmtime_localtime(&t,pip->daytime)) >= 0) {
-	        if ((t.hour >= 18) || lip->f.maint) {
+	        if ((t.hour >= 18) || lip->fl.maint) {
 		    uptsub_t	thr = (uptsub_t) locinfo_tmpmaint ;
 	            pthread_t	tid ;
 	            if ((rs = uptcreate(&tid,NULL,thr,lip)) >= 0) {
 	                rs = 1 ;
 	                lip->tid = tid ;
-	                lip->f.tmpmaint = TRUE ;
+	                lip->fl.tmpmaint = TRUE ;
 	            } /* end if (uptcreate) */
 	        } /* end if (after hours) */
 	    } /* end if (tmtime_localtime) */
@@ -2147,7 +2147,7 @@ static int locinfo_tmpmaint(LOCINFO *lip)
 	const int	to = lip->to_tmpfiles ;
 	int		rs ;
 	int		c = 0 ;
-	int		f_need = lip->f.maint ;
+	int		f_need = lip->fl.maint ;
 	cchar		*dname = lip->jobdname ;
 	char		tsfname[MAXPATHLEN+1] ;
 
@@ -2191,7 +2191,7 @@ static int locinfo_tmpdone(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (lip->f.tmpmaint) {
+	if (lip->fl.tmpmaint) {
 	    int	trs ;
 	    rs1 = uptjoin(lip->tid,&trs) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -2248,7 +2248,7 @@ static int locinfo_loadprids(LOCINFO *lip)
 static int locinfo_alreadybegin(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
-	if (lip->f.cache) {
+	if (lip->fl.cache) {
 	    if ((rs = cachetime_start(&lip->mtdb)) >= 0) {
 	        lip->open.cache = TRUE ;
 	    }
