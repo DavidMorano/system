@@ -234,7 +234,7 @@ int main(int argc,mainv argv,mainv envv) {
 	pip->debuglevel = 0 ;
 	pip->verboselevel = 1 ;
 
-	pip->f.quiet = FALSE ;
+	pip->fl.quiet = FALSE ;
 
 /* process program arguments */
 
@@ -403,7 +403,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        break ;
 
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'v':
@@ -653,7 +653,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	if (rs1 >= 0) {
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -936,7 +936,7 @@ done:
 	u_close(fd_stdout) ;
 
 ret2:
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_close(&pip->lh) ;
 
 /* close off and get out! */
