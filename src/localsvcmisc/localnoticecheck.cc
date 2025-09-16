@@ -269,7 +269,7 @@ struct subinfo	*sip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (sip->f.allocusername && (sip->username != NULL)) {
+	if (sip->fl.allocusername && (sip->username != NULL)) {
 	    rs1 = uc_free(sip->username) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->username = NULL ;
@@ -297,7 +297,7 @@ cchar	un[] ;
 	        char	ubuf[USERNAMELEN + 1] ;
 	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
 	            if ((rs = uc_mallocstrw(ubuf,rs,&cp)) >= 0) {
-	                sip->f.allocusername = TRUE ;
+	                sip->fl.allocusername = TRUE ;
 	                sip->username = cp ;
 	            }
 	        } /* end if */
