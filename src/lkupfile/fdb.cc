@@ -140,7 +140,7 @@ const char	fname[] ;
 	if (rs < 0)
 	    goto ret0 ;
 
-	pip->f.fdbopen = TRUE ;
+	pip->fl.fdbopen = TRUE ;
 
 /* open the file (if we can) */
 
@@ -308,10 +308,10 @@ struct proginfo	*pip ;
 {
 
 
-	if (pip->f.fdbopen)
+	if (pip->fl.fdbopen)
 	    vecstr_finish(&pip->fdb) ;
 
-	pip->f.fdbopen = FALSE ;
+	pip->fl.fdbopen = FALSE ;
 	return SR_OK ;
 }
 /* end subroutine (fdbfree) */
