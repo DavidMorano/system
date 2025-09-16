@@ -36,7 +36,13 @@
 #include	<climits>		/* for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<field.h>
 #include	<fieldterms.h>
 #include	<localmisc.h>
@@ -46,6 +52,14 @@
 import libutil ;
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -98,7 +112,7 @@ static int vecstrx_arger(vecstrx *vsp,cchar *abuf) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *fbuf{} ; (rs = uc_malloc((alen+1),&fbuf)) >= 0) {
+	if (char *fbuf{} ; (rs = libmem.mall((alen+1),&fbuf)) >= 0) {
 	    cint	flen = alen ;
 	    if (field fsb ; (rs = fsb.start(abuf,alen)) >= 0) {
 	        int	fl ;
@@ -110,7 +124,7 @@ static int vecstrx_arger(vecstrx *vsp,cchar *abuf) noex {
 	        rs1 = fsb.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (field) */
-	    rs1 = uc_free(fbuf) ;
+	    rs1 = libmem.free(fbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? c : rs ;
