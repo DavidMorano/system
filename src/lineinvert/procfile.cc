@@ -267,7 +267,7 @@ const char	fname[] ;
 	                debugprintf("procfile: got NL\n") ;
 #endif
 
-	            pip->f.lastnl = TRUE ;
+	            pip->fl.lastnl = TRUE ;
 	            lp = (cp + 1) ;
 	            ll = (ep - lp) ;
 
@@ -281,7 +281,7 @@ const char	fname[] ;
 	                rs = bwrite(ofp,lp,ll) ;
 
 	                wlen += rs ;
-	                pip->f.lastnl = (lp[ll - 1] == '\n') ;
+	                pip->fl.lastnl = (lp[ll - 1] == '\n') ;
 	            }
 
 	            if ((rs >= 0) && (cb > 0)) {
@@ -305,19 +305,19 @@ const char	fname[] ;
 	                rs = bwrite(ofp,lp,ll) ;
 
 	                wlen += rs ;
-	                pip->f.lastnl = (lp[ll - 1] == '\n') ;
+	                pip->fl.lastnl = (lp[ll - 1] == '\n') ;
 	                pl = 0 ;
 
 	            } /* end if (outputting previous buffer) */
 
-	            if ((rs >= 0) && (! pip->f.lastnl)) {
+	            if ((rs >= 0) && (! pip->fl.lastnl)) {
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(2))
 	                    debugprintf("procfile: outputting extra NL\n") ;
 #endif
 
-	                pip->f.lastnl = FALSE ;
+	                pip->fl.lastnl = FALSE ;
 	                rs = bputc(ofp,'\n') ;
 
 	                wlen += 1 ;
@@ -415,13 +415,13 @@ const char	fname[] ;
 	    rs = bwrite(ofp,lp,ll) ;
 
 	    wlen += 1 ;
-	    pip->f.lastnl = (lp[ll - 1] == '\n') ;
+	    pip->fl.lastnl = (lp[ll - 1] == '\n') ;
 
 	} /* end if (previous buffer) */
 
-	if ((rs >= 0) && (! pip->f.lastnl)) {
+	if ((rs >= 0) && (! pip->fl.lastnl)) {
 
-	    pip->f.lastnl = FALSE ;
+	    pip->fl.lastnl = FALSE ;
 	    rs = bputc(ofp,'\n') ;
 
 	    wlen += 1 ;
@@ -505,7 +505,7 @@ char		**cbp ;
 	                rs = bwrite(ofp,copybuf,fbp->len) ;
 
 	            wlen += rs ;
-	            pip->f.lastnl = (copybuf[fbp->len - 1] == '\n') ;
+	            pip->fl.lastnl = (copybuf[fbp->len - 1] == '\n') ;
 
 	        }
 
