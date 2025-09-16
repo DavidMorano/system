@@ -124,7 +124,7 @@ int		ofd, logsize ;
 	    bprintf(pip->efp,
 	        "%s: device=%s\n",pip->progname,bdp) ;
 
-	if (pip->f.print)
+	if (pip->fl.print)
 	    return OK ;
 
 
@@ -171,7 +171,7 @@ int		ofd, logsize ;
 
 /* hang it up, baby ! */
 
-	            if (! pip->f.fakeit)
+	            if (! pip->fl.fakeit)
 	                rs = uc_tcsetattr(tfd,TCSANOW,&settings) ;
 
 	        }
