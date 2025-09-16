@@ -590,7 +590,7 @@ char	*envv[] ;
 /* quiet mode */
 	                        case 'Q':
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* version */
@@ -648,7 +648,7 @@ char	*envv[] ;
 
 	                                rs = cfdeci(argp,argl,&iw) ;
 
-					pip->f.readlock = (iw > 0) ;
+					pip->fl.readlock = (iw > 0) ;
 
 				    }
 
@@ -1659,7 +1659,7 @@ char	*envv[] ;
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file\n",
@@ -1831,7 +1831,7 @@ badpidopen:
 	goto badret ;
 
 badpidlock:
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 
 	    bprintf(pip->efp,
 	        "%s: could not lock the PID file (rs=%d)\n",
