@@ -258,7 +258,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	if (bopen(efp,BFILE_STDERR,"dwca",0666) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    bcontrol(efp,BC_LINEBUF,0) ;
 	}
 
@@ -426,7 +426,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* verbose mode */
@@ -635,7 +635,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        if (npa <= 1)
 	            bprintf(ofp,"%s\n",entry.dir) ;
 
-	    } else if (! pip->f.quiet)
+	    } else if (! pip->fl.quiet)
 	        bprintf(efp,"%s: user \"%s\" not found\n",
 	            pip->progname,un) ;
 
@@ -646,7 +646,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        if (npa <= 1)
 	            bprintf(ofp,"%s\n",un) ;
 
-	    } else if (! pip->f.quiet)
+	    } else if (! pip->fl.quiet)
 	        bprintf(efp,"%s: user \"%s\" not found\n",
 	            pip->progname,un) ;
 
@@ -1179,7 +1179,7 @@ badarg:
 /* not found */
 baduser:
 	ex = EX_NOUSER ;
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 	    bprintf(efp,"%s: could not get information for \"%s\" (rs %d)\n",
 	        pip->progname,un,rs) ;
 
