@@ -319,22 +319,22 @@ char	*envv[] ;
 
 	pip->loglen = -1 ;
 
-	pip->f.log = FALSE ;
+	pip->fl.log = FALSE ;
 
-	pip->f.optlogzones = TRUE ;
-	pip->f.optlogenv = TRUE ;
-	pip->f.optlogmsgid = TRUE ;
-	pip->f.optdivert = TRUE ;
+	pip->fl.optlogzones = TRUE ;
+	pip->fl.optlogenv = TRUE ;
+	pip->fl.optlogmsgid = TRUE ;
+	pip->fl.optdivert = TRUE ;
 
 #if	defined(SYSV)
-	pip->f.sysv_ct = TRUE ;
+	pip->fl.sysv_ct = TRUE ;
 #else
-	pip->f.sysv_ct = FALSE ;
+	pip->fl.sysv_ct = FALSE ;
 #endif
 
-	pip->f.sysv_rt = FALSE ;
+	pip->fl.sysv_rt = FALSE ;
 	if (u_access("/usr/sbin",R_OK) >= 0)
-	    pip->f.sysv_rt = TRUE ;
+	    pip->fl.sysv_rt = TRUE ;
 
 /* process program arguments */
 
@@ -606,7 +606,7 @@ char	*envv[] ;
 
 /* multirecip-mode */
 	                        case 'm':
-	                            pip->f.multirecip = TRUE ;
+	                            pip->fl.multirecip = TRUE ;
 	                            break ;
 
 /* options */
@@ -643,7 +643,7 @@ char	*envv[] ;
 
 /* quiet */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* mail spool directory */
@@ -750,7 +750,7 @@ char	*envv[] ;
 	if (f_version)
 	    bprintf(pip->efp,"%s: version %s/%s\n",
 	        pip->progname,
-	        VERSION,(pip->f.sysv_ct ? "SYSV" : "BSD")) ;
+	        VERSION,(pip->fl.sysv_ct ? "SYSV" : "BSD")) ;
 
 	if (f_usage)
 	    usage(pip) ;
@@ -844,11 +844,11 @@ char	*envv[] ;
 
 	pip->uid = u.uid ;
 	pip->euid = u.euid ;
-	pip->f.setuid = (pip->uid != pip->euid) ;
+	pip->fl.setuid = (pip->uid != pip->euid) ;
 
 	pip->gid = u.gid ;
 	pip->egid = u.egid ;
-	pip->f.setgid = (pip->gid != pip->egid) ;
+	pip->fl.setgid = (pip->gid != pip->egid) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -899,7 +899,7 @@ char	*envv[] ;
 
 	if (fromaddr == NULL) {
 
-	    if (pip->f.trusted && (uu_user != NULL))
+	    if (pip->fl.trusted && (uu_user != NULL))
 	        fromaddr = uu_user ;
 
 	    else
@@ -971,17 +971,17 @@ char	*envv[] ;
 	buf[0] = '\0' ;
 	if (rs1 >= 0) {
 
-	    pip->f.log = TRUE ;
+	    pip->fl.log = TRUE ;
 	    if (pip->loglen > 0)
 	        logfile_checksize(&pip->lh,pip->loglen) ;
 
 	    logfile_printf(&pip->lh,"%s %-14s %s/%s",
 	        timestr_logz(pip->now.time,timebuf),
 	        pip->progname,
-	        VERSION,(pip->f.sysv_ct ? "SYSV" : "BSD")) ;
+	        VERSION,(pip->fl.sysv_ct ? "SYSV" : "BSD")) ;
 
 	    logfile_printf(&pip->lh,"ostype=%s os=%s(%s)",
-	        (pip->f.sysv_rt ? "SYSV" : "BSD"),
+	        (pip->fl.sysv_rt ? "SYSV" : "BSD"),
 	        u.sysname,u.release) ;
 
 	    buf[0] = '\0' ;
@@ -1020,7 +1020,7 @@ char	*envv[] ;
 
 	rs1 = pcsuserfile(pip->pr,USERFNAME,u.nodename,u.username,buf) ;
 
-	if (pip->f.log) {
+	if (pip->fl.log) {
 
 	    if (rs1 == 1)
 	        logfile_printf(&pip->lh,
@@ -1039,7 +1039,7 @@ char	*envv[] ;
 
 /* try to open an environment summary log also */
 
-	if (pip->f.optlogenv) {
+	if (pip->fl.optlogenv) {
 
 	    logfname[0] = '\0' ;
 
@@ -1063,7 +1063,7 @@ char	*envv[] ;
 #endif
 
 	    if (rs >= 0)
-	        pip->f.logenv = TRUE ;
+	        pip->fl.logenv = TRUE ;
 
 	} /* end if (option to log envelope information) */
 
@@ -1167,7 +1167,7 @@ done:
 
 	    case SR_NOENT:
 	        ex = EX_NOUSER ;
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            bprintf(pip->efp,
 	                "%s: recipient not found\n",
 	                pip->progname) ;
@@ -1176,7 +1176,7 @@ done:
 
 	    case SR_TXTBSY:
 	        ex = EX_TEMPFAIL ;
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            bprintf(pip->efp,
 	                "%s: could not capture the mail lock\n",
 	                pip->progname) ;
@@ -1185,7 +1185,7 @@ done:
 
 	    case SR_ACCES:
 	        ex = EX_ACCESS ;
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            bprintf(pip->efp,
 	                "%s: could not access the mail spool-file\n",
 	                pip->progname) ;
@@ -1194,7 +1194,7 @@ done:
 
 	    case SR_REMOTE:
 	        ex = EX_FORWARDED ;
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            bprintf(pip->efp,"%s: mail is being forwarded\n",
 	                pip->progname) ;
 
@@ -1205,7 +1205,7 @@ done:
 	        logfile_printf(&pip->lh,
 	            "file-system is out of space\n") ;
 
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            bprintf(pip->efp,
 	                "%s: local file-system is out of space\n",
 	                pip->progname) ;
@@ -1214,7 +1214,7 @@ done:
 
 	    default:
 	        ex = EX_UNKNOWN ;
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            bprintf(pip->efp,"%s: unknown bad thing (%d)\n",
 	                pip->progname,rs) ;
 
@@ -1225,7 +1225,7 @@ done:
 	} else
 	    ex = EX_OK ;
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_printf(&pip->lh,
 	        "recipients processed=%u delivered=%u\n",
 	        c_processed,c_delivered) ;
@@ -1237,10 +1237,10 @@ badinit1:
 	    bprintf(pip->efp,"%s: exiting ex=%d (%d)\n",
 	        pip->progname,ex,rs) ;
 
-	if (pip->f.logenv)
+	if (pip->fl.logenv)
 	    logfile_close(&pip->envsum) ;
 
-	if (pip->f.log)
+	if (pip->fl.log)
 	    logfile_close(&pip->lh) ;
 
 retearly:
@@ -1455,37 +1455,37 @@ vecstr		*setsp ;
 
 	        case progopt_logzones:
 	            if ((vlen > 0) && (cfdeci(vp,vlen,&val) >= 0))
-	                pip->f.optlogzones = (val > 0) ;
+	                pip->fl.optlogzones = (val > 0) ;
 
 	            break ;
 
 	        case progopt_logenv:
 	            if ((vlen > 0) && (cfdeci(vp,vlen,&val) >= 0))
-	                pip->f.optlogenv = (val > 0) ;
+	                pip->fl.optlogenv = (val > 0) ;
 
 	            break ;
 
 	        case progopt_divert:
 	            if ((vlen > 0) && (cfdeci(vp,vlen,&val) >= 0))
-	                pip->f.optdivert = (val > 0) ;
+	                pip->fl.optdivert = (val > 0) ;
 
 	            break ;
 
 	        case progopt_logmsgid:
 	            if ((vlen > 0) && (cfdeci(vp,vlen,&val) >= 0))
-	                pip->f.optlogmsgid = (val > 0) ;
+	                pip->fl.optlogmsgid = (val > 0) ;
 
 	            break ;
 
 	        case progopt_nospam:
 	            if ((vlen > 0) && (cfdeci(vp,vlen,&val) >= 0))
-	                pip->f.optnospam = (val > 0) ;
+	                pip->fl.optnospam = (val > 0) ;
 
 	            break ;
 
 	        case progopt_norepeat:
 	            if ((vlen > 0) && (cfdeci(vp,vlen,&val) >= 0))
-	                pip->f.optnorepeat = (val > 0) ;
+	                pip->fl.optnorepeat = (val > 0) ;
 
 	            break ;
 
