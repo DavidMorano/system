@@ -398,7 +398,7 @@ int		len ;
 
 /* form the envelope address that we will be using for this message */
 
-	if ((mi.efrom == NULL) || (! pip->f.trusted)) {
+	if ((mi.efrom == NULL) || (! pip->fl.trusted)) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
@@ -1035,7 +1035,7 @@ int		len ;
 /* check for SPAM */
 
 #if	CF_SPAMSUBJECT
-		if ((! f_spam) && pip->f.spam) {
+		if ((! f_spam) && pip->fl.spam) {
 
 			rs1 = cheapspamcheck(pip,mhp->value,mhp->vlen) ;
 
@@ -1051,7 +1051,7 @@ int		len ;
 
 #if	CF_SPAMFLAG
 
-		if ((! f_spam) && pip->f.spam) {
+		if ((! f_spam) && pip->fl.spam) {
 
 #ifdef	HI_SPAMFLAG
 	rs1 = -1 ;
@@ -1780,7 +1780,7 @@ char		id[] ;
 	            debugprintf("ext_id: looping %d EMAs\n",i) ;
 #endif
 
-	        if ((! ep->f.error) && (ep->rlen > 0)) {
+	        if ((! ep->fl.error) && (ep->rlen > 0)) {
 
 	            cp = strwcpy(id,ep->route,MIN(ADDRLEN,ep->rlen)) ;
 
