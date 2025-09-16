@@ -165,7 +165,7 @@ const char	name[] ;
 	    u_close(sfd) ;
 	} /* end if (source file opened) */
 
-	if ((rs < 0) && pip->f.zero) {
+	if ((rs < 0) && pip->fl.zero) {
 	    if (isNotPresent(rs)) rs = SR_OK ;
 	}
 
@@ -227,7 +227,7 @@ const char	fname[] ;
 
 	if (bfnamelen > 0) {
 
-	    if (pip->f.rmsuf) {
+	    if (pip->fl.rmsuf) {
 	        const char	*tp = strnrchr(bfname,bfnamelen,'.') ;
 	        int	bfl ;
 
@@ -263,7 +263,7 @@ const char	fname[] ;
 
 	    f_update = f && (ssbp->st_mtime > dsb.st_mtime) ;
 
-	    if (f && pip->f.rmfile) {
+	    if (f && pip->fl.rmfile) {
 
 	        f_create = TRUE ;
 	        rs = u_unlink(dstfname) ;
@@ -330,10 +330,10 @@ const char	fname[] ;
 	                fname) ;
 #endif
 
-	        if (pip->f.print || (pip->verboselevel > 1))
+	        if (pip->fl.print || (pip->verboselevel > 1))
 	            bprintf(pip->ofp,"%s\n",fname) ;
 
-	        if ((! pip->f.nochange) && (! pip->f.print)) {
+	        if ((! pip->fl.nochange) && (! pip->fl.print)) {
 		    int	len ;
 
 	            rs = uc_copy(sfd,dfd,-1) ;
