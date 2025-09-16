@@ -51,7 +51,13 @@
 #include	<cstdarg>
 #include	<cstring>		/* |strncasecmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<utimeout.h>
 #include	<filer.h>
 #include	<field.h>
@@ -64,7 +70,11 @@
 
 #include	"vecstrx.hh"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ulibvals.ccm"
+
 import libutil ;
+import ulibvals ;			/* |libval.maxline(3u)| */
 
 /* local defines */
 
@@ -75,9 +85,9 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -139,6 +149,7 @@ static int	mkterms() noex ;
 
 /* local variables */
 
+static int		maxline = ulibval.maxline ;
 static vars		var ;
 static char		fterms[fieldterms_termsize] ;
 
@@ -169,15 +180,14 @@ int vecstrx::envfile(cchar *fname) noex {
 /* local subroutines */
 
 int vecstrx_envfiler(vecstrx *op,cchar *fname) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if (subinfo si(op,fterms) ; (rs = si.start()) >= 0) {
             cmode   om = 0666 ;
             cint    of = O_RDONLY ;
-            cint    to_open = utimeout[uto_open] ;
-            if ((rs = uc_opene(fname,of,om,to_open)) >= 0) {
-		cnullptr	np{} ;
+            if ((rs = u_open(fname,of,om)) >= 0) {
                 cint		fd = rs ;
                 if (filer df ; (rs = df.start(fd,0z,0,0)) >= 0) {
                     cint    to = utimeout[uto_read] ;
@@ -194,7 +204,7 @@ int vecstrx_envfiler(vecstrx *op,cchar *fname) noex {
                     rs1 = df.finish ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (filer) */
-                rs1 = uc_close(fd) ;
+                rs1 = u_close(fd) ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (file) */
             rs1 = si.finish() ;
@@ -209,7 +219,7 @@ int subinfo::start() noex {
 	int		sz = 0 ;
 	llen = var.linebuflen ;
 	sz += (2 * (llen + 1)) ;
-	if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
 	    a = bp ;
 	    lbuf = bp ;
 	    bp += (llen + 1) ;
@@ -224,7 +234,7 @@ int subinfo::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (a) {
-	    rs1 = uc_libfree(a) ;
+	    rs1 = libmem.free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    a = nullptr ;
 	}
@@ -299,7 +309,7 @@ static int mkterms() noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = ucmaxline) >= 0) {
+	if ((rs = maxline) >= 0) {
 	    linebuflen = (rs * LINEBUFMULT) ;
 	}
 	return rs ;
