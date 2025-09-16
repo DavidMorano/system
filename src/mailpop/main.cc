@@ -349,7 +349,7 @@ char	*envv[] ;
 	                            break ;
 
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 	                        case 's':
@@ -835,7 +835,7 @@ char	*envv[] ;
 	if (rs < 0) {
 
 	    ex = EX_DATAERR ;
-	    if (! pip->f.quiet)
+	    if (! pip->fl.quiet)
 	    	bprintf(pip->efp,"%s: exiting (%d)\n",
 	        	pip->progname,rs) ;
 
@@ -911,7 +911,7 @@ badarg:
 /* handle other things */
 badconnect:
 	ex = EX_UNAVAILABLE ;
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 		bprintf(pip->efp,"%s: could not connect to host (%d)\n",
 	    		pip->progname,rs) ;
 
