@@ -100,7 +100,7 @@ int uc_mincoreset(void *ca,size_t cs,char *bits) noex {
 		    nbytes = (npages / CHAR_BIT) ;
 		    memclear(bits,nbytes) ;
 		    asz = int(npages) ;
-		    if ((rs = uc_libmalloc(asz,&ba)) >= 0) {
+		    if ((rs = lm_mall(asz,&ba)) >= 0) {
 			if ((rs = u_mincore(ca,cs,ba)) >= 0) {
 			    for (size_t bi = 0z ; bi < npages ; bi += 1) {
 			        if (ba[bi]) {
@@ -108,7 +108,7 @@ int uc_mincoreset(void *ca,size_t cs,char *bits) noex {
 				}
 			   } /* end for */
 			} /* end if (u_mincore) */
-			rs1 = uc_libfree(ba) ;
+			rs1 = lm_free(ba) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		} /* end if (pagesize) */
