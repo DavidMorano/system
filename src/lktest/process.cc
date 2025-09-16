@@ -105,7 +105,7 @@ int		timeout, to_remove ;
 
 /* try to capture the file */
 
-	    lockcmd = (pip->f.readlock) ? F_RLOCK : F_WLOCK ;
+	    lockcmd = (pip->fl.readlock) ? F_RLOCK : F_WLOCK ;
 
 	    rs = u_fstat(fd,&sb) ;
 
