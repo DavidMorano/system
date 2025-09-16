@@ -207,7 +207,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* verbose */
 	                case argopt_verbose:
-	                    pip->f.verbose = TRUE ;
+	                    pip->fl.verbose = TRUE ;
 	                    if (f_optequal)
 	                        goto badargextra ;
 
@@ -265,7 +265,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -288,12 +288,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* print something!! */
 	                    case 'p':
-	                        pip->f.print = TRUE ;
+	                        pip->fl.print = TRUE ;
 	                        break ;
 
 			    case 'q':
@@ -340,7 +340,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* verbose output */
 	                    case 'v':
-	                        pip->f.verbose = TRUE ;
+	                        pip->fl.verbose = TRUE ;
 	                        if (f_optequal) {
 
 	                            f_optequal = FALSE ;
@@ -484,7 +484,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* pop the files proper */
 
-	    if (pip->f.print || pip->f.verbose) {
+	    if (pip->fl.print || pip->fl.verbose) {
 
 	        if ((rs = bopen(ofp,BFILE_STDOUT,"dwct",0644)) < 0)
 	            goto badoutopen ;
@@ -513,7 +513,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	    } /* end for (looping through requested circuits) */
 
-	    if (pip->f.print || pip->f.verbose)
+	    if (pip->fl.print || pip->fl.verbose)
 	        bclose(ofp) ;
 
 
@@ -631,7 +631,7 @@ badoutopen:
 
 badnofiles:
 	ex = EX_USAGE ;
-	if (! pip->f.quiet)
+	if (! pip->fl.quiet)
 		bprintf(pip->efp,"%s: no files were specified\n",
 	    	pip->progname) ;
 
