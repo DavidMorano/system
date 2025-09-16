@@ -212,7 +212,7 @@ int progconf_begin(PROGINFO *pip)
 
 /* look for system configuration file */
 
-	if ((rs >= 0) && (! pip->f.nosysconf)) {
+	if ((rs >= 0) && (! pip->fl.nosysconf)) {
 	    cchar	*cfn = CONFIGFNAME ;
 	    rs = procfile(pip,sysconfs,cfn) ;
 	}
