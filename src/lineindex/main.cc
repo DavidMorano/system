@@ -483,7 +483,7 @@ char	*envv[] ;
 
 /* quiet mode */
 	                        case 'Q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* version */
@@ -555,12 +555,12 @@ char	*envv[] ;
 
 /* remove labels */
 	                        case 's':
-	                            pip->f.removelabel = TRUE ;
+	                            pip->fl.removelabel = TRUE ;
 	                            break ;
 
 /* index whole files */
 	                        case 'w':
-	                            pip->f.wholefile = TRUE ;
+	                            pip->fl.wholefile = TRUE ;
 	                            break ;
 
 /* verbose mode */
@@ -1117,7 +1117,7 @@ char	*envv[] ;
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            bprintf(pip->efp,
 	                "%s: could not open the argument list file\n",
