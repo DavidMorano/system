@@ -36,7 +36,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/mman.h>
 #include	<unistd.h>
-#include	<fcntl.h>		/* |uc_open(3c)| */
+#include	<fcntl.h>		/* |O_{xx}| */
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -170,16 +170,16 @@ int subinfo::pwmapload() noex {
 /* end subroutine (subinfo::pwmapload) */
 
 int subinfo::pwmapbegin() noex {
+	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (mapdata == nullptr) {
 	    cmode	om = 0666 ;
 	    cint	of = O_RDONLY ;
 	    cchar	*fn = SYSPASSWD ;
-	    if ((rs = uc_open(fn,of,om)) >= 0) {
+	    if ((rs = u_open(fn,of,om)) >= 0) {
 	        cint	fd = rs ;
-	        if ((rs = uc_fsize(fd)) >= 0) {
-		    cnullptr	np{} ;
+	        if ((rs = u_fsize(fd)) >= 0) {
 	            csize	ms = size_t(rs) ;
 	            int		mp = PROT_READ ;
 	            int		mf = MAP_SHARED ;
