@@ -45,7 +45,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<sysval.hh>
 #include	<intceil.h>
@@ -59,7 +58,7 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -103,7 +102,7 @@ int ucmemla_acquire(ucmemla *op,size_t us,void *rp) noex {
 		    rs = ucmemla_map(op,us,&vp) ;
 		} else {
 		    cint	am = int(us) ;
-		    if ((rs = uc_libmalloc(am,&vp)) >= 0) {
+		    if ((rs = libmem.mall(am,&vp)) >= 0) {
 		        op->ma = vp ;
 		        op->ms = us ;
 		    } /* end if (memory-allocation) */
@@ -121,7 +120,7 @@ int ucmemla_release(ucmemla *op) noex {
 	    if (op->f_large) {
 		rs = u_mmapend(op->ma,op->ms) ;
 	    } else {
-		rs = uc_libfree(op->ma) ;
+		rs = libmem.free(op->ma) ;
 	    }
 	    op->ma = nullptr ;
 	    op->ms = 0 ;
