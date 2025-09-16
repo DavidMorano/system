@@ -204,7 +204,7 @@ struct recip	*rp ;
 	} else {
 
 	    rs = SR_OK ;
-	    if (! (pip->f.diverting && pip->f.trusted)) {
+	    if (! (pip->fl.diverting && pip->fl.trusted)) {
 		if ((rs = getuid_name(rp->recipient,-1)) >= 0) {
 	            uid_recip = rs ;
 		} else if (isNotPresent(rs)) {
@@ -347,7 +347,7 @@ struct recip	*rp ;
 	                    debugprintf("deliver: deleting old lockfile\n") ;
 #endif
 
-	                if (pip->f.log)
+	                if (pip->fl.log)
 	                    logfile_printf(&pip->lh,
 	                        "removed a stale mail lock\n") ;
 
@@ -411,9 +411,9 @@ struct recip	*rp ;
 /* try to open the mail spool file */
 
 #ifdef	COMMENT
-	        if (pip->f.setgid) setegid(pip->egid) ;
+	        if (pip->fl.setgid) setegid(pip->egid) ;
 
-	        if (pip->f.setgid) setegid(pip->gid) ;
+	        if (pip->fl.setgid) setegid(pip->gid) ;
 #endif /* COMMENT */
 
 	        rs = openspoolfile(pip,&os,mailfname) ;
@@ -453,7 +453,7 @@ struct recip	*rp ;
 
 /* optionally check for mail forwarding */
 
-	                if (pip->f.optforward && f_readable && 
+	                if (pip->fl.optforward && f_readable && 
 				(! f_create) &&
 	                    ((rs = u_read(sfd,buf,BUFLEN)) > 0)) {
 
@@ -760,7 +760,7 @@ const char	mailfname[] ;
 
 	if (rs == SR_ACCESS) {
 
-	    if (pip->f.setuid) {
+	    if (pip->fl.setuid) {
 
 	        euid = geteuid() ;
 
@@ -781,7 +781,7 @@ const char	mailfname[] ;
 
 	    } /* end if (we have SUID) */
 
-	    if (pip->f.setgid) {
+	    if (pip->fl.setgid) {
 
 	        egid = getegid() ;
 
@@ -868,7 +868,7 @@ int		uid_recip ;
 
 	if (rs == SR_ACCESS) {
 
-	    if (pip->f.setuid) {
+	    if (pip->fl.setuid) {
 
 	        euid = geteuid() ;
 
@@ -882,7 +882,7 @@ int		uid_recip ;
 
 	    } /* end if (we have SUID) */
 
-	    if (pip->f.setgid) {
+	    if (pip->fl.setgid) {
 
 	        egid = getegid() ;
 
