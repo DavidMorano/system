@@ -521,7 +521,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -543,7 +543,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* indicate that we have a main top-level module */
 	                    case 'm':
-	                        pip->f.main = TRUE ;
+	                        pip->fl.main = TRUE ;
 	                        break ;
 
 /* output file */
@@ -739,7 +739,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            cchar	*pn = pip->progname ;
 	            cchar	*fmt ;
 	            fmt = "%s: invalid query (%d)\n" ;
