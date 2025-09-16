@@ -186,7 +186,7 @@ int progfile(proginfo *pip,procoptions opts,cc *fname) noex {
 	}
 
 	if (rs < 0) {
-	    if (! pip->f.quiet)
+	    if (! pip->fl.quiet)
 		bprintf(pip->efp,"%s: unavailable (%d) file=%s\n",
 			pip->progname,rs,fname) ;
 	    goto ret0 ;

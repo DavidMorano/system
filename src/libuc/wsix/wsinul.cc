@@ -44,6 +44,8 @@
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
+#include	"wsix.h"
+
 
 /* local defines */
 
