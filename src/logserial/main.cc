@@ -148,8 +148,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->debuglevel = 0 ;
 	pip->tmpdname = NULL ;
 
-	pip->f.print = FALSE ;
-	pip->f.fakeit = FALSE ;
+	pip->fl.print = FALSE ;
+	pip->fl.fakeit = FALSE ;
 
 
 /* process program arguments */
@@ -328,12 +328,12 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* do not actually do it ! */
 	                    case 'n':
-	                        pip->f.fakeit = TRUE ;
+	                        pip->fl.fakeit = TRUE ;
 	                        break ;
 
 /* print out something */
 	                    case 'p':
-	                        pip->f.print = TRUE ;
+	                        pip->fl.print = TRUE ;
 	                        break ;
 
 /* verbose output */
