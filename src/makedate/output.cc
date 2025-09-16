@@ -128,7 +128,7 @@ int output(progifo *pip,cchar *ofname) noex {
 #endif
 
 	    if ((modstr != NULL) && (modstr[0] != '\0')) {
-	        if (pip->f.main) {
+	        if (pip->fl.main) {
 	            rs = bprintf(ofp,"%-23s",modstr) ;
 	    	    wlen += rs ;
 	        } else {
