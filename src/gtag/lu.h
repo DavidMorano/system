@@ -1,4 +1,5 @@
 /* lu HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* lookup a reference in the databases */
@@ -19,10 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bfile.h>
 #include	<hdb.h>
 
@@ -38,10 +40,10 @@ struct lu_flags {
 } ;
 
 struct lu_value {
-	LU_FL		f ;
 	bfile		infile ;
 	bfile		outfile ;
 	bfile		errfile ;
+	LU_FL		fl ;
 } ;
 
 struct lu_head {
@@ -66,6 +68,5 @@ EXTERNC_end
 
 
 #endif /* LU_INCLUDE */
-
 
 
