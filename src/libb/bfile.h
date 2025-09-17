@@ -117,7 +117,7 @@ struct bfile_mapper {
 	char		*bdata ;	/* buffer data */
 	size_t		bsize ;		/* buffer size */
 	size_t		offset ;	/* file offset for page */
-	BFILE_MAPFL	f ;
+	BFILE_MAPFL	fl ;
 } ;
 
 struct bfile_bdflags {
@@ -127,7 +127,7 @@ struct bfile_bdflags {
 struct bfile_bufdesc {
 	char		*bdata ;	/* base of buffer */
 	size_t		boff ;		/* base of buffer */
-	BFILE_BDFL	f ;
+	BFILE_BDFL	fl ;
 	int		bsize ;		/* size of buffer */
 	int		blen ;		/* length of data (buffer index) */
 } ;
@@ -162,7 +162,7 @@ struct bfile_head {
 	size_t		offset ; 	/* user view */
 	size_t		fsize ;		/* current? file size */
 	dev_t		dev ;
-	BFILE_FL	f ;
+	BFILE_FL	fl ;
 	uint		magic ;
 	int		fd ;
 	int		pagesize ;	/* system page size */
@@ -355,7 +355,7 @@ static inline int bfile_magic(bfile *op,Args ... args) noex {
 	if (op && (args && ...)) {
 	    rs = SR_NOTOPEN ;
 	    if (op->magic == BFILE_MAGIC) {
-		rs = (op->f.nullfile) ? 0 : 1 ;
+		rs = (op->fl.nullfile) ? 0 : 1 ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
