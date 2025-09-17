@@ -112,7 +112,7 @@ int checkname(proginfo *,cchar *name,USTAT *sbp) noex {
 	if (bnl <= 0) goto ret0 ;
 
 	f_link = S_ISLNK(sbp->st_mode) ? TRUE : FALSE ;
-	f_follow = pip->f.follow ;
+	f_follow = pip->fl.follow ;
 
 /* do not follow the directory (if there is one) under these conditions */
 
@@ -120,9 +120,9 @@ int checkname(proginfo *,cchar *name,USTAT *sbp) noex {
 
 /* OK, do the appropriate thing */
 
-	if (pip->f.all) {
+	if (pip->fl.all) {
 
-	    if (! pip->f.no) {
+	    if (! pip->fl.no) {
 
 	    rs1 = 0 ;
 	        if (S_ISREG(sbp->st_mode) || S_ISDIR(sbp->st_mode)) {
@@ -138,14 +138,14 @@ int checkname(proginfo *,cchar *name,USTAT *sbp) noex {
 
 	    } /* end if */
 
-	    if (pip->f.print)
+	    if (pip->fl.print)
 	        bprintf(pip->ofp,"%s\n",name) ;
 
 	} /* end if (remove all) */
 
 /* check for a dangling symbolic link */
 
-	if (pip->f.links && S_ISLNK(sbp->st_mode)) {
+	if (pip->fl.links && S_ISLNK(sbp->st_mode)) {
 
 	    if (checklink(name,sbp,pip) > 0) {
 	        rc = 0 ;
@@ -156,9 +156,9 @@ int checkname(proginfo *,cchar *name,USTAT *sbp) noex {
 
 /* should we check for a dangling AppleDouble file? */
 
-	if (pip->f.appledouble && (strcmp(bnp,APPLEDOUBLE) == 0)) {
+	if (pip->fl.appledouble && (strcmp(bnp,APPLEDOUBLE) == 0)) {
 
-	    if (pip->f.follow && S_ISLNK(sbp->st_mode)) {
+	    if (pip->fl.follow && S_ISLNK(sbp->st_mode)) {
 
 	        sbp = &sb2 ;
 	        rs2 = u_stat(name,&sb2) ;
@@ -186,7 +186,7 @@ int checkname(proginfo *,cchar *name,USTAT *sbp) noex {
 
 /* check for a name match */
 
-	if (! pip->f.all) {
+	if (! pip->fl.all) {
 	    vecstr	*nlp = &pip->names ;
 	    for (int i = 0 ; (rs = nlp->get(i,&sp)) >= 0 ; i += 1) {
 	        if (sp) {
@@ -196,7 +196,7 @@ int checkname(proginfo *,cchar *name,USTAT *sbp) noex {
 
 	    if (rs >= 0) {
 
-	        if (! pip->f.no) {
+	        if (! pip->fl.no) {
 
 		rs1 = 0 ;
 	            if (S_ISREG(sbp->st_mode) || S_ISDIR(sbp->st_mode)) {
@@ -215,7 +215,7 @@ int checkname(proginfo *,cchar *name,USTAT *sbp) noex {
 
 	        } /* end if */
 
-	        if (pip->f.print)
+	        if (pip->fl.print)
 	            bprintf(pip->ofp,"%s\n", name) ;
 
 	    } /* end if */
@@ -265,13 +265,13 @@ int		pdirlen ;
 
 		    if (rs >= 0) {
 
-	            if ((pip->verboselevel > 0) || pip->f.print)
+	            if ((pip->verboselevel > 0) || pip->fl.print)
 	                bprintf(pip->ofp,"%s\n",fname) ;
 
 	            rs1 = SR_OK ;
-	            if (! pip->f.no) {
+	            if (! pip->fl.no) {
 
-	                if (pip->f.burn) {
+	                if (pip->fl.burn) {
 	                    rs = burn(fname,pip->bcount,pip->rvp) ;
 			}
 
