@@ -183,13 +183,13 @@ int bopene(bfile *fp,cchar *fn,cchar *os,mode_t om,int to) noex {
 		boflags |= BO_FILEDESC ;
 		fd_existing = fd ;
 	    } else if (fd == SR_EMPTY) {
-		fp->f.nullfile = true ;
+		fp->fl.nullfile = true ;
 	    } else if (fd != SR_DOM) {
 		rs = fd ;
 	    }
 	} /* end if */
 
-	if (fp->f.nullfie) goto ret1 ;
+	if (fp->fl.nullfie) goto ret1 ;
 
 	if (boflags & BO_READ) {
 	    boflags &= (~ BO_APPEND) ;
@@ -249,7 +249,7 @@ int bopene(bfile *fp,cchar *fn,cchar *os,mode_t om,int to) noex {
 	        rs = u_stat(fn,0,&sb) ;
 	        if (rs == SR_NOENT) {
 		    rs = SR_OK ;
-		    fp->f.created = true ;
+		    fp->fl.created = true ;
 		}
 	    }
 
@@ -301,11 +301,11 @@ int bopene(bfile *fp,cchar *fn,cchar *os,mode_t om,int to) noex {
 	} else if (S_ISCHR(sb.st_mode)) {
 	    if (isatty(fp->fd)) {
 	        bsize = MIN(LINEBUFLEN,2048) ;
-	        fp->f.terminal = true ;
+	        fp->fl.terminal = true ;
 	        fp->bm = bfilebm_line ;
 	    } /* end if (is a terminal) */
 	} else if (S_ISSOCK(sb.st_mode)) {
-	    fp->f.network = true ;
+	    fp->fl.network = true ;
 	    bsize = (64*1024) ;
 	    fp->bm = bfilebm_line ;
 	}
@@ -317,11 +317,11 @@ int bopene(bfile *fp,cchar *fn,cchar *os,mode_t om,int to) noex {
 	}
 
 	if (f_notseek) {
-	    fp->f.notseek = true ;
+	    fp->fl.notseek = true ;
 	    fp->offset = 0 ;
 	}
 
-	if ((oflags & O_APPEND) && (! fp->f.notseek)) {
+	if ((oflags & O_APPEND) && (! fp->fl.notseek)) {
 	    rs = u_seeko(fp->fd,0L,SEEK_END,&soff) ;
 	    fp->offset = (BFILE_OFF) soff ;
 	} /* end if (append mode) */
@@ -330,9 +330,9 @@ int bopene(bfile *fp,cchar *fn,cchar *os,mode_t om,int to) noex {
 
 #if	CF_MAPABLE
 	{
-	    int		f_mapable = (! fp->f.notseek) && (! fp->f.terminal) ;
+	    int		f_mapable = (! fp->fl.notseek) && (! fp->fl.terminal) ;
 	    if (f_mapable) {
-	        fp->f.mappable = true ;
+	        fp->fl.mappable = true ;
 	    }
 	    if (f_mapable && (! (oflags & O_WRONLY))) {
 	        rs = bfile_mapbegin(fp) ;
@@ -345,7 +345,7 @@ int bopene(bfile *fp,cchar *fn,cchar *os,mode_t om,int to) noex {
 
 	if (rs < 0) goto bad1 ;
 
-	if ((oflags & O_CREAT) && fp->f.created) f_created = true ;
+	if ((oflags & O_CREAT) && fp->fl.created) f_created = true ;
 
 ret1:
 	fp->magic = BFILE_MAGIC ;		/* set magic number */
@@ -391,7 +391,7 @@ int bopenprog(bfile *fp,cc *pname,cc *os,mainv argv,mainv envv) noex {
 	memset(fp,0,sizeof(bfile)) ;
 	fp->pagesize = getpagesize() ;
 	fp->fd = -1 ;
-	fp->f.notseek = true ;
+	fp->fl.notseek = true ;
 
 	oflags = mkoflags(os,&boflags) ;
 	oflags |= O_CLOEXEC ;
@@ -435,7 +435,7 @@ int bclose(bfile *fp) noex {
 	int		rs1 ;
 	if ((rs = bfile_magic(fp)) >= 0) {
 	    if ((rs = bfile_active(fp)) > 0) {
-	        if (fp->f.write && (fp->len > 0)) {
+	        if (fp->fl.write && (fp->len > 0)) {
 	            rs1 = bfile_flush(fp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
@@ -496,7 +496,7 @@ static int bfile_opts(bfile *fp,int oflags,mode_t om) noex {
 	if ((rs >= 0) && (oflags & O_MINMODE) && (om > 0)) {
 	    rs = uc_fminmod(fp->fd,om) ;
 	}
-	if (oflags & O_NETWORK) fp->f.network = true ;
+	if (oflags & O_NETWORK) fp->fl.network = true ;
 	return rs ;
 }
 /* end subroutine (bfile_opts) */
@@ -513,7 +513,7 @@ static int bfile_mapbegin(bfile *fp) noex {
 	        fp->maps[i].bdata = nullptr ;
 	    } /* end for */
 	    fp->bp = nullptr ;
-	    fp->f.mapinit = true ;
+	    fp->fl.mapinit = true ;
 	} /* end if (m-a) */
 	return rs ;
 }
