@@ -86,7 +86,7 @@ int breade(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 	int		rs ;
 	if ((rs = bfile_magic(op,ubuf)) > 0) {
 	    if ((rs = bfile_ckrd(op)) >= 0) {
-	        if (op->f.mapinit) {
+	        if (op->fl.mapinit) {
 	            rs = bfile_rdmap(op,ubuf,ulen,to,opts) ;
 	        } else {
 	            rs = bfile_rdreg(op,ubuf,ulen,to,opts) ;
@@ -120,7 +120,7 @@ static int bfile_rdmap(bfile *op,void *ubuf,int ulen,int,int) noex {
 	        ((op->bp == nullptr) || (op->len == op->pagesize))) {
 
 	        i = (op->offset / op->pagesize) & (BFILE_NMAPS - 1) ;
-	        if ((! op->maps[i].f.valid) || (op->maps[i].bdata == nullptr)
+	        if ((! op->maps[i].fl.valid) || (op->maps[i].bdata == nullptr)
 	            || (op->maps[i].offset != (op->offset & (~ pagemask))))
 	            bfile_pagein(op,op->offset,i) ;
 
@@ -175,7 +175,7 @@ static int bfile_rdreg(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 	int		f_already = false ;
 	char		*dbp ;
 
-	maxeof = (op->f.network && (to < 0)) ? BFILE_MAXNEOF : 1 ;
+	maxeof = (op->fl.network && (to < 0)) ? BFILE_MAXNEOF : 1 ;
 	dbp = charp(ubuf) ;
 	while ((rs >= 0) && (ulen > 0) && (neof < maxeof)) {
 
