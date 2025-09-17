@@ -63,7 +63,6 @@ struct bibleparas_head {
 	cchar 		*dbname ;		/* DB-name */
 	cchar 		*dbfname ;		/* DB file-name */
 	char		*mapdata ;		/* memory-map address */
-	BIBLEPARAS_FL	f ;
 	BPI		vind ;			/* verse-index */
 	time_t		ti_db ;			/* DB file modification */
 	time_t		ti_map ;		/* DB map */
@@ -71,6 +70,7 @@ struct bibleparas_head {
 	time_t		ti_vind ;		/* verse-index */
 	size_t		mapsize ;		/* map size */
 	size_t		filesize ;		/* file size */
+	BIBLEPARAS_FL	fl ;
 	uint		magic ;
 	int		nverses ;
 	int		ncursors ;
