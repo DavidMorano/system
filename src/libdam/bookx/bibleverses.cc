@@ -274,7 +274,7 @@ int bibleverses_close(BIBLEVERSES *op)
 #endif
 
 #if	CF_DEBUGS
-	if (op->f.vind) {
+	if (op->fl.vind) {
 	    rs1 = bvi_audit(&op->vind) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -330,7 +330,7 @@ int bibleverses_audit(BIBLEVERSES *op)
 	if (op->magic != BIBLEVERSES_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (op->f.vind) {
+	if (op->fl.vind) {
 	    rs = bvi_audit(&op->vind) ;
 	}
 
@@ -790,7 +790,7 @@ static int bibleverses_indopen(BIBLEVERSES *op,SUBINFO *sip)
 #endif
 
 	if ((rs = bibleverses_indopenseq(op,sip)) >= 0) {
-	    if (op->f.vind) {
+	    if (op->fl.vind) {
 	        rs = bvi_count(&op->vind) ;
 	        op->nverses = rs ;
 	    }
@@ -1013,7 +1013,7 @@ static int bibleverses_indopencheck(BIBLEVERSES *op,cchar *idir)
 	            if (binfo.ctime < op->ti_db) {
 	                rs = SR_STALE ;
 	            } else {
-	                op->f.vind = TRUE ;
+	                op->fl.vind = TRUE ;
 	            }
 	            if (rs < 0)
 	                bvi_close(&op->vind) ;
@@ -1041,7 +1041,7 @@ static int bibleverses_indopenmk(BIBLEVERSES *op,SUBINFO *sip,cchar *idir)
 	    if ((rs = mkpath2(tbuf,idir,op->dbname)) >= 0) {
 		if ((rs = bvi_open(&op->vind,tbuf)) >= 0) {
 	            nverses = rs ;
-		    op->f.vind = TRUE ;
+		    op->fl.vind = TRUE ;
 		}
 	    }
 	}
@@ -1224,8 +1224,8 @@ static int bibleverses_indclose(BIBLEVERSES *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->f.vind) {
-	    op->f.vind = FALSE ;
+	if (op->fl.vind) {
+	    op->fl.vind = FALSE ;
 	    rs1 = bvi_close(&op->vind) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
