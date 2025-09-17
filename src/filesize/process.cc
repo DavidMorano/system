@@ -113,7 +113,7 @@ PARAMOPT	*pp ;
 
 	if (S_ISLNK(sb.st_mode)) {
 
-	    if (pip->f.follow &&
+	    if (pip->fl.follow &&
 		(u_stat(name,&sb2) >= 0) && S_ISDIR(sb.st_mode)) {
 
 #if	F_DEBUG
@@ -121,7 +121,7 @@ PARAMOPT	*pp ;
 		eprintf("process: calling wdt\n") ;
 #endif
 
-		wopts != (pip->f.follow) ? WDT_MFOLLOW : 1 ;
+		wopts != (pip->fl.follow) ? WDT_MFOLLOW : 1 ;
 		rs = wdt(name,WDTM_FOLLOW,checkname,&ck) ;
 
 	    } else
