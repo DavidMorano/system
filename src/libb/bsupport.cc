@@ -74,11 +74,11 @@ int bfile_acc(bfile *op,bool fwr) noex {
 
 int bfile_ckrd(bfile *op) noex {	
 	int		rs = SR_BADF ;
-	if (op->f.rd) {
+	if (op->fl.rd) {
 	    rs = SR_OK ;
-	    if (op->f.writing) {
+	    if (op->fl.writing) {
 		rs = bfile_flush(op) ;
-		op->f.writing = false ;
+		op->fl.writing = false ;
 	    }
 	} /* end if (access allowed) */
 	return rs ;
@@ -87,15 +87,15 @@ int bfile_ckrd(bfile *op) noex {
 
 int bfile_ckwr(bfile *op) noex {	
 	int		rs = SR_BADF ;
-	if (op->f.wr) {
+	if (op->fl.wr) {
 	    rs = SR_OK ;
-	    if (! op->f.writing) {
+	    if (! op->fl.writing) {
 		if ((rs = bfile_bufreset(op)) >= 0) {
-	            if ((! op->f.notseek) && (! op->f.append)) {
+	            if ((! op->fl.notseek) && (! op->fl.append)) {
 	                rs = u_seek(op->fd,op->offset,SEEK_SET) ;
 	            }
 		}
-		op->f.writing = true ;
+		op->fl.writing = true ;
 	    } /* end if (not previously writing */
 	} /* end if (access allowed) */
 	return rs ;
@@ -106,7 +106,7 @@ int bfile_flushn(bfile *op,int n) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (n != 0) {
-	    bool	f_sa = (! op->f.notseek) && (op->of & O_APPEND) ;
+	    bool	f_sa = (! op->fl.notseek) && (op->of & O_APPEND) ;
 	    if (f_sa) {
 	        off_t	o{} ;
 	        rs = u_seeko(op->fd,0LL,SEEK_END,&o) ;
@@ -152,7 +152,7 @@ int bfile_pagein(bfile *op,off_t off,int i) noex {
 	        op->maps[i].bdata = charp(vp) ;
 	        op->maps[i].bsize = ms ;
 	        op->maps[i].offset = of ;
-	        op->maps[i].f.valid = true ;
+	        op->maps[i].fl.valid = true ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
