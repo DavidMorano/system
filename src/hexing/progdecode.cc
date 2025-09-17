@@ -183,7 +183,7 @@ int		ll ;
 	    char	*obuf = statep->obuf ;
 	    while ((rs = b64decoder_read(dp,obuf,olen)) > 0) {
 		const int	ol = rs ;
-		if (pip->f.text) {
+		if (pip->fl.text) {
 		    rs = bwritetext(ofp,crp,obuf,ol) ;
 	    	    wlen += rs ;
 		} else {
