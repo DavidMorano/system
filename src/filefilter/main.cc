@@ -631,7 +631,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'o':
@@ -651,7 +651,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* unique check mode */
 	                    case 'u':
-	                        pip->f.f_uniq = TRUE ;
+	                        pip->fl.f_uniq = TRUE ;
 	                        break ;
 
 /* verbose mode */
@@ -815,43 +815,43 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    goto retearly ;
 	}
 
-	if (pip->f.f_noextra) {
-	    pip->f.f_nodev = TRUE ;
-	    pip->f.f_nopipe = TRUE ;
-	    pip->f.f_nosock = TRUE ;
+	if (pip->fl.f_noextra) {
+	    pip->fl.f_nodev = TRUE ;
+	    pip->fl.f_nopipe = TRUE ;
+	    pip->fl.f_nosock = TRUE ;
 	}
 
 /* if we do not have a request for something yet, use our progmode */
 
 	switch (pip->progmode) {
 	case progmode_filenoprog:
-	    pip->f.f_noprog = TRUE ;
+	    pip->fl.f_noprog = TRUE ;
 	    break ;
 	case progmode_fileuniq:
-	    pip->f.f_uniq = TRUE ;
+	    pip->fl.f_uniq = TRUE ;
 	    break ;
 	case progmode_filtername:
 	default:
-	    pip->f.f_name = TRUE ;
+	    pip->fl.f_name = TRUE ;
 	    break ;
 	} /* end switch */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
 	    debugprintf("main: requests prog=%u uniq=%u name=%u\n",
-	        pip->f.f_noprog,pip->f.f_uniq,pip->f.f_name) ;
+	        pip->fl.f_noprog,pip->fl.f_uniq,pip->fl.f_name) ;
 #endif
 
 	if (pip->debuglevel > 0) {
-	    if (pip->f.f_noprog) {
+	    if (pip->fl.f_noprog) {
 	        bprintf(pip->efp,"%s: request> %s\n",
 	            pip->progname,whiches[which_elf]) ;
 	    }
-	    if (pip->f.f_uniq) {
+	    if (pip->fl.f_uniq) {
 	        bprintf(pip->efp,"%s: request> %s\n",
 	            pip->progname,whiches[which_uniq]) ;
 	    }
-	    if (pip->f.f_name) {
+	    if (pip->fl.f_name) {
 	        bprintf(pip->efp,"%s: request> %s\n",
 	            pip->progname,whiches[which_name]) ;
 	    }
@@ -898,7 +898,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: invalid usage (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1017,36 +1017,36 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *pop)
 	                c += 1 ;
 	                switch (oi) {
 	                case progopt_uniq:
-	                    pip->f.f_uniq = TRUE ;
+	                    pip->fl.f_uniq = TRUE ;
 	                    break ;
 	                case progopt_name:
-	                    pip->f.f_name = TRUE ;
+	                    pip->fl.f_name = TRUE ;
 	                    break ;
 	                case progopt_noprog:
 	                case progopt_noelf:
 	                case progopt_prog:
 	                case progopt_elf:
-	                    pip->f.f_noprog = TRUE ;
+	                    pip->fl.f_noprog = TRUE ;
 	                    break ;
 	                case progopt_nosock:
 	                case progopt_sock:
-	                    pip->f.f_nosock = TRUE ;
+	                    pip->fl.f_nosock = TRUE ;
 	                    break ;
 	                case progopt_nopipe:
 	                case progopt_pipe:
-	                    pip->f.f_nopipe = TRUE ;
+	                    pip->fl.f_nopipe = TRUE ;
 	                    break ;
 	                case progopt_nodev:
 	                case progopt_dev:
-	                    pip->f.f_nodev = TRUE ;
+	                    pip->fl.f_nodev = TRUE ;
 	                    break ;
 	                case progopt_noextra:
 	                    if (! pip->final.f_noextra) {
 	                        pip->final.f_noextra = TRUE ;
-	                        pip->f.f_noextra = TRUE ;
+	                        pip->fl.f_noextra = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.f_noextra = (rs > 0) ;
+	                            pip->fl.f_noextra = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1084,8 +1084,8 @@ static int procsuf_begin(PROGINFO *pip,PARAMOPT *app,cchar *poa,cchar *por)
 	if ((rs = procsufs(pip,app,poa)) >= 0) {
 	    rs = procsufs(pip,app,por) ;
 	    if (rs < 0) {
-	        if (pip->f.sufacc) {
-	            pip->f.sufacc = FALSE ;
+	        if (pip->fl.sufacc) {
+	            pip->fl.sufacc = FALSE ;
 	            rs1 = vecpstr_finish(&pip->sufacc) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
@@ -1100,13 +1100,13 @@ static int procsuf_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip->f.sufrej) {
-	    pip->f.sufrej = FALSE ;
+	if (pip->fl.sufrej) {
+	    pip->fl.sufrej = FALSE ;
 	    rs1 = vecpstr_finish(&pip->sufrej) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	if (pip->f.sufacc) {
-	    pip->f.sufacc = FALSE ;
+	if (pip->fl.sufacc) {
+	    pip->fl.sufacc = FALSE ;
 	    rs1 = vecpstr_finish(&pip->sufacc) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1216,7 +1216,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	        rs1 = bclose(afp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            fmt = "%s: inacessible argument-list (%d)\n" ;
 	            bprintf(pip->efp,fmt,pn,rs) ;
 	            bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1286,7 +1286,7 @@ static int procfile(PROGINFO *pip,bfile *ofp,cchar fname[])
 
 	uf.f_valid = FALSE ;
 
-	if (f_suf && (pip->f.sufacc || pip->f.sufrej || pip->f.f_name)) {
+	if (f_suf && (pip->fl.sufacc || pip->fl.sufrej || pip->fl.f_name)) {
 	    bnl = sfbasename(fname,-1,&bnp) ;
 	    if (bnl <= 0) f_suf = FALSE ;
 	}
@@ -1294,12 +1294,12 @@ static int procfile(PROGINFO *pip,bfile *ofp,cchar fname[])
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("main/procfile: b=%r sa=%u sr=%u\n",
-	        bnp,bnl,pip->f.sufacc,pip->f.sufrej) ;
+	        bnp,bnl,pip->fl.sufacc,pip->fl.sufrej) ;
 #endif
 
 /* check against the suffix lists */
 
-	if (f_suf && (pip->f.sufacc || pip->f.sufrej)) {
+	if (f_suf && (pip->fl.sufacc || pip->fl.sufrej)) {
 	    int		sl ;
 	    cchar	*tp, *sp ;
 	    if ((tp = strnrchr(bnp,bnl,'.')) != NULL) {
@@ -1313,14 +1313,14 @@ static int procfile(PROGINFO *pip,bfile *ofp,cchar fname[])
 
 /* check against the suffix-acceptance list */
 
-	        if (pip->f.sufacc) {
+	        if (pip->fl.sufacc) {
 	            rs1 = vecpstr_findn(&pip->sufacc,sp,sl) ;
 	            f_accept = (rs1 >= 0) ;
 	        }
 
 /* check against the suffix-rejectance list */
 
-	        if (pip->f.sufrej && (! f_accept)) {
+	        if (pip->fl.sufrej && (! f_accept)) {
 	            rs1 = vecpstr_findn(&pip->sufrej,sp,sl) ;
 	            if (rs1 >= 0) f_process = FALSE ;
 	        }
@@ -1336,7 +1336,7 @@ static int procfile(PROGINFO *pip,bfile *ofp,cchar fname[])
 
 /* check name against exclusion list */
 
-	if (pip->f.f_name && f_process && (! f_accept)) {
+	if (pip->fl.f_name && f_process && (! f_accept)) {
 
 	    if ((rs1 = hdbstr_fetch(&pip->ndb,bnp,bnl,NULL,NULL)) >= 0) {
 	        f_process = FALSE ;
@@ -1363,21 +1363,21 @@ static int procfile(PROGINFO *pip,bfile *ofp,cchar fname[])
 /* check for one of the restricted file types */
 
 	f_filetype = FALSE ;
-	f_filetype = f_filetype || pip->f.f_nosock ;
-	f_filetype = f_filetype || pip->f.f_nopipe ;
-	f_filetype = f_filetype || pip->f.f_nodev ;
+	f_filetype = f_filetype || pip->fl.f_nosock ;
+	f_filetype = f_filetype || pip->fl.f_nopipe ;
+	f_filetype = f_filetype || pip->fl.f_nodev ;
 
 	if ((rs >= 0) && f_filetype && f_process) {
 
-	    if (f_process && pip->f.f_nosock &&
+	    if (f_process && pip->fl.f_nosock &&
 	        S_ISSOCK(uf.st_mode))
 	        f_process = FALSE ;
 
-	    if (f_process && pip->f.f_nopipe &&
+	    if (f_process && pip->fl.f_nopipe &&
 	        S_ISFIFO(uf.st_mode))
 	        f_process = FALSE ;
 
-	    if (f_process && pip->f.f_nodev &&
+	    if (f_process && pip->fl.f_nodev &&
 	        (S_ISCHR(uf.st_mode) || S_ISBLK(uf.st_mode)))
 	        f_process = FALSE ;
 
@@ -1385,7 +1385,7 @@ static int procfile(PROGINFO *pip,bfile *ofp,cchar fname[])
 
 /* check for unique file */
 
-	if ((rs >= 0) && pip->f.f_uniq && f_process) {
+	if ((rs >= 0) && pip->fl.f_uniq && f_process) {
 
 	    key.buf = &uf ;
 	    key.len = sizeof(struct fileuniq) ;
@@ -1400,7 +1400,7 @@ static int procfile(PROGINFO *pip,bfile *ofp,cchar fname[])
 
 /* check for program (ELF) file */
 
-	if ((rs >= 0) && pip->f.f_noprog && f_process && (! f_accept)) {
+	if ((rs >= 0) && pip->fl.f_noprog && f_process && (! f_accept)) {
 	    if (f_isreg) {
 	        if (procnoprog(pip,&uf,fname) != 0) {
 	            f_process = FALSE ;
@@ -1412,7 +1412,7 @@ static int procfile(PROGINFO *pip,bfile *ofp,cchar fname[])
 
 	if ((rs >= 0) && f_process) {
 
-	    if (pip->f.f_uniq) {
+	    if (pip->fl.f_uniq) {
 	        int	size ;
 
 	        ufp = NULL ;
@@ -1454,7 +1454,7 @@ static int procuniq_begin(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
-	if (pip->f.f_uniq) {
+	if (pip->fl.f_uniq) {
 	    hdbcmpfunc_t	cf = (hdbcmpfunc_t) cmpuniq ;
 	    rs = hdb_start(&pip->udb,DEFLINKS,1,NULL,cf) ;
 	}
@@ -1474,11 +1474,11 @@ static int procuniq_end(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pip->f.f_uniq) {
+	if (pip->fl.f_uniq) {
 	    HDB_CUR	cur ;
 	    HDB_DATUM	key, val ;
 
-	    pip->f.f_uniq = FALSE ;
+	    pip->fl.f_uniq = FALSE ;
 	    if ((rs = hdb_curbegin(&pip->udb,&cur)) >= 0) {
 	        struct fileuniq	*up ;
 	        while (hdb_curenum(&pip->udb,&cur,&key,&val) >= 0) {
@@ -1526,14 +1526,14 @@ static int procsufs(PROGINFO *pip,PARAMOPT *pop,cchar *s)
 	    case suf_acc:
 	        f = pip->have.sufacc ;
 	        if (f) {
-	            pip->f.sufacc = TRUE ;
+	            pip->fl.sufacc = TRUE ;
 	            vlp = &pip->sufacc ;
 	        }
 	        break ;
 	    case suf_rej:
 	        f = pip->have.sufrej ;
 	        if (f) {
-	            pip->f.sufrej = TRUE ;
+	            pip->fl.sufrej = TRUE ;
 	            vlp = &pip->sufrej ;
 	        }
 	        break ;
