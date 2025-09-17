@@ -47,7 +47,6 @@
 #include	<cstring>
 
 #include	<usystem.h>
-#include	<ucmallreg.h>
 #include	<getourenv.h>
 #include	<ids.h>
 #include	<bfile.h>
@@ -483,7 +482,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -712,7 +711,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	}
 
 	if ((rs < 0) && (ex == EX_OK)) {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        bprintf(pip->efp,"%s: could not process (%d)\n",
 	            pip->progname,rs) ;
 	    }
@@ -861,14 +860,14 @@ static int procexecend(PROGINFO *pip)
 	    pep->av = NULL ;
 	}
 
-	if (pep->f.list) {
-	    pep->f.list = FALSE ;
+	if (pep->fl.list) {
+	    pep->fl.list = FALSE ;
 	    rs1 = vechand_finish(&pep->list) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (pep->f.store) {
-	    pep->f.store = FALSE ;
+	if (pep->fl.store) {
+	    pep->fl.store = FALSE ;
 	    rs1 = strpack_finish(&pep->store) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -978,19 +977,19 @@ static int procexecbeginer(PROGINFO *pip,ARGINFO *aip,cchar *program)
 	memset(pep,0,sizeof(PROGEXEC)) ;
 
 	if ((rs = strpack_start(&pep->store,ssize)) >= 0) {
-	    pep->f.store = TRUE ;
+	    pep->fl.store = TRUE ;
 	    if ((rs = vechand_start(&pep->list,vn,vo)) >= 0) {
-	        pep->f.list = TRUE ;
+	        pep->fl.list = TRUE ;
 	        if ((rs = procexecargz(pip,aip,program)) >= 0) {
 	            rs = procexecname(pip,aip,program) ;
 	        }
 	        if (rs < 0) {
-	            pep->f.list = FALSE ;
+	            pep->fl.list = FALSE ;
 	            vechand_finish(&pep->list) ;
 	        }
 	    } /* end if (vechand-start) */
 	    if (rs < 0) {
-	        pep->f.store = FALSE ;
+	        pep->fl.store = FALSE ;
 	        strpack_finish(&pep->store) ;
 	    }
 	} /* end if (strpack-start) */
