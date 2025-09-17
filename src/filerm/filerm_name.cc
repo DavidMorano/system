@@ -80,19 +80,19 @@ int filerm_name(proginfo *pip,cchar *name) noex {
 	    if (USTAT sb ; (rs = u_lstat(name,&sb)) >= 0) {
 	        int	wopts = 0 ;
 	        bool	f_dir = S_ISDIR(sb.st_mode) ;
-	        if ((! f_dir) && S_ISLNK(sb.st_mode) && pip->f.follow) {
+	        if ((! f_dir) && S_ISLNK(sb.st_mode) && pip->fl.follow) {
 	            if (u_stat(name,&sb) >= 0) {
 	                f_dir = S_ISDIR(sb.st_mode) ;
 	            }
 	        } /* end if */
 	        if (f_dir) {
-	            wopts |= (pip->f.follow) ? WDT_MFOLLOW : 0 ;
+	            wopts |= (pip->fl.follow) ? WDT_MFOLLOW : 0 ;
 	            rs = wdt(name,wopts,checkname,pip) ;
 	        } else {
 	            rs = checkname(name,&sb,pip) ;
 	        }
 	        /* finish up */
-	        if ((rs >= 0) && (! pip->f.no)) {
+	        if ((rs >= 0) && (! pip->fl.no)) {
 	            cint	ro = pip->rn_opts ;
 	            rs = removename(name,ro,pip->rvp pip->bcount) ;
 	            if ((rs < 0) && isNotPresent(rs)) rs = SR_OK ;
