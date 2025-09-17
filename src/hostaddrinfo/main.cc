@@ -497,36 +497,36 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* want cannonical-name */
 	                case argopt_cname:
-	                    pip->f.cname = TRUE ;
+	                    pip->fl.cname = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.cname = (rs > 0) ;
+	                            pip->fl.cname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 /* want return-status */
 	                case argopt_rs:
-	                    pip->f.rs = TRUE ;
+	                    pip->fl.rs = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.rs = (rs > 0) ;
+	                            pip->fl.rs = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 /* address-only */
 	                case argopt_ao:
-	                    lip->f.ao = TRUE ;
+	                    lip->fl.ao = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.ao = (rs > 0) ;
+	                            lip->fl.ao = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -574,7 +574,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'a':
@@ -761,7 +761,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -932,7 +932,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            rs1 = bclose(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                bprintf(pip->efp,fmt,pn,rs) ;
 	                bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1001,7 +1001,7 @@ static int procname(PROGINFO *pip,bfile *ofp,cchar *np)
 
 	    if (rs == SR_NOTFOUND) {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,"%s: not found query=%s (%d)\n",
 	                pip->progname,name,rs) ;
 	        }
@@ -1033,7 +1033,7 @@ static int procspecial(PROGINFO *pip,bfile *ofp,cchar *np,int nl)
 	if (DEBUGLEVEL(3))
 	    debugprintf("main/procspecial: af=%d\n",pip->af) ;
 #endif
-	f = f && lip->f.ao ;
+	f = f && lip->fl.ao ;
 	f = f && ((pip->af == AF_UNSPEC) || (pip->af == AF_INET4)) ;
 	if (f) {
 	    f = hasINET4AddrStr(np,nl) ;
@@ -1069,7 +1069,7 @@ static int procinfo(PROGINFO *pip,bfile *ofp,char *cname,cchar *np,int nl)
 	if ((rs = prepname_start(&pn,np,nl)) >= 0) {
 	    HOSTINFO		hi ;
 	    HOSTINFO_CUR	cur ;
-	    const int		f_all = (! lip->f.ao) ;
+	    const int		f_all = (! lip->fl.ao) ;
 	    const char		*hn = pn.hostname ;
 
 #if	CF_DEBUG
@@ -1179,7 +1179,7 @@ static int procprint4(PROGINFO *pip,bfile *ofp,cchar *indent,
 
 	if ((al >= 0) && (al < INET4ADDRLEN)) return SR_DOM ;
 
-	f_all = (! lip->f.ao) ;
+	f_all = (! lip->fl.ao) ;
 	if ((rs = inetaddr_start(&ia,ap)) >= 0) {
 	    const int	aslen = INET4_ADDRSTRLEN ;
 
@@ -1221,7 +1221,7 @@ static int procprint6(PROGINFO *pip,bfile *ofp,cchar *indent,
 	if ((al >= 0) && (al < INET6ADDRLEN)) return SR_DOM ;
 
 	pl = 0 ;
-	f_all = (! lip->f.ao) ;
+	f_all = (! lip->fl.ao) ;
 	for (i = 0 ; i < INET6ADDRLEN ; i += 1) {
 	    cthexi(digbuf,diglen,(ap[i] & 0xff)) ;
 	    if ((i > 0) && ((i & 1) == 0)) astr6[pl++] = ':' ;
