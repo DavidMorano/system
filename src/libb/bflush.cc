@@ -47,7 +47,7 @@
 int bflushn(bfile *op,int n) noex {
 	int		rs ;
 	if ((rs = bfile_magic(op)) > 0) {
-	    if (op->f.writing && (op->len > 0)) {
+	    if (op->fl.writing && (op->len > 0)) {
 		rs = bfile_flushn(op,n) ;
 	    }
 	} /* end if (magic) */
