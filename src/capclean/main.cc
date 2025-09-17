@@ -138,8 +138,8 @@ char	*envv[] ;
 	pip->ofp = ofp ;
 	pip->debuglevel = 0 ;
 
-	pip->f.verbose = FALSE ;
-	pip->f.remove = FALSE ;
+	pip->fl.verbose = FALSE ;
+	pip->fl.remove = FALSE ;
 
 	if ((rs = userinfo(&u,NULL)) < 0) goto baduser ;
 
@@ -212,7 +212,7 @@ char	*envv[] ;
 
 /* verbose */
 	                case argopt_verbose:
-	                    pip->f.verbose = TRUE ;
+	                    pip->fl.verbose = TRUE ;
 	                    if (f_optequal) 
 				goto badargextra ;
 
@@ -249,12 +249,12 @@ char	*envv[] ;
 
 /* verbose output */
 	                    case 'v':
-	                        pip->f.verbose = TRUE ;
+	                        pip->fl.verbose = TRUE ;
 	                        break ;
 
 /* actually remove the files */
 				case 'r':
-				pip->f.remove = TRUE ;
+				pip->fl.remove = TRUE ;
 				break ;
 
 	                    case '?':
