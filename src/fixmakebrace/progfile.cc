@@ -170,7 +170,7 @@ static int progfiler(PROGINFO *pip,bfile *ofp,cchar *fname)
 	        if ((rs > 0) && (! f_skipfile)) {
 
 	            rs = 1 ;
-	            if (! pip->f.nochange) {
+	            if (! pip->fl.nochange) {
 
 	                bseek(&infile,0L,SEEK_SET) ;
 
@@ -225,7 +225,7 @@ static int fileneed(PROGINFO *pip,bfile *ifp)
 	const char	*ss ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
-	ss = (pip->f.backward) ? ssp : ssb ;
+	ss = (pip->fl.backward) ? ssp : ssb ;
 
 	f_need = FALSE ;
 	f_bol = TRUE ;
@@ -287,7 +287,7 @@ static int filefix(PROGINFO *pip,bfile *ifp)
 	    debugprintf("progfile/filefix: ent\n") ;
 #endif
 
-	ss = (pip->f.backward) ? ssp : ssb ;
+	ss = (pip->fl.backward) ? ssp : ssb ;
 
 /* open the scratch file */
 
@@ -342,7 +342,7 @@ static int filefix(PROGINFO *pip,bfile *ifp)
 #endif
 
 		if (kl > 0) {
-	        if (pip->f.backward) {
+	        if (pip->fl.backward) {
 	            rs = bprintf(&tmpfile,"%r$%c%r%c",
 	                cp,cl,CH_LBRACE,kp,kl,CH_RBRACE) ;
 	        } else {
