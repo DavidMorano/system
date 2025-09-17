@@ -502,7 +502,7 @@ int bibleqs_count(BIBLEQS *op)
 
 	if (op->magic != BIBLEQS_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.ind) {
+	if (op->fl.ind) {
 	   rs = txtindex_count(&op->ind) ;
 	}
 
@@ -1051,7 +1051,7 @@ static int bibleqs_indopencheck(BIBLEQS *op,cchar *idir)
 	    if ((rs = txtindex_open(&op->ind,op->pr,tbuf)) >= 0) {
 	        TXTINDEX_INFO	tinfo ;
 		c = rs ;
-	        op->f.ind = TRUE ;
+	        op->fl.ind = TRUE ;
 #if	CF_DEBUGS
 	        debugprintf("bibleqs_indopencheck: txtindex_open() rs=%d\n",
 			rs) ;
@@ -1060,7 +1060,7 @@ static int bibleqs_indopencheck(BIBLEQS *op,cchar *idir)
 	            if (tinfo.ctime < op->ti_db) rs = SR_STALE ;
 	        } /* end if (txtindex_info) */
 	        if (rs < 0) {
-		    op->f.ind = FALSE ;
+		    op->fl.ind = FALSE ;
 	            txtindex_close(&op->ind) ;
 		}
 	    } /* end if (txtindex_open) */
@@ -1085,7 +1085,7 @@ static int bibleqs_indopenmk(BIBLEQS *op,SUBINFO *sip,cchar *idir)
 	    if ((rs = mkpath2(tbuf,idir,op->dbname)) >= 0) {
 	        rs = txtindex_open(&op->ind,op->pr,tbuf) ;
 		c = rs ;
-	        op->f.ind = (rs >= 0) ;
+	        op->fl.ind = (rs >= 0) ;
 #if	CF_DEBUGS
 	        debugprintf("bibleqs_indopenalt: txtindex_open() rs=%d\n",
 	            rs) ;
@@ -1162,10 +1162,10 @@ static int bibleqs_indmkeigen(BIBLEQS *op,TXTINDEXMK *tip)
 	int		c = 0 ;
 
 #if	CF_DEBUGS
-	debugprintf("bibleqs_indmkeigen: f_edb=%u\n",op->f.edb) ;
+	debugprintf("bibleqs_indmkeigen: f_edb=%u\n",op->fl.edb) ;
 #endif
 
-	if (op->f.edb) {
+	if (op->fl.edb) {
 	    cint	size = (nkeys + 1) * szof(TXTINDEXMK_KEY) ;
 	if ((rs = uc_malloc(size,&keys)) >= 0) {
 	    int	i = 0 ;
@@ -1287,7 +1287,7 @@ static int bibleqs_indmkdata(BIBLEQS *op,TXTINDEXMK *tip)
 /* paramters for KTAGing */
 
 	ka.edbp = &op->edb ;
-	ka.f_eigen = op->f.edb ;
+	ka.f_eigen = op->fl.edb ;
 	ka.minwlen = op->minwlen ;
 	ka.wterms = op->wterms ;
 
@@ -1416,8 +1416,8 @@ static int bibleqs_indclose(BIBLEQS *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->f.ind) {
-	    op->f.ind = FALSE ;
+	if (op->fl.ind) {
+	    op->fl.ind = FALSE ;
 	    rs1 = txtindex_close(&op->ind) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1831,11 +1831,11 @@ static int bibleqs_eigenopen(BIBLEQS *op)
 	int		rs1 = 0 ;
 	int		f = FALSE ;
 
-	if (! op->f.edbinit) {
-	op->f.edbinit = TRUE ;
+	if (! op->fl.edbinit) {
+	op->fl.edbinit = TRUE ;
 	rs1 = eigenfind(&op->edb,op->pr,op->dbname,op->minwlen) ;
-	op->f.edb = (rs1 > 0) ;
-	f = op->f.edb ;
+	op->fl.edb = (rs1 > 0) ;
+	f = op->fl.edb ;
 	}
 
 #if	CF_DEBUGS
@@ -1852,8 +1852,8 @@ static int bibleqs_eigenclose(BIBLEQS *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->f.edb) {
-	    op->f.edb = FALSE ;
+	if (op->fl.edb) {
+	    op->fl.edb = FALSE ;
 	    rs1 = eigendb_close(&op->edb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1963,7 +1963,7 @@ SEARCHKEYS	*skp ;
 	        rs1 = SR_NOTFOUND ;
 
 #if	CF_EXTRAEIGEN
-	        if (op->f.edb)
+	        if (op->fl.edb)
 	            rs1 = eigendb_exists(&op->edb,kp,kl) ;
 #endif
 
@@ -1995,8 +1995,8 @@ static int subinfo_start(SUBINFO *sip) noex {
 #ifdef	COMMENT
 static int subinfo_ids(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-	if (! sip->f.id) {
-	    sip->f.id = TRUE ;
+	if (! sip->fl.id) {
+	    sip->fl.id = TRUE ;
 	    rs = ids_load(&sip->id) ;
 	}
 	return rs ;
@@ -2007,8 +2007,8 @@ static int subinfo_ids(SUBINFO *sip) noex {
 static int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (sip->f.id) {
-	    sip->f.id = FALSE ;
+	if (sip->fl.id) {
+	    sip->fl.id = FALSE ;
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
