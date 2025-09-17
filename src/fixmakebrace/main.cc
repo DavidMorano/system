@@ -473,19 +473,19 @@ int main(int argc,cchar **argv,cchar **envv)
 	                case argopt_backward:
 	                    pip->final.backward = TRUE ;
 	                    pip->have.backward = TRUE ;
-	                    pip->f.backward = TRUE ;
+	                    pip->fl.backward = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.backward = (rs > 0) ;
+	                            pip->fl.backward = (rs > 0) ;
 	                        }
 	                    }
 			    break ;
 
 /* follow symbolic links */
 	                case argopt_follow:
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    break ;
 
 /* default action and user specified help */
@@ -515,7 +515,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -538,7 +538,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* follow symbolic links */
 	                    case 'f':
-	                        pip->f.follow = TRUE ;
+	                        pip->fl.follow = TRUE ;
 	                        break ;
 
 /* file name length restriction */
@@ -571,7 +571,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* options */
@@ -886,9 +886,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    c += 1 ;
 	                    pip->final.backward = TRUE ;
 	                    pip->have.backward = TRUE ;
-	                    pip->f.backward = TRUE ;
+	                    pip->fl.backward = TRUE ;
 	                    if ((vl > 0) && (cfdecui(vp,vl,&v) >= 0))
-	                        pip->f.backward = (v > 0) ? TRUE : FALSE ;
+	                        pip->fl.backward = (v > 0) ? TRUE : FALSE ;
 			    }
 	                    break ;
 	                } /* end switch */
@@ -978,7 +978,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            rs1 = bclose(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                bprintf(pip->efp,fmt,pn,rs) ;
 	                bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
