@@ -502,7 +502,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -848,7 +848,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,SHIO *ofp,cchar *afn)
 	        rs1 = shio_close(afp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*fmt ;
 		    fmt = "%s: inaccessible argument-list (%d)\n" ;
