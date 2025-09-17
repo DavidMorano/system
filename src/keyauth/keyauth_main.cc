@@ -469,11 +469,11 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'n':
-	                        pip->f.no = TRUE ;
+	                        pip->fl.no = TRUE ;
 	                        break ;
 
 /* quiet mode */
@@ -890,7 +890,7 @@ static int process(PROGINFO *pip,cchar *un)
 				rs) ;
 #endif
 	            rs = SR_OK ;
-	            if ((vl >= 2) || pip->f.no) {
+	            if ((vl >= 2) || pip->fl.no) {
 	                fmt = "already key-logged in!\n" ;
 	                progout_printf(pip,fmt) ;
 	            }
@@ -903,7 +903,7 @@ static int process(PROGINFO *pip,cchar *un)
 	                fmt = "%s: not already key-logged in\n" ;
 	                bprintf(pip->efp,fmt,pn) ;
 	            }
-	            if (pip->f.no) {
+	            if (pip->fl.no) {
 	                fmt = "not key-logged in!\n" ;
 	                progout_printf(pip,fmt) ;
 	            } else {
