@@ -25,9 +25,7 @@
 
 	$ testnetfile <file>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -47,7 +45,6 @@
 #include	<getusername.h>
 #include	<netfile.h>
 #include	<vecstr.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
