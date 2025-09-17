@@ -99,10 +99,10 @@ char		name[] ;
 
 	} /* end if */
 
-	if (pip->f.print || pip->f.verbose)
+	if (pip->fl.print || pip->fl.verbose)
 	    bprintf(ofp,"device=%s\n",bdp) ;
 
-	if (pip->f.print || pip->f.fakeit) 
+	if (pip->fl.print || pip->fl.fakeit) 
 		return SR_OK ;
 
 
@@ -119,7 +119,7 @@ char		name[] ;
 
 /* hang it up, baby ! */
 
-	        if (! pip->f.fakeit)
+	        if (! pip->fl.fakeit)
 	            rs = uc_tcsetattr(tfd,TCSANOW,&settings) ;
 
 	    }
