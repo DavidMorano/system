@@ -662,6 +662,11 @@ queue.o:		queue.dir
 queue.dir:
 	makesubdir $@
 
+# MAPX
+mapx.o:			mapx.dir
+mapx.dir:
+	makesubdir $@
+
 # CHRONO
 chrono.o:		chrono.dir
 chrono.dir:
