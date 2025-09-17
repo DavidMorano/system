@@ -35,7 +35,7 @@ struct initinfo_head {
 	vecstr		entries ;
 	time_t		ti_check ;
 	time_t		ti_pread ;
-	INITINFO_FL	f ;
+	INITINFO_FL	fl ;
 	uint		magic ;
 } ;
 
