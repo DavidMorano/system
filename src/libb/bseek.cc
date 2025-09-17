@@ -83,11 +83,11 @@ int bseek(bfile *op,off_t wo,int w) noex {
 	int		ro = 0 ;
 	if ((rs = bfile_magic(op)) > 0) {
 	    rs = SR_NOTSEEK ;
-	    if (! op->f.notseek) {
+	    if (! op->fl.notseek) {
 		ro = intsat(op->offset) ;
 		if ((rs = notappend(op,wo,w)) > 0) {
 		    off_t	ao = 0 ;
-	            if (op->f.writing) {
+	            if (op->fl.writing) {
 	                if (op->len > 0) {
 	                    rs = bfile_flush(op) ;
 	                }
