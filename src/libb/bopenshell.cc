@@ -354,7 +354,7 @@ int bopenshell(bfile **fpa,cchar *cmd) noex {
 
 #ifdef	COMMENT
 	        if ((i == 1) || (i == 2))
-	            fpa[i]->f.bufline = TRUE ;
+	            fpa[i]->fl.bufline = TRUE ;
 #endif
 
 #if	BFILE_DUP
