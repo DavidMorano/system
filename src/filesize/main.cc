@@ -165,10 +165,10 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	(void) memset(&pip->f,0,sizeof(PROGINFO_flags)) ;
 
-	pip->f.nochange = FALSE ;
-	pip->f.quiet = FALSE ;
-	pip->f.follow = FALSE ;
-	pip->f.suffix = FALSE ;
+	pip->fl.nochange = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.follow = FALSE ;
+	pip->fl.suffix = FALSE ;
 
 
 /* process program arguments */
@@ -331,7 +331,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* follow symbolic links */
 	                case argopt_follow:
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    break ;
 
 /* default action and user specified help */
@@ -383,7 +383,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* take input file arguments from STDIN */
 	                    case 'f':
-				pip->f.follow = TRUE ;
+				pip->fl.follow = TRUE ;
 	                        break ;
 
 /* file name length restriction */
@@ -412,12 +412,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* quiet */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* require a suffix for file names */
@@ -574,7 +574,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    }
 #endif /* CF_DEBUG */
 
-	    pip->f.suffix = TRUE ;
+	    pip->fl.suffix = TRUE ;
 
 	} /* end if */
 
@@ -600,11 +600,11 @@ int main(int argc,cchar **argv,cchar **envv)
 	            switch (kwi) {
 
 	            case opt_follow:
-	                pip->f.follow = TRUE ;
+	                pip->fl.follow = TRUE ;
 	                break ;
 
 	            case opt_nofollow:
-	                pip->f.follow = FALSE ;
+	                pip->fl.follow = FALSE ;
 	                break ;
 
 	            } /* end switch */
@@ -698,7 +698,7 @@ int main(int argc,cchar **argv,cchar **envv)
 #endif
 
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(efp,
 	                "%s: could not open the argument list file\n",
 	                pip->progname) ;
