@@ -210,7 +210,7 @@ int bclose(bfile *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = bfile_magic(op)) >= 0) {
-            if (op->f.writing && (op->len > 0)) {
+            if (op->fl.writing && (op->len > 0)) {
                 rs1 = bfile_flush(op) ;
                 if (rs >= 0) rs = rs1 ;
             }
@@ -260,10 +260,10 @@ int sub_bopen::operator () (mainv av,mainv ev) noex {
 int sub_bopen::getfile() noex {
 	int		rs = SR_OK ;
 	if ((rs = getfdfile(fn,-1)) >= 0) {	/* "standard" file */
-	    op->f.filedesc = true ;
+	    op->fl.filedesc = true ;
 	    rs = openfd(rs) ;
 	} else if (rs == SR_EMPTY) {		/* "null" file */
-	    op->f.nullfile = true ;
+	    op->fl.nullfile = true ;
 	} else if (rs != SR_DOM) {
 	    rs = openreg() ;
 	}
@@ -300,7 +300,7 @@ int sub_bopen::openadj() noex {
 	    }
 	    if ((fl & O_APPEND) && (! (of & O_APPEND))) {
 	        nof |= O_APPEND ;
-		op->f.append = true ;
+		op->fl.append = true ;
 	    }
 	    if (nof) {
 		op->of = nof ;
@@ -353,15 +353,15 @@ int sub_bopen::bufsize() noex {
 	            } else if (S_ISCHR(sb.st_mode)) {
 	                if (isatty(op->fd)) {
 	                    bsize = min(maxline,2048) ;
-	                    op->f.terminal = true ;
+	                    op->fl.terminal = true ;
 	                    op->bm = bfilebm_line ;
 	                } /* end if (is a terminal) */
 	            } else if (S_ISSOCK(sb.st_mode)) {
-	                op->f.network = true ;
+	                op->fl.network = true ;
 	                bsize = (64*1024) ;
 	                op->bm = bfilebm_line ;
 	            }
-		    op->f.notseek = f_notseek ;
+		    op->fl.notseek = f_notseek ;
 	        } /* end if (fstat) */
 	    } /* end if (maxlinelen) */
 	} /* end if (pagesize) */
@@ -420,7 +420,7 @@ static int bfile_opts(bfile *op) noex {
 	    rs = uc_fminmod(op->fd,om) ;
 	}
 	if ((rs >= 0) && (of & O_NETWORK)) {
-	    op->f.network = true ;
+	    op->fl.network = true ;
 	}
 	return rs ;
 }
@@ -429,16 +429,16 @@ static int bfile_opts(bfile *op) noex {
 static int bfile_mapbegin(bfile *op) noex {
 	cint		nm = BFILE_NMAPS ;
 	int		rs = SR_OK ;
-	if (op->f.mappable) {
+	if (op->fl.mappable) {
 	    cint	sz = (nm * sizeof(bfile_map)) ;
 	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
 	        op->maps = maper(vp) ;
 	        for (int i = 0 ; i < nm ; i += 1) {
-	            op->maps[i].f.valid = false ;
+	            op->maps[i].fl.valid = false ;
 	            op->maps[i].bdata = nullptr ;
 	        } /* end for */
 	        op->bp = nullptr ;
-	        op->f.mapinit = true ;
+	        op->fl.mapinit = true ;
 	    } /* end if (m-a) */
 	} /* end if (f_mappable) */
 	return rs ;
@@ -450,7 +450,7 @@ static int bfile_mapend(bfile *op) noex {
 	int		rs1 ;
 	if (op->maps) {
 	    for (int i = 0 ; i < BFILE_NMAPS ; i += 1) {
-	        if ((op->maps[i].f.valid) && op->maps[i].bdata) {
+	        if ((op->maps[i].fl.valid) && op->maps[i].bdata) {
 		    void	*md = op->maps[i].bdata ;
 		    csize	ms = op->maps[i].bsize ;
 	            rs1 = u_mmapend(md,ms) ;
@@ -475,19 +475,19 @@ int sub_bopen::mkoflags() noex {
 	    cint	sc = mkchar(*osp++) ;
 	    switch (sc) {
 	    case 'r':
-	        op->f.rd = true ;
+	        op->fl.rd = true ;
 	        break ;
 	    case 'w':
-		op->f.wr = true ;
+		op->fl.wr = true ;
 	        break ;
 	    case 'm':
 	    case '+':
-	        op->f.rd = true ;
-		op->f.wr = true ;
+	        op->fl.rd = true ;
+		op->fl.wr = true ;
 	        break ;
 	    case 'a':
 	        of |= O_APPEND ;
-		op->f.append = true ;
+		op->fl.append = true ;
 	        break ;
 	    case 'b': /* POSIX "binary" mode -- nothing on real UNIXes® */
 	        break ;
@@ -504,7 +504,7 @@ int sub_bopen::mkoflags() noex {
 	        of |= O_NDELAY ;
 	        break ;
 	    case 'p':
-	        op->f.program = true ;
+	        op->fl.program = true ;
 	        break ;
 	    case 'x':
 	        of |= O_EXCL ;
@@ -514,16 +514,16 @@ int sub_bopen::mkoflags() noex {
 		break ;
 	    case 'N':
 	        of |= O_NETWORK ;	/* "network" file */
-		op->f.network = true ;
+		op->fl.network = true ;
 		break ;
 	    case 'M':
 	        of |= O_MINMODE ;	/* minimum file-permissions-mode */
 		break ;
 	    } /* end switch */
 	} /* end while (open flags) */
-	if (op->f.rd && op->f.wr) {
+	if (op->fl.rd && op->fl.wr) {
 	    of |= O_RDWR ;
-	} else if (op->f.wr) {
+	} else if (op->fl.wr) {
 	    of |= O_WRONLY ;
 	} else {
 	    of |= O_RDONLY ;
@@ -547,7 +547,7 @@ int sub_bopen::iclose() noex {
 
 sub_isreadonly::operator bool () noex {
 	bfile		*op = sop->op ;
-	return (op->f.rd && (! op->f.wr)) ;
+	return (op->fl.rd && (! op->fl.wr)) ;
 }
 
 
