@@ -116,7 +116,7 @@ struct proginfo	*pip ;
 	    return 1 ;
 	}
 
-	if ((pip->debuglevel <= 1) && (! pip->f.no)) {
+	if ((pip->debuglevel <= 1) && (! pip->fl.no)) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1) {
@@ -131,7 +131,7 @@ struct proginfo	*pip ;
 
 	} /* end if (removed the file) */
 
-	if (pip->f.print)
+	if (pip->fl.print)
 	    bprintf(pip->ofp,"%s\n", name) ;
 
 	return 1 ;
