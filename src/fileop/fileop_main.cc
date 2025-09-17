@@ -56,7 +56,6 @@
 #include	<cfdec.h>
 #include	<field.h>
 #include	<nulstr.h>
-#include	<ucmallreg.h>
 #include	<vstrxcmp.h>
 #include	<getourenv.h>
 #include	<nleadstr.h>
@@ -961,24 +960,24 @@ int main(int argc,mainv argv,mainv envv) {
 	                case argopt_follow:
 	                    pip->final.follow = true ;
 	                    pip->have.follow = true ;
-	                    pip->f.follow = true ;
+	                    pip->fl.follow = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.follow = (rs > 0) ;
+	                            pip->fl.follow = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 	                case argopt_cores:
 	                    pip->final.cores = true ;
-	                    pip->f.cores = true ;
+	                    pip->fl.cores = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.cores = (rs > 0) ;
+	                            pip->fl.cores = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -987,24 +986,24 @@ int main(int argc,mainv argv,mainv envv) {
 	                case argopt_iacc:
 	                case argopt_ignacc:
 	                    pip->final.iacc = true ;
-	                    pip->f.iacc = true ;
+	                    pip->fl.iacc = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.iacc = (rs > 0) ;
+	                            pip->fl.iacc = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 	                case argopt_im:
 	                    pip->final.im = true ;
-	                    pip->f.im = true ;
+	                    pip->fl.im = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.im = (rs > 0) ;
+	                            pip->fl.im = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1043,12 +1042,12 @@ int main(int argc,mainv argv,mainv envv) {
 	                case argopt_ff:
 	                    pip->final.ff = true ;
 	                    pip->have.ff = true ;
-	                    pip->f.ff = true ;
+	                    pip->fl.ff = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.ff = (rs > 0) ;
+	                            pip->fl.ff = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1057,12 +1056,12 @@ int main(int argc,mainv argv,mainv envv) {
 	                case argopt_readable:
 	                    pip->final.readable = true ;
 	                    pip->have.readable = true ;
-	                    pip->f.readable = true ;
+	                    pip->fl.readable = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.readable = (rs > 0) ;
+	                            pip->fl.readable = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1153,7 +1152,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            PARAMOPT	*app = &pip->aparams ;
 	                            cchar	*po = po_prune ;
 	                            rs = paramopt_loads(app,po,argp,argl) ;
-	                            pip->f.prune |= (rs > 0) ;
+	                            pip->fl.prune |= (rs > 0) ;
 	                        }
 	                    } else
 	                        rs = SR_INVALID ;
@@ -1162,12 +1161,12 @@ int main(int argc,mainv argv,mainv envv) {
 /* summary mode (for "lines") */
 	                case argopt_summary:
 	                    pip->final.summary = true ;
-	                    pip->f.summary = true ;
+	                    pip->fl.summary = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.summary = (rs > 0) ;
+	                            pip->fl.summary = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1176,10 +1175,10 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (! pip->final.f_noprog) {
 	                        pip->final.f_noprog = true ;
 	                        pip->have.f_noprog = true ;
-	                        pip->f.f_noprog = true ;
+	                        pip->fl.f_noprog = true ;
 	                        if (avl > 0) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.f_noprog = (rs > 0) ;
+	                            pip->fl.f_noprog = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1210,7 +1209,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -1235,12 +1234,12 @@ int main(int argc,mainv argv,mainv envv) {
 	                    case 'c':
 	                        pip->final.nostop = true ;
 	                        pip->have.nostop = true ;
-	                        pip->f.nostop = true ;
+	                        pip->fl.nostop = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.nostop = (rs > 0) ;
+	                                pip->fl.nostop = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1264,12 +1263,12 @@ int main(int argc,mainv argv,mainv envv) {
 	                    case 'f':
 	                        pip->final.follow = true ;
 	                        pip->have.follow = true ;
-	                        pip->f.follow = true ;
+	                        pip->fl.follow = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.follow = (rs > 0) ;
+	                                pip->fl.follow = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1304,7 +1303,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = true ;
+	                        pip->fl.nochange = true ;
 	                        break ;
 
 /* options */
@@ -1325,12 +1324,12 @@ int main(int argc,mainv argv,mainv envv) {
 	                    case 'q':
 	                        pip->final.quiet = true ;
 	                        pip->have.quiet = true ;
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.quiet = (rs > 0) ;
+	                                pip->fl.quiet = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1339,12 +1338,12 @@ int main(int argc,mainv argv,mainv envv) {
 	                    case 'r':
 	                        pip->final.rmfile = true ;
 	                        pip->have.rmfile = true ;
-	                        pip->f.rmfile = true ;
+	                        pip->fl.rmfile = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.rmfile = (rs > 0) ;
+	                                pip->fl.rmfile = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1395,12 +1394,12 @@ int main(int argc,mainv argv,mainv envv) {
 	                    case 'u':
 	                        pip->final.f_uniq = true ;
 	                        pip->have.f_uniq = true ;
-	                        pip->f.f_uniq = true ;
+	                        pip->fl.f_uniq = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.f_uniq = (rs > 0) ;
+	                                pip->fl.f_uniq = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1436,12 +1435,12 @@ int main(int argc,mainv argv,mainv envv) {
 	                    case 'z':
 	                        pip->final.zargs = true ;
 	                        pip->final.zargs = true ;
-	                        pip->f.zargs = true ;
+	                        pip->fl.zargs = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.zargs = (rs > 0) ;
+	                                pip->fl.zargs = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1628,7 +1627,7 @@ int main(int argc,mainv argv,mainv envv) {
 	if (rs >= 0) {
 	    if ((rs = procopts(pip,&akopts)) >= 0) {
 	        if ((rs = procfts(pip)) >= 0) {
-	            if (pip->f.cores) pip->fts |= (1 << ft_r) ;
+	            if (pip->fl.cores) pip->fts |= (1 << ft_r) ;
 	            if ((rs >= 0) && (pip->debuglevel > 0)) {
 	                rs = procprintfts(pip,po_fts) ;
 	            }
@@ -1642,16 +1641,16 @@ int main(int argc,mainv argv,mainv envv) {
 	        PARAMOPT	*pop = &pip->aparams ;
 	        cchar		*po = po_prune ;
 	        rs = paramopt_loads(pop,po,vp,-1) ;
-	        pip->f.prune |= (rs > 0) ;
+	        pip->fl.prune |= (rs > 0) ;
 	    }
 	}
 
-	if (pip->f.f_noextra) {
-	    pip->f.f_nodev = true ;
-	    pip->f.f_nopipe = true ;
-	    pip->f.f_nosock = true ;
-	    pip->f.f_noname = true ;
-	    pip->f.f_nodoor = true ;
+	if (pip->fl.f_noextra) {
+	    pip->fl.f_nodev = true ;
+	    pip->fl.f_nopipe = true ;
+	    pip->fl.f_nosock = true ;
+	    pip->fl.f_noname = true ;
+	    pip->fl.f_nodoor = true ;
 	}
 
 /* create the 'fnos' value */
@@ -1662,18 +1661,18 @@ int main(int argc,mainv argv,mainv envv) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    debugprintf("main: f_follow=%u\n",pip->f.follow) ;
-	    debugprintf("main: f_nostop=%u\n",pip->f.nostop) ;
-	    debugprintf("main: f_iacc=%u\n",pip->f.iacc) ;
+	    debugprintf("main: f_follow=%u\n",pip->fl.follow) ;
+	    debugprintf("main: f_nostop=%u\n",pip->fl.nostop) ;
+	    debugprintf("main: f_iacc=%u\n",pip->fl.iacc) ;
 	}
 #endif /* CF_DEBUG */
 
 	if (pip->debuglevel > 0) {
 	    bfile	*efp = (bfile *) pip->efp ;
 	    cchar	*pn = pip->progname ;
-	    bprintf(efp,"%s: follow=%u\n",pn,pip->f.follow) ;
-	    bprintf(efp,"%s: nostop=%u\n",pn,pip->f.nostop) ;
-	    bprintf(efp,"%s: iacc=%u\n",pn,pip->f.iacc) ;
+	    bprintf(efp,"%s: follow=%u\n",pn,pip->fl.follow) ;
+	    bprintf(efp,"%s: nostop=%u\n",pn,pip->fl.nostop) ;
+	    bprintf(efp,"%s: iacc=%u\n",pn,pip->fl.iacc) ;
 	}
 
 /* check a few more things */
@@ -1684,7 +1683,7 @@ int main(int argc,mainv argv,mainv envv) {
 #ifdef	COMMENT
 	if (pip->debuglevel > 0)
 	    bfile	*efp = (bfile *) pip->efp ;
-	    bprintf(efp,"%s: follow=%u\n",pip->progname,pip->f.follow) ;
+	    bprintf(efp,"%s: follow=%u\n",pip->progname,pip->fl.follow) ;
 #endif
 
 	if ((rs >= 0) && (pip->nice > 0)) {
@@ -1752,7 +1751,7 @@ int main(int argc,mainv argv,mainv envv) {
 	}
 
 #ifdef	COMMENT
-	if ((rs >= 0) && (pan == 0) && (! pip->f.zargs) && (! pip->f.quiet)) {
+	if ((rs >= 0) && (pan == 0) && (! pip->fl.zargs) && (! pip->fl.quiet)) {
 	    ex = EX_USAGE ;
 	    bprintf(pip->efp,"%s: no files or directories were specified\n",
 	        pip->progname) ;
@@ -1765,7 +1764,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    cchar	*fmt = "%s: invalid usage (%d)\n" ;
 	            bprintf(efp,fmt,pip->progname,rs) ;
 	        }
@@ -1937,15 +1936,15 @@ static int procsig(PROGINFO *pip)
 /* create the 'fnos' value */
 static int loadfnos(PROGINFO *pip)
 {
-	if (pip->f.f_nodev) {
+	if (pip->fl.f_nodev) {
 	    bwset(pip->fnos,ft_c) ;
 	    bwset(pip->fnos,ft_b) ;
 	}
-	if (pip->f.f_noname) bwset(pip->fnos,ft_n) ;
-	if (pip->f.f_nopipe) bwset(pip->fnos,ft_p) ;
-	if (pip->f.f_nolink) bwset(pip->fnos,ft_l) ;
-	if (pip->f.f_nosock) bwset(pip->fnos,ft_s) ;
-	if (pip->f.f_nodoor) bwset(pip->fnos,ft_d) ;
+	if (pip->fl.f_noname) bwset(pip->fnos,ft_n) ;
+	if (pip->fl.f_nopipe) bwset(pip->fnos,ft_p) ;
+	if (pip->fl.f_nolink) bwset(pip->fnos,ft_l) ;
+	if (pip->fl.f_nosock) bwset(pip->fnos,ft_s) ;
+	if (pip->fl.f_nodoor) bwset(pip->fnos,ft_d) ;
 	return SR_OK ;
 }
 /* end if (loadfnos) */
@@ -1980,10 +1979,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.f_uniq) {
 	                        pip->final.f_uniq = true ;
 	                        pip->have.f_uniq = true ;
-	                        pip->f.f_uniq = true ;
+	                        pip->fl.f_uniq = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.f_uniq = (rs > 0) ;
+	                            pip->fl.f_uniq = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1991,10 +1990,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case progopt_name:
 	                    if (! pip->final.f_name) {
 	                        pip->final.f_name = true ;
-	                        pip->f.f_name = true ;
+	                        pip->fl.f_name = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.f_name = (rs > 0) ;
+	                            pip->fl.f_name = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2002,10 +2001,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.f_prog) {
 	                        pip->final.f_prog = true ;
 	                        pip->have.f_prog = true ;
-	                        pip->f.f_prog = true ;
+	                        pip->fl.f_prog = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.f_prog = (rs > 0) ;
+	                            pip->fl.f_prog = (rs > 0) ;
 	                        }
 	                    }
 			    break ;
@@ -2013,20 +2012,20 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.f_noprog) {
 	                        pip->final.f_noprog = true ;
 	                        pip->have.f_noprog = true ;
-	                        pip->f.f_noprog = true ;
+	                        pip->fl.f_noprog = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.f_noprog = (rs > 0) ;
+	                            pip->fl.f_noprog = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case progopt_nosock:
 	                    if (! pip->final.f_nosock) {
 	                        pip->final.f_nosock = true ;
-	                        pip->f.f_nosock = true ;
+	                        pip->fl.f_nosock = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.f_nosock = (rs > 0) ;
+	                            pip->fl.f_nosock = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2034,80 +2033,80 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case progopt_nofifo:
 	                    if (! pip->final.f_nopipe) {
 	                        pip->final.f_nopipe = true ;
-	                        pip->f.f_nopipe = true ;
+	                        pip->fl.f_nopipe = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.f_nopipe = (rs > 0) ;
+	                            pip->fl.f_nopipe = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case progopt_nodev:
 	                    if (! pip->final.f_nodev) {
 	                        pip->final.f_nodev = true ;
-	                        pip->f.f_nodev = true ;
+	                        pip->fl.f_nodev = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.f_nodev = (rs > 0) ;
+	                            pip->fl.f_nodev = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case progopt_noname:
 	                    if (! pip->final.f_noname) {
 	                        pip->final.f_noname = true ;
-	                        pip->f.f_noname = true ;
+	                        pip->fl.f_noname = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.f_noname = (rs > 0) ;
+	                            pip->fl.f_noname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case progopt_nolink:
 	                    if (! pip->final.f_nolink) {
 	                        pip->final.f_nolink = true ;
-	                        pip->f.f_nolink= true ;
+	                        pip->fl.f_nolink= true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.f_nolink = (rs > 0) ;
+	                            pip->fl.f_nolink = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case progopt_noextra:
 	                    if (! pip->final.f_noextra) {
 	                        pip->final.f_noextra = true ;
-	                        pip->f.f_noextra = true ;
+	                        pip->fl.f_noextra = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.f_noextra = (rs > 0) ;
+	                            pip->fl.f_noextra = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case progopt_nodotdir:
 	                    if (! pip->final.f_nodotdir) {
 	                        pip->final.f_nodotdir = true ;
-	                        pip->f.f_nodotdir = true ;
+	                        pip->fl.f_nodotdir = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.f_nodotdir = (rs > 0) ;
+	                            pip->fl.f_nodotdir = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case progopt_cores:
 	                    if (! pip->final.cores) {
 	                        pip->final.cores = true ;
-	                        pip->f.cores = true ;
+	                        pip->fl.cores = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.cores = (rs > 0) ;
+	                            pip->fl.cores = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case progopt_summary:
 	                    if (! pip->final.summary) {
 	                        pip->final.summary = true ;
-	                        pip->f.summary = true ;
+	                        pip->fl.summary = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.summary = (rs > 0) ;
+	                            pip->fl.summary = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2115,10 +2114,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case progopt_ignasscomm:
 	                    if (! pip->final.ignasscomm) {
 	                        pip->final.ignasscomm = true ;
-	                        pip->f.ignasscomm = true ;
+	                        pip->fl.ignasscomm = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.ignasscomm = (rs > 0) ;
+	                            pip->fl.ignasscomm = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2144,7 +2143,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        PARAMOPT	*pop = &pip->aparams ;
 	                        cchar		*po = po_prune ;
 	                        rs = paramopt_loads(pop,po,vp,vl) ;
-	                        pip->f.prune |= (rs > 0) ;
+	                        pip->fl.prune |= (rs > 0) ;
 	                    }
 	                    break ;
 	                case progopt_younger:
@@ -2167,7 +2166,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case progopt_igncomm:
 	                    if (! pip->final.igncomm) {
 	                        pip->final.igncomm = true ;
-	                        pip->f.igncomm = true ;
+	                        pip->fl.igncomm = true ;
 	                        if (vl > 0) {
 	                            cchar	*cp ;
 	                            if (sfshrink(vp,vl,&cp) > 0) {
@@ -2180,10 +2179,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.follow) {
 	                        pip->final.follow = true ;
 	                        pip->have.follow = true ;
-	                        pip->f.follow = true ;
+	                        pip->fl.follow = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.follow = (rs > 0) ;
+	                            pip->fl.follow = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2191,20 +2190,20 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case progopt_ignacc:
 	                    if (! pip->final.iacc) {
 	                        pip->final.iacc = true ;
-	                        pip->f.iacc = true ;
+	                        pip->fl.iacc = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.iacc = (rs > 0) ;
+	                            pip->fl.iacc = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case progopt_im:
 	                    if (! pip->final.im) {
 	                        pip->final.im = true ;
-	                        pip->f.im = true ;
+	                        pip->fl.im = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.im = (rs > 0) ;
+	                            pip->fl.im = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2212,10 +2211,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.quiet) {
 	                        pip->final.quiet = true ;
 	                        pip->have.quiet = true ;
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.quiet = (rs > 0) ;
+	                            pip->fl.quiet = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2223,10 +2222,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.ff) {
 	                        pip->final.ff = true ;
 	                        pip->have.ff = true ;
-	                        pip->f.ff = true ;
+	                        pip->fl.ff = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.ff = (rs > 0) ;
+	                            pip->fl.ff = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2234,10 +2233,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.readable) {
 	                        pip->final.readable = true ;
 	                        pip->have.readable = true ;
-	                        pip->f.readable = true ;
+	                        pip->fl.readable = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.readable = (rs > 0) ;
+	                            pip->fl.readable = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2245,10 +2244,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.rmfile) {
 	                        pip->final.rmfile = true ;
 	                        pip->have.rmfile = true ;
-	                        pip->f.rmfile = true ;
+	                        pip->fl.rmfile = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.rmfile = (rs > 0) ;
+	                            pip->fl.rmfile = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2387,7 +2386,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 #if	CF_DIRS
 	    if (rs >= 0) {
-	        if (pip->f.follow || pip->f.f_uniq) {
+	        if (pip->fl.follow || pip->fl.f_uniq) {
 	            rs = procdir_begin(pip) ;
 	        }
 	    }
@@ -2427,7 +2426,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    } /* end block */
 
 #if	CF_DIRS
-	    if (pip->f.follow || pip->f.f_uniq) {
+	    if (pip->fl.follow || pip->fl.f_uniq) {
 	        rs1 = procdir_end(pip) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -2523,7 +2522,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	        rs1 = bclose(afp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            fmt = "%s: inacessible argument-list (%d)\n" ;
 	            bprintf(efp,fmt,pn,rs) ;
 	            bprintf(efp,"%s: afile=%s\n",pn,afn) ;
@@ -2533,7 +2532,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	} /* end if (processing file argument file list) */
 
 	if ((rs >= 0) && (pip->progmode == progmode_filesize)) {
-	    if ((pip->verboselevel > 0) && (! pip->f.zargs)) {
+	    if ((pip->verboselevel > 0) && (! pip->fl.zargs)) {
 	        bfile	*ofp = (bfile *) pip->ofp ;
 	        long	blocks, blockbytes ;
 
@@ -2626,7 +2625,7 @@ int procname(PROGINFO *pip,cchar *name)
 	}
 #endif
 
-	if (pip->f.im && isNotStat(rs)) {
+	if (pip->fl.im && isNotStat(rs)) {
 	    rs = SR_OK ;
 	    f_go = false ;
 	}
@@ -2641,7 +2640,7 @@ int procname(PROGINFO *pip,cchar *name)
 	}
 #endif
 
-	if ((rs >= 0) && f_go && f_islink && (pip->f.follow || pip->f.ff)) {
+	if ((rs >= 0) && f_go && f_islink && (pip->fl.follow || pip->fl.ff)) {
 
 	    if ((rs = uc_stat(name,&ssb)) >= 0) {
 	        f_isdir = S_ISDIR(ssb.st_mode) ;
@@ -2651,7 +2650,7 @@ int procname(PROGINFO *pip,cchar *name)
 	        rs = SR_OK ;
 	    } else if (rs == SR_LOOP) {
 	        rs = SR_OK ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	    	    bfile	*efp = (bfile *) pip->efp ;
 	            cchar	*pn = pip->progname ;
 	            cchar	*fmt ;
@@ -2671,13 +2670,13 @@ int procname(PROGINFO *pip,cchar *name)
 	} /* end if */
 
 	if ((rs >= 0) && f_go) {
-	    if (pip->f.readable && (! f_islink)) {
+	    if (pip->fl.readable && (! f_islink)) {
 	        if ((rs = uc_access(name,R_OK)),isNotAccess(rs)) {
 	            f_go = false ;
 	            rs = SR_OK ;
 	        }
 	    }
-	    if ((rs >= 0) && f_go && pip->f.prune) {
+	    if ((rs >= 0) && f_go && pip->fl.prune) {
 	        rs = procprune(pip,name) ;
 	        f_go = (rs > 0) ;
 	    }
@@ -2714,7 +2713,7 @@ static int procdir(PROGINFO *pip,cchar *np,USTAT *sbp)
 
 	while ((nl > 0) && (np[nl-1] == '/')) nl -= 1 ;
 
-	if (pip->f.f_nodotdir && (nl > 0)) {
+	if (pip->fl.f_nodotdir && (nl > 0)) {
 	    if (np[0] == '.') f_cont = false ;
 	}
 
@@ -2722,7 +2721,7 @@ static int procdir(PROGINFO *pip,cchar *np,USTAT *sbp)
 
 #if	CF_DIRS
 	if (f_cont) {
-	    if (pip->f.follow || pip->f.f_uniq) {
+	    if (pip->fl.follow || pip->fl.f_uniq) {
 	        const dev_t	dev = sbp->st_dev ;
 	        const ino_t	ino = sbp->st_ino ;
 	        int		f = true ;
@@ -2781,17 +2780,17 @@ static int procdirs(PROGINFO *pip,cchar *np,int nl,USTAT *sbp)
 	    bp = strwcpy(fname,np,nl) ;
 	    *bp++ = '/' ;
 
-	    if (pip->f.follow) {
+	    if (pip->fl.follow) {
 	        opts |= FSDIRTREE_MFOLLOW ;
 	        opts |= FSDIRTREE_MUNIQDIR ;
 	    }
-	    if (pip->f.f_uniq) {
+	    if (pip->fl.f_uniq) {
 	        opts |= FSDIRTREE_MUNIQDIR ;
 	    }
 
 	    if ((rs = fsdirtree_open(&d,np,opts)) >= 0) {
 	        cint	mpl = MAXPATHLEN ;
-	        if (pip->f.prune) {
+	        if (pip->fl.prune) {
 	            rs = fsdirtree_prune(&d,pip->prune) ;
 	        }
 	        if (rs >= 0) {
@@ -2827,11 +2826,11 @@ static int procdirs(PROGINFO *pip,cchar *np,int nl,USTAT *sbp)
 	        rs1 = fsdirtree_close(&d) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else if (isNotAccess(rs)) {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            fmt = "%s: no-access dir=%s (%d)\n" ;
 	            bprintf(efp,fmt,pn,np,rs) ;
 	        }
-	        if (pip->f.iacc) rs = SR_OK ;
+	        if (pip->fl.iacc) rs = SR_OK ;
 	    } /* end if (fsdirtree) */
 
 #if	CF_DEBUG
@@ -2872,7 +2871,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 	if (DEBUGLEVEL(4)) {
 	    cchar	*cp = strfiletype(sbp) ;
 	    debugprintf("main/procother: ent name=%s ft=%s\n",name,cp) ;
-	    debugprintf("main/procother: f_prog=%u\n",pip->f.f_prog) ;
+	    debugprintf("main/procother: f_prog=%u\n",pip->fl.f_prog) ;
 	}
 #endif /* CF_DEBUG */
 
@@ -2929,7 +2928,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 	    debugprintf("main/procother: symbolic link check?\n") ;
 #endif
 
-	if (f_process && S_ISLNK(sbp->st_mode) && pip->f.f_nolink) {
+	if (f_process && S_ISLNK(sbp->st_mode) && pip->fl.f_nolink) {
 	    f_process = false ;
 	}
 
@@ -2942,7 +2941,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 #endif
 
 #if	CF_FOLLOWFILES
-	    if (pip->f.follow) {
+	    if (pip->fl.follow) {
 	        sbp = &ssb ;
 	        if ((rs = uc_stat(name,&ssb)) >= 0) { /* STAT */
 	            f_islink = S_ISLNK(ssb.st_mode) ;
@@ -2955,14 +2954,14 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 	            if (DEBUGLEVEL(4))
 	                debugprintf("main/procother: symlink DANGLING\n") ;
 #endif
-	            if (! pip->f.nostop) f_process = false ;
+	            if (! pip->fl.nostop) f_process = false ;
 	            rs = SR_OK ;
 	        }
 	    } /* end if (follow link) */
 #endif /* CF_FOLLOWFILES */
 	} /* end if (symbolic-link-file) */
 
-	if ((rs >= 0) && f_process && pip->f.f_uniq) {
+	if ((rs >= 0) && f_process && pip->fl.f_uniq) {
 	    dev_t	dev = sbp->st_dev ;
 	    ino_t	ino = sbp->st_ino ;
 	    if ((rs = procuniq_have(pip,dev,ino)) > 0) {
@@ -2971,7 +2970,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 	}
 
 #if	CF_DIRS
-	if ((rs >= 0) && f_process && (pip->f.follow || pip->f.f_uniq)) {
+	if ((rs >= 0) && f_process && (pip->fl.follow || pip->fl.f_uniq)) {
 	    cint	nl = strlen(name) ;
 	    int		f = true ;
 	    if ((rs = procdir_haveprefix(pip,name,nl)) >= 0) {
@@ -2993,14 +2992,14 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 
 /* prepare for suffix checks */
 
-	f_suf = (pip->have.sufreq || pip->f.sufacc || pip->f.sufrej) ;
+	f_suf = (pip->have.sufreq || pip->fl.sufacc || pip->fl.sufrej) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("main/procother: f_suf=%u\n",f_suf) ;
 #endif
 
-	if (f_suf || pip->f.cores) {
+	if (f_suf || pip->fl.cores) {
 	    bnl = sfbasename(name,-1,&bnp) ;
 	}
 
@@ -3041,7 +3040,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 /* check against the suffix-acceptance list */
 
 	            if ((rs >= 0) && f_process) {
-		        if (pip->f.sufacc && (! f_accept)) {
+		        if (pip->fl.sufacc && (! f_accept)) {
 	                    slp = (pip->sufs + suf_acc) ;
 	                    if ((rs = vecpstr_findn(slp,sp,sl)) >= 0) {
 	                        f_accept = true ;
@@ -3054,7 +3053,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 /* check against the suffix-rejectance list */
 
 	            if ((rs >= 0) && f_process) {
-		        if (pip->f.sufrej && (! f_accept)) {
+		        if (pip->fl.sufrej && (! f_accept)) {
 	                    slp = (pip->sufs + suf_rej) ;
 	                    if ((rs1 = vecpstr_findn(slp,sp,sl)) >= 0) {
 	                        f_process = false ;
@@ -3087,7 +3086,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 /* readable */
 
 	if ((rs >= 0) && f_process) {
-	    if (pip->f.readable && (! f_islink)) {
+	    if (pip->fl.readable && (! f_islink)) {
 	        if ((rs = uc_access(name,R_OK)), isNotAccess(rs)) {
 	            f_process = false ;
 	            rs = SR_OK ;
@@ -3104,7 +3103,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 /* check if it is a program (and disallowed) */
 
 	if ((rs >= 0) && f_process) {
-	    if (pip->f.f_noprog && (! f_accept)) {
+	    if (pip->fl.f_noprog && (! f_accept)) {
 	        if (S_ISREG(sbp->st_mode)) {
 	            rs = fileobject(name) ;
 	            f_process = (rs == 0) ;
@@ -3119,7 +3118,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 #endif
 
 	if ((rs >= 0) && f_process) {
-	    if (pip->f.cores && (! f_accept)) {
+	    if (pip->fl.cores && (! f_accept)) {
 	        f_process = (strwcmp("core",bnp,bnl) == 0) ;
 	    }
 	} /* end if (yes-core) */
@@ -3133,7 +3132,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 #endif
 
 	if ((rs >= 0) && f_process) {
-	    if (pip->f.f_prog) {
+	    if (pip->fl.f_prog) {
 	        if (S_ISREG(sbp->st_mode)) {
 	            rs = fileobject(name) ;
 	            f_process = (rs > 0) ;
@@ -3158,7 +3157,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 	        rs = procsize(pip,name,sbp,ckp) ;
 	        break ;
 	    case progmode_filefind:
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    bfile	*ofp = (bfile *) pip->ofp ;
 	            rs = bprintln(ofp,name,-1) ;
 	        }
@@ -3181,11 +3180,11 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 
 /* done */
 
-	if ((pip->debuglevel > 0) || ((rs < 0) && (! pip->f.quiet))) {
+	if ((pip->debuglevel > 0) || ((rs < 0) && (! pip->fl.quiet))) {
 	    int	f = false ;
 	    f = f || (pip->debuglevel > 1) ;
 	    f = f || (! isNotAccess(rs))  ;
-	    f = f || (! pip->f.iacc) ;
+	    f = f || (! pip->fl.iacc) ;
 	    if (f) {
 	        bfile	*efp = (bfile *) pip->efp ;
 	        cchar	*pn = pip->progname ;
@@ -3193,7 +3192,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 	        cchar	*e = (rs < 0) ? " failure" : "" ;
 	        bprintf(efp,fmt,pn,name,rs,f_process,e) ;
 	    }
-	    if (isNotAccess(rs) && pip->f.iacc) {
+	    if (isNotAccess(rs) && pip->fl.iacc) {
 	        rs = SR_OK ;
 	    }
 	} /* end if (print-out) */
@@ -3430,19 +3429,19 @@ static int proclines(PROGINFO *pip,cchar *name,USTAT *sbp,FILEINFO *ckp)
 #endif
 	if (S_ISREG(sbp->st_mode)) {
 	    int		cch = 0 ;
-	    if (pip->f.ignasscomm) {
+	    if (pip->fl.ignasscomm) {
 	        cch = ';' ;
-	    } else if (pip->f.igncomm) {
+	    } else if (pip->fl.igncomm) {
 	        cch = pip->cch ;
 	    }
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
 	        debugprintf("fileop/proclines: f_ignasscomm=%u\n",
-	            pip->f.ignasscomm) ;
+	            pip->fl.ignasscomm) ;
 #endif
 	    if ((rs = filelines(name,cch)) >= 0) {
 	        pip->c_lines += rs ;
-	        if (! pip->f.summary) {
+	        if (! pip->fl.summary) {
 	    	    bfile	*ofp = (bfile *) pip->ofp ;
 	            bprintf(ofp,"%10u %s\n",rs,name) ;
 	        }
@@ -3861,13 +3860,13 @@ static int procsuf_begin(PROGINFO *pip)
 	                if (c > 0) {
 	                    switch (si) {
 	                    case suf_req:
-	                        pip->f.sufreq = true ;
+	                        pip->fl.sufreq = true ;
 	                        break ;
 	                    case suf_acc:
-	                        pip->f.sufacc = true ;
+	                        pip->fl.sufacc = true ;
 	                        break ;
 	                    case suf_rej:
-	                        pip->f.sufrej = true ;
+	                        pip->fl.sufrej = true ;
 	                        break ;
 	                    } /* end switch */
 	                } /* end if */
@@ -4003,7 +4002,7 @@ static int procrm_begin(PROGINFO *pip)
 	int		rs ;
 
 	rs = vecpstr_start(&pip->rmdirs,0,0,0) ;
-	pip->f.rmdirs = (rs >= 0) ;
+	pip->fl.rmdirs = (rs >= 0) ;
 
 	return rs ;
 }
@@ -4033,9 +4032,9 @@ static int procrm_end(PROGINFO *pip) {
 	vecpstr_vcmpq	vcf = vecpstr_vcmp(vstrcmpr) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip->f.rmdirs) {
+	if (pip->fl.rmdirs) {
 	    vecpstr	*rlp = &pip->rmdirs ;
-	    pip->f.rmdirs = false ;
+	    pip->fl.rmdirs = false ;
 	    if ((rs = vecpstr_sort(rlp,cvf)) >= 0) {
 	        cchar	*np{} ;
 	        for (int i = 0 ; vecpstr_get(rlp,i,&np) >= 0 ; i += 1) {
@@ -4057,7 +4056,7 @@ static int proclines_begin(PROGINFO *pip)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("fileop/proclines_begin: progopt_ignasscomm=%u\n",
-	        pip->f.ignasscomm) ;
+	        pip->fl.ignasscomm) ;
 #endif
 	return SR_OK ;
 }
@@ -4068,7 +4067,7 @@ static int proclines_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if (pip == nullptr) return SR_FAULT ;
-	if (pip->f.summary) {
+	if (pip->fl.summary) {
 	    bfile	*ofp = (bfile *) pip->ofp ;
 	    rs = bprintf(ofp,"%10u\n",pip->c_lines) ;
 	}
@@ -4246,7 +4245,7 @@ static int procuniq_begin(PROGINFO *pip)
 	cint	at = 1 ;	/* use 'lookaside(3dam)' */
 	int		rs = SR_OK ;
 
-	if (pip->f.f_uniq) {
+	if (pip->fl.f_uniq) {
 	    hdbhashfunc_t	hf = (hdbhashfunc_t) fileidhash ;
 	    hdbcmpfunc_t	cf = (hdbcmpfunc_t) fileidcmp ;
 	    if ((rs = hdb_start(dbp,n,at,hf,cf)) >= 0) {
@@ -4269,7 +4268,7 @@ static int procuniq_end(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pip->f.f_uniq && pip->open.files) {
+	if (pip->fl.f_uniq && pip->open.files) {
 	    hdb		*dbp = &pip->files ;
 	    hdb_cur	cur ;
 	    hdb_dat	key, val ;
@@ -4366,7 +4365,7 @@ static int procprune_begin(PROGINFO *pip,cchar *pfname)
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = procprune_loadfile(pip,pfname)) >= 0) {
-	    if (pip->f.prune) {
+	    if (pip->fl.prune) {
 	        int	size ;
 	        if ((rs = procprune_size(pip,&size)) > 0) {
 	            cint	n = rs ;
@@ -4455,7 +4454,7 @@ static int procprune_loadfile(PROGINFO *pip,cchar *pfname)
 	        rs1 = bclose(pfp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (bfile) */
-	    if (c > 0) pip->f.prune = true ;
+	    if (c > 0) pip->fl.prune = true ;
 	} /* end if (have file) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -4727,7 +4726,7 @@ static int proclink(PROGINFO *pip,cchar *name,USTAT *sbp, FILEINFO *ckp) noex {
 		    } /* end if */
 	        } /* end if (dolink) */
 
-	        if ((rs == SR_EXIST) && (! pip->f.quiet)) {
+	        if ((rs == SR_EXIST) && (! pip->fl.quiet)) {
 	    	    bfile	*efp = (bfile *) pip->efp ;
 	            cchar	*pn = pip->progname ;
 	            bprintf(efp,"%s: exists w=%u\n",pn,w) ;
@@ -4989,7 +4988,7 @@ static int procsyncer_reg(PROGINFO *pip,cchar *name,USTAT *sbp) noex {
 	        f = f || (sbp->st_mtime > dsb.st_mtime) ;
 	        if (f) {
 	            f_update = true ;
-	            if (pip->f.rmfile) {
+	            if (pip->fl.rmfile) {
 	                f_create = true ;
 	                uc_unlink(dstfname) ;
 	            }
