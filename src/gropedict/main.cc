@@ -825,7 +825,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	        bclose(afp) ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: argument file inaccessible (%d)\n",
 	                pip->progname,rs) ;
