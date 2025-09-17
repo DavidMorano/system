@@ -110,7 +110,7 @@ int		f_eject ;
 	    goto badinfile ;
 
 
-	if (gp->f.headers) {
+	if (gp->fl.headers) {
 
 	    gp->maxlines = gp->maxlines - 2 ;
 	    if ((rs = bcontrol(ifp,BC_STAT,&sb)) < 0) {
@@ -178,7 +178,7 @@ int		f_eject ;
 
 	    while (*lbp == '\014') {
 
-	        if ((gp->debuglevel > 0) || gp->f.verbose)
+	        if ((gp->debuglevel > 0) || gp->fl.verbose)
 	            bprintf(gp->efp,
 	                "%s: requested page break at fn=%d page=%d line=%d\n",
 	                gp->progname,fn,page,line) ;
@@ -200,7 +200,7 @@ int		f_eject ;
 	    if (f_pagebreak) {
 
 	        f_pagebreak = FALSE ;
-	        if ((gp->debuglevel > 0) || gp->f.verbose)
+	        if ((gp->debuglevel > 0) || gp->fl.verbose)
 	            bprintf(gp->efp,
 	                "%s: scheduled page break at fn=%d page=%d line=%d\n",
 	                gp->progname,fn,page,line) ;
@@ -219,7 +219,7 @@ int		f_eject ;
 
 /* are we at a page header ? */
 
-	    if ((line == 0) && gp->f.headers) {
+	    if ((line == 0) && gp->fl.headers) {
 
 	        len2 = sprintf(headline,gp->headerstring,
 	            timestr_edate(sb.st_mtime,timebuf),page + 1) ;
@@ -260,7 +260,7 @@ int		f_eject ;
 	    line += 1 ;
 	    if (line >= gp->maxlines) {
 
-	        if ((gp->debuglevel > 0) || gp->f.verbose)
+	        if ((gp->debuglevel > 0) || gp->fl.verbose)
 	            bprintf(gp->efp,
 	                "%s: forced page break at fn=%d page=%d line=%d\n",
 	                gp->progname,fn,page,line) ;
