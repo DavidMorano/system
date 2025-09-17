@@ -22,9 +22,7 @@
 
 	This is a fairly generic front-end subroutine for a program.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -43,7 +41,6 @@
 #include	<bfile.h>
 #include	<paramopt.h>
 #include	<vecstr.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -499,7 +496,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* follow symbolic links */
 	                case argopt_follow:
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    break ;
 
 /* default action and user specified help */
@@ -548,7 +545,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* options */
@@ -583,12 +580,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* take input file arguments from STDIN */
 	                    case 'f':
-	                        pip->f.follow = TRUE ;
+	                        pip->fl.follow = TRUE ;
 	                        break ;
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* require a suffix for file names */
@@ -621,7 +618,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case 'u':
-	                        pip->f.uniq = TRUE ;
+	                        pip->fl.uniq = TRUE ;
 	                        break ;
 
 /* verbose output */
@@ -783,13 +780,13 @@ int main(int argc,cchar **argv,cchar **envv)
 	                    if ((kwi = matostr(progopts,2,cp,-1)) >= 0) {
 	                        switch (kwi) {
 	                        case progopt_follow:
-	                            pip->f.follow = TRUE ;
+	                            pip->fl.follow = TRUE ;
 	                            break ;
 	                        case progopt_nofollow:
-	                            pip->f.follow = FALSE ;
+	                            pip->fl.follow = FALSE ;
 	                            break ;
 	                        case progopt_uniq:
-	                            pip->f.uniq = TRUE ;
+	                            pip->fl.uniq = TRUE ;
 	                            break ;
 	                        } /* end switch */
 	                    } /* end if (progopts) */
@@ -840,7 +837,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*fmt = "%s: invalid query (%d)\n" ;
 	            bprintf(pip->efp,fmt,pn,rs) ;
@@ -1072,7 +1069,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *pop,
 	        rs1 = bclose(afp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            fmt = "%s: inaccessible argument list file (%d)\n" ;
 	            bprintf(pip->efp,fmt,pn,rs) ;
 	            bprintf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1108,7 +1105,7 @@ static int procereport(PROGINFO *pip,int prs)
 	int		rs = SR_OK ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
-	if (pip->f.uniq && (prs == SR_NOTUNIQ)) {
+	if (pip->fl.uniq && (prs == SR_NOTUNIQ)) {
 	    fmt = "%s: citation was not unique in DB (%d)\n" ;
 	    bprintf(pip->efp,fmt,pn,prs) ;
 	} else {
