@@ -53,7 +53,7 @@ int breserve(bfile *op,int n) noex {
 	    rs = SR_INVALID ;
 	    if (n >= 0) {
 		rs = SR_OK ;
-	        if (op->f.writing) {
+	        if (op->fl.writing) {
 	            cint blenr = intconv(op->bdata + op->bsize - op->bp) ;
 	            if (n > blenr) {
 			rs = bfile_flushn(op,-1) ;
