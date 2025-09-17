@@ -1,23 +1,28 @@
-/* dictfiles */
+/* dictfiles HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 #ifndef	DICTFILES_INCLUDE
-#define	DICTFILES_INCLUDE	1
+#define	DICTFILES_INCLUDE
 
 
-#include	<sys/types.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bfile.h>
-#include	<localmisc.h>
 
-
-/* object defines */
 
 #define	DICTFILES		struct dictfiles_head
+#define	DICTFILES_ENT		struct dictfiles_entry
+#define	DICTFILES_FI		struct dictfiles_file
 #define	DICTFILES_NLETTERS	256
 
 
-struct dictfiles_ent {
+struct dictfiles_entty {
 	ulong		len ;
 	ulong		usage ;
 	int		fi ;
@@ -32,32 +37,27 @@ struct dictfiles_file {
 } ;
 
 struct dictfiles_head {
-	ulong		magic ;
-	struct dictfiles_ent	e[DICTFILES_NLETTERS] ;
-	struct dictfiles_file	*files ;
+	DICT^FILES_FI	*files ;
 	char		*dictdname ;
 	char		*prefix ;
+	DICTFILES_ENT	e[DICTFILES_NLETTERS] ;
+	uint		magic ;
 	int		maxopen ;
 	int		nopen ;
 	int		usage ;		/* counter */
 } ;
 
+typedef	DICTFILES	dictfiles ;
+typedef	DICTFILES_ENT	dictfiles_ent ;
+typedef	DICTFILES_FI	dictfiles_fi ;
 
-#if	(! defined(DICTFILES_MASTER)) || (DICTFILES_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int dictfiles_open(dictfiles *,int,cchar *,cchar *) noex ;
+extern int dictfiles_write(dictfiles *,cchar *,int) noex ;
+extern int dictfiles_close(dictfiles *) noex ;
 
-extern int dictfiles_open(DICTFILES *,int,const char *,const char *) ;
-extern int dictfiles_write(DICTFILES *,const char *,int) ;
-extern int dictfiles_close(DICTFILES *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* DICTFILES_MASTER */
+EXTERNC_end
 
 
 #endif /* DICTFILES_INCLUDE */
