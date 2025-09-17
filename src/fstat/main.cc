@@ -512,7 +512,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* set the output format type */
@@ -757,7 +757,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	        bclose(&afile) ;
 	    } else {
-		if (! pip->f.quiet) {
+		if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: inaccessible argument list file (%d)\n",
 	                pip->progname,rs) ;
