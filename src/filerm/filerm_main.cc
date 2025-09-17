@@ -343,21 +343,21 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* remove the dangling AppleDouble files */
 	                case argopt_appledouble:
-	                    pip->f.appledouble = TRUE ;
+	                    pip->fl.appledouble = TRUE ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
 
 /* remove the dangling symbolic links */
 	                case argopt_links:
-	                    pip->f.links = TRUE ;
+	                    pip->fl.links = TRUE ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
 
 /* remove the core files */
 	                case argopt_cores:
-	                    pip->f.cores = TRUE ;
+	                    pip->fl.cores = TRUE ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -378,7 +378,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* burn the file before removal */
 	                case argopt_burn:
-	                    pip->f.burn = TRUE ;
+	                    pip->fl.burn = TRUE ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -454,7 +454,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                    break ;
 
 	                case argopt_follow:
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    break ;
 
 /* default action and user specified help */
@@ -484,7 +484,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -493,12 +493,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* remove all files! */
 	                    case 'a':
-	                        pip->f.all = TRUE ;
+	                        pip->fl.all = TRUE ;
 	                        break ;
 
 /* burn them as we go */
 	                    case 'b':
-	                        pip->f.burn = TRUE ;
+	                        pip->fl.burn = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -511,17 +511,17 @@ int main(int argc,cchar **argv,cchar **envv)
 /* continue on error */
 	                    case 'c':
 	                    case 'f':
-	                        pip->f.force = TRUE ;
+	                        pip->fl.force = TRUE ;
 	                        break ;
 
 /* do NOT actually perform the act */
 	                    case 'n':
-	                        pip->f.no = TRUE ;
+	                        pip->fl.no = TRUE ;
 	                        break ;
 
 /* print out the bad links */
 	                    case 'p':
-	                        pip->f.print = TRUE ;
+	                        pip->fl.print = TRUE ;
 	                        break ;
 
 /* quiet STDOUT */
@@ -531,7 +531,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* recursive */
 	                    case 'r':
-	                        pip->f.recursive = TRUE ;
+	                        pip->fl.recursive = TRUE ;
 	                        break ;
 
 /* verbose output */
@@ -547,12 +547,12 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case 'z':
-	                        pip->f.zargs = TRUE ;
+	                        pip->fl.zargs = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.zargs = (rs > 0) ;
+	                                pip->fl.zargs = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -660,8 +660,8 @@ int main(int argc,cchar **argv,cchar **envv)
 	if (afname == NULL) afname = getenv(VARAFNAME) ;
 
 	pip->rn_opts = 0 ;
-	pip->rn_opts |= (pip->f.follow ? REMOVENAME_MFOLLOW : 0) ;
-	pip->rn_opts |= (pip->f.burn ? REMOVENAME_MBURN : 0) ;
+	pip->rn_opts |= (pip->fl.follow ? REMOVENAME_MFOLLOW : 0) ;
+	pip->rn_opts |= (pip->fl.burn ? REMOVENAME_MBURN : 0) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -671,7 +671,7 @@ int main(int argc,cchar **argv,cchar **envv)
 /* are we instructed to "burn" the files? */
 
 	pip->rvp = NULL ;
-	if (pip->f.burn) {
+	if (pip->fl.burn) {
 
 	    if ((pip->bcount < 0) && (argval != NULL)) {
 	        rs = cfdeci(argval,-1,&v) ;
@@ -704,7 +704,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* OK, we do it */
 
-	if ((rs >= 0) && ((pip->f.print || (pip->verboselevel > 0)))) {
+	if ((rs >= 0) && ((pip->fl.print || (pip->verboselevel > 0)))) {
 
 	    if ((ofname == NULL) || (ofname[0] == '\0') || (ofname[0] == '-'))
 	        ofname = BFILE_STDOUT ;
@@ -780,7 +780,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	        bclose(afp) ;
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            bprintf(pip->efp,
 	                "%s: could not open argument list file (%d)\n",
 	                pip->progname,rs) ;
@@ -796,7 +796,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	    bprintf(ofp,"files processed %u\n",pip->c_processed) ;
 
-	    if (pip->f.no) {
+	    if (pip->fl.no) {
 	        bprintf(ofp,"files removed   %u (would have been)\n",
 	            pip->c_removed) ;
 	    } else
@@ -809,7 +809,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    bprintf(pip->efp,"%s: files processed=%u\n",
 	        pip->progname,pip->c_processed) ;
 
-	    if (pip->f.no) {
+	    if (pip->fl.no) {
 	        bprintf(pip->efp,"%s: files removed=%u (would have been)\n",
 	            pip->progname,pip->c_removed) ;
 
@@ -825,12 +825,12 @@ int main(int argc,cchar **argv,cchar **envv)
 	}
 
 badoutopen:
-	if (pip->f.burn && (pip->rvp != NULL)) {
+	if (pip->fl.burn && (pip->rvp != NULL)) {
 	    randomvar_finish(&rv) ;
 	    pip->rvp = NULL ;
 	}
 
-	if ((rs >= 0) && (! pip->f.zargs) && (c_args <= 0)) {
+	if ((rs >= 0) && (! pip->fl.zargs) && (c_args <= 0)) {
 	    rs = SR_INVALID ;
 	    ex = EX_USAGE ;
 	    bprintf(pip->efp,"%s: no files or directories were specified\n",
