@@ -168,7 +168,7 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
         /* enter here for a lock (or unlock) of a requested area of the file */
 	        case BC_SETLK:
 	        case BC_SETLKW:
-	            if (op->f.writing && (op->len > 0)) {
+	            if (op->fl.writing && (op->len > 0)) {
 	                rs = bfile_flush(op) ;
 	            }
 		    fallthrough ;
@@ -205,7 +205,7 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 	        case BC_INPARTLINE:
 	            {
 	                int	f = (int) va_arg(ap,int) ;
-	                op->f.inpartline = MKBOOL(f) ;
+	                op->fl.inpartline = MKBOOL(f) ;
 	            }
 	            break ;
 	        case BC_GETFL:
@@ -292,7 +292,7 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 	            rs = (op->bm == bfilebm_line) ;
 	            break ;
 	        case BC_ISTERMINAL:
-	            rs = op->f.terminal ;
+	            rs = op->fl.terminal ;
 	            break ;
 	        case BC_SETBUFLINE:
 	            {
@@ -311,7 +311,7 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 	            {
 		        int f = (int) va_arg(ap,int) ;
 	                op->bm = bfilebm_reg ;
-		        if (f && op->f.terminal) op->bm = bfilebm_line ;
+		        if (f && op->fl.terminal) op->bm = bfilebm_line ;
 	            }
 	            break ;
 	        case BC_GETBUFFLAGS:
@@ -319,8 +319,8 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 		        int *rip = (int *) va_arg(ap,int *) ;
 		        if (rip != nullptr) {
 		            int 	v = 0 ;
-		            if (op->f.inpartline) v |= BFILE_FINPARTLINE ;
-		            if (op->f.terminal) v |= BFILE_FTERMINAL ;
+		            if (op->fl.inpartline) v |= BFILE_FINPARTLINE ;
+		            if (op->fl.terminal) v |= BFILE_FTERMINAL ;
 		            switch (op->bm) {
 		            case bfilebm_reg:
 		                v |= BFILE_FBUFDEF ;
@@ -351,10 +351,10 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 		            op->bm = bfilebm_atomic ;
 		        } else if (v & BFILE_FBUFDEF) {
 		            int		bm = bfilebm_reg ;
-		            if (op->f.terminal) bm = bfilebm_line ;
+		            if (op->fl.terminal) bm = bfilebm_line ;
 		            op->bm = bm ;
 		        }
-		        op->f.inpartline = MKBOOL(v & BFILE_FINPARTLINE) ;
+		        op->fl.inpartline = MKBOOL(v & BFILE_FINPARTLINE) ;
 	            }
 	            break ;
 	        case BC_NONBLOCK:
