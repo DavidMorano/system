@@ -409,7 +409,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -597,7 +597,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	} /* end if */
 
 	if (rs < 0) {
-	    if (! pip->f.quiet)
+	    if (! pip->fl.quiet)
 	        bprintf(pip->efp,"%s: no user=%s\n",pip->progname,un) ;
 	    goto baduser ;
 	}
