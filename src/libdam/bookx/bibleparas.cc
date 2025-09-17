@@ -297,7 +297,7 @@ int bibleparas_audit(BIBLEPARAS *op)
 	if (op->magic != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (op->f.vind) {
+	if (op->fl.vind) {
 	    rs = bpi_audit(&op->vind) ;
 	}
 
@@ -607,7 +607,7 @@ static int bibleparas_indopen(BIBLEPARAS *op,SUBINFO *sip)
 	int		rs ;
 
 	if ((rs = bibleparas_indopenseq(op,sip)) >= 0) {
-	    if (op->f.vind) {
+	    if (op->fl.vind) {
 	        rs = bpi_count(&op->vind) ;
 	        op->nverses = rs ;
 	    }
@@ -782,7 +782,7 @@ static int bibleparas_indopenalt(BIBLEPARAS *op,SUBINFO *sip,DIRSEEN *dsp)
 	            if ((rs = bibleparas_indmk(op,ebuf,sip->dt)) >= 0) {
 		        if ((rs = mkpath2(indname,ebuf,op->dbname)) >= 0) {
 	                    rs = bpi_open(&op->vind,indname)  ;
-	                    op->f.vind = (rs >= 0) ;
+	                    op->fl.vind = (rs >= 0) ;
 		        }
 	            }
 		}
@@ -794,11 +794,11 @@ static int bibleparas_indopenalt(BIBLEPARAS *op,SUBINFO *sip,DIRSEEN *dsp)
 
 #if	CF_DEBUGS
 	debugprintf("bibleparas_indopenalt: mid rs=%d f_vind=%u\n",rs,
-	    op->f.vind) ;
+	    op->fl.vind) ;
 #endif
 
 #if	CF_STARTAUDIT
-	if ((rs >= 0) && op->f.vind) {
+	if ((rs >= 0) && op->fl.vind) {
 	    rs = bpi_audit(&op->vind) ;
 	}
 #endif /* CF_STARTAUDIT */
@@ -821,7 +821,7 @@ static int bibleparas_indopencheck(BIBLEPARAS *op,cchar dbname[])
 	    BPI_INFO	binfo ;
 	    if ((rs = bpi_info(&op->vind,&binfo)) >= 0) {
 		if (binfo.ctime >= op->ti_db) {
-		    op->f.vind = TRUE ;
+		    op->fl.vind = TRUE ;
 		} else {
 		    rs = SR_STALE ;
 		}
@@ -985,8 +985,8 @@ static int bibleparas_indclose(BIBLEPARAS *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->f.vind) {
-	    op->f.vind = FALSE ;
+	if (op->fl.vind) {
+	    op->fl.vind = FALSE ;
 	    rs1 = bpi_close(&op->vind) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
