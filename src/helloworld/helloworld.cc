@@ -382,7 +382,7 @@ void	*contextp ;
 
 	pip->efp = stderr ;
 	if ((cp = getenv(VARERRORFNAME)) != NULL) {
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    pip->efp = fopen(cp,"w") ;
 	}
 
@@ -566,7 +566,7 @@ void	*contextp ;
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -701,7 +701,7 @@ void	*contextp ;
 /* OK, we finally do our thing */
 
 	if ((outfname != NULL) && (outfname[0] != '\0')) {
-	    pip->f.outfile = TRUE ;
+	    pip->fl.outfile = TRUE ;
 	    ofp = fopen(outfname,"w") ;
 	}
 
@@ -800,7 +800,7 @@ void	*contextp ;
 
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 
 	            fprintf(pip->efp,
 	                "%s: could not open argument list file\n",
@@ -826,10 +826,10 @@ void	*contextp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_helloworlder: f_outfile=%u\n",pip->f.outfile) ;
+	    debugprintf("b_helloworlder: f_outfile=%u\n",pip->fl.outfile) ;
 #endif
 
-	if (pip->f.outfile) {
+	if (pip->fl.outfile) {
 	    fclose(ofp) ;
 	} else
 	    fflush(ofp) ;
@@ -837,7 +837,7 @@ void	*contextp ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
 	debugprintf("b_helloworlder: ex=%u rs=%d nouser=%u\n",
-		ex,rs,lip->f.nouser) ;
+		ex,rs,lip->fl.nouser) ;
 #endif
 
 done:
@@ -878,7 +878,7 @@ retearly:
 
 /* early return thing */
 ret2:
-	if (pip->f.errfile) {
+	if (pip->fl.errfile) {
 	    fclose(pip->efp) ;
 	} else
 	    fflush(pip->efp) ;
