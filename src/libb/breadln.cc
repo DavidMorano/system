@@ -96,7 +96,7 @@ int breadlnto(bfile *op,char *ubuf,int ulen,int to) noex {
 	int		rlen = 0 ;
 	if ((rs = bfile_magic(op,ubuf)) > 0) {
 	    if ((rs = bfile_ckrd(op)) >= 0) {
-		if (op->f.mapinit) {
+		if (op->fl.mapinit) {
 		    rs = breadlnmap(op,ubuf,ulen) ;
 		    rlen = rs ;
 		} else {
@@ -136,7 +136,7 @@ static int breadlnmap(bfile *op,char *ubuf,int ulen) noex {
 
 	        i = (runoff / op->pagesize) & (BFILE_NMAPS - 1) ;
 	        baseoff = runoff & (~ pagemask) ;
-	        if ((! op->maps[i].f.valid) || (op->maps[i].bdata == np)
+	        if ((! op->maps[i].fl.valid) || (op->maps[i].bdata == np)
 	            || (op->maps[i].offset != baseoff)) {
 
 	            bfile_pagein(op,runoff,i) ;
@@ -216,7 +216,7 @@ static int breadlnreg(bfile *op,char *ubuf,int ulen,int to) noex {
 	while ((rs >= 0) && (ulen > 0)) {
 
 	    if (op->len == 0) {
-	        if (f_partial && op->f.inpartline) break ;
+	        if (f_partial && op->fl.inpartline) break ;
 	        rs = breload(op,to,opts) ;
 	        if (rs <= 0) break ;
 	        if (op->len < op->bsize) f_partial = true ;
@@ -264,7 +264,7 @@ static int breload(bfile *op,int to,int opts) noex {
 	int		maxeof ;
 	int		neof = 0 ;
 	int		len = 0 ;
-	maxeof = (op->f.network && (to < 0)) ? BFILE_MAXNEOF : 1 ;
+	maxeof = (op->fl.network && (to < 0)) ? BFILE_MAXNEOF : 1 ;
 	while ((rs >= 0) && (len == 0) && (neof < maxeof)) {
 	    if (to >= 0) {
 	        rs = uc_reade(op->fd,op->bdata,op->bsize,to,opts) ;
