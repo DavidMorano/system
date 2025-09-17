@@ -118,7 +118,7 @@ int bopenprog(bfile *op,cc *pname,cc *os,mainv argv,mainv envv) noex {
 
 	memclear(op) ;
 	op->fd = -1 ;
-	op->f.notseek = true ;
+	op->fl.notseek = true ;
 
 	oflags = mkoflags(os,&boflags) ;
 	oflags |= O_CLOEXEC ;
