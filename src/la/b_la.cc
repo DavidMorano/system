@@ -711,7 +711,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -930,7 +930,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1650,7 +1650,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	lip->pip = pip ;
 	lip->to = -1 ;
 
-	lip->f.percache = true ;
+	lip->fl.percache = true ;
 
 	return rs ;
 }
@@ -1663,7 +1663,7 @@ static int locinfo_finish(LOCINFO *lip) noex {
 	if (lip == nullptr) return SR_FAULT ;
 
 	if_constexpr (f_percache) {
-	    if (lip->f.percache) {
+	    if (lip->fl.percache) {
 	        if ((rs1 = percache_finireg(&pc)) > 0) {
 	            rs1 = uc_atexit(ourfini) ;
 	        }
@@ -1671,11 +1671,11 @@ static int locinfo_finish(LOCINFO *lip) noex {
 	    }
 	} /* end if_constexpr (f_percache) */
 
-	if ((lip->fname != nullptr) && lip->f.allocfname) {
+	if ((lip->fname != nullptr) && lip->fl.allocfname) {
 	    rs1 = uc_free(lip->fname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    lip->fname = nullptr ;
-	    lip->f.allocfname = FALSE ;
+	    lip->fl.allocfname = FALSE ;
 	}
 
 	if (lip->sysdomain != nullptr) {
@@ -1751,8 +1751,8 @@ static int locinfo_flags(LOCINFO *lip,int f_init,int f_nocache) noex {
 
 	if (lip == nullptr) return SR_FAULT ;
 
-	lip->f.init = f_init ;
-	lip->f.nocache = f_nocache ;
+	lip->fl.init = f_init ;
+	lip->fl.nocache = f_nocache ;
 
 	if_constexpr (f_percache) {
 	    if (f_init) {
@@ -1796,8 +1796,8 @@ static int locinfo_uname(LOCINFO *lip)
 {
 	int		rs = 1 ; /* cache-hit indication */
 
-	if (! lip->f.uname) {
-	    lip->f.uname = true ;
+	if (! lip->fl.uname) {
+	    lip->fl.uname = true ;
 	    rs = uinfo_name(&lip->uname) ;
 	}
 
@@ -1810,8 +1810,8 @@ static int locinfo_uaux(LOCINFO *lip)
 {
 	int		rs = 1 ; /* cache-hit indication */
 
-	if (! lip->f.uaux) {
-	    lip->f.uaux = true ;
+	if (! lip->fl.uaux) {
+	    lip->fl.uaux = true ;
 	    rs = uinfo_aux(&lip->uaux) ;
 	}
 
@@ -1857,7 +1857,7 @@ static int locinfo_fsdir(LOCINFO *lip)
 	    if ((rs = getuserhome(hbuf,hlen,"-")) >= 0) {
 	        cchar	**vpp = &lip->fname ;
 	        if ((rs = locinfo_setentry(lip,vpp,hbuf,rs)) >= 0) {
-	            lip->f.allocfname = true ;
+	            lip->fl.allocfname = true ;
 	        }
 	    }
 	} else {
@@ -1880,7 +1880,7 @@ static int locinfo_hostid(LOCINFO *lip) noex {
 	    lip->ti_hostid = pip->daytime ;
 
 	    if_constexpr (f_percache) {
-	        if (lip->f.percache) {
+	        if (lip->fl.percache) {
 	            rs = percache_gethostid(&pc,pip->daytime,&uv) ;
 	        }
 	    } /* end if_constexpr (f_percache) */
@@ -2000,7 +2000,7 @@ static int getnprocs_all(PROGINFO *pip)
 	int		na = 0 ;
 
 #if	CF_PERCACHE
-	if (lip->f.percache) {
+	if (lip->fl.percache) {
 	    rs = percache_getnprocs(&pc,pip->daytime) ;
 	    na = rs ;
 	}
@@ -2029,7 +2029,7 @@ static int getbtime(PROGINFO *pip)
 	    lip->ti_btime = pip->daytime ;
 
 #if	CF_PERCACHE
-	    if (lip->f.percache) {
+	    if (lip->fl.percache) {
 	        rs = percache_getbtime(&pc,pip->daytime,&bt) ;
 	    }
 #endif /* CF_PERCACHE */
@@ -2059,7 +2059,7 @@ static int getnusers(PROGINFO *pip)
 	    lip->ti_nusers = pip->daytime ;
 
 #if	CF_PERCACHE
-	    if (lip->f.percache) {
+	    if (lip->fl.percache) {
 	        rs = percache_getnusers(&pc,pip->daytime) ;
 	        nu = rs ;
 	    }
