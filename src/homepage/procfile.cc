@@ -354,7 +354,7 @@ const char	fname[] ;
 	            cp += 2 ;
 	            cl -= 2 ;
 	        } else
-	            pfp->f.noauthor = TRUE ;
+	            pfp->fl.noauthor = TRUE ;
 
 	        while ((cl > 0) && CHAR_ISWHITE(*cp)) {
 	            cp += 1 ;
@@ -366,7 +366,7 @@ const char	fname[] ;
 		    char	namebuf[REALNAMELEN + 1] ;
 
 
-	            if (! pfp->f.noauthor) {
+	            if (! pfp->fl.noauthor) {
 	
 			rs1 = mkrealname(namebuf,REALNAMELEN,cp,cl) ;
 
@@ -381,7 +381,7 @@ const char	fname[] ;
 
 	            if (f_write && (cl > 0)) {
 
-	                if (! pfp->f.noauthor)
+	                if (! pfp->fl.noauthor)
 	                    bprintf(&ofile,"by ") ;
 
 	                bprintlns(&ofile,LINEFOLDLEN,cp,cl) ;
