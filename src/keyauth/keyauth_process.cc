@@ -25,7 +25,7 @@ static process(PROGINFO *pip,cchar *un)
 		    bprintf(pip->efp,fmt,pn,nbuf) ;
 	        }
 	        if ((rs = onckeyalready(nbuf)) == nrs) {
-		    if (pip->f.n) {
+		    if (pip->fl.n) {
 	                fmt = "not key-logged in!\n" ;
 	                progout_printf(pip,fmt) ;
 		    } else {
@@ -33,7 +33,7 @@ static process(PROGINFO *pip,cchar *un)
 		    }
 		} else (rs == SR_NOTFOUND) {
 		    rs = SR_OK ;
-		    if ((vl >= 2) || pip->f.n) {
+		    if ((vl >= 2) || pip->fl.n) {
 	                fmt = "already key-logged in!\n" ;
 	                progout_printf(pip,fmt) ;
 		    }
