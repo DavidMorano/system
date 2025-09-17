@@ -462,7 +462,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -471,7 +471,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* follow links */
 	                    case 'f':
-	                        pip->f.follow = TRUE ;
+	                        pip->fl.follow = TRUE ;
 	                        break ;
 
 /* file name length restriction */
@@ -498,7 +498,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* options */
@@ -517,7 +517,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* print something !! */
 	                    case 'p':
-	                        pip->f.print = TRUE ;
+	                        pip->fl.print = TRUE ;
 	                        break ;
 
 /* require a suffix for file names */
@@ -789,10 +789,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case progopt_cvtupper:
-	                    pip->f.cvtupper = TRUE ;
+	                    pip->fl.cvtupper = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        pip->f.cvtupper = (rs > 0) ;
+	                        pip->fl.cvtupper = (rs > 0) ;
 	                    }
 	                    break ;
 	                } /* end switch */
@@ -911,7 +911,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 static int procout_begin(PROGINFO *pip,bfile *ofp,cchar *ofn)
 {
 	int		rs = SR_OK ;
-	if (pip->f.print || (pip->verboselevel > 0)) {
+	if (pip->fl.print || (pip->verboselevel > 0)) {
 	    if ((ofn == NULL) || (ofn[0] == '\0')) ofn = BFILE_STDOUT ;
 	    rs = bopen(ofp,ofn,"wct",0644) ;
 	    pip->ofp = ofp ;
@@ -925,7 +925,7 @@ static int procout_end(PROGINFO *pip,bfile *ofp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip->f.print || (pip->verboselevel > 0)) {
+	if (pip->fl.print || (pip->verboselevel > 0)) {
 	    rs1 = bclose(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    pip->ofp = NULL ;
@@ -1010,11 +1010,11 @@ static int procspecer(PROGINFO *pip,void *ofp,cchar name[])
 	    if (DEBUGLEVEL(4))
 	        debugprintf("main/procspecer: LINK\n") ;
 #endif
-	    if (pip->f.follow) {
+	    if (pip->fl.follow) {
 		ustat	sb2 ;
 	        if ((rs = u_stat(name,&sb2)) >= 0) {
 		    if (S_ISDIR(sb2.st_mode)) {
-	        	wopts = (pip->f.follow) ? WDT_MFOLLOW : 0 ;
+	        	wopts = (pip->fl.follow) ? WDT_MFOLLOW : 0 ;
 	        	rs = wdt(name,wopts,checkname,pip) ;
 		    } else {
 	        	if ((rs = checkname(name,&sb2,pip)) >= 0) {
@@ -1035,7 +1035,7 @@ static int procspecer(PROGINFO *pip,void *ofp,cchar name[])
 	    if (DEBUGLEVEL(4))
 	        debugprintf("main/procspecer: DIR\n") ;
 #endif
-	    wopts = (pip->f.follow) ? WDT_MFOLLOW : 0 ;
+	    wopts = (pip->fl.follow) ? WDT_MFOLLOW : 0 ;
 	    rs = wdt(name,wopts,checkname,pip) ;
 	} else {
 #if	CF_DEBUG
@@ -1136,7 +1136,7 @@ static int checkname(cchar *name,ustat *sbp,PROGINFO *pip)
 	            *nnp = 'Þ' ;
 		}
 
-	    } else if (pip->f.cvtupper && (isuc(uch))) {
+	    } else if (pip->fl.cvtupper && (isuc(uch))) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1210,12 +1210,12 @@ static int checkname(cchar *name,ustat *sbp,PROGINFO *pip)
 	if (! f_changed) 
 		return 0 ;
 
-	    if (pip->f.print)
+	    if (pip->fl.print)
 	        bprintf(pip->ofp,"%s\n",name) ;
 
 	    memcpy(newname,name,dirlen) ;
 
-	if (pip->f.nochange) {
+	if (pip->fl.nochange) {
 
 	    if (pip->verboselevel > 0) {
 	        bprintf(pip->ofp,"original=\"%s\"\n",name) ;
@@ -1245,7 +1245,7 @@ static int checkname(cchar *name,ustat *sbp,PROGINFO *pip)
 
 /* we would have created a file name that was too long */
 badfile:
-	if (pip->f.nochange || (pip->verboselevel > 0)) {
+	if (pip->fl.nochange || (pip->verboselevel > 0)) {
 	    bprintf(pip->efp,"%s: length limit original=\"%s\"\n",
 	        pip->progname,name) ;
 	}
