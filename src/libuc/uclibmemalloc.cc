@@ -37,12 +37,15 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstring>		/* |stpncpy(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<errtimer.hh>
 #include	<localmisc.h>
 
 #include	"uclibmemalloc.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
