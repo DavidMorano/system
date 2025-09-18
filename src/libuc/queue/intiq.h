@@ -53,11 +53,11 @@ typedef INTIQ		intiq ;
 
 EXTERNC_begin
 
-extern int	intiq_start(intiq *) noex ;
-extern int	intiq_ins(intiq *,int) noex ;
-extern int	intiq_rem(intiq *,int *) noex ;
-extern int	intiq_count(intiq *) noex ;
-extern int	intiq_finish(intiq *) noex ;
+extern int	intiq_start	(intiq *) noex ;
+extern int	intiq_ins	(intiq *,int) noex ;
+extern int	intiq_rem	(intiq *,int *) noex ;
+extern int	intiq_count	(intiq *) noex ;
+extern int	intiq_finish	(intiq *) noex ;
 
 EXTERNC_end
 
