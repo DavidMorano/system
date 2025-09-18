@@ -87,9 +87,9 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -104,15 +104,15 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static int	tmpx_writable(tmpx *,int) noex ;
-static int	tmpx_openbegin(tmpx *,cchar *) noex ;
-static int	tmpx_openend(tmpx *) noex ;
-static int	tmpx_filesize(tmpx *,time_t) noex ;
-static int	tmpx_fileopen(tmpx *,time_t) noex ;
-static int	tmpx_fileopener(tmpx *op) noex ;
-static int	tmpx_fileclose(tmpx *) noex ;
-static int	tmpx_mapents(tmpx *,int,int,tmpx_ent **) noex ;
-static int	tmpx_mapper(tmpx *,int,uint,uint) noex ;
+static int	tmpx_writable	(tmpx *,int) noex ;
+static int	tmpx_openbegin	(tmpx *,cchar *) noex ;
+static int	tmpx_openend	(tmpx *) noex ;
+static int	tmpx_filesize	(tmpx *,time_t) noex ;
+static int	tmpx_fileopen	(tmpx *,time_t) noex ;
+static int	tmpx_fileopener	(tmpx *op) noex ;
+static int	tmpx_fileclose	(tmpx *) noex ;
+static int	tmpx_mapents	(tmpx *,int,int,tmpx_ent **) noex ;
+static int	tmpx_mapper	(tmpx *,int,uint,uint) noex ;
 
 static int	isproctype(int) noex ;
 
@@ -125,7 +125,7 @@ constexpr int		proctypes[] = {
 	TMPX_TPROCUSER,
 	TMPX_TPROCDEAD,
 	-1
-} ;
+} ; /* end array (proctypes) */
 
 static sysval		pagesize(sysval_ps) ;
 
@@ -219,7 +219,7 @@ int tmpx_check(tmpx *op,time_t dt) noex {
                 if ((dt - op->ti_check) >= TMPX_INTCHECK) {
                     op->ti_check = dt ;
                     if ((dt - op->ti_open) < TMPX_INTOPEN) {
-                        if (USTAT sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
+                        if (ustat sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
                             csize   fs = sb.st_size ;
                             f_ch = (fs != op->fsize) ;
                             f_ch = f_ch || (sb.st_mtime > op->ti_mod) ;
@@ -451,12 +451,12 @@ static int tmpx_writable(tmpx *op,int oflags) noex {
 
 static int tmpx_openbegin(tmpx *op,cchar *dbfn) noex {
 	int		rs ;
-	if (cchar *cp ; (rs = uc_mallocstrw(dbfn,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = libmem.strw(dbfn,-1,&cp)) >= 0) {
 	    custime	dt = getustime ;
 	    op->fname = cp ;
 	    if ((rs = tmpx_fileopen(op,dt)) >= 0) {
 		op->ti_check = dt ;
-		if (USTAT sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
+		if (ustat sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
 	    	    op->fsize = size_t(sb.st_size & SIZE_MAX) ;
 	    	    op->ti_mod = sb.st_mtime ;
 		    op->magic = TMPX_MAGIC ;
@@ -466,7 +466,8 @@ static int tmpx_openbegin(tmpx *op,cchar *dbfn) noex {
 		}
 	    } /* end if (tmpx-fileopen) */
 	    if (rs < 0) {
-		uc_free(op->fname) ;
+		void *vp = voidp(op->fname) ;
+		libmem.free(vp) ;
 		op->fname = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
@@ -482,7 +483,8 @@ static int tmpx_openend(tmpx *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (op->fname) {
-	    rs1 = uc_free(op->fname) ;
+	    void *vp = voidp(op->fname) ;
+	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->fname = nullptr ;
 	}
@@ -496,7 +498,7 @@ static int tmpx_filesize(tmpx *op,time_t dt) noex {
 	    rs = tmpx_fileopen(op,dt) ;
 	}
 	if (rs >= 0) {
-	    if (USTAT sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
+	    if (ustat sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
 	        op->ti_mod = sb.st_mtime ;
 	        op->fsize = sb.st_size ;
 	    }
