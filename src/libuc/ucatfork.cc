@@ -258,7 +258,7 @@ int ucatfork_head::record(void_f sb,void_f sp,void_f sc) noex {
 			ucatfork_ent	*ep{} ;
 	                if ((rs = ucatfork_trackbegin()) >= 0) {
 	                    cint	esz = szof(UCAF_ENT) ;
-	                    if ((rs = uc_libmalloc(esz,&ep)) >= 0) {
+	                    if ((rs = lm_mall(esz,&ep)) >= 0) {
 				ucatfork_list	*lp = &hlist ;
 				entry_load(ep,sb,sp,sc) ;
 				list_add(lp,ep) ;
@@ -295,7 +295,7 @@ int ucatfork_head::expunge(void_f sb,void_f sp,void_f sc) noex {
 				if (entry_match(ep,sb,sp,sc)) {
 				    c += 1 ;
 				    list_rem(lp,ep) ;
-				    uc_libfree(ep) ;
+				    lm_free(ep) ;
 	                        } /* end if (match) */
 	                        ep = nep ;
 	                    } /* end while (deleting matches) */
@@ -329,7 +329,7 @@ int ucatfork_head::trackend() noex {
 	    ftrack = false ;
 	    while (ep) {
 	        nep = ep->next ;
-	        rs1 = uc_libfree(ep) ;
+	        rs1 = lm_free(ep) ;
 		if (rs >= 0) rs = rs1 ;
 	        ep = nep ;
 	    } /* end while */
