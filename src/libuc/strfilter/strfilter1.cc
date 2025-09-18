@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* manage a variable length bit-array */
+/* String-Filter */
 /* version %I% last-modified %G% */
 
 
@@ -54,7 +54,7 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<ulogerror.h>
-#include	<umemalloc.hh>
+#include	<umem.hh>
 #include	<strn.h>		/* |strnbrk(3uc)| */
 #include	<strnul.hh>
 #include	<mkchar.h>
@@ -74,19 +74,12 @@ import sif ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::bitset ;			/* type */
 using std::min ;			/* subroutine */
 using std::max ;			/* subroutine */
 using std::sort ;			/* subroutine (niebloid) */
 using std::binary_search ;		/* subroutine */
-using libu::umemallocstrw ;		/* subroutine */
-using libu::umemalloc ;			/* subroutine */
-using libu::umemvalloc ;		/* subroutine */
-using libu::umemcalloc ;		/* subroutine */
-using libu::umemrealloc ;		/* subroutine */
-using libu::umemfree ;			/* subroutine */
-using libu::umemrsfree ;		/* subroutine */
+using libu::umem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -141,7 +134,7 @@ int strfilter::ifinish() noex {
 	if (magic == STRFILTER_MAGIC) {
 	    rs = SR_OK ;
 	    if (filtarr) {
-		rs1 = umemfree(filtarr) ;
+		rs1 = umem.free(filtarr) ;
 		if (rs >= 0) rs = rs1 ;
 		filtarr = nullptr ;
 	    }
@@ -281,11 +274,11 @@ int strfilter::extend(int n) noex {
 	    if (filtarr == nullptr) {
 	        ne = max((n + 1),defents) ;
 	        sz = (ne + 1) * szof(ulong) ;
-	        rs = umemalloc(sz,&na) ;
+	        rs = umem.malloc(sz,&na) ;
 	    } else {
 	        ne = (ext * 2) ;
 	        sz = (ne + 1) * szof(ulong) ;
-	        rs = umemrealloc(filtarr,sz,&na) ;
+	        rs = umem.ralloc(filtarr,sz,&na) ;
 	    }
 	    if (rs >= 0) {
 	        filtarr = ulongp(na) ;
