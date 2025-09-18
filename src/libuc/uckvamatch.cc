@@ -31,7 +31,7 @@
 	Arguments:
 	kva		key-value handle
 	keyname		key-name to lookup
-	rpp		pointer to pointer to results
+	rpp		pointer to pointer to result
 
 	Returns:
 	>=0		key-name found and this is the length (including zero)
@@ -51,15 +51,14 @@
 
 #include	"uckvamatch.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
-
-using std::nullptr_t ;			/* type */
-using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
