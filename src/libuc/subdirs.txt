@@ -1,10 +1,15 @@
 addrset
+termx
 buffer
 bufsize
 caches
+
+fmtflag
 cfx
-chrono
 ctx
+fmtstr
+
+chrono
 debug
 dial
 dirseen
@@ -13,7 +18,6 @@ envs
 envx
 field
 filer
-fmtstr
 fsdir
 getutmp
 getx
