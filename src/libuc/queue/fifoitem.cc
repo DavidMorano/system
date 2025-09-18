@@ -30,7 +30,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<strwcmp.h>
 #include	<localmisc.h>
 
@@ -46,6 +52,8 @@ import libutil ;
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -118,7 +126,7 @@ int fifoitem_ins(fifoitem *op,cvoid *sp,int sl) noex {
 	int		rs ;
 	if ((rs = fifoitem_magic(op,sp)) >= 0) {
 	    cint	esz = szof(fifoitem_ent) ;
-	    if (void *vp ; (rs = uc_malloc(esz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(esz,&vp)) >= 0) {
 	        fifoitem_ent	*ep = entp(vp) ;
 	        if ((rs = entry_start(ep,sp,sl)) >= 0) {
 		    if (op->head && op->tail) {
@@ -135,7 +143,7 @@ int fifoitem_ins(fifoitem *op,cvoid *sp,int sl) noex {
 	            op->n += 1 ;
 	        } /* end if (entry_start) */
 	        if (rs < 0) {
-	            uc_free(vp) ;
+	            libmem.free(vp) ;
 	        }
 	    } /* end if (m-a) */
 	} /* end if (magic) */
@@ -167,7 +175,7 @@ int fifoitem_rem(fifoitem *op,void *vbuf,int vlen) noex {
 	                if (rs >= 0) rs = rs1 ;
 	            }
 	            {
-	                rs1 = uc_free(ep) ;
+	                rs1 = libmem.free(ep) ;
 	                if (rs >= 0) rs = rs1 ;
 	            }
 	            op->n -= 1 ;
@@ -254,7 +262,7 @@ int fifoitem_curdel(fifoitem *op,fifoitem_cur *curp) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        {
-	            rs1 = uc_free(ep) ;
+	            rs1 = libmem.free(ep) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        op->n -= 1 ;
@@ -291,7 +299,7 @@ int fifoitem_del(fifoitem *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        {
-	            rs1 = uc_free(ep) ;
+	            rs1 = libmem.free(ep) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        op->n -= 1 ;
@@ -345,7 +353,7 @@ static int entry_start(fifoitem_ent *ep,cvoid *vp,int sl) noex {
 	if (sl < 0) sl = lenstr(sp) ;
 	ep->next = nullptr ;
 	ep->prev = nullptr ;
-	if (cvoid *dp ; (rs = uc_mallocbuf(sp,sl,&dp)) >= 0) {
+	if (void *dp ; (rs = libmem.item(sp,sl,&dp)) >= 0) {
 	    ep->dp = cvoidp(dp) ;
 	    ep->dl = sl ;
 	}
@@ -356,8 +364,8 @@ static int entry_start(fifoitem_ent *ep,cvoid *vp,int sl) noex {
 static int entry_finish(fifoitem_ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ep->dp) {
-	    rs1 = uc_free(ep->dp) ;
+	if (void *vp = cast_const<voidp>(ep->dp) ; vp) {
+	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->dp = nullptr ;
 	}
