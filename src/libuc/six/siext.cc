@@ -78,8 +78,8 @@ extern "C++" {
 
 namespace {
     struct brkinit {
-	chrset	brks ;
-	constexpr brkinit() noex {
+	chrset		brks ;
+	brkinit() noex {
 	    brks.set(CH_SLASH) ;
 	    brks.set(CH_DOT) ;
 	} ; /* end ctor */
@@ -92,7 +92,7 @@ namespace {
 
 /* local variables */
 
-constexpr brkinit	bi ;
+local brkinit		bi ;
 
 
 /* exported variables */
