@@ -62,8 +62,7 @@ int uc_execve(cchar *fname,mainv av,mainv ev) noex {
 	int		rs1 ;
 	int		rv = 0 ;
 	if (fname && av && ev) {
-	    char	*ebuf{} ;
-	    if ((rs = libmalloc_mp(&ebuf)) >= 0) {
+	    if (char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) {
 	        if ((rs = mkpathexp(ebuf,fname,-1)) > 0) {
 		    rs = u_execve(ebuf,av,ev) ;
 		    rv = rs ;
@@ -71,7 +70,7 @@ int uc_execve(cchar *fname,mainv av,mainv ev) noex {
 		    rs = u_execve(fname,av,ev) ;
 		    rv = rs ;
 	        }
-	        rs1 = uc_libfree(ebuf) ;
+	        rs1 = libmalloc_free(ebuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
