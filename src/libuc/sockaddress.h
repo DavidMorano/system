@@ -107,10 +107,12 @@ struct sockaddress : sockaddress_head {
 	    len		(this,sockaddressmem_len) ;
 	    addrlen	(this,sockaddressmem_addrlen) ;
 	    finish	(this,sockaddressmem_finish) ;
-	} ;
+	} ; /* end ctor */
+	sockaddress(const void *,int = -1) noex ;
 	sockaddress(const sockaddress &) noex ;
 	sockaddress &operator = (const sockaddress &) noex ;
 	int start(int,cvoid * = nullptr,int = 0,uint = 0) noex ;
+	int operator () (const void *,int = -1) noex ;
 	operator int () noex ;
 } ; /* end struct (sockaddress) */
 #else	/* __cplusplus */
