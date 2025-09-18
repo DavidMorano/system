@@ -46,13 +46,14 @@ OBJ2_QUEUE= cq.o fifoitem.o fifoelem.o
 OBJ3_QUEUE= charq.o chariq.o
 OBJ4_QUEUE= slq.o fifostr.o
 OBJ5_QUEUE= slist.o
-OBJ6_QUEUE=
+OBJ6_QUEUE= shortq.o
 OBJ7_QUEUE=
 
 OBJA_QUEUE= obj0_queue.o obj1_queue.o obj2_queue.o 
 OBJB_QUEUE= obj3_queue.o obj4_queue.o obj5_queue.o
+OBJC_QUEUE= obj6_queue.o
 
-OBJ_QUEUE= obja_queue.o objb_queue.o
+OBJ_QUEUE= obja_queue.o objb_queue.o objc_queue.o
 
 
 INCDIRS=
@@ -151,38 +152,47 @@ obja_queue.o:		$(OBJA_QUEUE)
 objb_queue.o:		$(OBJB_QUEUE)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objc_queue.o:		$(OBJC_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd_queue.o:		$(OBJD_QUEUE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 # single-list-pointer-queue (singly linked pointer queue) */
-slq.o:			slq.cc slq.h
+slq.o:			slq.cc slq.h				$(INCS)
 
 # self-relaltive
-plainq.o:		plainq.cc plainq.h
-q.o:			q.cc q.h plainq.h
-aiq.o:			aiq.cc aiq.h q.h
+plainq.o:		plainq.cc plainq.h			$(INCS)
+q.o:			q.cc q.h plainq.h			$(INCS)
+aiq.o:			aiq.cc aiq.h q.h			$(INCS)
 
 # pointer-based
-pq.o:			pq.cc pq.h
-ciq.o:			ciq.cc ciq.h pq.h
-piq.o:			piq.cc piq.h pq.h
+pq.o:			pq.cc pq.h				$(INCS)
+ciq.o:			ciq.cc ciq.h pq.h			$(INCS)
+piq.o:			piq.cc piq.h pq.h			$(INCS)
 
 # character
-charq.o:		charq.cc charq.h
-chariq.o:		chariq.cc chariq.h charq.h
+charq.o:		charq.cc charq.h			$(INCS)
+chariq.o:		chariq.cc chariq.h charq.h		$(INCS)
+
+# short
+shortq.o:		shortq.cc shortq.h			$(INCS)
 
 # FIFOs (variable element size and fixed element size)
-fifoitem.o:		fifoitem.cc fifoitem.h
-fifoelem.o:		fifoelem.cc fifoelem.h
+fifoitem.o:		fifoitem.cc fifoitem.h			$(INCS)
+fifoelem.o:		fifoelem.cc fifoelem.h			$(INCS)
 
 # container
-cq.o:			cq.cc cq.h
+cq.o:			cq.cc cq.h				$(INCS)
 
 # composite
-fifostr.o:		fifostr.cc fifostr.h
+fifostr.o:		fifostr.cc fifostr.h			$(INCS)
 
 # specialty interlocked
-intiq.o:		intiq.cc intiq.h
+intiq.o:		intiq.cc intiq.h			$(INCS)
 
 # single-linked-list
-slist.o:		slist.cc slist.h
+slist.o:		slist.cc slist.h			$(INCS)
 
 
