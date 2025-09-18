@@ -61,6 +61,7 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
+#include	<functional>		/* |mem_fn(3c++)| */
 #include	<usystem.h>
 #include	<syswords.hh>
 #include	<libmallocxx.h>
@@ -72,11 +73,16 @@
 
 #include	"sysdbfn.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -99,23 +105,23 @@ namespace {
     struct sysdbmgr {
 	cchar		*strs[sysdbfile_overlast] ;
 	ptm		mx ;		/* data mutex */
-	pid_t		pid ;
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
+	pid_t		pid ;
 	int init() noex ;
 	int fini() noex ;
 	int get(int,cchar **) noex ;
+	int gets(int,cchar **) noex ;
         void atforkbefore() noex {
 	    mx.lockbegin() ;
         }
         void atforkafter() noex {
 	    mx.lockend() ;
         }
+	void dtor() noex ;
 	destruct sysdbmgr() noex {
-	    if (cint rs = fini() ; rs < 0) {
-		ulogerror("sysdbmgr",rs,"dtor-fini") ;
-	    }
+	    dtor() ;
 	} ; /* end dtor (sysdbmgr) */
     } ; /* end structure (sysdbmgr) */
 } /* end namespace */
@@ -178,8 +184,8 @@ int sysdbmgr::init() noex {
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) ylikely {
-	            void_f	b = sysdbmgr_atforkbefore ;
-	            void_f	a = sysdbmgr_atforkafter ;
+	            const void_f	b = sysdbmgr_atforkbefore ;
+	            const void_f	a = sysdbmgr_atforkafter ;
 	            if ((rs = uc_atforkrecord(b,a,a)) >= 0) ylikely {
 	                if ((rs = uc_atexit(sysdbmgr_exit)) >= 0) ylikely {
 	                    finitdone = true ;
@@ -222,15 +228,15 @@ int sysdbmgr::fini() noex {
 		for (int i = 0 ; i < sysdbfile_overlast ; i += 1) {
 		    if (cchar *str ; (str = strs[i]) != nullptr) {
 			char *bp = cast_const<charp>(str) ;
-			rs1 = uc_libfree(bp) ;
+			rs1 = libmem.free(bp) ;
 			if (rs >= 0) rs = rs1 ;
 			strs[i] = nullptr ;
 		    }
 		} /* end for */
 	    }
 	    {
-	        void_f	b = sysdbmgr_atforkbefore ;
-	        void_f	a = sysdbmgr_atforkafter ;
+	        const void_f	b = sysdbmgr_atforkbefore ;
+	        const void_f	a = sysdbmgr_atforkafter ;
 	        rs1 = uc_atforkexpunge(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -248,48 +254,61 @@ int sysdbmgr::fini() noex {
 int sysdbmgr::get(int w,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
+	int		len = 0 ; /* return-value */
 	if ((*rpp = strs[w]) == nullptr) {
 	    if ((rs = init()) >= 0) {
 		if ((rs = mx.lockbegin) >= 0) {
 		    if ((*rpp = strs[w]) == nullptr) {
-		        if (char *pbuf ; (rs = libmalloc_mp(&pbuf)) >= 0) {
-		            cchar	*sysdbdir = sysword.w_sysdbdir ;
-			    cchar	*fn = sysdbfile[w] ;
-		            if ((rs = mkpath(pbuf,sysdbdir,fn)) >= 0) {
-				auto	alloc = uc_libmallocstrw ;
-	                        if (cc *rp ; (rs = alloc(pbuf,rs,&rp)) >= 0) {
-			            strs[w] = rp ;
-			            *rpp = rp ;
-			        } /* end if (memory-allocation) */
-		            } /* end if (mkpath) */
-		            rs1 = uc_libfree(pbuf) ;
-		            if (rs >= 0) rs = rs1 ;
-		        } /* end if (m-a-f) */
+			rs = gets(w,rpp) ;
+			len = rs ;
 		    } /* end if (string-check) */
 		    rs1 = mx.lockend ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (mutex) */
 	    } /* end if (sysdbmgr::init) */
 	} /* end if (value needed to be calculated) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (sysdbmgr::get) */
+/* end method (sysdbmgr::get) */
+
+int sysdbmgr::gets(int w,cchar **rpp) noex {
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
+	if (char *pbuf ; (rs = libmalloc_mp(&pbuf)) >= 0) {
+	    cchar	*sysdbdir = sysword.w_sysdbdir ;
+	    cchar	*fn = sysdbfile[w] ;
+	    if ((rs = mkpath(pbuf,sysdbdir,fn)) >= 0) {
+		if (cc *rp ; (rs = libmem.strw(pbuf,rs,&rp)) >= 0) {
+		    strs[w] = rp ;
+		    *rpp = rp ;
+		    len = lenstr(rp) ;
+		} /* end if (memory-allocation) */
+	    } /* end if (mkpath) */
+	    rs1 = libmalloc_free(pbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? len : rs ;
+} /* end method (sysdbmgr::gets) */
 
 static void sysdbmgr_atforkbefore() noex {
 	sysdbmgr_data.atforkbefore() ;
-}
-/* end subroutine (sysdbmgr_atforkbefore) */
+} /* end subroutine (sysdbmgr_atforkbefore) */
 
 static void sysdbmgr_atforkafter() noex {
 	sysdbmgr_data.atforkafter() ;
-}
-/* end subroutine (sysdbmgr_atforkafter) */
+} /* end subroutine (sysdbmgr_atforkafter) */
 
 static void sysdbmgr_exit() noex {
 	if (cint rs = sysdbmgr_data.fini() ; rs < 0) {
 	    ulogerror("sysdbmgr",rs,"exit-fini") ;
 	}
-}
-/* end subroutine (sysdbmgr_exit) */
+} /* end subroutine (sysdbmgr_exit) */
+
+void sysdbmgr::dtor() noex {
+	if (cint rs = fini() ; rs < 0) {
+	    ulogerror("sysdbmgr",rs,"dtor-fini") ;
+	}
+} /* end method (sysdbmgr::dtor) */
 
 
