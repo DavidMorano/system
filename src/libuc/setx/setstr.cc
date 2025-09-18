@@ -36,12 +36,14 @@
 
 #include	"setstr.h"
 
-import libutil ;
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
 
-/* imported spaces */
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -97,77 +99,85 @@ int setstr_finish(setstr *op) noex {
 }
 /* end subroutine (setstr_finish) */
 
-int setstr_already(setstr *op,cchar *sp,int sl) noex {
+int setstr_already(setstr *op,cchar *sp,int 탎l) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		f = true ;
 	if (op && sp) {
-	    hdb_dat	key ;
-	    hdb_dat	val ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    key.buf = sp ;
-	    key.len = sl ;
-	    val.buf = sp ;
-	    val.len = sl ;
-	    if ((rs = hdb_fetch(op,key,nullptr,&val)) == rsn) {
-	        f = false ;
-	        rs = SR_OK ;
-	    }
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	       hdb_dat	key ;
+	       hdb_dat	val ;
+	       key.buf = sp ;
+	       key.len = sl ;
+	       val.buf = sp ;
+	       val.len = sl ;
+	       if ((rs = hdb_fetch(op,key,np,&val)) == rsn) {
+	           f = false ;
+	           rs = SR_OK ;
+	       }
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (setstr_already) */
 
-int setstr_add(setstr *op,cchar *sp,int sl) noex {
+int setstr_add(setstr *op,cchar *sp,int 탎l) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (op && sp) {
-	    hdb_dat	key ;
-	    hdb_dat	val ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    key.buf = sp ;
-	    key.len = sl ;
-	    val.buf = sp ;
-	    val.len = sl ;
-	    if ((rs = hdb_fetch(op,key,nullptr,&val)) == rsn) {
-	        if (cchar *asp{} ; (rs = uc_mallocstrw(sp,sl,&asp)) >= 0) {
-		    key.buf = asp ;
-		    val.buf = asp ;
-	            f = true ;
-	            rs = hdb_store(op,key,val) ;
-		    if (rs < 0) {
-		        uc_free(asp) ;
-		    }
-	        } /* end if (m-a) */
-	    } /* end if (not already present) */
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        hdb_dat	key ;
+	        hdb_dat	val ;
+	        key.buf = sp ;
+	        key.len = sl ;
+	        val.buf = sp ;
+	        val.len = sl ;
+	        if ((rs = hdb_fetch(op,key,np,&val)) == rsn) {
+	            if (cchar *asp ; (rs = libmem.strw(sp,sl,&asp)) >= 0) {
+		        key.buf = asp ;
+		        val.buf = asp ;
+	                f = true ;
+	                rs = hdb_store(op,key,val) ;
+		        if (rs < 0) {
+			    void *vp = voidp(asp) ;
+		            libmem.free(vp) ;
+		        }
+	            } /* end if (m-a) */
+	        } /* end if (not already present) */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (setstr_add) */
 
-int setstr_del(setstr *op,cchar *sp,int sl) noex {
+int setstr_del(setstr *op,cchar *sp,int 탎l) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		f = false ;
 	if (op && sp) {
-	    hdb_dat	key ;
-	    hdb_dat	val{} ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    key.buf = sp ;
-	    key.len = sl ;
-	    if ((rs = hdb_fetch(op,key,nullptr,&val)) >= 0) {
-	        cchar	*asp = (cchar *) val.buf ;
-		{
-	            rs1 = hdb_delkey(op,key) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		if (asp) {
-	            rs1 = uc_free(asp) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-	        f = true ;
-	    } else if (rs == rsn) {
-	        rs = SR_OK ;
-	    }
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        hdb_dat	key ;
+	        hdb_dat	val{} ;
+	        key.buf = sp ;
+	        key.len = sl ;
+	        if ((rs = hdb_fetch(op,key,np,&val)) >= 0) {
+	            cchar	*asp = ccharp(val.buf) ;
+		    {
+	                rs1 = hdb_delkey(op,key) ;
+	                if (rs >= 0) rs = rs1 ;
+		    }
+		    if (asp) {
+			void *vp = voidp(asp) ;
+	                rs1 = libmem.free(vp) ;
+	                if (rs >= 0) rs = rs1 ;
+		    }
+	            f = true ;
+	        } else if (rs == rsn) {
+	            rs = SR_OK ;
+	        }
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -193,11 +203,12 @@ int setstr_curend(setstr *op,setstr_cur *curp) noex {
 /* end subroutine (setstr_curend) */
 
 int setstr_curenum(setstr *op,setstr_cur *curp,cchar **rpp) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (op && curp && rpp) {
 	    hdb_dat	val{} ;
-	    if ((rs = hdb_curenum(op,curp,nullptr,&val)) >= 0) {
+	    if ((rs = hdb_curenum(op,curp,np,&val)) >= 0) {
 	        rl = val.len ;
 	        if (rpp) {
 	            *rpp = charp(val.buf) ;
@@ -271,15 +282,16 @@ int setstr_co::operator () (int a) noex {
 static int setstr_finents(setstr *op) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		rs2 ;
+	int		c = 0 ; /* return-value */
 	if (hdb_cur cur ; (rs1 = hdb_curbegin(op,&cur)) >= 0) {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
-	    int		rs2 ;
 	    while ((rs2 = hdb_curenum(op,&cur,&key,&val)) >= 0) {
 	        if (key.buf) {
 		    c += 1 ;
-	            rs1 = uc_free(key.buf) ;
+		    void *vp = voidp(key.buf) ;
+	            rs1 = uc_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	    } /* end while (enum) */
