@@ -31,7 +31,13 @@
 #include	<envstandards.h>	/* must be before others */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"intiq.h"
@@ -43,7 +49,7 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
