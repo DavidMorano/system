@@ -234,7 +234,7 @@ static int strpack_chunknew(strpack *op,int amount) noex {
 	cint		csz = szof(strpack_ch) ;
 	int		rs ;
 	if (op->chsize > amount) amount = op->chsize ;
-	if (void *vp ; (rs = uc_libmalloc(csz,&vp)) >= 0) {
+	if (void *vp ; (rs = lm_mall(csz,&vp)) >= 0) {
 	    strpack_ch	*cep = chunkp(vp) ;
 	    if ((rs = chunk_start(cep,(amount + 1))) >= 0) {
 	        if ((rs = vechand_add(op->clp,cep)) >= 0) {
@@ -249,7 +249,7 @@ static int strpack_chunknew(strpack *op,int amount) noex {
 		}
 	    } /* end if (chunk) */
 	    if (rs < 0) {
-	        uc_libfree(cep) ;
+	        lm_free(cep) ;
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
@@ -269,7 +269,7 @@ static int strpack_chunkfins(strpack *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_libfree(chp) ;
+	            rs1 = lm_free(chp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	    }
@@ -283,7 +283,7 @@ static int chunk_start(strpack_ch *cnp,int csz) noex {
 	memclear(cnp) ;
 	if (csz > 0) {
 	    cnp->csz = csz ;
-	    if (void *vp ; (rs = uc_libmalloc(csz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(csz,&vp)) >= 0) {
 	        cnp->cdata = charp(vp) ;
 	    }
 	}
@@ -306,7 +306,7 @@ static int chunk_finish(strpack_ch *cnp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (cnp->cdata) {
-	    rs1 = uc_libfree(cnp->cdata) ;
+	    rs1 = lm_free(cnp->cdata) ;
 	    if (rs >= 0) rs = rs1 ;
 	    cnp->cdata = nullptr ;
 	}
