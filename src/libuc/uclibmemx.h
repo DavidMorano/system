@@ -30,7 +30,11 @@
 
 EXTERNC_begin
 
-extern int uc_libmemallocsys(int,char **) noex ;
+extern int uc_libmemsys(int,char **) noex ;
+
+local inline int uc_libmemallocsys(int w,char **rpp) noex  {
+    	return uc_libmemsys(w,rpp) ;
+}
 
 EXTERNC_end
 
