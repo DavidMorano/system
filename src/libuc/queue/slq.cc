@@ -28,7 +28,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"slq.h"
@@ -38,6 +44,8 @@
 
 
 /* local namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -202,7 +210,7 @@ void slq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("slq",rs,"fini-finish") ;
 	}
-}
+} /* end method (slq::dtor) */
 
 slq_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
