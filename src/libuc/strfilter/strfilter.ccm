@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* manage a variable length bit-array */
+/* String-Filter */
 /* version %I% last-modified %G% */
 
 #define	CF_BINSEARCH	1		/* binary-search */
