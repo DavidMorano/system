@@ -36,16 +36,16 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<ucmemalloc.h>
+#include	<ucmem.h>
 #include	<mkchar.h>
 #include	<char.h>
 #include	<localmisc.h>
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 module asstr ;
 
-import libutil ;			/* |lenstr(3u)| */
+import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* imported namespaces */
 
@@ -73,31 +73,27 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* exported subroutines */
 
-    int asstr_start(asstr *op,cchar *sp,int sl) noex {
+int asstr_start(asstr *op,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    rs = SR_OK ;
-	    op->sp = sp ;
-	    op->sl = sl ;
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	        rs = SR_OK ;
+	        op->sp = sp ;
+	        op->sl = sl ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (asstr_start) */
+} /* end subroutine (asstr_start) */
 
-    int asstr_finish(asstr *op) noex {
+int asstr_finish(asstr *op) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	if (op) {
 	    rs = SR_OK ;
-	    if (op->sp != nullptr) {
-	        rs1 = uc_free(op->sp) ;
-	        if (rs >= 0) rs = rs1 ;
-	        op->sp = nullptr ;
-	    }
+	    op->sp = nullptr ;
 	    op->sl = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (asstr_finish) */
+} /* end subroutine (asstr_finish) */
 
     int asstr_get(asstr *op) noex {
 	int		rs = SR_FAULT ;
