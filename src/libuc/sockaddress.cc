@@ -90,7 +90,10 @@
 
 #include	"sockaddress.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/digtab.ccm"
+
+import libutil ;			/* |memcopy(3u)| */
 import digtab ;				/* |getdig(3u)| */
 
 /* local defines */
@@ -100,7 +103,6 @@ import digtab ;				/* |getdig(3u)| */
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -650,7 +652,7 @@ sockaddress::operator int () noex {
     	return sockaddress_getlen(this) ;
 }
 
-static void sockaddress_init(sockaddress *op,const sockaddress *other) noex {
+local void sockaddress_init(sockaddress *op,const sockaddress *other) noex {
     	cint	msz = SOCKADDRESS_STRSIZE ;
     	memcopy(op->str,other->str,msz) ;
 	{
@@ -659,6 +661,28 @@ static void sockaddress_init(sockaddress *op,const sockaddress *other) noex {
 	    op->finish	(op,sockaddressmem_finish) ;
 	}
 } /* end subroutine (sockaddress_init) */
+
+local void sockaddress_copy(sockaddress *op,cvoid *vp,int vl) noex {
+    	cint	msz = SOCKADDRESS_STRSIZE ;
+    	if (vp) {
+	    if (vl >= 0) {
+		memcopyz(op->str,msz,vp,vl) ;
+	    } else {
+		memcopy(op->str,vp,msz) ;
+	    }
+	} else {
+    	    memclear(op->str,msz) ;
+	}
+} /* end subroutine (sockaddress_copy) */
+
+int sockaddress::operator () (cvoid *vp,int vl) noex {
+    	sockaddress_copy(this,vp,vl) ;
+	return SR_OK ;
+} /* end method (sockaddress::operator) */
+
+sockaddress::sockaddress(cvoid *vp,int vl) noex {
+    	sockaddress_copy(this,vp,vl) ;
+} /* end method (sockaddress::ctor) */
 
 sockaddress::sockaddress(const sockaddress &o) noex {
     	sockaddress_init(this,&o) ;
