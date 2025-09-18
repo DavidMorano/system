@@ -324,7 +324,7 @@ int tcpeek(int fd,char *dbuf,int dlen) noex {
 	        if_constexpr (f_streams) {
 	            cint	clen = CMSGBUFLEN ;
 	            char	*cbuf{} ;
-	            if ((rs = uc_libmalloc((clen+1),&cbuf)) >= 0) {
+	            if ((rs = lm_mall((clen+1),&cbuf)) >= 0) {
 			{
 	                    STRPEEK	pd{} ;
 	                    pd.flags = 0 ;
@@ -335,7 +335,7 @@ int tcpeek(int fd,char *dbuf,int dlen) noex {
 	                    rs = u_ioctl(fd,I_PEEK,&pd) ;
 	                    len = pd.databuf.len ;
 			}
-		        rs1 = uc_libfree(cbuf) ;
+		        rs1 = lm_free(cbuf) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */
 	        } else {
