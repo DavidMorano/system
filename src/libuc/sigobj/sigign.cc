@@ -31,14 +31,31 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucsig.h>
 #include	<localmisc.h>
 
 #include	"sigign.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libuc::libmem ;
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -81,7 +98,7 @@ int sigign_start(sigign *iap,cint *ignores) noex {
 	        if ((nhandles = getnhandles(ignores)) > 0) {
 	            cint	sz = (nhandles * szof(sigign_ha)) ;
 	            iap->nhandles = nhandles ;
-	            if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	            if (void *vp{} ; (rs = libmem.mall(sz,&vp)) >= 0) {
 	                iap->handles = (sigign_ha *) vp ;
 	                if (sigset_t nsm{} ; (rs = uc_sigsetempty(&nsm)) >= 0) {
                             SIGACTION       san{} ;
@@ -108,7 +125,7 @@ int sigign_start(sigign *iap,cint *ignores) noex {
                             } /* end if (error handling) */
 			} /* end if (uc_sigsetempty) */
 		        if (rs < 0) {
-	      		    uc_free(iap->handles) ;
+	      		    libmem.free(iap->handles) ;
 			    iap->handles = nullptr ;
 	 	        } /* end if (error handling) */
 	            } /* end if (memory allocations) */
@@ -136,7 +153,7 @@ int sigign_finish(sigign *iap) noex {
 	                rs1 = u_sigaction(hsig,sap,nullptr) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end for */
-	            rs1 = uc_free(iap->handles) ;
+	            rs1 = libmem.free(iap->handles) ;
 	            if (rs >= 0) rs = rs1 ;
 	            iap->handles = nullptr ;
 	        } /* end if */
