@@ -45,6 +45,8 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -62,6 +64,8 @@
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -148,7 +152,7 @@ int subinfo::start() noex {
 		dnl = rs ;
 	    } /* end if (mkpath) */
 	    if (rs < 0) {
-		uc_free(tbuf) ;
+		malloc_free(tbuf) ;
 		tbuf = nullptr ;
 		tlen = 0 ;
 	    }
@@ -161,7 +165,7 @@ int subinfo::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (tbuf) {
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = malloc_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    tbuf = nullptr ;
 	    tlen = 0 ;
@@ -289,11 +293,10 @@ int subinfo::entfins(vecobj *elp) noex {
 static int terment_start(terment *ep,cchar *fp,int fl,time_t t) noex {
 	int		rs = SR_FAULT ;
 	if (ep && fp) {
-	    cchar	*cp{} ;
 	    ep->atime = t ;
-	    if ((rs = uc_mallocstrw(fp,fl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = libmem.strw(fp,fl,&cp)) >= 0) {
 	        ep->devpath = cp ;
-	    }
+	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -305,9 +308,10 @@ static int terment_finish(terment *ep) noex {
 	if (ep) {
 	    rs = SR_OK ;
 	    if (ep->devpath) {
-	        rs1 = uc_free(ep->devpath) ;
+		void *vp = voidp(ep->devpath) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
-	        ep->devpath = NULL ;
+	        ep->devpath = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
