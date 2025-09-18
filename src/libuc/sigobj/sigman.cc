@@ -31,23 +31,34 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucsig.h>
 #include	<localmisc.h>
 
 #include	"sigman.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* memclear(2u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-typedef	sigman_ha *	handp ;
+using libuc::libmem ;
 
 
 /* local typedefs */
+
+typedef	sigman_ha *	handp ;
 
 
 /* external subroutines */
@@ -65,7 +76,7 @@ template<typename ... Args>
 static int sigman_ctor(sigman *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    sigman_head		*hp = cast_static<sigman_head *>(op) ;
+	    sigman_head	 *hp = cast_static<sigman_head *>(op) ;
 	    rs = memclear(hp) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -132,7 +143,7 @@ int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 	        }
 	    }
 	    sz = (nhs * szof(sigman_ha)) ;
-	    if ((rs >= 0) && (nhs > 0) && ((rs = uc_malloc(sz,&p)) >= 0)) {
+	    if ((rs >= 0) && (nhs > 0) && ((rs = libmem.mall(sz,&p)) >= 0)) {
 	        sigman_ha	*hp = handp(p) ;
 	        SIGACTION	san{} ;
 	        SIGACTION	*sap ;
@@ -176,7 +187,7 @@ int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 		        sap = &hp[i].action ;
 		        u_sigaction(hsig,sap,nullptr) ;
 		    } /* end if */
-	            uc_free(op->handles) ;
+	            libmem.free(op->handles) ;
 	            op->handles = nullptr ;
 	        } /* end if (error) */
 	    } /* end if (memory allocations) */
@@ -203,7 +214,7 @@ int sigman_finish(sigman *op) noex {
 	            rs1 = u_sigaction(hsig,sap,nullptr) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end for */
-	        rs1 = uc_free(op->handles) ;
+	        rs1 = libmem.free(op->handles) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->handles = nullptr ;
 	    } /* end if */
