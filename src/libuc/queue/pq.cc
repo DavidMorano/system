@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+	Object:
+	pq
+
+	Description:
 	This is a regular, pointer based, no-frills doubly linked
 	list queue.  Note that this object CAN be moved (copied)
 	since there are no pointers pointing back at the list head
@@ -34,11 +38,21 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<uclibmem.h>
+#include	<localmisc.h>
 
 #include	"pq.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -403,7 +417,7 @@ int pq_curend(pq *qhp,pq_cur *curp) noex {
 }
 /* end subroutine (pq_curend) */
 
-int pq_enum(pq *qhp,pq_cur *curp,pq_ent **rpp) noex {
+int pq_curenum(pq *qhp,pq_cur *curp,pq_ent **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (qhp && curp) {
 	    rs = SR_NOTFOUND ;
@@ -426,6 +440,6 @@ int pq_enum(pq *qhp,pq_cur *curp,pq_ent **rpp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (pq_enum) */
+/* end subroutine (pq_curenum) */
 
 
