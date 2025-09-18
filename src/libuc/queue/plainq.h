@@ -20,7 +20,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stddef.h>		/* <- for |ptrdiff_t| */
 #include	<usystem.h>
 
 
@@ -46,18 +45,18 @@ typedef PLAINQ_ENT	plainq_ent ;
 
 EXTERNC_begin
 
-extern int plainq_start(plainq *) noex ;
-extern int plainq_finish(plainq *) noex ;
-extern int plainq_ins(plainq *,plainq_ent *) noex ;
-extern int plainq_insgroup(plainq *,plainq_ent *,int,int) noex ;
-extern int plainq_inshead(plainq *,plainq_ent *) noex ;
-extern int plainq_unlink(plainq *,plainq_ent *) noex ;
-extern int plainq_rem(plainq *,plainq_ent **) noex ;
-extern int plainq_gethead(plainq *,plainq_ent **) noex ;
-extern int plainq_remtail(plainq *,plainq_ent **) noex ;
-extern int plainq_gettail(plainq *,plainq_ent **) noex ;
-extern int plainq_count(plainq *) noex ;
-extern int plainq_audit(plainq *) noex ;
+extern int plainq_start		(plainq *) noex ;
+extern int plainq_finish	(plainq *) noex ;
+extern int plainq_ins		(plainq *,plainq_ent *) noex ;
+extern int plainq_insgroup	(plainq *,plainq_ent *,int,int) noex ;
+extern int plainq_inshead	(plainq *,plainq_ent *) noex ;
+extern int plainq_unlink	(plainq *,plainq_ent *) noex ;
+extern int plainq_rem		(plainq *,plainq_ent **) noex ;
+extern int plainq_gethead	(plainq *,plainq_ent **) noex ;
+extern int plainq_remtail	(plainq *,plainq_ent **) noex ;
+extern int plainq_gettail	(plainq *,plainq_ent **) noex ;
+extern int plainq_count		(plainq *) noex ;
+extern int plainq_audit		(plainq *) noex ;
 
 EXTERNC_end
 
