@@ -13,7 +13,7 @@
 	This code was originally written.
 
 	= 2018-09-26, David A-D- Morano
-	I brought |uc_libmem.malloc(3uc)| in line w/ the standard for
+	I brought |uc_libmem.mall(3uc)| in line w/ the standard for
 	|calloc(3c)|.  I never used this myself in 40 years, so I
 	never missed it!
 
@@ -27,8 +27,8 @@
 	uc_libmemallocstrw
 	uc_libmemallocitem
 	uc_libmemalloc
-	uc_libmem.malloc
-	uc_libmem.malloc
+	uc_libmemvalloc
+	uc_libmemcalloc
 	uc_libmemrealloc
 	uc_libmemfree
 	uc_libmemrsfree
@@ -37,8 +37,8 @@
 	int uc_libmemallocstrw(cchar *,int,cchar **) noex ;
 	int uc_libmemallocitem(cvoid *,int,voidpp) noex ;
 	int uc_libmemalloc(int,void *) noex ;
-	int uc_libmem.malloc(int,void *) noex ;
-	int uc_libmem.malloc(int,int,void *) noex ;
+	int uc_libmemvalloc(int,void *) noex ;
+	int uc_libmemcalloc(int,int,void *) noex ;
 	int uc_libmemrealloc(void *,int,void *) noex ;
 	int uc_libmemfree(void *) noex ;
 	int uc_libmemrsfree(int,void *) noex ;
@@ -117,27 +117,27 @@ using libuc::libmem ;
 /* exported subroutines */
 
 int uc_libmemallocstrw(cchar *sp,int 탎l,cchar **rpp) noex {
-    	return libmem.mallocstrw(sp,탎l,rpp) ;
+    	return libmem.strw(sp,탎l,rpp) ;
 }
 
 int uc_libmemallocitem(cvoid *sp,int 탎l,void **rpp) noex {
-    	return libmem.mallocitem(sp,탎l,rpp) ;
+    	return libmem.item(sp,탎l,rpp) ;
 }
 
 int uc_libmemalloc(int sz,void *vp) noex {
-    	return libmem.malloc(sz,vp) ;
+    	return libmem.mall(sz,vp) ;
 }
 
 int uc_libmemvalloc(int sz,void *vp) noex {
-    	return libmem.valloc(sz,vp) ;
+    	return libmem.vall(sz,vp) ;
 }
 
 int uc_libmemcalloc(int ne,int esz,void *vp) noex {
-    	return libmem.calloc(ne,esz,vp) ;
+    	return libmem.call(ne,esz,vp) ;
 }
 
 int uc_libmemrealloc(void *cp,int sz,void *vp) noex {
-    	return libmem.ralloc(cp,sz,vp) ;
+    	return libmem.rall(cp,sz,vp) ;
 }
 
 int uc_libmemfree(void *cp) noex {
@@ -152,12 +152,12 @@ int uc_libmemrsfree(int rs,void *p) noex {
 /* local subroutines */
 
 namespace libuc {
-    int libmems::mallocstrw(cchar *sp,int 탎l,cchar **rpp) noex {
+    int libmems::strw(cchar *sp,int 탎l,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (sp && rpp) {
 	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
-	        if (char *bp ; (rs = malloc((sl + 1),&bp)) >= 0) {
+	        if (char *bp ; (rs = mall((sl + 1),&bp)) >= 0) {
 	            *rpp = bp ;
 		    {
 	                char *ep = stpncpy(bp,sp,sl) ;
@@ -170,14 +170,14 @@ namespace libuc {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-    } /* end subroutine (allocstrw) */
-    int libmems::mallocitem(cvoid *sp,int sl,void **rpp) noex {
+    } /* end method (libmems::strw) */
+    int libmems::item(cvoid *sp,int sl,void **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (sp && rpp) {
 	    rs = SR_INVALID ;
 	    if (sl > 0) {
-	        if (char *bp ; (rs = malloc((sl + 1),&bp)) >= 0) {
+	        if (char *bp ; (rs = mall((sl + 1),&bp)) >= 0) {
 	            *rpp = bp ;
 		    {
 	                char *ep = charp(memcopy(bp,sp,sl)) ;
@@ -190,26 +190,26 @@ namespace libuc {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-    } /* end subroutine (allocitem) */
-    int libmems::malloc(int sz,void *vp) noex {
+    } /* end method (libmems::item) */
+    int libmems::mall(int sz,void *vp) noex {
 	mgr		lmo ;
 	lmo.m = &mgr::stdmalloc ;
 	return lmo(sz,vp) ;
-    } /* end subroutine (alloc) */
-    int libmems::calloc(int ne,int esz,void *vp) noex {
+    } /* end method (libmems::mall) */
+    int libmems::call(int ne,int esz,void *vp) noex {
 	cint		sz = (ne * esz) ;
 	int		rs ;
-	if ((rs = malloc(sz,vp)) >= 0) {
+	if ((rs = mall(sz,vp)) >= 0) {
 	    memclear(vp,sz) ;
 	}
 	return (rs >= 0) ? sz : rs ;
-    } /* end subroutine (calloc) */
-    int libmems::valloc(int sz,void *vp) noex {
+    } /* end method (libmems::call) */
+    int libmems::vall(int sz,void *vp) noex {
 	mgr		lmo ;
 	lmo.m = &mgr::stdvalloc ;
 	return lmo(sz,vp) ;
-    } /* end subroutine (valloc) */
-    int libmems::ralloc(void *cp,int sz,void *vp) noex {
+    } /* end method (libmems::vall) */
+    int libmems::rall(void *cp,int sz,void *vp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) {
 	    const uintptr_t	am = (szof(uintptr_t) - 1) ;
@@ -222,7 +222,7 @@ namespace libuc {
 	    } /* end if (aligned correctly) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (libmems::ralloc) */
+    } /* end method (libmems::rall) */
     int libmems::free(void *cp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) {
@@ -236,7 +236,7 @@ namespace libuc {
 	    } /* end if (valid address alignment) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (free) */
+    } /* end method (libmems::free) */
     int libmems::rsfree(int rs,void *p) noex {
 	if (p) {
     	    if (cint rs1 = free(p) ; rs >= 0) {
@@ -246,7 +246,25 @@ namespace libuc {
     	    if (rs >= 0) rs = SR_FAULT ;
 	}
 	return rs ;
-    } /* end subroutine (rsfree) */
+    } /* end method (libmems::rsfree) */
+} /* end namespace (libuc) */
+
+namespace libuc {
+    int libmems::mallocstrw(cchar *sp,int 탎l,cchar **rpp) noex {
+	return strw(sp,탎l,rpp) ;
+    }
+    int libmems::mallocitem(cvoid *sp,int 탎l,void **rpp) noex {
+	return item(sp,탎l,rpp) ;
+    }
+    int libmems::malloc(int sz,void *vp) noex {
+	return vall(sz,vp) ;
+    }
+    int libmems::calloc(int ne,int esz,void *vp) noex {
+	return call(ne,esz,vp) ;
+    }
+    int libmems::ralloc(void *cp,int sz,void *vp) noex {
+	return rall(cp,sz,vp) ;
+    }
 } /* end namespace (libuc) */
 
 int mgr::operator () (int sz,void *vp) noex {
