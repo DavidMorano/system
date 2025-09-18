@@ -20,7 +20,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<ptm.h>
 #include	<pq.h>
 
@@ -37,7 +42,7 @@ struct piq_ent {
 
 struct piq_head {
 	ptm		*mxp ;
-	pq		*freep ;
+	pq		*qlp ;
 	uint		magic ;
 } ;
 
@@ -45,12 +50,12 @@ typedef	PIQ		piq ;
 
 EXTERNC_begin
 
-extern int piq_start(piq *) noex ;
-extern int piq_ins(piq *,void *) noex ;
-extern int piq_rem(piq *,void *) noex ;
-extern int piq_count(piq *) noex ;
-extern int piq_audit(piq *) noex ;
-extern int piq_finish(piq *) noex ;
+extern int piq_start	(piq *) noex ;
+extern int piq_ins	(piq *,void *) noex ;
+extern int piq_rem	(piq *,void *) noex ;
+extern int piq_count	(piq *) noex ;
+extern int piq_audit	(piq *) noex ;
+extern int piq_finish	(piq *) noex ;
 
 EXTERNC_end
 
