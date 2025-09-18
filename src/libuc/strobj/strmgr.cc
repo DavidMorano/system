@@ -17,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	strmgr
 
 	Description:
@@ -38,8 +38,6 @@
 #include	<localmisc.h>
 
 #include	"strmgr.h"
-
-import libutil ;
 
 /* local defines */
 
