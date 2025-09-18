@@ -207,13 +207,13 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 	if (op) {
 	    csize	sz = (slen * szof(ulong)) ;
 	    memclear(op) ;
-	    if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = lm_mall(sz,&vp)) >= 0) {
 		op->state = ulongp(vp) ;
-	        op->f.flipper = false ;
-	        op->f.pseudo = f_pseudo ;
+	        op->fl.flipper = false ;
+	        op->fl.pseudo = f_pseudo ;
 	        op->laststir = 0 ;
 	        op->maintcount = 0 ;
-	        if (op->f.pseudo) {
+	        if (op->fl.pseudo) {
 		    rs = randomvar_initpseudo(op,seed) ;
 	        } else {
 		    rs = randomvar_initreal(op,seed) ;
@@ -231,7 +231,7 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 		    }
 		} /* end if (ok) */
 		if (rs < 0) {
-		    uc_libfree(op->state) ;
+		    lm_free(op->state) ;
 		    op->state = nullptr ;
 		    op->magic = 0 ;
 		}
@@ -246,7 +246,7 @@ int randomvar_finish(randomvar *op) noex {
 	int		rs1 ;
 	if ((rs = randomvar_magic(op)) >= 0) {
 	    if (op->state) {
-		rs1 = uc_libfree(op->state) ;
+		rs1 = lm_free(op->state) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;
@@ -377,14 +377,14 @@ int randomvar_getuint(randomvar *op,uint *rp) noex {
 	int		rs ;
 	if ((rs = randomvar_magic(op,rp)) >= 0) {
 	    ulong	rv ;
-	    if (op->f.flipper) {
+	    if (op->fl.flipper) {
 		rv = op->state[op->a] ;
 		*rp = uint(rv >> 32) ;
-		op->f.flipper = false ;
+		op->fl.flipper = false ;
 	    } else {
 		if ((rs = randomvar_getulong(op,&rv)) >= 0) {
 		    *rp = uint(rv) ;
-		    op->f.flipper = true ;
+		    op->fl.flipper = true ;
 		}
 	    }
 	} /* end if (magic) */
@@ -465,7 +465,7 @@ static int randomvar_maint(randomvar *op) noex {
 	int		rs ;
 	if ((rs = randomvar_swapone(op)) >= 0) {
 	    op->maintcount = 0 ;
-	    if (! op->f.pseudo) {
+	    if (! op->fl.pseudo) {
 	        TIMEVAL		tv ;
 	        gettimeofday(&tv,nullptr) ;
 	        if ((tv.tv_sec - op->laststir) >= RANDOMVAR_STIRINT) {
