@@ -33,7 +33,7 @@
 
 EXTERNC_begin
 
-extern int sysdbfn_get(sysdbfiles,cchar *,cchar **) noex ;
+extern int	sysdbfn_get(sysdbfiles,cchar *,cchar **) noex ;
 
 EXTERNC_end
 
