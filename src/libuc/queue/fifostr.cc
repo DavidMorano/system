@@ -31,19 +31,30 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<snwcpy.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<usupport.h>		/* |libu::snwcpy(3u)| */
+#include	<uclibmem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"fifostr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+using libu::snwcpy ;			/* subroutine */
 
 
 /* local typedefs */
@@ -96,7 +107,7 @@ int fifostr_start(fifostr *op) noex {
 	    op->ic = 0 ;
 	    op->cnt = 0 ;
 	    op->magic = FIFOSTR_MAGIC ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (fifostr_start) */
@@ -112,14 +123,13 @@ int fifostr_finish(fifostr *op) noex {
 }
 /* end subroutine (fifostr_finish) */
 
-int fifostr_add(fifostr *op,cchar *sp,int sl) noex {
+int fifostr_add(fifostr *op,cchar *sp,int µsl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = fifostr_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    {
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
 	        cint	sz = szof(fifostr_ent) + (sl + 1) ;
-		if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+		if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 	    	    fifostr_ent		*ep = entp(vp) ;
 	            ep->slen = sl ;
 	            {
@@ -249,7 +259,7 @@ int fifostr_rem(fifostr *op,char *rbuf,int rlen) noex {
                     } else {
                         (op->head)->prev = nullptr ;
                     }
-                    rs = uc_libfree(ep) ;
+                    rs = libmem.free(ep) ;
                     op->ic -= 1 ;
                     op->cnt -= sl ;
                 } /* end if (successful removal) */
@@ -345,7 +355,7 @@ int fifostr_curdel(fifostr *op,fifostr_cur *curp) noex {
                         (op->head)->prev = nullptr ;
                     }
                 } /* end if */
-                rs1 = uc_libfree(ep) ;
+                rs1 = libmem.free(ep) ;
                 if (rs >= 0) rs = rs1 ;
                 c = --op->ic ;
                 op->cnt -= sl ;
@@ -444,7 +454,7 @@ void fifostr::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("fifostr",rs,"fini-finish") ;
 	}
-}
+} /* end method (dtor) */
 
 fifostr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -465,7 +475,6 @@ fifostr_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (fifostr_co::operator) */
+} /* end method (fifostr_co::operator) */
 
 
