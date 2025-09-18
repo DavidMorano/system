@@ -134,7 +134,7 @@ struct tmpx ;
 struct tmpx_op {
 	tmpx		*op = nullptr ;
 	int		w = -1 ;
-	void operator () (tmpx *p,int m) noex {
+	void init(tmpx *p,int m) noex {
 	    op = p ;
 	    w = m ;
 	} ;
@@ -161,12 +161,12 @@ struct tmpx : tmpx_head {
 	tmpx_co		nusers ;
 	tmpx_co		close ;
 	tmpx() noex {
-	    open(this,tmpxmem_open) ;
-	    getrunlevel(this,tmpxmem_getrunlevel) ;
-	    nusers(this,tmpxmem_nusers) ;
-	    close(this,tmpxmem_close) ;
+	    open.init	(this,tmpxmem_open) ;
+	    getrunlevel	(this,tmpxmem_getrunlevel) ;
+	    nusers	(this,tmpxmem_nusers) ;
+	    close	(this,tmpxmem_close) ;
 	    magic = 0 ;
-	} ;
+	} ; /* end ctor */
 	tmpx(const tmpx &) = delete ;
 	tmpx &operator = (const tmpx &) = delete ;
 	int read(int,tmpx_ent *) noex ;
@@ -191,23 +191,23 @@ typedef TMPX		tmpx ;
 
 EXTERNC_begin
 
-extern int tmpx_open(tmpx *,cchar *,int) noex ;
-extern int tmpx_read(tmpx *,int,tmpx_ent *) noex ;
-extern int tmpx_write(tmpx *,int,tmpx_ent *) noex ;
-extern int tmpx_check(tmpx *,time_t) noex ;
-extern int tmpx_curbegin(tmpx *,tmpx_cur *) noex ;
-extern int tmpx_curend(tmpx *,tmpx_cur *) noex ;
-extern int tmpx_curenum(tmpx *,tmpx_cur *,tmpx_ent *) noex ;
-extern int tmpx_fetchuser(tmpx *,tmpx_cur *,tmpx_ent *,cchar *) noex ;
-extern int tmpx_fetchpid(tmpx *,tmpx_ent *,pid_t) noex ;
-extern int tmpx_nusers(tmpx *) noex ;
-extern int tmpx_close(tmpx *) noex ;
+extern int tmpx_open		(tmpx *,cchar *,int) noex ;
+extern int tmpx_read		(tmpx *,int,tmpx_ent *) noex ;
+extern int tmpx_write		(tmpx *,int,tmpx_ent *) noex ;
+extern int tmpx_check		(tmpx *,time_t) noex ;
+extern int tmpx_curbegin	(tmpx *,tmpx_cur *) noex ;
+extern int tmpx_curend		(tmpx *,tmpx_cur *) noex ;
+extern int tmpx_curenum		(tmpx *,tmpx_cur *,tmpx_ent *) noex ;
+extern int tmpx_fetchuser	(tmpx *,tmpx_cur *,tmpx_ent *,cchar *) noex ;
+extern int tmpx_fetchpid	(tmpx *,tmpx_ent *,pid_t) noex ;
+extern int tmpx_nusers		(tmpx *) noex ;
+extern int tmpx_close		(tmpx *) noex ;
 
-extern int tmpx_getboottime(tmpx *,time_t *) noex ;
-extern int tmpx_getrunlevel(tmpx *) noex ;
-extern int tmpx_getuserlines(tmpx *,vecstr *,cchar *) noex ;
-extern int tmpx_getuserterms(tmpx *,vecstr *,cchar *) noex ;
-extern int tmpx_getsessions(tmpx *,vecint *,cchar *) noex ;
+extern int tmpx_getboottime	(tmpx *,time_t *) noex ;
+extern int tmpx_getrunlevel	(tmpx *) noex ;
+extern int tmpx_getuserlines	(tmpx *,vecstr *,cchar *) noex ;
+extern int tmpx_getuserterms	(tmpx *,vecstr *,cchar *) noex ;
+extern int tmpx_getsessions	(tmpx *,vecint *,cchar *) noex ;
 
 EXTERNC_end
 
