@@ -18,6 +18,10 @@
 
 /******************************************************************************
 
+	Object:
+	plainq
+
+	Description:
 	This object implements a self-relative doublely linked list
 	for queue operations. This type of queue can be used in
 	shared memory areas that are mapped to different addresses
@@ -26,11 +30,9 @@
 	stored with relative positions from the head of the queue.
 	This is done so that multiple processes (in different address
 	spaces) can access the queue (once proper mutual exclusion
-	is provided).
-
-	This object CAN be used in applications where the object
-	is moved (copied) in memory since no pointers (whatever)
-	point back to the header.
+	is provided).  This object CAN be used in applications where
+	the object is moved (copied) in memory since no pointers
+	(whatever) point back to the header.
 
 	Important note:
 
@@ -49,7 +51,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<localmisc.h>
 
 #include	"plainq.h"
 
@@ -58,6 +67,8 @@
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
