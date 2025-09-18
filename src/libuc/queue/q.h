@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stddef.h>		/* <- for |ptrdiff_t| */
-#include	<stdint.h>		/* <- for |intptr_t| */
+#include	<stddef.h>		/* |ptrdiff_t| */
+#include	<stdint.h>		/* |intptr_t| */
 #include	<usystem.h>
 #include	<plainq.h>
 #include	<ptm.h>
@@ -49,13 +49,13 @@ typedef	Q_ENT		q_ent ;
 
 EXTERNC_begin
 
-extern int q_start(q *,int) noex ;
-extern int q_finish(q *) noex ;
-extern int q_ins(q *,q_ent *) noex ;
-extern int q_inshead(q *,q_ent *) noex ;
-extern int q_rem(q *,q_ent **) noex ;
-extern int q_remtail(q *,q_ent **) noex ;
-extern int q_count(q *) noex ;
+extern int q_start	(q *,int) noex ;
+extern int q_finish	(q *) noex ;
+extern int q_ins	(q *,q_ent *) noex ;
+extern int q_inshead	(q *,q_ent *) noex ;
+extern int q_rem	(q *,q_ent **) noex ;
+extern int q_remtail	(q *,q_ent **) noex ;
+extern int q_count	(q *) noex ;
 
 EXTERNC_end
 
