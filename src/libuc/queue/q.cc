@@ -37,8 +37,15 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<ptma.h>
+#include	<localmisc.h>
 
 #include	"q.h"
 
@@ -48,7 +55,7 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -70,9 +77,9 @@ typedef plainq_ent	*entp ;
 
 template<typename ... Args>
 static inline int q_ctor(q *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    if ((op->mxp = new(nothrow) ptm) != np) {
 	        if ((op->pqp = new(nothrow) plainq) != np) {
@@ -118,10 +125,9 @@ int q_start(Q *op,int type) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = q_ctor(op)) >= 0) {
-	    ptma	ma ;
 	    bool	f_mutex = false ;
 	    bool	f_plainq = false ;
-	    if ((rs = ptma_create(&ma)) >= 0) {
+	    if (ptma ma ; (rs = ptma_create(&ma)) >= 0) {
 	        int	matype = PTHREAD_PROCESS_PRIVATE ;
 	        if (type > 0) matype = PTHREAD_PROCESS_SHARED ;
 	        if ((rs = ptma_setpshared(&ma,matype)) >= 0) {
