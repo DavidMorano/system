@@ -113,7 +113,7 @@ int uc_getpuid(pid_t pid) noex {
 	                    uid = sb.st_uid ;
 		        }
 	            } /* end if (mkpidfname) */
-		    rs1 = uc_libfree(pidfname) ;
+		    rs1 = lm_free(pidfname) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (mallocxx) */
 	    } else if (pid == 0) {
