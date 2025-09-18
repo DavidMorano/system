@@ -54,7 +54,7 @@ struct randomvar_flags {
 struct randomvar_head {
 	ulong		*state ;
 	time_t		laststir ;
-	RANDOMVAR_FL	f ;
+	RANDOMVAR_FL	fl ;
 	uint		magic ;
 	int		maintcount ;
 	int		a, b, c ;
