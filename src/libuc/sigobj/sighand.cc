@@ -33,18 +33,35 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucsig.h>
 #include	<localmisc.h>
 
 #include	"sighand.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
 #define	SH		sighand
 #define	SH_H		sighand_handler
+
+
+/* imported namespaces */
+
+using libuc::libmem ;
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -111,7 +128,7 @@ int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
                 }
             }
             sz = (nhandles * szof(sighand_ha)) ;
-            if ((rs >= 0) && (sz > 0) && ((rs = uc_malloc(sz,&p)) >= 0)) {
+            if ((rs >= 0) && (sz > 0) && ((rs = libmem.mall(sz,&p)) >= 0)) {
                 sighand_ha      *hp = (sighand_ha *) p ;
                 SIGACTION	san{} ;
                 SIGACTION	*sap ;
@@ -154,7 +171,7 @@ int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
                         sap = &hp[i].action ;
                         u_sigaction(hsig,sap,nullptr) ;
                     }
-                    uc_free(iap->handles) ;
+                    libmem.free(iap->handles) ;
                     iap->handles = nullptr ;
                 }
             } /* end if (memory allocations) */
@@ -179,7 +196,7 @@ int sighand_finish(SH *iap) noex {
 	            rs1 = u_sigaction(hsig,sap,nullptr) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end for */
-	        rs1 = uc_free(iap->handles) ;
+	        rs1 = libmem.free(iap->handles) ;
 	        if (rs >= 0) rs = rs1 ;
 	        iap->handles = nullptr ;
 	    } /* end if */
