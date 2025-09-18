@@ -49,20 +49,20 @@ typedef PQ_CUR		pq_cur ;
 
 EXTERNC_begin
 
-extern int pq_start(pq *) noex ;
-extern int pq_ins(pq *,pq_ent *) noex ;
-extern int pq_insgroup(pq *,pq_ent *,int,int) noex ;
-extern int pq_gethead(pq *,pq_ent **) noex ;
-extern int pq_gettail(pq *,pq_ent **) noex ;
-extern int pq_rem(pq *,pq_ent **) noex ;
-extern int pq_remtail(pq *,pq_ent **) noex ;
-extern int pq_unlink(pq *,pq_ent *) noex ;
-extern int pq_curbegin(pq *,pq_cur *) noex ;
-extern int pq_curend(pq *,pq_cur *) noex ;
-extern int pq_enum(pq *,pq_cur *,pq_ent **) noex ;
-extern int pq_count(pq *) noex ;
-extern int pq_audit(pq *) noex ;
-extern int pq_finish(pq *) noex ;
+extern int pq_start	(pq *) noex ;
+extern int pq_ins	(pq *,pq_ent *) noex ;
+extern int pq_insgroup	(pq *,pq_ent *,int,int) noex ;
+extern int pq_gethead	(pq *,pq_ent **) noex ;
+extern int pq_gettail	(pq *,pq_ent **) noex ;
+extern int pq_rem	(pq *,pq_ent **) noex ;
+extern int pq_remtail	(pq *,pq_ent **) noex ;
+extern int pq_unlink	(pq *,pq_ent *) noex ;
+extern int pq_curbegin	(pq *,pq_cur *) noex ;
+extern int pq_curend	(pq *,pq_cur *) noex ;
+extern int pq_curenum	(pq *,pq_cur *,pq_ent **) noex ;
+extern int pq_count	(pq *) noex ;
+extern int pq_audit	(pq *) noex ;
+extern int pq_finish	(pq *) noex ;
 
 EXTERNC_end
 
