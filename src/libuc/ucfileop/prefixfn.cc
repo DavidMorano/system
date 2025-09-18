@@ -76,8 +76,8 @@ local bool isprefix(int ch) noex {
 /* local variables */
 
 constexpr cauto		mem_almp = libmalloc_mp ;
-constexpr cauto		mem_alst = uc_libmallocstrw ;
-constexpr cauto		mem_free = uc_libfree ;
+constexpr cauto		mem_alst = lm_strw ;
+constexpr cauto		mem_free = lm_free ;
 
 
 /* exported variables */
