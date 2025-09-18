@@ -76,7 +76,6 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |lenstr(3c)| */
 #include	<usystem.h>
 #include	<sigblocker.h>
 #include	<aflag.hh>
@@ -88,7 +87,9 @@
 
 #include	"ucclustername.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* local defines */
 
@@ -101,6 +102,8 @@ import libutil ;
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -275,31 +278,32 @@ int ucclustername_get(char *rbuf,int rlen,cchar *nn) noex {
 }
 /* end subroutine (ucclustername_get) */
 
-int ucclustername_set(cchar *cbuf,int clen,cchar *nn,int to) noex {
+int ucclustername_set(cchar *cbuf,int µclen,cchar *nn,int to) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
 	if (cbuf && nn) ylikely {
 	    rs = SR_INVALID ;
 	    if (cbuf[0] && nn[0]) ylikely {
-	        if (clen < 0) clen = lenstr(cbuf) ;
-	        if (sigblocker b ; (rs = b.start) >= 0) ylikely {
-	            if ((rs = ucclustername_init()) >= 0) ylikely {
-	                SI si ;
-		        char		*sbuf = charp(cbuf) ;
-	                if ((rs = subinfo_start(&si,sbuf,clen,nn)) >= 0) {
-	                    UCLUSTERNAME	*uip = &ucclustername_data ;
-		            {
-	                        rs = subinfo_cacheset(&si,uip,to) ;
-				rc = rs ;
-		            }
-	                    rs1 = subinfo_finish(&si) ;
-	                    if (rs >= 0) rs = rs1 ;
-	                } /* end if (subinfo) */
-	            } /* end if (ucclustername_init) */
-	            rs1 = b.finish ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (sigblock) */
+		if (int clen ; (clen = getlenstr(cbuf,µclen)) >= 0) {
+	            if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	                if ((rs = ucclustername_init()) >= 0) ylikely {
+	                    SI si ;
+		            char *sbuf = charp(cbuf) ;
+	                    if ((rs = subinfo_start(&si,sbuf,clen,nn)) >= 0) {
+	                        UCLUSTERNAME *uip = &ucclustername_data ;
+		                {
+	                            rs = subinfo_cacheset(&si,uip,to) ;
+				    rc = rs ;
+		                }
+	                        rs1 = subinfo_finish(&si) ;
+	                        if (rs >= 0) rs = rs1 ;
+	                    } /* end if (subinfo) */
+	                } /* end if (ucclustername_init) */
+	                rs1 = b.finish ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end if (sigblock) */
+		} /* end if (getlenstr) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
@@ -313,7 +317,7 @@ static int ucclustername_end(UCLUSTERNAME *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->a) {
-	    rs1 = uc_libfree(uip->a) ;
+	    rs1 = libmem.free(uip->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    uip->a = nullptr ;
 	    uip->nn = nullptr ;
@@ -447,7 +451,7 @@ static int subinfo_cacheset(SI *sip,UCLUSTERNAME *uip,int ttl) noex {
 	    f = true ;
 	    sz += (lenstr(sip->nn) + 1) ;
 	    sz += (lenstr(sip->rbuf,sip->rlen) + 1) ;
-	    if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) ylikely {
+	    if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) ylikely {
 	        uca.a = bp ;
 	        aprev = uip->a ;
 	        uca.nn = bp ;
@@ -461,7 +465,7 @@ static int subinfo_cacheset(SI *sip,UCLUSTERNAME *uip,int ttl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (alloc) */
 	if ((rs >= 0) && aprev) {
-	    uc_libfree(aprev) ;
+	    libmem.free(aprev) ;
 	}
 	return (rs >= 0) ? f : rs ;
 }
