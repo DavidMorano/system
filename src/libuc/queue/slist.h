@@ -77,6 +77,7 @@ struct slist : slist_head {
 	    start	(this,slistmem_start) ;
 	    audit	(this,slistmem_audit) ;
 	    finish	(this,slistmem_finish) ;
+	    head = nullptr ;
 	} ;
 	slist(const slist &) = delete ;
 	slist &operator = (const slist &) = delete ;
@@ -92,7 +93,7 @@ struct slist : slist_head {
 	int curend(slist_cur *) noex ;
 	void dtor() noex ;
 	destruct slist() {
-	    dtor() ;
+	    if (head) dtor() ;
 	} ;
 } ; /* end struct (slist) */
 #else	/* __cplusplus */
@@ -101,20 +102,20 @@ typedef SLIST		slist ;
 
 EXTERNC_begin
 
-extern int slist_start(slist *) noex ;
-extern int slist_ins(slist *,slist_ent *) noex ;
-extern int slist_insgroup(slist *,slist_ent *,int,int) noex ;
-extern int slist_present(slist *,slist_ent *) noex ;
-extern int slist_gethead(slist *,slist_ent **) noex ;
-extern int slist_gettail(slist *,slist_ent **) noex ;
-extern int slist_rem(slist *,slist_ent **) noex ;
-extern int slist_unlink(slist *,slist_ent *) noex ;
-extern int slist_curbegin(slist *,slist_cur *) noex ;
-extern int slist_curend(slist *,slist_cur *) noex ;
-extern int slist_curenum(slist *,slist_cur *,slist_ent **) noex ;
-extern int slist_count(slist *) noex ;
-extern int slist_audit(slist *) noex ;
-extern int slist_finish(slist *) noex ;
+extern int slist_start		(slist *) noex ;
+extern int slist_ins		(slist *,slist_ent *) noex ;
+extern int slist_insgroup	(slist *,slist_ent *,int,int) noex ;
+extern int slist_present	(slist *,slist_ent *) noex ;
+extern int slist_gethead	(slist *,slist_ent **) noex ;
+extern int slist_gettail	(slist *,slist_ent **) noex ;
+extern int slist_rem		(slist *,slist_ent **) noex ;
+extern int slist_unlink		(slist *,slist_ent *) noex ;
+extern int slist_curbegin	(slist *,slist_cur *) noex ;
+extern int slist_curend		(slist *,slist_cur *) noex ;
+extern int slist_curenum	(slist *,slist_cur *,slist_ent **) noex ;
+extern int slist_count		(slist *) noex ;
+extern int slist_audit		(slist *) noex ;
+extern int slist_finish		(slist *) noex ;
 
 EXTERNC_end
 
