@@ -147,7 +147,7 @@ int namesem_open(namesem *op,cchar *name,int of,mode_t om,uint c) noex {
 	                        op->magic = NAMESEM_MAGIC ;
 			    }
 			    if (rs < 0) {
-				uc_libfree(op->name) ;
+				lm_free(op->name) ;
 				op->name = nullptr ;
 			    }
 			} /* end if (memory-allocation) */
@@ -170,7 +170,7 @@ int namesem_close(namesem *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->name) {
-		rs1 = uc_libfree(op->name) ;
+		rs1 = lm_free(op->name) ;
 		if (rs >= 0) rs = rs1 ;
 		op->name = nullptr ;
 	    }
@@ -405,7 +405,7 @@ static int namesemdiradd(cchar *name,mode_t om) noex {
 	            }
 	            if (rs >= 0) u_close(rs) ;
 		} /* end if (mkpath2) */
-		rs1 = uc_libfree(tmpfname) ;
+		rs1 = lm_free(tmpfname) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mallocxx-tmpfname) */
 	} /* end if (non-null) */
@@ -422,7 +422,7 @@ static int namesemdirrm(cchar *name) noex {
 	        if ((rs = mkpath2(tmpfname,pp,name)) >= 0) {
 		    rs = u_unlink(tmpfname) ;
 	        } /* end if (mkpath2) */
-	        rs1 = uc_libfree(tmpfname) ;
+	        rs1 = lm_free(tmpfname) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mallocxx-tmpfnam) */
 	} /* end if (non-null) */
@@ -447,7 +447,7 @@ static int namesemdircheck(cchar *pp) noex {
 	    } else if (isNotPresent(rs)) {
 		rs = namesemdirchecker(pwbuf,pwlen,pp) ;
 	    }
-	    rs1 = uc_libfree(pwbuf) ;
+	    rs1 = lm_free(pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
