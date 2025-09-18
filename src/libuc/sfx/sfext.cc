@@ -98,7 +98,7 @@ namespace {
 
 /* local variables */
 
-constexpr brkinit       bi ;
+local brkinit		bi ;
 
 cbool			f_sirchr = CF_SIRCHR ;
 
