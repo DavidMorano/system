@@ -24,7 +24,8 @@
 /*******************************************************************************
 
   	Group:
-	uc_lbmemalloc
+	uc_lbmemsys
+	uc_lbmemallocsys
 
 	Description:
 	This is the low-level component of the MEMALLOC facility.
@@ -42,6 +43,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
+#include	<ucmem.h>		/* |libuc::mem(3uc)| */
 #include	<getbufsize.h>
 #include	<localmisc.h>
 
@@ -55,6 +57,8 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 
 /* imported namespaces */
+
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -80,20 +84,20 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* exported subroutines */
 
-int uc_libmemallocsys(int w,char **rpp) noex {
+int uc_libmemsys(int w,char **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (rpp) {
 	    *rpp = nullptr ;
 	    if ((rs = getbufsize(w)) >= 0) {
 		rl = rs ;
-	        if (char *bp ; (rs = uc_libmalloc((rl+1),&bp)) >= 0) {
+	        if (char *bp ; (rs = mem.mall((rl + 1),&bp)) >= 0) {
 	            *rpp = bp ;
 	        } /* end if */
 	    } /* end if (getbufsize) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (uc_libmemallocsys) */
+/* end subroutine (uc_libmemsys) */
 
 
