@@ -173,7 +173,7 @@ int suber::fileopen(cchar *fname) noex {
 	    if ((rs = uc_open(fname,of,om)) >= 0) {
 	        fd = rs ;
 	        fopened = true ;
-	    }
+	    } /* end if (uc_open) */
 	} /* end if (actually needed an open) */
 	return rs ;
 } /* end method (suber::fileopen) */
@@ -239,7 +239,8 @@ int suber::loadfds(int fbsz,int fbo,int to) noex {
 	        rs1 = fb.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (filer) */
-	    rs = rslibfree(rs,lbuf) ;
+	    rs1 = libmalloc_free(lbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 } /* end method (suber::loadfds) */
