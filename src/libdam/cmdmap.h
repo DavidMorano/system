@@ -41,7 +41,7 @@ struct cmdmap_flags {
 
 struct cmdmap_head {
 	vecobj		*mlp ;		/* map-list-pointer */
-	CMDMAP_FL	f ;
+	CMDMAP_FL	fl ;
 	uint		magic ;
 } ;
 
@@ -60,6 +60,5 @@ EXTERNC_end
 
 
 #endif /* CMDMAP_INCLUDE */
-
 
 
