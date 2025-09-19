@@ -239,7 +239,7 @@ int biblebook_close(BIBLEBOOK *op) noex {
 	    op->names = nullptr ;
 	}
 
-	if (! op->f.localdb) {
+	if (! op->fl.localdb) {
 
 	    rs1 = (*op->call.close)(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -261,7 +261,7 @@ int biblebook_count(BIBLEBOOK *op) noex {
 
 	if (op->magic != BIBLEBOOK_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.localdb) {
+	if (op->fl.localdb) {
 	    rs = nelem(booknames) - 1 ;
 	} else {
 	    if (op->call.count != nullptr) {
@@ -292,7 +292,7 @@ int biblebook_audit(BIBLEBOOK *op) noex {
 
 	if (op->magic != BIBLEBOOK_MAGIC) return SR_NOTOPEN ;
 
-	if (! op->f.localdb) {
+	if (! op->fl.localdb) {
 	    rs = SR_NOSYS ;
 	    if (op->call.audit != nullptr) {
 	        rs = (*op->call.audit)(op->obj) ;
@@ -313,7 +313,7 @@ int biblebook_lookup(BIBLEBOOK *op,char *rbuf,int rlen,int bi) noex {
 
 	if (bi < 0) return SR_INVALID ;
 
-	if (op->f.localdb) {
+	if (op->fl.localdb) {
 	    cint	n = (nelem(booknames) - 1) ;
 	    if (bi < n) {
 	        rs = sncpy1(rbuf,rlen,booknames[bi]) ;
@@ -346,14 +346,14 @@ int biblebook_match(BIBLEBOOK *op,cchar *mbuf,int mlen) noex {
 
 	if (op->magic != BIBLEBOOK_MAGIC) return SR_NOTOPEN ;
 
-	if (! op->f.localdb) {
+	if (! op->fl.localdb) {
 	    rs = SR_NOSYS ;
 	    if (op->call.match != nullptr) {
 	        rs = (*op->call.match)(op->obj,mbuf,mlen) ;
 	    }
 	} 
 
-	if (op->f.localdb || (rs == SR_NOSYS)) {
+	if (op->fl.localdb || (rs == SR_NOSYS)) {
 	    rs = biblebook_matcher(op,mbuf,mlen) ;
 	}
 
@@ -386,7 +386,7 @@ static int biblebook_openload(BIBLEBOOK *op,cchar *pr,cchar *dbname) noex {
 /* end subroutine (biblebook_openload) */
 
 static int biblebook_openlocal(BIBLEBOOK *op) noex {
-	op->f.localdb = true ;
+	op->fl.localdb = true ;
 	return SR_OK ;
 }
 /* end subroutine (biblebook_openlocal) */
@@ -560,7 +560,7 @@ static int biblebook_matcher(BIBLEBOOK *op,cchar *mbuf,int mlen) noex {
 static int biblebook_loadnames(BIBLEBOOK *op) noex {
 	int		rs = SR_OK ;
 	if (op->names == nullptr) {
-	    if (op->f.localdb) {
+	    if (op->fl.localdb) {
 	        rs = biblebook_loadnameslocal(op) ;
 	    } else {
 	        rs = biblebook_loadnamesremote(op) ;
