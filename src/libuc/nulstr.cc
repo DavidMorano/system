@@ -30,18 +30,40 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"nulstr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -65,8 +87,7 @@ int nulstr_start(nulstr *ssp,cchar *sp,int sl,cchar **rpp) noex {
 	    if (sl >= 0) ylikely {
 	        if (sp[sl] != '\0') {
 	            if (sl > NULSTR_SHORTLEN) {
-		        cchar	*cp ;
-	                if ((rs = uc_libmallocstrw(sp,sl,&cp)) >= 0) {
+	                if (cc *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
 	                    cl = rs ;
 	                    *rpp = cp ;
 	                    ssp->as = cp ;
@@ -93,7 +114,7 @@ int nulstr_finish(nulstr *ssp) noex {
 	    rs = SR_OK ;
 	    if (ssp->as) ylikely {
 		char *bp = cast_const<charp>(ssp->as) ;
-	        rs1 = uc_libfree(bp) ;
+	        rs1 = libmem.free(bp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ssp->as = nullptr ;
 	    }
