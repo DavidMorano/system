@@ -328,10 +328,10 @@ int main(int argc,mainv argv,mainv envv) {
 	pip->vzlw = 0 ;
 	pip->vzlb = 0 ;
 
-	pip->f.pagenums = false ;
-	pip->f.hyphenate = true ;
-	pip->f.ha = true ;
-	pip->f.ibz = OPT_IBZ ;
+	pip->fl.pagenums = false ;
+	pip->fl.hyphenate = true ;
+	pip->fl.ha = true ;
+	pip->fl.ibz = OPT_IBZ ;
 
 	if (pip->daytime == 0) pip->daytime = time(nullptr) ;
 
@@ -666,7 +666,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    pip->have.frontmatter = true ;
 	                    pip->final.frontmatter = true ;
 	                    if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
-	                        pip->f.frontmatter = true ;
+	                        pip->fl.frontmatter = true ;
 	                        pip->frontfname = cp ;
 	                    }
 	                    break ;
@@ -684,10 +684,10 @@ int main(int argc,mainv argv,mainv envv) {
 	                    } /* end if */
 	                    pip->have.backmatter = true ;
 	                    pip->final.backmatter = true ;
-	                    pip->f.backmatter = true ;
+	                    pip->fl.backmatter = true ;
 	                    if ((cp != nullptr) && (cl > 0)) {
 	                        rs = optbool(cp,cl) ;
-	                        pip->f.backmatter = (rs > 0) ;
+	                        pip->fl.backmatter = (rs > 0) ;
 	                    }
 	                    break ;
 
@@ -704,10 +704,10 @@ int main(int argc,mainv argv,mainv envv) {
 	                    } /* end if */
 	                    pip->have.ibz = true ;
 	                    pip->final.ibz = true ;
-	                    pip->f.ibz = true ;
+	                    pip->fl.ibz = true ;
 	                    if ((cp != nullptr) && (cl > 0)) {
 	                        rs = optbool(cp,cl) ;
-	                        pip->f.ibz = (rs > 0) ;
+	                        pip->fl.ibz = (rs > 0) ;
 	                    }
 	                    break ;
 
@@ -785,10 +785,10 @@ int main(int argc,mainv argv,mainv envv) {
 	                    } /* end if */
 	                    pip->have.tc = true ;
 	                    pip->final.tc = true ;
-	                    pip->f.tc = true ;
+	                    pip->fl.tc = true ;
 	                    if ((cp != nullptr) && (cl > 0)) {
 	                        rs = optbool(cp,cl) ;
-	                        pip->f.tc = (rs > 0) ;
+	                        pip->fl.tc = (rs > 0) ;
 	                    }
 	                    break ;
 
@@ -806,7 +806,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    } /* end if */
 	                    pip->have.pagetitle = true ;
 	                    pip->final.pagetitle = true ;
-	                    pip->f.pagetitle = true ;
+	                    pip->fl.pagetitle = true ;
 	                    if ((cp != nullptr) && (cl > 0)) {
 	                        pip->pagetitle = cp ;
 	                    }
@@ -841,7 +841,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -1032,12 +1032,12 @@ int main(int argc,mainv argv,mainv envv) {
 
 	if (! pip->have.hyphenate) {
 	    pip->have.hyphenate = true ;
-	    pip->f.hyphenate = true ;
+	    pip->fl.hyphenate = true ;
 	}
 
 	if (! pip->have.ha) {
 	    pip->have.ha = true ;
-	    pip->f.ha = true ;
+	    pip->fl.ha = true ;
 	}
 
 /* if no font-family was specified on invocation -> assume "Times" */
@@ -1109,7 +1109,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            cchar	*fmt = "%s: invalid text encountered (%d)\n" ;
 	            bprintf(pip->efp,fmt,pip->progname,rs) ;
 	        }
@@ -1238,10 +1238,10 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                    if (! pip->have.hyphenate) {
 	                        pip->have.hyphenate = true ;
 	                        pip->final.hyphenate = true ;
-	                        pip->f.hyphenate = true ;
+	                        pip->fl.hyphenate = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.hyphenate = (rs > 0) ;
+	                            pip->fl.hyphenate = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1250,10 +1250,10 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                    if (! pip->have.ha) {
 	                        pip->have.ha = true ;
 	                        pip->final.ha = true ;
-	                        pip->f.ha = true ;
+	                        pip->fl.ha = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.ha = (rs > 0) ;
+	                            pip->fl.ha = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1270,7 +1270,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                        pip->final.vs = true ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
-	                            pip->f.vs = rs ;
+	                            pip->fl.vs = rs ;
 	                        }
 	                    }
 	                    break ;
@@ -1285,11 +1285,11 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                    if (! pip->have.frontmatter) {
 	                        pip->have.frontmatter = true ;
 	                        pip->final.frontmatter = true ;
-	                        pip->f.frontmatter = true ;
+	                        pip->fl.frontmatter = true ;
 	                        if (vl > 0) {
 	                            cchar	**vpp = &pip->frontfname ;
 	                            rs = proginfo_setentry(pip,vpp,vp,vl) ;
-	                            pip->f.frontmatter = (rs > 0) ;
+	                            pip->fl.frontmatter = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1298,10 +1298,10 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                    if (! pip->have.backmatter) {
 	                        pip->have.backmatter = true ;
 	                        pip->final.backmatter = true ;
-	                        pip->f.backmatter = true ;
+	                        pip->fl.backmatter = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.backmatter = (rs > 0) ;
+	                            pip->fl.backmatter = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1310,10 +1310,10 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                    if (! pip->have.pagenums) {
 	                        pip->have.pagenums = true ;
 	                        pip->final.pagenums = true ;
-	                        pip->f.pagenums = true ;
+	                        pip->fl.pagenums = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.pagenums = (rs > 0) ;
+	                            pip->fl.pagenums = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1322,10 +1322,10 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                    if (! pip->have.ibz) {
 	                        pip->have.ibz = true ;
 	                        pip->final.ibz = true ;
-	                        pip->f.ibz = true ;
+	                        pip->fl.ibz = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.ibz = (rs > 0) ;
+	                            pip->fl.ibz = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1334,10 +1334,10 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                    if (! pip->have.tc) {
 	                        pip->have.tc = true ;
 	                        pip->final.tc = true ;
-	                        pip->f.tc = true ;
+	                        pip->fl.tc = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.tc = (rs > 0) ;
+	                            pip->fl.tc = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1347,11 +1347,11 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                    if (! pip->have.pagetitle) {
 	                        pip->have.pagetitle = true ;
 	                        pip->final.pagetitle = true ;
-	                        pip->f.pagetitle = true ;
+	                        pip->fl.pagetitle = true ;
 	                        if (vl > 0) {
 	                            cchar	**vpp = &pip->pagetitle ;
 	                            rs = proginfo_setentry(pip,vpp,vp,vl) ;
-	                            pip->f.pagetitle = (rs > 0) ;
+	                            pip->fl.pagetitle = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1547,7 +1547,7 @@ static int procargs(PI *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
 	        rs1 = bclose(afp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    fmt = "%s: inaccessible argument-file (%d)\n" ;
 	            bprintf(pip->efp,fmt,pn,rs) ;
 	            bprintf(pip->efp,"%s:  afile=%s\n",pn,afn) ;
