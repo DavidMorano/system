@@ -53,7 +53,7 @@ struct pwfile_head {
 	vecitem		*alp ;
 	hdb		*ulp ;		/* user-list-pointer */
 	time_t		readtime ;
-	PWFILE_FL	f ;
+	PWFILE_FL	fl ;
 	uint		magic ;
 	int		lfd ;
 } ;
