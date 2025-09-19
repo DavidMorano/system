@@ -64,7 +64,7 @@ struct calyears_head {
 	HOLIDAYER	hols ;
 	vechand		doms ;
 	vechand		cals ;			/* calendars */
-	CALYEARS_FL	f ;
+	CALYEARS_FL	fl ;
 	CALYEARS_FL	init, open ;
 	uint		magic ;
 	int		nentries ;
