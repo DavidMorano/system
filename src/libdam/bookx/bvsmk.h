@@ -57,7 +57,7 @@ struct bvsmk_head {
 	cchar		*idname ;
 	char		*nidxfname ;
 	vecobj		books ;
-	BVSMK_FL	f ;
+	BVSMK_FL	fl ;
 	uint		magic ;
 	int		nverses ;
 	int		nzverses ;
