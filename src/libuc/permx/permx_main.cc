@@ -200,14 +200,14 @@ int tryer::start() noex {
 	    cint	ng = rs ;
 	    if (gids == nullptr) {
 	        cint	gsize = ((ng + 1) * szof(gid_t)) ;
-	        if (void *vp{} ; (rs = uc_libmalloc(gsize,&vp)) >= 0) {
+	        if (void *vp{} ; (rs = lm_mall(gsize,&vp)) >= 0) {
 		    gids = (gid_t *) vp ;
 		    f_gidalloc = true ;
 	            if ((rs = u_getgroups(ng,gids)) >= 0) {
 		        gids[rs] = gidend ;
 		    }
 		    if (rs < 0) {
-		        uc_libfree(gids) ;
+		        lm_free(gids) ;
 		        gids = nullptr ;
 		        f_gidalloc = false ;
 	            }
@@ -223,7 +223,7 @@ int tryer::finish() noex {
 	int		rs1 ;
 	if (f_gidalloc && gids) {
 	    f_gidalloc = false ;
-	    rs1 = uc_libfree(gids) ;
+	    rs1 = lm_free(gids) ;
 	    if (rs >= 0) rs = rs1 ;
 	    gids = nullptr ;
 	}
