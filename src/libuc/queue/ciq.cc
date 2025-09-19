@@ -36,9 +36,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<ptm.h>
 #include	<pq.h>
+#include	<localmisc.h>
 
 #include	"ciq.h"
 
@@ -48,7 +55,7 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -72,9 +79,9 @@ struct ciq_ent : pq_ent {
 
 template<typename ... Args>
 static inline int ciq_ctor(ciq *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    if ((op->mxp = new(nothrow) ptm) != np) {
 	        if ((op->fifop = new(nothrow) pq) != np) {
@@ -142,7 +149,7 @@ static int	pq_finishup(pq *) noex ;
 int ciq_start(ciq *op) noex {
 	int		rs ;
 	if ((rs = ciq_ctor(op)) >= 0) {
-	    if ((rs = ptm_create(op->mxp,NULL)) >= 0) {
+	    if ((rs = ptm_create(op->mxp,nullptr)) >= 0) {
 		if ((rs = pq_start(op->fifop)) >= 0) {
 	            if ((rs = pq_start(op->freep)) >= 0) {
 		        op->magic = CIQ_MAGIC ;
@@ -191,12 +198,12 @@ int ciq_ins(ciq *op,void *vp) noex {
 	int		c = 0 ;
 	if ((rs = ciq_magic(op,vp)) >= 0) {
 	    if ((rs = ptm_lock(op->mxp)) >= 0) {
-	        pq_ent	*pep{} ;
+	        pq_ent	*pep{} ; /* used-afterwards */
 	        cint	rse = SR_EMPTY ;
 	        if ((rs = pq_remtail(op->freep,&pep)) == rse) {
 		    cint	esz = szof(ciq_ent) ;
-	            rs = uc_libmalloc(esz,&pep) ;
-	        }
+	            rs = libmem.mall(esz,&pep) ;
+	        } /* end if (memory-allocation) */
 	        if (rs >= 0) {
 	            ciq_ent	*cep = (ciq_ent *) pep ;
 	            cep->vp = vp ;
@@ -218,8 +225,7 @@ int ciq_rem(ciq *op,void *vrp) noex {
 	if ((rs = ciq_magic(op,vrp)) >= 0) {
 	    void	**vpp = voidpp(vrp) ;
 	    if ((rs = ptm_lock(op->mxp)) >= 0) {
-	        pq_ent	*pep{} ;
-	        if ((rs = pq_rem(op->fifop,&pep)) >= 0) {
+	        if (pq_ent *pep{} ; (rs = pq_rem(op->fifop,&pep)) >= 0) {
 	            c = rs ;
 	            if (vpp) {
 		        ciq_ent	*cep = (ciq_ent *) pep ;
@@ -227,7 +233,7 @@ int ciq_rem(ciq *op,void *vrp) noex {
 	            } /* end if */
 		    rs1 = pq_ins(op->freep,pep) ;
 		    if (rs1 < 0) {
-		        uc_libfree(pep) ;
+		        libmem.free(pep) ;
 		    }
 	        } /* end if (pq_rem) */
 	        rs1 = ptm_unlock(op->mxp) ;
@@ -245,8 +251,7 @@ int ciq_gettail(ciq *op,void *vrp) noex {
 	if ((rs = ciq_magic(op)) >= 0) {
 	    void	**rpp = (void **) vrp ;
 	    if ((rs = ptm_lock(op->mxp)) >= 0) {
-	        pq_ent	*pep{} ;
-	        if ((rs = pq_gettail(op->fifop,&pep)) >= 0) {
+	        if (pq_ent *pep{} ; (rs = pq_gettail(op->fifop,&pep)) >= 0) {
 	            c = rs ;
 	            if (rpp) {
 		        ciq_ent	*cep = (ciq_ent *) pep ;
@@ -268,8 +273,7 @@ int ciq_remtail(ciq *op,void *vrp) noex {
 	if ((rs = ciq_magic(op)) >= 0) {
 	    void	**rpp = (void **) vrp ;
 	    if ((rs = ptm_lock(op->mxp)) >= 0) {
-	        pq_ent	*pep{} ;
-	        if ((rs = pq_remtail(op->fifop,&pep)) >= 0) {
+	        if (pq_ent *pep{} ; (rs = pq_remtail(op->fifop,&pep)) >= 0) {
 	            c = rs ;
 	            if (rpp) {
 		        ciq_ent	*cep = (ciq_ent *) pep ;
@@ -277,7 +281,7 @@ int ciq_remtail(ciq *op,void *vrp) noex {
 		    }
 		    rs = pq_ins(op->freep,pep) ;
 		    if (rs < 0) {
-		        uc_libfree(pep) ;
+		        libmem.free(pep) ;
 		    }
 	        } /* end if (pq_remtail) */
 	        rs1 = ptm_unlock(op->mxp) ;
@@ -294,13 +298,12 @@ int ciq_rement(ciq *op,void *ep) noex {
 	int		c = 0 ;
 	if ((rs = ciq_magic(op)) >= 0) {
 	    if ((rs = ptm_lock(op->mxp)) >= 0) {
-	        pq_ent	*pep{} ;
-	        if ((rs = ciq_findent(op,&pep,ep)) > 0) {
+	        if (pq_ent *pep{} ; (rs = ciq_findent(op,&pep,ep)) > 0) {
 	            if ((rs = pq_unlink(op->fifop,pep)) >= 0) {
 	                c = rs ;
 		        rs = pq_ins(op->freep,pep) ;
 		        if (rs < 0) {
-			    uc_libfree(pep) ;
+			    libmem.free(pep) ;
 			}
 	            } /* end if (pq_remtail) */
 	        } else if (rs == 0) {
@@ -335,16 +338,18 @@ int ciq_count(ciq *op) noex {
 int ciq_audit(ciq *op) noex {
 	int		rs ;
 	int		rs1 ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = ciq_magic(op)) >= 0) {
 	    if ((rs = ptm_lock(op->mxp)) >= 0) {
 	        if ((rs = pq_audit(op->freep)) >= 0) {
 	            rs = pq_audit(op->fifop) ;
+		    rv = rs ;
 	        }
 	        rs1 = ptm_unlock(op->mxp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (ciq_audit) */
 
@@ -353,20 +358,19 @@ int ciq_audit(ciq *op) noex {
 
 static int ciq_findent(ciq *op,pq_ent **rpp,cvoid *vrp) noex {
 	pq		*pqp = op->fifop ;
-	pq_cur		cur ;
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if ((rs = pq_curbegin(pqp,&cur)) >= 0) {
-	    pq_ent	*pep{} ;
-	    while ((rs1 = pq_enum(pqp,&cur,&pep)) >= 0) {
+	if (pq_cur cur ; (rs = pq_curbegin(pqp,&cur)) >= 0) {
+	    pq_ent *pep{} ; /* used-afterwards */
+	    while ((rs1 = pq_curenum(pqp,&cur,&pep)) >= 0) {
 		ciq_ent	*cep = (ciq_ent *) pep ;
 		f = (cep->vp == vrp) ;
 		if (f) break ;
 	    } /* end while */
 	    if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	    if (rpp) {
-		*rpp = (f) ? pep : NULL ;
+		*rpp = (f) ? pep : nullptr ;
 	    }
 	    rs1 = pq_curend(pqp,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -379,9 +383,8 @@ static int pq_finishup(pq *qp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
-	    pq_ent	*pep{} ;
-	    while ((rs1 = pq_rem(qp,&pep)) >= 0) {
-	        rs1 = uc_libfree(pep) ;
+	    if (pq_ent *pep ; (rs1 = pq_rem(qp,&pep)) >= 0) {
+	        rs1 = libmem.free(pep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if ((rs >= 0) && (rs1 != SR_EMPTY)) rs = rs1 ;
