@@ -1055,7 +1055,7 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 	    if (rs < 0)
 	        goto badlisten ;
 
-	    if (dip->f.errchan) {
+	    if (dip->fl.errchan) {
 
 	        rs = mklisten_start(dip,&dip->serr) ;
 	        afd2 = rs ;
@@ -1172,7 +1172,7 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 	    fd = s ;
 	    u_close(afd) ;
 
-	    if (dip->f.errchan) {
+	    if (dip->fl.errchan) {
 
 	        dummylen = szof(SOCKADDRESS) ;
 	        rs = uc_accepte(afd2,&dummy,&dummylen,TO_ACCEPT) ;
@@ -1187,7 +1187,7 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 
 	    mklisten_finish(dip,&dip->sout) ;
 
-	    if (dip->f.errchan)
+	    if (dip->fl.errchan)
 	        mklisten_finish(dip,&dip->serr) ;
 
 	} /* end if (light-weight mode) */
@@ -1228,7 +1228,7 @@ badsend:
 
 	    mklisten_finish(dip,&dip->sout) ;
 
-	    if (dip->f.errchan) {
+	    if (dip->fl.errchan) {
 	        u_close(afd2) ;
 	        mklisten_finish(dip,&dip->serr) ;
 	    }
@@ -1692,7 +1692,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 
 	    memcpy(&m5.saout,&dip->sout.sa,dip->sout.salen) ;
 
-	    if (dip->f.errchan) {
+	    if (dip->fl.errchan) {
 	        memcpy(&m5.saerr,&dip->serr.sa,dip->serr.salen) ;
 	    } else {
 	        m5.saerr = {} ;
@@ -2079,7 +2079,7 @@ double		*ap ;
 	                se.nodename,avail) ;
 #endif
 
-	            if ((! op->dip->f.empty) || (empty > 0.0)) {
+	            if ((! op->dip->fl.empty) || (empty > 0.0)) {
 
 	                c += 1 ;
 	                if (avail > bestavail) {
