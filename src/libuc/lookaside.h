@@ -29,7 +29,7 @@
 
 
 #define	LOOKASIDE		struct lookaside_head
-#define	LOOKASIDE_MINENTRIES	4
+#define	LOOKASIDE_MINENTS	4
 
 
 struct lookaside_head {
@@ -49,12 +49,12 @@ typedef LOOKASIDE	lookaside ;
 
 EXTERNC_begin
 
-extern int lookaside_start(lookaside *,int,int) noex ;
-extern int lookaside_get(lookaside *,void *) noex ;
-extern int lookaside_release(lookaside *,void *) noex ;
-extern int lookaside_count(lookaside *) noex ;
-extern int lookaside_finish(lookaside *) noex ;
-extern int lookaside_audit(lookaside *) noex ;
+extern int lookaside_start	(lookaside *,int,int) noex ;
+extern int lookaside_get	(lookaside *,void *) noex ;
+extern int lookaside_release	(lookaside *,void *) noex ;
+extern int lookaside_count	(lookaside *) noex ;
+extern int lookaside_finish	(lookaside *) noex ;
+extern int lookaside_audit	(lookaside *) noex ;
 
 EXTERNC_end
 
