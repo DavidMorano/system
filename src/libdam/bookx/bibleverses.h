@@ -70,7 +70,7 @@ struct bibleverses_head {
 	cchar 		*dbname ;		/* DB-name */
 	cchar 		*dbfname ;		/* DB file-name */
 	char		*mapdata ;		/* memory-map address */
-	BIBLEVERSES_FL	f ;
+	BIBLEVERSES_FL	fl ;
 	bvi		vind ;			/* verse-index */
 	time_t		ti_db ;			/* DB file modification */
 	time_t		ti_map ;		/* DB map */
