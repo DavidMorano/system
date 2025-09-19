@@ -398,14 +398,14 @@ int commandment_search(CMD *op,cc *s,cmpfunc,cchar **rpp) noex {
 	if (cmpfunc == nullptr) cmpfunc = defaultcmp ;
 	if ((rs = commandment_magic(op,s,rpp)) >= 0) {
 	    char	**rpp2 ;
-	    if (op->f.osorted && (! op->f.issorted)) {
-	        op->f.issorted = true ;
+	    if (op->fl.osorted && (! op->fl.issorted)) {
+	        op->fl.issorted = true ;
 	        if (op->c > 1) {
 		    csize	qn = size_t(op->i) ;
 		    csize	qsz = szof(char *) ;
 	            qsort(op->va,qn,qsz,cmpfunc) ;
 	    } /* end if (sorting) */
-	    if (op->f.issorted) {
+	    if (op->fl.issorted) {
 	        csize	bn = size_t(op->i) ;
 	        csize	bsz = szof(char *) ;
 	        rpp2 = (char **) bsearch(&s,op->va,bn,bsz,cmpfunc) ;
