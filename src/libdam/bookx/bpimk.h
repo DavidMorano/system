@@ -59,9 +59,8 @@ struct bpimk_head {
 	cchar 		*dbname ;
 	cchar		*idname ;
 	char		*nidxfname ;
-	BPIMK_FL	f ;
 	vecobj		verses ;
-	mode_t		om ;
+	BPIMK_FL	fl ;
 	uint		pcitation ;
 	uint		maxbook ;
 	uint		maxchapter ;
@@ -69,6 +68,7 @@ struct bpimk_head {
 	uint		nverses ;
 	uint		nzverses ;
 	int		nfd ;
+	mode_t		om ;
 } ;
 
 typedef BPIMK		bpimk ;
