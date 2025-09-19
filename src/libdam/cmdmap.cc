@@ -196,7 +196,7 @@ int cmdmap_load(cmdmap *op,int key,int cmd) noex {
 	            rs = SR_OK ;
 	        } /* end if */
 	        if ((rs >= 0) && f_add) {
-	            op->f.sorted = false ;
+	            op->fl.sorted = false ;
 	            rs = vecobj_add(op->mlp,&e) ;
 	        }
 	    } /* end if (valid) */
@@ -212,8 +212,8 @@ int cmdmap_lookup(cmdmap *op,int key) noex {
 	    rs = SR_INVALID ;
 	    if (key >= 0) {
 		rs = SR_OK ;
-	        if (! op->f.sorted) {
-	            op->f.sorted = true ;
+	        if (! op->fl.sorted) {
+	            op->fl.sorted = true ;
 	            rs = vecobj_sort(op->mlp,vcmpfind) ;
 	        }
 	        if (rs >= 0) {
