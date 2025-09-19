@@ -245,7 +245,7 @@ int commandments_audit(CM *op)
 	if (op->magic != COMMANDMENTS_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (op->f.idx) {
+	if (op->fl.idx) {
 	    rs = cmi_audit(&op->idx) ;
 	}
 
@@ -262,7 +262,7 @@ int commandments_count(CM *op)
 
 	if (op->magic != COMMANDMENTS_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.idx) {
+	if (op->fl.idx) {
 	    CMI		*cip = &op->idx ;
 	    rs = cmi_count(cip) ;
 	} else {
@@ -499,7 +499,7 @@ static int commandments_findbegin(CM *op,cchar *pr,cchar *dbname)
 		int	tl = rs ;
 		if ((rs = uc_stat(tbuf,&sb)) >= 0) {
 		    if (S_ISREG(sb.st_mode)) {
-			op->f.user = TRUE ;
+			op->fl.user = TRUE ;
 			op->ti_db = sb.st_mtime ;
 			op->size_db = sb.st_size ;
 		    } else {
@@ -716,10 +716,10 @@ static int commandments_idxmkname(CM *op,char *tbuf,cchar *dbname)
 	int		pl = 0 ;
 #if	CF_DEBUGS
 	debugprintf("commandments_idxmkname: ent dbname=%s\n",dbname) ;
-	debugprintf("commandments_idxmkname: f_user=%u\n",op->f.user) ;
+	debugprintf("commandments_idxmkname: f_user=%u\n",op->fl.user) ;
 #endif
 	tbuf[0] = '\0' ;
-	    if (op->f.user) {
+	    if (op->fl.user) {
 	        if ((rs = commandments_userhome(op)) >= 0) {
 		    if ((rs = commandments_usridname(op,tbuf)) >= 0) {
 		        rs = pathadd(tbuf,rs,dbname) ;
@@ -776,7 +776,7 @@ static int commandments_idxopencheck(CM *op,cchar *dbname)
 	        f = f && (cinfo.idxctime >= op->ti_db) ;
 	        f = f && (cinfo.dbsize == op->size_db) ;
 		if (f) {
-	            op->f.idx = TRUE ;
+	            op->fl.idx = TRUE ;
 		    op->nents = cinfo.nents ;
 		    op->maxent = cinfo.maxent ;
 		    op->ti_idx = cinfo.idxmtime ;
@@ -851,11 +851,11 @@ static int commandments_idxmapend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.idx) {
+	if (op->fl.idx) {
 	    CMI		*cip = &op->idx ;
 	    rs1 = cmi_close(cip) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->f.idx = false ;
+	    op->fl.idx = false ;
 	}
 	return rs ;
 }
@@ -1212,9 +1212,9 @@ static int commandments_chownpr(CM *op,cchar *tbuf) noex {
 
 static int commandments_ids(CM *op) noex {
 	int		rs = SR_OK ;
-	if (! op->f.ids) {
+	if (! op->fl.ids) {
 	    USTAT	sb ;
-	    op->f.ids = TRUE ;
+	    op->fl.ids = TRUE ;
 	    if ((rs = uc_stat(op->pr,&sb)) >= 0) {
 		op->uid_pr = sb.st_uid ;
 		op->gid_pr = sb.st_gid ;
