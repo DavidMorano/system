@@ -20,8 +20,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -35,7 +33,7 @@
 
 
 struct cksum_flags {
-	uint		local:1 ;
+	uint		loc:1 ;
 } ;
 
 struct cksum_state {
@@ -43,8 +41,8 @@ struct cksum_state {
 } ;
 
 struct cksum_head {
-	CKSUM_FL	f ;
-	CKSUM_ST	local, total ;
+	CKSUM_ST	loc, total ;
+	CKSUM_FL	fl ;
 } ;
 
 typedef	CKSUM		cksum ;
