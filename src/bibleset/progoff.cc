@@ -340,7 +340,7 @@ bfile		*ofp ;
 	        wlen += rs ;
 	    }
 
-	    if ((rs >= 0) && pip->f.tc) {
+	    if ((rs >= 0) && pip->fl.tc) {
 	        rs = proctcbegin(pip,ofp) ;
 	        wlen += rs ;
 	    }
@@ -918,7 +918,7 @@ bfile		*ofp ;
 	} else {
 
 	    i = -1 ;
-	    if (! pip->f.quiet)
+	    if (! pip->fl.quiet)
 	        bprintf(pip->efp,"%s: font-family not available (%s)\n",
 	            pip->progname,ff) ;
 
