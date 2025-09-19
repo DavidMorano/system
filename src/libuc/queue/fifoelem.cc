@@ -31,7 +31,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"fifoelem.h"
@@ -45,6 +51,11 @@ import libutil ;			/* |lenstr(3u)| + |memcopy(3u)| */
 #define	FE		fifoelem
 #define	FE_ENT		fifoelem_ent
 #define	FE_CUR		fifoelem_cur
+
+
+/* imported namespace */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -86,7 +97,8 @@ int fifoelem_start(FE *op) noex {
     	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-	    op->head = op->tail = nullptr ;
+	    op->head = nullptr ;
+	    op->tail = nullptr ;
 	    op->n = 0 ;
 	    op->magic = FIFOELEM_MAGIC ;
 	} /* end if (non-null) */
@@ -111,7 +123,7 @@ int fifoelem_add(FE *op,void *usp,int usl) noex {
 	int		n = 0 ; /* return-value */
 	if ((rs = fifoelem_magic(op,usp)) >= 0) {
 	    cint	rsz = szof(FE_ENT) ;
-	    if (void *vp ; (rs = uc_malloc(rsz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(rsz,&vp)) >= 0) {
 	        FE_ENT	*ep = (FE_ENT *) vp ;
 	        if ((rs = entry_start(ep,usp,usl)) >= 0) {
 	            if (op->head && op->tail) {
@@ -132,7 +144,7 @@ int fifoelem_add(FE *op,void *usp,int usl) noex {
 	        } /* end if (entry_start) */
 		n = op->n ;
 	        if (rs < 0) {
-		    uc_free(vp) ;
+		    libmem.free(vp) ;
 		} /* end if (error) */
 	    } /* end if (m-a) */
 	} /* end if (magic) */
@@ -163,7 +175,7 @@ int fifoelem_rem(FE *op,void *ebuf,int elen) noex {
 		       if (rs >= 0) rs = rs1 ;
 		    }
 		    {
-		       rs1 = uc_free(ep) ;
+		       rs1 = libmem.free(ep) ;
 		       if (rs >= 0) rs = rs1 ;
 		    }
 		    op->n -= 1 ;
@@ -213,7 +225,7 @@ int fifoelem_del(FE *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        {
-	            rs1 = uc_free(ep) ;
+	            rs1 = libmem.free(ep) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        op->n -= 1 ;
@@ -315,7 +327,7 @@ int fifoelem_curdel(FE *op,FE_CUR *curp) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = uc_free(ep) ;
+	        rs1 = libmem.free(ep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->n -= 1 ;
@@ -369,7 +381,7 @@ static int entry_start(FE_ENT *ep,cvoid *vsp,int vsl) noex {
 	}
 	ep->prev = ep->next = nullptr ;
 	cchar	*sp = charp(vsp) ;
-	if (cchar *cp ; (rs = uc_mallocstrw(sp,vsl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = libmem.strw(sp,vsl,&cp)) >= 0) {
 	    ep->dl = vsl ;
 	    ep->dp = voidp(cp) ;
 	}
@@ -381,7 +393,7 @@ static int entry_finish(FE_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->dp) {
-	    rs1 = uc_free(ep->dp) ;
+	    rs1 = libmem.free(ep->dp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->dp = nullptr ;
 	}
