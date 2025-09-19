@@ -27,10 +27,10 @@
 
 
 struct charq_head {
-	char		*buf ;
+	char		*qbuf ;
+	int		qlen ;
 	int		ri ;
 	int		wi ;
-	int		sz ;
 	int		count ;
 } ;
 
@@ -38,13 +38,17 @@ typedef CHARQ		charq ;
 
 EXTERNC_begin
 
-extern int	charq_start(charq *,int) noex ;
-extern int	charq_ins(charq *,int) noex ;
-extern int	charq_rem(charq *,char *) noex ;
-extern int	charq_remall(charq *) noex ;
-extern int	charq_size(charq *) noex ;
-extern int	charq_count(charq *) noex ;
-extern int	charq_finish(charq *) noex ;
+extern int	charq_start	(charq *,int) noex ;
+extern int	charq_ins	(charq *,int) noex ;
+extern int	charq_rem	(charq *,char *) noex ;
+extern int	charq_remall	(charq *) noex ;
+extern int	charq_size	(charq *) noex ;
+extern int	charq_count	(charq *) noex ;
+extern int	charq_finish	(charq *) noex ;
+
+local inline int charq_len(charq *op) noex {
+    	return charq_count(op) ;
+}
 
 EXTERNC_end
 
