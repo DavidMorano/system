@@ -79,7 +79,7 @@ struct bvimk_head {
 	char		*nidxfname ;
 	vecobj		verses ;
 	vecobj		lines ;
-	BVIMK_FL	f ;
+	BVIMK_FL	fl ;
 	uint		pcitation ;
 	uint		maxbook ;
 	uint		maxchapter ;
