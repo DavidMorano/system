@@ -154,7 +154,7 @@ static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
                     c += rs ;
                 } /* end if */
             } /* end if (mkpath1) */
-	    rs1 = uc_libfree(dirbuf) ;
+	    rs1 = libmalloc_free(dirbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
