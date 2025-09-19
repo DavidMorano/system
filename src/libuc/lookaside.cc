@@ -30,13 +30,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>
-#include	<cstring>
 #include	<new>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<pq.h>
 #include	<intceil.h>
 #include	<localmisc.h>
@@ -46,14 +49,10 @@
 
 /* local defines */
 
-#define	OURMALLOC(size,pointer)		uc_libmalloc((size),(pointer))
-#define	OURREALLOC(p1,size,p2)		uc_librealloc((p1),(size),(p2))
-#define	OURFREE(pointer)		uc_libfree((pointer))
-
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -81,9 +80,9 @@ struct lookaside_ch {
 
 template<typename ... Args>
 static int lookaside_ctor(lookaside *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->eap = nullptr ;
 	    op->nchunks = 0 ;
@@ -126,7 +125,7 @@ static int	lookaside_newchunk(lookaside *) noex ;
 
 /* local variables */
 
-constexpr int	qalign = int(2 * sizeof(void *)) ;
+constexpr int	qalign = int(2 * szof(void *)) ;
 
 
 /* exported variables */
@@ -139,13 +138,13 @@ int lookaside_start(lookaside *op,int esize,int n) noex {
 	if ((rs = lookaside_ctor(op)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (esize > 0) {
-		cint	csize = sizeof(lookaside_ch) ;
+		cint	csz = szof(lookaside_ch) ;
 		if (esize < qalign) esize = qalign ;
-		if (n < 0) n = LOOKASIDE_MINENTRIES ;
+		if (n < 0) n = LOOKASIDE_MINENTS ;
 		op->esize = esize ;
 		op->n = n ;
 		op->i = -1 ;
-		op->eaoff = iceil(csize,qalign) ;
+		op->eaoff = iceil(csz,qalign) ;
 		if ((rs = pq_start(op->cqp)) >= 0) {
 	    	    rs = pq_start(op->esp) ;
 	    	    if (rs < 0) {
@@ -164,7 +163,7 @@ int lookaside_start(lookaside *op,int esize,int n) noex {
 int lookaside_finish(lookaside *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if (op) {
 	    pq		*cqp = op->cqp ; /* loop invariant */
 	    pq_ent	*rep = nullptr ;
@@ -174,7 +173,7 @@ int lookaside_finish(lookaside *op) noex {
 	        lookaside_ch	*cp = chunkp(rep) ;
 	        c += 1 ;
 	        op->nchunks -= 1 ;
-	        rs1 = OURFREE(cp) ;
+	        rs1 = libmem.free(cp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end while */
 	    {
@@ -259,7 +258,7 @@ static int lookaside_newchunk(lookaside *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    int		sz = op->eaoff + (op->n * op->esize) ;
-	    if (caddr_t a ; (rs = OURMALLOC(sz,&a)) >= 0) {
+	    if (caddr_t a ; (rs = libmem.mall(sz,&a)) >= 0) {
 		pq_ent	*nep = (pq_ent *) a ;
 	        if ((rs = pq_ins(op->cqp,nep)) >= 0) {
 	            op->eap = caddr_t(a + op->eaoff) ;
@@ -267,9 +266,9 @@ static int lookaside_newchunk(lookaside *op) noex {
 	            op->nchunks += 1 ;
 	        } /* end if (pq_ins) */
 	        if (rs < 0) {
-		    OURFREE(a) ;
+		    libmem.free(a) ;
 		}
-	    } /* end if (m-a) */
+	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
 }
