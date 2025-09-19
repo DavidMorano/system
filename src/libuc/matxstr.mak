@@ -40,6 +40,17 @@ MODS=
 LIBS=
 
 
+OBJ0_MATXSTR= matstr.o matostr.o matpstr.o
+OBJ1_MATXSTR= matkeystr.o matsubstr.o 
+OBJ2_MATXSTR= matnstr.o 
+OBJ3_MATXSTR= matlocalfs.o
+
+OBJA_MATXSTR= obj0.o obj1.o
+OBJB_MATXSTR= obj2.o obj3.o
+
+OBJ_MATXSTR= obja.o objb.o
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
@@ -57,18 +68,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_MATXSTR= matstr.o matostr.o matpstr.o
-OBJ1_MATXSTR= matkeystr.o matsubstr.o 
-OBJ2_MATXSTR= matnstr.o 
-OBJ3_MATXSTR= matlocalfs.o
-
-OBJA_MATXSTR= obj0.o obj1.o
-OBJB_MATXSTR= obj2.o obj3.o
-
-OBJ_MATXSTR= obja.o objb.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -101,13 +101,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_MATXSTR)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MATXSTR)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -120,23 +115,23 @@ control:
 
 
 obj0.o:			$(OBJ0_MATXSTR)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MATXSTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1_MATXSTR)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MATXSTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2_MATXSTR)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MATXSTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3_MATXSTR)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_MATXSTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA_MATXSTR)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_MATXSTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB_MATXSTR)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_MATXSTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 matstr.o:		matstr.cc matstr.h		$(INCS)
