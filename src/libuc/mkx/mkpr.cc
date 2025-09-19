@@ -81,7 +81,9 @@
 
 #include	"mkpr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 
 /* local defines */
 
@@ -114,6 +116,8 @@ import libutil ;
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -305,12 +309,12 @@ static int subinfo_start(SI *sip,cchar *prname,cchar *domain) noex {
                 cint	dlen = rs ;
                 if ((rs = sncpylc(dbuf,dlen,prname)) >= 0) ylikely {
 		    cchar	*cp{} ; 
-                    if ((rs = uc_mallocstrw(dbuf,rs,&cp)) >= 0) ylikely {
+                    if ((rs = libmem.strw(dbuf,rs,&cp)) >= 0) ylikely {
                         sip->open.dname = true ;
                         sip->dname = cp ;
-                    } /* end if (m-a) */
+                    } /* end if (memory-allocation) */
                 } /* end if (sncpylc) */
-	        rs1 = uc_free(dbuf) ;
+	        rs1 = malloc_free(dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
         } /* end if (had some upper-case) */
@@ -328,7 +332,8 @@ static int subinfo_finish(SI *sip) noex {
 	}
         if (sip->open.dname && sip->dname) {
             sip->open.dname = false ;
-            rs1 = uc_free(sip->dname) ;
+	    void *vp = voidp(sip->dname) ;
+            rs1 = libmem.free(vp) ;
             if (rs >= 0) rs = rs1 ;
             sip->dname = nullptr ;
         }
@@ -374,7 +379,7 @@ static int subinfo_env(SI *sip,char *rbuf,int rlen) noex {
 	    	    rs = subinfo_enver(sip,rbuf,rlen,ebuf) ;
 		    len = rs ;
 		}
-		rs1 = uc_free(ebuf) ;
+		rs1 = malloc_free(ebuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
@@ -428,7 +433,7 @@ static int subinfo_domain(SI *sip,char *rbuf,int rlen) noex {
 	                    if ((rs = snwcpylc(dbuf,dlen,dnp,dnl)) > 0) {
 		                rs = subinfo_domainer(sip,rbuf,rlen,dbuf,rs) ;
 	                    }
-		            rs1 = uc_free(dbuf) ;
+		            rs1 = malloc_free(dbuf) ;
 		            if (rs >= 0) rs = rs1 ;
 	                } /* end if (m-a-f) */
 		    } /* end if (small-string-optimization) */
@@ -481,11 +486,11 @@ static int subinfo_user(SI *sip,char *rbuf,int rlen) noex {
 			rs = subinfo_users(sip,rbuf,rlen,tbuf,d) ;
 			len = rs ;
 		    }
-		    rs1 = uc_free(tbuf) ;
+		    rs1 = malloc_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (getpwx_name) */
-	    rs1 = uc_free(pwbuf) ;
+	    rs1 = malloc_free(pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
@@ -506,13 +511,12 @@ static int subinfo_users(SI *sip,char *rbuf,int rlen,cc *sym,cc *d) noex {
                         rs = mknpath1(rbuf,rlen,d) ;
                         len = rs ;
                     } else if ((bl > 0) && (rbuf[0] != '/')) {
-                        char        *tmore{} ;
-			if ((rs = malloc_mp(&tmore)) >= 0) {
+                        if (char *tmore ; (rs = malloc_mp(&tmore)) >= 0) {
                             if ((rs = mkpath1(tmore,rbuf)) >= 0) {
                                 rs = mknpath2(rbuf,rlen,d,tmore) ;
                                 len = rs ;
 			    }
-			    rs1 = uc_free(tmore) ;
+			    rs1 = malloc_free(tmore) ;
 			    if (rs >= 0) rs = rs1 ;
 			} /* end if (m-a-f) */
                     } /* end if */
@@ -565,7 +569,7 @@ static int subinfo_home(SI *sip,char *rbuf,int rlen) noex {
 	    	    rs = subinfo_homer(sip,rbuf,rlen,hbuf) ;
 	    	    len = rs ;
 	        }
-		rs1 = uc_free(hbuf) ;
+		rs1 = malloc_free(hbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if */
@@ -608,7 +612,7 @@ static int subinfo_bases(SI *sip,char *rbuf,int rlen) noex {
 	        }
 	        if (rs > 0) break ;
 	    } /* end for */
-	    rs1 = uc_free(tmpfname) ;
+	    rs1 = malloc_free(tmpfname) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
@@ -633,7 +637,7 @@ static int dirsearch(cchar *basedname,cchar *username) noex {
 	        rs1 = fsdir_close(&dir) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (fsdir) */
-	    rs1 = uc_free(nbuf) ;
+	    rs1 = malloc_free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? f_found : rs ;
