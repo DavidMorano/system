@@ -161,7 +161,7 @@ int pwfile_open(PF *op,cchar *pwfname) noex {
 	            op->fname = cp ;
 	            op->lfd = -1 ;
 	            if ((rs = pwfile_loadbegin(op)) >= 0) ylikely {
-	                op->f = {} ;
+	                op->fl = {} ;
 	                op->magic = PWFILE_MAGIC ;
 	            }
 	            if (rs < 0) {
@@ -269,7 +269,7 @@ int pwfile_curbegin(PF *op,PF_CUR *curp) noex {
 	    if ((rs = pwfile_checkopen(op)) >= 0) ylikely {
 		int	cmd ; /* used in two blocks below */
 	        bool	f_locked = false ;
-	        if (! op->f.locked) {
+	        if (! op->fl.locked) {
 		    cint	to = TO_LOCK ;
 		    cmd = F_RLOCK ;
 	            if ((rs = lockfile(op->lfd,cmd,0z,0z,to)) < 0) {
@@ -277,7 +277,7 @@ int pwfile_curbegin(PF *op,PF_CUR *curp) noex {
 	                op->lfd = -1 ;
 	                return rs ;
 	            }
-	            op->f.locked = op->f.locked_cur = true ;
+	            op->fl.locked = op->fl.locked_cur = true ;
 	            f_locked = true ;
 	        } /* end if (not locked) */
 	        curp->i = 0 ;
@@ -285,7 +285,7 @@ int pwfile_curbegin(PF *op,PF_CUR *curp) noex {
 		    rs = hdb_curbegin(op->ulp,curp->hcp) ;
 		}
 	        if ((rs < 0) && f_locked) {
-	            op->f.locked = op->f.locked_cur = false ;
+	            op->fl.locked = op->fl.locked_cur = false ;
 #ifdef	COMMENT
 		    cmd = F_ULOCK ;
 	            lockfile(op->lfd,cmd,0z,0z,to) ;
@@ -304,13 +304,13 @@ int pwfile_curend(PF *op,PF_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = pwfile_magic(op,curp)) >= 0) ylikely {
-	    if (op->f.locked_cur && (! op->f.locked_explicit)) {
+	    if (op->fl.locked_cur && (! op->fl.locked_explicit)) {
 		cint	to = TO_LOCK ;
-	        op->f.locked = false ;
+	        op->fl.locked = false ;
 	        rs1 = lockfile(op->lfd,F_ULOCK,0z,0z,to) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->f.locked_cur = false ;
+	    op->fl.locked_cur = false ;
 	    curp->i = 0 ;
 	    rs1 = hdb_curend(op->ulp,curp->hcp) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -327,8 +327,8 @@ int pwfile_lock(PF *op,int type,int to_lock) noex {
 	        f_opened = (rs > 0) ;
 	        switch (type) {
 	        case F_ULOCK:
-	            if (op->f.locked_explicit) {
-	                op->f.locked = op->f.locked_explicit = false ;
+	            if (op->fl.locked_explicit) {
+	                op->fl.locked = op->fl.locked_explicit = false ;
 	                rs = lockfile(op->lfd,type,0z,0z,to_lock) ;
 	                if (rs < 0) {
 	                    u_close(op->lfd) ;
@@ -342,7 +342,7 @@ int pwfile_lock(PF *op,int type,int to_lock) noex {
 	        case F_RTEST:
 	        case F_WTEST:
 	            rs = SR_LOCKED ;
-	            if (! op->f.locked) {
+	            if (! op->fl.locked) {
 	                rs = lockfile(op->lfd,type,0z,0z,to_lock) ;
 #ifdef	COMMENT
 	                if (f_opened) {
@@ -356,10 +356,10 @@ int pwfile_lock(PF *op,int type,int to_lock) noex {
 	        case F_WLOCK:
 	        case F_TRLOCK:
 	        case F_TWLOCK:
-	            if (! op->f.locked) {
+	            if (! op->fl.locked) {
 			cint	to = to_lock ;
 	                if ((rs = lockfile(op->lfd,type,0z,0z,to)) >= 0) {
-	                    op->f.locked = op->f.locked_explicit = true ;
+	                    op->fl.locked = op->fl.locked_explicit = true ;
 	                }
 	            } else {
 	                rs = SR_INVALID ;
@@ -452,7 +452,7 @@ static int pwfile_filefronter(PF *op) noex {
 	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) ylikely {
 	    cint	llen = rs ;
 	    if (ucstream pf ; (rs = pf.open(op->fname,"rc")) >= 0) ylikely {
-	        if (! op->f.locked) {
+	        if (! op->fl.locked) {
 	            rs = pf.lockbegin(0,TO_LOCK) ;
 	        }
 	        if (rs >= 0) ylikely {
@@ -462,7 +462,7 @@ static int pwfile_filefronter(PF *op) noex {
 			n += rs ;
 	                if (rs < 0) break ;
 	            } /* end while (reading file entries) */
-	            if ((rs >= 0) && (! op->f.locked)) {
+	            if ((rs >= 0) && (! op->fl.locked)) {
 	                rs = pf.lockend ;
 	            }
 	        } /* end if (ok) */
