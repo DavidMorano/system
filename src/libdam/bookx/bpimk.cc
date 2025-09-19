@@ -196,8 +196,8 @@ int bpimk_open(BPIMK *op,cchar dbname[],int of,mode_t om)
 	op->om = (om|0600) ;
 	op->nfd = -1 ;
 
-	op->f.ofcreat = MKBOOL(of & O_CREAT) ;
-	op->f.ofexcl = MKBOOL(of & O_EXCL) ;
+	op->fl.ofcreat = MKBOOL(of & O_CREAT) ;
+	op->fl.ofexcl = MKBOOL(of & O_EXCL) ;
 
 	if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
 	    op->dbname = cp ;
@@ -240,8 +240,8 @@ int bpimk_close(BPIMK *op)
 	debugprintf("bpimk_close: nverses=%u\n",op->nverses) ;
 #endif
 
-	f_go = (! op->f.abort) ;
-	if (op->f.notsorted) {
+	f_go = (! op->fl.abort) ;
+	if (op->fl.notsorted) {
 	    vecobj_sort(&op->verses,vvecmp) ;
 	}
 
@@ -311,7 +311,7 @@ int bpimk_add(BPIMK *op,BPIMK_VERSE *bvp)
 
 	citcmpval = (bve.citation & 0x00FFFFFF) ;
 	if (citcmpval < op->pcitation)
-	    op->f.notsorted = TRUE ;
+	    op->fl.notsorted = TRUE ;
 
 	op->pcitation = citcmpval ;
 
@@ -339,7 +339,7 @@ int bpimk_add(BPIMK *op,BPIMK_VERSE *bvp)
 
 int bpimk_abort(BPIMK *op,int f)
 {
-	op->f.abort = f ;
+	op->fl.abort = f ;
 	return SR_OK ;
 }
 /* end subroutine (bpimk_abort) */
@@ -375,7 +375,7 @@ static int bpimk_filesbegin(BPIMK *op)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	if (op->f.ofcreat) {
+	if (op->fl.ofcreat) {
 	    rs = bpimk_filesbeginc(op) ;
 	} else {
 	    rs = bpimk_filesbeginwait(op) ;
@@ -391,7 +391,7 @@ static int bpimk_filesbegin(BPIMK *op)
 
 static int bpimk_filesbeginc(BPIMK *op)
 {
-	cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	int		rs ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_IDX	 ;
@@ -402,13 +402,13 @@ static int bpimk_filesbeginc(BPIMK *op)
 	    char		rbuf[MAXPATHLEN+1] ;
 	    if (type) {
 	        if ((rs = mktmpfile(rbuf,om,tbuf)) >= 0) {
-	            op->f.created = TRUE ;
+	            op->fl.created = TRUE ;
 	            tfn = rbuf ;
 	        }
 	    }
 	    if (rs >= 0) {
 	        int	of = O_CREAT ;
-	        if (op->f.ofexcl) of |= O_EXCL ;
+	        if (op->fl.ofexcl) of |= O_EXCL ;
 	        rs = bpimk_filesbegincreate(op,tfn,of,om) ;
 		if ((rs < 0) && type) {
 		    uc_unlink(rbuf) ;
@@ -440,7 +440,7 @@ static int bpimk_filesbeginwait(BPIMK *op)
 	        if (to-- == 0) break ;
 	    } /* end while (db exists) */
 	    if (rs == nrs) {
-	        op->f.ofcreat = FALSE ;
+	        op->fl.ofcreat = FALSE ;
 	        c = 0 ;
 	        rs = bpimk_filesbeginc(op) ;
 	    }
@@ -464,7 +464,7 @@ static int bpimk_filesbegincreate(BPIMK *op,cchar *tfn,int of,mode_t om)
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
 	    cint	fd = rs ;
 	    cchar	*cp ;
-	    op->f.created = TRUE ;
+	    op->fl.created = TRUE ;
 	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
 	        op->nidxfname = (char *) cp ;
 	    }
@@ -486,7 +486,7 @@ static int bpimk_filesend(BPIMK *op)
 	int		rs1 ;
 
 	if (op->nidxfname != NULL) {
-	    if (op->f.created && (op->nidxfname[0] != '\0')) {
+	    if (op->fl.created && (op->nidxfname[0] != '\0')) {
 	        u_unlink(op->nidxfname) ;
 	    }
 	    rs1 = uc_free(op->nidxfname) ;
@@ -663,7 +663,7 @@ static int bpimk_nidxopen(BPIMK *op)
 	int		fd = -1 ;
 	int		of = (O_CREAT|O_WRONLY) ;
 	if (op->nidxfname == NULL) {
-	    cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	    cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	    cchar	*dbn = op->dbname ;
 	    cchar	*suf = FSUF_IDX ;
 	    char	tbuf[MAXPATHLEN+1] ;
@@ -676,7 +676,7 @@ static int bpimk_nidxopen(BPIMK *op)
 		    fd = rs ;
 	            tfn = rbuf ;
 	        } else {
-	            if (op->f.ofexcl) of |= O_EXCL ;
+	            if (op->fl.ofexcl) of |= O_EXCL ;
 	            rs = uc_open(tbuf,of,om) ;
 	            op->nfd = rs ;
 		    fd = rs ;
@@ -689,7 +689,7 @@ static int bpimk_nidxopen(BPIMK *op)
 	        } /* end if (ok) */
 	    } /* end if (mknewfname) */
 	} else {
-	    if (op->f.ofexcl) of |= O_EXCL ;
+	    if (op->fl.ofexcl) of |= O_EXCL ;
 	    rs = uc_open(op->nidxfname,of,om) ;
 	    op->nfd = rs ;
 	    fd = rs ;
