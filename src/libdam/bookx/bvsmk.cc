@@ -191,8 +191,8 @@ int bvsmk_open(BVSMK *op,cchar *pr,cchar db[],int of,mode_t om)
 	op->om = om ;
 	op->nfd = -1 ;
 
-	op->f.ofcreat = MKBOOL(of & O_CREAT) ;
-	op->f.ofexcl = MKBOOL(of & O_EXCL) ;
+	op->fl.ofcreat = MKBOOL(of & O_CREAT) ;
+	op->fl.ofexcl = MKBOOL(of & O_EXCL) ;
 
 	size += (lenstr(pr)+1) ;
 	size += (lenstr(db)+1) ;
@@ -241,7 +241,7 @@ int bvsmk_close(BVSMK *op)
 	debugprintf("bvsmk_close: nzverses=%u\n",op->nzverses) ;
 #endif
 
-	f_go = (! op->f.abort) ;
+	f_go = (! op->fl.abort) ;
 	nverses = op->nverses ;
 	if (nverses > 0) {
 	    rs1 = bvsmk_mkidx(op) ;
@@ -348,7 +348,7 @@ int bvsmk_add(BVSMK *op,int book,uchar *ap,int al)
 
 int bvsmk_abort(BVSMK *op,int f)
 {
-	op->f.abort = f ;
+	op->fl.abort = f ;
 	return SR_OK ;
 }
 /* end subroutine (bvsmk_abort) */
@@ -374,7 +374,7 @@ static int bvsmk_filesbegin(BVSMK *op)
 	        cchar	*cp ;
 	        if ((rs = uc_mallocstrw(dnp,dnl,&cp)) >= 0) {
 	            op->idname = cp ;
-	            if (op->f.ofcreat) {
+	            if (op->fl.ofcreat) {
 	                rs = bvsmk_filesbeginc(op) ;
 	            } else {
 	                rs = bvsmk_filesbeginwait(op) ;
@@ -398,7 +398,7 @@ static int bvsmk_filesbegin(BVSMK *op)
 
 static int bvsmk_filesbeginc(BVSMK *op)
 {
-	cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	int		rs ;
 	cchar		*id = op->idname ;
 	cchar		*db = op->db;
@@ -410,14 +410,14 @@ static int bvsmk_filesbeginc(BVSMK *op)
 	    char		rbuf[MAXPATHLEN+1] ;
 	    if (type) {
 	        if ((rs = mktmpfile(rbuf,om,tbuf)) >= 0) {
-	            op->f.created = TRUE ;
+	            op->fl.created = TRUE ;
 	            tfn = rbuf ;
 	        }
 	    }
 	    if (rs >= 0) {
 	        mode_t	om = op->om ;
 	        int	of = O_CREAT ;
-	        if (op->f.ofexcl) of |= O_EXCL ;
+	        if (op->fl.ofexcl) of |= O_EXCL ;
 	        rs = bvsmk_filesbegincreate(op,tfn,of,om) ;
 		if ((rs < 0) && type) {
 		    uc_unlink(rbuf) ;
@@ -453,7 +453,7 @@ static int bvsmk_filesbeginwait(BVSMK *op)
 	        if (to-- == 0) break ;
 	    } /* end while (db exists) */
 	    if (rs == nrs) {
-	        op->f.ofcreat = FALSE ;
+	        op->fl.ofcreat = FALSE ;
 	        c = 0 ;
 	        rs = bvsmk_filesbeginc(op) ;
 	    }
@@ -480,7 +480,7 @@ static int bvsmk_filesbegincreate(BVSMK *op,cchar *tfn,int of,mode_t om)
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
 	    cint	fd = rs ;
 	    cchar	*cp ;
-	    op->f.created = TRUE ;
+	    op->fl.created = TRUE ;
 	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
 	        op->nidxfname = (char *) cp ;
 	    }
@@ -502,7 +502,7 @@ static int bvsmk_filesend(BVSMK *op)
 	int		rs1 ;
 
 	if (op->nidxfname != NULL) {
-	    if (op->f.created && (op->nidxfname[0] != '\0')) {
+	    if (op->fl.created && (op->nidxfname[0] != '\0')) {
 	        u_unlink(op->nidxfname) ;
 	    }
 	    rs1 = uc_free(op->nidxfname) ;
@@ -748,7 +748,7 @@ static int bvsmk_nidxopen(BVSMK *op) noex {
 	debugprintf("bvsmk_nidxopen: ent nidxfname=%s\n",op->nidxfname) ;
 #endif
 	if (op->nidxfname == NULL) {
-	    cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	    cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	    cchar	*id = op->idname ;
 	    cchar	*db = op->db ;
 	    cchar	*suf = FSUF_IDX ;
@@ -762,7 +762,7 @@ static int bvsmk_nidxopen(BVSMK *op) noex {
 		    fd = rs ;
 	            tfn = rbuf ;
 	        } else {
-	            if (op->f.ofexcl) of |= O_EXCL ;
+	            if (op->fl.ofexcl) of |= O_EXCL ;
 	            rs = uc_open(tbuf,of,om) ;
 	            op->nfd = rs ;
 		    fd = rs ;
@@ -780,7 +780,7 @@ static int bvsmk_nidxopen(BVSMK *op) noex {
 	        } /* end if (ok) */
 	    } /* end if (mknewfname) */
 	} else {
-	    if (op->f.ofexcl) of |= O_EXCL ;
+	    if (op->fl.ofexcl) of |= O_EXCL ;
 	    rs = uc_open(op->nidxfname,of,om) ;
 	    op->nfd = rs ;
 	    fd = rs ;
