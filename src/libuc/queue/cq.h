@@ -47,15 +47,15 @@ typedef CQ_CUR		cq_cur ;
 
 EXTERNC_begin
 
-extern int cq_start(cq *) noex ;
-extern int cq_finish(cq *) noex ;
-extern int cq_ins(cq *,void *) noex ;
-extern int cq_rem(cq *,void *) noex ;
-extern int cq_unlink(cq *,void *) noex ;
-extern int cq_count(cq *) noex ;
-extern int cq_curbegin(cq *,cq_cur *) noex ;
-extern int cq_curend(cq *,cq_cur *) noex ;
-extern int cq_enum(cq *,cq_cur *,void *) noex ;
+extern int cq_start	(cq *) noex ;
+extern int cq_finish	(cq *) noex ;
+extern int cq_ins	(cq *,void *) noex ;
+extern int cq_rem	(cq *,void *) noex ;
+extern int cq_unlink	(cq *,void *) noex ;
+extern int cq_count	(cq *) noex ;
+extern int cq_curbegin	(cq *,cq_cur *) noex ;
+extern int cq_curend	(cq *,cq_cur *) noex ;
+extern int cq_curenum	(cq *,cq_cur *,void *) noex ;
 
 EXTERNC_end
 
