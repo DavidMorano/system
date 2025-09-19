@@ -135,9 +135,9 @@ char	*envv[] ;
 	pip->debuglevel = 0 ;
 	pip->tmpdname = NULL ;
 
-	pip->f.verbose = FALSE ;
-	pip->f.print = FALSE ;
-	pip->f.fakeit = FALSE ;
+	pip->fl.verbose = FALSE ;
+	pip->fl.print = FALSE ;
+	pip->fl.fakeit = FALSE ;
 
 
 /* process program arguments */
@@ -195,7 +195,7 @@ char	*envv[] ;
 
 /* verbose */
 	                case ARGOPT_VERBOSE:
-	                    pip->f.verbose = TRUE ;
+	                    pip->fl.verbose = TRUE ;
 	                    if (f_optequal) goto badargextra ;
 
 	                    break ;
@@ -272,17 +272,17 @@ char	*envv[] ;
 
 /* do not actually do it ! */
 	                    case 'n':
-	                        pip->f.fakeit = TRUE ;
+	                        pip->fl.fakeit = TRUE ;
 	                        break ;
 
 /* print out something */
 	                    case 'p':
-	                        pip->f.print = TRUE ;
+	                        pip->fl.print = TRUE ;
 	                        break ;
 
 /* verbose output */
 	                    case 'v':
-	                        pip->f.verbose = TRUE ;
+	                        pip->fl.verbose = TRUE ;
 	                        break ;
 
 	                    case '?':
@@ -399,12 +399,12 @@ char	*envv[] ;
 	if (npa > 0) {
 
 
-	    if (pip->f.print || pip->f.verbose) {
+	    if (pip->fl.print || pip->fl.verbose) {
 
 	        if ((rs = bopen(ofp,BFILE_STDOUT,"dwct",0644)) < 0)
 	            goto badoutopen ;
 
-	if (pip->f.verbose)
+	if (pip->fl.verbose)
 	    bprintf(ofp,"dev_directory=%s\n",
 	        devbase) ;
 
@@ -420,7 +420,7 @@ char	*envv[] ;
 
 	    } /* end for (looping through requested circuits) */
 
-	    if (pip->f.print || pip->f.verbose)
+	    if (pip->fl.print || pip->fl.verbose)
 	        bclose(ofp) ;
 
 
