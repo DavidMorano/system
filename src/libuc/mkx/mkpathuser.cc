@@ -94,8 +94,8 @@ static int	mkpathusername(char *,cchar *,int,cchar *,int) noex ;
 
 /* local variables */
 
-constexpr cauto		mall = uc_libmalloc ;
-constexpr cauto		mfre = uc_libfree ;
+constexpr cauto		mall = lm_mall ;
+constexpr cauto		mfre = lm_free ;
 
 
 /* exported variables */
