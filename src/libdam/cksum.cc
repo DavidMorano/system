@@ -137,7 +137,7 @@ typedef unsigned char *ucharp ;
 
 /* local variables */
 
-static constexpr uint	table[] = {
+constexpr uint		table[] = {
 	0x00000000,
 	0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
 	0x1a864db2, 0x1e475005, 0x2608edb8, 0x22c9f00f, 0x2f8ad6d6,
@@ -198,57 +198,57 @@ static constexpr uint	table[] = {
 
 /* exported subroutines */
 
-int cksum_start(cksum *csp) noex {
+int cksum_start(cksum *op) noex {
 	int		rs = SR_FAULT ;
-	if (csp) {
-	    rs = memclear(csp) ;
+	if (op) {
+	    rs = memclear(op) ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (cksum_start) */
 
-int cksum_finish(cksum *csp) noex {
+int cksum_finish(cksum *op) noex {
 	int		rs = SR_FAULT ;
-	if (csp) {
+	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (cksum_finish) */
 
-int cksum_begin(cksum *csp) noex {
+int cksum_begin(cksum *op) noex {
 	int		rs = SR_FAULT ;
-	if (csp) {
+	if (op) {
 	    rs = SR_OK ;
-	    csp->f.local = true ;
-	    csp->local.len = 0 ;
-	    csp->local.sum = 0 ;
+	    op->fl.loc = true ;
+	    op->loc.len = 0 ;
+	    op->loc.sum = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (cksum_begin) */
 
-int cksum_accum(cksum *csp,void *abuf,int alen) noex {
+int cksum_accum(cksum *op,void *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
-	if (csp && abuf) {
+	if (op && abuf) {
 	    uint	ch ;
 	    uchar	*olp ;
 	    uchar	*bp = (uchar *) abuf ;
 	    olp = (bp + alen) ;
-	    if (csp->f.local) {
-	        csp->local.len += alen ;
-	        csp->total.len += alen ;
+	    if (op->fl.loc) {
+	        op->loc.len += alen ;
+	        op->total.len += alen ;
 	        while (bp < olp) {
 		    ch = mkchar(*bp) ;
-	            ADDSUM(csp->local.sum,ch) ;
-	            ADDSUM(csp->total.sum,ch) ;
+	            ADDSUM(op->loc.sum,ch) ;
+	            ADDSUM(op->total.sum,ch) ;
 	            bp += 1 ;
 	        } /* end while */
 	    } else {
-	        csp->local.len += alen ;
+	        op->loc.len += alen ;
 	        while (bp < olp) {
 		    ch = mkchar(*bp) ;
-	            ADDSUM(csp->local.sum,ch) ;
+	            ADDSUM(op->loc.sum,ch) ;
 	            bp += 1 ;
 	        } /* end while */
 	    } /* end if (started) */
@@ -258,32 +258,32 @@ int cksum_accum(cksum *csp,void *abuf,int alen) noex {
 }
 /* end subroutine (cksum_accum) */
 
-int cksum_end(cksum *csp) noex {
+int cksum_end(cksum *op) noex {
 	int		rs = SR_FAULT ;
-	if (csp) {
+	if (op) {
 	    rs = SR_OK ;
-	    csp->f.local = false ;
+	    op->fl.loc = false ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (cksum_end) */
 
-int cksum_getlen(cksum *csp,uint *rp) noex {
+int cksum_getlen(cksum *op,uint *rp) noex {
 	int		rs = SR_FAULT ;
-	if (csp && rp) {
+	if (op && rp) {
 	    rs = SR_OK ;
-	    *rp = csp->local.len ;
+	    *rp = op->loc.len ;
 	}
 	return rs ;
 }
 /* end subroutine (cksum_getlen) */
 
 /* get the cksum accummulated so far */
-int cksum_getsum(cksum *csp,uint *rp) noex {
+int cksum_getsum(cksum *op,uint *rp) noex {
 	int		rs = SR_FAULT ;
-	if (csp) {
-	    uint	sum = csp->local.sum ;
-	    uint	v = csp->local.len ;
+	if (op) {
+	    uint	sum = op->loc.sum ;
+	    uint	v = op->loc.len ;
 	    cint	n = szof(uint) ;
 	    for (int i = 0 ; (v != 0) && (i < n) ; i += 1) {
 	        cint	ch = mkchar(v) ;
@@ -291,18 +291,18 @@ int cksum_getsum(cksum *csp,uint *rp) noex {
 	        v = (v >> 8) ;		/* unsigned shift, zero fill */
 	    } /* end while */
 	    if (rp) *rp = (~ sum) ;
-	    rs = (csp->local.len & INT_MAX) ;
+	    rs = (op->loc.len & INT_MAX) ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (cksum_getsum) */
 
 /* get the total checksum and total length */
-int cksum_getsumall(cksum *csp,uint *rp) noex {
+int cksum_getsumall(cksum *op,uint *rp) noex {
 	int		rs = SR_FAULT ;
-	if (csp) {
-	    uint	sum = csp->total.sum ;
-	    uint	v = csp->total.len ;
+	if (op) {
+	    uint	sum = op->total.sum ;
+	    uint	v = op->total.len ;
 	    cint	n = szof(uint) ;
 	    for (int i = 0 ; (v != 0) && (i < n) ; i += 1) {
 	        cint	ch = mkchar(v) ;
@@ -310,7 +310,7 @@ int cksum_getsumall(cksum *csp,uint *rp) noex {
 	        v = (v >> 8) ;		/* unsigned shift, zero fill */
 	    } /* end for */
 	    if (rp) *rp = (~ sum) ;
-	    rs = (csp->total.len & INT_MAX) ;
+	    rs = (op->total.len & INT_MAX) ;
 	} /* end if (non-null) */
 	return rs ;
 }
