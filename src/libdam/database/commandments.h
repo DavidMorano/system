@@ -84,7 +84,7 @@ struct commandments_head {
 	uid_t		uid ;
 	uid_t		uid_pr ;
 	gid_t		gid_pr ;
-	COMMANDMENTS_FL	f ;
+	COMMANDMENTS_FL	fl ;
 	uint		magic ;
 	int		ncursors ;
 	int		nents ;
