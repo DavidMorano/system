@@ -40,15 +40,15 @@ typedef CIQ		ciq ;
 
 EXTERNC_begin
 
-extern int ciq_start(ciq *) noex ;
-extern int ciq_ins(ciq *,void *) noex ;
-extern int ciq_rem(ciq *,void *) noex ;
-extern int ciq_gettail(ciq *,void *) noex ;
-extern int ciq_remtail(ciq *,void *) noex ;
-extern int ciq_rement(ciq *,void *) noex ;
-extern int ciq_count(ciq *) noex ;
-extern int ciq_audit(ciq *) noex ;
-extern int ciq_finish(ciq *) noex ;
+extern int ciq_start	(ciq *) noex ;
+extern int ciq_ins	(ciq *,void *) noex ;
+extern int ciq_rem	(ciq *,void *) noex ;
+extern int ciq_gettail	(ciq *,void *) noex ;
+extern int ciq_remtail	(ciq *,void *) noex ;
+extern int ciq_rement	(ciq *,void *) noex ;
+extern int ciq_count	(ciq *) noex ;
+extern int ciq_audit	(ciq *) noex ;
+extern int ciq_finish	(ciq *) noex ;
 
 EXTERNC_end
 
