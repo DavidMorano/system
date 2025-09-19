@@ -43,12 +43,12 @@ struct chariq {
 
 EXTERNC_begin
 
-extern int	chariq_start(chariq *,int) noex ;
-extern int	chariq_ins(chariq *,int) noex ;
-extern int	chariq_rem(chariq *,char *) noex ;
-extern int	chariq_size(chariq *) noex ;
-extern int	chariq_count(chariq *) noex ;
-extern int	chariq_finish(chariq *) noex ;
+extern int	chariq_start	(chariq *,int) noex ;
+extern int	chariq_ins	(chariq *,int) noex ;
+extern int	chariq_rem	(chariq *,char *) noex ;
+extern int	chariq_size	(chariq *) noex ;
+extern int	chariq_count	(chariq *) noex ;
+extern int	chariq_finish	(chariq *) noex ;
 
 EXTERNC_end
 
