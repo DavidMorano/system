@@ -41,8 +41,15 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<sigblocker.h>
+#include	<localmisc.h>
 
 #include	"aiq.h"
 
@@ -52,7 +59,7 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -65,9 +72,9 @@ typedef q_ent		*entp ;
 
 template<typename ... Args>
 static inline int aiq_ctor(aiq *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if ((op->qp = new(nothrow) q) != np) {
@@ -99,6 +106,9 @@ static int aiq_magic(aiq *op,Args ... args) noex {
 	}
 	return rs ;
 }
+
+
+/* local variables */
 
 
 /* exported variables */
