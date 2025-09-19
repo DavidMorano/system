@@ -357,7 +357,7 @@ int uc_unlinkpmq(cchar *name) noex {
 	                    } /* end if (error) */
 	                } until ((rs >= 0) || f_exit) ;
 		    } /* end if (ok) */
-		    rs1 = uc_libfree(altname) ;
+		    rs1 = libmalloc_free(altname) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (valid) */
@@ -380,12 +380,12 @@ static int pmq_nameload(pmq *op,cchar *name) noex {
 	    rs = SR_INVALID ;
 	} /* end if (needed rooted name) */
 	if (rs >= 0) ylikely {
-	    if (char *cp ; (rs = uc_libmalloc((cl + 1),&cp)) >= 0) ylikely {
+	    if (char *cp ; (rs = lm_mall((cl + 1),&cp)) >= 0) ylikely {
 	        if ((rs = sncpy(cp,cl,prefix,name)) >= 0) {
 		    op->name = cp ;
 	        }
 	        if (rs < 0) {
-		    uc_libfree(cp) ;
+		    lm_free(cp) ;
 	        }
 	    } /* end if (m-a) */
 	} /* end if (ok) */
@@ -396,7 +396,7 @@ static int pmq_nameload(pmq *op,cchar *name) noex {
 static int pmq_nameclean(pmq *op) noex {
 	int		rs = SR_OK ;
 	if (op->name) ylikely {
-	    rs = uc_libfree(op->name) ;
+	    rs = lm_free(op->name) ;
 	    op->name = nullptr ;
 	}
 	return rs ;
@@ -540,7 +540,7 @@ static int pmqdiradd(cchar *name,mode_t om) noex {
 	        } /* end if (u_creat) */
 	        if (rs >= 0) u_close(rs) ;
 	    } /* end if (mkpath) */
-	    rs1 = uc_libfree(tbuf) ;
+	    rs1 = libmalloc_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -551,11 +551,11 @@ static int pmqdirrm(cchar *name) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*pp = PMQ_PATHPREFIX ;
-	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = libmalloc_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath2(tbuf,pp,name)) >= 0) {
 	        rs = u_unlink(tbuf) ;
 	    }
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = libmalloc_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -611,7 +611,7 @@ static int getpmquid(void) noex {
 		    uid = PMQ_UID ;
 		}
 	    } /* end if */
-	    rs1 = uc_free(pwbuf) ;
+	    rs1 = libmalloc_free(pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? uid : rs ;
