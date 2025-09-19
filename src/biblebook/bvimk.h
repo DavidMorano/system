@@ -1,4 +1,6 @@
-/* bvimk */
+/* bvimk HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* revision history:
@@ -11,35 +13,30 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BVIMK_INCLUDE
-#define	BVIMK_INCLUDE	1
+#define	BVIMK_INCLUDE
 
 
 #include	<envstandards.h>
-
-#include	<sys/types.h>
-
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 
 #define	BVIMK_MAGIC	0x88773422
 #define	BVIMK		struct bvimk_head
-#define	BVIMK_OBJ	struct bvimk_obj
-#define	BVIMK_VERSE	struct bvimk_v
-#define	BVIMK_LINE	struct bvimk_l
-#define	BVIMK_INFO	struct bvimk_i
 #define	BVIMK_FL	struct bvimk_flags
+#define	BVIMK_OBJ	struct bvimk_object
+#define	BVIMK_VER	struct bvimk_verse
+#define	BVIMK_LN	struct bvimk_line
+#define	BVIMK_INFO	struct bvimk_information
 #define	BVIMK_INTOPEN	(10*60)
 #define	BVIMK_INTSTALE	(5*60)
 
 
-/* this is the object description */
-struct bvimk_obj {
-	const char	*name ;
+struct bvimk_object {
+	cchar		*name ;
 	uint		objsize ;
 } ;
 
-struct bvimk_i {
+struct bvimk_information {
 	uint		maxbook ;
 	uint		maxchapter ;
 	uint		maxverse ;
@@ -47,12 +44,12 @@ struct bvimk_i {
 	uint		nzverses ;
 } ;
 
-struct bvimk_l {
+struct bvimk_line {
 	uint		loff ;
 	uint		llen ;
 } ;
 
-struct bvimk_v {
+struct bvimk_verse {
 	BVIMK_LINE	*lines ;
 	uint		voff ;
 	uint		vlen ;
@@ -69,14 +66,13 @@ struct bvimk_flags {
 } ;
 
 struct bvimk_head {
-	uint		magic ;
 	cchar 		*dbname ;
 	cchar		*idname ;
 	char		*nidxfname ;
-	BVIMK_FL	f ;
-	VECOBJ		verses ;
-	VECOBJ		lines ;
-	mode_t		om ;
+	vecobj		verses ;
+	vecobj		lines ;
+	BVIMK_FL	fl ;
+	uint		magic ;
 	uint		pcitation ;
 	uint		maxbook ;
 	uint		maxchapter ;
@@ -84,26 +80,26 @@ struct bvimk_head {
 	uint		nverses ;
 	uint		nzverses ;
 	int		nfd ;
+	mode_t		om ;
 } ;
 
+typedef	BVIMK		bvimk ;
+typedef	BVIMK_FL	bvimk_fl ;
+typedef	BVIMK_OBJ	bvimk_obj ;
+typedef	BVIMK_VER	bvimk_ver ;
+typedef	BVIMK_LN	bvimk_ln ;
+typedef	BVIMK_INFO	bvimk_info ;
 
-#if	(! defined(BVIMK_MASTER)) || (BVIMK_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	bvimk_open(bvimk *,cchar *,int,mode_t) noex ;
+extern int	bvimk_add(bvimk *,bvimk_ver *) noex ;
+extern int	bvimk_abort(bvimk *,int) noex ;
+extern int	bvimk_info(bvimk *,nbimk_ver *) noex ;
+extern int	bvimk_close(bvimk *) noex ;
 
-extern int	bvimk_open(BVIMK *,cchar *,int,mode_t) ;
-extern int	bvimk_add(BVIMK *,BVIMK_VERSE *) ;
-extern int	bvimk_abort(BVIMK *,int) ;
-extern int	bvimk_info(BVIMK *,BVIMK_INFO *) ;
-extern int	bvimk_close(BVIMK *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BVIMK_MASTER */
 
 #endif /* BVIMK_INCLUDE */
 
