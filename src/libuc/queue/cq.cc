@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Object
+	cq
+
+	Description:
 	This module implement a simple cheap queue (CQ).
 
 *******************************************************************************/
@@ -27,8 +31,15 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vechand.h>
+#include	<localmisc.h>
 
 #include	"cq.h"
 
@@ -38,7 +49,7 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -52,9 +63,9 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 static inline int cq_ctor(cq *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if ((op->qp = new(nothrow) vechand) != np) {
@@ -85,7 +96,7 @@ static int cq_magic(cq *op,Args ... args) noex {
 	    rs = (op->magic == CQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine (cq_magic) */
 
 
 /* local variables */
@@ -99,7 +110,7 @@ static int cq_magic(cq *op,Args ... args) noex {
 int cq_start(cq *op) noex {
 	int		rs ;
 	if ((rs = cq_ctor(op)) >= 0) {
-	    cint	vo = (VECHAND_OORDERED | VECHAND_OCOMPACT) ;
+	    cint	vo = (vechandm.ordered | vechandm.compact) ;
 	    cint	de = CQ_DEFENTS ;
 	    if ((rs = vechand_start(op->qp,de,vo)) >= 0) {
 	        op->magic = CQ_MAGIC ;
@@ -133,7 +144,7 @@ int cq_finish(cq *op) noex {
 int cq_ins(cq *op,void *ep) noex {
 	int		rs ;
 	if ((rs = cq_magic(op,ep)) >= 0) {
-		rs = vechand_add(op->qp,ep) ;
+	    rs = vechand_add(op->qp,ep) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -143,13 +154,12 @@ int cq_rem(cq *op,void *vrp) noex {
 	int		rs ;
 	int		count = 0 ;
 	if ((rs = cq_magic(op)) >= 0) {
-		void	*vp{} ;
-		if ((rs = vechand_get(op->qp,0,&vp)) >= 0) {
-		    void	**rpp = (void **) vrp ;
-		    if (rpp) *rpp = vp ;
-	    	    vechand_del(op->qp,0) ;
-	            count = vechand_count(op->qp) ;
-	        }
+	    if (void *vp ; (rs = vechand_get(op->qp,0,&vp)) >= 0) {
+		void	**rpp = voidpp(vrp) ;
+		if (rpp) *rpp = vp ;
+	    	vechand_del(op->qp,0) ;
+	        count = vechand_count(op->qp) ;
+	    } /* end if (vechand_get) */
 	} /* end if (magic) */
 	return (rs >= 0) ? count : rs ;
 }
@@ -159,10 +169,10 @@ int cq_unlink(cq *op,void *ep) noex {
 	int		rs ;
 	int		count = 0 ;
 	if ((rs = cq_magic(op,ep)) >= 0) {
-		if ((rs = vechand_ent(op->qp,ep)) >= 0) {
-	    	    vechand_del(op->qp,0) ;
-	    	    count = vechand_count(op->qp) ;
-		}
+	    if ((rs = vechand_ent(op->qp,ep)) >= 0) {
+		vechand_del(op->qp,0) ;
+		count = vechand_count(op->qp) ;
+	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? count : rs ;
 }
@@ -171,7 +181,7 @@ int cq_unlink(cq *op,void *ep) noex {
 int cq_count(cq *op) noex {
 	int		rs ;
 	if ((rs = cq_magic(op)) >= 0) {
-		rs = vechand_count(op->qp) ;
+	    rs = vechand_count(op->qp) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -180,7 +190,7 @@ int cq_count(cq *op) noex {
 int cq_curbegin(cq *op,cq_cur *curp) noex {
 	int		rs ;
 	if ((rs = cq_magic(op,curp)) >= 0) {
-		curp->i = -1 ;
+	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -189,25 +199,24 @@ int cq_curbegin(cq *op,cq_cur *curp) noex {
 int cq_curend(cq *op,cq_cur *curp) noex {
 	int		rs ;
 	if ((rs = cq_magic(op,curp)) >= 0) {
-		curp->i = -1 ;
+	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (cq_curend) */
 
-int cq_enum(cq *op,cq_cur *curp,void *vrp) noex {
+int cq_curenum(cq *op,cq_cur *curp,void *vrp) noex {
 	int		rs ;
 	if ((rs = cq_magic(op,curp,vrp)) >= 0) {
-	        int	i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
-	        void	*vp{} ;
-	        if ((rs = vechand_get(op->qp,i,&vp)) >= 0) {
-		    void	**rpp = (void **) vrp ;
-		    *rpp = vp ;
-	    	    curp->i = i ;
-		}
+	    int	i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
+	    if (void *vp ; (rs = vechand_get(op->qp,i,&vp)) >= 0) {
+		void	**rpp = voidpp(vrp) ;
+		*rpp = vp ;
+	    	curp->i = i ;
+	    } /* end if (vechand_get) */
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (cq_enum) */
+/* end subroutine (cq_curenum) */
 
 
