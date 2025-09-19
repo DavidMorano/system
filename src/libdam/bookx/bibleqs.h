@@ -73,7 +73,7 @@ struct bibleqs_head {
 	time_t		ti_lastcheck ;
 	time_t		ti_tind ;		/* text-index */
 	size_t		dbmsize ;		/* DB map-size */
-	BIBLEQS_FL	f ;
+	BIBLEQS_FL	fl ;
 	uint		magic ;
 	int		minwlen ;		/* minimum key-word length */
 	int		ncursors ;
