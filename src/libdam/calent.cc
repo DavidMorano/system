@@ -225,7 +225,7 @@ int calent_mkhash(calent *op,cchar *md) noex {
 	        if (op->lines) {
 	            calent_ln	*elp = op->lines ;
 	            rs = SR_OK ;
-	            if (! op->f.hash) {
+	            if (! op->fl.hash) {
 	                uint	hash = 0 ;
 	                int	sl, cl ;
 	                cchar	*sp, *cp ;
@@ -239,7 +239,7 @@ int calent_mkhash(calent *op,cchar *md) noex {
 	                    } /* end while */
 	                } /* end for */
 	                op->hash = hash ;
-	                op->f.hash = true ;
+	                op->fl.hash = true ;
 	           } /* end if (needed) */
 	        } /* end if (open) */
 	    } /* end if (valid) */
@@ -253,7 +253,7 @@ int calent_sethash(calent *op,uint hash) noex {
 	if ((rs = calent_magic(op)) >= 0) {
 	    rs = SR_OK ;
 	    op->hash = hash ;
-	    op->f.hash = true ;
+	    op->fl.hash = true ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -264,7 +264,7 @@ int calent_gethash(calent *op,uint *rp) noex {
 	int		f = false ;
 	if ((rs = calent_magic(op)) >= 0) {
 	    rs = SR_OK ;
-	    f = op->f.hash ;
+	    f = op->fl.hash ;
 	    if (rp) {
 	        *rp = (f) ? op->hash : 0 ;
 	    }
