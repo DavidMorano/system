@@ -217,8 +217,8 @@ static int fdliner_bufsize(fdliner *op,int mfd) noex {
 		cint	fs = intsat(fsz) ;
 	        cmode	m = sb.st_mode ;
 	        bs = FDLINER_BUFSIZEDEF ;
-	        op->f.fnet = S_ISCHR(m) || S_ISSOCK(m) || S_ISFIFO(m) ;
-	        if (op->f.fnet) {
+	        op->fl.fnet = S_ISCHR(m) || S_ISSOCK(m) || S_ISFIFO(m) ;
+	        if (op->fl.fnet) {
 	            op->fbo |= FILER_ONET ;
 	        } else {
 	            bs = BCEIL(fs,FDLINER_BUFSIZEBLOCK) ;
