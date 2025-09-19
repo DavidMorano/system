@@ -145,7 +145,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	if (bopen(efp,BFILE_STDERR,"dwca",0666) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    bcontrol(efp,BC_LINEBUF,0) ;
 	}
 
@@ -292,7 +292,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->f.quiet = TRUE ;
+	                            pip->fl.quiet = TRUE ;
 	                            break ;
 
 /* verbose mode */
