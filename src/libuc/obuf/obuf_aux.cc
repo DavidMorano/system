@@ -40,7 +40,7 @@
 
 #include	"obuf.hh"
 
-import libutil ;
+import libutil ;			/* |getlenstr(3u)| */
 
 using std::string_view ;
 
