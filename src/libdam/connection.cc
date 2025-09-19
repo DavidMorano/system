@@ -167,7 +167,7 @@ int connection_start(CON *op,cchar *inetdomain) noex {
 	        op->inetdomain = inetdomain ;
 	        op->fl.inet = false ;
 	        op->sock = -1 ;
-	        if (void *vp ; (rs = uc_libmalloc(ssz,&vp)) >= 0) {
+	        if (void *vp ; (rs = lm_mall(ssz,&vp)) >= 0) {
 		    op->sap = sockaddressp(vp) ;
 	        }
 	    } /* end if (vars) */
@@ -193,7 +193,7 @@ int connection_finish(CON *op) noex {
 	        op->name = nullptr ;
 	    }
 	    if (op->sap) {
-		rs1 = uc_libfree(op->sap) ;
+		rs1 = lm_free(op->sap) ;
 	        if (rs >= 0) rs = rs1 ;
 		op->sap = nullptr ;
 	    }
