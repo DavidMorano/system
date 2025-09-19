@@ -40,8 +40,8 @@ struct calent_flags {
 
 struct calent_head {
 	CALENT_LN	*lines ;
-	CALENT_FL	f ;
 	CALENT_Q	q ;
+	CALENT_FL	fl ;
 	uint		magic ;
 	uint		voff ;
 	uint		vlen ;
