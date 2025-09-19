@@ -9,7 +9,9 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This obejct module was originally written.
+	This, or something almost identical to this, is actually
+	very old.  This code might date to about 1983.  But I
+	just cleaned it up to the present form below.
 
 */
 
@@ -26,9 +28,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<localmisc.h>
 
 #include	"charq.h"
+
+
+/* local defines */
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -56,9 +76,9 @@ int charq_start(charq *op,int sz) noex {
 	if (op) {
 	    rs = SR_INVALID ;
 	    if (sz > 1) {
-		if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
-		    op->buf = charp(vp) ;
-	            op->sz = sz ;
+		if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
+		    op->qbuf = charp(vp) ;
+	            op->qlen = sz ;
 	            op->count = 0 ;
 	            op->ri = 0 ;
 	            op->wi = 0 ;
@@ -74,12 +94,12 @@ int charq_finish(charq *op) noex {
 	int		rs1 ;
 	if (op) {
 	    rs = SR_OK ;
-	    if (op->buf) {
-	        rs1 = uc_libfree(op->buf) ;
+	    if (op->qbuf) {
+	        rs1 = libmem.free(op->qbuf) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->buf = nullptr ;
+	        op->qbuf = nullptr ;
 	    }
-	    op->sz = 0 ;
+	    op->qlen = 0 ;
 	    op->count = 0 ;
 	} /* end if (non-null) */
 	return rs ;
@@ -90,9 +110,9 @@ int charq_ins(charq *op,int ch) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OVERFLOW ;
-	    if (op->count < op->sz) {
-	        op->buf[op->wi] = charconv(ch) ;
-	        op->wi = ((op->wi + 1) % op->sz) ;
+	    if (op->count < op->qlen) {
+	        op->qbuf[op->wi] = charconv(ch) ;
+	        op->wi = ((op->wi + 1) % op->qlen) ;
 	        op->count += 1 ;
 	        rs = op->count ;
 	    }
@@ -106,8 +126,8 @@ int charq_rem(charq *op,char *cp) noex {
 	if (op) {
 	    rs = SR_EMPTY ;
 	    if (op->count > 0) {
-	        if (cp) *cp = op->buf[op->ri] ;
-	        op->ri = ((op->ri + 1) % op->sz) ;
+	        if (cp) *cp = op->qbuf[op->ri] ;
+	        op->ri = ((op->ri + 1) % op->qlen) ;
 	        op->count -= 1 ;
 	        rs = op->count ;
 	    }
@@ -131,7 +151,7 @@ int charq_remall(charq *op) noex {
 int charq_size(charq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = op->sz ;
+	    rs = op->qlen ;
 	}
 	return rs ;
 }
