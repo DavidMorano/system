@@ -78,10 +78,10 @@
 #define	CALYEARS_DBSUF	"calendar"
 #define	CALYEARS_DMODE	0777
 #define	CALYEARS_DBDIR	"share/calendar"
-#define	CALYEARS_DOMER	struct calyears_domer
+#define	CALYEARS_DOMER	calyears_domer
 
-#define	SUBINFO		struct subinfo
-#define	SUBINFO_FL	struct subinfo_flags
+#define	SI		subinfo
+#define	SI_FL		subinfo_flags
 
 #define	IDXDNAME	".calyears"
 #define	IDXSUF		"cyi"
@@ -147,14 +147,14 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	IDS		id ;
-	SUBINFO_FL	init, f ;
+	idx		id ;
 	vecstr		dirs ;
 	CALYEARS	*op ;
-	cchar	*tudname ;
-	cchar	*userhome ;
-	cchar	**dns ;
+	cchar		*tudname ;
+	cchar		*userhome ;
+	cchar		**dns ;
 	time_t		dt ;
+	SI_FL		init, fl ;
 	int		year ;
 	int		isdst ;
 	int		gmtoff ;	/* seconds west of GMT */
@@ -200,24 +200,24 @@ static int	calyears_dayname(CALYEARS *,CALCITE *,int,cchar *,int) ;
 static int	calyears_holidayer(CALYEARS *) ;
 #endif /* CF_TRANSHOL */
 
-static int	subinfo_start(SUBINFO *,CALYEARS *,time_t) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_calscreate(SUBINFO *,cchar **,cchar **) ;
-static int	subinfo_calscreater(SUBINFO *,cchar *,cchar **) ;
-static int	subinfo_calcreate(SUBINFO *,cchar *,cchar *) ;
-static int	subinfo_ids(SUBINFO *) ;
-static int	subinfo_username(SUBINFO *) ;
-static int	subinfo_mkdns(SUBINFO *) ;
-static int	subinfo_havedir(SUBINFO *,cchar *) ;
-static int	subinfo_loadnames(SUBINFO *,vecstr *,cchar *) ;
-static int	subinfo_regacc(SUBINFO *,cchar *,int) ;
+static int	subinfo_start(SI *,CALYEARS *,time_t) ;
+static int	subinfo_finish(SI *) ;
+static int	subinfo_calscreate(SI *,cchar **,cchar **) ;
+static int	subinfo_calscreater(SI *,cchar *,cchar **) ;
+static int	subinfo_calcreate(SI *,cchar *,cchar *) ;
+static int	subinfo_ids(SI *) ;
+static int	subinfo_username(SI *) ;
+static int	subinfo_mkdns(SI *) ;
+static int	subinfo_havedir(SI *,cchar *) ;
+static int	subinfo_loadnames(SI *,vecstr *,cchar *) ;
+static int	subinfo_regacc(SI *,cchar *,int) ;
 
 #if	CF_CHECKDNAME
-static int	subinfo_checkdname(SUBINFO *,cchar *) noex ;
+static int	subinfo_checkdname(SI *,cchar *) noex ;
 #endif
 
 #ifdef	COMMENT
-static int	subinfo_tmpuserdir(SUBINFO *) noex ;
+static int	subinfo_tmpuserdir(SI *) noex ;
 #endif
 
 static int	mkmonth(cchar *,int) noex ;
@@ -707,7 +707,7 @@ static int calyears_argend(CALYEARS *op)
 
 static int calyears_opensub(CALYEARS *op,cchar *dns[],cchar *cns[])
 {
-	SUBINFO		si, *sip = &si ;
+	SI		si, *sip = &si ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -1157,7 +1157,7 @@ static int calyears_checkupdate(CALYEARS *op,time_t dt)
 	            f = f || (sb.st_mtime > op->ti_db) ;
 		    f = f || (sb.st_mtime > op->ti_map) ;
 		    if (f) {
-	                SUBINFO	si ;
+	                SI	si ;
 
 	                calyears_dbloadend(op) ;
 
@@ -1179,7 +1179,7 @@ static int calyears_checkupdate(CALYEARS *op,time_t dt)
 /* end subroutine (calyears_checkupdate) */
 #endif /* COMMENT */
 
-static int subinfo_start(SUBINFO *sip,CALYEARS *op,time_t dt) noex {
+static int subinfo_start(SI *sip,CALYEARS *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (dt == 0) dt = time(NULL) ;
 	memclear(sip) ;
@@ -1189,12 +1189,12 @@ static int subinfo_start(SUBINFO *sip,CALYEARS *op,time_t dt) noex {
 }
 /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+static int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (sip->f.dirs) {
-	    sip->f.dirs = FALSE ;
+	if (sip->fl.dirs) {
+	    sip->fl.dirs = FALSE ;
 	    rs1 = vecstr_finish(&sip->dirs) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->dns = NULL ;
@@ -1212,10 +1212,10 @@ static int subinfo_finish(SUBINFO *sip) noex {
 	    sip->userhome = NULL ;
 	}
 
-	if (sip->f.id) {
+	if (sip->fl.id) {
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->f.id = FALSE ;
+	    sip->fl.id = FALSE ;
 	}
 
 	return rs ;
@@ -1223,7 +1223,7 @@ static int subinfo_finish(SUBINFO *sip) noex {
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_calscreate(SUBINFO *sip,cchar **dns,cchar **cns)
+static int subinfo_calscreate(SI *sip,cchar **dns,cchar **cns)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -1251,7 +1251,7 @@ static int subinfo_calscreate(SUBINFO *sip,cchar **dns,cchar **cns)
 /* end subroutine (subinfo_calscreate) */
 
 
-static int subinfo_calscreater(SUBINFO *sip,cchar *dn,cchar *cns[])
+static int subinfo_calscreater(SI *sip,cchar *dn,cchar *cns[])
 {
 	vecstr		cals ;
 	int		rs = SR_OK ;
@@ -1297,7 +1297,7 @@ static int subinfo_calscreater(SUBINFO *sip,cchar *dn,cchar *cns[])
 /* end subroutine (subinfo_calscreater) */
 
 
-static int subinfo_calcreate(SUBINFO *sip,cchar *dn,cchar *cn)
+static int subinfo_calcreate(SI *sip,cchar *dn,cchar *cn)
 {
 	CALYEARS	*op = sip->op ;
 	cint	nlen = MAXNAMELEN ;
@@ -1335,7 +1335,7 @@ static int subinfo_calcreate(SUBINFO *sip,cchar *dn,cchar *cn)
 /* end subroutine (subinfo_calcreate) */
 
 
-static int subinfo_mkdns(SUBINFO *sip)
+static int subinfo_mkdns(SI *sip)
 {
 	CALYEARS	*op = sip->op ;
 	int		rs = SR_OK ;
@@ -1347,7 +1347,7 @@ static int subinfo_mkdns(SUBINFO *sip)
 	    if ((rs = vecstr_start(dlp,1,0)) >= 0) {
 	        cchar	*sharedname = CALYEARS_DBDIR ;
 	        char	tbuf[MAXPATHLEN + 1] ;
-		sip->f.dirs = TRUE ;
+		sip->fl.dirs = TRUE ;
 
 /* user-home area */
 
@@ -1385,7 +1385,7 @@ static int subinfo_mkdns(SUBINFO *sip)
 
 		if (rs < 0) {
 		    vecstr_finish(dlp) ;
-		    sip->f.dirs = FALSE ;
+		    sip->fl.dirs = FALSE ;
 		}
 	    } /* end if (vecstr) */
 	} /* end if (username) */
@@ -1394,7 +1394,7 @@ static int subinfo_mkdns(SUBINFO *sip)
 }
 /* end subroutine (subinfo_mkdns) */
 
-static int subinfo_havedir(SUBINFO *sip,cchar *dn) noex {
+static int subinfo_havedir(SI *sip,cchar *dn) noex {
 	int		rs ;
 	int		f = FALSE ;
 
@@ -1409,17 +1409,17 @@ static int subinfo_havedir(SUBINFO *sip,cchar *dn) noex {
 }
 /* end subroutine (subinfo_havedir) */
 
-static int subinfo_ids(SUBINFO *sip) noex {
+static int subinfo_ids(SI *sip) noex {
 	int		rs = SR_OK ;
-	if (! sip->f.id) {
-	    sip->f.id = TRUE ;
+	if (! sip->fl.id) {
+	    sip->fl.id = TRUE ;
 	    rs = ids_load(&sip->id) ;
 	}
 	return rs ;
 }
 /* end subroutine (subinfo_ids) */
 
-static int subinfo_loadnames(SUBINFO *sip,vecstr *nlp,cchar *dirname) noex {
+static int subinfo_loadnames(SI *sip,vecstr *nlp,cchar *dirname) noex {
 	FSDIR		dir ;
 	FSDIR_ENT	ds ;
 	int		rs ;
@@ -1466,7 +1466,7 @@ static int subinfo_loadnames(SUBINFO *sip,vecstr *nlp,cchar *dirname) noex {
 }
 /* end subroutine (subinfo_loadnames) */
 
-static int subinfo_username(SUBINFO *sip) noex {
+static int subinfo_username(SI *sip) noex {
 	int		rs = SR_OK ;
 
 	if (sip->username[0] == '\0') {
@@ -1514,7 +1514,7 @@ static int subinfo_tmpuserdir(subinfo *sip) noex {
 #endif /* COMMENT */
 
 #if	CF_CHECKDNAME
-static int subinfo_checkdname(SUBINFO *sip,cchar *dname) noex {
+static int subinfo_checkdname(SI *sip,cchar *dname) noex {
 	int		rs = SR_OK ;
 
 	if (dname[0] == '/') {
@@ -1536,7 +1536,7 @@ static int subinfo_checkdname(SUBINFO *sip,cchar *dname) noex {
 /* end subroutine (subinfo_checkdname) */
 #endif /* CF_CHECKDNAME */
 
-static int subinfo_regacc(SUBINFO *sip,cchar *fn,int am) noex {
+static int subinfo_regacc(SI *sip,cchar *fn,int am) noex {
 	int		rs ;
 	int		f = FALSE ;
 	if (USTAT sb ; (rs = u_stat(fn,&sb)) >= 0) {
