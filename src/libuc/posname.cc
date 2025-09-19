@@ -30,15 +30,24 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<sncpyxw.h>		/* |sncpy2w(3uc)| */
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"posname.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ulibvals.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
+import ulibvals ;			/* |maxpathlen(3u)| */
 
 /* local defines */
 
@@ -63,34 +72,33 @@ static int	posname_loadnul(posname *,cchar *,int,cchar **) noex ;
 
 /* local variables */
 
-constexpr cauto		mall = uc_libmalloc ;
-constexpr cauto		mals = uc_libmallocstrw ;
-constexpr cauto		mfre = uc_libfree ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int posname_start(posname *op,cchar *sp,int sl,cchar **rpp) noex {
+int posname_start(posname *op,cchar *sp,int µsl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
+	int		rl = 0 ; /* return-value */
 	if (op && sp && rpp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    rs = SR_OK ;
+	    rs = SR_INVALID ;
 	    op->as = nullptr ;
-	    *rpp = sp ;
-	    if (sl > 0) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
+	        *rpp = sp ;
+		rs = SR_OK ;
 	        if (sp[0] != '/') {
 		    rs = posname_loadslash(op,sp,sl,rpp) ;
-		    sl = rs ;
+		    rl = rs ;
 		} else if (sp[sl] != '\0') {
 		    rs = posname_loadnul(op,sp,sl,rpp) ;
-		    sl = rs ;
+		    rl = rs ;
+		} else {
+		    rl = sl ;
 		}
-	    } /* end if (PWD needed) */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? sl : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (posname_start) */
 
@@ -101,7 +109,8 @@ int posname_finish(posname *op) noex {
 	    rs = SR_OK ;
 	    if (op->as) ylikely {
 		char *bp = cast_const<charp>(op->as) ;
-	        rs1 = mfre(bp) ;
+		bp[0] = '\0' ;
+	        rs1 = lm_free(bp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->as = nullptr ;
 	    }
@@ -117,40 +126,44 @@ int posname_finish(posname *op) noex {
 static int posname_loadslash(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) ylikely {
+	int		nl = 0 ; /* return-value */
+	if ((rs = ulibval.maxpathlen) >= 0) ylikely {
 	    cint	nlen = rs ;
-	    if ((rs = sncpy2w(nbuf,nlen,"/",sp,sl)) >= 0) ylikely {
-		sl = rs ;
-	        if (sl > POSNAME_SHORTLEN) {
-		    if (cc *cp ; (rs = mals(sp,sl,&cp)) >= 0) ylikely {
-	                op->as = cp ;
-	                *rpp = cp ;
-	            } /* end if (memory-allocation) */
-	        } else {
-	            *rpp = op->buf ;
-	            strwcpy(op->buf,sp,sl) ;
-	        } /* end if */
-	    } /* end if (pathadd) */
-	    rs1 = uc_free(nbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
-	return (rs >= 0) ? sl : rs ;
+	    if (char *nbuf ; (rs = lm_mall((nlen + 1),&nbuf)) >= 0) ylikely {
+	        if ((rs = sncpy2w(nbuf,nlen,"/",sp,sl)) >= 0) ylikely {
+		    if ((nl = rs) > POSNAME_SHORTLEN) {
+		        if (cc *cp ; (rs = lm_strw(nbuf,nl,&cp)) >= 0) ylikely {
+	                    op->as = cp ;
+	                    *rpp = cp ;
+	                } /* end if (memory-allocation) */
+	            } else {
+	                *rpp = op->buf ;
+	                strwcpy(op->buf,nbuf,nl) ;
+	            } /* end if */
+	        } /* end if (pathadd) */
+	        rs1 = lm_free(nbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (ulibval.maxpathlen) */
+	return (rs >= 0) ? nl : rs ;
 }
 /* end subroutine (posname_loadslash) */
 
 static int posname_loadnul(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_OK ;
+	int		nl = 0 ; /* return-value */
 	if (sl > POSNAME_SHORTLEN) {
-	    if (cchar *cp ; (rs = mals(sp,sl,&cp)) >= 0) ylikely {
+	    if (cchar *cp ; (rs = lm_strw(sp,sl,&cp)) >= 0) ylikely {
 		op->as = cp ;
-		sl = rs ;
+		nl = rs ;
 		*rpp = cp ;
 	    } /* end if (memory-allocation) */
 	} else {
 	    *rpp = op->buf ;
 	    strwcpy(op->buf,sp,sl) ;
+	    nl = rs ;
 	} /* end if */
-	return (rs >= 0) ? sl : rs ;
+	return (rs >= 0) ? nl : rs ;
 }
 /* end subroutine (posname_loadnul) */
 
