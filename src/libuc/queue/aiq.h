@@ -49,13 +49,13 @@ typedef	AIQ_ENT		aiq_ent ;
 
 EXTERNC_begin
 
-extern int aiq_start(aiq *,int) noex ;
-extern int aiq_finish(aiq *) noex ;
-extern int aiq_ins(aiq *,aiq_ent *) noex ;
-extern int aiq_inshead(aiq *,aiq_ent *) noex ;
-extern int aiq_rem(aiq *,aiq_ent **) noex ;
-extern int aiq_remtail(aiq *,aiq_ent **) noex ;
-extern int aiq_count(aiq *) noex ;
+extern int aiq_start	(aiq *,int) noex ;
+extern int aiq_finish	(aiq *) noex ;
+extern int aiq_ins	(aiq *,aiq_ent *) noex ;
+extern int aiq_inshead	(aiq *,aiq_ent *) noex ;
+extern int aiq_rem	(aiq *,aiq_ent **) noex ;
+extern int aiq_remtail	(aiq *,aiq_ent **) noex ;
+extern int aiq_count	(aiq *) noex ;
 
 EXTERNC_end
 
