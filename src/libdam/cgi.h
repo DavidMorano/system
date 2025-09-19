@@ -36,7 +36,7 @@ struct cgi_flags {
 
 struct cgi_head {
 	shio		*ofp ;
-	CGI_FL		f ;
+	CGI_FL		fl ;		/* currently unused! */
 	uint		magic ;
 	int		wlen ;
 } ;
