@@ -61,6 +61,8 @@
 
 /* imported namespaces */
 
+using libuc::libmem ;			/* variable */
+
 
 /* local typedefs */
 
@@ -98,8 +100,8 @@ int mkpathrooted(char *rbuf,cchar *fn) noex {
 	                if ((rs = getpwd(pbuf,plen)) >= 0) ylikely {
 	                    rs = mkpath(rbuf,pbuf,fn) ;
 		            rl = rs ;
-	                }
-	                rs1 = uc_libfree(pbuf) ;
+	                } /* end if (getpwd) */
+	                rs1 = libmalloc_free(pbuf) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (rooting file) */
 	        } else {
