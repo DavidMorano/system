@@ -55,7 +55,7 @@ struct fdliner_head {
 	char		*lbuf ;
 	off_t		poff ;		/* file-offset previous */
 	off_t		foff ;		/* file-offset current */
-	FDLINER_FL	f ;
+	FDLINER_FL	fl ;
 	int		llen ;
 	int		fbo ;
 	int		to ;		/* read time-out */
