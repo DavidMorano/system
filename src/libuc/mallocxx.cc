@@ -53,6 +53,14 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -181,7 +189,7 @@ int malloc_ps(char **rpp) noex {
 	int		sz = 0 ;
 	if (rpp) ylikely {
 	    if ((rs = pagesize) > 0) ylikely {
-	        rs = uc_valloc((rs + 1),rpp) ;
+	        rs = mem.vall((rs + 1),rpp) ;
 	    } else if (rs <= 0) {
 		*rpp = nullptr ;
 		if (rs >= 0) rs = SR_NOSYS ;
@@ -203,11 +211,19 @@ int malloc_mailaddr(char **rpp) noex {
 		if ((rs = getbufsize(w)) >= 0) ylikely {
 		    cint	nnl = rs ;
 		    mal = ((hmult * hnl) + (nmult * nnl)) ;
-		    rs = uc_malloc((mal + 1),rpp) ;
+		    rs = mem.mall((mal + 1),rpp) ;
 		} /* end if */
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? mal : rs ;
 } /* end subroutine (mailoc_mailaddr) */
+
+int malloc_strw(cchar *sp,int sl,cchar **rpp) noex {
+    	return mem.strw(sp,sl,rpp) ;
+}
+
+int malloc_free(void *p) noex {
+    	return mem.free(p) ;
+}
 
 
