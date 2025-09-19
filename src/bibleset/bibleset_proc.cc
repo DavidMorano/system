@@ -199,17 +199,17 @@ int bibleset_proc(PI *pip,bfile *ofp,cc *fname) noex {
 	            debugprintf("progfile: while-out rs=%d\n",rs) ;
 #endif
 
-	        if ((rs >= 0) && pip->f.inverse) {
+	        if ((rs >= 0) && pip->fl.inverse) {
 	            rs = verseend(pip,ofp,&bc) ;
 	            wlen += rs ;
 	        }
 
-	        if ((rs >= 0) && pip->f.inchapter) {
+	        if ((rs >= 0) && pip->fl.inchapter) {
 	            rs = chapterend(pip,ofp,&bc) ;
 	            wlen += rs ;
 	        }
 
-	        if ((rs >= 0) && pip->f.inbook) {
+	        if ((rs >= 0) && pip->fl.inbook) {
 	            rs = bookend(pip,ofp,&bc) ;
 	            wlen += rs ;
 	        }
@@ -246,7 +246,7 @@ static int procline(PROGINFO *pip,void *ofp,BC *bcp,cc *sp,int sl) noex {
 	                    rs) ;
 #endif
 
-	    if ((bcp->book != 0) || (! pip->f.ibz)) {
+	    if ((bcp->book != 0) || (! pip->fl.ibz)) {
 		BIBLEBOOK	*bbp = &pip->bb ;
 
 #ifdef	COMMENT
@@ -263,21 +263,21 @@ static int procline(PROGINFO *pip,void *ofp,BC *bcp,cc *sp,int sl) noex {
 
 /* any changes from the last verse? */
 
-	            pip->f.setchapter = false ;
-	            pip->f.setverse = false ;
+	            pip->fl.setchapter = false ;
+	            pip->fl.setverse = false ;
 	            if ((rs = biblecur_newbook(bcp,bbp)) > 0) {
 
-	                if ((rs >= 0) && pip->f.inverse) {
+	                if ((rs >= 0) && pip->fl.inverse) {
 	                    rs = verseend(pip,ofp,bcp) ;
 	                    wlen += rs ;
 	                }
 
-	                if ((rs >= 0) && pip->f.inchapter) {
+	                if ((rs >= 0) && pip->fl.inchapter) {
 	                    rs = chapterend(pip,ofp,bcp) ;
 	                    wlen += rs ;
 	                }
 
-	                if ((rs >= 0) && pip->f.inbook) {
+	                if ((rs >= 0) && pip->fl.inbook) {
 	                    rs = bookend(pip,ofp,bcp) ;
 	                    wlen += rs ;
 	                }
@@ -296,12 +296,12 @@ static int procline(PROGINFO *pip,void *ofp,BC *bcp,cc *sp,int sl) noex {
 
 	            if ((rs >= 0) && biblecur_newchapter(bcp)) {
 
-	                if ((rs >= 0) && pip->f.inverse) {
+	                if ((rs >= 0) && pip->fl.inverse) {
 	                    rs = verseend(pip,ofp,bcp) ;
 	                    wlen += rs ;
 	                }
 
-	                if ((rs >= 0) && pip->f.inchapter) {
+	                if ((rs >= 0) && pip->fl.inchapter) {
 	                    rs = chapterend(pip,ofp,bcp) ;
 	                    wlen += rs ;
 	                }
@@ -322,7 +322,7 @@ static int procline(PROGINFO *pip,void *ofp,BC *bcp,cc *sp,int sl) noex {
 	            if ((rs >= 0) && biblecur_newverse(bcp,sl)) {
 	    		SILETTER	ls ;
 
-	                if ((rs >= 0) && pip->f.inverse) {
+	                if ((rs >= 0) && pip->fl.inverse) {
 	                    rs = verseend(pip,ofp,bcp) ;
 	                    wlen += rs ;
 	                }
@@ -363,7 +363,7 @@ static int procline(PROGINFO *pip,void *ofp,BC *bcp,cc *sp,int sl) noex {
 
 	            if ((rs >= 0) && (sl > 0)) {
 
-	                if (pip->f.inversezero) {
+	                if (pip->fl.inversezero) {
 	                    rs = handleversezero(pip,ofp,sp,sl) ;
 	                } else {
 	                    rs = printwords(pip,ofp,sp,sl) ;
@@ -399,7 +399,7 @@ static int bookstart(PI *pip,bfile *ofp,BC *bcp,BB *bbp) noex {
 	if (bcp == nullptr) return SR_FAULT ;
 	if (bbp == nullptr) return SR_FAULT ;
 
-	pip->f.inbook = true ;
+	pip->fl.inbook = true ;
 
 	if (rs >= 0) {
 	    cint	book = bcp->book ;
@@ -425,7 +425,7 @@ static int bookstart(PI *pip,bfile *ofp,BC *bcp,BB *bbp) noex {
 	}
 
 	if ((rs >= 0) && (bcp->book >= 0)) {
-	    if ((rs >= 0) && (! pip->f.maintextheader)) {
+	    if ((rs >= 0) && (! pip->fl.maintextheader)) {
 	        rs = progoutmtheader(pip,ofp) ;
 	        wlen += rs ;
 	    }
@@ -433,7 +433,7 @@ static int bookstart(PI *pip,bfile *ofp,BC *bcp,BB *bbp) noex {
 	        rs = bwrite(ofp,".OP\n",-1) ;
 	        wlen += rs ;
 	    }
-	    if ((rs >= 0) && (! pip->f.maintextfooter)) {
+	    if ((rs >= 0) && (! pip->fl.maintextfooter)) {
 	        rs = progoutmtfooter(pip,ofp) ;
 	        wlen += rs ;
 	    }
@@ -458,7 +458,7 @@ static int bookstart(PI *pip,bfile *ofp,BC *bcp,BB *bbp) noex {
 	            pip->troff.infont_p) ;
 	        wlen += rs ;
 	    }
-	    if ((rs >= 0) && pip->f.tc) {
+	    if ((rs >= 0) && pip->fl.tc) {
 	        rs = progofftcadd(pip,ofp,
 	            (pip->c.book >= 33),bcp->bookname) ;
 	        wlen += rs ;
@@ -484,7 +484,7 @@ static int bookend(PI *pip,bfile *ofp,BC *bcp) noex {
 	if (bcp == nullptr) return SR_FAULT ;
 	if (bbp == nullptr) return SR_FAULT ;
 
-	if (pip->f.inbook) {
+	if (pip->fl.inbook) {
 
 	    if (rs >= 0) {
 	        rs = bprintf(ofp,".br\n%s\n",STR_BOOKEND) ;
@@ -504,7 +504,7 @@ static int bookend(PI *pip,bfile *ofp,BC *bcp) noex {
 	    }
 
 	    pip->c.book += 1 ;
-	    pip->f.inbook = false ;
+	    pip->fl.inbook = false ;
 
 	} /* end if (enabled) */
 
@@ -517,7 +517,7 @@ static int chapterstart(PI *pip,bfile *ofp,BC *bcp) noex {
 	int		wlen = 0 ;
 	int		chapter = bcp->chapter ;
 
-	pip->f.inchapter = true ;
+	pip->fl.inchapter = true ;
 
 	if (rs >= 0) {
 	    cchar	*com = pip->troff.linecomment ;
@@ -583,7 +583,7 @@ static int chapterstart(PI *pip,bfile *ofp,BC *bcp) noex {
 #endif /* COMMENT */
 
 #if	CF_CHAPTERBEGIN
-	    pip->f.chapterbegin = true ;
+	    pip->fl.chapterbegin = true ;
 #else
 	    rs = keepend(pip,ofp) ;
 	    wlen += rs ;
@@ -602,11 +602,11 @@ static int chapterend(PI *pip,bfile *ofp,BC *bcp) noex {
 
 	if (bcp == nullptr) return SR_FAULT ;
 
-	if (pip->f.inchapter) {
+	if (pip->fl.inchapter) {
 
-	    pip->f.versezerohalf = false ;
-	    if (pip->f.chapterbegin) {
-	        pip->f.chapterbegin = false ;
+	    pip->fl.versezerohalf = false ;
+	    if (pip->fl.chapterbegin) {
+	        pip->fl.chapterbegin = false ;
 	        rs = keepend(pip,ofp) ;
 	        wlen += rs ;
 	    }
@@ -616,7 +616,7 @@ static int chapterend(PI *pip,bfile *ofp,BC *bcp) noex {
 	        wlen += rs ;
 	    }
 
-	    pip->f.inchapter = false ;
+	    pip->fl.inchapter = false ;
 
 	} /* end if (enabled) */
 
@@ -641,11 +641,11 @@ static int versestart(PI *pip,bfile *ofp,BC *bcp) noex {
 	    wlen += rs ;
 	}
 
-	pip->f.preverseone = false ;
+	pip->fl.preverseone = false ;
 
 /* start new business */
 
-	pip->f.inverse = true ;
+	pip->fl.inverse = true ;
 	if (rs >= 0) {
 	    cchar	*com = pip->troff.linecomment ;
 	    rs = bprintf(ofp,"%s start verse=%u\n",com,verse) ;
@@ -658,9 +658,9 @@ static int versestart(PI *pip,bfile *ofp,BC *bcp) noex {
 	}
 
 	if ((verse == 0) && (bcp->book > 0)) {
-	    pip->f.versezerohalf = true ;
-	    pip->f.inversezero = true ;
-	    pip->f.reduced = true ;
+	    pip->fl.versezerohalf = true ;
+	    pip->fl.inversezero = true ;
+	    pip->fl.reduced = true ;
 
 	    if (rs >= 0) {
 	        rs = linecenter_start(&pip->cv,"R") ;
@@ -673,7 +673,7 @@ static int versestart(PI *pip,bfile *ofp,BC *bcp) noex {
 	} /* end if */
 
 	if (verse == 0) {
-	    pip->f.quoteblock = true ;
+	    pip->fl.quoteblock = true ;
 	    if (rs >= 0) {
 	        rs = bwrite(ofp,".QS 4\n",-1) ;
 	        wlen += rs ;
@@ -718,10 +718,10 @@ static int verseend(PI *pip,bfile *ofp,BC *bcp) noex {
 	    debugprintf("procfile/verseend: ent\n") ;
 #endif
 
-	if (pip->f.inverse) {
+	if (pip->fl.inverse) {
 	    cint	verse = (bcp->verse - 1) ;
 
-	    if (pip->f.inversezero) {
+	    if (pip->fl.inversezero) {
 	        if (rs >= 0) {
 	            rs = printversezero(pip,ofp) ;
 	            wlen += rs ;
@@ -734,37 +734,37 @@ static int verseend(PI *pip,bfile *ofp,BC *bcp) noex {
 
 /* continue with end-processing for this verse */
 
-	        if (pip->f.quoteblock) {
-	            pip->f.quoteblock = false ;
+	        if (pip->fl.quoteblock) {
+	            pip->fl.quoteblock = false ;
 	            if (rs >= 0) {
 	                rs = bwrite(ofp,".QE\n",-1) ;
 	                wlen += rs ;
 	            }
 	        }
 
-	        if (pip->f.reduced) {
-	            pip->f.reduced = false ;
+	        if (pip->fl.reduced) {
+	            pip->fl.reduced = false ;
 	            if (rs >= 0) {
 	                rs = bwrite(ofp,".S +1 P\n",-1) ;
 	                wlen += rs ;
 	            }
 	        }
 
-	        if ((rs >= 0) && pip->f.inversezero) {
-	            pip->f.inversezero = false ;
+	        if ((rs >= 0) && pip->fl.inversezero) {
+	            pip->fl.inversezero = false ;
 	            rs1 = linecenter_finish(&pip->cv) ;
 		    if (rs >= 0) rs = rs1 ;
 	        }
 
-	        pip->f.inverse = false ;
+	        pip->fl.inverse = false ;
 
 	        if ((rs >= 0) && (verse > 0)) {
 	            rs = keepend(pip,ofp) ;
 	            wlen += rs ;
 	        }
 
-	        if ((rs >= 0) && (verse == 1) && pip->f.chapterbegin) {
-	            pip->f.chapterbegin = false ;
+	        if ((rs >= 0) && (verse == 1) && pip->fl.chapterbegin) {
+	            pip->fl.chapterbegin = false ;
 	            rs = keepend(pip,ofp) ;
 	            wlen += rs ;
 	        }
@@ -781,11 +781,11 @@ static int versestartone(PI *pip,bfile *ofp,BC *bcp) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		verse = bcp->verse ;
-	if ((verse == 1) && (! pip->f.preverseone)) {
-	    pip->f.preverseone = true ;
+	if ((verse == 1) && (! pip->fl.preverseone)) {
+	    pip->fl.preverseone = true ;
 	    if (rs >= 0) {
 	        rs = bprintf(ofp,".SP %s\n",
-	            ((pip->f.versezerohalf) ? "0.5" : "1")) ;
+	            ((pip->fl.versezerohalf) ? "0.5" : "1")) ;
 	        wlen += rs ;
 	    }
 	}
@@ -1182,8 +1182,8 @@ static int mkfixbufend(PI *pip,char *buf,int buflen) noex {
 static int setverse(PI *pip,bfile *ofp,int v) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	if (! pip->f.setverse) {
-	    pip->f.setverse = true ;
+	if (! pip->fl.setverse) {
+	    pip->fl.setverse = true ;
 	    if (v < 1) v = 1 ;
 	    rs = progoffdsn(pip,ofp,"bV",v) ;
 	    wlen += rs ;
@@ -1195,8 +1195,8 @@ static int setverse(PI *pip,bfile *ofp,int v) noex {
 static int setchapter(PI *pip,bfile *ofp,int v) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	if (! pip->f.setchapter) {
-	    pip->f.setchapter = true ;
+	if (! pip->fl.setchapter) {
+	    pip->fl.setchapter = true ;
 	    if (v < 1) v = 1 ;
 	    rs = progoffdsn(pip,ofp,"bC",v) ;
 	    wlen += rs ;
@@ -1209,8 +1209,8 @@ static int keepstart(PI *pip,bfile *ofp) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if (! pip->f.inkeep) {
-	    pip->f.inkeep = true ;
+	if (! pip->fl.inkeep) {
+	    pip->fl.inkeep = true ;
 
 	    if (rs >= 0) {
 	        rs = progoffsrs(pip,ofp,"save","bD","\\n(Ds") ;
@@ -1242,8 +1242,8 @@ static int keepend(PI *pip,bfile *ofp) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if (pip->f.inkeep) {
-	    pip->f.inkeep = false ;
+	if (pip->fl.inkeep) {
+	    pip->fl.inkeep = false ;
 
 	    if (rs >= 0) {
 	        rs = bwrite(ofp,".DE\n",-1) ;
@@ -1261,14 +1261,14 @@ static int keepend(PI *pip,bfile *ofp) noex {
 /* end subroutine (keepend) */
 
 static int outcols_short(PI *pip) noex {
-	pip->f.tmpshortcol = true ;
+	pip->fl.tmpshortcol = true ;
 	return SR_OK ;
 }
 /* end subroutine (outcols_short) */
 
 static int outcols_get(PI *pip,int linewidth) noex {
 	int		cbl = MIN(linewidth,COLUMNS) ;
-	if (pip->f.tmpshortcol) {
+	if (pip->fl.tmpshortcol) {
 	    cbl = MIN(40,COLUMNS) ;
 	}
 	return cbl ;
@@ -1276,7 +1276,7 @@ static int outcols_get(PI *pip,int linewidth) noex {
 /* end subroutine (outcols_get) */
 
 static int outcols_normal(PI *pip) noex {
-	pip->f.tmpshortcol = false ;
+	pip->fl.tmpshortcol = false ;
 	return SR_OK ;
 }
 /* end subroutine (outcols_normal) */
