@@ -30,7 +30,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| + |memcpy(3c)| */
 #include	<usystem.h>
 #include	<usupport.h>		/* |ulogeerror(3u)| */
 #include	<strwcpy.h>
@@ -38,11 +37,16 @@
 
 #include	"mallocstuff.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
+
+using libuc::mem ;
 
 
 /* local typedefs */
@@ -68,34 +72,36 @@
 
 /* exported subroutines */
 
-char *mallocbuf(void *bp,int bl) noex {
+char *mallocbuf(void *bp,int 킶l) noex {
 	char		*rp = nullptr ;
 	if (bp) {
 	    int		rs ;
-	    if (bl < 0) bl = strlen(charp(bp)) ;
-	    if ((rs = uc_malloc((bl+1),&rp)) >= 0) {
-		memcpy(rp,bp,bl) ;
-		*rp = '\0' ;
-	    } /* end if (uc_malloc) */
-	    if (rs < 0) {
-		ulogerror("mallocbuf",rs,"uc_malloc") ;
-	    }
+	    if (int bl ; (bl = getlenstr(charp(bp),킶l)) >= 0) {
+	        if ((rs = mem.malloc((bl+1),&rp)) >= 0) {
+		    memcopy(rp,bp,bl) ;
+		    *rp = '\0' ;
+	        } /* end if (memory-allocation) */
+	        if (rs < 0) {
+		    ulogerror("mallocbuf",rs,"uc_malloc") ;
+	        }
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rp ;
 }
 /* end subroutine (mallocbuf) */
 
-char *mallocstrw(char *sp,int sl) noex {
+char *mallocstrw(char *sp,int 탎l) noex {
 	char		*rp = nullptr ;
 	if (sp) {
 	    int		rs ;
-	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = uc_malloc((sl+1),&rp)) >= 0) {
-	        strwcpy(rp,sp,sl) ;
-	    } /* end if (uc_malloc) */
-	    if (rs < 0) {
-		ulogerror("mallocstrw",rs,"uc_malloc") ;
-	    }
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        if ((rs = mem.malloc((sl + 1),&rp)) >= 0) {
+	            strwcpy(rp,sp,sl) ;
+	        } /* end if (uc_malloc) */
+	        if (rs < 0) {
+		    ulogerror("mallocstrw",rs,"uc_malloc") ;
+	        }
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rp ;
 }
@@ -107,12 +113,12 @@ char *mallocstr(cchar *sp) noex {
 /* end subroutine (mallocstr) */
 
 char *mallocint(int v) noex {
+	int		rs ;
 	cint		len = sizeof(int) ;
 	char		*rp = nullptr ;
-	int		rs ;
-	if ((rs = uc_malloc((len+1),&rp)) >= 0) {
+	if ((rs = mem.malloc((len + 1),&rp)) >= 0) {
 	    char	*bp = charp(&v) ;
-	    memcpy(rp,bp,len) ;
+	    memcopy(rp,bp,len) ;
 	    *rp = '\0' ;
 	} /* end if (uc_malloc) */
 	if (rs < 0) {
