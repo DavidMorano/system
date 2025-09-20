@@ -46,14 +46,19 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<ascii.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"langstate.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |memclear(3u)| */
 
@@ -61,6 +66,9 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
