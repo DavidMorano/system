@@ -19,7 +19,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2003 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -38,6 +38,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mkpathx.h>
 #include	<localmisc.h>
 
 #include	"systems.h"
@@ -54,9 +55,6 @@
 
 
 /* external subroutines */
-
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
 
 
 /* external variables */
@@ -79,44 +77,31 @@ static const unsigned char 	fterms[32] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int ns_open(op,ap,n1,n2)
-NS		*op ;
-NS_ARGS		*ap ;
-const char	n1[], n2[] ;
-{
-
-
-	if (op == NULL)
-		return SR_OK ;
-
-	memset(op,0,sizeof(NS)) ;
-
-	return 0 ;
+int ns_open(NS *op,NS_ARGS *ap,cc *n1,cc *n2) noex {
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = memclear(op) ;
+	}
+	return rs ;
 }
 /* end subroutine (ns_open) */
 
 
-int ns_close(op)
-NS		*op ;
-{
-
-
-	if (op == NULL)
-		return SR_OK ;
-
-	if (op->magic != NS_MAGIC)
-		return SR_NOTOPEN ;
-
-	return 0 ;
+int ns_close(NS *op) noex {
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_NOTOPEN ;
+	    if (op->magic == NS_MAGIC) {
+		rs = SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (ns_close) */
-
-
-
-/* PRIVATE SUBROUTINES */
-
 
 
