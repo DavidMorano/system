@@ -302,7 +302,7 @@ int listenspec_finish(LS *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = listenspec_magic(op)) >= 0) {
-	    if (op->f.active) {
+	    if (op->fl.active) {
 	        rs1 = listenspec_active(op,0,false) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -380,7 +380,7 @@ int listenspec_active(LS *op,int opts,int f) noex {
 	int		rs ;
 	int		f_previous = false ;
 	if ((rs = listenspec_magic(op)) >= 0) {
-	    f_previous = op->f.active ;
+	    f_previous = op->fl.active ;
 	    switch (op->ltype) {
 	    case ltype_tcp:
 	        rs = listenspec_tcpactive(op,opts,f) ;
@@ -399,7 +399,7 @@ int listenspec_active(LS *op,int opts,int f) noex {
 	        break ;
 	    } /* end switch */
 	    /* if we just activated (rs > 0), then set Close-On-Exec */
-	    if ((rs > 0) && (op->fd >= 0) && op->f.active) {
+	    if ((rs > 0) && (op->fd >= 0) && op->fl.active) {
 	        rs = uc_closeonexec(op->fd,true) ;
 	        if_constexpr (f_nonblock) {
 	            if (rs >= 0) {
@@ -419,7 +419,7 @@ int listenspec_isactive(LS *op) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = listenspec_magic(op)) >= 0) {
-	    f = op->f.active ;
+	    f = op->fl.active ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -428,7 +428,7 @@ int listenspec_isactive(LS *op) noex {
 int listenspec_delset(LS *op,int f) noex {
 	int		rs ;
 	if ((rs = listenspec_magic(op)) >= 0) {
-	    op->f.delmark = f ;
+	    op->fl.delmark = f ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -438,7 +438,7 @@ int listenspec_delmarked(LS *op) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = listenspec_magic(op)) >= 0) {
-	    f = op->f.delmark ;
+	    f = op->fl.delmark ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -447,7 +447,7 @@ int listenspec_delmarked(LS *op) noex {
 int listenspec_getfd(LS *op) noex {
 	int		rs ;
 	if ((rs = listenspec_magic(op)) >= 0) {
-	    rs = (op->f.active) ? op->fd : SR_BADFD ;
+	    rs = (op->fl.active) ? op->fd : SR_BADFD ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -465,7 +465,7 @@ int listenspec_gettype(LS *op) noex {
 int listenspec_accept(LS *op,void *fromp,int *fromlenp,int to) noex {
 	int		rs ;
 	if ((rs = listenspec_magic(op)) >= 0) {
-	    if (op->f.active) {
+	    if (op->fl.active) {
 	        switch (op->ltype) {
 	        case ltype_tcp:
 	            rs = listenspec_tcpaccept(op,fromp,fromlenp,to) ;
@@ -515,9 +515,9 @@ int listenspec_getinfo(LS *op,listenspec_info *lip) noex {
 	    } /* end switch */
 	    if (rs >= 0) {
 	        lip->state = 0 ;
-	        if (op->f.active) lip->state |= LISTENSPEC_MACTIVE ;
-	        if (op->f.delmark) lip->state |= LISTENSPEC_MDELPEND ;
-	        if (op->f.broken) lip->state |= LISTENSPEC_MBROKEN ;
+	        if (op->fl.active) lip->state |= LISTENSPEC_MACTIVE ;
+	        if (op->fl.delmark) lip->state |= LISTENSPEC_MDELPEND ;
+	        if (op->fl.broken) lip->state |= LISTENSPEC_MBROKEN ;
 	        strwcpy(lip->type,ltypes[op->ltype],LISTENSPEC_TYPELEN) ;
 	    } /* end if */
 	} /* end if (magic) */
@@ -539,7 +539,7 @@ int listenspec_geterr(LS *op,int *rp) noex {
 int listenspec_clear(LS *op) noex {
 	int		rs ;
 	if ((rs = listenspec_magic(op)) >= 0) {
-	    op->f.broken = false ;
+	    op->fl.broken = false ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -728,7 +728,7 @@ static int listenspec_tcpactive(LS *op,int opts,int f) noex {
 	int		rs = SR_OK ;
 	int		f_a = false ;
 
-	if (f && (! op->f.active)) {
+	if (f && (! op->fl.active)) {
 	    LISTENSPEC_TCP *ip = (LISTENSPEC_TCP *) op->info ;
 	    int		af ;
 	    cchar	*cp ;
@@ -769,19 +769,19 @@ static int listenspec_tcpactive(LS *op,int opts,int f) noex {
 	    } /* end if */
 
 	    if (rs >= 0) {
-	        op->f.active = true ;
-	        op->f.broken = false ;
+	        op->fl.active = true ;
+	        op->fl.broken = false ;
 		f_a = true ;
 	    } else {
 		op->rs_error = rs ;
-	        op->f.broken = true ;
+	        op->fl.broken = true ;
 	    }
-	} else if ((! f) && op->f.active) {
+	} else if ((! f) && op->fl.active) {
 	    if (op->fd >= 0) {
 	        u_close(op->fd) ;
 	        op->fd = -1 ;
 	    }
-	    op->f.active = false ;
+	    op->fl.active = false ;
 	} /* end if */
 
 	return (rs >= 0) ? f_a : rs ;
@@ -909,22 +909,22 @@ static int listenspec_ussactive(LS *op,int opts,int f) noex {
 	int		rs = SR_OK ;
 	int		f_a = false ;
 
-	if (f && (! op->f.active)) {
+	if (f && (! op->fl.active)) {
 	    if ((rs = listenuss(ip->fname,ip->mode,opts)) >= 0) {
 	        op->fd = rs ;
-	        op->f.active = true ;
-	        op->f.broken = false ;
+	        op->fl.active = true ;
+	        op->fl.broken = false ;
 		f_a = true ;
 	    } else {
 		op->rs_error = rs ;
-	        op->f.broken = true ;
+	        op->fl.broken = true ;
 	    }
-	} else if ((! f) && op->f.active) {
+	} else if ((! f) && op->fl.active) {
 	    if (op->fd >= 0) {
 	        u_close(op->fd) ;
 	        op->fd = -1 ;
 	    }
-	    op->f.active = false ;
+	    op->fl.active = false ;
 	} /* end if */
 
 	return (rs >= 0) ? f_a : rs ;
@@ -1043,25 +1043,25 @@ static int listenspec_passactive(LS *op,int opts,int f) noex {
 	LISTENSPEC_PASS	*ip = (LISTENSPEC_PASS *) op->info ;
 	int		rs = SR_OK ;
 	int		f_a = false ;
-	if (f && (! op->f.active)) {
+	if (f && (! op->fl.active)) {
 	    if ((rs = listenpass(ip->fname,ip->mode,opts)) >= 0) {
 	        op->fd = rs ;
-	        op->f.active = true ;
-	        op->f.broken = false ;
+	        op->fl.active = true ;
+	        op->fl.broken = false ;
 		f_a = true ;
 		if_constexpr (f_streams) {
 	            rs = u_ioctl(op->fd,I_SRDOPT,RMSGD) ;
 		}
 	    } else {
 		op->rs_error = rs ;
-	        op->f.broken = true ;
+	        op->fl.broken = true ;
 	    }
-	} else if ((! f) && op->f.active) {
+	} else if ((! f) && op->fl.active) {
 	    if (op->fd >= 0) {
 	        u_close(op->fd) ;
 	        op->fd = -1 ;
 	    }
-	    op->f.active = false ;
+	    op->fl.active = false ;
 	} /* end if */
 	return (rs >= 0) ? f_a : rs ;
 }
@@ -1187,20 +1187,20 @@ static int listenspec_connactive(LS *op,int opts,int f) noex {
 	int		rs1 ;
 	int		f_a = false ;
 
-	if (f && (! op->f.active)) {
+	if (f && (! op->fl.active)) {
 	    if ((rs = listenconn(ip->fname,ip->mode,opts)) >= 0) {
 	        op->fd = rs ;
-	        op->f.active = true ;
-	        op->f.broken = false ;
+	        op->fl.active = true ;
+	        op->fl.broken = false ;
 		f_a = true ;
 #if	SYSHAS_STREAMS
 	        u_ioctl(op->fd,I_SRDOPT,RMSGD) ;
 #endif
 	    } else {
 		op->rs_error = rs ;
-	        op->f.broken = true ;
+	        op->fl.broken = true ;
 	    }
-	} else if ((! f) && op->f.active) {
+	} else if ((! f) && op->fl.active) {
 	    if (ip->fname[0] != '\0') {
 	        rs1 = uc_fdetach(ip->fname) ;
 		if (rs >= 0) rs = rs1 ;
@@ -1209,7 +1209,7 @@ static int listenspec_connactive(LS *op,int opts,int f) noex {
 	        u_close(op->fd) ;
 	        op->fd = -1 ;
 	    }
-	    op->f.active = false ;
+	    op->fl.active = false ;
 	} /* end if */
 
 	return (rs >= 0) ? f_a : rs ;
@@ -1294,7 +1294,7 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 	                    break ;
 	                case lopt_reuse:
 	                case lopt_ra:
-	                    op->f.reuse = true ;
+	                    op->fl.reuse = true ;
 	                    break ;
 	                } /* end switch */
 	            } else {
