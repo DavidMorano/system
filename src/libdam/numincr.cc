@@ -98,8 +98,8 @@ int numincr_load(numincr *op,cchar *sp,int sl) noex {
 	            op->v = v ;
 		}
 	    } else if (isalphalatin(ch)) {
-	        op->f.alpha = true ;
-	        op->f.uc = isupperlatin(ch) ;
+	        op->fl.alpha = true ;
+	        op->fl.uc = isupperlatin(ch) ;
 	        if (int v ; (rs = cfa26(sp,sl,&v)) >= 0) {
 	            op->v = v ;
 	        }
@@ -141,8 +141,8 @@ int numincr_cvtstr(numincr *op,char *rbuf,int rlen,int prec) noex {
 	int		rs = SR_FAULT ;
 	(void) prec ;
 	if (op && rbuf) {
-	    if (op->f.alpha) {
-	        cint	type = (op->f.uc) ? 'A' : 'a' ;
+	    if (op->fl.alpha) {
+	        cint	type = (op->fl.uc) ? 'A' : 'a' ;
 	        rs = cta26(rbuf,rlen,type,op->prec,op->v) ;
 	    } else {
 	        rs = ctdecp(rbuf,rlen,op->prec,op->v) ;
