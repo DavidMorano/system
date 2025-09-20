@@ -46,6 +46,9 @@
 
 #include	"termenq.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -60,9 +63,9 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -144,7 +147,7 @@ int termenq_open(TE *op,cchar *dbfn,int oflags) noex {
 	        op->fd = -1 ;
 	        op->fname = nullptr ;
 		if ((rs = termenq_initstuff(op,oflags)) >= 0) {
-                    if (cchar *cp ; (rs = uc_mallocstrw(dbfn,-1,&cp)) >= 0) {
+                    if (cchar *cp ; (rs = libmem.strw(dbfn,-1,&cp)) >= 0) {
                         op->fname = cp ;
                         if ((rs = termenq_fileopen(op,dt)) >= 0) {
                             op->ti_check = dt ;
@@ -158,7 +161,8 @@ int termenq_open(TE *op,cchar *dbfn,int oflags) noex {
                             }
                         } /* end if (termenq-fileopen) */
                         if (rs < 0) {
-                            uc_free(op->fname) ;
+			    void *vp = voidp(op->fname) ;
+                            libmem.free(vp) ;
                             op->fname = nullptr ;
                         }
                     } /* end if (memory-allocation) */
@@ -185,7 +189,8 @@ int termenq_close(TE *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->fname) {
-	        rs1 = uc_free(op->fname) ;
+		void *vp = voidp(op->fname) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
 	    }
@@ -455,7 +460,7 @@ static int termenq_initstuff(TE *op,int of) noex {
             rs = SR_INVALID ;
             break ;
         } /* end switch */
-	op->f.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
+	op->fl.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
 	return rs ;
 }
 /* end subroutine (termenq_initstuff) */
@@ -527,18 +532,19 @@ static int termenq_mapents(TE *op,int ei,TE_ENT **rpp) noex {
 	} /* end if (old map was sufficient) */
 
 	if ((rs >= 0) && (n == 0)) {
+	    uint	fsz = uint(op->fsize) ;
 	    uint	eoff = (ei * esz) ;
 	    uint	elen = (en * esz) ;
 	    uint	eext = (eoff + elen) ;
 
-	    if (eext > op->fsize) eext = op->fsize ;
+	    if (eext > fsz) eext = fsz ;
 
 	    n = (eext - eoff) / esz ;
 
 	    if (n > 0) {
-	        uint	woff, wext, wsize ;
-	        woff = ufloor(eoff,op->pagesz) ;
-	        wext = uceil(eext,op->pagesz) ;
+	        uint	wsize ;
+	        uint	woff = ufloor(eoff,op->pagesz) ;
+	        uint	wext = uceil(eext,op->pagesz) ;
 	        wsize = (wext - woff) ;
 	        if (wsize > 0) {
 	            bool	f = (woff < op->mapoff) ;
