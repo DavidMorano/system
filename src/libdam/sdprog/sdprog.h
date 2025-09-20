@@ -1,8 +1,8 @@
-/* sdprog HEADER */
+/* sdprog HEADER (Syhstem-Dialer Program) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* SYSDIALER "sdprog" dialer */
+/* SYSDIALER "sdprog" program-dialer */
 /* version %I% last-modified %G% */
 
 
@@ -44,7 +44,7 @@ struct sdprog_flags {
 struct sdprog_head {
 	logfile		*lhp ;
 	pid_t		pid ;
-	SDPROG_FL	f ;
+	SDPROG_FL	fl ;
 	uint		magic ;
 	int		fd ;
 	int		tlen ;
