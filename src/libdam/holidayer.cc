@@ -167,10 +167,10 @@ int holidayer_close(HO *op) noex {
 	debugprintf("holidayer_close: ent\n") ;
 #endif
 
-	if (op->f.hols) {
+	if (op->fl.hols) {
 	    rs1 = holidayer_holfins(op) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->f.hols = false ;
+	    op->fl.hols = false ;
 	    rs1 = vechand_finish(&op->hols) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -201,7 +201,7 @@ int holidayer_audit(HO *op) noex {
 
 	if (op->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.hols) {
+	if (op->fl.hols) {
 	    vechand	*hlp = &op->hols ;
 	    if ((rs = vechand_audit(hlp)) >= 0) {
 		void	*vp{} ;
@@ -449,7 +449,7 @@ int holidayer_check(HO *op,time_t dt) noex {
 static int holidayer_holfins(HO *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.hols) {
+	if (op->fl.hols) {
 	    vechand	*hlp = &op->hols ;
 	    void	*vp{} ;
 	    for (int i = 0 ; vechand_get(hlp,i,&vp) >= 0 ; i += 1) {
@@ -501,7 +501,7 @@ static int holidayer_holend(HO *op,HO_H *hep) noex {
 static int holidayer_yearfind(HO *op,uint y,holidays **rpp) noex {
 	HOLIDAYER_HOL	*hep{} ;
 	int		rs = SR_NOTFOUND ;
-	if (op->f.hols) {
+	if (op->fl.hols) {
 	    vechand	*hlp = &op->hols ;
 	    void	*vp{} ;
 	    for (int i = 0 ; (rs = vechand_get(hlp,i,&vp)) >= 0 ; i += 1) {
@@ -582,10 +582,10 @@ static int holidayer_yearfile(HO *op,char *hfname,uint y) noex {
 static int holidayer_yearadd(HO *op,HO_H *hep) noex {
 	vechand		*hlp = &op->hols ;
 	int		rs = SR_OK ;
-	if (! op->f.hols) {
+	if (! op->fl.hols) {
 	    const int	vo = VECHAND_OSTATIONARY ;
 	    if ((rs = vechand_start(hlp,2,vo)) >= 0) {
-	        op->f.hols = true ;
+	        op->fl.hols = true ;
 	    }
 	}
 	if (rs >= 0) {
