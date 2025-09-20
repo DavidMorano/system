@@ -52,7 +52,7 @@ struct mxalias_head {
 	keyvals		*elp ;
 	time_t		ti_access ;
 	time_t		ti_check ;
-	MXALIAS_FL	f ;
+	MXALIAS_FL	fl ;
 	uint		magic ;
 	int		ncursors ;
 	int		count ;
