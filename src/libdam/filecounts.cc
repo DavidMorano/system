@@ -219,7 +219,7 @@ int filecounts_open(FC *op,cchar *fn,int of,mode_t om) noex {
 	if ((rs = filecounts_ctor(op,fn)) >= 0) {
 	    static cint		rsv = var ;
 	    if ((rs = rsv) >= 0) {
-	        op->f.rdonly = ((of & O_ACCMODE) == O_RDONLY) ;
+	        op->fl.rdonly = ((of & O_ACCMODE) == O_RDONLY) ;
 	        if ((rs = u_open(fn,of,om)) >= 0) {
 	            op->fd = rs ;
 	            if (cchar *cp{} ; (rs = uc_mallocstrw(fn,-1,&cp)) >= 0) {
@@ -405,7 +405,7 @@ static int filecounts_proclist(FC *op,FC_N *nlp) noex {
 		cint	fd = op->fd ;
 	        if (filer fb ; (rs = fb.start(fd,0z,0,vo)) >= 0) {
 	            if ((rs = filecounts_scan(op,&work,&fb)) >= 0) {
-	                if (! op->f.rdonly) {
+	                if (! op->fl.rdonly) {
 	                    rs = filecounts_update(op,&work) ;
 	                } /* end if */
 	                if (rs >= 0) {
@@ -687,7 +687,7 @@ static int filecounts_snaperline(FC *op,dater *dmp,vecobj *ilp,
 
 static int filecounts_lockbegin(FC *op) noex {
 	cint		to = TO_LOCK ;
-	cint		cmd = (op->f.rdonly) ? F_RLOCK : F_WLOCK ;
+	cint		cmd = (op->fl.rdonly) ? F_RLOCK : F_WLOCK ;
 	return lockfile(op->fd,cmd,0z,0z,to) ;
 }
 /* end subroutine (filecounts_lockbegin) */
