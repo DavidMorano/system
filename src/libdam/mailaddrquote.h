@@ -32,7 +32,7 @@ struct mailaddrquote_flags {
 
 struct mailaddrquote_head {
 	bufstr			*bsp ;	/* buffer-string-pointer */
-	MAILADDRQUOTE_FL	f ;
+	MAILADDRQUOTE_FL	fl ;
 	uint			magic ;
 } ;
 
