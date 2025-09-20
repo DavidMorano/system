@@ -40,7 +40,7 @@ struct htm_flags {
 struct htm_head {
 	shio		*ofp ;
 	char		*lbuf ;
-	HTM_FL		f ;
+	HTM_FL		fl ;		/* currently unused! */
 	uint		magic ;
 	int		llen ;
 	int		wlen ;
