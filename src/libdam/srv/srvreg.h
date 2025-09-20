@@ -82,9 +82,9 @@ struct srvreg_head {
 	time_t		opentime ;		/* file open time */
 	time_t		accesstime ;		/* file access time */
 	time_t		mtime ;			/* file modification time */
-	SRVREG_FL	f ;
 	SRVREG_FILE	h ;
 	SVCREG_BUF	b ;	/* file buffer */
+	SRVREG_FL	fl ;
 	uint		magic ;
 	int		oflags ;
 	int		operm ;
