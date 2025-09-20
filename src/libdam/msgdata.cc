@@ -26,9 +26,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
+#include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<sockaddress.h>
@@ -39,6 +38,9 @@
 
 #include	"msgdata.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -49,7 +51,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -86,14 +87,14 @@ int msgdata_init(msgdata *mip,int mlen) noex {
 	int		rs = SR_FAULT ;
 	int		ml = 0 ;
 	if (mip) {
-	    cint		clen = MAX(CMSGBUFLEN,conmsghdr_len) ;
+	    cint	clen = MAX(CMSGBUFLEN,conmsghdr_len) ;
 	    int		sz = 0 ;
 	    memclear(mip) ;
 	    mip->ns = -1 ;
 	    if (mlen < MSGBUFLEN) mlen = MSGBUFLEN ;
-	    sz += (clen+1) ;
-	    sz += (mlen+1) ;
-	    if (char *bp{} ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	    sz += (clen + 1) ;
+	    sz += (mlen + 1) ;
+	    if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
 	        MSGHDR	*mp = &mip->msg ;
 	        mip->a = bp ;
 	        ml = mlen ;
@@ -102,11 +103,11 @@ int msgdata_init(msgdata *mip,int mlen) noex {
 	        bp += (mlen+1) ;
 	        mip->cmsgp = (CONMSGHDR *) bp ;
 	        mip->clen = clen ;
-	        bp += (clen+1) ;
+	        bp += (clen + 1) ;
 	        mip->mbuf[0] = '\0' ;
 	        mip->vecs[0].iov_base = mip->mbuf ;
 	        mip->vecs[0].iov_len = mip->mlen ;
-	        memset(mip->cmsgp,0,clen) ; /* clear control-message */
+	        memclear(mip->cmsgp,clen) ; /* clear control-message */
 	        memclear(mp) ;
 	        mp->msg_name = &mip->from ;
 	        mp->msg_namelen = szof(SOCKADDRESS) ;
@@ -126,7 +127,7 @@ int msgdata_fini(msgdata *mip) noex {
 	if (mip) {
 	    rs = SR_OK ;
 	    if (mip->a) {
-	        rs1 = uc_libfree(mip->a) ;
+	        rs1 = lm_free(mip->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        mip->a = nullptr ;
 	    }
@@ -245,8 +246,9 @@ int msgdata_setaddr(msgdata *mip,cvoid *sap,int sal) noex {
 	cint		flen = szof(SOCKADDRESS) ;
 	int		rs = SR_OK ;
 	if (sal <= flen) {
-	    memcpy(&mip->from,sap,sal) ;
-	    mip->msg.msg_namelen = sal ;
+	    if ((rs = mip->from(sap,sal)) >= 0) {
+	        mip->msg.msg_namelen = sal ;
+	    }
 	} else {
 	    rs = SR_TOOBIG ;
 	}
