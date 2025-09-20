@@ -47,13 +47,13 @@
 
 struct ds_flags {
 	uint		update:1 ;
-	uint		mailnew:1 ;		/* new mail arrived */
+	uint		mailnew:1 ;	/* new mail arrived */
 } ;
 
 struct ds_head {
 	cchar		*termtype ;
-	TD		*tdp ;			/* terminal display manager */
-	DS_FL		f ;
+	TD		*tdp ;		/* terminal display manager */
+	DS_FL		fl ;		/* currently unused! */
 	uint		magic ;
 	int		tfd ;
 	int		rows ;
