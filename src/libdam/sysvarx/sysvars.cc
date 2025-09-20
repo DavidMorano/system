@@ -614,7 +614,7 @@ static int sysvars_indopenseqer(SVS *op,SUBINFO *sip,dirseen *dsp,
 	if (rs >= 0) {
 	    if (mainv dv ; (rs = vecstr_getvec(sdp,&dv)) >= 0) {
 	        if ((rs = var_opena(op->vindp,dv)) >= 0) {
-	            op->f.var = true ;
+	            op->fl.var = true ;
 		}
 	        if ((rs < 0) && isNotPresent(rs)) {
 	            rs = sysvars_indopenalt(op,sip,dsp) ;
@@ -692,7 +692,7 @@ static int sysvars_indopenalt(SVS *op,SUBINFO *sip,dirseen *dsp) noex {
 	            if (rs >= 0) {
 	                if ((rs = mkpath2(indname,ebuf,op->dbname)) >= 0) {
 	                    rs = var_open(op->vindp,indname) ;
-	                    op->f.var = (rs >= 0) ;
+	                    op->fl.var = (rs >= 0) ;
 	                }
 	            }
 
@@ -763,8 +763,8 @@ static int sysvars_indmkdata(SVS *op,cchar *indname,mode_t om) noex {
 static int sysvars_indclose(SVS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.var) {
-	    op->f.var = false ;
+	if (op->fl.var) {
+	    op->fl.var = false ;
 	    rs1 = var_close(op->vindp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -905,8 +905,8 @@ static int subinfo_ids(SUBINFO *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = SR_OK ;
-	    if (! sip->f.id) {
-	        sip->f.id = true ;
+	    if (! sip->fl.id) {
+	        sip->fl.id = true ;
 	        rs = ids_load(&sip->id) ;
 	    }
 	} /* end if (non-null) */
@@ -919,8 +919,8 @@ static int subinfo_finish(SUBINFO *sip) noex {
 	int		rs1 ;
 	if (sip) {
 	    rs = SR_OK ;
-	    if (sip->f.id) {
-	        sip->f.id = false ;
+	    if (sip->fl.id) {
+	        sip->fl.id = false ;
 	        rs1 = ids_release(&sip->id) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
