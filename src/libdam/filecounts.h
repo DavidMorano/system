@@ -63,7 +63,7 @@ struct filecounts_flags {
 
 struct filecounts_head {
 	cchar		*fname ;	/* file-name */
-	FILECOUNTS_FL	f ;
+	FILECOUNTS_FL	fl ;
 	uint		magic ;
 	int		fd ;
 	int		ncursors ;
