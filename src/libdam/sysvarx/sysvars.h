@@ -49,7 +49,7 @@ struct sysvars_head {
 	char		*dbname ;	/* DB name (allocated) */
 	var		*vindp ;	/* variable-index-pointer */
 	time_t		ti_db ;		/* DB mtime */
-	SYSVARS_FL	f ;
+	SYSVARS_FL	fl ;
 	uint		magic ;
 	int		ncursors ;
 } ;
