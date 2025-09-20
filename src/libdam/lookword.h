@@ -40,7 +40,7 @@ struct lookword_flags {
 struct lookword_head {
 	void		*md ;		/* map-data */
 	size_t		ms ;		/* map-size */
-	LOOKWORD_FL	f ;
+	LOOKWORD_FL	fl ;
 	uint		magic ;
 	int		fd ;
 } ;
