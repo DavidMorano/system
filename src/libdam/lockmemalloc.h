@@ -32,8 +32,7 @@ enum lockmemallocsets {
     lockmemallocset_end,
     lockmemallocset_begin,
     lockmemallocset_overlast
-} ;
-
+} ; /* end enum (lockmemallocsets) */
 
 EXTERNC_begin
 
