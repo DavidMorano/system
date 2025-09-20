@@ -575,7 +575,7 @@ static int progsig_entfins(progsig *uip) noex {
 		    if (rs >= 0) rs = rs1 ;
 		}
 		{
-		    rs1 = uc_libfree(ep) ;
+		    rs1 = lm_free(ep) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
 	    } /* end if (non-null) */
@@ -703,7 +703,7 @@ static int progsig_workgener(progsig *uip,SESMSG_GEN *mp) noex {
 	SN	*ep ;
 	cint		esize = szof(SN) ;
 	int		rs ;
-	if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
+	if ((rs = lm_mall(esize,&ep)) >= 0) {
 	    time_t	st = mp->stime ;
 	    cint	mt = mp->msgtype ;
 	    cint	nlen = lenstr(mp->nbuf) ;
@@ -716,7 +716,7 @@ static int progsig_workgener(progsig *uip,SESMSG_GEN *mp) noex {
 		}
 	    } /* end if (snote_start) */
 	    if (rs < 0) {
-		uc_libfree(ep) ;
+		lm_free(ep) ;
 	    }
 	} /* end if (m-a) */
 	return rs ;
@@ -744,7 +744,7 @@ static int progsig_workbiffer(progsig *uip,SESMSG_BIFF *mp) noex {
 	SN		*ep ;
 	cint		esize = szof(SN) ;
 	int		rs ;
-	if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
+	if ((rs = lm_mall(esize,&ep)) >= 0) {
 	    time_t	st = mp->stime ;
 	    cint	mt = mp->msgtype ;
 	    cint	nlen = lenstr(mp->nbuf) ;
@@ -756,7 +756,7 @@ static int progsig_workbiffer(progsig *uip,SESMSG_BIFF *mp) noex {
 		    snote_finish(ep) ;
 	    } /* end if (snote_start) */
 	    if (rs < 0)
-		uc_libfree(ep) ;
+		lm_free(ep) ;
 	} /* end if (m-a) */
 	return rs ;
 }
@@ -1104,7 +1104,7 @@ static int snote_finish(SN *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->a != nullptr) {
-	    rs1 = uc_libfree(ep->a) ;
+	    rs1 = lm_free(ep->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->a = nullptr ;
 	    ep->user = nullptr ;
@@ -1122,7 +1122,7 @@ static int libmalstrw(cchar *sp,int sl,cchar **rpp) noex {
 	if (rpp) {
 	    char	*bp ;
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((rs = uc_libmalloc((sl+1),&bp)) >= 0) {
+	    if ((rs = lm_mall((sl+1),&bp)) >= 0) {
 	        *rpp = bp ;
 	        strwcpy(bp,sp,sl) ;
 	    } /* end if (m-a) */
