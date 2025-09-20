@@ -40,7 +40,7 @@ struct numincr_flags {
 } ;
 
 struct numincr_head {
-	NUMINCR_FL	f ;
+	NUMINCR_FL	fl ;
 	int		v ;		/* value */
 	int		b ;		/* base (not used?) */
 	int		prec ;		/* precision */
