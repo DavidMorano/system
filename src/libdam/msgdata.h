@@ -50,8 +50,8 @@ struct msgdata_head {
 	void		*a ;		/* allocation */
 	char		*mbuf ;		/* buffer */
 	MSGHDR		msg ;
-	SOCKADDRESS	from ;
 	IOVEC		vecs[1] ;
+	sockaddress	from ;
 	int		clen ;		/* Control-Message length */
 	int		mlen ;		/* fixed at buffer size */
 	int		ml ;		/* variable as used */
