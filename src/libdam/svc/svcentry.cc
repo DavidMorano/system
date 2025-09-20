@@ -245,8 +245,8 @@ int svcentry_finish(SE *op) noex {
 	            op->efname = nullptr ;
 		}
 	    }
-	    if (op->f.srvargs) {
-	        op->f.srvargs = false ;
+	    if (op->fl.srvargs) {
+	        op->fl.srvargs = false ;
 	        rs1 = vecstr_finish(op->sap) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -458,7 +458,7 @@ int expander::comp_a() noex {
 		cint	vn = 6 ;
 	        cint	vo = VECSTR_OCOMPACT ;
 	        if ((rs = vecstr_start(op->sap,vn,vo)) >= 0) {
-	            op->f.srvargs = true ;
+	            op->fl.srvargs = true ;
 	            if ((rs = vecstr_procargs(op->sap,obuf)) > 0) {
 			if ((rs = vecstr_get(op->sap,0,&argz)) >= 0) {
 			    rs = SR_OK ;
@@ -530,19 +530,19 @@ int expander::comp_prog() noex {
 int expander::comp_def() noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	if (op->f.srvargs) {
+	if (op->fl.srvargs) {
 	    rs = vecstr_count(op->sap) ;
 	    c = rs ;
 	}
 	if ((rs == 0) && (op->program != nullptr)) {
 	    cchar	*cp{} ;
 	    if (int cl ; (cl = sfbasename(op->program,-1,&cp)) > 0) {
-	        if (! op->f.srvargs) {
+	        if (! op->fl.srvargs) {
 	            if ((rs = vecstr_start(op->sap,2,0)) >= 0) {
-	                op->f.srvargs = true ;
+	                op->fl.srvargs = true ;
 		    }
 	        }
-	        if (op->f.srvargs) {
+	        if (op->fl.srvargs) {
 	            rs = vecstr_add(op->sap,cp,cl) ;
 		    c = rs ;
 		}
@@ -556,8 +556,8 @@ void expander::compfrees() noex {
 	freeit(&op->options) ;
 	freeit(&op->groupname) ;
 	freeit(&op->username) ;
-	if (op->f.srvargs) {
-	    op->f.srvargs = false ;
+	if (op->fl.srvargs) {
+	    op->fl.srvargs = false ;
 	    vecstr_finish(op->sap) ;
 	}
 	freeit(&op->program) ;
