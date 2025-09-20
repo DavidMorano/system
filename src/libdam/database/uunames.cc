@@ -728,13 +728,13 @@ static int uunames_indopendname(UU *op,cchar *dname,time_t dt) noex {
 
 	if (rs >= 0) {
 	    rs = uunames_indmapcreate(op,indname,dt) ;
-	    op->f.varind = (rs >= 0) ;
+	    op->fl.varind = (rs >= 0) ;
 	}
 
 	if ((rs < 0) && (rs != SR_BADFMT) && (! f_mk)) {
 	    if ((rs = uunames_indfn(op,dname,dt)) >= 0) {
 		rs = uunames_indmapcreate(op,indname,dt) ;
-	        op->f.varind = (rs >= 0) ;
+	        op->fl.varind = (rs >= 0) ;
 	    }
 	}
 
@@ -799,8 +799,8 @@ static int uunames_indfn(UU *op,cchar *dname,time_t) noex {
 static int uunames_indclose(UU *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.varind) {
-	    op->f.varind = false ;
+	if (op->fl.varind) {
+	    op->fl.varind = false ;
 	    rs1 = uunames_indmapdestroy(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
