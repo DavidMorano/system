@@ -40,7 +40,7 @@ struct offindex_flags {
 
 struct offindex_head {
 	vecobj		*oip ;
-	OFFINDEX_FL	f ;
+	OFFINDEX_FL	fl ;
 	uint		magic ;
 } ;
 
