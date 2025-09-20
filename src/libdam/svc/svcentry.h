@@ -72,7 +72,7 @@ struct svcentry_head {
 	time_t		atime ;		/* job arrival time */
 	time_t		stime ;		/* job start time */
 	pid_t		pid ;		/* run flag */
-	SVCENTRY_FL	f ;
+	SVCENTRY_FL	fl ;
 	uint		magic ;
 	int		interval ;	/* interval (seconds) */
 	char		jobid[SVCENTRY_IDLEN + 1] ;
