@@ -40,7 +40,7 @@ struct qpdecoder_flags {
 
 struct qpdecoder_head {
 	void		*outbuf ;	/* output-buffer */
-	QPDECODER_FL	f ;
+	QPDECODER_FL	fl ;
 	uint		magic ;
 	int		rl ;		/* stage length */
 	char		rb[QPDECODER_NSTAGE + 1] ;	/* stage buffer */
