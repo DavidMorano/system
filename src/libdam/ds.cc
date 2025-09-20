@@ -77,9 +77,9 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static int ds_ctor(ds *op,Args ... args) noex {
     	DS		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
 	    if ((op->tdp = new(nothrow) td) != np) {
