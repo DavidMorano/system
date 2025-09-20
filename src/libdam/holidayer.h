@@ -50,7 +50,7 @@ struct holidayer_head {
 	cchar		*pr ;
 	ids		id ;
 	vechand		hols ;
-	HOLIDAYER_FL	f ;
+	HOLIDAYER_FL	fl[ ;
 	uint		magic ;
 	uint		year ;
 	int		ncursors ;
