@@ -322,7 +322,7 @@ int ipasswd_fetch(ipasswd *op,realname *rp,ipasswd_cur *curp,
             } else {
                 f_cur = true ;
                 if (curp->magic != IPASSWD_CURMAGIC) return SR_NOTOPEN ;
-                if (! op->f.cursor) return SR_INVALID ;
+                if (! op->fl.cursor) return SR_INVALID ;
             }
             if (up) *up = '\0' ;
     /* do we have a hold on the file? */
@@ -335,7 +335,7 @@ int ipasswd_fetch(ipasswd *op,realname *rp,ipasswd_cur *curp,
                 cchar       *cp ;
                 char        hbuf[4 + 1] ;
     /* continue with regular fetch activities */
-                op->f.cursoracc = true ;    /* does not hurt if no cursor! */
+                op->fl.cursoracc = true ;    /* does not hurt if no cursor! */
     /* which index do we want to use? */
                 wi = -1 ;
                 if (rs >= 0) {
@@ -472,8 +472,8 @@ int ipasswd_fetch(ipasswd *op,realname *rp,ipasswd_cur *curp,
 int ipasswd_curbegin(ipasswd *op,ipasswd_cur *curp) noex {
 	int		rs ;
 	if ((rs = ipasswd_magic(op,curp)) >= 0) {
-	    op->f.cursor = true ;
-	    op->f.cursoracc = false ;
+	    op->fl.cursor = true ;
+	    op->fl.cursoracc = false ;
 	    for (int i = 0 ; i < IPASSWD_NINDICES ; i += 1) {
 	        curp->i[i] = -1 ;
 	    }
@@ -488,8 +488,8 @@ int ipasswd_curend(ipasswd *op,ipasswd_cur *curp) noex {
 	int		rs ;
 	if ((rs = ipasswd_magic(op,curp)) >= 0) {
 	    if (curp->magic == IPASSWD_CURMAGIC) {
-	        if (op->f.cursoracc) op->ti_access = dt ;
-	        op->f.cursor = false ;
+	        if (op->fl.cursoracc) op->ti_access = dt ;
+	        op->fl.cursor = false ;
 	        for (int i = 0 ; i < IPASSWD_NINDICES ; i += 1) {
 	            curp->i[i] = -1 ;
 	        }
@@ -508,7 +508,7 @@ int ipasswd_curenum(ipasswd *op,ipasswd_cur *curp,char *ubuf,cc **sa,
 	if ((rs = ipasswd_magic(op,curp,ubuf,sa,rbuf)) >= 0) {
 	    if (curp->magic == IPASSWD_CURMAGIC) {
 		rs = SR_INVALID ;
-	        if (op->f.cursor) {
+	        if (op->fl.cursor) {
 		    time_t	dt = 0 ;
 		    int		ri = (curp->i[0] < 1) ? 1 : (curp->i[0] + 1) ;
 		    /* capture a hold on the file */
@@ -603,7 +603,7 @@ int ipasswd_curfetch(ipasswd *op,ipasswd_cur *curp,int opts,char *ubuf,
 	} else {
 	    f_cur = true ;
 	    if (curp->magic != IPASSWD_CURMAGIC) return SR_NOTOPEN ;
-	    if (! op->f.cursor) return SR_INVALID ;
+	    if (! op->fl.cursor) return SR_INVALID ;
 	}
 
 	if (ubuf) ubuf[0] = '\0' ;
@@ -621,7 +621,7 @@ int ipasswd_curfetch(ipasswd *op,ipasswd_cur *curp,int opts,char *ubuf,
 
 /* continue with regular fetch activities */
 
-	    op->f.cursoracc = true ;	/* does not hurt if no cursor! */
+	    op->fl.cursoracc = true ;	/* does not hurt if no cursor! */
 
 	    if (rs >= 0) {
 	        realname	rn, *rp = &rn ;
@@ -822,7 +822,7 @@ int ipasswd_check(ipasswd *op,time_t dt) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = ipasswd_magic(op)) >= 0) {
-	    if ((! op->f.cursor) && (op->fd >= 0)) {
+	    if ((! op->fl.cursor) && (op->fd >= 0)) {
 	        f = f || ((dt - op->ti_access) >= TO_ACCESS) ;
 	        f = f || ((dt - op->ti_open) >= TO_OPEN) ;
 	        if (f) {
@@ -895,7 +895,7 @@ static int ipasswd_hdrloader(ipasswd *op) noex {
 static int ipasswd_enterbegin(ipasswd *op,time_t dt) noex {
 	int		rs ;
 	int		f = false ;
-	op->f.held = true ;
+	op->fl.held = true ;
 	if ((rs = ipaswd_mapcheck(op,dt)) > 0) {
 	    f = true ;
 	}
@@ -906,8 +906,8 @@ static int ipasswd_enterbegin(ipasswd *op,time_t dt) noex {
 static int ipasswd_enterend(ipasswd *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	(void) dt ;
-	if (op->f.held) {
-	    op->f.held = false ;
+	if (op->fl.held) {
+	    op->fl.held = false ;
 	}
 	return rs ;
 }
@@ -996,7 +996,7 @@ static int ipasswd_remotefs(ipasswd *op) noex {
 	int		f = false ;
 	if ((rs = isfsremote(op->fd)) > 0) {
 	    f = true ;
-	    op->f.remote = !!f ;
+	    op->fl.remote = !!f ;
 	}
 	return (rs >= 0) ? f : rs ;
 }
