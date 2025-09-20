@@ -54,8 +54,8 @@
 	subroutines that are set aside for library use.  These
 	memory-allocation-free subroutines are:
 
-	+ uc_libmalloc(3uc)
-	+ uc_libfree(3uc)
+	+ lm_mall(3uc)
+	+ lm_free(3uc)
 	+ libmalloc{xx}
 
 	These subroutines are need when we deal with data that is
@@ -138,14 +138,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<utmpacc.h>
 #include	<getxname.h>		/* |getnodename(3uc)| */
@@ -216,7 +214,7 @@ constexpr cint	timeouts[] = {
 	(5*60),		/* netload */
 	(5*60),		/* systat */
 	0
-} ;
+} ; /* end array (timeouts) */
 
 
 /* exported variables */
@@ -252,15 +250,15 @@ int percache_fini(percache *pcp) noex {
 		    for (int i = 0 ; i < pertype_overlast ; i += 1) {
 		        char	*dp = pcp->items[i].data ;
 	                if (dp) {
-		            rs1 = uc_libfree(dp) ;
+		            rs1 = lm_free(dp) ;
 		            if (rs >= 0) rs = rs1 ;
 		            pcp->items[i].data = nullptr ;
 	                }
 			pcp->items[i].t = 0 ;
 			pcp->items[i].v = 0 ;
 		    } /* end for */
-		    pcp->init = false ;
-		    pcp->initdone = false ;
+		    pcp->f_init = false ;
+		    pcp->f_initdone = false ;
 	        } /* end if (was inited) */
 	    } /* end if (not-voided) */
 	} /* end if (non-null) */
@@ -293,7 +291,7 @@ int percache_invalidate(percache *pcp) noex {
 		for (int i = 0 ; i < pertype_overlast ; i += 1) {
 		    char	*dp = pcp->items[i].data ;
 	            if (dp) {
-		        rs1 = uc_libfree(dp) ;
+		        rs1 = lm_free(dp) ;
 		        if (rs >= 0) rs = rs1 ;
 		        pcp->items[i].data = nullptr ;
 	            }
@@ -314,9 +312,9 @@ int percache_gethostid(percache *pcp,time_t dt,uint *hip) noex {
 	        custime		vt = pcp->items[pt].t ;
 	        cint		to = timeouts[pt] ;
 	        if ((dt - vt) > to) {
-	            uint	uv = gethostid() ;
-	            pcp->items[pt].t = dt ;
-	            pcp->items[pt].v = uv ;
+	            long	lv = gethostid() ;
+	            pcp->items[pt].t = uint(dt) ;
+	            pcp->items[pt].v = uint(lv) ;
 	        } /* end if */
 	        *hip = pcp->items[pt].v ;
 	    } /* end if (init) */
@@ -333,10 +331,9 @@ int percache_getbtime(percache *pcp,time_t dt,time_t *btp) noex {
 	        custime		vt = pcp->items[pt].t ;
 	        cint		to = timeouts[pt] ;
 	        if ((dt - vt) > to) {
-	            time_t	bt ;
-	            if ((rs = utmpacc_boottime(&bt)) >= 0) {
-	                pcp->items[pt].t = dt ;
-	                pcp->items[pt].v = bt ;
+	            if (time_t bt ; (rs = utmpacc_boottime(&bt)) >= 0) {
+	                pcp->items[pt].t = uint(dt) ;
+	                pcp->items[pt].v = uint(bt) ;
 	            }
 	        } /* end if (update needed) */
 	        *btp = pcp->items[pt].v ;
@@ -467,7 +464,7 @@ int geter::getval(int pt) noex {
 	if ((dt - vt) > to) {
 	    if ((rs = getv(pt)) >= 0) {
 	        n = rs ;
-	        pcp->items[pt].t = dt ;
+	        pcp->items[pt].t = uint(dt) ;
 	        pcp->items[pt].v = n ;
 	    }
 	} /* end if (update needed) */
@@ -487,19 +484,19 @@ int geter::getstr(int pt) noex {
 	    if (char *dbuf ; (rs = libmalloc_nn(&dbuf)) >= 0) {
 	        cint	dlen = rs ;
 		if (dp) {
-		    uc_libfree(dp) ;
+		    lm_free(dp) ;
 		    pcp->items[pt].data = nullptr ;
 		}
 	        if ((rs = getx(pt,dbuf,dlen)) >= 0) {
 		    len = rs ;
-		    if (char *bp ; (rs = uc_libmalloc((len+1),&bp)) >= 0) {
+		    if (char *bp ; (rs = lm_mall((len+1),&bp)) >= 0) {
 			strwcpy(bp,dbuf,len) ;
 		        pcp->items[pt].data = bp ;
-	                pcp->items[pt].t = dt ;
+	                pcp->items[pt].t = uint(dt) ;
 		        pcp->items[pt].v = len ;
 	            } /* end if (memory-allocation) */
 		} /* end if (getx) */
-		rs1 = uc_libfree(dbuf) ;
+		rs1 = lm_free(dbuf) ;
 		if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	} /* end if (update needed) */
