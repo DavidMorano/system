@@ -209,7 +209,7 @@ int loadave_readvalues(loadave *eop,loadave_vals *vp) noex {
 
 /* have we reached the timeout for the chain update? */
 
-	if (eop->f.open &&
+	if (eop->fl.open &&
 	    ((daytime - eop->tim_update) >= TO_KUPDATE)) {
 
 	    eop->tim_update = daytime ;
@@ -220,7 +220,7 @@ int loadave_readvalues(loadave *eop,loadave_vals *vp) noex {
 
 	if ((daytime - eop->v.tim_read) >= TO_KSYSMISC) {
 
-	    if (! eop->f.open)
+	    if (! eop->fl.open)
 	        rs = loadave_kopen(eop,daytime) ;
 
 	    if (rs >= 0) {
@@ -283,11 +283,11 @@ int loadave_check(loadave *eop,time_t daytime) noex {
 
 /* check on the weirdo 'K' stuff */
 
-	if (eop->f.open &&
+	if (eop->fl.open &&
 	    ((daytime - eop->tim_access) >= TO_KMAXIDLE))
 	    loadave_kclose(eop) ;
 
-	if (eop->f.open &&
+	if (eop->fl.open &&
 	    ((daytime - eop->tim_open) >= TO_KMAXOPEN))
 	    loadave_kclose(eop) ;
 
@@ -306,7 +306,7 @@ static int loadave_kopen(loadave *eop,time_t daytime) noex {
 
 	eop->tim_open = daytime ;
 	eop->tim_update = daytime ;
-	eop->f.open = TRUE ;
+	eop->fl.open = TRUE ;
 
 	return SR_OK ;
 }
@@ -317,7 +317,7 @@ static int loadave_kclose(loadave *eop) noex {
 	    kstat_close(eop->kcp) ;
 	    eop->kcp = nullptr ;
 	}
-	eop->f.open = FALSE ;
+	eop->fl.open = FALSE ;
 	return SR_OK ;
 }
 /* end subroutine (loadave_kclose) */
