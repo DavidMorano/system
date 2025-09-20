@@ -48,12 +48,12 @@ struct termenq_flags {
 struct termenq_head {
 	cchar		*fname ;	/* stored file name */
 	caddr_t		mapdata ;	/* file mapping buffer */
-	TERMENQ_FL	f ;
 	time_t		ti_open ;	/* open time (for FD caching) */
 	time_t		ti_mod ;	/* last modification time */
 	time_t		ti_check ;	/* last check time */
 	size_t		mapsize ;
 	size_t		fsize ;		/* file total size */
+	TERMENQ_FL	fl ;
 	uint		mapoff ;	/* file mapping starting offset */
 	uint		magic ;
 	int		pagesz ;
