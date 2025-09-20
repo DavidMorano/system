@@ -60,7 +60,7 @@ struct uunames_head {
 	time_t		ti_mod ;		/* DB file modification */
 	time_t		ti_map ;		/* map */
 	time_t		ti_lastcheck ;
-	UUNAMES_FL	f ;
+	UUNAMES_FL	fl ;
 	uint		magic ;
 	int		ncursors ;
 } ;
