@@ -238,10 +238,10 @@ int		operm ;
 	    goto bad2 ;
 
 	amode = (oflags & O_ACCMODE) ;
-	op->f.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
+	op->fl.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
 
 #if	CF_DEBUGS
-	debugprintf("srvreg_open: f_writable=%d\n",op->f.writable) ;
+	debugprintf("srvreg_open: f_writable=%d\n",op->fl.writable) ;
 #endif
 
 	op->opentime = daytime ;
@@ -264,7 +264,7 @@ int		operm ;
 /* local or remote */
 
 	rs = isfsremote(op->fd) ;
-	op->f.remote = (rs > 0) ;
+	op->fl.remote = (rs > 0) ;
 	if (rs < 0)
 	    goto bad3 ;
 
@@ -387,8 +387,8 @@ SRVREG_CUR	*cp ;
 
 	op->cursors += 1 ;
 
-	op->f.cursorlockbroken = FALSE ;
-	op->f.cursoracc = FALSE ;
+	op->fl.cursorlockbroken = FALSE ;
+	op->fl.cursoracc = FALSE ;
 	cp->i = -1 ;
 	return SR_OK ;
 }
@@ -414,7 +414,7 @@ SRVREG_CUR	*cp ;
 	if (cp == NULL)
 	    return SR_FAULT ;
 
-	if (op->f.cursoracc) {
+	if (op->fl.cursoracc) {
 
 	    daytime = time(NULL) ;
 
@@ -425,7 +425,7 @@ SRVREG_CUR	*cp ;
 	if (op->cursors > 0)
 	    op->cursors -= 1 ;
 
-	if ((op->cursors == 0) && (op->f.readlocked || op->f.writelocked))
+	if ((op->cursors == 0) && (op->fl.readlocked || op->fl.writelocked))
 	    srvreg_lockrelease(op) ;
 
 	cp->i = -1 ;
@@ -461,9 +461,9 @@ SRVREG_ENT	*ep ;
 
 #if	CF_DEBUGS
 	debugprintf("srvreg_enum: ent fileinit=%u\n",
-		op->f.fileinit) ;
+		op->fl.fileinit) ;
 	debugprintf("srvreg_enum: cursorlockbroken=%u\n",
-		op->f.cursorlockbroken) ;
+		op->fl.cursorlockbroken) ;
 #endif
 
 	if (cup == NULL)
@@ -471,12 +471,12 @@ SRVREG_ENT	*ep ;
 
 /* is the file even initialized? */
 
-	if (! op->f.fileinit)
+	if (! op->fl.fileinit)
 	    return SR_NOTFOUND ;
 
 /* has our lock been broken */
 
-	if (op->f.cursorlockbroken)
+	if (op->fl.cursorlockbroken)
 	    return SR_LOCKLOST ;
 
 /* do we have proper file access? */
@@ -490,7 +490,7 @@ SRVREG_ENT	*ep ;
 	debugprintf("srvreg_enum: srvreg_filecheck() rs=%d\n",rs) ;
 #endif
 
-	if ((rs < 0) || (! op->f.fileinit))
+	if ((rs < 0) || (! op->fl.fileinit))
 	    goto bad1 ;
 
 /* OK, give an entry back to caller */
@@ -535,7 +535,7 @@ SRVREG_ENT	*ep ;
 	if (rs >= 0)
 	    cup->i = ei ;
 
-	op->f.cursoracc = TRUE ;
+	op->fl.cursoracc = TRUE ;
 
 ret0:
 
@@ -550,10 +550,10 @@ bad1:
 
 #if	CF_DEBUGS
 	debugprintf("srvreg_enum: BAD1 rs=%d fileinit=%u\n",
-		rs,op->f.fileinit) ;
+		rs,op->fl.fileinit) ;
 #endif
 
-	if ((rs >= 0) && (! op->f.fileinit))
+	if ((rs >= 0) && (! op->fl.fileinit))
 	    rs = SR_EOF ;
 
 bad0:
@@ -601,7 +601,7 @@ SRVREG_ENT	*ep ;
 
 /* is the file even initialized? */
 
-	if (! op->f.fileinit)
+	if (! op->fl.fileinit)
 	    return SR_NOTFOUND ;
 
 /* do we have proper file access? */
@@ -610,7 +610,7 @@ SRVREG_ENT	*ep ;
 	    daytime = time(NULL) ;
 
 	rs = srvreg_filecheck(op,daytime,1) ;
-	if ((rs < 0) || (! op->f.fileinit))
+	if ((rs < 0) || (! op->fl.fileinit))
 	    goto bad1 ;
 
 /* deal with the cursor */
@@ -682,7 +682,7 @@ SRVREG_ENT	*ep ;
 	    op->accesstime = daytime ;
 
 	} else
-	    op->f.cursoracc = TRUE ;
+	    op->fl.cursoracc = TRUE ;
 
 /* done */
 ret0:
@@ -738,10 +738,10 @@ SRVREG_ENT	*ep ;
 
 #if	CF_DEBUGS
 	debugprintf("srvreg_write: ent ei=%d fileinit=%u\n",
-		ei,op->f.fileinit) ;
+		ei,op->fl.fileinit) ;
 #endif
 
-	if (! op->f.writable)
+	if (! op->fl.writable)
 	    return SR_RDONLY ;
 
 /* do we have proper file access? */
@@ -756,10 +756,10 @@ SRVREG_ENT	*ep ;
 /* is the file initialized? */
 
 #if	CF_DEBUGS
-	debugprintf("srvreg_write: fileinit=%u\n",op->f.fileinit) ;
+	debugprintf("srvreg_write: fileinit=%u\n",op->fl.fileinit) ;
 #endif
 
-	if (! op->f.fileinit) {
+	if (! op->fl.fileinit) {
 
 	    if (daytime == 0)
 	        daytime = time(NULL) ;
@@ -884,7 +884,7 @@ SRVREG_ENT	*ep ;
 	debugprintf("srvreg_write: srvreg_writehead() rs=%d\n",rs) ;
 #endif
 
-		if ((rs >= 0) && op->f.remote)
+		if ((rs >= 0) && op->fl.remote)
 			u_fsync(op->fd) ;
 
 	} /* end if (data write was successful) */
@@ -928,7 +928,7 @@ time_t		daytime ;
 	    timestr_log(daytime,timebuf)) ;
 #endif
 
-	if (op->f.readlocked || op->f.writelocked)
+	if (op->fl.readlocked || op->fl.writelocked)
 		return SR_OK ;
 
 	if ((daytime - op->accesstime) > TO_ACCESS)
@@ -977,7 +977,7 @@ int		f_read ;
 
 /* capture the lock if we do not already have it */
 
-	if ((! op->f.readlocked) && (! op->f.writelocked)) {
+	if ((! op->fl.readlocked) && (! op->fl.writelocked)) {
 
 	    if (daytime == 0)
 	        daytime = time(NULL) ;
@@ -1029,14 +1029,14 @@ time_t		daytime ;
 
 	    u_seek(op->fd,0L,SEEK_SET) ;
 
-	    op->f.fileinit = FALSE ;
-	    if (op->f.writable) {
+	    op->fl.fileinit = FALSE ;
+	    if (op->fl.writable) {
 
 #if	CF_DEBUGS
 	        debugprintf("srvreg_fileinit: writing header\n") ;
 #endif
 
-	        if (! op->f.writelocked) {
+	        if (! op->fl.writelocked) {
 
 	            rs = srvreg_lockget(op,daytime,0) ;
 	            if (rs < 0)
@@ -1064,12 +1064,12 @@ time_t		daytime ;
 	        if (rs > 0) {
 	            op->filesize = rs ;
 		    op->mtime = daytime ;
-		    if (op->f.remote) {
+		    if (op->fl.remote) {
 			u_fsync(op->fd) ;
 		    }
 		}
 
-	        op->f.fileinit = (rs >= 0) ;
+	        op->fl.fileinit = (rs >= 0) ;
 
 	    } /* end if (writing) */
 
@@ -1080,7 +1080,7 @@ time_t		daytime ;
 
 /* read the file header */
 
-	    if (! op->f.readlocked) {
+	    if (! op->fl.readlocked) {
 
 	        rs = srvreg_lockget(op,daytime,1) ;
 	        if (rs < 0)
@@ -1135,7 +1135,7 @@ time_t		daytime ;
 	        if (! f)
 	            rs = SR_BADFMT ;
 
-	        op->f.fileinit = f ;
+	        op->fl.fileinit = f ;
 
 	    } /* end if */
 
@@ -1151,7 +1151,7 @@ ret0:
 
 #if	CF_DEBUGS
 	debugprintf("srvreg_fileinit: ret rs=%d fileinit=%u\n",
-		rs,op->f.fileinit) ;
+		rs,op->fl.fileinit) ;
 #endif
 
 	return rs ;
@@ -1187,14 +1187,14 @@ SRVREG		*op ;
 	    goto bad2 ;
 
 	if (sb.st_size < SRVREG_FOTAB)
-	    op->f.fileinit = FALSE ;
+	    op->fl.fileinit = FALSE ;
 
-	f_changed = (! op->f.fileinit) ||
+	f_changed = (! op->fl.fileinit) ||
 	    (sb.st_size != op->filesize) ||
 	    (sb.st_mtime != op->mtime) ;
 
 #if	CF_DEBUGS
-	debugprintf("srvreg_filechanged: fileinit=%u\n",op->f.fileinit) ;
+	debugprintf("srvreg_filechanged: fileinit=%u\n",op->fl.fileinit) ;
 	debugprintf("srvreg_filechanged: f_size=%08x o_size=%08x\n",
 		sb.st_size,op->filesize) ;
 	debugprintf("srvreg_filechanged: f_mtime=%08x o_mtime=%08x\n",
@@ -1204,7 +1204,7 @@ SRVREG		*op ;
 
 /* if it has NOT changed, read the file header for write indications */
 
-	if ((! f_changed) && op->f.fileinit) {
+	if ((! f_changed) && op->fl.fileinit) {
 
 	    struct srvreg_filehead	h ;
 
@@ -1221,10 +1221,10 @@ SRVREG		*op ;
 	        goto bad2 ;
 
 	    if (rs < SRVREG_FLTOP)
-	        op->f.fileinit = FALSE ;
+	        op->fl.fileinit = FALSE ;
 
 #if	CF_DEBUGS
-	debugprintf("srvreg_filechanged: fileinit=%u\n",op->f.fileinit) ;
+	debugprintf("srvreg_filechanged: fileinit=%u\n",op->fl.fileinit) ;
 #endif
 
 	    if (rs > 0) {
@@ -1310,14 +1310,14 @@ time_t		daytime ;
 
 /* acquire a file record lock */
 
-	if (f_read || (! op->f.writable)) {
+	if (f_read || (! op->fl.writable)) {
 
 #if	CF_DEBUGS
 	    debugprintf("srvreg_lockget: need READ lock\n") ;
 #endif
-	    f_already = op->f.readlocked ;
-	    op->f.readlocked = TRUE ;
-	    op->f.writelocked = FALSE ;
+	    f_already = op->fl.readlocked ;
+	    op->fl.readlocked = TRUE ;
+	    op->fl.writelocked = FALSE ;
 	    lockcmd = F_RLOCK ;
 
 	} else {
@@ -1326,9 +1326,9 @@ time_t		daytime ;
 	    debugprintf("srvreg_lockget: need WRITE lock\n") ;
 #endif
 
-	    f_already = op->f.writelocked ;
-	    op->f.readlocked = FALSE ;
-	    op->f.writelocked = TRUE ;
+	    f_already = op->fl.writelocked ;
+	    op->fl.readlocked = FALSE ;
+	    op->fl.writelocked = TRUE ;
 	    lockcmd = F_WLOCK ;
 
 	} /* end if */
@@ -1353,7 +1353,7 @@ ret0:
 
 #if	CF_DEBUGS
 	debugprintf("srvreg_lockget: ret rs=%d fileinit=%u\n",
-		rs,op->f.fileinit) ;
+		rs,op->fl.fileinit) ;
 #endif
 
 	return rs ;
@@ -1365,13 +1365,13 @@ bad2:
 	debugprintf("srvreg_lockget: BAD rs=%d\n",rs) ;
 #endif
 
-	op->f.fileinit = FALSE ;
+	op->fl.fileinit = FALSE ;
 
 	lockfile(op->fd,F_ULOCK,0L,0L,TO_LOCK) ;
 
 bad1:
-	op->f.readlocked = FALSE ;
-	op->f.writelocked = FALSE ;
+	op->fl.readlocked = FALSE ;
+	op->fl.writelocked = FALSE ;
 
 bad0:
 	goto ret0 ;
@@ -1388,12 +1388,12 @@ SRVREG		*op ;
 	debugprintf("srvreg_lockrelease: ent\n") ;
 #endif
 
-	if ((op->f.readlocked || op->f.writelocked)) {
+	if ((op->fl.readlocked || op->fl.writelocked)) {
 	    if (op->fd >= 0) {
 	        rs = lockfile(op->fd,F_ULOCK,0L,0L,TO_LOCK) ;
 	    }
-	    op->f.readlocked = FALSE ;
-	    op->f.writelocked = FALSE ;
+	    op->fl.readlocked = FALSE ;
+	    op->fl.writelocked = FALSE ;
 	} /* end if */
 
 #if	CF_DEBUGS
