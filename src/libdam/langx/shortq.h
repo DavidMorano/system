@@ -28,23 +28,76 @@
 
 
 #define	SHORTQ		struct shortq_head
+#define	SHORTQ_MAGIC	0x87625374
 
 
 struct shortq_head {
     	void		*qvp ;		/* queue-value-pointer */
+	uint		magic ;
 } ;
 
+#ifdef	__cplusplus
+enum shortqmems {
+    	shortqmem_start,
+	shortqmem_remall,
+	shortqmem_size,
+	shortqmem_count,
+	shortqmem_len,
+	shortqmem_finish,
+	shortqmem_overlast
+} ; /* end enum (shortqmem) */
+struct shortq ;
+struct shortq_co {
+	shortq		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (shortq *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 0) noex ;
+	operator int () noex {
+	    return operator () (0) ;
+	} ;
+} ; /* end struct (shortq_co) */
+struct shortq : shortq_head {
+	shortq_co	start ;
+	shortq_co	remall ;
+	shortq_co	size ;
+	shortq_co	count ;
+	shortq_co	len ;
+	shortq_co	finish ;
+	shortq() noex {
+	    start	(this,shortqmem_start) ;
+	    remall	(this,shortqmem_remall) ;
+	    size	(this,shortqmem_size) ;
+	    count	(this,shortqmem_count) ;
+	    len		(this,shortqmem_len) ;
+	    finish	(this,shortqmem_finish) ;
+	    magic = 0 ;
+	} ; /* end ctor */
+	shortq(const shortq &) = delete ;
+	shortq &operator = (const shortq &) = delete ;
+	int ins(short) noex ;
+	int rem(short *) noex ;
+	operator int () noex ;
+	void dtor() noex ;
+	destruct shortq() {
+	    if (magic) dtor() ;
+	} ;
+} ; /* end struct (shortq) */
+#else	/* __cplusplus */
 typedef SHORTQ		shortq ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
-extern int	shortq_start(shortq *,int) noex ;
-extern int	shortq_ins(shortq *,int) noex ;
-extern int	shortq_rem(shortq *,char *) noex ;
-extern int	shortq_remall(shortq *) noex ;
-extern int	shortq_size(shortq *) noex ;
-extern int	shortq_count(shortq *) noex ;
-extern int	shortq_finish(shortq *) noex ;
+extern int	shortq_start	(shortq *,int) noex ;
+extern int	shortq_ins	(shortq *,short) noex ;
+extern int	shortq_rem	(shortq *,short *) noex ;
+extern int	shortq_remall	(shortq *) noex ;
+extern int	shortq_size	(shortq *) noex ;
+extern int	shortq_count	(shortq *) noex ;
+extern int	shortq_finish	(shortq *) noex ;
 
 local inline int shortq_len(shortq *op) noex {
     	return shortq_count(op) ;
