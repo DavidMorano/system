@@ -114,12 +114,12 @@ typedef LANGSTATE	langstate ;
 
 EXTERNC_begin
 
-extern int langstate_start(langstate *) noex ;
-extern int langstate_proc(langstate *,int,int) noex ;
-extern int langstate_procln(langstate *,int,cchar *,int) noex ;
-extern int langstate_getstat(langstate *,langstate_info *) noex ;
-extern int langstate_code(langstate *) noex ;
-extern int langstate_finish(langstate *) noex ;
+extern int langstate_start	(langstate *) noex ;
+extern int langstate_proc	(langstate *,int,int) noex ;
+extern int langstate_procln	(langstate *,int,cchar *,int) noex ;
+extern int langstate_getstat	(langstate *,langstate_info *) noex ;
+extern int langstate_code	(langstate *) noex ;
+extern int langstate_finish	(langstate *) noex ;
 
 EXTERNC_end
 
