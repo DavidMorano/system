@@ -213,9 +213,9 @@ int cyimk_open(CYIMK *op,int year,cc *dname,cc *cname,int of,mode_t om) noex {
 	op->nfd = -1 ;
 	op->year = year ;
 
-	op->f.ofcreat = MKBOOL(of & O_CREAT) ;
-	op->f.ofexcl = MKBOOL(of & O_EXCL) ;
-	op->f.none = (! op->f.ofcreat) && (! op->f.ofexcl) ;
+	op->fl.ofcreat = MKBOOL(of & O_CREAT) ;
+	op->fl.ofexcl = MKBOOL(of & O_EXCL) ;
+	op->fl.none = (! op->fl.ofcreat) && (! op->fl.ofexcl) ;
 
 	if (rs >= 0) {
 	    if ((rs = cyimk_idbegin(op,dname,year)) >= 0) {
@@ -258,10 +258,10 @@ int cyimk_close(CYIMK *op)
 
 	if (op->magic != CYIMK_MAGIC) return SR_NOTOPEN ;
 
-	f_go = (! op->f.abort) ;
+	f_go = (! op->fl.abort) ;
 	n = op->nentries ;
 	if (n > 0) {
-	    if (op->f.notsorted) {
+	    if (op->fl.notsorted) {
 	        vecobj_sort(&op->verses,vvecmp) ;
 	    }
 	    rs1 = cyimk_mkidx(op) ;
@@ -330,7 +330,7 @@ int cyimk_add(CYIMK *op,CYIMK_ENT *bvp)
 	    bve.hash = bvp->hash ;
 	    mkcitation(&bve.citation,bvp) ;
 	    citcmpval = (bve.citation & 0x0000FFFF) ;
-	    if (citcmpval < op->pcitation) op->f.notsorted = TRUE ;
+	    if (citcmpval < op->pcitation) op->fl.notsorted = TRUE ;
 	    op->pcitation = citcmpval ;
 	    rs = vecobj_add(&op->verses,&bve) ;
 	    op->nentries += 1 ;
@@ -343,7 +343,7 @@ int cyimk_add(CYIMK *op,CYIMK_ENT *bvp)
 
 int cyimk_abort(CYIMK *op,int f)
 {
-	op->f.abort = f ;
+	op->fl.abort = f ;
 	return SR_OK ;
 }
 /* end subroutine (cyimk_abort) */
@@ -436,7 +436,7 @@ static int cyimk_filesbegin(CYIMK *op)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	if (op->f.ofcreat) {
+	if (op->fl.ofcreat) {
 	    rs = cyimk_filesbeginc(op) ;
 	} else {
 	    rs = cyimk_filesbeginwait(op) ;
@@ -449,7 +449,7 @@ static int cyimk_filesbegin(CYIMK *op)
 
 static int cyimk_filesbeginc(CYIMK *op)
 {
-	cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	int		rs ;
 	char		dbn[MAXPATHLEN+1] ;
 	if ((rs = mkpath2(dbn,op->idname,op->cname)) >= 0) {
@@ -461,14 +461,14 @@ static int cyimk_filesbeginc(CYIMK *op)
 	    char		rbuf[MAXPATHLEN+1] ;
 	    if (type) {
 	        if ((rs = mktmpfile(rbuf,om,tbuf)) >= 0) {
-	            op->f.created = TRUE ;
+	            op->fl.created = TRUE ;
 	            tfn = rbuf ;
 	        }
 	    }
 	    if (rs >= 0) {
 	        mode_t	om = op->om ;
 	        int	of = O_CREAT ;
-	        if (op->f.ofexcl) of |= O_EXCL ;
+	        if (op->fl.ofexcl) of |= O_EXCL ;
 	        rs = cyimk_filesbegincreate(op,tfn,of,om) ;
 	        if ((rs < 0) && type) {
 	            uc_unlink(rbuf) ;
@@ -502,7 +502,7 @@ static int cyimk_filesbeginwait(CYIMK *op)
 	        if (to-- == 0) break ;
 	    } /* end while (db exists) */
 	    if (rs == nrs) {
-	        op->f.ofcreat = FALSE ;
+	        op->fl.ofcreat = FALSE ;
 	        c = 0 ;
 	        rs = cyimk_filesbeginc(op) ;
 	    }
@@ -519,7 +519,7 @@ static int cyimk_filesbegincreate(CYIMK *op,cchar *tfn,int of,mode_t om)
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
 	    cint	fd = rs ;
 	    cchar	*cp ;
-	    op->f.created = TRUE ;
+	    op->fl.created = TRUE ;
 	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
 	        op->nidxfname = (char *) cp ;
 	    }
@@ -543,7 +543,7 @@ static int cyimk_filesend(CYIMK *op)
 	}
 
 	if (op->nidxfname != NULL) {
-	    if (op->f.created && (op->nidxfname[0] != '\0')) {
+	    if (op->fl.created && (op->nidxfname[0] != '\0')) {
 	        rs1 = u_unlink(op->nidxfname) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -784,7 +784,7 @@ static int cyimk_nidxopen(CYIMK *op)
 	int		fd = -1 ;
 	int		of = (O_CREAT|O_WRONLY) ;
 	if (op->nidxfname == NULL) {
-	    cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	    cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	    cchar	*dbn = op->cname ;
 	    cchar	*suf = FSUF_IDX ;
 	    char	tbuf[MAXPATHLEN+1] ;
@@ -797,7 +797,7 @@ static int cyimk_nidxopen(CYIMK *op)
 	            fd = rs ;
 	            tfn = rbuf ;
 	        } else {
-	            if (op->f.ofexcl) of |= O_EXCL ;
+	            if (op->fl.ofexcl) of |= O_EXCL ;
 	            rs = uc_open(tbuf,of,om) ;
 	            op->nfd = rs ;
 	            fd = rs ;
@@ -810,7 +810,7 @@ static int cyimk_nidxopen(CYIMK *op)
 	        } /* end if (ok) */
 	    } /* end if (mknewfname) */
 	} else {
-	    if (op->f.ofexcl) of |= O_EXCL ;
+	    if (op->fl.ofexcl) of |= O_EXCL ;
 	    rs = uc_open(op->nidxfname,of,om) ;
 	    op->nfd = rs ;
 	    fd = rs ;
