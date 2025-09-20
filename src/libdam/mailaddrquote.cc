@@ -179,8 +179,8 @@ int mailaddrquote_finish(MAQ *op) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if ((rs = mailaddrquote_magic(op)) >= 0) {
-	    if (op->bsp && op->f.qaddr) {
-	        op->f.qaddr = false ;
+	    if (op->bsp && op->fl.qaddr) {
+	        op->fl.qaddr = false ;
 	        len = bufstr_finish(op->bsp) ;
 	        if (rs >= 0) rs = len ;
 	    }
@@ -203,7 +203,7 @@ static int mailaddrquote_quote(MAQ *op,cc *abuf,int alen) noex {
 	    int		si ;
 	    int		al = alen ;
 	    cchar	*ap = abuf ;
-	    op->f.qaddr = true ;
+	    op->fl.qaddr = true ;
 	    bufstr_chr(bsp,CH_DQUOTE) ;
 	    while ((rs >= 0) && ((si = siterm(ap,al,qterms)) >= 0)) {
 	        bufstr_strw(bsp,ap,si) ;
