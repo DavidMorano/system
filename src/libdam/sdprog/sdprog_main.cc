@@ -1,8 +1,8 @@
-/* sdprog SUPPORT */
+/* sdprog SUPPORT (System-Dailer Program) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* SYSDIALER "prog" dialer */
+/* SYSDIALER "prog" program-dialer */
 /* version %I% last-modified %G% */
 
 
@@ -21,7 +21,8 @@
 /*******************************************************************************
 
 	Description:
-	This is a dialer module.
+	This is a dialer module.  More specifically, it is the "program"
+	dialer (it dials out through the execution of a 'program').
 
 	Synopsis:
 	prog <execfile>
@@ -39,6 +40,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -682,12 +684,12 @@ badcookload:
 badcookinit:
 ret3:
 ret2:
-	if ((rs < 0) && op->f.log) {
+	if ((rs < 0) && op->fl.log) {
 
 	    logfile_printf(&op->lh,"failed (%d)",rs) ;
 
 	    logfile_close(&op->lh) ;
-	    op->f.log = FALSE ;
+	    op->fl.log = FALSE ;
 
 	} /* end if */
 
@@ -931,11 +933,11 @@ int prog_close(PROG *op)
 	    op->efname[0] = '\0' ;
 	}
 
-	if (op->f.log) {
+	if (op->fl.log) {
 	    logfile_printf(&op->lh,"bytes=%u",op->tlen) ;
 	    rs1 = logfile_close(&op->lh) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->f.log = FALSE ;
+	    op->fl.log = FALSE ;
 	} /* end if */
 
 	op->magic = 0 ;
@@ -993,8 +995,8 @@ static int subinfo_finish(SUBINFO *sip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (sip->f.ids) {
-	    sip->f.ids = FALSE ;
+	if (sip->fl.ids) {
+	    sip->fl.ids = FALSE ;
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1163,7 +1165,7 @@ static int subinfo_procargs(SUBINFO *sip)
 
 /* logfile */
 	                case argopt_lf:
-			    sip->f.log = TRUE ;
+			    sip->fl.log = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl)
@@ -1260,7 +1262,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                    switch (kc) {
 
 	                    case 'i':
-	                        sip->f.ignore = TRUE ;
+	                        sip->fl.ignore = TRUE ;
 	                        break ;
 
 /* options */
@@ -1349,9 +1351,9 @@ static int subinfo_procopts(SUBINFO *sip,KEYOPT *kop)
 
 	        switch (oi) {
 	        case procopt_log:
-	                sip->f.log = TRUE ;
+	                sip->fl.log = TRUE ;
 	                if ((vl > 0) && ((rs = optbool(vp,vl)) >= 0)) {
-	                    sip->f.log = (rs > 0) ;
+	                    sip->fl.log = (rs > 0) ;
 			}
 	            break ;
 	        } /* end switch */
@@ -1502,10 +1504,10 @@ static int subinfo_userinfo(SUBINFO *sip)
 	USERINFO	*uip = &sip->u ;
 	int		rs = SR_OK ;
 
-	if (sip->f.userinfo)
+	if (sip->fl.userinfo)
 	    goto ret0 ;
 
-	sip->f.userinfo = TRUE ;
+	sip->fl.userinfo = TRUE ;
 	rs = userinfo(uip,sip->userinfobuf,USERINFO_LEN,nullptr) ;
 	if (rs < 0)
 	    goto bad0 ;
@@ -1705,7 +1707,7 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 	cchar		*azp = nullptr ;
 	cchar		*abuf = nullptr ;
 
-	if (op->f.log) {
+	if (op->fl.log) {
 	    logfile_printf(&op->lh,"prog=%s",progfname) ;
 	}
 
@@ -1746,7 +1748,7 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 
 /* setup the zeroth argument */
 
-	f_m = ((argv == nullptr) || (argv[0] == nullptr)) && sip->f.progdash ;
+	f_m = ((argv == nullptr) || (argv[0] == nullptr)) && sip->fl.progdash ;
 	f_m = f_m || 
 	    ((argv != nullptr) && (argv[0] != nullptr) && hasmz(argv[0])) ;
 	if (f_m) {
@@ -1813,10 +1815,10 @@ static int subinfo_logfile(SUBINFO *sip)
 	cchar		*lidp = nullptr ;
 	char		logfname[MAXPATHLEN + 1] ;
 
-	if (! sip->f.log)
+	if (! sip->fl.log)
 	    goto ret0 ;
 
-	sip->f.log = TRUE ;
+	sip->fl.log = TRUE ;
 	lnp = sip->logfname ;
 	if (lnp[0] != '/') {
 	    rs = mkpath3(logfname,sip->pr,PROG_LOGDNAME,lnp) ;
@@ -1827,7 +1829,7 @@ static int subinfo_logfile(SUBINFO *sip)
 	    goto ret0 ;
 
 	    rs1 = logfile_open(&op->lh,lnp,0,0666,lidp) ;
-	    op->f.log = (rs1 >= 0) ;
+	    op->fl.log = (rs1 >= 0) ;
 
 	    if (rs1 >= 0) {
 		USERINFO	*uip = &sip->u ;
@@ -1863,8 +1865,8 @@ static int subinfo_dirok(SUBINFO *sip,cchar d[],int dlen)
 	int		f = FALSE ;
 	cchar		*dnp ;
 
-	if (! sip->f.ids) {
-	    sip->f.ids = TRUE ;
+	if (! sip->fl.ids) {
+	    sip->fl.ids = TRUE ;
 	    rs = ids_load(&sip->id) ;
 	}
 
@@ -2072,7 +2074,7 @@ static int sched_begin(SUBINFO *sip)
 	if (rs < 0) {
 	    vecstr_finish(&sip->svars) ;
 	} else
-	    sip->f.svars = TRUE ;
+	    sip->fl.svars = TRUE ;
 
 ret0:
 	return rs ;
@@ -2085,8 +2087,8 @@ static int sched_end(SUBINFO *sip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (sip->f.svars) {
-	    sip->f.svars = FALSE ;
+	if (sip->fl.svars) {
+	    sip->fl.svars = FALSE ;
 	    rs1 = vecstr_finish(&sip->svars) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
