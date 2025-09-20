@@ -264,9 +264,9 @@ int strlistmks_open(SLM *op,cc *dbname,int of,mode_t om,int n) noex {
 	            op->om = om ;
 	            op->nfd = -1 ;
 	            op->gid = -1 ;
-	            op->f.ofcreat = !!(of & O_CREAT) ;
-	            op->f.ofexcl = !!(of & O_EXCL) ;
-	            op->f.none = (! op->f.ofcreat) && (! op->f.ofexcl) ;
+	            op->fl.ofcreat = !!(of & O_CREAT) ;
+	            op->fl.ofexcl = !!(of & O_EXCL) ;
+	            op->fl.none = (! op->fl.ofcreat) && (! op->fl.ofexcl) ;
 	            if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
 		        op->dbname = cp ;
 		        if ((rs = strlistmks_filesbegin(op)) >= 0) {
@@ -298,7 +298,7 @@ int strlistmks_close(SLM *op) noex {
 	int		nvars = 0 ;
 	if ((rs = strlistmks_magic(op)) >= 0) {
 	    nvars = op->nstrs ;
-	    if (! op->f.abort) {
+	    if (! op->fl.abort) {
 	        rs1 = strlistmks_mksfile(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -311,7 +311,7 @@ int strlistmks_close(SLM *op) noex {
 	        rs1 = strlistmks_listend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if ((rs >= 0) && (! op->f.abort)) {
+	    if ((rs >= 0) && (! op->fl.abort)) {
 	        rs1 = strlistmks_renamefiles(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -351,7 +351,7 @@ int strlistmks_addvar(SLM *op,cchar *sp,int sl) noex {
 int strlistmks_abort(SLM *op) noex {
 	int		rs ;
 	if ((rs = strlistmks_magic(op)) >= 0) {
-	    op->f.abort = true ;
+	    op->fl.abort = true ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -557,7 +557,7 @@ static int strlistmks_nfstore(SLM *op,char *outfname) noex {
 
 static int strlistmks_fexists(SLM *op,char *tbuf) noex {
 	int		rs = SR_OK ;
-	if (op->f.ofcreat && op->f.ofexcl) {
+	if (op->fl.ofcreat && op->fl.ofexcl) {
 	    cchar	*dbn = op->dbname ;
 	    if ((rs = mkfnamesuf2(tbuf,dbn,suf,end)) >= 0) {
 		USTAT	sb ;
