@@ -100,7 +100,7 @@ struct ipasswd_head {
 	time_t		ti_access ;
 	time_t		ti_map ;
 	size_t		mapsize ;
-	IPASSWD_FL	f ;
+	IPASSWD_FL	fl ;		/* currently unused! */
 	uint		magic ;
 	uint		ropts ;
 	int		pagesize ;
