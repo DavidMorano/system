@@ -85,7 +85,7 @@ namespace {
 	int finish() noex ;
 	int tmpenum() noex ;
     } ; /* end struct (suber) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -105,9 +105,9 @@ constexpr char		devdname[] = DEVDNAME ;
 /* exported subroutines */
 
 int getuserterm(char *rbuf,int rlen,cchar *un) noex {
-	int	rs = SR_FAULT ;
-	int	rs1 ;
-	int	len = 0 ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
 	if (rbuf && un) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
@@ -134,7 +134,7 @@ int suber::start() noex {
 	if (char *p{} ; (rs = malloc_mp(&p)) >= 0) {
 	    tbuf = p ;
 	    tlen = rs ;
-	}
+	} /* end if (memory-allocation) */
 	return rs ;
 }
 /* end method (suber::start) */
@@ -143,7 +143,7 @@ int suber::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (tbuf) {
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = malloc_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    tbuf = nullptr ;
 	    tlen = 0 ;
@@ -207,7 +207,7 @@ static int newer(char *termdev,time_t *tp) noex {
 	cmode		om = 0666 ;
 	if ((rs = u_open(termdev,of,om)) >= 0) {
 	    cint	fd = rs ;
-	    if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 		f = true ;
 	        f = f && ((sb.st_mode & S_IWGRP) == S_IWGRP) ;
 	        f = f && (sb.st_atime > *tp) ;
