@@ -419,7 +419,7 @@ int mxalias_curend(MA *op,MA_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mxalias_magic(op,curp)) >= 0) {
-	    if (op->f.cursoracc) {
+	    if (op->fl.cursoracc) {
 	        op->ti_access = getustime ;
 	    }
 	    curp->i = -1 ;
