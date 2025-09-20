@@ -116,9 +116,9 @@ int lookword_open(LW *op,cchar *dfname,int opts) noex {
 	int		rs = SR_FAULT ;
 	if (op && dfname) {
 	    memclear(op) ;
-	    op->f.dict = LOGICVAL(opts&LOOKWORD_ODICT) ;
-	    op->f.fold = LOGICVAL(opts&LOOKWORD_OFOLD) ;
-	    op->f.word = LOGICVAL(opts&LOOKWORD_OWORD) ;
+	    op->fl.dict = LOGICVAL(opts&LOOKWORD_ODICT) ;
+	    op->fl.fold = LOGICVAL(opts&LOOKWORD_OFOLD) ;
+	    op->fl.word = LOGICVAL(opts&LOOKWORD_OWORD) ;
 	    if ((rs = uc_open(dfname,O_RDONLY,0666)) >= 0) {
 	        cnullptr	np{} ;
 	        cint		fd = rs ;
@@ -248,9 +248,9 @@ static int lookword_mksword(LW *op,char *rbuf,int rlen,cchar *s) noex {
 	for (i = 0 ; (i < rlen) && (s[i] != '\0') ; i += 1) {
 	    cint	ch = mkchar(*readp++) ;
 	    if (ch == 0) break ;
-	    dch = (op->f.dict) ? DICT(ch) : ch ;
+	    dch = (op->fl.dict) ? DICT(ch) : ch ;
 	    if (dch != NO_COMPARE) {
-	        fch = (op->f.fold) ? FOLD(dch) : dch ;
+	        fch = (op->fl.fold) ? FOLD(dch) : dch ;
 	        *(writep++) = fch ;
 	    }
 	} /* end for */
@@ -280,7 +280,7 @@ static int lookword_record(LW *op,LW_CUR *curp,
 	    } ;
 	    while ((rs >= 0) && cmp()) {
 	        if ((tp = strchr(front,'\n')) != np) {
-	            if (op->f.word) {
+	            if (op->fl.word) {
 	                f_mat = (compare(op,front,tp,wstr,&m) == 0) ;
 	                f_mat = f_mat && 
 	                    (wstr[m] == '\0') && (front[m] == '\n') ;
@@ -444,11 +444,11 @@ static int compare(LW *op,cchar *s2,cchar *back,cchar *s1,int *rp) noex {
 	while (s1[i] && ((s2+j) < back) && (s2[j] != '\n')) {
 	    ch1 = mkchar(s1[i]) ;
 	    ch2 = mkchar(s2[j]) ;
-	    if (op->f.dict && (! isdict(ch2))) {
+	    if (op->fl.dict && (! isdict(ch2))) {
 	        j += 1 ;		/* ignore character in comparison */
 	        continue ;
 	    }
-	    if (op->f.fold) {
+	    if (op->fl.fold) {
 	        fch1 = FOLD(ch1) ;
 	        fch2 = FOLD(ch2) ;
 	        rc = (fch1 - fch2) ;
