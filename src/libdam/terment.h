@@ -17,9 +17,13 @@
 
 /*******************************************************************************
 
-	This code provides the methods for the TERMENT object. The
+  	Group:
+	terment_{xx}
+
+	Description:
+	This code provides the methods for the TERMENT object.  The
 	TERMENT object, while residing in a file, forms a single
-	record in a file-database of records. This is similar to a
+	record in a file-database of records.  This is similar to a
 	raw UTMPX object when it is written out to the 'utmpx' file.
 	This object is used by the TERMENQ object to represent a
 	record in the TERMENQ database.
@@ -31,10 +35,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |pid_t| */
-#include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
 #include	<usystem.h>
 
 #include	"terment.h"
