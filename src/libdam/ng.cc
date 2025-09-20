@@ -201,7 +201,7 @@ int ng_addparse(NG *ngp,cchar *sp,int sl) noex {
 	        if ((rs = ema_parse(&aid,sp,sl)) > 0) {
 		    ema_ent	*ep ;
 	            for (int i = 0 ; ema_get(&aid,i,&ep) >= 0 ; i += 1) {
-	                if ((ep != nullptr) && (! ep->f.error)) {
+	                if ((ep != nullptr) && (! ep->fl.error)) {
 			    cchar	*rp{} ;
 	                    int		rl = 0 ;
 	                    if ((ep->rp != nullptr) && (ep->rl > 0)) {
