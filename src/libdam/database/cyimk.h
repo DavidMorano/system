@@ -63,11 +63,11 @@ struct cyimk_head {
 	cchar		*idname ;
 	cchar		*cname ;
 	char		*nidxfname ;
-	CYIMK_FL	f ;
 	vecobj		verses ;
 	vecobj		lines ;
 	gid_t		gid ;
 	uid_t		uid ;
+	CYIMK_FL	fl ;
 	uint		magic ;
 	uint		pcitation ;
 	int		nentries ;
