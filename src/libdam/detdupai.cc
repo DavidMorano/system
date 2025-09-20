@@ -78,13 +78,13 @@ int detdupai(cint *ap,int al) noex {
 		cint	esize = szof(int) ;
 		cint	sz = ((al+1)*szof(int)) ;
 	        int	*aa ;
-	        if ((rs = uc_libmalloc(sz,&aa)) >= 0) {
+	        if ((rs = lm_mall(sz,&aa)) >= 0) {
 	            memcpy(aa,ap,sz) ;
 	            qsort(aa,al,esize,cmpint) ;
 	            for (int i = 1 ; (!f) && (i < al) ; i += 1) {
 		        f = (aa[i] == aa[i-1]) ;
 		    } /* end for */
-	            rs1 = uc_libfree(aa) ;
+	            rs1 = lm_free(aa) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (needed more work) */
