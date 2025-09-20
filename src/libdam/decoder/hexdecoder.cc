@@ -9,7 +9,8 @@
 /* revision history:
 
 	= 2016-06-29, David A­D­ Morano
-	This was really made from scratch.
+	This was made from scratch, although it is (very) similar to
+	many others that I have made like it.
 
 */
 
@@ -27,7 +28,7 @@
 	hexdecoder_finish
 
 	Description:
-	We facilitate HEX (coded input) decoding.
+	This object facilitates HEX (coded input) decoding.
 
 *******************************************************************************/
 
@@ -45,14 +46,13 @@
 
 #include	"hexdecoder.h"
 
-import libutil ;
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -75,7 +75,7 @@ typedef obuf *		obufp ;
 /* forward references */
 
 template<typename ... Args>
-static int hexdecoder_ctor(hexdecoder *op,Args ... args) noex {
+local int hexdecoder_ctor(hexdecoder *op,Args ... args) noex {
 	HEXDECODER	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
@@ -85,7 +85,7 @@ static int hexdecoder_ctor(hexdecoder *op,Args ... args) noex {
 }
 /* end subroutine (hexdecoder_ctor) */
 
-static int hexdecoder_dtor(hexdecoder *op) noex {
+local int hexdecoder_dtor(hexdecoder *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -95,7 +95,7 @@ static int hexdecoder_dtor(hexdecoder *op) noex {
 /* end subroutine (hexdecoder_dtor) */
 
 template<typename ... Args>
-static inline int hexdecoder_magic(hexdecoder *op,Args ... args) noex {
+local inline int hexdecoder_magic(hexdecoder *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == HEXDECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -104,7 +104,7 @@ static inline int hexdecoder_magic(hexdecoder *op,Args ... args) noex {
 }
 /* end subroutine (hexdecoder_magic) */
 
-static int	hexdecoder_cvt(hexdecoder *) noex ;
+local int	hexdecoder_cvt(hexdecoder *) noex ;
 
 
 /* local variables */
@@ -116,9 +116,11 @@ static int	hexdecoder_cvt(hexdecoder *) noex ;
 /* exported subroutines */
 
 int hexdecoder_start(hexdecoder *op) noex {
+    	cnothrow	nt{} ;
+    	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = hexdecoder_ctor(op)) >= 0) {
-	    if (obuf *obp ; (obp = new(nothrow) obuf) != nullptr) {
+	    if (obuf *obp ; (obp = new(nt) obuf) != np) {
 		if ((rs = obp->start) >= 0) {
 	            op->outbuf = obp ;
 	            op->magic = HEXDECODER_MAGIC ;
@@ -162,31 +164,32 @@ int hexdecoder_finish(hexdecoder *op) noex {
 }
 /* end subroutine (hexdecoder_finish) */
 
-int hexdecoder_load(hexdecoder *op,cchar *sp,int sl) noex {
+int hexdecoder_load(hexdecoder *op,cchar *sp,int µsl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = hexdecoder_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
-	        while ((rs >= 0) && (sl > 0) && *sp) {
-		    cint	ch = mkchar(*sp) ;
-		    if (ishexlatin(ch)) {
-		        if (op->rl == 0) {
-			    op->rb[0] = charconv(ch) ;
-			    op->rl = 1 ;
-		        } else {
-			    op->rb[1] = charconv(ch) ;
-			    rs = hexdecoder_cvt(op) ;
-			    c += rs ;
-			    op->rl = 0 ;
-		        }
-		    } /* end if (ishexlatin) */
-		    sp += 1 ;
-		    sl -= 1 ;
-	        } /* end while */
-	    } else {
-	        rs = SR_BUGCHECK ;
-	    }
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	        if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
+	            while ((rs >= 0) && (sl > 0) && *sp) {
+		        cint	ch = mkchar(*sp) ;
+		        if (ishexlatin(ch)) {
+		            if (op->rl == 0) {
+			        op->rb[0] = charconv(ch) ;
+			        op->rl = 1 ;
+		            } else {
+			        op->rb[1] = charconv(ch) ;
+			        rs = hexdecoder_cvt(op) ;
+			        c += rs ;
+			        op->rl = 0 ;
+		            }
+		        } /* end if (ishexlatin) */
+		        sp += 1 ;
+		        sl -= 1 ;
+	            } /* end while */
+	        } else {
+	            rs = SR_BUGCHECK ;
+	        }
+	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -218,7 +221,7 @@ int hexdecoder_read(hexdecoder *op,char *rbuf,int rlen) noex {
 
 /* private subroutines */
 
-static int hexdecoder_cvt(hexdecoder *op) noex {
+local int hexdecoder_cvt(hexdecoder *op) noex {
 	int		rs = SR_OK ;
 	cchar		*rb = op->rb ;
 	if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
