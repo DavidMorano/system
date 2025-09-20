@@ -93,13 +93,13 @@ typedef LANGPROC_CUR	langproc_cur ;
 
 EXTERNC_begin
 
-extern int langproc_start(langproc *,cchar *) noex ;
-extern int langproc_proc(langproc *,int,cchar *,int) noex ;
-extern int langproc_count(langproc *) noex ;
-extern int langproc_curbegin(langproc *,langproc_cur *) noex ;
-extern int langproc_curend(langproc *,langproc_cur *) noex ;
-extern int langproc_curenum(langproc *,langproc_cur *,cchar **) noex ;
-extern int langproc_finish(langproc *) noex ;
+extern int langproc_start	(langproc *,cchar *) noex ;
+extern int langproc_proc	(langproc *,int,cchar *,int) noex ;
+extern int langproc_count	(langproc *) noex ;
+extern int langproc_curbegin	(langproc *,langproc_cur *) noex ;
+extern int langproc_curend	(langproc *,langproc_cur *) noex ;
+extern int langproc_curenum	(langproc *,langproc_cur *,cchar **) noex ;
+extern int langproc_finish	(langproc *) noex ;
 
 EXTERNC_end
 
