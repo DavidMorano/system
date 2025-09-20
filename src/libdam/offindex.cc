@@ -186,8 +186,8 @@ int offindex_lookup(offindex *op,off_t off) noex {
 	if ((rs = offindex_magic(op)) >= 0) {
 	    OI_E	key ;
 	    rs = SR_NOSYS ;
-	    if (! op->f.setsorted) {
-	        op->f.setsorted = true ;
+	    if (! op->fl.setsorted) {
+	        op->fl.setsorted = true ;
 	        vecobj_setsorted(op->oip) ;
 	    }
 	    key.lineoff = off ;
