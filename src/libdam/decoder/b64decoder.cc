@@ -21,13 +21,14 @@
   	Object:
 	b64decoder
 
-	Description:
-	We facilitate Base-64 (B64) (coded input) decoding.
+	Methods:
+	b64decoder_start
+	b64decoder_load
+	b64decoder_read
+	b64decoder_finish
 
-		b64decoder_start
-		b64decoder_load
-		b64decoder_read
-		b64decoder_finish
+	Description:
+	This object facilitates Base-64 (B64) (coded input) decoding.
 
 *******************************************************************************/
 
