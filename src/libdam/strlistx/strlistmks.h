@@ -53,8 +53,8 @@ struct strlistmks_head {
 	char		*nfname ;	/* new-file-name */
 	strtab		*stp ;		/* string-tab-pointer */
 	srectab		*rtp ;		/* string-record-table-pointer */
-	STRLISTMKS_FL	f ;
 	gid_t		gid ;
+	STRLISTMKS_FL	fl ;
 	uint		magic ;
 	int		nstrs ;
 	int		nfd ;
