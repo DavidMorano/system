@@ -23,9 +23,9 @@
 
 #define	PINGSTATDB_MAGIC	0x31415926
 #define	PINGSTATDB		struct pingstatdb_head
-#define	PINGSTATDB_CUR		struct pingstatdb_c
-#define	PINGSTATDB_ENT		struct pingstatdb_e
-#define	PINGSTATDB_UP		struct pingstatdb_u
+#define	PINGSTATDB_CUR		struct pingstatdb_cursor
+#define	PINGSTATDB_ENT		struct pingstatdb_entry
+#define	PINGSTATDB_UP		struct pingstatdb_upper
 #define	PINGSTATDB_FL		struct pingstatdb_flags
 
 
@@ -40,20 +40,20 @@ struct pingstatdb_flags {
 
 struct pingstatdb_head {
 	cchar		*fname ;
+	char		*zname ;
 	bfile		pfile ;
 	vecitem		entries ;
 	TIMEB		now ;
 	time_t		mtime ;
-	PINGSTATDB_FL	f ;
+	PINGSTATDB_FL	fl ;
 	uint		magic ;
-	char		zname[DATER_ZNAMESIZE] ;
 } ;
 
-struct pingstatdb_c {
+struct pingstatdb_cursor {
 	int		i ;
 } ;
 
-struct pingstatdb_e {
+struct pingstatdb_entry {
 	time_t		ti_change ;	/* last change */
 	time_t		ti_ping ;	/* last ping */
 	uint		count ;
@@ -61,36 +61,28 @@ struct pingstatdb_e {
 	char		hostname[MAXHOSTNAMELEN+1] ;
 } ;
 
-struct pingstatdb_u {
+struct pingstatdb_upper {
 	uint		timestamp ;
 	uint		timechange ;
 	uint		count ;
 } ;
 
 
-#if	(! defined(PINGSTATDB_MASTER)) || (PINGSTATDB_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int pingstatdb_open(pingstatdb *,cchar *,mode_t,int) noex ;
+extern int pingstatdb_close(pingstatdb *) noex ;
+extern int pingstatdb_match(pingstatdb *,cchar *,pingstatdb_ent *) noex ;
+extern int pingstatdb_curbegin(pingstatdb *,pingstatdb_cur *) noex ;
+extern int pingstatdb_curend(pingstatdb *,pingstatdb_cur *) noex ;
+extern int pingstatdb_enum(pingstatdb *,pingstatdb_cur *,
+		pingstatdb_ent *) noex ;
+extern int pingstatdb_update(pingstatdb *,cchar *,int,time_t) noex ;
+extern int pingstatdb_uptime(pingstatdb *,cchar *,pingstatdb_up *) noex ;
+extern int pingstatdb_check(pingstatdb *,time_t) noex ;
 
-extern int pingstatdb_open(PINGSTATDB *,const char *,mode_t,int) ;
-extern int pingstatdb_close(PINGSTATDB *) ;
-extern int pingstatdb_match(PINGSTATDB *,const char *,
-		PINGSTATDB_ENT *) ;
-extern int pingstatdb_curbegin(PINGSTATDB *,PINGSTATDB_CUR *) ;
-extern int pingstatdb_curend(PINGSTATDB *,PINGSTATDB_CUR *) ;
-extern int pingstatdb_enum(PINGSTATDB *,PINGSTATDB_CUR *,
-		PINGSTATDB_ENT *) ;
-extern int pingstatdb_update(PINGSTATDB *,const char *,int,time_t) ;
-extern int pingstatdb_uptime(PINGSTATDB *,const char *,PINGSTATDB_UP *) ;
-extern int pingstatdb_check(PINGSTATDB *,time_t) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PINGSTATDB_MASTER */
 
 #endif /* PINGSTATDB_INCLUDE */
 
