@@ -55,8 +55,8 @@ struct varmks_head {
 	strtab		keys ;
 	strtab		vals ;
 	VARMKS_REC	rectab ;
-	VARMKS_FL	f ;
 	gid_t		gid ;
+	VARMKS_FL	fl ;
 	uint		magic ;
 	int		nvars ;
 	int		nfd ;
