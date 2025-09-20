@@ -207,8 +207,8 @@ int varmks_open(VARMKS *op,cchar *dbname,int of,mode_t om,int n) noex {
 	op->nfd = -1 ;
 	op->gid = -1 ;
 
-	op->f.ofcreat = MKBOOL(of & O_CREAT) ;
-	op->f.ofexcl = MKBOOL(of & O_EXCL) ;
+	op->fl.ofcreat = MKBOOL(of & O_CREAT) ;
+	op->fl.ofexcl = MKBOOL(of & O_EXCL) ;
 
 	if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
 	    op->dbname = cp ;
@@ -250,9 +250,9 @@ int varmks_close(VARMKS *op)
 	debugprintf("varmks_close: nvars=%u\n",op->nvars) ;
 #endif
 
-	f_go = (! op->f.abort) ;
+	f_go = (! op->fl.abort) ;
 	nvars = op->nvars ;
-	if (! op->f.abort) {
+	if (! op->fl.abort) {
 	    rs1 = varmks_mkvarfile(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	    f_go = f_go && (rs1 >= 0) ;
@@ -340,7 +340,7 @@ int varmks_abort(VARMKS *op)
 
 	if (op->magic != VARMKS_MAGIC) return SR_NOTOPEN ;
 
-	op->f.abort = TRUE ;
+	op->fl.abort = TRUE ;
 	return SR_OK ;
 }
 /* end subroutine (varmks_abort) */
@@ -366,7 +366,7 @@ static int varmks_filesbegin(VARMKS *op)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	if (op->f.ofcreat) {
+	if (op->fl.ofcreat) {
 	    rs = varmks_filesbeginc(op) ;
 	} else {
 	    rs = varmks_filesbeginwait(op) ;
@@ -382,7 +382,7 @@ static int varmks_filesbegin(VARMKS *op)
 
 static int varmks_filesbeginc(VARMKS *op)
 {
-	cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	int		rs ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_IDX	 ;
@@ -393,14 +393,14 @@ static int varmks_filesbeginc(VARMKS *op)
 	    char		rbuf[MAXPATHLEN+1] ;
 	    if (type) {
 	        if ((rs = mktmpfile(rbuf,om,tbuf)) >= 0) {
-	            op->f.created = TRUE ;
+	            op->fl.created = TRUE ;
 	            tfn = rbuf ;
 	        }
 	    }
 	    if (rs >= 0) {
 	        mode_t	om = op->om ;
 	        int	of = O_CREAT ;
-	        if (op->f.ofexcl) of |= O_EXCL ;
+	        if (op->fl.ofexcl) of |= O_EXCL ;
 	        rs = varmks_filesbegincreate(op,tfn,of,om) ;
 		if ((rs < 0) && type) {
 		    uc_unlink(rbuf) ;
@@ -435,7 +435,7 @@ static int varmks_filesbeginwait(VARMKS *op)
 	        if (to-- == 0) break ;
 	    } /* end while (db exists) */
 	    if (rs == nrs) {
-	        op->f.ofcreat = FALSE ;
+	        op->fl.ofcreat = FALSE ;
 	        c = 0 ;
 	        rs = varmks_filesbeginc(op) ;
 	    }
@@ -462,7 +462,7 @@ static int varmks_filesbegincreate(VARMKS *op,cchar *tfn,int of,mode_t om)
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
 	    cint	fd = rs ;
 	    cchar	*cp ;
-	    op->f.created = TRUE ;
+	    op->fl.created = TRUE ;
 	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
 	        op->nidxfname = (char *) cp ;
 	    }
@@ -484,7 +484,7 @@ static int varmks_filesend(VARMKS *op)
 	int		rs1 ;
 
 	if (op->nidxfname != NULL) {
-	    if (op->f.created && (op->nidxfname[0] != '\0')) {
+	    if (op->fl.created && (op->nidxfname[0] != '\0')) {
 	        u_unlink(op->nidxfname) ;
 	    }
 	    rs1 = uc_free(op->nidxfname) ;
@@ -854,7 +854,7 @@ static int varmks_nidxopen(VARMKS *op)
 	debugprintf("varmks_nidxopen: ent nidxfname=%s\n",op->nidxfname) ;
 #endif
 	if (op->nidxfname == NULL) {
-	    cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	    cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	    cchar	*dbn = op->dbname ;
 	    cchar	*suf = FSUF_IDX ;
 	    char	tbuf[MAXPATHLEN+1] ;
@@ -867,7 +867,7 @@ static int varmks_nidxopen(VARMKS *op)
 		    fd = rs ;
 	            tfn = rbuf ;
 	        } else {
-	            if (op->f.ofexcl) of |= O_EXCL ;
+	            if (op->fl.ofexcl) of |= O_EXCL ;
 	            rs = uc_open(tbuf,of,om) ;
 	            op->nfd = rs ;
 		    fd = rs ;
@@ -880,7 +880,7 @@ static int varmks_nidxopen(VARMKS *op)
 	        } /* end if (ok) */
 	    } /* end if (mknewfname) */
 	} else {
-	    if (op->f.ofexcl) of |= O_EXCL ;
+	    if (op->fl.ofexcl) of |= O_EXCL ;
 	    rs = uc_open(op->nidxfname,of,om) ;
 	    op->nfd = rs ;
 	    fd = rs ;
