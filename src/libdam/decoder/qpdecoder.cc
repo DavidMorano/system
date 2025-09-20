@@ -8,8 +8,9 @@
 
 /* revision history:
 
-	= 2016-06-29, David AÂ­DÂ­ Morano
-	This was really made from scratch.
+	= 2016-06-29, David A­D­ Morano
+	This was made from scratch, although it is (very) similar to
+	many others that I have made like it.
 
 	= 2018-12-14, David A-D- Morano
 	Made a small enhancement for error handling.
@@ -30,8 +31,8 @@
 	qpdecoder_finish
 
 	Description:
-	We facilitate the decoding of Quoted-Printable (QP) encoded
-	data.
+	This object facilitates the decoding of Quoted-Printable
+	(QP) encoded data.
 
 	Orientation note:
 	Data that is encoded in the Quoted-Printable format is
@@ -61,14 +62,13 @@
 
 #include	"qpdecoder.h"
 
-import libutil ;
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
 
 /* namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -91,7 +91,7 @@ typedef obuf *		obufp ;
 /* forward references */
 
 template<typename ... Args>
-static int qpdecoder_ctor(qpdecoder *op,Args ... args) noex {
+local int qpdecoder_ctor(qpdecoder *op,Args ... args) noex {
 	QPDECODER	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
@@ -101,7 +101,7 @@ static int qpdecoder_ctor(qpdecoder *op,Args ... args) noex {
 }
 /* end subroutine (qpdecoder_ctor) */
 
-static int qpdecoder_dtor(qpdecoder *op) noex {
+local int qpdecoder_dtor(qpdecoder *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -111,7 +111,7 @@ static int qpdecoder_dtor(qpdecoder *op) noex {
 /* end subroutine (qpdecoder_dtor) */
 
 template<typename ... Args>
-static inline int qpdecoder_magic(qpdecoder *op,Args ... args) noex {
+local inline int qpdecoder_magic(qpdecoder *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == QPDECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -120,10 +120,10 @@ static inline int qpdecoder_magic(qpdecoder *op,Args ... args) noex {
 }
 /* end subroutine (qpdecoder_magic) */
 
-static int	qpdecoder_loadspace(qpdecoder *,cchar *,int) noex ;
-static int	qpdecoder_add(qpdecoder *,cchar *,int) noex ;
-static int	qpdecoder_add(qpdecoder *,int) noex ;
-static int	qpdecoder_cvt(qpdecoder *) noex ;
+local int	qpdecoder_loadspace(qpdecoder *,cchar *,int) noex ;
+local int	qpdecoder_add(qpdecoder *,cchar *,int) noex ;
+local int	qpdecoder_add(qpdecoder *,int) noex ;
+local int	qpdecoder_cvt(qpdecoder *) noex ;
 
 
 /* local variables */
@@ -137,10 +137,12 @@ cint		nstage = QPDECODER_NSTAGE ;
 /* exported subroutines */
 
 int qpdecoder_start(qpdecoder *op,int f_space) noex {
+    	cnothrow	nt{} ;
+	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = qpdecoder_ctor(op)) >= 0) {
-	    op->f.space = bool(f_space) ;
-	    if (obuf *obp ; (obp = new(nothrow) obuf) != nullptr) {
+	    op->fl.space = bool(f_space) ;
+	    if (obuf *obp ; (obp = new(nt) obuf) != np) {
 		if ((rs = obp->start) >= 0) {
 	            op->outbuf = obp ;
 	            op->magic = QPDECODER_MAGIC ;
@@ -184,72 +186,73 @@ int qpdecoder_finish(qpdecoder *op) noex {
 }
 /* end subroutine (qpdecoder_finish) */
 
-int qpdecoder_load(qpdecoder *op,cchar *sp,int sl) noex {
+int qpdecoder_load(qpdecoder *op,cchar *sp,int µsl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = qpdecoder_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
-	        if (op->f.space) {
-	            rs = qpdecoder_loadspace(op,sp,sl) ;
-	            c += rs ;
-	        } else {
-	            cint	nl = nstage ;
-	            while ((rs >= 0) && (sl > 0)) {
-	                if (op->f.esc) {
-	                    cint	rl = op->rl ;
-	                    int		ml = min(sl,(nl - op->rl)) ;
-	                    char	*rb = op->rb ;
-	                    strwcpy((rb + rl),sp,ml) ;
-	                    op->rl += ml ;
-	                    sp += ml ;
-	                    sl -= ml ;
-	                    if (rl == nl) {
-	                        rs = qpdecoder_cvt(op) ;
-	                        c += rs ;
-	                        op->rl = 0 ;
-	                        op->f.esc = false ;
-	                    }
-	                } else {
-	                    int		si ;
-	                    while ((si = sichr(sp,sl,'=')) >= 0) {
-	                        op->f.esc = true ;
-	                        if (si > 0) {
-	                            rs = qpdecoder_add(op,sp,si) ;
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	        if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
+	            if (op->fl.space) {
+	                rs = qpdecoder_loadspace(op,sp,sl) ;
+	                c += rs ;
+	            } else {
+	                cint	nl = nstage ;
+	                while ((rs >= 0) && (sl > 0)) {
+	                    if (op->fl.esc) {
+	                        cint	rl = op->rl ;
+	                        int	ml = min(sl,(nl - op->rl)) ;
+	                        char	*rb = op->rb ;
+	                        strwcpy((rb + rl),sp,ml) ;
+	                        op->rl += ml ;
+	                        sp += ml ;
+	                        sl -= ml ;
+	                        if (rl == nl) {
+	                            rs = qpdecoder_cvt(op) ;
 	                            c += rs ;
-	                            sp += si ;
-	                            sl -= si ;
+	                            op->rl = 0 ;
+	                            op->fl.esc = false ;
 	                        }
-	                        sp += 1 ;
-	                        sl -= 1 ;
-	                        if ((rs >= 0) && (sl > 0)) {
-	                            cint	rl = op->rl ;
-	                            int		ml = min(sl,(nl - op->rl)) ;
-	                            char	*rb = op->rb ;
-	                            strwcpy((rb + rl),sp,ml) ;
-	                            op->rl += ml ;
-	                            sp += ml ;
-	                            sl -= ml ;
-	                            if (op->rl == nl) {
-	                                rs = qpdecoder_cvt(op) ;
+	                    } else {
+	                        int si ;
+	                        while ((si = sichr(sp,sl,'=')) >= 0) {
+	                            op->fl.esc = true ;
+	                            if (si > 0) {
+	                                rs = qpdecoder_add(op,sp,si) ;
 	                                c += rs ;
-	                                op->rl = 0 ;
-	                                op->f.esc = false ;
+	                                sp += si ;
+	                                sl -= si ;
 	                            }
-	                        } /* end if */
-			        if (rs < 0) break ;
-	                    } /* end while */
-	                    if ((rs >= 0) && (sl > 0)) {
-	                        rs = qpdecoder_add(op,sp,sl) ;
-	                        c += rs ;
-	                        sl = 0 ;
-	                    } /* end if (remaining source) */
-	                } /* end if (escape or not) */
-	            } /* end while */
-	        } /* end if (space or not) */
-	    } else {
-	        rs = SR_BUGCHECK ;
-	    }
+	                            sp += 1 ;
+	                            sl -= 1 ;
+	                            if ((rs >= 0) && (sl > 0)) {
+	                                cint	rl = op->rl ;
+	                                int	ml = min(sl,(nl - op->rl)) ;
+	                                char	*rb = op->rb ;
+	                                strwcpy((rb + rl),sp,ml) ;
+	                                op->rl += ml ;
+	                                sp += ml ;
+	                                sl -= ml ;
+	                                if (op->rl == nl) {
+	                                    rs = qpdecoder_cvt(op) ;
+	                                    c += rs ;
+	                                    op->rl = 0 ;
+	                                    op->fl.esc = false ;
+	                                }
+	                            } /* end if */
+			            if (rs < 0) break ;
+	                        } /* end while */
+	                        if ((rs >= 0) && (sl > 0)) {
+	                            rs = qpdecoder_add(op,sp,sl) ;
+	                            c += rs ;
+	                            sl = 0 ;
+	                        } /* end if (remaining source) */
+	                    } /* end if (escape or not) */
+	                } /* end while */
+	            } /* end if (space or not) */
+	        } else {
+	            rs = SR_BUGCHECK ;
+	        }
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -284,22 +287,22 @@ int qpdecoder_read(qpdecoder *op,char *rbuf,int rlen) noex {
 
 /* private subroutines */
 
-static int qpdecoder_loadspace(qpdecoder *op,cchar *sp,int sl) noex {
+local int qpdecoder_loadspace(qpdecoder *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	while ((rs >= 0) && (sl-- > 0)) {
 	    cint	ch = mkchar(*sp) ;
 	    if (! CHAR_ISWHITE(ch)) {
-	        if (op->f.esc) {
+	        if (op->fl.esc) {
 	            op->rb[op->rl++] = charconv(ch) ;
 	            if (op->rl == 2) {
 	                rs = qpdecoder_cvt(op) ;
 	                c += rs ;
 	                op->rl = 0 ;
-	                op->f.esc = false ;
+	                op->fl.esc = false ;
 	            }
 	        } else if (ch == '=') {
-	            op->f.esc = true ;
+	            op->fl.esc = true ;
 	        } else {
 	            rs = qpdecoder_add(op,ch) ;
 	            c += rs ;
@@ -311,7 +314,7 @@ static int qpdecoder_loadspace(qpdecoder *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (qpdecoder_readspace) */
 
-static int qpdecoder_add(qpdecoder *op,cchar *vp,int vl = -1) noex {
+local int qpdecoder_add(qpdecoder *op,cchar *vp,int vl = -1) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	while ((rs >= 0) && vl-- && *vp) {
@@ -322,10 +325,10 @@ static int qpdecoder_add(qpdecoder *op,cchar *vp,int vl = -1) noex {
 }
 /* end subrolutine (qpdecoder_add) */
 
-static int qpdecoder_add(qpdecoder *op,int v) noex {
+local int qpdecoder_add(qpdecoder *op,int v) noex {
     	int		rs ;
 	obuf 		*obp = obufp(op->outbuf) ;
-	if (op->f.space && (v == '_')) {
+	if (op->fl.space && (v == '_')) {
 	    v = ' ' ;
 	}
 	rs = obp->add(v) ;
@@ -333,14 +336,14 @@ static int qpdecoder_add(qpdecoder *op,int v) noex {
 }
 /* end subrolutine (qpdecoder_add) */
 
-static int qpdecoder_cvt(qpdecoder *op) noex {
+local int qpdecoder_cvt(qpdecoder *op) noex {
 	int		rs = SR_OK ;
 	char		*rb = op->rb ;
 	if (op->outbuf != nullptr) {
 	    obuf 	*obp = obufp(op->outbuf) ;
+	    cint	ch0 = mkchar(rb[0]) ;
+	    cint	ch1 = mkchar(rb[1]) ;
 	    int		v = 0 ;
-	    int		ch0 = mkchar(rb[0]) ;
-	    int		ch1 = mkchar(rb[1]) ;
 	    if (ishexlatin(ch0) && ishexlatin(ch1)) {
 		v |= (digvalhex(ch0)<<4) ;
 		v |= (digvalhex(ch1)<<0) ;
