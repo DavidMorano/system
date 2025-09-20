@@ -89,7 +89,7 @@ struct listenspec_flags {
 struct listenspec_head {
 	void		*info ;		/* particular listener information */
 	cchar		*prlocal ;
-	LISTENSPEC_FL	f ;
+	LISTENSPEC_FL	fl ;
 	uint		magic ;
 	int		ltype ;		/* "listen" type */
 	int		fd ;
