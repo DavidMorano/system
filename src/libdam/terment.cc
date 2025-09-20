@@ -17,13 +17,13 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	terment
 
 	Description:
-	This code provides the methods for the TERMENT object. The
+	This code provides the methods for the TERMENT object.  The
 	TERMENT object, while residing in a file, forms a single
-	record in a file-database of records. This is similar to a
+	record in a file-database of records.  This is similar to a
 	raw UTMPX object when it is written out to the 'utmpx' file.
 	This object (TERMENQ) is used to represent a record in the
 	TERMENQ database.
@@ -40,11 +40,20 @@
 
 #include	"terment.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -80,7 +89,7 @@ int terment_finish(terment *op) noex {
 int terment_settype(terment *op,int type) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    op->type = type ;
+	    op->type = uchar(type) ;
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -100,7 +109,7 @@ int terment_setsid(terment *op,pid_t sid) noex {
 int terment_setlines(terment *op,int lines) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    op->lines = lines ;
+	    op->lines = uchar(lines) ;
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -110,7 +119,7 @@ int terment_setlines(terment *op,int lines) noex {
 int terment_setcols(terment *op,int cols) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    op->cols = cols ;
+	    op->cols = uchar(cols) ;
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -158,53 +167,77 @@ int terment_setanswer(terment *op,cchar *sp,int sl) noex {
 /* end subroutine (terment_setanswer) */
 
 int terment_gettype(terment *op) noex {
-	int	rs = MKCHAR(op->type) ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = MKCHAR(op->type) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (terment_gettype) */
 
 int terment_getsid(terment *op) noex {
-	int		rs = op->sid ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = op->sid ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (terment_getsid) */
 
 int terment_getlines(terment *op) noex {
-	int		rs = op->lines ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = op->lines ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (terment_getlines) */
 
 int terment_getcols(terment *op) noex {
-	int		rs = op->cols ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = op->cols ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (terment_getcols) */
 
 int terment_getid(terment *op,cchar **rpp) noex {
-	int		rs = strnlen(op->id,TERMENT_LID) ;
-	if (rpp) *rpp = op->id ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = lenstr(op->id,TERMENT_LID) ;
+	   if (rpp) *rpp = op->id ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (terment_getid) */
 
 int terment_getline(terment *op,cchar **rpp) noex {
-	int		rs = strnlen(op->line,TERMENT_LLINE) ;
-	if (rpp) *rpp = op->line ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = lenstr(op->line,TERMENT_LLINE) ;
+	    if (rpp) *rpp = op->line ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (terment_getline) */
 
 int terment_gettermtype(terment *op,cchar **rpp) noex {
-	int		rs = strnlen(op->termtype,TERMENT_LTERMTYPE) ;
-	if (rpp) *rpp = op->termtype ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = lenstr(op->termtype,TERMENT_LTERMTYPE) ;
+	    if (rpp) *rpp = op->termtype ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (terment_gettermtype) */
 
 int terment_getanswer(terment *op,cchar **rpp) noex {
-	int		rs = strnlen(op->answer,TERMENT_LANSWER) ;
-	if (rpp) *rpp = op->answer ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = lenstr(op->answer,TERMENT_LANSWER) ;
+	    if (rpp) *rpp = op->answer ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (terment_getanswer) */
