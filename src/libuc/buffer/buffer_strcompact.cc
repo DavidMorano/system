@@ -50,7 +50,9 @@
 
 #include	"buffer.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |gelenstr(3u)| */
 
 /* local defines */
 
@@ -79,26 +81,27 @@ extern "C" {
 
 /* exported subroutines */
 
-int buffer_strcompact(buffer *op,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	int		cl ;
-	int		len = 0 ;
-	int		c = 0 ;
-	cchar		*cp{} ;
-	if (sl < 0) sl = lenstr(sp) ;
-	while ((cl = sfnext(sp,sl,&cp)) > 0) {
-	    if (c++ > 0) {
-	        rs = buffer_chr(op,CH_SP) ;
-	        len += rs ;
-	    }
-	    if (rs >= 0) {
-	        rs = buffer_strw(op,cp,cl) ;
-	        len += rs ;
-	    }
-	    sl -= intconv((cp + cl) - sp) ;
-	    sp = (cp+cl) ;
-	    if (rs < 0) break ;
-	} /* end while */
+int buffer_strcompact(buffer *op,cchar *sp,int µsl) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ; /* return-value */
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	    int		c = 0 ;
+	    cchar	*cp{} ;
+	    rs = SR_OK ;
+	    for (int cl ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
+	        if (c++ > 0) {
+	            rs = buffer_chr(op,CH_SP) ;
+	            len += rs ;
+	        }
+	        if (rs >= 0) {
+	            rs = buffer_strw(op,cp,cl) ;
+	            len += rs ;
+	        }
+	        sl -= intconv((cp + cl) - sp) ;
+	        sp = (cp + cl) ;
+	        if (rs < 0) break ;
+	    } /* end for */
+	} /* end if (getlenstr) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (buffer_strcompact) */
