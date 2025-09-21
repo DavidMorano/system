@@ -42,7 +42,9 @@
 
 #include	"filegrp.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* local defines */
 
@@ -55,7 +57,7 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -63,6 +65,9 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -202,7 +207,7 @@ int filegrp_finish(FG *op) noex {
                             if (rs >= 0) rs = rs1 ;
                         }
                         {
-                            rs1 = uc_libfree(rp) ;
+                            rs1 = libmem.free(rp) ;
                             if (rs >= 0) rs = rs1 ;
                         }
                     }
@@ -216,7 +221,7 @@ int filegrp_finish(FG *op) noex {
             {
                 void        *vp{} ;
                 while (cq_rem(op->flp,&vp) >= 0) {
-                    rs1 = uc_libfree(vp) ;
+                    rs1 = libmem.free(vp) ;
                     if (rs >= 0) rs = rs1 ;
                 }
             }
@@ -333,7 +338,7 @@ static int filegrp_newrec(FG *op,time_t dt,FG_REC **rpp,gid_t gid,cc *gn) noex {
 		}
 	    } /* end if (record-start) */
 	    if (rs < 0) {
-		uc_libfree(rp) ;
+		libmem.free(rp) ;
 	    }
 	} /* end if */
 	if (rpp) *rpp = (rs >= 0) ? rp : nullptr ;
@@ -419,7 +424,7 @@ static int filegrp_allocrec(FG *op,FG_REC **rpp) noex {
 	cint		sz = szof(FG_REC) ;
 	int		rs ;
 	if ((rs = cq_rem(op->flp,rpp)) == SR_NOTFOUND) {
-	    if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 	        *rpp = (FG_REC *) vp ;
 	    }
 	}
@@ -437,10 +442,10 @@ static int filegrp_recfree(FG *op,FG_REC *rp) noex {
 	        if (n < FILEGRP_MAXFREE) {
 	            rs = cq_ins(fqp,rp) ;
 	            if (rs < 0) {
-		        uc_libfree(rp) ;
+		        libmem.free(rp) ;
 		    }
 	        } else {
-	            uc_libfree(rp) ;
+	            libmem.free(rp) ;
 	        }
 	    } /* end if (cq_count) */
 	} /* end if (non-null) */
@@ -493,7 +498,7 @@ static int record_finish(FG_REC *rp) noex {
 	    rp->gid = -1 ;
 	    rp->gn[0] = '\0' ;
 	    {
-	        rs1 = uc_libfree(rp->gn) ;
+	        rs1 = libmem.free(rp->gn) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
@@ -539,9 +544,13 @@ static int record_update(FG_REC *rp,time_t dt,cc *gn) noex {
 /* end subroutine (record_update) */
 
 static int record_access(FG_REC *rp,time_t dt) noex {
-	cint		gl = lenstr(rp->gn) ;
-	rp->ti_access = dt ;
-	return gl ;
+    	int		rs = SR_FAULT ;
+	int		gl ; /* return-value */
+	if ((gl = lenstr(rp->gn)) >= 0) {
+	    rs = SR_OK ;
+	    rp->ti_access = dt ;
+	} /* end if (getlenstr) */
+	return (rs >= 0) ? gl : rs ;
 }
 /* end subroutine (record_access) */
 
