@@ -6,13 +6,25 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1998-07-01, David A­D­ Morano
+	This code was originally written by Paul Hsieh.  It was
+	adapted into its present form by me.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
 /*******************************************************************************
 
   	Name:
 	hash_hsieh
 
 	Description:
-	This is a popular hash function originally written by Paul Hsieh.
+	This is a popular hash function originally written by Paul
+	Hsieh.
 
 	Synopsis:
 	uint hash_hsieh(cchar *data,int len) noex
@@ -71,43 +83,46 @@
 /* exported subroutines */
 
 uint hash_hsieh(cchar *data,int len) noex {
-	uint	hash = 0 ;
+	uint		hash = 0 ; /* return-value */
 	if ((len > 0) && data) {
-	uint	tmp ;
-	int	rem = (len & 3) ;
-	hash = len ;
-    len >>= 2;
-    /* main loop */
-    for (;len > 0; len--) {
-        hash  += get16bits (data);
-        tmp    = (get16bits (data+2) << 11) ^ hash;
-        hash   = (hash << 16) ^ tmp;
-        data  += 2 * szof(uint16_t) ;
-        hash  += hash >> 11;
-    } /* end for */
-    /* handle end cases */
-    switch (rem) {
-        case 3: hash += get16bits (data);
-                hash ^= hash << 16;
-                hash ^= ((signed char)data[szof(uint16_t)]) << 18;
-                hash += hash >> 11;
-                break;
-        case 2: hash += get16bits (data);
-                hash ^= hash << 11;
-                hash += hash >> 17;
-                break;
-        case 1: hash += (signed char)*data;
-                hash ^= hash << 10;
-                hash += hash >> 1;
+	    uint	tmp ;
+	    int	rem = (len & 3) ;
+	    hash = len ;
+            len >>= 2;
+            /* main loop */
+            for (;len > 0; len--) {
+                hash  += get16bits (data);
+                tmp    = (get16bits (data+2) << 11) ^ hash;
+                hash   = (hash << 16) ^ tmp;
+                data  += 2 * szof(uint16_t) ;
+                hash  += hash >> 11 ;
+            } /* end for */
+            /* handle end cases */
+            switch (rem) {
+            case 3: 
+		hash += get16bits(data);
+                hash ^= hash << 16 ;
+                hash ^= ((signed char)data[szof(uint16_t)]) << 18 ;
+                hash += hash >> 11 ;
+                break ;
+	    case 2: 
+		hash += get16bits(data) ;
+                hash ^= hash << 11 ;
+                hash += hash >> 17 ;
+                break ;
+	    case 1: 
+		hash += (signed char) *data ;
+                hash ^= hash << 10 ;
+                hash += hash >> 1 ;
 		break ;
-    } /* end switch */
-    /* force "avalanching" of final 127 bits */
-    hash ^= hash << 3;
-    hash += hash >> 5;
-    hash ^= hash << 4;
-    hash += hash >> 17;
-    hash ^= hash << 25;
-    hash += hash >> 6;
+            } /* end switch */
+            /* force "avalanching" of final 127 bits */
+            hash ^= hash << 3 ;
+            hash += hash >> 5 ;
+            hash ^= hash << 4 ;
+            hash += hash >> 17 ;
+            hash ^= hash << 25 ;
+            hash += hash >> 6 ;
 	} /* end if (valid) */
 	return hash ;
 }
