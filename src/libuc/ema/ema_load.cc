@@ -38,12 +38,12 @@
 
 #include	"ema.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
-#pragma		GCC dependency	"ema_entry.ccm"
-#pragma		GCC dependency	"ema_asstr.ccm"
-#pragma		GCC dependency	"ema_parts.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"ema_entry.ccm"
+#pragma		GCC dependency		"ema_asstr.ccm"
+#pragma		GCC dependency		"ema_parts.ccm"
 
-import libutil ;
+import libutil ;			/* |getlenstr(3u)| */
 import ema_entry ;
 import ema_asstr ;
 import ema_parts ;
@@ -52,6 +52,8 @@ import ema_parts ;
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -125,7 +127,7 @@ namespace ema_ns {
 loader::operator int () noex {
         cint        sz = szof(ema_ent) ;
 	int		rs ;
-        if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
             ema_ent         *ep = entp(vp) ;
             if ((rs = entry_start(ep)) >= 0) {
                 rs = loads(ep) ;
@@ -134,7 +136,7 @@ loader::operator int () noex {
                 }
             } /* end if (entry_start) */
             if (rs < 0) {
-                uc_free(ep) ;
+                libmem.free(ep) ;
             }
         } /* end if (memory-allocation) */
 	return rs ;
@@ -170,19 +172,19 @@ int loader::loadparts(ema_ent *ep) noex {
                         sl -= 1 ;
                         ep->type = ematype_pcs ;
                     } /* end if (PCS list-type) */
-                    if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+                    if ((rs = libmem.strw(sp,sl,&cp)) >= 0) {
                         ep->ap = cp ;
                         ep->al = sl ;
                     }
                     break ;
                 case si_route:
-                    if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+                    if ((rs = libmem.strw(sp,sl,&cp)) >= 0) {
                         ep->rp = cp ;
                         ep->rl = sl ;
                     }
                     break ;
                 case si_comment:
-                    if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+                    if ((rs = libmem.strw(sp,sl,&cp)) >= 0) {
                         ep->cp = cp ;
                         ep->cl = sl ;
                     }
@@ -197,7 +199,7 @@ int loader::loadorig(ema_ent *ep) noex {
     	int		rs = SR_OK ;
         if ((rs >= 0) && (origl > 0)) {
 	    if ((rs = rmwht(origp,origl)) > 0) {
-                if (cc *cp ; (rs = uc_mallocstrw(origp,rs,&cp)) >= 0) {
+                if (cc *cp ; (rs = libmem.strw(origp,rs,&cp)) >= 0) {
                     ep->op = cp ;
                     ep->ol = origl ;
                 } /* end if (memory-allocation) */
