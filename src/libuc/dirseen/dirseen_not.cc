@@ -114,7 +114,7 @@ int dirseen_notadd(dirseen *op,ustat *sbp,cchar *dbuf,int dlen) noex {
 	        if ((rs = pathclean(cbuf,dbuf,dlen)) > 0) {
 	            rs = dirseen_add(op,cbuf,rs,sbp) ;
 	        }
-	        rs1 = uc_free(cbuf) ;
+	        rs1 = malloc_free(cbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
