@@ -48,7 +48,9 @@
 
 #include	"grcache.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -65,8 +67,8 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::nothrow ;			/* type */
+using libuc::libmem ;			/* variable */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -229,7 +231,7 @@ int grcache_finish(grcache *op) noex {
 			    if (rs >= 0) rs = rs1 ;
 			}
 			{
-	                    rs1 = uc_free(rp) ;
+	                    rs1 = libmem.free(rp) ;
 			    if (rs >= 0) rs = rs1 ;
 			}
 	            }
@@ -241,7 +243,7 @@ int grcache_finish(grcache *op) noex {
 	    }
 	    if (op->flp) {
 	        while (cq_rem(op->flp,&vp) >= 0) {
-	            rs1 = uc_free(vp) ;
+	            rs1 = libmem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end while */
 	    }
@@ -567,10 +569,10 @@ static int grcache_allocrec(grcache *op,rec **rpp) noex {
 	int		rs ;
 	if ((rs = cq_rem(op->flp,rpp)) == SR_NOTFOUND) {
 	    cint	sz = szof(rec) ;
-	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 	        *rpp = recp(vp) ;
-	    }
-	}
+	    } /* end if (memory-allocation) */
+	} /* end if (cq_rem) */
 	return rs ;
 }
 /* end subroutine (grcache_allocrec) */
@@ -582,7 +584,7 @@ static int grcache_recfree(grcache *op,rec *rp) noex {
 	    if (n < GRCACHE_MAXFREE) {
 	        rs = cq_ins(op->flp,rp) ;
 	    } else {
-	        uc_free(rp) ;
+	        libmem.free(rp) ;
 	    }
 	}
 	return rs ;
@@ -620,7 +622,7 @@ static int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 	            if (ucentgr gr ; (rs = gr.getnam(grbuf,grlen,gn)) >= 0) {
 	                cint	sz = (rs+1) ;
 	                grl = rs ; /* indicates entry found */
-	                if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	                if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 			    ucentgr	*grp = &rp->gr ;
 		            char	*nbuf = charp(vp) ;
 		            if ((rs = grp->load(nbuf,grl,&gr)) >= 0) {
@@ -628,7 +630,7 @@ static int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 	    	                rp->grl = grl ;
 		            }
 		            if (rs < 0) {
-				uc_free(grbuf) ;
+				libmem.free(grbuf) ;
 			    }
 	                } /* end if (memory-allocation) */
 	            } else if (rs == rsn) {
@@ -636,7 +638,7 @@ static int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 	                grl = 0 ; /* indicates an empty (not-found) entry */
 		    }
 	            if (rs >= 0) {
-			if (cchar *cp ; (rs = uc_mallocstrw(gn,-1,&cp)) >= 0) {
+			if (cchar *cp ; (rs = libmem.strw(gn,-1,&cp)) >= 0) {
 			    rp->gn = cp ;
 	                    rp->ti_create = dt ;
 	                    rp->ti_access = dt ;
@@ -644,7 +646,7 @@ static int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 	                    rp->magic = RECORD_MAGIC ;
 			} /* end if (memory-allocation) */
 	            } /* end if (ok) */
-	            rs1 = uc_free(grbuf) ; /* free first one up at top */
+	            rs1 = libmem.free(grbuf) ; /* free first one up at top */
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
@@ -661,12 +663,13 @@ static int record_finish(rec *rp) noex {
 	    if (rp->magic == RECORD_MAGIC) {
 		rs = SR_OK ;
 		if (rp->gn) {
-	            rs1 = uc_free(rp->gn) ;
+		    void *vp = voidp(rp->gn) ;
+	            rs1 = libmem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            rp->gn = nullptr ;
 		}
 	        if (rp->grbuf) {
-	            rs1 = uc_free(rp->grbuf) ;
+	            rs1 = libmem.free(rp->grbuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	            rp->grbuf = nullptr ;
 	        }
@@ -698,9 +701,9 @@ static int record_reload(rec *ep,int grl,ucentgr *ngrp) noex {
 	int		rs = SR_OK ;
         void    	*vp{} ;
         if (ep->grbuf) {
-            rs = uc_realloc(ep->grbuf,(grl+1),&vp) ;
+            rs = libmem.rall(ep->grbuf,(grl + 1),&vp) ;
         } else {
-            rs = uc_malloc((grl+1),&vp) ;
+            rs = libmem.mall((grl + 1),&vp) ;
         }
         if (rs >= 0) {
             char        *grbuf = charp(vp) ; /* new variable */
@@ -709,7 +712,7 @@ static int record_reload(rec *ep,int grl,ucentgr *ngrp) noex {
             ep->grl = grl ;
             rs = grp->load(grbuf,grl,ngrp) ;
             if (rs < 0) {
-                uc_free(vp) ;
+                libmem.free(vp) ;
             }
         } /* end if (ok) */
 	return rs ;
@@ -732,7 +735,7 @@ static int record_refresh(rec *ep,time_t dt,int wc) noex {
 			rs = record_reload(ep,grl,&gr) ;
 	            } else if (rs == rsn) {
 	                if (ep->grbuf) {
-		            uc_free(ep->grbuf) ;
+		            libmem.free(ep->grbuf) ;
 		            ep->grbuf = nullptr ;
 	                }
 	                ep->grl = 0 ; /* signal whatever? */
@@ -743,7 +746,7 @@ static int record_refresh(rec *ep,time_t dt,int wc) noex {
 	                ep->ti_access = dt ;
 	                ep->wcount = wc ;
 	            } /* end if (ok) */
-	            rs1 = uc_free(grbuf) ; /* free first one up top */
+	            rs1 = libmem.free(grbuf) ; /* free first one up top */
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
