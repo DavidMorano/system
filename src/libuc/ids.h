@@ -35,7 +35,7 @@ struct ids_head {
 	gid_t		*gids ;
 	uid_t		uid, euid ;
 	gid_t		gid, egid ;
-} ;
+} ; /* end struct (ids_head) */
 
 #ifdef	__cplusplus
 enum idsmems {
@@ -68,7 +68,8 @@ struct ids : ids_head {
 	    ngroups(this,idsmem_ngroups) ;
 	    release(this,idsmem_release) ;
 	    refresh(this,idsmem_refresh) ;
-	} ;
+	    gids = nullptr ;
+	} ; /* end ctor */
 	ids(const ids &) = delete ;
 	ids &operator = (const ids &) = delete ;
 	int copy(const ids *) noex ;
@@ -83,11 +84,11 @@ typedef IDS		ids ;
 
 EXTERNC_begin
 
-extern int	ids_load(ids *) noex ;
-extern int	ids_ngroups(ids *) noex ;
-extern int	ids_release(ids *) noex ;
-extern int	ids_refresh(ids *) noex ;
-extern int	ids_copy(ids *,const ids *) noex ;
+extern int	ids_load	(ids *) noex ;
+extern int	ids_ngroups	(ids *) noex ;
+extern int	ids_release	(ids *) noex ;
+extern int	ids_refresh	(ids *) noex ;
+extern int	ids_copy	(ids *,const ids *) noex ;
 
 EXTERNC_end
 
