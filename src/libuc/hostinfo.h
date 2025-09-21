@@ -59,7 +59,8 @@ struct hostinfo_head {
 	void		*a ;		/* holds allocation for host-bufs */
 	char		*ehostname ;	/* allocated on start */
 	char		*chostname ;	/* allocated on start */
-	HOSTINFO_FL	init, f ;
+	HOSTINFO_FL	init ;
+	HOSTINFO_FL	fl ;
 	uint		magic ;
 } ;
 
