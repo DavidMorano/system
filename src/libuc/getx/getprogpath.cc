@@ -129,7 +129,7 @@ static int getprogpathrel(ids *idp,vs *plp,char *rbuf,cc *pnp,int pnl) noex {
 	int		rl = 0 ;
 	if ((rs = maxpathlen) >= 0) {
 	    cint	pwdl = rs ;
-	    if (char *pwdp{} ; (rs = uc_libmalloc((pwdl+1),&pwdp)) >= 0) {
+	    if (char *pwdp{} ; (rs = lm_mall((pwdl+1),&pwdp)) >= 0) {
 	        bool	f = false ;
 	        cchar	*pp{} ;
 		pwdp[0] = '\0' ;
@@ -160,7 +160,7 @@ static int getprogpathrel(ids *idp,vs *plp,char *rbuf,cc *pnp,int pnl) noex {
 	            if (rs < 0) break ;
 	        } /* end for */
 	        if ((rs >= 0) && (!f)) rs = SR_NOENT ;
-		rs1 = uc_libfree(pwdp) ;
+		rs1 = lm_free(pwdp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (maxpathlen) */
