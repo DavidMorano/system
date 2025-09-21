@@ -36,12 +36,10 @@
 
 #include	"ema.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
-#pragma		GCC dependency	"ema_entry.ccm"
-#pragma		GCC dependency	"ema_asstr.ccm"
-#pragma		GCC dependency	"ema_parts.ccm"
+#pragma		GCC dependency		"ema_entry.ccm"
+#pragma		GCC dependency		"ema_asstr.ccm"
+#pragma		GCC dependency		"ema_parts.ccm"
 
-import libutil ;
 import ema_entry ;
 import ema_asstr ;
 import ema_parts ;
@@ -50,6 +48,8 @@ import ema_parts ;
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -185,15 +185,16 @@ namespace ema_ns {
 	            if ((state == si_address) &&
 	                (! f_quote) && (c_comment == 0)) {
 	                sz = szof(ema) ;
-	                if ((rs = uc_malloc(sz,&nlp)) >= 0) {
+	                if ((rs = libmem.mall(sz,&nlp)) >= 0) {
 	                    if ((rs = ema_start(nlp)) >= 0) {
 	                        srcp->adv() ;
 	                        rs = ema_parseit(nlp,srcp) ;
-	                        if (rs < 0)
+	                        if (rs < 0) {
 	                            ema_finish(nlp) ;
+				}
 	                    }
 	                    if (rs < 0) {
-	                        uc_free(nlp) ;
+	                        libmem.free(nlp) ;
 	                        nlp = nullptr ;
 	                    }
 	                } /* end if (allocation) */
@@ -306,7 +307,7 @@ namespace ema_ns {
 	        } else if (rs >= 0) {
 	            if (nlp) {
 	                ema_finish(nlp) ;
-	                uc_free(nlp) ;
+	                libmem.free(nlp) ;
 	                nlp = nullptr ;
 	            }
 	        } /* end if */
@@ -314,7 +315,7 @@ namespace ema_ns {
 	    if (rs < 0) {
 	        if (nlp) {
 	            ema_finish(nlp) ;
-	            uc_free(nlp) ;
+	            libmem.free(nlp) ;
 	        }
 	    } /* end if (error) */
 	    op->n += n ;
