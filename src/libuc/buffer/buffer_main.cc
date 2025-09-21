@@ -55,8 +55,13 @@
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<libmallocxx.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<stdintx.h>
 #include	<fmtstr.h>
 #include	<strwcpy.h>
@@ -69,7 +74,11 @@
 
 #include	"buffer.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ulibvals.ccm"
+
+import libutil ;			/* |gelenstr(3u)| */
+import ulibvals ;			/* |maxlinelen(3u)| */
 
 /* local defines */
 
@@ -86,9 +95,9 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -152,6 +161,8 @@ int buffer_hexx(buffer *op,T v) noex {
 
 /* local variables */
 
+static cint		maxlinelen = ulibval.maxline ;
+
 constexpr bool		f_bufstart = CF_BUFSTART ;
 constexpr bool		f_fastgrow = CF_FASTGROW ;
 
@@ -182,7 +193,7 @@ int buffer_finish(buffer *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->dbuf) {
-	        rs1 = uc_libfree(op->dbuf) ;
+	        rs1 = libmem.free(op->dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbuf = nullptr ;
 	    }
@@ -222,18 +233,19 @@ int buffer_adv(buffer *op,int advlen) noex {
 }
 /* end subroutine (buffer_adv) */
 
-int buffer_strw(buffer *op,cchar *sbuf,int slen) noex {
+int buffer_strw(buffer *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && sbuf) {
+	if (op && sp) {
 	    if ((rs = op->clen) >= 0) {
-	        if (slen < 0) slen = lenstr(sbuf) ;
-	        if ((rs = buffer_ext(op,slen)) >= 0) {
-	            char	*bp = (op->dbuf + op->clen) ;
-	            len = intconv(strwcpy(bp,sbuf,slen) - bp) ;
-	            op->clen += len ;
-	        }
-	    }
+		if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	            if ((rs = buffer_ext(op,sl)) >= 0) {
+	                char	*bp = (op->dbuf + op->clen) ;
+	                len = intconv(strwcpy(bp,sp,sl) - bp) ;
+	                op->clen += len ;
+	            } /* end if (buffer_ext) */
+		} /* end if (getlenstr) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
@@ -246,43 +258,50 @@ int buffer_chr(buffer *op,int ch) noex {
 	        if ((rs = buffer_ext(op,1)) >= 0) {
 	            op->dbuf[(op->clen)++] = char(ch) ;
 	            op->dbuf[op->clen] = '\0' ;
-	        }
-	    }
+	        } /* end if (buffer_ext) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? 1 : rs ;
 }
 /* end subroutine (buffer_chr) */
 
-int buffer_buf(buffer *op,cchar *sbuf,int slen) noex {
+int buffer_buf(buffer *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
-	if (op && sbuf) {
+	int		rl = 0 ; /* return-value */
+	if (op && sp) {
 	    if ((rs = op->clen) >= 0) {
-	        if (slen < 0) slen = lenstr(sbuf) ;
-	        if ((rs = buffer_ext(op,slen)) >= 0) {
-	            char	*bp = (op->dbuf + op->clen) ;
-	            memcpy(bp,sbuf,slen) ;
-	            op->clen += slen ;
-	        }
-	    }
+		if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	            if ((rs = buffer_ext(op,sl)) >= 0) {
+	                char	*bp = (op->dbuf + op->clen) ;
+	                memcopy(bp,sp,sl) ;
+	                op->clen += sl ;
+			rl = sl ;
+	            } /* end if (buffer_ext) */
+		} /* end if (getlenstr) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? slen : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (buffer_buf) */
 
 int buffer_vprintf(buffer *op,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		rl = 0 ; /* return-value */
 	if (op && fmt) {
-	    if (char *lbuf ; (rs = libmalloc_ml(&lbuf)) >= 0) {
+	    if ((rs = maxlinelen) >= 0) {
 		cint	llen = rs ;
-	        if ((rs = fmtstr(lbuf,llen,0x01,fmt,ap)) >= 0) {
-	            rs = buffer_strw(op,lbuf,rs) ;
-	        }
-		rs1 = uc_libfree(lbuf) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
+	        if (char *lbuf ; (rs = libmem.mall((llen + 1),&lbuf)) >= 0) {
+	            if ((rs = fmtstr(lbuf,llen,0x01,fmt,ap)) >= 0) {
+	                rs = buffer_strw(op,lbuf,rs) ;
+			rl = rs ;
+	            }
+		    rs1 = libmem.free(lbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (maxlinelen) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (buffer_vprintf) */
 
@@ -423,7 +442,7 @@ static int buffer_ext(buffer *op,int req) noex {
 	    char	*nbuf{} ; /* used-multiple */
 	    if (op->dbuf) {
 	        nlen = max(op->startlen,need) ;
-	        if ((rs = uc_libmalloc((nlen + 1),&nbuf)) >= 0) {
+	        if ((rs = libmem.mall((nlen + 1),&nbuf)) >= 0) {
 	            op->dbuf = nbuf ;
 		    op->dlen = nlen ;
 	        } else {
@@ -438,7 +457,7 @@ static int buffer_ext(buffer *op,int req) noex {
 	                nlen = (nlen + BUFFER_STARTLEN) ;
 		    }
 	        } /* end while */
-	        if ((rs = uc_librealloc(op->dbuf,nlen,&nbuf)) >= 0) {
+	        if ((rs = libmem.rall(op->dbuf,nlen,&nbuf)) >= 0) {
 	            op->dbuf = nbuf ;
 		    op->dlen = nlen ;
 	        } else {
