@@ -38,7 +38,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<bit>			/* <- |countr_zero(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<stdintx.h>
 #include	<baops.h>
 #include	<intceil.h>
@@ -46,7 +52,9 @@
 
 #include	"bits.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -56,8 +64,9 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::popcount ;
-using std::countr_zero ;
+using std::popcount ;			/* subroutine (template) */
+using std::countr_zero ;		/* subroutine (template) */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -132,7 +141,7 @@ int bits_finish(bits *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->a) {
-	        rs1 = uc_libfree(op->a) ;
+	        rs1 = libmem.free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
 	    }
@@ -365,11 +374,11 @@ int alloc::resize(int nsz) noex {
 	if (nsz > asz) {
 	    caddr_t	na{} ;
 	    if (a == nullptr) {
-	        if ((rs = uc_libmalloc(nsz,&na)) >= 0) {
+	        if ((rs = libmem.mall(nsz,&na)) >= 0) {
 	            memclear(na,nsz) ;
 		}
 	    } else {
-	        if ((rs = uc_librealloc(a,nsz,&na)) >= 0) {
+	        if ((rs = libmem.rall(a,nsz,&na)) >= 0) {
 	            memclear((na + asz),(nsz - asz)) ;
 		}
 	    }
