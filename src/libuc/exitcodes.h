@@ -83,6 +83,8 @@
 
 /* exit OK */
 #define	EX_OK		0		/* this is general (good) success */
+#define	EX_SUCCESS	0
+#define	EX_FAILURE	1
 
 /* general favorites */
 #define	EX_UNKNOWN	122		/* unknown reason */
