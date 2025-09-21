@@ -43,7 +43,9 @@
 
 #include	"gncache.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 
 /* local defines */
 
@@ -54,7 +56,7 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -217,7 +219,7 @@ int gncache_finish(GN *op) noex {
 	                    if (rs >= 0) rs = rs1 ;
 		        }
 	                {
-	                    rs1 = uc_free(rp) ;
+	                    rs1 = libmem.free(rp) ;
 	                    if (rs >= 0) rs = rs1 ;
 		        }
 	            } /* end if (non-null) */
@@ -229,7 +231,7 @@ int gncache_finish(GN *op) noex {
 	    }
 	    if (op->flp) {
 	        while (cq_rem(op->flp,&vp) >= 0) {
-	            rs1 = uc_free(vp) ;
+	            rs1 = libmem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end while */
 	    }
@@ -283,15 +285,14 @@ int gncache_lookgid(GN *op,char *rbuf,int rlen,gid_t gid) noex {
 	            rs = gncache_recaccess(op,rp,dt) ;
 	            gl = rs ;
 	        } else if (rs == SR_NOTFOUND) {
-	            char	*gbuf{} ;
-		    if ((rs = malloc_gn(&gbuf)) >= 0) {
+	            if (char *gbuf ; (rs = malloc_gn(&gbuf)) >= 0) {
 			cint	glen = rs ;
 	                ct = ct_miss ;
 	                if ((rs = getgroupname(gbuf,glen,gid)) >= 0) {
 	                    rs = gncache_newrec(op,dt,&rp,gid,gbuf) ;
 	                    gl = rs ;
 	                }
-		        rs1 = uc_free(gbuf) ;
+		        rs1 = malloc_free(gbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 	        } /* end if (search-gid) */
@@ -353,7 +354,7 @@ static int gncache_newrec(GN *op,time_t dt,rec **rpp,gid_t gid,cc *gn) noex {
 		}
 	    } /* end if (record-start) */
 	    if (rs < 0) {
-	        uc_free(rp) ;
+	        libmem.free(rp) ;
 	    }
 	} /* end if */
 	if (rpp) {
@@ -444,10 +445,9 @@ static int gncache_allocrec(GN *op,rec **rpp) noex {
 	int		rs ;
 	if ((rs = cq_rem(op->flp,rpp)) == SR_NOTFOUND) {
 	    cint	sz = sizeof(rec) ;
-	    void	*vp{} ;
-	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 	        *rpp = recp(vp) ;
-	    }
+	    } /* end if (memory-allocation) */
 	} /* end if (cq_rem) */
 	return rs ;
 }
@@ -476,10 +476,10 @@ static int gncache_recfree(GN *op,rec *rp) noex {
 	if (n < GNCACHE_MAXFREE) {
 	    rs = cq_ins(op->flp,rp) ;
 	    if (rs < 0) {
-	        uc_free(rp) ;
+	        libmem.free(rp) ;
 	    }
 	} else {
-	    uc_free(rp) ;
+	    libmem.free(rp) ;
 	}
 	return rs ;
 }
@@ -516,7 +516,7 @@ static int record_start(rec *rp,time_t dt,gid_t gid,cchar *gn) noex {
 		if (char *cp ; (rs = malloc_gn(&cp)) >= 0) {
 		    rp->gn = cp ;
 	            gl = intconv(strwcpy(rp->gn,gn,gnl) - rp->gn) ;
-		}
+		} /* end if (memory-allocation) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? gl : rs ;
@@ -531,7 +531,7 @@ static int record_finish(rec *rp) noex {
 	    rp->gid = -1 ;
 	    if (rp->gn) {
 	        rp->gn[0] = '\0' ;
-		rs1 = uc_free(rp->gn) ;
+		rs1 = libmem.free(rp->gn) ;
 		if (rs >= 0) rs = rs1 ;
 		rp->gn = nullptr ;
 	    }
@@ -555,14 +555,13 @@ static int record_refresh(rec *rp,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		gl = 0 ;
-	char		*gbuf{} ;
-	if ((rs = malloc_gn(&gbuf)) >= 0) {
+	if (char *gbuf ; (rs = malloc_gn(&gbuf)) >= 0) {
 	    cint	glen = rs ;
 	    if ((rs = getgroupname(gbuf,glen,rp->gid)) >= 0) {
 	        gl = rs ;
 	        rs = record_update(rp,dt,gbuf) ;
 	    }
-	    rs1 = uc_free(gbuf) ;
+	    rs1 = malloc_free(gbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? gl : rs ;
