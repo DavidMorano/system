@@ -45,7 +45,9 @@
 
 #include	"namecache.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 
 /* local defines */
 
@@ -64,7 +66,7 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -86,7 +88,7 @@ struct namecache_ent {
 	time_t		ti_init ;
 	time_t		ti_access ;
 	int		realnamelen ;
-} ;
+} ; /* end struct (namecache_ent) */
 
 
 /* forward references */
@@ -94,9 +96,9 @@ struct namecache_ent {
 template<typename ... Args>
 static int namecache_ctor(namecache *op,Args ... args) noex {
     	NAMECACHE	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
 	    if ((op->dbp = new(nothrow) hdb) != np) {
@@ -153,14 +155,14 @@ constexpr bool		f_fullname = CF_FULLNAME ;
 /* exported subroutines */
 
 int namecache_start(NC *op,cchar *vname,int nmax,int ttl) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = namecache_ctor(op,vname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (vname[0]) {
 	        if (nmax < 3) nmax = NAMECACHE_DEFMAX ;
 	        if (ttl < 1) ttl = NAMECACHE_DEFTO ;
-	        if (cchar *cp{} ; (rs = uc_mallocstrw(vname,-1,&cp)) >= 0) {
-		    cnullptr	np{} ;
+	        if (cchar *cp ; (rs = libmem.strw(vname,-1,&cp)) >= 0) {
 	            cint	ne = NAMECACHE_DEFENTS ;
 	            op->vname = cp ;
 	            if ((rs = hdb_start(op->dbp,ne,1,np,np)) >= 0) {
@@ -169,7 +171,8 @@ int namecache_start(NC *op,cchar *vname,int nmax,int ttl) noex {
 	                op->magic = NAMECACHE_MAGIC ;
 	            } /* end if (hdb-start) */
 	            if (rs < 0) {
-		        uc_free(op->vname) ;
+			void *vp = voidp(op->vname) ;
+		        libmem.free(vp) ;
 		        op->vname = nullptr ;
 	            }
 	        } /* end if (memory-allocation) */
@@ -195,7 +198,8 @@ int namecache_finish(NC *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->vname) {
-	        rs1 = uc_free(op->vname) ;
+		void *vp = voidp(op->vname) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->vname = nullptr ;
 	    }
@@ -294,7 +298,7 @@ int namecache_lookup(NC *op,cchar *un,cchar **rpp) noex {
 		            } /* end if (real-name) */
 	                } /* end if (getpw_name) */
 	            } /* end if (hdb_fetch) */
-	            rs1 = uc_free(pwbuf) ;
+	            rs1 = libmem.free(pwbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (memory-allocation) */
 	        if (rpp) {
@@ -322,17 +326,17 @@ int namecache_stats(NC *op,NC_ST *sp) noex {
 /* private subroutines */
 
 static int namecache_newent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
-	cint		msize = szof(NC_ENT) ;
+	cint		msz = szof(NC_ENT) ;
 	int		rs ;
 	if (epp) *epp = nullptr ;
-	if (NC_ENT *ep{} ; (rs = uc_malloc(msize,&ep)) >= 0) {
+	if (NC_ENT *ep{} ; (rs = libmem.mall(msz,&ep)) >= 0) {
 	    if ((rs = entry_start(ep,un,sp,sl)) >= 0) {
 	        hdb_dat		key ;
 	        hdb_dat		val{} ;
 	        key.buf = ep->username ;
 	        key.len = lenstr(ep->username) ;
 	        val.buf = ep ;
-	        val.len = msize ;
+	        val.len = msz ;
 	        if ((rs = hdb_store(op->dbp,key,val)) >= 0) {
 		    if (epp) *epp = ep ;
 		} /* end if (hdb-store) */
@@ -341,7 +345,7 @@ static int namecache_newent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 		}
 	    } /* end if (entry-start) */
 	    if (rs < 0) {
-		uc_free(ep) ;
+		libmem.free(ep) ;
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
@@ -391,7 +395,7 @@ static int namecache_entfins(NC *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_free(ep) ;
+	            rs1 = libmem.free(ep) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	    } /* end while */
@@ -427,7 +431,7 @@ static int entry_finish(NC_ENT *ep) noex {
 	if (ep) {
 	    rs = SR_OK ;
 	    if (ep->a) {
-	        rs1 = uc_free(ep->a) ;
+	        rs1 = libmem.free(ep->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->a = nullptr ;
 	    }
@@ -457,7 +461,7 @@ static int entry_update(NC_ENT *ep,cchar *rp,int rl) noex {
 		        strdcpy1(ubuf,ulen,ep->username) ;
 	                rs = entry_loadnames(ep,ubuf,rp,rl) ;
 		    }
-		    rs1 = uc_free(ubuf) ;
+		    rs1 = libmem.free(ubuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (changed) */
@@ -470,12 +474,12 @@ static int entry_loadnames(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
 	int		rs ;
 	int		sz = 0 ;
 	if (ep->a != nullptr) {
-	    uc_free(ep->a) ;
+	    libmem.free(ep->a) ;
 	    ep->a = nullptr ;
 	}
 	sz += (lenstr(up)+1) ;
 	sz += (lenstr(rp,rl)+1) ;
-	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
+	if (char *bp{} ; (rs = libmem.mall(sz,&bp)) >= 0) {
 	    ep->a = bp ;
 	    ep->username = bp ;
 	    bp = (strwcpy(bp,up,-1)+1) ;
