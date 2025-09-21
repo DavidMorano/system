@@ -46,7 +46,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* memory-allocation */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
 
@@ -58,7 +63,7 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libu::umem ;
 
 
 /* external subroutines */
@@ -75,9 +80,6 @@ using std::nullptr_t ;			/* type */
 
 /* local variables */
 
-constexpr auto		mall = uc_libmalloc ;
-constexpr auto		mfre = uc_libfree ;
-
 
 /* exported variables */
 
@@ -93,7 +95,7 @@ int field_svcargs(field *fbp,vecstr *sap) noex {
 	if (fbp && sap) {
 	    if ((rs = fbp->remaining(np)) >= 0) {
 	        cint	alen = rs ;
-	        if (char *abuf ; (rs = mall((alen+1),&abuf)) >= 0) {
+	        if (char *abuf ; (rs = umem.malloc((alen+1),&abuf)) >= 0) {
 	            while ((rs1 = fbp->sharg(np,abuf,alen)) >= 0) {
 			cint	al = rs1 ;
 	                c += 1 ;
@@ -101,7 +103,7 @@ int field_svcargs(field *fbp,vecstr *sap) noex {
 	                if (rs < 0) break ;
 	            } /* end while */
 		    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
-	            rs1 = mfre(abuf) ;
+	            rs1 = umem.free(abuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a) */
 	    } /* end if (field_remaining) */
