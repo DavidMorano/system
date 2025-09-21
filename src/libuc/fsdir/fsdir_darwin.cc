@@ -70,9 +70,8 @@
 /* imported namespaces */
 
 using std::destroy_at ;			/* subroutine */
-using libu::umemalloc ;			/* subroutine */
-using libu::umemfree ;			/* subroutine */
 using libu::snwcpy ;			/* subroutine */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -109,9 +108,6 @@ static int	fsdir_end(fsdir *) noex ;
 
 
 /* local variables */
-
-constexpr auto		mallo	= umemalloc ;
-constexpr auto		mfree	= umemfree ;
 
 
 /* exported variables */
@@ -228,7 +224,7 @@ static int fsdir_begin(fsdir *op,cchar *dname) noex {
 	cnullptr	np{} ;
 	cint		objl = szof(posixdirent) ;
 	int		rs ;
-	if (void *vp ; (rs = mallo(objl,&vp)) >= 0) {
+	if (void *vp ; (rs = umem.malloc(objl,&vp)) >= 0) {
 	    rs = SR_NOMEM ;
 	    if (posixdirent *objp ; (objp = new(vp) posixdirent) != np) {
 		if ((rs = objp->open(dname)) >= 0) {
@@ -239,7 +235,7 @@ static int fsdir_begin(fsdir *op,cchar *dname) noex {
 		}
 	    } /* end if (operator-new) */
 	    if (rs < 0) {
-		mfree(vp) ;
+		umem.free(vp) ;
 	    }
 	} /* end if (m-a) */
 	return rs ;
@@ -258,7 +254,7 @@ static int fsdir_end(fsdir *op) noex {
 	    }
 	    destroy_at(objp) ;
 	    {
-		rs1 = mfree(op->posixp) ;
+		rs1 = umem.free(op->posixp) ;
 	        if (rs >= 0) rs = rs1 ;
 		op->posixp = nullptr ;
 	    }
