@@ -36,25 +36,8 @@ DEFS=
 INCS= ctx.h
 
 MODS += uconstants.ccm digtab.ccm cvtdig.ccm cvtfloat.ccm
-MODS += fmtflag.ccm
 
 LIBS=
-
-
-INCDIRS=
-
-LIBDIRS= -L${LIBDIR}
-
-
-RUNINFO= -rpath $(RUNDIR)
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0_CTX= cvtdig.o cvtfloat.o
@@ -73,7 +56,23 @@ OBJB_CTX= obj4ctx.o obj5ctx.o obj6ctx.o obj7ctx.o
 OBJ_CTX= obja_ctx.o objb_ctx.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS=
+
+LIBDIRS= -L${LIBDIR}
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -86,6 +85,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -106,8 +108,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_CTX)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_CTX)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 
 again:
@@ -121,35 +123,35 @@ control:
 
 
 obj0ctx.o:		$(OBJ0_CTX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_CTX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1ctx.o:		$(OBJ1_CTX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_CTX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2ctx.o:		$(OBJ2_CTX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_CTX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3ctx.o:		$(OBJ3_CTX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_CTX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4ctx.o:		$(OBJ4_CTX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_CTX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5ctx.o:		$(OBJ5_CTX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_CTX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj6ctx.o:		$(OBJ6_CTX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6_CTX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj7ctx.o:		$(OBJ7_CTX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7_CTX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja_ctx.o:		$(OBJA_CTX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_CTX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb_ctx.o:		$(OBJB_CTX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_CTX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 ctchars.o:		mods.o ctchars.cc ctchars.h	$(INCS)
@@ -166,7 +168,6 @@ ctroman.o:		mods.o ctroman.cc ctroman.h	$(INCS)
 ctwords.o:		mods.o ctwords.cc ctwords.hh	$(INCS)
 
 MOBJ += uconstants.o digtab.o cvtdig.o cvtfloat.o
-MOBJ += fmtflag.o
 
 mods.o:			$(MOBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
@@ -176,7 +177,5 @@ digtab.o:		digtab.ccm
 
 cvtdig.o:		cvtdig.ccm 			$(INCS)
 cvtfloat.o:		cvtfloat.ccm 			$(INCS)
-
-fmtflag.o:		fmtflag.ccm			$(INCS)
 
 
