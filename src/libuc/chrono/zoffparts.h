@@ -26,7 +26,7 @@
 
 *******************************************************************************/
 
-#ifndef	ZOFFPATHS_INCLUDE
+#ifndef	ZOFFPARTS_INCLUDE
 #define	ZOFFPARTS_INCLUDE
 
 
