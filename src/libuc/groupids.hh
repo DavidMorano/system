@@ -33,7 +33,7 @@ enum groupidsmems {
 	groupidsmem_ngroups,
 	groupidsmem_finish,
 	groupidsmem_overlast
-} ;
+} ; /* end enum (groupidsmems) */
 
 struct groupids ;
 
@@ -68,10 +68,10 @@ struct groupids {
 	gid_t		*gids = nullptr ;
 	int		ng = 0 ;
 	groupids() noex {
-	    start(this) ;
-	    ngroups(this,groupidsmem_ngroups) ;
-	    finish(this,groupidsmem_finish) ;
-	} ;
+	    start	(this) ;
+	    ngroups	(this,groupidsmem_ngroups) ;
+	    finish	(this,groupidsmem_finish) ;
+	} ; /* end ctor */
 	groupids(const groupids &) = delete ;
 	groupids &operator = (const groupids &) = delete ;
 	int get(gid_t **) noex ;
