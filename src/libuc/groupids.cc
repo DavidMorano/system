@@ -70,8 +70,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-
 
 /* local typedefs */
 
@@ -123,7 +121,7 @@ int groupids::istart(gid_t **gpp) noex {
 	if ((rs = u_getgroups(0,np)) >= 0) ylikely {
 	    cint	sz = ((rs + 1) * szof(gid_t)) ;
 	    ng = rs ;
-	    if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) ylikely {
+	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
 		gids = (gid_t *) vp ;
 		if ((rs = u_getgroups(ng,gids)) >= 0) ylikely {
 		    gids[ng] = gidend ;
@@ -132,7 +130,7 @@ int groupids::istart(gid_t **gpp) noex {
 		    }
 		}
 		if (rs < 0) {
-		    uc_libfree(gids) ;
+		    lm_free(gids) ;
 		    gids = nullptr ;
 		}
 	    } /* end if (m-a) */
@@ -145,7 +143,7 @@ int groupids::ifinish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (gids) ylikely {
-	    rs1 = uc_libfree(gids) ;
+	    rs1 = lm_free(gids) ;
 	    if (rs >= 0) rs = rs1 ;
 	    gids = nullptr ;
 	} /* end if (non-null) */
