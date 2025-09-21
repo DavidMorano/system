@@ -33,7 +33,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>		/* |trullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<sncpyx.h>
@@ -41,7 +41,9 @@
 
 #include	"cachetime.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 
 /* local defines */
 
@@ -53,7 +55,7 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -169,7 +171,7 @@ int cachetime_finish(CT *op) noex {
 	                        if (rs >= 0) rs = rs1 ;
 		            }
 		            {
-		                rs1 = uc_free(ep) ;
+		                rs1 = libmem.free(ep) ;
 	                        if (rs >= 0) rs = rs1 ;
 		            }
 		        }
@@ -193,20 +195,21 @@ int cachetime_finish(CT *op) noex {
 }
 /* end subroutine (cachetime_finish) */
 
-int cachetime_lookup(CT *op,cchar *sp,int sl,time_t *timep) noex {
+int cachetime_lookup(CT *op,cchar *sp,int µsl,time_t *timep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
 	if ((rs = cachetime_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
-		{
-	            rs = cachetime_lookuper(op,sp,sl,timep) ;
-		    rv = rs ;
-		}
-	        rs1 = ptm_unlock(op->mxp) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (mutex) */
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	        if ((rs = ptm_lock(op->mxp)) >= 0) {
+		    {
+	                rs = cachetime_lookuper(op,sp,sl,timep) ;
+		        rv = rs ;
+		    }
+	            rs1 = ptm_unlock(op->mxp) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (mutex) */
+	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
 }
@@ -312,7 +315,7 @@ static int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
 	    f_hit = true ;
 	} else if (rs == SR_NOTFOUND) {
 	    cint	sz = sizeof(ent) ;
-	    if ((rs = uc_malloc(sz,&ep)) >= 0) {
+	    if ((rs = libmem.mall(sz,&ep)) >= 0) {
 	        if ((rs = entry_start(ep,sp,sl)) >= 0) {
 	    	    key.buf = ep->name ;
 	    	    key.len = lenstr(ep->name) ;
@@ -327,7 +330,7 @@ static int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
 		    }
 	        } /* end if (entry) */
 		if (rs < 0) {
-		    uc_free(ep) ;
+		    libmem.free(ep) ;
 		}
 	    } /* end if (memory-allocation) */
 	} /* end if */
@@ -339,14 +342,14 @@ static int entry_start(ent *ep,cchar *sp,int sl) noex {
 	int		rs ;
 	cchar		*cp ;
 	memclear(ep) ; /* dangerous */
-	if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
-	    USTAT	sb ;
-	    if ((rs = u_stat(cp,&sb)) >= 0) {
+	if ((rs = libmem.strw(sp,sl,&cp)) >= 0) {
+	    if (ustat sb ; (rs = u_stat(cp,&sb)) >= 0) {
 		ep->name = cp ;
 	        ep->mtime = sb.st_mtime ;
 	    }
 	    if (rs < 0) {
-	        uc_free(cp) ;
+		void *vp = voidp(cp) ;
+	        libmem.free(vp) ;
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
@@ -357,7 +360,8 @@ static int entry_finish(ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->name != nullptr) {
-	    rs1 = uc_free(ep->name) ;
+	    void *vp = voidp(ep->name) ;
+	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->name = nullptr ;
 	}
