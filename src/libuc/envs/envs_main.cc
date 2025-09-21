@@ -37,7 +37,9 @@
 
 #include	"envs.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |emclear(3u)| + |lenstr(3u)| */
 
 /* local defines */
 
@@ -62,7 +64,7 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -172,7 +174,7 @@ int envs_finish(envs *op) noex {
 			if (rs >= 0) rs = rs1 ;
 		    }
 		    {
-			rs1 = uc_free(ep) ;
+			rs1 = libmem.free(ep) ;
 			if (rs >= 0) rs = rs1 ;
 		    }
 		}
@@ -214,7 +216,7 @@ int envs_store(envs *op,cchar *kp,int fa,cchar *vp,int vl) noex {
 	        }
 	    } else if (rs == SR_NOTFOUND) {
 	        cint	esz = szof(ENVS_ENT) ;
-	        if ((rs = uc_malloc(esz,&ep)) >= 0) {
+	        if ((rs = libmem.mall(esz,&ep)) >= 0) {
 	            int		knl ;
 	            cchar	*knp ;
 		    if ((rs = entry_start(ep,kp,vp,vl,&knp)) >= 0) {
@@ -229,7 +231,7 @@ int envs_store(envs *op,cchar *kp,int fa,cchar *vp,int vl) noex {
 		        }
 		    } /* end if (entry_start) */
 		    if (rs < 0) {
-		        uc_free(ep) ;
+		        libmem.free(ep) ;
 		    }
 	        } /* end if (allocated entry) */
 	    } /* end if */
@@ -288,12 +290,12 @@ int envs_curbegin(envs *op,ENVS_CUR *curp) noex {
 	if ((rs = envs_magic(op,curp)) >= 0) {
 	    cint	osz = szof(hdb_cur) ;
 	    curp->i = -1 ;
-	    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(osz,&vp)) >= 0) {
 	        hdb_cur		*ocp = (hdb_cur *) vp ;
 		curp->curp = ocp ;
 	        rs = ENVS_DBCURBEGIN(op->varp,ocp) ;
 		if (rs < 0) {
-		    uc_free(curp->curp) ;
+		    libmem.free(curp->curp) ;
 		    curp->curp = nullptr ;
 		}
 	    } /* end if (m-a) */
@@ -311,7 +313,7 @@ int envs_curend(envs *op,ENVS_CUR *curp) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (curp->curp) {
-		rs1 = uc_free(curp->curp) ;
+		rs1 = libmem.free(curp->curp) ;
 		if (rs >= 0) rs = rs1 ;
 		curp->curp = nullptr ;
 	    }
@@ -427,7 +429,7 @@ static int entry_start(ENVS_ENT *ep,cc *kp,cc *vnam,int vnlen,cc**rpp) noex {
 	if (ep && kp) {
 	    rs = SR_INVALID ;
 	    if (kp[0]) {
-	        if (cchar *cp{} ; (rs = uc_mallocstrw(kp,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = libmem.strw(kp,-1,&cp)) >= 0) {
 		    vecstr	*elp = &ep->elist ;
 	            cint	vn = ENVS_DEFENTS ;
 	            int		vo = 0 ;
@@ -446,7 +448,8 @@ static int entry_start(ENVS_ENT *ep,cc *kp,cc *vnam,int vnlen,cc**rpp) noex {
 			}
 	            } /* end if (vecstr_start) */
 	            if (rs < 0) {
-		        uc_free(ep->kp) ;
+			void *vp = voidp(ep->kp) ;
+		        libmem.free(vp) ;
 		        ep->kp = nullptr ;
 	            }
 	        } /* end if (memory-allocation) */
@@ -463,7 +466,8 @@ static int entry_finish(ENVS_ENT *ep) noex {
 	    vecstr	*elp = &ep->elist ;
 	    rs = SR_OK ;
 	    if (ep->kp) {
-		rs1 = uc_free(ep->kp) ;
+		void *vp = voidp(ep->kp) ;
+		rs1 = libmem.free(vp) ;
 		if (rs >= 0) rs = rs1 ;
 		ep->kp = nullptr ;
 	    }
