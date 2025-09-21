@@ -31,13 +31,21 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= hash.h
+INCS += hash.h
 
 MODS +=
 
-LIBS=
+LIBS +=
+
+
+OBJ0= hash_elf.o hash_djb.o hash_hsieh.o
+OBJ1= hash_again.o 
+OBJ2= hashindex.o
+OBJ3=
+
+OBJ_HASH= obj0.o obj1.o obj2.o
 
 
 INCDIRS=
@@ -46,7 +54,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,13 +64,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= hash_again.o hash_elf.o hash_hsieh.o
-OBJ1= hashindex.o
-
-OBJ_HASH= obj0.o obj1.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -77,6 +78,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -89,17 +93,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_HASH)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_HASH)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -112,15 +114,22 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-hash_again.o:		hash_again.cc			$(INCS)
 hash_elf.o:		hash_elf.cc			$(INCS)
+hash_djb.o:		hash_djb.cc			$(INCS)
 hash_hsieh.o:		hash_hsieh.cc			$(INCS)
+hash_again.o:		hash_again.cc			$(INCS)
 
 hashindex.o:		hashindex.cc hashindex.h	$(INCS)
 
