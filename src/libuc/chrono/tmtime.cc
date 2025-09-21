@@ -64,7 +64,7 @@
 
 #include	"tmtime.hh"
 
-import libutil ;
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -96,8 +96,8 @@ static int tmtime_ctor(tmtime *op,Args ... args) noex {
 		    op->zname = a ;
 		    memclear(a,rs) ;
 		    a[rs] = '\0' ;
-	        }
-	    }
+	        } /* end if (memory-allocation) */
+	    } /* end if (NULL zname) */
 	} /* end if (non-null) */
 	return rs ;
 }
