@@ -2,15 +2,16 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* perform the hash done in processing ELF files */
+/* perform the hash algorithm done in processing ELF files (GNU version) */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-	This code was originally written.  The idea of this
-	hash is taken from the ELF-type object manipulation procedures.
+	This code was originally written by the famous Peter Jay
+	Weinberger of AT&T Bell Laboratories (see notes below).  It
+	was adapted into its present form by me.
 
 */
 
@@ -56,7 +57,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -65,7 +65,9 @@
 
 #include	"hash.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
