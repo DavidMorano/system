@@ -76,10 +76,11 @@ struct bufstr : bufstr_head {
 	bufstr_co	strsize ;
 	bufstr_co	finish ;
 	bufstr() noex {
-	    start(this,bufstrmem_start) ;
-	    strsize(this,bufstrmem_strsize) ;
-	    finish(this,bufstrmem_finish) ;
-	} ;
+	    start	(this,bufstrmem_start) ;
+	    strsize	(this,bufstrmem_strsize) ;
+	    finish	(this,bufstrmem_finish) ;
+	    dbuf = nullptr ;
+	} ; /* end ctor */
 	bufstr(const bufstr &) = delete ;
 	bufstr &operator = (const bufstr &) = delete ;
 	int strw(cchar *,int = -1) noex ;
