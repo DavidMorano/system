@@ -65,6 +65,7 @@ import libutil ;			/* |memcopy(3u)| */
 
 using std::min ;		/* subroutine-template */
 using std::max ;		/* subroutine-template */
+using libuc::libmem ;		/* variable */
 
 
 /* local typedefs */
@@ -132,7 +133,7 @@ int filer_start(filer *op,int fd,off_t foff,int bsz,int of) noex {
 		op->fd = fd ;
 		op->of = of ;
 		if ((rs = filer_adjbuf(op,bsz)) >= 0) {
-	            if (char *p ; (rs = uc_libvalloc(bsz,&p)) >= 0) {
+	            if (char *p ; (rs = libmem.vall(bsz,&p)) >= 0) {
 	                op->dbuf = p ;
 	                op->bp = p ;
 	                if (foff < 0) {
@@ -144,7 +145,7 @@ int filer_start(filer *op,int fd,off_t foff,int bsz,int of) noex {
 			    op->magic = FILER_MAGIC ;
 	                } /* end if (ok) */
 	                if (rs < 0) {
-		            uc_libfree(op->dbuf) ;
+		            libmem.free(op->dbuf) ;
 		            op->dbuf = nullptr ;
 	                }	
 	            } /* end if (memory-allocation) */
@@ -167,7 +168,7 @@ int filer_finish(filer *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->dbuf) {
-	        rs1 = uc_libfree(op->dbuf) ;
+	        rs1 = libmem.free(op->dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbuf = nullptr ;
 	    }
@@ -443,12 +444,12 @@ int filer_vprintf(filer *op,cchar *fmt,va_list ap) noex {
 	if ((rs = filer_magic(op,fmt,ap)) >= 0) {
 	    if ((rs = maxlinelen) >= 0) {
 		cint	llen = rs ;
-		if (char *lbuf{} ; (rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
+		if (char *lbuf ; (rs = libmem.mall((llen + 1),&lbuf)) >= 0) {
 	    	    if ((rs = fmtstr(lbuf,llen,0,fmt,ap)) >= 0) {
 	    	        rs = filer_write(op,lbuf,rs) ;
 			wlen = rs ;
 		    }
-		    rs1 = uc_libfree(lbuf) ;
+		    rs1 = libmem.free(lbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (maxlinelen) */
