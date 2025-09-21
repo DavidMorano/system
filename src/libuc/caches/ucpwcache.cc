@@ -410,7 +410,7 @@ int ucpwcache::iopbegin() noex {
 	int		rs = SR_OK ;
 	if (pwc == nullptr) {
 	    cint	esz = szof(ucpwcache) ;
-	    if (void *vp ; (rs = uc_libmalloc(esz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(esz,&vp)) >= 0) {
 	        cint		amax = UCPWCACHE_MAX ;
 	        cint		attl = UCPWCACHE_TTL ;
 	        pwcache		*pwcp = (pwcache *) vp ;
@@ -420,7 +420,7 @@ int ucpwcache::iopbegin() noex {
 	            ttl = attl ;
 		}
 	        if (rs < 0) {
-	            uc_libfree(vp) ;
+	            lm_free(vp) ;
 		}
 	    } /* end if (memory-allocation) */
 	} /* end if (needed initialization) */
@@ -438,7 +438,7 @@ int ucpwcache::iopend() noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = uc_libfree(pwc) ;
+	        rs1 = lm_free(pwc) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    pwc = nullptr ;
