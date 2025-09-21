@@ -42,16 +42,18 @@
 
 #include	"dirseen.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -297,10 +299,10 @@ int entry_start(dirseen_ent *ep,cchar *sp,int sl,dev_t dev,ino_t ino) noex {
 	int		rs ;
 	ep->dev = dev ;
 	ep->ino = ino ;
-	if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) ylikely {
+	if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) ylikely {
 	    ep->namep = cp ;
 	    ep->namel = rs ;
-	}
+	} /* end if (memory-allocation) */
 	return rs ;
 }
 /* end subroutine (entry_start) */
@@ -311,7 +313,8 @@ int entry_finish(dirseen_ent *ep) noex {
 	if (ep) {
 	    rs = SR_OK ;
 	    if (ep->namep) ylikely {
-	        rs1 = uc_free(ep->namep) ;
+		void *vp = voidp(ep->namep) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->namep = nullptr ;
 		ep->namel = 0 ;
