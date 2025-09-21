@@ -84,7 +84,7 @@ static cpcchar		dialers[] = {
 	[opendial_prog] 		= "prog", 
 	[opendial_finger] 		= "finger", 
 	[opendial_overlast] 		= nullptr
-} ;
+} ; /* end array (dialers) */
 
 
 /* exported variables */
