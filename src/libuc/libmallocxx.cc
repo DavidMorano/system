@@ -41,7 +41,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<sysval.hh>
 #include	<getbufsize.h>
 
@@ -51,7 +57,19 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+extern "C" {
+    int lm_mallsys(int w,charpp rpp) noex ;
+}
 
 
 /* external variables */
@@ -75,105 +93,112 @@ static sysval		pagesize(sysval_ps) ;
 
 int libmalloc_ma(char **rpp) noex {
 	cint	w = getbufsize_ma ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_mn(char **rpp) noex {
 	cint	w = getbufsize_mn ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_mp(char **rpp) noex {
 	cint	w = getbufsize_mp ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_ml(char **rpp) noex {
 	cint	w = getbufsize_ml ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_mm(char **rpp) noex {
 	cint	w = getbufsize_mm ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_nn(char **rpp) noex {
 	cint	w = getbufsize_nn ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_hn(char **rpp) noex {
 	cint	w = getbufsize_hn ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_un(char **rpp) noex {
 	cint	w = getbufsize_un ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_gn(char **rpp) noex {
 	cint	w = getbufsize_gn ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_pn(char **rpp) noex {
 	cint	w = getbufsize_pn ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_pw(char **rpp) noex {
 	cint	w = getbufsize_pw ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_sp(char **rpp) noex {
 	cint	w = getbufsize_sp ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_ua(char **rpp) noex {
 	cint	w = getbufsize_ua ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_gr(char **rpp) noex {
 	cint	w = getbufsize_gr ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_pj(char **rpp) noex {
 	cint	w = getbufsize_pj ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_pr(char **rpp) noex {
 	cint	w = getbufsize_pr ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_nw(char **rpp) noex {
 	cint	w = getbufsize_nw ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_ho(char **rpp) noex {
 	cint	w = getbufsize_ho ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_sv(char **rpp) noex {
 	cint	w = getbufsize_sv ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_fs(char **rpp) noex {
 	cint	w = getbufsize_fs ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_sn(char **rpp) noex {
 	cint	w = getbufsize_sn ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_zn(char **rpp) noex {
 	cint	w = getbufsize_zn ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 int libmalloc_zi(char **rpp) noex {
 	cint	w = getbufsize_zi ;
-	return uc_libmallocsys(w,rpp) ;
+	return lm_mallsys(w,rpp) ;
 }
 
 int libmalloc_ps(char **rpp) noex {
 	int             rs ;
         if ((rs = pagesize) >= 0) {
             cint        sz = (rs + 1) ;
-            rs = uc_libvalloc(sz,rpp) ;
+            rs = libmem.vall(sz,rpp) ;
         }
         return rs ;
+} /* end if (libmalloc_ps) */
+
+int libmalloc_strw(cchar *sp,int sl,cchar **rpp) noex {
+    	return libmem.strw(sp,sl,rpp) ;
 }
-/* end if (libmalloc_ps) */
+
+int libmalloc_free(void *p) noex {
+    	return libmem.free(p) ;
+}
 
 
