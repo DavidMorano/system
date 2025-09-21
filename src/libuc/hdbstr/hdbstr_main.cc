@@ -34,7 +34,13 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<hdb.h>
 #include	<strwcpy.h>
 #include	<strdcpyx.h>
@@ -42,7 +48,7 @@
 
 #include	"hdbstr.h"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -55,6 +61,8 @@ import libutil ;
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -81,8 +89,7 @@ static int hdbstr_ctor(hdbstr *op,Args ... args) noex {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (hdbstr_ctor) */
+} /* end subroutine (hdbstr_ctor) */
 
 static int hdbstr_dtor(hdbstr *op) noex {
 	int		rs = SR_FAULT ;
@@ -90,8 +97,7 @@ static int hdbstr_dtor(hdbstr *op) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (hdbstr_dtor) */
+} /* end subroutine (hdbstr_dtor) */
 
 template<typename ... Args>
 static inline int hdbstr_magic(hdbstr *op,Args ... args) noex {
@@ -100,8 +106,7 @@ static inline int hdbstr_magic(hdbstr *op,Args ... args) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (hdbstr_magic) */
+} /* end subroutine (hdbstr_magic) */
 
 static int	hdbstr_finents(hdbstr *) noex ;
 
@@ -160,8 +165,9 @@ static int hdbstr_finents(hdbstr *op) noex {
             hdb_dat	key{} ;
             hdb_dat	val{} ;
             while ((rs1 = hdb_curenum(op,&cur,&key,&val)) >= 0) {
-                if (key.buf != nullptr) {
-                    rs1 = uc_free(key.buf) ;
+                if (key.buf) {
+		    void *vp = cast_const<voidp>(key.buf) ;
+                    rs1 = libmem.free(vp) ;
                     if (rs >= 0) rs = rs1 ;
                 }
                 n += 1 ;
@@ -188,7 +194,7 @@ int hdbstr_add(hdbstr *op,cchar *kstr,int klen,cchar *vstr,int vlen) noex {
 	        vlen = 0 ;
 	    }
 	    sz = (klen + vlen + 2) ;
-	    if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
+	    if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
 	        hdb_dat		key ;
 	        hdb_dat		val ;
 	        key.buf = bp ;
@@ -199,7 +205,7 @@ int hdbstr_add(hdbstr *op,cchar *kstr,int klen,cchar *vstr,int vlen) noex {
 	        if (vstr) strwcpy(bp,vstr,vlen) ;
 	        rs = hdb_store(op,key,val) ;
 	        if (rs < 0) {
-	            uc_free(bp) ;
+	            libmem.free(bp) ;
 	        }
 	    } /* end if (memory-allocation) */
 	} /* end if (magic) */
@@ -348,8 +354,9 @@ int hdbstr_delkey(hdbstr *op,cchar *kstr,int klen) noex {
 		    rs = rs1 ;
 		    if (rs < 0) break ;
 	            if (hdb_curdel(op,&cur,1) >= 0) {
-	                if (key.buf != nullptr) {
-	                    uc_free(key.buf) ;
+	                if (key.buf) {
+		    	    void *vp = cast_const<voidp>(key.buf) ;
+	                    libmem.free(vp) ;
 	                    key.buf = nullptr ;
 	                }
 	            } /* end if */
@@ -365,8 +372,9 @@ int hdbstr_delkey(hdbstr *op,cchar *kstr,int klen) noex {
 			f = f || (strncmp(s1,s2,skey.len) != 0) ;
 			if (f) break ;
 	                if (hdb_curdel(op,&cur,0) >= 0) {
-	                    if (key.buf != nullptr) {
-	                        uc_free(key.buf) ;
+	                    if (key.buf) {
+		    		void *vp = cast_const<voidp>(key.buf) ;
+	                        libmem.free(vp) ;
 	                        key.buf = nullptr ;
 	                    }
 	                } /* end if */
@@ -390,7 +398,10 @@ int hdbstr_curdel(hdbstr *op,hc *curp,int f_adv) noex {
 	    if ((rs = hdb_curget(op,curp,&key,&val)) >= 0) {
 	        cchar	*kp = charp(key.buf) ;
 	        if ((rs = hdb_curdel(op,curp,f_adv)) >= 0) {
-	            if (kp) uc_free(kp) ;
+	            if (kp) {
+			void *vp = voidp(kp) ;
+			libmem.free(vp) ;
+		    }
 	        }
 	    } /* end if */
 	} /* end if (magic) */
@@ -454,18 +465,18 @@ int hdbstr_count(hdbstr *op) noex {
 
 hdbstr_iter hdbstr::begin() noex {
     	hdbstr_iter	it ;
-    	int		rs = SR_OK ;
-	    cint csz = szof(hdbstr_cur) ;
-	    if (void *vp{} ; (rs = uc_malloc(csz,&vp)) >= 0) {
-		it.curp = (hdb_cur *) vp ;
-    	        it.op = this ;
-		rs = hdbstr_curbegin(it.op,it.curp) ;
-		if (rs < 0) {
-		    uc_free(it.curp) ;
-		    it.curp = nullptr ;
-		    it.op = nullptr ;
-		} /* end if (error handling) */
-	    } /* end if (memory-allocation) */
+	cint		csz = szof(hdbstr_cur) ;
+    	int		rs ;
+	if (void *vp ; (rs = libmem.mall(csz,&vp)) >= 0) {
+	    it.curp = (hdb_cur *) vp ;
+	    it.op = this ;
+	    rs = hdbstr_curbegin(it.op,it.curp) ;
+	    if (rs < 0) {
+		libmem.free(it.curp) ;
+		it.curp = nullptr ;
+		it.op = nullptr ;
+	    } /* end if (error handling) */
+	} /* end if (memory-allocation) */
 	if (rs < 0) {
 	    ulogerror(objname,rs,"begin") ;
 	}
@@ -475,18 +486,18 @@ hdbstr_iter hdbstr::begin() noex {
 
 hdbstr_iter hdbstr::end() noex {
     	hdbstr_iter	it ;
+	cint		csz = szof(hdbstr_cur) ;
     	int		rs = SR_OK ;
-	    cint csz = szof(hdbstr_cur) ;
-	    if (void *vp{} ; (rs = uc_malloc(csz,&vp)) >= 0) {
-		it.curp = (hdb_cur *) vp ;
-    	        it.op = this ;
-		rs = hdbstr_curend(it.op,it.curp) ;
-		if (rs < 0) {
-		    uc_free(it.curp) ;
-		    it.curp = nullptr ;
-		    it.op = nullptr ;
-		} /* end if (error handling) */
-	    }
+	if (void *vp ; (rs = libmem.mall(csz,&vp)) >= 0) {
+	    it.curp = (hdb_cur *) vp ;
+	    it.op = this ;
+	    rs = hdbstr_curend(it.op,it.curp) ;
+	    if (rs < 0) {
+		libmem.free(it.curp) ;
+		it.curp = nullptr ;
+		it.op = nullptr ;
+	    } /* end if (error handling) */
+	} /* end if (memory-allocation) */
 	if (rs < 0) {
 	    ulogerror(objname,rs,"begin") ;
 	}
