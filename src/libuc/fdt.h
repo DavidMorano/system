@@ -8,7 +8,11 @@
 
 
 #include	<envstandards.h>	/* must be ordered fist to configure */
-#include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 
 #include	"ucb.h"
@@ -20,13 +24,13 @@
 
 
 struct fdt_ent {
-	int		fd ;
 	UCB		ucbp ;
+	int		fd ;
 } ;
 
 struct fdt_head {
-	ulong		magic ;
 	vecobj		entries ;
+	uint		magic ;
 } ;
 
 typedef FDT		fdt ;
@@ -34,15 +38,14 @@ typedef FDT_ENT		fdt_ent ;
 
 EXTERNC_begin
 
-extern int	fdt_alloc(FDT *,int,UCB **) noex ;
-extern int	fdt_get(FDT *,int,UCB **) noex ;
-extern int	fdt_free(FDT *,int) noex ;
-extern int	fdt_getentry(FDT *,int,FDT_ENT *) noex ;
+extern int	fdt_alloc(fdt *,int,UCB **) noex ;
+extern int	fdt_get(fdt *,int,UCB **) noex ;
+extern int	fdt_free(fdt *,int) noex ;
+extern int	fdt_getentry(fdt *,int,fdt_ent *) noex ;
 
 EXTERNC_end
 
 
 #endif /* FDT_INCLUDE */
-
 
 
