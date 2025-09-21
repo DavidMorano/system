@@ -31,17 +31,19 @@ module ;
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<functional>		/* |mem_fn(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<ucmemalloc.h>		/* |ucmemalloc(3uc)| */
-#include	<mallocstuff.h>
+#include	<uclibmem.h>		/* |uclibmem(3uc)| */
 #include	<ema.h>
 #include	<localmisc.h>
 
 #include	"ema.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 export module ema_entry ;
 
@@ -58,6 +60,8 @@ export {
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -77,6 +81,28 @@ typedef ema_ent	*	entp ;
 
 /* forward references */
 
+local int itemallo(ccharp &dp,cchar *ip,int il) noex {
+    	int		rs = SR_OK ;
+	if (ip) {
+	    if (cchar *cp ; (rs = libmem.strw(ip,il,&cp)) >= 0) {
+		dp = cp ;
+	    }
+	} /* end if (non-null) */
+    	return rs ;
+} /* end subroutine (itemallo) */
+
+local int itemfree(ccharp &ip) noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	if (ip) {
+	    void *vp = voidp(ip) ;
+	    rs1 = libmem.free(vp) ;
+	    if (rs >= 0) rs = rs1 ;
+	    ip = nullptr ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (itemfree) */
+
 
 /* local variables */
 
@@ -86,98 +112,92 @@ typedef ema_ent	*	entp ;
 
 /* exported subroutines */
 
-   int entry_start(ema_ent *ep) noex {
+int entry_start(ema_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	if (ep) {
 	    rs = memclear(ep) ; /* dangerous */
 	    ep->type = ematype_reg ;
 	}
 	return rs ;
-    } /* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
-   int entry_finish(ema_ent *ep) noex {
+int entry_finish(ema_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (ep) {
 	    rs = SR_OK ;
-	    if (ep->op != nullptr) {
-	        rs1 = uc_free(ep->op) ;
+	    {
+	        rs1 = itemfree(ep->op) ;
 	        if (rs >= 0) rs = rs1 ;
-	        ep->op = nullptr ;
 	    }
-	    if (ep->ap != nullptr) {
-	        rs1 = uc_free(ep->ap) ;
+	    {
+	        rs1 = itemfree(ep->ap) ;
 	        if (rs >= 0) rs = rs1 ;
-	        ep->ap = nullptr ;
 	    }
-	    if (ep->rp != nullptr) {
-	        rs1 = uc_free(ep->rp) ;
+	    {
+		rs1 = itemfree(ep->rp) ;
 	        if (rs >= 0) rs = rs1 ;
-	        ep->rp = nullptr ;
 	    }
-	    if (ep->cp != nullptr) {
-	        rs1 = uc_free(ep->cp) ;
+	    {
+	        rs1 = itemfree(ep->cp) ;
 	        if (rs >= 0) rs = rs1 ;
-	        ep->cp = nullptr ;
 	    }
-	    if (ep->listp != nullptr) {
+	    if (ep->listp) {
 		{
 		    ema *emap = cast_static<ema *>(ep->listp) ;
 	            rs1 = ema_finish(emap) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_free(ep->listp) ;
+	            rs1 = libmem.free(ep->listp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	        ep->listp = nullptr ;
 	    } /* end if (recursive free-up) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
-   int entry_startload(ema_ent *ep,ema_ent *oep) noex {
-	int		rs = SR_OK ;
-	*ep = *oep ;
-	if (oep->op != nullptr) {
-	    ep->op = mallocstrw(oep->op,oep->ol) ;
-	}
-	if (oep->ap != nullptr) {
-	    ep->ap = mallocstrw(oep->ap,oep->al) ;
-	}
-	if (oep->rp != nullptr) {
-	    ep->rp = mallocstrw(oep->rp,oep->rl) ;
-	}
-	if (oep->cp != nullptr) {
-	    ep->cp = mallocstrw(oep->cp,oep->cl) ;
-	}
-	if (oep->listp != nullptr) {
-	    cint	nsz = szof(ema) ;
-	    ep->listp = nullptr ;
-	    if (void *vp ; (rs = uc_malloc(nsz,&vp)) >= 0) {
-	        ema *nop = resumelife<ema>(vp) ;
-	        if ((rs = ema_start(nop)) >= 0) {
-		    ema *emap = resumelife<ema>(ep->listp) ;
-	            if ((rs = ema_addents(nop,emap)) >= 0) {
-	                ep->listp = nop ;
-	            }
+int entry_startload(ema_ent *ep,ema_ent *oep) noex {
+	int		rs = SR_FAULT ;
+	if (ep && oep) {
+	    rs = SR_OK ;
+	    *ep = *oep ; /* <- copy */
+	    if (rs >= 0) rs = itemallo(ep->op,oep->op,oep->ol) ;
+	    if (rs >= 0) rs = itemallo(ep->ap,oep->ap,oep->al) ;
+	    if (rs >= 0) rs = itemallo(ep->rp,oep->rp,oep->rl) ;
+	    if (rs >= 0) rs = itemallo(ep->cp,oep->cp,oep->cl) ;
+	    if (oep->listp != nullptr) {
+	        cint	nsz = szof(ema) ;
+	        ep->listp = nullptr ;
+	        if (void *vp ; (rs = libmem.mall(nsz,&vp)) >= 0) {
+	            ema *nop = resumelife<ema>(vp) ;
+	            if ((rs = ema_start(nop)) >= 0) {
+		        ema *emap = resumelife<ema>(ep->listp) ;
+	                if ((rs = ema_addents(nop,emap)) >= 0) {
+	                    ep->listp = nop ;
+	                }
+	                if (rs < 0) {
+	                    ema_finish(nop) ;
+		        }
+	            } /* end if (ema_start) */
 	            if (rs < 0) {
-	                ema_finish(nop) ;
+	                libmem.free(nop) ;
 		    }
-	        } /* end if (ema_start) */
-	        if (rs < 0) {
-	            uc_free(nop) ;
-		}
-	    } /* end if (allocation) */
-	} /* end if (non-nullptr) */
+	        } /* end if (allocation) */
+	    } /* end if (non-nullptr) */
+	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (entry_startload) */
+} /* end subroutine (entry_startload) */
 
 #if	COMMENT
 static int entry_debugprint(ema_ent *ep,cchar *s) noex {
-	if (ep == nullptr) return SR_FAULT ;
-	if (s != nullptr)
+    	int		rs = SR_FAULT ;
+	if (ep) {
+	    rs = SR_OK ;
+	if (s != nullptr) {
 	    debugprintf("entry_debugprint: s=%s\n",s) ;
+	}
 	debugprintf("entry_debugprint: type=%u\n",ep->type) ;
 	if (ep->op)
 	    debugprintf("entry_debugprint: O %u %r\n",
@@ -191,7 +211,8 @@ static int entry_debugprint(ema_ent *ep,cchar *s) noex {
 	if (ep->cp)
 	    debugprintf("entry_debugprint: C %u %r\n",
 	        ep->cl,ep->cp,ep->cl) ;
-	return SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (entry_debugprint) */
 #endif /* COMMENT */
