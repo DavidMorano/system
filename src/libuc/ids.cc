@@ -44,8 +44,8 @@
 #include	<unistd.h>		/* for |getgroups(2)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<uclibsubs.h>
 #include	<localmisc.h>
 
 #include	"ids.h"
@@ -56,7 +56,9 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 
 
 /* external subroutines */
@@ -101,14 +103,14 @@ int ids_load(ids *op) noex {
 	    if ((rs = var) >= 0) ylikely {
 		cint	nmax = rs ;
 	        cint	sz = ((rs + 1) * szof(gid_t)) ;
-	        if (void *vp ; (rs = uc_libmalloc(sz,&vp)) >= 0) ylikely {
+	        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
 		    op->gids = (gid_t *) vp ;
 		    if ((rs = u_getgroups(nmax,op->gids)) >= 0) ylikely {
 			ng = rs ;
 		        op->gids[ng] = gidend ;
 		    }
 		    if (rs < 0) {
-		        uc_libfree(op->gids) ;
+		        libmem.free(op->gids) ;
 		        op->gids = nullptr ;
 		    } /* end if (error) */
 	        } /* end if (m-a) */
@@ -127,7 +129,7 @@ int ids_release(ids *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->gids) {
-	        rs1 = uc_libfree(op->gids) ;
+	        rs1 = libmem.free(op->gids) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->gids = nullptr ;
 	    }
@@ -159,7 +161,7 @@ int ids_refresh(ids *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->gids) {
-	        rs1 = uc_libfree(op->gids) ;
+	        rs1 = libmem.free(op->gids) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->gids = nullptr ;
 	    }
@@ -182,8 +184,8 @@ int ids_copy(ids *op,const ids *otherp) noex {
 	        cint	n = rs ;
 	        int	sz = 0 ;
 	        sz += intconv((n + 1) * szof(gid_t)) ;
-	        if (void *p ; (rs = uc_libmalloc(sz,&p)) >= 0) ylikely {
-	            int		i = 0 ; /* <- used-afterwards */
+	        if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) ylikely {
+	            int		i = 0 ; /* used-afterwards */
 		    op->gids = (gid_t *) p ;
 		    for (i = 0 ; otherp->gids[i] ; i += 1) {
 		        op->gids[i] = otherp->gids[i] ;
@@ -208,7 +210,7 @@ static int ids_ctor(ids *op) noex {
 	    op->euid = geteuid() ;
 	    op->gid = getgid() ;
 	    op->egid = getegid() ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ids_ctor) */
@@ -218,7 +220,7 @@ static int ids_dtor(ids *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->gids = nullptr ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ids_dtor) */
@@ -262,14 +264,19 @@ void ids::dtor() noex {
 	if (cint rs = release ; rs < 0) {
 	    ulogerror("ids",rs,"fini-release") ;
 	}
-}
+} /* end method (vars::dtor) */
 
 vars::operator int () noex {
     	int		rs ;
 	if ((rs = maxgroups) == 0) ylikely {
 	    cint	cmd = _SC_NGROUPS_MAX ;
 	    if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
-	        maxgroups = rs ;
+		gid_t	gids[1] ;
+		cint max1 = rs ;
+		if ((rs = u_getgroups(0,gids)) >= 0) ylikely {
+		    cint max2 = rs ;
+	            maxgroups = max(max1,max2) ;
+		} /* end if */
 	    } /* end if */
 	} /* end if (needed) */
 	return rs ;
