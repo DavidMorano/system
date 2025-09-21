@@ -72,6 +72,8 @@
 
 /* imported namespaces */
 
+using libuc::libmem ;			/* variable */
+
 
 /* local typedefs */
 
@@ -168,7 +170,7 @@ int userterms::start() noex {
 	    if ((rs = malloc_mp(&tbuf)) >= 0) {
 		tlen = rs ;
 		tl = intconv(strwcpy(tbuf,DEVDNAME) - tbuf) ;
-	    }
+	    } /* end if (memory-allocation) */
 	    if (rs < 0) {
 		vecobj_finish(&el) ;
 	    }
@@ -180,7 +182,7 @@ int userterms::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (tbuf) {
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = malloc_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	{
@@ -265,9 +267,9 @@ int userterms::proc() noex {
 static int terment_start(TE *ep,cc *sp,int sl,time_t t) noex {
 	int		rs ;
 	ep->atime = t ;
-	if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
 	    ep->devpath = cp ;
-	}
+	} /* end if (memory-allocation) */
 	return rs ;
 }
 /* end subroutine (terment_start) */
@@ -278,7 +280,8 @@ static int terment_finish(TE *ep) noex {
 	if (ep) {
 	    rs = SR_OK ;
 	    if (ep->devpath) {
-	        rs1 = uc_free(ep->devpath) ;
+		void *vp = voidp(ep->devpath) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->devpath = nullptr ;
 	    }
