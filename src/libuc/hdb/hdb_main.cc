@@ -130,7 +130,12 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| + |memcmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<lookaside.h>
 #include	<strn.h>
 #include	<hash.h>
@@ -138,7 +143,9 @@
 
 #include	"hdb.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -157,9 +164,9 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -235,7 +242,7 @@ static inline int hdb_ctor(hdb *op,Args ... args) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end subroutine (hdb_ctor) */
 
 static inline int hdb_dtor(hdb *op) noex {
 	int		rs = SR_FAULT ;
@@ -247,8 +254,7 @@ static inline int hdb_dtor(hdb *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (hdb_dtor) */
+} /* end subroutine (hdb_dtor) */
 
 template<typename ... Args>
 static inline int hdb_magic(hdb *op,Args ... args) noex {
@@ -257,8 +263,7 @@ static inline int hdb_magic(hdb *op,Args ... args) noex {
 	    rs = (op->magic == HDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (hdb_magic) */
+} /* end subroutine (hdb_magic) */
 
 static int	hdb_entnew(hdb *,ENT **) noex ;
 static int	hdb_entdel(hdb *,ENT *) noex ;
@@ -332,7 +337,7 @@ int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {
 	    }
 	    if (rs >= 0) {
 		cint	tsize = (n * esz) ;
-	        if (void *vp{} ; (rs = uc_malloc(tsize,&vp)) >= 0) {
+	        if (void *vp{} ; (rs = libmem.mall(tsize,&vp)) >= 0) {
 	            ENT		**hepp = (ENT **) vp ;
 	            memclear(hepp,tsize) ;
 	            op->htlen = n ;
@@ -363,7 +368,7 @@ int hdb_finish(hdb *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->htaddr) {
-	        rs1 = uc_free(op->htaddr) ;
+	        rs1 = libmem.free(op->htaddr) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->htaddr = nullptr ;
 	    }
@@ -868,7 +873,7 @@ static int hdb_entnew(hdb *op,ENT **epp) noex {
 	int		rs ;
 	if (op->at == 0) {
 	    cint	esz = szof(ENT) ;
-	    rs = uc_malloc(esz,epp) ;
+	    rs = libmem.mall(esz,epp) ;
 	} else {
 	     rs = lookaside_get(op->esp,epp) ;
 	}
@@ -879,7 +884,7 @@ static int hdb_entnew(hdb *op,ENT **epp) noex {
 static int hdb_entdel(hdb *op,ENT *ep) noex {
 	int		rs = SR_OK ;
 	if (op->at == 0) {
-	    rs = uc_free(ep) ;
+	    rs = libmem.free(ep) ;
 	} else {
 	    rs = lookaside_release(op->esp,ep) ;
 	}
@@ -967,7 +972,7 @@ static int hdb_ext(hdb *op) noex {
 	int		nhtlen = (op->htlen * 2) ;
 	int		sz ;
 	sz = nhtlen * szof(ENT *) ;
-	if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	if (void *vp{} ; (rs = libmem.mall(sz,&vp)) >= 0) {
 	    int		i = 0 ; /* <- used later */
 	    ENT		*hep, *nhep ;
 	    ENT		**nhtaddr = (ENT **) vp ;
@@ -989,7 +994,7 @@ static int hdb_ext(hdb *op) noex {
 		} /* end if (non-null) */
 	    } /* end for */
 	    if (rs >= 0) {
-	        uc_free(op->htaddr) ;
+	        libmem.free(op->htaddr) ;
 	        op->htaddr = nhtaddr ;
 	        op->htlen = nhtlen ;
 	    } else {
@@ -1002,7 +1007,7 @@ static int hdb_ext(hdb *op) noex {
 	                } /* end for */
 	            }
 	        } /* end for */
-	        rs1 = uc_free(nhtaddr) ;
+	        rs1 = libmem.free(nhtaddr) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end block (success) */
 	} /* end if (m-a) */
