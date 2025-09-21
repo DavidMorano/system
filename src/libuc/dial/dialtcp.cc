@@ -135,7 +135,7 @@ struct subinfo {
 	cchar		*hn ;
 	cchar		*ps ;
 	cchar		*pn ;
-	SUBINFO_FL	f ;
+	SUBINFO_FL	fl ;
 	int		count ;
 	int		type ;
 	int		proto ;
@@ -268,7 +268,7 @@ static int subinfo_addr(SUBINFO *sip,int af) noex {
 	cchar		*hn = sip->hn ;
 	if ((rs = inetpton(sip->addrbuf,addrlen,af,hn,-1)) >= 0) {
 	    af = rs ;
-	    sip->f.address = true ;
+	    sip->fl.address = true ;
 	} else if (rs == SR_INVALID) {
 	    rs = SR_OK ;
 	}
@@ -294,7 +294,7 @@ static int subinfo_tryone(SUBINFO *sip) noex {
 	int		rs1 ;
 	int		af = sip->af ;
 	int		fd = -1 ;
-	if (sip->f.address) {
+	if (sip->fl.address) {
 	    rs = try_addr(sip) ;
 	    fd = rs ;
 	} else {
