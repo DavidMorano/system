@@ -140,7 +140,7 @@ static inline int hostinfo_ctor(hostinfo *op,Args ... args) noex {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->init = {} ;
-	    op->f = {} ;
+	    op->fl = {} ;
 	    op->arg = {} ;
 	    op->addr = {} ;
 	    op->domainname = nullptr ;
@@ -467,11 +467,11 @@ int hostinfo_curenumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
 	                ci = i ;
 	                if (rs == rsn) {
 	                    rs = SR_OK ;
-	                    if ((! op->f.inet4) || (! op->f.inet6)) {
-	                        if ((rs == 0) && (! op->f.inet4)) {
+	                    if ((! op->fl.inet4) || (! op->fl.inet6)) {
+	                        if ((rs == 0) && (! op->fl.inet4)) {
 	                            rs = getinet(op,af4) ;
 	                        }
-	                        if ((rs == 0) && (! op->f.inet6)) {
+	                        if ((rs == 0) && (! op->fl.inet6)) {
 	                            rs = getinet(op,af6) ;
 	                        }
 	                        f_exit = (rs == 0) ;
@@ -528,11 +528,11 @@ int hostinfo_curenumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
 	                ci = i ;
 	                if (rs == rsn) {
 	                    rs = SR_OK ;
-	                    if ((op->f.inet4) || (! op->f.inet6)) {
-	                        if ((rs == 0) && (! op->f.inet4)) {
+	                    if ((op->fl.inet4) || (! op->fl.inet6)) {
+	                        if ((rs == 0) && (! op->fl.inet4)) {
 	                            rs = getinet(op,af4) ;
 	                        }
-	                        if ((rs == 0) && (! op->f.inet6)) {
+	                        if ((rs == 0) && (! op->fl.inet6)) {
 	                            rs = getinet(op,af6) ;
 	                        }
 	                        f_exit = (rs == 0) ;
@@ -681,11 +681,11 @@ static int hostinfo_findcanonical(hostinfo *op) noex {
 	        si = i ;
 	        if (rs == rsn) {
 	            rs = SR_OK ;
-	            if ((! op->f.inet4) || (! op->f.inet6)) {
-	                if ((rs == 0) && (! op->f.inet4)) {
+	            if ((! op->fl.inet4) || (! op->fl.inet6)) {
+	                if ((rs == 0) && (! op->fl.inet4)) {
 	                    rs = getinet(op,af4) ;
 	                }
-	                if ((rs == 0) && (! op->f.inet6)) {
+	                if ((rs == 0) && (! op->fl.inet6)) {
 	                    rs = getinet(op,af6) ;
 	                }
 	                f_continue = (rs > 0) ;
@@ -777,7 +777,7 @@ static int hostinfo_getaddr(hostinfo *op,int af) noex {
 	if_constexpr (f_hostbyname) {
 	    f_inet4 = (af == af4) ;
 	}
-	if (op->f.addr && (af == op->addr.af)) {
+	if (op->fl.addr && (af == op->addr.af)) {
 	    char	*hebuf{} ;
 	    if ((rs = malloc_ho(&hebuf)) >= 0) {
 	        HOSTENT		*hep{} ;
@@ -952,7 +952,7 @@ static int hostinfo_addrbegin(hostinfo *op,int af) noex {
 	        inetaddrlen = getaflen(rs1) ;
 	        if ((rs = uc_mallocbuf(inetaddr,inetaddrlen,&vp)) >= 0) {
 	            op->addr.addr = (cchar *) vp ;
-	            op->f.addr = true ;
+	            op->fl.addr = true ;
 	            op->addr.af = rs1 ;
 	            op->addr.addrlen = inetaddrlen ;
 	        } else {
@@ -960,7 +960,7 @@ static int hostinfo_addrbegin(hostinfo *op,int af) noex {
 	        }
 	    } /* end if (allocating space for ADDR) */
 	} /* end if */
-	return (rs >= 0) ? op->f.addr : rs ;
+	return (rs >= 0) ? op->fl.addr : rs ;
 }
 /* end subroutine (hostinfo_addrbegin) */
 
@@ -1001,10 +1001,10 @@ static int getinet(hostinfo *op,int af) noex {
 	    if ((op->arg.af == af0) || (op->arg.af == af)) {
 	        switch (af) {
 	        case AF_INET4:
-	            op->f.inet4 = true ; /* mark as tried */
+	            op->fl.inet4 = true ; /* mark as tried */
 	            break ;
 	        case AF_INET6:
-	            op->f.inet6 = true ; /* mark as tried */
+	            op->fl.inet6 = true ; /* mark as tried */
 	            break ;
 	        } /* end switch */
 	        for (int i = 0 ; getinets[i] != nullptr ; i += 1) {
@@ -1025,7 +1025,7 @@ static int getinet_straight(hostinfo *op,int af) noex {
 	    rs = hostinfo_addrbegin(op,af) ;
 	}
 	if (rs >= 0) {
-	    if (op->f.addr && (af == op->addr.af)) {
+	    if (op->fl.addr && (af == op->addr.af)) {
 	        rs = hostinfo_getaddr(op,af) ;
 	    } else {
 	        rs = hostinfo_getname(op,af,op->arg.hostname) ;
@@ -1049,7 +1049,7 @@ static int getinet_add(hostinfo *op,int af) noex {
 	    bool	f_continue = false ;
 	    if_constexpr (f_fastaddr) {
 	        if ((rs = hostinfo_addrbegin(op,af)) >= 0) {
-	            f_continue = (! op->f.addr) ;
+	            f_continue = (! op->fl.addr) ;
 	        }
 	    } else {
 	        f_continue = (! isinetaddr(op->arg.hostname)) ;
@@ -1087,7 +1087,7 @@ static int getinet_rem(hostinfo *op,int af) noex {
 	bool		f_continue = false ;
 	if_constexpr (f_fastaddr) {
 	    if ((rs = hostinfo_addrbegin(op,af)) >= 0) {
-	        f_continue = (! op->f.addr) ;
+	        f_continue = (! op->fl.addr) ;
 	    }
 	} else {
 	    f_continue = (! isinetaddr(op->arg.hostname)) ;
@@ -1129,7 +1129,7 @@ static int getinet_remlocal(hostinfo *op,int af) noex {
 	bool		f_continue = false ;
 	if_constexpr (f_fastaddr) {
 	    if ((rs = hostinfo_addrbegin(op,af)) >= 0) {
-	        f_continue = (! op->f.addr) ;
+	        f_continue = (! op->fl.addr) ;
 	    }
 	} else {
 	    f_continue = (! isinetaddr(op->arg.hostname)) ;
@@ -1167,7 +1167,7 @@ static int getinet_known(hostinfo *op,int af) noex {
 	bool		f_continue = false ;
 	if_constexpr (f_fastaddr) {
 	    if ((rs = hostinfo_addrbegin(op,af)) >= 0) {
-	        f_continue = (! op->f.addr) ;
+	        f_continue = (! op->fl.addr) ;
 	    }
 	} else {
 	    f_continue = (! isinetaddr(op->arg.hostname)) ;
