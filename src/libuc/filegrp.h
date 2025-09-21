@@ -28,7 +28,6 @@
 
 #define	FILEGRP			struct filegrp_head
 #define	FILEGRP_ST		struct filegrp_statistics
-
 #define	FILEGRP_MAGIC		0x98643163
 #define	FILEGRP_DEFENTS		10
 #define	FILEGRP_DEFMAX		20	/* default maximum entries */
@@ -59,13 +58,13 @@ typedef FILEGRP_ST	filegrp_st ;
 
 EXTERNC_begin
 
-extern int filegrp_start(filegrp *,int,int) noex ;
-extern int filegrp_add(filegrp *,gid_t,cchar *) noex ;
-extern int filegrp_lookname(filegrp *,cchar *,int) noex ;
-extern int filegrp_lookgid(filegrp *,char *,int,gid_t) noex ;
-extern int filegrp_check(filegrp *,time_t) noex ;
-extern int filegrp_stats(filegrp *,filegrp_st *) noex ;
-extern int filegrp_finish(filegrp *) noex ;
+extern int filegrp_start	(filegrp *,int,int) noex ;
+extern int filegrp_add		(filegrp *,gid_t,cchar *) noex ;
+extern int filegrp_lookname	(filegrp *,cchar *,int) noex ;
+extern int filegrp_lookgid	(filegrp *,char *,int,gid_t) noex ;
+extern int filegrp_check	(filegrp *,time_t) noex ;
+extern int filegrp_stats	(filegrp *,filegrp_st *) noex ;
+extern int filegrp_finish	(filegrp *) noex ;
 
 EXTERNC_end
 
