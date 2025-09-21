@@ -30,7 +30,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<mallocstuff.h>
 #include	<strn.h>
 #include	<vechand.h>
 #include	<ascii.h>
@@ -40,12 +39,12 @@
 
 #include	"ema.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
-#pragma		GCC dependency	"ema_entry.ccm"
-#pragma		GCC dependency	"ema_asstr.ccm"
-#pragma		GCC dependency	"ema_parts.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"ema_entry.ccm"
+#pragma		GCC dependency		"ema_asstr.ccm"
+#pragma		GCC dependency		"ema_parts.ccm"
 
-import libutil ;
+import libutil ;			/* |getlenstr(3u)| */
 import ema_entry ;
 import ema_asstr ;
 import ema_parts ;
@@ -57,6 +56,7 @@ import ema_parts ;
 
 /* imported namespaces */
 
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -150,7 +150,7 @@ int ema_finish(ema *op) noex {
 	                    if (rs >= 0) rs = rs1 ;
 		        }
 		        {
-	                    rs1 = uc_free(ep) ;
+	                    rs1 = libmem.free(ep) ;
 	                    if (rs >= 0) rs = rs1 ;
 		        }
 	            } /* end if (non-null) */
@@ -170,18 +170,19 @@ int ema_finish(ema *op) noex {
 }
 /* end subroutine (ema_finish) */
 
-int ema_parse(ema *op,cchar *sp,int sl) noex {
+int ema_parse(ema *op,cchar *sp,int µsl) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ema_magic(op,sp)) >= 0) {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (asstr desc ; (rs = desc.start(sp,sl)) >= 0) {
-	        if ((rs = ema_ns::ema_parseit(op,&desc)) > 0) {
-	            op->n += rs ;
-	        }
-		rs1 = desc.finish ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if */
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	        if (asstr desc ; (rs = desc.start(sp,sl)) >= 0) {
+	            if ((rs = ema_ns::ema_parseit(op,&desc)) > 0) {
+	                op->n += rs ;
+	            }
+		    rs1 = desc.finish ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if */
+	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -281,7 +282,7 @@ namespace ema_ns {
 local int ema_addentone(ema *op,ema_ent *ep) noex {
 	cint		sz = szof(ema_ent) ;
 	int		rs ;
-	if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 	    ema_ent *nep = entp(vp) ;
 	    if ((rs = entry_startload(nep,ep)) >= 0) {
 	        if ((rs = vechand_add(op->elp,nep)) >= 0) {
@@ -292,7 +293,7 @@ local int ema_addentone(ema *op,ema_ent *ep) noex {
 		}
 	    } /* end if (entry_startload) */
 	    if (rs < 0) {
-	        uc_free(nep) ;
+	        libmem.free(nep) ;
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
