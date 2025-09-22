@@ -30,13 +30,18 @@
 
 namespace libu {
     struct umems {
+        int strw(cchar *,int,cchar **) noex ;
+        int mall(int,void *) noex ;
+        int vall(int,void *) noex ;
+        int call(int,int,void *) noex ;
+        int rall(void *,int,void *) noex ;
+        int free(void *) noex ;
+        int rsfree(int,void *) noex ;
         int mallocstrw(cchar *,int,cchar **) noex ;
         int malloc(int,void *) noex ;
         int valloc(int,void *) noex ;
         int calloc(int,int,void *) noex ;
         int ralloc(void *,int,void *) noex ;
-        int free(void *) noex ;
-        int rsfree(int,void *) noex ;
     } ; /* end struct (umems) */
     extern umems	umem ;
 } /* end namespace (libu) */
