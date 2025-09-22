@@ -52,7 +52,7 @@
 #include	<usysrets.h>
 #include	<usysflag.h>
 #include	<usupport.h>
-#include	<umemalloc.hh>
+#include	<umem.hh>
 #include	<uclibsubs.h>		/* LIBUC */
 #include	<errtimer.hh>
 #include	<getbufsize.h>
@@ -77,9 +77,8 @@ import ulibvals ;
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using libu::umemalloc ;			/* subroutine */
-using libu::umemfree ;			/* subroutine */
 using libu::snwcpy ;			/* subroutine */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -110,9 +109,6 @@ static inline int posixdirent_magic(posixdirent *op,Args ... args) noex {
 /* local variables */
 
 static cint		maxnamelen = ulibval.maxnamelen ;
-
-constexpr auto		mallo	= umemalloc ;
-constexpr auto		mfree	= umemfree ;
 
 constexpr bool		f_readdirr = F_READDIRR ;
 
@@ -215,7 +211,7 @@ int posixdirent::bufbegin(cchar *fn) noex {
 	    cint	req = _PC_NAME_MAX ;
 	    if ((rs = u_pathconf(fn,req,nullptr)) >= 0) {
 	        cint	dsz = (max(maxnamelen,rs) + szof(dirent)) + 1 ;
-		if (void *vp ; (rs = mallo(dsz,&vp)) >= 0) {
+		if (void *vp ; (rs = umem.malloc(dsz,&vp)) >= 0) {
 		    debuf = (dirent *) vp ;
 		    memclear(vp,dsz) ;
 		}
@@ -231,7 +227,7 @@ int posixdirent::bufend() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	if (debuf) {
-	    rs1 = mfree(debuf) ;
+	    rs1 = umem.free(debuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    debuf = nullptr ;
 	    delen = 0 ;
