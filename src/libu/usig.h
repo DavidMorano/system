@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	usig
+
+	Description:
 	This module provides UNIX® process signal mangement.
 
 *******************************************************************************/
@@ -33,6 +37,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<usys.h>
 
 
 EXTERNC_begin
