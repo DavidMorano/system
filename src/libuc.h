@@ -43,7 +43,6 @@
 #include	<ucmallocx.h>
 #include	<ucmallreg.h>
 #include	<ucmem.h>
-#include	<ucmemalloc.h>
 #include	<ucmemla.h>
 #include	<ucopen.h>
 #include	<ucopeninfo.h>
