@@ -50,7 +50,9 @@
 
 #include	"usupport_hasx.h"
 
-import libutil ;			/* |lenstr(3u)| */
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* local defines */
 
@@ -82,17 +84,16 @@ import libutil ;			/* |lenstr(3u)| */
 /* exported subroutines */
 
 namespace libu {
-    bool hasnotdots(cchar *sp,int sl) noex {
+    bool hasnotdots(cchar *sp,int µsl) noex {
 	bool		f = true ;
-	if (sp[0] == '.') {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    {
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	    if (sp[0] == '.') {
 	        if (sl <= 2) {
 	            f = (sl != 1) ;
 		    f = f || ((sl == 2) && (sp[1] != '.')) ;
 	        }
-	    } /* end block */
-	} /* end if (had a leading dot) */
+	    } /* end if (had a leading dot) */
+	} /* end if (getlenstrmagic) */
 	return f ;
     } /* end subroutine (hasnotdots) */
 } /* end namespace (libu) */
