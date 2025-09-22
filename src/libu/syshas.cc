@@ -94,7 +94,7 @@
                 sigqueue	= SYSHAS_SIGQUEUE ;
                 sigsend		= SYSHAS_SIGSEND ;
                 sigsendset	= SYSHAS_SIGSENDSET ;
-                sigwait		= SYSHAS_SIGWAIT ;
+                sigwaitinfo	= SYSHAS_SIGWAITINFO ;
                 pthreadsigsend	= SYSHAS_PTHREADSIGSEND ;
                 ucontext	= SYSHAS_UCONTEXT ;
                 getcontext	= SYSHAS_GETCONTEXT ;
