@@ -91,6 +91,10 @@ how this messed-up system works on Darwin.
 #define	_DARWIN_C_SOURCE
 #endif
 
+#ifndef	_DARWIN_UNLIMITED_GETGROUPS
+#define	_DARWIN_UNLIMITED_GETGROUPS
+#endif
+
 #ifndef	_REENTRANT
 #define	_REENTRANT
 #endif
