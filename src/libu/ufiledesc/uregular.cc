@@ -25,6 +25,7 @@
 	u_fpathconf
 	u_fstype
 	u_fsync
+	u_fsize
 	u_ftruncate
 	u_ioctl
 	u_lockf
@@ -139,7 +140,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<usystem.h>
+#include	<usyscalls.h>
 #include	<usysflag.h>
 #include	<intsat.h>
 #include	<localmisc.h>
@@ -469,6 +470,14 @@ int u_fsync(int fd) noex {
 	return ro(fd) ;
 }
 /* end subroutine (u_fsync) */
+
+int u_fsize(int fd) noex {
+    	int		rs ;
+	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	    rs = intsat(sb.st_size) ;
+	}
+	return rs ;
+} /* end subroutine (u_fsize) */
 
 int u_ftruncate(int fd,off_t fo) noex {
 	uregular	ro(fo) ;
