@@ -52,9 +52,11 @@ module ;
 #include	<errtimer.hh>
 #include	<localmisc.h>
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 module usysbasic ;
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -163,7 +165,7 @@ int ustatfilefs(cchar *afn,ustatfs *asp) noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (ustatfilefs) */
-int ustatfilevfs(cchar *afn,ustatfs *asp) noex {
+int ustatfilevfs(cchar *afn,ustatvfs *asp) noex {
 	int		rs = SR_FAULT ;
 	if (afn && asp) {
 	    rs = SR_INVALID ;
@@ -306,13 +308,13 @@ sysret_t ucaller::stdstatvfs() noex {
 	}
 	return rs ;
 }
-/* end method (ucaller::stdstatfs) */
+/* end method (ucaller::stdstatvfs) */
 
 sysret_t ucaller::stdgetcwd() noex {
     	cnullptr	np{} ;
     	csize		rsize = size_t(rlen) ;
 	int		rs = SR_OK ;
-	if (char *rp ; (rp = getcwd(rbuf,(rsize+1))) != np) {
+	if (char *rp ; (rp = getcwd(rbuf,(rsize + 1))) != np) {
 	    rs = lenstr(rp) ;
 	} else {
 	    rs = (- errno) ;
