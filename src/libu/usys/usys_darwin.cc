@@ -126,6 +126,44 @@ EXTERNC_end
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
+/* SIGWAITINFO begin */
+#if	(!defined(SYSHAS_SIGWAITINFO)) || (SYSHAS_SIGWAITINFO == 0)
+
+typedef	CTIMESPEC 	ctsp ;
+
+EXTERNC_begin
+
+unixret_t sigwaitinfo(const sigset_t *setp,siginfo_t *sip) noex {
+    	int	rc = -1 ;	
+	if (setp && sip) {
+	    errno = ENOSYS ;
+	} else {
+	    errno = EFAULT ;
+	}
+	return rc ;
+} /* end subroutine (sigwaitinfo) */
+
+unixret_t sigtimedwait(const sigset_t *setp,siginfo_t *sip,ctsp *tsp) noex {
+    	int	rc = -1 ;	
+	if (setp && sip && tsp) {
+	    errno = ENOSYS ;
+	} else {
+	    errno = EFAULT ;
+	}
+	return rc ;
+} /* end subroutine (sigtimedwait) */
+
+unixret_t sigwaitinfoto(const sigset_t *setp,siginfo_t *sip,ctsp *tsp) noex {
+    	return sigtimedwait(setp,sip,tsp) ;
+}
+
+EXTERNC_end
+
+#endif /* (!defined(SYSHAS_SIGWAITINFO)) || (SYSHAS_SIGWAITINFO == 0) */
+/* SIGWAITINFO end */
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*/
 /* RELTIMEDWAIT begin */
 #if	(!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0)
 
