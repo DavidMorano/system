@@ -1,4 +1,4 @@
-/* libutil1 MODULE */
+/* libutil1 MODULE (module-implementation-unit) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -45,7 +45,7 @@ module ;
 #include	<usysrets.h>
 #include	<localmisc.h>
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 module libutil ;
 
