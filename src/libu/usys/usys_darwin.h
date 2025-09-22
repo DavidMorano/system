@@ -116,20 +116,19 @@ EXTERNC_end
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
-/* SIGWAIT begin */
-#if	(!defined(SYSHAS_SIGWAIT)) || (SYSHAS_SIGWAIT == 0)
+/* SIGWAITINFO begin */
+#if	(!defined(SYSHAS_SIGWAITINFO)) || (SYSHAS_SIGWAITINFO == 0)
 
 EXTERNC_begin
 
-extern unixret_t sigwait(const sigset_t *,int *) noex ;
 extern unixret_t sigwaitinfo(const sigset_t *,siginfo_t *) noex ;
 extern unixret_t sigtimedwait(const sigset_t *,siginfo_t *,CTIMESPEC *) noex ;
 extern unixret_t sigwaitinfoto(const sigset_t *,siginfo_t *,CTIMESPEC *) noex ;
 
 EXTERNC_end
 
-#endif /* (!defined(SYSHAS_SIGWAIT)) || (SYSHAS_SIGWAIT == 0) */
-/* SIGWAIT end */
+#endif /* (!defined(SYSHAS_SIGWAITINFO)) || (SYSHAS_SIGWAITINFO == 0) */
+/* SIGWAITINFO end */
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
