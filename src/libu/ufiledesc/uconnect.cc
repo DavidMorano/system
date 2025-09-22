@@ -101,7 +101,7 @@ struct connsub_flags {
 
 struct connsub {
 	SOCKADDR	*sap ;
-	CS_FL		f ;
+	CS_FL		fl ;
 	int		sal ;
 	int		fd ;
 } ;
@@ -170,12 +170,12 @@ static int connsub_finish(CS *cip) noex {
 
 static int connsub_checkblock(CS *cip) noex {
 	int		rs = SR_OK ;
-	if (! cip->f.checkblock) {
-	    cip->f.checkblock = true ;
+	if (! cip->fl.checkblock) {
+	    cip->fl.checkblock = true ;
 	    if ((rs = u_fcntl(cip->fd,F_GETFL,0)) >= 0) {
-	        if (rs & O_NONBLOCK) cip->f.nonblock = true ;
-	        if (rs & O_NDELAY) cip->f.ndelay = true ;
-		cip->f.blocking = ((! cip->f.nonblock) && (! cip->f.ndelay)) ;
+	        if (rs & O_NONBLOCK) cip->fl.nonblock = true ;
+	        if (rs & O_NDELAY) cip->fl.ndelay = true ;
+		cip->fl.blocking = ((! cip->fl.nonblock) && (! cip->fl.ndelay)) ;
 	    }
 	} /* end if (block check) */
 	return rs ;
@@ -211,7 +211,7 @@ static int connsub_proc(CS *cip) noex {
 	            break ;
 	        case SR_INTR:
 	            if ((rs = connsub_checkblock(cip)) >= 0) {
-	                if (cip->f.blocking) {
+	                if (cip->fl.blocking) {
 	                    rs = connsub_wait(cip,TO_CONNECT) ;
 	                } else {
 			    rs = SR_INTR ; /* continue looping */
@@ -223,7 +223,7 @@ static int connsub_proc(CS *cip) noex {
 /* a previous connect attempt is still in progress */
 	        case SR_ALREADY:
 	            if ((rs = connsub_checkblock(cip)) >= 0) {
-	                if (cip->f.blocking) {
+	                if (cip->fl.blocking) {
 	                    rs = connsub_wait(cip,TO_CONNECT) ;
 	                } else {
 			    rs = SR_ALREADY ; /* propagate */
@@ -237,7 +237,7 @@ static int connsub_proc(CS *cip) noex {
 	        case SR_ISCONN:
 		    if_constexpr (f_isconn) {
 	                if ((rs = connsub_checkblock(cip)) >= 0) {
-			    if (cip->f.blocking) {
+			    if (cip->fl.blocking) {
 			        rs = SR_OK ;
 			    } else {
 			        rs = SR_ISCONN ; /* propagate */
