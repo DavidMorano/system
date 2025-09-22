@@ -60,19 +60,28 @@ export {
 	return intconv(cp - sp) ;
     } /* end subroutine (clenstr) */
     constexpr inline int lenstr(cchar *sp,int sl = -1) noex {
-    	int		len = 0 ;
-	if (sl >= 0) {
-    	    csize	ssize = size_t(sl) ;
-	    len = intconv(strnlen(sp,ssize)) ;
-	} else {
-	    len = intconv(strlen(sp)) ;
-	}
+    	int		len = -1 ;
+	if (sp) {
+	    if (sl >= 0) {
+    	        csize	ssize = size_t(sl) ;
+	        len = intconv(strnlen(sp,ssize)) ;
+	    } else {
+	        len = intconv(strlen(sp)) ;
+	    }
+	} /* end if (non-null) */
     	return len ;
     } /* end subroutine (lenstr) */
     constexpr inline int getlenstr(cchar *sp,int sl = -1) noex {
-	if (sl < 0) sl = lenstr(sp) ;
-	return sl ;
-    }
+	int		len = -1 ;
+	if (sp) {
+	    if (sl >= 0) {
+		len = sl ;
+	    } else {
+	        len = intconv(strlen(sp)) ;
+	    }
+	} /* end if (non-null) */
+	return len ;
+    } /* end subroutine (getlenstr) */
 } /* end export */
 
 export {
@@ -143,34 +152,61 @@ export {
 } /* end export */
 
 export {
-    constexpr inline void *memcopy(void *dp,cvoid *sp,int dsz) noex {
-	caddr_t		rp ; /* return-value */
-	if (dsz < 0) {
-	    cchar *cp = ccharp(sp) ;
-	    dsz = intconv(strlen(cp)) ;
-	}
-	{
-	    csize	dsize = size_t(dsz) ;
-	    caddr_t	dst = caddr_t(dp) ;
-	    memcpy(dp,sp,dsize) ;
-	    rp = (dst + dsz) ;
-	}
+    constexpr inline void *memcopy(void *dp,cvoid *sp,int sl) noex {
+	caddr_t		rp = nullptr ; /* return-value */
+	if (dp && sp) {
+	    if (sl < 0) {
+	        cchar *cp = ccharp(sp) ;
+	        sl = intconv(strlen(cp)) ;
+	    }
+	    {
+	        csize	srcsize = size_t(sl) ;
+	        caddr_t	dst = caddr_t(dp) ;
+	        memcpy(dp,sp,srcsize) ;
+	        rp = (dst + sl) ;
+	    }
+	} /* end if (non-null) */
 	return voidp(rp) ;
     } /* end subroutine (memcopy) */
     template<typename T>
-    constexpr inline void *memcopy(T *dp,cvoid *sp,int dsz = -1) noex {
+    constexpr inline void *memcopy(T *dp,cvoid *sp,int sl = -1) noex {
     	caddr_t		rp = nullptr ;
-	if (rp && sp) {
-    	    if (dsz < 0) dsz = szof(T) ;
+	if (dp && sp) {
+    	    if (sl < 0) sl = szof(T) ;
 	    rp = caddr_t(dp) ;
 	    {
-		csize dsize = size_t(dsz) ;
-	        memcpy(dp,sp,dsize) ;
-	        rp += dsz ;
-	    }
-	}
+		csize srcsize = size_t(sl) ;
+	        memcpy(dp,sp,srcsize) ;
+	        rp += sl ;
+	    } /* end block */
+	} /* end if (non-null) */
 	return voidp(rp) ;
     } /* end subroutine (memcopy) */
+    template<typename T>
+    constexpr inline void *memcopyz(T *dp,int dl,cvoid *sp,int sl) noex {
+    	caddr_t		rp = nullptr ;
+	if (dp && sp) {
+	    if (dl < 0) {
+		dl = szof(T) ;
+	    }
+	    if (sl < 0) {
+	        cchar *cp = ccharp(sp) ;
+	        sl = intconv(strlen(cp)) ;
+	    }
+	    if (sl > dl) sl = dl ;
+	    {
+	        csize	srcsize = size_t(sl) ;
+	        caddr_t	dst = caddr_t(dp) ;
+	        memcpy(dp,sp,srcsize) ;
+	        rp = (dst + sl) ;
+		if (sl < dl) {
+		    csize zsize = size_t(dl - sl) ;
+		    memset(rp,0,zsize) ;
+		}
+	    } /* end block */
+	} /* end if (non-null) */
+	return voidp(rp) ;
+    } /* end subroutine (memcopyz) */
 } /* end export */
 
 export {
