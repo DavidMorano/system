@@ -64,7 +64,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<usupport.h>
-#include	<umemalloc.hh>
+#include	<umem.hh>
 #include	<timewatch.hh>
 #include	<ptm.h>
 #include	<localmisc.h>
@@ -83,13 +83,7 @@ import usysbasic ;
 
 /* imported namespaces */
 
-using libu::umemallocstrw ;		/* subroutine */
-using libu::umemalloc ;			/* subroutine */
-using libu::umemvalloc ;		/* subroutine */
-using libu::umemcalloc ;		/* subroutine */
-using libu::umemrealloc ;		/* subroutine */
-using libu::umemfree ;			/* subroutine */
-using libu::umemrsfree ;		/* subroutine */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -260,7 +254,7 @@ int uregfork::record(void_f sb,void_f sp,void_f sc) noex {
 			uregfork_ent	*ep{} ;
 	                if ((rs = trackbegin()) >= 0) {
 	                    cint	esz = szof(URF_ENT) ;
-	                    if ((rs = umemalloc(esz,&ep)) >= 0) {
+	                    if ((rs = umem.malloc(esz,&ep)) >= 0) {
 				uregfork_list	*lp = &hlist ;
 				entry_load(ep,sb,sp,sc) ;
 				list_add(lp,ep) ;
@@ -293,7 +287,7 @@ int uregfork::expunge(void_f sb,void_f sp,void_f sc) noex {
                             if (entry_match(ep,sb,sp,sc)) {
                                 c += 1 ;
                                 list_rem(lp,ep) ;
-                                umemfree(ep) ;
+                                umem.free(ep) ;
                             } /* end if (match) */
                             ep = nep ;
                         } /* end while (deleting matches) */
@@ -324,7 +318,7 @@ int uregfork::trackend() noex {
 	    ftrack = false ;
 	    while (ep) {
 	        nep = ep->next ;
-	        rs1 = umemfree(ep) ;
+	        rs1 = umem.free(ep) ;
 		if (rs >= 0) rs = rs1 ;
 	        ep = nep ;
 	    } /* end while */
