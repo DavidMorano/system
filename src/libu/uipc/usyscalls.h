@@ -80,7 +80,7 @@
 #include	<utimeout.h>
 #include	<utimeouts.h>
 #include	<ulogerror.h>
-#include	<umemalloc.hh>
+#include	<umem.hh>
 #include	<ucomposite.h>
 
 #include	<varnames.hh>
