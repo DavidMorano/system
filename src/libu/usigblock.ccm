@@ -38,11 +38,14 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<usig.h>
 #include	<ulogerror.h>
+
+#pragma		GCC dependency		"mod/usigsets.ccm"
 
 export module usigblock ;
 
-import usigset ;			/* |usigmask(3u)| */
+import usigsets ;			/* |usigset(3u)| */
 
 export {
     enum usigblockmems {
@@ -80,7 +83,7 @@ export {
 	void dtor() noex ;
 	destruct usigblock() {
 	    if (fl.open) dtor() ;
-	}
+	} ;
     private:
 	int istart(cint *) noex ;
 	int ifinish() noex ;
@@ -92,16 +95,16 @@ export {
 	    sigset_t	nsm ;
 	    rs = SR_OK ;
 	    if (sigs) {
-	        if ((rs = usigset_empty(&nsm)) >= 0) {
+	        if ((rs = usigset.empty(&nsm)) >= 0) {
 	            for (int i = 0 ; (rs >= 0) && (sigs[i] > 0) ; i += 1) {
-	                rs = usigset_add(&nsm,sigs[i]) ;
+	                rs = usigset.add(&nsm,sigs[i]) ;
 	            }
 		}
 	    } else {
-	        rs = usigset_fill(&nsm) ;
+	        rs = usigset.fill(&nsm) ;
 	    }
 	    if (rs >= 0) {
-	        if ((rs = usigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
+	        if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 		    fl.open = true ;
 		}
 	    } /* end if */
@@ -111,7 +114,7 @@ export {
 	int		rs = SR_NOTOPEN ;
 	if (fl.open) {
 	    fl.open = false ;
-	    rs = usigmask(SIG_SETMASK,&osm,nullptr) ;
+	    rs = u_sigmask(SIG_SETMASK,&osm,nullptr) ;
 	}
 	return rs ;
     } /* end method (usigblock::ifinish) */
