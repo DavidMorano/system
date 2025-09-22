@@ -70,14 +70,8 @@ import ulibvals ;			/* |max{x}| */
 
 /* imported namespaces */
 
-using libu::umemallocstrw ;		/* subroutine */
-using libu::umemalloc ;			/* subroutine */
-using libu::umemvalloc ;		/* subroutine */
-using libu::umemcalloc ;		/* subroutine */
-using libu::umemrealloc ;		/* subroutine */
-using libu::umemfree ;			/* subroutine */
-using libu::umemrsfree ;		/* subroutine */
 using libu::hasnotdots ;		/* subroutine */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -152,14 +146,14 @@ mgr::operator int () noex {
 	int		c = 0 ;
 	plen = var.maxpath ;
 	nlen = var.maxname ;
-	if (char *a ; (rs = umemalloc(sz,&a)) >= 0) {
+	if (char *a ; (rs = umem.malloc(sz,&a)) >= 0) {
 	    pbuf = (a + 0) ;
 	    nbuf = (a + (plen + 1)) ;
 	    if ((rs = mknpath(pbuf,plen,tardname)) >= 0) {
 		rs = remover(rs) ;
 		c = rs ;
 	    }
-	    rs1 = umemfree(a) ;
+	    rs1 = umem.free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
