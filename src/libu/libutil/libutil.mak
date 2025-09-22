@@ -144,13 +144,6 @@ objb.o:			$(OBJB)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
 
 
-usigset.ccm:		
-	ln mod/usigset.ccm .
-
-usigblock.ccm:
-	ln mod/usigblock.ccm .
-
-
 libutil0.o:		libutil.ccm $(DEPMODS) 
 	makemodule libutil
 
