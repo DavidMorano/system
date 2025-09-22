@@ -43,23 +43,33 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<functional>		/* |mem_fn(3c++)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<getpwd.h>
-#include	<libmallocxx.h>
 #include	<strwcpy.h>
 #include	<pathadd.h>
 #include	<localmisc.h>
 
 #include	"absfn.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ulibvals.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
+import ulibvals ;
 
 /* local defines */
 
 
 /* imported namespaces */
+
+using std::bind_front ;			/* subroutine (template) */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -82,10 +92,6 @@ local int	absfn_loadnul(absfn *,cchar *,int,cchar **) noex ;
 
 /* local variables */
 
-constexpr cauto		mem_almp = libmalloc_mp ;
-constexpr cauto		mem_alst = uc_libmallocstrw ;
-constexpr cauto		mem_free = uc_libfree ;
-
 
 /* exported variables */
 
@@ -94,24 +100,26 @@ constexpr cauto		mem_free = uc_libfree ;
 
 int absfn_start(absfn *op,cchar *sp,int µsl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		sl = 0 ; /* return-value */
+	int		nl = 0 ; /* return-value */
 	if (op && sp && rpp) ylikely {
 	    rs = SR_INVALID ;
 	    op->as = nullptr ;
-	    if ((sl = getlenstr(sp,µsl)) > 0) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	        rs = SR_OK ;
 	        *rpp = sp ;
 	        if (sp[0] != '/') {
 		    rs = absfn_loadpwd(op,sp,sl,rpp) ;
-		    sl = rs ;
+		    nl = rs ;
 		} else if (sp[sl] != '\0') {
 		    rs = absfn_loadnul(op,sp,sl,rpp) ;
-		    sl = rs ;
+		    nl = rs ;
+		} else {
+		    nl = sl ;
 		}
 	    } /* end if (getlenstr) */
 	    if (rs < 0) *rpp = nullptr ;
 	} /* end if (non-null) */
-	return (rs >= 0) ? sl : rs ;
+	return (rs >= 0) ? nl : rs ;
 }
 /* end subroutine (absfn_start) */
 
@@ -122,7 +130,7 @@ int absfn_finish(absfn *op) noex {
 	    rs = SR_OK ;
 	    if (op->as) {
 		char *bp = cast_const<charp>(op->as) ;
-	        rs1 = mem_free(bp) ;
+	        rs1 = libmem.free(bp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->as = nullptr ;
 	    }
@@ -138,42 +146,46 @@ int absfn_finish(absfn *op) noex {
 local int absfn_loadpwd(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *pbuf ; (rs = mem_almp(&pbuf)) >= 0) ylikely {
+	int		nl = 0 ; /* return-value */
+	if ((rs = ulibval.maxpathlen) >= 0) {
 	    cint	plen = rs ;
-	    if ((rs = getpwd(pbuf,plen)) >= 0) ylikely {
-	 	if ((rs = pathaddw(pbuf,rs,sp,sl)) >= 0) ylikely {
-		    sl = rs ;
-	            if (sl > ABSFN_SHORTLEN) {
-	                if (cc *cp ; (rs = mem_alst(sp,sl,&cp)) >= 0) {
-	                    *rpp = cp ;
-	                    op->as = cp ;
-	                } /* end if (memory-allocation) */
-	            } else {
-	                *rpp = op->buf ;
-	                strwcpy(op->buf,sp,sl) ;
-	            } /* end if */
-	        } /* end if (pathadd) */
-	    } /* end if (getpwd) */
-	    rs1 = mem_free(pbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
-	return (rs >= 0) ? sl : rs ;
+	    if (char *pbuf ; (rs = libmem.mall((plen + 1),&pbuf)) >= 0) {
+	        if ((rs = getpwd(pbuf,plen)) >= 0) ylikely {
+	 	    if ((rs = pathaddw(pbuf,rs,sp,sl)) >= 0) ylikely {
+		        if ((nl = rs) > ABSFN_SHORTLEN) {
+	                    if (cc *cp ; (rs = lm_strw(pbuf,nl,&cp)) >= 0) {
+	                        *rpp = cp ;
+	                        op->as = cp ;
+	                    } /* end if (memory-allocation) */
+	                } else {
+	                    *rpp = op->buf ;
+	                    strwcpy(op->buf,pbuf,nl) ;
+	                } /* end if */
+	            } /* end if (pathadd) */
+	        } /* end if (getpwd) */
+	        rs1 = lm_free(pbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (maxpathlen) */
+	return (rs >= 0) ? nl : rs ;
 }
 /* end subroutine (absfn_loadpwd) */
 
 local int absfn_loadnul(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_OK ;
+	int		nl = 0 ; /* return-value */
 	if (sl > ABSFN_SHORTLEN) {
-	    if (cchar *cp ; (rs = mem_alst(sp,sl,&cp)) >= 0) {
-		sl = rs ;
+	    if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
+		nl = rs ;
 		*rpp = cp ;
 		op->as = cp ;
 	    } /* end if (memory-allocation) */
 	} else {
+	    nl = sl ;
 	    *rpp = op->buf ;
 	    strwcpy(op->buf,sp,sl) ;
 	} /* end if */
-	return (rs >= 0) ? sl : rs ;
+	return (rs >= 0) ? nl : rs ;
 }
 /* end subroutine (absfn_loadnul) */
 
