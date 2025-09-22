@@ -39,7 +39,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strncpy(3c)| */
-#include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -51,7 +50,7 @@
 
 #include	"umem.hh"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |getlenstr(3u)| + |memclear(3u)| */
 
@@ -104,7 +103,7 @@ namespace libu {
 /* exported subroutines */
 
 namespace libu {
-    int umems::mallocstrw(cchar *sp,int 탎l,cchar **rpp) noex {
+    int umems::strw(cchar *sp,int 탎l,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		bl = 0 ; /* return-value */
 	if (sp && rpp) {
@@ -120,26 +119,26 @@ namespace libu {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? bl : rs ;
-    } /* end method (umems::mallocstrw) */
-    int umems::malloc(int sz,void *vp) noex {
+    } /* end method (umems::strw) */
+    int umems::mall(int sz,void *vp) noex {
 	umgr	lmo ;
 	lmo.m = &umgr::stdmalloc ;
 	return lmo(sz,vp) ;
-    } /* end subroutine (umems::malloc) */
-    int umems::valloc(int sz,void *vp) noex {
+    } /* end subroutine (umems::mall) */
+    int umems::vall(int sz,void *vp) noex {
 	umgr	lmo ;
 	lmo.m = &umgr::stdvalloc ;
 	return lmo(sz,vp) ;
-    } /* end subroutine (umems::valloc) */
-    int umems::calloc(int ne,int esz,void *vp) noex {
+    } /* end subroutine (umems::vall) */
+    int umems::call(int ne,int esz,void *vp) noex {
 	cint		sz = (ne * esz) ;
 	int		rs ;
 	if ((rs = malloc(sz,vp)) >= 0) {
 	    memclear(vp,sz) ;
 	}
 	return (rs >= 0) ? sz : rs ;
-    } /* end subroutine (umems::calloc) */
-    int umems::ralloc(void *cp,int sz,void *vp) noex {
+    } /* end subroutine (umems::call) */
+    int umems::rall(void *cp,int sz,void *vp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) {
 	    const uintptr_t	am = (szof(uintptr_t) - 1) ;
@@ -152,7 +151,7 @@ namespace libu {
 	    } /* end if (aligned correctly) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (umems::ralloc) */
+    } /* end subroutine (umems::rall) */
     int umems::free(void *cp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) {
@@ -172,6 +171,24 @@ namespace libu {
 	}
 	return rs ;
     } /* end subroutine (ursfree) */
+} /* end namespace (libu) */
+
+namespace libu {
+    int umems::mallocstrw(cchar *sp,int 탎l,cchar **rpp) noex {
+    	return strw(sp,탎l,rpp) ;
+    }
+    int umems::malloc(int sz,void *vp) noex {
+    	return mall(sz,vp) ;
+    }
+    int umems::valloc(int sz,void *vp) noex {
+    	return vall(sz,vp) ;
+    }
+    int umems::calloc(int ne,int esz,void *vp) noex {
+    	return call(ne,esz,vp) ;
+    }
+    int umems::ralloc(void *cp,int sz,void *vp) noex {
+    	return rall(cp,sz,vp) ;
+    }
 } /* end namespace (libu) */
 
 
@@ -209,8 +226,7 @@ int umgr::operator () (int sz,void *vp) noex {
 	    } /* end if (valid size) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (umgr::operator) */
+} /* end subroutine (umgr::operator) */
 
 int umgr::stdmalloc(int sz,void *vp) noex {
 	csize		msize = size_t(sz) ;
@@ -225,8 +241,7 @@ int umgr::stdmalloc(int sz,void *vp) noex {
 	    *rpp = nullptr ;
 	}
 	return rs ;
-}
-/* end method (umgr::stdmalloc) */
+} /* end method (umgr::stdmalloc) */
 
 int umgr::stdvalloc(int sz,void *vp) noex {
 	csize		msize = size_t(sz) ;
@@ -241,8 +256,7 @@ int umgr::stdvalloc(int sz,void *vp) noex {
 	    *rpp = nullptr ;
 	}
 	return rs ;
-}
-/* end method (umgr::stdvalloc) */
+} /* end method (umgr::stdvalloc) */
 
 int umgr::stdrealloc(int sz,void *vp) noex {
 	csize		msize = size_t(sz) ;
