@@ -49,15 +49,19 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<csignal>
 #include	<cerrno>
+#include	<csignal>
 #include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usupport.h>
 #include	<usyscalls.h>
+#include	<usupport.h>
+#include	<localmisc.h>
 
 #include	"usig.h"
 
@@ -147,8 +151,6 @@ int u_sigsuspend(const sigset_t *ssp) noex {
 	    rs = SR_OK ;
 	    if (sigsuspend(ssp) < 0) {
 		rs = (- errno) ;
-	    }
-	    if (rs < 0) {
 		switch (rs) {
 	        case SR_INTR:
 	            if (to_intr-- > 0) {
@@ -181,8 +183,7 @@ int u_pause() noex {
 
 int u_sigsend(idtype_t idtype,id_t id,int sig) noex {
 	int		rs ;
-	if ((rs = sigsend(idtype,id,sig)) < 0) {
-	    rs = (- errno) ;
+	if ((rs = sigsend(idtype,id,sig)) < 0) { rs = (- errno) ;
 	}
 	return rs ;
 }
@@ -210,12 +211,14 @@ int u_sigwait(const sigset_t *ssp,int *rp) noex {
 /* end subroutine (u_sigwait) */
 
 int u_sigmask(int how,sigset_t *setp,sigset_t *osetp) noex {
-	int		rs = SR_OK ;
-	if (errno_t ec ; (ec = pthread_sigmask(how,setp,osetp)) > 0) {
-	    rs = (- ec) ;
-	}
+	int		rs = SR_INVALID ;
+	if (how >= 0) {
+	    rs = SR_OK ;
+	    if (errno_t ec ; (ec = pthread_sigmask(how,setp,osetp)) > 0) {
+	        rs = (- ec) ;
+	    }
+	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (u_sigmask) */
+} /* end subroutine (u_sigmask) */
 
 
