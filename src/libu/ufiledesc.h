@@ -95,6 +95,7 @@ extern int u_fstatvfs(int,USTATVFS *) noex ;
 extern int u_fpathconf(int,int,long *) noex ;
 extern int u_fstype(int,char *,int) noex ;
 extern int u_fsync(int) noex ;
+extern int u_fsize(int) noex ;
 extern int u_ftruncate(int,off_t) noex ;
 extern int u_ioctl(int,int,...) noex ;
 extern int u_lockf(int,int,off_t) noex ;
