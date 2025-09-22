@@ -206,8 +206,8 @@
 /* Solaris®: sigsendset(2) */
 #define	SYSHAS_SIGSENDSET	1
 
-/* Solaris®: sigwait(2) */
-#define	SYSHAS_SIGWAIT		1
+/* Solaris®: sigwaitinfo(2) */
+#define	SYSHAS_SIGWAITINFO	1
 
 /* Solaris®: pthread_sigsend(2) */
 #define	SYSHAS_PTHREADSIGSEND	1
@@ -457,8 +457,8 @@
 /* Darwin: sigsendset(2) */
 #define	SYSHAS_SIGSENDSET	0
 
-/* Darwin: sigwait(2) */
-#define	SYSHAS_SIGWAIT		0
+/* Darwin®: sigwaitinfo(2) */
+#define	SYSHAS_SIGWAITINFO	0
 
 /* Darwin: pthread_sigsend(2) */
 #define	SYSHAS_PTHREADSIGSEND	0
@@ -684,8 +684,8 @@
 /* Linux: sigsendset(2) */
 #define	SYSHAS_SIGSENDSET	0
 
-/* Linux: sigwait(2) */
-#define	SYSHAS_SIGWAIT		1
+/* Linux®: sigwaitinfo(2) */
+#define	SYSHAS_SIGWAITINFO	1
 
 /* Linux: pthread_sigsend(2) */
 #define	SYSHAS_PTHREADSIGSEND	0
@@ -814,7 +814,7 @@ struct syshas_mgr {
         uint    sigqueue:1 ;
         uint    sigsend:1 ;
         uint    sigsendset:1 ;
-        uint    sigwait:1 ;
+        uint    sigwaitinfo:1 ;
         uint    pthreadsigsend:1 ;
         uint    ucontext:1 ;
         uint    getcontext:1 ;
