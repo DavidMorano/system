@@ -298,10 +298,10 @@ static int subinfo_idpr(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 
-	if (! sip->f.id_pr) {
+	if (! sip->fl.id_pr) {
 	    ustat	sb ;
 	    cchar		*pr = sip->pr ;
-	    sip->f.id_pr = TRUE ;
+	    sip->fl.id_pr = TRUE ;
 	    if (u_stat(pr,&sb) >= 0) {
 	        sip->uid_pr = sb.st_uid ;
 	        sip->gid_pr = sb.st_gid ;
@@ -319,12 +319,12 @@ static int subinfo_idun(SUBINFO *sip)
 	int		rs1 ;
 	int		len = 0 ;
 
-	if (! sip->f.id_un) {
+	if (! sip->fl.id_un) {
 	    struct passwd	pw ;
 	    cint		pwlen = getbufsize(getbufsize_pw) ;
 	    cchar		*un = sip->un ;
 	    char		*pwbuf ;
-	    sip->f.id_un = TRUE ;
+	    sip->fl.id_un = TRUE ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if (un[0] == '-') {
 	            if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
@@ -361,9 +361,9 @@ static int subinfo_prgroup(SUBINFO *sip)
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 
-	if (! sip->f.id_pr) rs = subinfo_idpr(sip) ;
+	if (! sip->fl.id_pr) rs = subinfo_idpr(sip) ;
 
-	if (! sip->f.id_un) rs = subinfo_idun(sip) ;
+	if (! sip->fl.id_un) rs = subinfo_idun(sip) ;
 
 	if ((rs >= 0) && (! f)) {
 	    f = (sip->gid_un == sip->gid_pr) ;
