@@ -293,7 +293,7 @@ int		logsize ;
 
 	    pip->stab.checked += 1 ;
 	    rs = 0 ;
-	    if (! pip->f.nogo)
+	    if (! pip->fl.nogo)
 	        rs = logfile_checksize(&cur,logsize) ;
 
 	    if (rs > 0) {
