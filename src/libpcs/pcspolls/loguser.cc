@@ -1,4 +1,4 @@
-/* loguser (LOGUSER) */
+/* loguser SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -18,12 +18,13 @@
 
 /*******************************************************************************
 
-	Description:
+  	Name:
+	loguser
 
+	Description:
 	This object is a PCSPOLLS module for performing LOGUSER polls.
 
 	Synopsis:
-
 	int loguser_start(op,pr,sn,envv,pcp)
 	PCSPOLLS	*op ;
 	const char	*pr ;
@@ -173,7 +174,7 @@ int loguser_start(LOGUSER *op,cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp)
 	        pthread_t	tid ;
 	        thrsub_t	thr = (thrsub_t) loguser_worker ;
 	        if ((rs = uptcreate(&tid,NULL,thr,op)) >= 0) {
-	            op->f.working = TRUE ;
+	            op->fl.working = TRUE ;
 		    op->tid = tid ;
 	        }
 	    } /* end if (non-null) */
@@ -203,19 +204,19 @@ int loguser_check(LOGUSER *op)
 
 	if (op->magic != LOGUSER_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.working) {
+	if (op->fl.working) {
 	    const pid_t	pid = getpid() ;
 	    if (pid == op->pid) {
 	        if (op->f_exiting) {
 	            int		trs = 0 ;
-	            op->f.working = FALSE ;
+	            op->fl.working = FALSE ;
 	            rs1 = uptjoin(op->tid,&trs) ;
 	            if (rs >= 0) rs = rs1 ;
 	            if (rs >= 0) rs = trs ;
 	            f = TRUE ;
 		}
 	    } else {
-		op->f.working = FALSE ;
+		op->fl.working = FALSE ;
 	    }
 	}
 
@@ -234,19 +235,19 @@ int loguser_finish(LOGUSER *op)
 	if (op->magic != LOGUSER_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
-	debugprintf("loguser_finish: f_working=%d\n",op->f.working) ;
+	debugprintf("loguser_finish: f_working=%d\n",op->fl.working) ;
 #endif
 
-	if (op->f.working) {
+	if (op->fl.working) {
 	    const pid_t	pid = getpid() ;
 	    if (pid == op->pid) {
 	        int	trs = 0 ;
-	        op->f.working = FALSE ;
+	        op->fl.working = FALSE ;
 	        rs1 = uptjoin(op->tid,&trs) ;
 	        if (rs >= 0) rs = rs1 ;
 	        if (rs >= 0) rs = trs ;
 	    } else {
-		op->f.working = FALSE ;
+		op->fl.working = FALSE ;
 		op->tid = 0 ;
 	    }
 	}
