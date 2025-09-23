@@ -91,7 +91,7 @@ struct txtindexmks_head {
 	bfile		*tagfilep ;
 	TXTINDEXMKS_PA	pi ;
 	TXTINDEXMKS_TI	ti ;
-	TXTINDEXMKS_FL	f ;
+	TXTINDEXMKS_FL	fl ;
 	uint		tagoff ;	/* tag-file running offset */
 	uint		tagsize ;	/* tag-file size (after completed) */
 	uint		magic ;
