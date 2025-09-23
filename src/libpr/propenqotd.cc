@@ -399,7 +399,7 @@ static int subinfo_start(SI *sip,time_t dt,cchar *pr,
 	sip->dt = dt ;
 	sip->euid = geteuid() ;
 
-	sip->f.logsub = true ;
+	sip->fl.logsub = true ;
 
 	if ((rs = u_stat(pr,&sb)) >= 0) {
 	    sip->uid_pr = sb.st_uid ;
@@ -632,7 +632,7 @@ static int subinfo_defaults(SI *sip) noex {
 
 	{
 	    cchar	*lf = sip->lfname ;
-	    if (((lf == nullptr) || (lf[0] == '+')) && sip->f.logsub) {
+	    if (((lf == nullptr) || (lf[0] == '+')) && sip->fl.logsub) {
 	        cchar	*vp = sip->sn ;
 	        cint	vl = -1 ;
 	        rs = subinfo_logfile(sip,vp,vl) ;
