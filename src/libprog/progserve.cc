@@ -257,7 +257,7 @@ cchar	*sav[] ;
 /* do we need a default service? */
 
 	if (cip->service[0] == '\0') {
-	    if (pip->f.defsvc) {
+	    if (pip->fl.defsvc) {
 	        cp = (pip->defsvc[0] != '\0') ? pip->defsvc : DEFSVC ;
 	        cip->service = cp ;
 	    }
@@ -324,8 +324,8 @@ cchar	*sav[] ;
 /* username service (when using FINGER)? */
 
 #if	defined(P_FINGERS) && (P_FINGERS > 0)
-	if ((rs >= 0) && (! f_served) && pip->f.loginsvc) {
-	    if (pip->f.useracct && (strcmp(cip->service,"help") != 0)) {
+	if ((rs >= 0) && (! f_served) && pip->fl.loginsvc) {
+	    if (pip->fl.useracct && (strcmp(cip->service,"help") != 0)) {
 	        struct passwd	pw ;
 	        const int	pwlen = getbufsize(getbufsize_pw) ;
 	        char		*pwbuf ;
@@ -378,7 +378,7 @@ badnosvc:
 	        proglog_printf(pip,"service not found\n") ;
 
 #if	defined(P_FINGERS) && (P_FINGERS > 0)
-	    if (pip->f.defnoserver) {
+	    if (pip->fl.defnoserver) {
 	        cp = "no user\n" ;
 	        rs = uc_writen(cip->fd_output,cp,strlen(cp)) ;
 	    }
@@ -800,7 +800,7 @@ cchar	*argz ;
 
 	rs = progshlib(pip,progfname,argz,alp,enp,enl) ;
 
-	if (pip->f.logprog) {
+	if (pip->fl.logprog) {
 	    proglog_begin(pip,pip->uip) ;
 	    if (pip->open.logprog && (rs < 0)) {
 	        proglog_printf(pip,
@@ -977,7 +977,7 @@ cchar	*argz ;
 
 	rs = progexec(pip,progfname,argz,alp) ;
 
-	if (pip->f.logprog) {
+	if (pip->fl.logprog) {
 	    proglog_begin(pip,pip->uip) ;
 	    if (pip->open.logprog) {
 	        proglog_printf(pip,
@@ -1259,7 +1259,7 @@ static int loadpeernames(PROGINFO *pip,CLIENTINFO *cip,vecstr *nlp)
 
 /* use 'nlspeername(3dam)' */
 
-	if ((rs >= 0) && (rs1 < 0) && (! pip->f.daemon)) {
+	if ((rs >= 0) && (rs1 < 0) && (! pip->fl.daemon)) {
 	    if ((cp = getourenv(pip->envv,VARNLSADDR)) != nullptr) {
 	        rs1 = nlspeername(cp,pip->domainname,peername) ;
 	        if (rs1 >= 0) {
