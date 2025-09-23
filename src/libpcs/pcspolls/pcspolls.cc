@@ -251,7 +251,7 @@ int pcspolls_start(pcspolls *op,PCSCONF *pcp,cchar *sn)
 
 	if ((rs = pcspolls_valsbegin(op,pcp,sn)) >= 0) {
 	    if ((rs = thread_start(&op->t,op)) >= 0) {
-		op->f.working = true ;
+		op->fl.working = true ;
 		op->magic = PCSPOLLS_MAGIC ;
 	    }
 	    if (rs < 0)
@@ -279,8 +279,8 @@ int pcspolls_finish(pcspolls *op)
 	nprintf(NDF,"pcspolls_finish: ent\n") ;
 #endif
 
-	if (op->f.working) {
-	    op->f.working = false ;
+	if (op->fl.working) {
+	    op->fl.working = false ;
 	    rs1 = thread_finish(&op->t) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -929,8 +929,8 @@ static int pollobj_callstart(POLLOBJ *pop,THREAD *tip)
 	    int	(*start)(void *,void *,void *,void *,void *) ;
 	    start = (int (*)(void *,void *,void *,void *,void *)) saddr ;
 	    if ((rs = (*start)(pop->obj,pr,sn,envv,pcp)) >= 0) {
-	        pop->f.running = true ;
-	        pop->f.active = true ;
+	        pop->fl.running = true ;
+	        pop->fl.active = true ;
 	    }
 #if	CF_DEBUGS
 	    debugprintf("pcspolls/pollobj_callstart: "
@@ -954,7 +954,7 @@ static int pollobj_check(POLLOBJ *pop)
 	nprintf(NDF,"pcspolls/pollobj_check: ent n=%s\n",pop->name) ;
 #endif
 
-	if ((pop->check != nullptr) && pop->f.running) {
+	if ((pop->check != nullptr) && pop->fl.running) {
 	    int	(*check)(void *) = pop->check ;
 	    rs1 = (*check)(pop->obj) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -962,10 +962,10 @@ static int pollobj_check(POLLOBJ *pop)
 #if	CF_EARLY
 	    if (f) {
 	    	int	(*finish)(void *) = pop->finish ;
-		pop->f.running = false ;
+		pop->fl.running = false ;
 	    	rs1 = (*finish)(pop->obj) ;
 	    	if (rs >= 0) rs = rs1 ;
-		pop->f.active = false ;
+		pop->fl.active = false ;
 	    }
 #endif /* CF_EARLY */
 	} /* end if (checking) */
@@ -993,15 +993,15 @@ static int pollobj_finish(POLLOBJ *pop)
 	nprintf(NDF,"pcspolls/pollobj_finish: ent n=%s\n",pop->name) ;
 #endif
 
-	if ((pop->finish != nullptr) && pop->f.active) {
+	if ((pop->finish != nullptr) && pop->fl.active) {
 	    int	(*finish)(void *) = pop->finish ;
 	    rs1 = (*finish)(pop->obj) ;
 #if	CF_DEBUGS
 	    debugprintf("pcspolls/pollobj_finish: obj->finish() rs=%d\n",rs1) ;
 #endif
 	    if (rs >= 0) rs = rs1 ;
-	    pop->f.running = false ;
-	    pop->f.active = false ;
+	    pop->fl.running = false ;
+	    pop->fl.active = false ;
 	    f = true ;
 	}
 
