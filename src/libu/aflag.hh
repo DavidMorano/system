@@ -83,15 +83,15 @@ struct aflag {
 	aflag_mx	lockend ;
 	std::atomic_flag	af{} ;
 	constexpr aflag() noex {
-	    set(this,aflagmem_set) ;
-	    clear(this,aflagmem_clear) ;
-	    test(this,aflagmem_test) ;
-	    testandset(this,aflagmem_testandset) ;
-	    wait(this,aflagmem_wait) ;
-	    notify(this,aflagmem_notify) ;
-	    notifyall(this,aflagmem_notifyall) ;
-	    lockbegin(this,aflagmx_lockbegin) ;
-	    lockend(this,aflagmx_lockend) ;
+	    set		(this,aflagmem_set) ;
+	    clear	(this,aflagmem_clear) ;
+	    test	(this,aflagmem_test) ;
+	    testandset	(this,aflagmem_testandset) ;
+	    wait	(this,aflagmem_wait) ;
+	    notify	(this,aflagmem_notify) ;
+	    notifyall	(this,aflagmem_notifyall) ;
+	    lockbegin	(this,aflagmx_lockbegin) ;
+	    lockend	(this,aflagmx_lockend) ;
 	} ;
 	operator bool () const noex {
 	    return af.test() ;
