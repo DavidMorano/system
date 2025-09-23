@@ -679,25 +679,25 @@ static int procinfo_store(PROCINFO *pip,int uit,cc *vp,int vl,cc **rpp) noex {
 
 static int procinfo_uabegin(PROCINFO *pip) noex {
 	int		rs = SR_OK ;
-	if ((! pip->f.ua) && pip->f.pw && (! pip->f.uainit)) {
-	    pip->f.uainit = true ;
+	if ((! pip->fl.ua) && pip->fl.pw && (! pip->fl.uainit)) {
+	    pip->fl.uainit = true ;
 	    if (pip->uap == nullptr) {
 	        cint	sz = szof(userattrdb) ;
 	        void	*vp{} ;
 	        if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	            pip->uap = (userattrdb *) vp ;
-	            pip->f.allocua = true ;
+	            pip->fl.allocua = true ;
 	        }
 	    }
 	    if (rs >= 0) {
 	        cchar	*un = pip->pw.pw_name ;
 	        if ((rs = userattrdb_open(pip->uap,un)) >= 0) {
-	            pip->f.ua = true ;
+	            pip->fl.ua = true ;
 		} else {
 		    {
 	                uc_free(pip->uap) ;
 	                pip->uap = nullptr ;
-	                pip->f.allocua = false ;
+	                pip->fl.allocua = false ;
 		    }
 		    if (isNotPresent(rs)) rs = SR_OK ;
 		}
@@ -710,15 +710,15 @@ static int procinfo_uabegin(PROCINFO *pip) noex {
 static int procinfo_uaend(PROCINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip->f.ua) {
-	    pip->f.ua = false ;
+	if (pip->fl.ua) {
+	    pip->fl.ua = false ;
 	    rs1 = userattrdb_close(pip->uap) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	if (pip->f.allocua && (pip->uap != nullptr)) {
+	if (pip->fl.allocua && (pip->uap != nullptr)) {
 	    rs1 = uc_free(pip->uap) ;
 	    pip->uap = nullptr ;
-	    pip->f.allocua = false ;
+	    pip->fl.allocua = false ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
@@ -729,8 +729,8 @@ static int procinfo_ualookup(PROCINFO *pip,char *rbuf,int rlen,cc *kn) noex {
 	int		rs = SR_FAULT ;
 	if (pip && rbuf && kn) {
 	    rbuf[0] = '\0' ;
-	    if (pip->f.pw) {
-	        if (! pip->f.ua) rs = procinfo_uabegin(pip) ;
+	    if (pip->fl.pw) {
+	        if (! pip->fl.ua) rs = procinfo_uabegin(pip) ;
 	        if (rs >= 0) {
 	            rs = userattrdb_lookup(pip->uap,rbuf,rlen,kn) ;
 	        }
@@ -797,7 +797,7 @@ static int procinfo_pwentry(PROCINFO *pip,cchar *un) noex {
 	char		*pwbuf = pip->tbuf ;
 	if ((rs = procinfo_getpwuser(pip,&pw,pwbuf,pwlen,un)) >= 0) {
 	    ucentpw	*pwp = cast_static<ucentpw *>(&pw) ;
-	    pip->f.pw = true ;
+	    pip->fl.pw = true ;
 	    if ((rs = pwp->size()) >= 0) {
 	        int	pwsz = rs ;
 	        char	*p{} ;
@@ -824,8 +824,8 @@ static int procinfo_getpwuser(PROCINFO *pip,ucentpw *pwp,
 	int		rs ;
 	if ((un != nullptr) && (un[0] != '-') && (un[0] != '\0')) {
 	    if ((rs = GETPW_NAME(pwp,pwbuf,pwlen,un)) >= 0) {
-	        pip->f.altuser = (pwp->pw_uid != uip->uid) ;
-	        if (pip->f.altuser) {
+	        pip->fl.altuser = (pwp->pw_uid != uip->uid) ;
+	        if (pip->fl.altuser) {
 	            uip->uid = pwp->pw_uid ;
 	            uip->gid = pwp->pw_gid ;
 	        }
@@ -844,7 +844,7 @@ static int procinfo_homedname(PROCINFO *pip) noex {
 	if ((pip->sis[uit] == 0) && (uip->homedname == nullptr)) {
 	    cchar	*vp = nullptr ;
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            vp = getenv(varname.home) ;
 	        }
 	    }
@@ -867,7 +867,7 @@ static int procinfo_shell(PROCINFO *pip) noex {
 	if ((pip->sis[uit] == 0) && (uip->shell == nullptr)) {
 	    cchar	*vp = nullptr ;
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            vp = getenv(varname.shell) ;
 	        }
 	    }
@@ -894,7 +894,7 @@ static int procinfo_org(PROCINFO *pip) noex {
 	    char	*orgfname{} ;
 	    if ((rs = malloc_mp(&orgfname)) >= 0) {
 	        if ((vp == nullptr) || (vp[0] == '\0')) {
-	            if (! pip->f.altuser) {
+	            if (! pip->fl.altuser) {
 	                vp = getenv(varname.organization) ;
 	            }
 	        }
@@ -903,7 +903,7 @@ static int procinfo_org(PROCINFO *pip) noex {
 	            rs = sncpy2(cname,orglen,".",orgcname) ;
 	            if (rs >= 0) {
 	                cchar	*hd = uip->homedname ;
-	                if ((hd == nullptr) && pip->f.pw) {
+	                if ((hd == nullptr) && pip->fl.pw) {
 	                    hd = pip->pw.pw_dir ;
 		        }
 	                if (hd == nullptr) hd = DEFHOMEDNAME ;
@@ -936,7 +936,7 @@ static int procinfo_bin(PROCINFO *pip) noex {
 	if ((pip->sis[uit] == 0) && (uip->bin == nullptr)) {
 	    cchar	*vp = nullptr ;
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            vp = getenv(VARBIN) ;
 	        }
 	    }
@@ -955,7 +955,7 @@ static int procinfo_office(PROCINFO *pip) noex {
 	if ((pip->sis[uit] == 0) && (uip->office == nullptr)) {
 	    cchar	*vp = nullptr ;
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            vp = getenv(VAROFFICE) ;
 	        }
 	    }
@@ -974,7 +974,7 @@ static int procinfo_printer(PROCINFO *pip) noex {
 	if ((pip->sis[uit] == 0) && (uip->printer == nullptr)) {
 	    cchar	*vp = nullptr ;
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            vp = getenv(varname.printer) ;
 	        }
 	    }
@@ -991,7 +991,7 @@ static int procinfo_gecos(PROCINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		*gstr = pip->pw.pw_gecos ;
-	if (pip->f.pw && (gstr != nullptr) && (gstr[0] != '\0')) {
+	if (pip->fl.pw && (gstr != nullptr) && (gstr[0] != '\0')) {
 	    gecos	g ;
 	    if ((rs = gecos_start(&g,gstr,-1)) >= 0) {
 	        userinfo	*uip = pip->uip ;
@@ -1126,7 +1126,7 @@ static int procinfo_realname(PROCINFO *pip) noex {
 	    cchar	*sp = pip->tstrs.gecosname ;
 	    char	nbuf[REALNAMELEN+1] ;
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            sp = getenv(varname.name) ;
 	        }
 	    }
@@ -1160,7 +1160,7 @@ static int procinfo_mailname(PROCINFO *pip) noex {
 	    char	nbuf[REALNAMELEN+1] ;
 	    char	mbuf[REALNAMELEN+1] ;
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            sp = getenv(varname.mailname) ;
 	        }
 	    }
@@ -1168,20 +1168,20 @@ static int procinfo_mailname(PROCINFO *pip) noex {
 	        sp = pip->tstrs.gecosname ;
 	    }
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
-	        if (pip->f.pw) {
+	        if (pip->fl.pw) {
 	            cchar	*gn = pip->pw.pw_gecos ;
 	            sp = nbuf ;
 	            sl = mkgecosname(nbuf,nlen,gn) ;
 	        }
 	    }
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            sp = getenv(varname.name) ;
 		    sl = -1 ;
 	        }
 	    }
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
-	        if (pip->f.pw) {
+	        if (pip->fl.pw) {
 		    sp = pip->pw.pw_name ;
 		    sl = -1 ;
 		}
@@ -1209,7 +1209,7 @@ static int procinfo_name(PROCINFO *pip) noex {
 	    char	gbuf[REALNAMELEN+1] ;
 	    char	rbuf[REALNAMELEN+1] ;
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            sp = getenv(varname.name) ;
 	        }
 	    }
@@ -1228,7 +1228,7 @@ static int procinfo_name(PROCINFO *pip) noex {
 	        }
 	    }
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
-	        if (pip->f.pw) {
+	        if (pip->fl.pw) {
 		    sp = pip->pw.pw_name ;
 		    sl = -1 ;
 		}
@@ -1247,7 +1247,7 @@ static int procinfo_fullname(PROCINFO *pip) noex {
 	int		uit = uit_fullname ;
 	if ((pip->sis[uit] == 0) && (uip->fullname == nullptr)) {
 	    cchar	*sp = nullptr ;
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            sp = getenv(varname.fullname) ;
 	        }
 	    if ((sp != nullptr) && (sp[0] != '\0')) {
@@ -1285,7 +1285,7 @@ static int procinfo_domainname(PROCINFO *pip) noex {
 	if ((pip->sis[uit] == 0) && (uip->domainname == nullptr)) {
 	    uip->domainname = nullptr ;
 	    if (uip->domainname == nullptr) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 		    cnullptr	np{} ;
 		    cchar	*valp ; 
 		    if ((valp = getenv(varname.localdomain)) != np) {
@@ -1299,7 +1299,7 @@ static int procinfo_domainname(PROCINFO *pip) noex {
 	        int	dl = -1 ;
 	        char	*dbuf = pip->domainname ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
-	            if (pip->f.pw) {
+	            if (pip->fl.pw) {
 	                cchar	*kn = UA_DN ;
 	                rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
 	                if (isNotPresent(rs)) {
@@ -1334,7 +1334,7 @@ static int procinfo_project(PROCINFO *pip) noex {
 	    int		dl = -1 ;
 	    char	dbuf[dlen+1] = { 0 } ;
 	    if ((rs >= 0) && (dbuf[0] == '\0')) {
-	        if (pip->f.pw) {
+	        if (pip->fl.pw) {
 	            cchar	*kn = UA_PROJECT ;
 	            rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
 	            dl = rs ;
@@ -1345,7 +1345,7 @@ static int procinfo_project(PROCINFO *pip) noex {
 	        }
 	    }
 	    if ((rs >= 0) && (dbuf[0] == '\0')) {
-	        if (pip->f.pw) {
+	        if (pip->fl.pw) {
 	            cchar	*un = pip->pw.pw_name ;
 	            rs = getprojname(dbuf,dlen,un) ;
 	            dl = rs ;
@@ -1370,7 +1370,7 @@ static int procinfo_tz(PROCINFO *pip) noex {
 	if ((pip->sis[uit] == 0) && (uip->tz == nullptr)) {
 	    uip->tz = nullptr ;
 	    if (uip->tz == nullptr) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            uip->tz = getenv(varname.tz) ;
 	        }
 	    }
@@ -1379,7 +1379,7 @@ static int procinfo_tz(PROCINFO *pip) noex {
 	        int	dl = -1 ;
 	        char	dbuf[TZABBRLEN+1] = { 0 } ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
-	            if (pip->f.pw) {
+	            if (pip->fl.pw) {
 	                cchar	*kn = UA_TZ ;
 	                rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
 	                dl = rs ;
@@ -1406,7 +1406,7 @@ static int procinfo_md(PROCINFO *pip) noex {
 	if ((pip->sis[uit] == 0) && (uip->md == nullptr)) {
 	    uip->md = nullptr ;
 	    if (uip->md == nullptr) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            uip->md = getenv(varname.maildir) ;
 	        }
 	    }
@@ -1416,7 +1416,7 @@ static int procinfo_md(PROCINFO *pip) noex {
 		if ((rs = malloc_hn(&dbuf)) >= 0) {
 		    cint	dlen = rs ;
 	            if ((rs >= 0) && (dbuf[0] == '\0')) {
-	                if (pip->f.pw) {
+	                if (pip->fl.pw) {
 	                    cchar	*kn = UA_MD ;
 	                    rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
 	                    dl = rs ;
@@ -1445,7 +1445,7 @@ static int procinfo_wstation(PROCINFO *pip) noex {
 	if ((pip->sis[uit] == 0) && (uip->wstation == nullptr)) {
 	    uip->wstation = nullptr ;
 	    if (uip->wstation == nullptr) {
-	        if (! pip->f.altuser) {
+	        if (! pip->fl.altuser) {
 	            uip->wstation = getenv(VARWSTATION) ;
 	        }
 	    }
@@ -1454,7 +1454,7 @@ static int procinfo_wstation(PROCINFO *pip) noex {
 	        int	dl = -1 ;
 	        char	dbuf[WSLEN+1] = { 0 } ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
-	            if (pip->f.pw) {
+	            if (pip->fl.pw) {
 	                cchar	*kn = UA_WS ;
 	                rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
 	                dl = rs ;
