@@ -818,8 +818,8 @@ algorithms.dir:
 	makesubdir $@
 
 # MATHDAM
-mathdam.o:		mathdam.dir
-mathdam.dir:	
+mathx.o:		mathx.dir
+mathx.dir:	
 	makesubdir $@
 
 # FMQ
