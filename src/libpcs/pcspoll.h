@@ -1,5 +1,9 @@
 /* pcspoll HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
+
+/* load management and interface for the PCSPOLLS object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -52,7 +56,7 @@ struct pcspoll_head {
 	void		*obj ;		/* object pointer */
 	modload		loader ;
 	PCSPOLL_CA	call ;
-	PCSPOLL_FL	f ;
+	PCSPOLL_FL	fl ;
 	uint		magic ;
 } ;
 
