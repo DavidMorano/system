@@ -1,7 +1,9 @@
-/* maininfo */
+/* maininfo SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
+/* main information */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGN	0		/* special debugging */
@@ -9,12 +11,12 @@
 #define	CF_SIGHAND	1		/* install csignalandlers */
 #define	CF_SIGALTSTACK	0		/* do *not* define */
 
-
 /* revision history:
 
 	= 2001-11-01, David A­D­ Morano
-	This subroutine was written for use as a front-end for Korn Shell (KSH)
-	commands that are compiled as stand-alone programs.
+	This subroutine was written for use as a front-end for Korn
+	Shell (KSH) commands that are compiled as stand-alone
+	programs.
 
 */
 
@@ -22,21 +24,22 @@
 
 /*******************************************************************************
 
-	This is the front-end to make the various SHELL (KSH) built-in commands
-	into stand-alone programs.
+  	Name:
+	maininfo
 
+	Descroption:
+	This is the front-end to make the various SHELL (KSH)
+	built-in commands into stand-alone programs.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<upt.h>
@@ -48,18 +51,14 @@
 /* local defines */
 
 
-/* external subroutines */
+/* local typedefs */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy2w(char *,int,const char *,const char *,int) ;
-extern int	sncpylc(char *,int,const char *) ;
-extern int	sncpyuc(char *,int,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	haslc(const char *,int) ;
-extern int	hasuc(const char *,int) ;
-extern int	isNotPresent(int) ;
+extern "C" {
+    typedef int (*thrsub)(void *) noex ;
+}
+
+
+/* external subroutines */
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
@@ -67,12 +66,8 @@ extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 #if	CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strnrchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -80,26 +75,25 @@ extern char	*strnrchr(const char *,int,int) ;
 
 /* local structures */
 
-typedef int (*thrsub)(void *) ;
-
 
 /* forward references */
 
-static int	maininfo_utiler(MAININFO *) ;
+static int	maininfo_utiler(MAININFO *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int maininfo_start(MAININFO *mip,int argc,cchar **argv)
-{
+int maininfo_start(MAININFO *mip,int argc,mainv argv) noex {
 	sigset_t	ss ;
-	const int	sig = SIGTIMEOUT ;
+	cint	sig = SIGTIMEOUT ;
 	int		rs ;
-	const char	*argz = NULL ;
+	cchar	*argz = NULL ;
 
 	memset(mip,0,sizeof(MAININFO)) ;
 
@@ -119,7 +113,7 @@ int maininfo_start(MAININFO *mip,int argc,cchar **argv)
 	        if ((cl = sfbasename(argz,-1,&cp)) > 0) {
 	            cchar	**vpp = &mip->progname ;
 	            if (cp[0] == '-') {
-	                mip->f.progdash = TRUE ;
+	                mip->fl.progdash = TRUE ;
 	                cp += 1 ;
 	                cl -= 1 ;
 	            }
@@ -282,7 +276,7 @@ int maininfo_utilbegin(MAININFO *op,int f_run)
 	if (f_run) {
 	    if ((rs = uptcreate(&tid,NULL,w,op)) >= 0) {
 	        op->tid = tid ;
-	        op->f.utilout = TRUE ;
+	        op->fl.utilout = TRUE ;
 	    }
 	} /* end if (run) */
 
@@ -290,26 +284,20 @@ int maininfo_utilbegin(MAININFO *op,int f_run)
 }
 /* end subroutine (maininfo_utilbegin) */
 
-
-int maininfo_utilend(MAININFO *op)
-{
+int maininfo_utilend(MAININFO *op) noex {
 	int		rs = SR_OK ;
-
-	if (op->f.utilout) {
+	if (op->fl.utilout) {
 	    int		trs = SR_OK ;
-	    op->f.utilout = FALSE ;
+	    op->fl.utilout = FALSE ;
 	    if ((rs = uptjoin(op->tid,&trs)) >= 0) {
 	        rs = trs ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (maininfo_utilend) */
 
-
-int maininfo_srchname(MAININFO *mip,cchar **rpp)
-{
+int maininfo_srchname(MAININFO *mip,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	cchar		*srch = mip->progname ;
 	if (rpp == NULL) return SR_FAULT ;
