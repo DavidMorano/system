@@ -56,21 +56,21 @@ constexpr int	nwords = ((UCHAR_MAX + 1) / (szof(word_t) * CHAR_BIT)) ;
 export {
     struct chrset {
 	word_t		bs[nwords] = {} ;	/* 32 bytes (4 words) */
-	constexpr int load(cchar *) noex ;
-	constexpr chrset() = default ;
-	constexpr chrset(cchar *ss) noex {
+	int load(cchar *) noex ;
+	chrset() = default ;
+	chrset(cchar *ss) noex {
 	    load(ss) ;
 	} ;
-	constexpr void set(int) noex ;
-	constexpr void clr(int) noex ;
-	constexpr bool tst(int) const noex ;
-	constexpr bool operator [] (int ch) const noex {
+	void set(int) noex ;
+	void clr(int) noex ;
+	bool tst(int) const noex ;
+	bool operator [] (int ch) const noex {
 	    return batst(bs,ch) ;
 	} ;
     } ; /* end struct (chrset) */
 } /* end export */
 
-constexpr int chrset::load(cchar *ss) noex {
+int chrset::load(cchar *ss) noex {
     	int		rs = SR_FAULT ;
 	if (ss) {
 	    for (int ch ; ((ch = (*ss & UCHAR_MAX))) ; ss += 1) {
@@ -80,15 +80,15 @@ constexpr int chrset::load(cchar *ss) noex {
 	return rs ;
 } /* end method (chrset::load) */
 
-constexpr bool chrset::tst(int ch) const noex {
+bool chrset::tst(int ch) const noex {
 	return bool(batst(bs,ch)) ;
 } /* end method (chrset::tst) */
 
-constexpr void chrset::set(int ch) noex {
+void chrset::set(int ch) noex {
 	baset(bs,ch) ;
 } /* end method (chrset::set) */
 
-constexpr void chrset::clr(int ch) noex {
+void chrset::clr(int ch) noex {
 	baclr(bs,ch) ;
 } /* end method (chrset::clr) */
 
