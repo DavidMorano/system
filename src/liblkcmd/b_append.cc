@@ -524,7 +524,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* take input file arguments from STDIN */
@@ -574,23 +574,23 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* truncate */
 	                    case 't':
-	                        lip->f.trunc = TRUE ;
+	                        lip->fl.trunc = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.trunc = (rs > 0) ;
+	                                lip->fl.trunc = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 	                    case 'u':
-	                        lip->f.lbuf = TRUE ;
+	                        lip->fl.lbuf = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.lbuf = (rs > 0) ;
+	                                lip->fl.lbuf = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -904,7 +904,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 	    int		cl ;
 	    cchar	*cp ;
 
-	    if (lip->f.trunc) lip->start = 0L ;
+	    if (lip->fl.trunc) lip->start = 0L ;
 
 	    if ((rs = shio_isseekable(ofp)) > 0) {
 	        if (lip->start >= 0) {
@@ -915,14 +915,14 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 	    } /* end if (stat) */
 
 #ifdef	COMMENT
-	    if (pip->f.bufnone)
+	    if (pip->fl.bufnone)
 	        shio_control(ofp,SHIO_CSETBUFNONE,TRUE) ;
 
 	    if (pip->have.bufline)
-	        shio_control(ofp,SHIO_CSETBUFLINE,pip->f.bufline) ;
+	        shio_control(ofp,SHIO_CSETBUFLINE,pip->fl.bufline) ;
 
 	    if (pip->have.bufwhole)
-	        shio_control(ofp,SHIO_CSETBUFWHOLE,pip->f.bufwhole) ;
+	        shio_control(ofp,SHIO_CSETBUFWHOLE,pip->fl.bufwhole) ;
 #endif /* COMMENT */
 
 	    if (rs >= 0) {
@@ -978,7 +978,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 	            rs1 = shio_close(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                shio_printf(pip->efp,
 	                    "%s: inaccessible argument-list (%d)\n",
 	                    pip->progname,rs) ;
@@ -1069,7 +1069,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar fname[])
 	            debugprintf("main/procfile: shio_write() rs=%d\n",rs) ;
 #endif
 
-	        if ((rs >= 0) && lip->f.lbuf) {
+	        if ((rs >= 0) && lip->fl.lbuf) {
 	            if (strnchr(lbuf,len,'\n') != NULL)
 	                rs = bflush(ofp) ;
 	        }
