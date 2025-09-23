@@ -96,10 +96,10 @@ int progloger_begin(PROGINFO *pip,cchar *lfn,USERINFO *uip)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("progloger_begin: f_log=%u lfn=%s\n",
-	        pip->f.logprog,lfn) ;
+	        pip->fl.logprog,lfn) ;
 #endif
 
-	if (pip->f.logprog) {
+	if (pip->fl.logprog) {
 	    const char	*logcname = LOGCNAME ;
 	    char	lbuf[MAXPATHLEN+1] ;
 	    if ((rs = proglogfname(pip,lbuf,logcname,lfn)) >= 0) {
