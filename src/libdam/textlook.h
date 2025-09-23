@@ -77,7 +77,7 @@ struct textlook_head {
 	txtindex	*idp ;			/* index-data-pointer */
 	time_t		ti_lastcheck ;
 	time_t		ti_tind ;		/* text-index */
-	TEXTLOOK_FL	f ;
+	TEXTLOOK_FL	fl ;
 	uint		magic ;
 	int		pagesize ;
 	int		dbfsize ;		/* DB file-size */
