@@ -316,8 +316,8 @@ int txtindexmks_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	            op->om = (om | 0600) ;
 	            op->nfd = -1 ;
 	            op->pi = *pp ; /* copy the given parameters */
-	            op->f.ofcreat = MKBOOL(of & O_CREAT) ;
-	            op->f.ofexcl = MKBOOL(of & O_EXCL) ;
+	            op->fl.ofcreat = MKBOOL(of & O_CREAT) ;
+	            op->fl.ofexcl = MKBOOL(of & O_EXCL) ;
 	            if (cchar *cp ; (rs = uc_mallocstrw(db,-1,&cp)) >= 0) {
 	                op->dbname = cp ;
 	                if ((rs = txtindexmks_checkparams(op)) >= 0) {
@@ -359,7 +359,7 @@ int txtindexmks_close(TIM *op) noex {
 	int		rs1 ;
 	int		clists = 0 ;
 	if ((rs = txtindexmks_magic(op)) >= 0) {
-	    bool	f_go  = (! op->f.abort) ;
+	    bool	f_go  = (! op->fl.abort) ;
 	    {
 	        rs1 = txtindexmks_ntagclose(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -415,7 +415,7 @@ int txtindexmks_noop(TIM *op) noex {
 int txtindexmks_abort(TIM *op) noex {
 	int		rs ;
 	if ((rs = txtindexmks_magic(op)) >= 0) {
-	    op->f.abort = true ;
+	    op->fl.abort = true ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -491,7 +491,7 @@ static int txtindexmks_checkparams(TIM *op) noex {
 static int txtindexmks_filesbegin(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	if (op->f.ofcreat) {
+	if (op->fl.ofcreat) {
 	    rs = txtindexmks_filesbeginc(op) ;
 	} else {
 	    rs = txtindexmks_filesbeginwait(op) ;
@@ -502,7 +502,7 @@ static int txtindexmks_filesbegin(TIM *op) noex {
 /* end subroutine (txtindexmks_filesbegin) */
 
 static int txtindexmks_filesbeginc(TIM *op) noex {
-	cint		type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	cint		type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	cint		szinc = (var.maxpathlen + 1) ;
 	int		rs ;
 	int		rs1 ;
@@ -518,17 +518,17 @@ static int txtindexmks_filesbeginc(TIM *op) noex {
 	        char	*rbuf = (ap + (szinc * ai++)) ;
 	        if (type) {
 	            if ((rs = mktmpfile(rbuf,tbuf,om)) >= 0) {
-	    	        op->f.created = true ;
+	    	        op->fl.created = true ;
 	                tfn = rbuf ;
 		    }
 	        }
 	        if (rs >= 0) {
 	            bfile	*tfp = op->tagfilep ;
 	            char	ostr[8] = "wc" ;
-	            if (op->f.ofexcl) strcat(ostr,"e") ;
+	            if (op->fl.ofexcl) strcat(ostr,"e") ;
 	            if ((rs = bopen(tfp,tfn,ostr,om)) >= 0) {
 	                cchar	*cp ;
-	    	        op->f.created = true ;
+	    	        op->fl.created = true ;
 	                if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
 	                    op->ntagfname = charp(cp) ;
 	                }
@@ -565,7 +565,7 @@ static int txtindexmks_filesbeginwait(TIM *op) noex {
 		    if (to-- == 0) break ;
 		} /* end while (db exists) */
 		if (rs == nrs) {
-		    op->f.ofcreat = false ;
+		    op->fl.ofcreat = false ;
 		    c = 0 ;
 		    rs = txtindexmks_filesbeginc(op) ;
 		}
@@ -581,7 +581,7 @@ static int txtindexmks_filesbeginopen(TIM *op,cchar *tfn) noex {
 	char		ostr[8] = "wce" ;
 	if ((rs = bopen(tfp,tfn,ostr,om)) >= 0) {
 	    cchar	*cp ;
-	    op->f.created = true ;
+	    op->fl.created = true ;
 	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
 		op->ntagfname = (char *) cp ;
 	    }
@@ -596,13 +596,13 @@ static int txtindexmks_filesbeginopen(TIM *op,cchar *tfn) noex {
 static int txtindexmks_filesend(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.tagopen) {
-	    op->f.tagopen = false ;
+	if (op->fl.tagopen) {
+	    op->fl.tagopen = false ;
 	    rs1 = bclose(op->tagfilep) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (op->ntagfname != nullptr) {
-	    if (op->f.created && (op->ntagfname[0] != '\0')) {
+	    if (op->fl.created && (op->ntagfname[0] != '\0')) {
 	        u_unlink(op->ntagfname) ;
 	    }
 	    rs1 = uc_free(op->ntagfname) ;
@@ -610,7 +610,7 @@ static int txtindexmks_filesend(TIM *op) noex {
 	    op->ntagfname = nullptr ;
 	}
 	if (op->nidxfname != nullptr) {
-	    if (op->f.created && (op->nidxfname[0] != '\0')) {
+	    if (op->fl.created && (op->nidxfname[0] != '\0')) {
 	        u_unlink(op->nidxfname) ;
 	    }
 	    rs1 = uc_free(op->nidxfname) ;
@@ -1047,7 +1047,7 @@ static int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 /* end subroutine (txtindexmks_mkhashwreigen) */
 
 static int txtindexmks_nhashopen(TIM *op) noex {
-	cint		type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	cint		type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	int		rs ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_IND ;
@@ -1062,7 +1062,7 @@ static int txtindexmks_nhashopen(TIM *op) noex {
 	        op->nfd = rs ;
 	        tfn = rbuf ;
 	    } else {
-	        if (op->f.ofexcl) of |= O_EXCL ;
+	        if (op->fl.ofexcl) of |= O_EXCL ;
 	        rs = uc_open(tbuf,of,om) ;
 	        op->nfd = rs ;
 	    }
@@ -1135,7 +1135,7 @@ int txtindexmks_ntagclose(TIM *op) noex {
 	{
 	    rs1 = bclose(op->tagfilep) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->f.tagopen = false ;
+	    op->fl.tagopen = false ;
 	}
 	return (rs >= 0) ? tagsize : rs ;
 }
