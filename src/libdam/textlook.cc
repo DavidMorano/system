@@ -636,7 +636,7 @@ static int textlook_indopen(TL *op,SI *sip) noex {
     	int		rs = SR_FAULT ;
 	if (op && sip) {
 	    if ((rs = txtindex_open(op->idp,op->pr,op->dbname)) >= 0) {
-	        op->f.ind = true ;
+	        op->fl.ind = true ;
 	        rs = textlook_snbegin(op) ;
 	        if (rs < 0) {
 	            txtindex_close(op->idp) ;
@@ -708,8 +708,8 @@ static int textlook_indclose(TL *op) noex {
 	    rs1 = textlook_snend(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	if (op->f.ind) {
-	    op->f.ind = false ;
+	if (op->fl.ind) {
+	    op->fl.ind = false ;
 	    rs1 = txtindex_close(op->idp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1043,8 +1043,8 @@ static int subinfo_start(SI *sip) noex {
 static int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (sip->f.id) {
-	    sip->f.id = false ;
+	if (sip->fl.id) {
+	    sip->fl.id = false ;
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
