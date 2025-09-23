@@ -95,8 +95,8 @@ int pimkreplyaddr(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
-	if (! pip->f.init_replyto) {
-	    pip->f.init_replyto = true ;
+	if (! pip->fl.init_replyto) {
+	    pip->fl.init_replyto = true ;
 	    if (pip->hdr_replyto == nullptr) {
 	        if (pip->hdr_replyto == nullptr) {
 		    cchar	*cp = nullptr ;
@@ -137,7 +137,7 @@ static int piloadreply(PROGINFO *pip) noex {
 
 /* add a name if we can find one */
 
-	    if (! pip->f.init_fromname) {
+	    if (! pip->fl.init_fromname) {
 	        rs = mkfromname(pip) ;
 	    }
 
