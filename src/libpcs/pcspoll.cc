@@ -1,10 +1,11 @@
-/* pcspoll */
+/* pcspoll SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* load management and interface for the PCSPOLLS object */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -21,27 +22,26 @@
 
 /*******************************************************************************
 
-	This module implements an interface (a trivial one) that provides
-	access to the PCSPOLLS object (which is dynamically loaded).
+  	Name:
+	pcspoll
 
+	Description:
+	This module implements an interface (a trivial one) that
+	provides access to the PCSPOLLS object (which is dynamically
+	loaded).
 
 *******************************************************************************/
 
-
-#define	PCSPOLL_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<modload.h>
@@ -71,22 +71,13 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	pathclean(char *,const char *,int) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
+
+
+/* external variables */
 
 
 /* local structures */
@@ -94,10 +85,10 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* forward references */
 
-static int	pcspoll_objloadbegin(PCSPOLL *,const char *,const char *) ;
+static int	pcspoll_objloadbegin(PCSPOLL *,cchar *,cchar *) ;
 static int	pcspoll_objloadend(PCSPOLL *) ;
-static int	pcspoll_modloadopen(PCSPOLL *,const char *,const char *) ;
-static int	pcspoll_loadcalls(PCSPOLL *,const char *) ;
+static int	pcspoll_modloadopen(PCSPOLL *,cchar *,cchar *) ;
+static int	pcspoll_loadcalls(PCSPOLL *,cchar *) ;
 
 static int	isrequired(int) ;
 
@@ -112,7 +103,7 @@ static cchar	*subs[] = {
 	"info",
 	"cmd",
 	"finish",
-	NULL
+	nullptr
 } ;
 
 enum subs {
@@ -130,9 +121,9 @@ enum subs {
 int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn)
 {
 	int		rs ;
-	const char	*pr ;
+	cchar	*pr ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("pcspoll_start: pcp={%p} sn=%s\n",pcp,sn) ;
@@ -140,26 +131,26 @@ int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn)
 
 	memset(op,0,sizeof(PCSPOLL)) ;
 
-	if (pcp == NULL) return SR_FAULT ;
-	if (sn == NULL) return SR_FAULT ;
+	if (pcp == nullptr) return SR_FAULT ;
+	if (sn == nullptr) return SR_FAULT ;
 
 	if (sn[0] == '\0') return SR_INVALID ;
 
 	pr = pcp->pr ;
-	if (pr == NULL)
+	if (pr == nullptr)
 	    return SR_BUGCHECK ;
 
 	{
 	    ustat	sb ;
-	    const char	*lc = LIBCNAME ;
-	    const char	*pc = POLLSCNAME ;
+	    cchar	*lc = LIBCNAME ;
+	    cchar	*pc = POLLSCNAME ;
 	    char	pollsdname[MAXPATHLEN+1] ;
 	    if ((rs = mkpath3(pollsdname,pr,lc,pc)) >= 0) {
 	        if ((u_stat(pollsdname,&sb) >= 0) && S_ISDIR(sb.st_mode)) {
-		    const char	*objname = PCSPOLL_OBJNAME ;
+		    cchar	*objname = PCSPOLL_OBJNAME ;
 	            if ((rs = pcspoll_objloadbegin(op,pr,objname)) >= 0) {
 	                if ((rs = (*op->call.start)(op->obj,pcp,sn)) >= 0) {
-			    op->f.loaded = TRUE ;
+			    op->fl.loaded = TRUE ;
 			}
 	                if (rs < 0)
 		            pcspoll_objloadend(op) ;
@@ -184,11 +175,11 @@ int pcspoll_finish(PCSPOLL *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSPOLL_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.loaded) {
+	if (op->fl.loaded) {
 	    rs1 = (*op->call.finish)(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = pcspoll_objloadend(op) ;
@@ -206,14 +197,14 @@ int pcspoll_info(PCSPOLL *op,PCSPOLL_INFO *ip)
 	int		rs = SR_NOSYS ;
 	int		n = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSPOLL_MAGIC) return SR_NOTOPEN ;
 
-	if (ip != NULL) memset(ip,0,sizeof(PCSPOLL_INFO)) ;
+	if (ip != nullptr) memset(ip,0,sizeof(PCSPOLL_INFO)) ;
 
-	if (op->f.loaded) {
-	    if (op->call.info != NULL) {
+	if (op->fl.loaded) {
+	    if (op->call.info != nullptr) {
 	        PCSPOLLS_INFO	ps ;
 	        rs = (*op->call.info)(op->obj,&ps) ;
 	        if (rs >= 0) {
@@ -233,12 +224,12 @@ int pcspoll_cmd(PCSPOLL *op,int cmd)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSPOLL_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.loaded) {
-	    if (op->call.cmd != NULL) {
+	if (op->fl.loaded) {
+	    if (op->call.cmd != nullptr) {
 	        rs = (*op->call.cmd)(op->obj,cmd) ;
 	    }
 	} else
@@ -272,7 +263,7 @@ static int pcspoll_objloadbegin(PCSPOLL *op,cchar *pr,cchar *objname)
 	            rs = pcspoll_loadcalls(op,objname) ;
 		    if (rs < 0) {
 	    	        uc_free(op->obj) ;
-	    	        op->obj = NULL ;
+	    	        op->obj = nullptr ;
 		    }
 	        } /* end if (memory-allocation) */
 	    } /* end if (getmv) */
@@ -290,10 +281,10 @@ static int pcspoll_objloadend(PCSPOLL *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->obj != NULL) {
+	if (op->obj != nullptr) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->obj = NULL ;
+	    op->obj = nullptr ;
 	}
 
 	rs1 = modload_close(&op->loader) ;
@@ -315,10 +306,10 @@ static int pcspoll_modloadopen(PCSPOLL *op,cchar *pr,cchar *objname)
 	if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
 	    MODLOAD	*lp = &op->loader ;
  	    int		i ;
-	    const char	*modbname ;
+	    cchar	*modbname ;
 	    char	symname[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
+	    for (i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
 	        if (isrequired(i)) {
 	            rs = sncpy3(symname,SYMNAMELEN,objname,"_",subs[i]) ;
 		    if (rs >= 0)
@@ -356,7 +347,7 @@ static int pcspoll_loadcalls(PCSPOLL *op,cchar objname[])
 	char		symname[SYMNAMELEN + 1] ;
 	const void	*snp ;
 
-	for (i = 0 ; subs[i] != NULL ; i += 1) {
+	for (i = 0 ; subs[i] != nullptr ; i += 1) {
 
 	    rs = sncpy3(symname,SYMNAMELEN,objname,"_",subs[i]) ;
 	    if (rs < 0) break ;
@@ -364,21 +355,21 @@ static int pcspoll_loadcalls(PCSPOLL *op,cchar objname[])
 	    rs1 = modload_getsym(lp,symname,&snp) ;
 
 	    if (rs1 == SR_NOTFOUND) {
-		snp = NULL ;
+		snp = nullptr ;
 		if (isrequired(i)) break ;
 	    } else
 		rs = rs1 ;
 
 	    if (rs < 0) break ;
 
-	    if (snp != NULL) {
+	    if (snp != nullptr) {
 
 	        c += 1 ;
 		switch (i) {
 
 		case sub_start:
 		    op->call.start = 
-			(int (*)(void *,PCSCONF *,const char *)) snp ;
+			(int (*)(void *,PCSCONF *,cchar *)) snp ;
 		    break ;
 
 		case sub_info:
