@@ -1,4 +1,4 @@
-/* testpollobj */
+/* testpollobj SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -43,15 +43,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<pcsconf.h>
 #include	<storebuf.h>
@@ -190,7 +189,7 @@ PCSCONF		*pcp ;
 	if ((rs = uc_malloc(wsize,&wap)) >= 0) {
 	    workargs_load(wap,op,pr,sn,envv,pcp) ;
 	    if ((rs = thrbase_start(&op->t,worker,wap)) >= 0) {
-		op->f.working = TRUE ;
+		op->fl.working = TRUE ;
 		op->wap = wap ;
 		op->magic = TESTPOLLOBJ_MAGIC ;
 	    }
@@ -220,11 +219,11 @@ TESTPOLLOBJ	*op ;
 	if (op->magic != TESTPOLLOBJ_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
-	debugprintf("testpollobj_finish: f_working=%d\n",op->f.working) ;
+	debugprintf("testpollobj_finish: f_working=%d\n",op->fl.working) ;
 #endif
 
-	if (op->f.working) {
-	    op->f.working = FALSE ;
+	if (op->fl.working) {
+	    op->fl.working = FALSE ;
 	    rs1 = thrbase_finish(&op->t) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
