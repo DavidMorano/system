@@ -37,15 +37,15 @@ INCS += libf.h
 
 MODS +=
 
-LIBS +=
+LIBS += -lu
 
 
 OBJ0= freadln.o
-OBJ1=
+OBJ1= fwrite.o fprint.o
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o 
+OBJA= obj0.o obj1.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= obja.o
@@ -101,7 +101,7 @@ all:			$(ALL)
 
 
 $(T).so:		$(OBJ)
-	$(LD) -shared $(LDFLAGS) -o $@ $(OBJ)
+	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
@@ -152,5 +152,7 @@ objb.o:			$(OBJB)
 
 
 freadln.o:		freadln.cc	freadln.h	$(INCS)
+fwrite.o:		fwrite.cc			$(INCS)
+fprint.o:		fprint.cc			$(INCS)
 
 
