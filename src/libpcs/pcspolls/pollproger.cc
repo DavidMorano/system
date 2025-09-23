@@ -1,4 +1,5 @@
 /* pollproger SUPPORT (POLLPROG) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is a PCSPOLLS module for running the PCSPOLL program */
@@ -157,7 +158,7 @@ int pollprog_start(POLLPROG *op,cc *pr,cc *sn,mv envv,PCSCONF *pcp) noex {
 	        pthread_t	tid ;
 	        thrsub_f	thr = (thrsub_f) pollprog_worker ;
 	        if ((rs = uptcreate(&tid,NULL,thr,op)) >= 0) {
-	            op->f.working = TRUE ;
+	            op->fl.working = TRUE ;
 		    op->tid = tid ;
 	        }
 	    } /* end if (non-null) */
@@ -187,19 +188,19 @@ int pollprog_finish(POLLPROG *op)
 	if (op->magic != POLLPROG_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
-	debugprintf("pollprog_finish: f_working=%d\n",op->f.working) ;
+	debugprintf("pollprog_finish: f_working=%d\n",op->fl.working) ;
 #endif
 
-	if (op->f.working) {
+	if (op->fl.working) {
 	    const pid_t	pid = getpid() ;
 	    if (pid == op->pid) {
 	        int	trs = 0 ;
-	        op->f.working = FALSE ;
+	        op->fl.working = FALSE ;
 	        rs1 = uptjoin(op->tid,&trs) ;
 	        if (rs >= 0) rs = rs1 ;
 	        if (rs >= 0) rs = trs ;
 	    } else {
-		op->f.working = FALSE ;
+		op->fl.working = FALSE ;
 		op->tid = 0 ;
 	    }
 	}
@@ -227,19 +228,19 @@ int pollprog_check(POLLPROG *op)
 
 	if (op->magic != POLLPROG_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.working) {
+	if (op->fl.working) {
 	    const pid_t	pid = getpid() ;
 	    if (pid == op->pid) {
 	        if (op->f_exiting) {
 	            int		trs = 0 ;
-	            op->f.working = FALSE ;
+	            op->fl.working = FALSE ;
 	            rs1 = uptjoin(op->tid,&trs) ;
 	            if (rs >= 0) rs = rs1 ;
 	            if (rs >= 0) rs = trs ;
 	            f = TRUE ;
 		}
 	    } else {
-		op->f.working = FALSE ;
+		op->fl.working = FALSE ;
 	    }
 	}
 
