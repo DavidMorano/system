@@ -347,7 +347,7 @@ int progmsgs(PROGINFO *pip,bfile *ifp,bfile *tfp,vecobj *fip,vecobj *rlp) noex {
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("progmsgs: ent\n") ;
 	    debugprintf("progmsgs: f_optnospam=%u f_spam=%u\n",
-		pip->f.optnospam,pip->f.spam) ;
+		pip->fl.optnospam,pip->fl.spam) ;
 	}
 #endif
 
@@ -377,7 +377,7 @@ int progmsgs(PROGINFO *pip,bfile *ifp,bfile *tfp,vecobj *fip,vecobj *rlp) noex {
 
 /* find the start of a message */
 
-	        while ((rs >= 0) && (! pdp->f.eof)) {
+	        while ((rs >= 0) && (! pdp->fl.eof)) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -444,7 +444,7 @@ int progmsgs(PROGINFO *pip,bfile *ifp,bfile *tfp,vecobj *fip,vecobj *rlp) noex {
 	            if (ll == 0) break ;
 #endif
 
-	            if (pip->f.logmsg)
+	            if (pip->fl.logmsg)
 	                proglog_printf(pip,"message %4u",
 	                    pip->nmsgs) ;
 
@@ -464,7 +464,7 @@ int progmsgs(PROGINFO *pip,bfile *ifp,bfile *tfp,vecobj *fip,vecobj *rlp) noex {
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
-	                debugprintf("progmsgs: f_eof=%u\n",pdp->f.eof) ;
+	                debugprintf("progmsgs: f_eof=%u\n",pdp->fl.eof) ;
 #endif
 
 	            if (pd.f.eof) break ;
@@ -505,8 +505,8 @@ static int procmsg(PROGINFO *pip,PROCDATA *pdp,int f_eoh)
 #endif
 
 	pdp->tlen = 0 ;
-	pdp->f.eom = FALSE ;
-	pdp->f.spam = FALSE ;
+	pdp->fl.eom = FALSE ;
+	pdp->fl.spam = FALSE ;
 
 	if ((rs = mailmsg_start(msgp)) >= 0) {
 	    int		ll ;
@@ -605,7 +605,7 @@ static int procmsger(PROGINFO *pip,PROCDATA *pdp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
-	debugprintf("progmsgs/procmsger: f_spam=%u\n",mip->f.spam) ;
+	debugprintf("progmsgs/procmsger: f_spam=%u\n",mip->fl.spam) ;
 	debugprintf("progmsgs/procmsger: ret rs=%d tlen=%u\n",rs,tlen) ;
 	}
 #endif
@@ -632,7 +632,7 @@ static int procmsgenv(PROGINFO *pip,PROCDATA *pdp)
 	if ((rs = procmsgenver(pip,pdp,sabuf,salen)) >= 0) {
 	    TIMEB	*nowp = &pip->now ;
 	    cint	malen = MAILADDRLEN ;
-	    if ((mip->e_from[0] == '\0') || (! pip->f.trusted)) {
+	    if ((mip->e_from[0] == '\0') || (! pip->fl.trusted)) {
 	        const time_t	t = nowp->time ;
 		cchar		*envfrom = pip->envfrom ;
 	        if ((rs = sncpy1(pdp->efrom,malen,envfrom)) >= 0) {
@@ -645,7 +645,7 @@ static int procmsgenv(PROGINFO *pip,PROCDATA *pdp)
 	        strwcpy(pdp->efrom,mip->e_from,malen) ;
 	        rs = dater_setcopy(&pdp->edate,&mip->edate) ;
 	    } /* end if */
-	    if (pip->open.logprog && pip->f.logmsg) {
+	    if (pip->open.logprog && pip->fl.logmsg) {
 		int	cl ;
 	        cchar	*cp = pdp->efrom ;
 		cl = strnlen(cp,(LOGLINELEN - 4)) ;
@@ -811,7 +811,7 @@ static int procmsgenver(PROGINFO *pip,PROCDATA *pdp,char *addrbuf,int addrlen)
 	            abl -= sl ;
 	        }
 
-	        if (pip->open.logprog && pip->f.logmsg) {
+	        if (pip->open.logprog && pip->fl.logmsg) {
 	            proglog_printf(pip,"  | %-25s", dbuf) ;
 	            proglog_printf(pip,"  |   %c %r",
 	                atypes[atype],addr,MIN(al,(LOGLINELEN - TABLEN))) ;
@@ -838,7 +838,7 @@ static int procmsgenver(PROGINFO *pip,PROCDATA *pdp,char *addrbuf,int addrlen)
 	    addrbuf[sal] = '\0' ;
 	    strwcpy(mip->e_from,addrbuf,MAILADDRLEN) ;
 
-	    if (pip->open.logprog && pip->f.logmsg) {
+	    if (pip->open.logprog && pip->fl.logmsg) {
 	        proglog_printf(pip,"  > %r",
 	            addrbuf,MIN(sal,(LOGLINELEN - 4))) ;
 	    }
@@ -935,7 +935,7 @@ static int procmsghdr_messageid(PROGINFO *pip,PROCDATA *pdp)
 
 /* log the MID if logging enabled */
 
-	if ((rs >= 0) && pip->f.logmsg) {
+	if ((rs >= 0) && pip->fl.logmsg) {
 	    int	f_first = TRUE ;
 	    cchar	*fmt ;
 	    cchar	*cp ;
@@ -968,7 +968,7 @@ static int procmsghdr_messageid(PROGINFO *pip,PROCDATA *pdp)
 		rs,f_messageid) ;
 #endif /* CF_DEBUG */
 
-	mip->f.messageid = f_messageid ;
+	mip->fl.messageid = f_messageid ;
 	return rs ;
 }
 /* end subroutine (procmsghdr_messageid) */
@@ -1022,20 +1022,20 @@ static int procmsghdr_clines(PROGINFO *pip,PROCDATA *pdp)
 	if (rs >= 0)
 	    rs = procmsgce(pip,pdp,msgp) ;
 
-	pdp->f.plaintext = pdp->f.ct_plaintext && pdp->f.ce_text ;
-	if ((rs >= 0) && pdp->f.plaintext) {
+	pdp->fl.plaintext = pdp->fl.ct_plaintext && pdp->fl.ce_text ;
+	if ((rs >= 0) && pdp->fl.plaintext) {
 
 	    rs1 = procmsghdrval(pip,pdp,msgp,HN_CLINES,&v) ;
-	    pdp->f.hdr_clines = ((rs1 >= 0) && (v >= 0)) ;
+	    pdp->fl.hdr_clines = ((rs1 >= 0) && (v >= 0)) ;
 
 	    if ((rs1 == SR_NOTFOUND) || (v < 0)) {
 	        rs1 = procmsghdrval(pip,pdp,msgp,HN_LINES,&v) ;
-	        pdp->f.hdr_lines = ((rs1 >= 0) && (v >= 0)) ;
+	        pdp->fl.hdr_lines = ((rs1 >= 0) && (v >= 0)) ;
 	    }
 
 	    if ((rs1 == SR_NOTFOUND) || (v < 0)) {
 	        rs1 = procmsghdrval(pip,pdp,msgp,HN_XLINES,&v) ;
-	        pdp->f.hdr_xlines = ((rs1 >= 0) && (v >= 0)) ;
+	        pdp->fl.hdr_xlines = ((rs1 >= 0) && (v >= 0)) ;
 	    }
 
 	} /* end if (plain text) */
@@ -1056,7 +1056,7 @@ static int procmsghdr_xmailer(PROGINFO *pip,PROCDATA *pdp)
 	cchar		*vp ;
 
 #if	CF_XMAILER
-	if (pip->f.logmsg) {
+	if (pip->fl.logmsg) {
 	    int	n ;
 	    int	i ;
 
@@ -1101,7 +1101,7 @@ static int procmsghdr_received(PROGINFO *pip,PROCDATA *pdp)
 	char		sabuf[STACKADDRLEN+1] ;
 
 #if	CF_RECEIVED
-	if (pip->f.logmsg) {
+	if (pip->fl.logmsg) {
 	    int	n, ri ;
 	    int	i ;
 
@@ -1364,7 +1364,7 @@ static int procmsghdr_xpriority(PROGINFO *pip,PROCDATA *pdp)
 	if (DEBUGLEVEL(5))
 	debugprintf("progmsgs/procmsghdr_xpriority: enr\n") ;
 #endif
-	if (pip->f.logmsg) {
+	if (pip->fl.logmsg) {
 	    MAILMSG	*msgp = pdp->msgp ;
 	    int		hl ;
 	    cchar	*hdr = HN_XPRIORITY ;
@@ -1476,7 +1476,7 @@ static int procmsgout(PROGINFO *pip,PROCDATA *pdp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
-	    debugprintf("progmsgs/procmsgout: f_spam=%u\n",pdp->f.spam) ;
+	    debugprintf("progmsgs/procmsgout: f_spam=%u\n",pdp->fl.spam) ;
 	    debugprintf("progmsgs/procmsgout: ret rs=%d mlen=%u\n",rs,tlen) ;
 	}
 #endif
@@ -1528,19 +1528,19 @@ static int procmsgouthdrs(PROGINFO *pip,PROCDATA *pdp)
 	if (DEBUGLEVEL(5)) {
 	    debugprintf("progmsgs/procmsgouthdrs: mid rs=%d tlen=%u\n",
 	        rs,tlen) ;
-	    debugprintf("progmsgs/procmsgouthdrs: f_spam=%u\n",pdp->f.spam) ;
+	    debugprintf("progmsgs/procmsgouthdrs: f_spam=%u\n",pdp->fl.spam) ;
 	}
 #endif
 
 /* check spam */
 
-	if ((rs >= 0) && pip->f.spam && (! pdp->f.spam)) {
+	if ((rs >= 0) && pip->fl.spam && (! pdp->fl.spam)) {
 	    rs = procspam(pip,pdp) ;
 	}
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
-	    debugprintf("progmsgs/procmsgouthdrs: f_spam=%u\n",pdp->f.spam) ;
+	    debugprintf("progmsgs/procmsgouthdrs: f_spam=%u\n",pdp->fl.spam) ;
 	    debugprintf("progmsgs/procmsgouthdrs: ret rs=%d tlen=%u\n",
 	        rs,tlen) ;
 	}
@@ -1669,7 +1669,7 @@ static int procmsgouthdr_clines(PROGINFO *pip,PROCDATA *pdp)
 	    debugprintf("progmsgs/procmsgouthdr_clines: hdr=%s\n",hdr) ;
 #endif
 
-	if (pdp->f.plaintext && (mip->clines < 0)) {
+	if (pdp->fl.plaintext && (mip->clines < 0)) {
 
 	    if (rs >= 0) {
 	        rs = bprintf(pdp->tfp,"%s: ",hdr) ;
@@ -2000,7 +2000,7 @@ static int procmsgouthdr_date(PROGINFO *pip,PROCDATA *pdp)
 
 	                dater_mkstrdig(tdp,dbuf,dlen) ;
 
-	                if (pip->f.logmsg) {
+	                if (pip->fl.logmsg) {
 			    cint	czoff = pip->now.timezone ;
 			    cchar	*fmt = "  date=%s" ;
 			    char	tbuf[TIMEBUFLEN+1] = { 0 } ;
@@ -2023,7 +2023,7 @@ static int procmsgouthdr_date(PROGINFO *pip,PROCDATA *pdp)
 
 	            } else if (isNotValid(rs)) {
 	                rs = SR_OK ;
-	                if (pip->f.logmsg) {
+	                if (pip->fl.logmsg) {
 	                    proglog_printf(pip,"  bad_date=>%r<",vp,vl) ;
 		        }
 	            }
@@ -2080,7 +2080,7 @@ static int procmsgouthdr_subject(PROGINFO *pip,PROCDATA *pdp)
 
 	        strdcpyclean(mip->h_subject,MAILADDRLEN,'¿',cp,cl) ;
 
-	        if (pip->f.logmsg) {
+	        if (pip->fl.logmsg) {
 	            proglog_printf(pip,"  subject=>%r<",
 	                mip->h_subject,MIN(cl,50)) ;
 		}
@@ -2088,10 +2088,10 @@ static int procmsgouthdr_subject(PROGINFO *pip,PROCDATA *pdp)
 /* check for SPAM */
 
 #if	CF_SPAMSUBJECT
-	        if ((rs >= 0) && (! pdp->f.spam) && pip->f.spam) {
+	        if ((rs >= 0) && (! pdp->fl.spam) && pip->fl.spam) {
 	            rs = procmailmsg_spamsubj(pip,cp,cl) ;
-	            mip->f.spam = (rs > 0) ;
-	            pdp->f.spam = (rs > 0) ;
+	            mip->fl.spam = (rs > 0) ;
+	            pdp->fl.spam = (rs > 0) ;
 	        } /* end if (spam check) */
 #endif /* CF_SPAMSUBJECT */
 
@@ -2150,7 +2150,7 @@ static int procmsgouthdr_articleid(PROGINFO *pip,PROCDATA *pdp)
 
 	        strwcpy(mip->h_articleid,cp,ml) ;
 
-	        if (pip->f.logmsg) {
+	        if (pip->fl.logmsg) {
 		    int	ll = MIN(ml,50) ;
 	            proglog_printf(pip,"  articleid=%r",cp,ll) ;
 		}
@@ -2246,7 +2246,7 @@ static int procmsgouthdr_deliveredto(PROGINFO *pip,PROCDATA *pdp)
 		    if (rs >= 0) {
 	                if ((rs = progprinthdr(pip,tfp,hdr,cp,cl)) >= 0) {
 	                    pdp->tlen += rs ;
-	                    if (pip->f.logmsg) {
+	                    if (pip->fl.logmsg) {
 		                cint	ml = MIN(cl,50) ;
 	                        proglog_printf(pip,"  %s»%r",hdr,cp,ml) ;
 		            }
@@ -2333,7 +2333,7 @@ static int procmsgoutbody(PROGINFO *pip,PROCDATA *pdp)
 	        int	rl = MIN(lenr,llen) ;
 	        rs = bfliner_readln(blp,rl,&lp) ;
 	        ll = rs ;
-	        pdp->f.eof = (ll == 0) ;
+	        pdp->fl.eof = (ll == 0) ;
 	        if (rs <= 0) break ;
 
 	        pdp->offset += ll ;
@@ -2385,7 +2385,7 @@ static int procmsgoutbody(PROGINFO *pip,PROCDATA *pdp)
 	    while (rs >= 0) {
 	        rs = bfliner_readln(blp,llen,&lp) ;
 	        ll = rs ;
-	        pdp->f.eof = (ll == 0) ;
+	        pdp->fl.eof = (ll == 0) ;
 	        if (rs <= 0) break ;
 
 	        pdp->offset += ll ;
@@ -2440,7 +2440,7 @@ static int procmsgoutbody(PROGINFO *pip,PROCDATA *pdp)
 	    if (DEBUGLEVEL(4))
 	        debugprintf("progmsgs/procmsgoutbody: extra EOL\n") ;
 #endif
-	    pdp->f.eom = TRUE ;
+	    pdp->fl.eom = TRUE ;
 	    rs = bputc(pdp->tfp,'\n') ;
 	    tlen += rs ;
 	} /* end if */
@@ -2457,7 +2457,7 @@ static int procmsgoutbody(PROGINFO *pip,PROCDATA *pdp)
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("progmsgs/procmsgoutbody: ret rs=%d tlen=%u\n",
 		rs,tlen) ;
-	    debugprintf("progmsgs/procmsgoutbody: f_eof=%u\n",pdp->f.eof) ;
+	    debugprintf("progmsgs/procmsgoutbody: f_eof=%u\n",pdp->fl.eof) ;
 	}
 #endif
 
@@ -2495,7 +2495,7 @@ static int procmsgoutback(PROGINFO *pip,PROCDATA *pdp)
 	        clen = pdp->clen ;
 	    }
 
-	    if (pip->f.logmsg)
+	    if (pip->fl.logmsg)
 	        proglog_printf(pip,"  clen=%u",clen) ;
 
 	    if ((rs = btell(pdp->tfp,&coff)) >= 0) {
@@ -2510,10 +2510,10 @@ static int procmsgoutback(PROGINFO *pip,PROCDATA *pdp)
 
 /* write-back out the content-lines (if specified) */
 
-	if ((rs >= 0) && pdp->f.plaintext && (mip->clines < 0)) {
+	if ((rs >= 0) && pdp->fl.plaintext && (mip->clines < 0)) {
 	    int	clines = pdp->clines ;
 
-	    if (pip->f.logmsg)
+	    if (pip->fl.logmsg)
 	        proglog_printf(pip,"  clines=%u",clines) ;
 
 	    if ((rs = btell(pdp->tfp,&coff)) >= 0) {
@@ -2541,11 +2541,11 @@ static int procmsglog(PROGINFO *pip,PROCDATA *pdp)
 	int		rs = SR_OK ;
 
 #if	CF_LOGMLEN
-	if (pip->f.logmsg)
+	if (pip->fl.logmsg)
 	    proglog_printf(pip,"  mlen=%u", pdp->tlen) ;
 #endif
 
-	if (pip->f.logmsg && pdp->f.spam) {
+	if (pip->fl.logmsg && pdp->fl.spam) {
 	    proglog_printf(pip,"  spam") ;
 	}
 
@@ -2562,7 +2562,7 @@ static int procmsgct(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 	int		hl ;
 	cchar		*hp ;
 
-	pdp->f.ct_plaintext = TRUE ;
+	pdp->fl.ct_plaintext = TRUE ;
 	if ((hl = mailmsg_hdrval(msgp,HN_CTYPE,&hp)) > 0) {
 
 #if	CF_DEBUG
@@ -2588,7 +2588,7 @@ static int procmsgct(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 	        if ((rs1 >= 0) && (strnchr(vp,vl,'/') != nullptr))
 	            rs1 = sisub(vp,vl,"plain") ;
 
-	        pdp->f.ct_plaintext = (rs1 >= 0) ;
+	        pdp->fl.ct_plaintext = (rs1 >= 0) ;
 
 	    } /* end if (non-zero) */
 	    mhcom_finish(&c) ;
@@ -2614,7 +2614,7 @@ static int procmsgce(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 	int		hl ;
 	cchar		*hp ;
 
-	pdp->f.ce_text = TRUE ;
+	pdp->fl.ce_text = TRUE ;
 	if ((hl = mailmsg_hdrval(msgp,HN_CENCODING,&hp)) > 0) {
 
 #if	CF_DEBUG
@@ -2639,7 +2639,7 @@ static int procmsgce(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 	        if (rs1 < 0)
 	            rs1 = sisub(vp,vl,"8bit") ;
 
-	        pdp->f.ce_text = (rs1 >= 0) ;
+	        pdp->fl.ce_text = (rs1 >= 0) ;
 
 	    } /* end if */
 	    comparse_finish(&com) ;
@@ -2695,17 +2695,17 @@ static int procspam(PROGINFO *pip,PROCDATA *pdp)
 	int		rs = SR_OK ;
 	int		f_spam = FALSE ;
 
-	if (pip->f.spam && (! pdp->f.spam)) {
+	if (pip->fl.spam && (! pdp->fl.spam)) {
 	    MSGINFO	*mip = pdp->mip ;
 	    MAILMSG	*msgp = pdp->msgp ;
 
 /* check spam-flag */
 
 #if	CF_SPAMFLAG
-	if ((rs >= 0) && (! pdp->f.spam)) {
+	if ((rs >= 0) && (! pdp->fl.spam)) {
 	    if ((rs = procmailmsg_spamflag(pip,msgp)) > 0) {
 	        f_spam = TRUE ;
-	        pdp->f.spam = TRUE ;
+	        pdp->fl.spam = TRUE ;
 	    }
 	} /* end if (spam-flag check) */
 #endif /* CF_SPAMFLAG */
@@ -2713,10 +2713,10 @@ static int procspam(PROGINFO *pip,PROCDATA *pdp)
 /* check spam-status */
 
 #if	CF_SPAMSTATUS
-	if ((rs >= 0) && (! pdp->f.spam)) {
+	if ((rs >= 0) && (! pdp->fl.spam)) {
 	    if ((rs = procmailmsg_spamstatus(pip,msgp)) > 0) {
 	        f_spam = TRUE ;
-	        pdp->f.spam = TRUE ;
+	        pdp->fl.spam = TRUE ;
 	    }
 	} /* end if (spam-status check) */
 #endif /* CF_SPAMSTATUS */
@@ -2724,15 +2724,15 @@ static int procspam(PROGINFO *pip,PROCDATA *pdp)
 /* check bogosity */
 
 #if	CF_BOGOSITY
-	if ((rs >= 0) && (! pdp->f.spam)) {
+	if ((rs >= 0) && (! pdp->fl.spam)) {
 	    if ((rs = procmailmsg_bogosity(pip,msgp)) > 0) {
 	        f_spam = TRUE ;
-	        pdp->f.spam = TRUE ;
+	        pdp->fl.spam = TRUE ;
 	    }
 	} /* end if (bogosity check) */
 #endif /* CF_BOGOSITY */
 
-	    mip->f.spam = pdp->f.spam ;
+	    mip->fl.spam = pdp->fl.spam ;
 	} /* end if (additional spam processing) */
 
 #if	CF_DEBUG
@@ -2793,7 +2793,7 @@ int		al ;
 	                if ((c == 0) && (addrbuf != nullptr))
 	                    strwcpy(addrbuf,cp,MAILADDRLEN) ;
 
-	                if (pip->f.logmsg) {
+	                if (pip->fl.logmsg) {
 
 	                    if ((rs = mknewhdrname(hbuf,hlen,hdr)) > 0) {
 	                        hnp = hbuf ;
@@ -2834,7 +2834,7 @@ int		al ;
 	                } /* end if (logging enabled) */
 
 	                c += 1 ;
-	                if ((! pip->f.logmsg) && (c > 0))
+	                if ((! pip->fl.logmsg) && (c > 0))
 	                    break ;
 
 	            } /* end if (got an address) */
