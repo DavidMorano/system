@@ -40,7 +40,7 @@ MODS += bstree.ccm sview.ccm strfilter.ccm
 MODS += mapblock.ccm memtrack.ccm addrset.ccm
 MODS += sif.ccm
 
-LIBS= -lu
+LIBS= -lu -lsecdb
 
 
 INCDIRS=
@@ -95,7 +95,7 @@ OBJ07=
 OBJ08= strkeyx.o
 OBJ09= strobj.o
 OBJ10= cfx.o memtrack.o mapblock.o
-OBJ11= field.o
+OBJ11= field.o termx.o
 
 OBJ12=
 OBJ13=
@@ -165,7 +165,7 @@ a:			$(T).a
 
 
 $(T).so:		$(OBJ) Makefile
-	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
+	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(RUNINFO) $(LIBINFO)
 
 $(T).o:			$(OBJ)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
@@ -444,8 +444,6 @@ opensysfs.o:		opensysfs.cc opensysfs.h
 
 quoteshellarg.o:	quoteshellarg.cc
 mkquoted.o:		mkquoted.cc mkquoted.h
-termconseq.o:		termconseq.cc termconseq.h
-termescseq.o:		termescseq.cc termescseq.h
 
 tmtime.o:		tmtime.cc tmtime.h
 
@@ -664,24 +662,14 @@ queue.o:		queue.dir
 queue.dir:
 	makesubdir $@
 
-# CFX
-cfx.o:			cfx.dir
-cfx.dir:
-	makesubdir $@
-
-# CTX
-ctx.o:			ctx.dir
-ctx.dir:
+# MAPX
+mapx.o:			mapx.dir
+mapx.dir:
 	makesubdir $@
 
 # CHRONO
 chrono.o:		chrono.dir
 chrono.dir:
-	makesubdir $@
-
-# DATER
-dater.o:		dater.dir
-dater.dir:
 	makesubdir $@
 
 # SBUF
@@ -849,7 +837,22 @@ fsdir.o:		fsdir.dir
 fsdir.dir:
 	makesubdir $@
 
-# FMTSTR
+# FMTFLAG		(in-order from FMTFLAG)
+fmtflag.o:		fmtflag.dir
+fmtflag.dir:
+	makesubdir $@
+
+# CTX			(in-order from FMTFLAG)
+ctx.o:			ctx.dir
+ctx.dir:
+	makesubdir $@
+
+# CFX			(in-order from FMTFLAG)
+cfx.o:			cfx.dir
+cfx.dir:
+	makesubdir $@
+
+# FMTSTR		(in-order from FMTFLAG)
 fmtstr.o:		fmtstr.dir
 fmtstr.dir:
 	makesubdir $@
@@ -908,7 +911,6 @@ ucpts.o:		ucpts.cc ucpts.h
 expcook.o:		expcook.cc	expcook.h
 keyopt.o:		keyopt.cc	keyopt.h
 utf8decoder.o:		utf8decoder.cc	utf8decoder.h
-termstr.o:		termstr.cc	termstr.h
 td.o:			td.cc		td.h termstr.h
 recip.o:		recip.cc	recip.h
 querystr.o:		querystr.cc	querystr.h
@@ -988,6 +990,16 @@ ucfileop.dir:
 # UCSTREAM
 ucstream.o:		ucstream.dir
 ucstream.dir:
+	makesubdir $@
+
+# TERMX
+termx.o:		termx.dir
+termx.dir:
+	makesubdir $@
+
+# DEBUG
+debug.o:		debug.dir
+debug.dir:
 	makesubdir $@
 
 # string-constants
