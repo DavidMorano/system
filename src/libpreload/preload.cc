@@ -270,7 +270,7 @@ static int preload_begin(preload *uip) noex {
 	if (uip->ents == nullptr) {
 	    cint	osize = sizeof(varray) ;
 	    void	*p{} ;
-	    if ((rs = uc_libmalloc(osize,&p)) >= 0) {
+	    if ((rs = lm_mall(osize,&p)) >= 0) {
 	        varray		*ents = (varray *) p ;
 	        cint		esize = sizeof(preload_ent) ;
 	        cint		n = 4 ;
@@ -278,7 +278,7 @@ static int preload_begin(preload *uip) noex {
 	            uip->ents = ents ;
 		}
 	        if (rs < 0) {
-	            uc_libfree(p) ;
+	            lm_free(p) ;
 		}
 	    } /* end if (memory-allocation) */
 	} /* end if (needed initialization) */
@@ -300,7 +300,7 @@ static int preload_end(preload *uip) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = uc_libfree(uip->ents) ;
+	        rs1 = lm_free(uip->ents) ;
 	        if (rs >= 0) rs = rs1 ;
 	        uip->ents = nullptr ;
 	    }
@@ -406,7 +406,7 @@ static int entry_start(preload_ent *ep,cchar *vp,int vl,int ttl) noex {
 	int		rs ;
 	char		*bp{} ;
 	if (vl < 0) vl = strlen(vp) ;
-	if ((rs = uc_libmalloc((vl+1),&bp)) >= 0) {
+	if ((rs = lm_mall((vl+1),&bp)) >= 0) {
 	    ep->vp = bp ;
 	    ep->vl = vl ;
 	    strwcpy(bp,vp,vl) ;
@@ -421,7 +421,7 @@ static int entry_finish(preload_ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->vp != nullptr) {
-	    rs1 = uc_libfree(ep->vp) ;
+	    rs1 = lm_free(ep->vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->vp = nullptr ;
 	}
@@ -432,7 +432,7 @@ static int entry_finish(preload_ent *ep) noex {
 static int entry_reload(preload_ent *ep,cchar *vp,int vl,int ttl) noex {
 	int		rs = SR_OK ;
 	if (ep->vp != nullptr) {
-	    rs = uc_libfree(ep->vp) ;
+	    rs = lm_free(ep->vp) ;
 	    ep->vp = nullptr ;
 	}
 	if (rs >= 0) {
