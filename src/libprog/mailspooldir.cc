@@ -129,13 +129,13 @@ int mailspooldir(proginfo *pip,char *spooldname,int fl) noex {
 
 /* handle the common case first (it doesn't really matter) */
 
-	if (pip->f.setgid)
+	if (pip->fl.setgid)
 	    rs = perm(tmpdname,-1,pip->egid,NULL,W_OK) ;
 
 	if (rs < 0)
 	    rs = perm(tmpdname,-1,-1,NULL,W_OK) ;
 
-	if ((rs < 0) && pip->f.setuid)
+	if ((rs < 0) && pip->fl.setuid)
 	    rs = perm(tmpdname,pip->euid,-1,NULL,W_OK) ;
 
 	if (rs < 0) {
