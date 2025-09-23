@@ -71,7 +71,7 @@
 
 int proglogzone_begin(proginfo *pip) noex {
 	int		rs = SR_OK ;
-	if (pip->f.optlogzone) {
+	if (pip->fl.optlogzone) {
 	    cint	nlen = MAXNAMELEN ;
 	    cchar	*sn = pip->searchname ;
 	    cchar	*zone = LOGZONEFNAME ;
