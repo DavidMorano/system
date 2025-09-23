@@ -1,4 +1,5 @@
 /* pcspolls HEADER  */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* access manager interface to PCS loadable-object polling */
@@ -78,7 +79,7 @@ struct pcspolls_head {
 	cchar 		*pr ;
 	mainv		envv ;
 	PCSPOLLS_THREAD	t ;
-	PCSPOLLS_FL	f ;
+	PCSPOLLS_FL	fl ;
 	uint		magic ;
 } ;
 
