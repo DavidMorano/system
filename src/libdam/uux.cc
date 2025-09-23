@@ -245,8 +245,8 @@ int uux_open(UUX *op,SD_ARGS *ap,cc *hostname,cc *svcname,mainv av) noex {
 	} /* end if (mkargs) */
 	} /* end if (ok) */
 
-	if ((rs < 0) && op->f.log) {
-	    op->f.log = false ;
+	if ((rs < 0) && op->fl.log) {
+	    op->fl.log = false ;
 	    logfile_printf(&op->lh,"failed (%d)",rs) ;
 	    logfile_close(&op->lh) ;
 	} /* end if */
@@ -276,8 +276,8 @@ UUX		*op ;
 	rs1 = u_close(op->fd) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (op->f.log) {
-	    op->f.log = false ;
+	if (op->fl.log) {
+	    op->fl.log = false ;
 	    logfile_printf(&op->lh,"bytes=%u",op->tlen) ;
 	    rs1 = logfile_close(&op->lh) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -556,8 +556,8 @@ struct subinfo	*sip ;
 	    sip->dav = nullptr ;
 	}
 
-	if (sip->f.ids) {
-	    sip->f.ids = false ;
+	if (sip->fl.ids) {
+	    sip->fl.ids = false ;
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -750,7 +750,7 @@ struct subinfo	*sip ;
 
 /* logfile */
 	                case argopt_lf:
-			    sip->f.log = true ;
+			    sip->fl.log = true ;
 	                    if (f_optequal) {
 
 	                        f_optequal = false ;
@@ -852,11 +852,11 @@ struct subinfo	*sip ;
 	                        break ;
 
 	                    case 'r':
-	                        sip->f.queueonly = true ;
+	                        sip->fl.queueonly = true ;
 	                        break ;
 
 	                    case 'n':
-	                        sip->f.noreport = true ;
+	                        sip->fl.noreport = true ;
 	                        break ;
 
 	                    default:
@@ -947,9 +947,9 @@ static int subinfo_procopts(SI *sip,keyopt *kop) noex {
 	        switch (oi) {
 
 	        case procopt_log:
-	                sip->f.log = true ;
+	                sip->fl.log = true ;
 	                if ((vl > 0) && ((rs = optbool(vp,vl)) >= 0))
-	                    sip->f.log = (rs > 0) ;
+	                    sip->fl.log = (rs > 0) ;
 	            break ;
 
 	        } /* end switch */
@@ -1101,10 +1101,10 @@ struct subinfo	*sip ;
 	char	logfname[MAXPATHLEN + 1] ;
 
 
-	if (! sip->f.log)
+	if (! sip->fl.log)
 	    goto ret0 ;
 
-	sip->f.log = true ;
+	sip->fl.log = true ;
 	lnp = sip->logfname ;
 	if (lnp[0] != '/') {
 	    rs = mkpath3(logfname,sip->pr,UUX_LOGDNAME,lnp) ;
@@ -1117,7 +1117,7 @@ struct subinfo	*sip ;
 	    if ((rs1 = logfile_open(&op->lh,lnp,0,0666,lidp)) >= 0) {
 	        USERINFO	u, *uip = &u ;
 	        char	userbuf[USERINFO_LEN + 1] ;
-	        op->f.log = true ;
+	        op->fl.log = true ;
 
 	        if ((rs1 = userinfo(uip,userbuf,USERINFO_LEN,nullptr)) >= 0) {
 
@@ -1224,8 +1224,8 @@ int		dlen ;
 	cchar	*dnp ;
 
 
-	if (! sip->f.ids) {
-	    sip->f.ids = true ;
+	if (! sip->fl.ids) {
+	    sip->fl.ids = true ;
 	    rs = ids_load(&sip->id) ;
 	}
 
