@@ -60,9 +60,7 @@ module filerec ;
 using std::nullptr_t ;			/* type */
 using std::unordered_set ;              /* type */
 using std::pair ;                       /* type */
-using libu::umemallocstrw ;		/* subroutine */
-using libu::umemalloc ;			/* subroutine */
-using libu::umemfree ;			/* subroutine */
+using libu::umem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -142,7 +140,7 @@ int filerec::checkin(custat *sbp,cchar *fn) noex {
 	        filerec_ent	k(dev,ino,fmode) ;
 		k.load(timod,fsize) ;
 		if (! setp->contains(k)) ylikely {
-		    if (cchar *cp ; (rs = umemallocstrw(fn,-1,&cp)) >= 0) {
+		    if (cchar *cp ; (rs = umem.mallocstrw(fn,-1,&cp)) >= 0) {
 			k.fname = cp ;
 		        try {
 	                    pair<setiter,bool>	ret = setp->insert(k) ;
@@ -153,7 +151,7 @@ int filerec::checkin(custat *sbp,cchar *fn) noex {
 		        }
 		        if (rs < 0) {
 			    char *bp = cast_const<charp>(cp) ;
-			    umemfree(bp) ;
+			    umem.free(bp) ;
 			    k.fname = nullptr ;
 			} /* end if (error) */
 		    } /* end if (memory-allocation) */
@@ -180,7 +178,7 @@ int filerec::finents() noex {
 	    for (stype::iterator it = setp->begin() ; it != ite ; ++it) {
 		char **fpp = cast_const<charpp>(&it->fname) ;
 		char *bp = cast_const<charp>(it->fname) ;
-		rs1 = umemfree(bp) ;
+		rs1 = umem.free(bp) ;
 		if (rs >= 0) rs = rs1 ;
 		*fpp = nullptr ;
 	    } /* end for */
