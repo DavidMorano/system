@@ -91,7 +91,7 @@ int pimkface(PROGINFO *pip,char *fbuf,int flen) noex {
 	if (pip == NULL) return SR_FAULT ;
 	if (fbuf == NULL) return SR_FAULT ;
 
-	pip->f.init_face = TRUE ;
+	pip->fl.init_face = TRUE ;
 	if ((rs = mkpath2(tbuf,pip->homedname,fn)) >= 0) {
 	    cint	am = R_OK ;
 	    if ((rs = uc_access(tbuf,am)) >= 0) {
