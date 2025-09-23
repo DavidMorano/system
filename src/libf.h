@@ -28,6 +28,18 @@
 
 #include	<freadln.h>
 
+EXTERNC_begin
+
+extern int	fprint(FILE *,cchar *,int) noex ;
+
+EXTERNC_end
+
+#ifdef	__cplusplus
+
+extern int	fwrite(FILE *,cvoid *,int) noex ;
+
+#endif /* __cplusplus */
+
 
 #endif /* LIBF_INCLUDE */
 
