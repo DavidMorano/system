@@ -662,14 +662,9 @@ queue.o:		queue.dir
 queue.dir:
 	makesubdir $@
 
-# CFX
-cfx.o:			cfx.dir
-cfx.dir:
-	makesubdir $@
-
-# CTX
-ctx.o:			ctx.dir
-ctx.dir:
+# MAPX
+mapx.o:			mapx.dir
+mapx.dir:
 	makesubdir $@
 
 # CHRONO
@@ -842,7 +837,22 @@ fsdir.o:		fsdir.dir
 fsdir.dir:
 	makesubdir $@
 
-# FMTSTR
+# FMTFLAG		(in-order from FMTFLAG)
+fmtflag.o:		fmtflag.dir
+fmtflag.dir:
+	makesubdir $@
+
+# CTX			(in-order from FMTFLAG)
+ctx.o:			ctx.dir
+ctx.dir:
+	makesubdir $@
+
+# CFX			(in-order from FMTFLAG)
+cfx.o:			cfx.dir
+cfx.dir:
+	makesubdir $@
+
+# FMTSTR		(in-order from FMTFLAG)
 fmtstr.o:		fmtstr.dir
 fmtstr.dir:
 	makesubdir $@
@@ -985,6 +995,11 @@ ucstream.dir:
 # TERMX
 termx.o:		termx.dir
 termx.dir:
+	makesubdir $@
+
+# DEBUG
+debug.o:		debug.dir
+debug.dir:
 	makesubdir $@
 
 # string-constants
