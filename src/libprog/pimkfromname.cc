@@ -79,11 +79,11 @@ extern "C" {
 int pimkfromname(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		nbl = 0 ;
-	if (! pip->f.init_fromname) {
+	if (! pip->fl.init_fromname) {
 	    cint	nlen = REALNAMELEN ;
 	    cchar	*nbp ;
 	    char	nbuf[REALNAMELEN + 1] ;
-	    pip->f.init_fromname = TRUE ;
+	    pip->fl.init_fromname = TRUE ;
 /* for a real-name: first try the PCS facility (we are a PCS program!) */
 	    nbp = nbuf ;
 	    rs = pcsfullname(pip->pr,nbuf,nlen,pip->username) ;
