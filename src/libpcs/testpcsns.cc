@@ -12,12 +12,12 @@
 
 #define	CF_DEBUGS	1		/* compile-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
+
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<usystem.h>
 #include	<bfile.h>
-#include	<ucmallreg.h>
 #include	<localmisc.h>
 #include	"pcsns.h"
 
