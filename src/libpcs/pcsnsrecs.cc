@@ -131,7 +131,7 @@ int pcsnsrecs_start(RECS *op,int nmax,int ttl) noex {
 	{
 	    cint	sz = sizeof(RECARR) ;
 	    char	*p ;
-	    if ((rs = uc_libmalloc(sz,&p)) >= 0) {
+	    if ((rs = lm_mall(sz,&p)) >= 0) {
 	        int	ro = 0 ;
 	        ro |= RECARR_OSTATIONARY ;
 	        ro |= RECARR_OREUSE ;
@@ -148,7 +148,7 @@ int pcsnsrecs_start(RECS *op,int nmax,int ttl) noex {
 	                recarr_finish(op->recs) ;
 	        }
 	        if (rs < 0) {
-	            uc_libfree(op->recs) ;
+	            lm_free(op->recs) ;
 	            op->recs = NULL ;
 	        }
 	    } /* end if (memory-allocation) */
@@ -182,7 +182,7 @@ int pcsnsrecs_finish(RECS *op) noex {
 	if (rs >= 0) rs = rs1 ;
 
 	if (op->recs != NULL) {
-	    rs1 = uc_libfree(op->recs) ;
+	    rs1 = lm_free(op->recs) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->recs = NULL ;
 	}
@@ -241,7 +241,7 @@ int pcsnsrecs_lookup(RECS *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	        if ((rs = pcsnsrecs_recdel(op,ep)) >= 0) {
 	            pq_ent	*pep = (pq_ent *) ep ;
 	            rs = pq_unlink(&op->lru,pep) ;
-	            uc_libfree(ep) ;
+	            lm_free(ep) ;
 		    if (rs >= 0) rs = 0 ;
 	        }
 	    } else {
@@ -294,7 +294,7 @@ int pcsnsrecs_invalidate(RECS *op,cchar *un,int w) noex {
 	    rs1 = record_finish(ep) ;
 	    if (rs >= 0) rs = rs1 ;
 
-	    rs1 = uc_libfree(ep) ;
+	    rs1 = lm_free(ep) ;
 	    if (rs >= 0) rs = rs1 ;
 
 	} else if (rs == SR_NOTFOUND) {
@@ -326,7 +326,7 @@ int pcsnsrecs_check(RECS *op,time_t dt) noex {
 	            if ((rs = pcsnsrecs_recdel(op,ep)) >= 0) {
 	                pq_ent	*pep = (pq_ent *) ep ;
 	                rs = pq_unlink(&op->lru,pep) ;
-	                uc_libfree(ep) ;
+	                lm_free(ep) ;
 	            }
 	        } /* end if (entry-old) */
 	    }
@@ -414,10 +414,10 @@ static int pcsnsrecs_newrec(RECS *op,time_t dt,
 	cint	size = sizeof(PCSNSRECS_REC) ;
 	int		rs ;
 
-	if ((rs = uc_libmalloc(size,&ep)) >= 0) {
+	if ((rs = lm_mall(size,&ep)) >= 0) {
 	    rs = pcsnsrecs_recstart(op,dt,ep,rip) ;
 	    if (rs < 0)
-	        uc_libfree(ep) ;
+	        lm_free(ep) ;
 	} /* end if (m-a) */
 
 	*epp = (rs >= 0) ? ep : NULL ;
@@ -464,7 +464,7 @@ static int pcsnsrecs_recrear(RECS *op,PCSNSRECS_REC *ep) noex {
 	            if (rs < 0) {
 	                PCSNSRECS_REC	*ep = (PCSNSRECS_REC *) pep ;
 	                record_finish(ep) ;
-	                uc_libfree(pep) ;
+	                lm_free(pep) ;
 	            }
 	        }
 	    }
@@ -501,7 +501,7 @@ static int pcsnsrecs_recfins(RECS *op) noex {
 	    if (ep != NULL) {
 	        rs1 = record_finish(ep) ;
 	        if (rs >= 0) rs = rs1 ;
-	        rs1 = uc_libfree(ep) ;
+	        rs1 = lm_free(ep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end for */
@@ -543,7 +543,7 @@ static int record_start(PCSNSRECS_REC *ep,time_t dt,int wc,RECINFO *rip) noex {
 	ep->w = rip->w ;
 	strwcpy(ep->un,rip->un,USERNAMELEN) ;
 
-	if ((rs = uc_libmalloc((vlen+1),&vbuf)) >= 0) {
+	if ((rs = lm_mall((vlen+1),&vbuf)) >= 0) {
 	    vl = (strwcpy(vbuf,rip->vbuf,vlen) - vbuf) ;
 	    ep->vbuf = vbuf ;
 	    ep->vlen = vlen ;
@@ -568,7 +568,7 @@ static int record_finish(PCSNSRECS_REC *ep) noex {
 	if (ep == NULL) return SR_FAULT ;
 
 	if (ep->vbuf != NULL) {
-	    rs1 = uc_libfree(ep->vbuf) ;
+	    rs1 = lm_free(ep->vbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->vbuf = NULL ;
 	    ep->vlen = 0 ;
