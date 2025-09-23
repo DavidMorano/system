@@ -1,4 +1,4 @@
-/* testcrash (TESTCRASH) */
+/* testcrash SUPPOER */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -191,7 +191,7 @@ int testcrash_start(TESTCRASH *op,cchar *pr,cchar *sn,cchar **envv,
 	    int	(*thr)(THRBASE *,void *) = (int (*)(THRBASE *,void *)) worker ;
 	    workargs_load(wap,op,pr,sn,envv,pcp) ;
 	    if ((rs = thrbase_start(&op->t,thr,wap)) >= 0) {
-		op->f.working = TRUE ;
+		op->fl.working = TRUE ;
 		op->wap = wap ;
 		op->magic = TESTCRASH_MAGIC ;
 	    }
@@ -219,11 +219,11 @@ int testcrash_finish(TESTCRASH *op)
 	if (op->magic != TESTCRASH_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
-	debugprintf("testcrash_finish: f_working=%d\n",op->f.working) ;
+	debugprintf("testcrash_finish: f_working=%d\n",op->fl.working) ;
 #endif
 
-	if (op->f.working) {
-	    op->f.working = FALSE ;
+	if (op->fl.working) {
+	    op->fl.working = FALSE ;
 	    rs1 = thrbase_finish(&op->t) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
