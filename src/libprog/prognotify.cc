@@ -152,7 +152,7 @@ int prognotify(proginfo *pip,vecobj *mip,vecobj *rsp) noex {
 
 /* do we have a MBTAB database? */
 
-	if ((pip->mbfname == nullptr) || (! pip->f.mbtab))
+	if ((pip->mbfname == nullptr) || (! pip->fl.mbtab))
 	    return SR_OK ;
 
 	if (pip->debuglevel > 0) {
@@ -321,8 +321,8 @@ static int prognotifyrecipnode(proginfo *pip,vecobj *mip,REPORTINFO *rip,
 	            if (rs1 >= 0) {
 	                rip->m1.mlen = iep->mlen ;
 	                rip->m1.flags = 0 ;
-	                rip->m1.flags |= (iep->f.spam) ? 1 : 0 ;
-	                rip->m1.flags |= (iep->f.messageid) ? 2 : 0 ;
+	                rip->m1.flags |= (iep->fl.spam) ? 1 : 0 ;
+	                rip->m1.flags |= (iep->fl.messageid) ? 2 : 0 ;
 	                strwcpy(rip->m1.msgid,iep->h_messageid,MCMSG_LMSGID) ;
 	                strwcpy(rip->m1.from,iep->h_from,MCMSG_LFROM) ;
 			/* send the report */
