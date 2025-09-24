@@ -395,7 +395,7 @@ static int pcsnsmgr_begin(PCSNSMGR *uip) noex {
 	if (uip->recs == nullptr) {
 	    cint	size = sizeof(PCSNSRECS) ;
 	    void	*p ;
-	    if ((rs = uc_libmalloc(size,&p)) >= 0) {
+	    if ((rs = lm_mall(size,&p)) >= 0) {
 	        cint		max = PCSNSMGR_MAX ;
 	        cint		ttl = PCSNSMGR_TTL ;
 	        PCSNSRECS	*recsp = (PCSNSRECS *) p ;
@@ -405,7 +405,7 @@ static int pcsnsmgr_begin(PCSNSMGR *uip) noex {
 	            uip->ttl = ttl ;
 		}
 	        if (rs < 0)
-	            uc_libfree(p) ;
+	            lm_free(p) ;
 	    } /* end if (memory-allocation) */
 	} /* end if (needed initialization) */
 
@@ -421,7 +421,7 @@ static int pcsnsmgr_end(PCSNSMGR *uip) noex {
 	    PCSNSRECS	*recsp = (PCSNSRECS *) uip->recs ;
 	    rs1 = pcsnsrecs_finish(recsp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    rs1 = uc_libfree(uip->recs) ;
+	    rs1 = lm_free(uip->recs) ;
 	    if (rs >= 0) rs = rs1 ;
 	    uip->recs = nullptr ;
 	}
