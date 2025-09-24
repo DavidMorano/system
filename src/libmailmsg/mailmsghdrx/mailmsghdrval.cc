@@ -35,9 +35,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
-#include	<mallocxx.h>
+#include	<bufsizevar.hh>
 #include	<sfx.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>		/* |REALNAMELEN| */
@@ -51,6 +50,8 @@
 
 
 /* imported namespaces */
+
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -72,7 +73,9 @@ static int mailmsghdrval_loadadd(mailmsghdrval *,cchar *,int) noex ;
 
 /* local variables */
 
-constexpr int		extlen = REALNAMELEN ;
+static bufsizevar	maxlinelen(getbufsize_ml) ;
+
+cint			extlen = REALNAMELEN ;
 
 
 /* exported variables */
@@ -83,21 +86,24 @@ constexpr int		extlen = REALNAMELEN ;
 int mailmsghdrval_start(mailmsghdrval *op,int i,cchar *hp,int hl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    op->idx = i ;
-	    op->vl = 0 ;
-	    if (char *cp ; (rs = malloc_ml(&cp)) >= 0) {
-		op->vlen = rs ;
-	        op->vbuf = cp ;
-		op->vbuf[0] = '\0' ;
-		if (hp) {
-	            rs = mailmsghdrval_loadadd(op,hp,hl) ;
-		}
-		if (rs < 0) {
-		    uc_free(cp) ;
-		    op->vbuf = nullptr ;
-		    op->vlen = 0 ;
-		}
-	    } /* end if (m-a) */
+	    if ((rs = maxlinelen) >= 0) {
+	        cint	sz = (rs + 1) ;
+	        op->idx = i ;
+	        op->vl = 0 ;
+	        if (char *bp ; (rs = mem.mall(sz,&bp)) >= 0) {
+		    op->vlen = rs ;
+	            op->vbuf = bp ;
+		    op->vbuf[0] = '\0' ;
+		    if (hp) {
+	                rs = mailmsghdrval_loadadd(op,hp,hl) ;
+		    }
+		    if (rs < 0) {
+		        mem.free(op->vbuf) ;
+		        op->vbuf = nullptr ;
+		        op->vlen = 0 ;
+		    } /* end if (error) */
+	        } /* end if (m-a) */
+	    } /* end if (maxlinelen) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -110,7 +116,7 @@ int mailmsghdrval_finish(mailmsghdrval *op) noex {
 	    rs = SR_OK ;
 	    op->vbuf[0] = '\0' ;
 	    if (op->vbuf) {
-	        rs1 = uc_free(op->vbuf) ;
+	        rs1 = mem.free(op->vbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->vbuf = nullptr ;
 	    }
@@ -166,7 +172,7 @@ static int mailmsghdrval_loadadd(mailmsghdrval *op,cchar *hp,int hl) noex {
 	    if (reqlen > remlen) {
 		cint	sz = (op->vlen + reqlen + extlen) ;
 	        char	*nvp ;
-	        if ((rs = uc_realloc(op->vbuf,(sz+1),&nvp)) >= 0) {
+	        if ((rs = mem.rall(op->vbuf,(sz+1),&nvp)) >= 0) {
 		    op->vbuf = nvp ;
 		    op->vlen = sz ;
 		}
