@@ -47,7 +47,7 @@ struct outema_flags {
 
 struct outema_head {
 	filer		*ofp ;
-	OUTEMA_FL	f ;
+	OUTEMA_FL	fl ;
 	uint		magic ;
 	int		maxlen ;
 	int		rlen ;
