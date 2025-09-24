@@ -30,10 +30,8 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<mallocxx.h>
 #include	<fdliner.h>
 #include	<mailmsghdrs.h>
 #include	<mailmsg.h>
@@ -141,7 +139,7 @@ int msgentry_loadhdrs(msgentry *mep,fdliner *lsp) noex {
 	    fdliner_done(lsp) ;
 	    if (f_eoh) break ;
 	} /* end while */
-	mep->f.eoh = f_eoh ;
+	mep->fl.eoh = f_eoh ;
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (msgentry_loadhdrs) */
@@ -151,8 +149,8 @@ int msgentry_getclen(msgentry *mep) noex {
 	int		clen ;
 	cchar		*kn = HN_CLEN ;
 	clen = mep->clen ;
-	if (! mep->f.clen) {
-	    mep->f.clen = true ; /* once-flag */
+	if (! mep->fl.clen) {
+	    mep->fl.clen = true ; /* once-flag */
 	    mep->clen = -1 ;
 	    clen = msgentry_gethdrnum(mep,kn) ;
 	    if (clen >= 0) {
@@ -168,7 +166,7 @@ int msgentry_setclen(msgentry *mep,int clen) noex {
 	int		rs = SR_FAULT ;
 	if (mep) {
 	    rs = SR_OK ;
-	    mep->f.clen = true ;
+	    mep->fl.clen = true ;
 	    mep->clen = clen ;
 	} /* end if (non-null) */
 	return rs ;
@@ -179,7 +177,7 @@ int msgentry_setflags(msgentry *mep) noex {
 	int		rs ;
 	if ((rs = msgentry_setct(mep)) >= 0) {
 	    if ((rs = msgentry_setce(mep)) >= 0) {
-	        mep->f.plaintext = mep->f.ctplain && mep->f.ceplain ;
+	        mep->fl.plaintext = mep->fl.ctplain && mep->fl.ceplain ;
 	    }
 	}
 	return rs ;
@@ -191,7 +189,7 @@ int msgentry_setct(msgentry *mep) noex {
 	int		rs1 ;
 	int		hl ;
 	cchar		*hp ;
-	mep->f.ctplain = true ;
+	mep->fl.ctplain = true ;
 	if ((hl = mailmsg_hdrval(&mep->m,HN_CTYPE,&hp)) > 0) {
 	    mep->hdr.ctype = true ;
 	    if (mhcom hc ; (rs = mhcom_start(&hc,hp,hl)) >= 0) {
@@ -204,7 +202,7 @@ int msgentry_setct(msgentry *mep) noex {
 	            if ((rs1 >= 0) && (strnchr(vp,vl,'/') != nullptr)) {
 	                rs1 = sisub(vp,vl,"plain") ;
 		    }
-	            mep->f.ctplain = (rs1 >= 0) ;
+	            mep->fl.ctplain = (rs1 >= 0) ;
 	        } /* end if */
 	        rs1 = mhcom_finish(&hc) ;
 		if (rs >= 0) rs = rs1 ;
@@ -219,7 +217,7 @@ int msgentry_setce(msgentry *mep) noex {
 	int		rs1 ;
 	int		hl ;
 	cchar		*hp ;
-	mep->f.ceplain = true ;
+	mep->fl.ceplain = true ;
 	if ((hl = mailmsg_hdrval(&mep->m,HN_CENCODING,&hp)) > 0) {
 	    mep->hdr.cencoding = true ;
 	    if (comparse com ; (rs = comparse_start(&com,hp,hl)) >= 0) {
@@ -232,7 +230,7 @@ int msgentry_setce(msgentry *mep) noex {
 	            if (rs1 < 0) {
 	                rs1 = sisub(vp,vl,"8bit") ;
 		    }
-	            mep->f.ceplain = (rs1 >= 0) ;
+	            mep->fl.ceplain = (rs1 >= 0) ;
 	        } /* end if */
 	        rs1 = comparse_finish(&com) ;
 		if (rs >= 0) rs = rs1 ;
@@ -245,9 +243,9 @@ int msgentry_setce(msgentry *mep) noex {
 int msgentry_getclines(msgentry *mep) noex {
 	int		rs = SR_OK ;
 	int		clines = 0 ;
-	if (! mep->f.clines) {
+	if (! mep->fl.clines) {
 	    cchar	*kn = HN_CLINES ;
-	    mep->f.clines = true ; /* once-flag */
+	    mep->fl.clines = true ; /* once-flag */
 	    mep->clines = -1 ;
 	    if ((clines = msgentry_gethdrnum(mep,kn)) >= 0) {
 	        mep->hdr.clines = true ;
@@ -264,7 +262,7 @@ int msgentry_setclines(msgentry *mep,int clines) noex {
     	int		rs = SR_FAULT ;
 	if (mep) {
 	    rs = SR_OK ;
-	    mep->f.clines = true ;
+	    mep->fl.clines = true ;
 	    mep->clines = clines ;
 	}
 	return rs ;
