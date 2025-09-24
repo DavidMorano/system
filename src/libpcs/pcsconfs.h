@@ -1,5 +1,9 @@
 /* pcsconfs HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
+
+/* interface to query the PCS configuration-variable database */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -21,8 +25,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<localmisc.h>
 
 #include	"var.h"
 
@@ -51,14 +55,14 @@ struct pcsconfs_flags {
 } ;
 
 struct pcsconfs_head {
-	uint		magic ;
 	cchar		**envv ;
 	cchar		*pr ;			/* program-root */
 	cchar		*cfname ;		/* DB database name */
 	cchar		*a ;			/* memory allocation */
-	PCSCONFS_FL	f ;
 	var		db ;
 	time_t		ti_conf ;		/* DB mtime */
+	PCSCONFS_FL	fl ;
+	uint		magic ;
 	int		ncursors ;
 } ;
 
