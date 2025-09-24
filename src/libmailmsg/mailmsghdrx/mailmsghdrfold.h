@@ -31,7 +31,7 @@ struct mailmsghdrfold_flags {
 
 struct mailmsghdrfold_head {
 	cchar		*sp ;
-	MAILMSGHDRFOLD_FL	f ;
+	MAILMSGHDRFOLD_FL	fl ;
 	uint		magic ;
 	int		sl ;
 	int		mcols ;		/* message columns (usually 76) */
