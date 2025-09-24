@@ -56,7 +56,9 @@
 
 #include	"mailmsgattent.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| + |gelenstr(3u)| */
 
 /* local defines */
 
@@ -64,6 +66,14 @@ import libutil ;
 
 #define	MME		mailmsgattent
 #define	MT		mimetypes
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -140,9 +150,9 @@ int mailmsgattent_start(MME *op,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
 	    } /* end if (ok) */
 /* content_encoding */
 	    if ((rs >= 0) && (ce != nullptr)) {
-	        if (cchar *enc ; (rs = uc_mallocstrw(ce,-1,&enc)) >= 0) {
+	        if (cchar *enc ; (rs = libmem.strw(ce,-1,&enc)) >= 0) {
 		    op->encoding = enc ;
-	        }
+	        } /* end if (memory-allocation) */
 	    }
 	    if (rs >= 0) {
 	        op->magic = MAILMSGATTENT_MAGIC ;
@@ -205,7 +215,8 @@ int mailmsgattent_type(MME *op,MT *mtp) noex {
 	int		f = false ;
 	if ((rs = mailmsgattent_magic(op,mtp)) >= 0) {
 	    if ((op->type != nullptr) && (op->type[0] == '\0')) {
-	        uc_free(op->type) ;
+		void *vp = voidp(op->type) ;
+	        libmem.free(vp) ;
 	        op->type = nullptr ;
 	    }
 	    if (op->type == nullptr) {
@@ -213,20 +224,22 @@ int mailmsgattent_type(MME *op,MT *mtp) noex {
 	        char	typespec[mtp->typelen + 1] ;
 		/* we did not have a type so we look the hard way */
 	        if (op->subtype != nullptr) {
-	            uc_free(op->subtype) ;
+		    void *vp = voidp(op->subtype) ;
+	            libmem.free(vp) ;
 	            op->subtype = nullptr ;
 	        }
 	        if ((op->ext != nullptr) && (op->ext[0] == '\0')) {
-	            uc_free(op->ext) ;
+		    void *vp = voidp(op->ext) ;
+	            libmem.free(vp) ;
 	            op->ext = nullptr ;
 	        }
 		/* if no explicit extension, then we get from the filename */
 	        if ((op->ext == nullptr) && (op->attfname != nullptr)) {
 	            if ((tp = strrchr(op->attfname,'.')) != nullptr) {
-		        cchar	*cp ;
-		        if ((rs = uc_mallocstrw((tp+1),-1,&cp)) >= 0) {
+			tp += 1 ;
+		        if (cchar *cp ; (rs = libmem.strw(tp,-1,&cp)) >= 0) {
 	                    op->ext = cp ;
-		        }
+		        } /* end if (memory-allocation) */
 	            } /* end if */
 	        } /* end if (extracting filename extension) */
 		/* continue */
@@ -239,9 +252,10 @@ int mailmsgattent_type(MME *op,MT *mtp) noex {
 			        cchar	*cp ;
 			        vp = typespec ;
 			        vl = intsat(tp - typespec) ;
-			        if ((rs = uc_mallocstrw((tp+1),-1,&cp)) >= 0) {
+				tp += 1 ;
+			        if ((rs = libmem.strw(tp,-1,&cp)) >= 0) {
 	                            op->subtype = cp ;
-			        }
+			        } /* end if (memory-allocation) */
 	                    } else {
 	                        vp = typespec ;
 		            }
@@ -253,10 +267,10 @@ int mailmsgattent_type(MME *op,MT *mtp) noex {
 		        vp = "binary" ;
 	            }
 		    if ((rs >= 0) && (vp != nullptr)) {
-		        if (cchar *cp ; (rs = uc_mallocstrw(vp,vl,&cp)) >= 0) {
+		        if (cchar *cp ; (rs = libmem.strw(vp,vl,&cp)) >= 0) {
 			    f = true ;
 			    op->type = cp ;
-		        }
+		        } /* end if (memory-allocation) */
 		    }
 	        } /* end if (ok) */
 	    } /* end if (needed a type) */
@@ -270,27 +284,29 @@ int mailmsgattent_typeset(MME *op,cchar *tstr,cchar *ststr) noex {
 	int		rs1 ;
 	if ((rs = mailmsgattent_magic(op)) >= 0) {
 	    if (op->type != nullptr) {
-	        rs1 = uc_free(op->type) ;
+		void *vp = voidp(op->type) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->type = nullptr ;
 	    }
 	    if (op->subtype != nullptr) {
-	        rs1 = uc_free(op->subtype) ;
+		void *vp = voidp(op->subtype) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->subtype = nullptr ;
 	    }
 	    if (rs >= 0) {
 	        if ((tstr != nullptr) && (tstr[0] != '\0')) {
-	            cchar	*cp ;
-	            if ((rs = uc_mallocstrw(tstr,-1,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = libmem.strw(tstr,-1,&cp)) >= 0) {
 	                op->type = cp ;
 	                if ((ststr != nullptr) && (ststr[0] != '\0')) {
-	                    if ((rs = uc_mallocstrw(ststr,-1,&cp)) >= 0) {
+	                    if ((rs = libmem.strw(ststr,-1,&cp)) >= 0) {
 	                        op->subtype = cp ;
 	                    } /* end if (memory-allocation) */
 	                }
 	                if (rs < 0) {
-	                    uc_free(op->type) ;
+			    void *vp = voidp(op->type) ;
+	                    libmem.free(vp) ;
 	                    op->type = nullptr ;
 	                }
 	            } /* end if (memory-allocation) */
@@ -340,16 +356,16 @@ int mailmsgattent_code(MME *op,cchar *tmpdname) noex {
 	                if ((code >= CE_7BIT) && (code < CE_OVERLAST)) {
 			    cchar	*cp ;
 			    enc = contentencodings[code] ;
-			    if ((rs = uc_mallocstrw(enc,-1,&cp)) >= 0) {
+			    if ((rs = libmem.strw(enc,-1,&cp)) >= 0) {
 	                        op->encoding = cp ;
-			    }
-		        }
+			    } /* end if (memory-allocation) */
+		        } /* end if */
 		    } /* end if */
 	        } else {
 	            code = CE_BASE64 ;
-		    if (cchar *cp ; (rs = uc_mallocstrw(enc,-1,&cp)) >= 0) {
+		    if (cchar *cp ; (rs = libmem.strw(enc,-1,&cp)) >= 0) {
 	                op->encoding = cp ;
-		    }
+		    } /* end if (memory-allocation) */
 	        } /* end if */
 	    } else {
 	        cchar	*enc = op->encoding ;
@@ -359,7 +375,8 @@ int mailmsgattent_code(MME *op,cchar *tmpdname) noex {
 	    } /* end if */
 	    if (rs < 0) {
 	        if (op->encoding != nullptr) {
-	            uc_free(op->encoding) ;
+		    void *vp = voidp(op->encoding) ;
+	            libmem.free(vp) ;
 	            op->encoding = nullptr ;
 	        }
 	    } /* end if (error) */
@@ -378,9 +395,9 @@ int mailmsgattent_setcode(MME *op,int code) noex {
                 op->cte = code ;
                 if (op->encoding == nullptr) {
                     cchar       *enc = contentencodings[code] ;
-                    if (cchar *cp ; (rs = uc_mallocstrw(enc,-1,&cp)) >= 0) {
+                    if (cchar *cp ; (rs = libmem.strw(enc,-1,&cp)) >= 0) {
                         op->encoding = cp ;
-                    }
+                    } /* end if (memory-allocation) */
                 } /* end if */
             } else {
                 rs = SR_INVALID ;
@@ -399,9 +416,9 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
             bfile	infile, *ifp = &infile ;
 	    cchar	*atf = strstdfname(stdfile_in,op->attfname) ;
             if ((rs = bopen(ifp,atf,"r",0666)) >= 0) {
-                if (USTAT sb ; (rs = bcontrol(ifp,BC_STAT,&sb)) >= 0) {
+                if (ustat sb ; (rs = bcontrol(ifp,BC_STAT,&sb)) >= 0) {
                     bfile   auxfile, *afp = &auxfile ;
-                    if (char *abuf{} ; (rs = malloc_mp(&abuf)) >= 0) {
+                    if (char *abuf ; (rs = malloc_mp(&abuf)) >= 0) {
                         bool     f_needaux = true ;
                         abuf[0] = '\0' ;
                         if (S_ISREG(sb.st_mode)) {
@@ -417,7 +434,8 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
                             code = rs ;
                             if (rs < 0) {
                                 if (op->auxfname != nullptr) {
-                                    uc_free(op->auxfname) ;
+				    void *vp = voidp(op->auxfname) ;
+                                    libmem.free(vp) ;
                                     op->auxfname = nullptr ;
                                 }
                                 if (abuf[0] != '\0') {
@@ -430,7 +448,7 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
                         } else {
                             bseek(ifp,0L,SEEK_SET) ;
                         }
-			rs1 = uc_free(abuf) ;
+			rs1 = malloc_free(abuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
                 } /* end if (bstat) */
@@ -449,14 +467,15 @@ static int mailmsgattent_startfn(MME *op,cchar *sp,int sl) noex {
         int             rs = SR_OK ;
         cchar           *cp ;
         if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
-            if (cchar *fn ; (rs = uc_mallocstrw(cp,cl,&fn)) >= 0) {
+            if (cchar *fn ; (rs = libmem.strw(cp,cl,&fn)) >= 0) {
                 op->attfname = fn ;
                 rs = mailmsgattent_checkatt(op) ;
                 if (rs < 0) {
-                    uc_free(op->attfname) ;
+		    void *vp = voidp(op->attfname) ;
+                    libmem.free(vp) ;
                     op->attfname = nullptr ;
-                }
-            } /* end if (m-a) */
+                } /* end if (error) */
+            } /* end if (memory-allocation) */
         } /* end if */
         return rs ;
 }
@@ -476,9 +495,9 @@ static int mailmsgattent_startct(MME *op,cchar *sp,int sl) noex {
                 if (int oi ; (oi = matcasestr(contypevals,ep,el)) >= 0) {
                     rs = mailmsgattent_startctpri(op,ep,el) ;
                 } else {
-                    if (cchar *ext ; (rs = uc_mallocstrw(ep,el,&ext)) >= 0) {
+                    if (cchar *ext ; (rs = libmem.strw(ep,el,&ext)) >= 0) {
                         op->ext = ext ;
-                    }
+                    } /* end if (memory-allocation) */
                 }
             } /* end if */
         } /* end if */
@@ -490,9 +509,9 @@ static int mailmsgattent_startctpri(MME *op,cchar *sp,int sl) noex {
         int             rs = SR_OK ;
         cchar           *cp ;
         if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
-            if (cchar *fn ; (rs = uc_mallocstrw(cp,cl,&fn)) >= 0) {
+            if (cchar *fn ; (rs = libmem.strw(cp,cl,&fn)) >= 0) {
                 op->type = fn ;
-            }
+            } /* end if (memory-allocation) */
         }
         return rs ;
 }
@@ -502,9 +521,9 @@ static int mailmsgattent_startctsub(MME *op,cchar *sp,int sl) noex {
         int             rs = SR_OK ;
         cchar           *cp ;
         if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
-            if (cchar *fn ; (rs = uc_mallocstrw(cp,cl,&fn)) >= 0) {
+            if (cchar *fn ; (rs = libmem.strw(cp,cl,&fn)) >= 0) {
                 op->subtype = fn ;
-            }
+            } /* end if (memory-allocation) */
         }
         return rs ;
 }
@@ -526,7 +545,7 @@ static int mailmsgattent_needaux(MME *op,cc *tmpdn,char *abuf,bfile *afp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (tmpdn) {
-            if (char *tmpfname{} ; (rs = malloc_mp(&tmpfname)) >= 0) {
+            if (char *tmpfname ; (rs = malloc_mp(&tmpfname)) >= 0) {
                 if (tmpdn[0] != '\0') {
                     rs = mkpath2(tmpfname,tmpdn,tmpcname) ;
                 } else {
@@ -537,21 +556,22 @@ static int mailmsgattent_needaux(MME *op,cc *tmpdn,char *abuf,bfile *afp) noex {
                     if ((rs = mktmpfile(abuf,tmpfname,om)) >= 0) {
                         cchar       *afn = abuf ;
                         cchar       *cp ;
-                        if ((rs = uc_mallocstrw(afn,-1,&cp)) >= 0) {
+                        if ((rs = libmem.strw(afn,-1,&cp)) >= 0) {
                             op->auxfname = cp ;
                             rs = bopen(afp,op->auxfname,"wct",0666) ;
                             if (rs < 0) {
-                                uc_free(op->auxfname) ;
+				void *vp = voidp(op->auxfname) ;
+                                libmem.free(vp) ;
                                 op->auxfname = nullptr ;
-                            }
-                        } /* end if (m-a) */
+                            } /* end if (error) */
+                        } /* end if (memory-allocation) */
                         if (rs < 0) {
                             uc_unlink(abuf) ;
                             abuf[0] = '\0' ;
-                        }
+                        } /* end if (error) */
                     } /* end if (mktmpfile) */
                 } /* end if (ok) */
-	        rs1 = uc_free(tmpfname) ;
+	        rs1 = malloc_free(tmpfname) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
@@ -563,7 +583,7 @@ static int mailmsgattent_analyzer(MME *op,bfile *afp,bfile *ifp) noex {
         int             rs ;
 	int		rs1 ;
         int             code = 0 ;
-        if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+        if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
             cint	llen = rs ;
             int		lines = 0 ;
             int		clen = 0 ;
@@ -593,7 +613,7 @@ static int mailmsgattent_analyzer(MME *op,bfile *afp,bfile *ifp) noex {
                 if (op->clen < 0) op->clen = clen ;
                 op->clines = (code < CE_BINARY) ? lines : -1 ;
             }
-	    rs1 = uc_free(lbuf) ;
+	    rs1 = malloc_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
         return (rs >= 0) ? code : rs ;
@@ -604,7 +624,7 @@ static int freeit(void *p) noex {
         int             rs = SR_OK ;
         void            **pp = (void **) p ;
         if (*pp != nullptr) {
-            rs = uc_free(*pp) ;
+            rs = libmem.free(*pp) ;
             *pp = nullptr ;
         }
         return rs ;
