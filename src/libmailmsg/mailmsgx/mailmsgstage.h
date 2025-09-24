@@ -56,7 +56,7 @@ struct mailmsgstage_head {
 	vechand		*mlp ;
 	size_t		tflen ;
 	size_t		mapsize ;
-	MAILMSGSTAGE_FL	f ;
+	MAILMSGSTAGE_FL	fl ;
 	uint		magic ;
 	int		nmsgs ;
 	int		tfd ;
