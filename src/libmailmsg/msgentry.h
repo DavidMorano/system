@@ -57,7 +57,8 @@ struct msgentry_flags {
 struct msgentry_head {
 	mailmsg		m ;
 	off_t		boff ;		/* w/ tmpfile */
-	MSGENTRY_FL	f, hdr ;
+	MSGENTRY_FL	hdr ;
+	MSGENTRY_FL	fl ;
 	int		blen ;		/* w/ tmpfile */
 	int		clen ;		/* supplied or calculated */
 	int		clines ;	/* supplied or calculated */
