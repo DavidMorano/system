@@ -43,8 +43,9 @@
 #include <cstdio>
 #endif /* COMMENT */
 
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<strings.h>
+#include	<strings.h>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -55,7 +56,7 @@
 #include	<localmisc.h>
 
 /* modification by David A-D- Morano */
-#include	<nss_parse.h>
+#include	"nss_parse.h"
 
 
 /* local defines */
@@ -72,7 +73,13 @@
 
 /* forward references */
 
-char *_strpbrk_escape(char *, char *) noex ;
+constexpr local int lenstr(cchar *s) noex {
+    cchar	*ss = s ;
+    while (*s) {
+	s += 1 ;
+    }
+    return intconv(s - ss) ;
+} /* end subroutine (lenstr) */
 
 
 /* local variables */
@@ -88,65 +95,67 @@ char *_strpbrk_escape(char *, char *) noex ;
  *   Like strtok_r, except we do not break on a token if it is escaped
  *   with the escape character (\).
  */
-char * _strtok_escape(char *string, char *sepset, char **lasts) noex {
+char * _strtok_escape(char *locstr,char *sepset,char **lasts) noex {
 	char	*r;
 
 	/* first or subsequent call */
-	if (string == NULL)
-		string = *lasts;
+	if (locstr == nullptr)
+		locstr = *lasts;
 
-	if (string == 0)		/* return if no tokens remaining */
-		return (NULL);
+	if (locstr == nullptr)		/* return if no tokens remaining */
+		return (nullptr);
 
-	if (*string == '\0')		/* return if no tokens remaining */
-		return (NULL);
+	if (*locstr == '\0')		/* return if no tokens remaining */
+		return (nullptr);
 
 	/* move past token */
-	if ((r = _strpbrk_escape(string, sepset)) == NULL)
+	if ((r = _strpbrk_escape(locstr,sepset)) == nullptr)
 		*lasts = 0;	/* indicate this is last token */
 	else {
 		*r = '\0';
 		*lasts = r+1;
 	}
-	return (string);
-}
+	return locstr ;
+} /* end subroutine (_strtok_escape) */
 
 /*
  * Return ptr to first occurrence of any non-escaped character from `brkset'
- * in the character string `string'; NULL if none exists.
+ * in the character string `string'; nullptr if none exists.
  */ 
-char * _strpbrk_escape(char *string, char *brkset) noex {
+char * _strpbrk_escape(char *locstr,char *brkset) noex {
 	const char *p;
 
 	do {
-		for (p = brkset; *p != '\0' && *p != *string; ++p)
+		for (p = brkset; *p != '\0' && *p != *locstr; ++p)
 			;
-		if (p == string)
-			return ((char *)string);
+		if (p == locstr)
+			return ((char *)locstr);
 		if (*p != '\0') {
-			if (*(string-1) != '\\')
-				return ((char *)string);
+			if (*(locstr-1) != '\\')
+				return ((char *)locstr);
 		}
-	} while (*string++);
+	} while (*locstr++);
 
-	return (NULL);
-}
+	return nullptr ;
+} /* end subroutine (_strpbrk_escape) */
 
-char   * _escape(char *s, char *esc) noex {
+char * _escape(char *s,char *esc) noex {
 	int	nescs = 0;	/* number of escapes to place in s */
 	int	i, j;
 	int	len_s;
 	char	*tmp;
 
-	if (s == NULL || esc == NULL)
-		return (NULL);
+	if (s == nullptr || esc == nullptr)
+		return (nullptr);
 
-	len_s = strlen(s);
-	for (i = 0; i < len_s; i++)
-		if (strchr(esc, s[i]))
+	len_s = lenstr(s) ;
+	for (i = 0; i < len_s; i++) {
+		if (strchr(esc, s[i])) {
 			nescs++;
-	if ((tmp = malloc(nescs + len_s + 1)) == NULL)
-		return (NULL);
+		}
+	}
+	if ((tmp = charp(malloc(nescs + len_s + 1))) == nullptr)
+		return (nullptr);
 	for (i = 0, j = 0; i < len_s; i++) {
 		if (strchr(esc, s[i])) {
 			tmp[j++] = '\\';
@@ -155,28 +164,29 @@ char   * _escape(char *s, char *esc) noex {
 	}
 	tmp[len_s + nescs] = '\0';
 	return (tmp);
-}
+} /* end subroutine (_escape) */
 
-char * _unescape(char *s, char *esc) noex {
+char * _unescape(char *s,char *esc) noex {
 	int	len_s;
 	int	i, j;
 	char	*tmp;
 
-	if (s == NULL || esc == NULL)
-		return (NULL);
+	if (s == nullptr || esc == nullptr)
+		return (nullptr);
 
-	len_s = strlen(s);
-	if ((tmp = malloc(len_s + 1)) == NULL)
-		return (NULL);
+	len_s = lenstr(s);
+	if ((tmp = charp(malloc(len_s + 1))) == nullptr)
+		return (nullptr);
 	for (i = 0, j = 0; i < len_s; i++) {
-		if (s[i] == '\\' && strchr(esc, s[i + 1]))
+		if (s[i] == '\\' && strchr(esc, s[i + 1])) {
 			tmp[j++] = s[++i];
-		else
+		} else {
 			tmp[j++] = s[i];
-	}
+		}
+	} /* end for */
 	tmp[j] = '\0';
-	return (tmp);
-}
+	return tmp ;
+} /* end subroutine (_unescape) */
 
 char * _strdup_null(char *s) noex {
 	return (strdup(s ? s : ""));
@@ -235,10 +245,9 @@ int _readbufline(char *mapbuf,	/* input mmap buffer */
 			}
 			(*lastlen)++;
 		};
-	}
+	} /* end for */
 	/* NOTREACHED */
-}
-/* end subroutine (_readbufline) */
+} /* end subroutine (_readbufline) */
 
 #endif /* COMMENT */
 
