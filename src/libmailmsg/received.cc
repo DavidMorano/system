@@ -59,7 +59,9 @@
 #include	"mhcom.h"
 #include	"received.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |gelenstr(3u)| */
 
 /* local defines */
 
@@ -70,6 +72,14 @@ import libutil ;
 #ifndef	CF_FIELDWORD
 #define	CF_FIELDWORD	1		/* used |field_word(3dam)| */
 #endif
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -154,16 +164,16 @@ int received_start(received *op,cchar *hbuf,int hlen) noex {
 	        if (cchar *sp ; (rs = com.getval(&sp)) > 0) {
 		    cint	sl = rs ;
 	            cint	sz = (rs + 1) ;
-	            if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	            if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) {
 	                op->a = charp(p) ;
 	                if ((rs = received_bake(op,sz,sp,sl)) >= 0) {
 	                    c = rs ;
 	                    op->magic = RECEIVED_MAGIC ;
 	                }
 	                if (rs < 0) {
-	                    uc_free(op->a) ;
+	                    libmem.free(op->a) ;
 	                    op->a = nullptr ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (memory-allocation) */
 	        } /* end if (non-zero content) */
 	        rs1 = com.finish ;
@@ -179,7 +189,7 @@ int received_finish(received *op) noex {
 	int		rs1 ;
 	if ((rs = received_magic(op)) >= 0) {
 	    if (op->a) {
-	        rs1 = uc_free(op->a) ;
+	        rs1 = libmem.free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
 	    }
