@@ -2,6 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* access the PCS configuration information */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -70,16 +73,16 @@ struct pcsconf_flags {
 
 struct pcsconf_head {
 	modload		loader ;
-	ptmM		mx ;
+	ptm		mx ;
 	void		*obj ;		/* object pointer */
 	void		*cookmgr ;	/* cookie-manager */
 	cchar		*pr ;		/* supplied program-root */
 	cchar		**envv ;	/* supplied environment */
 	cchar		*pcsusername ;	/* calculated */
 	PCSCONF_CA	call ;
-	PCSCONF_FL	f ;
 	uid_t		uid_pcs ;
 	gid_t		gid_pcs ;
+	PCSCONF_FL	fl ;
 	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
