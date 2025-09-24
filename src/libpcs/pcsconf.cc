@@ -1,12 +1,13 @@
-/* pcsconf */
+/* pcsconf SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* load management and interface for the PCSCONFS object */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGDUMP	0		/* only if underlying SW supports */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
-
 
 /* revision history:
 
@@ -17,7 +18,8 @@
 	This was modified for more general use.
 
 	= 2008-10-07, David A­D­ Morano
-	This was modified to allow for the main part to be a loadable module.
+	This was modified to allow for the main part to be a loadable
+	module.
 
 */
 
@@ -25,27 +27,26 @@
 
 /*******************************************************************************
 
-	This module implements an interface (a trivial one) that provides
-	access to the PCSCONFS object (which is dynamically loaded).
+  	Name:
+	pcsconf
 
+	Description:
+	This module implements an interface (a trivial one) that
+	provides access to the PCSCONFS object (which is dynamically
+	loaded).
 
 *******************************************************************************/
 
-
-#define	PCSCONF_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<vsystem.h>
 #include	<getbufsize.h>
 #include	<getnodename.h>
@@ -98,29 +99,10 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfcookkey(cchar *,int,cchar **) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	pathclean(char *,cchar *,int) ;
-
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* local structures */
@@ -138,7 +120,7 @@ struct cookmgr_nodedomain {
 } ;
 
 struct cookmgr {
-	struct cookmgr_flags	f ;
+	struct cookmgr_flags	fl ;
 	struct cookmgr_nodedomain	nd ;
 	EXPCOOK	cooks ;
 	UINFO_NAME	uname ;
@@ -167,24 +149,13 @@ static int	cookmgr_uaux(COOKMGR *) ;
 static int	cookmgr_nodedomain(COOKMGR *) ;
 static int	cookmgr_finish(COOKMGR *) ;
 
-static int	isrequired(int) ;
+static bool	isrequired(int) noex ;
 
 
 /* global variables */
 
 
 /* local variables */
-
-static cchar	*subs[] = {
-	"start",
-	"curbegin",
-	"fetch",
-	"enum",
-	"curend",
-	"audit",
-	"finish",
-	NULL
-} ;
 
 enum subs {
 	sub_start,
@@ -197,24 +168,15 @@ enum subs {
 	sub_overlast
 } ;
 
-static cchar	*cooks[] = {
-	"sysname",
-	"nodename",
-	"release",
-	"version",
-	"machine",
-	"architecture",
-	"platform",
-	"provider",
-	"hwserial",
-	"nisdomain",
-	"N",
-	"D",
-	"H",
-	"U",
-	"R",
-	"PN",
-	NULL
+constexpr cpcchar	subs[] = {
+	"start",
+	"curbegin",
+	"fetch",
+	"enum",
+	"curend",
+	"audit",
+	"finish",
+	nullptr
 } ;
 
 enum cooks {
@@ -237,17 +199,38 @@ enum cooks {
 	cook_overlast
 } ;
 
+constexpr cpcchar	cooks[] = {
+	"sysname",
+	"nodename",
+	"release",
+	"version",
+	"machine",
+	"architecture",
+	"platform",
+	"provider",
+	"hwserial",
+	"nisdomain",
+	"N",
+	"D",
+	"H",
+	"U",
+	"R",
+	"PN",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int pcsconf_start(PCSCONF *op,cchar *pr,cchar **envv,cchar *cfname)
-{
+int pcsconf_start(PCSCONF *op,cchar *pr,cchar **envv,cchar *cfname) noex {
 	int		rs ;
 	cchar		*objname = PCSCONF_OBJNAME ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
@@ -256,7 +239,7 @@ int pcsconf_start(PCSCONF *op,cchar *pr,cchar **envv,cchar *cfname)
 	debugprintf("pcsconf_start: cfname=%s\n",cfname) ;
 #endif
 
-	if ((cfname != NULL) && (cfname[0] == '\0')) return SR_INVALID ;
+	if ((cfname != nullptr) && (cfname[0] == '\0')) return SR_INVALID ;
 
 	memset(op,0,sizeof(PCSCONF)) ;
 	op->pr = pr ;
@@ -264,7 +247,7 @@ int pcsconf_start(PCSCONF *op,cchar *pr,cchar **envv,cchar *cfname)
 	op->uid_pcs = -1 ;
 
 	if ((rs = pcsconf_objloadbegin(op,pr,objname)) >= 0) {
-	    if ((rs = ptm_create(&op->m,NULL)) >= 0) {
+	    if ((rs = ptm_create(&op->m,nullptr)) >= 0) {
 	        rs = (*op->call.start)(op->obj,pr,envv,cfname) ;
 	        if (rs >= 0) {
 		    op->magic = PCSCONF_MAGIC ;
@@ -291,22 +274,22 @@ int pcsconf_finish(PCSCONF *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONF_MAGIC) return SR_NOTOPEN ;
 
-	if (op->pcsusername != NULL) {
+	if (op->pcsusername != nullptr) {
 	    rs1 = uc_free(op->pcsusername) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->pcsusername = NULL ;
+	    op->pcsusername = nullptr ;
 	}
 
-	if (op->cookmgr != NULL) {
+	if (op->cookmgr != nullptr) {
 	    rs1 = cookmgr_finish(op->cookmgr) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = uc_free(op->cookmgr) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->cookmgr = NULL ;
+	    op->cookmgr = nullptr ;
 	}
 
 	rs1 = (*op->call.finish)(op->obj) ;
@@ -330,11 +313,11 @@ int pcsconf_audit(PCSCONF *op)
 	int		rs1 ;
 	int		vl = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONF_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.audit != NULL) {
+	if (op->call.audit != nullptr) {
 	    if ((rs = ptm_lock(&op->m)) >= 0) {
 		{
 	            rs = (*op->call.audit)(op->obj) ;
@@ -356,7 +339,7 @@ int pcsconf_getpcsuid(PCSCONF *op)
 	int		rs1 ;
 	int		v = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONF_MAGIC) return SR_NOTOPEN ;
 
@@ -379,7 +362,7 @@ int pcsconf_getpcsgid(PCSCONF *op)
 	int		rs1 ;
 	int		v = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONF_MAGIC) return SR_NOTOPEN ;
 
@@ -402,17 +385,17 @@ int pcsconf_getpcsusername(PCSCONF *op,char *ubuf,int ulen)
 	int		rs1 ;
 	int		vl = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (ubuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (ubuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONF_MAGIC) return SR_NOTOPEN ;
 
 	if (ulen < 0) ulen = USERNAMELEN ;
 
 	if ((rs = ptm_lock(&op->m)) >= 0) {
-	    if (op->pcsusername == NULL) rs = pcsconf_getpcspw(op) ;
+	    if (op->pcsusername == nullptr) rs = pcsconf_getpcspw(op) ;
 	    if (rs >= 0) {
-		if (op->pcsusername != NULL) {
+		if (op->pcsusername != nullptr) {
 		    rs = sncpy1(ubuf,ulen,op->pcsusername) ;
 		    vl = rs ;
 		} else {
@@ -432,12 +415,12 @@ int pcsconf_getpr(PCSCONF *op,cchar **prp)
 {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONF_MAGIC) return SR_NOTOPEN ;
 
 	rs = strlen(op->pr) ;
-	if (prp != NULL) *prp = op->pr ;
+	if (prp != nullptr) *prp = op->pr ;
 
 	return rs ;
 }
@@ -448,11 +431,11 @@ int pcsconf_getenvv(PCSCONF *op,cchar ***envvp)
 {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONF_MAGIC) return SR_NOTOPEN ;
 
-	if (envvp != NULL) *envvp = op->envv ;
+	if (envvp != nullptr) *envvp = op->envv ;
 
 	return rs ;
 }
@@ -464,8 +447,8 @@ int pcsconf_curbegin(PCSCONF *op,PCSCONF_CUR *curp)
 	int		rs = SR_NOSYS ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONF_MAGIC) return SR_NOTOPEN ;
 
@@ -473,7 +456,7 @@ int pcsconf_curbegin(PCSCONF *op,PCSCONF_CUR *curp)
 
 	memset(curp,0,sizeof(PCSCONF_CUR)) ;
 
-	if (op->call.curbegin != NULL) {
+	if (op->call.curbegin != nullptr) {
 	    if ((rs = ptm_lock(&op->m)) >= 0) {
 	        void	*p ;
 	        if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
@@ -483,7 +466,7 @@ int pcsconf_curbegin(PCSCONF *op,PCSCONF_CUR *curp)
 		    }
 	            if (rs < 0) {
 	                uc_free(curp->scp) ;
-	                curp->scp = NULL ;
+	                curp->scp = nullptr ;
 		    }
 	        } /* end if (memory-allocation) */
 		rs1 = ptm_unlock(&op->m) ;
@@ -501,8 +484,8 @@ int pcsconf_curend(PCSCONF *op,PCSCONF_CUR *curp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONF_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != PCSCONF_CURMAGIC) return SR_NOTOPEN ;
@@ -511,9 +494,9 @@ int pcsconf_curend(PCSCONF *op,PCSCONF_CUR *curp)
 	debugprintf("pcsconf_curend: ent scp{%p}\n",curp->scp) ;
 #endif
 
-	if (curp->scp != NULL) {
+	if (curp->scp != nullptr) {
 	    if ((rs = ptm_lock(&op->m)) >= 0) {
-	        if (op->call.curend != NULL) {
+	        if (op->call.curend != nullptr) {
 	            rs1 = (*op->call.curend)(op->obj,curp->scp) ;
 		    if (rs >= 0) rs = rs1 ;
 #if	CF_DEBUGS
@@ -523,7 +506,7 @@ int pcsconf_curend(PCSCONF *op,PCSCONF_CUR *curp)
 		    rs = SR_NOSYS ;
 		}
 	        uc_free(curp->scp) ;
-	        curp->scp = NULL ;
+	        curp->scp = nullptr ;
 		rs1 = ptm_unlock(&op->m) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
@@ -549,14 +532,14 @@ int pcsconf_fetch(PCSCONF *op,cchar *kp,int kl,PCSCONF_CUR *curp,
 	int		rs1 ;
 	int		vl = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (kp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (kp == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONF_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != PCSCONF_CURMAGIC) return SR_NOTOPEN ;
 
-	if (op->call.fetch != NULL) {
+	if (op->call.fetch != nullptr) {
 	    if ((rs = ptm_lock(&op->m)) >= 0) {
 	        rs = (*op->call.fetch)(op->obj,kp,kl,curp->scp,vbuf,vlen) ;
 	        if (rs >= 0) {
@@ -585,14 +568,14 @@ int		vlen ;
 	int		rs1 ;
 	int		vl = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (kbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (kbuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONF_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != PCSCONF_CURMAGIC) return SR_NOTOPEN ;
 
-	if (op->call.enumerate != NULL) {
+	if (op->call.enumerate != nullptr) {
 	    if ((rs = ptm_lock(&op->m)) >= 0) {
 		void	*cp = curp->scp ;
 	        rs = (*op->call.enumerate)(op->obj,cp,kbuf,klen,vbuf,vlen) ;
@@ -617,8 +600,8 @@ int pcsconf_fetchone(PCSCONF *op,cchar *kp,int kl,char vbuf[],int vlen)
 	int		rs1 ;
 	int		vl = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (kp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (kp == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONF_MAGIC) return SR_NOTOPEN ;
 
@@ -656,7 +639,7 @@ static int pcsconf_objloadbegin(PCSCONF *op,cchar *pr,cchar *objname)
 			rs = pcsconf_loadcalls(op,objname) ;
 			if (rs < 0) {
 	    		    uc_free(op->obj) ;
-	    		    op->obj = NULL ;
+	    		    op->obj = nullptr ;
 			}
 		    } /* end if (memory-allocations) */
 		} /* end if (getmv) */
@@ -675,10 +658,10 @@ static int pcsconf_objloadend(PCSCONF *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->obj != NULL) {
+	if (op->obj != nullptr) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->obj = NULL ;
+	    op->obj = nullptr ;
 	}
 
 	rs1 = modload_close(&op->loader) ;
@@ -701,11 +684,11 @@ static int pcsconf_modloadopen(PCSCONF *op,cchar *pr,cchar *objname)
 	if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
 	    MODLOAD	*lp = &op->loader ;
 	    int		i ;
-	    int		f_modload = FALSE ;
+	    int		f_modload = false ;
 	    cchar	*modbname ;
 	    char	symname[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
+	    for (i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
 	        if (isrequired(i)) {
 	            rs = sncpy3(symname,SYMNAMELEN,objname,"_",subs[i]) ;
 	            if (rs >= 0)
@@ -745,7 +728,7 @@ static int pcsconf_loadcalls(PCSCONF *op,cchar objname[])
 	char		symname[SYMNAMELEN + 1] ;
 	const void	*snp ;
 
-	for (i = 0 ; subs[i] != NULL ; i += 1) {
+	for (i = 0 ; subs[i] != nullptr ; i += 1) {
 
 	    rs = sncpy3(symname,SYMNAMELEN,objname,"_",subs[i]) ;
 	    if (rs < 0) break ;
@@ -753,7 +736,7 @@ static int pcsconf_loadcalls(PCSCONF *op,cchar objname[])
 	    rs1 = modload_getsym(lp,symname,&snp) ;
 
 	    if (rs1 == SR_NOTFOUND) {
-	        snp = NULL ;
+	        snp = nullptr ;
 	        if (isrequired(i))
 	            break ;
 	    } else
@@ -761,7 +744,7 @@ static int pcsconf_loadcalls(PCSCONF *op,cchar objname[])
 
 	    if (rs < 0) break ;
 
-	    if (snp != NULL) {
+	    if (snp != nullptr) {
 
 	        c += 1 ;
 	        switch (i) {
@@ -833,7 +816,7 @@ static int pcsconf_getpcspw(PCSCONF *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->pcsusername == NULL) {
+	if (op->pcsusername == nullptr) {
 	    const uid_t	uid_pcs = op->uid_pcs ;
 	    cchar	*un = PCSCONF_USER ;
 	    if ((rs = pcsconf_getpcsids(op)) >= 0) {
@@ -848,12 +831,12 @@ static int pcsconf_getpcspw(PCSCONF *op)
 		    }
 		    if ((rs >= 0) && (rs1 == SR_NOTFOUND)) {
 			const uid_t	u = uid_pcs ;
-		        un = NULL ;
+		        un = nullptr ;
 		        if ((rs = getpwusername(&pw,pwbuf,pwlen,u)) >= 0) {
 			    un = pw.pw_name ;
 		        } /* end if (getusername) */
 		    } /* end if */
-		    if ((rs >= 0) && (un != NULL)) {
+		    if ((rs >= 0) && (un != nullptr)) {
 		        cchar	*cp ;
 		        if ((rs = uc_mallocstrw(un,-1,&cp)) >= 0) {
 			    op->pcsusername = cp ;
@@ -876,14 +859,14 @@ static int pcsconf_expand(PCSCONF *op,char *vbuf,int vlen,int vl)
 	int		rs = SR_OK ;
 	int		kl ;
 	int		sl = vl ;
-	int		f_havekeys = FALSE ;
+	int		f_havekeys = false ;
 	cchar		*sp = (cchar *) vbuf ;
-	cchar		*kp = NULL ;
+	cchar		*kp = nullptr ;
 
 	if (vlen < 0) vlen = EBUFLEN ;
 
 	while ((kl = sfcookkey(sp,sl,&kp)) > 0) {
-	    f_havekeys = TRUE ;
+	    f_havekeys = true ;
 
 	    rs = pcsonf_cookload(op,kp,kl) ;
 
@@ -918,7 +901,7 @@ static int pcsonf_cookmgr(PCSCONF *op)
 {
 	int		rs = SR_OK ;
 
-	if (op->cookmgr == NULL) {
+	if (op->cookmgr == nullptr) {
 	    const int	osize = sizeof(COOKMGR) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(osize,&p)) >= 0) {
@@ -958,7 +941,7 @@ static int cookmgr_start(COOKMGR *cmp,cchar *pr)
 	cmp->pr = pr ;
 
 	rs = expcook_start(&cmp->cooks) ;
-	cmp->f.cooks = (rs >= 0) ;
+	cmp->fl.cooks = (rs >= 0) ;
 
 	return rs ;
 }
@@ -969,15 +952,15 @@ static int cookmgr_load(COOKMGR *cmp,cchar *kp,int kl)
 {
 	int		rs = SR_OK ;
 
-	if (expcook_findkey(&cmp->cooks,kp,kl,NULL) == SR_NOTFOUND) {
+	if (expcook_findkey(&cmp->cooks,kp,kl,nullptr) == SR_NOTFOUND) {
 	    NULSTR	ns ;
-	    cchar	*kname = NULL ;
+	    cchar	*kname = nullptr ;
 	    if ((rs = nulstr_start(&ns,kp,kl,&kname)) >= 0) {
 	        const int	ci = matstr(cooks,kp,kl) ;
 	        int		vl = -1 ;
-	        cchar	*vp = NULL ;
+	        cchar	*vp = nullptr ;
 	        char	ubuf[USERNAMELEN+1] ;
-	        char	*tbuf = NULL ;
+	        char	*tbuf = nullptr ;
 	        switch (ci) {
 	        case cook_sysname:
 	        case cook_nodename:
@@ -1072,9 +1055,9 @@ static int cookmgr_load(COOKMGR *cmp,cchar *kp,int kl)
 	            vl = sfbasename(cmp->pr,-1,&vp) ;
 	            break ;
 	        } /* end switch */
-	        if ((rs >= 0) && (vp != NULL))
+	        if ((rs >= 0) && (vp != nullptr))
 	            rs = expcook_add(&cmp->cooks,kname,vp,vl) ;
-	        if (tbuf != NULL) uc_free(tbuf) ;
+	        if (tbuf != nullptr) uc_free(tbuf) ;
 	        nulstr_finish(&ns) ;
 	    } /* end if (nulstr) */
 	} /* end if (key not already found) */
@@ -1101,8 +1084,8 @@ static int cookmgr_uname(COOKMGR *cmp)
 {
 	int		rs = SR_OK ;
 
-	if (! cmp->f.uname) {
-	    cmp->f.uname = TRUE ;
+	if (! cmp->fl.uname) {
+	    cmp->fl.uname = true ;
 	    rs = uinfo_name(&cmp->uname) ;
 	}
 
@@ -1115,8 +1098,8 @@ static int cookmgr_uaux(COOKMGR *cmp)
 {
 	int		rs = SR_OK ;
 
-	if (! cmp->f.uaux) {
-	    cmp->f.uaux = TRUE ;
+	if (! cmp->fl.uaux) {
+	    cmp->fl.uaux = true ;
 	    rs = uinfo_aux(&cmp->uaux) ;
 	}
 
@@ -1129,7 +1112,7 @@ static int cookmgr_nodedomain(COOKMGR *cmp)
 {
 	int		rs = SR_OK ;
 
-	if (cmp->nd.a == NULL) {
+	if (cmp->nd.a == nullptr) {
 	    char	nn[NODENAMELEN+1] ;
 	    char	dn[MAXHOSTNAMELEN+1] ;
 	    if ((rs = getnodedomain(nn,dn)) >= 0) {
@@ -1156,14 +1139,14 @@ static int cookmgr_finish(COOKMGR *cmp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (cmp != NULL) {
-	    if (cmp->nd.a != NULL) {
+	if (cmp != nullptr) {
+	    if (cmp->nd.a != nullptr) {
 	        rs1 = uc_free(cmp->nd.a) ;
 	        if (rs >= 0) rs = rs1 ;
-	        cmp->nd.a = NULL ;
+	        cmp->nd.a = nullptr ;
 	    }
-	    if (cmp->f.cooks) {
-	        cmp->f.cooks = FALSE ;
+	    if (cmp->fl.cooks) {
+	        cmp->fl.cooks = false ;
 	        rs1 = expcook_finish(&cmp->cooks) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -1173,10 +1156,8 @@ static int cookmgr_finish(COOKMGR *cmp)
 }
 /* end subroutine (cookmgr_finish) */
 
-
-static int isrequired(int i)
-{
-	int		f = FALSE ;
+static bool isrequired(int i) noex {
+	int		f = false ;
 	switch (i) {
 	case sub_start:
 	case sub_curbegin:
@@ -1185,7 +1166,7 @@ static int isrequired(int i)
 	case sub_curend:
 	case sub_audit:
 	case sub_finish:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
