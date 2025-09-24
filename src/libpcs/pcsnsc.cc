@@ -189,12 +189,12 @@ int pcsnsc_open(PCSNSC *op,cchar *pr,int to)
 	if ((rs = pcsnsc_setbegin(op,pr)) > 0) {
 	    if ((rs = pcsnsc_connect(op)) > 0) {
 	        if ((rs = pcsnsc_bufbegin(op)) >= 0) {
-	            op->f.srv = TRUE ;
+	            op->fl.srv = TRUE ;
 		    rs = 1 ;
 	            op->magic = PCSNSC_MAGIC ;
 	        }
 	    }
-	    if ((rs < 0) || (! op->f.srv)) {
+	    if ((rs < 0) || (! op->fl.srv)) {
 	        pcsnsc_setend(op) ;
 	    }
 	} /* end if (pcsnsc-set) */
@@ -274,7 +274,7 @@ int pcsnsc_help(PCSNSC *op,char *rbuf,int rlen,int idx)
 
 	if (op->magic != PCSNSC_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.srv) {
+	if (op->fl.srv) {
 	    struct pcsmsg_gethelp	mreq ;
 	    struct pcsmsg_help		mres ;
 	    const int		to = op->to ;
@@ -300,15 +300,15 @@ int pcsnsc_help(PCSNSC *op,char *rbuf,int rlen,int idx)
 	                    }
 	                }
 		    } else if (isBadRecv(rs)) {
-		        op->f.srv = FALSE ;
+		        op->fl.srv = FALSE ;
 		        rs = SR_OK ;
 	            } /* end if (uc_recve) */
 		} else if (isBadSend(rs)) {
-		    op->f.srv = FALSE ;
+		    op->fl.srv = FALSE ;
 		    rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (pcsmsg_gethelp) */
-	    if (rs < 0) op->f.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
 #if	CF_DEBUGS
@@ -337,7 +337,7 @@ int pcsnsc_getval(PCSNSC *op,char *rbuf,int rlen,cchar *un,int w)
 
 	if (op->magic != PCSNSC_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.srv) {
+	if (op->fl.srv) {
 	    struct pcsmsg_getval	mreq ;
 	    struct pcsmsg_val		mres ;
 	    const int		to = op->to ;
@@ -370,21 +370,21 @@ int pcsnsc_getval(PCSNSC *op,char *rbuf,int rlen,cchar *un,int w)
 #if	CF_DEBUGS
 	debugprintf("pcsnsc_getval: uc_recve() out rs=%d\n",rs) ;
 #endif
-		        op->f.srv = FALSE ;
+		        op->fl.srv = FALSE ;
 		        rs = SR_OK ;
 	            } /* end if (uc_recve) */
 		} else if (isBadSend(rs)) {
 #if	CF_DEBUGS
 	debugprintf("pcsnsc_getval: u_send() out rs=%d\n",rs) ;
 #endif
-		    op->f.srv = FALSE ;
+		    op->fl.srv = FALSE ;
 		    rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (pcsmsg_getval) */
 #if	CF_DEBUGS
 	debugprintf("pcsnsc_getval: pcsmsg_getval() out rs=%d\n",rs) ;
 #endif
-	    if (rs < 0) op->f.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
 #if	CF_DEBUGS
@@ -409,7 +409,7 @@ int pcsnsc_mark(PCSNSC *op)
 
 	if (op->magic != PCSNSC_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.srv) {
+	if (op->fl.srv) {
 	    struct pcsmsg_mark	mreq ;
 	    struct pcsmsg_ack	mres ;
 	    const int		to = op->to ;
@@ -430,15 +430,15 @@ int pcsnsc_mark(PCSNSC *op)
 	                    }
 	                }
 		    } else if (isBadRecv(rs)) {
-		        op->f.srv = FALSE ;
+		        op->fl.srv = FALSE ;
 		        rs = SR_OK ;
 	            } /* end if (uc_recve) */
 		} else if (isBadSend(rs)) {
-		    op->f.srv = FALSE ;
+		    op->fl.srv = FALSE ;
 		    rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (pcsmsg_mark) */
-	    if (rs < 0) op->f.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
 #if	CF_DEBUGS
@@ -463,7 +463,7 @@ int pcsnsc_exit(PCSNSC *op,cchar *reason)
 
 	if (op->magic != PCSNSC_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.srv) {
+	if (op->fl.srv) {
 	    struct pcsmsg_exit	mreq ;
 	    struct pcsmsg_ack	mres ;
 	    const int		to = op->to ;
@@ -488,15 +488,15 @@ int pcsnsc_exit(PCSNSC *op,cchar *reason)
 	                    }
 	                }
 		    } else if (isBadRecv(rs)) {
-		        op->f.srv = FALSE ;
+		        op->fl.srv = FALSE ;
 		        rs = SR_OK ;
 	            } /* end if (uc_recve) */
 		} else if (isBadSend(rs)) {
-		    op->f.srv = FALSE ;
+		    op->fl.srv = FALSE ;
 		    rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (pcsmsg_exit) */
-	    if (rs < 0) op->f.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
 #if	CF_DEBUGS
@@ -807,7 +807,7 @@ static int pcsnsc_istatus(PCSNSC *op,PCSNSC_STATUS *statp)
 	    memset(statp,0,sizeof(PCSNSC_STATUS)) ;
 	}
 
-	if (op->f.srv) {
+	if (op->fl.srv) {
 	    struct pcsmsg_getstatus	mreq ;
 	    struct pcsmsg_status	mres ;
 	    const int		to = op->to ;
@@ -838,21 +838,21 @@ static int pcsnsc_istatus(PCSNSC *op,PCSNSC_STATUS *statp)
 	                    }
 	                }
 		    } else if (isBadRecv(rs)) {
-		        op->f.srv = FALSE ;
+		        op->fl.srv = FALSE ;
 		        rs = SR_OK ;
 	            } /* end if (uc_recve) */
 #if	CF_DEBUGS
 		debugprintf("pcsnsc_istatus: recv-out rs=%d\n",rs) ;
 #endif
 		} else if (isBadSend(rs)) {
-		    op->f.srv = FALSE ;
+		    op->fl.srv = FALSE ;
 		    rs = SR_OK ;
 	        } /* end if (u_send) */
 #if	CF_DEBUGS
 		debugprintf("pcsnsc_istatus: send-out rs=%d\n",rs) ;
 #endif
 	    } /* end if (pcsmsg_getstatus) */
-	    if (rs < 0) op->f.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
 #if	CF_DEBUGS
