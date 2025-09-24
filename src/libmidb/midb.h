@@ -1,12 +1,20 @@
-/* header file for the "Multiple Index Data Base (MIDB) package */
+/* midb HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
 
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-
+	This was originally written.
 
 */
 
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
+#ifdef	MIDB_INCLUDE
+#define	MIDB_INCLUDE
 
 
 #define		MIDB_MAGIC	0x20052616
@@ -14,11 +22,11 @@
 #define		MIDB_BUFSIZE	512
 
 
-
 typedef struct midb_struct {
 	struct midb_index	*skey_struct[] ;
 	struct midb_index	*mkey_struct[] ;
-	long	magic ;
+	char	*buf ;
+	char	*bp ;
 	long	bufoffset ;
 	off_t	offset ;
 	int	fd ;
@@ -26,18 +34,17 @@ typedef struct midb_struct {
 	int	mkey_len ;
 	int	(*skey_fun[])() ;
 	int	(*mkey_fun[])() ;
+	uint	magic ;
 	int	stat ;
 	int	len ;
 	int	oflag ;
 	int	bufsize ;
-	char	*buf ;
-	char	*bp ;
 } midb ;
 
 
 typedef struct midb_query_struct {
-	long	next ;			/* use the next record of this index */
 	char	*key ;			/* use this key if record not given */
+	long	next ;			/* use the next record of this index */
 	int	keylen ;		/* key's length if not string */
 	int	index ;			/* searching this index */
 } ;
@@ -53,26 +60,20 @@ struct midb_ent {
 	long	offset_index ;
 } ;
 
-
 /* internal data status fields */
-
 #define		MIDBSM_WRITE	0x01
 #define		MIDBSM_NOTSEEK	0x02
 #define		MIDBSM_LINEBUF	0x04
 #define		MIDBSM_UNBUF	0x08
 
-
 /* control commands */
-
 #define		MIDBCMD_TELL	1
 #define		MIDBCMD_BUF	2
 #define		MIDBCMD_FULLBUF	2
 #define		MIDBCMD_LINEBUF	3
 #define		MIDBCMD_UNBUF	4
 
-
 /* returns */
-
 #define		MIDBR_NOTOPEN	-300
 #define		MIDBR_OPEN	-300
 #define		MIDBR_WRONLY	-301
@@ -81,6 +82,5 @@ struct midb_ent {
 #define		MIDBR_NOTSEEK	-304
 #define		MIDBR_EOF	-305
 #define		MIDBR_FAULT	-306
-
 
 
