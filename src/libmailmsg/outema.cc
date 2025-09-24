@@ -41,9 +41,19 @@
 
 #include	"outema.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -140,7 +150,7 @@ int outema_ent(outema *op,EMA_ENT *ep) noex {
 	                if (c++ > 0) rs = b.chr(CH_SP) ;
 	                if (rs >= 0) {
 	                    cint	sz = (cl+2+1) ;
-	                    if (char *ap ; (rs = uc_malloc(sz,&ap)) >= 0) {
+	                    if (char *ap ; (rs = libmem.mall(sz,&ap)) >= 0) {
 				char	*tbp = ap ;
 	                        *tbp++ = CH_LPAREN ;
 	                        if ((rs = snwcpycompact(tbp,cl,cp,cl)) >= 0) {
@@ -151,7 +161,7 @@ int outema_ent(outema *op,EMA_ENT *ep) noex {
 	                               rs = b.strw(tbp,tbl) ;
 				    }
 	                        } /* end if (snwcpycompact) */
-	                        rs1 = uc_free(ap) ;
+	                        rs1 = libmem.free(ap) ;
 				if (rs >= 0) rs = rs1 ;
 	                    } /* end if (m-a-f) */
 	                } /* end if (ok) */
@@ -178,12 +188,12 @@ int outema_item(outema *op,cchar *vp,int vl) noex {
 	if ((rs = outema_magic(op)) >= 0) {
 	    if (vl < 0) vl = lenstr(vp) ;
 	    if (vl > 0) {
-	        bool	f_prevcomma = op->f.comma ;
-	        op->f.comma = true ;
+	        bool	f_prevcomma = op->fl.comma ;
+	        op->fl.comma = true ;
 	        rs = outema_value(op,vp,vl) ;
 	        wlen += rs ;
 	        op->c_items += 1 ;
-	        op->f.comma = f_prevcomma ;
+	        op->fl.comma = f_prevcomma ;
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
@@ -204,14 +214,14 @@ int outema_value(outema *op,cchar *vp,int vl) noex {
 	        op->c_values = 0 ;
 	        while ((rs >= 0) && (vl > 0)) {
 	            if ((cl = sfnextqtok(vp,vl,&cp)) > 0) {
-	                f_comma = (op->f.comma && (op->c_items > 0)) ;
+	                f_comma = (op->fl.comma && (op->c_items > 0)) ;
 	                nlen = outema_needlength(op,cl) ;
 	                if (nlen > op->rlen) {
 	                    if (op->llen > 0) {
 	                        fmt = "\n" ;
 	                        if (f_comma) {
 	                            f_comma = false ;
-	                            op->f.comma = false ;
+	                            op->fl.comma = false ;
 	                            fmt = ",\n" ;
 	                        }
 	                        rs = filer_write(op->ofp,fmt,-1) ;
@@ -223,7 +233,7 @@ int outema_value(outema *op,cchar *vp,int vl) noex {
 	                } /* end if (overflow) */
 	                if (rs >= 0) {
 	                    if (f_comma) {
-	                        op->f.comma = false ;
+	                        op->fl.comma = false ;
 	                    }
 	                    rs = filer_outpart(op->ofp,f_comma,cp,cl) ;
 	                    wlen += rs ;
@@ -287,7 +297,7 @@ int outema_printf(outema *op,cchar *fmt,...) noex {
 		    } /* end if (filer_write) */
 	        } /* end if (bufvprintf) */
 	        va_end(ap) ;
-		rs1 = uc_free(fbuf) ;
+		rs1 = malloc_free(fbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
@@ -343,7 +353,7 @@ int outema_needlength(outema *op,int cl) noex {
 	    if (op->llen == 0) {
 	        nlen += 1 ;
 	    }
-	    if (op->f.comma && (op->c_items > 0)) {
+	    if (op->fl.comma && (op->c_items > 0)) {
 	        nlen += 1 ;
 	    }
 	} /* end if (magic) */
