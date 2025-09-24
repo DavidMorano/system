@@ -518,8 +518,8 @@ static int pcsnso_infoloadend(PCSNSO *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->f.id) {
-	    op->f.id = FALSE ;
+	if (op->fl.id) {
+	    op->fl.id = FALSE ;
 	    rs1 = ids_release(&op->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -632,8 +632,8 @@ static int pcsnso_getprojinfo(PCSNSO *op,SUBINFO *sip)
 static int pcsnso_client(PCSNSO *op)
 {
 	int		rs = MKBOOL(op->open.client) ;
-	if (! op->f.client) {
-	    op->f.client = TRUE ;
+	if (! op->fl.client) {
+	    op->fl.client = TRUE ;
 	    rs = pcsnso_clientbegin(op,0) ;
 	} else if (! op->open.client) {
 	    const time_t	dt = time(NULL) ;
@@ -758,7 +758,7 @@ static int getname(SUBINFO *sip)
 	            len = rs ;
 	            if (rs != 0) break ;
 	        } /* end for */
-	        if ((rs > 0) && sip->f.setcache) {
+	        if ((rs > 0) && sip->fl.setcache) {
 	            rs = pcsnsmgr_set(sip->rbuf,len,sip->un,sip->w,0) ;
 #if	CF_DEBUGS
 	            debugprintf("pcsnso/getname: pcsnsmgr_set() rs=%d\n",rs) ;
@@ -877,12 +877,12 @@ static int getname_nsmgr(SUBINFO *sip)
 	    debugprintf("pcsnso/getname_nsmgr: pcsnsmgr_get() rs=%d\n",rs) ;
 #endif
 	    rs = SR_OK ;
-	    sip->f.setcache = TRUE ;
+	    sip->fl.setcache = TRUE ;
 	} else if (rs == 0) {
 #if	CF_DEBUGS
 	    debugprintf("pcsnso/getname_nsmgr: pcsnsmgr_get() rs=%d\n",rs) ;
 #endif
-	    sip->f.setcache = TRUE ;
+	    sip->fl.setcache = TRUE ;
 	}
 
 #if	CF_DEBUGS
