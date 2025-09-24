@@ -1,7 +1,8 @@
 /* pcsclient HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* 
+/* perfmrm functions to be a PCS client to the PCS server daemon */
 /* version %I% last-modified %G% */
 
 
@@ -59,7 +60,7 @@ struct pcsclient_head {
 	time_t		ti_shm ;		/* DB file modification */
 	time_t		ti_map ;		/* DB map */
 	time_t		ti_lastcheck ;		/* last check of file */
-	PCSCLIENT_FL	f ;
+	PCSCLIENT_FL	fl ;
 	uint		magic ;
 	int		nodenamelen ;
 	int		pagesize ;
@@ -72,9 +73,9 @@ typedef PCSCLIENT_DATA	pcsclient_data ;
 
 EXTERNC_begin
 
-extern int	pcsclient_open(PCSCLIENT *,cchar *) noex ;
-extern int	pcsclient_get(PCSCLIENT *,time_t,int,PCSCLIENT_DATA *) noex ;
-extern int	pcsclient_close(PCSCLIENT *) noex ;
+extern int	pcsclient_open(pcsclient *,cchar *) noex ;
+extern int	pcsclient_get(pcsclient *,time_t,int,pcsclient_data *) noex ;
+extern int	pcsclient_close(pcsclient *) noex ;
 
 EXTERNC_end
 
