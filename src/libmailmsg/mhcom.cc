@@ -33,7 +33,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<ascii.h>
@@ -43,7 +42,9 @@
 
 #include	"mhcom.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -53,6 +54,8 @@ import libutil ;
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -79,7 +82,7 @@ static inline int mhcom_magic(mhcom *op,Args ... args) noex {
 }
 /* end subroutine (mhcom_magic) */
 
-static int	mhcom_bake(mhcom *,int,cchar *,int) noex ;
+local int	mhcom_bake(mhcom *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -104,7 +107,7 @@ int mhcom_start(mhcom *op,cchar *sp,int sl) noex {
 	    }
 	    buflen = (sl + 2) ;
 	    sz = ( 2* buflen) ;
-	    if (void *p{} ; (rs = uc_malloc(sz,&p)) >= 0) {
+	    if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) {
 	        op->a = charp(p) ;
 	        op->value = (op->a + (0*buflen)) ;
 	        op->comment = (op->a + (1*buflen)) ;
@@ -112,9 +115,9 @@ int mhcom_start(mhcom *op,cchar *sp,int sl) noex {
 	            op->magic = MHCOM_MAGIC ;
 	        }
 	        if (rs < 0) {
-	            uc_free(op->a) ;
+	            libmem.free(op->a) ;
 	            op->a = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;
@@ -126,7 +129,7 @@ int mhcom_finish(mhcom *op) noex {
 	int		rs1 ;
 	if ((rs = mhcom_magic(op)) >= 0) {
 	    if (op->a) {
-	        rs1 = uc_free(op->a) ;
+	        rs1 = libmem.free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
 	    }
@@ -161,7 +164,7 @@ int mhcom_getcom(mhcom *op,cchar **rpp) noex {
 
 /* private subroutines */
 
-static int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
+local int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
 	sbuf		as[MHCOM_SOVERLAST] ;
 	int		rs ;
 	int		rs1 ;
@@ -175,8 +178,7 @@ static int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
 		int	pc ;
 		int	f_quote = false ;
 	        while ((sl != 0) && (*sp != '\0')) {
-	            cint	ch = mkchar(*sp) ;
-	            switch (ch) {
+	            switch (cint ch = mkchar(*sp) ; ch) {
 	            case '\\':
 	                sp += 1 ;
 	                if ((f_quote || c_comment) &&
