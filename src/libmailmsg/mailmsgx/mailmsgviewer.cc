@@ -190,7 +190,7 @@ int mailmsgviewer_getline(MMV *op,int ln,cchar **lpp) noex {
 	            rs = ep->ll ;
 	        } else if (rs == SR_NOTFOUND) {
 	            rs = SR_OK ;
-	            if ((! op->f.eof) && op->mapdata) {
+	            if ((! op->fl.eof) && op->mapdata) {
 	                rs = mailmsgviewer_findline(op,ln,lpp) ;
 	            }
 	        } /* end if */
@@ -275,7 +275,7 @@ static int mailmsgviewer_mapbegin(MMV *op,cc *fn) noex {
                             op->mapsize = ms ;
                         }
                     } else {
-                        op->f.eof = true ;
+                        op->fl.eof = true ;
                     }
                 } else {
                     rs = SR_PROTO ;
@@ -307,7 +307,7 @@ static int mailmsgviewer_findline(MMV *op,int ln,cchar **lpp) noex {
 	int		rs = SR_OK ;
 	int		ll = 0 ;
 	*lpp = nullptr ;
-	if (! op->f.eof) {
+	if (! op->fl.eof) {
 	    if ((rs = vecobj_count(op->llp)) >= 0) {
 	        MMV_LN		e ;
 	        int		c = rs ;
@@ -338,7 +338,7 @@ static int mailmsgviewer_findline(MMV *op,int ln,cchar **lpp) noex {
 	                bp = (tp + 1) ;
 	            } /* end while */
 	            if ((rs >= 0) && (tp == nullptr)) {
-	                op->f.eof = true ;
+	                op->fl.eof = true ;
 	                if (bl > 0) {
 	                    *lpp = bp ;
 	                    ll = bl ;
