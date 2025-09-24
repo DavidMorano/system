@@ -509,12 +509,12 @@ static int subinfo_getuid(SUBINFO *sip,uid_t *uidp)
 	    cp = getenv(sip->varusername) ;
 
 	    if ((cp != NULL) && (strcmp(cp,sip->un) == 0)) {
-	        sip->f.uid = TRUE ;
+	        sip->fl.uid = TRUE ;
 	        sip->uid = getuid() ;
 	    } else {
 	        rs = subinfo_getpw(sip) ;
-	        if ((rs >= 0) && (! sip->f.uid)) {
-	            sip->f.uid = TRUE ;
+	        if ((rs >= 0) && (! sip->fl.uid)) {
+	            sip->fl.uid = TRUE ;
 	            sip->uid = sip->pw.pw_uid ;
 	        }
 	    } /* end if */
@@ -524,7 +524,7 @@ static int subinfo_getuid(SUBINFO *sip,uid_t *uidp)
 	if (uidp != NULL)
 	    *uidp = sip->uid ;
 
-	if ((rs >= 0) && (! sip->f.uid))
+	if ((rs >= 0) && (! sip->fl.uid))
 	    rs = SR_NOTFOUND ;
 
 	return rs ;
@@ -564,7 +564,7 @@ static int subinfo_getpw(SUBINFO *sip)
 	        rs = getpwusername(&sip->pw,pwbuf,pwlen,-1) ;
 	    }
 	    if (rs >= 0) {
-	        sip->f.uid = TRUE ;
+	        sip->fl.uid = TRUE ;
 	        sip->uid = sip->pw.pw_uid ;
 	    }
 	} /* end if (was not already initialized) */
