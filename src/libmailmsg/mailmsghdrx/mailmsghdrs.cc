@@ -33,7 +33,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<mailmsg.h>
 #include	<localmisc.h>
@@ -47,6 +46,8 @@
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -129,7 +130,7 @@ cpcchar		mailmsghdrs_names[] = {
 	[hi_xforwardedto] 	= "x-forwarded-to",
 	[hi_subj] 		= "subj",
 	[hi_overlast] 		= nullptr	
-} ;
+} ; /* end array (mailmsghdrs_names) */
 
 
 /* exported subroutines */
@@ -137,10 +138,11 @@ cpcchar		mailmsghdrs_names[] = {
 int mailmsghdrs_start(mailmsghdrs *op,mailmsg *msgp) noex {
 	cint		n = HI_OVERLAST ;
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		c = 0 ;
 	if (op && msgp) {
 	    cint	sz = (n + 1) * szof(char **) ;
-	    if (void *p{} ; (rs = uc_malloc(sz,&p)) >= 0) {
+	    if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) {
 	        int	i ; /* used-afterwards */
 	        mainv	mhnames = mailmsghdrs_names ;
 	        cchar	*hp{} ;
@@ -158,6 +160,12 @@ int mailmsghdrs_start(mailmsghdrs *op,mailmsg *msgp) noex {
 	        if (rs >= 0) {
 		    op->magic = MAILMSGHDRS_MAGIC ;
 		}
+		if (rs < 0) {
+		    rs1 = libmem.free(p) ;
+		    if (rs >= 0) rs = rs1 ;
+		    op->v = nullptr ;
+		    op->magic = 0 ;
+		} /* end if (error) */
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -169,7 +177,7 @@ int mailmsghdrs_finish(mailmsghdrs *op) noex {
 	int		rs1 ;
 	if ((rs = mailmsghdrs_magic(op)) >= 0) {
 	    if (op->v) {
-	        rs1 = uc_free(op->v) ;
+	        rs1 = libmem.free(op->v) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->v = nullptr ;
 	    }
