@@ -1,7 +1,8 @@
 /* pcsclient SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* manage the SYSMISC shared-memory region */
+/* perfmrm functions to be a PCS client to the PCS server daemon */
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
@@ -17,18 +18,18 @@
 
 	= 2010-12-09, David A­D­ Morano
 	I enhanced this subroutine to get the number of CPUs without
-	using the KINFO object. That KINFO object (as it is and has
-	been) is NOT reentrant. This is no fault of my own (since
+	using the KINFO object.  That KINFO object (as it is and has
+	been) is NOT reentrant.  This is no fault of my own (since
 	I wrote that KINFO code also) but rather from Sun-Solaris.
 	The KINFO object uses the underlying Solaris KSTAT facility
 	-- which is not reentrant (and therefore not thread-safe).
 	I needed a thread-safe way of getting the number of CPUs
-	so I had to add some sort of mechanism to do that. We have
-	(basically) cheap and cheaper ways to do it. I tried regular
-	'cheap' and got tired, so I switched to 'cheaper'. The
+	so I had to add some sort of mechanism to do that.  We have
+	(basically) cheap and cheaper ways to do it.  I tried regular
+	'cheap' and got tired, so I switched to 'cheaper'.  The
 	'cheaper' version is the shared-memory thing I added below.
 	The regular 'cheap' one was to query the MSINFO or MSU
-	facility. The latter is left unfinished due to time
+	facility.  The latter is left unfinished due to time
 	constraints.  Also, it (naturally) took longer than desired
 	to even to the 'cheaper' solution.
 
@@ -39,11 +40,11 @@
 /*******************************************************************************
 
 	This subroutine returns the number of CPUs available from
-	the current node. We do note that the number of CPUs can
+	the current node.  We do note that the number of CPUs can
 	change dynamically as some may be added or removed during
-	the course of live machine operation. We allow the number
+	the course of live machine operation.  We allow the number
 	of CPUs returned to the caller to be zero (0) even though
-	it is not clear how this might happen. This sort of assumes
+	it is not clear how this might happen.  This sort of assumes
 	that the caller understands (believes) that at least one
 	CPU is available at any time -- otherwise how would we be
 	able to execute in the first place!
@@ -55,7 +56,7 @@
 	Although load-averages are available when retrieving SYSMISC
 	(miscellaneous system) information from the kernel, we do not
 	bother with it at all since the general introduction of the
-	'getloadavg(3c)' subroutine in the world. If that subroutine
+	|getloadavg(3c)| subroutine in the world.  If that subroutine
 	was not available, load-averages would have to be treated
 	as being as difficult to retrieve as the number of CPUs is.
 
@@ -140,24 +141,10 @@
 
 /* external subroutines */
 
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	pathclean(char *,cchar *,int) ;
-extern int	filebuf_writefill(FILEBUF *,char *,int) ;
-extern int	isNotPresent(int) ;
-
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -171,13 +158,13 @@ struct loadinfo_flags {
 } ;
 
 struct loadinfo {
-	cchar	*pr ;
-	cchar	*dbname ;
-	cchar	*username ;
-	cchar	*rn ;
-	cchar	*prbuf ;
-	LOADINFO_FL	f ;
+	cchar		*pr ;
+	cchar		*dbname ;
+	cchar		*username ;
+	cchar		*rn ;
+	cchar		*prbuf ;
 	expcook		cooks ;
+	LOADINFO_FL	fl ;		/* currently unused! */
 	mode_t		om ;
 } ;
 
@@ -446,10 +433,10 @@ static int pcsclient_shmcreater(PCSCLIENT *op,LOADINFO *lip,int shmi,
 	int		fd = -1 ;
 	int		oflags ;
 	int		om = lip->om ;
-	int		f_needwr = FALSE ;
-	int		f_needupdate = FALSE ;
-	int		f_needchmod = FALSE ;
-	int		f_created = FALSE ;
+	int		f_needwr = false ;
+	int		f_needupdate = false ;
+	int		f_needchmod = false ;
+	int		f_created = false ;
 	cchar		*cp ;
 
 #if	CF_DEBUGS
@@ -485,8 +472,8 @@ static int pcsclient_shmcreater(PCSCLIENT *op,LOADINFO *lip,int shmi,
 
 	if (rs == SR_NOENT) {
 
-	    f_created = TRUE ;
-	    f_needwr = TRUE ;
+	    f_created = true ;
+	    f_needwr = true ;
 	    oflags = (O_RDWR | O_CREAT | O_EXCL) ;
 	    rs = uc_openshm(shmname,oflags,(om & 0444)) ;
 	    fd = rs ;
@@ -501,8 +488,8 @@ static int pcsclient_shmcreater(PCSCLIENT *op,LOADINFO *lip,int shmi,
 	if ((rs >= 0) && f_needwr) {
 	    if (rs >= 0) {
 	        if (op->dt == 0) op->dt = time(nullptr) ;
-	        f_needupdate = TRUE ;
-	        f_needchmod = TRUE ;
+	        f_needupdate = true ;
+	        f_needchmod = true ;
 	        rs = pcsclient_shmwr(op,fd,om) ;
 	    }
 	} /* end if */
@@ -536,7 +523,7 @@ static int pcsclient_shmcreater(PCSCLIENT *op,LOADINFO *lip,int shmi,
 
 	        if (rs == SR_STALE) {
 	            rs = SR_OK ;
-	            f_needupdate = TRUE ;
+	            f_needupdate = true ;
 	        }
 
 	    }
@@ -560,7 +547,7 @@ static int pcsclient_shmcreater(PCSCLIENT *op,LOADINFO *lip,int shmi,
 	}
 
 	if (rs >= 0) {
-	    op->f.shm = TRUE ;
+	    op->fl.shm = true ;
 	} else {
 	    pcsclient_shmloadend(op) ;
 	    op->shmtable = nullptr ;
@@ -732,8 +719,8 @@ static int pcsclient_shmloadend(PCSCLIENT *op)
 	    op->mapdata = nullptr ;
 	    op->mapsize = 0 ;
 	    op->ti_map = 0 ;
-	    if (op->f.shm && (op->shmtable != nullptr)) {
-	        op->f.shm = FALSE ;
+	    if (op->fl.shm && (op->shmtable != nullptr)) {
+	        op->fl.shm = false ;
 	        op->shmtable = nullptr ;
 	    }
 	}
@@ -742,12 +729,10 @@ static int pcsclient_shmloadend(PCSCLIENT *op)
 }
 /* end subroutine (pcsclient_shmloadend) */
 
-
-static int pcsclient_shmproc(PCSCLIENT *op)
-{
+static int pcsclient_shmproc(PCSCLIENT *op) noex {
 	SYSMISCFH	hdr ;
 	int		rs ;
-	int		f_stale = FALSE ;
+	int		f_stale = false ;
 
 #if	CF_DEBUGS
 	debugprintf("pcsclient_shmproc: ent\n") ;
