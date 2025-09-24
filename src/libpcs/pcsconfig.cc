@@ -1,4 +1,5 @@
-/* pcs-config SUPPORT */
+/* pcsconfig SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* handle PCS configuration functions */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	pcsconfig
+
+	Description:
 	These subroutines form part of the PCS program (yes, getting
 	a little bit more complicated every day now).
 
@@ -44,10 +49,9 @@
 #include	"defs.h"
 
 
-/* local typedefs */
-
-
 /* local defines */
+
+#define	PC		pcsconfig
 
 #ifndef	PBUFLEN
 #define	PBUFLEN		(4 * MAXPATHLEN)
@@ -61,11 +65,13 @@
 #define	EBUFLEN		(3 * MAXPATHLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 #define	PCS_REQCNAME	"req"
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -79,8 +85,8 @@
 
 /* forward references */
 
-static int	config_addcooks(CONFIG *) noex ;
-static int	config_reader(CONFIG *,char *,char *,char *) noex ;
+static int	config_addcooks(PC *) noex ;
+static int	config_reader(PC *,char *,char *,char *) noex ;
 
 
 /* local variables */
@@ -103,7 +109,7 @@ enum params {
 	param_overlast
 } ;
 
-static constexpr cpcchar	params[] = {
+constexpr cpcchar	params[] = {
 	"cmd",
 	"logsize",
 	"msfile",
@@ -127,7 +133,7 @@ static constexpr cpcchar	params[] = {
 
 /* exported subroutines */
 
-int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck) noex {
+int config_start(PC *cfp,proginfo *pip,cchar *cfname,int intcheck) noex {
 	expcook		*ckp ;
 	int		rs = SR_OK ;
 
@@ -139,7 +145,7 @@ int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck) noex {
 
 /* start in */
 
-	memset(cfp,0,sizeof(CONFIG)) ;
+	memset(cfp,0,sizeof(PC)) ;
 	cfp->pip = pip ;
 	cfp->intcheck = intcheck ;
 
@@ -147,7 +153,7 @@ int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck) noex {
 	if ((rs = paramfile_open(&cfp->p,pip->envv,cfname)) >= 0) {
 	    if ((rs = expcook_start(ckp)) >= 0) {
 	        if ((rs = config_addcooks(cfp)) >= 0) {
-	            cfp->f.p = true ;
+	            cfp->fl.p = true ;
 	            rs = config_read(cfp) ;
 	        }
 	    }
@@ -162,9 +168,9 @@ int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck) noex {
 /* end subroutine (config_start) */
 
 
-int config_finish(CONFIG *cfp)
+int config_finish(PC *cfp)
 {
-	PROGINFO	*pip ;
+	proginfo	*pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -173,7 +179,7 @@ int config_finish(CONFIG *cfp)
 	pip = cfp->pip ;
 	if (pip == nullptr) return SR_FAULT ;
 
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 
 	    rs1 = expcook_finish(&cfp->cooks) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -189,9 +195,9 @@ int config_finish(CONFIG *cfp)
 /* end subroutine (config_finish) */
 
 
-int config_check(CONFIG *cfp)
+int config_check(PC *cfp)
 {
-	PROGINFO	*pip ;
+	proginfo	*pip ;
 	int		rs = SR_OK ;
 	int		f_changed = false ;
 
@@ -199,7 +205,7 @@ int config_check(CONFIG *cfp)
 	    return SR_FAULT ;
 
 	pip = cfp->pip ;
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 	    const time_t	dt = pip->daytime ;
 	    cint		intcheck = cfp->intcheck ;
 	    int			f_check = false ;
@@ -224,17 +230,17 @@ int config_check(CONFIG *cfp)
 /* end subroutine (config_check) */
 
 
-int config_read(CONFIG *cfp)
+int config_read(PC *cfp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (cfp->f.p) {
-	        int	size = 0 ;
+	if (cfp->fl.p) {
+	        int	sz = 0 ;
 	        char	*abuf ;
-	        size += (PBUFLEN+1) ;
-	        size += (EBUFLEN+1) ;
-	        size += (MAXPATHLEN+1) ;
-	        if ((rs = uc_malloc(size,&abuf)) >= 0) {
+	        sz += (PBUFLEN+1) ;
+	        sz += (EBUFLEN+1) ;
+	        sz += (MAXPATHLEN+1) ;
+	        if ((rs = uc_malloc(sz,&abuf)) >= 0) {
 		    {
 		        char	*pbuf = abuf ;
 		        char	*ebuf = (abuf+(PBUFLEN+1)) ;
@@ -253,9 +259,9 @@ int config_read(CONFIG *cfp)
 /* private subroutines */
 
 
-int config_reader(CONFIG *cfp,char *pbuf,char *ebuf,char *tbuf)
+int config_reader(PC *cfp,char *pbuf,char *ebuf,char *tbuf)
 {
-	PROGINFO	*pip = cfp->pip ;
+	proginfo	*pip = cfp->pip ;
 	PARAMFILE	*pfp = &cfp->p ;
 	PARAMFILE_CUR	cur ;
 	PARAMFILE_ENT	pe ;
@@ -312,20 +318,20 @@ int config_reader(CONFIG *cfp,char *pbuf,char *ebuf,char *tbuf)
 	            if ((rs = cfdecti(ebuf,el,&v)) >= 0) {
 	                switch (pi) {
 	                case param_intrun:
-	                    if (! pip->final.intrun)
+	                    if (! pip->fin.intrun)
 	                        pip->intrun = v ;
 	                    break ;
 	                case param_mspoll:
 	                case param_intpoll:
-	                    if (! pip->final.intpoll)
+	                    if (! pip->fin.intpoll)
 	                        pip->intpoll = v ;
 	                    break ;
 	                case param_intmark:
-	                    if (! pip->final.intmark)
+	                    if (! pip->fin.intmark)
 	                        pip->intmark = v ;
 	                    break ;
 	                case param_intlock:
-	                    if (! pip->final.intlock)
+	                    if (! pip->fin.intlock)
 	                        pip->intlock = v ;
 	                    break ;
 	                case param_intspeed:
@@ -336,7 +342,7 @@ int config_reader(CONFIG *cfp,char *pbuf,char *ebuf,char *tbuf)
 	            } /* end if (cfdecti) */
 	            break ;
 	        case param_pidfile:
-	            if (! pip->final.pidfname) {
+	            if (! pip->fin.pidfname) {
 	                pip->have.pidfname = true ;
 	                rs1 = prsetfname(pr,tbuf,ebuf,el,true,
 	                    RUNDNAME,pip->nodename,PIDFNAME) ;
@@ -364,7 +370,7 @@ int config_reader(CONFIG *cfp,char *pbuf,char *ebuf,char *tbuf)
 	            }
 	            break ;
 	        case param_logfile:
-	            if (! pip->final.logprog) {
+	            if (! pip->fin.logprog) {
 	                pip->have.logprog = true ;
 	                rs1 = prsetfname(pr,tbuf,ebuf,el,true,
 	                    LOGDNAME,pip->searchname,"") ;
@@ -424,8 +430,8 @@ int config_reader(CONFIG *cfp,char *pbuf,char *ebuf,char *tbuf)
 }
 /* end subroutine (config_readrer) */
 
-static int config_addcooks(CONFIG *cfp) noex {
-	PROGINFO	*pip = cfp->pip ;
+static int config_addcooks(PC *cfp) noex {
+	proginfo	*pip = cfp->pip ;
 	expcook		*ckp = &cfp->cooks ;
 	int		rs = SR_OK ;
 	int		i ;
