@@ -1,4 +1,5 @@
-/* pcs-config HEADER */
+/* pcsconfig HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 
@@ -11,8 +12,8 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	PCSCONFIG_INCLUDE
-#define	PCSCONFIG_INCLUDE
+#ifndef	PCSPCSCONFIG_INCLUDE
+#define	PCSPCSCONFIG_INCLUDE
 
 
 #include	<envstandards.h>
@@ -28,37 +29,37 @@
 #include	"defs.h"		/* for PROGINFO */
 
 
-#define	CONFIG		struct config_head
-#define	CONFIG_FL	struct config_flags
+#define	PCSCONFIG	struct pcsconfig_head
+#define	PCSCONFIG_FL	struct pcsconfig_flags
 
 
-struct config_flags {
+struct pcsconfig_flags {
 	uint		p:1 ;
 	uint		lockinfo:1 ;
 } ;
 
-struct config_head {
-	PROGINFO	*pip ;
-	PARAMFILE	p ;
+struct pcsconfig_head {
+	proginfo	*pip ;
+	paramfile	p ;
 	expcook		cooks ;
 	time_t		ti_lastcheck ;
-	CONFIG_FL	f ;
+	PCSCONFIG_FL	fl ;
 	int		intcheck ;
 } ;
 
-typedef	CONFIG		config ;
-typedef	CONFIG_FL	config_fl ;
+typedef	PCSCONFIG	pcsconfig ;
+typedef	PCSCONFIG_FL	pcsconfig_fl ;
 
 EXTERNC_begin
 
-extern int	config_start(CONFIG *,PROGINFO *,cchar *,int) noex ;
-extern int	config_check(CONFIG *) noex ;
-extern int	config_read(CONFIG *) noex ;
-extern int	config_finish(CONFIG *) noex ;
+extern int	pcsconfig_start(pcsconfig *,proginfo *,cchar *,int) noex ;
+extern int	pcsconfig_check(pcsconfig *) noex ;
+extern int	pcsconfig_read(pcsconfig *) noex ;
+extern int	pcsconfig_finish(pcsconfig *) noex ;
 
 EXTERNC_end
 
 
-#endif /* PCSCONFIG_INCLUDE */
+#endif /* PCSPCSCONFIG_INCLUDE */
 
 
