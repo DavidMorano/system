@@ -35,7 +35,20 @@ DEFS=
 
 INCS= mailmsghdrx.h
 
+MPDS +=
+
 LIBS=
+
+
+#OBJ0_MAILMSGHDRX= mailmsghdrct.o mailmsghdrfold.o
+OBJ0_MAILMSGHDRX= mailmsghdrfold.o
+OBJ1_MAILMSGHDRX= mailmsghdrs.o mailmsghdrval.o
+OBJ2_MAILMSGHDRX=
+OBJ3_MAILMSGHDRX=
+
+OBJA_MAILMSGHDRX= obj0_mailmsghdrx.o obj1_mailmsghdrx.o
+
+OBJ_MAILMSGHDRX= $(OBJA_MAILMSGHDRX)
 
 
 LDRPATH= $(EXTRA)/lib
@@ -44,7 +57,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,16 +67,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-#OBJ0_MAILMSGHDRX= mailmsghdrct.o mailmsghdrfold.o
-OBJ0_MAILMSGHDRX= mailmsghdrfold.o
-OBJ1_MAILMSGHDRX= mailmsghdrs.o mailmsghdrval.o
-
-OBJA_MAILMSGHDRX= obj0_mailmsghdrx.o obj1_mailmsghdrx.o
-
-OBJ_MAILMSGHDRX= $(OBJA_MAILMSGHDRX)
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -97,13 +100,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_MAILMSGHDRX)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MAILMSGHDRX)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -116,13 +114,16 @@ control:
 
 
 obj0_mailmsghdrx.o:	$(OBJ0_MAILMSGHDRX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MAILMSGHDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_mailmsghdrx.o:	$(OBJ1_MAILMSGHDRX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MAILMSGHDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_mailmsghdrx.o:	$(OBJ2_MAILMSGHDRX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MAILMSGHDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3_mailmsghdrx.o:	$(OBJ3_MAILMSGHDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 mailmsghdrct.o:		mailmsghdrct.cc		mailmsghdrct.h		$(INCS)
