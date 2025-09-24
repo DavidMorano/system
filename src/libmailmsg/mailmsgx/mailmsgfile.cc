@@ -74,7 +74,9 @@
 
 #include	"mailmsgfile.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u) */
 
 /* local defines */
 
@@ -90,9 +92,9 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -238,13 +240,14 @@ int mailmsgfile_finish(MMF *op) noex {
 	        rs1 = mailmsgfile_filefins(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->f.files) {
-	        op->f.files = false ;
+	    if (op->fl.files) {
+	        op->fl.files = false ;
 	        rs1 = hdb_finish(op->flp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->tmpdname) {
-	        rs1 = uc_free(op->tmpdname) ;
+		void *vp = voidp(op->tmpdname) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->tmpdname = nullptr ;
 	    }
@@ -322,20 +325,20 @@ int mailmsgfile_get(MMF *op,cc *msgid,cc **rpp) noex {
 /* private subroutines */
 
 static int mailmsgfile_starter(MMF *op,cc *tmpdname) noex {
+	cnullptr	np{} ;
 	cint		ne = MAILMSGFILE_NE ;
 	int		rs ;
-	cchar		*cp{} ;
-	if ((rs = uc_mallocstrw(tmpdname,-1,&cp)) >= 0) {
-	    cnullptr	np{} ;
+	if (cchar *cp ; (rs = libmem.strw(tmpdname,-1,&cp)) >= 0) {
 	    op->tmpdname = cp ;
 	    if ((rs = hdb_start(op->flp,ne,true,np,np)) >= 0) {
-		op->f.files = true ;
+		op->fl.files = true ;
 		if ((rs = mailmsgfile_checkbegin(op)) >= 0) {
 		    op->magic = MAILMSGFILE_MAGIC ;
 		}
 	    }
 	    if (rs < 0) {
-	        uc_free(op->tmpdname) ;
+		void *vp = voidp(op->tmpdname) ;
+	        libmem.free(vp) ;
 		op->tmpdname = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
@@ -356,13 +359,12 @@ static int mailmsgfile_newx(MMF *op,cc *mid,int mfd,off_t bo,int bl) noex {
 	    vlines = mip->vlines ;
 	} else if (rs == SR_NOTFOUND) {
 	    cchar	tpat[] = "msgXXXXXXXXXXX" ;
-	    char	*ibuf{} ;
-	    if ((rs = malloc_mp(&ibuf)) >= 0) {
+	    if (char *ibuf ; (rs = malloc_mp(&ibuf)) >= 0) {
 		if ((rs = mkpath2(ibuf,op->tmpdname,tpat)) >= 0) {
 		    rs = mailmsgfile_mk(op,mid,ibuf,mfd,bo,bl) ;
 		    vlines = rs ;
 		}
-		rs1 = uc_free(ibuf) ;
+		rs1 = malloc_free(ibuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (found or not) */
@@ -374,8 +376,7 @@ static int mailmsgfile_mk(MMF *op,cc *mid,cc *fn,int mfd,off_t bo,int bl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		vlines = 0 ;
-	char		*mfbuf{} ;
-	if ((rs = malloc_mp(&mfbuf)) >= 0) {
+	if (char *mfbuf ; (rs = malloc_mp(&mfbuf)) >= 0) {
 	    cint	of = (O_WRONLY | O_CREAT) ;
 	    cmode	om = 0666 ;
 	    mfbuf[0] = '\0' ;
@@ -401,7 +402,7 @@ static int mailmsgfile_mk(MMF *op,cc *mid,cc *fn,int mfd,off_t bo,int bl) noex {
 		    mfbuf[0] = '\0' ;
 	        }
 	    } /* end if (tmpfile) */
-	    rs1 = uc_free(&mfbuf) ;
+	    rs1 = malloc_free(&mfbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? vlines : rs ;
@@ -425,7 +426,7 @@ static int mailmsgfile_filefins(MMF *op) noex {
 	                if (rs >= 0) rs = rs1 ;
 		    }
 	 	    {
-	                rs1 = uc_free(mip) ;
+	                rs1 = libmem.free(mip) ;
 	                if (rs >= 0) rs = rs1 ;
 		    }
 	        } /* end if */
@@ -492,7 +493,7 @@ static int mailmsgfile_mkdis(MMF *op,MMF_MI *mip,
 	        rs1 = filer_finish(&in) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (filer) */
-	    rs1 = uc_free(lbuf) ;
+	    rs1 = malloc_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? vlines : rs ;
@@ -549,8 +550,7 @@ static int mailmsgfile_procout(MMF *op,filer *fbp,int li,cc *lp,int ll,
 	}
 	if (rs >= 0) {
 	    cint	olen = var.outbuflen ;
-	    char	*obuf{} ;
-	    if ((rs = uc_malloc((olen+1),&obuf)) >= 0) {
+	    if (char *obuf ; (rs = libmem.mall((olen+1),&obuf)) >= 0) {
 		bool	f_eol = ((ll > 0) && (lp[ll-1] == '\n')) ;
 	        if ((rs = mkdisplayable(obuf,olen,lp,ll)) >= 0) {
 	            cint	ol = rmeol(obuf,rs) ;
@@ -574,7 +574,7 @@ static int mailmsgfile_procout(MMF *op,filer *fbp,int li,cc *lp,int ll,
 	                wlen += rs ;
 	            }
 	        } /* end if (mkdisplayable) */
-		rs1 = uc_free(obuf) ;
+		rs1 = libmem.free(obuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (ok) */
@@ -586,7 +586,7 @@ static int mailmsgfile_store(MMF *op,MMF_MI *mip) noex {
 	int		rs = SR_FAULT ;
 	if (op && mip) {
 	    cint	sz = szof(MMF_MI) ;
-	    if (MMF_MI	*ep{} ; (rs = uc_malloc(sz,&ep)) >= 0) {
+	    if (MMF_MI	*ep ; (rs = libmem.mall(sz,&ep)) >= 0) {
 	        hdb_dat	key ;
 	        hdb_dat	val ;
 	        *ep = *mip ; /* copy */
@@ -596,7 +596,7 @@ static int mailmsgfile_store(MMF *op,MMF_MI *mip) noex {
 	        val.len = sz ;
 	        rs = hdb_store(op->flp,key,val) ;
 	        if (rs < 0) {
-	            uc_free(ep) ;
+	            libmem.free(ep) ;
 	        }
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
@@ -610,7 +610,7 @@ static int mailmsgfile_checkbegin(MMF *op) noex {
 	uptsub_f	sub = uptsub_f(mailmsgfile_checker) ;
 	if ((rs = uptcreate(&tid,nullptr,sub,op)) >= 0) {
 	    op->tid = tid ;
-	    op->f.checkout = true ;
+	    op->fl.checkout = true ;
 	}
 	return rs ;
 }
@@ -618,10 +618,10 @@ static int mailmsgfile_checkbegin(MMF *op) noex {
 
 static int mailmsgfile_checkend(MMF *op) noex {
 	int		rs = SR_OK ;
-	if (op->f.checkout) {
+	if (op->fl.checkout) {
 	    int	trs = SR_OK ;
 	    if ((rs = uptjoin(op->tid,&trs)) >= 0) {
-	        op->f.checkout = false ;
+	        op->fl.checkout = false ;
 	        rs = trs ;
 	    }
 	}
@@ -631,10 +631,10 @@ static int mailmsgfile_checkend(MMF *op) noex {
 
 static int mailmsgfile_checkout(MMF *op) noex {
 	int		rs = SR_OK ;
-	if (op->f.checkout && op->f_checkdone) {
+	if (op->fl.checkout && op->f_checkdone) {
 	    int		trs = SR_OK ;
 	    if ((rs = uptjoin(op->tid,&trs)) >= 0) {
-	        op->f.checkout = false ;
+	        op->fl.checkout = false ;
 	        rs = trs ;
 	    }
 	}
@@ -664,15 +664,14 @@ static int mailmsgfile_checkerx(MMF *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	char		*pbuf{} ;
-	if ((rs = malloc_mp(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) {
 	    cint	plen = rs ;
 	    if ((rs = mkpath1(pbuf,op->tmpdname)) >= 0) {
 		MMF_CD	cd(pbuf,plen) ;
 		rs = mailmsgfile_checkerxx(op,&cd) ;
 		rv = rs ;
 	    } /* end if (mkpath) */
-	    rs1 = uc_free(pbuf) ;
+	    rs1 = malloc_free(pbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rv : rs ;
@@ -709,13 +708,12 @@ static int mailmsgfile_checkerxxx(MMF *op,vecpstr *flp,
 	cint		to = op->to ;	/* timeout */
 	int		rs ;
 	int		rs1 ;
-	char		*ebuf{} ;
-	if ((rs = malloc_mn(&ebuf)) >= 0) {
+	if (char *ebuf ; (rs = malloc_mn(&ebuf)) >= 0) {
 	    fsdir	dir ;
 	    fsdir_ent	de ;
 	    cint	elen = rs ;
 	    if ((rs = fsdir_open(&dir,op->tmpdname)) >= 0) {
-	        USTAT	sb ;
+	        ustat sb ;
 	        while ((rs = fsdir_read(&dir,&de,ebuf,elen)) > 0) {
 	            if (de.name[0] != '.') {
 	                if ((rs = pathadd(pbuf,plen,de.name)) >= 0) {
@@ -732,7 +730,7 @@ static int mailmsgfile_checkerxxx(MMF *op,vecpstr *flp,
 	        rs1 = fsdir_close(&dir) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (fsdir) */
-	    rs1 = uc_free(ebuf) ;
+	    rs1 = malloc_free(ebuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -745,10 +743,9 @@ static int mi_start(MMF_MI *mip,cc *msgid,cc *mfname,int blen) noex {
 	    cint	milen = lenstr(msgid) ;
 	    cint	mflen = lenstr(mfname) ;
 	    int		sz = 0 ;
-	    char	*bp = nullptr ;
 	    memclear(mip) ;
 	    sz = (milen + 1 + mflen + 1) ;
-	    if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	    if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
 	        mip->a = bp ;
 	        mip->nsize = blen ;
 	        mip->mid = bp ;
@@ -771,7 +768,7 @@ static int mi_finish(MMF_MI *mip) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (mip->a) {
-	        rs1 = uc_free(mip->a) ;
+	        rs1 = libmem.free(mip->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        mip->a = nullptr ;
 	    }
