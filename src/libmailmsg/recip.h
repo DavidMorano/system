@@ -50,7 +50,7 @@ struct recip_head {
 	cchar		*name ;		/* recipient real-name (if known) */
 	cchar		*maildname ;	/* recipient maildir */
 	uid_t		uid ;
-	RECIP_FL	f ;		/* flags */
+	RECIP_FL	fl ;		/* flags */
 	uint		magic ;
 	int		mbo ;		/* mailbox-message offset */
 	int		n ;		/* number of deliveries */
