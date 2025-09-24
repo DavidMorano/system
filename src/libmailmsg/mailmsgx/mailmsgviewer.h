@@ -17,8 +17,12 @@
 
 /*******************************************************************************
 
-        This little object supports some buffered file operations for
-        low-overhead buffered I-O requirements.
+  	Object:
+	mailmsgviewer
+
+	Description:
+	This little object supports some buffered file operations
+	for low-overhead buffered I-O requirements.
 
 *******************************************************************************/
 
@@ -46,7 +50,7 @@ struct mailmsgviewer_head {
 	char		*mapdata ;
 	char		*bp ;
 	size_t		mapsize ;
-	MAILMSGVIEWER_FL f ;
+	MAILMSGVIEWER_FL fl ;
 	uint		magic ;
 	int		ln ;
 } ;
@@ -66,6 +70,6 @@ extern int mailmsgviewer_rewind(mailmsgviewer *) noex ;
 EXTERNC_end
 
 
-#endif /* mailmsgviewer_INCLUDE */
+#endif /* MAILMSGVIEWER_INCLUDE */
 
 
