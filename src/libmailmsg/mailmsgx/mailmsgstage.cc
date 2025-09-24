@@ -81,7 +81,10 @@
 
 #include	"mailmsgstage.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import libutil ;			/* |getlenstr(3u) */
 import uconstants ;
 
 /* local defines */
@@ -105,9 +108,9 @@ import uconstants ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -174,22 +177,22 @@ int mailmsgstage_start(MMS *op,int ifd,int to,int mmo) noex {
 		void	*vp{} ;
 	        op->tfd = -1 ;
 		op->to = to ;
-	        op->f.useclen = bool(mmo & MAILMSGSTAGE_OUSECLEN) ;
-	        op->f.useclines = bool(mmo & MAILMSGSTAGE_OUSECLINES) ;
+	        op->fl.useclen = bool(mmo & MAILMSGSTAGE_OUSECLEN) ;
+	        op->fl.useclines = bool(mmo & MAILMSGSTAGE_OUSECLINES) ;
 	        if (tmpdn == np) {
 		    static cchar *vap = getenv(varname.tmpdir) ;
 		    tmpdn = vap ;
 		}
 	        if (tmpdn == np) tmpdn = MAILMSGSTAGE_TMPDNAME ;
-		if ((rs = uc_malloc(osz,&vp)) >= 0) {
+		if ((rs = libmem.mall(osz,&vp)) >= 0) {
 		    op->mlp = (vechand *) vp ;
 	            if ((rs = mailmsgstage_starts(op,ifd,tmpdn)) >= 0) {
 			n = rs ;
 		    } /* end if (mailmsgstage_starts) */
 		    if (rs < 0) {
-			uc_free(op->mlp) ;
+			libmem.free(op->mlp) ;
 			op->mlp = nullptr ;
-		    }
+		    } /* end if (error) */
 		} /* end if (m-a) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -211,17 +214,18 @@ static int mailmsgstage_starts(MMS *op,int ifd,cc *tmpdn) noex {
 	                op->tfd = rs ;
 	                if ((rs = uc_closeonexec(op->tfd,true)) >= 0) {
 	                    cchar	*cp ;
-	                    if ((rs = uc_mallocstrw(tbuf,-1,&cp)) >= 0) {
+	                    if ((rs = libmem.strw(tbuf,-1,&cp)) >= 0) {
 	                        op->tmpfname = cp ;
 			        {
 	                            rs = mailmsgstage_starter(op,ifd) ;
 	                            nmsgs = rs ;
 			        }
 	                        if (rs < 0) {
-	                            uc_free(op->tmpfname) ;
+				    void *vp = voidp(op->tmpfname) ;
+	                            libmem.free(vp) ;
 	                            op->tmpfname = nullptr ;
 	                        }
-	                    } /* end if (m-a) */
+	                    } /* end if (memory-allocation) */
 	                } /* end if (uc_closeonexec) */
 	                if (rs < 0) {
 	                    u_close(op->tfd) ;
@@ -230,13 +234,13 @@ static int mailmsgstage_starts(MMS *op,int ifd,cc *tmpdn) noex {
 			        u_unlink(tbuf) ;
 			        tbuf[0] = '\0' ;
 		            }
-	                }
+	                } /* end if (error) */
 	            } /* end if (opentmpfile) */
-		    rs1 = uc_free(tbuf) ;
+		    rs1 = malloc_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (mkpath2) */
-	    rs1 = uc_free(tpat) ;
+	    rs1 = malloc_free(tpat) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? nmsgs : rs ;
@@ -309,12 +313,13 @@ int mailmsgstage_finish(MMS *op) noex {
 	        if (op->tmpfname[0] != '\0') {
 	            u_unlink(op->tmpfname) ;
 	        }
-	        rs1 = uc_free(op->tmpfname) ;
+		void *vp = voidp(op->tmpfname) ;
+	        rs1 = libmem.free(vp) ;
 	        op->tmpfname = nullptr ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->mlp) {
-	        rs1 = uc_free(op->mlp) ;
+	        rs1 = libmem.free(op->mlp) ;
 	        if (rs >= 0) rs = rs1 ;
 		op->mlp = nullptr ;
 	    }
@@ -477,9 +482,9 @@ int mailmsgstage_getfl(MMS *op,int mi) noex {
 	        flags |= ((mep->hdr.clines) ? MAILMSGSTAGE_MCLINES : 0) ;
 	        flags |= ((mep->hdr.ctype) ? MAILMSGSTAGE_MCTYPE : 0) ;
 	        flags |= ((mep->hdr.cencoding) ? MAILMSGSTAGE_MCENCODING : 0) ;
-	        flags |= ((mep->f.ctplain) ? MAILMSGSTAGE_MCTPLAIN : 0) ;
-	        flags |= ((mep->f.ceplain) ? MAILMSGSTAGE_MCEPLAIN : 0) ;
-	        flags |= ((mep->f.plaintext) ? MAILMSGSTAGE_MCPLAIN : 0) ;
+	        flags |= ((mep->fl.ctplain) ? MAILMSGSTAGE_MCTPLAIN : 0) ;
+	        flags |= ((mep->fl.ceplain) ? MAILMSGSTAGE_MCEPLAIN : 0) ;
+	        flags |= ((mep->fl.plaintext) ? MAILMSGSTAGE_MCPLAIN : 0) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? flags : rs ;
@@ -672,7 +677,7 @@ static int mailmsgstage_gmsgbody(MMS *op,filer *tfp,fdliner *lsp,
 	cchar		*lp ;
 	if (rs >= 0) clen = msgentry_getclen(mep) ;
 	if (rs >= 0) clines = msgentry_getclines(mep) ;
-	if (op->f.useclines && mep->f.plaintext && (clines >= 0)) {
+	if (op->fl.useclines && mep->fl.plaintext && (clines >= 0)) {
 	    nmax = clines ;
 	}
 	while ((rs >= 0) && (blines < nmax) && 
@@ -710,7 +715,7 @@ static int mailmsgstage_gmsgentnew(MMS *op,msgentry **mpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    cint	esz = szof(msgentry) ;
-	    rs = uc_malloc(esz,mpp) ;
+	    rs = libmem.mall(esz,mpp) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -722,7 +727,7 @@ static int mailmsgstage_gmsgentdel(MMS *op,msgentry *mep) noex {
 	if (op && mep) {
 	    rs = SR_OK ;
 	    {
-	        rs1 = uc_free(mep) ;
+	        rs1 = libmem.free(mep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
@@ -743,7 +748,7 @@ static int mailmsgstage_msgfins(MMS *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_free(mep) ;
+	            rs1 = libmem.free(mep) ;
 	            if (rs >= 0) rs = rs1 ;
 		    vechand_del(mlp,i--) ;
 	 	}
