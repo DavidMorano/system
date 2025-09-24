@@ -30,7 +30,6 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<vecitem.h>
 #include	<strwcpy.h>
@@ -39,14 +38,16 @@
 
 #include	"recip.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
 
 /* external namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -115,14 +116,16 @@ int recip_start(recip *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = recip_ctor(op,sp)) >= 0) {
 	    op->uid = -1 ;
-	    if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
 	        op->recipient = cp ;
 	        if ((rs = vecitem_start(op->mdp,10,0)) >= 0) {
 	            op->magic = RECIP_MAGIC ;
 	        }
 	        if (rs < 0) {
-	            uc_free(cp) ;
-	        }
+		    void *vp = voidp(cp) ;
+	            libmem.free(vp) ;
+	            op->recipient = nullptr ;
+	        } /* end if (error) */
 	    } /* end if (memory-allocation) */
 	    if (rs < 0) {
 		recip_dtor(op) ;
@@ -138,17 +141,20 @@ int recip_finish(recip *op) noex {
 	if ((rs = recip_magic(op)) >= 0) {
 	    if (op->recipient) {
 	        {
-	            rs1 = uc_free(op->recipient) ;
+		    void *vp = voidp(op->recipient) ;
+	            rs1 = libmem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->recipient = nullptr ;
 		}
 	        if (op->name) {
-	            rs1 = uc_free(op->name) ;
+		    void *vp = voidp(op->name) ;
+	            rs1 = libmem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->name = nullptr ;
 	        }
 	        if (op->maildname) {
-	            rs1 = uc_free(op->maildname) ;
+		    void *vp = voidp(op->maildname) ;
+	            rs1 = libmem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->maildname = nullptr ;
 	        }
@@ -190,7 +196,7 @@ int recip_get(recip *op,cchar **rpp) noex {
 int recip_setuser(recip *op,uid_t uid) noex {
 	int		rs ;
 	if ((rs = recip_magic(op)) >= 0) {
-	    op->f.user = true ;
+	    op->fl.user = true ;
 	    op->uid = uid ;
 	}
 	return rs ;
@@ -202,12 +208,13 @@ int recip_setname(recip *op,cchar *sp,int sl) noex {
 	if ((rs = recip_magic(op,sp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (op->name != nullptr) {
-	        uc_free(op->name) ;
+		void *vp = voidp(op->name) ;
+	        libmem.free(vp) ;
 	        op->name = nullptr ;
 	    }
 	    if (sp[0]) {
 	        if (sl < 0) sl = lenstr(sp) ;
-	        if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
 	            op->name = cp ;
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
@@ -221,12 +228,13 @@ int recip_setmailspool(recip *op,cchar *sp,int sl) noex {
 	if ((rs = recip_magic(op,sp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (op->maildname) {
-	        uc_free(op->maildname) ;
+		void *vp = voidp(op->maildname) ;
+	        libmem.free(vp) ;
 	        op->maildname = nullptr ;
-	    }
+	    } /* end if */
 	    if (sp[0]) {
 	        if (sl < 0) sl = lenstr(sp) ;
-	        if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
 	            op->maildname = cp ;
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
@@ -352,7 +360,7 @@ int recip_isuser(recip *op) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = recip_magic(op)) >= 0) {
-	    f = op->f.user ;
+	    f = op->fl.user ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -363,7 +371,7 @@ int recip_getuser(recip *op,uid_t *up) noex {
 	int		f = false ;
 	if ((rs = recip_magic(op)) >= 0) {
 	    if (up) *up = op->uid ;
-	    f = op->f.user ;
+	    f = op->fl.user ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
