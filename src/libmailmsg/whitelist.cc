@@ -182,11 +182,10 @@ int whitelist_fileadd(whitelist *op,cchar *fname) noex {
 	if ((rs = whitelist_magic(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-		if (char *mbuf{} ; (rs = malloc_mailaddr(&mbuf)) >= 0) {
+		if (char *mbuf ; (rs = malloc_mailaddr(&mbuf)) >= 0) {
 		    cint	mlen = rs ;
-		    bfile	loadfile, *lfp = &loadfile ;
-	            if ((rs = bopen(lfp,fname,"r",0666)) >= 0) {
-			if (bfliner bl ; (rs = bl.start(lfp)) >= 0) {
+		    if (bfile lf ; (rs = lf.open(fname,"r",0)) >= 0) {
+			if (bfliner bl ; (rs = bl.start(&lf)) >= 0) {
 			    cchar	*lp ;
 	    		    while ((rs = bl.getln(&lp)) > 0) {
 				cchar	*cp ;
@@ -203,10 +202,10 @@ int whitelist_fileadd(whitelist *op,cchar *fname) noex {
 			    rs1 = bl.finish ;
 			    if (rs >= 0) rs = rs1 ;
 			} /* end if (bfliner) */
-	                rs1 = bclose(lfp) ;
+	                rs1 = lf.close ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (bfile) */
-		    rs1 = uc_free(mbuf) ;
+		    rs1 = malloc_free(mbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (valid) */
