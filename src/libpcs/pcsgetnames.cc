@@ -361,12 +361,12 @@ static int subinfo_getuid(SUBINFO *sip,uid_t *uidp) noex {
 	    static cchar	*cp = getenv(vn) ;
 	    sip->init.uid = true ;
 	    if ((cp != nullptr) && (strcmp(cp,sip->un) == 0)) {
-	        sip->f.uid = true ;
+	        sip->fl.uid = true ;
 	        sip->uid = getuid() ;
 	    } else {
 	        rs = subinfo_getpw(sip) ;
-	        if ((rs >= 0) && (! sip->f.uid)) {
-	            sip->f.uid = true ;
+	        if ((rs >= 0) && (! sip->fl.uid)) {
+	            sip->fl.uid = true ;
 	            sip->uid = sip->pw.pw_uid ;
 	        }
 	    } /* end if */
@@ -374,7 +374,7 @@ static int subinfo_getuid(SUBINFO *sip,uid_t *uidp) noex {
 	if (uidp != nullptr) {
 	    *uidp = sip->uid ;
 	}
-	if ((rs >= 0) && (! sip->f.uid)) {
+	if ((rs >= 0) && (! sip->fl.uid)) {
 	    rs = SR_NOTFOUND ;
 	}
 	return rs ;
@@ -402,7 +402,7 @@ static int subinfo_getpw(SUBINFO *sip) noex {
 	        rs = getpwusername(&sip->pw,pwbuf,pwlen,-1) ;
 	    }
 	    if (rs >= 0) {
-	        sip->f.uid = true ;
+	        sip->fl.uid = true ;
 	        sip->uid = sip->pw.pw_uid ;
 	    }
 	} /* end if (was not already initialized) */
