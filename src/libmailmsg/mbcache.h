@@ -102,7 +102,8 @@ struct mbcache_scanner {
 	off_t		boff ;		/* offset message body */
 	time_t		etime ;		/* time-envelope */
 	time_t		htime ;		/* time-header */
-	MBCACHE_SFLAGS	hdr, hdrval, proc, f ;
+	MBCACHE_SFLAGS	hdr, hdrval, proc ;
+	MBCACHE_SFLAGS	fl ;
 	int		vl[mbcachemf_overlast] ;
 	int		mlen ;		/* length message whole */
 	int		hlen ;		/* length message headers */
@@ -124,7 +125,7 @@ struct mbcache_head {
 	strpack		*spp ;		/* string-pack-pointer */
 	dater		*dmp ;		/* dater-manager-pointer */
 	MBCACHE_SCAN	**msgs ;
-	MBCACHE_FL	f ;
+	MBCACHE_FL	fl ;
 	uint		magic ;
 	int		mflags ;	/* mailbox open-flags */
 } ;
