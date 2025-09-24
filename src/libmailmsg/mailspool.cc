@@ -45,19 +45,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
 #include	<ctime>
+#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<getax.h>
+#include	<getpwx.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<estrings.h>
@@ -68,17 +67,11 @@
 
 #include	"mailspool.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
-
-#if	CF_UCGETPW
-#define	GETPW_NAME	uc_getpwnam
-#define	GETPW_UID	uc_getpwuid
-#else
-#define	GETPW_NAME	getpw_name
-#define	GETPW_UID	getpw_uid
-#endif /* CF_UCGETPW */
 
 #define	TO_SPOOL	(10*60)
 
@@ -86,6 +79,8 @@ import libutil ;
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -210,14 +205,13 @@ static int mailspool_lfbegin(MS *op,cchar *md,cchar *un) noex {
 	    cint	maxpath = rs ;
 	    cint	sz = ((rs + 1) * 2) ;
 	    int		ai = 0 ;
-	    if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    if (char *a ; (rs = libmem.mall(sz,&a)) >= 0) {
 		cint	nlen = maxpath ;
 		char	*nbuf = (a + ((maxpath + 1) * ai++)) ;
 	        if ((rs = sncpy(nbuf,nlen,un,".lock")) >= 0) {
-	    	    char	*lfname = (a + ((maxpath + 1) * ai++)) ;
-	            if ((rs = mkpath(lfname,md,nbuf)) >= 0) {
-			auto mall = uc_mallocstrw ;
-		        if (cchar *cp ; (rs = mall(lfname,rs,&cp)) >= 0) {
+	    	    char	*lfn = (a + ((maxpath + 1) * ai++)) ;
+	            if ((rs = mkpath(lfn,md,nbuf)) >= 0) {
+		        if (cchar *cp ; (rs = libmem.strw(lfn,rs,&cp)) >= 0) {
 		            op->lfname = cp ;
 		        }
 	            }
@@ -233,7 +227,8 @@ static int mailspool_lfend(MS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->lfname) {
-	    rs1 = uc_free(op->lfname) ;
+	    void *vp = voidp(op->lfname) ;
+	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->lfname = nullptr ;
 	}
@@ -268,6 +263,7 @@ int mailspool_setlockinfo(MS *op,cchar *wbuf,int wlen) noex {
 
 static int si_start(si *sip,MS *op,cc *md,cc *un,int of,om_t om,int to) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (sip) {
 	    memclear(sip) ;
 	    sip->op = op ;
@@ -279,11 +275,12 @@ static int si_start(si *sip,MS *op,cc *md,cc *un,int of,om_t om,int to) noex {
 	    sip->egid = getegid() ;
 	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
 	        if ((rs = mkpath(tbuf,md,un)) >= 0) {
-	            if (cchar *cp ; (rs = uc_mallocstrw(tbuf,rs,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = libmem.strw(tbuf,rs,&cp)) >= 0) {
 		        sip->mfname = cp ;
-		    }
+		    } /* end if (memory-allocation) */
 		}
-		rs = rsfree(rs,tbuf) ;
+		rs1 = malloc_free(tbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return rs ;
@@ -298,7 +295,8 @@ static int si_finish(si *sip) noex {
 	    mailspool	*op = sip->op ;
 	    rs = SR_OK ;
 	    if (sip->mfname) {
-	        rs1 = uc_free(sip->mfname) ;
+		void *vp = voidp(sip->mfname) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        sip->mfname = nullptr ;
 	    }
@@ -358,7 +356,7 @@ static int si_lockoutbegin(si *sip,time_t dt) noex {
 	int		f = false ;
 	cchar		*lfname ;
 	lfname = op->lfname ;
-	if (USTAT sb ; (rs = u_stat(lfname,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(lfname,&sb)) >= 0) {
 	    if ((dt-sb.st_mtime) >= TO_SPOOL) {
 		if ((rs = u_unlink(lfname)) >= 0) {
 		    rs = si_lockcreate(sip) ;
@@ -450,9 +448,8 @@ static int si_chown(si *sip) noex {
 	    if (USTAT sb ; (rs = u_stat(md,&sb)) >= 0) {
 		const gid_t	gid = sb.st_gid ;
 	        if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
-	            ucentpw	pw ;
 	            cint	pwlen = rs ;
-		    if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,sip->un)) >= 0) {
+	            if (ucentpwx pw ; (rs = pw.nam(pwbuf,pwlen,sip->un)) >= 0) {
 			const uid_t	euid = geteuid() ;
 		        const uid_t	uid = pw.pw_uid ;
 			if ((uid != euid) || (gid != egid)) {
@@ -468,7 +465,7 @@ static int si_chown(si *sip) noex {
 		    } else if (isNotPresent(rs)) {
 		        rs = SR_OK ;
 		    }
-		    rs1 = uc_free(pwbuf) ;
+		    rs1 = malloc_free(pwbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (stat) */
