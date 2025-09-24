@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	pcsconfs
+
+	Description:
 	This little object provides access to the PCSCONF database
 	and index (if any).
 
@@ -28,6 +32,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -170,8 +175,8 @@
 #define	DEFNVARS	20
 #endif
 
-#define	CONFVARS	struct confvars
-#define	CONFVARS_FL	struct confvars_flags
+#define	CONFVARS	confvars
+#define	CONFVARS_FL	confvars_flags
 
 
 /* external subroutines */
@@ -230,7 +235,7 @@ struct confvars {
 	ids		id ;
 	paramfile	pf ;
 	varmk		v ;
-	CONFVARS_FL	f ;
+	CONFVARS_FL	fl ;
 	PCSCONFS	*op ;
 	cchar		**envv ;
 	cchar		*prconf ;
@@ -305,7 +310,7 @@ int pcsconfs_start(PCSCONFS *op,cchar *pr,cchar **envv,cchar *cfname) noex {
 
 	memset(op,0,sizeof(PCSCONFS)) ;
 	op->envv = (envv != nullptr) ? envv : (cchar **) environ ;
-	op->f.prdb = (cfname == nullptr) ;
+	op->fl.prdb = (cfname == nullptr) ;
 
 	if ((rs = pcsconfs_valsbegin(op,pr,cfname)) >= 0) {
 	    if ((rs = pcsconfs_dbcheck(op)) >= 0) {
@@ -342,7 +347,7 @@ int pcsconfs_audit(PCSCONFS *op) noex {
 
 	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.db) {
+	if (op->fl.db) {
 	    rs = var_audit(&op->db) ;
 	}
 
@@ -360,7 +365,7 @@ int pcsconfs_curbegin(PCSCONFS *op,PCSCONFS_CUR *curp) noex {
 
 	memset(curp,0,sizeof(PCSCONFS_CUR)) ;
 
-	if (op->f.db) {
+	if (op->fl.db) {
 	    rs = var_curbegin(&op->db,&curp->vcur) ;
 	    if (rs >= 0) op->ncursors += 1 ;
 	}
@@ -381,7 +386,7 @@ int pcsconfs_curend(PCSCONFS *op,PCSCONFS_CUR *curp) noex {
 	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != PCSCONFS_CURMAGIC) return SR_NOTOPEN ;
 
-	if (op->f.db) {
+	if (op->fl.db) {
 	    rs1 = var_curend(&op->db,&curp->vcur) ;
 	    if (rs >= 0) rs = rs1 ;
 	    if (op->ncursors > 0) op->ncursors -= 1 ;
@@ -403,7 +408,7 @@ int pcsconfs_fetch(PCSCONFS *op,cchar *kp,int kl,PCSCONFS_CUR *curp,
 	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != PCSCONFS_CURMAGIC) return SR_NOTOPEN ;
 
-	if (op->f.db) {
+	if (op->fl.db) {
 	    rs = var_fetch(&op->db,kp,kl,&curp->vcur,vbuf,vlen) ;
 	}
 
@@ -427,7 +432,7 @@ int pcsconfs_enum(PCSCONFS *op,PCSCONFS_CUR *curp,char *kbuf,int klen,
 	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != PCSCONFS_CURMAGIC) return SR_NOTOPEN ;
 
-	if (op->f.db) {
+	if (op->fl.db) {
 	    rs = var_enum(&op->db,&curp->vcur,kbuf,klen,vbuf,vlen) ;
 	}
 
@@ -446,7 +451,7 @@ int pcsconfs_count(PCSCONFS *op) noex {
 
 	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.db) {
+	if (op->fl.db) {
 	    rs = var_count(&op->db) ;
 	}
 
@@ -498,7 +503,7 @@ static int pcsconfs_dbcheck(PCSCONFS *op) noex {
 
 	if ((rs = confvars_start(sip,op)) >= 0) {
 
-	    if (sip->f.conf) {
+	    if (sip->fl.conf) {
 	        f_conf = true ;
 	        rs = confvars_dbstart(sip) ;
 	    }
@@ -514,8 +519,8 @@ static int pcsconfs_dbcheck(PCSCONFS *op) noex {
 static int pcsconfs_dbclose(PCSCONFS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.db) {
-	    op->f.db = false ;
+	if (op->fl.db) {
+	    op->fl.db = false ;
 	    rs1 = var_close(&op->db) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -557,7 +562,7 @@ static int confvars_start(CONFVARS *sip,PCSCONFS *op) noex {
 
 	cfname = op->cfname ;
 
-	if (op->f.prdb) {
+	if (op->fl.prdb) {
 	    vecstr	subs ;
 	    if ((rs = vecstr_start(&subs,4,0)) >= 0) {
 
@@ -571,7 +576,7 @@ static int confvars_start(CONFVARS *sip,PCSCONFS *op) noex {
 		    if (rs1 >= 0) {
 			cchar	*cp ;
 			if ((rs = uc_mallocstrw(pbuf,rs1,&cp)) >= 0) {
-			    sip->f.cfname = true ;
+			    sip->fl.cfname = true ;
 			    sip->cfname = cp ;
 			}
 		    }
@@ -586,7 +591,7 @@ static int confvars_start(CONFVARS *sip,PCSCONFS *op) noex {
 	        USTAT	sb ;
 	        rs1 = u_stat(cfname,&sb) ;
 	        if ((rs1 >= 0) && S_ISREG(sb.st_mode)) {
-	            sip->f.conf = true ;
+	            sip->fl.conf = true ;
 	            sip->cmtime = sb.st_mtime ;
 	        }
 	    }
@@ -600,15 +605,15 @@ static int confvars_finish(CONFVARS *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (sip->f.cfname && (sip->cfname != nullptr)) {
-	    sip->f.cfname = false ;
+	if (sip->fl.cfname && (sip->cfname != nullptr)) {
+	    sip->fl.cfname = false ;
 	    rs1 = uc_free(sip->cfname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->cfname = nullptr ;
 	}
 
-	if (sip->f.id) {
-	    sip->f.id = false ;
+	if (sip->fl.id) {
+	    sip->fl.id = false ;
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -641,7 +646,7 @@ static int confvars_dbstart(CONFVARS *sip) noex {
 	int		dl = -1 ;
 	char		dbname[MAXPATHLEN+1] ;
 
-	if (op->f.prdb) {
+	if (op->fl.prdb) {
 	    rs = confvars_confglobal(sip,dbname) ;
 	    dl = rs ;
 	} else {
@@ -656,8 +661,8 @@ static int confvars_dbstart(CONFVARS *sip) noex {
 	    if (isOneOf(stales,rs)) {
 	        if (rs == SR_ACCESS) varunlink(dbname,-1) ;
 	        rs = confvars_dbmake(sip,dbname) ;
-		if (isNotPresent(rs) && op->f.prdb) {
-		    op->f.prdb = false ;
+		if (isNotPresent(rs) && op->fl.prdb) {
+		    op->fl.prdb = false ;
 	    	    if ((rs = confvars_conflocal(sip,dbname)) >= 0) {
 			dl = rs ;
 	    		if ((rs = pathadd(dbname,dl,sip->prconf)) >= 0)
@@ -666,7 +671,7 @@ static int confvars_dbstart(CONFVARS *sip) noex {
 		}
 	        if (rs >= 0) {
 	            rs = confvars_dbopen(sip,dbname) ;
-		    if ((rs >= 0) && op->f.prdb) {
+		    if ((rs >= 0) && op->fl.prdb) {
 		        dbname[dl] = '\0' ;
 		        rs = confvars_chown(sip,dbname,dl) ;
 		    }
@@ -730,7 +735,7 @@ static int confvars_dbopen(CONFVARS *sip,cchar *dbname) noex {
 	vdp = &op->db ;
 	if ((rs = var_open(vdp,dbname)) >= 0) {
 	    VAR_INFO	vi ;
-	    op->f.db = true ;
+	    op->fl.db = true ;
 	    if ((rs = var_info(vdp,&vi)) >= 0) {
 #if	CF_DEBUGS
 	{
@@ -748,7 +753,7 @@ static int confvars_dbopen(CONFVARS *sip,cchar *dbname) noex {
 	        if (sip->cmtime > vi.wtime) rs = SR_STALE ;
 	    }
 	    if (rs < 0) {
-	        op->f.db = false ;
+	        op->fl.db = false ;
 	        var_close(vdp) ;
 	    }
 	} /* end if (attempted open) */
@@ -768,8 +773,8 @@ static int confvars_dbclose(CONFVARS *sip) noex {
 	int		rs1 ;
 
 	vdp = &op->db ;
-	if (op->f.db) {
-	    op->f.db = false ;
+	if (op->fl.db) {
+	    op->fl.db = false ;
 	    rs1 = var_close(vdp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -884,21 +889,19 @@ static int confvars_chown(CONFVARS *sip,char *dname,int dl) noex {
 
 static int confvars_ids(CONFVARS *sip) noex {
 	int		rs = SR_OK ;
-	if (! sip->f.id) {
-	    sip->f.id = true ;
+	if (! sip->fl.id) {
+	    sip->fl.id = true ;
 	    if ((rs = ids_load(&sip->id)) >= 0) {
-	        USTAT	sb ;
-	        if ((rs = u_stat(sip->pr,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(sip->pr,&sb)) >= 0) {
 		    sip->uid_pcs = sb.st_uid ;
 		    sip->gid_pcs = sb.st_gid ;
 	        }
 	        if (rs < 0) {
-	            sip->f.id = false ;
+	            sip->fl.id = false ;
 	            ids_release(&sip->id) ;
 		}
 	    } /* end if (loaded IDs) */
 	} /* end if (needed IDs) */
-
 	return rs ;
 }
 /* end subroutine (confvars_ids) */
