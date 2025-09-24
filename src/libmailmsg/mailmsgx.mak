@@ -31,28 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= mailmsgx.h
+INCS += mailmsgx.h
 
-LIBS=
+MODS +=
 
-
-LDRPATH= $(EXTRA)/lib
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ0_MAILMSGX= mailmsgatt.o mailmsgattent.o 
@@ -66,7 +51,23 @@ OBJB= obj2_mailmsgx.o obj3_mailmsgx.o
 OBJ_MAILMSGX= obja.o objb.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+LDRPATH= $(EXTRA)/lib
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -79,6 +80,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -99,13 +103,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_MAILMSGX)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MAILMSGX)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -118,23 +117,23 @@ control:
 
 
 obj0_mailmsgx.o:	$(OBJ0_MAILMSGX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MAILMSGX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_mailmsgx.o:	$(OBJ1_MAILMSGX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MAILMSGX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_mailmsgx.o:	$(OBJ2_MAILMSGX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MAILMSGX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_mailmsgx.o:	$(OBJ3_MAILMSGX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_MAILMSGX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 mailmsgatt.o:		mailmsgatt.cc		mailmsgatt.h		$(INCS)
