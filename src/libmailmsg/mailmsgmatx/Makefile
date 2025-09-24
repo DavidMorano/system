@@ -35,6 +35,8 @@ DEFS=
 
 INCS= mailmsgmatx.h
 
+MPDS +=
+
 LIBS=
 
 
@@ -44,7 +46,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,13 +58,15 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 OBJ0_MAILMSGMATX= mailmsgmatenv.o
 OBJ1_MAILMSGMATX= mailmsgmathdr.o
+OBJ2_MAILMSGMATX=
+OBJ3_MAILMSGMATX=
 
 OBJA_MAILMSGMATX= obj0_mailmsgmatx.o obj1_mailmsgmatx.o
 
 OBJ_MAILMSGMATX= $(OBJA_MAILMSGMATX)
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -76,6 +79,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -96,13 +102,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_MAILMSGMATX)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MAILMSGMATX)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -115,13 +116,16 @@ control:
 
 
 obj0_mailmsgmatx.o:	$(OBJ0_MAILMSGMATX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MAILMSGMATX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_mailmsgmatx.o:	$(OBJ1_MAILMSGMATX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MAILMSGMATX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_mailmsgmatx.o:	$(OBJ2_MAILMSGMATX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MAILMSGMATX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3_mailmsgmatx.o:	$(OBJ3_MAILMSGMATX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 mailmsgmatenv.o:	mailmsgmatenv.cc	mailmsgmatenv.h		$(INCS)
