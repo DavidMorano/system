@@ -39,7 +39,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
@@ -63,9 +62,9 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -129,18 +128,18 @@ int mimetypes_start(mt *op) noex {
 	    if ((rs = rsv) >= 0) {
 		cint	hsz = szof(hdb) ;
 		op->typelen = var.typelen ;
-		if (void *vp ; (rs = uc_malloc(hsz,&vp)) >= 0) {
+		if (void *vp ; (rs = libmem.mall(hsz,&vp)) >= 0) {
 	            cint	ne = MIMETYPES_NUMKEYS ;
 		    op->dbp = (hdb *) vp ;
 	            if ((rs = hdb_start(op->dbp,ne,1,nullptr,nullptr)) >= 0) {
 			op->magic = MIMETYPES_MAGIC ;
 		    }
 		    if (rs < 0) {
-			uc_free(op->dbp) ;
+			libmem.free(op->dbp) ;
 			op->dbp = nullptr ;
-		    }
+		    } /* end if (error) */
 		} /* end if (memory-allocation) */
-	    }
+	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -160,7 +159,7 @@ int mimetypes_finish(mt *op) noex {
 	            while ((rs2 = hdb_curenum(dbp,&cur,&key,&data)) >= 0) {
 	                if (key.buf != nullptr) {
 		            void	*vp = voidp(key.buf) ;
-	                    rs1 = uc_free(vp) ;
+	                    rs1 = libmem.free(vp) ;
 	                    if (rs >= 0) rs = rs1 ;
 	                }
 	            } /* end while */
@@ -173,7 +172,7 @@ int mimetypes_finish(mt *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        }
 		{
-		    rs1 = uc_free(op->dbp) ;
+		    rs1 = libmem.free(op->dbp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    op->dbp = nullptr ;
 		}
@@ -190,11 +189,10 @@ int mimetypes_file(mt *op,cchar *fname) noex {
 	int		rs1 ;
         int             c = 0 ;
 	if ((rs = mimetypes_magic(op,fname)) >= 0) {
-	    if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
-                bfile	mfile, *mfp = &mfile ;
+	    if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
 		cint	llen = rs ;
-                if ((rs = bopen(mfp,fname,"r",0666)) >= 0) {
-                    while ((rs = breadln(mfp,lbuf,llen)) > 0) {
+                if (bfile mf ; (rs = mf.open(fname,"r",0666)) >= 0) {
+                    while ((rs = mf.readln(lbuf,llen)) > 0) {
 			cchar	*cp ;
 			if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
 			    rs = mimetypes_fileln(op,cp,cl) ;
@@ -202,10 +200,10 @@ int mimetypes_file(mt *op,cchar *fname) noex {
 			}
                         if (rs < 0) break ;
                     } /* end while (reading lines) */
-                    rs1 = bclose(mfp) ;
+                    rs1 = mf.close ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (bfile) */
-		rs1 = uc_free(lbuf) ;
+		rs1 = malloc_free(lbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
@@ -222,7 +220,6 @@ static int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
 	cchar		*ctp{} ;
 	/* extract the typespec (MIME content type) */
 	if (int ctl ; (ctl = exttypespec(lbuf,ll,&ctp)) > 0) {
-            int		size ;
             int		cl, fl ;
             cchar	*cp = ctp + ctl ;
             /* get the file suffixes for this MIME content type */
@@ -237,9 +234,10 @@ static int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
 			key.buf = fp ;
 			key.len = fl ;
                         if ((rs = hdb_fetch(op->dbp,key,np,&data)) == rsn) {
-                            char    *bkp, *bvp ;
-                            size = key.len + 1 + ctl + 1 ;
-                            rs = uc_malloc(size,&bkp) ;
+            		    cint	sz = (key.len + 1 + ctl + 1) ;
+                            char    *bkp ;
+                            char    *bvp ;
+                            rs = libmem.mall(sz,&bkp) ;
                             if (rs < 0) break ;
                             kp = charp(key.buf) ;
                             bvp = strwcpy(bkp,kp,key.len) + 1 ;
@@ -249,9 +247,9 @@ static int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
                             data.buf = bvp ;
                             rs = hdb_store(op->dbp,key,data) ;
                             if (rs < 0) {
-                                uc_free(bkp) ;
+                                libmem.free(bkp) ;
                                 break ;
-                            }
+                            } /* end if (error) */
                             c += 1 ;
 			} /* end if */
                     } /* end if (non-zero field) */
