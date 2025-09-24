@@ -35,7 +35,26 @@ DEFS=
 
 INCS= mailmsg.h
 
+MODS +=
+
 LIBS=
+
+
+OBJ0_MAILMSG= mailmsg_main.o 
+OBJ1_MAILMSG= mailmsg_envaddrfold.o mailmsg_envget.o
+OBJ2_MAILMSG= mailmsg_envdates.o mailmsg_envtimes.o
+OBJ3_MAILMSG= mailmsg_loadfile.o
+OBJ4_MAILMSG= mailmsg_loadfd.o mailmsg_loadmb.o 
+OBJ5_MAILMSG=
+OBJ6_MAILMSG=
+OBJ7_MAILMSG=
+
+OBJA_MAILMSG= obj0_mailmsg.o obj1_mailmsg.o
+OBJB_MAILMSG= obj2_mailmsg.o obj3_mailmsg.o
+OBJC_MAILMSG= obj4_mailmsg.o
+OBJD_MAILMSG=
+
+OBJ_MAILMSG= obja.o objb.o objc.o
 
 
 LDRPATH= $(EXTRA)/lib
@@ -44,7 +63,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,20 +73,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_MAILMSG= mailmsg_main.o 
-OBJ1_MAILMSG= mailmsg_envaddrfold.o mailmsg_envget.o
-OBJ2_MAILMSG= mailmsg_envdates.o mailmsg_envtimes.o
-OBJ3_MAILMSG= mailmsg_loadfile.o
-OBJ4_MAILMSG= mailmsg_loadfd.o mailmsg_loadmb.o 
-
-OBJA_MAILMSG= obj0_mailmsg.o obj1_mailmsg.o
-OBJB_MAILMSG= obj2_mailmsg.o obj3_mailmsg.o
-OBJC_MAILMSG= obj4_mailmsg.o
-
-OBJ_MAILMSG= obja.o objb.o objc.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -81,6 +86,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -101,13 +109,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_MAILMSG)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MAILMSG)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -120,29 +123,41 @@ control:
 
 
 obj0_mailmsg.o:		$(OBJ0_MAILMSG)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_mailmsg.o:		$(OBJ1_MAILMSG)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_mailmsg.o:		$(OBJ2_MAILMSG)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_mailmsg.o:		$(OBJ3_MAILMSG)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4_mailmsg.o:		$(OBJ4_MAILMSG)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj5_mailmsg.o:		$(OBJ5_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6_mailmsg.o:		$(OBJ6_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7_mailmsg.o:		$(OBJ7_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA_MAILMSG)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB_MAILMSG)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objc.o:			$(OBJC_MAILMSG)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd.o:			$(OBJD_MAILMSG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 mailmsg_main.o:			mailmsg_main.cc			$(INCS)
