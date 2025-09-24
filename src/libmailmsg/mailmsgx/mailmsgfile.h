@@ -37,7 +37,7 @@
 
 
 struct mailmsgfile_minfo {
-	cchar		*a ;		/* memory allocation */
+	char		*a ;		/* memory allocation */
 	cchar		*mid ;
 	cchar		*mfname ;
 	uint		nsize ;
@@ -56,7 +56,7 @@ struct mailmsgfile_head {
 	hdb		*flp ;		/* File-List-Pointer */
 	cchar		*tmpdname ;
 	pthread_t	tid ;
-	MAILMSGFILE_FL	f ;
+	MAILMSGFILE_FL	fl ;
 	uint		magic ;
 	int		pagesize ;
 	int		cols ;
