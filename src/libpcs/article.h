@@ -1,5 +1,9 @@
 /* article HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
+
+/* manage an ARTICLE object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -72,7 +76,7 @@ struct article_head {
 	dater		msgdate ;
 	ema		addr[articleaddr_overlast] ;
 	cchar		*strs[articlestr_overlast] ;
-	ARTICLE_FL	f ;
+	ARTICLE_FL	fl ;
 	uint		aoff ;
 	uint		alen ;
 	int		clen ;
