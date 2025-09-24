@@ -57,7 +57,9 @@
 #include	"mailaddr.h"
 #include	"splitaddr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -66,9 +68,9 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -142,10 +144,10 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	if ((rs = splitaddr_ctor(op,ap)) >= 0) {
 	    if ((rs = vechand_start(op->comp,nents,0)) >= 0) {
 	        int	al = lenstr(ap) ;
-	        while (al && (ap[al-1] == '.')) {
+	        while (al && (ap[al - 1] == '.')) {
 		    al -= 1 ;
 	        }
-	        if (char *bp ; (rs = uc_malloc((al+1),&bp)) >= 0) {
+	        if (char *bp ; (rs = libmem.mall((al+1),&bp)) >= 0) {
 	            int		bl = al ;
 	            bool	f = false ;
 	            op->mailaddr = charp(bp) ;
@@ -172,7 +174,7 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 			op->magic = SPLITADDR_MAGIC ;
 		    }
 		    if (rs < 0) {
-			uc_free(bp) ;
+			libmem.free(bp) ;
 			op->mailaddr = nullptr ;
 		    } /* end if (error handling) */
 	        } /* end if (memory-allocation) */
@@ -193,7 +195,8 @@ int splitaddr_finish(splitaddr *op) noex {
 	int		rs1 ;
 	if ((rs = splitaddr_magic(op)) >= 0) {
 	    if (op->mailaddr) {
-	        rs1 = uc_free(op->mailaddr) ;
+		void *vp = voidp(op->mailaddr) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->mailaddr = nullptr ;
 	    }
