@@ -61,7 +61,8 @@ struct mhcom_co {
 struct mhcom : mhcom_head {
 	mhcom_co	finish ;
 	mhcom() noex {
-	    finish(this,mhcommem_finish) ;
+	    finish	(this,mhcommem_finish) ;
+	    magic = 0 ;
 	} ;
 	mhcom(const mhcom &) = delete ;
 	mhcom &operator = (const mhcom &) = delete ;
@@ -69,8 +70,8 @@ struct mhcom : mhcom_head {
 	int getval(cchar **) noex ;
 	int getcom(cchar **) noex ;
 	void dtor() noex ;
-	~mhcom() {
-	    dtor() ;
+	destruct mhcom() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (mhcom) */
 #else	/* __cplusplus */
