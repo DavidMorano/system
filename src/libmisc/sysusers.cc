@@ -154,7 +154,7 @@ int sysusers_readent(sysusers *op,PASSWD *pwp,char *pwbuf,int pwlen) noex {
             if ((rs = getbufsize(getbufsize_un)) >= 0) {
                 cint        ulen = rs ;
                 char        *ubuf ;
-                if ((rs = uc_libmalloc((ulen+1),&ubuf)) >= 0) {
+                if ((rs = lm_mall((ulen+1),&ubuf)) >= 0) {
                     cchar   *lp{} ;
                     while ((rs = filemap_getln(op->fmp,&lp)) > 0) {
                         int         ll = rs ;
@@ -166,7 +166,7 @@ int sysusers_readent(sysusers *op,PASSWD *pwp,char *pwbuf,int pwlen) noex {
                         if (rs > 0) break ;
                         if (rs < 0) break ;
                     } /* end while */
-                    rs1 = uc_libfree(ubuf) ;
+                    rs1 = lm_free(ubuf) ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (m-a-f) */
             } /* end if (getbufsize) */
