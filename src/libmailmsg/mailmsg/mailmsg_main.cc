@@ -89,7 +89,9 @@
 
 #include	"mailmsg.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -109,7 +111,7 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -669,7 +671,7 @@ static int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,cc *hp,int hl) noex {
 }
 /* end subroutine (mailmsg_hdrmatch) */
 
-static int msghdrname_start(MMHNAME *hnp,cc *hp,int hl,cc *vp,int vl) noex {
+static int msghdrname_start(MMHNAME *hnp,cc *hp,int hl,cc *valp,int vall) noex {
 	vecobj		*ilp = &hnp->insts ;
 	int		rs ;
 	int		isz = szof(MMHINST) ;
@@ -681,17 +683,17 @@ static int msghdrname_start(MMHNAME *hnp,cc *hp,int hl,cc *vp,int vl) noex {
 	hnp->namelen = 0 ;
 	hnp->lastinst = -1 ;
 	if ((rs = vecobj_start(ilp,isz,2,0)) >= 0) {
-	    cchar	*cp ;
-	    if ((rs = uc_mallocstrw(hp,hl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = libmem.strw(hp,hl,&cp)) >= 0) {
 	        hnp->name = cp ;
 	        hnp->namelen = (rs-1) ;
-	        rs = msghdrname_addnew(hnp,vp,vl) ;
+	        rs = msghdrname_addnew(hnp,valp,vall) ;
 		if (rs < 0) {
-	    	    uc_free(hnp->name) ;
+		    void *vp = voidp(hnp->name) ;
+	    	    libmem.free(vp) ;
 	    	    hnp->name = nullptr ;
 	    	    hnp->namelen = 0 ;
-		}
-	    } /* end if (m-a) */
+		} /* end if (error) */
+	    } /* end if (memory-allocation) */
 	    if (rs < 0) {
 		vecobj_finish(ilp) ;
 	    }
@@ -703,20 +705,22 @@ static int msghdrname_start(MMHNAME *hnp,cc *hp,int hl,cc *vp,int vl) noex {
 static int msghdrname_finish(MMHNAME *hnp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	void		*vp{} ;
 	if ((hnp->vp != nullptr) && hnp->f_alloc) {
-	    rs1 = uc_free(hnp->vp) ;
+	    void *vp = voidp(hnp->vp) ;
+	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    hnp->vp = nullptr ;
 	    hnp->vl = 0 ;
 	    hnp->f_alloc = false ;
 	}
 	if (hnp->name != nullptr) {
-	    rs1 = uc_free(hnp->name) ;
+	    void *vp = voidp(hnp->name) ;
+	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    hnp->name = nullptr ;
 	    hnp->namelen = 0 ;
 	}
+	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(&hnp->insts,i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
 		MMHINST		*hip = (MMHINST *) vp ;
@@ -752,8 +756,7 @@ static int msghdrname_addnew(MMHNAME *hnp,cchar *vp,int vl) noex {
 	vecobj		*ilp = &hnp->insts ;
 	int		rs ;
 	int		f = false ;
-	void		*p ;
-	if ((rs = vecobj_addnew(ilp,&p)) >= 0) {
+	if (void *p ; (rs = vecobj_addnew(ilp,&p)) >= 0) {
 	    MMHINST	*instp = (MMHINST *) p ;
 	    cint	i = rs ;
 	    if ((rs = msghdrinst_start(instp,vp,vl)) >= 0) {
@@ -826,7 +829,6 @@ static int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 	    MMHINST	*hip{} ;
 	    int		sz = 1 ;
 	    cchar	*hivp = nullptr ;
-	    char	*bp{} ;
 	    void	*vp{} ;
 	    for (int i = 0 ; vecobj_get(ilp,i,&vp) >= 0 ; i += 1) {
 	        if (vp) {
@@ -836,7 +838,8 @@ static int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 		}
 	        if (rs < 0) break ;
 	    } /* end for */
-	    if ((rs >= 0) && ((rs = uc_malloc(sz,&bp)) >= 0)) {
+	    if (rs >= 0) {
+	        if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
 	            int		n = 0 ;
 		    hnp->vp = bp ;
 	            hnp->f_alloc = true ;
@@ -853,10 +856,17 @@ static int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 	                } /* end if (non-null) */
 			if (rs < 0) break ;
 	            } /* end for */
-	            *bp = '\0' ;
-	            hnp->vl = intconv(bp - hnp->vp) ;
-	    } /* end if (m-a) */
-	    vl = hnp->vl ;
+		    if (rs >= 0) {
+	                *bp = '\0' ;
+	                hnp->vl = intconv(bp - hnp->vp) ;
+		    }
+		    if (rs < 0) {
+			libmem.free(bp) ;
+			hnp->vp = nullptr ;
+		    } /* end if (error) */
+	        } /* end if (memory-allocation) */
+	        vl = hnp->vl ;
+	    } /* end if (ok) */
 	} /* end if (needed) */
 	if (rpp) {
 	    *rpp = (rs >= 0) ? hnp->vp : nullptr ;
@@ -883,7 +893,7 @@ static int msghdrinst_start(MMHINST *hip,cchar *vp,int vl) noex {
 		    vecobj_finish(&hip->vals) ;
 		}
 	    }
-	}
+	} /* enf if (vecobj_start) */
 	return rs ;
 }
 /* end subroutine (msghdrinst_start) */
@@ -892,8 +902,7 @@ static int msghdrinst_add(MMHINST *hip,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
 	if (vl > 0) {
 	    vecobj	*vlp = &hip->vals ;
-	    void	*p ;
-	    if ((rs = vecobj_addnew(vlp,&p)) >= 0) {
+	    if (void *p ; (rs = vecobj_addnew(vlp,&p)) >= 0) {
 	        MMHVAL	*valp = (MMHVAL *) p ;
 		valp->vp = vp ;
 		valp->vl = vl ;
@@ -907,8 +916,7 @@ static int msghdrinst_ival(MMHINST *hip,int li,cchar **rpp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	cchar		*rp = nullptr ;
-	void		*vp{} ;
-	if ((rs = vecobj_get(&hip->vals,li,&vp)) >= 0) {
+	if (void *vp ; (rs = vecobj_get(&hip->vals,li,&vp)) >= 0) {
 	    MMHVAL *valp = (MMHVAL *) vp ;
 	    vl = valp->vl ;
 	    rp = valp->vp ;
@@ -933,23 +941,29 @@ static int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
 	            sz += (valp->vl + 1) ;
 		}
 	    } /* end for */
-	    if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
-		int	n = 0 ;
-		hip->vp = bp ;
-		hip->f_alloc = true ;
-		for (int i = 0 ; vlp->get(i,&vp) >= 0 ; i += 1) {
-		    if (vp) {
-	    	        MMHVAL	*valp = (MMHVAL *) vp ;
-		        if (valp->vl > 0) {
-			    if (n++ > 0) *bp++ = ' ' ;
-			    bp = strwcpy(bp,valp->vp,valp->vl) ;
-			}
-		    }
-		} /* end for */
-		*bp = '\0' ;
-		hip->vl = intconv(bp - hip->vp) ;
-	    } /* end if (m-a) */
-	    vl = hip->vl ;
+	    if (rs >= 0) {
+	        if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
+		    int	n = 0 ;
+		    hip->vp = bp ;
+		    hip->f_alloc = true ;
+		    for (int i = 0 ; vlp->get(i,&vp) >= 0 ; i += 1) {
+		        if (vp) {
+	    	            MMHVAL	*valp = (MMHVAL *) vp ;
+		            if (valp->vl > 0) {
+			        if (n++ > 0) *bp++ = ' ' ;
+			        bp = strwcpy(bp,valp->vp,valp->vl) ;
+			    }
+		        }
+		    } /* end for */
+		    *bp = '\0' ;
+		    hip->vl = intconv(bp - hip->vp) ;
+		    if (rs < 0) {
+			libmem.free(bp) ;
+			hip->vp = nullptr ;
+		    } /* end if (error) */
+	        } /* end if (memory-allocation) */
+	        vl = hip->vl ;
+	    } /* end if (ok) */
 	} /* end if (needed) */
 	if (rpp) {
 	    *rpp = (rs >= 0) ? hip->vp : nullptr ;
@@ -962,16 +976,17 @@ static int msghdrinst_finish(MMHINST *hip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((hip->vp != nullptr) && hip->f_alloc) {
-	    rs1 = uc_free(hip->vp) ;
+	    void *vp = voidp(hip->vp) ;
+	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    hip->vp = nullptr ;
 	    hip->vl = 0 ;
 	    hip->f_alloc = false ;
-	}
+	} /* end if */
 	{
 	    rs1 = vecobj_finish(&hip->vals) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end block */
 	hip->vp = nullptr ;
 	hip->f_alloc = false ;
 	return rs ;
