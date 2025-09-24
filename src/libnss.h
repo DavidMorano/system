@@ -44,7 +44,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<strx.h>
 
 #ifdef	COMMENT /* modification by David A-D- Morano */
 #include <sys/socket.h>
@@ -58,37 +57,37 @@ EXTERNC_begin
 #ifdef	COMMENT /* modification by David A-D- Morano */
 extern struct hostent	
 *_switch_gethostbyname_r(cchar *, struct hostent *,
-    char *, int, int *);
+    char *, int, int *) noex ;
 extern struct hostent	
 *_switch_gethostbyaddr_r(cchar *, int, int,
-    struct hostent *, char *, int, int *);
+    struct hostent *, char *, int, int *) noex ;
 extern struct hostent	
 *_switch_getipnodebyname_r(cchar *,
-    struct hostent *, char *, int, int, int, int *);
+    struct hostent *, char *, int, int, int, int *) noex ;
 extern struct hostent	
 *_switch_getipnodebyaddr_r(cchar *, int, int,
-    struct hostent *, char *, int, int *);
+    struct hostent *, char *, int, int *) noex ;
 extern struct hostent	
 *_door_gethostbyname_r(cchar *, struct hostent *,
-    char *, int, int *);
+    char *, int, int *) noex ;
 extern struct hostent	
 *_door_gethostbyaddr_r(cchar *, int, int,
-    struct hostent *, char *, int, int *);
+    struct hostent *, char *, int, int *) noex ;
 extern struct hostent	
 *_door_getipnodebyname_r(cchar *, struct hostent *,
-    char *, int, int, int, int *);
+    char *, int, int, int, int *) noex ;
 extern struct hostent	
 *_door_getipnodebyaddr_r(cchar *, int, int,
-    struct hostent *, char *, int, int *);
-extern struct hostent	*__mappedtov4(struct hostent *, int *);
-extern int	str2hostent(cchar *, int, void *, char *, int);
-extern int	str2hostent6(cchar *, int, void *, char *, int);
-extern int	__str2hostent(int, cchar *, int, void *, char *, int);
-extern int	str2servent(cchar *, int, void *, char *, int);
-extern void	_nss_initf_hosts(nss_db_params_t *);
-extern void	_nss_initf_ipnodes(nss_db_params_t *);
-extern void	order_haddrlist_af(sa_family_t, char **);
-extern int	nss_ioctl(int, int, void *);
+    struct hostent *, char *, int, int *) nox ;
+extern struct hostent	*__mappedtov4(struct hostent *, int *) noex ;
+extern int	str2hostent(cchar *, int, void *, char *, int) noex ;
+extern int	str2hostent6(cchar *, int, void *, char *, int) noex ;
+extern int	__str2hostent(int, cchar *, int, void *, char *, int) noex ;
+extern int	str2servent(cchar *, int, void *, char *, int) noex ;
+extern void	_nss_initf_hosts(nss_db_params_t *) noex ;
+extern void	_nss_initf_ipnodes(nss_db_params_t *) noex ;
+extern void	order_haddrlist_af(sa_family_t, char **) noex ;
+extern int	nss_ioctl(int, int, void *) noex ;
 #endif /* COMMENT */
 
 /* parse.c */
@@ -99,7 +98,7 @@ extern char *_unescape(char *, char *) noex ;
 extern char *_strdup_null(char *) noex ;
 
 #ifdef	COMMENT /* modification by David A-D- Morano */
-extern int _readbufline(char *,	int, char *, int, int *);
+extern int _readbufline(char *,	int, char *, int, int *) noex ;
 #endif /* COMMENT */
 
 EXTERNC_end
