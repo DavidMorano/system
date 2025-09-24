@@ -70,6 +70,7 @@ struct received : received_head {
 	received_co	finish ;
 	received() noex {
 	    finish(this,receivedmem_finish) ;
+	    magic = 0 ;
 	} ;
 	received(const received &) = delete ;
 	received &operator = (const received &) = delete ;
@@ -77,8 +78,8 @@ struct received : received_head {
 	int getkey(int,cchar **) noex ;
 	int getitem(int,cchar **) noex ;
 	void dtor() noex ;
-	~received() {
-	    dtor() ;
+	destruct received() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (received) */
 #else	/* __cplusplus */
