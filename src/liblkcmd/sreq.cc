@@ -163,7 +163,7 @@ int sreq_finish(sreq *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (op->f.ss) {
+	if (op->fl.ss) {
 	    rs1 = sreq_svcentend(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -293,14 +293,14 @@ int sreq_svcparse(sreq *op,int f_long) noex {
 	if (op->svc == nullptr) {
 	    int		sl ;
 	    cchar	*sp ;
-	    op->f.longopt = f_long ;
+	    op->fl.longopt = f_long ;
 	    if ((sl = sfnext(op->svcbuf,op->svclen,&sp)) >= 0) {
 	        cchar	*tp ;
 	        char	*bp ;
 	        if ((tp = strnchr(sp,sl,'/')) != nullptr) {
 	            if (! f_long) {
 	                if (((sp+sl)-tp) > 1) {
-	                    op->f.longopt = (tolc(tp[1]) == 'w') ;
+	                    op->fl.longopt = (tolc(tp[1]) == 'w') ;
 	                }
 	            }
 	            sl = (tp-sp) ;
@@ -324,7 +324,7 @@ int sreq_svcparse(sreq *op,int f_long) noex {
 /* end subroutine (sreq_svcparse) */
 
 int sreq_setlong(sreq *op,int f) noex {
-	op->f.longopt = MKBOOL(f) ;
+	op->fl.longopt = MKBOOL(f) ;
 	return SR_OK ;
 }
 /* end subroutine (sreq_setlong) */
@@ -396,7 +396,7 @@ int sreq_closefds(sreq *op) noex {
 int sreq_svcentbegin(sreq *op,LOCINFO *lip,SVCENT *sep) noex {
 	int		rs ;
 	if ((rs = svcentsub_start(&op->ss,lip,sep)) >= 0) {
-	    op->f.ss = true ;
+	    op->fl.ss = true ;
 	}
 	return rs ;
 }
@@ -405,8 +405,8 @@ int sreq_svcentbegin(sreq *op,LOCINFO *lip,SVCENT *sep) noex {
 int sreq_svcentend(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.ss) {
-	    op->f.ss = false ;
+	if (op->fl.ss) {
+	    op->fl.ss = false ;
 	    rs1 = svcentsub_finish(&op->ss) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -433,10 +433,10 @@ int sreq_exiting(sreq *op) noex {
 int sreq_thrdone(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.thread) {
+	if (op->fl.thread) {
 	    pthread_t	tid = op->tid ;
 	    int		trs ;
-	    op->f.thread = false ;
+	    op->fl.thread = false ;
 	    rs1 = uptjoin(tid,&trs) ;
 	    if (rs >= 0) rs = rs1 ;
 	    if (rs >= 0) rs = trs ;
@@ -546,8 +546,8 @@ int sreq_builtrelease(sreq *op) noex {
 	    if ((rs = uc_free(op->objp)) >= 0) {
 	        op->objp = nullptr ;
 	        op->binfo.objsize = 0 ;
-	        op->f.builtout = false ;
-	        op->f.builtdone = false ;
+	        op->fl.builtout = false ;
+	        op->fl.builtdone = false ;
 	        rs = 1 ;
 	    }
 	}
@@ -561,11 +561,11 @@ int sreq_objstart(sreq *op,cchar *pr,cchar **envv) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != SREQ_MAGIC) return SR_NOTFOUND ;
 	if (op->objp != nullptr) {
-	    if (! op->f.builtout) {
+	    if (! op->fl.builtout) {
 	        objstart_t	m = (objstart_t) op->binfo.start ;
 	        cchar	**av = op->av ;
 	        if ((rs = (*m)(op->objp,pr,op,av,envv)) >= 0) {
-	            op->f.builtout = true ;
+	            op->fl.builtout = true ;
 	        }
 	    } else {
 	        rs = SR_NOANODE ;
@@ -583,11 +583,11 @@ int sreq_objcheck(sreq *op) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != SREQ_MAGIC) return SR_NOTFOUND ;
 	if (op->objp != nullptr) {
-	    if (op->f.builtout) {
-	        if (! op->f.builtdone) {
+	    if (op->fl.builtout) {
+	        if (! op->fl.builtdone) {
 	            objcheck_t	m = (objcheck_t) op->binfo.check ;
 	            if ((rs = (*m)(op->objp)) > 0) {
-	                op->f.builtdone = true ;
+	                op->fl.builtdone = true ;
 	            }
 	        } else {
 	            rs = true ;
@@ -605,8 +605,8 @@ int sreq_objabort(sreq *op) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != SREQ_MAGIC) return SR_NOTFOUND ;
 	if (op->objp != nullptr) {
-	    if (op->f.builtout) {
-	        if (! op->f.builtdone) {
+	    if (op->fl.builtout) {
+	        if (! op->fl.builtdone) {
 	            objabort_t	m = (objabort_t) op->binfo.abort ;
 	            rs = (*m)(op->objp) ;
 	        } else {
@@ -625,11 +625,11 @@ int sreq_objfinish(sreq *op) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != SREQ_MAGIC) return SR_NOTFOUND ;
 	if (op->objp != nullptr) {
-	    if (op->f.builtout) {
+	    if (op->fl.builtout) {
 	        objfinish_t	m = (objfinish_t) op->binfo.finish ;
 	        if ((rs = (*m)(op->objp)) >= 0) {
-	            op->f.builtdone = false ;
-	            op->f.builtout = false ;
+	            op->fl.builtdone = false ;
+	            op->fl.builtout = false ;
 	        }
 	    }
 	} else {
