@@ -79,7 +79,7 @@ static int lkmail_ctor(lkmail *op,Args ... args) noex {
 	    op->lfd = -1 ;
 	    if (char *cp ; (rs = malloc_mp(&cp)) >= 0) {
 	        op->lockfname = cp ;
-	    }
+	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -91,7 +91,7 @@ static int lkmail_dtor(lkmail *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->lockfname) {
-		rs1 = uc_free(op->lockfname) ;
+		rs1 = malloc_free(op->lockfname) ;
 		if (rs >= 0) rs = rs1 ;
 		op->lockfname = nullptr ;
 	    }
@@ -274,18 +274,20 @@ int lkmail_old(lkmail *op,time_t dt,int age) noex {
 
 static int lkmail_starter(lkmail *op) noex {
     	int		rs ;
+	int		rs1 ;
 	if (char *mbuf ; (rs = malloc_mp(&mbuf)) >= 0) {
 	    cchar	*fn = op->lockfname ;
 	    cchar	*cp ;
 	    if (int cl ; (cl = sfdirname(fn,-1,&cp)) > 0) {
 	        if ((rs = mkpath1w(mbuf,cp,cl)) >= 0) {
-		    if (USTAT sb ; (rs = u_stat(mbuf,&sb)) >= 0) {
+		    if (ustat sb ; (rs = u_stat(mbuf,&sb)) >= 0) {
 			op->id.uid_maildir = sb.st_uid ;
 			op->id.gid_maildir = sb.st_gid ;
 		    }
 		}
 	    } /* end if (sfdirname) */
-	    rs = rsfree(rs,mbuf) ;
+	    rs1 = malloc_free(mbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
