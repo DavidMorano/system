@@ -302,7 +302,7 @@ cchar	*ap ;
 	}
 #endif
 
-	f_long = lip->f.longer ;
+	f_long = lip->fl.longer ;
 	av = lip->av ;
 	to = lip->to ;
 
@@ -375,7 +375,7 @@ cchar	*ap ;
 	    }
 
 #if	CF_SHUTDOWN
-	    if ((rs >= 0) && lip->f.shutdown)
+	    if ((rs >= 0) && lip->fl.shutdown)
 	        cm_shutdown(&con,SHUT_WR) ;
 #endif /* CF_SHUTDOWN */
 
