@@ -1,10 +1,11 @@
-/* msuclients */
+/* msuclients SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* object to interact with the MSU server */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -12,8 +13,9 @@
 	This object module was first written.
 
 	= 2011-01-25, David A­D­ Morano
-	I added the capability to also send the 'mark', 'report', and 'exit'
-	commands to the server.  Previously these were not implemented here.
+	I added the capability to also send the 'mark', 'report',
+	and 'exit' commands to the server.  Previously these were
+	not implemented here.
 
 */
 
@@ -21,23 +23,22 @@
 
 /*******************************************************************************
 
-	This module mediates the interactions with the MSU server.
+  	Name:
+	msuclients
 
+	Description:
+	This module mediates the interactions with the MSU server.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<vecstr.h>
@@ -596,7 +597,7 @@ static int msuclients_connect(MSUCLIENTS *op)
 	    int	af = AF_UNIX ;
 	    rs = sockaddress_start(&op->srv,af,op->reqfname,0,0) ;
 	    op->srvlen = rs ;
-	    op->f.srv = (rs >= 0) ;
+	    op->fl.srv = (rs >= 0) ;
 
 #if	CF_DEBUGS
 	   { 
@@ -638,8 +639,8 @@ static int msuclients_disconnect(MSUCLIENTS *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->f.srv) {
-	    op->f.srv = FALSE ;
+	if (op->fl.srv) {
+	    op->fl.srv = FALSE ;
 	    rs1 = sockaddress_finish(&op->srv) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
