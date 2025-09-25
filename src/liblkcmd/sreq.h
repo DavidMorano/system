@@ -66,9 +66,9 @@ struct sreq_head {
 	SVCENTSUB	ss ;
 	osetstr		namesvcs ;		/* service names (for 'help') */
 	MFSERVE_INFO	binfo ;			/* buuilt-info info */
+	mainv		av ;			/* argument vector */
 	void		*sop ;			/* shared-object handle */
 	void		*objp ;			/* object pointer */
-	cchar		**av ;			/* argument vector */
 	cchar		*argstab ;		/* argument strings */
 	cchar		*peername ;
 	cchar		*netuser ;
@@ -82,7 +82,8 @@ struct sreq_head {
 	time_t		etime ;			/* time-end */
 	pid_t		pid ;			/* child PID */
 	pthread_t	tid ;			/* child thread ID */
-	SREQ_FL		open, f ;
+	SREQ_FL		open ;
+	SREQ_FL		fl ;
 	uint		magic ;
 	volatile int	f_exiting ;
 	int		ji ;			/* job number in DB */
@@ -99,7 +100,7 @@ struct sreq_head {
 	int		svclen ;		/* service-length */
 	int		trs ;			/* thread return-status */
 	char		logid[SREQ_JOBIDLEN+1] ;
-} ;
+} ; /* end struct (sreq_head) */
 
 typedef	SREQ		sreq ;
 typedef	SREQ_FL		sreq_fl ;
