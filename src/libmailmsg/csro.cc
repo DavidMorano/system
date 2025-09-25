@@ -49,13 +49,14 @@
 #include	<usystem.h>
 #include	<hdb.h>
 #include	<vecstr.h>
-#include	<mallocstuff.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"csro.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* getlenstr(eu)| */
 
 /* local defines */
 
@@ -64,7 +65,7 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -81,9 +82,9 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 static int csro_ctor(csro *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    cnullptr	np{} ;
 	    op->magic = 0 ;
 	    op->elp = nullptr ;
 	    rs = SR_NOMEM ;
@@ -200,10 +201,10 @@ int csro_finish(csro *op) noex {
 /* end subroutine (csro_finish) */
 
 int csro_add(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = csro_magic(op,mailname,fname)) >= 0) {
-	    cnullptr	np{} ;
 	    csro_val	ve ;
 	    if ((rs = value_start(&ve,mailname,fname,moff)) >= 0) {
 	        vecstr	*nlp = op->nlp ;
@@ -235,11 +236,11 @@ int csro_add(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
 
 /* do we already have an entry like this? */
 int csro_already(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
 	if ((rs = csro_magic(op,mailname,fname)) >= 0) {
-	    cnullptr	np{} ;
 	    csro_val	ve ;
 	    if ((rs = value_start(&ve,mailname,fname,moff)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
@@ -373,7 +374,7 @@ static int value_start(VALUE *ep,cchar *mailname,cchar *fname,off_t moff) noex {
 	if (fname != nullptr) {
 	   sz += (lenstr(fname)+1) ;
 	}
-	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
+	if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
 	    ep->mailname = bp ;
 	    bp = (strwcpy(bp,fname,-1)+1) ;
 	    ep->fname = bp ;
@@ -393,10 +394,11 @@ static int value_finish(VALUE *ep) noex {
 	if (ep) {
 	    rs = SR_OK ;
 	    {
-		rs1 = uc_free(ep->mailname) ;
+		void *vp = voidp(ep->mailname) ;
+		rs1 = libmem.free(vp) ;
 		if (rs >= 0) rs = rs1 ;
+	        ep->mailname = nullptr ;
 	    }
-	    ep->mailname = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
 }
