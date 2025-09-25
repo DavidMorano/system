@@ -93,7 +93,9 @@
 #include	"dbmake.hh"
 #include	"mailaliashdr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlibentr(3u)| */
 
 /* local defines */
 
@@ -101,11 +103,11 @@ import libutil ;
 /* imported namespaces */
 
 using namespace	mailutils ;		/* namespace */
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::rotl ;			/* subroutine-template */
 using std::rotr ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -371,12 +373,12 @@ int dbmake::wrfilekeytab() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (int *keytab ; (rs = uc_malloc(ktsize,&keytab)) >= 0) {
+	if (int *keytab ; (rs = libmem.mall(ktsize,&keytab)) >= 0) {
 	    if ((rs = strtab_recmk(klp,keytab,ktsize)) >= 0) {
 		rs = u_write(fd,keytab,ktsize) ;
 		wlen += rs ;
 	    }
-	    rs1 = uc_free(keytab) ;
+	    rs1 = libmem.free(keytab) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 	return (rs >= 0) ? wlen : rs ;
@@ -388,7 +390,7 @@ int dbmake::wrfilerec() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = uc_malloc(recsize,&rectab)) >= 0) {
+	if ((rs = libmem.mall(recsize,&rectab)) >= 0) {
 	    {
 	        void	*vp{} ;
 	        int	ri = 0 ;
@@ -406,7 +408,7 @@ int dbmake::wrfilerec() noex {
 	        rs = u_write(fd,rectab,recsize) ;
 	        wlen = rs ;
 	    } /* end block */
-	    rs1 = uc_free(rectab) ;
+	    rs1 = libmem.free(rectab) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (record table) */
 	return (rs >= 0) ? wlen : rs ;
@@ -418,8 +420,8 @@ int dbmake::wrfilekeys() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (int (*indtab)[2] ; (rs = uc_malloc(risize,&indtab)) >= 0) {
-	    if (char *kstab ; (rs = uc_malloc(sksize,&kstab)) >= 0) {
+	if (int (*indtab)[2] ; (rs = libmem.mall(risize,&indtab)) >= 0) {
+	    if (char *kstab ; (rs = libmem.mall(sksize,&kstab)) >= 0) {
 	        if ((rs = strtab_strmk(klp,kstab,sksize)) >= 0) {
 	            int		(*it)[2] = indtab ;
 	            cint	ris = risize ;
@@ -431,10 +433,10 @@ int dbmake::wrfilekeys() noex {
 	                }
 	            }
 	        }
-	        rs1 = uc_free(kstab) ;
+	        rs1 = libmem.free(kstab) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory allocation) */
-	    rs1 = uc_free(indtab) ;
+	    rs1 = libmem.free(indtab) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory allocation) */
 	return (rs >= 0) ? wlen : rs ;
@@ -446,12 +448,12 @@ int dbmake::wrfilevals() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (char *vstab ; (rs = uc_malloc(svsize,&vstab)) >= 0) {
+	if (char *vstab ; (rs = libmem.mall(svsize,&vstab)) >= 0) {
 	    if ((rs = strtab_strmk(vlp,vstab,svsize)) >= 0) {
 	        rs = u_write(fd,vstab,svsize) ;
 		wlen += rs ;
 	    }
-	    rs1 = uc_free(vstab) ;
+	    rs1 = libmem.free(vstab) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (value string-table) */
 	return (rs >= 0) ? wlen : rs ;
