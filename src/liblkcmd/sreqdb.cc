@@ -458,7 +458,7 @@ int sreqdb_exiting(SREQDB *op,int ji)
 	    const int	st = sreqstate_done ;
 	    if ((rs = sreq_setstate(jep,st)) >= 0) {
 		if ((rs = sreq_exiting(jep)) >= 0) {
-		    if (jep->f.thread) {
+		    if (jep->fl.thread) {
 	                if ((rs = intiq_ins(&op->exits,ji)) >= 0) {
 	        	    op->f_threxiting = TRUE ;
 			}
