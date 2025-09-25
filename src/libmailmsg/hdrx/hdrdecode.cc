@@ -48,7 +48,9 @@
 
 #include	"hdrdecode.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -58,6 +60,8 @@ import libutil ;
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -138,7 +142,7 @@ namespace {
 	} ;
 	int proc() noex ;
     } ; /* end struct (subinfo) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -184,7 +188,7 @@ int hdrdecode_start(hdrdecode *op,cchar *pr) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    memclear(hop) ;
-	    if (cchar *cp{} ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = libmem.strw(pr,-1,&cp)) >= 0) {
 	        op->pr = cp ;
 	        op->magic = HDRDECODE_MAGIC ;
 	        rs = SR_OK ;
@@ -204,7 +208,7 @@ int hdrdecode_finish(hdrdecode *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_free(op->ctp) ;
+	            rs1 = libmem.free(op->ctp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->ctp = nullptr ;
 		}
@@ -215,7 +219,7 @@ int hdrdecode_finish(hdrdecode *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_free(op->b64p) ;
+	            rs1 = libmem.free(op->b64p) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->b64p = nullptr ;
 		}
@@ -226,13 +230,14 @@ int hdrdecode_finish(hdrdecode *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        {
-	            rs1 = uc_free(op->qpp) ;
+	            rs1 = libmem.free(op->qpp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        op->qpp = nullptr ;
 	    }
 	    if (op->pr) {
-	        rs1 = uc_free(op->pr) ;
+		void *vp = voidp(op->pr) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->pr = nullptr ;
 	    }
@@ -276,12 +281,11 @@ static int hdrdecode_b64decoder(hdrdecode *op) noex {
 	int		rs = SR_OK ;
 	if (op->b64p == nullptr) {
 	    cint	sz = szof(b64decoder) ;
-	    void	*p ;
-	    if ((rs = uc_malloc(sz,&p)) >= 0) {
+	    if (void	*p ; (rs = libmem.mall(sz,&p)) >= 0) {
 	        op->b64p = (b64decoder *) p ;
 	        rs = b64decoder_start(op->b64p) ;
 	        if (rs < 0) {
-	            uc_free(op->b64p) ;
+	            libmem.free(op->b64p) ;
 	            op->b64p = nullptr ;
 	        }
 	    } /* end if (m-a) */
@@ -294,11 +298,11 @@ static int hdrdecode_qpdecoder(hdrdecode *op) noex {
 	int		rs = SR_OK ;
 	if (op->qpp == nullptr) {
 	    cint	sz = szof(qpdecoder) ;
-	    if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	    if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) {
 	        op->qpp = (qpdecoder *) p ;
 	        rs = qpdecoder_start(op->qpp,true) ;
 	        if (rs < 0) {
-	            uc_free(op->qpp) ;
+	            libmem.free(op->qpp) ;
 	            op->qpp = nullptr ;
 	        }
 	    } /* end if (m-a) */
@@ -311,13 +315,13 @@ static int hdrdecode_chartrans(hdrdecode *op) noex {
 	int		rs = SR_OK ;
 	if (op->ctp == nullptr) {
 	    cint	sz = szof(chartrans) ;
-	    if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	    if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) {
 	        op->ctp = (chartrans *) p ;
 	        rs = chartrans_open(op->ctp,op->pr,2) ;
 	        if (rs < 0) {
-	            uc_free(op->ctp) ;
+	            libmem.free(op->ctp) ;
 	            op->ctp = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (m-a) */
 	} /* end if (initialization needed) */
 	return rs ;
@@ -372,9 +376,9 @@ int subinfo::proctrans(escinfo *eip) noex {
 	int		el = eip->edl ;
 	int		c = 0 ;
 	if (el > 0) {
-	    int		tlen = (eip->edl+3) ; /* allow for error indicator */
+	    int		tlen = (eip->edl + 3) ; /* allow for error indicator */
 	    cchar	*keystr = "BQ" ;
-	    if (char *tbuf ; (rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
+	    if (char *tbuf ; (rs = libmem.mall((tlen + 1),&tbuf)) >= 0) {
 	        cint	ki = sichr(keystr,-1,eip->ech) ;
 	        int	tl = 0 ;
 	        bool	f_err = false ;
@@ -402,7 +406,7 @@ int subinfo::proctrans(escinfo *eip) noex {
 	                c += rs ;
 	            }
 	        } /* end if (pass or trans) */
-	        rs1 = uc_free(tbuf) ;
+	        rs1 = libmem.free(tbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (positive) */
@@ -442,13 +446,13 @@ int subinfo::storetrans(int txid,cchar *tp,int tl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wl = 0 ;
-	if (wchar_t *tbuf ; (rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
+	if (wchar_t *tbuf ; (rs = libmem.mall((tlen + 1),&tbuf)) >= 0) {
 	    chartrans	*ctp = op->ctp ;
 	    if ((rs = chartrans_transread(ctp,txid,tbuf,tlen,tp,tl)) >= 0) {
 	        rs = store(tbuf,rs) ;
 	        wl = rs ;
 	    }
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = libmem.free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? wl : rs ;
