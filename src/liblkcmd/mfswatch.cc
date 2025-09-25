@@ -1240,7 +1240,7 @@ static int mfswatch_usersbegin(PROGINFO *pip)
 	LOCINFO		*lip = pip->lip ;
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
-	if (lip->f.users) {
+	if (lip->fl.users) {
 	    if (! wip->open.users) {
 		OSETSTR		*ulp = &wip->users ;
 		cint	n = DEFNUSERS ;
@@ -1540,7 +1540,7 @@ static int mfswatch_svcproc(PROGINFO *pip,SREQ *jep,SVCFILE_ENT *sep,
 		cchar **sav)
 {
 	LOCINFO		*lip = pip->lip ;
-	cint	f_long = jep->f.longopt ;
+	cint	f_long = jep->fl.longopt ;
 	int		rs ;
 	cchar		*subsvc = jep->subsvc ;
 #if	CF_DEBUG
@@ -1853,7 +1853,7 @@ static int mfswatch_progspawn(PROGINFO *pip,SREQ *jep,cchar *pbuf,vecstr *alp)
 	                        cchar	*pn = pip->progname ;
 	                        cchar	*fmt = "spawned pid=%u" ;
 	                        cchar	*lid = jep->logid ;
-	                        jep->f.process = TRUE ;
+	                        jep->fl.process = TRUE ;
 	                        jep->pid = rs ;
 	                        wip->nprocs += 1 ;
 	                        logssprintf(pip,lid,fmt,rs) ;
@@ -2110,7 +2110,7 @@ static int mfswatch_svcprocer(PROGINFO *pip,SREQ *jep,svcprocer_t w)
 	        sap->w = w ;
 	        if ((rs = uptcreate(&tid,NULL,helper,sap)) >= 0) {
 	            jep->tid = tid ;
-	            jep->f.thread = TRUE ;
+	            jep->fl.thread = TRUE ;
 	            wip->nthrs += 1 ;
 	        }
 	    } /* end if (m-a) */
@@ -2425,7 +2425,7 @@ static int mfswatch_logprogres(PROGINFO *pip,int jsn,cchar *lid,
 	        debugprintf("progwatchjobs: signalled sig=%s\n",ss) ;
 #endif
 
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        fmt = "%s: jsn=%d server(%u) was signalled sig=%s\n" ;
 	        shio_printf(pip->efp,fmt,pn,jsn,pid,ss) ;
 	    }
@@ -2442,7 +2442,7 @@ static int mfswatch_logprogres(PROGINFO *pip,int jsn,cchar *lid,
 	        debugprintf("mfswatch_logprogres: abnormal cs=%u\n",cs) ;
 #endif
 
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        fmt = "%s: jsn=%d server(%u) exited abnormally cs=%u\n" ;
 	        shio_printf(pip->efp,fmt,pn,jsn,pid,cs) ;
 	    }
