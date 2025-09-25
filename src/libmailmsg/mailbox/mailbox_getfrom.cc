@@ -44,7 +44,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bfile.h>
@@ -92,7 +91,7 @@ constexpr int	rsnomsg[] = {
 	SR_NOMSG,
 	SR_NOENT,
 	0
-} ;
+} ; /* end array (rsnomsg) */
 
 
 /* exported variables */
@@ -103,7 +102,7 @@ constexpr int	rsnomsg[] = {
 int mailbox_getfrom(mailbox *mbp,char *rbuf,int rlen,cchar *fn,int mi) noex {
 	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if ((rs = mailbox_magic(mbp,rbuf,fn)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
@@ -149,8 +148,8 @@ int mailbox_getfrom(mailbox *mbp,char *rbuf,int rlen,cchar *fn,int mi) noex {
 static int mailmsg_fromer(mailmsg *mmp,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		vl = 0 ;
-	int		len = 0 ;
-	cchar		*vp ;
+	int		len = 0 ; /* return-value */
+	cchar		*vp ; /* used-multiple */
 	cchar		*hn = HN_FROM ;
 	if ((rs = mailmsg_hdrival(mmp,hn,0,&vp)) > 0) {
 	    vl = rs ;
@@ -172,7 +171,7 @@ static int mailmsg_fromer(mailmsg *mmp,char *rbuf,int rlen) noex {
 		    }
 		}
 	    }
-	}
+	} /* end if */
 	if ((rs >= 0) && (vl > 0)) {
 	    rs = mkaddrfrom(rbuf,rlen,vp,vl) ;
 	    len = rs ;
