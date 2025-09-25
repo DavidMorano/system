@@ -35,24 +35,9 @@ DEFS=
 
 INCS= hdrx.h
 
+MODS +=
+
 LIBS=
-
-
-LDRPATH= $(EXTRA)/lib
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0_HDRX= hdrctype.o hdrdecode.o
@@ -63,7 +48,23 @@ OBJA_HDRX= obj0_hdrx.o obj1_hdrx.o
 OBJ_HDRX= $(OBJA_HDRX)
 
 
-.SUFFIXES:		.hh .ii .ccm
+LDRPATH= $(EXTRA)/lib
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -76,6 +77,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -96,13 +100,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_HDRX)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_HDRX)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -115,13 +114,16 @@ control:
 
 
 obj0_hdrx.o:	$(OBJ0_HDRX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_HDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_hdrx.o:	$(OBJ1_HDRX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_HDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_hdrx.o:	$(OBJ2_HDRX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_HDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3_hdrx.o:	$(OBJ3_HDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 hdrctype.o:		hdrctype.cc	hdrctype.h	$(INCS)
