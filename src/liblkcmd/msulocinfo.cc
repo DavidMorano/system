@@ -187,7 +187,7 @@ int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	    lip->ti_boot = t ;
 	}
 
-	lip->f.listen = TRUE ;
+	lip->fl.listen = TRUE ;
 
 	return rs ;
 }
@@ -601,7 +601,7 @@ int locinfo_ipcpid(LOCINFO *lip,int f)
 	pf = pip->pidfname ;
 	if (f) { /* activate */
 
-	    pip->f.pidfname = FALSE ;
+	    pip->fl.pidfname = FALSE ;
 	    if ((rs = u_open(pf,of,0664)) >= 0) {
 	        int 	fd = rs ;
 	        int	wl ;
@@ -611,7 +611,7 @@ int locinfo_ipcpid(LOCINFO *lip,int f)
 	        if (rs >= 0) {
 	            pidbuf[wl++] = '\n' ;
 	            rs = u_write(fd,pidbuf,wl) ;
-	            pip->f.pidfname = (rs >= 0) ;
+	            pip->fl.pidfname = (rs >= 0) ;
 	        }
 	        u_close(fd) ;
 	    } /* end if (file) */
@@ -623,8 +623,8 @@ int locinfo_ipcpid(LOCINFO *lip,int f)
 
 	} else { /* de-activate */
 
-	    if ((pf != NULL) && pip->f.pidfname) {
-	        pip->f.pidfname = FALSE ;
+	    if ((pf != NULL) && pip->fl.pidfname) {
+	        pip->fl.pidfname = FALSE ;
 	        if (pf[0] != '\0') u_unlink(pf) ;
 	    }
 
@@ -688,7 +688,7 @@ int locinfo_reqexit(LOCINFO *lip,cchar *reason)
 	cchar		*fmt = "reqexit · reason=%s" ;
 	if (reason == NULL) reason = "" ;
 	rs = logprintf(pip,fmt,reason) ;
-	lip->f.reqexit = TRUE ;
+	lip->fl.reqexit = TRUE ;
 	return rs ;
 }
 /* end subroutine (locinfo_reqexit) */
@@ -696,7 +696,7 @@ int locinfo_reqexit(LOCINFO *lip,cchar *reason)
 
 int locinfo_isreqexit(LOCINFO *lip)
 {
-	int		rs = MKBOOL(lip->f.reqexit) ;
+	int		rs = MKBOOL(lip->fl.reqexit) ;
 	return rs ;
 }
 /* end subroutine (locinfo_isreqexit) */
