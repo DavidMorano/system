@@ -52,7 +52,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>		/* for |getbufsize_mailaddr| */
 #include	<bufsizevar.hh>
@@ -64,7 +63,7 @@
 
 #include	"mailaddr.h"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -89,7 +88,7 @@ namespace {
 	int		mailaddrlen ;
 	operator int () noex ;
     } ; /* end struct (val) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -118,7 +117,7 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	    if ((rs = rsv) >= 0) {
 	        cint	hnl = var.hostnamelen ; /* host-name length */
 	        cint	mal = var.mailaddrlen ; /* mail-address length */
-		cchar	*tp ;
+		cchar	*tp ; /* used-multiple */
 	        rs = SR_OK ;
 	        if (sl < 0) sl = lenstr(sp) ;
 	        /* what kind of address do we have? */
