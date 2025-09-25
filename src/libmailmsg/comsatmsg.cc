@@ -76,6 +76,14 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -112,7 +120,7 @@ int comsatmsg_start(comsatmsg *op) noex {
 	    static cint		rsv = var ;
 	    if ((rs = rsv) >= 0) {
 	        cint	sz = (var.usernamelen + var.maxpathlen + 2) ;
-	        if (char *cp ; (rs = uc_malloc(sz,&cp)) >= 0) {
+	        if (char *cp ; (rs = libmem.mall(sz,&cp)) >= 0) {
 		    op->a = cp ;
 		    op->username = (cp) ;
 		    op->fname = (cp + (var.usernamelen + 1)) ;
@@ -128,7 +136,7 @@ int comsatmsg_finish(comsatmsg *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->a) {
-		rs1 = uc_free(op->a) ;
+		rs1 = libmem.free(op->a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
