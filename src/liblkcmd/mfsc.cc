@@ -167,12 +167,12 @@ int mfsc_open(MFSC *op,cchar *pr,int to) noex {
 	if ((rs = mfsc_setbegin(op,pr)) >= 0) {
 	    if ((rs = mfsc_connect(op)) > 0) {
 	        if ((rs = mfsc_bufbegin(op)) >= 0) {
-	            op->f.srv = TRUE ;
+	            op->fl.srv = TRUE ;
 	            rs = 1 ;
 	            op->magic = MFSC_MAGIC ;
 	        }
 	    } /* end if (mfsc_connect) */
-	    if ((rs < 0) || (! op->f.srv)) {
+	    if ((rs < 0) || (! op->fl.srv)) {
 	        mfsc_setend(op) ;
 	    }
 	} /* end if (mfsc-set) */
@@ -246,7 +246,7 @@ int mfsc_help(MFSC *op,char *rbuf,int rlen,int idx) noex {
 
 	if (op->magic != MFSC_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.srv) {
+	if (op->fl.srv) {
 	    struct mfsmsg_gethelp	mreq ;
 	    struct mfsmsg_help		mres ;
 	    cint		to = op->to ;
@@ -272,15 +272,15 @@ int mfsc_help(MFSC *op,char *rbuf,int rlen,int idx) noex {
 	                    }
 	                }
 	            } else if (isBadRecv(rs)) {
-	                op->f.srv = FALSE ;
+	                op->fl.srv = FALSE ;
 	                rs = SR_OK ;
 	            } /* end if (uc_recve) */
 	        } else if (isBadSend(rs)) {
-	            op->f.srv = FALSE ;
+	            op->fl.srv = FALSE ;
 	            rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (mfsmsg_gethelp) */
-	    if (rs < 0) op->f.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
 #if	CF_DEBUGS
@@ -307,7 +307,7 @@ int mfsc_getval(MFSC *op,char *rbuf,int rlen,cchar *un,int w) noex {
 
 	if (op->magic != MFSC_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.srv) {
+	if (op->fl.srv) {
 	    struct mfsmsg_getval	mreq ;
 	    struct mfsmsg_val		mres ;
 	    cint		to = op->to ;
@@ -334,15 +334,15 @@ int mfsc_getval(MFSC *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	                    }
 	                }
 	            } else if (isBadRecv(rs)) {
-	                op->f.srv = FALSE ;
+	                op->fl.srv = FALSE ;
 	                rs = SR_OK ;
 	            } /* end if (uc_recve) */
 	        } else if (isBadSend(rs)) {
-	            op->f.srv = FALSE ;
+	            op->fl.srv = FALSE ;
 	            rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (mfsmsg_getval) */
-	    if (rs < 0) op->f.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
 #if	CF_DEBUGS
@@ -365,7 +365,7 @@ int mfsc_mark(MFSC *op) noex {
 
 	if (op->magic != MFSC_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.srv) {
+	if (op->fl.srv) {
 	    struct mfsmsg_mark	mreq ;
 	    struct mfsmsg_ack	mres ;
 	    cint		to = op->to ;
@@ -386,15 +386,15 @@ int mfsc_mark(MFSC *op) noex {
 	                    }
 	                }
 	            } else if (isBadRecv(rs)) {
-	                op->f.srv = FALSE ;
+	                op->fl.srv = FALSE ;
 	                rs = SR_OK ;
 	            } /* end if (uc_recve) */
 	        } else if (isBadSend(rs)) {
-	            op->f.srv = FALSE ;
+	            op->fl.srv = FALSE ;
 	            rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (mfsmsg_mark) */
-	    if (rs < 0) op->f.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
 #if	CF_DEBUGS
@@ -417,7 +417,7 @@ int mfsc_exit(MFSC *op,cchar *reason) noex {
 
 	if (op->magic != MFSC_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.srv) {
+	if (op->fl.srv) {
 	    struct mfsmsg_exit	mreq ;
 	    struct mfsmsg_ack	mres ;
 	    cint		to = op->to ;
@@ -442,15 +442,15 @@ int mfsc_exit(MFSC *op,cchar *reason) noex {
 	                    }
 	                }
 	            } else if (isBadRecv(rs)) {
-	                op->f.srv = FALSE ;
+	                op->fl.srv = FALSE ;
 	                rs = SR_OK ;
 	            } /* end if (uc_recve) */
 	        } else if (isBadSend(rs)) {
-	            op->f.srv = FALSE ;
+	            op->fl.srv = FALSE ;
 	            rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (mfsmsg_exit) */
-	    if (rs < 0) op->f.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
 #if	CF_DEBUGS
@@ -474,7 +474,7 @@ int mfsc_listener(MFSC *op,char *rbuf,int rlen,int idx) noex {
 
 	if (op->magic != MFSC_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.srv) {
+	if (op->fl.srv) {
 	    struct mfsmsg_getlistener	mreq ;
 	    struct mfsmsg_listener	mres ;
 	    cint		to = op->to ;
@@ -499,15 +499,15 @@ int mfsc_listener(MFSC *op,char *rbuf,int rlen,int idx) noex {
 	                    }
 	                }
 	            } else if (isBadRecv(rs)) {
-	                op->f.srv = FALSE ;
+	                op->fl.srv = FALSE ;
 	                rs = SR_OK ;
 	            } /* end if (uc_recve) */
 	        } else if (isBadSend(rs)) {
-	            op->f.srv = FALSE ;
+	            op->fl.srv = FALSE ;
 	            rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (mfsmsg_gethelp) */
-	    if (rs < 0) op->f.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
 #if	CF_DEBUGS
@@ -771,7 +771,7 @@ static int mfsc_istatus(MFSC *op,MFSC_STATUS *statp) noex {
 	    memclear(statp) ;
 	}
 
-	if (op->f.srv) {
+	if (op->fl.srv) {
 	    struct mfsmsg_getstatus	mreq ;
 	    struct mfsmsg_status	mres ;
 	    cint		to = op->to ;
@@ -802,21 +802,21 @@ static int mfsc_istatus(MFSC *op,MFSC_STATUS *statp) noex {
 	                    }
 	                }
 	            } else if (isBadRecv(rs)) {
-	                op->f.srv = FALSE ;
+	                op->fl.srv = FALSE ;
 	                rs = SR_OK ;
 	            } /* end if (uc_recve) */
 #if	CF_DEBUGS
 	            debugprintf("mfsc_istatus: recv-out rs=%d\n",rs) ;
 #endif
 	        } else if (isBadSend(rs)) {
-	            op->f.srv = FALSE ;
+	            op->fl.srv = FALSE ;
 	            rs = SR_OK ;
 	        } /* end if (u_send) */
 #if	CF_DEBUGS
 	        debugprintf("mfsc_istatus: send-out rs=%d\n",rs) ;
 #endif
 	    } /* end if (mfsmsg_getstatus) */
-	    if (rs < 0) op->f.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
 #if	CF_DEBUGS
