@@ -27,9 +27,10 @@
 #include	<usysrets.h>
 
 
-#define	COMPARSE_MAGIC		0x77811276
-#define	COMPARSE		struct comparse_head
-#define	COMPARSE_STR		struct comparse_string
+#define	COMPARSE_MAGIC	0x77811276
+#define	COMPARSE	struct comparse_head
+#define	COMPARSE_STR	struct comparse_string
+#define	COMPARSE_DEFSZ	80
 
 
 struct comparse_string {
@@ -68,7 +69,8 @@ struct comparse_co {
 struct comparse : comparse_head {
 	comparse_co	finish ;
 	comparse() noex {
-	    finish(this,comparsemem_finish) ;
+	    finish	(this,comparsemem_finish) ;
+	    magic = 0 ;
 	} ;
 	comparse(const comparse &) = delete ;
 	comparse &operator = (const comparse &) = delete ;
@@ -76,8 +78,8 @@ struct comparse : comparse_head {
 	int getval(cchar **) noex ;
 	int getcom(cchar **) noex ;
 	void dtor() noex ;
-	~comparse() {
-	    dtor() ;
+	destruct comparse() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (comparse) */
 #else	/* __cplusplus */
