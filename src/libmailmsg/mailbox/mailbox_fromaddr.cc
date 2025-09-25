@@ -45,7 +45,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<dater.h>
@@ -64,10 +63,13 @@
 
 /* local defines */
 
-#define	MMF	MAILMSGFROM
+#define	MB	mailbox
+#define	MMF	mailmsgfrom
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -88,23 +90,23 @@ extern "C" {
 
 /* forward references */
 
-static int mailbox_proc(mailbox *,dater *,MMF *,bfile *,int) noex ;
+local int mailbox_proc(mailbox *,dater *,MMF *,bfile *,int) noex ;
 
-static int mailmsg_msgfrom(mailmsg *,MMF *) noex ;
-static int mailmsg_msgtime(mailmsg *,dater *,time_t *) noex ;
-static int mailmsg_hdrtime(mailmsg *,dater *,time_t *) noex ;
-static int mailmsg_envtime(mailmsg *,dater *,time_t *) noex ;
+local int mailmsg_msgfrom(mailmsg *,MMF *) noex ;
+local int mailmsg_msgtime(mailmsg *,dater *,time_t *) noex ;
+local int mailmsg_hdrtime(mailmsg *,dater *,time_t *) noex ;
+local int mailmsg_envtime(mailmsg *,dater *,time_t *) noex ;
 
-static int	isNoMsg(int) noex ;
+local bool isNoMsg(int) noex ;
 
 
 /* local variables */
 
-static constexpr int	rsnomsg[] = {
+constexpr int	rsnomsg[] = {
 	SR_NOMSG,
 	SR_NOENT,
 	0
-} ;
+} ; /* end array (rsnomsg) */
 
 
 /* exported variables */
@@ -142,7 +144,7 @@ int mailbox_fromaddr(mailbox *mbp,dater *dp,MMF *fip,cchar *mfn) noex {
 
 /* local subroutines */
 
-static int mailbox_proc(mailbox *mbp,dater *dp,MMF *fip,
+local int mailbox_proc(mailbox *mbp,dater *dp,MMF *fip,
 		 bfile *mfp,int mi) noex {
 	mailbox_mi	*mip{} ;
 	int		rs ;
@@ -151,8 +153,7 @@ static int mailbox_proc(mailbox *mbp,dater *dp,MMF *fip,
 	if ((rs = mailbox_msgret(mbp,mi,&mip)) >= 0) {
 	    const off_t		moff = mip->moff ;
 	    if ((rs = bseek(mfp,moff,SEEK_SET)) >= 0) {
-		mailmsg		m ;
-		if ((rs = mailmsg_start(&m)) >= 0) {
+		if (mailmsg m ; (rs = mailmsg_start(&m)) >= 0) {
 		    if ((rs = mailmsg_loadfile(&m,mfp)) >= 0) {
 			time_t	t ;
 			if ((rs = mailmsg_msgtime(&m,dp,&t)) > 0) {
@@ -171,49 +172,52 @@ static int mailbox_proc(mailbox *mbp,dater *dp,MMF *fip,
 }
 /* end subroutine (mailbox_proc) */
 
-static int mailmsg_msgfrom(mailmsg *mmp,MMF *fip) noex {
-	int		rs ;
-	int		vl ;
-	int		len = 0 ;
-	cchar		*hn = HN_FROM ;
-	cchar		*vp ;
-	if ((rs = mailmsg_hdrival(mmp,hn,0,&vp)) > 0) {
-	    vl = rs ;
-	} else if ((rs == 0) || isNoMsg(rs)) {
-	    hn = HN_RETURNPATH ;
-	    if ((rs = mailmsg_hdrival(mmp,hn,0,&vp)) > 0) {
-	        vl = rs ;
-	    } else if ((rs == 0) || isNoMsg(rs)) {
-	        hn = HN_REPLYTO ;
-	        if ((rs = mailmsg_hdrival(mmp,hn,0,&vp)) > 0) {
-	            vl = rs ;
-	        } else if ((rs == 0) || isNoMsg(rs)) {
-	            hn = HN_SENDER ;
-	            if ((rs = mailmsg_hdrival(mmp,hn,0,&vp)) > 0) {
-	                vl = rs ;
-	            } else if ((rs == 0) || isNoMsg(rs)) {
-	                rs = mailmsg_envaddress(mmp,0,&vp) ;
-	                vl = rs ;
-		    }
-		}
+static cpcchar	hnames[] = {
+    	HN_FROM,
+	HN_RETURNPATH,
+	HN_REPLYTO,
+	HN_SENDER
+} ; /* end arraya (hnames) */
+
+local int mailmsg_hdrfrom(mailmsg *mmp,cchar **rpp) noex {
+    	int		rs ;
+	int		rl = 0 ; /* return-value */
+	for (cauto &hn : hnames) {
+	    if ((rs = mailmsg_hdrival(mmp,hn,0,rpp)) >= 0) {
+	        rl = rs ;
+	    } else if (isNoMsg(rs)) {
+		rs = SR_OK ;
 	    }
-	}
-	if ((rs >= 0) && (vl > 0)) {
-	    cint	rlen = vl ;
-	    char	*rbuf ;
-	    if ((rs = uc_malloc((rlen+1),&rbuf)) >= 0) {
-		if ((rs = mkaddrfrom(rbuf,rlen,vp,vl)) >= 0) {
+	    if (rs != 0) break ;
+	} /* end for */
+	if (rs == 0) {
+	    rs = mailmsg_envaddress(mmp,0,rpp) ;
+	    rl = rs ;
+	} /* end if (empty so far) */
+	return (rs >= 0) ? rl : rs ;
+} /* end subroutine (mailmsg_hdrfrom) */
+
+local int mailmsg_msgfrom(mailmsg *mmp,MMF *fip) noex {
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
+	if (cc *valp ; (rs = mailmsg_hdrfrom(mmp,&valp)) > 0) {
+	    cint	vall = rs ;
+	    if (char *rbuf ; (rs = libmem.mall((vall + 1),&rbuf)) >= 0) {
+		cint rlen = vall ;
+		if ((rs = mkaddrfrom(rbuf,rlen,valp,vall)) >= 0) {
 	            rs = mailmsgfrom_loadfrom(fip,rbuf,rs) ;
 		    len = rs ;
-		}
-		uc_free(rbuf) ;
+		} /* end if (mkaddrfree) */
+		rs1 = libmem.free(rbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory-allocation) */
 	} /* end if (ok) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mailmsg_msgfrom) */
 
-static int mailmsg_msgtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
+local int mailmsg_msgtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 	int		rs ;
 	if ((rs = mailmsg_hdrtime(mmp,dp,tp)) == 0) {
 	    rs = mailmsg_envtime(mmp,dp,tp) ;
@@ -222,12 +226,11 @@ static int mailmsg_msgtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 }
 /* end subroutine (mailmsg_msgtime) */
 
-static int mailmsg_hdrtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
+local int mailmsg_hdrtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 	int		rs ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	cchar		*hn = HN_FROM ;
-	cchar		*vp ;
-	if ((rs = mailmsg_hdrval(mmp,hn,&vp)) > 0) {
+	if (cchar *vp ; (rs = mailmsg_hdrval(mmp,hn,&vp)) > 0) {
 	    if ((rs = dater_setmsg(dp,vp,rs)) >= 0) {
 		f = true ;
 		rs = dater_gettime(dp,tp) ;
@@ -241,11 +244,10 @@ static int mailmsg_hdrtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 }
 /* end subroutine (mailmsg_hdrtime) */
 
-static int mailmsg_envtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
+local int mailmsg_envtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 	int		rs ;
-	int		f = false ;
-	cchar		*vp{} ;
-	if ((rs = mailmsg_envdate(mmp,0,&vp)) >= 0) {
+	int		f = false ; /* return-value */
+	if (cchar *vp{} ; (rs = mailmsg_envdate(mmp,0,&vp)) >= 0) {
 	    if ((rs = dater_setstd(dp,vp,rs)) >= 0) {
 		f = true ;
 		rs = dater_gettime(dp,tp) ;
@@ -259,7 +261,7 @@ static int mailmsg_envtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 }
 /* end subroutine (mailmsg_envtime) */
 
-static int isNoMsg(int rs) noex {
+local bool isNoMsg(int rs) noex {
 	return isOneOf(rsnomsg,rs) ;
 }
 /* end subroutine (isNoMsg) */
