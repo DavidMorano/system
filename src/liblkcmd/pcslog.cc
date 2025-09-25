@@ -93,7 +93,7 @@ int logbegin(PROGINFO *pip,USERINFO *uip)
 	debugprintf("logbegin: ent\n") ;
 #endif
 
-	if (pip->f.logprog) {
+	if (pip->fl.logprog) {
 	    rs = proglog_begin(pip,uip) ;
 	} /* end if (logging specified) */
 
@@ -288,7 +288,7 @@ int loginfo(PROGINFO *pip)
 	        proglog_printf(pip,"pid=%s",pip->pidfname) ;
 	    }
 
-	    if (pip->f.daemon) {
+	    if (pip->fl.daemon) {
 		const int	v = pip->pid ;
 	        proglog_printf(pip,"daemon pid=%u",v) ;
 	    }
