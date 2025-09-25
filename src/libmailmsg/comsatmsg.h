@@ -60,16 +60,17 @@ struct comsatmsg : comsatmsg_head {
 	comsatmsg_co	start ;
 	comsatmsg_co	finish ;
 	comsatmsg() noex {
-	    start(this,comsatmsgmem_start) ;
-	    finish(this,comsatmsgmem_finish) ;
+	    start	(this,comsatmsgmem_start) ;
+	    finish	(this,comsatmsgmem_finish) ;
+	    a = nullptr ;
 	} ;
 	comsatmsg(const comsatmsg &) = delete ;
 	comsatmsg &operator = (const comsatmsg &) = delete ;
 	int rd(char *,int) noex ;
 	int wr(cchar *,int = -1) noex ;
 	void dtor() noex ;
-	~comsatmsg() {
-	    dtor() ;
+	destruct comsatmsg() {
+	    if (a) dtor() ;
 	} ;
 } ; /* end struct (comsatmsg) */
 #else	/* __cplusplus */
