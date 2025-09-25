@@ -151,7 +151,7 @@ int daytime_start(DT *op,cc *pr,SREQ *jep,mv argv,mv envv) noex {
 	            pthread_t	tid ;
 	            thrsub_f	thr = (thrsub_f) daytime_worker ;
 	            if ((rs = uptcreate(&tid,nullptr,thr,op)) >= 0) {
-	                op->f.working = true ;
+	                op->fl.working = true ;
 	                op->tid = tid ;
 	                op->magic = DAYTIME_MAGIC ;
 	            }
@@ -172,16 +172,16 @@ int daytime_finish(DT *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = daytime_magic(op)) >= 0) {
-	    if (op->f.working) {
+	    if (op->fl.working) {
 		if ((rs = ucpid) >= 0) {
 	            if (rs == op->pid) {
 	                int	rst{} ;
-	                op->f.working = false ;
+	                op->fl.working = false ;
 	                rs1 = uptjoin(op->tid,&rst) ;
 	                if (rs >= 0) rs = rs1 ;
 	                if (rs >= 0) rs = rst ;
 	            } else {
-	                op->f.working = false ;
+	                op->fl.working = false ;
 	                op->tid = 0 ;
 	            }
 		} /* end if (ucpid) */
@@ -201,19 +201,19 @@ int daytime_check(DT *op) noex {
 	int		rs1 ;
 	int		f = false ;
 	if ((rs = daytime_magic(op)) >= 0) {
-	    if (op->f.working) {
+	    if (op->fl.working) {
 	        const pid_t		pid = getpid() ;
 	        if (pid == op->pid) {
 	            if (op->f_exiting) {
 	                int		rst = 0 ;
-	            	op->f.working = false ;
+	            	op->fl.working = false ;
 	                rs1 = uptjoin(op->tid,&rst) ;
 	                if (rs >= 0) rs = rs1 ;
 	                if (rs >= 0) rs = rst ;
 	                f = true ;
 	            }
 	        } else {
-	            op->f.working = false ;
+	            op->fl.working = false ;
 	        }
 	    } else {
 	        f = true ;
@@ -242,12 +242,12 @@ static int daytime_argsbegin(DT *op,cchar **argv) noex {
 	cint		ss = DAYTIME_CSIZE ;
 	int		rs ;
 	if ((rs = vecpstr_start(alp,5,0,ss)) >= 0) {
-	    op->f.args = true ;
+	    op->fl.args = true ;
 	    for (int i = 0 ; (rs >= 0) && (argv[i] != nullptr) ; i += 1) {
 	        rs = vecpstr_add(alp,argv[i],-1) ;
 	    }
 	    if (rs < 0) {
-	        op->f.args = false ;
+	        op->fl.args = false ;
 	        vecpstr_finish(alp) ;
 	    }
 	} /* end if (m-a) */
@@ -258,7 +258,7 @@ static int daytime_argsbegin(DT *op,cchar **argv) noex {
 static int daytime_argsend(DT *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.args) {
+	if (op->fl.args) {
 	    vecpstr	*alp = &op->args ;
 	    rs1 = vecpstr_finish(alp) ;
 	    if (rs >= 0) rs = rs1 ;
