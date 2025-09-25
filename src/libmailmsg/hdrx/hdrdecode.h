@@ -47,7 +47,7 @@ struct hdrdecode_head {
 	qpdecoder	*qpp ;
 	chartrans	*ctp ;
 	cchar		*pr ;
-	HDRDECODE_FL	f ;
+	HDRDECODE_FL	fl ;
 	uint		magic ;
 	char		cs[HDRDECODE_CSLEN+1] ;
 } ;
