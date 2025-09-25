@@ -43,7 +43,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<dater.h>
 #include	<localmisc.h>
@@ -66,6 +65,9 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 
@@ -81,7 +83,7 @@ int mailmsg_envtimes(mailmsg *op,dater *dp,time_t *ta,int nents) noex {
 	int		rs ;
 	int		n = 0 ;
 	if ((rs = mailmsg_magic(op,dp,ta)) >= 0) {
-	    auto	mef = mailmsg_envdate ;
+	    cauto	mef = mailmsg_envdate ;
 	    cchar	*cp ;
 	    for (int i = 0 ; (rs = mef(op,i,&cp)) >= 0 ; i += 1) {
 	        if (cp && (cp[0] != '\0')) {
