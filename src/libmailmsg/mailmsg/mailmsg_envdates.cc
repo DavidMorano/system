@@ -71,27 +71,27 @@
 int mailmsg_envdates(mailmsg *op,TIMEB *nowp,char *zname,time_t *rp) noex {
 	int		rs ;
 	int		rs1 ;
-	int		n = 0 ;
+	int		n = 0 ; /* return-value */
 	if ((rs = mailmsg_magic(op,nowp,zname,rp)) >= 0) {
 	    if (dater d ; (rs = dater_start(&d,nowp,zname,-1)) >= 0) {
-	        auto	mef = mailmsg_envdate ;
-	        time_t	envtime ;
+	        cauto	mef = mailmsg_envdate ;
 	        time_t	posttime = 0 ;
 	        cchar	*sp ;
 	        for (int i = 0 ; (rs = mef(op,i,&sp)) >= 0 ; i += 1) {
 	            if (sp) {
-		        cint	sl = rs ;
-	                if (sl > 0) {
+		        if (cint sl = rs ; sl > 0) {
 	                    if ((rs = dater_setstd(&d,sp,sl)) >= 0) {
-	                        dater_gettime(&d,&envtime) ;
-	                        n += 1 ;
-	                        if (posttime != 0) {
-	                            if (envtime < posttime) {
+	                        time_t envtime ; 
+				if ((rs = dater_gettime(&d,&envtime)) >= 0) {
+	                            n += 1 ;
+	                            if (posttime != 0) {
+	                                if (envtime < posttime) {
+	                                    posttime = envtime ;
+				        }
+	                            } else {
 	                                posttime = envtime ;
-				    }
-	                        } else {
-	                            posttime = envtime ;
-			        }
+			            }
+				} /* end if (dater_gettime) */
 	                    } /* end if (had a good date) */
 	                } /* end if (we got a good date) */
 		    } /* end if (non-null) */
