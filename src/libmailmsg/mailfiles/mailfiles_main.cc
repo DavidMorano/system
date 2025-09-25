@@ -35,7 +35,6 @@
 #include	<new>			/* |nothrow(3C++)| */
 #include	<usystem.h>
 #include	<vecobj.h>
-#include	<mallocstuff.h>
 #include	<strwcpy.h>
 #include	<strn.h>
 #include	<sfx.h>
@@ -44,7 +43,9 @@
 
 #include	"mailfiles.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -54,7 +55,7 @@ import libutil ;
 
 /* local namespaces */
 
-using std::nullptr_t ;			/* type */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -267,16 +268,17 @@ static int entry_start(MF_ENT *ep,cchar *sp,int sl) noex {
 	if (ep && sp) {
 	    memclear(ep) ;
 	    ep->f_changed = false ;
-	    if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
 	        ep->mailfname = cp ;
-		if (USTAT sb ; (rs = u_stat(cp,&sb)) >= 0) {
+		if (ustat sb ; (rs = u_stat(cp,&sb)) >= 0) {
 		    ep->lasttime = sb.st_mtime ;
 		    ep->lastsize = sb.st_size ;
 		}
 		if (rs < 0) {
-		    uc_free(ep->mailfname) ;
+		    void *vp = voidp(ep->mailfname) ;
+		    libmem.free(vp) ;
 		    ep->mailfname = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
@@ -287,7 +289,8 @@ static int entry_finish(MF_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->mailfname) {
-	    rs1 = uc_free(ep->mailfname) ;
+	    void *vp = voidp(ep->mailfname) ;
+	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->mailfname = nullptr ;
 	}
