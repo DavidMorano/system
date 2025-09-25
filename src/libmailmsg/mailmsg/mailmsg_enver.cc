@@ -29,7 +29,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<mailmsgmatenv.h>
 #include	<isoneof.h>
@@ -69,13 +68,13 @@ static inline bool	isNotField(int) noex ;
 
 /* local variables */
 
-constexpr cint		rsnofield[] = {
+constexpr int		rsnofield[] = {
 	SR_NOENT,
 	SR_NOMSG,
 	0
 } ;
 
-constexpr bool		f_direct = CF_DIRECT ;
+cbool			f_direct = CF_DIRECT ;
 
 
 /* exported variables */
@@ -96,7 +95,7 @@ int mailmsg_envget(mailmsg *op,int ei,mailmsg_envdat *mep) noex {
 	            mep->d.el = ep->d.el ;
 	            mep->r.ep = ep->r.ep ;
 	            mep->r.el = ep->r.el ;
-	        }
+	        } /* end if (vecobj_get) */
 	    } else {
 	        cchar	*sp{} ;
 	        if ((rs = mailmsg_envaddress(op,ei,&sp)) >= 0) {
