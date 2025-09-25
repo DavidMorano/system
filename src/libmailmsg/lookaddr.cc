@@ -66,7 +66,9 @@
 
 #include	"lookaddr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |gelenstr(eu)| */
 
 /* local defines */
 
@@ -80,9 +82,9 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -103,9 +105,9 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static int lookaddr_ctor(lookaddr *op,Args ... args) noex {
     	LOOKADDR	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    cnullptr	np{} ;
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->svp = new(nothrow) vecstr) != np) {
@@ -181,7 +183,7 @@ constexpr cpcchar	sched3[] = {
 int lookaddr_start(LA *op,cchar *pr,cchar *sn) noex {
 	int		rs ;
 	if ((rs = lookaddr_ctor(op,pr,sn)) >= 0) {
-	    if (char *pb{} ; (rs = malloc_mp(&pb)) >= 0) {
+	    if (char *pb ; (rs = malloc_mp(&pb)) >= 0) {
 	        cint	vn = 2 ;
 	        cint	vo = 0 ;
 	    	op->pbuf = pb ;
@@ -195,7 +197,8 @@ int lookaddr_start(LA *op,cchar *pr,cchar *sn) noex {
 	            }
 	        } /* end if (vecstr_start) */
 	        if (rs < 0) {
-		    uc_free(op->pbuf) ;
+		    void *vp = voidp(op->pbuf) ;
+		    malloc_free(vp) ;
 		    op->pbuf = nullptr ;
 		}
 	    } /* end if (memory-allocation) */
@@ -226,7 +229,7 @@ int lookaddr_finish(LA *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->pbuf) {
-		rs1 = uc_free(op->pbuf) ;
+		rs1 = malloc_free(op->pbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 		op->pbuf = nullptr ;
 		op->plen = 0 ;
@@ -249,11 +252,11 @@ int lookaddr_userbegin(LA *op,LA_US *up,cchar *un) noex {
 	    memclear(up) ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
 	        cint	hl = rs ;
-	        if (USTAT sb ; (rs = uc_stat(hbuf,&sb)) >= 0) {
+	        if (ustat sb ; (rs = uc_stat(hbuf,&sb)) >= 0) {
 	            if (S_ISDIR(sb.st_mode)) {
 	                if ((rs = perm(hbuf,-1,-1,nullptr,X_OK)) >= 0) {
 	                    cchar	*cp ;
-	                    if ((rs = uc_mallocstrw(hbuf,hl,&cp)) >= 0) {
+	                    if ((rs = libmem.strw(hbuf,hl,&cp)) >= 0) {
 	                        up->dname = cp ;
 	                    }
 	                } else if (isNotPresent(rs)) {
@@ -294,7 +297,8 @@ int lookaddr_userend(LA *op,LA_US *up) noex {
 	            up->open.ubl = false ;
 	        }
 	        if (up->dname) {
-	            rs1 = uc_free(up->dname) ;
+		    void *vp = voidp(up->dname) ;
+	            rs1 = libmem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            up->dname = nullptr ;
 	        }
