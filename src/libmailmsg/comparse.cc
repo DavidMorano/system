@@ -10,7 +10,9 @@
 
 	= 2004-05-29, David A­D­ Morano
 	This code was adapted from the EMA (E-Mail Address) code
-	(which has code that does a similar function).
+	(which has code that does a similar function).  Both the
+	EMA code and this code were based on previous code I wrote
+	for PCS-mailer address parsing back around 1992 or so.
 
 */
 
@@ -35,22 +37,29 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<ascii.h>
 #include	<buffer.h>
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<mkchar.h>
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
 #include	"comparse.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
-#define	COMPARSE_DEFSIZE	80
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -73,7 +82,7 @@ namespace {
 	int		mailcommlen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -104,25 +113,26 @@ static vars		var ;
 
 /* exported subroutines */
 
-int comparse_start(comparse *op,cchar *sp,int sl) noex {
+int comparse_start(comparse *op,cchar *sp,int µsl) noex {
     	COMPARSE	*hop = op ;
 	int		rs = SR_FAULT ;
 	int		vl = 0 ;
 	if (op && sp) {
 	    static cint		rsv = var ;
 	    memclear(hop) ;
-	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rs = rsv) >= 0) {
-		op->mailaddrlen = var.mailaddrlen ;
-		op->mailcommlen = var.mailcommlen ;
-	        while ((sl > 0) && chiswh(*sp)) {
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        if ((rs = comparse_bake(op,sp,sl)) >= 0) {
-	            vl = rs ;
-	            op->magic = COMPARSE_MAGIC ;
-	        }
+		if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+		    op->mailaddrlen = var.mailaddrlen ;
+		    op->mailcommlen = var.mailcommlen ;
+	            while ((sl > 0) && chiswh(*sp)) {
+	                sp += 1 ;
+	                sl -= 1 ;
+	            }
+	            if ((rs = comparse_bake(op,sp,sl)) >= 0) {
+	                vl = rs ;
+	                op->magic = COMPARSE_MAGIC ;
+	            } /* end if (comparse_bake) */
+		} /* end if (getlenstr) */
 	    } /* end if (vars) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
@@ -134,12 +144,14 @@ int comparse_finish(comparse *op) noex {
 	int		rs1 ;
 	if ((rs = comparse_magic(op)) >= 0) {
 	    if (op->val.sp) {
-	        rs1 = uc_free(op->val.sp) ;
+		void *vp = voidp(op->val.sp) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->val.sp = nullptr ;
 	    }
 	    if (op->com.sp) {
-	        rs1 = uc_free(op->com.sp) ;
+		void *vp = voidp(op->com.sp) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->com.sp = nullptr ;
 	    }
@@ -175,7 +187,7 @@ int comparse_getcom(comparse *op,cchar **rpp) noex {
 int comparse_bake(comparse *op,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
 	buffer		as[state_overlast] ;
-	cint		defsize = COMPARSE_DEFSIZE ;
+	cint		defsz = COMPARSE_DEFSZ ;
 	int		rs ;
 	int		rs1 ;
 	int		vl = 0 ;
@@ -183,26 +195,25 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	    sp += 1 ;
 	    sl -= 1 ;
 	}
-	if ((rs = buffer_start(&as[0],defsize)) >= 0) {
-	    if ((rs = buffer_start(&as[1],defsize)) >= 0) {
+	if ((rs = buffer_start(&as[0],defsz)) >= 0) {
+	    if ((rs = buffer_start(&as[1],defsz)) >= 0) {
 	        int	pstate = state_value ;
 	        int	state = state_value ;
 		int	pc ;
 	        int	c_comment = 0 ;
 		bool	f_quote = false ;
 	        while ((sl != 0) && (*sp != '\0')) {
-	            cint	ch = mkchar(*sp) ;
-	            switch (ch) {
-	            case '\\':
+	            switch (cint ch = mkchar(*sp) ; ch) {
+	            case CH_BSLASH:
 	                if (f_quote) {
 	                    sp += 1 ;
 	                    sl -= 1 ;
 	                    if ((sl > 0) && (sp[0] != '\0')) {
-	                        buffer_chr((as + state),*sp++) ;
+	                        rs = buffer_chr((as + state),*sp++) ;
 	                        sl -= 1 ;
 	                    }
 	                } else {
-	                    buffer_chr((as + state),*sp++) ;
+	                    rs = buffer_chr((as + state),*sp++) ;
 	                    sl -= 1 ;
 	                }
 	                break ;
@@ -227,12 +238,12 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	                        sp += 1 ;
 	                        sl -= 1 ;
 	                    } else {
-	                        buffer_chr((as + state),*sp++) ;
+	                        rs = buffer_chr((as + state),*sp++) ;
 	                        sl -= 1 ;
 	                    }
 	                    c_comment += 1 ;
 	                } else {
-	                    buffer_chr((as + state),*sp++) ;
+	                    rs = buffer_chr((as + state),*sp++) ;
 	                    sl -= 1 ;
 	                }
 	                break ;
@@ -244,16 +255,16 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	                        sp += 1 ;
 	                        sl -= 1 ;
 	                    } else {
-	                        buffer_chr((as + state),*sp++) ;
+	                        rs = buffer_chr((as + state),*sp++) ;
 	                        sl -= 1 ;
 	                    }
 	                } else {
-	                    buffer_chr((as + state),*sp++) ;
+	                    rs = buffer_chr((as + state),*sp++) ;
 	                    sl -= 1 ;
 	                }
 	                break ;
-	            case ' ':
-	            case '\t':
+	            case CH_SP:
+	            case CH_TAB:
 	                if (! f_quote) {
 			    if ((rs = buffer_get((as+state),np)) >= 0) {
 	                        cint	cl = rs ;
@@ -269,13 +280,14 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 			/* FALLTHROUGH */
 	            default:
 	                if (c_comment > 0) {
-	                    buffer_chr((as + state_comment),*sp++) ;
+	                    rs = buffer_chr((as + state_comment),*sp++) ;
 	                } else {
-	                    buffer_chr((as + state),*sp++) ;
+	                    rs = buffer_chr((as + state),*sp++) ;
 			}
 	                sl -= 1 ;
 	                break ;
 	            } /* end switch */
+		    if (rs < 0) break ;
 	        } /* end while (scanning characters) */
 	        if (rs >= 0) {
 	            int		w = state_comment ;
@@ -284,7 +296,7 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	                while (bl && chiswh(bp[bl-1])) {
 			    bl -= 1 ;
 			}
-	                if (cchar *cp ; (rs = uc_mallocstrw(bp,bl,&cp)) >= 0) {
+	                if (cchar *cp ; (rs = libmem.strw(bp,bl,&cp)) >= 0) {
 	                    op->com.sp = cp ;
 	                    op->com.sl = bl ;
 	                    w = state_value ;
@@ -293,15 +305,16 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	                        while (bl && chiswh(bp[bl-1])) {
 				    bl -= 1 ;
 				}
-	                        if ((rs = uc_mallocstrw(bp,bl,&cp)) >= 0) {
+	                        if ((rs = libmem.strw(bp,bl,&cp)) >= 0) {
 	                            op->val.sp = cp ;
 	                            op->val.sl = bl ;
 	                        } /* end if (memory-allocation) */
 	                    } /* end if (buffer_get) */
 	                    if (rs < 0) {
-	                        uc_free(op->com.sp) ;
+				void *vp = voidp(op->com.sp) ;
+	                        libmem.free(vp) ;
 	                        op->com.sp = nullptr ;
-	                    }
+	                    } /* end if (error) */
 	                } /* end if (memory-allocation) */
 	            } /* end if (buffer_get) */
 	        } /* end if (finishing-up) */
