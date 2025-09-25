@@ -102,7 +102,7 @@ struct mailalias_head {
 	time_t		ti_fileold ;
 	size_t		mapsize ;
 	MAILALIAS_FI	fi ;
-	MAILALIAS_FL	f ;
+	MAILALIAS_FL	fl ;
 	uint		magic ;
 	int		pagesize ;
 	int		sklen ;
