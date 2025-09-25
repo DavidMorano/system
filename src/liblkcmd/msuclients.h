@@ -1,4 +1,9 @@
-/* msuclients */
+/* msuclients HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* object to interact with the MSU server */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,30 +16,26 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MSUCLIENTS_INCLUDE
-#define	MSUCLIENTS_INCLUDE	1
+#define	MSUCLIENTS_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sockaddress.h>
-#include	<localmisc.h>
 
 
 #define	MSUCLIENTS_MAGIC	0x58261221
 #define	MSUCLIENTS		struct msuclients_head
-#define	MSUCLIENTS_OBJ		struct msuclients_obj
-#define	MSUCLIENTS_DATA		struct msuclients_d
 #define	MSUCLIENTS_FL		struct msuclients_flags
+#define	MSUCLIENTS_OBJ		struct msuclients_object
+#define	MSUCLIENTS_DA		struct msuclients_data
 
 
-struct msuclients_obj {
+struct msuclients_object {
 	char		*name ;
 	uint		objsize ;
 } ;
 
-struct msuclients_d {
+struct msuclients_data {
 	uint		pid ;		/* server PID */
 	uint		utime ;		/* last update time */
 	uint		btime ;		/* SYSMISC boot-time */
@@ -48,36 +49,33 @@ struct msuclients_flags {
 } ;
 
 struct msuclients_head {
-	ulong		magic ;
-	const char	*pr ;
-	const char	*tmpourdname ;
-	const char	*clientfname ;
-	const char	*reqfname ;
-	MSUCLIENTS_FL	f ;
+	cchar		*pr ;
+	cchar		*tmpourdname ;
+	cchar		*clientfname ;
+	cchar		*reqfname ;
 	SOCKADDRESS	srv ;		/* server address */
 	time_t		dt ;
+	MSUCLIENTS_FL	fl ;
+	uint		magic ;
 	int		srvlen ;	/* server address length */
 	int		fd ;
 	int		to ;
 } ;
 
+typedef	MSUCLIENTS	msuclients ;
+typedef	MSUCLIENTS_FL	msuclients_fl ;
+typedef	MSUCLIENTS_OBJ	msuclients_obj ;
+typedef	MSUCLIENTS_DA	msuclients_da ;
 
-#if	(! defined(MSUCLIENTS_MASTER)) || (MSUCLIENTS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	msuclients_open(msuclients *,cchar *,cchar *,int) noex ;
+extern int	msuclients_status(msuclients *) noex ;
+extern int	msuclients_get(msuclients *,time_t,msucliens_da *) noex ;
+extern int	msuclients_close(msuclients *) noex ;
 
-extern int	msuclients_open(MSUCLIENTS *,cchar *,cchar *,int) ;
-extern int	msuclients_status(MSUCLIENTS *) ;
-extern int	msuclients_get(MSUCLIENTS *,time_t,MSUCLIENTS_DATA *) ;
-extern int	msuclients_close(MSUCLIENTS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* MSUCLIENTS_MASTER */
 
 #endif /* MSUCLIENTS_INCLUDE */
 
