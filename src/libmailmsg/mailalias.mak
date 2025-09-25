@@ -35,7 +35,20 @@ DEFS +=
 
 INCS += mailalias.h mailaliashdr.h
 
+MODS +=
+
 LIBS +=
+
+
+OBJ0_MAILALIAS= mailalias_obj.o
+OBJ1_MAILALIAS= dbmake.o
+OBJ2_MAILALIAS= 
+OBJ3_MAILALIAS= 
+
+OBJA_MAILALIAS= obj0.o obj1.o
+OBJB_MAILALIAS= obj2.o obj3.o
+
+OBJ_MAILALIAS= obja.o
 
 
 INCDIRS=
@@ -54,19 +67,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_MAILALIAS= mailalias_obj.o
-OBJ1_MAILALIAS= dbmake.o
-OBJ2_MAILALIAS= 
-OBJ3_MAILALIAS= 
-OBJ4_MAILALIAS= 
-
-OBJA_MAILALIAS= obj0.o obj1.o
-OBJB_MAILALIAS= obj2.o obj3.o obj4.o
-
-OBJ_MAILALIAS= obja.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -79,6 +80,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -113,26 +117,23 @@ control:
 
 
 obj0.o:			$(OBJ0_MAILALIAS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1_MAILALIAS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2_MAILALIAS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3_MAILALIAS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_MAILALIAS)
-
-obj4.o:			$(OBJ4_MAILALIAS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA_MAILALIAS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB_MAILALIAS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_MAILALIAS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 mailalias_obj.o:	mailalias_obj.cc	$(INCS) dbmake.hh
