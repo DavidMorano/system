@@ -51,7 +51,7 @@
 struct mailbox_information {
 	int		nmsgs ;			/* messages total */
 	int		nclens ;		/* messages with CLENs */
-} ;
+} ; /* end struct (mailbox_information) */
 
 struct mailbox_flags {
 	uint		readlock:1 ;
@@ -60,14 +60,14 @@ struct mailbox_flags {
 	uint		useclen:1 ;
 	uint		useclines:1 ;
 	uint		rewrite:1 ;
-} ;
+} ; /* end struct (mailbox_flags) */
 
 struct mailbox_head {
 	vecobj		*mlp ;		/* Message-List-Pointer */
 	cchar		*mailfname ;	/* allocated */
 	time_t		ti_mod ;	/* modification time */
 	time_t		ti_check ;	/* check time */
-	MAILBOX_FL	f ;
+	MAILBOX_FL	fl ;
 	uint		magic ;
 	int		pagesize ;
 	int		mfd ;		/* mail file-descriptor */
@@ -78,7 +78,7 @@ struct mailbox_head {
 	int		to_lock ;	/* lock timeout */
 	int		to_read ;	/* read timeout */
 	int		mflags ;	/* open-flags */
-} ;
+} ; /* end struct (mailbox_head) */
 
 struct mailbox_msgflags {
 	uint		env:1 ;		/* had an environment marker */
@@ -96,15 +96,16 @@ struct mailbox_msgflags {
 	uint		msgold:1 ;	/* unused: message is 'old' */
 	uint		msgdel:1 ;	/* marked for deletion */
 	uint		addany:1 ;	/* anything (something) being added */
-} ;
+} ; /* end struct (mailbox_msgflags) */
 
 struct mailbox_msginfo {
 	vecstr		hdradds ;	/* HDRs to be added */
-	MAILBOX_MFL	hdr, hdrval, hdradd, f, cmd ;
 	off_t		moff ;		/* offset to start of message */
 	off_t		hoff ;		/* offset to top of headers */
 	off_t		soff ;		/* offset to semaphore */
 	off_t		boff ;		/* offset to message body */
+	MAILBOX_MFL	hdr, hdrval, hdradd, cmd ;
+	MAILBOX_MFL	fl ;
 	uint		hash[8] ;	/* ?? */
 	int		mlen ;		/* total "message" length */
 	int		hlen ;		/* total header-area length */
@@ -114,7 +115,7 @@ struct mailbox_msginfo {
 	int		lines ;		/* lines (?) */
 	int		xlines ;	/* xlines (?) */
 	int		msgi ;		/* message index */
-} ;
+} ; /* end struct (mailbox_msginfo) */
 
 struct mailbox_reader {
 	char		*rbuf ;
@@ -123,7 +124,7 @@ struct mailbox_reader {
 	off_t		roff ;		/* read offset */
 	int		rsize ;
 	int		rlen ;
-} ;
+} ; /* end struct (mailbox_reader) */
 
 #ifdef	COMMENT
 
@@ -144,7 +145,7 @@ struct mailbox_msgvalues {
 	cchar	*reply-to:	/* header "reply-to" */
 	cchar	*status ;	/* header "status" */
 	cchar	*mid ;		/* message ID "message-id" */
-} ;
+} ; /* end struct (mailbox_msgvalues) */
 
 #endif /* COMMENT */
 
@@ -163,26 +164,26 @@ typedef MAILBOX_MI		mailbox_mi ;
 
 EXTERNC_begin
 
-extern int mailbox_open(mailbox *,cchar *,int) noex ;
-extern int mailbox_getinfo(mailbox *,mailbox_info *) noex ;
-extern int mailbox_count(mailbox *) noex ;
-extern int mailbox_mbfile(mailbox *,char *,int) noex ;
-extern int mailbox_check(mailbox *,time_t) noex ;
-extern int mailbox_msgoff(mailbox *,int,off_t *) noex ;
-extern int mailbox_msgret(mailbox *,int,mailbox_mi **) noex ;
-extern int mailbox_msgdel(mailbox *,int,int) noex ;
-extern int mailbox_msghdradd(mailbox *,int,cchar *,cchar *,int) noex ;
-extern int mailbox_countdel(mailbox *) noex ;
-extern int mailbox_readbegin(mailbox *,mailbox_read *,off_t,int) noex ;
-extern int mailbox_readln(mailbox *,mailbox_read *,char *,int) noex ;
-extern int mailbox_readend(mailbox *,mailbox_read *) noex ;
-extern int mailbox_getfrom(mailbox *,char *,int,cchar *,int) noex ;
-extern int mailbox_fromaddr(mailbox *,dater *,mailmsgfrom *,cchar *) noex ;
-extern int mailbox_close(mailbox *) noex ;
+extern int mailbox_open		(mailbox *,cchar *,int) noex ;
+extern int mailbox_getinfo	(mailbox *,mailbox_info *) noex ;
+extern int mailbox_count	(mailbox *) noex ;
+extern int mailbox_mbfile	(mailbox *,char *,int) noex ;
+extern int mailbox_check	(mailbox *,time_t) noex ;
+extern int mailbox_msgoff	(mailbox *,int,off_t *) noex ;
+extern int mailbox_msgret	(mailbox *,int,mailbox_mi **) noex ;
+extern int mailbox_msgdel	(mailbox *,int,int) noex ;
+extern int mailbox_msghdradd	(mailbox *,int,cchar *,cchar *,int) noex ;
+extern int mailbox_countdel	(mailbox *) noex ;
+extern int mailbox_readbegin	(mailbox *,mailbox_read *,off_t,int) noex ;
+extern int mailbox_readln	(mailbox *,mailbox_read *,char *,int) noex ;
+extern int mailbox_readend	(mailbox *,mailbox_read *) noex ;
+extern int mailbox_getfrom	(mailbox *,char *,int,cchar *,int) noex ;
+extern int mailbox_fromaddr	(mailbox *,dater *,mailmsgfrom *,cchar *) noex ;
+extern int mailbox_close	(mailbox *) noex ;
 
 #ifdef	COMMENT
-extern int mailbox_msgread(mailbox *,int,char *,int) noex ;
-extern int mailbox_msgreadln(mailbox *,int,char *,int) noex ;
+extern int mailbox_msgread	(mailbox *,int,char *,int) noex ;
+extern int mailbox_msgreadln	(mailbox *,int,char *,int) noex ;
 #endif
 
 EXTERNC_end
