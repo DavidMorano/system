@@ -32,10 +32,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<filer.h>
@@ -47,7 +45,15 @@
 
 /* local defines */
 
-#define	ISEND(c)	(((c) == '\n') || ((c) == '\r'))
+#define	MM		mailmsg
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -61,8 +67,7 @@
 
 /* forward references */
 
-
-/* external variables */
+local int mailmsg_read(MM *op,int,off_t,char *,int) noex ;
 
 
 /* local variables */
@@ -73,34 +78,19 @@
 
 /* exported subroutines */
 
-int mailmsg_loadfd(mailmsg *op,int mfd,off_t fbo) noex {
-	cint		bsz = 2048 ;
+int mailmsg_loadfd(MM *op,int mfd,off_t fbo) noex {
 	int		rs ;
 	int		rs1 ;
-	int		tlen = 0 ;
+	int		tlen = 0 ; /* return-value */
 	if ((rs = mailmsg_magic(op)) >= 0) {
 	    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
 		cint	llen = (rs * MAILMSG_MF) ;
-		if (char *lbuf{} ; (rs = uc_malloc((llen+1),&lbuf)) >= 0) {
-	    	    cchar	*lp = lbuf ;
-		    if (filer b ; (rs = b.start(mfd,fbo,bsz,0)) >= 0) {
-			int	line = 0 ;
-	                while ((rs = b.readln(lbuf,llen,-1)) > 0) {
-	                    int		ll = rs ;
-	                    tlen += ll ;
-	                    while ((ll > 0) && ISEND(lbuf[0])) {
-	                        ll -= 1 ;
-		            }
-	                    if ((ll > 0) || (line > 0)) {
-	                        line += 1 ;
-	                        rs = mailmsg_loadline(op,lp,ll) ;
-	                    }
-	                    if (rs <= 0) break ;
-	                } /* end while (reading lines) */
-	                rs1 = b.finish ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (filer) */
-	    	    rs1 = uc_free(lbuf) ;
+		if (char *lbuf ; (rs = libmem.mall((llen + 1),&lbuf)) >= 0) {
+		    {
+		        rs = mailmsg_read(op,mfd,fbo,lbuf,llen) ;
+		        tlen = rs ;
+		    }
+	    	    rs1 = libmem.free(lbuf) ;
 	    	    if (rs >= 0) rs = rs1 ;
 		} /* end if (memory-allocation) */
 	    } /* end if (getbufsize) */
@@ -108,5 +98,30 @@ int mailmsg_loadfd(mailmsg *op,int mfd,off_t fbo) noex {
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (mailmsg_loadfd) */
+
+
+/* local subroutines */
+
+local int mailmsg_read(MM *op,int mfd,off_t fbo,char *lbuf,int llen) noex {
+	cint		bsz = 2048 ;
+    	int		rs ;
+	int		rs1 ;
+	int		tlen = 0 ; /* return-value */
+	cchar		*lp = lbuf ;
+	if (filer b ; (rs = b.start(mfd,fbo,bsz,0)) >= 0) {
+	    int	ln = 0 ;
+	    while ((rs = b.readln(lbuf,llen,-1)) > 0) {
+	        tlen += rs ;
+	        if (cint ll = rmeol(lbuf,rs) ; (ll > 0) || (ln > 0)) {
+	            ln += 1 ;
+	            rs = mailmsg_loadline(op,lp,ll) ;
+	        }
+	        if (rs <= 0) break ;
+	    } /* end while (reading lines) */
+	    rs1 = b.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (filer) */
+	return (rs >= 0) ? tlen : rs ;
+} /* end subroutine (mailmsg_read) */
 
 
