@@ -39,11 +39,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -98,7 +95,7 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 		cint	alen = rs ;
 	        if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
 	            mailmsg_envdat	me, *mep = &me ;
-		    auto		mef = mailmsg_envget ;
+		    cauto		mef = mailmsg_envget ;
 	            int			cl ;
 	            cchar		*cp ;
 	            for (int i = 0 ; mef(op,i,mep) >= 0 ; i += 1) {
@@ -120,7 +117,7 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 	            rs1 = b.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (sbuf) */
-	        rs1 = uc_free(abuf) ;
+	        rs1 = malloc_free(abuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory-allocation) */
 	} /* end if (magic) */
