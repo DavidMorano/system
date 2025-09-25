@@ -35,7 +35,20 @@ DEFS=
 
 INCS= mailbox.h
 
+MPDS +=
+
 LIBS=
+
+
+OBJ0_MAILBOX= mailbox_main.o
+OBJ1_MAILBOX= mailbox_fromaddr.o
+OBJ2_MAILBOX= mailbox_getfrom.o
+OBJ3_MAILBOX=
+
+OBJA_MAILBOX= obj0_mailbox.o obj1_mailbox.o
+OBJB_MAILBOX= obj2_mailbox.o
+
+OBJ_MAILBOX= $(OBJA_MAILBOX) $(OBJB_MAILBOX)
 
 
 LDRPATH= $(EXTRA)/lib
@@ -44,7 +57,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,17 +67,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_MAILBOX= mailbox_main.o
-OBJ1_MAILBOX= mailbox_fromaddr.o
-OBJ2_MAILBOX= mailbox_getfrom.o
-
-OBJA_MAILBOX= obj0_mailbox.o obj1_mailbox.o
-OBJB_MAILBOX= obj2_mailbox.o
-
-OBJ_MAILBOX= $(OBJA_MAILBOX) $(OBJB_MAILBOX)
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -78,6 +80,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -98,13 +103,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_MAILBOX)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MAILBOX)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -116,14 +116,17 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_mailbox.o:	$(OBJ0_MAILBOX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_MAILBOX)
+obj0_mailbox.o:		$(OBJ0_MAILBOX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_mailbox.o:	$(OBJ1_MAILBOX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_MAILBOX)
+obj1_mailbox.o:		$(OBJ1_MAILBOX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_mailbox.o:	$(OBJ2_MAILBOX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_MAILBOX)
+obj2_mailbox.o:		$(OBJ2_MAILBOX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3_mailbox.o:		$(OBJ3_MAILBOX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 mailbox_main.o:		mailbox_main.cc		$(INCS)
