@@ -45,11 +45,9 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<bfile.h>
-#include	<estrings.h>
 #include	<rmx.h>
 #include	<localmisc.h>
 
@@ -57,6 +55,14 @@
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -82,23 +88,21 @@
 int mailmsg_loadfile(mailmsg *op,bfile *fp) noex {
 	int		rs ;
 	int		rs1 ;
-	int		tlen = 0 ;
+	int		tlen = 0 ; /* return-value */
 	if ((rs = mailmsg_magic(op,fp)) >= 0) {
 	    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
 		cint	llen = (rs * MAILMSG_MF) ;
-		if (char *lbuf{} ; (rs = uc_malloc((llen+1),&lbuf)) >= 0) {
-	    	    int		line = 0 ;
-	    	    cchar	*lp = lbuf ;
-	    	    while ((rs = breadln(fp,lbuf,llen)) > 0) {
-	        	cint	ll = rmeol(lbuf,rs) ;
+		if (char *lbuf ; (rs = libmem.mall((llen + 1),&lbuf)) >= 0) {
+	    	    int		ln = 0 ;
+	    	    for (cc *lp = lbuf ; (rs = fp->readln(lbuf,llen)) > 0 ; ) {
 	        	tlen += rs ;
-	        	if ((ll > 0) || (line > 0)) {
-	            	    line += 1 ;
+	        	if (cint ll = rmeol(lbuf,rs) ; (ll > 0) || (ln > 0)) {
+	            	    ln += 1 ;
 	            	    rs = mailmsg_loadline(op,lp,ll) ;
 	        	}
 	        	if (rs <= 0) break ;
-	    	    } /* end while */
-	    	    rs1 = uc_free(lbuf) ;
+	    	    } /* end for */
+	    	    rs1 = libmem.free(lbuf) ;
 	    	    if (rs >= 0) rs = rs1 ;
 		} /* end if (memory-allocation) */
 	    } /* end if (getbufsize) */
