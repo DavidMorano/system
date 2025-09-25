@@ -139,7 +139,7 @@ static int	logfind(PROGINFO *) ;
 int logbegin(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
-	if (pip->f.logprog) {
+	if (pip->fl.logprog) {
 	    if ((rs = logfind(pip)) >= 0) {
 	        cchar	*li = pip->logid ;
 	        cchar	*lf = pip->lfname ;
