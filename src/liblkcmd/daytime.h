@@ -33,7 +33,6 @@
 #include	"sreq.h"
 
 
-/* object defines */
 #define	DAYTIME			struct daytime_head
 #define	DAYTIME_FL		struct daytime_flags
 #define	DAYTIME_MAGIC		0x88773424
@@ -53,7 +52,7 @@ struct daytime_head {
 	volatile int	f_exiting ;	/* thread is exiting */
 	pid_t		pid ;
 	pthread_t	tid ;
-	DAYTIME_FL	f ;
+	DAYTIME_FL	fl ;
 	uint		magic ;
 	int		ifd ;
 	int		ofd ;
