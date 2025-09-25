@@ -24,7 +24,6 @@
 #include	<vecobj.h>
 
 
-/* object defines */
 #define	CSRO_MAGIC	0x99723317
 #define	CSRO_DEFENTS	10
 #define	CSRO		struct csro_head
