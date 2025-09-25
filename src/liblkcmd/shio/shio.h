@@ -78,7 +78,7 @@ struct shio_head {
 	void		*fp ;
 	bfile		*bfp ;		/* memory-allocated */
 	cchar		*fname ;	/* memory allocated */
-	SHIO_FL		f ;
+	SHIO_FL		fl ;
 	uint		magic ;
 } ;
 
