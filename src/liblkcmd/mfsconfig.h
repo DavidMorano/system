@@ -1,4 +1,6 @@
-/* mfs-config */
+/* mfs-config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* version %I% last-modified %G% */
 
@@ -16,13 +18,11 @@
 /* Copyright © 2000,2017 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MFSCONFIG_INCLUDE
-#define	MFSCONFIG_INCLUDE	1
+#define	MFSCONFIG_INCLUDE
 
 
 #include	<envstandards.h>
-
 #include	<sys/types.h>
-
 #include	<msfile.h>
 #include	<paramfile.h>
 #include	<expcook.h>
@@ -41,26 +41,25 @@ struct config_flags {
 } ;
 
 struct config {
-	PROGINFO	*pip ;
-	CONFIG_FL	f ;
-	PARAMFILE	p ;
+	proginfo	*pip ;
+	paramfile	p ;
 	time_t		ti_lastcheck ;
+	CONFIG_FL	fl ;
 	int		intcheck ;
 } ;
 
+typedef	CONFIG		config ;
+typedef	CONFIG_FL	config_fl ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	config_start(CONFIG *,PROGINFO *,cchar *,int) ;
-extern int	config_check(CONFIG *) ;
-extern int	config_read(CONFIG *) ;
-extern int	config_finish(CONFIG *) ;
+extern int	config_start(CONFIG *,proginfo *,cchar *,int) noex ;
+extern int	config_check(CONFIG *) noex ;
+extern int	config_read(CONFIG *) noex ;
+extern int	config_finish(CONFIG *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* MFSCONFIG_INCLUDE */
 
