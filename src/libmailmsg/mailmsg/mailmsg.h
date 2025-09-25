@@ -43,26 +43,26 @@ struct mailmsg_head {
 	uint		magic ;
 	int		msgstate ;
 	int		lastname ;	/* index of last HDR-name */
-} ;
+} ; /* end if (mailmsg_head) */
 
 typedef MAILMSG		mailmsg ;
 
 EXTERNC_begin
 
-extern int mailmsg_start(mailmsg *) noex ;
-extern int mailmsg_loadmb(mailmsg *,mailbox *,off_t) noex ;
-extern int mailmsg_loadline(mailmsg *,cchar *,int) noex ;
-extern int mailmsg_envcount(mailmsg *) noex ;
-extern int mailmsg_envaddress(mailmsg *,int,cchar **) noex ;
-extern int mailmsg_envdate(mailmsg *,int,cchar **) noex ;
-extern int mailmsg_envremote(mailmsg *,int,cchar **) noex ;
-extern int mailmsg_hdrcount(mailmsg *,cchar *) noex ;
-extern int mailmsg_hdrikey(mailmsg *,int,cchar **) noex ;
-extern int mailmsg_hdriline(mailmsg *,cchar *,int,int,cchar **) noex ;
-extern int mailmsg_hdrival(mailmsg *,cchar *,int,cchar **) noex ;
-extern int mailmsg_hdrval(mailmsg *,cchar *,cchar **) noex ;
-extern int mailmsg_loadfd(mailmsg *,int,off_t) noex ;
-extern int mailmsg_finish(mailmsg *) noex ;
+extern int mailmsg_start	(mailmsg *) noex ;
+extern int mailmsg_loadmb	(mailmsg *,mailbox *,off_t) noex ;
+extern int mailmsg_loadline	(mailmsg *,cchar *,int) noex ;
+extern int mailmsg_envcount	(mailmsg *) noex ;
+extern int mailmsg_envaddress	(mailmsg *,int,cchar **) noex ;
+extern int mailmsg_envdate	(mailmsg *,int,cchar **) noex ;
+extern int mailmsg_envremote	(mailmsg *,int,cchar **) noex ;
+extern int mailmsg_hdrcount	(mailmsg *,cchar *) noex ;
+extern int mailmsg_hdrikey	(mailmsg *,int,cchar **) noex ;
+extern int mailmsg_hdriline	(mailmsg *,cchar *,int,int,cchar **) noex ;
+extern int mailmsg_hdrival	(mailmsg *,cchar *,int,cchar **) noex ;
+extern int mailmsg_hdrval	(mailmsg *,cchar *,cchar **) noex ;
+extern int mailmsg_loadfd	(mailmsg *,int,off_t) noex ;
+extern int mailmsg_finish	(mailmsg *) noex ;
 
 EXTERNC_end
 
