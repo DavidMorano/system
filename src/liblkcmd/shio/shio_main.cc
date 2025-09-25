@@ -288,7 +288,7 @@ int shio_opene(SHIO *op,cchar *fname,cchar *ms,mode_t om,int to) noex {
 
 	fni = matstr(stdfnames,fname,-1) ;
 
-	op->f.stdfname = (fni >= 0) ;
+	op->fl.stdfname = (fni >= 0) ;
 	switch (fni) {
 	case stdfname_stdin:
 	    ofname = BFILE_STDIN ;
@@ -310,14 +310,14 @@ int shio_opene(SHIO *op,cchar *fname,cchar *ms,mode_t om,int to) noex {
 	    break ;
 	case stdfname_stdnull:
 	case stdfname_oldnull:
-	    op->f.nullfile = true ;
+	    op->fl.nullfile = true ;
 	    break ;
 	default:
 	    ofname = fname ;
 	    break ;
 	} /* end switch */
 
-	if (op->f.nullfile) goto ret1 ;
+	if (op->fl.nullfile) goto ret1 ;
 
 #if	CF_SFIO
 
@@ -328,7 +328,7 @@ int shio_opene(SHIO *op,cchar *fname,cchar *ms,mode_t om,int to) noex {
 	if ((fni >= 0) && (fp != nullptr)) {
 	    int		rs1 ;
 
-	    op->f.sfio = true ;
+	    op->fl.sfio = true ;
 #if	CF_SFSWAP
 	    rs1 = sfsync(fp) ;
 	    if (rs1 >= 0) {
@@ -343,11 +343,11 @@ int shio_opene(SHIO *op,cchar *fname,cchar *ms,mode_t om,int to) noex {
 	    if (rs >= 0) {
 	        if ((rs1 = sffileno(op->fp)) >= 0) {
 	            if (isatty(rs1)) {
-	                op->f.terminal = true ;
-	                op->f.bufline = true ;
+	                op->fl.terminal = true ;
+	                op->fl.bufline = true ;
 	            }
 	        }
-	        if (op->f.bufline) {
+	        if (op->fl.bufline) {
 	            rs = shio_sfcookbegin(op) ;
 	        } /* end if (buffered) */
 	    } /* end if (ok) */
@@ -369,12 +369,12 @@ int shio_opene(SHIO *op,cchar *fname,cchar *ms,mode_t om,int to) noex {
 
 	if (rs >= 0) {
 	    rs = bcontrol(op->fp,BC_ISLINEBUF,0) ;
-	    op->f.bufline = (rs > 0) ;
+	    op->fl.bufline = (rs > 0) ;
 	}
 
 	if (rs >= 0) {
 	    rs = bcontrol(op->fp,BC_ISTERMINAL,0) ;
-	    op->f.terminal = (rs > 0) ;
+	    op->fl.terminal = (rs > 0) ;
 	}
 
 #endif /* CF_SFIO */
@@ -433,7 +433,7 @@ int shio_close(SHIO *op) noex {
 
 	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.nullfile) goto ret1 ;
+	if (op->fl.nullfile) goto ret1 ;
 
 #if	CF_SFIO
 	if (op->outstore != nullptr) {
@@ -451,7 +451,7 @@ int shio_close(SHIO *op) noex {
 #endif /* CF_STOREFNAME */
 
 #if	CF_SFIO
-	if (op->f.sfio) {
+	if (op->fl.sfio) {
 	    int	rs1 = SR_BADF ;
 	    if (op->fp != nullptr) {
 #if	CF_SFSWAP
@@ -487,12 +487,12 @@ int shio_reade(SHIO *op,void *abuf,int alen,int to,int opts) noex {
 
 	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.nullfile) goto ret0 ;
+	if (op->fl.nullfile) goto ret0 ;
 
 	if (rlen == 0) goto ret0 ;
 
 #if	CF_SFIO
-	if (op->f.sfio) {
+	if (op->fl.sfio) {
 	    Sfio_t	*fp = op->fp ;
 	    Sfio_t	*streams[2] ;
 	    time_t	ti_now = time(nullptr) ;
@@ -507,7 +507,7 @@ int shio_reade(SHIO *op,void *abuf,int alen,int to,int opts) noex {
 	        if (rs > 0) {
 	            int v = sfvalue(fp) ;
 	            if (v & SF_READ) {
-	                if (op->f.bufline || op->f.bufnone) {
+	                if (op->fl.bufline || op->fl.bufnone) {
 	                    char	*p ;
 	                    p = sfgetr(op->fp,'\n',0) ;
 	                    if (p != nullptr) {
@@ -574,10 +574,10 @@ int shio_readlinetimed(SHIO *op,char *lbuf,int llen,int to) noex {
 
 	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.nullfile) goto ret0 ;
+	if (op->fl.nullfile) goto ret0 ;
 
 #if	CF_SFIO
-	if (op->f.sfio) {
+	if (op->fl.sfio) {
 	    rl = sfreadlinetimed(op->fp,lbuf,llen,to) ;
 	    rs = (rl >= 0) ? rl : SR_HANGUP ;
 	} else {
@@ -635,13 +635,13 @@ int shio_write(SHIO *op,cvoid *lbuf,int llen) noex {
 
 	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.nullfile) {
+	if (op->fl.nullfile) {
 	    wlen = llen ;
 	    goto ret0 ;
 	}
 
 #if	CF_SFIO
-	if (op->f.sfio) {
+	if (op->fl.sfio) {
 	    if (llen < 0) llen = lenstr(lbuf) ;
 	    rs = shio_sfcheckwrite(op,lbuf,llen) ;
 	    wlen = rs ;
@@ -649,7 +649,7 @@ int shio_write(SHIO *op,cvoid *lbuf,int llen) noex {
 	    rs = bwrite(op->fp,lbuf,llen) ;
 	    wlen = rs ;
 #if	CF_FLUSHPART
-	    if ((rs >= 0) && op->f.bufline && hasnl(lbuf,llen)) {
+	    if ((rs >= 0) && op->fl.bufline && hasnl(lbuf,llen)) {
 	        rs = bflush(op->fp) ;
 	    }
 #endif
@@ -658,7 +658,7 @@ int shio_write(SHIO *op,cvoid *lbuf,int llen) noex {
 	rs = bwrite(op->fp,lbuf,llen) ;
 	wlen = rs ;
 #if	CF_FLUSHPART
-	if ((rs >= 0) && op->f.bufline && hasnl(lbuf,llen)) {
+	if ((rs >= 0) && op->fl.bufline && hasnl(lbuf,llen)) {
 	    rs = bflush(op->fp) ;
 	}
 #endif
@@ -678,10 +678,10 @@ int shio_println(SHIO *op,cchar *lbuf,int llen) noex {
 
 	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
 
-	if (! op->f.nullfile) {
+	if (! op->fl.nullfile) {
 
 #if	CF_SFIO
-	if (op->f.sfio) {
+	if (op->fl.sfio) {
 	    if (llen < 0) llen = lenstr(lbuf) ;
 	    rs = shio_shprintln(op,lbuf,llen) ;
 	    wlen += rs ;
@@ -734,22 +734,22 @@ int shio_vprintf(SHIO *op,cchar *fmt,va_list ap) noex {
 
 	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.nullfile) goto ret0 ;
+	if (op->fl.nullfile) goto ret0 ;
 
 	if ((rs = fmtstr(lbuf,llen,0,fmt,ap)) > 0) {
 	    int	len = rs ;
 
 #if	CF_SFIO
-	    if (op->f.sfio) {
+	    if (op->fl.sfio) {
 	        rs = shio_sfcheckwrite(op,lbuf,len) ;
 	        wlen = rs ;
-	        if ((rs >= 0) && op->f.bufline && hasnl(lbuf,len)) {
+	        if ((rs >= 0) && op->fl.bufline && hasnl(lbuf,len)) {
 	            sfsync(op->fp) ;
 	        }
 	    } else {
 	        if ((rs = bwrite(op->fp,lbuf,len)) >= 0) {
 	            wlen = rs ;
-	            if (op->f.bufline && hasnl(lbuf,len)) {
+	            if (op->fl.bufline && hasnl(lbuf,len)) {
 	                rs = bflush(op->fp) ;
 		    }
 	        }
@@ -757,7 +757,7 @@ int shio_vprintf(SHIO *op,cchar *fmt,va_list ap) noex {
 #else /* CF_SFIO */
 	    if ((rs = bwrite(op->fp,lbuf,len)) >= 0) {
 	        wlen = rs ;
-	        if (op->f.bufline && hasnl(lbuf,len)) {
+	        if (op->fl.bufline && hasnl(lbuf,len)) {
 	            rs = bflush(op->fp) ;
 		}
 	    }
@@ -777,22 +777,22 @@ int shio_putc(SHIO *op,int ch) noex {
 
 	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.nullfile) goto ret0 ;
+	if (op->fl.nullfile) goto ret0 ;
 
 #if	CF_SFIO
-	if (op->f.sfio) {
+	if (op->fl.sfio) {
 	    char	buf[2] ;
 	    buf[0] = ch ;
 	    rs = shio_sfcheckwrite(op,buf,1) ;
 	} else {
 	    rs = bputc(op->fp,ch) ;
-	    if ((rs >= 0) && op->f.bufline && (ch == '\n')) {
+	    if ((rs >= 0) && op->fl.bufline && (ch == '\n')) {
 	        bflush(op->fp) ;
 	    }
 	}
 #else /* CF_SFIO */
 	if ((rs = bputc(op->fp,ch)) >= 0) {
-	    if (op->f.bufline && (ch == '\n')) {
+	    if (op->fl.bufline && (ch == '\n')) {
 	        bflush(op->fp) ;
 	    }
 	}
@@ -810,10 +810,10 @@ int shio_seek(SHIO *op,off_t o,int w) noex {
 
 	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
 
-	if (op->f.nullfile) goto ret0 ;
+	if (op->fl.nullfile) goto ret0 ;
 
 #if	CF_SFIO
-	if (op->f.sfio) {
+	if (op->fl.sfio) {
 	    if ((rs = shio_sfcookflush(op)) >= 0) {
 	        Sfoff_t	sfo ;
 	        sfo = sfseek(op->fp,(Sfoff_t) o,w) ;
@@ -837,10 +837,10 @@ int shio_flush(SHIO *op) noex {
 
 	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
 
-	if (! op->f.nullfile) {
+	if (! op->fl.nullfile) {
 
 #if	CF_SFIO
-	    if (op->f.sfio) {
+	    if (op->fl.sfio) {
 	        rs = shio_sfcookflush(op) ;
 	    } else
 	        rs = bflush(op->fp) ;
@@ -870,10 +870,10 @@ int shio_control(SHIO *op,int cmd,...) noex {
 	    case SHIO_CNOP:
 	        break ;
 	    case SHIO_CSETBUFWHOLE:
-	        if (! op->f.nullfile) {
+	        if (! op->fl.nullfile) {
 	            f = (int) va_arg(ap,int) ;
 #if	CF_SFIO
-	            if (op->f.sfio) {
+	            if (op->fl.sfio) {
 	                if ((rs = shio_sfcookline(op,false)) >= 0) {
 	                    int	flags = SF_WHOLE ;
 	                    int	sfcmd = (f) ? SFIO_ON : SFIO_OFF ;
@@ -888,11 +888,11 @@ int shio_control(SHIO *op,int cmd,...) noex {
 	        }
 	        break ;
 	    case SHIO_CSETBUFLINE:
-	        if (! op->f.nullfile) {
+	        if (! op->fl.nullfile) {
 	            f = (int) va_arg(ap,int) ;
-	            op->f.bufline = f ;
+	            op->fl.bufline = f ;
 #if	CF_SFIO
-	            if (op->f.sfio) {
+	            if (op->fl.sfio) {
 	                if ((rs = shio_sfcookline(op,f)) >= 0) {
 	                    int	flags = SF_LINE ;
 	                    int	sfcmd = (f) ? SFIO_ON : SFIO_OFF ;
@@ -907,11 +907,11 @@ int shio_control(SHIO *op,int cmd,...) noex {
 	        }
 	        break ;
 	    case SHIO_CSETBUFNONE:
-	        if (! op->f.nullfile) {
-	            op->f.bufnone = true ;
-	            op->f.bufline = false ;
+	        if (! op->fl.nullfile) {
+	            op->fl.bufnone = true ;
+	            op->fl.bufline = false ;
 #if	CF_SFIO
-	            if (op->f.sfio) {
+	            if (op->fl.sfio) {
 	                if ((rs = shio_sfcookline(op,false)) >= 0) {
 	                    int	flags = (SF_LINE | SF_WHOLE) ;
 	                    rs = sfset(op->fp,flags,SFIO_OFF) ;
@@ -925,15 +925,15 @@ int shio_control(SHIO *op,int cmd,...) noex {
 	        }
 	        break ;
 	    case SHIO_CSETBUFDEF:
-	        if (! op->f.nullfile) {
+	        if (! op->fl.nullfile) {
 	            f = (int) va_arg(ap,int) ;
-	            op->f.bufline = op->f.terminal ;
+	            op->fl.bufline = op->fl.terminal ;
 #if	CF_SFIO
-	            if (op->f.sfio) {
+	            if (op->fl.sfio) {
 	                if ((rs = shio_sfcookline(op,true)) >= 0) {
 	                    int	flags ;
 	                    flags = SF_WHOLE ;
-	                    if (! op->f.terminal) flags |= SF_LINE ;
+	                    if (! op->fl.terminal) flags |= SF_LINE ;
 	                    int	sfcmd = (f) ? SFIO_ON : SFIO_OFF ;
 	                    rs = sfset(op->fp,flags,sfcmd) ;
 	                }
@@ -946,11 +946,11 @@ int shio_control(SHIO *op,int cmd,...) noex {
 	        }
 	        break ;
 	    case SHIO_CSETFLAGS:
-	        if (! op->f.nullfile) {
+	        if (! op->fl.nullfile) {
 	            f = (int) va_arg(ap,int) ;
-	            op->f.bufline = f ;
+	            op->fl.bufline = f ;
 #if	CF_SFIO
-	            if (op->f.sfio) {
+	            if (op->fl.sfio) {
 	                int	flags = SF_LINE ;
 	                int	sfcmd = (f) ? SFIO_ON : SFIO_OFF ;
 	                rs = sfset(op->fp,flags,sfcmd) ;
@@ -963,9 +963,9 @@ int shio_control(SHIO *op,int cmd,...) noex {
 	        }
 	        break ;
 	    case SHIO_CFD:
-	        if (! op->f.nullfile) {
+	        if (! op->fl.nullfile) {
 #if	CF_SFIO
-	            if (op->f.sfio) {
+	            if (op->fl.sfio) {
 	                rs = sffileno(op->fp) ;
 	                if (rs < 0)
 	                    rs = SR_NOTOPEN ;
@@ -986,12 +986,12 @@ int shio_control(SHIO *op,int cmd,...) noex {
 	        }
 	        break ;
 	    case SHIO_CNONBLOCK:
-	        if (! op->f.nullfile) {
+	        if (! op->fl.nullfile) {
 	            int	v = (int) va_arg(ap,int) ;
 	            int	f ;
 	            f = (v > 0) ;
 #if	CF_SFIO
-	            if (op->f.sfio) {
+	            if (op->fl.sfio) {
 	                rs = SR_OK ;
 	            } else {
 	                rs = bcontrol(op->fp,BC_NONBLOCK,f) ;
@@ -1004,9 +1004,9 @@ int shio_control(SHIO *op,int cmd,...) noex {
 	    case SHIO_CSTAT:
 	        {
 	            USTAT *sbp = (USTAT *) va_arg(ap,void *) ;
-	            if (! op->f.nullfile) {
+	            if (! op->fl.nullfile) {
 #if	CF_SFIO
-	                if (op->f.sfio) {
+	                if (op->fl.sfio) {
 	                    rs = SR_OK ;
 	                } else {
 	                    rs = bcontrol(op->fp,BC_STAT,sbp) ;
@@ -1034,9 +1034,9 @@ int shio_getfd(SHIO *op) noex {
 	int		rs ;
 	int		fd = -1 ;
 	if ((rs = shio_magic(op,fname)) >= 0) {
-	    if (! op->f.nullfile) {
+	    if (! op->fl.nullfile) {
 #if	CF_SFIO
-	        if (op->f.sfio) {
+	        if (op->fl.sfio) {
 	            rs = sffileno(op->fp) ;
 	            fd = rs ;
 	            if (rs < 0) {
@@ -1071,7 +1071,7 @@ int shio_readintr(SHIO *op,void *ubuf,int ulen,int to,volatile int **ipp) noex {
 	int		rs ;
 	if (to < 0) to = INT_MAX ;
 	if ((rs = shio_magic(op)) >= 0) {
-	    if (! op->f.nullfile) {
+	    if (! op->fl.nullfile) {
 	        while (rs >= 0) {
 	            cint	rto = (to >= 0) ? MIN(to,1) : to ;
 	            if (isInterrupt(ipp)) break ;
@@ -1094,7 +1094,7 @@ int shio_reserve(SHIO *op,int amount) noex {
 	int		rs ;
 	if ((rs = shio_magic(op)) >= 0) {
 #if	CF_SFIO
-	    if (op->f.sfio) {
+	    if (op->fl.sfio) {
 	        rs = SR_OK ;
 	    } else {
 	        rs = breserve(op->fp,amount) ;
@@ -1110,9 +1110,9 @@ int shio_reserve(SHIO *op,int amount) noex {
 int shio_isterm(SHIO *op) noex {
 	int		rs ;
 	if ((rs = shio_magic(op)) >= 0) {
-	    if (! op->f.nullfile) {
+	    if (! op->fl.nullfile) {
 #if	CF_SFIO
-	        if (op->f.sfio) {
+	        if (op->fl.sfio) {
 	            int	rc = sfisterm(op->fp) ;
 	            rs = (rc >= 0) ? rc : SR_BADF ;
 	        } else {
@@ -1255,9 +1255,9 @@ static int shio_shprintln(SHIO *op,cchar *lbuf,int llen) noex {
 static int shio_sfiscook(SHIO *op) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
-	f = f || op->f.terminal ;
-	f = f || op->f.bufline ;
-	f = f || op->f.bufnone ;
+	f = f || op->fl.terminal ;
+	f = f || op->fl.bufline ;
+	f = f || op->fl.bufnone ;
 	if (f) {
 	    rs = shio_sfcookline(op,f) ;
 	}
@@ -1389,7 +1389,7 @@ static int shio_sfcookwrite(SHIO *op,cchar *lbuf,int llen) noex {
 	                    if (rs < 0) break ;
 	                } /* end while */
 	            } /* end if (handle remaining) */
-		    if ((rs >= 0) && op->f.bufline) {
+		    if ((rs >= 0) && op->fl.bufline) {
 	        	rs = shio_sfflush(op) ;
 		    }
 	        } /* end if (outstore_strw) */
