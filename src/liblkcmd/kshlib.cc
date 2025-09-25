@@ -1342,7 +1342,7 @@ static int kshlib_end(KSHLIB *uip)
 	if (rs >= 0) rs = rs1 ;
 
 	if (uip->sesdname != NULL) {
-	    rs1 = uc_libfree(uip->sesdname) ;
+	    rs1 = lm_free(uip->sesdname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    uip->sesdname = NULL ;
 	}
@@ -1433,7 +1433,7 @@ static int kshlib_autorunoptnotes(KSHLIB *uip,cchar *vp,int vl,int f)
 	nprintf(NDF,"kshlib_autorunoptnotes: ent f=%u\n",f) ;
 	nprintutmp("kshlib_autorunoptnotes") ;
 #endif
-	if (! uip->f.initrun) {
+	if (! uip->fl.initrun) {
 	    int		f_go = TRUE ;
 	    if (f) {
 		if ((rs = kshlib_sid(uip)) >= 0) {
@@ -1456,7 +1456,7 @@ static int kshlib_autorunoptnotes(KSHLIB *uip,cchar *vp,int vl,int f)
 	nprintf(NDF,"kshlib_autorunoptnotes: mid rs=%d f_go=%u\n",rs,f_go) ;
 #endif
 	    if ((rs >= 0) && f_go) {
-	        uip->f.initrun = TRUE ;
+	        uip->fl.initrun = TRUE ;
 		rs = kshlib_autorunopter(uip) ;
 		rv = rs ;
 #if	CF_DEBUGN
@@ -1735,7 +1735,7 @@ static int kshlib_workgener(KSHLIB *uip,SESMSG_GEN *mp)
 	nprintf(NDF,"kshlib_workgener: m=>%r<\n",
 	    mp->nbuf,strlinelen(mp->nbuf,-1,50)) ;
 #endif
-	if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
+	if ((rs = lm_mall(esize,&ep)) >= 0) {
 	    time_t	st = mp->stime ;
 	    const int	mt = mp->msgtype ;
 	    int		nl = rmeol(mp->nbuf,-1) ;
@@ -1756,7 +1756,7 @@ static int kshlib_workgener(KSHLIB *uip,SESMSG_GEN *mp)
 	            storenote_finish(ep) ;
 	    } /* end if (storenote_start) */
 	    if (rs < 0)
-	        uc_libfree(ep) ;
+	        lm_free(ep) ;
 	} /* end if (m-a) */
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_workgener: ret rs=%d\n",rs) ;
@@ -1794,7 +1794,7 @@ static int kshlib_workbiffer(KSHLIB *uip,SESMSG_BIFF *mp)
 	nprintf(NDF,"kshlib_workbiffer: m=>%r<\n",
 	    mp->nbuf,strlinelen(mp->nbuf,-1,50)) ;
 #endif
-	if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
+	if ((rs = lm_mall(esize,&ep)) >= 0) {
 	    time_t	st = mp->stime ;
 	    const int	mt = mp->msgtype ;
 	    int		nl = rmeol(mp->nbuf,-1) ;
@@ -1806,7 +1806,7 @@ static int kshlib_workbiffer(KSHLIB *uip,SESMSG_BIFF *mp)
 	            storenote_finish(ep) ;
 	    } /* end if (storenote_start) */
 	    if (rs < 0)
-	        uc_libfree(ep) ;
+	        lm_free(ep) ;
 	} /* end if (m-a) */
 	return rs ;
 }
@@ -1862,7 +1862,7 @@ static int kshlib_sesdname(KSHLIB *uip)
 	           if ((rs = mksdname(pbuf,dname,uip->sid)) >= 0) {
 			cchar	*cp ;
 			pl = rs ;
-	                if ((rs = uc_libmallocstrw(pbuf,pl,&cp)) >= 0) {
+	                if ((rs = lm_strw(pbuf,pl,&cp)) >= 0) {
 			    uip->sesdname = cp ;
 			}
 	    	    } /* end if (mksdname) */
@@ -1889,7 +1889,7 @@ static int kshlib_reqfname(KSHLIB *uip) noex {
 	            if ((rs = mkpath2(pbuf,sesdname,dbuf)) >= 0) {
 	                cchar	*cp ;
 		        pl = rs ;
-	                if ((rs = uc_libmallocstrw(pbuf,pl,&cp)) >= 0) {
+	                if ((rs = lm_strw(pbuf,pl,&cp)) >= 0) {
 	                    uip->reqfname = cp ;
 	                }
 	            } /* end if (mkpath) */
@@ -1976,7 +1976,7 @@ static int kshlib_reqclose(KSHLIB *uip)
 	        if (uip->reqfname[0] != '\0') {
 	            u_unlink(uip->reqfname) ;
 	        }
-	        rs1 = uc_libfree(uip->reqfname) ;
+	        rs1 = lm_free(uip->reqfname) ;
 	        if (rs >= 0) rs = rs1 ;
 	        uip->reqfname = NULL ;
 	    } /* end if (reqfname) */
@@ -2380,7 +2380,7 @@ static int kshlib_mqfins(KSHLIB *uip)
 	        if (ep != NULL) {
 	            rs1 = storenote_finish(ep) ;
 	            if (rs >= 0) rs = rs1 ;
-	            rs1 = uc_libfree(ep) ;
+	            rs1 = lm_free(ep) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (non-null) */
 	    } /* end for */
@@ -2459,7 +2459,7 @@ int		mdl ;
 	if (mdl < 0) mdl = strlen(mdp) ;
 	size += (mdl+1) ;
 	size += (strlen(un)+1) ;
-	if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	if ((rs = lm_mall(size,&bp)) >= 0) {
 	    ep->a = bp ;
 	    ep->user = bp ;
 	    bp = (strwcpy(bp,un,-1)+1) ;
@@ -2477,7 +2477,7 @@ static int storenote_finish(STORENOTE *ep)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->a != NULL) {
-	    rs1 = uc_libfree(ep->a) ;
+	    rs1 = lm_free(ep->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->a = NULL ;
 	    ep->user = NULL ;
@@ -2498,7 +2498,7 @@ static int mallocstrw(cchar *sp,int sl,cchar **rpp)
 	char		*bp ;
 	if (rpp == NULL) return SR_FAULT ;
 	if (sl < 0) sl = strlen(sp) ;
-	if ((rs = uc_libmalloc((sl+1),&bp)) >= 0) {
+	if ((rs = lm_mall((sl+1),&bp)) >= 0) {
 	    *rpp = bp ;
 	    strwcpy(bp,sp,sl) ;
 	} /* end if (m-a) */
