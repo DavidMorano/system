@@ -200,7 +200,7 @@ int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck)
 	                debugprintf("config_start: config_addcooks rs=%d\n",
 				rs) ;
 #endif
-	            cfp->f.p = TRUE ;
+	            cfp->fl.p = TRUE ;
 	            rs = config_read(cfp) ;
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
@@ -240,10 +240,10 @@ int config_finish(CONFIG *cfp)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("config_finish: ent %c\n",
-		((cfp->f.p) ? '¥' : '_')) ;
+		((cfp->fl.p) ? '¥' : '_')) ;
 #endif
 
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -279,7 +279,7 @@ int config_check(CONFIG *cfp)
 	if (cfp == NULL) return SR_FAULT ;
 
 	pip = cfp->pip ;
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 	    const time_t	dt = pip->daytime ;
 	    const int		intcheck = cfp->intcheck ;
 	    int			f_check = TRUE ;
@@ -319,7 +319,7 @@ int config_check(CONFIG *cfp)
 int config_read(CONFIG *cfp)
 {
 	int		rs = SR_OK ;
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 	    rs = config_reader(cfp) ;
 	}
 	return rs ;
@@ -341,7 +341,7 @@ static int config_reader(CONFIG *cfp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("config_read: f_p=%u\n",cfp->f.p) ;
+	    debugprintf("config_read: f_p=%u\n",cfp->fl.p) ;
 #endif
 
 	lip = pip->lip ;
