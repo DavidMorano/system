@@ -601,7 +601,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -622,12 +622,12 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                        break ;
 
 	                    case 'a':
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.all = (rs > 0) ;
+	                                lip->fl.all = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -821,7 +821,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    debugprintf("b_sysdb: f_all=%u\n",lip->f.all) ;
+	    debugprintf("b_sysdb: f_all=%u\n",lip->fl.all) ;
 	    debugprintf("b_sysdb: w=%d\n",w) ;
 	}
 #endif
@@ -865,7 +865,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1062,7 +1062,7 @@ static int process(PI *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn,
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 	    LOCINFO	*lip = pip->lip ;
 	    if ((rs = process_begin(pip,w)) >= 0) {
-	        if (lip->f.all) {
+	        if (lip->fl.all) {
 	            rs = procall(pip,w,ofp) ;
 	            wlen += rs ;
 	        } else {
