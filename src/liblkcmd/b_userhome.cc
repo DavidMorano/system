@@ -23,12 +23,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ username [<username>|-] 
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be first to configure */
 
@@ -65,7 +62,6 @@
 #include	<grmems.h>
 #include	<sysrealname.h>
 #include	<sysusernames.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -749,7 +745,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -771,23 +767,23 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                    case 'a':
 	                        lip->final.all = TRUE ;
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.all = (rs > 0) ;
+	                                lip->fl.all = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 	                    case 'n':
-	                        lip->f.realname = TRUE ;
+	                        lip->fl.realname = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.realname = (rs > 0) ;
+	                                lip->fl.realname = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -979,10 +975,10 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
 	    debugprintf("b_userxxx: process() rs=%d nouser=%u\n",
-	        rs,lip->f.nouser) ;
+	        rs,lip->fl.nouser) ;
 #endif
 
-	if ((rs >= 0) && lip->f.nouser) {
+	if ((rs >= 0) && lip->fl.nouser) {
 	    rs = SR_SRCH ;
 	}
 
@@ -1120,10 +1116,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.linebuf) {
 	                        lip->have.linebuf = TRUE ;
 	                        lip->final.linebuf = TRUE ;
-	                        lip->f.linebuf = TRUE ;
+	                        lip->fl.linebuf = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.linebuf = (rs > 0) ;
+	                            lip->fl.linebuf = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1131,10 +1127,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.all) {
 	                        lip->have.all = TRUE ;
 	                        lip->final.all = TRUE ;
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.all = (rs > 0) ;
+	                            lip->fl.all = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1142,10 +1138,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.realname) {
 	                        lip->have.realname = TRUE ;
 	                        lip->final.realname = TRUE ;
-	                        lip->f.realname = TRUE ;
+	                        lip->fl.realname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.realname = (rs > 0) ;
+	                            lip->fl.realname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1154,10 +1150,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.name) {
 	                        lip->have.name = TRUE ;
 	                        lip->final.name = TRUE ;
-	                        lip->f.name = TRUE ;
+	                        lip->fl.name = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.name = (rs > 0) ;
+	                            lip->fl.name = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1165,10 +1161,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.fullname) {
 	                        lip->have.fullname = TRUE ;
 	                        lip->final.fullname = TRUE ;
-	                        lip->f.fullname = TRUE ;
+	                        lip->fl.fullname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.fullname = (rs > 0) ;
+	                            lip->fl.fullname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1176,10 +1172,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.org) {
 	                        lip->have.org = TRUE ;
 	                        lip->final.org = TRUE ;
-	                        lip->f.org = TRUE ;
+	                        lip->fl.org = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.org = (rs > 0) ;
+	                            lip->fl.org = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1187,10 +1183,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.projinfo) {
 	                        lip->have.projinfo = TRUE ;
 	                        lip->final.projinfo = TRUE ;
-	                        lip->f.projinfo = TRUE ;
+	                        lip->fl.projinfo = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.projinfo = (rs > 0) ;
+	                            lip->fl.projinfo = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1198,10 +1194,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.sysuser) {
 	                        lip->have.sysuser = TRUE ;
 	                        lip->final.sysuser = TRUE ;
-	                        lip->f.sysuser = TRUE ;
+	                        lip->fl.sysuser = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.sysuser = (rs > 0) ;
+	                            lip->fl.sysuser = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1209,10 +1205,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.reguser) {
 	                        lip->have.reguser = TRUE ;
 	                        lip->final.reguser = TRUE ;
-	                        lip->f.reguser = TRUE ;
+	                        lip->fl.reguser = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.reguser = (rs > 0) ;
+	                            lip->fl.reguser = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1220,10 +1216,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.speuser) {
 	                        lip->have.speuser = TRUE ;
 	                        lip->final.speuser = TRUE ;
-	                        lip->f.speuser = TRUE ;
+	                        lip->fl.speuser = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.speuser = (rs > 0) ;
+	                            lip->fl.speuser = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1258,11 +1254,11 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 
-	    if (lip->f.linebuf)
+	    if (lip->fl.linebuf)
 	        rs = shio_control(ofp,SHIO_CSETBUFLINE,TRUE) ;
 
 	    if (rs >= 0) {
-	        if (lip->f.all) {
+	        if (lip->fl.all) {
 	            rs = procall(pip,aip,bop,ofp) ;
 	        } else {
 	            rs = procargs(pip,aip,bop,ofp,afn) ;
@@ -1604,13 +1600,13 @@ static int procselect(PROGINFO *pip,struct passwd *pwp)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		f = TRUE ;
-	if (lip->f.all) {
+	if (lip->fl.all) {
 	    if (matstr(specials,pwp->pw_name,-1) >= 0) {
-	        f = lip->f.speuser ;
+	        f = lip->fl.speuser ;
 	    } else {
-	        if (lip->f.sysuser) f = f && (pwp->pw_uid < SYSUID) ;
-	        if (lip->f.reguser) f = f && (pwp->pw_uid >= SYSUID) ;
-	        if (lip->f.speuser) f = FALSE ;
+	        if (lip->fl.sysuser) f = f && (pwp->pw_uid < SYSUID) ;
+	        if (lip->fl.reguser) f = f && (pwp->pw_uid >= SYSUID) ;
+	        if (lip->fl.speuser) f = FALSE ;
 	    }
 	} /* end if (type of user) */
 	return (rs >= 0) ? f : rs ;
@@ -1625,16 +1621,16 @@ static int procout(PROGINFO *pip,SHIO *ofp,struct passwd *pwp,cchar *pp)
 	int		wlen = 0 ;
 	int		f = FALSE ;
 	cchar		*fmt ;
-	f = f || lip->f.realname ;
-	f = f || lip->f.name ;
-	f = f || lip->f.fullname ;
+	f = f || lip->fl.realname ;
+	f = f || lip->fl.name ;
+	f = f || lip->fl.fullname ;
 	if (f) {
 	    const int	nlen = REALNAMELEN ;
 	    int		nl = 0 ;
 	    cchar	*un = pwp->pw_name ;
 	    char	nbuf[REALNAMELEN+1] ;
 	    fmt = "%-16s %s\n" ;
-	    if (lip->f.realname) {
+	    if (lip->fl.realname) {
 	        cchar	*gecos = pwp->pw_gecos ;
 	        cchar	*gp ;
 	        if ((rs = getgecosname(gecos,-1,&gp)) > 0) {
@@ -1642,9 +1638,9 @@ static int procout(PROGINFO *pip,SHIO *ofp,struct passwd *pwp,cchar *pp)
 	                nl = rs ;
 	            } /* end if (mkrealname) */
 	        } /* end if (getgecosname) */
-	    } else if (lip->f.name || lip->f.fullname) {
+	    } else if (lip->fl.name || lip->fl.fullname) {
 	        int 	w = pcsnsreq_fullname ;
-	        if (lip->f.name) w = pcsnsreq_pcsname ;
+	        if (lip->fl.name) w = pcsnsreq_pcsname ;
 	        if ((rs = locinfo_prpcs(lip)) >= 0) {
 	            rs = procgetns(pip,nbuf,nlen,un,w) ;
 	            nl = rs ;
@@ -1654,14 +1650,14 @@ static int procout(PROGINFO *pip,SHIO *ofp,struct passwd *pwp,cchar *pp)
 	        rs = shio_printf(ofp,fmt,un,nbuf,nl) ;
 	        wlen += rs ;
 	    }
-	} else if (lip->f.org || lip->f.projinfo) {
+	} else if (lip->fl.org || lip->fl.projinfo) {
 	    const int	nlen = REALNAMELEN ;
 	    int		nl = 0 ;
 	    cchar	*un = pwp->pw_name ;
 	    char	nbuf[REALNAMELEN+1] ;
 	    fmt = "%-16s %s\n" ;
 	    int 	w = pcsnsreq_pcsorg ;
-	    if (lip->f.projinfo) w = pcsnsreq_projinfo ;
+	    if (lip->fl.projinfo) w = pcsnsreq_projinfo ;
 	    if ((rs = locinfo_prpcs(lip)) >= 0) {
 	        if ((rs = procgetns(pip,nbuf,nlen,un,w)) >= 0) {
 	            nl = rs ;
@@ -1716,7 +1712,7 @@ cchar		name[] ;
 #endif
 
 	if ((rs == SR_SRCH) || (rs == SR_NOENT)) {
-	    lip->f.nouser = TRUE ;
+	    lip->fl.nouser = TRUE ;
 	    rs = SR_OK ;
 	}
 
