@@ -333,7 +333,7 @@ void	*contextp ;
 
 	if (rs1 >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    shio_control(&errfile,SHIO_CLINEBUF,0) ;
 	}
 
@@ -583,7 +583,7 @@ void	*contextp ;
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -859,7 +859,7 @@ void	*contextp ;
 	        shio_close(afp) ;
 	    } else {
 
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,
 	                "%s: inaccessible argument list file (%d)\n",
 	                pip->progname,rs) ;
@@ -888,7 +888,7 @@ done:
 
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        break ;
@@ -1039,9 +1039,9 @@ KEYOPT		*kop ;
 	            if (! pip->final.quiet) {
 	                pip->have.quiet = TRUE ;
 	                pip->final.quiet = TRUE ;
-	                pip->f.quiet = TRUE ;
+	                pip->fl.quiet = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
-	                    pip->f.quiet = (uv > 0) ? 1 : 0 ;
+	                    pip->fl.quiet = (uv > 0) ? 1 : 0 ;
 	            }
 	            break ;
 
@@ -1049,7 +1049,7 @@ KEYOPT		*kop ;
 	            if (! lip->final.intref) {
 	                lip->have.intref = TRUE ;
 	                lip->final.intref = TRUE ;
-	                lip->f.intref = TRUE ;
+	                lip->fl.intref = TRUE ;
 	                if (vl > 0) {
 			    rs = cfdecui(vp,vl,&uv) ;
 	                    lip->intref = uv ;
@@ -1220,8 +1220,8 @@ int		f_nocache ;
 	if (lip == NULL)
 	    return SR_FAULT ;
 
-	lip->f.init = f_init ;
-	lip->f.nocache = f_nocache ;
+	lip->fl.init = f_init ;
+	lip->fl.nocache = f_nocache ;
 	return 0 ;
 }
 /* end subroutine (locinfo_flags) */
@@ -1243,8 +1243,8 @@ BABYCALC_INFO	*bip ;
 	    return SR_FAULT ;
 
 	pip = lip->pip ;
-	if (! lip->f.babycalc) {
-	    lip->f.babycalc = TRUE ;
+	if (! lip->fl.babycalc) {
+	    lip->fl.babycalc = TRUE ;
 	    rs = babycalc_open(&lip->bc,pip->pr,lip->dbname) ;
 	    lip->open.babycalc = (rs >= 0) ;
 	    if (pip->debuglevel > 0)
@@ -1294,8 +1294,8 @@ uint		*rp ;
 		dbuf,strlinelen(dbuf,dlen,50)) ;
 #endif
 
-	if (! lip->f.babycalc) {
-	    lip->f.babycalc = TRUE ;
+	if (! lip->fl.babycalc) {
+	    lip->fl.babycalc = TRUE ;
 	    rs = babycalc_open(&lip->bc,pip->pr,lip->dbname) ;
 	    lip->open.babycalc = (rs >= 0) ;
 
@@ -1311,8 +1311,8 @@ uint		*rp ;
 
 	} /* end if */
 
-	if ((rs >= 0) && (! lip->f.cvtdater)) {
-	    lip->f.cvtdater = TRUE ;
+	if ((rs >= 0) && (! lip->fl.cvtdater)) {
+	    lip->fl.cvtdater = TRUE ;
 	    rs = cvtdater_start(&lip->cvt,pip->daytime) ;
 	    lip->open.cvtdater = (rs >= 0) ;
 	}
