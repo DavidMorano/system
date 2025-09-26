@@ -594,7 +594,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -652,7 +652,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                lip->final.o_string = TRUE ;
-	                                lip->f.o_string = TRUE ;
+	                                lip->fl.o_string = TRUE ;
 	                                lip->string = argp ;
 	                            }
 	                        } else
@@ -787,10 +787,10 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (termtype != NULL) {
 	    n = matpcasestr(ansiterms,2,termtype,-1) ;
-	    lip->f.ansiterm = (n >= 0) ;
+	    lip->fl.ansiterm = (n >= 0) ;
 	} /* end if */
 
-	if ((rs >= 0) && lip->f.o_string) {
+	if ((rs >= 0) && lip->fl.o_string) {
 	    if (lip->string == NULL) lip->string = getourenv(envv,VARSTRING) ;
 	    if (lip->string == NULL) {
 	        const int	gl= GROUPNAMELEN ;
@@ -846,7 +846,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -974,7 +974,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 	                switch (ki) {
 	            case progopt_str:
 	                if (! lip->final.o_string) {
-	                    lip->f.o_string = TRUE ;
+	                    lip->fl.o_string = TRUE ;
 	                    if (vl > 0) {
 	                        strdcpy1w(lip->strbuf,STRBUFLEN,vp,vl) ;
 	                        lip->string = lip->strbuf ;
@@ -983,64 +983,64 @@ static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 	                break ;
 	            case progopt_date:
 	            case progopt_time:
-	                lip->f.o_time = TRUE ;
+	                lip->fl.o_time = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    lip->f.o_time = (rs > 0) ;
+	                    lip->fl.o_time = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_nodetitle:
-	                lip->f.o_nodetitle = TRUE ;
+	                lip->fl.o_nodetitle = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    lip->f.o_nodetitle = (rs > 0) ;
+	                    lip->fl.o_nodetitle = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_name:
 	            case progopt_node:
-	                lip->f.o_node = TRUE ;
+	                lip->fl.o_node = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    lip->f.o_node = (rs > 0) ;
+	                    lip->fl.o_node = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_users:
-	                lip->f.o_users = TRUE ;
+	                lip->fl.o_users = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    lip->f.o_users = (rs > 0) ;
+	                    lip->fl.o_users = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_procs:
-	                lip->f.o_procs = TRUE ;
+	                lip->fl.o_procs = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    lip->f.o_procs = (rs > 0) ;
+	                    lip->fl.o_procs = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_mem:
-	                lip->f.o_mem = TRUE ;
+	                lip->fl.o_mem = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    lip->f.o_mem = (rs > 0) ;
+	                    lip->fl.o_mem = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_load:
 	            case progopt_la:
-	                lip->f.o_load = TRUE ;
+	                lip->fl.o_load = TRUE ;
 	                if (vl > 0) {
 	                    rs = optbool(vp,vl) ;
-	                    lip->f.o_load = (rs > 0) ;
+	                    lip->fl.o_load = (rs > 0) ;
 	                }
 	                break ;
 	            case progopt_term:
 	                if (! lip->final.term) {
 	                    lip->final.term = TRUE ;
 	                    lip->have.term = TRUE ;
-	                    lip->f.term = TRUE ;
+	                    lip->fl.term = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.term = (rs > 0) ;
+	                        lip->fl.term = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -1147,7 +1147,7 @@ static int procbuf(PROGINFO *pip,char *lbuf,int llen)
 	int		c = 0 ;
 	int		wlen = 0 ;
 	int		f_terminal ;
-	f_terminal = lip->f.term ;
+	f_terminal = lip->fl.term ;
 	if ((rs = sbuf_start(&b,lbuf,llen)) >= 0) {
 
 	    if (f_terminal)
@@ -1155,12 +1155,12 @@ static int procbuf(PROGINFO *pip,char *lbuf,int llen)
 
 /* time */
 
-	    if (lip->f.o_string && (lip->string != NULL)) {
+	    if (lip->fl.o_string && (lip->string != NULL)) {
 	        c += 1 ;
 	        sbuf_strw(&b,lip->string,-1) ;
 	    } /* end if (option-string) */
 
-	    if (lip->f.o_time) {
+	    if (lip->fl.o_time) {
 	        char	timebuf[TIMEBUFLEN + 1] ;
 	        timestr_logz(pip->daytime,timebuf) ;
 	        if (c++ > 0) sbuf_chr(&b,' ') ;
@@ -1169,10 +1169,10 @@ static int procbuf(PROGINFO *pip,char *lbuf,int llen)
 
 /* node-name */
 
-	    if ((rs >= 0) && lip->f.o_node) {
+	    if ((rs >= 0) && lip->fl.o_node) {
 	        if ((rs = proginfo_nodename(pip)) >= 0) {
 	            if (c++ > 0) sbuf_chr(&b,' ') ;
-	            if (lip->f.o_nodetitle)
+	            if (lip->fl.o_nodetitle)
 	                sbuf_strw(&b,"node=",-1) ;
 	            sbuf_strw(&b,pip->nodename,-1) ;
 	        }
@@ -1180,7 +1180,7 @@ static int procbuf(PROGINFO *pip,char *lbuf,int llen)
 
 /* users (number of logged-in users) */
 
-	    if ((rs >= 0) && lip->f.o_users) {
+	    if ((rs >= 0) && lip->fl.o_users) {
 	        if ((rs = locinfo_nusers(lip)) >= 0) {
 	            if (c++ > 0) sbuf_chr(&b,' ') ;
 	            sbuf_strw(&b,"users=",-1) ;
@@ -1190,7 +1190,7 @@ static int procbuf(PROGINFO *pip,char *lbuf,int llen)
 
 /* number of processes */
 
-	    if ((rs >= 0) && lip->f.o_procs) {
+	    if ((rs >= 0) && lip->fl.o_procs) {
 	        if ((rs = locinfo_nprocs(lip)) >= 0) {
 	            if (c++ > 0) sbuf_chr(&b,' ') ;
 	            sbuf_strw(&b,"procs=",-1) ;
@@ -1200,7 +1200,7 @@ static int procbuf(PROGINFO *pip,char *lbuf,int llen)
 
 /* memory usage */
 
-	    if ((rs >= 0) && lip->f.o_mem) {
+	    if ((rs >= 0) && lip->fl.o_mem) {
 	        if ((rs = sysmemutil(NULL)) >= 0) {
 	            int	percent = rs ;
 	            if (c++ > 0) sbuf_chr(&b,' ') ;
@@ -1214,7 +1214,7 @@ static int procbuf(PROGINFO *pip,char *lbuf,int llen)
 
 /* load averages */
 
-	    if ((rs >= 0) && lip->f.o_load) {
+	    if ((rs >= 0) && lip->fl.o_load) {
 	        if ((rs = locinfo_loadavgs(lip)) >= 0) {
 	            double	dla[3] ;
 	            cchar	*fmt ;
@@ -1233,7 +1233,7 @@ static int procbuf(PROGINFO *pip,char *lbuf,int llen)
 
 /* done */
 
-	    if (f_terminal && lip->f.ansiterm)
+	    if (f_terminal && lip->fl.ansiterm)
 	        sbuf_termconseq(&b,'K',-1,-1,-1,-1) ;
 
 	    if (f_terminal)
@@ -1253,13 +1253,13 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	if (lip) {
 	    rs = memclear(lip) ;
 	    lip->pip = pip ;
-	    lip->f.o_string = TRUE ;
-	    lip->f.o_time = FALSE ;
-	    lip->f.o_node = TRUE ;
-	    lip->f.o_users = TRUE ;
-	    lip->f.o_procs = TRUE ;
-	    lip->f.o_mem = TRUE ;
-	    lip->f.o_load = TRUE ;
+	    lip->fl.o_string = TRUE ;
+	    lip->fl.o_time = FALSE ;
+	    lip->fl.o_node = TRUE ;
+	    lip->fl.o_users = TRUE ;
+	    lip->fl.o_procs = TRUE ;
+	    lip->fl.o_mem = TRUE ;
+	    lip->fl.o_load = TRUE ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -1311,9 +1311,9 @@ static int locinfo_nusers(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		nu = 0 ;
 
-	if (! lip->f.tmpx) {
+	if (! lip->fl.tmpx) {
 	    rs = tmpx_open(&lip->ut,NULL,O_RDONLY) ;
-	    lip->f.tmpx = (rs >= 0) ;
+	    lip->fl.tmpx = (rs >= 0) ;
 	}
 
 	if (rs >= 0) {
@@ -1336,7 +1336,7 @@ static int locinfo_check(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if ((rs >= 0) && lip->f.tmpx) {
+	if ((rs >= 0) && lip->fl.tmpx) {
 	    rs = tmpx_check(&lip->ut,pip->daytime) ;
 	}
 
@@ -1353,8 +1353,8 @@ static int locinfo_utmpend(LOCINFO *lip)
 
 	if (lip == NULL) return SR_FAULT ;
 
-	if (lip->f.tmpx) {
-	    lip->f.tmpx = FALSE ;
+	if (lip->fl.tmpx) {
+	    lip->fl.tmpx = FALSE ;
 	    rs1 = tmpx_close(&lip->ut) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
