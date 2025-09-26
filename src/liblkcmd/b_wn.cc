@@ -43,12 +43,9 @@
 	every username.  Your mileage may vary!
 
 	Synopsis:
-
 	$ wn [-l] [-u] [-h] [-nh] [<username(s)> ...]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be first to configure */
 
@@ -84,7 +81,6 @@
 #include	<getusername.h>
 #include	<grmems.h>
 #include	<sysrealname.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -561,12 +557,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                case argopt_nh:
 	                    lip->final.hdr = TRUE ;
-	                    lip->f.hdr = FALSE ;
+	                    lip->fl.hdr = FALSE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.hdr = (rs == 0) ;
+	                            lip->fl.hdr = (rs == 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -742,12 +738,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                    case 'H':
 	                        lip->have.hdr = TRUE ;
-	                        lip->f.hdr = TRUE ;
+	                        lip->fl.hdr = TRUE ;
 	                        break ;
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -769,12 +765,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                    case 'a':
 	                        lip->have.all = TRUE ;
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.all = (rs > 0) ;
+	                                lip->fl.all = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -783,12 +779,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'b':
 	                        lip->final.biff = TRUE ;
 	                        lip->have.biff = TRUE ;
-	                        lip->f.biff = TRUE ;
+	                        lip->fl.biff = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.biff = (rs > 0) ;
+	                                lip->fl.biff = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -797,12 +793,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'h':
 	                        lip->final.hdr = TRUE ;
 	                        lip->have.hdr = TRUE ;
-	                        lip->f.hdr = TRUE ;
+	                        lip->fl.hdr = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.hdr = (rs > 0) ;
+	                                lip->fl.hdr = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -811,12 +807,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'l':
 	                        lip->final.fmtlong = TRUE ;
 	                        lip->have.fmtlong = TRUE ;
-	                        lip->f.fmtlong = TRUE ;
+	                        lip->fl.fmtlong = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.fmtlong = (rs > 0) ;
+	                                lip->fl.fmtlong = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -842,26 +838,26 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* short mode */
 	                    case 's':
-	                        lip->f.fmtshort = TRUE ;
+	                        lip->fl.fmtshort = TRUE ;
 	                        lip->have.fmtshort = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.fmtshort = (rs > 0) ;
+	                                lip->fl.fmtshort = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 /* unique mode */
 	                    case 'u':
-	                        lip->f.uniq = TRUE ;
+	                        lip->fl.uniq = TRUE ;
 	                        lip->have.uniq = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.uniq = (rs > 0) ;
+	                                lip->fl.uniq = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -977,12 +973,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* argument defaults */
 
-	if (lip->f.fmtshort && lip->f.uniq)
-	    lip->f.users = TRUE ;
+	if (lip->fl.fmtshort && lip->fl.uniq)
+	    lip->fl.users = TRUE ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_wn: f_quick=%u\n",lip->f.fmtshort) ;
+	    debugprintf("b_wn: f_quick=%u\n",lip->fl.fmtshort) ;
 #endif
 
 	if ((rs >= 0) && (lip->max == 0) && (argval != NULL)) {
@@ -1002,9 +998,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
 	    fmt = "%s: hdr=%u\n" ;
-	    shio_printf(pip->efp,fmt,pn,lip->f.hdr) ;
+	    shio_printf(pip->efp,fmt,pn,lip->fl.hdr) ;
 	    fmt = "%s: fmtlong=%u\n" ;
-	    shio_printf(pip->efp,fmt,pn,lip->f.fmtlong) ;
+	    shio_printf(pip->efp,fmt,pn,lip->fl.fmtlong) ;
 	}
 
 #ifdef	COMMENT
@@ -1063,7 +1059,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	} /* end if (summary) */
 
 /* done */
-	if ((rs < 0) && (! pip->f.quiet)) {
+	if ((rs < 0) && (! pip->fl.quiet)) {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt = "%s: could not perform function (%d)\n" ;
 	    shio_printf(pip->efp,fmt,pn,rs) ;
@@ -1189,10 +1185,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_hdr:
 	                    if (! lip->final.hdr) {
 	                        lip->final.hdr = TRUE ;
-	                        lip->f.hdr = TRUE ;
+	                        lip->fl.hdr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.hdr = (rs > 0) ;
+	                            lip->fl.hdr = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1200,10 +1196,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.fmtlong) {
 	                        lip->have.fmtlong = TRUE ;
 	                        lip->final.fmtlong = TRUE ;
-	                        lip->f.fmtlong = TRUE ;
+	                        lip->fl.fmtlong = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.fmtlong = (rs > 0) ;
+	                            lip->fl.fmtlong = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1211,10 +1207,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.fmtshort) {
 	                        lip->have.fmtshort = TRUE ;
 	                        lip->final.fmtshort = TRUE ;
-	                        lip->f.fmtshort = TRUE ;
+	                        lip->fl.fmtshort = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.fmtshort = (rs > 0) ;
+	                            lip->fl.fmtshort = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1222,10 +1218,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.uniq) {
 	                        lip->have.uniq = TRUE ;
 	                        lip->final.uniq = TRUE ;
-	                        lip->f.uniq = TRUE ;
+	                        lip->fl.uniq = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.uniq = (rs > 0) ;
+	                            lip->fl.uniq = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1233,10 +1229,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.users) {
 	                        lip->have.users = TRUE ;
 	                        lip->final.users = TRUE ;
-	                        lip->f.users = TRUE ;
+	                        lip->fl.users = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.users = (rs > 0) ;
+	                            lip->fl.users = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1244,10 +1240,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.all) {
 	                        lip->have.all = TRUE ;
 	                        lip->final.all = TRUE ;
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.all = (rs > 0) ;
+	                            lip->fl.all = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1255,10 +1251,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.fmtline) {
 	                        lip->have.fmtline = TRUE ;
 	                        lip->final.fmtline = TRUE ;
-	                        lip->f.fmtline = TRUE ;
+	                        lip->fl.fmtline = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.fmtline = (rs > 0) ;
+	                            lip->fl.fmtline = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1267,10 +1263,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.msg) {
 	                        lip->have.msg = TRUE ;
 	                        lip->final.msg = TRUE ;
-	                        lip->f.msg = TRUE ;
+	                        lip->fl.msg = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.msg = (rs > 0) ;
+	                            lip->fl.msg = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1278,10 +1274,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.biff) {
 	                        lip->have.biff = TRUE ;
 	                        lip->final.biff = TRUE ;
-	                        lip->f.biff = TRUE ;
+	                        lip->fl.biff = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.biff = (rs > 0) ;
+	                            lip->fl.biff = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1326,7 +1322,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 
-	    if (lip->f.linebuf)
+	    if (lip->fl.linebuf)
 	        rs = shio_control(ofp,SHIO_CSETBUFLINE,TRUE) ;
 
 	    if (rs >= 0) {
@@ -1585,7 +1581,7 @@ static int procents(PROGINFO *pip,SHIO *ofp,OSETSTR *nlp)
 	if ((rs = vecobj_start(elp,esize,20,0)) >= 0) {
 
 	    if ((rs = setostr_count(nlp)) > 0) {
-	        lip->f.restricted = TRUE ;
+	        lip->fl.restricted = TRUE ;
 	    }
 
 #if	CF_DEBUG
@@ -1652,7 +1648,7 @@ static int procgetdb(PROGINFO *pip,OSETSTR *nlp,VECOBJ *elp)
 
 	        f = (up->ut_type == UTMPX_TUSERPROC) ;
 
-	        if ((! f) && (! lip->f.restricted) && lip->f.all) {
+	        if ((! f) && (! lip->fl.restricted) && lip->fl.all) {
 	            f = (up->ut_type == UTMPX_TINITPROC) ;
 	            f = f || (up->ut_type == UTMPX_TLOGINPROC) ;
 	        } /* end if */
@@ -1662,9 +1658,9 @@ static int procgetdb(PROGINFO *pip,OSETSTR *nlp,VECOBJ *elp)
 	        if (f) f = (up->ut_user[0] != '.') ;
 #endif /* CF_DOTUSER */
 
-	        if (f && lip->f.restricted) {
+	        if (f && lip->fl.restricted) {
 
-	            if (lip->f.self) {
+	            if (lip->fl.self) {
 	                f = (lip->sid == up->ut_pid) ;
 	            } else {
 	                const int	ml = MIN(UTMPX_LUSER,LOGNAMELEN) ;
@@ -1676,12 +1672,12 @@ static int procgetdb(PROGINFO *pip,OSETSTR *nlp,VECOBJ *elp)
 
 	        } /* end if */
 
-	        if ((rs >= 0) && f && (lip->f.msg || lip->f.biff)) {
+	        if ((rs >= 0) && f && (lip->fl.msg || lip->fl.biff)) {
 	            rs = procbiffable(pip,up) ;
 	            f = rs ;
 	        }
 
-	        if ((rs >= 0) && f && lip->f.uniq) {
+	        if ((rs >= 0) && f && lip->fl.uniq) {
 	            rs1 = vecobj_search(elp,up,vcmpname,NULL) ;
 	            if (rs1 >= 0) f = FALSE ;
 	        }
@@ -1727,7 +1723,7 @@ static int procbiffable(PROGINFO *pip,TMPX_ENT *up)
 	    if ((rs = u_stat(dname,&sb)) >= 0) {
 	        const mode_t	tm = sb.st_mode ;
 	        f = (tm & S_IWGRP) ;
-	        if (f && lip->f.biff) {
+	        if (f && lip->fl.biff) {
 	            f = (tm & S_IXUSR) ;
 	        }
 	    } else if (isNotPresent(rs)) {
@@ -1780,9 +1776,9 @@ static int procout(PROGINFO *pip,SHIO *ofp,VECOBJ *elp)
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 
-	if (lip->f.hdr && (! lip->f.fmtshort) && (! lip->f.fmtline)) {
+	if (lip->fl.hdr && (! lip->fl.fmtshort) && (! lip->fl.fmtline)) {
 
-	    if (lip->f.fmtlong) {
+	    if (lip->fl.fmtlong) {
 	        fmt = "USER       LINE         LOGIN          "
 	            "  ID    SID SN HOST\n" ;
 
@@ -1808,14 +1804,14 @@ static int procout(PROGINFO *pip,SHIO *ofp,VECOBJ *elp)
 
 	    if ((lip->max > 0) && (c++ >= lip->max)) break ;
 
-	    if (lip->f.fmtshort) {
+	    if (lip->fl.fmtshort) {
 
 	        cp = up->ut_user ;
 	        cl = strnlen(cp,MIN(COLS_USERNAME,UTMPX_LUSER)) ;
 
 	        rs = shio_printf(ofp,"%r\n",cp,cl) ;
 
-	    } else if (lip->f.fmtline) {
+	    } else if (lip->fl.fmtline) {
 
 	        cp = up->ut_line ;
 	        cl = strnlen(cp,UTMPX_LLINE) ;
@@ -1850,7 +1846,7 @@ static int procout(PROGINFO *pip,SHIO *ofp,VECOBJ *elp)
 
 /* print whichever output format */
 
-	        if (lip->f.fmtlong) {
+	        if (lip->fl.fmtlong) {
 	            char	ut_idbuf[UTMPX_LID + 1] ;
 	            char	ut_hostbuf[UTMPX_LHOST + 1] ;
 
