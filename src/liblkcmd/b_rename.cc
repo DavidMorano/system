@@ -548,7 +548,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -814,7 +814,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        shio_printf(pip->efp,
 	            "%s: could not perform function (%d)\n",
 	            pip->progname,rs) ;
@@ -936,10 +936,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 		    	    if (! lip->final.sortkey) {
 	                	lip->have.sortkey = TRUE ;
 	                	lip->final.sortkey = TRUE ;
-	                	lip->f.sortkey = FALSE ;
+	                	lip->fl.sortkey = FALSE ;
 	                	if (vl > 0) {
 			    	    rs = parsesort(pip,vp,vl) ;
-	                    	    lip->f.sortkey = TRUE ;
+	                    	    lip->fl.sortkey = TRUE ;
 		        	}
 		    	    }
 	            	    break ;
@@ -1049,7 +1049,7 @@ static int entername(PROGINFO *pip,vecstr *nlp,cchar *name)
 
 	if (cl > 0) {
 	    char	tbuf[MAXPATHLEN + 1] ;
-	    if (lip->f.findsuffix) rs = locinfo_findsuf(lip,cp,cl) ;
+	    if (lip->fl.findsuffix) rs = locinfo_findsuf(lip,cp,cl) ;
 	    if (rs >= 0) {
 	        if ((rs = pathclean(tbuf,cp,cl)) >= 0) {
 	            rs = vecstr_adduniq(nlp,tbuf,-1) ;
@@ -1326,7 +1326,7 @@ static int locinfo_setsuf(LOCINFO *lip,cchar *suf)
 	    }
 	    break ;
 	case suf_plus:
-	    lip->f.findsuffix = TRUE ;
+	    lip->fl.findsuffix = TRUE ;
 	    break ;
 	case suf_null:
 	case suf_empty:
@@ -1346,7 +1346,7 @@ static int locinfo_findsuf(LOCINFO *lip,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 
-	if (lip->f.findsuffix) {
+	if (lip->fl.findsuffix) {
 	    int		cl ;
 	    cchar	*tp, *cp ;
 	    char	sufbuf[SUFLEN + 1] ;
@@ -1365,7 +1365,7 @@ static int locinfo_findsuf(LOCINFO *lip,cchar *sp,int sl)
 		    }
 		    if ((rs = uc_mallocstrw(cp,cl,&ccp)) >= 0) {
 		        lip->suffix = ccp ;
-		        lip->f.findsuffix = FALSE ;
+		        lip->fl.findsuffix = FALSE ;
 		    }
 	        }
 	    }
@@ -1410,7 +1410,7 @@ static int locinfo_setsort(LOCINFO *lip,cchar *vp,int vl)
 	if (vl > 0) {
 	    if ((si = matostr(sortkeys,1,vp,vl)) >= 0) {
 	        lip->sortkey = si ;
-	        lip->f.sortkey = TRUE ;
+	        lip->fl.sortkey = TRUE ;
 	    } else {
 	        rs = SR_INVALID ;
 	    }
