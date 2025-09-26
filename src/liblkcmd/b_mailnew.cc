@@ -563,7 +563,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	pip->verboselevel = 1 ;
 	pip->daytime = time(nullptr) ;
 
-	pip->f.logprog = true ;
+	pip->fl.logprog = true ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -873,7 +873,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* version */
@@ -883,12 +883,12 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* long dates */
 	                    case 'l':
-	                        lip->f.datelong = true ;
+	                        lip->fl.datelong = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                        	lip->f.datelong = (rs > 0) ;
+	                        	lip->fl.datelong = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1124,8 +1124,8 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                                cchar	*pn = pip->progname ;
 	                                cchar	*s = "off" ;
 				        cchar	*fmt ;
-	                                if (lip->f.sort) {
-					    int f_rev = lip->f.sortrev ;
+	                                if (lip->fl.sort) {
+					    int f_rev = lip->fl.sortrev ;
 	                                    s = (f_rev) ? "rev" : "for" ;
 	                                }
 				        fmt = "%s: sort=%s\n" ;
@@ -1170,7 +1170,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1315,16 +1315,16 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
 	                    if (! lip->final.sort) {
 	                        lip->final.sort = true ;
 	                        lip->have.sort = true ;
-	                        lip->f.sort = true ;
+	                        lip->fl.sort = true ;
 	                        if (vl > 0) {
 	                            int	ch = tolc(*vp & 0xff) ;
 	                            switch (ch) {
 	                            case '0':
 	                            case 'n':
-	                                lip->f.sort = false ;
+	                                lip->fl.sort = false ;
 	                                break ;
 	                            case 'r':
-	                                lip->f.sortrev = true ;
+	                                lip->fl.sortrev = true ;
 	                                break ;
 	                            } /* end switch */
 	                        }
@@ -1344,7 +1344,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
 	                    if (! lip->final.datelong) {
 	                        lip->final.datelong = true ;
 	                        lip->have.datelong = true ;
-	                        lip->f.datelong = true ;
+	                        lip->fl.datelong = true ;
 	                        if (vl) {
 				    rs = locinfo_optdate(lip,vp,vl) ;
 	                        }
@@ -1787,7 +1787,7 @@ static int procmailmsg(PROGINFO *pip,cchar *un,MBCACHE *mcp,int mi)
 
 	        if (t == 0) t = msp->etime ;
 
-		if (lip->f.datelong || (dp == nullptr) || (dp[0] == '\0')) {
+		if (lip->fl.datelong || (dp == nullptr) || (dp[0] == '\0')) {
 		    TMTIME	m ;
 		    cint	dl = DSBUFLEN ;
 		    if ((rs = tmtime_localtime(&m,t)) >= 0) {
@@ -2115,8 +2115,8 @@ static int procout(PROGINFO *pip,void *ofp)
 	if (pip == nullptr) return SR_FAULT ;
 
 	nshow = lip->nshow ;
-	if (lip->f.sort) {
-	    int (*fn)() = (lip->f.sortrev) ? vcmprev : vcmpfor ;
+	if (lip->fl.sort) {
+	    int (*fn)() = (lip->fl.sortrev) ? vcmprev : vcmpfor ;
 	    rs = vechand_sort(&lip->msgs,fn) ;
 	}
 
@@ -2169,7 +2169,7 @@ static int procouter(PROGINFO *pip,void *ofp,HDRDECODE *hdp,MSGENTRY *mep)
 #endif
 
 	ll = lip->linelen ;
-	dl = (lip->f.datelong) ? 15 : 5 ;
+	dl = (lip->fl.datelong) ? 15 : 5 ;
 	if ((rs = outinfo_start(&oi,mep,ll,dl)) >= 0) {
 	    if ((rs = outinfo_trans(&oi,hdp)) >= 0) {
 	        if ((rs = outinfo_calc(&oi)) >= 0) {
@@ -2643,7 +2643,7 @@ static int locinfo_optdate(LOCINFO *lip,cchar *vp,int vl)
 	    if ((oi = matpstr(datetypes,1,vp,vl)) >= 0) {
 		switch (oi) {
 		case datetype_long:
-		    lip->f.datelong = true ;
+		    lip->fl.datelong = true ;
 		    break ;
 		} /* end switch */
 	    } /* end if (matpstr) */
