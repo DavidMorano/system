@@ -110,7 +110,6 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<ugetpw.h>
-#include	<ucmallreg.h>
 #include	<getbufsize.h>
 #include	<getusername.h>
 #include	<getutmpent.h>
@@ -864,12 +863,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_fg:
 	                    lip->final.fg = TRUE ;
 	                    lip->have.fg = TRUE ;
-	                    lip->f.fg = TRUE ;
+	                    lip->fl.fg = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.fg = (rs > 0) ;
+	                            lip->fl.fg = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -877,7 +876,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_daemon:
 	                    pip->final.daemon = TRUE ;
 	                    pip->have.daemon = TRUE ;
-	                    pip->f.daemon = TRUE ;
+	                    pip->fl.daemon = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
@@ -936,12 +935,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'Q':
 	                        pip->have.quiet = TRUE ;
 	                        pip->final.quiet = TRUE ;
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.quiet = (rs > 0) ;
+	                                pip->fl.quiet = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -993,7 +992,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                    case 'd':
 	                        pip->have.background = TRUE ;
-	                        pip->f.background = TRUE ;
+	                        pip->fl.background = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -1232,7 +1231,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    lip->mntfname = getourenv(envv,VARMNTFNAME) ;
 
 	if (lip->mntfname != NULL)
-	    pip->f.daemon = TRUE ;
+	    pip->fl.daemon = TRUE ;
 
 	if ((lip->mntfname == NULL) || (lip->mntfname[0] == '\0'))
 	    lip->mntfname = MNTFNAME ;
@@ -1260,7 +1259,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	} /* end if (ok) */
 
 /* done */
-	if ((rs < 0) && (ex != EX_OK) && (! pip->f.quiet)) {
+	if ((rs < 0) && (ex != EX_OK) && (! pip->fl.quiet)) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*fmt = "%s: could not perform function (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
@@ -1431,10 +1430,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.quiet) {
 	                        pip->have.quiet = TRUE ;
 	                        pip->final.quiet = TRUE ;
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.quiet = (rs > 0) ;
+	                            pip->fl.quiet = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1442,10 +1441,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.termout) {
 	                        lip->have.termout = TRUE ;
 	                        lip->final.termout = TRUE ;
-	                        lip->f.termout = TRUE ;
+	                        lip->fl.termout = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.termout = (rs > 0) ;
+	                            lip->fl.termout = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1453,10 +1452,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.maint) {
 	                        lip->have.maint = TRUE ;
 	                        lip->final.maint = TRUE ;
-	                        lip->f.maint = TRUE ;
+	                        lip->fl.maint = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.maint = (rs > 0) ;
+	                            lip->fl.maint = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1464,10 +1463,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.daemon) {
 	                        pip->have.daemon = TRUE ;
 	                        pip->final.daemon = TRUE ;
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.daemon = (rs > 0) ;
+	                            pip->fl.daemon = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1495,10 +1494,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.reuseaddr) {
 	                        pip->have.reuseaddr = TRUE ;
 	                        pip->final.reuseaddr = TRUE ;
-	                        pip->f.reuseaddr = TRUE ;
+	                        pip->fl.reuseaddr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.reuseaddr = (rs > 0) ;
+	                            pip->fl.reuseaddr = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1506,7 +1505,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.intrun) {
 	                        pip->have.intrun = TRUE ;
 	                        pip->final.intrun = TRUE ;
-	                        pip->f.intrun = TRUE ;
+	                        pip->fl.intrun = TRUE ;
 	                        if (vl > 0) {
 	                            rs = cfdecti(vp,vl,&v) ;
 	                            pip->intrun = v ;
@@ -1592,7 +1591,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 	        rs1 = shio_close(afp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*fmt ;
 		    fmt = "%s: inaccessible argument-list (%d)\n" ;
@@ -1618,14 +1617,14 @@ static int process(PROGINFO *pip,PARAMOPT *app,cchar *ofn)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pip->f.background || pip->f.daemon) {
+	if (pip->fl.background || pip->fl.daemon) {
 	    if ((rs = procextras(pip)) >= 0) {
 	        if ((rs = procpidfname(pip)) >= 0) {
 	            if ((rs = procbackinfo(pip)) >= 0) {
 	                if ((rs = ids_load(&pip->id)) >= 0) {
-	                    if (pip->f.background) {
+	                    if (pip->fl.background) {
 	                        rs = procback(pip) ;
-	                    } else if (pip->f.daemon) {
+	                    } else if (pip->fl.daemon) {
 	                        rs = procdaemon(pip) ;
 	                    }
 	                    rs1 = ids_release(&pip->id) ;
@@ -1710,7 +1709,7 @@ static int procbackcheck(PROGINFO *pip)
 	    rs1 = proclockrelease(pip,plp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        fmt = "%s: could not acquire PID lock (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,rs) ;
 	    }
@@ -1734,7 +1733,7 @@ static int procmntcheck(PROGINFO *pip)
 	    } else
 	        rs = SR_BUSY ;
 	    if (rs < 0) {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            fmt = "%s: inaccessible mount point (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
 	        }
@@ -1883,7 +1882,7 @@ static int procbackenv(PROGINFO *pip,SPAWNER *srp)
 	            if (v > 0) np = "intidle" ;
 	            break ;
 	        case 2:
-	            v = (pip->f.reuseaddr&1) ;
+	            v = (pip->fl.reuseaddr&1) ;
 	            if (v > 0) np = "resueaddr" ;
 	            break ;
 	        } /* end switch */
@@ -2210,7 +2209,7 @@ static int procserve(PROGINFO *pip,LFM *plp,cchar mntfname[])
 	            }
 	            uc_fdetach(mntfname) ;
 	        } else {
-	            if ((! pip->f.quiet) && (pip->efp != NULL)) {
+	            if ((! pip->fl.quiet) && (pip->efp != NULL)) {
 	                fmt = "%s: could not perform mount (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	            }
@@ -3196,13 +3195,13 @@ static int locinfo_tmpcheck(LOCINFO *lip)
 	if (lip->jobdname != NULL) {
 	    TMTIME	t ;
 	    if ((rs = tmtime_localtime(&t,pip->daytime)) >= 0) {
-	        if ((t.hour >= HOUR_MAINT) || lip->f.maint) {
+	        if ((t.hour >= HOUR_MAINT) || lip->fl.maint) {
 		    uptsub_t	thr = (uptsub_t) locinfo_tmpmaint ;
 	            pthread_t	tid ;
 	            if ((rs = uptcreate(&tid,NULL,thr,lip)) >= 0) {
 	                rs = 1 ;
 	                lip->tid = tid ;
-	                lip->f.tmpmaint = TRUE ;
+	                lip->fl.tmpmaint = TRUE ;
 	            } /* end if (uptcreate) */
 	        } /* end if (after hours) */
 	    } /* end if (tmtime_localtime) */
@@ -3220,7 +3219,7 @@ static int locinfo_tmpmaint(LOCINFO *lip)
 	const int	to = TO_TMPFILES ;
 	int		rs ;
 	int		c = 0 ;
-	int		f_need = lip->f.maint ;
+	int		f_need = lip->fl.maint ;
 	cchar		*dname = lip->jobdname ;
 	char		tsfname[MAXPATHLEN+1] ;
 
@@ -3264,7 +3263,7 @@ static int locinfo_tmpdone(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (lip->f.tmpmaint) {
+	if (lip->fl.tmpmaint) {
 	    int	trs ;
 	    rs1 = uptjoin(lip->tid,&trs) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -3388,7 +3387,7 @@ static int locinfo_termoutbegin(LOCINFO *lip,void *ofp)
 	cchar		*tstr = lip->termtype ;
 	cchar		*vp ;
 
-	if (lip->f.termout || ((rs = shio_isterm(ofp)) > 0)) {
+	if (lip->fl.termout || ((rs = shio_isterm(ofp)) > 0)) {
 	    int	ncols = COLUMNS ;
 	    if ((vp = getourenv(pip->envv,VARCOLUMNS)) != NULL) {
 	        int	v ;
