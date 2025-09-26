@@ -55,7 +55,6 @@
 #include	<estrings.h>
 #include	<ascii.h>
 #include	<hdbstr.h>
-#include	<ucmallreg.h>
 #include	<sfx.h>
 #include	<strn.h>
 #include	<exitcodes.h>
@@ -540,13 +539,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_unresolved:
-	                    lip->f.unresolved = TRUE ;
+	                    lip->fl.unresolved = TRUE ;
 	                    lip->final.unresolved = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.unresolved = (rs > 0) ;
+	                            lip->fl.unresolved = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -590,7 +589,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -599,13 +598,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* output-address mode */
 	                    case 'a':
-	                        lip->f.addr = TRUE ;
+	                        lip->fl.addr = TRUE ;
 	                        lip->final.addr = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.addr = (rs > 0) ;
+	                                lip->fl.addr = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -788,7 +787,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        } else {
 	            cchar	*ofn = ofname ;
 	            cchar	*afn = afname ;
-	            if (lip->f.addr) {
+	            if (lip->fl.addr) {
 	                if ((rs = hdbstr_start(&lip->addrs,10)) >= 0) {
 	                    lip->open.addr = TRUE ;
 	                }
@@ -957,7 +956,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 
 	memset(lip,0, sizeof(LOCINFO)) ;
 	lip->pip = pip ;
-	lip->f.unresolved = TRUE ;
+	lip->fl.unresolved = TRUE ;
 
 	if ((rs = getusername(lip->username,USERNAMELEN,-1)) >= 0) {
 	    rs = paramopt_start(&lip->lists) ;
@@ -973,8 +972,8 @@ static int locinfo_finish(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip->f.addr) {
-	    lip->f.addr = FALSE ;
+	if (lip->fl.addr) {
+	    lip->fl.addr = FALSE ;
 	    rs1 = hdbstr_finish(&lip->addrs) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1059,30 +1058,30 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                case progopt_unresolved:
 	                    if (! lip->final.unresolved) {
-	                        lip->f.unresolved = TRUE ;
+	                        lip->fl.unresolved = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.unresolved = (rs > 0) ;
+	                            lip->fl.unresolved = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 	                case progopt_addr:
 	                    if (! lip->final.addr) {
-	                        lip->f.addr = TRUE ;
+	                        lip->fl.addr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.addr = (rs > 0) ;
+	                            lip->fl.addr = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 	                case progopt_audit:
 	                    if (! lip->final.audit) {
-	                        lip->f.audit = TRUE ;
+	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.audit = (rs > 0) ;
+	                            lip->fl.audit = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1219,7 +1218,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 	    } /* end if (processing file argument file list) */
 
-	    if ((rs >= 0) && lip->f.addr) {
+	    if ((rs >= 0) && lip->fl.addr) {
 	        rs = locinfo_outprint(lip,ofp) ;
 	    }
 
@@ -1259,7 +1258,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar np[],int nl)
 	    debugprintf("b_mxalias/procname: query=%r\n",np,nl) ;
 #endif
 
-	if (! lip->f.addr) {
+	if (! lip->fl.addr) {
 	    rs = shio_printf(ofp,"%r:\n",np,nl) ;
 	}
 
@@ -1277,7 +1276,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar np[],int nl)
 	                rs = vl ;
 	                if (rs >= 0) {
 	                    c += 1 ;
-	                    if (lip->f.addr) {
+	                    if (lip->fl.addr) {
 	                        rs = locinfo_outadd(lip,vbuf,vl) ;
 	                    } else {
 	                        rs = procvalprint(pip,ofp,vbuf,vl) ;
@@ -1285,7 +1284,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar np[],int nl)
 	                } /* end if (ok) */
 	            } /* end while */
 	        } else if (((rs == 0) || (rs == SR_NOTFOUND)) &&
-	            lip->f.unresolved && lip->f.addr) {
+	            lip->fl.unresolved && lip->fl.addr) {
 
 	            rs = locinfo_outadd(lip,np,nl) ;
 
