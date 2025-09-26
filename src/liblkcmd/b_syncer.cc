@@ -465,7 +465,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -487,7 +487,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* background */
 	                    case 'b':
-	                        lip->f.background = TRUE ;
+	                        lip->fl.background = TRUE ;
 	                        break ;
 
 /* options */
@@ -506,12 +506,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* parallel mode */
 			    case 'p':
-	                        lip->f.parallel = TRUE ;
+	                        lip->fl.parallel = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.parallel = (rs > 0) ;
+	                                lip->fl.parallel = (rs > 0) ;
 				    }
 	                        }
 	                        break ;
@@ -632,9 +632,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        if (pip->debuglevel > 0) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*mode = "synchronous" ;
-		    if (lip->f.background) {
+		    if (lip->fl.background) {
 			mode = "background" ;
-		    } else if (lip->f.parallel) {
+		    } else if (lip->fl.parallel) {
 			mode = "parallel" ;
 		    }
 		    shio_printf(pip->efp,"%s: mode=%s\n",pn,mode) ;
@@ -643,14 +643,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	}
 
 	if (rs >= 0) {
-	    if (lip->f.background) {
+	    if (lip->fl.background) {
 	        if ((rs = uc_fork()) == 0) {
 		    for (i = 0 ; i < NOFILE ; i += 1) u_close(i) ;
 		    setsid() ;
 		    sync() ;
 		    uc_exit(EX_OK) ;
 	        } /* end if (child) */
-	    } else if (lip->f.parallel) {
+	    } else if (lip->fl.parallel) {
 	        rs = uc_syncer(1) ;
 	    } else {
 	        sync() ;
@@ -798,20 +798,20 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case progopt_parallel:
 			    if (! lip->final.parallel) {
 	                        lip->final.parallel = TRUE ;
-	                        lip->f.parallel = TRUE ;
+	                        lip->fl.parallel = TRUE ;
 	                        if (vl > 0) {
 			            rs = optbool(vp,vl) ;
-	                            lip->f.parallel = (rs > 0) ;
+	                            lip->fl.parallel = (rs > 0) ;
 			        }
 			    }
 	                    break ;
 	                case progopt_background:
 			    if (! lip->final.background) {
 			        lip->final.background = TRUE ;
-			        lip->f.background = TRUE ;
+			        lip->fl.background = TRUE ;
 	                        if (vl > 0) {
 			            rs = optbool(vp,vl) ;
-	                            lip->f.background = (rs > 0) ;
+	                            lip->fl.background = (rs > 0) ;
 	                        }
 			    }
 	                    break ;
