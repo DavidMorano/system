@@ -542,7 +542,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -564,12 +564,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* access time */
 	                    case 'a':
-	                        lip->f.access = TRUE ;
+	                        lip->fl.access = TRUE ;
 	                        break ;
 
 /* do NOT create file */
 	                    case 'c':
-	                        lip->f.nocreate = TRUE ;
+	                        lip->fl.nocreate = TRUE ;
 	                        break ;
 
 /* the old BSD "force" option (ignored) */
@@ -597,7 +597,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* modification time */
 	                    case 'm':
-	                        lip->f.modify = TRUE ;
+	                        lip->fl.modify = TRUE ;
 	                        break ;
 
 /* reference file */
@@ -619,7 +619,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                lip->f.toucht = TRUE ;
+	                                lip->fl.toucht = TRUE ;
 	                                datespec = argp ;
 	                            }
 	                        } else
@@ -641,12 +641,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* use GMT */
 	                    case 'z':
 	                        lip->final.gmt = TRUE ;
-	                        lip->f.gmt = TRUE ;
+	                        lip->fl.gmt = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.gmt = (rs > 0) ;
+	                                lip->fl.gmt = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -790,7 +790,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        TMZ	stz ;
 	        TMTIME	tmt ;
 
-	        if (lip->f.toucht) {
+	        if (lip->fl.toucht) {
 	            rs = tmz_xtoucht(&stz,datespec,-1) ;
 	        } else {
 	            rs = tmz_xtouch(&stz,datespec,-1) ;
@@ -897,7 +897,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
 	    ex = mapex(mapexs,rs) ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        shio_printf(pip->efp,
 	            "%s: processing error (%d)\n",
 	            pip->progname,rs) ;
@@ -1120,7 +1120,7 @@ static int procfile(PROGINFO *pip,TOUCH_INFO *spip,cchar fname[])
 	    return SR_FAULT ;
 
 	if ((rs = u_stat(fname,&sb)) == nrs) {
-	    if (! lip->f.nocreate) {
+	    if (! lip->fl.nocreate) {
 	        if ((rs = u_creat(fname,0666)) >= 0) {
 	            int	fd = rs ;
 	            rs = u_fstat(fd,&sb) ;
@@ -1141,9 +1141,9 @@ static int procfile(PROGINFO *pip,TOUCH_INFO *spip,cchar fname[])
 	    struct utimbuf	ut ;
 	    ut.actime = sb.st_atime ;
 	    ut.modtime = sb.st_mtime ;
-	    if (lip->f.access) ut.actime = spip->atime ;
-	    if (lip->f.modify) ut.modtime = spip->mtime ;
-	    if ((! lip->f.access) && (! lip->f.modify)) {
+	    if (lip->fl.access) ut.actime = spip->atime ;
+	    if (lip->fl.modify) ut.modtime = spip->mtime ;
+	    if ((! lip->fl.access) && (! lip->fl.modify)) {
 	        ut.actime = spip->atime ;
 	        ut.modtime = spip->mtime ;
 	    }
