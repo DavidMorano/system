@@ -435,7 +435,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	pip->verboselevel = 1 ;
 
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -735,7 +735,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'R':
@@ -758,12 +758,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'a':
 	                        lip->final.add = TRUE ;
 	                        lip->have.add = TRUE ;
-	                        lip->f.add = TRUE ;
+	                        lip->fl.add = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.add = (rs > 0) ;
+	                                lip->fl.add = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -785,24 +785,24 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'i':
 	                        lip->final.inc = TRUE ;
 	                        lip->have.inc = TRUE ;
-	                        lip->f.inc = TRUE ;
+	                        lip->fl.inc = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.inc = (rs > 0) ;
+	                                lip->fl.inc = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 /* list */
 	                    case 'l':
-	                        lip->f.list = TRUE ;
+	                        lip->fl.list = TRUE ;
 	                        break ;
 
 /* header */
 	                    case 'h':
-	                        lip->f.hdr = TRUE ;
+	                        lip->fl.hdr = TRUE ;
 	                        break ;
 
 /* options */
@@ -823,12 +823,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'p':
 	                        lip->final.print = TRUE ;
 	                        lip->have.print = TRUE ;
-	                        lip->f.print = TRUE ;
+	                        lip->fl.print = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.print = (rs > 0) ;
+	                                lip->fl.print = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -986,9 +986,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
-	    shio_printf(pip->efp,"%s: f_print=%u\n",pn,lip->f.print) ;
-	    shio_printf(pip->efp,"%s: f_add=%u\n",pn,lip->f.add) ;
-	    shio_printf(pip->efp,"%s: f_inc=%u\n",pn,lip->f.inc) ;
+	    shio_printf(pip->efp,"%s: f_print=%u\n",pn,lip->fl.print) ;
+	    shio_printf(pip->efp,"%s: f_add=%u\n",pn,lip->fl.add) ;
+	    shio_printf(pip->efp,"%s: f_inc=%u\n",pn,lip->fl.inc) ;
 	}
 
 	if (qs == NULL) qs = getourenv(envv,VARQS) ;
@@ -1087,7 +1087,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        fmt = "%s: processing error (%d)\n" ;
 	        break ;
 	    } /* end switch */
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        if (fmt != NULL)
 	            shio_printf(pip->efp,fmt,pip->progname,rs) ;
 	    }
@@ -1222,10 +1222,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.print) {
 	                        lip->have.print = TRUE ;
 	                        lip->final.print = TRUE ;
-	                        lip->f.print = TRUE ;
+	                        lip->fl.print = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.print = (rs > 0) ;
+	                            lip->fl.print = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1233,10 +1233,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.add) {
 	                        lip->have.add = TRUE ;
 	                        lip->final.add = TRUE ;
-	                        lip->f.add = TRUE ;
+	                        lip->fl.add = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.add = (rs > 0) ;
+	                            lip->fl.add = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1244,10 +1244,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.inc) {
 	                        lip->have.inc = TRUE ;
 	                        lip->final.inc = TRUE ;
-	                        lip->f.inc = TRUE ;
+	                        lip->fl.inc = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.inc = (rs > 0) ;
+	                            lip->fl.inc = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1264,7 +1264,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        if (vl > 0) {
 	                            pip->final.logprog = TRUE ;
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.logprog = (rs > 0) ;
+	                            pip->fl.logprog = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1433,7 +1433,7 @@ static int procout_begin(PROGINFO *pip,void *ofp,cchar *ofname)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 
-	if (lip->f.print || lip->f.list) {
+	if (lip->fl.print || lip->fl.list) {
 
 	    if ((ofname == NULL) || (ofname[0] == '\0') || (ofname[0] == '-'))
 	        ofname = STDFNOUT ;
@@ -1443,7 +1443,7 @@ static int procout_begin(PROGINFO *pip,void *ofp,cchar *ofname)
 	        fmt = "    count date			  counter-name" ;
 	        lip->ofp = ofp ;
 
-	        if (lip->f.hdr) {
+	        if (lip->fl.hdr) {
 	            shio_print(ofp,fmt,-1) ;
 	        }
 
@@ -1546,7 +1546,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *qs)
 	            rs1 = shio_close(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	                shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1561,7 +1561,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *qs)
 	        rs = procdebugdb(pip,qs) ;
 	    }
 
-	    if ((rs >= 0) && lip->f.list) {
+	    if ((rs >= 0) && lip->fl.list) {
 	        rs = proclist(pip) ;
 	    }
 
@@ -1782,8 +1782,8 @@ static int procreg(PROGINFO *pip,MAPSTRINT *nlp)
 	    if (rs >= 0) {
 	        int	act = -1 ;
 
-	        if (lip->f.add) act = 0 ;
-	        if (lip->f.inc) act = 1 ;
+	        if (lip->fl.add) act = 0 ;
+	        if (lip->fl.inc) act = 1 ;
 
 /* preliminary (if we need to do anything at all) */
 
@@ -1865,13 +1865,13 @@ static int procreger(PROGINFO *pip,cchar *db,int nc,int ac,MAPSTRINT *nlp)
 
 /* optional print result */
 
-	        if ((rs >= 0) && lip->f.print) {
+	        if ((rs >= 0) && lip->fl.print) {
 	            for (i = 0 ; i < nc ; i += 1) {
 	                fmt = (namelist[i].value >= 0) ? "%u\n" : "\n" ;
 	                rs = shio_printf(ofp,fmt,namelist[i].value) ;
 	                if (rs < 0) break ;
 	            } /* end for */
-	        } else if ((rs < 0) && (! pip->f.quiet)) {
+	        } else if ((rs < 0) && (! pip->fl.quiet)) {
 	            fmt = "%s: could not process names (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
 	        }
@@ -1906,8 +1906,8 @@ static int procqs(PROGINFO *pip,cchar *qs)
 	if ((qs != NULL) && (qs[0] != '\0')) {
 	    int		act = -1 ;
 
-	    if (lip->f.add) act = 0 ;
-	    if (lip->f.inc) act = 1 ;
+	    if (lip->fl.add) act = 0 ;
+	    if (lip->fl.inc) act = 1 ;
 
 	    if (rs >= 0) {
 	        querystr	ps ;
@@ -2032,14 +2032,14 @@ static int procqser(PROGINFO *pip,cchar *dbfname,cchar *cnp,int cnl,int ac)
 
 	        rs = filecounts_process(&fc,namelist) ;
 
-	        if ((rs >= 0) && lip->f.print) {
+	        if ((rs >= 0) && lip->fl.print) {
 	            SHIO	*ofp = lip->ofp ;
 	            int		i ;
 	            for (i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	                fmt = (namelist[i].value >= 0) ? "%u\n" : "\n" ;
 	                rs = shio_printf(ofp,fmt,namelist[i].value) ;
 	            } /* end for */
-	        } else if ((rs < 0) && (! pip->f.quiet)) {
+	        } else if ((rs < 0) && (! pip->fl.quiet)) {
 	            fmt = "%s: could not process names (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
 	        }
@@ -2064,8 +2064,8 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
-	lip->f.add = TRUE ;
-	lip->f.inc = TRUE ;
+	lip->fl.add = TRUE ;
+	lip->fl.inc = TRUE ;
 
 	return rs ;
 }
