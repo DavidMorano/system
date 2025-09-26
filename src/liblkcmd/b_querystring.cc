@@ -345,7 +345,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	pip->verboselevel = 1 ;
 	pip->daytime = time(NULL) ;
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -594,7 +594,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -798,7 +798,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -931,10 +931,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.dummy) {
 	                        lip->have.dummy = TRUE ;
 	                        lip->final.dummy = TRUE ;
-	                        lip->f.dummy = TRUE ;
+	                        lip->fl.dummy = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.dummy = (rs > 0) ;
+	                            lip->fl.dummy = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1165,7 +1165,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *qs)
 
 	                rs = shio_printf(ofp,"%s\t%s\n",kp,vp) ;
 	                wlen += rs ;
-	                if (pip->open.logprog && pip->f.logprog) {
+	                if (pip->open.logprog && pip->fl.logprog) {
 			    kl = strlen(kp) ;
 			    vl = strlen(vp) ;
 	                    proclog(pip,kp,kl,vp,vl) ;
