@@ -40,13 +40,27 @@ MODS +=
 LIBS +=
 
 
+OBJ0= binexp.o
+OBJ1= factorial.o
+OBJ2= fibonacci.o
+OBJ3= complex.o
+OBJ4= 
+OBJ5= 
+OBJ6= 
+OBJ7= 
+
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB=
+
+OBJ= obja.o
+
+
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,20 +71,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= binexp.o
-OBJ1= factorial.o
-OBJ2= fibonacci.o
-OBJ3= 
-OBJ4= 
-OBJ5= 
-
-OBJA= obj0.o obj1.o obj2.o 
-OBJB=
-
-OBJ= obja.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -83,6 +84,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -103,13 +107,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	$(RM) $(ALL)
@@ -122,33 +121,43 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4.o:			$(OBJ4)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5.o:			$(OBJ5)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 binexp.o:		binexp.cc binexp.h		$(INCS)
 factorial.o:		factorial.cc factorial.h	$(INCS)
 fibonacci.o:		fibonacci.cc fibonacci.h	$(INCS)
+
+complex.o:		complex0.o complex1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+complex0.o:		complex.ccm			$(INCS)
+	makemodule complex
+
+complex1.o:		complex1.cc complex.ccm		$(INCS)
+	makemodule complex
+	$(COMPILE.cc) $<
 
 
