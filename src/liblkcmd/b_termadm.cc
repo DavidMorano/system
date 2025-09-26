@@ -387,7 +387,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	pip->verboselevel = 1 ;
 
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -656,7 +656,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -707,12 +707,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 's':
-	                        lip->f.set = TRUE ;
+	                        lip->fl.set = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.set = (rs > 0) ;
+	                                lip->fl.set = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -902,7 +902,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*fmt = "%s: invalid query (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
@@ -1037,10 +1037,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case progopt_poll:
-	                    lip->f.poll = TRUE ;
+	                    lip->fl.poll = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.poll = (rs > 0) ;
+	                        lip->fl.poll = (rs > 0) ;
 	                    }
 	                    break ;
 	                case progopt_intpoll:
@@ -1055,10 +1055,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.logprog) {
 	                        pip->have.logprog = TRUE ;
 	                        pip->final.logprog = TRUE ;
-	                        pip->f.logprog = TRUE ;
+	                        pip->fl.logprog = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.logprog = (rs > 0) ;
+	                            pip->fl.logprog = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1162,7 +1162,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            rs1 = shio_close(afp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	                shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1174,7 +1174,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    rs1 = shio_close(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 		fmt = "%s: inaccessible output (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,rs) ;
 		fmt = "%s: ofile=%s\n" ;
@@ -1253,7 +1253,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *rp,int rl)
 	}
 
 	if (ri >= 0) {
-	    if (lip->f.set) {
+	    if (lip->fl.set) {
 	        rs = procset(pip,ofp,ri,vp,vl) ;
 	        wlen += rs ;
 	    } else {
@@ -1589,7 +1589,7 @@ static int locinfo_termbegin(LOCINFO *lip)
 	    cchar	*fn = lip->termfname ;
 	    if ((rs = u_open(fn,of,om)) >= 0) {
 	        lip->tfd = rs ;
-	        lip->f.opened = TRUE ;
+	        lip->fl.opened = TRUE ;
 	    }
 	} else {
 	    const int	rlen = MAXPATHLEN ;
@@ -1599,7 +1599,7 @@ static int locinfo_termbegin(LOCINFO *lip)
 	        if ((rs = u_open(rbuf,of,om)) >= 0) {
 		    cchar	**vpp = &lip->termfname ;
 		    lip->tfd = rs ;
-	            lip->f.opened = TRUE ;
+	            lip->fl.opened = TRUE ;
 	    	    rs = locinfo_setentry(lip,vpp,rbuf,rl) ;
 		}
 	    }
@@ -1618,11 +1618,11 @@ static int locinfo_termend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (lip->f.opened && (lip->tfd >= 0)) {
+	if (lip->fl.opened && (lip->tfd >= 0)) {
 	    rs1 = u_close(lip->tfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    lip->tfd = -1 ;
-	    lip->f.opened = FALSE ;
+	    lip->fl.opened = FALSE ;
 	}
 	return rs ;
 }
@@ -1642,7 +1642,7 @@ static int locinfo_ws(LOCINFO *lip)
 	if (! lip->init.ws) {
 	    lip->init.ws = TRUE ;
 	    if ((rs = tcgetws(lip->tfd,&lip->ws)) >= 0) {
-	        lip->f.ws = TRUE ;
+	        lip->fl.ws = TRUE ;
 	    } else {
 		cchar	*pn = pip->progname ;
 		cchar	*fmt = "%s: terminal information inaccessible (%d)\n" ;
