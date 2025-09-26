@@ -568,7 +568,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -923,10 +923,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (oi) {
 	                case progopt_xu:
 	                    c += 1 ;
-	                    lip->f.xu = TRUE ;
+	                    lip->fl.xu = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.xu = (rs > 0) ;
+	                        lip->fl.xu = (rs > 0) ;
 	                    }
 	                    break ;
 	                } /* end switch */
