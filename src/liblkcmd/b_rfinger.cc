@@ -477,7 +477,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	pip->to = -1 ;
 	pip->daytime = time(NULL) ;
 
-	pip->f.logprog = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 #if	CF_SPECIAL3
 	if (rs >= 0) goto badlocstart ;
@@ -744,7 +744,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -1056,7 +1056,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    shio_printf(pip->efp,fmt,pn,lip->linelen) ;
 	}
 
-	lip->f.longer = f_long ;
+	lip->fl.longer = f_long ;
 
 /* loop through the arguments */
 
@@ -1110,7 +1110,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            cchar	*pn = pip->progname ;
 	            cchar	*fmt ;
 	            fmt = "%s: invalid query (%d)\n" ;
@@ -1249,10 +1249,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.quiet) {
 	                        pip->have.quiet = TRUE ;
 	                        pip->final.quiet = TRUE ;
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.quiet = (rs > 0) ;
+	                            pip->fl.quiet = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1260,10 +1260,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.termout) {
 	                        lip->have.termout = TRUE ;
 	                        lip->final.termout = TRUE ;
-	                        lip->f.termout = TRUE ;
+	                        lip->fl.termout = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.termout = (rs > 0) ;
+	                            lip->fl.termout = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1271,10 +1271,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.shutdown) {
 	                        lip->have.shutdown = TRUE ;
 	                        lip->final.shutdown = TRUE ;
-	                        lip->f.shutdown = TRUE ;
+	                        lip->fl.shutdown = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.shutdown = (rs > 0) ;
+	                            lip->fl.shutdown = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1405,7 +1405,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *sfn,
 	            rs1 = shio_close(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	                shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1493,7 +1493,7 @@ static int procdial(PROGINFO *pip,void *ofp,cchar *ap)
 	if ((rs = query_parse(&q,ap)) >= 0) {
 	    LINEBUF	b ;
 	    if ((rs = linebuf_start(&b)) >= 0) {
-		cint	f_long = lip->f.longer ;
+		cint	f_long = lip->fl.longer ;
 		cint	llen = b.llen ;
 		cchar		**av = lip->av ;
 		cchar		*un = q.upart ;
@@ -1512,7 +1512,7 @@ static int procdial(PROGINFO *pip,void *ofp,cchar *ap)
 		    if ((rs = opendial(di,af,hn,ps,ss,NULL,ev,to,oo)) >= 0) {
 	    		cint	s = rs ;
 	    		if ((rs = uc_writen(s,qp,ql)) >= 0) {
-	    		    if (lip->f.shutdown && isasocket(s)) {
+	    		    if (lip->fl.shutdown && isasocket(s)) {
 	        		rs = u_shutdown(s,SHUT_WR) ;
 			    }
 			    if (rs >= 0) {
@@ -1671,7 +1671,7 @@ static int procsystem(PROGINFO *pip,void *ofp,CM_ARGS *cap,cchar *ap) noex {
 	}
 #endif
 
-	f_long = lip->f.longer ;
+	f_long = lip->fl.longer ;
 	if ((rs = query_parse(&q,ap)) >= 0) {
 	    LINEBUF	b ;
 	    if ((rs = linebuf_start(&b)) >= 0) {
@@ -1715,7 +1715,7 @@ static int procsystemcm(PROGINFO *pip,void *ofp,CM_ARGS *cap,cchar *hn,
 		cint	ql = lbp->ll ;
 		cchar		*qp = lbp->lbuf ;
 		if ((rs = cm_write(&con,qp,ql)) >= 0) {
-	   	    if (lip->f.shutdown) {
+	   	    if (lip->fl.shutdown) {
 	                rs = cm_shutdown(&con,SHUT_WR) ;
 	            }
 	            if (rs >= 0) {
@@ -2005,7 +2005,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	lip->pip = pip ;
 	lip->dialer = -1 ;
 	lip->termtype = getourenv(pip->envv,varterm) ;
-	lip->f.shutdown = TRUE ;
+	lip->fl.shutdown = TRUE ;
 
 	if ((rs = strpack_start(&lip->strs,0)) >= 0) {
 	    rs = vechand_start(&lip->args,0,0) ;
@@ -2326,7 +2326,7 @@ static int locinfo_termoutbegin(LOCINFO *lip,void *ofp)
 	int		f_termout = FALSE ;
 	cchar		*tstr = lip->termtype ;
 
-	if (lip->f.termout || ((rs = shio_isterm(ofp)) > 0)) {
+	if (lip->fl.termout || ((rs = shio_isterm(ofp)) > 0)) {
 	    int		ncols = COLUMNS ;
 	    cchar	*vp ;
 	    if ((vp = getourenv(pip->envv,VARCOLUMNS)) != NULL) {
