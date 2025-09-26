@@ -634,7 +634,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -655,29 +655,29 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 			    case 'c':
-				if (! lip->f.numtype) {
+				if (! lip->fl.numtype) {
 				    lip->numtype = numtype_combinations ;
-				    lip->f.numtype = TRUE ;
+				    lip->fl.numtype = TRUE ;
 				}
 	                        break ;
 
 			    case 'p':
-				if (! lip->f.numtype) {
+				if (! lip->fl.numtype) {
 				    lip->numtype = numtype_permutations ;
-				    lip->f.numtype = TRUE ;
+				    lip->fl.numtype = TRUE ;
 				}
 	                        break ;
 
 			    case 'f':
-				if (! lip->f.numtype) {
+				if (! lip->fl.numtype) {
 				    lip->numtype = numtype_factorial ;
-				    lip->f.numtype = TRUE ;
+				    lip->fl.numtype = TRUE ;
 				}
 	                        break ;
 
 /* multi-set variant */
 			    case 'm':
-				lip->f.multi = TRUE ;
+				lip->fl.multi = TRUE ;
 	                        break ;
 
 /* options */
@@ -712,12 +712,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* specify with or without repititions */
 	                    case 'w':
-	                        lip->f.with = TRUE ;
+	                        lip->fl.with = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.with = (rs > 0) ;
+	                                lip->fl.with = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -826,7 +826,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    rs = procopts(pip,&akopts) ;
 	}
 
-	if (lip->f.multi) {
+	if (lip->fl.multi) {
 	    switch (lip->numtype) {
 	    case numtype_permutations:
 		lip->numtype = numtype_multipermutations ;
@@ -864,7 +864,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	    	    SHIO	*efp = (SHIO *) pip->efp ;
 		    cchar	*pn = pip->progname ;
 	            shio_printf(efp,"%s: invalid query (%d)\n",pn,rs) ;
@@ -991,7 +991,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.otype) {
 	                        lip->have.otype = TRUE ;
 	                        lip->final.otype = TRUE ;
-	                        lip->f.otype = TRUE ;
+	                        lip->fl.otype = TRUE ;
 	                        if (vl > 0) {
 	                            rs = locinfo_setotype(lip,vp,vl) ;
 				}
@@ -1001,7 +1001,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.hex) {
 	                        lip->have.hex = TRUE ;
 	                        lip->final.hex = TRUE ;
-	                        lip->f.hex = TRUE ;
+	                        lip->fl.hex = TRUE ;
 				lip->otype = otype_hex ;
 	                    }
 	                    break ;
@@ -1098,7 +1098,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            rs1 = shio_close(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	    	        SHIO	*efp = (SHIO *) pip->efp ;
 	                fmt = "%s: inacessible argument-list (%d)\n",
 	                shio_printf(efp,fmt,rs) ;
@@ -1193,14 +1193,14 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 		v = ipowell(n,k) ;
 		break ;
 	    case numtype_permutations:
-	        if (lip->f.with) {
+	        if (lip->fl.with) {
 		    v = ipowell(n,k) ;
 		} else {
 		    v = permutations(n,k) ;
 		}
 		break ;
 	    case numtype_combinations:
-	        if (lip->f.with) {
+	        if (lip->fl.with) {
 		    v = multicombinations(n,k) ;
 		} else {
 		    v = combinations(n,k) ;
