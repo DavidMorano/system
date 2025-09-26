@@ -598,7 +598,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -1233,7 +1233,7 @@ static int procfile(PROGINFO *pip,PROCDATA *pdp,void *ofp,cchar *ifname)
 	        ifname,rs,nblocks) ;
 	}
 
-	if ((rs < 0) && (! pip->f.quiet)) {
+	if ((rs < 0) && (! pip->fl.quiet)) {
 	    shio_printf(pip->efp,"%s: error (%d) file=%s\n",
 	        pip->progname,rs,ifname) ;
 	} else if (pip->debuglevel > 0) {
@@ -1363,7 +1363,7 @@ static int locinfo_allocbegin(LOCINFO *lip,int blocklen)
 	    if ((rs = u_mmap(NULL,ms,mp,mf,-1,0L,&md)) >= 0) {
 	        lip->rdata = md ;
 	        lip->rsize = ms ;
-	        lip->f.mapfile = TRUE ;
+	        lip->fl.mapfile = TRUE ;
 	    }
 	} /* end if */
 
