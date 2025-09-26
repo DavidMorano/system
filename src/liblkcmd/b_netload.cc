@@ -557,7 +557,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -611,12 +611,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 's':
 	                        lip->final.set = TRUE ;
 	                        lip->have.set = TRUE ;
-	                        lip->f.set = TRUE ;
+	                        lip->fl.set = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.set = (rs > 0) ;
+	                                lip->fl.set = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -781,7 +781,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1132,7 +1132,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 
 	switch (ri) {
 	case qopt_netload:
-	    if (lip->f.set) {
+	    if (lip->fl.set) {
 	        rs = procset(pip,vp,vl) ;
 	    } else {
 	        cbp = cbuf ;
@@ -1165,7 +1165,7 @@ static int procout(PROGINFO *pip,void *ofp,cchar *sp,int sl)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	if ((pip->verboselevel > 0) && (! lip->f.set)) {
+	if ((pip->verboselevel > 0) && (! lip->fl.set)) {
 	    if (sp == NULL) {
 	        sp = "*" ;
 	        sl = 1 ;
