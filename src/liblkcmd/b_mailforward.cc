@@ -407,8 +407,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	pip->intpoll = -1 ;
 	pip->disint = -1 ;
 
-	pip->f.quiet = FALSE ;
-	pip->f.daemon = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.daemon = FALSE ;
 
 /* start parsing the arguments */
 
@@ -655,7 +655,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -669,7 +669,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* daemon mode */
 	                    case 'd':
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -909,7 +909,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("b_mailforward: daemon=%u logging=%u\n",
-	        pip->f.daemon,pip->have.log) ;
+	        pip->fl.daemon,pip->have.log) ;
 #endif
 
 /* log ID */
@@ -1003,7 +1003,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        rs1 = shio_close(afp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,
 	                "%s: inaccessible argument-list (%d)\n",
 	                pip->progname,rs) ;
@@ -1044,7 +1044,7 @@ baduserinfo:
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 		}
@@ -1453,7 +1453,7 @@ CONFIG	*op ;
 	        switch (i) {
 
 	        case param_pollint:
-	            if (pip->f.pollint)
+	            if (pip->fl.pollint)
 	                rs1 = TRUE ;
 	            break ;
 
