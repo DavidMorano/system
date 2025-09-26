@@ -481,7 +481,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
-	                        lip->f.mnz = TRUE ;
+	                        lip->fl.mnz = TRUE ;
 	                        if (argl) {
 	                            rs = optvalue(argp,argl) ;
 	                            lip->mod = rs ;
@@ -606,7 +606,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -651,7 +651,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* lower case */
 	                    case 'l':
-	                        lip->f.uppercase = FALSE ;
+	                        lip->fl.uppercase = FALSE ;
 	                        break ;
 
 /* perform a final modulo operation */
@@ -687,7 +687,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* line-buffered */
 	                    case 'u':
-	                        lip->f.bufline = TRUE ;
+	                        lip->fl.bufline = TRUE ;
 	                        break ;
 
 /* verbose output */
@@ -1033,7 +1033,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *ifn,
 	    int		cl ;
 	    cchar	*cp ;
 
-	    if (lip->f.bufline)
+	    if (lip->fl.bufline)
 	        rs = shio_control(ofp,SHIO_CSETBUFLINE,TRUE) ;
 
 	    if (rs >= 0) {
@@ -1067,7 +1067,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *ifn,
 	            int		len ;
 	            char	lbuf[LINEBUFLEN+1] ;
 
-	            if (lip->f.bufline)
+	            if (lip->fl.bufline)
 	                shio_control(afp,SHIO_CSETBUFLINE,TRUE) ;
 
 	            while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1110,7 +1110,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *ifn,
 	            int		len ;
 	            char	lbuf[LINEBUFLEN+1] ;
 
-	            if (lip->f.bufline)
+	            if (lip->fl.bufline)
 	                shio_control(ifp,SHIO_CSETBUFLINE,TRUE) ;
 
 	            while ((rs = shio_readline(ifp,lbuf,llen)) > 0) {
@@ -1311,7 +1311,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
 
 	    if (lip->mod > 0) {
 	        value = (value % lip->mod) ;
-	        if (lip->f.mnz && (value == 0)) {
+	        if (lip->fl.mnz && (value == 0)) {
 	            value = lip->mod ;
 		}
 	    }
@@ -1360,7 +1360,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
 	    case 16:
 	        if ((rs = cthexi(obuf,olen,value)) > 0) {
 		    int	i ;
-	            if (lip->f.uppercase) {
+	            if (lip->fl.uppercase) {
 	                if ((i = strcspn(obuf,"abcdef")) > 0) {
 	                    while (i < 8) {
 	                        obuf[i] = touc(obuf[i]) ;
