@@ -455,7 +455,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* initialize */
 
 	pip->verboselevel = 1 ;
-	pip->f.logprog = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -746,7 +746,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -768,14 +768,14 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* list mode */
 	                    case 'l':
-	                        lip->f.list = TRUE ;
+	                        lip->fl.list = TRUE ;
 	                        lip->have.list = TRUE ;
 	                        lip->final.list = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(argp,argl) ;
-	                                lip->f.list = (rs > 0) ;
+	                                lip->fl.list = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -800,13 +800,13 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* only special-queries */
 	                    case 's':
-	                        lip->f.squery = TRUE ;
+	                        lip->fl.squery = TRUE ;
 	                        lip->final.squery = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.squery = (rs > 0) ;
+	                                lip->fl.squery = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -980,7 +980,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 #endif
 
 	rs1 = checkonc(pip->pr,NULL,NULL,NULL) ;
-	lip->f.onckey = (rs1 >= 0) ;
+	lip->fl.onckey = (rs1 >= 0) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -995,7 +995,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 #endif
 
 	if ((un != NULL) && (un[0] != '-') && (un[0] != '\0')) {
-	    lip->f.altuser = TRUE ;
+	    lip->fl.altuser = TRUE ;
 	}
 
 /* go */
@@ -1102,7 +1102,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1265,10 +1265,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 	                    if (! lip->final.squery) {
 	                        lip->have.squery = TRUE ;
 	                        lip->final.squery = TRUE ;
-	                        lip->f.squery = TRUE ;
+	                        lip->fl.squery = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.squery = (rs > 0) ;
+	                            lip->fl.squery = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1305,7 +1305,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("main/process: ent ofn=%s\n",ofn) ;
-	    debugprintf("main/process: f_list=%u\n",lip->f.list) ;
+	    debugprintf("main/process: f_list=%u\n",lip->fl.list) ;
 	}
 #endif
 
@@ -1313,7 +1313,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    ofn = STDFNOUT ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
-	    if (lip->f.list) {
+	    if (lip->fl.list) {
 	        rs = proclist(pip,ofp) ;
 	    } else {
 	        rs = procargs(pip,aip,bop,ofp,afn) ;
@@ -1488,7 +1488,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar *qp,int ql)
 	    shio_printf(pip->efp,fmt,pn,qp,ql) ;
 	}
 
-	if (! lip->f.squery) {
+	if (! lip->fl.squery) {
 	    PCSCONF_CUR	cur ;
 	    int		nfs ;
 	    if ((rs = pcsconf_curbegin(pcp,&cur)) >= 0) {
@@ -1964,11 +1964,11 @@ static int locinfo_prlocal(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if (! lip->f.prlocal) {
+	if (! lip->fl.prlocal) {
 	    cchar	*var = VARPRLOCAL ;
 	    cchar	*dn = pip->domainname ;
 	    char	tmpdname[MAXPATHLEN + 1] ;
-	    lip->f.prlocal = TRUE ;
+	    lip->fl.prlocal = TRUE ;
 	    if ((rs = mkpr(tmpdname,MAXPATHLEN,var,dn)) >= 0) {
 	        cchar	**vpp = &lip->prlocal ;
 	        rs = locinfo_setentry(lip,vpp,tmpdname,rs) ;
@@ -1988,14 +1988,14 @@ static int locinfo_nisdomain(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (! lip->f.nisdomain) {
+	if (! lip->fl.nisdomain) {
 	    cint	dlen = MAXHOSTNAMELEN ;
 	    int		dl = -1 ;
 	    cchar	*dp = NULL ;
 	    char	dbuf[MAXHOSTNAMELEN+ 1] ;
-	    lip->f.nisdomain = TRUE ;
+	    lip->fl.nisdomain = TRUE ;
 
-	    if (! lip->f.altuser) {
+	    if (! lip->fl.altuser) {
 	        dp = getourenv(pip->envv,VARNISDOMAIN) ;
 	    }
 
@@ -2080,14 +2080,14 @@ static int locinfo_clustername(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (! lip->f.clustername) {
+	if (! lip->fl.clustername) {
 	    cint	nlen = NODENAMELEN ;
 	    int		nl = -1 ;
 	    cchar	*np = NULL ;
 	    char	nbuf[NODENAMELEN+ 1] ;
-	    lip->f.clustername = TRUE ;
+	    lip->fl.clustername = TRUE ;
 
-	    if (! lip->f.altuser) {
+	    if (! lip->fl.altuser) {
 	        np  = getourenv(pip->envv,VARCLUSTER) ;
 	    }
 
@@ -2148,12 +2148,12 @@ static int locinfo_org(LOCINFO *lip)
 	    debugprintf("b_pcsconf/locinfo_org: ent\n") ;
 #endif
 
-	if (! lip->f.org) {
+	if (! lip->fl.org) {
 	    cint	rlen = ORGLEN ;
 	    int		rl = -1 ;
 	    cchar	*rp = pip->org ;
 	    char	rbuf[ORGLEN+ 1] ;
-	    lip->f.org = TRUE ;
+	    lip->fl.org = TRUE ;
 
 	    if ((rp == NULL) || (rp[0] == '\0')) {
 	        cint	w = pcsnsreq_pcsorg ;
@@ -2202,14 +2202,14 @@ static int locinfo_pcsorg(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if (! lip->f.pcsorg) {
+	if (! lip->fl.pcsorg) {
 	    cint	rlen = ORGLEN ;
 	    int		rl = -1 ;
 	    cchar	*rp = NULL ;
 	    char	rbuf[ORGLEN+ 1] ;
-	    lip->f.pcsorg = TRUE ;
+	    lip->fl.pcsorg = TRUE ;
 
-	    if (! lip->f.altuser) {
+	    if (! lip->fl.altuser) {
 	        rp = getourenv(pip->envv,VARPCSORG) ;
 	    }
 
@@ -2246,12 +2246,12 @@ static int locinfo_pcsdeforg(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if (! lip->f.pcsdeforg) {
+	if (! lip->fl.pcsdeforg) {
 	    cint	rlen = ORGLEN ;
 	    int		rl = -1 ;
 	    cchar	*rp = NULL ;
 	    char	rbuf[ORGLEN+ 1] ;
-	    lip->f.pcsdeforg = TRUE ;
+	    lip->fl.pcsdeforg = TRUE ;
 
 	    if (rp == NULL) {
 	        cchar	*un = pip->username ;
@@ -2296,20 +2296,20 @@ static int locinfo_name(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if (! lip->f.name) {
+	if (! lip->fl.name) {
 	    cint	rlen = REALNAMELEN ;
 	    int		rl = -1 ;
 	    cchar	*rp = NULL ;
 	    char	rbuf[REALNAMELEN+1] ;
-	    lip->f.name = TRUE ;
+	    lip->fl.name = TRUE ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
 	        debugprintf("pcsconf/locinfo_name: un=%s alt=%u\n",
-	            pip->username,lip->f.altuser) ;
+	            pip->username,lip->fl.altuser) ;
 #endif
 
-	    if (! lip->f.altuser) {
+	    if (! lip->fl.altuser) {
 	        rp = getourenv(pip->envv,VARNAME) ;
 	    }
 
@@ -2346,14 +2346,14 @@ static int locinfo_fullname(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if (! lip->f.fullname) {
+	if (! lip->fl.fullname) {
 	    cint	rlen = REALNAMELEN ;
 	    int		rl = -1 ;
 	    cchar	*rp = NULL ;
 	    char	rbuf[REALNAMELEN+1] ;
-	    lip->f.fullname = TRUE ;
+	    lip->fl.fullname = TRUE ;
 
-	    if (! lip->f.altuser) {
+	    if (! lip->fl.altuser) {
 	        rp = getourenv(pip->envv,VARFULLNAME) ;
 	    }
 
@@ -2390,12 +2390,12 @@ static int locinfo_ema(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if (! lip->f.ema) {
+	if (! lip->fl.ema) {
 	    cint	dlen = MAXHOSTNAMELEN ;
 	    int		dl = -1 ;
 	    cchar	*dp = NULL ;
 	    char	dbuf[MAXHOSTNAMELEN+ 1] ;
-	    lip->f.ema = TRUE ;
+	    lip->fl.ema = TRUE ;
 
 	    if (dp == NULL) {
 	        if ((rs = locinfo_clustername(lip)) >= 0) {
@@ -2456,11 +2456,11 @@ static int locinfo_pcsusername(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if (! lip->f.pcsusername) {
+	if (! lip->fl.pcsusername) {
 	    PCSCONF	*pcp = pip->pcsconf ;
 	    cint	ulen = USERNAMELEN ;
 	    char	ubuf[USERNAMELEN+1] ;
-	    lip->f.pcsusername = TRUE ;
+	    lip->fl.pcsusername = TRUE ;
 	    if ((rs = pcsconf_getpcsusername(pcp,ubuf,ulen)) >= 0) {
 	        cchar	**vpp = &lip->pcsusername ;
 	        rs = locinfo_setentry(lip,vpp,ubuf,rs) ;
@@ -2478,11 +2478,11 @@ static int locinfo_facility(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
-	if (! lip->f.facility) {
+	if (! lip->fl.facility) {
 	    PROGINFO	*pip = lip->pip ;
 	    cint	flen = MAXNAMELEN ;
 	    char	fbuf[MAXNAMELEN+1] ;
-	    lip->f.facility = TRUE ;
+	    lip->fl.facility = TRUE ;
 	    if ((rs = pcsgetfacility(pip->pr,fbuf,flen)) >= 0) {
 	        cchar	**vpp = &lip->facility ;
 	        rs = locinfo_setentry(lip,vpp,fbuf,rs) ;
