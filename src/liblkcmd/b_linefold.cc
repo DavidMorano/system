@@ -399,7 +399,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* initialize */
 
 	pip->verboselevel = 1 ;
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -622,7 +622,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -644,12 +644,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* "crown" mode (for LINEFILL) */
 	                    case 'c':
-	                        lip->f.crown = TRUE ;
+	                        lip->fl.crown = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.crown = (rs > 0) ;
+	                                lip->fl.crown = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -675,12 +675,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* "split"-line mode (for LINEFILL) */
 	                    case 's':
-	                        lip->f.split = TRUE ;
+	                        lip->fl.split = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.split = (rs > 0) ;
+	                                lip->fl.split = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -893,7 +893,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if ((rs < 0) && (ex == EX_OK)) {
 	    switch (rs) {
 	    default:
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            cchar	*pn = pip->progname ;
 	            cchar	*fmt = "%s: could not process (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
@@ -1137,7 +1137,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	                rs1 = shio_close(afp) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } else {
-	                if (! pip->f.quiet) {
+	                if (! pip->fl.quiet) {
 			    fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                    shio_printf(pip->efp,fmt,pn,rs) ;
 	                    shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1188,7 +1188,7 @@ static int procfile(PROGINFO *pip,void *ofp,char *ibuf,int ilen,cchar *fn)
 	case progmode_linefill:
 	case progmode_fmt:
 	case progmode_mfmt:
-	    if (lip->f.split) {
+	    if (lip->fl.split) {
 	        rs = procfold(pip,ofp,ibuf,ilen,fn) ;
 	        wlen += rs ;
 	    } else {
@@ -1266,7 +1266,7 @@ static int procfill(PROGINFO *pip,void *ofp,char *ibuf,int ilen,cchar *fn)
 	    rs1 = shio_close(ifp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        cchar	*pn = pip->progname ;
 	        cchar	*fmt ;
 		fmt = "%s: inaccessible source (%d)\n" ;
@@ -1391,7 +1391,7 @@ static int procfold(PROGINFO *pip,void *ofp,char *ibuf,int ilen,cchar *fn)
 	    rs1 = shio_close(ifp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        cchar	*pn = pip->progname ;
 	        cchar	*fmt ;
 		fmt = "%s: inaccessible source (%d)\n" ;
