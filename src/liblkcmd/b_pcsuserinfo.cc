@@ -79,7 +79,6 @@
 #include	<sysrealname.h>
 #include	<sysusernames.h>
 #include	<pcsns.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -678,24 +677,24 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                case argopt_nocache:
 	                    lip->final.nocache = TRUE ;
-	                    lip->f.nocache = TRUE ;
+	                    lip->fl.nocache = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.nocache = (rs > 0) ;
+	                            lip->fl.nocache = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 	                case argopt_all:
 	                    lip->final.all = TRUE ;
-	                    lip->f.all = TRUE ;
+	                    lip->fl.all = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.all = (rs > 0) ;
+	                            lip->fl.all = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -728,7 +727,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -750,12 +749,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                    case 'a':
 	                        lip->final.all = TRUE ;
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (argl) {
 	                                rs = optbool(argp,argl) ;
-	                                lip->f.all = (rs > 0) ;
+	                                lip->fl.all = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -763,12 +762,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* full-name */
 	                    case 'f':
 	                        lip->final.fullname = TRUE ;
-	                        lip->f.fullname = TRUE ;
+	                        lip->fl.fullname = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.fullname = (rs > 0) ;
+	                                lip->fl.fullname = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -794,7 +793,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* set */
 	                    case 's':
 	                        lip->final.set = TRUE ;
-	                        lip->f.set = TRUE ;
+	                        lip->fl.set = TRUE ;
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
@@ -977,7 +976,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1158,10 +1157,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.linebuf) {
 	                        lip->have.linebuf = TRUE ;
 	                        lip->final.linebuf = TRUE ;
-	                        lip->f.linebuf = TRUE ;
+	                        lip->fl.linebuf = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.linebuf = (rs > 0) ;
+	                            lip->fl.linebuf = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1169,10 +1168,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.all) {
 	                        lip->have.all = TRUE ;
 	                        lip->final.all = TRUE ;
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.all = (rs > 0) ;
+	                            lip->fl.all = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1180,10 +1179,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.realname) {
 	                        lip->have.realname = TRUE ;
 	                        lip->final.realname = TRUE ;
-	                        lip->f.realname = TRUE ;
+	                        lip->fl.realname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.realname = (rs > 0) ;
+	                            lip->fl.realname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1192,10 +1191,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.pcsname) {
 	                        lip->have.pcsname = TRUE ;
 	                        lip->final.pcsname = TRUE ;
-	                        lip->f.pcsname = TRUE ;
+	                        lip->fl.pcsname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.pcsname = (rs > 0) ;
+	                            lip->fl.pcsname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1203,10 +1202,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.fullname) {
 	                        lip->have.fullname = TRUE ;
 	                        lip->final.fullname = TRUE ;
-	                        lip->f.fullname = TRUE ;
+	                        lip->fl.fullname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.fullname = (rs > 0) ;
+	                            lip->fl.fullname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1214,10 +1213,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.mailname) {
 	                        lip->have.mailname = TRUE ;
 	                        lip->final.mailname = TRUE ;
-	                        lip->f.mailname = TRUE ;
+	                        lip->fl.mailname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.mailname = (rs > 0) ;
+	                            lip->fl.mailname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1252,12 +1251,12 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 
-	    if (lip->f.linebuf) {
+	    if (lip->fl.linebuf) {
 	        rs = shio_control(ofp,SHIO_CSETBUFLINE,TRUE) ;
 	    }
 
 	    if (rs >= 0) {
-	        if (lip->f.all) {
+	        if (lip->fl.all) {
 	            rs = procall(pip,aip,bop,ofp) ;
 	        } else {
 	            rs = procargs(pip,aip,bop,ofp,afn) ;
@@ -1347,7 +1346,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
 	            rs1 = shio_close(afp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			cchar	*pn = pip->progname ;
 			cchar	*fmt ;
 			fmt = "%s: inaccessible argument-list (%d)\n" ;
@@ -1564,7 +1563,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *un)
 	}
 #endif
 
-	if (lip->f.set) {
+	if (lip->fl.set) {
 	    switch (pip->progmode) {
 	    case progmode_pcsname:
 	        rs = procsetname(pip,un) ;
@@ -1606,7 +1605,7 @@ static int procsetname(PROGINFO *pip,cchar *un)
 	int		rs ;
 
 	if (lip->setval != NULL) {
-	    const int	f = lip->f.fullname ;
+	    const int	f = lip->fl.fullname ;
 	    rs = pcsinfoset(pip->pr,lip->setval,-1,un,f) ;
 	} else
 	    rs = SR_INVALID ;
@@ -1656,9 +1655,9 @@ static int procgetname(PROGINFO *pip,void *ofp,cchar *un)
 	char		nbuf[REALNAMELEN + 1] ;
 	char		*np ;
 
-	if (lip->f.realname || lip->f.mailname) {
+	if (lip->fl.realname || lip->fl.mailname) {
 	    w = pcsnsreq_realname ;
-	} else if (lip->f.fullname) {
+	} else if (lip->fl.fullname) {
 	    w = pcsnsreq_fullname ;
 	}
 
@@ -1667,7 +1666,7 @@ static int procgetname(PROGINFO *pip,void *ofp,cchar *un)
 	    const int	mlen = REALNAMELEN ;
 	    char	*mbuf = NULL ;
 	    int		nl = rs ;
-	    if ((w == pcsnsreq_realname) && lip->f.mailname) {
+	    if ((w == pcsnsreq_realname) && lip->fl.mailname) {
 		if ((rs = uc_malloc((mlen+1),&mbuf)) >= 0) {
 		    if ((rs = mkmailname(mbuf,mlen,np,nl)) >= 0) {
 			np = mbuf ;
