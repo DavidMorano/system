@@ -485,13 +485,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_nh:
-	                    lip->f.hdr = FALSE ;
+	                    lip->fl.hdr = FALSE ;
 	                    lip->final.hdr = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.hdr = (rs == 0) ;
+	                            lip->fl.hdr = (rs == 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -619,12 +619,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* print header */
 	                    case 'H':
-	                        lip->f.hdr = TRUE ;
+	                        lip->fl.hdr = TRUE ;
 	                        break ;
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -659,12 +659,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* print header */
 	                    case 'h':
 	                        lip->final.hdr = TRUE ;
-	                        lip->f.hdr = TRUE ;
+	                        lip->fl.hdr = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.hdr = (rs > 0) ;
+	                                lip->fl.hdr = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -852,7 +852,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
 	    ex = mapex(mapexs,rs) ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        shio_printf(pip->efp,
 	            "%s: could not perform function (%d)\n",
 	            pip->progname,rs) ;
@@ -975,10 +975,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                case akoname_dotusers:
 	                    lip->have.dotusers = TRUE ;
-	                    lip->f.dotusers = TRUE ;
+	                    lip->fl.dotusers = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.dotusers = (rs > 0) ;
+	                        lip->fl.dotusers = (rs > 0) ;
 	                    }
 	                    break ;
 
@@ -986,10 +986,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_hdr:
 	                    if (! lip->final.hdr) {
 	                        lip->final.hdr = TRUE ;
-	                        lip->f.hdr = TRUE ;
+	                        lip->fl.hdr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.hdr = (rs > 0) ;
+	                            lip->fl.hdr = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1138,7 +1138,7 @@ static int procloadname(PROGINFO *pip,vecstr *nlp,cchar *cp,int cl)
 	        cl = rs ;
 	    }
 	    if (nch == '+') {
-	        lip->f.self = TRUE ;
+	        lip->fl.self = TRUE ;
 	    }
 	}
 
@@ -1412,7 +1412,7 @@ static int procthemout(PROGINFO *pip,void *ofp,vecobj *ulp)
 
 	vecobj_sort(ulp,cmpdate) ;
 
-	    if (lip->f.hdr) {
+	    if (lip->fl.hdr) {
 	        fmt = "LOGNAME    NUMBER DATE                    REALNAME\n" ;
 	        shio_printf(ofp,fmt) ;
 	    }
@@ -1426,7 +1426,7 @@ static int procthemout(PROGINFO *pip,void *ofp,vecobj *ulp)
 	    for (i = 0 ; vecobj_get(ulp,i,&rp) >= 0 ; i += 1) {
 	        if (rp == NULL) continue ;
 
-	        if ((! lip->f.dotusers) && (rp->name[0] == '.'))
+	        if ((! lip->fl.dotusers) && (rp->name[0] == '.'))
 	            continue ;		/* ignore fake (dot) users */
 
 #if	CF_DEBUG
