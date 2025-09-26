@@ -353,7 +353,7 @@ void		*contextp ;
 	rs1 = shio_open(&errfile,cp,"wca",0666) ;
 	if (rs1 >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    shio_control(&errfile,SHIO_CLINEBUF,0) ;
 	}
 
@@ -571,7 +571,7 @@ void		*contextp ;
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -779,7 +779,7 @@ void		*contextp ;
 
 	        shio_close(afp) ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,
 	                "%s: could not open argument list file\n",
 	                pip->progname) ;
@@ -1046,9 +1046,9 @@ PROGINFO	*pip ;
 	int	rs = SR_OK ;
 
 
-	if (! lip->f.fla) {
+	if (! lip->fl.fla) {
 
-	    lip->f.fla = TRUE ;
+	    lip->fl.fla = TRUE ;
 	    rs = uc_getloadavg(lip->fla,3) ;
 
 	}
@@ -1066,9 +1066,9 @@ PROGINFO	*pip ;
 	int	rs = SR_OK ;
 
 
-	if (! lip->f.nusers) {
+	if (! lip->fl.nusers) {
 
-	    lip->f.nusers = TRUE ;
+	    lip->fl.nusers = TRUE ;
 	    rs = nusers(lip->utfname) ;
 
 	    lip->nusers = rs ;
@@ -1085,8 +1085,8 @@ static int getnprocs(PROGINFO *pip)
 
 	int	rs = SR_OK ;
 
-	if (! lip->f.nprocs) {
-	    lip->f.nprocs = TRUE ;
+	if (! lip->fl.nprocs) {
+	    lip->fl.nprocs = TRUE ;
 	    rs = uc_nprocs(0) ;
 	    lip->nprocs = rs ;
 	}
