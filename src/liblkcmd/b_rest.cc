@@ -22,12 +22,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ rest <timespec(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -58,7 +55,6 @@
 #include	<userinfo.h>
 #include	<pcsconf.h>
 #include	<pcspoll.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -358,7 +354,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	pip->verboselevel = 1 ;
 	pip->intpoll = -1 ;
 
-	pip->f.logprog = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 	pip->lip = &li ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -592,7 +588,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -1004,10 +1000,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case progopt_poll:
-	                    lip->f.poll = TRUE ;
+	                    lip->fl.poll = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.poll = (rs > 0) ;
+	                        lip->fl.poll = (rs > 0) ;
 	                    }
 	                    break ;
 	                case progopt_intpoll:
@@ -1022,10 +1018,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.logprog) {
 	                        pip->have.logprog = TRUE ;
 	                        pip->final.logprog = TRUE ;
-	                        pip->f.logprog = TRUE ;
+	                        pip->fl.logprog = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.logprog = (rs > 0) ;
+	                            pip->fl.logprog = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1399,7 +1395,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
-	lip->f.poll = TRUE ;
+	lip->fl.poll = TRUE ;
 
 	return rs ;
 }
