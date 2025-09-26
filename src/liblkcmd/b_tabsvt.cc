@@ -491,11 +491,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	pip->lip = &li ;
 	memset(&li,0,sizeof(LOCINFO)) ;
 
-	lip->have.clear = lip->f.clear = TRUE ;
-	lip->have.scroll = lip->f.scroll = TRUE ;
-	lip->have.la = lip->f.la = TRUE ;
-	lip->have.mailcheck = lip->f.mailcheck = TRUE ;
-	lip->have.nusers = lip->f.nusers = TRUE ;
+	lip->have.clear = lip->fl.clear = TRUE ;
+	lip->have.scroll = lip->fl.scroll = TRUE ;
+	lip->have.la = lip->fl.la = TRUE ;
+	lip->have.mailcheck = lip->fl.mailcheck = TRUE ;
+	lip->have.nusers = lip->fl.nusers = TRUE ;
 
 /* start parsing the arguments */
 
@@ -727,7 +727,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -762,18 +762,18 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'a':
 	                        lip->have.all = TRUE ;
 	                        lip->final.all = TRUE ;
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        break ;
 
 	                    case 'd':
 	                        lip->have.date = TRUE ;
 	                        lip->final.date = TRUE ;
-	                        lip->f.date = TRUE ;
+	                        lip->fl.date = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.date = (rs > 0) ;
+	                                lip->fl.date = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -781,7 +781,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'i':
 	                        lip->have.init = TRUE ;
 	                        lip->final.init = TRUE ;
-	                        lip->f.init = TRUE ;
+	                        lip->fl.init = TRUE ;
 	                        break ;
 
 /* options */
@@ -913,17 +913,17 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    debugprintf("b_tabsvt: f_init=%u\n",lip->f.init) ;
-	    debugprintf("b_tabsvt: f_all=%u\n",lip->f.all) ;
-	    debugprintf("b_tabsvt: f_clear=%u\n",lip->f.clear) ;
-	    debugprintf("b_tabsvt: f_date=%u\n",lip->f.date) ;
+	    debugprintf("b_tabsvt: f_init=%u\n",lip->fl.init) ;
+	    debugprintf("b_tabsvt: f_all=%u\n",lip->fl.all) ;
+	    debugprintf("b_tabsvt: f_clear=%u\n",lip->fl.clear) ;
+	    debugprintf("b_tabsvt: f_date=%u\n",lip->fl.date) ;
 	}
 #endif
 
 /* get program-root for PCS if it is needed */
 
 	pcsroot[0] = '\0' ;
-	if ((rs >= 0) && lip->f.mailcheck) {
+	if ((rs >= 0) && lip->fl.mailcheck) {
 	    if ((prpcs != NULL) && (prpcs[0] != '\0')) {
 	        lip->prpcs = prpcs ;
 	    } else {
@@ -933,7 +933,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    }
 	} /* end if (mailcheck) */
 
-	if (lip->f.nusers && (lip->utfname == NULL)) {
+	if (lip->fl.nusers && (lip->utfname == NULL)) {
 	    lip->utfname = utfname ;
 	} /* end if (nusers) */
 
@@ -952,11 +952,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (pip->debuglevel > 0) {
 	    shio_printf(pip->efp,"%s: f_all=%u\n",
-	        pip->progname,lip->f.all) ;
+	        pip->progname,lip->fl.all) ;
 	    shio_printf(pip->efp,"%s: f_date=%u\n",
-	        pip->progname,lip->f.date) ;
+	        pip->progname,lip->fl.date) ;
 	    shio_printf(pip->efp,"%s: f_scroll=%u\n",
-	        pip->progname,lip->f.scroll) ;
+	        pip->progname,lip->fl.scroll) ;
 	}
 
 /* find the terminal type, if we have it */
@@ -1118,10 +1118,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.all) {
 	                lip->have.all = TRUE ;
 	                lip->final.all = TRUE ;
-	                lip->f.all = TRUE ;
+	                lip->fl.all = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    lip->f.all = (rs > 0) ;
+	                    lip->fl.all = (rs > 0) ;
 			}
 	            }
 	            break ;
@@ -1130,10 +1130,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.init) {
 	                lip->have.init = TRUE ;
 	                lip->final.init = TRUE ;
-	                lip->f.init = TRUE ;
+	                lip->fl.init = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    lip->f.init = (rs > 0) ;
+	                    lip->fl.init = (rs > 0) ;
 			}
 	            }
 	            break ;
@@ -1142,10 +1142,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.sd) {
 	                lip->have.sd = TRUE ;
 	                lip->final.sd = TRUE ;
-	                lip->f.sd = TRUE ;
+	                lip->fl.sd = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    lip->f.sd = (rs > 0) ;
+	                    lip->fl.sd = (rs > 0) ;
 			}
 	            }
 	            break ;
@@ -1154,10 +1154,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.clear) {
 	                lip->have.clear = TRUE ;
 	                lip->final.date = TRUE ;
-	                lip->f.clear = TRUE ;
+	                lip->fl.clear = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    lip->f.clear = (rs > 0) ;
+	                    lip->fl.clear = (rs > 0) ;
 			}
 	            }
 	            break ;
@@ -1166,10 +1166,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.date) {
 	                lip->have.date = TRUE ;
 	                lip->final.date = TRUE ;
-	                lip->f.date = TRUE ;
+	                lip->fl.date = TRUE ;
 	                if (vl > 0) {
 			    rs = (vp,vl) ;
-	                    lip->f.date = (rs > 0) ;
+	                    lip->fl.date = (rs > 0) ;
 			}
 	            }
 	            break ;
@@ -1178,10 +1178,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.scroll) {
 	                lip->have.scroll = TRUE ;
 	                lip->final.scroll = TRUE ;
-	                lip->f.scroll = TRUE ;
+	                lip->fl.scroll = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    lip->f.scroll = (rs > 0) ;
+	                    lip->fl.scroll = (rs > 0) ;
 			}
 	            }
 	            break ;
@@ -1190,10 +1190,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.la) {
 	                lip->have.la = TRUE ;
 	                lip->final.la = TRUE ;
-	                lip->f.la = TRUE ;
+	                lip->fl.la = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    lip->f.la = (rs > 0) ;
+	                    lip->fl.la = (rs > 0) ;
 			}
 	            }
 	            break ;
@@ -1202,10 +1202,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.mailcheck) {
 	                lip->have.mailcheck = TRUE ;
 	                lip->final.mailcheck = TRUE ;
-	                lip->f.mailcheck = TRUE ;
+	                lip->fl.mailcheck = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    lip->f.mailcheck = (rs > 0) ;
+	                    lip->fl.mailcheck = (rs > 0) ;
 			}
 	            }
 	            break ;
@@ -1214,10 +1214,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            if (! lip->final.nusers) {
 	                lip->have.nusers = TRUE ;
 	                lip->final.nusers = TRUE ;
-	                lip->f.nusers = TRUE ;
+	                lip->fl.nusers = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
-	                    lip->f.nusers = (rs > 0) ;
+	                    lip->fl.nusers = (rs > 0) ;
 			}
 	            }
 	            break ;
@@ -1293,10 +1293,10 @@ cchar	termspec[] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_s/process: f_init=%u\n",lip->f.init) ;
+	    debugprintf("b_s/process: f_init=%u\n",lip->fl.init) ;
 #endif
 
-	if ((rs >= 0) && lip->f.init) {
+	if ((rs >= 0) && lip->fl.init) {
 
 	    rs = terminit(pip,termspec,termflags,lines,buf,BUFLEN) ;
 
@@ -1313,10 +1313,10 @@ cchar	termspec[] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_s/process: f_clear=%u\n",lip->f.clear) ;
+	    debugprintf("b_s/process: f_clear=%u\n",lip->fl.clear) ;
 #endif
 
-	if ((rs >= 0) && lip->f.clear) {
+	if ((rs >= 0) && lip->fl.clear) {
 
 	    rs = termclear(pip,termspec,termflags,lines,buf,BUFLEN) ;
 
@@ -1333,10 +1333,10 @@ cchar	termspec[] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_s/process: f_date=%u\n",lip->f.date) ;
+	    debugprintf("b_s/process: f_date=%u\n",lip->fl.date) ;
 #endif
 
-	if ((rs >= 0) && lip->f.date) {
+	if ((rs >= 0) && lip->fl.date) {
 
 	    time_t	daytime = time(NULL) ;
 
@@ -1345,10 +1345,10 @@ cchar	termspec[] ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
-	        debugprintf("b_s/process: f_sd=%u\n",lip->f.sd) ;
+	        debugprintf("b_s/process: f_sd=%u\n",lip->fl.sd) ;
 #endif
 
-	    if (lip->f.sd) {
+	    if (lip->fl.sd) {
 
 	        rs = termdate(pip,termspec,termflags,lines,buf,BUFLEN,
 	            daytime) ;
@@ -1501,11 +1501,11 @@ int		buflen ;
 
 #if	CF_SR
 	if ((termflags & TCF_MSR) && (termflags & TCF_MACSRS)) {
-	    if (lip->f.scroll && (! lip->f.clear))
+	    if (lip->fl.scroll && (! lip->fl.clear))
 	        lines = -1 ;
 	}
 
-	if (lip->f.scroll && (termflags & TCF_MSR) && (lines > 0)) {
+	if (lip->fl.scroll && (termflags & TCF_MSR) && (lines > 0)) {
 
 #if	CF_CSR
 	    if (termflags & TCF_MVCSR)
@@ -1532,23 +1532,23 @@ int		buflen ;
 
 /* clear screen */
 
-	if (lip->f.clear) {
+	if (lip->fl.clear) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
 	        debugprintf("b_s/terminit: clear\n") ;
 #endif
 
-	    lip->f.clear = FALSE ;
+	    lip->fl.clear = FALSE ;
 	    loadstrs(&b,s_clear) ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
 	        debugprintf("b_s/terminit: f_all=%u TERM=%s F_MSD=%u\n",
-	            lip->f.all,termspec,((termflags & TCF_MSD) ? 1 : 0)) ;
+	            lip->fl.all,termspec,((termflags & TCF_MSD) ? 1 : 0)) ;
 #endif
 
-	    if (lip->f.all && (termflags & TCF_MSD)) {
+	    if (lip->fl.all && (termflags & TCF_MSD)) {
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))
@@ -1609,7 +1609,7 @@ int		buflen ;
 
 /* clear the status display if there is and additionally asked to do so */
 
-	if (lip->f.all && (termflags & TCF_MSD)) {
+	if (lip->fl.all && (termflags & TCF_MSD)) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -1762,7 +1762,7 @@ time_t		daytime ;
 
 
 		    rs1 = SR_OVERFLOW ;
-	            if (lip->f.nusers) {
+	            if (lip->fl.nusers) {
 
 			rs1 = nusers(lip->utfname) ;
 			n = rs1 ;
@@ -1814,7 +1814,7 @@ time_t		daytime ;
 	            char	*pbp = (char *) blanks ;
 
 
-	            if (lip->f.la) {
+	            if (lip->fl.la) {
 
 	                double	la[3] ;
 
@@ -1861,12 +1861,12 @@ time_t		daytime ;
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
 	                debugprintf("b_s/termdate: mailcheck=%u\n",
-	                    lip->f.mailcheck) ;
+	                    lip->fl.mailcheck) ;
 #endif
 
 	            mnbuf[0] = '\0' ;
 	            mcbuf[0] = '\0' ;
-	            if (lip->f.mailcheck) {
+	            if (lip->fl.mailcheck) {
 
 	                rs1 = pcsmailcheck(lip->prpcs,mnbuf,MNBUFLEN,"-") ;
 
