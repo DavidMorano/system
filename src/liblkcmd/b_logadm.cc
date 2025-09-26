@@ -624,7 +624,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -647,7 +647,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* host */
 	                    case 'h':
 	                        lip->have.host = TRUE ;
-	                        lip->f.host = TRUE ;
+	                        lip->fl.host = TRUE ;
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
@@ -661,7 +661,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* termline */
 	                    case 'l':
 	                        lip->have.termline = TRUE ;
-	                        lip->f.termline = TRUE ;
+	                        lip->fl.termline = TRUE ;
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
@@ -675,12 +675,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* no */
 	                    case 'n':
 	                        lip->have.no = TRUE ;
-	                        lip->f.no = TRUE ;
+	                        lip->fl.no = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.no = (rs > 0) ;
+	                                lip->fl.no = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -688,12 +688,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* yes */
 	                    case 'y':
 	                        lip->have.yes = TRUE ;
-	                        lip->f.yes = TRUE ;
+	                        lip->fl.yes = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.yes = (rs > 0) ;
+	                                lip->fl.yes = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -875,8 +875,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	locinfo_to(lip,to) ;
 
-	if ((rs >= 0) && lip->f.yes) {
-	    if (lip->f.no) {
+	if ((rs >= 0) && lip->fl.yes) {
+	    if (lip->fl.no) {
 	        shio_printf(pip->efp,"%s: invalid argument combination\n",
 	            pip->progname) ;
 	        goto badargcombo ;
@@ -884,7 +884,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    rs1 = getutmpent(&lip->ue,lip->sid) ;
 	    if (rs1 == SR_NOENT) {
 	        rs = proclogin(pip) ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            if (rs == SR_PERM) {
 	                shio_printf(pip->efp,
 	                    "%s: no permission for action (%d)\n",
@@ -896,16 +896,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        } /* end if (not quiet) */
 	    } else {
 	        ex = EX_PROTOCOL ; /* bad protocol to log in when already */
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            shio_printf(pip->efp,"%s: already logged in (%u)\n",
 	                pip->progname,rs1) ;
 	    }
 	    goto done ;
 	} /* end if (yes) */
 
-	if ((rs >= 0) && lip->f.no) {
+	if ((rs >= 0) && lip->fl.no) {
 	    rs = logout(-1) ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        if (rs == SR_PERM) {
 	            shio_printf(pip->efp,"%s: no permission for action (%d)\n",
 	                pip->progname,rs) ;
@@ -933,7 +933,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        cchar	*ofn = ofname ;
 	        rs = procargs(pip,&ainfo,&pargs,ofn,afn) ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            if (rs == SR_NOENT) {
 	                ex = EX_NOUSER ;
 	                shio_printf(pip->efp,
@@ -961,14 +961,14 @@ done:
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 		}
 	        break ;
 	    case SR_ISDIR:
 	        ex = EX_NOINPUT ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: could not find terminal (%d)\n",
 	                pip->progname,rs) ;
 		}
@@ -1261,7 +1261,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            rs1 = shio_close(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                shio_printf(pip->efp,
 	                    "%s: inaccessible argument-list (%d)\n",
 	                    pip->progname,rs) ;
