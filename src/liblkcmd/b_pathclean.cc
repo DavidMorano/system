@@ -494,7 +494,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -514,7 +514,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	                        break ;
 
 	                    case 'j':
-	                        lip->f.join = true ;
+	                        lip->fl.join = true ;
 	                        break ;
 
 /* options */
@@ -865,7 +865,7 @@ static int locinfo_mkjoin(LOCINFO *lip,char *pbuf,int plen) noex {
 	    if (sp[0] != ';') {
 
 		rs1 = SR_OK ;
-		if (lip->f.exists) {
+		if (lip->fl.exists) {
 		    ustat	sb ;
 		    rs1 = u_stat(sp,&sb) ;
 		    if ((rs1 >= 0) && (! S_ISDIR(sb.st_mode))) 
@@ -961,19 +961,19 @@ static int procopts(PROGINFO *pip,keyopt *kop) noex {
 
 	        case progopt_join:
 	            c += 1 ;
-	            lip->f.join = true ;
+	            lip->fl.join = true ;
 	            if (vl > 0) {
 			rs = optbool(vp,vl) ;
-	                lip->f.join = (rs > 0) ;
+	                lip->fl.join = (rs > 0) ;
 		    }
 	            break ;
 
 	        case progopt_exists:
 	            c += 1 ;
-	            lip->f.exists = true ;
+	            lip->fl.exists = true ;
 	            if (vl > 0) {
 			rs = optbool(vp,vl) ;
-	                lip->f.exists = (rs > 0) ;
+	                lip->fl.exists = (rs > 0) ;
 		    }
 	            break ;
 
@@ -1087,7 +1087,7 @@ static int procargs(PI *pip,AI *aip,bits *bop,cc *ofname,cc *afname) noex {
 
 	} /* end if (processing argument-list file) */
 
-	if ((rs >= 0) && lip->f.join) {
+	if ((rs >= 0) && lip->fl.join) {
 
 	    rs = procjoin(pip,ofp) ;
 
@@ -1152,7 +1152,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar sp[],int sl) noex {
 
 /* process */
 
-	if ((rs >= 0) && (! lip->f.join)) {
+	if ((rs >= 0) && (! lip->fl.join)) {
 	    rs = procjoin(pip,ofp) ;
 	} /* end if */
 
