@@ -1010,7 +1010,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -1203,7 +1203,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                rs,un) ;
 #endif
 
-	        if ((rs < 0) && (! pip->f.quiet)) {
+	        if ((rs < 0) && (! pip->fl.quiet)) {
 	            cchar	*pn = pip->progname ;
 	            cchar	*fmt ;
 	            if (rs == SR_NOTUNIQ) {
@@ -1728,22 +1728,22 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	        struct datasys	*dsp = &pdp->ds ;
 	        switch (qi) {
 	        case qopt_nodename:
-	            if (! dsp->f.node) rs = datasys_node(dsp) ;
+	            if (! dsp->fl.node) rs = datasys_node(dsp) ;
 	            if ((rs >= 0) && (dsp->nodename[0] != '\0'))
 	                sp = dsp->nodename ;
 	            break ;
 	        case qopt_cluster:
-	            if (! dsp->f.cluster) rs = datasys_cluster(dsp) ;
+	            if (! dsp->fl.cluster) rs = datasys_cluster(dsp) ;
 	            if ((rs >= 0) && (pdp->ds.clustername[0] != '\0'))
 	                sp = dsp->clustername ;
 	            break ;
 	        case qopt_system:
-	            if (! dsp->f.system) rs = datasys_system(dsp) ;
+	            if (! dsp->fl.system) rs = datasys_system(dsp) ;
 	            if ((rs >= 0) && (dsp->systemname[0] != '\0'))
 	                sp = dsp->systemname ;
 	            break ;
 	        case qopt_nisdomain:
-	            if (! dsp->f.nisdomain) rs = datasys_nisdomain(dsp) ;
+	            if (! dsp->fl.nisdomain) rs = datasys_nisdomain(dsp) ;
 	            if ((rs >= 0) && (dsp->nisdomainname[0] != '\0'))
 	                sp = dsp->nisdomainname ;
 	            break ;
@@ -1754,14 +1754,14 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	case qopt_udomain:
 	case qopt_inetdomain:
 	    {
-	        if (! pdp->f.domain) rs = progdata_domain(pdp) ;
+	        if (! pdp->fl.domain) rs = progdata_domain(pdp) ;
 	        if ((rs >= 0) && (pdp->domainname != nullptr))
 	            sp = pdp->domainname ;
 	    }
 	    break ;
 	case qopt_hostname:
 	    {
-	        if (! pdp->f.host) rs = progdata_host(pdp) ;
+	        if (! pdp->fl.host) rs = progdata_host(pdp) ;
 	        if ((rs >= 0) && (pdp->hostname[0] != '\0'))
 	            sp = pdp->hostname ;
 	    }
@@ -1825,7 +1825,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	            }
 	            break ;
 	        case qopt_organization:
-	            if (pdp->f.self) {
+	            if (pdp->fl.self) {
 	                sp = getourenv(pip->envv,VARORGANIZATION) ;
 	            }
 	            if ((rs >= 0) && (sp == nullptr)) {
@@ -1899,7 +1899,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	            } /* end block */
 	            break ;
 	        case qopt_printer:
-	            if (pdp->f.self) sp = getourenv(pip->envv,VARPRINTER) ;
+	            if (pdp->fl.self) sp = getourenv(pip->envv,VARPRINTER) ;
 	            if (sp == nullptr) sp = pdp->du.pent.printer ;
 	            if (sp == nullptr) sp = cbuf ;
 	            break ;
@@ -1971,7 +1971,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    break ;
 /* the easy self queries */
 	case qopt_ruid:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        uid_t	v = getuid() ;
 	        sp = cbuf ;
 	        rs = ctdecui(cbuf,clen,(uint) v) ;
@@ -1979,7 +1979,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    }
 	    break ;
 	case qopt_rgid:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        gid_t	v = getgid() ;
 	        sp = cbuf ;
 	        rs = ctdecui(cbuf,clen,(uint) v) ;
@@ -1987,7 +1987,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    }
 	    break ;
 	case qopt_eprojid:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        projid_t	v = getprojid() ;
 	        sp = cbuf ;
 	        rs = ctdecui(cbuf,clen,(uint) v) ;
@@ -1995,7 +1995,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    }
 	    break ;
 	case qopt_euid:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        uid_t	v = geteuid() ;
 	        sp = cbuf ;
 	        rs = ctdecui(cbuf,clen,(uint) v) ;
@@ -2003,7 +2003,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    }
 	    break ;
 	case qopt_egid:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        gid_t	v = getegid() ;
 	        sp = cbuf ;
 	        rs = ctdecui(cbuf,clen,(uint) v) ;
@@ -2011,7 +2011,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    }
 	    break ;
 	case qopt_egids:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        SBUF	b ;
 	        sp = cbuf ;
 	        if ((rs = sbuf_start(&b,cbuf,clen)) >= 0) {
@@ -2030,7 +2030,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    } /* end if (self) */
 	    break ;
 	case qopt_pid:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        const pid_t	v = ugetpid() ;
 	        sp = cbuf ;
 	        rs = ctdecui(cbuf,clen,(uint) v) ;
@@ -2038,7 +2038,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    }
 	    break ;
 	case qopt_ppid:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        const pid_t	v = getppid() ;
 	        sp = cbuf ;
 	        rs = ctdecui(cbuf,clen,(uint) v) ;
@@ -2046,7 +2046,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    }
 	    break ;
 	case qopt_pgid:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        const pid_t	v = getpgrp() ;
 	        sp = cbuf ;
 	        rs = ctdecui(cbuf,clen,(uint) v) ;
@@ -2055,7 +2055,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    break ;
 	case qopt_sid:
 	case qopt_psid:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        if ((rs1 = u_getsid(0)) >= 0) {
 	            sp = cbuf ;
 	            rs = ctdecui(cbuf,clen,(uint) rs1) ;
@@ -2065,7 +2065,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    break ;
 	case qopt_tid:
 	case qopt_ptid:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        const taskid_t	v = gettaskid() ;
 	        sp = cbuf ;
 	        rs = ctdecui(cbuf,clen,(uint) v) ;
@@ -2118,7 +2118,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	case qopt_logname:
 	case qopt_logsession:
 	case qopt_logdate:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        if (! pdp->du.init.utmpent) {
 	            rs = datauser_utmpent(&pdp->du) ;
 	        }
@@ -2154,7 +2154,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    } /* end if (self) */
 	    break ;
 	case qopt_tz:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        sp = getourenv(pip->envv,VARTZ) ;
 	    }
 	    if (sp == nullptr) {
@@ -2213,7 +2213,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    }
 	    break ;
 	case qopt_mailname:
-	    if ((sp == nullptr) && pdp->f.self) {
+	    if ((sp == nullptr) && pdp->fl.self) {
 	        sp = getourenv(pip->envv,VARMAILNAME) ;
 	    }
 	    if (sp == nullptr) {
@@ -2233,7 +2233,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    }
 	    break ;
 	case qopt_eusername:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        if (! pdp->du.init.pent) {
 	            rs = datauser_pw(&pdp->du) ;
 	        }
@@ -2253,7 +2253,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    } /* end if (self eusername) */
 	    break ;
 	case qopt_rgroupname:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        if (! pdp->du.init.gr) {
 	            rs = datauser_gr(&pdp->du) ;
 	        }
@@ -2270,7 +2270,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    } /* end if (self rgroupname) */
 	    break ;
 	case qopt_egroupname:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        if (! pdp->du.init.gr) {
 	            rs = datauser_gr(&pdp->du) ;
 	        }
@@ -2287,7 +2287,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    } /* end if (self egroupname) */
 	    break ;
 	case qopt_egroups:
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        SBUF	b ;
 	        gid_t	egids[NGROUPS_MAX + 1] ;
 	        gid_t	v ;
@@ -2391,7 +2391,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	case qopt_auid:
 #if	CF_AUID
 #if	defined(SYSHAS_AUDIT) && (SYSHAS_AUDIT > 0)
-	    if (pdp->f.self) {
+	    if (pdp->fl.self) {
 	        cint	v = uc_getauid() ;
 	        if (v >= 0) {
 	            sp = cbuf ;
@@ -2451,7 +2451,7 @@ static int procquery_name(PROGINFO *pip,PROGDATA *pdp,
 	int		rs1 ;
 	int		sl = -1 ;
 	cchar		*sp = nullptr ;
-	if ((sp == nullptr) && pdp->f.self) {
+	if ((sp == nullptr) && pdp->fl.self) {
 	    cchar	*cp ;
 	    cchar	*var = VARNAME ;
 	    if ((cp = getourenv(pip->envv,var)) != nullptr) {
@@ -2526,7 +2526,7 @@ static int procquery_fullname(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
 	int		sl = -1 ;
 	cchar		*sp = nullptr ;
 	cchar		*cp ;
-	if ((sp == nullptr) && pdp->f.self) {
+	if ((sp == nullptr) && pdp->fl.self) {
 	    cchar	*var = VARFULLNAME ;
 	    if ((cp = getourenv(pip->envv,var)) != nullptr) {
 	        if (cp[0] != '\0') {
@@ -2550,7 +2550,7 @@ static int procquery_fullname(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
 	        } /* end if (have-entry) */
 	    } /* end if (datauser_pw) */
 	} /* end if */
-	if ((rs >= 0) && (sp == nullptr) && pdp->f.self) {
+	if ((rs >= 0) && (sp == nullptr) && pdp->fl.self) {
 	    if ((cp = getourenv(pip->envv,VARNAME)) != nullptr) {
 	        if (realname rn ; (rs = rn.start(cp)) >= 0) {
 	            if ((rs = rn.fullname(cbuf,clen)) > 0) {
@@ -2591,7 +2591,7 @@ static int procquery_netname(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
 {
 	int		rs = SR_OK ;
 	int		cl = 0 ;
-	if (pdp->f.self) {
+	if (pdp->fl.self) {
 	    char	nbuf[MAXNETNAMELEN+1] ;
 	    if ((rs = uc_getnetname(nbuf)) >= 0) {
 	        cl = (strdcpy1w(cbuf,clen,nbuf,rs) - cbuf) ;
@@ -2686,11 +2686,11 @@ static int progdata_start(PROGDATA *pdp,PROGINFO *pip,cchar *un,int f_self,
 	pdp->pwfname = pwfname ;
 	pdp->domainname = nullptr ;
 	pdp->hostname[0] = '\0' ;
-	pdp->f.self = f_self ;
+	pdp->fl.self = f_self ;
 
 #if	CF_DEBUGS
 	debugprintf("userinfo/progdata_start: ent un=%s\n",un) ;
-	debugprintf("userinfo/progdata_start: f_self=%u\n",pdp->f.self) ;
+	debugprintf("userinfo/progdata_start: f_self=%u\n",pdp->fl.self) ;
 #endif
 
 	if ((rs = datasys_start(&pdp->ds,pip)) >= 0) {
@@ -2701,14 +2701,14 @@ static int progdata_start(PROGDATA *pdp,PROGINFO *pip,cchar *un,int f_self,
 
 #if	CF_DEBUGS
 	debugprintf("userinfo/progdata_start: datauser_start() rs=%d\n",rs) ;
-	debugprintf("userinfo/progdata_start: f_self=%u\n",pdp->f.self) ;
+	debugprintf("userinfo/progdata_start: f_self=%u\n",pdp->fl.self) ;
 #endif
 
 	if (rs == SR_NOTFOUND) rs = SR_SEARCH ;
 
 #if	CF_DEBUGS
 	debugprintf("userinfo/progdata_start: ret rs=%d f_self=%u\n",
-	    rs,pdp->f.self) ;
+	    rs,pdp->fl.self) ;
 #endif
 
 	return rs ;
@@ -2740,7 +2740,7 @@ static int progdata_domain(PROGDATA *pdp)
 {
 	int		rs = SR_OK ;
 
-	if (! pdp->f.domain) {
+	if (! pdp->fl.domain) {
 	    cchar	*sp = nullptr ;
 
 	    if (! pdp->du.init.domain) rs = datauser_domain(&pdp->du) ;
@@ -2756,7 +2756,7 @@ static int progdata_domain(PROGDATA *pdp)
 		}
 	    } /* end if */
 
-	    pdp->f.domain = TRUE ;
+	    pdp->fl.domain = TRUE ;
 	    if ((rs >= 0) && (sp != nullptr)) {
 	        pdp->domainname = sp ;
 		rs = strlen(sp) ;
@@ -2776,12 +2776,12 @@ static int progdata_host(PROGDATA *pdp)
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
-	if ((! pdp->f.host) && (pdp->hostname[0] == '\0')) {
-	    pdp->f.host = TRUE ;
+	if ((! pdp->fl.host) && (pdp->hostname[0] == '\0')) {
+	    pdp->fl.host = TRUE ;
 	    if (! pdp->ds.f.node) {
 	        rs = datasys_node(&pdp->ds) ;
 	    }
-	    if ((rs >= 0) && (! pdp->f.domain)) {
+	    if ((rs >= 0) && (! pdp->fl.domain)) {
 	        rs = progdata_domain(pdp) ;
 	    }
 	    if (rs >= 0) {
@@ -2872,8 +2872,8 @@ static int datasys_uname(DATASYS *dsp)
 {
 	int		rs = SR_OK ;
 
-	if (! dsp->f.uname) {
-	    dsp->f.uname = TRUE ;
+	if (! dsp->fl.uname) {
+	    dsp->fl.uname = TRUE ;
 	    rs = uinfo_name(&dsp->uname) ;
 	} /* end if (uname) */
 
@@ -2886,8 +2886,8 @@ static int datasys_uaux(DATASYS *dsp)
 {
 	int		rs = SR_OK ;
 
-	if (! dsp->f.uaux) {
-	    dsp->f.uaux = TRUE ;
+	if (! dsp->fl.uaux) {
+	    dsp->fl.uaux = TRUE ;
 	    rs = uinfo_aux(&dsp->uaux) ;
 	} /* end if (uaux) */
 
@@ -2903,8 +2903,8 @@ static int datasys_node(DATASYS *dsp)
 
 	if (pip == nullptr) return SR_FAULT ;
 
-	if (! dsp->f.node) {
-	    dsp->f.node = TRUE ;
+	if (! dsp->fl.node) {
+	    dsp->fl.node = TRUE ;
 	    if (dsp->nodename == nullptr) {
 	        cchar	*cp = getourenv(pip->envv,VARNODE) ;
 	        if ((cp != nullptr) && (cp[0] != '\0')) {
@@ -2913,7 +2913,7 @@ static int datasys_node(DATASYS *dsp)
 		}
 	    }
 	    if ((dsp->nodename == nullptr) || (dsp->nodename[0] == '\0')) {
-	        if (! dsp->f.uname) rs = datasys_uname(dsp) ;
+	        if (! dsp->fl.uname) rs = datasys_uname(dsp) ;
 	        if (rs >= 0) {
 	            int		nl = -1 ;
 	            cchar	*np = dsp->uname.nodename ;
@@ -2941,8 +2941,8 @@ static int datasys_cluster(DATASYS *dsp)
 
 	if (pip == nullptr) return SR_FAULT ;
 
-	if (! dsp->f.cluster) {
-	    dsp->f.cluster = TRUE ;
+	if (! dsp->fl.cluster) {
+	    dsp->fl.cluster = TRUE ;
 	    if (dsp->clustername == nullptr) {
 	        cchar	*cp = getourenv(pip->envv,VARCLUSTER) ;
 	        if ((cp != nullptr) && (cp[0] != '\0')) {
@@ -2971,8 +2971,8 @@ static int datasys_system(DATASYS *dsp)
 
 	if (pip == nullptr) return SR_FAULT ;
 
-	if (! dsp->f.system) {
-	    dsp->f.system = TRUE ;
+	if (! dsp->fl.system) {
+	    dsp->fl.system = TRUE ;
 	    if (dsp->systemname == nullptr) {
 	        cchar	*cp = getourenv(pip->envv,VARSYSTEM) ;
 	        if ((cp != nullptr) && (cp[0] != '\0')) {
@@ -3031,8 +3031,8 @@ static int datasys_domain(DATASYS *dsp)
 
 	if (pip == nullptr) return SR_FAULT ;
 
-	if (! dsp->f.domain) {
-	    dsp->f.domain = TRUE ;
+	if (! dsp->fl.domain) {
+	    dsp->fl.domain = TRUE ;
 	    if (dsp->domainname == nullptr) {
 	        cchar	*cp = getourenv(pip->envv,VARDOMAIN) ;
 	        if ((cp != nullptr) && (cp[0] != '\0'))
@@ -3041,7 +3041,7 @@ static int datasys_domain(DATASYS *dsp)
 	    }
 	    if ((dsp->domainname == nullptr) || (dsp->domainname[0] == '\0')) {
 	        if (dsp->nodename == nullptr) {
-	            if (! dsp->f.node) rs = datasys_node(dsp) ;
+	            if (! dsp->fl.node) rs = datasys_node(dsp) ;
 	        }
 	        if (rs >= 0) {
 	            cint	dlen = NODENAMELEN ;
@@ -3069,9 +3069,9 @@ static int datasys_nisdomain(DATASYS *dsp)
 
 	if (pip == nullptr) return SR_FAULT ;
 
-	if (! dsp->f.nisdomain) {
+	if (! dsp->fl.nisdomain) {
 	    cchar	*ndp ;
-	    dsp->f.nisdomain = TRUE ;
+	    dsp->fl.nisdomain = TRUE ;
 	    if (dsp->nisdomainname == nullptr) {
 	        cchar	*cp = getourenv(pip->envv,VARNISDOMAIN) ;
 	        if ((cp != nullptr) && (cp[0] != '\0')) {
