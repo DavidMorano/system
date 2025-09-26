@@ -929,7 +929,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -993,12 +993,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* set-mode */
 	                    case 's':
-	                        lip->f.set = true ;
+	                        lip->fl.set = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.set = (rs > 0) ;
+	                                lip->fl.set = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1180,7 +1180,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1375,10 +1375,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.hextime) {
 	                        lip->have.hextime = true ;
 	                        lip->final.hextime = true ;
-	                        lip->f.hextime = true ;
+	                        lip->fl.hextime = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.hextime = (rs > 0) ;
+	                            lip->fl.hextime = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2256,12 +2256,12 @@ static int procacc(PROGINFO *pip,char *cbuf,int clen,cchar *vp,int vl)
 static int procsystat(PROGINFO *pip,char *cbuf,int clen,cc *vp,int vl) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
-	if (lip->f.set) {
+	if (lip->fl.set) {
 	    rs = localsetsystat(pip->pr,vp,vl) ;
 	} else {
 	    cbuf[0] = '\0' ;
 	    if_constexpr (f_percache) {
-	        if (lip->f.percache) {
+	        if (lip->fl.percache) {
 		    custime	dt = pip->daytime ;
 		    cchar	*pr = pip->pr ;
 		    cchar	*cp ;
@@ -2352,7 +2352,7 @@ static int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if ((pip->verboselevel > 0) && (! lip->f.set)) {
+	if ((pip->verboselevel > 0) && (! lip->fl.set)) {
 	    if ((sp == nullptr) && (sl < 0)) sp = "*" ;
 	    if (sp != nullptr) {
 	        rs = shio_print(ofp,sp,sl) ;
@@ -2374,7 +2374,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	lip->ttl = DEFTTL ;
 	lip->to = -1 ;
 
-	lip->f.percache = true ;
+	lip->fl.percache = true ;
 
 	return rs ;
 }
@@ -2387,7 +2387,7 @@ static int locinfo_finish(LOCINFO *lip) noex {
 	if (lip == nullptr) return SR_FAULT ;
 
 	if_constexpr (f_percache) {
-	    if (lip->f.percache) {
+	    if (lip->fl.percache) {
 	        if ((rs1 = percache_finireg(&pc)) > 0) {
 	            rs1 = uc_atexit(ourfini) ;
 	        }
@@ -2395,11 +2395,11 @@ static int locinfo_finish(LOCINFO *lip) noex {
 	    }
 	} /* end if_constexpr (f_percache) */
 
-	if ((lip->fname != nullptr) && lip->f.allocfname) {
+	if ((lip->fname != nullptr) && lip->fl.allocfname) {
 	    rs1 = uc_free(lip->fname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    lip->fname = nullptr ;
-	    lip->f.allocfname = false ;
+	    lip->fl.allocfname = false ;
 	}
 
 	if (lip->open.stores) {
@@ -2472,8 +2472,8 @@ static int locinfo_flags(LOCINFO *lip,int f_init,int f_nocache)
 
 	if (lip == nullptr) return SR_FAULT ;
 
-	lip->f.init = f_init ;
-	lip->f.nocache = f_nocache ;
+	lip->fl.init = f_init ;
+	lip->fl.nocache = f_nocache ;
 
 #if	CF_PERCACHE
 	if (f_init) {
@@ -2652,8 +2652,8 @@ static int locinfo_uname(LOCINFO *lip)
 {
 	int		rs = 1 ; /* cache-hit indication */
 
-	if (! lip->f.uname) {
-	    lip->f.uname = true ;
+	if (! lip->fl.uname) {
+	    lip->fl.uname = true ;
 	    rs = uinfo_name(&lip->uname) ;
 	}
 
@@ -2666,8 +2666,8 @@ static int locinfo_uaux(LOCINFO *lip)
 {
 	int		rs = 1 ; /* cache-hit indication */
 
-	if (! lip->f.uaux) {
-	    lip->f.uaux = true ;
+	if (! lip->fl.uaux) {
+	    lip->fl.uaux = true ;
 	    rs = uinfo_aux(&lip->uaux) ;
 	}
 
@@ -2686,7 +2686,7 @@ static int locinfo_hostid(LOCINFO *lip) noex {
 	    lip->init.hostid = true ;
 	    lip->ti_hostid = pip->daytime ;
 	    if_constexpr (f_percache) {
-	        if (lip->f.percache) {
+	        if (lip->fl.percache) {
 	            rs = percache_gethostid(&pc,pip->daytime,&uv) ;
 	        }
 	    } /* end if_constexpr (f_percache) */
@@ -2733,7 +2733,7 @@ static int locinfo_runlevel(LOCINFO *lip)
 	    lip->ti_runlevel = pip->daytime ;
 
 #if	CF_PERCACHE
-	    if (lip->f.percache) {
+	    if (lip->fl.percache) {
 	        rs = percache_getrunlevel(&pc,pip->daytime) ;
 	        rl = rs ;
 	    }
@@ -2900,12 +2900,12 @@ static int locinfo_netload(LOCINFO *lip,char *cbuf,int clen,cchar *vp,int vl)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
-	if (lip->f.set) {
+	if (lip->fl.set) {
 	    rs = localsetnetload(pip->pr,vp,vl) ;
 	} else {
 	    cbuf[0] = '\0' ;
 #if	CF_PERCACHE
-	    if (lip->f.percache) {
+	    if (lip->fl.percache) {
 		custime	dt = pip->daytime ;
 		cchar		*pr = pip->pr ;
 		cchar		*cp ;
@@ -2992,7 +2992,7 @@ static int getncpus(PROGINFO *pip)
 	    lip->init.ncpus = true ;
 
 #if	CF_PERCACHE && 0 /* note: this PERCACHE call does not exist! */
-	    if ((rs >= 0) && (n == 0) && lip->f.percache) {
+	    if ((rs >= 0) && (n == 0) && lip->fl.percache) {
 	        rs = percache_getncpus(&pc,pip->daytime) ;
 	        n = rs ;
 	    }
@@ -3073,7 +3073,7 @@ static int getnprocs_all(PROGINFO *pip)
 	int		na = 0 ;
 
 #if	CF_PERCACHE
-	if (lip->f.percache) {
+	if (lip->fl.percache) {
 	    rs = percache_getnprocs(&pc,pip->daytime) ;
 	    na = rs ;
 	}
@@ -3102,7 +3102,7 @@ static int getbtime(PROGINFO *pip)
 	    lip->ti_btime = pip->daytime ;
 
 #if	CF_PERCACHE
-	    if (lip->f.percache) {
+	    if (lip->fl.percache) {
 	        rs = percache_getbtime(&pc,pip->daytime,&bt) ;
 	    }
 #endif /* CF_PERCACHE */
@@ -3132,7 +3132,7 @@ static int getnusers(PROGINFO *pip)
 	    lip->ti_nusers = pip->daytime ;
 
 #if	CF_PERCACHE
-	    if (lip->f.percache) {
+	    if (lip->fl.percache) {
 	        rs = percache_getnusers(&pc,pip->daytime) ;
 	        nu = rs ;
 	    }
@@ -3240,7 +3240,7 @@ static int cftime(PROGINFO *pip,char *cvtbuf,int cvtlen,ulong lv) noex {
 	switch (lip->timeform) {
 	case timeform_decimal:
 	default:
-	    if (lip->f.hextime) {
+	    if (lip->fl.hextime) {
 	        rs = cthexul(cvtbuf,cvtlen,lv) ;
 	    } else {
 	        rs = ctdecul(cvtbuf,cvtlen,lv) ;
