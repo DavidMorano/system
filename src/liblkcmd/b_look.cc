@@ -526,7 +526,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -549,12 +549,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* dictionary order */
 	                    case 'd':
 	                        lip->final.d = TRUE ;
-	                        lip->f.d = TRUE ;
+	                        lip->fl.d = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.d = (rs > 0) ;
+	                                lip->fl.d = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -562,12 +562,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* fold-case */
 	                    case 'f':
 	                        lip->final.f = TRUE ;
-	                        lip->f.f = TRUE ;
+	                        lip->fl.f = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.f = (rs > 0) ;
+	                                lip->fl.f = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -586,24 +586,24 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* sort mode */
 	                    case 's':
-	                        lip->f.sort = TRUE ;
+	                        lip->fl.sort = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.sort = (rs > 0) ;
+	                                lip->fl.sort = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 /* whole word */
 	                    case 'w':
-	                        lip->f.w = TRUE ;
+	                        lip->fl.w = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.w = (rs > 0) ;
+	                                lip->fl.w = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -726,8 +726,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        cp = argv[ai] ;
 		switch (pan) {
 	        case 0:
-	            if (! lip->final.d) lip->f.d = TRUE ;
-	            if (! lip->final.f) lip->f.f = TRUE ;
+	            if (! lip->final.d) lip->fl.d = TRUE ;
+	            if (! lip->final.f) lip->fl.f = TRUE ;
 	            strwcpy(string,cp,MAXSTRLEN) ;
 	            break ;
 	        case 1:
@@ -789,21 +789,21 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (pip->debuglevel > 0) {
 	    shio_printf(pip->efp,"%s: dict=%s\n",pip->progname,file) ;
 	    shio_printf(pip->efp, "%s: fold=%u dictorder=%u\n",
-	        pip->progname,lip->f.f,lip->f.d) ;
+	        pip->progname,lip->fl.f,lip->fl.d) ;
 	}
 
 /* continue */
 
 #if	CF_DEBUGS
 	debugprintf("main: file=%s f_dict=%u f_fold=%u\n",
-	    file,lip->f.f,lip->f.f) ;
+	    file,lip->fl.f,lip->fl.f) ;
 #endif
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
 	    debugprintf("main: dict=%s\n", file) ;
 	    debugprintf("main: f_sort=%u f_dict=%u f_fold=%u\n",
-	        lip->f.sort,lip->f.f,lip->f.f) ;
+	        lip->fl.sort,lip->fl.f,lip->fl.f) ;
 	}
 #endif
 
@@ -816,7 +816,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if ((rs = shio_open(ofp,ofname,"wct",0666)) >= 0) {
 
-	    if (lip->f.sort) {
+	    if (lip->fl.sort) {
 	        rs = procsort(pip,ofp,file) ;
 	    } else {
 	        rs = procsearch(pip,ofp,file,string) ;
@@ -1066,9 +1066,9 @@ static int procsearch(PROGINFO *pip,void *ofp,cchar *dfname,cchar *string)
 	int		lo = 0 ;
 	int		c = 0 ;
 
-	if (lip->f.d) lo |= LOOKWORD_ODICT ;
-	if (lip->f.f) lo |= LOOKWORD_OFOLD ;
-	if (lip->f.w) lo |= LOOKWORD_OWORD ;
+	if (lip->fl.d) lo |= LOOKWORD_ODICT ;
+	if (lip->fl.f) lo |= LOOKWORD_OFOLD ;
+	if (lip->fl.w) lo |= LOOKWORD_OWORD ;
 	if ((rs = lookword_open(&lw,dfname,lo)) >= 0) {
 	    LOOKWORD_CUR	cur ;
 	    if ((rs = lookword_curbegin(&lw,&cur)) >= 0) {
