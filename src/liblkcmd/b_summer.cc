@@ -684,7 +684,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'o':
@@ -874,24 +874,24 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 /* if we do not have a request for something yet, use our progmode */
 
 	f = FALSE ;
-	f = f || lip->f.sum ;
-	f = f || lip->f.amean ;
-	f = f || lip->f.hmean ;
-	f = f || lip->f.speedup ;
+	f = f || lip->fl.sum ;
+	f = f || lip->fl.amean ;
+	f = f || lip->fl.hmean ;
+	f = f || lip->fl.speedup ;
 	if (! f) {
 	    switch (pip->progmode) {
 	    case progmode_speedup:
-	        lip->f.speedup = TRUE ;
+	        lip->fl.speedup = TRUE ;
 	        break ;
 	    case progmode_amean:
-	        lip->f.amean = TRUE ;
+	        lip->fl.amean = TRUE ;
 	        break ;
 	    case progmode_hmean:
-	        lip->f.hmean = TRUE ;
+	        lip->fl.hmean = TRUE ;
 	        break ;
 	    case progmode_asum:
 	    default:
-	        lip->f.sum = TRUE ;
+	        lip->fl.sum = TRUE ;
 	        break ;
 	    } /* end switch */
 	} /* end if (didn't get anuthing yet) */
@@ -899,26 +899,26 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
 	    debugprintf("main: requests- sum=%u amean=%u hmean=%u\n",
-	        lip->f.sum,lip->f.amean,lip->f.hmean) ;
+	        lip->fl.sum,lip->fl.amean,lip->fl.hmean) ;
 #endif
 
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt = "%s: request> %s\n" ;
 
-	    if (lip->f.sum) {
+	    if (lip->fl.sum) {
 	        shio_printf(pip->efp,fmt,pn,whiches[which_sum]) ;
 	    }
 
-	    if (lip->f.amean) {
+	    if (lip->fl.amean) {
 	        shio_printf(pip->efp,fmt,pn,whiches[which_amean]) ;
 	    }
 
-	    if (lip->f.hmean) {
+	    if (lip->fl.hmean) {
 	        shio_printf(pip->efp,fmt,pn,whiches[which_hmean]) ;
 	    }
 
-	    if (lip->f.speedup) {
+	    if (lip->fl.speedup) {
 	        shio_printf(pip->efp,fmt,pn,whiches[which_speedup]) ;
 	    }
 
@@ -949,7 +949,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1084,32 +1084,32 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                            wi = matostr(whiches,2,cp,cl) ;
 	                            switch (wi) {
 	                            case which_sum:
-	                                lip->f.sum = TRUE ;
+	                                lip->fl.sum = TRUE ;
 	                                break ;
 	                            case which_amean:
-	                                lip->f.amean = TRUE ;
+	                                lip->fl.amean = TRUE ;
 	                                break ;
 	                            case which_hmean:
-	                                lip->f.hmean = TRUE ;
+	                                lip->fl.hmean = TRUE ;
 	                                break ;
 	                            case which_speedup:
-	                                lip->f.speedup = TRUE ;
+	                                lip->fl.speedup = TRUE ;
 	                                break ;
 	                            } /* end switch */
 	                        } /* end if (non-zero value) */
 	                        break ;
 	                    case progopt_sum:
 	                    case progopt_asum:
-	                        lip->f.sum = TRUE ;
+	                        lip->fl.sum = TRUE ;
 	                        break ;
 	                    case progopt_amean:
-	                        lip->f.amean = TRUE ;
+	                        lip->fl.amean = TRUE ;
 	                        break ;
 	                    case progopt_hmean:
-	                        lip->f.hmean = TRUE ;
+	                        lip->fl.hmean = TRUE ;
 	                        break ;
 	                    case progopt_speedup:
-	                        lip->f.speedup = TRUE ;
+	                        lip->fl.speedup = TRUE ;
 	                        break ;
 	                    } /* end switch */
 		        } /* end if (ok) */
@@ -1198,7 +1198,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn,
 	                rs1 = shio_close(afp) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } else {
-	                if (! pip->f.quiet) {
+	                if (! pip->fl.quiet) {
 			    fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                    shio_printf(pip->efp,fmt,pn,rs) ;
 	                    shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1237,7 +1237,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn,
 	                rs1 = shio_close(ifp) ;
 			if (rs >= 0) rs = rs1 ;
 	            } else {
-	                if (! pip->f.quiet) {
+	                if (! pip->fl.quiet) {
 			    fmt = "%s: inaccessible input (%d)\n" ;
 	                    shio_printf(pip->efp,fmt,pn,rs) ;
 	                    shio_printf(pip->efp,"%s: ifile=%s\n",pn,ifn) ;
@@ -1282,7 +1282,7 @@ static int procout(PROGINFO *pip,void *ofp,PROCESSOR *pp,int pan)
 	    double	fnum ;
 	    int		wi ;
 
-	    if (lip->f.sum) {
+	    if (lip->fl.sum) {
 	        wi = which_sum ;
 	        rs = processor_result(pp,wi,&fnum) ;
 	        if (rs >= 0) {
@@ -1291,7 +1291,7 @@ static int procout(PROGINFO *pip,void *ofp,PROCESSOR *pp,int pan)
 		}
 	    }
 
-	    if (lip->f.amean) {
+	    if (lip->fl.amean) {
 	        wi = which_amean ;
 	        rs = processor_result(pp,wi,&fnum) ;
 	        if (rs >= 0)
@@ -1299,7 +1299,7 @@ static int procout(PROGINFO *pip,void *ofp,PROCESSOR *pp,int pan)
 		    wlen += rs ;
 	    }
 
-	    if (lip->f.hmean) {
+	    if (lip->fl.hmean) {
 	        wi = which_hmean ;
 	        rs = processor_result(pp,wi,&fnum) ;
 	        if (rs >= 0)
@@ -1307,7 +1307,7 @@ static int procout(PROGINFO *pip,void *ofp,PROCESSOR *pp,int pan)
 		    wlen += rs ;
 	    }
 
-	    if (lip->f.speedup) {
+	    if (lip->fl.speedup) {
 	        const int	size = pan * sizeof(double) ;
 	        double		*fa ;
 	        if ((rs = uc_malloc(size,&fa)) >= 0) {
