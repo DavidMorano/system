@@ -596,7 +596,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -652,12 +652,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'r':
 	                        lip->final.bell = TRUE ;
 	                        lip->have.bell = TRUE ;
-	                        lip->f.bell = TRUE ;
+	                        lip->fl.bell = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.bell = (rs > 0) ;
+	                                lip->fl.bell = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -678,7 +678,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* line-buffered */
 	                    case 'u':
 	                        pip->have.bufnone = TRUE ;
-	                        pip->f.bufnone = TRUE ;
+	                        pip->fl.bufnone = TRUE ;
 	                        pip->final.bufnone = TRUE ;
 	                        break ;
 
@@ -788,7 +788,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	rs = procopts(pip,&akopts) ;
 
 	if ((! pip->final.ignore) && hasalluc(pip->progname,-1))
-	    pip->f.ignore = TRUE ;
+	    pip->fl.ignore = TRUE ;
 
 #ifdef	COMMENT
 	if (pip->tmpdname == NULL) pip->tmpdname = getourenv(envv,VARTMPDNAME) ;
@@ -821,8 +821,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    debugprintf("b_termnote: to_read=%d\n",pip->to_read) ;
 	    debugprintf("b_termnote: have.bufline=%u\n",pip->have.bufline) ;
 	    debugprintf("b_termnote: have.bufnone=%u\n",pip->have.bufnone) ;
-	    debugprintf("b_termnote: f_bufline=%u\n",pip->f.bufline) ;
-	    debugprintf("b_termnote: f_bufnone=%u\n",pip->f.bufnone) ;
+	    debugprintf("b_termnote: f_bufline=%u\n",pip->fl.bufline) ;
+	    debugprintf("b_termnote: f_bufnone=%u\n",pip->fl.bufnone) ;
 	}
 #endif /* CF_DEBUG */
 
@@ -878,7 +878,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        shio_printf(pip->efp,"%s: could not process file (%d)\n",
 	            pip->progname,rs) ;
 	    }
@@ -1014,10 +1014,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.ignore) {
 	                        pip->have.ignore = TRUE ;
 	                        pip->final.ignore = TRUE ;
-	                        pip->f.ignore = TRUE ;
+	                        pip->fl.ignore = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.ignore = (rs > 0) ;
+	                            pip->fl.ignore = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1027,10 +1027,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.bufwhole) {
 	                        pip->have.bufwhole = TRUE ;
 	                        pip->final.bufwhole = TRUE ;
-	                        pip->f.bufwhole = TRUE ;
+	                        pip->fl.bufwhole = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.bufwhole = (rs > 0) ;
+	                            pip->fl.bufwhole = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1040,10 +1040,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.bufline) {
 	                        pip->have.bufline = TRUE ;
 	                        pip->final.bufline = TRUE ;
-	                        pip->f.bufline = TRUE ;
+	                        pip->fl.bufline = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.bufline = (rs > 0) ;
+	                            pip->fl.bufline = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1054,10 +1054,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.bufnone) {
 	                        pip->have.bufnone = TRUE ;
 	                        pip->final.bufnone = TRUE ;
-	                        pip->f.bufnone = TRUE ;
+	                        pip->fl.bufnone = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.bufnone = (rs > 0) ;
+	                            pip->fl.bufnone = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1066,10 +1066,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.bell) {
 	                        lip->have.bell = TRUE ;
 	                        lip->final.bell = TRUE ;
-	                        lip->f.bell = TRUE ;
+	                        lip->fl.bell = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.bell = (rs > 0) ;
+	                            lip->fl.bell = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1078,10 +1078,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.biff) {
 	                        lip->have.biff = TRUE ;
 	                        lip->final.biff = TRUE ;
-	                        lip->f.biff = TRUE ;
+	                        lip->fl.biff = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.biff = (rs > 0) ;
+	                            lip->fl.biff = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1090,10 +1090,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.all) {
 	                        lip->have.all = TRUE ;
 	                        lip->final.all = TRUE ;
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.all = (rs > 0) ;
+	                            lip->fl.all = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1187,7 +1187,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	        rs1 = shio_close(afp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            fmt = "%s: inaccessible argument-list (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
 	            shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1239,9 +1239,9 @@ static int process(PROGINFO *pip,cchar *ifn)
 	    debugprintf("b_termnote/process: ifn=%s\n",ifn) ;
 #endif
 
-	if (lip->f.bell) o |= TERMNOTE_OBELL ;
-	if (lip->f.biff) o |= TERMNOTE_OBIFF ;
-	if (lip->f.all) o |= TERMNOTE_OALL ;
+	if (lip->fl.bell) o |= TERMNOTE_OBELL ;
+	if (lip->fl.biff) o |= TERMNOTE_OBIFF ;
+	if (lip->fl.all) o |= TERMNOTE_OALL ;
 
 	if ((ifn == NULL) || (ifn[0] == '\0')) ifn = STDFNIN ;
 
