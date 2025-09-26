@@ -606,7 +606,7 @@ void		*contextp ;
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -616,12 +616,12 @@ void		*contextp ;
 	                    case 'c':
 	                        lip->final.counts = TRUE ;
 	                        lip->have.counts = TRUE ;
-	                        lip->f.counts = TRUE ;
+	                        lip->fl.counts = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
-	                                lip->f.counts = (rs > 0) ;
+	                                lip->fl.counts = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -644,7 +644,7 @@ void		*contextp ;
 	                        break ;
 
 	                    case 'u':
-	                        lip->f.uniq = TRUE ;
+	                        lip->fl.uniq = TRUE ;
 	                        break ;
 
 /* verbose output */
@@ -801,7 +801,7 @@ void		*contextp ;
 	    uchar	*wt = wterms ;
 	    if ((rs = procopts(pip,&akopts)) >= 0) {
 	        if ((rs = procargs(pip,aip,&pargs,app,ofp,wt,ifn,afn)) >= 0) {
-	            if (lip->f.counts) {
+	            if (lip->fl.counts) {
 	                rs = procoutcounts(pip,ofp) ;
 	            }
 	        } /* end if (procargs) */
@@ -819,7 +819,7 @@ done:
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        break ;
@@ -1166,10 +1166,10 @@ KEYOPT		*kop ;
 	                    if (! lip->final.foldcase) {
 	                        lip->have.foldcase = TRUE ;
 	                        lip->final.foldcase = TRUE ;
-	                        lip->f.foldcase = TRUE ;
+	                        lip->fl.foldcase = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.foldcase = (rs > 0) ;
+	                            lip->fl.foldcase = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1178,10 +1178,10 @@ KEYOPT		*kop ;
 	                    if (! lip->final.uniq) {
 	                        lip->have.uniq = TRUE ;
 	                        lip->final.uniq = TRUE ;
-	                        lip->f.uniq = TRUE ;
+	                        lip->fl.uniq = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.uniq = (rs > 0) ;
+	                            lip->fl.uniq = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1190,10 +1190,10 @@ KEYOPT		*kop ;
 	                    if (! lip->final.counts) {
 	                        lip->have.counts = TRUE ;
 	                        lip->final.counts = TRUE ;
-	                        lip->f.counts = TRUE ;
+	                        lip->fl.counts = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.counts = (rs > 0) ;
+	                            lip->fl.counts = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1290,7 +1290,7 @@ const char	*afname ;
 
 	        shio_close(afp) ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,
 	                "%s: argument file inaccessible (%d)\n",
 	                pip->progname,rs) ;
@@ -1386,9 +1386,9 @@ const char	fname[] ;
 
 	                        while ((cl = xwords_get(&w,i++,&cp)) > 0) {
 
-	                            if (lip->f.counts) {
+	                            if (lip->fl.counts) {
 	                                rs = procword(pip,cp,cl) ;
-	                            } else if (lip->f.uniq) {
+	                            } else if (lip->fl.uniq) {
 	                                rs = printuniq(pip,ofp,cp,cl) ;
 	                                wlen += rs ;
 	                            } else {
