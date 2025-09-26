@@ -586,7 +586,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -811,7 +811,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
