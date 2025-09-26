@@ -72,7 +72,6 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<ucmallreg.h>
 #include	<getourenv.h>
 #include	<getusername.h>
 #include	<bits.h>
@@ -828,7 +827,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -863,18 +862,18 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	                    case 'a':
 	                        lip->have.all = TRUE ;
 	                        lip->final.all = TRUE ;
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        break ;
 
 	                    case 'd':
 	                        lip->have.date = TRUE ;
 	                        lip->final.date = TRUE ;
-	                        lip->f.date = TRUE ;
+	                        lip->fl.date = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.date = (rs > 0) ;
+	                                lip->fl.date = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -882,7 +881,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	                    case 'i':
 	                        lip->have.init = TRUE ;
 	                        lip->final.init = TRUE ;
-	                        lip->f.init = TRUE ;
+	                        lip->fl.init = TRUE ;
 	                        break ;
 
 /* options */
@@ -1035,50 +1034,50 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 /* special option handling */
 
-	if (lip->have.home && lip->f.home) {
+	if (lip->have.home && lip->fl.home) {
 	    if (! lip->have.clear) {
 	        lip->final.clear = TRUE ;
-	        lip->f.clear = FALSE ;
+	        lip->fl.clear = FALSE ;
 	    }
 	} /* end if */
 
-	if (lip->have.clear && (! lip->f.clear)) {
+	if (lip->have.clear && (! lip->fl.clear)) {
 	    if (! lip->have.home) {
 	        lip->final.home = TRUE ;
-	        lip->f.home = FALSE ;
+	        lip->fl.home = FALSE ;
 	    }
 	} /* end if */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    debugprintf("b_s: f_init=%u\n",lip->f.init) ;
-	    debugprintf("b_s: f_all=%u\n",lip->f.all) ;
-	    debugprintf("b_s: f_home=%u\n",lip->f.home) ;
-	    debugprintf("b_s: f_clear=%u\n",lip->f.clear) ;
-	    debugprintf("b_s: f_date=%u\n",lip->f.date) ;
-	    debugprintf("b_s: f_sd=%u\n",lip->f.sd) ;
-	    debugprintf("b_s: f_mailcheck=%u\n",lip->f.mailcheck) ;
+	    debugprintf("b_s: f_init=%u\n",lip->fl.init) ;
+	    debugprintf("b_s: f_all=%u\n",lip->fl.all) ;
+	    debugprintf("b_s: f_home=%u\n",lip->fl.home) ;
+	    debugprintf("b_s: f_clear=%u\n",lip->fl.clear) ;
+	    debugprintf("b_s: f_date=%u\n",lip->fl.date) ;
+	    debugprintf("b_s: f_sd=%u\n",lip->fl.sd) ;
+	    debugprintf("b_s: f_mailcheck=%u\n",lip->fl.mailcheck) ;
 	}
 #endif /* CF_DEBUG */
 
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
 	    shio_printf(pip->efp,"%s: f_init=%u\n",
-	        pn,lip->f.init) ;
+	        pn,lip->fl.init) ;
 	    shio_printf(pip->efp,"%s: f_home=%u\n",
-	        pn,lip->f.home) ;
+	        pn,lip->fl.home) ;
 	    shio_printf(pip->efp,"%s: f_clear=%u\n",
-	        pn,lip->f.clear) ;
+	        pn,lip->fl.clear) ;
 	    shio_printf(pip->efp,"%s: f_date=%u\n",
-	        pn,lip->f.date) ;
+	        pn,lip->fl.date) ;
 	    shio_printf(pip->efp,"%s: f_scroll=%u\n",
-	        pn,lip->f.scroll) ;
+	        pn,lip->fl.scroll) ;
 	    shio_printf(pip->efp,"%s: f_sd=%u\n",
-	        pn,lip->f.sd) ;
+	        pn,lip->fl.sd) ;
 	    shio_printf(pip->efp,"%s: f_mailcheck=%u\n",
-	        pn,lip->f.mailcheck) ;
+	        pn,lip->fl.mailcheck) ;
 	    shio_printf(pip->efp,"%s: f_all=%u\n",
-	        pn,lip->f.all) ;
+	        pn,lip->fl.all) ;
 	}
 
 /* find the terminal type, if we have it */
@@ -1285,10 +1284,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.all) {
 	                        lip->have.all = TRUE ;
 	                        lip->final.all = TRUE ;
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.all = (rs > 0) ;
+	                            lip->fl.all = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1296,10 +1295,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.init) {
 	                        lip->have.init = TRUE ;
 	                        lip->final.init = TRUE ;
-	                        lip->f.init = TRUE ;
+	                        lip->fl.init = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.init = (rs > 0) ;
+	                            lip->fl.init = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1307,10 +1306,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.sd) {
 	                        lip->have.sd = TRUE ;
 	                        lip->final.sd = TRUE ;
-	                        lip->f.sd = TRUE ;
+	                        lip->fl.sd = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.sd = (rs > 0) ;
+	                            lip->fl.sd = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1318,10 +1317,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.home) {
 	                        lip->have.home = TRUE ;
 	                        lip->final.home = TRUE ;
-	                        lip->f.home = TRUE ;
+	                        lip->fl.home = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.home = (rs > 0) ;
+	                            lip->fl.home = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1329,10 +1328,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.clear) {
 	                        lip->have.clear = TRUE ;
 	                        lip->final.clear = TRUE ;
-	                        lip->f.clear = TRUE ;
+	                        lip->fl.clear = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.clear = (rs > 0) ;
+	                            lip->fl.clear = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1340,10 +1339,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.date) {
 	                        lip->have.date = TRUE ;
 	                        lip->final.date = TRUE ;
-	                        lip->f.date = TRUE ;
+	                        lip->fl.date = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.date = (rs > 0) ;
+	                            lip->fl.date = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1351,10 +1350,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.scroll) {
 	                        lip->have.scroll = TRUE ;
 	                        lip->final.scroll = TRUE ;
-	                        lip->f.scroll = TRUE ;
+	                        lip->fl.scroll = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.scroll = (rs > 0) ;
+	                            lip->fl.scroll = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1362,10 +1361,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.la) {
 	                        lip->have.la = TRUE ;
 	                        lip->final.la = TRUE ;
-	                        lip->f.la = TRUE ;
+	                        lip->fl.la = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.la = (rs > 0) ;
+	                            lip->fl.la = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1373,10 +1372,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.mailcheck) {
 	                        lip->have.mailcheck = TRUE ;
 	                        lip->final.mailcheck = TRUE ;
-	                        lip->f.mailcheck = TRUE ;
+	                        lip->fl.mailcheck = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.mailcheck = (rs > 0) ;
+	                            lip->fl.mailcheck = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1384,10 +1383,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.mailfrom) {
 	                        lip->have.mailfrom = TRUE ;
 	                        lip->final.mailfrom = TRUE ;
-	                        lip->f.mailfrom = TRUE ;
+	                        lip->fl.mailfrom = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.mailfrom = (rs > 0) ;
+	                            lip->fl.mailfrom = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1395,10 +1394,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.mailsubj) {
 	                        lip->have.mailsubj = TRUE ;
 	                        lip->final.mailsubj = TRUE ;
-	                        lip->f.mailsubj = TRUE ;
+	                        lip->fl.mailsubj = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.mailsubj = (rs > 0) ;
+	                            lip->fl.mailsubj = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1406,10 +1405,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.nusers) {
 	                        lip->have.nusers = TRUE ;
 	                        lip->final.nusers = TRUE ;
-	                        lip->f.nusers = TRUE ;
+	                        lip->fl.nusers = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.nusers = (rs > 0) ;
+	                            lip->fl.nusers = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1499,14 +1498,14 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    debugprintf("b_s/process: f_sd=%u\n",lip->f.sd) ;
-	    debugprintf("b_s/process: f_mailcheck=%u\n",lip->f.mailcheck) ;
+	    debugprintf("b_s/process: f_sd=%u\n",lip->fl.sd) ;
+	    debugprintf("b_s/process: f_mailcheck=%u\n",lip->fl.mailcheck) ;
 	    debugprintf("b_s/process: term-handle=%u\n",
 	        (tf & TCF_MSD)) ;
 	}
 #endif
 
-	if ((rs >= 0) && lip->f.mailcheck && lip->f.sd) {
+	if ((rs >= 0) && lip->fl.mailcheck && lip->fl.sd) {
 	    if (tf & TCF_MSD) {
 
 #if	CF_DEBUG
@@ -1532,10 +1531,10 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_s/process: f_init=%u\n",lip->f.init) ;
+	    debugprintf("b_s/process: f_init=%u\n",lip->fl.init) ;
 #endif
 
-	if ((rs >= 0) && lip->f.init) {
+	if ((rs >= 0) && lip->fl.init) {
 	    if ((rs = terminit(pip,ofp,buf,blen)) >= 0) {
 	        rs = shio_write(ofp,buf,rs) ;
 	    }
@@ -1543,10 +1542,10 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_s/process: f_clear=%u\n",lip->f.clear) ;
+	    debugprintf("b_s/process: f_clear=%u\n",lip->fl.clear) ;
 #endif
 
-	if ((rs >= 0) && (lip->f.home || lip->f.clear)) {
+	if ((rs >= 0) && (lip->fl.home || lip->fl.clear)) {
 	    if ((rs = termclear(pip,buf,blen)) >= 0) {
 	        rs = shio_write(ofp,buf,rs) ;
 	    }
@@ -1554,16 +1553,16 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_s/process: f_date=%u\n",lip->f.date) ;
+	    debugprintf("b_s/process: f_date=%u\n",lip->fl.date) ;
 #endif
 
-	if ((rs >= 0) && lip->f.date) {
+	if ((rs >= 0) && lip->fl.date) {
 	    TMTIME	tm ;
 	    const int	tl = 16 ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
-	        debugprintf("b_s/process: f_sd=%u\n",lip->f.sd) ;
+	        debugprintf("b_s/process: f_sd=%u\n",lip->fl.sd) ;
 #endif
 
 	    if ((rs = tmtime_localtime(&tm,pip->daytime)) >= 0) {
@@ -1572,7 +1571,7 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 	        char		tbuf[TIMEBUFLEN + 1] ;
 
 		if ((rs = sntmtime(tbuf,tlen,&tm,ts)) >= 0) {
-	            if (lip->f.sd) {
+	            if (lip->fl.sd) {
 	                if ((rs = termdate(pip,buf,blen,tbuf)) >= 0) {
 	                    rs = shio_write(ofp,buf,rs) ;
 	                }
@@ -1586,7 +1585,7 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 	} /* end if (date) */
 
 #if	CF_TERMMAILNAME
-	if ((rs >= 0) && lip->f.mailcheck && lip->f.sd) {
+	if ((rs >= 0) && lip->fl.mailcheck && lip->fl.sd) {
 	    if (lip->termflags & TCF_MSD) {
 	        colx = 0 ;
 	        if ((rs = termmailname(pip,buf,blen,colx)) >= 0) {
@@ -1832,7 +1831,7 @@ static int terminit(PROGINFO *pip,SHIO *ofp,char *tbuf,int tlen)
 #if	CF_SR
 	    if (rs >= 0) {
 		if ((rs = locinfo_termlines(lip,ofp)) > 0) {
-	            if (lip->f.scroll && (lip->termflags & TCF_MSR)) {
+	            if (lip->fl.scroll && (lip->termflags & TCF_MSR)) {
 
 #if	CF_CSR
 	        if (lip->termflags & TCF_MVCSR) {
@@ -1861,15 +1860,15 @@ static int terminit(PROGINFO *pip,SHIO *ofp,char *tbuf,int tlen)
 
 /* clear screen */
 
-	    if (lip->f.clear) {
+	    if (lip->fl.clear) {
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))
 	            debugprintf("b_s/terminit: clear\n") ;
 #endif
 
-	        lip->f.clear = FALSE ;
-	        if (lip->f.home)
+	        lip->fl.clear = FALSE ;
+	        if (lip->fl.home)
 	            sbuf_loadstrs(&b,s_home) ;
 
 	        sbuf_loadstrs(&b,s_clear) ;
@@ -1877,11 +1876,11 @@ static int terminit(PROGINFO *pip,SHIO *ofp,char *tbuf,int tlen)
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))
 	            debugprintf("b_s/terminit: f_all=%u TERM=%s F_MSD=%u\n",
-	                lip->f.all,lip->termspec,
+	                lip->fl.all,lip->termspec,
 	                ((lip->termflags & TCF_MSD) ? 1 : 0)) ;
 #endif
 
-	        if (lip->f.all && (lip->termflags & TCF_MSD)) {
+	        if (lip->fl.all && (lip->termflags & TCF_MSD)) {
 	            fmt = "%s\r%s%s" ;
 
 #if	CF_DEBUG
@@ -1927,15 +1926,15 @@ static int termclear(PROGINFO *pip,char *rbuf,int rlen)
 
 /* clear the main screen */
 
-	    if (lip->f.home)
+	    if (lip->fl.home)
 	        sbuf_loadstrs(&b,s_home) ;
 
-	    if (lip->f.clear)
+	    if (lip->fl.clear)
 	        sbuf_loadstrs(&b,s_clear) ;
 
 /* clear the status display if there is one and additionally asked to do so */
 
-	    if (lip->f.clear && lip->f.all && (lip->termflags & TCF_MSD)) {
+	    if (lip->fl.clear && lip->fl.all && (lip->termflags & TCF_MSD)) {
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))
@@ -2039,7 +2038,7 @@ static int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
 
 	    if (rs >= 0) {
 	        rs1 = SR_OVERFLOW ;
-	        if (lip->f.nusers) {
+	        if (lip->fl.nusers) {
 
 	            if ((rs1 = nusers(lip->utfname)) >= 0) {
 	                n = rs1 ;
@@ -2088,7 +2087,7 @@ static int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
 	        char	labuf[12 + 1] ;
 	        cchar	*pbp = blanks ;
 
-	        if (lip->f.la) {
+	        if (lip->fl.la) {
 	            double	la[3] ;
 
 	            if ((rs = uc_getloadavg(la,3)) >= 0) {
@@ -2125,12 +2124,12 @@ static int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
 	            debugprintf("b_s/termdatesd: mailcheck=%u\n",
-	                lip->f.mailcheck) ;
+	                lip->fl.mailcheck) ;
 #endif
 
 	        mcbuf[0] = '\0' ;
 	        rs1 = lip->nmsgs ;
-	        if (lip->f.mailcheck && (rs1 > 0)) {
+	        if (lip->fl.mailcheck && (rs1 > 0)) {
 	            const int	maxmsgs = 99 ;
 
 	            if (rs1 > maxmsgs) rs1 = maxmsgs ;
@@ -2446,13 +2445,13 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
 	lip->lines = 0 ;
-	lip->f.home = TRUE ;
-	lip->f.clear = TRUE ;
-	lip->f.scroll = TRUE ;
-	lip->f.la = TRUE ;
-	lip->f.mailcheck = TRUE ;
-	lip->f.nusers = TRUE ;
-	lip->f.sd = TRUE ;
+	lip->fl.home = TRUE ;
+	lip->fl.clear = TRUE ;
+	lip->fl.scroll = TRUE ;
+	lip->fl.la = TRUE ;
+	lip->fl.mailcheck = TRUE ;
+	lip->fl.nusers = TRUE ;
+	lip->fl.sd = TRUE ;
 	if ((rs = uc_malloc((mnlen+1),&bp)) >= 0) {
 	    lip->mnbuf = bp ;
 	    lip->mnlen = mnlen ;
@@ -2541,7 +2540,7 @@ static int locinfo_prpcs(LOCINFO *lip,cchar *prpcs)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
-	if (lip->f.mailcheck) {
+	if (lip->fl.mailcheck) {
 	    if ((prpcs != NULL) && (prpcs[0] != '\0')) {
 		ustat	sb ;
 		if ((rs = uc_stat(prpcs,&sb)) >= 0) {
@@ -2570,7 +2569,7 @@ static int locinfo_prpcs(LOCINFO *lip,cchar *prpcs)
 static int locinfo_utfname(LOCINFO *lip,cchar *utfn)
 {
 	int		rs = SR_OK ;
-	if (lip->f.nusers && (lip->utfname == NULL)) {
+	if (lip->fl.nusers && (lip->utfname == NULL)) {
 	    cchar	**vpp = &lip->utfname ;
 	    rs = locinfo_setentry(lip,vpp,utfn,-1) ;
 	} /* end if (nusers) */
