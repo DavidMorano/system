@@ -471,7 +471,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto badlocstart ;
 	}
 
-	lip->f.nh = FALSE ;
+	lip->fl.nh = FALSE ;
 
 /* start parsing the arguments */
 
@@ -710,31 +710,31 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_zerospeed:
-	                    lip->f.zerospeed = TRUE ;
+	                    lip->fl.zerospeed = TRUE ;
 	                    break ;
 
 	                case argopt_zeroentry:
-	                    lip->f.zeroentry = TRUE ;
+	                    lip->fl.zeroentry = TRUE ;
 	                    break ;
 
 	                case argopt_nh:
-	                    lip->f.nh = TRUE ;
+	                    lip->fl.nh = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.nh = (rs > 0) ;
+	                            lip->fl.nh = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 	                case argopt_empty:
-	                    lip->f.empty = TRUE ;
+	                    lip->fl.empty = TRUE ;
 	                    break ;
 
 /* age */
 	                case argopt_age:
-	                    lip->f.age = TRUE ;
+	                    lip->fl.age = TRUE ;
 	                    break ;
 
 /* handle all keyword defaults */
@@ -765,7 +765,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -799,16 +799,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* only enabled nodes */
 	                    case 'e':
-	                        lip->f.enabled = TRUE ;
+	                        lip->fl.enabled = TRUE ;
 	                        break ;
 
 	                    case 'h':
-	                        lip->f.nh = FALSE ;
+	                        lip->fl.nh = FALSE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.nh = (rs == 0) ;
+	                                lip->fl.nh = (rs == 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -834,7 +834,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* node only */
 	                    case 'n':
-	                        pip->f.nodeonly = TRUE ;
+	                        pip->fl.nodeonly = TRUE ;
 	                        break ;
 
 /* reverse search sense */
@@ -969,7 +969,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if ((i = matstr(prognames,pip->progname,-1)) >= 0) {
 	    switch (i) {
 	    case progname_msage:
-	        lip->f.age = TRUE ;
+	        lip->fl.age = TRUE ;
 	        break ;
 	    } /* end switch */
 	}
@@ -1077,7 +1077,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("b_msinfo: MS stuff, zerospeed=%u\n",
-	        lip->f.zerospeed) ;
+	        lip->fl.zerospeed) ;
 #endif
 
 	if (pip->debuglevel > 0) {
@@ -1104,7 +1104,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    vecstr	nodes ;
 	    if ((rs = vecstr_start(&nodes,10,0)) >= 0) {
 
-	        if (! lip->f.all) {
+	        if (! lip->fl.all) {
 	            rs = procargs(pip,&ainfo,&pargs,&nodes,afname) ;
 	        } /* end if (not doing all nodes in DB) */
 
@@ -1127,7 +1127,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        cchar *pn = pip->progname ;
 	        cchar *fmt = "%s: could not perform function (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,rs) ;
@@ -1252,10 +1252,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.quiet) {
 	                        pip->have.quiet = TRUE ;
 	                        pip->final.quiet = TRUE ;
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.quiet = (rs > 0) ;
+	                            pip->fl.quiet = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1283,10 +1283,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.age) {
 	                        lip->have.age = TRUE ;
 	                        lip->final.age = TRUE ;
-	                        lip->f.age = TRUE ;
+	                        lip->fl.age = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.age = (rs > 0) ;
+	                            lip->fl.age = (rs > 0) ;
 	                        }
 	                    } /* end if */
 	                    break ;
@@ -1294,10 +1294,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.all) {
 	                        lip->have.all = TRUE ;
 	                        lip->final.all = TRUE ;
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.all = (rs > 0) ;
+	                            lip->fl.all = (rs > 0) ;
 	                        }
 	                    } /* end if */
 	                    break ;
@@ -1305,10 +1305,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.geekout) {
 	                        lip->have.geekout = TRUE ;
 	                        lip->final.geekout = TRUE ;
-	                        lip->f.geekout = TRUE ;
+	                        lip->fl.geekout = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.geekout = (rs > 0) ;
+	                            lip->fl.geekout = (rs > 0) ;
 	                        }
 	                    } /* end if */
 	                    break ;
@@ -1462,10 +1462,10 @@ cchar		*ofn ;
 	        int	msflags = 0 ;
 	        int	oflags = 0 ;
 
-	        if (lip->f.enabled)
+	        if (lip->fl.enabled)
 	            msflags |= MSFILE_FLA ;
 
-	        if (lip->f.empty)
+	        if (lip->fl.empty)
 	            msflags |= MSFILE_FUSERS ;
 
 #if	CF_DEBUG
@@ -1474,7 +1474,7 @@ cchar		*ofn ;
 #endif
 
 	        oflags = O_RDONLY ;
-	        if (lip->f.zerospeed || lip->f.zeroentry)
+	        if (lip->fl.zerospeed || lip->fl.zeroentry)
 	            oflags = O_RDWR ;
 
 	        rs = procmsfile(pip,nnp,&entries,ofp,msfn,oflags,msflags) ;
@@ -1539,7 +1539,7 @@ int		oflags ;
 
 /* loop through any specified nodes */
 
-	    if (! lip->f.all) {
+	    if (! lip->fl.all) {
 	        cchar	*cp ;
 
 	        for (i = 0 ; vecstr_get(nnp,i,&cp) >= 0 ; i += 1) {
@@ -1608,7 +1608,7 @@ int		oflags ;
 
 /* zero out nodes if requested */
 
-	    if ((rs >= 0) && (lip->f.zerospeed || lip->f.zeroentry)) {
+	    if ((rs >= 0) && (lip->fl.zerospeed || lip->fl.zeroentry)) {
 	        MSFILE_ENT	e, ez ;
 
 #if	CF_DEBUG
@@ -1616,7 +1616,7 @@ int		oflags ;
 	            debugprintf("b_msinfo: zeroing speed\n") ;
 #endif
 
-	        if (lip->f.zeroentry) {
+	        if (lip->fl.zeroentry) {
 	            memset(&ez,0,sizeof(MSFILE_ENT)) ;
 		}
 
@@ -1625,10 +1625,10 @@ int		oflags ;
 
 	            e = *ep ;
 	            e.speed = 0 ;
-	            if (lip->f.zerospeed) {
+	            if (lip->fl.zerospeed) {
 	                rs = msfile_update(&ms,pip->daytime,&e) ;
 
-	            } else if (lip->f.zeroentry) {
+	            } else if (lip->fl.zeroentry) {
 	                rs = msfile_write(&ms,pip->daytime,
 	                    e.nodename,-1,&ez) ;
 		    }
@@ -1672,9 +1672,9 @@ cchar		name[] ;
 	    rs = vecobj_add(elp,&e) ;
 
 	} else if ((rs != SR_NOANODE) && 
-	    (! pip->f.nodeonly)) {
+	    (! pip->fl.nodeonly)) {
 
-	    if (lip->f.age) {
+	    if (lip->fl.age) {
 	        shio_printf(ofp,"\n") ;
 	    } else {
 	        shio_printf(ofp,"%-14s *NA*\n",name) ;
@@ -1701,21 +1701,21 @@ VECOBJ		*elp ;
 	int		i, j ;
 	int		wlen = 0 ;
 
-	if ((! lip->f.age) && (! lip->f.geekout) && (! pip->f.nodeonly)) {
-	    if (! lip->f.nh)
+	if ((! lip->fl.age) && (! lip->fl.geekout) && (! pip->fl.nodeonly)) {
+	    if (! lip->fl.nh)
 	        shio_printf(ofp,
 	            "NODE           SPEED NCPU"
 	            "  1m   5m  15m  NPROC   PMT    PMA MU  UPDATED\n") ;
 	}
 
-	if (lip->f.age)
+	if (lip->fl.age)
 	    pip->daytime = time(NULL) ;
 
 	j = 0 ;
 	for (i = 0 ; vecobj_get(elp,i,&ep) >= 0 ; i += 1) {
 	    if (ep != NULL) {
 
-	        if (lip->f.age) {
+	        if (lip->fl.age) {
 	            rs = printnodeage(pip,ofp,ep) ;
 	        } else {
 	            rs = printnode(pip,ofp,ep) ;
@@ -1768,7 +1768,7 @@ MSFILE_ENT	*ep ;
 
 	if (ep == NULL) return SR_FAULT ;
 
-	if (lip->f.geekout > 0) {
+	if (lip->fl.geekout > 0) {
 
 	    wl += shio_printf(ofp,"%s\n",ep->nodename) ;
 
@@ -1789,7 +1789,7 @@ MSFILE_ENT	*ep ;
 	    wl += shio_printf(ofp,"  update=%s\n",
 	        timestr_logz(t,timebuf)) ;
 
-	} else if (pip->f.nodeonly) {
+	} else if (pip->fl.nodeonly) {
 
 	    wl += shio_printf(ofp,"%s\n",ep->nodename) ;
 
