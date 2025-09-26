@@ -71,7 +71,6 @@
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<getourenv.h>
-#include	<ucmallreg.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -507,7 +506,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 	pip->verboselevel = 1 ;
 	pip->daytime = time(nullptr) ;
-	pip->f.logprog = true ;
+	pip->fl.logprog = true ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -829,7 +828,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* version */
@@ -1076,7 +1075,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -1255,16 +1254,16 @@ static int procopts(PI *pip,KEYOPT *kop,paramopt *app)
 	                    if (! lip->final.sort) {
 	                        lip->final.sort = true ;
 	                        lip->have.sort = true ;
-	                        lip->f.sort = true ;
+	                        lip->fl.sort = true ;
 	                        if (vl > 0) {
 	                            int	ch = tolc(*vp & 0xff) ;
 	                            switch (ch) {
 	                            case '0':
 	                            case 'n':
-	                                lip->f.sort = false ;
+	                                lip->fl.sort = false ;
 	                                break ;
 	                            case 'r':
-	                                lip->f.sortrev = true ;
+	                                lip->fl.sortrev = true ;
 	                                break ;
 	                            } /* end switch */
 	                        }
@@ -1288,7 +1287,7 @@ static int procopts(PI *pip,KEYOPT *kop,paramopt *app)
 	                            lip->final.clen = true ;
 	                            lip->have.clen = true ;
 	                            rs = optvalue(vp,vl) ;
-	                            lip->f.clen = (rs > 0) ;
+	                            lip->fl.clen = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1590,7 +1589,7 @@ static int procmailbox(PI *pip,SHIO *ofp,cchar *mbp,int mbl)
 
 	strdcpy1w(mbfname,MAXPATHLEN,mbp,mbl) ;
 
-	if (! lip->f.clen) mbopts |= MAILBOX_ONOCLEN ;
+	if (! lip->fl.clen) mbopts |= MAILBOX_ONOCLEN ;
 
 	if ((rs = mailbox_open(&mb,mbfname,mbopts)) >= 0) {
 	    MBCACHE	mc ;
@@ -2064,7 +2063,7 @@ static int locinfo_start(LOCINFO *lip,PI *pip)
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
 	lip->pagesize = getpagesize() ;
-	lip->f.clen = true ;
+	lip->fl.clen = true ;
 
 	if ((rs = vecstr_start(&lip->stores,0,0)) >= 0) {
 	    VECPSTR	*flp = &lip->mbfnames ;
