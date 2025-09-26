@@ -493,7 +493,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -515,12 +515,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* force */
 	                    case 'f':
-	                        lip->f.force = TRUE ;
+	                        lip->fl.force = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.force = (rs > 0) ;
+	                                lip->fl.force = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -677,7 +677,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid argument (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -850,7 +850,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	        rs1 = shio_close(afp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    fmt = "%s: argument file inaccessible (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
 	            shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -893,7 +893,7 @@ static int procname(PROGINFO *pip,cchar *name)
 	    rs = uc_unlinkshm(np) ;
 	}
 
-	f = ((! pip->f.quiet) && (rs < 0)) ;
+	f = ((! pip->fl.quiet) && (rs < 0)) ;
 	if ((pip->debuglevel > 0) || f) {
 	    shio_printf(pip->efp,"%s: name=%s (%d)\n",
 	        pip->progname,np,rs) ;
