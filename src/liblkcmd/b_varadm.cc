@@ -767,7 +767,7 @@ void	*contextp ;
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -1046,7 +1046,7 @@ void	*contextp ;
 
 	        shio_close(afp) ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,
 	                "%s: argument file inaccessible (%d)\n",
 	                pip->progname,rs) ;
@@ -1074,7 +1074,7 @@ done:
 
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        break ;
@@ -1661,8 +1661,8 @@ struct locinfo	*lip ;
 	    return SR_FAULT ;
 
 #if	CF_PERCACHE
-	if (lip->f.percache && lip->f.nocache) {
-	    lip->f.percache = FALSE ;
+	if (lip->fl.percache && lip->fl.nocache) {
+	    lip->fl.percache = FALSE ;
 	    rs1 = percache_finish(&pc) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1706,8 +1706,8 @@ int		f_nocache ;
 	if (lip == NULL)
 	    return SR_FAULT ;
 
-	lip->f.init = f_init ;
-	lip->f.nocache = f_nocache ;
+	lip->fl.init = f_init ;
+	lip->fl.nocache = f_nocache ;
 	return 0 ;
 }
 /* end subroutine (locinfo_flags) */
@@ -1843,7 +1843,7 @@ int		f_init ;
 	if (f_newfile) {
 
 	    pcp->nusers = 0 ;
-	    pcp->f.nusers = FALSE ;
+	    pcp->fl.nusers = FALSE ;
 	    pcp->state[pertype_nusers].last = 0 ;
 	    pcp->utfname[0] = '\0' ;
 	    if (utfname != NULL)
@@ -1988,9 +1988,9 @@ struct proginfo	*pip ;
 	    lip->ti_nusers = pip->daytime ;
 
 #if	CF_PERCACHE
-	    if (! lip->f.percache) {
-		int f_init = lip->f.init ;
-		lip->f.percache = TRUE ;
+	    if (! lip->fl.percache) {
+		int f_init = lip->fl.init ;
+		lip->fl.percache = TRUE ;
 		rs = percache_start(&pc,pip->daytime,lip->utfname,f_init) ;
 	    }
 
@@ -2033,9 +2033,9 @@ struct proginfo	*pip ;
 	    lip->ti_nprocs = pip->daytime ;
 
 #if	CF_PERCACHE
-	    if (! lip->f.percache) {
-		int f_init = lip->f.init ;
-		lip->f.percache = TRUE ;
+	    if (! lip->fl.percache) {
+		int f_init = lip->fl.init ;
+		lip->fl.percache = TRUE ;
 		rs = percache_start(&pc,pip->daytime,lip->utfname,f_init) ;
 	    }
 
