@@ -65,7 +65,6 @@
 #include	<field.h>
 #include	<char.h>
 #include	<ids.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -644,7 +643,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* get-file */
 	                case argopt_gf:
-	                    lip->f.query = TRUE ;
+	                    lip->fl.query = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl)
@@ -728,7 +727,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -766,7 +765,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* get a variable by name */
 	                    case 'g':
 	                    case 'n':
-	                        lip->f.query = TRUE ;
+	                        lip->fl.query = TRUE ;
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
@@ -782,12 +781,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'a':
 	                        lip->have.list = TRUE ;
 	                        lip->final.list = TRUE ;
-	                        lip->f.list = TRUE ;
+	                        lip->fl.list = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.list = (rs > 0) ;
+	                                lip->fl.list = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -815,12 +814,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 's':
 	                        lip->have.set = TRUE ;
 	                        lip->final.set = TRUE ;
-	                        lip->f.set = TRUE ;
+	                        lip->fl.set = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.set = (rs > 0) ;
+	                                lip->fl.set = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -829,12 +828,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'u':
 	                        lip->have.uniq = TRUE ;
 	                        lip->final.uniq = TRUE ;
-	                        lip->f.uniq = TRUE ;
+	                        lip->fl.uniq = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.uniq = (rs > 0) ;
+	                                lip->fl.uniq = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -970,7 +969,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
 	    debugprintf("b_sysvar: f_flist=%u f_list=%u f_set=%u f_query=%u\n",
-	        lip->final.list,lip->f.list,lip->f.set,lip->f.query) ;
+	        lip->final.list,lip->fl.list,lip->fl.set,lip->fl.query) ;
 #endif
 
 /* continue */
@@ -993,9 +992,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* load the system default variables if we are in "set" mode */
 
-	    if ((rs >= 0) && ((n > 0) || lip->f.set)) {
+	    if ((rs >= 0) && ((n > 0) || lip->fl.set)) {
 
-	        lip->f.set = TRUE ;
+	        lip->fl.set = TRUE ;
 	        if ((rs = procsysdefs(pip)) >= 0) {
 	            rs = procset(pip,dbname) ;
 		}
@@ -1014,8 +1013,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	    } /* end if (set mode) */
 
-	    f = (lip->f.list || lip->f.query || lip->f.audit) ;
-	    if ((rs >= 0) && ((! lip->f.set) || f)) {
+	    f = (lip->fl.list || lip->fl.query || lip->fl.audit) ;
+	    if ((rs >= 0) && ((! lip->fl.set) || f)) {
 	        if (rs >= 0) {
 	            cchar	*ofn = ofname ;
 	            cchar	*dfn = dbname ;
@@ -1038,7 +1037,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
 	    ex = mapex(mapexs,rs) ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        shio_printf(pip->efp,
 	            "%s: could not perform function (%d)\n",
 	            pip->progname,rs) ;
@@ -1191,10 +1190,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.set) {
 	                        lip->have.set = TRUE ;
 	                        lip->final.set = TRUE ;
-	                        lip->f.set = TRUE ;
+	                        lip->fl.set = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.set = (rs > 0) ;
+	                            lip->fl.set = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1203,10 +1202,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.list) {
 	                        lip->have.list = TRUE ;
 	                        lip->final.list = TRUE ;
-	                        lip->f.list = TRUE ;
+	                        lip->fl.list = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.list = (rs > 0) ;
+	                            lip->fl.list = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1224,10 +1223,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.audit) {
 	                        lip->have.audit = TRUE ;
 	                        lip->final.audit = TRUE ;
-	                        lip->f.audit = TRUE ;
+	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.audit = (rs > 0) ;
+	                            lip->fl.audit = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1236,10 +1235,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.star) {
 	                        lip->have.star = TRUE ;
 	                        lip->final.star = TRUE ;
-	                        lip->f.star = TRUE ;
+	                        lip->fl.star = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.star = (rs > 0) ;
+	                            lip->fl.star = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1298,7 +1297,7 @@ cchar		*gfn ;
 	                cp = aip->argv[ai] ;
 	                if (cp[0] != '\0') {
 	                    pan += 1 ;
-	                    lip->f.query = TRUE ;
+	                    lip->fl.query = TRUE ;
 	                    rs = locinfo_qkey(lip,cp,-1) ;
 	                }
 	            }
@@ -1327,7 +1326,7 @@ cchar		*gfn ;
 	                if ((cl = sfskipwhite(lbuf,len,&cp)) > 0) {
 	                    if (cp[0] != '#') {
 	                        pan += 1 ;
-	                        lip->f.query = TRUE ;
+	                        lip->fl.query = TRUE ;
 	                        rs = locinfo_qkey(lip,cp,cl) ;
 	                    }
 	                }
@@ -1496,7 +1495,7 @@ static int procsysdef(PROGINFO *pip,cchar fname[])
 	        vecstr_finish(&lvars) ;
 	    } /* end if (lvars) */
 	} else {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 		cchar	*pn = pip->progname ;
 		cchar	*fmt = "%s: inaccessible fname=%s (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,fname,rs1) ;
@@ -1523,7 +1522,7 @@ static int process(PROGINFO *pip,cchar dbname[],void *ofp,cchar gfname[])
 
 	if ((rs = var_open(&sv,dbname)) >= 0) {
 
-	    if (lip->f.audit) {
+	    if (lip->fl.audit) {
 
 	        rs = var_audit(&sv) ;
 
@@ -1539,7 +1538,7 @@ static int process(PROGINFO *pip,cchar dbname[],void *ofp,cchar gfname[])
 
 	    } /* end if */
 
-	    if ((rs >= 0) && lip->f.list) {
+	    if ((rs >= 0) && lip->fl.list) {
 
 	        rs = procoutall(pip,&sv,ofp) ;
 
@@ -1551,7 +1550,7 @@ static int process(PROGINFO *pip,cchar dbname[],void *ofp,cchar gfname[])
 
 	    } /* end if (dump-file mode) */
 
-	    if ((rs >= 0) && lip->f.query) {
+	    if ((rs >= 0) && lip->fl.query) {
 	        VECSTR	*qlp = &lip->queries ;
 	        int	i ;
 	        cchar	*kp ;
@@ -1800,7 +1799,7 @@ static int procqkey(PROGINFO *pip,void *ofp,VAR *vfp,cchar *kp,int kl)
 	        shio_printf(pip->efp,"%s: notfound=%s\n",
 	            pip->progname,kp) ;
 
-	    if (lip->f.star && (n == 0))
+	    if (lip->fl.star && (n == 0))
 	        rs = shio_printf(ofp,"*") ;
 
 	    if (rs >= 0)
@@ -1979,10 +1978,10 @@ static int procvarfile(PROGINFO *pip,cchar *fnp,int fnl) noex {
 	                if ((kl > 0) && (! hasweird(kp,kl))) {
 
 	                    rs1 = SR_OK ;
-	                    if (lip->f.uniq)
+	                    if (lip->fl.uniq)
 	                        rs1 = hdbstr_fetch(varp,kp,kl,NULL,NULL) ;
 
-	                    if ((rs1 == SR_NOTFOUND) || (! lip->f.uniq)) {
+	                    if ((rs1 == SR_NOTFOUND) || (! lip->fl.uniq)) {
 
 	                        vp = vbuf ;
 	                        vl = 0 ;
@@ -2033,7 +2032,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 
 	if ((rs = hdbstr_start(&lip->vars,DEFNVARS)) >= 0) {
 	    if ((rs = vecstr_start(&lip->queries,10,0)) >= 0) {
-	        lip->f.uniq = TRUE ;
+	        lip->fl.uniq = TRUE ;
 	    }
 	    if (rs < 0)
 	        hdbstr_finish(&lip->vars) ;
@@ -2121,10 +2120,10 @@ static int locinfo_addvar(LOCINFO *lip,cchar *cp,int cl)
 	}
 
 	rs1 = SR_NOTFOUND ;
-	if (lip->f.uniq)
+	if (lip->fl.uniq)
 	    rs1 = hdbstr_fetch(varp,kp,kl,NULL,NULL) ;
 
-	if ((rs1 == SR_NOTFOUND) || (! lip->f.uniq)) {
+	if ((rs1 == SR_NOTFOUND) || (! lip->fl.uniq)) {
 	    c += 1 ;
 	    rs = hdbstr_add(varp,kp,kl,vp,vl) ;
 	}
