@@ -452,7 +452,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	pip->verboselevel = 1 ;
 	pip->daytime = time(NULL) ;
 
-	pip->f.logprog = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -758,7 +758,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -767,23 +767,23 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'a':
-	                        lip->f.allusers = TRUE ;
+	                        lip->fl.allusers = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.allusers = (rs > 0) ;
+	                                lip->fl.allusers = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 	                    case 'n':
-	                        lip->f.nodel = TRUE ;
+	                        lip->fl.nodel = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.nodel = (rs > 0) ;
+	                                lip->fl.nodel = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1180,16 +1180,16 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
 	                    if (! lip->final.sort) {
 	                        lip->final.sort = TRUE ;
 	                        lip->have.sort = TRUE ;
-	                        lip->f.sort = TRUE ;
+	                        lip->fl.sort = TRUE ;
 	                        if (vl > 0) {
 	                            int	ch = tolc(*vp & 0xff) ;
 	                            switch (ch) {
 	                            case '0':
 	                            case 'n':
-	                                lip->f.sort = FALSE ;
+	                                lip->fl.sort = FALSE ;
 	                                break ;
 	                            case 'r':
-	                                lip->f.sortrev = TRUE ;
+	                                lip->fl.sortrev = TRUE ;
 	                                break ;
 	                            } /* end switch */
 	                        }
@@ -1222,10 +1222,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
 	                    if (! lip->final.allusers) {
 	                        lip->final.allusers = TRUE ;
 	                        lip->have.allusers = TRUE ;
-	                        lip->f.allusers = TRUE ;
+	                        lip->fl.allusers = TRUE ;
 	                        if (vl) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.allusers = (rs > 0) ;
+	                            lip->fl.allusers = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1234,10 +1234,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
 	                    if (! lip->final.nodel) {
 	                        lip->final.nodel = TRUE ;
 	                        lip->have.nodel = TRUE ;
-	                        lip->f.nodel = TRUE ;
+	                        lip->fl.nodel = TRUE ;
 	                        if (vl) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.nodel = (rs > 0) ;
+	                            lip->fl.nodel = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1480,7 +1480,7 @@ static int procmailusers(PROGINFO *pip,PARAMOPT *app)
 	    debugprintf("b_mailexpire/procmailusers: ent\n") ;
 #endif
 
-	if (lip->f.allusers) {
+	if (lip->fl.allusers) {
 	    rs = procmailusers_all(pip) ;
 	    c += rs ;
 	} else {
@@ -1790,7 +1790,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            rs1 = shio_close(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	                shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1811,7 +1811,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    rs1 = procout_end(pip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        fmt = "%s: inaccessible output (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,rs) ;
 	        shio_printf(pip->efp,"%s: ofile=%s\n",pn,ofn) ;
@@ -2013,7 +2013,7 @@ static int procmailmsg(PROGINFO *pip,MBCACHE *mcp,int mi,int to)
 	    if (t == 0) t = times[0] ; /* ENV */
 	    if ((dt-t) >= to) {
 	        c += 1 ;
-	        if (! lip->f.nodel) {
+	        if (! lip->fl.nodel) {
 	            rs = mbcache_msgdel(mcp,mi,TRUE) ;
 	        }
 	    }
