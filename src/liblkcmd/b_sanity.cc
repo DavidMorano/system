@@ -619,7 +619,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -671,7 +671,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 
 /* line-buffered */
 	                    case 'u':
-	                        pip->f.bufline = true ;
+	                        pip->fl.bufline = true ;
 	                        break ;
 
 /* verbose mode */
@@ -817,7 +817,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	    shio_printf(pip->efp,"%s: to_open=%d\n",pn,pip->to_open) ;
 	    shio_printf(pip->efp,"%s: to_read=%d\n",pn,pip->to_read) ;
 	    }
-	    shio_printf(pip->efp,"%s: pass=%u\n",pn,lip->f.pass) ;
+	    shio_printf(pip->efp,"%s: pass=%u\n",pn,lip->fl.pass) ;
 	}
 
 	if (pip->to_open == 0)
@@ -826,7 +826,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	if (pip->to_read == 0)
 	    pip->to_read = 1 ;
 
-	if (lip->f.pass && (! lip->have.geekout)) lip->f.geekout = false ;
+	if (lip->fl.pass && (! lip->have.geekout)) lip->fl.geekout = false ;
 
 /* linewidth (for geek-out mode -- the default) */
 
@@ -851,15 +851,15 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	    debugprintf("b_sanity: linelen=%u\n",lip->linelen) ;
 	    debugprintf("b_sanity: to_open=%d\n",pip->to_open) ;
 	    debugprintf("b_sanity: to_read=%d\n",pip->to_read) ;
-	    debugprintf("b_sanity: f_lbufline=%u\n",pip->f.bufline) ;
-	    debugprintf("b_sanity: geekout=%u\n",lip->f.geekout) ;
-	    debugprintf("b_sanity: pass=%u\n",lip->f.pass) ;
+	    debugprintf("b_sanity: f_lbufline=%u\n",pip->fl.bufline) ;
+	    debugprintf("b_sanity: geekout=%u\n",lip->fl.geekout) ;
+	    debugprintf("b_sanity: pass=%u\n",lip->fl.pass) ;
 	}
 #endif
 
 	if ((rs >= 0) && (pip->debuglevel > 0)) {
 	    cchar	*pn = pip->progname ;
-	    shio_printf(pip->efp,"%s: geekout=%u\n",pn,lip->f.geekout) ;
+	    shio_printf(pip->efp,"%s: geekout=%u\n",pn,lip->fl.geekout) ;
 	    shio_printf(pip->efp,"%s: linelen=%d\n",pn,lip->linelen) ;
 	}
 
@@ -967,7 +967,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	lip->indent = DEFINDENT ;
 	lip->to = -1 ;
 
-	lip->f.geekout = true ;
+	lip->fl.geekout = true ;
 
 	return rs ;
 }
@@ -1099,18 +1099,18 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case progopt_sanity:
 	                case progopt_geekout:
 	                    lip->have.geekout = true ;
-	                    lip->f.geekout = true ;
+	                    lip->fl.geekout = true ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.geekout = (rs > 0) ;
+	                        lip->fl.geekout = (rs > 0) ;
 	                    }
 	                    break ;
 	                case progopt_pass:
 	                    lip->have.pass = true ;
-	                    lip->f.pass = true ;
+	                    lip->fl.pass = true ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.pass = (rs > 0) ;
+	                        lip->fl.pass = (rs > 0) ;
 	                    }
 	                    break ;
 	                } /* end switch */
@@ -1154,7 +1154,7 @@ const char	*afn ;
 	    int		cl ;
 	    cchar	*cp ;
 
-	    if (pip->f.bufline)
+	    if (pip->fl.bufline)
 	        shio_control(ofp,SHIO_CSETBUFLINE,true) ;
 
 /* go through the loops */
@@ -1298,7 +1298,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 		int	f_zero ;
 
 #if	CF_LINEBUFIN
-	        if (pip->f.bufline)
+	        if (pip->fl.bufline)
 	            shio_control(ofp,SHIO_CSETBUFLINE,true) ;
 #endif
 
@@ -1318,7 +1318,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 	            if (len > 0) {
 	                cp = lbuf ;
 	                cl = len ;
-	                if ((rs >= 0) && lip->f.geekout) {
+	                if ((rs >= 0) && lip->fl.geekout) {
 	                    cp = geekbuf ;
 	                    cl = mkgeekout(pip,geekbuf,llen,lbuf,len) ;
 	                }
