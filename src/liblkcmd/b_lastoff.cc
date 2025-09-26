@@ -499,7 +499,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -514,7 +514,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* line-buffered */
 	                    case 'u':
-	                        pip->f.bufline = TRUE ;
+	                        pip->fl.bufline = TRUE ;
 	                        break ;
 
 /* verbose mode */
@@ -751,7 +751,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    int		cl ;
 	    cchar	*cp ;
 
-	    if (pip->f.bufline) {
+	    if (pip->fl.bufline) {
 	        shio_control(ofp,SHIO_CSETBUFLINE,0) ;
 	    }
 
@@ -809,7 +809,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            rs1 = shio_close(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                shio_printf(pip->efp,fmt,rs) ;
 	                shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -868,7 +868,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 	    const int	llen = LINEBUFLEN ;
 
 #if	CF_LINEBUFIN
-	    if (pip->f.bufline)
+	    if (pip->fl.bufline)
 	        shio_control(&infile,SHIO_CSETBUFLINE,0) ;
 #endif
 
@@ -901,7 +901,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 	            }
 #endif /* CF_DEBUG */
 
-	            if (pip->f.bufline) {
+	            if (pip->fl.bufline) {
 	                lb[plbi].buf[lb[plbi].len] = '\0' ;
 	                rs = shio_printf(ofp,"%s",lb[plbi].buf) ;
 	            } else {
