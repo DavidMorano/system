@@ -654,12 +654,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_fg:
 			    lip->have.fg = TRUE ;
 			    lip->final.fg = TRUE ;
-			    lip->f.fg = TRUE ;
+			    lip->fl.fg = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 				    rs = optbool(avp,avl) ;
-	                            lip->f.fg = (rs > 0) ;
+	                            lip->fl.fg = (rs > 0) ;
 	                        }
 	                    }
 			    break ;
@@ -694,7 +694,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* disable interval */
 	                case argopt_disable:
-	                    pip->f.disable = TRUE ;
+	                    pip->fl.disable = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
@@ -746,7 +746,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -768,7 +768,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* daemon mode */
 	                    case 'd':
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -920,10 +920,10 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
 
 	if (pip->intrun >= 0)
-	    pip->f.intrun = TRUE ;
+	    pip->fl.intrun = TRUE ;
 
 	if (pip->intpoll >= 0)
-	    pip->f.intpoll = TRUE ;
+	    pip->fl.intpoll = TRUE ;
 
 /* continue with prepatory initialization */
 
@@ -965,11 +965,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* hack */
 
-	co.f.lockinfo = lip->f.lockinfo ;
+	co.f.lockinfo = lip->fl.lockinfo ;
 
 /* find anything that we do not already have */
 
-	if ((rs >= 0) && pip->f.daemon && (pip->pidfname[0] == '\0')) {
+	if ((rs >= 0) && pip->fl.daemon && (pip->pidfname[0] == '\0')) {
 	    char	cname[MAXNAMELEN+1] ;
 	    snsds(cname,MAXNAMELEN,pip->nodename,PIDFNAME) ;
 	    mkpath3(tmpfname,pip->pr,RUNDNAME,cname) ;
@@ -996,12 +996,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("b_unlinkd: daemon=%u logging=%u\n",
-	        pip->f.daemon,pip->have.logfname) ;
+	        pip->fl.daemon,pip->have.logfname) ;
 #endif
 
 /* log ID */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 	    char	logidbuf[LOGIDLEN+1] ;
 
 	    mkpath3(tmpfname,pip->pr,VARDNAME,SERIALFNAME) ;
@@ -1030,7 +1030,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* logging is normally only for daemon mode */
 
-	if ((rs >= 0) && (pip->f.daemon || pip->have.logfname)) {
+	if ((rs >= 0) && (pip->fl.daemon || pip->have.logfname)) {
 
 /* log file */
 
@@ -1054,12 +1054,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* can we open the MS file? */
 
-	    if ((rs >= 0) && pip->f.daemon) {
+	    if ((rs >= 0) && pip->fl.daemon) {
 	        LFM	pidlock ;
 	        pid_t	pid = 0 ;
 	        int	cs ;
 
-		if (! lip->f.fg) {
+		if (! lip->fl.fg) {
 	            if (pip->open.logprog) logfile_flush(&pip->lh) ;
 		    if (pip->efp != NULL) shio_flush(pip->efp) ;
 	            rs = uc_fork() ;
@@ -1164,7 +1164,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	            } /* end if (close-all-files) */
 
-		    if ((rs >= 0) && (! lip->f.fg)) {
+		    if ((rs >= 0) && (! lip->fl.fg)) {
 			if (pip->pid != sinfo.sid) rs = u_setsid() ;
 		    }
 
@@ -1261,10 +1261,10 @@ done:
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
 	        debugprintf("b_unlinkd: daemon=%u child=%u\n",
-	            pip->f.daemon,f_child) ;
+	            pip->fl.daemon,f_child) ;
 #endif
 
-	    if ((! pip->f.daemon) || f_child) {
+	    if ((! pip->fl.daemon) || f_child) {
 
 	        shio_printf(pip->efp, "%s: MS updates=%u\n",
 	            pip->progname,rs) ;
@@ -1277,7 +1277,7 @@ done:
 	    case SR_ALREADY:
 	    case SR_AGAIN:
 		ex = EX_MUTEX ;
-	        if ((! pip->f.quiet) && (pip->efp != NULL)) {
+	        if ((! pip->fl.quiet) && (pip->efp != NULL)) {
 	            shio_printf(pip->efp,
 	                "%s: existing lock (%d)\n",
 	                pip->progname,rs) ;
@@ -1289,7 +1289,7 @@ done:
 	        break ;
 	    default:
 		ex = mapex(mapexs,rs) ;
-	        if ((! pip->f.quiet) && (pip->efp != NULL)) {
+	        if ((! pip->fl.quiet) && (pip->efp != NULL)) {
 	            shio_printf(pip->efp,
 	                "%s: could not perform update (%d)\n",
 	                pip->progname,rs) ;
@@ -1308,7 +1308,7 @@ done:
 	    }
 	} /* end if */
 
-	if ((pip->open.logprog && (! pip->f.daemon)) || f_child) {
+	if ((pip->open.logprog && (! pip->fl.daemon)) || f_child) {
 	    logfile_printf(&pip->lh,"exiting ex=%u (%d)",
 	        ex,rs) ;
 	}
@@ -1326,7 +1326,7 @@ done:
 /* early return thing */
 retearly:
 	if (pip->debuglevel > 0) {
-	    if (pip->f.daemon) {
+	    if (pip->fl.daemon) {
 	        shio_printf(pip->efp,"%s: (%s) exiting ex=%u (%d)\n",
 	            pip->progname,((f_child) ? "child" : "parent"),ex,rs) ;
 	    } else {
@@ -1439,10 +1439,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 			if (! lip->final.lockinfo) {
 			    c += 1 ;
 	                    lip->have.lockinfo = TRUE ;
-	                    lip->f.lockinfo = TRUE ;
+	                    lip->fl.lockinfo = TRUE ;
 	                    if (vl > 0) {
 				rs = optbool(vp,vl) ;
-	                        lip->f.lockinfo = (rs > 0) ;
+	                        lip->fl.lockinfo = (rs > 0) ;
 			    }
 			}
 	                break ;
@@ -1535,7 +1535,7 @@ LFM		*lp ;
 
 /* get some updated information */
 
-	if (pip->f.disable) {
+	if (pip->fl.disable) {
 	    e.flags |= MSFLAG_MDISABLED ;
 	    if (pip->intdis > 0)
 	        e.dtime = pip->daytime + pip->intdis ;
@@ -1551,7 +1551,7 @@ LFM		*lp ;
 	        lw = pip->intrun - (pip->daytime - ti_start) ;
 	        if (lw <= 0) break ;
 
-	        if (pip->f.daemon) {
+	        if (pip->fl.daemon) {
 
 	            if (pip->have.pidfname && (lp != NULL)) {
 	                LFM_CHECK	ci ;
@@ -1649,7 +1649,7 @@ LFM		*lp ;
 
 	        c += 1 ;
 
-	        if (! pip->f.daemon)
+	        if (! pip->fl.daemon)
 	            break ;
 
 /* sleep for daemon mode */
@@ -2045,10 +2045,10 @@ const char	*cfname ;
 
 	    expcook_add(&op->cooks,"U",pip->username,-1) ;
 
-	    op->f.p = TRUE ;
+	    op->fl.p = TRUE ;
 	    rs = config_read(op) ;
 
-	    op->f.p = (rs >= 0) ;
+	    op->fl.p = (rs >= 0) ;
 	    if (rs < 0)
 	        goto bad2 ;
 
@@ -2084,7 +2084,7 @@ struct config	*op ;
 	int	rs = SR_NOTOPEN ;
 
 
-	if (op->f.p) {
+	if (op->fl.p) {
 	    if ((rs = paramfile_check(&op->p,pip->daytime)) > 0)
 	        rs = config_read(op) ;
 	}
@@ -2101,7 +2101,7 @@ struct config	*op ;
 	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
 
-	if (op->f.p) {
+	if (op->fl.p) {
 
 	    rs1 = expcook_finish(&op->cooks) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -2132,10 +2132,10 @@ struct config	*op ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("config_read: f_p=%u\n",op->f.p) ;
+	    debugprintf("config_read: f_p=%u\n",op->fl.p) ;
 #endif
 
-	if (! op->f.p) goto ret0 ;
+	if (! op->fl.p) goto ret0 ;
 
 	pr = pip->pr ;
 	    rs = SR_OK ;
@@ -2145,17 +2145,17 @@ struct config	*op ;
 	        switch (i) {
 
 	        case param_msfile:
-	            if (pip->f.msu_msfile)
+	            if (pip->fl.msu_msfile)
 	                rs1 = TRUE ;
 	            break ;
 
 	        case param_intrun:
-	            if (pip->f.msu_intrun)
+	            if (pip->fl.msu_intrun)
 	                rs1 = TRUE ;
 	            break ;
 
 	        case param_intpoll:
-	            if (pip->f.msu_intpoll)
+	            if (pip->fl.msu_intpoll)
 	                rs1 = TRUE ;
 	            break ;
 
